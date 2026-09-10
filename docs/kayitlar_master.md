@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T18:23:14.922841+00:00
-total_compiled_files: 106
-source_commit: 88ba0a86
+compiled_at: 2026-09-09T12:24:57.408053+00:00
+total_compiled_files: 184
+source_commit: 59eaa47f6
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -648,6 +648,559 @@ Bunlarda EN = TR yazılır (migration adım 2 bunu yapar); çeviri **yanlış** 
 
 
 ---
+# FILE: docs\audits\arac-envanteri-2026-09-07.md
+
+# Araç Envanteri — 2026-09-07
+
+> Kayıt: REC-180 · Şerit: OPS · Ölçüm: 2026-09-07, ağaç origin/master a248e0689 · Yöntem: 5 sonnet
+> tarama + 1 opus çürütme (curutme.md) · Bu belge cetvelin (`docs/standards/arac-envanteri-standard.md`)
+> **ilk envanteridir**; sonraki üretim `scripts/hijyen/arac-envanteri.cjs` (REC-185) — o betik
+> koşana kadar bu belge elle derlenmiştir ve AXIOM 1 gereği bu haliyle "var" sayılır.
+
+---
+
+## 1 · Recep tek sayfası
+
+| Tür | Toplam | KAL | ÖLÜ DOĞRULANDI | KARANTİNA | ÖLÇÜLEMEDİ |
+|---|---|---|---|---|---|
+| hook (`.claude/hooks/*.cjs`) | 14 | 14 | 0 | 0 | 0 |
+| betik (`scripts/**`) | 119 | 66 | 52 | 1 (ek, aşağıda) | 1 |
+| skill (satır = ad×ağaç) | 64 | 40 | — | 0 | — (24 ENVANTER-DIŞI) |
+| githook (`.githooks/*`) | 5 | 5 | 0 | 0 | 0 |
+| ci (`.github/workflows/*.yml`) | 29 | 20 | 9 | 0 | 0 (+1 GitHub-hayalet, ayrı) |
+| cetvel (`docs/standards/*.md`) | 67 | 48 | — | — | — (19 KAL-KAPISIZ) |
+
+**Düzeltmeler / önemli sapmalar:**
+- **"27 dosya" hook değil:** `.claude/hooks/` içindeki 27 dosyanın **14'ü** gerçek kanca (`.cjs`,
+  settings.json'a bağlı veya kütüphane), **13'ü** companion `.md` açıklama dosyası — cetvel §1
+  gereği companion **araç değildir, envantere girmez**. "27 kanca" denirse evren yanlıştır.
+- **Sahip dağılımı AXIOM 2 sonrası:** betiklerde ham tarama ALTYAPI 29 · OPS 10 · URUN 3 ·
+  URUN-KATALOG 6 · **SAHİPSİZ 71** bulmuştu. AXIOM 2 ("sahipsiz araç yoktur") uygulanınca 71 satır
+  **OPS**'a yazılır (her birine en yakın şerit "devir adayı" notuyla) → nihai: ALTYAPI 29 ·
+  **OPS 81** (10 asıl + 71 devir-adaylı) · URUN 3 · URUN-KATALOG 6. Cetvellerde aynı mekanik: 57
+  sahipsiz satır OPS'a yazıldı (nihai OPS 59, ALTYAPI 5, URUN 3).
+- **CI'da `disabled_manually` olanlar (8):** `jules-a11y.yml`, `jules-dependency-update.yml`,
+  `jules-i18n-sync.yml`, `jules-lint-fix.yml`, `jules-performance.yml`, `jules-security-audit.yml`,
+  `jules-test-coverage.yml`, `ai-auto-repair.yml` — GitHub tarafında elle KAPATILMIŞ, `workflow_dispatch`
+  bile çalışmaz. Sonnet `ai-auto-repair.yml`'i "skipped" görüp KAL saymıştı; çürütme bunu düzeltti
+  (bağlı olduğu `workflow_run` tetiği kapalı workflow'da boş kayıt üretir, bu "çalışıyor" değildir).
+- **En önemli 3 bulgu:**
+  1. **`scripts/generate/generate-sitemap.mjs` — ÖLÜ + TEHLİKELİ.** Halefi `src/app/sitemap.ts`
+     zaten üretimde; bu betik hem ölü hem yanlış kod içeriyor (curutme notu). Bu PR'da
+     `scripts/archive/`'e taşınarak **KARANTİNA**ya alındı — silme yine Recep kapısı.
+  2. **"no tests" fail-open ana dizin sınıfı:** `scripts/db/checks/` altındaki beş `.py` betik
+     (`check_category_id`, `check_product_fields`, `check_rls`, `simulate_frontend`, ve komşu
+     `audit_checks.js`/`check_auth_functions.js`) çağıransız — ama ikisi (`check_product_fields.py`,
+     `simulate_frontend.py`) **bugün** REC-178 sayfalama onarımının gündeminde anıldı; silme kararı
+     OPS/KATALOG'a sorulmadan verilmemeli (ÖLÜ DOĞRULANDI ama "uyarılı").
+  3. **`ai-auto-repair.yml` kapalı, kimse fark etmemiş:** CI kırmızıya düştüğünde otomatik onarım
+     denemesi olacağı varsayılıyordu; GitHub'da `disabled_manually` — mekanizma aylardır çalışmıyor
+     ve bunu hiçbir kapı yakalamadı (bu envanterin varlık nedeni tam burada).
+
+**Ölü doğrulanan liste** (aşağıdaki Bölüm 3 tablosunda `OLU-DOGRULANDI` satırları, 52 betik + 9 CI
+= 61 kalem) **Recep'in silme kapısına gider**; karantina eylemi OPS'a aittir (AXIOM 3).
+
+---
+
+## 2 · Sonnet'in kaçırdığı kanallar (curutme.md'den aynen — REC-185 kapı betiğine girdi)
+
+Sonnet'in çağıran taraması **tek bir dosya-adı grep'ini dar bir dosya kümesinde** koştu
+(`package.json`, `.github/workflows`, `.githooks`, `.claude/hooks`, `docs/standards`,
+`docs/recep-komut-rehberi.md`, `scripts/**`) ve bu yüzden altı sınıfı topluca kaçırdı:
+
+1. **Yetenek ağaçları** — `.claude/skills/*/SKILL.md`, `.agent/skills/*/SKILL.md` ve
+   `.agent/plugins/*/manifest.yaml`; bunlar betiği yalnız *anmakla* kalmayıp `fs.existsSync` /
+   `pathlib.exists()` ile **varlık kapısı** kuruyor (`admin-i18n-merger.cjs`, `skills-creator.py`).
+2. **Konformans testleri ve okudukları veri dosyaları** — `src/__tests__/conformance/*.test.ts` ile
+   `docs/{mutlak-yol,artefakt-ilan}-istisnalari.json` ve `docs/proje-takip/yol-haritasi.json`; betik
+   ADI kapının veri satırı (`secret-scan.py`, `update_schema_master.py`, `tier-c-temizlik.mjs`,
+   `agac-silme-kapisi.cjs`).
+3. **Betiğin ürettiği çıktı belgesi** — `docs/audits/*.md` başlığındaki "Üreten: …" satırı
+   (`rbac-ui-db-parity.mjs`, `matris-sutun-doluluk.mjs`).
+4. **Kardeş durum/yapılandırma dosyaları** (`kirli-sayac-taban.json` vb.) ve `.gitignore`'daki
+   çıktı satırları — çıktısı bilerek commit edilmeyen araçlarda "çıktı yok" ölüm sanıldı
+   (`companion-borc.cjs`).
+5. **Filo panosu `C:/tmp/venthub-board/*.jsonl`** — tek gerçek koşum-izi kaydı
+   (`agac-artik-envanteri.cjs`, `nlm_selective_upload.py`, `db-durum-olc.mjs`, `identity-fix.mjs`
+   — dördü de son üç günde koşmuş/onarılmış).
+6. **CI'da iki ayrı körlük:** `gh workflow list --all`'un **state** sütunu hiç okunmadı (7 jules +
+   `ai-auto-repair` `disabled_manually`); ve `uses: './.github/workflows/…'` grep'i **tırnaksız**
+   desenle yazıldığı için 0 eşleşme verdi — dört Gemini reusable workflow'unun çağıranı
+   `gemini-dispatch.yml`'de duruyorken "çağıran yok" sanıldı ve günlük koşan `gemini-review` ölü
+   ilan edildi.
+
+**Sonuç:** kapı betiği (REC-185, `scripts/hijyen/arac-envanteri.cjs`) bu altı kanalı **taramak
+zorunda**; yalnız `package.json`/CI/`.githooks`/`.claude/hooks`/`docs/standards` grep'i tek-göz
+hatasını tekrarlar.
+
+---
+
+## 3 · Tür başına tablolar
+
+### 3.1 · hook — `.claude/hooks/*.cjs` (14 araç; 13 companion `.md` HARİÇ, aşağıda not)
+
+| yol | tur | ne_yapar | sahip | tetik | kanıt | kapı | durum |
+|---|---|---|---|---|---|---|---|
+| `.claude/hooks/accumulate-edits.cjs` | hook | PostToolUse: bu turda düzenlenen JS/TS yollarını geçici birikim dosyasına ekler | ALTYAPI | `hook:PostToolUse Edit\|Write\|MultiEdit` | bağlı (özel iz dosyası gerekmiyor) | yok | KAL |
+| `.claude/hooks/bash-write-audit.cjs` | hook | PostToolUse: Bash yazma hedeflerini denetler ("dikiş yeri alarmı") | ALTYAPI | `hook:PostToolUse Bash` | `C:/tmp/venthub-board/.bash-audit-*.json`, 2026-09-07 | bash-write-audit-merge-muafiyeti/-tree/-uretilmis-sinifi.test.ts | KAL |
+| `.claude/hooks/bash-write-guard.cjs` | hook | PreToolUse: Bash yazma kapısı (lane-guard + protect-config'in Bash karşılığı) | ALTYAPI | `hook:PreToolUse Bash` | bağlı | bash-write-guard-muafiyet.test.ts, sir-basan-kalip.test.ts | KAL |
+| `.claude/hooks/bash-write-targets.cjs` | hook (kütüphane) | Bash komutundan yazma hedeflerini çıkaran saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:87 | dolaylı | bash-write-gate.test.ts | KAL |
+| `.claude/hooks/board-brief.cjs` | hook | UserPromptSubmit: sessiz pano brifingi + kira yenileme | ALTYAPI | `hook:UserPromptSubmit *` | bağlı | board-invariants.test.ts, fleet-mechanism-integrity.test.ts | KAL |
+| `.claude/hooks/board-release.cjs` | hook | SessionEnd: şeridi bırak (kira serbest bırakma) | ALTYAPI | `hook:SessionEnd *` | bağlı | yok | KAL |
+| `.claude/hooks/lane-guard.cjs` | hook | PreToolUse: şerit koruması (çok-oturumlu çakışma engeli) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | yok | KAL |
+| `.claude/hooks/precompact-durum-kapisi.cjs` | hook | PreCompact: durum kapısı (REC-86 Faz 1) | ALTYAPI | `hook:PreCompact *`; ayrıca `require()` ← session-board.cjs:176 | bağlı | precompact-durum-kapisi.test.ts | KAL |
+| `.claude/hooks/protect-config.cjs` | hook | PreToolUse: kalite ağı (config-protection + içerik taraması) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | auth-role-source.test.ts, stock-restore-evidence.test.ts (dolaylı) | KAL |
+| `.claude/hooks/sensitive-path-guard.cjs` | hook | PreToolUse: iki hassas yol sınıfını korur | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | yok | KAL |
+| `.claude/hooks/session-board.cjs` | hook | SessionStart: oturum kimliği + pano durumu bağlamı enjekte eder | ALTYAPI | `hook:SessionStart *` | `.git/venthub-sid`, 2026-09-07 | bash-write-audit-tree, companion-defter, fleet-mechanism-integrity, precompact-durum-kapisi.test.ts | KAL |
+| `.claude/hooks/sir-basan-kalip.cjs` | hook (kütüphane) | Bir Bash komutunun SIR değerini basıp basmadığını ölçen saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:67 | dolaylı | sir-basan-kalip.test.ts | KAL |
+| `.claude/hooks/son-soz-gate.cjs` | hook | Stop kapısı: turda kullanıcı mesajı varsa SON SÖZ kullanıcıya mı yazılmış | ALTYAPI | `hook:Stop *` | bağlı | yok | KAL |
+| `.claude/hooks/verify-on-stop.cjs` | hook | Stop (async): JS/TS düzenlendiyse eslint --fix + tsc doğrulaması | ALTYAPI | `hook:Stop *` (async, timeout 120) | `.cwd-ayrisma-sayaci.json`, 2026-09-07 | board-invariants.test.ts | KAL |
+| `.claude/hooks/defter-bayatlik-olcumu.cjs` | hook | Stop hook — PROJE TAKİP DEFTERİ BAYATLIK ÖLÇÜMÜ (yalnız ÖLÇER ve UYARIR). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/defter-bayatlik-olcumu.test.ts | YENI |
+| `.claude/hooks/eylem-defteri.cjs` | hook | PostToolUse hook — EYLEM DEFTERİ (git'in GÖRMEDİĞİ taşıma/silmeleri kaydeder). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/eylem-defteri.test.ts | YENI |
+| `.claude/hooks/hafiza-sorusu-yonlendirme.cjs` | hook | UserPromptSubmit hook — HAFIZA SORUSU YÖNLENDİRME. | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/hafiza-sorusu-yonlendirme.test.ts | YENI |
+| `.claude/hooks/soguk-okuyucu-sinavi.cjs` | hook | PostToolUse hook — SOĞUK OKUYUCU SINAVI ÇAĞRISI (yalnız HATIRLATIR, sınavı ajan koşar). | OPS | docs/standards/hafiza-kancalari-standard.md, src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts | YENI |
+| `.claude/hooks/hafiza-indeks-bekcisi.cjs` | hook | HAFIZA İNDEKSİ BEKÇİSİ (REC-280), iki kol: (A) `MEMORY.md` **yumuşak eşik 15800** — satır eklemeden önce katla; (B) ⭐**kayıp yazım dedektörü** — kaybolan satır `dizin-*.md`'ye katlanmamışsa uyarır. ⛔BLOKLAMAZ, daima çıkış 0; ağ/LLM/DB yok. Mutlak yol YAZMAZ (§24), dizin `os.homedir()`+transcript'ten türer. | ALTYAPI | `.claude/settings.json` PreToolUse `Edit\|Write\|MultiEdit` — yazımdan ÖNCE | fikstürle 7 koşum 2026-09-08: katlanmış satır **SESSİZ** · silinmiş satır **UYARI** (satır gösterildi) · yalnız boşluk farkı SESSİZ · 15917 baytta uyarı, eşik altında sessiz · MEMORY.md dışı hedef sessiz · proje dizini çözülemeyince "ATLANDI" satırı + çıkış 0 | `hafiza-indeks-bekcisi-kilidi` konformans kolları (7) | KAL |
+
+**Not (companion, envanter dışı — cetvel §1):** `accumulate-edits.md`, `bash-write-audit.md`,
+`bash-write-guard.md`, `bash-write-targets.md`, `board-brief.md`, `board-release.md`,
+`lane-guard.md`, `precompact-durum-kapisi.md`, `protect-config.md`, `sensitive-path-guard.md`,
+`session-board.md`, `son-soz-gate.md`, `verify-on-stop.md` (13 dosya) — her biri yukarıdaki
+kancanın açıklama dokümanı, kod tarafından `require` edilmez, çalıştırılabilir değildir. Standart
+madde 1 gereği araç sayılmaz.
+
+### 3.2 · betik — `scripts/**` (119 araç)
+
+> Durum sütunu **curutme.md'nin nihai hükmüyle** yazıldı (bkz. §1 tekli aşama: OLU-ADAY→ikinci göz).
+> Sahip sütununda ham tarama SAHİPSİZ bulduysa AXIOM 2 gereği **OPS** yazılıp yanına "devir adayı"
+> notu eklendi; ALTYAPI/OPS/URUN/URUN-KATALOG ile ilk taramada zaten etiketliyse değiştirilmedi.
+
+| yol | ne_yapar | sahip | tetik | kanıt | kapı | durum |
+|---|---|---|---|---|---|---|
+| `scripts/a11y/reflow-scan.mjs` | WCAG 2.2 SC 1.4.10 Reflow ölçüm aracı (320px, tek-yön scroll) | OPS *(devir adayı: ALTYAPI)* | `docs/standards/{admin-design,storefront-reflow}-standard.md` | cetvel referansı | yok | KAL |
+| `scripts/admin-i18n-merger.cjs` | (docstring yok) i18n admin birleştirme | OPS *(devir adayı: ALTYAPI)* | `.agent/skills/maestro-combine/SKILL.md:23`, `manifest.yaml:37` `validate:` | skill validate adımı canlı | yok | KAL |
+| `scripts/apply-stock-fix.mjs` | Stok düzeltmesi uygular (kök scripts/'ten bir üst) | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | pano 2026-08-27 yalnız companion listesi, koşum değil | yok | OLU-DOGRULANDI |
+| `scripts/assert-node-major.mjs` | INV-NODE-1 3. yüzey: derlemenin GERÇEK Node ana sürümünü ölçer | OPS *(devir adayı: ALTYAPI)* | `docs/standards/runtime-version-alignment-standard.md`, `package.json` | 2026-08-19 | yok | KAL |
+| `scripts/board/board.cjs` | Çok-oturumlu controller panosu | ALTYAPI | `.githooks/lib/{companion-defter,doc-scope}.cjs` | 2026-09-05 | yok | KAL |
+| `scripts/board/gozcu.cjs` | Filo gözcüsü (pano izleyicisi) | ALTYAPI | `scripts/board/{board,mechanism-setup}.cjs` | 2026-08-24 | yok | KAL |
+| `scripts/board/izin-reddi-gunlugu.cjs` | İzin-reddi olay günlüğü (filo-görünür ret sayacı) | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` | 2026-08-31 | yok | KAL |
+| `scripts/board/kimlik.cjs` | "Bu commit'i hangi oturum yapıyor" TEK cevap | ALTYAPI | `.claude/hooks/{bash-write-audit,session-board}.cjs` | 2026-08-31 | yok | KAL |
+| `scripts/board/lane-precommit.cjs` | Pre-commit 2. katman şerit kapısı (E1) | ALTYAPI | `.githooks/pre-commit`, `.claude/hooks/bash-write-audit.cjs` | 2026-08-31 | yok | KAL |
+| `scripts/board/mechanism-setup.cjs` | Mekanik otonomi kurulumu/doğrulaması (T115-VH) | ALTYAPI | `.claude/hooks/{board-brief,session-board}.cjs` | 2026-09-06 | yok | KAL |
+| `scripts/board/registry-autosync.cjs` | Registry oto-senkronu (oturum açılışı, arka plan) | ALTYAPI | `.claude/hooks/session-board.cjs` | 2026-08-15 | yok | KAL |
+| `scripts/board/registry-sync.cjs` | Orion registry senkronu — kalıcı iş durumu | ALTYAPI | `.githooks/post-merge`, `docs/standards/multi-session-coordination-standard.md` | 2026-08-15 | yok | KAL |
+| `scripts/ci/apt-hardening.sh` | Koşucuda apt'yi sınırlı sürede başarısız olmaya zorlar | ALTYAPI | `.github/workflows/e2e-smoke.yml` | 2026-08-19 | yok | KAL |
+| `scripts/ci/retry-bounded.sh` | Bir komutu zaman sınırıyla çalıştırır, düşerse tekrar dener | ALTYAPI | `.github/workflows/e2e-smoke.yml` | 2026-08-19 | yok | KAL |
+| `scripts/clean_root.ps1` | Kök temizliği (REC-102, kullanıcı ev dizini sabitliği kaldırıldı) | OPS *(devir adayı: ALTYAPI)* | `docs/standards/fleet-mechanism-standard.md` | 2026-09-01 | yok | KAL |
+| `scripts/compile_skills.py` | Skill derleme (git kökü türetimi) | OPS | `docs/standards/uretilmis-artefakt-standard.md`, `scripts/skills-creator.py` | 2026-06-10 | yok | KAL |
+| `scripts/db/audit_checks.js` | (docstring yok) DB denetim kontrolleri | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | pano 2026-08-20 yalnız anılıyor | yok | OLU-DOGRULANDI |
+| `scripts/db/check_auth_functions.js` | (docstring yok) auth fonksiyon kontrolü | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme (depo+dal+pano+orion) | yok | OLU-DOGRULANDI |
+| `scripts/db/checks/anon-yazma-nobetcisi.mjs` | INV-ANON-YAZMA-1 nöbetçisi (anon role yeni yazma politikası) | ALTYAPI | `.github/workflows/db-advisor.yml` | 2026-09-04 | INV-ANON-YAZMA-1 | KAL |
+| `scripts/db/checks/catalog-integrity.mjs` | Katalog bütünlüğü kapısı (T099) | ALTYAPI | `.github/workflows/db-advisor.yml`, `docs/standards/catalog-depth-standard.md` | 2026-08-23 | catalog-integrity-gate.test.ts | KAL |
+| `scripts/db/checks/check_category_id.py` | Hava Perdesi ürünlerinin kategori ID'sini kontrol eder | ALTYAPI | `cagiran-yok` | 0 eşleşme (yalnız eski ikili yedek) | yok | OLU-DOGRULANDI |
+| `scripts/db/checks/check_product_fields.py` | Aktif ürünlerin alan bütünlüğünü kontrol eder | ALTYAPI | `cagiran-yok` | pano 2026-09-06T18:39Z: REC-178 sayfalama onarım hedef listesinde anıldı | yok | **OLU-DOGRULANDI (uyarılı — silmeden önce OPS/KATALOG'a sor)** |
+| `scripts/db/checks/check_rls.py` | RLS durumunu admin/anon anahtarla test eder | ALTYAPI | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/checks/rbac-ui-db-parity.mjs` | RBAC UI↔DB parite raporu (rapor, kapı değil) | ALTYAPI | `cagiran-yok` (çıktı üzerinden dolaylı) | `docs/audits/t134-rbac-ui-db-parity-2026-08-20.md:3` "Üreten:"; pano 2026-09-06T14:57:26Z | yok | KAL |
+| `scripts/db/checks/rls-politika-sarma.mjs` | INV-RLS-SARMA-1: RLS politika ifadesinde iç içe `(SELECT auth.uid())` sarması var mı (REC-216) | ALTYAPI | `.github/workflows/db-advisor.yml` (`rls-role-coverage` işinde adım) | kapı testi 11/11, 2026-09-07 | rls-politika-sarma.test.ts | KAL |
+| `scripts/db/checks/rls-role-coverage.mjs` | INV-RLS-COVERAGE-1: kodun okuduğu ile DB'nin izin verdiği ayrışması | ALTYAPI | `.github/workflows/db-advisor.yml`, `docs/standards/db-grant-hygiene-standard.md` | 2026-08-20 | INV-RLS-COVERAGE-1 | KAL |
+| `scripts/db/checks/simulate_frontend.py` | Kategori akışını frontend gibi simüle eder | ALTYAPI | `cagiran-yok` | pano 2026-09-06T14:57Z: `.limit(10)` örneği incelendi, koşulmadı | yok | **OLU-DOGRULANDI (uyarılı)** |
+| `scripts/db/migrations/apply-metadata-update.js` | (docstring yok) metadata güncelleme migration'ı | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/apply-performance-fixes.js` | (docstring yok) performans düzeltmesi migration'ı | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/apply-sql-via-rpc.mjs` | (docstring yok) RPC üzerinden SQL uygulama | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/apply_linter_warnings_fix.js` | Linter uyarı düzeltmesi (.env manuel okuma) | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/apply_security_hardening.js` | Güvenlik sertleştirme migration'ı | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | yalnız kardeş companion adı çakışması | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/apply_security_hardening_null_fix.js` | Güvenlik sertleştirme null düzeltmesi | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | yalnız kendi companion'ı | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/compile_functions_master.py` | Fonksiyon master dokümanı derler | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme (üretim zinciri REC-132 ile kesildi) | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/compile_hvac_master.py` | HVAC master dokümanı derler | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/fix-advisor-issues.js` | (docstring yok) advisor bulgu düzeltmesi | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/force-migrate.js` | IPv4 zorlayarak migration uygular | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | yalnız sır-taraması haritasında anılıyor (`venthub-haritasi.md:46`) | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/migrate-db.js` | Bağlantı dizesini standart formattan kurar, migration uygular | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | aynı harita satırı | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/nlm_selective_upload.py` | Seçici NLM defter yükleme | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` (elle) | pano 2026-09-03T16:46-16:48Z (REC-132): "üretim-sonra-yükle akışının tek tüketicisi" | yok | KAL |
+| `scripts/db/migrations/run-direct-migration.cjs` | (docstring yok) doğrudan migration çalıştırma | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | yalnız denetim belgesi + pano ad-çakışması notu | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/run-migration-robustly.mjs` | .env manuel parse (CRLF uyumlu) ile migration | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/run-rls-migration.js` | (docstring yok) RLS migration çalıştırma | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/run_saas_migrations.cjs` | SaaS (multi-tenant) migration çalıştırma | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; Faz 2 PARK'ta | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/run_single_docs.py` | Tek doküman migration derlemesi | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/db/migrations/update_schema_master.py` | Şema master dokümanının frontmatter'ını günceller | OPS *(devir adayı: ALTYAPI)* | `elle` (`orion doc schema` yanında) | `docs/artefakt-ilan-istisnalari.json:10` → `uretilmis-artefakt-ilan-kapsami.test.ts` okuyor | uretilmis-artefakt-ilan-kapsami.test.ts | KAL |
+| `scripts/db/product-data/content-write.mjs` | Genel içerik yazımı (`technical_specs`, marka-bağımsız) | URUN-KATALOG | `family-description-write.mjs`, `identity-fix.mjs` | 2026-08-22 | yok | KAL |
+| `scripts/db/product-data/family-description-write.mjs` | Aile açıklaması yazımı (`product_families.description`) | URUN-KATALOG | `cagiran-yok` (kendisi `content-write.mjs`'i çağırır, ters yön) | 0 koşum izi | yok | OLU-DOGRULANDI |
+| `scripts/db/product-data/identity-fix.mjs` | T148-VH kimlik düzeltmesi (sku/model_code/name/slug) | URUN-KATALOG | `elle` | `docs/plans/urun-kimlik-duzeltme-2026-08-22.md:96`; pano 2026-09-07T06:48Z (bugün, REC-178 hedefi) | yok | KAL |
+| `scripts/db/product-data/seat-content-write.mjs` | T140-VH SEAT içerik yazımı, varsayılan DRY-RUN | URUN-KATALOG | `scripts/db/product-data/content-write.mjs` | 2026-08-22 | yok | KAL |
+| `scripts/db/product-data/t138-model-split.mjs` | T138-VH model katmanı ayrıştırma, varsayılan DRY-RUN | URUN-KATALOG | `docs/standards/product-schema-standard.md` | 2026-08-23 | yok | KAL |
+| `scripts/db/verify_security_hardening.js` | Güvenlik sertleştirme doğrulaması | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/docs/sync_supabase_docs.cjs` | (docstring yok) Supabase doküman senkronu | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/edge/drift-check.mjs` | Repo≠prod sapma dedektörü (edge functions) | ALTYAPI | `.github/workflows/{deploy-functions,edge-shared-input-drift}.yml` | 2026-08-15 | yok | KAL |
+| `scripts/edge/select-functions.mjs` | Değişen dosyalardan deploy edilecek edge fonksiyonlarını seçer | ALTYAPI | `.github/workflows/{deploy-functions,edge-shared-input-drift}.yml` | 2026-08-15 | yok | KAL |
+| `scripts/expand-all-evals.py` | Manifest'teki tüm skill'ler için eval genişletir | OPS | `cagiran-yok` | 0 eşleşme (skill ağaçları dahil) | yok | OLU-DOGRULANDI |
+| `scripts/generate/generate-meta.mjs` | Sondaki slash'ı temizleyip meta üretir | ALTYAPI | `cagiran-yok` | 0 eşleşme; App Router metadata API yerini aldı | yok | OLU-DOGRULANDI |
+| `scripts/generate/generate-sitemap.mjs` | Statik sitemap üretir (halefi `src/app/sitemap.ts`) | ALTYAPI | `cagiran-yok` | pano 2026-09-07T07:00:51Z: "ÖLÜ + TEHLİKELİ, karantina = scripts/archive/" | yok | KAYIP (onceki: KARANTINA (bu PR ile `scripts/archive/`'e taşındı — bkz. §4)) |
+| `scripts/generate/generate-next-routes.js` | ⚠Çalışmıyor — hatalı import'lar, Pre-App-Router hedef düzeni | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` (anılıyor, silme adayı notuyla) | 2026-09-01 | yok | KAL *(not: REC-102 "silme adayı" dedi, henüz silinmedi/karantinada değil)* |
+| `scripts/health-check.ps1` | Lint + Type Check koşumu | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/hijyen/agac-artik-envanteri.cjs` | Çalışma ağacı artık envanteri (REC-142 DoD4) | ALTYAPI | `cagiran-yok` (elle) | pano 2026-09-05T06:48:22Z: "ENVANTER ÇIKTI …366 üretilmiş" | yok | KAL |
+| `scripts/hijyen/agac-silme-kapisi.cjs` | Worktree silme kapısı (REC-84 Kol-4) | ALTYAPI | `cagiran-yok` (test fikstürü + vercel-ignore-build glob) | build-skip-positive-logic.test.ts:128, `vercel-ignore-build.sh:257`, pano 2026-09-04T11:53Z | build-skip-positive-logic.test.ts | KAL |
+| `scripts/hijyen/artefakt-bayatlik-sayim.cjs` | Artefakt bayatlık sayımı (donmuş mod tek kaynağı, REC-132 D1) | ALTYAPI | `docs/standards/uretilmis-artefakt-standard.md`, `scripts/board/board.cjs` | 2026-09-05 | uretilmis-artefakt-tazeligi.test.ts | KAL |
+| `scripts/hijyen/companion-borc.cjs` | Companion borç listesi (uyku kipi defterdarı, REC-142) | ALTYAPI | `elle` | `docs/standards/companion-doc-standard.md:511` iş-emri kaynağı; çıktı bilerek commit edilmiyor | yok | KAL |
+| `scripts/hijyen/companion-sayim.cjs` | Companion sayımı — tek kaynak (§26) | ALTYAPI | `scripts/board/board.cjs`, `scripts/hijyen/companion-borc.cjs` | 2026-09-05 | yok | KAL |
+| `scripts/hijyen/kirli-sayac.cjs` | VS Code kaynak-denetimi rozetinin CLI karşılığı (REC-84 Kol-4) | ALTYAPI | `elle --taban-yaz` | `kirli-sayac-taban.json:5`, `vercel-ignore-build.sh:257`, `deploy-build-skip-standard.md:45` | yok | KAL |
+| `scripts/hijyen/kume-master-tazeligi.cjs` | Küme master tazelik paritesi — INV-DOC-3 v2 (REC-144) | ALTYAPI | `docs/standards/companion-doc-standard.md` | 2026-09-05 | INV-DOC-3 | KAL |
+| `scripts/hijyen/merge-ritueli.cjs` | Merge ritüeli — beş maddelik self-merge ölçümü (REC-131) | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` | 2026-09-06 | yok | KAL |
+| `scripts/hijyen/taban-tazele.cjs` | Dal ağacını origin/master ile hizalar | ALTYAPI | `docs/standards/{fleet-mechanism,uretilmis-artefakt}-standard.md` | 2026-09-01 | yok | KAL |
+| `scripts/hijyen/tasiyici-anahtari.cjs` | Companion taşıyıcı anahtarı — tek okuma noktası (REC-142) | ALTYAPI | `.githooks/{post-commit,post-merge}` | 2026-09-05 | yok | KAL |
+| `scripts/icerik-hatti/aile-metni-yaz.mjs` | Aile metni yazıcı — REC-146 Adım 3, varsayılan kuru koşum | URUN-KATALOG | `elle` | 0 çağıran/0 koşum izi; DB'ye yazar, dosya artefaktı bırakmaz | yok | **OLCULEMEDI** *(1 günlük, aktif şeritte, elle prod-yazan araç — mevcut ölçütlerle ayrım yapılamıyor, sahibine sorulmalı)* |
+| `scripts/icerik-hatti/db-durum-olc.mjs` | DB durum ölçümü — salt okuma | URUN-KATALOG | `elle` | pano 2026-09-06T18:39Z/18:49Z: fail-open bulundu ve kapatıldı | yok | KAL |
+| `scripts/icerik-hatti/kanit-tablosu.py` | Kanıt tablosu + kanıtsız değer mandalı (REC-163 Adım 2) | URUN-KATALOG | `scripts/icerik-hatti/toplu-sunum.py` | `origin/urun-katalog/calisma` 2026-09-06, `icerik-hatti-kanit-daraltma-2026-09-06.md:115`; pano 2026-09-07T06:42Z | yok | KAL |
+| `scripts/icerik-hatti/taslak-kaynak-kapisi.py` | İçerik taslağı kaynak doğrulama kapısı | URUN-KATALOG | `scripts/icerik-hatti/toplu-sunum.py` | 2026-09-06 | kendisi kapı | KAL |
+| `scripts/icerik-hatti/tier-c-temizlik.mjs` | REC-155 B: iç-not içeren açıklamaları temizler | URUN-KATALOG | `elle` | `docs/proje-takip/yol-haritasi.json:570` (YH-32 beklenen dosya) → `yol_haritasi_dogrula.py` kapısı | yol_haritasi_dogrula.py (dolaylı) | KAL |
+| `scripts/icerik-hatti/toplu-sunum.py` | Toplu sunum üretici (REC-146 Adım 2b, K7.8) | URUN-KATALOG | `scripts/icerik-hatti/aile-metni-yaz.mjs` | 2026-09-06 | yok | KAL |
+| `scripts/kademe2-load/load.mjs` | Kademe-2 CSV→DB loader (deterministik, LLM yok) | URUN-KATALOG *(devir adayı, orijinal SAHİPSİZ)* | `docs/standards/fleet-mechanism-standard.md` | 2026-09-01 | yok | KAL |
+| `scripts/katalog/katalog-sayim.mjs` | Katalog sayımı — tek kaynak (REC-136) | URUN-KATALOG | `.github/workflows/katalog-sayim.yml`, `docs/standards/katalog-sayim-standard.md` | 2026-09-03 | yok | KAL |
+| `scripts/katalog/matris-sutun-doluluk.mjs` | Matris sütun doluluk ölçümü (REC-141 / URUN kalem 5) | URUN-KATALOG | `elle` | `docs/audits/matris-sutun-doluluk-2026-09-05.md` (2 gün taze); `design/menu/github.md:46`; pano 2026-09-06T14:58Z | yok | KAL |
+| `scripts/media/avens-kentalfan-fill-manifest.mjs` | KENTALFAN eki manifesti (Casals plug fan serisi) | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu (`t139-gun-sonu-raporu-2026-08-21.md:85`), yetki **EXPIRED**; pano 2026-09-07T07:02Z karantina önerisi | yok | OLU-DOGRULANDI |
+| `scripts/media/avensair-avens-run.mjs` | AVenS kategori keşfi + eşleme + indirme + webp | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | `t139-gun-sonu-raporu-2026-08-21.md:84`, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/avensair-nicotra-run.mjs` | NICOTRA görselleri keşif+eşleme+indirme+webp | URUN-KATALOG *(devir adayı)* | `cagiran-yok` (upload-pilot-images.mjs onu çağırıyor ama o zincir de kapandı) | `t139-urun-gorseli-pilotu-2026-08-21.md:142`, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/build-olcek-manifest.mjs` | T139-ÖLÇEK url-haritası + DB birleştirme manifesti | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | 0 eşleşme; ölçek koşumu hiç açılmadı | yok | OLU-DOGRULANDI |
+| `scripts/media/danfoss-fc101-run.mjs` | DANFOSS FC-101 görsel eki | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/danfoss-fc102-fill-manifest.mjs` | DANFOSS FC-102 görsel eki | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/nicotra-dd-fill-manifest.mjs` | Nicotra DD eki (2 SKU) | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/seat-atex-manifest.mjs` | SEAT ATEX görsel eki | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/seat-image-run.mjs` | SEAT-FAZ2 görselleri eşleme+indirme+webp | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/upload-pilot-images.mjs` | T139-VH Adım-4: pilot webp'leri bucket'a yükler (PROD YAZAR) | URUN-KATALOG *(devir adayı)* | `scripts/media/{avensair-nicotra-run,seat-atex-manifest}.mjs` | 2026-08-21 | yok | KAL *(uyarı: çağırdığı iki betik de ÖLÜ DOĞRULANDI — zincir çürüdü, tek başına yeniden ölçülmeli)* |
+| `scripts/media/url-fill-manifest.mjs` | Genel URL-dolgu ("URL ile bağlama yetkisi" kalıbı) | URUN-KATALOG *(devir adayı)* | `docs/standards/product-image-standard.md` | 2026-08-21 | yok | KAL |
+| `scripts/media/vortice-crawl-map.mjs` | Vortice kategori ağacı → model_code haritası (prod'a yazmaz) | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/vortice-image-pilot.mjs` | Vortice ürün görseli pilotu | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/media/vortice-probe-missing.mjs` | Kategori ağacında bulunamayan kodları doğrudan yoklar | URUN-KATALOG *(devir adayı)* | `cagiran-yok` | koştu, yetki EXPIRED | yok | OLU-DOGRULANDI |
+| `scripts/migrate-skills-to-v2.py` | Skill v2 göçü (git kökü türetimi) | OPS | `cagiran-yok` | 0 eşleşme; göç tamamlandı | yok | OLU-DOGRULANDI |
+| `scripts/nlm/acilis_kapisi.py` | Açılış kapısı — gün kapanışı damgasını okur (YH-47) | OPS | `docs/standards/proje-takip-defteri-standard.md`, `scripts/nlm/gun_kapanisi.py` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/gun_kapanisi.py` | Gün kapanışı — tek komut (YH-47) | OPS | `docs/standards/proje-takip-defteri-standard.md`, `scripts/nlm/acilis_kapisi.py` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/hafiza_sinavi.py` | Hafıza sınavı — belgeler için kapı (v1.1) | OPS | `docs/standards/proje-takip-defteri-standard.md` | 2026-09-05 | kendisi kapı | KAL |
+| `scripts/nlm/kararlar_disa_aktar.py` | Linear "Kararlar" belgelerinin depo aynası | OPS | `scripts/nlm/gun_kapanisi.py` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/konusma_gunlugu.py` | Konuşma günlüğü — gün bazlı, sır süzgeçli özet | OPS | `docs/standards/proje-takip-defteri-standard.md` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/linear_disa_aktar.py` | Linear → "şantiye durumu" dışa aktarımı | OPS | `scripts/nlm/gun_kapanisi.py` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/pano_disa_aktar.py` | Pano (telsiz) notlarını NLM defteri için Markdown'a çevirir | OPS | `scripts/nlm/{gun_kapanisi,konusma_gunlugu}.py` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/proje_takip_sync.py` | Proje Takip defteri eşitleyicisi | OPS | `docs/standards/proje-takip-defteri-standard.md` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/yol_haritasi_ayna.py` | Yol haritası → Linear aynası (sır süzgeçli) | OPS | `scripts/nlm/gun_kapanisi.py` | 2026-09-06 | yok | KAL |
+| `scripts/nlm/yol_haritasi_dogrula.py` | Yol haritası doğrulayıcı — planın test dosyası (v1) | OPS | `docs/standards/proje-takip-defteri-standard.md` | 2026-09-06 | kendisi kapı | KAL |
+| `scripts/security/secret-scan.py` | Sır taraması (18 imza, geçmiş dahil tüm depo) | OPS *(devir adayı: ALTYAPI)* | `elle` | `docs/mutlak-yol-istisnalari.json:71` → `mutlak-yol-sizintisi.test.ts` okuyor; CLAUDE.md görünürlük öncesi zorunlu | mutlak-yol-sizintisi.test.ts | KAL |
+| `scripts/seo/indexnow-bildir.mjs` | IndexNow toplu bildirim (tek seferlik, REC-127) | URUN | `cagiran-yok` | 0 çağıran/0 pano izi; görev tamamlandı (GSC+sitemap OK) | yok | OLU-DOGRULANDI |
+| `scripts/setup-hooks.mjs` | `.githooks/`i git'e bağlar (`pnpm install` sonrası `prepare`) | OPS *(devir adayı: ALTYAPI)* | `.githooks/README.md`, `docs/standards/deploy-build-skip-standard.md` | 2026-08-15 | yok | KAL |
+| `scripts/setup_webhooks.js` | Webhook kurulum yardımcısı (.env parse) | OPS *(devir adayı: ALTYAPI)* | `docs/standards/rendering-cache-standard.md`, `scripts/setup_webhooks_cli.js` | 2026-08-15 | yok | KAL |
+| `scripts/setup_webhooks_cli.js` | Webhook kurulum CLI'ı (.env parse) | OPS *(devir adayı: ALTYAPI)* | `docs/standards/rendering-cache-standard.md`, `scripts/setup_webhooks.js` | 2026-08-15 | yok | KAL |
+| `scripts/skills-creator.py` | Yeni skill oluşturma (name/description/category) | OPS | `elle` | `.claude/skills/skills-creator/SKILL.md:25,67`, `.agent/skills/…`, `manifest.yaml:162` `validate:` | skill validate adımı canlı | KAL |
+| `scripts/skills-evaluator.py` | Skill eval koşucusu | OPS | `scripts/skills-creator.py`, `package.json → skills:verify` | 2026-06-10 | yok | KAL |
+| `scripts/skills-orchestrator.py` | Skill orkestrasyonu (docstring yok) | OPS | `cagiran-yok` (0 gerçek çağıran; yalnız ölü companion çağrı grafiğinde `skills-router.py`'nin "çağıranı") | 0 eşleşme | yok | **OLU-DOGRULANDI (zincir uyarısı)** *(kendisini çağıran skills-router.py de aynı turda yeniden ölçülmeli)* |
+| `scripts/skills-router.py` | Skill yönlendirme | OPS | `scripts/skills-orchestrator.py` (çağıranı ÖLÜ DOĞRULANDI — bkz. yukarı) | 2026-06-08 | yok | KAL *(uyarı: tek çağıranı ölü doğrulandı, ikinci turda yeniden ölç)* |
+| `scripts/tools/deploy_iyzico.ps1` | İyzico deploy betiği | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme | yok | OLU-DOGRULANDI |
+| `scripts/tools/extract_brands.py` | Marka çıkarımı (docstring yok) | OPS *(devir adayı: URUN-KATALOG)* | `cagiran-yok` | pano 2026-09-07T07:02Z: karantina önerisi OPS'a, silme Recep kapısı | yok | OLU-DOGRULANDI |
+| `scripts/tools/extract_pdf.py` | PDF çıkarımı (docstring yok) | OPS *(devir adayı: URUN-KATALOG)* | `cagiran-yok` | 0 eşleşme; PDF hattı `venthub-pdf-ingestor`'a taşındı | yok | OLU-DOGRULANDI |
+| `scripts/tools/fix_aria_labels.py` | ARIA label eşlemesi (ikon→etiket) | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; tek-seferlik codemod | yok | OLU-DOGRULANDI |
+| `scripts/tools/fix_literal_newlines.ps1` | Literal `\n`'i gerçek newline'a çevirir | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; tek-seferlik codemod | yok | OLU-DOGRULANDI |
+| `scripts/tools/migrate_images.py` | `<img>` → `VentImage` göçü | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; göç tamamlandı | yok | OLU-DOGRULANDI |
+| `scripts/tools/replace_http.py` | http→https değiştirme taraması | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | 0 eşleşme; tek-seferlik codemod | yok | OLU-DOGRULANDI |
+| `scripts/vercel-ignore-build.sh` | T086 Vercel "Ignored Build Step" — build gerektirmeyen değişiklikleri atlar | OPS *(devir adayı: ALTYAPI)* | `docs/standards/deploy-build-skip-standard.md` | 2026-08-27 | build-skip-positive-logic.test.ts | KAL |
+| `scripts/archive/generate-sitemap.mjs` | scripts/generate-sitemap.mjs | OPS | docs/proje-takip/linear/is-dagilimi-2026-09-07.json, docs/proje-takip/linear/is-dagilimi-2026-09-07.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | KAYIP (onceki: YENI) |
+| `scripts/db/migrations/apply_wizard_migration.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/distribute_products_smart.ts` | Manual .env parser | OPS | cagiran-yok (betik taramasi; anma: registry/P04-Category-Architecture/completed/016-i18n-tam-kilitleme-ve-slug-konsolidasyonu/plan.json) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/fix_category_name.ts` | Load credentials dynamically from environment | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/fix_product_categories_client.ts` | Manual .env parser | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/fix_products_select.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/restore_categories.ts` | SİLİNEN KATEGORİLERİ GERİ YÜKLE | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run-direct-migration.ts` | (aciklama satiri yok — elle yazilmali) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run-migration.ts` | Migration dosyasını oku | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run_category_migration.ts` | Service role key gerekli - anon key ile silme yapılamayabilir | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run_migration_remote.ts` | Capture notices | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/db/migrations/run_migration_via_db_url.ts` | Use provided pooler format from .env or fallback to provided working string | OPS | cagiran-yok (betik taramasi; anma: docs/audits/vibe-coding-20-madde-denetimi-2026-08-13.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/hijyen/arac-envanteri.cjs` | Envanteri fs'ten üretir ve INV-ARAC-1..3 kapısını koşar (REC-185) | ALTYAPI | `elle` + `src/__tests__/conformance/arac-envanteri.test.ts` | kapı testi 17/17, 2026-09-07 | arac-envanteri.test.ts | KAL |
+| `scripts/icerik-hatti/_kaynak.py` | -*- coding: utf-8 -*- | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/_veri.mjs` | ORTAK VERI ERISIMI (JS) — 1000 satir tavanina karsi sayfalama + veri-tamligi kapisi. | OPS | scripts/db/product-data/identity-fix.mjs, scripts/media/avens-kentalfan-fill-manifest.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/_veri.py` | -*- coding: utf-8 -*- | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/aile-kaynak-cikar.py` | -*- coding: utf-8 -*- | OPS | docs/standards/catalog-ingestion-standard.md, scripts/icerik-hatti/kanit-tablosu.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/faz4-etiket-duzelt.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/faz4-teknik-yukle.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/faz4-teknik-yukle.py` | -*- coding: utf-8 -*- | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-faz4-hazirlik-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/fiyatsiz-ayrim.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/_veri.mjs, scripts/icerik-hatti/_veri.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/teknik_bosluk.py` | -*- coding: utf-8 -*- | OPS | scripts/icerik-hatti/_kaynak.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/urun-veri-cek.mjs` | URUN VERI CEKME — kanit tablosunun girdisi (REC-163). | OPS | scripts/icerik-hatti/aile-kaynak-cikar.py (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/nlm/santiye.py` | Olcut updatedAt DEGIL "sonAnlamli" (son yorum / PR eki / baslama / bitis / acilis): etiket, toplu bakim, betik dokunusu yasi TAZELEMEZ. | OPS | docs/standards/work-tracking-ssot-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/birim-gomulu-duzelt.mjs` | BİRİM-GÖMÜLÜ HÜCRE DÜZELTİCİSİ — REC-190 | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-birim-olcek-kusurlari-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/kategori-metni-yaz.mjs` | KATEGORİ REHBER PARAGRAFLARINI CANLIYA YAZAR — REC-146 madde 3 / REC-161 yolu. | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/kayip-urun-aile-bagla.mjs` | KAYIP ÜRÜN AKTARIMI — İKİNCİ YARI: AİLE BAĞI + KATEGORİ ONARIMI (REC-226) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/kayip-urun-aktar.mjs` | KAYIP ÜRÜN AKTARIMI — REC-226 | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/kip/satis-kipine-gec.mjs` | Satış kipi geçiş betiği — TEK KOMUTLA aç/kapat, yedekli, geri alınabilir (REC-168). | OPS | docs/standards/satis-kipi-gecis-standard.md, src/__tests__/conformance/build-skip-positive-logic.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/build-skip-positive-logic.test.ts, src/__tests__/conformance/satis-kipi-anahtari.test.ts | YENI |
+| `scripts/icerik-hatti/katalog-disa-aktar.mjs` | TAŞINABİLİR KATALOG — DIŞA AKTARICI (REC-212) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-tasinabilir-katalog-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/katalog-geri-yukle.mjs` | TAŞINABİLİR KATALOG — GERİ YÜKLEYİCİ (REC-212, ikinci yarı) | OPS | cagiran-yok (betik taramasi; anma: docs/audits/icerik-hatti-tasinabilir-katalog-2026-09-07.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/katalog-karnesi.mjs` | KATALOG KARNESİ — hattın dokuz satırı, TEK komutla (KOL 6 ilk çıktısı) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `scripts/icerik-hatti/uydurma-kod-bosalt.mjs` | UYDURMA `model_code` BOŞALTICISI — REC-226 (kaynak kanıtına dayalı) | URUN-KATALOG | elle (kuru koşum varsayılan; `--yaz` + `CANLI_YAZIM_ONAYI`) | PR #1109 (üç yönlü sabotaj koşuldu) | kendi ön koşul kapısı içinde (üç yüzeyde `sku` yedeği varsa yazmaz) | KAYIP (onceki: KAL) |
+| `scripts/icerik-hatti/kimlik-kurali.mjs` | ÜRÜN KİMLİK KURALI — TEK KAYNAK (REC-226 / REC-272 / REC-275) | URUN-KATALOG | import edilir (kural tek kaynak; kademe2-load + icerik-hatti kullanir) | PR #1109 · 442 urunde cakisma 0 olculdu | cagiranin on kosul kapisi | KAL |
+| `scripts/icerik-hatti/uydurma-kimlik-tek-kural.mjs` | UYDURMA KİMLİĞİ TEK KURALA GETİRİR — REC-226 / REC-272 / REC-275 | URUN-KATALOG | elle (kuru kosum varsayilan; --yaz + CANLI_YAZIM_ONAYI) | PR #1109 · uc yonlu sabotaj | iki on kosul kapisi (sku yedegi + benzersizlik) | KAL |
+| `scripts/icerik-hatti/kimlik-kurali-kapisi.mjs` | KİMLİK KURALI KAPISI — INV-KIMLIK-TEK-KURAL-1 (REC-275) | URUN-KATALOG | elle / CI (ALTYAPI'dan baglanmasi istenecek) | PR #1109 · iki yonlu sabotaj: ardisik-sayi uydurma ve kodsuz-satir dusurme KIRMIZI verdirdi | INV-KIMLIK-TEK-KURAL-1 (kendisi kapi) | KAL |
+| `scripts/nlm/linear_arsiv.py` | Linear GraphQL: kim / say / arsivle <no...> / arsivle done / arsivle canceled — Done kayitlar 7 gun sonra arsiv (250 sinir); LINEAR_API_KEY ortamdan | OPS | insan (OPS rutin, haftalik) | 2026-09-08 · PR #1118 | yok (cetvel: work-tracking-ssot-standard, arsiv rutini) | KAL-KAPISIZ |
+| `scripts/media/gorsel-envanteri.mjs` | GÖRSEL ENVANTERİ — mükerrer görseller + "yeni fotoğraf gerekli" listesi (REC-282 / REC-284) | URUN-KATALOG | elle (SALT OKUMA; `--yaz` kolu BİLEREK YOK — envanterden çıkacak düzeltme Recep kapısı) | 2026-09-08 koşuldu: 442 ürün · 1042 görsel · 898 hash · 3 kategori-aşan grup · 103 görselsiz ürün; rapor `docs/audits/icerik-hatti-gorsel-envanteri-2026-09-08.{md,json}` | yok — **KAL-KAPISIZ**: çıktısı kapıya bağlı değil, kapı REC-284'te kurulacak | KAL-KAPISIZ |
+| `scripts/db/checks/tip-drift.mjs` | INV-TIP-DRIFT-1 — `src/types/database.types.ts` CANLI ŞEMAYLA SENKRON MU (REC-121). Ölçüt ŞEMA YÜZEYİ (tablo/görünüm/kolon/fonksiyon/enum/bileşik); biçim ve CLI sürüm farkı sessiz. | ALTYAPI | **CI — `db-advisor.yml`, AYRI iş** (`tip-drift` + `tip-drift-precheck`). ⭐Kardeşlerden farklı: sır `SUPABASE_ACCESS_TOKEN`, `pg` sürücüsü ve kök sertifika YOK — betik DB'ye bağlanmaz, Supabase API'sinden tip üretir. | kapı koşumu 2026-09-08: 62 tablo/786 kolon iki tarafta = çıkış 0 YEŞİL · aynı gün `--tip-dosyasi` fikstürüyle bayat tipe karşı **çıkış 1**, iki yön de adıyla basıldı (3 eksik + 3 fazla) — iki yönlü | INV-TIP-DRIFT-1 (kendisi kapı) · düzeneği `tip-drift-kapisi` konformans kolları (6 kol: CI çağırıyor · doğru sır · yanlış sır/pg kopyalanmamış · atlanmış iş uyarır · artefakta yazmaz · fail-closed) | KAL |
+| `scripts/db/checks/aile-kategori-tutarlilik.mjs` | INV-AILE-KATEGORI-1 — ürünün kategorisi ile AİLESİNİN kategorisi AYRIŞMASIN (REC-290). Vitrin ürün değil AİLE listeler; ayrışma = veri doğru, vitrin sessizce yanlış. SALT OKUR. | ALTYAPI | CI — `db-advisor.yml` `catalog-integrity` işine adım olarak bağlı (kardeşiyle aynı sır + kök sertifika); `--fikstur` ile ağsız da koşar | canlı koşum 2026-09-08: ürün 442 · ailesi olan 442 · aktif aile 47 · evren 442 · **ihlal 0** (KATALOG'un 11'lik onarımı sonrası). İki yönlü: ters sorgu 442 örtüşen sayıyor → ölçüt kör değil. Fikstür üç kol: temiz→0, ihlal→1, evren 0→**2** | INV-AILE-KATEGORI-1 (kendisi kapı) · düzeneği `ssr`-benzeri konformans kolu ile kilitli | KAL |
+| `scripts/hijyen/commit-oncesi-uyarilar.cjs` | COMMIT ÖNCESİ İKİ UYARI (REC-267): (1) yeni betik araç envanterinde ilan edilmemiş → betik adı + koşulacak komut yazılır, (2) şerit önekli dal ANA REPO ağacında. ⛔BLOKLAMAZ, daima çıkış 0; ağ/LLM/DB yok. | ALTYAPI | `.githooks/pre-commit` — şerit kapısından ÖNCE (bloklayan çıktının ardındaki uyarı okunmaz), `|| true` ile | 2026-09-08: kol 1 kendi betiğimde yandı (adı + komut basıldı) · kol 2 ana repo ağacında GERÇEK hâli yakaladı (`urun/rec286-kapi-siniri` ana repoda duruyordu) · maliyet 5 koşum **264-300 ms** | uyarı-only, kapı DEĞİL — düzeneği `commit-oncesi-uyarilar-kilidi` konformans kolları ölçer | KAL |
+| `scripts/db/checks/denetim-izi-tetik-kapisi.mjs` | INV-DENETIM-IZI-1 — denetim tetiği CANLI DB'de duruyor mu, HÂLÂ fail-closed mı, ve `products` kolon süzgeci yerinde mi (REC-292). ⭐Metin taraması yetmez: bu depoda migration dosyası "prod'da hangi tetik var" sorusunda YETKİLİ KAYNAK DEĞİL (`on_products_change` migration'larda yok, `scripts/webhook_setup.sql` ile kurulmuş). SALT OKUR. | ALTYAPI | CI — `db-advisor.yml` `rls-role-coverage` işine adım olarak bağlı (kardeşleriyle aynı sır + kök sertifika; yeni iş adı açmak açık PR'ları kilitler, gerekçesi o işte yazılı); `--fixture` ile ağsız da koşar | fikstür 6 kol, hepsi beklendiği gibi: tam→0 ihlal · `site_settings` tetiği silinmiş→**TETIK-YOK** · gövdeye `exception when` girmiş→**FAIL-OPEN** · süzgeç kalkmış→**SUZGEC-YOK** · süzgeçten `price` çıkmış→**SUZGEC-DAR** · webhook tetikleri sayıma girmiyor (7). ⛔Canlı koşum HENÜZ YOK: ölçeceği tetikler migration Recep kapısından geçmeden var olmayacak — kapı ile migration AYNI PR'da iner | INV-DENETIM-IZI-1 (kendisi kapı) · düzeneği `denetim-izi-kapisi.test.ts` 21 kolu ile kilitli | YENI |
+| `scripts/icerik-hatti/katalog-paket-uret.mjs` | TAŞINABİLİR KATALOG — İNSAN-OKUR PAKET ÜRETİCİ (REC-212 F1, adım 1-2) | URUN-KATALOG | elle (`--hedef=<paket>`), `katalog-disa-aktar.mjs`'ten SONRA | 2026-09-09: koştu, 7 CSV/8088 satır + 1146 görsel üretti, başarısız 0 | yok | AKTİF |
+
+### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
+
+| # | Ad | Ağaç | ne_yapar | sahip (manifest kategorisi) | tetik | kanıt (son değişiklik · manifest) | kapı | durum |
+|---|---|---|---|---|---|---|---|---|
+| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) | 09-05 §3 KAL kararı | KAL |
+| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet | manifest kaydı | KAL |
+| 3 | typography | .claude | font/okunabilirlik/tip ölçeği | guards | `skill:typography` | 2026-08-11 · manifest yok | 09-05 §3 | KAL |
+| 4 | typography | .agent | (aynı) | guards | `skill:typography` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
+| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok | 09-05 §3 | KAL |
+| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet | manifest kaydı | KAL |
+| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
+| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok | 09-05 §3 | KAL |
+| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 13 | codegraph | .claude | CodeGraph MCP caller/callee/impact | intelligence | `skill:codegraph` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
+| 14 | codegraph | .agent | (aynı) | intelligence | `skill:codegraph` | 2026-06-11 · manifest evet | manifest kaydı | KAL |
+| 15 | diff-review | .claude | git diff yıkıcı/tehlikeli örüntü tespiti | audit | `skill:diff-review` | 2026-08-25 · manifest yok | yok | ENVANTER-DISI |
+| 16 | diff-review | .agent | (aynı) | audit | `skill:diff-review` | 2026-08-25 · manifest evet | manifest kaydı | KAL |
+| 17 | fallow | .claude | JS/TS dead-code/duplication/complexity | audit | `skill:fallow` | 2026-08-18 · manifest yok | yok | ENVANTER-DISI |
+| 18 | fallow | .agent | (aynı) | audit | `skill:fallow` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 19 | find-skills | .claude | skill arama/keşif/kurulum | intelligence | `skill:find-skills` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
+| 20 | find-skills | .agent | (aynı) | intelligence | `skill:find-skills` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 21 | git-commit | .claude | conventional commit üretimi/staging | utils | `skill:git-commit` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
+| 22 | git-commit | .agent | (aynı) | utils | `skill:git-commit` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 23 | i18n-conventions | .claude | TR/EN sözlük/JSX literal göçü kuralları | guards | `skill:i18n-conventions` | 2026-06-16 · manifest yok | yok | ENVANTER-DISI |
+| 24 | i18n-conventions | .agent | (aynı) | guards | `skill:i18n-conventions` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 25 | notebook-navigator | .claude | NLM ikizinde kavramsal/RAG sorgu | intelligence | `skill:notebook-navigator` | 2026-08-25 · manifest yok | yok | ENVANTER-DISI |
+| 26 | notebook-navigator | .agent | (aynı) | intelligence | `skill:notebook-navigator` | 2026-08-25 · manifest evet | manifest kaydı | KAL |
+| 27 | notebooklm-sync | .claude | .md dosyalarını NLM defterine senkronize | intelligence | `skill:notebooklm-sync` | 2026-08-25 · manifest yok | yok | ENVANTER-DISI |
+| 28 | notebooklm-sync | .agent | (aynı) | intelligence | `skill:notebooklm-sync` | 2026-08-17 · manifest evet | manifest kaydı | KAL |
+| 29 | orion-cli | .claude | Orion CLI doküman pipeline komutları | intelligence | `skill:orion-cli` | 2026-08-17 · manifest yok | yok | ENVANTER-DISI |
+| 30 | orion-cli | .agent | (aynı) | intelligence | `skill:orion-cli` | 2026-08-17 · manifest evet | manifest kaydı | KAL |
+| 31 | plan-challenger | .claude | plan/PRD uygulama-öncesi red-team çürütme | audit | `skill:plan-challenger` | 2026-08-18 · manifest yok | yok | ENVANTER-DISI |
+| 32 | plan-challenger | .agent | (aynı) | audit | `skill:plan-challenger` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 33 | skills-creator | .claude | yeni skill oluşturma/manifest derleme | orchestration | `skill:skills-creator` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
+| 34 | skills-creator | .agent | (aynı) | orchestration | `skill:skills-creator` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok | yok | ENVANTER-DISI |
+| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 37 | supabase | .claude | Supabase client/servis/db query kuralı | guards | `skill:supabase` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
+| 38 | supabase | .agent | (aynı) | guards | `skill:supabase` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
+| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
+| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
+| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet | manifest kaydı | KAL |
+| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
+| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
+| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
+| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 51 | agy-orchestrate | .claude | Antigravity CLI'a geniş taramayı delege eder | orchestration | `skill:agy-orchestrate` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
+| 52 | create-migration | .claude | güvenli Supabase migration oluşturma akışı | OPS *(sahipsiz — kategori/manifest yok)* | `skill:create-migration` | 2026-08-26 · manifest yok | yok | ENVANTER-DISI |
+| 53 | maestro | .claude | bölünebilir büyük kod değişikliğini paralel dalga olarak orkestre eder | orchestration | `skill:maestro` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
+| 54 | prd-complexity-audit | .claude | kod tabanını vizyon/PRD'ye karşı denetler | intelligence | `skill:prd-complexity-audit` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
+| 55 | venthub-20-eksen-denetimi | .claude | 20 eksende kalite/güvenlik karnesi üretir | OPS *(sahipsiz — kategori/manifest yok)* | `skill:venthub-20-eksen-denetimi` | 2026-08-15 · manifest yok | yok | ENVANTER-DISI |
+| 56 | multi-agent-research | .agent | worker-judge çok-ajanlı kod araştırması | orchestration | `skill:multi-agent-research` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 57 | parallel-file-audit | .agent | kör alt-ajanlarla paralel dosya denetimi | orchestration | `skill:parallel-file-audit` | 2026-06-16 · manifest evet | manifest kaydı | KAL |
+| 58 | teamwork-director | .agent | teamwork-preview prompt hazırlama/delegasyon | orchestration | `skill:teamwork-director` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 59 | lighthouse-performance-guard | .agent | Lighthouse/web-vitals regresyon denetimi | audit | `skill:lighthouse-performance-guard` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 60 | performance-alignment | .agent | NLM ile çok-turlu performans hizalama planı | audit | `skill:performance-alignment` | 2026-08-17 · manifest evet | manifest kaydı | KAL |
+| 61 | venthub-catalog-importer | .agent | HVAC katalog PDF içe alma/doğrulama | audit | `skill:venthub-catalog-importer` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 62 | maestro-combine | .agent | çakışmasız paralel merge (JSON delta) | orchestration | `skill:maestro-combine` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
+| 63 | maestro-feature | .agent | worker-judge çok-ajan özellik geliştirme | orchestration | `skill:maestro-feature` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 64 | maestro-refactor | .agent | bölünebilir büyük değişikliği paralel dalga | orchestration | `skill:maestro-refactor` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
+| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| 67 | office-hours | .claude | fikir sorgusu: plandan ONCE alti zorlayici soru + oncul curutme + 2-3 yol -> docs/plans tasarim notu; kod/emir yazmaz (gstack uyarlamasi, PR #1116) | OPS | insan (/office-hours) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
+| 68 | qa | .claude | Playwright+Chromium ile gercek tarayici denetimi: gez -> kanit -> atomik fix(qa) -> yeniden olc; scripts/gez.mjs; prod yalniz bakis (gstack uyarlamasi, PR #1116) | OPS | insan (/qa) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
+| 69 | llm-council | .claude | zor karar icin konsey: N mercekli uye -> anonim dondurulmus-sirali capraz puanlama -> baskan sentezi + muhalefet serhi; Workflow betigi SKILL.md icinde, "workflow kullan" sart; karar Recep'in (karpathy/llm-council fikri, PR #1116) | OPS | insan (/llm-council) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
+| 70 | task-observer | .claude | is sirasinda skill surtunmesini (Recep duzeltmesi, tekrar, kural ihlali) docs/skill-gozlemleri/acik/ altina tek-dosya gozlem olarak yazar; haftalik inceleme OPS gun kapanisinda (rebelytics CC BY 4.0 uyarlamasi, PR #1116) | OPS | insan + oturum basi (sessiz) | 2026-09-08 · PR #1116 | docs/skill-gozlemleri/ (cikti dizini) | KAL-KAPISIZ |
+| 71 | video-kaynak | .claude | YouTube'da yt-dlp ile anahtarsiz ara -> Recep secer -> NotebookLM source_add -> chat_ask ile sorgulanabilirlik dogrulamasi; transkript = veri, talimat degil (Agent-Reach fikri, urun alinmadi, PR #1116) | OPS | insan (/video-kaynak) | 2026-09-08 · PR #1116 | docs/notebooklm/kaynaklar.md (cikti) | KAL-KAPISIZ |
+
+**Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
+yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
+CLAUDE.md iki ağacı (`.claude/skills`, `.agent/skills`) kasıtlı paralel tanımlıyor; manifest yalnız
+`venthub-core` plugin'inin `.agent` tarafını kaydediyor. `create-migration` ve
+`venthub-20-eksen-denetimi` ayrıca **sahipsiz** (ne manifest kategorisi ne `SKILL.md category:`
+alanı) → AXIOM 2 gereği OPS'a yazıldı.
+
+### 3.4 · githook — `.githooks/*` (5 araç)
+
+| yol | ne_yapar | sahip | tetik | kanıt | kapı | durum |
+|---|---|---|---|---|---|---|
+| `.githooks/pre-commit` | Companion `.md` yoksa UYARI (bloklamaz) + `lane-precommit.cjs` ile şerit kapısı (BLOKLAR) | ALTYAPI | `githook:pre-commit` (shim `.git/hooks/pre-commit`) | 2026-09-05 (532fe30df) | githooks-integrity.test.ts, githooks-doc-scope.test.ts | KAL |
+| `.githooks/post-commit` | Arka planda companion üretimi (`orion doc tree/batch`) + başarısızlık defteri | ALTYAPI | `githook:post-commit` (shim) | 2026-09-05; `.git/orion-doc.log` son gerçek üretim 2026-09-03 | githooks-integrity.test.ts | KAL *(üretim tarafı UYKU KİPİNDE — REC-142, taşıyıcı anahtarı kapalı)* |
+| `.githooks/post-merge` | `doc-scope.cjs` süzgeciyle `orion doc single/schema/batch/tree` + arka planda `registry-sync.cjs` | ALTYAPI | `githook:post-merge` (shim) | 2026-09-05; `.git/orion-postmerge.log` son 2 satır "UYKU KIPI" (2026-09-06) | githooks-integrity.test.ts | KAL *(üretim tarafı UYKU KİPİNDE)* |
+| `.githooks/lib/doc-scope.cjs` | Companion kapsam süzgecinin TEK uygulaması (SSOT `.cc_docs.yaml`) | ALTYAPI | `require()` ← pre-commit YOK, post-commit + post-merge EVET | — | githooks-doc-scope.test.ts (INV-HOOKS-2) | KAL |
+| `.githooks/lib/companion-defter.cjs` | Companion üretim başarısızlıklarını görünür deftere yazar (REC-67) | ALTYAPI | `require()` ← post-commit | — | companion-defter.test.ts | KAL |
+
+**Not:** `.githooks/README.md` (SSOT gerekçe dokümanı) ve `src/__tests__/conformance/{githooks-integrity,githooks-doc-scope,hook-referential-stability}.test.ts` yukarıdaki satırların doküman/kapı bileşenidir, ayrı araç sayılmadı.
+
+### 3.5 · ci — `.github/workflows/*.yml` (29 araç)
+
+| dosya | ne_yapar | sahip | tetik | kanıt | kapı | durum |
+|---|---|---|---|---|---|---|
+| `ci.yml` | Ana test/lint/build hattı | ALTYAPI | `ci:pull_request,push(master)` | 2026-09-06T20:44:38Z success | pnpm test/lint/build | KAL |
+| `e2e-smoke.yml` | Playwright/E2E duman testi (admin+checkout) | ALTYAPI | `ci:pull_request,push(master)` | 2026-09-06T20:44:38Z success | Playwright | KAL |
+| `pr-size-check.yml` | PR boyut kontrolü | ALTYAPI | `ci:pull_request(opened,synchronize)` | 2026-09-06T20:44:38Z success | inline github-script | KAL |
+| `auto-label.yml` | PR otomatik etiketleme | ALTYAPI | `ci:pull_request(opened,edited)` | 2026-09-06T20:44:38Z success | inline | KAL |
+| `auto-reviewer.yml` | Otomatik reviewer ataması | ALTYAPI | `ci:pull_request(opened)` | 2026-09-06T20:44:38Z success | inline | KAL |
+| `db-advisor.yml` | Supabase RLS/rol/katalog bütünlük kontrolleri | ALTYAPI | `ci:push(master),pull_request` | 2026-09-06T20:44:38Z success | anon-yazma-nobetcisi/catalog-integrity/rls-role-coverage.mjs | KAL |
+| `deploy-functions.yml` | Edge fonksiyonlarını deploy eder | ALTYAPI | `ci:workflow_dispatch,push(master,path)` | 2026-09-06T09:11:33Z success | drift-check/select-functions.mjs | KAL |
+| `edge-shared-input-drift.yml` | Edge paylaşılan girdi sapma kapısı | ALTYAPI | `ci:pull_request(path)` | 2026-09-06T06:37:33Z success | drift-check/select-functions.mjs | KAL |
+| `expired-reservations-cron.yml` | Süresi dolan rezervasyonları temizler | ALTYAPI *(devir adayı: OPS)* | `ci:schedule(03:15 UTC),workflow_dispatch` | 2026-09-06T07:54:35Z success | inline curl | KAL |
+| `order-housekeeping-cron.yml` | Sipariş mutabakatı (iyzico-callback) | ALTYAPI *(devir adayı: OPS)* | `ci:schedule(*/30),workflow_dispatch` | 2026-09-07T05:43:33Z success | inline curl | KAL |
+| `stock-alert-cron.yml` | Stok uyarısı Edge Function tetikleyici | ALTYAPI *(devir adayı: URUN-KATALOG)* | `ci:schedule(06:20 UTC),workflow_dispatch` | 2026-09-06T10:59:40Z success | inline curl | KAL |
+| `katalog-sayim.yml` | Katalog satır/ürün sayımı | URUN-KATALOG | `ci:schedule(06:10 UTC),workflow_dispatch` | 2026-09-06T10:51:24Z success | scripts/katalog/katalog-sayim.mjs | KAL |
+| `ssr-duman-alarmi.yml` | Prod SSR render canlılık duman testi | ALTYAPI | `ci:schedule(06:40 UTC),deployment_status,workflow_dispatch` | 2026-09-06T20:42:57Z skipped | pnpm test:ssr-smoke | KAL |
+| `rls-guard.yml` | Migration PR'larında RLS regresyon denetimi | ALTYAPI | `ci:pull_request(path:supabase/migrations/**)` | 2026-09-06T05:04:06Z success | inline github-script | KAL |
+| `supabase-migrate.yml` | Master'a merge olan migration'ı prod DB'ye otomatik uygular (Kural 13) | ALTYAPI | `ci:push(master,path),workflow_dispatch` | 2026-09-06T05:13:30Z success | Supabase CLI | KAL |
+| `gemini-dispatch.yml` | PR olaylarını Gemini iş akışlarına yönlendirir | ALTYAPI | `ci:pull_request(opened),pull_request_review(_comment)` | 2026-09-06T20:45:40Z skipped | invoke/plan-execute/review/triage çağırır | KAL |
+| `gemini-review.yml` | Gemini kod review adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:132` | 60 dispatch koşumunun 24 başarılısında `review::success`, en yeni 2026-09-06T20:44:38Z | reusable workflow | **KAL** *(sonnet'in "2026-03-18 failure/ÖLÜ ADAY" hükmü YANLIŞTI — düzeltildi)* |
+| `gemini-invoke.yml` | Gemini'yi PR bağlamında çalıştırır | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:160` | 24 başarılı dispatch koşumunda `invoke::skipped` (bağlı, tetik `@gemini` yorumu hiç gerçekleşmedi) | reusable workflow | KAL *(bağlı, uykuda)* |
+| `gemini-plan-execute.yml` | Gemini plan/uygulama adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:174` | aynı ölçüm, `plan-execute::skipped` ×24 | reusable workflow | KAL *(bağlı, uykuda)* |
+| `gemini-triage.yml` | Gemini triage adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:146` | aynı ölçüm, `triage::skipped` ×24 | reusable workflow | KAL *(bağlı, uykuda)* |
+| `db-advisor-fix.yml` | DB advisor bulgularını otomatik düzeltme | ALTYAPI | `ci:workflow_dispatch` (tek satır) | son koşum 2025-12-08T07:41:35Z failure (9 ay); `gh workflow list --all` state `active` | — | OLU-DOGRULANDI |
+| `jules-a11y.yml` | A11y denetimi (Jules AI) | ALTYAPI | `ci:workflow_dispatch` | `gh workflow list --all` state **disabled_manually** | — | OLU-DOGRULANDI |
+| `jules-dependency-update.yml` | Bağımlılık güncelleme önerisi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
+| `jules-i18n-sync.yml` | TR/EN sözlük paritesi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
+| `jules-lint-fix.yml` | Lint/TS otomatik düzeltme dalgası (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
+| `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
+| `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
+| `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
+| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | **OLU-DOGRULANDI** *(sonnet'in KAL hükmü çürütüldü)* |
+
+**Envanter dışı ek bulgu (29'a dahil değil):** `tmp-lf-fix.yml` — `gh workflow list --all` bunu
+`active` listeliyor, ama `.github/workflows/` dizininde YOK ve `git log --all` boş dönüyor.
+GitHub tarafında bayat/hayalet bir kayıt; repo tarafı hiç izlemedi. Durum: **ÖLÇÜLEMEDİ (GitHub
+tarafı hayalet)** — OPS'un GitHub Actions ayarlarından elle temizlemesi gerekir (repo commit'i
+gerektirmez).
+
+### 3.6 · cetvel — `docs/standards/*.md` (67 araç)
+
+> Kapı sütunu cetveller.md'deki kapı aynen taşındı. Durum: KAPILI→**KAL**, HARİTADA-KAPISIZ ve
+> YETİM→**KAL-KAPISIZ** (AXIOM 3 madde 3: kapısı yok ama var — kapı borcu). Sahip: sahipsiz
+> satırlar AXIOM 2 gereği OPS'a yazıldı, devir adayı eklendi.
+
+| dosya | ne_yapar | sahip | tetik | kanıt | kapı | durum |
+|---|---|---|---|---|---|---|
+| 3d-scene-lighting-research | 3D vitrin sahne/ışık araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
+| 3d-showroom-ux-research | 3D vitrin bilgi paneli/UX araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
+| 3d-webgl-standard | 3D/WebGL standardı | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-19 | yok | KAL-KAPISIZ |
+| SOURCES | Admin standardı kaynak manifestosu | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-06-12 | yok (yanlış-pozitif elendi) | KAL-KAPISIZ |
+| admin-capabilities | Admin yetenek kapsamı, bayi/enterprise modülü | OPS *(devir adayı: ALTYAPI)* | haritada | yok | yok | KAL-KAPISIZ |
+| admin-design-standard | Admin tasarım & etkileşim cetveli | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-19 | admin-export-hygiene.test.ts (9 INV) | KAL |
+| admin-standard | Admin/Back-Office standardı | OPS *(devir adayı: ALTYAPI)* | haritada | 2026-08-15 | admin-erp-resource-registry.test.ts | KAL |
+| aile-metni-sayisal-standard | Aile metninde sayısal değer cetveli | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-09-06 | aile-metni-sayisal-deger.test.ts | KAL |
+| analytics-standard | "Ne ölçülür" analytics kontratı | OPS *(devir adayı: ALTYAPI)* | haritada | 2026-08-19 | analytics-event-taxonomy.test.ts (3 INV) | KAL |
+| auth-account-standard | Auth & hesap standardı | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-26 | auth-reset-chain.test.ts (3 INV) | KAL |
+| canonical-url-standard | Kanonik adres standardı (canonical/hreflang/sitemap) | OPS *(devir adayı: URUN)* | haritada değil | 2026-08-18 | canonical-lang-segment.test.ts (2 INV) | KAL |
+| catalog-depth-standard | Katalog derinliği — sayfa ne zaman açılır | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-08-28 | catalog-integrity-gate.test.ts (3 INV) | KAL |
+| catalog-ingestion-standard | Katalog içe-alım standardı v1.0 | OPS *(devir adayı: URUN-KATALOG)* | haritada | 2026-09-06 | catalog-integrity-gate.test.ts (2 INV) | KAL |
+| category-taxonomy-standard | Kategori taksonomisi cetveli | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-08-10 | yok | KAL-KAPISIZ |
+| checkout-payment-standard | Checkout & ödeme cetveli | ALTYAPI | haritada değil | 2026-09-05 | payment-render-surface.test.ts (4 INV) | KAL |
+| ci-runner-install-standard | CI koşucu kurulum cetveli (INV-CI-INSTALL-1) | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-19 | ci-install-bounded.test.ts | KAL |
+| collaboration-protocol | Çok-ajan işbirliği protokolü | OPS | haritada değil | 2026-08-27 | board-invariants.test.ts (8 INV) | KAL |
+| commerce-domain-map-standard | Ticaret alan haritası standardı | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-19 | currency-not-from-language.test.ts (5 INV) | KAL |
+| companion-doc-standard | Companion doküman standardı v0.1 | ALTYAPI | haritada değil | 2026-09-05 | companion-doc-parity.test.ts (6 INV) | KAL |
+| crm-standard | CRM cetveli — nesne katmanı, SAHA PROJESİ (v0) | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-20 | yok | KAL-KAPISIZ |
+| csp-standard | CSP standardı | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-19 | csp-origin-coverage.test.ts (2 INV) | KAL |
+| csv-import-export-standard | Kanonik CSV içe/dışa-alım format standardı v1.1 | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-06-20 | admin-csv-import-mapping.test.ts | KAL |
+| customer-account-standard | Müşteri hesap yüzeyi standardı v0.1 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-16 | auth-account-surface.test.ts | KAL |
+| db-grant-hygiene-standard | VIEW yetki hijyeni cetveli | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-20 | db-view-grant-hygiene.test.ts (2 INV) | KAL |
+| dealer-module-blueprint | Bayi modülü implementasyon blueprint (Katman 4) | OPS *(devir adayı: ALTYAPI)* | haritada | 2026-06-12 | yok | KAL-KAPISIZ |
+| dealer-network-standard | B2B bayi-ağı domain standardı | OPS *(devir adayı: ALTYAPI)* | haritada | 2026-06-12 | yok | KAL-KAPISIZ |
+| dependency-integrity-standard | Bağımlılık bütünlüğü cetveli v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-19 | peer-dependency-integrity.test.ts | KAL |
+| deploy-build-skip-standard | Dağıtım atlama cetveli (Ignored Build Step) v1.1 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-09-03 | build-skip-positive-logic.test.ts | KAL |
+| document-numbering-standard | Belge numaralandırma cetveli | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-09-06 | eposta-sablon-alanlari.test.ts | KAL |
+| edge-function-security-standard | Edge function güvenlik cetveli v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-24 | config-fail-closed.test.ts (5 INV) | KAL |
+| email-template-standard | E-posta şablonu cetveli v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-09-06 | eposta-sablon-alanlari.test.ts (2 INV) | KAL |
+| erp-workspace-design-standard | ERP çalışma alanı tasarım cetveli | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-20 | admin-erp-resource-registry.test.ts | KAL |
+| execution-method-standard | Yürütme yöntemi cetveli v1.0 (T144-VH) | ALTYAPI | haritada değil | 2026-08-21 | `.claude/hooks/board-brief.cjs` (isim geçiyor) | KAL |
+| fleet-mechanism-standard | Filo mekanizması cetveli v1.0 | ALTYAPI | haritada değil | 2026-09-06 | bash-write-audit-tree.test.ts (10 INV) | KAL |
+| form-submission-standard | Form gönderim cetveli (müşteri yüzü) | OPS *(devir adayı: URUN)* | haritada değil | 2026-08-23 | form-submission-standard.test.ts | KAL |
+| i18n-localization-standard | i18n/localization standardı | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-23 | i18n-locale-case.test.ts | KAL |
+| i18n-ters-yon-standard | i18n ters yön standardı (TR yüzeyde EN metin) | URUN | haritada değil | 2026-09-01 | i18n-ters-yon.test.ts (3 INV) | KAL |
+| is-kayit-duzeni-standard | İş-kayıt düzeni standardı | OPS | haritada değil | 2026-08-26 | yok | KAL-KAPISIZ |
+| katalog-sayim-standard | Katalog sayımı standardı | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-09-03 | yok | KAL-KAPISIZ |
+| legal-compliance-standard | Hukuki uyum cetveli | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-20 | invoice-ledger-contract.test.ts (5 INV) | KAL |
+| marka-token-eslemesi-standard | Marka kılavuzu → kod token eşlemesi standardı | OPS *(devir adayı: URUN)* | haritada değil | 2026-09-06 | marka-palet-tokenlari.test.ts (2 INV) | KAL |
+| matris-gorunum-standard | Matris görünüm standardı — sütun seçimi | OPS *(devir adayı: URUN)* | haritada değil | 2026-09-03 | yok | KAL-KAPISIZ |
+| measurement-discipline-standard | Ölçüm disiplini standardı | OPS | haritada değil | 2026-08-19 | yok | KAL-KAPISIZ |
+| migration-safety-standard | Migration güvenlik standardı (DROP/RENAME/TYPE) | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-15 | edge-select-columns.test.ts (yorumda) | KAL |
+| mockup-gelisim-hatti-standardi | Mockup geliştirme hattı standardı | OPS *(devir adayı: URUN)* | haritada değil | 2026-08-25 | yok | KAL-KAPISIZ |
+| multi-session-coordination-standard | Çok-oturumlu koordinasyon standardı v1.0 | OPS | haritada | 2026-08-16 | board-invariants.test.ts | KAL |
+| notification-standard | Bildirim cetveli v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-23 | notification-standard.test.ts (3 INV) | KAL |
+| pano-orion-koprusu-standardi | Pano ↔ Orion köprüsü cetveli (RFC-1) | OPS | haritada değil | 2026-08-26 | yok | KAL-KAPISIZ |
+| payment-ledger-standard | Ödeme defteri cetveli | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-24 | payment-ledger-vocabulary.test.ts | KAL |
+| pricing-standard | Fiyatlandırma standardı v1.1 | OPS *(devir adayı: URUN-KATALOG)* | haritada | 2026-08-18 | admin-fx-lock-crud.test.ts (9 INV) | KAL |
+| product-image-standard | Ürün görseli standardı v0.2 | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-08-21 | yok | KAL-KAPISIZ |
+| product-schema-standard | Ürün veritabanı şeması standardı v1.0 | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-08-23 | product-identity-resolver.test.ts | KAL |
+| proje-takip-defteri-standard | Proje takip defteri cetveli v1.0 | OPS | haritada değil | 2026-09-06 | board-invariants.test.ts | KAL |
+| purchasing-standard | Satınalma standardı v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-18 | purchasing-machine-and-evidence.test.ts (3 INV) | KAL |
+| quote-standard | Teklif modülü standardı v2 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-09-06 | quote-insert-policy-guard.test.ts (4 INV) | KAL |
+| rendering-cache-standard | Render & önbellek standardı v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada | 2026-08-21 | instruction-surface-ppr.test.ts (2 INV) | KAL |
+| runtime-version-alignment-standard | Çalışma zamanı sürüm hizalaması v1.0 | OPS *(devir adayı: ALTYAPI)* | haritada değil | 2026-08-19 | runtime-version-alignment.test.ts | KAL |
+| session-loop-ritual | Oturum açılış ritüeli — loop komutları (SSOT) | OPS | haritada değil | 2026-08-18 | board-invariants.test.ts | KAL |
+| settled-work-standard | Çözüldü (Settled) standardı v1.0 | OPS | haritada değil | 2026-08-22 | yok | KAL-KAPISIZ |
+| spec-axis-standard | Spec ekseni cetveli (`products.technical_specs`) | OPS *(devir adayı: URUN-KATALOG)* | haritada değil | 2026-08-23 | spec-axis-gate.test.ts | KAL |
+| storefront-design-standard | Storefront tasarım cetveli | OPS *(devir adayı: URUN)* | haritada değil | 2026-09-05 | storefront-style-ratchet.test.ts | KAL |
+| storefront-reflow-standard | Vitrin reflow cetveli — WCAG 2.2 SC 1.4.10 v1.0 (T050-VH) | URUN | haritada değil | 2026-08-30 | kart-yukleme-onceligi.test.ts (4 INV) | KAL |
+| subagent-delegation-standard | Alt-ajan devri cetveli | OPS | haritada | 2026-08-22 | yok | KAL-KAPISIZ |
+| tasarim-yetenek-standard | Tasarım yetenek (skill) kullanım cetveli v0.1 (taslak) | OPS | haritada | 2026-09-06 | yok | KAL-KAPISIZ |
+| uretilmis-artefakt-standard | Üretilmiş artefakt standardı | ALTYAPI | haritada değil | 2026-09-05 | uretilmis-artefakt-tazeligi.test.ts (5 INV) | KAL |
+| vaat-butunlugu-standard | Vaat bütünlüğü standardı — vitrin neyi vaat edebilir | URUN | haritada değil | 2026-09-06 | uc-boyut-musteri-yuzeyi.test.ts (5 INV) | KAL |
+| work-tracking-ssot-standard | İş-takibi & dokümantasyon SSOT standardı [ESKİ, tarihçe] | OPS | haritada değil | 2026-09-06 | kume-master-tazeligi.test.ts | KAL |
+| arac-envanteri-standard | Araç Envanteri Standardı (v1.0 — 2026-09-07) | OPS | docs/README.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| satis-kipi-gecis-standard | Satış Kipi Geçiş Cetveli — v1.0 | OPS | cagiran-yok (betik taramasi; anma: docs/plans/rec168-migration-taslagi-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| hafiza-kancalari-standard | Hafıza Kancaları Standardı (REC-177) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| urun-yapisal-veri-standard | VentHub Ürün Yapısal Verisi Standardı (Cetvel) — v1.0 | URUN | src/__tests__/conformance/jsonld-urungrubu-gorsel.test.ts (INV-URUNGRUBU-GORSEL-1) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| kategori-adlandirma-standard | Kategori Adlandırma Cetveli — hangi alan NEREDE kazanır | URUN | docs/README.md (soru→otorite tablosu) | 2026-09-09 (§4 açık karar KAPANDI: `marketing_title` emekli, Recep) | kategori-adi-tek-kaynak.test.ts (INV-KATEGORI-ADI-1) — **KISMEN**: zincirin 1. adımını ve sözlüksüz çağrıyı ölçer, sıranın kendisini ölçmez | KAL |
+| denetim-izi-standard | Cetvel — Denetim izi bütünlüğü: hangi veri yazımı denetim izine düşmek ZORUNDA, nasıl ölçülür, kim neyi üstlenir (REC-292). Yazma yüzeyi evreni (7 kalem, ikisi dosya DEĞİL), fail-closed hükmü + ispat yükü, tetiğin GÖRMEDİĞİ yollar (TRUNCATE / sahip rolü), dört yasak. | ALTYAPI | `docs/plans/rec292-denetim-izi-2026-09-09.md` · kapı `scripts/db/checks/denetim-izi-tetik-kapisi.mjs` · `CLAUDE.md` kural 11'in tek yazılı karşılığı | 2026-09-09 prod ölçümüyle yazıldı: yazan 14 betiğin 0'ı denetim yazıyor · 09-08'de hiçbir tablodan satır yok · `site_settings`'te `tenant_id` YOK · `exec` RPC YOK · TRUNCATE yetkisi `anon`'a kadar açık | `denetim-izi-kapisi.test.ts` — cetvelin fail-closed hükmünü, TRUNCATE kapsam-dışı beyanını, geriye-dönük-üretim yasağını ve tenant borcunu ADIYLA arar (cetvel sessizleşirse KIRMIZI) | YENI |
+
+---
+
+## 4 · Özel satırlar
+
+- **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
+  altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
+  hem de içeriğinde hatalı kod barındırıyor (curutme.md, pano 2026-09-07T07:00:51Z bağımsız
+  teyit) — geri getirilmemeli, silme kararı Recep kapısına gidecek (AXIOM 3).
+- **`.claude/worktrees/agent-a91c11837d4004440`** (dal: `worktree-agent-a91c11837d4004440`) —
+  bayat alt-ajan worktree'si; vitest test dosyalarını ana ağaçla çiftliyor (test koşucusunu
+  yavaşlatıyor/çift saydırabiliyor). Bu araç envanterinin kapsamında bir "araç" değil (hook/
+  betik/skill/githook/ci/cetvel sınıflarının hiçbirine girmiyor) → **envanter dışı artık, silme
+  adayı (OPS ölçüp siler)**. Silmeden önce canlılık kontrolü yapılmalı (hafıza:
+  silmeden-once-canlilik-ve-taze-dal).
+- **`tmp-lf-fix.yml`** — bkz. §3.5 son not: GitHub Actions tarafında `active` görünen ama repoda
+  hiç var olmamış hayalet kayıt; 29'luk dosya sayımına dahil değildir, OPS'un GitHub ayarlarından
+  temizlemesi gerekir.
+
+---
+
+## 5 · Sonnet'in kaçırdığı kanallar
+
+(Bkz. Bölüm 2 — aynen curutme.md'den taşındı, REC-185 kapı betiğine girdi olarak tekrar
+vurgulanmıştır.)
+
+---
+
+## 6 · Sayım
+
+| Tür | Toplam | KAL | KAL-KAPISIZ | OLU-DOGRULANDI | KARANTINA | OLCULEMEDI | ENVANTER-DISI |
+|---|---|---|---|---|---|---|---|
+| hook (`.claude/hooks/*.cjs`) | 14 | 14 | — | 0 | 0 | 0 | — |
+| betik (`scripts/**`) | 119 | 66 | — | 52 | 1 | 1 (+2 uyarılı OLU-DOGRULANDI) | — |
+| skill (satır) | 64 | 40 | — | — | — | — | 24 |
+| githook (`.githooks/*`) | 5 | 5 | — | 0 | 0 | 0 | — |
+| ci (`.github/workflows/*.yml`) | 29 | 20 | — | 9 | 0 | 0 (+1 GitHub-hayalet ayrı) | — |
+| cetvel (`docs/standards/*.md`) | 67 | 48 | 19 | — | — | — | — |
+| **TOPLAM (satır)** | **298** | **193** | **19** | **61** | **1** | **1** | **24** |
+
+**Ek toplamlar:** companion `.md` (hook, envanter dışı) 13 · skill tekil ad 39 (satır 64) ·
+GitHub-hayalet CI 1 (`tmp-lf-fix.yml`, 29'a dahil değil) · özel-durum envanter-dışı nesne 1
+(`.claude/worktrees/agent-a91c11837d4004440`).
+
+
+---
 # FILE: docs\audits\build-skip-canli-olcum-2026-08-28.md
 
 # Build-skip canlı ölçümü — D8.3 deneyi (2026-08-28)
@@ -1096,6 +1649,117 @@ uyuştu veya canlı DB ile doğrulandı. Tam çıktı: workflow task `wmpn8vfln`
 
 
 ---
+# FILE: docs\audits\fiyatsiz-27-ayrim-2026-09-06.md
+
+# Fiyatsız ürünlerin ayrımı — içe alım boşluğu mu, ticari boşluk mu? (REC-168)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06 · **Durum:** SALT OKUMA ölçüm; hiçbir fiyat yazılmadı.
+
+## KAYNAK / CETVEL
+
+* `docs/standards/pricing-standard.md` — fiyat/kur/marj otoritesi.
+* `docs/standards/catalog-ingestion-standard.md` **§1** — köprü = model kodu; **kodun biçimi hakkında varsayım yok** (T119: yalnız beş haneli kod bekleyen bir çıkarım 74 ürünü düşürmüştü). **§6.3** — kaynak dizini; PDF doğrudan taranmaz.
+* Emir: OPS → KATALOG, REC-168. **YÖNTEM:** şerit, alt ajan yok. Sapma yok.
+
+---
+
+## 0 · Niçin bu ayrım
+
+Satış kipine geçince fiyatsız ürün vitrinde fiyatsız kalır. Ama **"fiyat yok" tek bir sorun değil**, iki bambaşka sorundur ve çözümleri de bambaşkadır:
+
+| Sınıf | Ne demek | Kimin işi |
+|---|---|---|
+| **İÇE ALIM BOŞLUĞU** | fiyat AVenS listesinde **var**, biz içe almamışız | bizim — bir betik |
+| **TİCARİ BOŞLUK** | fiyat listede **yok**, AVenS hiç vermemiş | Recep — AVenS'e sorulacak |
+
+Ayrım yapılmadan "satış kipine geçelim" denirse hangisinin **bizim eksiğimiz** olduğu bilinmez.
+
+## 1 · Ölçüm
+
+| Ölçüt | Sayı |
+|---|---|
+| Ürün kaydı (ham) | 375 |
+| Silinmiş (`deleted_at` dolu) — **evrenden çıkarıldı** | 0 |
+| **Canlı ürün** | **375** |
+| Fiyatlı (`gross_price` ya da `net_price` > 0) | 348 |
+| **FİYATSIZ** | **27** |
+
+**Ayrım: 27 = 1 içe alım + 26 ticari + 0 kod yok**
+
+## 2 · ⭐ASIL BULGU — dağınık ürün değil, KOMPLE AİLE
+
+27 sayısı yanıltıcı okunabilir. Ürün bazında dağınık değil: **4 aile TAMAMEN fiyatsız** (15 ürün). Satış kipine geçilince bu aileler vitrinde **tek bir fiyat bile göstermez** — eksik ürün değil, eksik aile.
+
+| Aile | Fiyatsız | Toplam | Durum |
+|---|---|---|---|
+| `vortice-vort-qbk-sal-kc-evo` | 11 | 21 | kısmi (10 fiyatlı) |
+| `vortice-radon-range-circular` | 5 | 5 | **TAMAMI FİYATSIZ** |
+| `vortice-vortice-bravo-s` | 4 | 4 | **TAMAMI FİYATSIZ** |
+| `vortice-radon-range-roof` | 3 | 3 | **TAMAMI FİYATSIZ** |
+| `vortice-deumido-range` | 3 | 3 | **TAMAMI FİYATSIZ** |
+| `avens-hucreli-aspiratorler` | 1 | 6 | kısmi (5 fiyatlı) |
+
+Bu, tek tek ürün eksiği gibi görünen şeyin aslında **ticari kapsam sorusu** olduğunu söylüyor: AVenS bu aileler için hiç fiyat vermemiş. Soru "fiyatı girelim mi" değil, **"bunları satıyor muyuz"**.
+
+## 3 · Tablo (ürün bazında)
+
+| Ürün (slug) | Model kodu | Aile | Fiyat listesi s. | Sınıf |
+|---|---|---|---|---|
+| `avens-hf-fw-18-18-5-5kw-20150` | `20150` | avens-hucreli-aspiratorler | 28 | **ICE ALIM BOSLUGU** |
+| `vort-qbk-sal-kc-evo-315-t2-1-5kw-43152` | `43152` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-315-t4-8-0-25-0-03kw-43165` | `43165` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-355-t4-8-0-25-0-03kw-43166` | `43166` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-400-t4-8-0-75-0-12kw-43167` | `43167` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-450-t4-8-1-1-0-18kw-43168` | `43168` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-500-t4-8-1-5-0-25kw-43169` | `43169` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-500-t6-0-55kw-43160` | `43160` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-560-t4-8-3-0-55kw-43170` | `43170` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-560-t6-1-1kw-43162` | `43162` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-630-t4-8-5-5-1-1kw-43171` | `43171` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vort-qbk-sal-kc-evo-630-t6-1-5kw-43164` | `43164` | vortice-vort-qbk-sal-kc-evo | yok | **TICARI BOSLUK** |
+| `vortice-bra-vo-s1-13147` | `13147` | vortice-vortice-bravo-s | yok | **TICARI BOSLUK** |
+| `vortice-bra-vo-s2-13148` | `13148` | vortice-vortice-bravo-s | yok | **TICARI BOSLUK** |
+| `vortice-bra-vo-s3-13149` | `13149` | vortice-vortice-bravo-s | yok | **TICARI BOSLUK** |
+| `vortice-bra-vo-s4-13150` | `13150` | vortice-vortice-bravo-s | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-100-es-16277` | `16277` | vortice-radon-range-circular | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-125-es-16278` | `16278` | vortice-radon-range-circular | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-150-es-16279` | `16279` | vortice-radon-range-circular | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-150-rf-es-16257` | `16257` | vortice-radon-range-roof | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-160-es-16280` | `16280` | vortice-radon-range-circular | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-160-rf-es-16258` | `16258` | vortice-radon-range-roof | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-200-es-16281` | `16281` | vortice-radon-range-circular | yok | **TICARI BOSLUK** |
+| `vortice-ca-rm-200-rf-es-16259` | `16259` | vortice-radon-range-roof | yok | **TICARI BOSLUK** |
+| `vortice-deumido-ng-10-26020` | `26020` | vortice-deumido-range | yok | **TICARI BOSLUK** |
+| `vortice-deumido-ng-16-26021` | `26021` | vortice-deumido-range | yok | **TICARI BOSLUK** |
+| `vortice-deumido-ng-20-26022` | `26022` | vortice-deumido-range | yok | **TICARI BOSLUK** |
+
+## 4 · Pozitif kontrol — ölçüt gerçekten arıyor mu
+
+"26 ürün listede yok" iddiası, eşleştirici **bozuksa da** aynı sonucu verirdi. Ayırt edici sınav: **fiyatlı** ürünlerin kodu listede geçmeli.
+
+| Sınav | Sonuç |
+|---|---|
+| Fiyatlı üründen rastgele örnek (tohum 7) | 40 |
+| Kodu fiyat listesinde **geçen** | **40** |
+
+Yani ölçüt körü körüne "yok" demiyor: olması gereken yerde **buluyor**, olmaması gereken yerde bulmuyor. Bu sınav geçmeseydi rapor yayımlanmazdı.
+
+## 5 · Bu ölçümün sınırı — adıyla
+
+Eşleme ölçütü: **model kodu, fiyat listesi sayfasında geçiyor mu.** Geçmek, o sayfadaki fiyatın **bu ürüne ait olduğunu kanıtlamaz** — kod başka bir bağlamda da geçebilir. Bu yüzden sınıf adı "fiyat bulundu" değil **İÇE ALIM BOŞLUĞU**: iddia "fiyat listede duruyor olabilir, bakılmalı"dır, "fiyat şudur" değil.
+
+Ters yön daha güçlü: kod **hiç geçmiyorsa** o ürün fiyat listesinde yoktur — **TİCARİ BOŞLUK** iddiası bu yüzden daha sağlamdır.
+
+Ayrıca `model_code` boş olan ürün **ölçülemez**, ayrı sınıfta tutulur; kanıtsızla karıştırılmaz.
+
+## 6 · Sıradaki
+
+* **İçe alım boşlukları** → REC önerisi (açmayı OPS yapar).
+* **Ticari boşluklar** → Recep'e OPS taşır; AVenS'ten istenecek kalem.
+* Fiyat **yazılmadı**; bu iş yalnız sınıflandırmadır.
+
+
+---
 # FILE: docs\audits\i18n-sozluk-render-denetimi-2026-08-23.md
 
 # i18n Sözlük / Render Denetimi — 2026-08-23
@@ -1369,6 +2033,8760 @@ karar öncesi **yeniden ölçülmelidir**. Kod tarafındaki sayılar (§3, §4) 
 
 
 ---
+# FILE: docs\audits\icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md
+
+# 1000 Satır Tavanı — Filo Notu (2026-09-06)
+
+**Yazan:** URUN-KATALOG şeridi (sid 3a7976a1). **Emir:** OPS 14:15Z ("yarın sabah filo notu; tüm sayım
+betikleri"); ALTYAPI kapanışı ("başka betikler?"); OPS 15:xxZ "not sende, ben ayrıca yazmayacağım".
+**YÖNTEM:** elle ölçüm (PostgREST şeması + `count=exact`, grep + satır okuma) + **Workflow düşmanca
+çürütme** (3 mercek, §6). Cetvel: `docs/standards/execution-method-standard.md` ("bağımsız çürütme =
+Workflow"). Konunun kendi cetveli YOK — reçete satırının hangi cetvele gireceği OPS/ALTYAPI kararı (§7).
+**Kanıt zinciri:** [[sessiz-tavan-ve-fail-open-kapi]] · [[fail-open-kapi-kapi-degildir]] (hafıza),
+commit `40072eeb` + `5c9f0fb3` (PR #1058), ALTYAPI 13:51Z ölçümü, URUN + ALTYAPI pano notları 15:0xZ.
+
+## 0. Tek cümle
+
+PostgREST (Supabase REST, supabase-js, supabase-py, ham `fetch`/`urllib`) **tek çağrıda en çok 1000 satır
+döner**; `limit=2000` / `.limit(5000)` bunu **aşamaz**; tavana takılan okuma **hata vermez, eksik döner**.
+Yani "çalıştı, satır geldi" hiçbir şeyi kanıtlamaz — **çekilen sayı, sunucunun kesin sayısıyla
+karşılaştırılmadıkça** ölçüm değildir.
+
+## 1. Ölçülen vaka (bugün, üç ayrı yerde)
+
+| Saat | Nerede | Ne oldu |
+|---|---|---|
+| 13:51Z | ALTYAPI, `scripts/kip/satis-kipine-gec.mjs` (dal B) | supabase-js ile product_prices: 1044 satırın **44'ü sessizce düştü**; sayfalama + kesin sayı eklendi, sabotajla kanıtlandı |
+| ~14:00Z | KATALOG, `scripts/icerik-hatti/fiyatsiz-ayrim.py` (REC-168) | `limit=2000` istendi, **1000 geldi**; sonuç şans eseri değişmedi (fiyatsız 27 aynı kaldı) — betik sertleştirildi (`40072eeb`) |
+| ~14:10Z | KATALOG, aynı betik | ilk kapı **fail-open** çıktı: kesin sayı alınamayınca (`-1`) denetim atlanıyordu → KIRMIZI'ya çevrildi (`5c9f0fb3`), sabotaj A/B ile kanıtlandı |
+
+Üç vaka da **sessizdi**: hata yok, uyarı yok, çıkış kodu 0.
+
+## 2. Tablo evreni — hangi tablolar tavanı aşıyor (ÖLÇÜLDÜ 15:0xZ)
+
+Yöntem: `GET /rest/v1/` (OpenAPI şeması) → 62 nesne; her biri için `Prefer: count=exact` → `Content-Range`.
+Servis rolü ile; anon anahtar RLS altında sessizce boş döner, ölçüm için KABUL EDİLMEZ.
+
+| Durum | Nesne |
+|---|---|
+| **> 1000 (tavan ISIRIR)** | **product_prices 1044** · **product_images 1042** |
+| 500–1000 (yaklaşan) | YOK |
+| < 500 (en büyükler) | products 375 · inventory_summary 375 · inventory_velocity 375 (görünüm) · _migration_ledger 234 · admin_audit_log 60 · product_families 40 · client_errors 39 · categories 37 · currency_rates 34 |
+| ölçülemedi | admin_users → `42501 permission denied for table users` (auth.users görünümü; servis rolüne de kapalı — tavan konusu DEĞİL) |
+
+Geri kalan 50 nesne 0–11 satır. Tam liste ölçüm çıktısında (bu notun kaynağı; `_veri.py` ile yeniden
+üretilebilir).
+
+**Sonuç:** bugün tavan yalnız **fiyat** ve **görsel** tablolarında ısırır. `products` 1000'i geçtiği gün,
+ürün tablosunu sayfalamasız okuyan her betik/sayfa (sitemap, `generateStaticParams`, dışa aktarımlar)
+aynı sınıfa girer — o gün bu not yeniden açılır.
+
+## 3. Okuyucu envanteri — kim, hangi tabloyu, nasıl okuyor
+
+Sınıflar:
+**A** = tavana tabi + >1000 tablo + korumasız → **GERÇEK AŞIM** ·
+**B** = tavana tabi, çoklu okuma, kesin sayı yok, tablo bugün tavan altı → **KALIP RİSKİ** ·
+**C** = tavana tabi ama anahtarlı / tekil / küçük parça → güvenli ·
+**D** = pg doğrudan SQL → **tavan uygulanmaz** ·
+**E** = reçeteye uygun (kesin sayı + sayfalama + KIRMIZI).
+
+### A — gerçek aşım: **BULUNAMADI** (iki bağımsız mercekle de doğrulandı, §6)
+
+product_prices ve product_images okuyan her yer tek tek okundu (§3-C/E); hepsi anahtarlı ya da sayfalı.
+Migration'lardaki görünümler iki tabloyu okumuyor; RPC'ler (`get_display_prices`, `get_product_families_enriched`,
+`get_family_detail`, `fts_search_products`) ürün başına `limit 1` alt-sorguyla dokunuyor, üst seviye kelepçeli
+(workflow mercek 2).
+
+### E — reçeteye uygun
+
+| Dosya | Tablo | Not |
+|---|---|---|
+| `scripts/icerik-hatti/_veri.py` (#1058) | ortak modül | referans uygulama. **Bugün iki kez düzeltildi:** `select=*` (§4-f) ve **`order=id` + filtreli kesin sayı + `SAYFA_BOYU`** (§4-g/h; workflow bulgusu) |
+| `scripts/icerik-hatti/fiyatsiz-ayrim.py` (#1058) | products, product_prices, product_families | ⚠**İlk taslakta YANLIŞ SINIFTAYDI:** `_veri`'yi değil kendi kopyasını kullanıyordu, product_prices sayfalaması **sırasızdı** (1044 = 2 sayfa; doğruluk Postgres sırasına bağlıydı) ve pozitif kontrol düşükken rapor yine yazılıyordu. Workflow buldu (§6); kopya kaldırıldı, `_veri`'ye geçirildi, pozitif kontrol düşük → çıkış 1. Sayfa 100 ve 1000 çıktıları bayt-aynı, 27 = 1 + 26 + 0 değişmedi |
+| `scripts/icerik-hatti/teknik_bosluk.py` · `urun-veri-cek.mjs` (#1058) | products, product_families | products `_veri.tumunu_cek` / kesin sayı kapısı; **product_families düz okuması** (40 satır) workflow'un bulduğu kalıp riskiydi → `tumunu_cek`'e alındı |
+| `scripts/kip/satis-kipine-gec.mjs` (ALTYAPI dal B, push'suz) | product_prices | count-first + döngü sınırı + uyuşmazlık = KIRMIZI (ALTYAPI 13:51Z) |
+| `scripts/icerik-hatti/db-durum-olc.mjs` | products | `Prefer: count=exact` + `Range: 0-0` (yalnız sayı). ⚠**İlk taslakta fail-open'dı:** başlık yoksa `\|\| '/0'` ile `urun: 0`, çıkış 0 (workflow buldu) → başlık yoksa/sayı değilse çıkış 1; sabotajla ölçüldü |
+| `scripts/icerik-hatti/tier-c-temizlik.mjs` | products, product_families | `.range()` döngüsü + BEKLENEN sabitleriyle fazla/eksik → KIRMIZI |
+
+### B — kalıp riski (bugün doğru, yarın sessizce yanlış)
+
+| Dosya:satır | Tablo (bugün) | Biçim | Sahip | Öneri |
+|---|---|---|---|---|
+| `scripts/generate/generate-sitemap.mjs:21-22` | categories (37), products (375) | `.limit(1000)` / **`.limit(5000)`** — tuzağın birebiri | **yok**; `package.json`/workflows/`next.config.mjs` hiçbir yerden çağırmıyor (ölçüldü) → ölü aday | sil ya da reçeteye geçir — OPS kararı |
+| `scripts/kademe2-load/load.mjs:134` | categories (37) | supabase-js tam okuma, sayım kontrolü yok | ALTYAPI (kendi bulgusu) | reçete |
+| `scripts/db/checks/check_product_fields.py:15` | products active (375) | supabase-py tam okuma | ALTYAPI (`scripts/db/checks/**`) | reçete ya da pg |
+| `scripts/tools/extract_brands.py:70` | products (375) | supabase-py tam okuma | **yok** | reçete / arşiv |
+| `scripts/media/*-run.mjs`, `*-manifest.mjs` (10 dosya, 2026-08-21) | products?brand=ilike… (marka başına ≤173) | ham fetch, filtreli, sayım yok | **yok** (URUN = GÖRSEL beratı, claim'de değil) | reçete; görsel akışı canlanırsa önce bu |
+| `scripts/icerik-hatti/urun-veri-cek.mjs` (#1058) | products (375) | `Range` 500'lük döngü, **kesin sayı YOKTU** | KATALOG | **bu notla düzeltildi** (commit `74c38046`; sabotaj A/B çıkış 1, iyi girdi 375=375) |
+| `src/lib/services/pricingMaterialize.service.ts:317` | product_prices (1044) | `.range(o, o+999)` döngüsü; **ilk kısa sayfada durur** (max-rows ≥ 1000 varsayımı), kesin sayı karşılaştırması yok | src/lib/services — claim'de değil | reçetenin (b) adımı; sahibini OPS belirler |
+| **`src/lib/services/pricingMaterialize.service.ts:126`** `refreshCostInBase` | products (375) | tam okuma, `.range()`/count yok — **YAZMA yolu** (CostRefreshModal `dryRun:false`); aynı dosyanın 308. satırındaki yorum tavanı biliyor ama bu okuma sayfalanmamış | claim'de değil | products 1000'i geçince maliyet tazeleme sessizce eksik ürünle yazar → reçete (workflow buldu, doğrulandı) |
+| **`src/lib/admin/inboxCounts.ts:26`** | products | tam okuma, istemcide sayım | claim'de değil | sunucuda `count` (workflow buldu, doğrulandı) |
+| **`supabase/functions/order-housekeeping/index.ts:63`** | venthub_orders | **`limit=1000` — tuzağın birebiri**, cron'da koşuyor | `supabase/functions/**` hiçbir şeridin claim'inde değil (ALTYAPI ölçtü) | OPS sahip atar; reçete (workflow buldu, doğrulandı) |
+| **`supabase/functions/stock-alert/index.ts:182`** | products | ön-filtreli ama sınırsız, cron | claim'de değil | reçete (workflow buldu, doğrulandı) |
+| `scripts/db/product-data/identity-fix.mjs:69` | products (375) | değişken-yol `rest/v1/${p}` ile tam okuma, sonucu "DEĞİŞMEZ" kapısı olarak kullanıyor | geçmiş yazım betiği (08-23) | reçete ya da arşiv (workflow buldu; ilk taslak C demişti) |
+
+### C — güvenli (anahtarlı / tekil / küçük parça)
+
+| Dosya:satır | Tablo | Biçim |
+|---|---|---|
+| `src/lib/services/pricing.service.ts:146` | product_prices | `eq product_id` (ürün başına) |
+| `supabase/functions/order-validate/index.ts:118` | product_prices | `product_id=eq & price_list_id=eq` |
+| `scripts/kademe2-load/load.mjs` | product_images | anahtarlı `maybeSingle` (ilk taslak "product_prices" yazmıştı — yanlış tablo, workflow düzeltti; dosyada product_prices okuması yok) |
+| `scripts/media/upload-pilot-images.mjs:61` | product_images | `count: exact, head: true` ürün başına (doğrulandı) |
+| `src/views/admin/ProductsTableBody.tsx:87` | product_images | `in(product_id)` **20'lik parça** (20 ürün × ort. 2.8 görsel) (doğrulandı) |
+| `src/lib/services/family.service.ts:322` (`getSeriesLanding`) | product_images (gömülü) | `eq parent_family_id` anahtarlı — canlı yol, ilk taslakta yoktu (workflow buldu) |
+| `src/lib/services/displayPrice.service.ts:50` | `get_display_prices(uuid[])` rpc | id başına satır, çağıran 200'lük parçalıyor — tavan ancak >1000 id ile ısırır (workflow buldu) |
+| `scripts/db/product-data/*.mjs` (4 dosya, 08-22/23; identity-fix hariç → B) | products | yol değişkende (`rest/v1/${p}`), anahtarlı yazım betikleri — elle okundu |
+| `scripts/db/checks/check_category_id.py`, `check_rls.py`, `simulate_frontend.py` | categories, products | `eq id/slug` · yalnız `count` · `.limit(10)` bilinçli örnek (ALTYAPI) |
+| `src/lib/services/family.service.ts:412` + `getAllFamilySlugs` | product_families (40) | tam okuma ama 40 satır — URUN kendi evrenini ölçtü (13 aile paketi / 37 kategori / 73 anahtar / 375 ürün) |
+
+### D — pg doğrudan SQL (tavan uygulanmaz)
+
+`scripts/katalog/katalog-sayim.mjs` (URUN ölçtü + benim ölçümüm: `pg.Client`, PostgREST yok) ·
+`scripts/katalog/matris-sutun-doluluk.mjs` (dosya + SQL metni, istemci yok) ·
+`scripts/db/checks/{catalog-integrity,rls-role-coverage,rbac-ui-db-parity,anon-yazma-nobetcisi}.mjs`
+(ALTYAPI: `client.query`, sayımlar sunucuda `count(*)`) · `scripts/db/audit_checks.js` (`new Client`).
+
+### Taramanın sınırları (bilinçli, yazıldı)
+
+1. **Değişken yol/tablo grep'e görünmez** — `.from(TABLO)`, `` rest/v1/${p} `` (rbac-ui-db-parity de aynı
+   sınırı kendi raporunda yazıyor). product-data 5 betik bu yüzden **elle** okundu; başka değişken-yol
+   okuyucu varsa bu tarama onu görmemiştir.
+2. **RPC dönüşleri de tavana tabidir** — `get_display_prices`, `get_product_families_enriched`,
+   `admin_search_products`, `fts_search_products` … (PostgREST `max-rows` rpc'ye de uygulanır).
+   Döndürdükleri kümeler bugün 1000 altı; tablo büyüdüğünde aynı sınıf.
+3. **src/ tam taranmadı.** product_prices / product_images okuyan **tüm** src dosyaları okundu (evren =
+   tablo adıyla grep); diğer tablolar tavan altı olduğundan src'deki tam-tablo okumaları
+   (sitemap, `generateStaticParams`, wizard) **bugün** risk değil — "products 1000'i geçince" §2 notu.
+4. Edge Functions: iki tablo için grep + satır okuma; yalnız order-validate okuyor (anahtarlı).
+
+## 4. Reçete (6 madde) + kod
+
+- **(a)** Tek çağrı ≤ 1000. `limit`/`.limit()` tavanı **aşmaz**. 1000 bir **proje ayarıdır** (Supabase `max_rows`,
+  Dashboard/Management API ile değişir; depoda kaydı yok, `config.toml`'da `[api]` bölümü yok) — betikler bunu üç yerde
+  sabit yazıyor; ayar düşerse kapılar yine ölçer (kesin sayı karşılaştırması ayardan bağımsız), ama "1000" sayısı sabit değildir.
+- **(b)** Sayfalamak **yetmez** — çekilen toplam, sunucunun **kesin sayısıyla** karşılaştırılır
+  (`Prefer: count=exact` → `Content-Range: 0-0/N`).
+- **(c)** Kesin sayı **alınamazsa KIRMIZI**. "Ölçemedim" ile "temiz" aynı dala düşmez (fail-open yasak).
+- **(d)** Döngü tavanı = `kesin // sayfa + 2`; aşılırsa KIRMIZI (sayfalama bozulunca sonsuz döngü yerine).
+- **(e)** `count=exact`'in **kabul edildiği yer istemciye göre değişir**: ham urllib/fetch başlıkta çalışır;
+  supabase-js'te seçenek filtre zincirinin sonundaki `.select()`'e verilirse **yutulur** (ALTYAPI ölçtü) →
+  sayıyı **ayrı** çağrıyla al: `.select('id', { count: 'exact', head: true })`.
+- **(f)** *(bugün eklendi)* Kesin sayı sorgusu **`select=*&limit=1`** ile: `select=id`, `id` kolonu olmayan
+  tablo/görünümde (`rate_limits`, `_migration_ledger`, `inventory_summary`…) **400 verir** ve ölçüm
+  "ölçülemedi"ye düşer — bugünkü taramada 8 nesne böyle kaçtı, düzeltilince 7'si ölçüldü.
+- **(g)** *(workflow bulgusu)* **Sıralı sayfala** (`order=id`): sırasız sayfalama satır atlar/tekrarlar ve toplam sayı
+  **yine tutar** — kesin sayı kapısı bunu göremez. Bugün `fiyatsiz-ayrim.py` tam bu haldeydi (1044 = 2 sayfa).
+- **(h)** *(workflow bulgusu)* Kesin sayı **aynı filtreyle** alınır: tablo toplamı ile filtreli çekim karşılaştırılırsa kapı
+  daima kırmızıdır (ya da filtre unutulursa daima yeşil). `_veri.kesin_sayi` artık sorgu yolunu alıyor.
+
+**Python (ham urllib) — referans:** `scripts/icerik-hatti/_veri.py` (#1058): `kesin_sayi(yol)` +
+`tumunu_cek(yol, tablo, sira="id")`; `SAYFA_BOYU` ile sınanır; anon anahtarı reddeder.
+
+**supabase-js — kalıp:**
+
+```js
+const { count, error: e1 } = await db.from(T).select('id', { count: 'exact', head: true }) // AYRI çağrı
+// (c) NaN kapısı: postgrest-js Content-Range '*' gelirse parseInt('*') = NaN döner ve typeof NaN === 'number'
+//     GEÇER → tavan NaN → sonsuz döngü (workflow buldu). Number.isInteger şart.
+if (e1 || !Number.isInteger(count) || count < 0) { console.error('OLCUM GUVENILIR DEGIL'); process.exit(1) }
+const BOY = 1000, tavan = Math.floor(count / BOY) + 2; let top = [], bas = 0, tur = 0
+for (;;) {
+  if (++tur > tavan) { console.error('DONGU TAVANI'); process.exit(1) }                              // (d)
+  const { data, error } = await db.from(T).select(ALANLAR).order('id').range(bas, bas + BOY - 1)
+  if (error) throw error; if (!data.length) break; top = top.concat(data); if (data.length < BOY) break; bas += BOY
+}
+if (top.length !== count) { console.error(`EKSIK VERI ${top.length}/${count}`); process.exit(1) }   // (b)
+```
+
+`order('id')` şart: sırasız sayfalama satır atlar/tekrarlar. Filtre varsa `count` sorgusuna da aynı filtre.
+
+## 5. Sınav — iki yön + üçüncü hal (her reçete uygulamasında koşulur)
+
+| Hal | Ne yapılır | Beklenen |
+|---|---|---|
+| iyi girdi | olduğu gibi | çıkış 0; çekilen = kesin |
+| iyi girdi, **küçük sayfa** | `SAYFA_BOYU=100` (tablo kaç sayfa olursa olsun sayfalama yolu KOŞSUN) | çıkış 0; çıktı büyük sayfayla **bayt-aynı** |
+| sabotaj A | ölçüm kaynağını KOPAR (`Prefer` başlığını boz) | "OLCUM GUVENILIR DEGIL" · çıkış 1 · **çıktı üretilmez** |
+| sabotaj B | ilerlemeyi boz (offset artmasın) — **küçük sayfayla** | "DONGU TAVANI" · çıkış 1 · çıktı üretilmez |
+| sabotaj C | sırayı boz (`order=` kaldır) | kesin sayı kapısı bunu **göremez** (sayı tutar) → tek savunma `order` zorunluluğu kodda; sınav = küçük/büyük sayfa çıktı eşitliği |
+
+⚠**Bugün ölçülen boş sınav:** 375 satırlık tabloda 500'lük sayfayla sabotaj B **yeşil kaldı** — ilk sayfa tabloyu bitirince
+offset hiç kullanılmıyor, yani sınav sabote edilen yolu hiç koşturmuyordu. Tablo tek sayfaya sığıyorsa sabotaj B boş sınavdır;
+sayfa boyunu küçült. Aynı sebeple `_veri.py`'nin sabit 1000 sayfası ≤1000 satırlık her tabloda boş sınavdı → `SAYFA_BOYU`.
+
+Çıkış kodu **borusuz** ölçülür: `python x.py | tail` çıkış kodunu yutar ([[komut-ikamesi-cikis-kodunu-sifirlar]]).
+Bugünkü kanıt: `_veri.py` (sabotaj A/B/C: A çıkış 1, B "6 tur > 5" çıkış 1, C filtreli 375/375), `urun-veri-cek.mjs`
+(sayfa 100/500 bayt-aynı, A/B çıkış 1), `fiyatsiz-ayrim.py` (sayfa 100 = 11 sayfa product_prices, çıktı 1000'lükle bayt-aynı,
+27 = 1 + 26 + 0), `db-durum-olc.mjs` (başlık kopuk → çıkış 1), `satis-kipine-gec.mjs` (ALTYAPI 13:51Z).
+
+## 6. Düşmanca çürütme (Workflow `wf_4d6746e4-08c`, 3 mercek + bağımsız doğrulama)
+
+**Koşum:** 21 ajan (3 çürütücü + 18 doğrulayıcı), 15 tamamlandı, **6 doğrulayıcı oturum kotasına takıldı** (hepsi reçete
+merceğinin bulguları). YÖNTEM: Workflow (cetvel: bağımsız çürütme). Kota ile düşen 6 bulgu **workflow tarafından doğrulanmadı**;
+sahibi (ben) kodda ölçtü — aşağıda ayrı işaretli, sessiz kapsam yok.
+
+| Mercek | Sonuç |
+|---|---|
+| 1 istemci yolu | A sınıfı yeni okuyucu **yok**. 4 eksik okuyucu (B): pricingMaterialize:126, inboxCounts:26, order-housekeeping:63, stock-alert:182 — **doğrulandı**, §3-B'ye girdi. 4 yanlış sınıf: fiyatsiz-ayrim/teknik_bosluk/urun-veri-cek families düz okuması, identity-fix:69 — **doğrulandı**, düzeltildi/taşındı. |
+| 2 iki tablo | A **yok** (görünümler + RPC'ler dahil). 7 not düzeltmesi: fiyatsiz-ayrim `_veri` kullanmıyor + sırasız (§3-E), "yerel commit" dediğim değişikliklerin o an commit'siz olması (→ `74c38046`), load.mjs yanlış tablo, family.service:322, displayPrice:50, pricingMaterialize "ilk kısa sayfada dur" — hepsi işlendi. |
+| 3 reçete | 8 bulgu: (1) fiyatsiz-ayrim sırasız — **KESİN, en acil** → `_veri` `order=id`; (2) envanter/HEAD çelişkisi → commit; (3) JS kalıbı NaN → `Number.isInteger`; (4) filtreli sayım (MUHTEMEL) → `kesin_sayi(yol)`; (5) sınav üçüncü hal + sabit sayfa → §5 + `SAYFA_BOYU`; (6) db-durum-olc fail-open → düzeltildi; (7) max-rows ayar → §4-a; (8) pozitif kontrol düşükken rapor → çıkış 1. **Bu 8'in 6'sının workflow doğrulaması kotaya takıldı** (fiyatsiz-ayrim ×2, not, db-durum-olc, _veri ×2); tümü kodda yeniden ölçüldü ve düzeltildi (§5 kanıt satırı), ama ikinci göz eksik — okuyucu bilsin. |
+
+Çürütmenin dediği tek cümle: **notun A hükmü ayakta, ama "reçeteye uygun" dediğim kendi tablomun yarısı uygun değildi.**
+Reçeteyi yazan, kendi kodunu en son sınayan oldu.
+
+## 7. Şeritlere düşen (karar sahibine göre)
+
+- **ALTYAPI:** `load.mjs:134` (kendi bulgusu) · `check_product_fields.py:15` · reçete satırının cetvele
+  girmesi (fleet-mechanism ya da satis-kipi-gecis — ALTYAPI seçer) · **ortak JS yardımcısı** (`_veri.py`'nin
+  mjs eşdeğeri) yazılsın mı — ALTYAPI kararı; bu not karar vermez.
+- **URUN:** alan temiz (kendi ölçümü + benim ölçümüm örtüştü). REC-169 "hangi ailenin hiç fiyatı yok"
+  sorusunu **sunucuda toplulaştırarak** soracak → 1044 satır istemciye hiç gelmez, tavan konusu düşer ✓.
+- **KATALOG (ben):** `_veri.py` (`select=*`, `order=id`, filtreli sayım, `SAYFA_BOYU`) · `urun-veri-cek.mjs` sayım kapısı ·
+  `fiyatsiz-ayrim.py` `_veri`'ye geçti + pozitif kontrol fail-closed · `db-durum-olc.mjs` fail-open kapandı ·
+  families okumaları `tumunu_cek` — commit `74c38046` + devamı, **push kilit sonrası #1058 ile**.
+- **OPS (sahipsiz 8 kalem, karar):** `generate-sitemap.mjs` (ölü aday: sil/geçir) · `scripts/tools/extract_brands.py` ·
+  `scripts/media/*` 10 dosya · `pricingMaterialize.service.ts:126` (**yazma yolu, öncelikli**) ve `:317` ·
+  `src/lib/admin/inboxCounts.ts:26` · `supabase/functions/order-housekeeping/index.ts:63` (**limit=1000, cron**) ·
+  `supabase/functions/stock-alert/index.ts:182` · `identity-fix.mjs:69`. Bu not **hiçbirine dokunmadı** — şerit sınırı.
+
+## 8. Tek satır ders
+
+**Bir betiğin "çalıştı" demesi, tam veri çektiğini kanıtlamaz.** Sayı karara gidiyorsa, sunucunun kesin
+sayısıyla karşılaştırılmış olmalı; karşılaştırılamıyorsa cevap "temiz" değil "ölçemedim"dir.
+
+
+---
+# FILE: docs\audits\icerik-hatti-anlatim-derinligi-2026-09-05.md
+
+# İçerik hattı — 40 ailenin anlatım DERİNLİĞİ (REC-146 Adım 2b·1)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** OPS pano notu 2026-09-05 ("2b BAŞLA: derinlik ölçümü
+40 aile — cümle/madde sayısı, dolu blok sayısı → tablo")
+**Kapsam:** salt okuma · kod yok · prod yok · **DB'ye yazma yok** · sayılar betikten (PyMuPDF 1.27.2)
+**Girdi:** 24 kaynak PDF + AVenS Ürün Fiyat Kataloğu 2026 + canlı DB `products` (40 aile, 375 model)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; kaynağı olmayan blok boş kalır.
+* Kararlar — Katalog ve Ürün Verisi **K7.4** (boşluk önce raporlanır) · **K7.5** (her tespit kayıt altında).
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı yapısal blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Önceki adımlar: `icerik-hatti-pdf-yapisi-…` (1) · `…-sayfa-araliklari-…` (1b) · `…-bolum-aile-eslemesi-…` (2a)
+  · `…-sessiz-bosluk-…` (2a·3). **Bu rapor, o raporun §5.4'te kendi üstüne yazdığı ölçüm borcunu kapatır:**
+  *"bu rapor anlatımın **varlığını** ölçtü, **yeterliliğini** ölçmedi."*
+
+---
+
+## 0 · BAŞLIK: kaynak var, ama derinlik markaya göre uçurum
+
+| Sınıf | Aile | Ne demek |
+|---|---|---|
+| **ZENGİN** | **15** | Altı bloğun 4–6'sı dolu, ≥12 birim. Sayfa bugün yazılabilir. |
+| **YETERLİ** | **3** | 3 blok dolu, 5–11 birim. Sayfa yazılır ama yarısı boş kalır. |
+| **ZAYIF** | **10** | 1–4 birim. Kimlik cümlesi çıkar, blok çıkmaz. |
+| **ÖZEL YOK** | **12** | Kendine ait metni yok; anlatım komşu aileyle **aynı sayfada** — ayrıştırma insan işi. |
+
+**Uçurum marka ekseninde:**
+
+| Marka | Aile | ZENGİN | YETERLİ | ZAYIF | ÖZEL YOK |
+|---|---|---|---|---|---|
+| Vortice | 21 | **15** | — | 2 | 4 |
+| AVenS *(kendi markamız)* | 9 | **0** | 2 | — | **7** |
+| Nicotra Gebhardt | 4 | — | — | **4** | — |
+| SEAT | 3 | — | 1 | 2 | — |
+| Danfoss | 3 | — | — | 2 | 1 |
+
+> **Karara giden cümle:** Vortice ailelerinin anlatımı hazır; **kendi markamız AVenS'in dokuz ailesinin
+> yedisinde kendine ait tek cümle yok.** Vitrinde en çok anlatmak isteyeceğimiz ürünler, kaynağı en zayıf
+> olanlar. Bu bir malzeme sorunu değil, **AVenS kataloğunun tablo ağırlıklı yazılmış olması**.
+
+**15A çizimlerinin örnek ailesi en zayıf uçta:** SEAT YETERLİ (50 birim), STORM ZAYIF (18), **JET ZAYIF (4)**.
+
+---
+
+## 1 · Ölçüt tanımı (aynen uygulandı)
+
+Metin **blok bazlı** okunur (`get_text("blocks")` = paragraf); blok içi satırlar birleştirilir, tireli
+satır sonu onarılır, tablo/kod/altbilgi satırları elenir. Sonra:
+
+* **BİRİM** = *cümle* (nokta/soru/ünlem ile biten, ≥5 kelime) **veya** *madde* (≥4 kelimelik özellik satırı).
+* **KELİME** = birimlerin toplam kelime sayısı — derinliğin en az manipüle edilebilir ölçüsü.
+* **DOLU BLOK** = altı bloktan birine malzeme veren **en az bir birim**. Tek kelime yetmez.
+* Aynı birim birden çok yerde tekrarlıyorsa **bir kez** sayılır.
+
+**İki kova karıştırılmaz:**
+
+* **ÖZEL** — yalnızca bu aileye ait sayfa/bölümden gelen metin. **Sınıf buna göre verilir.**
+* **PAYLAŞIK** — aynı sayfayı/bölümü başka aileyle paylaşan metin. Ailenin malı *olabilir*, ayrıştırması
+  insan işi. Sınıfa katılmaz, ayrı kolonda gösterilir.
+
+**Sınıf eşikleri:** ZENGİN = ≥12 birim **ve** ≥4 blok · YETERLİ = ≥5 birim **ve** ≥3 blok ·
+ZAYIF = ≥1 birim · ÖZEL YOK = 0 birim. Eşikler Systemair kabuğundan türetildi (altı bloğun çoğunu
+doldurmak için blok başına en az bir birim gerekir); **keyfîdir, tartışmaya açıktır** — ham sayılar
+tabloda durduğu için eşik değişirse sınıf yeniden hesaplanabilir.
+
+---
+
+## 2 · Ölçüt ÜÇ kez düzeltildi — üçü de yayımlanmadan yakalandı
+
+K7.5 gereği hatanın kendisi de kayıttır. Üçü de bugünkü **aynı sınıf**: *ölçüt keskin, evren yanlış.*
+
+| # | Yanlış | Verdiği sonuç | Gerçek | Nasıl yakalandı |
+|---|---|---|---|---|
+| 1 | "Cümle" diye **PDF satırı** sayıldı | bir aile "515 cümle" | PDF bir cümleyi 5 satıra böler; gerçek ~60 | Çıktıdaki 20 satırı **okudum** |
+| 2a | `temizle()` Türkçe **`ı ş ğ ç ö ü` harflerini SİLİYORDU** | `Isıtıcı` → `IS T C`; PDF'teki `ISITICI` ile eşleşmiyor | Türkçe adlı **her aile** etkilendi | "Elektrikli ısıtıcı 0 birim" — oysa s.69'da metni var |
+| 2b | EN kanalı 24 PDF'in **yalnız 15'ini** okuyordu | 9 PDF hiç taranmadı | BRA.VO'nun föyü tam o 9'un içinde | "0 birim" çıkan aileyi tek tek açtım |
+| 3 | Bölümsüz PDF'te **sayfa jetonu** ile atıf | BRA.VO'ya 16 birim | O metin komşu **aksesuar tablosunun**; BRA.VO'nun gerçek föyü 3 birim | Örneği okuyunca konu tutmadı |
+
+**2a en tehlikelisiydi**, çünkü sessiz: hiçbir hata vermiyor, yalnızca Türkçe ürünler eşleşmiyordu — ve
+sonuç "AVenS'in kaynağı yok" gibi görünüyordu. **Aynı `temizle()` fonksiyonu bugünkü önceki adımlarda da
+kullanıldı**; o raporların Türkçe aile sayıları bu kusuru taşıyor olabilir (§5'te açık kalem).
+
+**3 numaranın dersi:** dosya→aile bağını *tahmin eden* ölçüt (sayfada model kodu geçiyor mu) iki yönlü
+yanılır — kod görselse kaynağı **kaybeder**, komşu tabloda geçiyorsa **yanlış aileye yazar**. Çözüm:
+bölüm çıkarılamayan 8 PDF için **dosya düzeyinde hüküm + kanıt** yazıldı (§4).
+
+---
+
+## 3 · 40 ailenin derinlik tablosu
+
+`ÖZEL` = kendine ait birim · `KELİME` = o birimlerin kelime toplamı · `BLOK` = altıdan kaçı dolu ·
+`PAYLAŞIK` = komşu aileyle ortak havuzdaki birim (ailenin malı olabilir, ayrıştırılmadı).
+
+| Sınıf | Marka | Aile | ÖZEL | KELİME | BLOK | Dolu bloklar | PAYLAŞIK |
+|---|---|---|---|---|---|---|---|
+| ZENGİN | Vortice | `vortice-vort-mono` | 729 | 9269 | 5/6 | Gövde·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-isi-geri-kazanim` | 533 | 6342 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-lineo` | 383 | 4657 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | 19 |
+| ZENGİN | Vortice | `vortice-vort-quadro-evo` | 195 | 2609 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-vort-heatmaster-slimroof-smoke` | 182 | 2438 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | 19 |
+| ZENGİN | Vortice | `vortice-vort-heatmaster-slimroof-roof` | 170 | 2391 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-vort-nordik-hvls` | 166 | 3172 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-vort-e-atex` | 165 | 2684 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | 23 |
+| ZENGİN | Vortice | `vortice-vort-qbk-sal-kc-evo` | 160 | 2013 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | 20 |
+| ZENGİN | Vortice | `vortice-lineo-quiet` | 131 | 1653 | 5/6 | Gövde·Çark·Motor·Kontrol·Montaj | 21 |
+| ZENGİN | Vortice | `vortice-vort-commercial-in-line-circular` | 123 | 1346 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-vort-industrial-ventilation-axial` | 108 | 1969 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | 23 |
+| ZENGİN | Vortice | `vortice-punto-evo-flexo` | 107 | 1262 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-vort-commercial-in-line-rectangular` | 90 | 1022 | 6/6 | Gövde·Çark·Motor·Koruma·Kontrol·Montaj | — |
+| ZENGİN | Vortice | `vortice-deumido-range` | 60 | 749 | 4/6 | Gövde·Koruma·Kontrol·Montaj | — |
+| YETERLİ | SEAT | `seat-serisi` | 50 | 436 | 3/6 | Gövde·Motor·Koruma | — |
+| YETERLİ | AVenS | `avens-plug-fanlar` | 34 | 317 | 3/6 | Çark·Motor·Koruma | — |
+| YETERLİ | AVenS | `avens-isi-geri-kazanim` | 22 | 231 | 3/6 | Gövde·Kontrol·Montaj | — |
+| ZAYIF | SEAT | `storm-serisi` | 18 | 152 | 2/6 | Gövde·Koruma | 21 |
+| ZAYIF | SEAT | `jet-serisi` | 4 | 28 | 1/6 | Montaj | 21 |
+| ZAYIF | Danfoss | `danfoss-fc101` | 3 | 37 | 1/6 | Kontrol | 32 |
+| ZAYIF | Nicotra Gebhardt | `nicotra-gebhardt-at` | 3 | 33 | 1/6 | Çark | — |
+| ZAYIF | Vortice | `vortice-vort-industrial-ventilation-roof` | 3 | 28 | 0/6 | — | — |
+| ZAYIF | Vortice | `vortice-vortice-bravo-s` | 3 | 32 | 0/6 | — | — |
+| ZAYIF | Danfoss | `danfoss-fc102` | 2 | 31 | 0/6 | — | — |
+| ZAYIF | Nicotra Gebhardt | `nicotra-gebhardt-adh` | 2 | 27 | 1/6 | Çark | — |
+| ZAYIF | Nicotra Gebhardt | `nicotra-gebhardt-dd` | 2 | 33 | 2/6 | Çark·Motor | — |
+| ZAYIF | Nicotra Gebhardt | `nicotra-gebhardt-rdh` | 2 | 29 | 1/6 | Çark | — |
+| ÖZEL YOK | AVenS | `avens-bvu-ls` | 0 | 0 | 0/6 | — | 4 |
+| ÖZEL YOK | AVenS | `avens-elektrikli-isiticilar` | 0 | 0 | 0/6 | — | 17 |
+| ÖZEL YOK | AVenS | `avens-hiz-anahtarlari` | 0 | 0 | 0/6 | — | 32 |
+| ÖZEL YOK | AVenS | `avens-hucreli-aspiratorler` | 0 | 0 | 0/6 | — | 17 |
+| ÖZEL YOK | AVenS | `avens-hucreli-hf-s` | 0 | 0 | 0/6 | — | 17 |
+| ÖZEL YOK | AVenS | `avens-siginak-havalandirma-uniteleri` | 0 | 0 | 0/6 | — | 4 |
+| ÖZEL YOK | AVenS | `avens-sulu-batarya` | 0 | 0 | 0/6 | — | 17 |
+| ÖZEL YOK | Danfoss | `danfoss-fc51` | 0 | 0 | 0/6 | — | 39 |
+| ÖZEL YOK | Vortice | `vortice-h-ad-elektrikli` | 0 | 0 | 0/6 | — | 46 |
+| ÖZEL YOK | Vortice | `vortice-hava-perdesi` | 0 | 0 | 0/6 | — | 46 |
+| ÖZEL YOK | Vortice | `vortice-radon-range-circular` | 0 | 0 | 0/6 | — | 103 |
+| ÖZEL YOK | Vortice | `vortice-radon-range-roof` | 0 | 0 | 0/6 | — | 103 |
+
+**Toplam:** 3.450 özel birim / 44.990 kelime. ÖZEL YOK sınıfındaki 12 ailenin paylaşık havuzunda
+**445 birim** bekliyor — hepsi kayıp değil, **sahibi belirsiz**.
+
+---
+
+## 4 · Bölüm çıkarılamayan 8 PDF: dosya→aile hükümleri
+
+Adım 1b'de bu 8 PDF'ten yapısal bölüm çıkarılamamıştı ve "tek aileli oldukları için tüm belge o ailenindir"
+**varsayılmış ama doğrulanmamıştı**. Doğrulandı:
+
+| PDF | Hüküm | Kanıt |
+|---|---|---|
+| `nordik-hvls-industrial-ceiling-fans-181471.pdf` | → `vortice-vort-nordik-hvls` | kapak "NORDIK HVLS HYPERBLADE" = DB modelleri |
+| `qbk-sal-kc-evo-en-yeni-2025.pdf` | → `vortice-vort-qbk-sal-kc-evo` | kapak "VORT QBK SAL-KC EVO" = DB modelleri |
+| `vortice_vort_mono_range_new.pdf` | → `vortice-vort-mono` | içerikte HRW 30/40/60 MONO 55 kez |
+| `vortice-brochure-mev.pdf` | **DIŞLANDI (mükerrer)** | üsttekiyle **birebir aynı dosya**, md5 `1722110df8` — adı yanıltıcı |
+| `vortice-bravo-s.pdf` | → `vortice-vortice-bravo-s` | tek sayfalık föy; **model kodu metinde yok, görsel** |
+| `nrg-range-175696-isi-geri-kazanim.pdf` | aile YOK | VORT NGR FLAT EVO/MEGA — DB'de NGR modeli yok |
+| `vort-hr-w-all-100-df.pdf` | aile YOK | VORT HR W-ALL 100 DF — DB'de W-ALL modeli yok |
+| `Why-Ventilate-Brochure.pdf` | aile YOK | ürün belgesi değil, genel tanıtım |
+
+> **Kayıt altına alınan iki yan bulgu:**
+> 1. **Mükerrer dosya:** `vortice-brochure-mev.pdf` = `vortice_vort_mono_range_new.pdf`. Adı "MEV" diyor,
+>    içeriği VORT HRW MONO. Kim bakarsa MEV serisi sanır. Deponun temizliği bizim işimiz değil ama
+>    **kaydı burada duruyor**.
+> 2. **BRA.VO S bir fan değil, hava kalitesi sensörü** ("It is an air quality meter, capable to detect the
+>    presence of pollutants in the environment"). Adım 2a·3'te not edilmişti; ölçümle doğrulandı.
+>    Toplam kaynağı **3 birim / 32 kelime** — dört modelin farkını anlatan liste **görsel**, metinde yok.
+
+---
+
+## 5 · Adım 2b·2'ye (taslak yazımı) etkisi
+
+1. **Bugün yazılabilir: 18 aile** (15 ZENGİN + 3 YETERLİ). Bunların 15'i Vortice, **EN kaynaklı → çeviri
+   gerekir**; 3'ü (SEAT, AVenS plug fan, AVenS ısı geri kazanım) Türkçe kaynaklı.
+2. **Ayrıştırma bekleyen 12 aile** (ÖZEL YOK). Bunlar için gereken şey **yeni kaynak değil**, komşu ailenin
+   sayfasındaki metni doğru aileye bölmek. İnsan işi, ama küçük: ortalama 37 birim/aile.
+   En büyük ikisi radon kanal/çatı (103 birim, sınırı Adım 2a·3'te s.23/s.24 diye çözülmüştü).
+3. **K7.3 web araştırması: 10 ZAYIF aile için gerekli**, diğerleri için değil. Öncelik sırası bu rapora
+   göre kurulmalı — özellikle **Nicotra Gebhardt'ın dördü** (aile başına 2–3 birim) ve **JET (4 birim)**.
+4. **Çark ve Kontrol blokları** ZAYIF ailelerin hiçbirinde dolu değil; ZENGİN ailelerin 13'ünde dolu.
+   Boşluk kaynakta, bizde değil.
+5. **AVenS için ayrı karar gerekebilir:** kendi markamızın anlatımı kaynakta yok. Seçenekler — (a) AVenS'ten
+   teknik föy istemek, (b) kendi metnimizi yazıp `is_description_manual` ile işaretlemek. **Bu bir ticari
+   karar, ölçümle çözülmez; Recep'e gider.**
+
+---
+
+## 6 · Ölçülemeyenler (uydurulmadı)
+
+* **Anlatımın DOĞRULUĞU ölçülmedi** — bu rapor hacim ölçtü. Kaynak yanlış olabilir (AVenS kataloğunda
+  iki hata bulundu: `icerik-hatti-avens-katalog-hatalari-2026-09-05.md`).
+* **Anlatımın GÜNCELLİĞİ ölçülmedi** — 2026 baskısı, ürün revizyonu olabilir.
+* **Görsel içindeki metin okunmadı.** BRA.VO'nun dört modelini ayıran liste görsel olduğu için sayılamadı;
+  aynı durum başka ailelerde de olabilir — **ölçülmedi**.
+* **Blok eşleştirmesi anahtar kelimeye dayanır**, anlama değil. "panel" geçen bir cümle Kontrol'e sayılır;
+  bağlamı kontrol paneli mi ön panel mi, ayırt edilmez. Blok sayıları **üst sınır** okunmalı.
+* **Önceki adımların Türkçe sayıları** §2/2a'daki `temizle()` kusurundan etkilenmiş olabilir; bu raporun
+  sayıları düzeltilmiş fonksiyonla üretildi, **öncekiler yeniden koşulmadı**.
+* Paylaşık havuzdaki 445 birimin aileler arası dağılımı **ayrıştırılmadı**.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-05
+
+
+---
+# FILE: docs\audits\icerik-hatti-aralik-hucresi-2026-09-07.md
+
+# Aralık hücresi onarımı — REC-190 kalanı kapandı
+
+**Damga:** 2026-09-07 · **Şerit:** URUN-KATALOG · **Kayıt:** REC-190
+**Cetvel:** `docs/standards/product-schema-standard.md` — "Ön ek → anlam"
+
+## Karar yeni değil, cetvelde zaten yazılıydı
+
+REC-190'da üç hücre bilerek dokunulmadan bırakılmıştı: `operating_temperature_c = "5 - 32"`.
+Alan tek sayıya söz veriyor, veri ise aralık. "Şema kararı gerekiyor" diye kayda geçirdim.
+
+URUN şeridi ölçtü ve karar **zaten yazılıymış**:
+
+> "Aralığı TEK ALANA sıkıştırmak yasak: `min_`/`max_` çifti yazılır."
+> "`min_…` Aynı aralığın alt sınırı. Kaynak aralık veriyorsa **çift olarak** yazılır."
+
+Yani yeni bir karar üretilmedi; yazılı hüküm uygulandı. **Bugün ikinci kez** böyle oldu (ilki:
+"kapı yaz" denen kapının zaten var olması) — emir açmadan önce cetvele bakmak iş üretmekten
+kurtarıyor.
+
+## Uygulama
+
+| Önce | Sonra |
+|---|---|
+| `operating_temperature_c: "5 - 32"` | `min_operating_temperature_c: 5` + `max_operating_temperature_c: 32` |
+
+Üç ayrıntı bilerek: **ön ek** (son ek değil — cetvelin örneği `min_delivery_m3h`) · **birim son
+eki korunur** (`_c`) · **değer sayı**, metin değil.
+
+**Eski alan silinir.** Bırakılırsa aynı büyüklük iki yerde yaşar, biri bayatlar ve vitrin
+hangisini okuyorsa onu gösterir — bugün üç kez yaşadığımız sınıfın aynısı.
+
+## Ölçüm
+
+- Yazılan: **3 ürün / 6 hücre** (VRT-26020, VRT-26021, VRT-26022 — Vortice DEUMIDO NG)
+- İdempotentlik: ikinci koşum → onarılır **0**, dokunulmaz **0** ✓
+- Canlı doğrulama: üçünde de `min=5`, `max=32`, eski alan **yok**
+
+## Betikte kalan kapı
+
+Aralık kolu körlemesine çalışmıyor: sınırlar ters ya da eşitse (`alt >= üst`) **dokunmuyor** ve
+"okunuş şüpheli" diye listeliyor. Biçim çözülemezse yine dokunmuyor — uydurma yok.
+
+**REC-190 bu commit'le tam kapanır.**
+
+
+---
+# FILE: docs\audits\icerik-hatti-atex-malzeme-kanit-2026-09-07.md
+
+# ATEX malzeme bilgisi — kanıt ölçümü
+
+**Damga:** 2026-09-07 · **Şerit:** URUN-KATALOG · **Kayıt:** REC-95 / REC-172
+**Yöntem:** elle (tek oturum, salt okuma) — canlı DB + kaynak dizini (58 belge / 2127 sayfa)
+
+## Soruyu doğuran cümle
+
+Recep, 2026-09-07:
+
+> "atex sertifikası var ise kıvılcım önleyen sürtünmenin olabileceği alanlarda bakır gibi
+> daha yumuşak malzeme kullanılmış demektir."
+
+Soru: bu bilgi ürün kaydına bir **alan** olarak girer mi, girerse hangi ürünlere ve **hangi kaynağa** dayanarak?
+
+## Ölçüm 1 — canlıda bugün ne var
+
+375 ürün (kesin sayı ile doğrulandı), alan `products.technical_specs` (JSONB).
+
+| Alan | Tüm ürün | Adında ATEX geçen (41) |
+|---|---|---|
+| `atex_marking` | 20 | 20 |
+| `atex_zone` | 19 | 19 |
+| `impeller_material` | **0** | 0 |
+| `motor_protection` | **0** | 0 |
+| `material` / `housing_material` | **0** | 0 |
+
+**Malzeme bilgisi canlıda sıfır** — hiçbir üründe, ATEX'li ya da değil.
+
+Adında ATEX geçip hiçbir ATEX alanı olmayan **2** ürün (bilinen açık, REC-172):
+`SEA-51201003` (SEAT 20 ATEX) · `SEA-61183003` (STORM 18 ATEX).
+
+## Ölçüm 2 — kaynakta ne yazıyor (aile aile)
+
+41 ATEX ürünü dört aileye dağılmış. Her ailenin kaynak sayfalarında malzeme ifadesi arandı:
+
+| Aile | Ürün | Kaynakta malzeme ifadesi | Kıvılcım/bakır ifadesi |
+|---|---|---|---|
+| `vortice-vort-e-atex` | 14 | **var** — "Aluminium made hubs. Stamped steel motor cover." (E_ATEX_Range s.6) | **yok** |
+| `seat-serisi` | 13 | **var** — "Polipropilen gövde yapısı" (AvensAir 2026 s.41) | **yok** |
+| `storm-serisi` | 7 | **var** — "Polipropilen gövde yapısı" (AvensAir 2026 s.42) | **yok** |
+| `jet-serisi` | 7 | **YOK** (0 sayfa) | yok |
+
+## Bulgu — Recep'in cümlesi kaynakta AYNEN var, ama başka bir ailede
+
+AvensAir 2026 fiyat listesi **s.39, "CMS ATEX SANTRİFÜJ FANLAR"**:
+
+> "Çelik sactan, tamamen birleştirilmiş veya kaynaklı gövde. Alüminyum sacdan yapılmış öne
+> eğik pervane. **Bakır veya alüminyumdan yapılmış, kıvılcım önleyici giriş halkası**"
+
+İngilizce karşılığı üç Nicotra-Gebhardt kataloğunda da geçiyor:
+> "Inlet cone of copper or aluminium prevent the production of sparks during operation."
+
+İki nokta:
+
+1. **Kıvılcım önleyen parça pervane değil, GİRİŞ HALKASI** (inlet cone). Pervane alüminyum sac.
+2. **Bu cümlenin ait olduğu 11 model katalogumuzda YOK.** Ölçüldü: adında `CMS` 0 ürün ·
+   adında `VORTICENT` 0 ürün · SKU'su `253` ile başlayan 0 ürün.
+
+Yani ilke doğru, kaynağı da var — ama **satmadığımız bir aileyi** tarif ediyor. Bizim 41 ATEX
+ürünümüzün hiçbirinin kaynağında "kıvılcım önleyici / bakır" ifadesi geçmiyor.
+
+## Hüküm — yeni alan AÇMIYORUZ, mevcut alanı ÇÖZÜYORUZ
+
+Kıvılcım koruması zaten **ATEX işaretinin içinde kodlu**. AvensAir s.38 kod şemasını veriyor:
+
+| Kod | Anlamı |
+|---|---|
+| `ec` | **kıvılcım çıkarmayan** |
+| `eb` | gelişmiş koruma |
+| `db` | aleve dayanıklı |
+| `Ex h` | elektriksel olmayan ekipman koruması |
+| `IIA/IIB/IIC` | gaz grubu (propan / etilen / hidrojen) |
+| `Ga/Gb/Gc` | ekipman koruma sınıfı |
+
+Yani `atex_marking` alanı (20 üründe dolu) bilgiyi **zaten taşıyor**; müşteri onu okuyamıyor.
+`impeller_material` gibi bir alan açmak, kaynağı olmayan 41 satır uydurmak olurdu (K7 ihlali) —
+kaynak yalnız hub/gövde malzemesini söylüyor, kıvılcım korumasını söylemiyor.
+
+**Yapılacak iş budur:** ATEX işaret kodunu ürün sayfasında **çözen bir gösterim** (kod → anlam),
+kaynağı AvensAir 2026 s.38 tablosu. Veri yazımı değil, sunum işi → ÜRÜN şeridinin konusu.
+
+## Recep'e giden iki soru
+
+1. **CMS ATEX santrifüj** ailesi (11 model, AvensAir listesinde fiyatlı) satılıyor mu?
+   Katalogda hiç yok. — park jeti sorusuyla aynı sınıf.
+2. `jet-serisi` (7 ürün) için elimizde **hiç malzeme kaynağı yok**. Tedarikçiden mi istenecek,
+   yoksa aile metninde malzeme cümlesi hiç geçmeyecek mi?
+
+## Sınırı — dürüstçe
+
+* Ölçüm **kaynak dizininin** kapsamıdır (58 belge). Dizinde olmayan bir belgede malzeme yazıyor
+  olabilir; bu ölçüm "kaynakta yok" değil, **"dizinde yok"** der.
+* Ürün↔kaynak eşlemesi aile ve model adı üzerinden yapıldı, SKU üzerinden değil — bir ailenin
+  sayfası bulunduğunda o ailenin tüm ürünlerine sayıldı.
+
+---
+
+## ⛔ DÜZELTME — "jet-serisi: malzeme kaynağı YOK" iddiası YANLIŞTI (aynı gün, 19:xxZ)
+
+Yukarıdaki tabloda `jet-serisi` için **"kaynakta malzeme ifadesi YOK (0 sayfa)"** yazmıştım.
+**Bu yanlış.** JET serisi, dört ailenin **en ayrıntılı malzeme kaydına sahip** olanıdır.
+
+### Niçin kaçırdım — ölçütün kendisi dardı
+
+İlk tarama şu kelimeleri aradı: *kıvılcım, spark, bakır, copper, alüminyum, alumini, pervane,
+impeller material, polipropilen, polypropylene, gövde, malzeme*. Kaynak metin ise malzemeyi
+**başka kelimelerle** yazıyor: `Housings:` · `Wheels:` · `PPH` · `stainless steel`.
+
+Yani "0 sayfa" sonucu kaynağın değil, **sözlüğümün** ölçüsüydü. Yokluğu kanıtlamak varlığı
+kanıtlamaktan zordur; dar bir sözlükle "yok" demek, ölçüm değil **varsayımdır**.
+
+### Gerçek kayıt — `JET.pdf` s.1 ve `SEAT-CATALOGUE.pdf` s.20 (aynı metin)
+
+> **Housings:** PP Single back strong high density UV treated and recyclable polypropylene
+> (PPH) with no air leakage. All fan mounting hardware in **stainless steel**.
+> **Wheels:** PP Forward curved centrifugal type impeller made of **injection molded PPH**.
+
+Ayrıca `SEAT-CATALOGUE.pdf` s.4 (marka tarihçesi): *"1995: SEAT adds the **JET Series** inline
+fans to its range of **PP fans**."* — JET, PP ailesinin parçası olarak doğmuş.
+
+### Düzeltilmiş aile tablosu
+
+| Aile | Ürün | Kaynakta malzeme |
+|---|---|---|
+| `vortice-vort-e-atex` | 14 | alüminyum göbek (hub), preslenmiş çelik motor kapağı |
+| `seat-serisi` | 13 | polipropilen gövde |
+| `storm-serisi` | 7 | polipropilen gövde |
+| `jet-serisi` | 7 | **PPH gövde (UV işlemli, geri dönüştürülebilir) · paslanmaz çelik montaj donanımı · enjeksiyon kalıplı PPH pervane** |
+
+**Dördünün de malzeme kaynağı var.** Eksik olan tek şey, bu bilginin ürün kaydına ve vitrine
+hiç taşınmamış olması (`material` / `housing_material` alanları **0/375**).
+
+### Değişmeyen hüküm
+
+Kıvılcım/bakır cümlesi hâlâ yalnız **CMS ATEX santrifüj** ailesine ait ve o aile katalogda yok
+(→ REC-226, 74 kayıp kalemin 11'i). Bu düzeltme malzeme **kapsamasını** genişletir, ATEX
+kıvılcım hükmünü değiştirmez.
+
+### Ders (kendi payıma, bugün üçüncü kez aynı sınıf)
+
+Bir şeyin "yok" olduğunu ilan etmeden önce, **aramada kullandığım kelimelerin kaynağın
+kelimeleri olup olmadığını** sormalıyım. Bugün Recep'e sorulmaması gereken bir soru sordum
+("jet için malzeme kaynağı tedarikçiden istensin mi") — cevabı elimizdeki belgede duruyordu.
+
+
+---
+# FILE: docs\audits\icerik-hatti-avens-csv-kaynak-olcumu-2026-09-09.md
+
+# AVenS fiyat CSV'si ↔ kaynak PDF ölçümü (2026-09-09, URUN-KATALOG)
+
+**Soru (OPS emri, adım 2):** `avensair-fiyat.csv` kaynağa göre eksik mi, ne kadar?
+
+**Niçin soruldu:** ingestor CI'ı 5/5 kırmızı. Kapı "çıktı bayat" diyordu; sebebin bir kısmı
+sahteydi (bkz. `uretim-recetesi.json`, 2026-09-09 notu), **bir kısmı gerçek çıktı.**
+
+---
+
+## Ölçülen evren
+
+| ne | değer |
+|---|---|
+| kaynak | `kaynak-dizini/sayfalar.jsonl` → `avens_fiyat_listesi_2026_HQ.pdf` |
+| sayfa | 74 |
+| tablo | 148 |
+| **taramaya giren tablo** | **74** (başlığında hem `KOD` hem `FİYAT/EURO` olanlar) |
+| ⛔**taramanın DIŞINDA kalan** | **74** (başlık satırı BOŞ olan tablolar) |
+
+Sütunlar **başlıktan** bulundu, konum varsayımı yapılmadı. Kod olmayan 14 hücre (tabloya
+sızmış açıklama paragrafları) elendi.
+
+---
+
+## Sonuç
+
+| ölçüt | kaynak (başlıklı tablolar) | CSV | fark |
+|---|---|---|---|
+| tekil ürün kodu | 444 | 484 | −40 |
+| ⭐**alfanümerik kod** | **35** | **0** | **+35** |
+| kaynakta var, CSV'de yok | **59** (35'i alfanümerik) | — | — |
+| CSV'de var, kaynakta yok | — | **99** | — |
+
+### ✅ SAĞLAM BULGU — tek yönlü, evren tanımından bağımsız
+**CSV'de alfanümerik ürün kodu SIFIR.** Kaynağın yalnızca taradığım yarısında bile **35 tane** var.
+Sıfır, hiçbir evren genişletmesiyle açıklanamaz: CSV bu kodları **sistematik olarak dışlamış.**
+
+Bu tam olarak `SKILL.md`'nin 2026-08-20'de (e7e5f7b) düzelttiği kusurdur — kural şöyle der:
+*"`model_code` biçimine varsayım koyma — uzunluk/biçim kısıtı YOK. Salt sayısal (`11313`),
+alfanümerik (`NS311280`), boşluklu (`ENKEC 155`) hepsi geçerlidir."*
+CSV o düzeltmeden **önce** (2026-06-22) üretilmiştir. **Kapı haklı: çıktı gerçekten bayat.**
+
+Canlı veri de aynı yönü gösteriyor: **107 aktif AVenS ürününün 39'u alfanümerik kodlu** —
+yani CSV'nin hiç tanımadığı biçimde.
+
+### ⛔SAĞLAM OLMAYAN — kesin sayı VERİLEMEZ
+*"Toplam kaç ürün eksik"* sorusuna bu ölçüm **cevap veremez**, ve bunu gizlemiyorum:
+
+- Taramam tabloların **yarısını** (başlıksız 74 tablo) görmüyor.
+- Bunun kanıtı ölçümün kendi içinde: **CSV'de olup kaynakta bulamadığım 99 kod** var
+  (ör. `M 100/4" PUNTO` s.13, ısı geri kazanım cihazları s.68). Bunlar gerçek ürün; kaynakta
+  **varlar**, benim başlık ölçütüm onları **eledi**.
+- Yani `59` sayısı bir **alt sınır bile değil**, dar bir evrenin sayısıdır.
+
+**Alt sınır olarak söylenebilecek tek şey: en az 35 alfanümerik kodlu ürün CSV'de yok.**
+
+---
+
+## Hüküm
+
+1. **CSV bayat ve eksik** — kanıt: alfanümerik kod 0/35.
+2. **Kaynak dizini bu konuda EKSİK DEĞİL** — fiyat listesi PDF'i dizinde, 74 sayfa.
+   *(2026-09-09'da önce "dizinde YOK" demiştim; yanlıştı — dizinde `avens` arayıp 90 kaydın
+   yalnız ilkine bakmıştım. Düzeltildi.)*
+3. **Onarım = CSV'nin yeniden üretimi**, ve bu ayrı/büyük bir iştir: görsel çoklu-ajan çıkarımı
+   (SKILL, T119'da 25 alt-ajan). **Plan yazılacak, plan-challenger'dan geçecek, sonra koşulacak.**
+4. **İngestor CI o zamana kadar KIRMIZI kalır ve bu DOĞRUDUR** — kapı gerçek bir borcu gösteriyor.
+   Susturulmadı.
+
+## Yöntem notu — bu ölçümün kendi sınırı ölçüldü
+Bu belgedeki iki numaralı bulgu, ölçütün **ayırt ettiğini** kanıtlamak için konuldu: aynı tarama
+CSV'de 99 kod "bulamıyorsa" tarama eksiktir, ve bu, `59` sayısını hüküm olmaktan çıkarır.
+Bugünün tekrar eden hata sınıfı buydu (*ölçüt keskin, evren yanlış*); burada evreni ölçüp yazdım.
+
+
+---
+# FILE: docs\audits\icerik-hatti-avens-katalog-hatalari-2026-09-05.md
+
+# AVenS Ürün Fiyat Kataloğu 2026 — tespit edilen içerik hataları
+
+**Kim ölçtü:** VentHub içerik hattı (REC-146), 2026-09-05 · **Yöntem:** betikle metin taraması (PyMuPDF), elle değil
+**Kaynak dosya:** `avens_fiyat_listesi_2026_HQ.pdf`, 74 sayfa
+**Niçin bu rapor var:** VentHub ürün sayfalarının Türkçe anlatımı bu katalogdan türetiliyor. Aşağıdaki
+kalemler **birebir kopyalansaydı** vitrinde yanlış bilgi görünecekti. Bizim tarafta düzeltildi;
+kaynağın kendisi düzeltilmediği sürece her yeni çıkarımda tekrar edecek.
+
+**Bu belge AVenS'e iletilmek üzere hazırlanmıştır (Recep kararı, 2026-09-05).**
+
+---
+
+## H1 · Dört farklı seri, tek tanıtım cümlesi (yüksek etki)
+
+Sayfa başlıklarında, dört ayrı serinin tanıtım cümlesi **birebir aynı**:
+
+| Sayfa | Seri | Tanıtım cümlesi |
+|---|---|---|
+| 41 | SEAT SERİSİ | KİMYASALLARA VE AŞINDIRICI GAZLARA (KARŞI) DAYANIKLI SANTRİFÜJ FANLAR |
+| 43 | *(başlıkta seri adı yok)* JET | **aynı cümle** |
+| 44 | SEAT ATEX SERİSİ | **aynı cümle** |
+| 45 | STORM ATEX / JET ATEX | **aynı cümle** |
+| 42 | STORM SERİSİ | *farklı* — "DAHA YÜKSEK STATİK BASINCA SAHİP, KİMYASALLARA VE KOROZYONA DAYANIKLI FANLAR" |
+
+**Sorun:** JET, SEAT'ten farklı bir üründür — JET **çatı fanı**, yatay ve dikey montaja uygun (s.43'ün kendi
+maddesinde yazıyor). Ama başlık bunu söylemiyor. Ürünleri yan yana listeleyen bir yerde (site, teklif, katalog
+dizini) dört seri aynı cümleyle görünür ve **ayırt edilemez**.
+
+**Ek olarak s.43'te seri adı başlıkta yok:** sayfa doğrudan tanıtım cümlesiyle başlıyor; "JET SERİSİ" ibaresi
+başlık bloğunda görünmüyor. (Sayfanın gövdesinde geçiyor.)
+
+**Önerimiz:** her serinin tanıtım cümlesi o seriyi ayıran özelliği söylesin. Örnek: JET için
+"Çatı ve duvar uygulamaları için, yatay ve dikey montaja uygun santrifüj çatı fanları."
+
+---
+
+## H2 · Sayfa 45: başlık STORM/JET ATEX, gövde metni "SEAT ATEX" diyor (yüksek etki)
+
+Sayfa 45'in başlığı **"STORM ATEX SERİSİ / JET ATEX SERİSİ"**. Aynı sayfanın gövde metni:
+
+> "Patlayıcı ortamlar için tasarlanan **SEAT ATEX Serisi**; ATEX Bölge 2, Kategori 3, Gaz Grup C sınıfında,
+> T4 sıcaklık sınıfına sahip, IE3 verimlilik dereceli patlamaya dayanıklı asenkron motoru ile maksimum
+> güvenlik, yüksek enerji verimliliği ve uzun ömürlü kullanım sunar."
+
+Betik taraması bu çelişkiyi kataloğun **tek** yerinde buldu (başlıkta geçen seri adıyla gövdede geçen seri adı
+karşılaştırıldı; 74 sayfada 1 çelişki).
+
+**Önerimiz:** cümledeki "SEAT ATEX" → "STORM ATEX ve JET ATEX".
+
+---
+
+## H3 · Sayfa 45: performans aralığı STORM'un, JET'in değil (yüksek etki)
+
+Sayfa 45'te verilen aralık:
+
+> "Geniş performans aralığı sayesinde **40–4500 Pa** statik basınç ve **50–5.000 m³/h** debi değerlerinde
+> verimli çalışma sağlar"
+
+Bu değerler **sayfa 42'deki STORM aralığının birebir aynısı**. Sayfa 43'te JET için verilen aralık ise farklı:
+**200–3.500 m³/h debi ve 2.000 Pa'ya kadar statik basınç**.
+
+Sayfa 45 hem STORM ATEX'i hem JET ATEX'i kapsadığı için, tek aralık verilmesi JET ATEX alıcısına
+**yanlış performans** bildirir.
+
+**Önerimiz:** iki seri için iki ayrı aralık satırı; ya da JET ATEX ayrı sayfaya alınsın.
+
+---
+
+## H4 · Sayfa 42: STORM 10 XRM modeli listede, ürün tanımı yok (düşük etki)
+
+`STORM 10 XRM (*)` kodu 61102010 ile fiyat tablosunda yer alıyor; yıldız işaretinin (*) ne anlama geldiği
+sayfada **açıklanmamış**. XRM'in diğer STORM 10 modellerinden farkı anlaşılamıyor.
+
+**Önerimiz:** yıldız dipnotu eklensin ya da XRM açılımı yazılsın.
+
+---
+
+## Ölçüm sınırları (bizim tarafımızın şeffaflığı için)
+
+* Tarama **metin düzeyinde**dir; görsel, tablo hizalaması ve fiyat doğruluğu **kontrol edilmedi**.
+* "Birden fazla sayfada aynen geçen tanıtım cümlesi" taramasında 10 tekrar bulundu; bunların **8'i
+  meşru** (aynı aksesuar notunun kardeş sayfalarda tekrarı, ör. hız anahtarı notu). Hata olarak yalnız
+  H1'deki dört-seri-tek-cümle kalemi raporlanmıştır.
+* Kataloğun tamamı değil, **anlatım metinleri** tarandı (74 sayfanın 61'inde düz cümle var).
+
+---
+
+*Ölçüm ve rapor: VentHub · 2026-09-05 · sorular için VentHub içerik hattı.*
+
+
+---
+# FILE: docs\audits\icerik-hatti-birim-olcek-kusurlari-2026-09-07.md
+
+# Birim ve ölçek kusurları — ölçüm ve düzeltici (REC-190)
+
+**Damga:** 2026-09-07 · **Şerit:** URUN-KATALOG · **Kayıt:** REC-190
+**Yöntem:** elle · **Cetvel:** `docs/standards/product-schema-standard.md` (K9–K11)
+
+## Kural
+
+Alan adı bir birim taahhüt ediyorsa (`max_delivery_m3h`, `voltage_v`, `max_absorbed_power_w`)
+değeri **sayı** olmalı ve **o birimde** olmalı. Ad bir birime söz veriyorsa o söz tutulur.
+
+## Ölçüm (375 ürün, kesin sayı ile doğrulandı)
+
+**32 hücre** kuralı çiğniyor — ama hepsi aynı kusur değil. Dört sınıf çıktı:
+
+| Sınıf | Adet | Örnek | Karar |
+|---|---|---|---|
+| Sayı + birim metni | 27 | `max_delivery_m3h = "1550 m³/h"` | **onarılır** → 1550 |
+| Sade birim | 2 | `voltage_v = "380 V"` | **onarılır** → 380 |
+| **Aralık** | 3 | `operating_temperature_c = "5 - 32"` | **DOKUNULMAZ** |
+| **Ölçek hatası** | 2 | `max_absorbed_power_w = 0.18` | **onarılır** → 180 |
+
+Toplam onarım: **31 hücre / 29 ürün**. Dokunulmayan: **3 hücre**.
+
+## Niçin aralığa dokunulmuyor
+
+`operating_temperature_c` tek sayıya söz veriyor ama veri bir aralık (5–32 °C). Birimi silip
+"5" yazmak 32'yi yok eder; "532" yazmak felakettir. Doğru onarım **şema kararıdır**
+(`operating_temperature_min_c` / `_max_c`) ve bu betiğin işi değildir. Betik burada durur ve
+sebebini adıyla yazar. → ÜRÜN/OPS cetvel kararı.
+
+## Dördüncü sınıf en tehlikelisi — hiçbir kapı görmez
+
+`SEA-51201003`, `max_absorbed_power_w = 0.18`. Değer **sayı**, **pozitif**, **geçerli**. Tip
+kapısı, şema kapısı, konformans testi — hiçbiri kırmızı vermez. Yanlış olan tek şey **fizik**:
+0,18 W'lık sanayi fanı yoktur. 0,18 **kW** yazılmış.
+
+Vitrinde sonucu: fan gücü **bin kat** küçük görünür ve müşteri yanlış ürün seçer.
+
+**Uydurmadan onarım:** yalnız ürün adının kendisi "0,18 kW" diyorsa ve alan değeri tam o sayıysa
+×1000 yapılır. Ad kanıtı yoksa dokunulmaz.
+
+Bu ayrım ölçüldü, varsayılmadı: W alanında 10'dan küçük **12** değer var; **10'u doğru**
+(Vortice ev tipi fanlar gerçekten 4–9 W çeker), yalnız **2'si** ad kanıtıyla hatalı.
+Körlemesine "10'dan küçükse ×1000" deseydik **10 doğru ürünü bozardık**.
+
+## Betik
+
+`scripts/icerik-hatti/birim-gomulu-duzelt.mjs` — varsayılan **kuru koşum**; canlıya yazım
+`--yaz` + `CANLI_YAZIM_ONAYI` (Recep'in kendi sözü) ile. İkinci koşum 0 onarım göstermeli.
+
+## Durum
+
+Yazım **Recep kapısında**. Bu commit yalnız ölçüm + hazır betiktir.
+
+---
+
+## CANLIYA YAZILDI — 2026-09-07
+
+**Recep'in sözü, lafzıyla:** "birim ölçek yaz"
+
+- Yazım: **29 ürün / 31 hücre** güncellendi
+- **İdempotentlik:** ikinci koşum → onarılır **0 hücre / 0 ürün** ✓
+- Dokunulmayan **3 hücre** (aralık) olduğu gibi duruyor — şema kararı bekliyor
+
+### Canlı doğrulama (yazım sonrası okundu)
+
+| SKU | Alan | Önce | Sonra |
+|---|---|---|---|
+| SEA-51201003 | `max_absorbed_power_w` | `0.18` | **180** |
+| SEA-51201003 | `voltage_v` | `"380 V"` | **380** |
+| SEA-61103110 | `max_absorbed_power_w` | `0.06` | **60** |
+| SEA-61103110 | `voltage_v` | `"220 V"` | **220** |
+| NIC-11901 | `max_delivery_m3h` | `"1550 m³/h"` | **1550** |
+| NIC-11935 | `max_delivery_m3h` | `"10500 m³/h"` | **10500** |
+
+SEAT 20 ATEX'in gücü artık 0,18 W değil **180 W** — bin kat hata canlıda kapandı.
+
+### Kalan iş
+
+3 aralık hücresi (`operating_temperature_c = "5 - 32"`, üç Vortice nem alma cihazı).
+Şema kararı: `operating_temperature_min_c` / `_max_c`. Karar ÜRÜN/OPS'ta, veri yazımı Recep kapısında.
+
+
+---
+# FILE: docs\audits\icerik-hatti-bolum-aile-eslemesi-2026-09-05.md
+
+# İçerik hattı — bölüm → aile eşleme tablosu (REC-146 Adım 2a·1)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** OPS, REC-146 yorumu 2026-09-05 13:57Z (Adım 2a)
+**Kapsam:** salt okuma + belge · kod yok · prod yok · **DB'ye yazma YOK**
+**Girdi:** `icerik-hatti-sayfa-araliklari-2026-09-05.md` (117 bölüm) + canlı DB `products` model adları
+**Araç:** betik (`esleme.py`), elle sayım yok
+
+## KAYNAK / CETVEL
+
+* `docs/standards/catalog-ingestion-standard.md` · `docs/standards/vaat-butunlugu-standard.md` (uydurma yok)
+* Kararlar — Vitrin 15A **K7** (kaynağı olmayan bölüm çizilmez)
+* Adım 1b bulgusu: *"bölüm → aile eşlemesi çoktan-bire ve insan kararı; emirde istenmezse taslak üreten
+  ajan kendi uydurur."* Bu tablo o boşluğu kapatır.
+
+---
+
+## 0 · Eşleme ÖLÇÜTÜ — niçin bu, niçin başkası değil
+
+Bölüm adına bakarak "bu Quadro, şu aile Quadro Evo, olur" demek **ad benzerliğidir ve yanıltır**:
+katalogda `VORT QUADRO`, `VORT QUADRO I`, `VORT QUADRO EVO`, `VORT QUADRO EP AC`, `VORT QUADRO I EP AC`
+diye beş ayrı bölüm var ve bizde bunlardan **yalnız biri** satılıyor.
+
+Kullanılan ölçüt: **bölüm adı, o ailenin DB'deki GERÇEK ürün model kodlarıyla örtüşüyor mu.**
+`Vortice Vort Quadro Evo QE 100 LL` gibi 23 model `VORT QUADRO EVO RANGE` bölümüne oturuyor; `VORT QUADRO I`
+bölümüne oturan **tek bir modelimiz yok**. Ölçüt satmadığımız ürünü ayıklıyor, bu yüzden ayırt edici.
+
+Üç sonuç: **ESLESTI** (model kodları örtüşüyor) · **AILE YOK** (o bölümün ürünü bizde satılmıyor) ·
+**INSAN** (örtüşme kısmi, ya da tek bölüm iki aileye düşüyor — ölçümle çözülmez).
+
+---
+
+## 1 · Sonuç sayıları
+
+| | Bölüm |
+|---|---|
+| **ESLESTI** — model kodu örtüşüyor | **27** |
+| **AILE YOK** — bölümün ürünü bizde yok | **81** |
+| **INSAN** — karar gerekiyor | **9** |
+| kural yazılmayan | **0** |
+| **Toplam** | **117** |
+
+**Aile tarafından bakınca:** 117 bölüm **12 aileye** kesin bağlandı. Bunların 11'i Adım 1'deki
+"kaynak klasörü olan 19 aile" içinde; **1 tanesi yeni**.
+
+> **Kendi önceki sayımı düzeltiyorum:** Adım 1'de `Vortice Lineo Kanal Fanları`'nı *"kendi klasörü yok,
+> insan kararı gerekir"* diye **21 kaynaksız aile** listesine koymuştum. Bölüm ölçümü bunu çözdü:
+> `LINEO RANGE` / `LINEO V0 RANGE` **ayrı bölümler** ve DB'deki `Lineo 100…315` (7 model) tam oturuyor.
+> **Lineo artık kaynaklı. Kaynaksız aile 21 → 20.**
+
+### 19 kaynak-klasörlü ailenin bölüm durumu
+
+| Durum | Adet | Aileler |
+|---|---|---|
+| Kesin bölümü var | **11** | deumido · isi-geri-kazanim · lineo-quiet · punto-evo-flexo · commercial-in-line-circular · vort-e-atex · slimroof-roof · heatmaster-smoke · industrial-axial · vort-mono · quadro-evo |
+| İnsan kararıyla bağlanabilir | **4** | hava-perdesi · radon-circular · radon-roof · commercial-in-line-rectangular |
+| **Hiç bölüm çıkmadı** | **4** | industrial-ventilation-roof (TIRACAMINO) · nordik-hvls · qbk-sal-kc-evo · bravo-s |
+
+**"Hiç bölüm çıkmadı" kusur değil, iki farklı şey:** `nordik-hvls`, `qbk-sal-kc-evo` ve `bravo-s`
+**tek aileli PDF'ler** — bölüm sınırına ihtiyaç yok, aralık = tüm belge. **TIRACAMINO farklı ve dikkat
+ister:** kaynağı `industrial_Ventilation.pdf` klasöründe görünüyor ama o katalogda TIRACAMINO bölümü
+**yok**; oradaki 5 `TORRETTE …` bölümü çatı fanı, TIRACAMINO ise şömine/baca fanı. **Klasör düzeyinde
+kaynak var görünmesi, bölüm düzeyinde kaynak olduğunu göstermiyor** — TIRACAMINO fiilen kaynaksız.
+
+---
+
+## 2 · İnsan kararı bekleyen 9 bölüm (karar bunlara ait, gerisi mekanik)
+
+| Bölüm | Sayfa | Önerim | Niçin karar gerekiyor |
+|---|---|---|---|
+| `THE RADON-SPECIFIC VORTICE RANGE` | 2022-11 radon s.23–42 | **sayfa bölünerek ikiye** | Tek bölüm iki aileyi kapsıyor: `CA-RM … ES` (kanal, 5 model) ve `CA-RM … RF ES` (çatı, 3 model). Sınırın hangi sayfada olduğu ölçülmedi |
+| `AIR DOOR RANGE` | Air_Conditioning s.6–8 | **ortak metin, iki aileye** | `AD 900…2000` (ortam havalı, 4) ve `H AD 900…1500` (elektrikli ısıtmalı, 4) aynı bölümde; elektrikli/ısıtmasız ayrımı bölümde ayrıştırılmamış |
+| `CA IN-LINE QUIET ES RANGE` | Doc_Pubblicita_Commercial s.76–84 | **dikdörtgen aileye** | DB'de `CA IL 4020…8060 ES RECT`; `IL`=`IN-LINE` ve `ES` örtüşüyor ama bölüm adında `RECT` **yok** — yuvarlak/dikdörtgen ayrımı doğrulanmadı |
+| `PUNTO EVO RANGE` | ResidentialVentilation s.28–33 | **Punto Evo / Flexo ailesine** | Aile adı "Punto Evo / Flexo" ama DB'de yalnız **Flexo** modelleri var; düz Punto Evo satılmıyor |
+| `VORT HRW 20 MONO RANGE` | vmc s.10–21 | **VORT Mono'ya, boy notuyla** | DB'de 30/40/60 var, **20 yok** — aynı seri, satmadığımız boy |
+| `VORT HR NETI IoT RANGE` | radon-en s.40–45 | **VORT HR'ye** | IoT varyantı; DB'de IoT modeli yok, seri aynı |
+| `VORT HRI MINI RANGE` | vmc s.22–25 | **VORT HR'ye** | DB `Vort Invisible Mini Top` ile aynı ürün mü, **doğrulanmadı** |
+| `VORT HRI INVISIBLE-E RANGE` | vmc s.62–71 | **VORT HR'ye** | `-E` varyantı; aynı ürün mü **doğrulanmadı** |
+| `EXAMPLE OF E-ATEX RANGE` | E_ATEX s.5–16 | **VORT-E ATEX'e** | Bölüm adı "örnek"; ayrı ürün mü, aynı serinin uygulama örneği mi ayrıştırılmadı |
+
+**OPS/Recep kararı gereken tek ticari kalem:** satmadığımız varyantların (IoT, EP, 20 boy) metni
+ailemize yazılsın mı? Yazılırsa müşteri **satmadığımız özelliği** okur. Önerim: **yazılmasın** —
+vaat bütünlüğü cetveli bunu zaten yasaklıyor; taslakta o cümleler ayıklanır.
+
+---
+
+## 3 · Tam tablo — 117 bölüm
+
+| PDF | Bölüm | Sayfa | Kaç | Durum | Aile | Kanıt |
+|---|---|---|---|---|---|---|
+| industrial_Ventilation.pdf | VORTICEL E RANGE | 4–13 | 10 | OK ESLESTI | vortice-vort-industrial-ventilation-axial | DB: E 354/404/504/604 M |
+| industrial_Ventilation.pdf | VORTICEL A-E RANGE | 14–23 | 10 | OK ESLESTI | vortice-vort-industrial-ventilation-axial | DB: A-E 354/454/504/564 T |
+| industrial_Ventilation.pdf | VORTICEL MP RANGE | 24–31 | 8 | OK ESLESTI | vortice-vort-industrial-ventilation-axial | DB: MP 302..604 T (8 model) |
+| industrial_Ventilation.pdf | VORTICEL MPC-E RANGE | 32–37 | 6 | - AILE YOK | — | DB'de MPC modeli YOK |
+| industrial_Ventilation.pdf | VORT JET A RANGE | 38–43 | 6 | - AILE YOK | — | DB'de Vortice VORT JET modeli YOK (SEAT'in JET ailesiyle ilgisiz) |
+| industrial_Ventilation.pdf | VORT JET A F400 RANGE | 44–49 | 6 | - AILE YOK | — | ayni |
+| industrial_Ventilation.pdf | VORT JET R RANGE | 50–53 | 4 | - AILE YOK | — | ayni |
+| industrial_Ventilation.pdf | VORT JET R F400 RANGE | 54–57 | 4 | - AILE YOK | — | ayni |
+| industrial_Ventilation.pdf | MPC-ED RANGE | 58–63 | 6 | - AILE YOK | — | DB'de MPC modeli YOK |
+| industrial_Ventilation.pdf | MPC-HP RANGE | 64–75 | 12 | - AILE YOK | — | DB'de MPC modeli YOK |
+| industrial_Ventilation.pdf | MPC-ED F400 RANGE | 76–85 | 10 | - AILE YOK | — | DB'de MPC modeli YOK |
+| industrial_Ventilation.pdf | VORTICENT C E RANGE | 86–97 | 12 | - AILE YOK | — | DB'de VORTICENT modeli YOK |
+| industrial_Ventilation.pdf | E-ATEX RANGE | 98–103 | 6 | OK ESLESTI | vortice-vort-e-atex | DB: E 254..606 T ATEX (14 model) |
+| industrial_Ventilation.pdf | C-ATEX RANGE | 104–109 | 6 | - AILE YOK | — | DB'de VORTICENT C ATEX modeli YOK |
+| industrial_Ventilation.pdf | TORRETTE RF-EU RANGE | 110–119 | 10 | - AILE YOK | — | DB'de TORRETTE modeli YOK; TIRACAMINO somine/baca, TORRETTE cati |
+| industrial_Ventilation.pdf | TORRETTE TR-E RANGE | 120–127 | 8 | - AILE YOK | — | ayni |
+| industrial_Ventilation.pdf | TORRETTE TR-E-V RANGE | 128–135 | 8 | - AILE YOK | — | ayni |
+| industrial_Ventilation.pdf | TORRETTE TR-ED RANGE | 136–145 | 10 | - AILE YOK | — | ayni |
+| industrial_Ventilation.pdf | TORRETTE TR-ED-V RANGE | 146–168 | 23 | - AILE YOK | — | ayni |
+| ResidentialVentilation.pdf | PUNTO RANGE | 6–11 | 6 | - AILE YOK | — | DB'de duz Punto modeli YOK (yalniz Punto Evo Flexo) |
+| ResidentialVentilation.pdf | PUNTO FILO RANGE | 12–15 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | PUNTO FOUR RANGE | 16–19 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | PUNTO GHOST RANGE | 20–23 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | PUNTO EVO FLEXO RANGE | 24–27 | 4 | OK ESLESTI | vortice-punto-evo-flexo | DB: Punto Evo Flexo MEX 100/120 (4 model) |
+| ResidentialVentilation.pdf | PUNTO EVO RANGE | 28–33 | 6 | INSAN INSAN KARARI | vortice-punto-evo-flexo | aile adi 'Punto Evo / Flexo' ama DB'de yalniz FLEXO modeli var |
+| ResidentialVentilation.pdf | PUNTO EVO ES RANGE | 34–37 | 4 | - AILE YOK | — | DB'de ES modeli YOK |
+| ResidentialVentilation.pdf | PUNTO EVO GOLD RANGE | 38–41 | 4 | - AILE YOK | — | DB'de GOLD modeli YOK |
+| ResidentialVentilation.pdf | VORTICE VARIO RANGE | 42–45 | 4 | - AILE YOK | — | DB'de VARIO modeli YOK |
+| ResidentialVentilation.pdf | VORTICE VARIO I RANGE | 46–63 | 18 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | ARIETT RANGE | 64–67 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | ARIETT I RANGE | 68–71 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | ARIETT HABITAT RANGE | 72–75 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT PRESS RANGE | 76–79 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT PRESS I RANGE | 80–83 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT PRESS HABITAT RANGE | 84–87 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT QUADRO EVO RANGE | 88–95 | 8 | OK ESLESTI | vortice-vort-quadro-evo | DB: Vort Quadro Evo QE ... (23 model) |
+| ResidentialVentilation.pdf | VORT QUADRO RANGE | 96–99 | 4 | - AILE YOK | — | DB'de duz Quadro modeli YOK (yalniz Quadro EVO) |
+| ResidentialVentilation.pdf | VORT QUADRO I RANGE | 100–103 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT NOTUS RANGE | 104–107 | 4 | - AILE YOK | — | DB'de NOTUS modeli YOK (fiyat listesinde var, aile acilmamis) |
+| ResidentialVentilation.pdf | VORT PLATT RANGE | 108–111 | 4 | - AILE YOK | — | DB'de PLATT modeli YOK (fiyat listesinde var) |
+| ResidentialVentilation.pdf | VORT PENTA RANGE | 112–115 | 4 | - AILE YOK | — | DB'de PENTA modeli YOK (fiyat listesinde var) |
+| ResidentialVentilation.pdf | VORT LETO MEV RANGE | 116–119 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT HRW MONO RANGE | 120–129 | 10 | OK ESLESTI | vortice-vort-mono | DB: VORT HRW 30/40/60 MONO EVO (8 model) |
+| ResidentialVentilation.pdf | VORT PRESS EP RANGE | 130–133 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT PRESS I EP RANGE | 134–141 | 8 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT QUADRO EP AC RANGE | 142–145 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT QUADRO I EP AC RANGE | 146–149 | 4 | - AILE YOK | — | DB'de YOK |
+| ResidentialVentilation.pdf | VORT PLATT EP RANGE | 150–153 | 4 | - AILE YOK | — | ayni |
+| ResidentialVentilation.pdf | VORT PENTA EP RANGE | 154–168 | 15 | - AILE YOK | — | ayni |
+| vortice-brochure-radon-en.pdf | VORT NOTUS RANGE | 4–7 | 4 | - AILE YOK | — | DB'de NOTUS modeli YOK (fiyat listesinde var, aile acilmamis) |
+| vortice-brochure-radon-en.pdf | VORT PLATT RANGE | 8–11 | 4 | - AILE YOK | — | DB'de PLATT modeli YOK (fiyat listesinde var) |
+| vortice-brochure-radon-en.pdf | VORT PENTA RANGE | 12–15 | 4 | - AILE YOK | — | DB'de PENTA modeli YOK (fiyat listesinde var) |
+| vortice-brochure-radon-en.pdf | VORT MONO RANGE | 16–31 | 16 | OK ESLESTI | vortice-vort-mono | DB: VORT HRW ... MONO EVO |
+| vortice-brochure-radon-en.pdf | VORT HR NETI RANGE | 32–39 | 8 | OK ESLESTI | vortice-isi-geri-kazanim | DB: Vort HR 300 Neti |
+| vortice-brochure-radon-en.pdf | VORT HR NETI IoT RANGE | 40–45 | 6 | INSAN INSAN KARARI | vortice-isi-geri-kazanim | IoT varyanti; DB'de IoT modeli YOK, ayni seri |
+| vortice-brochure-radon-en.pdf | VORT HR AVEL RANGE | 46–57 | 12 | OK ESLESTI | vortice-isi-geri-kazanim | DB: Vort HR 350 Avel / 350 Avel H / 450 AVEL D |
+| vortice-brochure-radon-en.pdf | VORT INVISIBLE MINI RANGE | 58–63 | 6 | OK ESLESTI | vortice-isi-geri-kazanim | DB: Vort Invisible Mini Top |
+| vortice-brochure-radon-en.pdf | VORT HRI FLAT RANGE | 64–69 | 6 | - AILE YOK | — | DB'de HRI FLAT modeli YOK |
+| vortice-brochure-radon-en.pdf | VORT HRI FLAT IoT RANGE | 70–75 | 6 | - AILE YOK | — | DB'de YOK |
+| vortice-brochure-radon-en.pdf | VORT PHANTOM RANGE | 76–85 | 10 | - AILE YOK | — | DB'de YOK |
+| vortice-brochure-radon-en.pdf | VORT HRI PHANTOM IoT RANGE | 86–91 | 6 | - AILE YOK | — | DB'de YOK |
+| vortice-brochure-radon-en.pdf | VORT HRI DH RANGE | 92–99 | 8 | - AILE YOK | — | DB'de YOK |
+| vortice-brochure-radon-en.pdf | VORT SANIKIT RANGE | 100–164 | 65 | - AILE YOK | — | DB'de YOK (65 sayfa, en buyuk bolum — aile acilmamis) |
+| Commercial_Ventilation_in_Line_1.pdf | VORTICE LINEO V0 RANGE | 6–17 | 12 | OK ESLESTI | vortice-lineo | DB: Lineo 100..315 (7 model) |
+| Commercial_Ventilation_in_Line_1.pdf | LINEO ES RANGE | 18–23 | 6 | - AILE YOK | — | DB'de duz Lineo ES modeli YOK (Quiet ES var, ayri aile) |
+| Commercial_Ventilation_in_Line_1.pdf | CA V0 E RANGE | 24–27 | 4 | - AILE YOK | — | DB'de V0 modeli YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA V0 EP RANGE | 28–33 | 6 | - AILE YOK | — | DB'de YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA MD and CA MD E RANGE | 34–39 | 6 | OK ESLESTI | vortice-vort-commercial-in-line-circular | DB: CA ... MD |
+| Commercial_Ventilation_in_Line_1.pdf | CA MD EP RANGE | 40–45 | 6 | - AILE YOK | — | DB'de EP modeli YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA ES RANGE | 46–53 | 8 | - AILE YOK | — | DB'de duz CA ES modeli YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA WE D E RANGE | 54–57 | 4 | - AILE YOK | — | DB'de YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA WE D EP RANGE | 58–61 | 4 | - AILE YOK | — | DB'de YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA MD E W RANGE | 62–65 | 4 | - AILE YOK | — | DB'de YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA MD W EP RANGE | 66–71 | 6 | - AILE YOK | — | DB'de YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA MD E RF RANGE | 72–75 | 4 | - AILE YOK | — | DB'de YOK |
+| Commercial_Ventilation_in_Line_1.pdf | CA MD RF EP RANGE | 76–88 | 13 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | LINEO RANGE | 4–4 | 1 | OK ESLESTI | vortice-lineo | DB: Lineo 100..315 |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CONSTRUCTION RANGE | 5–5 | 1 | - AILE YOK | — | urun bolumu degil, yapi/kesit anlatimi |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | LINEO V0 RANGE | 6–19 | 14 | OK ESLESTI | vortice-lineo | ayni |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | LINEO V0 ES RANGE | 20–25 | 6 | - AILE YOK | — | ayni |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA V0 RANGE | 26–31 | 6 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA MD RANGE | 32–39 | 8 | OK ESLESTI | vortice-vort-commercial-in-line-circular | DB: CA 100..315 MD (7 model) |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA ES RANGE | 40–45 | 6 | - AILE YOK | — | DB'de duz CA ES modeli YOK |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA WE D E RANGE | 46–49 | 4 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA MD E W RANGE | 50–55 | 6 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA MD E RF RANGE | 56–61 | 6 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA IN-LINE RANGE | 62–62 | 1 | - AILE YOK | — | DB'de karsiligi YOK; dikdortgen aile CA IL ... ES RECT |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CONSTRUCTION RANGE | 63–63 | 1 | - AILE YOK | — | urun bolumu degil, yapi/kesit anlatimi |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA IN-LINE RANGE | 64–69 | 6 | - AILE YOK | — | DB'de karsiligi YOK; dikdortgen aile CA IL ... ES RECT |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA IN-LINE QUIET RANGE | 70–75 | 6 | - AILE YOK | — | ayni |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | CA IN-LINE QUIET ES RANGE | 76–84 | 9 | INSAN INSAN KARARI | vortice-vort-commercial-in-line-rectangular | DB: CA IL 4020..8060 ES RECT — IL=IN-LINE ve ES ortusuyor ama RECT bolum adinda YOK |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HRW 20 MONO RANGE | 10–21 | 12 | INSAN INSAN KARARI | vortice-vort-mono | DB'de 30/40/60 var, 20 YOK — ayni seri farkli boy |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HRI MINI RANGE | 22–25 | 4 | INSAN INSAN KARARI | vortice-isi-geri-kazanim | DB: Vort Invisible Mini Top ile ayni mi, DOGRULANMADI |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT PROMETEO PLUS HR 400 RANGE | 26–43 | 18 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HR 350 EXO RANGE | 44–49 | 6 | - AILE YOK | — | DB'de 350 Avel var, 350 EXO YOK |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HRI DH RANGE | 50–55 | 6 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HRI PHANTOM RANGE | 56–61 | 6 | - AILE YOK | — | DB'de YOK |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HRI INVISIBLE-E RANGE | 62–71 | 10 | INSAN INSAN KARARI | vortice-isi-geri-kazanim | DB: Vort Invisible Mini Top; -E varyanti DOGRULANMADI |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | VORT HRI FLAT RANGE | 72–80 | 9 | - AILE YOK | — | DB'de HRI FLAT modeli YOK |
+| heat-master-slimroof-cati-fanlari-yeni.pdf | HEATMASTER F400 SERIES | 4–25 | 22 | OK ESLESTI | vortice-vort-heatmaster-slimroof-smoke | DB: HEATMASTER F400 315..630 (10 model) |
+| heat-master-slimroof-cati-fanlari-yeni.pdf | SLIMROOF ES SERIES | 26–44 | 19 | OK ESLESTI | vortice-vort-heatmaster-slimroof-roof | DB: SLIMROOF 155..630 ES (10 model) |
+| 2022-11-en-ca-rm-es-radon.pdf | THE RADON-SPECIFIC VORTICE RANGE | 23–42 | 20 | INSAN INSAN KARARI | vortice-radon-range-circular + vortice-radon-range-roof | TEK bolum IKI aileyi kapsiyor: DB'de CA-RM ES (kanal, 5) ve CA-RM RF ES (cati, 3) |
+| LINEO_QUITE_KATALOG.pdf | LINEO RANGE | 1–5 | 5 | OK ESLESTI | vortice-lineo | DB: Lineo 100..315 |
+| LINEO_QUITE_KATALOG.pdf | LINEO QUIET RANGE | 6–11 | 6 | OK ESLESTI | vortice-lineo-quiet | DB: Lineo 100..315 Quiet (6 model) |
+| LINEO_QUITE_KATALOG.pdf | LINEO QUIET ES RANGE | 12–17 | 6 | OK ESLESTI | vortice-lineo-quiet | DB: Lineo 100..315 Quiet ES (6 model) |
+| LINEO_QUITE_KATALOG.pdf | LINEO QUIET RANGE | 18–23 | 6 | OK ESLESTI | vortice-lineo-quiet | DB: Lineo 100..315 Quiet (6 model) |
+| LINEO_QUITE_KATALOG.pdf | LINEO RANGE | 24–33 | 10 | OK ESLESTI | vortice-lineo | DB: Lineo 100..315 |
+| LINEO_QUITE_KATALOG.pdf | LINEO ES RANGE | 34–40 | 7 | - AILE YOK | — | DB'de duz Lineo ES modeli YOK (Quiet ES var, ayri aile) |
+| Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf | VORT JET-A Range | 16–17 | 2 | - AILE YOK | — | ayni |
+| Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf | VORT JET-R Range | 18–21 | 4 | - AILE YOK | — | ayni |
+| Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf | MPC HP and MPC EC Range | 22–24 | 3 | - AILE YOK | — | DB'de MPC modeli YOK |
+| Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_4.pdf | VORT QUADRO EVO RANGE | 1–20 | 20 | OK ESLESTI | vortice-vort-quadro-evo | DB: Vort Quadro Evo QE ... (23 model) |
+| E_ATEX_Range_yeni_2025.pdf | E-ATEX RANGE | 3–4 | 2 | OK ESLESTI | vortice-vort-e-atex | DB: E 254..606 T ATEX (14 model) |
+| E_ATEX_Range_yeni_2025.pdf | EXAMPLE OF E-ATEX RANGE | 5–16 | 12 | OK ESLESTI | vortice-vort-e-atex | ayni bolumun devami |
+| Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf | DEUMIDO RANGE | 1–12 | 12 | OK ESLESTI | vortice-deumido-range | DB: DEUMIDO NG 10/16/20 |
+| Air_Conditioning_Air_Door_2.pdf | AIR DOOR RANGE | 6–8 | 3 | INSAN INSAN KARARI | vortice-hava-perdesi + vortice-h-ad-elektrikli | TEK bolum IKI aileyi kapsiyor: DB'de AD 900..2000 (ortam havali, 4) ve H AD 900..1500 (elektrikli, 4) |
+| Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf | Punto Evo Range | 7–8 | 2 | INSAN INSAN KARARI | vortice-punto-evo-flexo | aile adi 'Punto Evo / Flexo' ama DB'de yalniz FLEXO modeli var |
+---
+
+## 4 · Ölçülemeyenler (uydurulmadı)
+
+* `AILE YOK` çıkan 81 bölümün **hepsi gerçekten satılmıyor mu**, yoksa bir kısmı DB'de **farklı adla mı
+  duruyor** — kontrol edilmedi. Ölçüt model koduna dayanıyor; ad değişmişse bölüm kaçar.
+* Radon bölümünde kanal/çatı sınırının **hangi sayfada** olduğu ölçülmedi (§2).
+* `VORT SANIKIT RANGE` **65 sayfayla en büyük bölüm** ve karşılığı yok — Vortice'nin sattığı, bizim
+  açmadığımız bir ürün ailesi olabilir. **Ticari fırsat mı, alakasız mı: ölçmedim**, OPS'a not.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-05
+
+
+---
+# FILE: docs\audits\icerik-hatti-faz2-inceleme-2026-09-07.md
+
+# REC-172 Faz 2 — KATALOG incelemesi (ikinci göz)
+
+**Tarih/damga (ölçüldü, `date -u`):** 2026-09-07T07:1xZ · **Şerit:** URUN-KATALOG (sid 3a7976a1)
+**İncelenen:** `docs/audits/rec172-faz2-sonuc-2026-09-06.md` (OPS, dal `ops/rec172-faz2`) +
+ingestor `staging/teknik-*-2026-09-06.csv` (16 dosya, 764 satır)
+**YÖNTEM:** elle ölçüm — kaynak PDF'leri yeniden açarak (pymupdf), cetveli okuyarak, canlı DB'yi
+sorgulayarak. Faz 2 doğrulama ajanının çıktısına **bakılmadı**; ikinci göz birinci gözün raporuna
+değil **kaynağa** bakar. Cetvel: `docs/standards/product-schema-standard.md`, `catalog-ingestion-standard.md`.
+**Canlıya yazım:** YOK ve bu incelemeyle açılmadı (§7 kapısı hâlâ kapalı).
+
+## 0. Hüküm
+
+Faz 2 çıktısı **denetimi geçti**: örneklediğim satırların hepsi kaynakta gerçekten var, çürütme
+gerekçelerinin ikisini bağımsız olarak doğruladım, uydurma değer bulamadım. **Ama iki düzeltme
+var** (§3, §4) ve biri OPS'un "doğrudan alınabilir" dediği KABUL dosyasını etkiliyor.
+
+## 1. DD (hüküm KABUL) — örnekleme, 12/12 kaynakta doğrulandı
+
+"Kabul" damgası otomatik geçiş değildir; kabul edilen küme de sınanır. 81 satırdan tohum 11 ile
+12 satır örnekledim, `493-series-dd.pdf`'i **yeniden açıp** değerin verilen sayfada geçtiğini ölçtüm.
+
+```
+12/12 GECTI  (weight_kg, rpm_max, motor_poles, insulation_class, max_absorbed_power_w,
+              ip_rating, phase · NIC-11902/11911/11916/11920/11921 · s.19/35/47)
+```
+
+**İkinci kat ölçüt — "değer sayfada geçiyor" tek başına ZAYIF.** Katalog sayfası bir tablodur ve
+her sütun başka bir motordur; değerin sayfada bulunması onun *o ürüne* ait olduğunu kanıtlamaz.
+(Aynı sebeple kendi kanıt tablomda 287 satırı "yabancı kaynakta geçen" diye kanıt saymıyorum.)
+Bu yüzden alıntının işaret ettiği **sütun etiketiyle** (M922/M9G4/M955…) bağladım:
+
+```
+11/12 SUTUN-VAR   (etiket sayfada + değer etiketin 1–9 satır komşuluğunda)
+ 1/12 SUTUN-YOK   -> NIC-11921 phase=3
+```
+
+⚠**Tek "eksik" benim ölçütümün kusuruydu, satırın değil:** kaynakta `3~` yazıyor, CSV `3` diyor;
+tam-kelime araması `3~`'ü kaçırdı. Alıntı zaten *"Phases satırında M955 sütunu = 3~"* diyor.
+**Yani DD için 12/12 doğru.** Ölçütün kendi kusurunu satırın kusuru diye yazmamak için bunu
+açıkça kaydediyorum.
+
+**Kalan sınır:** 81 satırın 12'sini ölçtüm (%15). Kalan 69 satır için hükmüm "örnekleme temiz",
+"hepsi doğrulandı" değil.
+
+## 2. Çürütme gerekçeleri — ikisi bağımsız doğrulandı
+
+| İddia | Benim ölçümüm | Sonuç |
+|---|---|---|
+| §3.3 "nominal noktanın `max_`/`min_` alanına yazılması yasak" | `product-schema-standard.md` **satır 299**: *"Nominal noktayı `max_` alanına yazmak yasak"*; satır 292/294 `max_` = aralığın üst sınırı, `nominal_` = eğri üzerinde belirli nokta | ÖNCÜL **DOĞRU** — 12 satırın çürütülmesi yerinde |
+| §6-A "NIC-11921'in DB kodu `6N090P`, katalogda `61090P`" | Katalogda 6-ile-başlayan **66 kod** var, **6N ile başlayan 0**; `61090P` geçiyor, `6N090P` geçmiyor | Katalog tarafı **DOĞRU** — ama DB tarafı eksik anlatılmış, bkz. §3 |
+
+## 3. ⚠DÜZELTME — "DB'deki yazım düzeltilmeli" hükmü olduğu gibi uygulanamaz
+
+OPS §6-A: *"DB sipariş kodu `6N090P` … DB'deki yazım düzeltilmeli, satırlar doğru."*
+**Canlı DB'yi ölçtüm** (`products`, NIC-11921):
+
+```
+model_code : 11921            <- SIPARIS KODU DEGIL
+name       : DD 12/12 1500W 3F 4P 2V** - 6N090P
+slug       : dd-12-12-1500w-3f-4p-2v-6n090p-11921
+DB'de model_code=61090P olan ürün: YOK
+```
+
+`6N090P` **`model_code` alanında değil**; yalnız **ürün adında ve slug'da** yaşıyor. Sonuçları:
+
+1. Düzeltme bir alan güncellemesi değil; **ad + slug** değişikliğidir.
+2. **Slug değişimi URL değişimidir** → kanonik URL, yönlendirme ve SEO etkisi doğurur. Bu
+   `src/app/[lang]/products/**` yüzeyi, yani **URUN şeridinin** işi ve tek başına sorulacak
+   yapısal bir karardır ([[yapisal-karar-pakete-gomulmez]]) — teknik özellik yüklemesine
+   iliştirilerek geçirilemez.
+3. Teknik özellik yüklemesi bu düzeltmeyi **beklemez**: 81 satır `sku`/`model_code` ile bağlanıyor,
+   ikisi de doğru. Kod yazımı ayrı kalemdir.
+
+**Hükmüm:** DD'nin 81 satırı yüklenebilir (kapı açıldığında); kod yazımı **ayrı iş**, sahibi URUN,
+kararı Recep'in. Bu incelemede düzeltilmedi.
+
+## 4. Kabul edilen kümede kalan tek şüphem — `ip_rating=IP20` (NIC-11921)
+
+Rapor STORM'da `IP20`'yi *"yalnız 'also available with external rotor' seçeneği için verilmiş"*
+diye **çürütmüş** (§3.4). DD'de aynı değer **kabul** edilmiş. İki ürün farklı, ama şüphe aynı
+sınıftan: değer motorun mu, seçeneğin mi? Örneklememde satır SUTUN-VAR çıktı (etiket M955, mesafe 1),
+yani **koordinat düzeyinde sağlam**; ama "opsiyon mu standart mı" sorusu koordinatla çözülmez.
+**Yüklemeden önce bu tek satır bağlamıyla okunmalı** — 81 satırın 80'i için itirazım yok.
+
+## 5. Sınırlar (dürüstlük)
+
+- 764 satırın 12'sini kaynağa karşı ölçtüm; kalan 752 için hükmüm **yok**, "temiz" demiyorum.
+- Yalnız DD (KABUL) örneklendi. KISMEN/RET dosyalarının satır listelerini **okudum**, kaynağa karşı
+  **ölçmedim** — onlar zaten onarım kuyruğunda.
+- §5'teki 3 şema kararı (permissible_motor_power_w · max_static_pressure_pa toplam/statik ·
+  atex_marking biçimi) **Recep'in**; OPS taşıyor, ben karar üretmedim.
+- Faz 2'nin kendi doğrulama CSV'lerini kanıt olarak kullanmadım (aynı koşunun ürünü).
+
+## 6. Yükleme kapısına eklediğim şart
+
+OPS §7'de 6 şart var; **yedincisini ekliyorum** (kendi payım):
+
+> **7. Yükleyici betik, kaynak dizini EVREN KAPISINDAN geçecek.** Bugün ölçüldü: `teknik_bosluk.py`
+> ve `kanit-tablosu.py` dar/yanlış bir kaynak dizinine karşı sessizdi (KANITSIZ 208 → 909, çıkış 0).
+> `_kaynak.taban_dogrula` eklendi (commit `7e3071c7`), altı hal borusuz ölçüldü. Yükleyici de aynı
+> kapıyı kullanacak — yoksa eksik bir evrenle "bu alan boş" deyip **canlı veriyi yanlış doldurabilir**.
+
+**Şu an kapı: 4/6 şart açık + benim 7. şartım karşılandı (betik tarafı hazır).**
+
+
+---
+# FILE: docs\audits\icerik-hatti-faz4-canli-yazim-2026-09-07.md
+
+# FAZ 4 canlı yazım — REC-172 (KOL 2)
+
+**Damga:** 2026-09-07T12:00Z civarı (koşum) · **Şerit:** URUN-KATALOG · **Kayıt:** REC-172
+**Yetki:** **Recep'in kendi sözü**, 2026-09-07: *"faz 4 yaabilirsin"*. Akran aktarımı (OPS notu)
+tek başına yeterli sayılmadı ve o notla koşulmadı — bkz. "Yetki zinciri" bölümü.
+**YÖNTEM:** elle betik (deterministik yükleme; emirdeki öneriyle aynı, sapma yok).
+
+## Sonuç
+
+**109 ürün güncellendi. 339 hücre. Kaybolan alan 0.**
+
+| Ölçüt | Öncesi | Sonrası |
+|---|---|---|
+| Ürün | 375 | 375 |
+| Toplam teknik alan | 4887 | **5165** (+278) |
+| Ürün başına ortalama | 13.0 | **13.8** |
+| Hiç teknik alanı olmayan ürün | 8 | **6** |
+| Değişen ürün | — | **109** (beklenen 109 ✅) |
+| Değişen hücre | — | **339** (beklenen 339 ✅) |
+| **Kaybolan alan (regresyon)** | — | **0** ✅ |
+
++278 ile 339 arasındaki fark açıklanıyor: 339 hücrenin 278'i **yeni** alan, kalanı mevcut
+alanın düzeltilmesi (birim gömülü metin → sayı; ör. `9800 m³/h` → `9800`).
+
+## Kapılar — hepsi koşum sırasında ölçüldü
+
+1. **Evren kapısı:** 8/8 dosya. Eksik dosyayla betik çıkış 1 verir (`⛔ EVREN EKSIK`).
+2. **Kesin sayı kapısı:** canlıdan 375 ürün, sunucunun `count=exact` değeriyle doğrulandı.
+3. **İki anahtarlı yazma kolu:** `--yaz` **ve** `CANLI_YAZIM_ONAYI` birlikte; biri eksikse yazım reddedilir.
+   Onay damgası olarak Recep'in kendi cümlesi geçildi ve log'a yazıldı.
+4. **İdempotency — kanıtlandı:** yazımdan sonra ikinci kuru koşum **0 hücre / 0 ürün**,
+   725 değerin tamamı "zaten aynı" kovasına düştü.
+5. **Regresyon kapısı:** öncesi/sonrası anlık görüntüler alan alan karşılaştırıldı —
+   **hiçbir mevcut alan kaybolmadı** (0).
+
+## Yüklenmeyen 16 satır — bilinçli
+
+Bunlar hata değil, **karar bekleyen** satırlar; yüklemeye hiç girmediler:
+
+| Kalem | Sayı | Sebep |
+|---|---|---|
+| Nicotra AT `weight_kg` | 8 | Sürüm belirsiz (S/SC); iki sürüm arası ağırlık %20-26 sapıyor |
+| SEAT STORM `max_absorbed_power_w` | 4 | Aynı anahtara **çelişen** iki değer (180 / 250) |
+| SEAT STORM `ip_rating` = IP20 | 2 | Dayanak tartışmalı; reçete tek satır dedi, ölçümde iki satır çıktı |
+| Danfoss/AVenS `frequency_hz` = 50 | 2 | Kaynak "50/60 Hz" diyor; `min_`/`max_` alan kararı yok |
+
+Toplam giren 764 → çıkan 725 (fark 39: çıkarılan + karar bekleyen + mükerrer).
+
+## Yetki zinciri — niçin bir tur beklendi
+
+FAZ 4 GO'su bana önce **OPS kanalından** ulaştı ("Recep'in kendi sözü" tırnak içinde aktarılmıştı).
+Koşmadım. Sebep: bana **ulaşan** girdi OPS'un notuydu, Recep'in mesajı değil; ve aynı gün Recep'in
+kendi ayrımı yürürlükteydi — *"canlıya dokunan iş bana söylenecek, OPS'a değil"*. 725 değerin canlı
+DB'ye yazılmasında yanlış anlaşılma payı sıfır olmalıydı.
+
+Bir tur sonra Recep doğrudan yazdı (*"faz 4 yaabilirsin"*) ve koşum o an başladı. Gecikme
+bir turdu; alternatifi, aktarılmış bir cümleyle canlıya yazmaktı.
+
+Aynı gerekçeyle REC-184 silmesi de o notla yapılmadı, Recep'in kendi cümlesiyle yapıldı.
+
+## Çıktılar
+
+* Yazım log'u: `faz4-yazim.log` (tam liste, 725 satır) — scratchpad, depoya girmiyor
+* Kaynak CSV'ler: ingestor `staging/duzeltilmis/` (8 dosya)
+* Betikler: `scripts/icerik-hatti/faz4-{etiket-duzelt,teknik-yukle}.py`
+* Hazırlık belgesi: `docs/audits/icerik-hatti-faz4-hazirlik-2026-09-07.md`
+
+## Kalan (REC-172 kapanmıyor)
+
+* **16 karar satırı** yukarıda — dördü ayrı ayrı çözülecek.
+* **Kanıtsız 205 değer** (bugün 299'du; kaynak dizini tazelenince düştü — REC-207).
+* **38 hücre birim-gömülü metin** taşıyor (REC-190) — bu koşumda 61 tanesi düzeltildi, kalanı ayrı.
+
+
+---
+# FILE: docs\audits\icerik-hatti-faz4-hazirlik-2026-09-07.md
+
+# FAZ 4 hazırlığı — etiket düzeltme + yükleyici kuru koşumu (Katalog)
+
+**Damga (ölçüldü, `date -u`):** 2026-09-07T08:0xZ · **Şerit:** URUN-KATALOG (sid 3a7976a1)
+**Emir:** OPS — *"FAZ 4 GO: yükleme hazırlığına başlayabilirsin (alan adları + etiket düzeltme +
+yükleme betiği kuru koşum); canlıya YAZMA adımı yine ayrı GO ile."*
+**YÖNTEM:** elle + betik — düzeltme ve yükleme deterministik olduğu için ajan dalgası koşulmadı;
+sapma yok. **Canlıya yazım: 0** (kuru koşum; yazım kolu iki ayrı anahtara bağlı, §5).
+**Cetvel:** `docs/standards/product-schema-standard.md`, `catalog-ingestion-standard.md`.
+**Girdi:** `rec172-faz2-sonuc-2026-09-06.md` (OPS) + ingestor `staging/teknik-*-2026-09-06.csv` (8 dosya, 764 satır).
+
+## 0. Hüküm
+
+Hazırlık **bitti**: 764 satırın **725'i yüklenebilir**, **16'sı karar bekliyor**, 23'ü çıkarıldı
+ya da tekilleştirildi. Kuru koşum **339 hücre / 109 ürün** diyor. Ama reçetenin kendisinde
+**üç ölçülmüş kusur** var (§1) ve **üç yeni karar kalemi** doğdu (§4) — ikisi vitrine yanlış
+değer yazdırabilecek cinsten.
+
+## 1. ⚠Reçetenin üç kusuru (ölçüldü — körü körüne uygulanamazdı)
+
+| # | Kusur | Ölçüm | Sonuç |
+|---|---|---|---|
+| 1 | **Satır numaraları iki farklı kuralla verilmiş** | ADH'de "8 güç satırı" denen `3,9,…,45` gerçekte `max_static_pressure_pa`; güç satırları `4,10,…,46`. AT'de de +1 kayma. RDH'de ise numaralar **dosya satırı** ve doğru | Körü körüne uygulansa **doğru satırlar silinir, yanlışlar kalırdı** |
+| 2 | STORM "sil: satır 51 (dayanaksız IP20)" — **tek** satır | Ölçümde **iki** IP20 satırı: `SEA-61102010` (s.4) ve `SEA-61103010` (s.4), ikisi de GÜÇLÜ, ikisi de aynı motor-tipi tablosundan | Aynı sınıftan iki satırın birini silip diğerini bırakmak tutarsız → **ikisi de karar bekliyor** |
+| 3 | STORM "**16** mükerrer anahtar" | Ölçüm: **10** mükerrer `(sku,alan)` çifti — 8'i aynı değer (tekilleştirildi), 2'si çelişen değer (karar bekliyor) | Sayı 16 değil 10; fazla satır 8 |
+
+**Bu yüzden seçim satır numarasıyla değil `(sku, alan)` ikilisiyle yapılıyor.** Bağımsız
+doğrulama: alan bazlı seçim reçetenin kendi saydığı **22** (K9) ve **8** (K10) rakamını birebir
+üretiyor — yani kusur numaralarda, kümede değil.
+
+## 2. Recep kararlarının uygulanışı (K9/K10/K11)
+
+| Karar | Uygulama | Satır |
+|---|---|---|
+| **K9** — kayış tahrikli gövdede izinli motor gücü **ayrı alan** | `max_absorbed_power_w` → `permissible_motor_power_w` (ADH 8 + AT 8 + RDH 6) | **22** |
+| **K10** — Nicotra eğrisi **toplam basınç**, statiğe çevrilmez | `max_static_pressure_pa` → `max_total_pressure_pa` (ADH) | **8** |
+| **K11-a** — ATEX: `atex_marking` (grup kodu) + `atex_zone` (bölge) **iki ayrı alan** | 19 satır `atex_zone`'a taşındı, yüklemeye girdi | **19** (JET 7 + SEAT 12) |
+
+**Migration gerekmiyor** (ölçüldü): `products.technical_specs` **JSONB**, düz anahtar→değer.
+Yeni alan adı DB şeması değiştirmeden yaşar. Gereken tek şey **cetvel satırı**
+(`product-schema-standard.md`). **OPS 08:1xZ: o dosya claim'ime alındı, cetvel sahibi benim** —
+K9/K10 kuralları + ATEX açık kalemi + birim kuralı aynı dalda yazıldı.
+
+## 3. Sayılar
+
+```
+girdi   764 satır (8 dosya)
+ -15    SEAT 50: 3 dayanaksız wiring + 12 min_/max_ semantik ihlali
+ - 8    STORM mükerrer (aynı değer, iki kaynak) tekilleştirildi
+ ± 0    STORM 24 gerilim satırı ayrıştırıldı: 12 voltage_v=400 + 12 voltage_alt_v=230
+        (ilk yazımda 230 V'u ATMIŞTIM; cetvel §11 "Gerilim: bir alan bir bilgi" onu
+         voltage_alt_v'ye koyuyor — 12 değer çöpe gitmedi, cetvel okununca yakalandı)
+ -16    KARAR BEKLİYOR (yüklemeye girmez, silinmez de):
+           8  AT weight_kg, sürüm belirsiz          (§4.2)
+           4  STORM çelişen güç                     (§4.3)
+           2  STORM IP20 (§1 kusur 2)  ·  2  Danfoss frequency_hz (alan kararı yok)
+   ±0    ATEX 19 satır (JET 7 + SEAT 12) -> atex_zone; K11-a ile yüklemeye GİRDİ
+=  725  yüklenebilir  ->  kuru koşum: 339 hücre / 109 ürün değişecek
+                          (725'in 386'sı canlıda zaten aynı değer = idempotent)
+```
+
+⚠**Bu blokta önce "23 karar bekliyor" yazmıştım — YANLIŞ, betik 35 diyor.** Sayıyı yeniden
+koşmadan, önceki koşumun 16'sına ATEX'in 7'sini ekleyerek hesapladım; ATEX kuralı JET'in
+7 satırı yanında **SEAT'in 12 ATEX satırını** da tutuyordu. Aynı hatanın (sayıyı betikten
+değil hatırdan yazmak) bugün **üçüncü** tekrarı → [[olcut-dogru-evren-yanlis-is-emri-dogurur]].
+**694 rakamı o an doğruydu; gerilim düzeltmesinden sonra 706 oldu** — çünkü o, betiğin kendi çıktısından alınmıştı.
+
+## 4. ⚠Üç yeni karar kalemi (ölçümle doğdu, reçetede yoktu)
+
+### 4.1 ATEX — ✅ ÇÖZÜLDÜ (Recep K11-a, 09:2xZ): iki ayrı alan
+Canlıda `atex_marking` = **14 Vortice ürününde ekipman-grubu işaretlemesi**
+(`II 2G/D h T3/125°C X Gb/Db`). JET'in 7 satırı ise **kurulum bölgesi beyanı**
+(`Zone II, Category 3G (Directive 94/9/CE)`). İkisi de "II" ile başlıyor; biri **grup**,
+diğeri **bölge**. Aynı alana konursa alan iki anlam taşır ve üzerindeki her karşılaştırma
+sessizce anlamsızlaşır — reçetenin §5-8'de işaret ettiği kusurun ta kendisi.
+**Karar (Recep, 2026-09-07 09:2xZ): (a) — iki ayrı alan.** `atex_marking` grup kodunu,
+`atex_zone` bölge beyanını taşır. Cetvele yazıldı; 19 satır `atex_zone`'a taşındı ve
+yükleme listesine girdi. Böylece alan tek anlam taşıyor ve hiçbir satır çöpe gitmedi.
+
+### 4.2 AT ailesi ağırlıkları — sürüm belirsiz
+DB adı "AT 7/7" sürüm harfi taşımıyor, sipariş kodu PDF'in tamamında **0 kez** geçiyor;
+belirsizlik iki sürüme indi (S / SC) ve aralarında ağırlık **%20-26 sapıyor**.
+%26 sapan bir ağırlık vitrine yazılamaz → **8 satır tutuldu**.
+
+### 4.3 STORM çelişen güç değerleri
+`SEA-61122000` ve `SEA-61122010` için aynı anahtara iki değer (180 W / 250 W — 2018 PDF vs
+2026 web). **4 satır tutuldu**; hangisinin geçerli olduğu birincil teyit ister.
+
+**Ayrıca — bu işin dışında ama ölçüldü:** canlıda **38 hücre** sayısal anahtarda birim-gömülü
+metin taşıyor (`max_delivery_m3h = "6530 m³/h"`, `voltage_v = "220 V"`). Canlının teamülü
+sayı (int 2990 · float 639 hücre); bu 38 hücre **mevcut bir bozukluk**, bu yüklemenin getirdiği
+değil. Yükleme, kapsadığı hücrelerde bunu düzeltiyor; kalanı ayrı kalem.
+
+## 5. Yükleyici kapıları (`faz4-teknik-yukle.py`)
+
+1. **EVREN** — `duzeltilmis/` altında 8 dosya yoksa KIRMIZI (dar dizin sessizce eksik yükler).
+2. **VERİ** — canlı okuma `_veri.tumunu_cek`: kesin sayı + sıralı sayfalama + karşılaştırma
+   (PostgREST 1000 satırda sessizce keser).
+3. **EŞLEŞME** — CSV'deki her `sku` canlıda bulunmalı; bulunmayan varsa **yazım yapılmaz**.
+4. **IDEMPOTENT** — aynı değer zaten yazılıysa hücre değişmez; ikinci koşum 0 değişiklik.
+5. **YAZIM KOLU İKİ ANAHTARLI** — `--yaz` **ve** `CANLI_YAZIM_ONAYI` ortam değişkeni.
+   Varsayılan kuru koşum. Recep'in kendi sözü olmadan yazılmaz; akran aktarımı onay değildir.
+
+## 6. Sınır
+
+Değerlerin doğruluğunu bu iş **yeniden ölçmedi** — Faz 2 doğrulaması + kendi ikinci göz
+incelemem (`icerik-hatti-faz2-inceleme-2026-09-07.md`, DD 12/12) dayanak. Bu iş yalnız
+**etiket/kutu** işidir: hangi değer hangi alana, hangisi hiç girmez.
+
+
+---
+# FILE: docs\audits\icerik-hatti-gorsel-envanteri-2026-09-08.md
+
+# Görsel envanteri — mükerrerler ve "yeni fotoğraf gerekli" listesi (2026-09-08)
+
+**Niçin:** Recep kararı, lafzıyla —
+> *"tekrar edenler aynen kalsınlar ama bunarı kaydet bilelim görsel olarak mükkerre olnalar
+> ve bunlar yeni foto lazım diye bilelim."*
+
+**YÖNTEM:** elle · araç `scripts/media/gorsel-envanteri.mjs` (bugün yazıldı, salt okuma, tekrar koşulabilir).
+**CETVEL:** `docs/standards/product-image-standard.md` — bu ölçümün kolu YOK; kapı REC-284'te.
+**Ham veri:** `icerik-hatti-gorsel-envanteri-2026-09-08.json` (aynı dizin).
+**SALT OKUMA — canlıya hiçbir yazım yapılmamıştır.**
+
+---
+
+## Ölçüm
+
+| | sayı |
+|---|---|
+| görsel kaydı | 1042 |
+| hash'lenen dosya | 898 |
+| boyutu benzersiz olduğu için elenen | 144 |
+| mükerrer grup (aynı dosya, birden çok ürün) | **129** |
+| — bunlardan kategori içi (meşru varyant paylaşımı) | 126 |
+| — **kategori sınırını aşan (şüpheli)** | **3** |
+| görselsiz ürün | **103** (hepsi `status=active`) |
+
+⭐**Eleme neden bilgi kaybı değil:** farklı bayt boyutundaki iki dosya birbirinin aynısı olamaz.
+144 dosya boyutu benzersiz olduğu için tanım gereği tekildir. Boyut yalnız **eleme** ölçütüdür;
+karar hep sha256 ile verilir (boyut eşitliği içerik eşitliği değildir).
+
+## 1. Kategori sınırını aşan üç grup — hepsi AYNI dokuz ürün
+
+| hash | ürün | kategoriler |
+|---|---|---|
+| `e5ebeadb41e3a5f0` | 9 | heat-recovery-vmc + air-treatment |
+| `bac4bcd2c8666dbc` | 9 | heat-recovery-vmc + air-treatment |
+| `767e808a589d9668` | 9 | heat-recovery-vmc + air-treatment |
+
+Üç ayrı fotoğraf, aynı dokuz ürüne kopyalanmış:
+**AVE-13010 · 13011 · 13013** (ısı geri kazanım — fotoğraf doğru) ve
+**AVE-13052 … 13057** (sulu batarya — fotoğraf **yanlış**, REC-282).
+
+⭐**Sabahki bulgu bu taramayla TAM oldu:** kusur *"herhalde başka yerlerde de vardır"* değil,
+**tam olarak bu bir grup.** 442 ürünün tamamı tarandı, kategori sınırını aşan başka paylaşım
+**yok**. Bu, düzeltmenin sınırını da kesinleştiriyor: 6 ürün, 3 fotoğraf.
+
+## 2. ⭐YENİ BULGU — 103 aktif ürünün hiç görseli yok
+
+Sabahki ölçüm kategori görseline bakıyordu; bu tarama ürün düzeyini de gösterdi.
+
+| kategori | görselsiz aktif ürün |
+|---|---|
+| `fans` | **86** |
+| `air-treatment` | 8 |
+| `commercial-ventilation` | 7 |
+| `accessories` | 2 |
+
+**86 fan ürünü vitrinde fotoğrafsız duruyor.** Bu, kategori görseli işinden büyük ve bugüne
+kadar sayılmamıştı. Kaynak durumu bilinmiyor — ölçülmedi, ölçülmeden tahmin de yazılmayacak.
+
+## 3. Kategori içi paylaşım (126 grup) — kusur DEĞİL
+
+Bir ailenin varyantları (ör. aynı fanın 8 güç seçeneği) aynı fotoğrafı kullanır; bu beklenen
+davranıştır. Envanterde **ayrı** listelenir ki "mükerrer" sayısı korkutucu görünmesin:
+129'un 126'sı bu türden.
+
+---
+
+## "Yeni fotoğraf gerekli" listesi — 109 ürün
+
+| küme | sayı | durum |
+|---|---|---|
+| yanlış fotoğraflı sulu batarya | 6 | fotoğraf var ama **başka ürünün**; doğrusu iki kaynakta arandı, yok |
+| hiç görseli olmayan aktif ürün | 103 | 86'sı fan |
+
+Tam liste JSON'da (`gorselsiz_urunler`, SKU + ad + kategori + durum).
+**Recep kararı gereği hiçbiri silinmedi/değiştirilmedi** — bu belge kaydın kendisidir.
+
+### ⭐Listenin kaynak durumu ölçüldü — bugün çözülebilecek olan YALNIZ 7 ürün
+
+Görselsiz 103 ürün markaya göre: **78 AVenS · 23 Vortice · 2 SEAT**.
+Her küme için kaynak ayrı ayrı arandı:
+
+| küme | ürün | kaynakta durum | hüküm |
+|---|---|---|---|
+| **NORDIK HVLS** tavan vantilatörü | **7** | `nordik-hvls-…-181471.pdf` · 7 görselli sayfa, en büyük **3052×2527** | ✅**çözülebilir** |
+| VORTICENT CMS ATEX | 11 | `industrial_Ventilation.pdf`'te 18 sayfa geçiyor ama en büyük görsel **216×180** | ⛔yetersiz çözünürlük |
+| CA IL ES RECT (`VRT-16076…16080`) | 5 | hiçbir Vortice PDF'inde geçmiyor | ⛔kaynak yok |
+| AVenS | 78 | katalog PDF'i **yok** (0 dosya) · avensair.com'da ürünler **yok** | ⛔kaynak yok |
+| SEAT | 2 | **ölçülmedi** | — |
+
+⛔**VORTICENT için "kaynak yok" hükmü iki eşikle ölçüldü:** önce ≥600px (0 sayfa), sonra
+eşiksiz sayım (en büyük 216×180). Yani sorun "aramadım" değil, kaynağın kendisi yetersiz.
+
+⭐**İki iş aynı ürünlerde birleşti:** `VRT-16076…16080` — hem kimliği uydurma olan beş ürün
+(REC-226/275, Recep'in kararını bekliyor) hem de görselsiz. Aynı beş ürün, iki ayrı boşluk.
+Sebebi ortak: bu ürünler kaynakta zayıf temsil ediliyor.
+
+**Sonuç:** 103 görselsiz ürünün **7'si** eldeki kaynakla bugün kapatılabilir; kalan **96'sı
+tedarikçiden fotoğraf istemeyi gerektirir.** Bu, tedarik talebinin somut gerekçesidir.
+
+## ⭐SINIRIN AYNI GÜN GERÇEKLEŞMESİ — 14 ürünün "fotoğrafı" fotoğraf değil
+
+Aşağıdaki sınırı yazdıktan **saatler sonra** tam o boşluktan bir kusur çıktı.
+
+`vortice-vort-e-atex` ailesinin **14 ürününün tek görseli bir PERFORMANS GRAFİĞİDİR** —
+basınç/debi eğrisi, ürün fotoğrafı değil. Gözle doğrulandı (VRT-40325), sonra 14'ü birden ölçüldü.
+
+**Envanter bunu göremezdi ve görmedi:** 14 görselin her biri *farklı* dosya (her ürünün kendi
+eğrisi), yani "aynı dosya iki üründe" ölçütüne hiç takılmıyorlar. Envanterde temiz göründüler.
+
+| ölçüt | 14 ATEX görseli | bilinen 3 fotoğraf |
+|---|---|---|
+| beyaz oranı | %86–88 | %18–68 |
+| **orta ton (gölge/hacim)** | **%9–10** | **%24–54** |
+| doygun renk | %0 | %0–32 |
+
+⭐**İlk ölçütüm KÖRDÜ, düzeltildi:** "renk sayısı ≤ 40" koşulu koymuştum; grafiğin ekseni ve
+ızgarası 68 renk kovası ürettiği için bilinen grafiği **"fotoğraf" saydı**. Ayırt eden alan renk
+sayısı değil **orta ton oranı** — gölge geçişi fotoğrafta olur, çizgi grafiğinde olmaz.
+Kalibrasyon iki bilinen örnekle yapıldı (biri gözle doğrulanmış grafik, biri gerçek fotoğraf).
+
+**Yeni kusur sınıfı, adıyla:** *yanlış fotoğraf* değil, **fotoğraf olmayan görsel**.
+Bu sınıf için ayrı bir ölçüm gerekir; mükerrer taraması onu asla yakalayamaz.
+
+Recep'in *"fotosu da burdan al ve koy"* emri (avensair.com adresiyle) tam bu kusuru hedefliyor.
+
+---
+
+## Sınır — bu envanterin ölçmediği
+
+- Görselin **doğru ürüne ait olup olmadığı**: yalnız *aynı dosya iki üründe mi* sorusunu
+  ölçer. Tek bir ürüne yapıştırılmış yanlış fotoğraf (kopya değilse) bu taramada **görünmez**.
+  ⭐Bu satır yazıldığı gün gerçekleşti — yukarıdaki ATEX bölümüne bakınız.
+- Görselin **nereden geldiği**: kayıt yok, üretilemez (uydurulmayacak).
+- Görselin **kalitesi/çerçevelemesi**: Recep'in "merkezleme/orantı" maddesi bu ölçümün dışında.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kanit-daraltma-2026-09-06.md
+
+# İçerik hattı — kanıt eşlemesi: aileye daraltma + birim dönüşümü (REC-163 artım 1 + 2)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06 · **Durum:** ölçüm + betik; DB'ye hiçbir şey yazılmadı.
+
+## KAYNAK / CETVEL
+
+* `docs/standards/catalog-ingestion-standard.md` **§6.3** — Kaynak Dizini; "PDF doğrudan
+  taranmaz, dizin okunur" kuralı ve kanıt tablosu + kanıtsız mandalı.
+* Kararlar — **K7** (kaynak yoksa satır yok) · **K7.5** (her bulgu kayıtta).
+* OPS kapanışı: *"artım 1, `tenant_id` taşınmadan kapanmaz."* → bu ölçümde taşındı (3127/3127).
+* **YÖNTEM:** elle (tek betik ailesi + ölçüm). Cetvel `execution-method-standard.md` —
+  "tek dosya = elle". Sapma yok.
+
+---
+
+## 0 · Kapatılan sorun
+
+v1'in dürüst sınırı şuydu: *"değer, dizindeki **bir** sayfada geçiyor"*. Hangi sayfa olduğunu
+gösteremiyordu (3434 satırın yalnız 88'i tek adaylı) ve **hangi kataloğun** sayfası olduğuna hiç
+bakmıyordu. Somut sonucu şu satır:
+
+```
+aile   : avens-hucreli-hf-s      alan: max_absorbed_power_w   deger: 7500
+bulundu: markalar/vortice/.../Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.27
+```
+
+AVenS hücreli aspiratörün gücü, **Vortice'nin başka bir ürün ailesinin broşüründe** "bulunmuş"
+sayılıyordu. 7500 yaygın bir sayı; geçmesi rastlantı. v1 bunu **kanıt** diye sayıyordu.
+
+## 1 · Ne yapıldı
+
+Her ailenin **kendi kaynak PDF'leri** belirlendi ve arama yalnız o sayfalarda yapıldı.
+
+Harita **elle yazılmadı** — taslaklardan program çıkardı
+(`scripts/icerik-hatti/aile-kaynak-cikar.py`). Gerekçe: taslak, bir ailenin hangi katalog
+sayfalarından yazıldığının **kaydıdır**; elle harita yazmak ölçülmemiş bir eşleme uydurmak olurdu.
+Çıkarım, ailenin slug'ının geçtiği bölümlerdeki `[KOD s.NN]` referanslarını toplar; adsız
+`[s.NN]` biçimi `VARSAYILAN-KAYNAK` yorumundan çözülür. **40/40 aile haritalandı, haritasız kalan yok.**
+
+| Aile başına kaynak PDF | Aile |
+|---|---|
+| 1 PDF | 26 |
+| 2 PDF | 3 |
+| 3 PDF | 9 |
+| 4 PDF | 2 |
+
+## 2 · Ölçülen kazanç (aynı veri, aynı dizin, 375 ürün / 1171 sayfa)
+
+| Ölçüt | v1 | v2 | |
+|---|---|---|---|
+| Aranabilir değer | 3733 | 3733 | — |
+| Kendi kaynağında bulunan | 3434\* | **3127** | \*v1'de "herhangi bir kaynakta" |
+| **Tek adaylı (sayfa gösterilebilen)** | **88** | **267** | **3,0×** |
+| Aday sayfa **ortancası** | 100 | **13** | 7,7× dar |
+| Aday sayfa ortalaması | 211,7 | 29,6 | |
+| En kötü durum (max aday) | 959 | 202 | |
+| ⚠ Yabancı kaynakta geçen | (kanıt sayılıyordu) | **307** | yeni sınıf |
+| ⛔ KANITSIZ | 299 | **299** | **mandal korundu** |
+
+Korunum sağlanıyor: 3127 + 307 + 299 = 3733. **Kanıtsız sayısı değişmedi** — daraltma
+mandalı bozmadı, yalnız "kanıt" sütunundan 307 rastlantıyı ayırdı.
+
+## 3 · ⚠ Kendi kusurum — ölçüm yayımdan ÖNCE yakaladı
+
+İlk koşumda MONO ailesinin **101 değerinin tamamı** "kendi kaynağında yok" çıktı ve
+`vortice_vort_mono_range_new.pdf` "dizinde yok" diye rapor edildi. Yanlıştı.
+
+Dosya dizinde **duruyor** — `vortice-brochure-mev.pdf` ile **bayt-aynı** olduğu için dizin onu
+tek kayda indirgemiş ve ötekini `manifest.json` → `takma_adlar` altında tutmuş. Taban ada göre
+kurduğum filtre **takma adlara kördü**. Düzeltildi (manifest okunur, takma ad kanoniğe çözülür);
+MONO 0 → **81 kanıt**, yabancı 428 → 307.
+
+Ders: **kendi kurduğum tekilleştirmeyi kendi filtrem görmedi.** Dizin, aynı PDF'i iki adla
+tutmamak için doğru davrandı; ikinci katman o kararı bilmiyordu. → [[olcut-keskin-ama-evren-yanlis]]
+
+## 4 · ⚠ Daraltmanın ÇÖZMEDİĞİ — sabotaj sınavı ne dedi
+
+İki aileye kasten **yanlış** kaynak atandı (Lineo → hava perdesi broşürü):
+
+| | doğru harita | sabotajlı harita |
+|---|---|---|
+| `vortice-lineo` kanıt | 86 | **32** |
+| `vortice-lineo` tek adaylı | 19 | **15** |
+
+Yani sabotaj satırların **%63'ünü** düşürdü ama **%37'si ayakta kaldı**; tek adaylı satırlarda
+düşüş yalnız **%21**. Sebep: `100`, `125`, `230` gibi **jenerik** değerler hemen her HVAC
+kataloğunda geçer. **Daraltma rastlantıyı azaltır, bitirmez.** Bu yüzden alan adı hâlâ
+`kanit_gucu` değil `esleme_yontemi`; değeri hâlâ `SAYFA_ICINDE_GECIYOR`.
+
+Manşeti kendim düşürüyorum: **"3127 değerin kaynağı var" DEMEK DEĞİL.** Söylenebilecek olan
+şudur — 267 değer için tek bir sayfa gösterebiliyoruz; kalan 2860 için "ailenin kendi
+kataloğunun şu 13 sayfasından birinde geçiyor" diyebiliyoruz.
+
+## 5 · `tenant_id` (OPS'un kapanış şartı)
+
+Her kanıt/kanıtsız/yabancı satırı artık `tenant_id` taşıyor — **3127/3127 dolu**, bugün tek
+kiracı (`d3b07384…0000`). Niçin şart: bu alan olmadan çok-kiracılı kurulumda başka kiracının
+değeri bizim kanıtımız gibi sayılabilirdi ve fark **hiçbir yerde görünmezdi** (kural 12).
+
+## 6 · Üretilen dosyalar
+
+| Dosya | Ne |
+|---|---|
+| `scripts/icerik-hatti/aile-kaynak-cikar.py` | taslaklardan aile→PDF haritası üretir |
+| `scripts/icerik-hatti/aile-kaynak-haritasi.json` | üretilmiş harita (40 aile) |
+| `scripts/icerik-hatti/urun-veri-cek.mjs` | ürün verisi + `tenant_id` çeker (salt okuma) |
+| `scripts/icerik-hatti/kanit-tablosu.py` | v2 — daraltma, takma ad çözümü, yabancı sınıfı |
+
+Koşum sırası:
+
+```bash
+node   scripts/icerik-hatti/urun-veri-cek.mjs urunler.json
+python scripts/icerik-hatti/aile-kaynak-cikar.py docs/audits urunler.json \
+       scripts/icerik-hatti/aile-kaynak-haritasi.json
+python scripts/icerik-hatti/kanit-tablosu.py --veri urunler.json --cikti-dizin <dizin>
+```
+
+---
+
+# ARTIM 2 — birim dönüşümü
+
+## 7 · Kanıtsızın gerçek bileşimi (daraltma sonrası ölçüldü)
+
+299 kanıtsız değer **tek bir yığın değil**; üç ayrı sorun:
+
+| Alan | Adet | Ne demek |
+|---|---|---|
+| `pq_curve` · `thermal_efficiency_curve` · `discharge_velocity_curve` | **166** | katalogda yalnız **grafik** olarak var — metinde sayı yok |
+| `max_delivery_ls` | **123** | DB l/s tutuyor, katalog m³/h basıyor → **birim farkı** |
+| diğer (`rated_power_w`, `max_delivery_m3h`, `absorbed_current_a`, `filter_classes`) | 10 | tekil |
+
+(Daha önce "132 dönüşüm" demiştim; daraltma sonrası ölçülen sayı **123**.)
+
+## 8 · Dönüşüm kanıtsızı KAPATIR, gizlemez
+
+Dönüşümle bulunan satırın `esleme_yontemi`'i ayrıdır
+(`BIRIM_DONUSUMUYLE_BIRIME_BITISIK`) ve hangi dönüşümün uygulandığı satırda yazar.
+Doğrudan eşleşmeyle aynı kefeye konmaz.
+
+**Yuvarlama toleransı gerekti:** `719.44 l/s × 3.6 = 2589.984`, katalogda yazan **2590**.
+Fark (%0,0006) değerin **kendi yuvarlanmasından** gelir. Tolerans bağıl ve dardır (%0,1) —
+geniş tolerans komşu modelin değerini yakalar ve kanıt uydurur.
+
+## 9 · ⛔ İlk kuralım AYIRT ETMİYORDU — sınav yakaladı, manşeti düşürdüm
+
+İlk sürüm dönüştürülen sayıyı **çıplak** arıyordu ve 105 satır "kapandı". İki yönlü sınav
+(katsayıyı kasten bozup koşmak) bunu çürüttü:
+
+| l/s → m³/h katsayısı | ÇIPLAK sayı arayınca | **BİRİMLE BİTİŞİK** arayınca |
+|---|---|---|
+| **3,6 (doğru)** | 105 | **91** |
+| 3,5 (sabotaj) | 56 | **0** |
+| 3,7 (sabotaj) | 46 | **1** |
+| 3,4 (sabotaj) | 41 | **0** |
+| 4,0 (sabotaj) | 49 | **0** |
+| 2,0 (sabotaj) | 54 | **0** |
+
+Çıplak arama **yanlış katsayıyla da 41–56 satır kapatıyordu** — yani ölçüt ayırt etmiyordu,
+sayfadaki yüzlerce sayıdan birine çarpıp kanıt uyduruyordu. Kural değiştirildi: dönüşümlü
+eşleme **sayının birimle bitişik geçmesini** ister (`2590 m³/h`). Son sürümde tam koşum:
+doğru katsayı **109**, sabotaj katsayıları **0 · 1 · 0 · 1**.
+
+Ayrıca **asgari belirginlik** kuralı kondu: `11000 W → "11"` araması 46 sayfada "bulunuyordu";
+11 her katalogda geçer. Dönüşümlü eşleme için gösterim **en az 3 basamak** taşımalı. Bu kural
+ilk sürümdeki 180 dönüşümün 37'sini düşürdü. (Doğrudan eşleşmeye uygulanmaz — orada değer
+DB'nin kendi yazımıdır.)
+
+## 10 · Artım 1 + 2 birlikte — son tablo
+
+| Ölçüt | v1 | v2 (daraltma) | **v3 (+dönüşüm)** |
+|---|---|---|---|
+| Kendi kaynağında bulunan | 3434\* | 3127 | **3238** |
+| — doğrudan eşleşen | 3434\* | 3127 | 3127 |
+| — birim dönüşümüyle | — | — | **111** |
+| **Tek adaylı** | **88** | 267 | **312** (3,5×) |
+| Aday sayfa ortancası | 100 | 13 | 13 |
+| Yabancı kaynakta geçen | kanıt sayılıyordu | 307 | 287 |
+| ⛔ **KANITSIZ** | **299** | 299 | **208** |
+
+\*v1'de "herhangi bir kaynakta". Korunum: 3238 + 287 + 208 = 3733 ✔
+
+Mandal **91 birim küçüldü** ve küçülmenin tamamı ayırt eden bir sınavdan geçti.
+
+## 11 · Bu ölçümün kapatmadığı
+
+* **287 yabancı satır** ne demek — bir kısmı gerçek boşluk, bir kısmı harita darlığı olabilir;
+  ayrıştırılmadı.
+* **Kalan 208 kanıtsızın 166'sı eğri** — katalogda yalnız grafik. Sayısallaştırma
+  **Recep kararıdır** (emek/fayda dengesi ticari karar).
+* Kalan 15 `max_delivery_ls` birimle bitişik geçmiyor — sayfada tablo başlığında olabilir;
+  güçlü eşleme (satır/sütun) yazılana kadar açık.
+* Güçlü eşleme (tablo hücresi / satır-sütun) yazılmadı — o gün `esleme_yontemi` değişir.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kategori-gorsel-2026-09-08.md
+
+# Kategori görselleri — ölçüm (2026-09-08, URUN-KATALOG)
+
+**YÖNTEM:** elle (tek eksen: canlı `categories` + `storage.objects` + dosya hash'i). Sapma yok.
+**CETVEL:** `docs/standards/product-image-standard.md` (mevcut) — kategori görseli için kol YOK,
+yazımı bu işin kapsamındadır.
+**KAYNAK:** canlı DB (`tnofewwkwlyjsqgwjjga`), storage `product-images` kovası, indirilmiş
+dosyaların `md5sum`'ı. Ölçüm damgası **06:20–06:25Z**.
+
+---
+
+## 0. Niçin bu ölçüm
+
+Recep'in gözlemi (URUN üzerinden devredildi, lafzıyla):
+
+> *"hava perdesi resmini daha iyisi var zaten arka planı da beyaz değil onun kirli beyaz gibi..
+> aksesuar içinde resim lazım.. diğer resimlerde tam ortalı değil ve orantısız görünüyorlar.
+> ve 2 anesi de aynı resim.. ısıgerikazanım doğru ama havaşartlandırmada da ısı geri kazanım
+> resmi var. merkezlemeler de hepsinde elden geçmeli.. fanlar için de sessiz fan resmi kullanılsın"*
+
+**Her maddesi doğru çıktı. İki madde ölçümde İDDİADAN BÜYÜK çıktı.**
+
+---
+
+## 1. Doluluk — 37 kategori
+
+| | toplam | `image_url` BOŞ |
+|---|---|---|
+| üst kategori | 13 | **8** |
+| yaprak | 24 | 8 |
+| **toplam** | **37** | **16** |
+
+Boş üstler: `accessories` · `air-conditioning` · `commercial-ventilation` · `electric-heating`
+`hygiene-sanitizer` · `residential-ventilation` · `smart-home` · `summer-ventilation`
+
+⛔**BOŞ 16 KATEGORİNİN HİÇBİRİNDE GÖRSELLİ ÜRÜN YOK** (ölçüldü: `gorselli_urun = 0`, hepsinde).
+Sekizinin ürünü de yok. **Sonuç: bu iş "var olan havuzdan seçim" işi DEĞİL, görsel TEDARİK işidir.**
+Bende görsel üretme yeteneği yok ([[no-image-generation-capability]]); kaynak marka siteleridir
+([[brand-image-sources]]). Bu, işin süresini ve yöntemini değiştirir — emir buna göre yazılmalı.
+
+## 2. ⭐"2 tanesi de aynı resim" — gerçek sayı DÖRT (kategori), DOKUZ (dosya)
+
+Dört kategorinin görseli **byte-eşit aynı dosya** (`md5 cce86848005c…`):
+
+| kategori | düzey | görselin ait olduğu ürün |
+|---|---|---|
+| `air-treatment` (İklimlendirme ve Hava Şartlandırma) | üst | AVE-13053 sulu batarya |
+| `heat-recovery-vmc` (Isı Geri Kazanım) | üst | AVE-13013 ısı geri kazanım |
+| `ducted-central-hrv` (Kanallı Merkezi Üniteler) | yaprak | AVE-13011 ısı geri kazanım |
+| `water-coil-duct-heaters` (Sulu Batarya Kanal Tipi) | yaprak | AVE-13052 sulu batarya |
+
+Gözle bakıldı: dosya **bir AVenS kutu tipi ısı geri kazanım cihazı** fotoğrafı.
+Recep'in *"hava şartlandırmada da ısı geri kazanım resmi var"* teşhisi **birebir doğru**.
+
+## 3. ⭐ALTINDAKİ ASIL KUSUR — altı ürün YANLIŞ FOTOĞRAFLA satılıyor
+
+Kategori tekrarı bir **sonuç**; sebep ürün görsellerinde. Aynı ısı-geri-kazanım fotoğrafı
+**dokuz ürün kaydında** duruyor ve altısı tamamen başka bir üründür:
+
+| SKU | ürün | fotoğraf doğru mu |
+|---|---|---|
+| AVE-13010 / 13011 / 13013 | AVenS 750 / 1000 / 2000 ISI GERİ KAZANIM | ✔ doğru |
+| **AVE-13052 · 13053 · 13054 · 13055 · 13056 · 13057** | **SULU BATARYA 11–40 KW KANAL TİPİ** | ⛔**YANLIŞ** |
+
+Sulu batarya bir ısıtma serpantinidir; vitrinde onun yerine kutu ünite fotoğrafı görünüyor.
+Üç ayrı dosya boyutunda (7108 · 8744 · 12568) aynı desen — yani **üç görselin üçü de** kopyalanmış.
+
+**Kusurun sınırı ölçüldü:** kategori sınırını aşan görsel paylaşımı **yalnız bu grupta** var.
+Diğer paylaşımların hepsi aynı kategori içi (varyant paylaşımı — meşru).
+En büyük grup 23 ürün, hepsi tek kategori.
+
+## 4. `fans` görseli
+
+`fans` üst kategorisi = **ADH-200 E2** (NIC-11942) — gözle bakıldı: **santrifüj/salyangoz fan**.
+Recep *"fanlar için sessiz fan resmi kullanılsın"* dedi; mevcut görsel sessiz fan DEĞİL. Doğru.
+
+## 5. Kova sözleşmesi sapması — iki kategori yerel dosya gösteriyor
+
+`air-curtains` → `/images/products/air-curtain.png` · `inline-duct-fans` → `/images/products/vortice_lineo_360.png`
+
+Diğer 19 kategori storage URL'i taşıyor. Yani **kategori görseli için iki ayrı taşıyıcı**
+yan yana yaşıyor ve hangisinin kanonik olduğu yazılı değil. Recep'in *"hava perdesi… arka planı
+kirli beyaz"* şikayeti tam bu yerel PNG'ye ait.
+
+---
+
+## Hüküm ve sıra
+
+1. ⛔**Sulu batarya altılısının yanlış fotoğrafı** — vitrinde yanlış ürün gösteriliyor; en ağır
+   kalem. Düzeltme canlı veri değişikliğidir → **Recep kapısı**. Doğru fotoğraf elde YOK;
+   kaldırma mı, tedarik mi — Recep'in kararı.
+2. Kategori görseli tedariki (16 boş + `fans` + `air-curtains` değişimi) — tedarik işi, üretim değil.
+3. Kova sözleşmesinin tek kaynağa alınması + kategori görseli için konformans kolu
+   (bugün YOK: dört kategorinin aynı dosyayı göstermesini hiçbir kapı görmedi).
+4. Merkezleme/orantı — görsel işleme; kalem 1–3 kapanmadan sıraya girmez.
+
+**Bu belgede canlıya hiçbir yazım yapılmamıştır.**
+
+---
+
+## ⛔DÜZELTME — 06:35Z, ÖLÇÜTÜM DOĞRUYDU AMA EVRENİM YANLIŞTI
+
+Yukarıdaki "16 boş kategori" sayısı **iş hacmi olarak yanlış**: `is_active` alanına bakmamıştım.
+
+| | sayı |
+|---|---|
+| `image_url` boş | 16 |
+| bunlardan **pasif** (`is_active=false`, vitrinde YOK) | **13** |
+| **gerçekten görsel gereken AKTİF kategori** | **3** |
+
+Görsel gereken üçü: `accessories` (üst, 2 ürün) · `electric-duct-heaters` (6 ürün) ·
+`industrial-ceiling-fans` (7 ürün).
+
+**Yani tedarik işi 16 değil 3 kalemlik.** Dün gece panoya ve URUN'e "16/37 boş, üst 13'ten 8'i
+boş" diye bildirdiğim sayı bu düzeltmeyle geçersizdir; düzeltme aynı turda panoya yazıldı.
+
+⭐**Ders (tekrarlayan):** ölçüt keskin, evren yanlış → yanlış iş emri doğar. Aynı hatayı BUILD
+vakasında da yapmıştım. Kural: "kaç tane boş" sorusunda **görünürlük alanı** evrenin parçasıdır.
+
+## ⭐YENİ BULGU — 26 ürün PASİF kategoride duruyor
+
+Düzeltmeyi ararken çıktı; görsel işinden ayrı ve muhtemelen daha ağır:
+
+| kategori | ürün (hepsi `status=active`) | `is_active` |
+|---|---|---|
+| `ex-proof-atex-fans` (Ex-Proof / ATEX Fanlar) | **12** | false |
+| `rectangular-duct-fans` (Dikdörtgen Kanal Tipi) | **7** | false |
+| `commercial-ventilation` (ÜST kategori) | **7** | false |
+
+Ürünlerin kendisi aktif ama bulundukları kategori kapalı. **Bu ürünlere kategori üzerinden
+erişilip erişilemediği ÖLÇÜLMEDİ** — kategori sayfası ve menü URUN'ün alanı, ölçümü ona ait.
+Eğer erişilemiyorsa 26 aktif ürün vitrinde görünmüyor demektir. Ayrı kayıt açılacak.
+
+---
+
+## ⛔İKİNCİ DÜZELTME — 06:5xZ, "26 ürün" SAYIM HATASI (URUN ölçtü, kabul)
+
+**26 değil 19.** `commercial-ventilation` (7) ile `rectangular-duct-fans` (7) **aynı yedi ürün**:
+yedisinin de `category_id` üst pasif kategoriye, `subcategory_id` alt pasif kategoriye bakıyor.
+Sorgum iki kolonu `OR` ile saydığı için **aynı kayıt iki kez** göründü. Gerçek: 12 + 7 = **19**.
+SKU'lar (URUN ölçtü): AVE-1200/1250/1316/1317/1355/1360/1410.
+
+**Ve teşhisim ters yöndeymiş:** ürünler görünmez DEĞİL — kusur tersi, **pasif kategori vitrini
+kapatmıyor**. Kayıt REC-283'te (URUN).
+
+## ⭐BUGÜNÜN DESENİ — üç sayım hatası, üç ayrı kök
+
+| # | hata | yakalayan | kök |
+|---|---|---|---|
+| 1 | "16 boş kategori" | ben | **evren**: görünürlük (`is_active`) sayıma dahil değildi |
+| 2 | "26 ürün pasif kategoride" | **URUN** | **tekillik**: `OR` ile iki kolon → çift sayım |
+| 3 | "AVenS'te 0 kullanılabilir görsel" | ben | **sebep**: 0 görsel değil, 0 PDF |
+
+Üçü de "sorgu doğru çalıştı, cevap yanlış" biçiminde. Ortak ders: **bir sayı iş emri doğuracaksa
+sayının EVRENİ · TEKİLLİĞİ · YOKLUĞUN SEBEBİ ayrı ayrı ölçülür.** Sorgunun hatasız koşması
+bunların hiçbirini garanti etmiyor.
+
+Bu, kurulacak kapının da tasarım ölçütü: kapı **sayıyı** değil, sayının **evrenini** doğrulamalı.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kategori-olcumu-2026-09-06.md
+
+# İçerik hattı — kategori rehber paragrafları ÖNCESİ ölçüm (REC-146 madde 3)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06 · **Durum:** ölçüm; hiçbir şey yazılmadı.
+
+## KAYNAK / CETVEL
+
+* `docs/standards/rendering-cache-standard.md` — statik vitrinde görünen her tablonun tazeleme dalı olmalı.
+* Kararlar — Vitrin 15A **K8** (kategori üç mod) · **K1** (fiyat/vaat yok) · **K7** (kaynak yoksa satır yok).
+* `CLAUDE.md` **kural 7** — DB çevirileri JSONB (`metadata->>lang`); kullanıcıya görünen metin dile bağlı.
+* İş emri REC-146 madde 3: *"7 kategori × 1 paragraf … → `categories.description`;
+  `display_mode` (series/showcase/landing) ↔ 15A üç mod eşlemesi yazılır."*
+
+---
+
+## 1 · Emrin "7 kategori"si BUGÜN karşılıksız — evren değişmiş
+
+Emir 2026-09-05'te açıldı ve "7 kategori" dedi. Bugün canlıdan ölçtüm:
+
+| Ölçüm | Sayı |
+|---|---|
+| Toplam kategori | **37** |
+| `description` dolu olan | **0** |
+| `authority_content` dolu olan | **0** |
+| Üst seviye kategori | 13 |
+| Alt kategori | 24 |
+| **Doğrudan ürünü olan kategori** | **6** |
+
+Doğrudan ürünü olan altı kategori:
+
+| Kategori | slug | Ürün |
+|---|---|---|
+| Fanlar | `fans` | **295** |
+| Kontrol Sistemleri | `control-systems` | 37 |
+| İklimlendirme ve Hava Şartlandırma | `air-treatment` | 17 |
+| Isı Geri Kazanım (VMC) | `heat-recovery-vmc` | 16 |
+| Hava Perdeleri | `air-curtains` | 8 |
+| Aksesuarlar | `accessories` | 2 |
+
+**Yani "7" değil 6.** Emirdeki sayı bir öncül; ölçüm onu çürüttü. Sayıyı emirden değil
+ölçümden alıyorum — aksi hâlde yedinci paragrafı hangi kategoriye yazacağımı **uydurmam**
+gerekirdi.
+
+## 2 · İki yapısal bulgu (ikisi de benim şeridimin dışında, ikisi de kayıtta — K7.5)
+
+### 2.1 · Yedi üst kategori İNGİLİZCE adlı ve SIFIR ürünlü
+
+`Air Conditioning` · `Commercial Ventilation` · `Electric Heating` · `Hygiene and Sanitizer`
+· `Residential Ventilation` · `Smart Home` · `Summer Ventilation`
+
+Hepsi üst seviye, hepsinin ürün sayısı 0, hepsinin adı İngilizce. Türkçe vitrinde
+İngilizce kategori adı görünüyorsa bu bir i18n kusurudur (kural 7). **ÜRÜN şeridinin
+alanı** (`kategori-adi-*` konformans testleri orada); ölçümü bildiriyorum, dokunmuyorum.
+
+### 2.2 · ~~24 alt kategorinin hiçbirinde ürün yok~~ — **BU İDDİA YANLIŞTI, DÜZELTİLDİ**
+
+İlk yazdığım hâli: *"24 alt kategorinin hiçbirinde doğrudan ürün yok."* **Yanlış.**
+ÜRÜN şeridi ölçüp çürüttü, ben de kendim yeniden ölçüp doğruladım.
+
+**Sebep ölçüt değil EVREN:** ürün ↔ kategori bağı **iki sütunla** kurulur —
+`products.category_id` **ve** `products.subcategory_id`. Ben yalnız birincisine baktım;
+o sütunda alt kategoriler gerçekten 0 çıkıyor. İkincisiyle ölçünce:
+
+| Ölçüm (`subcategory_id` ile) | Sayı |
+|---|---|
+| Ürünü olan alt kategori | **17 / 24** |
+| Alt kategoriye bağlı ürün | **365** |
+
+Yani "24 boş sayfa" diye bir sorun **yok**; alt kategori ağacı çalışıyor.
+→ [[olcut-keskin-ama-evren-yanlis]] — ölçüt keskindi, evren eksikti; keskin bir ölçüt
+yanlış evrende **kendinden emin bir yanlış** üretir.
+
+**Bunun kapsama etkisi (yeni soru):** alt kategoriler gerçekten dolu olduğuna göre, rehber
+paragrafı yalnız 6 üst kategoriye mi yazılacak, yoksa ürünü olan 17 alt kategoriye de mi?
+**6 → 23.** Bu bir kapsam kararıdır, tek başıma büyütmem; OPS/Recep'e sordum.
+
+## 3 · ⛔ ASIL ENGEL: kategori açıklamasının BUGÜN i18n yolu YOK
+
+Şema ölçümü:
+
+```
+categories.description        text      NULL yok, varsayilan yok   ← JSONB DEGIL
+categories.metadata           jsonb     varsayilan '{}'
+categories.authority_content  jsonb     NULL
+categories.display_mode       text      varsayilan 'series'
+```
+
+Kod ölçümü — `src/utils/categoryHelpers.ts:143` `getCategoryDescription()`:
+
+```ts
+const meta = category.metadata
+if (meta?.hero_description) return meta.hero_description as string
+return category.description || ''
+```
+
+**İkisi de dile bakmıyor.** Ürün ailelerinde `description` jsonb `{tr,en}` iken kategoride
+düz metin. Sonuç: TR paragrafı `description`'a yazarsak **İngilizce vitrinde de Türkçe
+görünür**. Bu, kural 7'nin doğrudan ihlali ve düzeltmesi benim şeridimde değil.
+
+**HÜKÜM (benim, ölçüme dayalı):** kategori paragrafı, i18n yolu açılmadan DB'ye
+**yazılmaz**. Taslak yazılır, bekletilir. Önerilen yol — kararı ÜRÜN + Recep verir:
+
+* **(a)** `metadata.description_i18n = {tr, en}` + `getCategoryDescription(category, lang)`
+  — aile tarafındaki kalıbın aynısı, yeni sütun gerekmez, migration gerekmez.
+* **(b)** `description` sütununu jsonb'ye çevirmek — migration demek, prod'a otomatik iner
+  (kural 13), ve `description`'ı okuyan **yedi** ayrı yer var. Daha pahalı.
+
+Önerim **(a)**: migration yok, mevcut `metadata` alanı zaten jsonb ve varsayılanı `'{}'`.
+
+## 4 · Rehber paragrafının kaynağı, ürün metninden FARKLI bir sorun
+
+Aile metinlerinde kaynak katalog PDF'iydi ve kapı sayıyı sayfada arıyordu. Rehber paragrafı
+ise *seçim tavsiyesi* — emir "kaç hava değişimi, gürültü/yerleşim, seçiciye bağlantı" diyor.
+**"Kaç hava değişimi" bir NORMDUR**, katalogda yazmaz; TS/EN veya ASHRAE gibi bir kaynağa
+dayanmalıdır. Elimizde böyle bir kaynak **yok** (24 PDF üretici kataloğu).
+
+**HÜKÜM:** ilk sürüm rehber paragrafları **sayısal norm iddiası taşımaz**. Ne yapar:
+kategorinin ne işe yaradığını, hangi soruların ürünü belirlediğini (yerleşim, gürültü,
+kanal/duvar/çatı, tek oda/merkezi) ve seçiciye/ilgili ailelere yönlendirmeyi anlatır.
+Hava değişim sayısı gerekiyorsa **normatif kaynak temini ayrı bir iştir** — Recep'e sorulur.
+Uydurma sayı, kapının ölçemeyeceği yerde en tehlikeli hâlini alır: kaynağı olmadığı için
+kırmızı bile vermez.
+
+## 5 · `display_mode` ↔ 15A üç mod eşlemesi (emrin ikinci teslimatı)
+
+~~Bugün 37 kategorinin hepsi varsayılan `series`; üç mod hiçbir kategoriye bilinçli
+atanmamış.~~ **← BU İDDİA YANLIŞTI, DÜZELTİLDİ (aynı gün, 17:30Z).**
+
+**Sebep: ÖLÇMEDİM, SÜTUN VARSAYILANINA BAKIP GENELLEDİM.** `column_default = 'series'`
+görüp "hepsi öyledir" dedim; dağılımı hiç sorgulamadım. Bu, aynı gün başkalarında
+eleştirdiğim hatanın kendisi: **hatırlanan/çıkarsanan sayıyı ölçülmüş gibi yazmak.**
+
+**Ölçülen gerçek dağılım:**
+
+| `display_mode` | Kategori | Hangileri |
+|---|---|---|
+| `series` | **22** | — |
+| `showcase` | **11** | fans · air-treatment · control-systems · heat-recovery-vmc · air-conditioning · commercial-ventilation · electric-heating · hygiene-sanitizer · residential-ventilation · smart-home · summer-ventilation |
+| `landing` | **4** | air-curtains · dehumidifiers · duct-fans · inline-duct-fans |
+
+Yani eşleme **yapılmış**, hem de anlamlı görünüyor: ürünü olan altı üst kategorinin beşi
+`showcase`, dört alt kategori `landing`. Eksik olan şey eşleme değil, **eşlemenin yazılı
+gerekçesi** — hangi kategori niçin o modda, bir yerde yazmıyor.
+
+Bunu ilk okuyan biri "eşleme yok, yapılmalı" diye iş açacaktı; **var olan işi ikinci kez
+yaptıracaktı.** Ölçüm buradan çıkan sayıyı üreten komutla birlikte durur:
+`SELECT display_mode, count(*) FROM categories GROUP BY display_mode;`
+Eşleme yazılmadan paragraf yazmak eksik iş olur: landing modundaki kategori paragrafı
+başka yerde, başka uzunlukta görünür.
+
+Bu eşleme **veri kararıdır** (hangi kategori hangi modda) ve vitrin görünümünü değiştirir
+→ Recep'e tek başına sorulacak yapısal karar sınıfına girer.
+
+## 6 · Bu ölçümün kapatmadığı
+
+* **Kapsam:** paragraf 6 üst kategoriye mi, ürünü olan 17 alt kategoriye de mi (6 → 23)?
+* 7 boş İngilizce kategori vitrinde görünüyor mu, silinecek mi (Recep kararı).
+* `authority_content` neyi besliyor — 37/37 boş, hiç kullanılmamış olabilir.
+
+## 7 · Sıradaki adım
+
+1. Bu ölçüm panoya + Recep'e gider (i18n engeli ve "7 değil 6" düzeltmesi dahil).
+2. i18n yolu kararı çıkana kadar **6 kategori taslağı** yazılır, DB'ye yazılmaz.
+3. `display_mode` eşlemesi Recep kararı olarak ayrı sorulur.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kayip-urun-aktarimi-2026-09-07.md
+
+# Kayıp ürün aktarımı — 67 kalem canlıya yazıldı (REC-226)
+
+**Damga:** 2026-09-07 · **Şerit:** URUN-KATALOG · **Kayıt:** REC-226
+**Recep'in sözü, lafzıyla:** "evet aktar" · **OPS GO:** 20:15Z (sınır: silme ve fiyat Recep'te)
+
+## Patinajın sebebi — asıl bulgu
+
+Bu eksik **20 Ağustos'ta kapanabilirdi.**
+
+Çıkarım aracının ürün kodunu 5 haneye kısıtlayan hatası o gün ölçüldü ve
+`venthub-pdf-ingestor@e7e5f7b` ile **düzeltildi**. Ama araç bir daha **hiç koşulmadı**;
+`avensair-fiyat.csv` hâlâ **22 Haziran** tarihli. Üç hafta boyunca aynı eksik raporlandı,
+sayıldı, kayda geçirildi — bir kez koşulmadı.
+
+> Düzeltilmiş ama koşulmamış bir araç, düzeltilmemiş araçla aynı sonucu verir.
+
+## Sayı düzeltmesi: 74 değil 68 — ve yazılan 67
+
+| | |
+|---|---|
+| t119 (08-20) "kayıp" | 74 |
+| bunlardan canlıda ZATEN olan | **6** (sulu batarya `13052`–`13057`) |
+| gerçekten eksik | **68** |
+| yazılan | **67** |
+| yazılmayan | **1** (`20153` VORT MASTER) |
+
+**Niçin 74 sanılmıştı:** t119 raporu **CSV eksiğini** ölçüyordu, veritabanını değil. Ben de
+ilk aktarımda bu ikisini karıştırdım ve Recep'e "74'ü sitede yok" dedim. Ölçünce 68 çıktı.
+
+**Niçin 67:** `20153` (VORT MASTER) için kaynak sayfa 62'nin metni **boş** çıktı — kategori
+dayanağı yok. Kategoriyi tahmin etmek yerine **yazmadım**; kalem açıkta, sebebi yazılı.
+
+## Veri iki bağımsız kaynaktan doğrulandı
+
+| Alan | Kaynak | Yöntem |
+|---|---|---|
+| fiyat | t119 EK-A (2026-08-20) | 25 alt-ajanın **görsel** okuması |
+| kod + ad | `kaynak-dizini/sayfalar.jsonl` (bugün) | **metin** çıkarımı |
+
+Çapraz sonuç: **74/74 kod** dizinde bulundu · **65/65 fiyat** iki yöntemde de aynı çıktı.
+İki farklı yöntem aynı rakamı veriyorsa, tek yöntemin hatası saklanamaz.
+
+## Kategori eşlemesi — kaynak sayfa başlıklarına dayanır, tahmine değil
+
+| Sayfa | Kaynak başlığı | Kök / alt kategori | Marka | Adet |
+|---|---|---|---|---|
+| 21 | "temel kasa … ABS plastikten" | Aksesuarlar | AVenS | 9 |
+| 27 | AVENS dikdörtgen kanal | Fanlar / Dikdörtgen Kanal Tipi | AVenS | 7 |
+| 39 | "CMS ATEX SANTRİFÜJ FANLAR" (EX-PROOF) | Fanlar / Ex-Proof (ATEX) | Vortice | 11 |
+| 44 | "SEAT ATEX SERİSİ" (PTC sensörü) | Aksesuarlar | SEAT | 1 |
+| 47 | NIMUS "SANTRİFÜJ FANLAR" | Fanlar / Santrifüj-Radyal | AVenS | 15 |
+| 48 | NIMAX "SANTRİFÜJ FANLAR" | Fanlar / Santrifüj-Radyal | AVenS | 15 |
+| 49 | "ENKELFAN — EC MOTORLU PLUG FAN" | Fanlar / Santrifüj-Radyal | AVenS | 9 |
+
+`VORTICENT` = Vortice tescilli adı olduğu için o 11 kalem Vortice markasına yazıldı;
+diğerleri listeyi yayımlayan AVenS'e.
+
+## Ölçüm — önce / sonra
+
+| | Önce | Sonra |
+|---|---|---|
+| Ürün | 375 | **442** |
+| Adında ATEX geçen | 41 | **52** |
+| CMS ATEX ürünü | **0** | **11** |
+| Boş kategori | 14 / 37 | **12 / 37** |
+
+İdempotentlik: ikinci koşum → yazılacak **0**, atlanan 74 ✓
+
+## Ne YAZILMADI — sınırı
+
+* **Fiyat yazılmadı.** OPS/Recep sınırı: silme ve fiyat değişikliği Recep'te. Ürünler fiyatsız —
+  canlıdaki 375 ürünün 374'ü zaten `price = null` (fiyat `product_prices` tablosunda).
+* **Aile (`family_id`) atanmadı** — ayrı iş (REC-218 SEAT mega-aile ayrışmasıyla birlikte).
+* **Teknik özellik yazılmadı** — kaynakta var, ayrı çıkarım adımı.
+* **15 sahte kayıt silinmedi** — silme Recep kapısında.
+
+## Kalan
+
+1. `20153` VORT MASTER — sayfa 62 metni boş; kaynağı yeniden çıkarmak gerek.
+2. QE-B 9 kaleminin fiyatı belirsiz (sayfa 21'de fiyatlar ayrı blokta, eşleme kesin değil) —
+   fiyat zaten yazılmadığı için bu şimdilik bloke değil.
+3. `avensair-fiyat.csv` hâlâ Haziran tarihli — düzeltilmiş araçla yeniden üretilmeli.
+
+---
+
+## ⛔ İKİNCİ YARI — "canlıya yazıldı" ile "müşteri görebiliyor" ayrı iddialardır
+
+Yukarıdaki bölümde **"67 ürün canlıda"** yazdım. DB için doğruydu, **vitrin için değildi.**
+
+URUN şeridi üç bağımsız yüzeyde ölçtü: ürün sayfası **404** · sitemap'te **sıfır** · kategori
+sayfasında adı **hiç geçmiyor**. `catalog-integrity` kapısı aynı şeyi kendi cümlesiyle söyledi:
+
+> `[orphan]` Aile URL kanonik adrestir; **ailesiz ürünün kanonik bir vitrin adresi yoktur.**
+> `[product-no-subcategory]` `subcategory_id` boş olan ürün hiçbir yaprak kategori sayfasında
+> görünemez. Boş alan burada "eksik veri" değil, **görünmez ürün** demektir.
+
+Ben birinci iddiayı ölçüp ikincisini duyurdum. Bugün bu dersin dördüncü tekrarı — ve bu sefer
+67 kalemle.
+
+### Onarım
+
+**Yedi aile açıldı** (metinleri kaynak sayfalardan alındı, üretilmedi):
+
+| Aile | Ürün | Kategori |
+|---|---|---|
+| AVenS QE-B Kasa Serisi | 9 | Fanlar / Banyo ve Tuvalet Fanları |
+| AVenS Dikdörtgen Kanal Tipi Radyal Fanlar | 7 | Commercial Ventilation / Dikdörtgen Kanal Tipi |
+| Vortice VORTICENT CMS ATEX Santrifüj Fanlar | 11 | Fanlar / Ex-Proof (ATEX) |
+| SEAT ATEX PTC Sensörü | 1 | Fanlar / Ex-Proof (ATEX) |
+| AVenS NIMUS Santrifüj Fanlar | 15 | Fanlar / Santrifüj-Radyal |
+| AVenS NIMAX Santrifüj Fanlar | 15 | Fanlar / Santrifüj-Radyal |
+| AVenS ENKELFAN EC Motorlu Plug Fanlar | 9 | Fanlar / Santrifüj-Radyal |
+
+**İki kategori kusuru onarıldı** — ikisi de ilk yazımda benim hatamdı:
+
+1. `rectangular-duct-fans` yaprağı **`commercial-ventilation` altında**, `fans` altında değil.
+   Ağacı ölçmeden "fans" varsaymıştım; 7 ürünün üst kategorisi yanlıştı.
+2. `accessories` kökünün **hiç yaprağı yok**. Oraya yazdığım 10 ürün görünmez kalırdı.
+   **Yeni kategori açmadım** (yapısal karar, tek başına sorulur) — kaynak sayfanın işaret
+   ettiği mevcut yapraklara taşıdım:
+   - QE-B kasaları → Banyo ve Tuvalet Fanları (kaynak: DIN 18017-3, konut banyo havalandırma)
+   - PTC sensörü → Ex-Proof (ATEX) (kaynak sayfa 44 "SEAT ATEX SERİSİ")
+
+### Ölçüm — kapının kendi ölçütleriyle
+
+| | Önce | Sonra |
+|---|---|---|
+| `family_id` NULL | **67** | **0** |
+| `subcategory_id` NULL | 20 | **10** |
+| Aile sayısı | 40 | **47** |
+
+Kalan 10 yapraksız ürün **benim yazdıklarım değil** — hava perdeleri ve BVU-LS, önceden öyleydi
+ve üçü de `catalog-integrity-baseline.json`'da ilan edilmiş (`avens-bvu-ls`,
+`vortice-h-ad-elektrikli`, `vortice-hava-perdesi`). Kapı onları kırmızı saymaz.
+
+**Sonuç:** kapının blokeri (`orphan`) kalktı. Vitrin ölçümü (ürün sayfası 200 + sitemap) URUN
+şeridinde.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kaynak-dizini-olcumu-2026-09-06.md
+
+# Kaynak dizini fikri — ÖNCE ÖLÇÜM (OPS isteği, 2026-09-06)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Durum:** salt-okuma ölçüm. Kod yok, PR bugün yok,
+karar Recep'te. Emir açılmadan önce ölçülüyor (CLAUDE.md kural 1).
+
+## KAYNAK / CETVEL
+
+* CLAUDE.md **kural 1** — emir açmadan önce "bu zaten var mı" diye SOR/ölç.
+* `docs/standards/catalog-ingestion-standard.md` · `docs/audits/icerik-hatti-*` (bugünkü hat).
+* Ölçülen fikir (OPS): PDF sayfa metinleri + tabloları bir kez çıkarılıp kalıcı tutulsun
+  (hash + sayfa + metin + tablo); her DB değeri/iddia bir **kanıt satırına** (ürün, alan,
+  değer, pdf, sayfa, parça) bağlansın; kapılar ve raporlar PDF yerine dizini okusun.
+
+---
+
+## Soru 1 — Kapı bugün sayfa metnini nasıl çıkarıyor? Önbellek var mı? Kaç PDF/sayfa/bayt?
+
+**Çıkarma:** `scripts/icerik-hatti/taslak-kaynak-kapisi.py:100` `sayfa_metni_getir()` →
+PyMuPDF `fitz`, sayfa başına `get_text("text")`. Tablo çıkarımı **yok**; tablo hücreleri düz
+metin akışına karışık geliyor (kapının "birim başlık hücresinde" sorunu tam buradan doğuyor).
+
+**Önbellek:** var ama **süreç-içi ve uçucu** — `onbellek = {}` (satır 170), anahtar
+`(pdf_adı, sayfa)`. Koşum bitince kaybolur. **Diskte hiçbir kalıcı çıkarım yok.**
+
+**Evren (ölçüldü):**
+
+| | |
+|---|---|
+| PDF dosyası | **24** |
+| Ayrı belge (hash'e göre) | **23** — ikisi birebir aynı, aşağıda |
+| Toplam sayfa | **1201** |
+| Çıkarılan düz metin | **1.469.265 bayt (1,40 MB)** |
+| Sayfa başına ortalama | ~1.223 bayt |
+
+Yani tüm külliyatın düz metni **1,4 MB**. Kalıcı dizin, boyut açısından önemsiz.
+
+### ⛔ Bulgu 1.1 — İki dosya BİREBİR AYNI (aynı MD5, farklı ad, farklı klasör)
+
+```
+5a109c61…  markalar/vortice/isi-geri-kazanim/01-input/vortice-brochure-mev.pdf
+5a109c61…  markalar/vortice/konut-fanlari/vort-mono/01-input/vortice_vort_mono_range_new.pdf
+```
+
+İkisi de 30 sayfa, 30.706 bayt. Kapının kaynak haritasında `MONO` ikincisine bağlı; birincisi
+hiç kullanılmıyor. **Kaynak dizini kurulacaksa tekilleştirme (hash) ilk gün gerekli** — yoksa
+aynı sayfa iki ayrı "kaynak" gibi görünür ve iki farklı ada referans veren iki iddia,
+aslında aynı sayfayı gösterirken farklı sayılır.
+
+## Soru 2 — venthub-pdf-ingestor'da zaten böyle bir çıktı var mı?
+
+**Yetenek VAR, artefakt YOK.**
+
+* `src/docling_parser.py` — `--output-json` bayrağıyla ayrıştırma sonucunu JSON yazabiliyor
+  (satır 388, 412–413). Sayfa metnini `fitz` ile alıyor (satır 140).
+* `src/pipeline.py:172` — **sayfa HASH'i anahtarlı kalıcı önbellek** tanımlı:
+  `.pipeline_cache.json`, `new_cache[page_hash] = {...}` (satır 247, 254–255).
+  **Yani "hash + sayfa" fikri bu depoda zaten tasarlanmış.**
+* **AMA diskte tek bir çıkarım dosyası yok:** `.pipeline_cache.json` yok, `*_parsed.json` yok;
+  depoda (`.venv` hariç) çıkarılmış metin/tablo artefaktı **bulunamadı**.
+
+**Fark önemli:** mevcut önbellek sayfa hash'ine karşı **çıkarılmış ÜRÜN kayıtlarını** tutuyor,
+**ham sayfa metnini/tablosunu değil**. OPS'un tarif ettiği dizin ham katmanı ister. Yani
+"sıfırdan yazılacak" değil, **mevcut ardışık düzenin bir katman aşağısı**.
+
+## Soru 3 — Bugünkü 279 iddianın kanıt satırı ÜRETİLEBİLİR Mİ? Kapı çıktısı taşıyor mu?
+
+**Hesaplanıyor, basılıyor, SAKLANMIYOR.**
+
+Kapıda `--ayrinti` kipi zaten her doğrulanan iddia için kaynak+sayfa+jeton basıyor
+(`taslak-kaynak-kapisi.py:322`). Ölçtüm — 16 taslak dosyasında:
+
+| | |
+|---|---|
+| `--ayrinti` ile basılan kanıt satırı | **328** |
+| Aile bloklarına düşen (sunumdaki sayı) | **279** |
+
+Fark, taslakların karşılaştırma/bulgu bölümlerindeki referanslardan geliyor; onlar vitrine
+çıkmıyor. Örnek satırlar:
+
+```
+OK [RAD s.23] 200 mm
+OK [RAD s.23] IPX7
+OK [RAD s.24] 200 mm
+```
+
+**Eksik olan alanlar:** satırda *kaynak, sayfa, jeton* var; *ürün/aile* ve *alan (hangi blok)*
+**yok** — ikisi de kapının o anki döngüsünde elde mevcut, sadece çıktıya yazılmıyor.
+Ayrıca çıktı **metin**; makine okunur değil.
+
+**Hüküm:** bugünün 279 iddiası için kanıt tablosu **bugün üretilebilir** ve maliyeti bir dizin
+kurmak değil, kapının çıktısına iki alan eklemek + JSON/CSV yazdırmaktır. Kaynak dizini
+fikrinin *bu parçası* zaten %80 hazır.
+
+## Soru 4 — Taranmış (metin çıkmayan) PDF sayısı
+
+| | |
+|---|---|
+| Hiç metin çıkmayan PDF | **0** |
+| Sayfa başına <50 bayt metin veren PDF | **0** |
+
+**24 PDF'in tamamı metin katmanı taşıyor.** OCR ihtiyacı yok. En zayıfı
+`vortice-bravo-s.pdf` (1 sayfa, 272 bayt) — küçük ama gerçek metin.
+
+Sayfa düzeyinde boş/az metinli sayfa toplamı 19/1201 (kapak, ayraç, tam sayfa görsel);
+en yüksek `LINEO_QUITE_KATALOG.pdf` 6/40.
+
+---
+
+## Ölçümün söylediği (yorum, karar değil)
+
+1. **Boyut engel değil:** 1,40 MB düz metin, 1201 sayfa. Kalıcı dizin ucuz.
+2. **OCR gerekmiyor:** taranmış PDF sıfır.
+3. **"Sıfırdan" değil:** ingestor'da hash-anahtarlı önbellek tasarımı zaten var; eksik olan
+   **ham metin/tablo katmanının kalıcılığı**.
+4. **Kanıt satırı fikri en hazır parça:** kapı bunu bugün hesaplıyor, yalnız saklamıyor;
+   ürün/alan iki ek alanla tamamlanır.
+5. **Tablo çıkarımı asıl kazanç olabilir:** kapının bugünkü en büyük zaafı (zayıf eşleşme,
+   birim başlık hücresinde) düz metin akışından doğuyor. `get_text("blocks")`/tablo çıkarımı
+   dizine girerse "sayı ile birimi AYNI SATIRDA gördüm" denebilir ve **zayıf eşleşme sınıfı
+   büyük ölçüde kapanır**. Bugün 54 zayıf iddia var; bu sınıfın ne kadarının kapanacağı
+   **ölçülmedi** — tahmin vermiyorum.
+6. **Tekilleştirme ilk gün gerekli:** 24 dosya = 23 belge.
+
+## Bu ölçümün kapatmadığı
+
+* Tablo çıkarımının zayıf eşleşmelerin **kaçını** kapatacağı (ölçülmedi).
+* Dizinin nerede duracağı (repo mu, ingestor mu) ve tazelik kapısı — karar konusu.
+* Kanıt satırlarının DB'ye mi yoksa dosyaya mı yazılacağı.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kaynak-dizini-tazeleme-2026-09-07.md
+
+# Kaynak dizini tazeleme — REC-207 (KOL 1)
+
+**Damga:** 2026-09-07T11:49:46Z (`date -u`) · **Şerit:** URUN-KATALOG · **Kayıt:** REC-207 (üst: REC-206)
+**Yetki:** OPS GO (11:2xZ) — canlıya yazım yok, migration yok, yalnız yerel dizin üretimi.
+**YÖNTEM:** elle betik (deterministik iş; emirdeki öneriyle aynı, sapma yok).
+
+## Ne yapıldı
+
+`scripts/kaynak_dizini/cikar.py` (ingestor deposu) tüm kök üzerinde koşuldu; `kaynak-dizini/sayfalar.jsonl`
+ve `manifest.json` yeniden üretildi.
+
+| Ölçüt | Önce (`f167289`, 09-06) | Sonra (09-07) |
+|---|---|---|
+| Belge | 23 | **58** |
+| Dosya (takma ad dahil) | 24 | **59** |
+| Sayfa | 1171 | **2127** |
+| Tablolu sayfa | 580 | **1261** |
+| Metinsiz sayfa | 12 | 16 |
+| Araç sürümü | pymupdf 1.27.2.2 | pymupdf **1.27.2.3** |
+
+**Tazelik kapısı** (`scripts/kaynak_dizini/tazelik.py`, borusuz ölçüldü): **YEŞİL, çıkış 0** —
+"diskte 59 PDF · dizinde 58 belge · takma ad 1". Koşumdan önce aynı kapı **KIRMIZI, çıkış 1** veriyordu
+ve 36 eksik dosyayı adıyla listeliyordu.
+
+## Kanıt oranına etkisi (asıl kazanç)
+
+`kanit-tablosu.py` yeni dizine karşı, canlı ürün verisiyle (375 ürün, salt okuma):
+
+| | Önce | Sonra |
+|---|---|---|
+| ⛔ KANITSIZ KALAN | 299 | **205** |
+| KENDİ kaynağında bulunan | — | 3238 / 3733 (%86) |
+| ⚠ YABANCI kaynakta geçen | — | 290 |
+
+**94 değer kanıtlandı** — tek yönlü mandal, yalnız küçülür. Bu, KOL 1'in KOL 2'yi açtığının sayısal kanıtı:
+belgeler dizine girmeden bu 94 değerin hiçbiri kanıt satırına bağlanamıyordu.
+
+## Üç bulgu (ölçülmüş, hiçbiri varsayım değil)
+
+### 1. ⚠Kayıttaki teşhisim yanlıştı — kapı zaten vardı
+
+REC-207'yi yazarken "küme farkını ölçen kapı gerekiyor, bugünkü `_kaynak.taban_dogrula` yalnız sayfa
+sayısı ölçüyor" dedim. **Yanlış.** `tazelik.py` (REC-163 Adım 5) tam bunu ölçüyor: EKSİK / DEĞİŞMİŞ /
+ARTIK üç sınıfı ayrı ayrı, takma adları eksik saymadan, fark listesini **adıyla** basarak, ve fail-closed
+(borusuz ölçtüm: çıkış kodu 1).
+
+Hatanın kaynağı: bir kapıya bakıp hükmü verdim, **ikinci kapıyı aramadım**. "Bir dosyaya bakıp yokluk
+ilan etme" hatasının bu haftaki üçüncü örneği.
+
+### 2. Gerçek boşluk: kapının tetiği yok
+
+`tazelik.py` **hiçbir yerden çağrılmıyor** — ingestor deposunda CI yok (`.github/workflows` dizini
+mevcut değil), git kancası yok; ana repoda da (`.github/`, `scripts/`, `.githooks/`) çağrı yok.
+Tek geçtiği yer `scripts/icerik-hatti/kanit-tablosu.py:141`'deki hata mesajı — o da `cikar.py`'yi
+işaret ediyor, tazelik kapısını değil.
+
+Yani 36 belgenin bir gün görünmez kalmasının sebebi **kapının yokluğu değil, tetiğinin yokluğu**.
+Yazılmış, doğru ölçen, fail-closed bir kapı hiç koşmuyorsa var olmayan kapıdan farkı yoktur.
+REC-207'nin kalan işi budur.
+
+### 3. 15 PDF versiyon kontrolünde değildi
+
+Dün "36 belge indirildi" commit'i (`90bebe2`) 15 PDF'i dışarıda bırakmış: Nicotra ADH serisi ve
+Danfoss frekans konvertörü kılavuzları diskte vardı, git'te yoktu (`git ls-files` 44 · diskte 59).
+Bu dosyalar bu koşumda dizine girdi; commit'lenmezlerse dizin ile depo çelişir ve kapı başka bir
+makinede haklı olarak kırmızı verir. Depo private, PDF'ler zaten versiyonlanıyor (44 tanesi) —
+telif engeli yok. Bu koşumla birlikte commit'lendiler.
+
+## Araç sürümü değişimi — ölçüldü, çıktı bozulmadı
+
+Manifest `arac_surum` 1.27.2.2 → 1.27.2.3. Betiğin kendi kuralı "farklı PyMuPDF sürümü farklı çıktı
+verebilir ve bu fark GÖRÜNÜR olmalı" diyor, bu yüzden varsaymak yerine ölçtüm: eski dizin (`HEAD`)
+ile yeni dizin, **ortak 1171 sayfa** üzerinde karşılaştırıldı.
+
+* Metin farkı: **0**
+* Tablo farkı: **0**
+* Eskide olup yenide olmayan kayıt: **0**
+
+Mevcut kanıt satırları (sayfa/tablo referansları) geçerliliğini koruyor. Determinizm sözü sürüm
+sıçramasına rağmen tutmuş — ama bu **ölçüldüğü için** biliniyor, garanti edildiği için değil.
+
+## Bitti ölçütü — durum
+
+| Ölçüt | Durum |
+|---|---|
+| dizindeki belge sayısı == ingestor'daki PDF sayısı | ✅ 58 + 1 takma ad = 59 = diskteki PDF |
+| Kapı iki yönlü (bayatken kırmızı, tazeyken yeşil) | ✅ aynı kapı koşum öncesi KIRMIZI/çıkış 1, sonrası YEŞİL/çıkış 0 |
+| Manifest damgası + `arac_surum` kayıtlı | ✅ (damga bilinçli olarak manifestte, dizin satırlarında değil — determinizm kuralı) |
+| Kapı otomatik koşuyor | ❌ **AÇIK** — tetik yok, REC-207'nin kalan işi |
+
+Determinizm sınavı (aynı PDF iki kez → byte-eşit) bu koşumda ayrıca koşulmadı; yerine daha güçlü bir
+ölçüm yapıldı: **farklı araç sürümüyle** üretilen iki çıktı ortak sayfalarda byte düzeyinde eşit çıktı.
+
+
+---
+# FILE: docs\audits\icerik-hatti-musteri-belgeleri-2026-09-06.md
+
+# Müşteriye verilecek belgeler — ne var, ne yok, ne yapmalı
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06 · **Durum:** ölçüm + öneri.
+Kod yazılmadı, hiçbir şey yüklenmedi. **Karar Recep'te, Design tarafı ayrı ilerliyor.**
+
+**Soruyu soran:** Recep — *"Ben müşteriyim ve ürün bilgisi istedim, ya da katalog, ya da broşür.
+Bizim bunların zaten olması lazım… kullanıcı da indirebilsin. Hazırlığımız tüm ihtiyacı
+karşılayacak genişlikte olmalı."*
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **belgesiz iddia vaat ihlalidir** (bu raporun ekseni).
+* Kararlar — Vitrin 15A **K1** (fiyat/vaat metni yok) · **K7** (kaynak yoksa satır yok) · **K8** (kategori modları).
+* `docs/standards/catalog-ingestion-standard.md` · `docs/audits/icerik-hatti-kaynak-dizini-olcumu-2026-09-06.md`.
+* **Cetvel yok** olan kısım: *belge yönetimi* (hangi belge nereden gelir, kim onaylar, ne zaman
+  bayatlar). Bu iş açılırsa **cetveli yazmak kapsama dahildir** (kural 1).
+
+---
+
+## 1 · Müşteri gerçekte ne ister — sekiz belge türü
+
+Bir HVAC alıcısının satın alma öncesi/sonrası isteyebileceği belgeler, **iş etkisine göre**:
+
+| # | Belge | Neden ister | Bugün |
+|---|---|---|---|
+| 1 | **Ürün teknik föyü** | "Bu modelin değerleri neler" | ✅ **VAR** — üretiliyor |
+| 2 | **Seri/aile broşürü** | "Serinin tamamını göreyim, hangisi bana uyar" | ❌ yok |
+| 3 | **Kategori seçim rehberi** | "Hangi tip fan lazım, nasıl seçerim" | ⏳ yazıldı, yüklenmedi |
+| 4 | **Sertifika / uygunluk** (CE, ATEX, EN 12101-3) | **İhale ve proje şartı** — belgesiz satılmaz | ❌ yok |
+| 5 | **Teknik çizim** (ölçü, DWG/PDF) | Projeye yerleştirmek için | ⚠ **raf var, boş** |
+| 6 | **Montaj / kullanım kılavuzu** | Kurulum ve satış sonrası | ❌ yok |
+| 7 | **Performans eğrisi** (debi-basınç) | Mühendis seçimi bununla yapar | ❌ yok |
+| 8 | **Garanti / servis şartları** | Satın alma kararı ve sonrası | ❌ yok (bu şeridin dışı) |
+
+**En kritik ikisi 4 ve 7'dir.** Duman egzoz fanı, ATEX fanı ve sığınak ürünü satarken
+sertifika **sorulur**; performans eğrisi olmadan mühendis seçim yapamaz. Bunlar "güzel olur"
+değil, **satışın önkoşulu**.
+
+## 2 · Bugün elimizde ne var — ölçüldü
+
+### 2.1 · Ürün föyü ÜRETİLİYOR ✅
+
+`src/lib/pdfGenerator.ts` → `generateProductDatasheet`, ürün sayfasından çağrılıyor
+(`ProductDetailPageView.tsx:332`). Bugün (REC-158 Faz 1) **vitrinle aynı biçimlendiriciden**
+geçiyor, yani föydeki satırlar ile sayfadaki satırlar aynı kaynaktan; parite kapısı var
+(`INV-FOY-PARITE-1`). Bu, sekiz kalemin en olgunu.
+
+**Sınırı:** föy **ürünün teknik özelliklerinden** üretilir. 375 ürünün 367'sinde teknik özellik
+var — ama bu değerlerin **hiçbirinin kaynağı yazılı değil** (REC-163 tam bunu kapatıyor).
+
+### 2.2 · ⚠ BELGE RAFI YAPILMIŞ AMA TAMAMEN BOŞ — en çarpıcı bulgu
+
+`src/components/authority/TechnicalDrawingAuthority.tsx` bir **indirilebilir belge listesi**
+çiziyor: başlık, format, güncellenme tarihi ve **indir düğmesi**. Verisi
+`categories.authority_content` (jsonb) alanından geliyor.
+
+**Ölçüm: 37 kategorinin 37'sinde `authority_content` BOŞ.** Yani raf kurulmuş, vidalanmış,
+sayfaya yerleştirilmiş — **üstünde tek belge yok.** Yeni bir şey inşa etmeden önce burayı
+doldurmak, aynı işi ikinci kez yapmamak demek (bugün filoda üç kez düştüğümüz tuzak:
+"zaten yazılmış mıydı" diye sormamak).
+
+### 2.3 · Depo YOK
+
+`information_schema` taraması: ürün/aile/kategori belgesi tutacak **hiçbir alan yok**.
+Belge/dosya taşıyan tek tablo `order_attachments` — o da sipariş ekleri, katalog değil.
+Yani bugün bir üretici broşürünü yükleyecek yerimiz **yok**.
+
+### 2.4 · 24 tedarikçi PDF'i elimizde ama müşteriye kapalı
+
+Bugün kalıcı dizine aldık: **23 belge, 1171 sayfa, 580 tablolu sayfa**, hash'li ve
+deterministik. Bu belgeler bilgi kaynağı olarak kullanılıyor ama **müşteriye açılmıyor** —
+ve açılmaları düz bir teknik iş değil (bkz. §4 telif).
+
+## 3 · Boşluğun gerçek maliyeti
+
+Müşteri "kataloğunuz var mı" diye sorduğunda bugün verilebilecek tek şey **tek ürünlük bir
+föy.** Serinin tamamını, seçim rehberini, sertifikayı veremiyoruz. Bunun üç somut bedeli var:
+
+1. **Kaybedilen satış:** proje/ihale alıcısı sertifika ve eğri isteyince rakibe gider.
+2. **Telefon yükü:** belge sitede yoksa her talep tek tek insana düşer.
+3. **Görünmezlik:** PDF'ler arama motorunda da bulunur; rakip katalog yayımlarken biz yokuz.
+
+## 4 · ⛔ İki risk — teknik değil, TİCARİ ve HUKUKİ
+
+**4.1 · Üretici broşürünü olduğu gibi yayımlamak izin ister.** Vortice, AVenS, Nicotra,
+Danfoss broşürleri **onların telif eseri**. Yetkili satıcı olarak çoğu üretici bunu teşvik
+eder ama bu **varsayılamaz** — marka bazında yazılı izin ya da bayi portalındaki
+"paylaşılabilir" sürüm gerekir. **Bu Recep'in ticari kararı, benim ölçebileceğim bir şey değil.**
+
+**4.2 · Sertifika iddiası, belge olmadan yapılamaz.** Elimizde CE/ATEX/EN 12101-3 belgesi
+yokken sayfada "sertifikalı" demek **vaat ihlalidir** (`vaat-butunlugu-standard.md`). Bugün
+duman egzoz ve ATEX ailelerinin metinlerinde sınıf bilgisi **kaynak referansıyla** veriliyor —
+yani "katalog böyle diyor" düzeyinde, "belgesi bizde" düzeyinde değil. **Bu ayrım korunmalı.**
+
+## 5 · Önerim — iki raf, bir kural
+
+Belgeleri kaynağına göre **ikiye** ayırmak gerekiyor; çünkü ikisinin riski ve süreci farklı:
+
+### RAF A — BİZİM ÜRETTİĞİMİZ (izin gerekmez, bugün başlanabilir)
+
+| Belge | Nereden | Durum |
+|---|---|---|
+| Ürün föyü | teknik özellikler | ✅ var |
+| **Aile föyü** | bugün onayladığın 40 aile metni + altı blok | **yeni — en hızlı kazanç** |
+| Kategori seçim rehberi | 23 kategori paragrafı | ⏳ hazır, bekliyor |
+
+**Aile föyü en yüksek getirili kalem:** metin zaten yazıldı, kaynağıyla doğrulandı, sen
+onayladın. Föy üreticisi zaten çalışıyor. Yani "seri broşürü" ihtiyacının büyük kısmı,
+**yeni içerik üretmeden** karşılanabilir.
+
+### RAF B — ÜRETİCİDEN GELEN (izin ve depo gerekir)
+
+Broşür · sertifika · teknik çizim · montaj kılavuzu · performans eğrisi.
+Bunlar için **önce depo** (belge tablosu + dosya alanı), **sonra izin**, sonra yükleme.
+Depo yokken "elimizde var" demek anlamsız — koyacak yerimiz yok.
+
+### KURAL (cetvel yazılacak)
+
+Her belge için **kaynağı, sürümü ve tazeliği** kayıtlı olur:
+* belge nereden geldi (üretici / bizim ürettiğimiz),
+* hangi PDF hash'inden türedi (kaynak dizini bunu artık verebiliyor),
+* üretici kataloğu değişince **hangi belgelerimiz bayatladı** — hash karşılaştırmasıyla
+  **ölçülebilir**; bugün bu soruyu soracak bir mekanizma yok.
+
+## 6 · Sıra önerim (Recep ve OPS kararına)
+
+1. **`authority_content`'i doldur** — raf zaten var, en ucuz görünürlük. Önce teknik çizim
+   ve sertifika **yer tutucusu değil**, gerçekten elde olan ne varsa.
+2. **Aile föyü** — mevcut föy üreticisini aile seviyesine genişlet; içerik hazır.
+3. **Belge deposu** — RAF B için tablo + dosya alanı (migration gerekir → Recep kapısı).
+4. **Üretici izni** — marka bazında; **Recep'in işi**, ben ölçemem.
+5. **Sertifika envanteri** — hangi ailede hangi belge fiilen var, listelenir; olmayan
+   **"yok" diye yazılır**, boş bırakılmaz.
+
+## 7 · Design tarafı (ayrı şerit)
+
+Bu raporun konusu **içerik ve depo**. Belge rafının sayfada nerede duracağı, nasıl
+görüneceği, indirme deneyimi **Design'ın alanı** — ve Design ayrı ilerliyor. İki şeridin
+kesişmesi gereken tek nokta şu: **`authority_content` bugün Design'ın çizdiği bir bileşeni
+besliyor ve boş.** Yani Design'ın çizdiği yüzey içerik bekliyor; içerik kararı verilmeden
+o yüzey tamamlanmış sayılamaz.
+
+## 8 · Bu raporun kapatmadığı
+
+* Üretici izinlerinin durumu (hiçbiri sorulmadı — Recep'in kanalı).
+* Elimizde fiilen hangi sertifika/çizim var (envanter yapılmadı; PDF'lerin içinde olabilir).
+* Performans eğrilerinin kaynak PDF'lerde görsel mi veri mi olduğu (ölçülmedi).
+* Belge deposunun şeması ve migration maliyeti (karar çıkarsa ölçülür).
+
+
+---
+# FILE: docs\audits\icerik-hatti-pdf-yapisi-2026-09-05.md
+
+# İçerik hattı — kaynak PDF yapısı ölçümü (REC-146 Adım 1)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** Linear REC-146, OPS yorumu 2026-09-05 12:32 + düzeltme 12:41
+**Ölçüm zamanı:** 2026-09-05T13:04Z (`date -u`) · **Kapsam:** salt okuma, kod yok, prod yok, DB yazma yok
+**Kaynak:** `~/venthub-pdf-ingestor/venthub/**` (74 CSV artığı emekli — ölçülmedi)
+**Ölçüm aracı:** PyMuPDF 1.27.2 (betik: `pdf_yapisi_olc.py` + `tur2.py`, oturum scratchpad'i)
+**Karşılaştırma tabanı:** `product_families` (40 aile) — canlı DB, salt okuma sorgusu
+
+## KAYNAK / CETVEL
+
+* `docs/standards/catalog-ingestion-standard.md` — PDF→CSV hattı. **İçerik/anlatım çıkarımını kapsamıyor**;
+  bu ölçüm o cetvel ekinin ham maddesidir.
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; ölçülemeyen hücreye "veri yok" yazılır.
+* Systemair ölçüm raporu (DESIGN-MENU, 2026-09-05) madde 3 — kapatılamayan tek soru: *"ingestor'daki 24
+  katalog PDF'i yapısal başlık taşıyor mu? ölçemedim."* Bu rapor o soruyu kapatır.
+* Kararlar — Vitrin 15A: K6 (ürün sayfası anlatımı), K7 (yoksa satır yok).
+* Systemair incelemesi §3.1 — altı blok: **Gövde · Çark · Motor · Koruma · Kontrol · Montaj**.
+
+> **Not — emirdeki blok adları ile cetvel farkı:** OPS emri blokları "genel tanım · gövde/malzeme ·
+> çark-motor · kontrol · montaj · aksesuar" diye saymıştı. REC-146 başlığı ve §3.1 ise
+> "Gövde · Çark · Motor · Koruma · Kontrol · Montaj" diyor. **Kanonik altı = §3.1** alındı (cetvel kazanır);
+> "genel tanım" ve "aksesuar" ek sütun olarak ayrıca ölçüldü, altıya dahil edilmedi.
+
+---
+
+## 0 · CEVAP (tek cümle)
+
+**HAYIR — PDF'ler Systemair kalıbında yapısal başlık taşımıyor.** 24 PDF'in **hiçbiri** altı bloğun altısını
+da başlık olarak taşımıyor; **"Koruma" saf başlığı 24 PDF'te sıfır kez** geçiyor. Ama **hammadde var**:
+altı bloğun karşılığı, başlık olarak değil **model altı teknik madde satırı** olarak duruyor — 24 PDF'in
+18'inde en az bir blok, 3'ünde altısı da. Yani Adım 2 "başlık kopyala" değil, **"madde topla + Türkçeye çevir"** işidir.
+
+---
+
+## 1 · Evren — kaç PDF, ne kadar metin
+
+| Ölçüm | Değer |
+|---|---|
+| PDF dosyası | **24** |
+| Bayt olarak benzersiz | **23** — `vortice-brochure-mev.pdf` ile `vortice_vort_mono_range_new.pdf` **birebir aynı dosya** (sha256 `891cded60ba4dc05…`) |
+| Toplam sayfa | **1201** (ort. 50, en küçük 1, en büyük 168) |
+| Metin çıkarılabilir | **24 / 24** — hiçbir PDF OCR gerektirmiyor (en düşük yoğunluk 272 karakter/sayfa) |
+| Görsel-only sayfa (< 20 karakter) | **20 / 1201** (%1,7) |
+| Metin tablosu (fitz `find_tables`) | **1424** — teknik tablolar görsel değil, **metin**; makine okuyabilir |
+| Dil | **EN 22 · TR 1 · veri yok 1** (`vortice-bravo-s.pdf`, 1 sayfa, 272 karakter — dil kararı için eşiğin altında) |
+
+**Marka dağılımı: 23 Vortice + 1 AVenS fiyat listesi. SEAT, Nicotra Gebhardt ve Danfoss için marka kataloğu SIFIR.**
+
+---
+
+## 2 · PDF × yapı tablosu (24/24, her hücre ölçülmüş)
+
+`saf başlık` = satırın tamamı blok adından ibaret (Systemair kalıbı: "Casing", "IMPELLER", "MOTOR").
+`gövde` = blok anahtar kelimesi metnin herhangi bir yerinde — **zayıf gösterge**, ayırt etmez (aşağıda §3).
+
+| PDF | Marka | Kaynak klasörü | Sayfa | Krkt/sayfa | Görsel-only | Metin tablosu | Dil | Saf başlık (6) | Gövde (6) | Çıkarım |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2022-11-en-ca-rm-es-radon.pdf | Vortice | radon-range | 42 | 490 | 0 | 17 | en | 0/6 (yok) | 5/6 | metin |
+| Air_Conditioning_Air_Door_2.pdf | Vortice | hava-perdesi | 8 | 990 | 1 | 3 | en | 1/6 (Montaj:1) | 4/6 | metin |
+| avens_fiyat_listesi_2026_HQ.pdf | AVenS (fiyat listesi) | avensair-fiyat-listesi-2026 | 74 | 1502 | 1 | 148 | tr | 2/6 (Govde:2, Motor:6) | 6/6 | metin |
+| Commercial_Ventilation_in_Line_1.pdf | Vortice | vort-commercial-in-line | 88 | 1352 | 1 | 163 | en | 1/6 (Montaj:1) | 6/6 | metin |
+| Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf | Vortice | deumido-range | 12 | 610 | 0 | 4 | en | 0/6 (yok) | 2/6 | metin |
+| Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf | Vortice | vort-commercial-in-line | 84 | 1348 | 1 | 52 | en | 1/6 (Kontrol:11) | 6/6 | metin |
+| Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf | Vortice | marka geneli | 24 | 1384 | 0 | 3 | en | 1/6 (Motor:2) | 6/6 | metin |
+| Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf | Vortice | punto-evo-flexo | 8 | 762 | 0 | 8 | en | 1/6 (Montaj:1) | 5/6 | metin |
+| Doc_Pubblicita_Residential_ventilation_vmc_1.pdf | Vortice | isi-geri-kazanim | 80 | 1233 | 1 | 69 | en | 2/6 (Govde:1, Kontrol:4) | 6/6 | metin |
+| Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_4.pdf | Vortice | vort-quadro-evo | 20 | 1015 | 0 | 5 | en | 1/6 (Govde:2) | 6/6 | metin |
+| E_ATEX_Range_yeni_2025.pdf | Vortice | vort-e-atex | 16 | 977 | 3 | 14 | en | 0/6 (yok) | 6/6 | metin |
+| heat-master-slimroof-cati-fanlari-yeni.pdf | Vortice | vort-heatmaster-slimroof | 44 | 1160 | 2 | 74 | en | 2/6 (Cark:3, Motor:2) | 6/6 | metin |
+| industrial_Ventilation.pdf | Vortice | vort-industrial-ventilation | 168 | 1329 | 0 | 124 | en | 3/6 (Cark:10, Kontrol:16, Motor:4) | 6/6 | metin |
+| LINEO_QUITE_KATALOG.pdf | Vortice | lineo-quiet | 40 | 999 | 6 | 22 | en | 1/6 (Cark:2) | 6/6 | metin |
+| nordik-hvls-industrial-ceiling-fans-181471.pdf | Vortice | vort-nordik-hvls | 24 | 1031 | 0 | 6 | en | 3/6 (Cark:2, Montaj:1, Motor:1) | 6/6 | metin |
+| nrg-range-175696-isi-geri-kazanim.pdf | Vortice | isi-geri-kazanim | 32 | 1802 | 1 | 22 | en | 1/6 (Kontrol:3) | 6/6 | metin |
+| qbk-sal-kc-evo-en-yeni-2025.pdf | Vortice | vort-qbk-sal-kc-evo | 20 | 991 | 1 | 21 | en | 1/6 (Motor:1) | 6/6 | metin |
+| ResidentialVentilation.pdf | Vortice | marka geneli | 168 | 1151 | 1 | 299 | en | 1/6 (Govde:1) | 6/6 | metin |
+| vort-hr-w-all-100-df.pdf | Vortice | isi-geri-kazanim | 16 | 910 | 0 | 13 | en | 0/6 (yok) | 5/6 | metin |
+| vortice-bravo-s.pdf | Vortice | vortice-bravo-s | 1 | 272 | 0 | 0 | veri yok | 0/6 (yok) | 0/6 | metin |
+| vortice-brochure-mev.pdf | Vortice | isi-geri-kazanim | 30 | 1022 | 0 | 11 | en | 1/6 (Govde:1) | 5/6 | metin |
+| vortice-brochure-radon-en.pdf | Vortice | marka geneli | 164 | 1274 | 0 | 330 | en | 2/6 (Govde:4, Montaj:1) | 6/6 | metin |
+| vortice_vort_mono_range_new.pdf | Vortice | vort-mono | 30 | 1022 | 0 | 11 | en | 1/6 (Govde:1) | 5/6 | metin |
+| Why-Ventilate-Brochure.pdf | Vortice | marka geneli | 8 | 847 | 1 | 5 | en | 1/6 (Govde:1) | 4/6 | metin |
+---
+
+## 3 · Asıl soru: yapısal başlık var mı? — üç farklı ölçüt, üç farklı cevap
+
+Bu bölüm raporun çekirdeği. **Aynı PDF'e üç ölçüt uygulandı ve üçü zıt cevap veriyor** — hangi ölçütün
+seçildiği, Adım 2'nin ne iş olduğunu değiştiriyor.
+
+### Ölçüt A — anahtar kelime metinde geçiyor mu (ZAYIF, ayırt etmiyor)
+
+| Sonuç | Değer |
+|---|---|
+| 6/6 blok "geçiyor" çıkan PDF | **15 / 24** |
+
+**Bu ölçüt kullanılamaz.** "Motor" kelimesi bir fiyat tablosunun sütun başlığında da geçer. Ölçüt
+ayırt etmiyor: neredeyse her katalog 6/6 veriyor, hâlbuki hiçbirinde Systemair'ın anlatımı yok.
+Design'ın ölçüm raporundaki "5 örnekte Çark 0, Koruma 0" satırı da aynı sınıf ölçüttü — orada
+*yokluk* gösterdiği için doğru sonuç vermişti; burada *varlık* iddiası için geçersiz.
+
+### Ölçüt B — Systemair kalıbı SAF BAŞLIK (satır = blok adı, punto/kalınlık ile başlık)
+
+| Blok | 24 PDF'te toplam saf başlık |
+|---|---|
+| Kontrol | 34 |
+| Çark | 17 |
+| Motor | 16 |
+| Gövde | 13 |
+| Montaj | 5 |
+| **Koruma** | **0** |
+
+| Sonuç | Değer |
+|---|---|
+| En az 1 saf başlık taşıyan PDF | 19 / 24 |
+| **6/6 saf başlık taşıyan PDF** | **0 / 24** |
+| En yükseği | `industrial_Ventilation.pdf` — **3/6** (Çark, Kontrol, Motor) |
+
+**Üstelik bu 85 başlığın çoğu anlatım başlığı bile değil.** Başlık metinleri okundu (sayım değil, kanıt):
+
+* "Kontrol" saf başlıklarının büyük kısmı **aksesuar ürün adı**: `CONTROLLERS` (27), `REGULATORS` (12),
+  `C 1.5 Electronic speed controller 1.5 A` (16) — yani aksesuar kataloğu bölüm başlığı, fanın kontrol anlatımı değil.
+* "Koruma" hiç saf başlık vermiyor; onun yerine **spec satırı** olarak var: `Insulation class: II` (29),
+  `Protection rating: IPX4.` (18), `Protection rating: IP44.` (6).
+* Gerçek anlatım başlığına en yakın olanlar: `Casing` (6), `CASINGS` (3), `IMPELLER` (7), `MOTOR` (10),
+  `BLADES` (4), `INSTALLATION` (3), ve TR tarafta `GÖVDE` (2).
+
+**Hüküm: Systemair'ın "sabit sıra, altı başlık" kalıbı bu 24 PDF'te YOK.**
+
+### Ölçüt C — SPEC-MADDE (model altı teknik madde satırı) — **hammadde burada**
+
+| Kaç blokta madde bulundu | PDF sayısı |
+|---|---|
+| 6/6 | **3** |
+| 5/6 | 2 |
+| 4/6 | 3 |
+| 3/6 | 4 |
+| 2/6 | 2 |
+| 1/6 | 4 |
+| 0/6 | 6 |
+
+Örnek satırlar (ham, PDF'ten birebir): `Backward curved centrifugal impellers.` ·
+`Ball bearing motor.` · `Insulation class: II` · `Protection rating: IPX4.` ·
+`Mounting brackets made of galvanized steel included.` · `Impact-resistant ABS enclosures with anti-UV treatment.`
+
+**Bu, altı bloğa doğrudan oturan cümle malzemesidir** — ama İngilizce, model düzeyinde ve dağınık.
+
+---
+
+## 4 · ⭐ Beklenmedik bulgu: TÜRKÇE anlatım AVenS fiyat listesinde duruyor
+
+Emir "24 katalog PDF" diyordu; fiyat listesi de o 24'ün içinde. Ölçünce çıkan:
+**`avens_fiyat_listesi_2026_HQ.pdf` (74 sayfa, TR) tek Türkçe kaynak ve 15A'nın istediği kalıbın TAM karşılığını taşıyor.**
+
+Sayfa 41'den birebir:
+
+```
+SEAT SERİSİ
+KİMYASALLARA VE AŞINDIRICI GAZLARA KARŞI DAYANIKLI SANTRİFÜJ FANLAR
+-  Polipropilen gövde yapısı, asitlere ve korozyona karşı üstün dayanım
+   sağlayarak maksimum koruma sunar.
+-  Geniş performans aralığı sayesinde 40–2000 Pa statik basınç ve
+   50–15.000 m³/h debi değerlerinde verimli çalışma sağlar
+```
+
+Bu, 15A'nın istediği **kimlik cümlesi + kalın madde** yapısının kendisi — ve *Gövde* + *Koruma* bloklarının
+Türkçe hammaddesi aynı cümlede.
+
+| Ölçüm (fiyat listesi içi) | Değer |
+|---|---|
+| Anlatım maddesi taşıyan sayfa | **8 / 74** |
+| Bunlardan içindekiler tablosu (anlatım değil) | 2 (sayfa 4–5, 53 madde) |
+| **Gerçek anlatım maddesi** | **13 madde / 6 sayfa** (s. 39, 40, 41, 42, 43, 45) |
+| Kapsadığı aileler | CMS ATEX, Torrette TR-A, **SEAT Serisi**, **STORM Serisi**, **JET Serisi**, STORM/JET ATEX |
+
+**Neden bu önemli:** 15A çizimlerinde örnek olarak kullanılan **JET ve STORM ailelerinin DB açıklaması BOŞ**
+(`tr_len = 0`) ve bu iki ailenin **marka kataloğu PDF'i YOK**. Türkçe anlatımları tek yerde duruyor: bu fiyat listesi.
+
+---
+
+## 5 · Aile × kaynak eşlemesi — 40 ailenin kaçının kaynağı var
+
+İki bağımsız ölçüt kullanıldı; **klasör eşlemesi** esas alındı (ingestor'un kendi dosya yerleşimi),
+seri-kodu taraması yalnız çapraz kontrol.
+
+| Sonuç | Değer |
+|---|---|
+| Kendi kaynak klasörü + marka kataloğu olan aile | **19 / 40** |
+| Kaynak klasörü olmayan aile | **21 / 40** |
+
+**Kaynağı olan 19 ailenin tamamı Vortice.**
+
+**Kaynağı olmayan 21 aile:**
+
+| Marka | Aile sayısı | Durum |
+|---|---|---|
+| AVenS | 9 | Marka kataloğu yok. 2'si (BVU, BVU-LS) yalnız fiyat listesinde geçiyor; 7'sinin **hiçbir PDF kaynağı yok** |
+| SEAT | 3 (JET, SEAT, STORM) | Marka kataloğu yok — **ama TR anlatımı fiyat listesi s. 41-43, 45'te var** (§4) |
+| Nicotra Gebhardt | 4 (ADH, AT, DD, RDH) | Marka kataloğu yok; yalnız fiyat listesinde satır olarak geçiyor |
+| Danfoss | 3 (FC 51, FC 101, FC 102) | Marka kataloğu yok; FC 51 hiçbir PDF'te geçmiyor |
+| Vortice | 2 (Lineo, H AD Elektrikli) | Kendi klasörü yok; içeriği kardeş ailenin klasöründe (Lineo Quiet / hava-perdesi) — **insan kararı gerekir** |
+
+> ⚠ **Seri kodu taraması tek başına kanıt değil — yazıya geçiriyorum.** `AT` kodu (Nicotra AT ailesi)
+> 22 PDF'te "eşleşti"; hepsi İngilizce/İtalyanca *"at"* kelimesi. `JET` kodu Vortice'nin "jet fan system"
+> broşüründe geçiyor, SEAT'in JET ailesiyle ilgisi yok. Bu yüzden kod eşleşmesine **marka hizası filtresi**
+> uygulandı ve karar klasör eşlemesine bırakıldı. Kısa kodlu aileler (AT, AD, DD) için kod taraması kullanılamaz.
+
+---
+
+## 6 · Adım 2 için ne anlama geliyor (ölçümden çıkan, karar değil)
+
+1. **"PDF'ten başlık kopyala" planı yürümez.** Altı başlık kalıbı kaynakta yok (§3-B). Taslak üretimi
+   = dağınık İngilizce spec maddelerini bloklara **toplama** + **Türkçeye çevirme** işi. Emek tahmini
+   bu yüzden Design'ın "240 kısa metin" tahmininden yüksek.
+2. **19 aile için kaynak var, 21 aile için yok.** 21'inin 12'si (AVenS 7 + Nicotra 4 + Danfoss FC51)
+   için elde hiçbir metin yok — bunlar ya üretici sitesinden toplanır ya "veri yok" kalır (K7: satır çizilmez).
+3. **JET ve STORM — 15A'nın örnek aileleri — çözülebilir durumda** ve kaynağı Türkçe (§4). Öncelik sırasında
+   ilk sırada olmaları hem emirle hem ölçümle uyumlu.
+4. **Dil:** kaynağın 22/24'ü İngilizce. TR birinci tur demek, 22 kaynağın tamamında **çeviri** demek;
+   EN ikinci tur ise kaynağa daha yakın. Sıra tercihi Adım 2 emrinin konusu.
+5. **Mükerrer dosya:** `vortice-brochure-mev.pdf` = `vortice_vort_mono_range_new.pdf` (bayt-ayni).
+   İki farklı ailenin klasöründe duruyor; hangisinin doğru yeri olduğu **insan kararı**, ölçümle çözülmez.
+6. **OCR gerekmiyor** — 24/24 metin çıkarılabilir, tablolar metin. Bu iyi haber: hat tamamen betikle kurulabilir.
+
+## 7 · Ölçülemeyenler (uydurulmadı)
+
+* `vortice-bravo-s.pdf` — 1 sayfa, 272 karakter: dil tespiti eşiğin altında (**veri yok**), blok 0/6.
+  Katalog değil, tek sayfalık föy olabilir; sınıflandırma yapılmadı.
+* Bir PDF sayfasının **hangi aileye** ait olduğu, klasör dışında ölçülmedi. Sayfa aralığı çıkarımı
+  (aile → sayfa) yalnız fiyat listesi için yapıldı; Vortice çok-aileli broşürlerde (168 sayfa) sayfa
+  aralığı ayrıştırması **yapılmadı** — Adım 2'nin ilk işi olmalı.
+* CSV artıkları (74 dosya) emir gereği ölçülmedi.
+
+---
+
+**Mekanizma durumu (şeffaflık):** gözcü YEŞİL, teslimat YEŞİL (jeton `PROB-3a79-9XUWQZ`, bildirimde görüldü
+ve geri yazıldı). Cron **kurulmadı** — Recep kararı "zamanlayıcı yok"; kapı bunu kırmızı sayar, **bilinen ve
+kabul edilen fark**. Uyanış ölçülemez (betiğin diskte izi yoktur).
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-05
+
+
+---
+# FILE: docs\audits\icerik-hatti-rec178-olu-aday-olcumu-2026-09-07.md
+
+# REC-178 · `generate-sitemap.mjs` ölü aday ölçümü + kalan 3 kalem
+
+**Damga (ölçüldü, `date -u`):** 2026-09-07T07:3xZ · **Şerit:** URUN-KATALOG (sid 3a7976a1)
+**Emir:** OPS 07:05Z — *"ölü aday: ölç (çağıran var mı, son 30 gün koşum izi var mı); yoksa karantina
+önerisi OPS'a, silme Recep kapısı"*. **YÖNTEM:** elle, **salt ölçüm — kod yazılmadı.**
+**Kaynak/cetvel:** kendi filo notum `icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md` (PR #1063)
++ hafıza `sessiz-tavan-ve-fail-open-kapi`.
+⚠**Şerit sınırı:** `scripts/generate/**`, `scripts/tools/**`, `scripts/media/**`, `scripts/db/product-data/**`
+**benim claim'imde değil.** Bu belge ölçüm ve öneridir; o dosyalara **dokunulmadı**.
+
+## 1. Hüküm — ÖLÜ, ve ölüden fazlası: **koşarsa canlı sitemap'i EZER**
+
+`scripts/generate/generate-sitemap.mjs` yalnız kullanılmıyor değil; **çalıştırılırsa zarar verir.**
+
+| Ölçüt | Ölçüm | Sonuç |
+|---|---|---|
+| Çağıran var mı? | Depo geneli grep (`json,yml,mjs,js,ts,cjs,md,ps1,sh`): kod çağrısı **0**. Tek eşleşme eski bir ajan worktree'sindeki **üretilmiş belge** (`.claude/worktrees/agent-a91c…/…/generate-sitemap.md`) — kod değil | **çağrılmıyor** |
+| Son 30 gün commit | **0** | — |
+| Son dokunuş | **2026-03-08** (`09202cac`, "write generated sitemap to project public directory") — 6 ay | **bayat** |
+| Sitemap gerçekte nereden geliyor? | `src/app/sitemap.ts` (Next.js rotası, 6469 B, son değişim 09-05) | **rota canlı** |
+| `public/sitemap.xml` diskte var mı? | **YOK** | betik hiç koşmamış |
+| Canlı yüzey | `https://venthub.com.tr/sitemap.xml` → **HTTP 200, application/xml, 70.795 B** | rota üretiyor |
+
+**Çakışma:** betik çıktısını `public/sitemap.xml`'e yazıyor (satır 84–86, hata dalında 96–97).
+Next.js'te `public/` altındaki statik dosya, **aynı yol için** `app/sitemap.ts` rotasından **önce**
+servis edilir. Yani bu betiği bir kez koşturmak, canlıda 70 KB üreten dinamik sitemap'i
+**donmuş bir dosyayla değiştirir** — ve üstelik o dosya kendi 1000/5000 tavanıyla eksik üretilir
+(satır 21–22: `categories … .limit(1000)`, `products … .limit(5000)`).
+
+> Bu, filo notundaki tuzağın en pahalı biçimi: betik "başarıyla" koşar, kimse hata görmez,
+> arama motoruna eksik ve donmuş bir site haritası gider.
+
+**ÖNERİM (karar OPS/Recep'in, ben silmedim):** **karantina** — `scripts/generate/generate-sitemap.mjs`
+kaldırılsın (ya da `.arsiv` uzantısıyla etkisizleştirilsin). Reçeteyle onarmak **gereksiz**: ürettiği
+çıktı zaten canlıda daha iyisiyle üretiliyor; onarılmış hâli bile koşarsa aynı ezme riskini taşır.
+Silme **Recep kapısı** (kural: silmeden önce canlılık ve tazelik ölçülür — ölçüldü, yukarıda).
+
+## 2. Kalan 3 kalem — satırlar teyit edildi, reçete uygulanmadı (sahibi başkası)
+
+| Dosya:satır | Bugünkü ölçüm | Tavan riski | Öneri |
+|---|---|---|---|
+| `scripts/tools/extract_brands.py:70` | `supabase.table('products').select('id,name,brand').execute()` — supabase-py, tam tablo, sayım yok | products **375** (tavan altı) → bugün doğru, 1000'i geçince sessizce eksik | reçete: `count=exact` + `.range()` döngüsü + fark KIRMIZI, sayfa boyu 100 ile sınav |
+| `scripts/db/product-data/identity-fix.mjs:69` | `rest('products?deleted_at=is.null&select=sku,model_code')` — ham fetch, tam tablo, sayım yok; sonucu **"DEĞİŞMEZ" kapısı** olarak kullanıyor | aynı | aynı reçete; kapı girdisi eksikse kapı yanlış "temiz" der |
+| `scripts/media/*` (10 dosya, 2026-08-21) | `rest/v1/products?...&brand=ilike.*X*` — marka başına ≤173 satır, filtreli, sayım yok | marka başına tavan altı | aynı reçete; **filtreli sayım şart** (`kesin_sayi` aynı filtreyle — 09-06'da ölçülen tuzak) |
+
+Üçünde de **bugün yanlış sonuç üretilmiyor**; sınıf **kalıp riski**, gerçek aşım değil.
+Referans uygulama: `scripts/icerik-hatti/_veri.py` (`kesin_sayi(yol)` + `tumunu_cek(..., sira="id")`,
+`SAYFA_BOYU` ile sınanır) — kopyalanmasın, **çağrılsın** (kopya kapı, biri düzeltilip öteki unutulur).
+
+## 3. Sınırlar
+
+- Ölçüm **salt okuma**; hiçbir dosya değiştirilmedi, hiçbir betik çalıştırılmadı.
+- "Çağıran yok" ölçütü grep'tir: **değişken yol / dinamik import** ile çağrılıyorsa bu tarama görmez.
+  Karşı kanıt: `public/sitemap.xml` diskte yok — betik fiilen **hiç koşmamış**, yani dinamik bir
+  çağıran da yok.
+- Canlı sitemap ölçümü tek istek (HTTP 200 + 70.795 B); içeriğinin **doğruluğu** ölçülmedi, yalnız
+  rotanın ürettiği doğrulandı.
+
+
+---
+# FILE: docs\audits\icerik-hatti-recep-kararlari-uygulama-2026-09-08.md
+
+# Recep'in altı kararı — uygulama ve kanıt (2026-09-08, URUN-KATALOG)
+
+**Niçin:** 2026-09-08 sabahı Recep'e altı karar sunuldu (hepsi canlı veri yazımı, hepsi ölçülmüş
+ve hazır, hiçbiri ilerlemiyordu). Recep altısını da tek mesajda cevapladı; bu belge **ne
+uygulandığını ve neyle kanıtlandığını** yazar.
+
+**YÖNTEM:** elle (canlı DB + ölçüm). Sapma yok.
+**CETVEL:** `category-taxonomy-standard.md` (kategori/aile bağı) · `product-image-standard.md`
+(görsel) · `rendering-cache-standard.md` (vitrin doğrulaması).
+⛔**Canlı yazım yetkisi:** Recep'in **kendi sözü**, aşağıda lafzıyla. Akran aktarımı onay değildir.
+
+**Recep'in cevabı, lafzıyla:**
+> *"1. taşı. 2. het fan kalsıon diğerleri silinsin. 3.bunlar aksiyel fan çatısında olmalı 4.koy
+> 5. vortice sitesinden al ve koy. sonra taşınabilir kategoride de olsun. 6. ben de bimiyorum bu
+> ürünlerin kaynağı blli değilş mi? ürün koduna göre sana bişey diyemem ürünün adı yok mu avens
+> ise kalsın vortice ise zaten ürünler var demektir."*
+
+---
+
+## Uygulanan — beş madde
+
+| # | karar | uygulama | kanıt |
+|---|---|---|---|
+| 1 | taşı | 7 AVenS ürünü + **aile kaydı** → `fans > duct-fans` | DB 7/7 · **vitrin 5→6 ürün ailesi** |
+| 2 | jet fan kalsın, diğerleri silinsin | **7** boş kategori silindi | silinen sorgusu **0** · jet fan kategorisi **2** duruyor |
+| 3 | aksiyel fan çatısına | **11** VORTICENT CMS ATEX → `axial-industrial-fans` | DB 11 |
+| 4 | koy | NORDIK HVLS görseli 7 ürüne + kategoriye | storage **HTTP 200 · 71210 bayt** · sayfada **7** referans |
+| 6 | Vortice ise kalsın | `VRT-16076…16080` = **Vortice CA IL … ES RECT** → dokunulmadı | ailesi vitrinde, erişilebilir |
+
+**Madde 2 — tek netleştirme, güvenli tarafta karar:** Recep tekil *"jet fan"* dedi ama bu adda
+**iki** kategori var (`jet-fans`, `parking-jet-fan`). Silme geri dönüşsüz olduğu için **ikisi de
+tutuldu**; ikisi de pasif, vitrinde görünmüyor, tutmanın maliyeti yok. Aksi karar tek komutluk iş.
+
+**Silme öncesi bağımlılık kapısı:** yedi kategorinin her biri için ürün **0**, alt kategori **0**,
+aile **0** ölçüldü. Ölçmeden silinmedi.
+
+**⭐SİLİNEN YEDİ KATEGORİNİN ADI (2026-09-08 sonradan eklendi — ilk yazımda EKSİKTİ):**
+`air-conditioning` · `air-conditioning-solutions` · `electric-heating` · `hygiene-sanitizer` ·
+`smart-home` · `summer-ventilation` · `window-fans`
+
+> ⛔**NİÇİN SONRADAN EKLENDİ — kendi kusurum:** geri dönüşü olmayan bir silme yaptım ve **neyi
+> sildiğimi hiçbir yere yazmadım**. Bugün URUN *"DB'de `endustriyel-havalandirma` yok"* diye bir
+> bulgu bildirince "acaba ben mi sildim" sorusunu **cevaplayamadım**: ad ne bu belgede, ne
+> `admin_audit_log`'da, ne de betikte vardı. Listeyi ancak oturum kaydından (`.jsonl`) çıkarabildim.
+> Cevap: **hayır, o kategori benim sildiklerimden değil** — yedisinin hiçbiri o değil.
+>
+> **Kalıcı ders:** geri dönüşsüz işlemde *"kapı ölçtüm"* demek yetmez; **ne silindiğinin ADI**
+> yazılmalı. Sayı (7) kimliği taşımaz.
+>
+> **İkinci bulgu (ayrı, filoya bildirildi → REC-292):** bu silmeler `admin_audit_log`'a **düşmedi** —
+> ⚠düzeltme (2026-09-09): tablo **boş değil**, `categories` için 12 satır var; hepsi admin
+> panelinden ve eski. Ayırt edici ölçüt tablonun doluluğu değil **o günün yazımları**:
+> 2026-09-08 tarihiyle hiçbir tabloda satır yok. Kural 11 admin işlemlerinin loglanmasını
+> istiyor; betikle yapılan doğrudan DB yazımları bu kaydı üretmiyor.
+
+---
+
+## ⛔İKİ HATA — ikisi de aynı turda yakalandı ve onarıldı
+
+### 1. Sayıya güvenip içeriğe bakmamak (madde 3)
+`ex-proof-atex-fans` altındaki **"12 ürün"** toplu taşındı. On ikinin biri
+**`SEA-810105 PTC SENSOR`** — fan değil, **sensör**. Aksiyel fanlara girmişti; aynı turda geri
+alındı, eski yerinde. Gerçek ATEX fanı sayısı **11**.
+
+⭐**Ders:** *sayı eleme ölçütü, içerik karar ölçütüdür.* Bugün ikinci kez aynı sınıf: kategori
+sayısına bakıp satırların **adına** bakmadım.
+
+### 2. ⭐"Taşıdım" beyanı vitrinde ölçülünce YARIM çıktı (madde 1)
+Madde 1 "bitti" diye raporlandıktan **sonra** canlı vitrin ölçüldü: taşınan 7 ürün kategori
+sayfasında **YOKTU**.
+
+**Sebep — bugüne kadar yazılı olmayan yapısal kural:**
+> **Kategori vitrini ÜRÜN değil AİLE listeler** (sayfa metni: *"5 ürün ailesi"*).
+> `products.subcategory_id` taşımak **yetmez**; `product_families.subcategory_id` de taşınmalıdır.
+
+Aile taşınırken yalnız `category_id` güncellenmişti; `subcategory_id` pasif
+`rectangular-duct-fans`'ta kalmıştı → aile listeye hiç girmiyordu.
+
+**Onarım + kanıt:** aile `subcategory_id → duct-fans`; vitrin **5 → 6 ürün ailesi**,
+`/tr/products/avens-dikdortgen-kanal-radyal` sayfada, "AVenS" 12 kez. Ölçüm **hiç sorulmamış**
+adresle (`?v=<damga>`), `X-Vercel-Cache: MISS`, `Age: 0`.
+
+⛔**CETVELE GİRMESİ GEREKEN:** *ürün taşıma işi İKİ TABLODUR.* Yalnız `products` güncellenirse
+veri doğru, **vitrin sessizce yanlış** kalır ve **hiçbir kapı bunu görmez** — "veri değişti,
+sayfa değişmedi" deseninin yeni örneği.
+
+---
+
+## ⛔Madde 5 — UYGULANMADI, Recep kapısında
+
+Recep: *"vortice sitesinden al ve koy."* Ölçüldü:
+
+| kaynak | sonuç |
+|---|---|
+| `vortice.com/.../wall/40320` (E 254 M **ATEX**) | ⛔fotoğraf **YOK** — `fakeImg.png` placeholder + performans eğrisi |
+| `vortice.com/.../wall/40303` (E 254 M, **ATEX'siz kardeş**) | ✅gerçek ürün fotoğrafı var |
+
+⭐**Kusurun kaynağı bulundu:** bizdeki 14 ATEX ürününün "görseli" olan performans grafiği tam
+olarak Vortice'nin kendi sayfasından geliyor. **Vortice ATEX modelleri için fotoğraf yayınlamıyor.**
+
+Kardeş modelin fotoğrafı, Recep'in `fans` kategorisi için seçtiği **turuncu aksiyel fanın
+kendisi** — yani Recep onu zaten "aksiyel fan" temsilcisi olarak onaylamış durumda.
+
+**Karar Recep'te:** kardeş modelin fotoğrafı ATEX ürünlerine konsun mu?
+**REC-282'den farkı:** orada ısı geri kazanım cihazı ≠ sulu batarya (tamamen başka ürün);
+burada **aynı fan gövdesinin sertifikalı varyantı**. Yine de "bu ürünün fotoğrafı" iddiası
+taşıdığı için tek başına karar verilmedi.
+
+Madde 5'in ikinci yarısı (*"sonra taşınabilir kategoride de olsun"*) → REC-212, görsellerin
+taşınabilir katalog dışa aktarımına dahil edilmesi; bu belgenin kapsamı dışında.
+
+---
+
+## ⭐EK — KAPI İLK KOŞUŞUNDA İKİNCİ YARIM TAŞIMAYI YAKALADI
+
+OPS emriyle (`category-taxonomy-standard §8`) ayrışma ölçümü kuruldu:
+
+```sql
+select count(*) from products p join product_families f on f.id = p.family_id
+where f.deleted_at is null
+  and (p.subcategory_id is distinct from f.subcategory_id
+    or p.category_id   is distinct from f.category_id);
+```
+
+**İlk koşum: 0 değil, `11`.** On birinin hepsi **az önce "taşındı" diye raporladığım**
+VORTICENT CMS ATEX ürünleriydi — ailesi (`vortice-vorticent-cms-atex`) hâlâ pasif
+`ex-proof-atex-fans` altındaydı. **Madde 3 de madde 1 ile aynı sebeple yarım kalmış.**
+
+| adım | ölçüm |
+|---|---|
+| önce | **11** ayrışan satır |
+| onarım | aile → `fans > axial-industrial-fans` |
+| sonra | **0** |
+| vitrin | `aksiyel-sanayi-fanlari` **3 ürün ailesi**, VORTICENT sayfada |
+
+⭐**Kaydedilmeye değer:** kapı, kurulduğu günün ilk koşumunda **kendi yazarının** hatasını buldu.
+Vitrin ölçümü olmasaydı madde 1, SQL ölçümü olmasaydı madde 3 sessizce yarım kalacaktı — ve
+ikisi de "bitti" diye raporlanmıştı.
+
+## ⛔YENİ AÇIK KONU — Recep'e sorulacak (madde 3'ün yan bulgusu)
+
+Aile kaydının tam adı: **"Vortice VORTICENT CMS ATEX *Santrifüj* Fanlar."**
+Recep'in emri *"bunlar aksiyel fan çatısında olmalı"* idi ve uygulandı — ama ürünün kendi adı
+**santrifüj** diyor. Santrifüj ve aksiyel **farklı fan tipleridir**.
+
+Emir uygulandı (Recep kararı ezer), fakat bu bir **teknik çelişki** ve kayda geçirilir:
+ya aile adı yanlış, ya hedef kategori. Karar Recep'in; ölçüm ve soru burada durur.
+
+
+---
+# FILE: docs\audits\icerik-hatti-sayfa-araliklari-2026-09-05.md
+
+# İçerik hattı — kaynak PDF sayfa aralıkları (REC-146 Adım 1b)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** OPS pano notu 2026-09-05 13:15Z (Adım 1b, isteğe bağlı)
+**Ölçüm zamanı:** 2026-09-05 · **Kapsam:** salt okuma, kod yok, prod yok, DB yazma yok
+**Kaynak:** `~/venthub-pdf-ingestor/venthub/**` · **Araç:** PyMuPDF 1.27.2 (betik, elle değil)
+**Önceki adım:** `icerik-hatti-pdf-yapisi-2026-09-05.md` (Adım 1)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/catalog-ingestion-standard.md` — PDF→CSV hattı; **sayfa aralığı çıkarımını kapsamıyor**.
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; ölçülemeyen "veri yok" kalır.
+* REC-146 KABUL şartı: *"taslakların her cümlesi kaynak PDF sayfasına referanslı"*. Adım 1 raporu bu
+  şartın **sayfa aralığı ayrıştırması olmadan sağlanamayacağını** yazmıştı; bu rapor o boşluğu doldurur.
+
+---
+
+## 0 · CEVAP
+
+**Bölüm sınırı YAPIDAN çıkarılabiliyor — tahmine gerek yok.** Vortice katalogları bölüm açılış sayfasında,
+sayfanın en büyük puntosuyla **"&lt;SERİ ADI&gt; RANGE"** (bazen `SERIES`) yazıyor; ara sayfalar koşan başlık
+(`INDUSTRIAL VENTILATION` vb.) taşıyor. Bu ayrım ölçülebilir ve keskin.
+
+**Sonuç: 24 PDF'in 15'inde, toplam 117 bölüm, sayfa aralığıyla çıkarıldı.** Büyük çok-aileli broşürlerde
+kapsama %89–98. Adım 2'nin "her cümle kaynak sayfaya referanslı" şartı artık **karşılanabilir**.
+
+---
+
+## 1 · Ölçütü bir kez değiştirdim — sebebi ölçüm
+
+İlk denemem **ad listesiyle** eşleşmeydi (DB'deki ürün adlarını sayfa başlığında ara). Sonuç:
+`industrial_Ventilation.pdf` 168 sayfada **yalnız 4 sayfa** eşleşti — yani ölçüt işe yaramadı.
+
+Başlıkları **okuyunca** sebep göründü: sayfa başlıkları `VORTICEL E RANGE` gibi, ad listemdeki
+`VORTICEL` ile eşleşiyordu ama ara sayfaların hepsi `INDUSTRIAL VENTILATION` koşan başlığıydı ve
+ad listesi bunları elemiyordu; asıl kayıp, listede olmayan seriler (`MPC-ED`, `TORRETTE TR-E`,
+`VORTICENT C E` …) yüzündendi. **Ad listesi kapalı bir küme; katalog ondan geniş.**
+
+Yapısal ölçüte (`… RANGE`) geçince aynı PDF **4 sayfa yerine 19 bölüm / %98 kapsama** verdi.
+
+> **Ders (kayda geçiyor):** aradığım şeyin adını biliyorsam ad listesi kurarım; **yapısını** bilirsem
+> desen kurarım. Ad listesi bilmediğim seriyi göremez — ve göremediğini bana söylemez.
+> Bu, Adım 1'deki "üç ölçüt üç cevap" ile aynı sınıf hata; orada yakalamıştım, burada tekrarladım.
+
+---
+
+## 2 · Bölüm × sayfa aralığı tablosu (15 PDF, 117 bölüm)
+
+Ardışık aynı adlı bölümler birleştirildi (yayılım/spread başına tekrarlanan başlık tek bölümdür).
+
+**industrial_Ventilation.pdf** — 168 sayfa · **19 bölüm** · kapsama %98
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| VORTICEL E RANGE | 4–13 | 10 |
+| VORTICEL A-E RANGE | 14–23 | 10 |
+| VORTICEL MP RANGE | 24–31 | 8 |
+| VORTICEL MPC-E RANGE | 32–37 | 6 |
+| VORT JET A RANGE | 38–43 | 6 |
+| VORT JET A F400 RANGE | 44–49 | 6 |
+| VORT JET R RANGE | 50–53 | 4 |
+| VORT JET R F400 RANGE | 54–57 | 4 |
+| MPC-ED RANGE | 58–63 | 6 |
+| MPC-HP RANGE | 64–75 | 12 |
+| MPC-ED F400 RANGE | 76–85 | 10 |
+| VORTICENT C E RANGE | 86–97 | 12 |
+| E-ATEX RANGE | 98–103 | 6 |
+| C-ATEX RANGE | 104–109 | 6 |
+| TORRETTE RF-EU RANGE | 110–119 | 10 |
+| TORRETTE TR-E RANGE | 120–127 | 8 |
+| TORRETTE TR-E-V RANGE | 128–135 | 8 |
+| TORRETTE TR-ED RANGE | 136–145 | 10 |
+| TORRETTE TR-ED-V RANGE | 146–168 | 23 |
+
+**ResidentialVentilation.pdf** — 168 sayfa · **30 bölüm** · kapsama %97
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| PUNTO RANGE | 6–11 | 6 |
+| PUNTO FILO RANGE | 12–15 | 4 |
+| PUNTO FOUR RANGE | 16–19 | 4 |
+| PUNTO GHOST RANGE | 20–23 | 4 |
+| PUNTO EVO FLEXO RANGE | 24–27 | 4 |
+| PUNTO EVO RANGE | 28–33 | 6 |
+| PUNTO EVO ES RANGE | 34–37 | 4 |
+| PUNTO EVO GOLD RANGE | 38–41 | 4 |
+| VORTICE VARIO RANGE | 42–45 | 4 |
+| VORTICE VARIO I RANGE | 46–63 | 18 |
+| ARIETT RANGE | 64–67 | 4 |
+| ARIETT I RANGE | 68–71 | 4 |
+| ARIETT HABITAT RANGE | 72–75 | 4 |
+| VORT PRESS RANGE | 76–79 | 4 |
+| VORT PRESS I RANGE | 80–83 | 4 |
+| VORT PRESS HABITAT RANGE | 84–87 | 4 |
+| VORT QUADRO EVO RANGE | 88–95 | 8 |
+| VORT QUADRO RANGE | 96–99 | 4 |
+| VORT QUADRO I RANGE | 100–103 | 4 |
+| VORT NOTUS RANGE | 104–107 | 4 |
+| VORT PLATT RANGE | 108–111 | 4 |
+| VORT PENTA RANGE | 112–115 | 4 |
+| VORT LETO MEV RANGE | 116–119 | 4 |
+| VORT HRW MONO RANGE | 120–129 | 10 |
+| VORT PRESS EP RANGE | 130–133 | 4 |
+| VORT PRESS I EP RANGE | 134–141 | 8 |
+| VORT QUADRO EP AC RANGE | 142–145 | 4 |
+| VORT QUADRO I EP AC RANGE | 146–149 | 4 |
+| VORT PLATT EP RANGE | 150–153 | 4 |
+| VORT PENTA EP RANGE | 154–168 | 15 |
+
+**vortice-brochure-radon-en.pdf** — 164 sayfa · **14 bölüm** · kapsama %98
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| VORT NOTUS RANGE | 4–7 | 4 |
+| VORT PLATT RANGE | 8–11 | 4 |
+| VORT PENTA RANGE | 12–15 | 4 |
+| VORT MONO RANGE | 16–31 | 16 |
+| VORT HR NETI RANGE | 32–39 | 8 |
+| VORT HR NETI IoT RANGE | 40–45 | 6 |
+| VORT HR AVEL RANGE | 46–57 | 12 |
+| VORT INVISIBLE MINI RANGE | 58–63 | 6 |
+| VORT HRI FLAT RANGE | 64–69 | 6 |
+| VORT HRI FLAT IoT RANGE | 70–75 | 6 |
+| VORT PHANTOM RANGE | 76–85 | 10 |
+| VORT HRI PHANTOM IoT RANGE | 86–91 | 6 |
+| VORT HRI DH RANGE | 92–99 | 8 |
+| VORT SANIKIT RANGE | 100–164 | 65 |
+
+**Commercial_Ventilation_in_Line_1.pdf** — 88 sayfa · **13 bölüm** · kapsama %94
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| VORTICE LINEO V0 RANGE | 6–17 | 12 |
+| LINEO ES RANGE | 18–23 | 6 |
+| CA V0 E RANGE | 24–27 | 4 |
+| CA V0 EP RANGE | 28–33 | 6 |
+| CA MD and CA MD E RANGE | 34–39 | 6 |
+| CA MD EP RANGE | 40–45 | 6 |
+| CA ES RANGE | 46–53 | 8 |
+| CA WE D E RANGE | 54–57 | 4 |
+| CA WE D EP RANGE | 58–61 | 4 |
+| CA MD E W RANGE | 62–65 | 4 |
+| CA MD W EP RANGE | 66–71 | 6 |
+| CA MD E RF RANGE | 72–75 | 4 |
+| CA MD RF EP RANGE | 76–88 | 13 |
+
+**Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf** — 84 sayfa · **15 bölüm** · kapsama %96
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| LINEO RANGE | 4–4 | 1 |
+| CONSTRUCTION RANGE | 5–5 | 1 |
+| LINEO V0 RANGE | 6–19 | 14 |
+| LINEO V0 ES RANGE | 20–25 | 6 |
+| CA V0 RANGE | 26–31 | 6 |
+| CA MD RANGE | 32–39 | 8 |
+| CA ES RANGE | 40–45 | 6 |
+| CA WE D E RANGE | 46–49 | 4 |
+| CA MD E W RANGE | 50–55 | 6 |
+| CA MD E RF RANGE | 56–61 | 6 |
+| CA IN-LINE RANGE | 62–62 | 1 |
+| CONSTRUCTION RANGE | 63–63 | 1 |
+| CA IN-LINE RANGE | 64–69 | 6 |
+| CA IN-LINE QUIET RANGE | 70–75 | 6 |
+| CA IN-LINE QUIET ES RANGE | 76–84 | 9 |
+
+**Doc_Pubblicita_Residential_ventilation_vmc_1.pdf** — 80 sayfa · **8 bölüm** · kapsama %89
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| VORT HRW 20 MONO RANGE | 10–21 | 12 |
+| VORT HRI MINI RANGE | 22–25 | 4 |
+| VORT PROMETEO PLUS HR 400 RANGE | 26–43 | 18 |
+| VORT HR 350 EXO RANGE | 44–49 | 6 |
+| VORT HRI DH RANGE | 50–55 | 6 |
+| VORT HRI PHANTOM RANGE | 56–61 | 6 |
+| VORT HRI INVISIBLE-E RANGE | 62–71 | 10 |
+| VORT HRI FLAT RANGE | 72–80 | 9 |
+
+**heat-master-slimroof-cati-fanlari-yeni.pdf** — 44 sayfa · **2 bölüm** · kapsama %93
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| HEATMASTER F400 SERIES | 4–25 | 22 |
+| SLIMROOF ES SERIES | 26–44 | 19 |
+
+**2022-11-en-ca-rm-es-radon.pdf** — 42 sayfa · **1 bölüm** · kapsama %48
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| THE RADON-SPECIFIC VORTICE RANGE | 23–42 | 20 |
+
+**LINEO_QUITE_KATALOG.pdf** — 40 sayfa · **6 bölüm** · kapsama %100
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| LINEO RANGE | 1–5 | 5 |
+| LINEO QUIET RANGE | 6–11 | 6 |
+| LINEO QUIET ES RANGE | 12–17 | 6 |
+| LINEO QUIET RANGE | 18–23 | 6 |
+| LINEO RANGE | 24–33 | 10 |
+| LINEO ES RANGE | 34–40 | 7 |
+
+**Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf** — 24 sayfa · **3 bölüm** · kapsama %38
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| VORT JET-A Range | 16–17 | 2 |
+| VORT JET-R Range | 18–21 | 4 |
+| MPC HP and MPC EC Range | 22–24 | 3 |
+
+**Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_4.pdf** — 20 sayfa · **1 bölüm** · kapsama %100
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| VORT QUADRO EVO RANGE | 1–20 | 20 |
+
+**E_ATEX_Range_yeni_2025.pdf** — 16 sayfa · **2 bölüm** · kapsama %88
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| E-ATEX RANGE | 3–4 | 2 |
+| EXAMPLE OF E-ATEX RANGE | 5–16 | 12 |
+
+**Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf** — 12 sayfa · **1 bölüm** · kapsama %100
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| DEUMIDO RANGE | 1–12 | 12 |
+
+**Air_Conditioning_Air_Door_2.pdf** — 8 sayfa · **1 bölüm** · kapsama %38
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| AIR DOOR RANGE | 6–8 | 3 |
+
+**Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf** — 8 sayfa · **1 bölüm** · kapsama %25
+
+| Bölüm (seri) | Sayfa | Kaç sayfa |
+|---|---|---|
+| Punto Evo Range | 7–8 | 2 |
+---
+
+## 3 · Bölüm sınırı ÇIKMAYAN 9 PDF (ölçüldü, uydurulmadı)
+
+`Doc_Pubblicita_Industrial_ventilation_vort_jet_fan_system_1.pdf` · `nordik-hvls-…` ·
+`qbk-sal-kc-evo-…` · `nrg-range-…` · `vort-hr-w-all-100-df.pdf` · `vortice-brochure-mev.pdf` ·
+`vortice_vort_mono_range_new.pdf` · `Why-Ventilate-Brochure.pdf` · `vortice-bravo-s.pdf` ·
+`avens_fiyat_listesi_2026_HQ.pdf`
+
+Sebep tek değil ve **sınıflandırılmadı** (ölçmedim): bir kısmı zaten **tek aileli** (bölüm sınırına ihtiyaç
+yok — `nordik-hvls`, `qbk-sal-kc-evo`, `deumido`), bir kısmı farklı şablon kullanıyor. **Tek aileli PDF'te
+bölüm sınırının olmaması kusur değildir** — aralık = tüm belge. Ayrım Adım 2'de yapılmalı.
+
+AVenS fiyat listesi ayrı: bölüm başlığı `RANGE` değil `… SERİSİ` kalıbında (TR). Adım 1 raporunda
+anlatım sayfaları zaten tek tek verilmişti (s. 39, 40, 41, 42, 43, 45) — bu rapor onu tekrarlamıyor.
+
+---
+
+## 4 · Mükerrer PDF hakemliği — dosya adı içeriği yansıtmıyor
+
+Adım 1'de bulunan bayt-aynı çift: `vortice-brochure-mev.pdf` (klasör: `isi-geri-kazanim`) =
+`vortice_vort_mono_range_new.pdf` (klasör: `vort-mono`). Hangi klasörün doğru olduğunu **içerikten** ölçtüm:
+
+| Terim | Geçiş |
+|---|---|
+| `MONO` | **84** |
+| `VORT HR` | **67** |
+| `heat recovery` | 42 |
+| `VORT MONO` | 17 |
+| **`MEV`** | **0** |
+| `NRG` · `recuperator` · `single room` · `extract ventilation` | 0 |
+
+**Hüküm:** dosya **iki aileyi birden** anlatıyor (VORT MONO **ve** VORT HR / ısı geri kazanım) — yani
+mükerrerlik yanlış yerleştirme değil, **iki klasöre de ait olması**. Ama **dosya adı desteksiz**:
+içerikte `MEV` **sıfır kez** geçiyor. `vortice-brochure-mev.pdf` adı içeriği yansıtmıyor.
+
+**Öneri (karar değil):** dosyayı silmek yerine ad düzeltilsin; hangi kopyanın kalacağı ve adın ne olacağı
+ingestor sahibinin kararı. Ölçüm ikisinin de içerikçe geçerli olduğunu söylüyor.
+
+---
+
+## 5 · Adım 2 için ne değişti
+
+1. **KABUL şartı artık karşılanabilir.** 117 bölümün her biri sayfa aralığıyla adreslenebiliyor;
+   "bu cümle şu PDF'in şu sayfasından" denebilir.
+2. **Kaynak, DB ailelerinden İNCE.** Katalog `VORT QUADRO EVO`, `VORT QUADRO`, `VORT QUADRO I`,
+   `VORT QUADRO EP AC`, `VORT QUADRO I EP AC` diye **beş ayrı bölüm** taşıyor; DB'de tek aile var
+   (`Vortice VORT Quadro Evo`). Aynı şey Punto (8 bölüm), CA (13 bölüm), VORT HR (birçok) için geçerli.
+   **Bölüm → aile eşlemesi bire bir değil, çoktan-bire** — ve hangi bölümün hangi aileye yazılacağı
+   **insan kararı**, ölçümle çözülmez. Adım 2 emrinde bu eşleme tablosu istenmelidir.
+3. **Kapsama boşluğu var ama küçük:** büyük broşürlerde %89–98. Kapsanmayan sayfalar genelde kapak,
+   içindekiler, kurumsal giriş ve arka kapak — yani anlatım taşımayan sayfalar. Doğrulanmadı, **varsayım**.
+
+## 6 · Ölçülemeyenler
+
+* Bölüm sınırı çıkmayan 9 PDF'in **niçin** çıkmadığı sınıflandırılmadı (§3).
+* Kapsanmayan sayfaların gerçekten kapak/içindekiler olduğu **doğrulanmadı** (§5.3).
+* `RANGE` deseni **İngilizce** kalıba dayanıyor; İtalyanca/Almanca kataloglar gelirse desen genişletilmeli.
+  Bugünkü evrende 22/24 PDF İngilizce olduğu için sorun çıkmadı.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-05
+
+
+---
+# FILE: docs\audits\icerik-hatti-sensor-kategorisi-yazimi-2026-09-09.md
+
+# Sensör/yedek parça alt kategorisi — canlı yazım ve kanıt (2026-09-09, URUN-KATALOG)
+
+**Yetki:** Recep'in **kendi sözü**, kendi penceresinde, lafzıyla:
+> *"sensöt kategorisini sen nereye koymuştun aksesurlar altına mı? … bana soru sormana gerek yok
+> ben zaten hedefi vermedim mi? katralog veri girişi full kapsam ajans gibi"*
+
+⛔Bu yazım **bir gün beklemişti**, çünkü akran aktarımı (*"OPS diyor ki Recep onayladı"*) canlı
+prod yazımı için onay sayılmaz. Recep kendi ağzıyla söyleyince aynı turda yapıldı.
+
+**YÖNTEM:** elle (MCP `execute_sql`). **Yazma yüzeyi dosya değil, doğrudan DB.**
+**CETVEL:** `category-taxonomy-standard.md` §8 (taşıma iki tablodur) + §9 (önce döküm).
+
+---
+
+## §9 gereği: döküm YAZIMDAN ÖNCE panoya bırakıldı
+
+Etkilenen her satır id'siyle ve önceki değeriyle yazıldı, sonra yazım koşuldu.
+
+| tablo | işlem | satır |
+|---|---|---|
+| `categories` | **yeni** | `1a87e18b-6195-48f4-8c75-2f5f5feb137f` · "Yedek Parça ve Sensörler" · `spare-parts-sensors` · parent `accessories` · level 1 · aktif |
+| `products` | `subcategory_id`: **null → yeni** | `fd189d5e…` SEA-810105 PTC SENSOR · `d585cb3d…` AVE-30110 BVU-LS 1000 · `f347d28f…` AVE-30111 BVU-LS 2000/3000 |
+| `product_families` | `subcategory_id`: **null → yeni** | `55937a21…` SEAT ATEX PTC Sensörü · `61a657c1…` AVenS BVU-LS Kurşun Seperatör |
+
+`category_id` üçünde de zaten `accessories`'ti, **değişmedi**.
+Aile kayıtları §8 gereği taşındı — yalnız `products` güncellenseydi veri doğru, **vitrin sessizce
+yanlış** kalırdı.
+
+## Kapılar (DB tarafı, vitrine dokunulmadan)
+
+| ölçüt | sonuç |
+|---|---|
+| aile/ürün kategori ayrışması | **0** |
+| yeni kategoride ürün / aile | **3 / 2** |
+| yaprak kategorisi olmayan aktif ürün | **11 → 8** |
+
+## ⭐Vitrin ölçümü BİLEREK YAPILMADI
+
+Sınanan şey *"veri değişince sayfa **kendiliğinden** tazeleniyor mu"* (webhook çalışma kanıtı,
+REC-59/REC-292). **Sayfayı ben çekseydim ISR tazelemesini kendim tetikleyebilirdim** ve tazelenmenin
+webhook'tan mı isteğimden mi geldiği ayrışmazdı — yani ölçmek kanıtı **bozardı.**
+İlk istek URUN'a bırakıldı. *Ölçmemek de bir ölçüm kararıdır.*
+
+## ⛔REC-292 SAHNE KANITI — canlı, bugün
+
+Yazımdan hemen sonra, **ölçülmüş UTC** damgasıyla (`date -u` → `2026-09-09T07:25:50Z`):
+
+| ölçüt | sonuç |
+|---|---|
+| `admin_audit_log`, bugünün tarihi, **tüm tablolar** | **0** |
+| aynısı, yalnız `categories`/`products`/`product_families` | **0** |
+
+**Canlıya beş satır yazıldı (1 kategori + 3 ürün + 2 aile) ve denetim izinde hiçbiri yok.**
+Bu, REC-292'nin *"betikle/doğrudan yapılan yazımlar loglanmıyor"* bulgusunun **canlı sahne kanıtı**.
+⚠Tablo boş değil: `categories` için 12 eski satır var, hepsi **admin panelinden**. Ayırt edici
+ölçüt tablonun doluluğu değil **o günün yazımları**.
+
+## Kalan iş — aynı kusur, başka yer
+
+Yaprak kategorisi olmayan **8 ürün Hava Perdeleri'nde** (Vortice Air Door; iki aile: H AD elektrikli
+ısıtmalı 4, AD ortam havalı 4). Kategori metni bu ikiliği zaten anlatıyor, yani ayrım hazır.
+**Kendiliğimden dokunulmadı:** `air-curtains` `display_mode: series` taşıyor ve alt kategori eklemek
+vitrin gösterimini değiştirebilir — orası URUN'un alanı, ona soruldu. Bozulmuyorsa aynı kalıp
+uygulanır ve sayı **0**'a iner.
+
+## Yöntem notu — kendi hatam
+İlk döküme saati **11:0xZ** yazdım; gerçek UTC **07:25Z**'ymiş. Yerel saati "Z" ile damgalamışım.
+OPS yakaladı. Kural zaten yazılıydı: **saat varsayılmaz, `date -u` ile ölçülür.**
+
+
+---
+# FILE: docs\audits\icerik-hatti-seri-metni-tek-model-kusuru-2026-09-06.md
+
+# Seri açıklaması tek modelin verisini taşıyor — 10 aile / 109 ürün (canlı)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Bulundu:** REC-146 Adım 2b·2 sırasında, Heatmaster/Slimroof
+taslağı için mevcut metinler okunurken
+**Kapsam:** salt okuma · kod yok · prod yazımı yok · sayılar **canlı DB'den**, betikten değil elle SQL ile
+(bu bir keşif ölçümüdür; karara giden sayı üretilirse betiğe bağlanmalı)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — ürün hakkında **yanlış kapsamlı** bilgi vermek de vaat ihlalidir.
+* Kararlar — Katalog ve Ürün Verisi **K7.5** (her tespit kayıtta).
+* `scripts/db/product-data/vortice-lineo-descriptions.json` `_kusur` alanı — **bu kusur 2026-08-21'de
+  zaten tespit edilmiş**: *"T138 model bölme pilotunda model aileleri yaratılırken SERİ açıklaması
+  olduğu gibi KOPYALANDI."* Düzeltme **yalnız Lineo ailesine** uygulanmış; bu rapor kalanını ölçüyor.
+
+---
+
+## 0 · BAŞLIK
+
+Vitrinde **10 ürün ailesinin** açıklaması, o ailedeki **tek bir modelin** verisini serinin tamamıymış
+gibi sunuyor. Metin yanlış değil — **kapsamı** yanlış. Bu, "Tier C" kusurundan daha sinsidir: o metin
+bakınca anlamsız olduğu belliydi, bu metin **doğru görünüyor**.
+
+| | |
+|---|---|
+| Etkilenen aile | **10** |
+| Etkilenen ürün sayfası | **109** |
+| Kusurun kaynağı | T138 model bölme pilotu (2026-08-21), seri açıklamasının modelden kopyalanması |
+| Daha önce düzeltilen | yalnız `vortice-lineo-quiet` (T141/T149) |
+
+**En ağır iki örnek — kendi ürünümüzü küçültüyoruz:**
+
+| Aile | Metin ne diyor | DB'deki gerçek aralık | Kat |
+|---|---|---|---|
+| `vortice-vort-heatmaster-slimroof-roof` | "Nominal debisi **460 m³/h**" | 460 – **18.600** m³/h | **40,4×** |
+| `vortice-vort-heatmaster-slimroof-smoke` | "**Maksimum** debisi **2580 m³/h**" | 2.580 – **22.550** m³/h | **8,7×** |
+
+İkincisinde sözcük özellikle yanlış: metin **"maksimum"** diyor, oysa yazılan sayı serinin **en küçük**
+modelinin debisi. Müşteri 22.550 m³/h'lik bir seriyi 2.580 m³/h sanıyor.
+
+---
+
+## 1 · Ölçüm: üç eksende tarandı
+
+Ölçüt: ailenin açıklama metni, o ailede **birden çok değer varken tek bir değeri** anıyor mu.
+`Tier C` şablonlu 11 aile bu taramanın **dışında** tutuldu (onlar ayrı kalem, REC-155).
+
+| Aile | Ürün | Tek çap yazılı | Tek debi yazılı | Tek faz yazılı |
+|---|---|---|---|---|
+| `avens-plug-fanlar` | 14 | ✔ | | ✔ |
+| `vortice-punto-evo-flexo` | 4 | ✔ | | |
+| `vortice-vort-commercial-in-line-rectangular` | 5 | | | ✔ |
+| `vortice-vort-e-atex` | 14 | ✔ | | ✔ |
+| `vortice-vort-heatmaster-slimroof-roof` | 10 | | ✔ | ✔ |
+| `vortice-vort-heatmaster-slimroof-smoke` | 10 | | ✔ | ✔ |
+| `vortice-vort-industrial-ventilation-axial` | 16 | | | ✔ |
+| `vortice-vort-mono` | 8 | | ✔ | |
+| `vortice-vort-nordik-hvls` | 7 | | | ✔ |
+| `vortice-vort-qbk-sal-kc-evo` | 21 | ✔ | | ✔ |
+| **TOPLAM** | **109** | 4 | 3 | 8 |
+
+### Örnekler
+
+* **Çap:** `vortice-vort-qbk-sal-kc-evo` metni "315 mm nominal çaplı" diyor; seride **7 farklı çap** var,
+  315 – 630 mm. Müşteri 630'luk ararken bu sayfayı eler.
+* **Faz:** `vortice-vort-heatmaster-slimroof-smoke` metni "monofaze model" diyor; seride **3 monofaze
+  ve 7 trifaze** model var — yani çoğunluk görünmez.
+  Aynı kusur ters yönde de var: `vortice-vort-qbk-sal-kc-evo` "trifaze" diyor, 3 monofaze modeli gizliyor.
+* **Ürün adı:** `vortice-isi-geri-kazanim` seri metni doğrudan **tek bir ürünün adıyla** başlıyor
+  ("Vortice Vort Invisible Mini Top…"), oysa ailede 5 ürün var. *(Bu aile yukarıdaki tabloya girmedi —
+  ölçütüm sayı arıyordu, ad aramıyordu; §4'te açık kalem.)*
+
+---
+
+## 2 · Niçin bu kusur "Tier C"den daha tehlikeli
+
+| | "Tier C" (REC-155) | Bu kusur |
+|---|---|---|
+| Metin | anlamsız, bakınca belli | **anlamlı, doğru görünüyor** |
+| Fark edilme | ilk bakışta | ancak veriyle karşılaştırınca |
+| Zarar | müşteri hiçbir şey öğrenmiyor | müşteri **yanlış** şey öğreniyor |
+| Arama motoru | boş içerik | **yanlış kapasiteyle** indeksleme |
+
+Bir sayfanın "açıklaması var" olması, o açıklamanın **o sayfayı anlattığı** anlamına gelmiyor.
+Derinlik ölçümüm (2b·1) bu kusuru **göremedi**, çünkü o ölçüm kaynağın hacmini ölçüyordu,
+DB'ye yazılmış metnin kapsamını değil. **İki ayrı soru: "yazacak malzeme var mı" ve "yazılmış olan doğru mu".**
+
+---
+
+## 3 · Öneri (uygulanmadı — karar Recep'te)
+
+1. **Bu 10 aile, REC-146 2b·2 taslak sırasında zaten yeniden yazılıyor.** Ayrı bir düzeltme turu
+   açmaya gerek yok; taslaklar aralık vererek yazılıyor (Heatmaster/Slimroof taslağında uygulandı).
+2. **Kalıcı çözüm bir kapıdır, metin düzeltmesi değil.** Öneri: aile açıklamasında geçen sayısal
+   değer, ailenin ürünlerinden **türetilmiş bir aralık** değilse konformans testi KIRMIZI versin.
+   Örnek kural: *"seri metni tek bir modelin çapını/debisini anıyorsa ve ailede birden çok değer varsa"*.
+   Bu testin yeri `src/__tests__/conformance/` — **URUN şeridinin claim'i**, bu şerit yazamaz.
+3. **Sıra:** Tier C temizliği (REC-155, onaylı) → 2b·2 taslakları → kapı. Kapı olmadan üçüncü kez
+   aynı kusur doğar; T138'de doğdu, T141'de yarım düzeltildi, bugün kalanı bulundu.
+
+---
+
+## 4 · Ölçülemeyenler / ölçütümün sınırı (uydurulmadı)
+
+* **Ölçüt sayı arıyor, ad aramıyor.** `vortice-isi-geri-kazanim` gibi seri metnini tek ürün **adıyla**
+  başlatan aileler bu taramaya takılmadı; §1 tablosu **alt sınırdır**, gerçek sayı daha yüksek olabilir.
+* **Yalnız üç eksen tarandı:** çap, debi, faz. Kutup sayısı, güç (kW), koruma sınıfı, ses seviyesi
+  **taranmadı** — aynı kusur oralarda da olabilir.
+* **`technical_specs` alanı kirli:** `max_delivery_m3h` bazı kayıtlarda sayı yerine metin taşıyor
+  (`"6530 m³/h"`). Sorgu buna dayanıklı yazıldı ama **alan adı birimi taahhüt ederken değerin birim
+  taşıması ayrı bir kusurdur** — kaç kayıtta olduğu **ölçülmedi**, ayrı iş.
+* **EN metinler yalnız faz ekseninde tarandı**, çap/debi ekseninde taranmadı.
+* Bu ölçüm **elle SQL** ile yapıldı; karara giden sayı üretilecekse betiğe bağlanmalı
+  (→ `olcut-dogru-evren-yanlis-is-emri-dogurur`).
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-sessiz-bosluk-2026-09-05.md
+
+# İçerik hattı — sessiz boşluk taraması ve ÖNCEKİ SAYILARIMIN DÜZELTİLMESİ
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** Recep, 2026-09-05 (Kararlar—Katalog ve Ürün Verisi **K7.4/K7.5**)
+**Kapsam:** salt okuma · kod yok · prod yok · DB'ye yazma yok · sayılar betikten (PyMuPDF)
+**Girdi:** 24 kaynak PDF + canlı DB `products` (40 aile, 375 ürün model adı)
+
+## KAYNAK / CETVEL
+
+* Kararlar — Katalog ve Ürün Verisi **K7.4** ("sessiz boşluklar tespit edilir, doldurulabiliyorsa doldurulur
+  ama **önce raporlanır**") ve **K7.5** ("her şey kesinlikle kayıt altında olacak… sonra geri dönüp
+  gelecekte bu neymiş dememeliyiz").
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok.
+* Önceki adımlar: `icerik-hatti-pdf-yapisi-…` (Adım 1) · `…-sayfa-araliklari-…` (1b) · `…-bolum-aile-eslemesi-…` (2a).
+
+---
+
+## 0 · BAŞLIK: sessiz boşluk **yok**, ama benim önceki sayım **yanlıştı**
+
+Adım 1'de "21 ailenin kaynağı yok, bunların 12'sinde elde **hiçbir metin** yok" yazmıştım.
+**Bu yanlış.** Ölçüm düzeltildi:
+
+| | Aile |
+|---|---|
+| Model kodu en az bir PDF'te geçen | **40 / 40** |
+| **AVenS fiyat listesinde TÜRKÇE anlatımı olan** | **36 / 40** |
+| Kalan 4'ün Vortice kataloğunda (EN) anlatımı olan | **4 / 4** |
+| **Gerçekten kaynaksız aile** | **0** |
+
+Yani içerik hattının önündeki engel "malzeme yok" değil, "malzeme dağınık ve bir kısmı İngilizce".
+Bu, işin **büyüklüğünü küçültür**, cinsini değiştirmez.
+
+---
+
+## 1 · Ölçütüm dört kez yanıldı — dördü de yayımlanmadan yakalandı
+
+K7.5 gereği hatanın kendisi de kayıttır. Dördü de **aynı sınıf**: ölçüt keskindi, **evren yanlıştı**.
+
+| # | Yanlış ölçüt | Verdiği sonuç | Gerçek | Nasıl yakalandı |
+|---|---|---|---|---|
+| 1 | Seri kodu taraması (Adım 1) | `AT` kodu 22 PDF'te "eşleşti" | Hepsi İngilizce *at* kelimesi | Marka hizası kontrolü |
+| 2 | Klasör adı slug içinde geçiyor mu (Adım 1) | 22/40 aile "kaynaklı" | Marka klasörü `vortice` her slug'a uyuyordu; doğrusu 19 | Sonucu okuyunca saçmalık göründü |
+| 3 | Ad listesiyle bölüm arama (Adım 1b) | 168 sayfada 4 bölüm | Ad listesi kapalı küme; yapısal desenle 19 bölüm | Sayfa başlıklarını **okudum** |
+| 4 | **Model jetonu + madde işareti (bu adım)** | 3 aile "kaynaksız", anlatım "6 sayfada 13 madde" | **0 aile kaynaksız**, anlatım **61 sayfada** | Üç "boşluğun" üçünü de tek tek açtım |
+
+**4 numaralı hata en pahalısıydı** çünkü **eyleme dönüşmüştü**: Adım 1 raporunda "12 aile için üreticiden
+metin toplanmalı" yazdım, OPS Linear'a taşıdı, Recep'e "kaynağımız yok" diye sunuldu. Gerçekte kaynak
+elimizdeydi — 74 sayfalık AVenS kataloğunun içinde.
+
+**Ders (cetvele önerilir):** *bir şeyin YOK olduğunu iddia etmek, VAR olduğunu iddia etmekten daha ağır
+kanıt ister.* "Bulamadım" ile "yok" farklı cümlelerdir; ilkini yazıp ikincisini kastettim.
+
+---
+
+## 2 · Üç "boşluk" tek tek açıldı — üçü de ölçüm hatası
+
+### 2.1 Radon (kanal + çatı) — kaynak VAR, üstelik ayrımıyla birlikte
+
+Model jetonum `CA-RM 100 ES` idi; katalog kodu bir kez yazıp çapları ayrı listeliyor.
+Gerçek metin, `2022-11-en-ca-rm-es-radon.pdf`:
+
+* **s.23** — `VORT CA RM ES DUCT EXHAUST FAN`, çaplar 100/125/150/160/200 mm, IPX7 su geçirmez, elektronik
+  kontrollü fırçasız motor, kontrol paneliyle birleştirilebilir, seri montaj mümkün → **kanal ailesi**
+* **s.24** — `VORT CA RM RF ES ROOFTOP SUCTION UNIT`, çaplar 150/160/200 mm, IP45, dış mekân montajına uygun
+  → **çatı ailesi**
+
+> **Yan kazanç:** Adım 2a'da "insan kararı" diye bıraktığım *"tek bölüm iki aileyi kapsıyor, sınır hangi
+> sayfada belli değil"* kalemi **bununla kapandı**: sınır s.23 / s.24.
+> **9 insan kararından biri düştü, 8 kaldı.**
+
+### 2.2 BRA.VO S — kaynak VAR, üstelik iki tane
+
+`vort-hr-w-all-100-df.pdf` içinde dört model de geçiyor: "BRA.VO S1/S2/S3/S4 — wireless remote sensor for
+monitoring temperature…". Kendi tek sayfalık föyü de anlatım taşıyor:
+"It is an air quality meter, capable to detect the presence of pollutants… integrates with all VORTICE IoT
+mechanical heat recovery units. There are four models available which differ according to the type of
+pollutants detected."
+
+> **Bu bir üründen fazlası: sınıflandırma hatası.** BRA.VO **fan değil, hava kalitesi sensörü**.
+> Adım 1'de bu dosyayı "1 sayfa, 272 karakter, dil veri yok, 0/6 blok" diye **neredeyse boş** göstermiştim;
+> aslında ailenin kimlik cümlesi tam olarak orada duruyor.
+
+### 2.3 AVenS Elektrikli Kanal Isıtıcıları — kaynak VAR (ince)
+
+Fiyat listesi **s.69**: `ELEKTRİKLİ ISITICILAR — Trifaze 380V, 50Hz.` +
+"Elektrikli ısıtıcı kontrol paneli ile birlikte kullanılır."
+Jetonum `12 kW Elektrikli Isıtıcı` idi; katalog gücü tabloda ayrı kolonda veriyor.
+**Anlatım var ama zayıf** — iki cümle. Altı bloktan yalnız Motor/Kontrol'e malzeme verir.
+
+---
+
+## 3 · 40 ailenin anlatım kaynağı (ölçülmüş)
+
+**36 aile — AVenS fiyat listesinde Türkçe anlatım** (sayfa numaralarıyla):
+
+| Marka | Aile | TR anlatım sayfası |
+|---|---|---|
+| AVenS | BVU Sığınak Havalandırma Üniteleri · BVU-LS Kurşun Seperatör | 56 |
+| AVenS | Hız Anahtarları | 27, 36 |
+| AVenS | Hücreli Aspiratörler HF/FW · HF/S | 28 |
+| AVenS | Isı Geri Kazanım Cihazları | 68 |
+| AVenS | Plug Fanlar (KENTALFAN) | 50, 51 |
+| AVenS | Sulu Batarya Kanal Tipi | 69 |
+| AVenS | Elektrikli Kanal Isıtıcıları | 69 *(ince)* |
+| Danfoss | FC 101 · FC 102 · FC 51 | 58 · 59 · 34, 36 |
+| Nicotra Gebhardt | DD · AT · ADH · RDH | 52 · 53 · 54 · 55 |
+| SEAT | SEAT · STORM · JET | 41, 44 · 42, 45 · 43, 45 |
+| Vortice | Hava perdesi (AD) · H AD elektrikli | 64 |
+| Vortice | VORT HR ısı geri kazanım · VORT Mono | 67 · 66 |
+| Vortice | Lineo · Lineo Quiet | 22–25 · 22, 23 |
+| Vortice | Punto Evo / Flexo | 10 |
+| Vortice | Commercial In-Line yuvarlak · dikdörtgen | 25, 32 · 26 |
+| Vortice | VORT-E ATEX · Aksiyel Endüstriyel | 38 · 30, 31, 38 |
+| Vortice | Slimroof · Heatmaster | 33 · 34 |
+| Vortice | TIRACAMINO | 29 |
+| Vortice | Nordik HVLS · QBK SAL KC Evo · Quadro Evo | 62 · 36 · 20 |
+
+**4 aile — yalnız Vortice kataloğunda (İngilizce), çeviri gerekir:**
+Deumido (`DEUMIDO RANGE`, 12 sayfa) · Radon kanal (s.23) · Radon çatı (s.24) · BRA.VO S (iki kaynak).
+
+---
+
+## 4 · TIRACAMINO: düzeltilmiş hüküm
+
+Adım 2a'da "klasör düzeyinde kaynağı var görünüyor ama bölüm düzeyinde yok — fiilen kaynaksız" demiştim.
+**Yarısı doğru, sonucu yanlıştı.** Doğrusu:
+
+* Vortice `industrial_Ventilation.pdf` içinde TIRACAMINO bölümü **gerçekten yok** (oradaki 5 `TORRETTE …`
+  bölümü çatı fanı) — bu tespit **ayakta**.
+* Ama **AVenS fiyat listesi s.29** "ŞÖMİNE VE BACA FANLARI / TIRACAMINO" başlığıyla Türkçe anlatım taşıyor.
+* **Sonuç: TIRACAMINO kaynaksız DEĞİL, kaynağı başka dosyada.**
+
+Genelleme: *bir dosyada bölüm bulunamaması, o ailenin kaynaksız olduğunu göstermez* — **tüm evren taranmalı.**
+
+---
+
+## 5 · Bu ölçümün Adım 2b'ye etkisi
+
+1. **Çeviri yükü sandığımdan küçük.** 40 ailenin 36'sı Türkçe kaynaklı. Çeviri yalnız 4 ailede zorunlu.
+2. **Üretici sitesinden veri çekme (K7.3) şu an ZORUNLU DEĞİL.** Elde kaynağı olmayan aile yok. Web araştırması
+   **derinleştirme** için değerli (Çark ve Kontrol blokları kaynakta hâlâ zayıf), **boşluk kapatma** için değil.
+   Öncelik sırasında geriye alınmasını öneriyoruz.
+3. **İnsan kararı bekleyen kalem 9 → 8** (radon sınırı ölçümle çözüldü).
+4. **Yeni ölçüm borcu:** 36 ailenin TR anlatımı ne kadar *derin*? Bu rapor **varlık** ölçtü, **yeterlilik**
+   ölçmedi. Bazı sayfalarda tek cümle var (elektrikli ısıtıcı), bazılarında dört madde (SEAT). Adım 2b'nin
+   ilk işi bu derinlik ölçümü olmalı — yoksa "kaynak var" deyip iki kelimelik anlatımla sayfa açarız.
+
+## 6 · Ölçülemeyenler (uydurulmadı)
+
+* Anlatım **derinliği** ölçülmedi (§5.4).
+* Fiyat listesindeki anlatımların **güncelliği** doğrulanmadı (2026 baskısı, ürün revizyonu olabilir).
+* Vortice kataloglarındaki EN anlatımların aile başına **tam sayfa aralığı** yalnız 15 PDF için çıkarıldı
+  (Adım 1b); kalan 9 PDF tek aileli olduğu için aralık = tüm belge kabul edildi, **doğrulanmadı**.
+* AVenS kataloğundaki **fiyat ve tablo doğruluğu** kapsam dışı.
+* Kaynak hataları ayrı belgede: `icerik-hatti-avens-katalog-hatalari-2026-09-05.md` (K7.6, Recep AVenS'e iletecek).
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-05
+
+
+---
+# FILE: docs\audits\icerik-hatti-tasinabilir-katalog-2026-09-07.md
+
+# Taşınabilir katalog — dışa aktarım (REC-212, birinci yarı)
+
+**Damga:** 2026-09-07 · **Şerit:** URUN-KATALOG · **Kayıt:** REC-212
+**Yöntem:** elle (tek oturum) · **Cetvel:** `docs/standards/csv-import-export-standard.md` (dışa
+aktarım kolon sözleşmesi orada; bu paket CSV değil JSONL olduğu için cetvele **yeni bölüm
+gerekiyor** — yazımı bu işin devamındadır)
+
+## Soruyu doğuran cümle
+
+Recep 2026-09-07:
+
+> "bugün PC alsam ve/veya USB'yi atsam ve bir kullanıcıya versem 'al bunları yükle' desem…
+> yükleyebiliyor muyuz? tüm ürünler için"
+
+O gün ölçülen cevap: **hayır**. Katalog yalnız canlı DB'de yaşıyordu. Elimizdeki tek dışa
+aktarım admin CSV'siydi ve **7 kolon** veriyor (`id,name,sku,category_id,status,price,stock_qty`)
+— 38 kolonluk ürünün beşte biri. Teknik özellik yok, fiyat listesi yok, görsel yok, aile yok.
+
+## Ne yapıldı
+
+`scripts/icerik-hatti/katalog-disa-aktar.mjs` — canlıyı **salt okur**, yedi tabloyu tek pakete yazar.
+
+| Tablo | Satır | Kolon |
+|---|---|---|
+| brands | 5 | 6 |
+| categories | 37 | 21 |
+| product_families | 40 | 18 |
+| price_lists | 3 | 10 |
+| products | 375 | 38 |
+| product_prices | 1044 | 17 |
+| product_images | 1042 | 7 |
+| **toplam** | **2546** | |
+
+Paket boyutu **1,7 MB** — USB'ye de e-postaya da sığar.
+
+## Üç sınav (ikisi sabotaj)
+
+1. **Yeşil hâl:** 7 tablo / 2546 satır yazıldı, manifest'te tablo başına sha256.
+2. **Determinizm:** iki koşum, veri dosyaları **bayt-eşit** (damga yalnız manifest'te).
+   Böylece "katalog değişti mi" sorusu `cmp` ile cevaplanır.
+3. **Sabotaj — eksik veri:** sayfalama tavanı simüle edildi (çekilen 10 ≠ sunucu 37) →
+   **çıkış 1, hedef dizin hiç oluşmadı.**
+4. **Sabotaj — ölçemediği hâl:** olmayan tablo verildi, kesin sayı alınamadı → **çıkış 1**.
+
+### Sınav sırasında bulunan ve onarılan kusur
+
+İlk sürüm tek fazlıydı: tabloyu okuyup **hemen yazıyordu**. Sabotaj sınavında kapı doğru
+kırmızı verdi ama `brands.jsonl` diskte kaldı — **yarım paket**. Yarım paket USB'ye
+kopyalandığında tam paketten ayırt edilemez ve manifest'i olmadığı için sessizce eksik yüklenir.
+Onarım: iki faz — önce hepsi okunup doğrulanır, **sonra** yazılır. Ya hep ya hiç.
+
+> Kapının kırmızı vermesi yeterli değil; kırmızı verirken **ne bıraktığı** da ölçülmeli.
+
+## Bu paket henüz "taşınabilir katalog" DEĞİL — sınırı
+
+* **Geri yükleyici yok.** Paket, geri yüklenebildiği ölçüde taşınabilirdir; bu yarısı
+  ölçülmemiştir. Geri yükleyici canlıya yazacağı için **Recep kapısındadır**.
+* **Görsel dosyaları pakette yok** — yalnız `product_images.path` yolları var (1042 satır).
+  Görselsiz bir hedefe yüklenirse ürünler görselsiz açılır.
+* **`tenant_id` olduğu gibi taşınır** — başka bir kuruluma yüklenirken yeniden eşlenmelidir.
+* Betik bu üç sınırı **manifest'in içine de yazar**, çünkü paketi açan kişi bu belgeyi
+  okumayabilir.
+
+## Sıradaki adım
+
+Recep'in kendi sıralaması (2026-09-07): *"taşınabilir katalog tarafını halledip sonra benim
+veya senin kontrolümden geçirdikten sonra yüklememiz daha doğru değil mi?"* — yani geri
+yükleyici + doğrulama, yüklemeden önce.
+
+---
+
+## İkinci yarı — geri yükleyici ve ROUND-TRIP kanıtı (aynı gün, 18:xxZ)
+
+`scripts/icerik-hatti/katalog-geri-yukle.mjs` eklendi. **Yazma kolu bilerek kapalı**; betik
+bugün yalnız ölçer.
+
+### Asıl değeri: dışa aktarımın TAMLIĞINI ölçer
+
+Paket canlıdan çıktıysa, aynı canlıya karşı kuru koşum **sıfır fark** vermelidir. Fark
+çıkarsa suçlu geri yükleyici değil, **dışa aktarıcıdır** — bir kolonu ya da tabloyu pakete
+koymamış demektir.
+
+**Ölçüm (2026-09-07):**
+
+| Tablo | Paket | Aynı | Değişik | Yeni | Canlıda fazla |
+|---|---|---|---|---|---|
+| brands | 5 | 5 | 0 | 0 | 0 |
+| categories | 37 | 37 | 0 | 0 | 0 |
+| product_families | 40 | 40 | 0 | 0 | 0 |
+| price_lists | 3 | 3 | 0 | 0 | 0 |
+| products | 375 | 375 | 0 | 0 | 0 |
+| product_prices | 1044 | 1044 | 0 | 0 | 0 |
+| product_images | 1042 | 1042 | 0 | 0 | 0 |
+| **toplam** | **2546** | **2546** | **0** | **0** | **0** |
+
+**ROUND-TRIP: sıfır fark.** Paket bu veritabanını eksiksiz tarif ediyor.
+
+Bu, "dosya üretildi" ile "katalog taşındı" arasındaki farkı gösteren tek ölçümdür.
+
+### Üç sabotaj
+
+| Sınav | Sonuç |
+|---|---|
+| Pakette tek satır değiştirildi | sha256 tutmadı → çıkış 1, hiçbir şey okunmadı |
+| Manifest'siz dizin verildi | reddedildi → çıkış 1 ("hangi tablodan kaç satır beklendiği bilinmeden eksik yükleme, tam yüklemeden ayırt edilemez") |
+| `--yaz` + onay verildi | **yazma kolu açılmadı** → çıkış 1 |
+
+### Yazma kolu niçin kapalı
+
+Yükleme sırası, çakışma kuralı (upsert mi, sil-yaz mı) ve `tenant_id` yeniden eşlemesi
+**karara bağlı**. Kararsız bir yükleyici canlıyı bozar. Betik bunu gizlemiyor: `--yaz`
+verildiğinde sebebini yazıp duruyor.
+
+Yani REC-212 bugün şurada: **paket üretilebiliyor, bütünlüğü doğrulanabiliyor, tamlığı
+kanıtlanmış** — geri yazma, kararlar verildikten sonra ve Recep kapısında.
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-avens-hucreli-siginak-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+
+# İçerik hattı — TR taslak: AVenS Hücreli Aspiratörler + AVenS Sığınak Havalandırma (REC-146, iki paylaşımlı çift)
+
+**Şerit:** URUN-KATALOG · **Marka:** AVenS (**VentHub'ın kendi markası**)
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026 (TR) — **s.28** (hücreli çift) · **s.56** (sığınak çift)
+**Referans biçimi:** `[AVenS s.NN]` = AVenS 2026 fiyat kataloğu (74 sayfa; PDF sayfa no = basılı sayfa no, ölçüldü)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp örneği: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md`.
+
+---
+
+## 0 · Neden bu dört aile birlikte yazıldı
+
+İki **paylaşımlı çift** var: `avens-hucreli-aspiratorler` ile `avens-hucreli-hf-s` **aynı sayfayı**
+(s.28), `avens-siginak-havalandirma-uniteleri` ile `avens-bvu-ls` **aynı sayfayı** (s.56) paylaşıyor.
+Paylaşık sayfayı doğru aileye bölmenin tek dürüst yolu ikisini yan yana yazmaktır; ayıran cümle
+ancak karşılaştırınca görünür. Ayrı yazılsalardı iki hücreli aile de "kayış kasnaklı hücreli radyal
+fan" diye başlayacak, iki sığınak ailesi de "sığınak havalandırma" diye başlayacaktı — vitrinde
+**dört ayrı sayfa, iki cümle** çıkardı.
+
+## 1 · Kaynakta gerçekten ne var (ölçüldü, 2026-09-06)
+
+PyMuPDF `get_text("blocks")` ile s.28 ve s.56 tam çıkarıldı. **Ölçülen hacim çok düşük:**
+
+| Aile | DB slug | Ürün | Kaynak sayfa | Kaynakta bulunan tanıtım metni |
+|---|---|---|---|---|
+| AVenS-HF/FW | `avens-hucreli-aspiratorler` | 6 | s.28 | **1 cümle** + 2 rozet + 6 satırlık tablo |
+| AVenS-HF/S | `avens-hucreli-hf-s` | 7 | s.28 | **1 cümle** + 2 rozet + 7 satırlık tablo |
+| AVenS BVU | `avens-siginak-havalandirma-uniteleri` | 3 | s.56 | **0 cümle**, **6 madde** + 3 satırlık tablo |
+| AVenS BVU-LS | `avens-bvu-ls` | 2 | s.56 | **0 cümle**, 1 dipnot + 2 satırlık tablo |
+
+Katalogda bu ailelere ait **başka sayfa yoktur**: `HF/FW`, `HF/S`, `BVU`, `SIĞINAK`, `KURŞUN`,
+`SEPERATÖR`, `H13`, `serpinti` terimleri 74 sayfanın tamamında tarandı; s.4 ve s.5 (**içindekiler**)
+dışında yalnız s.28 ve s.56'da geçiyor. Yani **üretici föyü yok, elimizdeki her şey bu iki sayfa.**
+
+---
+
+## 2 · AVenS-HF/FW — Sık Kanatlı Kayış Kasnaklı Hücreli Radyal Fanlar
+
+**DB:** `avens-hucreli-aspiratorler` · 6 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> Sık kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi; yüksek debi ve yüksek basınç gerektiren havalandırma uygulamaları için 50 mm standart hücre paneliyle üretilir. [AVenS s.28]
+
+### Maddeler
+* Hücre paneli 50 mm standart; dış cidar elektrostatik toz boyalıdır. [AVenS s.28]
+* Çark statik ve dinamik balans ayarlıdır; kaynak bu ürünleri "yüksek performanslı radyal fanlar" olarak tanımlar. [AVenS s.28]
+* Anma güçleri 1,1 kW ile 5,5 kW arasındadır. [AVenS s.28]
+* Hava debisi 3400 m³/h ile 18000 m³/h arasında; kataloğun basınç sütunu 250 Pa ile 350 Pa arasındadır. [AVenS s.28]
+
+### Model listesi (kaynaktan birebir)
+
+| Kod | Model | Güç | Hava debisi | Basınç kaybı | Ref |
+|---|---|---|---|---|---|
+| 20100 | AVenS-HF/FW 7/7 | 1,1 kW | 3400 m³/h | 250 Pa | [AVenS s.28] |
+| 20110 | AVenS-HF/FW 9/9 | 1,5 kW | 5000 m³/h | 250 Pa | [AVenS s.28] |
+| 20120 | AVenS-HF/FW 10/10 | 2.2 kW | 7000 m³/h | 250 Pa | [AVenS s.28] |
+| 20130 | AVenS-HF/FW 12/12 | 3 kW | 9500 m³/h | 250 Pa | [AVenS s.28] |
+| 20140 | AVenS-HF/FW 15/15 | 4 kW | 14000 m³/h | 250 Pa | [AVenS s.28] |
+| 20150 | AVenS-HF/FW 18/18 | 5,5 kW | 18000 m³/h | 350 Pa | [AVenS s.28] |
+
+*Ondalık ayırıcı (`2.2` ile `1,1`) kaynakta karışıktır; tablo kaynağa birebir sadık bırakıldı — §9 bulgu 3.*
+
+### Yapısal bloklar
+
+**Gövde.** Çift cidar hücreli yapı; 50 mm standart hücre paneli ve elektrostatik toz boyalı dış cidar. [AVenS s.28]
+
+**Çark.** Sık kanatlı radyal çark; statik ve dinamik balans ayarlıdır. [AVenS s.28]
+
+**Motor.** Tahrik **kayış-kasnaklıdır**; anma güçleri 1,1 kW ile 5,5 kW arasında sıralanır. [AVenS s.28]
+*Motor tipi, yalıtım sınıfı, devir ve IP derecesi: **kaynakta karşılığı yok.***
+
+**Koruma.** **Kaynakta karşılığı yok** — s.28'de koruma derecesi, yalıtım sınıfı, yangın/sıcaklık
+dayanımı veya sertifika bilgisi geçmiyor.
+
+**Kontrol.** **Kaynakta karşılığı yok** — hız kademesi, kumanda veya frekans konvertörü bilgisi yok.
+Kaynak yalnız "farklı opsiyonlar için iletişime geçiniz" notunu düşer. [AVenS s.28]
+
+**Montaj.** **Kaynakta karşılığı yok** — montaj biçimi, yön, titreşim sönümleyici veya kanal bağlantısı
+hakkında s.28'de tek satır yok.
+
+---
+
+## 3 · AVenS-HF/S — Seyrek Kanatlı Kayış Kasnaklı Hücreli Radyal Fanlar
+
+**DB:** `avens-hucreli-hf-s` · 7 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> Seyrek kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi; HF/FW ile aynı 50 mm hücre gövdesini kullanır, kapasitesi 25000 m³/h ve 11 kW seviyesine kadar uzanır. [AVenS s.28]
+
+### Maddeler
+* Hücre paneli 50 mm standart; dış cidar elektrostatik toz boyalıdır. [AVenS s.28]
+* Çark statik ve dinamik balans ayarlıdır; kaynak bu ürünleri "yüksek performanslı radyal fanlar" olarak tanımlar. [AVenS s.28]
+* Anma güçleri 1,1 kW ile 11 kW arasındadır. [AVenS s.28]
+* Hava debisi 4000 m³/h ile 25000 m³/h arasında; kataloğun basınç sütunu 250 Pa ile 500 Pa arasındadır. [AVenS s.28]
+
+### Model listesi (kaynaktan birebir)
+
+| Kod | Model | Güç | Hava debisi | Basınç kaybı | Ref |
+|---|---|---|---|---|---|
+| 20200 | AVenS-HF/S 250 | 1,1 kW | 4000 m³/h | 250 Pa | [AVenS s.28] |
+| 20210 | AVenS-HF/S 280 | 1,5 kW | 6000 m³/h | 250 Pa | [AVenS s.28] |
+| 20220 | AVenS-HF/S 315 | 3 kW | 9500 m³/h | 250 Pa | [AVenS s.28] |
+| 20230 | AVenS-HF/S 355 | 4 kW | 12000 m³/h | 250 Pa | [AVenS s.28] |
+| 20240 | AVenS-HF/S 400 | 5.5 kW | 16000 m³/h | 250 Pa | [AVenS s.28] |
+| 20250 | AVenS-HF/S 450 | 7,5 kW | 20000 m³/h | 400 Pa | [AVenS s.28] |
+| 20260 | AVenS-HF/S 500 | 11 kW | 25000 m³/h | 500 Pa | [AVenS s.28] |
+
+### Yapısal bloklar
+
+**Gövde.** HF/FW ile ortak: çift cidar hücreli yapı, 50 mm standart hücre paneli, elektrostatik toz boyalı dış cidar. [AVenS s.28]
+
+**Çark.** **Seyrek kanatlı** radyal çark; statik ve dinamik balans ayarlıdır. [AVenS s.28]
+
+**Motor.** Tahrik **kayış-kasnaklıdır**; anma güçleri 1,1 kW ile 11 kW arasında sıralanır. [AVenS s.28]
+*Motor tipi, yalıtım sınıfı, devir ve IP derecesi: **kaynakta karşılığı yok.***
+
+**Koruma.** **Kaynakta karşılığı yok** — HF/FW ile aynı boşluk.
+
+**Kontrol.** **Kaynakta karşılığı yok.** Kaynak yalnız "farklı opsiyonlar için iletişime geçiniz" notunu düşer. [AVenS s.28]
+
+**Montaj.** **Kaynakta karşılığı yok.**
+
+---
+
+## 4 · ÇİFT 1 — İki hücreli aileyi ayıran cümle
+
+> **AVenS-HF/FW ile AVenS-HF/S aynı hücre gövdesindendir:** ikisi de 50 mm standart hücre paneli, çift cidar yapı, elektrostatik toz boyalı dış cidar ve **kayış-kasnak tahrik** kullanır; ayıran tek şey **kanat sıklığıdır** — HF/FW **sık kanatlı**, HF/S **seyrek kanatlıdır** — ve buna bağlı kapasite bandı: HF/FW 3400 m³/h ile 18000 m³/h arasında ve 5,5 kW seviyesine kadar, HF/S 4000 m³/h ile 25000 m³/h arasında ve 11 kW seviyesine kadar. [AVenS s.28]
+
+**Ayrım kaynakta nerede bulundu:** iki başlık satırının kendisinde —
+`AVenS-HF/FW SIK KANATLI KAYIŞ KASNAKLI HÜCRELİ RADYAL FANLAR` ve
+`AVenS-HF/S SEYREK KANATLI KAYIŞ KASNAKLI HÜCRELİ RADYAL FANLAR`. [AVenS s.28]
+Başlıklardan sonraki tanıtım cümlesi **iki ailede kelimesi kelimesine aynıdır**; rozetler de aynıdır
+(`YÜKSEK DEBİ VE YÜKSEK BASINÇ`, `ÇİFT CİDAR HÜCRELİ`). Yani ayrım **yalnız iki kelimede** yaşıyor:
+*sık* ve *seyrek*. Vitrinde bu iki kelime görünmezse iki sayfa birbirinin kopyası olur.
+
+⚠ **İş emrindeki ipucu ölçümle düştü.** Emir "HF/FW = kayış-kasnaklı, çift emişli; HF/S muhtemelen
+farklı tahrik/çark" diyordu. Kaynak bunu **doğrulamıyor**: **her ikisi de kayış kasnaklıdır** ve
+s.28'de **"çift emişli" ifadesi hiç geçmez**. "Çift emişli" nitelemesi bu katalogda s.55'teki
+**Nicotra Gebhardt RDH** ailesine aittir [AVenS s.55] — **başka markanın metnidir, AVenS'e taşınmadı.**
+Model adındaki çift sayı (7/7, 9/9) kaynakta açıklanmıyor; anlamı **uydurulmadı** (§9 bulgu 1).
+
+---
+
+## 5 · AVenS BVU — Sığınak Havalandırma Üniteleri
+
+**DB:** `avens-siginak-havalandirma-uniteleri` · 3 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> Sığınak havalandırması için kompakt kanal tipi, plug fanlı ve by-pass damperli filtreli havalandırma ünitesi; radyoaktif nükleer serpinti tutucu H13 filtre, G4 kaba filtre ve aktif karbon filtre ile 1200 m³/h ile 3200 m³/h arasında maksimum debi sunar. [AVenS s.56]
+
+### Maddeler (kaynaktaki altı maddenin tamamı)
+* Radyoaktif nükleer serpinti tutucu filtre H13. [AVenS s.56]
+* G4 kaba filtre. [AVenS s.56]
+* Aktif karbon filtre. [AVenS s.56]
+* Kompakt kanal tipi. [AVenS s.56]
+* By-pass damperli. [AVenS s.56]
+* Plug fanlı. [AVenS s.56]
+
+### Model listesi (kaynaktan birebir)
+
+| Kod | Model | Maks. debi | Ref |
+|---|---|---|---|
+| 30100 | BVU 1000-230W | 1200 m³/h | [AVenS s.56] |
+| 30101 | BVU 2000-310W | 2000 m³/h | [AVenS s.56] |
+| 30102 | BVU 3000-430W | 3200 m³/h | [AVenS s.56] |
+
+### Yapısal bloklar
+
+**Gövde.** Kompakt kanal tipi ünite gövdesi; kaynak ünitenin maksimum debisini 1200 m³/h ile 3200 m³/h arasında verir. [AVenS s.56]
+*Gövde malzemesi, sac kalınlığı, yalıtım ve boya: **kaynakta karşılığı yok.***
+
+**Çark.** Ünite **plug fanlıdır**. [AVenS s.56]
+*Çark çapı, kanat yönü (öne/geriye eğimli) ve malzeme: **kaynakta karşılığı yok.***
+
+**Motor.** **Kaynakta karşılığı yok** — model adındaki `230W` / `310W` / `430W` eklerinin motor gücü
+olduğu s.56'da hiçbir yerde yazmıyor; model kodunun parçası olarak duruyor ve anlamı **varsayılmadı**
+(§9 bulgu 5).
+
+**Koruma.** Filtreleme kademeleri: radyoaktif nükleer serpinti tutucu H13 filtre, G4 kaba filtre ve aktif karbon filtre. [AVenS s.56]
+*Koruma derecesi, yangın sınıfı, sızdırmazlık sınıfı ve **sığınak/NBC mevzuatına uygunluk beyanı:
+kaynakta karşılığı yok** — mevzuat iddiası yazılmadı.*
+
+**Kontrol.** Hava yolunda **by-pass damperi** bulunur. [AVenS s.56]
+*Elektriksel kumanda, kontrol paneli, hız kademesi ve sensör: **kaynakta karşılığı yok.***
+
+**Montaj.** Ünite **kanal tipidir**. [AVenS s.56]
+*Montaj yönü, askı/ayak ve servis erişimi: **kaynakta karşılığı yok.***
+
+---
+
+## 6 · AVenS BVU-LS — Opsiyonel Kurşun Seperatör
+
+**DB:** `avens-bvu-ls` · 2 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> AVenS BVU Sığınak Havalandırma Üniteleri ile birlikte kullanılan **opsiyonel kurşun seperatör**; tek başına çalışan bir ünite değil, bir BVU modeline eşlenen aksesuardır. [AVenS s.56]
+
+### Maddeler
+* Kaynak bu ürünü "AVENS BVU-LS OPSİYONEL KURŞUN SEPERATÖR" başlığıyla tanımlar. [AVenS s.56]
+* Kaynak, ürünün AVenS BVU Sığınak Havalandırma Üniteleri ile **birlikte** kullanıldığını belirtir. [AVenS s.56]
+* Kataloğun tablosunda her seperatör için "uygun model" sütunu vardır; eşleşme BVU-LS 1000 için BVU 1000, BVU-LS 2000/3000 için BVU 2000/3000'dir. [AVenS s.56]
+
+### Model listesi (kaynaktan birebir)
+
+| Kod | Model | Uygun model | Ref |
+|---|---|---|---|
+| 30110 | BVU-LS 1000 | BVU 1000 | [AVenS s.56] |
+| 30111 | BVU-LS 2000/3000 | BVU 2000/3000 | [AVenS s.56] |
+
+### Yapısal bloklar
+
+**Gövde.** **Kaynakta karşılığı yok** — s.56'da BVU-LS için gövde, ölçü veya malzeme bilgisi yok.
+
+**Çark.** **Kaynakta karşılığı yok** — seperatörün hareketli parçası olup olmadığı bile yazmıyor.
+
+**Motor.** **Kaynakta karşılığı yok.**
+
+**Koruma.** **Kaynakta karşılığı yok.** Ürün adı "kurşun seperatör"dür; seperatörün neyi, hangi
+mekanizmayla ayırdığı, kurşunun nerede ve ne kalınlıkta bulunduğu ya da hangi radyasyon türüne karşı
+olduğu **kaynakta yazmıyor** ve **uydurulmamıştır** (§9 bulgu 6).
+
+**Kontrol.** **Kaynakta karşılığı yok.**
+
+**Montaj.** BVU ünitesiyle birlikte kullanılır; eşleşme kataloğun "uygun model" sütununda verilmiştir. [AVenS s.56]
+
+---
+
+## 7 · ÇİFT 2 — İki sığınak ailesini ayıran cümle
+
+> **AVenS BVU bir havalandırma ünitesidir; AVenS BVU-LS ise o üniteye eklenen opsiyonel bir aksesuardır.** BVU, H13 serpinti tutucu, G4 kaba ve aktif karbon filtre kademelerini, plug fanını ve by-pass damperini kendi kompakt kanal tipi gövdesinde taşıyıp 1200 m³/h ile 3200 m³/h arasında maksimum debi verir; BVU-LS'in ise kendi debisi, fanı ve filtresi yoktur — kataloğun "uygun model" sütunuyla bir BVU modeline eşlenir ve **onunla birlikte** kullanılır. [AVenS s.56]
+
+**Ayrım kaynakta nerede bulundu:** s.56'da BVU tablosunun sütun başlığı `MAKS. DEBİ`, BVU-LS
+tablosununki `UYGUN MODEL`'dir; ayrıca BVU-LS başlığı **"OPSİYONEL"** kelimesiyle başlar ve altında
+`* AVenS BVU Sığınak Havalandırma Üniteleri ile birlikte kullanılır.` dipnotu vardır. [AVenS s.56]
+Altı maddelik özellik listesi sayfada **BVU bloğunun içindedir**, BVU-LS'e ait değildir; bu ayrımı
+blok koordinatlarıyla ölçtüm (maddeler y≈194, BVU-LS başlığı y≈462).
+
+---
+
+## 8 · Boş kalan bloklar — tek bakışta
+
+| Blok | HF/FW | HF/S | BVU | BVU-LS |
+|---|---|---|---|---|
+| Gövde | dolu | dolu | kısmi | **BOŞ** |
+| Çark | dolu | dolu | kısmi | **BOŞ** |
+| Motor | kısmi (yalnız güç + tahrik) | kısmi (yalnız güç + tahrik) | **BOŞ** | **BOŞ** |
+| Koruma | **BOŞ** | **BOŞ** | dolu (filtre kademeleri) | **BOŞ** |
+| Kontrol | **BOŞ** | **BOŞ** | kısmi (by-pass damperi) | **BOŞ** |
+| Montaj | **BOŞ** | **BOŞ** | kısmi (kanal tipi) | kısmi (BVU ile birlikte) |
+
+**24 blok hücresinin 12'si tamamen boş.** Sebep tek: kaynak bir **fiyat listesidir**, teknik föy değildir.
+
+---
+
+## 9 · Kaynakta bulduklarım (K7.5 — hepsi kayıtta)
+
+1. **`7/7`, `9/9`, `10/10` gibi model adlarındaki çift sayının anlamı kaynakta açıklanmıyor.**
+   Sektörde bu genellikle çark ölçüsünü ifade eder ama s.28'de böyle bir açıklama **yoktur** — yazılmadı.
+2. **İş emrindeki "HF/FW kayış-kasnaklı, HF/S farklı tahrik" varsayımı yanlıştır.** Kaynak iki aileyi de
+   `KAYIŞ KASNAKLI` diye adlandırır; gerçek fark `SIK KANATLI` ile `SEYREK KANATLI` arasındadır. [AVenS s.28]
+3. **Ondalık ayırıcı kaynakta tutarsız:** aynı tabloda `1,1KW`, `2.2KW`, `5.5KW`, `7,5KW` biçimleri
+   birlikte kullanılmış. [AVenS s.28] Otomatik ayrıştırmada tuzak; tablolarda kaynağa birebir sadık kalındı.
+4. **Kaynak yazım hatası:** `AVENS-HF/FW 18/18` satırında güç `5,5K` yazılmış, birimin `W` harfi eksik.
+   [AVenS s.28] Bağlamdan kW olduğu açık; taslakta 5,5 kW yazıldı, kaynak hatası burada kayıtlı.
+   Ayrıca sütun başlığı **"BASINÇ KAYBI"**dır; bir fan kataloğunda beklenen başlık "basınç"tır — değer
+   birebir aktarıldı, başlık **düzeltilmedi**, üreticide doğrulanmalı.
+5. **BVU model adlarındaki `230W`, `310W`, `430W` eklerinin ne olduğu yazmıyor.** Motor gücü olduğu
+   **varsayılmadı**; makul görünse de bu bir çıkarımdır, kaynak değildir.
+6. **"Kurşun seperatör"ün işlevi kaynakta hiç anlatılmıyor.** Ne ayırdığı, kurşunun nerede/ne kalınlıkta
+   olduğu, hangi radyasyon türüne karşı olduğu yazmıyor. Sığınak/NBC mevzuatına atıf da yoktur —
+   mevzuat cümlesi yazılmadı.
+7. **Katalogda bu dört aile için başka sayfa yok.** 74 sayfa tarandı; ilgili terimler yalnız içindekiler
+   (s.4, s.5) ile s.28 ve s.56'da geçiyor. Üretici föyü **elimizde değil**.
+
+## 10 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR.
+* **Ses (dB), ağırlık, boyut, koruma/yalıtım sınıfı hiçbir ailede yok** — kaynakta yok, uydurulmadı.
+* **`is_description_manual`** yüklemede **true** yapılmalı; aksi halde bir sonraki otomatik tur bunu ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+* **Üretici föyü ihtiyacı:** dört ailenin de satılabilir sayfa olması için AVenS teknik föyü gerekir.
+  Föy yoksa "kendi metnimizi yazalım mı" kararı **Recep'e** gider — AVenS'in bizim markamız olması bu
+  taslakta uydurma izni olarak **kullanılmadı.**
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-avens-isitici-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+
+# İçerik hattı — TR taslak: AVenS Elektrikli Isıtıcılar · AVenS Sulu Batarya · AVenS Hız Anahtarları
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** REC-146 Adım 2b, AVenS ısıtıcı/anahtar grubu
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026 (TR) — s.69 (ısıtıcı çifti) · s.27, s.36 (hız anahtarı)
+**Referans biçimi:** `[AVenS s.NN]` = AVenS 2026 fiyat listesi PDF sayfası (PDF indeksi = basılı sayfa no; ölçüldü)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.1** (varyant metni yazılır, yüklenmez) · **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp örneği: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md`.
+
+## 0 · Bu üçü niçin bir arada yazıldı — ve okurun bilmesi gereken sınır
+
+Elektrikli ısıtıcılar ile sulu bataryalar TR fiyat listesinde **aynı sayfayı (s.69) paylaşır**; iki ayrı
+tablo hâlinde, ortak bir "ISI GERİ KAZANIM CİHAZLARI" başlığı altında. Ayrı ayrı yazılsalardı ikisi de
+"AVenS ısı geri kazanım cihazları için ısıtıcı" diye başlar ve vitrinde **iki ayrı aile tek cümleyle**
+çıkardı. Ayıran cümle ancak yan yana yazınca görünür (§4).
+
+**Dürüst sınır — bu turun en önemli cümlesi:** AVenS fiyat listesi bir **fiyat listesidir**, teknik föy
+değildir. Bu üç ailede kaynak, tablolardaki **model / güç / debi / eşleşme** verisi ile **üç** kısa
+anlatım cümlesinden ibarettir. Gövde malzemesi, koruma sınıfı, ısıtıcı rezistans tipi, batarya
+boru/kanat malzemesi, su bağlantı ölçüsü, basınç kaybı, hız anahtarı montaj biçimi — **hiçbiri kaynakta
+yoktur**. O bloklar bu taslakta **boştur ve boş kalmalıdır**. AVenS'in kendi markamız olması bu boşluğu
+doldurma izni değildir; **eksik olan, eksik diye raporlanır** (§6, §7).
+
+## 1 · Bugün DB'de ne var
+
+| Aile | Ürün | `description.tr` | Durum |
+|---|---|---|---|
+| `avens-elektrikli-isiticilar` | 6 | **BOŞ** | sıfırdan yazılıyor |
+| `avens-sulu-batarya` | 8 | **BOŞ** | sıfırdan yazılıyor |
+| `avens-hiz-anahtarlari` | 2 | **BOŞ** | sıfırdan yazılıyor |
+
+---
+
+## 2 · AVenS Elektrikli Isıtıcılar
+
+**DB:** `avens-elektrikli-isiticilar` · 6 ürün · 3 / 6 / 9 / 12 / 15 / 18 kW · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> AVenS ısı geri kazanım cihazlarıyla birlikte kullanılan, trifaze 380V 50Hz beslemeli elektrikli ısıtıcı serisi. [AVenS s.69]
+
+### Maddeler
+* Altı güç kademesi: 3 kW, 6 kW, 9 kW, 12 kW, 15 kW ve 18 kW. [AVenS s.69]
+* Her kademe belirli bir hava debisiyle eşleştirilmiştir: en küçük model 1000 m³/h, en büyük model 5000 m³/h. [AVenS s.69]
+* Uygun AVenS cihaz eşleşmesi tabloda verilir — 3 kW için AVenS 750 - 1000, 18 kW için AVenS 5000. [AVenS s.69]
+* Kontrol paneli ile birlikte kullanılır. [AVenS s.69]
+
+### Model tablosu (kaynaktan birebir)
+
+| Kod | Model | Debi | Isıtıcı gücü | Uygun model |
+|---|---|---|---|---|
+| 13037 | 3 KW ELEKTRİKLİ ISITICI | 1000 m³/h | 3kW | AVenS 750 - 1000 |
+| 13032 | 6 KW ELEKTRİKLİ ISITICI | 2000 m³/h | 6kW | AVenS 1500 - 2000 - 2500 |
+| 13033 | 9 KW ELEKTRİKLİ ISITICI | 3000 m³/h | 9kW | AVenS 3000 - 3500 |
+| 13034 | 12 KW ELEKTRİKLİ ISITICI | 4000 m³/h | 12kW | AVenS 4000 |
+| 13038 | 15 KW ELEKTRİKLİ ISITICI | 5000 m³/h | 15W (kaynak hatası) | AVenS 5000 |
+| 13039 | 18 KW ELEKTRİKLİ ISITICI | 5000 m³/h | 18W (kaynak hatası) | AVenS 5000 |
+
+Kaynakta güç sütunu son iki satırda `15W` / `18W` yazar; model adı `15 KW` / `18 KW`'dır. **Kaynak
+hatası olarak kayda geçirildi, düzeltilmedi** (§6-1).
+
+### Yapısal bloklar
+
+**Gövde.** *Kaynakta karşılığı yok — boş.* Fiyat listesi ısıtıcının gövde malzemesini, kabin yapısını
+veya ölçüsünü vermez.
+
+**Çark.** *Bu ürün tipi için geçersiz.* Elektrikli ısıtıcı bir fan değildir; çarkı yoktur, havayı
+kendisi hareket ettirmez — bağlı olduğu ısı geri kazanım cihazının debisiyle eşleştirilir. [AVenS s.69]
+
+**Motor.** *Bu ürün tipi için geçersiz.* Isıtıcının motoru yoktur.
+
+**Koruma.** *Kaynakta karşılığı yok — boş.* IP sınıfı, termik/aşırı ısınma koruması ve yangın sınıfı
+fiyat listesinde belirtilmemiştir.
+
+**Kontrol.** Elektrikli ısıtıcı kontrol paneli ile birlikte kullanılır. [AVenS s.69]
+
+**Montaj.** *Kaynakta montaj biçimi verilmemiştir.* Fiyat listesi yalnız **cihaz eşleşmesini** verir:
+her güç kademesinin karşısında uygun AVenS modeli yazılıdır, AVenS 750'den AVenS 5000'e. [AVenS s.69]
+
+---
+
+## 3 · AVenS Sulu Batarya
+
+**DB:** `avens-sulu-batarya` · 8 ürün · 7 / 8 / 11 / 14 / 20 / 28 / 36 / 40 kW · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> AVenS ısı geri kazanım cihazlarıyla birlikte kullanılan, 90/70 °C sıcak su ile çalışan kanal tipi sulu ısıtma bataryası serisi. [AVenS s.69]
+
+### Maddeler
+* Sekiz kapasite kademesi: 7 kW'tan 40 kW'a. [AVenS s.69]
+* Isıtma kapasitesi 90/70 °C su rejiminde Kcal/h olarak verilir; 7 kW modelde 4700, 40 kW modelde 47300 Kcal/h. [AVenS s.69]
+* Her kademe belirli bir hava debisiyle eşleştirilmiştir: en küçük model 750 m³/h, en büyük modeller 5000 m³/h. [AVenS s.69]
+* Kontrol paneli ile birlikte kullanılır. [AVenS s.69]
+
+### Model tablosu (kaynaktan birebir)
+
+| Kod | Model | Debi | Isıtıcı gücü (Kcal/h) 90/70 °C | Uygun model |
+|---|---|---|---|---|
+| 13050 | SULU BATARYA 7 KW KANAL TİPİ | 750 m³/h | 4700 | AVenS 750 |
+| 13051 | SULU BATARYA 8 KW KANAL TİPİ | 1000 m³/h | 7000 | AVenS 1000 |
+| 13052 | SULU BATARYA 11 KW KANAL TİPİ | 1500 m³/h | 11300 | AVenS 1500 |
+| 13053 | SULU BATARYA 14 KW KANAL TİPİ | 2000 m³/h | 20700 | AVenS 2000 |
+| 13054 | SULU BATARYA 20 KW KANAL TİPİ | 3000 m³/h | 33000 | AVenS 3000 |
+| 13055 | SULU BATARYA 28 KW KANAL TİPİ | 4000 m³/h | 37400 | AVenS 4000 |
+| 13056 | SULU BATARYA 36 KW KANAL TİPİ | 5000 m³/h | 42500 | AVenS 5000 |
+| 13057 | SULU BATARYA 40 KW KANAL TİPİ | 5000 m³/h | 47300 | AVenS 5000 |
+
+### Yapısal bloklar
+
+**Gövde.** *Kaynakta karşılığı yok — boş.* Batarya gövdesi, boru/kanat malzemesi (bakır-alüminyum vb.),
+sıra sayısı ve su bağlantı ölçüsü fiyat listesinde verilmemiştir.
+
+**Çark.** *Bu ürün tipi için geçersiz.* Sulu batarya bir fan değildir; çarkı yoktur.
+
+**Motor.** *Bu ürün tipi için geçersiz.* Bataryanın motoru yoktur.
+
+**Koruma.** *Kaynakta karşılığı yok — boş.* Donma koruması, test basıncı ve IP sınıfı belirtilmemiştir.
+
+**Kontrol.** Sulu bataryalar kontrol paneli ile birlikte kullanılır. [AVenS s.69]
+
+**Montaj.** Model adları bataryayı **kanal tipi** olarak tanımlar. [AVenS s.69] Fiyat listesi bunun
+ötesinde montaj yönü, servis boşluğu veya kanal bağlantı ölçüsü vermez — *o kısım boş.*
+
+---
+
+## 4 · İki aileyi ayıran cümle (paylaşık sayfanın çözümü)
+
+> **Elektrikli ısıtıcı ile sulu batarya aynı işi yapar — havayı ısıtır — ama enerjiyi farklı yerden alır.** Elektrikli ısıtıcı ısıyı trifaze 380V 50Hz elektrikten üretir ve gücü doğrudan kW ile anılır; sulu batarya ısıyı 90/70 °C sıcak sudan alır ve kapasitesi Kcal/h ile verilir. [AVenS s.69]
+
+İkisi de aynı AVenS cihaz ailesine (AVenS 750 – AVenS 5000) eşleştirilir ve ikisi de kontrol paneli ile
+birlikte kullanılır; seçim ürünün kendisinde değil, **binada hazır bir sıcak su kaynağı olup olmadığında**
+düğümlenir. [AVenS s.69] Vitrinde bu farkın görünmesi, iki aileyi ayıran yegâne şeydir — "ısıtıcı"
+kelimesi tek başına ikisini de anlatır ve müşteriyi yanlış aileye götürür.
+
+---
+
+## 5 · AVenS Hız Anahtarları
+
+**DB:** `avens-hiz-anahtarlari` · 2 ürün — AVenS 2,5 A HIZ ANAHTARI (kod 60006) · AVenS 5 A HIZ ANAHTARI
+(kod 01801) · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> AVenS fanlarının devrini ayarlamak için kullanılan, maksimum akım değerine göre iki boy sunulan hız anahtarı: 2,5 A ve 5 A. [AVenS s.27, 36]
+
+### Maddeler
+* AVenS 2,5 A hız anahtarı (kod 60006), dikdörtgen kanal tipi radyal fanlarda 1100 m³/h ile 2520 m³/h arası modellerin (AVENS 40x20, 50x25, 60x30) hız anahtarıdır. [AVenS s.27]
+* AVenS 5 A hız anahtarı (kod 01801), 4100 m³/h ve 6000 m³/h modellerin (AVENS 60x35, 70x40) hız anahtarıdır. [AVenS s.27]
+* Davlumbaz fanlarında da eşleşir: VORT QBK SAL KC EVO 315 M4 ve 355 M4 modellerinde (2540 m³/h ve 3540 m³/h) 2,5A, 400 M4 modelinde (5240 m³/h) 5A. [AVenS s.36]
+* Hız anahtarının kapsadığı sınırın üstünde frekans konvertörüne geçilir; 7000 m³/h ve 9500 m³/h modellerde FC 101-1.5kW ve FC 101-2.2kW. [AVenS s.27]
+
+### Model tablosu (kaynaktan birebir)
+
+| Kod | Model | Maks. akım |
+|---|---|---|
+| 60006 | AVenS 2,5 A HIZ ANAHTARI | 2.5 A |
+| 01801 | AVenS 5 A HIZ ANAHTARI | 5 A |
+
+### Yapısal bloklar
+
+**Gövde.** *Kaynakta karşılığı yok — boş.* Kutu malzemesi, ölçü ve renk verilmemiştir.
+
+**Çark.** *Bu ürün tipi için geçersiz.* Hız anahtarı bir kumanda elemanıdır; çarkı yoktur.
+
+**Motor.** *Bu ürün tipi için geçersiz.* Hız anahtarının motoru yoktur; ürün **kumanda ettiği fanın**
+motoruna maksimum akım sınırı üzerinden bağlanır.
+
+**Koruma.** *Kaynakta karşılığı yok — boş.* Sigorta/termik koruma, IP sınıfı ve EMC uygunluğu bu iki
+ürün için fiyat listesinde belirtilmemiştir. (⚠ s.22–23'teki "sıva üstü montaj, sigorta korumalı,
+minimum hız ayarı, On/Off anahtarı" tanımı **POT / POT-IT** hız anahtarlarına aittir, AVenS 2,5A/5A'ya
+değil — taşınmadı; §6-3.)
+
+**Kontrol.** Ürünün kendisi kontrol elemanıdır: fanın devrini ayarlar. Kaç kademe sunduğu ve ayar biçimi
+(potansiyometre mi kademe anahtarı mı) **kaynakta yazmıyor** — *o kısım boş.*
+
+**Montaj.** *Kaynakta karşılığı yok — boş.* Montaj biçimi (sıva üstü/altı) ve pano/duvar tipi
+belirtilmemiştir.
+
+### Seçim kuralı (kaynaktan türetilen tek cümle)
+> Hız anahtarı fanın modeline göre eşleştirilir: kataloğun eşleşme sütunu 2520 m³/h modele kadar 2,5 A anahtarı, 6000 m³/h modele kadar 5 A anahtarı gösterir; üstünde frekans konvertörü yazar. [AVenS s.27]
+
+---
+
+## 6 · Kaynakta bulduklarım (K7.5 — hepsi kayıtta)
+
+1. **Kaynakta birim hatası:** s.69 elektrikli ısıtıcı tablosunun "ISITICI GÜCÜ (kW)" sütununda son iki
+   satır `15W` ve `18W` yazar; model adları `15 KW ELEKTRİKLİ ISITICI` ve `18 KW ELEKTRİKLİ ISITICI`'dır.
+   Doğrusu **15 kW / 18 kW**. Taslakta model adı esas alındı, hatalı hücre **düzeltilmeden** kayda geçti.
+2. **Sulu batarya Kcal/h dizisi doğrusal değil:** 7 kW→4700, 8 kW→7000, 11 kW→11300, **14 kW→20700**,
+   20 kW→33000, 28 kW→37400, 36 kW→42500, 40 kW→47300. 14 kW satırındaki sıçrama (11300→20700) ve
+   28 kW sonrası yavaşlama kaynakta böyledir. **Birebir aktarıldı, düzeltilmedi** — ama kW ile Kcal/h
+   oranı satırdan satıra tutarsız olduğu için bu sütun **bağımsız doğrulama ister**; vitrinde bu
+   sayılar tek tek gösterilecekse önce föyle karşılaştırılmalıdır.
+3. **s.22–23'teki hız anahtarı tanımı bizim ürünümüzün değil:** "Sıva üstü montaj, sigorta korumalı,
+   minimum hız ayarı, On/Off anahtarı" cümlesi **POT-IT (kod 12826) / POT (kod 12828)** ürünlerinin
+   altındadır; AVenS 2,5A/5A ile ilgisi yoktur. LINEO taslağında bu cümle doğru yerde kullanılmıştı;
+   **buraya taşınmadı.** Taşınsaydı doğru görünen bir uydurma olurdu.
+4. **Aynı ürün iki farklı yazımla geçiyor:** `AVenS 2,5 A HIZ ANAHTARI` (s.27) ile `AVenS 2,5A HIZ
+   ANAHTARI` / `AVENS 5A HIZ ANAHTARI` (s.36) — boşluk ve büyük harf farkı. Kodlar aynı (60006 / 01801),
+   yani tek üründür. Otomatik eşleştirmede tuzak.
+5. **Marka yazımı kararsız:** s.69 sulu batarya tablosunda "uygun model" hücreleri `AvenS 750` (küçük v),
+   elektrikli ısıtıcı tablosunda `AVenS 750` biçimindedir.
+6. **s.68 bağlamı (taslakta KULLANILMADI, kayıtta):** Elektrikli ısıtıcı, s.68'de ısı geri kazanım
+   cihazlarının "ELEKTRİKLİ ISITICI (Opsiyonel)" sütunu olarak da geçer ve s.69'daki eşleşmeyle birebir
+   tutarlıdır (750/1000→3kW, 1500/2000/2500→6kW, 3000/3500→9kW, 4000→12kW, 5000→15-18kW). Ayrıca s.68
+   "AVenS Isı Geri Kazanım Cihazlarına Dijital Kontrol Panosu Fiyata Dahildir" der — s.69'daki "kontrol
+   paneli"nin bu pano olduğu **ölçülmedi, varsayılmadı**. Emir s.69 ile sınırlıydı; s.68 taslakta
+   referans olarak kullanılmadı, yalnız burada not edildi.
+
+## 7 · Bu taslağın kapatmadığı (föy şart olan kalemler)
+
+* **Elektrikli ısıtıcı:** rezistans tipi, gövde/kabin malzemesi, termik emniyet (aşırı ısınma
+  termostatı), IP sınıfı, hava hızı alt sınırı ve kanal bağlantı ölçüsü — **hiçbiri kaynakta yok**.
+* **Sulu batarya:** sıra sayısı, boru/kanat malzemesi, su bağlantı çapı, su ve hava tarafı basınç kaybı,
+  test basıncı, donma koruması — **hiçbiri kaynakta yok**.
+* **Hız anahtarı:** besleme gerilimi, kademe sayısı, ayar biçimi, montaj biçimi, kutu ölçüsü, IP sınıfı,
+  minimum hız ayarı olup olmadığı — **hiçbiri kaynakta yok**. Bu ailenin altı bloğundan dördü tümüyle boş.
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` ayrı tur ister.
+* **`is_description_manual`** bugün her ailede `false`. Elle yazılan bu metin yüklenirse **true**
+  yapılmalı; aksi halde bir sonraki otomatik tur ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+## 8 · Kapı ölçümü ve sabotaj sınavı (2026-09-06)
+
+`scripts/icerik-hatti/taslak-kaynak-kapisi.py <bu dosya> --ayrinti`
+
+| Ölçüm | Sonuç |
+|---|---|
+| Durum | **YEŞİL** (çıkış kodu 0) |
+| Doğrulanan iddia | 14 |
+| Düşen | 0 |
+| Ölçülemeyen (jeton taşımayan cümle) | 9 |
+| Kapsama | **%61** |
+| Referans sayısı | 23 (hepsi adlı, `[AVenS s.NN]`) |
+
+**Sabotaj sınavı — kapı gerçekten ayırt ediyor mu?** Taslağın kopyasında iki sayı kasten bozuldu:
+`4100 m³/h` → `4800 m³/h` (s.27'de geçmeyen debi) ve `18 kW` → `22 kW` (s.69'da geçmeyen güç).
+Kapı **KIRMIZI** verdi, çıkış kodu 1, **her iki bozmayı da tek tek adlandırdı**:
+"sayfada YOK: 22 kW" ve "sayfada YOK: 4800 m³/h". Yani bu dosyadaki yeşil, "bakmadım" yeşili değil.
+
+**Kapının bu dosyada ölçülen kör noktası (yeni bulgu, 2026-09-06):** kaynak sayfada derece işareti
+**U+00BA (masculine ordinal, `º`)** olarak geçiyor, taslakta doğru tipografi **U+00B0 (`°`)** kullanıldı.
+Kapı bunu yine de **doğruladı** — ama tam eşleşmeyle değil, `bulundu()` içindeki *sayı-yalnız* geri
+düşüşüyle: "70 °C" jetonu bulunamayınca yalnız "70" arandı ve sayfada bulundu. Sonuç bu satırda doğru,
+**ama ölçüt zayıf**: aynı geri düşüş "70 °F" ya da "70 bar" yazsaydı da yeşil verirdi. **Birim hataları
+bu kapıda görünmez.** (İlgili: `agrega-sayi-ters-gideni-gizler`, `olcut-keskin-ama-evren-yanlis`.)
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-avens-plug-hrv-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+
+# İçerik hattı — TR taslak: AVenS KENTALFAN plug fanlar · AVenS ısı geri kazanım cihazları
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Kaynak:** AVenS 2026 ürün fiyat kataloğu (TR) — plug fanlar **s.50, 51**, ısı geri kazanım **s.68**
+(ek ürünler s.69) · **Referans biçimi:** `[AVenS s.NN]`
+**AVenS = VentHub'ın kendi markasıdır** — bu, kaynakta olmayanı yazma izni değildir; her cümle sayfaya bağlıdır.
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; **yanlış kapsamlı bilgi de vaat ihlalidir**.
+* Kararlar — Vitrin 15A **K6** · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok.
+* `icerik-hatti-taslak-heatmaster-slimroof-2026-09-06.md` — kalıp ve tek-model kusuru örneği.
+
+---
+
+## 0 · Bu grupta ne düzeltiliyor
+
+| Aile | Bugün DB'de yazan | Kaynaktaki gerçek |
+|---|---|---|
+| `avens-plug-fanlar` | "**315 mm** nominal çaplı", "**trifaze** model" (14 üründe tek şablon) | seri **315–630** boy · **3 monofaze + 11 trifaze** · 2590–22550 m³/h |
+| `avens-isi-geri-kazanim` | açıklama **BOŞ** | 750 / 1000 / 2000 m³/h · alüminyum eşanjör · G4 filtre · plug fan |
+
+Plug fan metninde serinin **en küçük** modeli, serinin tamamı gibi sunulmuş; ayrıca faz bilgisi
+14 ürünün hepsinde aynı yazılmış hâlde. Taslak bunu **aralık vererek** düzeltir.
+
+---
+
+## 1 · AVenS KENTALFAN — IEC motorlu plug fanlar
+
+**DB:** `avens-plug-fanlar` · **14 ürün** · KENTALFAN 315 / 355 / 400 / 450 / 500 / 560 / 630
+
+### Kimlik cümlesi
+
+> Klima santralleri, ısı geri kazanım cihazları ve plenum kutuları için geliştirilmiş; geriye eğik kanatlı, tek emişli, doğrudan tahrikli IEC motorlu plug fan serisidir. [AVenS s.50]
+
+### Dört madde
+
+* Seride 14 model bulunur; hava debisi 2590 m³/h ile 22550 m³/h arasında değişir. [AVenS s.50]
+* Motor gücü 0,25 kW ile 5,5 kW arasındadır. [AVenS s.50]
+* Üç model monofaze (M4), on bir model trifazedir (T2 / T4 / T6 sürümleri). [AVenS s.50, 51]
+* IP-55 korumalı ve F sınıfı elektrik yalıtımlı, IEC standartlı asenkron motorla sunulur. [AVenS s.50, 51]
+
+### Yapısal bloklar
+
+**Gövde.** Gövde malzemesi, kaplaması ve yapısı için **kaynakta karşılığı yok** — s.50 ve s.51 yalnız model, kod, elektriksel değer ve ağırlık verir. Seri ağırlıkları 15 kg ile 82 kg arasındadır. [AVenS s.51]
+
+**Çark.** Geriye eğik kanatlı, tek emişli, yüksek performanslı çark. [AVenS s.50] Seri KENTALFAN 315'ten KENTALFAN 630'a kadar boy numaralarıyla sunulur. [AVenS s.50] Bu boy numaralarının "nominal çap (mm)" karşılığı fiyat listesinde açıkça yazmaz; canlı veride 315–630 mm nominal çap olarak kayıtlıdır. [DB] Kanat sayısı, çark malzemesi ve emiş ağzı ölçüsü kaynakta verilmemiştir.
+
+**Motor.** Doğrudan tahrikli, IEC standartlı asenkron motor. [AVenS s.50] Monofaze modeller 4 kutupludur ve 230 V ile listelenir; trifaze modeller 2, 4 ve 6 kutuplu sürümler hâlinde 230 V / 400 V değerleriyle verilir. [AVenS s.51] Devir sayısı 900 ile 1460 arasında değişir (d/dk). [AVenS s.51] Motor gücü 0,25 kW ile 5,5 kW arasındadır. [AVenS s.50, 51]
+
+**Koruma.** IP-55 koruma derecesi ve F sınıfı elektrik yalıtımı. [AVenS s.50, 51] Çalışma sıcaklığı aralığı, ATEX ya da duman sertifikası ve emniyet şalteri gibi kalemler için **kaynakta karşılığı yok** — s.49'daki sıcaklık değerleri **başka bir aileye (ENKELFAN EC)** aittir, bu seriye taşınmadı.
+
+**Kontrol.** **Kaynakta karşılığı yok** — s.50 ve s.51'de hız kontrolü, frekans sürücüsü, sinyal girişi ya da kontrol panosu hakkında hiçbir ifade bulunmuyor.
+
+**Montaj.** Doğrudan tahrikli OEM fan olarak sunulur; uygulama alanları klima santralleri, ısı geri kazanım cihazları ve plenum kutularıdır. [AVenS s.50, 51] Montaj plakası, delik deseni, flanş ve gabari ölçüleri kaynakta verilmemiştir.
+
+---
+
+## 2 · AVenS alüminyum eşanjörlü ısı geri kazanım cihazları
+
+**DB:** `avens-isi-geri-kazanim` · **3 ürün** · AVenS 750 / 1000 / 2000
+
+### Kimlik cümlesi
+
+> Eurovent sertifikalı alüminyum eşanjör, G4 filtre ve plug fan ile kurulmuş, kanal bağlantılı ısı geri kazanım cihazı ailesidir. [AVenS s.68]
+
+### Dört madde
+
+* Vitrindeki üç modelin nominal hava debileri 750 m³/h, 1000 m³/h ve 2000 m³/h'tir; model adındaki sayı **debiyi** gösterir. [AVenS s.68]
+* Eurovent sertifikalı alüminyum eşanjör, G4 filtre ve plug fanlı yapı. [AVenS s.68]
+* Opsiyonel elektrikli ısıtıcı gücü AVenS 750 ve AVenS 1000 için 3 kW, AVenS 2000 için 6 kW olarak verilir. [AVenS s.68]
+* Cihazlar dijital kontrol panosuyla birlikte sunulur. [AVenS s.68]
+
+### Yapısal bloklar
+
+**Gövde.** AVenS 750 ve AVenS 1000 gövde ölçüleri (L × W × H) 910 mm × 815 mm × 350 mm'dir. [AVenS s.68] AVenS 2000 gövde ölçüsü 1400 mm × 1025 mm × 500 mm'dir. [AVenS s.68] Gövde sacı, yalıtımı ve kapak düzeni kaynakta anlatılmamıştır.
+
+**Çark.** Cihazlar plug fanlıdır. [AVenS s.68] Fan adedi, çark çapı, kanat biçimi ve devir bilgisi kaynakta verilmemiştir.
+
+**Motor.** **Kaynakta karşılığı yok** — s.68'de motor tipi, gücü, gerilimi, devri ve verim sınıfı hakkında hiçbir ifade bulunmuyor.
+
+**Koruma.** Hava filtrasyonu G4 sınıfı filtre ile yapılır. [AVenS s.68] Koruma derecesi (IP), elektrik yalıtım sınıfı, donma koruması ve çalışma sıcaklığı aralığı için **kaynakta karşılığı yok**.
+
+**Kontrol.** Cihazlar dijital kontrol panosuyla birlikte sunulur. [AVenS s.68] Panonun işlevleri, haberleşme protokolü, sensör donanımı ve kademe sayısı kaynakta anlatılmıyor.
+
+**Montaj.** Kanal bağlantı ağzı ölçüleri AVenS 750 için 250 mm × 250 mm, AVenS 1000 için 275 mm × 275 mm, AVenS 2000 için 300 mm × 300 mm'dir. [AVenS s.68] Kanal tipi elektrikli ısıtıcı ve sulu batarya, bu üç model için ayrı ürün olarak listelenir ve kontrol paneliyle birlikte kullanılır. [AVenS s.69] Cihazın montaj biçimi (tavana asma, döşemeye oturtma vb.) ve askı noktaları kaynakta belirtilmemiştir.
+
+---
+
+## 3 · Kaynakta ve veride bulduklarım (K7.5)
+
+1. **IP55 / F sınıfı iddiası DOĞRULANDI.** Kaynak s.50 ve s.51 başlığında birebir şöyle yazar:
+   "IP-55 korumalı ve F sınıfı elektrik yalıtımlı, IEC standartlı asenkron motor". Yani bugün canlı
+   sayfada duran iki iddia da gerçektir; **kusur yalnız kapsamdadır** (tek çap, tek faz). Yazım biçimi
+   kaynakta tireli — **IP-55** — bu taslakta da tireli bırakıldı.
+2. **750 / 1000 / 2000 gerçekten DEBİDİR**, sıra numarası değil: s.68 tablosunda "DEBİ" sütunu bu üç
+   model için sırasıyla 750 m³/h, 1000 m³/h ve 2000 m³/h değerlerini verir. [AVenS s.68]
+3. **Kaynak s.68'de dokuz model listelenir, vitrinde üç model var** (750 / 1000 / 2000). Aralık bu yüzden
+   yalnız sattığımız modellerden verildi: 750 m³/h ile 2000 m³/h. [AVenS s.68]
+4. **Kaynak kendi içinde çelişiyor (KENTALFAN 630 T6):** hava debisi s.50'de 14820 m³/h, s.51'de
+   14280 m³/h yazar. [AVenS s.50, 51] Canlı veri s.51 değerini almış. [DB] Bu yüzden taslakta model bazlı
+   debi kullanılmadı; yalnız seri aralığı verildi — aralık uçları (2590 ve 22550) iki sayfada da aynıdır.
+5. **Kaynakta tablo başlığı hatası var (s.51):** KENTALFAN 315 T2 satırı "Single-phase motor / 4 poles"
+   başlıklı bloğun altında duruyor, buna karşın 400 V sütununda akım değeri taşıyor. [AVenS s.51]
+   Model kodu (T2) ve bu sütun trifazeyi gösterirken başlık monofaze diyor; taslakta o başlığa dayanan
+   hiçbir cümle kurulmadı, faz dağılımı model kodlarından sayıldı.
+6. **Plug fanda Gövde ve Kontrol blokları boş kaldı.** Fiyat listesi bu seri için yalnız tablo verir;
+   gövde malzemesi ve hız kontrolü hakkında tek kelime yoktur. Uydurmak yerine blok boş bırakıldı — bu
+   bilgiler ancak AVenS teknik kataloğu/veri sayfası geldiğinde yazılabilir.
+7. **Isı geri kazanımda Motor bloğu boş kaldı.** s.68 motor hakkında hiçbir şey söylemiyor; "plug fanlı"
+   ifadesinden motor tipi çıkarmak uydurma olurdu.
+
+## 4 · Kapatmadığı
+
+* **EN çevirisi yazılmadı** (ayrı tur).
+* **Debi/basınç eğrileri ve model bazlı tablolar taslağa girmedi**; aralık dışında model bazlı sayı kullanılmadı.
+* **`is_description_manual`** bugün `false`; bu metin yüklenirse **true** yapılmalı, yoksa sonraki
+  otomatik tur ezer.
+* Ticari onay yok. Fiyat/stok/teslim vaadi içermez.
+
+---
+
+— URUN-KATALOG alt-ajanı (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-commercial-inline-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf, CVL=Commercial_Ventilation_in_Line_1.pdf, DPC=Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf -->
+
+# İçerik hattı — TR taslak: VORT COMMERCIAL IN-LINE · YUVARLAK + DİKDÖRTGEN
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** REC-146 Adım 2b, ikinci aile grubu
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+**Referans biçimi:** `[AVenS s.NN]` = AVenS Ürün Fiyat Kataloğu 2026 (TR) · `[CVL s.NN]` =
+Commercial_Ventilation_in_Line_1.pdf (EN, **çevrildi**) · `[DPC s.NN]` =
+Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf (EN, **çevrildi**)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md` (LINEO taslağı).
+
+---
+
+## 0 · Neden bu ikisi birlikte yazıldı
+
+İki aile de "VORT Commercial In-Line" başlığı altında duruyor ve bugünkü DB metinleri birbirine
+karışmış durumda: yuvarlak aileye dikdörtgen ailenin gövde tarifi, dikdörtgen aileye ise yanlış bir
+faz bilgisi yazılmış. Ayıran cümle ancak ikisi yan yana yazılınca görünür.
+
+**Kaynak dengesizliği baştan söylenmeli:** yuvarlak aile iki İngilizce Vortice kataloğunda **tam
+sayfa** anlatılır; dikdörtgen ailenin (CA IL … ES RECT) **hiçbir İngilizce katalogda karşılığı yoktur**
+— tek kaynağı TR fiyat listesinin bir sayfasıdır. Bu yüzden dikdörtgen ailede iki blok **bilerek boş**
+bırakıldı. (Ayrıntı → §5.1)
+
+## 1 · Bugün DB'de ne var (emirle verildi)
+
+| Aile | Ürün | Bugünkü `description.tr` | Tespit |
+|---|---|---|---|
+| `vortice-vort-commercial-in-line-circular` | 7 | "…kendinden sönümlü V0 plastik gövdeli karma akışlı havalandırma fanı (monofaze model)." | **V0 = gövde DEĞİL**, motor yuvası/klemens kutusu; gövde boyalı çelik saç |
+| `vortice-vort-commercial-in-line-rectangular` | 5 | "…kendinden flanşlı dikdörtgen kanal tipi radyal fan (monofaze model)." | **"monofaze" YANLIŞ** — 5 modelin 2'si trifaze; ayrıca faz bilgisi kaynakta hiç geçmiyor |
+
+---
+
+## 2 · CA MD Serisi — Yuvarlak Kanal Tipi (`…-circular`)
+
+**DB:** 7 ürün · CA 100 / 125 / 150 / 150 Q / 200 / 250 / 315 MD · debi 340–1800 m³/h
+
+### Kimlik cümlesi
+> Asma tavana veya çatı arasına monte edilen, boyalı çelik saç gövdeli yuvarlak kanal tipi fan
+> serisi; konut, ticari ve endüstriyel mahaller (mutfaklar, tuvaletler, laboratuvarlar, barlar,
+> restoranlar, çamaşırhaneler, mağazalar) için düşük görsel etkili havalandırma çözümü. [DPC s.32]
+
+### Dört madde
+* Anma çapı 100 ile 315 mm arasında değişen modeller. [DPC s.32]
+* Zorlu hava koşullarına ve yüksek sıcaklığa dayanacak biçimde üretilmiş; geniş sürekli çalışma sıcaklık aralığı -25 °C / +50 °C. [DPC s.32]
+* Toz ve suya karşı yüksek koruma derecesi IP44. [DPC s.32]
+* Hava debisi 340 m³/h ile 1800 m³/h arasında. [AVenS s.25]
+
+### Yapısal bloklar
+
+**Gövde.** Dekapaj görmüş, fosfat kaplı çelik saç gövde; agresif hava koşullarına karşı polyester
+boya ile boyanmıştır. [DPC s.32] Şebeke bağlantı klemenslerini ve akış yönlendirici kanatçıkları
+barındıran motor yuvası, kendinden sönümlü plastik reçineden (V0) üretilmiştir. [DPC s.32]
+Fiyat listesindeki tanım: metal gövde, standart montaj ayağı. [AVenS s.25]
+> *DB'deki bugünkü metin V0 sınıfını gövdeye atfediyor; kaynak bu sınıfı **motor yuvası ve klemens
+> kutusu** için kullanıyor, gövde boyalı çelik saçtır.* [DPC s.32]
+
+**Çark.** Geriye eğimli santrifüj çark kullanılır. [CVL s.34] Kanatlar, yapısal dayanım ile boyutsal
+kararlılığı birlikte sağlamak üzere cam elyaf takviyeli, ısıya dayanıklı plastik reçineden
+üretilmiştir. [DPC s.32] Cihaz içindeki türbülansı azaltmak için akış yönlendirici kanatçıklar
+optimize edilmiştir. [CVL s.34]
+
+**Motor.** Termik aşırı yük korumalı AC motorlar; milleri bilyalı yataklarda döner ve azami etiket
+sıcaklığında en az 30.000 saat sürekli çalışmayı güvence altına alır. [DPC s.32] Yüksek verimli
+bilyalı yataklı motorlar düşük gürültü emisyonu ve düşük özgül tüketim sağlar. [CVL s.34]
+Elektrik beslemesi 230 V ~ 50 Hz. [CVL s.34]
+
+**Koruma.** Toz ve suya karşı koruma derecesi IP44 — cihaz emiş ve basma tarafında kanala bağlıyken
+geçerlidir. [DPC s.32] Yalıtım sınıfı II. [DPC s.32] Performans ve güvenlik, bağımsız üçüncü taraf
+kuruluş (IMQ) tarafından belgelenmiştir. [DPC s.32] Aşırı yük koruması standarttır. [AVenS s.25]
+
+**Kontrol.** Fanlar çift hızlıdır; hız anahtarına ihtiyaç duymadan iki farklı hava debisi sağlanabilir,
+isteğe bağlı olarak hız anahtarı ile kontrol edilebilir. [AVenS s.25] Hız anahtarları sıva üstü
+montajlı, sigorta korumalı, minimum hız ayarlı ve On/Off anahtarlıdır. [AVenS s.25] Ürün, uzaktan
+ortam sıcaklığı, nem, duman ve varlık sensörlerine bağlanabilir (opsiyonel). [DPC s.32]
+> *Kaynak çelişkisi kayda geçirildi: İtalyan kataloğu aynı seriyi üç hızlı olarak tanımlar ve
+> opsiyonel TRIO-CA cihazıyla ayarlandığını söyler.* [DPC s.32]
+
+**Montaj.** Yatay, dikey veya eğimli monte edilebilir. [DPC s.32] Duvar, tavan ve asma tavan montajı
+için galvanizli çelik saç braketler standart olarak ürünle birlikte verilir. [DPC s.32] Fiyat
+listesinde de standart montaj ayağı ürüne dahildir. [AVenS s.25]
+
+---
+
+## 3 · CA IL ES RECT Serisi — Dikdörtgen Kanal Tipi (`…-rectangular`)
+
+**DB:** 5 ürün · CA IL 4020 / 5035 / 6040 / 7050 / 8060 ES RECT · debi 715–7030 m³/h
+
+### Kimlik cümlesi
+> Dikdörtgen flanşlı galvanizli çelik gövdeli, yüksek verimli EC motorlu dikdörtgen kanal tipi fan
+> serisi. [AVenS s.26]
+
+### Dört madde
+* Dikdörtgen flanşlı galvanizli çelik gövde. [AVenS s.26]
+* Kendi kendini temizleyen, yüksek performanslı, geriye eğimli kanat. [AVenS s.26]
+* Yüksek verimli EC motor ve düşük ses seviyesi. [AVenS s.26]
+* Hava debisi 715 m³/h ile 7030 m³/h arasında değişen beş model. [AVenS s.26]
+
+### Yapısal bloklar
+
+**Gövde.** Dikdörtgen flanşlı, galvanizli çelik gövde. [AVenS s.26]
+
+**Çark.** Kendi kendini temizleyen, yüksek performanslı, geriye eğimli kanat. [AVenS s.26]
+
+**Motor.** Yüksek verimli EC motor. [AVenS s.26] Seri, düşük ses seviyesi ile öne çıkarılır. [AVenS s.26]
+
+**Koruma.** — **kaynakta karşılığı yok, boş bırakıldı.** (TR fiyat listesinin bu sayfasında koruma
+sınıfı, yalıtım sınıfı, sıcaklık aralığı veya sertifika bilgisi verilmemiştir; bu seri için İngilizce
+katalog karşılığı da yoktur → §5.1.)
+
+**Kontrol.** 0-10 V veya PWM sinyaliyle hız kontrolü yapmak mümkündür. [AVenS s.26] Seriye POT (REGC)
+kodlu EC motor hız anahtarı sunulur. [AVenS s.26] Sensör üniteleri; sıcaklık, duman, nem, hareket ve
+zaman ile ilgili değişiklikleri algılayıp havalandırma fanını istenilen değerde çalıştıran
+cihazlardır. [AVenS s.26]
+
+**Montaj.** — **kaynakta karşılığı yok, boş bırakıldı.** (Sayfada montaj yönü, braket veya sabitleme
+öğesi tarif edilmemiştir. "Dikdörtgen flanş" bir gövde tarifi olarak Gövde bloğunda kalmıştır;
+ondan montaj biçimi **çıkarılmadı**.)
+
+---
+
+## 4 · İki aileyi ayıran cümle
+
+> **CA MD yuvarlak kanala, CA IL ES RECT dikdörtgen kanala bağlanır; ayrım yalnızca kesitte
+> değildir.** CA MD boyalı çelik saç gövdeli ve AC motorludur. [DPC s.32] Fanları çift hızlıdır.
+> [AVenS s.25] CA IL ES RECT ise galvanizli çelik gövdelidir ve kademesiz hız kontrolüne açık
+> (0-10 V veya PWM) EC motorludur. [AVenS s.26]
+
+Vitrinde bu farkın görünmesi şart: "kanal tipi fan" ikisini de anlatır, ama biri **hız kademesi**
+seçtirir, diğeri **sinyalle sürekli hız** verir.
+
+---
+
+## 5 · Kaynakta ve veride bulduklarım (hepsi kayıtta)
+
+### 5.1 · Dikdörtgen ailenin İngilizce katalog karşılığı YOK (ölçüldü)
+
+Her iki İngilizce PDF'in **tüm sayfaları** `RECT|4020|5035|6040|7050|8060` deseniyle tarandı:
+model adları **sıfır kez** geçiyor (CVL 88 sayfa, DPC 84 sayfa).
+
+Emirde işaret edilen **DPC s.76–84 "CA IN-LINE QUIET ES RANGE" bu aile DEĞİLDİR.** O bölüm
+CA-IL 100 / 125 / 150 / 160 / 200 QUIET ES modellerini anlatır: dairesel bağlantı ağızlı, melamin
+akustik kaplamalı, azami debileri 310–850 m³/h olan **yassı sessiz** bir seri. Bizim serimizin
+debileri 715–7030 m³/h; model adları da örtüşmüyor. **Bu bölümden tek cümle alınmadı** — alınsaydı
+yanlış aileye doğru görünen bir metin yazılmış olurdu.
+
+### 5.2 · Bugünkü DB metinlerindeki hatalar
+
+1. **Yuvarlak aile — "V0 plastik gövde" yanlış.** Kaynak, kendinden sönümlü V0 plastik reçineyi
+   **motor yuvası / klemens kutusu** için kullanır; gövde dekapajlı-fosfatlı, polyester boyalı
+   çelik saçtır [DPC s.32]. TR fiyat listesi de "Metal gövde" der [AVenS s.25].
+2. **Dikdörtgen aile — "(monofaze model)" yanlış.** DB'ye göre 5 modelin 2'si trifaze. Ayrıca faz
+   bilgisi AVenS s.26'da **hiç geçmiyor** — bu yüzden düzeltilmiş metin faz bilgisi **yazmıyor**,
+   uydurmuyor da. Faz alanı ürün teknik tablosundan gelmelidir, anlatımdan değil.
+3. **Yuvarlak aile — "karma akışlı" ifadesi tartışmalı** (bkz. 5.3/2). Taslak, kimlik cümlesinde
+   akış tipi iddiasını kullanmadı; "yuvarlak kanal tipi fan" dedi.
+
+### 5.3 · Kaynaklar arası çelişkiler (hiçbiri sessizce çözülmedi)
+
+1. **Hız kademesi:** AVenS s.25 "standart iki hızlı … Fanlar çift hızlıdır"; DPC s.32 "3-speed fans
+   … optional device TRIO-CA (code 12869)"; CVL s.34 "Two speeds". **2'ye 1** — taslak TR kaynağını
+   (çift hızlı) esas aldı, çelişkiyi Kontrol bloğunda alıntı olarak bıraktı.
+2. **Fan tipi:** DPC s.32 seriyi "mixed flow duct fans" (karma akışlı) diye tanımlıyor; CVL s.34 ise
+   aynı seriyi "In-line centrifugal fans in metal" başlığıyla veriyor ve "Backward curved centrifugal
+   impellers" diyor. **Karma akışlı, santrifüj ile aynı şey değildir.** Taslak çarkı, iki kaynağın da
+   hemfikir olduğu yönüyle ("geriye eğimli") tarif etti; akış tipi iddiası kimlik cümlesine sokulmadı.
+3. **Model sayısı:** CVL s.34 "13 models: from 100 diameter to 315"; DPC s.32 "8 models, with nominal
+   diameter between 100 and 315 mm". Kapsam farkı: CVL, CA MD **ve CA MD E**'yi birlikte sayıyor.
+   Taslak sayı yazmadı, çap aralığı yazdı.
+4. **Ürün kodları iki İngilizce katalogda FARKLI.** CA 100 / 125 / 150 Q MD için CVL s.34: 16150,
+   16151, 16152; DPC s.33 ve AVenS s.25: 16107, 16108, 16109. Aynı model, iki kod ailesi. Taslakta
+   kod kullanılmadı; ama **CSV/SKU eşlemesi yapan her iş bunu bilmeli.**
+5. **AVenS s.26'da CA IL ES RECT satırlarının KOD sütunu BOŞ.** Fiyat listesindeki diğer bütün
+   tablolarda kod var; bu tabloda yok. Aksesuar satırında (POT/REGC) kod var.
+6. **Emirde verilen AVenS s.32 bu ailelerden hiçbiri değil.** O sayfa `CA MD E RF` — yatay atışlı
+   **çatı tipi** fanlar. Kullanılmadı.
+7. **CVL s.34'te yazım hatası:** "Avalable only for the Extra EU market" (doğrusu *Available*).
+   İçerik doğru, yazım yanlış.
+8. **Katalogda olup DB'de olmayan boy:** `CA 160 MD` her iki İngilizce katalogda da var
+   (CVL s.34, DPC s.35); bizim yuvarlak ailemizde 160 boy **yok**. Metinde kullanılmadı.
+
+---
+
+## 6 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` ayrı tur ister.
+* **Dikdörtgen ailede Koruma ve Montaj blokları boş.** Doldurmanın tek dürüst yolu üreticiden
+  ayrı bir teknik doküman (koruma sınıfı, yalıtım sınıfı, sıcaklık aralığı) getirmektir. Boş kalması
+  bir eksiklik değil, **ölçülmüş bir kaynak boşluğudur.**
+* **Ses, basınç ve güç tabloları taslağa girmedi.** Kaynakta var; sayı yazmak ayrı bir
+  birim/doğrulama turu ister.
+* **Faz bilgisi (mono/tri) anlatım metnine yazılmadı** — teknik tablo alanıdır.
+* **`is_description_manual`** yükleme sırasında **true** yapılmalı; aksi halde bir sonraki otomatik
+  tur bu metni ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+— URUN-KATALOG alt-ajanı (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-danfoss-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+
+# İçerik hattı — TR taslak: DANFOSS FC101 · FC102 · FC-51 (frekans konvertörleri)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** REC-146 Adım 2b — Danfoss aile grubu
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026 (TR) — **s.58 (FC101) · s.59 (FC102) · s.34 ve s.36 (FC-51)**
+· ek olarak s.27 (FC101 hız anahtarı satırı) tarandı.
+**Referans biçimi:** `[AVenS s.NN]` = fiyat listesi · `[MANIFEST]` = `scripts/db/product-data/danfoss-content-manifest.json`
+(kaynağı Danfoss Design Guide PDF'leri; **bu kapı onu ölçmez**, ayrı doğrulanır).
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Derinlik ölçümü: **KAYNAK ZAYIF** — FC101 3 birim, FC102 2 birim, FC-51 0 birim öngörülmüştü.
+  Ölçüm bu turda **doğrulandı**: AVenS kataloğu bu üç ailede ürün föyü değil, **fiyat satırı**dır.
+
+---
+
+## 0 · Neden bu üçü birlikte yazıldı ve neden metin kısa
+
+Bu üç aile **fan değildir** — fan **sürücüsüdür**. Debi (m³/h), basınç, çark, kanat, gövde malzemesi
+gibi fan alanlarının hiçbiri bu ürünlerde YOKTUR; anlatım yalnız **güç (kW) · gerilim (V) · faz ·
+kontrol/haberleşme** üzerinden kurulabilir. Altı bloktan üçü (Gövde bir ölçüde, Çark ve Motor
+tamamen) bu ürün tipi için **geçersizdir** ve aşağıda uydurulmak yerine **açıkça boş bırakılmıştır**.
+
+Üçü birlikte yazıldı çünkü AVenS kataloğunda **birbirlerini tanımlıyorlar**: FC-51'in kendi tanıtım
+sayfası yok, yalnız fan sayfalarında (s.34, s.36) o fanın **hız anahtarı** olarak listeleniyor —
+yani FC-51'in kimliği ancak FC101 ile karşılaştırılınca çıkıyor. Ayrı ayrı yazılsalardı üçü de
+"Danfoss frekans konvertörü" diye başlayacak ve vitrinde **üç ayrı seri tek cümleyle** çıkacaktı.
+
+## 1 · Bugün DB'de ne var (emirden aktarıldı, bu turda SQL ile yeniden ölçülmedi)
+
+| Aile (slug) | Ürün | `description.tr` | Katalogda satır | Durum |
+|---|---|---|---|---|
+| `danfoss-fc101` | 16 | **BOŞ** | s.58 · 17 satır (0,75–90 kW) | sıfırdan yazılıyor |
+| `danfoss-fc102` | 17 | **BOŞ** | s.59 · 17 satır (1,1–90 kW) | sıfırdan yazılıyor |
+| `danfoss-fc51` | 2 | **BOŞ** | s.34 · 3 satır · s.36 · 1 satır | sıfırdan yazılıyor |
+
+---
+
+## 2 · VLT HVAC BASIC DRIVE FC101
+
+**DB:** `danfoss-fc101` · 16 ürün · açıklama **BOŞ** · katalog kodları 80101–80117
+
+### Kimlik cümlesi
+
+> Danfoss VLT HVAC Basic Drive FC101, HVAC uygulamalarına özel fonksiyonlar, EMC filtre, otomatik
+> enerji optimizasyonu ve akıllı logic kontrolör sunan bir frekans konvertörü (motor sürücüsü)
+> serisidir. [AVenS s.58]
+
+### Maddeler
+
+* Katalogda motor gücü 0,75 kW ile 90 kW arasında 17 model olarak listelenir. [AVenS s.58]
+* Besleme gerilimi tüm satırlarda 380V olarak verilir. [AVenS s.58]
+* Anma akımı, en küçük modelde 2,2 A'dan en büyük modelde 177 A'ya kadar değişir. [AVenS s.58]
+* Üç fazlı besleme, 380–480 V AC aralığı — üretici föyünden [MANIFEST].
+
+### Yapısal bloklar
+
+**Gövde.** AVenS kataloğunda bu aile için gövde, malzeme veya koruma sınıfı bilgisi **YOKTUR** —
+fiyat listesi yalnız kod, model, motor gücü ve fiyat sütunlarını taşır. [AVenS s.58]
+Üretici föyünden gelen taban gövde bilgisi: IP20 / Open type, H1–H8 gövde boyları, 2,1–51 kg
+ağırlık aralığı — **taban (gövdesiz, panel-montaj) varyant varsayımıyla** [MANIFEST].
+
+**Çark.** **Bu ürün tipi için geçersiz.** Frekans konvertöründe çark yoktur; ürün hava taşımaz,
+hava taşıyan fanın motorunu sürer.
+
+**Motor.** **Bu ürün tipi için geçersiz.** Ürünün kendisi motor değil, motor **sürücüsüdür**;
+sürdüğü motorun gücü Kimlik bölümündeki kW aralığıyla karşılanır.
+
+**Koruma.** Katalog, seri için EMC filtre ve akıllı logic kontrolör dışında koruma bilgisi
+vermez. [AVenS s.58] Üretici föyüne göre taban gövde koruma sınıfı IP20 / Open type'tır [MANIFEST].
+
+**Kontrol (bu ailenin asıl bloğu).** Standart yangın modu bulunur. [AVenS s.58]
+Çift satır nümerik kontrol panosu ile gelir. [AVenS s.58]
+Otomatik enerji optimizasyonu ve akıllı logic kontrolör standarttır. [AVenS s.58]
+Standart haberleşme protokolleri Modbus RTU, BacNet, Metasys N2, FC ve FLC olarak listelenir. [AVenS s.58]
+
+**Montaj.** Katalogda tesisat kısıtı olarak yalnız kablo mesafesi verilir: maksimum kablo
+mesafesi 50 metredir. [AVenS s.58] Montaj biçimi, ağırlık ve delik ölçüleri **kaynakta yok** —
+blok bilinçli olarak boş bırakıldı.
+
+---
+
+## 3 · VLT HVAC DRIVE FC102
+
+**DB:** `danfoss-fc102` · 17 ürün · açıklama **BOŞ** · katalog kodları 80120–80136
+
+### Kimlik cümlesi
+
+> Danfoss VLT HVAC Drive FC102, HVAC uygulamalarına özel fonksiyonlar, %98 temel enerji
+> verimliliği, uyku modu ve otomatik enerji optimizasyonu sunan bir frekans konvertörü
+> (motor sürücüsü) serisidir. [AVenS s.59]
+
+### Maddeler
+
+* Katalogda motor gücü 1,1 kW ile 90 kW arasında 17 model olarak listelenir. [AVenS s.59]
+* Besleme gerilimi satırlarda 380V olarak verilir. [AVenS s.59]
+* Temel enerji verimliliği %98 olarak belirtilir. [AVenS s.59]
+* Üç fazlı besleme, 380–480 V AC aralığı — üretici föyünden [MANIFEST].
+
+### Yapısal bloklar
+
+**Gövde.** AVenS kataloğunda bu aile için de gövde, malzeme veya koruma sınıfı bilgisi
+**YOKTUR**. [AVenS s.59] Üretici föyünden gelen taban gövde bilgisi: IP20 / Chassis,
+A2–C4 gövde boyları, 4,8–50 kg ağırlık aralığı — **taban varyant varsayımıyla** [MANIFEST].
+
+**Çark.** **Bu ürün tipi için geçersiz** — FC101 ile aynı gerekçe.
+
+**Motor.** **Bu ürün tipi için geçersiz** — ürün motor değil, motor sürücüsüdür.
+
+**Koruma.** Katalog bu aile için ayrı bir koruma bilgisi vermez; EMC filtre ibaresi
+FC101 satırında geçer, FC102 satırında geçmez. [AVenS s.59]
+Üretici föyüne göre taban gövde koruma sınıfı IP20 / Chassis'tir [MANIFEST].
+
+**Kontrol (bu ailenin asıl bloğu).** Standart yangın modu bulunur. [AVenS s.59]
+LCD operatör paneli ile gelir. [AVenS s.59]
+Uyku modu ve otomatik enerji optimizasyonu standarttır. [AVenS s.59]
+Standart haberleşme protokolleri Modbus RTU, BacNet, Metasys N2 ve FC olarak listelenir;
+FC101'deki FLC protokolü bu listede **yoktur**. [AVenS s.59]
+
+**Montaj.** Tesisat kısıtı olarak maksimum kablo mesafesi 150 metredir. [AVenS s.59]
+Montaj biçimi ve ölçüler **kaynakta yok** — blok bilinçli olarak boş bırakıldı.
+
+---
+
+## 4 · FC-51
+
+**DB:** `danfoss-fc51` · 2 ürün (FC-51 220V 0,37 kW · FC-51 230V 0,37 kW) · açıklama **BOŞ**
+
+⚠ **Bu ailenin katalogda kendi tanıtım sayfası YOKTUR.** FC101 s.58 ve FC102 s.59 gibi bir
+"seri sayfası" bulunmaz; FC-51 yalnızca fan sayfalarındaki **hız anahtarı / aksesuar** tablolarında
+görünür (s.34 HeatMaster çatı fanları, s.36 VORT QBK SAL KC EVO davlumbaz fanları). Aşağıdaki her
+cümle bu iki tablodan gelir. Seri tanıtım metni, teknik özellik listesi, kontrol paneli, haberleşme
+protokolü, gövde/koruma bilgisi **kaynakta hiç yoktur** — ve **manifest'te de yoktur**
+(manifest yalnız FC101/FC102 Design Guide'larını taramış, FC-51 orada tanımlı değil) [MANIFEST].
+
+### Kimlik cümlesi
+
+> Danfoss FC-51, AVenS kataloğunda küçük güçlü çatı ve davlumbaz fanlarının hız kontrolü için
+> hız anahtarı olarak listelenen kompakt bir frekans konvertörüdür. [AVenS s.34, 36]
+
+### Maddeler
+
+* Katalogda 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi listelenir. [AVenS s.34]
+* 220V besleme ile hem 0,37 kW hem 0,55 kW satırı bulunur. [AVenS s.34]
+* 380V besleme ile 0,37 kW satırı bulunur. [AVenS s.34]
+* 230V besleme ile 0,37 kW satırı bulunur. [AVenS s.36]
+
+### Yapısal bloklar
+
+**Gövde.** **Kaynakta yok** — FC-51 için katalogda hiçbir gövde/malzeme/koruma bilgisi bulunmaz.
+
+**Çark.** **Bu ürün tipi için geçersiz.**
+
+**Motor.** **Bu ürün tipi için geçersiz** — ürün motor değil, motor sürücüsüdür.
+
+**Koruma.** **Kaynakta yok.**
+
+**Kontrol (bu ailenin asıl bloğu — ve kaynakta olan tek şey uygulamadır).**
+HEATMASTER F400 315 M4 0,25kW ve F400 355 M4 0,25kW modellerinde hız anahtarı olarak
+FC-51 220V 0,37 kW gösterilir. [AVenS s.34]
+HEATMASTER F400 400 M4 0,55kW modelinde hız anahtarı olarak FC-51 220V 0,55 kW gösterilir. [AVenS s.34]
+HEATMASTER F400 315 T4 0,25kW ve F400 355 T4 0,25kW modellerinde hız anahtarı olarak
+FC-51 380V 0,37 kW gösterilir. [AVenS s.34]
+VORT QBK SAL KC EVO 315 T4 0,25kW ve 355 T4 0,25kW modellerinde hız anahtarı olarak
+FC-51 380V 0,37 kW gösterilir. [AVenS s.36]
+Kontrol paneli, haberleşme protokolü ve çalışma modları **kaynakta yok**.
+
+**Montaj.** **Kaynakta yok** — FC101/FC102'de verilen kablo mesafesi kısıtı FC-51 için verilmemiştir.
+
+---
+
+## 5 · Üç aileyi ayıran cümle (hangisi ne zaman seçilir)
+
+> **FC-51 · FC101 · FC102 aynı işi yapar — bir fanın motorunu değişken hızda sürer — ama üç ayrı
+> güç ve kontrol seviyesindedir.**
+
+Tablo **aile başına tek satır**tır: her satırın tüm hücreleri **aynı katalog sayfasından** gelir,
+referans satır sonundadır.
+
+| Aile | Güç aralığı | Gerilim | Kontrol paneli | Yangın modu | Enerji | Maks. kablo | Protokol | Kaynak |
+|---|---|---|---|---|---|---|---|---|
+| **FC-51** | 0,37 kW – 0,55 kW | 220V · 230V · 380V | kaynakta yok | kaynakta yok | kaynakta yok | kaynakta yok | kaynakta yok | [AVenS s.34, 36] |
+| **FC101** | 0,75 kW – 90 kW | 380V | çift satır nümerik pano | standart | otomatik enerji optimizasyonu | 50 metre | Modbus RTU, BacNet, Metasys N2, FC, FLC | [AVenS s.58] |
+| **FC102** | 1,1 kW – 90 kW | 380V | LCD operatör paneli | standart | %98 verimlilik + uyku modu | 150 metre | Modbus RTU, BacNet, Metasys N2, FC | [AVenS s.59] |
+
+**Seçim kuralı — kaynaktan çıkarılabilen hâliyle:**
+
+1. **FC-51** — tek bir küçük fanı (katalogda 0,25–0,55 kW motorlu çatı ve davlumbaz fanları)
+   hızlandırıp yavaşlatmak yeterliyse. [AVenS s.34, 36]
+2. **FC101** — 0,75 kW üstü motorlarda, yangın modu ve otomatik enerji optimizasyonu istendiğinde;
+   sürücü ile motor arasındaki kablo 50 metreyi geçmiyorsa. [AVenS s.58]
+3. **FC102** — aynı güç bandında (1,1 kW üstü) ama LCD operatör paneli, uyku modu ve %98 temel
+   enerji verimliliği gerektiğinde; ayrıca kablo mesafesi 150 metreye kadar çıkabildiğinde. [AVenS s.59]
+
+**Ayıran tek cümle:** FC101 ile FC102 **aynı güç bandını ve aynı yangın modunu** paylaşır; ayıran
+şey **operatör arayüzü (nümerik pano ↔ LCD panel)**, **uyku modu / %98 verimlilik iddiası** ve
+**üç kat uzun kablo mesafesidir**. [AVenS s.58, 59]
+
+---
+
+## 6 · Kaynakta ve veride bulduklarım (K7.5 — hepsi kayıtta)
+
+1. **KOD ÇAKIŞMASI — 80101 ve 80102 iki farklı ürüne veriliyor.** s.58'de `80101 = FC101PK75 0,75 kW`
+   ve `80102 = FC101P1K5 1,5 kW`; s.34'te ise `80101 = FC-51 220V 0,37kW` ve `80102 = FC-51 220V 0,55kW`.
+   Aynı katalogda aynı kod iki ürün. Manifest de bu çelişkiyi `denetim` listesinde
+   `DAN-80101` başlığıyla açmıştı [MANIFEST]. **Karar gerekiyor** — hangi kod hangi ürüne ait.
+2. **80141 kodu iki farklı gerilimle listeleniyor.** s.34: `80141 = FC-51 - 380V - 0,37kW`;
+   s.36: `80141 = FC-51 - 230V - 0,37kW`. Fiyat ikisinde de aynı (455). DB'deki iki FC-51 ürünü
+   "220V" ve "230V"; katalogdaki üçüncü gerilim olan **380V DB'de yok**. Bu turda **çözülmedi**,
+   uydurulmadı — hangi gerilimin doğru olduğu **ticari doğrulama** ister.
+3. **FC102 akım değerleri FC101 ile birebir aynı yazılmış.** s.59'daki akım sütunu
+   (3,7 / 5,3 / 7,2 / 9 / 12 / 15,5 A) s.58'inkiyle aynı. Üretici föyünde FC102 için farklı
+   değerler var (P1K5 için 4,1 A, P2K2 için 5,6 A, P4K0 için 10 A) [MANIFEST]. Yani AVenS
+   büyük olasılıkla FC101 sütununu kopyalamış. **Bu yüzden taslakta FC102 için akım değeri
+   YAZILMADI** — iki kaynak çelişiyor, çelişkiyi metne taşımak yerine buraya yazdım.
+4. **s.59'da dizgi hatası: `1,1 - 308V - 2,2A`.** Diğer 16 satırın hepsi 380V. "308V" açık bir
+   rakam devriği. Taslakta **380V** kullanıldı ve hata burada kayıtlı; 308V hiçbir yerde iddia edilmedi.
+5. **Katalogda "Motbus RTU" yazıyor** (doğrusu Modbus RTU) ve **"Protocal"** yazıyor
+   (doğrusu Protocol) — s.58 ve s.59'da aynı hata. Taslakta doğru yazım kullanıldı; anlam değişmedi.
+6. **s.27'de FC101 üçüncü kez, üçüncü bir adla geçiyor:** `FC 101-1.5kW Frenkans Konvertörü` ve
+   `FC 101-2.2kW Frenkans Konvertörü` (kodlar 80102, 80103) — dikdörtgen kanal tipi radyal fanların
+   hız anahtarı olarak. Ad biçimi s.58'deki `FC101P1K5` ile, s.36'daki `FC-101 - 380V - 1,5kW` ile
+   uyuşmuyor; ayrıca "Frenkans" ve s.34'teki "İnventörü" dizgi hataları var. **Aynı ürün için
+   katalogda en az dört farklı ad biçimi** dolaşıyor — DB eşlemesi bu yüzden kırılgan.
+7. **FC101 ailesinde DB 16 ürün, katalog 17 satır.** Emirdeki aile tanımı FC101P4K0 (4 kW) ile
+   başlıyor; katalog 0,75 kW ile başlıyor. Fark **ölçülmedi** (bu turda SQL koşulmadı) —
+   taslakta katalog aralığı kullanıldı ve bunun **katalog aralığı** olduğu cümlede yazılı.
+8. **Manifest'te FC-51 hiç yok.** Manifest yalnız FC101 ve FC102 Design Guide'larını taramış;
+   `denetim` kaydı FC-51'in **ayrı bir seri** olduğunu ve o iki föyde tanımlı olmadığını söylüyor
+   [MANIFEST]. Yani FC-51'in tek kaynağı bugün AVenS fiyat listesindeki dört satırdır.
+
+## 7 · Bu taslağın kapatmadığı
+
+* **FC-51 için üretici föyü YOK.** Bu aile bugün yalnız "hangi fanın hız anahtarı" bilgisiyle
+  yazılabiliyor. Vitrinde satılabilir bir ürün sayfası için Danfoss FC-51 Design Guide gerekir.
+* **Ağırlık, ölçü, IP sınıfı hiçbir ailede AVenS'ten gelmiyor.** FC101/FC102 için manifest
+  taban gövde varsayımıyla veri taşıyor; bu varsayım **stoktaki gerçek gövde varyantı** IP54/IP55
+  ise yanlış olur [MANIFEST]. Vitrine yazmadan önce ticari doğrulama ister.
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` için ayrı tur gerekir.
+* **`is_description_manual` bayrağı** yükleme sırasında **true** yapılmalı; aksi halde bir sonraki
+  otomatik tur bu elle yazılmış metni ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-endustriyel-atex-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf, IND=industrial_Ventilation.pdf, ATX=E_ATEX_Range_yeni_2025.pdf -->
+
+# İçerik hattı — TR taslak: VORTICEL Endüstriyel Aksiyel · VORT E-ATEX (REC-146 Adım 2b·2)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** alt-ajan görevi, iki aile birlikte
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Kaynak:** `industrial_Ventilation.pdf` s.4–31 ve s.98–103 (EN, **çevrildi**) · `E_ATEX_Range_yeni_2025.pdf` s.3–16 (EN, **çevrildi**) · `avens_fiyat_listesi_2026_HQ.pdf` s.30, s.31, s.38 (TR)
+**Referans biçimi:** `[IND s.NN]` = industrial_Ventilation · `[ATX s.NN]` = E_ATEX_Range_yeni_2025 · `[AVenS s.NN]` = AVenS 2026 fiyat listesi · `[DB]` = kendi ürün tablomuz (PDF değil)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; **yanlış kapsamlı bilgi de vaat ihlalidir**.
+* Kararlar — Vitrin 15A **K6** · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.2** (çeviri) · **K7.5** (tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok (Gövde · Çark · Motor · Koruma · Kontrol · Montaj).
+* **`icerik-hatti-seri-metni-tek-model-kusuru-2026-09-06.md`** — bu iki aile o kusurun örneğidir; taslak onu düzeltir.
+
+---
+
+## 0 · Bu grupta mevcut metin KORUNMUYOR, DÜZELTİLİYOR
+
+| Aile | Bugün DB'de yazan | DB'deki gerçek |
+|---|---|---|
+| `vortice-vort-industrial-ventilation-axial` | "**350 mm** nominal çaplı… (**trifaze** model)" | 16 ürün · 1850–14500 m³/h · **4 monofaze + 12 trifaze** · üç ayrı seri (E · A-E · MP) |
+| `vortice-vort-e-atex` | "**250 mm** nominal çaplı… (**monofaze** model)" | 14 ürün · 1145–6550 m³/h · **5 monofaze + 9 trifaze** |
+
+Yani her iki ailede de serinin **en küçük** modeli, serinin tamamı gibi sunulmuş. Taslak bunu
+**aralık vererek** düzeltir; aralıklar **DB'den** okundu, katalogdan değil — sattığımız modellerin
+aralığıdır.
+
+> ### ⚠ KİMLİK KARIŞIKLIĞI TUZAĞI (kayda geçiyor)
+> Aksiyel ailede **`E 354 M`** (kod 40703) vardır; ATEX ailesinde **`E 354 M ATEX`** (kod 40322)
+> vardır. **Bunlar ayrı ürünlerdir**, ayrı kataloglardadır ve debileri farklıdır. Aynı tuzak
+> `E 254/304/404/454/504/506/604` adlarında da geçerlidir. Bu taslakta her cümlenin referansı,
+> cümlenin ait olduğu ailenin kaynağına verilmiştir; kaynaklar **karıştırılmamıştır**.
+
+---
+
+## 1 · VORTICEL Endüstriyel Aksiyel Fanlar (E · A-E · MP)
+
+**DB:** `vortice-vort-industrial-ventilation-axial` · **16 ürün** · 1850–14500 m³/h · 4 monofaze + 12 trifaze `[DB]`
+**Modeller:** A-E 354/454/504/564 T · E 354/404/504/604 M · MP 302/304/354/404/454/504/506/604 T `[DB]`
+
+### Kimlik cümlesi
+
+> Ticari ve endüstriyel hacimlerin — spor salonu, kuru temizleme, marangozhane, garaj, depo, ahır —
+> havalandırması için tasarlanmış, farklı çaplarda, monofaze ve trifaze sürümleri bulunan duvar tipi
+> endüstriyel aksiyel fan ailesi. [IND s.4] Aile, Vortice'in üç serisini birlikte kapsar: VORTICEL E,
+> VORTICEL A-E ve VORTICEL MP. `[DB]`
+
+### Dört madde
+
+* **VORTICEL E** — düşük basınçlı duvar tipi aksiyel; anma çapı 250–350 mm aralığında 7 model ve toz/suya karşı IP44 korumalı motorlar. [IND s.4]
+* **VORTICEL A-E** — ince gövdeli (eksenel derinliği azaltılmış) duvar tipi aksiyel; 2, 4 ve 6 kutuplu, anma çapı 250–630 mm aralığında 19 model, IP54 korumalı motorlar. [IND s.14]
+* **VORTICEL MP** — orta basınçlı aksiyel; anma çapı 250–600 mm aralığında 19 model, IP55 korumalı motorlar ve −15 °C / +70 °C sürekli çalışma aralığı. [IND s.24]
+* **Hız kontrolü modele eşlenmiştir:** fiyat listesinde E serisinin dört modeli de IRM30, A-E 354 T IRT15, A-E 454/504/564 T ise IRT35 hız anahtarıyla verilir. [AVenS s.30]
+
+### Yapısal bloklar
+
+**Gövde.** VORTICEL E ve A-E serilerinde gövde; preslenmiş, asitle temizlenmiş ve fosfatlanmış çelik
+duvar panelidir, epoksi toz boyayla çekiçlenmiş yüzey bitişi verilir ve agresif maddelere uzun süreli
+direnç için gri renkte bitirilir. [IND s.4] Hava geçiş ağızları duvar paneliyle tek parça hâlinde
+biçimlendirilir ve hava akışını en iyilemek için ölçülendirilir; A-E serisinde bu ağız uzatılmış
+profillidir. [IND s.14] MP serisinde duvar panelleri kalıplanmış, asitle temizlenmiş ve fosfat kaplı
+çeliktir; gri polyester toz boyayla boyanır ve çekiçlenmiş yüzey bitişiyle zaman içindeki hava
+koşullarına üstün direnç gösterir. [IND s.24] Fiyat listesi E ve A-E serilerini duvar tipi olarak
+tanımlar. [AVenS s.30]
+
+**Çark.** VORTICEL E serisinde çark, cam elyafı yüklü plastik reçineden kalıplanmış altı kanatlıdır;
+kanatlar enjeksiyon döküm alüminyum kanallı göbeğe oturur ve çark dinamik olarak dengelenir (UNI ISO
+1940, Sınıf 6.3). [IND s.4] A-E serisinde çark yine dinamik dengelidir (UNI ISO 1940, Sınıf 6.3);
+kanat sayısı modele göre dörtten yediye değişir, kanatlar elektro-galvanizli çelik sacdan kalıplanır
+ve polyester toz boyayla kaplanır. [IND s.14] MP serisinde kanat, hava türbülansından doğan ses
+düzeyini azaltmak üzere tasarlanmış bindirmeli kanat profilindedir; kanatlar deforme olmayan, yüksek
+dayanımlı ve boyutsal olarak kararlı polipropilenden (PP), göbek ise enjeksiyon döküm alüminyumdandır.
+[IND s.24]
+
+**Motor.** E serisinde motorlar F sınıfı, termik korumalı asenkron tiptir; miller çift keçeli bilyalı
+yataklara oturur ve toz/suya karşı IP44 koruma derecesine sahiptir. [IND s.4] A-E serisinde motorlar,
+fanın eksenel derinliğini sınırlamak amacıyla seçilmiş F sınıfı termik korumalı asenkron rotor tipi
+motorlardır; miller çift korumalı bilyalı yataklara oturur ve koruma derecesi IP54'tür. [IND s.14]
+MP serisinde motorlar UMELEC B5 standart gövdeli asenkron endüksiyon tipidir; miller bilyalı yataklara
+oturur ve ısıyı daha etkin atmak için soğutma pervaneleri bulunur, koruma derecesi IP55'tir.
+[IND s.24] Monofaze modellerin kalkış kondansatörleri EN 60252-1 standardına uygundur ve üçüncü
+tarafça belgelendirilmiştir. [IND s.4] Seride 2, 4 ve 6 kutuplu motorlar bulunur. [IND s.14]
+
+**Koruma.** Toz ve suya karşı koruma derecesi seriye göre değişir; VORTICEL E serisinde IP44'tür.
+[IND s.4] A-E serisinde IP54'tür. [IND s.14] MP serisinde IP55'tir. [IND s.24] Kaza önleyici ve kuş
+girişini engelleyen koruma ızgaraları UNI ISO 13857 standardına göre tasarlanmıştır, motor taşıyıcı
+işlevini de üstlenir, elektro-kaynaklı çelik halkalardan yapılır ve siyah epoksi boyayla bitirilir.
+[IND s.4] Elektrik izolasyon sınıfı I'dir — topraklama gereklidir. [IND s.4] MP serisinde de izolasyon
+sınıfı I'dir ve topraklama gerekir. [IND s.24] MP serisinde sürekli çalışma sıcaklığı aralığı
+geniştir: −15 °C / +70 °C, sıcak duman ile azami çalışma sıcaklığı ise 70 °C'dir. [IND s.24] E ve A-E
+serilerinde azami sürekli çalışma sıcaklığı modele göre değişir ve teknik tabloda model bazında
+verilir. [IND s.15] Bu ailenin fanları **patlayıcı ortam belgesi taşımaz**; kaynak, önemli derişimde
+aşındırıcı toz ya da asidik/korozif madde içeren akışların taşınması için uygun olmadıklarını açıkça
+yazar. [IND s.24]
+
+**Kontrol.** E ve A-E serilerinde motor hızı Vortex kontrolörleriyle ayarlanabilir. [IND s.4] Fiyat
+listesinde E serisinin dört modeli de IRM30 ile, A-E 354 T IRT15 ile, A-E 454/504/564 T ise IRT35 ile
+eşlenmiştir. [AVenS s.30] MP modellerinde eşleşme IRT15 ve IRT35 arasında değişir, MP 604 T için
+IRT40 verilir. [AVenS s.31] Katalogda ayrıca inverterli hız kontrolörleri ve bunlarla birlikte
+kullanılan 0–10 V potansiyometre listelenir. [IND s.22]
+
+**Montaj.** E ve A-E serileri duvara monte edilir. [IND s.4] MP serisi duvara ve tavana monte
+edilebilir; yatay ve dikey montaja uygundur. [AVenS s.31] A-E ve MP serileri, kanala atış ya da hava
+filtresiyle birleştirme gibi belirgin basınç kaybı bulunan uygulamalarla uyumludur. [IND s.14]
+VORTICEL E serisi ise basınç kaybının aşılmasını gerektirmeyen uygulamalar için tasarlanmıştır.
+[IND s.4] Koruma ızgaralarının kolayca sökülebilmesi fanın bakım ve temizliğini basitleştirir.
+[IND s.4] Aksesuar olarak panel montajı için DPU ara parçası, PGR yerçekimli panjur ve TRA emniyet
+ağlı çerçeve model bazında eşlenmiştir. [IND s.22] MP serisi için aynı aksesuar kümesi ayrı bir
+tabloda verilir. [IND s.30]
+
+---
+
+## 2 · VORT E-ATEX (patlayıcı ortam aksiyel fanları)
+
+**DB:** `vortice-vort-e-atex` · **14 ürün** · 1145–6550 m³/h · 5 monofaze + 9 trifaze `[DB]`
+**Modeller:** E 254/304/354/404/454 M ve T ATEX · E 504/506/604/606 T ATEX `[DB]`
+
+### Kimlik cümlesi
+
+> Gaz veya toz nedeniyle patlayıcı ortam oluşabilen — ATEX sınıflandırmasına göre Grup II — sanayi
+> hacimlerinde kullanılmak üzere tasarlanmış, ATEX 2014/34/EU direktifine uygun, plaka tipi patlama
+> korumalı endüstriyel aksiyel fan ailesi. [ATX s.4]
+
+### Dört madde
+
+* **Gaz ortamı sınıflandırması "II 2G Ex h IIB T3 Gb"** — potansiyel patlayıcı gaz bulunan alanlar: endüstriyel depolar, kimya ve ilaç sanayii, akü şarj alanları. [ATX s.4]
+* **Toz ortamı sınıflandırması "II 2D Ex h IIIC T125°C Db"** — potansiyel patlayıcı toz bulunan alanlar: un üretim tesisleri, tekstil sanayii, alüminyum işleme tesisleri. [ATX s.4]
+* **Etiketteki tam kod "II 2G/D h T3/125°C X Gb/Db"**; kaynağa göre "h" yapısal güvenlik ve ateşleme kaynağı denetimini, "X" kullanma kılavuzunda belirtilen özel çalışma koşullarını, "Gb/Db" ise hem gaz hem toz için Bölge 1 uygunluğunu gösterir. [ATX s.5]
+* **Motor koruma derecesi IP65, motor sınıfı F, çalışma sıcaklığı aralığı −20 °C / +40 °C**. [ATX s.6] Ailede 14 model vardır; fiyat listesindeki debiler 1145 m³/h ile 6550 m³/h arasındadır. [AVenS s.38]
+
+### Yapısal bloklar
+
+**Gövde.** Çerçeve ve ızgaralar preslenmiş, asitle temizlenmiş ve fosfatlanmış çeliktendir; epoksi
+astar üzerine fırında sertleştirilen poliüretan toz boyayla gri dokulu yüzey elde edilir. [ATX s.6]
+Motor kapağı preslenmiş çeliktir. [ATX s.6] Elektrik bağlantısı metal kablo rakorlarıyla yapılır.
+[ATX s.6] Monofaze motorların kalkış kondansatörü metal bir muhafaza içine yerleştirilmiştir.
+[ATX s.6] Kaynak, kuş girişini engelleyen emniyet ızgaralarının çift yüzey kaplamayla korunan
+galvanizli çelik halkalardan yapıldığını belirtir. [IND s.98]
+
+**Çark.** Çark göbekleri alüminyumdandır. [ATX s.6] Kanatlar, cam elyafı takviyeli antistatik
+poliamid (PA) reçineden yapılır. [ATX s.6] Motor soğutma pervanesi de alüminyumdandır. [ATX s.6]
+Kaynak, kanat malzemesinin boyutsal kararlılık, dayanım ve agresif maddelere direnci bir arada
+sağlamak için seçildiğini yazar. [IND s.98]
+
+**Motor.** Motorlar tek hızlı, monofaze (M) veya trifaze (T) AC asenkron tiptir ve UNEL MEC standart
+B3/B5 gövdededir. [ATX s.6] Motorlar Ecodesign 2019/1781 düzenlemesine tam uyumludur ve miller çift
+korumalı bilyalı yataklara oturur. [ATX s.6] **Motorlarda termik koruma bulunmaz**; termik koruma
+(GV2-ME serisi) opsiyonel olarak sunulur. [ATX s.6] Modeller 4 veya 6 kutupludur ve devir sayısı
+model tablosunda verilir. [ATX s.7]
+
+**Koruma.** Motor koruma derecesi IP65'tir. [ATX s.6] Motor izolasyon sınıfı F'tir. [ATX s.6]
+Çalışma sıcaklığı aralığı −20 °C / +40 °C'dir. [ATX s.6] Ürünler, gaz ve toz nedeniyle patlama riski
+bulunan alanlarda kullanım için ATEX Direktifi uyarınca IMQ tarafından belgelendirilmiştir. [ATX s.6]
+Belgelendirmenin dayandığı standartlar arasında EN 14986, EN 60079-1, EN 60079-7, EN 60079-31 ve
+EN 60529 yer alır. [ATX s.3] Toz ortamı seçeneğinde etikette geçen 125°C, azami yüzey sıcaklığıdır.
+[ATX s.5] Kaynak, yapımda kullanılan önlem ve malzemelerin patlayıcı ortamlarda kullanıma uygun
+olduğunu ve motor koruma derecesinin IP65 olduğunu yazar. [IND s.98]
+
+**Kontrol.** Motorlar **tek hızlıdır**. [ATX s.6] Kontrol tarafında kaynakta yer alan tek donanım,
+opsiyonel GV2-ME termik-manyetik motor koruma şalteridir. [ATX s.6] GV2-ME04, GV2-ME05 ve GV2-ME06
+şalterleri ailedeki her modelle tek tek eşlenmiştir. [ATX s.13] Fiyat listesinde bu aile için, aksiyel
+ailede bulunan "HIZ ANAHTARI" sütunu yoktur. [AVenS s.38]
+
+> **Kaynakta karşılığı yok:** bu aile için hız kontrolü / debi ayarı seçeneği hiçbir kaynakta
+> geçmiyor — aksiyel ailedeki IRM/IRT hız anahtarları burada **eşlenmemiş**. Bu boşluk bilerek
+> bırakıldı; doldurulması için üretici teyidi gerekir.
+
+**Montaj.** Cihazlar duvara veya tavana monte edilmek üzere tasarlanmıştır ve kanala da bağlanabilir.
+[ATX s.7] Kurulum ortamlarının sınıflandırılması ve tanımlanması yetkili merciler tarafından
+yapılmalıdır. [ATX s.7] Anma çapları (mm) 250, 315, 355, 400, 450, 500 ve 630 değerleriyle
+tanımlıdır; her modelin montaj ölçüsü ayrı tabloda verilir. [ATX s.8] Kaynak, bu cihazların duvara,
+tavana ve hatta kanal içine kurulabildiğini belirtir. [IND s.98]
+
+---
+
+## 3 · İki aileyi ayıran cümle
+
+> **İki aile aynı gövde mantığından gelir; ayrım sertifika ve koruma tarafındadır.** Her ikisi de
+> Vortice'in plaka tipi aksiyel fanıdır: preslenmiş çelik panel, kuş girişini engelleyen koruma
+> ızgarası ve F sınıfı asenkron motor. [IND s.4] **Birinci fark — belge:** VORT E-ATEX ailesi ATEX
+> 2014/34/EU direktifine uygun üretilmiştir ve IMQ tarafından belgelendirilmiştir. [ATX s.6] Aksiyel
+> ailenin fanları böyle bir belge taşımaz; kaynak, aşındırıcı toz ile asidik/korozif madde derişimi
+> yüksek akışlar için uygun olmadıklarını açıkça yazar. [IND s.14] **İkinci fark — koruma derecesi:**
+> ATEX ailesinde motor koruma derecesi IP65'tir. [ATX s.6] Aksiyel ailede ise seriye göre değişir.
+> E serisinde IP44'tür. [IND s.4] A-E serisinde IP54'tür. [IND s.14] MP serisinde IP55'tir. [IND s.24]
+> **Üçüncü fark — malzeme ve
+> ateşleme kaynağı denetimi:** ATEX çarkında kanatlar antistatik poliamid reçinedendir ve elektrik
+> bağlantısı metal kablo rakorlarıyla yapılır. [ATX s.6] **Dördüncü fark — termik koruma:** ATEX
+> motorlarında dahilî termik koruma yoktur, koruma şalteri dışarıdan eklenir. [ATX s.6] Aksiyel
+> ailenin E serisi motorları ise termik korumalıdır. [IND s.4] **Beşinci fark — sıcaklık:** ATEX
+> ailesinin çalışma aralığı daha dardır, −20 °C / +40 °C. [ATX s.6] MP serisi ise −15 °C / +70 °C
+> aralığında çalışır. [IND s.24]
+
+Kısaca: **patlayıcı ortam varsa E-ATEX, yoksa VORTICEL aksiyel.** ATEX'in bedeli daha dar sıcaklık
+aralığı, tek hız ve dışarıdan eklenen motor korumasıdır; karşılığı, Bölge 1 / Bölge 21'de
+kullanılabilen belgeli bir fandır.
+
+---
+
+## 4 · Kaynakta gördüğüm çelişki ve hatalar (K7.5)
+
+1. **ATEX debileri iki katalogda FARKLI.** `industrial_Ventilation.pdf` s.99 eski kodları ve eski
+   değerleri verir (E 254 M ATEX kod 40301, 1040 m³/h; E 604 T ATEX kod 40317, 6900 m³/h).
+   `E_ATEX_Range_yeni_2025.pdf` s.7 yeni kodları ve yeni değerleri verir (40320, 1145 m³/h; 40331,
+   6550 m³/h). **DB'deki 1145–6550 aralığı yeni kataloğa uyuyor**, bu yüzden ATEX metninde
+   **ATX kaynağı esas alındı**; IND s.98 yalnızca yeni katalogla çelişmeyen yapısal ifadeler için
+   kullanıldı, IND s.99 hiç kullanılmadı.
+2. **ATX s.7'de anma çapı sütunu iki modelde yer değiştirmiş görünüyor:** E 506 T ATEX için 630,
+   E 604 T ATEX için 500 yazıyor. Oysa aynı belgenin s.8 ölçü tablosunda E 506 T ATEX'in ØF ölçüsü
+   498, E 604 T ATEX'inki 598'dir — yani tersi. Taslakta model başına çap iddiası **yazılmadı**.
+3. **ATX s.12'deki performans eğrisi başlıklarında kod yanlış:** "E 604 T ATEX … code 40332" ve
+   "E 606 T ATEX … code 40333" yazıyor; s.5, s.7 ve s.13'e göre 40331 = E 604 T, 40332 = E 606 T,
+   40333 = E 506 T. Eğri sayfaları taslakta kullanılmadı.
+4. **AVenS s.38 ile ATX s.7 debileri birkaç modelde küçük farklarla ayrışıyor:** E 506 T ATEX
+   AVenS'te 3600, katalogda 3580; E 354 T ATEX AVenS'te 2546, katalogda 2548. Taslakta yalnız uç
+   değerler (1145 ve 6550) kullanıldı; ikisi de her iki kaynakta aynı.
+5. **AVenS s.38'deki ATEX etiket şeması bir ÖRNEKTİR, bizim ürünümüzün kodu DEĞİLDİR.** Orada
+   "II 2 G Ex db IIC T4 Gb" yazar; bizim ailenin kodu ATX s.5'e göre "II 2G/D h T3/125°C X Gb/Db".
+   Taslakta **yalnız ürünün kendi kodu** kullanıldı. Bu, ailenin koruma tipini ("h" ↔ "db") ve gaz
+   grubunu ("IIB" ↔ "IIC") yanlış göstermeye çok açık bir tuzaktı.
+6. **ATX s.5'teki sıcaklık sınıfı tablosunun başlığı bozuk çıkıyor** (metin katmanında "Class L (mm)"
+   gibi okunuyor; satırlar T1 450 / T2 300 / T3 200 …). Bu tablodan **hiçbir sayı taslağa alınmadı**;
+   T3'ün karşılığı olan yüzey sıcaklığı **yazılmadı**, çünkü kaynaktaki birim güvenilir değil.
+7. **`industrial_Ventilation.pdf` s.4/s.5'e göre E serisinin ikinci tablosu (E 302 M … E 606 T)
+   "yalnızca AB dışı pazar için" işaretlidir.** Bizim sattığımız **E 404 M, E 504 M ve E 604 M** bu
+   tablodadır; **E 354 M** ise AB tablosundadır. Türkiye AB dışı pazar olduğu için bu bir çelişki
+   değil — ama vitrinde "Avrupa serisi / ErP kapsamında" gibi bir ifade kullanılırsa **yanlış olur**;
+   kullanılmadı.
+8. **A-E serisinin basınç sınıfı iki kaynakta farklı adlandırılıyor:** Vortice kataloğu başlığı
+   "Low-pressure plate axial fans" (düşük basınçlı) [IND s.14], AVenS fiyat listesi ise "VORTICEL A-E
+   ORTA BASINÇLI AKSİYEL FANLAR" der [AVenS s.30]. Taslak, blok metinlerinde A-E için basınç sınıfı
+   iddiasını **üstlenmedi**; yalnız iki kaynakta da doğrulanan "ince gövdeli / basınç kaybı olan
+   uygulamalara uygun" ifadeleri kullanıldı.
+9. **MP 604 T debisi iki kaynakta farklı:** AVenS s.31'de 14000 m³/h, IND s.25'te 14500. DB 14500
+   diyor; taslakta bu sayı **cümle içinde kullanılmadı**, yalnız DB satırında aralık ucu olarak var.
+10. **AVenS s.31 MP serisini "duvara ve tavana monte edilebilir" der; IND s.24 başlığı ise
+    "Wall-hung" (duvara asılan) der.** Tavan montajı yalnız TR fiyat listesinde geçtiği için o cümle
+    **AVenS'e referanslandı**, katalog kaynağına değil.
+
+## 5 · Kapatmadığı
+
+* **EN çevirisi yazılmadı** (ayrı tur).
+* **Debi / basınç / ses tabloları taslağa girmedi**; model başına sayı kullanılmadı.
+* **A-E serisi için elektrik izolasyon sınıfı** kaynakta (IND s.14) yazmıyor; E ve MP için yazıyor.
+  Bu yüzden "tüm ailede sınıf I" **denmedi**.
+* **ATEX ailesinde hız kontrolü/debi ayarı** kaynakta yok — o kısım bilerek boş bırakıldı (kutu).
+* **`is_description_manual`** bu metin yüklenirse **true** yapılmalı, yoksa sonraki otomatik tur ezer.
+* Ticari onay yok.
+
+---
+
+— URUN-KATALOG alt-ajanı (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-hava-perdesi-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf, AD=Air_Conditioning_Air_Door_2.pdf -->
+
+# İçerik hattı — TR taslak: AIR DOOR AD (ortam havalı) · AIR DOOR H AD (elektrikli ısıtıcılı)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** hava perdesi aile grubu (REC-146 Adım 2b)
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026 s.64 (TR) · Vortice AIR DOOR RANGE kataloğu s.4–8 (EN, **çevrildi**)
+**Referans biçimi:** `[AVenS s.NN]` = fiyat listesi · `[AD s.NN]` = Air_Conditioning_Air_Door_2.pdf
+
+> **Sayfa aralığı notu.** Emir `AD s.6–8` diyordu. Ölçtüm: AIR DOOR RANGE bölümü PDF'te **s.4'te
+> başlıyor** (aile tanımı + anahtar özellikler); s.5 montaj yüksekliği, hava hızı ve uygulama
+> alanlarını taşıyor. Bu iki sayfayı dışarıda bırakmak ailenin montaj verisini kaynaksız
+> bırakırdı — bu yüzden **s.4 ve s.5 de referans verildi**. PDF toplam 8 sayfa; basılı sayfa
+> numaraları PDF sayfalarıyla birebir örtüşüyor (kontrol edildi, s.6 → "6").
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.1** (varyant metni yazılır, yüklenmez) · **K7.2** (çeviri serbest) · **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp örneği: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md`.
+* Kapı: `scripts/icerik-hatti/taslak-kaynak-kapisi.py` (sonuç §8'de).
+
+---
+
+## 0 · Niçin bu ikisi birlikte yazıldı
+
+İki aile de kaynakta **aynı bölümü paylaşıyor**: AD ve H AD modelleri Vortice kataloğunda tek bir
+"AIR DOOR RANGE" başlığı, tek ürün tanımı ve **tek teknik tablo** içinde duruyor [AD s.6];
+TR fiyat listesinde ise aynı sayfada, iki ayrı tablo hâlinde [AVenS s.64].
+
+Paylaşık bölümü doğru aileye bölmenin tek dürüst yolu, ikisini yan yana yazmaktır. Ayrı ayrı
+yazılsalardı ikisi de "cross-flow fanlı, uzaktan kumandalı hava perdesi" diye başlayacak ve
+**ısıtıcılı olan ile olmayan vitrinde aynı görünecekti** — müşterinin ödediği farkı gizleyen tam
+bu tür bir cümledir. Kaynağın kendisi ayrımı açıkça yazıyor: ısıtma elemanları **"yalnızca
+AIR DOOR H modelleri için"** [AD s.6].
+
+## 1 · Bugün DB'de ne var (emirle gelen ölçüm, 2026-09-06)
+
+| Aile | Ürün | `description.tr` | Durum |
+|---|---|---|---|
+| `vortice-hava-perdesi` | 4 | 1 cümle (ortam havalı, "monofaze model") | var ama altı blok yok, zenginleştiriliyor |
+| `vortice-h-ad-elektrikli` | 4 | **BOŞ** | sıfırdan yazılıyor |
+
+**Mevcut `vortice-hava-perdesi` metni (çekirdeği doğru, korunuyor):**
+> "İç mekan sıcaklığını korumak ve dış ortamla ısı alışverişini engellemek amacıyla kapıların
+> üzerine monte edilmek üzere tasarlanmış, ortam havalı hava perdesi ünitesi (monofaze model)."
+
+Bu metin kaynakla çelişmiyor: ortam havalı dört modelin dördü de monofazedir. Taslak onu
+**değiştirmiyor**, üstüne altı bloğu ekliyor. `H AD` ailesinde ise "monofaze model" ifadesi
+**yanlış olurdu** — o ailede üç model trifazedir [AVenS s.64].
+
+---
+
+## 2 · AIR DOOR AD Serisi — ortam havalı (ısıtmasız)
+
+**DB:** `vortice-hava-perdesi` · 4 ürün · AD 900 / AD 1200 / AD 1500 / AD 2000 · dördü de monofaze
+
+### Kimlik cümlesi
+
+> Kapıların ve genel olarak giriş bölgelerinin hizasına monte edilen AIR DOOR üniteleri, dış
+> ortamdaki rahatsız edici sıcaklıktaki havanın içeri girmesini engelleyen bir hava akımı
+> oluşturur; böylece kışın ısıtma, yazın soğutma tarafında hissedilir bir maliyet tasarrufu
+> sağlar. [AD s.6]
+
+### Dört madde
+
+* Farklı sıcaklıktaki bölgeleri ayıran görünmez bir bariyer kurar; yazın soğutulmuş, kışın ısıtılmış havanın kaçmasını, dışarıdan toz, egzoz gazı, duman, koku ve böcek girişini engeller. [AD s.4]
+* Cross-Flow fan kanadı, hava yönü belirleyici kanatlar ve uzaktan kumanda. [AVenS s.64]
+* Isıtıcısız (standart) modellerde hava çıkış hızı 9/11 m/s'ye ulaşır — ısıtıcılı modellerin üstünde. [AD s.7]
+* Alüminyum gövde ve ızgara ile estetik, şık tasarım. [AVenS s.64]
+
+### Teknik veri (kaynak tablosundan birebir)
+
+| Model | Kod | Fan gücü asg./azm. (W) | Debi asg./azm. (m³/h) | Ses asg./azm. (dB) | Ağırlık (Kg) |
+|---|---|---|---|---|---|
+| AIR DOOR AD 900 | 65195 | 110/160 | 1100/1400 | 55/57 | 10 |
+| AIR DOOR AD 1200 | 65196 | 150/200 | 1600/1900 | 56/58 | 12.5 |
+| AIR DOOR AD 1500 | 65197 | 180/230 | 2000/2500 | 57/59 | 15.5 |
+| AIR DOOR AD 2000 | 65198 | 300/350 | 2900/3600 | 59/61 | 20.5 |
+
+Aynı değerlerin cümle hâli (kapının ölçebilmesi için):
+
+* Fan gücü modele göre 110/160 W ile 300/350 W arasındadır. [AD s.7]
+* Hava debisi 1100/1400 m³/h ile 2900/3600 m³/h arasında değişir (asgari/azami). [AD s.7]
+* Ses seviyesi 55/57 dB ile 59/61 dB arasındadır. [AD s.7]
+* Ağırlık 10 kg ile 20.5 kg arasındadır (ondalık ayırıcı kaynaktaki gibi bırakıldı — bulgu 6). [AD s.7]
+* Dört modelin dördü de 230 V ve 50 Hz besleme ile, monofaze çalışır. [AD s.7]
+* Gövde ölçüleri: A boyu sırasıyla 900 mm, 1200 mm, 1500 mm ve 2000 mm; B = 220 mm ile C = 190 mm dört modelde ortaktır. [AD s.7]
+* Hava hızı sütunu dört model için tek birleşik hücredir: 9/11 m/s. [AD s.7]
+* Isıtma gücü sütunu bu dört modelde tire ile boş bırakılmıştır — ısıtma yoktur. [AD s.7]
+* TR listede kapı genişliği karşılıkları: 1 m · 1,2 m · 1,5 m · 2 m. [AVenS s.64]
+
+### Yapısal bloklar
+
+**Gövde.** Ön paneller fırçalanmış alüminyumdandır (gümüş gri renk) ve emiş ızgarasını kendi
+üzerinde barındırır; arka paneller siyah boyalı sacdan, yan paneller siyah termoplastik reçineden
+üretilmiştir. [AD s.6] TR kaynak bunu "alüminyum gövde ve ızgara" ve "estetik, şık tasarım" diye
+özetler. [AVenS s.64] Gövde derinliği dört modelde ortaktır: B = 220 mm, C = 190 mm. [AD s.7]
+
+**Çark.** Cross-flow (çapraz akışlı) fanlar kullanılır; bu çark tipi düşük ses seviyesi sağlar.
+[AD s.6] Egzoz çıkışının hizasına yerleştirilen ayarlanabilir kanatlar, çıkan hava akımını
+istenen yöne yönlendirir. [AD s.6] TR kaynakta aynı parça "hava yönü belirleyici kanatlar"
+olarak geçer. [AVenS s.64]
+
+**Motor.** Fanlar asenkron, çift milli, iki hızlı motorlarla tahrik edilir; bu seçim performans,
+üretilen hava akımının sıcaklığı ve dışarı verilen ses seviyesi arasında en iyi dengeyi kurar.
+[AD s.6] Fan gücü 110/160 W ile 300/350 W arasındadır ve besleme 230 V / 50 Hz monofazedir.
+[AD s.7]
+
+**Koruma.** Yalıtım sınıfı: I. [AD s.6] Ürünler şu standartlara uygundur: EN 60335-1,
+EN 60335-2-80, EN 60529 ve EN 62233. [AD s.8] Elektromanyetik uyumluluk için EN 55014 serisi,
+EN 61000-3-2 ve EN 60555-1 listelenir; CE işareti Alçak Gerilim ve Elektromanyetik Uyumluluk
+direktiflerine dayanır. [AD s.8]
+> **IP koruma sınıfı, yangına tepki sınıfı ve motor ömrü (saat): kaynakta karşılığı yok.**
+> Bu üç kalem LINEO ailesinde vardı; hava perdesi kaynağında **yoktur** ve yazılmamıştır.
+
+**Kontrol.** Kızılötesi uzaktan kumanda ile açma/kapama ve çalışma hızı seçimi yapılır; aynı
+komutlar cihaz üzerinde de tekrarlanmıştır ve ön paneldeki bir lamba ürün durumunu gösterir.
+[AD s.6] Motorlar iki hızlıdır. [AD s.6] Ünite, piyasadaki standart kapı sensörleriyle birlikte
+çalışacak biçimde bağlanabilir. [AD s.6] TR kaynak ürünü "uzaktan kumandalı" olarak listeler.
+[AVenS s.64]
+> **Isıtıcı aç/kapa komutu bu ailede YOKTUR** — kumandadaki o işlev yalnızca AIR DOOR H
+> modelleri içindir. [AD s.6]
+
+**Montaj.** Yatay, duvara montaj içindir; kapıların üstüne ya da açıklığa mümkün olduğunca yakın
+monte edilir, böylece havanın yanlardan geçmesi önlenir. [AD s.5] Asgari montaj yüksekliği 2,3
+metre, önerilen azami montaj yüksekliği 4 metredir. [AD s.5] Ön taraftan emişli ızgara sayesinde
+perde ile tavan arasında boşluk bırakmak gerekmez; bu yüzden alçak tavanlı hacimlerde bile
+(en az 2,30 m) tavana yakın montaj mümkündür. [AD s.4] Pratik duvar montaj braketiyle kolay ve
+hızlı kurulur. [AD s.5] Geniş açıklıkları kapatmak için üniteler **seri hâlinde** yan yana monte
+edilebilir. [AD s.4]
+
+---
+
+## 3 · AIR DOOR H AD Serisi — elektrikli ısıtıcılı
+
+**DB:** `vortice-h-ad-elektrikli` · 4 ürün · H AD 900 M / H AD 900 T / H AD 1200 T / H AD 1500 T
+· **1 monofaze + 3 trifaze** · açıklama bugün **BOŞ**
+
+### Kimlik cümlesi
+
+> Kapı ve giriş açıklıklarının hizasına yatay monte edilen, PTC termistörlü elektrikli ısıtma
+> elemanlarıyla donatılmış hava perdesi; dışarıdan gelen soğuk havayı kesmekle kalmaz, üflediği
+> havayı ısıtarak geçiş bölgesinde konfor sıcaklığını korur. [AVenS s.64]
+
+### Dört madde
+
+* PTC termistörlerden oluşan ısıtma elemanları yüksek ısıl performans ve düşük hava direnci sunar; aşırı ısınmaya ve gerilim tepelerine karşı korumalıdır. [AD s.6]
+* Isıtıcı bataryası kapandıktan sonra fanın durmasını geciktiren özel bir çalışma mantığı vardır; bu, ürünün zaman içinde güvenilir çalışmasına katkı verir. [AD s.6]
+* Isıtıcı gücü üç kademelidir ve modele göre değişir: 2/4/6 kW, 4/6/8 kW ve 6/8/10 kW. [AD s.7]
+* Dört modelin biri monofaze (H AD 900), üçü trifazedir (T). [AVenS s.64]
+
+### Teknik veri (kaynak tablosundan birebir)
+
+| Model | Kod | Fan gücü asg./azm. (W) | Isıtıcı gücü asg./orta/azm. (kW) | Debi asg./azm. (m³/h) | Ses asg./azm. (dB) | Ağırlık (Kg) |
+|---|---|---|---|---|---|---|
+| AIR DOOR H AD 900 M | 65155 | 110/160 | 2/4/6 | 1000/1200 | 55/57 | 13.5 |
+| AIR DOOR H AD 900 T | 65156 | 110/160 | 2/4/6 | 1000/1200 | 55/57 | 13.5 |
+| AIR DOOR H AD 1200 T | 65157 | 150/200 | 4/6/8 | 1500/1700 | 56/58 | 16 |
+| AIR DOOR H AD 1500 T | 65158 | 180/230 | 6/8/10 | 1900/2200 | 57/59 | 18.5 |
+
+Aynı değerlerin cümle hâli (kapının ölçebilmesi için):
+
+* Fan gücü 110/160 W ile 180/230 W arasındadır. [AD s.7]
+* Isıtıcı gücü üç kademelidir: 2/4/6 kW, 4/6/8 kW ve 6/8/10 kW. [AD s.7]
+* Hava debisi 1000/1200 m³/h ile 1900/2200 m³/h arasında değişir. [AD s.7]
+* Ses seviyesi 55/57 dB ile 57/59 dB arasındadır. [AD s.7]
+* Ağırlık 13.5 kg ile 18.5 kg arasındadır (ondalık ayırıcı kaynaktaki gibi). [AD s.7]
+* Trifaze modellerin besleme gerilimi tabloda 380 V olarak verilir. [AD s.7]
+* Gövde ölçüleri: A boyu sırasıyla 950 mm, 950 mm, 1230 mm ve 1510 mm; B = 305 mm ile C = 235 mm dört modelde ortaktır. [AD s.7]
+* Hava hızı sütunu dört model için tek birleşik hücredir: 8,5/9,5 m/s. [AD s.7]
+* TR listede kapı genişliği karşılıkları: 1 m · 1 m · 1,2 m · 1,5 m. [AVenS s.64]
+
+> **Besleme uyarısı.** Tabloda 380 V yalnız 65156 satırının hizasında yazılıdır; 65155 satırının
+> besleme hücresi **boştur**. [AD s.7] O modelin monofaze olduğu ancak TR listeden bilinir:
+> "AIR DOOR H AD 900 Monofaze". [AVenS s.64]
+
+### Yapısal bloklar
+
+**Gövde.** Gövde yapısı ısıtmasız AD serisiyle ortaktır: fırçalanmış alüminyum ön panel (gümüş
+gri, emiş ızgarası entegre), siyah boyalı sac arka panel, siyah termoplastik reçine yan paneller.
+[AD s.6] TR kaynak bu aileyi de "alüminyum gövde ve ızgara" ve "estetik, şık tasarım" ile
+tanımlar. [AVenS s.64] Gövde **daha derindir**: ısıtmasız modelde B = 220 mm ve C = 190 mm iken,
+ısıtıcılı modelde B = 305 mm ve C = 235 mm'dir — ısıtma bataryası bu hacmi ister. [AD s.7]
+
+**Çark.** Ortaktır: cross-flow (çapraz akışlı) fanlar düşük ses seviyesi sağlar; egzoz
+hizasındaki ayarlanabilir kanatlar hava akımını istenen yöne yönlendirir. [AD s.6] TR kaynak bu
+ailede de "Cross-Flow fan kanadı" ve "hava yönü belirleyici kanatlar" yazar. [AVenS s.64]
+
+**Motor.** Fanlar asenkron, çift milli, iki hızlı motorlarla tahrik edilir. Kaynak bu seçimin
+gerekçesini yazarken **ısıtıcılı modelleri açıkça anar**: denge, performans ile *üretilen hava
+akımının sıcaklığı* (ısıtma elemanlı modellerde) ve ses seviyesi arasında kurulur. [AD s.6]
+Fan gücü 110/160 W ile 180/230 W arasındadır; buna ek olarak 2/4/6 kW ile 6/8/10 kW aralığında
+üç kademeli ısıtıcı gücü gelir. [AD s.7]
+
+**Koruma.** PTC ısıtma elemanları aşırı ısınmaya ve yüksek gerilime karşı korumalıdır.
+[AVenS s.64] Aynı koruma kaynakta "aşırı ısınma ve gerilim tepelerine karşı korumalı" diye
+tanımlanır ve bataryanın kapanmasından sonra fanı geciktiren çalışma mantığıyla desteklenir.
+[AD s.6] Yalıtım sınıfı: I. [AD s.6] Ürünler EN 60335-1, EN 60335-2-80, EN 60529 ve EN 62233
+standartlarına uygundur. [AD s.8]
+> **IP koruma sınıfı ve ısıtıcı için ayrı bir termik emniyet kodu: kaynakta karşılığı yok.**
+
+**Kontrol.** Kızılötesi uzaktan kumanda açma/kapama, çalışma hızı seçimi **ve ısıtma
+elemanlarının açılıp kapatılmasını** sağlar; son işlev kaynakta "yalnızca AIR DOOR H modelleri"
+notuyla verilmiştir. [AD s.6] Komutlar cihaz üzerinde de tekrarlanır, ön paneldeki lamba ürün
+durumunu gösterir. [AD s.6] Motorlar iki hızlıdır ve ünite piyasadaki standart kapı
+sensörleriyle çalışacak biçimde bağlanabilir. [AD s.6] TR kaynak ürünü "uzaktan kumandalı"
+olarak listeler. [AVenS s.64]
+
+**Montaj.** Ortaktır: yatay duvar montajı, kapı üstü ya da açıklığa en yakın konum, asgari 2,3
+metre montaj yüksekliği ve önerilen azami 4 metre. [AD s.5] Ön emişli ızgara sayesinde tavanla
+arada boşluk gerekmez. [AD s.4] Pratik duvar montaj braketiyle kurulur ve geniş açıklıklar için
+seri montaj mümkündür. [AD s.4] Isıtıcılı modellerde hava hızı 8,5/9,5 m/s'dir; ısıtmasız
+ailenin 9/11 m/s değerinin altında kalır. [AD s.7] Montaj yüksekliğinin bu farka göre nasıl
+seçileceği **kaynakta yazmıyor** — hesap yapılmadı, yorum eklenmedi.
+
+---
+
+## 4 · İki aileyi ayıran cümle (paylaşık bölümün çözümü)
+
+> **AIR DOOR AD ile AIR DOOR H AD aynı gövde ailesi, aynı cross-flow fan, aynı iki hızlı asenkron
+> motor ve aynı kızılötesi kumanda mantığını paylaşır. Ayıran tek şey, H AD'de bulunan PTC
+> termistörlü elektrikli ısıtma elemanlarıdır: AD ortam havasını üfler, H AD üflediği havayı
+> ısıtır.** [AD s.6]
+
+Bu farkın vitrinde görünmesi için kaynakta ölçülebilir üç sonucunu yazmak yeterlidir:
+
+1. **Hava hızı düşer.** Isıtmasız ailede 9/11 m/s, ısıtıcılı ailede 8,5/9,5 m/s. [AD s.7]
+2. **Debi düşer, karşılığında ısı gelir.** Aynı 900 boyunda ısıtmasız modelin debisi
+   1100/1400 m³/h iken ısıtıcılı modelinki 1000/1200 m³/h'dir; karşılığında 2/4/6 kW ısıtma
+   gücü gelir. [AD s.7]
+3. **Besleme ve gövde değişir.** Isıtmasız ailenin dördü de monofazeyken ısıtıcılı ailede üç
+   model trifazedir [AVenS s.64]; ayrıca ısıtıcılı gövde daha derindir (305 mm ve 235 mm'ye
+   karşı 220 mm ve 190 mm). [AD s.7]
+
+"Isıtmalı" kelimesi tek başına yetmez: ısıtmanın **bedeli** (daha düşük debi ve hız, trifaze
+besleme ihtiyacı, daha derin gövde) müşterinin karar verirken göreceği asıl bilgidir.
+
+---
+
+## 5 · K7.1 — YAZILDI ama YÜKLENMEZ (satmadığımız varyantlar)
+
+Kaynak, iki aileyi birlikte sayarken **"8 model"** der ve boy listesini şöyle verir:
+900 mm, 1200 mm, 1500 mm ve 2000; besleme türü ise monofaze veya trifazedir. [AD s.6]
+
+DB'deki 4 + 4 = 8 ürün bu sayıyla **birebir örtüşür**. Yani bu kaynakta satmadığımız bir AIR DOOR
+varyantı **yoktur** — LINEO turundaki gibi "yaz ama yükleme" kalemi bu grupta çıkmadı. Tek
+istisna adlandırmadır: TR liste 65155'i "AIR DOOR H AD 900 Monofaze" diye yazar, katalog
+"AIR DOOR H AD 900 M" der; kod aynı olduğu için aynı üründür, yeni bir varyant değildir.
+[AVenS s.64]
+
+---
+
+## 6 · Kaynakta gördüğüm çelişkiler ve tuzaklar (K7.5 — hepsi kayıtta)
+
+1. **Debi çelişkisi — anahtar özellikler ile teknik tablo uyuşmuyor.** Anahtar özellikler sayfası
+   "yüksek performans (2,700 m3/h'ye kadar)" der. [AD s.4] Aynı kataloğun teknik tablosunda ise
+   AIR DOOR AD 2000 için azami debi 3600 m³/h'dir. [AD s.7] **Taslakta anahtar özellikler
+   sayfasının değeri KULLANILMADI**; model bazında ayrıntılı olan tablo esas alındı. Hangisinin
+   güncel olduğu **ölçülmedi** — üretici teyidi gerekir.
+2. **Model adı katalog içinde tutarsız.** Teknik tablo 65158'i **"AIR DOOR AD H 1500 T"** yazar
+   (H ile AD yer değiştirmiş); boyut tablosu ve TR liste **"AIR DOOR H AD 1500 T"** yazar.
+   [AD s.7] Kod aynı olduğu için aynı üründür; ad, TR listedeki biçimle alındı. [AVenS s.64]
+3. **Boy listesinde birim düşmüş.** Kaynak "900 mm, 1200 mm, 1500 mm ve 2000" yazar — dördüncü
+   değerde birim yoktur. [AD s.6] Boyut tablosu aynı ölçüyü 2000 mm olarak ve başlıkta
+   "Dimensions (mm)" diyerek doğrular. [AD s.7] §5'teki alıntıda eksik **kaynaktaki gibi
+   bırakıldı**, tamamlanmadı.
+4. **Besleme sütunu birleşik hücrelerle yazılmış.** Tabloda 230 V yalnız 65195 satırının,
+   380 V yalnız 65156 satırının hizasında görünür; diğer satırlar boştur. [AD s.7] Yani
+   65155'in besleme değeri katalog tablosunda **yoktur**; monofaze olduğu ancak TR listeden
+   bilinir. [AVenS s.64] "Tabloya bakıp faz çıkaran" bir betik burada sessizce yanlış üretir.
+5. **TR listede ısıtıcı gücü birimsiz ve virgülle ayrılmış.** Sütun "ISITICI GÜCÜ" der, değerler
+   "2,4,6" biçimindedir. [AVenS s.64] Bu, ondalık sayı gibi okunabilir (2,4 ve 6). Doğrusu üç
+   kademedir ve birim **yalnız İngilizce katalogda** verilir: 2/4/6 kW. [AD s.7] Otomatik
+   ayrıştırmada bu alan elle doğrulanmadan kullanılmamalıdır.
+6. **Aynı tabloda iki farklı ondalık ayırıcı.** Ağırlık sütunu 12.5 kg, 15.5 kg, 20.5 kg (nokta);
+   hava hızı sütunu 8,5/9,5 m/s (virgül) biçimindedir. [AD s.7] Taslak kaynaktaki biçimi korudu;
+   **DB'ye yazılırken Türkçe ondalık ayırıcıya (virgül) çevrilmelidir.**
+7. **Standart kodlarından biri yumuşak tire (U+00AD) ile yazılmış.** Düz metne çıkarıldığında kod
+   parçalanıyor ve otomatik eşleşme düşüyor. [AD s.8] Bu yüzden EMC standartları taslakta seri
+   adıyla anıldı, tek tek dizilmedi.
+8. **Model adı TR listede bitişik yazılmış.** "AIR DOOR AD1200 / AD1500 / AD2000" — katalogda
+   boşlukludur. [AVenS s.64] Ad eşleştirmesi **kod üzerinden** yapılmalıdır (65195–65198,
+   65155–65158), ad üzerinden değil. [AD s.7]
+9. **Katalog eski.** Kapak arkasındaki baskı kodu 07/15 tarihlidir ve CE için gösterilen
+   direktifler 2006/95 ile 2004/108'dir; ikisi de o tarihten sonra yenilenmiştir. [AD s.8]
+   Vitrinde direktif numarası **yazılmadı**; yalnız "Alçak Gerilim ve Elektromanyetik Uyumluluk
+   direktifleri" denildi.
+
+---
+
+## 7 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` için ayrı tur gerekir.
+* **Fiyat ve stok yazılmadı** (K1). TR kaynakta Euro fiyat sütunu var; taslağa **alınmadı**.
+* **Boş kalan kalemler:** IP koruma sınıfı, yangına tepki sınıfı, motor ömrü (saat), filtre ve
+  ısı geri kazanım — **kaynakta karşılığı yok**, hiçbiri yazılmadı.
+* **Kapının zayıf yeri, dürüstçe:** kapı sayı+birim jetonunu bulamazsa **yalnız sayıyı** arar.
+  "6 kW" gibi tek haneli değerlerde bu ayırt edici değildir (sayfada "6" zaten geçer). Güçlü
+  doğrulananlar dört haneli olanlardır (1400, 3600, 2200, 1510, 1230). Bunu bilerek okuyun.
+* **`is_description_manual` bayrağı** — elle yazılmış bu metin yüklenirse **true** yapılmalı;
+  aksi hâlde sonraki otomatik tur ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+## 8 · Kapı çıktısı
+
+```
+cd C:/tmp/vh-katalog-rec146 && PYTHONIOENCODING=utf-8 \
+  python scripts/icerik-hatti/taslak-kaynak-kapisi.py <bu dosya> --ayrinti
+
+  [YESIL] ajan-hava-perdesi.md
+      dogrulanan 31 · DUSEN 0 · olculemeyen 65 (jeton tasimayan cumle) · kapsama %32 · referans 96
+
+SONUC: YESIL — jeton tasiyan her iddia, referans verdigi sayfada dogrulandi.
+```
+
+İki not:
+
+* Kapı betiği bu koşuda **çalışma ağacında düzenlenmekteydi** (commit'siz değişiklik):
+  ilk koşumda `KeyError: 'db_etiketi'` ile çöktü, ikinci koşumda konsol kod sayfası yüzünden
+  `UnicodeEncodeError` verdi. İkisi de **benim taslağımın değil, betiğin** durumudur;
+  `PYTHONIOENCODING=utf-8` ile koşuldu. → `ortak-agacta-commitsiz-is-ucar`
+* İlk koşumda **1 düşen** vardı: "2.700 m³/h" yazmıştım (Türkçe binlik ayırıcı), kaynak
+  "2,700 m3/h" yazıyor. Bu **benim hatamdı** ve kapı yakaladı — düzeltildi (bulgu 1).
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-heatmaster-slimroof-2026-09-06.md
+
+# İçerik hattı — TR taslak: SLIMROOF ES · HEATMASTER F400 (REC-146 Adım 2b·2, ikinci grup)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** Recep doğrudan onayı 2026-09-06 (K7.9)
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Kaynak:** Vortice Heatmaster/Slimroof kataloğu s.4–44 (EN, **çevrildi**) · AVenS fiyat listesi s.33–34 (TR)
+**Referans biçimi:** `[HSK s.NN]` = Heatmaster/Slimroof kataloğu · `[AVenS s.NN]` = fiyat listesi
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; **yanlış kapsamlı bilgi de vaat ihlalidir**.
+* Kararlar — Vitrin 15A **K6** · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.2** (çeviri) · **K7.5** (tespit kayıtta) · **K7.9** (bu grup).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok.
+* **`icerik-hatti-seri-metni-tek-model-kusuru-2026-09-06.md`** — bu iki ailenin mevcut metni
+  o kusurun **en ağır iki örneği**; bu taslak onu düzeltir.
+
+---
+
+## 0 · Bu grupta mevcut metin KORUNMUYOR, DÜZELTİLİYOR
+
+Lineo grubunda mevcut DB metni doğruydu, korudum. **Burada durum farklı** — mevcut metinler kusurlu:
+
+| Aile | Bugün DB'de yazan | DB'deki gerçek |
+|---|---|---|
+| `…-slimroof-roof` | "Nominal debisi **460 m³/h**", "monofaze model" | 460 – **18.600** m³/h · 5 monofaze + **5 trifaze** |
+| `…-slimroof-smoke` | "**Maksimum** debisi **2580 m³/h**", "monofaze model" | 2.580 – **22.550** m³/h · 3 monofaze + **7 trifaze** |
+
+Yani serinin **en küçük** modeli, serinin tamamı gibi sunulmuş — ikincisinde üstelik "maksimum" denerek.
+Taslak bunu **aralık vererek** düzeltir. Aralıklar **DB'den** okundu, katalogdan değil: bizim sattığımız
+modellerin aralığıdır. (Katalog Heatmaster için 21 model sayıyor, **bizde 10 model var** — katalog
+aralığını yazmak satmadığımız ürünü vaat etmek olurdu.)
+
+> **Adlandırma tuzağı (kayda geçiyor):** iki ailenin slug'ı da `…heatmaster-slimroof…` ile başlıyor;
+> `-roof` olan **SLIMROOF ES**, `-smoke` olan **HEATMASTER F400**. Slug'a bakarak hangisinin hangisi
+> olduğu anlaşılmıyor. Yeniden adlandırma bu şeridin işi değil, ama **karıştırılmaya açık** ve not edildi.
+
+---
+
+## 1 · SLIMROOF ES
+
+**DB:** `vortice-vort-heatmaster-slimroof-roof` · **10 ürün** · 460–18.600 m³/h · 5 monofaze + 5 trifaze
+
+### Kimlik cümlesi
+> Dikey gabarisi sınırlı çatılarda düşük enerji tüketimi ve hassas debi ayarı gerektiren uygulamalar için
+> tasarlanmış, EC motorlu radyal (yatay) atışlı çatı tipi santrifüj fan. [HSK s.26]
+
+### Dört madde
+* Kalıcı mıknatıslı EC motor — düşük tüketim ve kolay performans ayarı [HSK s.26]
+* Monofazede **IE5**, trifazede **IE4** verim sınıfı; dış rotorlu tasarım gabariyi küçültür [HSK s.27][AVenS s.33]
+* **Düşük dikey gabari** — mimari ve manzara kısıtı olan yerlere uygun [HSK s.29]
+* 0–10 V veya PWM sinyaliyle hız kontrolü [AVenS s.33]
+
+### Yapısal bloklar
+
+**Gövde.** Galvaniz çelik sac yapı, kuş telini bütünleşik olarak içerir. [HSK s.27] Alüminyum motor
+kapağı hafiftir ve kolayca sökülür; korozyona, darbeye, yüksek sıcaklığa ve atmosferik etkilere
+dayanıklıdır. Biçimi, şiddetli yağış halinde bile yağmurun alttaki kanala girmesini önleyecek şekilde
+tasarlanmıştır. [HSK s.27] Şapka, kanat ve gövde korozyona dayanıklıdır. [AVenS s.34]
+
+**Çark.** Yüksek verimli, geriye eğimli kanatlı, kendi kendini temizleyen santrifüj çark. 220 mm'ye
+kadar olan modellerde takviyeli poliamid, diğerlerinde alüminyum sac. [HSK s.27] Çark tasarımı, motor
+verimi ve kontrol elektroniği birlikte yüksek verim sağlar. [HSK s.29]
+
+**Motor.** Yüksek verimli EC motor: monofaze modellerde **IE5**, trifaze modellerde **IE4**. Dış rotorlu
+tip, toplam boyutları küçültür; miller bilyalı yataklara oturur, bu da ömrü uzatır. [HSK s.27]
+EC teknolojisi motorun her zaman optimum yükte çalışmasını sağlar. [AVenS s.33]
+
+**Koruma.** IP54 koruma derecesi. [HSK s.27] Elektrik izolasyon sınıfı I — **topraklama gereklidir**.
+[HSK s.27] Kuş ve yabani hayvanlara karşı koruma, hizmet kesintisine yol açabilecek arızaları önler.
+[HSK s.29] İstek üzerine dahili emniyet şalteri sunulur. [HSK s.27]
+Çalışma sıcaklığı −30 °C ile +60 °C arasında, modele göre değişir. [HSK s.27]
+
+**Kontrol.** Verimli enerji kullanımı için entegre elektronik kontrol sistemi. [AVenS s.33]
+0–10 V veya PWM sinyaliyle hız kontrolü yapılabilir. [AVenS s.33] Geniş ayar imkânı, sağlanan
+performansın değişen ihtiyaca uyarlanmasına ve enerji israfının sınırlanmasına olanak verir. [HSK s.29]
+
+**Montaj.** Radyal (yatay) atışlı çatı montajı. [HSK s.26] Hafif ve kolay sökülebilen motor kapakları ile
+fan taşıyıcı plakaların alttaki yapıya bağlandığı menteşeler, montaj ve bakımı basitleştirir; menteşe
+sistemi büyük boy modellerde bulunur. [HSK s.29][AVenS s.34] Alüminyum dikey atış aksesuarı (KV SLIMROOF)
+opsiyoneldir; işlenen havanın dikey atılmasını sağlayarak bina açıklıklarına yakın montajlarda havanın
+geri emilmesini önler. [HSK s.27][AVenS s.33]
+
+---
+
+## 2 · HEATMASTER F400
+
+**DB:** `vortice-vort-heatmaster-slimroof-smoke` · **10 ürün** · 2.580–22.550 m³/h · 3 monofaze + 7 trifaze
+
+### Kimlik cümlesi
+> Hem günlük havalandırma hem de yangın anında sıcak duman tahliyesi için kullanılabilen, **çift amaçlı**
+> radyal (yatay) atışlı çatı tipi santrifüj fan. [HSK s.4]
+
+### Dört madde
+* **F400 sertifikası: 400 °C sıcaklıkta 2 saat** çalışma (S2 servisi) [HSK s.4, s.5]
+* Sürekli çalışmada (S1) işlenen hava sıcaklığı **80 °C**, istek üzerine **120 °C** [HSK s.5]
+* Geriye eğimli kanatlı santrifüj çark; monofaze veya trifaze asenkron motor, tek ya da çift devir
+  (Dahlander) [HSK s.4]
+* 12101-3:2015 — duman ve ısı kontrol sistemleri standardına uygunluk [HSK s.4]
+
+### Yapısal bloklar
+
+**Gövde.** Galvaniz çelik sac yapı, kuş telini bütünleşik olarak içerir. [HSK s.5] Alüminyum motor
+kapakları hafif ve kolay sökülebilir; korozyona, darbeye, yüksek sıcaklığa ve atmosferik etkilere
+dayanıklıdır. Biçim, şiddetli yağışta bile yağmurun alttaki kanala girmesini engeller. [HSK s.5]
+
+**Çark.** Yüksek verimli, geriye eğimli kanatlı, kendi kendini temizleyen galvaniz çelik santrifüj çark.
+[HSK s.5] Geriye eğimli kanat yapısı verimi en üst düzeye çıkarmak için seçilmiştir. [HSK s.4]
+
+**Motor.** Yüksek verimli AC asenkron motor; Ecodesign 2019/1781 düzenlemesine uygundur ve tüketimi en aza
+indirir. Miller bilyalı yataklara oturur, bu da ömrü uzatır. [HSK s.5] Monofaze modellerde 230 V/50 Hz;
+trifaze modellerde boya göre 230–400 V/50 Hz veya 400–690 V/50 Hz; çift devirli (Dahlander) modellerde
+400 V/50 Hz. [HSK s.5] Seride 2, 4 ve 6 kutuplu motorlar ile çift devirli sürümler bulunur. [HSK s.4]
+
+**Koruma.** **IP55** koruma derecesi ve **F izolasyon sınıfı**. [HSK s.5] Elektrik izolasyon sınıfı I —
+**topraklama gereklidir**. [HSK s.5] Çalışma sıcaklığı −25 °C ile +60 °C arasındadır; işlenen havanın
+sürekli çalışmadaki (S1) azami sıcaklığı 80 °C, istek üzerine 120 °C'dir. Yangın halinde **400 °C'de
+2 saat** (S2 servisi) çalışır. [HSK s.5] Kuş ve yabani hayvanlara karşı koruma, hizmet kesintisine yol
+açabilecek arızaları önler. [HSK s.7] Elektrikli ekipman muhafazalarının koruma derecesi (CEI EN
+60529/1997) ve duman-ısı kontrol sistemleri (12101-3:2015) standartlarına uygundur. [HSK s.4]
+
+**Kontrol.** Motor tipine göre tek hızlı veya çift hızlı (Dahlander) çalışma. [HSK s.4] Fanların geniş
+ayar aralığı, sağlanan performansın değişen ihtiyaca uyarlanmasına ve enerji israfının sınırlanmasına
+olanak verir. [HSK s.7]
+
+**Montaj.** Radyal (yatay) atışlı çatı montajı. [HSK s.4] Menteşe, fan taşıyıcı plakanın eğilmesine izin
+vererek denetim ve bakım işlemlerini kolaylaştırır. [HSK s.5] Hafif ve kolay sökülebilen alüminyum motor
+kapakları ile taşıyıcı plakaları yapıya bağlayan menteşeler, montaj ve bakımı basitleştirir. [HSK s.7]
+Alüminyum dikey atış parçası, işlenen havanın dikey atılmasını sağlayarak bina açıklıklarına yakın
+montajlarda havanın geri emilmesini önler. [HSK s.5]
+
+---
+
+## 3 · İki seriyi ayıran cümle
+
+> **SLIMROOF ES ile HEATMASTER F400 aynı gövde ailesindendir:** ikisi de galvaniz çelik gövdeli, kuş teli
+> entegre, geriye eğimli kendi kendini temizleyen çarklı, radyal atışlı çatı fanıdır. **Ayıran iki şey
+> vardır.** Birincisi: HEATMASTER F400 **yangın anında 400 °C'de 2 saat** çalışacak şekilde sertifikalıdır
+> ve duman tahliyesi için kullanılabilir; SLIMROOF ES bunu **yapmaz**. İkincisi: SLIMROOF ES **EC motorlu**
+> olduğu için tüketimi düşüktür ve dikey gabarisi küçüktür; HEATMASTER F400 **AC asenkron motorludur**.
+> [HSK s.4, s.5, s.26, s.27]
+
+Kısaca: **yangın güvenliği gerekiyorsa HEATMASTER, enerji ve yükseklik kısıtı varsa SLIMROOF.**
+Bu cümle olmadan iki seri vitrinde birbirinin kopyası görünür.
+
+---
+
+## 4 · Kaynakta ve veride bulduklarım (K7.5)
+
+1. **Katalog 21 model sayıyor, bizde 10 var** (Heatmaster). Katalog aralığını yazmak satmadığımız ürünü
+   vaat etmek olurdu; **taslaktaki aralıklar DB'den** okundu.
+2. **Mevcut DB metinleri kusurlu** — ayrı raporda ölçüldü (10 aile / 109 ürün).
+   Bu taslak iki aileyi düzeltir, kalan 8'i 2b·2'nin sonraki grupları kapatacak.
+3. **Slug adları yanıltıcı:** `-roof` = SLIMROOF, `-smoke` = HEATMASTER. Karıştırılmaya açık.
+4. **AVenS s.34 metni iki aileyi de anlatıyor** (paylaşık sayfa); "yatay atışlı, menteşeli motor-pervane,
+   geriye eğimli kanat, korozyona dayanıklı alüminyum" ifadeleri **ortak** özelliklerdir, bu yüzden
+   ikisinde de kullanıldı — tek aileye ait sayılmadı.
+
+## 5 · Kapatmadığı
+
+* **EN çevirisi yazılmadı** (ayrı tur).
+* **Debi/basınç tabloları taslağa girmedi**; aralık dışında sayı kullanılmadı.
+* **`is_description_manual`** bugün `false`; bu metin yüklenirse **true** yapılmalı, yoksa sonraki
+  otomatik tur ezer.
+* Ticari onay yok.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-isi-geri-kazanim-2026-09-06.md
+
+# İçerik hattı — TR taslak: VORT HR (merkezi) · VORT HRW MONO (tekil oda) — REC-146 Adım 2b·2, üçüncü grup
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** OPS pano onayı 2026-09-06 ("üçüncü grup itiraz yok")
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Kaynak:** AVenS fiyat listesi s.66–67 (TR) · Vortice VMC broşürü s.32–63 (EN, **çevrildi**) ·
+VORT MONO kataloğu s.3–5 (EN, **çevrildi**)
+**Referans biçimi:** `[AVenS s.NN]` · `[VMC s.NN]` = merkezi üniteler broşürü · `[MONO s.NN]` = MONO kataloğu
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; **yanlış kapsamlı bilgi de vaat ihlalidir**.
+* Kararlar — Vitrin 15A **K6** · **K7** · **K1** · Katalog **K7.2** (çeviri) · **K7.5** (tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok.
+* `icerik-hatti-seri-metni-tek-model-kusuru-2026-09-06.md` — bu iki aile o listede; taslak düzeltir.
+
+---
+
+## 0 · Mevcut metinler DÜZELTİLİYOR — birinde satış hatası var
+
+| Aile | Bugün DB'de yazan | Ölçülen gerçek |
+|---|---|---|
+| `vortice-isi-geri-kazanim` | **"Vortice Vort Invisible Mini Top,** tavan arası… 218 mm derinliğe sahip…" | Ailede **5 ürün** var; metin yalnız **birini** anlatıyor, diğer dördü (HR 300 Neti, HR 350 Avel, Avel H, 450 AVEL D) metinde **hiç geçmiyor** |
+| `vortice-vort-mono` | "…30 m³/h (maks. 38 m³/h)… **zamanlayıcı veya nem sensörü olmadan**" | Debi aralığı **38–60 m³/h**; ve ailedeki **8 modelin 5'i HCS**, yani **nem sensörlü** |
+
+> **İkincisi düz bir satış hatasıdır, üslup meselesi değil.** Sayfada "nem sensörü olmadan" yazıyor;
+> o ailede sattığımız sekiz modelin beşinde **bağıl nem, sıcaklık ve ışık sensörü + uzaktan kumanda**
+> var [MONO s.4]. Yani ürünün en güçlü özelliğini, sayfanın kendisi yok sayıyor.
+
+Aralıklar **DB'den** okundu (bizim sattığımız modeller), katalogdan değil.
+
+---
+
+## 1 · VORT HR — Merkezi (kanallı) ısı geri kazanım üniteleri
+
+**DB:** `vortice-isi-geri-kazanim` · **5 ürün** · 120–400 m³/h ·
+HR 300 Neti · HR 350 Avel · HR 350 Avel H · HR 450 AVEL D · Invisible Mini Top
+
+### Kimlik cümlesi
+> Konutların, ticari işletmelerin ve otel odalarının havalandırmasını tek merkezden yürüten, çift akışlı
+> (dual-flow) ısı geri kazanımlı merkezi havalandırma üniteleri. [VMC s.32][AVenS s.67]
+
+### Dört madde
+* Zemin, duvar veya asma tavan montajı — modele göre **80 m²'den 240 m²'ye** kadar alan [VMC s.32, s.46, s.58]
+* Yüksek verimli ısı eşanjörü; ısının **%90'a yakını** geri kazanılır [VMC s.58]
+* **VORT HR 300 NETI: Passive House sertifikalı** [VMC s.32]
+* Entalpi eşanjörlü modellerde **hem sıcaklık hem nem** geri kazanılır [VMC s.32, s.46]
+
+### Yapısal bloklar
+
+**Gövde.** Modele göre iki yapı sunulur: iç ve dış gövdesi **yüksek yoğunluklu (40 kg/m³) genleştirilmiş
+polipropilen** olan duvar tipi üniteler [VMC s.46] ve **beyaz boyalı çelik sac** gövdeli asma tavan
+ünitesi [VMC s.58]. Asma tavan modelinde tüm ana bileşenlere **ürünün alt yüzünden** erişilir, bu da
+bakımı kolaylaştırır. [VMC s.58]
+
+**Çark.** Geriye eğimli kanatlı santrifüj fanlar, doğrudan EC motorlara akuple edilmiştir. [VMC s.46]
+VORT HR 450 AVEL D'de **iki adet EC motor** ve harici rotor bulunur. [AVenS s.67]
+
+**Motor.** EC motor. [VMC s.46][AVenS s.67] Doğrudan akuple tasarım kayış-kasnak kaybını ortadan kaldırır.
+[VMC s.46]
+
+**Koruma.** Yüksek verimli karşı akışlı ısı eşanjörü. [VMC s.46] Dışarıdan alınan hava **filtrelenerek**
+odaya verilir. [MONO s.3] VORT HR 300 NETI **Passive House sertifikasına** sahiptir. [VMC s.32]
+Entalpi eşanjörlü modellerde ürün içinde **yoğuşma oluşumu azalır**; bazı durumlarda su tahliyesine
+gerek kalmaz. [VMC s.32]
+
+**Kontrol.** Filtre değişim zamanını gösteren **görsel filtre uyarısı** bulunur. [VMC s.59]
+*(Kanal bağlantısı, debi kademeleri ve uzaktan kumanda seçenekleri modele göre değişir; kaynakta
+aile geneli için tek bir kontrol tanımı yok — bu blok bilerek KISA bırakıldı.)*
+
+**Montaj.** Zemin ve duvar montajı (HR 300 NETI, HR 350/450 AVEL) [VMC s.32, s.46] veya asma tavan
+montajı (INVISIBLE MINI TOP) [VMC s.58]. Asma tavan modelinde emiş ve basma bağlantıları **100 ve
+125 mm** anma çaplarıyla uyumludur [VMC s.58]; duvar tipi modellerde bağlantı ağızları **150 mm**
+anma çapındadır [VMC s.46]. VORT HR 300 NETI **dış ortama kuruluma uygundur**. [AVenS s.67]
+
+---
+
+## 2 · VORT HRW MONO — Tekil oda (desantralize) üniteleri
+
+**DB:** `vortice-vort-mono` · **8 ürün** · 38–60 m³/h ·
+HRW 30/40 MONO EVO · 30/40/60 MONO EVO **HCS** · 30/40/60 MONO EVO **HCS Wi-Fi**
+
+### Kimlik cümlesi
+> Kanal tesisatı gerektirmeden tek bir odanın havalandırmasını sağlayan, dış duvara gömülü olarak monte
+> edilen ısı geri kazanımlı oda tipi havalandırma üniteleri. [AVenS s.66][MONO s.5]
+
+### Dört madde
+* Kanal gerekmez — **260–700 mm** kalınlığındaki dış duvarlara monte edilir [MONO s.5]
+* **Üç çalışma modu:** taze hava · egzoz · ısı geri kazanımlı havalandırma [AVenS s.66]
+* **HCS modellerde** uzaktan kumanda ve bağıl nem, sıcaklık, ışık sensörü [MONO s.4]
+* **Wi-Fi modelleri birbiriyle haberleşir** — router ve internet aboneliği gerekmez [MONO s.5]
+
+### Yapısal bloklar
+
+**Gövde.** UV ışınlarına dayanıklı **ABS gövde**. [AVenS s.66] Estetik ön panel her konut ortamına
+uyum sağlar. [MONO s.5] Kırmızı kollu, **elle kullanılan kapatma sistemi** vardır ve kapalı olduğunu
+gösterir. [MONO s.5]
+
+**Çark.** *(Kaynakta bu aile için çark yapısına dair cümle YOK — **boş bırakıldı**, K7.)*
+
+**Motor.** EC motor, **rulman yataklı**. [AVenS s.66]
+
+**Koruma.** **G3 filtre** ile dışarıdan alınan hava filtrelenir. [AVenS s.66] Yüksek verimli
+**seramik eşanjör** kullanılır [AVenS s.66]; ısı geri kazanım verimi asgari debide **%90'a kadar**
+çıkar. [MONO s.5]
+
+**Kontrol.** **HCS modeller uzaktan kumandalıdır** ve bağıl nem, sıcaklık ile ışık sensörü taşır;
+HCS olmayan modellerde kontrol paneli **cihazın üzerindedir**. [AVenS s.66][MONO s.4]
+**Wi-Fi modülü**, ürünlerin **yerel MESH ağı üzerinden birbirleriyle** haberleşmesini sağlar; bunun için
+router kurmaya ya da internet servis sağlayıcısıyla sözleşme yapmaya **gerek yoktur**, ürünler arasında
+kablo çekilmesi de gerekmez. [MONO s.5]
+
+**Montaj.** **260 mm ile 700 mm** arasındaki dış duvarlara monte edilebilir. [MONO s.5] Birden fazla
+ürün kurulduğunda **aralarında kablo bağlantısı gerekmez**. [MONO s.5]
+
+---
+
+## 3 · İki aileyi ayıran cümle
+
+> **VORT HR merkezi, VORT HRW MONO tekildir.** VORT HR **kanal tesisatıyla** tüm konutu ya da işletmeyi
+> tek cihazdan havalandırır (80–240 m²); VORT HRW MONO **kanal gerektirmez**, dış duvara gömülür ve
+> **bir odayı** havalandırır. Seçim yapıyı belirler: yeni yapıda veya tadilatta kanal çekilebiliyorsa
+> VORT HR, çekilemiyorsa VORT HRW MONO. [VMC s.32][MONO s.5]
+
+**Sessizlik farkı da buradan gelir:** MONO ünitesinin ses düzeyi 3 metrede birinci hızda **19 dB(A)** —
+kaynağın deyişiyle *"bir metreden fısıltı"* düzeyinde [MONO s.5]; fiyat listesi aynı seriyi
+**19–49 dB(A)** aralığıyla veriyor [AVenS s.66].
+
+---
+
+## 4 · Kaynakta ve veride bulduklarım (K7.5)
+
+1. **Mevcut MONO metni satılan ürünü yanlış tanıtıyor** ("nem sensörü olmadan"), oysa 8 modelin 5'i
+   sensörlü. Bu, seri-metni kusurunun **en pahalı örneği**: diğerlerinde eksik anlatım vardı,
+   burada **ürünün ayırt edici özelliği inkâr ediliyor**.
+2. **Mevcut merkezi ünite metni tek ürünün adıyla başlıyor** — "Vortice Vort Invisible Mini Top…".
+   Aile sayfasında dört ürün daha var ve hiçbiri anılmıyor.
+3. **Çark bloğu MONO'da boş bırakıldı** — kaynakta o bilgi yok. "EC motorlu, demek ki şöyle çarkı vardır"
+   denilebilirdi; **denilmedi.**
+4. **Kontrol bloğu merkezi ailede kısa** — kaynak model bazında konuşuyor, aile geneli için tek bir
+   kontrol tanımı vermiyor. Uydurmak yerine kısa bırakıldı.
+5. **Fiyat listesi s.67'de dört model için dört ayrı madde var ama hangisinin hangi modele ait olduğu
+   sırayla anlaşılıyor**, başlıkla değil. Eşleştirme model adları üzerinden yapıldı; **s.67'nin
+   düzeni yanlış okumaya açık** — AVenS hata raporuna eklenebilir.
+
+## 5 · Kapatmadığı
+
+* EN çevirisi (ayrı tur) · sayısal tablolar (birim sözleşmesi ayrı doğrulama ister) · ticari onay.
+* **`is_description_manual`** bugün `false`; bu metin yüklenirse **true** yapılmalı.
+* Passive House sertifikasının **bizim sattığımız** HR 300 NETI kodunda geçerli olduğu
+  **doğrulanmadı** — kaynak seri düzeyinde konuşuyor, kod bazında teyit edilmedi.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-kategori-rehber-2026-09-06.md
+
+# İçerik hattı — TR taslak: kategori rehber paragrafları (REC-146 madde 3)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06
+**Durum:** **TASLAK — DB'ye YAZILMADI ve şu hâliyle YAZILAMAZ.**
+Kategori açıklamasının i18n yolu yok (ölçüm: `icerik-hatti-kategori-olcumu-2026-09-06.md` §3);
+yazım, o yol açıldıktan **ve** Recep onayından sonra.
+
+## KAYNAK / CETVEL
+
+* Kararlar — Vitrin 15A **K8** (kategori üç mod) · **K1** (fiyat/vaat metni yok) · **K7** (kaynak yoksa satır yok).
+* `docs/standards/vaat-butunlugu-standard.md` — yanlış kapsamlı bilgi de vaat ihlalidir.
+* Ölçüm: `docs/audits/icerik-hatti-kategori-olcumu-2026-09-06.md`.
+
+## Bu metinlerin kaynağı NEDIR, ne DEĞİLDİR
+
+Aile metinlerinin kaynağı üretici kataloğuydu ve her sayı kapıyla ölçüldü. **Kategori
+rehber paragrafı farklı bir şeydir:** üreticinin sözü değil, bizim seçim tavsiyemiz.
+Dayanağı iki yerdedir ve ikisi de ölçülebilir:
+
+1. **Kategorinin içinde gerçekten ne var** — DB'den ölçüldü, aşağıda her paragrafın altında
+   aile listesi var. Paragrafta adı geçen her ürün tipi o kategoride **vardır**.
+2. **Onaylanmış aile metinleri** — paragraflardaki nitelemeler (kanal tipi, çatı tipi, EC
+   motor, duman egzozu…) aile metinlerinden gelir, uydurulmaz.
+
+**Sayısal norm iddiası YOKTUR.** Emir "kaç hava değişimi" diyor; bu bir normdur (TS/EN,
+ASHRAE) ve elimizde normatif kaynak yok — 24 PDF üretici kataloğudur. Uydurma sayı burada
+en tehlikeli hâline gelir: kaynağı olmadığı için kapı **kırmızı bile veremez**.
+Norm gerekiyorsa kaynak temini ayrı iştir (Recep kararı).
+
+---
+
+## 1 · Fanlar (`fans`) — 295 ürün, 27 aile
+
+> VentHub'ın en geniş kategorisi: havayı bir yerden alıp başka bir yere taşıyan bütün
+> cihazlar burada. Seçimi belirleyen ilk soru cihazın **nereye monte edileceğidir** —
+> kanal içine, çatıya, duvara ya da pencereye. İkinci soru havanın **ne taşıdığıdır**:
+> normal ortam havası, yangın hâlinde duman, patlayıcı ortam gazı ya da radon.
+> Üçüncüsü sessizliktir; yaşam alanına yakın montajlarda sessiz seriler ayrı bir aile
+> olarak sunulur. Kanal tipi, çatı tipi, aksiyel, radyal (santrifüj), jet, sığınak,
+> hücreli ve plug fan aileleri bu kategorinin altındadır; ihtiyacınızı tarif ederseniz
+> seçiciyi kullanmadan da doğru aileye yönlendirilirsiniz.
+
+**Kapsadığı aileler (DB'den ölçüldü):** seat-serisi (40) · vortice-vort-quadro-evo (23) ·
+vortice-vort-qbk-sal-kc-evo (21) · jet-serisi (21) · storm-serisi (20) ·
+vortice-vort-industrial-ventilation-axial (16) · vortice-vort-e-atex (14) ·
+avens-plug-fanlar (14) · nicotra-gebhardt-dd (13) · vortice-lineo-quiet (12) ·
+heatmaster-slimroof roof/smoke (10+10) · nicotra at/adh (8+8) · vortice-vort-nordik-hvls (7) ·
+vortice-lineo (7) · commercial-in-line circular/rectangular (7+5) · avens-hucreli-hf-s (7) ·
+nicotra-gebhardt-rdh (6) · avens-hucreli-aspiratorler (6) · radon circular/roof (5+3) ·
+vortice-punto-evo-flexo (4) · vortice-vortice-bravo-s (4) ·
+avens-siginak-havalandirma-uniteleri (3) · vortice-vort-industrial-ventilation-roof (1)
+
+**Denetim notu:** sığınak havalandırma üniteleri bugün `fans` altında duruyor; ayrı bir
+sığınak kategorisi olsa daha bulunur olurdu. **Kategorizasyon ÜRÜN'ün alanı** — bulgu kayıtta.
+
+---
+
+## 2 · Kontrol Sistemleri (`control-systems`) — 37 ürün, 4 aile
+
+> Fanı çalıştırmak yetmez; ne zaman ve hangi hızda çalışacağına karar veren katman bu
+> kategoridedir. İki farklı ihtiyaç vardır. Küçük tesisatlarda **hız anahtarı** yeterlidir:
+> kademeli, basit, panoya ya da duvara monte edilir. Değişken debi, yumuşak kalkış, enerji
+> tasarrufu ya da bina otomasyonuna bağlanma gerekiyorsa **frekans konvertörü** gerekir;
+> HVAC uygulamalarına özel seriler ile genel amaçlı seriler ayrı ailelerde sunulur.
+> Seçimi belirleyen sorular: sürülecek motorun gücü, besleme gerilimi (tek faz / üç faz)
+> ve cihazın bir otomasyon sistemiyle haberleşmesinin gerekip gerekmediğidir.
+
+**Kapsadığı aileler:** danfoss-fc102 (17) · danfoss-fc101 (16) · danfoss-fc51 (2) ·
+avens-hiz-anahtarlari (2)
+
+---
+
+## 3 · İklimlendirme ve Hava Şartlandırma (`air-treatment`) — 17 ürün, 3 aile
+
+> Havayı yalnızca taşımak değil, **taşırken değiştirmek** gerektiğinde bu kategoriye
+> bakılır: ısıtmak, ya da nemini almak. Kanala giren havayı ısıtmak için iki yol vardır —
+> elektrikli kanal ısıtıcısı ve sulu batarya; birincisi bağımsız çalışır, ikincisi tesisatta
+> sıcak su kaynağı bulunmasını gerektirir ama işletme maliyeti düşüktür. Nem tarafında ise
+> bağımsız nem alma cihazları yer alır; bodrum, çamaşırlık, depo gibi nemin yoğuştuğu
+> hacimler için kullanılır. Seçimi belirleyen sorular: ısıtılacak hava debisi, kanal kesiti
+> ve tesisatta sıcak su devresi olup olmadığıdır.
+
+**Kapsadığı aileler:** avens-sulu-batarya (8) · avens-elektrikli-isiticilar (6) ·
+vortice-deumido-range (3)
+
+---
+
+## 4 · Isı Geri Kazanım — VMC (`heat-recovery-vmc`) — 16 ürün, 3 aile
+
+> Havalandırma yaparken ısıtma masrafını dışarı atmamanın yolu ısı geri kazanımıdır:
+> dışarı atılan havanın ısısı, içeri alınan taze havaya bir eşanjör üzerinden aktarılır.
+> İki farklı kurulum vardır ve seçim büyük ölçüde binanın durumuna bağlıdır. **Tekil oda
+> üniteleri** duvara açılan tek bir delikle çalışır; mevcut binada, kanal çekmeden,
+> oda oda uygulanır. **Kanallı merkezi üniteler** ise tüm daireyi ya da katı tek cihazdan
+> havalandırır; kanal geçişi gerektirdiği için yeni yapıda veya kapsamlı tadilatta tercih
+> edilir. Seçimi belirleyen sorular: kanal çekilebiliyor mu, havalandırılacak alan ne kadar,
+> cihaz nereye (zemin, duvar, asma tavan) monte edilecek.
+
+**Kapsadığı aileler:** vortice-vort-mono (8) · vortice-isi-geri-kazanim (5) ·
+avens-isi-geri-kazanim (3)
+
+---
+
+## 5 · Hava Perdeleri (`air-curtains`) — 8 ürün, 2 aile
+
+> Açık kalması gereken kapılarda içerideki havayı dışarıdan ayıran görünmez bir sınır
+> oluşturur: kapı boyunca aşağı doğru üflenen hava, dışarıdaki soğuk (ya da sıcak) havanın
+> ve tozun içeri girmesini engeller. Mağaza, market girişi, restoran ve depo kapıları
+> tipik uygulama alanıdır. İki seçenek vardır: **ısıtmasız** modeller yalnızca hava akımı
+> oluşturur; **elektrikli ısıtıcılı** modeller aynı zamanda giriş bölgesini ısıtır.
+> Seçimi belirleyen sorular: kapı genişliği, kapının yerden yüksekliği, montajın kapı
+> üstüne yapılıp yapılamayacağı ve girişte ısıtma isteyip istemediğinizdir.
+
+**Kapsadığı aileler:** vortice-hava-perdesi (4) · vortice-h-ad-elektrikli (4)
+
+---
+
+## 6 · Aksesuarlar (`accessories`) — 2 ürün, 1 aile
+
+> Ana cihazın kendisi değil, onu tamamlayan parçalar bu kategoridedir. Bugün burada
+> sığınak havalandırma sistemlerinin tamamlayıcı ekipmanı yer alıyor.
+
+**Kapsadığı aileler:** avens-bvu-ls (2)
+
+**⛔ DENETİM NOTU — bu paragraf bilerek kısa:** kategoride tek aile ve 2 ürün var, o ailenin
+de kaynakta anlatımı **yok** (Recep kararı bekleyen iki aileden biri). Kategoriyi olduğundan
+zengin göstermek vaat ihlali olur. Aksesuar yelpazesi genişlediğinde paragraf yeniden yazılır.
+
+---
+
+## Bu taslağın kapatmadığı
+
+* **i18n yolu** — açılmadan hiçbiri DB'ye yazılamaz (ölçüm §3).
+* **EN çevirileri** — TR onayından sonra, `i18n-conventions` cetveli okunarak.
+* **`display_mode` eşlemesi** — ~~hepsi varsayılan `series`~~ **YANLIŞTI, düzeltildi:**
+  ölçülen dağılım **22 `series` · 11 `showcase` · 4 `landing`** — eşleme YAPILMIŞ.
+  Sütun varsayılanına bakıp genellemişim (ölçüm §5, düzeltme aynı gün).
+  Eksik olan eşleme değil, **eşlemenin yazılı gerekçesi**.
+
+---
+
+# BÖLÜM II — 17 ALT KATEGORİ (OPS kapsam hükmü, 2026-09-06)
+
+Kapsam **6 → 23** oldu: ürünü olan her kategoriye paragraf. Sıra ürün sayısına göre azalan.
+Aile listeleri `subcategory_id` sütunuyla canlıdan ölçüldü.
+
+**YÖNTEM notu:** bu 17 paragrafı **kendim yazdım**, alt ajana vermedim. Cetvel "aynı kalıp
+× N hedef" için alt ajan/maestro önerir; sapmanın sebebi: girdiler zaten damıtılmış
+(doğruladığım 40 aile metni) ve bu metinlerde **ölçebileceğim bir kapı yok** — sayı/kod
+taşımayan editoryal cümlede alt-ajan çıktısını doğrulayacak makine yok, denetim tamamen
+bana düşerdi. Küçük N'de denetim maliyeti yazma maliyetini geçiyor.
+
+## 7 · Santrifüj / Radyal Fanlar (`centrifugal-fans`) — 83 ürün
+
+> Havayı eksen boyunca değil, çarkın çevresine doğru fırlatarak basan fanlar bu başlıktadır.
+> Aksiyel fanlara göre **daha yüksek basınç** üretirler; uzun kanal hatları, filtreli
+> sistemler ve hücreli tesisatlar için tercih edilir. Üç farklı yapı sunulur: **hücreli**
+> üniteler (çift cidarlı gövde içinde, kayış-kasnak tahrikli), **plug fanlar** (gövdesiz,
+> doğrudan santral içine yerleşen) ve **serbest çarklı radyal fanlar**. Seçimi belirleyen
+> sorular: gereken basınç, fanın bir hücre içine mi yoksa doğrudan santrale mi gireceği ve
+> kanat yönü (öne/geriye eğimli).
+
+**Aileler:** avens-hucreli-aspiratorler · avens-hucreli-hf-s · avens-plug-fanlar ·
+nicotra-gebhardt-dd/at/adh/rdh · vortice-vort-qbk-sal-kc-evo
+
+## 8 · Asit Dayanımlı Fanlar (`acid-resistant-fans`) — 81 ürün
+
+> Kimyasal buhar, asit ve korozif ortam taşıyan havalandırmalarda metal gövde ömrünü
+> kısaltır. Bu kategorideki fanların gövdesi **polipropilendir** ve asitlere ve korozyona
+> karşı üstün dayanım sağlar. Laboratuvar, kimya tesisi, galvaniz ve atık su uygulamalarında
+> kullanılır. Seçimi belirleyen sorular: gereken debi ve statik basınç, çatı mı kanal mı
+> montajı ve ortamın taşıdığı kimyasalın türüdür.
+
+**Aileler:** seat-serisi · storm-serisi · jet-serisi
+**Kaynak dayanağı:** kategori adının iddia ettiği özellik ölçüldü — polipropilen gövde,
+asit ve korozyona karşı üstün dayanım [AVenS s.41, s.42]. **Uydurma değil, kaynakta var.**
+
+## 9 · Kanal Tipi Fanlar (`duct-fans`) — 36 ürün
+
+> Havayı kanal hattının **içinde** taşıyan, kanala seri bağlanan fanlar. Cihaz görünmez;
+> asma tavan arasında ya da tesisat şaftında durur. Yuvarlak ve dikdörtgen kesitli modeller
+> vardır ve seçim kanalın kesitine göre yapılır. Yaşam alanına yakın hatlarda **sessiz**
+> seriler ayrıca sunulur. Seçimi belirleyen sorular: kanal çapı/kesiti, gereken debi,
+> gürültü hassasiyeti ve hattın radon gibi özel bir tahliye görevi olup olmadığıdır.
+
+**Aileler:** vortice-lineo · vortice-lineo-quiet · vortice-radon-range-circular ·
+vortice-vort-commercial-in-line-circular · vortice-vort-commercial-in-line-rectangular
+
+## 10 · Frekans Konvertörleri (`frequency-converters`) — 35 ürün
+
+> Motorun devrini besleme frekansını değiştirerek ayarlayan sürücüler. Fanı tam hızda değil
+> **ihtiyaç kadar** çalıştırmak enerji tüketimini doğrudan düşürür; ayrıca yumuşak kalkış
+> mekanik yükü azaltır. HVAC uygulamalarına özel seriler ile genel amaçlı seriler ayrı
+> ailelerde toplanmıştır. Seçimi belirleyen sorular: motor gücü, besleme gerilimi
+> (tek faz / üç faz) ve bina otomasyonuyla haberleşme gerekip gerekmediğidir.
+
+**Aileler:** danfoss-fc101 · danfoss-fc102 · danfoss-fc51
+
+## 11 · Banyo ve Tuvalet Fanları (`bathroom-toilet-fans`) — 31 ürün
+
+> Nemin ve kokunun kaynağında alındığı küçük hacim fanları. Duvara, tavana ya da kanala
+> bağlanabilir; kimi modeller nem ve hareket sensörüyle kendi kendine çalışır. Konutta
+> seçimi belirleyen ilk konu **gürültüdür** — yatak odasına komşu banyoda sessiz model
+> gerekir. Diğer sorular: montaj yüzeyi (duvar/tavan), atık havanın dışarı mı yoksa şafta
+> mı verileceği ve otomatik çalışma isteyip istemediğinizdir.
+
+**Aileler:** vortice-vort-quadro-evo · vortice-punto-evo-flexo · vortice-vortice-bravo-s
+
+## 12 · Aksiyel Fanlar (`axial-industrial-fans`) — 30 ürün
+
+> Havayı milin ekseni boyunca iten fanlar: **yüksek debi, düşük basınç**. Duvar açıklığı,
+> depo ve atölye havalandırması gibi kanal direncinin düşük olduğu yerlerde en verimli
+> çözümdür. Patlayıcı ortam (ATEX) gerektiren uygulamalar için ayrı bir aile vardır ve
+> bu ürünler sertifikalı yapıdadır. Seçimi belirleyen sorular: gereken debi, açıklığın
+> çapı ve ortamın patlayıcı sınıflandırma taşıyıp taşımadığıdır.
+
+**Aileler:** vortice-vort-industrial-ventilation-axial · vortice-vort-e-atex
+
+## 13 · Çatı Tipi Fanlar (`roof-fans`) — 13 ürün
+
+> Havayı binanın en üstünden dışarı atan, çatıya oturan fanlar. Kanal hattını kısaltır ve
+> egzoz havasını yaşam kotunun üzerinde bırakır. Yatay ya da dikey atışlı modeller vardır;
+> radon tahliyesi gibi özel görevler için ayrı aileler bulunur. Seçimi belirleyen sorular:
+> çatı tipi ve eğimi, atış yönü, gereken debi ve tahliye edilen havanın niteliğidir.
+
+**Aileler:** vortice-vort-heatmaster-slimroof-roof · vortice-radon-range-roof
+
+## 14 · Duman Egzoz Fanları (`smoke-exhaust-fans`) — 10 ürün
+
+> Yangın hâlinde dumanı tahliye etmek üzere, **yüksek sıcaklıkta çalışmaya sertifikalı**
+> fanlar. Normal havalandırma fanından farkı budur: sıcak duman içinde belirli bir süre
+> çalışmayı sürdürmesi gerekir. Kaçış yollarının duman kontrolünde kullanılır ve seçimi
+> **projedeki yangın senaryosu** belirler — sıcaklık/süre sınıfı, gereken debi ve montaj
+> yeri projeden gelir. Bu ürünlerde sınıf bilgisi ürün sayfasında kaynağıyla verilir.
+
+**Aileler:** vortice-vort-heatmaster-slimroof-smoke
+
+## 15 · Sulu Batarya Kanal Tipi (`water-coil-duct-heaters`) — 8 ürün
+
+> Kanaldan geçen havayı, içinden sıcak su dolaşan bir serpantinle ısıtan bataryalar.
+> Elektrikli ısıtıcıya göre kurulumu daha çok tesisat ister ama **işletme maliyeti
+> düşüktür**; binada zaten bir sıcak su kaynağı (kazan, ısı pompası) varsa doğru seçimdir.
+> Seçimi belirleyen sorular: kanal kesiti, hava debisi ve tesisatın su sıcaklığı/rejimidir.
+
+**Aileler:** avens-sulu-batarya
+
+## 16 · Kanallı Merkezi Üniteler (`ducted-central-hrv`) — 8 ürün
+
+> Tüm daireyi veya katı tek cihazdan havalandıran ısı geri kazanım üniteleri. Kirli hava
+> dışarı atılırken ısısı, içeri alınan taze havaya aktarılır. Kanal geçişi gerektirdiği
+> için **yeni yapıda ya da kapsamlı tadilatta** tercih edilir. Seçimi belirleyen sorular:
+> havalandırılacak alan, cihazın nereye (zemin, duvar, asma tavan) monte edileceği ve
+> yalnız sıcaklığın mı yoksa nemin de geri kazanılmasının istendiğidir.
+
+**Aileler:** vortice-isi-geri-kazanim · avens-isi-geri-kazanim
+
+## 17 · Tekil Oda Üniteleri (`single-room-hrv`) — 8 ürün
+
+> Duvara açılan **tek bir delikle** çalışan ısı geri kazanım üniteleri. Kanal çekmek
+> gerekmediği için mevcut binada oda oda uygulanabilir; tadilat yükü en düşük çözümdür.
+> Birden fazla ünite birlikte çalışacaksa kimi modeller kendi aralarında haberleşir.
+> Seçimi belirleyen sorular: odanın büyüklüğü, dış duvara erişim ve uzaktan kumanda /
+> sensörlü çalışma isteyip istemediğinizdir.
+
+**Aileler:** vortice-vort-mono
+
+## 18 · Endüstriyel Tavan Vantilatörleri (`industrial-ceiling-fans`) — 7 ürün
+
+> Büyük hacimlerde havayı **yavaş ama çok geniş** bir alanda hareket ettiren büyük çaplı
+> tavan vantilatörleri. Havayı dışarı atmazlar; içerideki havayı karıştırarak yazın serinlik
+> hissi, kışın tavanda biriken sıcak havanın aşağı indirilmesini sağlarlar. Depo, spor
+> salonu, fabrika ve showroom tipik uygulamadır. Seçimi belirleyen sorular: tavan yüksekliği,
+> kapsanacak alan ve asma noktasının taşıma kapasitesidir.
+
+**Aileler:** vortice-vort-nordik-hvls
+
+## 19 · Elektrikli Kanal Isıtıcıları (`electric-duct-heaters`) — 6 ürün
+
+> Kanaldan geçen havayı elektrikli rezistansla ısıtan **tesisat aksesuarıdır**. Sıcak su
+> devresi bulunmayan ya da yalnız belirli bir hatta ısıtma gereken yerlerde kullanılır;
+> bağımsız bir ısıtma cihazı değil, havalandırma hattını tamamlayan bir elemandır.
+> Seçimi belirleyen sorular: kanal kesiti, hava debisi ve elektrik tesisatının kapasitesidir.
+
+**Aileler:** avens-elektrikli-isiticilar
+**K7.10:** Recep kararı — bu ürünler **yalnız aksesuar olarak** sunulur; paragraf bu
+çerçeveyi bilinçli olarak aşmıyor.
+
+## 20 · Sığınak Havalandırma Fanları (`shelter-ventilation`) — 3 ürün
+
+> Sığınak havalandırma sistemlerinin hava hareketini sağlayan üniteler. Bu ürünlerde seçim
+> ticari değil **mevzuata bağlıdır**: sığınak hacmi ve ilgili yönetmeliğin öngördüğü
+> havalandırma düzeni belirleyicidir. Projeyle birlikte değerlendirilmesi gerekir.
+
+**Aileler:** avens-siginak-havalandirma-uniteleri
+**Denetim notu:** bu aile bugün `fans` üst kategorisi altında duruyor; sığınak ürünleri
+kendi başlığında toplansa daha bulunur olurdu. **Kategorizasyon ÜRÜN'ün alanı**, bulgu kayıtta.
+
+## 21 · Nem Alma Cihazları (`dehumidifiers`) — 3 ürün
+
+> Havayı taşımak yerine **nemini alan** bağımsız cihazlar. Bodrum, çamaşırlık, depo ve
+> havuz çevresi gibi nemin yoğuştuğu, küf ve koku riski taşıyan hacimler için kullanılır.
+> Havalandırmanın tek başına çözemediği durumlarda havalandırmayı tamamlar. Seçimi
+> belirleyen sorular: hacmin büyüklüğü, nem yükünün sürekli mi mevsimlik mi olduğu ve
+> cihazın sabit mi taşınabilir mi kullanılacağıdır.
+
+**Aileler:** vortice-deumido-range
+
+## 22 · Hız Anahtarları (`speed-controllers`) — 2 ürün
+
+> Fanın devrini kademeli olarak ayarlayan basit kumanda elemanları. Frekans konvertörüne
+> göre çok daha yalındır: küçük tesisatlarda, tek bir fanın hızını elle düşürüp yükseltmek
+> için kullanılır. Seçimi belirleyen sorular: sürülecek fanın gücü ve besleme tipidir.
+
+**Aileler:** avens-hiz-anahtarlari
+**⛔ K7.10:** Recep kararı — bu ailenin **satılabilir ürün sayfası YAZILMAYACAK** (kaynakta
+anlatım yok, yalnız kod ve fiyat); AVenS'ten teknik föy istenecek, gelene kadar ürün sayfası
+kısa kimlik hâlinde kalır. **Yukarıdaki kategori paragrafı ürün metni değildir** — kategorinin
+ne olduğunu anlatır ve ürüne dair hiçbir teknik iddia taşımaz.
+
+## 23 · Şömine ve Baca Fanları (`chimney-fans`) — 1 ürün
+
+> Bacanın çekişini mekanik olarak destekleyen fanlar. Doğal çekişin yetmediği, dumanın
+> içeri vurduğu şömine ve baca hatlarında kullanılır. Tek ürünlük bir başlık olduğu için
+> bu kategori bugün dar bir seçim sunar. Seçimi belirleyen sorular: baca kesiti, baca
+> malzemesi ve yakıt türüdür.
+
+**Aileler:** vortice-vort-industrial-ventilation-roof (ürün: TIRACAMINO)
+**Denetim notu:** aile slug'ı `industrial-ventilation-roof` — yanıltıcı; ürün bir baca
+fanıdır, endüstriyel çatı fanı değil. Kaynakta da karışıklık vardı ve taslakta kayıtlı.
+**Slug ÜRÜN'ün alanı**, dokunulmadı.
+
+---
+
+## Bölüm II'nin kapatmadığı
+
+* **22 numaralı kategori (Hız Anahtarları)** — kategori paragrafı yazıldı, ürün metni
+  YAZILMADI (K7.10). İkisi ayrı şeydir; karıştırılmamalı.
+* **Boş 7 alt kategori** — ürünü olmayan 7 alt kategoriye paragraf YAZILMADI. Boş sayfaya
+  rehber yazmak, olmayan bir yelpazeyi varmış gibi gösterir (vaat bütünlüğü).
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-lineo-2026-09-06.md
+
+# İçerik hattı — TR taslak: LINEO · LINEO QUIET (REC-146 Adım 2b·2, ilk aile grubu)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** OPS pano notu 2026-09-06 ("Lineo + Lineo Quiet ilk grup KABUL")
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026 s.22–24 (TR) · Vortice LINEO kataloğu s.3–26 (EN, **çevrildi**)
+**Referans biçimi:** `[AVenS s.NN]` = fiyat listesi · `[VLK s.NN]` = Vortice LINEO kataloğu
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.1** (varyant metni yazılır, **yüklenmez**) · **K7.2** (çeviri serbest)
+  · **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Derinlik ölçümü (`icerik-hatti-anlatim-derinligi-2026-09-05.md`): **Lineo ZENGİN** 383 birim / 6 blok ·
+  **Lineo Quiet ZENGİN** 131 birim / 5 blok. İkisi de TR fiyat listesinde s.22–23'ü **paylaşıyor**.
+
+---
+
+## 0 · Neden bu ikisi birlikte yazıldı
+
+Derinlik ölçümünde bu iki aile, TR kaynağında **aynı iki sayfayı paylaşan** ailelerdi. Paylaşık metni
+doğru aileye bölmenin tek dürüst yolu, ikisini **yan yana** yazmaktır: ayıran cümle ancak karşılaştırınca
+görünür. Ayrı ayrı yazılsalardı ikisi de "kanal tipi karma akışlı fan" diye başlayacak ve vitrinde
+**iki ayrı seri tek cümleyle** çıkacaktı — SEAT/JET'te tam bu tuzağa düşmenin eşiğinden dönmüştük.
+
+## 1 · Bugün DB'de ne var (ölçüldü, 2026-09-06)
+
+| Aile | Ürün | `description.tr` | Durum |
+|---|---|---|---|
+| `vortice-lineo` | 7 | **BOŞ** | sıfırdan yazılıyor |
+| `vortice-lineo-quiet` | 12 | 212 karakter, **2 cümle** | var ama altı blok **yok**, zenginleştiriliyor |
+
+**Mevcut Quiet metni (korunacak çekirdek, atılmıyor):**
+> "Ultra sessiz çalışan, akustik susturucu gövdeli kanal tipi karma akışlı havalandırma fanı serisi.
+> 100–315 mm çap seçenekleri ve 260–2890 m³/h debi aralığı ile konut ve ticari havalandırma
+> uygulamalarına uygundur."
+
+Bu metin **doğru** ve sayıları DB'den türetilmiş (`vortice-lineo-descriptions.json` `_kaynak` notu).
+Taslak onu **değiştirmiyor**, üstüne altı bloğu ekliyor. `is_description_manual` bugün **false**;
+elle yazılmış metin yüklenirse **true** olmalı.
+
+---
+
+## 2 · LINEO Serisi
+
+**DB:** `vortice-lineo` · 7 ürün · Lineo 100 / 100 Q / 125 / 150 / 200 / 250 / 315 · açıklama **BOŞ**
+
+### Kimlik cümlesi
+> Konut, ticari ve endüstriyel alanların havalandırması için, kanal içine yatay veya dikey monte
+> edilebilen karma akışlı (mixed flow) kanal fanı. [VLK s.4]
+
+### Dört madde
+* Yüksek performans, düşük enerji tüketimi, düşük gürültü emisyonu ve kolay montaj [VLK s.4]
+* Teknopolimer gövde; E2 yangına tepki sınıfı (EN ISO 11925-2:2010) ve IPX5 su koruması [VLK s.5]
+* Üç hızlı endüksiyon motor — performans, tüketim ve ses arasında en iyi denge [VLK s.24]
+* 100–315 mm anma çapı aralığı [VLK s.25]
+
+### Yapısal bloklar
+
+**Gövde.** Teknopolimer gövde, E2 yangına tepki güvenlik sınıfını (EN ISO 11925-2:2010) ve yüksek
+derecede su korumasını (IPX5) sağlar. [VLK s.5] Merkezi motor yuvası fan-motor grubunu içine alır;
+kablolama elemanlarını ise dışarıda, kolay erişilebilir bir konumda barındırır. Ana gövde, emiş ve
+basma borularına bağlanmaya hazır bir çift uç desteğe sabitlenmiştir. [VLK s.5]
+> *Sınıflandırma yalnızca kurallara uygun monte edilmiş ürün için geçerlidir.* [VLK s.5]
+
+**Çark.** Karma akışlı (mixed flow) çark kullanılır. Basma tarafındaki akış doğrultucular, yukarı
+akıştaki çarkla sinerji içinde çalışarak yönetilen hava akışını optimize eder; böylece performans
+artar, girdap oluşumu azalır ve gürültü emisyonu en aza iner. [VLK s.5] Ojival profilli akış
+yönlendirici aynı amaca hizmet eder. [VLK s.7] Diverjan eleman, çarkın performansını artırır. [VLK s.26]
+
+**Motor.** Üç hızlı endüksiyon motor. [VLK s.24] Motorlar, maksimum hızda ve maksimum ortam
+sıcaklığında sürekli çalışmada, tipine göre **30.000 veya 40.000 saat** asgari garantili ömre
+sahiptir. [VLK s.5]
+
+**Koruma.** IPX5 su koruma derecesi ve E2 yangına tepki sınıfı. [VLK s.5] Elektrik kutusu, elektriksel
+ve yangına karşı dayanım sağlayan malzemeden üretilmiştir. [VLK s.26] Ürünler CE işaretlidir; güvenlik
+ve elektromanyetik uyumluluk direktiflerine uygunluk için **IMQ sertifikasına** sahiptir. [VLK s.3]
+
+**Kontrol.** Lineo 100–150 modelleri çift hızlı, Lineo 200–315 modelleri üç hızlıdır; hız anahtarına
+ihtiyaç duymadan farklı kademede hava debisi sağlanabilir. İsteğe bağlı olarak hız anahtarı ile
+kontrol edilebilir. [AVenS s.24]
+
+**Montaj.** Kanal içine yatay veya dikey montaja uygundur. [VLK s.4] Giriş nozulu, duvar ve tavan
+montajında ürünü taşıyacak biçimde boyutlandırılmıştır. [VLK s.26] Her bileşen komşu elemanlarla kolay
+bağlanıp ayrılabilir; iç bileşenlere (motor-çark) erişim ve değişim kolaydır. [VLK s.5]
+
+---
+
+## 3 · LINEO QUIET Serisi
+
+**DB:** `vortice-lineo-quiet` · 12 ürün — **6 adet Quiet (AC) + 6 adet Quiet ES (EC)**, hepsi `active`
+· açıklama **2 cümle, blok yok**
+
+### Kimlik cümlesi
+> Ses emici kaplaması dış gövdeye tam entegre edilmiş, ortam ses emisyonunu en aza indirmek üzere
+> optimize edilmiş kanal tipi karma akışlı fan. [VLK s.6]
+
+### Dört madde
+* Akustik susturucu gövde — ses emici kaplama dış gövdeye **tam entegre** [VLK s.6][AVenS s.22]
+* İki motor seçeneği: AC endüksiyon (Quiet) ve **EC fırçasız** (Quiet ES) [VLK s.12, s.18]
+* Quiet üç hızlı, **Quiet ES dört hızlı** (4/6/8/10 V) — hız anahtarı olmadan farklı debi [AVenS s.22, s.23]
+* Serinin üst ucu: aynı gövde ailesinin en yüksek performans seviyesi [VLK s.6]
+
+### Yapısal bloklar
+
+**Gövde.** Ses emici kaplama dış gövdeye tamamen entegredir ve ortama yayılan ses emisyonunu en aza
+indirecek şekilde optimize edilmiştir. [VLK s.6] Gövde yapısı, malzemesi ve koruma sınıfı bakımından
+LINEO serisiyle ortaktır: teknopolimer gövde, E2 yangına tepki sınıfı, IPX5. [VLK s.5]
+
+**Çark.** LINEO serisiyle ortak: karma akışlı çark, basma tarafında akış doğrultucular, ojival profilli
+akış yönlendirici. [VLK s.5, s.7]
+
+**Motor.** İki seçenek sunulur: AC endüksiyon motorlu **LINEO QUIET** [VLK s.18] ve EC fırçasız motorlu
+**LINEO QUIET ES** [VLK s.12]. EC fırçasız model düşük enerji tüketimi sağlar. [AVenS s.22]
+
+**Koruma.** LINEO serisiyle ortak: IPX5, E2 sınıfı gövde, yangına dayanıklı elektrik kutusu, CE + IMQ.
+[VLK s.3, s.5, s.26]
+
+**Kontrol.** LINEO QUIET (AC) **üç hızlıdır**; hız anahtarına ihtiyaç duymadan üç farklı hava debisi
+sağlanabilir. [AVenS s.23] LINEO QUIET ES (EC) **dört hızlıdır**; hız anahtarına ihtiyaç duymadan dört
+farklı hava debisi sağlanabilir. [AVenS s.22] Her ikisi de isteğe bağlı hız anahtarıyla kontrol
+edilebilir; hız anahtarları sıva üstü montajlı, sigorta korumalı, minimum hız ayarlı ve On/Off
+anahtarlıdır. [AVenS s.22, s.23]
+
+**Montaj.** LINEO serisiyle ortak: kanal içine yatay veya dikey montaj, taşıyıcı giriş nozulu, kolay
+sökülüp takılabilen bileşenler. [VLK s.4, s.5, s.26]
+
+---
+
+## 4 · İki seriyi ayıran cümle (paylaşık sayfanın çözümü)
+
+> **LINEO ile LINEO QUIET aynı gövde, aynı çark, aynı koruma ailesindendir.** Ayıran tek şey,
+> QUIET'in dış gövdesine **tam entegre ses emici kaplama** ve buna bağlı olarak sunulan **EC fırçasız
+> motorlu ES seçeneği**dir. [VLK s.5, s.6, s.12]
+
+Vitrinde bu farkın görünmesi, iki seriyi ayıran yegâne şeydir. "Sessiz" kelimesi tek başına yetmez —
+LINEO de düşük gürültü emisyonu iddia eder [VLK s.4]; QUIET'te farklı olan **nasıl** sağlandığıdır.
+
+---
+
+## 5 · K7.1 — YAZILDI ama **YÜKLENMEZ** (satmadığımız varyantlar)
+
+Aşağıdaki metinler kaynakta vardır ve ileride ürün açılırsa hazır beklesin diye yazılmıştır.
+**DB'ye yüklenmez** — bugün bu modelleri satmıyoruz; vaat bütünlüğü satmadığımız ürünün anlatımını yasaklar.
+
+* **LINEO ES (düz seri, EC motorlu):** "EC fırçasız motorlu LINEO serisi." Kaynak: [VLK s.3] başlığı
+  ve s.25'teki "26 modelin 18'i AC, 8'i EC fırçasız motorlu" ifadesi. **DB'de düz seri ES modeli yok.**
+* **160 mm boy:** Katalogda `LINEO 160 QUIET` ve `LINEO 160 QUIET ES` mevcut [VLK s.12, s.13].
+  **DB'de 160 boy yok** — Quiet ailemiz 100/125/150/200/250/315.
+
+---
+
+## 6 · Kaynakta ve veride bulduklarım (K7.5 — hepsi kayıtta)
+
+1. **`Vortice Lineo 100 Q` (SKU `VRT-17144`… değil, `VRT-17143`) kimliği belirsiz.** DB'de `vortice-lineo`
+   ailesinde duruyor, adı "Q" ile bitiyor. Katalogda `LINEO 100 QUIET` kodu **17160**; 17143 bu değil.
+   "Q = Quiet" varsayımı **yapılmadı** — ürün yanlış ailede olabilir ya da farklı bir varyant olabilir.
+   **Ölçülmedi, uydurulmadı; denetim kalemi olarak bırakıldı.**
+2. **Kaynak dosya adı hatalı:** `LINEO_QUITE_KATALOG.pdf` — doğrusu QUIET. İçerik doğru, ad yanlış.
+   (Depo temizliği bizim işimiz değil; kaydı burada.)
+3. **Quiet ES ses değerlerinde ondalık ayırıcı karışık:** aynı tabloda hem `71,4` hem `76.7`
+   biçimi kullanılmış [VLK s.12]. Sayı okunabiliyor ama otomatik ayrıştırmada tuzak — **taslakta
+   ses değeri kullanılmadı.**
+4. **Mevcut Quiet metnindeki "260–2890 m³/h" aralığı DB'den türetilmiş** (manifest `_kaynak` notu),
+   katalogdan değil. Doğruluğu **bu turda yeniden ölçülmedi**; korunarak bırakıldı.
+
+## 7 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR. EN metin `description.en` için ayrı tur gerekir.
+* **Ses (dB) ve debi tabloları taslağa girmedi.** Kaynakta var ama sayı yazmak ayrı bir doğrulama
+  turu ister (birim sözleşmesi, `product-schema-standard.md` §11.6/11.7).
+* **`is_description_manual` bayrağı** bugün her ailede `false`. Elle yazılmış bu metin yüklenirse
+  **true** yapılmalı; aksi halde bir sonraki otomatik tur bunu ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-nicotra-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+
+# İçerik hattı — TR taslak: NICOTRA GEBHARDT DD · AT · ADH · RDH (REC-146 Adım 2b, radyal fan grubu)
+
+**Şerit:** URUN-KATALOG · **Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026 (TR) — **DD s.52 · AT s.53 · ADH s.54 · RDH s.55**
+**Referans biçimi:** `[AVenS s.NN]` = fiyat listesi (basılı sayfa numarası; PDF indeksi = NN−1)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.1** (satmadığımız varyantın metni yüklenmez) · **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp örneği: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md`.
+
+---
+
+## 0 · Bu taslağın dürüst sınırı — ÖNCE OKU
+
+Dört ailenin **tek** kaynağı var: AVenS 2026 fiyat listesinin **birer sayfası**. O sayfalarda
+aile başına **bir tanım cümlesi + bir fiyat tablosu** vardır; başka anlatım yoktur. Bu yüzden
+altı bloğun çoğu bu turda **BOŞ** kalmıştır. Boşluk bir eksiklik değil, **kaynağın gerçek
+sınırıdır**: gövde malzemesi, koruma sınıfı, yalıtım sınıfı, sıcaklık dayanımı, montaj biçimi
+ve sertifikalar bu dört ailenin sayfalarında **hiç geçmiyor** — oysa aynı katalogda komşu
+ailelerde (NIMUS s.47, NIMAX s.48, ENKELFAN s.49, KENTALFAN s.50) tam bu bilgiler yazılıdır.
+Yani boşluk bizim aramamızın değil, **kaynağın** eksiğidir.
+
+**Sonuç (karar besleyen):** dört ailenin dördü de üreticiden **teknik föy** ister. Ayrıntı §8'de.
+
+---
+
+## 1 · Bugün DB'de ne var
+
+| Aile | Ürün | `description.tr` | Kaynakta karşılığı |
+|---|---|---|---|
+| `nicotra-gebhardt-dd` | 13 | **BOŞ** | s.52 — 1 tanım cümlesi (iki alt seri için iki kez) + 14 satırlık tablo |
+| `nicotra-gebhardt-at` | 8 | **BOŞ** | s.53 — 1 tanım cümlesi + 11 satırlık tablo |
+| `nicotra-gebhardt-adh` | 8 | **BOŞ** | s.54 — 2 cümlelik tanım + 16 satırlık tablo |
+| `nicotra-gebhardt-rdh` | 6 | **BOŞ** | s.55 — 2 cümlelik tanım + 16 satırlık tablo |
+
+---
+
+## 2 · DD SERİSİ — direkt akuple radyal fanlar
+
+**DB:** `nicotra-gebhardt-dd` · 13 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+
+> NICOTRA Gebhardt DD serisi; düşük basınçlı, çift emişli, öne eğimli ve sık kanatlı,
+> direkt akuple motorlu radyal fan ailesidir. [AVenS s.52]
+
+### Maddeler
+
+* Fiyat listesi ikiye ayırır: standart DD serisi ve 3 hızlı DD 3V serisi; ikisinin de tanım cümlesi aynıdır. [AVenS s.52]
+* Motor gücü 147W ile 1500W arasındadır. [AVenS s.52]
+* Debi 1550 m³/h ile 7880 m³/h arasındadır. [AVenS s.52]
+* Model kodları tek fazlı ve üç fazlı, dört kutuplu ve altı kutuplu motor seçeneklerini birlikte kapsar. [AVenS s.52]
+
+### Yapısal bloklar
+
+**Gövde.** Fanlar çift emişlidir. [AVenS s.52]
+*Gövde malzemesi, koruma sınıfı ve sıcaklık dayanımı bu sayfada yazmıyor — kaynakta karşılığı yok.*
+
+**Çark.** Çark öne eğimli ve sık kanatlıdır. [AVenS s.52] Fan düşük basınç sınıfındadır. [AVenS s.52]
+
+**Motor.** Motor doğrudan (direkt) akupledir; ayrı bir tahrik düzeni yoktur. [AVenS s.52]
+Katalogdaki güç kademeleri 147W, 300W, 373W, 420W, 550W, 735W, 750W, 1100W ve 1500W değerleridir. [AVenS s.52]
+
+**Koruma.** **Kaynakta karşılığı yok.** DD sayfasında koruma sınıfı, yalıtım sınıfı,
+yangın/sıcaklık dayanımı veya sertifika bilgisi geçmiyor.
+
+**Kontrol.** DD 3V alt serisi 3 hızlıdır. [AVenS s.52] Standart DD tablosundaki modeller 1V
+olarak kodlanmıştır; aynı tabloda tek bir 2V kodlu model de vardır. [AVenS s.52]
+
+**Montaj.** **Kaynakta karşılığı yok.** Montaj biçimi, bağlantı ve uygulama alanı listesi
+DD sayfasında yer almıyor.
+
+---
+
+## 3 · AT SERİSİ — çift emişli radyal fanlar
+
+**DB:** `nicotra-gebhardt-at` · 8 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+
+> NICOTRA Gebhardt AT serisi; düşük basınçlı, kayış kasnak tahrikli, öne eğimli ve sık
+> kanatlı çift emişli radyal fan ailesidir. [AVenS s.53]
+
+### Maddeler
+
+* Tahrik kayış kasnaklıdır; motor fana doğrudan akuple değildir. [AVenS s.53]
+* Debi 2300 m³/h ile 18200 m³/h arasındadır. [AVenS s.53]
+* Fiyat listesinde model adı yalnız çark ölçüsünü verir; motor gücü, devir ve faz bilgisi tabloda yer almaz. [AVenS s.53]
+
+### Yapısal bloklar
+
+**Gövde.** Fanlar çift emişlidir. [AVenS s.53]
+*Gövde malzemesi ve koruma sınıfı bu sayfada yazmıyor — kaynakta karşılığı yok.*
+
+**Çark.** Çark öne eğimli ve sık kanatlıdır. [AVenS s.53] Fan düşük basınç sınıfındadır. [AVenS s.53]
+
+**Motor.** Kayış kasnak tahriklidir. [AVenS s.53] Motor bir katalog kalemi olarak
+listelenmediği için güç, devir, kutup ve faz bilgisi **kaynakta yok**.
+
+**Koruma.** **Kaynakta karşılığı yok.**
+
+**Kontrol.** **Kaynakta karşılığı yok.** Hız kademesi ve kontrol donanımı AT sayfasında
+geçmiyor. Tahrik kayış kasnak olduğu için hızın kasnak oranıyla belirlendiği **çıkarımı
+kaynakta yazılı değildir ve taslağa alınmamıştır.**
+
+**Montaj.** **Kaynakta karşılığı yok.**
+
+---
+
+## 4 · ADH SERİSİ — sık kanatlı çift emişli radyal fanlar
+
+**DB:** `nicotra-gebhardt-adh` · 8 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+
+> NICOTRA Gebhardt ADH serisi; öne eğimli, sık kanatlı, kayış kasnak tahrikli çift emişli
+> radyal fandır. Endüstriyel tip taze hava ve egzoz uygulamaları için özel olarak dizayn
+> edilmiştir. [AVenS s.54]
+
+### Maddeler
+
+* Endüstriyel tip taze hava ve egzoz uygulamaları için özel olarak tasarlanmıştır. [AVenS s.54]
+* Sattığımız aralığın alt ucu ADH-200 E2 modelinde 9800 m³/h debidir. [AVenS s.54]
+* Aralığın üst ucu ADH-1000-K modelinde 216000 m³/h değerine çıkar. [AVenS s.54]
+* Katalogdaki en büyük E2 gövdesi ADH-560 E2 modelidir ve 66100 m³/h verir. [AVenS s.54]
+* Katalog gövde büyüklüğüne göre üç kod eki kullanır: E2, -R ve -K. [AVenS s.54]
+
+### Yapısal bloklar
+
+**Gövde.** Fanlar çift emişlidir. [AVenS s.54] Model kodundaki E2, -R ve -K ekleri farklı
+gövde büyüklüğü gruplarını ayırır; **bu eklerin anlamı kaynakta açıklanmıyor.** [AVenS s.54]
+
+**Çark.** Çark öne eğimli ve sık kanatlıdır. [AVenS s.54]
+
+**Motor.** Kayış kasnak tahriklidir. [AVenS s.54] Motor verisi **kaynakta yok**.
+
+**Koruma.** **Kaynakta karşılığı yok.**
+
+**Kontrol.** **Kaynakta karşılığı yok.**
+
+**Montaj.** **Kaynakta karşılığı yok.** Kaynakta yalnız kullanım amacı — endüstriyel taze hava
+ve egzoz — yazılıdır, montaj biçimi değil. [AVenS s.54]
+
+---
+
+## 5 · RDH SERİSİ — seyrek kanatlı çift emişli radyal fanlar
+
+**DB:** `nicotra-gebhardt-rdh` · 6 ürün · açıklama **BOŞ**
+
+### Kimlik cümlesi
+
+> NICOTRA Gebhardt RDH serisi; geriye eğimli, seyrek kanatlı, kayış kasnak tahrikli çift
+> emişli radyal fandır. Ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları
+> için özel olarak dizayn edilmiştir. [AVenS s.55]
+
+### Maddeler
+
+* Ticari **ve** endüstriyel sistemlerde taze hava ve egzoz uygulamaları için tasarlanmıştır. [AVenS s.55]
+* Çark geriye eğimli ve seyrek kanatlıdır; kataloğun bu bölümündeki tek geriye eğimli radyal fan ailesidir. [AVenS s.55]
+* Sattığımız aralığın alt ucu RDH-180 E2 modelinde 2900 m³/h debidir. [AVenS s.55]
+* Aralığın üst ucu RDH-500 E2 modelinde 25500 m³/h değerindedir. [AVenS s.55]
+
+### Yapısal bloklar
+
+**Gövde.** Fanlar çift emişlidir. [AVenS s.55] Model kodundaki E2, -R ve -K ekleri ADH ile
+aynı biçimde kullanılır; anlamları **kaynakta açıklanmıyor.** [AVenS s.55]
+
+**Çark.** Çark geriye eğimli ve seyrek kanatlıdır. [AVenS s.55]
+
+**Motor.** Kayış kasnak tahriklidir. [AVenS s.55] Motor verisi **kaynakta yok**.
+
+**Koruma.** **Kaynakta karşılığı yok.**
+
+**Kontrol.** **Kaynakta karşılığı yok.**
+
+**Montaj.** **Kaynakta karşılığı yok.**
+
+---
+
+## 6 · Dört aileyi ayıran karşılaştırma
+
+Kaynak dört aileyi **dört ayrı bölüm başlığı** altında verir; ayrım tam da bu başlıklarda ve
+tek tanım cümlesindedir.
+
+| | DD | AT | ADH | RDH |
+|---|---|---|---|---|
+| Kaynak sayfası | s.52 | s.53 | s.54 | s.55 |
+| Bölüm başlığı | Direkt akuple radyal fanlar | Radyal fanlar | Sık kanatlı radyal fanlar | Seyrek kanatlı radyal fanlar |
+| Tahrik | direkt akuple motor | kayış kasnak | kayış kasnak | kayış kasnak |
+| Kanat yönü | öne eğimli | öne eğimli | öne eğimli | **geriye eğimli** |
+| Kanat sıklığı | sık | sık | sık | **seyrek** |
+| Emiş | çift | çift | çift | çift |
+| Basınç sınıfı (kaynakta yazılı) | düşük | düşük | yazmıyor | yazmıyor |
+| Beyan edilen kullanım | yazmıyor | yazmıyor | endüstriyel taze hava/egzoz | ticari + endüstriyel taze hava/egzoz |
+| DB debi aralığı | 1550–7880 m³/h | 2300–18200 m³/h | 9800–216000 m³/h | 2900–25500 m³/h |
+
+### Ayıran cümleler
+
+> **DD, dördü içinde motoru üzerinde gelen tek ailedir.** DD direkt akuple motorludur; AT, ADH
+> ve RDH kayış kasnak tahriklidir — bu üçünde motor ve devir seçimi projeye bırakılır. [AVenS s.52, 53]
+
+> **DD ile AT aynı çarkı, farklı tahriki tarifler.** İkisi de düşük basınçlı, çift emişli, öne
+> eğimli ve sık kanatlıdır; tanım cümlelerindeki tek fark tahrik biçimidir. [AVenS s.52, 53]
+> Kapasite farkı buradan doğar: DD 7880 m³/h değerinde biterken AT 18200 m³/h değerine çıkar. [AVenS s.52, 53]
+
+> **AT ile ADH aynı çark ailesinin iki ölçek basamağıdır.** İkisi de öne eğimli, sık kanatlı,
+> kayış kasnak tahrikli çift emişli radyal fandır; ADH'yi ayıran, kaynakta açıkça yazılan
+> **endüstriyel taze hava ve egzoz** hedefi ile çok daha geniş gövde aralığıdır. [AVenS s.53, 54]
+
+> **RDH, dördü içinde tek geriye eğimli seyrek kanatlı ailedir** ve kaynakta hedefi **ticari
+> ve endüstriyel** diye ikili tanımlanan tek ailedir. [AVenS s.55] Aynı gövde numarasında
+> ADH'den belirgin biçimde düşük debi verir: ADH-200 E2 9800 m³/h iken RDH-200 E2 3500 m³/h değerindedir. [AVenS s.54, 55]
+
+### Vitrinde hangi soru hangi aileye götürür
+
+* Motoruyla birlikte gelen, düşük basınçlı, çift emişli fan → **DD**. [AVenS s.52]
+* Aynı fan tipini kendi motor ve kasnak seçimiyle, daha yüksek debide → **AT**. [AVenS s.53]
+* Endüstriyel taze hava ve egzoz, büyük gövde, yüksek debi → **ADH**. [AVenS s.54]
+* Ticari veya endüstriyel sistemde geriye eğimli çark → **RDH**. [AVenS s.55]
+
+---
+
+## 7 · Kaynakta bulduklarım (K7.5 — hepsi kayıtta)
+
+1. **24 blok hücresinden 11'i boş kaldı.** Aile başına ölçüm §8'de. Sebep tek: AVenS fiyat
+   listesi bu dört ailede **teknik anlatım vermiyor**, yalnız tanım cümlesi ve fiyat tablosu
+   veriyor. Aynı katalogda NIMUS (s.47), NIMAX (s.48), ENKELFAN (s.49) ve KENTALFAN (s.50)
+   ailelerinde koruma sınıfı, yalıtım sınıfı ve sıcaklık dayanımı **yazılı** — yani bu boşluk
+   kataloğun genel üslubu değil, bu dört sayfaya özgü.
+2. **DB ürün sayısı ile katalog satır sayısı tutmuyor** (satmadığımız modeller, K7.1):
+   * DD: katalogda **14** satır, DB'de **13** ürün. Hangi satırın DB'de olmadığı **ölçülmedi** —
+     DB tarafı bu turda sorgulanmadı, uydurulmadı.
+   * AT: katalogda **11** model; DB listesinde olmayanlar **AT 12/12, AT 15/11, AT 18/18**.
+   * ADH: katalogda **16** model; DB listesinde olmayanlar **ADH-180, -250, -280, -315 E2 ve
+     ADH-630-R, -710-R, -800-K, -900-K**.
+   * RDH: katalogda **16** model; DB listesinde olmayanlar **RDH-315, -355, -400, -450, -560 E2 ve
+     RDH-630-R, -710-R, -800-K, -900-K, -1000-K**.
+   Bu modellerin metni **yazılmadı** — bugün satmıyoruz; vaat bütünlüğü satmadığımız ürünün
+   anlatımını yasaklar.
+3. **RDH ürün seçkisinde boşluk var.** DB'deki RDH ailesi 180/200/225/250/280 boylarını ardışık
+   kapsıyor, sonra dört boy atlayıp **500**'e sıçrıyor. Katalogda 315/355/400/450 boyları mevcut.
+   Bu bir veri hatası mı yoksa ticari seçim mi — **ölçülmedi**, denetim kalemi olarak bırakıldı.
+4. **DD tablosunda kod tutarsızlığı:** tek hızlı tabloda listelenen `11921 DD 12/12 1500W 3F 4P 2V`
+   kalemi iki hızlı (2V) kodlu ve yanında çift yıldız dipnot işareti var; sayfada bu dipnotun
+   karşılığı **basılmamış**. Yıldızın ne anlattığı bilinmiyor.
+5. **s.53'te aileye ait olmayan bir görsel bloğu var:** "DD Model · DDMP Model · RLM 50 Model ·
+   RLM EVO Model" ve altında "Bu modellerin fiyatları için iletişime geçiniz." notu. AT sayfasında
+   duruyor ama AT ailesini anlatmıyor; **DDMP, RLM 50 ve RLM EVO** dört ailemizde yok.
+   Taslağa alınmadı.
+6. **Debi aralıkları kaynakta doğrulandı; canlı-veritabanı işaretine gerek kalmadı.** Dördünün de DB
+   alt/üst ucu ilgili sayfadaki tabloda birebir bulundu — ADH'nin geniş aralığı dahil
+   (ADH-200 E2 alt uç, ADH-1000-K üst uç).
+7. **Basılı sayfa numarası ile PDF indeksi bir kaymalı** (basılı s.52 = PDF sayfa 51). Referanslar
+   **basılı** numarayı kullanır; kapı da basılı numarayla ölçer.
+
+## 8 · Aile başına ölçüm (rapor kalemi)
+
+| Aile | Kaynakta bulunan anlatım cümlesi | Dolan blok | Boş blok | Boş kalanlar |
+|---|---|---|---|---|
+| DD | 2 (aynı tanım cümlesi iki alt seri için) + "3 HIZLI" etiketi | 4 | 2 | Koruma, Montaj |
+| AT | 1 | 3 | 3 | Koruma, Kontrol, Montaj |
+| ADH | 2 | 3 | 3 | Koruma, Kontrol, Montaj |
+| RDH | 2 | 3 | 3 | Koruma, Kontrol, Montaj |
+
+**Föy ihtiyacı (karar besleyen sonuç):** dördü de üreticiden teknik föy ister. Öncelik sırası
+**AT > RDH > ADH > DD**. AT kaynakta tek cümleyle geçiyor ve motor verisi hiç yok; AT, ADH ve
+RDH'de koruma, kontrol ve montaj bloklarının üçü de tamamen boş (aile başına 3/6 hücre); DD ise
+en azından motor gücü ve hız kademesi taşıyor (2/6 boş).
+İstenecek asgari kalemler: gövde malzemesi, koruma sınıfı, yalıtım sınıfı, çalışma sıcaklık
+aralığı, montaj biçimi, sertifikalar ve kayış kasnak ailelerinde motor/kasnak seçim tablosu.
+
+## 9 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR.
+* **Fiyat ve stok yazılmadı** (K1). Katalogdaki Euro sütunu taslağa hiç girmedi.
+* **Ses, devir ve basınç eğrisi yok** — bu dört sayfada zaten yayımlanmamış.
+* **Web araştırması yapılmadı** — bu turun kapsamı dışı, ayrı iş olarak planlandı.
+* **`is_description_manual`** yüklemede **true** yapılmalı; aksi halde sonraki otomatik tur ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-radon-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: RAD=2022-11-en-ca-rm-es-radon.pdf -->
+
+# İçerik hattı — TR taslak: VORTICE RADON serisi (KANAL + ÇATI)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** REC-146 Adım 2b — aile grubu "radon"
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır. Bu dosya kaynak/kanıt kaydıdır.
+
+**Kaynak:** `2022-11-en-ca-rm-es-radon.pdf` (EN, 42 sayfa) — bölüm **THE RADON-SPECIFIC VORTICE RANGE**, s.23–25.
+Yol: `~/venthub-pdf-ingestor/venthub/markalar/vortice/konut-fanlari/radon-range/01-input/`
+
+**Referans biçimi:**
+
+* `[RAD s.NN]` = yukarıdaki PDF'in NN numaralı sayfası (1-tabanlı, PyMuPDF okuması).
+* `[DB]` = bugünkü Supabase ürün verisinden gelen sayı (aile/ürün/debi sayımı). **PDF'te yoktur** —
+  bu yüzden PDF sayfasına referans verilmez; kaynağı açıkça DB'dir.
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.2** (çeviri serbest) · **K7.5** (her tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp örneği: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md`.
+* **Sağlık sınırı (bu ailede özel):** Kaynak s.7–9 radon–akciğer kanseri epidemiyolojisini anlatır.
+  Bu taslak o cümlelerin **hiçbirini vitrine taşımaz**. Vitrinde yalnız kaynağın söylediği
+  **teknik işlev** vardır: radon yüklü havayı çekip dışarı atmak.
+
+---
+
+## 0 · Bu iki aile niçin birlikte yazıldı
+
+Kaynakta bu iki ailenin tarifi **art arda iki sayfada** durur ve ikisi de aynı başlığı taşır:
+**THE RADON-SPECIFIC VORTICE RANGE**. Aynı seri, aynı motor teknolojisi, aynı kumanda paneli.
+Ayrı ayrı yazılsalardı ikisi de "radon tahliyesi için fırçasız motorlu fan" diye başlayacak ve
+vitrinde **iki ayrı ürün ailesi tek cümleyle** çıkacaktı. Ayıran şey ancak yan yana konunca
+görünür: **nereye monte edildiği** ve buna bağlı **koruma sınıfı** (§4).
+
+### Aile sınırı — nerede bulundu (doğrulandı)
+
+| Sayfa | Başlık (kaynakta birebir) | Aile |
+|---|---|---|
+| s.23 | `VORT CA RM ES` — "Duct exhaust fan" | **KANAL** → `vortice-radon-range-circular` |
+| s.24 | `VORT CA RM RF ES` — "Rooftop suction unit" | **ÇATI** → `vortice-radon-range-roof` |
+| s.25 | `SICURBOX remote control panel (optional)` | **her iki aileye ortak** aksesuar |
+
+Önceki ölçümün bulduğu sınır **doğrulandı**: iki aile ayrı sayfalarda, ayrı çap kümesi ve ayrı
+koruma sınıfıyla tarif edilmiş. Kaynakta bu iki sayfa dışında ürün tarifi **yoktur** (s.1–22 radon
+olgusu ve havalandırma stratejileri, s.26–41 saha uygulama örnekleri, s.42 kapak).
+
+---
+
+## 1 · Bugün DB'de ne var (verilen ölçüm, 2026-09-06)
+
+| Aile | Ürün | Modeller | Debi | Faz | Bugünkü `description.tr` |
+|---|---|---|---|---|---|
+| `vortice-radon-range-circular` | 5 | CA-RM 100/125/150/160/200 ES | 350–1210 m³/h | 5 monofaze | 1 cümle, blok yok |
+| `vortice-radon-range-roof` | 3 | CA-RM 150/160/200 RF ES | 775–985 m³/h | 3 monofaze | 1 cümle, blok yok |
+
+Mevcut iki cümle korunmuyor **değil**, düzeltiliyor: çatı metnindeki koruma sınıfı kaynakla
+çelişiyor (§6.1). Kanal metnindeki IPX7 kaynakla **birebir uyuşuyor**.
+
+---
+
+## 2 · VORT CA-RM ES — KANAL tipi (`vortice-radon-range-circular`)
+
+**DB:** 5 ürün · CA-RM 100 / 125 / 150 / 160 / 200 ES · hepsi monofaze [DB]
+
+### Kimlik cümlesi
+
+> Vortice'nin radona özel ürün ailesinin kanal tipi üyesi: radon yüklü havayı kanal içinden çekip
+> dışarı atmak için tasarlanmış kanal tipi egzoz fanı. [RAD s.23]
+
+### Dört madde
+
+* Kanal tipi egzoz fanı — radona özel Vortice ürün ailesinin parçası [RAD s.23]
+* Anma çapları 100-125-150-160-200 mm [RAD s.23]
+* IPX7 — suya daldırmaya karşı sızdırmaz koruma [RAD s.23]
+* Elektronik kontrollü fırçasız motor; kendine ait kumanda paneliyle birlikte kullanılabilir [RAD s.23]
+
+Debi aralığı 350–1210 m³/h; beş model, hepsi monofaze [DB]
+
+### Yapısal bloklar
+
+**Gövde.** **Kaynakta karşılığı yok.** Bu kaynak, ürünün gövde malzemesini, yapısını veya üretim
+biçimini tarif etmiyor; ürün sayfasında yalnız tip, çap, koruma sınıfı, motor ve montaj bilgisi
+veriliyor [RAD s.23]. Gövde anlatımı, ürünün kendi teknik föyü/kataloğu bulunmadan yazılmaz.
+
+**Çark.** **Kaynakta karşılığı yok.** Bu kaynak CA-RM ES'in çark tipini (radyal / eksenel / karma
+akışlı) hiçbir yerde söylemiyor. Bugünkü DB metnindeki "radyal fan" ifadesi bu kaynaktan
+**doğrulanamıyor** (§6.2).
+
+**Motor.** Elektronik kontrollü fırçasız (brushless) motor kullanılır. [RAD s.23]
+
+**Koruma.** IPX7 koruma sınıfı — suya daldırmaya karşı sızdırmaz. [RAD s.23] Bu koruma seviyesi,
+ailenin kanal içi ve radon kuyusu içi yerleşimiyle uyumludur. [RAD s.20]
+
+**Kontrol.** Ürün, kendisi için tanımlanmış kumanda paneliyle birlikte kullanılabilir. [RAD s.23]
+Opsiyonel **SICURBOX** uzaktan kumanda paneli şunları sağlar: LCD ekran; iki fanın birbirinden
+bağımsız performans kontrolü; fanların güç kontrolü; fanın düzenli çalışmasının izlenmesi;
+çekilen debinin doğru kontrolü (akış anahtarı ayrıca temin edilir); haftalık zaman dilimleriyle
+programlı çalışma; çalışma hatalarının sesli ve görsel bildirimi; harici alarm sirenlerine
+bağlantı imkânı. [RAD s.25]
+
+**Montaj.** Kanal içine monte edilir ve **seri (ard arda) montaja** imkân verir. [RAD s.23]
+Uygulama örneklerinde CA-RM ES tipi fanlar radon kuyusunun içine de yerleştirilebilir. [RAD s.20]
+
+---
+
+## 3 · VORT CA-RM RF ES — ÇATI tipi (`vortice-radon-range-roof`)
+
+**DB:** 3 ürün · CA-RM 150 / 160 / 200 RF ES · hepsi monofaze [DB]
+
+### Kimlik cümlesi
+
+> Vortice'nin radona özel ürün ailesinin çatı tipi üyesi: dış ortama, çatı üzerine monte edilen
+> emiş (aspiratör) ünitesi. [RAD s.24]
+
+### Dört madde
+
+* Çatı tipi emiş ünitesi — radona özel Vortice ürün ailesinin parçası [RAD s.24]
+* Anma çapları 150-160-200 mm [RAD s.24]
+* IP45 — dış ortam montajına uygun koruma [RAD s.24]
+* Elektronik kontrollü fırçasız motor; kendine ait kumanda paneliyle birlikte kullanılabilir [RAD s.24]
+
+Debi aralığı 775–985 m³/h; üç model, hepsi monofaze [DB]
+
+### Yapısal bloklar
+
+**Gövde.** **Kaynakta karşılığı yok.** Kaynak yalnız ünitenin tipini, çap kümesini, koruma sınıfını
+ve motor teknolojisini veriyor; gövde malzemesi ya da yapısı tarif edilmiyor [RAD s.24].
+
+**Çark.** **Kaynakta karşılığı yok.** Kaynak CA-RM RF ES'in çark tipini söylemiyor; bugünkü DB
+metnindeki "radyal fan" ifadesi bu kaynaktan doğrulanamıyor (§6.2).
+
+**Motor.** Elektronik kontrollü fırçasız (brushless) motor kullanılır. [RAD s.24]
+
+**Koruma.** IP45 koruma sınıfı — dış ortam montajına uygundur. [RAD s.24]
+
+**Kontrol.** Ürün, kendisi için tanımlanmış kumanda paneliyle birlikte kullanılabilir. [RAD s.24]
+Opsiyonel **SICURBOX** uzaktan kumanda paneli kanal tipiyle ortaktır: LCD ekran; iki fanın bağımsız
+performans kontrolü; güç kontrolü; düzenli çalışmanın izlenmesi; çekilen debinin doğru kontrolü
+(akış anahtarı ayrıca temin edilir); haftalık programlama; hataların sesli ve görsel bildirimi;
+harici alarm sirenine bağlantı. [RAD s.25]
+
+**Montaj.** Dış ortama monte edilecek biçimde tasarlanmıştır. [RAD s.24] Uygulama örneklerinde
+CA-RM RF ES tipi fanlar, saçak/çatı üzerinden atış yapan bir kanalın **ucuna** yerleştirilir. [RAD s.17]
+
+---
+
+## 4 · İki aileyi ayıran cümle (paylaşık bölümün çözümü)
+
+> **VORT CA-RM ES ile VORT CA-RM RF ES aynı radon ailesinin iki montaj biçimidir**: ikisi de
+> elektronik kontrollü fırçasız motorludur ve aynı kumanda paneline bağlanabilir. Ayıran şey
+> **nereye monte edildikleri** ve buna bağlı **koruma sınıfı**dır — kanal tipi kanalın (ya da radon
+> kuyusunun) içine girer, IPX7 ile suya daldırmaya karşı sızdırmazdır ve seri montaja izin verir;
+> çatı tipi ise dış ortama, çatıya konur ve IP45 ile dış ortam montajına uygundur. Çap kümesi de
+> farklıdır: kanal tipi 100-125-150-160-200 mm, çatı tipi 150-160-200 mm. [RAD s.23, 24]
+
+Vitrinde "radon fanı" demek iki aileyi ayırmaz — ikisi de odur. Ayıran, **fanın binanın neresinde
+durduğudur**: kanalın içinde mi (IPX7, seri montaj), çatının üstünde mi (IP45).
+
+---
+
+## 5 · Ortak aksesuar — SICURBOX (her iki ailede aynı)
+
+Kaynak SICURBOX'ı ayrı bir sayfada, iki üründen sonra tarif eder; **hangi aileye ait olduğunu
+söylemez** ve "iki fanın bağımsız kontrolü" ifadesi her iki aile için de geçerlidir. Bu yüzden
+taslak onu **iki ailenin de Kontrol bloğunda** anar, ayrı bir ürün gibi yazmaz. [RAD s.25]
+
+---
+
+## 6 · Kaynakta ve veride bulduklarım (K7.5 — hepsi kayıtta)
+
+### 6.1 · IPX5 / IP45 çelişkisi — **kaynak IP45 diyor, DB metni YANLIŞ**
+
+Bugünkü DB metni çatı ailesi için **"IPX5"** diyor. Kaynağın s.24 satırı birebir şudur:
+
+> `IP45 (suitable for outdoor installation)`
+
+Ham metin okumasıyla (PyMuPDF `get_text("text")`) doğrulandı; sayfada "IPX5" dizisi **hiç geçmiyor**.
+Kanal ailesi için s.23 satırı birebir `IPX7 (immersion watertight)` — DB'deki IPX7 **doğru**.
+**Hüküm:** çatı ailesinin koruma sınıfı **IP45**'tir; DB'deki "IPX5" bir aktarım hatasıdır.
+Bu taslak IP45 yazar. (İkisi aynı şey değildir: IPX5'te toz basamağı belirtilmemiştir, IP45 ise
+toz için 4 su için 5 basamağını verir — yani DB metni ürünün toz korumasını sessizce siliyordu.)
+
+### 6.2 · "Radyal fan" ifadesi bu kaynakta yok
+
+Her iki DB metni de ürünü "radyal fan" diye tanımlıyor. Bu kaynağın s.23/s.24 ürün sayfalarında
+çark tipi **hiç yazmıyor**. Saha örneklerinde geçen "centrifugal exhaust fan Ø250" ifadeleri
+belirli bir **proje uygulamasını** anlatır, CA-RM ES / RF ES modelini değil — bu yüzden çark tipi
+iddiası oraya dayandırılmadı. **Ölçülmedi, uydurulmadı; denetim kalemi olarak bırakıldı.**
+
+### 6.3 · Kaynakta performans verisi YOK
+
+s.23–25'te tek bir performans sayısı (debi, basınç, güç, ses) yoktur. Taslaktaki debi aralıkları
+**yalnız DB'den** gelir ve `[DB]` ile işaretlenmiştir. Katalog veya teknik föy bulunmadan bu
+ailelerin performans tablosu yazılamaz.
+
+### 6.4 · Kaynak bir ÜRÜN KATALOĞU değil, bir SUNUM
+
+Dosyanın 42 sayfasının yalnız **3'ü** (s.23–25) ürün tarifidir; geri kalanı radon olgusu, mevzuat
+ve saha uygulama örnekleridir. Bu, altı bloğun neden yarısına yakınının boş kaldığının sebebidir —
+metin kısalığı tembellik değil, **kaynak yokluğudur**.
+
+### 6.5 · Model kodu biçimi: kaynak "VORT CA RM ES", DB "CA-RM … ES"
+
+Kaynak aynı sayfada iki biçim kullanıyor: başlıkta `VORT CA RM ES` (tiresiz), görsel altında
+`VORT CA-RM ES` (tireli). DB tireli biçimi kullanıyor. Çelişki değil, biçim farkı; marka-model
+adı çevrilmedi ve DB biçimi korundu.
+
+### 6.6 · Sağlık iddiaları kaynakta VAR ama vitrine ALINMADI
+
+Kaynak s.7 radonu "sigaradan sonra akciğer kanserinin ikinci sebebi" diye anar ve s.9 ölüm
+tahminleri verir. Bunlar bir ürün vaadi değil epidemiyolojik bağlamdır; vitrin metnine hiçbiri
+alınmadı. Ürün metinlerinde yalnız teknik işlev anlatılır.
+
+---
+
+## 7 · Blok doluluk karnesi
+
+| Blok | KANAL (CA-RM ES) | ÇATI (CA-RM RF ES) |
+|---|---|---|
+| Gövde | **BOŞ** — kaynakta karşılığı yok | **BOŞ** — kaynakta karşılığı yok |
+| Çark | **BOŞ** — kaynakta karşılığı yok | **BOŞ** — kaynakta karşılığı yok |
+| Motor | DOLU | DOLU |
+| Koruma | DOLU | DOLU |
+| Kontrol | DOLU | DOLU |
+| Montaj | DOLU | DOLU |
+
+**Aile başına 4 dolu / 2 boş.** Toplam 12 bloğun **8'i dolu, 4'ü boş**.
+
+## 8 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` ayrı tur ister.
+* **Gövde ve Çark blokları açık** — CA-RM ES / RF ES teknik föyü ya da Vortice ürün kataloğu depoya
+  girerse bu iki blok doldurulabilir. Bugün kaynak yok.
+* **Performans (debi/basınç/ses/güç) tabloları yok** — kaynakta hiç sayı yok (§6.3).
+* **`is_description_manual`** bayrağı: elle yazılmış bu metin yüklenirse **true** yapılmalı;
+  aksi halde bir sonraki otomatik tur ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+* **DB düzeltmesi ayrı iş:** §6.1 (IPX5→IP45) ve §6.2 (radyal iddiası) bu taslakla değil,
+  DB yazım turunda kapanır.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-seat-storm-jet-2026-09-05.md
+
+# İçerik hattı — TR taslak: SEAT · STORM · JET (REC-146 Adım 2a·2)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Emir:** OPS, REC-146 yorumu 2026-09-05 13:57Z
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Onay sonrası `product_families.description` `{tr,en}` +
+`is_description_manual=true` ile yazılır. Bu dosya kaynak/kanıt kaydıdır.
+**Kaynak:** AVenS Ürün Fiyat Kataloğu 2026, s. 41–45 (TR) · **Çeviri YOK** — kaynak zaten Türkçe.
+**Referans biçimi:** her cümlenin sonunda `[s.NN]` = kaynak PDF sayfası.
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf -->
+<!-- VARSAYILAN-KAYNAK: AVenS -->
+<!-- Bu iki satır makine içindir: taslak-kaynak-kapisi.py adsız [s.NN] referanslarını
+     bu kaynağa bağlar. Yoksa kapı dosyayı SESSİZCE atlar ve "temiz" görünür. -->
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Systemair incelemesi §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Adım 1 bulgusu: bu üç ailenin marka kataloğu **yok**, TR anlatımı yalnız bu fiyat listesinde.
+
+---
+
+## ⚠ Kaynakta iki tutarsızlık — kopyalamadan önce yazıyorum
+
+**1. Aynı kimlik cümlesi iki ailede.** s.41 (SEAT) ve s.43 (JET) **birebir aynı** başlığı taşıyor:
+"KİMYASALLARA VE AŞINDIRICI GAZLARA KARŞI DAYANIKLI SANTRİFÜJ FANLAR". Bunu olduğu gibi alırsak
+**SEAT ve JET sayfaları aynı kimlik cümlesiyle yayına girer** — vitrinde iki farklı seri, tek cümle.
+JET'i ayıran bilgi başlıkta değil, maddesinde: çatı/duvar uygulaması, yatay-dikey montaj [s.43].
+**Taslakta JET'in kimlik cümlesi o maddeden türetildi**, başlık ikinci sıraya alındı. Sapma bilerek yapıldı.
+
+**2. STORM/JET ATEX sayfasının gövdesi "SEAT ATEX" diyor.** s.45'in başlığı
+"STORM ATEX SERİSİ / JET ATEX SERİSİ", ama gövde metni *"Patlayıcı ortamlar için tasarlanan **SEAT ATEX**
+Serisi…"* diye başlıyor ve verdiği performans aralığı (40–4500 Pa, 50–5.000 m³/h) **STORM'un s.42'deki
+aralığının aynısı** — JET'in s.43'teki aralığı (200–3.500 m³/h, 2.000 Pa) değil.
+Yani s.45 metni başka sayfadan kopyalanmış ve düzeltilmemiş. **Verbatim alınırsa JET sayfasına yanlış
+seri adı ve yanlış performans aralığı yazılır.** Taslakta ATEX bloğu **yalnız seri-bağımsız
+sertifika bilgisiyle** yazıldı; performans aralığı her ailenin kendi sayfasından alındı.
+
+> Bu iki kalem **kaynak hatası**, benim ölçüm hatam değil. Düzeltilmesi AVenS içerik tarafının işi;
+> not olarak OPS'a taşındı.
+
+---
+
+## 1 · SEAT Serisi
+
+**DB:** `seat-serisi` · 40 ürün (13'ü ATEX) · modeller SEAT 15/20/25/30/35/50 · açıklama bugün **BOŞ**
+
+### Kimlik cümlesi
+> Kimyasallara ve aşındırıcı gazlara karşı dayanıklı santrifüj fanlar. [s.41]
+
+### Dört madde
+* Polipropilen gövde — asit ve korozyona karşı üstün dayanım [s.41]
+* 40–2000 Pa statik basınç · 50–15.000 m³/h debi [s.41]
+* Monofaze 220 V ve trifaze 380 V seçenekleri [s.41]
+* ATEX Bölge 2 versiyonu mevcut [s.44]
+
+### Yapısal bloklar
+
+**Gövde.** Polipropilen gövde yapısı, asitlere ve korozyona karşı üstün dayanım sağlayarak maksimum
+koruma sunar. [s.41]
+
+**Motor.** Monofaze 220 V ve trifaze 380 V seçenekleri; 0,18 kW ile 7,5 kW arasında güç ve
+950, 1400, 2800 d/dk devir alternatifleri. [s.41]
+
+**Koruma.** ATEX versiyonu, patlayıcı ortamlar için ATEX Bölge 2, Kategori 3, Gaz Grup C sınıfında ve
+T4 sıcaklık sınıfında; IE3 verimlilik dereceli patlamaya dayanıklı asenkron motor kullanır. [s.44]
+
+**Çark · Kontrol · Montaj —** kaynakta karşılığı yok, **boş bırakıldı** (K7).
+
+---
+
+## 2 · STORM Serisi
+
+**DB:** `storm-serisi` · 20 ürün (7'si ATEX) · modeller STORM 10/12/14/16/18 · açıklama bugün **BOŞ**
+
+### Kimlik cümlesi
+> Daha yüksek statik basınca sahip, kimyasallara ve korozyona dayanıklı fanlar. [s.42]
+
+### Dört madde
+* Polipropilen gövde — asit ve korozyona karşı üstün dayanım [s.42]
+* 40–4500 Pa statik basınç · 50–5.000 m³/h debi [s.42]
+* Monofaze 220 V ve trifaze 380 V seçenekleri [s.42]
+* ATEX Bölge 2 versiyonu mevcut [s.45]
+
+### Yapısal bloklar
+
+**Gövde.** Polipropilen gövde yapısı, asitlere ve korozyona karşı üstün dayanım sağlayarak maksimum
+koruma sunar. [s.42]
+
+**Motor.** Monofaze 220 V ve trifaze 380 V seçenekleri; 0,06 kW ile 0,37 kW arasında güç ve
+1400, 2800 d/dk devir alternatifleri. [s.42]
+
+**Koruma.** ATEX versiyonu, patlayıcı ortamlar için ATEX Bölge 2, Kategori 3, Gaz Grup C sınıfında ve
+T4 sıcaklık sınıfında; IE3 verimlilik dereceli patlamaya dayanıklı asenkron motor kullanır. [s.45]
+
+**Çark · Kontrol · Montaj —** kaynakta karşılığı yok, **boş bırakıldı** (K7).
+
+> **STORM'un SEAT'ten farkı tek cümlede:** aynı gövde ve aynı koruma, ama **basınç iki katından fazla**
+> (4500 Pa'ya karşı 2000 Pa), buna karşılık **debi üçte bir** (5.000'e karşı 15.000 m³/h) [s.41, s.42].
+> Vitrinde bu farkın görünmesi, iki seriyi ayıran yegâne şey.
+
+---
+
+## 3 · JET Serisi
+
+**DB:** `jet-serisi` · 21 ürün (7'si ATEX) · modeller JET 20/25/30 · açıklama bugün **BOŞ**
+
+### Kimlik cümlesi
+> Çatı ve duvar uygulamaları için, yatay ve dikey montaja uygun santrifüj çatı fanları. [s.43]
+
+*(Kaynak başlığı SEAT'inkiyle birebir aynı olduğu için kimlik cümlesi maddeden türetildi — bkz. yukarıdaki
+tutarsızlık notu. Başlık ikinci sıraya alındı:)*
+> Kimyasallara ve aşındırıcı gazlara karşı dayanıklı santrifüj fanlar. [s.43]
+
+### Dört madde
+* Yatay ve dikey montaja uygun; çatı ve duvar uygulamaları [s.43]
+* 200–3.500 m³/h debi · 2.000 Pa'ya kadar statik basınç [s.43]
+* Monofaze 220 V ve trifaze 380 V seçenekleri [s.43]
+* ATEX Bölge 2 versiyonu mevcut [s.45]
+
+### Yapısal bloklar
+
+**Motor.** Monofaze 220 V ve trifaze 380 V seçenekleri; 0,18 kW ile 2,2 kW arasında güç ve
+950, 1400, 2800 d/dk devir alternatifleri. [s.43]
+
+**Koruma.** ATEX versiyonu, patlayıcı ortamlar için ATEX Bölge 2, Kategori 3, Gaz Grup C sınıfında ve
+T4 sıcaklık sınıfında; IE3 verimlilik dereceli patlamaya dayanıklı asenkron motor kullanır. [s.45]
+
+**Montaj.** Yatay ve dikey montaja uygundur; çatı ve duvar uygulamaları için tasarlanmıştır. [s.43]
+
+**Gövde · Çark · Kontrol —** kaynakta karşılığı yok, **boş bırakıldı** (K7).
+
+> **Dikkat:** JET'in polipropilen gövdesi hakkında s.43'te **cümle yok**. SEAT ve STORM'da var.
+> Aynı ürün ailesi olduğu için "onda da vardır" demek **uydurmadır** — yazılmadı. Doğrulanırsa eklenir.
+
+---
+
+## 4 · Bu taslağın kapattığı ve kapatmadığı
+
+**Kapattığı:** 15A çizimlerinde örnek olarak kullanılan üç ailenin (JET, STORM, SEAT) açıklaması bugün
+DB'de **boş**; bu taslak üçünü de kaynağa dayalı, sayfa referanslı biçimde dolduruyor. Toplam
+**3 kimlik cümlesi + 12 madde + 9 dolu blok**; 3 ailede 18 bloğun **9'u bilerek boş** (K7):
+SEAT ve STORM'da Gövde·Motor·Koruma dolu, JET'te Motor·Koruma·Montaj dolu.
+
+**Kapatmadığı:**
+* **EN çevirisi yok** — ikinci tur (emir gereği).
+* Çark ve Kontrol blokları **üç ailede de boş**; kaynakta o bilgi yok. Doldurulacaksa AVenS'ten teknik
+  föy istenmeli.
+* Metnin **ticari onayı yok** — Recep/uzman turu. Özellikle "ATEX Bölge 2 versiyonu mevcut" maddesi
+  satış vaadi taşıyor; ATEX modellerinin stok/tedarik durumu **ölçülmedi**.
+* `STORM 10 XRM` modeli kaynakta var, DB'de **yok** [s.42]; taslakta ona ait cümle **yazılmadı**.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-05
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-vortice-konut-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf, QE=Doc_Pubblicita_Residential_ventilation_vort_quadro_evo_4.pdf, RES=ResidentialVentilation.pdf, PEF=Doc_Pubblicita_Residential_ventilation_Punto_Evo_Flexo_2.pdf -->
+
+# İçerik hattı — TR taslak: VORT QUADRO EVO · PUNTO EVO FLEXO
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Referans biçimi:** `[QE s.NN]` = Vort Quadro Evo broşürü · `[RES s.NN]` = Residential Ventilation ana kataloğu
+· `[PEF s.NN]` = Punto Evo Flexo broşürü · `[AVenS s.NN]` = AVenS TR fiyat kataloğu 2026.
+Sayfa numaraları **PDF sayfa numarasıdır** (dört kaynakta da basılı sayfa = PDF sayfası).
+
+## KAYNAK / CETVEL
+
+* Kalıp: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md` (Kimlik cümlesi · Dört madde · Altı blok · ayıran cümle).
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kapı: `scripts/icerik-hatti/taslak-kaynak-kapisi.py` (sayı/kod jetonu ↔ referans sayfa).
+
+---
+
+## 0 · Neden bu ikisi birlikte yazıldı
+
+İkisi de "konut fanı" rafında duruyor ve bugünkü DB metinleri ikisini de **tek cümleye** indirmiş. Yan yana
+yazılmalarının sebebi tam bu: biri **radyal (santrifüj), kasalı, gömme montajlı** bir sistem, diğeri **aksiyel
+(helikosantrifüj), kasasız, duvara doğrudan** bir fan. Ayrı ayrı yazılsalardı ikisi de "banyo fanı" diye çıkacak
+ve vitrinde **iki farklı mimari tek kelimeye** çökecekti — Lineo/Lineo Quiet turunda kaçındığımız tuzağın aynısı.
+
+## 1 · Bugün DB'de ne var (emirle verilen ölçüm)
+
+| Aile | Ürün | Bugünkü `description.tr` | Kusur |
+|---|---|---|---|
+| `vortice-vort-quadro-evo` | 23 | "Duvar veya tavan montajına uygun, bilyalı motorlu (Long Life) santrifüj kanal tipi fan." | çok kısa; **gömme montaj yok**, **kasa/modülerlik yok**, elektronik süit yok, "kanal tipi" nitelemesi kaynakla çelişiyor |
+| `vortice-punto-evo-flexo` | 4 | "…100 mm çaplı…" | seride **100 mm ve 120 mm** var; tek çap yazılmış |
+
+Ürün sayıları, monofaze sayısı ve DB aile aralıkları **DB'den** gelir; bu turda PDF'le değil, emirle verilmiştir. [DB]
+
+---
+
+## 2 · VORT QUADRO EVO Serisi
+
+**DB:** `vortice-vort-quadro-evo` · 23 ürün · QE 60 / 60/35 / 100 / 100/60 / 100/60/35 LL ailesi ·
+düz, T, TP, T PIR, TP HCS varyantları [DB]
+
+### Kimlik cümlesi
+
+> Banyo ve WC gibi ıslak hacimler için, duvar/tavan yüzeyine veya sıva altına gömme monte edilebilen konut
+> tipi radyal (santrifüj) aspiratör serisi; koruma derecesi IP45'tir. [QE s.2]
+
+### Dört madde
+
+* Duvar/tavan yüzey montajına veya gömme montaja uygundur; performans ve yangına dayanım DIN 18017-3 standardına göredir. [QE s.2]
+* Yüksek koruma derecesi (IP45), banyoların Zone 1 bölgesinde güvenli montaja izin verir. [QE s.2]
+* Modüler kurgu: 23 ventilasyon ünitesi ile 10 kasa serbestçe eşleştirilir; farklı yangın koruma seviyeleri seçilebilir. [QE s.6]
+* Debi seçenekleri tek hızlı 60 m³/h ve 100 m³/h'ten üç hızlı 100/60/35 m³/h'e uzanır. [AVenS s.20]
+
+### Yapısal bloklar
+
+**Gövde.** Salyangoz gövde, elektronik kart yuvasını da içine alacak biçimde kendinden sönümlü (V0) ABS'ten
+üretilmiştir. [QE s.4] Estetik ön kapak da kendinden sönümlü (V0) ABS'tir; çevresel emişli kapak, iki menteşesi
+sayesinde geniş açıyla açılarak filtre bakımını kolaylaştırır. [QE s.4] Motor yuvası ve filtre çerçevesi ABS
+plastiktendir. [QE s.4] Ürün, tercih edilen kasayla tamamlanır; kasalar 80 mm anma çaplı entegre valf ve geri
+tepme klapesi içerir. [QE s.5]
+
+**Çark.** Öne eğik kanatlı santrifüj çark PBT'den üretilmiştir; yüksek rijitlik, boyutsal kararlılık ve agresif
+kimyasal maddelere yüksek direnç sağlar. [QE s.4] Aerodinamik çalışmalara dayanan yüksek verim, anma debilerinde
+QE 60 ailesinde 343 Pa'ya, QE 100 ailesinde 353 Pa'ya varan basınç seviyeleri verir. [QE s.13] Duvar montajında
+ses gücü seviyesi 100 / 60 / 35 m³/h debilerinde sırasıyla 50.5, 43.7 ve 33.7 dB(A)'dır. [QE s.13]
+
+**Motor.** Bilyalı yataklara oturan milde çalışan AC motor, azami anma sıcaklığında en az 40.000 saat sürekli
+çalışma sağlar. [QE s.4] Çekilen güç 60 m³/h modellerde 16 W, 100 m³/h modellerde 26 W'tır; besleme 220-240 V,
+50 Hz'dir. [QE s.13] Azami çalışma sıcaklığı 50 °C'dir. [QE s.13]
+
+**Koruma.** Koruma derecesi IP45'tir ve banyoların Zone 1 bölgesine montaja izin verir. [QE s.2] Geri tepme
+klapesinin sızdırmazlığı TÜV sertifikalıdır; ürün kapalıyken kötü koku ve soğuk hava girişini önler. [QE s.3]
+Kasa valfi ve arka çıkış kapağı, DIN 18017-3'e uygun olarak Alman TÜV Enstitüsü tarafından onaylanmıştır.
+[AVenS s.21] Yangına dayanıklı K90 sınıfı kasa seçenekleri paslanmaz çelik valfle sunulur; valf anma çapı
+80 mm'dir. [AVenS s.21] G2 filtre, Erp Reg. 1253/2014/EU 2. Kademe uyarınca tıkalı filtre alarmıyla birlikte
+verilir. [QE s.4]
+
+**Kontrol.** Seri beş elektronik süit hâlinde sunulur. Temel sürümde açma/kapama, ayrılmış bir uzaktan anahtar
+ya da aydınlatma anahtarı ile yapılır. [QE s.6] Çok hızlı sürümlerde istenen hız uzaktan anahtarla seçilir;
+ünite asgari hızda kesintisiz çalıştırılıp uzaktan anahtarla azami hıza çıkarılabilir. [QE s.6] Zamanlayıcılı
+(T) sürümde gecikmeli açılma montajda 0-45 saniye, gecikmeli kapanma 0-20 dakika arasında ayarlanır.
+[AVenS s.20] Timer Plus (TP) sürümde gecikmeli açılma 0, 45, 90 veya 120 saniye; gecikmeli kapanma 6, 10, 15
+veya 21 dakikadır. [AVenS s.20] Uzun hareketsiz dönemler için tatil modu, her 8, 12 veya 24 saatte bir periyodik
+çalışma çevrimi kurar. [AVenS s.20] TP HCS sürümünde nem eşiği montajda %60, %70, %80 veya %90 olarak
+ayarlanır; fabrika ayarı %70'tir. [AVenS s.20] Fan, bağıl nem önceden ayarlanmış değerin %15 altına düştüğünde
+veya iki saat sürekli çalıştıktan sonra durur. [AVenS s.20] T PIR sürümünde fan, hareket algılandığı anda
+çalışmaya başlar ve gecikmeli olarak kapanır; çok hızlı modellerde sürekli çalışıp hareket algılandığında hıza
+çıkması mümkündür. [AVenS s.20] İsteğe bağlı hız anahtarları DIN standart kutu için 3SS-D, UNI 503 kutu için
+2SS-I ve 3SS-I kodlarıyla sunulur. [QE s.17]
+
+**Montaj.** Kasalar, toz ve sıva girişini önleyen kare çerçeveyle birlikte verilir; gömme kasalar alçıpan
+montajına imkân tanır. [AVenS s.21] Kasalarda 80 mm anma çaplı entegre valf ve geri tepme klapesi bulunur.
+[QE s.9] Gömme kasalara ikinci bir odadan hava emmek için QE-AD ikinci oda valfi bağlanabilir. [AVenS s.21]
+Alçıpan sistemlerine gömme montaj için QE-MH montaj tutucusu, kanal sistemleri ve asma tavanlar için QE-UMB
+üniversal braketi aksesuar olarak sunulur. [QE s.16] Otomatik akustik hava girişleri 30 m³/h ve 45 m³/h
+debilerde mevcuttur. [QE s.16] Aksesuar olarak 100, 125, 140, 160, 180 ve 200 mm çaplarda AVR yangın damperleri
+vardır. [QE s.17] 100 mm kanal için manuel ve otomatik hava besleme valfleri ile bunların ses yalıtımlı
+sürümleri sunulur. [QE s.17] Katalogda ana kolon çapı seçimi için 60 ve 100 m³/h anma debilerine göre kat
+sayısı–çap diyagramları verilmiştir. [QE s.11]
+
+---
+
+## 3 · PUNTO EVO FLEXO Serisi
+
+**DB:** `vortice-punto-evo-flexo` · 4 ürün · MEX 100/4" LL 1S · MEX 100/4" LL 1S T · MEX 120/5" LL 1S ·
+MEX 120/5" LL 1S T [DB]
+
+### Kimlik cümlesi
+
+> Duvar ve tavan montajına uygun, duvardan ya da kısa kanallardan doğrudan hava atışı için tasarlanmış mini
+> aksiyel fan serisi; 100 mm ve 120 mm olmak üzere iki anma çapı sunulur. [RES s.24]
+
+### Dört madde
+
+* İki sürüm vardır: Standart ve zaman saatli (T); seri aralıklı ya da sürekli havalandırma için uygundur. [RES s.24]
+* Debi MEX 100/4" modellerinde 90 m³/h, MEX 120/5" modellerinde 175 m³/h'tir. [AVenS s.10]
+  *(Kaynak s.10 model adını `MEX 100/4"` biçiminde, **inç işaretiyle** yazar ve o sayfada "mm"
+  birimi hiç geçmez. Önceki yazım "100 mm modellerde" diyordu — birim kaynakta olmayan bir
+  tamamlamaydı; kapı sıkılaştırılınca yakalandı ve model adına çevrildi.)*
+* IP45 koruma sınıfı; banyoların Zone 1 bölgesi dâhil ıslak hacimlere montaja uygundur. [PEF s.3]
+* Ses seviyesi 100 mm modellerde 26.9 dB(A), 120 mm modellerde 32.3 dB(A)'dır (Lp, 3 m). [PEF s.3]
+
+### Yapısal bloklar
+
+**Gövde.** Ön kapak, motor taşıyıcı ve entegre geri tepme klapesi; darbeye dayanıklı ve UV'ye dirençli ABS
+termoplastik reçineden üretilmiştir. [PEF s.4] Montaj derinliği düşüktür: 100 mm modellerde 61,5 mm, 120 mm
+modellerde 71 mm. [PEF s.3] Dış ölçüler kompakttır: 100 mm modellerde 173 mm, 120 mm modellerde 193 mm.
+[PEF s.3] Ürün, geri dönüştürülebilir malzemeler ve "Design for Disassembly" tekniğiyle düşük çevresel etki
+gözetilerek tasarlanmıştır. [PEF s.4]
+
+**Çark.** Çarklar PP reçineden üretilmiş helikosantrifüj (karma akışlı) tiptedir. [PEF s.4] Çark ve motor
+taşıyıcı; yüksek performans, düşük güç tüketimi ve düşük gürültü emisyonu için özel olarak tasarlanmıştır.
+[PEF s.4] Türbülansı azaltan ve performansı iyileştiren bir akış toplayıcı bulunur. [PEF s.6] Azami basınç
+100 mm modellerde 39.23 Pa, 120 mm modellerde 49.04 Pa'dır. [RES s.24]
+
+**Motor.** Bilyalı yataklı Long Life motorlar, 30.000 saat kesintisiz ve sorunsuz çalışma için garanti
+edilmiştir. [PEF s.4] Güç tüketimi 100 mm modellerde 9 W, 120 mm modellerde 13 W'tır. [PEF s.3] Besleme
+gerilimi 230 V, 50 Hz'dir. [RES s.24] Motor devri MEX 100/4" LL 1S modelinde 2175, MEX 120/5" LL 1S modelinde
+2075 dev/dak'tır. [RES s.24]
+
+**Koruma.** Koruma derecesi IP45'tir. [PEF s.4] Yalıtım sınıfı II'dir. [PEF s.4] Entegre kelebek tip geri tepme
+klapesi, cihaz kapalıyken istenmeyen hava girişini önler. [PEF s.4] Azami çalışma sıcaklığı 50 °C'dir.
+[RES s.24]
+
+**Kontrol.** Seri iki sürüm hâlinde sunulur: standart tek hızlı (1S) ve zaman saatli (T). [RES s.24] Zaman
+saatli sürümler MEX 100/4" LL 1S T ve MEX 120/5" LL 1S T kodlarıyla listelenir. [AVenS s.10] Seri, aralıklı
+veya sürekli havalandırma için uygundur. [RES s.24]
+> *Zaman saati gecikme süreleri (açılma/kapanma dakikaları) bu dört kaynakta verilmemiştir —
+> **kaynakta karşılığı yok**, uydurulmadı. Hız kontrol aksesuarı da Flexo için listelenmemiştir.*
+
+**Montaj.** Tipik montaj yerleri duvar/panel, giydirme duvar, tavan ve asma tavandır. [PEF s.4] Düşük montaj
+derinliği, 90° dirseklerin yakınlığı nedeniyle montaj alanının kısıtlı olduğu yerlerde bile uygulamaya
+elverişlidir. [PEF s.4] Ürün yatay ve dikey monte edilebilir. [AVenS s.10] Ön kapak alet gerektirmeden kolayca
+çıkarılabilir. [PEF s.6] Ürün ağırlığı 100 mm modellerde 0.60 kg, 120 mm modellerde 0.77 kg'dır. [PEF s.6]
+
+---
+
+## 4 · İki aileyi ayıran cümle
+
+> **VORT QUADRO EVO bir sistemdir, PUNTO EVO FLEXO bir cihazdır.** Quadro Evo, ayrı satılan bir kasayla
+> tamamlanan radyal (santrifüj) bir üniteyle 80 mm'lik kolona bağlanır ve gömme, K90 yangın kasası, nem/hareket
+> sensörlü elektronik süit gibi seçeneklerle kurulur. [QE s.5] Punto Evo Flexo ise kasasız, tek parça bir
+> helikosantrifüj duvar fanıdır; doğrudan duvardan veya kısa kanaldan atış yapar ve yalnız Standart ile zaman
+> saatli sürüm sunar. [RES s.24]
+
+Vitrinde ayrımın taşıyıcısı **debi değil kurgudur**: ikisinin debi aralıkları kısmen çakışır, ama biri kolonlu
+bir bina havalandırma sistemine bağlanır, diğeri tek mahalli dışarıya boşaltır.
+
+---
+
+## 5 · Kaynakta bulduğum çelişki ve hatalar (hepsi kayıtta)
+
+1. **Aynı ürünün ölçüleri iki kaynakta farklı.** Quadro Evo yüzey montaj sürümünün derinliği bir kaynakta
+   111,5 mm'dir. [QE s.14] Aynı sürüm için diğer kaynakta 123,5 mm verilmiştir. [RES s.90] Gömme sürüm bir
+   kaynakta 277 mm genişliktedir. [QE s.14] Diğer kaynakta aynı sürüm 262 mm genişliktedir. [RES s.90]
+   **Bu yüzden taslakta ölçü verilmedi** — hangisinin güncel olduğu ölçülmedi.
+2. **Ses basıncı ölçüm mesafesi iki kaynakta farklı etiketlenmiş.** Bir kaynakta tablo başlığı 1,5 m mesafeyi
+   söyler. [QE s.13] Diğer kaynakta aynı dB değerleri 2 m mesafe başlığıyla verilmiştir. [RES s.89] dB
+   değerleri iki kaynakta **birebir aynı**; yani en az biri yanlış etiketli. Taslakta ses gücü (LwA) değerleri
+   kullanıldı, ses basıncı mesafesi kullanılmadı.
+3. **Punto Evo Flexo koruma sınıfı iki kaynakta farklı.** Ana katalog "IPX5 and IP45" der. [RES s.24] Ürün
+   broşürü ve TR fiyat listesi yalnız IP45 der. [PEF s.4] Taslakta yalnız **IP45** yazıldı (iki kaynağın
+   kesişimi).
+4. **Emirde verilen `PEF s.7–8` sayfaları Flexo değil.** PEF broşürünün 7. sayfası **Punto Evo / Punto Evo ES /
+   Punto Evo Gold** kardeş serisini listeler, 8. sayfa künyedir. Flexo'nun kendi içeriği **s.3–s.6**'dadır;
+   referanslar oraya verildi. Bu ayrım kritik: `ME` kodlu Punto Evo modelleri **çift hızlı ve beş sürümlü**,
+   `MEX` kodlu Flexo modelleri **tek hızlı ve iki sürümlü** — karıştırılırsa vitrinde yanlış vaat doğar.
+5. **AVenS s.20 Quadro Evo fiyat tablosunda sıralama tutarsızlığı var:** `QE 60/35 LL` satırı `QE 60/35 LL T`
+   satırından daha yüksek fiyatla listelenmiş (217 ↔ 214). Fiyat bizim metnimize girmiyor, ama tabloyu otomatik
+   ayrıştıran her hat bunu **tespit edip durmalı**; sessiz geçmesin diye kayda geçiriliyor.
+6. **Quadro Evo kasa bilgisi emirde verilen s.20'de değil, s.21'dedir.** TR fiyat listesinde ünite sayfası
+   (s.20) ile kasa sayfası (s.21) ayrıdır ve **kasa fiyata dahil değildir** ("kasa dahil değildir" notu
+   s.20'dedir). Referanslar bilginin bulunduğu sayfaya verildi.
+7. **AVenS s.21'de OCR/dizgi kaybı var:** birkaç kasa açıklaması cümle ortasından başlıyor ("…ren TUM onaylı
+   DIN 18017-3'e uygun paslanmaz çelik valf."). Anlam kurtarılabiliyor ama **otomatik ayrıştırma için
+   güvenilmez**; bu yüzden kasa metinleri özetlenerek değil, yalnız doğrulanabilir kısımlarıyla kullanıldı.
+8. **Aksesuar kodu iki kaynakta farklı.** Otomatik akustik hava girişi EAA30 BL için bir kaynakta 91018 kodu
+   verilirken diğerinde 23753 verilmiştir (QE s.16 ↔ RES s.92). Kod taslağa **alınmadı**.
+
+## 6 · DB metniyle kaynak arasındaki farklar
+
+* **`vortice-vort-quadro-evo` — "kanal tipi fan" nitelemesi kaynakla çelişiyor.** Kaynak ürünü "residential
+  centrifugal extractor fans" / "duvar ve tavan tipi radyal fanlar" diye tanımlar; ürün bir **kanal fanı değil**,
+  kasa üzerinden 80 mm kolona bağlanan bir **mahal aspiratörüdür**. (Kanal tipi fan bizde ayrıca Lineo ailesidir —
+  aynı kelimeyi iki mimariye vermek vitrinde ayrımı öldürür.)
+* **`vortice-vort-quadro-evo` — gömme (sıva altı) montaj DB metninde hiç yok.** Kaynak serinin yarısını gömme
+  kasalar üzerine kurar; 10 kasanın 8'i gömme/K90 seçeneğidir. Bu, serinin **ana satış argümanıdır** ve bugün
+  metinde görünmüyor.
+* **`vortice-vort-quadro-evo` — modülerlik ve elektronik süit yok.** "23 ünite + 10 kasa" kurgusu ile
+  T / TP / T PIR / TP HCS ayrımı DB metninde hiç geçmiyor; oysa 23 ürünü birbirinden ayıran **tek şey** budur.
+* **`vortice-vort-quadro-evo` — "Long Life" doğru ama eksik.** Kaynak bunu "bilyalı yatak + en az 40.000 saat"
+  diye niceliklendirir; DB metni yalnız etiketi taşıyor, sayıyı taşımıyor.
+* **`vortice-punto-evo-flexo` — "100 mm çaplı" ifadesi seriyi yarıya indiriyor.** Seride 100 mm ve 120 mm
+  vardır; 120 mm modeller debinin **büyük ucudur** (175 m³/h ↔ 90 m³/h). Bugünkü metinle 120 mm ürünler
+  aranmadan kayboluyor.
+* **`vortice-punto-evo-flexo` — DB'nin bildirdiği 90–175 m³/h aralığı kaynakla uyumlu.** AVenS TR listesi
+  aynı iki değeri verir; bu turda **doğrulandı**, sorun yalnız çap ifadesindedir.
+
+## 7 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` ayrı tur ister.
+* **Ölçü tabloları taslağa girmedi** (madde 1'deki çelişki nedeniyle); hangi kaynağın güncel olduğu ölçülmeli.
+* **Kasa fiyatlandırması / "kasa dahil değildir" uyarısı** ticari metindir, vitrin anlatımına alınmadı.
+* **`is_description_manual`** bayrağı: elle yazılan bu metin yüklenirse **true** yapılmalı.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-vortice-tekiller-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf, DEU=Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf, BRV=vortice-bravo-s.pdf -->
+
+# İçerik hattı — TR taslak: DEUMIDO RANGE · BRA.VO S · TIRACAMINO (REC-146, Vortice tekiller)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Referans biçimi:** `[DEU s.NN]` = Vortice DEUMIDO RANGE kataloğu (EN, **çevrildi**) ·
+`[BRV s.1]` = Vortice BRA.VO S föyü (EN, tek sayfa) · `[AVenS s.NN]` = AVenS Ürün Fiyat Kataloğu 2026 (TR)
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — **uydurma yok**; kaynağı olmayan blok **boş kalır**.
+* Kararlar — Vitrin 15A **K6** (ürün sayfası anlatımı) · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok: Gövde · Çark · Motor · Koruma · Kontrol · Montaj.
+* Kalıp örneği: `docs/audits/icerik-hatti-taslak-lineo-2026-09-06.md`.
+
+## 0 · Bu üç aile neden AYRI yazıldı
+
+Üçü birbirinden bağımsızdır ve ortak kaynak sayfası paylaşmazlar. İkisi **fan bile değildir**:
+DEUMIDO bir **nem alma cihazı**, BRA.VO S bir **hava kalitesi sensörüdür**. Bu yüzden LINEO
+taslağındaki "ayırt edici cümle" bölümü burada yoktur; her ailenin **kendi kimlik cümlesi** yeterlidir.
+Altı bloğun bir kısmı bu ürün tiplerinde **anlamsızdır** — zorlanmadı, boş bırakıldı ve sebebi yazıldı.
+
+---
+
+## 1 · DEUMIDO RANGE (`vortice-deumido-range`)
+
+**DB:** 3 ürün — DEUMIDO NG 10 / NG 16 / NG 20 · **Kaynak:** DEUMIDO RANGE kataloğu s.1–12 (EN)
+
+### Kimlik cümlesi
+
+> Elektronik kumandalı, taşınabilir nem alma cihazı ailesi; yüksek bağıl nemin yol açtığı küf
+> oluşumunu, solunum sorunlarını ve mobilya, duvar ile yapı elemanlarındaki hasarı önlemek üzere
+> ortam bağıl nemini denetler. [DEU s.4]
+
+### Maddeler
+
+* Aile, farklı boyut, ağırlık ve performansa sahip üç modelden oluşur ve her konut ya da ticari
+  uygulamanın ihtiyacını karşılamayı hedefler: DEUMIDO NG 10 (kod 26020), DEUMIDO NG 16 (kod 26021),
+  DEUMIDO NG 20 (kod 26022). [DEU s.4]
+* Model adındaki sayı, 30 °C sabit sıcaklıkta ve sabit 80% bağıl nemde 24 saat sürekli çalışmada
+  çekilen günlük nem miktarıdır — yani seri **10 · 16 · 20 l/24h** kapasite basamaklarını kapsar. [DEU s.5]
+* Yıkanabilir toz filtresi havadaki katı kirleticileri tutar; aktif karbon filtre hoş olmayan
+  kokuları giderir. [DEU s.6]
+* Her DEUMIDO NG modelinin üst yüzeyinde sezgisel bir elektronik kumanda paneli bulunur. [DEU s.6]
+
+### Ölçülen aralıklar (üç modelin tamamı)
+
+| Büyüklük | NG 10 | NG 16 | NG 20 | **Aralık** |
+|---|---|---|---|---|
+| Nem çekme (30 °C, 80% BN) | 10 | 16 | 20 | **10–20 l/24h** |
+| Su haznesi | 2,5 | 3 | 3 | **2,5–3 litre** |
+| Maks. debi | 130 | 150 | 150 | **130–150 m³/h** |
+| Güç | 260 | 340 | 500 | **260–500 W** |
+| Ses (LP, 1 m) | 39 | 43,8 | 43,8 | **39–43,8 dB(A)** |
+| Ağırlık | 10,5 | 12,5 | 13 | **10,5–13 kg** |
+
+NG 10 satırı: 130 m³/h debi, 260 W güç, 39 dB(A) ses, 10,5 kg ağırlık ve 220–240 V besleme. [DEU s.7]
+NG 16 ve NG 20 satırı: 150 m³/h debi, 340 W ve 500 W güç, 43,8 dB(A) ses, 12,5 kg ve 13 kg ağırlık. [DEU s.9]
+
+### Yapısal bloklar
+
+**Gövde.** Parlak ABS reçineden sağlam gövde; taşımayı kolaylaştıran entegre tutamaklar ve hareket
+kolaylığı için 4 tekerlek. [DEU s.6] Su seviyesi şeffaf hazne sayesinde dışarıdan görülür: NG 10'da
+2,5 litre, NG 16 ve NG 20'de 3 litre. [DEU s.6, 8] Gövde ölçüleri katalogda A/B/C/D olarak verilir —
+NG 10 için 300 mm, 453 mm, 204 mm ve 429 mm. [DEU s.7] NG 16 ve NG 20 aynı gövdeyi paylaşır:
+311 mm, 547 mm, 236 mm ve 523 mm. [DEU s.9] Cihaz ağırlığı 10,5 kg ile 13 kg arasındadır. [DEU s.7, 9]
+
+**Çark.** Verimli santrifüj fan, nemli ortam havasını cihazın **arka** yüzünden içeri çeker; fazla nem
+alındıktan sonra filtrelenmiş ve nemi giderilmiş hava cihazın **üst** yüzündeki çıkıştan ortama geri
+verilir. [DEU s.6] NG 16 ve NG 20, bu santrifüj fanın **çift hızlı** sürümünü kullanır. [DEU s.8]
+Maksimum debi NG 10'da 130 m³/h, NG 16 ve NG 20'de 150 m³/h'tir. [DEU s.7, 9]
+
+**Motor.** *Kaynakta ayrı bir motor tanımı YOK* — föy motor tipini, kutup sayısını veya verim sınıfını
+vermez. Verilen tek elektriksel veri cihazın besleme ve tüketim değerleridir: 220–240 V besleme,
+260 W (NG 10) ile 500 W (NG 20) arasında güç. [DEU s.7, 9]
+
+**Koruma.** Yıkanabilir toz filtresi ve aktif karbon filtre, hem katı kirleticilere hem kokuya karşı
+koruma sağlar. [DEU s.6] Hazne dolduğunda kumanda panelindeki led uyarı verir. [DEU s.7] Cihazlar CE
+işaretlidir; Alçak Gerilim Direktifi (2014/35/UE) ve Elektromanyetik Uyumluluk Direktifi (2014/30/UE)
+kapsamındadır. [DEU s.3] Elektrik güvenliği tarafında EN 60335-1, EN 60335-2-40, EN 60529 ve EN 62233;
+elektromanyetik uyumluluk tarafında EN 55014 serisi ile EN 61000-3-2 ve EN 61000-3-3 standartları
+geçerlidir. [DEU s.3] Çalışma sıcaklığı aralığı 5 – 32 °C'dir. [DEU s.7, 9] Soğutucu akışkan
+R-134a'dır (GWP 1430). [DEU s.7]
+
+**Kontrol.** NG 10 panelinde On/Off tuşu, hazne dolu led göstergesi, istenen bağıl nem eşiğinin
+(40%, 50%, 60% veya 70%) ya da sürekli çalışmanın seçimi ve gecikmesi 15 saate kadar ayarlanabilen
+otomatik kapanma zamanlayıcısı bulunur. [DEU s.7] NG 16 ve NG 20 panelinde ek olarak bilgi ekranı
+(önce oda sıcaklığını, 8 saniye sonra bağıl nemi gösterir), yüksek/düşük hız seçimi, filtrelenmiş
+havayı geri veren kurutma işlevi (yüksek hızlı havalandırmayla nem alma) ve gecikmesi 24 saate kadar
+ayarlanabilen zamanlayıcı yer alır. [DEU s.9] Kurutma işlevi, cihazın üzerine serilen çamaşırın
+kurumasına yardımcı olur. [DEU s.8]
+
+**Montaj.** Ürün **taşınabilirdir**; sabit montaj gerektirmez. Küçük boyut ve düşük ağırlık ile entegre
+tutamaklar ve 4 tekerlek sayesinde kolayca taşınır ve yer değiştirir. [DEU s.6, 8]
+
+### Aksesuar (kaynakta var, vitrin metnine girmez)
+
+Aktif karbon filtre FSEK10 (kod 21018) DEUMIDO NG 10 (26020) için; FSEK1620 (kod 21019) NG 16 ve
+NG 20 (26021 – 26022) için listelenir. [DEU s.10]
+
+### Blok bilançosu — DEUMIDO
+
+**Dolu 6 / 6.** Motor bloğu **kısmi**: motor tanımı kaynakta yok, yalnız cihaz elektriksel verisi var
+ve bu açıkça yazıldı. Boş blok yok.
+
+---
+
+## 2 · BRA.VO S (`vortice-vortice-bravo-s`)
+
+**DB:** 4 ürün — BRA.VO S1 / S2 / S3 / S4 · **Kaynak:** `vortice-bravo-s.pdf`, **tek sayfa**
+
+### ⚠ Kaynağın ölçülmüş sınırı
+
+Föyün **metin katmanında toplam 39 kelime** vardır (PyMuPDF `get_text`, tüm çıkarma kipleri denendi).
+Sayfada 5 gömülü görsel var; dört modelin **hangisinin hangi kirleticiyi ölçtüğü** bu görsellerin
+içinde olabilir ama **metin katmanında yoktur**. Bu yüzden model ayrımı **yazılmadı** — uydurmak
+yerine eksik bırakıldı. Ayrımı yazmak, föyün görsel katmanının okunmasını (OCR ya da orijinal
+Vortice teknik dokümanı) gerektirir; bu taslağın kapsamı dışındadır.
+
+### Kimlik cümlesi
+
+> Ortamdaki kirleticilerin varlığını algılayabilen bir hava kalitesi ölçüm cihazıdır. [BRV s.1]
+
+### Maddeler
+
+* Algılanan kirletici tipine göre birbirinden ayrılan **dört model** sunulur. [BRV s.1]
+* Tüm VORTICE IoT mekanik ısı geri kazanım üniteleriyle entegre çalışır. [BRV s.1]
+
+> Bu iki madde, föyün metin katmanının **tamamıdır**. Üçüncü bir madde yazılamaz.
+
+### Yapısal bloklar
+
+**Gövde.** — **kaynakta karşılığı yok.** Föy malzeme, ölçü veya gövde tarifi vermez.
+
+**Çark.** — **bu ürün tipi için geçersiz.** BRA.VO S bir sensördür; hava hareket ettirmez.
+
+**Motor.** — **bu ürün tipi için geçersiz.** Aynı sebep.
+
+**Koruma.** — **kaynakta karşılığı yok.** Föyde koruma sınıfı (IP), yangın sınıfı ya da sertifika
+bilgisi geçmez.
+
+**Kontrol.** Cihaz bağımsız bir kumanda değildir; ölçtüğünü VORTICE IoT mekanik ısı geri kazanım
+ünitelerine taşıyarak onlarla entegre çalışır. [BRV s.1]
+
+**Montaj.** — **kaynakta karşılığı yok.** Föy montaj biçimini (sıva üstü / gömme / duvar) söylemez.
+
+### Blok bilançosu — BRA.VO S
+
+**Dolu 1 / 6** (yalnız Kontrol). Boş 5: Gövde · Koruma · Montaj = *kaynakta yok* ·
+Çark · Motor = *ürün tipi için geçersiz*.
+
+---
+
+## 3 · TIRACAMINO (`vortice-vort-industrial-ventilation-roof`)
+
+**DB:** 1 ürün · **Kaynak:** AVenS Ürün Fiyat Kataloğu 2026, **s.29** (TR)
+
+### ⚠ Kaynak seçimi (ölçüldü)
+
+Vortice `industrial_Ventilation.pdf` içinde **TIRACAMINO bölümü yoktur**; oradaki TORRETTE bölümleri
+çatı fanıdır, bu ürün değildir — o dosya **kullanılmadı**. AVenS kataloğunda TIRACAMINO yalnız iki
+sayfada geçer: s.4 (içindekiler) ve s.29 (ürünün kendisi). Yani TR kaynak **tek sayfadır** ve
+toplam üç satır metin içerir.
+
+### Kimlik cümlesi
+
+> Şömine ve baca fanları grubunda yer alan, sürekli 200ºC dayanımlı, radyal fanlı, baca gazı
+> tahliyelerine uygun fan. [AVenS s.29]
+
+### Maddeler
+
+* Hava debisi 750 m³/h. [AVenS s.29]
+* Hız anahtarı ürüne **dahildir** (ayrıca satın alınmaz). [AVenS s.29]
+* Katalog kodu 15000. [AVenS s.29]
+
+### Yapısal bloklar
+
+**Gövde.** Katalog gövde malzemesini yazmaz; verdiği tek gövde verisi ölçü tablosudur —
+⌀A 405, ⌀B 410, ⌀C 357, ⌀D 10, E 38, F 518, G 480, A1 401, B1 357, C1 140, D1 40. [AVenS s.29]
+> *Ölçü tablosunda **birim yazmıyor** (büyük olasılıkla mm, ama kaynak söylemiyor) — bu yüzden
+> birim eklenmedi. Vitrine yazılmadan önce doğrulanmalı.*
+
+**Çark.** Radyal (santrifüj) fanlıdır. [AVenS s.29]
+
+**Motor.** — **kaynakta karşılığı yok.** s.29 motor gücü, gerilim, akım ya da devir vermez.
+
+**Koruma.** Sürekli 200ºC sıcaklığa dayanır; baca gazı tahliyesine uygunluğu bu dayanıma dayanır.
+[AVenS s.29]
+
+**Kontrol.** Hız anahtarı ürünle birlikte verilir; debi bu anahtarla ayarlanır. [AVenS s.29]
+
+**Montaj.** — **kaynakta karşılığı yok.** s.29 montaj biçimini (baca üstü / şömine bacası içi,
+yatay / dikey) tarif etmez; yalnız uygulama alanını ("şömine ve baca fanları") söyler.
+
+### Blok bilançosu — TIRACAMINO
+
+**Dolu 4 / 6** (Gövde — yalnız ölçü, birimi belirsiz · Çark · Koruma · Kontrol).
+Boş 2: Motor · Montaj — ikisi de *kaynakta yok*.
+
+---
+
+## 4 · Bugünkü DB metni ile kaynak arasındaki farklar (K7.5 — hepsi kayıtta)
+
+### 4.1 DEUMIDO — ⛔ **AİLE METNİ TEK MODELİN VERİSİNİ TAŞIYOR**
+
+Bugünkü `description.tr`:
+
+> "Ev ve ticari kullanım için tasarlanmış, şık ve taşınabilir nem alma cihazı. Günde 10.0 litre nem
+> toplama kapasitesine sahip, 2.5 litrelik şeffaf su haznesi ve yıkanabilir toz filtresi ile birlikte gelir."
+
+Kaynakla karşılaştırma:
+
+| DB iddiası | Kaynakta | Hüküm |
+|---|---|---|
+| "Günde 10.0 litre" | 10 l/24h **yalnız NG 10**; NG 16 = 16, NG 20 = 20 | **YANLIŞ** aile geneli için — NG 10'un değeri üç ürüne birden yazılmış |
+| "2.5 litrelik hazne" | 2,5 L **yalnız NG 10**; NG 16 ve NG 20 = 3 L | **YANLIŞ** aile geneli için |
+| "yıkanabilir toz filtresi" | üç modelde de var | doğru |
+| "taşınabilir" | "portable / easily transportable" | doğru |
+| "ev ve ticari kullanım" | "any residential or commercial application" | doğru |
+| aktif karbon filtre | üç modelde de var | **DB'de eksik** — kaynakta var, metinde yok |
+| kurutma işlevi (çamaşır) | NG 16 ve NG 20'de var | **DB'de eksik** |
+| çift hızlı fan | NG 16 ve NG 20'de var | **DB'de eksik** |
+
+**Sonuç:** aile metni bugün NG 10'un ürün metnidir. NG 16 ve NG 20 sayfalarında **yanlış sayı**
+görünüyor. Aralık yazımı (10–20 l/24h, 2,5–3 L) bu hatayı kapatır. Doğrusu: kapasite ve hazne
+**model bazında** yazılmalı, aile metninde **aralık** verilmelidir.
+
+### 4.2 BRA.VO S — DB metni kaynakta doğrulanamadı
+
+Bugünkü `description.tr`:
+
+> "Sıcaklık, bağıl nem ve VOC seviyelerini izleyen akıllı ev hava kalitesi sensörü.
+> Vortice IoT ısı geri kazanım cihazları ile entegre çalışır."
+
+* **"Sıcaklık, bağıl nem ve VOC"** — föyün metin katmanında **geçmiyor**. `[DB]` Doğrulanmadı;
+  kaynağı bilinmiyor. Ne çürütüldü ne doğrulandı — **ölçülemedi**.
+* **"IoT ısı geri kazanım cihazları ile entegre"** — kaynakta **var**, doğru. [BRV s.1]
+* **"akıllı ev"** — föyde geçmiyor; kaynakta yalnız "hava kalitesi ölçer" der.
+* Dört modelin farkı DB metninde de yok; kaynakta da (metin katmanında) yok.
+
+### 4.3 TIRACAMINO — bir iddia kaynağın ötesinde
+
+Bugünkü `description.tr`:
+
+> "Şömine ve bacalarda **çekişi artırmak** ve baca gazını güvenli bir şekilde tahliye etmek için
+> tasarlanmış, sürekli 200ºC sıcaklığa dayanıklı, radyal pervaneli şömine ve baca fanı (750 m3/h)."
+
+* "sürekli 200ºC", "radyal", "baca gazı tahliyesi", "750 m³/h" — **hepsi kaynakta var**, doğru.
+* **"çekişi artırmak"** — s.29'da **geçmiyor**. Ürün adının anlamı ("tira camino" = baca çeker) ve
+  ürün tipi bunu düşündürür ama **kaynak bunu yazmıyor**. `[DB]` Taslakta **kullanılmadı**.
+* DB metnindeki "200ºC" karakteri kaynaktakiyle aynıdır (º = U+00BA, derece işareti değil) — sayı
+  doğru, tipografi kaynakla birebir.
+
+---
+
+## 5 · Bu taslağın kapatmadığı
+
+* **EN çevirisi yazılmadı** — bu tur TR. `description.en` ayrı tur ister.
+* **BRA.VO S1–S4 model ayrımı yazılamadı** — föyün görsel katmanında olabilir; metin katmanında yok.
+  Bu, dört ürünün **aynı metinle** vitrine çıkması demektir. Ayrımı açacak kaynak bulunmadan
+  bu aile "yazıldı" sayılmamalıdır.
+* **TIRACAMINO ölçü birimi** doğrulanmadı (tabloda birim yok).
+* **`is_description_manual`** yüklemede **true** yapılmalı; aksi halde bir sonraki otomatik tur ezer.
+* **Ticari onay yok** — Recep/uzman turu.
+
+---
+
+— URUN-KATALOG (sid 3a7976a1), 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-taslak-vortice-ticari-2026-09-06.md
+
+<!-- KAYNAK-HARITASI: AVenS=avens_fiyat_listesi_2026_HQ.pdf, NRD=nordik-hvls-industrial-ceiling-fans-181471.pdf, QBK=qbk-sal-kc-evo-en-yeni-2025.pdf -->
+
+# İçerik hattı — TR taslak: NORDIK HVLS HYPERBLADE · VORT QBK SAL-KC EVO (REC-146 Adım 2b·2)
+
+**Durum:** **TASLAK — DB'ye YAZILMADI.** Yazım Recep kapısıdır.
+**Kaynak:** Vortice NORDIK HVLS HYPERBLADE kataloğu (EN, **çevrildi**), tüm belge · Vortice VORT QBK
+SAL-KC EVO kataloğu (EN, **çevrildi**), tüm belge · AVenS 2026 ürün fiyat kataloğu (TR) s.36 ve s.62.
+**Referans biçimi:** `[NRD s.NN]` = Nordik kataloğu · `[QBK s.NN]` = QBK kataloğu · `[AVenS s.NN]` = fiyat listesi.
+Sayfa numaraları **PDF fiziksel sayfa sırasıdır** (her iki katalogda basılı sayfa numarasıyla örtüşür).
+
+## KAYNAK / CETVEL
+
+* `docs/standards/vaat-butunlugu-standard.md` — uydurma yok; **yanlış kapsamlı bilgi de vaat ihlalidir**.
+* Kararlar — Vitrin 15A **K6** · **K7** (kaynak yoksa satır yok) · **K1** (fiyat/vaat metni yok).
+* Kararlar — Katalog ve Ürün Verisi **K7.2** (çeviri) · **K7.5** (tespit kayıtta).
+* `systemair-incelemesi-ve-kabuk-v2.md` §3.1 — altı blok.
+* Kalıp örneği: `icerik-hatti-taslak-heatmaster-slimroof-2026-09-06.md`.
+
+---
+
+## 0 · Bu grupta mevcut metin KORUNMUYOR, DÜZELTİLİYOR
+
+| Aile | Bugün DB'de yazan | DB'deki gerçek |
+|---|---|---|
+| `vortice-vort-nordik-hvls` | "**3.0 m nominal kanat çaplı**", "**monofaze** model" | 5 boy: 3–7 m · 79.400–330.800 m³/h · 2 monofaze + **5 trifaze** |
+| `vortice-vort-qbk-sal-kc-evo` | "**315 mm nominal çaplı**", "**trifaze** model" | 7 nominal çap: 315–630 · 2.540–22.100 m³/h · **3 monofaze** + 18 trifaze |
+
+Her iki metinde de **serinin tek bir modeli, serinin tamamı gibi sunulmuş**. Nordik'te en küçük çap ve
+yalnızca monofaze; QBK'de en küçük çap ve yalnızca trifaze yazılmış — üstelik QBK'de o çapın (315)
+üç sürümünden **ikisi trifaze, biri monofazedir**, yani cümle kendi örneğinde bile eksik. Taslak bunu
+**aralık vererek** düzeltir.
+
+> **Sayı biçimi notu:** iki katalog binlik ayırıcıyı farklı yazıyor — Nordik kataloğu `79.400`,
+> QBK kataloğu ve AVenS `2540` / `22100`. Aşağıda **her sayı kaynağındaki biçimle** verildi;
+> vitrine yazılırken TR biçimine (2.540 / 22.100) çevrilecektir, değer değişmez.
+
+---
+
+## 1 · NORDIK HVLS HYPERBLADE
+
+**DB:** `vortice-vort-nordik-hvls` · **7 ürün** · 79.400–330.800 m³/h · 2 monofaze + 5 trifaze
+
+### Kimlik cümlesi
+
+> Geniş hacimli endüstriyel ve ticari alanlarda havayı düşük hızda karıştıran, EC motorlu,
+> ters yönde de dönebilen büyük çaplı endüstriyel tavan pervanesi ailesi. [NRD s.6]
+> Tavanda biriken sıcak havayı aşağı iterek tabakalaşmayı (stratifikasyon) giderir ve
+> hem yazın hem kışın kullanılır. [NRD s.5]
+
+### Dört madde
+
+* Beş farklı çapta **yedi model** — 300, 400, 500, 600 ve 700 cm kanat çapı. [NRD s.10]
+* Azami hava debisi **79.400 m³/h ile 330.800 m³/h** arasında değişir (AMCA 230-2023 ölçümü). [NRD s.11]
+* **M modeller monofaze** (100-240 V / 50-60 Hz), **T modeller trifaze** (200-480 V / 50-60 Hz) beslenir. [NRD s.7]
+* Toza ve suya karşı **IP65**, sürekli çalışmada **-10 °C ile +50 °C** arası geniş sıcaklık aralığı. [NRD s.5]
+
+### Yapısal bloklar
+
+**Gövde.** Güç ve kontrol elektroniği, motoru içine alan alüminyum döküm gövdenin içinde yer alır;
+bu yerleşim elektroniği suya ve toza karşı korur. [NRD s.10] Motor, rotor ve entegre elektronik,
+zaman içinde güvenilirliği artırmak üzere birlikte tasarlanmıştır. [NRD s.6] Ürün ağırlıkları
+modele göre 76 kg ile 156 kg arasındadır. [NRD s.11]
+
+**Çark (kanatlar).** Kanatlar anotlanmış alüminyumdandır ve aşağı yönlü hava akışında (downwash)
+yüksek verim değerlerine ulaşır. [NRD s.7] NACA aerodinamik profili sayesinde ses emisyonu
+özellikle düşüktür; her kanadın ucundaki kanatçık (winglet) uç girdaplarının doğurduğu direnci
+azaltır. [NRD s.7] Kanatlar tek parça üretildiği için zamanla arıza ya da kırılmaya daha az
+maruz kalır. [NRD s.6] Anotlanmış kanatlar korozyona ve aşınmaya yüksek direnç gösterir. [NRD s.6]
+Kanatlar ekstrüde alüminyumdan üretilir. [AVenS s.63] Katalog tablosuna göre her modelde
+5 kanat bulunur ve nominal çap 3 m ile 7 m arasındadır. [NRD s.11]
+
+**Motor.** Sürücüsü bütünleşik, kalıcı mıknatıslı senkron fırçasız (EC) motor; yüksek performansı,
+oranla düşük tüketimi ve geniş hız ayar aralığını birlikte sağlamak üzere tasarlanmıştır. [NRD s.7]
+M modeller monofaze 100-240 V / 50-60 Hz, T modeller trifaze 200-480 V / 50-60 Hz ile beslenir. [NRD s.7]
+Azami güç tüketimi modele göre 290 W ile 850 W arasındadır. [NRD s.11] EC motorların verimli,
+neredeyse bakım gerektirmeyen ve doğası gereği ayarlanabilir yapısı, mekanik dişli kutusunu
+gereksiz kılar. [NRD s.6]
+
+**Koruma.** Motorun koruma derecesi **IP65**'tir; toz ve suya karşı bu yüksek derece, zorlu
+koşullarda kullanıma uygundur. [NRD s.10] Elektronikteki (sürücü) güvenlik sistemleri aşırı akım,
+kısa devre, aşırı sıcaklık, aşırı gerilim ve düşük gerilime karşı korumayı ve parazit önleyici
+filtreleri kapsar. [NRD s.10] Yangın alarm sisteminden su akış sinyali geldiğinde kontrol sistemi
+fanı zorunlu olarak durdurur ve anında kilitler; böylece sprinklerlerin etkinliği bozulmaz
+(NFPA 72 gerekliliği). [NRD s.10] Elektronik, elektromanyetik girişim riskine karşı EMI/EMC
+filtreleriyle donatılmıştır. [NRD s.10] Serinin tüm modellerinin güvenliği UL 507 ve CSA 22.2
+standartlarına göre ETL tarafından belgelenmiştir. [NRD s.3] Ürünler Makine Direktifi 2006/42/EC,
+Elektromanyetik Uyumluluk Direktifi EMC 2014/30/UE ve elektrik motorları için Eko-Tasarım
+Direktifi 1781/2019/EC ile uyumludur. [NRD s.3]
+
+**Kontrol.** Elektronik, BAS (Bina Otomasyon Sistemi) entegrasyonu için opto-izoleli RS485
+konnektör ve Modbus RTU haberleşme protokolü içerir. [NRD s.10] Harici potansiyometre veya
+0-10 V sinyalle çalışan başka bir cihazla hız ayarı için izole analog giriş bulunur. [NRD s.10]
+Ürünler aşağı yönlü hava akışı için optimize edilmiştir, ancak kontrol sistemi ters yönde
+dönmeye de izin verir. [NRD s.6] Opsiyonel POT ve POT-I potansiyometreleri 0-10 V sinyalle
+hız ayarı yapar. [NRD s.15] Dijital potansiyometre POT-DIG fan hızını 0% ile 100% arasında
+ayarlar ve 0-10 V çıkış verir. [NRD s.15] POT-DIG ayrıca ters yön düğmesi taşır ve
+-10...+55 °C çalışma sıcaklığı aralığına sahiptir. [NRD s.15] Hayvancılık tesisleri için
+VORT T, VORT T-HCS ve VORT T-PLUS kumanda üniteleri opsiyonel olarak sunulur. [NRD s.14]
+Çok bölgeli tesisler için dokunmatik ekranlı VORT MASTER kumanda ünitesi bulunur. [NRD s.15]
+Bu kumanda üniteleri, potansiyometreler ve aksesuarlar AVenS 2026 listesinde aynı kodlarla yer alır. [AVenS s.62]
+
+**Montaj.** Askı çubuğu, braketler ve cıvatalar standart olarak birlikte verilir. [NRD s.7]
+Her fan, standart uzunluğu 1.5 m olan bir çubuk, bir çift braket ve ilgili metal bağlantı
+parçalarından oluşan komple montaj kitiyle sevk edilir; kit tamamen çeliktir. [NRD s.10]
+Ürünler hedef tavana en az 1.5 m mesafeyle monte edilecek şekilde tasarlanmıştır ve yerden
+yaklaşık 4 m yükseklikte azami etkinliğe ulaşır; bu koşullarda faydalı alan ürün çapının
+yaklaşık 3 katıdır. [NRD s.8] Dört gergi çubuğundan oluşan opsiyonel HYPERBLADE-RD kit,
+eksenel kararlılığı artırır. [NRD s.10] Bu kitin kullanımı kuvvetli rüzgâr, hareketli makinelerle
+çarpışma riski, kuş varlığı ve sismik ya da titreşimli bölgelerde **zorunludur**. [NRD s.16]
+Yüksek tavanlar için 3 m uzunluğunda HYPERBLADE-PL3 boru bulunur. [NRD s.16] Çelik kirişe,
+mevcut yapıya, omega kirişe, aşığa ve lamine kirişe bağlantı için STF 1'den STF 7'ye kadar
+braket kitleri sunulur. [NRD s.17] Nakliye için 2000x770x768 mm'den 3500x770x768 mm'ye kadar
+dört boy BOX PLUS sandığı vardır. [NRD s.16] AVenS 2026 listesinde ürün standart ahşap sandıkta
+paketli olarak yer alır. [AVenS s.62]
+
+### Bu ailede satılan modeller
+
+AVenS 2026 listesinde seri SVT sürümleriyle yer alır: 300/120 M ve T, 400/160 M ve T, 500/200 T,
+600/240 T, 700/280 T. [AVenS s.62] Katalog anahtarına göre **M = monofaze motor, T = trifaze
+motor** demektir. [NRD s.4]
+
+---
+
+## 2 · VORT QBK SAL-KC EVO
+
+**DB:** `vortice-vort-qbk-sal-kc-evo` · **21 ürün** · 2.540–22.100 m³/h · 3 monofaze + 18 trifaze
+
+### Kimlik cümlesi
+
+> Sıcak, nemli ve kirli havayı dışarı atmak için tasarlanmış; emiş ve basma ağızları 90° olan,
+> yağ ve is yüklü havanın işlenmesine uygun hücreli (kabinli) davlumbaz ve mutfak egzoz fanı
+> ailesi. [QBK s.4]
+
+### Dört madde
+
+* Seri **21 modelden** oluşur; 2, 4 ve 6 kutuplu motorlar, monofaze ve trifaze besleme ile
+  çift kutupluluk (Dahlander) sürümü bulunur. [QBK s.4]
+* Hava debisi **2540 m³/h ile 22100 m³/h** arasında değişir. [QBK s.6]
+* İşlenen hava sıcaklığı trifaze modellerde **120°C**'ye kadar çıkabilir. [QBK s.5]
+* Motorlar **IP55** korumalı ve F izolasyon sınıfındadır, hava akımından yalıtılmıştır. [QBK s.5]
+
+### Yapısal bloklar
+
+**Gövde.** Taşıyıcı yapı **30 mm** alüminyum profillerden oluşur ve naylon köşelerle kapatılır. [QBK s.5]
+Paneller **25 mm** kalınlığında, galvaniz sacdan sandviç yapıdadır; içleri taşyünü ile yalıtılmıştır,
+yangına dayanıklıdır (A1 sınıfı) ve yoğunluğu **90 kg/m3**'tür. [QBK s.5] Tüm paneller hızlı
+sabitleme sistemiyle donatılmıştır; temizlik, bakım ve ürünün yeniden yapılandırılması için
+kolayca sökülüp takılabilir. [QBK s.5] Paneller birbirinin yerine takılabilir ve ayar panelleri
+kulplu gelir. [QBK s.5] Basma kanallarına daha kolay bağlanabilmesi için dairesel emiş ağızları
+bulunur. [QBK s.5] Kabinde paslanmaz tahliyeli kondens suyu toplama tavası vardır. [QBK s.5]
+Kabin ölçüleri en küçük modelde 585×585×525, en büyük modelde 1120×1120×1060'tır. [QBK s.8]
+*(Kaynak s.8'deki ölçü tablosunun sütun başlıkları **birimsizdir** — A, B, C, D… — ve o sayfada
+"mm" hiç geçmez. Önceki yazım "mm" ekliyordu; birim kaynakta olmadığı için çıkarıldı. Ölçüler
+büyük olasılıkla mm'dir ama bu **varsayım**, kaynak iddiası değil.)*
+Ürün ağırlıkları 37 kg ile 151 kg arasındadır. [QBK s.6] Türkçe ürün tanımında kabin su geçirmez
+olarak nitelenir ve standart drenaj tahliye somunu belirtilir. [AVenS s.36]
+
+**Çark.** Yüksek verimli, geriye eğimli kanatlı, kendi kendini temizleyen galvaniz çelik santrifüj
+çark kullanılır. [QBK s.5] Çark doğrudan motora akuple edilmiştir ve statik ile dinamik olarak
+dengelenmiştir. [QBK s.5]
+
+**Motor.** Sincap kafesli asenkron AC motorlar kullanılır. [QBK s.5] Motorlar IP55 korumalı,
+F izolasyon sınıfındadır ve hava akımından yalıtılmıştır; bu sayede yağlı ya da is içeren,
+120°C'ye varan sıcaklıktaki akışkanlar uzun süre işlenebilir. [QBK s.5] M sürümler monofaze
+230V/50Hz; tek hızlı T modeller boya göre trifaze 230-400V/50Hz veya 400-690V/50Hz; çift kutuplu
+ve dolayısıyla çift hızlı T modeller trifaze 400V/50Hz ile beslenir. [QBK s.5] Motor güçleri
+0,25kW ile 5,5kW arasındadır. [AVenS s.36]
+
+**Koruma.** Motor koruma derecesi tüm modellerde **IP55**'tir. [QBK s.6] Emniyet şalteri
+bütünleşiktir ve kablolaması yapılmış olarak gelir. [QBK s.5] Motor tarafındaki panel açılarak
+emniyet şalterine doğrudan erişilir. [QBK s.5] Basma tarafında galvaniz çelikten koruma ızgarası
+bulunur. [QBK s.5] Bütünleşik emniyet düğmesi, basma tarafındaki ızgara ve ürünlerin yürürlükteki
+uluslararası güvenlik mevzuatına tam uygunluğu, kişilere ve mala zarar gelme riskini önler. [QBK s.7]
+Ürünler EN 60335-1 ve EN 60335-2-80 güvenlik standartlarına uygundur. [QBK s.3] Elektromanyetik
+uyumluluk için EN 55014-1, EN 55014-2, EN 61000-3-2 ve EN 61000-3-3 standartları uygulanır. [QBK s.3]
+CE işaretlemesi kapsamında Makine Direktifi 2006/42/CE, Eko-Tasarım Direktifi 2009/125/EC ve
+elektrik motorları düzenlemesi 2019/1781/UE dâhil direktiflere uyulur. [QBK s.3]
+
+**Kontrol.** Hız, opsiyonel olarak sunulan frekans değiştiricili regülatörlerle (inverter)
+ayarlanır; motor-fan verimiyle birleşen bu ayar, ihtiyaç değiştikçe tüketimi optimize eder. [QBK s.7]
+IREM INVERTER 230, trifaze fan uygulamalarında hız kontrolü için tasarlanmış monofaze girişli bir
+inverterdir; 200-240V monofaze giriş, 230V trifaze çıkış ve IP20 koruma sunar. [QBK s.14]
+IRET INVERTER 400 ise 380-480V trifaze giriş ve 400V trifaze çıkış sunar. [QBK s.14]
+Her iki inverter LCD ekranlı kontrol paneline sahiptir ve opsiyonel EMC filtresiyle kullanılır. [QBK s.14]
+EMC filtresi EN61800-3:2004 uyarınca tasarlanmıştır; yüksek frekanslı gürültüyü sınırlar,
+girişimi azaltır ve hassas ekipmanı korur. [QBK s.15] AVenS 2026 listesinde monofaze modeller
+AVenS 2,5A ve 5A hız anahtarlarıyla, trifaze modeller FC-51 380V 0,37kW ile FC-101 380V
+1,5kW, 3kW ve 5,5kW frekans konvertörleriyle eşleştirilmiştir. [AVenS s.36]
+
+**Montaj.** Emiş ve basma 90° açıyla konumlanmıştır; bu yapı binalarda ve fabrikalarda hava
+yenilemesi için uygundur. [QBK s.4] Paneller ihtiyaca göre yeniden konumlandırılabildiği için
+ürün, kanal güzergâhına en uygun duruma hızla uyarlanır. [QBK s.7] Opsiyonel yağmur çatısı
+kullanılarak dış mekâna montaj mümkündür. [QBK s.7] Kanal bağlantısı için dairesel delikli
+galvaniz TBIC panelleri 315'ten 630'a kadar tüm boylarda sunulur. [QBK s.16] Basmanın montaj
+ihtiyacına göre özelleştirilmesini sağlayan galvaniz TIC panelleri de aynı boylarda bulunur. [QBK s.17]
+Dış mekân montajı için galvaniz sacdan TEJ yağmur çatıları sunulur. [QBK s.18]
+
+### Bu ailede satılan modeller
+
+Seri 315, 355, 400, 450, 500, 560 ve 630 nominal çapında yedi boy içerir; her boy M4, T2, T4,
+T6 ve T4/8 sürümlerinden bir bölümüyle sunulur. [QBK s.6] Monofaze sürümler 315 M4, 355 M4 ve
+400 M4 modelleridir; kalan 18 model trifazedir. [QBK s.6]
+
+---
+
+## 3 · İki aileyi ayıran cümle
+
+> **Bu iki ürün ailesi aynı ihtiyacın iki ayrı ucundadır ve birbirinin yerine geçmez.**
+> NORDIK HVLS HYPERBLADE bir **tavan pervanesidir**: havayı dışarı atmaz, ortamdaki havayı düşük
+> hızda **karıştırır** ve tavanda biriken sıcak hava ile zeminde kalan soğuk havayı harmanlayarak
+> tabakalaşmayı giderir. [NRD s.18] VORT QBK SAL-KC EVO ise bir **egzoz fanıdır**: sıcak, nemli
+> ve kirli havayı, özellikle yağ ve is yüklü mutfak havasını ortamdan **çeker ve kanala basar**.
+> [QBK s.4] Birincisi konfor ve enerji tasarrufu için hava sirkülasyonu sağlar; ikincisi kirli
+> havanın ortamdan tahliyesini sağlar. [NRD s.5]
+
+Kısaca: **havayı karıştırmak gerekiyorsa NORDIK, havayı atmak gerekiyorsa QBK.**
+Bu cümle olmadan iki seri vitrinde "endüstriyel fan" başlığı altında birbirine karışır.
+
+---
+
+## 4 · Kaynakta bulduklarım (K7.5)
+
+1. **AVenS kodları katalog kodlarından farklı.** Katalog Nordik modellerini 61164, 61121, 61165,
+   61122, 61166, 61167 ve 61169 kodlarıyla listeler. [NRD s.4] AVenS 2026 ise aynı yedi modeli
+   **SVT** son ekiyle ve 61181, 61186, 61182, 61187, 61188, 61189, 61190 kodlarıyla satar. [AVenS s.62]
+   Model adları ve boyları birebir örtüşüyor, kodlar örtüşmüyor — vitrinde hangi kodun gösterileceği
+   ticari karardır, bu taslak karar vermez.
+2. **AVenS QBK sayfası seriyi eksik listeliyor.** Katalog 21 model sayar. [QBK s.4] AVenS s.36'da
+   ise yalnız 10 model fiyatlıdır; T6 ve T4/8 (Dahlander) sürümleri ile 315 T2 listede yoktur. [AVenS s.36]
+   Yani DB'deki 21 ürünün 11'i AVenS s.36'da yok; bu ürünlerin ticari durumu ayrıca sorulmalıdır.
+3. **AVenS s.36 paylaşımlı sayfa çıkmadı.** Ölçtüm: sayfada yalnız VORT QBK SAL KC EVO tablosu ile
+   hız anahtarı ve frekans konvertörü tablosu var. [AVenS s.36] Emirdeki "4 aileyle paylaşımlı"
+   uyarısı bu PDF'in bu sayfasında doğrulanmadı; yine de yalnız QBK satırları kullanıldı.
+4. **AVenS s.63 Nordik anlatımının devamıdır.** Emirde yalnız s.62 verilmişti; ölçtüm, s.63 aynı
+   ailenin Türkçe tanıtım sayfasıdır ve kanat malzemesi ile uzunluğunu verir. [AVenS s.63]
+   Taslakta yalnız iki cümle bu sayfadan alındı ve açıkça işaretlendi.
+5. **Debi ölçüm standardı belirtilmeli.** Katalog iki sütun verir: AMCA 230-2023'e göre 79.400 ile
+   330.800 m³/h, AMCA 230-1999'a göre 112.287 ile 467.817 m³/h. [NRD s.11] DB'deki aralık 2023
+   sütunuyla örtüşür; hangi standardın yazıldığı belirtilmezse iki kat farklı sayılar dolaşıma girer.
+6. **AVenS Türkçe metni yuvarlıyor.** Fiyat listesi 330.000 m³/h'ye varan hava akışından söz
+   eder. [AVenS s.63] Katalog tablosu aynı model için 330.800 m³/h verir. [NRD s.11] Taslakta
+   katalog değeri kullanıldı.
+
+7. **"3 ila 7 metre" ifadesi iki kaynakta farklı şeye bağlanıyor.** AVenS Türkçe metni kanatların
+   3 ila 7 metre uzunluğunda olduğunu söyler. [AVenS s.63] Katalog ise 3 m ile 7 m'yi ürünün
+   **nominal çapı** olarak verir. [NRD s.11] Fiziksel olarak doğru olan çaptır; taslakta
+   ölçü **çap** olarak kullanıldı, AVenS cümlesi yalnız malzeme (ekstrüde alüminyum) için
+   kaynak gösterildi. Bu, vitrinde "7 metre kanat" gibi yanlış bir vaade dönüşebilecek bir
+   kaynak çelişkisidir.
+
+## 5 · Kapatmadığı
+
+* **EN çevirisi yazılmadı** (ayrı tur).
+* **Debi/basınç eğrileri ve model bazlı tablolar taslağa girmedi**; aralık dışında model bazlı
+  sayı kullanılmadı.
+* **Nordik ses seviyesi kaynakta sayısal olarak yok** — katalog yalnız "özellikle düşük ses
+  emisyonu" der, dB vermez; bu yüzden metinde sayı yok.
+* **QBK ses seviyesi de sayısal değil** — sandviç panel yalıtımının gürültüyü azalttığı söylenir,
+  dB verilmez.
+* **Nordik için devir (RPM MAX) ve QBK için basınç eğrileri** kaynakta var ama model bazlı olduğu
+  için aile metnine girmedi.
+* **`is_description_manual`** bu metin yüklenirse **true** yapılmalı, yoksa sonraki otomatik tur ezer.
+* Ticari onay yok.
+
+---
+
+— URUN-KATALOG alt-ajanı, 2026-09-06
+
+
+---
+# FILE: docs\audits\icerik-hatti-toplu-sunum-2026-09-06.md
+
+# İçerik hattı — 40 ailenin metni, TEK SAYFADA (onay için)
+
+**Şerit:** URUN-KATALOG · **İş:** REC-146 Adım 2b · **Tarih:** 2026-09-06
+**Durum:** hiçbiri veritabanına yazılmadı. Bu dosya **senin tek onayın** için (K7.8).
+**Bu dosya elle yazılmadı** — taslaklardan makineyle üretildi:
+`python scripts/icerik-hatti/toplu-sunum.py --yaz`. Sayılar kapının çıktısıdır.
+
+## Ne onaylıyorsun
+
+Aşağıdaki 40 ailenin her biri için bir **kimlik cümlesi** (ürün sayfasının ilk cümlesi),
+birkaç madde ve altı yapısal blok (Gövde · Çark · Motor · Koruma · Kontrol · Montaj) yazıldı.
+Onayın: **bu dil ve bu seviye doğru** demektir; aile aile okuman gerekmez.
+Onay sonrası bunlar veritabanına yazılır ve vitrinde görünür.
+
+## Sayılarla (ölçülmüş, elle yazılmadı)
+
+| | |
+|---|---|
+| Aile | **40** |
+| Kaynağıyla doğrulanan iddia | **279** |
+| — bunların GÜÇLÜ olanı | 225 |
+| — bunların ZAYIF olanı | 54 |
+| Kaynağıyla çelişen iddia (DÜŞEN) | **0** |
+| Kapının ölçemediği cümle | 437 |
+| Kaynağı olmadığı için BOŞ bırakılan blok | 75 |
+
+**GÜÇLÜ / ZAYIF ne demek:** kapı, cümledeki sayıyı ve birimi kaynak sayfada arar.
+İkisi yan yana bulunursa GÜÇLÜ; ayrı ayrı bulunur ama yan yana olduğu
+doğrulanamazsa ZAYIF sayılır (PDF tablosunda birim başlık hücresinde durur,
+bu yüzden yan yana şartı gerçek cümleleri de düşürüyordu). ZAYIF **yanlış demek değil**,
+*kapı bu cümleyi tam kanıtlayamadı* demek. Gizlemiyoruz, sayıyoruz.
+
+**Kapının ölçemediği cümle:** içinde sayı/kod olmayan cümle (ör. "bakımı kolaydır").
+Bunlar kaynaktan çevrildi ama makine doğrulayamaz — insan gözü gerekir.
+
+*Sayılar yalnız AİLE METİNLERİNE aittir: kapı burada her ailenin kendi bölümüne
+ayrı ayrı koşturuldu. Taslak dosyalarının karşılaştırma/bulgu bölümlerindeki
+referanslar bu toplamın dışındadır — onlar vitrine çıkmıyor.*
+
+## Veritabanıyla tutuyor mu (canlıdan ölçüldü)
+
+* Slug'ı veritabanında bulunamayan aile: **0** (hepsi bulundu)
+* Ürün sayısı taslakla tutmayan aile: **0** (hepsi tutuyor)
+* Bugün vitrinde metni olan, yani **üstüne yazılacak** aile: **20**
+
+Üstüne yazılacak metinlerin bir kısmı zaten hatalıydı: seri metni tek bir modelin
+verisini taşıyordu (ölçüldü, ayrı raporda). Yeni metin bunu da düzeltiyor.
+
+## Senin verdiğin kararlar işlendi (K7.10)
+
+AVenS için verdiğin karar bu dosyaya **elle değil** veri dosyasından işlendi
+(`scripts/icerik-hatti/karar-k710.json`) — karar değişirse tek yer değişir.
+
+| Aile | Karar | Gerekçe / ölçüm |
+|---|---|---|
+| `avens-bvu-ls` | **SAYFA YAZILMAYACAK** | Kaynakta satilabilir anlatim yok (yalniz kod ve fiyat). AVenS'ten teknik foy istenecek; gelene kadar sayfa kod+fiyat kisa kimlik halinde kalir. Tarama listesinden DUSMEZ. |
+| `avens-hiz-anahtarlari` | **SAYFA YAZILMAYACAK** | BVU-LS ile ayni: kaynak satilabilir anlatim vermiyor. Teknik foy beklenir; kisa kimlik halinde kalir, tarama listesinde kalir. |
+| `avens-elektrikli-isiticilar` | **YALNIZ AKSESUAR** | Bagimsiz urun olarak degil, kanal tesisatinin aksesuari olarak sunulur; metin bu cerceveyi asmaz. |
+| `avens-sulu-batarya` | **YAZILIR** | Kaynak yeterli. |
+| `avens-hucreli-aspiratorler` | **YAZILIR — SART OLCULDU** | Sinirdaydi; sart 'kapidan GUCLU gecmeli'. Olcum: 12 dogrulanan, 0 zayif, 12 GUCLU. Sart karsilandi. |
+| `avens-hucreli-hf-s` | **YAZILIR — SART OLCULDU** | Sinirdaydi; sart 'kapidan GUCLU gecmeli'. Olcum: 13 dogrulanan, 0 zayif, 13 GUCLU. Sart karsilandi. |
+
+## ⛔ SENDEN KARAR BEKLEYEN AİLELER
+
+Bu ailelerde kaynak, satılabilir tek bir cümle bile vermiyor (yalnız kod ve fiyat).
+Uydurmadık, boş bıraktık. İki seçenek var: **(a)** üreticiden teknik föy isteyelim,
+**(b)** kendi teknik metnimizi yazalım.
+
+* `avens-bvu-ls` — AVenS BVU-LS — Opsiyonel Kurşun Seperatör (2 ürün)
+* `vortice-vortice-bravo-s` — BRA.VO S (`vortice-vortice-bravo-s`) (4 ürün)
+
+---
+
+## AVenS hücreli aspiratörler + sığınak üniteleri
+
+### `avens-hucreli-aspiratorler` — AVenS-HF/FW — Sık Kanatlı Kayış Kasnaklı Hücreli Radyal Fanlar
+
+> Sık kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi; yüksek debi ve yüksek basınç gerektiren havalandırma uygulamaları için 50 mm standart hücre paneliyle üretilir. [AVenS s.28]
+
+* Hücre paneli 50 mm standart; dış cidar elektrostatik toz boyalıdır. [AVenS s.28]
+* Çark statik ve dinamik balans ayarlıdır; kaynak bu ürünleri "yüksek performanslı radyal fanlar" olarak tanımlar. [AVenS s.28]
+* Anma güçleri 1,1 kW ile 5,5 kW arasındadır. [AVenS s.28]
+
+**Ürün:** 6 · **Kaynak:** AVenS s.28
+
+**Kapı:** doğrulanan 12 (güçlü 12 · zayıf 0) · düşen 0 · ölçülemeyen 3
+**Dolu blok:** Gövde, Çark
+**Kaynağı olmadığı için BOŞ:** Motor, Koruma, Kontrol, Montaj
+
+### `avens-hucreli-hf-s` — AVenS-HF/S — Seyrek Kanatlı Kayış Kasnaklı Hücreli Radyal Fanlar
+
+> Seyrek kanatlı, kayış kasnaklı, çift cidar hücreli radyal fan ailesi; HF/FW ile aynı 50 mm hücre gövdesini kullanır, kapasitesi 25000 m³/h ve 11 kW seviyesine kadar uzanır. [AVenS s.28]
+
+* Hücre paneli 50 mm standart; dış cidar elektrostatik toz boyalıdır. [AVenS s.28]
+* Çark statik ve dinamik balans ayarlıdır; kaynak bu ürünleri "yüksek performanslı radyal fanlar" olarak tanımlar. [AVenS s.28]
+* Anma güçleri 1,1 kW ile 11 kW arasındadır. [AVenS s.28]
+
+**Ürün:** 7 · **Kaynak:** AVenS s.28
+
+**Kapı:** doğrulanan 13 (güçlü 13 · zayıf 0) · düşen 0 · ölçülemeyen 3
+**Dolu blok:** Gövde, Çark
+**Kaynağı olmadığı için BOŞ:** Motor, Koruma, Kontrol, Montaj
+
+### `avens-siginak-havalandirma-uniteleri` — AVenS BVU — Sığınak Havalandırma Üniteleri
+
+> Sığınak havalandırması için kompakt kanal tipi, plug fanlı ve by-pass damperli filtreli havalandırma ünitesi; radyoaktif nükleer serpinti tutucu H13 filtre, G4 kaba filtre ve aktif karbon filtre ile 1200 m³/h ile 3200 m³/h arasında maksimum debi sunar. [AVenS s.56]
+
+* Radyoaktif nükleer serpinti tutucu filtre H13. [AVenS s.56]
+* G4 kaba filtre. [AVenS s.56]
+* Aktif karbon filtre. [AVenS s.56]
+
+**Ürün:** 3 · **Kaynak:** AVenS s.56
+
+**Kapı:** doğrulanan 5 (güçlü 5 · zayıf 0) · düşen 0 · ölçülemeyen 10
+**Dolu blok:** —
+**Kaynağı olmadığı için BOŞ:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+
+### `avens-bvu-ls` — AVenS BVU-LS — Opsiyonel Kurşun Seperatör
+
+> AVenS BVU Sığınak Havalandırma Üniteleri ile birlikte kullanılan **opsiyonel kurşun seperatör**; tek başına çalışan bir ünite değil, bir BVU modeline eşlenen aksesuardır. [AVenS s.56]
+
+* Kaynak bu ürünü "AVENS BVU-LS OPSİYONEL KURŞUN SEPERATÖR" başlığıyla tanımlar. [AVenS s.56]
+* Kaynak, ürünün AVenS BVU Sığınak Havalandırma Üniteleri ile **birlikte** kullanıldığını belirtir. [AVenS s.56]
+* Kataloğun tablosunda her seperatör için "uygun model" sütunu vardır; eşleşme BVU-LS 1000 için BVU 1000, BVU-LS 2000/3000 için BVU 2000/3000'dir. [AVenS s.56]
+
+**Ürün:** 2 · **Kaynak:** AVenS s.56
+
+**Kapı:** doğrulanan 0 (güçlü 0 · zayıf 0) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Montaj
+**Kaynağı olmadığı için BOŞ:** Gövde, Çark, Motor, Koruma, Kontrol
+
+## AVenS ısıtıcılar + hız anahtarları
+
+### `avens-elektrikli-isiticilar` — AVenS Elektrikli Isıtıcılar
+
+> AVenS ısı geri kazanım cihazlarıyla birlikte kullanılan, trifaze 380V 50Hz beslemeli elektrikli ısıtıcı serisi. [AVenS s.69]
+
+* Altı güç kademesi: 3 kW, 6 kW, 9 kW, 12 kW, 15 kW ve 18 kW. [AVenS s.69]
+* Her kademe belirli bir hava debisiyle eşleştirilmiştir: en küçük model 1000 m³/h, en büyük model 5000 m³/h. [AVenS s.69]
+* Uygun AVenS cihaz eşleşmesi tabloda verilir — 3 kW için AVenS 750 - 1000, 18 kW için AVenS 5000. [AVenS s.69]
+
+**Ürün:** 6 · **Kaynak:** AVenS s.69
+
+**Kapı:** doğrulanan 4 (güçlü 4 · zayıf 0) · düşen 0 · ölçülemeyen 4
+**Dolu blok:** Çark, Motor, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma
+
+### `avens-sulu-batarya` — AVenS Sulu Batarya
+
+> AVenS ısı geri kazanım cihazlarıyla birlikte kullanılan, 90/70 °C sıcak su ile çalışan kanal tipi sulu ısıtma bataryası serisi. [AVenS s.69]
+
+* Sekiz kapasite kademesi: 7 kW'tan 40 kW'a. [AVenS s.69]
+* Isıtma kapasitesi 90/70 °C su rejiminde Kcal/h olarak verilir; 7 kW modelde 4700, 40 kW modelde 47300 Kcal/h. [AVenS s.69]
+* Her kademe belirli bir hava debisiyle eşleştirilmiştir: en küçük model 750 m³/h, en büyük modeller 5000 m³/h. [AVenS s.69]
+
+**Ürün:** 8 · **Kaynak:** AVenS s.69
+
+**Kapı:** doğrulanan 4 (güçlü 4 · zayıf 0) · düşen 0 · ölçülemeyen 3
+**Dolu blok:** Çark, Motor, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma
+
+### `avens-hiz-anahtarlari` — AVenS Hız Anahtarları
+
+> AVenS fanlarının devrini ayarlamak için kullanılan, maksimum akım değerine göre iki boy sunulan hız anahtarı: 2,5 A ve 5 A. [AVenS s.27, 36]
+
+* AVenS 2,5 A hız anahtarı (kod 60006), dikdörtgen kanal tipi radyal fanlarda 1100 m³/h ile 2520 m³/h arası modellerin (AVENS 40x20, 50x25, 60x30) hız anahtarıdır. [AVenS s.27]
+* AVenS 5 A hız anahtarı (kod 01801), 4100 m³/h ve 6000 m³/h modellerin (AVENS 60x35, 70x40) hız anahtarıdır. [AVenS s.27]
+* Davlumbaz fanlarında da eşleşir: VORT QBK SAL KC EVO 315 M4 ve 355 M4 modellerinde (2540 m³/h ve 3540 m³/h) 2,5A, 400 M4 modelinde (5240 m³/h) 5A. [AVenS s.36]
+
+**Ürün:** 2 · **Kaynak:** AVenS s.27,36
+
+**Kapı:** doğrulanan 5 (güçlü 5 · zayıf 0) · düşen 0 · ölçülemeyen 1
+**Dolu blok:** Çark, Motor, Kontrol
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma, Montaj
+
+## AVenS plug fanlar + ısı geri kazanım
+
+### `avens-plug-fanlar` — AVenS KENTALFAN — IEC motorlu plug fanlar
+
+> Klima santralleri, ısı geri kazanım cihazları ve plenum kutuları için geliştirilmiş; geriye eğik kanatlı, tek emişli, doğrudan tahrikli IEC motorlu plug fan serisidir. [AVenS s.50]
+
+* Seride 14 model bulunur; hava debisi 2590 m³/h ile 22550 m³/h arasında değişir. [AVenS s.50]
+* Motor gücü 0,25 kW ile 5,5 kW arasındadır. [AVenS s.50]
+* Üç model monofaze (M4), on bir model trifazedir (T2 / T4 / T6 sürümleri). [AVenS s.50, 51]
+
+**Ürün:** 14 · **Kaynak:** AVenS s.50,51
+
+**Kapı:** doğrulanan 7 (güçlü 6 · zayıf 1) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Çark, Motor, Montaj
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma, Kontrol
+
+### `avens-isi-geri-kazanim` — AVenS alüminyum eşanjörlü ısı geri kazanım cihazları
+
+> Eurovent sertifikalı alüminyum eşanjör, G4 filtre ve plug fan ile kurulmuş, kanal bağlantılı ısı geri kazanım cihazı ailesidir. [AVenS s.68]
+
+* Vitrindeki üç modelin nominal hava debileri 750 m³/h, 1000 m³/h ve 2000 m³/h'tir; model adındaki sayı **debiyi** gösterir. [AVenS s.68]
+* Eurovent sertifikalı alüminyum eşanjör, G4 filtre ve plug fanlı yapı. [AVenS s.68]
+* Opsiyonel elektrikli ısıtıcı gücü AVenS 750 ve AVenS 1000 için 3 kW, AVenS 2000 için 6 kW olarak verilir. [AVenS s.68]
+
+**Ürün:** 3 · **Kaynak:** AVenS s.68,69
+
+**Kapı:** doğrulanan 5 (güçlü 2 · zayıf 3) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Gövde, Çark, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Motor, Koruma
+
+## VORTICE ticari kanal fanları (CA MD · CA IL ES)
+
+### `vortice-vort-commercial-in-line-circular` — CA MD Serisi — Yuvarlak Kanal Tipi (`…-circular`)
+
+> Asma tavana veya çatı arasına monte edilen, boyalı çelik saç gövdeli yuvarlak kanal tipi fan serisi; konut, ticari ve endüstriyel mahaller (mutfaklar, tuvaletler, laboratuvarlar, barlar, restoranlar, çamaşırhaneler, mağazalar) için düşük görsel etkili havalandırma çözümü. [DPC s.32]
+
+* Anma çapı 100 ile 315 mm arasında değişen modeller. [DPC s.32]
+* Zorlu hava koşullarına ve yüksek sıcaklığa dayanacak biçimde üretilmiş; geniş sürekli çalışma sıcaklık aralığı -25 °C / +50 °C. [DPC s.32]
+* Toz ve suya karşı yüksek koruma derecesi IP44. [DPC s.32]
+
+**Ürün:** 7 · **Kaynak:** AVenS s.25 · CVL s.34 · DPC s.32
+
+**Kapı:** doğrulanan 8 (güçlü 8 · zayıf 0) · düşen 0 · ölçülemeyen 18
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-vort-commercial-in-line-rectangular` — CA IL ES RECT Serisi — Dikdörtgen Kanal Tipi (`…-rectangular`)
+
+> Dikdörtgen flanşlı galvanizli çelik gövdeli, yüksek verimli EC motorlu dikdörtgen kanal tipi fan serisi. [AVenS s.26]
+
+* Dikdörtgen flanşlı galvanizli çelik gövde. [AVenS s.26]
+* Kendi kendini temizleyen, yüksek performanslı, geriye eğimli kanat. [AVenS s.26]
+* Yüksek verimli EC motor ve düşük ses seviyesi. [AVenS s.26]
+
+**Ürün:** 5 · **Kaynak:** AVenS s.26
+
+**Kapı:** doğrulanan 5 (güçlü 5 · zayıf 0) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Gövde, Çark, Motor, Kontrol
+**Kaynağı olmadığı için BOŞ:** Koruma, Montaj
+
+## DANFOSS frekans konvertörleri
+
+### `danfoss-fc101` — VLT HVAC BASIC DRIVE FC101
+
+> Danfoss VLT HVAC Basic Drive FC101, HVAC uygulamalarına özel fonksiyonlar, EMC filtre, otomatik enerji optimizasyonu ve akıllı logic kontrolör sunan bir frekans konvertörü (motor sürücüsü) serisidir. [AVenS s.58]
+
+* Katalogda motor gücü 0,75 kW ile 90 kW arasında 17 model olarak listelenir. [AVenS s.58]
+* Besleme gerilimi tüm satırlarda 380V olarak verilir. [AVenS s.58]
+* Anma akımı, en küçük modelde 2,2 A'dan en büyük modelde 177 A'ya kadar değişir. [AVenS s.58]
+
+**Ürün:** 16 · **Kaynak:** AVenS s.58
+
+**Kapı:** doğrulanan 2 (güçlü 1 · zayıf 1) · düşen 0 · ölçülemeyen 9
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Montaj
+**Kaynağı olmadığı için BOŞ:** Kontrol
+
+### `danfoss-fc102` — VLT HVAC DRIVE FC102
+
+> Danfoss VLT HVAC Drive FC102, HVAC uygulamalarına özel fonksiyonlar, %98 temel enerji verimliliği, uyku modu ve otomatik enerji optimizasyonu sunan bir frekans konvertörü (motor sürücüsü) serisidir. [AVenS s.59]
+
+* Katalogda motor gücü 1,1 kW ile 90 kW arasında 17 model olarak listelenir. [AVenS s.59]
+* Besleme gerilimi satırlarda 380V olarak verilir. [AVenS s.59]
+* Temel enerji verimliliği %98 olarak belirtilir. [AVenS s.59]
+
+**Ürün:** 17 · **Kaynak:** AVenS s.59
+
+**Kapı:** doğrulanan 3 (güçlü 2 · zayıf 1) · düşen 0 · ölçülemeyen 8
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Montaj
+**Kaynağı olmadığı için BOŞ:** Kontrol
+
+### `danfoss-fc51` — FC-51
+
+> Danfoss FC-51, AVenS kataloğunda küçük güçlü çatı ve davlumbaz fanlarının hız kontrolü için hız anahtarı olarak listelenen kompakt bir frekans konvertörüdür. [AVenS s.34, 36]
+
+* Katalogda 0,37 kW ve 0,55 kW olmak üzere iki güç kademesi listelenir. [AVenS s.34]
+* 220V besleme ile hem 0,37 kW hem 0,55 kW satırı bulunur. [AVenS s.34]
+* 380V besleme ile 0,37 kW satırı bulunur. [AVenS s.34]
+
+**Ürün:** 2 · **Kaynak:** AVenS s.34,36
+
+**Kapı:** doğrulanan 8 (güçlü 8 · zayıf 0) · düşen 0 · ölçülemeyen 1
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Montaj
+**Kaynağı olmadığı için BOŞ:** Kontrol
+
+## VORTICE endüstriyel aksiyel + ATEX
+
+### `vortice-vort-industrial-ventilation-axial` — VORTICEL Endüstriyel Aksiyel Fanlar (E · A-E · MP)
+
+> Ticari ve endüstriyel hacimlerin — spor salonu, kuru temizleme, marangozhane, garaj, depo, ahır — havalandırması için tasarlanmış, farklı çaplarda, monofaze ve trifaze sürümleri bulunan duvar tipi endüstriyel aksiyel fan ailesi. [IND s.4] Aile, Vortice'in üç serisini birlikte kapsar: VORTICEL E, VORTICEL A-E ve VORTICEL MP. `[DB]`
+
+* **VORTICEL E** — düşük basınçlı duvar tipi aksiyel; anma çapı 250–350 mm aralığında 7 model ve toz/suya karşı IP44 korumalı motorlar. [IND s.4]
+* **VORTICEL A-E** — ince gövdeli (eksenel derinliği azaltılmış) duvar tipi aksiyel; 2, 4 ve 6 kutuplu, anma çapı 250–630 mm aralığında 19 model, IP54 korumalı motorlar. [IND s.14]
+* **VORTICEL MP** — orta basınçlı aksiyel; anma çapı 250–600 mm aralığında 19 model, IP55 korumalı motorlar ve −15 °C / +70 °C sürekli çalışma aralığı. [IND s.24]
+
+**Ürün:** 16 · **Kaynak:** AVenS s.30,31 · IND s.4,14,15,22,24,30
+
+**Kapı:** doğrulanan 12 (güçlü 12 · zayıf 0) · düşen 0 · ölçülemeyen 25
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-vort-e-atex` — VORT E-ATEX (patlayıcı ortam aksiyel fanları)
+
+> Gaz veya toz nedeniyle patlayıcı ortam oluşabilen — ATEX sınıflandırmasına göre Grup II — sanayi hacimlerinde kullanılmak üzere tasarlanmış, ATEX 2014/34/EU direktifine uygun, plaka tipi patlama korumalı endüstriyel aksiyel fan ailesi. [ATX s.4]
+
+* **Gaz ortamı sınıflandırması "II 2G Ex h IIB T3 Gb"** — potansiyel patlayıcı gaz bulunan alanlar: endüstriyel depolar, kimya ve ilaç sanayii, akü şarj alanları. [ATX s.4]
+* **Toz ortamı sınıflandırması "II 2D Ex h IIIC T125°C Db"** — potansiyel patlayıcı toz bulunan alanlar: un üretim tesisleri, tekstil sanayii, alüminyum işleme tesisleri. [ATX s.4]
+* **Etiketteki tam kod "II 2G/D h T3/125°C X Gb/Db"**; kaynağa göre "h" yapısal güvenlik ve ateşleme kaynağı denetimini, "X" kullanma kılavuzunda belirtilen özel çalışma koşullarını, "Gb/Db" ise hem gaz hem toz için Bölge 1 uygunluğunu gösterir. [ATX s.5]
+
+**Ürün:** 14 · **Kaynak:** ATX s.3,4,5,6,7,8,13 · AVenS s.38 · IND s.98
+
+**Kapı:** doğrulanan 11 (güçlü 11 · zayıf 0) · düşen 0 · ölçülemeyen 23
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Montaj
+**Kaynağı olmadığı için BOŞ:** Kontrol
+
+## VORTICE hava perdeleri
+
+### `vortice-hava-perdesi` — AIR DOOR AD Serisi — ortam havalı (ısıtmasız)
+
+> Kapıların ve genel olarak giriş bölgelerinin hizasına monte edilen AIR DOOR üniteleri, dış ortamdaki rahatsız edici sıcaklıktaki havanın içeri girmesini engelleyen bir hava akımı oluşturur; böylece kışın ısıtma, yazın soğutma tarafında hissedilir bir maliyet tasarrufu sağlar. [AD s.6]
+
+* Farklı sıcaklıktaki bölgeleri ayıran görünmez bir bariyer kurar; yazın soğutulmuş, kışın ısıtılmış havanın kaçmasını, dışarıdan toz, egzoz gazı, duman, koku ve böcek girişini engeller. [AD s.4]
+* Cross-Flow fan kanadı, hava yönü belirleyici kanatlar ve uzaktan kumanda. [AVenS s.64]
+* Isıtıcısız (standart) modellerde hava çıkış hızı 9/11 m/s'ye ulaşır — ısıtıcılı modellerin üstünde. [AD s.7]
+
+**Ürün:** 4 · **Kaynak:** AD s.4,5,6,7,8 · AVenS s.64
+
+**Kapı:** doğrulanan 10 (güçlü 2 · zayıf 8) · düşen 0 · ölçülemeyen 25
+**Dolu blok:** Gövde, Çark, Motor, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Koruma
+
+### `vortice-h-ad-elektrikli` — AIR DOOR H AD Serisi — elektrikli ısıtıcılı
+
+> Kapı ve giriş açıklıklarının hizasına yatay monte edilen, PTC termistörlü elektrikli ısıtma elemanlarıyla donatılmış hava perdesi; dışarıdan gelen soğuk havayı kesmekle kalmaz, üflediği havayı ısıtarak geçiş bölgesinde konfor sıcaklığını korur. [AVenS s.64]
+
+* PTC termistörlerden oluşan ısıtma elemanları yüksek ısıl performans ve düşük hava direnci sunar; aşırı ısınmaya ve gerilim tepelerine karşı korumalıdır. [AD s.6]
+* Isıtıcı bataryası kapandıktan sonra fanın durmasını geciktiren özel bir çalışma mantığı vardır; bu, ürünün zaman içinde güvenilir çalışmasına katkı verir. [AD s.6]
+* Isıtıcı gücü üç kademelidir ve modele göre değişir: 2/4/6 kW, 4/6/8 kW ve 6/8/10 kW. [AD s.7]
+
+**Ürün:** 4 · **Kaynak:** AD s.4,5,6,7,8 · AVenS s.64
+
+**Kapı:** doğrulanan 11 (güçlü 1 · zayıf 10) · düşen 0 · ölçülemeyen 24
+**Dolu blok:** Gövde, Çark, Motor, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Koruma
+
+## VORTICE HEATMASTER / SLIMROOF (çatı fanları)
+
+### `vortice-vort-heatmaster-slimroof-roof` — SLIMROOF ES
+
+> Dikey gabarisi sınırlı çatılarda düşük enerji tüketimi ve hassas debi ayarı gerektiren uygulamalar için tasarlanmış, EC motorlu radyal (yatay) atışlı çatı tipi santrifüj fan. [HSK s.26]
+
+* Kalıcı mıknatıslı EC motor — düşük tüketim ve kolay performans ayarı [HSK s.26]
+* Monofazede **IE5**, trifazede **IE4** verim sınıfı; dış rotorlu tasarım gabariyi küçültür [HSK s.27][AVenS s.33]
+* **Düşük dikey gabari** — mimari ve manzara kısıtı olan yerlere uygun [HSK s.29]
+
+**Ürün:** 10 · **Kaynak:** AVenS s.33,34 · HSK s.26,27,29
+
+**Kapı:** doğrulanan 9 (güçlü 9 · zayıf 0) · düşen 0 · ölçülemeyen 14
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-vort-heatmaster-slimroof-smoke` — HEATMASTER F400
+
+> Hem günlük havalandırma hem de yangın anında sıcak duman tahliyesi için kullanılabilen, **çift amaçlı** radyal (yatay) atışlı çatı tipi santrifüj fan. [HSK s.4]
+
+* **F400 sertifikası: 400 °C sıcaklıkta 2 saat** çalışma (S2 servisi) [HSK s.4, s.5]
+* Sürekli çalışmada (S1) işlenen hava sıcaklığı **80 °C**, istek üzerine **120 °C** [HSK s.5]
+* Geriye eğimli kanatlı santrifüj çark; monofaze veya trifaze asenkron motor, tek ya da çift devir
+
+**Ürün:** 10 · **Kaynak:** HSK s.4,5,7
+
+**Kapı:** doğrulanan 6 (güçlü 6 · zayıf 0) · düşen 0 · ölçülemeyen 17
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+## VORTICE ısı geri kazanım (VORT HR · VORT MONO)
+
+### `vortice-isi-geri-kazanim` — VORT HR — Merkezi (kanallı) ısı geri kazanım üniteleri
+
+> Konutların, ticari işletmelerin ve otel odalarının havalandırmasını tek merkezden yürüten, çift akışlı (dual-flow) ısı geri kazanımlı merkezi havalandırma üniteleri. [VMC s.32][AVenS s.67]
+
+* Zemin, duvar veya asma tavan montajı — modele göre **80 m²'den 240 m²'ye** kadar alan [VMC s.32, s.46, s.58]
+* Yüksek verimli ısı eşanjörü; ısının **%90'a yakını** geri kazanılır [VMC s.58]
+* **VORT HR 300 NETI: Passive House sertifikalı** [VMC s.32]
+
+**Ürün:** 5 · **Kaynak:** AVenS s.67 · MONO s.3 · VMC s.32,46,58,59
+
+**Kapı:** doğrulanan 8 (güçlü 8 · zayıf 0) · düşen 0 · ölçülemeyen 14
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-vort-mono` — VORT HRW MONO — Tekil oda (desantralize) üniteleri
+
+> Kanal tesisatı gerektirmeden tek bir odanın havalandırmasını sağlayan, dış duvara gömülü olarak monte edilen ısı geri kazanımlı oda tipi havalandırma üniteleri. [AVenS s.66][MONO s.5]
+
+* Kanal gerekmez — **260–700 mm** kalınlığındaki dış duvarlara monte edilir [MONO s.5]
+* **Üç çalışma modu:** taze hava · egzoz · ısı geri kazanımlı havalandırma [AVenS s.66]
+* **HCS modellerde** uzaktan kumanda ve bağıl nem, sıcaklık, ışık sensörü [MONO s.4]
+
+**Ürün:** 8 · **Kaynak:** AVenS s.66 · MONO s.4,5
+
+**Kapı:** doğrulanan 9 (güçlü 9 · zayıf 0) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+## VORTICE LINEO (yuvarlak kanal fanları)
+
+### `vortice-lineo` — LINEO Serisi
+
+> Konut, ticari ve endüstriyel alanların havalandırması için, kanal içine yatay veya dikey monte edilebilen karma akışlı (mixed flow) kanal fanı. [VLK s.4]
+
+* Yüksek performans, düşük enerji tüketimi, düşük gürültü emisyonu ve kolay montaj [VLK s.4]
+* Teknopolimer gövde; E2 yangına tepki sınıfı (EN ISO 11925-2:2010) ve IPX5 su koruması [VLK s.5]
+* Üç hızlı endüksiyon motor — performans, tüketim ve ses arasında en iyi denge [VLK s.24]
+
+**Ürün:** 7 · **Kaynak:** AVenS s.24 · VLK s.3,4,5,7,24,25,26
+
+**Kapı:** doğrulanan 4 (güçlü 4 · zayıf 0) · düşen 0 · ölçülemeyen 16
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-lineo-quiet` — LINEO QUIET Serisi
+
+> Ses emici kaplaması dış gövdeye tam entegre edilmiş, ortam ses emisyonunu en aza indirmek üzere optimize edilmiş kanal tipi karma akışlı fan. [VLK s.6]
+
+* Akustik susturucu gövde — ses emici kaplama dış gövdeye **tam entegre** [VLK s.6][AVenS s.22]
+* İki motor seçeneği: AC endüksiyon (Quiet) ve **EC fırçasız** (Quiet ES) [VLK s.12, s.18]
+* Quiet üç hızlı, **Quiet ES dört hızlı** (4/6/8/10 V) — hız anahtarı olmadan farklı debi [AVenS s.22, s.23]
+
+**Ürün:** 12 · **Kaynak:** AVenS s.22,23 · VLK s.3,4,5,6,7,12,18,26
+
+**Kapı:** doğrulanan 8 (güçlü 7 · zayıf 1) · düşen 0 · ölçülemeyen 8
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+## NICOTRA GEBHARDT radyal fanlar
+
+### `nicotra-gebhardt-dd` — DD SERİSİ — direkt akuple radyal fanlar
+
+> NICOTRA Gebhardt DD serisi; düşük basınçlı, çift emişli, öne eğimli ve sık kanatlı, direkt akuple motorlu radyal fan ailesidir. [AVenS s.52]
+
+* Fiyat listesi ikiye ayırır: standart DD serisi ve 3 hızlı DD 3V serisi; ikisinin de tanım cümlesi aynıdır. [AVenS s.52]
+* Motor gücü 147W ile 1500W arasındadır. [AVenS s.52]
+* Debi 1550 m³/h ile 7880 m³/h arasındadır. [AVenS s.52]
+
+**Ürün:** 13 · **Kaynak:** AVenS s.52
+
+**Kapı:** doğrulanan 6 (güçlü 6 · zayıf 0) · düşen 0 · ölçülemeyen 6
+**Dolu blok:** Çark, Motor, Kontrol
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma, Montaj
+
+### `nicotra-gebhardt-at` — AT SERİSİ — çift emişli radyal fanlar
+
+> NICOTRA Gebhardt AT serisi; düşük basınçlı, kayış kasnak tahrikli, öne eğimli ve sık kanatlı çift emişli radyal fan ailesidir. [AVenS s.53]
+
+* Tahrik kayış kasnaklıdır; motor fana doğrudan akuple değildir. [AVenS s.53]
+* Debi 2300 m³/h ile 18200 m³/h arasındadır. [AVenS s.53]
+* Fiyat listesinde model adı yalnız çark ölçüsünü verir; motor gücü, devir ve faz bilgisi tabloda yer almaz. [AVenS s.53]
+
+**Ürün:** 8 · **Kaynak:** AVenS s.53
+
+**Kapı:** doğrulanan 1 (güçlü 1 · zayıf 0) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Çark, Motor
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma, Kontrol, Montaj
+
+### `nicotra-gebhardt-adh` — ADH SERİSİ — sık kanatlı çift emişli radyal fanlar
+
+> NICOTRA Gebhardt ADH serisi; öne eğimli, sık kanatlı, kayış kasnak tahrikli çift emişli radyal fandır. Endüstriyel tip taze hava ve egzoz uygulamaları için özel olarak dizayn edilmiştir. [AVenS s.54]
+
+* Endüstriyel tip taze hava ve egzoz uygulamaları için özel olarak tasarlanmıştır. [AVenS s.54]
+* Sattığımız aralığın alt ucu ADH-200 E2 modelinde 9800 m³/h debidir. [AVenS s.54]
+* Aralığın üst ucu ADH-1000-K modelinde 216000 m³/h değerine çıkar. [AVenS s.54]
+
+**Ürün:** 8 · **Kaynak:** AVenS s.54
+
+**Kapı:** doğrulanan 2 (güçlü 2 · zayıf 0) · düşen 0 · ölçülemeyen 9
+**Dolu blok:** Gövde, Çark, Motor
+**Kaynağı olmadığı için BOŞ:** Koruma, Kontrol, Montaj
+
+### `nicotra-gebhardt-rdh` — RDH SERİSİ — seyrek kanatlı çift emişli radyal fanlar
+
+> NICOTRA Gebhardt RDH serisi; geriye eğimli, seyrek kanatlı, kayış kasnak tahrikli çift emişli radyal fandır. Ticari ve endüstriyel sistemlerde taze hava ve egzoz uygulamaları için özel olarak dizayn edilmiştir. [AVenS s.55]
+
+* Ticari **ve** endüstriyel sistemlerde taze hava ve egzoz uygulamaları için tasarlanmıştır. [AVenS s.55]
+* Çark geriye eğimli ve seyrek kanatlıdır; kataloğun bu bölümündeki tek geriye eğimli radyal fan ailesidir. [AVenS s.55]
+* Sattığımız aralığın alt ucu RDH-180 E2 modelinde 2900 m³/h debidir. [AVenS s.55]
+
+**Ürün:** 6 · **Kaynak:** AVenS s.55
+
+**Kapı:** doğrulanan 2 (güçlü 2 · zayıf 0) · düşen 0 · ölçülemeyen 7
+**Dolu blok:** Gövde, Çark, Motor
+**Kaynağı olmadığı için BOŞ:** Koruma, Kontrol, Montaj
+
+## VORTICE RADON (radon tahliye fanları)
+
+### `vortice-radon-range-circular` — VORT CA-RM ES — KANAL tipi (`vortice-radon-range-circular`)
+
+> Vortice'nin radona özel ürün ailesinin kanal tipi üyesi: radon yüklü havayı kanal içinden çekip dışarı atmak için tasarlanmış kanal tipi egzoz fanı. [RAD s.23]
+
+* Kanal tipi egzoz fanı — radona özel Vortice ürün ailesinin parçası [RAD s.23]
+* Anma çapları 100-125-150-160-200 mm [RAD s.23]
+* IPX7 — suya daldırmaya karşı sızdırmaz koruma [RAD s.23]
+
+**Ürün:** 5 · **Kaynak:** RAD s.20,23,25
+
+**Kapı:** doğrulanan 3 (güçlü 3 · zayıf 0) · düşen 0 · ölçülemeyen 10
+**Dolu blok:** Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Gövde, Çark
+
+### `vortice-radon-range-roof` — VORT CA-RM RF ES — ÇATI tipi (`vortice-radon-range-roof`)
+
+> Vortice'nin radona özel ürün ailesinin çatı tipi üyesi: dış ortama, çatı üzerine monte edilen emiş (aspiratör) ünitesi. [RAD s.24]
+
+* Çatı tipi emiş ünitesi — radona özel Vortice ürün ailesinin parçası [RAD s.24]
+* Anma çapları 150-160-200 mm [RAD s.24]
+* IP45 — dış ortam montajına uygun koruma [RAD s.24]
+
+**Ürün:** 3 · **Kaynak:** RAD s.17,24,25
+
+**Kapı:** doğrulanan 3 (güçlü 3 · zayıf 0) · düşen 0 · ölçülemeyen 9
+**Dolu blok:** Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Gövde, Çark
+
+## SEAT · STORM · JET (AVenS çatı fanları)
+
+### `seat-serisi` — SEAT Serisi
+
+> Kimyasallara ve aşındırıcı gazlara karşı dayanıklı santrifüj fanlar. [s.41]
+
+* Polipropilen gövde — asit ve korozyona karşı üstün dayanım [s.41]
+* 40–2000 Pa statik basınç · 50–15.000 m³/h debi [s.41]
+* Monofaze 220 V ve trifaze 380 V seçenekleri [s.41]
+
+**Ürün:** 40 · **Kaynak:** ? s.41,44
+
+**Kapı:** doğrulanan 5 (güçlü 4 · zayıf 1) · düşen 0 · ölçülemeyen 3
+**Dolu blok:** Gövde, Motor
+**Kaynağı olmadığı için BOŞ:** Çark, Koruma, Kontrol, Montaj
+
+### `storm-serisi` — STORM Serisi
+
+> Daha yüksek statik basınca sahip, kimyasallara ve korozyona dayanıklı fanlar. [s.42]
+
+* Polipropilen gövde — asit ve korozyona karşı üstün dayanım [s.42]
+* 40–4500 Pa statik basınç · 50–5.000 m³/h debi [s.42]
+* Monofaze 220 V ve trifaze 380 V seçenekleri [s.42]
+
+**Ürün:** 20 · **Kaynak:** ? s.41,42,45
+
+**Kapı:** doğrulanan 6 (güçlü 5 · zayıf 1) · düşen 0 · ölçülemeyen 3
+**Dolu blok:** Gövde, Motor
+**Kaynağı olmadığı için BOŞ:** Çark, Koruma, Kontrol, Montaj
+
+### `jet-serisi` — JET Serisi
+
+> Çatı ve duvar uygulamaları için, yatay ve dikey montaja uygun santrifüj çatı fanları. [s.43] *(Kaynak başlığı SEAT'inkiyle birebir aynı olduğu için kimlik cümlesi maddeden türetildi — bkz. yukarıdaki tutarsızlık notu. Başlık ikinci sıraya alındı:)* Kimyasallara ve aşındırıcı gazlara karşı dayanıklı santrifüj fanlar. [s.43]
+
+* Yatay ve dikey montaja uygun; çatı ve duvar uygulamaları [s.43]
+* 200–3.500 m³/h debi · 2.000 Pa'ya kadar statik basınç [s.43]
+* Monofaze 220 V ve trifaze 380 V seçenekleri [s.43]
+
+**Ürün:** 21 · **Kaynak:** ? s.43,45
+
+**Kapı:** doğrulanan 5 (güçlü 4 · zayıf 1) · düşen 0 · ölçülemeyen 4
+**Dolu blok:** Motor, Koruma
+**Kaynağı olmadığı için BOŞ:** Gövde, Çark, Kontrol, Montaj
+
+## VORTICE konut tipi (QUADRO · PUNTO)
+
+### `vortice-vort-quadro-evo` — VORT QUADRO EVO Serisi
+
+> Banyo ve WC gibi ıslak hacimler için, duvar/tavan yüzeyine veya sıva altına gömme monte edilebilen konut tipi radyal (santrifüj) aspiratör serisi; koruma derecesi IP45'tir. [QE s.2]
+
+* Duvar/tavan yüzey montajına veya gömme montaja uygundur; performans ve yangına dayanım DIN 18017-3 standardına göredir. [QE s.2]
+* Yüksek koruma derecesi (IP45), banyoların Zone 1 bölgesinde güvenli montaja izin verir. [QE s.2]
+* Modüler kurgu: 23 ventilasyon ünitesi ile 10 kasa serbestçe eşleştirilir; farklı yangın koruma seviyeleri seçilebilir. [QE s.6]
+
+**Ürün:** 23 · **Kaynak:** AVenS s.20,21 · QE s.2,3,4,5,6,9,11,13,16,17
+
+**Kapı:** doğrulanan 20 (güçlü 16 · zayıf 4) · düşen 0 · ölçülemeyen 17
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-punto-evo-flexo` — PUNTO EVO FLEXO Serisi
+
+> Duvar ve tavan montajına uygun, duvardan ya da kısa kanallardan doğrudan hava atışı için tasarlanmış mini aksiyel fan serisi; 100 mm ve 120 mm olmak üzere iki anma çapı sunulur. [RES s.24]
+
+* İki sürüm vardır: Standart ve zaman saatli (T); seri aralıklı ya da sürekli havalandırma için uygundur. [RES s.24]
+* Debi MEX 100/4" modellerinde 90 m³/h, MEX 120/5" modellerinde 175 m³/h'tir. [AVenS s.10]
+* (Kaynak s.10 model adını `MEX 100/4"` biçiminde, **inç işaretiyle** yazar ve o sayfada "mm"
+
+**Ürün:** 4 · **Kaynak:** AVenS s.10 · PEF s.3,4,6 · RES s.24
+
+**Kapı:** doğrulanan 12 (güçlü 4 · zayıf 8) · düşen 0 · ölçülemeyen 17
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Montaj
+**Kaynağı olmadığı için BOŞ:** Kontrol
+
+## VORTICE tekil ürünler (DEUMIDO · BRA.VO · TIRACAMINO)
+
+### `vortice-deumido-range` — DEUMIDO RANGE (`vortice-deumido-range`)
+
+> Elektronik kumandalı, taşınabilir nem alma cihazı ailesi; yüksek bağıl nemin yol açtığı küf oluşumunu, solunum sorunlarını ve mobilya, duvar ile yapı elemanlarındaki hasarı önlemek üzere ortam bağıl nemini denetler. [DEU s.4]
+
+* Aile, farklı boyut, ağırlık ve performansa sahip üç modelden oluşur ve her konut ya da ticari
+* Model adındaki sayı, 30 °C sabit sıcaklıkta ve sabit 80% bağıl nemde 24 saat sürekli çalışmada
+* Yıkanabilir toz filtresi havadaki katı kirleticileri tutar; aktif karbon filtre hoş olmayan
+
+**Ürün:** 3 · **Kaynak:** DEU s.3,4,5,6,7,8,9,10
+
+**Kapı:** doğrulanan 10 (güçlü 2 · zayıf 8) · düşen 0 · ölçülemeyen 18
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+### `vortice-vortice-bravo-s` — BRA.VO S (`vortice-vortice-bravo-s`)
+
+> Ortamdaki kirleticilerin varlığını algılayabilen bir hava kalitesi ölçüm cihazıdır. [BRV s.1]
+
+* Algılanan kirletici tipine göre birbirinden ayrılan **dört model** sunulur. [BRV s.1]
+* Tüm VORTICE IoT mekanik ısı geri kazanım üniteleriyle entegre çalışır. [BRV s.1]
+
+**Ürün:** 4 · **Kaynak:** BRV s.1
+
+**Kapı:** doğrulanan 0 (güçlü 0 · zayıf 0) · düşen 0 · ölçülemeyen 5
+**Dolu blok:** Çark, Motor, Kontrol
+**Kaynağı olmadığı için BOŞ:** Gövde, Koruma, Montaj
+
+### `vortice-vort-industrial-ventilation-roof` — TIRACAMINO (`vortice-vort-industrial-ventilation-roof`)
+
+> Şömine ve baca fanları grubunda yer alan, sürekli 200ºC dayanımlı, radyal fanlı, baca gazı tahliyelerine uygun fan. [AVenS s.29]
+
+* Hava debisi 750 m³/h. [AVenS s.29]
+* Hız anahtarı ürüne **dahildir** (ayrıca satın alınmaz). [AVenS s.29]
+* Katalog kodu 15000. [AVenS s.29]
+
+**Ürün:** 1 · **Kaynak:** AVenS s.29
+
+**Kapı:** doğrulanan 1 (güçlü 1 · zayıf 0) · düşen 0 · ölçülemeyen 8
+**Dolu blok:** Gövde, Çark, Koruma, Kontrol
+**Kaynağı olmadığı için BOŞ:** Motor, Montaj
+
+## VORTICE ticari (NORDIK HVLS · QBK/SAL/KC)
+
+### `vortice-vort-nordik-hvls` — NORDIK HVLS HYPERBLADE
+
+> Geniş hacimli endüstriyel ve ticari alanlarda havayı düşük hızda karıştıran, EC motorlu, ters yönde de dönebilen büyük çaplı endüstriyel tavan pervanesi ailesi. [NRD s.6] Tavanda biriken sıcak havayı aşağı iterek tabakalaşmayı (stratifikasyon) giderir ve hem yazın hem kışın kullanılır. [NRD s.5]
+
+* Beş farklı çapta **yedi model** — 300, 400, 500, 600 ve 700 cm kanat çapı. [NRD s.10]
+* Azami hava debisi **79.400 m³/h ile 330.800 m³/h** arasında değişir (AMCA 230-2023 ölçümü). [NRD s.11]
+* **M modeller monofaze** (100-240 V / 50-60 Hz), **T modeller trifaze** (200-480 V / 50-60 Hz) beslenir. [NRD s.7]
+
+**Ürün:** 7 · **Kaynak:** AVenS s.62,63 · NRD s.3,4,5,6,7,8,10,11,14,15,16,17
+
+**Kapı:** doğrulanan 16 (güçlü 12 · zayıf 4) · düşen 0 · ölçülemeyen 29
+**Dolu blok:** Gövde, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** Çark
+
+### `vortice-vort-qbk-sal-kc-evo` — VORT QBK SAL-KC EVO
+
+> Sıcak, nemli ve kirli havayı dışarı atmak için tasarlanmış; emiş ve basma ağızları 90° olan, yağ ve is yüklü havanın işlenmesine uygun hücreli (kabinli) davlumbaz ve mutfak egzoz fanı ailesi. [QBK s.4]
+
+* Seri **21 modelden** oluşur; 2, 4 ve 6 kutuplu motorlar, monofaze ve trifaze besleme ile
+* Hava debisi **2540 m³/h ile 22100 m³/h** arasında değişir. [QBK s.6]
+* İşlenen hava sıcaklığı trifaze modellerde **120°C**'ye kadar çıkabilir. [QBK s.5]
+
+**Ürün:** 21 · **Kaynak:** AVenS s.36 · QBK s.3,4,5,6,7,8,14,15,16,17,18
+
+**Kapı:** doğrulanan 18 (güçlü 16 · zayıf 2) · düşen 0 · ölçülemeyen 24
+**Dolu blok:** Gövde, Çark, Motor, Koruma, Kontrol, Montaj
+**Kaynağı olmadığı için BOŞ:** yok
+
+
+
+---
+# FILE: docs\audits\karar-kayit-bagi-vitrin-15a-2026-09-07.md
+
+# Karar–Kayıt Bağı — Vitrin 15A (2026-09-07, SALT OKUMA ölçüm)
+
+Kaynaklar: `kararlar-vitrin-15a-2026-09-07.md` (docs/proje-takip/linear, 57 "##"/"###" başlık) ·
+`docs/proje-takip/linear/is-dagilimi-2026-09-07.json` (22:33 damgalı — scratchpad'deki 15:21 kopyadan
+daha taze, bu kullanıldı; **description alanı YOK**, yalnız `title` ile eşleştirildi) ·
+`git -C C:/tmp/ops-gun-kapanisi log --since=2026-09-01` (144 satır; **aktif dal
+`ops/rec217-vercel-onizleme-kapat`, master DEĞİL** — bkz. SINIR).
+
+## Özet sayılar
+
+| Kalem | Sayı |
+|---|---|
+| Toplam başlık | 57 |
+| Numaralı (Kxx başlıkta) | 41 |
+| Numarasız ("K —" / "AÇIK —" / adsız) | 16 |
+| Mükerrer numara (aynı numara ≥2 başlıkta) | 4 satır — K18 ×2 (İSTİŞARE + BAŞLIK DÜZELTMESİ), K37-c ×2 (asıl + uygulama notu) |
+| Bağlı kayıt VAR (kesin+zayıf toplam) | 22 satır |
+| — bunun kesin (K-etiketi tam eşleşme veya belgede açık atıf) | 15 |
+| — bunun zayıf/şüpheli (`?REC-nnn`) | 7 |
+| KAYIT YOK | 35 satır |
+| Kod indi (commit/PR bulundu, kesin+şüpheli) | 10 satır |
+| KOD YOK | 47 satır |
+
+*Not: 22+35=57, 10+47=57 (her satır tam olarak bir kovaya düşecek şekilde sayıldı; "zayıf" kayıtlar VAR tarafında, "şüpheli" kod bulguları İNDİ tarafında sayıldı — ayrım tablo hücresinde işaretli).*
+
+## Tam tablo
+
+| # | Karar no | Başlık (≤60 kr) | Tarih | Mükerrer? | Bağlı REC | Kod indi mi | Belge durum ifadesi |
+|---|---|---|---|---|---|---|---|
+| 1 | K1 | Ticari model — teklif odaklı, fiyat/sepet yok | 2026-08-31 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 2 | K2 | Kimlik — logo/palet/tipografi | 2026-09-02 | HAYIR | ?REC-202 (zayıf — başlıkta "K2" etiketi var ama içerik K5'in "tek fiil" konusu, kimlik değil) | KOD YOK | — |
+| 3 | K3 | Kategori ağacı ve adresler (15A, 7×26) | 2026-09-03 | HAYIR | REC-191 (K3+K4 etiketli) | ?#1077 (e8b8c2872 — commit mesajı "bağımsız çürütme BLOK verdi, üç iddiam çürüdü"; şüpheli, gerçek durumu doğrulamaz) | — |
+| 4 | K4 | Menüde olmayanlar — Atıksu/Hava Arıtma yok | 2026-09-03 | HAYIR | REC-195 (K4 Vitrin) + REC-191 (K3+K4) | ?#1077 (bkz. K3 notu, aynı şüphe) | — |
+| 5 | K5 | Kiremit ve düğme kuralı — tek fiil | 2026-09-03→09-04 | HAYIR | REC-196 (K5+K38 etiketli) | KOD YOK | — |
+| 6 | K6 | Ürün sayfası mimarisi — kabuk+deneyim modülü | 2026-08-25 (REC-65) | HAYIR | REC-65 (belgede doğrudan atıf) + REC-143 (K6/K18a) | KOD YOK (REC-65 pencere dışı/09-01 öncesi; REC-143 için commit yok) | — |
+| 7 | K7 | Teknik alan — dolu satır, "—" yok | 2026-09-03 | HAYIR | KAYIT YOK (git'te "K7.4/K7.6/K7.10" bulundu ama bu Katalog projesinin KENDİ K7.x numaralaması — karışma riski, bu karara ait değil) | KOD YOK | — |
+| 8 | K8 | Sayfa üretim düzeni — az şablon, 4 faz | 2026-09-01 (REC-106) | HAYIR | REC-106 (belgede atıf) + REC-162 (K8 PR önizleme) | ?#1053 (f23ec02d2, REC-162 PLAN — commit mesajı "emrin öncülü çürüdü"; ayrıca 3 farklı commit'te "MERGE ETME, K8" notu var (#1042/#1043/#1020) — bunlar K8'i gerekçe göstererek merge'ü ERTELİYOR, K8'in kendisini uygulamıyor) | — |
+| 9 | K9 | Apple çizgisi — masaüstü/mobil kabuk | 2026-08-30→09-04 | HAYIR (metinde sonradan değişti ama başlık tekil) | KAYIT YOK | KOD YOK | — |
+| 10 | K10 | Liste ve karşılaştırma — Ekran 11 | 2026-09-04 | HAYIR | REC-197 (K10 etiketli) | KOD YOK | — |
+| 11 | K11 | Çalışma protokolü — Design tek proje | 2026-09-03 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 12 | NUMARASIZ | Ürün sayfası: kabuk varsayılan, katlı panel | 2026-09-04 sabah | N/A | KAYIT YOK (git'te "K12" bulundu ama konusu slug/yönlendirme — NIC-11921 — bu kararla ilgisiz, başka bağlam) | KOD YOK | — |
+| 13 | NUMARASIZ | Liste sayfaları MATRİS görünümü, iki katlı | 2026-09-04 sabah | N/A | REC-197 (içerik eşleşmesi: "Tablo/Matris görünümü" ifadesi REC-197 başlığında da var) | KOD YOK | — |
+| 14 | NUMARASIZ | Arama sonucu sayfası (ekran 08) | 2026-09-04 öğle | N/A | KAYIT YOK | KOD YOK | — |
+| 15 | NUMARASIZ | TASARIM ONAYI: Menü v13 + Ana Sayfa v7 | 2026-09-04 akşamüstü | N/A | KAYIT YOK | KOD YOK | — |
+| 16 | NUMARASIZ | Recep kararları 10:40 (REC-59/138/124/settings) | 2026-09-04 10:40 | N/A | REC-59, REC-138, REC-124 (üçü belgede doğrudan adıyla anılıyor) | REC-124: KOD İNDİ #986 + #983 ("31/31 yazıldı" ifadesi eşleşiyor) · REC-138: KOD İNDİ #987 + #985 (konu biraz farklı evrilmiş — anon-yazma nöbetçisi / SSR duman kilidi) · REC-59: KOD YOK (git'te hiç geçmiyor) | "BEKLİYOR" (#981 merge ve YENI_KABUK_GEZINMESI için — belgenin kendi ifadesi) |
+| 17 | NUMARASIZ | Faz 1 kabuk önizlemesi (#981) | 2026-09-04 12:30 | N/A | REC-129 (belgede "#981" PR no anılıyor, git'te REC-129 karşılığı bulundu) | KOD İNDİ #981 (e390fa997 — "aynı bayrak, KAPALI") | — |
+| 18 | NUMARASIZ | Design'ın erişim ve yazma sınırı | 2026-09-04 13:45 | N/A | KAYIT YOK (REC-140 belgede "ileride değerlendirilir" diye anılıyor, henüz bağlı değil) | KOD YOK | — |
+| 19 | NUMARASIZ | Mobil header: Hesap ve dil sağ üste | 2026-09-04 14:00 | N/A | KAYIT YOK | KOD YOK | "K19 ile sonradan değişti" (belge kendi notu, satır 131) |
+| 20 | NUMARASIZ | DESIGN şerit adı ve iletişim kanalı | 2026-09-04 14:50 | N/A | KAYIT YOK (süreç kuralı, kod'a bağlanacak nitelikte değil) | KOD YOK | — |
+| 21 | NUMARASIZ | Cihaz/ürün seçimi yeri: AYRI SEÇİCİ SAYFASI | 2026-09-04 15:30 | N/A | REC-198 (içerik: "Ürün Seçici" ayrı sayfa /tr/secici) | KOD YOK (REC-198 Backlog, git'te "secici" adresine dair commit yok) | "K15'teki açık konu KAPANDI" (belge kendi notu) |
+| 22 | NUMARASIZ | Gözden geçirme v1 kararları (teklif listesi adresi vb.) | 2026-09-04 15:45 | N/A | KAYIT YOK | KOD YOK (git'te "teklif-listesi" adresine dair commit bulunamadı) | — |
+| 23 | NUMARASIZ | "Ürün Seçici" kalıcı girişi (header, ad) | 2026-09-04 16:10 | N/A | REC-198 (içerik eşleşmesi, K24 ile örtüşüyor) | Not: K24 (satır 38) altında görünen #1040 commit'i muhtemelen bu kararın da uygulamasıdır ama commit doğrudan "K24" etiketli, bu başlığa değil — çapraz atıf, kesin sayılmadı | "09-05 URUN ölçümü" ile güncellendi (belge kendi notu) |
+| 24 | NUMARASIZ | Mobil üst şerit KARARI: 52b + akıllı dil çipi | 2026-09-04 16:50 | N/A | KAYIT YOK | KOD YOK | — |
+| 25 | NUMARASIZ | Ürün sayfasındaki hesap paneli | 2026-09-04 17:10 | N/A | KAYIT YOK | KOD YOK | **AÇIK** — "Recep canlı veri görmeden karar vermiyor" (belgenin kendi başlığı) |
+| 26 | NUMARASIZ | "İletişim" sekmesi + ürün seçimi alt. çalışma | 2026-09-04 18:30 | N/A | KAYIT YOK | KOD YOK | K19 ile geri alındı ("İletişim sekmesi" kalktı — belge satır 189) |
+| 27 | K18 | Ürün Seçici: tek sayfa, grup grup (ilk yazım) | 2026-09-04 akşam | **EVET** (K18 satır 294'te tekrar) | REC-198 (K18 etiketli) | KOD YOK | **"İSTİŞARE — KARAR DEĞİL"** (belgenin kendi başlığı; satır 296'da "K18 KARARDIR" diye düzeltildi) |
+| 28 | K19 | Mobil kabuk v2 — Hesap sekmesi, İletişim yaprak | 2026-09-05 sabah | HAYIR | REC-160, REC-167, REC-199, REC-213 (hepsi K19 etiketli) | KOD İNDİ ?#1088 (387a49eb5, REC-**213-A** — tam REC-213 değil, alt-görev; "Ürünler sayfası kategori kapısını geri alıyor" içerik olarak K19'un "Ürünler" kısmına yakın ama farklı odaklı) | — |
+| 29 | K20 | Aile anlatımı = ürün sayfası, hikâye akışı | 2026-09-05 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 30 | K21 | Ürün değişirse her şey veriden | 2026-09-05 | HAYIR | REC-200 (K21 etiketli) | KOD YOK | — |
+| 31 | K18 eki | Ürün Seçici kademeli açılış önkoşulları | 2026-09-05 | HAYIR (etiket "K18 eki", bare "K18" değil — ama ailesi K18) | REC-198 (K18-c etiketi üzerinden) + ?REC-171 (zayıf-orta — "kural tablosu v2/kişi başına debi/ASHRAE 62.1" ifadeleri K18-a notuyla örtüşüyor ama K37-b'ye daha yakın) | KOD YOK | — |
+| 32 | K22 | Durum alfa ile anlatılmaz | 2026-09-05 | HAYIR | KAYIT YOK | KOD YOK (Design .dc.html seviyesinde düzeltme, üretim koduna henüz taşınmadı) | — |
+| 33 | K23 | Logo elle çizilmez | 2026-09-05 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 34 | K23-a | İkon kontur kalınlığı 1.5 | 2026-09-05 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 35 | K23-b | Sönükleştirme de dosyadan gelir | 2026-09-05 gece | HAYIR | KAYIT YOK | KOD YOK | — |
+| 36 | NUMARASIZ | Tasarım Programı Haritası | 2026-09-05 gece | N/A | KAYIT YOK | KOD YOK | — |
+| 37 | K1a | Satış kipi ekranları Menü v17'de (uygulama notu) | 2026-09-05 gece | HAYIR | REC-168 (başlık tam örtüşüyor: "Satış kipine TEK ANAHTARLA geçiş — hide_price + NEXT_PUBLIC_ODEME_ACIK") | KOD İNDİ #1061 (2204fd45a, taslak/docs-only) + #1070 (50f164966, "anahtar bağlandı, davranış bugün AYNI") — anahtar var, kapalı; ekranların kendisi (S1–S6) için ayrı commit yok | — |
+| 38 | K24 | Ürün Seçici girişi = header | 2026-09-06 | HAYIR | REC-198 (K24 dahil) — ayrıca commit'in kendi metni "REC (URUN) K24" diyor ama REC numarası YAZMIYOR (belirsiz/eksik atıf) | **KOD İNDİ #1040** (e232bb0a7 — "header'da 'Ürün Seçici' girişi, bayrak arkasında, KAPALI"; en kesin eşleşme bu satırda) | — |
+| 39 | K25 | Turkuaz metin rengi değil, `--brand-cyan-ink` | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | K25-b tarafından geri alındı ("ölçümsüzdü", belge satır 249-251) |
+| 40 | K25-b | Sayaç/kiremit zemini koyulaşır | 2026-09-06 | HAYIR | KAYIT YOK (REC numarası yok, doğrudan PR) | **KOD İNDİ #1043** (6905d05b5 — "iki AA koyu tonu token'a indi"; ama commit notunda "MERGE ETME, K8" var → K8 gerekçesiyle bilerek MASTER'A ALINMAMIŞ olabilir; master log'unda da bu commit görünüyor, yani fiilen dalda/mirror'da mevcut — SINIR'a bkz.) | — |
+| 41 | K26 | Değer emri kaynağa gider, DS türetir | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 42 | K27 | Tekrar eden desen DS'e çıkar | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 43 | K28 | Ham hex ölçütü | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 44 | K29 | Desen envanteri kabul + bileşen sırası | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 45 | K30 | Rozet tonu üç sınıf + `--surface-dark-inset` | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 46 | K31 | Hüküm kutusu tonları — renk eklenmez | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 47 | K31-a | Mobil alt sekme çubuğu hâl renkleri | 2026-09-06 | HAYIR | KAYIT YOK | KOD YOK | — |
+| 48 | K32–K35 | Kimlik kuralları F5–F8 (foto/yarıçap/mono/PQ) | 2026-09-06 | HAYIR (tek başlık altında 4 numara BİRLEŞİK — bkz. SINIR) | KAYIT YOK | KOD YOK | — |
+| 49 | K18 | BAŞLIK DÜZELTMESİ — K18 KARARDIR | 2026-09-06 | **EVET** (K18 satır 178 ile aynı numara) | REC-198 | KOD YOK | Düzeltme notu: "Kayıt kusuru OPS'ta" (belgenin kendi ifadesi) |
+| 50 | K18-c | Ürün Seçici prototipi = ölçüm aracı | 2026-09-06 | HAYIR | REC-198 (K18-c dahil) | KOD YOK (prototip Design projesinde .dc.html; bu repoda commit yok) | — |
+| 51 | K37 | Yöntem: dinamik, statik değil | 2026-09-06 | HAYIR | REC-198 (K37 dahil) | KOD YOK | — |
+| 52 | K37-a | Recep'in UI iyileştirmeleri (U1/U2/U3) | 2026-09-06 | HAYIR | REC-198 (K37-a dahil) | KOD YOK | "Emir #8 KAPANDI" (belge kendi ifadesi, ayrı bir alt-madde için) |
+| 53 | K37-b | Prototip teslimi (emir #10) KABUL + 4 hüküm | 2026-09-06 gece | HAYIR | REC-171 (içerik güçlü örtüşme: "kişi başına debi ASHRAE 62.1", "SINIRDA bandı kaynaklı eşik", "devir ölçekleme") | KOD YOK (REC-171 Backlog, git'te commit yok) | "U3 = RECEP" (yapısal karar bekleniyor, belgenin kendi notu) |
+| 54 | K37-c | Recep'in üç hükmü (U3=PANEL, kip anahtarı önce) | 2026-09-07 gece | **EVET** (K37-c satır 318'de tekrar) | KAYIT YOK | KOD YOK | — |
+| 55 | K37-c uygulama notu | Kip anahtarı teslim edildi | 2026-09-06 | **EVET** (K37-c ile aynı numara) | KAYIT YOK | KOD YOK (Design ölçümü, DOM/prototip düzeyinde — bu repo commit'i değil) | "Emir #12 madde 2 KAPANDI" (belge kendi ifadesi) |
+| 56 | K38 | Satış kipi kimlik hükmü (Sepete Ekle/Ödemeye Geç) | 2026-09-06 | HAYIR | REC-196 (K5+K38 etiketli) | KOD YOK | "K38 uygulandı" (belge kendi notu, ama Design/Marka seviyesinde — kod değil) |
+| 57 | K39 | Fiyatsız ürün satış kipinde "Teklif iste" | 2026-09-06 | HAYIR | REC-168 (mekanizma) + REC-169 (vitrin karşılığı) — ikisi de belgede doğrudan adıyla anılıyor | REC-168: KOD İNDİ #1061/#1070 (bkz. K1a) · REC-169: KOD YOK (Backlog) | — |
+
+## SINIR
+
+1. **Linear dökümünde `description` alanı YOK.** `is-dagilimi-2026-09-07.json` kaydı yalnız
+   `identifier/title/status/.../labels` taşıyor; eşleştirme SADECE `title` üzerinden yapıldı. Görev
+   tanımına yazılan "description/title'ında K-numarası geçiyorsa" ölçütünün description kısmı hiç
+   ölçülemedi — description'da geçen ama title'da geçmeyen bağlar bu tabloda YOK sayılmış olabilir
+   (yanlış-negatif riski).
+2. **Git ölçümü master değil, `ops/rec217-vercel-onizleme-kapat` dalında yapıldı** (aktif checkout).
+   `git merge-base --is-ancestor HEAD master` **false** döndü — bu dal master'a henüz karışmamış.
+   Karşılaştırma için `origin/master` log'u da çekildi: iki liste neredeyse özdeş (master'da 7 fazla
+   commit, bu dalda 1 fazla commit — `df1abdd2c`), yani tabloda kullanılan REC-124/138/129/168/198/
+   213-A/24/25-b bulguları her iki dalda da var — ama bu genel bir garanti değil, yalnız bu iki dal
+   için doğrulandı. `origin/master` local `master`'dan bile 2 commit ileride (`b645adf53`), yani
+   yerel `master` referansı da güncel değil.
+3. **K32–K35 tek başlık altında 4 karar numarası taşıyor**; görev "her başlık = bir karar" dediği
+   için bu 4 numara TEK satırda birleştirilmiş, tabloda ayrı satır açılmadı — sayım bu yüzden
+   "yaklaşık 57-59" aralığının alt ucuna yakın kaldı (57), gerçek K-numarası sayısı bundan fazla.
+4. **K-numarası boşlukları var:** metin içinde K12, K13, K14, K15, K16, K17 gibi numaralara atıf
+   var (ör. "K12 (katlı panel)", "K16'daki hüküm") ama bu numaraların KENDİ başlığı bu belgede yok —
+   büyük olasılıkla bu doküman ilk sürümünde (2026-09-04) sözlü/örtük numaralandırılmış, sonradan
+   başlık haline getirilmemiş. Git log'da rastlanan "K12 (URUN): NIC-11921 slug..." gibi kayıtlar
+   BAŞKA bir bağlamda K12 kullanıyor (muhtemelen farklı proje/tarih), bu belgenin K12'siyle
+   karıştırılmamalı — tabloda bu risk her ilgili satırda ayrıca not edildi.
+5. **"Katalog" projesinin kendi K numaralaması var** (K7.4, K7.6, K7.10 gibi) ve bu Vitrin 15A'nın
+   K7'siyle numara çakışması yaratıyor (aynı "K7" öneki, farklı doküman/konu). Grep bazlı otomatik
+   eşleştirme bu ikisini ayırt edemez; elle okuyarak elendi ama başka satırlarda gözden kaçmış
+   olabilir.
+6. **Zayıf eşleşmeler (`?REC-nnn`) kesin sayılmadı**, ama "Bağlı kayıt VAR" özet sayısına dahil
+   edildi (etiketli olarak) — gerçek/kanıtlı bağ sayısı özet tablodaki "kesin: 15" satırıdır.
+7. **Commit mesajı ile gerçek "merge edildi mi" durumu arasında fark olabilir.** Örn. K25-b
+   (`#1043`) ve üç ayrı commit "MERGE ETME, K8" notuyla işaretli — bu notun "commit dalda duruyor
+   ama bilerek master'a alınmamış" mı yoksa "zaten alındı, not eskimiş" mi olduğu bu ölçümle
+   AYRIŞTIRILAMADI (git log tek başına branch/PR merge durumunu kanıtlamaz, yalnız commit'in o
+   dalın tarihçesinde var olduğunu gösterir).
+8. **REC durumları (Backlog/In Review/Done) bu görevde tek tek doğrulanmadı** — yalnız git log'da
+   commit var mı diye bakıldı; "In Review" olan bir REC'in commit'i olsa bile PR henüz merge
+   olmamış olabilir (ör. REC-162, REC-168 "In Review" statüsünde, commit'leri var ama bu statü
+   PR'ın açık olduğunu gösteriyor olabilir — statü alanı ile commit varlığı çelişebilir, bu
+   çelişki çözülmedi).
+9. **"Belgenin kendi durum ifadesi" sütunu yalnız metinde açıkça yazılı ifadeler için dolduruldu**
+   ("AÇIK", "İSTİŞARE — KARAR DEĞİL", "geri alındı" gibi); ima yoluyla anlaşılan durum değişiklikleri
+   (ör. bir kararın sonraki bir kararla sessizce geçersiz kılınması) bazı satırlarda not olarak
+   eklendi ama bu yorum niteliğinde, "belgenin kendi ifadesi" kadar kesin değil.
+10. **57 başlık sayımı `##` ve `###` seviyelerini birlikte saydı** (K37 ailesi `###` ile yazılmış,
+    geri kalanı `##`); görev tanımındaki "yaklaşık 57-59" aralığına düşüyor ama farklı bir sayım
+    yöntemi (yalnız `##`) 48 verirdi — hangi yöntemin kastedildiği belirsizdi, ikisi birden
+    kullanılan doküman genelinde tutarlı göründüğü için `##`+`###` tercih edildi.
+
+
+---
 # FILE: docs\audits\kasa-ve-siralama-denetimi-2026-08-23.md
 
 # Kasa (büyük/küçük harf) ve Sıralama Denetimi — Açık İşler
@@ -1515,6 +10933,169 @@ yanlış sırada dizilir (ör. "Çatı Fanları" yanlış yere düşer). Görün
   konusu değil; ayrı ve ertelenmiş borç.
 - Buradaki hiçbir ölçüm tarayıcıda **görsel olarak** doğrulanmadı; kaynak kodu, canlı HTML
   (curl) ve node ile ölçüldü. Ekranda nasıl göründüğü ayrı bir doğrulama ister.
+
+
+---
+# FILE: docs\audits\katalog-karnesi-2026-09-09.md
+
+# KATALOG KARNESİ — ürün başına yapılmışlık · 2026-09-09
+
+**Soru (Recep):** *"USB'yi koyup verileri, klasörleri, resimleri, açıklamaları, fiyat
+listelerini ürün bazında hazır mı — tek soru tek cevap, yapılmışlık yüzdesi?"*
+
+**Ölçüm:** canlı DB, **tek sorgu**, salt okuma. Evren: `products` `status='active'` = **441**.
+
+---
+
+## CEVAP: **%59**
+
+| alan | var | oran |
+|---|---|---|
+| Görsel (`product_images`) | 429 / 441 | **%97** |
+| Teknik özellik (`technical_specs`) | 368 / 441 | **%83** |
+| Fiyat (`product_prices`) | 347 / 441 | **%79** |
+| Türkçe açıklama | 187 / 441 | **%42** |
+| İngilizce açıklama | 187 / 441 | **%42** |
+| İngilizce ad | 24 / 441 | **%5** |
+| **Müşteriye açık belge** | **0 / 441** | **%0** |
+
+**Yedi alanın ortalaması: %59.**
+
+## Hüküm tek cümleyle
+
+**Satılabilir bir katalog var, anlatılabilir bir katalog yok.**
+
+- **Sağlam taraf:** ürün *görünüyor* ve *satılabiliyor* — görsel %97, spec %83, fiyat %79.
+- **Zayıf taraf:** ürün *anlatılmıyor* — yarısının açıklaması yok, **hiçbirinin belgesi yok**,
+  İngilizce pratikte yok (%5).
+
+## İki kırılma noktası
+
+**1. Belge %0.** Tek bir ürünün föyü/kataloğu/montaj kılavuzu müşteriye açık değil.
+**59 kaynak PDF elimizde duruyor, hiçbiri bağlanmamış.** Tablo, kova ve indirme düğmesi yok.
+
+**2. İngilizce %5.** 441 üründen 24'ünün İngilizce adı var. Yabancı müşteri söz konusuysa
+site pratikte tek dilli.
+
+---
+
+## ⛔Bu karne niçin bugün yazıldı — patinajın teşhisi
+
+Recep: *"saçma saçma patinaj çekiyoruz günlerdir"* · *"aynı veriyi tekrar tekrar çıkarmaya mı
+bakıyorsun?"* — **Haklı.** Somut adı:
+
+**Yanlış soru kovalandı.** Katalog hattı günlerdir *"CSV eksiksiz mi"* sorusunu çözmeye
+çalışıyordu. Doğru soru **"DB'de ne eksik"**ti. İkisi aynı şey değil.
+
+**Gerekçe ölçümle çürüdü:** CSV yeniden üretimi *"kaynakta olan ürünler CSV'de yok"*
+varsayımına dayanıyordu. Ölçüldü — **ürünler zaten DB'de**: s.42/43'ün 27 satırı
+`STORM Serisi` (20 varyant) ve `JET Serisi` (21 varyant) altında, **gerçek üretici
+kodlarıyla** (`SEA-61103110` vb.) kayıtlı. Yeniden üretim, **zaten girilmiş verinin
+kopyasını** üretecekti.
+
+⭐**Ders:** *kaynağı yeniden çıkarmadan önce hedefe bak.* Eksik aranacaksa **önce DB'ye**
+bakılır, PDF'e değil. Bu karne **tek sorguyla** çıktı; günlerdir aranan cevap oradaydı.
+
+## Karar (Recep'e)
+
+**CSV yeniden üretimi DURDURULDU** — gerekçesi çürüdü, yeniden açılması Recep kararı.
+Sıradaki iş, üç boşluktan **hangisinin** kapatılacağına bağlı:
+
+| boşluk | bugün | etkisi |
+|---|---|---|
+| Belge | %0 | müşteri teknik veriye ulaşamıyor; en büyük eksik |
+| Açıklama | %42 | ürün anlatılmıyor, arama motoru göremiyor |
+| İngilizce | %5 | yabancı müşteriye kapalı |
+
+Sıralama **ticari karar** → Recep.
+
+## Nasıl tekrar ölçülür
+
+Aynı sorgu: `products status='active'` üzerinden yedi alanın varlık sayımı
+(`product_images` · `technical_specs` · `product_prices` · `description_i18n.tr/.en` ·
+`name_i18n.en` · belge tablosu **henüz yok**).
+⛔Belge satırı bugün **tanım gereği %0** — `product_documents` tablosu mevcut değil (REC-145).
+
+İlgili: REC-145 (belge deposu) · REC-146 (CSV — durduruldu) · REC-172 (teknik özellik)
+
+
+---
+# FILE: docs\audits\katalog-sayim-2026-09-03.md
+
+# Katalog sayımı — 2026-09-03
+
+Bu dosya **üretilmiştir** (`scripts/katalog/katalog-sayim.mjs`). Elle düzenlenmez.
+
+> **Sayısal bir katalog iddiası bu tabloyu kaynak göstermeden yapılmaz** (REC-136).
+> Sebebi ölçülmüş bir olaydır: aynı sorular elle yazılan farklı SQL'lerle tekrar tekrar
+> soruldu ve üç kez yanlış cevaplandı. Sayının üretildiği yer TEK olmalı.
+
+⚠**Bu bir KAPI DEĞİL, bir SAYAÇTIR.** Kırmızı vermez; "bu ürün doğru dalda mı" gibi
+YARGI gerektiren soruları ölçmez — ölçseydi var olmayan bir kapı sanılırdı.
+
+## Özet
+
+| urun | aile | kategori | kok | dal | aktif_kategori | marka |
+| --- | --- | --- | --- | --- | --- | --- |
+| 375 | 40 | 37 | 13 | 24 | 23 | 5 |
+
+
+## Kök başına dal ve ürün
+
+| kok | slug | is_active | dal_sayisi | urun | dalda_urun |
+| --- | --- | --- | --- | --- | --- |
+| Fanlar | fans | true | 14 | 295 | 295 |
+| Kontrol Sistemleri | control-systems | true | 2 | 37 | 37 |
+| İklimlendirme ve Hava Şartlandırma | air-treatment | true | 3 | 17 | 17 |
+| Isı Geri Kazanım (VMC) | heat-recovery-vmc | true | 2 | 16 | 16 |
+| Hava Perdeleri | air-curtains | true | 0 | 8 | 0 |
+| Aksesuarlar | accessories | true | 0 | 2 | 0 |
+| Air Conditioning | air-conditioning | false | 0 | 0 | 0 |
+| Commercial Ventilation | commercial-ventilation | false | 2 | 0 | 0 |
+| Electric Heating | electric-heating | false | 0 | 0 | 0 |
+| Hygiene and Sanitizer | hygiene-sanitizer | false | 0 | 0 | 0 |
+| Residential Ventilation | residential-ventilation | false | 1 | 0 | 0 |
+| Smart Home | smart-home | false | 0 | 0 | 0 |
+| Summer Ventilation | summer-ventilation | false | 0 | 0 | 0 |
+
+
+## Dalsız ürün / aile ve bütünlük
+
+| dalsiz_urun | dalsiz_aile | yetim_referans | ust_uyusmazligi |
+| --- | --- | --- | --- |
+| 10 | 3 | 0 | 0 |
+
+
+## Ürün almayan dal
+
+| ust | dal | slug | is_active |
+| --- | --- | --- | --- |
+| Commercial Ventilation | Dikdörtgen Kanal Tipi Fanlar | rectangular-duct-fans | false |
+| Commercial Ventilation | İklimlendirme Çözümleri | air-conditioning-solutions | false |
+| Fanlar | Cam ve Pencere Tipi Fanlar | window-fans | false |
+| Fanlar | Ex-Proof (ATEX) Fanlar | ex-proof-atex-fans | false |
+| Fanlar | Jet Fans | jet-fans | false |
+| Fanlar | Otopark Jet Fanları | parking-jet-fan | false |
+| Residential Ventilation | Kanal İçi Hayalet Fanlar | inline-duct-fans | false |
+
+
+## technical_specs doluluğu (kök başına)
+
+| kok | specli_urun | en_az_anahtar | ortalama_anahtar | en_cok_anahtar | seyrek_urun |
+| --- | --- | --- | --- | --- | --- |
+| Fanlar | 295 | 1 | 13.6 | 23 | 44 |
+| Kontrol Sistemleri | 35 | 1 | 9.5 | 10 | 2 |
+| Isı Geri Kazanım (VMC) | 16 | 7 | 17.6 | 21 | 0 |
+| İklimlendirme ve Hava Şartlandırma | 11 | 3 | 8.2 | 16 | 2 |
+| Hava Perdeleri | 8 | 19 | 19.5 | 20 | 0 |
+| Aksesuarlar | 2 | 1 | 1.0 | 1 | 2 |
+
+
+## Sayım sözleşmesi — iki tuzak
+
+1. **Ağaç ataması `subcategory_id`'dedir**; `category_id` yalnız kökü taşır. Yalnız birine
+   bakan sorgu yanlış cevap verir — 2026-09-04'te "375 ürün kökte" tam bu yüzden denildi.
+2. **`jsonb_each_text` satır çoğaltır**; o birleşimde `count(*)` ürünü değil ANAHTARI sayar.
 
 
 ---
@@ -2242,6 +11823,499 @@ olduğunu iddia etmiyorum** — gözlem olarak kaydediyorum ki kaybolmasın.
 
 
 ---
+# FILE: docs\audits\matris-sutun-doluluk-2026-09-05.md
+
+# Matris sütun doluluk ölçümü — 2026-09-05
+
+> **Üretilmiş belge.** Kaynak: `scripts/katalog/matris-sutun-doluluk.mjs`.
+> Elle düzenlenmez; sayı değişecekse betik yeniden koşulur.
+
+## Niçin ölçüldü
+
+Liste sayfaları matris (tablo) görünümü alacak (karar K13). Teknik alanlar aileye göre
+değiştiği için, bir grupta dolu olan sütun başka grupta tamamen boş olabilir. Yarısı boş
+tablo çizilmez — bu yüzden Design liste şablonunu çizmeden önce doluluk **canlı veriden**
+ölçülür.
+
+## Ölçüt (K13)
+
+| Kova | Aralık | Anlamı |
+|---|---|---|
+| **matris** | doluluk ≥ %60 | Grubun matrisine sütun olarak girer |
+| **ikincil** | %30 ≤ doluluk < %60 | Gizlenebilir ikincil sütun |
+| **ürün sayfası** | doluluk < %30 | Matrise girmez, yalnız ürün sayfasında |
+
+**Grup** = ürünün dalı (`subcategory_id`), dalı yoksa üst kategorisi (`category_id`).
+**Dolu** = anahtar var **ve** değeri null değil **ve** boşluk kırpılınca boş dize değil.
+Silinmiş ürün (`deleted_at`) sayılmaz.
+
+## Özet
+
+- Grup sayısı: **19**
+- Ölçülen ürün: **375**
+- Matrise giren sütun taşıyan grup: **18**
+- Hiç matris sütunu OLMAYAN grup: **1**
+
+## Grup grup doluluk
+
+### Santrifüj / Radyal Fanlar — 83 ürün
+
+`centrifugal-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `max_delivery_m3h` | 71/83 | %85.5 |
+
+**İkincil (gizlenebilir):** `max_absorbed_power_w` %56.6 · `diameter_mm` %50.6 · `absorbed_current_a` %42.2 · `erp_compliant` %42.2 · `frequency_hz` %42.2 · `insulation_class` %42.2 · `ip_rating` %42.2 · `max_delivery_ls` %42.2 · `max_static_pressure_pa` %42.2 · `motor_poles` %42.2 · `motor_type` %42.2 · `phase` %42.2 · `pq_curve` %42.2 · `rpm_max` %42.2 · `voltage_v` %42.2 · `weight_kg` %42.2
+
+**Yalnız ürün sayfasında:** 6 alan (%30 altı).
+
+### Asit Dayanımlı Fanlar — 81 ürün
+
+`acid-resistant-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `max_absorbed_power_w` | 81/81 | %100 |
+| `rpm_max` | 81/81 | %100 |
+| `voltage_v` | 81/81 | %100 |
+| `weight_kg` | 81/81 | %100 |
+| `diameter_mm` | 78/81 | %96.3 |
+| `phase` | 78/81 | %96.3 |
+| `noise_lpa_3m_db` | 66/81 | %81.5 |
+| `nominal_delivery_m3h` | 66/81 | %81.5 |
+| `nominal_static_pressure_pa` | 66/81 | %81.5 |
+
+**Yalnız ürün sayfasında:** 6 alan (%30 altı).
+
+### Kanal Tipi Fanlar — 36 ürün
+
+`duct-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 36/36 | %100 |
+| `erp_compliant` | 36/36 | %100 |
+| `frequency_hz` | 36/36 | %100 |
+| `insulation_class` | 36/36 | %100 |
+| `ip_rating` | 36/36 | %100 |
+| `max_absorbed_power_w` | 36/36 | %100 |
+| `max_delivery_ls` | 36/36 | %100 |
+| `max_delivery_m3h` | 36/36 | %100 |
+| `max_static_pressure_pa` | 36/36 | %100 |
+| `motor_type` | 36/36 | %100 |
+| `noise_level_db_a` | 36/36 | %100 |
+| `phase` | 36/36 | %100 |
+| `pq_curve` | 36/36 | %100 |
+| `rpm_max` | 36/36 | %100 |
+| `size_a_mm` | 36/36 | %100 |
+| `size_b_mm` | 36/36 | %100 |
+| `voltage_v` | 36/36 | %100 |
+| `weight_kg` | 36/36 | %100 |
+| `diameter_mm` | 31/36 | %86.1 |
+| `motor_poles` | 31/36 | %86.1 |
+| `size_c_mm` | 31/36 | %86.1 |
+
+**İkincil (gizlenebilir):** `has_humidistat` %33.3 · `has_timer` %33.3
+
+### Frekans Konvertörleri — 35 ürün
+
+`frequency-converters` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `drive_code` | 33/35 | %94.3 |
+| `enclosure_class` | 33/35 | %94.3 |
+| `enclosure_size` | 33/35 | %94.3 |
+| `ip_rating` | 33/35 | %94.3 |
+| `max_voltage_v` | 33/35 | %94.3 |
+| `min_voltage_v` | 33/35 | %94.3 |
+| `phase` | 33/35 | %94.3 |
+| `rated_output_current_a` | 33/35 | %94.3 |
+| `rated_power_w` | 33/35 | %94.3 |
+| `weight_kg` | 33/35 | %94.3 |
+
+### Banyo ve Tuvalet Fanları — 31 ürün
+
+`bathroom-toilet-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `erp_compliant` | 31/31 | %100 |
+| `frequency_hz` | 31/31 | %100 |
+| `ip_rating` | 31/31 | %100 |
+| `voltage_v` | 31/31 | %100 |
+| `absorbed_current_a` | 27/31 | %87.1 |
+| `diameter_mm` | 27/31 | %87.1 |
+| `has_humidistat` | 27/31 | %87.1 |
+| `has_timer` | 27/31 | %87.1 |
+| `insulation_class` | 27/31 | %87.1 |
+| `max_absorbed_power_w` | 27/31 | %87.1 |
+| `max_delivery_ls` | 27/31 | %87.1 |
+| `max_delivery_m3h` | 27/31 | %87.1 |
+| `max_static_pressure_pa` | 27/31 | %87.1 |
+| `motor_type` | 27/31 | %87.1 |
+| `noise_level_db_a` | 27/31 | %87.1 |
+| `phase` | 27/31 | %87.1 |
+| `pq_curve` | 27/31 | %87.1 |
+
+**Yalnız ürün sayfasında:** 12 alan (%30 altı).
+
+### Aksiyel Fanlar — 30 ürün
+
+`axial-industrial-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 30/30 | %100 |
+| `diameter_mm` | 30/30 | %100 |
+| `erp_compliant` | 30/30 | %100 |
+| `frequency_hz` | 30/30 | %100 |
+| `insulation_class` | 30/30 | %100 |
+| `ip_rating` | 30/30 | %100 |
+| `max_absorbed_power_w` | 30/30 | %100 |
+| `max_delivery_ls` | 30/30 | %100 |
+| `max_delivery_m3h` | 30/30 | %100 |
+| `max_static_pressure_pa` | 30/30 | %100 |
+| `motor_poles` | 30/30 | %100 |
+| `motor_type` | 30/30 | %100 |
+| `noise_level_db_a` | 30/30 | %100 |
+| `phase` | 30/30 | %100 |
+| `pq_curve` | 30/30 | %100 |
+| `rpm_max` | 30/30 | %100 |
+| `size_a_mm` | 30/30 | %100 |
+| `size_b_mm` | 30/30 | %100 |
+| `size_c_mm` | 30/30 | %100 |
+| `voltage_v` | 30/30 | %100 |
+| `weight_kg` | 30/30 | %100 |
+
+**İkincil (gizlenebilir):** `atex_marking` %46.7
+
+### Çatı Tipi Fanlar — 13 ürün
+
+`roof-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `diameter_mm` | 13/13 | %100 |
+| `discharge_type` | 13/13 | %100 |
+| `erp_compliant` | 13/13 | %100 |
+| `frequency_hz` | 13/13 | %100 |
+| `insulation_class` | 13/13 | %100 |
+| `ip_rating` | 13/13 | %100 |
+| `max_absorbed_power_w` | 13/13 | %100 |
+| `max_delivery_ls` | 13/13 | %100 |
+| `max_delivery_m3h` | 13/13 | %100 |
+| `motor_type` | 13/13 | %100 |
+| `phase` | 13/13 | %100 |
+| `size_a_mm` | 13/13 | %100 |
+| `size_b_mm` | 13/13 | %100 |
+| `size_c_mm` | 13/13 | %100 |
+| `voltage_v` | 13/13 | %100 |
+| `weight_kg` | 13/13 | %100 |
+| `max_ambient_temp_c` | 10/13 | %76.9 |
+
+**Yalnız ürün sayfasında:** 6 alan (%30 altı).
+
+### Duman Egzoz Fanları — 10 ürün
+
+`smoke-exhaust-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `diameter_mm` | 10/10 | %100 |
+| `discharge_type` | 10/10 | %100 |
+| `erp_compliant` | 10/10 | %100 |
+| `fire_rating` | 10/10 | %100 |
+| `frequency_hz` | 10/10 | %100 |
+| `insulation_class` | 10/10 | %100 |
+| `ip_rating` | 10/10 | %100 |
+| `max_absorbed_power_w` | 10/10 | %100 |
+| `max_ambient_temp_c` | 10/10 | %100 |
+| `max_delivery_ls` | 10/10 | %100 |
+| `max_delivery_m3h` | 10/10 | %100 |
+| `motor_poles` | 10/10 | %100 |
+| `motor_type` | 10/10 | %100 |
+| `phase` | 10/10 | %100 |
+| `size_a_mm` | 10/10 | %100 |
+| `size_b_mm` | 10/10 | %100 |
+| `size_c_mm` | 10/10 | %100 |
+| `voltage_v` | 10/10 | %100 |
+| `weight_kg` | 10/10 | %100 |
+
+### Hava Perdeleri — 8 ürün
+
+`air-curtains` · seviye 0
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 8/8 | %100 |
+| `airflow_speed_max_ms` | 8/8 | %100 |
+| `airflow_speed_min_ms` | 8/8 | %100 |
+| `discharge_velocity_curve` | 8/8 | %100 |
+| `erp_compliant` | 8/8 | %100 |
+| `frequency_hz` | 8/8 | %100 |
+| `insulation_class` | 8/8 | %100 |
+| `max_absorbed_power_w` | 8/8 | %100 |
+| `max_delivery_ls` | 8/8 | %100 |
+| `max_delivery_m3h` | 8/8 | %100 |
+| `motor_type` | 8/8 | %100 |
+| `noise_level_db_a` | 8/8 | %100 |
+| `number_of_speeds` | 8/8 | %100 |
+| `phase` | 8/8 | %100 |
+| `size_a_mm` | 8/8 | %100 |
+| `size_b_mm` | 8/8 | %100 |
+| `size_c_mm` | 8/8 | %100 |
+| `voltage_v` | 8/8 | %100 |
+| `weight_kg` | 8/8 | %100 |
+
+**İkincil (gizlenebilir):** `heating_capacity_kw` %50
+
+### Kanallı Merkezi Üniteler — 8 ürün
+
+`ducted-central-hrv` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 5/8 | %62.5 |
+| `diameter_mm` | 5/8 | %62.5 |
+| `erp_compliant` | 5/8 | %62.5 |
+| `filter_classes` | 5/8 | %62.5 |
+| `frequency_hz` | 5/8 | %62.5 |
+| `has_bypass` | 5/8 | %62.5 |
+| `insulation_class` | 5/8 | %62.5 |
+| `ip_rating` | 5/8 | %62.5 |
+| `max_absorbed_power_w` | 5/8 | %62.5 |
+| `max_delivery_ls` | 5/8 | %62.5 |
+| `max_delivery_m3h` | 5/8 | %62.5 |
+| `max_static_pressure_pa` | 5/8 | %62.5 |
+| `motor_type` | 5/8 | %62.5 |
+| `noise_level_db_a` | 5/8 | %62.5 |
+| `phase` | 5/8 | %62.5 |
+| `pq_curve` | 5/8 | %62.5 |
+| `thermal_efficiency_curve` | 5/8 | %62.5 |
+| `thermal_efficiency_pct` | 5/8 | %62.5 |
+| `voltage_v` | 5/8 | %62.5 |
+| `weight_kg` | 5/8 | %62.5 |
+
+**İkincil (gizlenebilir):** `connection_height_mm` %37.5 · `connection_width_mm` %37.5 · `height_mm` %37.5 · `length_mm` %37.5 · `nominal_delivery_m3h` %37.5 · `optional_heater_power_w` %37.5 · `width_mm` %37.5
+
+**Yalnız ürün sayfasında:** 1 alan (%30 altı).
+
+### Sulu Batarya Kanal Tipi — 8 ürün
+
+`water-coil-duct-heaters` · seviye 1
+
+⚠**Matrise girecek sütun YOK.** Bu grupta hiçbir alan %60 eşiğini geçmiyor;
+tablo görünümü bu grupta ya boş kalır ya da tek tük hücreyle çizilir.
+
+**Yalnız ürün sayfasında:** 3 alan (%30 altı).
+
+### Tekil Oda Üniteleri — 8 ürün
+
+`single-room-hrv` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 8/8 | %100 |
+| `diameter_mm` | 8/8 | %100 |
+| `erp_compliant` | 8/8 | %100 |
+| `filter_classes` | 8/8 | %100 |
+| `frequency_hz` | 8/8 | %100 |
+| `has_bypass` | 8/8 | %100 |
+| `insulation_class` | 8/8 | %100 |
+| `ip_rating` | 8/8 | %100 |
+| `max_absorbed_power_w` | 8/8 | %100 |
+| `max_delivery_ls` | 8/8 | %100 |
+| `max_delivery_m3h` | 8/8 | %100 |
+| `max_static_pressure_pa` | 8/8 | %100 |
+| `motor_type` | 8/8 | %100 |
+| `noise_level_db_a` | 8/8 | %100 |
+| `phase` | 8/8 | %100 |
+| `pq_curve` | 8/8 | %100 |
+| `thermal_efficiency_curve` | 8/8 | %100 |
+| `thermal_efficiency_pct` | 8/8 | %100 |
+| `voltage_v` | 8/8 | %100 |
+| `weight_kg` | 8/8 | %100 |
+
+### Endüstriyel Tavan Vantilatörleri — 7 ürün
+
+`industrial-ceiling-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 7/7 | %100 |
+| `blade_diameter_mm` | 7/7 | %100 |
+| `erp_compliant` | 7/7 | %100 |
+| `frequency_hz` | 7/7 | %100 |
+| `ip_rating` | 7/7 | %100 |
+| `max_absorbed_power_w` | 7/7 | %100 |
+| `max_delivery_ls` | 7/7 | %100 |
+| `max_delivery_m3h` | 7/7 | %100 |
+| `motor_type` | 7/7 | %100 |
+| `number_of_blades` | 7/7 | %100 |
+| `phase` | 7/7 | %100 |
+| `reversible` | 7/7 | %100 |
+| `rpm_max` | 7/7 | %100 |
+| `voltage_v` | 7/7 | %100 |
+| `weight_kg` | 7/7 | %100 |
+
+### Elektrikli Kanal Isıtıcıları — 6 ürün
+
+`electric-duct-heaters` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `compatible_model` | 6/6 | %100 |
+| `frequency_hz` | 6/6 | %100 |
+| `heating_power_w` | 6/6 | %100 |
+| `nominal_delivery_m3h` | 6/6 | %100 |
+| `phase` | 6/6 | %100 |
+| `voltage_v` | 6/6 | %100 |
+
+### Nem Alma Cihazları — 3 ürün
+
+`dehumidifiers` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 3/3 | %100 |
+| `erp_compliant` | 3/3 | %100 |
+| `frequency_hz` | 3/3 | %100 |
+| `humidity_removed_l_24h` | 3/3 | %100 |
+| `max_absorbed_power_w` | 3/3 | %100 |
+| `max_delivery_m3h` | 3/3 | %100 |
+| `noise_level_db_a` | 3/3 | %100 |
+| `operating_temperature_c` | 3/3 | %100 |
+| `refrigerant_type` | 3/3 | %100 |
+| `size_a_mm` | 3/3 | %100 |
+| `size_b_mm` | 3/3 | %100 |
+| `size_c_mm` | 3/3 | %100 |
+| `size_d_mm` | 3/3 | %100 |
+| `tank_capacity_l` | 3/3 | %100 |
+| `voltage_v` | 3/3 | %100 |
+| `weight_kg` | 3/3 | %100 |
+
+### Sığınak Havalandırma Fanları — 3 ürün
+
+`shelter-ventilation` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `max_absorbed_power_w` | 3/3 | %100 |
+| `max_delivery_m3h` | 3/3 | %100 |
+
+### Aksesuarlar — 2 ürün
+
+`accessories` · seviye 0
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `compatible_model` | 2/2 | %100 |
+
+### Hız Anahtarları — 2 ürün
+
+`speed-controllers` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `max_current_a` | 2/2 | %100 |
+
+### Şömine ve Baca Fanları — 1 ürün
+
+`chimney-fans` · seviye 1
+
+| Sütun | Dolu | Doluluk |
+|---|---:|---:|
+| `absorbed_current_a` | 1/1 | %100 |
+| `diameter_mm` | 1/1 | %100 |
+| `discharge_type` | 1/1 | %100 |
+| `erp_compliant` | 1/1 | %100 |
+| `frequency_hz` | 1/1 | %100 |
+| `insulation_class` | 1/1 | %100 |
+| `ip_rating` | 1/1 | %100 |
+| `max_absorbed_power_w` | 1/1 | %100 |
+| `max_delivery_ls` | 1/1 | %100 |
+| `max_delivery_m3h` | 1/1 | %100 |
+| `max_static_pressure_pa` | 1/1 | %100 |
+| `motor_poles` | 1/1 | %100 |
+| `motor_type` | 1/1 | %100 |
+| `noise_level_db_a` | 1/1 | %100 |
+| `phase` | 1/1 | %100 |
+| `pq_curve` | 1/1 | %100 |
+| `rpm_max` | 1/1 | %100 |
+| `size_a_mm` | 1/1 | %100 |
+| `size_b_mm` | 1/1 | %100 |
+| `size_c_mm` | 1/1 | %100 |
+| `voltage_v` | 1/1 | %100 |
+| `weight_kg` | 1/1 | %100 |
+
+## Katalog geneli ortak sütun adayları
+
+Bir sütunun "katalog geneli ortak" sayılabilmesi için **grupların çoğunda** matris kovasında
+olması gerekir. Aşağıdaki sayı, o anahtarın kaç grupta matris kovasına düştüğüdür.
+
+| Sütun | Matris kovasında olduğu grup sayısı |
+|---|---:|
+| `max_absorbed_power_w` | 13 / 19 |
+| `max_delivery_m3h` | 13 / 19 |
+| `phase` | 13 / 19 |
+| `voltage_v` | 13 / 19 |
+| `frequency_hz` | 12 / 19 |
+| `weight_kg` | 12 / 19 |
+| `erp_compliant` | 11 / 19 |
+| `ip_rating` | 10 / 19 |
+| `max_delivery_ls` | 10 / 19 |
+| `motor_type` | 10 / 19 |
+| `absorbed_current_a` | 9 / 19 |
+| `diameter_mm` | 9 / 19 |
+| `insulation_class` | 9 / 19 |
+| `noise_level_db_a` | 8 / 19 |
+| `size_a_mm` | 7 / 19 |
+| `size_b_mm` | 7 / 19 |
+| `size_c_mm` | 7 / 19 |
+| `max_static_pressure_pa` | 6 / 19 |
+| `pq_curve` | 6 / 19 |
+| `rpm_max` | 5 / 19 |
+| `motor_poles` | 4 / 19 |
+| `discharge_type` | 3 / 19 |
+| `compatible_model` | 2 / 19 |
+| `filter_classes` | 2 / 19 |
+| `has_bypass` | 2 / 19 |
+| `max_ambient_temp_c` | 2 / 19 |
+| `nominal_delivery_m3h` | 2 / 19 |
+| `thermal_efficiency_curve` | 2 / 19 |
+| `thermal_efficiency_pct` | 2 / 19 |
+| `airflow_speed_max_ms` | 1 / 19 |
+| `airflow_speed_min_ms` | 1 / 19 |
+| `blade_diameter_mm` | 1 / 19 |
+| `discharge_velocity_curve` | 1 / 19 |
+| `drive_code` | 1 / 19 |
+| `enclosure_class` | 1 / 19 |
+| `enclosure_size` | 1 / 19 |
+| `fire_rating` | 1 / 19 |
+| `has_humidistat` | 1 / 19 |
+| `has_timer` | 1 / 19 |
+| `heating_power_w` | 1 / 19 |
+| `humidity_removed_l_24h` | 1 / 19 |
+| `max_current_a` | 1 / 19 |
+| `max_voltage_v` | 1 / 19 |
+| `min_voltage_v` | 1 / 19 |
+| `noise_lpa_3m_db` | 1 / 19 |
+| `nominal_static_pressure_pa` | 1 / 19 |
+| `number_of_blades` | 1 / 19 |
+| `number_of_speeds` | 1 / 19 |
+| `operating_temperature_c` | 1 / 19 |
+| `rated_output_current_a` | 1 / 19 |
+| `rated_power_w` | 1 / 19 |
+| `refrigerant_type` | 1 / 19 |
+| `reversible` | 1 / 19 |
+| `size_d_mm` | 1 / 19 |
+| `tank_capacity_l` | 1 / 19 |
+
+
+
+---
 # FILE: docs\audits\odeme-yolu-denetimi-2026-08-15.md
 
 # Ödeme Yolu Denetimi — "Sepete Ekle"den Sipariş Satırına — 2026-08-15
@@ -2523,6 +12597,131 @@ merge edilmez.
 - **Gerçek bir ödeme yapılmadı.** İyzico sandbox'ta uçtan uca bir tur atılmadı; bu belge kodu
   okur, davranışı değil. Ö1 ve Ö3 sandbox'ta tek turda kesinleşir.
 - **İade/iptal yolu (`iyzico-refund`), kupon ve kargo entegrasyonu kapsam dışı.**
+
+
+---
+# FILE: docs\audits\olu-sozluk-anahtari-olcumu-2026-09-06.md
+
+# Ölü Sözlük Anahtarı — Borç Ölçümü (2026-09-06)
+
+> **Ne bu:** i18n sözlüğünde tanımlı olup kaynakta **tüketicisi olmayan** anahtarların
+> bugünkü ölçümü. **KOD DEĞİŞMEDİ** (tek istisna: kapının başlığındaki *bayat* dağılım
+> satırı düzeltildi — aşağıda F3). REC-133 · URUN şeridi · taban `7b13af63`.
+>
+> **Kaynak SSOT:** `src/__tests__/conformance/i18n-dead-key.test.ts` (INV-6) — borç listesi
+> kapının **içinde** yaşar; bu belge o listeyi **özetler**, yerine geçmez.
+
+---
+
+## 0. Ölçüm yöntemi
+
+| Ne | Nasıl |
+|---|---|
+| Borç listesi | `DONMUS_BORC` dizisi **parantez sayarak** çıkarıldı (girinti/yorum tuzağına düşmeden), yorumlar silinip yalnız dize girdileri alındı |
+| Ad alanı | anahtarın **ilk** segmenti |
+| Tarihçe | `git log --follow` + her commit'te aynı sayım |
+| Nokta kontrolü | üç anahtar elle sınandı (tam yol + yaprak literali) |
+
+⚠**İlk denemem 0 döndürdü** — parantez sayacını dizinin `[` karakterinin *üstünden*
+başlattım, derinlik hemen kapandı ve blok boş çıktı. Sayının 0 gelmesi beni durdurdu;
+düzeltildikten sonra 415. **Betiğe "dizi kapanmadıysa hata fırlat" koruması eklendi** —
+sessiz 0, yanlış bir "borç bitti" raporuna dönüşebilirdi.
+
+---
+
+## 1. BUGÜNKÜ BORÇ
+
+**415 benzersiz anahtar.**
+
+| Katman | Anahtar | Kimin işi |
+|---|---|---|
+| `admin.*` | **314** (%76) | **ADMIN şeridi** — kendi cetveli var, bu belge hüküm vermez |
+| Vitrin (14 ad alanı) | **101** (%24) | **URUN şeridi** — bizim |
+
+**Vitrin dağılımı:**
+
+| Ad alanı | Adet |
+|---|---|
+| `common` | 26 |
+| `account` | 24 |
+| `category` | 19 |
+| `auth` | 7 |
+| `orders` | 6 |
+| `products` | 5 |
+| `checkout` · `header` | 3 · 3 |
+| `support` · `returns` | 2 · 2 |
+| `brands` · `quotes` · `search` · `pdp` | 1 · 1 · 1 · 1 |
+
+---
+
+## 2. ⭐TARİHÇE — borç BÜYÜDÜ, ama gizlemekten değil
+
+| Commit | Tarih | Borç | Ne oldu |
+|---|---|---|---|
+| `66494956` | 08-23 | **431** | INV-6 kapısı doğdu; ilk ölçüm |
+| `bc10ac86` | 08-23 | **355** | Kapının **körlüğü** düzeltildi (ayraçlı şablon) → 76 anahtar aslında CANLIYMIŞ |
+| `6b1d3681` | 08-23 | **266** | 89 ölü anahtar **kaldırıldı** (gerçek borç ödemesi) |
+| `e1a4b87b` | 08-28 | 266 | değişmedi |
+| `480352bd` | 09-03 | **415** | REC-127: kapıya **DOSYA-BAĞI** şartı → **+149** gizli ölü anahtar ORTAYA ÇIKTI |
+
+**Niçin bu tablo önemli:** "borç listesi yalnız küçülebilir" kuralına bakan biri 266→415
+artışını görüp **kapının susturulduğunu** sanabilir. Ölçüm bunun tersini söylüyor: liste,
+kapı **keskinleştiği** için büyüdü. O 149 anahtar 09-03'ten önce de ölüydü — sadece zayıf
+bir ölçüt onları "canlı" sayıyordu (alakasız bir dosyadaki çıplak yaprak adı akladığı için).
+
+**Kuralın gerçek anlamı, açıkça:** liste **canlıya dönen** anahtarı tutamaz (bayatlık testi
+bunu zorlar). **Daha keskin ölçümün ortaya çıkardığı** anahtarın eklenmesi meşrudur — ve
+tam da bu yüzden her ekleme **sebebiyle birlikte** commit edilmelidir; sayı tek başına
+"iyi/kötü" demek değildir.
+
+---
+
+## 3. F3 — kapının başlığındaki dağılım satırı BAYATTI (bu PR'da düzeltildi)
+
+`i18n-dead-key.test.ts` başlığında şu satır duruyordu:
+
+> *Dağılım: admin 200 · pdp 61 · common 47 · category 39 · account 29 · products 21 · diğer 34*
+
+Bu **431-dönemi** (08-23) sayısıdır. Bugün ölçülen: **admin 314 · common 26 · account 24 ·
+category 19 · pdp 1**. `pdp` 61'den **1**'e inmiş, `admin` 200'den **314**'e çıkmış.
+
+Sayılar yanlış değil, **eski**. Ama okuyucuyu yanıltıyor: kapının kendi belgesi, kapının
+kendi listesini yanlış tarif ediyordu. Aynı sınıf bugün tasarım cetvelinde de görüldü
+(§5 özet tablosu bayat). **Ders:** özet sayı, üretildiği ölçümün tarihiyle birlikte yazılmalı.
+
+---
+
+## 4. Nokta kontrolü — üç vitrin anahtarı elle sınandı
+
+| Anahtar | Tam yol isabeti | Sonuç |
+|---|---|---|
+| `account.addresses.ph.phone` | 0 | ölü ✓ |
+| `support.home.subtitle` | 0 | ölü ✓ |
+| `returns.created` | **1** → incelendi | **yine de ölü** ✓ |
+
+⚠`returns.created`'in isabeti `t('returns.createdToast')` satırından geliyordu — **alt-dize**
+eşleşmesi. Yani kaba `grep` bir anahtarı yanlışlıkla "canlı" gösterebilir; kapı bunu
+yapmıyor (tam yol / yaprak + ata şartı). **Ölçüt kaba olursa borç OLDUĞUNDAN AZ görünür.**
+
+---
+
+## 5. Öneri (tek)
+
+**Vitrin tarafındaki 101 anahtar tek dalgada kaldırılabilir** ve bu **kullanıcıya görünmez**:
+ölü anahtar tanımı gereği hiçbir yerde render edilmiyor. Yani K8 gerektirmez; riski, yanlışlıkla
+canlı bir anahtarı silmektir — ona karşı INV-6'nın kendi bayatlık testi + `tsc` (`en: typeof tr`)
+koruyor. Admin'in 314'ü **admin şeridinin** işidir; bu belge oraya karışmaz.
+
+---
+
+## 6. Bu belgenin SINIRI (adıyla)
+
+- **Dinamik anahtarlar** ölçülmez: `t(değişken)` ve ayraçlı/ayraçsız şablonla üretilen
+  anahtarlar statik taranamaz. Kapı bunları **kanarya** listesiyle telafi ediyor
+  (8 + 3 anahtar); kanarya ölürse "sözlük bozuldu" değil **"kapı körleşti"** demektir.
+- Yaprak-adı ekseni **bilerek gevşek** (yanlış-kırmızı vermemek için). Yani gerçek borç,
+  ölçülenden **biraz daha büyük** olabilir — asla daha küçük değil.
+- Bu bir **ölçüm** belgesidir; anahtar silme işi ayrı iştir.
 
 
 ---
@@ -2939,6 +13138,1179 @@ PS-001→PS-046 kodlu **46 bulgu**, hepsi sorgu, görsel, NLM planı veya kaynak
 
 
 ---
+# FILE: docs\audits\rec124-katalog-veri-kusurlari-2026-09-04.md
+
+# REC-124 — katalog veri kusurları: CANLI ÖLÇÜM ve kalan liste
+
+> ## ✅ KAPANDI — 2026-09-04, 31/31 satır prod'a yazıldı ve doğrulandı
+>
+> Bu belge **ölçüm turunda** yazıldı ve o hâliyle *"yazım YOK"* diyordu. Yazım aynı gün,
+> ayrı bir onay zinciriyle yapıldı: **Recep 10:40 (kapsam) → OPS iki-göz (SQL okundu) →
+> Recep ekranda izin onayı → yazım.** Aşağıdaki §2 listesi artık **kapanmıştır**.
+>
+> - **Yedek (yazımdan ÖNCE alındı):** `C:/tmp/rec124-yedek-2026-09-04.json` — 31/31 satırın
+>   önceki değeri, sapma 0. Geri alma cümlesi dosyanın içinde.
+> - **Üretilmiş SQL:** `C:/tmp/rec124-yazim.sql` — tek `do $$` bloğu, her UPDATE
+>   `and name = <önceki>` kilidi taşır, sayaç tutmazsa `raise exception` ile **tümü** geri alınır.
+> - **Kaynak (SSOT):** `scripts/katalog/rec124-duzeltme-listesi.json` +
+>   `scripts/katalog/rec124-metin-duzeltme.mjs` (`--sql` kipi listeden deterministik üretir).
+> - **Doğrulama:** 31/31 **birebir dize** karşılaştırması. Ölçüt sayımı ikincil kanıttır ve
+>   tek başına **sahte-yeşil** olurdu (Vortice satırlarında yalnız birim değişti; ölçüt
+>   "düzeldi" der ama model adına dokunulmamıştır).
+> - **Vitrin tazelendi:** prod ürün sayfası yeni adı gösteriyor (eski ad 0), aile sayfası
+>   TR adını gösteriyor. Veri ile sayfa **ayrı ayrı** ölçüldü.
+>
+> **⚠KAPSAM DIŞI KALDI (bilerek, onay 31 satırdı):** `product_images.alt` hâlâ eski adı
+> taşıyor — **9 alt metin / 5 ürün** (`VRT-43152/43160/43162/43164`, `NIC-11907`). Ayrıca
+> `products.brand` kolonu hâlâ `AVENS`. İkisi de ayrı kalem.
+>
+> **⭐Bu turun asıl dersi §2'nin altında:** "23" sayısının **ölçütü hiçbir yere yazılmamıştı**;
+> ertesi gün aynı soru 95 satır döndürdü. Ölçüt artık liste dosyasının `_olcum` alanında yazılı.
+
+**Tarih:** 2026-09-04 · **Şerit:** URUN · **Yöntem:** salt-okuma SQL (prod), yazım YOK.
+**Cetvel:** `docs/standards/catalog-ingestion-standard.md` · `docs/standards/product-schema-standard.md`
+
+---
+
+## 0) Niçin bu belge — emir bileti tekrar etmedi, ölçtü
+
+İş emri REC-124'ün gövdesini tarif ediyordu: *"Frenkans/Inventoru yazımları, DAN-80101 aile,
+4 hijyen kalemi."* Biletin kendi **DURUM 2026-09-02** notu ise o kalemlerin çoğunun **yazıldığını**
+söylüyor. İkisi çelişiyordu; bu yüzden hiçbir şey yeniden yapılmadan **önce canlı ölçüldü**.
+
+Sonuç: **beş kalem gerçekten kapanmış, üç kalem açık ve ikisi biletin tarif ettiğinden FARKLI.**
+Emri olduğu gibi uygulasaydım, kapanmış işi yeniden açar ve açık olanı ıskalardım.
+
+---
+
+## 1) Kapanmış kalemler — canlıdan doğrulandı (yeniden YAPILMAYACAK)
+
+| # | Kalem | Beklenen | Ölçülen (2026-09-04, prod) | Hüküm |
+|---|---|---|---|---|
+| 1 | `"Frenkans"` yazımı | 0 olmalı | **0** | KAPANDI |
+| 2 | `"Inventoru"` yazımı | 0 olmalı | **0** | KAPANDI |
+| 3 | **DAN-80101 yanlış ailede** | `danfoss-fc51` olmalı | **`danfoss-fc51`** | KAPANDI |
+| 6 | `º` (masculine ordinal) | 0 olmalı | **0** | KAPANDI |
+| 9 | Galeri alt metni **başka ürünün SKU'sunu** taşıyor | 0 olmalı | **0 / 1042** alt metinli görsel | KAPANDI |
+
+⚠**9. kalemin ölçüm SINIRI (gizlenmiyor):** ölçüt *"alt metin, BAŞKA bir ürünün SKU dizesini
+içeriyor mu"* idi. Bu, biletin bildirdiği vakayı (`AVE-13050` sayfasında `AVE-11300`) tam olarak
+yakalayacak ölçüttür ve **sıfır** çıktı. Ama **yanlış görselin doğru görünen bir alt metni**
+olsaydı bu ölçüt onu göremezdi — o ayrı bir sorudur (görsel↔ürün eşlemesi), burada
+cevaplanmıyor ve cevaplanmış gibi yapılmıyor.
+
+---
+
+## 2) AÇIK kalemler — üçü de ölçülmüş, ikisi biletten FARKLI
+
+### A) Büyük harf normalizasyonu — **23 ürün** (bilet: "m.5", tanım belirsiz)
+
+Adı tamamen büyük harfle girilmiş ürünler. Örnekler:
+
+```
+AVE-13032 = 6 KW ELEKTRİKLİ ISITICI
+AVE-13033 = 9 KW ELEKTRİKLİ ISITICI
+AVE-13034 = 12 KW ELEKTRİKLİ ISITICI
+AVE-13037 = 3 KW ELEKTRİKLİ ISITICI
+AVE-13038 = 15 KW ELEKTRİKLİ ISITICI
+```
+
+**Niçin otomatik düzeltilmiyor — ölçülebilir sebep:** "Başlık Düzeni"ne çevirmek **marka ve birim
+kısaltmalarını bozar**. `KW` → `Kw` yanlıştır (doğrusu `kW`); `AVenS`, `SEAT`, `VMC`, `HF/S`,
+`BVU-LS` gibi kalemler de büyük harfli olmak ZORUNDA. Yani bu bir dize dönüşümü değil, **sözlük
+gerektiren** bir iştir.
+
+**Önerim:** otomatik dönüşüm YOK. 23 kalem **elle** yazılıp tek listede onaya sunulsun.
+Sayı küçük (23), risk düşük, ve makine kuralı burada güvenilir değil.
+**Kararı gereken:** Recep — "23 adı elle düzeltelim mi, yoksa bu hâliyle kalsın mı".
+
+### B) Çift boşluk — **1 ürün, ve bilettekinden BAŞKA bir ürün**
+
+| SKU | Ad (bugün) | Önerilen |
+|---|---|---|
+| `NIC-11907` | `DD 10/10 550W 1F 4P 3V  - 6M061U` | `DD 10/10 550W 1F 4P 3V - 6M061U` |
+
+Biletin 4. kalemi `AVE-80141` idi ve o **kapanmış**. Bu **yeni** bir vaka —
+"aynı sınıf kusur tek seferlik değil" demektir; kalıcı çözüm ingest tarafında bir kapı olurdu
+(bu belgenin kapsamı değil, ayrı kalem olarak not edildi).
+
+### C) `name_i18n.tr` boş aileler — **7 aile, bilet 2 diyordu**
+
+| Aile slug | `name` (TR metni burada VAR) | `name_i18n.en` |
+|---|---|---|
+| `avens-bvu-ls` | AVenS BVU-LS Kurşun Seperatör | AVenS BVU-LS Bullet Separator |
+| `avens-hiz-anahtarlari` | AVenS Hız Anahtarları | AVenS Speed Switches |
+| `avens-hucreli-hf-s` | AVenS Hücreli Aspiratörler HF/S | AVenS Box Extract Fans HF/S |
+| `jet-serisi` | JET Serisi | SEAT JET Series Acid-Resistant Fans |
+| `storm-serisi` | STORM Serisi | SEAT STORM Series Acid-Resistant Fans |
+| `vortice-h-ad-elektrikli` | Vortice H AD Elektrikli Isıtmalı Hava Perdeleri | Vortice AIR DOOR H AD Electrically Heated Air Curtains |
+| `vortice-lineo` | Vortice Lineo Kanal Fanları | Vortice Lineo Inline Duct Fans |
+
+Biletin andığı iki aile (`avens-sulu-batarya`, `danfoss-fc51`) listede **YOK** → onlar kapanmış.
+Kalan yedisi **aynı sınıf, daha geniş küme**.
+
+**Müşteriye etkisi bugün YOK:** `familyName()` `name_i18n.tr` boşken ham `name`'e düşüyor ve
+`name` zaten Türkçe. Yani **kusur görünmez, ama tutarsızdır** — TR yolu sözlükten değil
+yedekten besleniyor.
+
+**Önerim:** yedi ailenin `name_i18n.tr` alanı, **bugün `name` içinde ne yazıyorsa onunla**
+doldurulsun. Bu bir çeviri işi DEĞİL, mevcut değerin doğru kutuya taşınmasıdır — dolayısıyla
+**yeni metin üretilmiyor** ve gözden geçirme yükü doğurmuyor.
+
+⚠**Dikkat — `jet-serisi` ve `storm-serisi` istisna:** bu ikisinde EN adı TR'den **daha uzun**
+("SEAT JET Series Acid-Resistant Fans" ↔ "JET Serisi"). TR tarafı eksik BİLGİ taşıyor olabilir
+(marka + "asit dayanımlı" niteliği). Kopyalamak bugünkü davranışı değiştirmez ama **eksikliği
+kalıcılaştırır**. Bu ikisi için ayrı bir içerik kararı gerekebilir; ölçmedim, uydurmuyorum.
+
+---
+
+## 3) Prod yazımı — bu belge onay İSTEMİYOR, sadece LİSTE sunuyor
+
+Cetvel gereği prod veri yazımı Recep onayı kapısıdır. Bu belge **hiçbir şey yazmadı**
+(yalnız `SELECT`). Yazım, yukarıdaki üç kalem için ayrı ayrı karar alındıktan sonra
+**tek turda** yapılır ve sayım birebir doğrulanır (REC-110/REC-124'ün 2026-09-02 turundaki gibi).
+
+**Recep'e gidecek üç ayrı soru:**
+1. 23 ürün adının büyük harften çıkarılması — elle, sözlük gerektiği için. Yapılsın mı?
+2. `NIC-11907` çift boşluğu — düzeltilsin mi? (tek satır, risksiz)
+3. Yedi ailenin `name_i18n.tr` alanı `name` değeriyle doldurulsun mu? (`jet-serisi` /
+   `storm-serisi` için ek içerik kararı ayrıca sorulmalı)
+
+---
+
+## 4) Bu turun sınıfı
+
+⭐**Bayat bilet, iş emri doğurur.** Emir biletin GÖVDESİNİ tarif ediyordu; biletin kendi
+durum notu ise işin çoğunun yapıldığını söylüyordu. Ölçmeden başlansaydı kapanmış beş kalem
+yeniden açılır, açık üç kalemin ikisi (farklı ürün, daha geniş küme) **ıskalanırdı**.
+
+
+---
+# FILE: docs\audits\rec146-kod-cakismasi-11936-2026-09-09.md
+
+# REC-146 · `11936` kod çakışması — kaynaktan doğrulandı, hüküm verildi
+
+**Damga:** 2026-09-09 · **Şerit:** URUN-KATALOG
+**Kaynak:** `kaynak-dizini/sayfalar.jsonl` → `avens_fiyat_listesi_2026_HQ.pdf`
+**Yöntem:** ham sayfa **metni** okundu (tablo ayrıştırıcısı DEĞİL) + canlı DB ölçümü (salt okuma)
+**Prod DB yazımı YOK.**
+
+> Bu belge bir **soru** olarak açılmıştı ("hangisi doğru, karar Recep'in"). Recep'in itirazı
+> haklıydı: *"kaynağından doğrulayamadın mı?"* — Doğrulanabilirmiş. Soru geri çekildi,
+> yerine **ölçüme dayalı hüküm** kondu.
+
+---
+
+## 1. Çakışma gerçek — ayrıştırıcı hatası DEĞİL
+
+İlk bulguyu tablo ayrıştırıcım vermişti ve o gün **bölünmüş hücre** hatası yaşamıştım
+(`'11'+'936'`). Bu yüzden bu kez **ham sayfa metnine** bakıldı:
+
+| sayfa | ham metin (birebir) |
+|---|---|
+| **s.18** | `11936` · `MICRO 100` · `65-90 m3/h` · `C 1,5` · `102` |
+| **s.53** | `11936` · `AT 12/12` · `12000 m³/h` · `217` |
+
+İkisi de kaynakta **açıkça yazılı**. Kod uydurma değil, çıkarım hatası değil —
+**katalogda aynı kod iki farklı ürüne basılmış.**
+
+## 2. ⭐Hangisinin doğru olduğu ÖLÇÜLEBİLİR — sorulması gerekmiyordu
+
+`119xx` bloğunun kataloğun tamamındaki dağılımı çıkarıldı:
+
+| sayfa | kod aralığı | yoğunluk |
+|---|---|---|
+| s.52 | 11901–11921 | sıralı blok |
+| **s.53** | **11930–11940** | **kesintisiz 11 kod** |
+| s.54 | 11941–11956 | kesintisiz 16 kod |
+| s.55 | 11960–11975 | kesintisiz 16 kod |
+
+`119xx` **sayfa sırasına göre ilerleyen, yoğun ve kesintisiz** bir blok — tek bir ürün
+ailesine (radyal fanlar / AT serisi) ait.
+
+**s.18'in ÜÇ ürününün ÜÇÜ de bu bloğun içine düşüyor:**
+
+| s.18 ürünü | kodu | o kod zaten kimin |
+|---|---|---|
+| MICRO 100 | `11936` | AT 12/12 (s.53) |
+| MEDIO | `11944` | s.54 bloğu |
+| SUPER | `11952` | s.54 bloğu |
+
+⭐**Üç üründe üç çakışma tesadüf değildir.** Tek dizgi hatası bir çakışma üretir;
+üçünün üçü birden yoğun bir bloğun içine düşüyorsa **yanlış blok basılmış** demektir.
+
+## 3. Canlı DB doğrulaması (salt okuma) — blok AT serisinin
+
+```
+NIC-11930  AT 7/7    active
+NIC-11935  AT 12/9   active
+11936      -> DB'de YOK
+```
+`119xx` canlıda **Nicotra** ön ekiyle AT serisine bağlı. Blok oraya ait.
+
+## 4. HÜKÜM
+
+1. **`11936` = `AT 12/12`** (s.53). `119xx` bloğu AT serisinindir.
+2. **s.18'deki üç kod GÜVENİLMEZ** (`11936` · `11944` · `11952`) — sayfaya yanlış blok basılmış.
+   Bu üç ürün yüklenirken kod **kaynaktan alınmaz**; `model_code = null`,
+   `confidence = missing`, kimlik §11.4.2 kuralıyla addan kurulur.
+3. **Canlıda bugün bir hata YOK** — `11936` DB'de hiç yok. Risk gelecekteki yüklemedeydi,
+   yükleme öncesi kapatıldı.
+
+## 5. Sınır — bu hüküm neyi kapsamıyor
+
+- **Kataloğun kendisi hatalı** ve bu hata bizde değil, yayında. MICRO/MEDIO/SUPER'in
+  **gerçek kodları hâlâ bilinmiyor**; bu belge onları bulmuyor, yalnız **yanlış olanı
+  kullanmayı engelliyor**.
+- Doğru kodların öğrenilmesi **üreticiye/bayiye sorulacak bir iştir** ve ticari temas
+  gerektirir → Recep'in yüzeyi. Bu, yüklemeyi bloklamaz: üç ürün kodsuz olarak yüklenir.
+- Kapı tarafı: `csv_kaynak_kapisi.py` **EKSEN 1** bu sınıfı zaten yakalar
+  (CSV'de var, kaynakta yok / kaynakta var, CSV'de yok). Çakışma için ayrı bir kol
+  gerekmiyor — çünkü doğru davranış kodu **hiç kullanmamak**.
+
+## 6. Ders
+
+⭐**"Karar senin" demeden önce, cevabın veride olup olmadığına bak.**
+Bu soruyu Recep'e taşımıştım. Cevap kaynağın içindeydi: bir kod bloğunun **yoğunluğu ve
+sırası**, hangi ürün ailesine ait olduğunu söylüyor. Ticari karar sanılan şey **ölçüm işiydi**.
+Recep'e giden yalnız **tercih** olmalı; **olgu** araştırılır.
+→ ilgili: `product-schema-standard.md` §11.4.2 · `rec146-kodsuz-urun-cikarim-yolu-2026-09-09.md`
+
+
+---
+# FILE: docs\audits\rec146-kodsuz-urun-cikarim-yolu-2026-09-09.md
+
+# REC-146 · Şart 3 — kodsuz ürünlerin çıkarım yolu (ölçüm + karar)
+
+**Damga:** 2026-09-09 · **Şerit:** URUN-KATALOG · **Kaynak:** `kaynak-dizini/sayfalar.jsonl`
+(`avens_fiyat_listesi_2026_HQ.pdf`, 74 sayfa) · **Araç:** `scripts/kaynak_dizini/csv_kaynak_kapisi.py`
+
+**CETVEL:** `catalog-ingestion-standard.md` §6.3/§6.4 · `product-schema-standard.md`
+**Prod DB yazımı YOK.** Bu belge ölçüm ve karar üretir.
+
+---
+
+## 0. ⛔Planın "27 kodsuz ürün: s.18/42/43" ifadesi YANLIŞTI
+
+Plan v2 §5 üçüncü şartı *"s.18/42/43 çıkarım yolu (27 ürün)"* diye yazıyordu.
+Ölçtüm — **s.18'deki ürünler kodsuz DEĞİL.** Sayının 27 çıkması rastlantı:
+
+| sayfa | gerçek durum | ürün |
+|---|---|---|
+| **s.18** | ⛔**KOD sütunu VAR, kod da VAR** — hücre BÖLÜNMÜŞ | 2 |
+| s.26 | KOD sütunu var, **hücreler BOŞ** | 5 |
+| s.42 (STORM) | **KOD sütunu HİÇ YOK** | 13 |
+| s.43 (JET) | **KOD sütunu HİÇ YOK** | 14 |
+
+s.18 ham başlık satırı: `['', 'K', 'OD', 'MODEL', …]` — "KOD" kelimesi **iki hücreye bölünmüş.**
+Değer de öyle: `['', '11', '936', 'MICRO 100', …]` → kod **11936**, MEDIO → **11944**.
+
+Yani **gerçekten kodsuz ürün 32 değil, s.26+s.42+s.43 = 32'dir ve s.18 buna dâhil değildir.**
+Tesadüfen aynı sayı; sebep farklı. *(Bu, "ölçüt keskin ama evren yanlış" sınıfının bir başka örneği:
+sayı tuttuğu için doğru sanılıyordu.)*
+
+## 1. ⭐s.18'den çıkan İKİNCİ bulgu — kod ÇAKIŞMASI
+
+Kapı bir ad uyuşmazlığı bildirmişti: `11936` → CSV `micro 100`, kaynak `at 12/12` (s.53).
+Şimdi açıklandı: **`11936` kodu kaynakta İKİ farklı ürüne ait** — s.18 MICRO 100, s.53 AT 12/12.
+CSV s.18'i (MICRO 100) almış, benim çıkarımım bölünmüş hücre yüzünden s.18'i **görmemişti**.
+
+⛔**Bu tek başına bir katalog kusurudur ve yükleme öncesi karara bağlanmalıdır:** aynı kod iki
+ürüne verilemez. Kaynakta mı çakışma var, yoksa s.53 okuması mı hatalı — **kararı veren Recep'tir**
+(müşteriye giden kimlik). Bu belge yalnız bulguyu kayda geçirir.
+
+## 2. Kodsuz ürünlerde KİMLİK neyle kurulur — ölçülmüş cevap
+
+s.42 ham tablosu (`FİYAT` sütunu dâhil altı sütun):
+
+```
+['MODEL',            'AĞIRLIK', 'MOTOR', 'kW',   'RPM',  'FİYAT (Euro)']
+['STORM 10',         '2.70',    '220 V', '0,06', '1400', '628']
+['STORM 10',         '4.43',    '220 V', '0,09', '2800', '655']
+['STORM 10',         '3.50',    '380 V', '0,06', '1400', '628']
+['STORM 10',         '5.33',    '380 V', '0,09', '2800', '640']
+```
+
+⭐**Model adı TEK BAŞINA ürünü tanımlamıyor:** "STORM 10" dört ayrı ürün, dört ayrı fiyat.
+Ayırt eden alanlar **MOTOR (gerilim) · kW · RPM**. s.43 (JET) aynı şemada.
+
+**Sonuç — kodsuz ürün için kimlik anahtarı:**
+```
+KIMLIK = model_name + gerilim + guc_kw + rpm
+```
+s.26 (CA IL) farklı: orada ayırt eden **DEBİ** (`715 / 1610 / 3190 / 5070 / 7030 m³/h`) — yani
+ayırt edici alan **tablodan tabloya değişir**, sabit bir liste yazılamaz.
+
+**Kural (sabit liste yerine):** kodsuz tabloda kimlik = `model_name` + **MODEL ile FİYAT arasındaki
+TÜM sütunların** değerleri. Bu sütunlar tablonun kendi başlığından okunur, varsayılmaz.
+
+### ⛔2a. KENDİ İDDİAMI ÖLÇTÜM VE ÇÜRÜTTÜM — yükleyici sessizce birleştirmiyor
+
+Bu belgenin ilk hâlinde *"yükleyici onları mükerrer sanıp birleştirir ve bir ürün sessizce
+kaybolur"* yazmıştım. **Ölçmeden yazmıştım. Yanlış.** `scripts/kademe2-load/load.mjs` okundu:
+
+| satır | davranış |
+|---|---|
+| `kimlik-kurali.mjs:84` | kod yoksa **SKU addan türetilir** → dört "STORM 10" → **aynı SKU** |
+| `load.mjs:187` | `skuSeen.has(sku)` → **hata yazılır ve satır atlanır** (sessiz değil) |
+| `load.mjs:274` | `if (errors.length) APPLY iptal` → **yükleme TAMAMEN durur** |
+
+**Doğrusu:** yükleyici **fail-closed**. Birleştirme yok, sessiz kayıp yok — ama sonuç daha ağır:
+**27 kodsuz ürün yüzünden AVenS yüklemesinin TAMAMI reddedilir.** Tek bir ürün bile inmez.
+
+⭐Yani `ayirt_edici` sütunu bir "iyileştirme" değil, **yüklemenin ön koşulu**. O olmadan
+CSV ne kadar doğru olursa olsun `kademe2-load` hiçbir satırı yazmaz.
+*(Ders: kapının ne yaptığını okumadan onun adına konuşma —* [[fail-open-kapi-kapi-degildir]]
+*tersi de geçerli: fail-CLOSED bir kapıyı fail-open sanmak da yanlış hüküm üretir.)*
+
+## 3. Yapılacak — çıkarım yolu
+
+| # | iş | ölçütü |
+|---|---|---|
+| 1 | Bölünmüş başlık/değer hücrelerini birleştir (s.18 `'K'+'OD'`, `'11'+'936'`) | s.18'den **2 kodlu** ürün gelir, kodsuz sayılmaz |
+| 2 | Kodsuz tabloda kimlik = model + ara sütunların hepsi | s.42'de "STORM 10" **4 ayrı satır** kalır, birleşmez |
+| 3 | `model_code` = `null`, `confidence = missing` — **kod ÜRETİLMEZ** | uydurma ardışık numara **0** |
+| 4 | Ayırt edici alanlar CSV'ye **spec sütunu** olarak taşınır | kodsuz satırda ayırt edici alan **boş DEĞİL** |
+| 5 | `11936` çakışması Recep kapısına yazılır | karar alınmadan yükleme YOK |
+
+### ⛔3a. CSV şeması — v2'de yazılana EK
+Plan v2 `confidence` ve `kod_kaynakta_yok` sütunlarını ekliyordu. Buna **`ayirt_edici`**
+eklenir (kodsuz satırda kimliği kuran alanların `alan=değer` listesi). Aksi hâlde kodsuz
+ürünler CSV'de **birbirinden ayırt edilemez** → `kademe2-load` SKU çakışması görür ve
+**yüklemenin tamamını reddeder** (§2a, ölçüldü). Tek ürün değil, tüm parti iner ya da hiçbiri inmez.
+
+## 3b. ⭐SKU türetme kuralı — üç aday ölçüldü, biri seçildi
+
+`kimlik-kurali.mjs` (B) hâli kodsuz üründe SKU'yu **addan** türetiyor. 27 ürün aynı adı
+paylaştığı için bu çakışıyor. Üç aday kural gerçek veriyle koşuldu (34 kodsuz ürün):
+
+| aday | çakışma | SKU uzunluğu ort. | örnek |
+|---|---|---|---|
+| A · **tüm** ara sütunlar | 0 | 32.9 | `VRT-STORM-10-2-70-220-V-0-06-1400` |
+| B · **en küçük** ayırt edici küme | 0 | — | `VRT-STORM-10-2-70` |
+| C · **ad çakışırsa** mühendislik alanları | **0** | **23.8** | `VRT-STORM-10-220-V-0-06-1400` |
+
+### ⛔"En küçük küme" ölçütü YANLIŞ CEVAP VERİYOR
+Aday B'nin bulduğu minimal ayırt edici **`AĞIRLIK`** — s.42 ve s.43'te ağırlık tek başına
+13/13 ve 14/14 tekil. Matematiksel olarak doğru, **mühendislik olarak saçma**: ağırlık bir
+ölçüm değeridir, kimlik değil. Kataloğun bir sonraki baskısında `2.70` → `2.75` olursa
+SKU değişir ve **ürün kimliğini kaybeder.**
+⭐Ders: *"tekilliği sağlayan en küçük küme"* bir kimlik ölçütü değildir; tekillik gereklidir
+ama yeterli değildir. Alanın **anlamı** da ölçüte girer.
+
+### Seçilen: Aday C
+```
+kodsuz üründe SKU:
+  ad, kodsuz küme içinde TEKİL ise      → <ÖNEK>-<ad>
+  ad ÇAKIŞIYORSA                        → <ÖNEK>-<ad>-<mühendislik alanları>
+  mühendislik alanı = MOTOR · kW · RPM · DEBİ · HAVA DEBİSİ · HIZ ANAHTARI
+  ⛔AĞIRLIK ayırt edici DEĞİLDİR (spec olarak taşınır, kimliğe girmez)
+```
+**Ölçüm:** 34 kodsuz ürün → **34 tekil SKU, çakışma 0**, ayırt edici yalnız **24 üründe**
+eklendi. `VRT-CA-IL-4020-ES-RECT` temiz kaldı — modülün kendi 2026-09-07 ölçümünün
+önerdiği biçimin aynısı.
+
+**Ayırt ediciliğin sınırı ölçüldü:** s.43'te `MOTOR+RPM` **yetmiyor** (14 üründen 12 tekil);
+`MOTOR+kW` ve `MOTOR+kW+RPM` yetiyor. Yani üçlü keyfi seçilmedi, en dar güvenli küme.
+
+## 4. Bitti ölçütü (plan v2 §3'e ek dördüncü kontrol)
+
+```
+EKSEN 4 · AYIRT EDİCİLİK : kodsuz satırların (model_name + ayirt_edici) demeti TEKİL
+                           → mükerrer demet 0 · beklenen kodsuz satır 32
+```
+Sabotaj kolu: iki kodsuz satırın ayırt edici alanı eşitlenirse Eksen 4 **kırmızı** vermeli.
+*(Kapının üç ekseni için bu kanıt `scripts/kaynak_dizini/testler/kapi_sabotaj_sinavi.py`'de
+zaten var — dördüncüsü eklenirken aynı biçimde sınanır.)*
+
+## 5. Riskler / açık uçlar
+
+- **`11936` çakışması Recep kararı** — bu belge onu çözmez, kayda geçirir.
+- Ayırt edici alanların **ürün şemasındaki karşılığı** (`voltage`, `power_kw`, `rpm`, `airflow`)
+  `product-schema-standard.md` ile eşlenmeli; eşleme yapılmadan yükleme YOK.
+- s.42/43 tabloları `AĞIRLIK` da taşıyor; ağırlık **ayırt edici olarak kullanılmamalı**
+  (ölçüm değeri, kimlik değil) ama spec olarak taşınmalı.
+
+
+---
+# FILE: docs\audits\rec146-red-team-csv-plani-2026-09-09.md
+
+# Red Team: AVenS CSV yeniden üretim planı (2026-09-09)
+
+> Bağımsız denetim. Görev: planı **çürütmek**. Kod/veri ile çelişen her iddiada **KOD KAZANIR**.
+> Salt-okuma; bu rapor dışında hiçbir dosya değiştirilmedi, DB'ye yazılmadı.
+
+## 1. Metodoloji — ne ölçtüm, hangi evrende
+
+| ne | değer | nasıl |
+|---|---|---|
+| `sayfalar.jsonl` toplam satır | **2127** | satır sayımı |
+| dizindeki tekil belge | **58** | `dosya` alanı tekilleştirildi |
+| AVenS fiyat listesi sayfası | **74** | `dosya` içinde `avens_fiyat_listesi_2026_HQ` |
+| AVenS tablosu | **148** | `tablo` listesi uzunlukları toplamı |
+| başlık **satır 0**'ında `KOD` geçen tablo | **79** | planın evreni |
+| başlık satır 0'ında `KOD` geçmeyen tablo | **69** | iddia (1)'in evreni |
+| CSV satır / tekil `model_code` / boş `model_code` | **484 / 484 / 0** | `csv.DictReader`, `;`, BOM |
+
+Arama evreni her testte açıkça yazıldı. Kod arama **hem `metin` hem `tablo` hücrelerinde**,
+alfanümerik sınır koruması ile ve ayrıca **sınırsız ham alt-dize** ile iki kez koşuldu.
+
+**Ölçemediğim:** (a) prod DB'deki `VRT-16076…16080` kayıtlarının canlı durumu — plan DB'yi kapsam
+dışı bırakıyor ve bu denetim salt-okuma; (b) görsel çoklu-ajan çıkarımının gerçek koşum davranışı —
+`visual_ingest_page.py` reçetede "ölü anahtara bağlı" diye işaretli, koşturmadım.
+
+---
+
+## 2. Çürütmeler
+
+### 2.1 "Kaynak eksik değil, ölçütüm dardı" — 69 başlıksız tablo ürün taşımıyor
+
+* **İddia (plan §1b):** *"Başlığında `KOD` olmayan 69 tablo incelendi: **GİRİŞ, İÇİNDEKİLER** gibi
+  düzen tabloları. **Ürün taşımıyorlar.**"*
+* **Bulgu:** Bu bir **örneklemedir ve yanlıştır**. 69'un **hepsini** taradım (4'ünü değil).
+  **12 tanesi** ürün+fiyat satırı taşıyor, toplam **103 satır**. Dahası bunların **3'ünde
+  (s.42, s.43, s.18) `KOD` sütunu HİÇ YOKTUR** — yani "başlık kaymış" açıklaması da onları
+  kurtarmıyor; bunlar tam ürün aileleridir (STORM, JET).
+* **Somut kanıt:**
+
+  | sayfa | tablo | satır | ürün/fiyat satırı | başlık durumu | örnek satır |
+  |---|---|---|---|---|---|
+  | 41 | t1 | 29 | **27** | başlık **1. satırda** | `51152010 \| SEAT 15 \| 8.3 \| 220 V \| 0,25 \| 1400 \| 828` |
+  | **42** | t0 | 14 | **13** | `MODEL AĞIRLIK MOTOR kW RPM FİYAT (Euro)` — **KOD sütunu YOK** | `STORM 10 XRM (*) \| 2.10 \| 220 V \| 0,06 \| 1400 \| 1.025` |
+  | **43** | t0 | 15 | **14** | `MODEL AĞIRLIK MOTOR kW RPM FİYAT (Euro)` — **KOD sütunu YOK** | `JET 20 \| 35.0 \| 220 V \| 0,18 \| 1400 \| 2.791` |
+  | 48 | t1 | 17 | **15** | başlık 1. satırda | `NX313290 \| NIMAX 314 T2 1,5kW \| 5240 m³/h \| 1818` |
+  | 68 | t1 | 11 | **9** | başlık 1. satırda | `13010 \| AVenS 750 ISI GERİ KAZANIM \| 750 m³/h \| 3kW \| 1838` |
+  | 13 | t2,t3 | 5+11 | **6** | başlık 1./3. satırda | `11201 \| \| M 100/4" PUNTO \| \| 90 m3/h \| 32` |
+  | 16,17,29,68t2 | — | — | 10 | ölçü/boyut tabloları — ürün **değil**, doğru elenir | `VORTICE 150/6" \| 215 \| 218 \| …` |
+
+  Ölçüt genişletildiğinde (başlık satırını **ilk 4 satırda** ara) evren değişiyor:
+  **tekil kaynak kodu 442 → 498**, **alfanümerik kod 35 → 50**,
+  "CSV'de var kaynakta yok" **101 → 60**.
+* **Hüküm:** ⛔**ÇÜRÜDÜ.** "Ürün taşımıyorlar" cümlesi ölçülmemiş bir genellemedir; 69'un 12'si
+  ürün taşıyor. Planın §1b'deki *"kaynak eksik değil"* rahatlaması bu evrende geçersizdir —
+  ölçüt gerçekten dardı, ama plan darlığın **boyutunu** ölçmeden "çözüldü, sorun değil" ilan etti.
+* **Risk:** **Yüksek.** Plan bu satıra dayanarak kaynak tarafında iş kalmadığını varsayıyor; oysa
+  çıkarım aracının **KOD sütunu olmayan tablolarda ne yapacağı** (s.42/43) tanımsız — ve bu tam
+  olarak §1a'daki uydurma-kod kusurunu doğuran koşuldur.
+
+---
+
+### 2.2 "16076–16080 uydurma kod"
+
+* **İddia (plan §1a):** Bu beş kod 58 belgenin hiçbirinde geçmiyor, ardışık, çıkarım aracı üretti.
+* **Bulgu:** Çürütmeye çalıştım, **çürütemedim — iddia GÜÇLENDİ.** Dört testin dördü de doğruladı:
+  * **(a) `metin` + `tablo` ikisi de tarandı:** 58 belge × iki alan → **0 isabet.**
+  * **(b) Sınırsız ham alt-dize** (fiyat/debi/kcal içine gömülü geçme ihtimali):
+    `16076`…`16080` için `str.count` toplamı = **0**. Başka bağlamda dahi geçmiyorlar.
+  * **(c) 16xxx bloğu karşılaştırması — planın yapmadığı, iddiayı asıl sağlamlaştıran test:**
+    CSV'de **18** adet `16\d{3}` kodu var. **13'ü kaynakta hem metinde hem tabloda mevcut**;
+    yalnız **5'i (tam olarak 16076–16080) yok**. "Tüm blok başka kaynaktan geldi" alternatifi **elendi**.
+
+    | kod | metin isabeti (58 belge) | tablo isabeti | AVenS sayfası |
+    |---|---|---|---|
+    | **16076–16080** | **0** | **0** | — |
+    | 16100 | 2 | 2 | 33, 49 |
+    | 16107 / 16108 / 16109 | 3 | 3 | 25 |
+    | 16140 / 16141 / 16183 / 16185 / 16186 | 6 | 3 | 32 |
+    | 16153 / 16155 / 16156 / 16157 | 7–8 | 6–7 | 25 |
+
+  * **(d) İki yönlü kilit:** Tüm CSV'yi (484 kod) kaynağın **metin+tablo** birleşimine karşı taradım:
+    kaynağın hiçbir yerinde geçmeyen CSV kodu sayısı **tam olarak 5** — ve bunlar aynı beş koddur.
+    Karşı yönde, kaynakta kodu **hiçbir yerde bulunmayan** ürün satırı sayısı da **tam olarak 5**:
+    s.26'nın `CA IL 4020/5035/6040/7050/8060 ES RECT` satırları. **1:1 örtüşüyor.**
+  * s.26 ham veri iddiayı kelimesi kelimesine doğruluyor:
+    başlık `['KOD','MODEL','DEBİ','HIZ ANAHTARI','FİYAT (Euro)']`,
+    satır `['','CA IL 4020 ES RECT','715 m³/h','POT (REGC)','664']` — aynı tabloda
+    `['12828','POT (REGC) Ec motor hız anahtarı','','','112']` var, yani kod sütunu çalışıyor,
+    sadece bu beş satırda **boş**. Sayfanın `metin` alanında da bu beş ürünün yanında kod yok
+    (s.26 metninde geçen 5–9 haneli tek sayılar: 12828, 12992, 12993, 12994, 12998, 12999).
+* **Hüküm:** ✅**İDDİA AYAKTA** (planın verdiğinden daha güçlü kanıtla).
+* **Risk:** **Kritik** (müşteriye görünen uydurma veri) — bu planın hatası değil, doğru teşhisi.
+* **⚠Ek uyarı (planın kaçırdığı):** Bu beş, uydurma kodun **tek örneği** olduğu için değil,
+  **tek YAKALANABİLEN örneği** olduğu için beştir. s.42/43'te tablo çıkarımı KOD sütununu tümüyle
+  düşürmüş; oradaki 27 ürünün kodu (`61102000`, `71201000`…) CSV'ye **sayfa metninden** girmiş
+  (ölçüldü: "sadece metinde var, tabloda yok" = **29 kod**). Aynı araç, aynı kataloğun bir
+  sayfasında kodu metinden alabiliyorken s.26'da **üretmeyi** seçmiş. Planın kök-neden cümlesi
+  *"boş sütunu görüp numara üretmiş"* eksiktir: araç **önce metne bakmayı denemedi**.
+  Onarım bu ayrımı kapsamazsa aynı kusur başka sayfada tekrarlar.
+
+---
+
+### 2.3 Bitti ölçütü ULAŞILABİLİR Mİ? — Ulaşılabilir ama ANLAMSIZ
+
+* **İddia (plan §2):** *"CSV kod kümesi == kaynak kod kümesi → fark 0 (iki yönde)"* — aynı planda
+  *"kodsuz ürün KOD UYDURMAZ, `model_code` boş kalır"* (§2 madde 3).
+* **Bulgu — üç ayrı kusur:**
+
+  **(A) Ölçüt kendi hedefine kördür (sayı ile).** Kaynakta kodu hiçbir yerde bulunmayan ürün
+  satırı = **5** (s.26 CA IL). Plan bunları boş `model_code` ile yazacak. Boş kod kümeye girmez →
+  her iki tarafta da yoklar → **fark 0 hesaplanır**. Yani ölçüt, **planın var oluş sebebi olan
+  5 ürünü ölçmez**. Bu 5 ürün CSV'den tamamen düşse de ölçüt yine **fark 0** verir.
+  Bugünkü CSV'de boş `model_code` = **0/484** olduğundan bu, şu an görünmeyen ama plan uygulandığı
+  anda açılacak bir deliktir.
+
+  **(B) Ölçütün sağ tarafı ("kaynak kod kümesi") tanımsız bir büyüklüktür.** Aynı `sayfalar.jsonl`
+  üzerinde yalnız başlık-arama penceresini değiştirdim:
+
+  | evren | tekil kaynak kodu | alfanümerik | kaynak\CSV | CSV\kaynak |
+  |---|---|---|---|---|
+  | başlık = **satır 0** (planın / ölçüm belgesinin evreni) | **442** | 35 | 59 | 101 |
+  | başlık = **ilk 4 satırda ara** | **498** | 50 | 74 | 60 |
+
+  **56 kodluk fark, tek bir parametreden.** "Fark 0" ölçütü, karşılaştırdığı kümenin nasıl
+  çıkarılacağını sabitlemedikçe **koşana göre değişen** bir sayıdır — kapı değil, görüştür.
+
+  **(C) Plan kendi cetveliyle çelişiyor — KOD KAZANIR.** Plan çıkarım cetveli olarak
+  `.agent/skills/venthub-catalog-importer/SKILL.md`'yi gösteriyor. O dosyanın "Kritik kurallar"
+  bölümü, satır 97, aynen:
+
+  > `❌ model_code boş bırakma (köprü); eksik/şüpheli = null + confidence != ok.`
+
+  Planın 3. maddesi (`model_code` **boş kalır**) bu kuralı **doğrudan ihlal eder**. Cetvel boş
+  bırakmayı değil `null + confidence` işaretlemesini emrediyor ve gerekçesini de veriyor:
+  `model_code` **köprüdür** — spec↔ticaret birleştirmesinin join anahtarı (SKILL "Ticaret
+  birleştirme" bölümü: *"model_code ile eşle"*). Ayrıca CSV şeması bunu **taşıyamaz**: mevcut
+  sütunlar `model_code;model_name;price_eur;avensair_section;page_num` — **`confidence` sütunu
+  YOK**, planın önerdiği `kod_kaynakta_yok: true` işaretinin gideceği **hiçbir alan yok**.
+  Bu, planın §3'teki "A. Kodu boşalt, ürünü tut" seçeneğini de etkiler: boşaltılan alan bir köprüdür.
+
+* **Somut kanıt:** 5 kodsuz ürün satırı (s.26); 442 vs 498 tekil kod (aynı dosya, tek parametre);
+  CSV 5 sütun, `confidence` yok; `SKILL.md:97` yasak maddesi; boş `model_code` = 0/484.
+* **Hüküm:** ⛔**ÇÜRÜDÜ.** Ölçüt ulaşılabilir ama anlamsız: sağlanması ürün kaybını dışlamıyor,
+  ve ölçütü sağlamak için gereken davranış (boş kod) yürürlükteki cetvel tarafından yasaklanmış.
+* **Risk:** **Yüksek.**
+
+---
+
+### 2.4 "Yeni çıktı ayrı dosyaya yazılır, ölçütler geçince yerine konur" — KAPI DEĞİL, NİYET
+
+* **İddia (plan §4):** Veri kaybı riski bu usulle kapatıldı.
+* **Bulgu:** Mekanizma **yok**. `cikti_tazelik.py`'nin (280 satır) `main()`'i tek bir şey ölçüyor:
+  **çıktının son commit tarihi < en yeni girdinin son commit tarihi mi.** İçerikle ilgili tek
+  denetim `damga_gecerli()`'deki sha256'dır ve o da başında şu satırla kapanıyor
+  (`cikti_tazelik.py:129-130`):
+
+  ```python
+  if not kalem.get("determinist"):
+      return False, "kalem determinist degil — damga kabul edilmez, arac kosulmali"
+  ```
+
+  `avensair-fiyat.csv` reçetede `"determinist": false` olduğundan **sha256 yolu hiç çalışmaz**.
+  Geriye **saf tarih karşılaştırması** kalır. Sonuç: yeni CSV commit'lendiği **an** kapı YEŞİL olur —
+  dosya boş, kırpılmış, 5 ürün eksik ya da 27 uydurma kodlu olsa bile. Bu, planın korkusunu
+  duyurduğu *"dizin 2127→74"* kayıp sınıfının **tam olarak** kapının göremediği sınıftır.
+
+  Üç ek delik ölçüldü:
+
+  1. **Reçetenin girdileri yanlış yerde.** `ciktilar[0].girdiler` =
+     `[".../01-input", ".agent/skills/venthub-catalog-importer/SKILL.md"]`.
+     Planın *kaynağı* olan **`kaynak-dizini/sayfalar.jsonl` girdi listesinde YOK.** Dizin yeniden
+     çıkarılıp içerik değişirse CSV bayat ilan **edilmez**.
+  2. **Kardeş çıktılar kapısız.** `03-output/` altında **3 CSV** var
+     (`avensair-fiyat.csv`, `avens_fiyat_listesi_2026_HQ.csv`, `avensair_ekstra_urunler_2026.csv`);
+     reçetede tanımlı kalem sayısı **2** ve bunlardan biri `sayfalar.jsonl` — yani üç CSV'den
+     **yalnız 1'i** kapı altında. Plan yalnız `avensair-fiyat.csv`'yi yeniliyor; diğer ikisi
+     2026-06-22 tarihli ve hiçbir kapı onlara bakmıyor. `ekstra` dosyasının 204 kodunun **204'ü de**
+     ana CSV'nin içinde (`ekstra\ana = 0`), yani plan sonrası bu iki dosya sessizce **eski kod
+     evrenini** taşımaya devam eder.
+  3. **Reçete metni de bayat.** `⛔acik_kalem_icerik_tazeligi` alanı hâlâ
+     *"AVenS fiyat listesi PDF'i KAYNAK DIZININDE YOK"* diyor — ölçüm belgesi (§Hüküm 2) bunu
+     **düzeltilmiş** ilan etti (74 sayfa dizinde). Kapının okuduğu belge, kapının gerekçesini
+     yanlış anlatıyor.
+* **Somut kanıt:** `scripts/kaynak_dizini/cikti_tazelik.py:129-130` ve `:186-240` (tarih
+  karşılaştırması); `uretim-recetesi.json` → `ciktilar[0].girdiler` (2 kalem, `sayfalar.jsonl` yok),
+  `determinist: false`; `ls 03-output/` = 3 dosya, reçetede 1; planın "ayrı dosya / ölçüt geçince
+  yerine koy" kuralı için `.py`/`.yml`/`.yaml` içinde arama → **0 isabet.**
+* **Hüküm:** ⛔**ÇÜRÜDÜ.** Plan "kural" yazmış, **mekanizma yazmamış**. Kuralı uygulayacak olan,
+  kuralı yazan kişinin o günkü dikkatidir — bu bir kapı değildir.
+* **Risk:** **Kritik.**
+
+---
+
+### 2.5 Determinist olmayan çıkarımda "kod kümesi eşitliği" — AYIRT ETMİYOR (ölçüldü)
+
+* **İddia (plan §4):** *"Kabul ölçütü byte-eşitlik değil, **kod kümesi eşitliği**."*
+* **Bulgu:** Bunu varsayımla değil, **elimdeki gerçek dosyalarla** gösterebiliyorum.
+  `avensair-fiyat.csv` ↔ `avens_fiyat_listesi_2026_HQ.csv`:
+
+  | ölçüt | sonuç |
+  |---|---|
+  | kod kümesi farkı (iki yönde) | **0 / 0** — planın ölçütü **YEŞİL** verir |
+  | satır sayısı | 484 / 484 |
+  | **sütun sayısı** | **5 / 12** — HQ'da `spec_airflow_m3h, spec_speed_controller, spec_rpm, spec_current_a, spec_power_kw, spec_voltage, spec_weight_kg` fazladan |
+  | dosya boyutu | **33 701 B / 42 174 B** (fark 8 473 B) |
+
+  İki dosya **7 sütunluk veri farkı** taşıyor ve planın kabul ölçütü ikisini **ayırt edemiyor**.
+  Ölçüt `model_name` ve `price_eur` alanlarına **hiç bakmıyor**: 484 satır × 2 kritik alan =
+  **968 hücre ölçütün kör noktasında**, ve `price_eur` doğrudan müşteriye giden fiyattır.
+  İki koşum aynı kodları farklı fiyatla üretirse kapı yine YEŞİL verir — planın *kendi* uyarısı
+  ("çıkarım deterministik değil") tam da bu senaryoyu olası kılıyor.
+* **Planın "sabotaj kolu"nun da sınırı var:** *"kaynağa elle sahte bir kod eklenirse kapı kırmızı
+  vermeli"* — bu yalnız **kod** eksenini sınar. Fiyat/ad sabotajını (bir rakamı değiştir) mevcut
+  ölçüt **göremez**, çünkü ölçütte fiyat yok.
+* **Hüküm:** ⛔**ÇÜRÜDÜ.** "Byte-eşitlik değil" doğru bir teşhis, ama yerine konan şey kapı değil.
+* **Risk:** **Yüksek.**
+
+---
+
+## 3. Öneriler (somut, ölçülebilir)
+
+1. **§1b'yi sil, yerine ölçülmüş envanter koy.** "69 tablo düzen tablosudur" yanlıştır. Yaz:
+   *12 tablo ürün taşıyor (103 satır); 3'ünde (s.18/42/43) KOD sütunu HİÇ yok.*
+   **Kabul:** plan, s.42 ve s.43'ün (STORM/JET, 27 ürün) hangi yolla çıkarılacağını **adıyla** söylesin.
+
+2. **Bitti ölçütünü ÜRÜN sayısına bağla, koda değil.** Dört ölçüt birlikte, hepsi sayı:
+
+   ```
+   (a) kaynak ürün satırı sayısı  ==  CSV satır sayısı              → fark 0
+   (b) kaynakta bulunmayan CSV kodu (metin+tablo, 58 belge)         == 0    [bugün 5]
+   (c) alfanümerik kod sayısı                                       >= 50   [bugün 0; kaynakta 50]
+   (d) kodsuz ürün: CSV'de satır VAR, model_code null,
+       confidence != ok, kaynak sayfası yazılı                      == 5    [s.26 CA IL]
+   ```
+
+   (d) şıkkı ölçütün kör noktasını **sayıya çevirir**: 5 beklenip 5 bulunmalı; 0 bulunursa ürün düşmüştür.
+
+3. **Sağ tarafı sabitle.** "Kaynak kod kümesi" bir betikle üretilsin (`scripts/kaynak_kod_kumesi.py`),
+   çıktısı commit'lensin ve sürümlensin. Sabitlenmeden 442 mi 498 mi belli değildir — **56 kod farkı ölçüldü.**
+
+4. **`SKILL.md:97` çelişkisini plan koşulmadan ÖNCE çöz.** Plan `model_code` **boş** diyor,
+   SKILL boş bırakmayı **yasaklıyor** ve `null + confidence != ok` emrediyor. İkisinden biri
+   değişmeli. **KOD KAZANIR → SKILL'in dediği yapılır.** Bu, CSV şemasına **`confidence` ve
+   `kod_kaynakta_yok` sütunu eklemeyi** gerektirir (bugün 5 sütun var, ikisi de yok) →
+   `csv-import-export-standard.md` + `product-schema-standard.md` şema değişikliği; planın
+   kapsamında **görünmüyor**, kapsama alınmalı.
+
+5. **§1a'nın kök-neden cümlesini düzelt.** "Boş sütunu görüp numara üretti" eksik. Ölçüm:
+   **29 kod CSV'ye yalnız sayfa METNİNDEN girmiş** (s.42/43 dâhil). Araç metne bakabiliyor;
+   s.26'da bakmadan üretti. §5'teki cetvel maddesi buna göre yazılsın:
+   *"Tablo hücresinde kod yoksa ÖNCE sayfa metninde aranır; orada da yoksa ÜRETİLMEZ →
+   `null` + `confidence != ok` + kaynak sayfası."*
+
+6. **Kapıyı gerçekten kapı yap** (bunlar olmadan §4 bir niyettir):
+   * `uretim-recetesi.json` → `ciktilar[0].girdiler` listesine **`kaynak-dizini/sayfalar.jsonl` ekle.**
+   * `03-output/`'taki **3 CSV'nin üçünü de** reçeteye kalem olarak gir (bugün 1'i var).
+   * `cikti_tazelik.py`'ye **içerik ölçütü** ekle: `determinist:false` kalemlerde tarih yerine
+     yukarıdaki (a)–(d) sayılarını koştur, tutmuyorsa **kırmızı**. Bugün bu dosyada içerik ölçen
+     tek satır yok — `determinist:false` dalı sha256'yı da reddediyor, yani o kalemde kapının
+     içerik ayağı **hiç yok**.
+   * Reçetedeki bayat `⛔acik_kalem_icerik_tazeligi` metnini ("PDF kaynak dizininde YOK") düzelt.
+
+7. **Sabotaj kolunu iki eksene çıkar:** (i) kaynağa sahte **kod** ekle → kırmızı;
+   (ii) üretilmiş CSV'de tek bir **`price_eur` rakamını** değiştir → kırmızı.
+   (ii) bugünkü ölçütle **yeşil** kalır; kanıtı §2.5'teki iki gerçek dosyadır.
+
+8. **Yer değiştirmeyi mekanikleştir:** yeni çıktı `03-output/_aday/` altına yazılsın; ölçüt betiği
+   PASS dönmeden `mv` yapan komut **var olmasın**. "Ölçütler geçince yerine konur" bir insan
+   talimatıdır; `--yerine-koy` bayrağı ölçüt betiğinin çıkış kodunu okumalıdır.
+
+---
+
+## 4. Sonuç: **BLOK**
+
+Plan **teşhiste güçlü, kapıda boş**. Beş iddiadan biri ayakta, dördü çürüdü:
+
+| # | iddia | hüküm | risk |
+|---|---|---|---|
+| 1 | 69 başlıksız tablo ürün taşımıyor | ⛔**ÇÜRÜDÜ** — 12'si taşıyor, 103 satır; 3'ünde KOD sütunu hiç yok | Yüksek |
+| 2 | 16076–16080 uydurma | ✅**AYAKTA / GÜÇLENDİ** — 18 kodun 13'ü kaynakta, 5'i yok; iki yönde 1:1 örtüşme | Kritik (teşhis doğru) |
+| 3 | "fark 0" bitti ölçütü | ⛔**ÇÜRÜDÜ** — kodsuz 5 ürüne kör; sağ taraf tanımsız (442 vs 498); `SKILL.md:97` ile çelişik | Yüksek |
+| 4 | veri kaybı riski kapatıldı | ⛔**ÇÜRÜDÜ** — kapı saf tarih karşılaştırması; `determinist:false` sha256'yı reddediyor | **Kritik** |
+| 5 | kod kümesi eşitliği yeterli kabul ölçütü | ⛔**ÇÜRÜDÜ** — iki gerçek dosya: kod farkı 0, sütun farkı 7, boyut farkı 8 473 B | Yüksek |
+
+**Koşum ÖNCESİ kapatılması gereken üç kalem (bunlar olmadan koşma):**
+
+1. **`SKILL.md:97` çelişkisi** (§2.3-C) — plan, yürürlükteki cetvelin yasakladığı davranışı emrediyor;
+   CSV şemasında `confidence` sütunu yok. Cetvel ya da plan değişmeli; ikisi birden yürüyemez.
+2. **İçerik kapısı** (§2.4) — `cikti_tazelik.py` içerik ölçmüyor; yeni CSV commit'lendiği an yeşil.
+   Bu plan, kendisinin uyardığı kayıp sınıfına karşı **korumasız** koşulacak.
+3. **s.42/43 (KOD sütunsuz, 27 ürün)** için çıkarım yolu tanımsız (§2.1) — uydurma-kod kusurunu
+   doğuran koşul burada da mevcut, üstelik 5 değil 27 ürünle.
+
+§2.2'nin bulgusu (5 uydurma kod, müşteriye görünüyor) **doğrudur ve aciliyeti gerçektir**; bu BLOK
+hükmü o kalemin Recep kapısına gitmesini geciktirmemelidir — **teşhis sağlamdır, onarım yöntemi değildir.**
+
+
+---
+# FILE: docs\audits\rec146-uydurma-kimlik-canli-yazim-2026-09-09.md
+
+# REC-146 · Uydurma kimliğin canlıdan silinmesi — yazım kaydı + denetim kapısının ilk sınavı
+
+**Damga:** 2026-09-09T10:12:22Z · **Şerit:** URUN-KATALOG
+**Araç:** `scripts/icerik-hatti/uydurma-kimlik-tek-kural.mjs --yaz` + `CANLI_YAZIM_ONAYI`
+**İzin:** Recep'in **kendi sözüyle**, kendi şerit penceremde, **iki kez teyit edildi.**
+Akran aktarımına (URUN'ün ilettiği izne) **dayanılmadı** — OPS da aynı hükmü verdi:
+*"prod yazımı izni yazan şeridin penceresinde verilir."*
+
+---
+
+## 1. Ne yazıldı
+
+| id | eski | yeni |
+|---|---|---|
+| `f33627bc…` | `VRT-16076` · `…-16076` · kod `16076` | `VRT-CA-IL-4020-ES-RECT` · `vortice-ca-il-4020-es-rect` · kod **null** |
+| `a3a562de…` | `VRT-16077` | `VRT-CA-IL-5035-ES-RECT` |
+| `a15d7a50…` | `VRT-16078` | `VRT-CA-IL-6040-ES-RECT` |
+| `b86e5502…` | `VRT-16079` | `VRT-CA-IL-7050-ES-RECT` |
+| `0456207e…` | `VRT-16080` | `VRT-CA-IL-8060-ES-RECT` |
+
+`16076`–`16080` **kaynakta hiç geçmiyordu** — araç, sözleşme `model_code`'u zorunlu saydığı
+için boşluğu ardışık sayıyla doldurmuştu. Kod müşteriye kadar gitmişti.
+
+## 2. ⛔KAPSAM FARKI — yazımdan ÖNCE Recep'e bildirildi
+
+Dökümüm *"yalnız `model_code`; `sku` ve `slug` DURUR"* diyordu. Betik **üç alanı birden**
+değiştiriyor. Bu farkı yazımdan önce Recep'e **açıkça** yazdım, bedelini (slug değişimi eski
+adresi kırar) ve tavsiyemi (tam temizlik — yarısını yapıp uydurma sayıyı adreste bırakmak
+işi ikinci kez açmak olur) söyledim. **Onay ondan sonra geldi.**
+
+**Gerekçe (betiğin kendi tarihçesi):** *"model_code'u boşalt"* daha önce denenmiş ve
+**yetmemişti** — üç yüzey `sku`'ya düşüyordu. Uydurma sayı üç alana birden bulaşmıştı.
+
+## 3. Ön koşullar — betik kendi ölçtü, karşılanmadan yazmadı
+
+| ön koşul | sonuç |
+|---|---|
+| Üç yüzeyde `sku` yedeği kalmamalı (`pdfGenerator` · `jsonld` · `VariantSelector`) | ✓ hiçbiri düşmüyor (URUN onardı, #1148) |
+| Yeni kimlik benzersiz olmalı | ✓ 5 kimlik, çakışma **0** |
+| Canlı evren kesin sayıyla doğrulanmalı | ✓ 442 ürün |
+| Kod kaynakta **geçmemeli** (uydurma kanıtı) | ✓ 5/5, s.26 metninde yok |
+
+## 4. ⭐REC-292 DENETİM KAPISI — İLK GERÇEK SINAV, GEÇTİ
+
+Bu yazım, sabah *"denetim kaydı tutulmuyor"* diye bildirdiğim boşluğun kapandığının
+**ilk gerçek sınavıydı.** Beklenti yazımdan önce yazılmıştı: **beş satır; beş yoksa kırmızı.**
+
+`admin_audit_log`, bugün, `products` / `UPDATE` → **TAM BEŞ SATIR**, beş ayrı `row_pk`:
+
+```
+10:12:22.344Z  f33627bc…  16076 -> null   VRT-16076 -> VRT-CA-IL-4020-ES-RECT
+10:12:22.521Z  a3a562de…  16077 -> null   VRT-16077 -> VRT-CA-IL-5035-ES-RECT
+10:12:22.621Z  a15d7a50…  16078 -> null   VRT-16078 -> VRT-CA-IL-6040-ES-RECT
+10:12:22.715Z  b86e5502…  16079 -> null   VRT-16079 -> VRT-CA-IL-7050-ES-RECT
+10:12:22.840Z  0456207e…  16080 -> null   VRT-16080 -> VRT-CA-IL-8060-ES-RECT
+```
+
+`before`/`after` **tam** — eski ve yeni değerin ikisi de kayıtlı. Tetik: `denetim_izi_products_upd`
+(yazımdan önce `pg_trigger`'da `tgenabled='O'` ölçülmüştü).
+
+⭐**Sabah kusuru bildiren iş, akşam kanıtını üretti.**
+
+**Kendi hatam, kayda geçsin:** ilk sayım sorgum `created_at` kolonuna baktı ve hata verdi;
+tablonun zaman kolonu **`at`**. Şemadan okuyup düzelttim. *Kolon adı varsayılmaz, ölçülür.*
+
+## 5. ⛔DOĞAN BORÇ — eski adresler KIRIK
+
+`slug` değişti; beş eski adres bugün 404 veriyor. **Kalıcı yönlendirme (308) aynı gün inmeli:**
+
+```
+vortice-ca-il-4020-es-rect-16076  ->  vortice-ca-il-4020-es-rect
+(5035 · 6040 · 7050 · 8060 aynı desen: eski slug = yeni slug + "-" + eski kod)
+```
+
+Sahibi **URUN**; OPS bunu **öncelik 1** olarak emretti (10:15Z). Kabul ölçütü: beş eski adres
+canlıda **308 + `Location`** yeni adres, yeni adres **200**.
+⚠**Ölçümü URUN yapar** — vitrini ben ölçersem ISR tetiklenir ve kanıt bozulur
+(aynı sınıf hata bu hafta yaşandı).
+
+## 6. Bu yazımın kapatmadığı şey
+
+- **Kaynakta kodu olmayan 34 ürün** hâlâ yüklenmedi. Kural cetvelde (`product-schema-standard.md`
+  **§11.4.2**) ama **koda dökülmedi** — `kimlik-kurali.mjs` değişikliği Recep onayında.
+- `csv_kaynak_kapisi.py` **EKSEN 1** artık bu sınıfı yakalar: CSV'de olup kaynakta olmayan kod.
+  Yani aynı kusur bir daha sessizce giremez.
+
+## 7. Ders
+
+⭐**Kaçış valfi olmayan zorunlu alan, boşluğu uydurmayla doldurur.**
+Sözleşme `model_code`'u zorunlu saydı; kaynağında kodu olmayan ürün gelince araç **uydurdu**,
+hiçbir kapı görmedi, kod **müşteriye kadar gitti**. Kök neden bugün ingestor sözleşmesinde
+düzeltildi (`2034377`), cetvelde §11.4.1 yanlış önerisiyle birlikte kayda geçti.
+
+İlgili: REC-146 · REC-292 · PR #1148 (render onarımı, önkoşul)
+
+
+---
+# FILE: docs\audits\rec162-evren-muhafizi-adaylari-2026-09-06.md
+
+# Evren muhafızı olmayan konformans kapıları — ADAY listesi (2026-09-06)
+
+> **Bu bir kusur listesi DEĞİL, sınanmamış aday listesidir.** Ölçüt vekildir; kanıt kapı kapı sabotajdır.
+> Ölçüm: master `2ac01f8ae`, 2026-09-06 ~19:45Z, ALTYAPI şeridi.
+> İstek: OPS (pano, 19:4xZ) — "54'lük listeni dosya olarak bırak". **Doğru sayı 53** (önceki 54 sayımı
+> sıralı gösterimden okunmuştu, betikle yeniden sayıldı).
+
+## 0. Niçin var
+
+URUN 2026-09-06'da `tailwind-token-sinif-gecerliligi` kapısını sabotajla sınadı: yürüme kökünü `src` yerine
+`supabase` yapınca evren 941 dosyadan 44'e düştü ve kapı **3/3 YEŞİL kaldı**. Evren sıfır değildi — 44 dosya
+gerçekten tarandı, `className` içermedikleri için ihlal listesi boş çıktı. Yani kapı "ihlal yok" derken
+kusurun yaşadığı 897 dosyayı hiç görmemişti. Bu, "ölçüt keskin ama evren yanlış" sınıfının kapıya inmiş hâli.
+
+Aynı sınıf başka kapılarda da olabilir. Bu dosya, **nerede bakılacağını** söyler; **ne bulunacağını değil**.
+
+## 1. Ölçüt ve sınırı (okumadan listeye güvenme)
+
+| | |
+|---|---|
+| Evren | `src/__tests__/conformance/*.test.ts` — **163 dosya** |
+| "Ağaç yürüyor" ölçütü | dosyada `readdirSync` / `globSync` / `fast-glob` / `fg(` / `glob(` geçiyor — **99 dosya** |
+| "Muhafız var" ölçütü | `length).toBeGreaterThan` / `length).not.toBe(0)` / `toBeGreaterThanOrEqual(1` / `evren` / `length > 0` geçiyor |
+| **ADAY** | yürüyor **ve** muhafız görünmüyor — **53 dosya** (aşağıda) |
+
+**Yanlış pozitif kaynakları (beklenir, ayıklanacak):** muhafızı başka biçimde yazan kapı (sabit dosya listesi,
+ayrı sayım değişkeni, fixture'la koşan kapı, `expect(files).toMatchInlineSnapshot`). Bu ölçüt onları göremez.
+
+**Yanlış negatif kaynağı:** `length > 0` yazıp o sayıyı hiçbir şeye bağlamayan kapı listeye GİRMEZ ama
+korumasızdır. Yani 53, alt sınır sayılmalı.
+
+**Vekilin lehine tek kanıt:** bugün fail-open olduğu SABOTAJLA kanıtlanan tek kapı
+(`tailwind-token-sinif-gecerliligi`) bu listede **var**. Bu, ölçütün büsbütün kör olmadığını gösterir;
+"doğru" olduğunu göstermez.
+
+## 2. Kanıt nasıl üretilir (URUN'un tasarım uyarısı, aynen geçerli)
+
+Sabotaj **evreni boşaltmaz, DARALTIR**. Evren sıfırlanırsa çoğu kapı zaten kırmızı verir ve gerçek kusur kaçar.
+Doğru sabotaj: yürüme kökünü **geçerli ama yanlış** bir kümeye çevir (okunabilen, dosya içeren, ama aranan
+kalıbı barındırmayan bir ağaç). Kapı yine YEŞİL kalıyorsa **gerçek bulgu**.
+
+Öneri yöntem (karar OPS'un): kapı başına bir sabotaj koşumu; yeşil kalanlar ayrı bir tur çürütmeye girer.
+
+## 3. Aday kapılar (53)
+
+`yürür` = eşleşen ağaç-yürüme çağrısı sayısı (kaba yoğunluk göstergesi, önem sırası değil).
+
+| kapı | yürür |
+|---|---|
+| 3d-asset-validity.test.ts | 3 |
+| 3d-csp.test.ts | 3 |
+| 3d-model-recipe.test.ts | 2 |
+| 3d-procedural-env.test.ts | 2 |
+| 3d-single-canvas.test.ts | 2 |
+| admin-daypicker-classnames.test.ts | 2 |
+| admin-export-hygiene.test.ts | 2 |
+| admin-fx-lock-crud.test.ts | 2 |
+| admin-fx-lock-visibility.test.ts | 2 |
+| admin-mutate-real-write.test.ts | 2 |
+| admin-shell-invariants.test.ts | 2 |
+| admin-status-filter-domain.test.ts | 2 |
+| auth-account-surface.test.ts | 2 |
+| auth-reset-chain.test.ts | 3 |
+| auth-session-security.test.ts | 3 |
+| canonical-lang-segment.test.ts | 2 |
+| category-metadata-i18n-ssot.test.ts | 3 |
+| category-name-ssot.test.ts | 3 |
+| config-fail-closed.test.ts | 2 |
+| csp-origin-coverage.test.ts | 3 |
+| githooks-integrity.test.ts | 3 |
+| home-hero-route-ssot.test.ts | 1 |
+| i18n-attribute-literals.test.ts | 2 |
+| i18n-key-resolution.test.ts | 2 |
+| i18n-locale-case.test.ts | 2 |
+| i18n-locale-compare.test.ts | 2 |
+| i18n-uppercase-proper-noun.test.ts | 2 |
+| invoice-ledger-contract.test.ts | 2 |
+| jsonld-fiyat-sizintisi.test.ts | 2 |
+| kart-yukleme-onceligi.test.ts | 1 |
+| kvkk-request-ledger.test.ts | 4 |
+| lang-metadata-locale.test.ts | 1 |
+| legal-consent-analytics.test.ts | 2 |
+| legal-consent-gate.test.ts | 2 |
+| legal-en-leftover.test.ts | 3 |
+| localized-route-ssot.test.ts | 3 |
+| numeric-format-ssot.test.ts | 3 |
+| payment-integrity.test.ts | 2 |
+| payment-money-move.test.ts | 2 |
+| pricing-cache-invariants.test.ts | 3 |
+| pricing-fx-lock-contract.test.ts | 2 |
+| pricing-fx-rate-single-resolver.test.ts | 2 |
+| pricing-money-append-only.test.ts | 2 |
+| pricing-segment-source.test.ts | 3 |
+| pricing-storefront-source.test.ts | 2 |
+| quote-machine-ssot.test.ts | 4 |
+| render-price-surface.test.ts | 2 |
+| render-revalidation-contract.test.ts | 7 |
+| runtime-version-alignment.test.ts | 2 |
+| stock-restore-evidence.test.ts | 4 |
+| storefront-reflow-guards.test.ts | 2 |
+| tailwind-token-sinif-gecerliligi.test.ts | 1 |
+| webhook-auth-fail-closed.test.ts | 2 |
+
+**Sahiplik:** bu dosyada YAZILMADI. Şerit claim'leri gün içinde değişiyor; sahibi panodan okumak OPS'un işi.
+Kabaca ödeme/fiyat/i18n/admin/3d ailesi URUN'da, birkaçı sahipsiz.
+
+## 4. ALTYAPI'nın kendi kapıları — TEMİZ (aynı ölçüt)
+
+Claim'imdeki 22 konformans dosyası aynı ölçütten geçirildi: **ağaç yürüyüp muhafızı olmayan SIFIR**.
+Bu, "kendi işini de aynı sınavdan geçir" kuralının kaydıdır; ayrıcalık değil, ölçüm.
+
+## 5. Değişiklik geçmişi
+
+- 2026-09-06 — v1.0, ALTYAPI. Ölçüm master `2ac01f8ae`. OPS'un panodaki isteği üzerine yazıldı.
+  Sayı düzeltmesi: panoda 54 denmişti, betikle **53**.
+
+
+---
+# FILE: docs\audits\rec176-skill-dogrulama-2026-09-07.md
+
+# REC-176 — venthub-tasarim-dili skill doğrulama tablosu (2026-09-07)
+
+**Kaynaklar (ölçüm anındaki hâl):**
+- `.claude/skills/venthub-tasarim-dili/SKILL.md` (worktree `C:/tmp/ops-skills`, dal `ops/skill-tasarim-dili`)
+- `docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md` (kaynak_id `061e6113-…`, ayna aralığı beyanı "K1–K38")
+- `docs/proje-takip/linear/kararlar-kurumsal-belgeler-2026-09-06.md` (kaynak_id `9e95d258-…`, ayna aralığı "K1–K17-b")
+- `docs/proje-takip/linear/kararlar-katalog-2026-09-06.md` (kaynak_id `935079bf-…`, ayna aralığı "K1–K7.10")
+- `src/design-system/tokens.js` (yalnız K28/K25 token iddiaları için)
+
+**Yöntem:** SKILL.md §2'deki 14 kural satırı tek tek alındı; her satırda anılan K numarası Kararlar aynasında `grep`/tam-metin okuma ile bulundu; skill cümlesinin **anlamı** karar gövdesinin **anlamıyla** karşılaştırıldı (kelime eşleşmesi değil). Salt okuma; hiçbir dosya değiştirilmedi, git komutu koşulmadı.
+
+## Tablo
+
+| # | Skill'deki kural (kısaltılmış) | K no | Kararlar'da bulunan gövde (alıntı, ≤200 karakter, dosya adı) | Hüküm | Fark |
+|---|---|---|---|---|---|
+| 1 | K21 · Her şey veriden — "Karede görünen ürün adı, kod, sayı gerçek veridir…" | K21 | "Çizimde örnek ürün değişirse aynı turda kimlik satırı + sertifika çipleri + açıklama + hesap gerekçesi + seçici eksenleri … yeniden yazılır. Anahtarı olmayan hiçbir eksen … seçici olarak çizilmez" (vitrin-15a) | GENİŞLETİLMİŞ | K21'in gövdesi dar ve olay-tetikli: yalnız "örnek ürün DEĞİŞİRSE" anında kimlik/çip/anlatım/eksen'in yeniden yazılacağını söylüyor. Skill bunu genel bir ilkeye ("karede görünen HER ürün adı/kod/sayı gerçek veridir") büyütüyor — bu genel ilke K21'de yok. Ayrıca skill "SEAT 40 dersi" diyor; aynada örnek **SEAT 35**'tir (K18 altında, K21'de değil) — hem sayı hem K atfı yanlış. |
+| 2 | K7 · Teknik satır kaynaklı — "şemada olmayan bilgi (malzeme gibi) teknik satır olmaz, anlatımda kalır ve o da kaynağa bağlanır" | K7 | "Görüntüleme: varsa satır, yoksa satır hiç yok ('—', 'belirtilmemiş' yok). Süzgeçler de yalnız dolu alanlardan." (vitrin-15a) | GENİŞLETİLMİŞ | K7'nin gövdesi yalnız "boş alan satır olarak görünmez" diyor. "Malzeme gibi şemada olmayan bilgi anlatımda kalır, kaynağa bağlanır" cümlesi K7'de YOK — en yakın madde katalog aynasındaki **K2**: "Malzeme, montaj, sertifika alanları şemada yok; şema genişletme migration'ı Recep kapısı" — orada da "anlatımda kalır/kaynağa bağlanır" hükmü yok, sadece migration'ın Recep kapısında olduğu var. İcat eklenmiş. |
+| 3 | K18a · Değerlendirilemeyen gizlenmez | K18a | "eğrisi/verisi olmayan ürün 'değerlendirilemedi' hükmüyle görünür, gizlenmez, 'uymaz' denmez" (vitrin-15a, K18 içinde) | BİREBİR | Skill cümlesi aynanın cümlesiyle neredeyse birebir örtüşüyor. |
+| 4 | K5 · Kiremit ve düğme — "Kartta tek dolu kiremit yok; kart eylemleri çerçeveli. Kiremit sayfada tek." | K5 | "Her sayfada TEK dolu kiremit… diğer her düğme çerçeveli… Kart eylemleri çerçeveli: Karşılaştır + Teklif listesine ekle." (vitrin-15a) | DARALTILMIŞ | Doğru yönde ama gövdedeki "Eylem asla ince metin bağlantısı olmaz" ve özel etiket listesi ("Teklif iste" tek fiil, header "Teklif (n)" vb.) skill'e hiç girmemiş — eksik ama yanlış değil. |
+| 5 | K37-c · Kip anahtarı tek kaynaktan — "…ekranlarda elle yazılmaz" | K37-c | "### K37-c uygulama notu": "Menü … 'Kip anahtarı gerçekten döndü': kabuk tek kaynaktan (`kipSayacAdi` · `kipSekmeAdi`) — header sayacı 28 bant, alt çubuk sekmesi 34 çerçeve…" (vitrin-15a) | GENİŞLETİLMİŞ | K37-c başlığı bir **teslim/ölçüm notu**dur ("teslim edildi", DOM sayımları) — normatif bir kural cümlesi değil. Skill bunu "…ekranlarda elle yazılmaz" şeklinde YASAKLAYICI bir kurala çeviriyor; bu ek yasak aynada yok. |
+| 6 | K38 · Satış kipi kimliği — "₺ ve 'Sepete ekle' yalnız satış kipinde; teklif kipinde ₺ 0" | K38 | "1. Kiremit → satış kipinde `Sepete ekle`; `Teklif iste` çerçeveli. Teklif kipinde bugünkü hâl." (vitrin-15a) | DARALTILMIŞ | "Sepete ekle yalnız satış kipinde" doğru yönde (K38 madde 1). Ama "teklif kipinde ₺ 0" ölçümü K38'de yazmıyor — o sayı **K37-c uygulama notunda** geçiyor ("Teklif karelerinde ₺ 0"). Skill iki farklı K'nın içeriğini tek K38 altında birleştirmiş; atıf hatalı. |
+| 7 | K39 · Fiyatsız ürün satış kipinde "Teklif iste" | K39 | — | BULUNAMADI | Ayna dosyasının başlığı bile "ayna: **K1–K38**" diyor; dosyada K39 numaralı hiçbir madde YOK. Skill'in iddia ettiği kural (fiyatsız ürün satış kipinde gizlenmez/sepete eklenmez, "…'den başlayan" yalnız fiyatlı üyelerden) Kararlar'da hiçbir K numarasına bağlı değil — muhtemelen K1/K38'in mantıksal bir uzantısı ama yazılı karar YOK. |
+| 8 | K22 · Durum alfa ile anlatılmaz; "pasif hâl … dosyadan gelen tonla (K23-b)" | K22 + K23-b | K22: "…opacity ile değil soluk hex + zemin + rozet ile gösterilir… Tek istisna: görsel (`<img>`) şeritleri." K23-b: "Sönükleştirme de dosyadan gelir: … `brand/logo/venthub-isaret-soluk.svg` … Logo seti 28→30." (vitrin-15a) | GENİŞLETİLMİŞ | K22'nin kendi çözümü "soluk hex + zemin + rozet"tir, "dosyadan gelen ton" değil. K23-b'nin "dosyadan gelir" hükmü yalnız **marka işareti/logo** için (SVG dosya varyantı); skill bunu genel "pasif hâl" kuralına (her türlü UI durum göstergesi) genişletiyor — K23-b logo dışına taşmıyor. |
+| 9 | K25/K25-b · Turkuaz metin rengi değil; sayaç/kiremit zemini koyulaşır | K25, K25-b | K25: "turkuaz zemin/kenar rengidir… küçük metin/bağlantı için `--brand-cyan-ink`." K25-b: "Teklif/Sepet sayacı zemini `--brand-cyan-ink`… Kiremit düğme zemini `--action-terracotta-deep`." (vitrin-15a) | BİREBİR | Skill özeti aynanın iki maddesini doğru sadeleştiriyor. |
+| 10 | K28 · "Ham hex 0. Karede ham renk kodu sayısı sıfır; renk token'dan gelir." | K28 | "**'Ham hex 0' hedef DEĞİLDİR**; doğru beyan A kümesi 0 (token karşılığı olan değer ham yazılmış)… B kümesi… C ve D kümeleri ihlal değildir." (vitrin-15a) | GENİŞLETİLMİŞ | Bu en ağır sapma: K28 **açıkça ve kelimesi kelimesine** "'Ham hex 0' hedef değildir" diyor; skill bunun TAM TERSİNİ "Ham hex 0" olarak yazmış. Kural gövdesiyle DOĞRUDAN ÇELİŞEN bir ifade — kırmızı. |
+| 11 | K26/K27 · Değer emri kaynağa gider, DS türetir; tekrar eden desen DS'e çıkar | K26, K27 | K26: "renk·ölçü·yazım·kural·token değeri → DESIGN-MARKA (kaynak); … Akış tek yön: MARKA → DS → tüketici." K27: "Tekrar eden desen DS'e ÇIKAR; ekran DS'e GİRMEZ." (vitrin-15a) | BİREBİR | K27 neredeyse birebir aynı cümle; K26 doğru özetlenmiş. |
+| 12 | K23/K23-a · Logo elle çizilmez; ikon kontur kalınlığı sözleşme | K23, K23-a | K23: "Yeni yazılan hiçbir kare/belge/kodda marka işareti CSS ya da elle çizilmez." K23-a: "Arayüz ikonlarının konturu **1.5**… sözleşme JSON'unda tutulur." (vitrin-15a) | BİREBİR | Doğru ve eksiksiz özet. |
+| 13 | K37 · Dinamik, statik değil; kural motoru `secim-kurallari.json` tek kaynak | K37 | "Tasarım kararı çalıştırılarak verilir. Ürün Seçici A+C çalışan prototip… kural motoru `secim-kurallari.json` TEK KAYNAK (kod aynı dosyadan)…" (vitrin-15a) | BİREBİR | Doğru özet. |
+| 14 | "Yapısal karar tek başına sorulur" (K37-a U3 örneği) | K37-a | "**U3** Ekran 58 panel mi kalıcı sütun mu: … karar Recep'in (**yapısal, tek başına sorulur**)." (vitrin-15a) | GENİŞLETİLMİŞ | K37-a'da "yapısal, tek başına sorulur" ifadesi YALNIZ U3 (panel/kalıcı sütun) örneğine bağlı tek cümledir. Skill bunu genel bir kategoriye ("Menü yeri, URL şeması, sayfa mimarisi, panel/kalıcı sütun gibi kararlar") genişletiyor; "menü yeri" ve "URL şeması" ifadeleri K37-a'da hiç geçmiyor — bu genelleme muhtemelen kullanıcı hafızasındaki `yapisal-karar-pakete-gomulmez` ilkesinden geliyor, Kararlar gövdesinden değil. |
+
+## §1 tablosu — UUID/ayna çapraz kontrolü (3 satır)
+
+| Satır | Skill'in iddiası | Aynada bulunan | Sonuç |
+|---|---|---|---|
+| Vitrin 15A | UUID `061e6113-0f57-4296-a327-4e0f1a07cd76`, kapsam "K1–K39" | `kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76` ✓ eşleşiyor; ancak dosya başlığı "ayna: **K1–K38**" ve dosyada en yüksek numara **K38**'dir (K39 yok) | UUID DOĞRU, **kapsam aralığı YANLIŞ** (K39 icat) |
+| Kurumsal Belgeler | UUID `9e95d258-98a2-4c51-9a2d-40576c87a7bf` | `kaynak_id: 9e95d258-98a2-4c51-9a2d-40576c87a7bf` ✓ eşleşiyor (dosya başlığı "K1–K17-b"; skill bu satırda K-aralığı iddia etmiyor) | DOĞRU |
+| Katalog / Ürün Verisi | UUID `935079bf-b265-49d2-854a-a334abea07af`, kapsam "K1–K8: teknik alan, aile föyü" | `kaynak_id: 935079bf-b265-49d2-854a-a334abea07af` ✓ eşleşiyor; dosya başlığı "ayna: **K1–K7.10**", dosyada **K8 numaralı madde YOK** (K7 → K7.1–K7.6 → K7.10 şeklinde alt-numaralanmış) | UUID DOĞRU, **kapsam aralığı YANLIŞ** (K8 icat/yanlış yuvarlama) |
+
+## Özet sayım
+
+**Nihai sayım (14 satır):** BİREBİR **5** (satır 3, 9, 11, 12, 13) · DARALTILMIŞ **2** (satır 4, 6) · GENİŞLETİLMİŞ **6** (satır 1, 2, 5, 8, 10, 14) · BULUNAMADI **1** (satır 7) → toplam 5+2+6+1 = 14.
+
+Şüphenin doğrulanması: 14 kuraldan **7'si** (6 GENİŞLETİLMİŞ + 1 BULUNAMADI) yalnızca K numarası/başlık üzerinden yazılmış, gövdesi ya hiç okunmamış ya da yanlış K'ya atfedilmiş — kullanıcının "6'sı" tahmininden bile bir fazla.
+
+## Kırmızı satırlar için önerilen düzeltme (Kararlar gövdesine sadık)
+
+- **#1 (K21):** "Örnek ürün DEĞİŞİRSE aynı turda kimlik satırı + sertifika çipleri + açıklama + hesap gerekçesi + seçici eksenleri `technical_specs`/`description_i18n`'den yeniden yazılır; anahtarsız eksen seçici olarak çizilmez." "SEAT 40 dersi" ifadesi silinir veya "SEAT 35 (K18 örneği)" olarak düzeltilir.
+- **#2 (K7):** "Teknik tabloda yalnız dolu alan satır olur; boş alan '—'/'belirtilmemiş' ile DEĞİL, satırı hiç açılmadan gösterilir. Süzgeçler yalnız dolu alanlardan kurulur." Şemada olmayan alan (malzeme vb.) iddiası ya silinir ya da doğru kaynağıyla "K2 (katalog): şema dışı alan (malzeme/montaj/sertifika) şema genişletme migration'ı bekler, Recep kapısı" olarak yazılır.
+- **#5 (K37-c):** "K37-c, kip anahtarının (`kipSayacAdi`, `kipSekmeAdi`) tek kaynaktan döndüğünü DOM ölçümüyle DOĞRULAYAN teslim notudur; kuralın kendisi K37/K18-c'dedir (kural motoru `secim-kurallari.json` tek kaynak)." "Ekranlarda elle yazılmaz" ek yasağı kaldırılır ya da ayrı bir OPS hükmü olarak (kaynaksız) işaretlenir.
+- **#7 (K39):** Ya Kararlar'a önce K39 olarak yazılır (Recep onayı alınarak), ya da skill'den tamamen çıkarılır ve not düşülür: "Kararlar'da K39 yok; bu madde K1/K38'in OPS yorumudur, Recep onayı bekler."
+- **#8 (K22):** "Durum (arşiv/kapalı/yetersiz) opacity ile değil soluk hex + zemin + rozet ile anlatılır (K22); metin her zaman tam opaklık, tek istisna görsel şeritleri." Logo/marka işaretine özel "dosyadan gelen ton" (K23-b) ayrı cümle olarak, yalnız logo bağlamında bırakılır.
+- **#10 (K28):** "'Ham hex 0' hedef DEĞİLDİR. İhlal yalnız DS'te yayınlanmış token karşılığı olduğu hâlde ham yazılmış değerdir (A kümesi = 0). Token karşılığı olmayan ölçülmüş/tanımsız değerler (B) DESIGN-MARKA'ya token isteği olarak gider; tek kullanımlık kabuk varyantları (C) ve bilinçli semantik çiftler (D) ihlal SAYILMAZ." Bu satır SKILL.md'nin en yanlış cümlesidir, öncelikli düzeltme.
+- **#14 (Yapısal karar tek başına sorulur):** "K37-a örneği (Ekran 58 panel/kalıcı sütun, U3): yapısal seçenek Recep'e tek başına sorulur, toplu onaya gömülmez." Genel "menü yeri / URL şeması / sayfa mimarisi" kategorisi ya Kararlar'da ayrı bir K ile desteklenmeli ya da kaynağı "OPS/Recep genel ilkesi (Kararlar dışı)" olarak işaretlenmeli.
+
+## Düzeltme kaydı (2026-09-07, SKILL.md gövdeye sadıklaştırıldı)
+
+| K no | Eski cümle (kısa) | Yeni cümle (kısa) | Dayanak |
+|---|---|---|---|
+| K21 | "Karede görünen HER ürün adı/kod/sayı gerçek veridir"; "SEAT 40 dersi" | Dar hâle çekildi: yalnız "örnek ürün DEĞİŞİRSE" anında kimlik/çip/anlatım/eksen yeniden yazılır; "SEAT 40 dersi" → "SEAT 40/STORM 40 katalogda yok, gerçek kardeş SEAT 35/JET 25" | kararlar-vitrin-15a-2026-09-07.md § K21 + K21 uygulama notu (K18 altında) |
+| K7 | "şemada olmayan bilgi (malzeme gibi) teknik satır olmaz, anlatımda kalır ve o da kaynağa bağlanır" (icat) | "Teknik tabloda yalnız dolu alan satır olur, boş alan hiç açılmaz; şema dışı alan (malzeme/montaj/sertifika) katalog K2'nin konusu, genişletme migration'ı Recep kapısından geçer" | kararlar-vitrin-15a-2026-09-07.md § K7 + kararlar-katalog-2026-09-07.md § K2 |
+| K5 | Yalnız "kartta tek dolu kiremit yok; kart eylemleri çerçeveli" (daraltılmış) | Tamamlandı: "Eylem asla ince metin bağlantısı olmaz", özel etiketli gövde düğmeleri, tek fiil "Teklif iste" eklendi | kararlar-vitrin-15a-2026-09-07.md § K5 |
+| K37-c | "Kip anahtarı … ekranlarda elle yazılmaz" (yasaklayıcı kural icadı) | K37-c = Recep'in üç hükmü (U3=PANEL, kip anahtarı önceliği, prototip yeniden); "elle yazılmaz" ek yasağı kaldırıldı, kip anahtarının tek kaynaktan döndüğü bilgi "K37-c uygulama notu" (teslim/ölçüm kaydı) olarak ayrı işaretlendi, kuralın kendisi K37/K18-c'ye bağlandı | kararlar-vitrin-15a-2026-09-07.md § K37-c ve § K37-c uygulama notu |
+| K38 | Yalnız "₺ ve Sepete ekle yalnız satış kipinde; teklif kipinde ₺ 0" (₺0 ölçümü yanlış K'ya atıflı, daraltılmış) | Tamamlandı: kiremit/fiil ailesi (kod sözlüğü, "Siparişi tamamla" vb. açılmaz), fiyat tipografisi, stok rozet sınıfları eklendi; "teklif kipinde ₺ 0" ölçümü K38'den çıkarılıp K37-c uygulama notuna taşındı | kararlar-vitrin-15a-2026-09-07.md § K38 |
+| K39 | BULUNAMADI (Kararlar'da K39 yoktu, madde kaynaksızdı) | K39 artık taze aynada VAR (Recep kararı, 2026-09-06 16:58 TR); gövdeye göre yeniden yazıldı: `product_prices` geçerli fiyatı olmayan ürün satış kipinde "Teklif iste", sepete eklenemez, fiyatsız ailede "…'den başlayan" çizilmez | kararlar-vitrin-15a-2026-09-07.md § K39 |
+| K22 / K23-b | "pasif hâl … dosyadan gelen tonla (K23-b)" (K22'nin kendi çözümü yanlış atıflı, K23-b genelleştirilmiş) | K22'nin kendi çözümü "soluk hex + zemin + rozet" olarak düzeltildi; K23-b parantez içinde yalnız marka işareti/logoya özel olduğu açıkça belirtildi | kararlar-vitrin-15a-2026-09-07.md § K22 + § K23-b |
+| K28 | "Ham hex 0. Karede ham renk kodu sayısı sıfır" (gövdeyle DOĞRUDAN ÇELİŞEN cümle) | "Ham hex 0" hedef DEĞİLDİR cümlesi eklendi; A/B/C/D kümesi ayrımı ve doğru hedef (A kümesi 0) yazıldı | kararlar-vitrin-15a-2026-09-07.md § K28 |
+| Yapısal karar tek başına sorulur | Genel kategori: "Menü yeri, URL şeması, sayfa mimarisi, panel/kalıcı sütun gibi kararlar" | K37-a U3 örneğine daraltıldı ("Ekran 58 panel mi kalıcı sütun mu"); parantezle "bu ilke şimdilik yalnız bu örneğe bağlı, genel kategori Kararlar'da YOK" notu eklendi | kararlar-vitrin-15a-2026-09-07.md § K37-a |
+| §1 tablo | Vitrin "K1–K39" / Katalog "K1–K8" (2026-09-06 aynasına göre o gün YANLIŞTI: K38/K7.10 idi) | 2026-09-07 taze aynasında K39 ve K8 gerçekten VAR olduğu için aralıklar zaten doğru çıktı; değişiklik gerekmedi, yalnız doğrulandı | kararlar-vitrin-15a-2026-09-07.md başlık + kararlar-katalog-2026-09-07.md başlık |
+| frontmatter recovery | `python scripts/nlm/kararlar_disa_aktar.py --tarih <bugun>` (betiğin PR #1062'de olduğu belirtilmiyordu) | Satırın sonuna "(betik PR #1062 ile gelir)" notu eklendi | REC-176 iş emri notu (betik henüz master'da değil) |
+
+
+---
+# FILE: docs\audits\rec179-evren-muhafizi-sinavi-2026-09-07.md
+
+# REC-179 · Evren muhafızı sabotaj sınavı — 53 kapı (2026-09-07)
+
+**Kayıt:** REC-179 · **Şerit:** OPS · **Ölçüm:** 2026-09-07 08:0x–08:5xZ, ağaç `origin/master a248e0689`
+(`C:/tmp/ops-rec179`) · **Yöntem:** 6 sonnet sabotaj ajanı (kapı başına geçici kopya, yürüme kökü
+geçerli-ama-yanlış dizine çevrilir; değdi kanıtı = evren sayısı ölçümü; kopyalar koşum sonrası
+silinir, ağaç temiz) + 1 opus çürütme (sonnet'in FAIL-OPEN/zayıf dediği 19 kalemi kapının okuduğu
+kökte yeniden kurup tek koşumda doğrular) · **Aday listesi kaynağı:**
+`docs/audits/rec162-evren-muhafizi-adaylari-2026-09-06.md` (ALTYAPI, 2026-09-06, master `2ac01f8ae`)
+— 53 kapı, vekil ölçüt (`ağaç yürüyor + muhafız görünmüyor`); bu sınav o adayları tek tek sabote
+ederek KANITA çevirir, listeyi tekrar üretmez.
+
+---
+
+## 1. Recep tek sayfası
+
+- **53 kapı → FAIL-OPEN DOĞRULANDI 15 · PAKET KORUYOR 3 · ÇÜRÜDÜ 1 · KORUNUYOR 33 · YÜRÜMÜYOR 1.**
+- Sahip dağılımı (aday, çoğu ölçülmedi — bkz. §6): **URUN 29** (3D, i18n, kategori, pricing-lib,
+  auth-yüzey, rendering) · **ALTYAPI 14** (config, migration, webhook, fx/ledger, CI) ·
+  **sahipsiz 10** (7 admin-* kapı + 3 legal/kvkk-* kapı) — bu 10'un devri OPS kararı bekliyor.
+- **En ağır 3 bulgu:**
+  1. **`stock-restore-evidence`** — kapının ÇALIŞMA KÜMESİ bugün zaten **0** (`stockWriters=0`,
+     bağımsız 695-dosyalık prob ile doğrulandı); sabotaj hiçbir şeyi daraltmadı, kapı sabotajsız
+     hâlde de vakumda yeşil. Stok-restore invaryantı şu an FİİLEN denetlenmiyor.
+  2. **`3d-asset-validity`** — `PUBLIC_3D` evreni bugün **0** (repoda hiç `.hdr/.glb` yok); testin
+     ilk parçası zaten hiçbir şey ölçmüyor, sabotajdan bağımsız.
+  3. **Boş evrende yeşil kalan iki kapı:** `legal-en-leftover` ve `i18n-key-resolution`
+     (951→0 dosya) — evren SIFIRLANINCA bile kırmızı vermediler; bu, "geçerli-ama-daraltılmış kök"
+     sınıfından daha ağır bir sınıf (boş küme = en kolay yakalanması gereken durum).
+- **Opus'un çürütme olmadan kaçıracağı şey (kendi cümleleriyle):** *"Sonnet bunu (localized-route-ssot,
+  pricing-cache-invariants, pricing-storefront-source) 'tesadüfi yan etki' sayıp FAIL-OPEN yazdı;
+  kapı paket düzeyinde kırmızı"* — 3 kapı gereksiz yere "delik" sayılacaktı. Tersinden:
+  *"config-fail-closed'da beyan edilen sabotaj hiç kurulmamış ya da yanlış kurulmuş görünüyor —
+  KOK sabiti gerçekten değiştirildiğinde paket ENOENT ile kırmızı veriyor"* — 1 kapı gereksiz yere
+  "delik" sayılıp yanlış iş emri doğuracaktı.
+- **Düzeltme reçetesi (tek cümle):** Eşik `> 0` değil, **ölçülen bugünkü değerin bir kademe altı**
+  olmalı (`toBeGreaterThan(900)` gibi, `toBeGreaterThan(0)` değil) — ve **boş evren de kırmızı
+  vermeli**, çünkü `import.meta.glob(kök).length === 0` durumunu "ihlal yok" ile ayırt eden hiçbir
+  kapı bugün yok.
+
+---
+
+## 2. Tam tablo (53 satır)
+
+| Kapı | Yürüme kökü (orijinal→sabotaj) | Evren (orijinal→sabotaj) | Normal | Sabotaj | Sonnet hükmü | Opus hükmü | Önerilen muhafız | Sahip |
+|---|---|---|---|---|---|---|---|---|
+| 3d-asset-validity | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | 952→44 | 2 passed | 2 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI (+ağırlaştırıcı: `PUBLIC_3D`=0 bugün) | `Object.keys(SOURCES).length>900` + `PUBLIC_3D∪ASSET_REGISTRY` boşken açık skip | URUN (3D) |
+| 3d-csp | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | 952→44 | 4 passed | 3 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `Object.keys(SOURCES).length>900` + `SOURCES[REGISTRY_KEY]` tanımlı olmalı (`?? ''` kaldır) | URUN (3D) |
+| 3d-model-recipe | `/src/components/products/3d/**/*.tsx` → `/src/components/admin/**/*.tsx` | 40→63 | 3 passed | 2 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `FILES.length>30` + bilinen model dosyası pozitif kanaryası | URUN (3D) |
+| 3d-procedural-env | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | 952→44 | 1 passed | 1 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `Object.keys(SOURCES).length>900` + dedektör-sağlığı kanaryası | URUN (3D) |
+| 3d-single-canvas | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | 951→44 | 2 passed | 1 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `Object.keys(SOURCES).length>900` + `SOURCES['/'+CANONICAL]` tanımlı olmalı | URUN (3D) |
+| admin-daypicker-classnames | `/src/components/admin/*.tsx` → `/src/components/ui/*.tsx` | ölçülmedi (tekil dosya) | 3 passed | 1 passed/2 failed | KORUNUYOR | — | (mevcut `.not.toBeNull()` yeterli) | ADMIN (sahipsiz, aday) |
+| admin-export-hygiene | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | ALL ölçüldü (sabotajda 41) | 9 passed | 2 passed/2 failed | KORUNUYOR | — | (mevcut `>200`/`>5` yeterli) | ADMIN (sahipsiz, aday) |
+| admin-fx-lock-crud | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | 942→44 | 5 passed | 1 failed | KORUNUYOR | — | (mevcut `>500` yeterli) | ADMIN (sahipsiz, aday) |
+| admin-fx-lock-visibility | `/src/**/*.{ts,tsx}` → `/supabase/functions/**/*.ts` | 941→44 | 3 passed | 1 failed | KORUNUYOR | — | (mevcut `>1000` yeterli) | ADMIN (sahipsiz, aday) |
+| admin-mutate-real-write | `/src/**/*.{ts,tsx}` → `/scripts/**/*.{ts,tsx}` | ~941→11 | 1/1 PASS | 1/1 PASS | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `mutateWithAuditDosya>20` + `toplamFnGovde>40` | ADMIN (sahipsiz) → **OPS devir önerisi: URUN** |
+| admin-shell-invariants | `/src/**/*.{ts,tsx}` → `/scripts/**/*.{ts,tsx}` | ~941→11 | 26/26 PASS | 0/26 PASS | KORUNUYOR | — | (mevcut stale-guard `throw` yeterli) | ADMIN (sahipsiz, aday) |
+| admin-status-filter-domain | `/src/views/admin/*.tsx` → `/src/views/account/*.tsx` | 12→12 | 5/5 PASS | 3/5 PASS | KORUNUYOR | — | (mevcut `.not.toBeNull()` yeterli) | ADMIN (sahipsiz, aday) |
+| auth-account-surface | çoklu views/contexts/hooks/app/utils/components → `/scripts/**/*.{ts,tsx}` | ~9xx→11 | 7/7 PASS | 2/7 PASS | KORUNUYOR | — | (mevcut `source()` throw yeterli) | URUN (aday) |
+| auth-reset-chain | çoklu views/contexts/app/utils + middleware.ts → `/scripts/**/*.{ts,tsx}` | ~9xx→11 | 6/6 PASS | 0/6 PASS | KORUNUYOR | — | (mevcut yeterli) | URUN (aday) |
+| auth-session-security | çoklu contexts/utils/app → `/scripts/**/*.{ts,tsx}` | ~9xx→11 | 4/4 PASS | 1/4 PASS | KORUNUYOR | — | (mevcut yeterli) | URUN (aday) |
+| canonical-lang-segment | `/src/**/*.{ts,tsx}` → `/supabase/**/*.{ts,tsx}` | ~941→44 | 6/6 PASS | 3/6 PASS | KORUNUYOR (zayıf sinyal + açık kilit) | — | mevcut `bulunan.length>2` kilidi paketi kurtarıyor; iki komşu test hâlâ eşiksiz | URUN (i18n) |
+| category-metadata-i18n-ssot | `/src/**/*.{ts,tsx}` → `/supabase/**/*.{ts,tsx}` | ~941→44 | 1/1 PASS | 1/1 PASS | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `Object.keys(SOURCES).length>900` + `hero_description` alan-kanaryası `>3` | URUN |
+| category-name-ssot | `/src/**/*.{ts,tsx}` → `/supabase/**/*.{ts,tsx}` | ~941→44 | 1/1 PASS | 1/1 PASS | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `Object.keys(SOURCES).length>900` + `SOURCES['/src/utils/categoryHelpers.ts']` tanımlı | URUN |
+| config-fail-closed | `supabase/functions` → `src/types` | 41→9 | 6 passed | 6 passed (beyan) | FAIL-OPEN | **ÇÜRÜDÜ** — aynı sabotaj birebir kurulunca 1 failed (ENOENT, `HEALTHZ` `KOK`'tan türüyor); dar bir varyantta fail-open KALIYOR | `tsDosyalari(KOK).length>30` (mevcut KOK↔HEALTHZ bağı korunsun) | ALTYAPI |
+| csp-origin-coverage | `/src/**/*.{ts,tsx}` → `/docs/**/*.{ts,tsx}` | N→0 | 8 passed | 2 failed/6 passed | KORUNUYOR | — | (mevcut `usages.length>2` yeterli) | ALTYAPI (aday) |
+| githooks-integrity | `/.githooks/*` → `/docs/*` | (3 kanca+README)→0 | 8 passed | 4 failed/4 passed | KORUNUYOR | — | (mevcut isim-kanaryası yeterli) | ALTYAPI (aday) |
+| home-hero-route-ssot | `/src/components/home/*.tsx` → `/src/components/admin/*.tsx` | 1→yok | 4 passed | 1 failed/3 passed | KORUNUYOR | — | (mevcut `toBeTruthy()` ön-koşulu yeterli) | URUN (aday) |
+| i18n-attribute-literals | `/src/**/*.{ts,tsx}` → `/docs/**/*.{ts,tsx}` | 952→0 | 3 passed | 1 failed/2 passed | KORUNUYOR (paket; ana test tek başına zayıf) | — | ana teste kendi `Object.keys(SOURCES).length>900` kanaryası eklensin | URUN (i18n) |
+| i18n-key-resolution | `/src/**/*.{ts,tsx}` → `/docs/**/*.{ts,tsx}` | 951→0 | 2 passed | 2 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `taranan.dosya>450` + `seen.size (çözülen anahtar)>3000` | URUN (i18n) |
+| i18n-locale-case | `KOK/src` → `KOK/docs` | >400→~az | 7 passed | 3 failed/4 passed | KORUNUYOR | — | (mevcut `taranan>400` + pozitif kontrol yeterli) | URUN (i18n) |
+| i18n-locale-compare | `KOK/src` → `KOK/docs` | >400→0 | 8 passed | 3 failed/5 passed | KORUNUYOR | — | (mevcut kanarya yeterli) | URUN (i18n) |
+| i18n-uppercase-proper-noun | `/src/**/*.tsx` → `/docs/**/*.tsx` | >300→0 | 7 passed | 4 failed/3 passed | KORUNUYOR | — | (mevcut `tarananDosya>300` + tespit kanaryası yeterli) | URUN (i18n) |
+| invoice-ledger-contract | `supabase/migrations` → `docs/standards` | 234→0 | 10 passed | çoklu failed | KORUNUYOR | — | (mevcut `hepsi.length>100` yeterli) | ALTYAPI (aday) |
+| jsonld-fiyat-sizintisi | `cwd()+/src` → `docs` | 656→0 | 5 passed | 1 failed/1 passed | KORUNUYOR | — | (mevcut `toplamCagri>0` — zayıf ama sabotajı yakaladı) | URUN (aday) |
+| kart-yukleme-onceligi | `cwd()+/src` → `cwd()+/supabase` | N(>3 çağrı)→0 | 3 passed | 1 failed/2 passed | KORUNUYOR | — | (mevcut `tumCagrilar.length>3` yeterli) | URUN (aday) |
+| kvkk-request-ledger | `/supabase/migrations/*_kvkk_*.sql` → `/docs/standards/*_kvkk_*.sql` | 1→0 | tam suit geçer | 1 failed/1 passed | KORUNUYOR | — | (mevcut `toBeTruthy()` yeterli) | ALTYAPI/legal karma (aday) |
+| lang-metadata-locale | `app/[lang]` (rel.) → `docs` | 48→0 | 6 passed | 1 failed/1 passed | KORUNUYOR | — | (mevcut `sayfalar.length>20` yeterli) | URUN (aday) |
+| legal-consent-analytics | `import.meta.glob('/src/**')` → `/docs/**` | N→0 | 5 passed | 1 failed/1 passed | KORUNUYOR | — | (mevcut 4 sabit-yol `toBeTruthy()` yeterli) | legal (sahipsiz, aday) |
+| legal-consent-gate | `import.meta.glob('/src/**')` → `/docs/**` | N→0 | 5 passed | 1 failed/1 passed | KORUNUYOR | — | (mevcut sabit-yol `toBeTruthy()` yeterli) | legal (sahipsiz, aday) |
+| legal-en-leftover | `import.meta.glob('/src/views/legal/components/en/**')` → `/docs/**/*.{ts,tsx}` | N→0 | 1 passed | 1 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI (+ağırlaştırıcı: boş evren = daha ağır) | `Object.keys(SOURCES).length>4` + Türkçe-harf dedektör-sağlığı kanaryası | legal (sahipsiz) → **OPS devir önerisi** |
+| localized-route-ssot | `import.meta.glob('/src/**')` → `/docs/**/*.{ts,tsx}` | N→0 | 4 passed | 1 passed (izole) | FAIL-OPEN (ana iddia) | **PAKET KORUYOR** — komşu "INFRA_ALLOWLIST bayat değil" testi paket düzeyinde kırmızı veriyor; ana iddianın kendisi hâlâ eşiksiz | ana teste kendi `taranan.renderKatmani>250` kanaryası (komşu testin yan etkisine bel bağlanmasın) | URUN |
+| numeric-format-ssot | `/src/**/*.{ts,tsx}` → `/scripts/**/*.{ts,tsx}` | ~954→11 | 1 passed | 1 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI | `Object.keys(SOURCES).length>900` + `RAW_INTL_FORMAT` pozitif kanaryası | URUN (i18n) |
+| payment-integrity | `/src/**/*.{ts,tsx}` → `/scripts/**/*.{ts,tsx}` | ~954→11 | 6 passed | 6 failed | KORUNUYOR | — | (mevcut stale-guard yeterli) | ALTYAPI |
+| payment-money-move | `/supabase/functions/**/*.ts` → `/scripts/**/*.ts` | 44→11 | 8 passed | 2 failed/6 passed | KORUNUYOR | — | (mevcut `moneyMovers` + stale-guard yeterli) | ALTYAPI |
+| pricing-cache-invariants | `/src/**/*.{ts,tsx}` (SRC_SOURCES) → `/scripts/**/*.{ts,tsx}` | ~954→11 | 3 passed | 1 failed/2 passed | KORUNUYOR (dolaylı, zayıf) | **PAKET KORUYOR** — komşu "materialize elle-ezme" testi kırmızı veriyor; ana iddia (`offenders=[]`) tek başına eşiksiz | ana teste `Object.keys(SRC_SOURCES).length>900` eklensin | URUN (lib/pricing) |
+| pricing-fx-lock-contract | `/src/lib/services/*.ts` → `/scripts/db/migrations/*.ts` | 12→11 | 9 passed | 2 failed/7 passed | KORUNUYOR | — | (mevcut stale-guard yeterli) | ALTYAPI (fx, aday) |
+| pricing-fx-rate-single-resolver | `['/src/**/*.{ts,tsx}','/supabase/functions/**/*.ts']` → `['/scripts/**/*.{ts,tsx}','/scripts/**/*.ts']` | ~1000→11 | 5 passed | 3 failed/2 passed | KORUNUYOR | — | (mevcut `Object.keys(sources).toContain(RESOLVER_PATH)` yeterli) | ALTYAPI (fx, aday) |
+| pricing-money-append-only | `/supabase/migrations/**/*.sql` → `/scripts/db/**/*.sql` | 234→13 | 4 passed | 4 passed | FAIL-OPEN (eşik `>0` ayırt etmiyor) | FAIL-OPEN DOĞRULANDI | `entries.length>200` + `currency_rates` dosya-adı kanaryası | ALTYAPI |
+| pricing-segment-source | iki tam dosya yolu (joker yok) | uygulanamaz | 8 passed | — | YÜRÜMÜYOR | — | kök-yönlendirme kavramı bu kapıya uygulanamıyor; ayrı bir sınama yöntemi gerekir | ALTYAPI (fx/segment, aday) |
+| pricing-storefront-source | `/src/**/*.{ts,tsx}` → `/scripts/**/*.{ts,tsx}` | ~954→11 | 2 passed | 1 failed/1 passed | KORUNUYOR (dolaylı, zayıf) | **PAKET KORUYOR** — komşu "product.columns.ts bulunamadı" testi kırmızı veriyor; ana iddia tek başına eşiksiz | ana teste `Object.keys(SRC_SOURCES).length>900` + `musteriYuzeyiTaranan>500` eklensin | URUN (lib/pricing) |
+| quote-machine-ssot | `/src/**/*.{ts,tsx}` → `/supabase/**/*.{ts,tsx}` | 951→44 | 14 passed | 3 failed/11 passed | KORUNUYOR | — | (mevcut sabit-anahtar canary yeterli) | URUN (aday) |
+| render-price-surface | `/src/**/*.{ts,tsx}` → `/supabase/**/*.{ts,tsx}` | 951→44 | 4 passed | 3 failed/1 passed | KORUNUYOR | — | (mevcut stale-guard + `callsiteCount>0` yeterli) | URUN |
+| render-revalidation-contract | `/scripts/**/*.{...}` → `/docs/**/*.{...}` | 112→23 | 11 passed | 1 failed/10 passed | KORUNUYOR | — | (mevcut `scanned.length>5` + pozitif iddia yeterli) | URUN (rendering, aday) |
+| runtime-version-alignment | `.github/workflows` → `.` (proje kökü) | 4→4 | 11 passed | 2 failed/9 passed | KORUNUYOR | — | (mevcut "ÖLÇÜM YAPILDI" guard'ı yeterli) | ALTYAPI (CI, aday) |
+| stock-restore-evidence | `/src/**/*.{ts,tsx}` (appSources) → `/scripts/**/*.{ts,tsx}` | 951→11 | 5 passed | 6 passed | FAIL-OPEN | FAIL-OPEN DOĞRULANDI (+ağırlaştırıcı: `stockWriters` bugün zaten 0, bağımsız 695-dosya prob ile) | `Object.keys(productionSources).length>600` + çalışma kümesi 0 iken açık "VAKUM" ilanı (skip yerine) | ALTYAPI (karma) |
+| storefront-reflow-guards | `/src/views/*.tsx` → `/src/components/*.tsx` | 18→33 | 3 passed | 3 failed | KORUNUYOR | — | (mevcut `SOURCES[ABOUT]/[BRANDS]` stale-guard yeterli) | URUN |
+| tailwind-token-sinif-gecerliligi | `KOK/src` → `KOK/docs` | 951→0 | 3 passed | 3 passed | FAIL-OPEN (bilinen, PR #1064) | FAIL-OPEN DOĞRULANDI | `tsxDosyalari(KOK).length>900` | URUN — **PR #1064 ile kapanıyor** |
+| webhook-auth-fail-closed (R2) | scannedSources'ın `/src/**/*.{ts,tsx}` parçası → `/scripts/**/*.{ts,tsx}` (migrations/functions dokunulmadı) | src-parça 951→11 (migrations 234 dokunulmadı) | 9 passed | 3 passed (izole R2) | FAIL-OPEN (kısmi/zayıf) | FAIL-OPEN DOĞRULANDI (kısmi) | guard'ı üçe böl: `migrationCount>200` · `fnCount>40` · `srcCount>900` | ALTYAPI |
+
+---
+
+## 3. Çürütmenin düzelttikleri
+
+- **config-fail-closed** — sonnet'in "KOK → src/types, 6 passed" beyanı ölçümle uyuşmadı. Aynı
+  sabotaj birebir kurulunca (`HEALTHZ = join(KOK,'healthz','index.ts')`) test **1 failed** (ENOENT)
+  verdi — `HEALTHZ` sabiti `KOK`'tan türediği için kök kayınca paket kendiliğinden kırmızı oluyor.
+  Yalnız daha dar bir varyantta (tarama çağrısının kökü `HEALTHZ`'den bağımsız ayrıca değiştirilirse)
+  fail-open kalıyor — hüküm bu yüzden "ÇÜRÜDÜ" (tam FAIL-OPEN değil), ama dar bir delik hâlâ açık.
+- **stock-restore-evidence** — sonnet'in "951→11" evren sayısı kapının **yürüdüğü kümeyi** değil,
+  taranan-dosya sayısını ölçüyordu. Bağımsız bir prob (aynı `isOrderScopedStockWriter` yüklemi,
+  695 gerçek prod dosyası üzerinde) `stockWriters=0` verdi — yani kapının **çalışma kümesi**
+  sabotajsız hâlde de zaten sıfır. Sonnet'in "yan sayaç"ı kusuru olduğundan hafif gösteriyordu;
+  gerçekte invaryant bugün fiilen denetlenmiyor.
+- **3 "PAKET KORUYOR" kalemi** (localized-route-ssot, pricing-cache-invariants,
+  pricing-storefront-source) — sonnet üçünü de "FAIL-OPEN" / "KORUNUYOR ama zayıf" diye işaretledi
+  çünkü ana iddianın (`offenders===[]`) kendisi gerçekten eşiksiz. Ama tam dosya sabotajlı koşulunca
+  **aynı dosyadaki komşu bir test** (farklı amaçla yazılmış, aynı `SOURCES`/`SRC_SOURCES` değişkenini
+  ayrıca sabit bir yolla arayan bir stale-guard) paketi kırmızıya çekiyor — CI'ın gördüğü birim
+  dosyadır, yani doğru hüküm "paket koruyor, kapının KENDİSİ tek başına zayıf/ödünç korunuyor"tur.
+  Koruma **tasarlanmış değil**: o komşu test kaldırılır ya da ayrı bir değişkene taşınırsa üçü de
+  çıplak FAIL-OPEN'a düşer.
+
+---
+
+## 4. Sonnet'in sistematik hataları + yöntemin sınırı
+
+Altı sonnet ajanının ortak zaafı **kapıyı dosya değil assertion granülünde okumak** ve sabotajın
+kapının gerçekten yürüdüğü kümeye değip değmediğini ayrıca ölçmemekti:
+
+1. Aynı dosyadaki komşu bir testin sapmayı kırmızıya çevirmesi "tesadüfi yan etki" diye küçümsendi
+   (localized-route-ssot, pricing-cache-invariants, pricing-storefront-source) — oysa CI'ın gördüğü
+   birim dosyadır.
+2. `config-fail-closed`'da beyan edilen sabotaj hiç kurulmamış ya da yanlış kurulmuş görünüyor —
+   tek doğrulanamayan "6 passed" iddiası bu oldu.
+3. Evren sayısı olarak hep **taranan dosya sayısı** raporlandı, kapının **çalışma kümesi** değil —
+   `stock-restore-evidence`'ta bu fark kritikti.
+4. Sabotaj hedefi olarak sık sık `docs/` seçildi (0 adet `.ts/.tsx`) — bu "geçerli ama yanlış" değil
+   **boş evren** testidir; sonuç yine fail-open'ı kanıtlıyor ama daha ağır bir sınıf olduğu hâlde
+   ayrı işaretlenmedi.
+
+**Yöntemin sınırı:** bu 53 kapı `docs/audits/rec162-...md`'deki **vekil ölçüte** (ağaç yürüyor +
+"muhafız görünmüyor" grep deseni) göre seçilmiş bir **alt sınırdır** — evrendeki `163` konformans
+dosyasının **110'u bu turda hiç sınanmadı** (vekil onları "muhafızlı" saydığı için, ya da vekil
+onları görmedi: sabit dosya listesi, ayrı sayım değişkeni, fixture'lı kapı gibi yanlış-negatif
+kaynakları rec162'de açıkça not edilmişti). Yani 53/163 ölçüldü, 110/163 hâlâ aday bile değil.
+
+---
+
+## 5. Sahip başına iş listesi
+
+**URUN (29 kapı — ölçülen 15 FAIL-OPEN + PAKET KORUYOR 3'ün 2'si + KORUNUYOR geri kalanı):**
+3d-asset-validity, 3d-csp, 3d-model-recipe, 3d-procedural-env, 3d-single-canvas,
+category-metadata-i18n-ssot, category-name-ssot, i18n-key-resolution, numeric-format-ssot,
+tailwind-token-sinif-gecerliligi (**PR #1064 ile kapanıyor**), localized-route-ssot,
+pricing-cache-invariants, pricing-storefront-source, canonical-lang-segment, i18n-attribute-literals,
+i18n-locale-case, i18n-locale-compare, i18n-uppercase-proper-noun, auth-account-surface,
+auth-reset-chain, auth-session-security, home-hero-route-ssot, jsonld-fiyat-sizintisi,
+kart-yukleme-onceligi, lang-metadata-locale, quote-machine-ssot, render-price-surface,
+render-revalidation-contract, storefront-reflow-guards.
+
+**ALTYAPI (14 kapı):** config-fail-closed, pricing-money-append-only, stock-restore-evidence,
+webhook-auth-fail-closed (R2), csp-origin-coverage, githooks-integrity, invoice-ledger-contract,
+payment-integrity, payment-money-move, pricing-fx-lock-contract, pricing-fx-rate-single-resolver,
+pricing-segment-source (YÜRÜMÜYOR — ayrı sınama yöntemi gerekir), runtime-version-alignment,
+kvkk-request-ledger (legal ile karma).
+
+**OPS devir adayı (10 kapı, şu an sahipsiz — karar OPS'ta):**
+- **admin-mutate-real-write → URUN'a devir önerisi** (en ağır: no-op admin mutasyonu, kullanıcı
+  kaydettiğini sanır); aynı sahipsiz aile içindeki diğer 6 admin-* kapı
+  (admin-daypicker-classnames, admin-export-hygiene, admin-fx-lock-crud, admin-fx-lock-visibility,
+  admin-shell-invariants, admin-status-filter-domain) hepsi KORUNUYOR — bugün acil değil, ama
+  sahiplik netleşmeli.
+- **legal-en-leftover → OPS** (boş evrende yeşil kalan en ağır fail-open); aynı sahipsiz aile
+  (legal-consent-gate, legal-consent-analytics) KORUNUYOR durumda.
+
+---
+
+## Sayım satırı
+
+**53/53 · FAIL-OPEN DOĞRULANDI 15 · PAKET KORUYOR 3 · ÇÜRÜDÜ 1 · KORUNUYOR 33 · YÜRÜMÜYOR 1**
+**Sahip: URUN 29 · ALTYAPI 14 · sahipsiz (OPS devir bekliyor) 10** (7 admin-* + 3 legal/kvkk-*)
+
+
+---
 # FILE: docs\audits\registry-triyaj-2026-08-26.md
 
 # Registry Açık Kayıtlar — DEĞERLENDİRİLMİŞ Liste (2026-08-26)
@@ -3052,7 +14424,7 @@ PS-001→PS-046 kodlu **46 bulgu**, hepsi sorgu, görsel, NLM planı veya kaynak
 | 11 | T021-OR | Companion yaşam döngüsü kalıcı çözümü (otomatik commit) | companion-doc-standard.md'ye "periyodik commit-sweep" bölümü eklenmiş; bugün git status temiz (2 dosya, 95 değil). |
 | 12 | T021-VH | GA4 kurulumu + CSP | CSP script-src'de googletagmanager whitelist edilmiş + analytics.ts(gtag)+ConsentGatedAnalytics rıza-kapılı bileşeni mevcut. |
 | 13 | T023-VH | Kanonik SITE_URL — conformance bekçisi eksikliği | src/config/siteUrl.ts SSOT + src/__tests__/conformance/canonical-url-ssot.test.ts (INV-CANONICAL-1) tam istenen bekçiyi uyguluyor |
-| 14 | T031-VH | webhook secret rotasyonu | PR #584 (commit ba01937a) master'a merge, Vault taşıma+rotasyon penceresi canlı doğrulanmış. |
+| 14 | T031-VH | webhook secret rotasyonu | PR #584 (commit ba01937a) master'a merge, Vault taşıma+rotasyon penceresi canlı doğrulanmış. **DÜZELTME (OPS, 2026-09-06, REC-52):** bu satır yalnız KOD tarafını anlatır — rotasyon penceresi kodda çalışıyor (`route.ts` 234-237); **sır değeri DÖNMEDİ**, 5 elle adım Recep'te (commit mesajı ve `docs/plans/rec52-whsec-rotasyon-plani-2026-09-06.md` bunu söyler). "Yapılmış" = kod bitti, iş bitmedi; ALTYAPI ölçtü, terim karışıklığı. |
 | 15 | T055-VH | Fatura belgesi üretilmiyor (VUK) | supabase/migrations/20260820090000_order_invoices.sql + src/lib/services/orderInvoice.service.ts (T132-VH) gerçekten yazılmış. |
 | 16 | T058-VH | Kargo ops: takip no, delivered_at, idempotency | PR #554 (UI) + #563 (EDGE) merged; shipping-webhook'ta idempotent delivered_at guard mevcut. |
 | 17 | T063-VH | KVKK anonimleştirme + veri sahibi talep defteri | Commit ca537d87 (#564) merge, migration+RLS+conformance testi canlı; kalan sadece placeholder e-posta (iş dışı) |
@@ -3424,6 +14796,177 @@ Yeni bir sır türü eklemek için `scan.py` içindeki `SIGS` listesine
 
 İlişki: `docs/standards/edge-function-security-standard.md` ·
 `.claude/skills/venthub-20-eksen-denetimi/references/kapanmis-bulgular.md`
+
+
+---
+# FILE: docs\audits\sir-ekrana-basma-olayi-2026-09-04.md
+
+# Olay kaydı — sır değeri ekrana basıldı (2026-09-04, ALTYAPI)
+
+> **Bu dosya PAROLASIZDIR ve öyle kalacak.** Sızan değer burada, PR gövdelerinde, commit
+> mesajlarında ya da pano notlarında **yazılmadı**. Olayın kaydı, olayın tekrarı değildir.
+
+## Ne oldu
+
+REC-138 kapsamında yazdığım `anon-yazma-nobetcisi.mjs`'in **fail-closed** yolunu ölçüyordum:
+"`SUPABASE_DB_URL` yoksa nöbetçi kırmızı veriyor mu?" Bunu ölçmek için değişkenin boş mu
+dolu mu olduğunu görmek istedim ve şu kalıbı yazdım:
+
+```
+${VAR:+VAR (uzunluk ${#VAR})}${VAR:-YOK}
+```
+
+İkinci yarı hatalı: `${VAR:-YOK}`, değişken **dolu** olduğunda "YOK" basmaz — **değerin
+kendisini** basar. Yani boş/dolu ölçmek isterken prod veritabanı bağlantı dizesinin tamamı
+(host + kullanıcı + **parola**) komut çıktısına düştü.
+
+## Kapsam (ölçüldü, tahmin değil)
+
+| soru | cevap |
+|---|---|
+| repoya yazıldı mı? | **HAYIR** — commit yok, PR yok, takipli dosyada iz yok |
+| takipli dosyalarda gerçek dize var mı? | **HAYIR** — 3 dosyada bağlantı dizesi *deseni* var (`.env.example`, `ci.yml`, `.scripts/migrate.ps1`), gerçek host izi **0** |
+| dalımın commit'lerinde? | **0** |
+| scratchpad dosyalarımda gerçek dize? | **0** (3 dosyada yalnız placeholder deseni) |
+| nerede kaldı? | oturum çıktısı + yerel transkript (jsonl) |
+| yayıldı mı? | **HAYIR** — dışarıya giden hiçbir yüzeye (repo, PR, artifact) değmedi |
+
+**Sınıf bugünden eski:** OPS yerel transkriptleri taradı — benim oturumumda **2**, iki
+**ESKİ** oturumda **37** eşleşme. Yani bu tek seferlik bir dikkatsizlik değil, tekrar eden
+bir kalıp. Kapının gerekçesi budur.
+
+## Karar ve müdahale
+
+- **Recep kararı: parola DÖNDÜRÜLMEDİ.** Makine kendisinin, sızıntı sayılmadı, **kabul
+  edilen risk** olarak kayda geçti. (Benim önerim döndürmekti; karar sahibinin.)
+- **Yerel temizlik yapıldı** (OPS): transkriptlerdeki gerçek görünümlü bağlantı dizeleri
+  `[SIR-KALDIRILDI]` ile değiştirildi, yedekler silindi, kalan **0**.
+- **Kapı yazıldı** (bu işin asıl çıktısı) — aşağıda.
+
+## Kapı: INV-SIR-BASMA-1
+
+`.claude/hooks/sir-basan-kalip.cjs` — saf fonksiyon, `bash-write-guard.cjs`'den çağrılır.
+
+**Niçin yeni kanca değil:** yeni kanca kaydetmek `.claude/settings.json` düzenlemek demek,
+yani **config** — ve config'e ajan eli değmez. Bash komutlarını gören tek kayıtlı kanca
+`bash-write-guard`; `sensitive-path-guard` yalnız `Edit|Write|MultiEdit` matcher'ında ve
+`file_path` okuyor, komutu hiç görmüyor.
+
+**Ayırt edici, değişkenin ADI değil KULLANIM BİÇİMİ.** Aynı değişken güvenli de kullanılır:
+
+| biçim | karar | sebep |
+|---|---|---|
+| `${SIR:-YOK}` | ⛔ | dolu ise **değeri** basar (olayın kendisi) |
+| `${SIR-YOK}` | ⛔ | aynı |
+| `echo $SIR` | ⛔ | doğrudan basar |
+| `echo "${SIR:+$SIR}"` | ⛔ | varlık kalıbı ama içinde değeri basıyor |
+| `[ -z "${SIR:-}" ]` | ✅ | boş varsayılan — yaygın ve güvenli deyim |
+| `${#SIR}` | ✅ | yalnız uzunluk |
+| `${SIR:+VAR}` | ✅ | yalnız varlık bildirir |
+| `$NEXT_PUBLIC_*` | ✅ | tanımı gereği public (anon key prod bundle'ında zaten açık) |
+
+**Kapı ilk koşumunda kendi testini engelledi** — bu, kapının canlı olduğunun kanıtı. Aynı
+koşum bir **yanlış pozitif** de gösterdi (`${SIR:+VAR}` tehlikeli sayılıyordu) ve düzeltildi:
+meşru kullanımı reddeden bir kapı kısa sürede kapatılır ve hiçbir şey ölçmez.
+
+## Ölçümler
+
+birim 13/13 · konformans kolu 16/16 · kapı canlıda bir komutu **gerçekten reddetti**
+
+## Ders (cetvele giden hâli)
+
+**Bir sırrın boş mu dolu mu olduğunu ölçerken DEĞERİ değil OLGUYU bas.** Uzunluk
+(`${#VAR}`) ya da varlık (`${VAR:+VAR}`) yeterlidir; varsayılan-değer kalıbı (`${VAR:-...}`)
+ölçüm için **yanlış araçtır** ve dolu durumda tam tersini yapar.
+
+
+---
+# FILE: docs\audits\skill-envanteri-2026-09-05.md
+
+# Yetenek (skill) envanteri — KAL / KALDIR / ERİT — 2026-09-05
+
+**Kayıt:** REC-147 · **Şerit:** OPS · **Ölçüm:** `~/.claude/skills` (kullanıcı kapsamı, 31 dizin, 12,4 MB `du -sk`) + proje
+ağaçları `.claude/skills` (30) ve `.agent/skills` (34). Açıklamalar her yeteneğin kendi `SKILL.md` ön-bloğundan okundu;
+boyutlar `du -sk`. **Bu belge öneri listesidir; kaldırma Recep onayıyla uygulanır** (REC-147 adım 4).
+
+## 1 · Sınıflandırma ölçütü (cetvel yoktu — bu bölüm cetvelin ham maddesi)
+
+Bir yetenek üç sorudan geçer, sırayla; ilk "hayır" sınıfı belirler:
+
+| # | Soru | Hayır ise |
+|---|---|---|
+| 1 | **VentHub yönetimine hizmet ediyor mu?** (vitrin · katalog · belge · altyapı · ölçüm). Başka markanın kimliği, sosyal medya GIF'i, sanat üretimi → hayır. | **KALDIR** |
+| 2 | **Yaptığı şey bizde zaten kural olarak var mı, ya da bizim kararlarımızla çelişiyor mu?** (palet, yarıçap 0, gölge yok, `tokens.js` SSOT, görsel üretimi yok, R3F dışı 3D yok) | **KALDIR** (çelişki) ya da **ERİT** (yalnız kuralı alınır, motor alınmaz) |
+| 3 | **Bütünüyle, olduğu gibi kullanılır mı?** (belge dönüştürücü, referans kılavuzu, test aracı) | değilse **ERİT** |
+
+Ek kural: yeteneğin kendi "ne için değil" beyanı bizim aleyhimizeyse (taste-skill: "dashboards, data tables, multi-step
+product UI için değil") bütün olarak alınmaz.
+
+## 2 · 31 dış yetenek
+
+| Yetenek | Boyut | Ne yapar (kendi beyanı, kısaltılmış) | Sınıf | Gerekçe |
+|---|---|---|---|---|
+| design-dna | 89K | referans → 3 katlı JSON (token · stil · efekt), sonra üretim | **KAL (kısıtlı: Faz 1–2)** | Şema bugün sözleşme v1'in iskeleti oldu; Faz 3 üretim kullanılmaz (kural 8: tokens.js SSOT) |
+| pdf | 85K | PDF okuma/birleştirme/metin çıkarımı | **KAL** | Katalog PDF ölçümü (REC-146) + Kurumsal Belgeler provası |
+| xlsx | 1226K | tablo dosyası okuma/yazma/formül | **KAL** | İngestor CSV'leri, fiyat listeleri, teklif tabloları |
+| docx | 1272K | Word belgesi okuma/yazma | **KAL (düşük)** | Satınalma/teklif belgeleri için yedek yol; bugün iş yok |
+| webapp-testing | 36K | Playwright ile yerel uygulama testi, ekran görüntüsü, konsol | **KAL** | Hikâye sayfası doğrulaması 3 hâl (masaüstü · mobil · reduced-motion); playwright eklentisini tamamlar |
+| mcp-builder | 153K | MCP sunucusu yazım kılavuzu | **KAL** | Orion MCP geliştirmesi (orion kapsamı = VentHub yönetimi) |
+| claude-api | 1340K | Claude API/SDK referansı (model, fiyat, araç kullanımı) | **KAL** | Companion taşıyıcısı Haiku (REC-67), API çağıran betikler |
+| web-artifacts-builder | 56K | React+Tailwind+shadcn ile çok bileşenli artifact | **KAL (düşük)** | OPS rapor sayfaları; vitrin kodu için DEĞİL |
+| scroll-craft | 436K | kaydırma güdümlü sayfa: 8 gramer, imza hareketi, ≥4 cihaz ailesi, reduced-motion, 3 hâl doğrulama; kendi motoru + kie.ai video + ffmpeg | **ERİT** | Kurallar `venthub-hikaye-sayfasi`'na (§3); motor, video üretimi, "Nate'in hero tercihi" alınmaz |
+| taste-skill | 88K | üç düğme (VARIANCE · MOTION · DENSITY) + design read + anti-default listesi + audit-first | **ERİT** | Düğmeler (4 · 3 · 7) ve anti-default listesi alınır; kendi kütüphane seçimleri (Carbon, shadcn, motion/react) ve "next/font zorunlu" gibi kararlar bizim yığınla çakışır, alınmaz |
+| redesign-skill | 16K | mevcut siteyi denetler, "jenerik AI kalıbı" bulur, bozmadan yükseltir | **ERİT** | Denetim listesi Design gözden geçirme ölçütü olur; uygulama tarafı alınmaz |
+| soft-skill | 12K | "pahalı görünen" font/gölge/kart reçetesi | KALDIR | Gölge ve kart reçetesi sözleşmeyle (gölge yok, yarıçap 0) çelişir |
+| minimalist-skill | 8K | sıcak monokrom, pastel, bento | KALDIR | Palet kararı verildi (K2); yeniden seçilmez |
+| brutalist-skill | 12K | İsviçre tipografi + terminal estetiği | KALDIR | Tasarım dili kararı verildi; stil reçetesi |
+| stitch-skill | 24K | Google Stitch için DESIGN.md üretir | KALDIR | Stitch kullanılmıyor |
+| gpt-tasteskill | 8K | GSAP ScrollTrigger + Python rastgelelik + AIDA | KALDIR | GSAP yok (Framer Motion), rastgelelik vaat/ölçüm kültürüyle çelişir |
+| theme-factory | 154K | 10 hazır tema (Broadsheet vb.) | KALDIR | Kendi Design System'imiz yayında; hazır tema Broadsheet'i elle ezme dönemi bitti |
+| brand-guidelines | 16K | **Anthropic** marka renk/tipografisi | KALDIR | Yabancı marka; VentHub kimliği Marka Kılavuzu'nda |
+| brandkit | 20K | marka kiti **görsel üretimi** (board, logo sistemi) | KALDIR | Görsel üretim yeteneği yok (memory); logo seti Marka'da 28 SVG |
+| imagegen-frontend-web | 40K | bölüm başına görsel referans üretimi | KALDIR | Görsel üretim yok; referans Claude Design'da |
+| imagegen-frontend-mobile | 44K | mobil ekran görsel üretimi | KALDIR | aynı |
+| image-to-code-skill | 40K | önce görsel üret, sonra koda çevir (Codex) | KALDIR | Görsel üretim yok; koda çevirme Handoff ile |
+| canvas-design | 5692K | poster/sanat .png/.pdf | KALDIR | Sanat üretimi; en büyük dizin (5,7 MB) |
+| algorithmic-art | 64K | p5.js üretken sanat | KALDIR | Kapsam dışı |
+| slack-gif-creator | 57K | Slack GIF | KALDIR | Kapsam dışı |
+| pptx | 1270K | sunum dosyaları | KALDIR (şimdilik) | Pazarlama paketi (LinkedIn) gündeme gelince yeniden kurulur; bugün iş yok |
+| internal-comms | 36K | şirket-içi iletişim formatları (Anthropic'in) | KALDIR | Yabancı format |
+| doc-coauthoring | 16K | belge birlikte yazma akışı | KALDIR | Belge disiplinimiz cetvellerde; ek akış çakışır |
+| discernment-nudge | 24K | her cevaptan sonra "emin misin" dürtüsü | KALDIR | Ölçüm disiplini zaten kuralda; genel davranış eklentisi gürültü |
+| academy-guide | 20K | Claude Academy kurs önerisi | KALDIR | Kapsam dışı |
+| output-skill | 4K | kırpmayı yasaklar, tam çıktı zorlar | KALDIR | Genel davranış ezmesi; uzun çıktıyı dosyaya yazma kuralımız var |
+
+**Sayım:** KAL 8 (2 düşük) · ERİT 3 · KALDIR 20. KALDIR toplamı ≈ 7,4 MB / 12,4 MB. ERİT'lerin dosyası, kural
+`venthub-hikaye-sayfasi`'na geçince kaldırılır (üçü birden 540K).
+
+## 3 · Bizde kurulu olanlar (proje ağaçları) — yalnız ölçüm
+
+- Tasarımla ilgili 6 (`ui-ux-pro-max` 310 satır · `typography` 177 · `web-design-guidelines` 62 · `threejs-webgl-performance`
+  330 · `vercel-composition-patterns` 100 · `venthub-architecture` 78): **KAL**, VentHub'a bağlı. `ui-ux-pro-max`'in
+  palet/HSL bölümü sözleşme v1 ile **karşılaştırılmalı** (bayat değer riski) — bu, REC-147 fark belgesinin (URUN) yan çıktısı.
+- **Boşluk doğrulandı:** hareket · sayfa grameri · imza hareketi · brief düğmeleri · 3 hâl doğrulama hiçbirinde yok →
+  `venthub-hikaye-sayfasi` bu boşluğu doldurur (taslak: `docs/plans/venthub-hikaye-sayfasi-skill-taslak-2026-09-05.md`).
+- **Mükerrer adayı (ölçüm, karar değil):** `skills-creator` (iki ağaçta) ↔ `skill-creator` eklentisi. İki ağaç kasıtlı (CLAUDE.md),
+  silme önerilmez; içerik farkı ölçülmedi.
+- İki ağaç farkı 12 (REC-147 açıklamasında listeli) bu değerlendirmenin kapsamı dışı.
+
+## 4 · Cetvel taslağı — "Yetenek ekleme/çıkarma" (docs/standards adayı, Recep gözden geçirince taşınır)
+
+1. **Kapsam:** kullanıcı kapsamı (`~/.claude/skills`) depoya girmez (repo PUBLIC, üçüncü taraf kod). Proje ağaçları iki
+   (`.claude` · `.agent`), kasıtlı.
+2. **Ekleme:** §1 üç sorudan geçen yetenek eklenir; Linear kaydında KAYNAK (depo URL + commit) yazılır; ilk okuma
+   tablosu (ne yapar · bize · çakışma) zorunlu.
+3. **Çıkarma:** KALDIR listesi Recep onayıyla; kaldırma komutu Recep'in terminalinde (permissions.deny `rm -rf`) ya da
+   OPS `cmd /c rmdir` betiğiyle, önce liste, sonra sayım (dizin sayısı öncesi/sonrası).
+4. **Eritme:** dış yeteneğin **kuralı** VentHub yeteneğine yazılır, kaynağı satır başında anılır; **motoru/betikleri**
+   alınmaz. Eritilen dosya kaldırılır.
+5. **Yeniden başlatma:** yetenek değişimi yeni oturumda görünür (Recep 09-05 ölçtü); değişiklik günü pano notuyla duyurulur.
+6. **Tazelik:** her VentHub yeteneği başında `kaynak_updatedAt` (bağlı karar/sözleşme tarihi); sözleşme değişince
+   yetenek gözden geçirilir (bayatlık sinyaliyle aynı mantık).
+
+— OPS · 2026-09-05
 
 
 ---
@@ -6623,6 +18166,577 @@ Komut ve envanter hazır, kuru koşumu yapıldı; **yazım ayrı ve açık GO il
 
 
 ---
+# FILE: docs\audits\tasarim-kod-envanteri-2026-09-06.md
+
+# Tasarım → Kod Envanteri — 2026-09-06 (ölçüm, komutlarıyla)
+
+**Niçin:** Claude Design'daki VentHub Design System (10 bileşen) ile repo arasındaki boşluğu tek seferde ölçmek; `Tasarım → Kod Planı` (Linear, Vitrin 15A) ve REC-165 bu sayılara dayanır. Her sayı kendisini üreten komutla gelir (§6.1: sayı emirden emre kopyalanmaz). Yeniden ölçüm ancak PR sonrası bu komutlarla yapılır, elden değil.
+**Ölçen:** OPS Explore alt ajanı (salt okuma), master `261124b4` civarı, 2026-09-06 ~15:20Z. Yeniden koşum: `bash docs/audits/tasarim-kod-envanteri-2026-09-06.md` içindeki komutlar (kök dizinden).
+
+## 1 · DS bileşenlerinin repo karşılığı
+
+| DS bileşeni | Repo karşılığı | Ölçüm |
+|---|---|---|
+| KabukBandi | `src/components/StickyHeader.tsx` (351) · `Footer.tsx` (196) · `navigation/HeaderTeklifPaneli.tsx` (106) · `navigation/MobilAltSekmeCubugu.tsx` (356) · `layout/MainLayout.tsx` | var, **bayrakla kapalı** |
+| CerceveliDugme · AnaEylemDugmesi | ortak `Button` primitifi **0**; özel: `navigation/NavActionButton.tsx` (83), `quotes/QuoteRequestButton.tsx` (77), `BackToTopButton.tsx`, `home/ClientLeadButton.tsx` | yok |
+| Kart | ortak `Card` **0**; özel: `ProductCard.tsx` (217), `products/FamilyCard.tsx` (158), `calculators/ResultCard.tsx` (177), `admin/dashboard/StatCard.tsx` (149), `TiltCard.tsx` | yok |
+| Cip | `*Chip*` dosyası **0**; rozet: `admin/products/ProductHealthBadge.tsx`; faset: `admin/data-table/FacetedFilter.tsx` (100), vitrin `category/CategoryFilters.tsx` (118) | yok |
+| TeknikTablo · KarsilastirmaTablosu | `admin/data-table/DataTableKit.tsx` (349, admin'e kilitli); vitrin spec tablosu `src/app/_components/ProductDetailPageView.tsx` 971–1000 **inline**, `<table>` yok, "anlam" sütunu yok; karşılaştırma `category/sections/TypeComparison.tsx` (217) grid kart | yok |
+| AdetKontrolu | dosya **0**; tek uygulama `src/views/CartPage.tsx:127-142` inline | yok |
+| KatliCagriSatiri | bileşen **0**; ad-hoc `aria-expanded` **14 dosya** | yok |
+| PQEgrisi | vitrin SVG grafiği **0**; `recharts ^2.14.1` yalnız admin (`SalesChart.tsx` 138, `AbcPieChart.tsx` 111) | yok |
+
+```
+ls src/components/ui/                                   # 4 dosya: Pagination ScrollObserver Skeleton VentImage
+find src/components -name "*.tsx" | wc -l               # 221
+find src/components -name "*.md"  | wc -l               # 217 (sidecar)
+grep -rlc "aria-expanded" src --include=*.tsx | wc -l   # 14
+grep -rl "<table" src --include=*.tsx | wc -l           # 18 (14'ü admin)
+```
+
+## 2 · Kabuk bayrağı
+
+```
+grep -n "^export const" src/config/features.ts          # 2: UC_BOYUT_MUSTERI_YUZEYINDE=false (30) · YENI_KABUK_GEZINMESI=false (58)
+grep -rn "YENI_KABUK_GEZINMESI" src | wc -l             # 11 (StickyHeader 4 · MobilAltSekmeCubugu 2 · HeaderTeklifPaneli 2 · MainLayout 3)
+```
+`NEXT_PUBLIC_*` bayrağı yok; sabit seçimi dosyada gerekçeli. Kilit testleri: `header-teklif-paneli.test.ts` · `mobil-alt-sekme.test.ts` · `uc-boyut-musteri-yuzeyi.test.ts` (bayrağın `false` kaldığını kilitler).
+
+## 3 · Token kaynağı
+
+```
+wc -c src/index.css                                     # 24221
+grep -c "^\s*--[a-z0-9-]*:" src/index.css               # 101 tanım (57 benzersiz ad; :root 283, ikinci :root 528, admin tema 407/434)
+grep -n "marka-" tailwind.config.js | wc -l             # 0  ← 4 marka tokeni Tailwind'e bağlı DEĞİL
+grep -rn "var(--marka" src | wc -l                      # 0  ← kodda kullanım YOK
+grep -rn "brand-cyan-ink\|action-terracotta-deep" src/index.css | wc -l   # 0 (PR #1043 ile geliyor)
+```
+`:root`: `--marka-lacivert` #1A2B4A · `--marka-turkuaz` #0088B0 · `--marka-kiremit` #D95D0E · `--marka-amber` #F59E0B · 6 `--surface-*` · `--brand-cyan` · `--primary-navy` · `--secondary-blue` · … ; `--border-*` 0, `--text-*` yalnız `--text-primary`.
+`tailwind.config.js`: 16 vitrin + 23 admin = 39 HSL eşlemesi + 4 sabit HEX (`success-green`, `warning-orange`, `gold-accent`, `silver-accent`).
+`src/design-system/tokens.js` (315 satır): 14 export (zIndex, maxWidth, borderRadius, fontSize, boxShadow, height, minHeight, maxHeight, width, minWidth, transitionDuration, transitionTimingFunction, blur, transitionProperty) — **renk yok** (kural 8: renk index.css'te). Yarıçap ölçeği 6–48 px; **0 px girdisi yok**.
+
+## 4 · Kural borcu (yarıçap 0 · gölge yok · kiremit tek ana eylem)
+
+```
+grep -ro "bg-primary-navy" src --include=*.tsx --include=*.ts | wc -l   # 153 (73 dosya; en yoğun ProductDetailPageView 9)
+grep -ro "rounded-[a-z0-9]*" src --include=*.tsx | wc -l                 # 1527 (246 dosya; rounded-admin 383 · full 357 · lg 270 · xl 183 · 2xl 165 · hvac* 72 · md 37 · 3xl 29 · none 1)
+grep -ro "shadow-[a-z0-9]*" src --include=*.tsx | wc -l                  # 555 (164 dosya; sm 177 · admin 89 · 2xl 44 · lg 39 · md 34 · xl 33 · hvac 23 · glow 10 · elevation-* 8)
+```
+Not: admin sayıları dahildir (admin kendi tasarım cetvelinde, `admin-design-standard.md`); vitrin payı Faz 5 mandalında ayrı sayılır.
+
+## 5 · Katalog / kapı
+
+```
+ls .storybook .ladle 2>/dev/null; grep -c "storybook\|ladle" package.json   # yok / 0
+ls docs/standards | wc -l                                                   # 66 (tasarımla ilgili 5: storefront-design, admin-design, marka-token-eslemesi, tasarim-yetenek, erp-workspace-design)
+ls src/__tests__/conformance | wc -l                                        # 186 (tasarım/token: tailwind-token-sinif-gecerliligi · marka-palet-tokenlari INV-PALET-1)
+```
+
+## Özet boşluk (sayıyla)
+10 DS bileşeninin **0**'ı repoda; en yakın 6 desen 221 bileşene dağılmış inline Tailwind. Kabuk bandı yazılmış, `YENI_KABUK_GEZINMESI=false`. Marka paleti tanımlı ama Tailwind'e bağlı değil, 0 kullanım. Yarıçap-0 hedefine karşı 1.527, gölgesizliğe karşı 555, kiremit-tek-eylem hedefine karşı 153 aykırı kullanım. Bileşen kataloğu yok.
+
+**Sonraki ölçüm:** REC-165 Faz 2 PR'ından sonra aynı komutlar; sayılar bu dosyaya yeni tarihli bölüm olarak eklenir (elden yeniden sayım yok).
+
+
+---
+# FILE: docs\audits\tasarim-sozlesmesi-fark-2026-09-05.md
+
+# Tasarım Sözleşmesi ↔ Token Katmanı FARK BELGESİ (2026-09-05)
+
+> **Ne bu:** `docs/standards/storefront-design-standard.md` (cetvel) ile onun dayandığı
+> **değer SSOT'u** — `src/design-system/tokens.js` + `tailwind.config.js` + `src/index.css` —
+> arasındaki farkın ölçümü. **KOD DEĞİŞMEDİ.** Bu belge bir denetim çıktısıdır, emir değildir.
+> REC-147 Adım 2 · URUN şeridi · ölçüm ağacı `C:/tmp/vh-urun-rec89`, taban `5a28855c`.
+>
+> **Kapsam:** storefront = `src/` **eksi admin** — ratchet kapısıyla **aynı** ölçüt
+> (`storefront-style-ratchet.test.ts`: `rel.startsWith('admin/') || rel.includes('/admin/')`).
+> Admin'in kendi cetveli ve kendi kapıları var; bu belge admin'e **hüküm vermez**, yalnız
+> aynı dosyada ölçtüğü admin sayılarını **olgu olarak** kaydeder (F1'de gerekli, çünkü tek
+> `.dark` bloğu ikisini birden ilgilendiriyor).
+
+---
+
+## 0. Ölçüm yöntemi (yeniden koşulabilir olsun diye)
+
+Cetvelin kendi dersi: *"ölçüm YÖNTEMİ yazılmamış bir baseline, sonraki ölçümü yanlış alarma
+çevirir"* (§5 dipnotu). O yüzden her sayının komutu burada.
+
+| Ne | Nasıl |
+|---|---|
+| Token kullanım sayısı | `git grep -oE "<desen>" -- "src/**/*.ts" "src/**/*.tsx" ":!src/**/admin/**" ":!src/**/*.test.ts*" \| wc -l` |
+| **Neden `-o`** | `grep -c` **satır** sayar, olay değil; aynı satırdaki iki isabet tek görünür |
+| Token envanteri | `tokens.js` / `tailwind.config.js` bloklarından anahtar çıkarımı (parantez sayarak, girinti tuzağına düşmeden) |
+| Tema kapsaması | `index.css` **tam** ayrıştırma: her `--değişken` tanımı, onu **içeren seçici bağlamıyla** birlikte |
+| Ratchet sayaçları | kapının kendi aracıyla: `pnpm vitest run …storefront-style-ratchet.test.ts` |
+
+⚠**İlk ölçümüm yanlıştı, düzeltildi.** Koyu tema bloğunu `\n\}` (sütun-0 kapanış) ile
+aradım; blok `@layer base` içinde **girintili** olduğu için evren yanlış çıktı ve
+"14/39 dönmüyor" gibi bir sayı verdi. Parantez sayarak yeniden ölçüldü: gerçek sayı **16/16**.
+Ölçüt keskindi, **evren** yanlıştı — bu belgedeki sayılar ikinci yöntemle alınmıştır.
+
+---
+
+## 1. ÖNCE İYİ HABER: kopuk referans YOK
+
+| Kontrol | Sonuç |
+|---|---|
+| `tailwind.config.js`'te `hsl(var(--x))` ile tanımlı renk tokeni | **39** |
+| Bunlardan `index.css`'te **tanımsız** olan | **0** |
+| Cetvelin §2.1/§2.4/§2.5/§2.8'de **adını verdiği** ölçek | hepsi mevcut (`max-w-page/content/modal/prose`, `rounded-hvac-*`, `text-display`, `elevation-1..5`, `duration-hvac-*`, `ease-hvac-*`, `tracking-hvac-*`, `leading-hvac-*`) |
+
+Yani cetvel **var olmayan bir token'a atıfta bulunmuyor** ve hiçbir Tailwind rengi boş
+değişkene bakmıyor. Fark, "eksik" değil **"fazlalık ve dayanaksız gerekçe"** ekseninde.
+
+---
+
+## 2. BULGULAR
+
+### F1 — ⛔**BU BULGUNUN ADMİN YARISI YANLIŞTI — DÜZELTİLDİ (2026-09-05, aynı gün)**
+
+> **Ne yanlıştı:** ilk sürümde «**Admin** renk tokeni / koyu temada yeniden tanımlı olmayan:
+> **23 / 23**» yazıyordu. **Bu YANLIŞ.** Admin teması çalışıyor; 23 tokenin **23'ü** koyu
+> karşılığa sahip.
+>
+> **Niçin yanlış çıktı — ölçütüm değil EVRENİM hatalıydı:** tarayıcım "koyu bağlam"ı
+> `\.dark`, `prefers-color-scheme: dark` ve `data-theme="dark"` diye **isim listesiyle**
+> arıyordu. Admin ise `[data-admin-theme='dark']` kullanıyor — listede yoktu, dolayısıyla
+> admin'in koyu bloğu **hiç görülmedi** ve "yok" diye raporlandı. Yani seçici adını
+> **VARSAYDIM**. Düzeltilmiş yöntem hiçbir ad varsaymaz: her `--değişken` tanımı, onu
+> içeren seçici bağlamıyla toplanır ve **birden çok bağlamda tanımlı olan** = "dönüyor".
+>
+> Hatayı Recep yakaladı ("koyu tema sadece admin panelde ve zaten çalışıyor"). Belge o an
+> master'a inmişti; **sessizce düzeltmek yerine** yanlış iddia burada adıyla duruyor.
+> → ders: [[olcut-keskin-ama-evren-yanlis]]
+
+**DÜZELTİLMİŞ ÖLÇÜM** (yöntem: seçici adı varsayılmadan, bağlam sayarak):
+
+| Katman | Renk tokeni | Teması DÖNÜYOR mu | Hangi seçicilerle |
+|---|---|---|---|
+| **Admin** | 23 | ✅ **23 / 23 DÖNÜYOR** | `[data-admin-theme]` ↔ `[data-admin-theme='dark']` |
+| **Vitrin** | 16 | ❌ koyu karşılık **yok** | `:root` · `.light` · `@media (prefers-contrast: more)` |
+
+**Vitrin tarafında ayrıca ölçülen — ULAŞILAMAZ CSS:**
+
+| Ölçüm | Sayı |
+|---|---|
+| `.light` bloğunda tanımlı değişken | **31** |
+| `.dark` bloğunda tanımlı değişken | **8** (hepsi `--sidebar-*`, shadcn kalıntısı) |
+| Vitrinde `light` sınıfını **uygulayan** yer | **0** (className **ve** `classList` ölçüldü) |
+| Vitrinde `dark` sınıfını **uygulayan** yer | **0** |
+| `prefers-contrast: more` altında dönen değişken | **2** (`--surface-deep`, `--steel-gray`) |
+
+Yani vitrinde 39 satırlık bir alternatif palet duruyor ve **hiçbir şey onu açmıyor**.
+
+**⭐KARAR (Recep, 2026-09-05): vitrinde koyu tema YAPILMAYACAK.** Koyu/aydınlık yalnız
+admin panelde kalır — orada zaten çalışıyor. Dolayısıyla bu bir "eksik iş" değil,
+**kapanmış bir konudur**; F1 artık bir borç kalemi değil, bir kayıttır.
+
+**Kararın cetvele etkisi:** §2.2'nin ham gri yasağı **duruyor**, ama yazılı gerekçesi
+(«tema dönüyor, ham gri dönmez») vitrin için doğru değil ve okuyucuyu yanıltıyor. Bu
+düzeltmeyle birlikte cetvelin gerekçesi de gerçek dayanağıyla değiştirildi (bkz. aynı
+PR'daki `storefront-design-standard.md` §2.2).
+
+---
+
+### F2 — Semantik dört renk **HEX** ile tanımlı (kural 8'in tam yasağı)
+
+`tailwind.config.js`:
+
+| Token | Değer | Vitrinde kullanım |
+|---|---|---|
+| `success-green` | `#10B981` | **40** |
+| `warning-orange` | `#F59E0B` | **18** |
+| `gold-accent` | `#D97706` | **4** |
+| `silver-accent` | `#9CA3AF` | **0** |
+
+**Fark:** CLAUDE.md **kural 8** ve cetvel §2.3 «HEX renk yasak — CSS custom property (HSL)»
+diyor. Yasak **tüketici koda** uygulanıyor (kapı orada bakıyor), ama **token katmanının
+kendisi** dört rengi HEX yazmış. Sonuç F1 ile birleşince somutlaşır: bu dördü, koyu tema
+yazıldığında **hiçbir koşulda** dönemez — çünkü arkalarında değişken yok.
+
+`silver-accent` **hiç** kullanılmıyor — vitrinde 0 **ve** `src/` genelinde 0 (admin dahil
+ölçüldü, "vitrinde yok" ile karıştırılmasın). Ölü token.
+
+**Önerim:** dördü de `hsl(var(--…))` biçimine alınsın; `silver-accent` silinsin. Değer aynı
+kalır, davranış değişmez, tema kapısı açılır. (Renk değeri değişmediği için görsel risk yok;
+yine de canlıda görünür sınıfa girer → K8.)
+
+---
+
+### F3 — Kaçak değerler **token dosyasına taşınmış** (kural 8'in etrafından dolanma)
+
+`tokens.js` → `maxWidth`: **14** anahtar. Cetvelde rolü olan **4** (`page`, `content`,
+`modal`, `prose`). Kalan **10**:
+
+`150px`, `140px`, `120px`, `200px`, `640px`, `92vw`, `90vw`, `55vh`, `280px`, `60%`
+
+Vitrindeki kullanım: `max-w-150px` 3, `max-w-120px` 3, `max-w-92vw` 1, `max-w-90vw` 1,
+`max-w-200px` 1, `max-w-55vh` 1, `max-w-280px` 1, `max-w-60%` 1 → **toplam 12**.
+
+⚠`140px` ve `640px` vitrinde **0** — ama «ölü» **DEĞİL**: `src/` genelinde her biri **3**
+kullanımda (admin tarafında). Önce "ölü" yazmıştım, kapsamı depo geneline genişletince
+düştü. Ders aynı: *vitrinde yok* ile *hiç yok* farklı iki iddiadır.
+
+Aynı sınıf, başka ölçeklerde: `fontSize`'ta `'7px'` (kullanım **1**), `letterSpacing`'te
+`'hvac-22'` = 0.22em (kullanım **1**).
+
+**Fark:** kural 8 `w-[92vw]` gibi **arbitrary** değeri yasaklar; kapı da onu arar. Aynı değer
+`maxWidth: { '92vw': '92vw' }` diye token dosyasına yazılınca `max-w-92vw` **meşru** olur ve
+kapı görmez. Yasak lafzen sağlanıyor, **amacı** sağlanmıyor: ölçek disiplini yok, tek-kullanımlık
+ölçü token adı almış. Bu, INV-9'un "keyfî `w/h/text/gap-[...]` ≤ 6" sayacının **neden bu kadar
+düşük kalabildiğini** de açıklıyor.
+
+**Önerim:** yeni kaçak değer eklenmesini engelleyen bir kol (token adı **saf sayı/birim**
+olamaz: `^\d`, `vw|vh|%` ile biten ad) — mevcut 12 kullanım ratchet borcu olarak sabitlenir,
+geçmiş cezalandırılmaz. Kapı **ALTYAPI ağacında** olduğu için yazımı bana ait değil; ölçüm burada.
+
+---
+
+### F4 — Cetvelde **adı geçmeyen** 14 gölge token'ı
+
+`tokens.js` → `boxShadow`: **43** anahtar.
+
+| Sınıf | Sayı | Örnek |
+|---|---|---|
+| Cetvelin §2.8'de adını verdiği önek (`elevation-*`, `hvac*`, `glow-*`) | **18** | `elevation-3`, `hvac-lg`, `glow-md` |
+| `admin-*` (başka cetvel) | **11** | `admin-overlay` |
+| **Cetvelde adı geçmeyen** | **14** | `mega-menu`, `mega-menu-viewport`, `login-btn`, `login-btn-hover`, `series-card-hover`, `drawer-left`, `white-glow{,-md,-lg}`, `access-denied-{black,rose}`, `glass`, `inset-deep`, `ring` |
+
+**Fark:** §2.8 «katman derinliği `elevation-1..5`; marka gölgeleri `hvac-*`/`glow-*`» diyor ve
+«yeni serbest `shadow-[...]` yasak — yeni ihtiyaç → tokens.js'e ekle» diye bir **kapı** bırakıyor.
+O kapıdan 14 **sayfaya-özel** gölge girmiş (bir düğme, bir çekmece, bir mega menü). Sonuç F3 ile
+aynı sınıf: yasak sağlanıyor, ölçek disiplini oluşmuyor. Bunlar "yanlış" değil — **rolsüz**.
+
+**Önerim:** §2.8'e üçüncü bir sınıf yazılsın: *bileşene-özel gölge* (adı bileşeni söyler,
+merdivenden bağımsızdır). Böylece 14'ü meşrulaşır **ve** sayılabilir hâle gelir; sınırsızlık
+"adsız" olmaktan çıkar.
+
+---
+
+### F5 — Token benimseme: dört eksende **legacy hâlâ önde**
+
+| Eksen | Token kullanımı | LEGACY sayaç (= INV-9 tavanı, bkz. not) |
+|---|---|---|
+| Konteyner | `max-w-page` **37** | `max-w-7xl` **49** |
+| Yarıçap | `rounded-hvac-{sm,md,lg,xl}` **37** (+ `2xl/3xl` **34**) | ham `rounded-xl/2xl/3xl` **375** |
+| Gri | (rol token'ları) | ham `slate-*`+`gray-*` **1464** |
+| Vurgu | — | ham `blue-*`+`indigo-*` **144** |
+| Ağırlık | — | display dışı `font-black` **120** |
+
+**LEGACY sayılar nasıl bilindi:** INV-9 **11/11 yeşil**. Kapının **çift yönlü** kilidi var —
+sayaç tavanı aşarsa da, tavanın **altına düşerse** de kırmızı yanıyor. Dolayısıyla yeşil
+koşum, her sayacın **tavana eşit** olduğu anlamına gelir. (Bu bir çıkarımdır; doğrudan sayım
+değil — ama kapının kendi aracıyla alınmıştır ve yöntemi burada yazılıdır.)
+
+**Ayrıca:** cetvel §5'teki özet tablo **bayat** — 08-18 tavanlarını gösteriyor
+(1508 / 391 / 148 / 133), bugünkü tavanlar **1464 / 375 / 144 / 120**. Cetvel bunu zaten
+kendisi söylüyor («tavanların otoritesi artık testtir, bu tablo değil»), yani **çelişki
+değil**; yine de sayıların tazelenmesi okuyucuyu yanıltmayı bitirir.
+
+---
+
+### F6 — `rounded-hvac-2xl/3xl`: rol tablosunda yok, kullanım **34**
+
+§2.4'ün rol tablosu `sm/md/lg/xl` diyor; satır sonunda «`rounded-hvac-xl` (32px) **ve üstü**»
+ifadesi 2xl/3xl'i **örtük** kapsıyor. Kullanım hatırı sayılır (**34**), dolayısıyla bu bir
+ihlal değil, **tablo eksiği**. Rol yazılırsa "hangi yüzey 40px ister" sorusu cevaplanmış olur.
+
+---
+
+## 3. ÖZET
+
+| # | Bulgu | Ağırlık | Kime ait |
+|---|---|---|---|
+| F1 | ⛔**admin yarısı YANLIŞTI, düzeltildi** — admin teması **23/23 ÇALIŞIYOR**; vitrinde koyu yok ve **Recep kararıyla yapılmayacak**; vitrindeki `.light`/`.dark` blokları (39 değişken) **ulaşılamaz** | Kayıt (borç değil) | kapandı — cetvel §2.2 gerekçesi bu PR'da düzeltildi |
+| F2 | 4 semantik renk **HEX** (kural 8) — biri ölü | Orta | vitrin (K8: canlıda görünür) |
+| F3 | 10 kaçak `maxWidth` + `7px` + `hvac-22` token dosyasına taşınmış | Orta | kapı: ALTYAPI · ölçüm: URUN |
+| F4 | 14 gölge token'ı cetvelde **rolsüz** | Düşük | cetvel sahibi |
+| F5 | Legacy dört eksende önde; §5 özet tablosu bayat | Bilgi | göç dalgaları |
+| F6 | `rounded-hvac-2xl/3xl` rol tablosunda yok (kullanım 34) | Düşük | cetvel sahibi |
+| — | **Kopuk referans 0 / tanımsız değişken 0** | ✅ | — |
+
+**Bu belge kod değiştirmedi, karar vermedi.** F1 ve F2 canlıda görünür sınıfa girdiği için
+uygulama **Recep'in önizleme onayına** bağlıdır (K8). F3'ün kapısı ALTYAPI ağacındadır.
+
+---
+
+## 4. Bu belgenin SINIRI (adıyla)
+
+- Ölçülenler **statik**: token tanımı, ad, sayım. «Sayfa gerçekten doğru görünüyor mu»
+  sorusuna **cevap vermez** — o, cetvel §4.2'nin (Playwright görsel katmanı) işidir ve
+  hâlâ yazılmamıştır.
+- «Rol doğru mu» (§2.3 vurgu hiyerarşisi, §2.5 tipografi rolü) **ölçülmedi**; cetvel §5.1
+  bu sınıfı zaten "ÖLÇÜLEMEZ-STATİK" diye adıyla işaretliyor. Bu belge o sınırı **aşmıyor**.
+- Admin sayıları yalnız F1'de, **olgu** olarak; admin hakkında hüküm bu belgenin işi değil.
+
+
+---
+# FILE: docs\audits\teknik-bosluk-2026-09-06.md
+
+# Teknik boşluk matrisi — hangi alan eksik, kim doldurabilir? (FAZ 1)
+
+**Şerit:** URUN-KATALOG (sid 3a7976a1) · **Tarih:** 2026-09-06 · **Durum:** SALT OKUMA; canlıya hiçbir şey yazılmadı.
+
+## KAYNAK / CETVEL
+
+* `docs/standards/product-schema-standard.md` — alan adı → anlam sözleşmesi.
+* `docs/standards/catalog-ingestion-standard.md` §6.3 — kaynak dizini; **PDF doğrudan taranmaz, dizin okunur**.
+* Emir: OPS → KATALOG, Recep girdisi *"teknik özellikler tamamlanmadı, markaların sitelerinden **kanıtlı** alalım"*. **YÖNTEM:** şerit, alt ajan yok. Sapma yok.
+
+---
+
+## 0 · Soru nasıl kuruldu (ve niçin böyle)
+
+"Üründe alan boş" tek başına bir şey söylemez: bazı alanlar o aile için **zaten anlamsızdır** — hız anahtarında debi aranmaz. Anlamlı soru şu:
+
+> Ailenin ürünlerinin **çoğunda dolu** olan bir alan, bazı kardeşlerinde **boş** mu?
+
+Çünkü o zaman alan o aile için **bekleniyor** demektir. Eşik (K13): bir alan ailenin ürünlerinin **≥%60**'ında doluysa beklenen sayılır; beklenen ama boş hücre = **BOŞLUK**.
+
+## 1 · Ölçüm
+
+| Ölçüt | Sayı |
+|---|---|
+| Canlı ürün | 375 |
+| Aile | 40 |
+| **Boşluk hücresi** | **74** |
+| — ailenin teknik PDF'i dizinde **var** (bizden çıkarım) | 0 |
+| — **web kaynağı gerekir** | **74** |
+
+**74 = 0 + 74**
+
+## 2 · ⛔EMİRDEN SAPMA — K13 tek başına YETMEZ, ikinci ölçüt eklendi
+
+Emir K13 eşiğini tarif etti (aile içi: ≥%60 dolu = beklenen, beklenen ama boş = boşluk). Uyguladım ve **kör noktası çıktı**:
+
+| Aile | Ort. dolu alan | K13 boşluğu |
+|---|---|---|
+| `danfoss-fc51` | **0.0** | **0** |
+| `avens-sulu-batarya` | **0.8** | **0** |
+| `nicotra-gebhardt-*` (4 aile) | **1.0** | **0** |
+
+Bir ailede alan **hiç kimsede** yoksa o alan "beklenen" sayılmaz ve boşluk doğmaz. Sonuç: **kataloğun en boş aileleri kusursuz görünür.** K13 tek başına yayımlansaydı rapor "sorun SEAT'te" derdi; oysa asıl sorun Nicotra'da — 35 üründe fiilen veri yok.
+
+**Sapma:** ikinci, bağımsız ölçüt eklendi — *aile yoksulluğu*: ailenin ortalama dolu alan sayısı, katalog ortancasının (**13**) yarısından az mı (eşik **6.5**). K13 *tutarsızlığı*, bu *yetersizliği* ölçer; ikisi farklı sorular ve biri ötekinin yerine geçmez.
+
+**Ölçülen: 12 yoksul aile, 71 ürün (18%).**
+
+| Aile | Marka | Ürün | Ort. dolu alan |
+|---|---|---|---|
+| `danfoss-fc51` | Danfoss | 2 | **0.0** |
+| `avens-sulu-batarya` | AVenS | 8 | **0.8** |
+| `avens-bvu-ls` | AVenS | 2 | **1.0** |
+| `avens-hiz-anahtarlari` | AVenS | 2 | **1.0** |
+| `nicotra-gebhardt-adh` | Nicotra Gebhardt | 8 | **1.0** |
+| `nicotra-gebhardt-at` | Nicotra Gebhardt | 8 | **1.0** |
+| `nicotra-gebhardt-dd` | Nicotra Gebhardt | 13 | **1.0** |
+| `nicotra-gebhardt-rdh` | Nicotra Gebhardt | 6 | **1.0** |
+| `avens-siginak-havalandirma-uniteleri` | AVenS | 3 | **2.0** |
+| `avens-hucreli-aspiratorler` | AVenS | 6 | **2.7** |
+| `avens-hucreli-hf-s` | AVenS | 7 | **4.0** |
+| `avens-elektrikli-isiticilar` | AVenS | 6 | **6.0** |
+
+**Karar için anlamı:** yoksul ailelerde kardeşlerden çıkarım YAPILAMAZ — alınacak bir şey yok. Bunlar doğrudan **web kaynağı** sınıfıdır.
+
+## 3 · Aile tablosu
+
+| Aile | Marka | Ürün | Ort. dolu alan | Beklenen alan | Boşluk hücresi | Kaynak sınıfı |
+|---|---|---|---|---|---|---|
+| `seat-serisi` | SEAT | 40 | 8.9 | 9 | 31 | **SADECE_FIYAT_LISTESI** |
+| `storm-serisi` | SEAT | 20 | 11.6 | 13 | 28 | **SADECE_FIYAT_LISTESI** |
+| `jet-serisi` | SEAT | 21 | 8.4 | 9 | 12 | **SADECE_FIYAT_LISTESI** |
+| `avens-hucreli-aspiratorler` | AVenS | 6 | 2.7 | 3 | 3 | **SADECE_FIYAT_LISTESI** |
+| `avens-bvu-ls` | AVenS | 2 | 1.0 | 1 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-elektrikli-isiticilar` | AVenS | 6 | 6.0 | 6 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-hiz-anahtarlari` | AVenS | 2 | 1.0 | 1 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-hucreli-hf-s` | AVenS | 7 | 4.0 | 4 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-isi-geri-kazanim` | AVenS | 3 | 7.0 | 7 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-plug-fanlar` | AVenS | 14 | 17.0 | 17 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-siginak-havalandirma-uniteleri` | AVenS | 3 | 2.0 | 2 | 0 | **SADECE_FIYAT_LISTESI** |
+| `avens-sulu-batarya` | AVenS | 8 | 0.8 | 0 | 0 | **SADECE_FIYAT_LISTESI** |
+| `danfoss-fc101` | Danfoss | 16 | 10.0 | 10 | 0 | **SADECE_FIYAT_LISTESI** |
+| `danfoss-fc102` | Danfoss | 17 | 10.0 | 10 | 0 | **SADECE_FIYAT_LISTESI** |
+| `danfoss-fc51` | Danfoss | 2 | 0.0 | 0 | 0 | **SADECE_FIYAT_LISTESI** |
+| `nicotra-gebhardt-adh` | Nicotra Gebhardt | 8 | 1.0 | 1 | 0 | **SADECE_FIYAT_LISTESI** |
+| `nicotra-gebhardt-at` | Nicotra Gebhardt | 8 | 1.0 | 1 | 0 | **SADECE_FIYAT_LISTESI** |
+| `nicotra-gebhardt-dd` | Nicotra Gebhardt | 13 | 1.0 | 1 | 0 | **SADECE_FIYAT_LISTESI** |
+| `nicotra-gebhardt-rdh` | Nicotra Gebhardt | 6 | 1.0 | 1 | 0 | **SADECE_FIYAT_LISTESI** |
+| `vortice-deumido-range` | Vortice | 3 | 16.0 | 16 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-h-ad-elektrikli` | Vortice | 4 | 20.0 | 20 | 0 | **SADECE_FIYAT_LISTESI** |
+| `vortice-hava-perdesi` | Vortice | 4 | 19.0 | 19 | 0 | **SADECE_FIYAT_LISTESI** |
+| `vortice-isi-geri-kazanim` | Vortice | 5 | 20.2 | 20 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-lineo` | Vortice | 7 | 21.0 | 21 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-lineo-quiet` | Vortice | 12 | 23.0 | 23 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-punto-evo-flexo` | Vortice | 4 | 23.0 | 23 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-radon-range-circular` | Vortice | 5 | 21.0 | 21 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-radon-range-roof` | Vortice | 3 | 22.0 | 22 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-commercial-in-line-circular` | Vortice | 7 | 21.0 | 21 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-commercial-in-line-rectangular` | Vortice | 5 | 18.0 | 18 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-e-atex` | Vortice | 14 | 22.0 | 22 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-heatmaster-slimroof-roof` | Vortice | 10 | 17.0 | 17 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-heatmaster-slimroof-smoke` | Vortice | 10 | 19.0 | 19 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-industrial-ventilation-axial` | Vortice | 16 | 21.0 | 21 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-industrial-ventilation-roof` | Vortice | 1 | 22.0 | 22 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-mono` | Vortice | 8 | 20.0 | 20 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-nordik-hvls` | Vortice | 7 | 15.0 | 15 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-qbk-sal-kc-evo` | Vortice | 21 | 21.0 | 21 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vort-quadro-evo` | Vortice | 23 | 17.0 | 17 | 0 | **PDF_TEKNIK_VAR** |
+| `vortice-vortice-bravo-s` | Vortice | 4 | 13.0 | 13 | 0 | **PDF_TEKNIK_VAR** |
+
+## 4 · Boşluk sınıfı ne demek
+
+| Sınıf | Anlamı | Kimin işi |
+|---|---|---|
+| `PDF_TEKNIK_VAR` | ailenin **teknik** kaynağı dizinde duruyor | bizden çıkarım yeter |
+| `SADECE_FIYAT_LISTESI` | tek kaynağı AVenS fiyat listesi — orada **spec yok** | web kaynağı gerekir |
+| `KAYNAK_YOK` | dizinde hiçbir kaynağı yok | web kaynağı gerekir |
+
+⚠**Sınıf bir VEKİLDİR, kanıt değil.** "Ailenin teknik PDF'i var" demek "o değer o PDF'te yazıyor" demek **değildir**; iddia "bakılacak bir yer var"dır. Ters yön güçlü: kaynağı **yoksa** bizden çıkarım mümkün değildir.
+
+## 5 · OPS'un "alan adı ikiliği" sorusu — ÖNCÜLÜ YANLIŞ
+
+Soru şöyle geldi: *"`max_delivery_m3h` 243 vs `nominal_delivery_m3h` 89 — hangisi kanonik?"* **İkisi de kanonik; mükerrer değiller.** `product-schema-standard.md` "Ön ek → anlam" tablosu bunu açıkça ayırıyor:
+
+| Ön ek | Anlamı |
+|---|---|
+| `max_…` | üreticinin verdiği çalışma aralığının **üst sınırı** (serbest hava) |
+| `nominal_…` | eğri üzerinde **belirli bir çalışma noktası** (devir + karşı basınç) |
+
+Cetvel ayrıca **yasak** koyuyor: *"Nominal noktayı `max_` alanına yazmak yasak."* Gerekçesi ölçülmüş (2026-08-21, SEAT föyleri): nominal değeri `max_` alanına yazmak **birim hatasını kapatırken semantik hata üretiyordu**. Yani ikisini birleştirmek düzeltme değil, **bozma** olurdu.
+
+## 6 · FAZ 2 arama listesi — ajanlar koddan başlasın
+
+Yoksul ailelerin **model kodları**. Arama bunlarla başlar; kod üreticinin kendi kataloğunda birebir geçer ve marka adıyla arama yapmaktan çok daha kesindir.
+
+⚠**Marka sitesi adayı UYDURMUYORUM.** Doğrulamadığım bir adresi rapora koymak, bütün bu hattın kurulma sebebine aykırı olurdu: uydurulmuş bir kaynak, kaynaksızlıktan daha tehlikelidir çünkü kanıtlıymış gibi görünür. Aşağıdaki yönlendirme **ölçülmüş** kayıtlardan geliyor ve her satır kaynağını ve sınırını taşıyor.
+
+### 6.0 · Kaynak yönlendirmesi — üç marka, üç farklı yol
+
+ÜRÜN şeridinin **2026-08-21 tarihli ölçülmüş marka-kaynak haritası** (`brand-image-sources.md`) planımdaki bir varsayımı çürüttü; kendi kayıtlarımızla doğruladım (`catalog-ingestion-standard.md` satır 94: *"avens/ — AVenS kendi üretimi"*; K7.10'da iki AVenS ailesi zaten Recep'ten föy bekliyordu).
+
+| Marka | Ürün | Kaynak nerede | Kim getirir | Bilinen tuzak |
+|---|---|---|---|---|
+| **AVenS** | 34 | Bizim markamız. `avensair.com/kataloglar`'daki 24 katalog **Vortice + fiyat listesi**ydi (dizine alınan küme); AVenS föyleri orada görünmedi. Kaynak: Recep'in arşivi — ya da föy sitede varsa **linki** | **Recep** (link ya da PDF) | ajanı üretici sitesi aramaya gönderirsen 34 üründe sıfır sonuç alır ve bunu "bulunamadı" diye raporlar — üretici biziz |
+| **Nicotra Gebhardt** | 35 | `avensair.com/nicotra-gebhardt` (ÜRÜN 08-21: 28/35 eşleşti). Resmî sitenin **ürün sayfalarında** yalnız AT serisi görüldü — bu gözlem **Download-Center'ı (katalog/PDF yüzeyi) KAPSAMAZ**, orası ölçülmedi; Recep'in verdiği iki download adresi bu gözlemle **elenemez** | FAZ 2 ajanı (ya da Recep'in katalog PDF'i varsa o, daha iyi) | **koda değil MODEL TANIMLAYICIYA** eşle — sipariş kodu iki kaynakta farklı yazılıyor, 7 ürün kodla düştü; site araması sorgu başına sonuç sınırlıyor (1000 satır tavanının web kardeşi) |
+| **Danfoss** | 2 | `danfoss.com` FC-51 **ürün sayfası** (ÜRÜN 08-21, 33/34 sayımı o yüzeyde). Recep'in verdiği documentation merkezi ve `store.danfoss.com` **ayrı yüzeyler**, o sayımla elenmez | FAZ 2 ajanı | — |
+
+**Sınır (ÜRÜN'ün kendi ifadesiyle):** bu harita **görsel** kaynağı için çıkarıldı, teknik özellik için değil; bir sayfanın görseli taşıması teknik tabloyu da taşıdığını kanıtlamaz; ölçüm 16 gün önce. Yani "kaynak listesi" değil, **"aranacak yer + bilinen tuzaklar"**.
+
+**Bunun karar için anlamı:** 71 ürünün **34'ü (yaklaşık yarısı) web fazına hiç girmez.** O 34 için tek yol Recep'in AVenS föylerini teslim etmesi. FAZ 2 ajan kotası yalnız Nicotra + Danfoss'a (37 ürün) harcanmalı.
+
+**⭐Recep kararı (2026-09-06 gece):** *"AVenS'e odaklanmayın, diğerlerine bakın."* AVenS 34 ürün **park**; hedef Nicotra + Danfoss + SEAT (K13 boşlukları).
+
+### 6.1 · Recep'in verdiği başlangıç adresleri — ÖLÇÜLMEDİ, etiketli
+
+Aşağıdaki adresleri **Recep verdi** (2026-09-06 gece, compact öncesi). Ben hiçbirini açmadım: HTTP durumu, PDF varlığı, içeriğin teknik tablo taşıyıp taşımadığı **doğrulanmadı**. FAZ 2 ajanı için başlangıç noktası; kanıt değil. Ajan her birini indirir, sha256 alır, `KAYNAKLAR.md`'ye URL + sağlama yazar — o andan sonra kaynak olur.
+
+⚠ **SSOT bu liste DEĞİL:** Recep 2. ve 3. partiyi de verdi (toplam 37 tekil adres); tek kayıt OPS'un `docs/plans/rec172-kaynak-adresleri-2026-09-06.md` dosyasıdır (OPS hükmü 2026-09-06 15:1xZ). Aşağıdaki 1. parti satırları tarihçe olarak kalır; indirme KATALOG'da, çıkarım FAZ 2 iş akışında.
+
+**SEAT**
+
+- https://seat-ventilation.fr/en/pages/download-catalogs
+- https://seat-ventilation.com/pages/download-catalogs
+- https://seat-ventilation.com/collections/seat-30-series
+- https://seat-ventilation.com/collections/storm-series
+
+**Nicotra Gebhardt**
+
+- https://eu.nicotra-gebhardt.com/en/infocenter/downloadcenter/catalogues.html
+- https://www.nicotra-gebhardt.com/Resources/Download-Center
+
+**Danfoss**
+
+- https://www.danfoss.com/en/service-and-support/documentation/
+- https://store.danfoss.com/tr/tr/S%C3%BCr%C3%BCc%C3%BC/D%C3%BC%C5%9F%C3%BCk-Gerilim-S%C3%BCr%C3%BCc%C3%BCleri/VLT%C2%AE-Micro-Drive-FC-51/FC-051P22KT4E20HXBXCXXXSXXX/p/136N8941
+- https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-basic-drive-fc-101/
+- https://www.danfoss.com/en/products/dds/low-voltage-drives/vlt-drives/vlt-hvac-drive-fc-102/
+
+### `avens-bvu-ls` — AVenS · 2 ürün · ort. 1.0 alan
+
+```
+30110  30111
+```
+
+### `avens-elektrikli-isiticilar` — AVenS · 6 ürün · ort. 6.0 alan
+
+```
+13032  13033  13034  13037  13038  13039
+```
+
+### `avens-hiz-anahtarlari` — AVenS · 2 ürün · ort. 1.0 alan
+
+```
+01801  60006
+```
+
+### `avens-hucreli-aspiratorler` — AVenS · 6 ürün · ort. 2.7 alan
+
+```
+20100  20110  20120  20130  20140  20150
+```
+
+### `avens-hucreli-hf-s` — AVenS · 7 ürün · ort. 4.0 alan
+
+```
+20200  20210  20220  20230  20240  20250
+20260
+```
+
+### `avens-siginak-havalandirma-uniteleri` — AVenS · 3 ürün · ort. 2.0 alan
+
+```
+30100  30101  30102
+```
+
+### `avens-sulu-batarya` — AVenS · 8 ürün · ort. 0.8 alan
+
+```
+13050  13051  13052  13053  13054  13055
+13056  13057
+```
+
+### `danfoss-fc51` — Danfoss · 2 ürün · ort. 0.0 alan
+
+```
+80101  80141
+```
+
+### `nicotra-gebhardt-adh` — Nicotra Gebhardt · 8 ürün · ort. 1.0 alan
+
+```
+11942  11943  11947  11948  11949  11950
+11951  11956
+```
+
+### `nicotra-gebhardt-at` — Nicotra Gebhardt · 8 ürün · ort. 1.0 alan
+
+```
+11930  11931  11932  11933  11934  11935
+11938  11939
+```
+
+### `nicotra-gebhardt-dd` — Nicotra Gebhardt · 13 ürün · ort. 1.0 alan
+
+```
+11901  11902  11905  11907  11908  11909
+11910  11911  11912  11913  11916  11920
+11921
+```
+
+### `nicotra-gebhardt-rdh` — Nicotra Gebhardt · 6 ürün · ort. 1.0 alan
+
+```
+11960  11961  11962  11963  11964  11969
+```
+
+## 7 · Bu ölçümün kapatmadığı
+
+* Hangi web kaynağının **kullanılabilir** olduğu (üretici sitesinde PDF var mı) — FAZ 2.
+* `PDF_TEKNIK_VAR` sınıfındaki boşlukların **gerçekten** o PDF'te bulunup bulunmadığı — vekil, kanıt değil.
+* Eşiğin (%60) kendisi bir **seçim**; daha yüksek eşik daha az ama daha kesin boşluk verir. Değiştirilirse sayı değişir, bu yüzden eşik raporda yazılı.
+
+
+---
 # FILE: docs\audits\vibe-coding-20-madde-denetimi-2026-08-13.md
 
 # Vibe-Coding 20-Madde Meydan Okuma Denetimi — VentHub HVAC
@@ -7368,8 +19482,9 @@ Worker "geçti" dese de **diff'ten kendim doğrularım**, sonra tüm ağacı:
 
 > **Amaç:** Bu klasördeki ~40 plan/brief'in hangisi CANLI, hangisi BİTMİŞ tarihsel evrak — tek bakışta.
 > Kaynak: `docs/DURUM-TAKIP.md` panosu (anlatı SSOT). Yeni plan eklerken buraya satır ekle.
-> NLM ikizine yalnız **CANLI/REFERANS** satırındakiler gider (`.cc_docs.yaml standalone_files`);
-> bitmiş brief'ler bilinçli olarak yüklenmez (RAG'i geçmişe kilitler).
+> NLM **kod hafızası** ikizine (235043eb) yalnız **CANLI/REFERANS** satırındakiler gider (`.cc_docs.yaml standalone_files`);
+> **proje takip defterine** (a5f382a4) ise bu klasörün tamamı `docs/proje-takip/manifest.json` demet 03 ile gider
+> (kural 2026-09-06 kapsam denetimiyle netleşti: iki defter, iki kapsam; bitmiş brief'ler orada "tarihçe" olarak durur, karar SSOT'u Linear).
 
 ## 🟢 CANLI (aktif iş / güncel SSOT)
 
@@ -8174,6 +20289,82 @@ Onaylı flat CSV'yi okuyup DB'yi güncelleyen kod **yok.** Hat şu an CSV'de tı
 ---
 
 > 2026-06-20 · v1.0 · Bu hattın tek planı. Aşama durumları değiştikçe **burada** güncellenir (parça parça konuşma yerine).
+
+
+---
+# FILE: docs\plans\claude-mem-deneme-plani-2026-09-08.md
+
+# claude-mem deneme planı — tek şerit, iki hafta, ölçümle karar
+
+> **Durum:** PLAN (Recep "önerdiklerini de yap" dedi, 2026-09-08). Kurulum Recep'in
+> makinesinde yapılır; bu belge kurulum şartlarını, ölçüm kriterini ve geri alma yolunu sabitler.
+> **KAYNAK/CETVEL:** `execution-method-standard.md` (tekil araç denemesi) ·
+> `collaboration-protocol.md` (şerit izolasyonu) · **cetvel yok** "üçüncü-taraf hook katmanı
+> kabul ölçütü" için — bu plan o ölçütün ilk taslağıdır. **YÖNTEM:** elle, tek şerit.
+>
+> **KAYNAK:** thedotmack/claude-mem (46k★, README 2026-09-08 okundu). **ALINAN:** hiçbir şey
+> henüz — deneme. **BİZDEN:** kabul/red ölçütü, izolasyon, gizlilik şartı.
+
+## Ne yapıyor, bizde ne var
+
+claude-mem beş yaşam-döngüsü hook'u (SessionStart, UserPromptSubmit, PostToolUse, Stop,
+SessionEnd) ile her araç çağrısını yakalar, Agent SDK ile sıkıştırır, yerel SQLite + Chroma'ya
+yazar, sonraki oturuma "ilgili bağlam" enjekte eder. Bun + uv + yerel worker servisi ister.
+
+Bizim hafıza katmanı **küratörlü**: NotebookLM ikizi (milestone sync), `docs/` cetveller,
+Kararlar defteri (REC-*), eylem defteri hook'u, `hafiza-sorusu-yonlendirme` hook'u. Boşluk:
+**oturum-içi "ne denedim, ne çıktı"** bilgisi compact'la kayboluyor; defter elle yazılıyor ve
+bayatlıyor (`defter-bayatlik-olcumu` bugün 9 saat ölçtü).
+
+## Riskler (denemeden önce bilinen)
+
+1. **Hook çakışması:** aynı beş olayda bizim 8 hook'umuz var (session-board, board-brief,
+   hafiza-sorusu-yonlendirme, eylem-defteri, precompact-durum-kapisi, son-soz-gate…). Sıra ve
+   süre etkisi ölçülmeli; `statusMessage` gecikmesi 3 sn'yi geçerse red.
+2. **"Kod kazanır" bulanıklığı:** enjekte edilen özet CLAUDE.md/cetvelle çelişirse ajan hangisine
+   inanır? Kural: enjekte bağlam **ipucu**, cetvel **kanıt**. Bunu CLAUDE.md'ye yazmadan deneme
+   yapılmaz (tek satır, Recep onayı).
+3. **Gizlilik:** kurulum varsayılanı **hosted "claude-mem observer"** (e-posta ile giriş, 30 gün
+   ücretsiz). Repo public ama oturumlar iş verisi (fiyat, bayi, sipariş) içerir. **Şart:**
+   `npx claude-mem install --provider host` ya da `CLAUDE_MEM_ONLINE_OPTIN=false` — veri
+   makineden çıkmaz. Hosted mod **yasak**.
+4. **Maliyet:** her araç çağrısı Agent SDK ile sıkıştırma = token. Plan kotasından düşer
+   (`--provider host`). Haftalık kota etkisi ölçülür.
+5. **Windows:** README Windows notu var (npm PATH); Bun/uv otomatik kurulum. Recep'in makinesi
+   Windows — ilk gün "kuruldu mu" ölçümü.
+
+## Deneme düzeni
+
+- **Tek şerit:** yalnız Recep'in ana oturumu (ya da OPS). Diğer şeritler kurmaz — yanlış-pozitif
+  hook etkileşimi tek yerde görülsün.
+- **Süre:** 14 gün (2026-09-09 → 09-23).
+- **Sıfır noktası (kurulumdan önce ölç):** `defter-bayatlik` ortalaması (saat) · haftada kaç
+  "bunu konuşmuş muyduk" sorusu bağlamdan (ölçmeden) cevaplandı (`hafiza-sorusu-yonlendirme`
+  log'u) · oturum başına compact sayısı · 7 günlük kota kullanımı.
+
+## Kabul ölçütü (14. gün, OPS ölçer)
+
+| Ölçüt | Kabul | Red |
+|---|---|---|
+| Hook gecikmesi (UserPromptSubmit toplam) | < 2 sn | ≥ 3 sn |
+| "Hafıza sorusu" isabet: enjekte bağlam doğru kararı gösterdi | ≥ 3 ölçülmüş vaka | 0-1 |
+| Yanlış enjeksiyon: cetvelle çelişen özet ajanı yanılttı | 0 | ≥ 1 (kanıtlı) |
+| Kota | +%15'ten az | +%15'ten çok |
+| Veri dışarı çıktı mı (`~/.claude-mem/settings.json` provider) | host | başka |
+
+Üç "kabul" + sıfır "red" → tüm şeritlere yayılır (cetvel yazılır). Aksi → kaldırılır:
+`/plugin uninstall claude-mem`, `~/.claude-mem/` silinir, hook girdileri temizlenir; sonuç
+`docs/audits/claude-mem-deneme-2026-09-23.md`.
+
+## Recep'in yapacağı (kurulum günü)
+
+```powershell
+# varsayılan hosted DEĞİL — yerel sağlayıcı zorunlu
+npx claude-mem install --provider host
+# sonra Claude Code'u yeniden başlat; ~/.claude-mem/settings.json'da provider'ı doğrula
+```
+
+Kurulumdan sonra OPS'a "kuruldu, sıfır noktası şu" notu; 14. günde ölçüm OPS'ta.
 
 
 ---
@@ -9634,6 +21825,214 @@ sonrası **sıfır satırlık** bir işe indi.
 
 
 ---
+# FILE: docs\plans\kategori-gorsel-tedarik-2026-09-08.md
+
+# Kategori görseli tedarik planı (2026-09-08, URUN-KATALOG)
+
+**Niçin:** OPS istedi — *"16 boş kategori tedarik işi: kaynak planı (marka sitesi / katalog PDF
+görseli / üretim) ve süre tahmini yaz, Recep'e onunla gideceğim."*
+**Düzeltme:** sayı 16 değil **3** (+2 değişim). Gerekçe: `docs/audits/icerik-hatti-kategori-gorsel-2026-09-08.md` §DÜZELTME.
+**YÖNTEM:** elle (ölçüm + plan). Sapma yok.
+**CETVEL:** `docs/standards/product-image-standard.md` — **kategori görseli için kol YOK**; bu
+planın çıktısı cetvele bir bölüm eklemeyi de kapsar.
+
+---
+
+## 1. İş listesi — 5 kalem (16 değil)
+
+| # | kategori | ürün | marka | ne gerekiyor |
+|---|---|---|---|---|
+| 1 | `accessories` (ÜST, anasayfada) | 2 | AVenS | görsel YOK — tedarik |
+| 2 | `electric-duct-heaters` | 6 | AVenS | görsel YOK — tedarik |
+| 3 | `industrial-ceiling-fans` | 7 | Vortice | görsel YOK — tedarik |
+| 4 | `fans` (ÜST) | 355 | Nicotra | **değişim** — Recep: "sessiz fan resmi kullanılsın" (bugünkü: santrifüj fan) |
+| 5 | `air-curtains` (ÜST) | 8 | — | **değişim** — Recep: "arka planı kirli beyaz"; ayrıca tek yerel PNG'lerden biri |
+
+Kalan 13 boş kategori **pasif** (`is_active=false`) — vitrinde yok, görsel gerekmiyor.
+Aktifleşirlerse bu listeye girerler; **kapı bunu ölçmeli** (bugün ölçmüyor).
+
+## 2. Kaynak — ölçüldü, marka başına AYRI
+
+| kaynak | ölçüm | kimler için |
+|---|---|---|
+| **Vortice katalog PDF'leri** | **23 PDF · 8030 gömülü görsel**, bunların **490'ı ≥400×400**, en büyüğü **3350×4731** | kalem 3 |
+| **AVenS katalog PDF'i** | ⛔**HİÇ PDF YOK** (`venthub/markalar/avens/**` altında 0 PDF; yalnız `03-output` CSV'leri var) | kalem 1–2 → **tek yol marka sitesi** |
+| marka sitesi | araç mevcut: `scripts/media/avensair-avens-run.mjs` (kibar çekim), `upload-pilot-images.mjs` (yükleme) | kalem 1–2, 4–5 |
+| üretim (görsel oluşturma) | ⛔**yetenek YOK** — ne bende ne altyapıda | — |
+
+⭐**Yokluk iddiası iki kez ölçüldü:** ilk sayımda "AVenS'te 0 kullanılabilir görsel" çıktı; eşiksiz
+sayım sebebin **0 görsel değil 0 PDF** olduğunu gösterdi. Yokluğun sebebi yanlış okunursa plan da
+yanlış olurdu (PDF'ten çıkarmaya çalışırdık).
+
+## 3. Boşluk — kategori görselinin kendi yolu YOK
+
+- Kategori görseli bugün **bir ürünün fotoğrafına** işaret ediyor (`categories.image_url` → storage'daki ürün klasörü).
+- Bu üç kategorinin **ürünlerinde de görsel yok** → seçilecek bir şey yok; önce ÜRÜN görseli gelmeli.
+- 14 medya betiğinin hepsi **ürün** görseli içindir; kategori görseli yazan/denetleyen betik **yok**.
+- İki kategori yerel `/images/products/*.png` gösteriyor, 19'u storage → **kova sözleşmesi iki taşıyıcılı**, kanonik yazılı değil.
+
+## 4. Sıra ve süre — ölçülene dayalı, ölçülmeyen ölçülmemiş diye yazıldı
+
+| adım | iş | süre | dayanak |
+|---|---|---|---|
+| A | Vortice PDF'lerinden `industrial-ceiling-fans` (destratifikatör) görselini çıkar → 7 ürüne + kategoriye | **yarım gün** | kaynak elde, araç var, ölçüldü (490 görsel) |
+| B | AVenS sitesinde kalem 1–2 ürünlerinin görseli **var mı** — ölçüm | **1–2 saat** | ⚠**ÖLÇÜLMEDİ**; site içeriğini bilmiyorum |
+| C | B yeşilse: çekim + webp + yükleme (8 ürün) | yarım gün | araç var |
+| C′ | B kırmızıysa → **Recep kapısı**: görsel yoksa kategori görselsiz mi kalsın, başka kaynak mı | — | karar |
+| D | `fans` + `air-curtains` değişimi — hangi görsel? | — | ⛔**Recep seçer**, "sessiz fan" ve "temiz arka plan" ölçüt değil tercih |
+| E | Kova sözleşmesi tek kaynağa + kategori görseli konformans kolu | yarım gün | REC açılacak |
+
+**Toplam gerçekçi tahmin: 1,5–2 gün**, B adımının sonucuna bağlı. Merkezleme/orantı işi (Recep'in
+5. maddesi) bu plana **dahil değil** — A–E kapanmadan sıraya girmez.
+
+---
+
+## 6. ⛔B ADIMI KOŞULDU — SONUÇ KIRMIZI (07:0xZ, avensair.com)
+
+| aradığım | sitede | sonuç |
+|---|---|---|
+| **BVU-LS 1000 / 2000-3000** (kalem 1, `accessories`) | BVU 1000/2000/3000 var, **LS varyantı YOK** | ⛔bulunamadı |
+| **3–18 kW kanal tipi elektrikli ısıtıcı** (kalem 2) | yalnız *hava perdesi* alt kategorisi "Elektrikli Isıtıcılı" — **başka ürün** | ⛔bulunamadı |
+| sulu batarya (REC-282'nin doğru fotoğrafı) | **YOK** | ⛔bulunamadı |
+
+**Hüküm: AVenS tarafında görsel kaynağı yok — ne katalog PDF'i (0 dosya) ne marka sitesi.**
+Kalem 1–2 plandaki **C′ dalına** düşüyor: bu bir tedarik işi değil, **Recep kapısı**.
+
+Üçüncü satır REC-282'yi de etkiliyor: *"doğru sulu batarya fotoğrafı elde yok"* hükmü artık
+**iki bağımsız kaynakta** ölçülmüş durumda (ingestor + marka sitesi). Yanlış fotoğrafın yerine
+konacak bir şey yok; seçenek "kaldır" ya da "tedarikçiden iste".
+
+⭐**Yan bulgu — kaynağın kendisi eksik:** BVU-LS ve kW'lı elektrikli ısıtıcılar bizim katalogda
+var ama üreticinin kendi vitrininde yok. Bu, görselden önce **veri sorusu**: bu ürünler hâlâ
+üretimde mi, adları mı değişti? Cevap Recep'te ya da tedarikçide; ölçümle çözülmez.
+
+### Güncel sıra (B sonrası)
+
+| kalem | durum |
+|---|---|
+| 3 `industrial-ceiling-fans` | ✅ kaynak bulundu (NORDIK HVLS kataloğu s.7, 3052×2527), aday hazır |
+| 5 `air-curtains` | ✅ **tedarik gerekmiyor** — 8 ürünün 44 görseli storage'da; iş SEÇİM |
+| 4 `fans` | ✅ aday hazır (Punto/Quadro Evo, storage'da) — Recep seçer |
+| 1–2 AVenS | ⛔**tıkalı** — kaynak yok, Recep kapısı |
+
+**Revize tahmin: 3–4 saat** (kalem 3-4-5, karar gelir gelmez) + kalem 1-2 kararı beklemede.
+İlk tahmin 1,5–2 gündü; küçülmesinin sebebi hava perdesi görsellerinin zaten elde çıkması.
+
+## 5. Recep'e gidecek üç şey
+
+1. **Karar:** altı sulu batarya ürününün yanlış fotoğrafı (REC-282) — kaldır mı, bekle mi.
+2. **Karar:** `fans` ve `air-curtains` için hangi görsel — tercih, ölçüyle çözülmez.
+3. **Bilgi:** iş 16 değil 5 kalem; AVenS tarafında kaynak PDF yok, siteye bağlıyız.
+
+**Bu planda canlıya hiçbir yazım yapılmamıştır.**
+
+
+---
+# FILE: docs\plans\lansman-oncesi-dayaniklilik-plani-2026-09-08.md
+
+# Lansman öncesi dayanıklılık planı — 2026-09-08
+
+> **Durum:** PLAN (Recep: "sen istiyorsan yap", 2026-09-08). Kod değişikliği içermez; her madde ayrı
+> iş emri olur. **KAYNAK/CETVEL:** `execution-method-standard.md` (yöntem satırları) ·
+> `collaboration-protocol.md` (şerit) · `rendering-cache-standard.md` (sessiz arıza vakası) ·
+> `supabase-security` (RLS) · **cetvel yok** "dayanıklılık / olay yönetimi" için — bu plan o
+> cetvelin ilk taslağıdır; kabul edilirse `docs/standards/dayaniklilik-standard.md` olur.
+> **YÖNTEM:** plan elle; uygulama maddelerinde satır satır. Migration yok → plan-challenger
+> zorunlu değil, ama 3 ve 6 kod dokunduğu için emir açılırken koşulur.
+
+## Niçin bu plan
+
+2026-09-08 ölçümü (`git grep` + workflow listesi, tahmin değil):
+
+| Kalem | Durum | Kanıt |
+|---|---|---|
+| Yedekten geri dönüş tatbikatı | **YOK** | hiçbir belgede yok |
+| Sessiz arıza alarmı (iş sinyali) | **YOK** | Sentry yalnız hata görür; 2026-08-15 fiyat vakası hiçbir kapıya görünmedi |
+| Olay defteri (runbook) | **YOK** | bilgi Recep'te ve dağınık belgelerde |
+| Hız sınırı (Edge) | Kısmen | `_shared/rate_limit.ts`; yalnız apply-coupon, iyzico-payment, shipping-status |
+| Harici uptime izleme | YOK | `ssr-duman-alarmi.yml` var (SSR gövdesi), dışarıdan erişim izleme yok |
+| RLS DB-düzeyi testi | Kısmen | konformans testi kapsamı sayıyor; "bu kullanıcı bu satırı göremez" testi yok |
+| Bağımlılık taraması | Kısmen | `jules-security-audit.yml`; Dependabot yok |
+| Staging ortamı | Belirsiz | strix ve yük testi için ön koşul |
+| Dinamik pentest / yük testi / mutasyon testi | YOK | Stryker, k6, fast-check yok |
+| WAF | YOK | |
+
+**Sıralama ilkesi:** geri alınamazlık → sessizlik → tek operatör riski → saldırı yüzeyi → ölçüm araçları.
+
+## Maddeler (her biri bir iş emri)
+
+### 1. Yedekten geri dönüş tatbikatı — İLK
+- **Niçin ilk:** listedeki tek geri alınamaz arıza. "Supabase yedekliyor" varsayım; hiç ölçülmedi.
+- **Ne:** Supabase panelinde yedek/PITR durumunu oku → test projesine (ya da branch) geri yükle →
+  ürün sayısı (374 beklenen), fiyat satırı (1044), son 10 sipariş, RLS politikaları, Edge sırları
+  karşılaştır → süre ve adımları yaz.
+- **Çıktı:** `docs/audits/yedek-tatbikati-<tarih>.md`: RTO (kaç dakikada döneriz), RPO (kaç
+  dakikalık veri kaybı), takılan adımlar, tekrar aralığı (öneri: 3 ay).
+- **YÖNTEM:** elle, Recep + bir şerit; prod'a DOKUNMAZ. **Süre:** yarım gün.
+
+### 2. Sessiz arıza alarmı
+- **Niçin:** kod çalışırken iş durabiliyor (fiyat vakası). Sentry susar.
+- **Ne:** üç iş sinyali, tek cron (mevcut `*-cron.yml` deseni), eşik aşımında e-posta/WhatsApp
+  (Resend/Twilio zaten var): (a) 24 saatte sıfır sipariş ve sıfır teklif · (b) `display_price > 0`
+  ürün sayısı bir önceki güne göre %10+ düştü · (c) checkout 1. adıma gelen / 3. adıma geçen oranı
+  7 günlük ortalamanın yarısının altına indi. Eşikler ilk ay ölçülüp ayarlanır.
+- **Çıktı:** `supabase/functions/is-sinyali-alarmi` + workflow + `docs/standards/` alarm satırı.
+- **YÖNTEM:** tek şerit, plan-challenger (Edge kısıtı + tenant-scope), migration yoksa doğrudan PR.
+
+### 3. Olay defteri (runbook)
+- **Niçin:** tek operatör; gece ikide ödeme düşerse ilk beş dakika kimsede yazılı değil.
+- **Ne:** tek sayfa, senaryo başına 5-8 adım: ödeme düşük (İyzico) · sipariş takılı (webhook
+  gelmedi) · vitrin boş (ISR/önbellek) · admin açılmıyor · DB erişilemiyor · sır sızdı. Her
+  senaryoda: belirti → ilk kontrol (hangi log) → geçici çözüm → kalıcı çözüm → kimi ara.
+- **Çıktı:** `docs/standards/olay-defteri.md`; ilk tatbikat: bir senaryoyu masabaşı oyna, süre yaz.
+- **YÖNTEM:** elle; NotebookLM ikizine sync (milestone).
+
+### 4. Hız sınırını tüm Edge fonksiyonlarına yay
+- **Ne:** `_shared/rate_limit.ts` → kalan fonksiyonlar; kimlikli uçlarda kullanıcı, anonim
+  uçlarda IP anahtarı; eşikler fonksiyon başına tabloda.
+- **YÖNTEM:** **maestro** (aynı değişiklik çok hedefe) + `security-reviewer`.
+
+### 5. Harici uptime izleme
+- **Ne:** dışarıdan dakikada bir `/tr`, bir ürün sayfası, `/api/health` (yoksa eklenir); 2 ardışık
+  hata → alarm. Ücretsiz katman yeter (Vercel checks ya da bağımsız servis; karar Recep'in).
+- **YÖNTEM:** elle; 1 saat.
+
+### 6. RLS'in DB düzeyinde testi
+- **Ne:** pgTAP ya da `supabase test db`: her tenant-scoped tablo için "A kullanıcısı B'nin
+  satırını göremez/yazamaz" testi; CI'da koşar. Mevcut konformans testi kapsamı sayar, bu davranışı
+  ölçer.
+- **YÖNTEM:** tek şerit, plan-challenger ZORUNLU (test şeması migration ister).
+
+### 7. Staging + dinamik pentest (strix)
+- **Ön koşul:** staging (Vercel preview + Supabase branch, prod anahtarsız, test İyzico).
+- **Ne:** strix staging'e, Recep'in yazılı iziyle, `docs/audits/pentest-<tarih>.md`; bulgular
+  şiddetle emir olur. **Prod'a ASLA.** Lansmandan önce bir kez, sonra ödeme/auth değişimlerinde.
+- **YÖNTEM:** elle + security-reviewer; LLM token maliyeti önceden yazılır.
+
+### 8. Yük testi (k6, staging)
+- **Ne:** sepet/checkout ve kategori listeleme; hedef: 50 eşzamanlı kullanıcıda p95 < 2 sn,
+  hata 0. Sonuç ISR/önbellek cetveline geri beslenir.
+
+### 9. Test kalitesi ölçümü
+- **Ne:** Stryker ile fiyat motoru + durum makineleri (sipariş/iade) + `order-validate`; mutant
+  hayatta kalma oranı yazılır. fast-check ile "tutar sunucudan gelir", "durum geri gitmez"
+  özellikleri. 790 testin kaçının gerçek hata yakaladığı ilk kez ölçülür.
+
+### 10. Mekanizma budaması (üç ayda bir)
+- **Ne:** son 30 günde hiç tetiklenmeyen hook, hiç çağrılmayan skill, hiç okunmayan cetvel;
+  `task-observer` "sadeleştirme" gözlemleriyle birleştirilir; silme kararı Recep'in.
+- **Niçin:** 70 skill + 18 hook + pano; ekleme ölçülüyor, silme ölçülmüyor (2026-09-08 tespiti).
+
+## Kapsam dışı (bilinçli)
+WAF (lansman sonrası trafik ölçülünce) · hata ödül programı (staging + runbook olmadan erken) ·
+headroomlabs sıkıştırma (kayıplı) · claude-mem (ayrı deneme planı var).
+
+## Sonraki adım
+Recep onayı → 1 ve 3 doğrudan emir (kod yok) → 2, 4 emir + plan-challenger → 5 → 6-9 staging
+kurulunca. Her emirde KAYNAK/CETVEL bloğu bu belgeyi gösterir.
+
+
+---
 # FILE: docs\plans\product-schema-master-implementation-plan.md
 
 # VentHub HVAC — Revize Master Uygulama Planı v2.0 (Master Implementation Plan)
@@ -10069,6 +22468,415 @@ Bu 4 alan standarda dahil edilmeli:
 - **Format:** Diğer cetveller gibi Markdown, Türkçe
 - **Uzunluk:** 200-400 satır arası (pricing-standard referans: ~180 satır)
 - **Commit mesajı:** `docs(standard): product-schema-standard v1.0 — urun veritabani sema cetveli`
+
+
+---
+# FILE: docs\plans\rec-adres-agac-tek-yayin-2026-09-07.md
+
+# Adres şeması + kategori ağacı + nitelik katmanı — TEK YAYIN geçiş planı
+
+> **REC-191 · URUN · 2026-09-07**
+> **Bu belge PLAN'dır. Uygulama YOK, migration YOK, prod yazımı YOK, kod YOK.**
+> Uygulama Vitrin Faz 2'de, ayrı emirle ve Recep onayıyla koşar.
+
+**KAYNAK/CETVEL:** `Kararlar — SEO ve Yayın` (K3 kategori adres geçişi, K4 IndexNow) ·
+`Kararlar — Katalog ve Ürün Verisi` (K4 kategori verisi göçü) · REC-95 (nitelik katmanı) ·
+REC-135 (ağaç boşlukları) · `docs/standards/canonical-url-standard.md` ·
+`docs/plans/slug-localization-2026-08-10.md` §4 (segment göçünü kasten ertelemiş).
+**Ölçüm tazeliği:** canlı site + canlı DB, 2026-09-07 08:0x–08:5xZ. Her sayı bu belgede ölçümle
+işaretlidir; hatırlanan hiçbir sayı yok.
+
+---
+
+## 1. Niçin bu belge var
+
+Recep 2026-09-07'de `https://venthub.com.tr/tr/category/fanlar/asit-dayanikli-fanlar` adresini
+gösterip *"bu konunun kayıtları olmalı ve kararı da alınmıştı"* dedi. Haklıydı: karar yazılıydı
+(**K3**), ben belgeye bakmadan konuşmuştum.
+
+Kararı ararken asıl bulgu çıktı: **üç ayrı karar aynı adresleri değiştiriyor** ve hiçbiri
+diğerinden haberdar değil. Ayrı ayrı yayınlanırlarsa aynı sayfa üç kez adres değiştirir.
+
+| # | karar | ne der | adrese etkisi |
+|---|---|---|---|
+| K3 | Kararlar — SEO ve Yayın (2026-09-03, Recep) | `/category/` segmenti **kalkar**, kısa slug (`/tr/fanlar/korozyon-dayanimli`); eski adresler 301; hreflang + sitemap + GSC aynı yayında; **Vitrin Faz 2 ile**; ürün adresleri değişmez | 80 kategori adresi |
+| K4-Kat | Kararlar — Katalog (2026-09-03, Recep) | Ağaç 15A ağacına göçer; boş üst kategoriler + boş alt dallar temizlenir; **Sığınak üst kategori olur**; ürün atamaları 15A'ya göre | ağaç derinliği = adres derinliği |
+| REC-95 | (Backlog, karar 2026-08-27) | ATEX / mini aksiyel / asit dayanımlı **kategori değil**, niteliktir → rozet + filtre + vitrin sayfası | dal ağaçtan çıkar |
+
+**Hüküm (OPS 2026-09-07 kabul):** üçü **tek yayında** gider. Gerekçe ölçülebilir: her adres
+taşınması Google'da değer kaybı ve yeniden öğrenme süresi demektir; üç kez taşınan sayfa üç kez
+sarsılır ve bedel üç katına çıkar.
+
+---
+
+## 2. Bugünkü durum — ölçüm
+
+### 2.1 Büyüklük
+
+| ölçüm | değer | nasıl ölçüldü |
+|---|---|---|
+| site haritası toplam adres | **194** | `sitemap.xml`, `<loc>` sayımı |
+| kategori adresi | **80** | aynı, `/category/` içerenler |
+| ürün adresi | **80** | aynı, `/products/` içerenler (ilk yazımda 82 demiştim — çürütme düzeltti) |
+| taşınacak adres | **80** | ürün adresleri K3 gereği **değişmez** |
+| aktif kök kategori | **6** | canlı DB, `parent_id is null and is_active` |
+| pasif kök kategori | **7** (hepsi 0 ürün) | aynı |
+| alt dal | **24**, 7'si pasif ve 0 ürünlü | canlı DB |
+| kök slug ↔ mevcut sayfa adı çakışması | **0** | 23 TR slug × 13 rota adı karşılaştırması |
+
+### 2.2 ⚠ Bugün canlıda duran kusur — aynı sayfa iki adreste
+
+Site haritasındaki TR kategori adreslerinin **23'ü tek seviyeli, 17'si iki seviyeli**. Bu 17,
+tek seviyelilerin **aynısı**: her alt kategori hem `/tr/category/<alt>` hem
+`/tr/category/<üst>/<alt>` adresinden yayınlanıyor.
+
+Ölçüm (2026-09-07):
+
+```
+/tr/category/asit-dayanikli-fanlar          → 200 · canonical: .../asit-dayanikli-fanlar
+/tr/category/fanlar/asit-dayanikli-fanlar   → 200 · canonical: .../fanlar/asit-dayanikli-fanlar
+```
+
+**İki adres, aynı içerik, ve her biri KENDİNİ kanonik ilan ediyor.** İkisi de site haritasında.
+Google için bunlar iki ayrı sayfadır; aynı içeriği iki yerde gördüğünde hangisini göstereceğine
+kendi karar verir ve bağlantı değeri ikiye bölünür. **17 sayfa × 2 dil = 34 çift adres.**
+
+Bu, planın konusu değil **bugünün kusurudur**; geçiş bunu kendiliğinden çözer (tek şema, tek
+kanonik) ama geçiş Faz 2'ye kadar beklerse kusur da bekler. Ayrı ve küçük bir düzeltme olarak
+öne alınabilir → **§8 karar kalemi K-A**.
+
+#### ⚠ Çürütmenin düzeltmesi: iki adres aynı sayfa DEĞİL
+
+İlk yazımda "aynı içerik" dedim. Çürütme ölçtü ve **yanlış** çıktı: iki rota farklı metadata
+üretiyor ve **iki seviyeli olan sakat**:
+
+| | `/tr/category/<alt>` | `/tr/category/<üst>/<alt>` |
+|---|---|---|
+| `og:url` | **var** | **YOK** |
+| `CollectionPage` JSON-LD | **var** (2 eşleşme) | **YOK** (0) |
+| `ListItem` (kırıntı yolu) | 5 | 2 |
+
+Aynı asimetri `kanal-tipi-fanlar` ve EN karşılıklarında da ölçüldü.
+
+**Sonuç — §4 K-E önerisi tersine döndü.** İlk hâlde "iki seviyeli kalsın" önermiştim; ölçüm,
+hayatta bırakılması önerilen varyantın SEO bakımından **zayıf** olanı olduğunu söylüyor. Karar
+şu ikisinden biri olmalı: (a) tek seviyeli şema seçilir (zengin metadata zaten orada) ya da
+(b) iki seviyeli şema seçilirse **önce eksik metadata tamamlanır**, sonra geçiş yapılır. Eksik
+metadatayla geçmek, 17 sayfayı kalıcı olarak zayıf hâline sabitler.
+
+### 2.3 Yönlendirme zinciri
+
+`/category/fanlar` (dil öneksiz, eski adres) → **4 hop** → `/tr/category/fanlar` (200).
+
+Yeni geçişin 301'i bu zincirin **üstüne binerse** 5 hop olur. Google uzun zincirlerde değer
+aktarımını azaltır, belli bir noktadan sonra takibi bırakır. → **§5 zincir kuralı**.
+
+Doğru çalışan taraf: `/tr/category/fans` → 308 → `/tr/category/fanlar`. Yanlış dildeki slug
+doğrusuna gidiyor; dil bazlı çift içerik **yok**.
+
+### 2.4 Ağaç — hangi dal ne olacak
+
+| dal | üst | ürün | durum | geçişte |
+|---|---|---|---|---|
+| Sığınak Havalandırma Fanları | Fanlar | 3 | aktif | **üst kategoriye çıkar** (K4-Kat) |
+| **Asit Dayanımlı Fanlar** | Fanlar | **81** | aktif | **ağaçtan çıkar** (REC-95) — §2.5 |
+| Ex-Proof (ATEX) Fanlar | Fanlar | 0 | pasif | ağaçtan çıkar (REC-95) |
+| Otopark Jet Fanları · Jet Fans · Cam ve Pencere Tipi | Fanlar | 0 | pasif | hüküm REC-135 → Recep |
+| Dikdörtgen Kanal Tipi · İklimlendirme Çözümleri | Commercial Ventilation (pasif kök) | 0 | pasif | aynı |
+| Kanal İçi Hayalet Fanlar | Residential Ventilation (pasif kök) | 0 | pasif | aynı |
+| 7 pasif kök (Air Conditioning, Summer/Commercial/Residential Ventilation, Electric Heating, Hygiene, Smart Home) | — | 0 | pasif | arşiv/silme → Recep |
+| kalan 15 aktif dal | — | 30/31/36/83… | aktif | yalnız adresi değişir |
+
+### 2.5 ⭐ Asit Dayanımlı Fanlar — ölçüm REC-95'ten ileri gidiyor
+
+Canlı SELECT: bu dalın **81 ürününün tamamı SEAT markası**; SEAT markasının toplam ürün sayısı
+da 81 (`Kararlar — Katalog` K3). Yani bu dal bir nitelik bile değil — **bir markanın tüm
+ürünleri**, kategori kılığında.
+
+**Öneri (hüküm Recep'in):** dal kategori ağacından çıkar. 81 ürün gerçek kategorilerine dağılır
+(gövde tipine göre: santrifüj / aksiyel / kanal). "Asit dayanımlı" bir **nitelik** olarak
+işaretlenir (REC-95 katmanı) ve marka sayfası (`/tr/brands/seat`) zaten var olan yüzeydir.
+
+**Bu, planın en pahalı kalemidir** (81 ürünün yeniden atanması) ve **adres geçişinden ÖNCE
+bitmelidir** — sonra yapılırsa aynı 81 ürünün sayfası ikinci kez taşınır.
+
+#### ⚠ Çürütmenin düzeltmesi: bu öneri bugün UYGULANAMAZ
+
+İlk yazımda "81 ürün gerçek kategorilerine dağılır (gövde tipine göre)" dedim. Çürütme ölçtü:
+
+- **Dağıtacak veri yok.** `products` tablosunda `product_type` / `body_type` benzeri **hiçbir
+  alan yok**; `technical_specs` içinde de yalnız sayısal ölçüler var (faz, devir, gerilim,
+  ağırlık, çap, gürültü, güç, debi, basınç). Santrifüj / aksiyel / kanal ayrımı bu veriden
+  **türetilemez**.
+- **Dal saf değil.** İçinde `JET 30 ATEX`, `JET 20 ATEX`, `SEAT 20` birlikte duruyor — yani
+  jet fan + ATEX + SEAT serisi karışmış. "Bir markanın tüm ürünleri" tanımım eksikti; doğrusu
+  "bir markanın tüm ürünleri, üstelik kendi içinde birbirinden farklı üç şey".
+- **Bağ tek.** Ürünler dala yalnız `subcategory_id` ile bağlı; dal kaldırılırsa 81 ürün
+  **dalsız kalır**.
+
+**Sonuç:** bu adım "bir SQL cümlesi" değil, **81 satırın elle sınıflandırılması** demektir ve
+o iş Katalog şeridinin alanına girer. §3'e göre adres geçişinin ön koşulu olduğu için
+**bütün plan buraya kilitleniyor**. Uygulama emri bu maliyeti açıkça taşımalı; aksi hâlde
+"geçiş yakında" denip aylarca beklenir.
+
+---
+
+## 3. Sıra (değiştirilemez)
+
+1. **AĞAÇ KESİNLEŞİR** — K4-Kat göçü · REC-135 boş dal hükmü · asit-dayanıklı dalın hükmü ·
+   Sığınak'ın yükselmesi. Çıktı: **nihai kategori listesi** (kök + alt, her biri slug'lı).
+   Bu adım bitmeden 2'ye geçilmez; ağaç değişirse adres de değişir ve iş baştan başlar.
+2. **ADRES ŞEMASI — TEK YAYIN** — K3. Aşağıdaki §4–§7 bu adımı tarif eder.
+3. **NİTELİK / FASET KATMANI** — REC-95 fazları. Adres şeması oturduktan sonra; nitelik
+   sayfaları yeni şemaya göre doğar, eski şemaya göre doğup taşınmaz.
+
+---
+
+## 4. Hedef adres şeması
+
+K3'ün lafzı: `/tr/fanlar/korozyon-dayanimli`. Yani:
+
+| bugün | yarın |
+|---|---|
+| `/tr/category/fanlar` | `/tr/fanlar` |
+| `/tr/category/fanlar/kanal-tipi-fanlar` | `/tr/fanlar/kanal-tipi-fanlar` |
+| `/en/category/fans/duct-fans` | `/en/fans/duct-fans` |
+| `/tr/category/asit-dayanikli-fanlar` (tek seviyeli ikiz) | **kalkar** — §2.2 |
+| `/tr/products/<slug>` | **değişmez** (K3) |
+
+**Kararlar (uygulama emrinde kesinleşir, plan bunları işaret eder):**
+
+- **K-1 · Alt kategori tek seviyede mi yaşayacak?** K3 örneği iki seviye gösteriyor
+  (`/tr/fanlar/korozyon-dayanimli`). Bugünkü ikiz adreslerden **tek seviyeli olan kalkar**,
+  iki seviyeli kalır. Tersi de mümkün (daha kısa adres) ama üst-alt ilişkisini adresten siler
+  ve içerik hiyerarşisini zayıflatır. **Öneri: iki seviye kalsın.**
+- **K-2 · Dil öneki korunur.** `/tr` ve `/en` kalkmıyor; K3 yalnız `/category/` diyor.
+
+---
+
+## 5. Zincir kuralı — tek hop
+
+**Kural:** her eski adres, **tek 301 ile** son hâline gider. Yeni yönlendirme eski
+yönlendirmenin üstüne eklenmez; eski kuralların **hedefleri yeniden yazılır**.
+
+Somut: `next.config.mjs`'te bugün 13 eski Türkçe→İngilizce kategori yönlendirmesi var
+(`/category/fanlar` → `/category/fans`). Geçişte bunların hedefleri doğrudan yeni şemaya
+çevrilir, yeni bir katman eklenmez.
+
+### ⚠ Çürütmenin düzeltmesi: "≤ 1" ölçütü tutturulamaz
+
+İlk yazımda kabul ölçütünü `num_redirects ≤ 1` koymuştum. Çürütme bu 4 hop'un **nereden**
+geldiğini ölçtü ve ölçütün matematiksel olarak imkânsız olduğunu gösterdi:
+
+```
+/category/fanlar
+  308 → /category/fans/       next.config.mjs:64 — ':path*' BOŞKEN sondaki eğik çizgi kalıyor
+  308 → /category/fans        eğik çizgi normalizasyonu (çerçevenin kendi davranışı)
+  307 → /tr/category/fans     middleware dil enjeksiyonu — dosyanın kendi yorumu "deterministik
+                              değil" diyor, bu yüzden kalıcı yönlendirmeye çevrilemez
+  308 → /tr/category/fanlar   sayfanın slug yerelleştirmesi
+  200
+```
+
+`www` ile giriş bir hop daha ekliyor → **5 hop**.
+
+**Düzeltilmiş ölçüt (iki ayrı bütçe):**
+
+| adres sınıfı | bütçe | gerekçe |
+|---|---|---|
+| dil önekli adres (`/tr/...`, `/en/...`) | **≤ 1 hop** | tek katman bizim; tutturulabilir |
+| dil öneksiz eski adres (`/category/...`) | **≤ 3 hop** | dil enjeksiyonu + eğik çizgi normalizasyonu bizim kontrolümüzde değil |
+
+**Ve bugünden düzeltilebilecek bedava bir hop var:** `next.config.mjs:64-76`'daki 13 kuralın
+`:path*` deseni, yol boşken sonda eğik çizgi bırakıyor ve bu tek başına bir fazladan sıçrama
+üretiyor. Bu, geçişi beklemeden düzeltilebilir → **§8 karar kalemi K-G**.
+
+---
+
+## 6. Ad alanı çakışması — kapı gerekir
+
+Kategoriler kök seviyeye çıkınca `/tr/<kategori-slug>` ile `/tr/<sayfa-adı>` **aynı ad alanını**
+paylaşır. Bugün çakışma yok (ölçüldü: 23 slug × 13 rota adı). Ama yarın bir kategoriye
+`iletisim`, `markalar`, `sepet` gibi bir slug verilirse **sayfa gölgelenir** ve hiçbir test bunu
+görmez.
+
+**Gereken kapı (INV önerisi `INV-ADRES-CAKISMA-1`):** kategori slug'ı, uygulamadaki rota adları
+kümesiyle kesişemez. Kesişirse kırmızı. Kapı hem TR hem EN slug'ını ölçer, hem de rota listesini
+dosya sisteminden **türetir** (elle yazılmış liste bayatlar → evren muhafızı).
+
+#### ⚠ Çürütmenin düzeltmesi: sonuç doğru, evrenim dardı
+
+"Çakışma 0" sonucu doğrulandı — ama benim ölçtüğüm evren eksikti (23 slug). Gerçek evren
+**37 kategori × 2 dil = 74 slug**, ve rezerve adlar da 13 değil: `src/app/[lang]/` altındaki
+13 dizine ek olarak **`admin`** (middleware `/tr/admin*` → 308 `/admin*`), **`api`**, ve
+`next.config.mjs`'teki kendi yönlendirme kaynakları da aynı ad alanını tutuyor. Genişletilmiş
+evrende de kesişim **0** — yani sonucum doğruydu ama **şansla**; kapının evreni bu geniş
+listeyi almalı.
+
+**Çürütmenin bulduğu YENİ risk (planda yoktu):** hedef şemada `/[lang]/[kategori]` dinamik
+segmenti 13 statik kardeşin yanına gelir. Bugün `/tr/fanlar` **404** dönüyor (ölçüldü); yeni
+şemada **bilinen olmayan her `/tr/xyz` adresi** kategori sorgusuna girip öyle 404 olur. Yani
+her yazım hatası ve her bot taraması bir veritabanı sorgusu demektir. Uygulama emri bunun için
+ya bir kısa-devre listesi ya da önbellek öngörmeli.
+
+---
+
+## 7. SEO ölçütü ve yayın kontrol listesi
+
+### 7.1 Aynı yayında değişecek olanlar
+
+Bunlar **birlikte** gider; yarısı yeni yarısı eski kalırsa Google çelişki görür:
+
+- [ ] sayfa adresleri (rota yapısı)
+- [ ] her sayfanın kendini beyan ettiği kanonik adres
+- [ ] dil eşleşmeleri (hreflang: tr / en / x-default)
+- [ ] site haritası
+- [ ] sitenin kendi iç bağlantıları — **§7.1-b'deki yedi yüzeyin HEPSİ**; "tek noktadan
+      çözülür" İDDİASI ÇÜRÜDÜ, aşağıya bak
+- [ ] eski adres → yeni adres kalıcı yönlendirmeleri (tek hop, §5)
+- [ ] IndexNow anahtarı + bildirim (K4-SEO: tam bu yayında)
+- [ ] Google Search Console: yeni site haritası bildirimi
+
+### 7.1-b ⚠ ÇÜRÜTMENİN EN AĞIR BULGUSU — "tek çözücü" YANLIŞTI
+
+İlk yazımda *"tek kaynak `getLocalizedCategorySlug` + `Routes.category`, kopya çözücü yok
+(ölçüldü)"* dedim. **Bu cümle yanlıştı ve ölçümüm sığdı** — yalnız çözücü fonksiyonun
+çağrılarını saymıştım, oysa asıl mesele adres dizesini **çözücüye hiç uğramadan** kuran
+yerler. Çürütme yedi kaçak buldu:
+
+| # | yer | ne yapıyor | not |
+|---|---|---|---|
+| 1 | `supabase/migrations/20260826220000_search_suggestions_family_route.sql:128` — canlı `get_search_suggestions` fonksiyonu | `'/category/' || c.slug` ile adres üretiyor | **VERİTABANININ İÇİNDE** — kod incelemesi görmez, düzeltmesi **migration ister** (kural 13: merge = prod). REC-79/REC-114 aynı sınıftı |
+| 2 | `src/config/applications.ts:23,32,41` | `href: '/category/fans'` elle yazılmış | üstelik EN slug'ı sabitlenmiş |
+| 3 | `src/utils/applicationLinks.ts:7-9` | `'/category/air-curtains'` eşlemesi | aynı sınıf |
+| 4 | `src/lib/seo/jsonld.ts:161` | JSON-LD adresi kendi kuruyor | yapısal veri yanlış adres yayınlar |
+| 5 | `src/app/api/webhook/supabase/route.ts:172-183` | ISR tazeleme yollarını elle kuruyor | **§8-2**: bozulursa veri değişir, sayfa değişmez, hiçbir test görmez |
+| 6 | kategori sayfalarının kendi `page.tsx`'leri (`:101,102,152` ve `:134,135,170`) | kanonik / dil eşleşmesi / yönlendirme dizeleri elle | |
+| 7 | `src/app/sitemap.ts` | `Routes.category` üzerinden — **bu temiz**, ama listede adıyla anılmalı | |
+
+**Sonuç:** geçişin "tek dosyada biter" tarafı yok. Uygulama emri bu yedi yüzeyi **tek tek**
+listelemek ve her birini yayın kontrol listesine koymak zorundadır. 1 numaralı kalem ayrıca
+bir **migration** demektir ve Recep kapısına tabidir.
+
+### 7.1-c ⚠ Ürün sayfaları da etkileniyor — "ürün adresleri değişmez" yanıltıcıydı
+
+Ürün **adresi** değişmiyor (K3 doğru), ama ürün **sayfası** değişiyor: kırıntı yolu ve
+`BreadcrumbList` yapısal verisi kategori adresi taşıyor.
+
+Ölçüm (`/tr/products/vortice-lineo-quiet`): sayfada `/tr/category/…` **4 kez** geçiyor —
+2 görünür bağlantı + 2 yapısal veri satırı.
+
+**Sonuç:** 80 kategori adresine ek olarak **80 ürün sayfası** da yeniden taranmalıdır. Geçişin
+büyüklüğü "80 adres" değil, **160 sayfa**. §9'daki "ürün adresleri kapsam dışı" satırı bu
+yüzden yanıltıcıydı; düzeltildi.
+
+### 7.2 Faset/nitelik sayfaları (REC-95 katmanı için, şimdiden bağlayıcı)
+
+- Faset **kombinasyonları indekslenmez**; kanonik daima kategori ya da seri sayfasıdır.
+- Yalnız arama değeri ölçülmüş **5–10 kombinasyon** için elle sabit sayfa açılır ve bunlar
+  kendi kanoniklerine sahiptir.
+- Gerekçe: kombinasyon sayfaları sınırsız üretilebilir; hepsi indekslenirse tarama bütçesi
+  tükenir ve zayıf içerik siteyi aşağı çeker.
+
+### 7.3 Yayın sonrası ölçüm (iki hafta)
+
+- Search Console kapsam raporu: "bulunamadı" biriken adres **0** olmalı.
+- Eski adres örneklemi (en az 20 adres) tek hop veriyor mu — otomatik ölçüm.
+- Site haritasındaki her adres 200 dönüyor mu — otomatik ölçüm.
+- Trafik düşüşü beklenir ve normaldir; **kalıcı** düşüş normal değildir.
+
+---
+
+## 8. Recep'te bekleyen karar kalemleri
+
+| # | karar | not |
+|---|---|---|
+| **K-A** | §2.2'deki çift adres kusuru **şimdi mi** düzeltilsin, geçişe mi bırakılsın? | Bugün 34 çift adres canlıda. Geçiş beklerse kusur da bekler. Küçük ve ayrı bir düzeltme olarak öne alınabilir. |
+| **K-B** | Boş 7 alt dal: kalsın / kapansın / birleşsin (REC-135) | Hepsi 0 ürün ve pasif. |
+| **K-C** | 7 pasif kök kategori: arşiv mi silme mi (REC-135) | Hepsi 0 ürün. |
+| **K-D** | Asit Dayanımlı Fanlar (81 SEAT ürünü) ağaçtan çıksın mı, ürünler nereye dağılsın? | §2.5. Planın en pahalı kalemi; adres geçişinden **önce** bitmeli. |
+| **K-E** | K-1: alt kategori adresi iki seviyeli mi kalsın (öneri: evet) | §4. |
+| **K-F** | Geçişin zamanı: K3 "Vitrin Faz 2 ile" diyor. Faz 2 uzarsa maliyet artar mı? | Bugün 194 adres var ve GSC 2026-08-29'da kuruldu; birikim az, geçiş **bugün en ucuz**. Adres sayısı arttıkça bedel artar. |
+| **K-G** | `next.config.mjs:64-76`'daki 13 kuralın sondaki eğik çizgi kusuru **şimdi mi** düzeltilsin? | Çürütme buldu. Her eski adrese **bedava bir fazladan sıçrama** ekliyor, bugün canlıda. Geçişten bağımsız, küçük ve tek dosyalık. |
+
+---
+
+## 8-b. Çürütmenin bulduğu, planda HİÇ olmayan yüzeyler
+
+Bunlar ilk yazımda yoktu; uygulama emrinin kontrol listesine **zorunlu** olarak girer:
+
+| # | yüzey | kanıt | niçin patlar |
+|---|---|---|---|
+| 1 | **Statik üretim** — `generateStaticParams` + `revalidate = 3600` | `category/[categorySlug]/page.tsx:62,64` · `[subCategorySlug]/page.tsx:60,62` | şema değişince önceden üretilen parametre şekli değişir |
+| 2 | **ISR tazeleme yolları** | `api/webhook/supabase/route.ts:172-183, 204, 357` | yollar elle `/category/` ile kuruluyor; güncellenmezse **veri değişir, sayfa değişmez ve hiçbir test görmez** — 2026-08-15'te 1044 fiyat satırının başına gelen tam bu |
+| 3 | **Arama önerileri (DB fonksiyonu)** | `get_search_suggestions` | **migration ister**, kural 13 gereği merge = prod → Recep kapısı |
+| 4 | **IndexNow zinciri** | `lib/seo/indexnow.ts` + `route.ts:574` | bildirimi 2 numaradan besleniyor; o bozuksa Bing'e **yanlış adresler** bildirilir |
+| 5 | `public/_redirects` | Netlify kalıntısı, Vercel'de ölü | zararsız ama ad alanı ölçümünde evrene dahil edilmeli |
+
+**Çürütmenin eledikleri (risk sanılıp ölçümle düşenler):** Google Merchant / ürün beslemesi ve
+e-posta şablonlarında kategori adresi **yok** — depo tarandı, böyle bir yüzey bulunamadı.
+
+---
+
+## 9. Kapsam dışı
+
+- Ürün **adresleri** (K3: değişmez) — ama ürün **sayfaları** kapsam İÇİNDE (§7.1-c: kırıntı
+  yolu + yapısal veri kategori adresi taşıyor, 80 sayfa yeniden taranır).
+- Nitelik katmanının kendisi (REC-95 fazları — bu plan yalnız sırasını ve SEO kuralını bağlar).
+- 15A ağacının içeriği (K4-Kat, Katalog şeridi).
+- Bu belgenin uygulaması: kod, migration, `next.config` satırı — **hiçbiri bu işte yok**.
+
+---
+
+## 10. Geri alma
+
+Adres geçişi **geri alınabilir ama bedava değildir**: geri dönüş ikinci bir taşınmadır ve Google
+açısından iki sarsıntı eder. Bu yüzden geri alma planı "eski hâle dön" değil, **ileri düzeltme**
+olmalıdır:
+
+- Yayın öncesi tam adres eşleme tablosu dosyaya yazılır (eski → yeni, 80 satır) ve commit'lenir.
+  Bir adres yanlış eşlenmişse **o satır düzeltilir**, şema geri alınmaz.
+- Yayın, kategori sayfalarının canlı ölçümüyle doğrulanır; 200 dönmeyen tek bir adres varsa
+  yayın tamamlanmış sayılmaz.
+- Tam geri dönüş yalnız şema düzeyinde bir hata (ör. kitlesel 404) hâlinde ve Recep kararıyla.
+
+---
+
+## 11. Bağımsız çürütme — sonuç: **BLOK** (ve düzeltmeler yukarı işlendi)
+
+Plan, yazan şerit tarafından onaylanmadı; bağımsız bir denetçiye *"bu planı çürüt, emin
+değilsen FAIL de"* diye verildi (OPS emri: 80 adres taşınıyor, zorunlu). Sonuç **BLOK** ve
+üç sebebi de haklı çıktı. **Bu bölüm çürütmeyi özetler; düzeltmelerin kendisi ilgili
+bölümlere işlendi** — plan artık çürütülmüş hâliyle okunur.
+
+| # | çürütmenin bulduğu | nereye işlendi | derece |
+|---|---|---|---|
+| 1 | "Tek çözücü, kopya yok" **yanlış** — yedi kaçak, biri **canlı DB fonksiyonu** | §7.1-b (yeni) | **BLOK** |
+| 2 | `num_redirects ≤ 1` ölçütü **tutturulamaz** (4 hop'un 3'ü bizim katmanımız değil) | §5 düzeltildi, iki bütçe | **BLOK** |
+| 3 | 81 ürünü dağıtacak **veri yok** (`products`'ta gövde tipi alanı yok, dal saf değil) | §2.5 (yeni alt bölüm) | **BLOK** |
+| 4 | İki adres **aynı sayfa değil**; hayatta bırakmayı önerdiğim varyant `og:url` ve `CollectionPage` **eksik** | §2.2 (yeni alt bölüm), K-E tersine döndü | YÜKSEK |
+| 5 | "Ürün adresleri değişmez" **yanıltıcı** — ürün sayfaları kategori adresi taşıyor, +80 sayfa | §7.1-c (yeni), §9 | YÜKSEK |
+| 6 | Ad alanı sonucu doğru ama **evrenim dardı** (23 yerine 74 slug; `admin`/`api` eksik) + yeni risk: bilinmeyen her adres DB'ye gidecek | §6 | ORTA |
+| 7 | §3 sırası, henüz verilmemiş bir karara (K-E) bağlı → "değiştirilemez" değil **koşullu** | aşağıda | ORTA |
+| 8 | Beş yüzey planda **hiç yoktu**: statik üretim, ISR yolları, DB fonksiyonu, IndexNow zinciri, ölü artefakt | §8-b (yeni) | **BLOK** |
+| 9 | Ürün adresi sayısı 82 değil **80** | §2.1 | DÜŞÜK |
+
+**7 numaraya cevabım:** haklı. §3'ün "değiştirilemez" ifadesi fazla güçlüydü. Doğrusu: sıra,
+**K-E iki seviyeli şemayı seçerse** zorunludur (adres ebeveyn slug'ı taşıdığı için ağaç
+değişimi adresi değiştirir); **tek seviyeli şema seçilirse** bağımlılık kopar ve ağaç ile adres
+işleri paralel koşabilir. Yani sıra karara bağlıdır, kararın kendisi K-E'dir.
+
+**Çürütmenin bağımsız DOĞRULADIĞI iddialar** (ölçmediğim şeyi "doğru" saymamak için):
+site haritası 194 / kategori 80 · çift adres kusurunun gerçekliği (5 dal × TR+EN, tek canonical
+etiketi, ölçüm tuzağına düşülmemiş) · 23+17 dağılımı · 4 hop · `/tr/category/fans` tek hop ve
+dil bazlı çift içerik olmaması · 13 eski yönlendirme · 81/81 SEAT · genişletilmiş evrende
+çakışmanın yine 0 olması · hreflang üçlüsünün bugün yayınlanıyor olması.
+
+---
+
+*Yazan: URUN şeridi, 2026-09-07. Bağımsız çürütme aynı gün koştu, BLOK verdi, düzeltmeler
+işlendi. **Plan bu hâliyle de "uygula" demiyor** — Recep'in §8'deki yedi karar kalemine
+cevabı olmadan uygulama emri yazılamaz.*
 
 
 ---
@@ -10626,6 +23434,265 @@ Bugün bu kural yazısız; REC-117 onu ilk kez sınayan iş.
 
 
 ---
+# FILE: docs\plans\rec117-misafir-teklif-akisi-2026-09-08.md
+
+# REC-117 — Misafir teklif akışı: PLAN (kod yok)
+
+> **Durum:** taslak · **Şerit:** URUN (`4a8eaf9c`) · **Tarih:** 2026-09-08
+> **Kayıt:** [REC-117](https://linear.app/receps-workspace/issue/REC-117) (Recep kararı 2026-09-01, yazılı)
+> **YÖNTEM:** şerit (URUN) — cetvel `docs/standards/execution-method-standard.md`
+> **KAYNAK/CETVEL:** `docs/standards/quote-standard.md` (Q4 · §2.5 · §3.3 · §7.2 · §8 · §15/R17) ·
+> `CLAUDE.md` kural 2/3/7/11/12/13 · konformans ailesi `quote-*-policy-guard`, `quote-machine-ssot`
+> **Karne tazeliği:** veri modeli + RLS **bu plan için 2026-09-08'de prod'dan YENİDEN ölçüldü** (yalnız SELECT).
+
+---
+
+## 0) BAŞLIK YANLIŞ — ve bunu ölçüm söylüyor
+
+Kaydın başlığı **"anon INSERT/RLS = MIGRATION"** diyor. Ölçtüm: **migration gerekmiyor.**
+Bu bir görüş değil, dört ölçümün sonucu. Başlıktaki varsayım 2026-09-01'de yazıldı; o tarihte
+`quote_v2_schema` (2026-08-26) migration'ının misafir tarafına ne kadar yaklaştığı kayda geçmemişti.
+
+**Ölçüm 1 — kimlik üçlüsü zaten zorunlu, hesap zaten opsiyonel.**
+Prod `information_schema.columns`, `venthub_quotes`, NOT NULL kolonlar:
+
+| Kolon | NOT NULL | Varsayılan |
+|---|---|---|
+| `contact_name` | EVET | yok |
+| `contact_email` | EVET | yok |
+| `contact_phone` | EVET | yok |
+| `source`, `status`, `tenant_id`, `revision_no`, `id`, `created_at`, `updated_at` | EVET | `source` hariç hepsinde var |
+
+`user_id` bu listede **YOK** → nullable. Yani şema şu an tam olarak Recep'in cümlesini taşıyor:
+*"belirli bilgiler olmadan da teklif ve bilgilendirme yürümez"* → üçlü zorunlu;
+*"zorunlu olmamalı, kullanıcı rahat hissetmeli"* → hesap opsiyonel.
+
+**Ölçüm 2 — hesapsız belge kavramı cetvelde yazılı ve KASITLI.**
+`20260826233000_quote_v2_schema.sql` §7 yorumu:
+> *"R17 (hesapsız belge müşteri yüzünde görünmez) EK BİR POLİTİKA İSTEMEZ: sahiplik yüklemi
+> `user_id = auth.uid()` NULL ile eşleşmez, yani prospect belge zaten yalnız satıcı yüzünde yaşar.
+> Yeni bir şart eklemek yerine bunu yazıya geçiriyoruz ki sonradan 'eksik' sanılıp gevşetilmesin."*
+
+Bu satır bugünkü işi doğrudan ilgilendiriyor: **misafir kaydının admin yüzünde görünüp müşteri
+yüzünde görünmemesi bir eksiklik değil, çivilenmiş bir tasarım.** REC-117 madde 5 (admin yüzeyi)
+bu yüzden ek iş istemez — yalnız ölçülür.
+
+**Ölçüm 3 — `anon` yolu hiç yok.** Prod `pg_policies`: teklif tablolarında 9 politika,
+**dokuzunun da rolü `{authenticated}`**. Depodaki hiçbir teklif migration'ında `anon` kelimesi geçmiyor.
+
+**Ölçüm 4 — kolon GRANT'leri de yalnız `authenticated`'a.** `quote_v2_schema` §8:
+`grant insert (contact_name, contact_email, contact_phone) ... to authenticated`.
+
+**Sonuç:** eksik olan tek şey **misafirin yazabildiği bir yol**. Bunun iki yapılışı var ve
+aralarındaki fark bu planın en önemli kararı.
+
+---
+
+## 1) HÜKÜM — Edge Function yolu, anon RLS politikası DEĞİL
+
+### Yol A (kayıtta önerilen): `anon` rolüne INSERT politikası + kolon GRANT'i
+
+Ne gerektirir: `venthub_quotes` ve `venthub_quote_items` için `to anon` INSERT politikaları,
+artı `anon` rolüne kolon düzeyi `grant insert`. **Migration** → prod'a otomatik uygulanır → Recep onayı.
+
+Neden reddediyorum, üç ölçülmüş sebeple:
+
+1. **Yüzey genişler ve geri alması pahalıdır.** `anon` = internetteki herkes. PostgREST üzerinden
+   doğrudan tabloya yazma yolu açılır.
+   ⭐ **DÜZELTİLDİ (red-team Bulgu 6):** ilk yazdığım gerekçe *"hız limiti RLS'te ifade edilemez"*
+   idi ve **teknik olarak yanlıştı** — `with check` bir fonksiyon çağırabilir ve depoda
+   `bump_rate_limit` zaten tam bu deseni taşıyor. Doğru itiraz daha dar: yan etkili bir sayacı
+   politika yükleminde koşmak, yüklemin kaç kez değerlendirileceği garanti olmadığı için
+   güvenilmezdir. Red kararı bu satıra değil, aşağıdaki 3. gerekçeye dayanır.
+2. **REC-216 tam da bu şişmeyi temizliyor.** İlgili kayıt: *"RLS politika şişmesi (153 katman)"*.
+   Temizlik sürerken aynı yüzeye iki yeni politika eklemek, komşu şeridin işini büyütür.
+3. **Kolon GRANT'i rol bazlıdır, politika bazlı değil.** `quote_v2_schema` §8'in kendi uyarısı:
+   *"kolon grant'i admin'e ve müşteriye AYNI ANDA verilir"*. `anon`'a INSERT grant'i vermek,
+   o kolonları **her ziyaretçiye** açar; hangi politikanın onu dizginlediği ayrı bir okuma işi olur.
+
+### Yol B (HÜKMÜM): `quote-request-guest` Edge Function'ı, service_role ile yazar
+
+Ne gerektirir: **migration YOK.** Yeni bir Edge Function; şema, politika, GRANT hiç değişmez.
+
+Neden bu:
+
+- **RLS yüzeyi büyümez.** `anon` hiçbir teklif tablosuna erişemez — bugünkü hâli aynen kalır.
+  Yazan tek şey, gövdesi gözden geçirilebilir tek bir fonksiyondur.
+- **Spam koruması yazılabilir bir yere gelir.** Hız limiti, honeypot alanı, e-posta biçim ve
+  MX doğrulaması, `source` beyaz listesi — hepsi fonksiyon gövdesinde, testi yazılabilir hâlde.
+- **Desen zaten kurulu.** Depoda 28 Edge Function var; `quote-notification-webhook` teklif
+  yüzeyinde hâlihazırda çalışıyor. Yeni bir kalıp icat etmiyoruz.
+- **Recep'in onay turunu harcamıyoruz.** Migration onayı kıt bir kaynak (REC-110/114 turu bekliyor).
+  Bu iş onu tüketmeden bitiyor.
+
+**Bedeli, adıyla:** `service_role` RLS'i atlar. Yani fonksiyonun gövdesi artık *tek* koruma
+katmanıdır — orada yapılan bir hata, RLS'in yakalayacağı bir hata değildir. Bunun karşılığı
+§4'teki kapılar: fonksiyonun yalnız `status='requested'` + `user_id=null` yazabildiği, başka
+tablo/kolona dokunamadığı **testle çivilenir**. Kabul edilen risk budur ve yazılıdır.
+
+---
+
+## 2) İŞ KALEMLERİ (sıralı)
+
+| # | Kalem | Yüzey | Migration? |
+|---|---|---|---|
+| 1 | `quote-request-guest` Edge Function — doğrulama + hız limiti + INSERT. **`tenant_id` AÇIKÇA yazılır** (DEFAULT'a yaslanılmaz), **idempotency anahtarı alır**, hız limiti için `_shared/rate_limit.ts` → `bump_rate_limit` kullanılır (bellek-içi limit Deno izolatları arasında paylaşılmaz, koruma değildir) | `supabase/functions/quote-request-guest/**` | HAYIR |
+| 1b | ⭐**`quote-notification-webhook` alıcı çözümü TEK DALA iner** — bugün alıcıyı `auth.admin.getUserById(quote.user_id)` ile okuyor; `user_id` NULL'da 503 döner ve **e-posta hiç gitmez**. `contact_email` her teklifte NOT NULL olduğu için tek dal yeter; `user_id` dalı kalkar, SELECT listesine `contact_email` girer | `supabase/functions/quote-notification-webhook/index.ts` | HAYIR |
+| 3b | ⭐**KVKK aydınlatma** — bugün yok (`src/components/quotes` altında `kvkk`/`consent`/`aydinlatma` 0 eşleşme; `venthub_quotes`'ta kolon yok). Dayanak **KVKK m.5/2-c** (sözleşme öncesi zorunluluk): **rıza şart değil, AYDINLATMA şart.** Forma aydınlatma bağlantısı (`Routes.legal.kvkk`, iletişim formu kalıbı) + tek kutu "Aydınlatma metnini okudum"; **işaretsiz istek gönderilmez.** İspat: Edge Function aydınlatma **sürüm + zamanını** olay defterine yazar; kalıcı kolon borcu bir sonraki migration turuna yazılır | modal + Edge Function | HAYIR (kolon borcu ertelenir) |
+| 2 | `QuoteRequestButton` login kapısının kaldırılması (oturumlu akış korunur) | `src/components/quotes/QuoteRequestButton.tsx` | HAYIR |
+| 3 | `QuoteRequestModal` misafir alanları (ad/firma/e-posta/telefon) + oturumluda otomatik dolum | `src/components/quotes/QuoteRequestModal.tsx` | HAYIR |
+| 4 | `quoteService` misafir dalı — DI kuralı 2 aynen (ilk parametre `supabase`) | `src/lib/services/quoteService.ts` | HAYIR |
+| 5 | Kayıt teşviki: gönderim sonrası "hesabını oluştur, talebini takip et" | modal | HAYIR |
+| 6 | i18n TR/EN anahtarları — **nested**, düz nokta-key YASAK (`getDictValue` nested-only) | `src/i18n/dictionaries/*` | HAYIR |
+| 7 | Cetvel Q4 hükmünün güncellenmesi (login şartı → misafir kabulü) | `docs/standards/quote-standard.md` | HAYIR |
+| 8 | Kapılar (§4) | `src/__tests__/conformance/**` — **ALTYAPI şeridi, emir gerekir** | HAYIR |
+
+**Madde 5 (admin yüzeyi) iş değil, ÖLÇÜM:** `quotes_select_own_or_admin` admin dalı `user_id`
+şartı taşımıyor → misafir kaydı admin yüzünde zaten görünmeli. Kod yazmadan önce ölçülür;
+görünmüyorsa o zaman iş açılır.
+
+---
+
+## 3) ÖLÇÜLECEKLER — plan onaylanmadan önce (hiçbiri iddia değil)
+
+> **Bu bölümün beş maddesi de bağımsız red-team denetiminde ÖLÇÜLDÜ (2026-09-08).** Sonuçlar aşağıda;
+> hiçbiri artık "bekleyen ölçüm" değil.
+
+1. ✅ **Tetik geçiriyor.** `enforce_quote_status_transition` INSERT dalı `status not in
+   ('draft','requested')` dışını reddedip **`return new` ile erken çıkıyor**; muhatap kilidi
+   (`user_id is null`) o dönüşün ALTINDA, yalnız UPDATE yolunda yaşıyor. Prod `prosrc` birebir aynı.
+   `service_role`'ün tablo düzeyi INSERT yetkisi var, `anon`'un **hiçbir** yetkisi yok.
+2. ⛔ **Bildirim misafirde ÖLÜYOR — ve sessizce.** Tetik `AFTER INSERT`, koşulsuz, misafir kaydında
+   da ateşliyor. Ama uç alıcıyı `auth.admin.getUserById(quote.user_id)` ile okuyor → `user_id` NULL'da
+   **503 `user_lookup_failed`**. SELECT listesi `contact_email`'i hiç çekmiyor. Üstelik `pg_net`
+   ateşle-unut ve uç `quote_email_events` defterine yazmıyor → **arıza hiçbir yerde satır bırakmaz.**
+   Yani Recep'in *"bilgilendirme yürümez"* şartı bugünkü kodla karşılanmıyor. **Kalem 1b oldu**
+   (erteleme değil, iş).
+3. ✅ **`source` kısıtlamıyor** (`pdp|cart|project` misafire yeter).
+   ⚠ Ama `venthub_quote_items.product_id` v2'de NOT NULL'a çekilmiş → **misafir akışı katalog-dışı
+   serbest kalem KABUL EDEMEZ.** Bu bir sınır, formda karşılığı olmalı.
+4. ⚠ **Soru yanlış çerçevelenmişti.** INSERT sırasında `jwt_tenant_id()` **hiç çağrılmıyor**;
+   `tenant_id` kolon DEFAULT'undan geliyor (sabit UUID). `jwt_tenant_id()` claim yoksa aynı UUID'ye
+   düşüyor, yani bugün iki yol örtüşüyor ve sızıntı yok (prod: 1 tenant, ayrık claim taşıyan 0
+   kullanıcı). **Ama bu tesadüf.** service_role RLS'i atladığı için fonksiyon tenant'ı **açıkça**
+   yazmalı; DEFAULT'a yaslanmak Faz 2 açıldığı gün sessizce yanlış tenant üretir. → kalem 1'e girdi.
+5. ✅ **Admin yüzeyi hazır.** Prod `polqual`: admin dalı `user_id` şartsız. Kod tarafında NULL zaten
+   ele alınmış ve `user_id === null` için ayrı bir **"prospect" rozeti** var. Çökmüyor. Madde 5 iş değil.
+
+---
+
+## 4) KAPILAR — ne ölçecek, nasıl sabote edilecek
+
+> Bu dosyalar **ALTYAPI şeridinde** (`src/__tests__/conformance/**`). Kapılar bu plandan
+> emirle istenir; URUN tek başına yazmaz. (Cetvel: şerit sahipliği.)
+
+| Kapı | Korunan değişmez | Sabotaj kolu |
+|---|---|---|
+| INV-MISAFIR-YAZIM-1 | `quote-request-guest` yalnız `status='requested'` ve `user_id=null` yazar; başka tabloya/duruma yazan satır YOK | gövdeye `'draft'` yaz → kırmızı olmalı |
+| INV-MISAFIR-KIMLIK-1 | Üç kimlik alanı da doğrulanmadan INSERT'e gidilmez | doğrulamayı kaldır → kırmızı |
+| INV-MISAFIR-HIZ-1 | Hız limiti dalı gövdede mevcut ve devre dışı bırakılamaz | limiti sonsuz yap → kırmızı |
+| INV-MISAFIR-AYDINLATMA-1 | Formda aydınlatma bağlantısı + onay kutusu var; Edge Function işaretsiz isteği REDDEDER ve aydınlatma sürüm/zamanını deftere yazar | kutuyu kaldır ya da reddi gevşet → kırmızı |
+| Mevcut `quote-insert-policy-guard` | Değişmemeli — ama aşağıdaki şerhle | politika eklenirse ratchet kırmızı verir |
+| `edge-security` R7 | Yeni fonksiyon `config.toml`'da `[functions."quote-request-guest"]` bloğu ister | blok yazılmazsa KIRMIZI (beklenen) |
+| `edge-security` R10 | Dosya başında `// Çağıran sınıfı:` beyanı ister — *"YENİ fonksiyon beyansız eklenemez"* | beyan yazılmazsa KIRMIZI (beklenen) |
+
+⛔ **ÖNCEKİ RATCHET İDDİAM GERİ ÇEKİLDİ (red-team Bulgu 3).** Şöyle yazmıştım: *"kapının kırmızı
+vermemesi, migration yazmadığımızın bağımsız kanıtıdır."* **Yanlış.** Kapı yalnız
+`create|alter policy ... on venthub_quote(s|_items)` bloklarını tarar ve ratchet'i yalnız politika
+ADLARINI çiviler. `grant`, `alter table`, yeni tablo, yeni tetik — hatta `grant insert (...) to anon`
+— bu kapıya **görünmez**. Yani yeşilliği "migration yok" demez, "teklif tablolarında yeni politika
+yok" der. Kapıya ölçmediği bir şeyi söyletmek, bu deponun kendi *fail-open kapı* dersinin tekrarıydı.
+Migration olmadığının kanıtı kapı değil, **`supabase/migrations/` altında yeni dosya bulunmamasıdır**.
+
+⭐ **Yeni fonksiyon iki kapıyı kırmızıya düşürür (Bulgu 4)** ve bu ISTENEN davranıştır — ikisi de
+"beyansız fonksiyon eklenemez" diyor. Karşılamak **iş kalemidir**, sürpriz değil; `config.toml`
+değişimi ayrıca `edge-shared-input-drift` yüzeyini tetikler.
+
+---
+
+## 5) RİSKLER
+
+| Risk | Etki | Karşılık |
+|---|---|---|
+| `service_role` RLS'i atlar | fonksiyon hatası = korumasız yazma | §4 kapıları + plan-challenger + OPS bağımsız çürütmesi |
+| Anon uç = spam yüzeyi | çöp teklif, e-posta maliyeti | hız limiti + honeypot + e-posta doğrulama (kalem 1) |
+| Login kapısı kalkarken oturumlu akış bozulabilir | mevcut müşteri teklif veremez | oturumlu dal DEĞİŞMEZ; her iki dal ayrı ayrı ölçülür |
+| Cetvel Q4 ile kod ayrışır | belge yalan söyler | kalem 7 aynı PR'da (ayrı PR'a bırakılmaz) |
+| i18n düz nokta-key | ham anahtar render (tsc/lint/build GÖRMEZ) | nested + `i18n-key-resolution.test.ts` — ⭐önce `keycheck` yazmıştım, **o araç depoda YOK** (red-team Bulgu 10); var olmayan araca dayanan risk satırı karşılıksız güvencedir |
+| **Çift gönderim** — aynı form iki kez gönderilir | iki teklif kaydı, iki e-posta; `createQuoteRequest` başlık+kalemi iki ayrı INSERT ile yazıyor ve idempotency anahtarı yok, misafirde oturum de yok | kalem 1'de idempotency anahtarı; hız limiti bunu TEK BAŞINA engellemez (kaba kalkan) |
+| **`tenant_id` DEFAULT'a bırakılır** | bugün doğru değeri verir (tesadüf), Faz 2'de sessizce yanlış tenant | fonksiyon tenant'ı açıkça yazar (kural 12) |
+
+---
+
+## 6) SIRA VE ONAY
+
+1. ✅ Bu plan → **plan-challenger** (bağımsız denetçi, §8) → ✅ **OPS bağımsız çürütmesi** (§9).
+2. ⛔ **Recep'e Yol B SORUSU SORULMAZ** (OPS hükmü, 2026-09-08). Gerekçe: bu **yapısal bir karar
+   değil** — menü yeri, URL şeması ya da sayfa mimarisi değiştirmiyor; migration da yok, yani
+   merge onayı da gerekmiyor. Recep'e **bilgi** gider, karar sorusu değil. Karar zaten
+   2026-09-01'de verilmiş; buradaki seçim onun *nasıl* uygulanacağıdır ve o mühendislik kararıdır.
+3. Kod; kapılar için ALTYAPI'ya emir (`src/__tests__/conformance/**` onun şeridi).
+4. REC-59 canlı ölçümü Vercel kotasına bağlı; bu iş ona bağımlı DEĞİL, paralel yürür.
+
+---
+
+## 7) BU PLANIN ÖLÇMEDİĞİ (sınırı gizlemiyorum)
+
+- Prod ölçümleri **yalnız SELECT** ile alındı; hiçbir yazma denenmedi. Yani "misafir INSERT'i
+  bugün reddediliyor" iddiası **politika listesinden çıkarım**, davranışsal kanıt değil.
+- ~~Tetik gövdeleri tam okunmadı~~ → **kapandı**: red-team ikisini de prod `prosrc`'tan okudu (§3/1, §3/2).
+- ~~Hız limiti tabloysa migration geri gelir, hüküm yeniden açılır~~ → **bu kaçış kapısı GEREKSİZ ÇIKTI**
+  (red-team Bulgu 5): DB destekli hız limiti **zaten var ve canlı** — `public.rate_limits` tablosu +
+  `bump_rate_limit()` RPC + `_shared/rate_limit.ts`; `apply-coupon` ve `iyzico-payment` kullanıyor,
+  prod'da tablo dolu. Yani hız limiti için migration gerekmiyor ve hüküm **yeniden açılmıyor**.
+  Tersi de doğru ve bağlayıcı: bellek-içi limit Deno izolatları arasında paylaşılmadığı için gerçek
+  koruma değildir, kalem 1 bu paylaşılan yardımcıyı kullanmak **zorundadır**.
+
+---
+
+## 8) BAĞIMSIZ ÇÜRÜTME — sonuç ve neyi değiştirdi
+
+Plan, yazıldıktan sonra bağımsız bir denetçiye verildi (skill A2: üretici ≠ yargıç). **Sonuç: KOŞULLU.**
+
+**Merkezî hüküm AYAKTA** — ve denetim onu sandığımdan sağlam buldu: §3'ün beş maddesi de ölçüldü,
+beşi de hükmü destekledi, üstelik §7'deki kaçış şartım ölçümle çöktü (hız limiti altyapısı zaten var).
+
+**Ama dört düzeltme getirdi ve hepsi işlendi:**
+1. Bildirim zinciri misafirde ölüyor → **kalem 1b** (erteleme değil, iş)
+2. "Yeşil ratchet = migration yok" iddiam yanlıştı → **geri çekildi**, doğrusu §4'te
+3. Yeni Edge Function `edge-security` R7/R10'u kırmızıya düşürür → **§4'e yazıldı**
+4. `tenant_id` açıkça yazılmalı + idempotency anahtarı → **kalem 1 ve §5'e girdi**
+
+Bu bölüm silinmeyecek: bir planın nerede yanıldığı, doğru çıktığı yer kadar bilgi taşır.
+
+---
+
+## 9) İKİNCİ ÇÜRÜTME (OPS) — KOŞULLU KABUL, üç düzeltme daha
+
+Yol B ayakta. Üçü de işlendi:
+
+**1. KVKK aydınlatma eksikti — hukuki, ve planda hiç yoktu.** → kalem **3b** + kapı
+**INV-MISAFIR-AYDINLATMA-1**. Rıza değil aydınlatma şart (m.5/2-c); ispat olay defterine
+sürüm+zaman olarak yazılır, kalıcı kolon borcu sonraki migration turuna.
+
+**2. Idempotency nerede saklanacak, yazılmamıştı.** → Kolon eklenmiyor (migration yok):
+anahtar `hash(contact_email + kalemler)`, `bump_rate_limit` üzerinden `quote:<hash>` ile
+**10 dakikada 1**. Yani çift gönderim koruması hız limiti altyapısına biniyor, ayrı bir
+tablo istemiyor. Kalem 1'in kapsamında.
+
+**3. Kalem 1b sadeleşti: tek dal `contact_email`, `user_id` dalı kalkar.** Dayanak:
+`contact_email` her teklifte NOT NULL, yani tek dal daima bir değer bulur; ayrıca teklif
+yanıtının gitmesi gereken adres, kullanıcının **formda yazdığı** adrestir.
+
+> ⚠ **OPS bu kalem için "önce ölç: üye kayıtlarında `contact_email` ile auth e-postası ayrışan
+> var mı" dedi. ÖLÇTÜM VE ÖLÇÜM AYIRT ETMİYOR** — `venthub_quotes` bugün **toplam 1 satır**
+> taşıyor (üyeli 1, misafir 0, ayrışan 0). Tek satırla "ayrışma olmuyor" denemez; sıfır sonucu
+> burada yokluğu değil, **örneklemin yokluğunu** gösterir. Kararı bu sayıya değil, yukarıdaki
+> iki yapısal gerekçeye dayandırıyorum. Bugünün dersinin kendi işimize uygulanmış hâli: sıfır
+> gördüğümde önce ölçütün ayırt ettiğini kanıtlamak zorundayım, ve burada kanıtlayamadım.
+
+
+---
 # FILE: docs\plans\rec129-faz1-kabuk-plani-2026-09-04.md
 
 # REC-129 Faz 1 — Kabuk (renk değişkenleri + logo + header/footer) · PLAN v2
@@ -10756,13 +23823,23 @@ dizeler bilinen boşluk" diyor ve `toneClasses[tone]` dolaylı üretimi bunu kes
 
 ---
 
-## 6) Recep'e giden TEK karar sorusu
+## 6) ⭐KARAR GELDİ (Recep, 2026-09-04) — soru KAPANDI
 
-**Kiremit `#D95D0E` ana eylem rengi olarak beyaz üzerinde 3.80:1 veriyor; bugünkü lacivert
-8.83.** Büyük/kalın düğme yazısında standarda uyar, normal boy metinde uymaz; amber `#F59E0B`
-(2.15) beyaz üzerinde tek başına kullanılamaz. Palet kapalı karar olduğu için **ben
-değiştirmiyorum** — sorulan şey: kiremit yalnız büyük düğme yazısıyla mı sınırlansın, yoksa
-ton bir miktar koyulaştırılsın mı?
+Soru şuydu: kiremit `#D95D0E` beyaz üzerinde 3.80:1 (bugünkü lacivert 8.83); tonu
+koyulaştıralım mı, yoksa kullanımını mı sınırlayalım?
+
+**Recep'in kararı — ton DEĞİŞMEZ, kullanım SINIRLANIR:**
+
+1. **Kiremit** yalnız **büyük/kalın düğme yazısı** ve **dolgu** olarak kullanılır.
+2. **Normal boy metin daima lacivert.** Kiremit gövde metnine hiç girmez.
+3. **Amber tek başına asla** — yanında koyu yazı/ikon ile kullanılır.
+
+Bu karar paleti WCAG'a uyumlu kılıyor çünkü 3.0 eşiği büyük/kalın metin ve arayüz
+öğeleri için geçerlidir; 4.5 eşiğini gerektiren normal metin laciverte (8.83) bırakılıyor.
+Yani marka sıcaklığı korunuyor, okunabilirlik payı feda edilmiyor.
+
+**Bu kararın kapıya dönüşü bölüm 5'te** — ve orada dürüst bir sınır var: kuralın
+"yalnız ana eylemde" kısmı **statik olarak ölçülemiyor.**
 
 ---
 
@@ -10773,6 +23850,1261 @@ ton bir miktar koyulaştırılsın mı?
 3. Kontrast oranları **tarayıcıda ölçülmüş sayı** olarak raporda — "axe yeşil" yeterli sayılmaz.
 4. Cetvel yazılı ve kapıya bağlı.
 5. Beş maddelik merge ritüeli + **Recep onayı**.
+
+
+---
+# FILE: docs\plans\rec146-avens-csv-yeniden-uretim-2026-09-09.md
+
+# AVenS fiyat CSV'si — tam çıkarım planı (REC-146) · **v2, red-team sonrası**
+
+**Hedef (Recep, kendi sözü):** *"csv eksiksiz olması lazım bizim taşınabilir katalog mimarimiz
+için… katalog veri girişi full kapsam ajans gibi"*
+
+**YÖNTEM:** plan → plan-challenger → koşum. Çıkarım: görsel çoklu-ajan skill'i
+(`.agent/skills/venthub-catalog-importer/`).
+**CETVEL:** `catalog-ingestion-standard.md` §6.3/§6.4 · `category-taxonomy-standard.md` §9.
+**Prod DB yazımı YOK** — bu iş CSV üretir; DB'ye yükleme ayrı ve Recep kapısında.
+
+> ⛔**v1 BLOK aldı.** Bağımsız red-team (`docs/audits/rec146-red-team-csv-plani-2026-09-09.md`)
+> beş iddiadan **dördünü çürüttü**. Bu sürüm o dördünü kapatır. Çürüyenler aşağıda **adıyla**
+> duruyor — silinmedi, çünkü planın niçin değiştiğini ancak yanlışı görünce anlarsınız.
+
+---
+
+## 0. v1'de NE YANLIŞTI
+
+| # | v1 iddiası | gerçek | nasıl yanıldım |
+|---|---|---|---|
+| 1 | "69 başlıksız tablo düzen tablosu, **ürün taşımıyor**" | **12'si ürün taşıyor, 103 satır** | **4 tanesine baktım, 69'a genelledim** — örnekleme |
+| 2 | 16076–16080 uydurma | ✅**ayakta ve güçlendi** | — |
+| 3 | bitti ölçütü "kod kümesi farkı 0" | **kör ve çelişkili** | kodsuz ürünü ölçmüyor; SKILL'le çelişiyor |
+| 4 | "ayrı dosyaya yaz, ölçüt geçince taşı" | **mekanizma YOK** | niyeti kapı sandım |
+| 5 | "kabul ölçütü kod kümesi eşitliği" | **fiyat/ad'a kör** | tek eksende ölçüt |
+
+⭐**1 numaralı hata, bu haftanın tekrar eden sınıfının plana yazılmış hâliydi:** *ölçüt keskin,
+evren dar.* Üstelik uyarı zaten elimdeydi — kendi ölçüm belgeme *"tarama tabloların yarısını
+görmüyor"* diye yazmıştım, sonra plana *"sorun değil"* yazdım.
+
+## 1. Düzeltilmiş kaynak tablosu
+
+Başlık araması **satır 0 yerine ilk 4 satırda** yapılınca:
+
+| ölçüt | v1 | **v2 (doğru)** |
+|---|---|---|
+| kaynak tekil kod | 442 | **498** |
+| alfanümerik kod | 35 | **50** |
+| CSV tekil kod | 484 | 484 |
+| CSV'de alfanümerik | 0 | **0** *(değişmedi — asıl bulgu ayakta)* |
+
+**KOD sütunu HİÇ OLMAYAN ürün tabloları:** s.18, **s.42 (STORM, 13 ürün)**, **s.43 (JET, 14 ürün)**.
+Bunlar "başlık kaymış" değil, **kodsuz yayınlanmış ürün aileleri** — s.26 (CA IL, 5 ürün) ile aynı sınıf.
+
+### ✅Ayakta kalan tek iddia, üstelik güçlenerek: beş uydurma kod
+Red-team benim yapmadığım testi yaptı: **CSV'de 18 adet `16xxx` kodu var, 13'ü kaynakta mevcut,
+yalnız bu 5'i yok.** Bu, *"belki tüm blok başka bir kaynaktan"* alternatifini eler.
+İki yönde 1:1 kilit: kaynakta hiç geçmeyen CSV kodu **tam 5**; kaynakta kodu hiç olmayan s.26 ürünü
+**tam 5**. → Bu kalem Recep kapısında, **BLOK hükmü onu geciktirmez** (OPS hükmü uygulanıyor).
+
+**Kök neden düzeltmesi:** 29 kod CSV'ye yalnız sayfa **metninden** girmiş — yani araç metne
+bakabiliyor. s.26'da **bakmadan üretti**. Sorun "metni okuyamıyor" değil, **boşluğu doldurma
+eğilimi**.
+
+## 2. Yapılacak
+
+| # | iş | ölçütü |
+|---|---|---|
+| 1 | Çıkarımı skill ile yeniden koş — **74 sayfanın hepsi**, kodsuz tablolar dâhil | her sayfa için satır listesi |
+| 2 | Kod biçimine varsayım YOK (alfanümerik/boşluklu/uzun birebir) | alfanümerik kod **≥ 50** |
+| 3 | ⛔**Kodsuz ürün: kod ÜRETİLMEZ** — `model_code` null **+ `confidence != ok`** | uydurma ardışık numara **0** |
+| 4 | s.18/42/43 (27 ürün) ve s.26 (5 ürün) **adıyla** çıkarıma girer | bu 4 sayfadan gelen satır **> 0** |
+| 5 | Metinde olup tabloda olmayan satırlar yakalanır | fark listesi boşalır |
+
+### ⛔2a. CSV şeması değişmeli — SKILL ile çelişki kapatılıyor
+`SKILL.md:97` aynen: *"`model_code` boş bırakma (köprü); eksik/şüpheli = **null + confidence != ok**"*.
+v1 "boş kalır" diyordu — **cetvelle çelişiyordu**. Ama mevcut CSV **5 sütun** ve `confidence`
+**yok**. Bu yüzden: çıktı şemasına `confidence` **ve** `kod_kaynakta_yok` sütunları eklenir.
+Şema değişikliği `csv-import-export-standard.md`'yi ilgilendirir → yükleyici tarafı ayrıca ölçülecek.
+
+## 3. Bitti ölçütü — v1'in "fark 0"u ÇÜRÜDÜ, yerine ÜÇ EKSEN
+
+v1 tek eksenliydi ve **kodsuz ürünlere kördü**: boş kod kümeye girmez, 5 ürün tamamen düşse bile
+ölçüt "fark 0" derdi. Ayrıca iki dosya **kod farkı 0** iken sütun sayısı 5 vs 12 olabiliyor
+(gerçek dosyalarla kanıtlandı) — yani fiyat ve ad **kör noktada**.
+
+```
+EKSEN 1 · KİMLİK : CSV kod kümesi == kaynak kod kümesi           → iki yönde fark 0
+EKSEN 2 · SAYIM  : CSV ürün SATIRI == kaynak ürün satırı          → kodsuzlar DÂHİL
+                   (kodsuz ürün sayısı ayrı raporlanır, beklenen ≥ 32: s.18/26/42/43)
+EKSEN 3 · İÇERİK : her satırda price_eur ve model_name kaynakla eşleşir → uyuşmazlık 0
+```
+**Üçü birden geçmeden koşum kabul edilmez.** Sabotaj kolları: (a) kaynağa sahte kod eklenirse
+Eksen 1 kırmızı; (b) bir ürün satırı silinirse Eksen 2 kırmızı; (c) bir fiyat değiştirilirse
+Eksen 3 kırmızı. Üçü de kırmızı vermiyorsa **ölçüt ölçmüyordur**.
+
+## 4. ⛔Veri kaybı kapısı — v1'de YOKTU, KRİTİK
+
+v1 *"ayrı dosyaya yazılır, ölçüt geçince yerine konur"* diyordu. Red-team ölçtü: **bu bir niyet,
+kapı değil.** `cikti_tazelik.py` yalnız **commit tarihi** karşılaştırıyor; içerik ayağı olan sha256
+dalı `determinist:false` kalemlerde **satır 129-130'da reddediliyor** → bu CSV'de **içeriği ölçen
+tek satır yok**. Yeni CSV commit'lendiği an kapı yeşil.
+
+**Gerekli:** üç eksenin **koşulabilir bir betiği** (`scripts/kaynak_dizini/csv_kaynak_kapisi.py`),
+CI'da koşar, kırmızı verirse CSV değişimi inmez. Kapı olmadan yeniden üretim **koşulmaz** —
+bugün sabah aynı sınıf bir kayıp yaşandı (dizin 2127→74; kurtaran kapı değil git'ti).
+
+**Ayrıca yan bulgu:** reçetenin girdilerinde `sayfalar.jsonl` **yok** ve `03-output/`'taki üç
+CSV'den yalnız biri reçetede. Reçete kapsamı eksik.
+
+## 5. Koşumdan ÖNCE kapatılacak üç kalem (BLOK'un şartı)
+
+1. **SKILL çelişkisi + şema:** `confidence` ve `kod_kaynakta_yok` sütunları.
+2. **İçerik kapısı:** üç eksenli betik + CI kolu + sabotaj kanıtı.
+3. **s.18/42/43 çıkarım yolu:** KOD sütunu olmayan ürün tabloları nasıl işlenecek (27 ürün).
+
+## 6. Bu plandan çıkacak cetvel maddesi
+
+`catalog-ingestion-standard.md`: **"kaynakta kod yoksa kod ÜRETİLMEZ."**
+Boş bırakılır, `confidence != ok` işaretlenir. Beş vaka bunun gerekçesidir — araç boşluğu sessizce
+doldurdu, hiçbir kapı görmedi, kod **müşteriye kadar gitti**.
+
+## 7. Riskler
+- Çıkarım **deterministik değil** → kabul ölçütü byte-eşitlik olamaz; §3'teki üç eksen bunun yerine geçer.
+- **CSV → DB yükleme bu planın DIŞINDA.** Prod yazımı Recep kapısı.
+- Şema değişikliği yükleyiciyi (`kademe2-load`) etkileyebilir — koşumdan önce ölçülecek.
+
+
+---
+# FILE: docs\plans\rec158-foy-vitrin-bicim-paritesi-2026-09-06.md
+
+# REC-158 — Föy PDF ile vitrin AYNI biçimlendiriciyi kullanmalı
+
+> **Durum:** PLAN (kod yok) · **Şerit:** ALTYAPI · **Tarih:** 2026-09-06
+> **KAYNAK/CETVEL:** Kararlar — Kurumsal Belgeler **K3** (veri koddan) · **K11** (tek kabuk) ·
+> **K12** (`alanAdlari`) · **K13** (sayfa no üretim tarafında) ·
+> `docs/standards/rendering-cache-standard.md` (PDF önbelleği) ·
+> **PDF cetveli YOK** — "belge üretim hattı" bölümü bu işin kapsamında yazılır.
+> **YÖNTEM:** ALTYAPI şeridi, kendi worktree, kod PR'ı; migration yok. K8: PDF görünür
+> çıktı → Recep önizleme. Plan uygulanmadan önce **plan-challenger** (red-team).
+
+---
+
+## ⛔ÖNCE PREMİS DÜZELTMESİ — kayıttaki iddia ölçümle DARALDI
+
+Kayıt *"föy PDF'i ÜRETİMDE `technical_specs`'ten basılsın"* diyor. Ölçüldü (2026-09-06):
+
+| kayıttaki varsayım | ölçülen gerçek | kanıt |
+|---|---|---|
+| PDF üretimi yok | ⛔**VAR** — `jspdf` + `jspdf-autotable` | `package.json` |
+| föy `technical_specs` okumuyor | ⛔**OKUYOR** | `src/lib/pdfGenerator.ts:196,215` |
+| föy hiç üretilmiyor | ⛔**Üretiliyor**, ürün sayfasından çağrılıyor | `src/app/_components/ProductDetailPageView.tsx:332` |
+
+⭐**Yani "veriden basma" işi ZATEN YAPILMIŞ.** Bir alt ajan ölçümü *"PDF üretim kütüphanesi
+bulunamadı"* demişti; **doğrulama sırasında çürüdü** — `package.json`'da `jspdf` duruyor.
+(Ders: ajan çıktısı örneklenerek doğrulanır; bu kayıt onun canlı örneğidir.)
+
+## ⭐GERÇEK BOŞLUK — "aynı veri, iki yüzeyde İKİ FARKLI BİÇİM"
+
+⛔**BU BÖLÜM RED-TEAM'DEN SONRA DÜZELTİLDİ.** İlk yazımda "biçimlendirmenin tek kaynağı
+`productHelpers.ts`" demiştim — **eksikti**. Etiketin gerçek kaynağı `src/utils/specLabel.ts`:
+
+| yüzey | ETİKET | DEĞER | GRUP | SIRA |
+|---|---|---|---|---|
+| **Vitrin** | `specFieldLabel` / `specGroupLabel` (satır 983, 991) | `formatSpecValue` ✅ | `groupTechnicalSpecs` ✅ | `SPEC_SORT_ORDER` ✅ |
+| **Föy PDF** | ⛔`translateSpecKey` *(parametre, satır 339)* | ⛔**YOK** — ham `String(value)` | ⛔**YOK** | ⛔**YOK** |
+
+⭐**`translateSpecKey` vitrinin etiket kaynağı DEĞİL.** `ProductDetailPageView.tsx`'e yalnızca
+**PDF'e parametre geçmek için** import ediliyor; vitrin kendi render'ında onu hiç çağırmıyor.
+`specFieldLabel` önce i18n sözlüğüne (`pdp.specs.<key>`) bakar, ancak orada yoksa
+`translateSpecKey`'e düşer (`specLabel.ts:76-90`).
+
+⚠**Sonuç:** ilk planın *"`translateKey` parametresi korunur"* kararı **kabul ölçütünü
+sağlayamazdı** — canlı anahtarların çoğunda föy jenerik fallback'e düşer (`"Ip Rating"`),
+vitrin sözlük etiketini gösterir (`"Koruma Sınıfı (IP)"`). Bu, planı yazan (ben) tarafından
+değil **red-team tarafından** yakalandı; düzeltilmeseydi iş "yeşil" bitip parite yine
+sağlanmayacaktı.
+
+Föy, değeri ham basıyor: `String(value)` — `pdfGenerator.ts:216`.
+`grep -c "formatSpecValue|groupTechnicalSpecs|SPEC_SORT_ORDER"` → vitrin **6**, föy **0**.
+
+**Bunun müşteriye görünen sonucu, adıyla:** `formatSpecValue` **birim ekler**
+(`productHelpers.ts:112-134`: `°C`, `L`, `V`, `W`, `dB(A)`, `RPM`, `L/24h`).
+Föy bunu çağırmadığı için aynı ürünün aynı alanı:
+
+- vitrinde → **`45 dB(A)`**
+- föyde → **`45`**
+
+Ayrıca föyde **gruplama yok** (düz alfabetik olmayan tek tablo) ve **sıralama yok**
+(`SPEC_SORT_ORDER` devrede değil), yani vitrinde "Performans / Elektrik" diye ayrılan
+alanlar föyde tek yığın hâlinde ve rastgele sırada çıkıyor.
+
+⚠**Bu, bu depoda ölçülmüş bir hata sınıfıdır: "aynı ölçüt, iki uygulama."** Föy müşteriye
+gönderilen bir belgedir; vitrinle çelişen bir föy, teklif ekinde çelişki üretir.
+
+## HÜKÜM — işin doğru tanımı
+
+> REC-158 = *"föy DB'den bassın"* **değil** (zaten basıyor);
+> **"föy ile vitrin AYNI biçimlendiriciyi kullansın"** — tek kaynak `productHelpers.ts`.
+
+Bu, K11'in (tek kabuk) veri tarafındaki karşılığıdır: kabuk tek olsa da **biçim iki yerden
+geliyorsa** belge yine ayrışır.
+
+## ADIMLAR
+
+1. **Adım 0 — ölçüm dondurulur (bu belge).** Yukarıdaki tablo, değişiklikten önceki durumdur;
+   PR'da "önce/sonra" olarak karşılaştırılacak.
+2. **Föy DÖRT eksende de aynı kaynağa bağlanır** (red-team koşulu 1 — ilk planda ÜÇÜ vardı):
+   - **etiket** → `specFieldLabel(key, t)` *(yeni; `translateSpecKey` parametresi YETMEZ)*
+   - **grup başlığı** → `specGroupLabel(groupKey, t, group.label)` *(yeni)*
+   - **değer** → `formatSpecValue`
+   - **gruplama/sıra** → `groupTechnicalSpecs` + `SPEC_SORT_ORDER`
+   ⚠Föy `lang` alıyor ama `t` almıyor: çağıran taraf (`ProductDetailPageView`) `t`'yi zaten
+   biliyor — **`translateKey` yerine `t` geçirilir**. Aksi hâlde EN föyde grup başlıkları TR
+   kalır (`group.label` hardcoded TR).
+3. **Gruplamanın PDF'te NASIL render edileceği ÖNCE kararlaştırılır** (red-team koşulu 2).
+   Ölçüldü: `pdfGenerator.ts`'te **tek** `autoTable` çağrısı var, `didDrawPage` hook'u **YOK**.
+   Dört bölüm istenirse: 4× `autoTable` + `lastAutoTable.finalY` takibi + her bölüm öncesi
+   taşma kontrolü + `didDrawPage`'de `drawHeader()` **gerekir**.
+   ⚠**ÖNCEDEN VAR OLAN KUSUR, adıyla:** bugün bile `autoTable` kendi iç taşmasıyla 2. sayfaya
+   geçerse o sayfada **başlık çizilmiyor** (`didDrawPage` yok). Gruplama bunu **4 kat** büyütür.
+   ⭐Karar Faz 1'de: **tek tablo + doğru SIRA** (görsel risk minimum) · grup başlıklı 4 bölüm
+   **Faz 2**'ye bırakılır (K8 önizleme gerektirir).
+4. **K13 — sayfa numarası.** Dosyada 4 eşleşme var ama **davranış ölçülmedi**; PR'da çok sayfalı
+   bir fikstürle sayılarak gösterilir. Ölçmeden "var" denmez.
+5. **Kapı: `INV-FOY-PARITE-1`.** Ölçüt **metin taraması değil**, davranış: aynı `technical_specs`
+   fikstürü hem vitrin yardımcılarına hem föy üreticisine verilir; **çıkan etiket/değer/sıra
+   listesi EŞİT olmalı**. Sabotaj kolu: föyden `formatSpecValue` çıkarılınca kol DÜŞMELİ.
+   ⭐Kapı `pdfGenerator`'ın `productHelpers`'ı *import ettiğini* değil, **aynı çıktıyı ürettiğini**
+   ölçer — import denetimi, ikinci bir biçimlendirme yolunu görmez.
+   ✅**Uygulanabilirliği kanıtlı** (red-team koşulu 3): `src/lib/__tests__/pdfGeneratorFallback.test.ts`
+   zaten `jsPDF`'i ve `jspdf-autotable`'ı mock'luyor (`vi.mock` ×2). Kapı, `autoTable`'a geçen
+   `head`/`body` argümanını yakalayıp vitrin çıktısıyla karşılaştırır — **emsal desen budur**.
+   OPS hükmü: üç altın ürün (17160 · 17143 · bir SEAT) fikstür olarak kullanılır.
+6. **Cetvel:** `docs/standards/` altına **belge üretim hattı** bölümü — "müşteriye giden her
+   belge, vitrinle aynı biçimlendiriciden geçer" hükmü + bu vaka.
+
+## SINIRLAR — adıyla
+
+- ⛔**Migration YOK.** Önbellek tablosu gerekirse **ayrı karar** (kural 13: merge = prod'a
+  otomatik uygulama).
+- ⛔**K8:** föy görünür müşteri çıktısıdır → **Recep önizlemesi** olmadan inmez.
+- ⚠**Design `.dc.html` şablonu bu depoda YOK** ve olmaması doğrudur; şablon "dizgi kaynağı"
+  olarak işaretlenecek, veri kaynağı değil. Bu belgenin kapsamı **üretim tarafıdır**.
+- ⚠**Ölçülmedi:** föyün 375 ürünün tamamında nasıl göründüğü (toplu üretim REC-145'e bağlı);
+  bu plan **tek ürün** föyünü hedefler.
+- ✅**"Önbellek tetiği" maddesi KONUSUZ çıktı** (red-team koşulu 4 — ilk planda *"ölçülmedi"*
+  yazmıştım, **ölçülebilirdi ve ölçtüm**): `rendering-cache-standard.md`'de `pdfGenerator` /
+  `datasheet` / `föy` kelimeleri **0 kez** geçiyor. Sebebi de var: föy **istemci tarafında**,
+  buton tıklamasında üretiliyor (`handleDownloadPdf` → dinamik `import` → `doc.save()`),
+  her tıklamada taze veri çekiliyor. **Tazelenecek bir sunucu önbelleği YOK.** Yani bu bir
+  gizli-migration riski değil, **konusuz bir soru**.
+  ⛔Sunucu tarafı PDF hattı (varsa) **Faz 2** — ayrı karar (OPS hükmü).
+- ⚠**`SPEC_SORT_ORDER` ve `translateSpecKey` sözlükleri BAYAT.** Canlı şemadaki anahtarların
+  çoğu bu tablolarda yok (eski adlar taşıyorlar). Pratik etkisi düşük — her iki yüzey de aynı
+  `Object.entries` sırasını koruduğu için sıralama **stabil** kalıyor — ama plan bunu
+  *"sıra tek kaynağa bağlandı"* diye **sunmamalı**: kaynak çoğunlukla **etkisiz**.
+  Sözlük tazeleme **bu işin kapsamı dışında**, ayrı kalem olarak not edildi.
+
+## KABUL ÖLÇÜTÜ
+
+- Aynı fikstürde vitrin ve föy çıktısı **birebir aynı** etiket, değer (birimli) ve sırayı verir.
+- `INV-FOY-PARITE-1` yeşil; **sabotajda düşüyor**.
+- Föyde birim taşıyan alan sayısı: **önce 0**, sonra vitrindekiyle eşit (PR'da sayı verilir).
+- Migration **0**; Recep önizleme onayı yazılı.
+
+---
+
+## RED-TEAM SONUCU — **KOŞULLU**, dört koşul da bu belgeye İŞLENDİ
+
+`plan-challenger` bağımsız koşuldu (alt ajan) ve **planın kabul ölçütünü sağlayamayacağını**
+gösterdi. Dört koşulun dördü de yukarıya işlendi; **iddiaların dördünü de kendim doğruladım**:
+
+| red-team iddiası | benim ölçümüm | sonuç |
+|---|---|---|
+| Etiket kaynağı `specLabel.ts`, `translateSpecKey` değil | `ProductDetailPageView.tsx:983,991` → `specGroupLabel`/`specFieldLabel`; `translateSpecKey` yalnız satır 339'da **PDF parametresi** | ✅**HAKLI** — Adım 2 düzeltildi |
+| Gruplama sayfa düzenini bozar | `autoTable` çağrısı **1**, `didDrawPage` **0** | ✅**HAKLI** — Adım 3, Faz 1'de tek tablo |
+| Kapı yazılabilir, emsali var | `pdfGeneratorFallback.test.ts`'te `vi.mock` **×2** | ✅**HAKLI** — Adım 5'e emsal yazıldı |
+| Önbellek maddesi "ölçülmedi" değil, **konusuz** | `rendering-cache-standard.md`'de PDF/föy geçişi **0**; `handleDownloadPdf` **3** (istemci) | ✅**HAKLI** — sınırlara işlendi |
+
+⭐**DERS, adıyla:** ilk plan *"biçimlendirmenin tek kaynağı `productHelpers.ts`"* diyordu ve bu
+**eksikti** — ikinci bir kaynak (`specLabel.ts`) vardı, ben onu görmedim. Plan o hâliyle
+uygulansaydı iş **"yeşil" bitecek ama parite yine sağlanmayacaktı**: föy jenerik fallback
+etiketleri basmaya devam edecekti. Red-team'in yakaladığı şey bir hata değil, **kör noktaydı** —
+ve kör nokta ancak bağımsız bir gözle görülür.
+
+⚠**Kapsam sınırı (OPS hükmü, 2026-09-06):** Faz 1 = föy ile vitrin aynı biçimlendirici.
+Sunucu tarafı PDF hattı **Faz 2**, ayrı karar. `src/utils/productHelpers.ts` **URUN
+claim'inde** — kod PR'ından önce URUN'a yazılır, çakışma olmasın.
+
+
+---
+# FILE: docs\plans\rec162-vercel-kapisi-2026-09-06.md
+
+# REC-162 — Vercel kolu kapıda nasıl sayılır: "ÖLÇÜLEMEZ" sınıfı + atlama kapsamı
+
+> **KAYNAK/CETVEL:** `docs/standards/fleet-mechanism-standard.md` §20.1 (merge ritüeli madde 3) ·
+> §21 (kabul edilen boşluk sessiz olamaz) · §31/§32 (ölçüt canlı kalır) ·
+> CLAUDE.md kural 1. Ölçümler: bu belge §1.
+> **YÖNTEM:** elle (tek betik + tek kapı dosyası) · ölçüm salt-okuma yapıldı (Vercel dağıtım
+> geçmişi + GitHub status API) · **kod bu belgede YOK, yarın yazılır** (OPS hükmü: bugün plan).
+
+## ⭐0. EMRİN ÖNCÜLÜ ÖLÇÜMLE DEĞİŞTİ — iş yeniden tanımlandı
+
+Emir *"`vercel.json` `ignoreCommand` ile docs/md-only PR'larda önizleme derlemesi atlansın"*
+diyordu. Ölçüm iki maddesini de düşürdü:
+
+| emirdeki varsayım | ölçüm | sonuç |
+|---|---|---|
+| atlama **kurulacak** | `scripts/vercel-ignore-build.sh` **var** (15290 bayt, 2026-08-28) ve **bugün çalıştı**: belge-only bir PR *"Canceled by Ignored Build Step"* ile geçti | ⛔sıfırdan yazım YOK |
+| yüzey `vercel.json` | depoda **`vercel.json` yok**; Ignored Build Step **Vercel panelinde** tanımlı | ⛔yanlış yüzey |
+
+**Yeniden tanım:** iş *"atlama kur"* değil, **(a)** mevcut atlamanın **KAPSAMI** ve
+**(b)** rate-limited kolun kapıda **nasıl sayılacağı**dır.
+
+## 1. ÖLÇÜLENLER (2026-09-06, salt-okuma — kota harcanmadan)
+
+1. **Vercel sonucu bir CHECK RUN değil, COMMIT STATUS'tür.**
+   `commits/<sha>/check-runs` → Vercel adlı kol **yok**; `commits/<sha>/status` →
+   `Vercel | failure | Deployment rate limited`. ⭐**Sonuç:** GitHub'ın `rerequest` ucu
+   check-run içindir; **bu kol push'suz yeniden tetiklenemez.** "CI'ı yeniden koştur" bu kolda
+   uygulanamaz bir talimattır.
+2. **Limiter, atlama adımının ÖNÜNDEDİR.** Belge-only bir push (tek `.md`) yine
+   `rate limited` aldı — `Ignored Build Step`e **hiç gelmedi**.
+3. **Reddedilen istek dağıtım kaydı YARATMAZ.** O push için dağıtım listesinde **kayıt yok**
+   → kotaya maliyeti **sıfır**. ⭐Yani *"belge-only ucuzdur"* **maliyet** olarak doğru,
+   ama *"PR'ı yeşilleştirir"* anlamında **yanlış**.
+4. ⚠**Limit o an hesap geneli DEĞİLDİ.** Aynı 20 dakikada başka şeritlerin push'ları
+   dağıtıldı (biri **gerçek derleme**, biri production `BUILDING`), benimki reddedildi.
+   **Sebep ÖLÇÜLMEDİ** — adaylar: dal/PR bazlı geri-çekilme, ardışık reddedilmiş denemeden
+   sonra kilit, başka bir sınır türü. **Ad konmadı.**
+5. **Hacim:** ~2 saatte **20 dağıtım** (~9/saat). **PR başına en az 2** (dal önizlemesi +
+   merge sonrası master). Hızlı ardışık merge'lerde önceki master dağıtımı **CANCELED** olur.
+
+## 2. YAPILACAK — üç kalem
+
+### K1. Kapıda "ÖLÇÜLEMEZ" sınıfı (madde 3'ün dışı)
+
+Merge ritüelinde Vercel kolu **rate-limited** mesajıyla düşerse `DUSEN` sayılmaz;
+**ÖLÇÜLEMEZ** sayılır ve ekrana **adıyla** yazılır.
+
+⛔**Sınır — gevşetme DEĞİL:**
+- **K8 kapsamındaki PR** (müşteriye görünen değişiklik, önizleme şart) → **KIRMIZI kalır.**
+  Önizlemesi olmayan bir görsel değişiklik onaylanamaz.
+- **Belge-only PR** (yalnız `docs/**` ve `*.md`) → **ÖLÇÜLEMEZ, merge serbest.**
+- Rate-limited **dışındaki** her Vercel hatası (gerçek build hatası) → **eskisi gibi KIRMIZI.**
+- Sınıf **yalnız** Vercel'in kendi `rate limited` metnine bağlanır; genel "Vercel kırmızıysa
+  affet" **yasak**.
+
+### K2. Atlama betiğinin KAPSAMI (mevcut betik, sıfırdan değil)
+
+Bugün: `docs/**` + `*.md` atlanıyor; `scripts/**` **atlanmıyor** (ölçüldü: `scripts/` içeren
+PR gerçekten derlendi). Karar gerektiren soru: **`scripts/`, `.github/`, `registry/` eklensin mi?**
+⚠**Hüküm önerisi:** `.github/**` ve `scripts/hijyen/**` **eklenmeli** (siteyi üretmezler);
+`scripts/**` **toptan eklenmemeli** — `scripts/generate/generate-next-routes.js` gibi
+**çıktısı siteye giren** betikler var, toptan atlama onları görünmez kılar.
+⭐Bu ayrım ölçülmeden yazılmaz: **hangi betiğin çıktısı build'e giriyor** sayılacak.
+
+### K3. Cetvel satırı — "iş bitti ≠ erişilebilir"in yeni yüzü
+
+`fleet-mechanism-standard.md`'ye: **merge sonrası canlı doğrulama, merge SHA'sı ile değil
+son `READY` master dağıtımının SHA'sı ile yapılır.** Hızlı ardışık merge'lerde önceki master
+dağıtımı iptal olur; "merge oldu" ile "canlıda o sürüm var" aynı şey değildir.
+
+## 3. KAPILAR (üç sabotaj kolu — K1 için)
+
+| # | sabotaj | beklenen |
+|---|---|---|
+| S1 | Vercel `rate limited` **düşük**, PR **belge-only** | ÖLÇÜLEMEZ → merge serbest, ekranda adıyla |
+| S2 | Vercel `rate limited` **düşük**, PR **K8 kapsamında** | **KIRMIZI** — sınıf uygulanmaz |
+| S3 | Vercel **gerçek build hatası** ile düşük (metin farklı) | **KIRMIZI** — sınıf metne bağlı, duruma değil |
+
+⭐Ayrıca **boş-koşum koruması**: sınıfın hiç tetiklenmediği bir koşumda kol "geçti" demez.
+
+## 4. SINIRLAR — dürüstçe
+
+- Madde 4'teki **sebep bilinmiyor**; K1 sebebe değil **Vercel'in yazdığı metne** bağlanır.
+  Metin değişirse sınıf sessizce ölür → bu yüzden **metnin kendisi de bir kola bağlanır**
+  (metin bulunamazsa ÖLÇÜLEMEZ sınıfı **kapanır**, fail-closed).
+- Rate limit'in penceresi/kuralı **ölçülmedi**; "24 saat" **Vercel mesajından okunmuştu ve
+  ölçümle düştü** — plana sayı yazılmıyor.
+- ⛔**Ücretli plan seçeneği bu planın kapsamı dışıdır ve önerilmez** (Recep'in yazılı kararı).
+
+## KABUL ÖLÇÜTÜ
+
+- Üç sabotaj kolu da **adıyla** düşüyor/geçiyor (pass/fail özeti değil, **alınan değer**).
+- K8 PR'ında sınıf **uygulanmıyor** (S2 kırmızı).
+- Atlama kapsamı değişiyorsa: **hangi betiğin çıktısı build'e giriyor** sayımı belgede.
+- Cetvel satırı (K3) yazılı ve merge sonrası doğrulama o SHA ile tarif edilmiş.
+
+İlgili: REC-162
+
+
+---
+# FILE: docs\plans\rec168-migration-taslagi-2026-09-06.md
+
+# REC-168 — Migration TASLAĞI: satış kipi anahtarı (tek kaynak + koşullu tetik)
+
+> **KAYNAK/CETVEL:** `docs/standards/satis-kipi-gecis-standard.md` §3–§4 · `rendering-cache-standard.md` §3
+> (tazeleme sözleşmesi) · `db-grant-hygiene-standard.md` (GRANT tek başına kapı değildir) ·
+> CLAUDE.md kural 13 (**migration merge = prod'a otomatik uygulanır; yalnız Recep onayıyla**).
+> **YÖNTEM:** elle (tek dosya) · bu belge **taslaktır**, `supabase/migrations/` altına
+> **ikinci PR'da** `YYYYMMDDHHMMSS_satis_kipi_anahtari.sql` adıyla (14 hane) taşınır.
+> **Bu belgenin merge'i hiçbir şey uygulamaz** — `docs/` altında SQL çalışmaz.
+
+## Niçin migration gerekiyor (emir "migration YOK" diyordu — öncül ölçümle düştü)
+
+| ölçüm (canlı, 2026-09-06 13:4xZ) | sonuç |
+|---|---|
+| `site_settings` tablosu | **VAR** — `key text · value jsonb · description · updated_at · updated_by`, 2 satır (`general`, `payment`) |
+| `site_settings` tetiği | **YOK** (`pg_trigger` boş) → satır değişse hiçbir sayfa tazelenmez |
+| `site_settings` RLS | `rls_enabled=true`, üç politika **yalnız `authenticated`**; anon SELECT **kasıtlı yok** (migration `20260617000000`: *"ayar değerleri (ör. iyzico) public/anon'a…"*) |
+| RSC sunucu istemcisi | `src/lib/supabase/server.ts:10` ve `static.ts` **ANON key** ile çalışır |
+
+Sonuç: RSC anahtarı **okuyamaz**; anon'a tablo açmak `payment.iyzico_*` alanlarını da açar. Çözüm
+**tabloyu açmak değil**, anon'a **yalnız boolean döndüren** bir fonksiyon + **yalnız o satır için**
+tetik. İkisi de DDL → migration → Recep kapısı.
+
+## SQL (taslak — ikinci PR'da migrations/'a birebir taşınır)
+
+```sql
+-- REC-168: satış kipi anahtarı — tek kaynak, anon'a YALNIZ boolean, koşullu tetik
+-- Cetvel: docs/standards/satis-kipi-gecis-standard.md §3 (arayüz) · §4 (tazeleme)
+--
+-- BU MIGRATION PROD'A OTOMATİK UYGULANIR (supabase-migrate.yml) — merge = uygulama.
+-- İçerik DDL'dir, VERİ YAZMAZ: satis_kipi satırını betik ekler (scripts/kip/satis-kipine-gec.mjs).
+-- Satır yokken fonksiyon {acik:false} döner → davranış bugünkünün AYNISI (kapalı). Yani bu
+-- migration inince vitrinde HİÇBİR ŞEY değişmez; değişiklik ancak betik + Recep onayıyla olur.
+
+begin;
+
+-- 1) OKUMA FONKSİYONU — anon çağırır, yalnız {acik, damga} döner.
+--    SECURITY DEFINER: fonksiyon kendi yetkisiyle SELECT eder; site_settings RLS'i DEĞİŞMEZ,
+--    anon tabloya hâlâ ULAŞAMAZ. payment/general satırları bu fonksiyondan SIZMAZ:
+--    WHERE key='satis_kipi' ve yalnız value->>'acik' okunur. (Kapı: INV-SATIS-KIPI-2)
+--    search_path='' + şema-nitelikli adlar: advisor "mutable search_path" uyumlu (get_category_counts deseni).
+create or replace function public.satis_kipi_oku()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(
+    (select jsonb_build_object(
+              'acik',  coalesce((s.value->>'acik')::boolean, false),
+              'damga', s.updated_at)
+       from public.site_settings s
+      where s.key = 'satis_kipi'
+      limit 1),
+    jsonb_build_object('acik', false, 'damga', null)   -- satır yok → KAPALI (fail-closed)
+  );
+$$;
+
+-- R7 deseni (20260602070000): SECURITY DEFINER fonksiyonlarda public'ten geri al, adıyla ver.
+revoke all on function public.satis_kipi_oku() from public;
+grant execute on function public.satis_kipi_oku() to anon, authenticated, service_role;
+
+-- 2) TETİK — YALNIZ satis_kipi satırı değişince webhook.
+--    WHEN koşulu kasıtlı: payment/general satırı değişince to_jsonb(NEW) (iyzico alanları dahil)
+--    webhook yüküne GİRMEZ. handle_supabase_webhook() jenerik (TG_TABLE_NAME), route.ts
+--    `table === 'site_settings'` dalında `record.key === 'satis_kipi'` ile revalidateTag(SATIS_KIPI_TAG)
+--    — o dal URUN'un (REC-169 ilk kalem); bu migration dal olmadan da ZARARSIZDIR (webhook gelir, eşleşen
+--    dal yoksa no-op).
+--    DELETE bilerek dışarıda: AFTER DELETE'te NEW yoktur, WHEN(new.key) hata verir; betik satır SİLMEZ,
+--    silinirse fonksiyon zaten fail-closed. Bilinen sınır, cetvel §11.
+drop trigger if exists on_site_settings_satis_kipi on public.site_settings;
+create trigger on_site_settings_satis_kipi
+  after insert or update on public.site_settings
+  for each row
+  when (new.key = 'satis_kipi')
+  execute function public.handle_supabase_webhook();
+
+-- === Guard (20260815 deseni): eksikse migration DÜŞER, yarım kalmaz ===
+do $$
+begin
+  if not exists (select 1 from pg_proc where proname = 'satis_kipi_oku') then
+    raise exception 'REC-168 guard: satis_kipi_oku() yok';
+  end if;
+  if not exists (select 1 from pg_trigger where tgname = 'on_site_settings_satis_kipi') then
+    raise exception 'REC-168 guard: on_site_settings_satis_kipi tetiği yok';
+  end if;
+end $$;
+
+commit;
+```
+
+## Uygulama SIRASI (kod migration olmadan ÇALIŞIR — bu yüzden sıra güvenli)
+
+1. **Kod PR'ı** (`src/lib/kip/satisKipi.ts` + `checkout/page.tsx` + betik + kapılar): `satisKipiOku()`
+   RPC'yi bulamazsa **`{acik:false, kaynak:'kapali-varsayilan'}`** döner → bugünkü davranış aynen. Kota
+   penceresinde, koşullu self-merge.
+2. **Migration PR'ı** (bu taslak, `migrations/` altında): **Recep onayıyla** merge → prod'a uygulanır.
+   Vitrin yine değişmez (satır yok).
+3. **`pnpm supabase:gen`** → `database.types.ts`'e `satis_kipi_oku` girer (URUN'un claim'i; tip üretimi
+   AXIOM 3 — elle yazılmaz). Kod PR'ı bu adımdan önce inecekse RPC çağrısı tip düzeyinde `unknown`
+   üzerinden geçer (cetvel §3.4'te yazılı, kapı ölçer).
+4. **Betik kuru koşum** → **Recep onayı** → `--uygula --onay "Recep <tarih>"` → tetik → webhook → tazeleme.
+5. **Canlı doğrulama**: son **READY** master dağıtım SHA'sı ile (K3 — merge SHA'sı DEĞİL).
+
+## Sabotaj kolları (ikinci PR'daki kapı, adıyla)
+
+| kol | ne yapar | beklenen |
+|---|---|---|
+| INV-SATIS-KIPI-2a | anon istemci `site_settings`'ten SELECT dener | **42501 / RLS reddi** (tablo hâlâ kapalı) |
+| INV-SATIS-KIPI-2b | anon istemci `rpc('satis_kipi_oku')` | yalnız `{acik, damga}` — `iyzico` geçen anahtar **0** |
+| INV-SATIS-KIPI-2c | `payment` satırı güncellenir | webhook **atılmaz** (WHEN koşulu) — ölçüm: webhook olay sayısı 0 |
+| INV-SATIS-KIPI-2d | `satis_kipi` satırı yokken RPC | `{acik:false}` |
+
+⚠ Bu kollar **canlı DB'ye** bakar; konformans dizisinde değil, `scripts/db/checks/` altında (ALTYAPI
+claim'i) ayrı koşulur — canlıya bağlı testin CI'daki yeri cetvel §9'da.
+
+İlgili: REC-168 · REC-169 (route.ts dalı) · REC-159 (iade şeması, ayrı migration)
+
+
+---
+# FILE: docs\plans\rec292-denetim-izi-2026-09-09.md
+
+# Betikle yapılan doğrudan DB yazımlarının denetim izine düşmesi — PLAN
+
+> **REC-292 · ALTYAPI · 2026-09-09**
+> **Bu belge PLAN'dır. Migration YOK, kod YOK, prod yazımı YOK.**
+> Uygulama, plan-challenger + OPS çürütmesi + **Recep merge onayı**ndan sonra ayrı emirle koşar
+> (CLAUDE.md kural 13: migration içeren dal master'a merge edilince prod DB'ye OTOMATİK uygulanır).
+
+**KAYNAK/CETVEL — bu planı hangi cetvel yönetiyor:**
+⛔**YÖNETEN CETVEL YOK.** Denetim izi bütünlüğü (hangi yazım yüzeyi denetime düşmek zorundadır,
+düşmezse ne olur, nasıl ölçülür) için yazılmış bir cetvel aradım ve bulamadım —
+`docs/standards/` altındaki 79 dosyanın 10'u `admin_audit_log` adını anıyor ama hiçbiri yazım
+yüzeyini kurala bağlamıyor; en yakını `admin-standard.md:234`, ve o da yalnız admin paneli için
+bir kontrol listesi satırı ("eksik mutasyonlara ekle"). **Cetvelin yazımı bu işin kapsamındadır:**
+`docs/standards/denetim-izi-standard.md` (şeride talep edildi, 2026-09-09).
+
+**Kısmen yöneten mevcut cetveller:** `CLAUDE.md` kural 11 (admin işlemleri `admin_audit_log`) ·
+kural 13 (migration = prod) · kural 12 (tenant-scoped) ·
+`docs/standards/migration-safety-standard.md` §"her migration ATOMİK uygulanır" (INV-MIGRATION-1) ·
+`docs/standards/db-grant-hygiene-standard.md` §3.1 (politika okuyan role yazılmamış olabilir).
+
+**Ölçüm tazeliği:** repo ölçümleri 2026-09-09, `origin/master` = `b416ae39b`. Prod DB'nin canlı
+durumu **ÖLÇÜLMEDİ** — §6'da açık ölçüm kalemi olarak duruyor, hatırlanan sayı yok.
+
+---
+
+## 1. Arıza, tek cümleyle
+
+Betikler prod veriyi service_role ile doğrudan değiştiriyor ve bu yazımların **hiçbiri**
+denetim izine düşmüyor; yani veri değişti, kim/ne/ne zaman sorusunun cevabı YOK.
+
+KATALOG'un ölçümü (2026-09-08): 7 kategori silme + 18 ürün taşıma + 104 görsel; `admin_audit_log`
+tarafında `categories` satırı **0**. Bu sayıyı prod okumadan doğrulayamam ve doğrulamadım — ama
+**aynı sonucu koddan, daha güçlü biçimde ölçtüm** (§2.1): satır sayımı bir gözlem, kodun yapısı
+bir kesinliktir.
+
+## 2. Ölçüm — evren dahil
+
+### 2.1 Yazan betikler ve denetim yazımı
+
+`scripts/**` altında `.insert|.update|.upsert|.delete` çağıran **14 dosya** var. Bunların
+**0'ı** denetim satırı yazıyor. `logAdminAction`/`admin_audit_log` adını anan 3 dosya
+(`db/audit_checks.js`, `db/migrations/update_schema_master.{py,md}`) **içeriğe bakıldığında**
+yalnızca tablo adı listesi tutuyor — yazım değil. (Adı ölçüt saymadım, içeriği okudum.)
+
+Karşılaştırma: `logAdminAction` uygulama tarafında 25 yerden çağrılıyor
+(`src/lib/admin/mutateWithAudit.ts` sarmalayıcısı üzerinden). Yani denetim izi **admin panelinde
+var, panel dışında yok** — kural 11 tam bu boşlukta yaşıyor.
+
+### 2.2 Tablo evreni — emir 4 sayıyor, ölçüm 6 gösteriyor
+
+| tablo | yazan betik (örnek) | emirde var mı |
+|---|---|---|
+| `categories` | `restore_categories.ts` upsert · `run_category_migration.ts` delete · `satis-kipine-gec.mjs` update | ✓ |
+| `products` | `kademe2-load/load.mjs` insert · `tier-c-temizlik.mjs` update · `extract_brands.py` update | ✓ |
+| `product_families` | `load.mjs` insert · `tier-c-temizlik.mjs` update | ✓ |
+| `product_images` | `upload-pilot-images.mjs` insert + **delete** | ✓ |
+| **`brands`** | `load.mjs` insert | ⛔**YOK** |
+| **`site_settings`** | `satis-kipine-gec.mjs` insert + update | ⛔**YOK** |
+
+⚠**`site_settings` ticari olarak en hassas olan.** `scripts/kip/satis-kipine-gec.mjs` satış kipi
+anahtarını (REC-168) oradan çeviriyor; o anahtar vitrinde fiyatın görünüp görünmeyeceğini
+belirliyor. Fiyatın açılıp kapanması denetim izi olmadan yapılabiliyor. Bu betik **benim
+şeridimde** (`scripts/kip/**`) — yani boşluğu kendi kalemimde de buldum.
+
+### 2.3 Yazma yüzeyi tek dil değil — disiplin katmanının kapatamayacağı yer
+
+| yüzey | kanıt | grep'lenebilir mi |
+|---|---|---|
+| JS/TS `.from('x').update()` | 14 dosya | evet |
+| **Python `.table('x').update()`** | `scripts/tools/extract_brands.py:167` | evet, ama **farklı API adı** |
+| **Ham `.sql` dosyası** | `scripts/db/fixes/*.sql` (5 dosya DML içeriyor) | evet |
+| **Ham `fetch` + PostgREST** | `icerik-hatti/kayip-urun-aktar.mjs:136` POST · `kayip-urun-aile-bagla.mjs:144,155` POST+PATCH | evet, ama **hiçbir SDK deseni tutmaz** |
+| **Dinamik tablo adı** | `katalog-geri-yukle.mjs:44` — yedi tabloyu `rest/v1/${t}` döngüsüyle gezer | ⛔**HAYIR — literal ad grep'i göremez** |
+| **Keyfi SQL (`rpc/exec`)** | `apply-stock-fix.mjs:46,68` · `db/migrations/apply-sql-via-rpc.mjs:47` · `run-migration.ts:38` | evet ama **içeriği dosyadan gelen ham SQL** |
+| **MCP `execute_sql`** | ajanın elindeki araç | ⛔**HAYIR — dosya değil** |
+| `psql` / Supabase SQL editörü | insan eli | ⛔**HAYIR** |
+
+Uzantı dağılımı: `mjs` 56 · `py` 44 · `cjs` 24 · `js` 15 · `sql` 14 · `ps1` 4 · `sh` 3.
+
+⛔**Kendi ölçüm hatam, kayda geçsin:** ilk taramamda yalnız `--include=*.mjs,*.cjs,*.ts`
+kullandım ve `.js`'i atladım; `scripts/db/migrations/apply-metadata-update.js` (categories
+update) evrenin dışında kaldı. Çok satıra yayılan zincirleri de ilk grep'im görmedi. Bu, bugün
+**beşinci** "ölçüt keskin, evren yanlış" vakası. Düzeltme: çok satırlı desen + uzantı envanteri
++ `.table()` API varyantı.
+
+**Sonuç:** disiplin katmanı (yazım öncesi döküm, betiğe eklenen çağrı) bu evreni kapatamaz —
+çünkü evrenin iki üyesi hiç dosya değil. Disiplin, kapsadığı yerde iyidir; **kapı olamaz.**
+
+⛔**ALTINCI VAKA — bu tabloyu çürütme genişletti.** İlk hâlinde "6 yüzey" yazmıştım; bağımsız
+denetçi **ham `fetch` + PostgREST** sınıfını buldu, ben de örneklerken **yedinci dosyayı**
+(`apply-stock-fix.mjs`) ekledim. Bu sınıf Supabase SDK'sını hiç kullanmadığı için ne `.from(`,
+ne `.insert(`, ne `.table(` deseniyle görünür. Yani §2.3'ün ilk hâli **kendi düzeltmesinden
+sonra bile eksikti**.
+⭐**KAPI TASARIMINA ETKİSİ — asıl ders:** kapı **tablo adı** üzerinden kurulamaz, çünkü
+`katalog-geri-yukle.mjs` tabloyu değişkenden alıyor (`rest/v1/${t}`) ve literal-ad grep'i onu
+asla göremez. Kapı **yazma fiili** üzerinden kurulacak.
+
+### 2.4 Ev geleneği VAR — ve iki ölçülmüş kusuru var
+
+`supabase/migrations/20260826213000_enforce_role_change_actor_guard.sql` service_role ile yapılan
+rol yazımını denetime düşürüyor; yani "tetikle denetim" bu depoda **zaten kabul edilmiş bir
+desen**. Şablonu ondan alacağım. Ama migration'ın **kendi yorumu** iki kusuru adıyla yazıyor:
+
+1. **Fail-open, tasarım gereği** (satır 88-89): `exception when others then raise warning` —
+   denetim yazımı patlarsa göç DEVAM ediyor. Gerekçesi yazılı ve savunulabilir ("alarm,
+   korumaya çalıştığı şeyi bozarsa net zarar üretir"). Ama sonucu şu: **denetim sessizce
+   kaybolabilir ve hiçbir şey kırmızı olmaz.**
+2. **Kırılganlık, adıyla ilan edilmiş** (satır 66-72): `admin_audit_log`'a FORCE ROW LEVEL
+   SECURITY verilirse INSERT reddedilir, exception guard'ı da hatayı WARNING'e indirir, yani
+   **alarm sessizce ölür**. Ve o yorum kalıcı çözümün yerini de söylüyor: *"Kalıcı çözüm bu
+   migration'da değil, **bekçi kaleminde**."*
+
+⛔**DÜZELTME (çürütme sonrası, ölçümle):** yukarıda "o kalem benim şeridim" yazmıştım — **YANLIŞ.**
+Devir metninin devamını okumamıştım. Aynı migration satır 130-131 şunu diyor: *"Doğru bekçi metin
+taraması DEĞİL canlı DB'ye bakan kontrol betiğidir; o yüzey **EDGE'in claim'inde.** Ayrı kalem."*
+Yani borç iki yarım:
+- **Migration yarısı BENİM ve bu işte kapanabilir:** definer yolunu adıyla kapsayan bir INSERT
+  politikası. `admin_audit_log`'daki iki politika `TO authenticated` (satır 685-690), yani
+  `postgres` için politika YOK — FORCE RLS verilirse definer de reddedilir. Tek satırlık kapanış.
+- **Bekçi yarısı BENİM DEĞİL:** canlı DB'ye bakan kontrol betiği EDGE şeridinde. Üstlenmeyeceğim;
+  ayrı kalem olarak OPS'a bildirilecek.
+
+⚠Bu, kendi kalemimi başkasının şeridine taşımaya bir adım kalmışken yakalanan bir hataydı.
+Sebep tanıdık: **devredilen borcu okurken devrin ikinci yarısını atladım** — evreni yine eksik
+aldım (bugün altıncı vaka).
+
+### 2.5 FORCE RLS bugün verilmemiş
+
+`grep -ri "force row level security"` → tüm depoda **tek eşleşme**, ve o da yukarıdaki yorumun
+kendisi. Yani depo hiçbir tabloya FORCE vermemiş; SECURITY DEFINER/owner=postgres tetiği
+sahip-RLS-atlaması ile INSERT edebiliyor. ⚠Bu bir **repo** ölçümü — prod'un canlı durumu ayrı
+soru ve §6'da açık.
+
+## 3. Hüküm — hangi katman
+
+**DML tetiği doğru katman.** Gerekçe ölçümden: yazma yüzeyi çok dilli, çok API'li ve bir kısmı
+dosya değil; satır-düzeyi DML'in hepsinde tetik ateşlenir. Disiplin katmanı (yazım öncesi döküm)
+KATALOG'un cetveline gitti ve benim işim değil — ama zaten kapı olamaz, olsa olsa kapının
+üstünde bir görgü kuralıdır.
+
+⛔**DÜZELTME: "hepsinin ALTINDA durur" dedim — FAZLA İDDİA.** Tetiğin atlanabildiği yollar var
+ve ikisi bugün gerçekten erişilebilir:
+
+| atlama yolu | erişilebilir mi | tetik görür mü |
+|---|---|---|
+| **TRUNCATE** | ⚠**EVET** — `db-grant-hygiene-standard.md` §2 ölçümü: `service_role` yetkisi `arwdDxtm` (sekiz yetkinin tamamı, TRUNCATE dahil). Depoda tek `REVOKE TRUNCATE` var ve o `contact_messages` için | ⛔HAYIR — satır tetiği TRUNCATE'te ateşlenmez, RLS de uygulanmaz |
+| **Keyfi SQL (`rpc/exec`)** | ⚠prod'da fonksiyonun VARLIĞI ölçülmedi (repoda tanımı yok, migration dışı kurulmuş). Varsa service_role anahtarıyla `DROP TRIGGER` bile mümkün | ⛔tetik **kaldırılabilir bir nesneye** dönüşür |
+| `ALTER TABLE … DISABLE TRIGGER` · `session_replication_role='replica'` | service_role ile HAYIR; ama Supabase SQL editörü ve MCP `execute_sql` **sahip (`postgres`) rolüyle** koşar | ⛔HAYIR |
+
+⭐**Bu, §2.3'ün en can alıcı sonucunu tersine çeviriyor:** oradaki "dosya değil, grep'lenemez"
+diye işaretlediğim iki yüzeyi (SQL editörü, MCP `execute_sql`) *"disiplinin kapatamadığı ama
+tetiğin kapattığı"* diye sınıflamıştım. Gerçekte onlar **tetiğin de kapatamadığı** yüzeyler —
+üstelik tetiği devre dışı bırakabilen yüzeyler. Hüküm ayakta kalıyor (tetik hâlâ en alt
+ulaşılabilir katman), ama **"her şeyin altında" değil**: sahip rolü tetiğin de altındadır.
+Bunun karşılığı kapı değil kural olur: sahip rolüyle yazım Recep kapısıdır.
+
+**Eklenecek kalem:** `AFTER TRUNCATE … FOR EACH STATEMENT` tetiği — TRUNCATE kör noktasını
+kapatır ve planın ilk hâlinde hiç yoktu.
+
+**Kapsam: 6 tablo**, emirdeki 4 değil. `brands` ve `site_settings` ölçümle eklendi; `site_settings`
+ticari yüzeyi doğrudan etkilediği için düşmesi kabul edilemez.
+
+⭐**ÖNCELİK SIRASI (OPS onayı, 2026-09-09):** kapsam genişlemesi kabul edildi ve `site_settings`
+**en ağır kalem** olarak işaretlendi. Uygulama tek migration'da altı tabloyu birlikte kurar
+(INV-MIGRATION-1 atomiklik); ama bir sebeple kapsam daraltılmak zorunda kalırsa **düşecek son
+tablo `site_settings`'tir** — çünkü diğer beşi katalog verisi, o ise fiyatın vitrinde görünüp
+görünmeyeceğini belirleyen ticari anahtardır.
+
+### 2.6 ⛔KRİTİK — ev şablonu `site_settings` için ÇALIŞMA ANINDA PATLAR, ve fail-open bunu SONSUZA GİZLER
+
+Çürütmenin bulduğu ve **ölçerek doğruladığım** en ağır kalem. Üç ölçüm:
+
+1. `admin_audit_log.tenant_id` **NOT NULL** ve **sabit bir varsayılana** bağlı
+   (`20260530220000_tenant_schema_setup.sql:164`).
+2. `site_settings` tablosunda **`tenant_id` YOK** — tüm `supabase/migrations` içinde
+   `site_settings` ile `tenant` aynı satırda hiç geçmiyor.
+3. Ev şablonu denetim satırını yazarken **`new.tenant_id`** okuyor
+   (`20260826213000_…sql:86`).
+
+**Zincirin sonucu:** `site_settings` tetiğinde `new.tenant_id` PL/pgSQL'de **çalışma anında**
+`record "new" has no field "tenant_id"` fırlatır — ve plpgsql geç bağladığı için
+`CREATE FUNCTION` anında **yakalanmaz**. §4.2'nin fail-open bloğu (`exception when others`) bu
+hatayı WARNING'e indirir. Yani:
+
+> **`site_settings` tetiği kurulur, yeşil görünür, ve hiçbir zaman tek satır bile yazmaz.**
+
+⛔Planın **en hassas gördüğü tablo, planın kendi tasarımıyla kapısız kalır** — ve üstü yeşil
+kapıyla örtülür. Tam olarak dün "yeşil kapı göründüğünü kanıtlamaz" dersini aldığım arıza sınıfı,
+bu kez kendi planımın içinde.
+
+⚠**"Tenant'sız kalır" dediğim senaryo da yanlıştı:** kolon NOT NULL + sabit varsayılan olduğu
+için sonuç NULL değil, **yanlış tenant damgası**. Boşluk yerine doğru görünen yanlış kayıt üretir;
+denetim izinde bu daha kötüdür.
+
+**Karara bağlanacak (uygulamadan önce ZORUNLU):** (a) `site_settings`'e `tenant_id` eklemek
+(⚠F3 guard'ı "tenant_id'li tablo sayısı = 6" diye sabitliyor, o kapıyı kırar), (b) tetik
+gövdesinde tenant'ı `TG_TABLE_NAME`'e göre koşullu türetmek, (c) `site_settings` için ayrı ve
+tenant'sız tetik. **Hangisi olursa "boş kalır" seçeneği YOK.**
+
+## 4. Tasarım kararları — ve her birinin bedeli
+
+### 4.1 actor: NULL olacak ve bu GİZLENMEYECEK
+
+service_role bağlamında `auth.uid()` NULL döner. Tetik "kim" sorusunu **cevaplayamaz** ve
+cevaplıyormuş gibi yapmayacak. Garanti ettiği: **ne değişti, ne zaman, hangi satır, eski/yeni
+değer.** "Kim" en iyi çaba: `comment` alanına `session_user` + `application_name` yazılır
+(betikler `application_name` verirse okunur; vermezse boş kalır ve boş olduğu görünür).
+
+⚠Alan adı taahhüt eder: `actor` kolonu NULL ise rapor "bilinmiyor" demeli, "sistem" DEMEMELİ.
+
+⛔**DÜZELTME — "cevaplanamaz" FAZLA TESLİMİYET.** Dürüstlük kısmı doğru ve duruyor (NULL'a
+"sistem" yazmayacağım). Ama **hüküm yanlıştı**: service_role bir *anahtar* değil bir *JWT*'dir;
+aynı sırla `role: service_role` + gerçek `sub`/özel claim taşıyan jeton üretilebilir ve
+`auth.uid()` o zaman **gerçek kimlik döner**. Depoda zemin hazır: `jwt_tenant_id()` ve
+`is_admin_user()` hâlihazırda `auth.jwt()` claim'lerini okuyor, `custom_access_token_hook`
+kurulu. İkinci yol: betiklere **ayrı DB rolü** vermek → `session_user` "en iyi çaba" değil
+**belirleyici** aktör olur.
+
+⭐**Doğru ifade:** "actor bugün cevaplanamıyor; cevaplanabilir hale getirmenin yolu özel claim'li
+jeton ya da ayrı rol, maliyeti şu" — ve bu **ayrı bir kalem** olur. Çözülebilir bir eksikliği
+doğa yasası gibi kaydetmek, onu kalıcı yapardı. REC-292'nin kapsamında değil, ama planda
+**çözülebilir** olarak duruyor.
+
+### 4.5 ⛔ÇİFT-LOG — planın ilk hâlinde hiç yoktu
+
+İki yönlü bulgu, ikisi de ölçülü:
+
+1. **"Denetim panelde var" öncülüm fazla iyimserdi.** Panelin kendisinde de yazımlar
+   `mutateWithAudit` sarmalayıcısını atlayıp ham istemciyle koşuyor
+   (`views/admin/CategoriesTableBody.tsx`, `views/admin/ProductsTableBody.tsx`,
+   `components/admin/products/ProductCsvImport.tsx:166` `upsert`). ⭐Bu, tetik hükmünü
+   **güçlendirir**: tetik panelin bu boşluğunu da kapatır — ilk hâlinde kendime yazmadığım bir
+   kazanç.
+2. **Ama tersi de var:** `mutateWithAudit`'in gerçekten çalıştığı yollarda tetik eklenince
+   **her mutasyon iki denetim satırı** üretir. Deponun bu sorunu çözmüş bir deseni bile var:
+   `auditedByEdge` bayrağı ("Edge kendi audit'ini yazıyorsa `logAdminAction`'ı ATLA").
+
+**Karara bağlanacak (uygulamadan önce):** ya altı tablo için uygulama katmanı audit'i kapatılır,
+ya iki kaynak `action`/`comment` ile ayrıştırılır. Kararsız bırakılırsa denetim tablosu okunamaz
+hale gelir ve §5'in ayrım çifti kanıtı bile bulanır.
+
+### 4.2 Fail-open mu fail-closed mu — **plan-challenger'a ASIL SORU**
+
+| seçenek | bedeli |
+|---|---|
+| **fail-open + sessiz** (mevcut ev geleneği) | 104 görsel yükleyen betik kırılmaz; ama denetim kaybı görünmez. Bugün tam bu yüzden buradayız. |
+| **fail-closed** (denetim yazılamazsa yazım geri alınır) | Kanıtsız yazım imkânsız olur; ama `kademe2-load` gibi 1000+ satır yükleyen bir akış denetim tablosundaki tek bir aksaklıkta tamamen durur. Veri göçünü denetim tablosuna rehin verir. |
+| ⭐**fail-open + GÖRÜNÜR** (önerim) | Yazım devam eder, ama başarısız denetim yazımı **sayılır ve ölçülebilir bir ize düşer** (WARNING değil — WARNING kimsenin bakmadığı yerdir). Bedeli: ikinci bir küçük tablo/sayaç ve onu okuyan bir kapı. |
+
+⛔**HÜKÜM ÇÜRÜTÜLDÜ — DEĞİŞTİRİYORUM.** İlk hâlinde "üçüncüsü" demiş ve REC-280'e yaslanmıştım.
+Çürütme iki ayrı hata gösterdi ve ikisini de kabul ediyorum:
+
+**Hata 1 — ispat yükünü ters çevirmişim.** Tabloda fail-open'ı "mevcut ev geleneği", yani bedava
+varsayılan gibi sundum. Kod tersini söylüyor: tetik ile veri yazımı **aynı transaction**'dadır.
+`exception when others` bloğunu **yazmazsan** denetim insert'i patladığında transaction düşer ve
+veri yazımı da geri alınır. Yani **fail-closed, Postgres'in atomikliğinden bedava gelen
+varsayılandır; fail-open'ı elde etmek için fazladan üç satır yazmak gerekir.** İspat yükü
+fail-closed'ın değil, **fail-open'ın** üzerindedir — ve ilk hâlimde o yükü hiç taşımamıştım.
+
+**Hata 2 — REC-280 analojisi geçersiz.** Orada kaybedilen şey *bir uyarıydı* ve telafisi bir
+sonraki koşumdu. Burada kaybedilen şey **kanıtın kendisi** ve telafisi YOK — kendi §8'im
+"geçmişe dönük denetim satırı üretilmeyecek" diyor. İki farklı arıza sınıfını tek kalıba soktum;
+bu "tutarlılık" değil, [tek vaka açıklaması kural değildir] dersinin ihlali.
+
+⭐**YENİ HÜKÜM — karar GLOBAL DEĞİL, TABLO SINIFINA GÖRE:**
+
+| sınıf | tablolar | karar | gerekçe |
+|---|---|---|---|
+| **düşük hacim / yüksek değer** | `site_settings` (+ kapsama alınırsa `product_prices`) | ⭐**fail-CLOSED** — exception bloğu YAZILMAZ | Yazım tek satırlık ve geri alınabilir; maliyeti "betiği tekrar koş". Karşılığında fiyat görünürlüğü kayıtsız değiştirilemez. |
+| **kütle katalog** | `products`, `categories`, `product_families`, `product_images`, `brands` | fail-open + **GÖRÜNÜR** | 1000+ satırlık göçü denetim tablosuna rehin vermek gerçek zarar üretir. |
+
+Somut senaryo (uydurma değil, mevcut betik): `scripts/kip/satis-kipine-gec.mjs` satış kipini
+açar → vitrinde fiyat görünür. Denetim satırı yazılamazsa fiyatlar canlıya açılır ve **kimin ne
+zaman açtığının kaydı olmaz.** Burada fail-open'dan kazanılan hiçbir şey yok.
+
+⛔**"Görünür" kanalı da değiştiriyorum.** İlk hâlinde "ikinci bir küçük tablo/sayaç" demiştim.
+Çürütme haklı: denetim insert'ini düşüren nedenlerin çoğu (RLS, FORCE, ACL, sahiplik) **aynı
+şemadaki ikinci tabloyu da düşürür** — yani alarm arızayla korelasyonlu olur, kendi kendini ölçen
+bir alarm. Yerine: `RAISE WARNING` (zaten var) + **DB'ye hiç bağımlı olmayan** günlük tarafında
+izleyici. WARNING gerçekten **sessiz değil** — Supabase günlüğünde sorgulanabilir; eksik olan
+bakan gözdür. Yani sorun "görünmezlik" değil "**izlenmemesi**"; çözüm de ona göre.
+
+### 4.3 Hacim — before/after ne kadar tutulacak
+
+`kademe2-load` tek koşuda 1000+ satır yazabiliyor; tetik satır başına 1 denetim satırı üretir.
+Tam satırı JSONB olarak iki kez (before+after) tutmak tabloyu şişirir. Ölçülecek ve karara
+bağlanacak: tam satır mı, yoksa **değişen kolonlar** mı. Karar §6 ölçümüne bağlı, şimdi
+uydurmuyorum.
+
+⛔**DÜZELTME — YANLIŞ EVRENİ ÖLÇMÜŞÜM (bugün yedinci vaka).** Hacim tavanını `kademe2-load`'a
+bağladım; o **tek seferlik göç**. Asıl kaynak sürekli olan: `products` tablosuna **her siparişte**
+yazan DB fonksiyonları var (stok düşürme/geri yükleme, envanter hareketleri, rezervasyon serbest
+bırakma — `20250902_create_stock_rpc_functions.sql`, `20250918_inventory_batch_undo.sql`), üstelik
+`expired-reservations`/`order-housekeeping`/`stock-alert` cron'ları sürekli koşuyor. Göç bir
+kereliktir, **sipariş trafiği süreklidir.**
+
+İki sonucu var:
+1. §6.5'teki şişme tahmini yanlış tabana oturuyordu.
+2. ⭐Daha önemlisi **sinyal/gürültü**: "kim fiyatı değiştirdi" sorusunun cevabı otomatik stok
+   düşümlerinin arasında kaybolur. Ev geleneği bu tehlikeyi adıyla yazmış: *"okunmayan alarm
+   alarm değildir."* Bu dersi `site_settings` için devralmışım ama `products.stock_qty` için hiç
+   düşünmemiştim.
+
+**Karara bağlanacak:** `products` için tetik hangi kolonlarda ateşlenecek. Otomatik stok
+hareketlerini denetim izinden dışlamak (ya da ayrı `action` ile etiketlemek) gerekiyor; aksi
+halde tabloyu kendi gürültüsüyle boğarız. Ayrıca no-op UPDATE eleme deseni
+(`is not distinct from`, ev geleneği satır 36-38) şablona **yazılı** girecek — `ON CONFLICT DO
+UPDATE` satır değişmese de tetiği ateşler.
+
+### 4.4 tenant_id — kural 12
+
+`admin_audit_log.tenant_id` var ve ev geleneği onu `new.tenant_id`'den alıyor. Altı tablonun
+hepsinde `tenant_id` var mı, ölçülecek (§6). Yoksa o tablo için denetim satırı tenant'sız kalır
+ve bu **kural 12 ihlali** olur — o durumda çözüm ayrı, plan buna göre daralır.
+
+## 5. Bitti ölçütü
+
+1. Altı tablonun her biri için INSERT/UPDATE/DELETE → `admin_audit_log` satırı; **ayrım çifti**
+   ile kanıtlanır (tetik varken satır DÜŞER, tetik kaldırılınca DÜŞMEZ) — "satır var" tek başına
+   kanıt değil.
+   ⛔**DÜZELTME: ayrım çifti ALTI TABLONUN HER BİRİ İÇİN AYRI AYRI gösterilir, `site_settings`
+   DAHİL.** İlk hâliyle bu ölçüt §2.6'daki kritik arızayı **geçiriyordu**: `site_settings` tetiği
+   kurulur, ayrım çifti diğer beş tabloda kanıtlanır, kapı yeşil olurdu. Bir bitti ölçütünün
+   kendi planındaki kritik arızayı geçirmesi, ölçütün değil evrenin hatasıdır — bugün sekizinci
+   kez aynı sınıf.
+2. Denetim yazımı başarısız olduğunda **görünür**: sessiz kalmadığı ölçümle gösterilir.
+3. `enforce_role_change_actor_guard`'ın 08-26'da bekçi kalemine devrettiği FORCE-RLS
+   kırılganlığı kapanmış olur (§2.4/2) — veya kapanmadıysa **niçin** kapanmadığı yazılı olur.
+4. Konformans kapısı: yeni yazma yüzeyi eklenip tetiği eklenmezse KIRMIZI. Evren = `scripts/**`
+   değil, **ölçülen 6 yüzey** (§2.3); `.js`/`.py`/`.sql` dahil, çok satırlı desen dahil.
+5. `docs/standards/denetim-izi-standard.md` yazılmış olur (bu iş cetvelsiz başladı).
+6. TÜM konformans paketi yeşil — el seçimi alt küme DEĞİL. (Bugün bir CI kırmızısı tam bu
+   yüzden oldu.)
+
+## 6. Uygulamadan ÖNCE ölçülecek — şimdi bilmiyorum, uydurmuyorum
+
+1. Prod'da `admin_audit_log` FORCE ROW LEVEL SECURITY durumu (repo vermemiş; canlı ayrı soru).
+2. Altı tablonun `tenant_id` kolonu var mı, NOT NULL mu.
+3. Altı tabloda hâlihazırda kaç tetik var (çakışma ve sıra riski).
+4. `kademe2-load` tipik koşusunun satır sayısı → §4.3 kararı buna bağlı.
+5. `admin_audit_log`'un bugünkü satır sayısı ve büyüme hızı (tablo şişme tavanı).
+
+⭐**GELEN CANLI KANIT (OPS ayarladı, 2026-09-09):** KATALOG bugün sensör kategorisi yazımını
+yapacak ve **yazımdan sonra** `admin_audit_log`'da bugünün tarihiyle
+`categories`/`products`/`product_families` satır sayısını ölçüp belgeye yazacak. Beklenen **0**.
+Bu, arızanın **sahne kanıtı** olur: repo ölçümüm (§2.1) yapıyı gösteriyor, bu ölçüm ise aynı
+arızayı canlı bir yazımda gösterir. ⚠Sayı 0 ÇIKMAZSA planın öncülü yanlıştır ve plan buna göre
+yeniden yazılır — beklediğim sonucu ölçümden önce doğru saymıyorum.
+Ayrıca KATALOG yazımı MCP `execute_sql` ile yaparsa bunu döküme yazacak: §2.3'teki
+"dosya olmayan yazma yüzeyi" iddiasının ilk kayıtlı örneği olur.
+
+⛔**GÜNCELLEME (aynı gün, saatler sonra): BU KANIT GELMEYEBİLİR.** KATALOG sensör yazımını
+**yapmadı** ve sebebini yazdı: canlı prod yazımı + yapısal karar, Recep'in kendi sözünü ister;
+akran aktarımı onay değildir. **Bu davranış doğrudur** ve benim kendi sınırımla aynıdır (§8).
+Sonuç: planın canlı sahne kanıtı **Recep'in kendi kararına bağlı** ve gelmeyebilir.
+⭐**Plan buna dayanmıyor:** öncül §2.1'in kod-yapısal ölçümüyle zaten ayakta (14 yazan dosyanın
+0'ı denetim yazıyor). Canlı ölçüm gelirse **güçlendirir**, gelmezse plan **eksilmez**. Bir planı,
+gelmesi başkasının kararına bağlı bir ölçümün üstüne kurmak, o kararı beklerken işi durdurmak
+demekti — kurmuyorum.
+
+✅**GELDİ VE ÖNCÜL DOĞRULANDI (2026-09-09 07:25:50Z, `date -u` ile ölçülmüş damga).** Recep
+kendi sözünü verdi, KATALOG sensör kategorisi yazımını yaptı: **canlıya beş satır** yazıldı
+(`categories` + `products` + `product_families`), yazma yüzeyi **MCP `execute_sql`** — yani
+§2.3'teki "dosya olmayan yazma yüzeyi" iddiasının **ilk kayıtlı örneği**. Yazımdan sonra
+`admin_audit_log`'da bugünün tarihiyle **tüm tablolarda 0 satır**.
+Belge: `docs/audits/icerik-hatti-sensor-kategorisi-yazimi-2026-09-09.md` (KATALOG).
+⭐Söz tutuldu: "0 çıkmazsa planın öncülü yanlıştır ve plan yeniden yazılır" demiştim; **0
+çıktı**, dolayısıyla plan yeniden yazılmadı. Beklediğim sonucu ölçümden önce doğru saymamak,
+bu kez planı değiştirmedi — ama ölçüm ters çıksaydı değiştirecekti, ve fark buradadır.
+
+### 6.1 ⛔ÇÜRÜTME SONRASI EKLENEN ÖLÇÜM KALEMLERİ (ilk hâlinde yoktu)
+
+6. ⭐**Prod'da `exec` / `exec_sql` RPC fonksiyonu VAR MI, sahibi kim, SECURITY DEFINER mi, kime
+   GRANT edilmiş?** Repoda tanımı yok (migration dışı kurulmuş) ama üç betik onu çağırıyor
+   (`apply-stock-fix.mjs:46,68` · `apply-sql-via-rpc.mjs:47` · `run-migration.ts:38`).
+   **Niçin en kritik kalem:** varsa, service_role anahtarıyla keyfi SQL koşulabilir — yani
+   `DROP TRIGGER` dahil. O durumda denetim tetiği **kaldırılabilir bir nesnedir** ve §3'ün
+   hükmü çürür. Bu ölçüm gelmeden uygulama başlamaz.
+7. **Altı tabloda TRUNCATE yetkisi kimde?** (`db-grant-hygiene` ölçümü `arwdDxtm` diyor.)
+   `AFTER TRUNCATE … FOR EACH STATEMENT` tetiği kapsama alınacak mı?
+8. **Prod `pg_trigger` sayımı.** ⚠**Repo bu soruda YETKİLİ KAYNAK DEĞİL:** `on_products_change`
+   ve `on_categories_change` migration'larda yok, `scripts/webhook_setup.sql` ile kurulmuş.
+   Repo ölçümü ≥10 tetik gösteriyor; gerçek sayı prod'dan gelir. (İlk hâlimde bunu "bakmadım"
+   gibi yazmışım; doğrusu "repodan ölçülemez, sebebi şu".)
+9. **`admin_audit_log` politikalarının rol kapsaması.** İki politika `TO authenticated`
+   (`20260530220000_…sql:685-690`), `postgres` için politika YOK → FORCE-RLS borcunun tek
+   satırlık kapanışı burası.
+10. **Sipariş akışının `products` yazma frekansı** — §4.3'ün düzeltilmiş hacim tabanı.
+
+### 6.2 Tetik uygulama ayrıntıları — planın ilk hâlinde hiç konuşulmamıştı
+
+- **AFTER**, ve DELETE'te `OLD` (gerçekleşeni yakalamak için).
+- **Tetik adı bilinçli seçilir:** aynı zamanlamalı tetikler **alfabetik** ateşlenir. `on_*` <
+  `trg_*` olduğu için `trg_audit_*` adı denetimi webhook tetiklerinden **sonraya** atar; o
+  fonksiyon `net.http_post` çağırıyor ve `net` erişilemezse ifadeyi düşürür. Ad, sıra ve
+  BEFORE/AFTER **şablona yazılı** girecek — belirtilmezse uygulayan kişi rastgele karar verir.
+- No-op UPDATE elemesi (`is not distinct from`).
+- Tek migration, altı tablo birlikte (INV-MIGRATION-1). ⚠`admin_audit_log`'a indeks eklenecekse
+  `CREATE INDEX CONCURRENTLY` işlem bloğuna **sokulamaz** — atomiklik kapısı bunu kırmızı verir.
+
+## 7. Sabotaj kolu (kapı gerçekten ölçüyor mu)
+
+- **SABOTAJ A:** bir tablonun tetiğini kaldır → konformans kapısı KIRMIZI vermeli.
+- **SABOTAJ B:** yeni bir yazma yüzeyi ekle (`.py` içinde `.table('brands').delete()`) →
+  kapı KIRMIZI vermeli. Bu kol, §2.3'teki uzantı/API kaçağının geri gelmesini engeller.
+- **SABOTAJ C:** denetim yazımını patlat (tetik içindeki insert'i bozulmuş kolon adına çevir) →
+  §4.2'nin "görünür" iddiası KIRMIZI vermeli. Vermiyorsa fail-open sessizdir ve iddia yanlıştır.
+Üçü de geri alınır ve geri alındığı ölçümle doğrulanır.
+
+## 8. Sınırlar — bu plan neyi YAPMAZ
+
+- Merge etmem; migration'lı dalın merge kapısı **Recep**tir (kural 13).
+- Prod DB'ye yazmam; migration'ı elle uygulamam.
+- Disiplin katmanı (yazım öncesi döküm) KATALOG'un cetvelinde, benim işim değil.
+- Geçmişe dönük denetim satırı **üretilmeyecek**: olmayan kanıtı sonradan imal etmek, kaydın
+  kendisini yalancı yapar. Boşluk boşluk olarak kalır ve tarihi yazılır.
+
+## 9. YÖNTEM
+
+Plan (bu belge) → `plan-challenger` (migration içerdiği için ZORUNLU) → OPS çürütmesi →
+Recep kararı → uygulama ayrı emirle, tek push (ara push yasağı §8.1).
+
+---
+
+## 10. PROD ÖLÇÜMÜ — 2026-09-09, SALT OKUMA (§6 kapatıldı)
+
+OPS emriyle, Recep kararından **önce**, yalnız `SELECT`. Prod'a hiçbir yazım yapılmadı.
+Proje `tnofewwkwlyjsqgwjjga`. Bu bölüm §6'nın "bilmiyorum" kalemlerini **sayıya** çevirir.
+
+### 10.1 ⭐EN KRİTİK KALEM KAPANDI — keyfi SQL yolu prod'da YOK
+
+| ölçüm | sonuç |
+|---|---|
+| `exec`/`exec_sql`/`execute_sql`/`eval`/`run_sql` adlı fonksiyon | **0 satır — YOK** |
+| **Ada değil davranışa** bakan tarama: `public`+`extensions` içinde SECURITY DEFINER + metin argüman + gövdesinde dinamik `EXECUTE` | **0 satır — YOK** |
+
+⭐**Sonuç: §3'ün en ağır kaygısı kalktı.** Betikler `rpc/exec` çağırıyor ama karşılığı prod'da
+yok (çağrılar 404 alıyor). Yani denetim tetiği service_role anahtarıyla **kaldırılamaz**.
+⚠İkinci sorguyu bilerek **ada göre değil davranışa göre** yazdım — ilk sorgu beş ad taramıştı ve
+bugün sekiz kez düştüğüm tuzak tam buydu.
+
+### 10.2 §2.6'nın KRİTİK bulgusu prod'da DOĞRULANDI
+
+| tablo | `tenant_id` | RLS | FORCE RLS | mevcut tetik |
+|---|---|---|---|---|
+| `site_settings` | ⛔**YOK (0)** | açık | false | **0** |
+| `categories` | var | açık | false | 2 (`categories_set_level`, `on_categories_change`) |
+| `products` | var | açık | false | 2 (`on_products_change`, `products_set_updated_at`) |
+| `product_families` | var | açık | false | 3 |
+| `product_images` | var | açık | false | 1 (`on_product_images_change`) |
+| `brands` | var | açık | false | 2 |
+| `admin_audit_log` | var | açık | **false** | 0 |
+| `product_prices` | var | açık | false | 4 |
+| `price_lists` | var | açık | false | 2 |
+
+- **`site_settings`'te `tenant_id` gerçekten yok** → ev şablonu orada patlardı. Kritik bulgu
+  teyitli; OPS hükmü H3 (ayrı, tenant'sız tetik + sabit tenant + borç yorumu) uygulanacak.
+- Altı tablodaki mevcut tetik toplamı **10** (repo tahmini ≥10 ile uyumlu).
+- FORCE RLS **hiçbir tabloda açık değil** → definer yolu bugün çalışıyor.
+
+### 10.3 ⛔İKİ DÜZELTME — biri benim, biri emrin sayısında
+
+**(a) `admin_audit_log` politikaları: repo eksik anlatıyordu.** §2.4'te "iki politika
+`TO authenticated`, `postgres` için yok" yazmıştım. Prod'da **üç** politika var:
+`admin_audit_log_insert_v2` (authenticated), `admin_audit_log_select_v2` (authenticated),
+ve **`admin_audit_log_service_role` (service_role, ALL)** — repoda görmediğim üçüncüsü.
+FORCE-RLS analizinin sonucu değişmiyor (definer `postgres` için hâlâ politika yok), ama
+**dayanağım eksikti**; repo bu soruda yetkili kaynak değil, tekrar ölçüldü.
+
+**(b) ⭐"Audit logda `categories` satırı 0" — SAYI YANLIŞ, BULGU DAHA GÜÇLÜ.**
+Ölçüm: `categories` satırı **12 tane var** (8 × 2026-03-12, 4 × 2025-12-10) — hepsi admin
+panelinden, hepsi tarihî. Yani "0" ifadesi olduğu gibi yanlıştır.
+**Ama doğrusu iddiadan ağır:** 2026-09-08'de — 7 kategori silme + 18 ürün taşıma + 104 görselin
+yapıldığı gün — denetim kaydında **HİÇBİR TABLODAN tek satır yok.** Son kayıt 09-07 (`quotes`,
+1 satır). Yani boşluk `categories`'e özel değil, **o günün tamamı boş**.
+Toplam tablo hacmi bir yılda **61 satır** — denetim izi neredeyse hiç kullanılmıyor.
+⚠Bu düzeltme bulguyu çürütmez, **keskinleştirir**; ama yanlış sayı yanlış iş emri doğurur, o
+yüzden adıyla yazıldı.
+
+### 10.4 ⛔KAPSAM DIŞI AMA CİDDİ — TRUNCATE yetkisi `anon`'da
+
+Ölçüm: `has_table_privilege` → altı tablonun **hepsinde** TRUNCATE yetkisi
+**`anon`, `authenticated` ve `service_role`** rollerinde. Yalnız service_role değil, **anonim
+rol de** dahil. TRUNCATE satır tetiği ateşlemez **ve RLS'e tabi değildir**.
+
+⚠**Bugün canlı bir açık DEĞİL, LATENT bir yetki:** PostgREST TRUNCATE fiilini dışa açmaz ve
+§10.1 ölçümüne göre keyfi SQL koşturacak bir RPC de yok. Yani bugün ulaşılabilir bir yol
+görmüyorum. Ama iki koşuldan biri değişirse (bir RPC eklenir ya da başka bir SQL yüzeyi açılır)
+yetki **hazır bekliyor**. `db-grant-hygiene-standard.md` §4 bu sınıfa zaten "latent yetki" adını
+vermiş.
+
+⛔**Bu REC-292'nin kapsamı değil** (OPS TRUNCATE tetiğini kapsam dışı bıraktı) ve bu planda
+çözülmeyecek. **Ayrı kayıt açılması için OPS'a bildirildi** — kendi başıma iş açmıyorum,
+ama ölçtüğüm bir riski de sessizce bırakmıyorum.
+
+### 10.5 OPS hükümleri (çürütme sonrası) — plana işlenen karar
+
+| # | hüküm | plandaki karşılığı |
+|---|---|---|
+| H1 | fail-CLOSED **altı tabloda da**; sınıf ayrımı YOK | §4.2'nin iki sınıflı tablosu tek karara indi. ⚠Bedeli adıyla: kütle göç akışı artık denetim yazımına bağlı. OPS'un gerekçesi tutarlı — "görünür kanal" sorunu kendiliğinden kalkıyor, çünkü kayıp artık **kırmızı** veriyor. Sabotaj C = yazımın kırmızı vermesi. |
+| H2 | `products` tetiği `AFTER UPDATE OF` katalog kolonları; stok/rezervasyon **dışarıda** | §4.3'teki gürültü sorununu kökten çözer. |
+| H3 | `site_settings` ayrı, tenant'sız tetik + sabit tenant + borç yorumu | §2.6'nın kritik bulgusunun kapanışı. |
+| H4 | Çift-log: **tetik SSOT**; `logAdminAction` emekliliği ayrı küçük PR | §4.5 karara bağlandı. |
+| H5 | EDGE şeridi YOK → canlı tetik sayım kapısı CI'ya, **benim** | §2.4'te "benim değil" dediğim bekçi yarısı, şerit kapalı olduğu için bana döndü. |
+| H6 | `exec` RPC ölçümü **şimdi**, Recep kararından önce | §10.1'de yapıldı: **yok**. Ayrı kayıt gerekmiyor. |
+
+**Kapsam dışı (OPS):** actor jetonu (§4.1), TRUNCATE tetiği, FORCE-RLS politikası.
+Üçü de planda **ölçülmüş ve gerekçesiyle dışarıda** duruyor — sessizce düşmediler.
+
+
+---
+# FILE: docs\plans\rec296-koken-allowlist-2026-09-09.md
+
+# REC-296 — Edge Function köken allowlist'inin daraltılması (ALTYAPI)
+
+**Şerit:** ALTYAPI (`supabase/functions/_shared/**`) · **Dal:** `altyapi/rec296-koken-allowlist`
+**Worktree:** `c:/tmp/vh-altyapi-851` · **Taban:** `origin/master` = `1f7fe3e54`
+**YÖNTEM:** elle (tek dosya + cetvel + konformans kolu). Sapma yok — çok-eksen ölçüm ya da
+bağımsız çürütme gerektirecek bir tasarım kararı içermiyor; değişiklik tek satırlık bir
+predicate daraltması ve riski ÖLÇÜLEBİLİR (aşağıda ölçüldü).
+
+---
+
+## KAYNAK / CETVEL
+
+| kalem | durum |
+|---|---|
+| `docs/standards/edge-function-security-standard.md` §3.4 | **VAR** — CORS'un TEK KAYNAĞINI düzenler (`_shared/cors.ts` → `getCorsHeaders`), elle `cors` objesini yasaklar |
+| allowlist'in **GENİŞLİĞİ** hakkında hüküm | ⛔**YOK** — cetvel "hangi köken kabul edilir" sorusuna hiç değinmiyor |
+| Sonuç | **Cetvel eksik.** Bu iş, §3.6'nın yazımını da KAPSAR (kural 1: "cetvel yok" bedava değil) |
+
+Karne/tazelik: aşağıdaki ölçümlerin hepsi **2026-09-09 08:3x–08:4xZ** damgalıdır ve canlı
+prod'dan (SELECT/OPTIONS, yazım YOK) alınmıştır.
+
+---
+
+## 1. SORUN — tek cümle
+
+`getCorsHeaders` **her** `*.vercel.app` kökenini kabul ediyor; bu, bize ait olmayan
+herhangi bir Vercel projesinin tarayıcıdan Edge Function çağırabilmesi demektir.
+
+```ts
+const isVercel = origin.endsWith('.vercel.app');   // ⛔ JOKER
+```
+
+`.vercel.app` **paylaşılan bir son ektir** — herkes oraya deploy edebilir. Yani allowlist
+"bizim önizlemelerimiz" değil, "Vercel'e deploy eden herkes" anlamına geliyor.
+
+---
+
+## 2. ÖLÇÜMLER (hatırlanan sayı yok)
+
+### 2.1 Blast radius
+- Edge fonksiyon sayısı: **28**
+- `_shared/cors.ts` kullanan: **21**
+- `_shared/origins.ts` (katı, env güdümlü, `isOriginAccepted`) kullanan: **2**
+  (`iyzico-payment`, `iyzico-callback` — ikisi de AYNI ZAMANDA cors.ts kullanıyor)
+- Tarayıcıdan Edge çağıran vitrin dosyası: **18** (ödeme, admin kupon/kargo, teklif dahil)
+
+⭐**İki mekanizma bir arada yaşıyor:** para akışındaki iki fonksiyon katı allowlist'e tabi,
+kalan 19'u joker'e. Bu iş yalnız joker'i daraltır; `origins.ts`'e DOKUNMAZ (kapsam dışı).
+
+### 2.2 Canlı davranış — OPTIONS preflight, `log-client-error` ucu (08:3xZ)
+
+| Origin | `Access-Control-Allow-Origin` | hüküm |
+|---|---|---|
+| `https://venthub.com.tr` | `https://venthub.com.tr` | izinli (kanonik) |
+| `https://venthub-hvac-esite.vercel.app` | aynısı | izinli |
+| `https://evil.example.com` | `https://venthub-hvac-esite.vercel.app` (yedek) | reddedildi |
+
+Yani yedek dal ÇALIŞIYOR; kusur yedekte değil, **joker dalın genişliğinde**.
+
+⚠**KENDİ HATAM, ADIYLA:** ilk okumada ana çalışma ağacındaki `cors.ts`'i okudum ve kanonik
+alan adını GÖRMEDİM → "dağıtım sapması" demeye bir adım kalmıştı. Ağaç **11 commit
+geride**ydi (`cf06104a6` vs `1f7fe3e54`); kanonik köken bugün URUN tarafından eklenmişti
+(REC-117 bulgu 6). Beni durduran şey canlı ölçümdü. Sınıf: **ölçüt doğru, evren doğru,
+TAZELİK yanlış** — bugünün üçüncü tekrarı.
+
+### 2.3 Önizleme adresleri — gerçek biçim (depoda geçen örnekler)
+```
+venthub-hvac-esite.vercel.app
+venthub-hvac-esite-1fk7v482n-peckops-projects.vercel.app
+venthub-hvac-esite-m8cog5tbe-peckops-projects.vercel.app
+```
+Hepsi `venthub-hvac-esite` ile BAŞLIYOR. Daraltmanın önizlemeleri kırmaması bu ölçüme dayanır.
+
+---
+
+## 3. DEĞİŞİKLİK
+
+```ts
+const ONIZLEME = /^https:\/\/venthub-hvac-esite[a-z0-9-]*\.vercel\.app$/;
+const isVercel = ONIZLEME.test(origin);
+```
+
+Neden regex, neden `startsWith` değil: `startsWith('https://venthub-hvac-esite')` ise
+`https://venthub-hvac-esite.evil.example` de geçer. Kalıp **sonu da** çiviliyor (`$`).
+
+**Değişmeyenler:** `localhost:` dalı (yerel geliştirme), kanonik dal, yedek adres, başlıklar.
+
+---
+
+## 4. RİSK VE BEDEL — önden yazılıyor
+
+| risk | ölçüm | hüküm |
+|---|---|---|
+| Bir önizleme adresi kalıba uymaz → tarayıcıdan Edge çağrısı kırılır | depoda geçen 3 biçimin 3'ü de uyuyor | **düşük**, ama önizleme adresi ŞEMASI değişirse yeniden ölçülmeli |
+| Merge = Edge fonksiyonların prod'a dağıtımı (`deploy-functions.yml`) | 21 fonksiyon yeniden dağıtılır | davranış değişikliği YALNIZ reddedilen kökenlerde; kabul edilenlerde bit-aynı |
+| Ödeme akışı | `iyzico-*` ayrıca `origins.ts`'e tabi | bu değişiklik onları GEVŞETMEZ |
+
+⛔**Bunun bir prod davranış değişikliği olduğunu saklamıyorum:** merge dağıtım tetikler.
+Migration DEĞİL, yani kural 13 kapısına girmez; ama "yalnız kod" da değil.
+
+---
+
+## 5. KAPI (kalıcı katman — hand-patch değil)
+
+`src/__tests__/conformance/` altına kol: `_shared/cors.ts` içinde
+`endsWith('.vercel.app')` **geçmeyecek** + kalıbın ayrım çifti:
+- YEŞİL taraf: `venthub-hvac-esite.vercel.app`, `venthub-hvac-esite-1fk7v482n-peckops-projects.vercel.app`
+- KIRMIZI taraf: `baskasi.vercel.app`, `venthub-hvac-esite.evil.example`, `http://venthub-hvac-esite.vercel.app` (şema)
+- **Dedektör sağlığı:** dosya okunamazsa/boş tararsa **exit 2** — "ihlal yok" DEMEZ.
+
+## 6. CETVEL YAZIMI (bu işin parçası)
+
+`edge-function-security-standard.md` **§3.13** — *"Köken allowlist'i JOKER SON EK içermez"*:
+
+⚠**NUMARA DÜZELTİLDİ:** bu planın ilk hâli (ve OPS emri) "§3.6" diyordu; **§3.6 ZATEN DOLU**
+(`service_role` kuralı). Ölçmeden yazsaydım cetvelde iki tane §3.6 olurdu. Yeni madde §3.13.
+
+kural + niçin (`.vercel.app` paylaşılan son ektir) + ölçüm tablosu + kapı adı.
+
+---
+
+## 7. KAPSAM DIŞI (adıyla, sessizce bırakmıyorum)
+- `_shared/origins.ts` ve env güdümlü allowlist — dokunulmaz.
+- `apply-coupon` içindeki elle yazılmış ACAO (cetvel E4 tabanı) — ayrı kalem.
+- Paylaşılan TLS yardımcısı, TRUNCATE latent yetkisi — ayrı kayıtlar.
+
+## 8. BİTTİ ÖLÇÜTÜ
+1. Konformans paketi TAMAMI yeşil (`Test Files N/N`, `Tests N/N` — sayıyla, §3.2).
+2. Yeni kolun ayrım çifti ölçüldü: bozulmuş kalıpla **kırmızı**, doğrusuyla **yeşil**.
+3. Cetvel §3.6 yazıldı ve kola ADIYLA atıf yapıyor.
+4. Merge SONRASI canlı OPTIONS ölçümü: `baskasi.vercel.app` **yedek adrese** düşüyor,
+   `venthub-hvac-esite*.vercel.app` **izinli**. ⛔Bu ölçüm yapılmadan iş "bitti" DEĞİL —
+   "tetik var" ile "tetik çalışıyor" ayrımının aynısı (REC-292 dersi).
+
+
+---
+# FILE: docs\plans\rec52-whsec-rotasyon-plani-2026-09-06.md
+
+# REC-52 — Supabase webhook sırrı (whsec) rotasyonu: kalan 5 adım Recep'te
+
+> **Durum:** PLAN (uygulama YOK) · **Şerit:** ALTYAPI · **Tarih:** 2026-09-06
+> ⛔**SIR İŞİ:** bu planı yazan şerit sırrı **DÖNDÜRMEZ**. Beş adımın tamamı Recep'in
+> elindedir (Vercel + Supabase Vault panelleri). Bu belge **nasıl güvenli koşulacağını** ve
+> **bittiğinin nasıl kanıtlanacağını** yazar.
+> **KAYNAK/CETVEL:** `docs/audits/secret-exposure-audit-2026-08-15.md` §4.1 (5 adımlık runbook) ·
+> CLAUDE.md kural 11 (webhook HMAC + replay guard) · kural 13 (migration merge = prod) ·
+> `repo PUBLIC` taban çizgisi. **PDF/sır cetveli:** rotasyon runbook'u audit'te yaşıyor,
+> ayrı cetvel açılmasına gerek yok — bu plan ona atıf yapar.
+> **YÖNTEM:** elle (tek belge) + Recep kapısı. Kod PR'ı YOK, migration YOK.
+
+---
+
+## ⭐ÖNCE: KAYITTAKİ ÇELİŞKİ ÇÖZÜLDÜ — çelişki değil, TERİM KARIŞIKLIĞIYDI
+
+`docs/kayitlar_master.md` iki farklı şey söylüyordu:
+
+| satır | ne diyor | hangi katman |
+|---|---|---|
+| 3055 (08-26 derlemesi, **"✅ YAPILMIŞ"** başlığı altında) | *"PR #584 … Vault taşıma+rotasyon penceresi canlı doğrulanmış"* | **KOD** tarafı |
+| 15101 (08-15 oturum kaydı) | *"T031 whsec rotasyonu **yarım**"* | **DEĞER** tarafı |
+| 3364 (aynı dosya, Bulgu #4) | *"**Bu bir TAŞIMA'dır, ROTASYON DEĞİL** … Gerçek kapanış … **Recep'e ait**"* | ayrımı zaten yazmış |
+
+⭐**İkisi çelişmiyor: farklı katmanı anlatıyorlar.** Kod tarafı 2026-08-17'de bitti ve indi;
+**sır değerinin kendisi** hâlâ dönmedi.
+
+**Kanıt zinciri (repo içi, ölçüldü):**
+1. Commit `ba01937a`'nın kendi mesajı: *"Runbook: audit 4.1 (rotasyonun 5 adımı **Recep'te**)"* —
+   yazar merge anında bile işi tamamlanmamış işaretlemiş.
+2. `git log --all -- supabase/migrations/*vault* src/app/api/webhook/supabase/` →
+   `ba01937a` (08-17) **sonrası bu yollara dokunan commit YOK**.
+3. `secret-exposure-audit-2026-08-15.md:106` → *"**Kalan (Recep):** yukarıdaki 5 adım.
+   Kod tarafında yapılacak bir şey yok."*
+4. `kayitlar_master.md` **2026-09-03**'te derlenmiş, yani 17 günlük veriye sahip — ve içinde
+   *"rotasyon tamamlandı / Vault değeri değişti"* diyen **hiçbir kayıt yok**.
+
+⛔**KAYIT KUSURU, ADIYLA:** satır 3055'in **"✅ YAPILMIŞ"** başlığı altında durması yanıltıcı —
+*"kod tarafı yapılmış"* ile *"iş bitmiş"* karışmış. Bu, audit'in kendi uyardığı sınıf:
+**"iş bitti ≠ iş erişilebilir."** ⚠Düzeltme **bu dosyada yapılmaz**: `kayitlar_master.md`
+ÜRETİLMİŞ bir masterdır (AXIOM 3 — üretilen dosya elle düzenlenmez); düzeltme **kaynak
+kayıtta** yapılır ve master yeniden derlenir. Sahibi ALTYAPI değil → **OPS'a bildirildi.**
+
+## KOD NE DURUMDA — hazır, bekliyor
+
+Rotasyon penceresi **kodda mevcut ve çalışır**: `src/app/api/webhook/supabase/route.ts:234-237`
+iki değeri birden kabul ediyor (`SUPABASE_WEBHOOK_SECRET` **ve** `..._NEXT`), yani rotasyon
+**kesintisiz** yapılabilir. Migration (`20260816160245_webhook_secret_to_vault.sql`) sırrı
+Vault'a taşıdı ve kendi başlık yorumunda *"ROTASYON DEĞİLDİR"* diye yazıyor.
+
+**Yani kod tarafında yapılacak bir şey yok — ve bu planın kod PR'ı da yok.**
+
+## KALAN 5 ADIM — Recep'te (audit §4.1, birebir)
+
+1. Yeni değer üret (`openssl rand -hex 24`, başına `whsec_`).
+2. **Vercel** → `SUPABASE_WEBHOOK_SECRET_NEXT` = yeni değer (**eskiye DOKUNMA**) → deploy.
+3. **Supabase** → Vault'taki `supabase_webhook_secret` kaydını yeni değerle güncelle.
+4. **Doğrula:** admin'den bir ürün güncelle → PDP'nin tazelendiğini gör.
+5. **Vercel** → `SUPABASE_WEBHOOK_SECRET` = yeni değer, `..._NEXT`'i **SİL** → deploy.
+
+⭐**Sıra kritiktir ve sebebi yazılı:** 2. adımda eskiye dokunulmadığı için **kesinti olmaz**;
+5. adım pencereyi kapatır. Adımlar atlanır ya da sırası bozulursa webhook **sessizce** düşer —
+sipariş/stok tetikleri durur ve bu, kırmızı bir kapı üretmez.
+
+## BENDEN İSTENEN — ölçüm ve kanıt tarafı (sır DEĞİL)
+
+| # | iş | sahibi |
+|---|---|---|
+| B1 | Rotasyon **öncesi** durum ölçümü: webhook'un bugün çalıştığının kanıtı (admin güncelleme → PDP tazelenme) | Recep tetikler, ölçümü ben yazarım |
+| B2 | Rotasyon **sonrası** aynı ölçüm — *"eski sır ile imzalı istek 401"* kanıtı | Recep |
+| B3 | Kayıt düzeltmesi: `kayitlar_master.md` 3055'in yanıltıcı yerleşimi → **kaynak kayıtta** düzeltilir, master yeniden derlenir | OPS |
+| B4 | Bitince REC-52 kapanış yorumu: 5 adımın hangisinin ne zaman koşulduğu + 401 kanıtı | ben yazarım |
+
+## SINIRLAR — adıyla
+
+- ⛔**Sır değeri hiçbir yere yazılmaz** (repo PUBLIC; yeni bir sır commit'lenirse geri dönüşü YOK).
+  Bu belgede yalnız **değişken adları** geçer.
+- ⛔**Ben döndürmem.** Vercel ve Vault panelleri Recep'te; ALTYAPI'nın bu panellere erişimi
+  yoktur ve **istenmez**.
+- ⚠**Repo içi kanıtla ölçülemeyen:** Vercel env'in ve Vault kaydının **bugünkü** değeri.
+  Yani *"5 adım sessizce yapılmış olabilir"* ihtimali **dışlanamaz** — bu planın hükmü
+  **"git/dosya kanıtına göre"** sınırlıdır. Rotasyonun yapıldığını **yalnız Recep** doğrulayabilir.
+- ⚠`whsec_` biçimindeki bu sır, dört ayrı Edge webhook sırrından (`QUOTE_`, `ORDER_PAID_`,
+  `RETURNS_`, `SHIPPING_WEBHOOK_SECRET`) **farklıdır**; bu plan yalnız T031-VH'yi kapsar.
+
+## KABUL ÖLÇÜTÜ
+
+- 5 adım koşuldu ve **eski sır ile imzalı bir istek 401** aldı (davranışsal kanıt, beyan değil).
+- Rotasyon penceresi kapandı: `SUPABASE_WEBHOOK_SECRET_NEXT` **silindi**.
+- REC-52 kapanış yorumunda adım-adım zaman damgaları + 401 kanıtı yazılı.
+- Kayıt düzeltmesi yapıldı: *"kod tarafı bitti"* ile *"rotasyon bitti"* bir daha karışmıyor.
 
 
 ---
@@ -12003,6 +26335,22 @@ Ana metrik: ilk 4-8 haftada toplam organik tıklama + hedef kelime sıralarını
 4. **Doğrulama:** tsc+lint+build (RSC prerender kapısı) + preview'da: `/tr/category/konut-tipi-havalandirma/banyo-ve-tuvalet-fanlari`
    çalışır; `/tr/category/residential-ventilation/...` → 301 TR'ye; `/en/...` EN slug'larla.
 
+## 3.1 Aynı kalıbın ikinci kullanıcısı: kategori AÇIKLAMASI (REC-161, 2026-09-06)
+
+Bu plandaki `metadata.slug = {tr,en}` kalıbı **genel bir kalıp** oldu: dile-bağlı her kategori
+metni `metadata.<alan>_i18n = {tr,en}` ile taşınır ve `lang`'ı **zorunlu** alan tek bir çözücüden
+okunur. İlk türev: **kategori açıklaması** → `metadata.description_i18n` +
+`getCategoryDescription(category, lang)`.
+
+- **Kuralın SSOT'u burası DEĞİL** — cetvel: `docs/standards/i18n-localization-standard.md` **§3.1**
+  (kalıbın tanımı, `lang` neden zorunlu, geriye uyum şartı, canlı DB ölçümü).
+  Bu dosya bir *plan*'dır (tek seferlik slug göçünün eşleme tablosu); kural *cetvel*'de yaşar.
+- **Migration YOK.** `metadata` zaten `jsonb`; sütunu `jsonb`'ye çevirmek Kural 13 gereği
+  prod'a otomatik inerdi. Slug göçünün aksine bu iş şema değiştirmez.
+- **Kapı:** `INV-KATEGORI-ACIKLAMA-1` — `src/__tests__/conformance/kategori-aciklama-dil-cozumu.test.ts`.
+
+---
+
 ## 4. Kapsam dışı / ertelenen
 
 - Ürün slug'ları (dil-nötr, ideal durumda).
@@ -13020,6 +27368,95 @@ Bu, A seçilirse **uygulamadan önce ölçülecek** ve gerekiyorsa ayrı bir kal
 
 
 ---
+# FILE: docs\plans\venthub-hikaye-sayfasi-skill-taslak-2026-09-05.md
+
+# TASLAK — `venthub-hikaye-sayfasi` yeteneği (SKILL.md) — 2026-09-05
+
+**Durum:** taslak; Recep gözden geçirir, sonra iki ağaca (`.claude/skills` + `.agent/skills`) aynı içerikle girer.
+**Kayıt:** REC-147 · bağlı: REC-106 (Lego + SSOT), REC-146 (içerik hattı), Kararlar 15A K7 · K12 · K20 · K21 · K22 · K23 · K23-a.
+**Eritilen kaynaklar:** scroll-craft (gramer · cihaz aileleri · imza hareketi · 3 hâl doğrulama · reduced-motion) ·
+taste-skill (üç düğme · anti-default) · redesign-skill (jenerik kalıp denetimi). Motorları alınmadı.
+
+---
+
+```yaml
+---
+name: venthub-hikaye-sayfasi
+description: >-
+  VentHub vitrininde HİKÂYE AKIŞLI sayfa (ürün sayfası v2 aile anlatımı, kategori rehberi, senaryo sayfası) tasarlar ve
+  kodlar: tek şablon + veri (Lego), bölümlü editoryal gramer, tek imza hareketi, uydurma sayı yasağı, tablo ilk ekranda,
+  reduced-motion ve mobil ayrı kompozisyon, 3 hâl Playwright doğrulaması. Şu isteklerde kullan: "hikâye akışı",
+  "aile anlatımı", "ürün sayfası v2", "editoryal bölüm", "scrollytelling", "kaydırma akışı", "kategori rehber sayfası".
+  KULLANMA: admin ekranları, tablo/liste sayfaları, checkout, hesap sayfaları (çalışma yüzeyi gramerleri).
+kaynak_updatedAt: 2026-09-05   # sözleşme v1 (11:34Z) · Kararlar 15A K23-a (13:29Z)
+---
+```
+
+# venthub-hikaye-sayfasi
+
+Sayfa bir **şablondur**, bölümler **veridir**. Anlatım `product_families.description` / `technical_specs` /
+`description_i18n`'den gelir; şablon hiçbir cümle uydurmaz. Ürün değişirse her şey veriden yenilenir (K21).
+
+## 0 · Önce oku (sıra zorunlu)
+1. `src/design-system/tokens.js` + `src/index.css` — canlı token (SSOT, kural 8). Sözleşme tokens'ı besler, yerine geçmez.
+2. `tasarim-sozlesmesi-v1.json` (DESIGN-MENU ölçümü; kopya `docs/audits/` fark belgesi yanında) — hedef değerler:
+   `#1a2b4a` · `#0088b0` · `#d95d0e` (sayfada TEK dolu eylem) · Archivo / Source Serif 4 / IBM Plex Mono · yarıçap 0
+   (panel 8 px) · gölge yok · ikon konturu 1.5 · içerik sütunu 1060 · kabuk bandı 74 / oluk 40 / aralık 30.
+3. Kararlar — Vitrin 15A (Linear belgesi; ayna `docs/proje-takip/linear/`). Çelişirse Linear kazanır.
+4. Bu sayfanın veri kaynağı: aile kaydı + REC-146 altı blok (Gövde · Çark · Motor · Koruma · Kontrol · Montaj).
+
+## 1 · Gramer (scroll-craft'tan eritildi)
+- **Bölümlü editoryal** gramer (K20): giriş kimliği → teknik tablo (ilk ekranda, K12) → altı bloktan **dolu olanlar**
+  (boş blok ÇİZİLMEZ, K7) → aksesuar/ilgili → tek eylem (Teklif iste, K5).
+- **Bölüm davranış aileleri ≥ 4, ardışık tekrar yok** (sabit akış · yapışkan tablo · yatay kaydırmalı seri şeridi ·
+  karşılaştırma · 3D/ görsel sahne · madde listesi). Dört aileden azı "tek fikirli sayfa"dır.
+- **Tek imza hareketi.** Sayfada bir tane. 3D fan yalnız GLB modeli olan üründe (bugün 0/374 → imza hareketi statik
+  kompozisyon ya da yatay seri şeridi). "Renk değiştiren spot" imza hareketi sayılmaz.
+- Gramerin yasakları gramerin içindedir: editoryal gramer **pin/scrub** istemez; tam ekran video yok.
+
+## 2 · Brief düğmeleri (taste-skill'den eritildi) — B2B mühendis okuru
+`VARIANCE 4 · MOTION 3 · DENSITY 7`. Anlamı: hafif asimetri, kart ızgarasına kaçmayan yerleşim; hareket yalnız
+giriş/odak; teknik veri **düz** durur, jenerik kart kabına konmaz (DENSITY > 7 kuralı). Düğmeler brief'e yazılır, sapma
+gerekçesiyle yazılır.
+
+## 3 · Anti-default listesi (taste + redesign'dan eritildi, sözleşmeyle birleştirildi)
+Yasak: mor-mavi gradyan hero · `rounded-lg` her yerde · gölgeli kart · emoji bölüm işareti · her şey ortalı ·
+"01/02/03" sıra işareti (sıra bilgi taşımıyorsa) · Inter/Space Grotesk varsayılanı · lorem · yer tutucu sayı ·
+`opacity` ile durum anlatımı (K22: soluk hex + zemin + rozet) · elle çizilmiş logo (K23: `public/brand/` SVG) ·
+elle çizilmiş ikon (kontur 1.5 set, K23-a) · "yakında" etiketi (K18-b: "teknik destek iste").
+
+## 4 · Sayı ve vaat (vaat-bütünlüğü cetveli)
+Sayfadaki her sayı `technical_specs`'ten gelir ve birimini alandan alır. Kaynağı olmayan sayı YAZILMAZ; kaynağı
+olmayan bölüm çizilmez. "Çok satan", "en çok tercih edilen" gibi veri dayanağı olmayan ifade yok (REC-92 dersi).
+
+## 5 · Hareket ve erişilebilirlik
+- Her hareketin **hareketsiz eşdeğeri** vardır; `prefers-reduced-motion` altında kompozisyon derinliği korunur, hareket
+  düşer. Hareket bileşeni `'use client'` **uç yaprak**tır; sayfa RSC kalır (kural 4).
+- **Telefon başka makine:** mobil ayrı kompozisyon (K19 kabuk; yatay şerit → dikey liste; 44 px dokunma hedefi).
+- `useSearchParams` kullanan yaprak `<Suspense>` ile sarılır, **sayfa değil** (kural 5 eki, REC-150 dersi).
+
+## 6 · Doğrulama (bitti sayılma ölçütü)
+1. Playwright 3 hâl: masaüstü 1440 · mobil 390 · reduced-motion — üçünde ekran görüntüsü + konsol hatası 0.
+2. **SSR gövde kelime sayısı > 0** (`curl` ile ham HTML; REC-150 Adım 0 dersi: 0 kelime = Google'a boş sayfa).
+3. `axe` ihlali 0 (Vitest + Testing Library).
+4. Sözleşme karşıtlığı: sayfada `box-shadow` ≠ none 0 · `border-radius` > 8px 0 · tek `#d95d0e` dolu eylem.
+5. Vaat: sayfadaki her sayı için kaynak alanı listelenir (tablo, PR gövdesinde).
+
+## 7 · Yapılmaz
+Video/görsel üretimi (kie.ai, ffmpeg) · kendi scroll motoru (Framer Motion + R3F yeter) · saf Three.js DOM (kural 9) ·
+GSAP · `next/font` dışında font yükleme yolu · Tailwind arbitrary değer (kural 8) · sözlük dışı metin (kural 7).
+
+## 8 · Çıktı
+`src/app/[lang]/products/[slug]/…` RSC sayfa + `src/components/products/hikaye/*` uç bileşenler + veri okuma
+`lib/services` (DI, kural 2) + `src/__tests__/conformance/hikaye-*` (sözleşme karşıtlığı + SSR gövde kapısı).
+PR gövdesinde: gramer · imza hareketi · düğmeler · 3 hâl görüntüleri · sayı-kaynak tablosu.
+
+---
+**Açık sorular (Recep'e değil, OPS/URUN'a):** (1) bölüm davranış ailelerinin kesin listesi Kabuk v2 + ürün sayfası v2
+prototipi bitince sabitlenir; (2) "imza hareketi statik" durumunda hangi kompozisyon — DESIGN-MENU ürün sayfası v2'den ölçülür.
+
+
+---
 # FILE: docs\plans\venthub_hvac_unified_refactor_plan.md
 
 # VentHub HVAC Bütünsel Refactoring ve Enterprise Tip Güvenliği Master Planı
@@ -13484,8 +27921,17 @@ Email gönderen Edge Function'lar tenant bazlı branding kullanmalı:
 # VentHub SaaS Dönüşüm — Master Yol Haritası
 
 > **Oluşturma:** 2026-05-30
-> **Durum:** Faz 1 başlatılacak, Faz 2-4 planlanmış
+> **Durum:** ⛔ **PARK** (Recep kararı, 2026-08-28 · REC-88) — aşağıdaki park notuna bak
 > **Model:** Opus 4.6 (Planlama), Teamwork (Uygulama)
+
+> ⛔ **PARK KARARI (Recep, 2026-08-28 · REC-88):** Faz 2 (White-Label / multi-tenant)
+> **durduruldu**. Öncelik kendi şirket + tek operatör. Bu belgedeki Faz 2-4 planı
+> **iptal değil, PARK** — geçerliliğini korur, ama bugün kimse üzerinde çalışmıyor ve
+> "sıradaki iş" diye okunmamalıdır.
+> ⚠**Park, kuralı düşürmez:** çok-kiracılı kural (CLAUDE.md kural 12 — tenant-scoped okuma/
+> yazma, `app_metadata`, önbellek anahtarlarında `tenantId`) **yürürlükte kalır**. Bugün
+> yazılan kod yarın izolasyon açıldığında sessizce sızdırmasın diye.
+> Kaynak: `CLAUDE.md` (Proje Özeti) · REC-88.
 
 > ⚠️ **GÜNCEL GERÇEK (2026-06-12 — gerçek-zemin notu):** Faz 1 *altyapısı* uzak DB'ye uygulandı, AMA tenant
 > **izolasyonu STUB** durumunda: `tenantResolver` hardcoded `DEFAULT_TENANT_ID`'ye düşüyor, 3 tablo
@@ -13675,6 +28121,14 @@ Email gönderen Edge Function'lar tenant bazlı branding kullanmalı:
 ---
 
 ## 📋 Olgunluk Tablosu
+
+> ⚠️ **BU TABLO HEDEFİ GÖSTERİR, ÖLÇÜMÜ DEĞİL** (not: ALTYAPI, 2026-09-05 · REC-141/E8).
+> "Faz 1 Sonrası" sütunundaki `Multi-tenant ✅` **planlanan** durumdur. **Ölçülen** durum
+> yukarıdaki gerçek-zemin notudur: izolasyon **STUB**, üç tablo `tenant_id` taşımıyor,
+> hedef **ENFORCE EDİLMİYOR**. Yani bu satırı "Faz 1 bitti, çok-kiracılılık var" diye
+> okumak **yanlıştır** — çelişki tam buradan doğdu ve tarama A/E8 satırında yakalandı.
+> Sütun adı bilinçli olarak değiştirilmedi: tablo bir **plan** belgesidir; düzeltilmesi
+> gereken şey tablo değil, onu ölçüm sanma alışkanlığıydı.
 
 | Özellik | Shopify | VentHub Şu An | Faz 1 Sonrası | Faz 2 | Faz 3 | Faz 4 |
 |---|---|---|---|---|---|---|
@@ -14876,9 +29330,13 @@ defter-defter sorup elle birleştirmeyi gerektiriyor.
 | **Ne ölçülür** (analytics / GA4 / dönüşüm)? | `standards/analytics-standard.md` |
 | Şu an **gerçek** ne? | `audits/dealer-data-ground-truth-2026-06-11.md` |
 | Fiyat/kur/marj **nasıl hesaplanır**? | `standards/pricing-standard.md` |
+| **Katalog PDF'inde ne yazıyor?** (PDF'i AÇMA — dizini oku) | `standards/catalog-ingestion-standard.md` §6.3 → `<ingestor>/kaynak-dizini/sayfalar.jsonl` |
 | Hangi sayfa **nasıl üretilir**, veri değişince **ne tazelenir**, fiyat **hangi yüzeyde** görünür? | `standards/rendering-cache-standard.md` |
+| Bir kategorinin **adı hangi kolondan** gelir (menüde, başlıkta, kırıntıda)? | `standards/kategori-adlandirma-standard.md` |
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır? | `standards/multi-session-coordination-standard.md` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
+| Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
+| Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
 | Kapsamlı uçtan uca referans | `../CONTEXT.md` (NLM üretir) |
 
@@ -15244,6 +29702,42 @@ PR kapı takibi (`#578`/`#580`/`#584`) · dalga onayları Recep'ten çıkınca d
 ADMIN-CUSTOMER=`6cc7f2d3` · EDGE=`4397deef` · PRICING=`f68f03d8` · AUTH=`99fa366e` · QUOTE=`e033dc3e` ·
 ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
+### Controller — SKILL şeridi (Fable oturumu `0df102e3`, 2026-09-08, tek gün)
+- **OPS'A NOT (Recep istedi, 2026-09-08):** Recep 11 repo + gstack/strix/Agent-Reach'i "projeye
+  faydası var mı" diye sordu; ölçüm sonucu LLM ekibine iki şey ekliyor, Recep "bu ikisini al" dedi.
+  **PR `#1116`** (`claude/gunaydın-rrt2g1` → master, migration yok): **`office-hours`** skill'i
+  (fikir sorgusu — plandan ÖNCEKİ basamak; altı zorlayıcı soru + öncül çürütme + 2-3 yol →
+  `docs/plans/` tasarım notu; kod/emir/plan yazmaz) ve **`qa`** skill'i (Playwright+Chromium ile
+  gerçek tarayıcı denetimi: gez → kanıt → atomik `fix(qa)` → yeniden ölç; `scripts/gez.mjs`
+  yerelde ölçüldü; prod'da yalnız bakış, "Ödemeye Geç" hiç basılmaz). `execution-method-standard.md`
+  karar tablosuna iki satır işlendi. **OPS'tan beklenen:** gün kapanışında Kararlar defteri +
+  bu pano başlığına "yeni yetenek" kaydı; PR merge'ü Recep onayıyla. Alınmayanlar (ECC, paperclip,
+  agency-agents, browser-use, Scrapling/scrapy, unsloth, CL4R1T4S, open-design, archify,
+  Agent-Reach) oturumda gerekçelendi; **strix** (dinamik pentest, yalnız staging) "lansman öncesi
+  denetim" emri açılınca yeniden gündeme gelir.
+- **Ek (aynı gün, Recep "llm council" dedi):** **`llm-council`** skill'i — karpathy/llm-council fikri
+  (ürün değil) Workflow'a yazıldı: N mercekli üye → **anonim, döndürülmüş sıralı** çapraz puanlama →
+  başkan sentezi + zorunlu muhalefet şerhi; 9 ajan; "workflow kullan" olmadan açılmaz; karar Recep'in.
+  Cetvel tablosuna satır eklendi. Recep "önerdiklerini de yap" dedi → **`task-observer`** skill'i
+  (rebelytics CC BY 4.0 uyarlaması; gözlemler `docs/skill-gozlemleri/acik/`, haftalık inceleme OPS
+  gün kapanışında; ilk iki gözlem bugünkü iki Recep düzeltmesi) · **`.claude/statusline.cjs`**
+  (bağlam doluluk çubuğu; headroom fikri, uygulama bizden — Claude Code `used_percentage`'ı
+  doğrudan veriyor, hook gerekmedi; `settings.json` `statusLine`) · **claude-mem deneme planı**
+  `docs/plans/claude-mem-deneme-plani-2026-09-08.md` (kurulum Recep'in makinesinde, `--provider
+  host` ŞART, 14 gün, kabul/red ölçütü tabloda) · üç skill başlığına **KAYNAK/ALINAN/BİZDEN** bloğu
+  (Recep: "içeriği mi alıyorsun, bizden mi, ayırt edemiyorum"). Agent-Reach ürün olarak hayır;
+  ihtiyaç **`video-kaynak`** skill'iyle karşılandı (yt-dlp ara → Recep seçer → NLM `source_add` →
+  `chat_ask` doğrulaması).
+- **Karar (Recep "sen istiyorsan yap", 2026-09-08):** **`docs/plans/lansman-oncesi-dayaniklilik-plani-2026-09-08.md`**
+  — ölçülmüş var/yok tablosu + 10 madde, sıra: **yedek tatbikatı (İLK, geri alınamaz tek arıza)** →
+  sessiz-arıza alarmı → olay defteri → hız sınırı yayma (maestro) → uptime → pgTAP RLS → staging+strix
+  → k6 → Stryker → mekanizma budaması. Kod yok; her madde ayrı emir. **OPS: 1 ve 3 doğrudan emir
+  açılabilir (kod yok); 2/4/6 plan-challenger ister.**
+- **Ölçülen kısıt:** uzak Claude Code konteynerinde Chromium dış siteye çıkamıyor (proxy CONNECT
+  reddi); orada `qa` hedefi yerel `pnpm start`, preview/prod bakışı yerel makineden. Pano notları
+  (`C:/tmp/venthub-board`) konteynerde yerel kalıyor, eş-Controller'a ULAŞMIYOR — bu yüzden not
+  buraya yazıldı (kural: kendi bölümüme).
+
 ---
 
 ## Büyük Resim (zincir)
@@ -15342,15 +29836,18 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-03T18:22:26.278144+00:00
+compiled_at: 2026-09-09T12:24:55.683613+00:00
 standard: Enterprise-Ready (5N1K + Axioms)
 ---
 
-Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
+Bu belge, otonom derleyici tarafından 2026-09-09T12:24:55.683613+00:00 tarihinde sistemdeki kaynak kod dosyalarının (.py/.ts/.tsx/.js/.jsx) eşleşen `.md` (mimari dokümantasyon) dosyalarına sahip olup olmadığını göstermek amacıyla otonom olarak derlenmiştir.
 
 ## Dokümantasyon Durumu
 ```text
 📂 venthub-hvac/
+├── 📂 ** .agents/**
+│   └── 📂 **explorer_m4_1_gen2/**
+│       └── ⚠️ `handoff.md`
 ├── ⚪ `CHANGELOG.md`
 ├── ⚪ `CLAUDE.md`
 ├── ⚪ `CONTEXT.md`
@@ -15361,6 +29858,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 ├── ⚠️ `TEST_INFRA.md`
 ├── ⚠️ `TEST_READY.md`
 ├── ⚪ `VISION.md`
+├── 📂 **cache/**
 ├── 📂 **docs/**
 │   ├── ⚪ `DURUM-TAKIP.md`
 │   ├── ⚪ `README.md`
@@ -15388,20 +29886,82 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `admin-cetvel-scores-2026-06-18.md`
 │   │   ├── ⚪ `admin-panel-audit-2026-06-11.md`
 │   │   ├── ⚪ `aile-adi-en-cevirileri-2026-08-23.md`
+│   │   ├── ⚪ `arac-envanteri-2026-09-07.md`
 │   │   ├── ⚪ `build-skip-canli-olcum-2026-08-28.md`
 │   │   ├── ⚪ `canliya-alma-hazirlik-2026-08-15.md`
 │   │   ├── ⚪ `dealer-data-ground-truth-2026-06-11.md`
+│   │   ├── ⚪ `fiyatsiz-27-ayrim-2026-09-06.md`
 │   │   ├── ⚪ `i18n-sozluk-render-denetimi-2026-08-23.md`
+│   │   ├── ⚪ `icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-anlatim-derinligi-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-aralik-hucresi-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-atex-malzeme-kanit-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-avens-csv-kaynak-olcumu-2026-09-09.md`
+│   │   ├── ⚪ `icerik-hatti-avens-katalog-hatalari-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-birim-olcek-kusurlari-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-bolum-aile-eslemesi-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-faz2-inceleme-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-faz4-canli-yazim-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-faz4-hazirlik-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-gorsel-envanteri-2026-09-08.md`
+│   │   ├── ⚪ `icerik-hatti-kanit-daraltma-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-kategori-gorsel-2026-09-08.md`
+│   │   ├── ⚪ `icerik-hatti-kategori-olcumu-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-kayip-urun-aktarimi-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-kaynak-dizini-olcumu-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-kaynak-dizini-tazeleme-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-musteri-belgeleri-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-pdf-yapisi-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-rec178-olu-aday-olcumu-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-recep-kararlari-uygulama-2026-09-08.md`
+│   │   ├── ⚪ `icerik-hatti-sayfa-araliklari-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-sensor-kategorisi-yazimi-2026-09-09.md`
+│   │   ├── ⚪ `icerik-hatti-seri-metni-tek-model-kusuru-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-sessiz-bosluk-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-tasinabilir-katalog-2026-09-07.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-avens-hucreli-siginak-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-avens-isitici-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-avens-plug-hrv-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-commercial-inline-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-danfoss-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-endustriyel-atex-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-hava-perdesi-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-heatmaster-slimroof-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-isi-geri-kazanim-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-kategori-rehber-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-lineo-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-nicotra-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-radon-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-seat-storm-jet-2026-09-05.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-vortice-konut-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-vortice-tekiller-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-taslak-vortice-ticari-2026-09-06.md`
+│   │   ├── ⚪ `icerik-hatti-toplu-sunum-2026-09-06.md`
+│   │   ├── ⚪ `karar-kayit-bagi-vitrin-15a-2026-09-07.md`
 │   │   ├── ⚪ `kasa-ve-siralama-denetimi-2026-08-23.md`
+│   │   ├── ⚪ `katalog-karnesi-2026-09-09.md`
+│   │   ├── ⚪ `katalog-sayim-2026-09-03.md`
 │   │   ├── ⚪ `legal-i18n-scope-antigravity-2026-06-16.md`
 │   │   ├── ⚪ `lighthouse_diagnostic_2026-06-10.md`
 │   │   ├── ⚪ `locale-kasa-envanteri-2026-08-23.md`
+│   │   ├── ⚪ `matris-sutun-doluluk-2026-09-05.md`
 │   │   ├── ⚪ `odeme-yolu-denetimi-2026-08-15.md`
+│   │   ├── ⚪ `olu-sozluk-anahtari-olcumu-2026-09-06.md`
 │   │   ├── ⚪ `operasyon-dongusu-denetimi-2026-08-15.md`
 │   │   ├── ⚪ `product-schema-ground-truth-2026-06-21.md`
+│   │   ├── ⚪ `rec124-katalog-veri-kusurlari-2026-09-04.md`
+│   │   ├── ⚪ `rec146-kod-cakismasi-11936-2026-09-09.md`
+│   │   ├── ⚪ `rec146-kodsuz-urun-cikarim-yolu-2026-09-09.md`
+│   │   ├── ⚪ `rec146-red-team-csv-plani-2026-09-09.md`
+│   │   ├── ⚪ `rec146-uydurma-kimlik-canli-yazim-2026-09-09.md`
+│   │   ├── ⚪ `rec162-evren-muhafizi-adaylari-2026-09-06.md`
+│   │   ├── ⚪ `rec176-skill-dogrulama-2026-09-07.md`
+│   │   ├── ⚪ `rec179-evren-muhafizi-sinavi-2026-09-07.md`
 │   │   ├── ⚪ `registry-triyaj-2026-08-26.md`
 │   │   ├── ⚪ `render-stratejisi-denetimi-2026-08-16.md`
 │   │   ├── ⚪ `secret-exposure-audit-2026-08-15.md`
+│   │   ├── ⚪ `sir-ekrana-basma-olayi-2026-09-04.md`
+│   │   ├── ⚪ `skill-envanteri-2026-09-05.md`
 │   │   ├── ⚪ `t021-analytics-coverage-2026-08-19.md`
 │   │   ├── ⚪ `t077-ad-arayan-iddia-taramasi-2026-08-17.md`
 │   │   ├── ⚪ `t099-aile-icerik-uyumu-2026-08-18.md`
@@ -15421,6 +29981,9 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `t146-csv-import-kategori-slug-2026-08-23.md`
 │   │   ├── ⚪ `t150-wizard-i18n-anahtarlari-2026-08-23.md`
 │   │   ├── ⚪ `t162-lineo-birlestirme-2026-08-23.md`
+│   │   ├── ⚪ `tasarim-kod-envanteri-2026-09-06.md`
+│   │   ├── ⚪ `tasarim-sozlesmesi-fark-2026-09-05.md`
+│   │   ├── ⚪ `teknik-bosluk-2026-09-06.md`
 │   │   ├── ⚪ `vibe-coding-20-madde-denetimi-2026-08-13.md`
 │   │   ├── ⚪ `vibe-coding-20-madde-v2-2026-08-16.md`
 │   │   └── ⚪ `yetki-katmani-denetimi-2026-08-15.md`
@@ -15440,6 +30003,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `admin-shell-e2-notification-inbox-brief.md`
 │   │   ├── ⚪ `avensair-teslim-yol-haritasi-2026-06-15.md`
 │   │   ├── ⚪ `catalog-commerce-pipeline-master-2026-06-20.md`
+│   │   ├── ⚪ `claude-mem-deneme-plani-2026-09-08.md`
 │   │   ├── ⚪ `f5b-family-architecture-plan.md`
 │   │   ├── ⚪ `faz0-kit-contract-2026-06-13.md`
 │   │   ├── ⚪ `faz1-migration-playbook-2026-06-13.md`
@@ -15465,11 +30029,22 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `j9-categorybuilder-refactor-brief.md`
 │   │   ├── ⚪ `kademe2-clean-rebuild-2026-08-11.md`
 │   │   ├── ⚪ `kategori-esleme-2026-09-04.md`
+│   │   ├── ⚪ `kategori-gorsel-tedarik-2026-09-08.md`
+│   │   ├── ⚪ `lansman-oncesi-dayaniklilik-plani-2026-09-08.md`
 │   │   ├── ⚪ `product-schema-master-implementation-plan.md`
 │   │   ├── ⚪ `product-schema-standard-brief.md`
+│   │   ├── ⚪ `rec-adres-agac-tek-yayin-2026-09-07.md`
 │   │   ├── ⚪ `rec108-aile-adi-dil-zinciri-2026-09-01.md`
 │   │   ├── ⚪ `rec110-114-117-migration-paketi-2026-09-01.md`
+│   │   ├── ⚪ `rec117-misafir-teklif-akisi-2026-09-08.md`
 │   │   ├── ⚪ `rec129-faz1-kabuk-plani-2026-09-04.md`
+│   │   ├── ⚪ `rec146-avens-csv-yeniden-uretim-2026-09-09.md`
+│   │   ├── ⚪ `rec158-foy-vitrin-bicim-paritesi-2026-09-06.md`
+│   │   ├── ⚪ `rec162-vercel-kapisi-2026-09-06.md`
+│   │   ├── ⚪ `rec168-migration-taslagi-2026-09-06.md`
+│   │   ├── ⚪ `rec292-denetim-izi-2026-09-09.md`
+│   │   ├── ⚪ `rec296-koken-allowlist-2026-09-09.md`
+│   │   ├── ⚪ `rec52-whsec-rotasyon-plani-2026-09-06.md`
 │   │   ├── ⚪ `red-team-rec129-faz1-2026-09-04.md`
 │   │   ├── ⚪ `red-team-teklif-modu-2026-09-04.md`
 │   │   ├── ⚪ `render-dalga1-plan-2026-08-17.md`
@@ -15483,12 +30058,271 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `teklif-modu-tutarlilik-paketi-2026-09-04.md`
 │   │   ├── ⚪ `tenant-id-hardening-2026-08-15.md`
 │   │   ├── ⚪ `urun-kimlik-duzeltme-2026-08-22.md`
+│   │   ├── ⚪ `venthub-hikaye-sayfasi-skill-taslak-2026-09-05.md`
 │   │   ├── ⚪ `venthub_hvac_unified_refactor_plan.md`
 │   │   ├── ⚪ `venthub_saas_faz1_prompt.md`
 │   │   └── ⚪ `venthub_saas_master_roadmap.md`
 │   ├── 📂 **products/**
 │   │   ├── ⚪ `AIR_DOOR_AD_900_MASTER.md`
 │   │   └── ⚪ `AIR_DOOR_AD_900_SEO.md`
+│   ├── 📂 **proje-takip/**
+│   │   ├── ⚪ `celiski-mukerrerlik-analizi-2026-09-04.md`
+│   │   ├── ⚪ `defter-hijyen-2026-09-06.md`
+│   │   ├── 📂 **design/**
+│   │   │   ├── ⚪ `INDEX-2026-09-06.md`
+│   │   │   ├── 📂 **belge/**
+│   │   │   │   ├── ⚪ `CLAUDE.md`
+│   │   │   │   ├── ⚪ `alan-envanteri-2026-09-05.md`
+│   │   │   │   ├── ⚪ `anahtar-ve-kip-haritasi-2026-09-04.md`
+│   │   │   │   ├── ⚪ `antetli-ve-imza-notlar-2026-09-06.md`
+│   │   │   │   ├── ⚪ `bayat-2026-09-05.md`
+│   │   │   │   ├── ⚪ `bayat-2026-09-06.md`
+│   │   │   │   ├── ⚪ `bekleyen-hukumler-2026-09-06.md`
+│   │   │   │   ├── ⚪ `belge-kabugu-notlar.md`
+│   │   │   │   ├── 📂 **brand/**
+│   │   │   │   │   └── 📂 **logo/**
+│   │   │   │   │       └── ⚪ `README.md`
+│   │   │   │   ├── ⚪ `design-eklemeleri-e13-e17-2026-09-05.md`
+│   │   │   │   ├── ⚪ `eposta-sablonlari-notlar.md`
+│   │   │   │   ├── ⚪ `github.md`
+│   │   │   │   ├── ⚪ `kapsam-ve-belge-sistemi-onerisi-2026-09-05.md`
+│   │   │   │   ├── ⚪ `kararlar-katalog-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-04.md`
+│   │   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kartvizit-notlar-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kvkk-seti-notlar-2026-09-06.md`
+│   │   │   │   ├── ⚪ `linear-turu-2026-09-06-2.md`
+│   │   │   │   ├── ⚪ `linear-turu-2026-09-06-3.md`
+│   │   │   │   ├── ⚪ `ops-cevap-2026-09-06-belge-153-28-30.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-1-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-2-cip.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-3-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-4-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-5-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-1-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-2-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-3-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-4-belge.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-5-belge.md`
+│   │   │   │   ├── ⚪ `ops-iletisim-protokolu.md`
+│   │   │   │   ├── ⚪ `satinalma-seti-notlar-2026-09-06.md`
+│   │   │   │   ├── ⚪ `sorular-2026-09-06-2.md`
+│   │   │   │   ├── ⚪ `sorular-2026-09-06-3.md`
+│   │   │   │   ├── ⚪ `sorular-2026-09-06.md`
+│   │   │   │   ├── ⚪ `urun-teknik-foyu-notlar.md`
+│   │   │   │   ├── ⚪ `venthub-canli-durum.md`
+│   │   │   │   └── ⚪ `yasal-set-notlar-2026-09-06.md`
+│   │   │   ├── 📂 **ds/**
+│   │   │   │   ├── ⚪ `SKILL.md`
+│   │   │   │   ├── ⚪ `bayat-2026-09-05.md`
+│   │   │   │   ├── ⚪ `bayat-2026-09-06.md`
+│   │   │   │   ├── 📂 **brand/**
+│   │   │   │   │   └── ⚪ `README.md`
+│   │   │   │   ├── ⚪ `cip-cevrildi-denetim-istegi-2026-09-06.md`
+│   │   │   │   ├── 📂 **components/**
+│   │   │   │   │   ├── 📂 **dugme/**
+│   │   │   │   │   │   ├── ⚪ `AnaEylemDugmesi.prompt.md`
+│   │   │   │   │   │   ├── ⚪ `CerceveliDugme.prompt.md`
+│   │   │   │   │   │   └── ⚪ `KatliCagriSatiri.prompt.md`
+│   │   │   │   │   ├── 📂 **kabuk/**
+│   │   │   │   │   │   └── ⚪ `KabukBandi.prompt.md`
+│   │   │   │   │   ├── 📂 **veri/**
+│   │   │   │   │   │   ├── ⚪ `AdetKontrolu.prompt.md`
+│   │   │   │   │   │   ├── ⚪ `KarsilastirmaTablosu.prompt.md`
+│   │   │   │   │   │   ├── ⚪ `PQEgrisi.prompt.md`
+│   │   │   │   │   │   └── ⚪ `TeknikTablo.prompt.md`
+│   │   │   │   │   └── 📂 **yuzey/**
+│   │   │   │   │       ├── ⚪ `Cip.prompt.md`
+│   │   │   │   │       └── ⚪ `Kart.prompt.md`
+│   │   │   │   ├── ⚪ `design-marka-ds-kurulum-notlar-2026-09-05.md`
+│   │   │   │   ├── ⚪ `ds-duzeltme-notlar-2026-09-05.md`
+│   │   │   │   ├── ⚪ `emir-5-kapanis-notlar-2026-09-06.md`
+│   │   │   │   ├── ⚪ `emir-6-notlar-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-katalog-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-06.md`
+│   │   │   │   ├── ⚪ `karsilastirma-tablosu-karari-2026-09-06.md`
+│   │   │   │   ├── ⚪ `ops-cevap-2026-09-06-ds-s1-s4.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-1-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-2-cip.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-3-ds-kapanis.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-1-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-2-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-3-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-4-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-5-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-6-ds.md`
+│   │   │   │   ├── ⚪ `ops-iletisim-protokolu.md`
+│   │   │   │   ├── ⚪ `readme.md`
+│   │   │   │   ├── ⚪ `sorular-2026-09-06.md`
+│   │   │   │   ├── 📂 **templates/**
+│   │   │   │   │   └── 📂 **kabuk/**
+│   │   │   │   │       └── ⚪ `README.md`
+│   │   │   │   └── 📂 **ui_kits/**
+│   │   │   │       └── 📂 **kabuk/**
+│   │   │   │           └── ⚪ `README.md`
+│   │   │   ├── 📂 **marka/**
+│   │   │   │   ├── ⚪ `0 OKU-BENI.md`
+│   │   │   │   ├── ⚪ `CLAUDE.md`
+│   │   │   │   ├── ⚪ `bayat-2026-09-05.md`
+│   │   │   │   ├── ⚪ `bayat-2026-09-06.md`
+│   │   │   │   ├── 📂 **brand/**
+│   │   │   │   │   ├── ⚪ `README.md`
+│   │   │   │   │   └── 📂 **logo/**
+│   │   │   │   │       └── ⚪ `README.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-b.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-c.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-d.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-e.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-f.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-g.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-h.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-i.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-j.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-k.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-l.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-m.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-n.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-p.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05-r.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-05.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-b.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-c.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-d.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-e.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-f.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-g.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-h.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-i.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-j.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-k.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06-l.md`
+│   │   │   │   ├── ⚪ `design-marka-ops-notu-2026-09-06.md`
+│   │   │   │   ├── ⚪ `github.md`
+│   │   │   │   ├── 📂 **handoff/**
+│   │   │   │   │   └── ⚪ `README.md`
+│   │   │   │   ├── ⚪ `kararlar-katalog-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-06.md`
+│   │   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-06.md`
+│   │   │   │   ├── ⚪ `marka-deney-brief-1.md`
+│   │   │   │   ├── ⚪ `ops-cevap-marka-2026-09-05.md`
+│   │   │   │   ├── ⚪ `ops-cevap-marka-b-2026-09-05.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-1-marka.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-2-cip.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-05-2-marka.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-2-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-3-ds.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-4-marka.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-5-marka.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-6-marka.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-7-marka.md`
+│   │   │   │   ├── ⚪ `ops-emir-2026-09-06-8-marka.md`
+│   │   │   │   ├── ⚪ `ops-iletisim-protokolu.md`
+│   │   │   │   ├── ⚪ `venthub-canli-durum.md`
+│   │   │   │   └── ⚪ `venthub-proje-ayarlari.md`
+│   │   │   └── 📂 **menu/**
+│   │   │       ├── ⚪ `CLAUDE.md`
+│   │   │       ├── ⚪ `DEVIR.md`
+│   │   │       ├── ⚪ `ana-sayfa-brief.md`
+│   │   │       ├── ⚪ `bayat-2026-09-05.md`
+│   │   │       ├── ⚪ `bayat-2026-09-06.md`
+│   │   │       ├── ⚪ `bosluk-listesi-2026-09-04.md`
+│   │   │       ├── ⚪ `bosluk-listesi-v2.md`
+│   │   │       ├── 📂 **brand/**
+│   │   │       │   └── 📂 **logo/**
+│   │   │       │       └── ⚪ `README.md`
+│   │   │       ├── ⚪ `desen-envanteri-2026-09-06.md`
+│   │   │       ├── ⚪ `geri-bildirim-1.md`
+│   │   │       ├── ⚪ `geri-bildirim-10.md`
+│   │   │       ├── ⚪ `geri-bildirim-2.md`
+│   │   │       ├── ⚪ `geri-bildirim-3.md`
+│   │   │       ├── ⚪ `geri-bildirim-4.md`
+│   │   │       ├── ⚪ `geri-bildirim-5.md`
+│   │   │       ├── ⚪ `geri-bildirim-6.md`
+│   │   │       ├── ⚪ `geri-bildirim-7.md`
+│   │   │       ├── ⚪ `geri-bildirim-8.md`
+│   │   │       ├── ⚪ `geri-bildirim-9.md`
+│   │   │       ├── ⚪ `github.md`
+│   │   │       ├── ⚪ `gozden-gecirme-brief.md`
+│   │   │       ├── ⚪ `gozden-gecirme-bulgular-v1.md`
+│   │   │       ├── ⚪ `gozden-gecirme-eleme-v1.md`
+│   │   │       ├── ⚪ `ham-hex-beyani-2026-09-06.md`
+│   │   │       ├── ⚪ `kabuk-v2-notlar.md`
+│   │   │       ├── ⚪ `kararlar-katalog-2026-09-06.md`
+│   │   │       ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-06.md`
+│   │   │       ├── ⚪ `kararlar-vitrin-15a-2026-09-04.md`
+│   │   │       ├── ⚪ `kararlar-vitrin-15a-2026-09-06.md`
+│   │   │       ├── ⚪ `kararlar-vitrin-15a.md`
+│   │   │       ├── ⚪ `kart-mount-olcumu-2026-09-06.md`
+│   │   │       ├── ⚪ `madde82-denetim-2026-09-05.md`
+│   │   │       ├── ⚪ `menu-v17-olcum-2026-09-06.md`
+│   │   │       ├── ⚪ `mobil-kisayol-oneriler.md`
+│   │   │       ├── ⚪ `ops-devir-eki-2026-09-06-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-1-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-2-cip.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-3-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-4-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-5-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-6-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-7-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-05-8-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-1-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-10-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-2-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-3-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-4-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-5-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-6-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-7-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-8-menu.md`
+│   │   │       ├── ⚪ `ops-emir-2026-09-06-9-menu.md`
+│   │   │       ├── ⚪ `ops-iletisim-protokolu.md`
+│   │   │       ├── ⚪ `secim-motoru-kapsam-haritasi-taslak.md`
+│   │   │       ├── ⚪ `sogukgiris-oneriler.md`
+│   │   │       ├── ⚪ `systemair-incelemesi-ve-kabuk-v2.md`
+│   │   │       ├── ⚪ `systemair-olcum-raporu.md`
+│   │   │       ├── ⚪ `tasarim-sozlesmesi-notlar.md`
+│   │   │       ├── ⚪ `tasarim-sozlesmesi-sema.md`
+│   │   │       ├── ⚪ `urun-sayfasi-v2-notlar.md`
+│   │   │       ├── ⚪ `v14-notlar.md`
+│   │   │       ├── ⚪ `v15-notlar.md`
+│   │   │       ├── ⚪ `v3-notlar.md`
+│   │   │       ├── ⚪ `venthub-canli-durum.md`
+│   │   │       └── ⚪ `zorunlu-icerik-haritasi.md`
+│   │   ├── 📂 **design-15a/**
+│   │   │   ├── ⚪ `DESIGN-gozden-gecirme-bulgular-v1.md`
+│   │   │   ├── ⚪ `DESIGN-mobil-kisayol-oneriler.md`
+│   │   │   ├── ⚪ `DESIGN-sogukgiris-oneriler.md`
+│   │   │   ├── ⚪ `DESIGN-v14-notlar.md`
+│   │   │   ├── ⚪ `DESIGN-v15-notlar.md`
+│   │   │   ├── ⚪ `DESIGN-zorunlu-icerik-haritasi.md`
+│   │   │   ├── ⚪ `bosluk-listesi-2026-09-04.md`
+│   │   │   ├── ⚪ `geri-bildirim-5.md`
+│   │   │   ├── ⚪ `geri-bildirim-6.md`
+│   │   │   ├── ⚪ `geri-bildirim-7.md`
+│   │   │   ├── ⚪ `geri-bildirim-8.md`
+│   │   │   ├── ⚪ `geri-bildirim-9.md`
+│   │   │   ├── ⚪ `gozden-gecirme-brief.md`
+│   │   │   ├── ⚪ `secim-motoru-kapsam-haritasi-taslak.md`
+│   │   │   └── ⚪ `venthub-canli-durum.md`
+│   │   ├── ⚪ `gun-kapanisi-2026-09-07.md`
+│   │   ├── ⚪ `hafiza-sinavi-sonuc.md`
+│   │   ├── ⚪ `is-dagilimi.md`
+│   │   ├── 📂 **linear/**
+│   │   │   ├── ⚪ `anahtar-ve-kip-haritasi-2026-09-04.md`
+│   │   │   ├── ⚪ `is-dagilimi-2026-09-07.md`
+│   │   │   ├── ⚪ `is-dagilimi-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-altyapi-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-katalog-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-kurumsal-belgeler-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-marka-kilavuzu-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-seo-ve-yayin-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-teklif-akisi-2026-09-09.md`
+│   │   │   ├── ⚪ `kararlar-vitrin-15a-2026-09-09.md`
+│   │   │   └── ⚪ `venthub-yol-haritasi-ve-durum.md`
+│   │   ├── ⚪ `recep-bekleyen.md`
+│   │   └── ⚪ `yol-haritasi-durum.md`
 │   ├── ⚪ `recep-komut-rehberi.md`
 │   ├── 📂 **reference/**
 │   │   ├── 📂 **supabase/**
@@ -15503,6 +30337,13 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   └── ⚪ `t134-sentez-karar-tablosu-2026-08-20.md`
 │   ├── 📂 **screenshots/**
 │   │   └── ⚪ `README.md`
+│   ├── 📂 **skill-gozlemleri/**
+│   │   ├── ⚪ `README.md`
+│   │   ├── 📂 **acik/**
+│   │   │   ├── ⚪ `2026-09-08-kaynak-alinan-bizden.md`
+│   │   │   ├── ⚪ `2026-09-08-olcmeden-hukum-verme.md`
+│   │   │   └── ⚪ `2026-09-09-bilgi-kaynagini-kod-gibi-degerlendirme.md`
+│   │   └── 📂 **arsiv/**
 │   ├── 📂 **standards/**
 │   │   ├── ⚪ `3d-scene-lighting-research.md`
 │   │   ├── ⚪ `3d-showroom-ux-research.md`
@@ -15511,7 +30352,9 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `admin-capabilities.md`
 │   │   ├── ⚪ `admin-design-standard.md`
 │   │   ├── ⚪ `admin-standard.md`
+│   │   ├── ⚪ `aile-metni-sayisal-standard.md`
 │   │   ├── ⚪ `analytics-standard.md`
+│   │   ├── ⚪ `arac-envanteri-standard.md`
 │   │   ├── ⚪ `auth-account-standard.md`
 │   │   ├── ⚪ `canonical-url-standard.md`
 │   │   ├── ⚪ `catalog-depth-standard.md`
@@ -15529,18 +30372,25 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `db-grant-hygiene-standard.md`
 │   │   ├── ⚪ `dealer-module-blueprint.md`
 │   │   ├── ⚪ `dealer-network-standard.md`
+│   │   ├── ⚪ `denetim-izi-standard.md`
 │   │   ├── ⚪ `dependency-integrity-standard.md`
 │   │   ├── ⚪ `deploy-build-skip-standard.md`
+│   │   ├── ⚪ `document-numbering-standard.md`
 │   │   ├── ⚪ `edge-function-security-standard.md`
+│   │   ├── ⚪ `email-template-standard.md`
 │   │   ├── ⚪ `erp-workspace-design-standard.md`
 │   │   ├── ⚪ `execution-method-standard.md`
 │   │   ├── ⚪ `fleet-mechanism-standard.md`
 │   │   ├── ⚪ `form-submission-standard.md`
+│   │   ├── ⚪ `hafiza-kancalari-standard.md`
 │   │   ├── ⚪ `i18n-localization-standard.md`
 │   │   ├── ⚪ `i18n-ters-yon-standard.md`
 │   │   ├── ⚪ `is-kayit-duzeni-standard.md`
 │   │   ├── ⚪ `katalog-sayim-standard.md`
+│   │   ├── ⚪ `kategori-adlandirma-standard.md`
 │   │   ├── ⚪ `legal-compliance-standard.md`
+│   │   ├── ⚪ `marka-token-eslemesi-standard.md`
+│   │   ├── ⚪ `matris-gorunum-standard.md`
 │   │   ├── ⚪ `measurement-discipline-standard.md`
 │   │   ├── ⚪ `migration-safety-standard.md`
 │   │   ├── ⚪ `mockup-gelisim-hatti-standardi.md`
@@ -15551,17 +30401,21 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ⚪ `pricing-standard.md`
 │   │   ├── ⚪ `product-image-standard.md`
 │   │   ├── ⚪ `product-schema-standard.md`
+│   │   ├── ⚪ `proje-takip-defteri-standard.md`
 │   │   ├── ⚪ `purchasing-standard.md`
 │   │   ├── ⚪ `quote-standard.md`
 │   │   ├── ⚪ `rendering-cache-standard.md`
 │   │   ├── ⚪ `runtime-version-alignment-standard.md`
+│   │   ├── ⚪ `satis-kipi-gecis-standard.md`
 │   │   ├── ⚪ `session-loop-ritual.md`
 │   │   ├── ⚪ `settled-work-standard.md`
 │   │   ├── ⚪ `spec-axis-standard.md`
 │   │   ├── ⚪ `storefront-design-standard.md`
 │   │   ├── ⚪ `storefront-reflow-standard.md`
 │   │   ├── ⚪ `subagent-delegation-standard.md`
+│   │   ├── ⚪ `tasarim-yetenek-standard.md`
 │   │   ├── ⚪ `uretilmis-artefakt-standard.md`
+│   │   ├── ⚪ `urun-yapisal-veri-standard.md`
 │   │   ├── ⚪ `vaat-butunlugu-standard.md`
 │   │   └── ⚪ `work-tracking-ssot-standard.md`
 │   ├── ⚪ `standards_master.md`
@@ -15572,8 +30426,11 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 ├── 📂 **e2e/**
 │   ├── ✅ `admin-smoke.e2e.ts`
 │   ├── ✅ `checkout-smoke.e2e.ts`
-│   └── ✅ `reflow.e2e.ts`
+│   ├── ✅ `reflow.e2e.ts`
+│   └── ✅ `ssr-html.e2e.ts`
 ├── ⚠️ `eslint.config.md`
+├── 📂 **explorer_m2_3/**
+│   └── ⚠️ `analysis.md`
 ├── ⚠️ `implementation_plan.md`
 ├── 📂 **memory-engine/**
 │   └── ⚪ `README.md`
@@ -15682,10 +30539,12 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   ├── ✅ `page.tsx`
 │   │   │   ├── 📂 **payment-success/**
 │   │   │   │   └── ✅ `page.tsx`
-│   │   │   └── 📂 **products/**
-│   │   │       ├── 📂 **[slug]/**
-│   │   │       │   └── ✅ `page.tsx`
-│   │   │       └── ✅ `page.tsx`
+│   │   │   ├── 📂 **products/**
+│   │   │   │   ├── 📂 **[slug]/**
+│   │   │   │   │   └── ✅ `page.tsx`
+│   │   │   │   └── ✅ `page.tsx`
+│   │   │   └── 📂 **urun-secici/**
+│   │   │       └── ❌ `page.tsx`
 │   │   ├── 📂 **_components/**
 │   │   │   └── ✅ `ProductDetailPageView.tsx`
 │   │   ├── 📂 **admin/**
@@ -15874,7 +30733,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   ├── ✅ `CalculatorLayout.tsx`
 │   │   │   ├── ✅ `InputField.tsx`
 │   │   │   ├── ✅ `ResultCard.tsx`
-│   │   │   └── ✅ `StepIndicator.tsx`
+│   │   │   ├── ✅ `StepIndicator.tsx`
+│   │   │   └── ❌ `UrlParametreOkuyucu.tsx`
 │   │   ├── 📂 **category/**
 │   │   │   ├── ✅ `CategoryAuthoritySection.tsx`
 │   │   │   ├── ✅ `CategoryFilters.tsx`
@@ -15921,14 +30781,17 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   ├── ✅ `Breadcrumb.tsx`
 │   │   │   ├── ✅ `CategoryHubOverlay.tsx`
 │   │   │   ├── ✅ `EliteMegaMenu.tsx`
+│   │   │   ├── ❌ `HeaderTeklifPaneli.tsx`
 │   │   │   ├── ✅ `MegaMenu3DBackground.tsx`
+│   │   │   ├── ❌ `MobilAltSekmeCubugu.tsx`
 │   │   │   ├── ✅ `NavActionButton.tsx`
 │   │   │   ├── ✅ `NavBrand.tsx`
 │   │   │   ├── ✅ `NavPrimaryRail.tsx`
 │   │   │   ├── ✅ `NavSearchTrigger.tsx`
 │   │   │   ├── ✅ `NavSecondaryRail.tsx`
 │   │   │   ├── ✅ `NavShell.tsx`
-│   │   │   └── ✅ `NavUtilityRail.tsx`
+│   │   │   ├── ✅ `NavUtilityRail.tsx`
+│   │   │   └── ❌ `TeklifPaneliIcerigi.tsx`
 │   │   ├── 📂 **product/**
 │   │   │   └── ✅ `ProductSmartInference.tsx`
 │   │   ├── 📂 **products/**
@@ -15996,7 +30859,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   ├── ✅ `ProductsSkeleton.tsx`
 │   │   │   ├── ✅ `RadialActionMenu.tsx`
 │   │   │   ├── ✅ `RichTextRenderer.tsx`
-│   │   │   └── ✅ `VariantSelector.tsx`
+│   │   │   ├── ✅ `VariantSelector.tsx`
+│   │   │   └── 📂 **visual-models/**
 │   │   ├── 📂 **quotes/**
 │   │   │   ├── ✅ `QuoteRequestButton.tsx`
 │   │   │   └── ✅ `QuoteRequestModal.tsx`
@@ -16125,7 +30989,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   └── ✅ `tr.ts`
 │   │   ├── ✅ `format.ts`
 │   │   ├── ✅ `getDictValue.ts`
-│   │   └── ✅ `sort.ts`
+│   │   ├── ✅ `sort.ts`
+│   │   └── ❌ `yoldanDil.ts`
 │   ├── 📂 **lib/**
 │   │   ├── 📂 **admin/**
 │   │   │   ├── ✅ `csvProductMapping.ts`
@@ -16157,6 +31022,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── 📂 **images/**
 │   │   │   ├── ❌ `categoryImage.ts`
 │   │   │   └── ✅ `productImage.ts`
+│   │   ├── 📂 **kip/**
+│   │   │   └── ❌ `satisKipi.ts`
 │   │   ├── 📂 **kvkk/**
 │   │   │   └── ✅ `dueState.ts`
 │   │   ├── ✅ `order.ts`
@@ -16201,7 +31068,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── 📂 **supabase/**
 │   │   │   ├── ✅ `client.ts`
 │   │   │   ├── ✅ `server.ts`
-│   │   │   └── ✅ `static.ts`
+│   │   │   ├── ✅ `static.ts`
+│   │   │   └── ❌ `tumSatirlar.ts`
 │   │   ├── ✅ `supabase.ts`
 │   │   ├── ✅ `tenantResolver.ts`
 │   │   ├── ✅ `type-converters.ts`
@@ -16238,6 +31106,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ✅ `crypto.ts`
 │   │   ├── ✅ `engineeringIntelligence.ts`
 │   │   ├── ✅ `getCategoryIcon.tsx`
+│   │   ├── ❌ `icIngestNotu.ts`
 │   │   ├── ✅ `imageUtils.ts`
 │   │   ├── ✅ `navigationConfig.ts`
 │   │   ├── ✅ `passwordSecurity.ts`
@@ -16246,6 +31115,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── ✅ `router.ts`
 │   │   ├── ✅ `routes.ts`
 │   │   ├── ✅ `searchHighlight.tsx`
+│   │   ├── ❌ `siparisNo.ts`
 │   │   ├── ✅ `specLabel.ts`
 │   │   ├── ✅ `tenantConstants.ts`
 │   │   ├── ✅ `tenantServer.ts`
@@ -16408,7 +31278,8 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   │   ├── ✅ `revenue_alarm.ts`
 │   │   │   ├── ✅ `sentry.ts`
 │   │   │   ├── ✅ `tenant.ts`
-│   │   │   └── ✅ `tenant_config.ts`
+│   │   │   ├── ✅ `tenant_config.ts`
+│   │   │   └── ❌ `tum_satirlar.ts`
 │   │   ├── 📂 **admin-create-coupon/**
 │   │   ├── 📂 **admin-iyzico-reconcile/**
 │   │   ├── 📂 **admin-order-inspect/**
@@ -16432,6 +31303,7 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   ├── 📂 **order-paid-webhook/**
 │   │   ├── 📂 **order-validate/**
 │   │   ├── 📂 **quote-notification-webhook/**
+│   │   ├── 📂 **quote-request-guest/**
 │   │   ├── 📂 **refund-order-mock/**
 │   │   ├── 📂 **release-expired-reservations/**
 │   │   ├── 📂 **return-status-notification/**
@@ -16445,27 +31317,54 @@ Bu belge, otonom derleyici tarafından 2026-09-03T18:22:26.278144+00:00 tarihind
 │   │   └── 📂 **tcmb-rates-sync/**
 │   └── 📂 **migrations/**
 ├── 📂 **support/**
-└── ✅ `tailwind.config.js`
+├── ✅ `tailwind.config.js`
+├── 📂 **testsprite_tests/**
+│   └── 📂 **tmp/**
+└── ✅ `vitest.smoke.config.ts`
 ```
 
 ## Eksik Dokümantasyonlar
+- [ ] `src\app\[lang]\urun-secici\page.tsx`
+- [ ] `src\components\calculators\UrlParametreOkuyucu.tsx`
+- [ ] `src\components\navigation\HeaderTeklifPaneli.tsx`
+- [ ] `src\components\navigation\MobilAltSekmeCubugu.tsx`
+- [ ] `src\components\navigation\TeklifPaneliIcerigi.tsx`
+- [ ] `src\i18n\yoldanDil.ts`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\kip\satisKipi.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
 - [ ] `src\lib\seo\indexnow.ts`
+- [ ] `src\lib\supabase\tumSatirlar.ts`
+- [ ] `src\utils\icIngestNotu.ts`
+- [ ] `src\utils\siparisNo.ts`
+- [ ] `supabase\functions\_shared\tum_satirlar.ts`
+- [ ] `src\app\[lang]\urun-secici\page.tsx`
+- [ ] `src\components\calculators\UrlParametreOkuyucu.tsx`
+- [ ] `src\components\navigation\HeaderTeklifPaneli.tsx`
+- [ ] `src\components\navigation\MobilAltSekmeCubugu.tsx`
+- [ ] `src\components\navigation\TeklifPaneliIcerigi.tsx`
+- [ ] `src\i18n\yoldanDil.ts`
 - [ ] `src\lib\i18n\familyName.ts`
 - [ ] `src\lib\images\categoryImage.ts`
+- [ ] `src\lib\kip\satisKipi.ts`
 - [ ] `src\lib\pricing\quoteMode.ts`
 - [ ] `src\lib\seo\canonicalOrigin.ts`
 - [ ] `src\lib\seo\indexnow.ts`
+- [ ] `src\lib\supabase\tumSatirlar.ts`
+- [ ] `src\utils\icIngestNotu.ts`
+- [ ] `src\utils\siparisNo.ts`
+- [ ] `supabase\functions\_shared\tum_satirlar.ts`
 
 ## Sahipsiz (Orphan) MD Dosyaları
 Aşağıdaki `.md` dosyaları bir `.py` koduyla eşleşmiyor. Düzeltmek için `python cli/docs_tree.py --fix` çalıştırabilirsiniz.
+- [⚠️] ` .agents\explorer_m4_1_gen2\handoff.md`
 - [⚠️] `ORIGINAL_REQUEST.md`
 - [⚠️] `TEST_INFRA.md`
 - [⚠️] `TEST_READY.md`
 - [⚠️] `eslint.config.md`
+- [⚠️] `explorer_m2_3\analysis.md`
 - [⚠️] `implementation_plan.md`
 - [⚠️] `next.config.md`
 
