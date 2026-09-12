@@ -104,6 +104,12 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
     prod DB'ye **OTOMATİK uygular**. Migration'lı PR'ı yalnız kullanıcı onayıyla merge et; "sadece
     komutla uygulanacaksa" migration'ı merge ETME.
 
+14. **Tam iş:** Testi/kapıyı sonraki işe bırakma, hata yollarını (ağ yok, veri boş, yetki yok)
+    kodla birlikte yaz, iki çözüm arasındaki fark **yalnız satır sayısıysa** tam olanı seç.
+    Kapsam dışı sayılabilecek tek şey gerçekten ilgisiz iştir; o **ayrı kayıt** olarak açılır ve
+    numarası raporda geçer. Bu kural kapsam hakkındadır, yetki hakkında değil — hiçbir kapıyı
+    (özellikle kural 13'ü) gevşetmez. Cetvel: `docs/standards/execution-method-standard.md` §8.
+
 > Kuralların tam listesi (31 madde, detaylı gerekçeli) → `CONTEXT.md §14`.
 
 ## Doküman Haritası

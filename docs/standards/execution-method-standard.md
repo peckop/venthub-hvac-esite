@@ -197,6 +197,71 @@ yazıldı. Sebep burada, kararı veren ALTYAPI (§3.2: yazılmamış sapma hatad
 
 ---
 
+## 8. TAM İŞ İLKESİ (REC-302) — eksik bırakmak artık tasarruf değil
+
+**Recep, 2026-09-12:** *"doğru bir proje geliştirme ve yönetme derdindeyim; hataları minimize
+eden, çözen, oluşmasını baştan önleyen test vs."*
+
+**Niçin bu bölüm var.** "Fazlasına girme, kapsamı küçük tut" öğüdü, mühendis saatinin darboğaz
+olduğu dönemde doğruydu: son %10'luk tamlık günlere mal oluyordu, o yüzden atlanıyordu. O dönem
+bitti. Aynı tamlık bugün dakikalarla ölçülüyor — yani eski temkinlilik sessizce **bahaneye**
+dönüştü. Kaynak: gstack `ETHOS.md` §1; ölçüm REC-301 ÖLÇÜM 2.
+
+⚠**Kota ile ilke ayrı şeylerdir.** Bir günün kota darlığı **geçici bir durumdur**; "bugün kota
+%5, yalnız şu işi yap" bir emirdir ve emre uyulur. Ama o emir bu bölümü askıya almaz: kapsamı
+kota daraltır, **tamlık ölçütünü daraltmaz**. Daraltılan kapsam §3.2'ye göre yazılır.
+
+### 8.1 Test aynı PR'da yazılır, sonraki işe bırakılmaz
+
+Kapıyı/testi ayrı bir kayda bırakmak, işi **ölçülmemiş** indirmektir. Ölçüt basittir: bir işin
+davranış değiştiren parçası varsa, o davranışı ölçen kol **aynı dalda** doğar. Test yazmak, bu
+cetvelin ölçtüğü en ucuz iştir; erteleme gerekçesi "zaman" olamaz.
+
+Bunun bir istisnası vardır ve adı konur: **ilke/metin işi** (bu bölüm gibi) davranış
+değiştirmez, ona kapı açılmaz. İstisnayı kullanan, gerekçesini kayda yazar.
+
+### 8.2 Tam çözüm ile %90 çözüm arasında tam çözüm seçilir
+
+Karar kuralı: iki yaklaşım arasındaki fark **yalnız satır sayısıysa**, tam olan seçilir.
+*"B daha az kodla %90'ını kapsıyor"* bir gerekçe değildir — 70 satırlık fark, insan saatinin
+darboğaz olduğu dönemin muhasebesidir.
+
+Fark satır sayısı **değilse** (yeni bağımlılık, yeni yüzey, başka şeridin dosyası, migration)
+bu kural geçmez; o zaman karar bu cetvelin değil, ilgili kapının konusudur.
+
+### 8.3 Hata yolları kodla birlikte yazılır
+
+Ağ yok, veri boş, yetki yok, dosya bulunamadı: bunlar "sonra eklenecek dallar" değil, işin
+kendisidir. Yazılmamış hata yolu, arızayı **sessiz** yapar — ve bu projede ölçülmüş en pahalı
+kusur sınıfı tam budur (§6, companion sessizliği: üç gün fark edilmedi).
+
+⭐**Geri düşme biçimi seçilir, patlama biçimi seçilmez.** Bir mekanizma, dayandığı şey yoksa
+ya **bugünkü davranışa** geri düşmeli ya **görünür biçimde** durmalı; sessizce kapanmamalı.
+
+### 8.4 Kapsam dışı olan tek şey gerçekten ilgisiz iştir
+
+"Kapsam dışı" etiketi, işin bir parçasını gizlemek için kullanılamaz. Gerçekten ilgisiz iş
+(başka bir şeridin yüzeyi, ayrı bir göç, başka bir modül) **ayrı kayıt** olarak açılır ve
+kaydın numarası işin raporunda geçer. Adı konmayan eksik, kabul edilmiş eksik değildir.
+
+### 8.5 Bu ilke hiçbir kapıyı gevşetmez
+
+Tam iş ilkesi **kapsam** hakkındadır, **yetki** hakkında değildir. Migration içeren PR yine
+Recep kapısındadır (CLAUDE.md kural 13), başka şeridin dosyası yine yazılmaz, kota emri yine
+emirdir. *"Tam yapıyordum"* bir kapıyı aşma gerekçesi olarak kullanılamaz.
+
+### 8.6 Ölçülmüş vaka (2026-09-12, aynı gün)
+
+Kanca komutlarının yolu depo köküne bağlanırken iki biçim vardı. Kısa biçim (`$CLAUDE_PROJECT_DIR`)
+ve geri düşmeli biçim (`${CLAUDE_PROJECT_DIR:-.}`). Fark **dört karakter**.
+
+Kısa biçimde değişken bir gün tanımsız kalırsa yol `/.claude/...` olur ve **on altı kapının
+tamamı filo çapında sessizce düşer** — ekranda hiçbir şey değişmez. Geri düşmeli biçimde en kötü
+hâl **o günkü hâldir**. Dört karakterlik fark, §8.2 ile §8.3'ün aynı anda karşılığıdır; kabul
+ölçütü de ona göre yazıldı (değişken boşken çıkış 0 **ölçüldü**, varsayılmadı).
+
+---
+
 İlgili: `collaboration-protocol.md` §2.1 · `measurement-discipline-standard.md` ·
 `session-loop-ritual.md` · CLAUDE.md kural 1 (No-Plan-No-Code: plan hangi cetvelle yönetildiğini söyler —
 artık **hangi yöntemle koşacağını da**).
