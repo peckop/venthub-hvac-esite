@@ -13,8 +13,17 @@
 let raw = '';
 process.stdin.on('data', (c) => { raw += c; });
 process.stdin.on('end', () => {
+  // §9.7: bozuk/boş stdin → fail-OPEN ama SESSİZ DEĞİL. Güvenlik kancası da dahil: bozuk
+  // girdide .env yazımını DURDURMAZ ama durduramadığını SÖYLER.
   let input;
-  try { input = JSON.parse(raw); } catch { process.exit(0); } // bozuk girdi → karışma
+  if (!String(raw).trim()) {
+    process.stderr.write('[sensitive-path-guard] stdin okunamadi (bos), karisilmadi\n');
+    process.exit(0);
+  }
+  try { input = JSON.parse(raw); } catch {
+    process.stderr.write('[sensitive-path-guard] stdin okunamadi (bozuk JSON), karisilmadi\n');
+    process.exit(0);
+  }
   const p = String((input.tool_input || {}).file_path || '').replace(/\\/g, '/');
   if (!p) process.exit(0);
 

@@ -29,6 +29,7 @@ interface Sonuc {
   kod: number | null
   karar: string | null
   sebep: string
+  stderr: string
 }
 
 /** Kancayı koşar ve stdout'taki KARARI çözer (yoksa karar = null, yani karışmadı). */
@@ -38,8 +39,9 @@ function kos(file_path: string, secenek: { cwd?: string; hamGirdi?: string } = {
     encoding: 'utf8',
     cwd: secenek.cwd ?? process.cwd(),
   })
+  const stderr = r.stderr ?? ''
   const ham = (r.stdout ?? '').trim()
-  if (!ham) return { kod: r.status, karar: null, sebep: '' }
+  if (!ham) return { kod: r.status, karar: null, sebep: '', stderr }
   const j = JSON.parse(ham) as {
     hookSpecificOutput?: { permissionDecision?: string; permissionDecisionReason?: string }
   }
@@ -47,6 +49,7 @@ function kos(file_path: string, secenek: { cwd?: string; hamGirdi?: string } = {
     kod: r.status,
     karar: j.hookSpecificOutput?.permissionDecision ?? null,
     sebep: j.hookSpecificOutput?.permissionDecisionReason ?? '',
+    stderr,
   }
 }
 
@@ -102,6 +105,15 @@ describe('INV-KANCA-HASSAS-YOL-1 · sözleşme sınırları', () => {
     expect(bozuk.kod).toBe(0)
     expect(kos('', { hamGirdi: '{}' }).karar, 'dosya yolu yokken karar uydurdu').toBeNull()
     expect(kos('', { hamGirdi: '' }).karar).toBeNull()
+  })
+
+  it('⭐bozuk / boş girdide SESSİZ KALMAZ — stderr tek satır (cetvel §9.7)', () => {
+    // Güvenlik kancası da kurala dahil: bozuk girdide .env yazımını DURDURMAZ ama
+    // durduramadığını SÖYLER. Sessiz fail-open, kapının hiç koşmamasından ayırt edilemez.
+    expect(kos('', { hamGirdi: 'bu JSON degil' }).stderr).toContain('stdin okunamadi')
+    expect(kos('', { hamGirdi: '' }).stderr).toContain('stdin okunamadi')
+    // Geçerli JSON, hassas olmayan yol: NORMAL hâl, uyarı üretmemeli.
+    expect(kos('C:/repo/src/lib/x.ts').stderr, 'normal hâlde gürültü üretti').toBe('')
   })
 
   it('KARAR CWD\'DEN BAĞIMSIZ — depo dışından koşarken de aynı', () => {

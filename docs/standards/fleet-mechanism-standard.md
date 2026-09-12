@@ -310,6 +310,35 @@ kör olabilir" dersinin ikinci örneğidir; ölçüm aracı da ölçülür.
 
 ---
 
+### 9.7 BOZUK / BOŞ `stdin`: fail-OPEN ama SESSİZ DEĞİL (REC-308)
+
+**Kural.** Bir kanca `stdin`den beklediği JSON'u okuyamazsa (bozuk ya da boş):
+
+1. **İşi DURDURMAZ** — `exit 0`, yazım serbest kalır.
+2. **SESSİZ KALMAZ** — `stderr`e tek satır düşer: `[<kanca>] stdin okunamadi, karisilmadi`.
+3. Karar üretmez: hiçbir şeyi onaylamaz, hiçbir şeyi reddetmez. "Ölçemedi" hâli, "geçti"
+   hâlinden **ayrı** yazılır.
+
+**Niçin `exit 2` değil.** Bozuk `stdin` **harness/süreç sınıfı** bir arızadır; kancanın gördüğü
+tek dosyanın özelliği değildir. O anda `exit 2` vermek, sebebi hiç ilgili olmayan **bütün
+yazımları** durdurur — yani katmanın kendisi kesinti kaynağı olur (kendi kendine kesinti).
+`lane-guard` bunu 2026-08 ölçümünden beri böyle yapıyor ve gerekçesi dosyasının başında yazılı.
+
+**Niçin sessiz de olmaz.** Sessiz fail-open, kapının **çalışmış gibi görünüp hiçbir şey
+ölçmediği** hâldir — bu projede en pahalı kusur sınıfı (§9.5 companion sessizliği: üç gün fark
+edilmedi; 2026-09-12 kanca yolu vakası: `MODULE_NOT_FOUND` düştü, kapı yeşil göründü). Bir satır
+`stderr`, o hâli görünür yapmanın en ucuz biçimidir.
+
+**Kapsam.** Kural PreToolUse / Stop / SessionEnd / PreCompact kancalarının hepsi için geçerlidir.
+Güvenlik kancaları da dahildir: `sensitive-path-guard` bozuk girdide `.env` yazımını **durdurmaz**
+ama durduramadığını **söyler**. Sınıf ayrımı yok; ayrım yapmak "hangi kanca hangi hâlde ne yapar"
+sorusunu yeniden hatırlamaya bağlar.
+
+**Ölçüt (test biçimi).** Her kanca testinde bir kol: bozuk girdi → `exit 0` **ve** `stderr`
+boş değil. Tek başına "exit 0" kolu bu kuralı ölçmez — sessizlik tam orada saklanır.
+
+---
+
 ## 10. Compact dayanıklılığı — 4 sabit alan + PreCompact kapısı
 
 **Niçin var — ölçülmüş vakalar, tahmin değil.**

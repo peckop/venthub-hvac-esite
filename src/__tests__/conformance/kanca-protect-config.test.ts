@@ -123,6 +123,15 @@ describe('INV-KANCA-PROTECT-CONFIG-1 · sözleşme sınırları', () => {
     expect(kos({ tool_name: 'Write', tool_input: {} }).kod, 'dosya yolu yokken bloklandı').toBe(0)
   })
 
+  it('⭐bozuk / boş girdide SESSİZ KALMAZ — stderr tek satır (cetvel §9.7)', () => {
+    // Tek başına "exit 0" kolu bu kuralı ÖLÇMEZ: sessizlik tam orada saklanır. Sessiz
+    // fail-open, kapının çalışmış gibi görünüp hiçbir şey ölçmediği hâldir.
+    expect(kos(null, { hamGirdi: 'bu JSON degil' }).stderr, 'bozuk girdi sessizce yutuldu').toContain('stdin okunamadi')
+    expect(kos(null, { hamGirdi: '' }).stderr, 'boş girdi sessizce yutuldu').toContain('stdin okunamadi')
+    // Geçerli JSON ama dosya yolu yok: bu NORMAL hâl, uyarı üretmemeli (gürültü kapısı).
+    expect(kos({ tool_name: 'Write', tool_input: {} }).stderr, 'normal hâlde gürültü üretti').toBe('')
+  })
+
   it('KARAR CWD\'DEN BAĞIMSIZ — depo dışından koşarken de aynı sonucu verir', () => {
     // 2026-09-12 vakası: göreli yol sınıfı yüzünden bir kanca depo dışı bir klasörde
     // MODULE_NOT_FOUND ile düştü ve kapı "çalışmış gibi" göründü. Bu kol o sınıfı ölçer.

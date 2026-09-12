@@ -16,8 +16,18 @@ function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
 }
 
+// §9.7: bozuk/boş stdin → fail-OPEN ama SESSİZ DEĞİL. Bu kanca hiçbir şeyi durdurmaz;
+// sessizliğin bedeli şerit 4 saat boyunca kilitli kalmasıdır — kimse kırmızı görmez.
 let input = {}
-try { input = JSON.parse(readStdin() || '{}') } catch { process.exit(0) }
+const hamGirdi = readStdin()
+if (!String(hamGirdi).trim()) {
+  process.stderr.write('[board-release] stdin okunamadi (bos), serit birakilmadi\n')
+  process.exit(0)
+}
+try { input = JSON.parse(hamGirdi) } catch {
+  process.stderr.write('[board-release] stdin okunamadi (bozuk JSON), serit birakilmadi\n')
+  process.exit(0)
+}
 
 const sid = input.session_id || ''
 if (!sid) process.exit(0)

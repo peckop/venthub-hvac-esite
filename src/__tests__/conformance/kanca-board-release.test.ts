@@ -75,6 +75,16 @@ function kos(
   return r.status
 }
 
+/** Aynı koşunun `stderr`i — §9.7 kolu için (kos yalnız çıkış kodu döndürür). */
+function stderrAl(hamGirdi: string, panoDizini: string): string {
+  const r = spawnSync(process.execPath, [KANCA], {
+    input: hamGirdi,
+    encoding: 'utf8',
+    env: { ...process.env, VENTHUB_BOARD_DIR: panoDizini },
+  })
+  return r.stderr ?? ''
+}
+
 const birakmaSayisi = (dizin: string, sid?: string) =>
   olaylar(dizin).filter((e) => e.type === 'release' && (sid === undefined || e.sid === sid)).length
 
@@ -124,6 +134,15 @@ describe('INV-KANCA-BOARD-RELEASE-1 · sözleşme: fail-open, hiçbir girdide i�
     expect(kos(null, { panoDizini: pano, hamGirdi: '' })).toBe(0)
     expect(kos({}, { panoDizini: pano }), 'oturum kimliği yokken iş durdu').toBe(0)
     expect(olaylar(pano).length, 'bozuk girdi panoya yazdı').toBe(oncekiSayi)
+  })
+
+  it('⭐bozuk / boş girdide SESSİZ KALMAZ — stderr tek satır (cetvel §9.7)', () => {
+    // Bu kancada sessizliğin bedeli şeridin 4 saat kilitli kalmasıdır; kimse kırmızı görmez.
+    const pano = panoKur([{ sid: 'benim1', lane: 'ALTYAPI', globs: ['src/**'] }])
+    expect(stderrAl('bu JSON degil', pano)).toContain('stdin okunamadi')
+    expect(stderrAl('', pano)).toContain('stdin okunamadi')
+    // Geçerli JSON, talebi olmayan oturum: NORMAL hâl, uyarı üretmemeli.
+    expect(stderrAl(JSON.stringify({ session_id: 'talebi-yok' }), pano), 'normal hâlde gürültü').toBe('')
   })
 
   it('ETKİ CWD\'DEN BAĞIMSIZ — depo dışından koşarken de şerit bırakılır', () => {
