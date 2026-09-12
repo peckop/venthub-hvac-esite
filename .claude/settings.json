@@ -56,21 +56,21 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/protect-config.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/protect-config.cjs\"",
             "statusMessage": "config-protection"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/lane-guard.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/lane-guard.cjs\"",
             "statusMessage": "lane-guard"
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/sensitive-path-guard.cjs"
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sensitive-path-guard.cjs\""
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/hafiza-indeks-bekcisi.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-indeks-bekcisi.cjs\"",
             "statusMessage": "hafiza-indeksi"
           }
         ]
@@ -80,7 +80,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/bash-write-guard.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/bash-write-guard.cjs\"",
             "statusMessage": "bash-write-guard"
           }
         ]
@@ -92,7 +92,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/session-board.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/session-board.cjs\"",
             "statusMessage": "board"
           }
         ]
@@ -104,7 +104,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/board-release.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/board-release.cjs\"",
             "statusMessage": "board-release"
           }
         ]
@@ -116,7 +116,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/board-brief.cjs"
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/board-brief.cjs\""
           }
         ]
       },
@@ -125,7 +125,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/hafiza-sorusu-yonlendirme.cjs"
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-sorusu-yonlendirme.cjs\""
           }
         ]
       }
@@ -136,7 +136,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/accumulate-edits.cjs"
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/accumulate-edits.cjs\""
           }
         ]
       },
@@ -145,7 +145,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/bash-write-audit.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/bash-write-audit.cjs\"",
             "statusMessage": "bash-write-audit"
           }
         ]
@@ -155,7 +155,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/eylem-defteri.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/eylem-defteri.cjs\"",
             "statusMessage": "eylem-defteri"
           }
         ]
@@ -167,18 +167,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/son-soz-gate.cjs"
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-soz-gate.cjs\""
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/verify-on-stop.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/verify-on-stop.cjs\"",
             "timeout": 120,
             "statusMessage": "verify (eslint --fix + tsc)",
             "async": true
           },
           {
             "type": "command",
-            "command": "node .claude/hooks/defter-bayatlik-olcumu.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/defter-bayatlik-olcumu.cjs\"",
             "timeout": 90,
             "async": true,
             "statusMessage": "defter bayatlik olcumu"
@@ -192,7 +192,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/precompact-durum-kapisi.cjs",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/precompact-durum-kapisi.cjs\"",
             "statusMessage": "durum kapisi"
           }
         ]
