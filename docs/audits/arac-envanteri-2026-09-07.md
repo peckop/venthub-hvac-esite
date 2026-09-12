@@ -292,6 +292,8 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/paket-karnesi.mjs` | KATALOG KARNESİ — EVREN = PAKET (OPS hükmü 2026-09-09 12:32Z, Recep kararı K13) | URUN-KATALOG | elle kosulur (karne istendiginde) | 2026-09-09 (8 eksen, genel %57) | yok | AKTIF |
 | `scripts/icerik-hatti/defter-sorgu.mjs` | DEFTER SORGUSU — aile × alan soruları, ham cevaplar jsonl'e (OPS emri 2026-09-10 06:37Z) | URUN-KATALOG | elle kosulur (aile aile, seri — CLI kotali) | 2026-09-10 (3 aile pilot) | yok | AKTIF |
 | `scripts/icerik-hatti/defter-tablo-uret.mjs` | DEFTER TABLO ÜRETİMİ — aile başına kaynak-kısıtlı data-table (OPS kararı 2026-09-10 07:05Z) | URUN-KATALOG | elle kosulur (aile aile, kota gozetilir) | 2026-09-10 (yayim baslamadi; 'ready' kaynak kapisi eklendi) | yok | AKTIF |
+| `scripts/skills-eval-run.mjs` | SKILL YÖNLENDİRME SINAVINI KOŞAR (REC-303). | ALTYAPI | .github/workflows/skills-gate.yml, package.json (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts (saf cekirdek) | KAL |
+| `scripts/skills-eval/lib.mjs` | SKILL YÖNLENDİRME SINAVI — SAF ÇEKİRDEK (ağ yok, dosya yazımı yok). | ALTYAPI | scripts/skills-eval-run.mjs, src/__tests__/conformance/skills-eval-puanlama.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -421,6 +423,7 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
 | `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
 | `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | **OLU-DOGRULANDI** *(sonnet'in KAL hükmü çürütüldü)* |
+| `skills-gate.yml` | SKILL KAPISI — sayaç her PR'da (ücretsiz), yönlendirme sınavı yalnız skill değişince (ücretli). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi | KAL |
 
 **Envanter dışı ek bulgu (29'a dahil değil):** `tmp-lf-fix.yml` — `gh workflow list --all` bunu
 `active` listeliyor, ama `.github/workflows/` dizininde YOK ve `git log --all` boş dönüyor.

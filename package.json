@@ -28,7 +28,9 @@
     "clean": "rimraf .next out",
     "postinstall": "pnpm run type-check",
     "supabase:gen": "npx supabase@latest gen types typescript --project-id tnofewwkwlyjsqgwjjga > src/types/database.types.ts",
-    "skills:verify": "python scripts/skills-evaluator.py"
+    "skills:verify": "python scripts/skills-evaluator.py",
+    "skills:eval": "node scripts/skills-eval-run.mjs",
+    "skills:eval:kuru": "node scripts/skills-eval-run.mjs --kuru"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
