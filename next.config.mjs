@@ -114,6 +114,53 @@ const nextConfig = {
                 destination: '/:lang/products/nicotra-gebhardt-dd?sku=NIC-11921',
                 permanent: true,
             },
+
+            // ── REC-146 (Recep kararı 2026-09-09: "kodu boşalt") ────────────────────────
+            // Beş Vortice ürününe araç UYDURMA kod yazmıştı (16076–16080, ardışık; kaynak
+            // katalogda YOK). Katalog şeridi 10:12Z'de canlı DB'de temizledi ve bu üç alanı
+            // birden değiştirdi: `model_code` → NULL, `sku` ve **`slug`**.
+            //
+            // ⚠SLUG DEĞİŞİNCE ESKİ ADRES ÖLDÜ — ÖLÇTÜM (2026-09-09 ~10:1xZ, canlı):
+            //     /tr/products/vortice-ca-il-4020-es-rect-16076   → **404**
+            //     /tr/products/vortice-ca-il-4020-es-rect         → 308 → aile → 200
+            // Yani dün çalışan beş adres bugün ölü uçta. Dışarıdan bakan için sayfa kayboldu.
+            //
+            // ⭐HEDEF NİÇİN AİLE SAYFASI, YENİ VARYANT SLUG'I DEĞİL — bu dosyanın yukarıdaki
+            // K12 kaydında bedeli ödenmiş ders: next.config yönlendirmesi uygulamanın
+            // VERİ-SÜRÜCÜLÜ çözümünden ÖNCE koşar. Hedefi yeni varyant slug'ı yapsaydım
+            // zincir `308 → 308 → 200` olurdu ve ikinci adım DB'deki slug'a bağlı kalırdı;
+            // slug bir daha değişirse (ki bugün tam bu oldu) aynı adres yine 404'e düşer ve
+            // düzeltmeyi ikinci bir yayına borçlanırdım. Aile sayfası adlandırmadan BAĞIMSIZ
+            // olarak var. Kalıcı (308) yönlendirme tarayıcıda önbelleklenir; hedefi
+            // "yarın doğru olacak" değil "bugün de yarın da doğru" bir adres olmalı.
+            //
+            // `?sku=` korunuyor: varyant seçimi aile sayfasında o parametreyle açılır, yani
+            // müşteri aradığı MODELE düşer, ailenin başına değil.
+            {
+                source: '/:lang(tr|en)/products/vortice-ca-il-4020-es-rect-16076',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT',
+                permanent: true,
+            },
+            {
+                source: '/:lang(tr|en)/products/vortice-ca-il-5035-es-rect-16077',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT',
+                permanent: true,
+            },
+            {
+                source: '/:lang(tr|en)/products/vortice-ca-il-6040-es-rect-16078',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT',
+                permanent: true,
+            },
+            {
+                source: '/:lang(tr|en)/products/vortice-ca-il-7050-es-rect-16079',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT',
+                permanent: true,
+            },
+            {
+                source: '/:lang(tr|en)/products/vortice-ca-il-8060-es-rect-16080',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT',
+                permanent: true,
+            },
         ];
     },
     async headers() {
