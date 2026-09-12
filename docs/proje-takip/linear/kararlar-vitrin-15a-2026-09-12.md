@@ -1,6 +1,6 @@
-# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K58)
+# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-12 ayna: K1–K62)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-09T12:15:15.574Z · kopya: 2026-09-09T12:15Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-12T10:13:35.095Z · kopya: 2026-09-12T10:14Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -26,6 +26,8 @@ DURUM: KURAL → kapı: marka-palet-tokenlari.test.ts
 Logo 14A-3, wordmark "VentHub" (Archivo 700). Palet: lacivert #1A2B4A · turkuaz #0088B0 · kiremit #D95D0E · amber yalnız uyarı. Yazı tipleri: Archivo (arayüz) · Source Serif 4 (uzun metin) · IBM Plex Mono (kod/teknik değer). Koyu header + footer, aydınlık gövde. 16 ikon (7 kategori + 9 senaryo); dal ikonu çizilmez.
 
 ## K3 · Kategori ağacı ve adresler (2026-09-03, Recep)
+
+**⛔ K3-b (2026-09-11, Recep KARARI): adres kısmı İPTAL. Kısa slug OLMAYACAK,** `/category/` **ve** `/products/` **KALIR; ürün slug'ı teknik parametreli uzun slug + sona ürün kodu (**`-p-<id>`**), katalog paketi bitince TEK yayında. Tam metin: Kararlar — SEO ve Yayın K3-b. DÜZELTME 10:3xZ (Design-Menü cevabı + Recep):** sayfa birimi İKİ SAYFA (Menü Tasarımı v18): AİLE sayfası B6 anlatır ve listeler, adresi kodsuz ve DEĞİŞMEZ; MODEL sayfası B7 kanonik ve satar, adresi uzun-slug + `-p-` + SKU, `?sku=` KALKAR, 442 model adresi paket bitince TEK yayında. K3'ün "model adresleri Faz 3'te" maddesi KAPANDI (Recep 09-11). Breadcrumb 5 seviye. **GB1 madde 10 revizesi ONAYLANDI (Recep 09-11, Design-Menü penceresi):** dal sayfası AİLE kartı gösterir, süzgece dokunulunca MODEL kartına döner (B5 = B4'ün süzgeçli hâli, ayrı sayfa değil). Şart: aile kartı pasif kalmaz — model sayısı + değer aralığı + doğrudan modele giden 2-3 model çipi + "N modelin tamamını listele". Önekler Türkçeleşir (`/tr/kategori/`, `/tr/urun/`), EN değişmez: bkz. SEO K3-b. Casals markası: Kararlar — Katalog K17. Ağaç (7 kategori · 26 dal · Sığınak) değişmedi. Design-Menü'nün 09-11 kategori DB bulgusu buraya eklenecek.
 
 DURUM: İŞ → REC-191 (In Review)
 
@@ -214,8 +216,9 @@ DURUM: İŞ → REC-199 (Backlog)
 
 ## K53 · AÇIK — Ürün sayfasındaki hesap paneli (Recep, 2026-09-04 17:10)
 
-DURUM: AÇIK — karar bekliyor
+DURUM: İŞ → REC-199 (Backlog)
 
+* K54 aynı soruyu üç alternatifin (A/B/C) çizilmesine bağladı; Recep üçünü yan yana görünce seçer. (OPS 2026-09-12: "AÇIK" yanlış sınıftı, karar değil çalışma bekliyor; kapı 8 gün sonra kırmızı verdi.)
 * K12 (katlı panel) geçerli kalır; K17 (ayrı seçici) ile birlikte yaşıyor. Panel kalsın mı / bağlantı+sonuç şeridi mi sorusu AÇIK: Recep canlı veri görmeden karar vermiyor. OPS görüşü 60/40 kaldırma; karşı görüş Google'dan düşen ziyaretçinin sayfada cevap alması.
 * DESIGN'dan yazılı görüş istendi (geri-bildirim-6 madde 67): panel sorusu + genel "soğuk giriş" önerileri (bağlamsız düşen ziyaretçi). Kod sırası: önce seçici, panel ikinci; kararı canlı ölçüm verir.
 
@@ -477,3 +480,31 @@ Recep canlıda /tr/category/fanlar sayfasında alt grup kartlarını gördü: ya
 DURUM: İŞ → REC-135 (Todo; kategori ağacı boşlukları kaydı; sensör/separatör yaprak kategorisi KATALOG'ca 2026-09-09 canlıda açıldı, kapanışı KATALOG yazar). Uygulama notu: canlı DB yazımı: products + product_families birlikte, taksonomi cetveli §8; yazımdan ÖNCE §9 dökümü + pano notu, SONRA yazım; URUN deploy olmadan sayfayı ölçer = webhook tazeleme ÇALIŞMA kanıtı). Etki: 3 ürün yaprak kategoriye kavuşur (SEA-810105 + iki BVU-LS), catalog-integrity kapısındaki product-no-subcategory:seat-atex-ptc-sensor kırmızısı kapanır.
 
 Aynı sözle: ingestor deposundaki 4 pushsuz commit (marka/seri kaynak haritası v1-v4) PUSH edilir; ingestor CI 5/5 kırmızısı (avensair-fiyat.csv bayat) KATALOG onarır. Santrifüj/aksiyel çelişkisi Recep'e sorulmaz, KATALOG veriye göre karar verip belgeye yazar. marketing_title: OPS önerisi uygulanır — h1'e bağlanmaz, alan emekli (kolon silinmez), URUN küçük iş.
+
+## K59 · W4 header tek kat (2026-09-11, Recep KARARI, Design-Menü penceresi; OPS 13:0xZ yazdı)
+
+DURUM: İŞ → REC-213 / REC-199 (Backlog)
+
+* K19 kabuk kapsamı; kapı = header öğe listesi konformans testi (URUN açılınca).
+
+Header tek kat kalır; sağ küme `[sayaçlı iş nesneleri] · İletişim · Hesap`. Kural: sayaç taşıyan iş nesnesi header'da durur; kimlik ve tercih (dil, bildirim) hesap panelinde. Satış kipinde Sepet, Teklif'in yanına gelir (Teklif kalkmaz); hesap paneli büyür (Siparişlerim · Faturalarım · Kargo takibi), header büyümez. İkinci kata geçme eşiği: girişsiz sipariş sorgulama gerekirse. v18: 108 header'dan dil öğesi kaldırıldı; kaynak kare `Header Sag Kume Wireframe.dc.html` → W4.
+
+## K60 · Terminoloji: ekranda "alt kategori" ve "seri" (2026-09-11, Recep KARARI, Design-Menü penceresi)
+
+DURUM: İŞ → REC-300 (i18n sözlük anahtarları, kural 7); kapı = sözlükte "dal"/"aile" görünen metin 0.
+
+"dal" → "alt kategori", "aile" → "seri" (üretici kataloğunda basılı, alıcının söylediği kelime). DB adları DEĞİŞMEZ (`categories` · `product_families`); paket/sözleşme kolon adı `aile` kalır. v18'de uygulandı.
+
+## K61 · Belge erişiminin birincil yeri seri sayfası (2026-09-11, Recep KARARI, Design-Menü penceresi)
+
+DURUM: İŞ → REC-145 (belge tablosu + storage) BLOK; açılmadan yayına girmez. Vitrin düğmeleri REC-145 ardılı.
+
+Seri sayfası "Serinin belgeleri" bölümü (föy · katalog PDF · DWG/DXF · uygunluk belgeleri); modele özel olan model sayfasında; ürün kartına föy bağlantısı konmaz. v18 B6'ya amber notla eklendi (DB'de belge tablosu yok). `belgeler.gorunur_mu` (üretici PDF müşteriye açık mı) Recep kararı hâlâ bekliyor.
+
+## K62 · B12 hesap/teklif ekranı ERTELENDİ (2026-09-11, Recep: "acelesi yok")
+
+DURUM: KURAL → kapı YOK (REC-279)
+
+* Erteleme; REC-279 (K50) sırası değişmez.
+
+**Not (OPS 09-11):** Design-Menü 308 tablosundaki `/tr/cart` + `/tr/checkout` → 410 satırı REDDEDİLDİ (K1: sepet ölmedi, satış kipi kapalı); kip-kapalı davranış mevcut hâliyle kalır.

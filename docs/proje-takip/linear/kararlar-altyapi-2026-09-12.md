@@ -1,6 +1,6 @@
-# Kararlar — Altyapı, Kapılar ve Belge Hattı (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K10)
+# Kararlar — Altyapı, Kapılar ve Belge Hattı (Linear belgesinin TAM dışa aktarımı · 2026-09-12 ayna: K1–K10)
 
-<!-- kaynak_id: 5f43fac5-f2a9-40d7-8da5-86bf5235764e · kaynak_updatedAt: 2026-09-08T12:19:34.533Z · kopya: 2026-09-09T11:42Z -->
+<!-- kaynak_id: 5f43fac5-f2a9-40d7-8da5-86bf5235764e · kaynak_updatedAt: 2026-09-08T12:19:34.533Z · kopya: 2026-09-12T10:10Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
