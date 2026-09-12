@@ -32,6 +32,13 @@ function blokMetni() {
   return `${BAS}\n${govde}\n${SON}\n`
 }
 
+/**
+ * Satır sonu farkı İÇERİK farkı değildir (ölçülmüş tuzak: aynı dosya bir ağaçta LF, ötekinde
+ * CRLF checkout edilir). Karşılaştırma bu yüzden EOL'den bağımsız yapılır — yoksa betik her
+ * koşuda "guncellendi" der ve 71 dosyayı boş yere yeniden yazar.
+ */
+const eolsuz = (s) => s.replace(/\r\n/g, '\n').trim()
+
 /** Bir SKILL.md'ye bloğu yazar. Dönen: 'eklendi' | 'guncellendi' | 'ayni'. */
 function dosyayaYaz(dosya, blok) {
   const ham = fs.readFileSync(dosya, 'utf8')
@@ -39,9 +46,12 @@ function dosyayaYaz(dosya, blok) {
   const son = ham.indexOf(SON)
 
   if (bas !== -1 && son !== -1) {
-    const mevcut = ham.slice(bas, son + SON.length + 1)
-    if (mevcut.trim() === blok.trim()) return 'ayni'
-    const yeni = ham.slice(0, bas) + blok + ham.slice(son + SON.length + 1)
+    const mevcut = ham.slice(bas, son + SON.length)
+    if (eolsuz(mevcut) === eolsuz(blok)) return 'ayni'
+    // Kuyruk aynen korunur: kendi satır sonumuzu EKLEMEYİZ, yoksa her koşu dosyayı bir satır
+    // uzatır (ölçüldü: ikinci koşu 71 dosyaya birer boş satır ekliyordu).
+    const kuyruk = ham.slice(son + SON.length)
+    const yeni = ham.slice(0, bas) + blok.trimEnd() + kuyruk
     if (!kuru) fs.writeFileSync(dosya, yeni, 'utf8')
     return 'guncellendi'
   }
