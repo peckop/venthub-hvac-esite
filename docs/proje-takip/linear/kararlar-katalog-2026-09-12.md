@@ -1,6 +1,6 @@
-# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-09 ayna: K1–K15)
+# Kararlar — Katalog ve Ürün Verisi (Linear belgesinin TAM dışa aktarımı · 2026-09-12 ayna: K1–K17)
 
-<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-09T11:32:41.396Z · kopya: 2026-09-09T11:42Z -->
+<!-- kaynak_id: 935079bf-b265-49d2-854a-a334abea07af · kaynak_updatedAt: 2026-09-11T10:46:02.257Z · kopya: 2026-09-12T10:10Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -112,3 +112,17 @@ Kataloglar ATEX'i iki biçimde verir: ekipman grubu/kategori kodu (ör. `II 2G/D
 * **Eşleştirme makine işidir:** paketteki her değer dizinle bir kez eşlenir (VAR/YOK/ÇELİŞİYOR), sonuç pakete yazılır, **konu kapanır**. Aynı eşleme ikinci kez koşulmaz; yeni kaynak gelirse yalnız fark eşlenir (K8 sürüm kuralı).
 * **Recep'in gözle kontrolü TEK GEÇİŞ ve isteğe bağlıdır:** paket CSV'si üzerinde, PDF açmadan (referans kolonu yeter). "Gözle okumalısın" diye iş geri döndürülmez; şüpheli değer çelişki listesine gider, tek kararla kapanır.
 * **Kapanış ölçütü:** paket bitince "PDF'e dön" isteyen her emir K15 ihlalidir; OPS reddeder.
+
+## K16 · Katalog paketi için AYRI Design projesi: DESIGN-KATALOG (Opus) (2026-09-10 06:2xZ, **Recep kararı**: "Opus ile yeni proje açıyorum Design'da"; OPS'un 06:08Z "şimdilik ayrı proje yok" hükmü bu kararla geçersiz)
+
+* Linear projesi: **Katalog Veri Sözleşmesi (DESIGN-KATALOG)** — ekran değil veri ürünü; Design tarafı yeni Claude Design projesi (model Opus), imza "— DESIGN-KATALOG (Opus) tarih".
+* Nesne: paketin 8 CSV kolonu (ad · birim · tip · zorunlu · kaynak · hangi ekranda) + 2 gerçek satır + doluluk karnesi şablonu + `belgeler.csv` + alan-etiket sözlüğü. Kolon adları KATALOG paketinden (PR [peckop/venthub-hvac-esite#1158](https://linear.app/receps-workspace/review/rec-212-f1-tasinabilir-katalog-paketi-442-urun-7-csv-1146-gorsel-39-mb-6a3367c20ea9)/#1160); icat edilmez.
+* Roller: DESIGN-KATALOG yazar · OPS çürütür/onaylar · KATALOG uygular. MENU yalnız alan↔ekran haritasını verir. K13/K14/K15 aynen geçerli (paket ana kaynak, tek defter, PDF'e dönüş yok).
+
+**K16-a · Design ile defter AYRI kalır (2026-09-10 06:4xZ, Recep):** DESIGN-KATALOG NotebookLM defterine ve kaynak dizinine erişmez; Supabase SELECT ile doldurur. Defter + dizin kontrolü KATALOG/OPS'ta. Sebep: iki bağımsız ajan, iki bağımsız yol = sağlam kontrol (aynı kaynağı paylaşan iki ajan tek kontroldür).
+
+**K16-b · Değer sorusunda ÖNCE DEFTER (2026-09-10, Recep; OPS ölçümü ile):** `notebooklm ask -n 8bb600d9` tek soruda 77 sn, atıflı, belge+sayfa, çelişkiyi kendisi işaretledi (SEAT 30 monofaze 1,10/1,50 kW). Çelişki 299 + "kaynakta yok" tepesi önce defterle ayıklanır; atıf sayfası dizin satırıyla otomatik eşlenir (kanıt). Alan-etiket sözlüğü gerekirse cevaplardan türer. PDF açılmaz.
+
+## K17 · Casals markası açılır, 4 aile / 53 ürün bağlanır (2026-09-11, Recep KARARI, Design-Menü penceresi; OPS 10:3xZ yazdı)
+
+Casals `brands` kaydı açılır; ENKELFAN (9) · KENTALFAN (14) · NIMAX (15) · NIMUS (15) aileleri AVenS'ten Casals'a bağlanır; aile slug'ları `casals-…` olur, eski 4 aile adresi 308. HF/S ve HF/FW AVenS'te KALIR; AVenS'te 53 ürün kalır. Flexiva: marka tanımlı, ürünü yok; gelirse katalog paketiyle girer. SQL hazırlığı Design-Menü'de (`kategori-agaci-sql-hazirligi-2026-09-11.md` §3.4 + 301 tablosu), UYGULAMA URUN şeridinde migration + PR, Recep merge (kural 13). Aynı dosyada kategori ağacı değişimi: 44 ürün dal değiştirir (plug 23 · hücreli 13 · perde 8), 4 yeni dal, ürün adresine etkisi 0 (dal adreste geçmez), toplam 308 = 5. **K17 EK (Recep 09-11, 10:38Z):** Plug Fanlar ve Hücreli Aspiratörler ayrı DAL olur: plug 23 ürün / 2 aile (Casals KENTALFAN + ENKELFAN), hücreli 13 / 2 (AVenS HF/S + HF/FW); Radyal 133 → 97 / 8. SQL §3.1–3.3 hazır, çalıştırılmadı. Adres şeması için bkz. Kararlar — SEO ve Yayın K3-b.
