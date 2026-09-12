@@ -19,6 +19,7 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { describe, expect,it } from 'vitest'
 
@@ -67,7 +68,27 @@ function migrationYolu(): string {
 }
 
 async function degerlendirYukle(): Promise<(s: TetikSatiri[]) => Hukum> {
-  const mod: { degerlendir: (s: TetikSatiri[]) => Hukum } = await import(/* @vite-ignore */ KAPI)
+  /**
+   * ⛔HAM YOL DEGIL, file:// URL — Windows'ta dinamik import ham surucu yolunu KABUL ETMEZ.
+   *
+   * OLCULDU (2026-09-09, ayirt edici cift, tek dosyada iki dal):
+   *   ham yol        -> Error: Only URLs with a scheme in: file, data, and node are supported
+   *   pathToFileURL  -> YUKLENDI, degerlendir = function
+   *
+   * ⭐BU KUSURU BEN KENDI AGACIMDA GORMEDIM: c:/tmp/vh-altyapi-851'de 27/27 YESIL cikiyordu.
+   * URUN teshis etti, KATALOG bagimsiz UCUNCU olcumle ayri worktree'de urretti
+   * (6 dustu / 21 gecti). Yani ayni dosya, ayni Node, FARKLI AGAC -> farkli sonuc; degisken
+   * isletim sistemi degil COZUMLEME ortamiydi. Kendi agacimda yesil gormek, kapinin
+   * her yerde kostugunun kaniti DEGILDI.
+   *
+   * ⛔ETKI, ADIYLA: dusen alti kol kapinin AYIRT EDICI kollariydi (yesil taraf + dort
+   * kirmizi sinif + ayiklayici). Yani o ortamlarda kapi "kirmizi vermiyor" degil,
+   * KAPI HIC SINANMIYORDU; gecen 21 kol ayirt etmeyen kisim. CI Linux oldugu icin
+   * master yesildi ve hicbir kapi bunu gormedi.
+   */
+  const mod: { degerlendir: (s: TetikSatiri[]) => Hukum } = await import(
+    /* @vite-ignore */ pathToFileURL(KAPI).href
+  )
   return mod.degerlendir
 }
 
