@@ -292,6 +292,36 @@ koşumunda TLS arızası hiç görünmedi, çünkü o adım hiç koşmadı.
 Dolayısıyla kırmızı bildirilirken sıra şudur: **önce HANGİ ADIM, sonra sahip.** İş düzeyi
 çıkış koduna bakıp adım düzeyini atlamak, gizlenmiş ikinci arızayı da atlamaktır.
 
+### 3.4 ⛔"İŞ MASTER'DA MI" SORUSU **İÇERİKLE** ÖLÇÜLÜR, COMMIT KİMLİĞİYLE DEĞİL (2026-09-09)
+
+**KURAL.** Bir işin master'a girip girmediği **içerik** üzerinden ölçülür:
+
+```bash
+git show origin/master:<dosya> | grep -F '<eklenen ayırt edici satır>'
+```
+
+⛔**Commit kimliği (SHA) bir içerik kanıtı DEĞİLDİR.** `squash` ve `cherry-pick` kimliği
+**değiştirir**, içeriği **korur**. Dolayısıyla `git merge-base --is-ancestor`, `git log
+origin/master..HEAD` ve "SHA master'da mı" gibi ölçütler bu iki işlemde **yanılır**.
+
+**Bu ölçüm iki yerde ZORUNLUDUR:**
+1. **Dal silmeden önce** — dalın taşıdığı değer gerçekten başka yerde mi?
+2. **Kapalı bir PR'ın dalına iş eklemeden önce** — kapalı PR yeni commit **almaz**.
+
+**NİÇİN — aynı gün, iki şerit, iki yön (ölçülmüş):**
+
+| şerit | ne yaptı | ölçüt neyi verdi | gerçek |
+|---|---|---|---|
+| ALTYAPI | cherry-pick'lenmiş §3.3 commit'inin dalını silecek | `--is-ancestor` → **HAYIR** | içerik master'da **VARDI** (yanlış NEGATİF) |
+| KATALOG | merge sonrası aynı dala 3 commit itti | push başarılı, ağaç temiz, `..HEAD` boş | üçü de master'a **GİRMEDİ** (yanlış GÜVEN) |
+
+Aynı gün ALTYAPI bu dersi yazdıktan **beş dakika sonra** kendi şeridindeki 66 uzak dalı yine
+SHA ile ölçtü ve "0'ı birleşmiş" dedi. Yama denkliğiyle yeniden ölçüm: **18 tamamen master'da,
+2 kısmen, 45 hiç.** Yani ders yazılmıştı ama **ölçüm alışkanlığı** değişmemişti.
+
+⭐**EN TEHLİKELİ SINIF "KISMEN GİRMİŞ" DALDIR:** yeşil görünür, eksiğini gizler. O yüzden
+silme kararı toplu verilemez — dal başına içerik eşleşmesi ya da açıkça yazılmış "ÇÜRÜDÜ" hükmü.
+
 ---
 
 ## 4. Standart-Önce (No-Standard-No-Code)

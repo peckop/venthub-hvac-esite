@@ -1,5 +1,21 @@
-#!/usr/bin/env node
 /**
+ * ⛔SHEBANG KALDIRILDI (2026-09-09) — ve sebebi KATALOG'un ölçümüdür, tahminim değil.
+ *
+ * Bu dosya `node scripts/db/checks/denetim-izi-tetik-kapisi.mjs` ile çağrılıyor
+ * (`db-advisor.yml`), `package.json`'da `bin` girdisi YOK. Yani shebang **işlevsizdi.**
+ *
+ * ⭐AMA ZARARSIZ DEĞİLDİ. Üç ağaçta aynı dosya, üç sonuç — korelasyon kusursuz
+ * (KATALOG ölçtü, `head -1 | cat -A`):
+ *   `vh-altyapi-851`   → `#!/usr/bin/env node$`    (LF)   → test GEÇİYOR (27/27)
+ *   `vh-katalog-rec146`→ `#!/usr/bin/env node^M$`  (CRLF) → test DÜŞÜYOR (6/27)
+ *   `vh-urun-rec89`    → `#!/usr/bin/env node^M$`  (CRLF) → test DÜŞÜYOR (6/27)
+ *
+ * MEKANİZMA: `vite-node` dosyayı bir fonksiyon gövdesine sarar ve shebang'ı sökerken satır
+ * sonunu **LF varsayar**; CRLF'te geriye `\r` kalır → `SyntaxError: Invalid or unexpected
+ * token`. Sürüm değişkeni ELENDİ: üç ağaçta da vitest 4.1.3 / vite 6.4.2 / Node v22.16.0.
+ * Fark, ağacın `core.autocrlf` ile nasıl oluşturulduğundan geliyordu — bu yüzden ben kendi
+ * ağacımda kusuru HİÇ göremedim ve görmemem de doğruydu.
+ *
  * INV-DENETIM-IZI-1 — denetim tetiği CANLI DB'de duruyor mu, ve HÂLÂ fail-closed mı?
  *
  * NİÇİN CANLI DB'YE BAKIYOR (metin taraması NEDEN YETMEZ)
@@ -40,7 +56,7 @@ import pg from 'pg'
 import fs from 'node:fs'
 import path from 'node:path'
 import tls from 'node:tls'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const CA_PATH = path.join(__dirname, 'supabase-root-2021-ca.pem')
@@ -76,18 +92,23 @@ function migrationDosyasiVarMi() {
   }
 }
 
-/** Denetim izi ZORUNLU olan tablolar (REC-292 kapsamı, ölçümle 6). */
-const KAPSAM = [
-  'categories',
-  'products',
-  'product_families',
-  'product_images',
-  'brands',
-  'site_settings',
-]
+/**
+ * ⭐KAPSAM · ZORUNLU KOLON · `degerlendir` ARTIK BURADA DEĞİL — `./lib/denetim-izi-hukum.mjs`.
+ *
+ * NİÇİN taşındı (üç bağımsız ölçüm, 2026-09-09): konformans testi bu betiği **dinamik
+ * import** ile çekiyordu ve bazı ağaçlarda kapının **ayırt edici altı kolu** sessizce
+ * düşüyordu (`SyntaxError`), benim ağacımda geçiyordu. Sebep bu dosyanın ilk satırındaki
+ * **shebang**: vite-node dosyayı bir fonksiyon gövdesine sarıp çalıştırır ve `#!` orada
+ * çözümlenemez; hangi ağacın vitest sürümü shebang'ı söktüğüne göre sonuç değişir.
+ *
+ * Onarım sebebi kovalamak değil **sınıfı kaldırmak**: saf hüküm shebang'siz bir modülde,
+ * CLI ve test AYNI kaynaktan besleniyor, testin import'u sıradan bir statik import.
+ * Shebang burada KALIYOR (bu dosya doğrudan çalıştırılıyor) ama artık kimseyi kör etmiyor.
+ */
+import { KAPSAM, PRODUCTS_ZORUNLU_KOLON, degerlendir } from './lib/denetim-izi-hukum.mjs'
 
-/** `products` UPDATE süzgecinde BULUNMASI ZORUNLU kolonlar (ticari çekirdek). */
-const PRODUCTS_ZORUNLU_KOLON = ['price', 'category_id', 'status', 'deleted_at', 'sku']
+// Geriye dönük yüzey: dışa açılan adlar DEĞİŞMEDİ (bu betiği import eden varsa kırılmaz).
+export { KAPSAM, PRODUCTS_ZORUNLU_KOLON, degerlendir }
 
 const SORGU = `
   select c.relname                          as tablo,
@@ -157,85 +178,6 @@ async function semadanTopla(connectionString) {
   } finally {
     await client.end()
   }
-}
-
-/** Tetik satırlarından hüküm çıkar. Saf fonksiyon: fikstürle de sınanabilir. */
-export function degerlendir(satirlar) {
-  const ihlaller = []
-  const denetimSatirlari = satirlar.filter((r) => /^denetim_izi/.test(r.tetik))
-
-  // (1) TETİK VAR MI
-  for (const tablo of KAPSAM) {
-    const bulunan = denetimSatirlari.filter((r) => r.tablo === tablo)
-    if (bulunan.length === 0) {
-      ihlaller.push({
-        sinif: 'TETIK-YOK',
-        tablo,
-        aciklama:
-          `${tablo} tablosunda denetim_izi tetigi YOK. Bu tabloya yapilan her yazim ` +
-          `KAYITSIZ gecer. Migration dosyasinin repoda durmasi bunu KANITLAMAZ — ` +
-          `tetik DROP edilmis olabilir.`,
-      })
-    }
-  }
-
-  // (2) FAIL-CLOSED MI — fonksiyon gövdesinde exception yakalayıcısı var mı
-  const govdeler = new Map()
-  for (const r of denetimSatirlari) govdeler.set(r.fonksiyon, r.govde)
-  for (const [fn, govde] of govdeler) {
-    if (/\bexception\s+when\b/i.test(String(govde))) {
-      ihlaller.push({
-        sinif: 'FAIL-OPEN',
-        tablo: fn,
-        aciklama:
-          `${fn} govdesinde "exception when" YAKALAYICISI var. Tetik AYAKTA gorunur ama ` +
-          `denetim yazimi patladiginda hata yutulur ve veri yazimi GECER: kayip SESSIZ olur. ` +
-          `REC-292 karari fail-CLOSED (OPS H1). Yakalayici bilincli eklendiyse karar ` +
-          `YENIDEN alinmali, sessizce degistirilmemeli.`,
-      })
-    }
-  }
-
-  // (3) products SÜZGECİ
-  //
-  // ⛔BURADA BİR KEZ YANILDIM, ve kendi fikstür kolum yakaladı — düzeltme yorumda kalsın:
-  // önce "products üzerinde tanımında `update` geçen İLK tetik" diye arıyordum. `products`
-  // üzerinde birden çok denetim tetiği var (biri INSERT/DELETE, biri UPDATE OF) ve gevşek
-  // eşleşme YANLIŞ tetiği seçip süzgeci yok sanıyordu. Doğru soru "hangi tetik UPDATE'te
-  // ateşleniyor" ve cevabı TEK tetik olmak zorunda değil.
-  const productsUpdTetikleri = denetimSatirlari.filter(
-    (r) => r.tablo === 'products' && /\bupdate\b/i.test(String(r.tanim)),
-  )
-  if (productsUpdTetikleri.length > 0) {
-    const suzgecli = productsUpdTetikleri.filter((r) => /update\s+of/i.test(String(r.tanim)))
-
-    if (suzgecli.length === 0) {
-      ihlaller.push({
-        sinif: 'SUZGEC-YOK',
-        tablo: 'products',
-        aciklama:
-          `products UPDATE tetigi kolon suzgeci OLMADAN kurulmus (UPDATE OF yok). ` +
-          `Her siparisin stok dusumu denetim satiri uretir ve "kim fiyati degistirdi" ` +
-          `sorusunun cevabi gurultude kaybolur (OPS H2).`,
-      })
-    } else {
-      // Zorunlu kolon, süzgeçli tetiklerin HERHANGİ BİRİNDE geçiyorsa kapsanmış sayılır:
-      // süzgeç birden çok tetiğe bölünmüş olabilir ve bu meşrudur.
-      const hepsi = suzgecli.map((r) => String(r.tanim)).join(' ')
-      const eksik = PRODUCTS_ZORUNLU_KOLON.filter((k) => !new RegExp(`\\b${k}\\b`).test(hepsi))
-      if (eksik.length > 0) {
-        ihlaller.push({
-          sinif: 'SUZGEC-DAR',
-          tablo: 'products',
-          aciklama:
-            `products UPDATE tetiginin kolon suzgecinde ticari cekirdek kolonlar EKSIK: ` +
-            `${eksik.join(', ')}. Bu kolonlarin degisimi KAYITSIZ gecer.`,
-        })
-      }
-    }
-  }
-
-  return { ihlaller, denetimTetikSayisi: denetimSatirlari.length }
 }
 
 async function main() {
@@ -345,12 +287,39 @@ async function main() {
   process.exit(1)
 }
 
-main().catch((err) => {
-  if (/certificate|self-signed|SELF_SIGNED/i.test(err.message)) {
-    console.error('denetim-izi-tetik-kapisi: OLCULEMEDI — TLS zinciri dogrulanamadi:', err.message)
-    console.error('Kok sertifikayi PGSSLROOTCERT ile verin (dogrulamayi KAPATMAK cozum degildir).')
-  } else {
-    console.error('denetim-izi-tetik-kapisi: kosum HATASI —', err.message)
+/**
+ * ⛔MODUL IMPORT EDILDIGINDE KOSMAZ — yalnizca DOGRUDAN cagrildiginda.
+ *
+ * OLCULDU (2026-09-09, URUN un yan bulgusu, ben dogruladim): bu dosyayi bir birim
+ * testinden `import` etmek kapinin KENDISINI kosturuyordu; ekrana "kok sertifika
+ * yuklendi" yazdi ve ardindan CANLI DB-ye baglanmayi denedi
+ * ("password authentication failed"). Yani `degerlendir`-i sinamak icin dosyayi
+ * import eden her kol, kimlik bilgisi olmayan bir makinede prod-a UZANIYORDU.
+ *
+ * NICIN CIDDI: (a) birim testi ag-a cikmamali - yavas, kirilgan ve makineye gore
+ * farkli sonuc verir; (b) sirsiz makinede uretilen hata, testin ASIL olctugu seyi
+ * GOLGELER (bugun tam bu oldu: kollar dusunce sebep import yolu mu, DB mi, ayirt
+ * edilemedi); (c) bir kapi betiginin yan etkisi, onu okuyan araca sizmamali.
+ */
+const dogrudanCagrildi = (() => {
+  const giris = process.argv[1]
+  if (!giris) return false
+  try {
+    return pathToFileURL(path.resolve(giris)).href === import.meta.url
+  } catch {
+    return false
   }
-  process.exit(2)
-})
+})()
+
+// Import edildiyse hicbir sey KOSMAZ; `degerlendir` disa acik ve sinanabilir kalir.
+if (dogrudanCagrildi) {
+  main().catch((err) => {
+    if (/certificate|self-signed|SELF_SIGNED/i.test(err.message)) {
+      console.error('denetim-izi-tetik-kapisi: OLCULEMEDI — TLS zinciri dogrulanamadi:', err.message)
+      console.error('Kok sertifikayi PGSSLROOTCERT ile verin (dogrulamayi KAPATMAK cozum degildir).')
+    } else {
+      console.error('denetim-izi-tetik-kapisi: kosum HATASI —', err.message)
+    }
+    process.exit(2)
+  })
+}
