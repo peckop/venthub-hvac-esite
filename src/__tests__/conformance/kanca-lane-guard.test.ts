@@ -132,6 +132,14 @@ describe('INV-KANCA-LANE-GUARD-1 · YANLIŞ-POZİTİF kolları (kapının en ola
 })
 
 describe('INV-KANCA-LANE-GUARD-1 · sözleşme sınırları', () => {
+  it('⭐bozuk / boş girdide SESSİZ KALMAZ — stderr tek satır (cetvel §9.7)', () => {
+    // Bu kanca pano hatalarında zaten konuşuyordu; stdin hâli sessizdi, aynı kurala getirildi.
+    expect(kos(null, { hamGirdi: 'bu JSON degil' }).stderr).toContain('stdin okunamadi')
+    expect(kos(null, { hamGirdi: '' }).stderr).toContain('stdin okunamadi')
+    // Geçerli JSON, çakışma yok: NORMAL hâl, uyarı üretmemeli (gürültülü kapı okunmaz).
+    expect(kos(yazma('src/lib/x.ts', 'benim1')).stderr, 'normal hâlde gürültü üretti').toBe('')
+  })
+
   it('bozuk / eksik girdi KARIŞMAZ (fail-open, kancanın yazılı sapması)', () => {
     expect(kos(null, { hamGirdi: 'bu JSON degil' }).kod, 'bozuk JSON bloklandı').toBe(0)
     expect(kos({ session_id: 'benim1', tool_input: {} }).kod, 'dosya yolu yokken bloklandı').toBe(0)

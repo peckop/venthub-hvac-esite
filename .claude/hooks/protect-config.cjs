@@ -30,8 +30,19 @@ function readStdin() {
   try { return fs.readFileSync(0, 'utf8'); } catch { return ''; }
 }
 
+// §9.7 (fleet-mechanism-standard): bozuk/boş stdin → fail-OPEN ama SESSİZ DEĞİL.
+// exit 2 vermek, sebebi bu dosyayla ilgisi olmayan BÜTÜN yazımları durdurur (kendi kendine
+// kesinti); sessiz fail-open ise kapının "çalışmış gibi görünüp hiçbir şey ölçmediği" hâldir.
 let input = {};
-try { input = JSON.parse(readStdin() || '{}'); } catch { process.exit(0); } // bozuk JSON → bloklama
+const hamGirdi = readStdin();
+if (!String(hamGirdi).trim()) {
+  process.stderr.write('[guard] stdin okunamadi (bos), karisilmadi\n');
+  process.exit(0);
+}
+try { input = JSON.parse(hamGirdi); } catch {
+  process.stderr.write('[guard] stdin okunamadi (bozuk JSON), karisilmadi\n');
+  process.exit(0);
+}
 
 const ti = (input && input.tool_input) || {};
 const filePath = ti.file_path || '';

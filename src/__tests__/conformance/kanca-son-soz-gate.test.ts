@@ -112,6 +112,13 @@ describe('INV-KANCA-SON-SOZ-1 · sözleşme sınırları', () => {
     expect(kos([insan('x'), asistanArac()], { yolYok: true }).kod, 'olmayan dosyada bloklandı').toBe(0)
   })
 
+  it('⭐bozuk / boş girdide SESSİZ KALMAZ — stderr tek satır (cetvel §9.7)', () => {
+    expect(kos([], { hamGirdi: 'bu JSON degil' }).stderr).toContain('stdin okunamadi')
+    expect(kos([], { hamGirdi: '' }).stderr).toContain('stdin okunamadi')
+    // Geçerli JSON, kapının karışmadığı normal hâl: uyarı üretmemeli.
+    expect(kos([insan('durum ne'), asistanMetin(UZUN_METIN)]).stderr, 'normal hâlde gürültü').toBe('')
+  })
+
   it('bozuk transkript satırı yutulur, karar yine verilir', () => {
     const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-transkript-'))
     const yol = path.join(dizin, 'oturum.jsonl')
