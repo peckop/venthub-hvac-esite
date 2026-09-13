@@ -32,6 +32,22 @@ const kuru = process.argv.includes('--kuru')
 const skillSuzgeci = (process.argv.find((a) => a.startsWith('--skill=')) || '').split('=')[1] || null
 
 /**
+ * ÖRNEKLEME — niçin var, sayıyla: tam dönüşüm 62 skill / 1261 vaka üretiyor ve
+ * yerleşik koşucu vaka başına varsayılan 3 koşum yapıyor. Yani tam sınav
+ * 1261 × 3 = 3783 AJAN KOŞUMU demek ve her koşum aboneliğin üzerinden giden bir
+ * tam `claude` çocuğu. `--ablation` açıkken bu iki katına çıkar.
+ * Bu biçimde tam koşum PRATİK DEĞİLDİR; pilot örneklemeyle yapılır.
+ */
+const sayi = (ad, varsayilan) => {
+  const a = process.argv.find((x) => x.startsWith(`--${ad}=`))
+  if (!a) return varsayilan
+  const n = Number(a.split('=')[1])
+  return Number.isFinite(n) && n >= 0 ? n : varsayilan
+}
+const ornekTetik = sayi('ornek-tetik', Infinity)
+const ornekTetiksiz = sayi('ornek-tetiksiz', Infinity)
+
+/**
  * ⚠BİÇİM KAYNAĞI TAHMİN DEĞİL, ÖLÇÜM:
  *  · `claude plugin eval init --bare <ad>` çalıştırıldı; ürettiği kalıp
  *    `prompt.md` frontmatter'ında `max_turns` + `allowed_tools`, grader'da
@@ -146,8 +162,8 @@ for (const agac of AGACLAR) {
       atlanan.push(`${agac}/${g.name}: JSON okunamadi — ${e.message.slice(0, 60)}`)
       continue
     }
-    const tetik = Array.isArray(j.should_trigger) ? j.should_trigger : []
-    const tetikSiz = Array.isArray(j.should_not_trigger) ? j.should_not_trigger : []
+    const tetik = (Array.isArray(j.should_trigger) ? j.should_trigger : []).slice(0, ornekTetik)
+    const tetikSiz = (Array.isArray(j.should_not_trigger) ? j.should_not_trigger : []).slice(0, ornekTetiksiz)
     if (!tetik.length && !tetikSiz.length) {
       atlanan.push(`${agac}/${g.name}: should_trigger ve should_not_trigger BOS`)
       continue

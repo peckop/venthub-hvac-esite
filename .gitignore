@@ -128,3 +128,8 @@ supabase/.temp/
 
 # /qa skill geçici ekran görüntüleri (kanıt olarak gerekenler docs/audits/qa-ekran/ altına kopyalanır)
 qa-raporlari/
+
+# REC-319: yerlesik eval vaka agaci URETILIR, commitlenmez
+# (uretici: scripts/skills-eval-convert.mjs — deterministik, idempotent)
+.claude/skills/*/evals-yerlesik/
+.agent/skills/*/evals-yerlesik/
