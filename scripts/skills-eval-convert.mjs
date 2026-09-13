@@ -92,6 +92,25 @@ function guvenliAd(metin, sira) {
   return `${String(sira).padStart(2, '0')}-${taban || 'vaka'}`
 }
 
+/**
+ * ⭐`plugins:` SATIRI ZORUNLU — ölçümle öğrenildi, tahminle değil.
+ *
+ * İlk koşumda 18 vakanın hepsi YÜKLENMEDEN düştü ve araç sebebi adıyla söyledi:
+ *   "ablation requested but no plugin resolved for this case: auto-detection
+ *    found no plugin.json, .claude-plugin/plugin.json, or SKILL.md it may load
+ *    between the case directory and the discovery root ... The with and without
+ *    arms would run identical configs, so Δ would measure nothing."
+ *
+ * Yani karşılaştırmalı ölçüm (ablation) için vakanın HANGİ skill'i denediği
+ * çözülebilmeli; yoksa iki kol aynı yapılandırmayı koşar ve fark HİÇBİR ŞEY
+ * ölçmez. Araç üç çare veriyor; `plugins:` beyanı seçildi çünkü eklenti kökünü
+ * hedeflemeye devam etmemizi sağlıyor ve fark ölçümü SKILL BAŞINA anlamlı olur.
+ *
+ * ⚠Not: bir `SKILL.md` de kabul ediliyor — yani `plugin.json` paketlemesi
+ * ablation için de GEREKMİYOR; skill dizinini göstermek yeterli.
+ *
+ * ⛔Hiç ajan koşumu yapılmadı, kota HARCANMADI: vakalar yüklenmeden düştü.
+ */
 function promptMetni(istem, tetiklenmeli, skillAdi) {
   const aciklama = tetiklenmeli
     ? `${skillAdi} TETIKLENMELI — yonlendirme sinavi (should_trigger)`
@@ -99,6 +118,10 @@ function promptMetni(istem, tetiklenmeli, skillAdi) {
   return [
     '---',
     `description: '${aciklama.replace(/'/g, "''")}'`,
+    // Yol VAKA DIZININE GORELI (olculdu: `skills/<ad>` ve `.claude/skills/<ad>`
+    // ikisi de "does not exist" verdi; `../../skills/<ad>` cozuldu ve arac
+    // "Plugin under test: ... at C:\...\.claude\skills\investigate" dedi).
+    `plugins: [../../skills/${skillAdi}]`,
     'max_turns: 4',
     'allowed_tools: [Skill]',
     '---',
