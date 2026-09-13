@@ -1,0 +1,119 @@
+# INV-MIGRATION-3 — migration linter PR kapısı (squawk)
+#
+# NİÇİN: CLAUDE.md kural 13 — migration içeren dal master'a merge edilince
+# `supabase-migrate.yml` onu prod DB'ye OTOMATİK uygular. Yani kilitleyen bir
+# ALTER, geçersiz bir söz dizimi ya da CONCURRENTLY'siz bir CREATE INDEX, merge
+# anında canlı veritabanına gider. Bu kapı o riski PR anında yakalar.
+#
+# KIRMIZI = MERGE YOK. Kapı kural 13'ün YERİNE GEÇMEZ, ona EK bir katmandır:
+# yeşil kapı Recep'in migration onayını kaldırmaz.
+#
+# KAPSAM: yalnız bu PR'da EKLENEN ya da DEĞİŞTİRİLEN migration dosyaları.
+# Geçmiş dosyalar prod'a uygulanmıştır ve DEĞİŞTİRİLMEZ; ilk tam tarama raporu
+# docs/audits/rec315-squawk-ilk-tarama-2026-09-13.md içindedir.
+#
+# Kural seti: .squawk.toml (pg_version 17.0 — canlı DB'den ölçüldü, 2026-09-13).
+
+name: INV-MIGRATION-3 (squawk)
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**.sql'
+      - '.squawk.toml'
+      - '.github/migration-linter-yardim.md'
+      - '.github/workflows/migration-linter.yml'
+  workflow_dispatch:
+
+# ⚠Repo 2026-08-15'ten beri PUBLIC. `permissions:` bloğu yazıldığı an
+# varsayılanlar düşer, bu yüzden `contents: read` ZORUNLU — yoksa checkout
+# "Repository not found" verir. Yazma yetkisi yok: bu kapı yalnız okur.
+permissions:
+  contents: read
+
+concurrency:
+  group: migration-linter-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ⛔self-hosted runner KULLANILMAZ (public repo: fork PR'ı yabancı kodu
+  # makinede çalıştırır). GitHub-hosted ubuntu-latest.
+  squawk:
+    name: INV-MIGRATION-3
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Taban dalla karşılaştırma yapılacak; sığ klonda merge-base yok.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # INV-NODE-1: Node ana sürümü üç yüzeyde hizalı olmalı. Kapı prod ile
+          # aynı ana sürümde koşmazsa ölçtüğü şey prod değildir.
+          node-version: '24'
+
+      # Sürüm SABİTLENİR. Linter sürümü kendi başına kayarsa aynı diff dünden
+      # farklı sonuç verir ve kapı "sebepsiz" kırmızı olur — kırmızının sebebi
+      # kaybolur. Yükseltme bilinçli bir değişiklikle, bu satır güncellenerek olur.
+      - name: Install squawk
+        run: npm install --no-save --no-fund --no-audit squawk-cli@2.65.0
+
+      # Değişen dosya listesi TEK YERDE üretilir ve EKRANA BASILIR.
+      # --diff-filter=AM: eklenen (A) ve değişen (M). Silinen (D) dosya
+      # taranamaz (içeriği yok) ve taranmamalıdır.
+      - name: Degisen migration dosyalarini bul
+        id: degisen
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event.pull_request.base.sha }}"
+          if [ -z "$BASE" ]; then
+            BASE=$(git merge-base origin/master HEAD)
+            echo "Taban PR olayindan gelmedi, merge-base kullanildi: $BASE"
+          fi
+          git diff --name-only --diff-filter=AM "$BASE" HEAD -- 'supabase/migrations/*.sql' > degisen.txt || true
+          SAYI=$(wc -l < degisen.txt | tr -d ' ')
+          echo "sayi=$SAYI" >> "$GITHUB_OUTPUT"
+          echo "DEGISEN MIGRATION DOSYASI: $SAYI"
+          cat degisen.txt
+
+      # Hiç migration değişmediyse kapı ATLANMAZ, ÖLÇTÜĞÜNÜ SÖYLER.
+      # "Sessiz yeşil" ile "ölçüldü ve temiz" ayrı sonuçlardır; sessiz yeşil,
+      # kapının koşup koşmadığını gizler.
+      - name: Degisiklik yoksa ilan et
+        if: steps.degisen.outputs.sayi == '0'
+        run: |
+          echo "::notice title=INV-MIGRATION-3::Bu PR de eklenen/degisen migration dosyasi YOK (0 dosya). Kapi kostu, taranacak dosya bulunmadi."
+          {
+            echo "### INV-MIGRATION-3 (squawk)"
+            echo "- Taranan dosya: **0** — bu PR migration eklemiyor/degistirmiyor."
+            echo "- Sonuc: gecti (olculdu, ihlal yok)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: squawk tara (degisen dosyalar)
+        if: steps.degisen.outputs.sayi != '0'
+        run: |
+          set -euo pipefail
+          SAYI=$(wc -l < degisen.txt | tr -d ' ')
+          echo "Kural seti: .squawk.toml · taranan dosya: $SAYI"
+          set +e
+          xargs -a degisen.txt ./node_modules/.bin/squawk -c .squawk.toml --reporter tty
+          KOD=$?
+          set -e
+          {
+            echo "### INV-MIGRATION-3 (squawk)"
+            echo "- Taranan dosya: **$SAYI**"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$KOD" -ne 0 ]; then
+            {
+              echo "- Sonuc: **KIRMIZI** — merge YOK."
+              echo ""
+              cat .github/migration-linter-yardim.md
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=INV-MIGRATION-3::Migration linter KIRMIZI. Kural 13 geregi bu dal merge edilince prod DB ye OTOMATIK uygulanir; merge YOK. Careler: .github/migration-linter-yardim.md"
+            exit 1
+          fi
+          echo "- Sonuc: gecti." >> "$GITHUB_STEP_SUMMARY"
