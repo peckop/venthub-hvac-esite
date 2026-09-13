@@ -1,0 +1,53 @@
+# squawk — Postgres migration linter yapılandırması (INV-MIGRATION-3 kapısı)
+#
+# NİÇİN VAR: CLAUDE.md kural 13 gereği migration içeren bir dal master'a merge
+# edilince `supabase-migrate.yml` onu prod DB'ye OTOMATİK uygular. Yani bir
+# migration dosyasındaki kilitleyen ya da geçersiz bir ifade, merge anında
+# canlı veritabanına gider. Bu dosya, o riski PR anında yakalayan kural setidir.
+#
+# KAPI: .github/workflows/migration-linter.yml → INV-MIGRATION-3
+# Kapsam: yalnız PR'da DEĞİŞEN/EKLENEN migration dosyaları. Geçmiş dosyalar
+# uygulanmıştır, DEĞİŞTİRİLMEZ (bkz. docs/audits/rec315-squawk-ilk-tarama-2026-09-13.md).
+
+# Canlı veritabanının ÖLÇÜLMÜŞ sürümü (2026-09-13, Supabase projesi
+# venthub-hvac-platform): postgres_engine 17, tam sürüm 17.6.1.003.
+# ⚠İş emrinde "Postgres 15 uyumlu" yazıyordu; sapma ölçümle düzeltildi.
+pg_version = "17.0"
+
+# ⭐İŞLEM VARSAYIMI: KAPALI — ve bu bir tercih değil, ölçüm sonucu.
+#
+# `supabase-migrate.yml` her dosyayı aynı biçimde koşmaz; dosyanın kendi
+# `BEGIN;`i var mı diye bakar (grep -qiE '^\s*(begin|start transaction)\s*;'):
+#   · kendi işlemini yönetiyorsa   → OLDUĞU GİBİ koşar
+#   · işlem denetimi içermiyorsa   → `psql --single-transaction` ile SARILIR
+#
+# Yani depoda iki meşru biçim yan yana yaşıyor ve tek bir varsayım ikisini de
+# doğru tanımlayamaz. `assume_in_transaction = true` denendiğinde kendi
+# işlemini yazan 20260909071451_denetim_izi_dml_tetikleri.sql dosyası
+# 2 adet `transaction-nesting` YANLIŞ POZİTİF üretti (ölçüldü 2026-09-13).
+# Kapalı varsayımda aynı dosya 0 yanlış pozitif veriyor.
+assume_in_transaction = false
+
+# ── KAPATILAN KURALLAR — her biri gerekçeli ───────────────────────────────
+# Bu kapının konusu PROD RİSKİ (kilit, geçersiz SQL, geri alınamaz değişiklik),
+# şema zevki değil. Aşağıdaki üç kural şema tasarımı tercihidir; bizim
+# yerleşik sözleşmemizle çelişiyor ve prod riski ölçmüyor:
+#
+#   prefer-identity          → PK sözleşmemiz `uuid PRIMARY KEY DEFAULT
+#                              gen_random_uuid()`; identity sütunu kullanmıyoruz.
+#                              Kural her yeni tabloda tetiklenir, hiçbir kilit
+#                              riski göstermez. (geçmişte 2 uyarı)
+#   prefer-bigint-over-int   → int/smallint sütunlarımız sayaç ve eşik
+#   prefer-bigint-over-smallint  alanları (stok eşiği, sıra numarası); bigint'e
+#                              çıkmak depolama maliyeti, güvenlik kazancı yok.
+#                              (geçmişte 24 + 2 uyarı)
+#
+# ⛔Sözdizimi (syntax-error) KAPATILMAZ. İlk taramada gerçek bir kusur buldu:
+# altı dosyada 11 kez `CREATE POLICY IF NOT EXISTS` geçiyor ve PostgreSQL bu
+# söz dizimini DESTEKLEMİYOR. O dosyalar prod'a hiç uygulanmamış (ledger
+# baseline'ında atlanmışlar); uygulanmaya çalışılsa koşu kırmızı olurdu.
+excluded_rules = [
+  "prefer-identity",
+  "prefer-bigint-over-int",
+  "prefer-bigint-over-smallint",
+]
