@@ -52,7 +52,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          # INV-NODE-1: Node ana sürümü üç yüzeyde hizalı olmalı. Kapı prod ile
+          # aynı ana sürümde koşmazsa ölçtüğü şey prod değildir.
+          node-version: '24'
 
       # Sürüm SABİTLENİR. Linter sürümü kendi başına kayarsa aynı diff dünden
       # farklı sonuç verir ve kapı "sebepsiz" kırmızı olur — kırmızının sebebi
