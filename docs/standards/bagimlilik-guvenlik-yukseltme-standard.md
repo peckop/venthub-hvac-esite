@@ -115,10 +115,31 @@ belirtilir. Atlanan kapı, atlandığı yazılmadıkça atlanmamış sayılır.
 
 ## 8 · Canlı doğrulama ölçütü "200" olmak zorunda değil
 
-Deploy sonrası ölçütü **mevcut davranıştan** türet, varsayımdan değil. 2026-09-13'te
-`/_next/image` ucu için "200 bekle" ölçütü **yanlış** olurdu: o uç Hobby görsel kotası dolduğu
-için **402** dönüyor ve `images.unoptimized: true` tam bu yüzden açılmıştı (2026-08-30, Recep
-onayı). Doğru ölçüt **"değişmemiş olması"**.
+Deploy sonrası ölçütü **mevcut davranıştan** türet, varsayımdan değil — ve o davranışı
+**ölç**, bir yorumdan ya da başka bir şeritten **aktarma**.
+
+2026-09-13'te `/_next/image` ucu için "200 bekle" ölçütü **yanlış** olurdu. Ama bu maddenin ilk
+hâli de yanlıştı: beklenen kodu **402** diye yazdım, çünkü `next.config.mjs` içindeki yorumdan
+ve akranın emrinden öyle aktardım. **Ölçüm başka çıktı: 404.**
+
+Ayırt edici ölçüm (çünkü 404 "kaynak görsel yok" da demek olabilirdi):
+`/_next/image` ucu **parametresiz**, **uydurma kaynakla** ve **var olan gerçek bir görselle**
+denendi → **üçü de 404**; aynı görsel doğrudan servis edildiğinde **200 / 72.932 bayt**.
+Yani uç **hiç kayıtlı değil** — `images.unoptimized: true` olduğunda Next optimizasyon rotasını
+**kurmuyor bile**. 402 rakamı optimizasyonun **kapatılmasından önceki** hâldi (kota reddi);
+kapatıldıktan sonra kod 402 değil **404** oldu ve yorum bu geçişte bayatladı.
+
+⭐Bunun güvenlik tarafında bir yan faydası var ve ölçülmüş bir kanıttır: o günün AVIF kritik
+açığı **Image Optimization API'nin içinde** yaşıyor ve **o uç bizde 404 veriyor**. Bu, platform
+beyanından bağımsız, kendi ölçtüğümüz ikinci kanıttır.
+
+**Kural:** beklenen kodu bir **yorumdan** ya da bir **akran mesajından** almak, onu ölçmek
+değildir. Deploy öncesi ve sonrası **aynı ucu** ölç; ölçüt **"değişmemiş olması"**, ve
+"değişmemiş"in referansı **senin kendi ölçümün** olmalı.
+(Aynı sınıf: yorumlar bayatlar — `memory/duzeltilmis-ama-kosulmamis-arac`.)
+
+⚠Ölçütü seçerken **kanonik davranışı** da ölç: kök adres `/` **308** veriyor ve dil ekli
+`/tr` 200 — "ana sayfa 200" ölçütü `/` üzerinde koşulursa yanlış kırmızı verir.
 
 ## 9 · Bu cetvelin kendi sınırları
 
