@@ -131,5 +131,9 @@ qa-raporlari/
 
 # REC-319: yerlesik eval vaka agaci URETILIR, commitlenmez
 # (uretici: scripts/skills-eval-convert.mjs — deterministik, idempotent)
+.claude/evals-yerlesik/
+.agent/evals-yerlesik/
+# Ilk denemenin yeri (skill basina) — yerlesik kosucu orada ARAMIYOR, olculdu.
+# Yerel agaclarda kalmis kopyalar depoya sizmasin diye desen burada duruyor.
 .claude/skills/*/evals-yerlesik/
 .agent/skills/*/evals-yerlesik/

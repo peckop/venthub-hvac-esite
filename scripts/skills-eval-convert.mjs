@@ -24,8 +24,22 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const depoKoku = path.resolve(import.meta.dirname, '..')
-const AGACLAR = ['.claude/skills', '.agent/skills']
-/** Üretilen ağacın adı. `evals/` DEĞİL: kaynağın yanında durup onu ezmesin. */
+/** Her giriş: [eklenti kökü, skill dizini]. Sınav hedefi EKLENTİ KÖKÜDÜR. */
+const AGACLAR = [
+  ['.claude', '.claude/skills'],
+  ['.agent', '.agent/skills'],
+]
+/**
+ * Üretilen ağacın adı. `evals/` DEĞİL: kaynağın yanında durup onu ezmesin.
+ *
+ * ⭐YER, TAHMİNLE DEĞİL ÖLÇÜMLE BULUNDU: ilk hâlde vakalar her skill'in altına
+ * (`skills/<ad>/evals-yerlesik/`) yazılıyordu ve koşum 2 saniyede
+ * "No eval cases found under ...\.claude" dedi. Yerleşik koşucu sınav dizinini
+ * EKLENTİ KÖKÜNÜN ALTINDA arıyor (`--help`: *"Directory name (below the
+ * plugin) that holds the eval cases"*), yani tek bir dizin, skill başına değil.
+ * Bu yüzden vaka adı `<skill>-<NN>-<slug>` biçiminde: tek havuzda hangi skill'e
+ * ait olduğu adından okunsun.
+ */
 const HEDEF_DIZIN = 'evals-yerlesik'
 
 const kuru = process.argv.includes('--kuru')
@@ -145,9 +159,10 @@ const atlanan = []
 let skillSayisi = 0
 let vakaSayisi = 0
 
-for (const agac of AGACLAR) {
-  const kok = path.join(depoKoku, agac)
+for (const [eklentiKoku, skillYolu] of AGACLAR) {
+  const kok = path.join(depoKoku, skillYolu)
   if (!fs.existsSync(kok)) continue
+  const hedefKok = path.join(depoKoku, eklentiKoku, HEDEF_DIZIN)
   for (const g of fs.readdirSync(kok, { withFileTypes: true })) {
     if (!g.isDirectory() || g.name.startsWith('_')) continue
     if (skillSuzgeci && g.name !== skillSuzgeci) continue
@@ -159,18 +174,17 @@ for (const agac of AGACLAR) {
       j = JSON.parse(fs.readFileSync(kaynak, 'utf8'))
     } catch (e) {
       // Sessiz atlama YOK: bozuk kaynak insan hukmu bekler.
-      atlanan.push(`${agac}/${g.name}: JSON okunamadi — ${e.message.slice(0, 60)}`)
+      atlanan.push(`${skillYolu}/${g.name}: JSON okunamadi — ${e.message.slice(0, 60)}`)
       continue
     }
     const tetik = (Array.isArray(j.should_trigger) ? j.should_trigger : []).slice(0, ornekTetik)
     const tetikSiz = (Array.isArray(j.should_not_trigger) ? j.should_not_trigger : []).slice(0, ornekTetiksiz)
     if (!tetik.length && !tetikSiz.length) {
-      atlanan.push(`${agac}/${g.name}: should_trigger ve should_not_trigger BOS`)
+      atlanan.push(`${skillYolu}/${g.name}: should_trigger ve should_not_trigger BOS`)
       continue
     }
 
     skillSayisi++
-    const hedefKok = path.join(kok, g.name, HEDEF_DIZIN)
     let sira = 0
     for (const [liste, tetiklenmeli] of [
       [tetik, true],
@@ -179,7 +193,7 @@ for (const agac of AGACLAR) {
       for (const istem of liste) {
         sira++
         vakaSayisi++
-        const vakaDizin = path.join(hedefKok, guvenliAd(istem, sira))
+        const vakaDizin = path.join(hedefKok, `${g.name}-${guvenliAd(istem, sira)}`)
         sayac[yaz(path.join(vakaDizin, 'prompt.md'), promptMetni(istem, tetiklenmeli, g.name))]++
         const graderDosya = path.join(vakaDizin, 'graders', tetiklenmeli ? 'tetik.md' : 'tetiklenmesin.md')
         sayac[yaz(graderDosya, tetiklenmeli ? tetikGrader(g.name) : olumsuzGrader(g.name))]++
