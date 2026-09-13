@@ -1,11 +1,11 @@
 ---
 name: venthub-architecture
-description: Defines VentHub architecture, component patterns, and Next.js App Router
+description: 'Defines VentHub architecture, component patterns, and Next.js App Router
   rules. Trigger for creating new components (yeni bileşen oluştur), React Server
   Components (RSC render), or render/cache strategy (statik-ISR sinirlari). PPR icin DEGIL:
-  bu projede PPR KULLANILMIYOR (next.config.mjs'te experimental.ppr yok, 2026-08-15 olculdu).
+  bu projede PPR KULLANILMIYOR (next.config.mjs''te experimental.ppr yok, 2026-08-15 olculdu).
   Do NOT use for git commands,
-  database resets, or running unit tests.
+  database resets, or running unit tests.'
 category: guards
 metadata:
   triggers:

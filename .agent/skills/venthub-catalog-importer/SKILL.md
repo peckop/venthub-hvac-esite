@@ -1,9 +1,9 @@
 ---
 name: venthub-catalog-importer
-description: HVAC katalog PDF'lerinden görsel çoklu-ajanla ürün verisi çıkarıp CSV üretir (Kademe 1).
+description: 'HVAC katalog PDF''lerinden görsel çoklu-ajanla ürün verisi çıkarıp CSV üretir (Kademe 1).
   ⚠BU DOSYA YALNIZ YÖNLENDİRİCİDİR — çalıştırma mekaniği venthub-pdf-ingestor deposundadır.
   Tetik: katalog oku, pdf scan, hvac catalog import, Vortice/Avensair katalog işleme.
-  DB'ye YAZMAZ. Birim test/git branch/db reset için KULLANMA.
+  DB''ye YAZMAZ. Birim test/git branch/db reset için KULLANMA.'
 when_to_use: 'Kullan: katalog PDF çıkarımı gerektiğinde — ama işi BURADA yapma, ingestor deposuna geç.'
 allowed-tools:
 - view_file
