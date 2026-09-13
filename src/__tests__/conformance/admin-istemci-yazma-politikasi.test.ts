@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -126,6 +127,53 @@ describe('INV-ADMIN-YAZMA-1 · admin istemci yazmasi = ilan edilmis RLS politika
       .filter(([, k]) => k.kural_var === false && !k.bekleyen_migration)
       .map(([t]) => t)
     expect(acikta, 'kural_var=false ise bekleyen_migration alani ZORUNLU').toEqual([])
+  })
+
+  it('ILAN BAYAT DEGIL: bekleyen migration master a INMISSE kural_var=true olmali', () => {
+    // ⭐KAPI KENDI BAYATLAMASINI YAKALAR. Olculmus vaka: error_groups icin
+    // migration 2026-09-13'te master'a indi ve prod'a uygulandi, ama envanter
+    // satiri hala "kural_var: false, bekleyen_migration: ..." diyordu. Bir olcum
+    // dosyasinin yanlis olmasi, hic olmamasindan kotudur: sonraki okuyucuyu
+    // kapanmis bir bosluga bakmaya gonderir.
+    //
+    // OLCUT (OPS ile kararlastirildi): bekleyen gosterilen dosya `origin/master`
+    // AGACINDA VARSA, o migration inmis sayilir. Ledger CI'da gorunmez, master'da
+    // varlik yeter. Isi ACAN PR'da dosya henuz origin/master'da OLMADIGI icin bu
+    // kol dogru sekilde sessiz kalir.
+    //
+    // ⛔FAIL-OPEN AMA SESSIZ DEGIL (fleet-mechanism-standard §9.7): git ya da
+    // `origin/master` erisilemezse kol OLCEMEDI der, stderr'e bir satir yazar ve
+    // ihlal ILAN ETMEZ. Olcemedim ile ihlal ayri sonuclardir.
+    const bekleyenler = Object.entries(envanter.tablolar).filter(([, k]) => k.bekleyen_migration)
+    if (!bekleyenler.length) return
+
+    let masterOkunabilir = true
+    try {
+      execFileSync('git', ['-C', KOK, 'rev-parse', '--verify', 'origin/master'], { stdio: 'pipe' })
+    } catch {
+      masterOkunabilir = false
+    }
+    if (!masterOkunabilir) {
+      process.stderr.write('[INV-ADMIN-YAZMA-1] OLCEMEDI: origin/master okunamadi, ilan bayatligi kolu atlandi\n')
+      return
+    }
+
+    const bayat: string[] = []
+    for (const [tablo, kayit] of bekleyenler) {
+      try {
+        execFileSync('git', ['-C', KOK, 'cat-file', '-e', `origin/master:${kayit.bekleyen_migration}`], { stdio: 'pipe' })
+        bayat.push(`${tablo} -> ${kayit.bekleyen_migration}`)
+      } catch {
+        // master'da yok: migration henuz inmemis, ilan dogru.
+      }
+    }
+    expect(
+      bayat,
+      'ILAN BAYAT: gosterilen bekleyen migration origin/master ta ZATEN VAR, yani inmis.\n' +
+        'Yapilacak: prod dan politikayi DOGRULA (pg_policies), sonra bu satirda\n' +
+        'kural_var=true yap, bekleyen_migration alanini KALDIR ve kaynak alanina\n' +
+        'uygulanan migration dosyasini yaz.',
+    ).toEqual([])
   })
 
   it('bekleyen migration dosyasi DISKTE var', () => {
