@@ -295,6 +295,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/skills-eval-run.mjs` | SKILL YÖNLENDİRME SINAVINI KOŞAR (REC-303). | ALTYAPI | .github/workflows/skills-gate.yml, package.json (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts (saf cekirdek) | KAL |
 | `scripts/skills-eval/lib.mjs` | SKILL YÖNLENDİRME SINAVI — SAF ÇEKİRDEK (ağ yok, dosya yazımı yok). | ALTYAPI | scripts/skills-eval-run.mjs, src/__tests__/conformance/skills-eval-puanlama.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts | KAL |
 | `scripts/hijyen/skill-bitis-blogu.mjs` | ORTAK BİTİŞ BLOĞUNU 71 SKILL.md'ye GEÇİRİR (REC-305). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skill-bitis-blogu.test.ts | KAL |
+| `scripts/skills-eval-convert.mjs` | evals.json → YERLEŞİK eval vaka ağacı dönüştürücüsü (REC-319 adım 2b). | ALTYAPI | .gitignore (betik taramasi) | 2026-09-13 (pilot: 18 vaka uretildi, 36 kosum kosuldu) | testi YOK — cikti .gitignore da, kapi kosamaz; KANIT pilot kosumu (docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md bolum 7-8) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
