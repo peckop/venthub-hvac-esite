@@ -75,11 +75,11 @@
     },
     "error_groups": {
       "istemci_islemleri": ["update"],
-      "prod_politika_islemleri": ["SELECT"],
-      "kural_var": false,
-      "bekleyen_migration": "supabase/migrations/20260913182000_error_groups_yazma_politikasi.sql",
-      "kaynak": "supabase/migrations (1 dosya create policy tasiyor - ama o dosya prod'a UYGULANMAMIS, REC-321)",
-      "_not": "OLCULMUS ISLEV HATASI. RLS acik, tek politika SELECT. Admin panelde durum/atama/not yazma (ErrorGroupsTableBody.tsx satir 313/346/377/408) RLS'e takiliyor. Bekleyen migration kural 13 geregi Recep sozuyle merge edilir; merge edilene kadar bu satir kural_var=false kalir."
+      "prod_politika_islemleri": ["SELECT", "UPDATE"],
+      "prod_politika_islemleri_eski": ["SELECT"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations/20260913182000_error_groups_yazma_politikasi.sql (UYGULANDI)",
+      "_not": "KAPANDI 2026-09-13. Once OLCULMUS ISLEV HATASIYDI: RLS acik, tek politika SELECT, admin panelde durum/atama/not yazma (ErrorGroupsTableBody.tsx satir 313/346/377/408) RLS'e takiliyordu. Migration PR #1173 ile master'a indi, supabase-migrate kosusu 34775094857 success ile prod'a uyguladi (18:39Z) ve prod'dan dogrulandi: error_groups_update_admin | UPDATE | {authenticated} | is_admin_user() (USING + WITH CHECK). ⚠SINIR: bu politikanin VARLIGI olculdu, DUGMENIN calistigi degil - gercek bir yonetici token'iyla panel denemesi Recep'te (service_role ile deneme RLS'i baypas eder, kanit sayilmaz)."
     }
   }
 }
