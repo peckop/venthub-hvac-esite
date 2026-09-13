@@ -1,0 +1,48 @@
+{
+  "surum": 2,
+  "nicin_var": "Bir skill adi HEM depo kapsaminda (.claude/skills) HEM kullanici kapsaminda (~/.claude/skills) varsa, oturum listesinde YALNIZ BIRI gorunur ve digeri GOLGELENIR. Golgelenen dosya yerinde durur, ama yonlendirme onu adiyla secemez ve kullanim sayaci onu 'hic cagrilmamis' gosterir. Bu, atil-arac temizliginin girdisini bozar: golgelenmis bir skill 'ise yaramaz' gibi gorunur, oysa sorun dosyada degil YERLESIMDEDIR. Bu dosya bilinen her cakismayi GORUNUR ve SINIRLI kilar; YENISI eklenirse kapi KIRMIZI verir.",
+  "kapi": "src/__tests__/conformance/skill-ad-cakismasi.test.ts",
+  "olcum_tarihi": "2026-09-14",
+  "_kapinin_siniri": "Kapi kullanici kapsamini YALNIZ OKUR, asla yazmaz. CI'da kullanici agaci YOKTUR -> kapi orada OLCEMEDI der ve GECER (fail-open), gerekcesini stderr'e tek satir yazar. Yani CI'daki yesil 'cakisma yok' kaniti DEGILDIR; kapi yerel gelistirme makinesinde anlamlidir. Cakisma YALNIZ AD uzerinden aranir, icerik benzerligi olculmez.",
+  "_nicin_agent_agaci_kapsamda_degil": "`.agent/skills` Antigravity/worker agacidir ve Claude Code'un sistem istemine HIC girmez; `~/.claude` ile ad uzayi paylasmaz. `.claude` ile `.agent`ta ayni adin bulunmasi CAKISMA DEGIL, KASITLI cift agactir (CLAUDE.md: 'IKISI DE AKTIF ve KASITLI'). Kapi o kolu KIRMIZI YAPMAZ.",
+  "_olculen_yon_kurali": "Hangi kapsamin kazandigi VARSAYILMAZ, olculur. Olculmus iki vakada (office-hours, qa) DEPO kazaniyor, kullanici surumu golgede kaliyor. Bu, uc vakayi genellemek icin YETERLI DEGIL; her kayit kendi yonunu tasir ve olculmediyse 'OLCULMEDI' yazar.",
+  "cakismalar": [
+    {
+      "ad": "office-hours",
+      "depo_yolu": ".claude/skills/office-hours/SKILL.md",
+      "golgelenen": "KULLANICI",
+      "kanit": "/skill-doctor 2026-09-13 raporunda `office-hours` YALNIZ `projectSettings` kaynagiyla listeli; kullanici kapsaminda da ayni adli dizin + SKILL.md var ama listede gorunmuyor.",
+      "etkisi": "DUSUK. Depo surumu kazaniyor, yani proje disiplini yururlukte. Golgelenen kullanici surumu 'hic cagrilmamis' listesinde de GORUNMUYOR (listeye hic girmiyor), dolayisiyla atil sayimini SASIRTMIYOR.",
+      "karar": "RECEP",
+      "karar_onerisi": "Dokunulmasin. Depo surumu kazandigi surece islevsel bir kayip yok; yalnizca kullanici kapsamindaki kopya olu duruyor. Recep isterse kendi kopyasini siler.",
+      "sahibi": "ALTYAPI (olcum) / RECEP (karar)",
+      "kayit": "REC-314"
+    },
+    {
+      "ad": "qa",
+      "depo_yolu": ".claude/skills/qa/SKILL.md",
+      "golgelenen": "KULLANICI",
+      "kanit": "/skill-doctor 2026-09-13 raporunda `qa` YALNIZ `projectSettings` kaynagiyla listeli (~30 baglam, 0x, never); kullanici kapsaminda ayni adli skill var ama listede gorunmuyor.",
+      "etkisi": "DUSUK, ayni gerekce. AMA: depo surumu 0x 'hic cagrilmamis' oldugu icin atil listesinde duruyor ve tetiklenebilirlik sinavina girecek — sinav dogru dosyayi (depo surumunu) olcecek, cunku listede kazanan o.",
+      "karar": "RECEP",
+      "karar_onerisi": "Dokunulmasin; sinav sonucunu bekle.",
+      "sahibi": "ALTYAPI (olcum) / RECEP (karar)",
+      "kayit": "REC-314"
+    },
+    {
+      "ad": "investigate",
+      "depo_yolu": ".claude/skills/investigate/SKILL.md",
+      "depo_olcum": "119 satir · 6.070 bayt · Turkce · hipotez-curutme disiplini. origin/master'da mevcut; #1171 (REC-307) ile eklendi.",
+      "kullanici_olcum": "728 satir · 47.020 bayt · Ingilizce · aciklama '(gstack)' ile isaretli",
+      "golgelenen": "OLCULMEDI",
+      "kanit": "Cakisma GERCEK: origin/master'da .claude/skills/investigate/SKILL.md var (119 satir, `name: investigate`, icerik kaniti alindi) ve kullanici kapsaminda da ayni ad var.",
+      "_yon_nicin_olculemedi": "⚠ELDEKI TEK OLCUM (/skill-doctor 2026-09-13) BU SORUYU CEVAPLAMIYOR. O rapor `investigate`i yalniz `userSettings` kaynagiyla gosteriyor, ve ILK BAKISTA bu 'depo surumu golgelendi' gibi okunuyor. OLCTUM: rapor ANA DEPO calisma agacindan kosmus ve o agac o an origin/master'in 15 COMMIT GERISINDE (dcb954304), yani `.claude/skills/investigate` ORADA HENUZ YOKTU. Dolayisiyla dosya listede gorunmedi cunku golgelendi DEGIL, cunku O AGACTA MEVCUT DEGILDI. Yon ancak GUNCEL bir agactan kosan yeni bir /skill-doctor ile olculebilir.",
+      "etkisi": "OLCULMEDI. Olculmus iki kardes vakada (office-hours, qa) DEPO kazaniyor; ayni davranis burada da beklenir ama BEKLENTI OLCUM DEGILDIR.",
+      "karar": "RECEP",
+      "karar_onerisi": "Once OLC (guncel agactan /skill-doctor), sonra karar. Yon depo lehineyse dokunulmasin; kullanici lehineyse depo surumu adiyla erisilemez demektir ve o zaman gstack surumunun adi degismeli — gerekce: depo surumu ekiple paylasilir ve surumlenir, kullanici surumu tek makinede yasar.",
+      "nicin_simdi_cozulmuyor": "Kullanici kapsami (~/.claude/skills) DEPO DEGIL, Recep'in kendi yapilandirmasidir; ALTYAPI orayi YAZMAZ. Ayrica yon henuz olculmedi — olculmeden onarim yazmak, hangi adimin kirmizi oldugunu bilmeden tamir etmektir.",
+      "sahibi": "ALTYAPI (olcum) / RECEP (karar)",
+      "kayit": "REC-314"
+    }
+  ]
+}
