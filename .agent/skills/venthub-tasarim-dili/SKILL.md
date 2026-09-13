@@ -25,7 +25,7 @@ metadata:
   recovery:
     Kararlar ayna BAYAT: python scripts/nlm/kararlar_disa_aktar.py --tarih <bugun> (betik PR #1062 ile gelir)
   sahip: OPS (Kararlar'i OPS tutar; Design seritleri yazar, OPS olcer ve kabul eder)
-  kaynak: REC-173 adim 3 (2026-09-06, Recep: tasarimlar bizim tarafimizda koruma altina alinmali; yarin baska bir AI araci kullanilabilir)
+  kaynak: 'REC-173 adim 3 (2026-09-06, Recep: tasarimlar bizim tarafimizda koruma altina alinmali; yarin baska bir AI araci kullanilabilir)'
 ---
 
 # VentHub tasarım dili — bizim skill'imiz
