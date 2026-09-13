@@ -75,7 +75,7 @@
     },
     "error_groups": {
       "istemci_islemleri": ["update"],
-      "prod_politika_islemleri": ["SELECT"],
+      "prod_politika_islemleri": ["SELECT", "UPDATE"],
       "prod_politika_islemleri_eski": ["SELECT"],
       "kural_var": true,
       "kaynak": "supabase/migrations/20260913182000_error_groups_yazma_politikasi.sql (UYGULANDI)",
