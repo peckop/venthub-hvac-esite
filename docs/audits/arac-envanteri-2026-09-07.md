@@ -532,6 +532,15 @@ gerektirmez).
   betik/skill/githook/ci/cetvel sınıflarının hiçbirine girmiyor) → **envanter dışı artık, silme
   adayı (OPS ölçüp siler)**. Silmeden önce canlılık kontrolü yapılmalı (hafıza:
   silmeden-once-canlilik-ve-taze-dal).
+- **`graphify` 0.9.61** (`uv tool install graphifyy`, REC-313, 2026-09-13) — **ENVANTER-DIŞI**:
+  depo içinde dosyası yok, altı sınıfın (hook/betik/skill/githook/ci/cetvel) hiçbirine girmiyor;
+  kullanıcı kapsamında kurulu bir dış araç. Skill'i **KURULMADI** — kurulumu `.claude/CLAUDE.md`'ye
+  kalıcı blok yazıyor ve karar Recep'te (rapor §5, §8). **Bağlı adım:** codegraph bayatlık uyarısı
+  verdiğinde ya da paylaşılan-primitif riski ölçülecekken ikinci bağımsız kol — yalnız üç komut
+  (`affected <ad>()`, `god-nodes`, `diagnose multigraph`). `query` **kullanılmaz** (5 soruda 2 yanlış
+  2 eksik, sessiz yanlış üretir). **Son kullanım:** 2026-09-13, REC-313 ölçümü.
+  **Kanıt:** `docs/audits/rec313-graphify-deneme-2026-09-13.md`. Çıktı dizini `graphify-out/`
+  üretilmiş artefakttır, `.gitignore`'da.
 - **`tmp-lf-fix.yml`** — bkz. §3.5 son not: GitHub Actions tarafında `active` görünen ama repoda
   hiç var olmamış hayalet kayıt; 29'luk dosya sayımına dahil değildir, OPS'un GitHub ayarlarından
   temizlemesi gerekir.

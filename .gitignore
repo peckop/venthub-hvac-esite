@@ -137,3 +137,8 @@ qa-raporlari/
 # Yerel agaclarda kalmis kopyalar depoya sizmasin diye desen burada duruyor.
 .claude/skills/*/evals-yerlesik/
 .agent/skills/*/evals-yerlesik/
+
+# REC-313: graphify cikti dizini URETILMIS ARTEFAKTTIR, commitlenmez.
+# 09-13 olculdu: 15 MB (graph.json 10.181.569 bayt) + cache/, tek komutla
+# yeniden uretilir: graphify extract . --code-only (56 sn, LLM yok).
+graphify-out/
