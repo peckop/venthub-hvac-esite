@@ -100,8 +100,8 @@ jobs:
           # conformance'ı ayrı job'a bölmek ya zorunlu kontrolün ADINI değiştirir
           # (açık tüm PR'lar "beklenen kontrol gelmedi"de kilitlenir) ya da
           # conformance'ı zorunlu kapının DIŞINA taşır. İkisi de bedeli tam klondan
-          # ağır. Geçmiş isteyen diğer workflow'larda (deploy-functions, rls-guard,
-          # ai-auto-repair) bu satır zaten var — desen korunuyor.
+          # ağır. Geçmiş isteyen diğer workflow'larda (deploy-functions, rls-guard)
+          # bu satır zaten var — desen korunuyor.
           fetch-depth: 0
 
       - name: Setup pnpm
@@ -197,17 +197,3 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
 
-      # Hata durumunda TÜM adımların logları yüklenir
-      # ai-auto-repair.yml bu artefaktı okuyarak Jules'a iletir
-      - name: Upload CI Logs on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-logs
-          path: |
-            ci-lint.log
-            ci-typecheck.log
-            ci-deno.log
-            ci-test.log
-            ci-build.log
-          retention-days: 3
