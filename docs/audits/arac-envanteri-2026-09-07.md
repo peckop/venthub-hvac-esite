@@ -296,6 +296,8 @@ madde 1 gereği araç sayılmaz.
 | `scripts/skills-eval/lib.mjs` | SKILL YÖNLENDİRME SINAVI — SAF ÇEKİRDEK (ağ yok, dosya yazımı yok). | ALTYAPI | scripts/skills-eval-run.mjs, src/__tests__/conformance/skills-eval-puanlama.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts | KAL |
 | `scripts/hijyen/skill-bitis-blogu.mjs` | ORTAK BİTİŞ BLOĞUNU 71 SKILL.md'ye GEÇİRİR (REC-305). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skill-bitis-blogu.test.ts | KAL |
 | `scripts/skills-eval-convert.mjs` | evals.json → YERLEŞİK eval vaka ağacı dönüştürücüsü (REC-319 adım 2b). | ALTYAPI | .gitignore (betik taramasi) | 2026-09-13 (pilot: 18 vaka uretildi, 36 kosum kosuldu) | testi YOK — cikti .gitignore da, kapi kosamaz; KANIT pilot kosumu (docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md bolum 7-8) | KAL |
+| `scripts/board/linear-okundu.cjs` | Linear yorum sayacinin esik damgasini "simdi"ye ceker (`--goster`, `--geri`) | OPS *(yazan: ALTYAPI)* | ELLE kosulur, yorumlari okuyan kisi tarafindan; sayac satiri komutu kendi ciktisinda gosterir | 2026-09-14 yazildi ve kosuldu (kabul sinavi: okundu+geri gidis-donus) | INV-MECH-1 (sira ve sessizlik kolu) | KAL |
+| `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
