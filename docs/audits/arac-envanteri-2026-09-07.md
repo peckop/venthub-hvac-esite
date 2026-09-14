@@ -30,8 +30,24 @@ düzenleme kazası**ydı. Yeni kol `BELGE YAPISI SAGLAM` iki şey arar: ilk sat�
 her `|` öbeğinin ikinci satırı ayraç mı. Gerçek arızada kırmızı, onarımdan sonra yeşil
 olduğu **ölçülerek** doğrulandı.
 
-→ Aynı cümle `docs/standards/arac-envanteri-standard.md` AXIOM 3 bölümüne de girmeli; o dosya
-bu şeritte claim edilmemiş, OPS'a iletildi.
+→ Aynı cümle `docs/standards/arac-envanteri-standard.md` AXIOM 3 bölümüne **yazıldı**
+(2026-09-14, OPS onaylı: dosya panoda kimsede değildi, bu PR süresince ALTYAPI claim'ine alındı).
+
+## 0.2 · §3.3'teki 13 kalemin KAL hükmü NEYE dayanıyor
+
+13 yetenek kaleminin 26 satırında (her kalem `.claude` + `.agent` ağacında) `kanıt` hücresine
+**tetiklenebilirlik sınavı** damgası elle yazıldı. Tam tablo, sınavın beş sınırı, düzeltilen
+maliyet tabanı ve kaybolan üç alt-ajan raporunun kaydı:
+**`docs/audits/rec314-tetiklenebilirlik-sinavi-2026-09-14.md`**.
+
+Kısaca: 13 kalemin 13'ü de tetiklendi (parti 1 6/6, parti 2 20/20, `without` kolu her yerde 0).
+Üçü "hiç çağrılmamış" listesindeydi ve **sökme sırasının başındaydı** — atıl liste bir sökme
+listesi olarak kullanılsaydı çalışan üç araç silinecekti. ⚠Altı vakada koşum
+`max turns (4)` ile bittiği için **"tetikleniyor" kanıtlı, "işi bitiriyor" ölçülmedi.**
+
+⚠Bu satırların insan kolonlarının gerçekten insanın olduğu **ölçüldü**: elle yazımdan sonra
+`--yaz` koşuldu ve fark **0 bayt** çıktı, `INV-ARAC-1..3` 19/19 yeşil. Yani bölüm 0'daki sınır
+yalnız KAYIP satırının durum sütunu içindir; mevcut satırın kanıt/kapı/durum hücreleri değil.
 
 ---
 
@@ -331,18 +347,18 @@ madde 1 gereği araç sayılmaz.
 
 | # | Ad | Ağaç | ne_yapar | sahip (manifest kategorisi) | tetik | kanıt (son değişiklik · manifest) | kapı | durum |
 |---|---|---|---|---|---|---|---|---|
-| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) | 09-05 §3 KAL kararı | KAL |
-| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet | manifest kaydı | KAL |
+| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | 09-05 §3 KAL kararı | KAL |
+| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
 | 3 | typography | .claude | font/okunabilirlik/tip ölçeği | guards | `skill:typography` | 2026-08-11 · manifest yok | 09-05 §3 | KAL |
 | 4 | typography | .agent | (aynı) | guards | `skill:typography` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
-| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok | 09-05 §3 | KAL |
-| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet | manifest kaydı | KAL |
-| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
-| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok | 09-05 §3 | KAL |
-| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
 | 13 | codegraph | .claude | CodeGraph MCP caller/callee/impact | intelligence | `skill:codegraph` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
 | 14 | codegraph | .agent | (aynı) | intelligence | `skill:codegraph` | 2026-06-11 · manifest evet | manifest kaydı | KAL |
 | 15 | diff-review | .claude | git diff yıkıcı/tehlikeli örüntü tespiti | audit | `skill:diff-review` | 2026-08-25 · manifest yok | yok | ENVANTER-DISI |
@@ -365,22 +381,22 @@ madde 1 gereği araç sayılmaz.
 | 32 | plan-challenger | .agent | (aynı) | audit | `skill:plan-challenger` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 33 | skills-creator | .claude | yeni skill oluşturma/manifest derleme | orchestration | `skill:skills-creator` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 34 | skills-creator | .agent | (aynı) | orchestration | `skill:skills-creator` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok | yok | ENVANTER-DISI |
-| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | yok | ENVANTER-DISI |
+| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
 | 37 | supabase | .claude | Supabase client/servis/db query kuralı | guards | `skill:supabase` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 38 | supabase | .agent | (aynı) | guards | `skill:supabase` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
-| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet | manifest kaydı | KAL |
-| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
-| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
-| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
-| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | yok | ENVANTER-DISI |
+| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
+| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
 | 51 | agy-orchestrate | .claude | Antigravity CLI'a geniş taramayı delege eder | orchestration | `skill:agy-orchestrate` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 52 | create-migration | .claude | güvenli Supabase migration oluşturma akışı | OPS *(sahipsiz — kategori/manifest yok)* | `skill:create-migration` | 2026-08-26 · manifest yok | yok | ENVANTER-DISI |
 | 53 | maestro | .claude | bölünebilir büyük kod değişikliğini paralel dalga olarak orkestre eder | orchestration | `skill:maestro` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
@@ -395,8 +411,8 @@ madde 1 gereği araç sayılmaz.
 | 62 | maestro-combine | .agent | çakışmasız paralel merge (JSON delta) | orchestration | `skill:maestro-combine` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
 | 63 | maestro-feature | .agent | worker-judge çok-ajan özellik geliştirme | orchestration | `skill:maestro-feature` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 64 | maestro-refactor | .agent | bölünebilir büyük değişikliği paralel dalga | orchestration | `skill:maestro-refactor` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
-| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
-| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | YENI |
+| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | YENI |
 | 67 | office-hours | .claude | fikir sorgusu: plandan ONCE alti zorlayici soru + oncul curutme + 2-3 yol -> docs/plans tasarim notu; kod/emir yazmaz (gstack uyarlamasi, PR #1116) | OPS | insan (/office-hours) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 68 | qa | .claude | Playwright+Chromium ile gercek tarayici denetimi: gez -> kanit -> atomik fix(qa) -> yeniden olc; scripts/gez.mjs; prod yalniz bakis (gstack uyarlamasi, PR #1116) | OPS | insan (/qa) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 69 | llm-council | .claude | zor karar icin konsey: N mercekli uye -> anonim dondurulmus-sirali capraz puanlama -> baskan sentezi + muhalefet serhi; Workflow betigi SKILL.md icinde, "workflow kullan" sart; karar Recep'in (karpathy/llm-council fikri, PR #1116) | OPS | insan (/llm-council) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
