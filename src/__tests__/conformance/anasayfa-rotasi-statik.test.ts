@@ -141,7 +141,65 @@ describe('INV-ANASAYFA-STATIK-1 — ana sayfa önceden üretilebilir kalır', ()
     ).toBe(false)
   })
 
-  it('K5 (vaat bütünlüğü) — `revalidate` beyanı duruyor', () => {
+  it('K5 (sınıf ilanı) — rota ait olduğu sınıfı AÇIKÇA ilan eder', () => {
+    // ⭐BU KOLU KAPI ÖĞRETTİ. Ana sayfa statiğe geçtiği gün `admin-smoke` kırmızı verdi:
+    // HTML'de 2 adet `BAILOUT_TO_CLIENT_SIDE_RENDERING`. İşaretler çatıdaki iki BİLİNÇLİ
+    // adadan geliyor (kök layout `<Analytics/>`, `ClientLayout` içindeki `NavigationTracker`);
+    // ikisi de `useSearchParams()` çağırıyor ve ikisi de ZATEN Suspense sınırlı. Suspense
+    // işareti KALDIRMAZ, KAPSAR — yani "daha çok Suspense" çözüm değildi.
+    //
+    // ÖLÇÜM (2026-09-14, tek build, 245 HTML): `about` 0 · kategori 0 · ana sayfa 2 ·
+    // marka 2. Ayırt edici değişken bileşenler değil SINIF İLANIYDI; aynı dosyada A/B
+    // denendi ve ilan eklenince 2 → 0.
+    //
+    // İlan, ada bildirimini (`ANASAYFA_BILINCLI_ADALAR`, ALTYAPI) GEÇERSİZ KILMAZ: bildirim
+    // üst sınır olarak bekçi kalır, bu ilan adaların işaret bırakmamasını sağlar.
+    expect(
+      /export const dynamic\s*=\s*'force-static'/.test(kaynak()),
+      '`force-static` ilanı kalkmış — çatıdaki `<Analytics/>` ve `NavigationTracker` yeniden ' +
+        'CSR bailout işareti üretir ve `admin-smoke` SSR kapısı kırmızı yanar. Kırmızıyı ' +
+        'kapının tavanını büyüterek kapatmayın; rotayı ait olduğu sınıfa koyun.',
+    ).toBe(true)
+  })
+
+  it('K6 (kural 14) — veri çekimi HATA YOLUYLA sarılı (ağsız build\'i düşürmez)', () => {
+    // ⭐ÜRÜNLER ROTASINDA CANIMIZI YAKAN DERSİN İKİZİ — orada eksikti ve CI'ın
+    // `Build (blocking)` adımını devirdi (`getaddrinfo ENOTFOUND dummy.supabase.co` →
+    // "exiting the build"). Ana sayfada bu koruma ZATEN vardı ve tam bu yüzden aynı CI'da
+    // yeşil geçmişti; kol onu KİLİTLER.
+    //
+    // NİÇİN SINIF ÖNEMLİ: rota dinamikken veri çekimi İSTEK anında koşar — düşerse tek
+    // ziyaretçi etkilenir. Statikken aynı çağrı BUILD'İN İÇİNDE koşar ve orada düşmek TÜM
+    // BUILD'i devirir. CI'ın build adımı SAHTE Supabase adresiyle (ağsız) koşar
+    // (`ci.yml`: `NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co`), yani bu rotanın
+    // ağsız ortamda da üretilebilmesi ZORUNLUDUR (CLAUDE.md kural 14).
+    const s = kaynak()
+    let sarili = false
+    const gez = (n: ts.Node): void => {
+      if (sarili) return
+      if (
+        ts.isCallExpression(n) &&
+        ts.isIdentifier(n.expression) &&
+        n.expression.text === 'getCachedHomeData'
+      ) {
+        let p: ts.Node | undefined = n.parent
+        while (p) {
+          if (ts.isTryStatement(p)) { sarili = true; return }
+          p = p.parent
+        }
+      }
+      ts.forEachChild(n, gez)
+    }
+    gez(agac(s))
+    expect(
+      sarili,
+      '`getCachedHomeData` çağrısı bir `try` bloğunun İÇİNDE değil. Ağsız build ortamında ' +
+        'fetch düşer ve prerender TÜM BUILD\'i devirir. Hata yolu kodla birlikte yazılır: ' +
+        'düşerse sayfa yine gelir (boş veriyle), prod\'da ISR sonraki tazelemede doldurur.',
+    ).toBe(true)
+  })
+
+  it('K7 (vaat bütünlüğü) — `revalidate` beyanı duruyor', () => {
     // Rota statikken `revalidate` ISR YEDEĞİDİR ve anlamlıdır; birincil tazeleme yolu
     // webhook'tur (`rendering-cache-standard.md` §3). Beyan kalkarsa webhook sinyali
     // kaçtığı gün sayfayı düzeltecek ikinci bir yol KALMAZ.
@@ -153,7 +211,7 @@ describe('INV-ANASAYFA-STATIK-1 — ana sayfa önceden üretilebilir kalır', ()
     ).toBe(true)
   })
 
-  it('K6 (kural 12) — önbellek anahtarı ve etiketi KİRACI-KAPSAMLI kalır', () => {
+  it('K8 (kural 12) — önbellek anahtarı ve etiketi KİRACI-KAPSAMLI kalır', () => {
     // ⭐SESSİZ KUSUR KOLU. Kiracı artık sabit diye `tenantId`yi anahtardan/etiketten
     // atmak cazip görünür ama YANLIŞTIR: tazeleme webhook'u etiketi DB SATIRINDAKİ
     // `tenant_id` ile kurar (`homeDataTag(tenantId)`). İki taraf ayrışırsa webhook bir
@@ -175,7 +233,7 @@ describe('INV-ANASAYFA-STATIK-1 — ana sayfa önceden üretilebilir kalır', ()
     ).toBe(true)
   })
 
-  it('K7 (ayırt edicilik) — çözücüler kusurlu deseni GERÇEKTEN yakalıyor', () => {
+  it('K9 (ayırt edicilik) — çözücüler kusurlu deseni GERÇEKTEN yakalıyor', () => {
     // ⭐BU KOL KAPININ KENDİSİNİ SINAR. Yukarısı yeşilse sebebi "desen yok" olabileceği
     // gibi "çözücü hiçbir şeyi eşleştirmiyor" da olabilir — ikisi dışarıdan AYNI görünür.
     const kusurlu = `

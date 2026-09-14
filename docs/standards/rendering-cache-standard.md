@@ -242,16 +242,16 @@ Statik üretilen bir sayfada, çatıdaki `useSearchParams()` çağıran bileşen
 |---|---|---|
 | `/[lang]/about` | var | **0** |
 | `/[lang]/category/[slug]` | var | **0** |
-| `/[lang]` (ilan YOKKEN) | yok | **2** |
+| `/[lang]` (ilan YOKKEN — 09-14 sabahı) | yok | **2** |
 | `/[lang]/brands/[slug]` | yok | **2** |
-| `/[lang]` (aynı dosyaya ilan EKLENİNCE — A/B denemesi) | var | **0** |
-| `/[lang]/products` (bu değişiklikle) | var | **0** |
+| `/[lang]` (ilan EKLENDİKTEN sonra) | var | **0** |
+| `/[lang]/products` | var | **0** |
 
-Üçüncü satır bir **A/B denemesidir**: ana sayfa dosyasına ilan eklenip aynı build tekrarlandı
-ve işaret 2 → 0'a düştü. Ana sayfanın ilanı bu değişikliğin kapsamında DEĞİL — ayrı ve küçük
-bir işe bırakıldı, çünkü ana sayfa tavanı `ANASAYFA_BILINCLI_ADALAR` ilanıyla (ALTYAPI,
-#1193) zaten bekçili ve o iş henüz canlıda ölçülmedi. Ürünler rotasında ise ilan ZORUNLU:
-`liste` sınıfının kapı tavanı 0.
+Üçüncü satır bir **A/B ölçümüdür**: ana sayfa dosyasına tek satır eklenip aynı build
+tekrarlandı ve işaret 2 → 0'a düştü. Değişen başka hiçbir şey yok.
+
+**Ana sayfa ve ürünler rotası artık `about`/kategori ile TEK SINIFTA.** Geriye ilan taşımayan
+tek vitrin sınıfı `brands` kaldı (aşağıdaki açık kalem).
 
 > **İlan, ada bildirimini geçersiz kılmaz.** `ANASAYFA_BILINCLI_ADALAR` / `PDP_BILINCLI_ADALAR`
 > listeleri **hangi adaların bilinçli olduğunu** söyler; `force-static` ise o adaların işaret

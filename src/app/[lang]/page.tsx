@@ -17,9 +17,45 @@ import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlu
 import HomePage from '../../views/HomePage'
 
 /**
+ * ⭐ROTA SINIFINI AÇIKÇA İLAN ET (REC-59) — ve bunu KAPI ÖĞRETTİ, tahmin etmedim.
+ *
+ * Ana sayfa statiğe geçince `admin-smoke` kırmızı verdi: üretilen HTML'de 2 adet
+ * `BAILOUT_TO_CLIENT_SIDE_RENDERING` işareti. Kusuru o değişiklik ÜRETMEDİ, MASKEYİ
+ * KALDIRDI: işaretler çatıdaki iki BİLİNÇLİ adadan geliyor — kök layout'taki `<Analytics/>`
+ * ve `ClientLayout` içindeki `NavigationTracker`; ikisi de `useSearchParams()` çağırıyor ve
+ * ikisi de ZATEN Suspense ile sarılı (kural 5'e uygun). **Suspense işareti kaldırmaz,
+ * KAPSAR** (`app/layout.tsx`'in kendi notu) — yani "daha çok Suspense" bir çözüm değildi.
+ *
+ * ÖLÇÜM (2026-09-14, tek build, 245 üretilmiş HTML): `about` 0 · kategori 0 · ana sayfa 2 ·
+ * marka sayfası 2. Ayırt edici değişken bileşenler DEĞİL, **rota sınıfı ilanıydı**: ilan
+ * edenlerde 0, etmeyenlerde 2. `force-static` altında `useSearchParams()` boş döner ve
+ * bailout üretmez. Aynı dosyada A/B denendi: ilan eklenince 2 → 0.
+ *
+ * ⭐KABUL ŞARTI DEPLOY'DAN ÖNCE ÖLÇÜLDÜ — `force-static` altında `useSearchParams()`
+ * SUNUCUDA boş döner, bu yüzden "analitik bozulur mu" sorusu gerçekti. Cevap ölçüldü:
+ * ilanı ZATEN taşıyan `/tr/category/fanlar` canlıda (gerçek tarayıcı, ağ istekleri)
+ * Vercel Analytics betiğini yüklüyor VE `view` olayını POST ediyor — ilansız kontrol
+ * sayfasıyla (`/tr/brands/vortice`) birebir aynı. Yani istemci tarafı ETKİLENMİYOR.
+ * ⚠TUZAK, sonraki ölçen için: Vercel bu isteklerin yolunu KARARTIR
+ * (`/c017d035d1065e5f/script.js`, POST `/c017d035d1065e5f/view`). `_vercel/insights` diye
+ * aramak BOŞ döner ve "analitik hiç çalışmıyor" sanılır. Ada göre değil OLAYA göre ölçülür.
+ * ⚠ÖLÇÜLMEDİ: `NavigationTracker` ağ isteği üretmez (istemci içi gezinme yığını), dışarıdan
+ * ölçülebilir sinyali yok. Mekanizma aynı ve kategori rotası 09-08'den beri bu ilanla
+ * canlıda — emsalle kabul, ölçümle değil. Susarak geçmiyorum.
+ *
+ * İLAN, ADA BİLDİRİMİNİ GEÇERSİZ KILMAZ: `ANASAYFA_BILINCLI_ADALAR` (ALTYAPI, #1193) hangi
+ * adaların bilinçli olduğunu söyler ve ÜST SINIR olarak bekçi kalır; bu ilan o adaların
+ * işaret BIRAKMAMASINI sağlar. İkisi birbirinin yerine geçmez — yarın kazara doğacak
+ * üçüncü bir ada yine kırmızı verir.
+ */
+export const dynamic = 'force-static'
+
+/**
  * ISR YEDEĞİ (1 saat) — birincil tazeleme yolu webhook'tur (`rendering-cache-standard.md` §3);
  * bu yalnız EMNİYET AĞIDIR. Yedek olmadan kaçan tek bir webhook sayfayı SONSUZA DEK eski
  * bırakır ve bunu hiçbir şey söylemez — 2026-08-15'te fiyatlar yazıldı, vitrin değişmedi.
+ * (`force-static` bunu İPTAL ETMEZ: kategori ve ürünler rotaları aynı ikiliyi taşıyor ve
+ * ikisinin de canlıda tazelendiği ölçüldü.)
  */
 export const revalidate = 3600
 
