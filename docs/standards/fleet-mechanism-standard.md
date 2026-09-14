@@ -43,8 +43,25 @@ bakmadığı şeyi kanıtlamaz" dersinin aynadaki hâli: **kırmızı da bakmad�
   güvenildi. Çözüm o katmanı daha iyi ölçmek değil, **ona ihtiyaç duymamak** oldu.
 
 ⚠**Bu bölümün kendi sınırı:** üç ölçüm de **tek bir günün** fotoğrafıdır ve `SendMessage`in
-kayıpsızlığı **iki günlük** gözlemdir (09-13 gece, 09-14 sabah). Bir mesaj kaybı yaşanırsa
-karar yeniden açılır; o gün `pano notu` yerine **mesaj teslim kanıtı** aranır, gözcü değil.
+kayıpsızlığı **iki günlük** gözlemdir (09-13 gece, 09-14 sabah). ⭐Daha önemlisi: o iki gün
+boyunca pano `who`'da **en çok iki canlı şerit** vardı. Yani ölçülen şey "mesajlaşma ölçeklenir"
+değil, **"bir-iki pencerede mesajlaşma yeter"**dir.
+
+### 0.1 Kararın yeniden açılma tetikleri — ikisi de OLAY tetikli, takvim değil
+
+**Tetik 1 — mesaj kaybı.** Bir emir gönderildiği hâlde muhataba ulaşmadıysa karar yeniden
+açılır. O gün aranacak şey `pano notu` değil **mesaj teslim kanıtıdır** (gönderildi / cevap
+geldi / kayıp), gözcü değil.
+
+**Tetik 2 — ölçek.** Pano `who`'da **aynı anda 3 veya daha fazla canlı şerit** göründüğü
+**ilk gün**: o gün **ve ertesi gün** mesaj teslim kanıtı ölçülür — kaç emir gönderildi, kaçına
+cevap geldi, kaç tanesi kayboldu — ve sonuç Recep'e **tek madde** olarak gider.
+
+**Niçin takvim değil olay:** Recep 2026-09-14, *"ölçmek önemli tabii, zamanı geldiğinde
+hatırlayana"*. Bir kararı "ileride tekrar bakarız"a bağlamak onu kimsenin bakmadığı bir nota
+çevirir. Bu yüzden yeniden ölçüm **cetvele yazılı bir tetiğe** bağlandı: ekip büyüdüğü gün
+ölçüm kendiliğinden gündeme gelir, kimsenin hatırlamasına gerek kalmaz.
+(Sabah yoklamasında bu tetik kontrol edilir.)
 
 ---
 
