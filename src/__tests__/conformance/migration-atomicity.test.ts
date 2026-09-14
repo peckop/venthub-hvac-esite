@@ -287,9 +287,15 @@ describe("INV-MIGRATION-2 · uygulama sırası locale'den bağımsız ve niyete 
   })
 
   it("YENİ migration'lar 14 haneli damga kullanır (sayısal ratchet)", () => {
-    // Mevcut 176 dosya üç ayrı genişlikte ve hepsi ledger'da; yeniden adlandırmak
+    // Mevcut dosyalar üç ayrı genişlikte ve hepsi ledger'da; yeniden adlandırmak
     // ledger'ı bozar. Bu yüzden geçmiş dondurulur, gelecek kısıtlanır.
-    const UYUMSUZ_TABAN = 176
+    //
+    // ⭐TABAN SIKIŞTI: 176 → 170 (REC-321, 2026-09-14). Altı ölü migration dosyası
+    // silindi ve altısı da 8 haneli damga taşıyordu. Ratchet tam istenen şeyi yaptı:
+    // silme turunda KIRMIZI yandı ve tabanın sıkıştırılmasını ZORLADI. Taban elle
+    // düşürülmezse ratchet gevşek kalır ve altı dosyalık bir yer yeniden 8 haneli
+    // damgayla doldurulabilirdi — yani kapı bir daha bakmadığı bir boşluk bırakırdı.
+    const UYUMSUZ_TABAN = 170
     const uyumsuz = adlar.filter((a) => !/^\d{14}_/.test(a))
 
     const mesaj =
