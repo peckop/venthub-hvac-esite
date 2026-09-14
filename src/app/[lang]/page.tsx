@@ -90,7 +90,7 @@ import { unstable_cache } from 'next/cache'
 
 import { TenantProvider } from '../../hooks/useTenant'
 import { HOME_DATA_TAG, homeDataTag } from '../../lib/cache/tags'
-import { getTenantConfig } from '../../utils/tenantServer'
+import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
@@ -117,8 +117,34 @@ export default async function RootPage({ params }: Props) {
   const { lang } = await params
   const dict = lang === 'en' ? en : tr
 
-  const tenantConfig = await getTenantConfig()
-  const tenantId = tenantConfig.id
+  // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59 Adım B/1 — Recep kararı 2026-09-04:
+  // *"kiracı çözümü derleme anında sabit; `getTenantConfig` istek başlığı okumaz; çok
+  // kiracılı yetenek kodda kalır, kapalı. Hedef: ana sayfa önceden üretilir."*)
+  //
+  // ÖLÇÜM, 2026-09-09 canlı başlıklar: `/tr` → `private, no-cache, no-store` + MISS,
+  // yani ana sayfa HER ZİYARETÇİ İÇİN sıfırdan üretiliyordu. Tek sebep buydu:
+  // `getTenantConfig()` → `utils/tenantServer.ts` → `await headers()`.
+  // Aynı ölçümde `/tr/category/fanlar` → `public, must-revalidate` + HIT; o rota bu deseni
+  // PR #1136'da almıştı. Yani desen yeni değil, YERİ eksikti.
+  //
+  // NİÇİN GÜVENLİ: kategori rotasının başlığında ölçümüyle yazılı — `categories`,
+  // `product_families` ve `products` satırlarının TAMAMI tek `tenant_id` taşıyor ve o değer
+  // `DEFAULT_TENANT_ID` ile birebir aynı. Sabit, bugün zaten dönen değerdir.
+  //
+  // ⭐SESSİZ RİSKİ DE KAPATIR: tazeleme webhook'u `tenantId`yi DB SATIRINDAN alır, sayfa
+  // ise BAŞLIKTAN alıyordu. İkisi ayrışsaydı webhook bir etiketi tazeler, sayfa başka
+  // etiketle önbelleklenmiş olurdu; tazeleme ıskalardı ve hiçbir kapı görmezdi.
+  //
+  // ⭐SABİT ile DB SATIRI BİREBİR AYNI — ölçüldü, varsayılmadı (2026-09-09, prod SELECT):
+  // `tenants` tablosunda TEK satır var ve alanları `DEFAULT_TENANT_CONFIG` ile aynı
+  // (id, name "Default Tenant", subdomain "default", custom_domain null, is_active true,
+  // features {viewer3d,pdfExports,engineeringCalculators}, styles {#0f172a,#3b82f6}).
+  // Yani bu değişiklik bugün hiçbir değeri değiştirmiyor; yalnız okuma YOLUNU değiştiriyor.
+  //
+  // Çok-kiracılı yapı PARK'ta (REC-88). Geri açılırsa doğru yol kiracı başına ayrı yayın.
+  // Bekçi: INV-ANASAYFA-STATIK-1.
+  const tenantConfig = DEFAULT_TENANT_CONFIG
+  const tenantId = DEFAULT_TENANT_ID
 
   let categories: DomainCategory[] = []
   let products: Product[] = []

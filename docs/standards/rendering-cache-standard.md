@@ -158,6 +158,48 @@ ayrı ayrı kırmızı yanar.
 > prod'da elle düşürülseler repo bunu göremez. Bunları idempotent bir migration'la repoya yazmak
 > gerekir; migration prod'a otomatik uygulandığı için (CLAUDE.md kural 13) kullanıcı onayı ister.
 
+### 3.1 Ana sayfa (`/[lang]`) — yüzeyden tabloya, ölçüm 2026-09-14 (REC-59 adım 2)
+
+Yukarıdaki §3 tablosu **tablo başına** yazılmıştır: bir tablonun tetiği ve handler dalı var mı.
+Bu alt bölüm ters yönü kapatır — **bir SAYFANIN gösterdiği her tablo o zincirde var mı.** İkisi
+ayrı sorulardır ve 08-15 hatası tam bu boşlukta yaşadı.
+
+Ana sayfanın RSC'si üç şey okur (`src/app/[lang]/page.tsx`, `getCachedHomeData`):
+
+| Ana sayfada görünen | Kaynak | Tetik + handler | Ana sayfa etiketini tazeliyor mu |
+|---|---|---|---|
+| Kategori ızgarası (ad, açıklama, görsel, slug) | `categories` | `on_categories_change` + handler var | **EVET** — `revalidateTag(HOME_DATA_TAG)` |
+| Öne çıkan 12 ürün kartı | `products` | `on_products_change` + handler var | **EVET** — `revalidateTag(HOME_DATA_TAG)`; ayrıca `UPDATE` dalında `homeDataTag(tenantId)` |
+| Boş-kategori gizleme sayacı | `get_category_counts()` RPC → `products` + `categories` | üstteki iki tetik | **EVET** (türev; kendi tablosu yok) |
+
+Yani ana sayfanın tazeleme borcu **YOKTUR**; ayrı kayıt açılmadı. `product_prices` dalının ana
+sayfa etiketine bilerek dokunmaması kusur değil kuraldır: fiyat yalnız PDP'de görünür (§2), ana
+sayfa kartları `hidePrice` geçer.
+
+**⭐ETİKETİN İKİ UCU AYNI KİRACIYI SÖYLEMELİDİR.** Sayfa etiketi `homeDataTag(tenantId)` ile
+kurar, webhook ise `tenantId`yi **DB satırından** okur. Sayfa bu değeri eskiden istek
+başlığından alıyordu (`getTenantConfig()` → `headers()`); ikisi ayrışsaydı webhook bir etiketi
+tazeler, sayfa başka etiketle önbelleklenmiş olurdu — **tazeleme ıskalar ve hata sessizdir.**
+Sayfa artık `DEFAULT_TENANT_ID` derleme sabitini kullanıyor; sabitin canlı `tenants` satırıyla
+birebir aynı olduğu prod SELECT ile ölçüldü (2026-09-09, tablo TEK satır).
+
+**Sınıf değişimi ve kanıtı.** Ana sayfa `revalidate = 3600` beyan ediyordu ama beyan ÖLÜYDÜ:
+canlı ölçüm (2026-09-14, `curl -I`) `/tr` ve `/en` için `Cache-Control: private, no-cache,
+no-store` + `X-Vercel-Cache: MISS` verdi — yani §1'deki "statik + ISR" sınıfında görünüp
+gerçekte **istek başına** üretiliyordu. Tek sebep `headers()` okumasıydı. Kaldırıldıktan sonra
+`pnpm build` rota tablosu `● /[lang]` (`/tr`, `/en`) ve `Revalidate 1h` yazdı.
+
+**Kapı:** `INV-ANASAYFA-STATIK-1`
+(`src/__tests__/conformance/anasayfa-rotasi-statik.test.ts`) — `headers()`/`cookies()` çağrısını,
+başlık okuyan modülün import'unu ve `searchParams` bağını ayrı ayrı yasaklar; `revalidate`
+beyanının ve kiracı-kapsamlı önbellek anahtarı/etiketinin (kural 12) durduğunu ayrıca zorlar.
+Sabotajla doğrulandı: eski desen geri konduğunda K2 ve K3 kırmızı yanıyor.
+
+> **Açık kalem (ayrı iş):** `/[lang]/products` rotası hâlâ `getTenantConfig()` çağırıyor VE
+> gövdesinde `searchParams` var — iki sebep birden, her biri tek başına yeterli. Ürünler
+> sayfası bu yüzden hâlâ istek başına üretiliyor. REC-59 adım 2'nin ikinci yarısıdır ve bu
+> değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
+
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 
 Statik kapı repo SQL'ini denetler; **prod'un gerçekten aynı hâlde olduğu ayrıca ölçülmelidir.** Ölçüm:
