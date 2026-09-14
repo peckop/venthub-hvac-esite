@@ -1,9 +1,37 @@
-| #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` |# Araç Envanteri — 2026-09-07
+# Araç Envanteri — 2026-09-07
 
 > Kayıt: REC-180 · Şerit: OPS · Ölçüm: 2026-09-07, ağaç origin/master a248e0689 · Yöntem: 5 sonnet
 > tarama + 1 opus çürütme (curutme.md) · Bu belge cetvelin (`docs/standards/arac-envanteri-standard.md`)
 > **ilk envanteridir**; sonraki üretim `scripts/hijyen/arac-envanteri.cjs` (REC-185) — o betik
 > koşana kadar bu belge elle derlenmiştir ve AXIOM 1 gereği bu haliyle "var" sayılır.
+
+## 0 · ⚠AXIOM 3'ÜN SINIRI — üretilen satırın `durum` sütunu insan metni TUTMAZ
+
+**Ölçüldü 2026-09-14 (REC-333 / #1188, ve #1185'te sessizce kaybedilmişti):** AXIOM 3
+"üretilen dosya elle düzenlenmez, yalnız insan hükmü kolonları elle yazılır" der. Bu izin
+**YENİ eklenen satırlar** içindir. Üreticinin **KAYIP** işaretlediği bir satırın `durum`
+sütunu **üreticinin malıdır**, insanın değil: konformansın `YAZMA KIPI IDEMPOTENT` kolu
+kendi içinde `--yaz` koşar ve o sütunu kanonik hâline **geri yazar.**
+
+#1185'te o sütuna elle yazdığım hüküm **commit'ten önce silinmişti** ve ben Recep'e
+"yazdım" demiştim; master'da olmadığını sonradan ölçtüm. Ders: **hüküm ÜRETİLMEYEN yere
+yazılır** — anlatı satırına, denetim belgesine, PR gövdesine. Üretilen tabloya yazılan
+hüküm sessizce kaybolur ve kaybı hiçbir kapı söylemez.
+
+## 0.1 · ⚠BELGENİN GÖVDESİ DE ÖLÇÜLÜR — üç kol içeriyi ölçüyordu, kimse belgeye bakmıyordu
+
+**Ölçüldü 2026-09-14:** #1185 bu belgenin **birinci satırına** yedi tablo parçası yazdı ve
+`# Araç Envanteri` başlığını o satırın sonuna itti; satır **1968 bayta** çıktı. `INV-ARAC-1..3`
+üç kolu da **17/17 yeşil** kaldı, çünkü hepsi `### 3.x` bölümlerinin **içini** ölçüyordu.
+
+Üretici bunu yapamaz (satırı daima başlık genişliğine tamamlar, hücre sayısı yetmezse satıra
+dokunmaz, yazma indeksleri ayrıştırılmış tablo aralığından gelir) — yani bu bir **elle
+düzenleme kazası**ydı. Yeni kol `BELGE YAPISI SAGLAM` iki şey arar: ilk satır başlık mı, ve
+her `|` öbeğinin ikinci satırı ayraç mı. Gerçek arızada kırmızı, onarımdan sonra yeşil
+olduğu **ölçülerek** doğrulandı.
+
+→ Aynı cümle `docs/standards/arac-envanteri-standard.md` AXIOM 3 bölümüne de girmeli; o dosya
+bu şeritte claim edilmemiş, OPS'a iletildi.
 
 ---
 
@@ -27,7 +55,7 @@
   **OPS**'a yazılır (her birine en yakın şerit "devir adayı" notuyla) → nihai: ALTYAPI 29 ·
   **OPS 81** (10 asıl + 71 devir-adaylı) · URUN 3 · URUN-KATALOG 6. Cetvellerde aynı mekanik: 57
   sahipsiz satır OPS'a yazıldı (nihai OPS 59, ALTYAPI 5, URUN 3).
-- **CI'da `disabled_manually` olanlar (8 — yedisi 2026-09-14'te SİLİNDİ, bkz. REC-327 / #1185; yalnız `ai-auto-repair.yml` duruyor):** `jules-a11y.yml`, `jules-dependency-update.yml`,
+- **CI'da `disabled_manually` olanlar (8 — 2026-09-14'te SEKİZİ DE SİLİNDİ: yedisi REC-327 / #1185, `ai-auto-repair.yml` ise REC-333 / #1188 ile):** `jules-a11y.yml`, `jules-dependency-update.yml`,
   `jules-i18n-sync.yml`, `jules-lint-fix.yml`, `jules-performance.yml`, `jules-security-audit.yml`,
   `jules-test-coverage.yml`, `ai-auto-repair.yml` — GitHub tarafında elle KAPATILMIŞ, `workflow_dispatch`
   bile çalışmaz. Sonnet `ai-auto-repair.yml`'i "skipped" görüp KAL saymıştı; çürütme bunu düzeltti
@@ -428,7 +456,7 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
 | `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
 | `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
-| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | **OLU-DOGRULANDI** *(sonnet'in KAL hükmü çürütüldü)* |
+| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | KAYIP (onceki: OLU-DOGRULANDI (sonnet'in KAL hükmü çürütüldü)) |
 | `skills-gate.yml` | SKILL KAPISI — sayaç her PR'da (ücretsiz), yönlendirme sınavı yalnız skill değişince (ücretli). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi | KAL |
 | `migration-linter.yml` | INV-MIGRATION-3 — migration linter PR kapısı (squawk) | ALTYAPI | .squawk.toml (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi — SABOTAJ KANITLI (2026-09-13: sabotaj dosyasi 5 kol, cikis 123 = KIRMIZI; geri alinca 0 dosya = yesil) | KAL |
 

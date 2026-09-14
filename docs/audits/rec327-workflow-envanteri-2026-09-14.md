@@ -15,6 +15,8 @@ GitHub tarafındaki **state** alanını gösterdi: 7'sinin de state'i **`disable
 — yani bu workflow'lar GitHub arayüzünden elle kapatılmış, `workflow_dispatch` ile bile
 tetiklenemez durumda. Aynı state'te olan `ai-auto-repair.yml` de var ama o dosya
 `jules-*.yml` deseni dışında (adı farklı) ve REC-327 kapsamı dışında bırakıldı — **silinmedi**.
+(Güncelleme: `ai-auto-repair.yml` REC-333 kapsamında 2026-09-14'te ayrıca ölçülüp
+kaldırıldı — bkz. `docs/audits/rec333-ai-auto-repair-2026-09-14.md` ve aşağıdaki tablo satırı.)
 
 Tüm 7 jules workflow'unun geçmiş koşum kaydı var (hiçbiri "hiç koşmamış" değil — hepsi
 2026-03 tarihli, GitHub'ın elle kapatılmasından önceki dönemde koşmuş). Silme kararı
@@ -53,7 +55,7 @@ elle devre dışı. Kaldırma güvenli.
 
 | Dosya | Ne yapar | Tetikleyici | Son koşum (tarih · sonuç) |
 |---|---|---|---|
-| `ai-auto-repair.yml` | CI kırmızı olunca Jules'a otomatik onarım denemesi yaptırır | `workflow_run` (CI tamamlanınca) | 2026-09-02 · skipped — GitHub state **disabled_manually** (elle kapatılmış, REC-327 kapsamı dışı) |
+| ~~`ai-auto-repair.yml`~~ | **KALDIRILDI (REC-333, 2026-09-14).** CI kırmızı olunca Jules'a otomatik onarım denemesi yaptırdı. Ölçüldü: 2026-03-18'den 2026-09-02'ye dek 19 gerçek koşum (skipped değil), en az 10 "Auto-Repair" PR'ı açıldı, **hiçbiri merge edilmedi** (0/10). `ci.yml`'in `ci-logs` artefaktını üreten adımı bu dosyanın TEK okuyucusuydu — o da kaldırıldı. Detay: `docs/audits/rec333-ai-auto-repair-2026-09-14.md`. | ~~`workflow_run` (CI tamamlanınca)~~ | (kaldırıldı) |
 | `auto-label.yml` | PR açılınca/düzenlenince etiket atar | `pull_request` (opened, edited) | 2026-09-14 · success |
 | `auto-reviewer.yml` | PR açılınca otomatik reviewer atar | `pull_request` (opened) | 2026-09-14 · success |
 | `ci.yml` | Ana CI: lint/type-check/test/build | `pull_request` (push yalnız master) | 2026-09-14 · ölçüm anında çalışıyordu (conclusion boş/in-progress) |
@@ -95,4 +97,4 @@ rapor değil, elle tutulan envanter burada; kapı sayıları raporun parçası).
 Bu envanter yalnız REC-327 kapsamındaki `jules-*.yml` kaldırmasını ve kalan workflow'ların
 anlık durumunu kaydeder. `ai-auto-repair.yml` de `disabled_manually` ama adı `jules-*`
 desenine uymadığı ve iş emri kapsamı yalnız `jules-*.yml` dosyalarını kapsadığı için
-**silinmedi** — ayrı bir kayıt/iş emri gerektirir.
+**bu iş emrinde silinmedi** — ayrı kayıt REC-333'e bırakıldı ve orada 2026-09-14'te kaldırıldı.
