@@ -136,14 +136,52 @@ girmesin" der; **"canlıda yanlış politika yok" DEMEZ.** Canlı taraf ancak el
 salt-okuma bir `pg_policies` sorgusuyla ölçülür ve o ölçüm bu kapının kapsamı
 dışındadır.
 
-## 7 · ÖLÇÜLMEDİ, ADIYLA YAZILI
+## 7 · BORÇ SATIRININ SINIFI — "canlı temiz" borcu KAPATMAZ, SINIFINI değiştirir
 
-- **Canlı token denemesi yapılmadı:** "bu üç politika gerçekten hiç eşleşmiyor"
-  iddiası iki fonksiyonun gövde tutarsızlığına dayanıyor; canlı bir `anon` /
-  `authenticated` token'ıyla tek bir `select` denemesi iddiayı kesinleştirir.
-  ⛔`service_role` ile yapılan deneme **kanıt sayılmaz** — o rolde
-  `bypassrls = true`, yani politikalar hiç değerlendirilmez.
-- **Üç politikanın canlıda hâlâ var olup olmadığı 2026-09-14'te doğrulanamadı:**
-  deponun geçmişi 2026-05-30'da düşürüldüklerini, REC-322'nin 2026-09-13 ölçümü
-  hâlâ durduklarını söylüyor. Çelişki açık. Migration `IF EXISTS` kullandığı için
-  iki hâlde de güvenli, ama **"bu iş bir şey değiştirdi mi" sorusu cevapsız.**
+Borç defteri (`docs/rls-yetki-karari-borc-ilani.json`) **depo metnini** ölçer; canlı
+veritabanı **başka bir yüzeydir** (§6). Bu yüzden canlıda temiz çıkan bir kalemin
+satırı defterden **SİLİNMEZ**: silmek kapının bayatlık kolunu (R2) kırmızı yakar ve
+dahası kapıyı o dosya için **KÖR** bırakır — silinen ad, kaçak taramasından boşuna
+muaf kalır.
+
+Doğru hareket satırı silmek değil, **sınıfını** değiştirmektir. İki sınıf vardır:
+
+| Sınıf | Ne demek | Kapanma yolu |
+|---|---|---|
+| `ACIK-BORC` | Desen depo metninde duruyor **ve** canlıda yürürlükte. | Düzeltici migration. |
+| `TARIHSEL-ILAN` | Desen depo metninde duruyor (tarihsel migration dosyası asla değişmez) ama canlıda yürürlükte **değil**. | Yapılacak bir şey yok; satır yalnız kapıyı kör bırakmamak için durur. |
+
+⚠**`TARIHSEL-ILAN` bir ilan değil bir ÖLÇÜM SONUCUDUR.** Kapının **R4** kolu bu sınıfın
+`canli_durumu` alanında `CANLIDA TEMIZ` ibaresini arar; ölçüm yapılmadan sınıf verilemez.
+R4'ün sınırı da adıyla yazılı: kol **ölçümün yapıldığı İDDİASINI** ölçer, canlıyı ölçmez
+(CI'da kimlik yok) — canlı kanıt ayrı bir belgede durur (`canli_olcum_kaydi` alanı).
+
+## 8 · CANLI ÖLÇÜM YAPILDI (2026-09-14, REC-335)
+
+Recep 2026-09-14'te prod veritabanına salt-okuma izni verdi ve altı borcun tamamı
+canlıda ölçüldü: **altısı da `TARIHSEL-ILAN`.** Tam tablo ve yöntem:
+`docs/audits/rec335-rls-yetki-borclari-canli-olcum-2026-09-14.md`.
+
+§7'nin önceki hâlinde "ölçülmedi" diye duran iki madde şöyle kapandı:
+
+- **Üç depo politikasının çelişkisi çözüldü:** `storage.objects` üzerinde
+  `product_images_insert_admin` / `_update_admin` / `_delete_admin` adlı politika
+  **YOKTUR.** Aynı adlardan yalnız `product_images_update_admin`, `public.product_images`
+  tablosunda ayaktadır ve gövdesi `user_profiles.role` okur — JWT talebi okumaz. Yani
+  2026-09-13 ölçümü **tablo ayırt etmeden ada bakmış**: §4'ün dersi (aynı ad farklı tablo)
+  bu kez bir silme tuzağı değil bir **ölçüm** tuzağı olarak işledi.
+- **"Bu iş bir şey değiştirdi mi" sorusu cevaplandı: hayır.** REC-322 migration'ının üç
+  `drop policy if exists` satırı var olmayan politikaları düşürmeye çalıştı ve sessizce
+  geçti. `IF EXISTS` fail-closed niyetiyle **doğru** yazılmıştı; yanlış olan, geçmenin
+  değişiklik kanıtı sayılmasıydı.
+
+⚠Hâlâ ölçülmemiş olan: **canlı token denemesi.** Yukarıdaki hüküm `pg_policies` ve
+`pg_proc` katalog okumasına dayanır, gerçek bir `anon` / `authenticated` token'ıyla
+`select` denemesine dayanmaz. ⛔`service_role` ile yapılan deneme **kanıt sayılmaz** —
+o rolde `bypassrls = true`, yani politikalar hiç değerlendirilmez.
+
+⚠Bir yardımcıyı **çağırmak**, doğru kaynağı **okumak** demek değildir: bir politikanın
+`is_admin_user()` çağırması tek başına yeşil hükmü vermez, çünkü karar o fonksiyonun
+içinde verilir. O yüzden karar mercii hâline gelmiş yardımcıların **tam gövdesi** ayrı
+okundu. `is_admin_user` yalnız `claims ->> 'user_role'` ve `app_metadata ->> 'user_role'`
+dallarını okuyor, `user_metadata`'yı bilerek okumuyor (CLAUDE.md kural 12).
