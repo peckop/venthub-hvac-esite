@@ -4370,7 +4370,6 @@ export type Database = {
       is_staff_user: { Args: never; Returns: boolean }
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
       jwt_price_segment: { Args: never; Returns: string }
-      jwt_role: { Args: never; Returns: string }
       jwt_tenant_id: { Args: never; Returns: string }
       process_goods_receipt: {
         Args: {
