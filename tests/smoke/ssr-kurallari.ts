@@ -133,6 +133,26 @@ export const PDP_MAX_BAILOUT = PDP_BILINCLI_ADALAR.reduce((n, a) => n + a.marker
  * bailout 0 doğar, dolayısıyla bu tavanın STATİK davranışı bu PR'ın CI'ında
  * KANITLANMAZ — yalnız #1192 master'a indikten sonra kanıtlanır. Bu, "kapı yeşil ama
  * bakmadığı şeyi kanıtlamadı" sınıfıdır ve adıyla yazılmıştır.
+ *
+ * ⛔GEREKÇE DÜZELTMESİ (2026-09-14, bu ilan indikten SONRA ölçüldü — ölçen URUN):
+ * Yukarıda ve aşağıdaki `nicin` metinlerinde markerı **bileşene** bağlayan okuma
+ * EKSİKTİR. Ayırt edici bileşen DEĞİL, **ROTA SINIFI İLANIDIR:**
+ * `export const dynamic = 'force-static'` altında `useSearchParams()` boş döner ve marker
+ * **0** olur. 245 HTML'lik TEK bir derlemede ölçüldü: ilanı olan rotalar (`about`,
+ * `category`) **0**; ilanı olmayanlar (anasayfa, `brands`) **2**; anasayfaya ilan
+ * eklenince **0**.
+ *
+ * Yani bu iki ada marker **üretebilir**, ama üretip üretmemeleri rotanın ilanına bağlıdır.
+ * Doğru okuma: *"bu iki ada, rota statik ilan edilmemişse marker doğurur."*
+ *
+ * **Tavan geçerli kalır** çünkü bir ÜST SINIRDIR: ilanlı rotada gerçek sayı 0, tavan 2 —
+ * kapı yine yeşil ve yine üçüncü bir adayı yakalar. Değişen şey hüküm değil GEREKÇEDİR;
+ * ayrıca yazıyorum çünkü *bir hükmü doğru sebeple vermek, doğru hükmü yanlış sebeple
+ * vermekten farklıdır — yanlış sebep bir sonraki kararda yanlış yere götürür.*
+ *
+ * ⚠BUNDAN DOĞAN AÇIK KALEM: `brands/[slug]` sınıfının kapı kuralı bu dosyada YOK ve o
+ * rota bugün 2 marker üretiyor — yani kimse bakmıyor. Sınıf kuralı + tavan ilanı bu
+ * dosyanın işi ve REC-59'da açık kalem olarak duruyor.
  */
 export const ANASAYFA_BILINCLI_ADALAR: readonly BilincliAda[] = [
   {
