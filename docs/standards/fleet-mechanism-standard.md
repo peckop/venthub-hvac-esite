@@ -1,10 +1,50 @@
-# Filo Mekanizması — Cetvel v1.0
+# Filo Mekanizması — Cetvel v2.0
 
-> **Kapsam:** çok-oturumlu filonun **hayatta kalma katmanı** — bir şeridin panoyu duyması,
-> düzenli uyanması ve bunların *kanıtlanması*. Tek soru: *bu oturum, kendisine yazılanı
-> gerçekten duyuyor mu — ve bunu nereden biliyoruz?*
+> **v2.0 (2026-09-14, REC-328, Recep kararı — kendi sözü "1"): FİLO DOĞRUDAN MESAJLA ÇALIŞIR.**
 > **Zorlayan kapı:** `INV-MECH-1` → `src/__tests__/conformance/fleet-mechanism-integrity.test.ts`
-> **İlk yazım:** 2026-08-20 · **Ölçüm sahibi:** ALTYAPI · **İş emri:** T115-VH
+> **İlk yazım:** 2026-08-20 (v1.0) · **Ölçüm sahibi:** ALTYAPI · **Kayıt:** T115-VH → REC-328
+
+## 0. YÜRÜRLÜKTEKİ MODEL — bunu oku, aşağısı büyük ölçüde tarihseldir
+
+| Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
+|---|---|---|
+| Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
+| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
+| Uyanma | cron + tur-sonu `ScheduleWakeup` | **cron KURULMAZ** (Recep 09-06) · uyandırma = mesaj |
+| Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
+
+**Niçin değişti — ölçüldü 2026-09-14, üç kalem:**
+
+1. Gözcü bugüne kadar **tek bir not yakalamadı**. Pano `SES` sütunu iki şerit için de
+   **~2700 dk (45 saat)** sessizdi; bekçiliği yapılan kanal fiilen kullanılmıyordu.
+2. Lider oturumun `TARAMA` katmanı **asılmış**, `TESLIM` kanıtı **6955 dk (~4,8 gün)** bayattı —
+   ve filo o süre boyunca **kayıpsız** çalıştı. Bütün emirler `SendMessage` ile gitti.
+3. ALTYAPI gözcüsü **kapatıldıktan sonra** pano `who` canlılığı **0 dk** kaldı: canlılık
+   **claim atışından** gelir, gözcüden değil. Üçlünün koruduğu sanılan şey zaten başka
+   yerden geliyordu.
+
+Buna karşılık maliyeti **her turda bir uyarı satırı** ve **her açılışta bir kurulum ritüeliydi**.
+Hiçbir şey yakalamayan bir uyarı, üçüncü günde bakılmayan bir uyarıdır — bu, "yeşil kapı
+bakmadığı şeyi kanıtlamaz" dersinin aynadaki hâli: **kırmızı da bakmadığı şeyi kanıtlamaz.**
+
+**v1.0'dan GEÇERLİ KALANLAR** (silinmedi, çünkü hâlâ ölçülmüş gerçek):
+
+- **§9 kanca yazım kuralları** tamamen geçerli: `cwd` kök değildir · `venthub-sid` kimliği ·
+  `git status -uall` · `windowsHide: true` · kanıtın taşıyıcısı sorusu.
+- **Teslimat katmanında YEŞİL YOKTUR** (REC-287). Artık o katmanı ölçmüyoruz, ama ilke
+  duruyor: bir kanıtın sınıfı, dayandığı varsayımdan okunur.
+- **"Talimat davranış üretmez, mekanizma üretir"** (2026-08-20, dört oturumun sağır kalması).
+  ⭐v2.0 bunu **çürütmüyor, kapsamını daraltıyor**: mekanizma gerekiyordu çünkü *kanal* pano
+  notuydu ve pano notu pasif bir kutudur. `SendMessage` **itici** bir kanaldır — mesaj
+  konuşmaya düşer, okunmak için bir bekçi gerekmez. Yani doğru ders şu olmalıydı:
+  **pasif kanal mekanizma ister; itici kanal istemez.**
+- **2026-09-01'in 62 dakikalık kaybı** hâlâ geçerli: o gün kanıtlanamayan bir katmana
+  güvenildi. Çözüm o katmanı daha iyi ölçmek değil, **ona ihtiyaç duymamak** oldu.
+
+⚠**Bu bölümün kendi sınırı:** üç ölçüm de **tek bir günün** fotoğrafıdır ve `SendMessage`in
+kayıpsızlığı **iki günlük** gözlemdir (09-13 gece, 09-14 sabah). Bir mesaj kaybı yaşanırsa
+karar yeniden açılır; o gün `pano notu` yerine **mesaj teslim kanıtı** aranır, gözcü değil.
 
 ---
 

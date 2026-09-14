@@ -2,9 +2,42 @@
 'use strict'
 
 /**
+ * ⛔⛔EMEKLİ — Recep kararı 2026-09-14 (REC-328, kendi sözü "1"). ÇAĞIRMAYIN.
+ *
+ * Bu betik gözcü/prob/doğrula üçlüsünü kuruyor ve ölçüyordu. Üçlü KAPATILDI: filo artık
+ * DOĞRUDAN MESAJLA çalışır (SendMessage + iş bitince notify_when_idle), pano ise not kutusu
+ * değil yalnız CLAIM (dosya sahipliği) + CANLILIK yüzeyidir, emir ise LINEAR KAYDIDIR
+ * (Recep sözü önce kayda yazılır, sonra şerit emri alır).
+ *
+ * NİÇİN EMEKLİ — ölçüldü 2026-09-14, üç kalem:
+ *   1. Gözcü bugüne kadar TEK BİR NOT yakalamadı. Pano SES sütunu iki şerit için de
+ *      ~2700 dk (45 saat) SESSİZ; yani bekçiliği yapılan kanal fiilen kullanılmıyordu.
+ *   2. Lider oturumun TARAMA katmanı ASILMIŞ, TESLİM kanıtı 6955 dk (~4,8 gün) bayattı ve
+ *      filo o süre boyunca KAYIPSIZ çalıştı — bütün emirler SendMessage ile gitti.
+ *   3. ALTYAPI gözcüsü KAPATILDIKTAN SONRA pano `who` canlılığı 0 dk kaldı: canlılık
+ *      CLAIM ATIŞINDAN gelir, gözcüden DEĞİL. Yani üçlünün koruduğu sanılan şey
+ *      zaten başka bir yerden geliyordu.
+ *
+ * Buna karşılık maliyeti her turda bir uyarı satırı ve her açılışta bir kurulum ritüeliydi.
+ * Hiçbir şey yakalamayan bir uyarı, üçüncü günde bakılmayan bir uyarıdır.
+ *
+ * ⭐SİLİNMEDİ, SEBEBİ: (a) envantere yazılmayan araç yoktur ve emeklilik bir SATIRDIR, dosya
+ * silmek değil (AXIOM 1'in tersi); (b) içindeki iki ders hâlâ geçerli ve başka hiçbir yerde
+ * bu kadar net yazılı değil — "talimat davranış üretmez, mekanizma üretir" ve teslimat
+ * katmanında YEŞİL YOKTUR (REC-287). O dersler bu dosyadan okunmaya devam eder.
+ *
+ * ⚠2026-09-01'in 62 dakikalık kaybı hâlâ geçerli bir ders: o gün kanıtlanamayan bir katmana
+ * güvenildiği için zaman kaybedildi. Çözüm katmanı daha iyi ölçmek değil, ONA İHTİYAÇ
+ * DUYMAMAK oldu.
+ *
+ * Cetvel: docs/standards/fleet-mechanism-standard.md · Kayıt: REC-328
+ *
+ * ────────────────────────────────────────────────────────────────────────────
+ * AŞAĞISI TARİHSEL KAYITTIR (emeklilik öncesi gerekçe ve davranış):
+ *
  * scripts/board/mechanism-setup.cjs — MEKANİK OTONOMİ kurulumu ve DOĞRULAMASI (T115-VH)
  *
- * NİÇİN VAR — ölçülmüş vaka, tahmin değil:
+ * NİÇİN VARDI — ölçülmüş vaka, tahmin değil:
  * 2026-08-20 sabahı DÖRT oturum panoya sağır kaldı. Sağırlığın bedeli Recep'in her oturumu elle
  * dürtmesi oldu. Daha keskin olan ikinci vaka bu şeridin kendisidir: hayatta-kalma katmanını
  * mekanikleştirmekle görevli şerit, KENDİ hayatta-kalma katmanını talimatla kurmadı — talimat

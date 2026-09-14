@@ -42,6 +42,24 @@ const oku = (goreli: string): string => {
   return fs.readFileSync(tam, 'utf8').replace(/\r\n/g, '\n')
 }
 
+/**
+ * ⭐YORUMLARI ÇIKAR, SONRA ÖLÇ (v2.0 / REC-328) — ölçüt seçimi kayda geçiyor.
+ *
+ * Bu dosyanın v2.0 kolları "kanca ajanı emekli bir ritüele yollamasın" diye ölçüyor. İlk
+ * denemede iki tuzağa da düştüm: (a) "kaynakta `mechanism-setup` geçmesin" demek, emekliliği
+ * ANLATAN yorum satırlarını kusur sayıyordu; (b) yorumları saymazsam, kolun v1.0 hâli benim
+ * yorumlarım sayesinde YEŞİL kalıyordu — yani metni ölçüp davranışı ölçmüyordu.
+ * Doğrusu: yorumlar çıkarıldıktan sonra kalan KOD ölçülür.
+ */
+const yorumsuzKod = (kaynak: string): string =>
+  kaynak
+    .split('\n')
+    .filter((l) => {
+      const t = l.trim()
+      return !(t.startsWith('//') || t.startsWith('*') || t.startsWith('/*') || t.startsWith('*/'))
+    })
+    .join('\n')
+
 const KURULUM = 'scripts/board/mechanism-setup.cjs'
 const GOZCU = 'scripts/board/gozcu.cjs'
 const PANO = 'scripts/board/board.cjs'
@@ -196,42 +214,58 @@ describe('INV-MECH-1: filo mekanizması bütünlüğü', () => {
     }
   })
 
-  it('MEKANİZMA kırmızısı SESSİZLİK KURALINA yem olmaz', () => {
-    // En sinsi kusur burada olurdu: brifingin "yeni bir şey yoksa sus" kuralı, mekanizma
-    // kırmızısını da susturursa gözcü öldüğü anda hiçbir satır çıkmaz — yani kapı tam da
-    // ölçmesi gereken arızada susar. Bu yüzden ÖLÇÜM erken yapılır ve çıkış koşulu ona bakar.
-    const cikis = /if \(others\.length === 0 && notes\.length === 0 && seritAldiMi([^)]*)\) process\.exit\(0\)/.exec(
-      brifingKaynak,
-    )
-    expect(cikis, 'board-brief.cjs sessizlik kuralı satırı bulunamadı (yeniden adlandırılmış olabilir).').not.toBeNull()
+  /**
+   * ⭐v2.0 (REC-328, Recep 2026-09-14) — BU İKİ KOL TERSİNE ÇEVRİLDİ.
+   *
+   * v1.0'da bu kollar kancaların üçlü kurulumunu DAYATMASINI zorluyordu. Üçlü emekli
+   * (gözcü bir not yakalamadı, pano SES sütunu 45 saat sessizdi, lider 4,8 gün gözcüsüz
+   * çalıştı ve hiçbir emir kaybolmadı). Artık zorlanan şey TERSİ: kanca ajanı emekli bir
+   * kurulum ritüeline YOLLAMAZ.
+   *
+   * ⚠ÖLÇÜT SEÇİMİ ÖNEMLİ — ilk denemede tuzağa düştüm ve kayda geçiyorum: "kaynakta
+   * `mechanism-setup` geçmesin" diye ölçmek YANLIŞTI, çünkü emekliliği ANLATAN yorum
+   * satırlarım da o kelimeyi içeriyor ve kol onları kusur sayardı. Tersi de tuzak:
+   * yorumları saymazsam, kolun v1.0 hâli benim yorumlarım sayesinde YEŞİL kalıyordu —
+   * yani metni ölçüp davranışı ölçmüyordu. Doğru ölçüt: YORUMLAR ÇIKARILDIKTAN SONRA
+   * kalan KOD içinde talimat geçmesin. (Yardımcı `yorumsuzKod` dosya başında tanımlı.)
+   * ([[yesil-kapi-gorundugunu-kanitlamaz]])
+   */
+  it('⛔board-brief ajanı EMEKLİ kurulum ritüeline YOLLAMAZ (v2.0) ve sessizlik kuralı sağlam', () => {
+    const kod = yorumsuzKod(brifingKaynak)
     expect(
-      cikis && /!mekanizmaSatiri/.test(cikis[1]),
-      'Sessizlik kuralı MEKANİZMA kırmızısını yutuyor: çıkış koşuluna !mekanizmaSatiri eklenmeli.',
-    ).toBe(true)
+      /mechanism-setup/.test(kod),
+      'board-brief hâlâ `mechanism-setup` çağırmaya yolluyor. Üçlü EMEKLİ (REC-328): ' +
+        'her turda basılan ve hiçbir şey yakalamayan uyarı, üçüncü günde bakılmayan uyarıdır.',
+    ).toBe(false)
+    expect(
+      /gozcun KANITLANMADI|Kur ve KANITLA/.test(kod),
+      'board-brief hâlâ gözcü kurulum uyarısı basıyor (v1.0 metni).',
+    ).toBe(false)
 
-    // Sıra ölçümü SATIR indeksiyle yapılır, karakter ofsetiyle değil: ilk denemede
-    // indexOf('seritAldiMi &&') dosyanın ÇOK ÖNCESİNDEKİ '!seritAldiMi &&' ile eşleşti ve
-    // ölçüm yanlış kırmızı verdi. Substring araması, konum sorusuna yanlış araçtır.
-    const L = brifingKaynak.split('\n')
-    const cikisSatiri = L.findIndex((l) => l.includes('others.length === 0') && l.includes('process.exit(0)'))
-    const olcumSatiri = L.findIndex((l) => l.includes('mekanizmaSatiri ='))
-    expect(olcumSatiri, 'mekanizmaSatiri hiç hesaplanmıyor.').toBeGreaterThan(-1)
-    expect(cikisSatiri, 'sessizlik çıkışı satırı bulunamadı.').toBeGreaterThan(-1)
+    // Sessizlik kuralı v2.0'da SADELEŞTİ: artık yutulacak bir mekanizma kırmızısı yok,
+    // yani koşul üç terimden ibaret olmalı. Kol bunu bir kez daha ölçer ki kural kazara
+    // kaldırılmasın — pano boşken brifing akmamalı.
     expect(
-      olcumSatiri < cikisSatiri,
-      'Ölçüm, sessizlik çıkışından SONRA yapılıyor: erken çıkışta hiç koşmaz.',
+      /if \(others\.length === 0 && notes\.length === 0 && seritAldiMi\) process\.exit\(0\)/.test(brifingKaynak),
+      'Sessizlik kuralı bulunamadı ya da bozuldu: pano boş + şerit alınmışsa brifing akmamalı.',
     ).toBe(true)
   })
 
-  it('SessionStart kancası mekanizmayı oturumun İLK işi olarak dayatır', () => {
-    // Üç katman da oturumla birlikte ölür; yeni oturum onları devralmaz. Bunu hatırlatmayı
-    // insana bırakmak, 2026-08-20'de dört kez başarısız oldu.
-    expect(oturumKaynak).toMatch(/MEKANIZMA/)
-    expect(oturumKaynak).toMatch(/mechanism-setup\.cjs plan/)
+  it('⛔SessionStart kancası MESAJLA ÇALIŞAN modeli anlatır, üçlü kurulumu DAYATMAZ (v2.0)', () => {
+    const kod = yorumsuzKod(oturumKaynak)
     expect(
-      /prob/.test(oturumKaynak),
-      'Kurulum hatırlatması KANIT adımını da içermeli: kurduğunu beyan etmek kurmuş olmak değildir.',
-    ).toBe(true)
+      /mechanism-setup/.test(kod),
+      'SessionStart hâlâ üçlü kurulumunu dayatıyor. REC-328: gözcü/cron KURULMAZ.',
+    ).toBe(false)
+    expect(
+      /UCLU YEDEGINI|uclunu kur|uc katmani kur/.test(kod),
+      'SessionStart hâlâ "üçlünü kur" talimatı basıyor (v1.0 metni).',
+    ).toBe(false)
+
+    // Kaldırmak yetmez: yerine GEÇEN modelin ADI geçmeli, yoksa ajan neyle çalışacağını
+    // bilmez ve boşluğu kendi icat eder.
+    expect(kod, 'SessionStart yürürlükteki modeli adıyla anmıyor (SendMessage).').toMatch(/SendMessage/)
+    expect(kod, 'SessionStart kararın kaydını anmıyor (REC-328).').toMatch(/REC-328/)
   })
 
   it('kurulum betiği ÖLÇÜLEN ile BEYAN EDİLENİ ayırır (fail-closed)', () => {
@@ -693,13 +727,25 @@ describe('INV-MECH-BAGIMSIZLIK-1 · teslimat kanıtı YEŞİL olamaz, sınıfı 
     ).toBe(false)
   })
 
-  it('AÇILIŞ SATIRI teslimatı "KANITLI" diye sunmaz ve sınıfı DAMGADAN okur (yer değiştiren yeşil)', () => {
+  it('⛔AÇILIŞ SATIRI teslimat kanıtı SUNMAZ — çünkü o katman artık ölçülmüyor (v2.0)', () => {
+    // v1.0'da bu kol "KANITLI demesin, sınıfı damgadan okusun" diye zorluyordu; amaç
+    // sahte-yeşilin mechanism-setup'tan buraya TAŞINMASINI engellemekti. v2.0'da teslimat
+    // katmanı hiç ölçülmüyor, dolayısıyla taşınacak bir yeşil de yok. Zorlanan şey değişti:
+    // açılış satırı teslimat hakkında HİÇBİR İDDİA kurmamalı.
+    const kod = yorumsuzKod(oturumKaynak)
     expect(
-      /TESLIMAT ' \+ teslim \+ 'dk once KANITLI/.test(oturumKaynak),
-      'açılış satırı hâlâ "KANITLI" diyor — sahte-yeşil mechanism-setup tan buraya TAŞINMIŞ olur',
+      /TESLIMAT/.test(kod),
+      'açılış satırı hâlâ TESLIMAT iddiası kuruyor. O katman REC-328 ile ölçüm dışı; ' +
+        'ölçülmeyen bir şey hakkında satır basmak, okuyanda ölçülmüş izlenimi bırakır.',
     ).toBe(false)
-    expect(oturumKaynak, 'açılış satırı sınıfı damgadan okumuyor (kendi adını uyduruyor)').toMatch(/teslimKanitSinifi/)
-    expect(oturumKaynak, 'açılış satırı yeşil olmadığını söylemiyor').toMatch(/YESIL DEGILDIR/)
+    expect(
+      /teslimKanitSinifi/.test(kod),
+      'açılış satırı emekli sınıf okuyucusunu hâlâ çağırıyor.',
+    ).toBe(false)
+
+    // ⭐REC-287'nin İLKESİ SİLİNMEDİ, yalnızca uygulama alanı kalmadı: board.cjs sınıf
+    // okuyucusunu dışa açmaya devam eder, çünkü `yoklama` hâlâ TESLIM yaşını gösteriyor
+    // ve bir sayı gösteriliyorsa sınıfı da adıyla anılmalı.
     expect(panoKaynak, 'board.cjs sınıf okuyucusunu dışa açmıyor').toMatch(/teslimKanitSinifi,/)
   })
 
