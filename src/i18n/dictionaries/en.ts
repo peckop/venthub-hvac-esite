@@ -672,6 +672,11 @@ export const en: typeof tr = {
     nextAria: 'Next'
   },
   products: {
+    // REC-338 — see the TR dictionary for the measurement that motivated these keys.
+    discovery: {
+      seoTitle: 'All Products | Industrial Ventilation and HVAC — VentHub',
+      seoDesc: 'Every VentHub product family in one list: fans, heat recovery, air curtains, ducting and accessories. Engineering-led selection.',
+    },
     orbital: {
       dragHint: 'Drag to Spin',
     },
