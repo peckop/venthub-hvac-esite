@@ -31,13 +31,50 @@ OPS ilk fırsatta bir şeride devreder ya da ölü sayar. "Sahipsiz" envanterde 
 
 ## AXIOM 3 — Kanıtsız araç ÖLÜ ADAYDIR; ölü aday karantinaya gider, silme Recep kapısıdır
 
-Bir araç şu üç sorudan geçer; ilk "hayır" sınıfı belirler:
+Bir araç şu **dört** sorudan geçer; ilk "hayır" sınıfı belirler:
 
 | # | Soru | Hayır ise |
 |---|---|---|
 | 1 | **Çağıranı var mı?** (package.json `scripts`, CI `run:`, kanca komutu, `.claude/settings.json`, başka betik, skill, cetvel, komut rehberi) | ÖLÜ ADAY |
 | 2 | **Son 30 günde koşum izi var mı?** (CI run damgası, pano/log dosyası, ürettiği çıktının commit tarihi) | ÖLÜ ADAY |
 | 3 | **Bir kapı ya da test onu sınıyor mu?** | KAL (kapısız) — kapı borcu satıra yazılır |
+| 4 | **Ürettiği çıktı KABUL EDİLİYOR mu?** — yalnız çıktı üreten araçlar için (PR, öneri, rapor, ticket). Ölçüt **çıktı kabul oranı**: üretilenin kaçı merge/uygulandı. | ÇIKTISI REDDEDİLDİ |
+
+### AXIOM 3'ün dördüncü sorusu niçin var (ölçüldü 2026-09-14, REC-333)
+
+`ai-auto-repair.yml` ilk **üç** sorudan **geçiyordu**: çağıranı vardı (`ci.yml:201`), koşum
+izi vardı, Jules'a fiilen görev gidiyor ve dal yaratıyordu. Ama ürettiği **10 PR'ın hepsi
+CLOSED — 0/10 merge.**
+
+Yani ne **KAL** (bir gün işe yarar) ne **ONAR** (zincir kırık) doğruydu: **araç çalışıyordu,
+çıktısı kabul edilmiyordu.** Bu, atıl araçtan **ayrı bir sınıftır**: atıl araç
+**çağrılmaz**; bu araç **çağrılıyor ama çıktısı kabul edilmiyor.** Üç soru bu sınıfa kör
+olduğu için dördüncüsü eklendi.
+
+⚠**Sınırı:** soru yalnız **çıktı üreten** araçlara sorulur. Bir kapının ya da ölçüm
+betiğinin "çıktısı" onun kırmızı/yeşil hükmüdür; orada kabul oranı anlamsızdır ve alan
+`yok` yazılır. Ayrıca kabul oranı **ölçülmeden** yazılmaz: sayıyı veren kaynak (örneğin
+`gh pr list --search ...` çıktısı) satırın kanıtına eklenir.
+
+⚠**`CIKTISI-REDDEDILDI` durumunun kapı tarafı boştur:** `INV-ARAC-3` yalnız `OLU-ADAY`
+satırlarının bayatlığını ölçer, bu durumu ölçmez. Yani bu hüküm bugün **insan
+hükmüdür** ve mekanik bir tazelik kapısı yoktur — bu, bilinen ve yazılı bir kapı borcudur.
+
+### ⚠AXIOM 3'ün SINIRI — üretilen satırın `durum` sütunu insan metni TUTMAZ
+
+**Ölçüldü 2026-09-14 (#1185'te sessizce kaybedildi, #1188'de yeniden ölçüldü):**
+"üretilen dosya elle düzenlenmez, yalnız insan hükmü kolonları elle yazılır" izni
+**mevcut ve YENİ satırlar** içindir.
+
+Üreticinin **KAYIP** işaretlediği bir satırın `durum` sütunu **üreticinin malıdır**:
+konformansın `YAZMA KIPI IDEMPOTENT` kolu kendi içinde `--yaz` koşar ve o sütunu kanonik
+hâline **geri yazar.** #1185'te o sütuna elle yazılan hüküm **commit'ten önce silinmişti**
+ve "yazıldı" diye rapor edilmişti; master'da olmadığı sonradan ölçüldü.
+
+→ **Kural:** hüküm **üretilmeyen yere** yazılır — anlatı satırına, denetim belgesine, PR
+gövdesine. Mevcut bir satırın insan kolonları (`kanit`, `kapi`, `durum`) gerçekten
+insanındır ve üretici onlara dokunmaz; bu 2026-09-14'te ölçüldü (26 satıra elle sınav
+kanıtı yazıldı, `--yaz` sonrası fark **0 bayt**).
 
 - **ÖLÜ ADAY** hükmü tek taramayla verilmez: ikinci bir göz (bağımsız ajan ya da başka şerit)
   çağıran kanallarını yeniden arar ve **ÖLÜ DOĞRULANDI / CANLI / ÖLÇÜLEMEDİ** yazar.
@@ -58,7 +95,17 @@ Bir araç şu üç sorudan geçer; ilk "hayır" sınıfı belirler:
 | `tetik` | nereden çağrılır | `package.json:<script>` · `ci:<dosya>` · `hook:<olay>` · `githook:<ad>` · `skill:<ad>` · `elle` · `cagiran-yok` |
 | `kanit` | son koşum izi | damga + kaynak (`ci-run 2026-09-06T20:44Z` · `pano .bash-audit 2026-09-07` · `cikti docs/x.md 2026-09-05`) ya da `yok` |
 | `kapi` | sınayan test/betik | dosya adı ya da `yok` |
-| `durum` | KAL · KAL-KAPISIZ · OLU-ADAY · OLU-DOGRULANDI · KARANTINA · SILINDI · OLCULEMEDI | AXIOM 3 |
+| `durum` | KAL · KAL-KAPISIZ · OLU-ADAY · OLU-DOGRULANDI · CIKTISI-REDDEDILDI · KARANTINA · SILINDI · OLCULEMEDI | AXIOM 3 |
+
+⚠**`cikti_kabul` bugün AYRI BİR KOLON DEĞİL, `kanit` içine yazılır** — biçim
+`cikti-kabul <kabul>/<uretilen> (<kaynak>)`, örnek `cikti-kabul 0/10 (gh pr list)`.
+Çıktı üretmeyen araçlarda hiç yazılmaz.
+
+Niçin kolon değil: envanter tablosu **üretilen** bir artefakttır ve yeni bir kolon
+üreticinin başlık okuma/hücre doldurma mantığını değiştirmeyi gerektirir. Cetvele
+uygulanamayan bir alan yazmak, belgenin kendi cetvelini ihlal etmesi olurdu. **Ayrı kolon
+bilinen bir borçtur** ve üretici o kolonu doldurabildiği gün açılır; o güne kadar ölçüt
+`kanit` içindeki damgadır.
 
 Companion `.md` dosyaları (`*.cjs` yanındaki açıklama), `__pycache__`, `README.md` **araç
 değildir**; envantere girmez (2026-09-07 dersi: 13 companion "kanca" sayıldı, evren yanlıştı).
