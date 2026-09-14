@@ -88,8 +88,17 @@ const migrationDosyalari = (): string[] =>
     .filter((d) => d.endsWith('.sql'))
     .sort()
 
-type Borc = { dosya: string; ne: string; canli_durumu: string; kapanma_yolu: string }
+type Borc = {
+  dosya: string
+  ne: string
+  canli_durumu: string
+  kapanma_yolu: string
+  sinif?: string
+}
 type Ilan = { surum: number; borclar: Borc[] }
+
+/** Bir borc satirinin gecerli siniflari — ilanin `_sinif_ne_demek` alaniyla ayni evren. */
+const SINIFLAR = ['ACIK-BORC', 'TARIHSEL-ILAN'] as const
 
 const ilaniOku = (): Ilan => JSON.parse(fs.readFileSync(ILAN_YOLU, 'utf8')) as Ilan
 
@@ -152,6 +161,46 @@ describe('INV-AUTH-ROLE-2: RLS yetki karari yalniz is_admin_user() uzerinden ver
         'o dosya adi kacak taramasindan bosuna muaf kalir ve kapi KOR olur.\n' +
         'Bayatlar: ' +
         bayatlar.join(', '),
+    ).toEqual([])
+  })
+
+  it('R4 · SINIF: her borc satirinin sinifi yazili ve TARIHSEL-ILAN OLCUME dayali', () => {
+    // ⭐REC-335 (2026-09-14). Canlinin temiz olmasi borcu KAPATMAZ: bu defter DEPO
+    // METNINI olcer, canli baska bir yuzeydir. Satiri silmek R2'yi kirmizi yakar VE
+    // kapiyi o dosya icin KOR birakir. Dogru hareket satiri silmek degil, SINIFINI
+    // degistirmektir.
+    //
+    // Bu kolun isi, sinifin bir BEYAN olarak kalmasini engellemektir: TARIHSEL-ILAN
+    // demek "canlida yururlukte degil" demektir ve bu bir OLCUM iddiasidir. O yuzden
+    // kol, canli_durumu alaninda "CANLIDA TEMIZ" ibaresini ARAR. Olcum yapilmadan
+    // sinif verilemez. ("hukum soylemek yazmak degildir" dersinin kapi hali.)
+    //
+    // SINIRI: kol, olcumun YAPILDIGI IDDIASINI olcer, canliyi olcmez — CI'da kimlik
+    // yoktur. Canli kanit ayri bir belgede durur (canli_olcum_kaydi alani).
+    const hatalar: string[] = []
+    for (const b of ilaniOku().borclar) {
+      if (!b.sinif) {
+        hatalar.push(`${b.dosya}: sinif alani YOK (${SINIFLAR.join(' | ')})`)
+        continue
+      }
+      if (!SINIFLAR.includes(b.sinif as (typeof SINIFLAR)[number])) {
+        hatalar.push(`${b.dosya}: taninmayan sinif "${b.sinif}"`)
+        continue
+      }
+      if (b.sinif === 'TARIHSEL-ILAN' && !/CANLIDA TEMIZ/i.test(b.canli_durumu)) {
+        hatalar.push(
+          `${b.dosya}: TARIHSEL-ILAN ilan edilmis ama canli_durumu "CANLIDA TEMIZ" demiyor`,
+        )
+      }
+    }
+    expect(
+      hatalar,
+      'Borc satirlarinin SINIFI eksik ya da olcume dayanmiyor.\n' +
+        'TARIHSEL-ILAN bir ILAN degil bir OLCUM SONUCUDUR: desen depo metninde durur\n' +
+        'ama canlida yururlukte DEGILDIR. Olcum yapilmadan bu sinif verilemez.\n' +
+        'Cetvel: docs/standards/rls-yetki-karari-standard.md · Olcum: docs/audits/rec335-*\n' +
+        'Hatalar: ' +
+        hatalar.join(', '),
     ).toEqual([])
   })
 
