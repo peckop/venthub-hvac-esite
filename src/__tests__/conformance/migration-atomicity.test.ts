@@ -290,16 +290,20 @@ describe("INV-MIGRATION-2 · uygulama sırası locale'den bağımsız ve niyete 
     // Mevcut dosyalar üç ayrı genişlikte ve hepsi ledger'da; yeniden adlandırmak
     // ledger'ı bozar. Bu yüzden geçmiş dondurulur, gelecek kısıtlanır.
     //
-    // ⭐TABAN SIKIŞTI: 176 → 170 (REC-321, 2026-09-14). Altı ölü migration dosyası
-    // silindi; ⚠BEŞİ 8 haneli, BİRİ (202508261956_…) 12 haneli damga taşıyordu — ilk
-    // yazımda "altısı da 8 haneli" demiştim, bağımsız çürütme bunu düzeltti. Sayı
-    // etkilenmiyor çünkü ölçüt "14 mü, değil mi"; ama gerekçe cümlesi olgusal olarak
-    // yanlıştı ve "aritmetik varsayılmaz, ölçülür" ilkesinin ihlaliydi. Ratchet tam
-    // istenen şeyi yaptı:
-    // silme turunda KIRMIZI yandı ve tabanın sıkıştırılmasını ZORLADI. Taban elle
-    // düşürülmezse ratchet gevşek kalır ve altı dosyalık bir yer yeniden 8 haneli
-    // damgayla doldurulabilirdi — yani kapı bir daha bakmadığı bir boşluk bırakırdı.
-    const UYUMSUZ_TABAN = 170
+    // ⭐TABAN SIKIŞTI: 176 → 171 (REC-321, 2026-09-14). BEŞ ölü migration dosyası
+    // silindi ve beşi de 8 haneli damga taşıyordu.
+    //
+    // ⚠BU SAYI İKİ KEZ DEĞİŞTİ, ikisi de ölçümle: ilk yazımda 170 demiştim çünkü ALTI
+    // dosya siliniyordu. Bağımsız çürütme, altıncısının (202508261956_…, 12 haneli)
+    // geçerli SQL taşıdığını ve bir tablonun TEK yaratıcısı olduğunu gösterdi; o dosya
+    // SİLİNMİYOR, dolayısıyla taban 171. Aynı çürütme "altısı da 8 haneli" cümlemi de
+    // düzeltti — beşi 8, biri 12 haneliydi.
+    //
+    // Ratchet tam istenen şeyi yaptı: silme turunda KIRMIZI yandı ve tabanın
+    // sıkıştırılmasını ZORLADI. Taban elle düşürülmezse ratchet gevşek kalır ve beş
+    // dosyalık bir yer yeniden 8 haneli damgayla doldurulabilirdi — yani kapı bir daha
+    // bakmadığı bir boşluk bırakırdı.
+    const UYUMSUZ_TABAN = 171
     const uyumsuz = adlar.filter((a) => !/^\d{14}_/.test(a))
 
     const mesaj =

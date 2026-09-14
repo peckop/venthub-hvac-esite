@@ -106,6 +106,26 @@ sonrası kırılma noktası ölçülmeden yazılmaz.
 politika işi ayrı kayıttır (REC-321 adım 2). Bir temizliğin, kapatmadığı borcu
 kapatmış gibi görünmesi bu cetvelin engellediği şeydir.
 
+## 5.1 · ⭐ÖLÜ OLMAK TEK BAŞINA SİLME GEREKÇESİ DEĞİLDİR
+
+REC-321 **altı** ölü dosyayla başladı, **beşi** silindi. Altıncısı
+(`202508261956_user_invoice_profiles.sql`) **duruyor** ve sebebi ölçüldü:
+
+| Ölçüt | Bu dosya |
+|---|---|
+| Prod'a uygulanmış mı | **hayır** (ölü) |
+| Geçersiz SQL taşıyor mu | **hayır** — politikaları `DO $$ … EXCEPTION WHEN duplicate_object` ile korumalı |
+| Replay'de işe yarıyor mu | **evet** — `public.user_invoice_profiles` tablosunun depodaki **tek yaratıcısı**, ve o tabloya dokunan sekiz migration hayatta |
+
+→ **KURAL:** silme gerekçesi **ölülük değil, GEÇERSİZLİK + İŞLEVSİZLİK.** Recep'in
+ilkesi *"işe yaramayan dosya tutulmaz"* idi; bu dosya **yarıyor**, dolayısıyla ilke onu
+**kapsamıyor.** Üç ölçüt de ayrı ayrı ölçülmeden bir dosya silinmez.
+
+⭐**Bunu bir SAYI düzeltmesi ortaya çıkardı.** "Altı dosyada 11 geçersiz ifade" sayısını
+yorumsuz kod üzerinde yeniden ölçünce **10 ve beş dosyada** çıktı; fazlalığın bu dosyanın
+**yorumundan** geldiği görüldü. Yani **sayıyı düzeltmek kararı düzeltti.** Bayat bir sayı,
+yanlış bir kapsam üretir — ve kapsam uygulanmış olsaydı geri dönüşü olmayacaktı.
+
 ## 6 · SİLMEDEN ÖNCE YAZILAN KAYIT — zorunlu adım
 
 Ölü bir dosya silinmeden **önce**, o dosyanın **başka bir yerdeki ize sebep olup
@@ -132,7 +152,7 @@ Sonra iki taraf **eşit mi** diye gösterilir. Ayrıca **adım sırası** doğru
 adımı parite adımından **önce** koşmalı, yoksa silme turu kırmızı yanar.
 
 **REC-321'in sayıları:** 236 dosya · son yeşil koşum (`643c7089`) 236 · sonradan giren
-**0** · silinen 6, eklenen 1 → **dosya 231, defter 231.** Adım sırası: Baseline(80) →
+**0** · silinen **5**, eklenen 1 → **dosya 232, defter 232** (yerelde ölçüldü: 232). Adım sırası: Baseline(80) →
 Apply(95) → Parite(179). ✓
 
 ## 8 · DEFTER SİLMESİ DOĞRULANIR — "koştu" ile "yaptı" ayrı şeyler
