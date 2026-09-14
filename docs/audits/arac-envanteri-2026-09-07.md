@@ -1,9 +1,37 @@
-| #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` || #1185 ile SILINDI | KAYIP (onceki: OLU-DOGRULANDI) — **SILINDI 2026-09-14**, REC-327 / #1185: GitHub tarafinda `disabled_manually` + canli referans 0 (dort kalip tarandi). Kaldirma kaniti ve kalan 24 workflow envanteri: `docs/audits/rec327-workflow-envanteri-2026-09-14.md` |# Araç Envanteri — 2026-09-07
+# Araç Envanteri — 2026-09-07
 
 > Kayıt: REC-180 · Şerit: OPS · Ölçüm: 2026-09-07, ağaç origin/master a248e0689 · Yöntem: 5 sonnet
 > tarama + 1 opus çürütme (curutme.md) · Bu belge cetvelin (`docs/standards/arac-envanteri-standard.md`)
 > **ilk envanteridir**; sonraki üretim `scripts/hijyen/arac-envanteri.cjs` (REC-185) — o betik
 > koşana kadar bu belge elle derlenmiştir ve AXIOM 1 gereği bu haliyle "var" sayılır.
+
+## 0 · ⚠AXIOM 3'ÜN SINIRI — üretilen satırın `durum` sütunu insan metni TUTMAZ
+
+**Ölçüldü 2026-09-14 (REC-333 / #1188, ve #1185'te sessizce kaybedilmişti):** AXIOM 3
+"üretilen dosya elle düzenlenmez, yalnız insan hükmü kolonları elle yazılır" der. Bu izin
+**YENİ eklenen satırlar** içindir. Üreticinin **KAYIP** işaretlediği bir satırın `durum`
+sütunu **üreticinin malıdır**, insanın değil: konformansın `YAZMA KIPI IDEMPOTENT` kolu
+kendi içinde `--yaz` koşar ve o sütunu kanonik hâline **geri yazar.**
+
+#1185'te o sütuna elle yazdığım hüküm **commit'ten önce silinmişti** ve ben Recep'e
+"yazdım" demiştim; master'da olmadığını sonradan ölçtüm. Ders: **hüküm ÜRETİLMEYEN yere
+yazılır** — anlatı satırına, denetim belgesine, PR gövdesine. Üretilen tabloya yazılan
+hüküm sessizce kaybolur ve kaybı hiçbir kapı söylemez.
+
+## 0.1 · ⚠BELGENİN GÖVDESİ DE ÖLÇÜLÜR — üç kol içeriyi ölçüyordu, kimse belgeye bakmıyordu
+
+**Ölçüldü 2026-09-14:** #1185 bu belgenin **birinci satırına** yedi tablo parçası yazdı ve
+`# Araç Envanteri` başlığını o satırın sonuna itti; satır **1968 bayta** çıktı. `INV-ARAC-1..3`
+üç kolu da **17/17 yeşil** kaldı, çünkü hepsi `### 3.x` bölümlerinin **içini** ölçüyordu.
+
+Üretici bunu yapamaz (satırı daima başlık genişliğine tamamlar, hücre sayısı yetmezse satıra
+dokunmaz, yazma indeksleri ayrıştırılmış tablo aralığından gelir) — yani bu bir **elle
+düzenleme kazası**ydı. Yeni kol `BELGE YAPISI SAGLAM` iki şey arar: ilk satır başlık mı, ve
+her `|` öbeğinin ikinci satırı ayraç mı. Gerçek arızada kırmızı, onarımdan sonra yeşil
+olduğu **ölçülerek** doğrulandı.
+
+→ Aynı cümle `docs/standards/arac-envanteri-standard.md` AXIOM 3 bölümüne de girmeli; o dosya
+bu şeritte claim edilmemiş, OPS'a iletildi.
 
 ---
 
