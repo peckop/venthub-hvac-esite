@@ -172,7 +172,30 @@ export default async function Page({
   // Çok-kiracılı yapı PARK'ta (REC-88); geri açılırsa doğru yol kiracı başına ayrı yayın.
   const tenantConfig = DEFAULT_TENANT_CONFIG
   const tenantId = DEFAULT_TENANT_ID
-  const { items: families, total } = await getCachedFamilies(lang, tenantId, page)
+  // ⭐HATA YOLU — ve bunu KAPI ÖĞRETTİ, tahmin etmedim (CLAUDE.md kural 14).
+  //
+  // Rota dinamikken bu çağrı istek anında koşuyordu: düşerse o tek istek hata sayfası
+  // görürdü, build'in umurunda olmazdı. Statiğe geçince aynı çağrı BUILD'İN İÇİNE taşındı
+  // ve orada düşmek TÜM BUILD'İ düşürür. CI'da tam bu oldu (koşum 34842305934):
+  //   `getaddrinfo ENOTFOUND dummy.supabase.co` → "Export encountered an error on
+  //   /[lang]/products/page: /tr/products, exiting the build."
+  // CI'ın `Build (blocking)` adımı SAHTE Supabase adresiyle koşar (ağ yok) — yani bu
+  // rotanın ağsız ortamda da üretilebilmesi ZORUNLU.
+  //
+  // Kategori rotası bu tuzağa düşmüyor çünkü `generateStaticParams`'ını DB'den alıyor:
+  // ağ yoksa liste boş döner ve hiç sayfa üretilmez. Bizim dil listemiz SABİT (tr/en),
+  // yani her koşulda üretilmek zorundayız. Ana sayfa da bu yüzden aynı korumayı taşıyor.
+  //
+  // Düşerse sayfa YİNE gelir, liste boş görünür — ve sessiz yutulmaz, loglanır.
+  let families: Awaited<ReturnType<typeof getCachedFamilies>>['items'] = []
+  let total = 0
+  try {
+    const sonuc = await getCachedFamilies(lang, tenantId, page)
+    families = sonuc.items
+    total = sonuc.total
+  } catch (error) {
+    console.warn('Aile listesi alinamadi (/products):', error)
+  }
   const dict = lang === 'en' ? en : tr
 
   // Kategori kapısı — ana sayfayla AYNI kurallar, bilerek birebir:

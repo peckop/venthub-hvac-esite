@@ -232,7 +232,51 @@ describe('INV-URUNLER-STATIK-1 — ürünler listesi önceden üretilebilir ve k
     ).toBe(true)
   })
 
-  it('K9 (ayırt edicilik) — çözücüler kusurlu deseni GERÇEKTEN yakalıyor', () => {
+  it('K9 (kural 14) — veri çekimi HATA YOLUYLA sarılı (ağsız build\'i düşürmez)', () => {
+    // ⭐BU KOLU KAPI ÖĞRETTİ, tahmin etmedim. İlk sürümde `getCachedFamilies` çıplaktı ve
+    // CI `Build (blocking)` KIRMIZI verdi (koşum 34842305934):
+    //   `getaddrinfo ENOTFOUND dummy.supabase.co` → "Export encountered an error on
+    //   /[lang]/products/page: /tr/products, exiting the build."
+    //
+    // NİÇİN SINIF DEĞİŞTİ: rota dinamikken bu çağrı İSTEK anında koşuyordu — düşerse o tek
+    // ziyaretçi hata görürdü. Statiğe geçince aynı çağrı BUILD'İN İÇİNE taşındı ve orada
+    // düşmek TÜM BUILD'i düşürür. CI'ın build adımı SAHTE Supabase adresiyle (ağsız) koşar.
+    //
+    // Kategori rotası bu tuzağa düşmez: `generateStaticParams`'ını DB'den alır, ağ yoksa
+    // liste boşalır ve hiç sayfa üretilmez. Bizim dil listemiz SABİT (tr/en) — her koşulda
+    // üretilmek zorundayız, yani hata yolu ZORUNLU (CLAUDE.md kural 14).
+    //
+    // Kanıt: bu PR'ın CI'ı, ve yerelde `NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co`
+    // ile `pnpm run build:ci` → çıkış 0, rota tabloda hâlâ `● /[lang]/products`.
+    const s = kaynak()
+    const kaynakDosya = agac(s)
+    let sarili = false
+    const gez = (n: ts.Node): void => {
+      if (sarili) return
+      if (
+        ts.isCallExpression(n) &&
+        ts.isIdentifier(n.expression) &&
+        n.expression.text === 'getCachedFamilies'
+      ) {
+        let p: ts.Node | undefined = n.parent
+        while (p) {
+          if (ts.isTryStatement(p)) { sarili = true; return }
+          p = p.parent
+        }
+      }
+      ts.forEachChild(n, gez)
+    }
+    gez(kaynakDosya)
+    expect(
+      sarili,
+      '`getCachedFamilies` çağrısı bir `try` bloğunun İÇİNDE değil. Ağsız build ortamında ' +
+        '(CI: `dummy.supabase.co`) fetch düşer ve prerender TÜM BUILD\'i devirir. Hata ' +
+        'yolu kodla birlikte yazılır (kural 14): düşerse liste boş görünür, sayfa yine gelir, ' +
+        've prod\'da ISR bir sonraki tazelemede doldurur.',
+    ).toBe(true)
+  })
+
+  it('K10 (ayırt edicilik) — çözücüler kusurlu deseni GERÇEKTEN yakalıyor', () => {
     // ⭐BU KOL KAPININ KENDİSİNİ SINAR. Yukarısı yeşilse sebebi "desen yok" olabileceği
     // gibi "çözücü hiçbir şeyi eşleştirmiyor" da olabilir — ikisi dışarıdan AYNI görünür.
     const kusurlu = `
