@@ -85,10 +85,48 @@ const others = hepsi.filter(c => c.sid !== sid)
 // ([[yesil-kapi-gorundugunu-kanitlamaz]] dersinin aynadaki hali: kirmizi da bakmadigi seyi
 // kanitlamaz). Cetvel: docs/standards/fleet-mechanism-standard.md.
 //
-// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis ise brifing hic akmaz (asagidaki satir).
-if (others.length === 0 && notes.length === 0 && seritAldiMi) process.exit(0)
+// ⭐LINEAR YENI-YORUM SAYACI (REC-329) — Recep karari 2026-09-14 ("3. evet").
+//
+// NICIN BURADA: Design seritleri kararlarini Linear PROJE yorumlarina yaziyor ve o
+// yuzey PASIF — kimse bakmazsa bekler. Olculen bedel: 2026-09-09'da iki Design mesaji
+// 1,5 saat, 2026-09-13 18:23Z'deki DESIGN-KATALOG teslim yorumlari 13+ saat cevapsiz
+// kaldi. Emekli edilen gozcu uclusu (REC-328) Linear'a HIC bakmiyordu; bu bosluk yeni
+// degil, HIC KAPATILMAMISTI.
+//
+// ⭐CETVEL AYRIMI (fleet-mechanism-standard v2.0): PASIF kanal mekanizma ister, ITICI
+// kanal istemez. Linear yorumu pasif bir kutu -> mekanizma hak ediyor. Ama bu GOZCU
+// DEGIL: surec kurmaz, cron kurmaz, Monitor kurmaz. Zaten kosan bu kancanin icinde TEK
+// sorgu, TEK satir, 60 sn onbellek. "Linear yorum sayaci = kanca, gozcu degil."
+//
+// ⚠SESSIZLIK KURALINDAN ONCE hesaplaniyor ve kurala DAHIL: pano sessiz oldugunda da
+// bu satir akmali, cunku itilmesi gereken sey tam olarak o. Once yazdigim sirada
+// satir sessizlik kontrolunun ALTINDA kaliyordu ve pano bos oldugunda HIC basilmiyordu
+// — yani en cok gerektigi anda susuyordu.
+let linearSatiri = null
+try {
+  linearSatiri = require('../../scripts/board/linear-yeni-yorum.cjs')
+} catch {
+  linearSatiri = null // betik yok/bozuk: sayac YOK, kanca calismaya devam eder
+}
+
+async function linearCizgisi() {
+  if (!linearSatiri || typeof linearSatiri.satir !== 'function') return null
+  try {
+    return await linearSatiri.satir()
+  } catch {
+    return null // anahtar yok / ag yok / zaman asimi: SESSIZ, hata basmaz
+  }
+}
+
+void (async () => {
+const linear = await linearCizgisi()
+
+// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok ise
+// brifing hic akmaz.
+if (others.length === 0 && notes.length === 0 && seritAldiMi && !linear) process.exit(0)
 
 const lines = []
+if (linear) lines.push(linear)
 if (others.length > 0) {
   lines.push('PANO: ' + others.map(c => {
     const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
@@ -116,3 +154,4 @@ process.stdout.write(JSON.stringify({
     additionalContext: lines.join('\n'),
   },
 }))
+})()

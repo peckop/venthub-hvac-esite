@@ -63,6 +63,37 @@ hatırlayana"*. Bir kararı "ileride tekrar bakarız"a bağlamak onu kimsenin ba
 ölçüm kendiliğinden gündeme gelir, kimsenin hatırlamasına gerek kalmaz.
 (Sabah yoklamasında bu tetik kontrol edilir.)
 
+### 0.2 ⭐"Küçük tek amaçlı otomasyon" serbest — gözcü değil, KANCA
+
+v2.0 gözcü/prob/doğrula üçlüsünü emekli etti. Bu, **her otomasyonu** yasaklamak
+değildir. Ayrım **kanalın yönünde**:
+
+> **PASİF kanal mekanizma ister, İTİCİ kanal istemez.**
+
+`SendMessage` **itici**: gönderilen mesaj karşı tarafın turuna kendiliğinden düşer, bekçi
+gerekmez. Linear **proje yorumu pasif**: bir kutuya yazılır ve kimse bakmazsa bekler.
+
+**Ölçülmüş bedel (REC-329):** 2026-09-09'da iki Design mesajı 1,5 saat, 2026-09-13
+18:23Z'deki DESIGN-KATALOG teslim yorumları **13+ saat** cevapsız kaldı. Emekli edilen
+üçlü Linear'a **hiç bakmıyordu**; bu boşluk yeni değil, **hiç kapatılmamıştı.**
+
+**Serbest olanın sınırları — beşi birlikte sağlanmalı:**
+
+1. **Süreç kurmaz.** Cron yok, `Monitor` yok, `ScheduleWakeup` yok, koparılmış süreç yok.
+2. **Zaten koşan bir kancanın içinde** yaşar; kendi tetiği yoktur.
+3. **Tek sorgu, tek satır.** Anlatmaz, sayar.
+4. **Fail-open ve SESSİZ:** anahtar yok / ağ yok / zaman aşımı → satır yok, hata **yok**.
+   ⚠Ama sessizlik **teşhis edilebilir** olmalı: sebebi soran bir kip (`--tani`) bulunur.
+   *Sessiz bir fail-open'ın bedeli, sessizliğin sebebinin sorulamamasıdır.*
+5. **Sessizlik kuralına DAHİL EDİLİR, altına konmaz.** Satır, brifingin sessizlik
+   kontrolünden **önce** hesaplanır; yoksa pano sessizken hiç basılmaz — yani **en çok
+   gerektiği anda susar.** (Bu kusur REC-329'da ilk yazımda yapıldı, kabul sınavı
+   yakaladı, `INV-MECH-1`'e sıra kolu eklendi.)
+
+**Adı böyle konur:** *"Linear yorum sayacı = kanca, gözcü değil."* Bir otomasyonun
+hangi sınıfta olduğu, ne kadar küçük olduğuna değil, **kendi tetiği olup olmadığına**
+bakılarak söylenir.
+
 ---
 
 ## 1. Niçin bu cetvel var — ölçülmüş vaka, tahmin değil
