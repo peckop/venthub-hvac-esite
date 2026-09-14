@@ -242,12 +242,40 @@ describe('INV-MECH-1: filo mekanizması bütünlüğü', () => {
       'board-brief hâlâ gözcü kurulum uyarısı basıyor (v1.0 metni).',
     ).toBe(false)
 
-    // Sessizlik kuralı v2.0'da SADELEŞTİ: artık yutulacak bir mekanizma kırmızısı yok,
-    // yani koşul üç terimden ibaret olmalı. Kol bunu bir kez daha ölçer ki kural kazara
-    // kaldırılmasın — pano boşken brifing akmamalı.
+    // Sessizlik kuralı KORUNUR, ama terim sayısı ARTABİLİR. v2.0'da üç terimdi; REC-329
+    // ile DÖRDÜNCÜ terim eklendi (`!linear`) çünkü Linear'da okunmamış yorum varsa
+    // brifing akmalı. Kol o yüzden "tam şu dize" demiyor; TERİMLERİN VARLIĞINI ölçüyor,
+    // böylece kural genişletilebilir ama KALDIRILAMAZ.
+    // ⚠REGEX `seritAldiMi`'ye ÇAPALANIR: dosyada `if (…) process.exit(0)` biçiminde
+    // BAŞKA erken çıkışlar da var (ör. `if (!sid) process.exit(0)`) ve çapasız bir
+    // desen onların ilkini yakalayıp "terim düşmüş" diye YANLIŞ kırmızı veriyordu
+    // (ölçüldü 2026-09-14). Kapının kendi ölçümü de yanlış evreni seçebilir.
+    const sessizlik = /if \(([^)]*seritAldiMi[^)]*)\)\s*process\.exit\(0\)/.exec(brifingKaynak)
+    expect(sessizlik, 'Sessizlik kuralı BULUNAMADI: pano boş + şerit alınmışsa brifing akmamalı.').toBeTruthy()
+    for (const terim of ['others.length === 0', 'notes.length === 0', 'seritAldiMi']) {
+      expect(
+        (sessizlik as RegExpExecArray)[1].includes(terim),
+        `Sessizlik kuralından "${terim}" terimi DÜŞMÜŞ — brifing gereksiz akar.`,
+      ).toBe(true)
+    }
+
+    // ⭐REC-329 KOLU: Linear satırı sessizlik kontrolünden ÖNCE hesaplanmalı.
+    //
+    // NİÇİN BİR KOL HAK EDİYOR: ilk yazımda satırı sessizlik kontrolünün ALTINA
+    // koymuşum ve pano sessiz olduğunda Linear satırı HİÇ basılmıyordu — yani en çok
+    // gerektiği anda susuyordu. Kusur gözle yakalandı; bir daha yakalanmasın diye
+    // sıra artık ölçülüyor.
+    const linearYeri = brifingKaynak.indexOf('await linearCizgisi()')
+    const sessizlikYeri = brifingKaynak.search(/if \([^)]*?seritAldiMi[^)]*?\)\s*process\.exit\(0\)/)
+    expect(linearYeri, 'board-brief Linear sayacını hiç çağırmıyor (REC-329).').toBeGreaterThan(-1)
     expect(
-      /if \(others\.length === 0 && notes\.length === 0 && seritAldiMi\) process\.exit\(0\)/.test(brifingKaynak),
-      'Sessizlik kuralı bulunamadı ya da bozuldu: pano boş + şerit alınmışsa brifing akmamalı.',
+      linearYeri < sessizlikYeri,
+      'Linear satırı sessizlik kontrolünden SONRA hesaplanıyor — pano sessizken hiç basılmaz, ' +
+        'yani en çok gerektiği anda susar.',
+    ).toBe(true)
+    expect(
+      /&&\s*!linear\)/.test(brifingKaynak),
+      'Sessizlik koşulu Linear satırını hesaba KATMIYOR: yeni yorum varken brifing susar.',
     ).toBe(true)
   })
 
