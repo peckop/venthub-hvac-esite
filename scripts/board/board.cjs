@@ -772,8 +772,8 @@ function yoklama(now = Date.now()) {
       ? '  Panoyu OKUDUGU kanitlanamayan serit YOK.'
       : '  UYARI — PANOYU OKUDUGU KANITLANAMAYAN ' + asilmis.length + ' serit: ' +
         asilmis.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8)).join(', ') +
-        '\n  Bunlar panoya YAZABILIR ama OKUDUKLARI kanitli DEGIL: adresli emir ulasmayabilir.' +
-        '\n  Kurulum: node scripts/board/mechanism-setup.cjs plan --sid <uuid> --serit <SERIT>',
+        '\n  ⛔REC-328 SONRASI BU BEKLENEN HALDIR: gozcu EMEKLI, kurulum ONERILMEZ.' +
+        '\n  Panoya adresli NOT BIRAKMA — emir SendMessage ile gider, pano yalniz claim + canlilik.',
   )
 
   if (esik) {
@@ -784,9 +784,11 @@ function yoklama(now = Date.now()) {
       altlar.push(
         '  UYARI — TESLIMAT KANITI BAYAT/YOK (' + teslimsiz.length + ' serit): ' +
         teslimsiz.map((d) => d.c.lane + '/' + d.c.sid.slice(0, 8) + '=' + teslimYaz(d.teslim)).join(', ') +
-        '\n  TARAMA yesil olsa bile bildirim KONUSMAYA ulasmiyor olabilir: gozcu sureci compact i' +
-        '\n  sag atlatir, teslimat kanali atlatmaz (olculdu 2026-09-01, 62 dk kayip).' +
-        '\n  Kanit: mechanism-setup.cjs prob --sid X, sonra dogrula --sid X --gordum <bildirimdeki>',
+        '\n  ⛔REC-328 SONRASI BU SUTUN ARTIK BIR ARIZA DEGIL: teslimat kaniti ARANMAZ, cunku' +
+        '\n  pano bildirim kanali olarak KULLANILMIYOR. Emrin ulastiginin kaniti, akranin' +
+        '\n  SendMessage cevabidir. (2026-09-01 in 62 dk kaybi hala gecerli bir ders: o gun' +
+        '\n  kanitlanamayan bir katmana guvenilmisti — cozum katmani daha iyi olcmek degil,' +
+        '\n  ONA IHTIYAC DUYMAMAK oldu.)',
       )
     }
 

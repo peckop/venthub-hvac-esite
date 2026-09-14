@@ -149,14 +149,16 @@ context += `Açılış türü (source): ${source}\n`
 if (source === 'resume') {
   const lider = /audit|ops/i.test(process.env.CC_LANE || '') || sid === 'cb0467f1-f1a3-437d-bc15-52c0bd90feb3'
   context +=
-    'RESUME ACILISI — makine geri dondu. UCLU YEDEGINI YENIDEN KUR (gozcu Monitor + cron; ' +
-    'resume Monitor\'u getirmez, cron\'u 7 gun icinde getirebilir ama GUVENME, CronList ile OLC).\n' +
+    // ⛔REC-328: "uclunu yeniden kur" talimati kaldirildi (gozcu/cron EMEKLI).
+    // Resume'da gercekten kaybolan sey MEKANIZMA degil, KIMIN NEREDE OLDUGU bilgisidir.
+    'RESUME ACILISI — makine geri dondu. Gozcu/cron KURULMAZ (REC-328); filo dogrudan ' +
+    'mesajla calisir.\n' +
     (lider
-      ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele, uyuyan ' +
-        'her birine SendMessage: "makine dondu, uyan: uclunu kur + panoyu oku + isbasi notu birak". ' +
-        'Sonra panoyu ve bu oturuma adresli notlari isle.\n'
-      : 'Panoya ISBASI notu birak (uyandiginin kaniti) ve liderin uyandirma mesajini bekleme — ' +
-        'kendi ucluunu simdi kur.\n')
+      ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele ve ' +
+        'uyuyan her birine SendMessage at: "makine dondu, hangi isteydin, serit talebini tazele". ' +
+        'Bekleme yapma; mesaj tek kanaldir.\n'
+      : 'Serit talebini TAZELE (canlilik atistan gelir) ve liderin uyandirma mesajini bekleme — ' +
+        'hangi iste oldugunu SendMessage ile lidere yaz.\n')
 }
 
 // COMPACT DONUSU (REC-86 Faz 1). Bu kol `resume`den AYRI: resume'da makine dondu ve MEKANIZMA
@@ -263,46 +265,29 @@ try {
   // ULASTIGINI kanitlamaz. Dahasi: gozcu TEPKISEL katmandir — panoya biri yazmadikca susar,
   // dolayisiyla "canli" olmasi bir sessizligi KIRACAGI anlamina gelmez.
   // Bu yuzden satir artik IKI OLCUM basar ve tek kelimeyle "canli" DEMEZ.
-  try {
-    const esik = board.esikleriOku ? board.esikleriOku() : null
-    const tarama = board.taramaDurumu
-      ? board.taramaDurumu(sid, Date.now(), esik ? esik.TARAMA_ESIK_TUR : 3)
-      : 'KANITSIZ'
-    const teslim = board.teslimDurumu ? board.teslimDurumu(sid, Date.now()) : 'KANITSIZ'
-    const teslimBayat =
-      teslim === 'KANITSIZ' || (esik && teslim > esik.TESLIM_ESIK_DK)
-    if (tarama === 'TARIYOR' && !teslimBayat) {
-      /**
-       * ⭐REC-287 — "KANITLI" KELIMESI BURADAN KALKTI. Bu satir her oturumun ACILISINDA
-       * gorunur, yani filonun teslimat katmani hakkindaki kanaatini TEK BASINA kuran satir.
-       * "KANITLI" diyordu; oysa damganin dayanagi bir akran jetonudur ve o jeton panoyu okuyan
-       * herkese aciktir (gozcu `to` suzmez, pano dosyasi `cat` lenebilir). Sahte-yesili
-       * mechanism-setup'tan kaldirip burada birakmak, onu yalnizca TASIMAK olurdu.
-       * Sinif damgadan OKUNUR — kanca kendi adini uydurmaz.
-       */
-      const sinif = board.teslimKanitSinifi ? board.teslimKanitSinifi(sid) : null
-      context +=
-        'MEKANIZMA: TARAMA taze + TESLIMAT ' + teslim + 'dk once ' +
-        (sinif || 'SINIFI YAZILMAMIS (eski damga)') + ' kanit.\n' +
-        '  ⛔Bu YESIL DEGILDIR: teslimat katmaninda yesil YOKTUR (REC-287). Jeton panoyu\n' +
-        '  okuyan herkese acik oldugu icin kanit, iki tarafin isbirligi yapmamasina dayanir.\n'
-    } else if (tarama === 'TARIYOR' && teslimBayat) {
-      context +=
-        'MEKANIZMA — YARIM: gozcu panoyu OKUYOR ama bildirimin sana ULASTIGI KANITSIZ' +
-        (teslim === 'KANITSIZ' ? '' : ' (son kanit ' + teslim + 'dk once, bayat)') + '.\n' +
-        '  Imlec tazeligi TESLIMATI KANITLAMAZ — 2026-09-01 de tam bu farkta 62 dk kaybedildi.\n' +
-        '  ILK IS: node scripts/board/mechanism-setup.cjs prob --sid ' + sid + '\n' +
-        '  sonra jetonu BILDIRIMDE gorup: ... dogrula --sid ' + sid + ' --jeton <jeton>\n'
-    } else {
-      context +=
-        'MEKANIZMA — ILK IS BU (TARAMA=' + tarama + '): uc katmani kur ve KANITLA.\n' +
-        '  node scripts/board/mechanism-setup.cjs plan --sid ' + sid + ' --serit <SERIT>\n' +
-        '  Kurulumdan sonra: mechanism-setup.cjs prob --sid ' + sid + '\n' +
-        '  prob AYIRT EDICI testtir: gozcu olu olsaydi sonuc FARKLI olurdu. Beyan yeterli degil.\n'
-    }
-  } catch {
-    /* ölçüm aracının kendisi patlarsa oturum yine açılır (fail-open, lane-guard ile aynı ilke) */
-  }
+  // ⛔UCLU KURULUM RITUELI KALDIRILDI (REC-328, Recep karari 2026-09-14, kendi sozu "1").
+  //
+  // Eskiden burada uc kol vardi ve hepsi ajani `mechanism-setup.cjs plan|prob|dogrula`
+  // ucluusunu kurmaya yollardi. Uclu EMEKLI. Yerine gecen model, iki gundur olculerek
+  // calisan model: FILO DOGRUDAN MESAJLA calisir (SendMessage + notify_when_idle), pano ise
+  // not kutusu DEGIL yalniz CLAIM + CANLILIK yuzeyidir, emir ise LINEAR KAYDIDIR.
+  //
+  // OLCUM (2026-09-14, REC-328 kaydinda da yazili):
+  //   · Pano SES sutunu iki serit icin de ~2700 dk (45 saat) SESSIZ — gozcunun bekcilik
+  //     yaptigi kanal fiilen KULLANILMIYOR; bugune kadar YAKALADIGI NOT YOK.
+  //   · Lider oturumun TARAMA katmani ASILMIS, TESLIM kaniti 6955 dk (~4,8 gun) bayatti;
+  //     filo o sure boyunca KAYIPSIZ calisti, butun emirler SendMessage ile gitti.
+  //   · ALTYAPI gozcusu KAPATILDIKTAN SONRA pano `who` canliligi 0 dk kaldi: canlilik
+  //     CLAIM ATISINDAN gelir, gozcuden DEGIL.
+  //
+  // 2026-09-01'in dersi (imlec tazeligi teslimati kanitlamaz, 62 dk kayip) SILINMIYOR —
+  // yalnizca artik BASKA bir seyi kanitliyor: o gun kaybedilen sey, kanitlanamayan bir
+  // katmana guvenilmesiydi. Cozum katmani daha iyi olcmek degil, ONA IHTIYAC DUYMAMAK oldu.
+  // Cetvel: docs/standards/fleet-mechanism-standard.md.
+  context +=
+    'FILO ILETISIMI: dogrudan mesaj (SendMessage) + is bitince notify_when_idle. ' +
+    'Pano = claim (dosya sahipligi) + canlilik; NOT KUTUSU DEGIL. Emir = Linear kaydi ' +
+    '(Recep sozu ONCE kayda yazilir, sonra serit emri alir). Gozcu/cron KURULMAZ — REC-328.\n'
 
   context += board.summary(sid) + '\n'
 
