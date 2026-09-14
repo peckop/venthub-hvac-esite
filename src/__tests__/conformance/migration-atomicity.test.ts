@@ -291,7 +291,11 @@ describe("INV-MIGRATION-2 · uygulama sırası locale'den bağımsız ve niyete 
     // ledger'ı bozar. Bu yüzden geçmiş dondurulur, gelecek kısıtlanır.
     //
     // ⭐TABAN SIKIŞTI: 176 → 170 (REC-321, 2026-09-14). Altı ölü migration dosyası
-    // silindi ve altısı da 8 haneli damga taşıyordu. Ratchet tam istenen şeyi yaptı:
+    // silindi; ⚠BEŞİ 8 haneli, BİRİ (202508261956_…) 12 haneli damga taşıyordu — ilk
+    // yazımda "altısı da 8 haneli" demiştim, bağımsız çürütme bunu düzeltti. Sayı
+    // etkilenmiyor çünkü ölçüt "14 mü, değil mi"; ama gerekçe cümlesi olgusal olarak
+    // yanlıştı ve "aritmetik varsayılmaz, ölçülür" ilkesinin ihlaliydi. Ratchet tam
+    // istenen şeyi yaptı:
     // silme turunda KIRMIZI yandı ve tabanın sıkıştırılmasını ZORLADI. Taban elle
     // düşürülmezse ratchet gevşek kalır ve altı dosyalık bir yer yeniden 8 haneli
     // damgayla doldurulabilirdi — yani kapı bir daha bakmadığı bir boşluk bırakırdı.

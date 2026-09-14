@@ -41,25 +41,60 @@ demektir** ve **kural 13 gereği Recep'in kapısıdır.** Bu cetvel o kapıyı g
 | **Parite kapısına istisna listesi** | Kapının amacını yok eder: defter, "atla" kararının **tek** dayanağı; istisna listesi o dayanağın **kör bir sınıfını** yaratır. Üstelik konformans kolu R3 parite adımının **varlığını** ölçüyor, **katılığını ölçmüyor** — istisna eklenince kapı **yeşil görünmeye devam eder.** |
 | **Yerinde tut, başına "ÖLÜ" notu düş** | Prod'a dokunmaması cazipti (ALTYAPI ve OPS bunu önerdi). Ama **felaket kurtarmayı çözmüyor** — aşağıya bakınız. |
 
-## 4 · ⭐ÖLÇÜLMEMİŞ BOYUT: FELAKET KURTARMA — ve öneriyi bu bozdu
+## 4 · ⛔FELAKET KURTARMA — İLK YAZDIĞIM BU BÖLÜM YANLIŞTI, bağımsız çürütme çürüttü
 
-Boş bir veritabanına bütün migration'lar sırayla koşulduğunda ne olur?
+Bu bölümün ilk hâli *"replay bugün patlıyor, silme bunu çözüyor"* diyordu. **Yanlıştı.**
+Bağımsız çürütme (plan-challenger, 2026-09-14) çürüttü; ben de kendim ölçüp doğruladım.
+Yanlış cümle silinmiyor, **düzeltilmiş hâliyle burada duruyor** — çünkü bu cetvelin en
+öğretici maddesi bu.
 
-**Ölçüldü (2026-09-14):** altı ölü dosyanın **beşi** `CREATE POLICY IF NOT EXISTS`
-taşıyor. PostgreSQL bu sözdizimini **desteklemiyor** ve ifadeler **en üst seviyede**,
-hiçbir `DO $$` bloğuyla korunmuş değil. Yani **bugün sıfırdan bir kurulum denenirse o
-replay o dosyalarda sözdizimi hatasıyla patlar.**
+### Ölçülen gerçek
 
-⭐**"Yerinde tut, not düş" seçeneği bu kusuru ÇÖZMÜYORDU.** Notu okuyan insan uyarılırdı,
-replay yine patlardı. **Silme çözüyor.**
+| | Replay nerede durur | Hata türü |
+|---|---|---|
+| **Silmeden önce** | `20250907_admin_audit_log.sql` | sözdizimi hatası (`CREATE POLICY IF NOT EXISTS`) |
+| **Silmeden sonra** | `20250908_enable_realtime_error_tables.sql` | `relation "error_groups" does not exist` |
 
-→ **DERS:** bir öneri, **ölçülmemiş bir boyutta** yanlış olabilir. ALTYAPI ve OPS
-bağımsız olarak aynı seçeneği önerdi; ikisi de **felaket kurtarma boyutunu ölçmemişti.**
-İki bağımsız önerinin uyuşması, ikisi de aynı şeye bakmadıysa doğrulama değildir. Kararı
-veren Recep, ölçülmemiş boyutta daha iyi olanı seçti.
+→ **Replay iki hâlde de imkânsız.** Silme, kırılma noktasını **bir gün** ileri kaydırıyor
+ve hata türünü değiştiriyor. **Net durum değişmiyor.**
 
-→ **KURAL:** bundan sonra ölü/geçersiz migration kararlarında **DR replay boyutu ölçülür
-ve yazılır.** "Bugün zarar vermiyor" cümlesi, replay senaryosu ölçülmeden yazılmaz.
+### Ve altında daha ciddi bir şey var (yeni bulgu)
+
+**Üç tabloyu hayatta kalan HİÇBİR migration yaratmıyor:** `client_errors`,
+`error_groups`, `user_invoice_profiles`. Buna karşılık o tablolara dokunan hayatta kalan
+migration sayısı **9 · 9 · 8** (GRANT, `CREATE INDEX`, `ALTER TABLE`, `CREATE POLICY`).
+`admin_audit_log` tek istisna: onu `20250910_fix_admin_audit_log_policies.sql` yeniden
+yaratıyor.
+
+⭐**Yani bu depo, migration geçmişinden veritabanını yeniden kuramıyor.** Tablolar
+prod'da **var** (8-9 migration onlara başarıyla dokunmuş), ama depoda **onları yaratan
+bir migration yok** — yani prod'un şeması, migration geçmişinin **üretebileceğinden
+farklı.** Bu, REC-321'den **bağımsız ve daha büyük** bir açık: bugün bir felaket
+kurtarma denenirse migration geçmişi yetmez. **Ayrı kayıt gerektirir.**
+
+⚠**Bir kayıp da var, adıyla:** silinen `202508261956_user_invoice_profiles.sql`
+**geçerli SQL** taşıyordu (politikaları `DO $$ ... EXCEPTION WHEN duplicate_object`
+ile korumalı) ve `user_invoice_profiles` tablosunun **tek yaratıcısıydı.** Silmek o
+yaratıcıyı kaldırdı. Replay zaten daha erken kırıldığı için bugün **maskeli** bir
+kayıp — ama gerçek.
+
+### DERSLER (ikisi de ilk yazımdan farklı)
+
+1. ⭐**Bir öneri ölçülmemiş bir boyutta yanlış olabilir** — bu ders **ayakta**: ALTYAPI ve
+   OPS bağımsız olarak aynı seçeneği önerdi ve ikisi de DR boyutunu ölçmemişti. *İki
+   bağımsız önerinin uyuşması, ikisi de aynı şeye bakmadıysa doğrulama değildir.*
+2. ⛔**Ama "ölçtüm" demek de yetmiyor:** ben DR boyutunu ölçtüm ve **yarısını** ölçtüm.
+   *"Bu dosyalar patlıyor"* doğruydu; *"silmek bunu düzeltir"* **ölçülmemiş bir
+   çıkarımdı** — silme sonrasında replay'in nerede durduğunu ölçmemiştim. **Bir
+   düzeltmenin işe yaradığı, düzeltme SONRASI durum ölçülmeden söylenmez.**
+3. **Karar yine de doğru kalıyor** ama **başka bir sebeple:** dosyalar prod'da ölü, geri
+   dönüşü olmayan bir işlev taşımıyorlar ve depoda yanlış inanç üretiyorlar. DR gerekçesi
+   **geçersiz**; "ölü dosya tutulmaz" gerekçesi **geçerli.** Doğru hükmü yanlış sebeple
+   savunmak, bir sonraki kararda yanlış yere götürür.
+
+→ **KURAL:** ölü/geçersiz migration kararlarında DR replay boyutu **hem önce hem sonra**
+ölçülür ve **iki sayı** yazılır. "Bu düzeltme DR'ı iyileştirir" cümlesi, düzeltme
+sonrası kırılma noktası ölçülmeden yazılmaz.
 
 ## 5 · POLİTİKA KAYBI SORUSU — ayrı borç, bu cetvel onu kapatmaz
 
