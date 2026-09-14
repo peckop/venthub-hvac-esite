@@ -90,7 +90,7 @@ import { unstable_cache } from 'next/cache'
 
 import { TenantProvider } from '../../hooks/useTenant'
 import { HOME_DATA_TAG, homeDataTag } from '../../lib/cache/tags'
-import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantServer'
+import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
