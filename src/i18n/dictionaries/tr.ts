@@ -184,6 +184,14 @@ export const tr = {
     nextAria: 'Sonraki'
   },
   products: {
+    // REC-338 — keşif listesinin (`/[lang]/products`) KENDİ başlığı ve açıklaması.
+    // Eskiden bu rotanın `generateMetadata`'sı HİÇ YOKTU: canlı ölçümde (2026-09-14)
+    // `/tr/products` ve `/en/products` kök layout'un varsayılan başlığını basıyordu
+    // ve `rel="canonical"` etiketi de yoktu.
+    discovery: {
+      seoTitle: 'Tüm Ürünler | Endüstriyel Havalandırma ve HVAC — VentHub',
+      seoDesc: 'VentHub ürün ailelerinin tamamı tek listede: fanlar, ısı geri kazanım, hava perdeleri, kanal ve aksesuarlar. Mühendislik destekli seçim.',
+    },
     orbital: {
       dragHint: 'Tut Çevir',
     },

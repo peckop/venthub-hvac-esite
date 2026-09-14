@@ -195,10 +195,79 @@ başlık okuyan modülün import'unu ve `searchParams` bağını ayrı ayrı yas
 beyanının ve kiracı-kapsamlı önbellek anahtarı/etiketinin (kural 12) durduğunu ayrıca zorlar.
 Sabotajla doğrulandı: eski desen geri konduğunda K2 ve K3 kırmızı yanıyor.
 
-> **Açık kalem (ayrı iş):** `/[lang]/products` rotası hâlâ `getTenantConfig()` çağırıyor VE
-> gövdesinde `searchParams` var — iki sebep birden, her biri tek başına yeterli. Ürünler
-> sayfası bu yüzden hâlâ istek başına üretiliyor. REC-59 adım 2'nin ikinci yarısıdır ve bu
-> değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
+### 3.2 Ürünler listesi (`/[lang]/products`) — ölçüm 2026-09-14 (REC-59 adım 2 ikinci yarı)
+
+Bu rota `revalidate` beyanı bile taşımıyordu ve **iki** sebeple dinamikti (her biri tek başına
+yeterli): `getTenantConfig()` → `headers()`, ve gövdedeki `searchParams` (`?page=`).
+
+| Ürünler listesinde görünen | Kaynak | Tetik + handler | Keşif etiketini tazeliyor mu |
+|---|---|---|---|
+| Aile kartları (47 satır, tek sayfa) | `product_families` + `products` | `on_product_families_change`, `on_products_change` | **EVET** — `revalidateTag(PRODUCTS_DISCOVERY_TAG)` |
+| Kategori kapısı ızgarası | `categories` | `on_categories_change` | **EVET** |
+| Boş-kategori gizleme sayacı | `get_category_counts()` RPC | üstteki tetikler | **EVET** (türev) |
+
+Ana sayfanın etiketi (`HOME_DATA_TAG`) bilerek KULLANILMIYOR: bir yüzeyin tazelenmesi
+ötekini sessizce ısıtır/soğuturdu (PS-042). Keşif yüzeyinin kendi etiketi var.
+
+**Sayfalama kalktı, adres DEĞİŞMEDİ.** `?page=` ve `parsePageParam` kaldırıldı, `PAGE_SIZE`
+24 → 72 yükseltildi. Ölçüm (prod SELECT, 2026-09-14): `product_families` = **47** satır, yani
+tamamı tek sayfaya sığıyor. Eski `?page=2` adresi **bizim verdiğimiz sinyalde hiç yoktu**
+(canlı `sitemap.xml`'de `page=` geçişi 0; üretici `src/app/sitemap.ts` böyle bir adres
+yazmıyor). Google'ın kendi keşfiyle dizine almış olması **ölçülmedi** — kanonik adres
+konduğu için risk oradan kapanır.
+
+**Boyut (build çıktısı, `gzip -9`, 2026-09-14):** `/tr/products` **111 KB** (ham 488 KB),
+`/en/products` 103 KB, 47 ailenin tamamı sayfada. Kabul edilen üst sınır ölçülenin 1,5 katı,
+yuvarlanmış: **170 KB**. Karşılaştırma: `/tr/category/fanlar` (34 aile, aynı deseni 09-08'de
+almıştı) canlıda 105 KB.
+
+**REC-338 aynı PR'da kapandı:** rotanın `generateMetadata`'sı **hiç yoktu**. Canlı ölçüm
+(2026-09-14): `/tr/products` ve `/en/products` HTML'inde `rel="canonical"` **0**, `<title>`
+kök layout'un varsayılanı. Artık kendi başlığı (sözlükten, kural 7), kanonik adresi ve
+`tr`/`en`/`x-default` hreflang üçlüsü var.
+
+**Kapı:** `INV-URUNLER-STATIK-1` (`src/__tests__/conformance/urunler-rotasi-statik.test.ts`,
+9 kol, AST). Sabotajla doğrulandı: eski desen geri konunca K3, K4, K5 ve K7 kırmızı yanıyor.
+
+### 3.3 ⭐ROTA SINIFI İLANI — `force-static` bir üslup tercihi değil, ölçülmüş bir kaldıraç
+
+Statik üretilen bir sayfada, çatıdaki `useSearchParams()` çağıran bileşenler (kök layout'taki
+`<Analytics/>`, `ClientLayout` içindeki `NavigationTracker`) HTML'e
+`BAILOUT_TO_CLIENT_SIDE_RENDERING` işareti bırakır. **Suspense bu işareti kaldırmaz, KAPSAR**
+(`app/layout.tsx`'in kendi notu) — yani "daha çok Suspense" bir çözüm değildir.
+
+Ölçüm (2026-09-14, tek build, 245 üretilmiş HTML):
+
+| Rota | `dynamic = 'force-static'` | HTML'de bailout işareti |
+|---|---|---|
+| `/[lang]/about` | var | **0** |
+| `/[lang]/category/[slug]` | var | **0** |
+| `/[lang]` (ilan YOKKEN) | yok | **2** |
+| `/[lang]/brands/[slug]` | yok | **2** |
+| `/[lang]` (aynı dosyaya ilan EKLENİNCE — A/B denemesi) | var | **0** |
+| `/[lang]/products` (bu değişiklikle) | var | **0** |
+
+Üçüncü satır bir **A/B denemesidir**: ana sayfa dosyasına ilan eklenip aynı build tekrarlandı
+ve işaret 2 → 0'a düştü. Ana sayfanın ilanı bu değişikliğin kapsamında DEĞİL — ayrı ve küçük
+bir işe bırakıldı, çünkü ana sayfa tavanı `ANASAYFA_BILINCLI_ADALAR` ilanıyla (ALTYAPI,
+#1193) zaten bekçili ve o iş henüz canlıda ölçülmedi. Ürünler rotasında ise ilan ZORUNLU:
+`liste` sınıfının kapı tavanı 0.
+
+> **İlan, ada bildirimini geçersiz kılmaz.** `ANASAYFA_BILINCLI_ADALAR` / `PDP_BILINCLI_ADALAR`
+> listeleri **hangi adaların bilinçli olduğunu** söyler; `force-static` ise o adaların işaret
+> BIRAKMAMASINI sağlar. İlan altında işaret 0 çıkması, ada bildiriminin yanlış olduğu anlamına
+> gelmez — bildirim üst sınır olarak bekçi kalır ve yarın kazara doğacak üçüncü bir ada yine
+> kırmızı verir. İkisi birbirinin yerine geçmez.
+
+Ayırt edici değişken bileşenler değil, **sınıf ilanıydı**: `force-static` altında
+`useSearchParams()` boş döner ve bailout üretmez. Vitrin sınıfına giren her yeni rota bu
+satırı yazar; yazmazsa `admin-smoke` SSR kapısı (`e2e/ssr-html.e2e.ts`) kırmızı verir ve
+o kırmızı **kapının tavanı büyütülerek kapatılmaz** — `tests/smoke/ssr-kurallari.ts`'in kendi
+notu bunu açıkça yasaklıyor.
+
+> **Açık kalem (marka sayfaları):** `/[lang]/brands/[slug]` hâlâ ilan taşımıyor ve 2 işaret
+> üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
+> yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
 
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 
