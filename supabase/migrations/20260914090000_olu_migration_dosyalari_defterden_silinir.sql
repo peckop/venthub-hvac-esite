@@ -31,16 +31,24 @@
 -- Bu, kararı Recep'in kapısına taşıyan şeydir: prod veritabanına YAZMA.
 -- ══════════════════════════════════════════════════════════════════════════════
 --
--- ARİTMETİK (ölçüldü 2026-09-14, varsayılmadı):
---   · master'da migration dosyası            : 236
---   · son YEŞİL parite koşumunda (643c7089)  : 236  → yani defter de 236
+-- ARİTMETİK (ölçüldü 2026-09-14, varsayılmadı — ve TABAN DEĞİŞTİĞİ İÇİN YENİDEN ölçüldü):
+--   · master'da migration dosyası            : 237
+--   · son YEŞİL parite koşumunda (667a49ab)  : 237  → yani defter de 237
 --   · o koşumdan sonra master'a giren migration: 0   (ölçüldü, `git diff --diff-filter=A`)
---   · silinen dosya                          : 5  (altidan bese indi, yukariya bakiniz)
+--   · silinen dosya                          : 5  (altıdan beşe indi, yukarıya bakınız)
 --   · eklenen dosya (bu migration)           : 1
---   → dosya  : 236 − 5 + 1 = 232   (yerelde OLCULDU: 232)
---   → defter : 236 − 5 + 1 = 232   (5 satır bu dosya tarafından silinir,
+--   → dosya  : 237 − 5 + 1 = 233   (yerelde ÖLÇÜLDÜ: 233)
+--   → defter : 237 − 5 + 1 = 233   (5 satır bu dosya tarafından silinir,
 --                                    1 satır bu dosyanın kendi adı olarak eklenir)
 --   PARİTE KORUNUR.
+--
+-- ⚠SAYILAR BİR KEZ TAZELENDİ, ve niçin tazelendiği önemli: ilk yazımda taban 236 ve
+-- referans koşum `643c7089` idi. Sonra REC-322'nin migration'ı (#1186) master'a girdi
+-- ve prod'a uygulandı; yeni parite koşumu `667a49ab` 237 dosyayla YEŞİL geçti. Yani
+-- defterin dayanağı DEĞİŞTİ. Dal master'la tazelendiğinde aritmetik de yeniden
+-- ölçüldü — çünkü bu sayılar "bir kez yazılıp bırakılan" sayılar değil, TABANA BAĞLI.
+-- ⭐Bu, cetvel §7'nin ("aritmetik yazılır, varsayılmaz") sahadaki ilk sınavıydı:
+-- taban kaydığında eski sayı hâlâ doğru GÖRÜNÜYORDU ve yalnız yeniden ölçüm yakaladı.
 --
 -- ADIM SIRASI DOĞRULANDI (workflow satır numaraları): Baseline(80) → Apply(95) →
 -- Ledger paritesi(179). Yani bu dosya UYGULAMA adımında koşar ve beş satırı siler;
@@ -102,36 +110,45 @@ set statement_timeout = '5s';
 
 begin;
 
--- ⚠TAM BES AD, TEK TEK YAZILI. Desen (`LIKE '2025%'` gibi) KULLANILMADI: bir desen
+-- ⚠TAM BEŞ AD, TEK TEK YAZILI. Desen (`LIKE '2025%'` gibi) KULLANILMADI: bir desen
 -- yarın eklenen bir dosyayı da kapsayabilir ve o zaman bu migration sessizce YANLIŞ
 -- satırı siler. Ad listesi uzun ama denetlenebilir.
-delete from public._migration_ledger
-where name in (
-  '20250907_admin_audit_log.sql',
-  '20250908_client_errors.sql',
-  '20250908_error_groups.sql',
-  '20250908_error_groups_policies_fix.sql',
-  '20250909_fix_product_images_rls.sql'
-);
-
--- ⭐KALAN SATIR SAYISI DOĞRULANIR — "koştu" ile "yaptı" ayrı şeylerdir.
--- DELETE'ten sonra bu beş addan biri hâlâ defterde duruyorsa migration KIRMIZI yanar
--- ve transaction geri alınır.
 --
--- ⚠BU KONTROLÜN SINIRI, ADIYLA (bağımsız çürütme buldu, ORTA risk): kontrol "KALAN
--- satır 0 mı" diye soruyor, "KAÇ satır SİLİNDİ" diye sormuyor. Defterde bu beş addan
--- yalnız üçü varsa DELETE üçünü siler, `kalan = 0` çıkar ve exception TETİKLENMEZ.
--- Yani "fazla kalan"ı yakalar, "beklenenden az silinen"i YAKALAMAZ.
--- İKİNCİ SAVUNMA HATTI VAR: workflow'un ayrı PARİTE adımı dosya listesiyle defteri
--- tam karşılaştırıyor ve o tutarsızlığı yakalar — pratik zarar bu yüzden sınırlı.
--- ⛔NİÇİN ŞİMDİ DÜZELTİLMEDİ: doğru düzeltme (`row_count` karşılaştırması, beklenen
--- sayı ile) defterin GERÇEK hâlini bilmeyi gerektiriyor; prod salt-okuma izni bu
--- turda verilmedi. Tahminle yazılmış bir sayı kontrolü, olmayan bir kontrolden DAHA
--- KÖTÜ olurdu: yanlış beklenti migration'ı sebepsiz kırmızıya düşürürdü.
+-- ⭐SİLME VE DOĞRULAMA AYNI BLOKTA — ve beklenen sayı TAHMİN DEĞİL, ÖLÇÜLDÜ.
+-- Recep 2026-09-14'te prod defterini salt-okuma okuma iznini kendi penceresinde verdi
+-- ("OPS'a verdiğim izin seni ilgilendiren izinler geçerlidir"). Ölçüm:
+--   · `_migration_ledger` toplam kayıt : 237  → depodaki 237 dosyayla BİREBİR eşit,
+--                                              yani parite artık DOLAYLI DEĞİL, ÖLÇÜLMÜŞ
+--   · bu beş addan defterde bulunan    : 5    → yani beşi de kayıtlı
+--   · tutulan `202508261956_…` defterde: 1    → doğru, o dosya kalıyor
+--   · REC-322'nin migration'ı defterde : 1    → #1186 gerçekten uygulanmış
+--
+-- Bu sayı sayesinde kontrol artık "kalan 0 mı" değil, "TAM BEŞ satır silindi mi" diye
+-- soruyor. Önceki hâlinin kör noktası buydu (bağımsız çürütme buldu): defterde beş
+-- addan yalnız üçü olsa DELETE üçünü siler, kalan 0 çıkar ve hata TETİKLENMEZDİ.
+-- Artık beklenenden AZ silinmesi de KIRMIZI yanıyor.
 do $$
 declare
+  silinen integer;
   kalan integer;
 begin
+  delete from public._migration_ledger
+  where name in (
+    '20250907_admin_audit_log.sql',
+    '20250908_client_errors.sql',
+    '20250908_error_groups.sql',
+    '20250908_error_groups_policies_fix.sql',
+    '20250909_fix_product_images_rls.sql'
+  );
+  get diagnostics silinen = row_count;
+
+  -- İKİ YÖNLÜ KONTROL: az silinen de, kalan da hata.
+  if silinen <> 5 then
+    raise exception
+      'REC-321: BEŞ satır silinmesi beklenirken % satır silindi. Defterin hâli 2026-09-14 '
+      'ölçümünden FARKLI — parite bozulabilir, geri alındı. Yeniden ölçün.', silinen;
+  end if;
+
   select count(*) into kalan
   from public._migration_ledger
   where name in (
@@ -143,7 +160,7 @@ begin
   );
   if kalan <> 0 then
     raise exception
-      'REC-321: defterde bu bes addan % tanesi HALA duruyor — parite bozulur, geri alindi', kalan;
+      'REC-321: silmeden sonra bu beş addan % tanesi HÂLÂ duruyor — geri alındı.', kalan;
   end if;
 end $$;
 

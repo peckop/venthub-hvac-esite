@@ -1,0 +1,63 @@
+{
+  "_ne": "RLS yetki karari BORC DEFTERI. Depoda 'jwt.claims ->> role' kalibini YETKI KARARI olarak tasiyan migration dosyalarinin ILAN EDILMIS listesi. Cetvel: docs/standards/rls-yetki-karari-standard.md. Kapi: INV-AUTH-ROLE-2.",
+  "_nicin_ilan": "Kapi bu listeye BAKAR: listede OLMAYAN bir dosya bu kalibi tasirsa KIRMIZI yanar. Yani kapi gecmisi affeder ama YENI ihlali yakalar. Liste bir MUAFIYET degil BORCTUR: her satir 'bu dosya hala yanlis kaynagi okuyor' demektir ve kapanmasi beklenir.",
+  "_nicin_bos_degil": "Bugun 6 kalem var (ilk yazimda 5 sanilmisti; bagimsiz curutme + tirnak duzlestirmesi altincisini bulmustu). Liste KUCULDUKCE is ilerliyor demektir. Liste buyurse yeni borc alinmis demektir ve bunun gerekcesi yazilmali.",
+  "_bayatlik_kolu": "Kapinin ucuncu kolu tersini de arar: ilan edilen bir dosya artik kalibi TASIMIYORSA (temizlenmis ya da silinmis) ilan BAYATTIR ve KIRMIZI yanar. Cozulmus bir borc defterde kalirsa kapi o dosya icin KOR kalir — bu ders 2026-09-14'te skill ad cakismasi ilaninda SAHADA olculdu.",
+  "_olcum_yuzeyi": "supabase/migrations/*.sql dosyalarinin METNI, yorumlar CIKARILDIKTAN SONRA. Canli veritabani DEGIL — CI'da kimlik yok. Yani kapi 'depoya yeni yanlis politika girmesin' der, 'canlida yanlis politika yok' DEMEZ. Olcum IKI normalizasyondan sonra yapilir: yorumlar cikarilir VE ikilenmis tirnaklar duzlestirilir (dinamik politika uretimi ifadeyi METIN olarak tasir).",
+  "_yorumlar_nicin_cikarilir": "Cetveli ve emeklilik gerekcesini ANLATAN yorumlar da bu kalibi iceriyor. Yorumu saymak metni olcup davranisi olcmemektir; tersi de tuzak (yorumdaki ihlali gormemek degil, yorumun YESIL tutmasi). Dogru olcut: yorumlar cikarildiktan sonra kalan SQL.",
+  "surum": 2,
+  "guncelleme": "2026-09-14",
+  "kaynak_kayit": "REC-322",
+  "borclar": [
+    {
+      "dosya": "202508270945_enable_rls_public.sql",
+      "ne": "inventory_movements uzerindeki p_admin_read_inventory politikasi auth.jwt() ->> 'role' = 'admin' okuyor — ayni kok hata, FARKLI YAZIM. Ustelik politika DINAMIK uretiliyor (_create_select_policy_if_absent yardimcisina METIN olarak veriliyor), o yuzden tirnaklar IKILENMIS gorunuyor.",
+      "olculdu": "2026-09-14, bagimsiz curutme buldu; ben tirnak duzlestirmesi ekleyerek DOGRULADIM",
+      "canli_durumu": "MUHTEMELEN KAPANMIS — 20260530220000_tenant_schema_setup.sql:354-359 ayni politikayi is_user_admin() ile DEGISTIRIYOR. Canli dogrulama YAPILMADI (prod okuma izni verilmedi).",
+      "kapanma_yolu": "Zaten degistirilmis gorunuyor; borc satiri canli dogrulama YAPILDIKTAN sonra kapanir. Kapatmadan once olcum SART — degistirmenin uygulandigi varsayimi test edilmedi."
+    },
+    {
+      "dosya": "20250902_create_stock_rpc_functions.sql",
+      "ne": "Stok RPC fonksiyonlarinda yetki kontrolu jwt.claims ->> 'role' ile admin/moderator karsilastirmasi yapiyor",
+      "olculdu": "2026-09-14, yorumsuz SQL uzerinde desen taramasi",
+      "canli_durumu": "OLCULMEDI — bu politikalarin/fonksiyonlarin canlida hala yururlukte olup olmadigi bilinmiyor",
+      "kapanma_yolu": "is_admin_user() ile degistiren yeni bir migration"
+    },
+    {
+      "dosya": "20250902_fix_products_update_permissions.sql",
+      "ne": "products UPDATE yetkisi ayni yanlis talebi okuyor",
+      "olculdu": "2026-09-14, yorumsuz SQL uzerinde desen taramasi",
+      "canli_durumu": "OLCULMEDI",
+      "kapanma_yolu": "is_admin_user() ile degistiren yeni bir migration"
+    },
+    {
+      "dosya": "20250902_inventory_and_stock.sql",
+      "ne": "Envanter/stok politikalarinda ayni yanlis talep",
+      "olculdu": "2026-09-14, yorumsuz SQL uzerinde desen taramasi",
+      "canli_durumu": "OLCULMEDI",
+      "kapanma_yolu": "is_admin_user() ile degistiren yeni bir migration"
+    },
+    {
+      "dosya": "20250908_product_images.sql",
+      "ne": "public.product_images admin politikalari ayni yanlis talep",
+      "olculdu": "2026-09-14, yorumsuz SQL uzerinde desen taramasi",
+      "canli_durumu": "KISMEN OLCULDU — ayni ADLARI tasiyan public.product_images politikalari 20260119/20260120/20260224 ile dusurulup yeniden olusturulmus, yani GOVDESI DEGISMIS olabilir",
+      "kapanma_yolu": "is_admin_user() ile degistiren yeni bir migration"
+    },
+    {
+      "dosya": "20250908_storage_product_images.sql",
+      "ne": "storage.objects uzerindeki uc admin politikasi (roles={public}) ayni yanlis talep — UYUYAN KAPI",
+      "olculdu": "2026-09-14, yorumsuz SQL uzerinde desen taramasi",
+      "canli_durumu": "CELISKILI — depo gecmisi 20260530224000 ile dusuruldugunu, REC-322'nin 2026-09-13 canli olcumu hala durdugunu soyluyor. Celiski COZULMEDI: 2026-09-14'te canli okuma izni verilmedi.",
+      "kapanma_yolu": "REC-322 migration'i (20260914080000) bu ucu IF EXISTS ile dusuruyor. Dosyanin KENDISI tarihsel kayit olarak kalir; borc satiri o migration prod'a uygulandiktan SONRA kapanir."
+    }
+  ],
+  "_ne_ogrendik": [
+    "AYNI AD FARKLI TABLO: product_images_*_admin adlari hem storage.objects hem public.product_images uzerinde var. DROP POLICY daima sema+tablo ile yazilir; yalniz ada dayanan silme CALISAN bir politikayi siler.",
+    "CASCADE YAZILMAZ: bir yetki yardimcisi emekli edilirken cascade, bagli politikalari SESSIZCE siler. Cascade'siz drop bagimlilik varsa KIRMIZI yanar — olcum yanlissa kapanan yol secilir.",
+    "KAPSAM OLCUMLE BUYUDU: REC-322 uc politika sanmisti; yorumsuz SQL taramasi BES migration'da gercek yetki karari buldu. Kaydin varsaydigi evren, olculen evrenden kucuktu.",
+    "DORT KAYNAK ARANIR, TEK YAZIM YETMEZ: jwt den role okumanin en az dort yazimi var (request.jwt.claims · jwt.claims · auth.jwt() · claim.role GUC). Ilk yazimda kapi yalniz ikisini ariyordu ve Supabase in EN YAYGIN kisayolu (auth.jwt()) kapidan SESSIZCE geciyordu. Bu, \"cagirani yok iddiasi dort kalibi arar\" dersinin RLS teki hali.",
+    "IKILENMIS TIRNAK EN DERIN KOR NOKTAYDI: politika DINAMIK uretildiginde ifade bir METIN olarak tasinir ve tirnaklar ikilenir; ham metinde desen ->> ''role'' olur ve tek-tirnak arayan olcum onu GORMEZ. Bagimsiz curutme dosyayi buldu ama SEBEBI ben olctum: kendi ilk olcumum de 0 demisti. Iki bagimsiz olcumun ayni sonucu vermesi, ikisi de ayni kor noktayi paylasiyorsa DOGRULAMA DEGILDIR.",
+    "GERCEK YUKLEME YOLU service_role: product-images kovasina yazan iki toplu betik SUPABASE_SERVICE_ROLE_KEY kullaniyor, o rolde bypassrls=true, yani RLS politikalari HIC DEGERLENDIRILMIYOR. \"Islev kaybi yok cunku tenant politikalari tasiyor\" gerekcem YANLIS TEMELLENDIRILMISTI; sonuc (silmek guvenli) degismiyor ama gerekce duzeltildi."
+  ]
+}

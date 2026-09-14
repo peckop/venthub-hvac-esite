@@ -151,9 +151,45 @@ Silme PR'ında şu dört sayı **ölçülerek** yazılır:
 Sonra iki taraf **eşit mi** diye gösterilir. Ayrıca **adım sırası** doğrulanır: uygulama
 adımı parite adımından **önce** koşmalı, yoksa silme turu kırmızı yanar.
 
-**REC-321'in sayıları:** 236 dosya · son yeşil koşum (`643c7089`) 236 · sonradan giren
-**0** · silinen **5**, eklenen 1 → **dosya 232, defter 232** (yerelde ölçüldü: 232). Adım sırası: Baseline(80) →
+**REC-321'in sayıları (TAZELENMİŞ, bkz. §7.2):** 237 dosya · son yeşil koşum (`667a49ab`) 237 · sonradan giren
+**0** · silinen **5**, eklenen 1 → **dosya 233, defter 233** (ikisi de ÖLÇÜLDÜ, bkz. §7.1). Adım sırası: Baseline(80) →
 Apply(95) → Parite(179). ✓
+
+## 7.1 · ⭐DEFTER OKUNABİLİYORSA DOLAYLI KANITLA YETİNİLMEZ
+
+REC-321 ilk yazımında defterin sayısı **dolaylı** olarak çıkarılmıştı: *"son parite
+koşumu yeşil geçtiğine göre defter dosya sayısına eşitti."* Doğru bir çıkarımdı ama
+**o koşumun anı** için geçerliydi.
+
+Recep 2026-09-14'te prod defterini **salt-okuma** okuma iznini verdi. Ölçüm:
+
+| Ne | Değer |
+|---|---:|
+| `_migration_ledger` toplam kayıt | **237** |
+| depodaki migration dosyası | **237** |
+| silinecek beş addan defterde bulunan | **5** |
+| tutulan `202508261956_…` defterde | **1** |
+| REC-322 migration'ı (#1186) defterde | **1** |
+
+→ **Parite artık dolaylı değil, ÖLÇÜLMÜŞ.** Ve beklenen silme sayısı **tahmin değil,
+ölçüm**: tam beş.
+
+→ **KURAL:** defteri okumak mümkünse **dolaylı kanıtla yetinilmez.** Dolaylı kanıt
+(yeşil kapı) yokluk için yeterli olabilir, ama **bir sayıyı** dayandırmak için zayıftır;
+o sayıya bir kontrol bağlanacaksa doğrudan ölçülür.
+
+## 7.2 · ⚠TABAN KAYARSA ARİTMETİK YENİDEN ÖLÇÜLÜR
+
+REC-321'in sayıları **bir kez tazelendi** ve sebebi öğretici: ilk yazımda taban **236**,
+referans koşum `643c7089` idi. Sonra REC-322'nin migration'ı master'a girip prod'a
+uygulandı; yeni parite koşumu `667a49ab` **237** dosyayla yeşil geçti. **Defterin
+dayanağı değişti.**
+
+⚠**Eski sayı hâlâ "doğru görünüyordu"** — tutarlı bir üçlüydü (236/236/232) ve yalnız
+**yeniden ölçüm** yakaladı.
+
+→ **KURAL:** dal master'la tazelendiğinde **aritmetik de yeniden ölçülür.** Bu sayılar
+"bir kez yazılıp bırakılan" sayılar değil, **tabana bağlı** sayılardır.
 
 ## 8 · DEFTER SİLMESİ DOĞRULANIR — "koştu" ile "yaptı" ayrı şeyler
 
@@ -167,9 +203,17 @@ Sessiz bir kısmi silme, paritenin bozulması demekti.
 
 ## 9 · BU CETVELİN SINIRLARI (adıyla)
 
-- **Defter doğrudan okunmadı.** Sayı kanıtı **dolaylı**: son parite koşumunun yeşil
-  geçmesi. Bu, o koşum **anı** için geçerli. Prod'a salt-okuma erişimi 2026-09-14'te
-  **verilmedi** (ısrar edilmedi, aşılmaya çalışılmadı).
+- ⭐**Defter DOĞRUDAN okundu** (2026-09-14, Recep'in kendi izniyle, salt-okuma): 237
+  kayıt, silinecek beş addan defterde **5**. Yani bu cetvelin ilk yazımındaki "dolaylı
+  kanıt" sınırı **kapandı** ve beklenen silme sayısı migration'a **ölçülmüş** olarak
+  yazıldı (§7.1).
+  ⚠**Kalan sınır:** bu ölçüm de bir **ANA** aittir. Merge ile uygulama arasında defter
+  elle değiştirilirse migration **kırmızı** yanar (beklenen 5 tutmaz) — bu **istenen**
+  davranıştır, kusur değil.
+  ⚠**İzin disiplini de kayda geçti:** aynı izin önce bir **akran aktarımıyla** geldi ve
+  **kullanılmadı** — o çağrıyı reddeden şey Recep değil, oturumun izin katmanıydı;
+  reddedilmiş bir eylemi "onaylandı" denerek yeniden denemek o katmanı atlamak olur.
+  İzin Recep'in **kendi cümlesiyle** ulaştığında aynı turda koşuldu.
 - **REC-321'in "11 geçersiz ifade" sayısı düzeltildi:** yorumlar çıkarıldıktan sonra
   gerçek sayı **10** ve **beş** dosyada. Altıncısı
   (`202508261956_user_invoice_profiles.sql`) geçersiz SQL **taşımıyor** — içindeki
