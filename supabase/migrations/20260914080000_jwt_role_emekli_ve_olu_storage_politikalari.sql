@@ -43,8 +43,17 @@ begin;
 -- çelişkinin çözümüne BAĞLI DEĞİL; bağlı olan şey yalnız "bu iş bir şey
 -- değiştirdi mi" sorusunun cevabı.
 --
--- İşlev kaybı YOK: görsel yükleme yolunu `product_images_*_tenant` politikaları
--- (rol `authenticated`, tenant klasörü + user_profiles.role kontrolü) taşıyor.
+-- ⚠İŞLEV KAYBI YOK — ama GEREKÇE DÜZELTİLDİ (bağımsız çürütme ölçtü, 2026-09-14):
+-- ilk yazımda "tenant politikaları taşıyor" demiştim. Ölçüm gösterdi ki `src/` altında
+-- `product-images` kovasına YAZAN bir kod yolu HİÇ YOK; gerçek yükleme iki toplu
+-- betikte ve `SUPABASE_SERVICE_ROLE_KEY` ile yapılıyor. O rolde `bypassrls = true`,
+-- yani HİÇBİR RLS politikası değerlendirilmiyor — ne eski admin üçlüsü ne yeni tenant
+-- üçlüsü. Sonuç aynı (kaldırmak güvenli), gerekçe DAHA KUVVETLİ: bu üç politika zaten
+-- hiçbir akışta kullanılmıyor. ⭐Yanlış sebeple verilen doğru hüküm, bir sonraki
+-- kararda yanlış yere götürür — o yüzden sebep düzeltildi, hüküm değil.
+--
+-- (Eski gerekçe kaydı: `product_images_*_tenant` politikaları — rol `authenticated`,
+-- tenant klasörü + `user_profiles.role` kontrolü — taşıyor sanılmıştı.)
 -- Kaldırılan üçü `roles = {public}` yüzeyini de kaldırır — uyuyan kapının
 -- tehlikesi buydu: koşul bir gün doğru hâle gelirse `anon` dahil HERKESİ
 -- kapsayacak bir yazma/silme yolu açardı.

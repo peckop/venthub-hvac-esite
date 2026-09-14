@@ -41,19 +41,45 @@ const yorumsuzSql = (kaynak: string): string =>
     .filter((satir) => !satir.trim().startsWith('--'))
     .join('\n')
 
+/**
+ * ⭐İKİLENMİŞ TIRNAK DÜZLEŞTİRİLİR — bu kol bağımsız çürütmede bulunan kör noktayı kapatır.
+ *
+ * Bazı migration'lar politikayı DİNAMİK üretiyor: politika ifadesini bir METİN olarak
+ * bir yardımcıya veriyor (ör. `_create_select_policy_if_absent(..., 'auth.jwt() ->> ''role''
+ * = ''admin''')`). SQL metin literalinde tırnak İKİLENİR, yani `->> 'role'` deseni ham
+ * metinde `->> ''role''` olarak görünür ve tek-tırnak arayan bir düzenli ifade onu GÖRMEZ.
+ * Düzleştirmeden bu dosya kapıdan SESSİZCE geçiyordu (ölçüldü 2026-09-14).
+ */
+const tirnakDuzlestir = (kod: string): string => kod.replace(/''/g, "'")
+
+/**
+ * JWT'den `role` talebini okuyan DÖRT kaynak — biri bile yetmez, dördü ayrı ayrı aranır.
+ *
+ * ⭐Bu liste, "çağıranı yok iddiası DÖRT kalıbı arar" dersinin RLS'teki karşılığıdır:
+ * tek bir yazım biçimini arayan ölçüm, aynı hatanın öteki yazımını kanıtlamaz.
+ * `auth.jwt()` Supabase'in yaygın kısayolu ve depoda ZATEN kullanılmış; `claim.role`
+ * eski sürümlerin tekil GUC yolu — bugün örneği yok ama yazılabilir bir kaçış yolu.
+ */
+const JWT_KAYNAKLARI: ReadonlyArray<{ ad: string; re: RegExp }> = [
+  { ad: 'request.jwt.claims', re: /request\.jwt\.claims[\s\S]{0,220}?->>\s*'role'/i },
+  { ad: 'jwt.claims', re: /jwt\.claims[\s\S]{0,140}?->>\s*'role'/i },
+  { ad: 'auth.jwt()', re: /auth\.jwt\(\)\s*->>\s*'role'/i },
+  { ad: 'claim.role GUC', re: /current_setting\(\s*'request\.jwt\.claim\.role'/i },
+]
+
 /** JWT bağlamında `role` talebi okunuyor mu (yalnız `->> 'role'` yetmez: `user_role` masum). */
-const jwtBaglaminda = (kod: string): boolean =>
-  /request\.jwt\.claims[\s\S]{0,200}?->>\s*'role'/i.test(kod) ||
-  /jwt\.claims[\s\S]{0,120}?->>\s*'role'/i.test(kod)
+const jwtKaynaklari = (kod: string): string[] =>
+  JWT_KAYNAKLARI.filter((k) => k.re.test(kod)).map((k) => k.ad)
 
 /** Okunan değer admin/moderator ile karşılaştırılıyor mu — yani YETKİ KARARI mı. */
 const yetkiKarariMi = (kod: string): boolean =>
-  /->>\s*'role'\s*\)?\s*(IN|=)\s*\(?\s*'(admin|moderator)'/i.test(kod)
+  /->>\s*'role'\s*\)?\s*(IN|=)\s*\(?\s*'(admin|moderator)'/i.test(kod) ||
+  /'request\.jwt\.claim\.role'[\s\S]{0,40}?(IN|=)\s*\(?\s*'(admin|moderator)'/i.test(kod)
 
 /** Bir migration dosyası yanlış kaynaktan yetki kararı veriyor mu. */
 const ihlalMi = (ham: string): boolean => {
-  const kod = yorumsuzSql(ham)
-  return jwtBaglaminda(kod) && yetkiKarariMi(kod)
+  const kod = tirnakDuzlestir(yorumsuzSql(ham))
+  return jwtKaynaklari(kod).length > 0 && yetkiKarariMi(kod)
 }
 
 const migrationDosyalari = (): string[] =>
@@ -190,6 +216,42 @@ describe('INV-AUTH-ROLE-2: RLS yetki karari yalniz is_admin_user() uzerinden ver
     // bir tablo kolonu) yakalanMAmali. Kapi yanlis KAYNAGI arar, kelimeyi degil.
     const tabloKolonu = "select 1 from user_profiles where role IN ('admin','moderator');"
     expect(ihlalMi(tabloKolonu)).toBe(false)
+
+    // ⭐SABOTAJ 5 — `auth.jwt()` KISAYOLU. Bagimsiz curutmede bulunan kor nokta:
+    // ilk yazimda kapi yalniz `request.jwt.claims` ve `jwt.claims` ariyordu, yani
+    // Supabase'in EN YAYGIN kisayolu kapidan sessizce geciyordu.
+    const authJwt = "create policy p on t for select using (auth.jwt() ->> 'role' = 'admin');"
+    expect(ihlalMi(authJwt)).toBe(true)
+
+    // ⭐SABOTAJ 6 — IKILENMIS TIRNAK / DINAMIK POLITIKA. En derin kor nokta: politika
+    // ifadesi bir METIN olarak yardimciya veriliyor ve tirnaklar ikileniyor. Duzlestirme
+    // olmadan bu kacar — depoda GERCEK bir ornegi var (202508270945_enable_rls_public.sql).
+    const dinamik =
+      "perform public._create_select_policy_if_absent('public','t','p','auth.jwt() ->> ''role'' = ''admin''');"
+    expect(ihlalMi(dinamik)).toBe(true)
+
+    // SABOTAJ 7 — AYIRT EDER: duzlestirme masum bir metni ihlal SAYMAMALI.
+    const masumDinamik = "perform f('public','t','p','tenant_id = jwt_tenant_id()');"
+    expect(ihlalMi(masumDinamik)).toBe(false)
+
+    // SABOTAJ 8 — eski tekil GUC yolu (`request.jwt.claim.role`) da yakalanMALI.
+    const guc =
+      "create policy p on t for select using (current_setting('request.jwt.claim.role', true) = 'admin');"
+    expect(ihlalMi(guc)).toBe(true)
+  })
+
+  it('KENDINI DOGRULAR: DORT jwt kaynagi da ayri ayri taniniyor', () => {
+    // Evren muhafızı: bir kaynak regex'i bozulursa bu kol kırmızı yanar. Dördünü
+    // birlikte ölçmek, birinin sessizce ölmesini gizler.
+    const ornekler: Array<[string, string]> = [
+      ['request.jwt.claims', "current_setting('request.jwt.claims', true)::jsonb ->> 'role'"],
+      ['jwt.claims', "x.jwt.claims ->> 'role'"],
+      ['auth.jwt()', "auth.jwt() ->> 'role'"],
+      ['claim.role GUC', "current_setting('request.jwt.claim.role', true)"],
+    ]
+    for (const [ad, ornek] of ornekler) {
+      expect(jwtKaynaklari(ornek), `${ad} kaynagi taninmali`).toContain(ad)
+    }
   })
 
   it('AYIRT EDER: REC-322 migration\'inin KENDISI kacak sayilmiyor (ihlali yalniz yorumda aniyor)', () => {

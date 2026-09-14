@@ -71,6 +71,59 @@ Böylece "canlıda çağıran yok" varsayımı yanlışsa sonuç **sessiz yetki 
 gürültülü hata** olur. Ölçüme güvenmek yerine **ölçüm yanlışsa kapanan** bir yol
 seçilir (fail-closed).
 
+## 5.1 · ⭐DÖRT YAZIM ARANIR — tek yazımı aramak ölçüm değildir
+
+JWT'den `role` talebini okumanın **en az dört** yazımı var. Kapının ilk hâli yalnız
+ikisini arıyordu ve Supabase'in **en yaygın kısayolu** sessizce geçiyordu:
+
+| # | Yazım | Durum |
+|---|---|---|
+| 1 | `current_setting('request.jwt.claims', …)::jsonb ->> 'role'` | aranıyordu |
+| 2 | `… jwt.claims ->> 'role'` | aranıyordu |
+| 3 | **`auth.jwt() ->> 'role'`** | **kaçıyordu** — depoda gerçek örneği var |
+| 4 | **`current_setting('request.jwt.claim.role', …)`** (eski tekil GUC) | **kaçıyordu** |
+
+→ **Kural:** bu sınıfta bir ölçüm yaparken **dört yazım da ayrı ayrı aranır.** Bu,
+projedeki *"çağıranı yok iddiası dört kalıbı arar"* dersinin RLS'teki karşılığıdır.
+
+## 5.2 · ⚠EN DERİN KÖR NOKTA: dinamik politika + ikilenmiş tırnak
+
+Bazı migration'lar politikayı **dinamik** üretiyor — ifadeyi bir **metin** olarak bir
+yardımcıya veriyor:
+
+```sql
+perform public._create_select_policy_if_absent(
+  'public','inventory_movements','p_admin_read_inventory',
+  'auth.jwt() ->> ''role'' = ''admin'''   -- ⚠tırnaklar İKİLENMİŞ
+);
+```
+
+SQL metin literalinde tırnak **ikilenir**, yani desen ham metinde `->> ''role''`
+olarak görünür ve tek tırnak arayan bir ölçüm onu **görmez.**
+
+⭐**Bu, iki bağımsız ölçümün aynı kör noktayı paylaşmasına örnektir:** bağımsız çürütme
+dosyayı buldu, ama **benim ilk ölçümüm de 0 demişti** ve sebebi ben ölçtüm. *İki
+bağımsız ölçümün aynı sonucu vermesi, ikisi de aynı kör noktayı paylaşıyorsa
+doğrulama değildir.*
+
+→ **Kural:** migration metni ölçülürken **iki normalizasyon** yapılır: yorumlar
+çıkarılır **ve** ikilenmiş tırnaklar düzleştirilir.
+
+## 5.3 · ⚠GEREKÇE DÜZELTMESİ — gerçek yükleme yolu `service_role`
+
+İlk yazımda "üç politikayı kaldırmak işlev kaybı üretmez çünkü
+`product_images_*_tenant` politikaları taşıyor" demiştim. **Bu gerekçe yanlış
+temellendirilmişti.** Bağımsız çürütmede ölçüldü: `product-images` kovasına yazan
+kod yolu `src/` altında **yok**; gerçek yükleme iki toplu betikte ve
+**`SUPABASE_SERVICE_ROLE_KEY`** ile yapılıyor. O rolde `bypassrls = true`, yani
+**hiçbir RLS politikası değerlendirilmiyor** — ne eski admin üçlüsü, ne yeni tenant
+üçlüsü.
+
+**Sonuç değişmiyor** (kaldırmak güvenli, hatta daha kuvvetli gerekçeyle: o politikalar
+zaten hiçbir akışta kullanılmıyor), ama **gerekçe** düzeltildi. Bir hükmü doğru
+sebeple vermek, doğru hükmü yanlış sebeple vermekten farklıdır: yanlış sebep bir
+sonraki kararda yanlış yere götürür.
+
 ## 6 · KAPI VE SINIRI (adıyla)
 
 **Kapı:** `INV-AUTH-ROLE-2` — `src/__tests__/conformance/rls-yetki-karari.test.ts`.
