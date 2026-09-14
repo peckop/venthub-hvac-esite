@@ -27,7 +27,7 @@
   **OPS**'a yazılır (her birine en yakın şerit "devir adayı" notuyla) → nihai: ALTYAPI 29 ·
   **OPS 81** (10 asıl + 71 devir-adaylı) · URUN 3 · URUN-KATALOG 6. Cetvellerde aynı mekanik: 57
   sahipsiz satır OPS'a yazıldı (nihai OPS 59, ALTYAPI 5, URUN 3).
-- **CI'da `disabled_manually` olanlar (8 — yedisi 2026-09-14'te SİLİNDİ, bkz. REC-327 / #1185; yalnız `ai-auto-repair.yml` duruyor):** `jules-a11y.yml`, `jules-dependency-update.yml`,
+- **CI'da `disabled_manually` olanlar (8 — 2026-09-14'te SEKİZİ DE SİLİNDİ: yedisi REC-327 / #1185, `ai-auto-repair.yml` ise REC-333 / #1188 ile):** `jules-a11y.yml`, `jules-dependency-update.yml`,
   `jules-i18n-sync.yml`, `jules-lint-fix.yml`, `jules-performance.yml`, `jules-security-audit.yml`,
   `jules-test-coverage.yml`, `ai-auto-repair.yml` — GitHub tarafında elle KAPATILMIŞ, `workflow_dispatch`
   bile çalışmaz. Sonnet `ai-auto-repair.yml`'i "skipped" görüp KAL saymıştı; çürütme bunu düzeltti
@@ -426,7 +426,7 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
 | `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
 | `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
-| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | **OLU-DOGRULANDI** *(sonnet'in KAL hükmü çürütüldü)* |
+| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | KAYIP (onceki: OLU-DOGRULANDI (sonnet'in KAL hükmü çürütüldü)) |
 | `skills-gate.yml` | SKILL KAPISI — sayaç her PR'da (ücretsiz), yönlendirme sınavı yalnız skill değişince (ücretli). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi | KAL |
 | `migration-linter.yml` | INV-MIGRATION-3 — migration linter PR kapısı (squawk) | ALTYAPI | .squawk.toml (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi — SABOTAJ KANITLI (2026-09-13: sabotaj dosyasi 5 kol, cikis 123 = KIRMIZI; geri alinca 0 dosya = yesil) | KAL |
 
