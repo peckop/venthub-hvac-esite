@@ -101,6 +101,63 @@ export const PDP_BILINCLI_ADALAR: readonly BilincliAda[] = [
 /** İlan edilen adaların kattığı toplam marker — PDP tavanı budur. */
 export const PDP_MAX_BAILOUT = PDP_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
 
+/**
+ * ANASAYFADA BİLİNÇLİ ADALAR — İLAN + MANDAL (REC-59 adım 2, 2026-09-14).
+ *
+ * ⭐NİÇİN ŞİMDİ DOĞDU: anasayfa tavanı `0` yazıldığında anasayfa **dinamikti** — istek
+ * anında üretilen bir sayfada prerender markerı hiç doğmaz, yani tavan 0 o gün hiçbir
+ * şeyi kısıtlamıyordu. Anasayfa statiğe geçince (REC-59 adım 2) aynı 0, kök layout'taki
+ * meşru adaları yasaklayan bir tavana dönüştü. Yani sayı değişmedi, **sayının ölçtüğü
+ * evren** değişti.
+ *
+ * Bu dosyanın kendi uyarısı bugünü öngörmüştü: *"Başka bir sınıf prerender'a geçerse kapı
+ * KIRMIZI verir; o kırmızıyı sayıyı büyüterek kapatmayın — önce markerın hangi adadan
+ * geldiğini ölçün, sonra buraya yazın."* Ölçüm yapıldı, buraya yazılıyor.
+ *
+ * ⭐İKİ ADA DA CLAUDE.md KURAL 5'E UYGUN: ikisi de `useSearchParams()` çağırıyor ve ikisi
+ * de `<Suspense>` ile sarılı. Suspense markerı **KALDIRMIYOR, KAPSIYOR** — sayfa gövdesi
+ * sunucudan gelmeye devam ediyor. Bu, PDP ilanındaki `vercel-analytics` kaleminde
+ * 2026-09-04'te ölçülen davranışın aynısıdır.
+ *
+ * ⚠ÖLÇÜMÜN KİMDE OLDUĞU AYRI YAZILIR (ikisi ayrı yüzeydir):
+ *   · KAYNAK olguları (iki bileşen de `useSearchParams` çağırıyor, ikisi de Suspense
+ *     içinde) bu ilanı yazan ALTYAPI tarafından koddan doğrulandı — 2026-09-14:
+ *     `src/app/layout.tsx:106-108` ve `src/components/layout/ClientLayout.tsx:124-126`.
+ *   · HTML'DEKİ MARKER SAYISI (2) URUN'un yerel `pnpm build` ölçümünden gelir
+ *     (`.next/server/app/tr.html`, REC-59 adım 2 / #1192). ALTYAPI bu sayıyı kendi
+ *     derlemesiyle TEKRAR ÖLÇMEDİ.
+ *   Sayı yanlışsa kapı **kırmızı** verir, sessizce geçmez: tavan bir ÜST sınırdır ve
+ *   gerçek sayım CI'da yapılır. Yani bu ilan fail-closed'dır.
+ *
+ * ⚠TAVANIN BUGÜN NEYİ ÖLÇTÜĞÜ: master'da anasayfa HÂLÂ dinamiktir. Dinamik sayfada
+ * bailout 0 doğar, dolayısıyla bu tavanın STATİK davranışı bu PR'ın CI'ında
+ * KANITLANMAZ — yalnız #1192 master'a indikten sonra kanıtlanır. Bu, "kapı yeşil ama
+ * bakmadığı şeyi kanıtlamadı" sınıfıdır ve adıyla yazılmıştır.
+ */
+export const ANASAYFA_BILINCLI_ADALAR: readonly BilincliAda[] = [
+  {
+    ada: 'vercel-analytics',
+    nicin:
+      'Kök layout içindeki <Analytics/> bileşeni useSearchParams() çağırıyor ' +
+      '(src/app/layout.tsx:106-108, Suspense fallback={null} ile sarılı). Suspense sınırı ' +
+      'markerı KALDIRMIYOR ama KAPSIYOR — anasayfa gövdesi sunucudan gelmeye devam ediyor. ' +
+      'Aynı ada PDP ilanında da var: kök layout tüm prerender edilen sınıfları etkiler.',
+    marker: 1,
+  },
+  {
+    ada: 'navigation-tracker',
+    nicin:
+      'ClientLayout içindeki NavigationTracker useSearchParams() çağırıyor ' +
+      '(src/components/layout/ClientLayout.tsx:124-126, Suspense fallback={null} ile sarılı). ' +
+      'Geri/ileri gezinme yığınını sessionStorage ile izliyor; sunucuda karşılığı yok. ' +
+      'Bileşen zaten kural 5 gereği AYRI bir bileşene çıkarılmış ve sınıra alınmış.',
+    marker: 1,
+  },
+]
+
+/** İlan edilen adaların kattığı toplam marker — anasayfa tavanı budur. */
+export const ANASAYFA_MAX_BAILOUT = ANASAYFA_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+
 export interface Kural {
   yol: string
   sinif: Sinif
@@ -326,7 +383,14 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
   const hepsi: Kural[] = [
     // Ana sayfa: tek sağlam işaret h1. Bailout 0 — REC-94'te 3D şerit kaldırıldı, eşik
     // 1'den 0'a İNDİ; eşiği indirmek işin parçası, yoksa kazanç kayda geçmez (ratchet).
-    { yol: '/tr', sinif: 'anasayfa', markerlar: [/<h1[\s>]/], maxBailout: 0, kapida: true },
+    // Anasayfa: bailout tavanı İLAN'dan türetilir (`ANASAYFA_BILINCLI_ADALAR`) — çıplak sayı yok.
+    {
+      yol: '/tr',
+      sinif: 'anasayfa',
+      markerlar: [/<h1[\s>]/],
+      maxBailout: ANASAYFA_MAX_BAILOUT,
+      kapida: true,
+    },
 
     // Ürün listesi: aile kartları SSR'da olmalı — `data-ssr` işareti ÜRÜN tarafının
     // bilerek koyduğu ölçüm kancası, i18n metnine bağlı değil, bu yüzden kapıya uygun.

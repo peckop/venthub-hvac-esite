@@ -20,6 +20,8 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+  ANASAYFA_BILINCLI_ADALAR,
+  ANASAYFA_MAX_BAILOUT,
   ihlaller,
   kurallar,
   PDP_BILINCLI_ADALAR,
@@ -307,7 +309,7 @@ describe('INV-DUMAN-5: PR kapısı gerçekten ZORUNLU kontrolün içinde', () =>
   })
 })
 
-describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mandal)', () => {
+describe('INV-DUMAN-6: bailout tavanı İLAN edilmiş adalardan türer (PDP + anasayfa, mandal)', () => {
   /**
    * NİÇİN VAR: tavan çıplak bir sayı olarak yazıldığında onu büyütmek BEDAVA olur.
    * Bugün tam bu durum yaşandı — #989 dördüncü bir bilinçli ada (Vercel Analytics)
@@ -353,6 +355,70 @@ describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mand
         'sayı ilan edilmeden büyütülmüş'
     ).toBe(toplam)
     expect(PDP_MAX_BAILOUT, 'dışa verilen sabit ilanla uyuşmuyor').toBe(toplam)
+  })
+
+  /**
+   * ⭐ANASAYFA İLANI — PDP deseninin ikizi (REC-59 adım 2, 2026-09-14).
+   *
+   * NİÇİN AYRI KOLLAR: anasayfa tavanı `0` yazıldığında anasayfa DİNAMİKTİ; dinamik
+   * sayfada prerender markerı hiç doğmaz, yani o 0 hiçbir şeyi kısıtlamıyordu. Anasayfa
+   * statiğe geçince aynı sayı kök layout'taki meşru adaları yasaklayan bir tavana
+   * dönüştü — sayı değişmedi, SAYININ ÖLÇTÜĞÜ EVREN değişti. Kollar, tavanın yine
+   * ilandan türemesini ve ilan yazılmadan büyütülememesini zorlar.
+   */
+  it('ANASAYFA: her ilan kalemi DOLU ve TEKİL — boş kalemle sayı şişirilemez', () => {
+    expect(ANASAYFA_BILINCLI_ADALAR.length, 'ilan boş — tavan gerekçesiz kalır').toBeGreaterThan(0)
+    for (const a of ANASAYFA_BILINCLI_ADALAR) {
+      expect(a.ada.trim().length, `ada adı boş: ${JSON.stringify(a)}`).toBeGreaterThan(2)
+      expect(a.nicin.trim().length, `"${a.ada}" gerekçesi yok/çok kısa`).toBeGreaterThan(40)
+      expect(a.marker, `"${a.ada}" en az 1 marker katmalı`).toBeGreaterThanOrEqual(1)
+    }
+    const adlar = ANASAYFA_BILINCLI_ADALAR.map((a) => a.ada)
+    expect(new Set(adlar).size, `ilan mükerrer ada içeriyor: ${adlar.join(', ')}`).toBe(adlar.length)
+  })
+
+  it('ANASAYFA kuralının tavanı ilan toplamına EŞİT — literal sayı kaçağı yakalanır', () => {
+    const toplam = ANASAYFA_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+    const ana = kurallar(fakeTemsilciler).find((k) => k.sinif === 'anasayfa')
+    expect(ana, 'anasayfa kuralı kayıp').toBeTruthy()
+    expect(
+      ana?.maxBailout,
+      `Anasayfa tavanı (${ana?.maxBailout}) ilan toplamıyla (${toplam}) uyuşmuyor — ` +
+        'sayı ilan edilmeden büyütülmüş'
+    ).toBe(toplam)
+    expect(ANASAYFA_MAX_BAILOUT, 'dışa verilen sabit ilanla uyuşmuyor').toBe(toplam)
+  })
+
+  /**
+   * ⭐SABOTAJ: üçüncü bir ada İLAN EDİLMEDEN marker doğurursa kapı KIRMIZI olmalı.
+   * Bu kol, tavanın gerçekten bir SINIR olduğunu ölçer — ilan büyümeden sayı büyümez.
+   */
+  it('ANASAYFA DAVRANIŞ, sınırda: tavan kadar geçer, ÜÇÜNCÜ ada KIRMIZI', () => {
+    const ana = kurallar(fakeTemsilciler).find((k) => k.sinif === 'anasayfa')
+    if (!ana) throw new Error('anasayfa kuralı kayıp — kol ölçemez')
+    // İçerik markerı KASITLI sağlanıyor: ölçülen şey bailout SAYIMI, marker eksikliği değil.
+    const govde = (n: number): string =>
+      `<html><body><h1>VentHub</h1>${'<!--BAILOUT_TO_CLIENT_SIDE_RENDERING-->'.repeat(n)}</body></html>`
+
+    expect(ihlaller(ana, govde(ana.maxBailout)), 'tavan kadar bailout ihlal saymamalı').toEqual([])
+    const fazla = ihlaller(ana, govde(ana.maxBailout + 1))
+    expect(fazla.length, 'ucuncu ada ihlal DOĞURMADI — tavan sinir degil').toBe(1)
+    expect(fazla[0]).toContain(`${ana.maxBailout + 1} > ${ana.maxBailout}`)
+  })
+
+  /**
+   * ⭐AYIRT EDER — ANASAYFA DİNAMİKKEN DE YEŞİL: dinamik sayfada bailout 0 doğar ve
+   * tavanın altında kalır. Bu kol, tavanı büyütmenin dinamik hâli bozmadığını ölçer
+   * (OPS kabul ölçütü: "ana sayfa dinamikken de statikken de kapı yeşil").
+   *
+   * ⚠SINIRI: statik hâlin gerçek marker sayısı bu kolda DEĞİL, CI'daki duman kapısında
+   * ölçülür — ve master'da anasayfa hâlâ dinamik olduğu için o ölçüm ancak #1192
+   * indikten sonra gerçekleşir.
+   */
+  it('AYIRT EDER: anasayfa DİNAMİKKEN (bailout 0) tavan yeşil kalır', () => {
+    const ana = kurallar(fakeTemsilciler).find((k) => k.sinif === 'anasayfa')
+    if (!ana) throw new Error('anasayfa kuralı kayıp — kol ölçemez')
+    expect(ihlaller(ana, '<html><body><h1>VentHub</h1></body></html>')).toEqual([])
   })
 
   it('DAVRANIŞ, sınırda: tavan kadar marker geçer, bir fazlası KIRMIZI', () => {
