@@ -360,7 +360,26 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
   it('YAZMA KIPI KORUR: yeni satir eklenirken MEVCUT satirlar bayt bayt ayni kalir', () => {
     const belge = fiksturBelgesi((m) => m)
     const oncekiSatirlar = fs.readFileSync(belge, 'utf8').split(/\r?\n/)
-    const sahte = path.join(KOK, 'scripts', 'zz-koruma-gecici.mjs')
+    /**
+     * ⛔UZANTI `.ps1`, VE BU BİR TERCİH DEĞİL ZORUNLULUK — ÖLÇÜLDÜ (2026-09-15, REC-336 adım 3).
+     *
+     * Bu kol, üreticinin YENİ bir araç görmesi için canlı `scripts/` dizinine gerçek bir dosya
+     * yazmak zorunda (üretici `scripts` kökünü sabit tarıyor, fikstür kökü almıyor). Dosya
+     * `.mjs` iken **kardeş bir kapıyı rastgele düşürüyordu:**
+     * `render-revalidation-contract.test.ts` modül yüklenirken
+     * `import.meta.glob('/scripts/**\/*.{js,mjs,cjs,ts,json,txt,sql}', {eager:true})` çalıştırıyor.
+     * İki dosya aynı koşumda paralel gidince glob geçici dosyayı LİSTEDE görüyor, okumaya
+     * geldiğinde dosya `finally` ile silinmiş oluyor → `ENOENT` → o paket HİÇ toplanamıyor
+     * (0 test) ve koşum kırmızı. Sıraya bağlı olduğu için bazen geçiyor: yani KIRILGAN bir kapı.
+     *
+     * ⭐NİÇİN UZANTI ÇÖZÜYOR: üretici `.cjs .mjs .js .py .ps1 .sh .ts` tarıyor; kardeş kapının
+     * globu `.ps1` İÇERMİYOR. Yani dosya üretici için hâlâ "yeni araç", kardeş kapı için hiç
+     * yok. Kolun ölçtüğü şey değişmedi, yalnız çakışma kalktı.
+     *
+     * ⚠KIRILGAN KAPI, OLMAYAN KAPIDAN KÖTÜDÜR: rastgele kırmızı, ekibi "bir daha koştur"
+     * alışkanlığına iter ve o alışkanlık gerçek kırmızıyı da yutar.
+     */
+    const sahte = path.join(KOK, 'scripts', 'zz-koruma-gecici.ps1')
     fs.writeFileSync(sahte, '// gecici koruma kolu dosyasi\n', 'utf8')
     try {
       const r = kostur(['--yaz', '--envanter', belge])
