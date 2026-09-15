@@ -197,10 +197,10 @@ jobs:
           # ayari sessizce dogrulanmis dosyanin ustune gecerse tam da onardigimiz kusur geri gelir.
           if [ -n "${DB_URL:-}" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "SUPABASE_DB_URL var -> INV-CATALOG-1 ve INV-RLS-COVERAGE-1 KOSACAK"
+            echo "SUPABASE_DB_URL var -> INV-CATALOG-1, INV-SEARCH-BEHAVIOR-1 ve INV-RLS-COVERAGE-1 KOSACAK"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning title=DB KAPILARI ATLANDI::SUPABASE_DB_URL yok -> INV-CATALOG-1 ve INV-RLS-COVERAGE-1 isleri ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda ne katalog butunlugu ne RLS rol kapsami OLCULDU."
+            echo "::warning title=DB KAPILARI ATLANDI::SUPABASE_DB_URL yok -> INV-CATALOG-1, INV-SEARCH-BEHAVIOR-1 ve INV-RLS-COVERAGE-1 isleri ATLANIYOR. ATLANMIS IS YESIL DEGILDIR: bu kosumda ne katalog butunlugu, ne ARAMA DAVRANISI, ne RLS rol kapsami OLCULDU."
           fi
 
   catalog-integrity:
@@ -238,6 +238,38 @@ jobs:
           # olarak, gorunmez bir pano ayari olarak degil.
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/catalog-integrity.mjs
+
+      # ⭐INV-SEARCH-BEHAVIOR-1 — arama DAVRANISI kapisi (REC-340 Faz 1 Adim 1).
+      # Cetvel: docs/standards/arama-standard.md §8.
+      #
+      # NICIN BU ISE ADIM OLARAK, YENI IS ADI ACILMADI: bu dosyanin kendi karari
+      # (INV-ANON-YAZMA-1 yorumu, asagida) yeni is adinin bedelini yaziyor — yeni ad, acik
+      # PR'lari "beklenen kontrol gelmedi"de kilitler ya da sessizce kapinin DISINDA kalir.
+      # Ustelik ayni sirri, ayni kok sertifikayi ve ayni pg surucusunu kullaniyor; ayri is
+      # acmak ayni on-yoklamayi ucuncu kez kurmak olurdu. `db-gate-precheck` zaten bu
+      # kapilara hizmet ediyor.
+      #
+      # NICIN `catalog-integrity` isine, `rls-role-coverage`a DEGIL: konu KATALOG VERISI.
+      # Arama, urun/aile/kategori govdesini olcuyor; RLS isinin konusu yetki kapsamidir.
+      # Kardes adim INV-AILE-KATEGORI-1 de ayni gerekceyle buraya eklenmisti.
+      #
+      # ⚠BU ADIM BUGUN UYARI URETIR, KIRMIZI VERMEZ — ve bu bilincli:
+      # olculdu (2026-09-15, prod, salt-okuma) on vakanin BESI sifir donuyor ve duzeltme
+      # REC-340 Faz 1 Adim 2-3'te. Bilinen kirmizilar betikteki `BILINEN_KIRMIZI` icinde
+      # ADIYLA ve GEREKCESIYLE ilan edildi; ilanli vaka uyari, ILANDA OLMAYAN vaka KIRMIZI.
+      # MANDAL IKI YONLU: ilanli bir vaka GECMEYE baslarsa betik KIRMIZI verir (ilan bayat,
+      # satir silinmeli). Yani liste yalniz KUCULEBILIR ve kapi duzeltme indikce kendiliginden
+      # gercek kapiya doner. Kirmizi baslayan bir kapiyi master'i bloklayacak sekilde indirmek,
+      # ucuncu gunde kapatilmasini garanti etmek olurdu.
+      - name: Arama davranisi kapisi (INV-SEARCH-BEHAVIOR-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          echo "NOT: bu kapi CANLI arama davranisini olcer; CI vitest'i dummy.supabase.co ile"
+          echo "     kostugu icin ayni olcum orada SESSIZCE YANLIS sonuc verir (cetvel K8.1)."
+          node scripts/db/checks/arama-davranisi.mjs
 
       # INV-AILE-KATEGORI-1 (REC-290) — urunun kategorisi ile AILESININ kategorisi ayrismasin.
       #
