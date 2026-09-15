@@ -248,8 +248,10 @@ export const tr = {
     detailedSearch: 'için detaylı ara',
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
     enterHint: 'Tüm sonuçlar için',
+    // `placeholderAi` SİLİNDİ (REC-340 Faz 0) — "yapay zeka destekli arama" diyordu ve
+    // arkasında yapay zeka yoktu. Ölü bırakılmadı, kaldırıldı; tek tüketicisi
+    // `SearchOverlay` artık aşağıdaki doğru metni kullanıyor.
     placeholder: 'Ürün, kategori veya marka ara...',
-    placeholderAi: 'Ürün, kategori veya yapay zeka destekli arama...',
     noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
     brandPrefix: 'Marka: ',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
