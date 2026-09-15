@@ -326,7 +326,9 @@ describe('INV-DUMAN-6: bailout tavanı İLAN edilmiş adalardan türer (PDP + an
     altgrupluKategori: '/tr/category/a',
     yaprakKategori: '/tr/category/a/b',
     pdp: '/tr/products/x',
-    sayimlar: { kategori: 1, ikiSegmentli: 1, pdp: 1 },
+    // REC-59 açık kalemi kapandı: marka sınıfı kural kümesine girdi, fikstür de onu taşır.
+    marka: '/tr/brands/x',
+    sayimlar: { kategori: 1, ikiSegmentli: 1, pdp: 1, marka: 1 },
     secim: { icerikten: false, denenenAday: 0, adayTavani: 8 },
     atlananlar: [],
   }
@@ -457,8 +459,27 @@ describe('INV-DUMAN-6: bailout tavanı İLAN edilmiş adalardan türer (PDP + an
  * bir yayın sonrası, gürültü olarak geri gelirdi.
  */
 describe('INV-DUMAN-7: temsilci ADRESTEN değil İÇERİKTEN seçilir', () => {
-  const SITEMAP = (yollar: string[]): string =>
-    `<urlset>${yollar.map((y) => `<loc>https://x${y}</loc>`).join('')}</urlset>`
+  /**
+   * ⭐FİKSTÜR GERÇEK HARİTAYA BENZETİLDİ (REC-59, 2026-09-15): marka sınıfı kapıya girince
+   * `zorunluKontrol` marka temsilcisini de FAIL-CLOSED aradı ve bu bloktaki beş kol düştü —
+   * çünkü yapay haritalarda hiç `/tr/brands/<slug>` yolu yoktu.
+   *
+   * İki yol vardı: (a) marka kontrolünü gevşetmek, (b) fikstürü gerçeğe benzetmek. (b)
+   * seçildi, çünkü GERÇEK site haritası marka adreslerini HER ZAMAN ilan ediyor
+   * (`sitemap.ts` §3 Brand Routes) — yani marka yolu olmayan bir harita, bu kolların
+   * ölçtüğü eksenle ilgisiz bir KURGUYDU. Kapıyı gevşetmek, olmayan bir dünyayı korumak
+   * için gerçek bir güvenceyi düşürmek olurdu.
+   *
+   * Marka yolu her fikstüre OTOMATİK eklenir; bu bloğun ölçtüğü eksen (temsilci İÇERİKTEN
+   * seçilir) marka sınıfından bağımsızdır ve tek satır gürültü eklemesin.
+   */
+  const MARKA_FIKSTUR_YOLU = '/tr/brands/fikstur-marka'
+  const SITEMAP = (yollar: string[]): string => {
+    const tam = yollar.some((y) => /^\/tr\/brands\/[^/]+$/.test(y))
+      ? yollar
+      : [...yollar, MARKA_FIKSTUR_YOLU]
+    return `<urlset>${tam.map((y) => `<loc>https://x${y}</loc>`).join('')}</urlset>`
+  }
 
   /** Sahte ağ: her yola verilen gövdeyi döner; hangi yolların çekildiğini KAYDEDER. */
   const sahteAg = (

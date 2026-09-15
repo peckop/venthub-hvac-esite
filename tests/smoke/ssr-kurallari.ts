@@ -34,7 +34,14 @@
  * başlığı basar (`altgruplu-kategori`) ya aile kartı basar (`yaprak-kategori`). Ölçülen
  * şey buydu; ad artık ona uyuyor.
  */
-export type Sinif = 'anasayfa' | 'liste' | 'altgruplu-kategori' | 'yaprak-kategori' | 'pdp'
+export type Sinif =
+  | 'anasayfa'
+  | 'liste'
+  | 'altgruplu-kategori'
+  | 'yaprak-kategori'
+  | 'pdp'
+  | 'marka-listesi'
+  | 'marka'
 
 /** Bir sınıfın niçin ölçülemediği — ⛔SESSİZ ATLAMA YASAK, sebep tüketiciye TAŞINIR. */
 export interface Atlanan {
@@ -178,6 +185,87 @@ export const ANASAYFA_BILINCLI_ADALAR: readonly BilincliAda[] = [
 /** İlan edilen adaların kattığı toplam marker — anasayfa tavanı budur. */
 export const ANASAYFA_MAX_BAILOUT = ANASAYFA_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
 
+/**
+ * MARKA SINIFINDA BİLİNÇLİ ADALAR — İLAN + MANDAL (REC-59 açık kalemi, 2026-09-15).
+ *
+ * ⭐AÇIK KALEM KAPANDI: yukarıdaki not *"`brands/[slug]` sınıfının kapı kuralı bu dosyada
+ * YOK ve o rota bugün 2 marker üretiyor — yani kimse bakmıyor"* diyordu. Kural artık var.
+ *
+ * ⭐SAYIYI BU KEZ ALTYAPI KENDİ ÖLÇTÜ (anasayfa ilanında sayı URUN'un derlemesinden
+ * aktarılmıştı ve bu sınır adıyla yazılmıştı). Ölçüm: ALTYAPI worktree'sinde `pnpm build`,
+ * 105 HTML üretildi, `.next/server/app/{tr,en}/brands/*.html` **altı marka sayfasının
+ * altısında da marker sayısı 2**; `brands.html` (liste) da **2**.
+ *
+ * ⚠**105 vs 245 FARKI ADIYLA:** aynı ilanın anasayfa bölümü "245 HTML'lik tek bir
+ * derlemede" diyor; benim derlemem **105** HTML üretti. İki sayı iki farklı ana ait (arada
+ * rota sınıfı ilanları ve kategori/ürün kümesi değişti) ve bu fark **ölçülmedi**. Burada
+ * yazma sebebim: ileride biri iki sayıyı karşılaştırıp birini bozuk sanmasın.
+ *
+ * İKİ ADA DA KÖK LAYOUT'TAN GELİYOR — yani anasayfa ilanındaki aynı iki ada:
+ * `vercel-analytics` ve `navigation-tracker`. Marka sayfasının KENDİ sayfa-düzeyi adası
+ * YOK; ölçümle doğrulandı (HTML'deki iki marker da footer/layout bölgesinde).
+ *
+ * ⭐KARŞILAŞTIRMALI ÖLÇÜM — ÜÇÜNCÜ ADA BAŞKA SINIFLARDA VAR: aynı derlemede `auth/login`,
+ * `auth/callback`, `payment-success`, `destek/hesaplayicilar/hrv` ve
+ * `destek/hesaplayicilar/hava-perdesi` **3** marker veriyor. Üçüncü marker sayfa düzeyinde
+ * doğuyor (girişte `animate-spin` bekleme göstergesiyle sarılı ada). Marka sınıfında o yok;
+ * bu yüzden tavan 2, 3 değil. *İki sınıfın aynı sayıyı vermesi tesadüf olabilir — ayrımı
+ * ölçmeden tek tavan yazmak, iki sınıfı birbirine kefil yapardı.*
+ *
+ * ⚠ROTA SINIFI İLANI: `brands/[slug]` bugün `export const revalidate = 3600` +
+ * `generateStaticParams()` taşıyor ama **`export const dynamic` ilanı YOK** (ölçüldü:
+ * `src/app/[lang]/brands/[slug]/page.tsx`). Yukarıdaki gerekçe düzeltmesine göre ayırt edici
+ * olan tam budur: ilanı olmayan rotada `useSearchParams()` çağıran adalar marker DOĞURUR.
+ * Yani 2 sayısı bu rotanın BUGÜNKÜ ilan durumunun sonucudur. Rota bir gün
+ * `force-static` ilan ederse sayı **0**'a düşer ve tavan (üst sınır olduğu için) yine
+ * yeşil kalır — kapı gevşemez, yalnız boşluğu daralır.
+ */
+export const MARKA_BILINCLI_ADALAR: readonly BilincliAda[] = [
+  {
+    ada: 'vercel-analytics',
+    nicin:
+      'Kök layout içindeki <Analytics/> useSearchParams() çağırıyor (src/app/layout.tsx). ' +
+      'Kök layout PRERENDER EDİLEN HER SINIFI etkiler; marka sayfaları da prerender ' +
+      'ediliyor (generateStaticParams + revalidate), bu yüzden aynı ada burada da sayılır.',
+    marker: 1,
+  },
+  {
+    ada: 'navigation-tracker',
+    nicin:
+      'ClientLayout içindeki NavigationTracker useSearchParams() çağırıyor. Aynı gerekçe: ' +
+      'kök layout kaynaklı, sayfaya özgü değil. Marka sayfasının KENDİ sayfa-düzeyi adası ' +
+      'YOK — ölçüldü, HTML’deki iki marker da layout bölgesinde.',
+    marker: 1,
+  },
+]
+
+/** İlan edilen adaların kattığı toplam marker — marka sınıfı tavanı budur. */
+export const MARKA_MAX_BAILOUT = MARKA_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+
+/**
+ * ⚠MARKA DETAYINDA ÜRÜN LİSTESİ SUNUCUDAN GELMİYOR — ÖLÇÜLDÜ, VE KAPI BUNU İDDİA ETMEZ.
+ *
+ * `.next/server/app/tr/brands/vortice.html` içinde:
+ *   · `<h1>` **1** (marka adı gövdede, sunucudan geliyor — 39 kez "Vortice" geçiyor)
+ *   · `href="/tr/products/` **0**  ·  `href="/tr/category/` **0**
+ *   · `animate-pulse` **4** (iskelet)
+ *
+ * Yani sayfanın başlığı ve marka anlatısı SSR'da, **ürün listesi DEĞİL** — istemcide
+ * yükleniyor ve HTML'de yerine dört iskelet duruyor.
+ *
+ * ⛔BU YÜZDEN MARKA KURALINA "ürün bağlantısı var" İŞARETİ KOYULMADI. Koyulsaydı kapı
+ * bugün KIRMIZI olurdu; sayıyı 0'a çekip "geçti" demek ise kapının olmayan bir şeyi
+ * doğruladığı izlenimi verirdi. Kapı yalnız ölçtüğünü iddia eder.
+ *
+ * ⭐BU BİR AÇIK KALEMDİR, SESSİZ GEÇİLMİYOR: marka detayında ürün listesinin sunucuda
+ * üretilip üretilmemesi gerektiği bir ÜRÜN kararıdır (vitrin/SEO eksenli) ve bu dosyanın
+ * işi değil. Karar "SSR olsun" çıkarsa bu bloğun yerine bir işaret eklenir ve o gün kapı
+ * gerçekten bir şey daha ölçer. Liste sayfasında durum FARKLI ve orada işaret KOYULDU:
+ * `brands.html` altı `href="/tr/brands/` bağlantısı basıyor, yani liste SSR'da GERÇEKTEN var.
+ */
+export const MARKA_DETAY_SSR_SINIRI =
+  'marka detayinda urun listesi SSR degil (olculdu 2026-09-15: href="/tr/products/" 0, animate-pulse 4)'
+
 export interface Kural {
   yol: string
   sinif: Sinif
@@ -203,7 +291,15 @@ export interface Temsilciler {
   altgrupluKategori: string | null
   yaprakKategori: string | null
   pdp: string | null
-  sayimlar: { kategori: number; ikiSegmentli: number; pdp: number }
+  /**
+   * Marka detay temsilcisi (REC-59 açık kalemi). Adresten seçilir, içerikten DEĞİL — ve
+   * bu ayrım kasıtlı: kategori sınıflarında içerikten seçim gerekmişti çünkü "alt gruplu"
+   * olmak ADRESTEN anlaşılmıyordu (REC-286). Marka sınıfında böyle bir belirsizlik YOK:
+   * `/tr/brands/<slug>` tek bir sınıftır ve site haritası onu kanonik olarak ilan ediyor.
+   * Gereksiz ağ isteği yapmamak da bir ölçüttür.
+   */
+  marka: string | null
+  sayimlar: { kategori: number; ikiSegmentli: number; pdp: number; marka: number }
   /** Seçim İÇERİKTEN mi yapıldı (kaç aday çekildi) — beyan, koşum çıktısına basılır. */
   secim: { icerikten: boolean; denenenAday: number; adayTavani: number }
   /** Temsilcisi bulunamayan sınıflar + SEBEP. Boş dizi = her sınıf ölçüldü. */
@@ -258,11 +354,16 @@ export async function temsilcileriSec(
   const kategori = yollar.filter((p) => /^\/tr\/category\/[^/]+$/.test(p))
   const ikiSegmentli = yollar.filter((p) => /^\/tr\/category\/[^/]+\/[^/]+$/.test(p))
   const pdp = yollar.filter((p) => /^\/tr\/products\/[^/]+$/.test(p))
+  // Marka detayı: site haritası bunları kanonik olarak ilan ediyor (`sitemap.ts` §3 Brand
+  // Routes, `HVAC_BRANDS` üzerinden). Liste sayfası (`/tr/brands`) SABİT yol olduğu için
+  // temsilci gerektirmez; yalnız detay sınıfı seçilir.
+  const marka = yollar.filter((p) => /^\/tr\/brands\/[^/]+$/.test(p))
 
   const sayimlar = {
     kategori: kategori.length,
     ikiSegmentli: ikiSegmentli.length,
     pdp: pdp.length,
+    marka: marka.length,
   }
   // Sıralama SABİTLENİR: sitemap sırası değişse bile aynı taban aynı temsilciyi verir,
   // yoksa "dün geçti bugün düştü" gürültüsünün sebebi ölçülemez hâle gelir.
@@ -319,6 +420,7 @@ export async function temsilcileriSec(
       altgrupluKategori: ilk(kategori.filter((p) => altPrefixleri.has(p))),
       yaprakKategori: ilk(ikiSegmentli),
       pdp: ilk(pdp),
+      marka: ilk(marka),
       sayimlar,
       secim: { icerikten: false, denenenAday: 0, adayTavani: ADAY_TAVANI },
       atlananlar,
@@ -363,10 +465,24 @@ export async function temsilcileriSec(
     })
   }
 
+  // Marka temsilcisi yoksa SESSİZ GEÇİLMEZ: sınıf `atlananlar`a sebebiyle yazılır.
+  // Site haritası marka adreslerini ilan etmiyorsa bu bir HARİTA kusurudur ve o kusurun
+  // görünmesi gerekir — kapının "marka sınıfını ölçtüm" sanması daha kötüdür.
+  if (marka.length === 0) {
+    atlananlar.push({
+      sinif: 'marka',
+      sebep:
+        "site haritasinda /tr/brands/<slug> deseni HIC YOK — temsilci secilemedi, " +
+        'sinif OLCULMEDI (yesil DEGIL). Harita brand rotalarini ilan ediyor olmali ' +
+        '(sitemap.ts §3 Brand Routes).',
+    })
+  }
+
   const t: Temsilciler = {
     altgrupluKategori,
     yaprakKategori,
     pdp: ilk(pdp),
+    marka: ilk(marka),
     sayimlar,
     secim: { icerikten: true, denenenAday, adayTavani: ADAY_TAVANI },
     atlananlar,
@@ -390,6 +506,25 @@ function zorunluKontrol(t: Temsilciler, sayimlar: Temsilciler['sayimlar']): void
         `içerikten=${t.secim.icerikten}, denenen aday=${t.secim.denenenAday}/${t.secim.adayTavani}). ` +
         'Kapı KIRMIZI. NOT: sitemap\'te HİÇ kategori/PDP yolu yoksa bu gerçek bir kusurdur; ' +
         'aday çekilebildiği hâlde hiçbiri aile kartı basmıyorsa bu da gerçek bir kusurdur.'
+    )
+  }
+
+  /**
+   * MARKA sınıfı da `kapida: true` — temsilcisi yoksa kapı KIRMIZI.
+   *
+   * ⭐AYRI `throw`, VE SIRASI SONRA: sebep karışmasın diye ayrı yazıldı (kategori/PDP
+   * temsilcisinin yokluğu İÇERİK seçimiyle ilgilidir; marka temsilcisinin yokluğu doğrudan
+   * SİTE HARİTASININ marka rotalarını ilan etmemesi demektir). Sırası sonda, çünkü ilk
+   * yazımda başa koymuştum ve **mevcut altı kolu düşürdü**: eski kollar kategori/PDP hata
+   * metnini bekliyordu, benim kontrolüm onlardan önce atıp başka bir metin veriyordu.
+   * Yani yeni bir kontrol eklerken ESKİ kontrolün mesajını çalmamak da ölçütün parçası.
+   */
+  if (!t.marka) {
+    throw new Error(
+      'SSR duman kurallari: MARKA sinifinin temsilcisi YOK ' +
+        `(sitemap'te /tr/brands/<slug> sayisi=${sayimlar.marka}). Kapi KIRMIZI. ` +
+        'Bu gercek bir kusurdur: sitemap.ts §3 Brand Routes marka adreslerini ilan ediyor ' +
+        'olmali. Olcememek gecmek DEGILDIR.'
     )
   }
 }
@@ -493,6 +628,47 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
       sinif: 'pdp',
       markerlar: [/<h1[\s>]/, />Model Seçimi</],
       maxBailout: PDP_MAX_BAILOUT,
+      kapida: true,
+    },
+
+    /**
+     * MARKA LİSTESİ — REC-59 açık kaleminin birinci yarısı.
+     *
+     * SABİT YOL: temsilci gerekmez, `/tr/brands` her zaman var (sitemap statik rotası).
+     *
+     * İKİ İŞARET DE ÖLÇÜLDÜ (kendi derlemem, `.next/server/app/tr/brands.html`):
+     * `<h1>` 1 · `href="/tr/brands/` **6**. İkinci işaret ayırt edicidir: yalnız `<h1>`
+     * arayan bir kural, liste boş gelse bile yeşil kalırdı — başlık kabuğun parçası,
+     * bağlantılar ise VERİNİN sunucuda çözüldüğünün kanıtı.
+     *
+     * KAPIDA KOŞAR: ölçüt sağlam (dil metnine bağlı değil, adres desenine bağlı).
+     */
+    {
+      yol: '/tr/brands',
+      sinif: 'marka-listesi',
+      markerlar: [/<h1[\s>]/, /href="\/tr\/brands\//],
+      maxBailout: MARKA_MAX_BAILOUT,
+      kapida: true,
+    },
+
+    /**
+     * MARKA DETAYI — REC-59 açık kaleminin ikinci yarısı, kapanan asıl kalem.
+     *
+     * ⚠TEK İŞARET, VE SEBEBİ YUKARIDA ADIYLA YAZILI (`MARKA_DETAY_SSR_SINIRI`): bu sayfada
+     * ürün listesi SSR'da YOK (ölçüldü: `href="/tr/products/` 0, `animate-pulse` 4). Bu
+     * yüzden "ürün bağlantısı var" işareti KOYULMADI — koyulsaydı kapı bugün kırmızı olurdu
+     * ve kırmızıyı kapatmak için ölçütü gevşetmek gerekirdi. Kapı yalnız ölçtüğünü iddia eder.
+     *
+     * Konan işaret `<h1>`: marka adı gövdede sunucudan geliyor (39 kez "Vortice"). Yani
+     * kural şunu güvenceye alır: marka detayı boş kabuk DÖNMEZ ve bailout sayısı 2'yi geçmez.
+     *
+     * KAPIDA KOŞAR: temsilci adresten seçiliyor (içerik denemesi yok) ve işaret sağlam.
+     */
+    {
+      yol: t.marka as string,
+      sinif: 'marka',
+      markerlar: [/<h1[\s>]/],
+      maxBailout: MARKA_MAX_BAILOUT,
       kapida: true,
     },
   ]
