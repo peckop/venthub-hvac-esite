@@ -1,0 +1,142 @@
+name: Sema Tabani Uret (salt-okuma)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NİÇİN VAR (REC-336, ölçüldü 2026-09-14)
+#
+# `supabase/migrations/**` tek başına prod şemasını ÜRETEMİYOR: boş bir veritabanına
+# oynatıldığında 14 tablo hiç doğmuyor. O 14 tablo `supabase/baselines/` altındaki
+# döküme yazılmış — ama o döküm ÖLÇÜLDÜ ve şu çıktı:
+#
+#   döküm 2026-08-13 : 41 create table · PRIMARY KEY 1 · ADD CONSTRAINT 0
+#                      CREATE INDEX 0 · REFERENCES 0
+#   canlı (aynı gün)  : PK 55 · unique 20 · FK 110 · indeks 199 · politika 163
+#
+# Yani o dosya bir ŞEMA TABANI DEĞİL, bir TABLO LİSTESİ. Onu "taban" sayan bir
+# kurulum, anahtarsız ve bağsız bir veritabanı üretir ve kapıyı YEŞİL yakar —
+# yani çalışmayan bir şeyi çalışıyor diye belgeler. Bu iş akışı o yüzden var:
+# GERÇEK bir `--schema-only` dökümü üretir.
+#
+# ⛔PROD'A YAZMA YOK. Tek yaptığı okumaktır; `pg_dump --schema-only` eşdeğeri.
+#
+# ⛔DOĞRUDAN COMMIT YOK. Döküm ARTEFAKT olarak iner; depoya `supabase/baselines/`
+# altına ancak PR ile girer. Sebep: bir şema tabanı insan gözü ve diff görmeden
+# depoya girmemeli — eskisinin boş olduğunun AYLARCA fark edilmemesinin sebebi tam
+# olarak buydu.
+#
+# ⛔ELLE TETİK (workflow_dispatch). Zamanlanmış koşum YOK: bu iş akışı prod'a
+# bağlanır ve ne zaman bağlandığı insanın kararı olsun.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      not:
+        description: "Nicin kosuyorsun (kayda gecer)"
+        required: false
+        default: "REC-336 sema tabani tazeleme"
+
+# Repo PUBLIC: `permissions:` yazıldığı anda varsayılanlar DÜŞER ve `contents: read`
+# olmadan checkout "Repository not found" verir (CLAUDE.md notu, sahada ölçüldü).
+permissions:
+  contents: read
+
+concurrency:
+  group: sema-tabani-uret
+  cancel-in-progress: false
+
+jobs:
+  uret:
+    runs-on: ubuntu-latest
+    env:
+      DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ⭐SIR VARLIĞI UZUNLUKLA ÖLÇÜLÜR, DEĞERİYLE DEĞİL.
+      # `${VAR:-VARSAYILAN}` kalıbı sır SET İSE değeri EKRANA BASAR; 2026-09-04'te
+      # tam bu kalıp prod bağlantı dizesini parolasıyla günlüğe dökmüştü.
+      - name: Sir var mi (FAIL-CLOSED, deger basilmaz)
+        run: |
+          if [ "${#DB_URL}" -eq 0 ]; then
+            echo "::error::SUPABASE_DB_URL sirri BOS ya da tanimsiz — doküm alinamaz."
+            exit 1
+          fi
+          echo "SUPABASE_DB_URL mevcut (uzunluk ${#DB_URL} karakter, deger BASILMADI)."
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.101.0
+
+      - name: CLI surumu
+        run: supabase --version
+
+      # Canlı sayılar AYNI KOŞUMDA okunur ki PR'ı inceleyen insan dökümdeki sayılarla
+      # yan yana görsün. Bu adım SELECT'tir; hiçbir şey yazmaz.
+      - name: Canli sema sayilari (salt-okuma, karsilastirma icin)
+        run: |
+          set -euo pipefail
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -tA -c "
+            select 'tablo=' || (select count(*) from information_schema.tables
+                                 where table_schema='public' and table_type='BASE TABLE')
+                || ' pk=' || (select count(*) from pg_constraint c join pg_namespace n on n.oid=c.connamespace
+                                 where n.nspname='public' and c.contype='p')
+                || ' unique=' || (select count(*) from pg_constraint c join pg_namespace n on n.oid=c.connamespace
+                                 where n.nspname='public' and c.contype='u')
+                || ' fk=' || (select count(*) from pg_constraint c join pg_namespace n on n.oid=c.connamespace
+                                 where n.nspname='public' and c.contype='f')
+                || ' indeks=' || (select count(*) from pg_indexes where schemaname='public')
+                || ' politika=' || (select count(*) from pg_policies where schemaname='public');
+          " | tee canli-sayilar.txt
+
+      - name: Sema dokumu al (--schema-only, VERI YOK)
+        run: |
+          set -euo pipefail
+          mkdir -p cikti
+          # ⚠VERİ DÖKÜLMEZ: yalnız şema. Veri dökümü bu işin kapsamı DEĞİL ve
+          # müşteri verisini bir artefakta indirmek kabul edilebilir değil.
+          supabase db dump --db-url "$DB_URL" -f cikti/public_schema.sql
+          echo "doküm satir sayisi: $(wc -l < cikti/public_schema.sql)"
+
+      # ⭐EN ÖNEMLİ ADIM: BOŞ DÖKÜMÜ REDDET.
+      # Eskisi tam da bu kontrol olmadığı için "taban" sayıldı. Eşikler 2026-09-14
+      # canlı ölçümünden TABAN olarak alındı (PK 55 · unique 20 · FK 110 · indeks 199
+      # · politika 163); tavan değil TABAN oldukları için şema büyürse kapı susar,
+      # şema ÇÖKERSE konuşur.
+      - name: DOKUM DOLU MU (fail-closed; bos dokum artefakt olmaz)
+        run: |
+          set -euo pipefail
+          F=cikti/public_schema.sql
+          say() { grep -ci "$1" "$F" || true; }
+          T=$(say 'create table'); P=$(say 'primary key'); I=$(say 'create index\|create unique index')
+          R=$(say 'references '); L=$(say 'create policy')
+          echo "dokumde: tablo=$T pk=$P indeks=$I fk=$R politika=$L"
+          echo "canlida: $(cat canli-sayilar.txt)"
+          HATA=0
+          [ "$T" -ge 50  ] || { echo "::error::doküm tablo sayisi $T < 50";      HATA=1; }
+          [ "$P" -ge 40  ] || { echo "::error::doküm PRIMARY KEY $P < 40";       HATA=1; }
+          [ "$I" -ge 100 ] || { echo "::error::doküm CREATE INDEX $I < 100";     HATA=1; }
+          [ "$R" -ge 80  ] || { echo "::error::doküm REFERENCES $R < 80";        HATA=1; }
+          [ "$L" -ge 100 ] || { echo "::error::doküm CREATE POLICY $L < 100";    HATA=1; }
+          if [ "$HATA" -ne 0 ]; then
+            echo "::error::Bu doküm bir SEMA TABANI DEGIL. 2026-08-13 dokumu tam boyle"
+            echo "::error::gecmisti (tablo listesi, 0 indeks) ve aylarca taban sanildi."
+            exit 1
+          fi
+          echo "doküm dolu — artefakt olarak yuklenebilir."
+
+      - name: Artefakt yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: sema-tabani
+          path: |
+            cikti/public_schema.sql
+            canli-sayilar.txt
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Sonraki adim (insan icin)
+        run: |
+          echo "Artefakti indir, supabase/baselines/<tarih>_public_schema.sql olarak"
+          echo "ekle ve PR ac. DOGRUDAN COMMIT YOK — sema tabani diff gorulmeden girmez."

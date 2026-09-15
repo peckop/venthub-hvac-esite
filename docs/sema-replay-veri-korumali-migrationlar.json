@@ -1,0 +1,96 @@
+{
+  "_ne": "SEMA REPLAY'inde BOS bir golge veritabaninda DUSMESI BEKLENEN migration'larin ilani, UC SINIF halinde. Cetvel: docs/standards/ledger-ve-olu-migration-standard.md. Kapi: INV-SEMA-TABAN-2. Olcum: docs/audits/rec336-sema-replay-olcum-2026-09-15.md",
+  "_nicin_ilan": "Hedef SEMA'nin uretilebilmesidir, VERININ degil. Ilan olmazsa replay kapisi dogru davranislari KIRMIZI sayar, gurultuye boger ve ucuncu gunde kapatilir (hafiza: olcut-dogru-evren-yanlis).",
+  "_nicin_muafiyet_degil": "Bu liste MUAFIYET DEGIL SINIF ILANI. Muafiyet 'hatasini gormezden gel' demektir; sinif ilani 'bu baglamda bu davranis beklenendir' demektir. Ayrim OLCULEBILIR: ilan edilen her dosya gercekten o sinifin izini tasimali (kapi arar). Bir dosya SADECE sema hatasi verdigi icin listeye KONAMAZ.",
+  "_uc_sinif": {
+    "VERI-KORUMALI": "Migration bir sayim/varlik olcup veri yoksa KENDISI durur ve islemi geri alir. Bos golgede dusmesi DOGRU DAVRANIS ve dosyanin dogru yazildiginin KANITI. KALICI olarak kapsam disi.",
+    "ORTAM-BAGIMLI": "Migration Supabase'e ozgu bir uzantiyi sart kosar (ornek: pg_cron). Ciplak PostgreSQL'de uzanti YOK. Kapsam disi olmasinin bedeli ADIYLA yazilir: dosyanin `public` semasina ait kismi uygulanmissa karsilastirma bozulmaz.",
+    "SEMA-VERI-KARISIK": "⛔EN AGIR SINIF VE BIR KUSURDUR: ayni dosya hem SEMA yaratiyor hem VERI kosulu ariyor, ustelik TEK ISLEM icinde. Veri kosulu tutmazsa yarattigi SEMA DA geri alinir ve ondan sonraki migration'lar domino gibi duser. Bu sinif kapsam disi ilan edilir ama BORC olarak durur; yeni migration'lar boyle YAZILMAZ (cetvel kurali)."
+  },
+  "_olcum_yuzeyi": "Bos bir PostgreSQL kumesinde: once supabase/baselines/00_golge_onsoz.sql, sonra TAM sema dokumu, sonra dokum tarihinden SONRAKI migration'lar sirayla. Liste GERCEK KOSUM ciktisindan derlendi.",
+  "_metin_taramasi_yanlis_evren": "'ON KOSUL/bekleniyordu/guard/DURDU' kelimelerini arayan tarama 21 dosya buluyor; gercekten dusen 8. Kelime TASIMAK ile on kosulun TETIKLENMESI ayri seylerdir. Bu ilan davranistan derlendi, metinden DEGIL.",
+  "_pass_fail_olcut_degil": "⭐DOSYA BAZINDA 'gecti/dusti' OLCUT DEGILDIR. Bir dosya kendi islemini yonetiyorsa (kendi `commit`i varsa) hata ANINDAKI durum kismi olabilir: ornegin pg_cron dosyasinin `public` nesneleri UYGULANIR, yalniz zamanlama kismi kaybolur. Kapinin olcutu SEMA KARSILASTIRMASIDIR (tablo/PK/unique/FK/indeks/politika sayilari ve nesne listesi); dosya listesi TESHIS icindir.",
+  "surum": 2,
+  "guncelleme": "2026-09-15",
+  "kaynak_kayit": "REC-336",
+  "olcum_kaydi": "docs/audits/rec336-sema-replay-olcum-2026-09-15.md",
+  "kalemler": [
+    {
+      "dosya": "20260811_f2_split_model_schema.sql",
+      "sinif": "SEMA-VERI-KARISIK",
+      "on_kosul": "yeni kategori sayisinin 4 olmasi (ve iki FK'nin RESTRICT'e donmus olmasi)",
+      "golgede_mesaji": "F2 guard: yeni kategori sayisi 4 degil (1)",
+      "nicin_dogru": "Korumanin kendisi dogru yazilmis (sessiz kismi goc yerine geri aliyor), AMA ayni dosyada brands ve product_families tablolarini da yaratiyor ve dosya kendi islemini commit ediyor; koruma tutmayinca SEMA DA geri alinir. Bos golgede bu dosya 20 migration'i domino gibi dusuren KOK SEBEPTIR.",
+      "borc": "Bu bir kusurdur. Yeni migration'lar sema ile veri kosulunu AYNI dosyada birlestirmez (cetvel kurali). Mevcut dosya tarihsel kayit olarak kalir; cozum yolu TAZE bir sema tabani tutmaktir."
+    },
+    {
+      "dosya": "20260813_pricing_w0_cost_parity.sql",
+      "sinif": "ORTAM-BAGIMLI",
+      "on_kosul": "pg_cron uzantisinin kurulabilir olmasi",
+      "golgede_mesaji": "extension \"pg_cron\" is not available",
+      "nicin_dogru": "Ciplak PostgreSQL'de pg_cron paketi yoktur. Dosyanin `public` semasina ait kismi (products degisikligi, currency_rates tablosu, iki indeks, RLS, iki politika) uzanti satirindan ONCE gelir ve UYGULANIR; kaybolan sey yalniz gunluk zamanlama isidir. Karsilastirma `public` semasi uzerinden yapildigi icin sonuc degismez."
+    },
+    {
+      "dosya": "20260823130000_product_families_name_i18n_en.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "25 satir guncellenmesi (aile adlarinin EN cevirileri)",
+      "golgede_mesaji": "T151b DURDU: 25 satir beklenirken 0 satir guncellendi",
+      "nicin_dogru": "Sessiz KISMI yazim yerine islemi geri aliyor. Bos golgede aile kaydi yoktur; 0 satir dogru sonuctur ve durmasi da dogru."
+    },
+    {
+      "dosya": "20260826220000_search_suggestions_family_route.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "ornek bir aramanin gercekten urun onerisi uretmesi",
+      "golgede_mesaji": "guard: \"lineo\" aramasi hic urun onerisi uretmedi ya da family_slug bos — kanit YOK sayilir",
+      "nicin_dogru": "Kendi ciktisini KANIT olarak olcuyor. Urun verisi olmayan bir veritabaninda kanit uretilemez; fail-closed davranis dogrudur."
+    },
+    {
+      "dosya": "20260827120000_katalog_omurgasi.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "374 aktif urun",
+      "golgede_mesaji": "ON KOSUL: 374 aktif urun bekleniyordu, 0 bulundu — karar kaydi bayat, olcumu yenile.",
+      "nicin_dogru": "Katalog omurgasini VERI uzerinde kuruyor. Bos golgede 0 urun beklenen durumdur ve durmasi dogrudur."
+    },
+    {
+      "dosya": "20260828090000_katalog_duzeltme_seri_kimlikleri.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "jet-serisi 21 model",
+      "golgede_mesaji": "ON KOSUL: jet-serisi 21 model bekleniyordu, 0 bulundu.",
+      "nicin_dogru": "Belirli urun kayitlarinin kimligini duzeltiyor; o kayitlar yoksa yapacak isi yoktur ve durmasi dogrudur."
+    },
+    {
+      "dosya": "20260828100000_anlati_sayfalari_landing.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "air-curtains kategorisinin var olmasi",
+      "golgede_mesaji": "ON KOSUL: air-curtains kategorisi yok.",
+      "nicin_dogru": "Kategori kaydina baglanan anlati sayfalari kuruyor; kategori verisi bos golgede yoktur ve durmasi dogrudur."
+    },
+    {
+      "dosya": "20260831071500_kategori_kalinti_temizligi.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "18 aktif alt kategori",
+      "golgede_mesaji": "ON KOSUL: 18 aktif alt kategori bekleniyordu, 0 bulundu — taban bayat.",
+      "nicin_dogru": "Temizlik isi; temizlenecek kalinti yoksa durmasi dogrudur ve yanlislikla genis silme yapmasini engeller."
+    },
+    {
+      "dosya": "20260831110000_kategori_gorselleri.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "product_images tablosunda satir olmasi",
+      "golgede_mesaji": "ON KOSUL: product_images BOS — atanacak gorsel yok.",
+      "nicin_dogru": "Gorsel atiyor; atanacak gorsel yoksa yapacak isi yoktur ve durmasi dogrudur."
+    },
+    {
+      "dosya": "20260914090000_olu_migration_dosyalari_defterden_silinir.sql",
+      "sinif": "VERI-KORUMALI",
+      "on_kosul": "_migration_ledger'da tam BES belirli satirin bulunmasi",
+      "golgede_mesaji": "REC-321: BES satir silinmesi beklenirken 0 satir silindi. Defterin hali 2026-09-14 olcumunden FARKLI — parite bozulabilir, geri alindi. Yeniden olcun.",
+      "nicin_dogru": "Kendi sayisini dogrulayan fail-closed silme. Bos golgede defter bostur; 0 satir silinmesi beklenen durumdur ve islemi geri almasi DOGRU."
+    }
+  ],
+  "_ne_ogrendik": [
+    "⛔SEMA MIGRATION'I VERI KOSULU ARAMAZ: 20260811_f2 hem tablo yaratiyor hem kategori sayiyor, tek islem icinde. Koruma tutmayinca SEMA DA geri gidiyor ve ardindan gelen 20 migration domino gibi dusuyor. Yani tek bir karisik dosya, butun zincirin sifirdan kurulabilirligini imkansiz kiliyor. Koruma kotu degil, YERI kotu.",
+    "HEDEF TANIMI OLCUMU BELIRLER: 'gecmis prod'u uretebiliyor mu' sorusu SEMA icin sorulur; veri bagimli adim bir sema adimi degildir.",
+    "DOSYA BAZINDA PASS/FAIL OLCUT DEGIL: kendi islemini yoneten bir dosya kismen uygulanabilir. Olcut sema karsilastirmasidir.",
+    "VERI KORUMASI IYI TASARIMDIR: sekiz VERI-KORUMALI dosyanin hepsi sessiz kismi yazim yerine islemi GERI ALIYOR; golgede dusmeleri dogru yazildiklarinin kanitidir."
+  ]
+}
