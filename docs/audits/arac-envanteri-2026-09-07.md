@@ -484,7 +484,7 @@ GitHub tarafında bayat/hayalet bir kayıt; repo tarafı hiç izlemedi. Durum: *
 tarafı hayalet)** — OPS'un GitHub Actions ayarlarından elle temizlemesi gerekir (repo commit'i
 gerektirmez).
 
-### 3.6 · cetvel — `docs/standards/*.md` (67 araç)
+### 3.6 · cetvel — `docs/standards/*.md` (68 araç)
 
 > Kapı sütunu cetveller.md'deki kapı aynen taşındı. Durum: KAPILI→**KAL**, HARİTADA-KAPISIZ ve
 > YETİM→**KAL-KAPISIZ** (AXIOM 3 madde 3: kapısı yok ama var — kapı borcu). Sahip: sahipsiz
@@ -492,6 +492,7 @@ gerektirmez).
 
 | dosya | ne_yapar | sahip | tetik | kanıt | kapı | durum |
 |---|---|---|---|---|---|---|
+| arama-standard | Sitedeki ürün aramasının cetveli: aranan alan ve satır kümesi (SSOT), sorgu normalizasyonu, eşleştirme semantiği, tenant/yetki sınırı, iki katmanlı kapı, on iki maddelik asgari vaka kümesi, tazeleme ve migration kuralları | URUN | REC-340 Faz 1 | 2026-09-15, REC-340 Faz 1. ⭐Satır URUN'un hükmüyle ALTYAPI tarafından yazıldı: dosya ALTYAPI claim'inde, URUN kapıya takıldı, AŞMADI, değişikliği geri alıp hükmü mesajla verdi. Ve satır bu PR'da duruyor çünkü KUPLAJ ölçüldü — envanter DİSKLE karşılaştırılır, satır ile dosya AYNI AĞAÇTA olmak zorunda (ayrı PR denendi: envanter 77 / disk 76, beş kol kırmızı) | `INV-SEARCH-*` — **HENÜZ YAZILMADI**, Faz 1 Adım 1'in konusu (kapı sütunu boş bırakılmadı: boşluk kapı varmış gibi okunur) | KAL-KAPISIZ |
 | 3d-scene-lighting-research | 3D vitrin sahne/ışık araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
 | 3d-showroom-ux-research | 3D vitrin bilgi paneli/UX araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
 | 3d-webgl-standard | 3D/WebGL standardı | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-19 | yok | KAL-KAPISIZ |
