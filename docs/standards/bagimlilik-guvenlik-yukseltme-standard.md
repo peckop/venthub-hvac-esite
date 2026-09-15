@@ -16,6 +16,38 @@ Otomatik kapı **bilinçli olarak yok** — audit çıktısı her gün değişir
 bir kapı, üçüncü günde bakılmayan bir kapıdır (aynı sınıf: `docs/audits/` içindeki
 "yeşil kapı bakmadığı şeyi kanıtlamaz" dersleri).
 
+### 1.1 · ⚠SIKLIK REVİZYONU — **TASLAK, ONAY BEKLİYOR** (REC-345, 2026-09-15)
+
+⛔**BU PARAGRAF HENÜZ KURAL DEĞİL.** Recep onayı gelmedi; onay gelene kadar geçerli olan
+sıklık **yukarıdaki satırdır** (haftada bir).
+
+Önerilen yeni sıklık: **iki haftada bir tam tarama + her güvenlik olayında anlık tarama.**
+
+⚠**BU ÖNERİ MEVCUT KURALI GEVŞETİYOR, ADIYLA YAZILIYOR:** yukarıdaki satır "haftada bir"
+diyor; öneri bunu **iki haftaya** çıkarıyor. Yani bu bir netleştirme değil, bir **gevşetme**
+ve öyle karara sunulmalı. Gevşetmeyi sessizce yapmak, cetvelin kendi geçmişini silmek olurdu.
+
+Gevşetme lehine ölçülmüş gerekçe: tarama çıktısı her gün değişir ve haftalık tam tarama
+pratikte **koşturulmadı** — 2026-09-15'te ölçüldü, son yazılı kayıt bu tarihten öncesine ait
+değil, yani haftalık kural yazılıydı ve **tutulmadı.** Tutulmayan bir sıklık, olmayan bir
+sıklıktan daha kötüdür: kayda uyulduğu sanılır.
+
+Gevşetme aleyhine gerekçe (aynı ölçümde): bugün **11 yüksek** kayıt var ve hepsi tek bir
+doğrudan bağımlılıktan geliyor (`docs/audits/bagimlilik-2026-09-15.md` §2). İki haftalık
+pencere, böyle bir kalemin görünmesini geciktirir.
+
+⭐**ASIL DÜZELTME SIKLIK DEĞİL, GÖRÜNÜRLÜK OLABİLİR:** haftalık kural tutulmadı çünkü
+hatırlanması gerekiyordu. REC-345 ile tarama tazeliği artık her turun başında görünen bir
+satıra bağlandı (`⚠BAGIMLILIK: son tarama N gun · high H`). Yani sıklık kuralının
+tutulmasını sağlayan şey sayının kendisi değil, **görünürlüğü**. Bu yüzden karar sunulurken
+iki seçenek ayrı ayrı sorulur: sıklığı gevşetmek mi, yoksa haftalık kuralı KORUYUP
+görünürlüğe güvenmek mi.
+
+**Eşik:** açılış satırı **14 gün** varsayılanıyla uyarır (`VENTHUB_BAGIMLILIK_ESIK_GUN`).
+Bu sayı taslaktaki sıklıkla hizalı; sıklık haftalık kalırsa eşik de **7** olmalıdır ve
+kapının varsayılanı o gün değişir. İkisinin ayrışması, kapının cetveli değil kendini
+ölçmesi demek olurdu.
+
 ## 2 · Şiddet tek başına süre belirlemez — MARUZİYET ölçülür
 
 ⛔**Manşet şiddeti bir eylem emri değildir.** "2 CRITICAL" gördüğünde önce beş soruyu ölç:

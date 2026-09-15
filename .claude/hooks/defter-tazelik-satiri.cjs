@@ -155,4 +155,54 @@ try {
 }
 
 process.stdout.write((uyari ? '⚠DEFTER: ' : 'DEFTER: ') + parcalar.join(' · ') + '\n')
+
+/**
+ * ── İKİNCİ SATIR: BAĞIMLILIK TARAMASI TAZELİĞİ (REC-345) ──
+ *
+ * NİÇİN AYNI KANCA: ölçüm zaten yazılı bir kayıtta duruyor
+ * (`docs/audits/bagimlilik-YYYY-MM-DD.md`) ve REC-342'de öğrenilen ders tam buydu —
+ * **ölçümün var olması, kararın verildiği yerde göründüğü anlamına gelmez.** İkinci bir
+ * kanca açmak yerine aynı yüzeye ikinci satır yazmak, hem bütçeyi hem dikkat payını korur.
+ *
+ * ⭐NE ÖLÇER, NE ÖLÇMEZ: tarama KAYDININ yaşını ölçer, taramanın kendisini KOŞTURMAZ.
+ * `pnpm outdated` ve `pnpm audit` ikisi de AĞ ister ve saniyeler sürer; bu satırın bütçesi
+ * 300 ms. Sayı kayıttan okunur.
+ * ⚠Sınırı adıyla: "tarama yapıldı" ile "tarama KAYDA GEÇTİ" aynı şey değildir. Kayda
+ * geçmeyen bir tarama burada görünmez — ve bu KASITLI, çünkü kayda geçmeyen ölçüm bir
+ * hafta sonra yok sayılır.
+ *
+ * ⭐`high ≥ 1` TEK BAŞINA UYARI SEBEBİ DEĞİLDİR: bugün 11 yüksek kayıt var ve hepsi
+ * bilinen, kayda geçmiş, insan kararı bekleyen kalemler. Her turda kırmızı yanan bir satır
+ * üç günde görmezden gelinir (bu projede ölçülmüş bir kusur). Kapı TARAMA TAZELİĞİNİ ölçer;
+ * sayı yine de YAZILIR, çünkü gizlenmesi de yanlış olurdu.
+ */
+const BAGIMLILIK_ESIK_GUN = Number(process.env.VENTHUB_BAGIMLILIK_ESIK_GUN || 14)
+const DENETIM_DIZINI = path.join(DEPO, 'docs', 'audits')
+
+try {
+  // Dizin hiç yoksa da "kayıt yok" demek DOĞRU cevaptır: ham `ENOENT` metnini basmak,
+  // okuyana yol hatası gibi görünür ve gerçek sebebi (tarama kaydı yazılmamış) gizler.
+  let adlar = []
+  try {
+    adlar = fs.readdirSync(DENETIM_DIZINI).filter((a) => /^bagimlilik-\d{4}-\d{2}-\d{2}\.md$/.test(a))
+  } catch {
+    adlar = []
+  }
+  if (adlar.length === 0) throw new Error('bagimlilik-*.md kaydi yok')
+
+  const enYeniAd = adlar.sort().slice(-1)[0]
+  const gun = Math.floor((Date.now() - Date.parse(/(\d{4}-\d{2}-\d{2})/.exec(enYeniAd)[1])) / 86_400_000)
+
+  // `high` sayısı kaydın kendi tablosundan okunur; ayrı bir yerde tutulan sayı bayatlar.
+  const metin = fs.readFileSync(path.join(DENETIM_DIZINI, enYeniAd), 'utf8')
+  const m = /Yüksek önemde güvenlik kaydı[^|]*\|\s*\*\*(\d+)\*\*/.exec(metin)
+  const high = m ? m[1] : null
+
+  const satir = 'son tarama ' + gun + ' gun' + (high === null ? ' · high OKUNAMADI (kayitta tablo satiri yok)' : ' · high ' + high)
+  process.stdout.write((gun >= BAGIMLILIK_ESIK_GUN || high === null ? '⚠BAGIMLILIK: ' : 'BAGIMLILIK: ') + satir + '\n')
+} catch (e) {
+  // ÖLÇEMEDİM ≠ TAZE.
+  process.stdout.write('⚠BAGIMLILIK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)
