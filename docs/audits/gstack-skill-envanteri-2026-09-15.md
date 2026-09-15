@@ -22,9 +22,61 @@ Hiçbir skill **çalıştırılmadı**, hiçbir dosya değiştirilmedi, ağa ç�
 | Hüküm | Adet | Ne demek |
 |---|---|---|
 | **DENE** | 9 | Bugün gerçek bir boşluğu dolduruyor |
-| **ÇAKIŞIYOR** | 20 | Bizde karşılığı var; ikincisi veri/karar bölünmesi üretir |
+| **KIYAS BEKLİYOR** | 20 | Bizde benzeri var **ama aynı olduğu ÖLÇÜLMEDİ** (§1b) |
 | **ATLA** | 29 | Bu projeye uygun değil |
 | **BELİRSİZ** | 12 | Tanıtımdan anlaşılmadı ya da bugün ihtiyaç yok |
+
+## 1b. "ÇAKIŞIYOR" hükmü GERİ ALINDI — ölçülmemiş hükümdü
+
+İlk sürümde 20 skill "ÇAKIŞIYOR" diye kapatılmıştı. **Bu hüküm askıya alındı.** Gerekçe, Recep'in
+2026-09-15 itirazı: *"senin 'bizde de aynısı var' iddian çok iddialı, gerçekten de aynısı mı? bak
+bugün de kullandın gstack daha iyi çıktı. bizde var diye kendi malımız diye ayrıcalık göstermem
+ben."*
+
+**İtiraz haklı ve kanıtı aynı gün elimizdeydi.** `plan-eng-review` ile `plan-challenger` için de
+"aynı iş" denebilirdi; yan yana koşunca **35 bulgunun yalnız 6'sı örtüştü**, %83'ü tek araçta
+yaşadı. Yani "aynı iş" sezgisi ölçülen tek vakada **YANLIŞ** çıktı — ve ben aynı sezgiyi 20 skill
+için ölçmeden uyguladım.
+
+**Üç hata adıyla:**
+1. **Ölçmeden hüküm.** Ad ve tanıtım benzerliğine bakıp "aynı iş" dendi. Tek ölçülen vaka bunu
+   çürüttü.
+2. **Sahiplik ölçüt sayıldı.** "Bizde var" bir envanter bilgisidir, üstünlük gerekçesi değil.
+   Recep'in uyarısı: *"6 ay sonra gstack için de bizim diyeceksin ve başka repodan gelen ile
+   kıyaslayacaksın."* Aynı körlük ters yöne de işler.
+3. **Yanlış yere itiraz.** gstack'in kendi kaydını tutması **doğru davranıştır** — bizim
+   `MEMORY.md`'mizin yaptığının aynısı. Recep: *"bence o da bir referans ve sonuçta kendi kaydını
+   tutuyor, bence böyle olması lazım. karışıklık bu değil, bizim karışıklığımız."* Kabul: §4'teki
+   itirazın konusu kayıt tutmak değil, **bizim** kayıtlarımızın dağınıklığıdır.
+
+### Kıyas ölçütü (bundan sonra her "aynı iş" iddiası buna tabidir)
+
+- **"Aynı iş yapıyor" iddiası yalnız YAN YANA KOŞUMLA kanıtlanır.** Aynı girdi ikisine de verilir.
+- **Ölçüt:** bulgu sayısı · örtüşen bulgu oranı · yalnız tek araçta kalan bulgular · yanlış pozitif.
+- **Kimin yazdığı kıyasta GEÇMEZ.** Ne "bizim", ne "dışarıdan". Yalnız sayılar.
+- **Örtüşme yüksekse** gerçekten aynı iştir, biri seçilir. **Düşükse** ikisi farklı soru soruyordur
+  ve ikisi de kalır — `plan-challenger` / `plan-eng-review` vakası budur.
+- **Brief eşit olmalı.** Bugünkü kıyasta bizim araca on yönlendirici soru yazıldı, gstack'e yalnız
+  plan verildi; bu yanlılık `gstack-yan-yana-2026-09-15.md`'de yazılı ve eşit-brief turu
+  yapılmadı. Sonraki kıyaslarda brief eşitliği ön şarttır.
+
+### İkinci kapı: TETİKLENME (Recep 2026-09-15)
+
+*"bu skill'ler peki doğru şekilde tetikleniyorlar mı? sadece 'gstack evet bu skill iyiymiş' demek
+de yeterli değil bize uygun şekilde otomatik tetikleniyor mu?"*
+
+Ölçtüm: bu sınav **bizde zaten var** ama gstack'i **görmüyor**. `.github/workflows/skills-gate.yml`
+iki iş taşıyor — `skills sayac` (ücretsiz, her PR'da; **12/8 kuralı + tetik çakışması** ölçüyor) ve
+`skills yonlendirme sinavi` (ücretli, skill değişince, `skills:eval`). İkisinin de evreni **proje
+klasörüdür**; gstack `~/.claude/skills/` altında, yani bugüne kadar **hiçbir gstack skill'i bu
+sınava girmedi**.
+
+**Risk somut:** pakette bizimkilerle **aynı adı taşıyan** skill'ler var (`qa`, `office-hours`,
+`investigate`) — tetik çakışması tam orada doğar.
+
+**Kural:** bir araç ancak **iki kapıyı birden** geçerse "bizim" olur — (a) yan yana koşumda değer
+katar, (b) yönlendirme sınavında doğru anda tetiklenir. Birini geçip ötekini geçmeyen araç
+envanterde kalır ama kullanıma girmez.
 
 ## 2. DENE — dokuz skill, öncelik sırasıyla
 
@@ -111,11 +163,34 @@ olduğunda ise ikinci bir durum kaydı doğuyor.
 **Hüküm:** kullanacağımız skill'lerin çıktısı **bizim** kayıt yüzeylerimize taşınır
 (`docs/audits/`, Linear). gstack'in kendi deposu referans kabul edilmez.
 
-## 8. Sıradaki adım
+## 8. Bu borç NASIL UNUTULMAYACAK (Recep sordu, cevap kapıya bağlanıyor)
+
+*"o zaman haftaya bunu unutmayacak mıyız? nasıl yöneteceksin? zaten her şeyi o gün içinde dahi
+unutuyoruz... ben compact atıyorum zaten gidiyor çoğu bilgi."*
+
+**Söz yetmez.** Üç katman, üçü de yazıya dayanıyor:
+
+1. **Bu dosya borcu adıyla söyler.** 20 satır "ÇAKIŞIYOR" değil **"KIYAS BEKLİYOR"**. Kapatılmış
+   bir hüküm değil, açık bir kalem.
+2. **Araç envanterine girer.** `docs/audits/arac-envanteri-*.md` — bugün arama cetveli nasıl
+   envantere yazıldıysa aynı şekilde. Envantere yazılmayan araç `INV-ARAC-1`'de kırmızı verir.
+3. **Kapıya yeni kol:** *"kıyas bekleyen araç var mı ve kaç gündür bekliyor?"* Belli bir tazelik
+   eşiğini aşarsa kırmızı. Unutmak o zaman **imkânsız** hale gelir, çünkü unutursak testler düşer.
+
+Bu, projenin kendi ilkesinin uygulanmasıdır: **hatırlanan değil, kapıya yazılan iş yapılır.**
+Katman 2 ve 3 `scripts/hijyen/**` ile `src/__tests__/conformance/**` altında, yani ALTYAPI
+şeridinde — emir olarak açılır, bu dosya onu ADIYLA işaret eder.
+
+## 9. Sıradaki adım
 
 Bu envanter bir **hüküm** dosyasıdır, emir değil. **DENE** listesindeki dokuz skill için sıra ve
-kapsam kararı Recep'e aittir; her biri kullanılmadan önce `SKILL.md`'si baştan sona okunur ve
-"bizim kayıt yüzeyimize yazar" şartı sağlanır.
+kapsam kararı Recep'e aittir; her biri kullanılmadan önce `SKILL.md`'si baştan sona okunur,
+yönlendirme sınavından geçer ve "bizim kayıt yüzeyimize yazar" şartı sağlanır.
+
+**KIYAS BEKLİYOR** listesindeki 20 skill için önerilen sıra — en çok kullandığımız işler önce,
+çünkü bir iyileşme orada en çok kazandırır: (1) değişiklik incelemesi (`diff-review` ↔ `review`),
+(2) arıza kök sebebi (`investigate` ↔ `gstack-investigate`), (3) site testi (`qa` ↔ `gstack-qa`).
+Kalanı ihtiyaç doğdukça ölçülür.
 
 İlgili: `gstack-yan-yana-2026-09-15.md` (aynı gün, `/plan-eng-review` ile `plan-challenger`
 karşılaştırması ve dört sorunun taşınması hükmü).
