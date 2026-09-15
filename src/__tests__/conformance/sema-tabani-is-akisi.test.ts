@@ -219,6 +219,42 @@ describe('INV-SEMA-TABAN-2: veri korumali migration ilani gecerli ve taze', () =
   })
 
   /**
+   * ⭐ISARETCI KIRIK OLMASIN — GERCEK KUSURDAN SONRA EKLENDI (2026-09-15).
+   *
+   * Ilan kendi olcum kaydini `olcum_kaydi` ve `_ne` alanlarinda ADIYLA gosteriyor. Ilk
+   * yazimda o ad henuz yazilmamis bir dosyayi gosteriyordu ve hicbir kol bunu olcmuyordu.
+   * Kirik isaretci sessiz bir kusurdur: ilani okuyan kisi "olcum var" sanir, dosyayi
+   * arar, bulamaz ve ilanin tamamina guvenmeyi birakir. Bir gerekce ancak GOSTERDIGI YER
+   * DURUYORSA gerekcedir.
+   *
+   * ⭐BOS DOSYA DA KABUL EDILMEZ: var olmak yetmez, icinde olcum olmali. Esik kasitli
+   * olarak dusuk (1 KB) — bu kol belgenin KALITESINI olcmez, VARLIGINI olcer; kaliteyi
+   * olcmeye calisan kol kacinilmaz olarak gevser.
+   */
+  it('ISARETCI SAGLAM: ilanin gosterdigi olcum kaydi VAR ve bos degil', () => {
+    const j = JSON.parse(fs.readFileSync(ILAN_YOLU, 'utf8')) as Record<string, unknown>
+    const kayit = j.olcum_kaydi
+    expect(typeof kayit, 'ilanda olcum_kaydi alani YOK').toBe('string')
+
+    const mutlak = path.join(KOK, ...(kayit as string).split('/'))
+    expect(
+      fs.existsSync(mutlak),
+      `Ilan var olmayan bir olcum kaydini gosteriyor: ${kayit as string}\n` +
+        'Ya dosyayi yaz, ya isaretciyi duzelt — arada bir yer YOK.',
+    ).toBe(true)
+    expect(
+      fs.statSync(mutlak).size,
+      `Olcum kaydi neredeyse bos: ${kayit as string}`,
+    ).toBeGreaterThan(1024)
+
+    // `_ne` alani da ayni yolu anmali; iki yerde iki ayri ad tutulursa biri sessizce bayatlar.
+    expect(
+      String(j._ne),
+      '_ne alani olcum kaydini BASKA bir adla aniyor — tek ad tutulmali.',
+    ).toContain(kayit as string)
+  })
+
+  /**
    * ⭐ASIL KOL: ilan edilen dosya GERÇEKTEN bir veri ön koşulu taşıyor mu.
    * Bu, ilanı bir muafiyet listesine dönüşmekten korur: biri şema hatası veren bir
    * dosyayı buraya ekleyip kapıyı susturamaz, çünkü o dosyada veri koruması yoktur.

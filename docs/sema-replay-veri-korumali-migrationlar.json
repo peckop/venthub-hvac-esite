@@ -1,5 +1,5 @@
 {
-  "_ne": "SEMA REPLAY'inde BOS bir golge veritabaninda DUSMESI BEKLENEN migration'larin ilani, UC SINIF halinde. Cetvel: docs/standards/ledger-ve-olu-migration-standard.md. Kapi: INV-SEMA-TABAN-2. Olcum: docs/audits/rec336-sema-replay-olcum-2026-09-15.md",
+  "_ne": "SEMA REPLAY'inde BOS bir golge veritabaninda DUSMESI BEKLENEN migration'larin ilani, UC SINIF halinde. Cetvel: docs/standards/ledger-ve-olu-migration-standard.md. Kapi: INV-SEMA-TABAN-2. Olcum: docs/audits/rec336-baseline-2026-09-15.md",
   "_nicin_ilan": "Hedef SEMA'nin uretilebilmesidir, VERININ degil. Ilan olmazsa replay kapisi dogru davranislari KIRMIZI sayar, gurultuye boger ve ucuncu gunde kapatilir (hafiza: olcut-dogru-evren-yanlis).",
   "_nicin_muafiyet_degil": "Bu liste MUAFIYET DEGIL SINIF ILANI. Muafiyet 'hatasini gormezden gel' demektir; sinif ilani 'bu baglamda bu davranis beklenendir' demektir. Ayrim OLCULEBILIR: ilan edilen her dosya gercekten o sinifin izini tasimali (kapi arar). Bir dosya SADECE sema hatasi verdigi icin listeye KONAMAZ.",
   "_uc_sinif": {
@@ -13,7 +13,7 @@
   "surum": 2,
   "guncelleme": "2026-09-15",
   "kaynak_kayit": "REC-336",
-  "olcum_kaydi": "docs/audits/rec336-sema-replay-olcum-2026-09-15.md",
+  "olcum_kaydi": "docs/audits/rec336-baseline-2026-09-15.md",
   "kalemler": [
     {
       "dosya": "20260811_f2_split_model_schema.sql",
