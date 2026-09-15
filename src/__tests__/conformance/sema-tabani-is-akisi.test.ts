@@ -327,3 +327,83 @@ describe('INV-SEMA-TABAN-2: veri korumali migration ilani gecerli ve taze', () =
     ).toEqual([])
   })
 })
+
+/**
+ * INV-SEMA-TABAN-3 — ŞEMA YARATAN MIGRATION VERİ KOŞULU ARAMAZ (REC-336, cetvel §10).
+ *
+ * NİÇİN VAR (ölçülmüş, varsayım değil): boş bir gölgede 63 migration'ın 25'i düştü ve kök
+ * sebep TEK dosyaydı — `20260811_f2_split_model_schema.sql` hem `create table` yapıyor hem
+ * "yeni kategori sayısı 4 değil" diye veri koşulu arıyor, üstelik kendi işlemini commit
+ * ediyor. Koruma tutmayınca **yarattığı şema da geri gidiyor** ve ~20 migration domino gibi
+ * düşüyor. Yani tek bir karışık dosya, bütün zincirin sıfırdan kurulabilirliğini imkânsız
+ * kılıyor. Korumanın kendisi doğru tasarım; yanlış olan YERİ.
+ *
+ * ⭐GEÇMİŞ DOSYA DEĞİŞTİRİLMEZ (cetvel §1: defter tek otorite). Bu yüzden kapı "dosyayı
+ * düzelt" demez; **ilan zorunluluğu** ölçer: karışık bir dosya ya ilanda `SEMA-VERI-KARISIK`
+ * sınıfıyla ve `borc` alanıyla durur, ya da KIRMIZI.
+ *
+ * ⚠KAPININ SINIRI, ADIYLA YAZILI (cetvel §10 ile aynı): bu kol SQL'i ANLAMAZ. Yeni yazılan
+ * bir karışık dosyayı kimse ilana koymazsa kapı onu YAKALAMAZ. Boşluk bilinçli: SQL'i
+ * anlamaya çalışan bir ölçüt yanlış-kırmızı üretir ve yanlış kırmızı veren kapı kapatılır.
+ * Kolun ölçtüğü şey, BİLİNEN karışık dosyanın ilanda ve borçlu kalmaya devam etmesidir —
+ * yani borcun sessizce silinmemesi.
+ */
+describe('INV-SEMA-TABAN-3: sema-veri karisik dosya BORC olarak durur (cetvel §10)', () => {
+  const CETVEL_YOLU = path.join(KOK, 'docs', 'standards', 'ledger-ve-olu-migration-standard.md')
+  const ILAN_YOLU = path.join(KOK, 'docs', 'sema-replay-veri-korumali-migrationlar.json')
+  const KARISIK_DOSYA = '20260811_f2_split_model_schema.sql'
+
+  it('CETVELDE KURAL YAZILI — uc cumlenin ucu de ADIYLA gecer', () => {
+    expect(fs.existsSync(CETVEL_YOLU), 'cetvel dosyasi yok').toBe(true)
+    const md = fs.readFileSync(CETVEL_YOLU, 'utf8')
+
+    // Kuralın üç ayağı ayrı ayrı aranır: biri düşerse kural yarım yazılmış demektir ve
+    // yarım kural, uygulanmayan kuraldır.
+    const ayaklar: [string, RegExp][] = [
+      ['sema yaratan migration veri kosulu aramaz', /VERİ KOŞULU ARAMAZ/i],
+      ['veri kosulu AYRI DOSYAYA yazilir', /AYRI DOSYAYA yazılır/i],
+      ['migration kendi islemini commit etmez', /KENDİ İŞLEMİNİ COMMIT ETMEZ/i],
+    ]
+    const eksik = ayaklar.filter(([, re]) => !re.test(md)).map(([ad]) => ad)
+    expect(eksik, `Cetvelde kuralin bu ayaklari YOK: ${eksik.join(' | ')}`).toEqual([])
+  })
+
+  it('CETVEL KENDI SINIRINI YAZIYOR — kapinin SQL anlamadigi gizlenmiyor', () => {
+    const md = fs.readFileSync(CETVEL_YOLU, 'utf8')
+    // Sınırını yazmayan cetvel, olmayan bir güvence satar. Bu kol tam onu engeller.
+    expect(md, 'Cetvel §10 sinir bolumu yok').toMatch(/SINIR \(adıyla\)/)
+    expect(md, 'Cetvel kapinin SQL anlamadigini YAZMIYOR').toMatch(/SQL'i anlayarak yapmaz/)
+  })
+
+  it('BILINEN KARISIK DOSYA ILANDA VE BORCLU — borc sessizce silinemez', () => {
+    const j = JSON.parse(fs.readFileSync(ILAN_YOLU, 'utf8')) as {
+      kalemler: { dosya: string; sinif: string; borc?: string }[]
+    }
+    const kalem = j.kalemler.find((k) => k.dosya === KARISIK_DOSYA)
+    expect(
+      kalem,
+      `${KARISIK_DOSYA} ilandan DUSMUS. O dosya 25 dusen migration'in KOK SEBEBI;\n` +
+        'ilandan cikarmak borcu kapatmaz, yalnizca GORUNMEZ kilar (cetvel §10).',
+    ).toBeDefined()
+    expect(kalem?.sinif, 'sinif SEMA-VERI-KARISIK olmali').toBe('SEMA-VERI-KARISIK')
+    expect(
+      (kalem?.borc ?? '').length,
+      'SEMA-VERI-KARISIK kaleminin borc alani BOS — agir sinif bedelini yazmak ZORUNDA.',
+    ).toBeGreaterThan(40)
+  })
+
+  it('AYIRT EDER — dosya GERCEKTEN hem sema hem veri kosulu tasiyor', () => {
+    // Kol bir iddiaya değil DOSYAYA dayanmalı: ilan "karışık" diyorsa dosyada hem şema
+    // yaratan ifade hem sayım kolu bulunmalı. Bulunmazsa ilan bayatlamış ya da yanlış.
+    const yol = path.join(KOK, 'supabase', 'migrations', KARISIK_DOSYA)
+    expect(fs.existsSync(yol), `${KARISIK_DOSYA} yok — ilan bayat`).toBe(true)
+    const sql = fs.readFileSync(yol, 'utf8').toLowerCase()
+
+    expect(sql, 'dosyada sema yaratan ifade YOK — karisik siniflandirmasi yanlis olabilir').toMatch(
+      /create table/,
+    )
+    expect(sql, 'dosyada veri kosulu izi YOK — karisik siniflandirmasi yanlis olabilir').toMatch(
+      /count\(|raise exception/,
+    )
+  })
+})
