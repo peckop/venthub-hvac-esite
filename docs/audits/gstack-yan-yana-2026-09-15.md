@@ -125,6 +125,45 @@ değişikliği içeren planda `/plan-eng-review` tek başına yeter. Yalnız ver
 > olabilir. Dürüst karşılaştırma için ikisine de aynı serbest brief verilen ikinci bir tur gerekir.
 > Bu tur **yapılmadı** — hüküm bu sınırla okunur.
 
+---
+
+## Değerlendirme: aracı mı tutalım, sorularını mı? (URUN hükmü, Recep sordu)
+
+**Aracın asıl katkısı bulduğu hatalar değil, SORDUĞU SORU.** `plan-challenger` *"bu plan yanlış
+mı"* diye sorar; `/plan-eng-review` *"bu plan gerekli mi"* diye sorar. Bugünkü somut karşılığı:
+bizim araçlarımız planın iki P0 hatasını buldu, gstack ise planın bir adımının **hiçbir vakayı
+kurtarmadığını** gösterip Faz 1'i küçülttü. Hata bulmak kolaydır; iş azaltmak zordur.
+
+**Bizde olmayan ve gstack'in getirdiği dört soru:**
+1. *Bu adım gerekli mi?* — Adım 5 (pgroonga A/B) dokuz vakanın hiçbirini kurtarmıyordu; çıkarıldı.
+2. *Bu zaten var mı?* — "What already exists" envanteri; `INV-SEARCH-ROUTE-1`'in varlığını bu
+   soru buldu ve planın "hiçbir kapı aramayı ölçmüyor" cümlesini çürüttü.
+3. *Kaç yol test ediliyor?* — 26 kod/kullanıcı yolundan 3'ü, yani %12. Sayı verilmeden "kapı
+   yazacağız" demek ölçüsüzdür.
+4. *Çalışan bir şeyi bozuyor muyuz?* — `VRT-17160` bugün kusursuz; yazım hatası yedeği onu
+   bozabilir. Bu kural bizde yazılı değildi.
+
+**İki çekince, ikisi de yapısal.**
+
+- **Araç bu projede BİRİKMİYOR.** Kendi telemetrisi, öğrenme kaydı, inceleme günlüğü ve sürüm
+  yükseltmesi var; bu turda hepsi kapatıldı (gerekçeleri aşağıdaki sapma listesinde). Kapalı
+  oldukları sürece araç her seferinde sıfırdan başlar. Açarsak da **dışa bağımlılık** doğar: başka
+  bir projenin sürüm yükseltmesi bizim inceleme davranışımızı değiştirebilir.
+- **Araç bu projenin kurallarını bilmiyor.** "Migration merge = prod'a otomatik uygulama" gibi
+  bize özel ve pahalı kuralları **brief'e ben yazdığım için** gördü. Yazmasaydım görmezdi. Yani
+  aracın kalitesi kısmen brief'i yazanın kalitesidir.
+
+**Hüküm:** aracı kullanmaya devam et, ama **kalıcı değeri araçta değil sorularda ara.** Yukarıdaki
+dört soru `plan-challenger`'a bir bölüm olarak taşınmalı. Dayanak: bugün gstack'e özgü 12 bulgunun
+çoğu bir yetenek farkından değil, **soru tipi farkından** doğdu — aynı soruları biz de sorabiliriz.
+O zaman araç yarın kaybolsa da kazanç depoda kalır.
+
+**Taşıma kalemi açılması gerekiyor** (`plan-challenger`'a kapsam-daraltma + mevcut-varlık +
+test-kapsamı + regresyon soruları). Bu dosya onu ADIYLA işaret eder; açılmadığı sürece bu hüküm
+"hatırlanan" kalır, "emre yazılan" olmaz.
+
+---
+
 ### gstack'in koşturulmayan kısımları (sapma listesi)
 
 Aşama 4'te yazılan sapmanın dışında, alt ajan şunları da atladı (emirle): dış ses turu (Codex /
