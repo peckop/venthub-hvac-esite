@@ -1,6 +1,6 @@
 # Ledger ve Ölü Migration Dosyası Cetveli
 
-**Sürüm 1.0 · 2026-09-14 · Şerit: ALTYAPI · Kaynak: REC-321 (Recep kararı, SEÇENEK 1)**
+**Sürüm 1.1 · 2026-09-15 · Şerit: ALTYAPI · Kaynak: REC-321 (Recep kararı, SEÇENEK 1) + REC-336 (§10)**
 
 Bu cetvel şu soruya cevap verir: **prod'a hiç uygulanmamış ama depoda duran bir
 migration dosyası ne olur?** 2026-09-14'e kadar bu sorunun yazılı cevabı **yoktu**;
@@ -222,3 +222,70 @@ Sessiz bir kısmi silme, paritenin bozulması demekti.
   saymıştı. O dosya ölü ama "geçersiz" değil, yalnız hiç uygulanmamış.
 - **Bu cetvel tek bir vakadan yazıldı.** İkinci bir ölü dosya kümesi çıkarsa buradaki
   kural sınanmış olacak; bugün sınanmamış durumda.
+
+## 10 · ⭐ŞEMA YARATAN MIGRATION VERİ KOŞULU ARAMAZ (REC-336, 2026-09-15)
+
+**Sürüm 1.1 ile eklendi. Kaynak: REC-336 şema replay ölçümü — `docs/audits/rec336-baseline-2026-09-15.md`.**
+
+### Kural (üç cümle)
+
+1. **Şema yaratan bir migration VERİ koşulu ARAMAZ.** `create table`, `alter table`,
+   `create index`, `create policy` yapan bir dosya "şu tabloda şu kadar satır olmalı"
+   diye bir ön koşul koymaz.
+2. **Veri koşulu AYRI DOSYAYA yazılır.** Aynı işi yapan iki dosya olur: biri şemayı
+   kurar, diğeri veriyi taşır ve kendi ön koşulunu arar.
+3. **Migration KENDİ İŞLEMİNİ COMMIT ETMEZ.** Sarmalamayı koşucu yapar; dosya kendi
+   `commit`ini yazarsa hata anındaki durum kısmi kalır ve kimse neyin uygulandığını
+   bilemez.
+
+### Niçin — ölçülmüş olay, varsayım değil
+
+REC-336'da boş bir gölge veritabanına taban dökümü + 63 migration oynatıldı: **25'i
+düştü.** Kök sebep **tek dosya**: `20260811_f2_split_model_schema.sql`.
+
+O dosya aynı işlem içinde üç şeyi birden yapıyor: `brands` ve `product_families`
+tablolarını (ve indekslerini) **yaratıyor**, "yeni kategori sayısı 4 değil" diye bir
+**veri koşulu arıyor**, ve **kendi işlemini commit ediyor.**
+
+Boş gölgede kategori verisi yoktur → koşul tutmaz → dosya işlemi geri alır → **yarattığı
+ŞEMA da geri gider** → ondan sonraki ~20 migration `brands` bulamadığı için domino gibi
+düşer.
+
+**Korumanın kendisi DOĞRU tasarımdır.** Sessiz kısmi göç yerine geri almak istenen
+davranıştır ve bu cetvelin §8'i de bunu söyler. Yanlış olan **YERİ**: şema ile veri koşulu
+aynı işlemde birleşince, **veri yoksa şema da üretilemez** hale gelir. Tek bir karışık
+dosya, bütün zincirin sıfırdan kurulabilirliğini imkânsız kılar.
+
+### ⭐NİÇİN BU BİR SİLME/DÜZELTME EMRİ DEĞİL
+
+Geçmiş bir migration'ı **değiştirmek yasaktır** (§1: defter tek otoritedir; dosyayı
+değiştirmek pariteyi bozar). O yüzden `20260811_f2_split_model_schema.sql`
+**değiştirilmedi** ve değiştirilmeyecek. Kural **bundan sonra yazılacak** dosyalar için
+geçerlidir; mevcut dosya **BORÇ** olarak ilan edilir
+(`docs/sema-replay-veri-korumali-migrationlar.json`, sınıf `SEMA-VERI-KARISIK`).
+
+Borcun çözüm yolu dosyayı geçmişte onarmak değil, **taze bir şema tabanı tutmaktır**:
+taban canlının o günkü hâli olduğu için karışık dosyanın üstünde durur ve zincir artık
+ondan başlamaz.
+
+### İLAN EDİLMİŞ İSTİSNA
+
+Kural mutlak değildir ama istisna **bedavaya alınmaz.** Bir dosya hem şema hem veri koşulu
+taşıyacaksa:
+
+- Dosya `docs/sema-replay-veri-korumali-migrationlar.json` içinde **`SEMA-VERI-KARISIK`**
+  sınıfıyla ilan edilir,
+- İlan kaleminde **`borc` alanı zorunludur** ve niçin başka yolu olmadığını yazar,
+- Kapı (`INV-SEMA-TABAN-2`) ilanı ve borcu ölçer; ilansız bir karışık dosya **KIRMIZI**.
+
+**Muafiyet ile sınıf ilanı aynı şey değildir:** muafiyet "hatasını görmezden gel" der,
+sınıf ilanı "bu bir kusurdur, adı yazılıdır, yenisi böyle yazılmaz" der.
+
+### SINIR (adıyla)
+
+- Bu kural **bir vakadan** yazıldı. İkinci bir karışık dosya çıkarsa kural sınanmış
+  olacak; bugün sınanmamış durumda.
+- Kapı, karışık dosyayı **ilan zorunluluğu** üzerinden ölçer; "şema mı veri mi" ayrımını
+  SQL'i anlayarak yapmaz. Yani yeni yazılan bir karışık dosya, kimse ilana koymazsa
+  **kapıya yakalanmaz**. Bu boşluk bilinçli olarak açık bırakıldı ve burada yazılıdır:
+  SQL'i anlamaya çalışan bir ölçüt, yanlış-kırmızı üretip kapatılma riskini taşır.
