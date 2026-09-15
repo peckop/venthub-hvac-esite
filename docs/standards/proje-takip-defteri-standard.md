@@ -56,8 +56,54 @@ bulgu dosyaları `docs/proje-takip/design-15a/` altında yaşar (önceden yalnı
 kapı adayı: OPS açılış rutini iki damgayı karşılaştırır, ayrışınca uyarı (ALTYAPI kapı tarafını yazar). Aynı gün ikinci
 olay: damga elle yazılınca önce yanlış ofset (dosya doğuştan bayat), sonra gelecek tarih (kapı sonsuza kadar yeşil = kör)
 çıktı. Kural: **damga elle yazılmaz, `date -u` ile ölçülür; eşitleyici üretir (v1.1); kapı `kopya > şimdi` hâlini HATA sayar.**
-Bugün kapı yok; `olc` çıkış 3 iken merge'i durduran bir CI kolu NLM girişi olmadan kurulamaz. Aday: manifest kapsamındaki
-dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
+`olc` çıkış 3 iken merge'i durduran bir **CI** kolu NLM girişi olmadan kurulamaz; o hâlâ kurulu değil. Aday: manifest
+kapsamındaki dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
+
+### 5.1 · ⭐AÇILIŞ SATIRI KAPISI — KURULDU (REC-342, 2026-09-15)
+
+⛔**"Bugün kapı yok" cümlesi 2026-09-15'te ÖLÇÜLDÜ ve YANLIŞ ÇIKTI.** Kapı vardı:
+`.claude/hooks/defter-bayatlik-olcumu.cjs` Stop olayında kurulu, `settings.json`'da bağlı ve elle koşturulduğunda doğru
+cevabı veriyordu ("son eşitleme 178 saat önce"). Yani REC-342'nin açılış varsayımı da bu paragraf da yanlıştı.
+
+⭐**Eksik olan ölçüm değil, ölçümün GÖRÜNDÜĞÜ YÜZEYDİ.** Üç sebep ölçüldü: (a) kanca **Stop** olayında koşuyor, yani
+turun SONUNDA — açılışta karar veren kişi görmez, defterin bayat olduğunu onu KULLANDIKTAN sonra öğrenir; (b) `async:
+true` ile kurulu ve **stderr**'e yazıyor, eşzamansız bir kancanın stderr'i turun akışına girmez; (c) 2 saatlik soğuma
+penceresi gürültü için doğru ama "bugün defter kaç gün bayat" sorusunun cevabı HER TURDA gerekir.
+**Bir kapının var olması, kararın verildiği yerde GÖRÜNDÜĞÜ anlamına gelmez.**
+
+⭐**İKİNCİ VE DAHA SESSİZ KUSUR (aynı ölçümde bulundu):** Stop kancası `olc` fiilinin **çıkış kodu 3**'ünü ARIZA
+sayıyordu ve `catch`e düşüp "OLCULMEDI" basıyordu. Oysa 3 bu cetvelin yukarıdaki satırında ve betiğin kendi başlığında
+**yazılı sözleşmedir**: "değişen var". Sonuç: sayı **tam gerektiği anda** kayboluyordu — defter tazeyken (çıkış 0)
+kusur hiç görünmüyordu. *Sözleşmesi YAZILI bir betik için çıkış kodu bir CEVAPTIR; sözleşmesi olmayan bir komut için
+yalnız bir işarettir.*
+
+**KURULAN KAPI:** `.claude/hooks/defter-tazelik-satiri.cjs`, **UserPromptSubmit** olayında, her turun **başında** tek
+satır:
+
+```
+⚠DEFTER: son esitleme 2026-09-08 (7 gun) · olc 14 degisen/22 · Kararlar kopyasi 3 gun
+```
+
+- **Eşik (VEYA ile bağlı):** yaş ≥ 2 gün **YA DA** değişen demet ≥ 1 → satır `⚠` ile başlar. Defter bugün eşitlenmiş
+  olsa bile içerik kaymışsa "taze" demek yanlış olur.
+- **Yaş ölçütü** `git log origin/master -- docs/proje-takip/state.json` — dosya damgası **DEĞİL**, çünkü eşitleme başka
+  bir worktree'de koşar ve yerel damga yanıltır (2026-09-07'de ölçüldü).
+- **Bütçe 300 ms, ve `olc` buraya SIĞMAZ:** ölçülen süreler `git log` 63 ms, `python olc` **631 ms**, çıplak node
+  açılışı ~187 ms. Bu yüzden pahalı sayı burada koşturulmaz; Stop kancasının yazdığı **önbellekten** okunur
+  (`.defter-olc-onbellek.json`, oturumdan bağımsız). Önbellek 24 saatten eskiyse **sayı KULLANILMAZ** ve satır
+  "önbellek bayat" der — *eski bir sayıyı taze gibi göstermek, hiç göstermemekten kötüdür.*
+- **Fail-open ama sessiz değil:** çıkış daima 0 (tur bloklanmaz), ama ölçemezse **"ölçülemedi (sebep)"** yazar.
+- ⛔**Dış servise çıkmaz:** NotebookLM'e hiçbir istek atılmaz; eşitlemeyi insan tetikler. Kapı bunu kaynakta da ölçer.
+
+**SINIRI (adıyla):** Kararlar kopyası ölçümü **dosya adındaki tarihi** okur, Linear belgesinin gerçek `updatedAt`
+değerini **değil**. Yani "kopya ne zaman alındı" sorusunu cevaplar, "kaynak o gün değişti mi" sorusunu **cevaplamaz** —
+o, API ister ve bu kanca çevrimdışıdır. Kopya bugünse kaynak yine de değişmiş olabilir; bu boşluk açıktır. Yukarıdaki
+damga-karşılaştırma adayı (v1.1) o boşluğun kapatma yolu olarak duruyor.
+
+**Kapı kendi kapısı:** `src/__tests__/conformance/kanca-defter-tazelik.test.ts` — 11 kol, iki bölüm. İki yön de ölçülür
+(bayatsa ⚠, tazeyse ⚠ YOK), "ölçemedi ≠ taze" ölçülür, bayat önbelleğin sayı olarak kullanılmadığı ölçülür, ve çıkış-3
+sözleşmesinin hem betikte hem **bu cetvelde** yazılı olduğu ölçülür — koda gömülü, yazılı olmayan bir sözleşme bir
+sonraki okuyucu için tuzaktır.
 
 **Hafıza sınavı (belgeler için kapı, v1.1):** `scripts/nlm/hafiza_sinavi.py` + `docs/proje-takip/hafiza-sinavi.json`
 (20 soru). Her soru deftere sorulur; cevap anahtarı Recep'ten değil YAZILI kararlardan gelir (Linear Kararlar, VISION,
