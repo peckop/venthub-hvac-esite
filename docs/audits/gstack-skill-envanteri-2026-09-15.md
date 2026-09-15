@@ -71,8 +71,14 @@ iki iş taşıyor — `skills sayac` (ücretsiz, her PR'da; **12/8 kuralı + tet
 klasörüdür**; gstack `~/.claude/skills/` altında, yani bugüne kadar **hiçbir gstack skill'i bu
 sınava girmedi**.
 
-**Risk somut:** pakette bizimkilerle **aynı adı taşıyan** skill'ler var (`qa`, `office-hours`,
-`investigate`) — tetik çakışması tam orada doğar.
+**DÜZELTME (OPS, 2026-09-15):** ilk sürümde *"pakette bizimkilerle aynı adı taşıyan skill'ler var"*
+yazmıştım — **yanlış, ad çakışması 09-13'te REC-314 adım 1 ile ÇÖZÜLDÜ**; üç kullanıcı sürümü
+`gstack-` öneki aldı ve bu envanterin kendi listesinde de zaten `gstack-qa` / `gstack-investigate`
+/ `gstack-office-hours` diye geçiyor. Yani kanıt elimdeydi, kendi tablomu okumadım.
+
+**Kalan gerçek boşluk iki tane:** (a) **tetik çakışması** — adlar ayrı olsa bile iki skill aynı
+soruya talip olabilir, sınav bunu ölçüyor; (b) **gstack'in sınavsızlığı** — evren proje klasörü
+olduğu için hiçbir gstack skill'i o sınava hiç girmedi.
 
 **Kural:** bir araç ancak **iki kapıyı birden** geçerse "bizim" olur — (a) yan yana koşumda değer
 katar, (b) yönlendirme sınavında doğru anda tetiklenir. Birini geçip ötekini geçmeyen araç
