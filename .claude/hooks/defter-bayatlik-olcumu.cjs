@@ -114,23 +114,57 @@ if (!sonEsitleISO) {
 const yasSaat = (Date.now() - Date.parse(sonEsitleISO)) / 3_600_000
 if (!Number.isFinite(yasSaat) || yasSaat < ESIK_SAAT) process.exit(0)
 
-/** ÖLÇÜM 2 — yalnız eşik aşılınca: kaç demet değişmiş (OPS'un `olc` fiili, SALT OKUMA). */
-let demetSatiri = 'degisen demet: OLCULMEDI'
-for (const yorumlayici of ['python', 'python3', 'py']) {
-  try {
-    const cikti = execFileSync(yorumlayici, [path.join(DEPO, 'scripts', 'nlm', 'proje_takip_sync.py'), 'olc'], {
-      encoding: 'utf8',
-      cwd: DEPO,
-      stdio: ['ignore', 'pipe', 'ignore'],
-      timeout: 60_000,
-    })
-    const son = cikti.trim().split('\n').filter(Boolean).slice(-3).join(' | ')
-    demetSatiri = 'olc ciktisi (son satirlar): ' + son.slice(0, 300)
-    break
-  } catch {
-    /* sıradaki yorumlayıcıyı dene */
+/**
+ * ÖLÇÜM 2 — yalnız eşik aşılınca: kaç demet değişmiş (OPS'un `olc` fiili, SALT OKUMA).
+ *
+ * ⛔İLK YAZIMIM BURADA YANLIŞTI — 2026-09-15'te ölçüldü (REC-342):
+ * `olc` fiili **çıkış kodu 3** ile "değişen demet VAR" der. Bu bir ARIZA DEĞİL, betiğin
+ * CEVABIDIR; hem betiğin kendi başlığında hem cetvelde (`proje-takip-defteri-standard.md`
+ * satır 38) aynen böyle yazılı. Eski sürüm `execFileSync`in fırlattığı her şeyi arıza sayıp
+ * `catch`e düşüyordu ve **tam sayının gerektiği anda** "OLCULMEDI" basıyordu. Yani defter
+ * gerçekten bayat olduğunda ölçüm kayboluyordu; taze olduğunda (çıkış 0) sorun yoktu.
+ *
+ * ⭐SINIF: "çıkış kodu kanıt değil" dersinin tersi hâli — çıkış kodu burada VERİYDİ ve ben
+ * onu arıza olarak okudum. Ayrım: kodu **sözleşmesi yazılı** bir betik için çıkış kodu bir
+ * cevaptır; sözleşmesi olmayan bir komut için yalnız bir işarettir.
+ *
+ * Bu yüzden: çıkış 0 ve 3 GEÇERLİ CEVAP sayılır, stdout iki hâlde de okunur. Başka bir kod
+ * ya da hiç stdout gelmemesi GERÇEK arızadır ve "ölçülemedi (sebep)" olarak yazılır.
+ */
+const OLC_GECERLI_KODLAR = [0, 3]
+
+function olcOzeti() {
+  for (const yorumlayici of ['python', 'python3', 'py']) {
+    let cikti = null
+    let sebep = ''
+    try {
+      cikti = execFileSync(yorumlayici, [path.join(DEPO, 'scripts', 'nlm', 'proje_takip_sync.py'), 'olc'], {
+        encoding: 'utf8',
+        cwd: DEPO,
+        stdio: ['ignore', 'pipe', 'ignore'],
+        timeout: 60_000,
+      })
+    } catch (e) {
+      // ⭐KOD 3 = CEVAP: stdout yine dolu gelir, onu kullan.
+      if (OLC_GECERLI_KODLAR.includes(e.status) && e.stdout) cikti = String(e.stdout)
+      else sebep = 'cikis kodu ' + String(e.status ?? e.code ?? 'bilinmiyor')
+    }
+    if (cikti == null) {
+      if (!sebep) sebep = 'ciktisiz'
+      continue
+    }
+    // `OZET: 14 degisen / 8 ayni / 22 demet` satırı SÖZLEŞMEDİR; yoksa biçim değişmiş demektir.
+    const m = /OZET:\s*(\d+)\s*degisen\s*\/\s*(\d+)\s*ayni\s*\/\s*(\d+)\s*demet/i.exec(cikti)
+    if (m) return { degisen: Number(m[1]), toplam: Number(m[3]) }
+    return { hata: 'OZET satiri bulunamadi — olc cikti bicimi degismis olabilir' }
   }
+  return { hata: 'python/py bulunamadi ya da betik cikti vermedi' }
 }
+
+const olc = olcOzeti()
+const demetSatiri = olc.hata
+  ? 'olc: OLCULEMEDI (' + olc.hata + ')'
+  : 'olc: ' + olc.degisen + ' degisen / ' + olc.toplam + ' demet'
 
 process.stderr.write(
   '[defter-bayatlik] ⚠DEFTER BAYAT: son esitleme ' + Math.round(yasSaat) + ' saat once (esik ' + ESIK_SAAT + ' saat).\n' +
@@ -146,6 +180,34 @@ try {
   fs.writeFileSync(uyariYolu, JSON.stringify({ ts: new Date().toISOString(), yasSaat: Math.round(yasSaat), sonEsitleISO }), 'utf8')
 } catch {
   /* soğuma yazılamadı: uyarı bir sonraki turda tekrar basar, zararsız */
+}
+
+/**
+ * ÖNBELLEK — açılış satırı (`defter-tazelik-satiri.cjs`) bu dosyayı okur.
+ *
+ * NİÇİN: `olc` ölçümü 631 ms sürüyor (ölçüldü) ve açılış satırının bütçesi 300 ms. Açılış
+ * satırı bu yüzden pahalı sayıyı KENDİ ÖLÇMEZ, buradan okur. Damga yazılır ki önbellek
+ * bayatladığında açılış satırı "önbellek bayat" diyebilsin — **eski bir sayıyı taze gibi
+ * göstermek, hiç göstermemekten kötüdür.**
+ *
+ * ⛔OTURUMA BAĞLI DEĞİL: dosya adında session_id YOK. Soğuma dosyası oturuma bağlıdır
+ * (uyarı sıklığı oturum başına), ama ÖLÇÜM paylaşılan bir olgudur.
+ */
+try {
+  fs.writeFileSync(
+    path.join(PANO, '.defter-olc-onbellek.json'),
+    JSON.stringify({
+      ts: new Date().toISOString(),
+      sonEsitleISO,
+      yasSaat: Math.round(yasSaat),
+      degisen: olc.hata ? null : olc.degisen,
+      toplam: olc.hata ? null : olc.toplam,
+      hata: olc.hata || null,
+    }),
+    'utf8',
+  )
+} catch {
+  /* önbellek yazılamadı: açılış satırı "önbellek yok" der — sessiz kalmaz */
 }
 
 process.exit(0)
