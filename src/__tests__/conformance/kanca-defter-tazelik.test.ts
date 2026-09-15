@@ -288,18 +288,38 @@ describe('INV-KANCA-DEFTER-3 · bagimlilik tarama tazeligi satiri', () => {
     }
   })
 
-  it('CETVEL SIKLIK REVİZYONUNU TASLAK olarak ve GEVŞETME olarak işaretliyor', () => {
-    // ⭐Bir taslağın "taslak" yazması yetmez: mevcut kuralı GEVŞETTİĞİNİ de yazmalı, yoksa
-    // onay veren kişi neyi gevşettiğini bilmeden onaylar. Bu kol o iki ibareyi arar.
+  it('⭐CETVEL SIKLIĞI ile KAPININ EŞİĞİ HİZALI — ayrışırsa kapı cetveli değil KENDİNİ ölçer', () => {
+    // Recep kararı 13 (2026-09-15, kendi sözü "13 ve 14 evet"): iki haftada bir tam tarama,
+    // eşik 14 gün SABİT. Bu kol iki sayının ayrışmasını engeller: cetvel "iki haftada bir"
+    // derken kapı 7 ya da 30 günde uyarıyorsa, kapı yazılı kuralı DEĞİL kendi varsayılanını
+    // ölçüyor olur ve kimse farkı görmez.
     const cetvel = fs.readFileSync(
       path.resolve(__dirname, '../../../docs/standards/bagimlilik-guvenlik-yukseltme-standard.md'),
       'utf8',
     )
     expect(cetvel, 'sıklık revizyonu bölümü yok').toMatch(/SIKLIK REVİZYONU/i)
-    expect(cetvel, 'taslak oldugu yazilmamis').toMatch(/TASLAK, ONAY BEKLİYOR/i)
-    expect(cetvel, 'GEVSETME oldugu yazilmamis — onay veren neyi gevsettigini bilmeli').toMatch(
-      /MEVCUT KURALI GEVŞETİYOR/i,
+    expect(cetvel, 'karar verildigi yazilmamis').toMatch(/KARAR VERİLDİ/i)
+    expect(cetvel, 'yeni siklik cetvelde yazili degil').toMatch(/iki haftada bir tam\s*\n?\s*tarama/i)
+    expect(cetvel, 'esik cetvelde SABIT olarak yazili degil').toMatch(/Eşik:\s*14 gün,\s*SABİT/)
+
+    // Kancanın varsayılanı da 14 olmalı — cetveldeki sayı ile kod ayrışmasın.
+    const kaynak = fs.readFileSync(SATIR_KANCA, 'utf8')
+    expect(kaynak, 'kancanin varsayilan esigi 14 degil').toMatch(
+      /VENTHUB_BAGIMLILIK_ESIK_GUN\s*\|\|\s*14/,
     )
+  })
+
+  it('⭐GEVŞETME OLDUĞU ve ÖNERİNİN REDDEDİLDİĞİ kayıtta DURUYOR', () => {
+    // İki yön de yazılı kalmalı: (a) kuralın hangi yönde değiştiği, (b) ALTYAPI'nın aksi
+    // yöndeki önerisinin reddedildiği. İkincisi olmazsa aynı yol bir sonraki tartışmada
+    // ikinci kez önerilir; birincisi olmazsa cetvel kendi geçmişini siler.
+    const cetvel = fs.readFileSync(
+      path.resolve(__dirname, '../../../docs/standards/bagimlilik-guvenlik-yukseltme-standard.md'),
+      'utf8',
+    )
+    expect(cetvel, 'gevsetme oldugu yazilmamis').toMatch(/GEVŞET/i)
+    expect(cetvel, 'eski satirin ne oldugu yazilmamis').toMatch(/haftada bir/i)
+    expect(cetvel, 'reddedilen oneri kayitta degil').toMatch(/ALTYAPI'NIN ÖNERİSİ AKSİ YÖNDEYDİ/i)
   })
 })
 
