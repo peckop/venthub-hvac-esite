@@ -582,7 +582,11 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   // sayfasının kategori kapısı bu anahtarı başlık olarak kullanıyor. Listeden
   // çıkarıldı; anahtar yeniden ölürse kapı bunu KIRMIZI ile söyler.
   'quotes.admin.navLabel',
-  'search.placeholder',
+  // 'search.placeholder' — REC-340 Faz 0 ile DİRİLDİ (2026-09-15): SearchOverlay artık bu
+  // anahtarı basıyor. Yerine kullanılan 'search.placeholderAi' SİLİNDİ, çünkü "yapay zeka
+  // destekli arama" diyordu ve arkasında yapay zeka YOKTU (prod'da ölçüldü: aramanın
+  // gövdesinde to_tsvector/plainto_tsquery var; embedding, vektör ve dış HTTP çağrısı YOK).
+  // Listeden çıkarıldı; anahtar yeniden ölürse kapı bunu KIRMIZI ile söyler.
   'support.home.warrantyDesc',
 
   // ============================================================================

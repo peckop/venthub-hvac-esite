@@ -78,6 +78,14 @@ const VITRIN_YOLLARI = [
   // buldu. Ölçüldükçe genişleyen liste, kapının kendi kör noktasının kaydıdır.
   'views/BrandDetailPage.tsx',
   'components/QuickViewModal.tsx',
+  // REC-340 (2026-09-15): AYNI SINIF, ÜÇÜNCÜ VAKA. Arama kutusu placeholder'ı "Ürün,
+  // kategori veya YAPAY ZEKA DESTEKLİ arama..." diyordu; arkasında yapay zeka yoktu.
+  // `SearchOverlay.tsx` `components/` kökünde duruyor ve taranan HİÇBİR yolun altında
+  // DEĞİLDİ — yani kapı, sitenin en çok görülen giriş alanını hiç görmüyordu. Kusuru
+  // YİNE insan gözü buldu (Recep), kapı değil. Bu liste kapının kendi kör noktasının
+  // kaydıdır ve üçüncü kez aynı sebeple genişliyor: dosya adı bazlı yol listesi,
+  // kapsamı KENDİ BAŞINA güvenceye almaz.
+  'components/SearchOverlay.tsx',
 ]
 
 /**
@@ -132,6 +140,59 @@ const ZAMAN_VAADI_TERIMLERI = [
   'opening soon',
   'coming soon',
 ]
+
+/**
+ * TEKNOLOJİ VAADİ TERİMLERİ (REC-340 Faz 0, 2026-09-15).
+ *
+ * NİÇİN ÜÇÜNCÜ AYRI LİSTE: kardeş iki liste farklı eksenlerde ölçüyor — VAAT_TERIMLERI bir
+ * TİCARİ YETENEK (taksit, ücretsiz kargo), ZAMAN_VAADI_TERIMLERI bir TARİH iddia ediyor.
+ * "Yapay zeka destekli arama" ikisi de değil: bir TEKNOLOJİNİN ÜRÜNDE VAR OLDUĞUNU iddia
+ * ediyor. Bu iddia ölçülebilir ve ölçüldüğünde YANLIŞ çıktı — arama düz PostgreSQL
+ * tam-metin aramasıydı (to_tsvector/plainto_tsquery), embedding yok, vektör yok, dış
+ * çağrı yok. Yani ziyaretçi "otoparkım 400 m2, hangi fan" diye yazınca hiçbir şey
+ * bulamıyordu; kutunun kendi etiketi ona yanlış şeyi denemeyi öğretiyordu.
+ *
+ * ⭐ÖLÇÜT ÖBEK, TEK KELİME DEĞİL — bu dosyanın doktrini burada da geçerli. Çıplak "yapay
+ * zeka" KOYULMAZ: meşru bağlamda geçebilir (bir bilgi yazısı yapay zekadan bahsedebilir,
+ * bir ürün açıklaması "yapay zeka ile tasarlanmış" demeyebilir ama bir başlık anabilir).
+ * İddiayı taşıyan şey, teknolojiyi ÜRÜNÜN ÖZELLİĞİ olarak bağlayan öbektir.
+ *
+ * YETENEK GELİRSE İDDİA HAK EDİLİR: REC-340 Faz 2/3 anlam bazlı aramayı getirirse bu terim
+ * yeniden yazılabilir. O gün kapı kırmızı derse, listeden ÇIKARMANIN gerekçesi ÖLÇÜM olur —
+ * tıpkı bugün konmasının gerekçesinin ölçüm olduğu gibi.
+ */
+const TEKNOLOJI_VAADI_TERIMLERI = [
+  'yapay zeka destekli',
+  'yapay zekâ destekli',
+  'yapay zeka ile',
+  'ai destekli',
+  'ai-powered',
+  'ai powered',
+  'powered by ai',
+]
+
+/**
+ * ⭐TÜRKÇE KÜÇÜLTME İNGİLİZCE TERİMİ KÖRLEŞTİRİR — SABOTAJLA ÖLÇÜLDÜ (2026-09-15, REC-340).
+ *
+ * INV-VAAT-SIZINTI-3'ü yazarken yalnız `toLocaleLowerCase('tr')` kullandım, kardeş iki kapı
+ * gibi. Ayırt edici kol KIRMIZI yandı: Türkçede büyük `I` harfinin küçüğü NOKTASIZ `ı`
+ * olduğu için "AI-powered" metni "aı-powered"a dönüyor ve `'ai-powered'` terimi HİÇ
+ * eşleşmiyor. Ölçüt doğruydu, EVREN yanlıştı; bunu ancak silinmiş cümleyi ölçüte geri
+ * veren kol gösterdi.
+ *
+ * ⭐KARDEŞ KAPILAR DA AYNI KÖRDÜ — ÖLÇÜLDÜ, VARSAYILMADI: INV-1'in listesindeki
+ * `'installment'` ve `'pci dss'` terimleri, metin "Installment" ya da "PCI DSS" diye
+ * yazılmışsa hiç yakalanmıyordu ("ınstallment", "pcı dss"). Bugün ihlal YOK, ama kapı bu
+ * yazımı yarın da göremezdi. Aynı kusur olduğu için üç kapı da bu yardımcıya bağlandı.
+ *
+ * Bu değişiklik kapıyı yalnız GENİŞLETİR: bir terim iki küçültmeden BİRİNDE geçiyorsa
+ * yakalanır. Hiçbir meşru metni ihlal saymadığı, her üç bölümün ters yön kollarıyla ölçülür.
+ */
+const ikiBicimdeAra = (metin: string, terimler: readonly string[]): string | undefined => {
+  const trKucuk = metin.toLocaleLowerCase('tr')
+  const enKucuk = metin.toLowerCase()
+  return terimler.find((t2) => trKucuk.includes(t2) || enKucuk.includes(t2))
+}
 
 const dosyalariTopla = (mutlak: string, biriktir: string[]): void => {
   let st
@@ -198,8 +259,7 @@ describe('INV-VAAT-SIZINTI-1 · vitrin ödeme/kargo vaadi yazmaz', () => {
       for (const anahtar of anahtarlariTopla(kaynak)) {
         const metin = coz(anahtar)
         if (!metin) continue
-        const kucuk = metin.toLocaleLowerCase('tr')
-        const carpan = VAAT_TERIMLERI.find((t2) => kucuk.includes(t2))
+        const carpan = ikiBicimdeAra(metin, VAAT_TERIMLERI)
         if (carpan) {
           ihlaller.push(`${dosya.replace(KOK, 'src')} · ${anahtar} · "${metin}" (terim: ${carpan})`)
         }
@@ -224,8 +284,16 @@ describe('INV-VAAT-SIZINTI-1 · vitrin ödeme/kargo vaadi yazmaz', () => {
     // Kapı "her metni temiz sayan" bir ölçüt kullanmıyor: ödeme akışının kendi
     // sözlüğündeki meşru vaat metni terim listesine TAKILIR. Takılmasaydı liste ölüydü.
     const mesruVaat = tr.checkout.securePaymentProvider
-    const kucuk = mesruVaat.toLocaleLowerCase('tr')
-    expect(VAAT_TERIMLERI.some((t2) => kucuk.includes(t2))).toBe(true)
+    expect(ikiBicimdeAra(mesruVaat, VAAT_TERIMLERI)).toBeDefined()
+  })
+
+  it('⭐AYIRT EDİCİ — BÜYÜK HARFLİ İngilizce yazım da yakalanıyor (REC-340 ölçümü)', () => {
+    // Türkçe küçültme büyük `I`yı noktasız `ı` yapar; eski ölçüt "Installment" ve
+    // "PCI DSS" yazımlarını HİÇ görmüyordu. Bugün sözlükte böyle bir metin yok, ama
+    // yarın yazılırsa kapı görsün diye körlük ADIYLA ölçülür.
+    for (const metin of ['Installment available', 'PCI DSS compliant']) {
+      expect(ikiBicimdeAra(metin, VAAT_TERIMLERI), `yakalanmadı: ${metin}`).toBeDefined()
+    }
   })
 
   it('⭐DÖNÜŞ YÖNÜ — geri dönüş listesi cetvelde DURUYOR ve boş değil', () => {
@@ -290,10 +358,8 @@ const zamanVaadiDosyalari = (): string[] => {
   return bulunan
 }
 
-const zamanVaadiBul = (metin: string): string | undefined => {
-  const kucuk = metin.toLocaleLowerCase('tr')
-  return ZAMAN_VAADI_TERIMLERI.find((t2) => kucuk.includes(t2))
-}
+const zamanVaadiBul = (metin: string): string | undefined =>
+  ikiBicimdeAra(metin, ZAMAN_VAADI_TERIMLERI)
 
 describe('INV-VAAT-SIZINTI-2 · hiçbir yüzey "yakında" diye tarih vaat etmez', () => {
   it('⭐ASIL İDDİA — taranan hiçbir yüzeyin bastığı metin zaman vaadi taşımaz', () => {
@@ -366,6 +432,107 @@ describe('INV-VAAT-SIZINTI-2 · hiçbir yüzey "yakında" diye tarih vaat etmez'
         `${beklenen} kapsamda DEĞİL — REC-148'de kör nokta çıkan dosya kapsamdan düşmüş.`,
       ).toBe(true)
     }
+    const toplamAnahtar = dosyalar.reduce(
+      (t2, d) => t2 + anahtarlariTopla(readFileSync(d, 'utf8')).filter((a) => coz(a)).length,
+      0,
+    )
+    expect(toplamAnahtar, 'Hiçbir anahtar çözülemedi — tarayıcı kör.').toBeGreaterThan(50)
+  })
+})
+
+/**
+ * INV-VAAT-SIZINTI-3 — hiçbir vitrin metni, üründe OLMAYAN bir teknolojiyi iddia etmez.
+ *
+ * NİÇİN VAR (ölçülmüş, REC-340 Faz 0 / 2026-09-15): arama kutusunun placeholder'ı TR'de
+ * "Ürün, kategori veya yapay zeka destekli arama...", EN'de "...AI-powered search..."
+ * diyordu. Prod'da fonksiyonun gövdesi okundu (iddia değil, ölçüm): to_tsvector var,
+ * sözlük `turkish`, plainto_tsquery var; embedding YOK, vektör YOK, dış HTTP çağrısı YOK.
+ * Yani düz tam-metin arama. Müşteriye olmayan bir özellik vaat ediliyordu.
+ *
+ * ⭐KARDEŞLERİNDEN FARKI — EKSEN: INV-1 ticari yeteneği, INV-2 tarihi ölçer. Bu kapı bir
+ * TEKNOLOJİNİN VARLIĞINI ölçer ve muafiyeti INV-1 ile aynıdır (ödeme akışı dışarıda),
+ * çünkü orada da yapay zeka iddiası doğru olmaz. Üç ekseni tek listeye sıkıştırmak,
+ * üçünün de ölçütünü körleştirirdi.
+ *
+ * Cetvel: docs/standards/vaat-butunlugu-standard.md · Kararlar Vitrin 15A K1
+ */
+const teknolojiVaadiBul = (metin: string): string | undefined =>
+  ikiBicimdeAra(metin, TEKNOLOJI_VAADI_TERIMLERI)
+
+describe('INV-VAAT-SIZINTI-3 · vitrin, üründe olmayan teknolojiyi iddia etmez', () => {
+  it('⭐ASIL İDDİA — vitrinin bastığı hiçbir metin teknoloji vaadi taşımaz', () => {
+    const ihlaller: string[] = []
+    for (const dosya of vitrinDosyalari()) {
+      const kaynak = readFileSync(dosya, 'utf8')
+      for (const anahtar of anahtarlariTopla(kaynak)) {
+        const metin = coz(anahtar)
+        if (!metin) continue
+        const carpan = teknolojiVaadiBul(metin)
+        if (carpan) {
+          ihlaller.push(`${dosya.replace(KOK, 'src')} · ${anahtar} · "${metin}" (terim: ${carpan})`)
+        }
+      }
+    }
+    expect(
+      ihlaller,
+      'Teknoloji vaadi sızıntısı — bu metinler üründe bir teknolojinin VAR olduğunu söylüyor.\n' +
+        'Doğrusu: ya iddiayı kaldırmak, ya yeteneği gerçekten getirmek. Arada bir yer YOK.\n' +
+        ihlaller.join('\n'),
+    ).toEqual([])
+  })
+
+  it('⭐AYIRT EDİCİ — terim listesi KALDIRILAN iki cümlenin ikisini de yakalıyor', () => {
+    // Ayırt etmeyen ölçüt ölçüm değildir: liste boşaltılsa üstteki kol "ihlal yok" der ve
+    // SAHTE-YEŞİL geçerdi. Bu kol, REC-340'ta sözlükten SİLİNEN gerçek iki cümleyi ölçüte
+    // geri verip listenin hâlâ çalıştığını kanıtlar. Silinmiş metnin yokluğunu başka
+    // hiçbir kapı gösteremez — gösterecek bir şey kalmaz.
+    const kaldirilanCumleler = [
+      'Ürün, kategori veya yapay zeka destekli arama...',
+      'Search products, categories, or AI-powered search...',
+    ]
+    const kacan = kaldirilanCumleler.filter((c) => !teknolojiVaadiBul(c))
+    expect(kacan, `Terim listesi bu cümleleri YAKALAMIYOR: ${kacan.join(' | ')}`).toEqual([])
+  })
+
+  it('⭐AYIRT EDİCİ (ters yön) — meşru metni ve yerine konan metni ihlal saymıyor', () => {
+    // Kapı her şeye kırmızı derse de ölçüm değildir. İki şey TEMİZ geçmeli: (1) yerine
+    // konan gerçek placeholder, (2) yapay zekadan meşru biçimde söz eden cümleler. Çıplak
+    // "yapay zeka" ölçüte KONMADI tam bu yüzden — konsaydı bu kol kırmızı yanardı ve ekip
+    // kapıyı gevşetmek zorunda kalırdı.
+    const mesruMetinler = [
+      'Ürün, kategori veya marka ara...',
+      'Search products, categories, brands...',
+      'Yapay zeka alanındaki gelişmeler HVAC sektörünü de etkiliyor.',
+      'Bu yazıda yapay zeka kavramını kısaca anlatıyoruz.',
+    ]
+    const yanlisYakalanan = mesruMetinler.filter((m) => teknolojiVaadiBul(m))
+    expect(
+      yanlisYakalanan,
+      `Kapı MEŞRU metni ihlal sayıyor: ${yanlisYakalanan.join(' | ')}`,
+    ).toEqual([])
+  })
+
+  it('BOŞLUK MUHAFIZI — arama kutusu GERÇEKTEN kapsamda ve tarayıcı anahtar görüyor', () => {
+    // REC-340'ın asıl kusuru terim listesi değil KAPSAMDI: kutu taranan hiçbir yolun
+    // altında değildi. O yüzden bu kol dosyayı ADIYLA arar — yol listesi sessizce
+    // daralırsa kapı "ihlal yok" deyip geçmesin.
+    const dosyalar = vitrinDosyalari()
+    const kutu = dosyalar.find((d) => d.endsWith('SearchOverlay.tsx'))
+    expect(kutu, 'SearchOverlay.tsx kapsamda DEĞİL — REC-340 kör noktası geri gelmiş.').toBeDefined()
+
+    // ⭐KAPSAMDA OLMAK YETMEZ, ZİNCİR İŞLEMELİ: dosya taranıyor olsa bile AST anahtarı
+    // görmezse ya da anahtar sözlükte çözülmezse kapı yine SAHTE-YEŞİL geçerdi. Üç halka
+    // (dosya bulundu → anahtar toplandı → metin çözüldü) burada TEK SEFERDE ölçülür;
+    // ölçülen anahtar da tam olarak REC-340'ta değiştirilen anahtardır.
+    const kutuAnahtarlari = anahtarlariTopla(readFileSync(kutu as string, 'utf8'))
+    expect(
+      kutuAnahtarlari,
+      'Arama kutusunun placeholder anahtarı AST ile toplanamadı — zincir kopuk.',
+    ).toContain('search.placeholder')
+    expect(
+      coz('search.placeholder'),
+      'search.placeholder sözlükte çözülemedi — kapı metni hiç göremez.',
+    ).toBeTruthy()
     const toplamAnahtar = dosyalar.reduce(
       (t2, d) => t2 + anahtarlariTopla(readFileSync(d, 'utf8')).filter((a) => coz(a)).length,
       0,

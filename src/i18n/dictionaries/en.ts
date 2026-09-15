@@ -175,8 +175,8 @@ export const en: typeof tr = {
     detailedSearch: 'detailed search for',
     keyboardHint: 'Navigate with arrow keys',
     enterHint: 'For all results',
+    // `placeholderAi` removed (REC-340 Phase 0) — see the TR dictionary for the measurement.
     placeholder: 'Search products, categories, brands...',
-    placeholderAi: 'Search products, categories, or AI-powered search...',
     noResultsAdvice: 'Try different keywords',
     brandPrefix: 'Brand: ',
     fuzzyMatchNotice: 'No exact match found, showing similar results.'
