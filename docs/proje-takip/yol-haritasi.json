@@ -119,6 +119,113 @@
       ]
     },
     {
+      "id": "YH-05",
+      "faz": "TICARI",
+      "yetenek": "Siparis numarasi gunun sira sayaci (saat degil); tam numara her yerde",
+      "durum": "ACIK",
+      "sebep": "REC-156 (09-06): EPOCH%10000 cakisma riski; #1032 Recep 'sen merge et' ile 05:13Z indi, migration prod'a uygulandi; URUN prod kaniti (3 cagri 3 numara, eszamanli 2 oturum) REC-156 yorumuna gelecek",
+      "sorumlu": "URUN",
+      "karar": "REC-156 · kural 13 · document-numbering-standard",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "supabase/migrations/20260906043551_siparis_no_gunluk_sayac.sql",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/utils/siparisNo.ts",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "docs/standards/document-numbering-standard.md",
+          "beklenen": "var"
+        },
+        {
+          "tur": "veri",
+          "sql": "select generate_order_number(), generate_order_number() -- iki farkli deger beklenir"
+        }
+      ]
+    },
+    {
+      "id": "YH-06",
+      "faz": "TICARI",
+      "yetenek": "Iade semasi: kalem/adet + refund_amount + return_no (IA-YYYYMMDD-NNNN)",
+      "durum": "PLANLI",
+      "sebep": "REC-159 (09-06, Belge sema olcumu): venthub_returns dar; satis kipi acilmadan; migration Recep",
+      "sorumlu": "URUN · Recep",
+      "karar": "REC-159 · 153-7",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "supabase/migrations",
+          "desen": "venthub_return_items",
+          "beklenen": "yok"
+        }
+      ]
+    },
+    {
+      "id": "YH-07",
+      "faz": "TICARI",
+      "yetenek": "Kurumsal belgeler: kartvizit YAPILIR; kesif raporu v1 kabul, 7 alan sema bekler (site_surveys, Linear kaydi acilir); rapor kabugu ikinci raporla",
+      "durum": "YAPILIYOR",
+      "sebep": "K17-a Recep 'yapilsin' 09-06; K17-b 153-28/29/30 OPS hukmu; migration Recep kapisi",
+      "sorumlu": "DESIGN-BELGE · OPS · Recep",
+      "karar": "K17-a · K17-b",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "docs/proje-takip/linear/kararlar-kurumsal-belgeler-2026-09-06.md",
+          "desen": "K17-a · Kartvizit = KARAR",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "docs/proje-takip/linear/kararlar-kurumsal-belgeler-2026-09-06.md",
+          "desen": "site_surveys",
+          "beklenen": "var"
+        }
+      ]
+    },
+    {
+      "id": "YH-08",
+      "faz": "15A-F1",
+      "yetenek": "Uc vitrin rotasi (ana sayfa · urunler · kategori) ONCEDEN URETILIR, rota sinifi ilanli, CSR bailout isareti 0; urunler sayfasinin kendi baslik + kanonigi var",
+      "durum": "ACIK",
+      "sebep": "REC-59 adim 2 (09-14, #1192 #1197 #1198): headers() kalkti, ?page= kalkti (47 aile tek sayfa), force-static; canli public+HIT iki dilde; REC-338 kapandi. Acik kalem: brands/[slug] ilansiz (2 isaret)",
+      "sorumlu": "URUN",
+      "karar": "REC-59 · REC-338 · rendering-cache-standard §3",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "src/__tests__/conformance/anasayfa-rotasi-statik.test.ts",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/__tests__/conformance/urunler-rotasi-statik.test.ts",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/__tests__/conformance/kategori-rotasi-statik.test.ts",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/app/[lang]/page.tsx",
+          "desen": "force-static",
+          "beklenen": "var"
+        },
+        {
+          "tur": "canli",
+          "url": "https://venthub.com.tr/tr/products",
+          "beklenen_durum": 200
+        }
+      ]
+    },
+    {
       "id": "YH-10",
       "faz": "15A-F1",
       "yetenek": "Yeni kabuk gezinmesi: header tek oge 'Teklif' + panel",
@@ -220,11 +327,11 @@
     {
       "id": "YH-15",
       "faz": "15A-F2",
-      "yetenek": "Kategori agaci 7 kategori · 26 dal · Siginak ust kategori · kisa slug",
+      "yetenek": "Kategori agaci 7 kategori · 26 dal · Siginak ust kategori; adres: /category/ ve /products/ KALIR, urun slug'i uzun + -p-<id> (kisa slug IPTAL)",
       "durum": "PLANLI",
-      "sebep": "K3 (09-03); shelter-ventilation bugun level=1 (09-04 olcumu) → uygulanmadi",
+      "sebep": "K3 (09-03) + K3-b (09-11, Recep KARARI): kisa slug OLMAYACAK; adres yayini katalog paketi bitince TEK yayinda (REC-300); shelter-ventilation level=1 (09-04) uygulanmadi",
       "sorumlu": "URUN",
-      "karar": "K3",
+      "karar": "K3 · K3-b · K59 · K60 · REC-300",
       "kanit": [
         {
           "tur": "belge",
@@ -244,21 +351,28 @@
     {
       "id": "YH-16",
       "faz": "15A-F2",
-      "yetenek": "Arama sonucu sayfasi /tr/arama (ekran 08)",
-      "durum": "PLANLI",
-      "sebep": "K14: liste sablonu + arama seridi; bugun arama kayan katman (SearchOverlay), rota yok",
-      "sorumlu": "URUN",
-      "karar": "K14",
+      "yetenek": "Arama: Turkce karakter + yazim hatasi + cok kelimeli sorgu toleransi (Faz 1, kendi Postgres); arama cetveli + INV-ARAMA-1; sonra parametreyle/ihtiyacla arama + arama gunlugu (Faz 3); dis motor YOK",
+      "durum": "YAPILIYOR",
+      "sebep": "REC-340 (09-14, Recep: 'cok kalitesiz ve islevsiz'): unaccent yok, pg_trgm kurulu ama RPC kullanmiyor, plainto_tsquery kati AND ('jet fan' 0); placeholder 'yapay zeka destekli' YANLIS BEYAN (Faz 0 kaldir, Recep karari); cetvel YOK; URUN+OPS hukmu: dis arama motoru kurulmaz",
+      "sorumlu": "URUN · Recep (Faz 0 + migration merge)",
+      "karar": "REC-340 · K14",
       "kanit": [
         {
           "tur": "kod",
-          "yol": "src/app/[lang]/arama",
-          "beklenen": "yok"
+          "yol": "docs/standards/arama-standard.md",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/__tests__/conformance",
+          "desen": "arama",
+          "beklenen": "var"
         },
         {
           "tur": "kod",
           "yol": "src/components/SearchOverlay.tsx",
-          "beklenen": "var"
+          "desen": "placeholderAi",
+          "beklenen": "yok"
         }
       ]
     },
@@ -267,9 +381,9 @@
       "faz": "15A-F2",
       "yetenek": "Urun Secici: tek sayfa, grup grup motor (ilk kanal fani), urun sayfasina entegrasyon EN SON",
       "durum": "YAPILIYOR",
-      "sebep": "K17 + K18 (istisare, Recep 'karar' deyince kesinlesir); hesaplayicilar rotasi var, secici sayfasi Design A akisi",
+      "sebep": "K17 + K18 (09-06 Recep KARAR: A tek sayfa form + C rehberli kabuk, B cizilmez; K18-a kanonik girdi kumesi); hesaplayicilar rotasi var; T-8 K18 ile kapandi (09-15)",
       "sorumlu": "DESIGN → URUN",
-      "karar": "K17 · K18",
+      "karar": "K17 · K18 · K18-a",
       "kanit": [
         {
           "tur": "belge",
@@ -333,6 +447,89 @@
       ]
     },
     {
+      "id": "YH-21",
+      "faz": "15A-F2",
+      "yetenek": "Urun Secici girisi header'da kendi ogesi (izgara alternatifi ARSIV)",
+      "durum": "PLANLI",
+      "sebep": "K24 (09-06, Recep OPS'a devretti); Menu v17 B4 karesinde uygulandi; tek giris sayfasi /urun-secici 09-05 indi (Adim 1), header ogesi kod Faz 2 — inince navigation kaniti 'var'a cevrilir",
+      "sorumlu": "DESIGN-MENU → URUN",
+      "karar": "K24 · K 09-04 16:10",
+      "kanit": [
+        {
+          "tur": "belge",
+          "sinav": "S08"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/app/[lang]/urun-secici",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/components/navigation",
+          "desen": "urun-secici",
+          "beklenen": "yok"
+        }
+      ]
+    },
+    {
+      "id": "YH-22",
+      "faz": "15A-F2",
+      "yetenek": "Renk tokenleri: turkuaz metin degil; --brand-cyan-ink #00708F + --action-terracotta-deep #BF5309 (AA)",
+      "durum": "PLANLI",
+      "sebep": "K25/K25-b (09-06); Marka kaynaga yazdi, DS turetti, Menu v17 uyguladi (ink 251 · deep 36); kod tarafi tokens.js'e girmedi",
+      "sorumlu": "DESIGN-MARKA → URUN",
+      "karar": "K25 · K25-b · K26",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "src/design-system/tokens.js",
+          "desen": "cyan-ink|cyanInk",
+          "beklenen": "yok"
+        }
+      ]
+    },
+    {
+      "id": "YH-23",
+      "faz": "15A-F2",
+      "yetenek": "Urun Secici A+C CALISAN PROTOTIP (dinamik yontem): gercek veri JSON + kural dosyasi tek kaynak + oturum kaydi; Claude API adimi YOK",
+      "durum": "YAPILIYOR",
+      "sebep": "K37 Recep karari 09-06 (dinamik); Menu emir #10 prototip TESLIM + OPS kabul (K37-b, 09-06); kod tarafi ayni kural dosyasindan (URUN, REC-171)",
+      "sorumlu": "DESIGN-MENU → URUN",
+      "karar": "K37 · K37-b · K18 · REC-171",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md",
+          "desen": "K37 · Yöntem: dinamik",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md",
+          "desen": "Claude API adımı YOK",
+          "beklenen": "var"
+        }
+      ]
+    },
+    {
+      "id": "YH-24",
+      "faz": "15A-F2",
+      "yetenek": "Recep UI iyilestirmeleri: ekran 11 farki goster · Bilgi Merkezi ic tasarimi · ekran 58 panel/sutun (karar Recep)",
+      "durum": "PLANLI",
+      "sebep": "K37-a 09-06; Menu #10 paketinde prototipten sonra; U3 yapisal karar tek basina sorulur",
+      "sorumlu": "DESIGN-MENU · Recep",
+      "karar": "K37-a",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md",
+          "desen": "K37-a · Recep'in UI",
+          "beklenen": "var"
+        }
+      ]
+    },
+    {
       "id": "YH-30",
       "faz": "SaaS-F1",
       "yetenek": "Cok kiracili temel: tenant_id + RLS + tenantResolver (derleme anında sabit)",
@@ -374,6 +571,82 @@
         {
           "tur": "belge",
           "sinav": "S14"
+        }
+      ]
+    },
+    {
+      "id": "YH-32",
+      "faz": "KATALOG",
+      "yetenek": "Ic ingest notu ('Tier C') musteri yuzeyinde YOK: veri temizlendi + render muhafizi",
+      "durum": "ACIK",
+      "sebep": "REC-155 (09-06): 187 urun + 11 aile temizlendi (OPS kostu), #1023 muhafiz; canli 8 sayfa 0 kalinti",
+      "sorumlu": "URUN-KATALOG · URUN",
+      "karar": "K7 · vaat-butunlugu",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "src/utils/icIngestNotu.ts",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "scripts/icerik-hatti/tier-c-temizlik.mjs",
+          "beklenen": "var"
+        },
+        {
+          "tur": "veri",
+          "sql": "select count(*) from products where description_i18n::text ilike '%Tier C%'"
+        }
+      ]
+    },
+    {
+      "id": "YH-33",
+      "faz": "KATALOG",
+      "yetenek": "Aile metnindeki sayi ailenin urunlerinden turemis ARALIK (tek model sayisi yasak)",
+      "durum": "PLANLI",
+      "sebep": "REC-157 (09-06): 10 aile / 109 urun tek model sayisi; veri Katalog 2b-2'de, kapi URUN'da (REC-156 sonrasi)",
+      "sorumlu": "URUN",
+      "karar": "K1 · K7.4 · REC-157",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "src/__tests__/conformance",
+          "desen": "aile-metni-aralik",
+          "beklenen": "yok"
+        }
+      ]
+    },
+    {
+      "id": "YH-34",
+      "faz": "KATALOG",
+      "yetenek": "AVenS: kaynagi olmayan aileye satilabilir sayfa YAZILMAZ (BVU-LS + hiz anahtarlari); sulu batarya yazilir; elektrikli isitici aksesuar",
+      "durum": "ACIK",
+      "sebep": "K7.10 Recep 09-06 'Avens icin de onay verdim'; 38 aile canliya yazildi, AVenS 2 aile disari",
+      "sorumlu": "URUN-KATALOG",
+      "karar": "K7.10",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "docs/proje-takip/linear/kararlar-katalog-2026-09-06.md",
+          "desen": "K7.10",
+          "beklenen": "var"
+        }
+      ]
+    },
+    {
+      "id": "YH-35",
+      "faz": "KATALOG",
+      "yetenek": "Katalog paketi ELDEN TESLIM EDILEBILIR (bir calisan USB ile yukler): 8 CSV + gorseller + belgeler + yukleme talimati + kontrol listesi",
+      "durum": "YAPILIYOR",
+      "sebep": "Recep 09-14 sorusu; DESIGN-KATALOG: BUGUN HAYIR, 3 engel — fiyat kolonu bos (REC-330), gorsel alt metni pakete girmiyor (REC-330 EK), belge PDF'leri girmiyor (REC-145); emir #3 talimat + kontrol listesi. Tek dosya kalibi, satir=urun, dal basina zorunlu sutun kumesi (csv-import-export §5); admin'de CSV yukleme ekrani YOK (olculecek)",
+      "sorumlu": "URUN (paket) · DESIGN-KATALOG (talimat) · OPS",
+      "karar": "REC-330 · REC-145 · csv-import-export-standard",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "docs/standards/csv-import-export-standard.md",
+          "desen": "Kategoriye Ozel Zorunlu",
+          "beklenen": "var"
         }
       ]
     },
@@ -473,174 +746,6 @@
       ]
     },
     {
-      "id": "YH-50",
-      "faz": "GUVENLIK",
-      "yetenek": "Design (15A) yalniz OKUR: Supabase SELECT, Linear'a tur sonu yorumu",
-      "durum": "ACIK",
-      "sebep": "Recep 09-04 13:45",
-      "sorumlu": "OPS",
-      "karar": "K 09-04 13:45",
-      "kanit": [
-        {
-          "tur": "belge",
-          "sinav": "S18"
-        }
-      ]
-    },
-    {
-      "id": "YH-51",
-      "faz": "GUVENLIK",
-      "yetenek": "Rol otoritesi user_profiles.role / app_metadata; raw_user_meta_data YASAK",
-      "durum": "ACIK",
-      "sebep": "auth-account A11; CLAUDE.md kural 12",
-      "sorumlu": "ALTYAPI",
-      "karar": "auth-account-standard A11",
-      "kanit": [
-        {
-          "tur": "belge",
-          "sinav": "S19"
-        },
-        {
-          "tur": "kod",
-          "yol": "src/middleware.ts",
-          "desen": "raw_user_meta_data",
-          "beklenen": "yok"
-        }
-      ]
-    },
-    {
-      "id": "YH-21",
-      "faz": "15A-F2",
-      "yetenek": "Urun Secici girisi header'da kendi ogesi (izgara alternatifi ARSIV)",
-      "durum": "PLANLI",
-      "sebep": "K24 (09-06, Recep OPS'a devretti); Menu v17 B4 karesinde uygulandi; tek giris sayfasi /urun-secici 09-05 indi (Adim 1), header ogesi kod Faz 2 — inince navigation kaniti 'var'a cevrilir",
-      "sorumlu": "DESIGN-MENU → URUN",
-      "karar": "K24 · K 09-04 16:10",
-      "kanit": [
-        {
-          "tur": "belge",
-          "sinav": "S08"
-        },
-        {
-          "tur": "kod",
-          "yol": "src/app/[lang]/urun-secici",
-          "beklenen": "var"
-        },
-        {
-          "tur": "kod",
-          "yol": "src/components/navigation",
-          "desen": "urun-secici",
-          "beklenen": "yok"
-        }
-      ]
-    },
-    {
-      "id": "YH-22",
-      "faz": "15A-F2",
-      "yetenek": "Renk tokenleri: turkuaz metin degil; --brand-cyan-ink #00708F + --action-terracotta-deep #BF5309 (AA)",
-      "durum": "PLANLI",
-      "sebep": "K25/K25-b (09-06); Marka kaynaga yazdi, DS turetti, Menu v17 uyguladi (ink 251 · deep 36); kod tarafi tokens.js'e girmedi",
-      "sorumlu": "DESIGN-MARKA → URUN",
-      "karar": "K25 · K25-b · K26",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "src/design-system/tokens.js",
-          "desen": "cyan-ink|cyanInk",
-          "beklenen": "yok"
-        }
-      ]
-    },
-    {
-      "id": "YH-32",
-      "faz": "KATALOG",
-      "yetenek": "Ic ingest notu ('Tier C') musteri yuzeyinde YOK: veri temizlendi + render muhafizi",
-      "durum": "ACIK",
-      "sebep": "REC-155 (09-06): 187 urun + 11 aile temizlendi (OPS kostu), #1023 muhafiz; canli 8 sayfa 0 kalinti",
-      "sorumlu": "URUN-KATALOG · URUN",
-      "karar": "K7 · vaat-butunlugu",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "src/utils/icIngestNotu.ts",
-          "beklenen": "var"
-        },
-        {
-          "tur": "kod",
-          "yol": "scripts/icerik-hatti/tier-c-temizlik.mjs",
-          "beklenen": "var"
-        },
-        {
-          "tur": "veri",
-          "sql": "select count(*) from products where description_i18n::text ilike '%Tier C%'"
-        }
-      ]
-    },
-    {
-      "id": "YH-33",
-      "faz": "KATALOG",
-      "yetenek": "Aile metnindeki sayi ailenin urunlerinden turemis ARALIK (tek model sayisi yasak)",
-      "durum": "PLANLI",
-      "sebep": "REC-157 (09-06): 10 aile / 109 urun tek model sayisi; veri Katalog 2b-2'de, kapi URUN'da (REC-156 sonrasi)",
-      "sorumlu": "URUN",
-      "karar": "K1 · K7.4 · REC-157",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "src/__tests__/conformance",
-          "desen": "aile-metni-aralik",
-          "beklenen": "yok"
-        }
-      ]
-    },
-    {
-      "id": "YH-05",
-      "faz": "TICARI",
-      "yetenek": "Siparis numarasi gunun sira sayaci (saat degil); tam numara her yerde",
-      "durum": "ACIK",
-      "sebep": "REC-156 (09-06): EPOCH%10000 cakisma riski; #1032 Recep 'sen merge et' ile 05:13Z indi, migration prod'a uygulandi; URUN prod kaniti (3 cagri 3 numara, eszamanli 2 oturum) REC-156 yorumuna gelecek",
-      "sorumlu": "URUN",
-      "karar": "REC-156 · kural 13 · document-numbering-standard",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "supabase/migrations/20260906043551_siparis_no_gunluk_sayac.sql",
-          "beklenen": "var"
-        },
-        {
-          "tur": "kod",
-          "yol": "src/utils/siparisNo.ts",
-          "beklenen": "var"
-        },
-        {
-          "tur": "kod",
-          "yol": "docs/standards/document-numbering-standard.md",
-          "beklenen": "var"
-        },
-        {
-          "tur": "veri",
-          "sql": "select generate_order_number(), generate_order_number() -- iki farkli deger beklenir"
-        }
-      ]
-    },
-    {
-      "id": "YH-06",
-      "faz": "TICARI",
-      "yetenek": "Iade semasi: kalem/adet + refund_amount + return_no (IA-YYYYMMDD-NNNN)",
-      "durum": "PLANLI",
-      "sebep": "REC-159 (09-06, Belge sema olcumu): venthub_returns dar; satis kipi acilmadan; migration Recep",
-      "sorumlu": "URUN · Recep",
-      "karar": "REC-159 · 153-7",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "supabase/migrations",
-          "desen": "venthub_return_items",
-          "beklenen": "yok"
-        }
-      ]
-    },
-    {
       "id": "YH-44",
       "faz": "SUREC",
       "yetenek": "Merge yalniz merge-ritueli.cjs --merge ile (kapi ile eylem ayni surecte); gh pr merge dogrudan cagrilmaz",
@@ -666,102 +771,21 @@
     {
       "id": "YH-45",
       "faz": "SUREC",
-      "yetenek": "Gozcu yalniz Monitor araciyla; teslimat kaniti baska oturumun jetonu + sure (beyan degil); acilista SendMessage (cron yok)",
-      "durum": "YAPILIYOR",
-      "sebep": "09-06 sabah: Katalog Bash-arka-plan gozcusu bildirim uretmedi (5 not kacti); dogrula ajan beyanina guveniyor; ALTYAPI kuyrugunda",
+      "yetenek": "Gozcu/prob/dogrula UCLUSU EMEKLI; filo dogrudan mesaj (SendMessage) + notify_when_idle; cron/gozcu KURULMAZ",
+      "durum": "ACIK",
+      "sebep": "REC-328 (09-14, #1182): uclu emekli, gozcu bildirim uretmiyordu; ekip aktifken mesaj teslim kaniti ilk gun olculur (yeniden olcum kosulu hafizada)",
       "sorumlu": "ALTYAPI · OPS",
-      "karar": "Recep 09-06 (cron yok) · wake-peers-via-sendmessage",
+      "karar": "REC-328 · Recep 09-06 (cron yok)",
       "kanit": [
         {
           "tur": "kod",
-          "yol": "scripts/board/mechanism-setup.cjs",
-          "desen": "--gordum",
-          "beklenen": "var"
+          "yol": "scripts/board/gozcu.cjs",
+          "beklenen": "yok"
         },
         {
           "tur": "kod",
           "yol": "docs/standards/fleet-mechanism-standard.md",
-          "desen": "run_in_background",
-          "beklenen": "yok"
-        }
-      ]
-    },
-    {
-      "id": "YH-23",
-      "faz": "15A-F2",
-      "yetenek": "Urun Secici A+C CALISAN PROTOTIP (dinamik yontem): gercek veri JSON + kural dosyasi tek kaynak + oturum kaydi; Claude API adimi YOK",
-      "durum": "YAPILIYOR",
-      "sebep": "K37 Recep karari 09-06 (statik degil dinamik); Menu emir #10 tek paket; kod tarafi ayni kural dosyasindan (URUN, sonra)",
-      "sorumlu": "DESIGN-MENU → URUN",
-      "karar": "K37 · K18 · K18-c",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md",
-          "desen": "K37 · Yöntem: dinamik",
-          "beklenen": "var"
-        },
-        {
-          "tur": "kod",
-          "yol": "docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md",
-          "desen": "Claude API adımı YOK",
-          "beklenen": "var"
-        }
-      ]
-    },
-    {
-      "id": "YH-24",
-      "faz": "15A-F2",
-      "yetenek": "Recep UI iyilestirmeleri: ekran 11 farki goster · Bilgi Merkezi ic tasarimi · ekran 58 panel/sutun (karar Recep)",
-      "durum": "PLANLI",
-      "sebep": "K37-a 09-06; Menu #10 paketinde prototipten sonra; U3 yapisal karar tek basina sorulur",
-      "sorumlu": "DESIGN-MENU · Recep",
-      "karar": "K37-a",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "docs/proje-takip/linear/kararlar-vitrin-15a-2026-09-06.md",
-          "desen": "K37-a · Recep'in UI",
-          "beklenen": "var"
-        }
-      ]
-    },
-    {
-      "id": "YH-07",
-      "faz": "TICARI",
-      "yetenek": "Kurumsal belgeler: kartvizit YAPILIR; kesif raporu v1 kabul, 7 alan sema bekler (site_surveys, Linear kaydi acilir); rapor kabugu ikinci raporla",
-      "durum": "YAPILIYOR",
-      "sebep": "K17-a Recep 'yapilsin' 09-06; K17-b 153-28/29/30 OPS hukmu; migration Recep kapisi",
-      "sorumlu": "DESIGN-BELGE · OPS · Recep",
-      "karar": "K17-a · K17-b",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "docs/proje-takip/linear/kararlar-kurumsal-belgeler-2026-09-06.md",
-          "desen": "K17-a · Kartvizit = KARAR",
-          "beklenen": "var"
-        },
-        {
-          "tur": "kod",
-          "yol": "docs/proje-takip/linear/kararlar-kurumsal-belgeler-2026-09-06.md",
-          "desen": "site_surveys",
-          "beklenen": "var"
-        }
-      ]
-    },
-    {
-      "id": "YH-34",
-      "faz": "KATALOG",
-      "yetenek": "AVenS: kaynagi olmayan aileye satilabilir sayfa YAZILMAZ (BVU-LS + hiz anahtarlari); sulu batarya yazilir; elektrikli isitici aksesuar",
-      "durum": "ACIK",
-      "sebep": "K7.10 Recep 09-06 'Avens icin de onay verdim'; 38 aile canliya yazildi, AVenS 2 aile disari",
-      "sorumlu": "URUN-KATALOG",
-      "karar": "K7.10",
-      "kanit": [
-        {
-          "tur": "kod",
-          "yol": "docs/proje-takip/linear/kararlar-katalog-2026-09-06.md",
-          "desen": "K7.10",
+          "desen": "REC-328",
           "beklenen": "var"
         }
       ]
@@ -814,6 +838,74 @@
           "tur": "kod",
           "yol": "scripts/nlm/acilis_kapisi.py",
           "desen": "gun_kapanisi",
+          "beklenen": "var"
+        }
+      ]
+    },
+    {
+      "id": "YH-50",
+      "faz": "GUVENLIK",
+      "yetenek": "Design (15A) yalniz OKUR: Supabase SELECT, Linear'a tur sonu yorumu",
+      "durum": "ACIK",
+      "sebep": "Recep 09-04 13:45",
+      "sorumlu": "OPS",
+      "karar": "K 09-04 13:45",
+      "kanit": [
+        {
+          "tur": "belge",
+          "sinav": "S18"
+        }
+      ]
+    },
+    {
+      "id": "YH-51",
+      "faz": "GUVENLIK",
+      "yetenek": "Rol otoritesi user_profiles.role / app_metadata; raw_user_meta_data YASAK",
+      "durum": "ACIK",
+      "sebep": "auth-account A11; CLAUDE.md kural 12",
+      "sorumlu": "ALTYAPI",
+      "karar": "auth-account-standard A11",
+      "kanit": [
+        {
+          "tur": "belge",
+          "sinav": "S19"
+        },
+        {
+          "tur": "kod",
+          "yol": "src/middleware.ts",
+          "desen": "raw_user_meta_data",
+          "beklenen": "yok"
+        }
+      ]
+    },
+    {
+      "id": "YH-52",
+      "faz": "GUVENLIK",
+      "yetenek": "Sema tabani (baseline) prod'u sifirdan URETEBILIR → test ortami (canli kopyasi, veri yok) → acilis oncesi guvenlik testi ailesi (dis tarama → otonom test araci → bagimsiz denetim)",
+      "durum": "YAPILIYOR",
+      "sebep": "REC-336 (09-14): 2026-08-13 baseline yalniz TABLO LISTESI (PK 1, FK/indeks 0; canli PK 55 · FK 110 · indeks 199 · politika 163), golge DB replay 26/46; bugun CI uzerinden salt-okuma pg_dump. REC-337: Recep 09-14 'onemli, rafa kalkmaz', acilis oncesi (~10 ay ortasi). Olu migration silindi (REC-321 #1187), jwt_role emekli (REC-322 #1186)",
+      "sorumlu": "ALTYAPI · OPS (test ortami) · Recep (migration merge)",
+      "karar": "REC-336 · REC-337 · REC-321 · CLAUDE.md 13",
+      "kanit": [
+        {
+          "tur": "kod",
+          "yol": "supabase/baselines",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "supabase/migrations/20250909_fix_product_images_rls.sql",
+          "beklenen": "yok"
+        },
+        {
+          "tur": "kod",
+          "yol": "docs/audits/rec321-ek-silme-uygulandi-2026-09-14.md",
+          "beklenen": "var"
+        },
+        {
+          "tur": "kod",
+          "yol": "docs/audits",
+          "desen": "rec336",
           "beklenen": "var"
         }
       ]
