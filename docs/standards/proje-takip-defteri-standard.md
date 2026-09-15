@@ -88,8 +88,14 @@ satır:
   olsa bile içerik kaymışsa "taze" demek yanlış olur.
 - **Yaş ölçütü** `git log origin/master -- docs/proje-takip/state.json` — dosya damgası **DEĞİL**, çünkü eşitleme başka
   bir worktree'de koşar ve yerel damga yanıltır (2026-09-07'de ölçüldü).
-- **Bütçe 300 ms, ve `olc` buraya SIĞMAZ:** ölçülen süreler `git log` 63 ms, `python olc` **631 ms**, çıplak node
-  açılışı ~187 ms. Bu yüzden pahalı sayı burada koşturulmaz; Stop kancasının yazdığı **önbellekten** okunur
+- **Bütçe: KANCANIN KENDİ İŞİ ≤ 300 ms — ve bu, TOPLAM süre DEĞİLDİR.** ⚠Bunu düzeltiyorum: REC-342'de "266-298 ms"
+  yazmıştım, ölçüm aracımın gürültüsüyle iyimser çıkmış. Temiz ölçüm (5 koşum, aynı makine): kanca toplamı **355-534
+  ms**, **çıplak node açılışı 170-292 ms**. Yani node tabanlı hiçbir kanca bu makinede 300 ms'nin altında TOPLAM süre
+  veremez; yorumlayıcının kendi açılışı tek başına bütçeyi yiyor. Ölçülebilir ve anlamlı olan ölçüt **kancanın kendi
+  işi**: ~135-240 ms (toplam eksi node açılışı). Bir bütçe yazılırken **hangi sürenin ölçüldüğü** de yazılmalıdır,
+  yoksa sayı ya erişilemez olur ya da sessizce gevşetilir.
+- **`olc` bu bütçeye SIĞMAZ:** ölçülen süreler `git log` 63 ms, `python olc` **631 ms**. Bu yüzden pahalı sayı burada
+  koşturulmaz; Stop kancasının yazdığı **önbellekten** okunur
   (`.defter-olc-onbellek.json`, oturumdan bağımsız). Önbellek 24 saatten eskiyse **sayı KULLANILMAZ** ve satır
   "önbellek bayat" der — *eski bir sayıyı taze gibi göstermek, hiç göstermemekten kötüdür.*
 - **Fail-open ama sessiz değil:** çıkış daima 0 (tur bloklanmaz), ama ölçemezse **"ölçülemedi (sebep)"** yazar.

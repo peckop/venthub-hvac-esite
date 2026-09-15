@@ -127,8 +127,12 @@ describe('INV-KANCA-DEFTER-1 · defter tazelik satiri', () => {
     const pano = panoKur(TAZE_ONBELLEK)
     const r = kos(SATIR_KANCA, depo, pano)
 
-    expect(r.stdout, `satir hala uyarili: ${r.stdout}`).toMatch(/^DEFTER:/)
-    expect(r.stdout).not.toMatch(/⚠/)
+    // ⚠YALNIZ DEFTER SATIRI ÖLÇÜLÜR: kanca REC-345'te ikinci bir satır (BAĞIMLILIK) daha
+    // basmaya başladı. Tüm stdout'ta ⚠ aramak, KOMŞU satırın uyarısını bu kolun kusuru
+    // sayardı — ölçüt doğru, evren yanlış olurdu. Kol bu yüzden satırı ADIYLA seçer.
+    const defterSatiri = r.stdout.split('\n').find((s) => s.includes('DEFTER:')) ?? ''
+    expect(defterSatiri, `satir hala uyarili: ${r.stdout}`).toMatch(/^DEFTER:/)
+    expect(defterSatiri).not.toMatch(/⚠/)
   })
 
   it('DEĞİŞEN DEMET ≥ 1 tek başına UYARI sebebidir (yaş taze olsa bile)', () => {
@@ -194,6 +198,128 @@ describe('INV-KANCA-DEFTER-1 · defter tazelik satiri', () => {
     for (const yasak of ['notebooklm ', 'fetch(', 'https://']) {
       expect(kaynak.split('\n').filter((s) => !s.trim().startsWith('*') && !s.trim().startsWith('//')).join('\n'), `kaynakta dis cagri izi: ${yasak}`).not.toContain(yasak)
     }
+  })
+})
+
+/**
+ * INV-KANCA-DEFTER-3 — BAĞIMLILIK satırı (REC-345).
+ *
+ * NİÇİN AYNI KANCADA: ölçüm zaten yazılı bir kayıtta duruyordu
+ * (`docs/audits/bagimlilik-YYYY-MM-DD.md`) ve REC-342'nin dersi tam buydu — ölçümün var
+ * olması, kararın verildiği yerde göründüğü anlamına gelmez.
+ *
+ * ⭐BU BÖLÜMÜN EN ÖNEMLİ KOLU "high ≥ 1 TEK BAŞINA UYARI DEĞİL" kolu. Bugün 11 yüksek kayıt
+ * var ve hepsi bilinen, kayda geçmiş, insan kararı bekleyen kalemler. Her turda kırmızı
+ * yanan bir satır üç günde görmezden gelinir (bu projede ölçülmüş bir kusur sınıfı). Kapı
+ * TARAMA TAZELİĞİNİ ölçer; sayı yine de yazılır, çünkü gizlenmesi de yanlış olurdu.
+ */
+describe('INV-KANCA-DEFTER-3 · bagimlilik tarama tazeligi satiri', () => {
+  /** Denetim kaydı yazan geçici depo: yaş ölçütü DOSYA ADINDAKİ tarihtir. */
+  function kayitliDepoKur(gunOnce: number, high: number | null): string {
+    const kok = depoKur(0, new Date().toISOString().slice(0, 10))
+    const gun = new Date(Date.now() - gunOnce * 86_400_000).toISOString().slice(0, 10)
+    const dizin = path.join(kok, 'docs', 'audits')
+    fs.mkdirSync(dizin, { recursive: true })
+    const tablo =
+      high === null
+        ? '| Bir sey | 5 |\n'
+        : `| Yüksek önemde güvenlik kaydı (prod) | **${high}** | \`pnpm audit\` |\n`
+    fs.writeFileSync(path.join(dizin, `bagimlilik-${gun}.md`), '# kayit\n\n' + tablo, 'utf8')
+    return kok
+  }
+
+  it('⭐ASIL İDDİA — tarama TAZEYSE satır ⚠ TAŞIMAZ ve high sayısını YAZAR', () => {
+    const r = kos(SATIR_KANCA, kayitliDepoKur(0, 11), panoKur(TAZE_ONBELLEK))
+    const satir = r.stdout.split('\n').find((s) => s.includes('BAGIMLILIK')) ?? ''
+    expect(satir, `satir yok: ${r.stdout}`).toMatch(/^BAGIMLILIK: son tarama 0 gun · high 11$/)
+  })
+
+  it('⭐high ≥ 1 TEK BAŞINA UYARI SEBEBİ DEĞİLDİR (her turda kırmızı = görmezden gelinen kapı)', () => {
+    // Bu kol gevşeklik değil, TASARIM KARARININ ölçümü. Kaldırılırsa satır her turda ⚠
+    // yanar ve üç günde okunmaz hale gelir — bu projede ölçülmüş bir kusur sınıfı.
+    const r = kos(SATIR_KANCA, kayitliDepoKur(1, 99), panoKur(TAZE_ONBELLEK))
+    const satir = r.stdout.split('\n').find((s) => s.includes('BAGIMLILIK')) ?? ''
+    expect(satir).toContain('high 99')
+    expect(satir, 'high tek basina uyari uretmis').not.toContain('⚠')
+  })
+
+  it('EŞİK AŞILIRSA ⚠ (varsayılan 14 gün)', () => {
+    const r = kos(SATIR_KANCA, kayitliDepoKur(20, 0), panoKur(TAZE_ONBELLEK))
+    const satir = r.stdout.split('\n').find((s) => s.includes('BAGIMLILIK')) ?? ''
+    expect(satir).toMatch(/^⚠BAGIMLILIK: son tarama 20 gun/)
+  })
+
+  it('EN YENİ KAYIT ölçülüyor — eski bir kayıt tazeliği gizlemez', () => {
+    // Dizinde hem eski hem yeni kayıt varsa ölçüt EN YENİSİ olmalı; en eskiye bakan bir
+    // ölçüt her taramadan sonra bile "bayat" derdi ve kapı gürültüye boğulurdu.
+    const kok = kayitliDepoKur(40, 3)
+    const bugun = new Date().toISOString().slice(0, 10)
+    fs.writeFileSync(path.join(kok, 'docs', 'audits', `bagimlilik-${bugun}.md`), '# k\n\n| Yüksek önemde güvenlik kaydı (prod) | **7** | x |\n', 'utf8')
+    const satir = kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK)).stdout.split('\n').find((s) => s.includes('BAGIMLILIK')) ?? ''
+    expect(satir).toMatch(/^BAGIMLILIK: son tarama 0 gun · high 7$/)
+  })
+
+  it('⭐ÖLÇEMEDİ ≠ TAZE — kayıt hiç yoksa satır SEBEBİ YAZAR', () => {
+    const r = kos(SATIR_KANCA, depoKur(0, new Date().toISOString().slice(0, 10)), panoKur(TAZE_ONBELLEK))
+    const satir = r.stdout.split('\n').find((s) => s.includes('BAGIMLILIK')) ?? ''
+    expect(satir).toMatch(/^⚠BAGIMLILIK: OLCULEMEDI \(bagimlilik-\*\.md kaydi yok\)/)
+  })
+
+  it('KAYITTA high TABLOSU OKUNAMAZSA ⚠ ve sebep yazılır (sessiz sıfır YOK)', () => {
+    // En sinsi hâl: tablo biçimi değişir, regex tutmaz ve satır "high 0" der. Sıfır, ölçüm
+    // gibi görünen bir yokluktur; o yüzden okunamama AÇIKÇA yazılır.
+    const r = kos(SATIR_KANCA, kayitliDepoKur(0, null), panoKur(TAZE_ONBELLEK))
+    const satir = r.stdout.split('\n').find((s) => s.includes('BAGIMLILIK')) ?? ''
+    expect(satir).toMatch(/^⚠BAGIMLILIK:/)
+    expect(satir).toContain('high OKUNAMADI')
+    expect(satir).not.toContain('high 0')
+  })
+
+  it('KANCA pnpm KOŞTURMAZ — ağ isteyen komut kaynakta GEÇMEZ', () => {
+    // `pnpm outdated`/`pnpm audit` saniyeler sürer ve ağ ister; satırın içinde koşarsa her
+    // tur yavaşlar ve çevrimdışıyken ölçüm kaybolur. Sayı KAYITTAN okunur.
+    const kaynak = fs
+      .readFileSync(SATIR_KANCA, 'utf8')
+      .split('\n')
+      .filter((s) => !s.trim().startsWith('*') && !s.trim().startsWith('//'))
+      .join('\n')
+    for (const yasak of ['pnpm outdated', 'pnpm audit', 'npm audit']) {
+      expect(kaynak, `kaynakta ag isteyen komut: ${yasak}`).not.toContain(yasak)
+    }
+  })
+
+  it('⭐CETVEL SIKLIĞI ile KAPININ EŞİĞİ HİZALI — ayrışırsa kapı cetveli değil KENDİNİ ölçer', () => {
+    // Recep kararı 13 (2026-09-15, kendi sözü "13 ve 14 evet"): iki haftada bir tam tarama,
+    // eşik 14 gün SABİT. Bu kol iki sayının ayrışmasını engeller: cetvel "iki haftada bir"
+    // derken kapı 7 ya da 30 günde uyarıyorsa, kapı yazılı kuralı DEĞİL kendi varsayılanını
+    // ölçüyor olur ve kimse farkı görmez.
+    const cetvel = fs.readFileSync(
+      path.resolve(__dirname, '../../../docs/standards/bagimlilik-guvenlik-yukseltme-standard.md'),
+      'utf8',
+    )
+    expect(cetvel, 'sıklık revizyonu bölümü yok').toMatch(/SIKLIK REVİZYONU/i)
+    expect(cetvel, 'karar verildigi yazilmamis').toMatch(/KARAR VERİLDİ/i)
+    expect(cetvel, 'yeni siklik cetvelde yazili degil').toMatch(/iki haftada bir tam\s*\n?\s*tarama/i)
+    expect(cetvel, 'esik cetvelde SABIT olarak yazili degil').toMatch(/Eşik:\s*14 gün,\s*SABİT/)
+
+    // Kancanın varsayılanı da 14 olmalı — cetveldeki sayı ile kod ayrışmasın.
+    const kaynak = fs.readFileSync(SATIR_KANCA, 'utf8')
+    expect(kaynak, 'kancanin varsayilan esigi 14 degil').toMatch(
+      /VENTHUB_BAGIMLILIK_ESIK_GUN\s*\|\|\s*14/,
+    )
+  })
+
+  it('⭐GEVŞETME OLDUĞU ve ÖNERİNİN REDDEDİLDİĞİ kayıtta DURUYOR', () => {
+    // İki yön de yazılı kalmalı: (a) kuralın hangi yönde değiştiği, (b) ALTYAPI'nın aksi
+    // yöndeki önerisinin reddedildiği. İkincisi olmazsa aynı yol bir sonraki tartışmada
+    // ikinci kez önerilir; birincisi olmazsa cetvel kendi geçmişini siler.
+    const cetvel = fs.readFileSync(
+      path.resolve(__dirname, '../../../docs/standards/bagimlilik-guvenlik-yukseltme-standard.md'),
+      'utf8',
+    )
+    expect(cetvel, 'gevsetme oldugu yazilmamis').toMatch(/GEVŞET/i)
+    expect(cetvel, 'eski satirin ne oldugu yazilmamis').toMatch(/haftada bir/i)
+    expect(cetvel, 'reddedilen oneri kayitta degil').toMatch(/ALTYAPI'NIN ÖNERİSİ AKSİ YÖNDEYDİ/i)
   })
 })
 

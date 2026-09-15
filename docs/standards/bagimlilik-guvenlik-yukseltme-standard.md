@@ -11,10 +11,58 @@
 zorunludur: geliştirme zincirindeki yüzlerce uyarı canlı yüzeyle karışırsa **gerçek kalem
 kaybolur**.
 
-Sıklık: haftada bir, ve her `next` / `@sentry/*` / `supabase-js` yükseltmesinden sonra.
+**Sıklık (Recep kararı 13, 2026-09-15 — kendi sözü: *"13 ve 14 evet"*):** **iki haftada bir tam
+tarama** (`pnpm outdated` + `pnpm audit --prod` → `docs/audits/bagimlilik-YYYY-MM-DD.md`) **+
+her güvenlik olayında anlık tarama.** Ayrıca her `next` / `@sentry/*` / `supabase-js`
+yükseltmesinden sonra.
+
+> ⚠**BU SATIR 2026-09-15'te "haftada bir"den GEVŞETİLDİ.** Gevşetme sessizce yapılmadı: iki
+> yönün gerekçesi §1.1'de duruyor ve karar Recep'e **gevşetme olarak** sunuldu. ALTYAPI'nın
+> önerisi haftalığı korumaktı; karar aksi yönde verildi ve uygulandı. Eski satırın
+> silinmemesi kasıtlı — bir kuralın hangi yönde değiştiği, kuralın kendisi kadar bilgidir.
+
 Otomatik kapı **bilinçli olarak yok** — audit çıktısı her gün değişir ve her gün kırmızı veren
 bir kapı, üçüncü günde bakılmayan bir kapıdır (aynı sınıf: `docs/audits/` içindeki
 "yeşil kapı bakmadığı şeyi kanıtlamaz" dersleri).
+
+### 1.1 · SIKLIK REVİZYONU — **KARAR VERİLDİ** (REC-345, 2026-09-15)
+
+✅**KARAR 13 = EVET.** Recep'in kendi sözü kayda geçti (`REC-345` yorumu, 2026-09-15 08:27Z):
+*"13 ve 14 evet"*. Yukarıdaki §1 satırı buna göre güncellendi; **bu paragraf artık taslak
+değil, kararın gerekçe kaydıdır.**
+
+⚠**KARAR BİR GEVŞETMEYDİ VE ÖYLE SUNULDU:** §1 "haftada bir" diyordu, yeni satır "iki
+haftada bir". Bu bir netleştirme değil **gevşetme**; onay veren kişinin neyi gevşettiğini
+bilmesi gerekiyordu, o yüzden karara gevşetme olarak sunuldu. Gevşetmeyi sessizce yapmak,
+cetvelin kendi geçmişini silmek olurdu.
+
+⭐**ALTYAPI'NIN ÖNERİSİ AKSİ YÖNDEYDİ VE BU DA KAYDA GEÇİYOR:** öneri haftalığı KORUYUP
+görünürlüğe güvenmekti (aşağıdaki gerekçe). Karar aksi yönde verildi; karar Recep'in,
+uygulandı. Bir önerinin reddedildiğinin yazılı kalması, bir sonraki tartışmada aynı yolun
+ikinci kez önerilmesini engeller.
+
+Gevşetme lehine ölçülmüş gerekçe: tarama çıktısı her gün değişir ve haftalık tam tarama
+pratikte **koşturulmadı** — 2026-09-15'te ölçüldü, son yazılı kayıt bu tarihten öncesine ait
+değil, yani haftalık kural yazılıydı ve **tutulmadı.** Tutulmayan bir sıklık, olmayan bir
+sıklıktan daha kötüdür: kayda uyulduğu sanılır.
+
+Gevşetme aleyhine gerekçe (aynı ölçümde): bugün **11 yüksek** kayıt var ve hepsi tek bir
+doğrudan bağımlılıktan geliyor (`docs/audits/bagimlilik-2026-09-15.md` §2). İki haftalık
+pencere, böyle bir kalemin görünmesini geciktirir.
+
+⭐**ASIL DÜZELTME SIKLIK DEĞİL, GÖRÜNÜRLÜK OLABİLİR:** haftalık kural tutulmadı çünkü
+hatırlanması gerekiyordu. REC-345 ile tarama tazeliği artık her turun başında görünen bir
+satıra bağlandı (`⚠BAGIMLILIK: son tarama N gun · high H`). Yani sıklık kuralının
+tutulmasını sağlayan şey sayının kendisi değil, **görünürlüğü**. Karar bu iki seçenek ayrı
+ayrı sunularak istendi; Recep gevşetmeyi seçti. ⭐**Bu yüzden görünürlük şimdi tek savunma:**
+haftalık pencere gitti, yerine iki haftalık pencere ve her turda görünen bir satır geldi. O
+satır susarsa kuralı tutan hiçbir şey kalmaz — kapının kendi kapısı (`INV-KANCA-DEFTER-3`)
+bu yüzden var.
+
+**Eşik: 14 gün, SABİT** (Recep kararı 13; `VENTHUB_BAGIMLILIK_ESIK_GUN` ile geçici olarak
+değiştirilebilir ama varsayılan budur). Sayı kararın sıklığıyla hizalı: **iki hafta = 14
+gün.** Sıklık bir gün yeniden değişirse eşik de **aynı commit'te** değişir; ikisinin
+ayrışması, kapının cetveli değil kendini ölçmesi demek olurdu.
 
 ## 2 · Şiddet tek başına süre belirlemez — MARUZİYET ölçülür
 
