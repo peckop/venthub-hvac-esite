@@ -83,6 +83,35 @@ const DAMGA = execFileSync('node', ['-e', "process.stdout.write(String(Date.now(
 }).trim()
 const VERITABANI = arg('ad', `golge_${DAMGA}`)
 
+/**
+ * ⛔SQL KİMLİK ENJEKSİYONU — BU KONTROL BİR GÜVENLİK BULGUSUNDAN SONRA EKLENDİ (2026-09-16).
+ *
+ * Betiğin ilk hâlinde veritabanı adı doğrudan SQL'e gömülüyordu
+ * (`create database "${VERITABANI}"`). Commit sonrası güvenlik taraması bunu
+ * **`sql-identifier-injection`** olarak işaretledi ve HAKLIYDI: `--ad 'x"; drop database
+ * postgres; --'` gibi bir değer, tırnağı kapatıp kendi komutunu ekleyebilirdi.
+ *
+ * ⭐NİÇİN PARAMETRE KULLANILAMAZ: PostgreSQL'de **kimlikler** (veritabanı/tablo/kolon adı)
+ * `$1` ile parametrelenemez — yalnız DEĞERLER parametrelenir. Yani doğru çözüm kaçış değil,
+ * **izin verilen karakter kümesini ÖNCEDEN daraltmaktır** (allowlist).
+ *
+ * Kural: yalnız küçük harf, rakam ve altçizgi; harf ya da altçizgi ile başlar; en çok 63
+ * karakter (PostgreSQL'in `NAMEDATALEN-1` sınırı — daha uzun ad SESSİZCE kırpılır ve
+ * "yarattığım DB" ile "sorguladığım DB" ayrışır).
+ *
+ * ⚠BU KOL BİR DERSİN DE KAYDI: betiği yazarken "ad zaten benim verdiğim bir şey" diye
+ * düşündüm. Ama betik **başkası da koşturacak** diye tasarlandı (Recep'in "bir başkası
+ * kursaydı çalışır mı" sınavı) — o an girdi artık BENİM girdim değildir.
+ */
+const AD_DESENI = /^[a-z_][a-z0-9_]{0,62}$/
+if (!AD_DESENI.test(VERITABANI)) {
+  console.error(`${AD}: REDDEDILDI — veritabani adi izin verilen bicimde DEGIL.`)
+  console.error(`  verilen: ${JSON.stringify(VERITABANI).slice(0, 80)}`)
+  console.error('  izin verilen: yalniz [a-z0-9_], harf/altcizgi ile baslar, en cok 63 karakter.')
+  console.error('  SEBEP: SQL kimlikleri parametrelenemez; guvenli yol izin verilen kumeyi daraltmaktir.')
+  process.exit(2)
+}
+
 function dur(kod, ...satirlar) {
   for (const s of satirlar) console.error(`${AD}: ${s}`)
   process.exit(kod)
