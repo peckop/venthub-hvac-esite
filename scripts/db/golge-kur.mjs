@@ -177,6 +177,45 @@ if (ayakta.status !== 0 || !(ayakta.stdout ?? '').includes(KONTEYNER)) {
     'Docker Desktop motoru kapali olabilir, ya da yigin hic baslatilmamis.',
   )
 }
+
+// ── --dusur: YALNIZ KENDI VERITABANINI DUSUR (reset'in YERINE) ───────────────
+/**
+ * ⛔NİÇİN VAR — 2026-09-16 OLAYI: gölgeyi tazelemek için `supabase db reset` koştum.
+ * O komut TEK BİR veritabanını sıfırlamıyor; **aynı kümedeki BAŞKA veritabanlarını da
+ * siliyor** ve URUN'un `arama_golge`'sini iş ortasında uçurdu. Küme, git stash yığını
+ * ile aynı sınıfta **paylaşılan kaynaktır**; "yalnız yerel" demek "yalnız benim" demek
+ * değildir.
+ *
+ * Bu bayrak o komutun yerine geçer: **yalnız adı verilen veritabanını** düşürür ve
+ * küme düzeyinde hiçbir şeye dokunmaz. Betiğin tamamında `db reset` GEÇMEZ.
+ *
+ * ⭐KORUMA: küme altyapısına ait adlar (`postgres`, `_supabase`, `template*`) REDDEDİLİR.
+ * Sebep: bu betik başkası da koşturacak diye tasarlandı; o an girdi benim girdim değildir.
+ */
+if (bayrak('dusur')) {
+  const KORUMALI = new Set(['postgres', '_supabase', 'template0', 'template1'])
+  if (KORUMALI.has(VERITABANI)) {
+    dur(
+      2,
+      `REDDEDILDI — "${VERITABANI}" kume altyapisi, golge DEGIL. Hicbir seye dokunulmadi.`,
+      'Yalnizca kendi golgenin adini ver: --dusur --ad <golge-adi>',
+    )
+  }
+  const varMi = tekDeger(
+    `select count(*) from pg_database where datname = '${VERITABANI.replace(/'/g, "''")}'`,
+    'postgres',
+  )
+  if (varMi === '0') {
+    console.log(`${AD}: "${VERITABANI}" YOK — dusurulecek bir sey yok.`)
+    process.exit(0)
+  }
+  const d = psql(`drop database "${VERITABANI}"`, { db: 'postgres', dur: true })
+  if (d.status !== 0) {
+    dur(1, `DUSURULEMEDI: ${String(d.stderr).slice(0, 200)}`)
+  }
+  console.log(`${AD}: DUSURULDU -> ${VERITABANI} (kume duzeyinde hicbir seye dokunulmadi)`)
+  process.exit(0)
+}
 if (!fs.existsSync(ONSOZ)) dur(2, `OLCEMEDI — onsoz YOK: ${path.relative(KOK, ONSOZ)}`)
 const tabanAd = enYeniTamTaban()
 if (!tabanAd) {
