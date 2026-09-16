@@ -233,7 +233,9 @@ const PaymentSuccessPage: React.FC = () => {
   if (status === 'inceleme') {
     return (
       <div className="min-h-screen bg-light-gray flex items-center justify-center">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+        {/* Köşe yarıçapı tasarım ölçeğinden (`rounded-hvac-*`); ham `rounded-xl` INV-9
+            stil sayacını artırır ve tavanı yükseltmek çözüm sayılmaz. */}
+        <div className="bg-white rounded-hvac-md shadow-lg p-8 max-w-md w-full text-center">
           <div className="bg-warning-orange/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
             <ShieldCheck size={32} className="text-warning-orange" />
           </div>
