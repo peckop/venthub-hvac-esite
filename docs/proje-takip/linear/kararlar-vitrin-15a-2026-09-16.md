@@ -1,6 +1,6 @@
-# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-12 ayna: K1–K62)
+# Kararlar — Vitrin 15A Yeniden Tasarım (Linear belgesinin TAM dışa aktarımı · 2026-09-16 ayna: K1–K62)
 
-<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-12T10:13:35.095Z · kopya: 2026-09-12T10:14Z -->
+<!-- kaynak_id: 061e6113-0f57-4296-a327-4e0f1a07cd76 · kaynak_updatedAt: 2026-09-15T06:21:53.865Z · kopya: 2026-09-16T06:21Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -67,7 +67,7 @@ Az sayıda ŞABLON + veri; sayfa başına özel görünüm yok. Kategori sayfas�
 
 DURUM: KURAL → kapı: mobil-alt-sekme.test.ts
 
-Nefes alanı, disiplinli tipografi, az/kusursuz öğe, ürün kahraman. Masaüstü menü paneli: 7 büyük kategori kiremiti, kürasyon sütunu yok, ≤12 öğe. Mobil (09-04 güncel): alt sekme çubuğu 4 sekme (Ana sayfa · Ürünler · Teklif · İletişim), İletişim yaprağı (WhatsApp ile yaz · Ara · E-posta gönder · Teknik destek iste; Kargo takibi satış kipinde), üst şeritte logo + sağ üstte hesap simgesi (+ yalnız dil uyuşmazlığında EN/TR çipi), arama alt satırda tam genişlik [eski metin "5 sekme / Destek yaprağı / üstte yalnız logo + arama" 09-04 16:50 ve 18:30 kararlarıyla değişti], yatay kategori çipleri, ürün sayfasında yapışık eylem çubuğu; ekranda ≤9 etkileşimli öğe, dokunma hedefi ≥44 px.
+Nefes alanı, disiplinli tipografi, az/kusursuz öğe, ürün kahraman. Masaüstü menü paneli: 7 büyük kategori kiremiti, kürasyon sütunu yok, ≤12 öğe. Mobil (09-04 güncel): alt sekme çubuğu 4 sekme (Ana sayfa · Ürünler · Teklif · İletişim), İletişim yaprağı (WhatsApp ile yaz · Ara · E-posta gönder · Teknik destek iste; Kargo takibi satış kipinde), üst şeritte logo + sağ üstte hesap simgesi (+ yalnız dil uyuşmazlığında EN/TR çipi), arama alt satırda tam genişlik \[eski metin "5 sekme / Destek yaprağı / üstte yalnız logo + arama" 09-04 16:50 ve 18:30 kararlarıyla değişti\], yatay kategori çipleri, ürün sayfasında yapışık eylem çubuğu; ekranda ≤9 etkileşimli öğe, dokunma hedefi ≥44 px.
 
 ## K10 · Liste ve karşılaştırma (2026-09-04)
 
@@ -226,7 +226,7 @@ DURUM: İŞ → REC-199 (Backlog)
 
 DURUM: İŞ → REC-199 (Backlog)
 
-* Mobil alt çubuk sekmesi ve yaprak adı **"İletişim"** (Destek değil). Yaprak: WhatsApp ile yaz · Ara · E-posta gönder · [çerçeveli] Teknik destek iste; beklenti satırları; ürün sayfasından açılınca bağlam satırı. YZ asistanı ve kargo takibi K1 gereği yok. K9 güncellendi: "Destek" → "İletişim".
+* Mobil alt çubuk sekmesi ve yaprak adı **"İletişim"** (Destek değil). Yaprak: WhatsApp ile yaz · Ara · E-posta gönder · \[çerçeveli\] Teknik destek iste; beklenti satırları; ürün sayfasından açılınca bağlam satırı. YZ asistanı ve kargo takibi K1 gereği yok. K9 güncellendi: "Destek" → "İletişim".
 * Ürün sayfası paneli / seçici sorusu: Recep "hafif panel mi açık kalsın mı" ikilemini KABUL ETMEDİ — kaygı: eksik girdiyle yanlış ürün seçilirse sorumluluk. Karar: üç alternatif (A tek sayfa seçici + bağlantı · B hafif panel · C rehberli "benim yerime seç") AYRI AYRI akış olarak çizilir, aynı örnek üzerinde, sorumluluk satırıyla; Recep yan yana görüp seçer (geri-bildirim-7 madde 69). K12 o güne kadar değişmez.
 * AFS mobil arayüzü esinlenme kaynağı (kopya değil): zorunlu içerik haritası DESIGN'a (madde 70). OPS'un "ana sayfaya kategori kartları" önerisi düştü: v9'da zaten var.
 
@@ -249,7 +249,7 @@ K9 ve K16'nın mobil sekme ve header maddelerini GÜNCELLER (Design Kabuk v2 + S
 2. **İletişim = header'ın sağında yeşil simge**, dokununca yaprak. Yaprak satırları unvanla değil NİYETLE adlanır: "Teklif ve sipariş" (WhatsApp · Ara; alt yazı: müşteri temsilcisi) · "Ürün seçimi ve teknik soru" (teknik destek formu / e-posta) · "Arıza ve garanti" (satış kipiyle açılır; şimdi çizilir, kapalı bekler). Canlı sohbet gelirse yeni satır olur (müsait saatte üstte, mesai dışı "mesaj bırak"); yüzen balon o günün kararıdır, bugün yüzen düğme ve kenar kulakçığı ÇİZİLMEZ (K5 tek ana düğme; alt bölge zaten kalabalık).
 3. **Header sağı:** TR/EN çipi HER ZAMAN görünür (girişsiz ziyaretçi için; K16'daki "yalnız uyuşmazlıkta" hükmü kalkar) · bildirim rozeti (teklif yanıtlandı) yalnız girişliyken · İletişim simgesi. Hesap simgesi header'dan kalkar (sekmeye gitti). Ürün sayfasında "Teklif iste" satırının yanında küçük "soru sor" simgesi. Girişsiz Hesap sayfasının ilk bloğu Destek (giriş/kayıt + kanallar).
 4. **Geri dönüş kuralı (ölçüm):** yeni kabuk açıldıktan 2 hafta sonra WhatsApp ve arama tıklaması bugünkü seviyenin altına düşerse İletişim alt çubuğa döner, Hesap header'a çıkar; Design iki hâli de çizer (tek kare farkı).
-5. **Design'ın Kabuk v2 diğer maddeleri KABUL:** Ürünler örtüsü → Ürünler sayfası (öne çıkanlar → 7 kategori → senaryolar → tüm ürünler/markalar) · iç sayfalarda "‹ geri · başlık · arama" · Hesap sayfası = AccountLayout gruplarının yeniden dizilişi (Özet · Tekliflerim · Sipariş & Kargo [satış kipi] · Listeler · Hesap yönetimi) · girişli ana sayfa kısayol şeridi.
+5. **Design'ın Kabuk v2 diğer maddeleri KABUL:** Ürünler örtüsü → Ürünler sayfası (öne çıkanlar → 7 kategori → senaryolar → tüm ürünler/markalar) · iç sayfalarda "‹ geri · başlık · arama" · Hesap sayfası = AccountLayout gruplarının yeniden dizilişi (Özet · Tekliflerim · Sipariş & Kargo \[satış kipi\] · Listeler · Hesap yönetimi) · girişli ana sayfa kısayol şeridi.
 
 *Kaynak: OPS–Recep konuşması 09-05 09:30–10:20 TR; Design dosyası* `systemair-incelemesi-ve-kabuk-v2.md`*. Geri alınabilir: itirazda bu madde silinir, K9/K16 eski hâliyle yürür.*
 
@@ -270,7 +270,7 @@ DURUM: KURAL → kapı YOK (REC-200 açıldı)
 
 Çizimde örnek ürün değişirse aynı turda kimlik satırı + sertifika çipleri + açıklama + hesap gerekçesi + seçici eksenleri `technical_specs` ve `description_i18n`'den yeniden yazılır. Anahtarı olmayan hiçbir eksen ve tek değerli hiçbir alan seçici olarak çizilmez (K7 uzantısı).
 
-## K18-a · Ürün Seçici kademeli açılış önkoşulları (eski başlık: "K18 eki") (DESIGN-MENU önerisi, OPS kabul 2026-09-05 12:42 TR [Linear damgası 09:42Z]; Recep K18 "önce A, geliştiğiçe C" kapsamında)
+## K18-a · Ürün Seçici kademeli açılış önkoşulları (eski başlık: "K18 eki") (DESIGN-MENU önerisi, OPS kabul 2026-09-05 12:42 TR \[Linear damgası 09:42Z\]; Recep K18 "önce A, geliştiğiçe C" kapsamında)
 
 DURUM: İŞ → REC-198 (Backlog)
 
@@ -279,7 +279,7 @@ DURUM: İŞ → REC-198 (Backlog)
 * **Faz sırası:** Faz 1 A + kanal fanı · Faz 2 motor eklenir, sekme soluktan açığa · Faz 3 C kipi (kural tablosu sonrası) · Faz 4 ürün sayfası paneli (K12 + canlı ölçüm).
 * Kaynak: DESIGN-MENU proje yorumu 09-05 12:28 TR (09:28Z); kalıcı sayfa `Ürün Seçici Karşılaştırma.dc.html`.
 
-## K22 · Durum alfa ile anlatılmaz (DESIGN-MENU ölçümü, OPS kabul 2026-09-05 14:00 TR [Linear damgası 11:00Z])
+## K22 · Durum alfa ile anlatılmaz (DESIGN-MENU ölçümü, OPS kabul 2026-09-05 14:00 TR \[Linear damgası 11:00Z\])
 
 DURUM: KURAL → kapı YOK (REC-277, Backlog)
 
@@ -390,7 +390,7 @@ DURUM: KURAL → kapı YOK (REC-277, Backlog)
 
 **K35 eki · K5 istisnası ve çizgi ağırlığı (2026-09-06 14:00Z, OPS):** P-Q eğrisinin çalışma noktası kiremidin üçüncü ve SON izinli kullanımıdır (K5: logo üst dilimi · sayfanın tek ana eylemi · P-Q çalışma noktası); ton `--action-terracotta` (deep değil; deep düğme zemini). Ana eğri **2 px** lacivert, ikincil 1,5 px turkuaz (F8). **Ölçüt notu:** token değerinin kaynağı HSL üçlüsüdür; kılavuzdaki hex yalnız etikettir — HSL→hex yuvarlaması (örn. #24395C → #24385C) ihlal değildir, ham-hex denetimi HSL karşılığıyla ölçer.
 
-## K18-b · BAŞLIK DÜZELTMESİ — K18 KARARDIR (Recep: "önce A, geliştikçe C", üç kez; son teyit 2026-09-06 ~17:40 TR; OPS 14:45Z)
+## K18-b · BAŞLIK DÜZELTMESİ — K18 KARARDIR (Recep: "önce A, geliştikçe C", üç kez; son teyit 2026-09-06 \~17:40 TR; OPS 14:45Z)
 
 DURUM: İŞ → REC-198 (Backlog)
 
@@ -508,3 +508,20 @@ DURUM: KURAL → kapı YOK (REC-279)
 * Erteleme; REC-279 (K50) sırası değişmez.
 
 **Not (OPS 09-11):** Design-Menü 308 tablosundaki `/tr/cart` + `/tr/checkout` → 410 satırı REDDEDİLDİ (K1: sepet ölmedi, satış kipi kapalı); kip-kapalı davranış mevcut hâliyle kalır.
+
+## AÇIK KARARLAR — T listesi (DESIGN-MENU v18 panosu, OPS 2026-09-15)
+
+*Yöntem (OPS 2026-09-14/15, kural): yapısal karar Recep'e ÇİZİLİ KARE olarak gider (metin değil), en fazla 5 kapalı soru → brief → iki kare + tasarımcı önerisi → "1 mi 2 mi". Kareler: Menü Design projesi* `Kararlar Gorsel.dc.html`*.*
+
+* **AÇIK — T-1 · İletişim yüzeyi:** panel (360 px, üstüne biner) mi / kalıcı sol sütun (262 px) mü? Design önerisi: panel (K19 ile tutarlı; sütun Teknik destek ve Kargo takibi'nde boş kalır).
+* **AÇIK — T-2 · Hava Şartlandırma kategori modu (2 dal):** vitrin (dallar kart) mi / anlatım (doğrudan liste) mi? Design önerisi: vitrin (mod kuralı ≥2 vitrin · 1 anlatım · 0 çizilmez bozulmaz).
+* **AÇIK — T-3 · Mobil seçicide "Hesapla" düğmesi:** kiremit mi / çerçeveli mi? Design önerisi: kiremit (sayfanın tek işi hesap; K5 tek ana düğme).
+* **AÇIK — T-4 · Ürün sayfası varsayılan varyantı:** ortanca devir (1400 d/dk · 2.476 m³/h) mi / en düşük (950 d/dk · 1.590 m³/h) mü? Design önerisi: ortanca (SEAT 30'un 4 varyantının 3'ü bu devirde; en düşükte mahali büyük kullanıcı fanı yetersiz sanır). 442 model sayfasını etkiler.
+* **AÇIK — T-5 · Çerez şeridi (A6):** çizilsin (karartmasız, iki eşit çerçeveli düğme) mi / çizilmesin mi? Design önerisi: çizilsin (teklif listesi localStorage kullanıyor).
+* **KAPANDI — T-6:** mobil sekme ikonu, OPS S1, 09-09 uygulandı.
+* **AÇIK — T-7 · Dal sayfası birimi:** aile kartı gösterir, süzgece dokununca model kartına döner mi / doğrudan model kartı mı? Design önerisi: aile kartı (133 model yerine 8 seri). Karesi T-1…T-5 cevabından sonra çizilir.
+* **KAPANDI — T-8:** Ürün Seçimi v3 A/B/C — K18 kapsıyor (A + C, B çizilmez); Recep'e soru gitmez.
+
+*Tasarımcı kararı sayılanlar (OPS hükmü 09-14, Recep itiraz hakkı): D-01…D-12 ve 17 yeni kare, her birinin K dayanağı MENU yorumunda (13:16Z). D-07 (Recep isteği 09-08), D-10/D-11 (A8 standardı) K'sız ama tasarımcı kararı.*
+
+*Cevap geldiğinde her T satırı K numarası alır ve bu blok kapanır.*
