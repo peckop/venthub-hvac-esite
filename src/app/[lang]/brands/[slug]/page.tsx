@@ -6,6 +6,14 @@ import { Routes } from '../../../../utils/routes'
 import PageComponent from '../../../../views/BrandDetailPage'
 
 /** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3-4. */
+/**
+ * ROTA SINIFI İLANI (REC-348 / Recep kararı 21, 2026-09-16) — gerekçe `products/[slug]` ile aynı:
+ * rotanın istemciye zorlanıp zorlanmadığını ayırt eden şey ilanın kendisidir (REC-59 ölçümü).
+ * `revalidate`'i iptal etmez. Güvenli olduğu ölçüldü: bu dosya `searchParams`/`cookies()`/
+ * `headers()` kullanmıyor.
+ */
+export const dynamic = 'force-static'
+
 export const revalidate = 3600
 
 export async function generateStaticParams() {
