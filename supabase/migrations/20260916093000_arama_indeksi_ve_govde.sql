@@ -491,6 +491,17 @@ begin
       v_aktif, v_indeks;
   end if;
 
+  -- ⭐BOŞ VERİTABANI KOLU — bu satır GÖLGE KOŞUMUNDA doğdu (2026-09-16, yerel Postgres 17.4).
+  --   Migration ilk yazımında veri olmayan bir veritabanında `"jet fan" hala 0` diyerek
+  --   DÜŞÜYORDU. Prod'da sorun değildi (442 ürün var) ama sıfırdan kurulan her ortam —
+  --   gölge, CI, yeni geliştirici makinesi — bu migration'da takılırdı.
+  -- ⛔ATLANMIŞ İŞ YEŞİL DEĞİLDİR: atlama SESSİZ olmaz, NOTICE ile adıyla yazılır.
+  if v_aktif = 0 then
+    raise notice '[REC-340 guard] AKTIF URUN YOK — yapi kuruldu, DAVRANIS OLCUMU ATLANDI. '
+                 'Bu kosumda arama davranisi HIC olculmedi.';
+    return;
+  end if;
+
   -- Bu adımın DÜZELTMESİ gereken vakalar (ölçülmüş beklenti: jet fan 61, fan jet 61)
   select count(*) into v_jet_fan from public.fts_search_products('jet fan', 500);
   select count(*) into v_fan_jet from public.fts_search_products('fan jet', 500);
@@ -507,9 +518,10 @@ begin
   if v_asit = 0 then
     raise exception '[REC-340 guard] "asit dayanimli fan" hala 0 — ALT KATEGORI govdeye girmedi';
   end if;
-  if v_banyo < 10 then
-    raise exception '[REC-340 guard] "banyo" % dondu, alt kategori eklenince >=10 beklenir', v_banyo;
-  end if;
+  -- ⚠"banyo >= 10" KOLU KALDIRILDI (gölge koşumunda fark edildi): cetvel K8.3 sabit beklenen-sayı
+  --   yasaklıyor — katalog şeridi ürün ekledikçe böyle bir eşik sahte kırmızı yakar. Alt kategori
+  --   etkisini zaten `asit dayanımlı fan > 0` kanıtlıyor: o terim ürün adında ve açıklamasında
+  --   HİÇ geçmiyor, yalnız alt kategori adında var (ölçüldü).
 
   -- REGRESYON: bugün kusursuz çalışan vaka bozulmamalı (plan §5, tartışmaya kapalı)
   select count(*) into v_sku from public.fts_search_products('VRT-17160', 500);
