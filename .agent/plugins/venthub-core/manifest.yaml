@@ -447,6 +447,58 @@ skills:
     run_last: false
     exclusions: []
     commands: {}
+  - name: venthub-architecture
+    path: .agent/skills/venthub-architecture/SKILL.md
+    description: 'Defines VentHub architecture, component patterns, and Next.js App
+      Router rules. Trigger for creating new components (yeni bileşen oluştur), React
+      Server Components (RSC render), or render/cache strategy (statik-ISR sinirlari).
+      PPR icin DEGIL: bu projede PPR KULLANILMIYOR (next.config.mjs''te experimental.ppr
+      yok, 2026-08-15 olculdu). Do NOT use for git commands, database resets, or running
+      unit tests.'
+    triggers_on:
+    - yeni bileşen oluştur
+    - RSC render
+    - render cache stratejisi
+    inputs:
+    - code design query
+    outputs:
+    - architecture compliance guidelines
+    depends_on: []
+    next_steps:
+    - venthub-auditor
+    run_last: false
+    exclusions: []
+    commands: {}
+  - name: venthub-tasarim-dili
+    path: .agent/skills/venthub-tasarim-dili/SKILL.md
+    description: 'VentHub''in KENDI tasarim dili: Kararlar belgelerinden K numarali
+      sert kurallar, tek kaynak adresleri, kare kabul olcum satiri ve OPS->Design
+      emir/cevap kalibi. Vitrin/menu/urun sayfasi/liste-karsilastirma/kurumsal belge/marka-logo
+      tasarimi, design token-renk kurallari, Claude Design emri yazma ve kare kabulu
+      icin. Yabanci stil recetesi ya da gorsel uretim DEGILDIR.'
+    triggers_on:
+    - tasarim dili
+    - vitrin tasarimi
+    - menu tasarimi
+    - urun sayfasi tasarimi
+    - kurumsal belge tasarimi
+    - Claude Design emri
+    - kare kabul olcumu
+    - design system kurali
+    inputs:
+    - docs/proje-takip/linear/kararlar-*.md
+    - src/design-system/tokens.js
+    outputs:
+    - kare kabul/ret hukmu + olcum satiri
+    - ops-emir-<tarih>-<n>-<proje>.md
+    depends_on: []
+    next_steps: []
+    run_last: false
+    exclusions: []
+    commands: {}
+    recovery:
+      Kararlar ayna BAYAT: python scripts/nlm/kararlar_disa_aktar.py --tarih <bugun>
+        (betik PR
   - name: vercel-composition-patterns
     path: .agent/skills/vercel-composition-patterns/SKILL.md
     description: React composition patterns that scale, including compound component
@@ -547,6 +599,28 @@ skills:
     run_last: false
     exclusions: []
     commands: {}
+  - name: investigate
+    path: .agent/skills/investigate/SKILL.md
+    description: Bir arızanın KÖK SEBEBİNİ hipotez-çürütme disipliniyle bulur; kök
+      sebep bulunmadan düzeltme yazılmaz. Kırmızı test, 500, "dün çalışıyordu", sahte
+      bulgu şüphesi gibi durumlarda kullanın. Düzeltme uygulamak, kod yazmak ya da
+      PR açmak için KULLANMAYIN — bu skill teşhis eder, tedavi etmez.
+    triggers_on:
+    - neden bozuldu
+    - kok sebep
+    - dun calisiyordu
+    - 500 veriyor
+    - kirmizi test
+    inputs:
+    - belirti metni (hata, kirmizi adim, ekran goruntusu)
+    outputs:
+    - kok sebep + kanit + duzeltme onerisi + regresyon testi onerisi
+    depends_on: []
+    next_steps:
+    - diff-review
+    run_last: false
+    exclusions: []
+    commands: {}
   - name: lighthouse-performance-guard
     path: .agent/skills/lighthouse-performance-guard/SKILL.md
     description: Automates web page performance audits, Lighthouse tracing, and web
@@ -602,6 +676,9 @@ skills:
     - planı stress-test et
     - varsayımları çürüt
     - plan red team
+    - bu adım gerekli mi
+    - kapsam açısından denetle
+    - çalışan bir şeyi bozuyor mu
     inputs:
     - docs/plans/implementation_plan.md
     outputs:
@@ -636,9 +713,11 @@ skills:
         'Audit script missing'; print('Venthub auditor skill ready.')"
   - name: venthub-catalog-importer
     path: .agent/skills/venthub-catalog-importer/SKILL.md
-    description: Ingests and validates HVAC catalog PDFs. Trigger for importing catalogs
-      (katalog oku), scanning PDFs (pdf scan), and HVAC catalog imports. Do NOT use
-      for running unit tests, creating git branches, or database resets.
+    description: 'HVAC katalog PDF''lerinden görsel çoklu-ajanla ürün verisi çıkarıp
+      CSV üretir (Kademe 1). ⚠BU DOSYA YALNIZ YÖNLENDİRİCİDİR — çalıştırma mekaniği
+      venthub-pdf-ingestor deposundadır. Tetik: katalog oku, pdf scan, hvac catalog
+      import, Vortice/Avensair katalog işleme. DB''ye YAZMAZ. Birim test/git branch/db
+      reset için KULLANMA.'
     triggers_on:
     - katalog oku
     - pdf scan
@@ -646,7 +725,7 @@ skills:
     inputs:
     - catalog pdf files
     outputs:
-    - validated catalog data JSON
+    - yönlendirme (asıl çıktı ingestor deposunda üretilir)
     depends_on: []
     next_steps: []
     run_last: false
