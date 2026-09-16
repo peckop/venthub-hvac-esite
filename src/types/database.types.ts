@@ -1960,6 +1960,52 @@ export type Database = {
           },
         ]
       }
+      product_search_index: {
+        Row: {
+          product_id: string
+          search_body: string
+          search_document: unknown
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          product_id: string
+          search_body: string
+          search_document: unknown
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          product_id?: string
+          search_body?: string
+          search_document?: unknown
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_search_index_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_search_index_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_search_index_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           barcode: string | null
@@ -2504,6 +2550,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      search_reindex_queue: {
+        Row: {
+          eklenme: string
+          id: number
+          kapsam: string
+          ref_id: string
+        }
+        Insert: {
+          eklenme?: string
+          id?: number
+          kapsam: string
+          ref_id: string
+        }
+        Update: {
+          eklenme?: string
+          id?: number
+          kapsam?: string
+          ref_id?: string
+        }
+        Relationships: []
       }
       shipping_email_events: {
         Row: {
@@ -4161,6 +4228,8 @@ export type Database = {
         Args: { p_dry_run?: boolean; p_request_id?: string; p_user_id: string }
         Returns: Json
       }
+      arama_indeksi_tazele: { Args: { p_ids?: string[] }; Returns: number }
+      arama_kuyrugu_bosalt: { Args: { p_tavan?: number }; Returns: number }
       bump_rate_limit: {
         Args: { p_key: string; p_limit: number; p_window_seconds: number }
         Returns: {

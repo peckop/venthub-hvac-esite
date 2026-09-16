@@ -71,6 +71,48 @@ olarak KOŞTURULABİLİR.* Eski ifade bir varsayımdı ve "felaket kurtarma yap�
 veriyordu. Önsöz niçin gerekli: döküm Supabase'in kendi iskelesini (auth/extensions şemaları,
 dokuz rol, `auth.users`, `vault`, `net`, `cron`) **hazır varsayar**.
 
+## ⏰TAZELİK ALARMI — INV-TABAN-TAZE-1 (2026-09-16, Recep sorusu)
+
+Recep aynen: *"ben DB'de değişiklik yaptığım an senin kendi yedeğin bayat olacak; tekrardan
+onu tazelemek yine 2 gün mü sürecek?"*
+
+**Ölçülmüş cevap: tazelemek iki gün DEĞİL.** Döküm CI'da **57 saniyede** alınıyor (koşum
+`34950954930`). İki gün süren şey **keşifti** — hangi dosyanın taban olduğunu bulmak, birinin
+KISMİ olduğunu görmek, gölge kümeyi elle kurmak. O keşif bir kez yapıldı ve bu README'ye yazıldı.
+
+⛔**Eksik olan şey ölçüm değil, ALARM'dı:** bugüne kadar tabanın bayatladığını söyleyen hiçbir
+şey yoktu. Fark edildiği gün yeniden keşfe başlanır ve **o zaman** gerçekten iki gün gider.
+
+**Alarm iki yerde konuşur, ikisi de aynı ölçütü kullanır:**
+
+| Nerede | Ne zaman | Ne yapar |
+|---|---|---|
+| `src/__tests__/conformance/taban-tazeligi.test.ts` | her PR (CI) | taban geride kalmışsa **bloklar** |
+| `.claude/hooks/defter-tazelik-satiri.cjs` (`TABAN:` satırı) | her turda, oturum içinde | **görünür** uyarı + onarım yolu |
+
+İkincisi niçin şart: ölçen ama **kararın verildiği yerde görünmeyen** kapı, görünmeyen kapıdır
+(REC-342'de ölçüldü — defter bayatlık kancası 7 gün doğru kırmızı verdi ve kimse görmedi).
+
+**ÖLÇÜT — sır gerektirmez, ağ gerektirmez.** Recep'in kendi düzeltmesi bunu mümkün kıldı:
+*"ben kendim bir müdahale ile yapmıyorum, size yaptırıyorum ve gerekirse migration onayı
+veriyorum."* Yani DB'ye giden her değişiklik **onaylanmış bir migration dosyasıdır**; o zaman
+soru tamamen dosya adlarından cevaplanır: **en yeni TAM taban tarihi ↔ en yeni migration damgası.**
+
+Üç ayrıntı ölçümle geldi ve ikisi kapının kendi yazarını yakaladı:
+1. **TAM/KISMİ ayrımı dosya adıyla değil İÇERİKLE yapılır** — tam döküm `create policy` taşır
+   (06-12 → 101, 09-15 → 163), kısmi olan taşımaz (08-13 → 0). Yukarıdaki "en yeni dosya bir
+   seçim kuralı değildir" dersinin makine karşılığı budur.
+2. **Sahada ÜÇ damga biçimi var:** 14 hane (kanonik), **12 hane (13 dosya)**, 8 hane (tarihsel).
+   Kapı ilk yazıldığında 12 haneliyi tanımıyordu ve o 13 dosya **sessizce karşılaştırmadan
+   düşüyordu**. Biçim kuralı (14 hane zorunlu) ayrı kapıdadır: `INV-MIGRATION-2`.
+3. **ÖLÇEMEDİ ≠ TAZE:** TAM taban bulunamazsa satır `⚠TABAN: OLCULEMEDI` basar ve sebebini yazar.
+
+⚠**ALARMIN GÖRMEDİĞİ ŞEY, ADIYLA:** bir migration merge edilip **canlıya uygulanmamış** olabilir.
+2026-09-15'te ölçüldü: `20250919_fts_search_products.sql` beş indeks yaratıyor, canlıda yalnız
+**ikisi** var ve hiçbir kapı görmemişti. Yani **dosya tarihi "uygulandı" demek değildir.** O
+eksiği ancak **sayarak doğrulama** kapatır (canlı sayım ↔ taban sayımı) ve o AYRI bir adımdır
+(`db-advisor.yml` hattı, sır gerektirir). Bu alarm yalnız *"taban geride mi"* der.
+
 ## Geçmiş
 
 | Tarih | Dosya | Kapsam | Not |

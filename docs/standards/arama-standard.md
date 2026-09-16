@@ -51,20 +51,48 @@ atıf yaptı. Atıf yanlışsa kural da yanlış yere uygulanır.)*
 **K3.1** — Bir ürün şu alanların birleşiminden aranır. Liste burada tutulur; kodda ikinci bir
 liste tutulmaz.
 
-| Alan | Kaynak | Diller |
-|---|---|---|
-| Ürün adı | `products.name` | — |
-| Ürün adı (çeviri) | `products.name_i18n` | TR + EN |
-| Model kodu | `products.model_code` | — |
-| SKU | `products.sku` | — |
-| Marka | `products.brand` | — |
-| Açıklama | `products.description_i18n` | **TR + EN** |
-| Teknik özellikler | `products.technical_specs` | — |
-| **Aile adı** | `product_families.name` + `name_i18n` | TR + EN |
-| **Kategori adı** | `categories.name` | — |
-| **Üst kategori adı** | `categories` (parent zinciri) | — |
+| Alan | Kaynak | Diller | Ağırlık |
+|---|---|---|---|
+| Ürün adı | `products.name` | — | **A** |
+| Ürün adı (çeviri) | `products.name_i18n` | TR + EN | **A** |
+| Model kodu | `products.model_code` | — | **B** |
+| SKU | `products.sku` | — | **B** |
+| Marka | `products.brand` | — | **B** |
+| **Aile adı** | `product_families.name` + `name_i18n` | TR + EN | **C** |
+| **Üst kategori adı** | `categories.name` (üzerinden `products.category_id`) | TR | **D** |
+| **ALT kategori adı** | `categories.name` (üzerinden `products.subcategory_id`) | TR | **D** |
+| Açıklama | `products.description_i18n` | **TR + EN** | **D** |
+| Teknik özellikler | `products.technical_specs` | — | **D** |
 
-**K3.2** — Son üç satır (kalın) **zorunludur ve sebebi ölçülmüştür.** Ürün adlarımız teknik künye
+**K3.1a — AĞIRLIK ZORUNLU, SÜS DEĞİL (2026-09-16 ölçümü).** Kategori adı gövdeye girince tek
+kelimelik genel sorgular çok geniş sonuç döndürüyor: `fan` eski gövdede 157/441 (%36), yeni
+gövdede **360/441 (%81,6)**. Sayıyı kısmak yanlış olurdu — 441 aktif ürünün çoğu gerçekten fan,
+yani 360 **doğru cevap**. Doğru çözüm sayı değil **sıralama**: `setweight` ile adında geçen ürün,
+yalnız kategorisinde geçenden önce gelir (`ts_rank` varsayılan dizisi `{D,C,B,A}={0,1 · 0,2 ·
+0,4 · 1,0}`). Ağırlıksız bir gövde bu cetvele uymaz.
+
+**K3.1b — ALT KATEGORİ (2026-09-16'da eklendi, plan bunu kaçırıyordu).** `products` tablosunda
+kategori bağı **iki** alanda: `category_id` (üst) **ve** `subcategory_id` (alt). 442 üründen
+**434'ü** alt kategorili, 18 alt kategori kullanımda. Ölçülen kazanç: `asit dayanımlı fan`
+0 → **80**, `banyo` 4 → **40**. Alt kategori olmadan bu iki sorgu onarımdan sonra **da** sıfır
+dönerdi. En kalabalık alt kategoriler: Santrifüj/Radyal 133 · Asit Dayanımlı 80 · Kanal Tipi 43
+· Banyo-Tuvalet 40 · Frekans Konvertörlü 35.
+
+**K3.1c — "ÜST KATEGORİ" AYRI JOIN İSTEMEZ (ölçüldü).** Alt kategorili 434 ürünün **434'ünde**
+`subcategory.parent_id = products.category_id`. Yani `category_id` zaten üst kategoridir; ayrıca
+parent zinciri yürümek aynı adı iki kez saymak olur. Bu eşitlik bozulursa (üç seviyeli ağaç
+gelirse) gövde üreticisi güncellenir — kapı kolu bu eşitliği ölçer.
+
+**⛔K3.1d — SINIR: KATEGORİ ADININ İNGİLİZCESİ VERİTABANINDA YOK (ölçüldü, 2026-09-16).**
+`categories` tablosunda `name_i18n` sütunu **yok**; `metadata` yalnız `slug`, `hide_price`,
+`description_i18n` taşıyor (31/31 satırda `name`/`name_en` anahtarı **0**). İngilizce kategori adı
+`translation_key` üzerinden **kod sözlüğünden** (`common.categoryList.*`) çözülüyor
+(`getCategoryDisplayName`). Sonuç: **EN kullanıcı kategori adıyla arama yapamaz.** Aile adının
+İngilizcesi gövdede **var** (`product_families.name_i18n`), o yüzden EN tarafı tamamen kör değil.
+Bu sınırın kapatılması = kategori adı çevirisini DB'ye taşımak; **ayrı iştir**, bu cetvelin
+kapsamında değildir ama burada adıyla yazılıdır ki "unutulmuş" sanılmasın.
+
+**K3.2** — Kalın satırlar (aile, üst kategori, alt kategori) **zorunludur ve sebebi ölçülmüştür.** Ürün adlarımız teknik künye
 biçimindedir (`JET 20 · 1400 d/dk · 0,18 kW · 220V`); "fan", "aspiratör" gibi kelimeler ürün adında
 değil **kategorisinde** yaşar. 2026-09-15 ölçümü: 441 aktif üründen ad+açıklama gövdesinde "fan"
 geçen 66, ama "fan" 10 kategori ve 22 aile adında var. Bu yüzden `jet fan` sorgusu bugün
@@ -98,6 +126,13 @@ kapısında da vardı — "Installment" ve "PCI DSS" görünmüyordu.)*
 şemasında. Niteliksiz çağrı **çalışma anında** `ERROR 42883: function does not exist` verir ve
 migration `CREATE OR REPLACE` aşamasında **hiç uyarmaz** (plpgsql gövdesi geç bağlanır).
 Bu yüzden: `extensions.unaccent(...)`, `operator(extensions.%)` biçiminde yazılır.
+
+**K5.3a — OPERATÖR SINIFI da şema-niteliklidir** (2026-09-16'da ölçüldü, kural bu satırla
+genişledi): `gin_trgm_ops` ve `gist_trgm_ops` `pg_opclass`'ta **`extensions`** şemasında duruyor.
+`CREATE INDEX ... USING gin (x gin_trgm_ops)` niteliksiz yazıldığında yalnız o anki `search_path`
+uygun olduğu için çalışır — migration bağlamında bu **kırılgan bir varsayımdır.** Doğrusu:
+`USING gin (x extensions.gin_trgm_ops)`. *(K5.3 yalnız fonksiyondan söz ediyordu; kusur sınıfı
+aynı ama fonksiyon kuralını okuyan biri indeks satırını gözden kaçırır.)*
 
 **K5.4 — Eklenti kurulumu ayrı bir kalemdir.** `unaccent`, `vector`, `pgroonga`, `fuzzystrmatch`
 2026-09-15 itibarıyla **kurulu değildir** (yalnız kurulabilir durumda). `pg_available_extensions`
@@ -230,17 +265,24 @@ REC-340 planının ilk sürümü "müşterinin yarısı sıfır sonuç görüyor
 **K11.1 — Türetilmiş arama metni, kaynak veri değişince tazelenir.** Kaynaklar: ürünün kendi
 alanları, aile adı, kategori adı, kategori ağacındaki yer.
 
-**K11.2 — Tazeleme satır-satır tetikle değil, KUYRUK + toplu işle yapılır.** *(Ölçüm: en kalabalık
-kategoride 361 ürün var; `products` üzerindeki mevcut tetik her satırda Vault'tan sır okuyup
-`net.http_post` atıyor. Satır-satır tazeleme tek bir kategori yeniden adlandırmasında 361 webhook
-POST'u ve 361 `updated_at` bump'ı üretir.)*
+**K11.2 — Kaynağa göre İKİ yol.** Ürünün kendi alanı değişince **anında** tazelenir (arama
+tazeliği gecikmesin, etkilenen satır bir tane). Aile ya da kategori adı değişince **kuyruğa**
+yazılır ve toplu iş koşar. *(Ölçüm: en kalabalık alt kategoride 133, en kalabalık üst kategoride
+361 ürün var; bunu tetiğin içinde satır satır yapmak yazma işlemini uzatır ve kilit süresini
+şişirir.)*
 
-**K11.3 — Tetikler koşulludur:** `WHEN (OLD.name IS DISTINCT FROM NEW.name)`. Adı değişmeyen
-güncelleme tazeleme tetiklemez.
+**K11.3 — Aile/kategori tetikleri koşulludur:** `WHEN (OLD.name IS DISTINCT FROM NEW.name)`.
+Adı değişmeyen güncelleme (sıra numarası, meta alanı) tazeleme tetiklemez. Ürün tetiği ise
+`UPDATE OF <alan listesi>` ile sınırlıdır; stok ve fiyat değişikliği gövdeyi etkilemez.
 
-**K11.4 — Toplu tazeleme sırasında vitrin webhook'u atlanır.** Kategori yeniden adlandırmanın
-vitrin tazelemesi **zaten vardır** (`on_categories_change` → handler'ın `categories` dalı); ikinci
-bir yol eklemek render'a hiçbir şey katmaz, yalnız gürültü katar.
+**K11.4 — Tazeleme `products` tablosuna YAZMAZ.** *(2026-09-16 ölçümü, bu satır yapı kararını
+değiştirdi.)* `products` üzerinde iki koşulsuz tetik var: `products_set_updated_at` (BEFORE UPDATE,
+`updated_at := now()`) ve `on_products_change` (AFTER INSERT/UPDATE/DELETE → Vault'tan sır okur +
+`net.http_post`). Türetilmiş metni `products`'ta tutmak, her tazelemede vitrin önbelleğini boşuna
+tazelemek ve 442 webhook POST'u üretmek demekti. Planın çözümü "toplu yazmada tetiği atla" idi;
+o da her tazelemede `ALTER TABLE ... DISABLE TRIGGER`, yani ACCESS EXCLUSIVE kilit ve o pencerede
+**gerçek** ürün değişikliklerinin webhook kaybı demektir. **Doğrusu: gövde ayrı tabloda tutulur**
+(`product_search_index`), `products`'a hiç yazılmaz ve bu tetiklerin hiçbiri uyanmaz.
 
 **K11.5 — Türetilmiş arama metninin yazımı `admin_audit_log`'a girmez.** Denetim izini üreten
 **kaynak** değişikliktir (kategori/aile adı) ve o zaten `denetim_izi_categories` /
@@ -251,8 +293,20 @@ değil.)*
 
 **K12.1 — Arama metni sütunu ÜRETİLMİŞ SÜTUN (`GENERATED ALWAYS AS`) olamaz.** PostgreSQL'de
 üretilmiş sütun ifadesi yalnız **aynı satırın** sütunlarına bakabilir; alt sorgu ve başka tabloya
-başvuru yasaktır. Aile adı `product_families`'te, kategori adı `categories`'tedir. Doğrusu:
-**normal `tsvector` sütunu + kuyrukla tazeleme + backfill.**
+başvuru yasaktır. Aile adı `product_families`'te, kategori adı `categories`'tedir.
+
+**K12.1a — Gövde `products` tablosunda DEĞİL, ayrı tabloda tutulur** (`product_search_index`,
+`product_id` birincil anahtar + `ON DELETE CASCADE`). Gerekçe K11.4'te ölçülmüştür. İki alan
+taşır: `search_body text` (ILIKE ve trigram benzerliği için ham metin — `technical_specs`
+**girmez**, JSON anahtar adları benzerlik skorunu bozar ve indeksi şişirir) ve
+`search_document tsvector` (ağırlıklı, K3.1a). Ölçülen boyut: gövde ortalama 307, en uzun 694
+karakter.
+
+**K12.1b — Yeni tabloda yetki AÇIKÇA daraltılır.** Bu veritabanında `pg_default_acl`, public
+şemasındaki her yeni tabloya `anon`/`authenticated` için `arwdDxtm` (INSERT/SELECT/UPDATE/DELETE/
+TRUNCATE/REFERENCES/TRIGGER) veriyor — ölçüldü. RLS yazmayı zaten reddeder, ama arama indeksinde
+tek katmana güvenilmez: içeriği zehirlenirse kullanıcıya **yanlış ürün** gösterilir. Bu yüzden
+`REVOKE ALL` + `GRANT SELECT` yazılır ve kuyruk tablosunda okuma da kapatılır.
 
 **K12.2 — `unaccent` IMMUTABLE değildir** (STABLE'dır), bu yüzden indeks ifadesinde ya da
 üretilmiş sütunda doğrudan kullanılamaz; IMMUTABLE sarmalayıcı gerekir. **Kurulumdan sonra
