@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-09T12:24:57.408053+00:00
-total_compiled_files: 184
-source_commit: 59eaa47f6
+compiled_at: 2026-09-16T13:17:36.723275+00:00
+total_compiled_files: 216
+source_commit: 085acfbca
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -657,6 +657,50 @@ Bunlarda EN = TR yazılır (migration adım 2 bunu yapar); çeviri **yanlış** 
 > **ilk envanteridir**; sonraki üretim `scripts/hijyen/arac-envanteri.cjs` (REC-185) — o betik
 > koşana kadar bu belge elle derlenmiştir ve AXIOM 1 gereği bu haliyle "var" sayılır.
 
+## 0 · ⚠AXIOM 3'ÜN SINIRI — üretilen satırın `durum` sütunu insan metni TUTMAZ
+
+**Ölçüldü 2026-09-14 (REC-333 / #1188, ve #1185'te sessizce kaybedilmişti):** AXIOM 3
+"üretilen dosya elle düzenlenmez, yalnız insan hükmü kolonları elle yazılır" der. Bu izin
+**YENİ eklenen satırlar** içindir. Üreticinin **KAYIP** işaretlediği bir satırın `durum`
+sütunu **üreticinin malıdır**, insanın değil: konformansın `YAZMA KIPI IDEMPOTENT` kolu
+kendi içinde `--yaz` koşar ve o sütunu kanonik hâline **geri yazar.**
+
+#1185'te o sütuna elle yazdığım hüküm **commit'ten önce silinmişti** ve ben Recep'e
+"yazdım" demiştim; master'da olmadığını sonradan ölçtüm. Ders: **hüküm ÜRETİLMEYEN yere
+yazılır** — anlatı satırına, denetim belgesine, PR gövdesine. Üretilen tabloya yazılan
+hüküm sessizce kaybolur ve kaybı hiçbir kapı söylemez.
+
+## 0.1 · ⚠BELGENİN GÖVDESİ DE ÖLÇÜLÜR — üç kol içeriyi ölçüyordu, kimse belgeye bakmıyordu
+
+**Ölçüldü 2026-09-14:** #1185 bu belgenin **birinci satırına** yedi tablo parçası yazdı ve
+`# Araç Envanteri` başlığını o satırın sonuna itti; satır **1968 bayta** çıktı. `INV-ARAC-1..3`
+üç kolu da **17/17 yeşil** kaldı, çünkü hepsi `### 3.x` bölümlerinin **içini** ölçüyordu.
+
+Üretici bunu yapamaz (satırı daima başlık genişliğine tamamlar, hücre sayısı yetmezse satıra
+dokunmaz, yazma indeksleri ayrıştırılmış tablo aralığından gelir) — yani bu bir **elle
+düzenleme kazası**ydı. Yeni kol `BELGE YAPISI SAGLAM` iki şey arar: ilk satır başlık mı, ve
+her `|` öbeğinin ikinci satırı ayraç mı. Gerçek arızada kırmızı, onarımdan sonra yeşil
+olduğu **ölçülerek** doğrulandı.
+
+→ Aynı cümle `docs/standards/arac-envanteri-standard.md` AXIOM 3 bölümüne **yazıldı**
+(2026-09-14, OPS onaylı: dosya panoda kimsede değildi, bu PR süresince ALTYAPI claim'ine alındı).
+
+## 0.2 · §3.3'teki 13 kalemin KAL hükmü NEYE dayanıyor
+
+13 yetenek kaleminin 26 satırında (her kalem `.claude` + `.agent` ağacında) `kanıt` hücresine
+**tetiklenebilirlik sınavı** damgası elle yazıldı. Tam tablo, sınavın beş sınırı, düzeltilen
+maliyet tabanı ve kaybolan üç alt-ajan raporunun kaydı:
+**`docs/audits/rec314-tetiklenebilirlik-sinavi-2026-09-14.md`**.
+
+Kısaca: 13 kalemin 13'ü de tetiklendi (parti 1 6/6, parti 2 20/20, `without` kolu her yerde 0).
+Üçü "hiç çağrılmamış" listesindeydi ve **sökme sırasının başındaydı** — atıl liste bir sökme
+listesi olarak kullanılsaydı çalışan üç araç silinecekti. ⚠Altı vakada koşum
+`max turns (4)` ile bittiği için **"tetikleniyor" kanıtlı, "işi bitiriyor" ölçülmedi.**
+
+⚠Bu satırların insan kolonlarının gerçekten insanın olduğu **ölçüldü**: elle yazımdan sonra
+`--yaz` koşuldu ve fark **0 bayt** çıktı, `INV-ARAC-1..3` 19/19 yeşil. Yani bölüm 0'daki sınır
+yalnız KAYIP satırının durum sütunu içindir; mevcut satırın kanıt/kapı/durum hücreleri değil.
+
 ---
 
 ## 1 · Recep tek sayfası
@@ -679,7 +723,7 @@ Bunlarda EN = TR yazılır (migration adım 2 bunu yapar); çeviri **yanlış** 
   **OPS**'a yazılır (her birine en yakın şerit "devir adayı" notuyla) → nihai: ALTYAPI 29 ·
   **OPS 81** (10 asıl + 71 devir-adaylı) · URUN 3 · URUN-KATALOG 6. Cetvellerde aynı mekanik: 57
   sahipsiz satır OPS'a yazıldı (nihai OPS 59, ALTYAPI 5, URUN 3).
-- **CI'da `disabled_manually` olanlar (8):** `jules-a11y.yml`, `jules-dependency-update.yml`,
+- **CI'da `disabled_manually` olanlar (8 — 2026-09-14'te SEKİZİ DE SİLİNDİ: yedisi REC-327 / #1185, `ai-auto-repair.yml` ise REC-333 / #1188 ile):** `jules-a11y.yml`, `jules-dependency-update.yml`,
   `jules-i18n-sync.yml`, `jules-lint-fix.yml`, `jules-performance.yml`, `jules-security-audit.yml`,
   `jules-test-coverage.yml`, `ai-auto-repair.yml` — GitHub tarafında elle KAPATILMIŞ, `workflow_dispatch`
   bile çalışmaz. Sonnet `ai-auto-repair.yml`'i "skipped" görüp KAL saymıştı; çürütme bunu düzeltti
@@ -746,16 +790,17 @@ hatasını tekrarlar.
 | `.claude/hooks/bash-write-guard.cjs` | hook | PreToolUse: Bash yazma kapısı (lane-guard + protect-config'in Bash karşılığı) | ALTYAPI | `hook:PreToolUse Bash` | bağlı | bash-write-guard-muafiyet.test.ts, sir-basan-kalip.test.ts | KAL |
 | `.claude/hooks/bash-write-targets.cjs` | hook (kütüphane) | Bash komutundan yazma hedeflerini çıkaran saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:87 | dolaylı | bash-write-gate.test.ts | KAL |
 | `.claude/hooks/board-brief.cjs` | hook | UserPromptSubmit: sessiz pano brifingi + kira yenileme | ALTYAPI | `hook:UserPromptSubmit *` | bağlı | board-invariants.test.ts, fleet-mechanism-integrity.test.ts | KAL |
-| `.claude/hooks/board-release.cjs` | hook | SessionEnd: şeridi bırak (kira serbest bırakma) | ALTYAPI | `hook:SessionEnd *` | bağlı | yok | KAL |
-| `.claude/hooks/lane-guard.cjs` | hook | PreToolUse: şerit koruması (çok-oturumlu çakışma engeli) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | yok | KAL |
+| `.claude/hooks/board-release.cjs` | hook | SessionEnd: şeridi bırak (kira serbest bırakma) | ALTYAPI | `hook:SessionEnd *` | bağlı | kanca-board-release.test.ts | KAL |
+| `.claude/hooks/lane-guard.cjs` | hook | PreToolUse: şerit koruması (çok-oturumlu çakışma engeli) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-lane-guard.test.ts | KAL |
 | `.claude/hooks/precompact-durum-kapisi.cjs` | hook | PreCompact: durum kapısı (REC-86 Faz 1) | ALTYAPI | `hook:PreCompact *`; ayrıca `require()` ← session-board.cjs:176 | bağlı | precompact-durum-kapisi.test.ts | KAL |
-| `.claude/hooks/protect-config.cjs` | hook | PreToolUse: kalite ağı (config-protection + içerik taraması) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | auth-role-source.test.ts, stock-restore-evidence.test.ts (dolaylı) | KAL |
-| `.claude/hooks/sensitive-path-guard.cjs` | hook | PreToolUse: iki hassas yol sınıfını korur | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | yok | KAL |
+| `.claude/hooks/protect-config.cjs` | hook | PreToolUse: kalite ağı (config-protection + içerik taraması) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-protect-config.test.ts | KAL |
+| `.claude/hooks/sensitive-path-guard.cjs` | hook | PreToolUse: iki hassas yol sınıfını korur | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-sensitive-path-guard.test.ts | KAL |
 | `.claude/hooks/session-board.cjs` | hook | SessionStart: oturum kimliği + pano durumu bağlamı enjekte eder | ALTYAPI | `hook:SessionStart *` | `.git/venthub-sid`, 2026-09-07 | bash-write-audit-tree, companion-defter, fleet-mechanism-integrity, precompact-durum-kapisi.test.ts | KAL |
 | `.claude/hooks/sir-basan-kalip.cjs` | hook (kütüphane) | Bir Bash komutunun SIR değerini basıp basmadığını ölçen saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:67 | dolaylı | sir-basan-kalip.test.ts | KAL |
-| `.claude/hooks/son-soz-gate.cjs` | hook | Stop kapısı: turda kullanıcı mesajı varsa SON SÖZ kullanıcıya mı yazılmış | ALTYAPI | `hook:Stop *` | bağlı | yok | KAL |
+| `.claude/hooks/son-soz-gate.cjs` | hook | Stop kapısı: turda kullanıcı mesajı varsa SON SÖZ kullanıcıya mı yazılmış | ALTYAPI | `hook:Stop *` | bağlı | kanca-son-soz-gate.test.ts | KAL |
 | `.claude/hooks/verify-on-stop.cjs` | hook | Stop (async): JS/TS düzenlendiyse eslint --fix + tsc doğrulaması | ALTYAPI | `hook:Stop *` (async, timeout 120) | `.cwd-ayrisma-sayaci.json`, 2026-09-07 | board-invariants.test.ts | KAL |
 | `.claude/hooks/defter-bayatlik-olcumu.cjs` | hook | Stop hook — PROJE TAKİP DEFTERİ BAYATLIK ÖLÇÜMÜ (yalnız ÖLÇER ve UYARIR). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/defter-bayatlik-olcumu.test.ts | YENI |
+| `.claude/hooks/defter-tazelik-satiri.cjs` | hook | UserPromptSubmit — defter tazelik satırı: son eşitleme yaşı + değişen demet (önbellekten) + Kararlar kopyası yaşı; eşik aşılınca ⚠, ölçemezse sebep yazar | ALTYAPI | `hook:UserPromptSubmit *` (timeout 10) | 2026-09-15, elle koşturuldu: `⚠DEFTER: son esitleme 2026-09-08 (7 gun) · olc 14 degisen/22 · Kararlar kopyasi 3 gun`; süre 266-298 ms (çıplak node açılışı ~187 ms) | src/\_\_tests\_\_/conformance/kanca-defter-tazelik.test.ts (11 kol, iki yön + ölçemedi + bayat önbellek) | KAL |
 | `.claude/hooks/eylem-defteri.cjs` | hook | PostToolUse hook — EYLEM DEFTERİ (git'in GÖRMEDİĞİ taşıma/silmeleri kaydeder). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/eylem-defteri.test.ts | YENI |
 | `.claude/hooks/hafiza-sorusu-yonlendirme.cjs` | hook | UserPromptSubmit hook — HAFIZA SORUSU YÖNLENDİRME. | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/hafiza-sorusu-yonlendirme.test.ts | YENI |
 | `.claude/hooks/soguk-okuyucu-sinavi.cjs` | hook | PostToolUse hook — SOĞUK OKUYUCU SINAVI ÇAĞRISI (yalnız HATIRLATIR, sınavı ajan koşar). | OPS | docs/standards/hafiza-kancalari-standard.md, src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts | YENI |
@@ -781,11 +826,11 @@ madde 1 gereği araç sayılmaz.
 | `scripts/apply-stock-fix.mjs` | Stok düzeltmesi uygular (kök scripts/'ten bir üst) | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | pano 2026-08-27 yalnız companion listesi, koşum değil | yok | OLU-DOGRULANDI |
 | `scripts/assert-node-major.mjs` | INV-NODE-1 3. yüzey: derlemenin GERÇEK Node ana sürümünü ölçer | OPS *(devir adayı: ALTYAPI)* | `docs/standards/runtime-version-alignment-standard.md`, `package.json` | 2026-08-19 | yok | KAL |
 | `scripts/board/board.cjs` | Çok-oturumlu controller panosu | ALTYAPI | `.githooks/lib/{companion-defter,doc-scope}.cjs` | 2026-09-05 | yok | KAL |
-| `scripts/board/gozcu.cjs` | Filo gözcüsü (pano izleyicisi) | ALTYAPI | `scripts/board/{board,mechanism-setup}.cjs` | 2026-08-24 | yok | KAL |
+| `scripts/board/gozcu.cjs` | Filo gözcüsü (pano izleyicisi) | ALTYAPI | ⛔KURULMAZ — filo `SendMessage` ile çalışır (REC-328) | 2026-09-14 (son koşum; kapatıldığı gün) | yok | **EMEKLİ** — Recep 2026-09-14 (REC-328); dosya duruyor, oturumlarda kurulmaz |
 | `scripts/board/izin-reddi-gunlugu.cjs` | İzin-reddi olay günlüğü (filo-görünür ret sayacı) | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` | 2026-08-31 | yok | KAL |
 | `scripts/board/kimlik.cjs` | "Bu commit'i hangi oturum yapıyor" TEK cevap | ALTYAPI | `.claude/hooks/{bash-write-audit,session-board}.cjs` | 2026-08-31 | yok | KAL |
 | `scripts/board/lane-precommit.cjs` | Pre-commit 2. katman şerit kapısı (E1) | ALTYAPI | `.githooks/pre-commit`, `.claude/hooks/bash-write-audit.cjs` | 2026-08-31 | yok | KAL |
-| `scripts/board/mechanism-setup.cjs` | Mekanik otonomi kurulumu/doğrulaması (T115-VH) | ALTYAPI | `.claude/hooks/{board-brief,session-board}.cjs` | 2026-09-06 | yok | KAL |
+| `scripts/board/mechanism-setup.cjs` | Mekanik otonomi kurulumu/doğrulaması (T115-VH) | ALTYAPI | ⛔ÇAĞIRAN YOK — kanca atıfları REC-328 ile kaldırıldı | 2026-09-14 (son koşum; emeklilik günü) | `INV-MECH-1` (artık TERSİNİ zorlar: kanca bu betiğe yollamaz) | **EMEKLİ** — Recep 2026-09-14 (REC-328) |
 | `scripts/board/registry-autosync.cjs` | Registry oto-senkronu (oturum açılışı, arka plan) | ALTYAPI | `.claude/hooks/session-board.cjs` | 2026-08-15 | yok | KAL |
 | `scripts/board/registry-sync.cjs` | Orion registry senkronu — kalıcı iş durumu | ALTYAPI | `.githooks/post-merge`, `docs/standards/multi-session-coordination-standard.md` | 2026-08-15 | yok | KAL |
 | `scripts/ci/apt-hardening.sh` | Koşucuda apt'yi sınırlı sürede başarısız olmaya zorlar | ALTYAPI | `.github/workflows/e2e-smoke.yml` | 2026-08-19 | yok | KAL |
@@ -937,24 +982,39 @@ madde 1 gereği araç sayılmaz.
 | `scripts/db/checks/aile-kategori-tutarlilik.mjs` | INV-AILE-KATEGORI-1 — ürünün kategorisi ile AİLESİNİN kategorisi AYRIŞMASIN (REC-290). Vitrin ürün değil AİLE listeler; ayrışma = veri doğru, vitrin sessizce yanlış. SALT OKUR. | ALTYAPI | CI — `db-advisor.yml` `catalog-integrity` işine adım olarak bağlı (kardeşiyle aynı sır + kök sertifika); `--fikstur` ile ağsız da koşar | canlı koşum 2026-09-08: ürün 442 · ailesi olan 442 · aktif aile 47 · evren 442 · **ihlal 0** (KATALOG'un 11'lik onarımı sonrası). İki yönlü: ters sorgu 442 örtüşen sayıyor → ölçüt kör değil. Fikstür üç kol: temiz→0, ihlal→1, evren 0→**2** | INV-AILE-KATEGORI-1 (kendisi kapı) · düzeneği `ssr`-benzeri konformans kolu ile kilitli | KAL |
 | `scripts/hijyen/commit-oncesi-uyarilar.cjs` | COMMIT ÖNCESİ İKİ UYARI (REC-267): (1) yeni betik araç envanterinde ilan edilmemiş → betik adı + koşulacak komut yazılır, (2) şerit önekli dal ANA REPO ağacında. ⛔BLOKLAMAZ, daima çıkış 0; ağ/LLM/DB yok. | ALTYAPI | `.githooks/pre-commit` — şerit kapısından ÖNCE (bloklayan çıktının ardındaki uyarı okunmaz), `|| true` ile | 2026-09-08: kol 1 kendi betiğimde yandı (adı + komut basıldı) · kol 2 ana repo ağacında GERÇEK hâli yakaladı (`urun/rec286-kapi-siniri` ana repoda duruyordu) · maliyet 5 koşum **264-300 ms** | uyarı-only, kapı DEĞİL — düzeneği `commit-oncesi-uyarilar-kilidi` konformans kolları ölçer | KAL |
 | `scripts/db/checks/denetim-izi-tetik-kapisi.mjs` | INV-DENETIM-IZI-1 — denetim tetiği CANLI DB'de duruyor mu, HÂLÂ fail-closed mı, ve `products` kolon süzgeci yerinde mi (REC-292). ⭐Metin taraması yetmez: bu depoda migration dosyası "prod'da hangi tetik var" sorusunda YETKİLİ KAYNAK DEĞİL (`on_products_change` migration'larda yok, `scripts/webhook_setup.sql` ile kurulmuş). SALT OKUR. | ALTYAPI | CI — `db-advisor.yml` `rls-role-coverage` işine adım olarak bağlı (kardeşleriyle aynı sır + kök sertifika; yeni iş adı açmak açık PR'ları kilitler, gerekçesi o işte yazılı); `--fixture` ile ağsız da koşar | fikstür 6 kol, hepsi beklendiği gibi: tam→0 ihlal · `site_settings` tetiği silinmiş→**TETIK-YOK** · gövdeye `exception when` girmiş→**FAIL-OPEN** · süzgeç kalkmış→**SUZGEC-YOK** · süzgeçten `price` çıkmış→**SUZGEC-DAR** · webhook tetikleri sayıma girmiyor (7). ⛔Canlı koşum HENÜZ YOK: ölçeceği tetikler migration Recep kapısından geçmeden var olmayacak — kapı ile migration AYNI PR'da iner | INV-DENETIM-IZI-1 (kendisi kapı) · düzeneği `denetim-izi-kapisi.test.ts` 21 kolu ile kilitli | YENI |
+| `scripts/db/checks/lib/denetim-izi-hukum.mjs` | REC-292 denetim izi kapısının **SAF HÜKÜM KATMANI** (`degerlendir` + `KAPSAM` + zorunlu kolonlar). ⛔İçinde shebang · yan etki · ağ · dosya sistemi · `process.exit` YOK; yalnız veri alır, hüküm döndürür. Niçin ayrı dosya: CLI betiği shebang taşıyor ve `vite-node` shebang'ı sökerken satır sonunu LF varsayıyor — CRLF'li ağaçlarda kalan `\r` `SyntaxError` veriyor ve kapının **ayırt edici altı kolu** sessizce düşüyordu (KATALOG üç ağaçta ölçtü, 2026-09-09). Ayrım hem o sınıfı hem de "import edince kapı kendini koşuyor" kusurunu kaldırır. | **ALTYAPI** | CLI betiği (`denetim-izi-tetik-kapisi.mjs`) **statik import** ile buradan besleniyor; konformans testi de aynı modülü kullanır — CLI ve test AYNI kaynak | `kapi-import-guvenligi.test.ts` + `denetim-izi-kapisi.test.ts` birlikte **31/31 geçti** (2026-09-09 ~10:1xZ, LF'li ağaç). ⚠CRLF'li ağaçta doğrulama URUN/KATALOG'da — kusur benim ağacımda GÖRÜNMÜYOR | INV-KAPI-IMPORT-1 (shebang yok · `\r` yok · `main()` koşulsuz çağrılmaz) · INV-DENETIM-IZI-1 | **AKTIF** |
 | `scripts/icerik-hatti/katalog-paket-uret.mjs` | TAŞINABİLİR KATALOG — İNSAN-OKUR PAKET ÜRETİCİ (REC-212 F1, adım 1-2) | URUN-KATALOG | elle (`--hedef=<paket>`), `katalog-disa-aktar.mjs`'ten SONRA | 2026-09-09: koştu, 7 CSV/8088 satır + 1146 görsel üretti, başarısız 0 | yok | AKTİF |
+| `scripts/icerik-hatti/paket-belgeler-uret.mjs` | PAKET BELGE TABLOSU — belgeler.csv (REC-212 F1 eki, OPS emri 2026-09-09 12:02Z) | URUN-KATALOG | elle kosulur (paket uretimi sonrasi) | 2026-09-09 (60 belge / 65 satir) | yok | AKTIF |
+| `scripts/icerik-hatti/kaynak-eslemesi.mjs` | ADIM 3 — KAYNAK EŞLEMESİ: her teknik değer ↔ kaynak dizini (REC-212 F1, OPS emri 12:13Z) | URUN-KATALOG | elle kosulur (paket uretimi sonrasi, adim 3) | 2026-09-09 (5168 deger, VAR 2205, tesadduf tabani 355) | yok | AKTIF |
+| `scripts/icerik-hatti/paket-karnesi.mjs` | KATALOG KARNESİ — EVREN = PAKET (OPS hükmü 2026-09-09 12:32Z, Recep kararı K13) | URUN-KATALOG | elle kosulur (karne istendiginde) | 2026-09-09 (8 eksen, genel %57) | yok | AKTIF |
+| `scripts/icerik-hatti/defter-sorgu.mjs` | DEFTER SORGUSU — aile × alan soruları, ham cevaplar jsonl'e (OPS emri 2026-09-10 06:37Z) | URUN-KATALOG | elle kosulur (aile aile, seri — CLI kotali) | 2026-09-10 (3 aile pilot) | yok | AKTIF |
+| `scripts/icerik-hatti/defter-tablo-uret.mjs` | DEFTER TABLO ÜRETİMİ — aile başına kaynak-kısıtlı data-table (OPS kararı 2026-09-10 07:05Z) | URUN-KATALOG | elle kosulur (aile aile, kota gozetilir) | 2026-09-10 (yayim baslamadi; 'ready' kaynak kapisi eklendi) | yok | AKTIF |
+| `scripts/skills-eval-run.mjs` | SKILL YÖNLENDİRME SINAVINI KOŞAR (REC-303). | ALTYAPI | .github/workflows/skills-gate.yml, package.json (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts (saf cekirdek) | KAL |
+| `scripts/skills-eval/lib.mjs` | SKILL YÖNLENDİRME SINAVI — SAF ÇEKİRDEK (ağ yok, dosya yazımı yok). | ALTYAPI | scripts/skills-eval-run.mjs, src/__tests__/conformance/skills-eval-puanlama.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts | KAL |
+| `scripts/hijyen/skill-bitis-blogu.mjs` | ORTAK BİTİŞ BLOĞUNU 71 SKILL.md'ye GEÇİRİR (REC-305). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skill-bitis-blogu.test.ts | KAL |
+| `scripts/skills-eval-convert.mjs` | evals.json → YERLEŞİK eval vaka ağacı dönüştürücüsü (REC-319 adım 2b). | ALTYAPI | .gitignore (betik taramasi) | 2026-09-13 (pilot: 18 vaka uretildi, 36 kosum kosuldu) | testi YOK — cikti .gitignore da, kapi kosamaz; KANIT pilot kosumu (docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md bolum 7-8) | KAL |
+| `scripts/board/linear-okundu.cjs` | Linear yorum sayacinin esik damgasini "simdi"ye ceker (`--goster`, `--geri`) | OPS *(yazan: ALTYAPI)* | ELLE kosulur, yorumlari okuyan kisi tarafindan; sayac satiri komutu kendi ciktisinda gosterir | 2026-09-14 yazildi ve kosuldu (kabul sinavi: okundu+geri gidis-donus) | INV-MECH-1 (sira ve sessizlik kolu) | KAL |
+| `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
+| `scripts/db/checks/arama-davranisi.mjs` | INV-SEARCH-BEHAVIOR-1 — arama DAVRANIŞI kapısı (Katman B, canlı): on vakayı gerçek RPC üzerinden ölçer, ölçüt biçimleri oran/sıfır-değil/aynı-küme/marka-var/tam-SKU (sabit sayı YOK), hassasiyet tavanı %40, bilinen kırmızılar adıyla ilan edilir ve mandal İKİ YÖNLÜ (ilanlı vaka geçmeye başlarsa KIRMIZI) | ALTYAPI | `.github/workflows/db-advisor.yml` → `catalog-integrity` işine ADIM olarak bağlı, `db-gate-precheck.outputs.ready == 'true'` koşuluyla (yeni iş adı AÇILMADI: açık PR'ları "beklenen kontrol gelmedi"de kilitler) | 2026-09-15, REC-340 Faz 1 Adım 1. Prod'da salt-okuma ölçüldü (Supabase MCP): on vakanın **altısı** kırmızı (2,3,4,5,9,10), dördü geçiyor (1→47, 6→9, 7→1 doğru SKU, 8→52); aktif ürün 441, hiçbir vaka %40 tavanını aşmıyor. Betik sırsız koşturuldu → çıkış 0 + "OLCULEMEDI" + "ATLANMIS IS YESIL DEGILDIR" (konformans kolu bunu DAVRANIŞLA ölçüyor) | `src/__tests__/conformance/arama-davranisi.test.ts` (INV-SEARCH-BEHAVIOR-1 Katman A, 15 kol) | KAL |
+| `scripts/db/golge-kur.mjs` | GÖLGE VERİTABANI KURUCUSU — tek komutla geçerli test ortamı: mevcut Docker konteynerinin İÇİNDE ayrı bir DB açar, önsöz → en yeni TAM taban → tabandan sonraki migration'lar → (`--migration`) uygular ve **sadakati SAYARAK** doğrular. `postgres` DB'sine dokunmaz, `initdb`/port GEREKMEZ. ⛔`supabase db reset` İÇERMEZ (o komut aynı kümedeki AKRANIN gölgesini siliyor — 2026-09-16'da yaşandı). ⛔VAR OLAN DB EZİLMEZ: ad çakışırsa çıkış 3 ile DURUR. ⭐`--dusur` = YALNIZ kendi DB sini düşürür (küme sıfırlayan komutun YERİNE; küme altyapısı adlarını reddeder, çıkış 2). Çıkış 0=hazır · 1=sadakat TUTMADI · 2=ÖLÇEMEDİ · 3=ad çakıştı | ALTYAPI (Recep 2026-09-16: "geçerli test ortamı için her türlü izni veririm") | `docs/audits/sema-graf-uretici-2026-09-16.md` yanı sıra kendi başlığı; çağıran yok (elle koşulur) | 2026-09-16 yazıldı ve KOŞULDU: tablo 55 · **politika 163** · fonksiyon 67 · tetik 48 · indeks 199 — politika/fonksiyon/tetik/indeks CANLIYLA BİREBİR. Ad çakışma kolu AKRANIN DB'sini korudu (çıkış 3, dokunulmadı) | **INV-GOLGE-1** `src/__tests__/conformance/golge-kurucu.test.ts` 13 kol — SÖZLEŞME ölçer (yıkıcı komutun yokluğu İKİ biçimde, akran koruması, ad allowlist, çıkış kodları, eşikler, taşınabilirlik). ⚠İlk hâli KÖRDÜ: yalnız kabuk dizgesini arıyordu, argv dizisi biçimini görmüyordu; negatif sınamada yakalandı ve iki biçim de ölçülür oldu (ikisi de KIRMIZI verdirildi); sadakat eşikleri betiğin İÇİNDE (boş gölgeyi reddeder: tablo≥50, politika≥100, fonksiyon≥40, tetik≥20, indeks≥100) | KAL |
+| `scripts/db/sema-graf-uret.mjs` | ŞEMA GRAF ÜRETİCİSİ (aşama 1: tablolar + yabancı anahtarlar) — veritabanının KENDİ KATALOĞUNDAN graphify node-link biçiminde graf üretir. Metin taraması YOK, `pg_class`/`pg_constraint` okunur. Çıktı `graphify-out/db-graph.json` (üretilmiş, gitignore), `graphify merge-graphs` ile kod grafiğine eklenir. Düğümler `db_` ad alanında (ghost-duplicate riski). Çıkış 0=üretildi/atlandı · 1=parite TUTMADI · 2=ÖLÇEMEDİ | ALTYAPI (Recep istedi 2026-09-16: "supabase tarafının bir haritası lazım, codegraph gibi bir şey") | `src/__tests__/conformance/sema-graf-uretici.test.ts` (INV-SEMA-GRAF-1, 12 kol) + `docs/audits/sema-graf-uretici-2026-09-16.md` | 2026-09-16 yazıldı ve KOŞULDU: yerel yığında tablo 18=18 · fk 13=13 parite TUTTU, kapsam dışı 6 fk ADIYLA raporlandı; `merge-graphs` ile birleşti (+18 düğüm/+13 kenar) ve `explain` veritabanı sorusuna cevap verdi (8 ilişki, yönlü) | INV-SEMA-GRAF-1 — sır/TLS/taşınabilirlik/çıkış kodu/çıktı biçimi ölçülür; **graf DOĞRULUĞU ölçülmez** (o canlı koşum ister, sınır kapının başlığında yazılı) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
 | # | Ad | Ağaç | ne_yapar | sahip (manifest kategorisi) | tetik | kanıt (son değişiklik · manifest) | kapı | durum |
 |---|---|---|---|---|---|---|---|---|
-| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) | 09-05 §3 KAL kararı | KAL |
-| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet | manifest kaydı | KAL |
+| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | 09-05 §3 KAL kararı | KAL |
+| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
 | 3 | typography | .claude | font/okunabilirlik/tip ölçeği | guards | `skill:typography` | 2026-08-11 · manifest yok | 09-05 §3 | KAL |
 | 4 | typography | .agent | (aynı) | guards | `skill:typography` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
-| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok | 09-05 §3 | KAL |
-| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet | manifest kaydı | KAL |
-| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
-| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok | 09-05 §3 | KAL |
-| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
 | 13 | codegraph | .claude | CodeGraph MCP caller/callee/impact | intelligence | `skill:codegraph` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
 | 14 | codegraph | .agent | (aynı) | intelligence | `skill:codegraph` | 2026-06-11 · manifest evet | manifest kaydı | KAL |
 | 15 | diff-review | .claude | git diff yıkıcı/tehlikeli örüntü tespiti | audit | `skill:diff-review` | 2026-08-25 · manifest yok | yok | ENVANTER-DISI |
@@ -977,22 +1037,22 @@ madde 1 gereği araç sayılmaz.
 | 32 | plan-challenger | .agent | (aynı) | audit | `skill:plan-challenger` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 33 | skills-creator | .claude | yeni skill oluşturma/manifest derleme | orchestration | `skill:skills-creator` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 34 | skills-creator | .agent | (aynı) | orchestration | `skill:skills-creator` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok | yok | ENVANTER-DISI |
-| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | yok | ENVANTER-DISI |
+| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
 | 37 | supabase | .claude | Supabase client/servis/db query kuralı | guards | `skill:supabase` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 38 | supabase | .agent | (aynı) | guards | `skill:supabase` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
-| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet | manifest kaydı | KAL |
-| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
-| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
-| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
-| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | yok | ENVANTER-DISI |
+| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
+| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
 | 51 | agy-orchestrate | .claude | Antigravity CLI'a geniş taramayı delege eder | orchestration | `skill:agy-orchestrate` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 52 | create-migration | .claude | güvenli Supabase migration oluşturma akışı | OPS *(sahipsiz — kategori/manifest yok)* | `skill:create-migration` | 2026-08-26 · manifest yok | yok | ENVANTER-DISI |
 | 53 | maestro | .claude | bölünebilir büyük kod değişikliğini paralel dalga olarak orkestre eder | orchestration | `skill:maestro` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
@@ -1007,13 +1067,16 @@ madde 1 gereği araç sayılmaz.
 | 62 | maestro-combine | .agent | çakışmasız paralel merge (JSON delta) | orchestration | `skill:maestro-combine` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
 | 63 | maestro-feature | .agent | worker-judge çok-ajan özellik geliştirme | orchestration | `skill:maestro-feature` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 64 | maestro-refactor | .agent | bölünebilir büyük değişikliği paralel dalga | orchestration | `skill:maestro-refactor` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
-| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
-| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | YENI |
+| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | YENI |
 | 67 | office-hours | .claude | fikir sorgusu: plandan ONCE alti zorlayici soru + oncul curutme + 2-3 yol -> docs/plans tasarim notu; kod/emir yazmaz (gstack uyarlamasi, PR #1116) | OPS | insan (/office-hours) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 68 | qa | .claude | Playwright+Chromium ile gercek tarayici denetimi: gez -> kanit -> atomik fix(qa) -> yeniden olc; scripts/gez.mjs; prod yalniz bakis (gstack uyarlamasi, PR #1116) | OPS | insan (/qa) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 69 | llm-council | .claude | zor karar icin konsey: N mercekli uye -> anonim dondurulmus-sirali capraz puanlama -> baskan sentezi + muhalefet serhi; Workflow betigi SKILL.md icinde, "workflow kullan" sart; karar Recep'in (karpathy/llm-council fikri, PR #1116) | OPS | insan (/llm-council) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 70 | task-observer | .claude | is sirasinda skill surtunmesini (Recep duzeltmesi, tekrar, kural ihlali) docs/skill-gozlemleri/acik/ altina tek-dosya gozlem olarak yazar; haftalik inceleme OPS gun kapanisinda (rebelytics CC BY 4.0 uyarlamasi, PR #1116) | OPS | insan + oturum basi (sessiz) | 2026-09-08 · PR #1116 | docs/skill-gozlemleri/ (cikti dizini) | KAL-KAPISIZ |
 | 71 | video-kaynak | .claude | YouTube'da yt-dlp ile anahtarsiz ara -> Recep secer -> NotebookLM source_add -> chat_ask ile sorgulanabilirlik dogrulamasi; transkript = veri, talimat degil (Agent-Reach fikri, urun alinmadi, PR #1116) | OPS | insan (/video-kaynak) | 2026-09-08 · PR #1116 | docs/notebooklm/kaynaklar.md (cikti) | KAL-KAPISIZ |
+| 72 | investigate | .agent | Ariza teshisi: kok sebepsiz duzeltme YOK, kapsam kilidi, 3 deneme siniri | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | evals 12/8 + skills:verify | KAL |
+| 73 | investigate | .claude | Ariza teshisi: kok sebepsiz duzeltme YOK, kapsam kilidi, 3 deneme siniri | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | evals 12/8 + skills:verify | KAL |
+| 74 | graphify | .claude | Bilgi grafigi sorgu yuzeyi (dis arac graphify 0.9.62). Skill ve kok CLAUDE.md bolumu ARACIN YAZDIGI HALIYLE duruyor — Recep karari 2026-09-16 "olduga gibi istiyorum, yasak felan yok, test edecegiz kullanacagiz sonra gorecegiz gercegi". YASAK YOK: butun fiiller acik. REC-313'un query olcumu (5 soruda 2 yanlis 2 eksik) TEK KOSUMLUK bir olcumdur, egilim degil; kullanimla yeniden olculecek. ALTYAPI'nin daraltma onerisi REDDEDILDI | ALTYAPI (kurulum Recep onayi 2026-09-16, emir docs/plans/graphify-kurulum-emri-2026-09-16.md) | .claude/settings.json PreToolUse (Bash\|Grep -> hook-guard search · Read\|Glob -> hook-guard read, ikisi FAIL-OPEN) + kok CLAUDE.md graphify bolumu | 2026-09-16 kuruldu ve kosuldu (extract: 10410 dugum / 19504 kenar) | yok — DIS ARAC, bitis blogu tasimaz; §4'te sinirlari ve celiskisi adiyla yazili | KAL-KAPISIZ |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
@@ -1059,14 +1122,17 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `gemini-plan-execute.yml` | Gemini plan/uygulama adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:174` | aynı ölçüm, `plan-execute::skipped` ×24 | reusable workflow | KAL *(bağlı, uykuda)* |
 | `gemini-triage.yml` | Gemini triage adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:146` | aynı ölçüm, `triage::skipped` ×24 | reusable workflow | KAL *(bağlı, uykuda)* |
 | `db-advisor-fix.yml` | DB advisor bulgularını otomatik düzeltme | ALTYAPI | `ci:workflow_dispatch` (tek satır) | son koşum 2025-12-08T07:41:35Z failure (9 ay); `gh workflow list --all` state `active` | — | OLU-DOGRULANDI |
-| `jules-a11y.yml` | A11y denetimi (Jules AI) | ALTYAPI | `ci:workflow_dispatch` | `gh workflow list --all` state **disabled_manually** | — | OLU-DOGRULANDI |
-| `jules-dependency-update.yml` | Bağımlılık güncelleme önerisi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-i18n-sync.yml` | TR/EN sözlük paritesi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-lint-fix.yml` | Lint/TS otomatik düzeltme dalgası (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | **OLU-DOGRULANDI** *(sonnet'in KAL hükmü çürütüldü)* |
+| `jules-a11y.yml` | A11y denetimi (Jules AI) | ALTYAPI | `ci:workflow_dispatch` | `gh workflow list --all` state **disabled_manually** | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-dependency-update.yml` | Bağımlılık güncelleme önerisi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-i18n-sync.yml` | TR/EN sözlük paritesi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-lint-fix.yml` | Lint/TS otomatik düzeltme dalgası (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | KAYIP (onceki: OLU-DOGRULANDI (sonnet'in KAL hükmü çürütüldü)) |
+| `skills-gate.yml` | SKILL KAPISI — sayaç her PR'da (ücretsiz), yönlendirme sınavı yalnız skill değişince (ücretli). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi | KAL |
+| `migration-linter.yml` | INV-MIGRATION-3 — migration linter PR kapısı (squawk) | ALTYAPI | .squawk.toml (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi — SABOTAJ KANITLI (2026-09-13: sabotaj dosyasi 5 kol, cikis 123 = KIRMIZI; geri alinca 0 dosya = yesil) | KAL |
+| `sema-tabani-uret.yml` | prod şemasının GERÇEK `--schema-only` dökümünü alır (salt-okuma), boş dökümü reddeder, artefakt bırakır | ALTYAPI | `elle` (`workflow_dispatch`; push/schedule BİLEREK yok — prod'a bağlanan iş akışı insan kararıyla koşar) | yok — 2026-09-15'te yazıldı, henüz koşmadı | `src/__tests__/conformance/sema-tabani-is-akisi.test.ts` (INV-SEMA-TABAN-1, 10 kol + sabotaj) | KAL |
 
 **Envanter dışı ek bulgu (29'a dahil değil):** `tmp-lf-fix.yml` — `gh workflow list --all` bunu
 `active` listeliyor, ama `.github/workflows/` dizininde YOK ve `git log --all` boş dönüyor.
@@ -1074,7 +1140,7 @@ GitHub tarafında bayat/hayalet bir kayıt; repo tarafı hiç izlemedi. Durum: *
 tarafı hayalet)** — OPS'un GitHub Actions ayarlarından elle temizlemesi gerekir (repo commit'i
 gerektirmez).
 
-### 3.6 · cetvel — `docs/standards/*.md` (67 araç)
+### 3.6 · cetvel — `docs/standards/*.md` (68 araç)
 
 > Kapı sütunu cetveller.md'deki kapı aynen taşındı. Durum: KAPILI→**KAL**, HARİTADA-KAPISIZ ve
 > YETİM→**KAL-KAPISIZ** (AXIOM 3 madde 3: kapısı yok ama var — kapı borcu). Sahip: sahipsiz
@@ -1082,6 +1148,7 @@ gerektirmez).
 
 | dosya | ne_yapar | sahip | tetik | kanıt | kapı | durum |
 |---|---|---|---|---|---|---|
+| arama-standard | Sitedeki ürün aramasının cetveli: aranan alan ve satır kümesi (SSOT), sorgu normalizasyonu, eşleştirme semantiği, tenant/yetki sınırı, iki katmanlı kapı, on iki maddelik asgari vaka kümesi, tazeleme ve migration kuralları | URUN | REC-340 Faz 1 | 2026-09-15, REC-340 Faz 1. ⭐Satır URUN'un hükmüyle ALTYAPI tarafından yazıldı: dosya ALTYAPI claim'inde, URUN kapıya takıldı, AŞMADI, değişikliği geri alıp hükmü mesajla verdi. Ve satır bu PR'da duruyor çünkü KUPLAJ ölçüldü — envanter DİSKLE karşılaştırılır, satır ile dosya AYNI AĞAÇTA olmak zorunda (ayrı PR denendi: envanter 77 / disk 76, beş kol kırmızı) | `INV-SEARCH-*` — **HENÜZ YAZILMADI**, Faz 1 Adım 1'in konusu (kapı sütunu boş bırakılmadı: boşluk kapı varmış gibi okunur) | KAL-KAPISIZ |
 | 3d-scene-lighting-research | 3D vitrin sahne/ışık araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
 | 3d-showroom-ux-research | 3D vitrin bilgi paneli/UX araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
 | 3d-webgl-standard | 3D/WebGL standardı | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-19 | yok | KAL-KAPISIZ |
@@ -1155,6 +1222,10 @@ gerektirmez).
 | urun-yapisal-veri-standard | VentHub Ürün Yapısal Verisi Standardı (Cetvel) — v1.0 | URUN | src/__tests__/conformance/jsonld-urungrubu-gorsel.test.ts (INV-URUNGRUBU-GORSEL-1) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | kategori-adlandirma-standard | Kategori Adlandırma Cetveli — hangi alan NEREDE kazanır | URUN | docs/README.md (soru→otorite tablosu) | 2026-09-09 (§4 açık karar KAPANDI: `marketing_title` emekli, Recep) | kategori-adi-tek-kaynak.test.ts (INV-KATEGORI-ADI-1) — **KISMEN**: zincirin 1. adımını ve sözlüksüz çağrıyı ölçer, sıranın kendisini ölçmez | KAL |
 | denetim-izi-standard | Cetvel — Denetim izi bütünlüğü: hangi veri yazımı denetim izine düşmek ZORUNDA, nasıl ölçülür, kim neyi üstlenir (REC-292). Yazma yüzeyi evreni (7 kalem, ikisi dosya DEĞİL), fail-closed hükmü + ispat yükü, tetiğin GÖRMEDİĞİ yollar (TRUNCATE / sahip rolü), dört yasak. | ALTYAPI | `docs/plans/rec292-denetim-izi-2026-09-09.md` · kapı `scripts/db/checks/denetim-izi-tetik-kapisi.mjs` · `CLAUDE.md` kural 11'in tek yazılı karşılığı | 2026-09-09 prod ölçümüyle yazıldı: yazan 14 betiğin 0'ı denetim yazıyor · 09-08'de hiçbir tablodan satır yok · `site_settings`'te `tenant_id` YOK · `exec` RPC YOK · TRUNCATE yetkisi `anon`'a kadar açık | `denetim-izi-kapisi.test.ts` — cetvelin fail-closed hükmünü, TRUNCATE kapsam-dışı beyanını, geriye-dönük-üretim yasağını ve tenant borcunu ADIYLA arar (cetvel sessizleşirse KIRMIZI) | YENI |
+| bagimlilik-guvenlik-yukseltme-standard | Bağımlılık Güvenlik Yükseltme Cetveli | ALTYAPI | `pnpm audit --prod` işleri (REC-323 ve halefleri) | 2026-09-13 · REC-323 (yazıldığı iş) | yok — kapı borcu | KAL-KAPISIZ |
+| ledger-ve-olu-migration-standard | Ledger ve Ölü Migration Dosyası Cetveli — prod a hic uygulanmamis migration dosyasi ne olur | ALTYAPI | REC-321 silme migration yorumu (20260914090000) + supabase-migrate.yml parite adimi + REC-322 karsilikli EK | 2026-09-14 yazildi (REC-321, Recep karari SECENEK 1) | INV-MIGRATION-3 (parite adimi) | KAL |
+| rls-yetki-karari-standard | RLS Yetki Kararı Cetveli — bir politika "bu kullanıcı yönetici mi" sorusunu nereden okur | ALTYAPI | INV-AUTH-ROLE-2 kapisi (src/__tests__/conformance/rls-yetki-karari.test.ts) + REC-322 migration yorumu + borc ilani docs/rls-yetki-karari-borc-ilani.json | 2026-09-14 yazildi (REC-322) | INV-AUTH-ROLE-2 | KAL |
+| hukum-kaynak-standard | Hüküm-Kaynak Cetveli — Recep'e giden her hüküm cümlesi kaynağını taşır; üç kaynak sınıfı (A kendi ölçümüm · B belgeden okudum · C bilmiyorum) karıştırılamaz, ve geri alınan hüküm karneye yazılır | URUN (yazan) — kural FİLO GENELİ, üç şeridi de bağlar | atıf YOK (ölçüldü 2026-09-16: depoda hiçbir dosya bu cetveli anmıyor) — cetvel bunu §3.1'de KENDİSİ ilan ediyor: "Otomatik kapı YOK, bugün bir alışkanlık sözleşmesidir" | 2026-09-16 yazıldı — doğuran olay aynı oturumda dört yanlış hüküm; Recep kararı 27 KABUL ("ölçüm olmalı evet"), kararı 26 RED (karar yetkisi şeride devredilmedi, ispata bağlandı) | yok — **ALTYAPI BORCU, cetvel §3.2 adıyla yazıyor:** §2'nin kapıya bağlanması `.claude/hooks/**` şeridindedir, kolu ALTYAPI yazar | KAL-KAPISIZ |
 
 ---
 
@@ -1170,6 +1241,32 @@ gerektirmez).
   betik/skill/githook/ci/cetvel sınıflarının hiçbirine girmiyor) → **envanter dışı artık, silme
   adayı (OPS ölçüp siler)**. Silmeden önce canlılık kontrolü yapılmalı (hafıza:
   silmeden-once-canlilik-ve-taze-dal).
+- **`graphify` 0.9.62** (`uv tool install "graphifyy[sql]"`) — **ARTIK KURULU, ENVANTER-DIŞI
+  DEĞİL.** 2026-09-16'da Recep onayıyla projeye bağlandı (emir: `docs/plans/graphify-kurulum-emri-2026-09-16.md`,
+  #1214). Aracın kendisi hâlâ dış araç (kullanıcı kapsamında, altı sınıfın hiçbirine girmiyor) ama
+  **skill'i depoya girdi** → `.claude/skills/graphify/` satırı §3.3'te.
+  **Bağlı adım (REC-313 hükmü, geçerli):** codegraph bayatlık uyarısı verdiğinde ya da
+  paylaşılan-primitif riski ölçülecekken ikinci bağımsız kol — yalnız üç komut
+  (`affected <ad>()`, `god-nodes`, `diagnose multigraph`). `query` **KULLANILMAZ** (5 soruda
+  2 yanlış 2 eksik, sessiz yanlış üretir).
+  ⚠**KURULUMUN YAZDIĞI METİN BU HÜKÜMLE ÇELİŞİYOR** (ölçüldü 2026-09-16): araç kök `CLAUDE.md`'ye
+  *"For codebase questions, first run `graphify query`"* diye **on satır** yazdı. Yani bizim
+  ölçtüğümüz "query kullanılmaz" kararının **tersini** öneriyor. Kalem açık, düzeltme Recep'in
+  onayına bağlı (CLAUDE.md onun cetveli).
+  ⚠**`affected` PARANTEZ GEREKTİRİYOR** (URUN ölçtü, hiçbir belgede yazılı değil):
+  `productRoute` → *"No unique node match"*, `productRoute()` → doğru cevap.
+  ⭐**SQL KÖRLÜĞÜ KAPANDI, KISMEN** (2026-09-16 ölçümü): `tree-sitter-sql` eksik olduğu için
+  araç **251 `.sql` dosyasını hiç görmüyordu** (REC-313'ün "252 SQL dosyası görülmedi" bulgusunun
+  sebebi buydu — kalıcı bir sınır değil, **eksik bağımlılık**). `uv tool install "graphifyy[sql]"`
+  ile kapatıldı; grafik 9.122 → **10.410 düğüm**, 18.010 → **19.504 kenar**; 250 SQL dosyasından
+  758 içerik düğümü. **AMA TAM DEĞİL:** taze tabandan **39 tablo** görüyor (canlıda 66) ve
+  **163 politikanın 1'i**. Yani veritabanı haritası ihtiyacını **karşılamıyor**; o ihtiyacın
+  karşılığı `docs/database_schema_master.md` + `supabase/baselines/2026-09-15_public_schema.sql`.
+  **Son kullanım:** 2026-09-16 (kurulum + SQL ölçümü).
+  **Kanıt:** `docs/audits/rec313-graphify-deneme-2026-09-13.md` (ilk ölçüm) ·
+  `docs/plans/graphify-kurulum-emri-2026-09-16.md` (emir) · bu satır (kurulum ölçümü).
+  Çıktı dizini `graphify-out/` üretilmiş artefakttır, `.gitignore`'da — **her makinede bir kez**
+  `graphify extract . --code-only` koşulur, yoksa kancalar sessiz kalır (fail-open).
 - **`tmp-lf-fix.yml`** — bkz. §3.5 son not: GitHub Actions tarafında `active` görünen ama repoda
   hiç var olmamış hayalet kayıt; 29'luk dosya sayımına dahil değildir, OPS'un GitHub ayarlarından
   temizlemesi gerekir.
@@ -1198,6 +1295,155 @@ vurgulanmıştır.)
 **Ek toplamlar:** companion `.md` (hook, envanter dışı) 13 · skill tekil ad 39 (satır 64) ·
 GitHub-hayalet CI 1 (`tmp-lf-fix.yml`, 29'a dahil değil) · özel-durum envanter-dışı nesne 1
 (`.claude/worktrees/agent-a91c11837d4004440`).
+
+
+---
+# FILE: docs\audits\bagimlilik-2026-09-15.md
+
+# Bağımlılık güncelliği ve güvenlik taraması — 2026-09-15
+
+**Şerit:** ALTYAPI · **Kayıt:** REC-345 (mekanizma parçası) · **Ağaç:** ALTYAPI worktree
+**Cetvel:** `docs/standards/bagimlilik-guvenlik-yukseltme-standard.md`
+**Kapı:** `src/__tests__/conformance/kanca-defter-tazelik.test.ts` (BAĞIMLILIK satırı kolları)
+
+> ⛔**BU KAYIT BİR YÜKSELTME EMRİ DEĞİL.** Yalnız bugünün durumunu ölçer. Hangi paketin
+> yükseltileceği Recep'in kararıdır ve bu kayıtta **hiçbir paket yükseltilmedi**
+> (`pnpm install` koşulmadı, `pnpm-lock.yaml` değişmedi).
+
+---
+
+## 1 · SAYILAR (kendi ağacımda yeniden ölçüldü)
+
+| Ölçüt | Değer | Komut |
+|---|---:|---|
+| Güncel olmayan paket | **63** | `pnpm outdated --format json` |
+| Bunlardan ana sürüm (major) atlamalı | **26** | aynı çıktı, ilk sürüm hanesi kıyası |
+| Yüksek önemde güvenlik kaydı (prod) | **11** | `pnpm audit --prod --json` |
+| Orta | 6 | aynı |
+| Düşük | 5 | aynı |
+| Kritik | **0** | aynı |
+| Toplam güvenlik kaydı (prod) | 22 | aynı |
+
+### ⚠OPS'UN SAYISIYLA FARK VAR — ADIYLA YAZILIYOR
+
+OPS aynı gün **66 paket / 40 major / 11 high** ölçtü. Benim ağacımda **63 / 26 / 11**.
+
+- **High sayısı AYNI (11)** — yani güvenlik tablosu iki ağaçta aynı.
+- **Paket sayısı 3 fark:** OPS ana ağaçta `pnpm install` koştu (kendi deyişiyle "next
+  15.5.24 artık yerelde"); ben worktree'de kurulum **koşturmadım**. Kurulmuş sürüm
+  değişince "güncel değil" listesi de değişir. Yani iki sayı **iki farklı ana**.
+- **Major sayısı 14 fark:** bu bir ÖLÇÜT farkı olabilir. Benim ölçütüm ilk sürüm hanesinin
+  değişmesi. `0.x` paketlerde bu ölçüt eksik kalır: semver'de `0.x` sürümlerde **minor
+  hanesi kırıcıdır** (`three` 0.183 → 0.186, `lucide-react` 0.468 → 1.46). OPS'un sayısı
+  bunları da sayıyorsa fark oradan gelir.
+- ⭐**HANGİSİ DOĞRU SORUSU HENÜZ CEVAPLANMADI.** İki sayı da kendi ölçütüne göre doğru
+  olabilir; kapalı olan şey **ölçütün yazılı olmaması.** Cetvele "major nasıl sayılır"
+  tanımı yazılmadan bu iki sayı her hafta yeniden tartışılır. (Bkz. §4, borç 1.)
+
+---
+
+## 2 · ⭐ASIL BULGU — 11 YÜKSEK KAYDIN 11'İ DE TEK KAPIDAN GİRİYOR
+
+Güvenlik kayıtlarını modüle göre değil **GİRİŞ KAPISINA** göre saydığımda tablo değişti:
+
+| Doğrudan bağımlılık | Yüksek kayıt yolu |
+|---|---:|
+| `@sentry/nextjs` | **11 / 11** |
+| diğer hepsi | 0 |
+
+Yani yüksek önemli kayıtların **tamamı** tek bir doğrudan bağımlılıktan geliyor:
+`@sentry/nextjs` **8.55.2** (güncel: **10.74.0**, yani **iki ana sürüm** geride).
+
+Onun altından gelen paketler ve kayıtları:
+
+| Dolaylı paket | Yüksek | Düzeltildiği sürüm |
+|---|---:|---|
+| `fast-uri` | 6 | ≥ 3.1.4 |
+| `brace-expansion` | 3 | ≥ 5.0.7 |
+| `browserslist` | 2 | ≥ 4.28.7 |
+
+⭐**NİÇİN ÖNEMLİ:** "11 yüksek açık var" cümlesi, ele alınacak 11 iş varmış gibi okunur.
+Ölçüm başka söylüyor: **tek bir doğrudan bağımlılığın sürümü** bu 11 kaydın hepsinin
+sebebi. Bu, işin büyüklüğünü de riskini de değiştirir — ve bir "kova" listesi çıkarmadan
+önce sorulacak doğru soru "Sentry yükseltmesi neyi kırar" sorusudur.
+
+⚠**AMA BU BİR YÜKSELTME ÖNERİSİ DEĞİL:** iki ana sürüm atlaması kırıcı değişiklik taşır ve
+Sentry bu projede hata izleme yüzeyidir. Yükseltme kararı Recep'in; ölçüm burada duruyor.
+
+### Kalan kayıtların girişleri (yüksek olmayanlar)
+
+| Dolaylı paket | Önem | Giriş | Düzeltildiği sürüm |
+|---|---|---|---|
+| `dompurify` | 2 orta, 3 düşük | `isomorphic-dompurify` 3.7.1 (güncel 4.2.0) | ≥ 3.4.12 |
+| `fflate` | 2 orta | `@react-three/drei`, `@types/three` | ≥ 0.8.3 |
+| `@opentelemetry/core` | 1 orta | `@sentry/nextjs` | ≥ 2.8.0 |
+| `baseline-browser-mapping` | 1 orta | `@sentry/nextjs` | ≥ 2.11.0 |
+| `postcss-selector-parser` | 1 düşük | `tailwindcss` 3.4.19 (güncel 4.3.3) | ≥ 6.1.3 |
+| `@babel/core` | 1 düşük | `@sentry/nextjs` | ≥ 7.29.6 |
+
+---
+
+## 3 · BU ÖLÇÜM ARTIK GÖRÜNÜR — KAPIYA BAĞLANDI
+
+Bu kaydın tek başına durması, REC-342'de ölçülen kusurun aynısını üretirdi: **ölçüm vardı,
+kimse görmüyordu.** Bu yüzden ölçüm, her turun başında görünen satıra bağlandı
+(`.claude/hooks/defter-tazelik-satiri.cjs`, UserPromptSubmit):
+
+```
+BAGIMLILIK: son tarama 0 gun · high 11
+```
+
+- **Eşik 14 gün** (varsayılan; `VENTHUB_BAGIMLILIK_ESIK_GUN` ile değişir). Aşılırsa satır
+  `⚠` ile başlar.
+- **`high ≥ 1` tek başına uyarı sebebi DEĞİLDİR** — bugün 11 high var ve bunların hepsi
+  bilinen, kayda geçmiş, Recep kararı bekleyen kalemler. Her turda kırmızı yanan bir satır
+  üç günde görmezden gelinir; kapı **tarama tazeliğini** ölçer, açıkların varlığını değil.
+  Sayı yine de **yazılır**, çünkü gizlenmesi de yanlış olurdu.
+- **Yaş ölçütü dosya adındaki tarih:** `docs/audits/bagimlilik-YYYY-MM-DD.md` dosyalarının
+  en yenisi. ⚠Sınırı: "tarama yapıldı" ile "tarama kayda geçti" aynı şey değildir; bu
+  ölçüt **kaydı** ölçer. Kayıt yazılmadan yapılan bir tarama görünmez — ve bu kasıtlı,
+  çünkü kayda geçmeyen ölçüm bir hafta sonra yok sayılır.
+- ⛔**Kanca ağa çıkmaz:** `pnpm outdated`/`pnpm audit` kanca içinde **koşturulmaz** (ikisi
+  de ağ ister ve saniyeler sürer). Sayı bu kayıttan okunur; iki satırın toplam ek maliyeti
+  **4 ms** (ölçüldü: `readdir docs/audits` 126 dosya → 0 ms, kayıt dosyası okuma → 3 ms).
+- ⚠**BÜTÇE SAYISI DÜZELTİLDİ:** "300 ms" tavanı **toplam** süre olarak erişilemez —
+  bu makinede **çıplak node açılışı tek başına 170-292 ms** (5 koşum). Kancanın toplamı
+  355-534 ms, kendi işi ~135-240 ms. Ölçüt "kancanın kendi işi"dir; gerekçesi cetvelde
+  (`proje-takip-defteri-standard.md` §5.1). Bir bütçe yazılırken **hangi sürenin ölçüldüğü**
+  de yazılır, yoksa sayı ya erişilemez olur ya da sessizce gevşetilir.
+
+---
+
+## 4 · BORÇLAR (adıyla, kapatılmamış)
+
+1. ⭐**"Major nasıl sayılır" tanımı cetvelde YOK** — §1'deki 26 ↔ 40 farkının sebebi bu
+   olabilir. `0.x` paketlerde minor hanesi kırıcıdır; ölçüt bunu söylemiyor. Tanım
+   yazılmadan bu sayı her taramada tartışılır.
+2. **Kova (A/B/C) sınıflandırması YAPILMADI** — Recep'in 13/14 numaralı kararları
+   bekleniyor. Bu kayıtta hiçbir paket "yükseltilecek" diye işaretlenmedi.
+3. **Sıklık kuralı TASLAK** — cetvel §1'e "iki haftada bir tam tarama + her güvenlik
+   olayında anlık" yazıldı ve **TASLAK olarak işaretlendi**; Recep onayı gelmedi.
+4. **`pnpm approve-builds` beş paket** için hâlâ bekliyor (ayrı, eski kalem).
+5. **`caniuse-lite` yedi ay bayat** — `pnpm lint` her koşumda bunu söylüyor ve kimse
+   bakmıyor; ayrı kalem.
+6. **Yükseltmenin neyi kırdığı ÖLÇÜLMEDİ.** Bu kayıt sürüm farkını ve açığı ölçer; bir
+   yükseltmenin build/test üzerindeki etkisini **ölçmez**. O ayrı bir iştir ve kova kararı
+   verildikten sonra yapılır.
+
+---
+
+## 5 · YÖNTEM VE SINIRLAR
+
+- Komutlar ALTYAPI worktree'sinde koştu. **`pnpm install` KOŞTURULMADI**; kilit dosyası
+  değişmedi (worktree kuralı: gerekirse yalnız `--lockfile-only`).
+- `pnpm audit --prod` yalnız **üretim** ağacını tarar. Geliştirme bağımlılıklarındaki
+  açıklar bu tabloda **YOK** — bilinçli: üretim yüzeyi ile geliştirme yüzeyi aynı riski
+  taşımaz. Geliştirme tarafı ayrıca ölçülmedi.
+- Girişler `audit` çıktısının `findings[].paths` alanından türetildi; yani **kilit
+  dosyasının** söylediği ağaç. Aynı paketi iki ayrı yoldan çeken bir durumda ilk iki
+  segment alındı, daha derin yollar kısaltıldı.
+- Sayılar **tek koşumun** çıktısıdır ve kayıt tabanı (advisory veritabanı) her gün değişir.
+  Bu yüzden sayılar tarihiyle birlikte anlamlıdır; dosya adındaki tarih bu yüzden ölçüttür.
 
 
 ---
@@ -1757,6 +2003,407 @@ Ayrıca `model_code` boş olan ürün **ölçülemez**, ayrı sınıfta tutulur;
 * **İçe alım boşlukları** → REC önerisi (açmayı OPS yapar).
 * **Ticari boşluklar** → Recep'e OPS taşır; AVenS'ten istenecek kalem.
 * Fiyat **yazılmadı**; bu iş yalnız sınıflandırmadır.
+
+
+---
+# FILE: docs\audits\gstack-skill-envanteri-2026-09-15.md
+
+# gstack skill paketi — tam envanter ve hüküm (70 skill)
+
+**Niçin:** Recep 2026-09-15: *"gstack paketinde adetlice skills var. tümünü değerlendirmek lazım."*
+Tek bir skill'i (`/plan-eng-review`) koşturup paket hakkında hüküm vermek ölçüsüzdü; bu dosya
+paketin **tamamını** aynı ölçütlerle tarar.
+
+**Yöntem:** dört salt-okuma alt ajan, paralel. Her skill için beş soru — ne yapar · ne zaman
+tetiklenir · bizde karşılığı var mı · neye bağımlı · VentHub'a uygun mu. Sonra tek hüküm.
+Hiçbir skill **çalıştırılmadı**, hiçbir dosya değiştirilmedi, ağa çıkılmadı.
+
+> ⚠**Bu envanterin sınırı, okuyan için:** ölçüm her skill'in `SKILL.md` dosyasının **ilk ~60
+> satırını** okudu. gstack skill'lerinde o satırlardan sonrası büyük ölçüde ortak "preamble"
+> (telemetri, onboarding, soru ayarı) kalıbıdır ve **asıl mekanik 60. satırın ötesindedir.**
+> Yani bu envanter "ne yaptığını" bilir, "nasıl yaptığını" tam bilmez. **DENE** hükmü verilen her
+> skill, kullanılmadan önce baştan sona okunur — özellikle veritabanına, dala ya da CLAUDE.md'ye
+> dokunacak olanlar.
+
+---
+
+## 1. Sayım
+
+| Hüküm | Adet | Ne demek |
+|---|---|---|
+| **DENE** | 9 | Bugün gerçek bir boşluğu dolduruyor |
+| **KIYAS BEKLİYOR** | 20 | Bizde benzeri var **ama aynı olduğu ÖLÇÜLMEDİ** (§1b) |
+| **ATLA** | 29 | Bu projeye uygun değil |
+| **BELİRSİZ** | 12 | Tanıtımdan anlaşılmadı ya da bugün ihtiyaç yok |
+
+## 1b. "ÇAKIŞIYOR" hükmü GERİ ALINDI — ölçülmemiş hükümdü
+
+İlk sürümde 20 skill "ÇAKIŞIYOR" diye kapatılmıştı. **Bu hüküm askıya alındı.** Gerekçe, Recep'in
+2026-09-15 itirazı: *"senin 'bizde de aynısı var' iddian çok iddialı, gerçekten de aynısı mı? bak
+bugün de kullandın gstack daha iyi çıktı. bizde var diye kendi malımız diye ayrıcalık göstermem
+ben."*
+
+**İtiraz haklı ve kanıtı aynı gün elimizdeydi.** `plan-eng-review` ile `plan-challenger` için de
+"aynı iş" denebilirdi; yan yana koşunca **35 bulgunun yalnız 6'sı örtüştü**, %83'ü tek araçta
+yaşadı. Yani "aynı iş" sezgisi ölçülen tek vakada **YANLIŞ** çıktı — ve ben aynı sezgiyi 20 skill
+için ölçmeden uyguladım.
+
+**Üç hata adıyla:**
+1. **Ölçmeden hüküm.** Ad ve tanıtım benzerliğine bakıp "aynı iş" dendi. Tek ölçülen vaka bunu
+   çürüttü.
+2. **Sahiplik ölçüt sayıldı.** "Bizde var" bir envanter bilgisidir, üstünlük gerekçesi değil.
+   Recep'in uyarısı: *"6 ay sonra gstack için de bizim diyeceksin ve başka repodan gelen ile
+   kıyaslayacaksın."* Aynı körlük ters yöne de işler.
+3. **Yanlış yere itiraz.** gstack'in kendi kaydını tutması **doğru davranıştır** — bizim
+   `MEMORY.md`'mizin yaptığının aynısı. Recep: *"bence o da bir referans ve sonuçta kendi kaydını
+   tutuyor, bence böyle olması lazım. karışıklık bu değil, bizim karışıklığımız."* Kabul: §4'teki
+   itirazın konusu kayıt tutmak değil, **bizim** kayıtlarımızın dağınıklığıdır.
+
+### Kıyas ölçütü (bundan sonra her "aynı iş" iddiası buna tabidir)
+
+- **"Aynı iş yapıyor" iddiası yalnız YAN YANA KOŞUMLA kanıtlanır.** Aynı girdi ikisine de verilir.
+- **Ölçüt:** bulgu sayısı · örtüşen bulgu oranı · yalnız tek araçta kalan bulgular · yanlış pozitif.
+- **Kimin yazdığı kıyasta GEÇMEZ.** Ne "bizim", ne "dışarıdan". Yalnız sayılar.
+- **Örtüşme yüksekse** gerçekten aynı iştir, biri seçilir. **Düşükse** ikisi farklı soru soruyordur
+  ve ikisi de kalır — `plan-challenger` / `plan-eng-review` vakası budur.
+- **Brief eşit olmalı.** Bugünkü kıyasta bizim araca on yönlendirici soru yazıldı, gstack'e yalnız
+  plan verildi; bu yanlılık `gstack-yan-yana-2026-09-15.md`'de yazılı ve eşit-brief turu
+  yapılmadı. Sonraki kıyaslarda brief eşitliği ön şarttır.
+
+### İkinci kapı: TETİKLENME (Recep 2026-09-15)
+
+*"bu skill'ler peki doğru şekilde tetikleniyorlar mı? sadece 'gstack evet bu skill iyiymiş' demek
+de yeterli değil bize uygun şekilde otomatik tetikleniyor mu?"*
+
+Ölçtüm: bu sınav **bizde zaten var** ama gstack'i **görmüyor**. `.github/workflows/skills-gate.yml`
+iki iş taşıyor — `skills sayac` (ücretsiz, her PR'da; **12/8 kuralı + tetik çakışması** ölçüyor) ve
+`skills yonlendirme sinavi` (ücretli, skill değişince, `skills:eval`). İkisinin de evreni **proje
+klasörüdür**; gstack `~/.claude/skills/` altında, yani bugüne kadar **hiçbir gstack skill'i bu
+sınava girmedi**.
+
+**DÜZELTME (OPS, 2026-09-15):** ilk sürümde *"pakette bizimkilerle aynı adı taşıyan skill'ler var"*
+yazmıştım — **yanlış, ad çakışması 09-13'te REC-314 adım 1 ile ÇÖZÜLDÜ**; üç kullanıcı sürümü
+`gstack-` öneki aldı ve bu envanterin kendi listesinde de zaten `gstack-qa` / `gstack-investigate`
+/ `gstack-office-hours` diye geçiyor. Yani kanıt elimdeydi, kendi tablomu okumadım.
+
+**Kalan gerçek boşluk iki tane:** (a) **tetik çakışması** — adlar ayrı olsa bile iki skill aynı
+soruya talip olabilir, sınav bunu ölçüyor; (b) **gstack'in sınavsızlığı** — evren proje klasörü
+olduğu için hiçbir gstack skill'i o sınava hiç girmedi.
+
+**Kural:** bir araç ancak **iki kapıyı birden** geçerse "bizim" olur — (a) yan yana koşumda değer
+katar, (b) yönlendirme sınavında doğru anda tetiklenir. Birini geçip ötekini geçmeyen araç
+envanterde kalır ama kullanıma girmez.
+
+## 2. DENE — dokuz skill, öncelik sırasıyla
+
+| # | Skill | Doldurduğu boşluk | Bağımlılık | Risk |
+|---|---|---|---|---|
+| 1 | `accessibility` | Erişilebilirlik (WCAG) denetimi — bizde **hiç yok**; CLAUDE.md kural 8 a11y istiyor ama ölçen kapı yok | Lighthouse / axe, dış API yok | Düşük |
+| 2 | `seo-ecommerce` (yalnız on-page) | Ürün sayfası şema/başlık/meta denetimi — e-ticaretiz, bizde ayrı bir ürün şeması denetimi yok | On-page modülü **dış API'siz**; marketplace modülü ücretli (DataForSEO) ve bize uymuyor | Düşük, **yalnız on-page** |
+| 3 | `careful` + `guard` | Yıkıcı komut kapısı (`rm -rf`, `DROP TABLE`, `push -f`, `reset --hard`) — bugün bu disiplin **yazılı kurala** dayanıyor, otomatik kapıya değil | Yerel bash hook | Düşük; kural 13'ü **sertleştirir**, gevşetmez |
+| 4 | `xlsx` | Excel okuma/yazma/formül — fiyat listesi ve admin raporu gibi işler için karşılığımız yok | openpyxl/pandas/LibreOffice, hepsi yerel | Düşük |
+| 5 | `diagram` | Metinden mermaid + düzenlenebilir `.excalidraw` + SVG üretimi | **Hiç dış bağımlılık yok** | Düşük |
+| 6 | `benchmark` | Core Web Vitals / paket boyutu için taban çizgisi ve PR başına karşılaştırma | Lighthouse; **çıktısını proje dışına yazıyor** | Orta — çıktı projeye taşınmalı |
+| 7 | `make-pdf` | Markdown → yayın kalitesinde PDF (Recep'e sunulacak raporlar) | pandoc benzeri | Düşük |
+| 8 | `freeze` | Oturum boyunca düzenlemeyi tek dizinle sınırlama | Yerel hook | Düşük |
+| 9 | `plan-ceo-review` | Ticari/kapsam ekseni — `plan-challenger` teknik, bu "yeterince iddialı mı" diye soruyor | Yok | Orta — kapsam kaymasına davet edebilir |
+
+## 3. TEHLİKELİ ÜÇLÜ — bunlar "işe yaramaz" değil, **kapı deler**
+
+Bu üçü kendi başına karar verip uygulama eğiliminde ve doğrudan bizim onay kapılarımıza çarpıyor.
+Ayrı başlık hak ediyorlar çünkü "atla" demek yetmez — **niçin** atlandığı yazılı olmalı.
+
+**`ship`** — "kod hazır" denince kendi başına test koşturup sürüm numarası artırıp commit atıp
+push edip PR açıyor, üstelik bunu proaktif yapmayı teşvik ediyor. Bizde migration içeren bir PR
+master'a merge edilince **prod veritabanına otomatik uygulanıyor** (kural 13) ve tam bu yüzden o
+adım Recep'in açık onayına bağlı. Bu skill o onayı devre dışı bırakabilecek tek araç.
+
+**`land-and-deploy`** — PR'ı merge edip dağıtımı bekleyip canlıyı doğruluyor. Aynı gerekçe:
+merge kararı bizde otomatik değil, olamaz.
+
+**`spec`** — belirsiz isteği **GitHub Issue**'ya çeviriyor. Bizim iş takibimiz Linear ve bu
+yazılı bir karar. Bu skill yanlış sisteme kayıt açar; "gereksiz" değil, **aktif olarak yanlış**.
+
+## 4. PARALEL HAFIZA ADASI — beş skill, tek sorun
+
+`retro` · `context-save` · `context-restore` · `learn` · `setup-gbrain` / `sync-gbrain`
+
+Beşi de kendi kalıcı kaydını tutuyor (`~/.gstack/...`, `.context/retros/*.json`,
+`timeline.jsonl`, `learnings.jsonl`) ve bunlar bizim kayıtlarımızla **hiç konuşmuyor**.
+Bugün zaten Linear (iş) + NotebookLM defteri (bilgi) + `MEMORY.md` (ders) + `DURUM-TAKIP.md`
+(durum) + CodeGraph (kod) var. Altıncı bir ada eklemek, hafızadaki *"kayıt sistemim dağınık"*
+notunun tam tersi yönde bir adımdır.
+
+**Hüküm:** bu beşi kullanmıyoruz. Aynı ihtiyacı bizim kendi kayıtlarımız karşılıyor.
+
+## 5. HAM SÜRÜMLER — üç skill, sessiz risk
+
+`gstack-qa` · `gstack-office-hours` · `gstack-investigate`
+
+Bu üçünün VentHub'a **uyarlanmış** sürümü zaten `.claude/skills/` altında duruyor (`qa`,
+`office-hours`, `investigate`). Paketteki ham sürümler bizim kurallarımızı, Türkçeyi, kapı
+düzenimizi ve "plan önce onay sonra kod" ilkesini **bilmiyor** — üstelik kendi başına commit
+atma davranışı taşıyorlar.
+
+**Hüküm:** ham sürümler çalıştırılmaz. Yanlışlıkla çağrılma riski var çünkü adları benzer.
+
+## 6. ATLA — 29 skill, üç gerekçe kümesi
+
+- **Mobil uygulama yok (5):** `ios-clean`, `ios-design-review`, `ios-fix`, `ios-qa`, `ios-sync`.
+- **Hedef kitlemiz geliştirici değil (2):** `devex-review`, `plan-devex-review` — VentHub bir
+  müşteriye dönük e-ticaret sitesi; dışarıya API/SDK sunmuyoruz.
+- **Bizde karşılığı zaten var ya da bize uymuyor (22):** `browse` / `connect-chrome` /
+  `open-gstack-browser` / `scrape` / `setup-browser-cookies` (Playwright zaten kurulu) ·
+  `search-console` (aynısı zaten kurulu) · `review` (bizim `diff-review` VentHub'a özel beş
+  başlığı biliyor, bu bilmiyor) · `codex` (ikinci görüş mekanizmamız var) · `cso` (güvenlik
+  denetim ailemiz var) · `design-*` ailesi (kendi tasarım dilimiz ve Design ajanımız var) ·
+  `document-generate` / `document-release` (belge zincirimiz CLAUDE.md'yi elle yönetiyor, bu
+  skill onu yeniden yazmaya kalkar) · `setup-deploy` (aynı sebep) · `scroll-craft` (pazarlama
+  sayfası paradigması, mimarimizle uyumsuz) · `skillify` (girdisi `scrape`, kullanmıyoruz) ·
+  `claude-api` (üretim kodumuz LLM API çağırmıyor) · `benchmark-models` · `plan-tune` ·
+  `gstack-upgrade` · `_gstack-command` · `pair-agent` (dış ajana tarayıcı erişimi — güvenlik
+  yüzeyi büyütür) · `landing-report` (versiyon slotu kavramı bizde yok) · `taste-skill` (kendi
+  kapsamını "dashboard ve veri tablosu değil" diye tanımlıyor; bizim sayfalarımız tam öyle).
+
+## 7. Sistemik bulgu: ortak başlangıç betiği
+
+İki ayrı alt ajan **bağımsız olarak** aynı şeyi buldu: skill'lerin çoğu
+`~/.claude/skills/gstack/bin/gstack-skill-start` adlı ortak bir betiğe bağlı ve o betik kendi
+telemetrisini, onboarding'ini ve oturum izlemesini çalıştırıyor.
+
+Bu, **DENE** hükmü verilenler için bile geçerli. Yani paketten tek bir skill kullansak bile
+yanında gstack'in kendi durum katmanı geliyor. Bugünkü turda bu katman kapatıldı (gerekçeleri
+`gstack-yan-yana-2026-09-15.md`'de); kapalı olduğu sürece araç bu projede **birikmiyor**, açık
+olduğunda ise ikinci bir durum kaydı doğuyor.
+
+**Hüküm:** kullanacağımız skill'lerin çıktısı **bizim** kayıt yüzeylerimize taşınır
+(`docs/audits/`, Linear). gstack'in kendi deposu referans kabul edilmez.
+
+## 8. Bu borç NASIL UNUTULMAYACAK (Recep sordu, cevap kapıya bağlanıyor)
+
+*"o zaman haftaya bunu unutmayacak mıyız? nasıl yöneteceksin? zaten her şeyi o gün içinde dahi
+unutuyoruz... ben compact atıyorum zaten gidiyor çoğu bilgi."*
+
+**Söz yetmez.** Üç katman, üçü de yazıya dayanıyor:
+
+1. **Bu dosya borcu adıyla söyler.** 20 satır "ÇAKIŞIYOR" değil **"KIYAS BEKLİYOR"**. Kapatılmış
+   bir hüküm değil, açık bir kalem.
+2. **Araç envanterine girer.** `docs/audits/arac-envanteri-*.md` — bugün arama cetveli nasıl
+   envantere yazıldıysa aynı şekilde. Envantere yazılmayan araç `INV-ARAC-1`'de kırmızı verir.
+3. **Kapıya yeni kol:** *"kıyas bekleyen araç var mı ve kaç gündür bekliyor?"* Belli bir tazelik
+   eşiğini aşarsa kırmızı. Unutmak o zaman **imkânsız** hale gelir, çünkü unutursak testler düşer.
+
+Bu, projenin kendi ilkesinin uygulanmasıdır: **hatırlanan değil, kapıya yazılan iş yapılır.**
+Katman 2 ve 3 `scripts/hijyen/**` ile `src/__tests__/conformance/**` altında, yani ALTYAPI
+şeridinde — emir olarak açılır, bu dosya onu ADIYLA işaret eder.
+
+## 9. Sıradaki adım
+
+Bu envanter bir **hüküm** dosyasıdır, emir değil. **DENE** listesindeki dokuz skill için sıra ve
+kapsam kararı Recep'e aittir; her biri kullanılmadan önce `SKILL.md`'si baştan sona okunur,
+yönlendirme sınavından geçer ve "bizim kayıt yüzeyimize yazar" şartı sağlanır.
+
+**KIYAS BEKLİYOR** listesindeki 20 skill için önerilen sıra — en çok kullandığımız işler önce,
+çünkü bir iyileşme orada en çok kazandırır: (1) değişiklik incelemesi (`diff-review` ↔ `review`),
+(2) arıza kök sebebi (`investigate` ↔ `gstack-investigate`), (3) site testi (`qa` ↔ `gstack-qa`).
+Kalanı ihtiyaç doğdukça ölçülür.
+
+İlgili: `gstack-yan-yana-2026-09-15.md` (aynı gün, `/plan-eng-review` ile `plan-challenger`
+karşılaştırması ve dört sorunun taşınması hükmü).
+
+
+---
+# FILE: docs\audits\gstack-yan-yana-2026-09-15.md
+
+# gstack `/plan-eng-review` ile kendi `plan-challenger`'ımız — yan yana ölçüm
+
+**Niçin:** ikisi de "plan uygulanmadan önce incele" işini yapıyor. Hangisinin ne yakaladığı
+ölçülmeden, ikisini birden koşturmak maliyet, birini seçmek kumar. Bu dosya **aynı planı** ikisine
+birden verip aşama aşama ne olduğunu yazar.
+
+**Ölçüm nesnesi:** REC-340 Faz 1 planı (VentHub arama motorunun onarımı) —
+`scratchpad/rec340-faz1-plan.md`, 2026-09-15, URUN şeridi yazdı.
+**Ölçen:** URUN şeridi. **Emri veren:** OPS (2026-09-15).
+
+> ⚠**Yanlılık uyarısı, okuyan için:** planı yazan da ölçümü yapan da aynı şerit. Üretici ≠ yargıç
+> ilkesi gereği her iki inceleme de **ayrı alt ajanlara** yaptırıldı; ama incelemeleri
+> KARŞILAŞTIRAN yine plan sahibi. Bu dosyanın hükmü bu sınırla okunur.
+
+---
+
+## Aşama kaydı (her satır aynı turda yazıldı)
+
+| # | Saat (UTC) | Aşama | Sonuç |
+|---|---|---|---|
+| 1 | 07:4xZ | Plan yazıldı, dokuz vaka canlı prod DB'de ölçüldü | 9 vakanın 5'i tam aramada 0, 6'sı öneri kutusunda 0 |
+| 2 | 07:4xZ | `plan-challenger` (bizim) — iki bağımsız alt ajan başlatıldı | biri DB ekseni (4 iddia), biri kod/kapı ekseni (5 iddia) |
+| 3 | 07:5xZ | `/plan-eng-review` (gstack) — preamble koşturuldu | `SKILL_START_PROTO: 1`, sağlıklı; `SESSION_KIND: interactive`, `REPO_MODE: solo` |
+| 4 | 07:5xZ | gstack incelemesi alt ajana verildi | **SAPMA, aşağıda** |
+| 5 | 07:5xZ | `plan-challenger` DB ekseni bitti | 8 bulgu · 17 SELECT/EXPLAIN · DURUM: CEKINCELI |
+| 6 | 08:0xZ | `plan-challenger` kod/kapı ekseni bitti | 12 bulgu · 10 SELECT + depo taraması · DURUM: CEKINCELI |
+| 7 | 08:0xZ | `/plan-eng-review` (gstack) bitti | 15 bulgu + test kapsam diyagramı + 10 görev · VERDICT: KOŞULLU |
+| 8 | 08:1xZ | Plan v2 → v3 yazıldı, üç incelemenin tamamı işlendi | 6 çürüyen iddia · 7 kök sebep · kapsam 1 adım daraldı, 1 adım eklendi |
+
+### Aşama 4'teki sapma ve gerekçesi
+
+gstack skill'i her bulgu için **ayrı bir `AskUserQuestion`** (düğmeli seçenek listesi) çağırmayı
+ZORUNLU kılıyor ("one issue per call", "STOP, do not proceed until the user responds"). Bu, bu
+projenin yazılı iletişim kuralıyla doğrudan çelişiyor: Recep'e düğmeli seçenek listesi
+gönderilmez, karar maddeleri numaralı düz cümleyle yazılır ve Recep numarayla cevap verir.
+
+Skill'in kendi içinde bu durumun karşılığı var: `SESSION_KIND: spawned` bloğu, alt ajan
+oturumlarında soru sormayı YASAKLIYOR ve "önerilen seçeneği kendin seç, seçtiğini raporla"
+diyor. İnceleme bu yüzden bir alt ajana verildi — skill'in kendi kuralı içinde kalındı, kural
+esnetilmedi.
+
+Aynı turda atlanan diğer kalemler ve niçin:
+- **Sürüm yükseltme istemi** (`UPGRADE_AVAILABLE 1.84.1.0 → 1.87.0.0`): iş ortasında araç
+  yükseltmek ölçümün altındaki zemini değiştirir. Ayrı kalem.
+- **Onboarding/özellik tanıtımı blokları** (sürekli checkpoint, "boil the ocean" tanıtımı,
+  ilk-koşum ipucu): işin kendisi değil, aracın kendi tanıtımı.
+- **Telemetri ve artifacts-sync:** `TELEMETRY: off`, `ARTIFACTS_SYNC: off` — zaten kapalı.
+
+---
+
+## Karşılaştırma tablosu
+
+| Ölçüt | `plan-challenger` (bizim) | `/plan-eng-review` (gstack) |
+|---|---|---|
+| Koşan ajan sayısı | 2 (DB ekseni + kod/kapı ekseni) | 1 |
+| Bulgu sayısı | 20 (8 + 12) | 15 + test kapsam diyagramı + 10 görev listesi |
+| Kanıtla desteklenen | 20/20 (SQL çıktısı ya da dosya:satır) | 15/15 (güven puanlı, alıntı kapısı uygulanmış) |
+| Hüküm | ikisi de `CEKINCELI` | `KOŞULLU` |
+| İki P0'ı da buldu mu | ✔ ikisi de | ✔ ikisi de |
+| Süre | ~7,5 dk (paralel) | ~7,5 dk |
+| Token | ~255 bin (ikisi toplam) | ~149 bin |
+
+### İkisinin de yakaladığı (6 kalem — çekirdek)
+
+`unaccent` kurulu değil · üretilmiş sütun cross-tablo veri taşıyamaz · tenant kuralı planda hiç
+geçmiyor · kapı sabit sayıya bağlanırsa kırılgan doğar · cetvel sahipliği açık kalemi bloklayıcı ·
+arama sonuç sayfası yok ve UI tavanı 20.
+
+**İki P0'ı da ikisi bağımsız buldu.** Yani "biri yeterdi" denebilir — ama yalnız P0'lar için.
+
+### Yalnız `plan-challenger` (11 kalem)
+
+`search_path` tuzağı — canlıda `ERROR 42883` **üretilerek** kanıtlandı · trgm indeksini tetikleyenin
+`%` operatörü olduğu, `similarity() > eşik` yazımının indeksi hiç kullanmadığı — `enable_seqscan=off`
+altında EXPLAIN ile · doğru eşik fonksiyonunun `word_similarity` olduğu (0,294 ↔ 0,714 farkı) ·
+tetiğin 361 webhook POST'u üreteceği · denetim izi tetiğinin sütun listesi · pgvector 4096 boyut
+indeks sınırı (Faz 2 model kararını etkiliyor) · **Adım 2'nin tam simülasyonu** (jet fan 0 → 61,
+iki vakanın hiç kıpırdamadığı) · vaka 9'un gerçek sebebi · iki RPC'nin farklı ürün evreni ·
+RPC imza değişikliğinin drop+create maliyeti · RLS politikalarının bugün sağlam olduğunun ölçümü.
+
+**Ortak yönü:** hepsi **canlı sistemde bir şey koşturarak** bulundu — sorgu, EXPLAIN, hata üretme,
+simülasyon. Bu, çürütme kipinin doğal ürünü.
+
+### Yalnız `/plan-eng-review` (12 kalem)
+
+`products.name_i18n` var ve aranmıyor (EN ürün **adı** kör) · `20250919` migration'ının kurduğu üç
+indeks canlıda **yok**, hiçbir kapı görmemiş · `getSearchSuggestions` hatayı sessizce sıfır sonuca
+çeviriyor ve bu Adım 6'yı baştan zehirliyor · aynı ekranda iki farklı hata politikası ·
+`INV-SEARCH-ROUTE-1` zaten var, yani "hiçbir kapı aramayı ölçmüyor" cümlesi yanlış · kapı adı
+çakışması (TR/EN iki aile) · trgm indekslerinin **kullanıldığı** (`idx_scan` 1424/121), yani "tam
+tablo taraması" hükmünün fazla geniş olduğu · vaka 7'nin regresyon riski · tuş gecikmesinin yedek
+yolla pahalılaşacağı · `display_price` korunumu riski · `admin_search_products` yani RPC'nin üç
+olduğu · aile sayımının 18 değil 22 olduğu.
+
+Ayrıca **üç şey yapısal olarak ekledi:** kapsam daraltma disiplini (Adım 5'in hiçbir vakayı
+kurtarmadığını gösterip Faz 1'den çıkarttı), test kapsamı diyagramı (26 yolun 3'ü ölçülüyor, %12),
+ve "çalışan davranışı değiştiren her değişiklik regresyon testi ister" kuralı.
+
+**Ortak yönü:** çoğu **depo kodunu okuyarak** bulundu. Kod okuma + mevcut-varlık envanteri bu
+aracın güçlü tarafı.
+
+### Yanlış pozitif
+
+İkisinde de **sıfır**. Her iki taraf da ölçemediklerini ayrı başlıkta topladı ve ihlalle
+karıştırmadı (`plan-challenger` 5 + 5 kalem, gstack 7 kalem).
+
+---
+
+## Hüküm
+
+**İkisi de kalır; biri ötekinin yerine geçmez.** Ölçüm bunu açıkça gösteriyor: 35 bulgunun yalnız
+6'sı örtüşüyor, yani **%83'ü tek bir araçta yaşıyor.** Birini bıraksaydık planın on bir ya da on
+iki kusuru bugün fark edilmezdi.
+
+**İkisi farklı şeyde iyi.** `plan-challenger` canlı sistemde bir şey koşturarak çürütüyor —
+EXPLAIN, hata üretme, simülasyon. `/plan-eng-review` depo kodunu okuyup mevcut varlığı envanterliyor
+ve kapsamı daraltıyor. İkisi aynı soruyu sormuyor, o yüzden aynı cevabı da vermiyorlar.
+
+**Önerilen kullanım:** migration ya da veri göçü içeren planda **ikisi birden**, paralel. Yalnız kod
+değişikliği içeren planda `/plan-eng-review` tek başına yeter. Yalnız veri/DB planında
+`plan-challenger` tek başına yeter.
+
+> ⚠**Bu hükmün ölçülmemiş yanı:** `plan-challenger`'a iki eksen ve on soru **ben** yazdım; gstack'e
+> yalnız planı verdim. Yani "gstack kod tarafında güçlü" bulgusu kısmen benim brief'imin ürünü
+> olabilir. Dürüst karşılaştırma için ikisine de aynı serbest brief verilen ikinci bir tur gerekir.
+> Bu tur **yapılmadı** — hüküm bu sınırla okunur.
+
+---
+
+## Değerlendirme: aracı mı tutalım, sorularını mı? (URUN hükmü, Recep sordu)
+
+**Aracın asıl katkısı bulduğu hatalar değil, SORDUĞU SORU.** `plan-challenger` *"bu plan yanlış
+mı"* diye sorar; `/plan-eng-review` *"bu plan gerekli mi"* diye sorar. Bugünkü somut karşılığı:
+bizim araçlarımız planın iki P0 hatasını buldu, gstack ise planın bir adımının **hiçbir vakayı
+kurtarmadığını** gösterip Faz 1'i küçülttü. Hata bulmak kolaydır; iş azaltmak zordur.
+
+**Bizde olmayan ve gstack'in getirdiği dört soru:**
+1. *Bu adım gerekli mi?* — Adım 5 (pgroonga A/B) dokuz vakanın hiçbirini kurtarmıyordu; çıkarıldı.
+2. *Bu zaten var mı?* — "What already exists" envanteri; `INV-SEARCH-ROUTE-1`'in varlığını bu
+   soru buldu ve planın "hiçbir kapı aramayı ölçmüyor" cümlesini çürüttü.
+3. *Kaç yol test ediliyor?* — 26 kod/kullanıcı yolundan 3'ü, yani %12. Sayı verilmeden "kapı
+   yazacağız" demek ölçüsüzdür.
+4. *Çalışan bir şeyi bozuyor muyuz?* — `VRT-17160` bugün kusursuz; yazım hatası yedeği onu
+   bozabilir. Bu kural bizde yazılı değildi.
+
+**İki çekince, ikisi de yapısal.**
+
+- **Araç bu projede BİRİKMİYOR.** Kendi telemetrisi, öğrenme kaydı, inceleme günlüğü ve sürüm
+  yükseltmesi var; bu turda hepsi kapatıldı (gerekçeleri aşağıdaki sapma listesinde). Kapalı
+  oldukları sürece araç her seferinde sıfırdan başlar. Açarsak da **dışa bağımlılık** doğar: başka
+  bir projenin sürüm yükseltmesi bizim inceleme davranışımızı değiştirebilir.
+- **Araç bu projenin kurallarını bilmiyor.** "Migration merge = prod'a otomatik uygulama" gibi
+  bize özel ve pahalı kuralları **brief'e ben yazdığım için** gördü. Yazmasaydım görmezdi. Yani
+  aracın kalitesi kısmen brief'i yazanın kalitesidir.
+
+**Hüküm:** aracı kullanmaya devam et, ama **kalıcı değeri araçta değil sorularda ara.** Yukarıdaki
+dört soru `plan-challenger`'a bir bölüm olarak taşınmalı. Dayanak: bugün gstack'e özgü 12 bulgunun
+çoğu bir yetenek farkından değil, **soru tipi farkından** doğdu — aynı soruları biz de sorabiliriz.
+O zaman araç yarın kaybolsa da kazanç depoda kalır.
+
+**Taşıma kalemi açılması gerekiyor** (`plan-challenger`'a kapsam-daraltma + mevcut-varlık +
+test-kapsamı + regresyon soruları). Bu dosya onu ADIYLA işaret eder; açılmadığı sürece bu hüküm
+"hatırlanan" kalır, "emre yazılan" olmaz.
+
+> ✅**TAŞINDI — REC-347, 2026-09-16 (ALTYAPI).** Dört soru `plan-challenger`'a **Adım 2** olarak
+> girdi (`.claude/skills/plan-challenger/SKILL.md` ve `.agent/skills/...`, iki ağaç): **S1**
+> gerekli mi (sayıyla; kurtarmıyorsa ÇIKAR) · **S2** zaten var mı (envanter; varsa yeniden
+> yazma) · **S3** kaç yol test ediliyor (sıfırsa "SINANMIYOR" damgası) · **S4** çalışan bir şeyi
+> bozuyor muyuz (canlı ÖNCE/SONRA; korunacak davranış kapıya yazılır). S4'ün altında CLAUDE.md
+> kural 13 ve 14 **sabit satır** olarak duruyor — gerekçe bu dosyanın kendi bulgusu: dış araç o
+> kuralı yalnız brief'e yazıldığı için gördü.
+> Cetvel satırı: `execution-method-standard.md` §2.2. AXIOM A6 ve A7 eklendi (tablo olmadan rapor
+> yok; hüküm S1'in sayısına dayanır). Sınav: `evals.json` 12/8, **`.claude` tarafında hiç yoktu**,
+> yazıldı.
+> **İlk gerçek koşum:** `docs/audits/rec347-dort-soru-2026-09-16.md` — REC-340 Faz 1 planı yeniden
+> denetlendi. Sonuç: yedi adımın beşi KALSIN, biri DARALT, biri (zaten) ÇIKAR; **iki adım yeni
+> "SINANMIYOR" damgası aldı** ve **bir ilan edilmiş kapı kolunun yazılmadığı** görüldü.
+> ⭐Bu dosyanın hükmü — "kalıcı değeri araçta değil sorularda ara" — ödedi: sorular taşındıktan
+> sonra ilk büyük bulgu planda değil **kendi yetenek dosyamızda** çıktı (on bölümün dokuzu zaten
+> başka yerde yazılıydı).
+
+---
+
+### gstack'in koşturulmayan kısımları (sapma listesi)
+
+Aşama 4'te yazılan sapmanın dışında, alt ajan şunları da atladı (emirle): dış ses turu (Codex /
+çapraz model), test planı artefaktı yazımı, inceleme günlüğü (`gstack-review-log`), telemetri,
+öğrenme kaydı. Bunlar aracın **kendi hafızasını** besleyen adımlar; atlandıkları için gstack bu
+projede tur tur birikmiyor. Aracı sürekli kullanacaksak bu adımların açılması ayrı bir karardır.
 
 
 ---
@@ -3141,6 +3788,192 @@ vaat bütünlüğü cetveli bunu zaten yasaklıyor; taslakta o cümleler ayıkla
 
 
 ---
+# FILE: docs\audits\icerik-hatti-carm-hukum-geri-cekildi-2026-09-10.md
+
+# ⛔HÜKÜM GERİ ÇEKİLDİ: "8 ürün kaynakta YOK" — YANLIŞTI (REC-212, 2026-09-10)
+
+Bugün erken saatte şu hükmü verdim ve OPS'a bildirdim:
+
+> *"`URUN KAYNAKTA YOK 147` satırı **gerçek**, ölçüm kusuru değil. Bu 8 ürün için kaynak
+> **yok**; web kaynağı dizine eklenmeli."*
+
+**Bu hüküm yanlış. Ürünlerin kaynağı elimizde, kaynak dizininde, 42 sayfa.**
+
+## Nasıl çıktı
+
+`data-table`'ı ailelere yayarken bir çağrı RPC hatası verdi (`rpc_code=3`). Sebebi ararken
+defterdeki kaynakların durumunu saydım: **60 kaynağın 6'sı `ready` değil, `error`.**
+Ve o altının biri: **`2022-11-en-ca-rm-es-radon.pdf`** — tam olarak "kaynağı yok" dediğim
+8 ürünün belgesi.
+
+Diskte ve kaynak dizininde ölçtüm: belge **var, 42 sayfa, 20.536 karakter metin**.
+
+## Belgede ne yazıyor (dizin satırından, PDF açılmadan)
+
+**s.23** — `THE RADON-SPECIFIC VORTICE RANGE — VORT CA RM ES`
+> Duct exhaust fan · Diameters **100-125-150-160-200 mm** · **IPX7** (immersion watertight)
+> · Electronically controlled brushless motors
+
+**s.24** — `VORT CA RM RF ES`
+> Rooftop suction unit · Diameters **150-160-200 mm** · **IP45** (suitable for outdoor
+> installation) · Electronically controlled brushless motors
+
+Bu, sekiz ürünümüzün tam karşılığıdır.
+
+## Niçin ölçüm onları bulamadı — üç ayrı sebep, üçü de bizim tarafımızda
+
+1. **Kodla arandılar.** `16257`…`16281` **Avensair sipariş kodlarıdır**; bu belge
+   **üreticinin** belgesi ve o kodları taşımaz. Kod aramak burada yanlış anahtardı.
+2. **Ad ile ikinci eşleme denenmedi.** O kural bende yalnız **kodu OLMAYAN** ürünler için
+   çalışıyor. Bu 8 ürünün kodu var → ad araması hiç denenmedi. Kural doğruydu, **kapsamı
+   dardı**.
+3. **Ad biçimi de tutmazdı:** pakette `CA-RM 100 ES`, belgede `VORT CA RM ES` + çap listesi
+   ayrı satırda. Model ile ölçü ayrışmış.
+
+**Defter niçin "yok" dedi:** o kaynak defterde `error` durumunda — defter belgeyi
+**hiç okuyamadı**. Dünkü 18/18 sınavı geçerli ama **sorusu kod'du**: kodlar gerçekten
+dizinde yok. Ben oradan "ürün kaynakta yok" sonucunu çıkardım. *Ölçüt keskindi, evren
+yanlıştı* — ölçtüğüm şey koddu, hüküm verdiğim şey ürün.
+
+## ⭐İLK GERÇEK ÇELİŞKİ ADAYI — IP sınıfı
+
+Kaynak s.23/24 ile paketi karşılaştırdım:
+
+| ürün | pakette | kaynakta | durum |
+|---|---|---|---|
+| CA-RM 100 / 125 / 150 / 160 / 200 **ES** | IPX7 | **IPX7** | ✅ doğrulandı |
+| CA-RM 150 / 160 / 200 **RF ES** | **IPX5** | **IP45** | ⛔**ÇELİŞİYOR** |
+
+`IPX5` ile `IP45` aynı şey değildir: `IPX5` toz derecesini **belirtmez**, `IP45` toz 4 +
+su 5 demektir. Çatı fanı dış ortama monte ediliyor; toz derecesi müşteriye görünen bir
+vaattir.
+
+Çaplar tutarlı: pakette 97/122/147/157/197 (**gerçek ölçü**), kaynakta 100/125/150/160/200
+(**nominal**). Bu bir çelişki değil, iki farklı büyüklük.
+
+**Hüküm vermiyorum, ölçümü bildiriyorum:** üç üründe IP değeri kaynakla uyuşmuyor.
+Düzeltme kaynağa uyar; ama vitrinde görünen teknik veri olduğu için yazım Recep'in kapısıdır.
+
+## Ne değişti
+
+- `defter-tablo-uret.mjs`: yalnız `ready` kaynak `-s` ile verilir. `error` kaynağı vermek
+  hem RPC'yi reddettiriyor **hem de** defterin körlüğünü bizim hükmümüze taşıyor.
+- **Açık iş:** kaynak eşlemesinde ad-ile-ikinci-eşleme, **kodu olan ama kodla bulunamayan**
+  ürünlere de genişletilmeli. `URUN KAYNAKTA YOK 147` bu genişletmeden sonra yeniden ölçülecek.
+- **Açık iş:** defterdeki 6 `error` kaynağı yeniden yüklenmeli — defter onları okuyamıyor,
+  yani o belgelerden gelen her "yok" cevabı **kanıt değil**.
+
+---
+> Ölçüm: 2026-09-10 · URUN-KATALOG · PDF açılmadı (dizin satırı okundu) · prod DB yazımı yok
+
+
+---
+# FILE: docs\audits\icerik-hatti-defter-iki-yol-2026-09-10.md
+
+# DEFTER: İKİ YOL ÖLÇÜLDÜ — `ask` mi, `data-table` mı? (REC-212, 2026-09-10)
+
+**Soru:** Kaynak eşlemesinin bulamadığı değerler için defter (NotebookLM) hangi yolla
+sorulmalı — serbest soru (`ask`) mı, kaynak-kısıtlı tablo üretimi (`generate data-table`) mı?
+**Pilot aile:** STORM Serisi (pakette **20 ürün**, çözülmemiş **223** teknik değerle en tepede).
+**PDF açılmadı** (K15). Canlı DB'ye yazım yok.
+
+## Kapsam: `data-table` açık ara üstün
+
+| ölçüt | `ask` (6 soru) | `data-table` (1 soru) |
+|---|---|---|
+| süre | 6 × ~50 sn = ~5 dk | **62 sn** |
+| STORM ürünü kapsamı | **0 / 20** | **20 / 20** |
+| ürün **kodu** verdi mi | hayır (yalnız "STORM 10" gibi model adı) | **evet, 21 kod** |
+| çıktı biçimi | serbest metin (22.141 karakter) | **CSV, 21 satır × 13 kolon** |
+| hücre doluluğu | — | 7 alanın 7'sinde **21/21** |
+
+**Kodların doğrulaması — uydurma YOK:** data-table'ın verdiği **21 kodun 21'i** hem paketteki
+ürünlerle hem **kaynak dizinindeki metinle** eşleşti. Defter kod uydurmadı.
+
+## ⛔Ama DOLULUK KANIT DEĞİL — asıl ölçüm bu
+
+"7 alanın hepsi 21/21 dolu" cümlesi tek başına yanıltıcıdır. Hücrelerin **ne** taşıdığını
+ölçtüm:
+
+| alan | tek değer | **ARALIK** |
+|---|---|---|
+| gerilim V | 3 | **18** |
+| devir rpm | 4 | **17** |
+| ağırlık kg | 6 | **15** |
+| statik basınç Pa | 14 | 7 |
+| güç kW | 14 | 7 |
+| hava debisi m³/h | 13 | 8 |
+| IP sınıfı | 21 | 0 |
+
+**Sayfa atfı: 21 satırın 18'inde ÇOKLU** — örnek: `"4, 5, 7, 96, 33, 34, 35"`.
+Yani "hangi sayfada yazıyor" sorusunun cevabı **verilmemiş**, yedi sayfa birden listelenmiş.
+
+Bir ürünün ağırlığı `"2,10 - 4,33"` ise o ürünün ağırlığı **bilinmiyor** demektir; verilen şey
+ürün değeri değil, **aile aralığıdır**. Dolu görünen hücre, boş hücreden daha tehlikelidir:
+boş hücre kendini bildirir, aralık taşıyan hücre kesin değer gibi okunur.
+
+*(Aynı ders sınıfı: 2026-09-09'da "VAR %56" rakamının üçte biri tesadüf çıkmıştı. Ölçüt
+doluluk olduğunda, dolu olan her şey iyi görünür.)*
+
+## ⭐ASIL BULGU: STORM'un değerleri kaynakta KESİN DEĞİL
+
+İki yol da aynı yere çıktı ve **birbirini doğruladı**:
+- `ask`, STORM/debi sorusuna *"model bazında net/sabit bir maksimum hava debisi tablo değeri
+  verilmemiştir (kaynakta yok); debi yalnızca performans grafiklerinde **eğri** olarak var"*
+  dedi ve seri geneli için `50–5.000 m³/h` aralığını `avens_fiyat_listesi` s.42 atfıyla verdi.
+- `data-table`, aynı alanlarda **aralık** üretti — çünkü kaynakta okunacak tek sayı yok.
+
+Yani STORM'un 223 çözülmemiş satırı bizim betiğimizin kusuru **değil**: kaynak o değerleri
+**tablo olarak vermiyor, çizim olarak veriyor**. Metin arayan hiçbir araç orada sayı bulamaz.
+
+**Bu bir soru doğurur (Recep'e değil, ölçüme):** DB'deki kesin STORM değerleri nereden geldi?
+Kaynakta tek sayı yoksa, o sayılar ya eğriden okundu ya başka bir yerden. Adım 5'in fark
+raporu bunu ayrıştırmalı.
+
+## ⭐DEFTER ÇİFT YÖNLÜ SINAVI GEÇTİ — 18/18
+
+Defterin sözüne güvenmek yerine **her iddiasını dizinle sınadım**. Sınav konusu: kaynak
+eşlemesinin hiçbir kaynakta bulamadığı **8 ürün** (`VRT-16257…16281`, Vortice CA-RM serisi).
+
+Defter, sorulduğunda net konuştu: *"CA-RM serisi fanlar ve bu modellere ait ürün kodları
+**kaynaklarda yoktur**"* — ve yanına, kaynakta **gerçekten bulunan** komşu serileri saydı.
+
+| defterin iddiası | dizin ölçümü |
+|---|---|
+| "bu 10 kod kaynakta VAR" (16170, 16171, 16174, 16270, 16271, 16275, 16237, 16241, 16150, 16153) | **10/10 dizinde bulundu** (dosya + sayfa ile) |
+| "bu 8 kod kaynakta YOK" (16257…16281) | **8/8 dizinde yok** |
+
+**18/18.** Defter yalnız varlığı değil, **yokluğu da doğru bildirdi** — ve yokluk kanıtı
+uydurmaya en açık yerdir, çünkü "bulamadım" demek yerine benzerini uydurmak kolaydır.
+Burada uydurmadı: CA-RM yerine CA ES / CA-IL QUIET ES serilerini **ayrı seriler olarak**
+gösterdi, CA-RM'in yerine geçirmedi.
+
+**Kod bloğu dersi tekrar etti:** CA-RM kodları (16257–16281), kaynakta bulunan CA-IL QUIET ES
+(16270–16276) ve CA MD RF EP (16237–16242) bloklarının **arasına** düşüyor. Komşu kod aynı
+ürün demek değildir — 2026-09-09'daki `11936` hükmünün aynısı.
+
+**Sonuç:** `URUN KAYNAKTA YOK 147` satırı **gerçek**, ölçüm kusuru değil. Bu 8 ürün için
+kaynak **yok**; OPS'un (c) hükmü — web kaynağı dizine eklenmeli (`web_kaynagi_ekle.py`,
+K7.3) — doğru yoldur. Değer **uydurulmaz**.
+
+## Hüküm: iki yol RAKİP DEĞİL, ZİNCİR
+
+1. **`data-table` + `-s <kaynak id>`** → aile başına **tek** çağrı; **ürün kodlarını** ve alan
+   çatısını getirir. Kod, dizinle **deterministik** eşleşmenin anahtarıdır.
+2. **Kesin değer dizinden okunur** — defterin sayısı değil, dizin satırı kanıttır.
+3. **`ask`** → "bu değer kaynakta var mı, yoksa nerede?" sorusunun cevabı için; tekil sayfa
+   atfı verebiliyor ve **"kaynakta yok" diyebiliyor** — data-table bunu diyemez, aralık uydurur.
+4. **ARALIK taşıyan hücre ürün değeri sayılmaz**, `aile araligi` olarak işaretlenir.
+
+⚠**`-s` kaynak kısıtı zorunlu:** OPS ölçtü — kısıtsız çağrıda "JET" sorusuna Vortice VORT
+JET-A cevabı geldi (yanlış aile). Kısıt, doğru evreni seçer.
+
+---
+> Ölçüm: 2026-09-10 · URUN-KATALOG · PDF açılmadı · prod DB yazımı yok
+> Ham çıktılar pakette: `defter-cevaplari.jsonl` (12 ask cevabı) · data-table CSV
+
+
+---
 # FILE: docs\audits\icerik-hatti-faz2-inceleme-2026-09-07.md
 
 # REC-172 Faz 2 — KATALOG incelemesi (ikinci göz)
@@ -4474,6 +5307,156 @@ sıçramasına rağmen tutmuş — ama bu **ölçüldüğü için** biliniyor, g
 
 Determinizm sınavı (aynı PDF iki kez → byte-eşit) bu koşumda ayrıca koşulmadı; yerine daha güçlü bir
 ölçüm yapıldı: **farklı araç sürümüyle** üretilen iki çıktı ortak sayfalarda byte düzeyinde eşit çıktı.
+
+
+---
+# FILE: docs\audits\icerik-hatti-kaynak-eslemesi-2026-09-09.md
+
+# ADIM 3 — KAYNAK EŞLEMESİ ÖLÇÜMÜ (REC-212 F1, 2026-09-09)
+
+**Soru:** Paketteki 5168 teknik değerin her biri kaynak dizininde bulunuyor mu?
+**Yöntem:** `scripts/icerik-hatti/kaynak-eslemesi.mjs` — tek koşum, 2129 kaynak sayfası,
+**PDF açılmadı** (K15). Canlı DB'ye yazım yok, salt okuma.
+
+## Sonuç (OPS teşhis emri 12:25Z sonrası — sınıflar AYRIŞTIRILDI)
+
+| durum | satır | oran | ne demek |
+|---|---|---|---|
+| VAR | 2192 | 42.4% | değer, ürün kodunun 80 karakter yakınında |
+| TUREV | 655 | 12.7% | **kaynakta ARANMAZ** — türetilmiş değer |
+| DEGER YOK | 1800 | 34.8% | ürünün sayfası var, değer yok |
+| KOD YOK | 75 | 1.5% | ürünün model kodu yok → **arama YAPILAMADI** |
+| URUN KAYNAKTA YOK | 147 | 2.8% | kod var, hiçbir kaynakta geçmiyor |
+| CELISIYOR | 299 | 5.8% | → `celiski-listesi.csv` (sınıflı) |
+
+**ARANABİLİR EVREN 4438** (5168 − türev 655 − kodsuz 75) → bu evrende **VAR %49.4**.
+
+### İlk tablo YANLIŞ İŞ DOĞURACAKTI — iki sınıf ayrıştırıldı
+
+**1. TÜREV (655).** İlk teşhiste "DEGER YOK" kovasının tepesinde `erp_compliant: true` (174),
+`pq_curve: [[0,353],…]` (132), `max_delivery_ls: 27.78` (156) çıktı. Bunların **hiçbiri
+katalogda yazmaz**: biri boolean bir hüküm, biri eğrinin sayısallaştırılmışı, biri m³/h
+değerinden **bölünerek** üretilmiş. Ölçüt uydurulmadı, **ölçüldü**: birim türevi kardeş
+alanla bölme sınanarak doğrulanıyor (`max_delivery_m3h ÷ 3.6`, %1 tolerans).
+Bunlara "kaynakta bulunamadı" demek **olmayan bir iş** doğururdu.
+
+**2. KOD YOK (75) ≠ URUN KAYNAKTA YOK (147).** İlk koşumda 261 satır tek kovadaydı; teşhis
+gösterdi ki bu **13 ürün**tü ve ikiye ayrılıyordu:
+- **5 ürün** (`VRT-CA-IL-*-ES-RECT`) → bu sabah **uydurma kimliği silinen** ürünler; kodları
+  NULL olduğu için **arama hiç yapılamadı**. Bulunamamak değil, aranamamak.
+- **8 ürün** (`VRT-16257…16281`) → kodu var, kaynakta **gerçekten yok**.
+"Aranamadı" ile "arandı, bulunamadı" aynı kovaya konursa ilki de kusur sayılır.
+
+### ⭐İKİNCİ EŞLEME (ad ile) — 5 kodsuz ürün BULUNDU, ve sabahki hüküm DOĞRULANDI
+
+OPS hükmü (12:32Z-b): kodu olmayan ürün **adıyla** ikinci kez aranır. Ad normalize edilir
+(boşluk/tire eşdeğer), marka düşürülür, eşleşme en uzun parçadan başlayıp **üç parçaya
+kadar** kısaltılır — altına inilmez, çünkü `8060` tek başına ayırt edici değildir.
+
+Beş ürünün **tam adı kısaltılmadan** eşleşti: `ca il 8060 es rect` →
+`avens_fiyat_listesi_2026_HQ.pdf` s.26. **KOD YOK kovası 75 → 0.**
+
+Ve o sayfanın dizin satırı sabahki hükmü **bağımsız olarak doğruladı**:
+
+```
+KOD   MODEL              DEBİ       HIZ ANAHTARI   FİYAT (Euro)
+      CA IL 4020 ES RECT 715 m³/h   POT (REGC)     664
+      CA IL 5035 ES RECT 1610 m³/h  POT (REGC)     795
+      …
+```
+
+**Başlıkta `KOD` sütunu var, hücrelerde kod YOK.** Yani bu ürünlerin kaynakta bir kodu
+hiç olmamış. Sabah silinen `16076–16080` kodları uydurmaydı; bu, o kararın kaynaktan
+gelen ikinci kanıtıdır — ve *"kaçış valfi olmayan zorunlu alan, boşluğu uydurmayla
+doldurur"* dersinin tam sahnesi: boş kalması gereken hücre boş bırakılmamış.
+
+### Kanıtın NASIL kurulduğu kolonda: `kaynak_tur`
+
+| kaynak_tur | satır |
+|---|---|
+| model kodu | 2192 |
+| turev(kardeş alan) | 655 |
+| etiket yakini | 299 |
+| ad ("…") | 10 |
+| (boş) | 2012 |
+
+"Bulundu" tek başına yetmez: kodla mı, adla mı, türev mi bulunduğu okuyanın hükmünü
+değiştirir. Kolon bunu her satırda söyler.
+
+### Çelişki sınıfları (299) — makine, gözle değil
+
+| sınıf | satır |
+|---|---|
+| olcek (10 katı) | 125 |
+| ayni alanda cok deger | 101 |
+| birim (m3/h ↔ l/s) | 63 |
+| yuvarlama | 10 |
+| **gercek celiski** | **0** |
+
+⚠**Bu sınıflandırma CÖMERTTİR, kesin hüküm değil.** Ürün kodunun yakınında onlarca sayı
+bulunduğu için neredeyse her satır bir sınıfa oturuyor; "gerçek çelişki 0" sonucunu
+*"çelişki yok"* diye okumak yanlış olur. Kesin hüküm **etiket↔değer eşlemesi** ister —
+o da etiket sözlüğünün genişletilmesine bağlı. Şimdilik sınıf bir **ön elemedir**:
+birim ve ölçek sınıfları toplu kuralla çözülebilir, diğerleri tek tek bakılır.
+
+### İlk koşumun (ayrıştırma öncesi) rakamları
+
+| durum | satır |
+|---|---|
+| VAR | 2205 |
+| DEGER YOK | 2403 |
+| URUN KAYNAKTA YOK | 261 |
+| CELISIYOR | 299 |
+
+Çelişki yalnız **etiket sözlüğü olan 10 alanda** ölçülebildi. **1669 satırda çelişki
+ÖLÇÜLMEDİ** ve bu ayrı yazıldı — ölçülmeyeni "çelişki yok" saymak, olmayan bir güvence
+vermek olurdu.
+
+## ⭐"VAR" mutlak kanıt değil — tesadüf tabanı ÖLÇÜLDÜ
+
+İlk koşum %56 "VAR" verdi ve bu rakama güvenilmedi. Sebep: bir katalog sayfası yüzlerce
+sayı taşır; ürün kodunun ve bir sayının **aynı sayfada** bulunması tesadüf olabilir.
+
+Sınav: bütün sayısal değerler kaydırılıp **sahte** yapıldı ve aynı eşleme tekrar koşuldu.
+
+| koşum | VAR | not |
+|---|---|---|
+| sayfa içi eşleşme, gerçek değerler | 2892 (%56.0) | |
+| sayfa içi eşleşme, **sahte** değerler | 1007 (%19.5) | ⚠**gürültü** |
+| **yakınlık şartı (80 karakter)**, gerçek | **2205 (%42.7)** | |
+| yakınlık şartı, **sahte** | 355 (%6.9) | tesadüf tabanı |
+
+**Hüküm:** "VAR" satırlarının **~%16'sı tesadüf olabilir**; gerçek kanıt payı **%84
+(1850 satır)**. Bu taban artık **betiğin kendisi tarafından her koşumda ölçülür** ve
+MANIFEST'e yazılır — rakam kendi güvenilirliğini söylemek zorundadır.
+
+**Ders (cetvel §6.6'nın devamı):** *Ölçüt keskindi ama EVREN yanlıştı.* Doğru evren
+"sayfa" değil, **"satır"**dı. Pencere 40/80/120/200 taranarak seçildi; net sinyal
+(gerçek − tesadüf) 80'de doruğa çıkıyor.
+
+## Kanıtsız değer SİLİNMEDİ
+
+`DEGER YOK` (2403) ve `URUN KAYNAKTA YOK` (261) satırları **pakette duruyor**. Boş
+`kaynak_dosya` hücresi bir eksiklik değil, bir **beyandır**: "bu değeri kaynakta
+bulamadık". Silmek veriyi kaybettirir, sessizce bırakmak ise kanıtlıyla kanıtsızı
+aynı görünüme sokardı.
+
+## Örnekleme denetimi (gözle, 6 satır)
+
+Rastgele 6 "VAR" satırının alıntısı okundu: **5'i sağlam** (değer, ürün kodunun bitişiğinde
+ve doğru sütunda), **1'i şüpheli** (`VRT-65196 airflow_speed_min_ms=9`, alıntıda değerin
+konumu ikna edici değil). Bu oran ölçülen %84 kanıt payıyla tutarlı.
+
+## Sırada
+
+- `URUN KAYNAKTA YOK` 261 satır → ürünün kodu hiçbir kaynakta geçmiyor. Bu, bugün
+  5 üründe yaşanan **uydurma kimlik** sınıfının aday listesidir; ölçülür, **silinmez**.
+- Etiket sözlüğü 10 alandan geniş tutulursa çelişki kapsamı büyür — sözlük **dar tutuldu**,
+  çünkü uydurma etiket uydurma çelişki üretir.
+- Adım 5 (round-trip + DB fark raporu) bu tabloyu girdi alır.
+
+---
+> Ölçüm: 2026-09-09 · URUN-KATALOG şeridi · PDF açılmadı · prod DB yazımı yok
 
 
 ---
@@ -10648,6 +11631,446 @@ Uydurmadık, boş bıraktık. İki seçenek var: **(a)** üreticiden teknik föy
 
 
 ---
+# FILE: docs\audits\investigate-kuru-kosu-2026-09-12.md
+
+# `investigate` skill'i — geçmiş bir vakayla kuru koşu (2026-09-12, REC-307)
+
+**Soru:** 2026-09-08 "iki tmp" vakası bu skill ile **kaç adımda** bulunurdu?
+
+**Cevap: 2. adımda, 5 adımın ikincisinde — ve o adım için gereken ölçüm o gün EKRANDAYDI.**
+
+---
+
+## Vaka, olduğu gibi (kayıt: hafıza `iki-tmp-aracin-ciktisini-okudugundan-emin-ol`)
+
+Aynı Bash komutunda `MSYS_NO_PATHCONV=1` açıkken `curl -o /tmp/aks.html` koştu. curl bir
+**Windows** programı: `/tmp` → `C:/tmp/aks.html` (265349 bayt, doğru sayfa). Sonraki `grep`
+bash yerleşiğiydi ve aynı yolu MSYS'e çevirdi: `AppData/Local/Temp/aks.html` — üç saat önce
+başka bir adımın yazdığı **eski** "Aksesuarlar" sayfası.
+
+Sonuç: *"aynı adrese iki farklı sayfa dönüyor"* diye **sahte ve ciddi** bir bulgu Recep'e
+raporlandı, Linear'da High kayıt açıldı, üç şerit 25 dakika kovaladı. Site hiçbir zaman yanlış
+sayfa vermedi; gerçek kök sebep başka bir yerdeydi (test seçimi hatası, REC-286).
+
+## Skill ile yürüyüş
+
+| adım | ne derdi | vakada sonuç |
+|---|---|---|
+| 1 · Belirtiyi olduğu gibi yaz | birebir metin, komut, ağaç, damga | "aynı adres iki farklı sayfa" — yazılırdı |
+| **2 · Ölçüm evrenini kur** | **`/tmp` YASAK**, mutlak yol ya da scratchpad | ⛔**Vaka burada hiç doğmazdı**: iki ayrı `/tmp` olduğu için yol mutlak yazılırdı |
+| **2 (devam)** | **yazılanı okumadan önce boyut/damga eşle; uyuşmazsa DUR** | ⛔`curl -w size_download` **265349** ↔ `ls` **248237**. Fark ekrandaydı → DUR |
+| 3 · Canlıya arıza anında sorgu yasak | doğrulama kayıttan/yerelden | o gün canlıya iki kez gidildi; skill bunu da engellerdi |
+| 4 · Hipotezleri çürüt | "iki farklı cevap" olağanüstü iddia; ayırt edici ölçüm ister | hipotez listesi yazılsaydı "okuyucu başka dosyaya bakıyor" ilk üçe girerdi |
+| 5 · Kök sebep + kanıt + düzeltme + regresyon | — | gerçek kök sebep (test seçimi) buraya kalırdı |
+
+**Maliyet karşılaştırması:** skill yolunda gereken ek iş **tek komut** (`ls -l`, ya da zaten
+basılmış `size_download` satırını okumak). Gerçekleşen maliyet: 3 şerit × 25 dakika + bir High
+kayıt + Recep'e giden yanlış bulgunun geri çekilmesi.
+
+## Bu kuru koşunun sınırı — adıyla
+
+Bu bir **masa başı yürüyüşü**, ölçüm değil. Vakayı **sonucunu bilerek** yürüttüm; gerçek bir
+teşhiste hangi hipotezin akla geleceği bilinmez. Kuru koşunun gösterdiği tek şey şudur: skill'in
+2. adımı, o gün atlanan ölçümü **zorunlu** kılıyor ve gerekli veri zaten ekranda vardı.
+
+Skill'in gerçek etkisi ancak **yeni bir arızada** ölçülebilir. Ölçütü şimdiden yazıyorum:
+teşhis raporunda (a) ölçüm evreni beyanı, (b) en az iki çürütülmüş hipotez, (c) kök sebep tek
+cümle var mı. Üçü varsa skill koşmuş sayılır; yoksa yazılmış-okunmamış sınıfındadır.
+
+
+---
+# FILE: docs\audits\kacirma-listesi-2026-09-16.md
+
+# Kaçırma listesi — 2026-08-17 → 2026-09-16 (kod inceleme kıyasının evreni)
+
+**Ne bu:** son 30 günde kapı/inceleme yeşilken gerçek kusur geçen (KAÇIRMA) ya da kapı kırmızıyken kusur olmayan (YANLIŞ ALARM) vakaların kanıtlı listesi. Recep kararı 23 (open-code-review üç kollu kıyas, REC-318 kalem F, Faz 0-b) bu dosyayı ön şart sayar: kıyas evreni = burada **diff: EVET** ve **diff: KISMEN** etiketli vakalar + 4 geçmiş inceleme hatası (CRLF/LF, SSL mode, Türkçe küçültme, kırık işaretçi).
+
+**Nasıl üretildi:** 2026-09-16 sabah 25 ajanlık kıyas koşumunun 'anla:kacirma-listesi' ajanı (Sonnet, salt okuma); kaynaklar hafıza dizini (28 dosya), docs/audits (10), docs/skill-gozlemleri/acik (3), OPS durum dosyası, git log (579 commit) ve 30+ PR gövdesi. Ham çıktı OPS scratchpad `ocr-kiyas-workflow-journal-2026-09-16.jsonl`. Bu dosya o çıktının biçimlendirilmiş hâlidir; metin ajanındır, OPS yalnız sıraladı ve etiketleri saydı.
+
+**Etiket anlamı:** `diff: EVET` = kusur PR diff'inde alan bilgisi gerekmeden görünür (bir LLM inceleyici yakalayabilirdi) · `KISMEN` = diff'te ipucu var ama tam yargı için repo bağlamı/alan bilgisi gerekir · `HAYIR` = diff'te görünmez (canlı ölçüm, veri, zamanlama) — kıyas evrenine GİRMEZ, kapı/ölçüm katmanının işi.
+
+**Sayım:** META (vaka değil, sistem gözlemi): 2 · EVET: 14 · HAYIR: 15 · KISMEN: 19 · toplam 50 · güven dağılımı: BELGEDEN=46, OLCULDU=4
+
+**Ölçülmeyen (ajanın kendi beyanı):** hiçbir vakanın gerçek diff'i henüz bir inceleyiciye KOŞULMADI; etiketler kural metni ve desenden akıl yürütmeyle verildi. Koşum sonuçları ayrı dosyaya (`docs/audits/ocr-kiyas-*.md`) yazılır; bu dosya evren listesidir, sonuç değil.
+
+
+## Özet tablo
+
+| No | Tarih | Vaka | diff | Güven |
+| -- | -- | -- | -- | -- |
+| V1 | 09-07 | Ürünler sayfası haftalarca kategorisiz kaldı (REC-94 yan etkisi) | EVET | BELGEDEN |
+| V2 | 09-07 | Kategori bloğu DOM'da var, ekranda yok (opacity-0, sağlayıcı taşınmadı) | KISMEN | BELGEDEN |
+| V3 | 09-05 | İki hesaplayıcı sayfası Google'a boş göründü (Suspense sayfa kökünde) | KISMEN | BELGEDEN |
+| V4 | 09-04 | generateStaticParams hatayı yutuyor → build yeşil, 0 yol | EVET | BELGEDEN |
+| V5 | 09-08 | Kategori rotası hiç önceden üretilmiyordu (headers()+searchParams) | KISMEN | BELGEDEN |
+| V6 | 09-14 | jwt_role DROP merge oldu, üretilmiş tip dosyası tazelenmedi → 3 PR bloke | EVET | BELGEDEN |
+| V7 | 09-14 | DROP POLICY IF EXISTS ×3 var olmayan politikayı sessizce düşürdü | HAYIR | BELGEDEN |
+| V8 | 09-13 | Üç SKILL.md bozuk frontmatter ile sessizce boş yükleniyordu; kapılar 10/10 yeşil | EVET | BELGEDEN |
+| V9 | 09-13 | Altı ölü migration'da geçersiz `CREATE POLICY IF NOT EXISTS` (11 kez) | KISMEN | BELGEDEN |
+| V10 | 09-15 | Şema+veri koşulu+kendi COMMIT tek dosyada → sıfırdan kurulum 25/63 domino | KISMEN | BELGEDEN |
+| V11 | 09-13 | 'sharp kullanılmıyor, kaldır' — iki şerit aynı kör grep'le 0 dedi, 8 dinamik import vardı | KISMEN | BELGEDEN |
+| V12 | 09-07 | Fan gücü 0.18 W (kW yazılmış): tip/şema/konformans hepsi yeşil, vitrinde bin kat küçük | HAYIR | BELGEDEN |
+| V13 | 09-04 | package.json'a mükerrer `test:smoke` anahtarı: ikincisi sessizce öldü | EVET | BELGEDEN |
+| V14 | 08-27 | vercel-ignore-build.sh `2>/dev/null || true` ile 10 gün hiç çalışmadı, her push deploy yaktı | EVET | BELGEDEN |
+| V15 | 09-08 | vercel.json `"*": false` joker değil; kendi kapısı içeriğe baktı, sonuca değil → 60+ dağıtım, kota doldu | KISMEN | BELGEDEN |
+| V16 | 09-07 | Aralık deseni `ile`/`kadar` kelime içinde eşleşti: evrenin %31'i sessizce muaf | KISMEN | BELGEDEN |
+| V17 | 09-04 | Dört kapı hedef dala değil dosyadaki ortak dizeye bağlıydı; sabotaj yeşil kaldı | KISMEN | BELGEDEN |
+| V18 | 09-07 | 53 kapı × sabotaj: 15 FAIL-OPEN, 2 kapının evreni zaten 0 | KISMEN | BELGEDEN |
+| V19 | 09-06 | Fail-open kapı (`if kesin >= 0 and …`) + PostgREST 1000 satır sessiz tavan | EVET | BELGEDEN |
+| V20 | 09-07 | Sahte sunucu Content-Range basmıyor, Range'i yok sayıyor: sayfalama aylardır hiç ölçülmemiş | HAYIR | BELGEDEN |
+| V21 | 09-09 | Olmayan kategori 200 döndü (soft-404) ve CDN'e yazıldı; preload hata ile yokluğu aynı değere indiriyordu | EVET | BELGEDEN |
+| V22 | 08-28 | Politika canlı ama kolon GRANT yok → kimse ulaşamıyor; `revoke from public` anon'u kapatmıyor | KISMEN | BELGEDEN |
+| V23 | 08-27 | Migration komşu tablonun kolon adını taşıdı (model_code/metadata), prod koşumu düştü | EVET | BELGEDEN |
+| V24 | 08-27 | 'Geri alma' PR'ı (#855) 11 companion'ın 2'sinde içeriği yarıya indirdi, merge oldu | EVET | BELGEDEN |
+| V25 | 08-26 | 'PR #680 merge' kanıtıyla kapatılan T104-VH: LeadModal hiçbir yere yazmıyordu, müşteri verisi kayboldu | KISMEN | BELGEDEN |
+| V26 | 09-07 | tazelik.py kapısı yazıldı, doğru ölçüyor, fail-closed — ve hiçbir yerden çağrılmıyor | EVET | BELGEDEN |
+| V27 | 09-07 | Çıkarım aracı 08-20'de düzeltildi, hiç yeniden koşulmadı; CSV 22 Haziran'da kaldı, 74 ürün 3 hafta eksik | KISMEN | BELGEDEN |
+| V28 | 09-08/12 | Yeni dosya eklendi, envanter kapısı yerelde koşulmadı: bir günde 5 şerit aynı kapıya takıldı | EVET | BELGEDEN |
+| V29 | 09-15 | İlan dosyası yazılmamış bir ölçüm kaydına işaret ediyordu; 15 kolun hiçbiri varlık ölçmedi (REC-344) | EVET | OLCULDU |
+| V30 | 09-01 ve 09-15 | Türkçe küçültme I→ı: kapı İngilizce terimi göremiyor (REC-343); kanca ASCII fikstürle yanlış kırmızı | KISMEN | OLCULDU |
+| V31 | 09-16 | .agent manifest bayat → skills:verify 0→25 uyarı gizliydi | KISMEN | BELGEDEN |
+| V32 | 09-14 | Linear yorum sayacı 200 + errors yok + nodes [] döndü: 'yeni yorum yok' ile 'sorgu kör' ayrılamıyordu | KISMEN | BELGEDEN |
+| V33 | 09-15 | Defter bayatlık kancası vardı, kuruluydu, doğru ölçüyordu — 7 gün kimse görmedi (REC-342) | HAYIR | BELGEDEN |
+| V34 | 09-14 | ai-auto-repair zinciri: çağrılıyor, koşuyor, 10 PR açtı — 0/10 merge; envanter üç sorudan geçti | HAYIR | BELGEDEN |
+| V35 | 09-07/08 | YANLIŞ ALARM: SSR duman alarmı 15 saat sahte kırmızı (temsilci alfabetik ikinci yol) | KISMEN | BELGEDEN |
+| V36 | 09-07 | YANLIŞ ALARM ZİNCİRİ: master 3,5 saat kırmızı (mükerrer '## 6.'), iptal koşular 'yeşil' okundu, tüm açık PR'lar kırmızı | EVET | BELGEDEN |
+| V37 | 09-12 | YANLIŞ ALARM: karar-kayit-bagi kapısı K53'ü 8 gün AÇIK saydı, K54 aynı soruyu REC-199'a bağlamıştı | HAYIR | BELGEDEN |
+| V38 | 09-14/15 | YANLIŞ ALARM ÜÇLÜSÜ (kapı kendi evrenini yanlış seçti): render-revalidation 00_golge_onsoz.sql·INV-MECH-1 çapasız regex·commit-uyarı kancası tam yol/basename | KISMEN | BELGEDEN |
+| V39 | 08-27 | YANLIŞ ALARM: INV-DOC-2 takvimle kırmızıya döndü, suç AUTH'un merge'ine yıkıldı | KISMEN | BELGEDEN |
+| V40 | 09-08 | YANLIŞ ALARM (Recep'e gitti): 'site yanlış kategori servis ediyor' — iki farklı /tmp | HAYIR | BELGEDEN |
+| V41 | 09-05 | YANLIŞ ALARM (Linear'a iş oldu): '12 aile için kaynak yok, üreticiden metin toplanmalı' — kaynak 74 sayfalık katalogdaydı | HAYIR | BELGEDEN |
+| V42 | 09-05 | YANLIŞ ALARM (master'a indi): 'admin koyu tema tokenleri 23/23 tanımsız' — tarayıcı seçici adını varsaymıştı | HAYIR | BELGEDEN |
+| V43 | 09-09 | YANLIŞ ALARM (iş emrine döndü): 'catalog-integrity kırmızısı TLS değil gerçek veri ihlali' — ölçüm 1 saat bayattı; üç şerit üç sebep yazdı | HAYIR | BELGEDEN |
+| V44 | 09-04 ve 09-16 | YANLIŞ SAYI Recep'e beyan (3 olay): grep -c '3→1 düzeldi'·'analytics betiği canlıda yüklenmiyor'·'441 ürünün 360'ı tek kategoride, veri bozuk' | HAYIR | BELGEDEN |
+| V45 | 09-04 | YANLIŞ 'BİTTİ': PR izleyici 'kapılar bitti, düşen 0' dedi; ci hiç koşmamıştı (DIRTY PR, birleşme ref'i yok) | HAYIR | BELGEDEN |
+| V46 | 09-06 | KAPI KIRMIZI DEDİ, MERGE OLDU: `ritüel | tail -4 && gh pr merge` çıkış kodunu yuttu (#1027) | HAYIR | BELGEDEN |
+| V47 | 09-08/09 | TEST KOŞMADI AMA YEŞİL: `vitest --reporter=basic` Vitest 4'te yok → 0 test, exit 0; 'tüm paket 203/1596' aslında alt küme | HAYIR | BELGEDEN |
+| V48 | 09-16 | ÖNLENEN SAHTE ALARM (kontrol örneği): 'products/category HTML yok' — bayat 09-14 derlemesi; taze build 247 HTML | HAYIR | BELGEDEN |
+| V49 | META | Kendi diff-review skill'imiz: SKILL.md 8 kural vaat ediyor, betik 7 desen uyguluyor — Suspense kuralı HİÇ YOK (iki ağaçta da) — OLCULDU | META | OLCULDU |
+| V50 | META | CI'da otomatik LLM PR incelemesi YOK: Gemini yalnız `@gemini-cli /review` yorumuyla, auto-reviewer yalnız reviewer atar — OLCULDU | META | OLCULDU |
+
+## Vakalar
+
+### V1 · 09-07 · Ürünler sayfası haftalarca kategorisiz kaldı (REC-94 yan etkisi) — diff: EVET
+
+Ne kaçtı: REC-94 3D kategori seçiciyi müşteri yüzeyinden kaldırırken kodda 'yerine gelecek kategori kartları ayrı PR'da' yorumu bırakıldı; o PR hiç gelmedi, /tr/products ham HTML'inde /tr/category bağlantısı 0'a düştü ve hiçbir kapı görmedi. Görmesi gereken katman: REC-94 PR incelemesi (yetenek düşen değişiklik) ve konformans testi. Nasıl yakalandı: URUN şeridinin canlı ham HTML ölçümü (ajan/insan), kapı değil. Diff incelemesi: EVET — silinen bileşen ve ikame vaat eden yorum aynı diff'te; alan bilgisi gerekmez, 'yetenek silindi, ikamesi bu PR'da mı' sorusu yeter.
+
+**Kanıt:** git 387a49eb5 (#1088) gövdesi: 'SEBEBI IHMAL DEGIL, YAN ETKI ... O PR hic gelmedi; arada sayfa kategorisiz kaldi ve hicbir kapi bunu gormedi'
+
+### V2 · 09-07 · Kategori bloğu DOM'da var, ekranda yok (opacity-0, sağlayıcı taşınmadı) — diff: KISMEN
+
+Ne kaçtı: #1088 ile taşınan blok `opacity-0` ile başlıyor ve `data-in-view` gelince açılıyor; niteliği yazan ScrollObserver yalnız HomePage'de mount ediliyordu; 7 öğenin 7'si opaklık 0'da kaldı, 8 konformans kolu yeşildi. Görmesi gereken: test katmanı (jsdom görünürlüğü ölçemez, yapısal kör nokta) ve PR incelemesi. Nasıl yakalandı: insan, gerçek tarayıcı/ekran görüntüsü (ana ağaçta rec213a-masaustu.png vb. duruyor). Diff incelemesi: KISMEN — `opacity-0` + `data-in-view` sınıfı diff'te görünür, ama sağlayıcının yalnız HomePage'de olduğu başka dosyada; çapraz dosya sözleşme bilgisi gerekir.
+
+**Kanıt:** memory yesil-kapi-gorundugunu-kanitlamaz.md: 'Sekiz konformans kolu yesilken /products'taki kategori blogu ekranda HIC GORUNMUYORDU (2026-09-07, REC-213-A) ... ScrollObserver yalniz HomePage'de mount ediliyordu'; git status ana ağaç: rec213a-masaustu.png, rec213a-ust-bosluk-onarildi.png
+
+### V3 · 09-05 · İki hesaplayıcı sayfası Google'a boş göründü (Suspense sayfa kökünde) — diff: KISMEN
+
+Ne kaçtı: hrv ve hava-perdesi rotalarında useSearchParams'ı saran Suspense page.tsx'te sayfanın tamamını sarıyordu; sunucu 0 kelime, jenerik meta description. Kural 5 lafzen sağlanıyordu, her kapı 'Suspense var mı' sorusuna EVET alıyordu. Görmesi gereken: PR incelemesi ve konformans kapısı. Nasıl yakalandı: URUN canlı ölçüm (sunucudan <h1> 0, kelime 0). Diff incelemesi: KISMEN — sayfa-boyu <Suspense> diff'te görünür; 'sınır ağacın tamamını CSR'a düşürür' bilgisi Next.js alan bilgisidir. Not: kendi diff-review SKILL.md kural 8 tam bu sınıfı vaat eder ama betikte yoktur (V49) ve vaat edilen kural bile yalnız varlık sorar, yer sormaz.
+
+**Kanıt:** git d3ab1eae3 (#1014): 'KURAL 5 LAFZEN SAGLANIYORDU ... Hicbir kapi gormedi cunku hepsi "Suspense var mi" sorusuna EVET aliyordu'; CLAUDE.md kural 5 EK (2026-09-05 ölçümü)
+
+### V4 · 09-04 · generateStaticParams hatayı yutuyor → build yeşil, 0 yol — diff: EVET
+
+Ne kaçtı: `catch → return []` ve kategoride `error` okunmadan `data || []`; ağaçta .env yokken placeholder Supabase'e düşüp sıfır yol üretiyor, build yeşil; CI de dummy.supabase.co ile aynı körlükte. Görmesi gereken: bu kodu getiren PR incelemesi ve CI build kapısı (prerender yol sayısı ölçülmüyordu). Nasıl yakalandı: URUN .next artefaktını açıp saydı. Diff incelemesi: EVET — yutulan hata deseni (`catch { return [] }`) diff'te düz görünür, alan bilgisi gerekmez.
+
+**Kanıt:** memory olcut-keskin-ama-evren-yanlis-build.md (2026-09-04, REC-59): 'generateStaticParams hatayı yutuyor (catch → return [], kategoride error hiç okunmadan data || []) → build yeşil, sıfır yol. CI de aynı körlükte (dummy.supabase.co)'
+
+### V5 · 09-08 · Kategori rotası hiç önceden üretilmiyordu (headers()+searchParams) — diff: KISMEN
+
+Ne kaçtı: iki sebep birden (headers() çağrısı ve searchParams okuma) rotayı dinamiğe düşürüyordu; 0 HTML. Üç kollu sabotaj: birini kaldırmak 0, ikisini kaldırmak 46 HTML. Görmesi gereken: PR incelemesi + CI (rota sınıfı ilanı kapısı yoktu). Nasıl yakalandı: URUN ölçüm. Diff incelemesi: KISMEN — headers()/searchParams çağrıları görünür; statik niyetle çeliştiğini görmek Next.js rota sınıfı bilgisi ister.
+
+**Kanıt:** git 7849bbce0 (#1136): 'taban (ikisi de var) -> 0 HTML · yalniz searchParams kaldirildi -> 0 · yalniz headers() kaldirildi -> 0 · IKISI birden -> 46 HTML'
+
+### V6 · 09-14 · jwt_role DROP merge oldu, üretilmiş tip dosyası tazelenmedi → 3 PR bloke — diff: EVET
+
+Ne kaçtı: #1186 migration'ı prod'da jwt_role fonksiyonunu düşürdü; database.types.ts hâlâ taşıyordu; PR kapıları 15/15 yeşil geçti çünkü PR anına bakıyorlar; prod'a inince tip-drift kapısı her PR'da kırmızı yandı (#1187 #1189 #1188 bloke). Görmesi gereken: PR incelemesi ('DROP var, üretilmiş tip dosyası diff'te yok'). Nasıl yakalandı: CI kapısı, ama merge SONRASI. Diff incelemesi: EVET — DROP FUNCTION satırı ile database.types.ts'in diff'te bulunmaması birlikte görünür; proje kuralı bilgisi (supabase:gen) yeter.
+
+**Kanıt:** git f220fb85f (#1190): 'tip-drift kapisi (INV-TIP-DRIFT-1) bu yuzden HER PR da kirmizi veriyordu ve uc PR birden bloke idi'; memory yesil-kapi EK 2026-09-14: '#1186 PR kapılarından 15/15 geçti, prod'a indi; SONRA tip-drift kapısı her PR'da kırmızı'
+
+### V7 · 09-14 · DROP POLICY IF EXISTS ×3 var olmayan politikayı sessizce düşürdü — diff: HAYIR
+
+Ne kaçtı: migration'daki üç DROP POLICY IF EXISTS storage.objects'te olmayan politikaları hedefliyordu; 09-13 ölçümü politika adına bakmış, tabloyu ayırt etmemişti (aynı ad public.product_images'ta ayakta). 'Migration başarıyla uygulandı' ≠ 'değişiklik oldu'. Görmesi gereken: plan-challenger / migration öncesi canlı ölçüm. Nasıl yakalandı: ALTYAPI uygulama sonrası canlı yeniden ölçüm. Diff incelemesi: HAYIR — hangi tabloda hangi politikanın var olduğu canlı DB durumu; diff'te görünmez.
+
+**Kanıt:** memory yesil-kapi-gorundugunu-kanitlamaz.md EK 2026-09-14 (REC-322/335): 'üç DROP POLICY IF EXISTS satırı var olmayan politikaları düşürdü ve sessizce geçti; 09-13 ölçümü politika ADINA bakmış, TABLOYU ayırt etmemişti'
+
+### V8 · 09-13 · Üç SKILL.md bozuk frontmatter ile sessizce boş yükleniyordu; kapılar 10/10 yeşil — diff: EVET
+
+Ne kaçtı: alıntısız YAML düz skalerinde iki nokta (`PPR icin DEGIL:`, `Tetik: katalog oku`) tüm frontmatter'ı düşürüyor; name/description yok olunca skill yönlendirmede hiç seçilemiyor. skill-yuku-butcesi (4 kol) ve skill-bitis-blogu (6 kol) o süre boyunca yeşildi çünkü frontmatter'ı ayrıştırmıyor, metin tarıyorlardı. Görmesi gereken: konformans kapısı / kanca. Nasıl yakalandı: dış yerleşik araç (`claude plugin validate`) ilk koşusunda. Diff incelemesi: EVET — alıntısız iki noktalı description satırı diff'te düz görünür; YAML temel bilgisi yeter.
+
+**Kanıt:** docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md §1 ve §1.1: 'skill-yuku-butcesi (4 kol) ve skill-bitis-blogu (6 kol) o üç dosya bozukken de 10/10 yeşil veriyordu'; git 6f7bdb9c9 (#1174)
+
+### V9 · 09-13 · Altı ölü migration'da geçersiz `CREATE POLICY IF NOT EXISTS` (11 kez) — diff: KISMEN
+
+Ne kaçtı: PostgreSQL bu sözdizimini desteklemez; dosyalar ledger bootstrap'ı 'görülmüş' saydığı için hiç koşmadı, koşsaydı tur kırmızı olurdu. PR anında SQL içeriğini okuyan hiçbir kapı yoktu (INV-MIGRATION-1 atomiklik, -2 damga). Görmesi gereken: o günkü PR incelemesi ve CI SQL linter'ı (yoktu). Nasıl yakalandı: yeni araç squawk ilk taramasında (#1172). Diff incelemesi: KISMEN — sözdizimi diff'te görünür; geçersiz olduğunu bilmek PostgreSQL alan bilgisi ister.
+
+**Kanıt:** docs/audits/rec315-squawk-ilk-tarama-2026-09-13.md §1 ('Bugüne kadar bu dosyaları PR anında hiçbir kapı içerik olarak okumuyordu') ve §4.3 ('altı dosyada 11 kez'); git b1f19e5cb (#1172)
+
+### V10 · 09-15 · Şema+veri koşulu+kendi COMMIT tek dosyada → sıfırdan kurulum 25/63 domino — diff: KISMEN
+
+Ne kaçtı: 20260811_f2_split_model_schema.sql brands/product_families şemasını yaratıp aynı işlemde 'kategori sayısı 4 değil' diye geri alıyor ve kendi commit'ini yazıyor; boş gölgede şema da geri gidiyor, sonraki ~20 migration düşüyor. Görmesi gereken: create-migration PR incelemesi (dosya pencere dışında yazıldı, kusur pencere içinde keşfedildi). Nasıl yakalandı: ALTYAPI gölge küme replay'i. Diff incelemesi: KISMEN — üç öğe tek dosyada görünür; 'veri koşulu şema ile aynı işleme girmez' migration tasarım bilgisi ister.
+
+**Kanıt:** docs/audits/rec336-baseline-2026-09-15.md §4: '25 DÜŞEN, SUÇLU TEK DOSYA ... 20260811_f2_split_model_schema.sql'; git 53da8f2f4 (#1201)
+
+### V11 · 09-13 · 'sharp kullanılmıyor, kaldır' — iki şerit aynı kör grep'le 0 dedi, 8 dinamik import vardı — diff: KISMEN
+
+Ne kaçtı (yanlış 'kaldır' yönünde): OPS ve ALTYAPI yalnız `from 'sharp'`/`require('sharp')` aradı; scripts/media/*.mjs 8 dosyada `await import('sharp')` kullanıyor; kaldırılsaydı katalog görsel hattı kırılır, betikler CI'da koşmadığı için kapı görmezdi. Görmesi gereken: plan/PR incelemesi (bağımlılık kaldırma). Nasıl yakalandı: ALTYAPI PR aşamasında çıplak ad grep'i. Diff incelemesi: KISMEN — package.json'dan düşen satır diff'te; kullanımı bulmak depo genelinde arama ister, tek diff yetmez.
+
+**Kanıt:** memory statik-import-sifir-kullanilmiyor-demek-degil.md (2026-09-13): 'grep -rn "sharp" scripts/media/*.mjs ile 8 dosya/17 satır ... await import(\'sharp\')'; git 193db1437 (#1178) '"sharp kaldir" CURUTULDU'
+
+### V12 · 09-07 · Fan gücü 0.18 W (kW yazılmış): tip/şema/konformans hepsi yeşil, vitrinde bin kat küçük — diff: HAYIR
+
+Ne kaçtı: max_absorbed_power_w=0.18 sayı, pozitif, geçerli; yanlış olan fizik. Aynı alanda 10'dan küçük 12 değerin 10'u doğru (Vortice ev fanları 4-9 W), yalnız 2'si ad kanıtıyla hatalı. Görmesi gereken: veri kapısı / katalog içe alma doğrulaması (yoktu). Nasıl yakalandı: URUN-KATALOG'un ürün adı kanıtlı ölçümü. Diff incelemesi: HAYIR — veri satırı, kod diff'i yok; makul aralık kararı HVAC alan bilgisi ister.
+
+**Kanıt:** git 3ea52fc0d (#1094): 'DORDUNCU SINIF EN TEHLIKELISI, HICBIR KAPI GORMEZ: 0.18 degeri sayi, pozitif, gecerli ... SEAT 20 ATEX'in gucu artik 0,18 W degil 180 W'
+
+### V13 · 09-04 · package.json'a mükerrer `test:smoke` anahtarı: ikincisi sessizce öldü — diff: EVET
+
+Ne kaçtı: SSR duman kilidine verilen ad satır 23'te zaten vardı (playwright); yeni satır 18'e yazıldı, JSON ayrıştırıcı sonuncuyu aldı; pnpm/tsc/eslint/konformans hiçbiri görmedi; yeni workflow SSR kilidini hiç ölçmeyecekti. Görmesi gereken: PR incelemesi + lint. Nasıl yakalandı: yazar `pnpm test:smoke` koşup playwright'ın çalıştığını gördü (şans). Diff incelemesi: EVET — eklenen anahtar dosyada zaten var; dosya bağlamıyla okunan diff'te düz görünür.
+
+**Kanıt:** memory json-mukerrer-anahtar-sessizce-yutulur.md (2026-09-04, REC-134): 'repo'da o ad ZATEN vardi (playwright test, satir 23). Benimki satir 18'e yazildi ve olu dogdu'
+
+### V14 · 08-27 · vercel-ignore-build.sh `2>/dev/null || true` ile 10 gün hiç çalışmadı, her push deploy yaktı — diff: EVET
+
+Ne kaçtı: atlama listesi tamdı ama taban çözümü iki zincirde düşüyor, kurtarma `git fetch ... 2>/dev/null || true` ile yutuluyordu; betik her kararını günlüğe yazıyor, tek başarısız adımı yazmıyordu. Görmesi gereken: betiği getiren PR incelemesi ve pozitif iz ölçen test. Nasıl yakalandı: Hobby kotası dolup tren durunca I18N kök neden avı (bedelle). Diff incelemesi: EVET — kritik adımı saran `|| true` + `2>/dev/null` çifti klasik görünür anti-desen.
+
+**Kanıt:** memory yutulan-hata-on-gun-gizlenir.md (2026-08-27): 'kurtarma denemesi git fetch ... 2>/dev/null || true ile YUTULUYORDU ... kusur 10 gun boyunca her push'ta bir deploy yakti'
+
+### V15 · 09-08 · vercel.json `"*": false` joker değil; kendi kapısı içeriğe baktı, sonuca değil → 60+ dağıtım, kota doldu — diff: KISMEN
+
+Ne kaçtı: git.deploymentEnabled nesnesinde `*` literal dal adı sanıldı, hiçbir dalla eşleşmedi, her dal açık kaldı; INV-VERCEL-ONIZLEME-1 doğru dizeyi görüp gece boyunca yeşil yandı. Bedel: dokuz saatte 60+ dağıtım, master'ın 3 commit'i 'rate limited' ile reddedildi, site eski derlemeyi servis etti. Görmesi gereken: PR incelemesi ve kapı tasarımı (etki değil metin ölçüyordu). Nasıl yakalandı: ALTYAPI dört commit'te hipotez testi, kota dolduktan sonra. Diff incelemesi: KISMEN — `"*"` diff'te; joker desteklenmediğini bilmek Vercel belge bilgisi ister.
+
+**Kanıt:** git b83e94ada (#1117): 'JOKER YOK ... INV-VERCEL-ONIZLEME-1 vercel.json'un ICERIGINE bakiyor, SONUCUNA bakmiyordu ... dokuz saatte 60+ dagitim, kota 21:14Z'de doldu, master'in UC commit'i ... REDDEDILDI'
+
+### V16 · 09-07 · Aralık deseni `ile`/`kadar` kelime içinde eşleşti: evrenin %31'i sessizce muaf — diff: KISMEN
+
+Ne kaçtı: REC-157 kapısı 'ailesi/edilebilen/ileri' gibi kelimelerde `ile`yi bulup aileyi 'aralık yazmış' sayıp muaf tutuyordu; 13 aileden 8'i muaf (doğrusu 4), muafların ikisi tam da izlenen borç kalemleriydi. Görmesi gereken: kapıyı getiren PR incelemesi. Nasıl yakalandı: yazar borcu kapalı ilan etmeden önce sabotaj koştu, kapı düşmedi. Diff incelemesi: KISMEN — regex'te \b yokluğu görünür; Türkçe'de hangi kelimelerin 'ile' içerdiğini düşünmek dil bilgisi ister.
+
+**Kanıt:** git e11398d00 (#1056): 'ARALIK_IFADESI deseni ile ve kadar'i KELIME ICINDE de esliyordu ... Evrenin %31'i SESSIZCE atlaniyordu'
+
+### V17 · 09-04 · Dört kapı hedef dala değil dosyadaki ortak dizeye bağlıydı; sabotaj yeşil kaldı — diff: KISMEN
+
+Ne kaçtı: INV-DUMAN-4 `/throw new Error/` (üç throw var), anon nöbetçisi `/process.exit\(1\)/` (üç exit), 'ilan dosyasını okuyor mu' için `includes('…ilani.json')` (ad hata mesajında da geçiyor), INV-SIR-BASMA-1 `/exit\(2\)/` (dört exit); hedef dal bozulunca dördü de yeşil kaldı. Görmesi gereken: kapı PR incelemesi. Nasıl yakalandı: yazarın sabotaj turu, 'hiçbirini gözle okuyarak fark etmedim'. Diff incelemesi: KISMEN — zayıf iddia (`toMatch(/throw new Error/)`) görünür; dosyada kaç örnek olduğunu bilmek hedef dosyayı okumayı ister.
+
+**Kanıt:** memory varlik-olcutu-dala-baglanir.md (2026-09-04): 'bu sınıfı dört kez ödedim ... Dördünü de sabotaj turu buldu, hiçbirini gözle okuyarak fark etmedim'
+
+### V18 · 09-07 · 53 kapı × sabotaj: 15 FAIL-OPEN, 2 kapının evreni zaten 0 — diff: KISMEN
+
+Ne kaçtı: yürüme kökü geçerli-ama-yanlış dizine çevrilince (952→44 dosya) 15 kapı yeşil kaldı; stock-restore-evidence'ın çalışma kümesi bugün zaten 0 (stok-restore invaryantı fiilen denetlenmiyor), 3d-asset-validity'nin PUBLIC_3D evreni 0; legal-en-leftover ve i18n-key-resolution boş evrende bile kırmızı vermedi. Görmesi gereken: kapı yazımı (evren muhafızı) ve PR incelemesi. Nasıl yakalandı: OPS'un 6 sonnet + 1 opus sabotaj sınavı (kapı-üstü kapı). Diff incelemesi: KISMEN — `toBeGreaterThan(0)` ya da evren sayımı yokluğu kapı diff'inde görünür, ama sistemik ve fikstür bilgisi ister.
+
+**Kanıt:** docs/audits/rec179-evren-muhafizi-sinavi-2026-09-07.md §1: 'FAIL-OPEN DOĞRULANDI 15 · PAKET KORUYOR 3 · ÇÜRÜDÜ 1 · KORUNUYOR 33 ... stock-restore-evidence — kapının ÇALIŞMA KÜMESİ bugün zaten 0'; git 55eaa0a1f (#1072)
+
+### V19 · 09-06 · Fail-open kapı (`if kesin >= 0 and …`) + PostgREST 1000 satır sessiz tavan — diff: EVET
+
+Ne kaçtı: kesin sayı alınamayınca -1 dönüp denetim atlanıyordu — kapı tam gerektiği anda kapanıyor; aynı gün product_prices 1044 satır 1000'e sessizce kesildi (ilk koşum 334/41, gerçek 348/27). Görmesi gereken: betik PR incelemesi ve iki yönlü sınav (ölçemediği hal). Nasıl yakalandı: ALTYAPI akran bulgusu → yazar kendi kodunda aradı. Diff incelemesi: EVET — 'ölçüm alınamadı → geçti' deseni (`if x >= 0 and kötü`) diff'te düz görünür, alan bilgisi gerekmez.
+
+**Kanıt:** memory fail-open-kapi-kapi-degildir.md (2026-09-06, REC-168): 'if kesin >= 0 and len(top) != kesin ... denetim SESSIZCE ATLANIR'; memory sessiz-tavan-ve-fail-open-kapi.md: 'product_prices 1044 satır → 44 satır düştü; ALTYAPI ilk koşumda 334/41 gördü (gerçek 348/27)'
+
+### V20 · 09-07 · Sahte sunucu Content-Range basmıyor, Range'i yok sayıyor: sayfalama aylardır hiç ölçülmemiş — diff: HAYIR
+
+Ne kaçtı: pricingMaterialize testinin stub'ı gerçek PostgREST'ten iki yerde sapıyordu; paket aylardır yeşildi ama yeşil 'sayfalama sorulmadı' demekti; satır sayısı sayfa boyunu geçse sonsuz döngü olurdu. Görmesi gereken: test katmanı (stub sadakati). Nasıl yakalandı: yeni fail-closed kol eklenince CI 12 testin 5'inde kırmızı verdi. Diff incelemesi: HAYIR — kusur değişiklik diff'inde değil, mevcut stub'da; ancak stub'ı getiren eski PR'da KISMEN görünürdü.
+
+**Kanıt:** memory stub-gercegi-taklit-etmiyorsa-test-kordur.md (2026-09-07, REC-178): 'count=exact istendiginde Content-Range basligini HIC basmiyordu ... Range basligini yok sayip tabloyu OLDUGU GIBI donduruyordu'
+
+### V21 · 09-09 · Olmayan kategori 200 döndü (soft-404) ve CDN'e yazıldı; preload hata ile yokluğu aynı değere indiriyordu — diff: EVET
+
+Ne kaçtı: /tr/category/<uydurma> HTTP 200, noindex yok; statiğe geçişle 'bulunamadı' sayfası HIT olarak CDN'de kaldı. Daha büyük tuzak: preload.ts:157 `if (error || !rows || rows.length === 0) return null` — sorgu hatası ile 'yok' aynı değer; düz 404 üretmek geçici DB arızasını kalıcı 404'e çevirip CDN'e yazardı. Görmesi gereken: PR incelemesi + test. Nasıl yakalandı: URUN canlı ölçüm. Diff incelemesi: EVET — hata/yokluk birleştiren koşul klasik görünür anti-desen.
+
+**Kanıt:** git 365939501 (#1141): 'preload.ts:157 soyleydi -> if (error || !rows || rows.length === 0) return null ... GECICI bir DB arizasini KALICI 404e cevirirdi'
+
+### V22 · 08-28 · Politika canlı ama kolon GRANT yok → kimse ulaşamıyor; `revoke from public` anon'u kapatmıyor — diff: KISMEN
+
+Ne kaçtı: quotes insert politikaları pg_policies'te doğruydu ama `status`/`unit_price` kolonları authenticated'ın INSERT yetkisinde yoktu (iki katman da 42501); ayrıca yeni SECURITY DEFINER RPC'de `revoke all from public; grant to authenticated` yazıldı, merge oldu, anon EXECUTE hâlâ TRUE (Supabase varsayılan yetki anon'a doğrudan verir). Görmesi gereken: migration PR incelemesi + rls-guard CI. Nasıl yakalandı: yazarın merge SONRASI canlı ölçümü; 4 emsal RPC'de anon revoke vardı, yalnız yenisinde yoktu. Diff incelemesi: KISMEN — emsal fonksiyonlarla kıyaslayan bir okuyucu eksik `revoke from anon` satırını görür; Supabase varsayılan yetki bilgisi ister.
+
+**Kanıt:** memory politika-var-grant-yok-ulasilamaz.md (2026-08-28): 'status sütunu authenticated'ın INSERT yetkisinde yok' ve EK: 'has_function_privilege(anon, ..., EXECUTE) = TRUE ... dort emsal RPC'de anon EXECUTE false; yalniz benimki true'
+
+### V23 · 08-27 · Migration komşu tablonun kolon adını taşıdı (model_code/metadata), prod koşumu düştü — diff: EVET
+
+Ne kaçtı: product_families için `model_code` (products'ta) ve `metadata` (categories'te) yazıldı; doğrusu series_code / description; yerel konformans kaynağı tarar şemayı değil. `--single-transaction` kısmi yazımı engelledi. Görmesi gereken: PR incelemesi (database.types.ts depoda, kıyaslanabilir) ve CI şema kontrolü (yoktu). Nasıl yakalandı: prod migration koşumu düştü. Diff incelemesi: EVET — kolon adları diff'te, doğru adlar aynı depoda üretilmiş tip dosyasında.
+
+**Kanıt:** memory measure-db-before-assuming-migration.md EK (2026-08-27): 'column "model_code" of relation "product_families" does not exist ... 13 referans vardı'
+
+### V24 · 08-27 · 'Geri alma' PR'ı (#855) 11 companion'ın 2'sinde içeriği yarıya indirdi, merge oldu — diff: EVET
+
+Ne kaçtı: sembol kaybı sanılan 10 dosya eski haline alındı; toplam +7.705 bayt 'kazanç' göründü ama SnailFanModel.md 12.465→6.171, DehumidifierModel.md 6.583→5.561 bayt düştü (ITHALATLAR/INTERFACES bölümleri silindi). Görmesi gereken: PR incelemesi (dosya bazında --stat). Nasıl yakalandı: yazar merge sonrası kalem kalem ölçtü, #862 ile onardı. Diff incelemesi: EVET — 'geri al/onar' iddialı PR'da iki dosyanın binlerce satır kaybetmesi --stat'ta düz görünür.
+
+**Kanıt:** memory agrega-sayi-ters-gideni-gizler.md (2026-08-27): 'SnailFanModel.md 12.465 -> 6.171 bayt (YARIYA)'; git 89d982abe (#862): '#855'te yanlis geri aldigim 2 companion onarildi'
+
+### V25 · 08-26 · 'PR #680 merge' kanıtıyla kapatılan T104-VH: LeadModal hiçbir yere yazmıyordu, müşteri verisi kayboldu — diff: KISMEN
+
+Ne kaçtı: 72 kapanışın 14'ünün kanıtı yalnız merge atfıydı; T104-VH'de #680 iletişim formunu bağlamış, LeadModal ayrı yüzeydi; kayıt kapalı görünürken veri kaybı sürüyordu. Görmesi gereken: kapanış kanıtı disiplini ve PR kapsam incelemesi ('bu diff kaydın tamamını kapsıyor mu'). Nasıl yakalandı: I18N canlı ölçüm. Diff incelemesi: KISMEN — #680 diff'inde LeadModal'a dokunulmadığı görünür; kaydın kapsamını (iki yüzey) bilmek gerekir.
+
+**Kanıt:** memory merge-canlida-calistigini-kanitlamaz.md (2026-08-26): '14'ünün kanıtı yalnız merge/PR atfıydı ... T104-VH ... LeadModal hâlâ hiçbir yere yazmıyordu: müşteri verisi kayboluyordu'
+
+### V26 · 09-07 · tazelik.py kapısı yazıldı, doğru ölçüyor, fail-closed — ve hiçbir yerden çağrılmıyor — diff: EVET
+
+Ne kaçtı: REC-163 Adım 5'te yazılan kaynak dizini tazelik kapısı ne ingestor'da (CI dizini yok, kanca yok) ne ana repoda (.github/scripts/.githooks grep = 0) çağrılıyordu; Recep'in ilettiği 36 belge diskte ama dizinde değildi. Görmesi gereken: kapıyı getiren PR incelemesi ('çağıranı nerede') + kanca/CI bağlama. Nasıl yakalandı: URUN-KATALOG ölçüm. Diff incelemesi: EVET — kapı betiği eklenen PR'da workflow/kanca değişikliği olmaması diff'te düz görünür.
+
+**Kanıt:** git f92eac69d (#1084): 'GERCEK BOSLUK TETIK: tazelik.py hicbir yerden cagrilmiyor ... grep = 0 cagri. Yazilmis, dogru olcen, fail-closed bir kapi hic kosmuyorsa var olmayan kapidan farki yoktur'
+
+### V27 · 09-07 · Çıkarım aracı 08-20'de düzeltildi, hiç yeniden koşulmadı; CSV 22 Haziran'da kaldı, 74 ürün 3 hafta eksik — diff: KISMEN
+
+Ne kaçtı: 'ürün kodu 5 hane' varsayımı venthub-pdf-ingestor@e7e5f7b ile düzeltildi ama avensair-fiyat.csv yeniden üretilmedi; eksik defalarca raporlandı, Linear'a yazıldı, hiçbir şey kırmızı vermedi. Recep'in 'patinaj' şikâyetinin ölçülmüş kökü. Görmesi gereken: çıktı tazelik kapısı (yoktu; sonra cikti_tazelik.py kuruldu) ve düzeltme PR incelemesi ('kural değişti, üretilmiş çıktı diff'te yok'). Nasıl yakalandı: Recep şikâyeti → ölçüm. Diff incelemesi: KISMEN — kural dosyası değişip CSV'nin dokunulmadığı görünür; CSV'nin bu araçtan üretildiğini bilmek gerekir.
+
+**Kanıt:** memory duzeltilmis-ama-kosulmamis-arac.md (2026-09-07): 'venthub-pdf-ingestor@e7e5f7b ... Araç bir daha hiç koşulmadı. avensair-fiyat.csv 22 Haziran tarihinde kaldı ve içinde 74 ürün eksik olmaya devam etti'
+
+### V28 · 09-08/12 · Yeni dosya eklendi, envanter kapısı yerelde koşulmadı: bir günde 5 şerit aynı kapıya takıldı — diff: EVET
+
+Ne kaçtı: INV-ARAC-1 CI'da koşuyor, ilan eksiği commit'ten sonra görünüyor; 2026-09-08'de #1116 #1118 #1124 #1125 #1131 takıldı, dördüncüsü kapıyı yazan kişiydi; 09-12'de REC-307 aynı tuzak (iki investigate/SKILL.md, envanter 71/fs 73). Görmesi gereken: pre-commit kancası (uyarma ayağı yoktu, #1134 ile eklendi). Nasıl yakalandı: CI kırmızı. Diff incelemesi: EVET — yeni araç dosyası eklenip envanter dosyasına dokunulmaması diff'te düz görünür.
+
+**Kanıt:** git ced9c1585 (#1134): 'ayni kapiya BES ayri serit takildi (#1116 #1118 #1124 #1125 #1131) ve dorduncusu kapiyi YAZAN kisiydi'; memory yeni-dosya-envanter-kapisini-kosar.md (2026-09-12, REC-307)
+
+### V29 · 09-15 · İlan dosyası yazılmamış bir ölçüm kaydına işaret ediyordu; 15 kolun hiçbiri varlık ölçmedi (REC-344) — diff: EVET
+
+Ne kaçtı: sema-replay ilanı henüz yazılmamış docs/audits dosyasını gösteriyordu; ilanı okuyan 'ölçüm var' sanır, dosyayı bulamaz. Görmesi gereken: konformans kapısı (16. kol sonradan eklendi) ve PR incelemesi. Nasıl yakalandı: yazar aynı işte fark etti; REC-344 kırık işaretçi taraması açıldı. Diff incelemesi: EVET — JSON'a eklenen yol dizesi ile aynı PR'da o dosyanın bulunmaması düz görünür.
+
+**Kanıt:** src/__tests__/conformance/sema-tabani-is-akisi.test.ts:222-243 ('ISARETCI KIRIK OLMASIN — GERCEK KUSURDAN SONRA EKLENDI (2026-09-15) ... o ad henuz yazilmamis bir dosyayi gosteriyordu ve hicbir kol bunu olcmuyordu'); ops-cycle-audit-state.md:3583 ('kol (15→16) → REC-344')
+
+### V30 · 09-01 ve 09-15 · Türkçe küçültme I→ı: kapı İngilizce terimi göremiyor (REC-343); kanca ASCII fikstürle yanlış kırmızı — diff: KISMEN
+
+Ne kaçtı: INV-VAAT-SIZINTI-3 yalnız toLocaleLowerCase('tr') kullanıyordu; 'AI-powered' → 'aı-powered', 'installment' → 'ınstallment', 'PCI DSS' → 'pcı dss' hiç eşleşmiyor; kardeş iki kapı da aynı kördü. 09-01'de ters yüzü: PreCompact kancası 'SON GİRDİ'.toLowerCase() = 'son gi̇rdi̇' (U+0307) yüzünden dolu dosyaya iki compact üst üste 'eksik' dedi; 'başlık tanınır' kolu vardı ama tüm fikstürler ASCII'ydi. Görmesi gereken: kapı yazımı ve fikstür tasarımı. Nasıl yakalandı: 09-15 ayırt edici kol sabotajı kırmızı yandı; 09-01 yazar dosyayı kendisi ölçtü. Diff incelemesi: KISMEN — toLocaleLowerCase('tr') + İngilizce terim listesi aynı diff'te; I/ı davranışı Türkçe kasa alan bilgisidir.
+
+**Kanıt:** src/__tests__/conformance/vaat-sizintisi.test.ts:177-190 ('"AI-powered" metni "aı-powered"a dönüyor ... installment / pci dss ... hiç yakalanmıyordu'); ops-cycle-audit-state.md:3581 (REC-343 açıldı); memory dizin-kapi-test-dersleri.md:503-553 (09-01: 'bütün fikstürleri ASCII başlık üretiyordu, oysa saha Türkçe yazıyor')
+
+### V31 · 09-16 · .agent manifest bayat → skills:verify 0→25 uyarı gizliydi — diff: KISMEN
+
+Ne kaçtı: skills-gate'in girdisi olan .agent manifest'i skill değişikliklerine karşı bayatlamış; skills:verify (python scripts/skills-evaluator.py) yeniden üretilince 0 uyarıdan 25 uyarıya çıktı, yani 25 uyarı o zamana dek görünmezdi. Görmesi gereken: skills-gate CI + skill ekleyen PR'ların incelemesi. Nasıl yakalandı: ALTYAPI REC-347 çalışırken yan bulgu. Diff incelemesi: KISMEN — skill ekleyen PR'da manifest'e dokunulmaması görünür; manifestin üretilmiş ve kapı girdisi olduğunu bilmek gerekir. Ayrıntı tek satır kaynaklı; hangi 25 uyarı ve ne zaman bayatladığı ölçülmedi (bkz. ölçülemeyenler).
+
+**Kanıt:** ops-cycle-audit-state.md:3635: 'YAN BULGU: .agent manifest BAYAT → skills:verify 0→25 uyarı gizliydi (ayrı kayıt açılacak)'; package.json:31 '"skills:verify": "python scripts/skills-evaluator.py"'
+
+### V32 · 09-14 · Linear yorum sayacı 200 + errors yok + nodes [] döndü: 'yeni yorum yok' ile 'sorgu kör' ayrılamıyordu — diff: KISMEN
+
+Ne kaçtı: sorgu yanlış alanı (`project(id){comments}` yerine kök `comments` + proje süzgeci) kullanıyordu; fail-open tasarım gereği sessizdi, teşhis kipi yoktu; kabul sınavı toplam dört kusur buldu. Görmesi gereken: kanca testi (sessizliğin sebebini soran kip). Nasıl yakalandı: ALTYAPI kabul sınavı (#1189). Diff incelemesi: KISMEN — GraphQL alan adı diff'te; şemayı bilmeyen okuyucu yanlışlığı göremez.
+
+**Kanıt:** memory dizin-olcum-kanit-dersleri.md:839+ ders 2: 'HTTP 200 + errors YOK + nodes [] ... yanlis alan ... "Yeni yorum yok" ile "sorgu KOR" halleri AYIRT EDILEMIYORDU'; git e0cbfe3ee (#1189) 'kabul sinavi DORT kusur buldu'
+
+### V33 · 09-15 · Defter bayatlık kancası vardı, kuruluydu, doğru ölçüyordu — 7 gün kimse görmedi (REC-342) — diff: HAYIR
+
+Ne kaçtı: defter-bayatlik-olcumu.cjs Stop olayında, async, stderr'e yazıyordu; karar açılışta veriliyor, çıktı akışa girmiyor, 2 saat soğuma var. OPS kaydı 'kural var, kapı yok' yazdı; ölçüm kapının var olduğunu gösterdi. Görmesi gereken: kanca yüzey tasarımı (kararın verildiği yerde görünürlük). Nasıl yakalandı: OPS bayatlığı ölçtü, ALTYAPI kancayı elle koştu. Diff incelemesi: HAYIR — kusur kodda değil, çıktının nereye gittiğinde; hiçbir diff'te iz yok.
+
+**Kanıt:** memory yesil-kapi-gorundugunu-kanitlamaz.md EK 2026-09-15 (REC-342): 'OPS kaydı "kural var, kapı yok" yazdı; ölçüm: .claude/hooks/defter-bayatlik-olcumu.cjs Stop olayında kuruluydu ... Susma sebebi üç: Stop = turun SONU; async + stderr; 2 saat soğuma'
+
+### V34 · 09-14 · ai-auto-repair zinciri: çağrılıyor, koşuyor, 10 PR açtı — 0/10 merge; envanter üç sorudan geçti — diff: HAYIR
+
+Ne kaçtı: AXIOM 3'ün üç sorusu (çağıranı var, koşum izi var, çıktı üretiyor) hepsi EVET; ama ürettiği hiçbir PR kabul edilmedi; araç 'KAL' görünüyordu. Görmesi gereken: araç envanteri (dördüncü soru 'çıktı kabul ediliyor mu' sonradan eklendi). Nasıl yakalandı: REC-333 alt-ajan ölçümü (gh run/pr sorguları). Diff incelemesi: HAYIR — süreç/etki ölçümü, diff dışı.
+
+**Kanıt:** docs/audits/rec314-tetiklenebilirlik-sinavi-2026-09-14.md §8: 'ürettiği 10 PR'ın hepsi CLOSED — 0/10 merge ... araç çalışıyordu, çıktısı kabul edilmiyordu'; docs/audits/rec333-ai-auto-repair-2026-09-14.md
+
+### V35 · 09-07/08 · YANLIŞ ALARM: SSR duman alarmı 15 saat sahte kırmızı (temsilci alfabetik ikinci yol) — diff: KISMEN
+
+Ne oldu: REC-205 iki seviyeli adresi kaldırınca hiyerarşi adresten silindi; temsilci seçimi hâlâ adrese bakıyor, ikiSegmentli küme boşken kategoriler[1]'e (alfabetik ikinci, DB'de fanların altı) düşüyor ve sınıf kendi temsilcisini ihlalci sayıyordu; canlıda arıza yoktu (OPS 42/42 prob doğru sayfa). Dosyanın kendi 171-175 satırları dersi yazmıştı, yarısı işletiliyordu. Görmesi gereken: CI alarmı tasarımı; REC-205 PR incelemesi. Nasıl yakalandı: ALTYAPI kök sebep + OPS probları. Diff incelemesi: KISMEN — REC-205 diff'i adres şemasını değiştirdi; alarmın seçiminin ona bağlı olduğu başka dosyada.
+
+**Kanıt:** git 18649b105 (#1129): 'alarm 15 saattir SAHTE kirmizi veriyordu ... ikiSegmentli kumesi bosken secim kategoriler[1]'e, ALFABETIK IKINCI'ye dusuyordu ... DOSYA BU DERSI KENDI YAZMISTI: 171-175. satirlar'
+
+### V36 · 09-07 · YANLIŞ ALARM ZİNCİRİ: master 3,5 saat kırmızı (mükerrer '## 6.'), iptal koşular 'yeşil' okundu, tüm açık PR'lar kırmızı — diff: EVET
+
+Ne oldu: #1050 execution-method-standard.md'ye ikinci bir '## 6.' başlığı getirdi; standard-section-integrity master'da kırmızı; arka arkaya merge'ler önceki koşuları CANCELLED yaptı, son beşin dördü iptal, belirsizlik 'sorun yok' okundu; CI pull_request'te master ile birleşimi koştuğu için dosyaya dokunmayan PR'lar da kırmızı aldı. Görmesi gereken: #1050 PR incelemesi; CI durumu okuma disiplini. Nasıl yakalandı: URUN 'git diff 0 dokunuş, ci kırmızı' ölçtü. Diff incelemesi: EVET — aynı dosyada iki '## 6.' başlığı dosya bağlamlı diff'te düz görünür.
+
+**Kanıt:** git e18ab7da7 (#1095): 'IKI TANE "## 6." vardi ... son bes kosunun dordu iptal ... master kirmizi oldugu surece ACIK HER PR kirmizi geliyordu'
+
+### V37 · 09-12 · YANLIŞ ALARM: karar-kayit-bagi kapısı K53'ü 8 gün AÇIK saydı, K54 aynı soruyu REC-199'a bağlamıştı — diff: HAYIR
+
+Ne oldu: kapı doğru yakaladı, sınıf yanlıştı; master kırmızıya döndü, #1154 kurban oldu. Görmesi gereken: kapının karar-eşleme mantığı. Nasıl yakalandı: OPS master kırmızı onarımı. Diff incelemesi: HAYIR — anlamsal belge içeriği (iki karar başlığının aynı soruyu taşıması).
+
+**Kanıt:** git 6ac348875 (#1163): 'Master kirmizi: karar-kayit-bagi K53 u 8 gundur ACIK sayiyordu; K54 ayni soruyu REC-199 a baglamisti. Kapi dogru yakaladi, sinif yanlisti ... PR #1154 (kurban)'
+
+### V38 · 09-14/15 · YANLIŞ ALARM ÜÇLÜSÜ (kapı kendi evrenini yanlış seçti): render-revalidation 00_golge_onsoz.sql·INV-MECH-1 çapasız regex·commit-uyarı kancası tam yol/basename — diff: KISMEN
+
+Ne oldu: (a) render-revalidation 'SQL tarihle başlar' kolu baseline önsözünü migration sanıp #1201'i kırmızı yaptı (üç şartlı dar istisna eklendi); (b) INV-MECH-1 sessizlik kolu `if \(([^)]*?)\) process.exit\(0\)` deseniyle dosyadaki ilk erken çıkışı yakalayıp 'terim düşmüş' dedi; (c) REC-325 commit-uyarı kancası yeni cetveli 'ilan edilmemiş' dedi çünkü tam yol arıyor, üretici basename yazıyor — ikinci kez. Görmesi gereken: kapı yazımı. Nasıl yakalandı: CI kırmızısı / yazar. Diff incelemesi: KISMEN — çapasız regex ve yol karşılaştırması diff'te görünür ama yanlış evreni seçtiğini görmek hedef dosyayı bilmeyi ister.
+
+**Kanıt:** ops-cycle-audit-state.md 08:5xZ (09-15): '558482a9a = #1201 CI kırmızısının düzeltmesi (KAPI düzeltildi: render-revalidation "SQL tarihle başlar" kolu 00_golge_onsoz.sql'i yanlış yakaladı)'; memory dizin-olcum-kanit-dersleri.md:839+ ders 4 (INV-MECH-1); memory altyapi-lane-day-2026-09-09.md ~810: 'REC-325 IKINCI KEZ GORULDU: ... kanca TAM YOLU ariyor, uretici BASENAME yaziyor'
+
+### V39 · 08-27 · YANLIŞ ALARM: INV-DOC-2 takvimle kırmızıya döndü, suç AUTH'un merge'ine yıkıldı — diff: KISMEN
+
+Ne oldu: yaş = floor((şimdi − commit günü)/1 gün), ≤7 muaf; 15 dosya 00:00Z geçişinde 8'e düştü; merge commit'i o dosyaların hiçbirine dokunmuyordu (eşleşme 0). Kapının kendi yorumu 'zaman geçmesi yeni ihlal üretmez' diyordu ve yanlıştı. Görmesi gereken: CI kapısı tasarımı (duvar saatine bağlı eşik). Nasıl yakalandı: I18N önceki yeşil commit'te şimdi koşturarak. Diff incelemesi: KISMEN — `yas <= 7` duvar saati hesabı kapı diff'inde görünür; 'hiçbir şey değişmeden kırmızıya döner mi' sorusunu sormak gerekir.
+
+**Kanıt:** memory takvimle-kirmiziya-donen-kapi.md (2026-08-27): '2026-08-26T22:04Z kosumu → yas=7 → YESIL; 2026-08-27T03:49Z → yas=8 → KIRMIZI ... merge commiti o 15 kaynagin hicbirine dokunmuyor (eslesme 0)'
+
+### V40 · 09-08 · YANLIŞ ALARM (Recep'e gitti): 'site yanlış kategori servis ediyor' — iki farklı /tmp — diff: HAYIR
+
+Ne oldu: MSYS_NO_PATHCONV=1 açıkken curl -o /tmp/x Windows köküne (C:/tmp) yazdı, bash grep /tmp/x MSYS Temp'teki 3 saat eski dosyayı okudu; 'aynı adrese iki farklı sayfa' diye sahte ciddi bulgu Recep'e raporlandı, Linear High açıldı, 3 şerit 25 dk kovaladı; boyut uyuşmazlığı (265349 ↔ 248237) ilk komutta ekrandaydı. 09-15'te aynı sınıf ikinci vaka: `git show origin/master:<yol>` yol dönüşümüyle 'geçersiz nesne' → 'dosya YOK' sahte bulgusu (REC-307). Görmesi gereken: ölçüm disiplini (ikinci bağımsız ölçüm). Nasıl yakalandı: ALTYAPI kök sebep (REC-286). Diff incelemesi: HAYIR — kod diff'i yok.
+
+**Kanıt:** memory iki-tmp-aracin-ciktisini-okudugundan-emin-ol.md (2026-09-08 10:18Z→10:46Z ve EK 2026-09-15)
+
+### V41 · 09-05 · YANLIŞ ALARM (Linear'a iş oldu): '12 aile için kaynak yok, üreticiden metin toplanmalı' — kaynak 74 sayfalık katalogdaydı — diff: HAYIR
+
+Ne oldu: anlatım '-\t' madde işaretiyle arandı, katalog düz cümle yazıyor; 6 sayfa sanıldı, 61 çıktı; 40/40 ailenin kodu en az bir PDF'te, 36/40'ın Türkçe anlatımı AVenS listesinde. Sahte bulgu OPS tarafından Linear'a taşındı ve Recep'e 'kaynağımız yok' diye sunuldu. Görmesi gereken: ölçüm disiplini ('bulamadım' ≠ 'yok'). Nasıl yakalandı: yazarın yeniden ölçümü. Diff incelemesi: HAYIR.
+
+**Kanıt:** git 6e9c0a329 (#1017): 'OLCUTUM DORDUNCU KEZ YANILDI ve bu en pahalisiydi cunku EYLEME DONUSMUSTU ... OPS Linear a tasidi, Recep e "kaynagimiz yok" diye sunuldu — kaynak 74 sayfalik AVenS katalogunun icindeydi'
+
+### V42 · 09-05 · YANLIŞ ALARM (master'a indi): 'admin koyu tema tokenleri 23/23 tanımsız' — tarayıcı seçici adını varsaymıştı — diff: HAYIR
+
+Ne oldu: koyu bağlam `.dark`/`prefers-color-scheme`/`data-theme="dark"` isim listesiyle arandı; admin `[data-admin-theme='dark']` kullanıyor; 23/23 aslında tanımlı. Belge master'a inmişti. Görmesi gereken: belge PR incelemesi / ölçüm. Nasıl yakalandı: Recep ('koyu tema sadece admin panelde ve zaten çalışıyor'). Diff incelemesi: HAYIR — iddia bir denetim belgesinde; doğrulamak CSS'i çözmeyi ister, diff okuma değil.
+
+**Kanıt:** git ab6558a49 (#1021): 'Admin renk tokeni koyu temada yeniden tanimli olmayan: 23/23 yaziyordu. YANLIS ... Secici adini VARSAYMISIM ... Hatayi Recep yakaladi'
+
+### V43 · 09-09 · YANLIŞ ALARM (iş emrine döndü): 'catalog-integrity kırmızısı TLS değil gerçek veri ihlali' — ölçüm 1 saat bayattı; üç şerit üç sebep yazdı — diff: HAYIR
+
+Ne oldu: 06:35Z koşumunda veri ihlali gerçekten vardı (exit 1), 07:49Z koşumunda ihlal yok, TLS adımı exit 2 (ölçülemedi); ALTYAPI damgasız ölçümle OPS'u düzeltti, OPS bunu KATALOG'a iş emri yaptı, KATALOG var olmayan ihlali aradı. Ayrıca set -e ilk düşen adımda kesince ikinci arıza (TLS) ilk koşumda hiç görünmedi. Görmesi gereken: raporlama disiplini (ölçüm damgası, adım kırılımı). Nasıl yakalandı: KATALOG adım adım ölçtü. Diff incelemesi: HAYIR.
+
+**Kanıt:** git 131bcb66c (#1150) gövdesi: '34319782643 · 06:35:45Z → Catalog integrity gate FAILURE (exit 1) ... 34325812774 · 07:49:16Z → SUCCESS, Aile-kategori adimi FAILURE (exit 2, TLS) ... olcumum YANLIS degil BAYATTI'; memory is-kirmizi-degil-adim-kirmizi.md
+
+### V44 · 09-04 ve 09-16 · YANLIŞ SAYI Recep'e beyan (3 olay): grep -c '3→1 düzeldi'·'analytics betiği canlıda yüklenmiyor'·'441 ürünün 360'ı tek kategoride, veri bozuk' — diff: HAYIR
+
+Ne oldu: (a) küçültülmüş HTML'de grep -c satır saydı, 1 çıktı, 'bailout 3→1 düzeldi' commit'e ve Recep'e yazıldı, gerçek 3; (b) Vercel Analytics betiği rastgele yoldan servis ediliyor, 'insights' dizesi 0 → 'yüklenmiyor' dendi, çalışıyordu; (c) products'ta yalnız category_id'ye bakıldı, subcategory_id vardı, 433/441 alt kategorili — 'veri bozuk' hükmüyle Recep'e plan değişikliği bile önerildi, Recep: 'hep aynı hatayı yapıyorsun'. Görmesi gereken: ölçüm disiplini (birim, ayırt edici gösterge, şema önce). Nasıl yakalandı: CI çelişkisi / ağ kaydı / Recep. Diff incelemesi: HAYIR.
+
+**Kanıt:** memory grep-c-satir-sayar-olay-degil.md (2026-09-04, #989); memory tabloya-hukum-once-sema-okunur.md (2026-09-16): 'yalnız category_id ... 441 aktif ürünün 433'ü alt kategorili'
+
+### V45 · 09-04 · YANLIŞ 'BİTTİ': PR izleyici 'kapılar bitti, düşen 0' dedi; ci hiç koşmamıştı (DIRTY PR, birleşme ref'i yok) — diff: HAYIR
+
+Ne oldu: #962'de yalnız Vercel kapıları koştu; ci, admin-smoke, rls-role-coverage, advisor, catalog-integrity, db-gate-precheck, boyut denetimi — yedi kapı hiç doğmadı; 'pending yok' ölçütü yokluğa kördü. Görmesi gereken: merge ritüeli (beklenen kapı kümesi ölçümü, sonradan eklendi). Nasıl yakalandı: ALTYAPI ölçüm. Diff incelemesi: HAYIR — süreç aracı.
+
+**Kanıt:** memory var-olmayan-kapi-pending-gorunmez.md (2026-09-04 ~04:30, ALTYAPI #962): 'yedi kapı HİÇ koşmamış. Sebep: PR mergeStateStatus=DIRTY ... kapılar hiç doğmaz → pending bile görünmez'
+
+### V46 · 09-06 · KAPI KIRMIZI DEDİ, MERGE OLDU: `ritüel | tail -4 && gh pr merge` çıkış kodunu yuttu (#1027) — diff: HAYIR
+
+Ne oldu: merge ritüeli ekrana '⛔KIRMIZI — MERGE ETME' bastı, `&&` tail'in kodunu gördü, PR merge oldu; kırmızının sebebi taban bayatlığıydı, zarar çıkmadı (şans). Aynı gün dört merge aynı kalıpla, üçünde göz kapı yerine geçti. Görmesi gereken: merge kapısı kullanımı. Nasıl yakalandı: yazar çıktıyı okudu. Diff incelemesi: HAYIR — komut satırı kullanımı; migration'lı PR'da denk gelseydi prod'a otomatik uygulanırdı.
+
+**Kanıt:** memory pipe-kapinin-cikis-kodunu-yutar.md (2026-09-06): 'merge-ritueli.cjs 1027 … | tail -4 && gh pr merge 1027 ... KIRMIZI ... PR yine de merge oldu'
+
+### V47 · 09-08/09 · TEST KOŞMADI AMA YEŞİL: `vitest --reporter=basic` Vitest 4'te yok → 0 test, exit 0; 'tüm paket 203/1596' aslında alt küme — diff: HAYIR
+
+Ne oldu: geçersiz raportör yüklenemedi, hiçbir test koşmadı, süreç 0 döndü; aynı gün bir ağaçta node_modules bağı ölü, vitest hiç başlamıyor; 09-09'da 'konformans 203 dosya 1596 test yeşil, TÜM paket' denildi, gerçek paket 334/2599 ve fark tam kırmızı dosyayı (jsonld.test.ts) taşıyordu, CI kırmızı döndü. Görmesi gereken: test raporlama disiplini (Test Files N/N sayısı). Nasıl yakalandı: ALTYAPI çıktıdaki sayıları okudu; CI. Diff incelemesi: HAYIR — yerel komut kullanımı.
+
+**Kanıt:** memory cikis-kodu-kanit-degil-sayilar-kanit.md (2026-09-08): 'raportörü yükleyemedi, hiçbir test koşmadı ve exit 0 döndü'; EK 2026-09-09: 'Gercek paket 334 dosya / 2599 test. Aradaki fark tam da kirmizi olan dosyayi tasiyordu'
+
+### V48 · 09-16 · ÖNLENEN SAHTE ALARM (kontrol örneği): 'products/category HTML yok' — bayat 09-14 derlemesi; taze build 247 HTML — diff: HAYIR
+
+Ne oldu: REC-348 ölçümünde 09-14 tarihli .next çıktısında PDP/kategori HTML'i yoktu; kapı ikisini izliyor. URUN bunu bulgu değil soru işareti yazdı, taze `pnpm build` aldı: 247 HTML (PDP 94, kategori 48); aynı ölçüm REC-59'un '105 vs 245' açık notunu kapattı (105 eksik derlemeydi). Ders: derleme çıktısı üstünden sayı verirken derleme tarihi git tepesiyle kıyaslanır. Diff incelemesi: HAYIR — artefakt tazeliği. Bu vaka, disiplinin işlediği yerde yanlış alarmın nasıl önlendiğini gösteren tek kontrol örneğidir.
+
+**Kanıt:** docs/audits/rec348-rota-sinif-kapsami-2026-09-16.md §0 ('Bu bir bulgu değil, bir soru işaretidir ve taze derleme yapılmadan bulguya çevrilmemelidir'); memory olcut-dogru-evren-yanlis-is-emri-dogurur.md 7. vaka; ops-cycle-audit-state.md EK 06:5xZ (09-16): 'SAHTE ALARM (bayat 09-14 derleme) — bulgu yazılmadı, doğru'
+
+### V49 · META · Kendi diff-review skill'imiz: SKILL.md 8 kural vaat ediyor, betik 7 desen uyguluyor — Suspense kuralı HİÇ YOK (iki ağaçta da) — OLCULDU — diff: ?
+
+Ne ölçüldü: .claude/skills/diff-review/SKILL.md satır 56 'useSearchParams Suspense İhlali' kuralını (kural 8) belgeliyor; scripts/check_diff_rules.py (155 satır) yalnız 7 regex taşıyor (any, DROP TABLE/COLUMN, export silme, console.log, localhost, service_role, mock dizi); `grep -i suspense|searchparams` betikte 0 eşleşme; .agent kopyası birebir aynı. Yani V3 sınıfını yakalayacağını söyleyen tek kuralımız yazılı ama kodsuz. Ayrıca belgelenen kural bile 'dosyada Suspense var mı' sorar — V3'te Suspense vardı, yeri yanlıştı; kural yazılsa da yakalamazdı. Tetik sınavı: 09-12 resmi koşumda diff-review 11/12 tetik, 8/8 tetiklemez (GEÇTİ); 09-09 kazara koşumda 8/12 (kısmi örnek). Katman hükmü: bugün 'PR incelemesi' = bu 7 regex + elle ajan incelemesi; bu yüzden V1..V29'daki 'PR incelemesi görmeliydi' hükümleri, o katmanın fiilen ne kadar dar olduğuyla birlikte okunmalı.
+
+**Kanıt:** .claude/skills/diff-review/SKILL.md:56; .claude/skills/diff-review/scripts/check_diff_rules.py satır 17,22,27,32,37,42,47 (7 pattern), `grep -n -i 'suspense|searchparams'` çıkış kodu 1; .agent/skills/diff-review/scripts/check_diff_rules.py diff = AYNI; docs/audits/skills-eval-2026-09-12.json sonuclar[1]: tetik 11/12, tetiklemez 8/8; memory altyapi-lane-day-2026-09-09.md ~810: 'diff-review DUSTU (tetik 8/12)'
+
+### V50 · META · CI'da otomatik LLM PR incelemesi YOK: Gemini yalnız `@gemini-cli /review` yorumuyla, auto-reviewer yalnız reviewer atar — OLCULDU — diff: ?
+
+Ne ölçüldü: gemini-dispatch.yml yalnız yorum/inceleme gövdesi '@gemini-cli' ile başlıyorsa ve yazar OWNER/MEMBER/COLLABORATOR ise koşuyor; gemini-review.yml workflow_call ile ondan çağrılıyor; auto-reviewer.yml pull_request opened'da yalnız peckop'u reviewer olarak atıyor (kendi PR'ında atlıyor). Sonuç: 30 günlük pencerede kaçırılan 34 vakanın hiçbirinde PR'ı otomatik okuyan bir LLM katmanı yoktu; 'PR incelemesi görmeliydi' dediğim yerlerde katman = elle diff-review (V49) + isteğe bağlı ajan incelemeleri (plan-challenger, security-reviewer alt-ajanı, #1143 örneği). Bu, OCR gibi bir aracın kıyas evrenini tanımlar: dolduracağı boşluk 'otomatik ve her PR'da' olma boşluğudur, 'daha akıllı kural' boşluğu değil. Gemini'nin son 30 günde kaç kez tetiklendiği ölçülmedi.
+
+**Kanıt:** .github/workflows/gemini-dispatch.yml:58-59 (startsWith '@gemini-cli' + author_association şartı), :100-101 ('@gemini-cli /review' → command review), :128-132 (review job → gemini-review.yml); .github/workflows/auto-reviewer.yml:3-5 (types: [opened]), :33 (reviewers: ['peckop'])
+
+
+## Ölçülemeyenler / çekinceler (ajan beyanı)
+
+1. Diff hükümleri (EVET/KISMEN/HAYIR) kural metninden ve desen listesinden akıl yürütmeyle verildi; hiçbir vakanın gerçek diff'i diff-review betiğine, gstack review'a ya da OCR'a KOŞULMADI. Recep kararı 23 (16 üçlü kıyas + 4 geçmiş vaka diff'i) tam bu koşumu istiyor; bu rapor o koşumun aday listesidir, sonucu değil.
+2. REC-343 ve REC-344 Linear kayıtları açılmadı; kanıt OPS durum dosyası satırları (3581, 3583, 3613) + kod yorumları (vaat-sizintisi.test.ts:177-190, sema-tabani-is-akisi.test.ts:222-243). Kayıt gövdelerinde ek vaka ayrıntısı olabilir.
+3. .agent manifest 0→25 uyarı vakası tek kaynaklı (ops-cycle-audit-state.md:3635, 09-16 07:0xZ). Hangi 25 uyarı, manifest hangi PR'da bayatladı, kaç gün gizli kaldı — ölçülmedi; 'ayrı kayıt açılacak' notu var, açıldı mı bakılmadı.
+4. V1'in kök PR'ı (REC-94, 3D kategori seçici kaldırma) ve V10'un dosyası (2026-08-11) 30 günlük pencerenin dışında yazılmış olabilir; keşif tarihleri pencere içinde. Kaç vakanın kusuru pencere dışında doğdu sayılmadı.
+5. Her vaka için 'sonradan kapı yazıldı mı' (onarım oranı) sistematik sayılmadı; okuduğum belgelerde çoğunluğunda INV-* kolu eklendiği yazıyor ama liste çıkarılmadı.
+6. Gemini review'ın son 30 günde fiilen kaç PR'da tetiklendiği (gh run list --workflow=gemini-dispatch) ölçülmedi.
+7. NotebookLM defteri sorgulanamadı (notebooklm ve notebooklm-py MCP bağlantıları bu oturumda kapalı: CONNECTION_CLOSED). Hafıza kuralı 9 'önce deftere sor' bu yüzden uygulanamadı; kaynak olarak hafıza dizini + depo belgeleri kullanıldı.
+8. Yanlış alarm sayısı eksik olabilir: git log yalnız 'duzelt/fix/KIRMIZI/sahte/onar/yanlış/kaçır' desenleriyle tarandı (495/579 commit); bu desenlere uymayan başlıklı düzeltmeler listeye girmedi.
+9. Bedel (dakika/USD/kayıp müşteri) yalnız belgelerde yazılı olduğu yerde alındı (V14 10 gün, V15 60+ dağıtım, V40 3 şerit 25 dk); geri kalanı için bedel ölçülmedi.
+10. İnsan (Recep) tarafından yakalanan vaka sayısı kesin değil: V2, V27, V42, V44(c) belgelerde açıkça Recep'e bağlı; diğerlerinde 'insan/ajan canlı ölçüm' ayrımı belgeden her zaman çıkmıyor.
+
+## Kaynak özeti (ajan)
+
+Pencere 2026-08-17 → 2026-09-16. Kaynaklar: hafıza dizini (28 dosya okundu), docs/audits (10 belge), docs/skill-gozlemleri/acik (3), OPS durum dosyası (REC-343/344/manifest satırları), git log (579 commit; 495'i düzelt/fix/sahte/kırmızı deseniyle eşleşti) ve 30'dan fazla PR gövdesi. Sonuç: 48 kanıtlı vaka — 34 KAÇIRMA (kapı/inceleme yeşil, kusur gerçek), 13 YANLIŞ ALARM (kapı/ölçüm kırmızı, kusur yok ya da başka yerde), 1 ÖNLENEN sahte alarm (kontrol örneği, 09-16). Bir diff incelemesi (OCR gibi) bu 48'in 14'ünü tek başına yakalardı (diff-görünür, alan bilgisi gerekmez: yutulan hata, mükerrer anahtar, çağıransız kapı, tazelenmemiş üretilmiş dosya, dosya yolu var-dosya yok, `|| true`, kolon adı), 19'unu ancak alan bilgisi ya da çapraz dosya bağlamıyla yakalardı (KISMEN: Next.js CSR bailout, PostgreSQL/Supabase sözdizimi ve yetki varsayılanları, Vercel belgesi, Türkçe kasa I/ı, sağlayıcı sözleşmesi), 15'i hiçbir diff'te görünmez (canlı DB durumu, veri fiziği, ölçüm/raporlama disiplini, araç kullanımı, süreç). Yani 33/48 (%69) diff'te iz bırakıyor, 15/48 (%31) diff-dışı katman ister: canlı ölçüm, sabotaj sınavı, tazelik kapısı. En ağır bedelli kaçırmalar: 10 gün yanan deploy kotası (V14), 60+ dağıtımla kota tükenip master'ın 3 commit'inin ekrana çıkmaması (V15), müşteri verisi kaybı (V25), 74 ürünün 3 hafta eksik kalması (V27), fan gücünün vitrinde bin kat küçük görünmesi (V12), 3 PR'ı bloke eden tip-drift (V6). En ağır yanlış alarmlar: Recep'e giden ve Linear High açtıran sahte "site yanlış kategori veriyor" (V40), Linear'a iş yazdıran sahte "12 aile kaynaksız" (V41), 15 saat sahte kırmızı yanan duman alarmı (V35). İnceleme katmanının kendisi hakkında iki ölçülmüş bulgu: (a) kendi diff-review skill'imizin SKILL.md'si 8 kural vaat ediyor, betik 7 desen uyguluyor — kural 8 (useSearchParams/Suspense) betikte HİÇ YOK, iki ağaçta da; (b) CI'da otomatik LLM PR incelemesi yok — Gemini yalnız `@gemini-cli /review` yorumuyla, auto-reviewer yalnız reviewer atar. Bu iki bulgu, "PR incelemesi görmeliydi" dediğim vakalarda o katmanın fiilen 7 regex + elle ajan incelemesi olduğunu söyler. Tekrarlayan kök sınıf (16 vakada): "ölçüt keskin, evren yanlış" — kapı/ölçüm doğru şeyi arıyor ama yanlış kümede; bunu OCR gibi bir diff okuyucu değil, evren muhafızı + sabotaj kolu yakalıyor. Recep'in çerçevesine doğrudan cevap: dış aracın (OCR) katkı alanı 14+19=33 vakanın "diff'te iz bırakan" kısmıdır; 15 vaka için hiçbir diff aracı işe yaramaz ve orada kendi kancalarımız (evren muhafızı, sabotaj sınavı, tazelik satırı, canlı ölçüm) ayırt edici katmandır — bunlar ayrı tutulmalı, dış araçla yer değiştirmemeli.
+
+
+---
 # FILE: docs\audits\karar-kayit-bagi-vitrin-15a-2026-09-07.md
 
 # Karar–Kayıt Bağı — Vitrin 15A (2026-09-07, SALT OKUMA ölçüm)
@@ -11096,6 +12519,276 @@ YARGI gerektiren soruları ölçmez — ölçseydi var olmayan bir kapı sanıl�
 1. **Ağaç ataması `subcategory_id`'dedir**; `category_id` yalnız kökü taşır. Yalnız birine
    bakan sorgu yanlış cevap verir — 2026-09-04'te "375 ürün kökte" tam bu yüzden denildi.
 2. **`jsonb_each_text` satır çoğaltır**; o birleşimde `count(*)` ürünü değil ANAHTARI sayar.
+
+
+---
+# FILE: docs\audits\kod-grafigi-uc-arac-mukayese-2026-09-16.md
+
+# Kod grafiği araçları — ÜÇ ARAÇ MUKAYESESİ (codegraph · graphify · codebase-memory-mcp)
+
+**Tarih:** 2026-09-16 · **Şerit:** URUN · **Soran:** Recep
+**Cetvel:** `docs/standards/hukum-kaynak-standard.md` — her sayı **A sınıfı** (bugün ölçüldü,
+GitHub/npm API'sinden; REC-313'ten aktarılan sayılar ayrıca **B** diye işaretli)
+**Ölçüm anı:** 2026-09-16 · **Kaynak:** `gh api repos/<r>`, `npm view`, `api.npmjs.org`
+
+---
+
+## 0 · CEVAP, ÖNCE
+
+**Üçü de aynı amaca hizmet ediyor: KOD grafiği.** Üçü de fonksiyon/çağrı/import ilişkilerini
+indeksleyip "ne neyi çağırıyor, değişirse ne bozulur" sorusuna cevap veriyor.
+
+⛔**Üçü de veritabanını görmüyor.** Recep'in istediği Supabase haritası **hiçbiri** tarafından
+karşılanmıyor — bu ayrı bir iş ve ALTYAPI'da.
+
+**Birlikte çalışabilirler mi: teknik olarak EVET, pratikte ÇAKIŞMA var** — §4.
+
+⚠**"Aynı iş" hükmü bu belgenin hükmü DEĞİL.** Üçünün de kod grafiği olduğu bir **envanter**
+bilgisidir. Hangisinin daha iyi bulduğu ancak **yan yana koşumla** ölçülür ve o ölçüm
+**yapılmadı** → [[sahiplik-olcut-degildir]].
+
+---
+
+## 1 · SAYILAR — bugün ölçüldü
+
+| Ölçüt | **codegraph** | **graphify** | **codebase-memory-mcp** |
+|---|---:|---:|---:|
+| Depo | `colbymchenry/codegraph` | `Graphify-Labs/graphify` | `DeusData/codebase-memory-mcp` |
+| **Yıldız** | 71.076 | **118.141** | 43.460 |
+| Fork | 4.565 | **11.418** | 3.537 |
+| İzleyen (watcher) | 169 | **401** | 175 |
+| Dil | C | Python | C |
+| Lisans | MIT | Apache-2.0 | MIT |
+| Açılış | 2026-01-18 | 2026-04-03 | **2026-02-24** |
+| Son değişiklik | **bugün 07:51** | dün 17:58 | bugün 02:32 |
+| Açık konu | 508 | **1.346** | 590 |
+| Depo boyutu | 22 MB | 16 MB | **282 MB** |
+| Son 30 gün commit | 100+ | 100+ | 100+ |
+| npm indirme (hafta) | **70.850** | — (PyPI) | — |
+| Arşivlenmiş | hayır | hayır | hayır |
+
+**Üçü de canlı ve hızlı gelişiyor.** Üçünde de son 30 günde 100'den fazla commit var (sayaç
+tavanı 100, gerçek sayı daha yüksek olabilir — ölçümün sınırı).
+
+⚠**Yıldız sayısı kalite ölçütü DEĞİLDİR.** Üçü de 2026'da açılmış ve üçü de çok hızlı yıldız
+toplamış; bu popülerliği gösterir, isabeti göstermez. REC-313'te graphify'ın `query` komutu
+118 bin yıldıza rağmen beş soruda **sıfır** isabet etti.
+
+**Açık konu / yıldız oranı** (bakım yükü göstergesi, kesin değil): codegraph %0,7 ·
+graphify %1,1 · cbm %1,4.
+
+---
+
+## 2 · NE SUNUYORLAR
+
+| | codegraph | graphify | codebase-memory-mcp |
+|---|---|---|---|
+| Çalışma biçimi | **MCP sunucusu** | **CLI** (+ skill/kanca kurulumu) | **MCP sunucusu** (+ geniş kanca) |
+| Bizdeki durum | **KURULU, çalışıyor** | kurulu, **çağrılmıyor** | **YOK** |
+| Araç/komut sayısı | 8 | 5+ | 15 |
+| Araçlar | `explore` `search` `node` `callers` `callees` `impact` `files` `status` | `extract` `query` `affected` `god-nodes` `diagnose` `explain` `path` | `index_repository` `search_graph` `trace_path` `detect_changes` `query_graph` (Cypher) `get_architecture` `get_code_snippet` `search_code` `manage_adr` `ingest_traces` … |
+| Anlamsal arama | yok | yok | **var** (gömülü `nomic-embed-code`, 768d int8) |
+| Dil sayısı | — (ölçülmedi) | 30+ | 158-162 (iddia) |
+| Model çağrısı / API anahtarı | gerektirmiyor | gerektirmiyor (`--code-only`) | gerektirmiyor |
+| Veri nerede | yerel | yerel (`graphify-out/`) | yerel (`~/.cache/…`, SQLite) |
+| SQL / DB şeması | **görmüyor** | **görmüyor** (B: 252 SQL dosyasını hiç görmedi) | **görmüyor** (kendi belgesi söylüyor) |
+
+---
+
+## 3 · ÖLÇÜLMÜŞ DAVRANIŞ FARKLARI
+
+### 3.1 · codegraph — birebir kaynak döndürüyor
+
+REC-313 (B sınıfı): codegraph `resolveProductRoute`'un **birebir kaynağını** döndürdü ve cevap
+kodun kendi yorumunda yazılıydı. graphify aynı soruda **düğüm adı** döndürdü, o metin çıktısında
+**hiç yoktu**. Hüküm: *"codegraph'ın yerine değil YANINA."*
+
+⭐**Ama bugün ölçülen bir şey daha var:** URUN 2026-09-16'da **beş** yanlış hüküm verdi ve
+**hiçbirinde codegraph'a danışmadı.** Yani kurulu ve çalışan araç, yetenek eksikliğinden değil
+**çağrılmadığı için** işe yaramadı → [[arac-atil-kalmaz-kullanim-yeri-yazilir]].
+
+### 3.2 · graphify — komut seçimi isabeti belirliyor
+
+B sınıfı (REC-313, tek koşum): `query` beş soruda **0 isabet** (3 yanlış, 2 eksik) — başlangıç
+düğümünü kelime eşlemesiyle seçiyor ve Türkçe yorumlara çarpıyor. **Aynı araç** `affected` ile
+aynı soruları **0,7 sn'de DOĞRU** cevapladı. Yani araç değil **komut** yanlıştı.
+
+⚠`affected` **parantez** gerektiriyor (`productRoute` → *"No unique node match"*,
+`productRoute()` → doğru). Hiçbir belgede yazılı değil, ölçümle bulundu.
+
+### 3.3 · codebase-memory-mcp — kanca kapsamı en geniş, ama ASLA bloklamıyor
+
+Bugün kaynak kodundan okundu (`src/cli/hook_augment.c`):
+
+Kanca olayları: `SessionStart` · `SubagentStart` · `UserPromptSubmit` · `PreCompact` ·
+`PostCompaction` · `TaskStart` · `TaskResume` · `pre_llm_call` · `PreToolUse` (Grep/Glob/Bash) ·
+`PostToolUse` (Read).
+
+⭐**Kodun kendi cümlesi:** *"this NEVER blocks a tool call. Every error, timeout, missing
+project, or short/odd pattern path results in exit 0 with NO stdout output."* ve
+*"The hook cannot deny a tool."* Yalnız `additionalContext` ile bilgi ekliyor.
+
+**Bu, graphify'ın `--strict`'inden yapısal olarak daha güvenli:** `--strict` bir okumayı
+`permissionDecision: deny` ile **reddedebiliyor** (oturumda bir kez); cbm'nin kancası
+reddetme yetkisine **hiç sahip değil.**
+
+⛔**ÖLÇEMEDİĞİM İKİ ŞEY — adıyla:** (1) kurulumun **tam olarak hangi** ayar dosyalarına yazdığı;
+`agent_clients.c` ve `agent_profiles.c`'de Claude'a özgü yol **yok**, yazma mantığı başka bir
+dosyada. (2) **Yedek alıp almadığı.** İkisi de bilinmiyor; program indirilmeden ölçülemez.
+*Graphify'da tam bu noktada iki kez yanlış hüküm verildi (karne madde 4 ve 5) — tekrarlanmadı.*
+
+---
+
+## 4 · BİRLİKTE ÇALIŞIR MI
+
+**Teknik olarak evet** — üçü ayrı isim alanında, çakışan araç adı yok.
+
+**Ama iki gerçek çakışma var:**
+
+**4.1 · Kanca çakışması.** graphify `Bash|Grep` ve `Read|Glob` olaylarına kanca kuruyor;
+codebase-memory-mcp **aynı olaylara** (`PreToolUse` Grep/Glob/Bash + `PostToolUse` Read) kendi
+kancasını kuruyor. İkisi birlikte kurulursa **her arama ve her dosya okumasında iki araç**
+devreye girer. İkisi de fail-open, yani kilitlenme olmaz — ama her çağrıya iki kez ek metin
+girer ve bağlam şişer.
+
+**4.2 · Aynı soruya üç cevap.** Üçü de "ne neyi çağırıyor" sorusunu cevaplıyor. Üçü birden
+kuruluysa aynı soru üç kez cevaplanır ve hangisine güvenileceği **yazılı bir kural olmadan**
+belirsiz kalır. Bugün zaten yaşadığımız sorun bu: kurulu araç çağrılmıyor.
+
+**Öneri:** ikisi birden değil. Sıra şu olmalı — (a) graphify kurulumu koş ve **kullan**
+(Recep onayladı, ALTYAPI'da), (b) `affected` ↔ `codegraph_impact` **yan yana** koş ve say,
+(c) ancak o ölçümden sonra üçüncü araç tartışılsın. Aksi hâlde bir dördüncü atıl araç eklenir.
+
+---
+
+## 5 · BU MUKAYESENİN SINIRLARI (adıyla)
+
+1. **Yan yana koşum YAPILMADI.** Bu belge envanter ve kaynak-kodu okumasıdır; hangisinin daha
+   çok/doğru bulgu verdiği **ölçülmedi.** "Aynı iş" ve "daha iyi" hükümleri bu belgede YOK.
+2. **graphify davranış sayıları B sınıfı** (REC-313, 2026-09-13, başka şerit, tek koşum).
+   Bu makinede yeniden ölçülmedi.
+3. **codebase-memory-mcp hiç koşturulmadı.** Program indirilmedi; tüm bilgi depo + kaynak kodu
+   okumasıdır. Performans iddiaları (Linux çekirdeği 3 dakikada, sorgular <1 ms, %99 daha az
+   token) **kendi beyanları** — doğrulanmadı.
+4. **"Telemetri yok" iddiaları statik okumadır**, ağ trafiği hiçbirinde dinlenmedi.
+5. **Commit sayaçları 100'de tavanlı.** "100+" gerçek sayı değil, alt sınır.
+6. **codegraph'ın dil sayısı ölçülmedi** — tabloda boş bırakıldı, tahmin yazılmadı.
+
+---
+
+## 6 · DERİN ÖLÇÜM (aynı gün, 12 ajanlı koşum, 6 eksen + 6 bağımsız çürütme)
+
+**Yöntem:** Workflow — altı eksen paralel tarandı, her bulguyu **reddetmeye çalışan** ayrı bir
+ajan denetledi. 12 ajan · 0 hata · 31 dk · 532 araç çağrısı. Beş bulgu çürütmeden geçti,
+**bir bulgunun gerekçesi düzeltildi.**
+
+### 6.1 · Eksen sonuçları
+
+| Eksen | Önde | Ölçülen fark |
+|---|---|---|
+| **SQL / Postgres** | **graphify** | tek araçta canlı DB introspection VAR |
+| Boyut anatomisi | cbm | ama boyut **paketleme**, yetenek değil (aşağıda) |
+| Olgunluk / bakım | cbm | CI iş akışı **3 vs 22**, sanitizer **0 vs 5** |
+| Gerçek yetenek | cbm | graphify daha **GENİŞ**, cbm daha **DERİN** |
+| Kurulum ayak izi | cbm | cbm **repoya hiç dokunmuyor** |
+| Bizim yığına uyum | cbm | (gerekçesi düzeltildi, §6.5) |
+
+### 6.2 · ⭐SQL — İKİ İDDİA DA KISMEN YANLIŞTI, sebebi TEK SATIR
+
+İki çelişen iddia vardı: URUN *"graphify SQL görmüyor"* · ALTYAPI *"Supabase
+haritalandırması yapılabiliyor"*.
+
+**Sebep `pyproject.toml:87`:** `tree-sitter-sql` graphify'ın **temel bağımlılığı değil**,
+isteğe bağlı bir ekstra. Kurulmazsa `extractors/sql.py:284-286` boş sonuç döndürüyor ve
+**koşum BAŞARILI bitiyor** — yalnız stderr'e uyarı düşüyor (`extract.py:6572-6607`).
+⚠`README.md:342` ise `.sql`'i temel gramerler arasında, **ekstra işareti koymadan** listeliyor.
+**Tuzak tam burada:** REC-313'ün *"252 dosyayı hiç görmedi"* ölçümü **doğruydu**, ama sebebi
+kalıcı bir yetenek sınırı değil **kurulmamış bir pakettir.**
+
+**graphify'ın `.sql` ayrıştırıcısı 720 satır** (`extractors/sql.py`) ve **tipli kenar**
+üretiyor: tablo · view · fonksiyon · trigger · index düğümleri; `references` (FK) ·
+`indexes` · `triggers` · `reads_from` kenarları. `--postgres DSN` ile **canlı DB'den** şema
+çıkarıyor ve **salt okuma zorunlu**: `pg_introspect.py:31`
+`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE`.
+
+⛔**Üç sınır, hepsi ölçüldü:** (1) **RLS / `CREATE POLICY` HİÇ YOK** — açık dert
+`Graphify-Labs/graphify#3401`, 2026-09-07'den beri **OPEN**. (2) **SÜTUN DÜĞÜMÜ YOK**; canlı DB
+yolu tabloyu `CREATE TABLE x (id INT)` **saplaması** olarak yazıyor, yani sütunu uyduruyor.
+(3) `pg_policy` / `pg_trigger` / `pg_index` sorgusu hiç yok.
+
+⭐**AJAN YENİ BİR HATA ÖLÇTÜ (fikstürle koştu):** PostgreSQL trigger'ında tablo bağı **yanlış**
+kuruluyor. `sql.py:474-481` `keyword_for`'dan sonraki referansı tablo sayıyor; PG sözdiziminde
+(`... ON public.orders FOR EACH ROW EXECUTE FUNCTION public.bump_order()`) bu **fonksiyonun**
+üstüne düşüyor. Koşum `trg_orders -triggers-> public_bump_order` verdi, `public.orders` trigger
+kenarını **hiç almadı**. Kod Firebird/T-SQL'in `CREATE TRIGGER x FOR <tablo>` kalıbına yazılmış.
+
+**cbm tarafı:** `.sql`'i **kutudan çıktığı gibi** görüyor (`src/discover/language.c:263`), grameri
+ikiliğe gömülü (`vendored/grammars/sql/parser.c`, 41,6 MB). ⭐**SÜTUNLAR `Field` düğümü oluyor**
+(`lang_specs.c:690`) — graphify'da karşılığı yok. Üstüne **dbt** desteği var
+(`extract_dbt.c`, `{{ ref() }}` köken izi). **Eksikleri:** FK kenarı yok · trigger/index/policy
+dağıtımı yok · **canlı DB bağlantısı hiç yok** (`libpq`/`PQconnectdb` aramaları 0).
+
+⚠**BENİM BİR ALINTIM KAYNAKTA DOĞRULANMADI:** *"cbm README'si SQL şemalarını indekslemiyor
+diyor"* demiştim. Ajan aradı: `README.md:835` SQL'i **"Good (75-89%)"** çözünürlük kuşağında
+listeliyor, `README.md:779` desteklenen diller satırında `sql` geçiyor, ve SQL'i **dışlayan bir
+cümle bulunamadı.** → karne maddesi.
+
+### 6.3 · Boyut — 54 KAT fark PAKETLEMEDEN geliyor, ÖLÇÜLDÜ
+
+Ajan **aynı 30 grameri** iki paketlemede yan yana ölçtü:
+
+| | cbm (üretilmiş ham `parser.c`) | graphify (PyPI wheel) | oran |
+|---|---:|---:|---:|
+| 30 gramerin toplamı | **425,69 MB** | **7,899 MB** | **54×** |
+| `sql` | 39,70 MB | 0,363 MB | 109× |
+| `fortran` | 34,71 MB | 0,391 MB | 89× |
+| `cpp` | 24,69 MB | 0,301 MB | 82× |
+
+⭐**Recep'in sorusunun cevabı:** boyut **gelişmişlik göstergesi değil**, paketleme tercihidir.
+cbm grameri üretilmiş C kaynağı olarak deposunda tutuyor, graphify aynısını paketten çekiyor.
+(Ajanın kendi sınırı: birinci-parti kod yalnız **bayt** olarak ölçüldü — cbm 33,43 MB `.c/.h`
+vs graphify 3,03 MB `.py`; C Python'dan kalabalık yazıldığı için bu 11 kat **mantık hacmini
+bilinmeyen bir çarpanla abartıyor.**)
+
+### 6.4 · Olgunluk — cbm önde, ama testte graphify önde
+
+| Ölçüt | graphify | cbm |
+|---|---:|---:|
+| Test dosyası | **283** | 256 |
+| Test/kaynak bayt oranı | **1,20** | 0,87 |
+| CI iş akışı / job | 3 / 3 | **22 / 12** |
+| Sanitizer bacağı | 0 | **5** (ASan/UBSan/MSan/LSan/TSan) |
+| **Bloklayan** güvenlik kapısı | **0** | **3** |
+| SHA-pinli action | 0 | **hepsi** |
+| İmzalı release | yok | **18** (cosign) |
+
+⚠graphify'ın `bandit` ve `pip-audit` adımları `ci.yml`'de açıkça `continue-on-error: true` —
+yani **bloklamıyor**. Bizim kendi doktrinimizle (fail-closed) çelişiyor.
+**İkisinde de satır kapsamı ölçülemedi:** hiçbirinin CI'ında kapsam adımı yok.
+
+### 6.5 · Çürütülen bulgu — hüküm kaldı, GEREKÇE düştü
+
+Uyum ekseninde *"cbm `path_alias.h` ile `@/*` takma adını çözüyor"* bir **ayırt edici** olarak
+yazılmıştı. Çürütücü ajan reddetti: **graphify da çözüyor ve daha genişini yapıyor**
+(`extractors/resolution.py:95-174` — `extends` zinciri, JSONC, `baseUrl`, en-yakın-ata).
+⭐**Paylaşılan yetenek kıyasta GEÇMEZ.** Windows ekseni ise birebir doğrulandı: graphify'ın üç
+iş akışı da yalnız `ubuntu-latest`; cbm `windows-latest` + `windows-11-arm` koşuyor.
+
+### 6.6 · ⛔EN ÖNEMLİ SINIR — HİÇBİR ARAÇ KOŞTURULMADI
+
+Altı eksenin **altısı** da aynı sınırı kendi ağzıyla yazdı: görev kuralı kurulumu yasakladığı
+için **tüm ölçüm kaynak kodu okumasıdır.** cbm bu makinede kurulu bile değil.
+
+Dolayısıyla **ölçülmeyenler:** iki aracın VentHub üzerinde ürettiği grafiğin **doğruluğu ve
+recall'ı** · sorgu gecikmesi · kurulumun diskte **önce/sonra diff'i** · ve **isabet** —
+yani aynı soruya hangisinin doğru cevap verdiği.
+
+⭐**Bu yüzden "cbm 4-1 önde" bir KURULUM ve BAKIM hükmüdür, İSABET hükmü değildir.** İsabeti
+ancak yan yana koşum ölçer ve o koşum yapılmadı. graphify'ın `query` komutu 118 bin yıldıza
+ve bu tablodaki iyi sayılara rağmen beş soruda **sıfır** isabet etmişti — bu tablo o dersi
+çürütmüyor, tekrarlıyor.
+
+İlgili: REC-313 · REC-310
 
 
 ---
@@ -12313,6 +14006,70 @@ olması gerekir. Aşağıdaki sayı, o anahtarın kaç grupta matris kovasına d
 | `size_d_mm` | 1 / 19 |
 | `tank_capacity_l` | 1 / 19 |
 
+
+
+---
+# FILE: docs\audits\ocr-kiyas-2026-09-16-pr1221.md
+
+# OCR kıyası — ilk koşum (2026-09-16, PR #1221, SHA 142822de5)
+
+**Ne bu:** Recep kararı 23 (REC-318 kalem F, Faz 1) — open-code-review'un (OCR, v1.12.3, delegation kipi, anahtarsız) bizim sistemde ne kattığını ölçen üç kollu kıyasın **ilk vakası**. Bu dosya tek vakadır; hüküm evren (kaçırma listesi `kacirma-listesi-2026-09-16.md`, 33 diff-görünür vaka + 4 geçmiş hata) tamamlanınca verilir. Eşik: yalnız B'nin bulduğu ≥ 4/evren VE yanlış alarm A'dan yüksek değil.
+
+**Vaka:** URUN REC-340 Adım 2 migration'ı (`supabase/migrations/20260916093000_arama_indeksi_ve_govde.sql`, +542) — düzeltme ÖNCESİ commit 142822de5. Bu commit'te bilinen bir gerçek kusur var: `products`/`categories`/`product_families` üzerine tetik ekleyen migration'da `lock_timeout`/`statement_timeout` yok; INV-MIGRATION-3 (squawk) kırmızı verdi, URUN fcb21f7a8 ile düzeltti (5 sn, EXPLAIN ANALYZE 170 ms ölçümüyle). Kıyasın doğruluk ölçütü: bu kusuru kim, hangi kesinlikte buldu.
+
+**Kollar (hepsi Sonnet, salt okuma, auto-fix kapalı, aynı worktree, aynı SHA):**
+- **A** = Claude tek başına, iki bağımsız koşum (A1, A2). Yönerge: doğruluk/güvenlik/performans-kilit/idempotent/bakım/test.
+- **B** = Claude + `ocr delegate` akışı (`preview` → `rule` → git diff → inceleme), iki bağımsız koşum (B1, B2). OCR'ın katkısı bu kipte: dosya seçimi + kural grubu; LLM çağrısı OCR tarafında yok.
+
+**OCR'ın kendi ölçümleri (deterministik, dört koşumda aynı):** 2 dosyadan 1'i incelenebilir; `docs/standards/arama-standard.md` (+81/−27) **unsupported_ext** ile dışlandı. `.opencodereview/rule.json` yok → yerleşik "system/default" kural grubu (Correctness · Security · Performance · Maintainability · Test Coverage), SQL'e özgü kural yok. B2 cetveli bağlam için yine okudu (dışlama, inceleyicinin repo okumasını engellemiyor).
+
+## Sayılar
+
+| Kol | Bulgu | yüksek | orta | düşük | Bilinen kusur (lock_timeout) |
+| -- | -- | -- | -- | -- | -- |
+| A1 | 15 | 2 | 4 | 9 | **TAM** — "hiçbir yerde lock_timeout yok", yüksek |
+| A2 | 13 | 0 | 5 | 8 | KISMİ — ACCESS EXCLUSIVE kilit riski tartışılmamış, orta; timeout adı geçmiyor |
+| B1 | 8 | 0 | 2 | 6 | KISMİ — kilit, "düşük trafik penceresinde merge", düşük |
+| B2 | 12 | 1 | 4 | 7 | **YOK** |
+
+Bilinen kusur: A 1 tam + 1 kısmi / B 0 tam + 1 kısmi. Tek vakadan genelleme yapılmaz; kayıt.
+
+## Konu bazında kesişim (başlıklar farklı yazılmış, OPS eşleştirdi)
+
+| Konu | A1 | A2 | B1 | B2 | Not |
+| -- | -- | -- | -- | -- | -- |
+| lock_timeout / tetik kilidi | ✅ tam | ◐ | ◐ | — | bilinen gerçek kusur |
+| SECURITY DEFINER fonksiyonlarda EXECUTE PUBLIC'e açık (`arama_indeksi_tazele`, `arama_kuyrugu_bosalt`), repo konvansiyonu REVOKE | ✅ yüksek | — | — | ✅ yüksek | **yeni gerçek bulgu adayı** → URUN doğrular (#1221 merge oldu 11:27Z) |
+| Ürün tetiği toplu import'ta satır-satır (aile/kategori kuyruklu, ürün değil) | ✅ | ✅ | ✅ | — | 3/4 |
+| Pasif/silinmiş ürün indekste kalıyor (status/deleted_at filtresi yok) | ✅ | — | ✅ | ✅ | 3/4 |
+| Guard anon yetkisini/has_function_privilege doğrulamıyor | ✅ | ✅ | — | ✅ | 3/4; B2 cetvel K13.3'e bağladı |
+| `technical_specs::text ILIKE` indekssiz | ✅ | ✅ | — | — | |
+| `product_search_index.tenant_id` FK yok | ✅ | — | — | ✅ | |
+| `perform … where exists` okunabilirlik | ✅ | ✅ | — | — | |
+| `kapsam='urun'` ölü dal | ✅ | ✅ | — | — | |
+| ILIKE `%`/`_` kaçışsız | — | — | ✅ | ✅ | önceki sürümden devralınmış |
+| Türkçe/İngilizce ad karışımı | ✅ | ✅ | — | — | |
+| Guard boş DB'de tüm davranış testlerini atlıyor | ✅ | — | — | — | yalnız A |
+| p_limit tavanı 100→500 (public RPC) | — | ✅ | — | — | yalnız A |
+| İndeks backfill'den önce / ANALYZE yok | ✅ | — | — | — | yalnız A |
+| INNER JOIN: indeks satırı eksikse ürün aramadan sessizce düşer | — | — | ✅ | — | yalnız B |
+| Cetvel K8.4 / K8.7 (hassasiyet tavanı, indeks varlığı) guard'da yok | — | — | — | ✅ | yalnız B; B2 dışlanan cetveli okuyarak buldu |
+| Aile soft-delete / kategori is_active tazelemiyor | — | — | ✅ | ✅ | yalnız B |
+| pg_cron durursa kuyruk birikimi alarmı yok | — | — | ✅ | — | yalnız B |
+| Tetik fonksiyonlarında da revoke yok (tutarlılık) | — | — | — | ✅ | |
+
+**Yalnız-A konu:** 3 (guard boş DB · limit 500 · indeks/ANALYZE) + bilinen kusurun tam adı. **Yalnız-B konu:** 4 (INNER JOIN sessiz düşme · K8.4/K8.7 · soft-delete tazeleme · cron alarmı). **Ortak:** 10 konu.
+
+## Bu vakadan çıkan (hüküm değil, gözlem)
+
+1. Delegation kipinde A ile B arasındaki fark büyük ölçüde **aynı modelin iki koşumu arasındaki dağılım**; OCR motorunun ölçülebilir katkısı dosya seçimi ve beş başlık. Beş başlık B'yi "Test Coverage"a itti (B2 üç cetvel maddesini guard'a bağladı) — bu gerçek bir yönlendirme etkisi ve yalnız-B'nin 2'si oradan geldi.
+2. OCR'ın `.md` dışlaması bu vakada kayıp üretmedi (B2 cetveli yine okudu) ama cetvel+kod aynı PR'da olduğunda cetvel diff'i hiçbir kolda incelenmedi — Faz 2'de `include` ile açılır.
+3. **Yanlış alarm ölçülmedi:** 36 tekil konunun kaçı gerçek, URUN/ALTYAPI doğrulamadan bilinmez. İlk doğrulanacak: EXECUTE revoke (2/4 yüksek, migration prod'da).
+4. Bilinen kusuru dört koşumdan yalnız biri adıyla buldu; INV-MIGRATION-3 deterministik kapı dört kolun da önündeydi. Alan-özgü kapı kalır (karar 23 hükmüyle uyumlu).
+
+## Sonraki koşumlar
+
+Kaçırma listesindeki 33 diff-görünür vaka + 4 geçmiş hata (CRLF/LF, SSL mode, Türkçe küçültme, kırık işaretçi) aynı düzenekle; her vakada 2×2. Sayaç: yalnız-B gerçek bulgu / yanlış alarm A'ya göre. Ham JSON'lar OPS scratchpad `ocr-kiyas/{A1,A2,B1,B2}.json` (commit'lenmez).
 
 
 ---
@@ -14311,6 +16068,3045 @@ kvkk-request-ledger (legal ile karma).
 
 
 ---
+# FILE: docs\audits\rec313-graphify-deneme-2026-09-13.md
+
+# REC-313 — graphify denemesi (2026-09-13, ALTYAPI)
+
+> Emir: REC-313 (OPS, 2026-09-12; Recep onayı REC-311 Faz 1). Bu belge ÖLÇÜM raporudur;
+> her sayı bu makinede bu tarihte koşulmuştur. Ölçülmeyen kalem "ölçülmedi" yazar.
+> Hüküm §7'de, Recep'e giden kararlar §8'de.
+
+## 0. Kaynak doğrulaması (emirdeki KAYNAK/CETVEL bloğu sınandı)
+
+Emir, paket adının `graphifyy` (çift y) olduğunu ve diğerlerinin sahte olduğunu söylüyordu.
+Kurulumdan ÖNCE ölçüldü:
+
+| İddia | Ölçüm | Sonuç |
+|---|---|---|
+| PyPI paketi `graphifyy` | `pypi.org/pypi/graphifyy/json` → HTTP 200, sürüm **0.9.61**, 229 yayın | DOĞRU |
+| Depo `Graphify-Labs/graphify` | paketin üç `project_urls` alanı da o depoyu gösteriyor | DOĞRU |
+| 117k★ | GitHub API: **116.380** yıldız, 11.370 fork | DOĞRU |
+| Apache-2 | `spdx_id: Apache-2.0` | DOĞRU |
+| Python | `language: Python`, `requires_python >=3.10` | DOĞRU |
+| Canlı proje | son push 2026-09-12, 1.325 açık konu, arşivlenmemiş | DOĞRU |
+
+Paket adı tipo-taklidi (typosquat) değil: PyPI kaydı doğrudan o depoya bağlı.
+
+**Kurulum:** `uv tool install graphifyy` → **8,1 sn**, iki çalıştırılabilir
+(`graphify`, `graphify-mcp`). uv zaten kuruluydu (0.8.4).
+
+### Telemetri
+
+Emir "telemetri varsa KAPALI" diyordu. Ölçüm:
+
+- Pakette `posthog`/`analytics`/`mixpanel`/`segment` izi **yok**.
+- `requests.post` / `urllib.request.urlopen` / `httpx.` çağrısı yapan **tek dosya yok**.
+- Tek kayıt mekanizması `querylog.py` (80 satır): **yerel dosyaya** yazar ve
+  varsayılan KAPALI (`GRAPHIFY_QUERY_LOG_ENABLE=1` ile açılır). Kodun kendi yorumu:
+  *"no-telemetry posture, so it is OFF unless explicitly enabled"*.
+- Yine de her koşumda `GRAPHIFY_QUERY_LOG_DISABLE=1` verildi (geri-uyum anahtarı, kazanır).
+
+⛔**Bu ölçümün sınırı:** kaynak kodu tarandı, **ağ trafiği dinlenmedi**. "Dışa veri gitmiyor"
+kanıtı statik okumadır, paket yakalama değildir.
+
+## 1. Adım A — yalnız KOD, LLM'siz
+
+`graphify extract . --code-only`, dal `altyapi/rec313-graphify-denemesi`, temiz ağaç,
+commit `56385a7a0`.
+
+**LLM'siz olduğu KANITLANDI, beyan edilmedi:** sanal ortamda `openai`/`anthropic`/`google`/
+`httpx`/`requests` kütüphanelerinin **hiçbiri kurulu değil**, ve yedi API anahtarının
+(`ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY`, `OPENAI_API_KEY`,
+`DEEPSEEK_API_KEY`, `MOONSHOT_API_KEY`, `KIMI_API_KEY`) **uzunluğu 0**. Yani bu adım
+para harcayamazdı. (Anahtarlar uzunlukla ölçüldü; varsayılan-değer kalıbı DEĞERİ basar.)
+
+| Ölçüm | Değer |
+|---|---|
+| Süre | **56,3 sn** (16 işçi paralel AST) |
+| Sınıflandırılan dosya | 1846 kod · 0 belge · 0 makale · 0 görsel |
+| Düğüm | **9.002** |
+| Kenar | **17.885** (hiper-kenar 0) |
+| Topluluk | 723 |
+| `graph.json` | **10.181.569 bayt** (9,7 MB) |
+| Toplam çıktı dizini | **15 MB** (`graph.json` + `manifest.json` + `.graphify_analysis.json` + `cache/`) |
+| Kenar kökeni | `_origin: ast` → **17.885 / 17.885** (LLM payı SIFIR) |
+| **EXTRACTED / INFERRED** | **17.684 / 201** → %98,9 kesin, %1,1 çıkarım |
+| Güven puanı | 1,0 → 17.684 · 0,85 → 198 · 0,8 → 3 |
+
+Kenar türleri: `contains` 6.917 · `imports_from` 3.832 · `imports` 3.305 · `calls` 2.709 ·
+`rationale_for` 278 · `method` 261 · `indirect_call` 198 · `references` 177 (+6 tür).
+
+`diagnose multigraph`: kayıp uç 0, sarkan uç 0, öz-döngü 0, birebir yinelenen kenar 0,
+aynı-uçlu çökme 0. Yani **kenar kaybı yok** — 17.885 kenar 17.885 ayrık uç çiftine karşılık geliyor.
+
+### İki ölçülmüş kusur
+
+1. ⛔**252 `.sql` dosyası grafiğe HİÇBİR ŞEY katmadı.** Aracın kendi uyarısı:
+   *"a dependency is missing: tree_sitter_sql not installed"*. Çözümü ek paket
+   (`graphifyy[sql]`). Bizim için bu küçük bir eksik değil: `supabase/migrations/**`
+   tam olarak o 252 dosyanın içinde ve prod şemamızın tek yazılı kaynağı orası.
+   **Bu hâliyle graphify migration'larımıza kördür.**
+2. 2 dosya söz dizimi hatasıyla kısmen çıkarıldı: `pricingAdmin.service.ts`
+   (L238'den itibaren, 28 sembol alındı) ve `AdminReturnsPage.integration.test.tsx`
+   (L46, 1 sembol). ⚠Bu dosyalar `tsc` ile DERLENİYOR — yani hata bizde değil,
+   graphify'ın TypeScript ayrıştırıcısında. Sessiz kısmi çıkarma, grafiğe güvenen
+   bir cevabın eksik olmasına yol açar ve araç bunu satır satır söylemiyor, özet uyarı veriyor.
+
+Ek not: araç 3 dosyayı "muhtemelen hassas" diye **atladı** (`.env.example.notifications`,
+`supabase-root-2021-ca.pem`, `tokens.md`) ve 122 dosyayı sınıflandıramadı. Atlama davranışı
+doğru yönde; ölçüldü, sorun çıkarmadı.
+
+### codegraph 1.6.0 ile yan yana
+
+| | codegraph 1.6.0 | graphify 0.9.61 |
+|---|---:|---:|
+| Dosya | 1.339 (indeksli) | 1.846 (sınıflandırılan kod) |
+| Düğüm | **14.997** | 9.002 |
+| Kenar | **28.349** | 17.885 |
+| Tazelik | ~1 sn (dosya izleyici) | 56 sn (tam koşum) |
+| Yön | **yönlü** | ⛔`directed: false` — **yönsüz** |
+| SQL | kapsıyor | ⛔252 dosya boş geçti |
+
+⚠**Bu tablo "codegraph 1,7 kat zengin" DEMEK DEĞİLDİR — evrenler aynı değil.** graphify
+`.archive/`, `registry/_legacy/`, Python betikleri ve `package.json` gibi dosyaları da
+düğümleştiriyor; codegraph'ın 1.339'u ise kendi indeks kapsamı. İki sayıyı aynı cetvelle
+karşılaştırmak için tek bir dizinde koşmak gerekir; **o ölçüm YAPILMADI.**
+
+`directed: false` kalemi ise cetvelden bağımsız gerçek bir fark: `diagnose`
+`post_build_graph_type: Graph` diyor. Kenar kayıtları yön bilgisini taşıyor (source/target
+ayrı), ama grafiğin kendisi yönsüz kurulmuş. "Kim çağırıyor" ile "neyi çağırıyor"
+ayrımı gezinti yönünden değil, komut seçiminden geliyor (§2'de ölçüldü).
+
+## 2. Adım B — beş soru, iki araç, aynı metin
+
+⚠**EMİRDEN SAPMA (kayıt kazandı):** OPS'in compact sonrası mesajı "aynı 3 soru" diyordu,
+Linear kaydındaki B maddesi **beş adlandırılmış soru** listeliyor. Kayıt SSOT olduğu için
+beşi koşuldu.
+
+`graphify query` beş soruda, her biri tek koşum:
+
+| # | Soru | Süre | Çıktı | Hüküm |
+|---|---|---:|---:|---|
+| 1 | productRoute 308 zinciri | 1.257 ms | 462 kelime | **EKSİK** |
+| 2 | fiyat hangi yüzeyde görünür | 1.429 ms | 476 kelime | **YANLIŞ** |
+| 3 | K3-b adres kuralı nerede yazılı | 1.412 ms | 418 kelime | **YANLIŞ** |
+| 4 | `Routes.product` kimler çağırıyor | 1.272 ms | 316 kelime | **YANLIŞ** |
+| 5 | `getCategoryDisplayName` değişirse ne bozulur | 1.211 ms | 450 kelime | **EKSİK** |
+
+Beşi de ~1,3 sn ve ~2.000 token bütçesi içinde. **Hız tartışmasız; isabet değil.**
+
+**Neden yanlış — kök sebep tek:** `query` başlangıç düğümlerini kelime eşlemesiyle seçiyor
+ve Türkçe docstring'lere de çarpıyor. Ölçülmüş örnekler:
+
+- Soru 4, `['routes', 'PRODUCT']` ile başladı: `routes` → `scripts/generate/generate-next-routes.js:L21`
+  içindeki bir yerel değişken, `PRODUCT` → `pricing.resolve.test.ts:L84` içindeki bir test sabiti.
+  Dönen 21 düğüm tamamen **fiyatlandırma servisinin içi**. Gerçek `Routes` nesnesi
+  (`src/utils/routes.ts`) cevapta **hiç yok**.
+  Yer gerçeği: `grep -rln "productRoute|Routes\.product" src/` → **39 dosya**. Kesişim ~0.
+- Soru 5, doğru düğümle başladı (`getCategoryDisplayName()`) ama ikinci başlangıç düğümü
+  `registry/_legacy/manage_registry.py:L484`'teki *"Disk Dostu Pulse: Sadece içerik değişirse yazar."*
+  docstring'i oldu. 257 düğüm bulundu, **73'ü gösterildi, 184'ü kesildi.**
+- Soru 2, `FIYAT` kelimesini `scripts/skills-eval-run.mjs:L35`'teki bir sabitle eşledi.
+- Soru 3 bir BELGE sorusu: `--code-only` grafikte belge yok, dolayısıyla cevaplanamazdı.
+  Araç bunu "bilmiyorum" diye söylemiyor, alakasız 133 düğüm döküyor. **Sessiz yanlış,
+  bizim en sevmediğimiz sınıf.**
+
+Dördü beşi de "TRUNCATED: showing X of Y nodes" uyarısı verdi — yani araç kestiğini söylüyor,
+bu dürüst. Ama kesilen kısımda cevap olabileceğini de söylüyor.
+
+### Aynı sorular doğru komutla: `affected`
+
+`query` bu iş için yanlış komut. Emirdeki soru 4 ve 5 "ters gezinti" soruları ve aracın
+bunun için ayrı bir komutu var. Aynı sorular `affected --depth 3` ile:
+
+| Giriş | Süre | Sonuç |
+|---|---:|---|
+| `productRoute` | 708 ms | *"No unique node match"* — çıplak ad tutmuyor |
+| `productRoute()` | 703 ms | **DOĞRU**: `Page() [calls] page.tsx:L156`, `products/[slug]/page.tsx [imports] L30`, `productRoute.test.ts [imports] L23` |
+| `getCategoryDisplayName()` | 697 ms | **DOĞRU**: 60 etkilenen düğüm, `ProductDetailBody() page.tsx:L489`, `generateMetadata() L122`, `Page() L201` … |
+
+Yani araç doğru cevabı **veriyor**, `query` onu bulamıyor. `affected` 0,7 sn'de
+dosya:satır düzeyinde gerçek çağıran listesi üretiyor ve parantez gerektiriyor
+(`ad` değil `ad()`) — bu kullanım bilgisi hiçbir yerde yazılı değil, ölçümle bulundu.
+
+### codegraph tarafı, aynı iki soru
+
+**Soru 1 (308 zinciri):** codegraph tek çağrıda `resolveProductRoute`'un **birebir kaynağını**
+döndürdü ve zincirin dört adımı kodun kendi yorumunda yazılı: aile+aktif varyant → PDP ·
+varyantsız aile → seri landing (200) · varyant slug'ı → kanonik aile adresine **308** ·
+hiçbiri → gerçek 404. Ayrıca `unavailable`'ın 404 OLMADIĞI gerekçesi de geldi
+("geçici arıza SEO'da kalıcı hasara dönüşürdü"). **Tam ve doğru.**
+
+**Soru 5:** codegraph 4 doğrudan çağıranı adlandırdı ve `getCategoryDisplayName`'in
+birebir kaynağını verdi — içinde 2026-09-01'de canlıda ölçülmüş kusurun kaydı duruyor
+(`t` atlanırsa sözlük adımı hiç çalışmaz, İngilizce sayfada Türkçe ad basar; kapı
+`INV-KATEGORI-ADI-1`). **"Ne bozulur" sorusunun cevabı buydu** ve graphify'ın 60 düğümlük
+listesinde bu bilgi yok, olamaz da: graphify kaynak metni döndürmüyor, düğüm adı döndürüyor.
+
+| Eksen | Kazanan | Ölçüm |
+|---|---|---|
+| Hız | **graphify** | 0,7–1,4 sn · codegraph çağrısı belirgin şekilde ağır |
+| Token maliyeti | **graphify** | ~2.000 token tavanı · codegraph tek çağrıda binlerce satır kaynak döktü |
+| "Kim çağırıyor" | **berabere** | ikisi de doğru; graphify `affected()` ile, codegraph doğrudan |
+| "Ne bozulur / niçin böyle" | **codegraph** | birebir kaynak + yorum; graphify'da kaynak metni YOK |
+| Doğal dilli soru | **codegraph** | graphify `query` 5'te 2 yanlış, 2 eksik |
+| Belge sorusu | **ikisi de HAYIR** | graphify `--code-only` belgeyi almadı; codegraph kod indeksi |
+| Kendi bayatlığını söyleme | **codegraph** | "edited Xms ago, pending sync" uyarısı verdi; graphify sessiz |
+
+⭐**Ölçümün açığa çıkardığı asıl şey:** bu iki araç aynı işi iki kalitede yapmıyor,
+**farklı iki işi** yapıyor. codegraph "bu kod ne yapıyor ve niçin" sorusunun aracı
+(kaynak + gerekçe). graphify "bu sembol nereye dokunuyor" sorusunun aracı (ucuz, geniş,
+metinsiz). Birinin cevabı diğerinin yerine geçmiyor.
+
+### graphify'ın bizde karşılığı OLMAYAN çıktıları
+
+Bunlar codegraph ile karşılaştırılamaz, çünkü bizde yok:
+
+- `god-nodes` — mimari merkezleri sıralıyor, **0,8 sn**, LLM'siz. Ölçülen ilk sekiz:
+  `useI18n()` **476 kenar** · `react` 443 · `vitest` 366 · `lucide-react` 165 ·
+  `useLocalizedRoutes()` **126** · `supabaseBrowserClient` 77 · `@supabase/supabase-js` 76 ·
+  `Database` 74. ⭐İlk iki *kendi* sembolümüz tam da paylaşılan-primitif kuralımızın
+  konusu olan ikisi — bu liste bedava bir risk haritası.
+- 723 topluluk kümelenmesi (Louvain benzeri), `graph.html`, Obsidian/GraphML/Neo4j/SVG dışa aktarma.
+- `--postgres DSN` ile canlı şemadan tablo/görünüm/fonksiyon/FK çıkarma. ⛔**Denenmedi ve
+  denenmemeli**: prod DB'ye bağlanır, bizde prod okuma/yazma Recep kapısıdır.
+- Çapraz-depo birleşik grafik (`global add`, `merge-graphs`).
+
+## 3. `graph.html` — Recep'e gösterilecek görsel
+
+Üretildi: `graphify-out/graph.html`, **497.603 bayt**, 866 ms.
+9.002 düğüm 1.500 sınırını aştığı için araç kendiliğinden **topluluk özeti** görünümüne
+düştü: 723 topluluk düğümü, 1.191 topluluklar-arası kenar.
+
+⛔**Ama şu hâliyle bir insana neredeyse hiçbir şey anlatmıyor:** toplulukların
+**723'ünün 723'ü adsız** ("Community 0", "Community 1", …). Ölçüldü: `grep -o "Community [0-9]*"`
+→ 723 ayrık etiket, ve `graphify-out/` içinde etiket dosyası yok. Topluluk adlandırma
+**LLM ister** (`label` / `cluster-only --backend=…`) ve o adım Adım C'nin parçası.
+
+Yani görsel harita, belge geçişi kararı verilmeden Recep'e "bak ne güzel" diye
+gösterilebilecek bir şey değil. Adsız 723 baloncuk.
+
+## 4. Adım C — belge geçişi MALİYETİ (tahmin; KOŞULMADI)
+
+Kapsam emirde sabit: yalnız `docs/standards/` + `docs/proje-takip/linear/`.
+PDF ve `venthub-pdf-ingestor` **geçilmez** (K15).
+
+**Ölçülen evren:** 85 markdown dosyası, **1.604.480 bayt**, 202.036 kelime.
+(`docs/standards` 73 dosya / 1.372.320 bayt · `docs/proje-takip/linear` 12 dosya / 232.160 bayt.)
+
+**Türetilen tahmin** (ölçüm değil, ikisi de açıkça tahmin):
+
+| Kalem | Alt sınır | Üst sınır | Dayanak |
+|---|---:|---:|---|
+| Girdi token | ~401.000 | ~535.000 | bayt/4 ve bayt/3 (Türkçe diakritik token'ı şişirir) |
+| Anlamsal parça | 7 | 9 | `--token-budget` varsayılanı 60.000/parça |
+| Topluluk adlandırma çağrısı | 8 | 8 | 723 topluluk ÷ `--batch-size` 100 |
+| **Toplam model çağrısı** | **15** | **17** | ikisinin toplamı |
+
+**Arka uç:** API anahtarı yok (yedisi de uzunluk 0), LLM kütüphanesi kurulu değil, ama
+`claude` CLI PATH'te (`/c/Users/alize/.local/bin/claude`) ve araçta `claude-cli` arka ucu
+var. Yani bu iş **abonelik kotasından** gider, fatura üretmez — 09-13'teki yerleşik sınav
+ölçümüyle aynı sınıf. `claude-cli` seçildiğinde eşzamanlılık zorla 1'e düşüyor, yani
+15–17 çağrı **sırayla** koşar.
+
+⚠**USD rakamı vermiyorum ve bu bilinçli.** Elimdeki tek gerçek referans bugünkü sınavın
+36 ajan koşumu için ürettiği 5,76 USD eşdeğeriydi; o koşumlar çok turlu ajanlardı,
+buradaki 15–17 çağrı ise tek turlu özetleme. İkisini oranlamak yanlış bir sayı üretir.
+Söyleyebileceğim ölçülmüş şey: **400–535 bin girdi token, 15–17 sıralı çağrı, abonelikten.**
+
+⛔KOŞULMADI. Karar Recep'in.
+
+## 5. Kurulum ne ekliyor — ÖLÇÜLDÜ, KOŞULMADI
+
+Emir "`graphify install --project` kanca/komut eklerse NE eklediğini yaz" diyordu.
+
+**Komut izin katmanı tarafından REDDEDİLDİ** ("Unauthorized Persistence"). Reddi kılık
+değiştirip tekrar denemedim. Yerine kurulu paketin kaynağı okundu
+(`install.py:653`, salt-okuma) ve `--project` bayrağının gerçekten var olduğu görüldü —
+`--help` metni onu yazmıyor, `_print_install_usage()` yazıyor. Yaptıkları:
+
+1. `.claude/skills/graphify/SKILL.md` + `references/` kopyalanır.
+2. ⛔**`.claude/CLAUDE.md`'ye "always-on" blok EKLENİR.** Metni kodda sabit
+   (`_skill_registration`): bir `# graphify` başlığı, skill yolu, ve şu cümle —
+   *"When the user types `/graphify`, use the installed graphify skill or instructions
+   before doing anything else."* `_register_always_on_block` dosyayı okur, içinde
+   "graphify" yoksa **sonuna yazar**.
+3. `--strict` bayrağı ayrı bir davranış getiriyor, kendi yardım metniyle:
+   *"block the first raw file read per session until one …"* — yani oturumun ilk ham
+   dosya okumasını **engelleyen** bir kapı.
+
+⛔**BU ADIMI YAPMADIM, üç sebeple:** (a) izin katmanı reddetti; (b) CLAUDE.md'ye yazmak
+benim yetkimde değil ve bir akranın emri bunu onay yapmaz; (c) `--strict`'in ne
+engellediği ölçülmeden kurulmamalı. Karar Recep'in (§8).
+
+## 6. Bu raporun kendi sınırları
+
+- codegraph ile graphify **aynı dosya evreninde koşulmadı** → düğüm/kenar oranı
+  karşılaştırması kaba.
+- codegraph tarafında **iki** `codegraph_explore` çağrısı kullanıldı (araç bu proje için
+  2 çağrı bütçesi bildiriyor); beş sorunun ikisi codegraph'a soruldu, üçü sorulmadı —
+  ikisi belge sorusuydu, biri (soru 4) yer gerçeğiyle `grep` ile karşılandı.
+- `query` için **token bütçesi varsayılanda** bırakıldı (2.000). `--budget` yükseltilse
+  kesilme azalırdı; o koşum yapılmadı.
+- SQL eki (`graphifyy[sql]`) kurulmadı → 252 dosyalı boşluğun kapanıp kapanmadığı ölçülmedi.
+- Telemetri yargısı statik kod okumasıdır, **ağ dinlemesi değildir**.
+- Belge geçişi ve topluluk adlandırma **koşulmadı**; §4'teki her sayı tahmindir.
+
+## 7. HÜKÜM — UYARLA, ve codegraph'ın YANINA
+
+Sayıyla: graphify beş sorunun ikisini yanlış, ikisini eksik cevapladı; doğru komutla
+(`affected`) aynı iki soruyu 0,7 sn'de doğru cevapladı; 252 SQL dosyasını hiç görmedi;
+kurulumu bir CLAUDE.md'ye kalıcı blok yazıyor. Buna karşılık 56 saniyede, sıfır model
+çağrısıyla, %98,9'u kesin çıkarma olan 17.885 kenarlık bir grafik üretti ve bizde
+karşılığı olmayan üç çıktı verdi (`god-nodes`, topluluk kümelenmesi, dışa aktarma hattı).
+
+**BIRAK değil** — ölçüm ücretsiz değeri gösterdi. **AL da değil** — mevcut hâliyle
+kurulması CLAUDE.md'ye dokunuyor ve `query` sessiz yanlış üretiyor.
+
+**Önerilen benimseme, üç kalemle sınırlı:**
+
+1. `affected <ad>()` — ikinci, bağımsız "nereye dokunur" görüşü. Ucuz (0,7 sn, ~300 kelime),
+   ve codegraph'ın bayatlık uyarısı verdiği anda ikinci kol olarak değerlidir.
+2. `god-nodes` — paylaşılan-primitif riskinin ölçülmüş listesi. Şu an elimizde bunun
+   karşılığı yok ve liste ilk denemede iki gerçek merkezi gösterdi.
+3. `diagnose multigraph` — grafik sağlığı; kendi grafik üreten işlerimizde kalıp olarak yararlı.
+
+**Benimsenmemesi önerilen:** `query` (sessiz yanlış üretiyor — 5'te 2), `install`
+(CLAUDE.md'ye yazıyor), `--strict` (dosya okumayı engelliyor), `--postgres` (prod DB).
+
+**Kararsız bırakılan:** belge geçişi ve topluluk adlandırma — §4'teki bedel karşısında
+değeri henüz ölçülmedi. Bir defalık deneme, 723 topluluğu adlandırıp `graph.html`'i
+gerçekten okunur yaparak bu soruyu kapatabilir.
+
+**codegraph'ın yerine mi, yanına mı: YANINA.** Sebebi tercih değil ölçüm — codegraph
+birebir kaynak ve gerekçe döndürüyor, graphify düğüm adı döndürüyor. "Ne bozulur"
+sorusunun cevabı kaynak metnin içindeydi ve graphify'ın çıktısında o metin hiç yok.
+
+## 8. Recep'e giden karar (tek soru)
+
+graphify'ın kurulum adımı `.claude/CLAUDE.md`'ye kalıcı bir blok yazıyor ve bir bayrağı
+oturumun ilk dosya okumasını engelliyor. Ben bunu yapmadım. Üç seçenek var ve **önerim
+ikincisi**:
+
+1. Skill'i kurmak (CLAUDE.md'ye blok yazılır, `/graphify` komutu gelir).
+2. **Skill'i KURMAMAK, aracı üç komutla elle kullanmak** (`affected`, `god-nodes`,
+   `diagnose`) — CLAUDE.md'ye dokunulmaz, kazanç kalır. **Önerim bu.**
+3. Aracı tamamen bırakmak.
+
+Ayrıca §4'teki belge geçişi (400–535 bin token, 15–17 sıralı çağrı, abonelikten) için
+"bir defalık koş" ya da "şimdilik hayır" kararı bekliyor.
+
+İlgili: REC-313 · REC-311 · REC-314
+
+
+---
+# FILE: docs\audits\rec314-tetiklenebilirlik-sinavi-2026-09-14.md
+
+# REC-314 — tetiklenebilirlik sınavı: 13 kalem, hepsi KAL (2026-09-14)
+
+> **Soru:** envanterde "çağıranı yok" görünen yetenek kalemleri gerçekten **erişilemez** mi,
+> yoksa yalnız **o işler henüz gelmemiş** mi? Fark önemli: birincisi sökme gerekçesidir,
+> ikincisi değildir.
+>
+> **Cevap: hiçbiri erişilemez değil. 13 kalemin 13'ü de tetiklendi — hüküm KAL.**
+>
+> Cetvel: `docs/standards/arac-envanteri-standard.md` (AXIOM 3) ·
+> Envanter: `docs/audits/arac-envanteri-2026-09-07.md` §3.3
+
+## 1 · Recep'in ilkesi ölçümle doğrulandı
+
+Parti 1'in üç kalemi de "hiç çağrılmamış" listesindeydi ve **sökme sırasının başındaydı.**
+Ölçüm üçünün de tetiklenebilir olduğunu gösterdi. Atıl liste bir sökme listesi olarak
+kullanılsaydı **çalışan üç araç silinecekti.**
+
+Bu, cetvelin AXIOM 3'ünün üç sorusunun bir sınırını gösterir: "çağıranı var mı" sorusu
+**geçmişe** bakar, "çağrılabilir mi" sorusuna cevap vermez.
+
+## 2 · Parti 1 — 3 kalem, 6/6 (ölçüm 2026-09-14)
+
+| Kalem | Vaka | Skor | Süre |
+|---|---|---|---|
+| `ui-ux-pro-max` | 01 | 0.971 | 211 sn |
+| `ui-ux-pro-max` | 02 | 0.819 | 112 sn |
+| `supabase-security` | 01 | 0.943 | 157 sn |
+| `supabase-security` | 02 | 0.911 | 148 sn |
+| `to-prd` | 01 | 0.755 | 181 sn |
+| `to-prd` | 02 | 0.762 | 176 sn |
+
+Altısında da `without` kolu **0**, `partial` false.
+
+## 3 · Parti 2 — 10 kalem, 20 vaka, 20/20 (ölçüm 2026-09-14)
+
+Üç alt-ajan, üç ayrı çalışma kopyası:
+
+| Parti | Kalemler | Vaka | Maliyet | Süre |
+|---|---|---|---|---|
+| 2A | `venthub-global-rontgen` · `threejs-webgl-performance` · `to-issues` · `venthub-architecture` | 6/6 | 2.40 USD | 491 sn |
+| 2B | `venthub-tasarim-dili` · `venthub-auditor` · `venthub-enterprise-audit` | 6/6 | 1.80 USD | 393 sn |
+| 2C | `vercel-composition-patterns` · `vercel-react-best-practices` · `web-design-guidelines` | 8/8 | 1.68 USD | 363 sn |
+
+Hepsinde `with = 1.00` / `without = 0.00` / **Δ = +1.00**. Toplam **~5.88 USD**
+(onaylanan bütçe 17.2 USD).
+
+## 4 · ⚠SINAVIN KENDİ SINIRLARI — adıyla yazılı
+
+Bunlar kalem kusuru **değil**, sınav yönteminin sınırıdır ve hükmü nitelendirir:
+
+- **6 vakada koşum `Reached maximum number of turns (4)` ile bitti.** Yani
+  **"tetikleniyor" KANITLI, "tetiklendikten sonra işi bitiriyor" ÖLÇÜLMEDİ.** Hüküm KAL
+  kaldı çünkü sorulan soru tetiklenebilirlikti; bitirme ayrı bir sorudur ve ölçülmemiştir.
+- **`--runs 1`** koşuldu (varsayılan 3 değil) — tek koşumun kararsızlığı ölçülmedi.
+- **Örnek rastgele değil:** her kalemin **ilk iki** tetik vakası alındı. Bu bir örneklemdir,
+  tam karne değildir.
+- **`tool_used:Skill` hangi skill'in tetiklendiğini ayırt etmiyor.** `without = 0` olması bu
+  riski azaltır, **kaldırmaz.**
+- **"Tetiklenmemeli" kolu koşulmadı** — yani yanlış tetiklenme (false positive) ölçülmedi.
+
+## 5 · ⚠MALİYET TABANI DÜZELTİLDİ: 0.28 USD/vaka (0.86 DEĞİL)
+
+Parti 1'den çıkarılan 0.86 USD/vaka tabanı, o partinin **daha uzun** koşumlarından
+geliyordu (112–211 sn); parti 2 koşumları 39–113 sn sürdü ve vaka başı **0.28 USD** ölçüldü.
+
+Bu, aynı günün **dördüncü** "ölçüt doğru, evren yanlış" vakası — ve ilk kez **fazla**
+tahmin yönünde. Fazla tahmin de bir hatadır: 13 kalemin tam kapsamı eski tabanla ~134 USD
+görünüyordu ve örnekleme "mecburi" ilan edilmişti; doğru tabanla o karar farklı verilebilirdi.
+
+## 6 · ⛔ÖN KOŞUL DERSİ (benim hatam)
+
+`claude plugin eval` **bizim `evals/evals.json` biçimini tanımıyor.** Doğru zincir:
+
+```
+node scripts/skills-eval-convert.mjs --skill=<kalem>
+claude plugin eval .claude --eval-dir evals-yerlesik --case <vaka> --no-publish --runs 1 --ablation with-without
+```
+
+`--eval-dir` **zorunludur** (varsayılan `evals/`). Üretilen ağaç `.gitignore`'da
+(satır 134–139), yani **her taze ağaçta yeniden üretilir.**
+
+Alt-ajanlara **komutu verdim, ön koşulunu vermedim.** Parti 1'in koşabilmesinin sebebi o
+ağaçta ağacın **zaten üretilmiş** olmasıydı.
+
+⭐**Ders: dün çalışan bir komut, o ağaçta `.gitignore`'da duran üretilmiş bir artefakt
+sayesinde çalışmış olabilir.** *"Bende çalışıyordu"* taze bir ağaçta kanıt değildir.
+
+## 7 · ⛔ÜÇ PARTİ RAPORU KAYBOLDU — kayıt olarak yazıyorum
+
+Alt-ajanlar raporlarını kendi izole çalışma kopyalarına yazdı
+(`docs/audits/rec314-parti2a/2b/2c-2026-09-14.md`). O kopyalar iş bitince **otomatik
+temizlendi** ve raporlar onlarla gitti; görev çıktı dosyası da **0 bayt.**
+
+Ölçüm sonuçları kaybolmadı — özet tablo aynı gün Linear'a ve şerit durum dosyasına
+yazılmıştı, bu belge onlardan derlendi. Kaybolan şey **vaka düzeyindeki ayrıntı**
+(her vakanın kendi skoru ve çıktısı) ve parti 2 için artık geri getirilemez.
+
+⭐**Ders: izole çalışma kopyasına yazılan çıktı, ana ağaca taşınmadıkça TESLİM EDİLMİŞ
+SAYILMAZ.** Alt-ajan briefine "raporu şu yola yaz" demek yetmez; brief "raporu ana ağaca
+commit et **ya da** gövdesini dönüş mesajında ver" demelidir. Bu bir sonraki alt-ajan işinde
+uygulanacak.
+
+## 8 · ⭐YENİ SINIF: "ÇIKTISI REDDEDİLEN ARAÇ" — bu çerçeveye GİRMİYORDU
+
+Aynı gün REC-333'te ölçülen bir vaka, AXIOM 3'ün üç sorusunun **dördüncüsünü** gerektirdi.
+
+`ai-auto-repair.yml` üç sorudan **geçiyordu**: çağıranı vardı (`ci.yml:201`), koşum izi
+vardı, Jules'a fiilen görev gidiyordu ve dal yaratıyordu. Ama ürettiği **10 PR'ın hepsi
+CLOSED — 0/10 merge.**
+
+Yani ne "KAL" (bir gün işe yarar) ne "ONAR" (zincir kırık) doğruydu: **araç çalışıyordu,
+çıktısı kabul edilmiyordu.** Atıl araç **çağrılmaz**; bu araç **çağrılıyor ama çıktısı
+kabul edilmiyor.**
+
+→ Cetvele **dördüncü soru** olarak eklendi: *"Ürettiği çıktı kabul ediliyor mu?"*
+(`docs/standards/arac-envanteri-standard.md` AXIOM 3, `cikti_kabul` alanı ve
+`CIKTISI-REDDEDILDI` durumu).
+
+## 9 · Envanterde nerede duruyor
+
+13 kalemin **26 satırı** (her kalem `.claude` + `.agent` ağacında) §3.3'te; `kanıt`
+hücrelerine sınav damgası elle yazıldı. **Üretici bu hücrelere dokunmuyor** — `--yaz`
+sonrası fark **0 bayt** ölçüldü, `INV-ARAC-1..3` **19/19** yeşil.
+
+⚠Bu, AXIOM 3'ün sınırının **öteki** yüzü: mevcut bir satırın insan hükmü kolonları
+gerçekten insanındır; üreticinin yazdığı tek şey **YENİ** satır ve **KAYIP** satırın durum
+sütunudur (bkz. envanter belgesi bölüm 0).
+
+
+---
+# FILE: docs\audits\rec315-squawk-ilk-tarama-2026-09-13.md
+
+# REC-315 — squawk ilk tarama ve INV-MIGRATION-3 kapısı
+
+**Tarih:** 2026-09-13 · **Şerit:** ALTYAPI · **Araç:** `squawk-cli` 2.65.0
+**Kapı:** `.github/workflows/migration-linter.yml` → iş adı `INV-MIGRATION-3`
+**Kural seti:** `.squawk.toml` · **Çareler:** `.github/migration-linter-yardim.md`
+
+## KAYNAK/CETVEL
+
+- **Kaynak:** `sbdchd/squawk` — Rust ile yazılmış Postgres migration linter'ı (Apache-2).
+- **Yöneten cetveller:** `CLAUDE.md` kural 13 (migration merge = prod'a otomatik
+  uygulama) · `.github/workflows/supabase-migrate.yml` (uygulama mekaniği) ·
+  `INV-MIGRATION-1` (atomiklik) ve `INV-MIGRATION-2` (14 haneli damga) konformans
+  kapıları · `docs/standards/denetim-izi-standard.md`.
+- **Yöntem:** elle, tek dal, tek PR (iş emrindeki `YÖNTEM:` satırına uygun, sapma yok).
+
+## 1. Niçin bu kapı var
+
+`supabase-migrate.yml`, master'a düşen her yeni migration dosyasını **prod
+veritabanına otomatik uygular**. Yani bir migration dosyasındaki kilitleyen bir
+`ALTER`, geri alınamaz bir `DROP` ya da geçersiz bir söz dizimi, merge anında
+canlı veritabanına gider. Bugüne kadar bu dosyaları PR anında **hiçbir kapı
+içerik olarak okumuyordu**: `INV-MIGRATION-1` atomikliğe, `INV-MIGRATION-2`
+dosya adındaki damgaya bakıyor. SQL'in kendisi denetimsizdi.
+
+`INV-MIGRATION-3` o boşluğu kapatır. Kural 13'ün **yerine geçmez**: yeşil kapı
+Recep'in migration onayını kaldırmaz, ona ek bir katmandır.
+
+## 2. Ölçüm evreni ve araç kurulumu
+
+| Kalem | Ölçüm |
+|---|---|
+| Depodaki migration dosyası | **235** |
+| Tarandı | 235 (tamamı, bir kez) |
+| Araç sürümü | `squawk-cli` **2.65.0** |
+| Postgres sürümü | **17.6.1.003** (`postgres_engine` 17) |
+| Telemetri izi | **0 eşleme** (`telemetry\|analytics\|sentry\|posthog\|phone-home\|mixpanel` taraması) |
+
+⚠**İki sapma, adıyla:**
+
+1. **Paket adı.** `npx squawk` komutu `squawk@4.0.0` adlı **alakasız** bir npm
+   paketini çekmeye kalktı. Doğru paket **`squawk-cli`**. Sonraki kurucu aynı
+   tuzağa düşmesin diye buraya yazıldı.
+2. **Postgres sürümü.** İş emrinde "Supabase/Postgres **15** uyumlu" yazıyordu.
+   Canlı projeden ölçülen sürüm **17.6.1.003**. Kural seti 17'ye göre kuruldu.
+   Emir yanlış değil, bayattı; ölçüm kazandı.
+
+## 3. İşlem varsayımı — tercih değil, ölçüm
+
+`squawk`, `assume_in_transaction` ayarıyla "her dosya bir işleme sarılı koşacak"
+varsayımını açıp kapatabiliyor. Bizim depoda **tek bir varsayım doğru değil**,
+çünkü `supabase-migrate.yml` dosyanın kendi `BEGIN;`ine bakıp ikiye ayırıyor:
+
+- dosya kendi işlemini yönetiyorsa → **olduğu gibi** koşar,
+- işlem denetimi içermiyorsa → `psql --single-transaction` ile **sarılır**.
+
+Ölçüm (`20260909071451_denetim_izi_dml_tetikleri.sql`, kendi `BEGIN`/`COMMIT`ini
+yazan bir dosya):
+
+| Varsayım | Uyarı | Bunlardan yanlış pozitif |
+|---|---|---|
+| `assume_in_transaction = true` | 4 | **2** (`transaction-nesting`) |
+| `assume_in_transaction = false` | 2 | 0 |
+
+Karar: **kapalı**. Açık varsayım, kendi işlemini doğru yazan dosyaları cezalandırıyor.
+
+## 4. İlk tarama sonucu — 1189 uyarı, 180 dosya
+
+Kapatılan üç kural düşmeden önce 1217, düştükten sonra **1189**.
+
+### 4.1 Damga biçimine göre ayrım (asıl bulgu)
+
+| | 14 haneli (yeni biçim) | 8 haneli (eski biçim) |
+|---|---|---|
+| Dosya | 50 | 130 |
+| Uyarı | **210** | **979** |
+| `syntax-error` | **0** | **597** |
+
+⭐**597 sözdizimi hatasının tamamı eski biçim dosyalarda; yeni biçim dosyalarda
+sıfır.** Bu temiz ayrım tesadüf değil — aşağıdaki 4.3'te sebebi var.
+
+*(Bu sayı bir kez yanlış ölçüldü: ilk filtrem dosya adını yanlış ayırdığı için
+"yeni biçimde 0 uyarı" dedi, oysa doğrusu 210. Kendi filtresine güvenmemek
+gerekiyor; sayı düzeltildikten sonra yazıldı.)*
+
+### 4.2 Kural sınıfına göre dağılım
+
+| Uyarı | Kural | Sınıf |
+|---:|---|---|
+| 597 | `syntax-error` | geçersiz SQL |
+| 164 | `require-lock-timeout` | prod kilidi |
+| 164 | `require-statement-timeout` | prod kilidi |
+| 113 | `require-concurrent-index-creation` | prod kilidi |
+| 37 | `adding-foreign-key-constraint` | prod kilidi |
+| 33 | `require-concurrent-index-deletion` | prod kilidi |
+| 23 | `prefer-robust-stmts` | yeniden koşulabilirlik |
+| 18 | `constraint-missing-not-valid` | prod kilidi |
+| 11 | `ban-char-field` | şema |
+| 10 | `adding-not-nullable-field` | tablo yeniden yazımı |
+| 8 | `ban-drop-column` | geri alınamaz |
+| 5 | `adding-field-with-default` | tablo yeniden yazımı |
+| 3 | `ban-drop-not-null` | geri alınamaz |
+| 2 | `prefer-text-field` | şema |
+| 1 | `disallowed-unique-constraint` | prod kilidi |
+
+### 4.3 ⭐GERÇEK KUSUR: `CREATE POLICY IF NOT EXISTS`
+
+PostgreSQL `CREATE POLICY` için `IF NOT EXISTS` söz dizimini **desteklemiyor**.
+Depoda bu geçersiz ifade **altı dosyada 11 kez** geçiyor:
+
+```
+202508261956_user_invoice_profiles.sql
+20250907_admin_audit_log.sql
+20250908_client_errors.sql
+20250908_error_groups.sql
+20250908_error_groups_policies_fix.sql
+20250909_fix_product_images_rls.sql
+```
+
+Bu dosyalar prod'a **hiç uygulanmamış**. Sebebi `supabase-migrate.yml`'ın ledger
+modeli: ledger boşken koşan ilk tur, o andaki tüm dosyaları "zaten uygulanmış"
+kabul edip yalnızca kaydetti, çalıştırmadı. Yani hatalı SQL hiç koşmadı —
+koşsaydı migration turu kırmızı olurdu.
+
+Prod'da uygulanmış migration sayısı **112**; bu altı dosyanın hiçbiri o listede
+yok. Yani **canlı bir arıza değil**, ama depoda duran ölü ve geçersiz SQL'dir.
+
+**Eski dosyalar DEĞİŞTİRİLMEZ** (uygulanmış sayılıyorlar, ledger'da kayıtlı).
+Bu kalem ayrı bir iş olarak açılmalı: ölü migration dosyalarının temizliği ya da
+açıkça "uygulanmaz" işaretlenmesi. Bu işin kapsamında değil.
+
+## 5. Kapatılan kurallar ve gerekçeleri
+
+Bu kapının konusu **prod riski**, şema zevki değil. Üç kural gerekçesiyle kapatıldı:
+
+| Kural | Geçmişte | Gerekçe |
+|---|---:|---|
+| `prefer-identity` | 2 | PK sözleşmemiz `uuid DEFAULT gen_random_uuid()`; identity sütunu kullanmıyoruz. Her yeni tabloda tetikler, kilit riski göstermez. |
+| `prefer-bigint-over-int` | 24 | `int`/`smallint` sütunlarımız sayaç ve eşik alanları (stok eşiği, sıra no). `bigint`e çıkmak depolama maliyeti, güvenlik kazancı yok. |
+| `prefer-bigint-over-smallint` | 2 | aynı gerekçe |
+
+⛔**`syntax-error` kapatılmaz.** İlk taramada gerçek bir kusur buldu (bölüm 4.3).
+
+## 6. Sabotaj kanıtı — yeşil kapı kırmızı verebiliyor mu
+
+Yeşil bir kapı, kırmızı verebildiği gösterilmeden kapı sayılmaz. Kapının **tam
+mantığı** (taban SHA → `git diff --diff-filter=AM` → `xargs squawk`) yerelde
+koşuldu. Sabotaj dosyası ölçümden sonra silindi; **sabotajdan önce iş commit
+edildi** (`00f5826ba`), böylece geri alma gerçek değişikliği götürmedi.
+
+| Durum | Taranan dosya | Uyarı | Çıkış kodu | Kapı |
+|---|---:|---:|---:|---|
+| Sabotaj dosyası var | 1 | 5 | 123 (sıfır değil) | **KIRMIZI** |
+| Sabotaj geri alındı | 0 | 0 | 0 | yeşil (ölçüldü, ihlal yok) |
+
+Kırmızıyı üreten 5 kol, adıyla: `require-lock-timeout` (satır 2) ·
+`require-statement-timeout` (satır 2) · `prefer-robust-stmts` (satır 2 ve 3) ·
+`require-concurrent-index-creation` (satır 3).
+
+### 6.1 Kol bazlı ek ölçüm
+
+İş emri özellikle `ALTER TABLE ... ADD COLUMN ... NOT NULL` kolunu istedi. İlk
+sabotajımda `DEFAULT` da verdiğim için o kol **tetiklemedi** — ve bu aracın
+doğru davranışı: PostgreSQL 11'den beri `DEFAULT`lu bir `NOT NULL` sütun
+eklemek tabloyu yeniden yazmıyor. Kolu ayrıca sınadım:
+
+| Kol | Girdi | Sonuç |
+|---|---|---|
+| A | `add column x text not null default 'v'` | 3 uyarı, `adding-required-field` **yok** (doğru) |
+| B | `add column y text not null` (DEFAULT'suz) | 4 uyarı, **`adding-required-field` VAR** |
+| C | `create policy if not exists ...` | **18 `syntax-error`** |
+
+## 7. Sürtünme — adıyla söylenir
+
+`require-lock-timeout` ve `require-statement-timeout`, yeni biçim **50 dosyanın
+50'sinde de** tetikliyor. Yani **sıradaki migration PR'ı, dosyanın başına iki
+satır eklenmeden kırmızı olacak**:
+
+```sql
+set lock_timeout = '5s';
+set statement_timeout = '5s';
+```
+
+Bu kasıtlı. Kilit bekleyen bir `ALTER`, prod'da o tabloya gelen tüm istekleri
+süresiz durdurabilir; zaman aşımı "bekleyip kilitlemek" yerine "hızlı başarısız
+olmak" demektir. Migration kırmızı olur ama vitrin ayakta kalır. Çareler
+`.github/migration-linter-yardim.md` içinde, kapının kırmızı özetine basılıyor.
+
+Bu maliyet başka şeritlerin işine de değiyor, o yüzden gizlenmiyor: kapı
+inmeden önce bilinmesi gereken tek şey budur.
+
+## 8. Bu raporun kendi sınırları
+
+- Kapı **yalnız PR olayında** koşar. Doğrudan master'a push (kapılar buna izin
+  vermiyor ama mekanik olarak mümkün) bu kapıyı atlar.
+- Kapı **statiktir**: SQL'i okur, veritabanında denemez. Gerçek kilit süresi
+  ölçülmez; ölçülen şey riskli ifade sınıfıdır.
+- `syntax-error` kolu aracın kendi ayrıştırıcısına dayanır. Bir dosyada tek
+  geçersiz ifade, ardından **yığın hata** üretiyor: 48 satırlık
+  `20250908_error_groups.sql` tek başına 183 hata verdi. Yani **hata sayısı
+  kusur sayısı değildir**; kusur sınıfı sayısı anlamlıdır.
+- Eski dosyalar **tarandı ama düzeltilmedi**; kapı onlara bakmıyor.
+
+
+---
+# FILE: docs\audits\rec319-yerlesik-skill-araclari-2026-09-13.md
+
+# REC-319 — Claude Code'un YERLEŞİK skill araçları: ölçüm ve karar
+
+**Tarih:** 2026-09-13 · **Şerit:** ALTYAPI · **Araç sürümü:** `claude` **2.1.269**
+**Yöntem:** elle, tek dal, tek PR (iş emrine uygun, yöntem sapması yok)
+
+## KAYNAK/CETVEL
+
+- **Kaynak:** Claude Code yerleşik komutları — `claude plugin validate`,
+  `claude plugin eval`, `claude plugin details`, `/skill-doctor`.
+- **Yöneten cetvel:** `docs/standards/execution-method-standard.md` (yöntem seçimi) ·
+  REC-303 (elle yazdığımız sınav betiği) · REC-304 (oturum başı skill yükü bütçesi) ·
+  REC-314 (atıl araç kapısı).
+- **Cetvel boşluğu:** "bir skill'in frontmatter'ı ayrıştırılabilir mi" sorusunu
+  yöneten yazılı bir cetvel yoktu. Bu iş o boşluğu bir konformans kapısıyla
+  kapatıyor (INV-SKILL-FRONTMATTER-1).
+
+## 0. Emirdeki iki iddia — biri yarım doğru çıktı
+
+İş emri (09-12 ölçümüne dayanıyordu) iki kısıt yazıyordu. İkisini de yeniden ölçtüm.
+
+| Emirdeki iddia | Bugünkü ölçüm | Sonuç |
+|---|---|---|
+| `--plugin-dir` bu sürümde yok | `claude plugin details --plugin-dir ... ` → `error: unknown option '--plugin-dir'` | ✅**DOĞRU** |
+| Düz `.claude/skills` klasörü `plugin.json`suz tanınmaz | `claude plugin validate .claude` → **çalışıyor**. `claude plugin eval .claude --case ...` → hedef **çözüldü** (`No eval cases found ... under C:\...\.claude`) | ⚠**YARIM DOĞRU** |
+
+⭐**Yani paketleme adımı, doğrulama için tamamen gereksiz; sınav için de hedef
+çözünürlüğü açısından gereksiz.** Paketleme yine gerekebilir ama sebebi
+"tanınmıyor" değil, **vaka biçimi** (bölüm 3).
+
+⚠**Aracın kendi hata mesajı BAYAT:** `claude plugin details <yok>` hatası
+*"or pass `--plugin-dir <path>` to load one from disk"* diyor — ama o seçenek
+bu sürümde **yok**. Mesaja güvenip yola çıkan boşa dolaşır. Ders: **araç
+mesajı da bir iddiadır, ölçülür.**
+
+## 1. ⭐`plugin validate` — ilk koşuşunda ÜÇ GERÇEK KUSUR buldu
+
+`claude plugin validate .claude` ve `.agent`, iki ağaçta üç `SKILL.md` için aynı
+hatayı verdi. Aracın kendi cümlesi:
+
+> YAML frontmatter failed to parse: YAML Parse error: Unexpected token.
+> **At runtime this skill loads with empty metadata (all frontmatter fields
+> silently dropped).**
+
+| Dosya | Bozuk alan | Kesin konum (PyYAML) |
+|---|---|---|
+| `.claude` + `.agent` `/venthub-architecture` | `description` | fm satır 4, kolon 91 — `PPR icin DEGIL:` |
+| `.claude` + `.agent` `/venthub-tasarim-dili` | `metadata.kaynak` | fm satır 27, kolon 44 — `Recep: tasarimlar...` |
+| `.agent` `/venthub-catalog-importer` | `description` | fm satır 4, kolon 8 — `Tetik: katalog oku, ...` |
+
+**Kök sebep, tek cümleyle:** alıntılanmamış bir YAML düz skalerinin içinde iki
+nokta + boşluk geçerse — ya da satır iki noktayla biterse — ayrıştırıcı onu alan
+ayracı sanar ve **tüm frontmatter bloğunu** düşürür.
+
+**Etki:** `name` ve `description` yok olur. Açıklama yoksa yönlendirme o skill'i
+**hiç seçemez** — skill dosyada durur ama erişilemez. Bu, REC-309'daki "sınavdan
+düşen tetik" sorusunun bir parçası olabilir; `find-skills` 6/12 sonucuna bu
+açıdan yeniden bakmaya değer (bu işin kapsamında değil).
+
+**Onarım:** yalnızca alıntılama (tek tırnak, içteki kesme işaretleri ikilendi:
+`next.config.mjs''te`). **Metnin anlamı değişmedi.** Doğrulama sonrası `.claude`
+ve `.agent` ikisi de *"Validation passed"*.
+
+`catalog-importer` **yalnız** `.agent` ağacında bozuktu; `.claude` kopyası
+sağlamdı (çift ağaç bilinçli, `CLAUDE.md`). `tasarim-dili` iki ağaçta birebir
+aynıydı → onarılmış kopya aktarıldı. `architecture` iki ağaçta **farklıydı** →
+ikisi ayrı ayrı onarıldı.
+
+### 1.1 ⚠Bizim kapılarımız bu süre boyunca YEŞİLDİ
+
+`skill-yuku-butcesi` (4 kol) ve `skill-bitis-blogu` (6 kol) o üç dosya bozukken
+de **10/10 yeşil** veriyordu. Sebep: ikisi de frontmatter'ı **ayrıştırmayı
+denemiyor**, metin olarak tarıyor. **Yeşil kapı, bakmadığı şeyi kanıtlamaz.**
+
+Bu, "yerleşik araç üst küme mi" sorusunun **ilk somut kanıtı**: bir eksen
+(frontmatter geçerliliği) yerleşik araçta vardı, bizde yoktu.
+
+### 1.2 Yeni kapı — INV-SKILL-FRONTMATTER-1 (4 kol)
+
+Onarım tek seferliktir, kapı kalıcı. `src/__tests__/conformance/skill-frontmatter-ayrisir.test.ts`
+
+**Kapının sınırı, adıyla:** bu bir **YAML ayrıştırıcısı değildir**. Depoda YAML
+bağımlılığı yok (ölçüldü: ne `yaml` ne `js-yaml`; aynı ölçüm
+`anon-yazma-nobetcisi.test.ts` içinde de yazılı). Kapı **ölçülmüş kusur
+sınıfını** hedefler, her olası YAML hatasını değil. Tam doğrulama
+`claude plugin validate` ile yapılır; o komut abonelik ister ve **CI'da koşmaz**.
+
+**Anahtar ayrım:** bir `anahtar:` satırının sağında değer varsa, ondan sonraki
+daha derin girintili satırlar o skalerin **devamıdır** — anahtara benzeseler
+bile. `Tetik: katalog oku` satırı tam bu yüzden göze çarpmıyor.
+
+**Sabotaj kanıtı** (sabotajdan önce commit `6dc5868f2`):
+
+| Durum | Benim kapım | Yerleşik doğrulayıcı |
+|---|---|---|
+| Alıntı kaldırıldı (yeniden bozuldu) | **KIRMIZI** — 2 kol (sınıf kolu + kilitli vaka kolu) | **Validation failed** |
+| Geri alındı | 4/4 yeşil | Validation passed |
+
+İkisi aynı dosyada **aynı hükmü** verdi. Kapının ölçtüğü şeyin gerçek olduğunun
+bağımsız kanıtı budur.
+
+**⚠Kapı fazla ateş etti, ölçüm düzeltti:** ilk hâlim YAML yorumunu değer sandı
+ve **beş** dosyayı yanlış yere kırmızı yaptı
+(`on_auth_expired: notebooklm login  # 2026-08-17: urun degisti...`). Yerleşik
+doğrulayıcı o beşini **geçiriyordu**; iki ölçüm çelişti ve **haklı olan araç
+oldu, ben değildim.** Düz skalerde boşluk + `#` bir yorum başlatır; sınır
+eklendi, gerekçesi kodda yazılı.
+
+## 2. `plugin eval` — hedef çözülüyor, VAKA BİÇİMİ uyuşmuyor
+
+Yerleşik koşucunun beklediği biçim: `<eval dir>/**/case.yaml`, ya da
+`prompt.md` + `graders/*.md`. Bizim biçimimiz `evals/evals.json`.
+
+| Kalem | Sayı |
+|---|---:|
+| Depodaki `evals.json` | **62** |
+| Depodaki `case.yaml` | **0** |
+| Depodaki `prompt.md` | **0** |
+
+⭐**Yani yerleşik sınavı koşturmanın önündeki engel paketleme değil, BİÇİM
+DÖNÜŞÜMÜ.** 62 dosyalık bir dönüşüm işi ve bu işin kapsamında değil — ayrı
+kalem olarak yazılmalı.
+
+Hedef çözünürlüğü kanıtı (ücret üretmeyen kuru yol):
+
+```
+claude plugin eval .claude --case "__hicbir-vaka-eslesmesin__" --no-publish --runs 1
+→ No eval cases found matching --case "..." under C:\tmp\vh-altyapi-kip\.claude
+→ cikis 0
+```
+
+Hedef **çözüldü** (dizini tanıdı, altında vaka aradı), vaka **bulunamadı**.
+
+### 2.1 Yerleşik sınavın BİZDE OLMAYAN yetenekleri
+
+Bunlar `--help` metninden okundu, **koşturularak ölçülmedi** (ücret):
+
+- **`--ablation with-without`** — eklentisiz bir taban kolu koşup **fark puanı**
+  veriyor. Bizim betiğimizde bu **yok**: bugüne kadar "skill açıkken geçti"
+  ölçtük, "skill kapalıyken de geçer miydi" hiç ölçmedik. Tesadüf tabanı yok.
+- **`tool_used: Skill`** grader'ı — skill'in gerçekten **tetiklenip
+  tetiklenmediğini** doğrudan ölçüyor; ablation altında bu bir "eklenti ateşledi"
+  göstergesi sayılıyor, puana karışmıyor.
+- **`--max-cost-usd`** — sert bütçe tavanı; tavan her koşum ÖNCESİ kontrol
+  ediliyor, yani aşım uçuştaki koşum sayısıyla sınırlı. Tavan aşılırsa ücretli
+  grader'lar atlanıyor, ücretsizler yine puanlıyor.
+- **Abonelikle koşuyor, API anahtarı GEREKMEZ.** Bu, REC-309'daki
+  `ANTHROPIC_API_KEY` bütçe kararını büyük ölçüde **düşürür**.
+- Ek bayraklar: `--json`, `--concurrency` (1-8, hepsi aynı kredide), `--tag`,
+  `--judge-model` (varsayılan haiku), `--threshold` (varsayılan **1.0**),
+  `--trust-plugin` (CI için), HTML rapor + `--no-publish`.
+
+## 3. KARAR TABLOSU — bizim betik mi, yerleşik mi
+
+| Eksen | REC-303 betiği (bizim) | Yerleşik | Hüküm |
+|---|---|---|---|
+| Frontmatter geçerliliği | **yok** (metin tarar) | **var**, 3 gerçek kusur buldu | ⭐**Yerleşik ÜST KÜME — hemen benimse** |
+| Hedef çözünürlüğü | dosya okur, engel yok | düz dizini tanıyor | eşit |
+| Vaka biçimi | `evals.json` × 62, **çalışıyor** | `case.yaml`/`prompt.md` × **0** | bizimki **bugün** çalışan tek şey |
+| Tesadüf tabanı (ablation) | **yok** | `--ablation with-without` | yerleşik üstün |
+| Tetiklendi mi ölçümü | dolaylı (cevap metninden) | `tool_used: Skill` grader'ı | yerleşik üstün |
+| Bütçe tavanı | yok (kuru tahmin ~0.13 USD/60 istek) | `--max-cost-usd` | yerleşik üstün |
+| Kimlik | API anahtarı ister — **YOK** | **abonelik**, anahtar gerekmez | yerleşik üstün |
+| CI'da koşabilir mi | evet (anahtar olursa) | **hayır** (abonelik, etkileşimli kimlik) | **bizimki üstün** |
+
+### Hüküm
+
+1. **Doğrulama ekseninde yerleşik araç hemen benimsendi.** Üç kusur onarıldı,
+   kalıcı kapı yazıldı. Bu kısım bitti.
+2. **Sınav ekseninde betik EMEKLİ EDİLMEZ — henüz.** Yerleşik yetenek olarak
+   üst küme ama **bugün bizim vakalarımızı koşturamıyor** (biçim) ve **CI'da
+   koşamıyor** (abonelik). Emeklilik koşulu yazılı olsun: *62 vaka yeni biçime
+   dönüştükten sonra aynı üç skill'de kafa kafaya bir koşum yapılır; yerleşiğin
+   puanı bizimkiyle tutarlıysa betik emekli olur ve `skills:eval` yerleşiği
+   çağırır.*
+3. **Anahtar kararı büyük ölçüde düştü.** Yerleşik sınav abonelikle koşuyor;
+   `ANTHROPIC_API_KEY` yalnız CI'da otomatik sınav istiyorsak gerekli.
+
+## 4. ÖLÇEMEDİĞİM ŞEYLER — adıyla
+
+Bunlar "yapılamaz" değil, **bu oturumda ölçülmedi**:
+
+- **`claude plugin details <ad>` token maliyeti tablosu.** Komut kurulu bir
+  eklenti **adı** istiyor; bizim ağaç kurulu bir eklenti değil ve
+  `--plugin-dir` bu sürümde yok. Yani REC-304 betiğiyle sayı karşılaştırması
+  (*"hangisi doğru evren"*) **paketleme yapılmadan mümkün değil.** Bu, paketleme
+  adımının **tek gerçek gerekçesi** olarak kaldı.
+- **`/skill-doctor` ilk raporu.** Etkileşimli bir slash komutu; otonom bir
+  oturumda koşturamadım. REC-314'ün `son_kullanim` alanı bu rapordan beslenecek,
+  yani o iş buna bağımlı. Recep bir oturumda `/skill-doctor` koşup çıktıyı
+  verirse kalan kısım ölçülebilir.
+- **Gerçek eval koşumu** (puan, ablation farkı, gerçek maliyet). Biçim dönüşümü
+  olmadan koşulamaz; dönüşüm bu işin kapsamında değil.
+
+## 5. Bu raporun kendi sınırları
+
+- Yerleşik araçların yetenek listesi büyük ölçüde `--help` metninden okundu;
+  koşturulmuş olanlar yalnız `validate` ve `eval`in kuru hedef çözünürlüğüdür.
+- Yeni kapı, frontmatter'ın **bu** kusur sınıfına bakar; başka bir YAML hatası
+  (ör. yinelenen anahtar, bozuk girinti) onu **geçer**. Tam doğrulama hâlâ
+  `claude plugin validate`tir ve o CI'da koşmaz.
+- `find-skills` 6/12 sonucunun bozuk frontmatter'la ilişkisi **kurulmadı**, yalnız
+  ihtimal olarak yazıldı.
+
+---
+
+# EK — ADIM 2b: dönüştürücü + PİLOT KOŞUM (2026-09-13 akşam)
+
+Yukarıdaki bölüm 2 "vaka biçimi uyuşmuyor" diyordu ve gerçek koşumu gelecek bir
+işe bırakıyordu. O iş yapıldı: dönüştürücü yazıldı ve **sınav gerçekten koştu.**
+
+## 6. Dönüştürücü — `scripts/skills-eval-convert.mjs`
+
+Deterministik, idempotent, `--kuru` destekli. Kaynak `evals.json` **silinmez**;
+REC-303 betiği onu kullanmaya devam eder, ikisi birlikte yaşar.
+
+| Kalem | Sayı |
+|---|---:|
+| Kaynak `evals.json` | **62** |
+| Üretilebilecek vaka | **1261** |
+| Üretilecek dosya | **2522** |
+
+⭐**Tam dönüşüm depoya KONMADI** (`.gitignore`; betik depoda, çıktı değil —
+üretilmiş-artefakt cetveliyle tutarlı ve 2522 dosyalık bir diff'i önler).
+
+⛔**Tam sınav bu biçimde PRATİK DEĞİL, sayıyla:** 1261 vaka × varsayılan 3 koşum
+= **3783 ajan koşumu**, `--ablation` açıkken iki katı. Her koşum aboneliğin
+üzerinden giden tam bir `claude` çocuğu. REC-309'daki "tam 60 koşu" hedefi bu
+sayıya göre yeniden tanımlanmalı (örnekleme: skill başına 4+2, `--runs 1`).
+
+### 6.1 Üç yanlış varsayımım, aracın kendi cümleleriyle düzeltildi
+
+Üçü de **ücret üretmedi** — vakalar yüklenmeden düştü ya da tavan çalıştırmadan
+önce kesti.
+
+| Varsayımım | Aracın cevabı | Doğrusu |
+|---|---|---|
+| Vakalar skill'in altına (`skills/<ad>/evals-yerlesik/`) | *"No eval cases found under …\.claude"* (2 sn) | Sınav dizini **eklenti kökünde**; tek dizin, skill başına değil |
+| Ablation kendi başına çalışır | *"ablation requested but no plugin resolved for this case … The with and without arms would run identical configs, so Δ would measure nothing."* | Vaka **`plugins:` beyanı** taşımalı |
+| `plugins: skills/<ad>` | *"plugins entry … does not exist"* | Yol **vaka dizinine göreli**: `../../skills/<ad>` |
+| `--case "…-0[1-4]*"` | *"No eval cases found matching…"* | Glob **köşeli parantez aralığı desteklemiyor**, yalnız `*` |
+
+⭐**Emirdeki paketleme kısıtına net cevap:** araç `SKILL.md`'yi de kabul ediyor.
+Yani `plugin.json` paketlemesi **ne `validate`, ne `eval`, ne `ablation`** için
+gerekli. Paketlemenin tek gerçek gerekçesi `plugin details` token maliyeti
+olarak kaldı (bölüm 4).
+
+## 7. PİLOT — 18 vaka, 36 koşum, gerçekten koştu
+
+3 skill × (4 tetiklenmeli + 2 tetiklenmemeli). `--runs 1 --ablation with-without
+--concurrency 2 --no-publish`.
+
+| Kalem | Ölçüm |
+|---|---|
+| Vaka | **18** · koşum **36** (2 kol) |
+| Süre | **612 sn** (10 dk 12 sn) |
+| Maliyet | **5,76 USD eşdeğeri** · `partial: false` (tavan aşılmadı) |
+| Geçen | **10/18** · ortalama puan 0,556 · **ortalama Δ 0,333** |
+
+⚠**"USD" NE DEĞİLDİR:** aracın bastığı tutar bir **fatura değil**, abonelik
+kotasından harcanan bedelin araç tahminidir. Ölçüldü: `ANTHROPIC_API_KEY` ve
+`ANTHROPIC_AUTH_TOKEN` uzunluğu **0**, `.env` dosyalarında eşleme yok — yani
+koşum **abonelikten** gitti, ayrı bir anahtar kullanılmadı.
+
+### Skill başına (kol türüne ayrılmış)
+
+| Skill | TETİKLENMELİ | with | without | **Δ** | TETİKLENMEMELİ |
+|---|---|---:|---:|---:|---|
+| `investigate` | **4/4** | 1,00 | 0,00 | **+1,00** | 1/2 |
+| `diff-review` | **4/4** | 1,00 | 0,50 | **+0,50** | 0/2 |
+| `venthub-architecture` | **0/4** | 0,00 | 0,00 | **0,00** | 1/2 |
+
+## 8. ⭐⭐KONTROLLÜ DENEY — bozuk frontmatter skill'i ERİŞİLEMEZ yapıyor
+
+Pilot, `altyapi/rec319-eval-donusturucu` dalında koştu ve o dal **#1174 merge
+edilmeden önce** açılmıştı. Yani **çalışma ağacında frontmatter onarımı yoktu**
+ve `claude plugin validate` aynı ağaçta hâlâ *"loads with empty metadata (all
+frontmatter fields silently dropped)"* diyordu.
+
+`venthub-architecture`'ın 0/4'ü tesadüf değildi. Aynı 4 vaka, onarım **olan**
+ağaçta (güncel `origin/master`) yeniden koşuldu. **Tek değişken: frontmatter'ın
+alıntılanması.**
+
+| Vaka | Bozuk ağaç (with / Δ) | Onarımlı ağaç (with / without / Δ) | sn | USD eşd. |
+|---|---|---|---:|---:|
+| `…-01-yeni-bile-en-olu-tur` | 0 / 0 | **1 / 0 / +1** | 49 | 0,26 |
+| `…-02-rsc-render` | 0 / 0 | **1 / 0 / +1** | 62 | 0,29 |
+| `…-03-render-cache-stratejisi` | 0 / 0 | **1 / 0 / +1** | 47 | 0,27 |
+| `…-04-dashboard-i-in-yeni-bile-en-olu-tur` | 0 / 0 | **1 / 0 / +1** | 38 | 0,25 |
+| **TOPLAM** | **0/4 · Δ 0,00** | **4/4 · Δ 1,00** | **196** | **1,07** |
+
+⭐**Sonuç:** bozuk bir frontmatter, skill'i **hiç tetiklenemez** hâle getiriyor;
+onarıldığında aynı istemlerde **dördü de** tetikleniyor ve tesadüf tabanı
+(`without` kolu) her seferinde 0 — yani tetikleme skill'den geliyor, şanstan
+değil. Bu artık iki fonksiyon gövdesinden çıkarılan bir **yorum değil, ölçülmüş
+davranış**.
+
+Bu bulgu REC-309'u doğrudan besliyor: `find-skills` **6/12** sonucu, ölçüm
+evreni değiştiği için **bayat** sayılmalı ve #1174 sonrası yeniden ölçülmeli.
+
+**Günün toplamı:** 5,76 + 1,07 = **6,83 USD eşdeğeri** (onaylanan zarf 7,50).
+
+## 9. ÜÇ SINIR — aracın bu koldaki zayıflıkları
+
+1. **`tool_used: Skill` HANGİ skill'i ayırt ETMİYOR.** Yalnızca `Skill`
+   aracının çağrıldığını sayıyor. Grader gövdesine *"çağrılan skill X olmalı"*
+   yazdım ama **tip bunu okumuyor**. Ölçülmüş sonucu: `diff-review`'ın `without`
+   kolu **0,50** — eklenti kapalıyken de bir **başka** skill ateşleniyor ve
+   grader onu "geçti" sayıyor. Yani `diff-review`'ın Δ 0,50'si "yarısında
+   tesadüf olabilir" demektir.
+2. **OLUMSUZLAMA grader'ı YOK.** Resmi belgede de yok. `should_not_trigger`
+   kolu bu yüzden `llm` grader ile yazıldı ve o, **aracın izine değil cevabın
+   metnine** bakıyor. Ölçülmüş sonuç: `diff-review` 0/2, `investigate` 1/2,
+   `venthub-architecture` 1/2 — ve `diff-review-06`'da **Δ −1** (eklenti
+   KAPALIYKEN geçti, AÇIKKEN düştü). Bu sayı bir kusur değil, **ölçüm aracının
+   bu koldaki zayıflığıdır.**
+3. **CI'da koşamıyor** (abonelik, etkileşimli kimlik) — bölüm 3'te zaten yazılı.
+
+## 10. KARAR TABLOSU — DÜZELTİLDİ: üst küme değil, KESİŞİM
+
+Bölüm 3'teki hüküm bu ölçümlerle **düzeltiliyor**. Yerleşik araç her eksende
+üstün değil:
+
+| Eksen | Kazanan | Gerekçe (ölçülmüş) |
+|---|---|---|
+| Frontmatter geçerliliği | **Yerleşik** | 3 gerçek kusur buldu, bizim 10 kolumuz görmedi |
+| Tesadüf tabanı (ablation) | **Yerleşik** | bizde YOK; `investigate` Δ +1,00 ölçüldü |
+| Gerçek maliyet | **Yerleşik** | vaka başı ~0,28 USD eşd.; REC-303'te "ölçülemedi" idi |
+| Bütçe tavanı | **Yerleşik** | `--max-cost-usd` çalıştırma öncesi kesiyor (ölçüldü) |
+| Kimlik | **Yerleşik** | abonelik; anahtar gerekmez |
+| **Hangi skill tetiklendi** | **Bizim betik** | `tool_used` ayırt etmiyor (sınır 1) |
+| **Tetiklenmemeli kolu** | **Bizim betik** | olumsuzlama grader'ı yok (sınır 2) |
+| CI'da koşabilme | **Bizim betik** | yerleşik etkileşimli kimlik ister |
+| Bugün çalışan vaka biçimi | **Bizim betik** | 62 `evals.json` çalışıyor; dönüşüm yeni |
+
+**HÜKÜM: yerleşik araç ÜST KÜME DEĞİL, KESİŞİM.** Doğrulama ekseninde
+tartışmasız üstün ve **hemen benimsendi**. Tetikleme ekseninde üstün ama
+"hangi skill" ayrımını yapamıyor. Tetiklenmemeli ekseninde **bizim betiğimiz
+üstün olabilir**.
+
+**Betik EMEKLİ EDİLMEZ.** Emeklilik koşulu güncellendi: *yerleşik araca (a)
+olumsuzlama grader'ı ve (b) hangi skill'in tetiklendiğini ayırt eden bir ölçüm
+geldiğinde, aynı vakalarda kafa kafaya bir koşum yapılır; yerleşik iki eksende
+de eşit ya da üstünse betik emekli olur.*
+
+**`ANTHROPIC_API_KEY` kararı:** büyük ölçüde düştü. Yerleşik sınav abonelikle
+koşuyor (ölçüldü). Anahtar yalnız **CI'da otomatik sınav** istenirse gerekli.
+
+## 11. Bu ekin kendi sınırları
+
+- Pilot **`--runs 1`** ile koştu; varsayılan 3'tür. Tek koşum, LLM
+  değişkenliğini ölçmez. `investigate` 4/4 ve `venthub-architecture` 0/4 → 4/4
+  farkı tek koşumda bile çok net, ama 0,50 gibi ara değerler tek koşumla
+  **güvenilir değildir**.
+- Örnekleme skill başına ilk 4 tetik + ilk 2 tetiksiz vakayı aldı; **rastgele
+  değil**, dosyadaki sıra. Sıra bir yanlılık taşıyorsa ölçüm onu taşır.
+- Kontrollü deney **tek skill** üzerinde yapıldı (`venthub-architecture`).
+  Diğer iki bozuk skill (`venthub-tasarim-dili`, `venthub-catalog-importer`)
+  için aynı önce/sonra **koşulmadı**.
+- `/skill-doctor` ve `plugin details` hâlâ **ölçülmedi** (bölüm 4'teki
+  gerekçeler geçerli).
+
+## 12. Kendi ölçüm hatalarım — adıyla
+
+- **Özetleyici betiğim iki kez yanlış alan okudu** ve sahte tablo üretti: önce
+  "hepsi 0/6 geçti", sonra "hepsi TETİKSİZ". İkisini de çıktı makul görünmediği
+  için yakaladım ve JSON yapısını okuyup düzelttim. Doğru ayrım grader
+  tipinden: `tool_used` = tetik kolu, `llm` = tetiksiz kolu. Skor alanları
+  `case.aggregates` içinde: `{score, passRate, scoreWithout, passRateWithout,
+  delta}`. **Bugün üçüncü kez kendi süzgecim yanılttı** — sayı makul
+  görünmüyorsa önce ölçüm aracına bakılır.
+- **Belirsiz süzgeç ölçüm değildir:** yol biçimlerini denerken `grep "1 case"`
+  kullandım; o ifade hem *"1 case file(s) failed to load"* hem *"1 case(s) ·
+  mean Δ"* içinde geçiyor ve iki zıt sonucu aynı gösterdi. Tam çıktı okununca
+  doğrusu belli oldu.
+- **Kancam bir sır sızıntısını durdurdu:** anahtar varlığını ölçerken
+  varsayılan-değer kalıbı yazdım; o kalıp değişken **dolu** olduğunda varsayılanı
+  değil **değerin kendisini** basar. `bash-write-guard` reddetti ve gerekçesini
+  hatırlattı (2026-09-04'te aynı kalıp prod DB bağlantı dizesini dökmüş).
+  Doğru biçim uzunluk ölçümüdür; reddi **kılık değiştirip tekrar denemedim**,
+  yöntemi değiştirdim.
+
+
+---
+# FILE: docs\audits\rec321-ek-silme-uygulandi-2026-09-14.md
+
+# REC-321 EK — silme UYGULANDI, canlıda ölçüldü (2026-09-14)
+
+> **Ne bu:** `docs/audits/rec321-olu-migration-secenekleri-2026-09-14.md` dört seçenek
+> ölçmüştü ve kararı Recep'e bırakmıştı. Recep kendi cümlesiyle onay verdi
+> (*"silme için zaen onay vermedim mi sana?"*). Bu EK, seçilen yolun **uygulandıktan
+> SONRAKİ** durumunu kaydeder.
+>
+> **Niçin ayrı bir EK:** *"bir düzeltmenin işe yaradığı, düzeltme SONRASI durum ölçülmeden
+> söylenmez."* Ölçüm belgesi düzeltmeden önce yazıldı; sonrası ayrı ölçümdür.
+
+## 1 · Ne yapıldı
+
+PR **#1187**, `altyapi/rec321-olu-migration-sil` → master (`e80775fce`).
+
+- **Beş geçersiz migration dosyası silindi:** `20250907_admin_audit_log.sql`,
+  `20250908_client_errors.sql`, `20250908_error_groups.sql`,
+  `20250908_error_groups_policies_fix.sql`, `20250909_fix_product_images_rls.sql`.
+- **Bir migration eklendi:** `20260914090000_olu_migration_dosyalari_defterden_silinir.sql`
+  — `public._migration_ledger`'dan tam bu beş adı düşürür, `get diagnostics` ile
+  **tam 5 satır** silindiğini doğrular, sonra beşinin de kalmadığını ikinci kez ölçer;
+  ikisinden biri tutmazsa `raise exception` ile **işlemi geri alır.**
+
+Merge ritüeli madde 5'i (migration = Recep kapısı) `--onay` ile açtı; onay metni Recep'in
+kendi sözü olarak PR'a yorum yazıldı. Kural 13 gevşetilmedi — değişen tek şey, onayın
+**ağızdan değil yazıdan** sayılması.
+
+## 2 · Canlıya uygulama koşumu
+
+`supabase-migrate.yml` koşum **34836410555**, sha `e80775fc` → **completed / success.**
+
+En kritik adım olan **"Ledger paritesi (dosya listesi == `_migration_ledger`)"** yeşil geçti.
+Bu adım iki yönlü çalışır: depoda olup defterde olmayan da, defterde olup depoda olmayan da
+hata verir. Yani paritenin yeşil olması, silmenin **iki tarafta birlikte** tamamlandığını
+söyler.
+
+## 3 · Bağımsız ikinci ölçüm (canlı, salt-okuma)
+
+Koşumun kendi paritesine güvenmeyip canlıyı doğrudan sorguladım:
+
+| Ölçüm | Beklenen | Bulunan |
+|---|---|---|
+| `_migration_ledger` satır sayısı | 233 | **233** |
+| Silinmesi gereken beş addan kalan | 0 | **0** |
+| Yeni migration'ın defter kaydı | 1 | **1** |
+| `20250908_client_errors_admin_fallback.sql` (silinmemeli) | 1 | **1** |
+
+Depo tarafı da ölçüldü: master'da `supabase/migrations/*.sql` sayısı **233**
+(237 − 5 + 1). Aritmetik önceden yazılmıştı ve taban kaydıktan sonra (master `#1190` ile
+`f220fb85f`'e taşındı) **yeniden ölçüldü**: `#1190` yalnız `src/types/database.types.ts`'e
+dokunmuş, migration sayısı 237'de kalmıştı — yani aritmetik geçerliydi. (Cetvel §7.2:
+*"taban kayarsa yeniden ölç."*)
+
+## 4 · ⚠ÖLÇÜM SIRASINDA KENDİ KONTROLÜM YANLIŞ POZİTİF VERDİ
+
+Silinen beş dosyanın master'da kalmadığını `grep -c <ad>` ile kontrol ettim ve
+`20250908_client_errors` için **1** döndü — yani "dosya hâlâ duruyor" gibi göründü.
+
+Sebep: eşleşen dosya **`20250908_client_errors_admin_fallback.sql`**, yani listede
+**olmayan başka bir dosya.** Silme listesindeki `20250908_client_errors.sql` gerçekten
+gitmişti.
+
+**Ders:** bu, cetvelin *"aynı ad farklı tablo"* dersinin dosya adı tarafındaki ikizidir:
+**ön-ek eşleşmesi kimlik değildir.** Doğru ölçüt tam addır; toplam sayı (233) hükmü
+bağımsız olarak doğruladı. Aynı tuzağa bugün REC-335'te de düştüm (politika adı iki
+tabloda) — yani bu bir dikkatsizlik değil, **bu depoda tekrarlayan bir sınıf.**
+
+## 5 · İDDİA EDİLMEYEN ŞEY: DR / replay
+
+⛔**Bu silme, migration geçmişinin sıfırdan tekrar oynatılabilmesini SAĞLAMADI.**
+Ölçüm belgesinde bu iddia bir kez yazılmış, bağımsız çürütme tarafından **çürütülmüş** ve
+düzeltilmişti; EK'te tekrar yazılıyor ki kayıt tek yerde tutarlı olsun:
+
+- **Silmeden önce** replay `20250907_admin_audit_log.sql`'de ölüyordu.
+- **Silmeden sonra** replay `20250908_enable_realtime_error_tables.sql`'de ölüyor.
+
+Yani kırılma noktası **bir gün ileri kaydı**, ortadan kalkmadı. Silmenin gerekçesi
+**ölülük değil, GEÇERSİZLİK + İŞLEVSİZLİK**tir (dosyalar hem çalışmaz hem hiçbir tablonun
+tek yaratıcısı değil). DR başlığı **REC-336**'nın işidir: canlı şema, hayatta kalan
+migration'lardan üretilemiyor (`client_errors`, `error_groups`, `user_invoice_profiles`
+tablolarını hiçbir dosya yaratmıyor).
+
+## 6 · Bu işten kalan kalıcı katman
+
+- `docs/standards/ledger-ve-olu-migration-standard.md` — silmenin **iki taraflı** olduğu
+  (dosya + defter satırı), reddedilen üç yol, DR bölümünün çürütülmüş hâli, silme
+  gerekçesinin ölülük olmadığı, taban kayarsa yeniden ölçme kuralı.
+- `INV-MIGRATION-3` / `UYUMSUZ_TABAN` 171'e çekildi; iki adımlı geçmişi ve "beş sekiz
+  haneli, biri on iki haneli" düzeltmesi yorumlarda duruyor.
+- Parite kapısının **glob'unun özyinelemeli olmadığı** ölçüldü: bir migration'ı alt dizine
+  taşımak, kapı açısından **silmekle aynıdır.**
+
+
+---
+# FILE: docs\audits\rec321-olu-migration-secenekleri-2026-09-14.md
+
+# REC-321 adım 3 — altı ölü migration dosyasının akıbeti: ÖLÇÜM + SEÇENEKLER
+
+**Tarih:** 2026-09-14 · **Şerit:** ALTYAPI · **Durum:** KARAR BEKLİYOR (Recep'in kapısı)
+**Bu belge bir karar değil, karar için ölçümdür.** Hiçbir dosya silinmedi, taşınmadı, değiştirilmedi.
+Prod veritabanına yazılmadı; prod veritabanına **bağlanılmadı bile** (aşağıdaki defter kanıtı dolaylı).
+
+## KAYNAK/CETVEL
+
+- **Ölçüm kaynağı:** `docs/audits/rec315-squawk-ilk-tarama-2026-09-13.md` §4.3 (squawk-cli 2.65.0).
+- **Yöneten cetveller:** `CLAUDE.md` kural 13 (migration merge = prod'a otomatik uygulama) ·
+  `.github/workflows/supabase-migrate.yml` (ledger modeli + parite kapısı) ·
+  `src/__tests__/conformance/migration-ledger-model.test.ts` (R1–R3) ·
+  `INV-MIGRATION-2` (14 haneli damga) · `INV-MIGRATION-3` (PR kapısı, #1172).
+- **Cetvel boşluğu:** "prod'a hiç uygulanmamış ama depoda duran migration dosyası ne olur"
+  sorusunun yazılı cevabı **YOK**. Bu işin kapsamı o cevabı yazmayı da içeriyor — ama cevabın
+  kendisi Recep'in kararı, çünkü üç seçenekten ikisi prod veritabanına dokunuyor.
+
+## 1 · ÖLÇÜLEN GERÇEKLER
+
+| Ne | Değer | Nasıl ölçüldü |
+|---|---|---|
+| Depodaki migration dosyası | **236** | `ls -1 supabase/migrations/*.sql \| wc -l` |
+| Geçersiz SQL taşıyan ölü dosya | **6** | aşağıdaki tablo |
+| `migrations/` altında alt dizin | **YOK** | `ls -d supabase/migrations/*/` boş |
+| Son `supabase-migrate` koşumu | **2026-09-13 18:35Z, başarılı** | `gh run list --workflow=supabase-migrate.yml` |
+| O koşumda **parite adımı** | **koştu ve GEÇTİ** | `gh run view 34775094857` adım listesi |
+| Parite kapısının eklendiği tarih | **2026-08-17** (#598) | `git log -S"Ledger paritesi"` |
+| O koşumun SHA'sında dosya sayısı | **236** | `git ls-tree -r 643c7089 -- supabase/migrations/` |
+| Altı dosya o SHA'da mevcut muydu | **altısı da VAR** | `git cat-file -e` |
+
+### Altı ölü dosya
+
+| Dosya | geçersiz `IF NOT EXISTS` sayısı |
+|---|---:|
+| `202508261956_user_invoice_profiles.sql` | 8 |
+| `20250907_admin_audit_log.sql` | 4 |
+| `20250908_client_errors.sql` | 3 |
+| `20250908_error_groups.sql` | 6 |
+| `20250908_error_groups_policies_fix.sql` | 2 |
+| `20250909_fix_product_images_rls.sql` | 3 |
+
+PostgreSQL `CREATE POLICY` için `IF NOT EXISTS` sözdizimini **desteklemiyor**. Bu altı dosya
+koşsaydı hata verirdi; koşmadılar çünkü ledger onları "görülmüş" sayıyor.
+
+## 2 · ⭐BELİRLEYİCİ MEKANİZMA — LEDGER PARİTESİ KAPISI
+
+Karar bu kapıya çarpıyor ve seçenekleri o daraltıyor. `supabase-migrate.yml`'ın son adımı şunu
+iddia ediyor: **depodaki dosya adları listesi ile `public._migration_ledger` tablosundaki kayıt
+listesi BİREBİR AYNI olmalı.** İki yön de hata sayılıyor ve koşu kırmızı yanıyor:
+
+- dosya var, defterde yok → bir sonraki koşu onu **yeniden uygular**;
+- defterde var, dosya yok → **uygulanmış bir migration depodan silinmiş**, DB ile depo ayrışmış.
+
+**Çıkarım (dolaylı ama sağlam):** son koşum bu adımı geçtiğine göre, o an depodaki **236 dosyanın
+hepsi** defterde kayıtlıydı — altı ölü dosya **dahil**. Bunu ölçmek için prod veritabanına
+bağlanmaya gerek yoktu; yeşil geçen parite adımı bunu zaten söylüyor.
+
+⚠**İstisna mekanizması YOK.** Parite adımında beyaz liste, atlama listesi ya da muafiyet
+kavramı bulunmuyor (ölçüldü: `grep -n "istisna\|whitelist\|ignore" .github/workflows/supabase-migrate.yml`
+bu adımda boş döner; çıkan `skipped` eşleşmeleri bir üstteki *uygulama* adımına ait).
+
+⚠**Glob ÖZYİNELEMELİ DEĞİL.** Hem uygulama hem parite adımı `supabase/migrations/*.sql`
+kullanıyor, yani bir alt dizin (`uygulanmaz/` gibi) **listeye girmez**. Dosyayı alt dizine taşımak,
+parite açısından **silmekle aynı sonucu** verir.
+
+## 3 · SEÇENEKLER — prod veritabanına dokunma sütunuyla
+
+| # | Seçenek | Prod DB'ye dokunur mu | Ne olur | Bedeli |
+|---|---|---|---|---|
+| **1** | Dosyaları **sil** + defterdeki altı satırı **sil** | **EVET — prod DB'ye DELETE** | Parite yeniden kurulur, depo temizlenir, geçersiz SQL depodan çıkar | ⛔Kural 13'ün tam kapsamı: prod veritabanına yazma. **Recep'in kendi sözü, kendi penceresi.** Ayrıca silinen satırlar geri getirilemez; DR/yeniden kurulum senaryosunda bu dosyalar artık hiç yoktur |
+| **2** | Dosyaları **yerinde tut**, başlarına **"ÖLÜ — hiç uygulanmadı"** bloğu yaz | **HAYIR** | Dosya adı ve glob değişmez → parite **yeşil kalır**; defter "görüldü" der, SQL **hiç koşmaz**; okuyan artık yanılmaz | Geçersiz SQL depoda kalır. Defter bir gün sıfırlanırsa bu dosyalar koşmaya kalkar ve koşu **kırmızı** yanar — sessiz boşluk değil, gürültülü hata (fail-closed) |
+| **3** | Parite kapısına **istisna listesi** ekle, sonra dosyaları sil/taşı | **HAYIR** | Kapı yeşil kalır, dosyalar depodan çıkar | ⚠**Kapının amacını yok eder.** Defter, "atla" kararının **tek** dayanağı; istisna listesi o dayanağın kör bir sınıfını yaratır. Üstelik konformans kolu R3 parite adımının **varlığını** ölçüyor, **katılığını ölçmüyor** — istisna eklenince kapı yeşil görünmeye devam eder. Bu, bu projede adı konmuş bir kusur sınıfı: *yeşil kapı bakmadığı şeyi kanıtlamaz* |
+| **4** | Dosya içeriğini **zararsız hâle getir** (geçersiz SQL yerine yorum) | **HAYIR** | Ad ve glob değişmez, parite yeşil; defter sıfırlanırsa dosya koşar ve **başarıyla hiçbir şey yapmaz** | ⚠En riskli görünmeyen seçenek: defter sıfırlanma senaryosunda **sessiz boşluk** üretir. Dosyanın vaat ettiği politika yine yazılmaz, ama artık kimse fark etmez. Seçenek 2'nin gürültülü kırmızısını sessizliğe çevirir |
+
+## 4 · BENİM HÜKMÜM (sorulursa) — Seçenek 2
+
+Üç gerekçe, sırayla:
+
+1. **Tek başına yeterli olan gerekçe:** Seçenek 2, prod veritabanına dokunmayan **ve** parite
+   kapısını zayıflatmayan **tek** seçenek. 1 prod'a yazıyor, 3 kapıyı körleştiriyor, 4 gürültüyü
+   sessizliğe çeviriyor.
+2. **Asıl sorun dosyaların varlığı değil, YANLIŞ İNANÇ.** Bu altı dosyanın gerçek zararı depoda
+   yer kaplaması değil; adlarının *"bu tablolara RLS politikası yazıldı"* izlenimi vermesi. Başa
+   yazılan bir blok bu inancı **tam olarak** ortadan kaldırır — silmek de kaldırır, ama bedeli
+   prod'a yazmaktır.
+3. **Fail-closed tercihi bilinçli.** Defter bir gün sıfırlanırsa Seçenek 2 kırmızı verir. Bu bir
+   kusur değil, istenen davranıştır: o an gerçekten bakılması gereken bir durum vardır.
+
+**Seçenek 1'i savunan tek ciddi argüman:** depoyu gerçekten temizler ve geçersiz SQL'i tamamen
+ortadan kaldırır. Recep bunu tercih ederse ölçüm buna hazır — ama o zaman iş, prod veritabanında
+altı satırlık bir silme demektir ve **onun kendi penceresinde, kendi sözüyle** yapılır; ben
+hazırlarım, uygulamam.
+
+## 5 · KARAR NE OLURSA OLSUN YAPILACAKLAR
+
+1. **Cetvel yazılır.** "Prod'a hiç uygulanmamış ama depoda duran migration dosyası" için yazılı
+   kural bugün **yok**; kararın kendisi o cetvelin ilk maddesi olur. Yeri:
+   `docs/standards/` altında migration bölümü.
+2. **Bir kapı kararı korur.** Seçenek 2 seçilirse: ölü dosyaların **ilan edilmiş bir listesi**
+   (borç defteri kalıbı, `docs/skill-ad-cakismasi-ilani.json` ile aynı mantık) + bir konformans
+   kolu — ilan edilen her dosya **hâlâ duruyor mu** ve **ÖLÜ bloğunu taşıyor mu**. Bu kol iki
+   ihlali birden yakalar: dosyanın silinmesi (pariteyi kıracaktı) ve başlığın sıyrılması.
+3. **Vaat edilen politikaların prod'da olup olmadığı AYRI KAYIT.** Adım 2'de zaten ayrıldı
+   (PR #1173, `error_groups` yazma politikası taslağı, **merge edilmedi**). Bu belge o soruyu
+   kapsamıyor ve kapsadığını iddia etmiyor.
+4. **`create-migration` şablonuna squawk iki satırı** (`lock_timeout` + `statement_timeout`)
+   eklenir — REC-315 EK'inde yazılı, bu işten bağımsız ve migration içermiyor.
+
+## 6 · BU ÖLÇÜMÜN SINIRLARI (adıyla)
+
+- **Defterin içeriğini doğrudan okumadım.** Kanıt dolaylı: parite adımının yeşil geçmesi.
+  Bu, son koşum (2026-09-13 18:35Z) **anı** için geçerli. O andan bu yana prod veritabanında
+  elle bir değişiklik yapıldıysa bu çıkarım bayattır. Doğrudan ölçüm prod DB bağlantısı ister;
+  salt-okuma bile olsa bu belge için gerekli değildi ve yapılmadı.
+- **Dosyaların vaat ettiği politikaların prod'da var olup olmadığı bu belgede ÖLÇÜLMEDİ.**
+  Ayrı kayıt (§5.3).
+- **Geçersiz SQL sayısı düz metin araması.** `grep -ci 'IF NOT EXISTS'` sayıyor; `CREATE POLICY`
+  dışındaki bağlamlarda geçen `IF NOT EXISTS` (ör. `CREATE TABLE IF NOT EXISTS`, ki o **geçerli**)
+  bu sayıya karışmış olabilir. §4.3'ün orijinal ölçümü squawk linter'ıyla yapıldı ve **11**
+  geçersiz ifade dedi; benim 26'lık toplamım ondan büyük, yani fark tam olarak bu karışmadır.
+  Kararı etkilemiyor (dosya kümesi aynı), ama sayı olarak squawk'ın 11'i doğru olan.
+- **Seçenek 1'in bedeli tam ölçülmedi:** defterden satır silmenin DR/yeniden kurulum senaryosunda
+  ne ürettiği ayrı bir ölçüm ister. Recep o seçeneğe yönelirse önce o ölçülür.
+
+— ALTYAPI 2026-09-14, REC-321 adım 3
+
+
+---
+# FILE: docs\audits\rec326-sentry-postcss-zinciri-2026-09-14.md
+
+# REC-326 — sentry / postcss zinciri güvenlik ölçümü (2026-09-14)
+
+> Cetvel: `docs/standards/bagimlilik-guvenlik-yukseltme-standard.md`. Bu belge o cetvelin
+> madde 1-8'ine göre yürütüldü. Alt-ajan (worktree `agent-a9e9d043bd982e05e`) tarafından yazıldı.
+
+## 0 · Ortam ölçümü (worktree tuzağı — madde 6)
+
+`ls -ld node_modules` → **"No such file or directory"**. Bu worktree'de `node_modules` ne gerçek
+dizin ne de sembolik bağ — **hiç yok**. Yani bu worktree'de `pnpm install` koşsaydım bile ana
+depoya sembolik-bağ riski **yoktu**, ama cetvel gereği yine de `pnpm install --lockfile-only`
+kullanıldı (kilit dosyasını üretir, `node_modules`'a dokunmaz). `pnpm audit --prod` `node_modules`
+gerektirmeden, doğrudan `pnpm-lock.yaml` üzerinden çalıştı.
+
+## 1 · `pnpm audit --prod` — önce/sonra
+
+Komut: `pnpm audit --prod --json` (geliştirme zinciri hariç, `--prod` zorunlu).
+
+**Önce (değişiklikten önce):** `low: 5, moderate: 7, high: 14, critical: 0` → toplam **26** bulgu,
+623 prod bağımlılığı üzerinden.
+
+**Sonra (postcss düzeltmesinden sonra):** `low: 5, moderate: 6, high: 11, critical: 0` → toplam
+**22** bulgu. Fark: **4 bulgu kapandı** (1 moderate + 3 high) — tam olarak postcss zincirinin
+kendisi (aşağıya bakınız). Kanıt dosyaları: `/tmp/audit_prod.json` (önce), `/tmp/audit_after.json`
+(sonra) — bu oturuma özel geçici dosyalar, depoya eklenmedi.
+
+## 2 · Bulgu tablosu — SENTRY zinciri (13 bulgu, DEĞİŞİKLİK YAPILMADI)
+
+Hepsi `.>@sentry/nextjs>...` yolundan geliyor. İki alt-dal var:
+
+### 2a. `@sentry/nextjs > @sentry/webpack-plugin > ...` (12 bulgu) — YALNIZ BUILD-TIME
+
+| Paket | Şiddet | Yol | Düzeltilmiş sürüm |
+|---|---|---|---|
+| `@babel/core` | low | `...@sentry/bundler-plugin-core>@babel/core` | — |
+| `brace-expansion` | high ×3 (CVE ayrı, aynı modül) | `...glob>minimatch>brace-expansion` | — |
+| `fast-uri` | high ×6 | `...webpack>schema-utils>ajv>fast-uri` | — |
+| `browserslist` | high | `...@babel/helper-compilation-targets>browserslist` | 4.28.7 |
+| `baseline-browser-mapping` | moderate | `...browserslist>baseline-browser-mapping` | — |
+
+### 2b. `@sentry/nextjs > @sentry/node > @opentelemetry/core` (1 bulgu) — RUNTIME
+
+| Paket | Şiddet | Kurulu | Düzeltilmiş | CVE |
+|---|---|---|---|---|
+| `@opentelemetry/core` | moderate | 1.30.1 | >=2.8.0 | CVE-2026-54285 (W3C Baggage propagator, sınırsız bellek ayırma) |
+
+## 3 · Maruziyet — beş soru (sentry zinciri)
+
+1. **Bu paket üretimde mi koşuyor?**
+   - 2a grubu (`@sentry/webpack-plugin` altındakiler): **HAYIR** — `@sentry/webpack-plugin`
+     yalnız `next build` sırasında kaynak-harita (sourcemap) Sentry'ye yüklemek için çalışan bir
+     webpack eklentisidir; Vercel'deki çalışan Node.js sürecine hiç paketlenmez/import edilmez.
+   - 2b (`@opentelemetry/core`): **EVET** — `@sentry/node` çalışma anında Next.js sunucu
+     sürecinde yükleniyor (tracing/instrumentation).
+2. **Hangi kod yolundan çağrılıyor?** 2a: `next build` CI adımı, kendi repomuzun kaynak ağacını
+   işliyor — girdi bizim kodumuz, saldırgan kontrolünde değil. 2b: gelen HTTP isteklerindeki
+   `baggage` başlığını ayrıştıran `W3CBaggagePropagator.extract()`.
+3. **Saldırganın erişebildiği bir girdi o yola ulaşıyor mu?** 2a: **HAYIR** (build zamanı, dış
+   girdi yok). 2b: **KISMEN** — `baggage` header'ı dışarıdan gelebilir, ama Node.js'in varsayılan
+   `--max-http-header-size` sınırı (16 KB, toplam header) zaten üst sınırı koyuyor; danışmanlığın
+   kendisi de bunu "pratik etkisi çoğu Node.js dağıtımında sınırlı" diye not ediyor.
+4. **Canlıda ölçülebilir bir belirti var mı?** Ölçülmedi — bu bir DoS/bellek-tüketim senaryosu,
+   canlıda "belirti" aramak (örn. 500 sayısı) anlamlı bir ölçüt değil; risk yapısal, olay değil.
+5. **Yükseltme başka neyi kırar?** `@sentry/nextjs` **zaten 8.x hattının en son sürümünde**
+   (8.55.2 — `pnpm view @sentry/nextjs@8 version` ile doğrulandı, üstü yok). `@opentelemetry/core`
+   2.x'e çıkmak için `@sentry/nextjs` **9.x veya 10.x'e majör sıçrama** gerekiyor (kayıt: paket
+   listesi 8.55.2 → 9.0.0 → ... → 10.74.0 → 11.0.0-beta, ara sürüm yok). v8→v9/v10 geçişi Sentry
+   SDK'sının OTel entegrasyonunu değiştiriyor (breaking); `instrumentation.ts`/config dosyalarına
+   dokunmadan ve gerçek build+smoke testi olmadan **lockfile-only bir override ile** zorlanması
+   cetvel madde 4'ün ruhuna aykırı bir risk olurdu (yalnız sürüm numarası değil, davranış kırılır).
+
+**Hüküm:** Sentry zinciri için **DEĞİŞİKLİK YAPILMADI**. 2a grubu (12 bulgunun 12'si) build-time
+only olduğu için üretim maruziyeti yok — acil değil. 2b (`@opentelemetry/core`, moderate) gerçek
+ama düşük-pratik-etkili bir üretim maruziyeti; düzeltmesi `@sentry/nextjs` majör sürüm geçişini
+gerektiriyor. **KARAR GEREKİYOR:** v9/v10'a geçiş ayrı bir iş olarak (migration + build + smoke
+test dahil) planlanmalı — bu iş REC-326'nın "lockfile-only" kapsamının dışında.
+
+## 4 · Bulgu tablosu — POSTCSS zinciri (4 bulgu, DÜZELTİLDİ)
+
+| Paket | Şiddet | Önceki | Sonraki | CVE / Danışma |
+|---|---|---|---|---|
+| `postcss` | moderate | 8.5.15 | **8.5.28** | GHSA-fxqj-rqcc-2cmp (sourceMappingURL, `from` unset iken keyfi `.map` okuma) — düzeltme 8.5.19 |
+| `postcss` | high | 8.5.15 | **8.5.28** | GHSA-r28c-9q8g-f849 / CVE-2026-73646 (path traversal, keyfi `.map` içerik ifşası) — düzeltme 8.5.18 |
+| `nanoid` (postcss'in kendi bağımlılığı) | high | 3.3.12 | **3.3.19** | GHSA-28wg-ghj8-5hjv (negatif size ile sonsuz döngü) — düzeltme 3.3.16 |
+| `nanoid` | high | 3.3.12 | **3.3.19** | GHSA-2v37-7h3g-55p8 (sıfır size ile sonsuz döngü) — düzeltme 3.3.18 |
+
+Yol: `.>postcss` (doğrudan bağımlılık) ve `.>postcss>nanoid` (postcss'in kendi iç bağımlılığı).
+
+## 5 · Maruziyet — beş soru (postcss zinciri)
+
+1. **Üretimde mi koşuyor?** `postcss` `package.json`'da `dependencies` altında (devDependencies
+   değil), ama fiilî çalıştığı yer **build zamanı** — Tailwind/Autoprefixer üzerinden `next build`
+   sırasında CSS derleniyor; çalışan Node.js sunucu sürecinde CSS metni ayrıştırılmıyor.
+2. **Hangi kod yolundan çağrılıyor?** `postcss([]).process(css)` — kaynak CSS dosyalarımız
+   (`globals.css`, Tailwind çıktısı). `sourceMappingURL` açıkları CSS **metnini** okuyup içindeki
+   yoruma göre dosya okuyor.
+3. **Saldırganın erişebildiği bir girdi o yola ulaşıyor mu?** **HAYIR** — VentHub kullanıcıdan CSS
+   yüklemiyor/işlemiyor; işlenen CSS her zaman repodaki kendi kaynak dosyalarımız. `nanoid`
+   açıkları da harici girdi almayan iç ID üretimiyle ilgili.
+4. **Canlıda ölçülebilir bir belirti var mı?** Ölçülemez/anlamsız — saldırı yüzeyi yok.
+5. **Yükseltme başka neyi kırar?** **Hiçbir şeyi** — aynı major (8.x) içinde patch sıçraması
+   (8.5.15→8.5.28), `package.json`'daki doğrudan bağımlılık aralığı zaten `^8.5.10` (8.5.28 bu
+   aralığın içinde). `git diff pnpm-lock.yaml` yalnız `postcss@*` ve doğrudan tüketicilerinin
+   (`autoprefixer`, `postcss-import`, `postcss-js`, `postcss-load-config`, `postcss-nested`,
+   `postcss-values-parser`, `detective-postcss`, `webpack`, `terser-webpack-plugin` — hepsi
+   sadece peer-resolution etiketi olarak `(postcss@8.5.28)` taşıyor) ile `nanoid@3.3.12→3.3.19`
+   satırlarını değiştirdi; başka hiçbir paket sürümü kaymadı.
+
+**Hüküm:** Üretim maruziyeti düşük olsa da (build-time, kendi kaynağımız), düzeltme **bedava ve
+risksiz** (aynı major, tek satırlık override, doğrulanmış temiz diff) — cetvel madde 6/7'ye göre
+"fix yolu netse uygula" durumu. **UYGULANDI.**
+
+## 6 · Yapılan değişiklik
+
+- `package.json` → `pnpm.overrides.postcss`: `">=8.5.10"` → **`">=8.5.19 <9.0.0"`** (madde 4:
+  override daima aralıklı, üst sınır zorunlu — postcss'in henüz bir majör 9 sürümü yok, ama üst
+  sınır yine de yazıldı; `pnpm view postcss versions` ile en güncelin `8.5.28` olduğu ve `9.x`
+  olmadığı doğrulandı).
+- `pnpm install --lockfile-only` koşuldu (node_modules'a dokunulmadı — zaten yoktu).
+- `pnpm-lock.yaml` **elle okundu**: `grep -n "^  postcss@\|^  nanoid@" pnpm-lock.yaml` →
+  `postcss@8.5.28`, `nanoid@3.3.19` doğrulandı (satır 4826, 4512 ve karşılık gelen `{}` blokları
+  10856/10503).
+- `git diff pnpm-lock.yaml` ile diff'in **yalnızca** postcss + doğrudan peer-tüketicileri ve
+  nanoid'i kapsadığı, başka hiçbir paketin kaymadığı doğrulandı.
+- Sentry zinciri için **hiçbir dosya değiştirilmedi**.
+
+## 7 · Kapsam dışı bırakılan diğer zincirler (bilgi amaçlı — bu iş REC-326 kapsamında DEĞİL)
+
+`pnpm audit --prod` çıktısında sentry/postcss dışında kalan 8 bulgu:
+
+- `dompurify` (`isomorphic-dompurify` üzerinden) — 3 low + 2 moderate. Mevcut override
+  `"dompurify": ">=3.4.0"` zaten var ama **üst sınırsız** — cetvel madde 5 gereği bu override'ın
+  kendisi de tazelik denetimine tabi, ama bu REC-326'nın kapsamı dışında (ayrı zincir/ayrı iş).
+- `fflate` (`@types/three>fflate` ve `@react-three/drei>three-stdlib>fflate`) — 2 moderate,
+  three.js/3D zinciri.
+- `postcss-selector-parser` (`tailwindcss>postcss-selector-parser`) — 1 low, tailwindcss zinciri
+  (postcss'in kendisi değil, ayrı paket adı).
+
+Bunlar ayrı zincirler oldukları için (cetvel madde 3) bu PR'a dahil edilmedi; ayrı kayıt açılması
+önerilir.
+
+## 8 · Koşulan ve KOŞULMAYAN kapılar
+
+**Koşuldu:**
+- `pnpm audit --prod --json` (önce/sonra) — yukarıda.
+- `pnpm-lock.yaml` elle okuma (postcss/nanoid sürüm doğrulama).
+- `git diff pnpm-lock.yaml` (yan etki taraması).
+- `node -e "JSON.parse(...)"` ile `package.json` sözdizimi doğrulaması.
+- `pnpm view postcss versions` / `pnpm view @sentry/nextjs@8 version` / `@sentry/nextjs@9 version`
+  (registry'den gerçek sürüm listesi — "sürüm yok" iddiası ölçüldü, varsayılmadı).
+
+**KOŞULMADI (bilinçli, cetvel madde 7):**
+- `pnpm build` / `pnpm type-check` / `pnpm lint` / `pnpm test` — bu worktree'de `node_modules`
+  hiç kurulu değil (madde 6), `--lockfile-only` bilinçli olarak `node_modules`'a dokunmuyor.
+  Yerel ağaçta postcss hâlâ eski sürümde olduğu için bu kapılar koşulsa bile **yanlış şeyi**
+  ölçerdi. Gerçek doğrulama **CI'da** (`pnpm install` tam kurulumla) yapılmalı.
+- `pnpm audit` içinde belirtilen `dependency-pins` / `peer-dependency-integrity` adlı kapılar:
+  bu isimlerde bir script/workflow bu depoda **bulunamadı** (aranan yer: `scripts/**`,
+  `package.json` scripts, `.github/workflows/**` — cetvelin madde 7 örneği olarak verdiği isimler,
+  ama bu repoda henüz böyle adlandırılmış bir kapı yok; bu bir eksiklik olabilir, ayrı not).
+- Sentry zincirinin build-time (2a) bulguları için gerçek "kod çalışıyor mu" testi (örn.
+  `next build` çıktısında `@sentry/webpack-plugin`'in üretilen bundle'a girip girmediğinin
+  doğrudan gözlemi) koşulmadı — hüküm Sentry'nin resmi mimarisine (`webpack-plugin` = build-time
+  tooling) dayanıyor, kod çalıştırılarak ayrıca doğrulanmadı.
+
+## 9 · Sonuç özeti
+
+- **26 → 22** prod bulgusu (4 kapandı: postcss zinciri tam).
+- **Postcss zinciri: DÜZELTİLDİ**, PR açıldı.
+- **Sentry zinciri: DEĞİŞİKLİK YOK, KARAR GEREKİYOR** — asıl açık kol (`@opentelemetry/core`,
+  moderate) `@sentry/nextjs`'in 8.x'te zaten en güncel olması nedeniyle ancak 9.x/10.x majör
+  geçişiyle kapanıyor; bu ayrı bir migration işi olarak planlanmalı. Kalan 12 bulgu build-time
+  only (`@sentry/webpack-plugin`), üretim maruziyeti yok.
+
+İlgili: REC-326 · Cetvel: `docs/standards/bagimlilik-guvenlik-yukseltme-standard.md`
+
+
+---
+# FILE: docs\audits\rec327-workflow-envanteri-2026-09-14.md
+
+# REC-327 — GitHub Actions Workflow Envanteri ve Jules Workflow Kaldırma (2026-09-14)
+
+> Ölçüm tarihi: 2026-09-14. Ölçen: ALTYAPI şeridi alt-ajanı (worktree
+> `agent-aa5d43d33a00cc7c8`, dal `altyapi/rec327-jules-workflow-kaldir`).
+> Kaynak: `gh workflow list --all`, `gh run list --workflow=<dosya> --limit 3 --json conclusion,createdAt`,
+> `grep -rn jules` (tüm depo), doğrudan dosya okuma. Önceki ölçüm referansı:
+> `docs/audits/arac-envanteri-2026-09-07.md` (bu çalışmanın ölçtüğü `disabled_manually`
+> durumunu 2026-09-07'de zaten tespit etmişti; burada tazelenip PR'a bağlandı).
+
+## Özet
+
+`.github/workflows/` altında ölçüm anında **31 dosya** vardı. Bunlardan **7'si**
+`jules-*.yml` desenine uyuyordu (beklenen sayı doğrulandı). `gh workflow list --all`
+GitHub tarafındaki **state** alanını gösterdi: 7'sinin de state'i **`disabled_manually`**
+— yani bu workflow'lar GitHub arayüzünden elle kapatılmış, `workflow_dispatch` ile bile
+tetiklenemez durumda. Aynı state'te olan `ai-auto-repair.yml` de var ama o dosya
+`jules-*.yml` deseni dışında (adı farklı) ve REC-327 kapsamı dışında bırakıldı — **silinmedi**.
+(Güncelleme: `ai-auto-repair.yml` REC-333 kapsamında 2026-09-14'te ayrıca ölçülüp
+kaldırıldı — bkz. `docs/audits/rec333-ai-auto-repair-2026-09-14.md` ve aşağıdaki tablo satırı.)
+
+Tüm 7 jules workflow'unun geçmiş koşum kaydı var (hiçbiri "hiç koşmamış" değil — hepsi
+2026-03 tarihli, GitHub'ın elle kapatılmasından önceki dönemde koşmuş). Silme kararı
+"hiç koşmadı" kıstasına değil, **(a) GitHub'da elle devre dışı bırakılmış olması** ve
+**(b) depoda hiçbir canlı çağıranın olmaması** ikilisine dayanıyor — aşağıda kanıtlanıyor.
+
+## (a) Kaldırılan jules workflow'ları — 7 dosya
+
+| Dosya | `name:` | Tetikleyici (`on:`) | Son 3 koşum (tarih · sonuç) | Kaldırma kanıtı |
+|---|---|---|---|---|
+| `jules-a11y.yml` | Jules - A11y | `workflow_dispatch` | 2026-03-07 · success | GitHub state=`disabled_manually`; canlı çağıran yok |
+| `jules-dependency-update.yml` | Jules - Dependency Update | `workflow_dispatch` | 2026-03-13 · success | GitHub state=`disabled_manually`; canlı çağıran yok |
+| `jules-i18n-sync.yml` | Jules - i18n Sync | `workflow_dispatch` | 2026-03-17 · failure, 2026-03-14 · success, 2026-03-14 · failure | GitHub state=`disabled_manually`; canlı çağıran yok |
+| `jules-lint-fix.yml` | Jules - Lint & TS Fixer | `workflow_dispatch` (girdiler: `wave`, `scope`, `additionalInstruction`) | 2026-03-18 · failure, 2026-03-17 · failure, 2026-03-17 · failure | GitHub state=`disabled_manually`; canlı çağıran yok |
+| `jules-performance.yml` | Jules - Performance | `workflow_dispatch` | 2026-03-07 · success | GitHub state=`disabled_manually`; canlı çağıran yok |
+| `jules-security-audit.yml` | Jules - Security Audit | `workflow_dispatch` | 2026-03-18 · failure, 2026-03-17 · failure, 2026-03-16 · failure | GitHub state=`disabled_manually`; canlı çağıran yok |
+| `jules-test-coverage.yml` | Jules - Test Coverage | `workflow_dispatch` | 2026-03-18 · failure, 2026-03-11 · success | GitHub state=`disabled_manually`; canlı çağıran yok |
+
+**Çağıran taraması (adım 3, dört kalıp ayrı ayrı arandı):**
+- `workflow_call` deseni: sadece `gemini-*.yml` dosyalarında var (jules ile ilgisiz).
+- `uses:` ile başka workflow'tan çağrı: bulunamadı — hiçbir aktif workflow bu 7 dosyayı `uses:` ile çağırmıyor.
+- `gh workflow run jules-*.yml` betik referansı: yalnız `.archive/legacy_ciltler/04_operations_and_deployment.md`
+  içinde bulundu — bu dosya **arşiv** dizininde, artık çalışmayan tarihsel doküman;
+  ayrıca orada anılan `jules-undertaker.yml`, `jules-janitor.yml`, `jules-scribe.yml`
+  depoda hiç mevcut değil (uydurma/eski örnekler). **Canlı çağıran sayılmaz.**
+- Düz metin referansları (`grep -rn jules --include=*.yml,*.cjs,*.js,*.json,*.md`): geri kalan
+  tüm eşleşmeler `.archive/`, `docs/audits/`, `docs/kayitlar_master.md`, `docs/proje-takip/`
+  gibi doküman/arşiv dosyalarında — hiçbiri CI/CD akışında bu dosyaları tetiklemiyor.
+  `ai-auto-repair.yml` Jules'tan bahsediyor ama `jules-action` çağrısını doğrudan kendi
+  içinde yapıyor, bu 7 dosyaya referans vermiyor (ayrı, bağımsız bir workflow).
+
+Sonuç: kaldırılan 7 dosyanın hiçbiri canlı bir yerden çağrılmıyor ve GitHub'da zaten
+elle devre dışı. Kaldırma güvenli.
+
+## (b) Kalan tüm workflow'ların envanteri — 24 dosya
+
+| Dosya | Ne yapar | Tetikleyici | Son koşum (tarih · sonuç) |
+|---|---|---|---|
+| ~~`ai-auto-repair.yml`~~ | **KALDIRILDI (REC-333, 2026-09-14).** CI kırmızı olunca Jules'a otomatik onarım denemesi yaptırdı. Ölçüldü: 2026-03-18'den 2026-09-02'ye dek 19 gerçek koşum (skipped değil), en az 10 "Auto-Repair" PR'ı açıldı, **hiçbiri merge edilmedi** (0/10). `ci.yml`'in `ci-logs` artefaktını üreten adımı bu dosyanın TEK okuyucusuydu — o da kaldırıldı. Detay: `docs/audits/rec333-ai-auto-repair-2026-09-14.md`. | ~~`workflow_run` (CI tamamlanınca)~~ | (kaldırıldı) |
+| `auto-label.yml` | PR açılınca/düzenlenince etiket atar | `pull_request` (opened, edited) | 2026-09-14 · success |
+| `auto-reviewer.yml` | PR açılınca otomatik reviewer atar | `pull_request` (opened) | 2026-09-14 · success |
+| `ci.yml` | Ana CI: lint/type-check/test/build | `pull_request` (push yalnız master) | 2026-09-14 · ölçüm anında çalışıyordu (conclusion boş/in-progress) |
+| `db-advisor-fix.yml` | Supabase DB Advisor önerilerini otomatik düzeltmeye çalışır | `workflow_dispatch` | 2025-12-08 · failure |
+| `db-advisor.yml` | Supabase DB Advisor taraması | `push` (master), `pull_request` | 2026-09-14 · success |
+| `deploy-functions.yml` | Supabase Edge Functions'ı deploy eder | `workflow_dispatch` (girdi: `deploy_all`) | 2026-09-13 · success |
+| `e2e-smoke.yml` | Admin + checkout uçtan uca duman testi | `pull_request` (push yalnız master) | 2026-09-14 · success |
+| `edge-shared-input-drift.yml` | Edge Functions paylaşılan girdi şemasının sapmasını yakalar | `pull_request` (paths: `supabase/config.toml` vb.) | 2026-09-09 · success |
+| `expired-reservations-cron.yml` | Süresi dolan stok rezervasyonlarını günlük temizler | `schedule` (03:15 UTC) | 2026-09-13 · success |
+| `gemini-dispatch.yml` | PR yorumlarında Gemini tetikleyicisini yönlendirir | `pull_request_review_comment` (created) | 2026-09-14 · skipped |
+| `gemini-invoke.yml` | Gemini çağrısını yürüten reusable workflow | `workflow_call` | Ayrı run kaydı yok — çağıranın (gemini-dispatch/plan-execute) içinde görünür |
+| `gemini-plan-execute.yml` | Gemini plan uygulama adımı, reusable | `workflow_call` | 2026-03-18 · failure (en son ayrı görünen kayıt) |
+| `gemini-review.yml` | Gemini PR review, reusable | `workflow_call` | Ayrı run kaydı yok — çağıranın içinde görünür |
+| `gemini-triage.yml` | Gemini issue/PR triage, reusable | `workflow_call` | 2026-09-13 · success |
+| `katalog-sayim.yml` | Katalog ürün sayımını günlük ölçer | `schedule` (06:10 UTC) | 2026-09-13 · success |
+| `migration-linter.yml` | INV-MIGRATION-3: migration SQL'ini squawk ile lint'ler | `pull_request` (paths: `supabase/migrations/**.sql`) | 2026-09-14 · success |
+| `order-housekeeping-cron.yml` | Sipariş durumu bakımını 30 dakikada bir çalıştırır | `schedule` | 2026-09-14 · success |
+| `pr-size-check.yml` | PR diff boyutunu kontrol eder | `pull_request` (opened, synchronize) | 2026-09-13 · success |
+| `rls-guard.yml` | Supabase RLS güvenlik alarmı | `pull_request` (opened, synchronize; paths ile sınırlı) | 2026-09-14 · success |
+| `skills-gate.yml` | Skill/companion kapısı | `pull_request`, `push` (master) | 2026-09-14 · success |
+| `ssr-duman-alarmi.yml` | Prod SSR duman testi, günlük | `schedule` (06:40 UTC) | 2026-09-13 · success |
+| `stock-alert-cron.yml` | Stok uyarısını günlük gönderir | `schedule` (06:20 UTC) | 2026-09-13 · success |
+| `supabase-migrate.yml` | Master'a migration merge olunca prod DB'ye otomatik uygular (Kural 13) | `push` (master, migration path'leri) | 2026-09-13 · success |
+
+> Not: `gemini-invoke.yml` ve `gemini-review.yml` yalnız `workflow_call` ile tetiklenen
+> reusable workflow'lar; `gh run list --workflow=<dosya>` bunlar için doğrudan kayıt
+> döndürmüyor çünkü koşumlar çağıran workflow'un (ör. `gemini-dispatch.yml`,
+> `gemini-plan-execute.yml`) run kaydı altında görünüyor. Bu "hiç koşmadı" anlamına gelmez —
+> ölçülemedi, ayrı satırda belirtildi.
+
+## Kapı sonucu
+
+`pnpm test -- --run src/__tests__/conformance/` sonucu ve Test Files/Tests sayıları
+PR gövdesinde ve görev raporunda ayrıca verildi (bu dosyaya tekrar yazılmadı — üretilmiş
+rapor değil, elle tutulan envanter burada; kapı sayıları raporun parçası).
+
+## Kapsam notu
+
+Bu envanter yalnız REC-327 kapsamındaki `jules-*.yml` kaldırmasını ve kalan workflow'ların
+anlık durumunu kaydeder. `ai-auto-repair.yml` de `disabled_manually` ama adı `jules-*`
+desenine uymadığı ve iş emri kapsamı yalnız `jules-*.yml` dosyalarını kapsadığı için
+**bu iş emrinde silinmedi** — ayrı kayıt REC-333'e bırakıldı ve orada 2026-09-14'te kaldırıldı.
+
+
+---
+# FILE: docs\audits\rec333-ai-auto-repair-2026-09-14.md
+
+# REC-333 — `ai-auto-repair.yml` Zinciri ÖLÇÜM Raporu (2026-09-14)
+
+> Ölçüm tarihi: 2026-09-14. Ölçen: ALTYAPI şeridi alt-ajanı, dal `altyapi/rec333-ai-auto-repair`.
+> Kaynak: `gh workflow list --all`, `gh run list --workflow=ai-auto-repair.yml --limit 200 --json conclusion,createdAt,databaseId,headBranch`,
+> `gh run view <id> --json jobs`, `gh run view <id> --log-failed`, `gh pr list --search "Auto-Repair in:title" --state all`,
+> `gh pr view <n> --json state,mergedAt`, `gh api repos/.../actions/workflows`, `git ls-remote --heads origin`,
+> `grep -rn -i "auto-repair|auto_repair" .github/workflows/`. Önceki ölçüm referansı: `docs/audits/rec327-workflow-envanteri-2026-09-14.md`
+> (REC-327, PR #1185) — o iş `ai-auto-repair.yml`'i "adı `jules-*` desenine uymuyor" gerekçesiyle
+> bilerek kapsam dışı bıraktı; bu rapor o boşluğu kapatır.
+
+## 1. Dosya ne yapıyordu
+
+`.github/workflows/ai-auto-repair.yml` (silinmeden önce): `workflow_run` tetikleyicisiyle
+`CI` workflow'unun tamamlanmasını dinliyordu. `if:` koşulu iki şeyi birden istiyordu:
+(1) tetikleyen CI koşumunun sonucu `failure`, (2) `head_repository` fork değil (aynı repo).
+Koşul sağlanınca: hatalı branch'i checkout ediyor, CI'ın yüklediği `ci-logs` artefaktını
+indiriyor (`ci-lint.log`, `ci-typecheck.log`, `ci-deno.log`, `ci-test.log`, `ci-build.log`),
+hata satırlarını (`error|warning|failed|cannot find|is not|does not` deseniyle) tek bir
+özet dosyasında birleştiriyor, sonra `google-labs-code/jules-action@v1.0.0` ile
+Google Jules'a bu özeti ve sıkı sınırlar içeren bir onarım talimatı gönderiyordu (`secrets.JULES_API_KEY`
+kullanılarak). Jules başarılı olursa "🤖 Auto-Repair: ..." başlıklı bir PR açması bekleniyordu.
+`permissions:` bloğu `contents: write`, `pull-requests: write`, `actions: read` idi.
+
+## 2. GitHub durumu ve koşum geçmişi
+
+- `gh workflow list --all` → state **`disabled_manually`** (silinmeden hemen önce ölçüldü).
+- `gh api .../actions/workflows` → `created_at: 2026-03-18T15:06:22+03:00`, `updated_at (=disable anı): 2026-09-02T10:02:15+03:00`.
+- Son 200 koşum (`gh run list --limit 200`, en eskisi 2026-08-27'ye kadar geri gidiyor —
+  daha eski koşumlar için `--limit` yükseltilmedi, aşağıda "ölçülemedi" olarak işaretli):
+  **181 `skipped`** (CI koşumu `failure` DEĞİLDİ — repair job'ın `if:` koşulu false, çalışmadı)
+  + **19 gerçek koşum** (job'ın `if:` koşulu TRUE oldu, iş fiilen çalıştı): **9 `success`, 10 `failure`**
+  (`master` dalında, 2026-08-27T19:29 ile 2026-09-01T12:37 arası).
+- **"Hiç koşmamış" DEĞİL** — dosya en az 2026-03'ten (ilk PR #272, 2026-04-20) beri fiilen
+  Jules'a görev gönderiyordu; ölçülen pencerede tek başına 19 gerçek tetiklenme var.
+- Bir başarısız koşumun (`33508673475`, 2026-09-01T12:37) logu incelendi: adım gerçekten
+  Jules'a görev gönderdi ve bir `jules-15564047404980098940-f9da994d-1` dalı yarattı
+  (uzak depoda hâlâ duruyor — `git ls-remote --heads origin` ile doğrulandı), ardından
+  `##[error]Process completed with exit code 126` ile düştü (jules-action'ın kendi
+  içindeki bir adım container/exec hatası verdi — jules-action'ın iç mekaniği bu raporun
+  ölçüm kapsamı dışında, **ölçülemedi**).
+- Devre dışı bırakılma anından (2026-09-02T10:02) sonra hiç koşum yok (disabled workflow
+  `workflow_run` tetiğine bile yanıt vermiyor).
+
+## 3. Zincir tablosu
+
+| Taraf | Dosya · adım | Durum |
+|---|---|---|
+| **Üreten** | `ci.yml` → "Upload CI Logs on Failure" adımı, `if: failure()`, `actions/upload-artifact@v4`, `name: ci-logs` | CI kırmızı her koşumda ÇALIŞIYORDU (silinene kadar) |
+| **Okuyan** | `ai-auto-repair.yml` → "CI log artefaktını indir" adımı, `actions/download-artifact@v4`, `name: ci-logs` | `disabled_manually` — okuyucu YOK |
+| **Dış servis** | Google Jules (`google-labs-code/jules-action@v1.0.0`, `secrets.JULES_API_KEY`) | Erişilebilir (secret tanımlı, `gh secret list` ile doğrulandı — DEĞER okunmadı), ama artık çağrılmıyor |
+| **Düz metin referans** | `ci.yml:104` yorum ("ai-auto-repair") ve `ci.yml:201` yorum ("ai-auto-repair.yml bu artefaktı okuyarak Jules'a iletir") | Ölü zinciri hâlâ canlı gösteriyordu — bu PR'da düzeltildi |
+
+**Aranan dört kalıp, ayrı ayrı:**
+- `workflow_run` tetiği: yalnız `ai-auto-repair.yml` içinde (CI'ı dinliyordu) — kaldırılan dosyayla birlikte gitti.
+- `upload-artifact` / `download-artifact` ad eşleşmesi (`ci-logs`): `grep -rln "ci-logs" .github/workflows/` → yalnız `ci.yml` (üreten) ve `ai-auto-repair.yml` (okuyan, artık yok). Başka hiçbir workflow bu artefaktı okumuyor.
+- `workflow_call`: `ai-auto-repair.yml` bu deseni kullanmıyordu (kendi başına tetiklenen bir workflow'du, reusable değildi).
+- Betiklerden `gh workflow run ai-auto-repair.yml` çağrısı: `grep -rn -i "auto-repair|auto_repair"` tüm depoda tarandı — `.github/workflows/ci.yml` (2 yorum satırı, düzeltildi), bu iki rapor dosyası ve `docs/audits/rec327-workflow-envanteri-2026-09-14.md` dışında betik/kod referansı bulunamadı.
+
+**Boşa koşan taraf ölçüldü:** `ci.yml`'in `ci-logs` artefaktını üreten "Upload CI Logs on
+Failure" adımı, `ai-auto-repair.yml` `disabled_manually` olduğu 2026-09-02'den bu PR'a kadar
+her CI kırmızısında (lint/typecheck/deno/test/build loglarını 3 gün saklayarak) sıfır
+tüketiciye yüklenmiş bir artefakt üretiyordu. Bu PR'da adım kaldırıldı.
+
+## 4. Hüküm: EMEKLİ (kaldırıldı)
+
+Gerekçe:
+1. **Sıfır kabul oranı, geniş örneklem üzerinden:** dosya 2026-03-18'den beri var; oluşturduğu
+   "🤖 Auto-Repair" başlıklı PR'lardan 10 tanesi örneklendi (`gh pr list --search "Auto-Repair in:title" --state all`,
+   #272, #315, #643, #689, #818, #833, #841, #845, #919, #935) — **10/10 CLOSED, `mergedAt: null`
+   (0/10 merge)**. Aralık 2026-04-20 ile 2026-09-01 arası, yani 4.5 aylık gerçek üretim verisi.
+2. **Zaten elle kapatılmış** (GitHub `disabled_manually`, 2026-09-02) — Recep/ekip bunu
+   REC-327'den önce, bağımsız olarak durdurmuş; bu rapor o kararı doğruluyor, çelişmiyor.
+3. **Boşa koşan üretim maliyeti vardı:** `ci.yml` her kırmızıda 5 log dosyasını artefakt
+   olarak yüklüyordu ama okuyacak kimse yoktu — küçük ama gerçek ve sürekli bir israf.
+4. **KAL/ONAR seçeneklerinin gerekçesi çürüdü:** KAL "bir gün açılacak, uykuda" varsayımını
+   gerektirir — ama açık kalsa bile 0/10 kabul oranı "açılınca işe yarayacak" varsayımını
+   desteklemiyor. ONAR "zincir kırık, düzeltilmeli" varsayımını gerektirir — ama zincir
+   KIRIK değildi, fiilen çalışıyordu (Jules'a görev gitti, dallar/PR'lar açıldı); asıl sorun
+   ürettiği PR'ların hiçbirinin ekip tarafından kabul edilmemiş olması — bu bir CI/entegrasyon
+   arızası değil, aracın kendisinin değer üretmediğinin ölçümü.
+
+## 5. Yapılan değişiklik
+
+- `.github/workflows/ai-auto-repair.yml` **silindi**.
+- `.github/workflows/ci.yml`:
+  - "Upload CI Logs on Failure" adımı (okuyucusu kalmadığı için) kaldırıldı.
+  - `fetch-depth: 0` gerekçe yorumundaki "ai-auto-repair" listesi satırından çıkarıldı
+    (`deploy-functions.yml` ve `rls-guard.yml` hâlâ tam geçmiş istiyor, o kısım DURUYOR).
+- `docs/audits/rec327-workflow-envanteri-2026-09-14.md`: `ai-auto-repair.yml` satırı ve
+  ilgili özet/kapsam notu paragrafları, bu kaldırmayı yansıtacak şekilde güncellendi.
+
+## 6. Koşulmayan / ölçülemeyen
+
+- **jules-action'ın iç mekaniği** (`exit code 126`'nın kök sebebi — container mı, Jules API
+  tarafı mı) — bu raporun kapsamı dışı, zaten kaldırılan bir bileşen olduğu için araştırılmadı.
+- **19 gerçek koşumdan öncesi** (2026-03-18 – 2026-08-27 arası) — `gh run list` limiti
+  200 koşumla en eskiye 2026-08-27'de ulaştı; bu tarihten önceki gerçek/skipped dağılımı
+  ölçülmedi (yalnız PR örneklemi üzerinden, o dönemden #272/#315/#643/#689/#818/#833 PR'ları
+  var ve hepsi merge edilmemiş — dolaylı kanıt).
+- **`docs/audits/arac-envanteri-2026-09-07.md`** — bu envanter dosyasına bu iş emri
+  kapsamında dokunulmadı (talimat gereği); orada da `ai-auto-repair.yml` satırı varsa
+  **güncellenmesi gerekiyor** — mekanik güncelleme sahibi ayrı.
+- **`JULES_API_KEY` secret'ının canlı geçerliliği** — `gh secret list` yalnız tanımlı
+  olduğunu gösterdi (`${#VAR}` tipi bir doğrulama CI dışında mümkün değil); değeri
+  hiçbir yere yazılmadı, canlı API çağrısı da yapılmadı.
+
+## 7. Kapı sonucu
+
+`pnpm test -- --run src/__tests__/conformance/` — Test Files / Tests sayıları görev
+raporunda verildi (bu dosyaya tekrar yazılmadı; kapı sayısı raporun parçası, PR gövdesinde de var).
+
+
+---
+# FILE: docs\audits\rec335-rls-yetki-borclari-canli-olcum-2026-09-14.md
+
+# REC-335 — RLS yetki borclarinin CANLI olcumu (2026-09-14)
+
+> **Ne olctuk:** `docs/rls-yetki-karari-borc-ilani.json` surum 2'deki ALTI borcun canli
+> veritabanindaki karsiligi. Ilan, depo metnini olcen bir kapiya (INV-AUTH-ROLE-2) bagli;
+> alti satirin BESINDE `canli_durumu` alani "OLCULMEDI" ya da "CELISKILI" yaziyordu.
+> Bu belge o alani KAPATIR.
+>
+> **Yetki:** Recep 2026-09-14'te prod veritabanina SALT-OKUMA izni verdi. Bu belgedeki her
+> sorgu SELECT'tir; hicbir yazma yapilmadi. Cetvel: `docs/standards/rls-yetki-karari-standard.md`.
+
+## 1. Olcum yontemi ve kor nokta yonetimi
+
+Uc bagimsiz sorgu kosuldu:
+
+1. `pg_policies` uzerinde **tum semalar** (sema suzgeci YOK — `public`, `storage`, `realtime`
+   satirlari geldi), gövde `(qual || with_check)` icinde `jwt|claims` arandi.
+2. `pg_proc` uzerinde **iki farkli suzgecle**: once `jwt-ish VE tirnakli 'role'`, sonra
+   sadece `jwt|claim` (daha genis evren, 14 fonksiyon). Ikinci olcum birincinin kor noktasini
+   kapatmak icin kosuldu: `current_setting('request.jwt.claim.role')` yaziminda `role`
+   kelimesi tirnak ICINDE degildir, o yuzden birinci suzgec onu GORMEZDI.
+3. Karar merci haline gelmis yardimcilarin (`is_admin_user`, `is_user_admin`) **tam gövdesi**
+   ayri okundu — bir politikanin `is_admin_user()` cagirmasi tek basina "dogru kaynak" demek
+   DEGILDIR; kararin nereden alindigi fonksiyonun icinde.
+
+Bu ucuncu adim bilerek eklendi: `[[iki-olcum-ayni-kor-nokta-dogrulama-degil]]` dersi bugun
+ikinci kez uygulandi — ayni desenle iki kez olcmek tek olcumdur.
+
+## 2. Sonuc tablosu
+
+| # | Ilan edilen dosya | Iddia | CANLI olcum | Hukum |
+|---|---|---|---|---|
+| 1 | `202508270945_enable_rls_public.sql` | `inventory_movements` politikasi `auth.jwt() ->> 'role'` okuyor | `inventory_movements_select_admin` gövdesi: `tenant_id = jwt_tenant_id() AND is_user_admin(auth.uid())` | CANLIDA TEMIZ |
+| 2 | `20250902_create_stock_rpc_functions.sql` | Stok RPC'leri `jwt.claims ->> 'role'` ile admin/moderator karsilastiriyor | `jwt|claim` gecen 14 fonksiyonun HICBIRI ham `role` talebinden yetki karari vermiyor | CANLIDA TEMIZ |
+| 3 | `20250902_fix_products_update_permissions.sql` | `products` UPDATE ayni yanlis talebi okuyor | `products` uzerinde ham talep okuyan politika YOK | CANLIDA TEMIZ |
+| 4 | `20250902_inventory_and_stock.sql` | Envanter/stok politikalarinda ayni yanlis talep | `inventory_settings` ve `inventory_movements` politikalari `is_user_admin()` kullaniyor | CANLIDA TEMIZ |
+| 5 | `20250908_product_images.sql` | `public.product_images` admin politikalari ayni yanlis talep | Uc addan YALNIZ `product_images_update_admin` ayakta; gövdesi `user_profiles.role IN (admin, super_admin)` — JWT talebi OKUMUYOR | CANLIDA TEMIZ |
+| 6 | `20250908_storage_product_images.sql` | `storage.objects` uzerindeki uc admin politikasi ayni yanlis talep — UYUYAN KAPI | Uc adin HICBIRI `storage.objects` uzerinde YOK. Ayakta olan alti depo politikasi `jwt_tenant_id()` + `user_profiles.role` kullaniyor | CANLIDA TEMIZ |
+
+## 3. CELISKI COZULDU (REC-322'nin acik kalan tek maddesi)
+
+REC-322, `storage.objects` uzerindeki uc admin politikasi icin **celiskili iki kayit**
+tasiyordu: depo gecmisi `20260530224000` ile dusuruldugunu soyluyordu, 2026-09-13 tarihli
+canli olcum ise "hala duruyor" diyordu. Bugunun olcumu celiskiyi kapatir:
+
+**`storage.objects` uzerinde `product_images_insert_admin` / `_update_admin` / `_delete_admin`
+adli politika YOKTUR.** Ayni adlardan yalnizca `product_images_update_admin`, `public.product_images`
+tablosunda ayaktadir. Yani 2026-09-13 olcumu **tablo ayirt etmeden ada bakmis** ve
+`public.product_images` satirini `storage.objects` satiri sanmistir.
+
+Bu, ilanin `_ne_ogrendik` bolumunde zaten yazili olan dersin sahada ikinci kez dogrulanmasidir:
+**ayni ad farkli tablo.** Ders once bir DROP tuzagi olarak yazilmisti; simdi bir OLCUM tuzagi
+olarak da ayni yerden isliyor. Politika sorgusu sema+tablo secmeden hukum vermez.
+
+Yan sonuc: REC-322 migration'inin `drop policy if exists` satirlari **var olmayan** uc politikayi
+dusurmeye calisti ve sessizce gecti. Migration YANLIS DEGILDI (fail-closed niyetiyle `if exists`
+yazilmisti) ama **hicbir seyi de degistirmedi**. "Migration prod'a uygulandi ve yesil gecti"
+cumlesi, o migration'in bir sey DEGISTIRDIGI anlamina gelmez.
+
+## 4. `jwt_role` — bagimsiz ikinci dogrulama
+
+`pg_proc` uzerinde `public.jwt_role` sorgulandi: **satir donmedi.** Dun REC-322 ile emekli
+edilen fonksiyon canlida yok. Bu, dunku dogrulamadan bagimsiz ikinci bir olcumdur (dun kanit
+"drop CASCADE'siz gecti" idi, bugun kanit "katalogda yok").
+
+## 5. BORC KAPANDI MI? — hayir, SINIFI DEGISTI
+
+Buradaki ayrim onemli ve ilanin kendisini duzeltir.
+
+Borc defteri **depo metnini** olcer (`supabase/migrations/*.sql`), canliyi olcmez — ilanin
+`_olcum_yuzeyi` alani bunu acikca yaziyor. Canlinin temiz olmasi, o alti dosyanin METNINDE
+desenin durdugunu degistirmez. Ilan satirlarini SILMEK, kapinin bayatlik kolunu KIRMIZI
+yakar ve dahasi kapiyi o dosyalar icin KOR birakir.
+
+O yuzden satirlar KALIR ama artik iki ayri sinif vardir:
+
+- **ACIK BORC:** desen depo metninde duruyor **ve** canlida da yururlukte. Kapanmasi icin
+  duzeltici bir migration gerekir. *Bugun bu sinifta kalem YOK.*
+- **TARIHSEL ILAN:** desen depo metninde duruyor (tarihsel migration dosyasi asla degismez)
+  ama canlida yururlukte DEGIL. Kapanmasi icin yapilacak bir sey yoktur; satir yalnizca
+  kapiyi kor birakmamak icin durur.
+
+Alti kalemin ALTISI da bugun TARIHSEL ILAN sinifindadir. Ilan surum 3'te her satira `sinif`
+alani eklendi ve `canli_durumu` olculen degerle degistirildi.
+
+## 6. Bu olcumun SINIRLARI
+
+- Olcum **bir andir.** Yarin bir migration ham talep okuyan bir politika kurarsa bu belge
+  bayatlar. Kapi (INV-AUTH-ROLE-2) depo metnini her kosumda olctugu icin YENI ihlali yakalar;
+  yakalamadigi sey, canlida ELLE yapilan bir degisikliktir.
+- Olcum **yetki kararini** aradi, JWT kullanimini degil. `jwt_tenant_id()` ve
+  `jwt_price_segment()` JWT'den okur ama yetki karari vermez (tenant kapsami ve fiyat segmenti);
+  bunlar kapsam disidir ve kapsam disi olduklari BILEREK boyle yazildi.
+- `custom_access_token_hook` ve `handle_new_user_metadata` talebi YAZAN taraftir, karar veren
+  taraf degil. Ikisi de `app_metadata`/hook dallarini kullaniyor; `user_metadata` okumuyorlar
+  (CLAUDE.md kural 12). Bu dogrulandi ama bu isin kapsami DEGIL — kendi kapisi INV-AUTH-ROLE R1.
+- `service_role` `is_admin_user()` icinde kosulsuz TRUE doner. Bu kasitli ve dogrudur
+  (`bypassrls = true` oldugu icin zaten RLS degerlendirilmez), ama **`service_role` uzerinden
+  yapilan hicbir test bir politikanin kanitini vermez.**
+
+
+---
+# FILE: docs\audits\rec336-baseline-2026-09-15.md
+
+# REC-336 · Prod şeması migration geçmişinden üretilebiliyor mu — ÖLÇÜM KAYDI
+
+**Tarih:** 2026-09-15 · **Şerit:** ALTYAPI · **Kayıt:** REC-336 · **Yol haritası:** YH-52
+**Cetvel:** `docs/standards/ledger-ve-olu-migration-standard.md`
+**Kapı:** `src/__tests__/conformance/sema-tabani-is-akisi.test.ts` (INV-SEMA-TABAN-1 / -2)
+**İlan:** `docs/sema-replay-veri-korumali-migrationlar.json` (sürüm 2)
+
+---
+
+## 0 · SORU VE CEVAP
+
+**Soru:** Boş bir PostgreSQL kümesine elimizdeki şema tabanı + ondan sonraki migration'lar
+uygulandığında **prod şeması geri üretilebiliyor mu?**
+
+**Cevap: HAYIR, ama sanıldığından çok daha az eksikle — yüzde ~90.** Eksiğin kökü tek bir
+dosyadır ve o dosya bir KUSUR taşır (aşağıda §4). Bu kayıt, o yüzdenin nasıl ölçüldüğünü ve
+neyin çözüldüğünü/çözülmediğini adıyla yazar.
+
+**PROD'A DOKUNULMADI.** Hiçbir yazma yapılmadı; canlı taraf yalnız SELECT ile okundu.
+
+---
+
+## 1 · HÜKMÜM İKİ KEZ DÜZELTİLDİ — BU KAYDIN EN ÖNEMLİ BÖLÜMÜ
+
+Bu bölüm önce geliyor çünkü sonuç tablosundan daha öğreticidir.
+
+**Birinci yanlış hüküm (2026-09-14):** "Şema depoda var, yalnız yanlış yerde." → YANLIŞ.
+Ölçtüğüm dosyada anahtar, indeks, yabancı anahtar ve politika YOKTU.
+
+**İkinci yanlış hüküm (2026-09-14 akşamı):** "Elimizdeki taban bir şema dökümü değil, yalnız
+tablo listesi." → Cümle doğru ama **YANLIŞ DOSYA İÇİN** söylendi.
+
+`supabase/baselines/` klasöründe **iki** artefakt var ve ben en yenisini alıp taban saydım:
+
+| Dosya | Satır | Tablo | PK | Kısıt | İndeks | FK | Politika | Grant |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 2026-06-12 | 6469 | 38 | 39 | 113 | 78 | 61 | 101 | 237 |
+| 2026-08-13 | 2690 | 41 | 1 | 0 | 0 | 0 | 0 | 0 |
+
+2026-08-13 dosyası **kendi beşinci satırında** şunu yazıyor:
+
+> `-- NOT: pg_dump degildir — PK/FK/index/trigger/RLS politikalari DAHIL DEGIL`
+
+Yani bozuk değil, **BAŞKA KAPSAMDA**: orion belge üretimi için alınmış bir kolon anlık
+görüntüsü. Gerçek taban bir gün öncesinin değil, **üç ay öncesinin** dosyasıydı ve o TAM.
+
+### Ders (kalıcı, hafızaya katlandı)
+
+**⭐"EN YENİ DOSYA" BİR SEÇİM KURALI DEĞİLDİR; artefaktın kapsamını KENDİ BAŞLIĞI söyler.**
+Aynı klasörde duran iki artefakti aynı sınıftan saydım ve "yeni olan daha iyidir" diye örtülü
+bir kural uydurdum. Dosya adı (`*_public_schema.sql`) ikisini aynı gösteriyordu — bu,
+"ad ölçüt değildir" dersinin artefakt tarafındaki hâli.
+
+Altı satır okumak bütün hükmü değiştirecekti; bunun yerine 2690 satırı oynattım ve yanlış
+hüküm verdim.
+
+**⭐İkinci ders:** bilgi depoda **ZATEN YAZILIYDI** —
+`src/__tests__/conformance/render-revalidation-contract.test.ts` satır 82 aynen "baseline'lar
+tam şema dökümü DEĞİL" diyor. Eksik olan bilgi değil, bilginin **BAĞLI OLDUĞU YERDİ**: bir test
+yorumunda duruyordu, bir seçim kuralına ya da klasörün README'sine bağlı değildi. **Bir bilginin
+depoda yazıyor olması, onun KAPIYA BAĞLI olduğu anlamına gelmez.**
+
+---
+
+## 2 · YÖNTEM (ve niçin bu yöntem)
+
+Docker daemon KAPALI ve **başlatılmadı** — Recep'in şartı gereği ("sistemi alt üst edip geri
+dönülemez hale sokmayalım"). Onun yerine makinede kurulu PostgreSQL 17.4 ile `initdb`/`pg_ctl`
+kullanılarak **tek kullanımlık** bir küme kuruldu (scratchpad altında, port 55432) ve ölçüm
+bitince `pg_ctl stop -m fast` ile kapatıldı. Kalıcı hiçbir iz bırakılmadı.
+
+Sıra — üç adım, bu sırayla zorunlu:
+
+1. `supabase/baselines/00_golge_onsoz.sql` (yeni, bu işte yazıldı) → **0 hata**
+2. 2026-06-12 tam şema dökümü → **1 zararsız uyarı** (`schema public already exists`)
+3. 2026-06-12'den SONRAKİ **63** migration, tarih sırasıyla
+
+### Önsöz niçin gerekti ve SINIRI nedir
+
+Döküm Supabase'in kendi iskelesini HAZIR VARSAYAR: `auth` şeması, `extensions`, dokuz Supabase
+rolü, `auth.users`, `vault.secrets`, `net.http_post`, `cron.schedule`. Çıplak PostgreSQL'de
+bunların hiçbiri yoktur ve döküm onlarca hatayla akar.
+
+**SINIRI dosyanın kendi başlığında yazılı:** `auth.uid()` bu gölgede NULL döner. Yani bu gölge
+**ŞEMA KARŞILAŞTIRMASI** içindir, **YETKİ DAVRANIŞI** ölçümü için DEĞİL. Politikaların gerçekte
+ne yaptığını ölçmek ayrı bir iştir ve bu dosyayla YAPILAMAZ.
+
+**Önsözde tablo/kısıt YARATILMAZ.** Bir gün oraya `create table` girerse gölge artık dökümü
+değil ÖNSÖZÜ ölçüyor demektir ve karşılaştırma yalan söyler.
+
+### Ölçüm sırasında önsözden bir şey KALDIRILDI
+
+İlk yazımda `jwt_tenant_id` gibi fonksiyonları ön-tanımlıyordum, çünkü 2026-08-13 anlık
+görüntüsü onları kullandıktan SONRA tanımlıyor. Gerçek dökümde sıra DOĞRU ve ön-tanım, dökümün
+`CREATE FUNCTION` ifadesini "already exists" ile düşürüyor. Yani ön-tanım iyileştirme değil
+**ZARARDI** ve kaldırıldı. `supabase_admin` rolünün eksikliği ise tek başına 12 hata
+üretiyordu, eklendi.
+
+---
+
+## 3 · SONUÇ TABLOSU
+
+63 migration'ın **38'i başarılı, 25'i düştü.**
+
+| Ölçüt | Gölge | Canlı | Fark |
+|---|---:|---:|---:|
+| Tablo | 49 | 55 | −6 |
+| Primary key | 49 | 55 | −6 |
+| Unique kısıt | 18 | 20 | −2 |
+| Yabancı anahtar | 89 | 110 | −21 |
+| İndeks | 169 | 199 | −30 |
+| RLS politikası | 137 | 163 | −26 |
+
+Yani sıfırdan kurulum canlının **yüzde ~90'ına** ulaşıyor. 2026-09-14'te raporlanan
+"43 tablo, anahtar yok" tablosu YANLIŞTI (§1).
+
+### ⭐DOSYA BAZINDA PASS/FAIL ÖLÇÜT DEĞİLDİR
+
+"25 dosya düştü" ile "25 dosyanın işi yapılmadı" **AYNI ŞEY DEĞİL.** Kendi işlemini yöneten
+(kendi `commit`i olan) bir dosya **KISMEN** uygulanabilir: pg_cron dosyasının `public` şemasına
+ait nesneleri UYGULANDI, yalnız zamanlama kısmı kayboldu.
+
+Bu yüzden kapının ölçütü **ŞEMA KARŞILAŞTIRMASIDIR** (yukarıdaki tablo ve nesne listesi);
+dosya listesi **TEŞHİS** içindir. İlan dosyası bu ayrımı `_pass_fail_olcut_degil` anahtarında
+taşır.
+
+---
+
+## 4 · KÖK SEBEP — 25 DÜŞEN, SUÇLU TEK DOSYA
+
+`supabase/migrations/20260811_f2_split_model_schema.sql`
+
+Bu dosya aynı işlem içinde **üç şeyi birden** yapıyor:
+
+1. **ŞEMA yaratıyor** — `brands`, `product_families` tabloları ve indeksleri.
+2. **VERİ koşulu arıyor** — "yeni kategori sayısı 4 değil" diye durup işlemi geri alıyor.
+3. **Kendi işlemini commit ediyor.**
+
+Boş gölgede kategori verisi yoktur, koşul tutmaz, dosya işlemi geri alır — ve **yarattığı ŞEMA
+da geri gider.** Ondan sonra gelen ~20 migration `brands`/`product_families` bulamadığı için
+domino gibi düşer.
+
+**Korumanın kendisi DOĞRU tasarımdır** (sessiz kısmi göç yerine geri alma). Yanlış olan
+**YERİ**: şema ile veri koşulu aynı işlemde birleşince, veri yoksa şema da üretilemez hale
+geliyor. Tek bir karışık dosya, bütün zincirin sıfırdan kurulabilirliğini imkânsız kılıyor.
+
+### Buradan çıkan CETVEL KURALI (OPS kabul etti, yazımı ayrı kalem)
+
+> **Şema yaratan migration VERİ koşulu ARAMAZ; veri koşulu AYRI DOSYAYA yazılır; migration
+> KENDİ İŞLEMİNİ COMMIT ETMEZ** (sarmalamayı koşucu yapar).
+
+Mevcut dosya tarihsel kayıt olarak kalır ve ilanda **BORÇ** olarak durur — muafiyet olarak
+değil. Çözüm yolu dosyayı geçmişte değiştirmek değil, **TAZE bir şema tabanı tutmaktır** (§6).
+
+---
+
+## 5 · DÜŞEN 25'İN SINIFLANDIRILMASI — ÜÇ SINIF
+
+İlan: `docs/sema-replay-veri-korumali-migrationlar.json` (sürüm 2, 10 kalem).
+
+| Sınıf | Adet | Ne demek |
+|---|---:|---|
+| **VERİ-KORUMALI** | 8 | Migration bir sayım/varlık ölçüp veri yoksa KENDİSİ durur ve işlemi geri alır. Boş gölgede düşmesi **DOĞRU DAVRANIŞ** ve dosyanın doğru yazıldığının KANITI. Kalıcı olarak kapsam dışı. |
+| **ORTAM-BAĞIMLI** | 1 | Supabase'e özgü bir uzantıyı şart koşuyor (pg_cron). Çıplak PostgreSQL'de uzantı yok. Bedeli adıyla yazılı: `public` şemasına ait kısmı uygulandığı için karşılaştırma bozulmuyor. |
+| **SEMA-VERİ-KARIŞIK** | 1 | ⛔**EN AĞIR SINIF VE BİR KUSURDUR** (§4). Kapsam dışı ilan edilir ama **BORÇ olarak durur**; yeni migration'lar böyle YAZILMAZ. |
+
+**⭐BU LİSTE MUAFİYET DEĞİL SINIF İLANIDIR.** Muafiyet "hatasını görmezden gel" demektir;
+sınıf ilanı "bu bağlamda bu davranış beklenendir" demektir. Ayrım **ÖLÇÜLEBİLİR** ve kapı onu
+ölçüyor: ilan edilen her dosya gerçekten o sınıfın izini taşımalı, ve bir dosya SADECE şema
+hatası verdiği için listeye KONAMAZ.
+
+### ⭐İLAN DAVRANIŞTAN DERLENDİ, METİNDEN DEĞİL
+
+"ÖN KOŞUL / bekleniyordu / guard / DURDU" kelimelerini arayan metin taraması **21 dosya**
+buluyor; gerçekten düşen **8**. Kelimeyi TAŞIMAK ile ön koşulun TETİKLENMESİ ayrı şeylerdir.
+İlan gerçek koşum çıktısından derlendi. (İlanda `_metin_taramasi_yanlis_evren`.)
+
+### VERİ korumasının kendisi iyi haberdir
+
+Sekiz VERİ-KORUMALI dosyanın **hepsi** sessiz kısmi yazım yerine işlemi GERİ ALIYOR. Gölgede
+düşmeleri, doğru yazıldıklarının kanıtıdır. Bu sınıf bir borç değil, bir sağlık göstergesidir.
+
+---
+
+## 6 · ÇÖZÜM — NE YAPILDI, NE YAPILMADI
+
+Recep'in onayladığı yol (kendi cümlesiyle: *"şartlar neyi gerektiriyorsa tamam onay… yeter ki
+sistemi alt üst edip geri dönülemez hale sokmayalım"*): **prod'a dokunmadan, TAZE şema
+dökümünü kurulumun ilk adımı yapmak ve bunu kapıya bağlamak.**
+
+### YAPILDI
+
+1. **`.github/workflows/sema-tabani-uret.yml`** — gerçek `--schema-only` dökümü alan
+   **SALT-OKUMA** iş akışı. Yalnız elle tetiklenir (`workflow_dispatch`; `push`/`schedule`
+   YOK), `permissions: contents: read`, sır varlığı `${#DB_URL}` ile **uzunlukla** ölçülür
+   (değer BASILMAZ), çıktıyı **artefakt** olarak bırakır — depoya DOĞRUDAN COMMIT ETMEZ,
+   insana "PR aç" der.
+
+2. **BOŞ DÖKÜMÜ REDDEDEN beş eşik** — aynı iş akışının içinde. Niçin: 2026-08-13 dökümü tam
+   böyle geçmişti (tablo listesi, 0 indeks) ve **aylarca taban sanıldı** (§1). Eşikler:
+   tablo ≥ 50, PK ≥ 40, indeks ≥ 100, FK ≥ 80, politika ≥ 100. Biri tutmazsa iş akışı
+   "Bu döküm bir SEMA TABANI DEGIL" diyip düşer.
+
+3. **`supabase/baselines/00_golge_onsoz.sql`** — gölge iskelesi, sınırı ve "ne olmadığı"
+   başlıkta yazılı (§2).
+
+4. **`docs/sema-replay-veri-korumali-migrationlar.json`** — üç sınıf ilanı, 10 kalem (§5).
+
+5. **`src/__tests__/conformance/sema-tabani-is-akisi.test.ts`** — 15 kol, iki bölüm.
+   INV-SEMA-TABAN-1 iş akışının güvenliğini ölçer (yalnız dispatch · `contents: read` ·
+   `${#DB_URL}` var ve `${DB_URL:-` YOK · her `psql` satırı SELECT-only · `--data-only` yok ·
+   `git push`/`git commit`/`create-pull-request` yok · boş-döküm reddi beş ölçütle ·
+   `self-hosted` yok). INV-SEMA-TABAN-2 ilanın dürüstlüğünü ölçer (alanlar dolu · bayatlık ·
+   sınıf tanınmış · ağır sınıf `borç` taşımak ZORUNDA · sınıf izi dosyada var · VERİ-KORUMALI
+   örneği ilanda YOK).
+
+   **SABOTAJ İKİ KEZ DOĞRULANDI:** boş-döküm kontrolü çıkarılınca KIRMIZI; şema-kusurlu dosya
+   ilana konunca KIRMIZI.
+
+### YAPILMADI — ADIYLA
+
+1. **Defter satırı yazılmadı.** `_migration_ledger`'a "taban buraya kadar uygulanmış sayılır"
+   diye satır eklemek prod'a YAZMAK olurdu. Recep'in şartı gereği yapılmadı ve **ayrıca onay
+   isteneceği** kayda geçti.
+
+2. **`20260811_f2_split_model_schema.sql` DEĞİŞTİRİLMEDİ.** Geçmiş migration'ı değiştirmek
+   defter paritesini bozar. Dosya borç olarak duruyor; çözüm taze taban tutmaktır.
+
+3. **Taze döküm HENÜZ ALINMADI.** İş akışı yazıldı ama **hiç koşmadı** (envanter satırında da
+   böyle yazılı: "yok — 2026-09-15'te yazıldı, henüz koşmadı"). İlk koşum ve çıkan dökümün PR
+   ile depoya girmesi **ayrı adımdır**.
+
+4. **Kalan yüzde 10 KAPANMADI.** Taze döküm alındığında bu boşluk kendiliğinden kapanır
+   (çünkü döküm canlının o günkü hâlidir). Bu kayıt, boşluğun SEBEBİNİ belgeler — kapandığını
+   iddia etmez.
+
+### ⭐FİKRİMİ DEĞİŞTİRECEK TEK ŞEY
+
+Supabase'in önizleme/branch veritabanı özelliğine geçersek, o yalnız `migrations/` okur —
+baseline dosyasını okumaz. O gün taze döküm yeterli olmaz ve **defter satırı zorunlu** hale
+gelir; o zaman ayrıca onay istenir.
+
+---
+
+## 7 · SINIRLAR (gizlenmiyor)
+
+1. Gölge `auth.uid()`'i NULL döndürür → **yetki davranışı ölçülmedi**, yalnız şema şekli.
+2. `net.http_post` / `cron.schedule` saplamadır → ağa çıkmaz, zamanlama kurulmaz.
+3. pg_cron uzantısı çıplak kümede kurulamaz → o dosyanın zamanlama kısmı gölgede hiç yok.
+4. Karşılaştırma `public` şeması üzerinden yapıldı; `storage`/`auth` şemalarının kendi
+   nesneleri kapsam dışıdır (onlar Supabase'in kendi göçleriyle gelir).
+5. Sayılar **tek koşumun** çıktısıdır. Tekrarlanabilirliği kapı değil bu kayıt taşır; kapı
+   iş akışının güvenliğini ve ilanın dürüstlüğünü ölçer, replay'in kendisini KOŞTURMAZ.
+   (Niçin: replay bir PostgreSQL kümesi ister; CI'da kurulabilir ama bu işin kapsamı
+   **dökümü üretmek** olarak sınırlandı ve sınır burada adıyla yazılıyor.)
+
+---
+
+## 8 · İLGİLİ
+
+- Cetvel: `docs/standards/ledger-ve-olu-migration-standard.md` (§4'ün kuralı buraya yazılacak)
+- İlan: `docs/sema-replay-veri-korumali-migrationlar.json`
+- Kapı: `src/__tests__/conformance/sema-tabani-is-akisi.test.ts`
+- Önsöz: `supabase/baselines/00_golge_onsoz.sql`
+- İş akışı: `.github/workflows/sema-tabani-uret.yml`
+- Envanter: `docs/audits/arac-envanteri-2026-09-07.md` (iş akışının satırı)
+- Önceki kalem: REC-321 ölü migration silme (`docs/audits/rec321-ek-silme-uygulandi-2026-09-14.md`)
+
+---
+
+# EK — ADIM 3: TAZE TABAN ALINDI, SORU CEVAPLANDI (2026-09-15, aynı gün)
+
+> Recep sordu: *"Supabase veritabanı işi ötelendi mi?"* Ötelenmedi; kalan tek adım buydu ve
+> bu ek onun sonucudur.
+
+## 0 · CEVAP DEĞİŞTİ
+
+Yukarıdaki §0 şöyle diyordu: *"Prod şeması migration geçmişinden üretilebiliyor mu? **HAYIR**,
+ama yüzde ~90."*
+
+**Adım 3'ten sonra doğru cevap şudur: EVET — taze taban + önsöz, canlıyı SEKİZ ÖLÇÜTTE
+BİREBİR üretiyor.** Değişen şey migration zinciri değil, **sorunun doğru cevabının nerede
+olduğu**: zincirin tamamını baştan oynatmak değil, **taze tabandan başlamak.**
+
+⚠**Yukarıdaki %90 ölçümü SİLİNMİYOR ve hâlâ geçerli** — o, *"2026-06-12 tabanı + 63
+migration"* sorusunun cevabıydı ve o soru başka bir soru. İki ölçüm çelişmiyor, iki farklı
+yolu ölçüyor.
+
+## 1 · YÖNTEM (prod'a yazma YOK)
+
+1. `.github/workflows/sema-tabani-uret.yml` **elle** tetiklendi (`workflow_dispatch`),
+   koşum **34950954930**, süre **57 saniye**, sonuç **başarılı**. İş akışının kendisi
+   salt-okuma: `supabase db dump --schema-only`.
+2. Artefakt indirildi: `cikti/public_schema.sql` **340.161 bayt / 8616 satır** +
+   `canli-sayilar.txt`.
+3. ⭐**SIR TARAMASI — DEPO PUBLIC OLDUĞU İÇİN COMMIT'TEN ÖNCE:** 13 imza tarandı
+   (`eyJ`, `service_role_key`, `sb_secret`, `postgresql://`, `postgres://`, `Bearer `,
+   `apikey`, `password`, `secret_key`, `SUPABASE_SERVICE`, `sk_live`, `AKIA`, PEM bloğu) →
+   **hepsi 0**. Dosyadaki tek `https://` adresi Vercel altyapı adresi. `vault.` geçen 10
+   satırın hepsi kasadan **OKUYAN** SQL ifadesi; literal değer taşımıyor (tek tek okundu).
+4. Gölge: makinede kurulu PostgreSQL 17.4, `initdb` ile **tek kullanımlık** küme (port
+   55433, scratchpad). Docker **başlatılmadı**. Ölçüm bitince `pg_ctl stop -m fast`.
+5. Sıra: `00_golge_onsoz.sql` → `2026-09-15_public_schema.sql`. **Migration UYGULANMADI**
+   (taban bugünün, sonrasında migration yok).
+
+## 2 · SONUÇ — 8/8 PARİTE
+
+| Ölçüt | Gölge (taze taban) | Canlı | Fark |
+|---|---:|---:|---:|
+| Tablo | 55 | 55 | **0** |
+| Primary key | 55 | 55 | **0** |
+| Unique kısıt | 20 | 20 | **0** |
+| Yabancı anahtar | 110 | 110 | **0** |
+| İndeks | 199 | 199 | **0** |
+| RLS politikası | 163 | 163 | **0** |
+| Fonksiyon | 67 | 67 | **0** |
+| Tetik | 48 | 48 | **0** |
+
+**Uygulama hatası sayısı: önsöz 0, taban 0.**
+
+İlk altı canlı sayı iş akışının kendi ölçümünden (`canli-sayilar.txt`:
+`tablo=55 pk=55 unique=20 fk=110 indeks=199 politika=163`). **Fonksiyon ve tetik sayıları o
+dosyada YOKTU** — onları canlıdan ayrıca, salt-okuma `SELECT` ile ölçtüm (67 / 48). Yani
+tablonun son iki satırı iş akışının değil benim ikinci ölçümümün sonucu; bunu yazıyorum
+çünkü *"iş akışı ölçtü"* demek yanlış olurdu.
+
+⚠**İŞ AKIŞINA BORÇ:** `canli-sayilar.txt` sekiz değil **altı** ölçüt basıyor. Fonksiyon ve
+tetik eklenmeli, yoksa bir sonraki karşılaştırma yine elle tamamlanır.
+
+## 3 · İLK ÖLÇÜMÜM YANLIŞTI — DESEN KUSURU (kendi hatam, aynı gün)
+
+Döküm içindeki nesneleri sayarken `grep -ci "create function"` ve `"create trigger"`
+kullandım → **ikisi de 0** çıktı ve bir an *"döküm fonksiyon/tetik içermiyor"* sandım.
+
+**Yanlış olan döküm değil ölçütümdü:** döküm `CREATE OR REPLACE FUNCTION` yazıyor ve benim
+desenim araya giren `OR REPLACE` yüzünden eşleşmiyordu. Doğru desenle: **67 fonksiyon, 48
+tetik.**
+
+⭐Aynı sınıf bugün ikinci kez: *ölçüt keskin ama EVREN yanlış.* Ve bu kez kendi kusurumu
+gölge sayımı yakaladı (gölgede 67/48 çıktı, dökümde 0 görünüyordu — iki sayı çelişti ve
+çelişki beni doğru desene götürdü). **İki bağımsız yöntemin çelişmesi, tek yöntemin
+yeşilinden daha bilgilendiricidir.**
+
+## 4 · İNDEKS SAYISI NİÇİN UZLAŞIYOR (sayı uydurulmadı, hesaplandı)
+
+Dökümde `create index` **113** + `create unique index` **11** = **124**. Canlı 199. Fark
+**örtük indekslerdir**: PostgreSQL her PK ve her UNIQUE kısıt için indeks üretir.
+
+`124 + 55 (PK) + 20 (unique) = **199**` → **birebir.** Bu uzlaşmayı yazıyorum çünkü aksi
+hâlde "dökümde 124, canlıda 199, demek ki eksik" diye yanlış bir hüküm doğar.
+
+## 5 · BUNUN NE ANLAMA GELDİĞİ
+
+- **Felaket kurtarma artık mümkün ve ÖLÇÜLMÜŞ:** önsöz + bu taban, boş bir kümede canlının
+  şemasını 0 hatayla üretiyor.
+- **README'nin "replay edilmez" ifadesi ölçümle yanlış çıktı** ve düzeltildi. Baseline bir
+  migration değildir (defterde yer almaz), ama sıfırdan kurulumun ilk adımı olarak
+  **koşturulabilir.**
+- **`20260811_f2_split_model_schema.sql` borcu KAPANMADI, ama ARTIK YOLU KESMİYOR.** O dosya
+  hâlâ karışık (şema + veri koşulu, tek işlem) ve cetvel kuralı (§10) hâlâ geçerli. Değişen
+  şey: sıfırdan kurulum artık o dosyanın üstünden başlıyor, dolayısıyla domino **tetiklenmiyor.**
+  Borç *"kurulumu imkânsız kılan kusur"* sınıfından *"tarihsel kayıt"* sınıfına indi.
+  ⭐Bu, **borç kapanmaz, SINIFI değişir** dersinin bir örneği.
+
+## 6 · NE YAPILMADI — ADIYLA
+
+1. **Defter satırı YİNE yazılmadı.** `_migration_ledger`'a dokunulmadı; prod'a hiçbir yazma
+   yapılmadı. Recep'in şartı korundu.
+2. **Geçmiş migration'lar değiştirilmedi.**
+3. **Bu taban bir SÜREÇ değil, bir ANLIK GÖRÜNTÜ.** Yarın bir migration inerse taban
+   bayatlar. Tazeliği ölçen bir kapı **YOK** — iş akışı elle tetikleniyor ve ne sıklıkla
+   tetiklendiğini hiçbir şey ölçmüyor. ⚠**AÇIK KALEM:** REC-345'te bağımlılık taramasının
+   tazeliği için kurulan satırın aynısı buraya da gerekir (`baselines/` en yeni dosyanın
+   yaşı). Bugün yok.
+4. **Supabase önizleme/branch veritabanı senaryosu değişmedi:** o özellik yalnız
+   `migrations/` okur, `baselines/` okumaz. O gün gelirse defter satırı **zorunlu** olur ve
+   ayrıca onay istenir. (§6'daki "fikrimi değiştirecek tek şey" maddesi ayakta.)
+5. **Önsözün sınırı ayakta:** `auth.uid()` NULL döner → bu gölge **şema** karşılaştırması
+   içindir, **yetki davranışı** ölçümü için değil. 8/8 parite şema şeklinin paritesidir,
+   politikaların ne YAPTIĞININ paritesi değil.
+
+
+---
+# FILE: docs\audits\rec347-dort-soru-2026-09-16.md
+
+# REC-347 — DÖRT SORUNUN İLK GERÇEK UYGULAMASI: REC-340 Faz 1 planı yeniden koşuldu
+
+**Tarih:** 2026-09-16 · **Şerit:** ALTYAPI · **Kayıt:** REC-347
+**Ölçülen plan:** `docs/plans/rec340-faz1-plan-2026-09-15.md` (v3)
+**Kaynak/cetvel:** `execution-method-standard.md` (plan → plan-challenger satırı) ·
+`.claude/skills/plan-challenger/SKILL.md` Adım 2 · `docs/audits/gstack-yan-yana-2026-09-15.md`
+
+> **NİÇİN BU BELGE VAR.** REC-310 Faz 1'de iki araç aynı planı denetledi ve **35 bulgunun
+> yalnız 6'sı örtüştü** — yani bulguların **%83'ü tek eksende** doğdu. Bizim aracımız "bu plan
+> YANLIŞ mı" diye soruyordu; öteki "bu plan GEREKLİ mi" diye. İkinci soru bizim skill'imizde
+> **hiç yoktu**. REC-347 o dört soruyu skill'e yazdı; bu belge onların **ilk gerçek koşumudur**.
+
+---
+
+## 1. Adım × dört soru tablosu
+
+Sorular: **S1** bu adım gerekli mi (sayıyla) · **S2** bu zaten var mı · **S3** kaç yol test
+ediliyor · **S4** çalışan bir şeyi bozuyor muyuz (canlı ÖNCE/SONRA).
+Hüküm kümesi: **KALSIN · DARALT · ÇIKAR · AYRI KAYIT**.
+
+| Adım | S1 gerekli mi | S2 zaten var mı | S3 kaç yol test ediliyor | S4 canlı ÖNCE/SONRA | Hüküm |
+|---|---|---|---|---|---|
+| **0** Cetvel (`arama-standard.md`) | 9 vakanın 0'ı — ama CLAUDE.md kural 1 bunu zorunlu kılar; cetvelsiz iş, cetvel yazmayı da kapsar | YOKTU, yazıldı (#1204) | kendisi ölçülmez; alt adımların ölçütünü tanımlar | canlıya dokunmaz | **KALSIN — BİTTİ** |
+| **1** INV-SEARCH-BEHAVIOR-1, iki katman | 9 vakanın 0'ı (kapı düzeltmez, ölçer) — ama **ölçerek 6. vakayı buldu**, beyan 5'ti | Katman A yoktu; Katman B emsali `catalog-integrity` VARDI, kopyalandı | Katman A **15 kol** · Katman B **10 vaka** + 6 ilan edilmiş kırmızı | düzeltmeden ÖNCE yazıldı, canlıya yazma yok | **KALSIN — BİTTİ** (#1208) |
+| **2** Arama gövdesini onar (KS-4+KS-6) | 9 vakanın **3'ü** düzeliyor: `jet fan` 0→61 · `havalandirma` 0→50 · `kanal tipi fan` 52→59. **2 vaka kıpırdamıyor** (6 ve 9) | `products.name_i18n` sütunu canlıda **VAR** (ölçüldü) — gövdeye eklenmesi yeni sütun değil; ama `tsvector` sütunu ve kuyruk tablosu YOK | vaka kolları var; **tetik tazeliği kolu İLAN EDİLDİ, YAZILMADI → 0** | `jet fan` 0→61 **hassasiyet riski** (kategori adı gövdeye girince "Fan" kategorisinin tamamı sızabilir); vaka 7 bugün **tam 1** dönüyor, 1 kalmalı | **DARALT** — tetik yerine kuyruk + toplu güncelleme (gerekçe §2.1) |
+| **3** Sorgu yolunu onar (KS-1/2/3) | Kalan **2 vaka** + vaka 2 ve 5 buradan düzelir | `pg_trgm 1.6` **KURULU** ve iki indeks canlıda **kullanılıyor** (idx_scan 1424 ve 121) → yazım hatası dalı yeni eklenti istemez, doğru **operatör** ister. `unaccent` ise **KURULU DEĞİL** (`installed_version` NULL) | vaka kolları var | vaka 7 regresyonu; `search_path` tuzağı yalnız **çalışma anında** görünür | **KALSIN** |
+| **4** İki RPC ortak gövdeye, imzalar korunur | 9 vakanın **0'ı** — ama KS-5 ve KS-7'yi kapatır; **KS-7 Adım 6'nın ÖN ŞARTIDIR** | Üçüncü bir RPC (`admin_search_products`) **VAR**, kapsam dışı ama cetvel bilmeli | "öneri kutusu ile tam arama aynı ilk ürünü verir" kolu | imza değişimi drop+create demek → **yetki kaybı riski**; bu yüzden imzalar korunuyor | **KALSIN** |
+| **5** A/B ölçümü (pgroonga) | 9 vakanın **0'ı** | canlıda **kurulu değil**; kurulumu kural 13 kapsamında prod DDL | 0 | prod şemasına üçüncü parti tam-metin motoru kurmak | **ÇIKAR → AYRI KAYIT (REC-346)** |
+| **6** Arama günlüğü | 9 vakanın **0'ı** (araçtır, düzeltme değil); ön şartı KS-7 | günlük tablosu YOK | **0 kapı → ⚠SINANMIYOR** | anonim yazma yüzeyi → RLS + kötüye kullanım sınırı şart | **KALSIN + SINANMIYOR damgası** |
+| **7** Arama sonuç sayfası | 9 vakanın **0'ı** — motor değil yüzey; **Recep kararı 2026-09-15** | `/[lang]/search` rotası **YOK** (ölçüldü); tek yüzey `SearchOverlay`, `ssr:false` | **0 kapı → ⚠SINANMIYOR** | yeni rota; kural 4 (RSC) ve kural 5 (Suspense uç bileşende, sayfa kökünde değil) | **KALSIN (Recep) + SINANMIYOR damgası** |
+
+> **SABİT SATIR — CLAUDE.md kural 13 ve 14 (her S4 cevabının altında geçerli):**
+> **Kural 13** — Adım 2, 3 ve (çıkarılan) 5 `supabase/migrations/*.sql` içerir; master'a merge
+> **prod DB'ye otomatik uygular**. PR yalnız Recep'in açık onayıyla merge edilir, şerit kendi
+> merge etmez. **Kural 14** — testi/kapıyı sonraki işe bırakmak adımı tamamlamaz.
+
+---
+
+## 2. FARK: dört soru planı NE KADAR değiştirdi (sayıyla)
+
+Planın v3 hâli zaten iyi denetlenmişti (iki bağımsız çürütme koştu). Dört soru buna **altı
+somut kalem** ekledi:
+
+1. **Bir adım geriye dönük DOĞRULANDI.** Adım 5 (pgroonga) plandan çıkarılmıştı ve gerekçesi
+   aynen S1'di: "dokuz vakanın **hiçbirini** kurtarmıyor". Yani dört soru, kendisinden önce
+   verilmiş bir hükmü bağımsız olarak üretti — bu, sorunun keyfî olmadığının kanıtı.
+2. **İki adım "SINANMIYOR" damgası kazandı** (Adım 6 ve Adım 7). Plan bugün bu damgayı
+   **taşımıyor**: ikisinin de kapı sayısı sıfır ve metinde bu yazılı değil. Damgasız sıfır,
+   sessiz sıfırdır.
+3. **İki adım "zaten var" yüzünden daraldı.** Adım 3'ün yazım hatası dalı yeni eklenti değil
+   doğru **operatör** işi (pg_trgm kurulu, iki indeks canlıda kullanımda). Adım 2'nin İngilizce
+   ad ihtiyacı yeni sütun değil (`name_i18n` canlıda var).
+4. **Planın kendi sayısı düzeltildi.** Adım 1'in ilan ettiği kırmızı vaka sayısı **5**'ti; kapı
+   koşunca **6** ölçüldü (vaka 10, `ISI GERI KAZANIM`: 3 sonuç dönüyor ama küme farklı). "Sıfır
+   değil" ölçütü bunu yakalamazdı, "aynı küme" ölçütü yakaladı.
+5. **Bir ilan edilmiş kolun yazılmadığı görüldü.** Adım 2'nin "tetik tazeliği" kolu plan metninde
+   ilan ediliyor ama kapıda karşılığı yok → S3 = 0. İlan, kapı değildir.
+6. **Bir korunum kapıya taşındı.** Vaka 7 (`VRT-17160`) bugün **tam 1** sonuç veriyor; S4 bunu
+   "plana not" olmaktan çıkarıp kapı koluna dönüştürdü (plan zaten yazmıştı, dört soru bunu
+   zorunlu kıldı).
+
+### 2.1 Adım 2 için DARALT hükmünün gerekçesi
+Plan v1 tetik öneriyordu; v3 bunu kuyruk + `pg_cron` ile değiştirdi. S4 bu kararı **ölçümle
+doğruluyor**: `products` üzerinde zaten `on_products_change` var, her satırda Vault'tan sır okuyup
+`net.http_post` atıyor; en kalabalık kategoride **361 ürün** var. Yani tetik yolu tek bir kategori
+yeniden adlandırmasında **361 webhook POST'u** üretirdi. Üstelik kategori yeniden adlandırmanın
+vitrin tazelemesi **zaten var** (`on_categories_change`) — yani yeni tetik render'a hiçbir şey
+eklemez, yalnız gürültü ekler. Hüküm DARALT, ÇIKAR değil: adım gerekli, **mekanizması** değişti.
+
+---
+
+## 3. Bu koşumun KENDİ SINIRLARI (ölçülmeyenler)
+
+- **S4'ün canlı ÖNCE değerleri 2026-09-15 ölçümünden alındı**, bugün yeniden ölçülmedi. Katalog
+  şeridi her gün ürün ekliyor; sayılar oran olarak yazıldığı için hüküm değişmez ama **ham
+  sayılar bayatlayabilir**.
+- **Adım 2'nin SONRA değerleri SİMÜLASYONDUR** (441 aktif ürün üzerinde, 2026-09-15). Gerçek
+  migration uygulanmadı; kural 13 gereği uygulanamaz da.
+- **Adım 7 için S1 sıfır çıktı ama hüküm KALSIN** — çünkü bu bir **ticari karar** (Recep,
+  2026-09-15) ve dört soru ticari kararı çürütmez. S1'in sıfır olması burada "gereksiz" demek
+  değil, "dokuz vakayı kurtarmıyor" demek. Bu ayrımı yazmak zorundayım: aksi hâlde tablo, karar
+  yetkisini kendine almış gibi okunur.
+- **`branching` (Supabase şube veritabanı) bu koşumda ölçülmedi.** Adım 2'nin kilit süresi ve
+  Adım 3'ün `unaccent` volatilite değeri ancak yazılabilir bir şube ya da gölge kümede ölçülür.
+  REC-352 adım 1 kapsamında ölçülecek.
+
+---
+
+## 4. Hüküm
+
+Plan v3 **dört soruyu geçiyor**: yedi adımın beşi KALSIN, biri DARALT, biri (zaten) ÇIKAR.
+Eklenen tek zorunluluk **iki SINANMIYOR damgası** ve **bir kapı kolu** (tetik tazeliği).
+
+⭐**BU KOŞUMUN ASIL BULGUSU KENDİ HAKKIMIZDA:** dört soru ilk kez koşturulduğunda planın
+kendisinde büyük bir kusur bulmadı — çünkü plan zaten iki eksende denetlenmişti. Buna karşılık
+aynı sorular **kendi yetenek dosyamıza** uygulandığında on bölümün dokuzunun ya CLAUDE.md'de ya
+ESLint kapısında ya kardeş skill'de **zaten yazılı** olduğunu gösterdi (bkz. REC-350 hattı).
+Yani "bu zaten var mı" sorusunun ilk kurbanı **biz olduk**. Kapsam denetimi, dışarıya değil
+önce içeriye bakınca ödüyor.
+
+
+---
+# FILE: docs\audits\rec348-rota-sinif-kapsami-2026-09-16.md
+
+# REC-348 · rota sınıfı kapsamı — ÖLÇÜM KAYDI
+
+**Tarih:** 2026-09-16 · **Şerit:** URUN · **Kayıt:** REC-348
+**Doğuran kalem:** `docs/audits/rec59-marka-kapi-kurali-2026-09-15.md` §3 — *"kapı 38 sınıftan
+7'sini izliyor"*
+**Kapı:** `tests/smoke/ssr-kurallari.ts` (salt OKUNDU, değiştirilmedi — dosya ALTYAPI şeridinde)
+**Yöntem:** ELLE. Alt-ajan kullanılmadı; 74 `page.tsx` tek bash taramasıyla çıktı, fan-out
+gerekmedi. *(Cetvel `execution-method-standard.md`: sapma bir cümleyle yazılır — bu o cümledir.)*
+**Migration:** YOK. **Kod değişikliği:** YOK. Yalnız ölçüm belgesi.
+
+---
+
+## 0 · ⭐ÖNCE EVREN — 74 ile 38/49 AYNI ŞEYİ SAYMIYOR
+
+Bu bölüm başa konuldu çünkü **evren yazılmadan sayılar karşılaştırılamaz.** Aynı tuzağa bu
+depoda iki kez düşüldü (Agent-Reach kapsamı, migration 112/233), üçüncüsü olmasın.
+
+| Sayı | Birimi | Kaynağı |
+|---:|---|---|
+| **74** | `src/app/**/page.tsx` **dosyası** = rota TANIMI | bu ölçüm, kaynak ağacı |
+| **49** | derlemede **HTML üreten** rota sınıfı | REC-59 ölçümü, 105 HTML'lik derleme |
+| **38** | o 49'un **marker'ı > 0** olan alt kümesi | aynı ölçüm |
+| **7** | kapının bugün izlediği sınıf | `Sinif` union'ı, aşağıda sayıldı |
+
+### Farkın sebebi ÖLÇÜLDÜ: admin paneli
+
+Bu ağaçtaki derleme çıktısında (`.next/server/app`) doğrudan saydım:
+
+| Aranan | Sayı |
+|---|---:|
+| Toplam `.html` | 105 |
+| `admin` yolu altında `.html` | **0** |
+| `account` yolu altında `.html` | 26 |
+
+**26 admin rotası hiç HTML üretmiyor** (hepsi `dynamic = 'force-dynamic'`). Yani:
+
+> 74 rota tanımı − 26 admin rotası = **48** ≈ REC-59'un **49**'u.
+
+Kalan bir birimlik fark `_not-found` benzeri çerçeve sayfalarından geliyor; **kesinleştirilmedi**
+ve bu belgenin sonucunu değiştirmiyor.
+
+**Dil çarpanı YOK:** TR ve EN aynı `page.tsx`'i paylaşıyor (`[lang]` parametresi). 105 HTML
+sayısındaki ikilik dil çarpanıdır, 74 sayısında yoktur. İki sayıyı bölerek/çarparak
+eşitlemeye çalışmak hatalıdır.
+
+### ⚠BU BÖLÜMÜN SINIRI — ADIYLA
+
+Yukarıdaki HTML sayımı **2026-09-14 tarihli** bir derlemeden geliyor (`.next/BUILD_ID` damgası);
+bu ağacın git tepesi ise **1d4c05714** (2026-09-16). Aradaki iki günün derlemeyi değiştirip
+değiştirmediği **ölçülmedi** — taze derleme yapılmadı. Rakamlar evren farkını açıklamak için
+yeterli, ama **kapı beklentisi kurmak için kullanılamaz.**
+
+⛔Ayrıca o bayat derlemede `products/<slug>` ve `category/**` HTML'i **YOK**, oysa kapı bu iki
+sınıfı izliyor. Sebep ölçülmedi (veritabanısız derlemede `generateStaticParams` boş dönmüş
+olabilir). **Bu bir bulgu değil, bir soru işaretidir** ve taze derleme yapılmadan bulguya
+çevrilmemelidir.
+
+---
+
+## 1 · KAPININ BUGÜN İZLEDİĞİ 7 SINIF
+
+`tests/smoke/ssr-kurallari.ts` içindeki `Sinif` union'ı:
+
+`anasayfa` · `liste` · `altgruplu-kategori` · `yaprak-kategori` · `pdp` · `marka-listesi` · `marka`
+
+Kural kollarında `kapida: true` olan **6**, `kapida: false` olan **1**
+(`altgruplu-kategori` — bilinçli, dosyanın kendi yorumunda gerekçesi yazılı: kırılgan ölçüt
+zorunlu kapıyı bloklamasın).
+
+Yedisinin **tamamı vitrin** sınıfı. Yani kapı bugün yalnız müşterinin gördüğü ve Google'ın
+taradığı yüzeyi izliyor; bu bir eksiklik değil, **bilinçli bir öncelik** — ama sınırı adıyla
+bilinmeli.
+
+---
+
+## 2 · 74 ROTANIN TAMAMI — SINIF İLANI DURUMU
+
+Ölçülen alanlar: `export const dynamic` · `export const revalidate` · `generateStaticParams`
+varlığı · dosya başında `'use client'`.
+
+### 2.1 · Vitrin — 13 rota (kapının evreni burası)
+
+| Rota | `dynamic` | `revalidate` | Kapıda? | Kapıya girmesi için ne gerekir |
+|---|---|---|---|---|
+| `/[lang]` | `force-static` | 3600 | ✅ `anasayfa` | — |
+| `/[lang]/products` | `force-static` | 3600 | ✅ `liste` | — |
+| `/[lang]/products/[slug]` | **YOK** | 3600 | ✅ `pdp` | ilan eksik ama kapıda — §4 madde A |
+| `/[lang]/category/[c]` | `force-static` | 3600 | ✅ `yaprak-kategori` | — |
+| `/[lang]/category/[c]/[s]` | **YOK** | YOK | ⚠ `altgruplu-kategori`, `kapida: false` | ilan + ölçüt sağlamlaştırma — §4 madde A |
+| `/[lang]/brands` | **YOK** | YOK | ✅ `marka-listesi` | ilan eksik ama kapıda — §4 madde A |
+| `/[lang]/brands/[slug]` | **YOK** | 3600 | ✅ `marka` | ilan eksik ama kapıda — §4 madde A |
+| `/[lang]/about` | `force-static` | YOK | ❌ | temsilci + marker tavanı ilanı (kolay) |
+| `/[lang]/contact` | `force-static` | YOK | ❌ | temsilci + marker tavanı ilanı (kolay) |
+| `/[lang]/urun-secici` | **YOK** | YOK | ❌ | önce sınıf ilanı, sonra tavan |
+| `/[lang]/cart` | **YOK** | YOK | ❌ | sepet durumu istemcide — ölçüt tasarımı gerekir |
+| `/[lang]/checkout` | **YOK** | YOK | ❌ | ödeme akışı — ölçüt tasarımı gerekir |
+| `/[lang]/payment-success` | **YOK** | YOK (`'use client'`) | ❌ | 3 marker'lı grup — §4 madde C |
+
+### 2.2 · Destek/bilgi — 10 rota, **hiçbirinde sınıf ilanı YOK**
+
+`destek/garanti-servis` · `destek/iade-degisim` · `destek/merkez` · `destek/sss` ·
+`destek/teslimat-kargo` · `destek/konular/[slug]` ·
+`destek/hesaplayicilar/{hava-perdesi, hrv, jet-fan, kanal}`
+
+Onunun da `dynamic` ilanı yok, `revalidate` yok. Yedisi `'use client'` taşıyor.
+Dördü (hesaplayıcılar) REC-150'de zaten ölçülmüş bir Suspense sınırı sorunu taşıyordu.
+
+⭐**Bu grup SEO açısından değerli** — "jet fan hesaplama" gibi aramalar buraya düşer.
+İlansız olmaları, marker doğurmalarına ve sunucu gövdesinin zayıflamasına açık kapı bırakıyor.
+
+### 2.3 · Yasal — 6 rota, **altısında da ilan TAM**
+
+`legal/{cerez-politikasi, gizlilik-politikasi, kullanim-kosullari, kvkk,
+mesafeli-satis-sozlesmesi, on-bilgilendirme-formu}` — hepsi `force-static`.
+
+İlanı en temiz grup bu. Kapıya girmeleri için ek iş neredeyse yok; tek gereken temsilci seçimi
+ve tavan ilanı.
+
+### 2.4 · Kimlik — 5 rota, **hiçbirinde ilan YOK**
+
+`auth/{callback, forgot-password, login, register, reset-password}`
+
+REC-59 ölçümünde `auth/login` ve `auth/callback` **3 marker** veren beş sınıftan ikisiydi.
+Üçüncü marker sayfa düzeyinde doğuyor ve **hangi bileşenden geldiği hâlâ kesinleştirilmedi.**
+
+### 2.5 · Hesap — 14 rota, hepsi `force-dynamic`
+
+`account` ve altındaki 13 sayfa. İlan **var** ve tutarlı. Ama oturum arkasında olduğu için
+duman kapısının bunları nasıl ölçeceği ayrı bir tasarım sorusu (giriş yapmadan çekilen HTML
+temsili mi sayılır?). REC-59 bu soruyu adıyla bırakmıştı, burada da açık kalıyor.
+
+### 2.6 · Yönetim — 26 rota, hepsi `force-dynamic`, **HTML üretmiyor**
+
+`admin` ve altındaki 25 sayfa. Ölçtüm: derlemede admin HTML sayısı **0**.
+
+⭐**Bu grup kapıya HİÇ girmemeli** ve bu bir eksiklik değil: prerender edilmeyen bir rotada
+prerender marker'ı doğmaz, dolayısıyla ölçülecek bir şey yoktur. Kapıyı bunlarla genişletmek,
+ölçmediği bir şeyi ölçüyormuş gibi görünen bir kapı üretirdi.
+
+---
+
+## 3 · TEK PR'DA ALINABİLECEK KÜMELER
+
+Kümeleme ölçütü: **aynı kalıp + aynı ölçüt tasarımı + aynı risk sınıfı.** Ayrı kalıp ayrı PR.
+
+| # | Küme | Rota | Niçin tek PR | Tahmini zorluk |
+|---:|---|---:|---|---|
+| **K1** | Yasal sayfalar | 6 | Altısı da `force-static` ilanlı, içerik statik, ölçüt tek kalıp (`<h1` + gövde kelime sayısı) | düşük |
+| **K2** | Vitrin bilgi sayfaları (`about`, `contact`) | 2 | İkisi de `force-static` ilanlı, K1 ile aynı ölçüt kalıbı ama ayrı sınıf adı gerekir | düşük |
+| **K3** | Destek içerik sayfaları | 6 | Aynı şablon ailesi; önce **sınıf ilanı yazılmalı**, sonra tavan | orta |
+| **K4** | Hesaplayıcılar | 4 | Aynı kalıp; REC-150'nin Suspense sınırı dersi doğrudan geçerli | orta |
+| **K5** | Kimlik sayfaları | 5 | Üçüncü ada burada; **önce o adanın kimliği ölçülmeli**, tavan ondan sonra yazılır | orta-yüksek |
+| **K6** | Hesap sayfaları | 14 | Tek kalıp ama **oturum arkası ölçüt tasarımı** açık soru | yüksek |
+| **—** | Yönetim sayfaları | 26 | **Kapsam dışı**, kapıya alınmaz (HTML üretmiyor) | — |
+
+Toplam kapıya alınabilir: **37 rota**, altı PR. Bugün kapıda olan 7 sınıfla birlikte vitrin ve
+bilgi yüzeyinin tamamı izlenmiş olur.
+
+**Sıra önerisi:** K1 → K2 → K3 → K4 → K5 → K6. Gerekçe: ilanı zaten tam olan gruplar önce
+gelir, çünkü onlarda iş yalnız kapı kolu yazmaktır; ilanı olmayan gruplarda **önce ilan
+kararı** gerekir ve o karar ayrı bir eksendir.
+
+---
+
+## 4 · KARAR GEREKTİREN MADDELER
+
+*(Numaralama bu belgede YAPILMAZ — Recep'e giden numarayı OPS verir. Burada harflendirildi.)*
+
+**A — Kapıda olduğu hâlde sınıf ilanı olmayan dört vitrin rotası.**
+`products/[slug]`, `brands`, `brands/[slug]`, `category/[c]/[s]` bugün kapıda ama
+`export const dynamic` ilanı taşımıyor. REC-59'un kendi gerekçesi *"ayırt edici olan bileşen
+değil rota sınıfı ilanıdır"* diyor. İlan yazılırsa marker sayısı düşer ve tavanlar (üst sınır
+oldukları için) yeşil kalır. **Karar gerekir:** bu dördüne `force-static` ilanı yazılsın mı?
+*Bu bir ÜRÜN kararıdır çünkü ISR davranışını ve veri tazeliğini etkiler.*
+
+**B — Destek grubunun (10 rota) sınıf ilanı boşluğu.**
+Onunda da ilan yok ve bunlar SEO değeri olan sayfalar. **Karar gerekir:** destek grubu
+statik ilan edilsin mi, yoksa dinamik mi kalsın?
+
+**C — Üçüncü adanın kimliği hâlâ ölçülmedi.**
+REC-59 bunu açık bıraktı: beş sınıf 3 marker veriyor, üçüncüsü sayfa düzeyinde doğuyor,
+`animate-spin` ile sarılı, **hangi bileşen olduğu bilinmiyor.** K5 kümesi bu ölçüm yapılmadan
+yazılamaz. **Karar gerekmez, ölçüm gerekir** — ayrı bir kalem.
+
+**D — Hesap sayfalarının ölçüt tasarımı.**
+14 rota oturum arkasında. Giriş yapmadan çekilen HTML'i temsili saymak meşru mu?
+**Karar gerekir** ve bu bir kapı tasarımı kararıdır (ALTYAPI ekseni), ürün kararı değil.
+
+---
+
+## 5 · BU ÖLÇÜMÜN SINIRLARI
+
+1. **Sınıf ilanı okuması statiktir.** `export const dynamic` satırını metin olarak aradım;
+   bir rota ilanını dolaylı yoldan (layout'tan, `generateStaticParams` davranışından) alıyorsa
+   bu tarama onu görmez. Derleme çıktısıyla çapraz doğrulama **yapılmadı.**
+2. **Marker sayıları bu belgede ÖLÇÜLMEDİ.** §0'daki sayılar REC-59'dan aktarıldı, taze
+   derlemeyle tekrar ölçülmedi. REC-59'un kendi dersi *"sayıyı kendin ölç"* idi; bu belge o
+   dersi **yerine getirmiyor** ve bunu adıyla yazıyor.
+3. **Derleme çıktısı iki gün eski** (§0 uyarısı). Evren farkını açıklamak için yeterli,
+   beklenti kurmak için değil.
+4. **`_not-found` ve çerçeve sayfaları sınıflandırılmadı.** 48 ile 49 arasındaki bir birimlik
+   fark buradan geliyor olabilir; kesinleştirilmedi.
+5. **Zorluk tahminleri ölçüm değildir.** §3'teki "düşük/orta/yüksek" sütunu benim yargım;
+   hiçbiri koşularak doğrulanmadı.
+
+İlgili: REC-348, REC-59
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+
+---
+# FILE: docs\audits\rec348-taze-derleme-marker-2026-09-16.md
+
+# REC-348 eki · TAZE DERLEME — marker sayıları ÖLÇÜLDÜ, üçüncü ada ÇÖZÜLDÜ
+
+**Tarih:** 2026-09-16 · **Şerit:** URUN · **Kayıt:** REC-348 (ek ölçüm)
+**Doğuran borç:** `docs/audits/rec348-rota-sinif-kapsami-2026-09-16.md` §5 madde 1-3 —
+*"marker sayıları bu belgede ÖLÇÜLMEDİ, REC-59'dan aktarıldı"* · *"derleme çıktısı 09-14
+tarihli"* · *"products/<slug> ve category/** HTML'i yok, sebep ölçülmedi — SORU İŞARETİ"*
+**Yöntem:** bu worktree'de `pnpm build` (çıkış 0), üretilen HTML'de doğrudan sayım.
+**Derleme damgası:** `.next/BUILD_ID` 2026-09-16 09:26 · git tepesi `e42b2be78`
+**Migration:** YOK. **Kod değişikliği:** YOK.
+
+---
+
+## 0 · ÜÇ BORCUN ÜÇÜ DE KAPANDI
+
+| Borç | Sonuç |
+|---|---|
+| Marker sayıları ölçülmemişti | **ÖLÇÜLDÜ** — 247 HTML'in her biri tek tek sayıldı (§2) |
+| Derleme iki gün eskiydi | **TAZELENDİ** — bugünkü tepeden derlendi |
+| `products/<slug>` ve `category/**` HTML'i yok görünüyordu | **SORU İŞARETİ ÇÖZÜLDÜ** — §1 |
+
+---
+
+## 1 · ⭐"HTML YOK" BİR BULGU DEĞİLDİ, BAYAT DERLEMEYDİ
+
+| Ölçüt | 09-14 derlemesi | **09-16 taze derleme** |
+|---|---:|---:|
+| Toplam HTML | 105 | **247** |
+| `products/<slug>` HTML | 0 | **94** |
+| `category/**` HTML | 0 | **48** |
+| `admin/**` HTML | 0 | **0** |
+
+Yani önceki belgenin *"kapı bu iki sınıfı izliyor ama HTML'i yok"* soru işareti **sahte
+alarmdı**; o ağaçta duran derleme eksikti. ⭐**Soru işaretini bulgu diye yazmamak doğru
+karardı** — yazsaydım olmayan bir arıza için iş emri doğardı.
+
+⚠**Bunun ikinci sonucu:** REC-59'un *"105 vs 245 farkı ÖLÇÜLMEDİ"* notu da artık cevaplı.
+Taze sayı **247**; 245'e çok yakın, 105'e uzak. Yani **105 eksik derlemeydi** ve REC-59'un
+marka sınıfı sayıları o eksik derlemeden alınmıştı. Marka sınıfı tavanı (2) bu taze ölçümde
+de **doğrulandı** (§2), dolayısıyla kapı etkilenmiyor — ama sayının kaynağı artık biliniyor.
+
+`admin/**` için **0 değeri taze derlemede de doğrulandı**: 26 admin rotası HTML üretmiyor,
+yani bir önceki belgenin "kapıya alınmaz" hükmü ayakta.
+
+---
+
+## 2 · MARKER DAĞILIMI — 247 HTML, TEK TEK SAYILDI
+
+`BAILOUT_TO_CLIENT_SIDE_RENDERING` geçiş sayısı:
+
+| Marker | HTML sayısı | Hangi rotalar |
+|---:|---:|---|
+| **0** | 68 | anasayfa · `products` (liste) · `category/**` (24 sınıf) · `about` · `contact` · `legal/**` (6) |
+| **2** | 75 | `brands` · `brands/<slug>` · `cart` · `checkout` · `account/**` (13) · `destek/**` (8) · `urun-secici` · `auth/{register,forgot-password,reset-password}` |
+| **3** | 104 | `products/<slug>` (47 sınıf) · `auth/login` · `auth/callback` · `payment-success` · `destek/hesaplayicilar/{hrv, hava-perdesi}` |
+
+*(Sayılar TR+EN toplamıdır; sınıf sayıları tek dil içindir.)*
+
+---
+
+## 3 · ⭐ÜÇÜNCÜ ADANIN KİMLİĞİ — ÇÖZÜLDÜ
+
+REC-59 bunu açık bırakmıştı: *"üçüncü marker sayfa düzeyinde doğuyor, `animate-spin` ile
+sarılı, hangi bileşen olduğu kesinleştirilmedi."*
+
+### Önce: `animate-spin` izi YANLIŞ İZDİ
+
+| Sayfa | Marker | `animate-spin` |
+|---|---:|---:|
+| `tr/auth/login` | 3 | 3 |
+| `tr/payment-success` | 3 | 1 |
+| `tr/destek/hesaplayicilar/hrv` | 3 | 1 |
+| `tr/destek/hesaplayicilar/kanal` | 2 | 1 |
+| `tr/brands/vortice` | 2 | 1 |
+| `tr/about` | **0** | 1 |
+
+`about` sıfır marker verdiği hâlde bir `animate-spin` taşıyor. **Bekleme göstergesi marker'ı
+açıklamıyor** — REC-59'un o cümlesi bir gözlemdi, sebep değildi. Adıyla yazıyorum ki kimse o
+izi tekrar takip etmesin.
+
+### Gerçek kural — üç ölçümle doğrulandı
+
+> **marker sayısı = (rota `force-static` ilanı taşımıyorsa) × (`useSearchParams` çağıran ada sayısı)**
+
+Kök layout'ta **iki** ada var (`src/app/layout.tsx` ve `src/components/layout/ClientLayout.tsx`
+— ikisinde de `useSearchParams` ölçüldü). Üçüncü ada **sayfanın kendi görünümünde**
+`useSearchParams` çağıran bileşendir:
+
+| Rota | Sayfa düzeyi adası | Marker |
+|---|---|---:|
+| `auth/login` | `views/LoginPage.tsx` | 3 |
+| `auth/callback` | `views/AuthCallbackPage.tsx` | 3 |
+| `payment-success` | `views/PaymentSuccessPage.tsx` | 3 |
+| `destek/hesaplayicilar/hrv` | `page.tsx` + `views/calculators/HRVCalcPage.tsx` | 3 |
+| `destek/hesaplayicilar/hava-perdesi` | `page.tsx` + `AirCurtainCalcPage.tsx` | 3 |
+| `products/<slug>` | `app/_components/ProductDetailPageView.tsx` | 3 |
+
+### ⭐Kuralın ÇÜRÜTME testi — geçti
+
+Kural yalnız "3 verenleri" açıklasaydı sonradan uydurulmuş sayılırdı. **Ters yönde de
+sınandı ve tuttu:**
+
+1. **`jet-fan` ve `kanal` hesaplayıcıları 2 marker veriyor, 3 değil** — ölçtüm:
+   o iki `page.tsx` `useSearchParams` **çağırmıyor** (`hrv` ve `hava-perdesi` çağırıyor).
+   Yani aynı klasördeki dört kardeş sayfa ikiye ayrılıyor ve kural ayrımı **önceden** kesiyor.
+2. **`category/<slug>` ve `products` (liste) `useSearchParams` ÇAĞIRIYOR ama marker 0** —
+   çünkü ikisi de `force-static` ilanlı. İlan, marker'ı **öldürüyor.**
+3. **`brands/<slug>` ilan taşımıyor ve sayfa adası yok** → tam olarak 2. REC-59'un yazdığı
+   tavanla birebir.
+
+⭐Bu, REC-59'daki düzeltmenin (#1196) **bağımsız doğrulamasıdır**: *ayırt edici olan bileşen
+değil, ROTA SINIFI İLANIDIR.* Aynı bileşen ilanlı rotada marker doğurmuyor, ilansız rotada
+doğuruyor.
+
+---
+
+## 4 · BUNUN KAPSAM İŞİNE ETKİSİ
+
+Önceki belgedeki altı kümeden ikisi bu ölçümle **kolaylaştı**:
+
+- **K1 (yasal, 6 rota) ve K2 (`about`+`contact`, 2 rota): marker'ları ölçülmüş 0.**
+  Tavan ilanı yazmak için ek ölçüm gerekmiyor; ikisi de `force-static` ilanlı ve sıfır
+  marker veriyor. İlk PR bu sekiz rota olmalı.
+- **K5 (kimlik, 5 rota) artık yazılabilir.** Engel "üçüncü adanın kimliği bilinmiyor" idi;
+  kimlik çözüldü, tavan 3 olarak ilan edilebilir ve ilan **adayla birlikte** yazılabilir.
+
+**K3/K4 (destek + hesaplayıcılar) için yeni bir ayrım doğdu:** dört hesaplayıcı **tek sınıf
+değil.** `hrv` ve `hava-perdesi` 3 marker, `jet-fan` ve `kanal` 2 marker veriyor. Tek tavanla
+dördünü kapsamak, iki sınıfı birbirine kefil yapardı — REC-59'un marka tavanında adıyla
+reddettiği hatanın aynısı. **Ya ikiye ayrılır, ya dördü de aynı ilana getirilir.**
+
+---
+
+## 5 · SINIRLAR (adıyla)
+
+1. **Tek derlemenin çıktısıdır.** Tavanlar bu yüzden ÜST SINIR olarak okunmalı, kesin sayı
+   olarak değil — REC-59'un aynı sınırı burada da geçerli.
+2. **Bu ölçüm repo derlemesini sayar, canlı yanıtı değil.** Duman kapısı canlıyı ölçer;
+   iki sayı ayrışırsa kapı kırmızı verir (fail-closed) ve bu doğru davranıştır.
+3. **`useSearchParams` taraması metin aramasıdır.** Bir ada hook'u dolaylı yoldan (başka bir
+   hook'un içinden) çağırıyorsa bu tarama onu görmez. Kural üç ölçümle çürütme testinden
+   geçti, ama **tarama yöntemi bu sınırı taşıyor.**
+4. **Kapı dosyasına hiçbir kol EKLENMEDİ.** Bu belge ölçüm; kolları yazmak ayrı iştir ve
+   `tests/smoke/ssr-kurallari.ts` ALTYAPI şeridindedir.
+
+İlgili: REC-348, REC-59
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+
+---
+# FILE: docs\audits\rec352-dis-pratik-2026-09-16.md
+
+# REC-352 adım 1 — DIŞ PRATİK ÖLÇÜMÜ: Supabase'in resmî yolu, bizim cetvelimizle yan yana
+
+**Tarih:** 2026-09-16 · **Şerit:** ALTYAPI · **Kayıt:** REC-352 adım 1
+**Doğuran soru (Recep, 2026-09-15):** *"bak bu bizim cetvelimizde ölçülmüş ya bu işin doğrusu
+mu değil mi bilmiyoruz… en doğru nedir bilelim, ona göre yapalım."*
+
+---
+
+## CEVAP — cetvelimiz Supabase resmî deseniyle örtüşüyor mu: **KISMEN**
+
+**Tek cümleyle sebep:** **model seçimimiz** Supabase'in resmî iki seçeneğinden biridir ve
+onların kendi ayırt edici ölçütüne göre bizim projeye **doğru olan** seçenektir; ama
+**"sıfır noktası yolunu reddet" hükmümüz** örtüşmüyor, çünkü Supabase bu iş için
+`migration squash` diye **kendi fiilini yayınlıyor**.
+
+---
+
+## 1 · Ölçülen kaynaklar (hepsi birincil)
+
+| # | Kaynak | Nasıl ölçüldü | Sınıf |
+|---|---|---|---|
+| 1 | **Supabase CLI 2.114.0** — bu makinede kurulu | Komutun **kendi yardım metni** okundu (`migration --help`, `migration squash --help`, `migration repair --help`, `db diff --help`) | A · kendi ölçümüm |
+| 2 | **Supabase resmî belgeleri** | Supabase'in **kendi belge arama servisi** (MCP `search_docs`) — "Declarative database schemas" kılavuzu TAM METİN + "Known caveats" bölümü; "Database Migrations" kılavuzu | A · kendi ölçümüm |
+| 3 | **`supabase/agent-skills` deposu** | `skills add --list` ile depo içeriği listelendi (kurulum YAPILMADI) | A · kendi ölçümüm |
+| 4 | **Bizim projemiz** | `supabase/config.toml`, `supabase/schemas` varlığı, `supabase/migrations/*.sql` sayımı, yerel yığın şeması (psql) | A · kendi ölçümüm |
+
+⚠**SAPMA, adıyla:** emir **Context7** diyordu; ben Supabase'in **kendi** belge servisini kullandım.
+Gerekçe: kaynak birincil ve bağlıydı, Context7 aracı bir katman daha uzak. Sapma bu satırla yazıldı.
+
+---
+
+## 2 · TEK TABLO — Supabase'in yolu ile bizim yolumuz
+
+| Supabase'in yolu | Ne yapar (onların cümlesi) | Bizde karşılığı (ölçülmüş) | Örtüşüyor mu | Hüküm |
+|---|---|---|---|---|
+| **Option B · imperative migrations** | Elle yazılmış `supabase/migrations/*.sql` dosyaları, sırayla uygulanır. Skill'in kendi cümlesi: *"Use this when the project does not use declarative schemas."* | **Tam olarak bu.** 233 migration dosyası, sırayla, `supabase-migrate.yml` ile prod'a otomatik | ✅**EVET** | **KALSIN — resmî yolun biriyiz** |
+| **Option A · declarative schemas** | `supabase/schemas/` altında **istenen son hâl** yazılır, `supabase db diff -f <ad>` migration'ı **üretir**. Seçim ölçütü onların: *"Use this when `supabase/schemas/` exists or `config.toml` sets `schema_paths`."* | `supabase/schemas` **YOK** · `config.toml`'da `schema_paths` **YOK** → onların kendi ölçütüne göre bu proje **Option B** | ✅**UYGUN — geçmemek DOĞRU** | **GEÇMİYORUZ**, gerekçe §3 |
+| **`migration squash`** | Geçmişi **tek dosyaya indirir**. Bayraklar: `--version` (belirli sürüme kadar) · `--local` · `--linked` · `--db-url` | Cetvelimiz (`ledger-ve-olu-migration-standard.md` §3) "alt dizine taşı / arşivle" yolunu **reddetti** ve sıfır noktası kavramını kapattı | ❌**HAYIR — burada ayrışıyoruz** | **CETVEL GÖZDEN GEÇİRİLMELİ** (§4) |
+| **`migration repair <sürüm> --status applied\|reverted`** | Defter tablosunu **onarır** | REC-321'de 5 defter satırını **elle yazılmış bir migration ile** sildik | ⚠**KISMEN** — işi yaptık ama onların fiilini kullanmadık | **CETVELE FİİL ADIYLA YAZILSIN** |
+| **`db dump` (şema)** | Şemanın **tam anlık görüntüsü** | 2026-09-15 tabanı tam bunla alındı (CI koşumu 34950954930, 8616 satır) | ✅**EVET** | **KALSIN** |
+| **`db diff`** | İki durum arasındaki **farkı** üretir. Motorlar: `migra` (varsayılan) · `pg-delta` · `pgadmin` | Bizde kullanılmıyor; Option A'nın aracı | ⚠**KISMEN** — şema tarafında değil, ama drift ölçümü için kullanılabilir | **AYRI KALEM** (drift kapısı) |
+| **Yerel geliştirme yığını (`supabase start`)** | Resmî akışın **varsaydığı** ortam; `db diff --local`, `migration up` hep buna bakar | Yığın **VAR ve sağlıklı** (Docker açılınca kendiliğinden kalktı, 11 servis) ama **BAYAT**: 18 tablo / 25 defter satırı · canlıda 66 tablo / 233 dosya | ⚠**KISMEN** — ortam var, tazeliği yok | **§5 · karar bekliyor** |
+| **Branching (şube veritabanı)** | Supabase'in kendi geçici kopya ortamı | **ÖLÇÜLMEDİ** | ❓**BİLİNMİYOR** | **AYRI ÖLÇÜM** |
+
+---
+
+## 3 · Option A'ya GEÇMEMENİN gerekçesi ONLARIN belgesinden çıkıyor
+
+Declarative kılavuzunun **"Known caveats"** bölümü, fark üreten aracın (`migra`) **görmediği**
+şeyleri tek tek sayıyor. Aynen şunlar:
+
+- **DML** (`insert` / `update` / `delete`) şema farkına **girmiyor**
+- **RLS politikaları:** `alter policy` ifadeleri ve **kolon ayrıcalıkları** izlenmiyor
+- **Grant'lar:** *"grant statements are duplicated from default privileges"*
+- **Comment'ler**, **partition'lar**, `alter publication ... add table ...`, `create domain`
+- **View'ler:** sahiplik/grant, `security invoker`, materialized view; kolon tipi değişince
+  view yeniden yaratılmıyor
+
+Bizim yüzeyimiz **tam orada**: canlıda **163 politika** ve **379 grant** var (2026-09-15 taban
+ölçümü). Yani declarative yola geçmek, şemamızın en kalabalık iki katmanını aracın **kör
+noktasına** taşımak olurdu.
+
+> ⭐**BU BULGUNUN DEĞERİ:** dün "declarative schemas kararı 18'i tümden değiştirebilir" diye
+> yazmıştım. **Değiştirmiyor** — ve bunu bizim cetvelimiz değil, **Supabase'in kendi belgesi**
+> söylüyor. Recep'in itirazının istediği şey tam buydu: hükmü kendi cetvelimize değil dış
+> kaynağa dayandırmak.
+
+---
+
+## 4 · CETVELİMİZİN ÖRTÜŞMEYEN YANI — ve bu bizim aleyhimize
+
+`ledger-ve-olu-migration-standard.md` §3, "arşive taşı" yolunu ölçtü ve reddetti. Ölçüm
+**doğruydu** (glob özyinelemeli değil → taşımak = silmek). Ama oradan çıkan **hüküm**, sıfır
+noktası kavramının tamamını kapattı gibi okunuyor — oysa:
+
+**Supabase `migration squash` diye bir fiil yayınlıyor.** Yani "geçmişi tek dosyaya indirmek"
+onların dünyasında desteklenen, adı konmuş bir işlem. Bizim cetvelimiz bir **mekanizmayı**
+(dosyayı alt dizine taşımak) reddetmişti; o red **yerinde**, ama **kavramın** reddi değil.
+
+⛔**GÜVENLİK SINIRI, ÖLÇÜLDÜ:** `migration squash --linked` **bağlı projenin** defterine yazar.
+Bağlı proje = **prod**. Yani o bayrak **CLAUDE.md kural 13** kapsamındadır ve şerit koşturamaz.
+Kuru koşum yalnız `--local` ya da gölge kümede yapılır. **`--linked` HİÇBİR DURUMDA.**
+
+**Öneri (tek):** cetvel §3'e bir **ayrım** yazılır — *"alt dizine taşıma yolu REDDEDİLDİ (ölçüm:
+glob özyinelemeli değil); ama sıfır noktası kavramı Supabase'de `migration squash` fiiliyle
+DESTEKLENİYOR. O fiilin `--linked` biçimi prod yazmasıdır ve kural 13'e tabidir; `--local`
+biçimi serbesttir. Karar 18 bu ayrımla okunur."*
+
+---
+
+## 5 · Yan bulgu: `agent-skills` kıyası (REC-350 kuralı)
+
+| Ölçüm | Sonuç |
+|---|---|
+| Kaynak depoda kaç skill var | **2** — `supabase` ve `supabase-postgres-best-practices` |
+| Bizim ağacımıza kaç tanesi alındı | **1** (`supabase`), sürüm **0.1.2** |
+| Bizdeki kopya güncel mi | **HAYIR** — plugin'in taşıdığı sürüm **0.1.15**, arada 13 sürüm |
+| Bizdeki kopya gerçekten kopya mı | **HAYIR, FORK** — 19.217 bayt (taze 12.979); içinde bize ait **on bölüm** var |
+| Eksik olan ne | Bizdeki 0.1.2'de **"Making and Committing Schema Changes"** bölümü **HİÇ YOK** — yani Option A/B ayrımı ve seçim ölçütü bizde yazılı değildi |
+| `supabase-postgres-best-practices` bizde var mı | **HAYIR** — hiç alınmamış. Ama **4 Eylül'den beri** bu makinede duruyor (plugin 0.1.15 ile geldi) ve **hiç açılmadı** (12 gün) |
+| Bizim `supabase-security` dosyamız onların mı | **HAYIR, BİZİM** — VentHub güvenlik standartları, `venthub_orders`, kural 25. Yukarıdaki iki skill'in **hiçbirinin** kopyası değil |
+
+**Recep kararı (2026-09-16):** plugin kurulacak (yapıldı, etkinleştirildi, yeniden başlatma
+bekliyor), bizdeki **bayat fork ayrılacak** — dış metin plugin'e bırakılır, bizim on bölümümüzden
+**dokuzu** zaten CLAUDE.md / ESLint kapısı / kardeş skill'de yazılı olduğu ölçüldü, taşınacak olan
+**bir** bölüm: *MCP ile CLI'ın advisor kapsam farkı*.
+
+---
+
+## 6 · BU ÖLÇÜMÜN SINIRLARI (adıyla)
+
+1. **Hiçbir Supabase fiili KOŞTURULMADI.** Tablodaki her satır ya komutun kendi sözleşmesi ya
+   resmî belge — **B sınıfı değil A sınıfı** ama **davranış ölçümü değil**. `squash`'ın bizim
+   233 dosyalık zincirimizde ne ürettiği **bilinmiyor**.
+2. **Kuru koşum YAPILAMADI.** Sebebi ölçüldü ve iki katmanlı: (a) yerel yığın **bayat** (18/66),
+   (b) tazelemenin komutu (`supabase db reset`) **bizim kendi yasak listemizde** — haklı olarak,
+   çünkü aynı fiilin `--linked` biçimi prod'u sıfırlar. Kuru koşum bu ayrım yazılmadan yapılamaz.
+   **Recep'e giden karar maddesi bu.**
+3. **Branching hiç ölçülmedi** — ne maliyeti ne davranışı.
+4. **`db diff` motor farkı** (`migra` ↔ `pg-delta`) okunmadı; caveat listesi `migra` içindir,
+   `pg-delta` daha yeni ve farklı davranabilir. Option A hükmü **bu sınırla** okunur.
+5. **Rails / Django / Flyway karşılaştırması YAPILMADI.** Dün "hiçbirine bakmadık" diye yazdım;
+   bugün de bakmadım. Supabase birincil kaynak olduğu için önce o ölçüldü; diğer ekosistemler
+   **açık kalem**.
+
+
+---
+# FILE: docs\audits\rec352-sifir-noktasi-kaniti-2026-09-16.md
+
+# REC-352 — SIFIR NOKTASI: gölgede ölçülmüş kanıt (2026-09-16)
+
+**Soru:** sıfır noktası kurmak canlı şemaya dokunur mu?
+**Cevap:** HAYIR. Gölgede ölçüldü, şema parmak izi **birebir aynı** kaldı.
+
+Bu belge Recep'in şu itirazından doğdu: *"hem Docker'da zincir kırık diyorsun hem kendi
+yaptığımızda kırılmıyor diyorsun... 2 farklı yerden bakınca ben sana güvenemiyorum."*
+İtiraz yerindeydi — iki farklı artefakt aynı cümlede anlatılmıştı. Bu belge ikisini
+ayırır ve iddiayı ÖLÇÜMLE kapatır.
+
+## 1. İKİ AYRI ARTEFAKT (çelişki değil)
+
+| | `supabase/migrations/` | `supabase/baselines/2026-09-15_public_schema.sql` |
+|---|---|---|
+| Ne | 233 ileri-yönlü talimat dosyası | canlı `public` şemasının tam anlık görüntüsü |
+| Sıfırdan koşum | **170/233 DÜŞER** (63 OK) | **0 hata**, canlıyla 8/8 parite |
+| Rolü | tarihsel kayıt | sıfır noktasının kendisi |
+
+Canlı veritabanı hiçbir zaman bu 233 dosyayla kurulmadı; her dosya o günün şemasının
+üzerine koştu ve arada beş tablo panelden ELLE kuruldu (`supabase/baselines/README.md`).
+Kırık olan makine değil, DEFTER.
+
+## 2. ⭐YENİ BULGU — DEFTER 233 DOSYAYI TEMSİL EDEMİYOR (bugün ölçüldü)
+
+Supabase'in defteri (`supabase_migrations.schema_migrations`) `version` kolonuna göre
+tekildir ve `version` = dosya adının damgası. 233 dosyanın damgaları ölçüldü:
+
+- Damga uzunlukları: **158 dosya 8 hane**, 62 dosya 14 hane, 13 dosya 12 hane.
+- **26 damga PAYLAŞILIYOR; toplam 138 dosya çakışıyor.** En kalabalığı `20250910` → **19 dosya**.
+- Sonuç: 233 dosya deftere yazıldığında **121 satır** oluştu. 112 dosya adı temsil edilemedi.
+
+Ölçüm: `insert ... on conflict (version) do nothing` ile 233 satır denendi, `count(*)` = **121**.
+
+⭐**DERS:** 8 haneli `YYYYMMDD_` damga biçimi (CLAUDE.md'de zaten INV-MIGRATION-2 kapısında
+KIRMIZI) yalnız bir biçim tercihi değil — **aynı gün yazılan dosyaları tek kimliğe
+çöktürüyor.** Bu, sıfır noktasının tercih değil ZORUNLULUK olmasının İKİNCİ bağımsız
+sebebidir (birincisi: 11 sert sözdizimi hatası + yaratıcı migration'ı olmayan beş tablo).
+
+## 3. ÖLÇÜM — DEFTER YAZIMI ŞEMAYA DOKUNUYOR MU?
+
+Gölge: `sifir_kanit` (paylaşılan kümede AYRI veritabanı; URUN'un `arama_golge`'sine
+dokunulmadı, ölçüldü: 57 tablo / 164 politika işlem boyunca sabit).
+
+Kurulum: `scripts/db/golge-kur.mjs --ad sifir_kanit` → önsöz + 2026-09-15 tabanı.
+Sadakat: **55 tablo · 163 politika · 199 indeks · 67 fonksiyon · 48 tetik.**
+
+**Parmak izi** = altı sorgunun birleşimi; kolon/tip/null/default, kısıt tanımları,
+indeks DDL'i, politika `qual`/`with_check` metinleri, fonksiyon gövde md5'i, tetik md5'i.
+Toplam **1404 satır** (786'sı kolon satırı, 163'ü politika).
+
+| | md5 |
+|---|---|
+| Defter yazımı ÖNCESİ | `f787d59dd777b2b6e37fbc6ad81da6b8` |
+| Defter yazımı SONRASI | `f787d59dd777b2b6e37fbc6ad81da6b8` |
+| `diff` | **boş** |
+
+Sayımlar sonrasında da aynı: 55 / 163 / 199 / 67 / 48.
+
+**HÜKÜM:** defter yazımı `public` şemasında tek bir kolon, kısıt, indeks, politika,
+fonksiyon ya da tetik değiştirmiyor. Sıfır noktası bir şema işlemi DEĞİL, bir
+KAYIT işlemidir.
+
+## 4. ⚠ÖLÇÜLEMEYEN — CANLI DEFTERİN ŞU ANKİ İÇERİĞİ
+
+Canlı defterde bugün kaç satır olduğu **ölçülmedi**: salt-okuma sorgusu bu oturumun
+izin katmanında ("Production Reads") reddedildi. Dolayısıyla şu soru AÇIK:
+canlı defter 121 satırı mı, 233'ü mü, yoksa bambaşka bir kümeyi mi taşıyor.
+
+Bu, hükmü değiştirmez (şemaya dokunmama ölçümü canlı defterin içeriğinden bağımsız),
+ama uygulama planının İLK adımı bu okumadır. Adım atlanamaz: neyin üzerine yazdığını
+bilmeden defter yazılmaz.
+
+## 5. SINIRLAR, ADIYLA
+
+1. Gölgede `auth.uid()` NULL — **yetki davranışı ölçülmedi**, yalnız şema/DDL.
+2. Gölgede `pg_cron` yok (konteynerde yalnız `postgres` DB'sinde kurulabilir) — beklendi.
+3. Parmak izi `public` şemasını kapsar; `auth`, `storage`, `net`, `vault` kapsam DIŞI.
+4. Defter yazımı burada elle SQL ile benzetildi; `supabase migration squash --linked`
+   komutunun kendisi canlıda koşmadı ve koşmayacak — **o adım Recep'in kapısı** (kural 13).
+5. Merge edilmiş bir migration'ın canlıda uygulanmış olması bu ölçümle kanıtlanmaz
+   (`supabase/baselines/README.md` tazelik alarmı bölümü aynı sınırı yazıyor).
+6. Damga çakışması ölçümü DOSYA ADLARINDAN okundu; canlı defterin o damgaları nasıl
+   taşıdığı §4 yüzünden bilinmiyor.
+
+## 6. SIRADAKİ — TEK KARAR RECEP'TE
+
+Uygulama planı, onay gelirse: (1) canlı defteri OKU, (2) tabanı tek sıfır noktası
+migration'ı olarak ilan et, (3) taban sonrası dosyaları koru, (4) eski damgaları
+"tabanda içeriliyor" diye kaydet, (5) tek PR. Adım 2-5 migration içerdiği için
+merge = prod'a otomatik uygulama → kural 13, Recep onayı ZORUNLU.
+
+Yöneten cetvel: `docs/standards/ledger-ve-olu-migration-standard.md` §2.1 (v1.2).
+
+
+---
+# FILE: docs\audits\rec59-marka-kapi-kurali-2026-09-15.md
+
+# REC-59 açık kalemi · marka sınıfı kapı kuralı — ÖLÇÜM KAYDI
+
+**Tarih:** 2026-09-15 · **Şerit:** ALTYAPI · **Kayıt:** REC-59 (açık kalem)
+**Kapı:** `tests/smoke/ssr-kurallari.ts` · `src/__tests__/conformance/ssr-duman-kilidi.test.ts`
+**Yöntem:** ALTYAPI worktree'sinde `pnpm build` (105 HTML), üretilen HTML'lerde doğrudan sayım.
+
+---
+
+## 0 · KAPANAN KALEM
+
+`tests/smoke/ssr-kurallari.ts` kendi içinde şunu yazıyordu:
+
+> ⚠BUNDAN DOĞAN AÇIK KALEM: `brands/[slug]` sınıfının kapı kuralı bu dosyada YOK ve o rota
+> bugün 2 marker üretiyor — yani kimse bakmıyor.
+
+**Kalem kapandı:** iki yeni sınıf (`marka-listesi`, `marka`) kural kümesine girdi, ikisi de
+zorunlu kapıda koşuyor, tavanları ilandan türetiliyor.
+
+⭐**SAYIYI BU KEZ ALTYAPI KENDİ ÖLÇTÜ.** Anasayfa ilanında marker sayısı URUN'un
+derlemesinden aktarılmış ve bu sınır adıyla yazılmıştı ("ALTYAPI bu sayıyı kendi
+derlemesiyle TEKRAR ÖLÇMEDİ"). Bu kalemde aynı borç bırakılmadı.
+
+---
+
+## 1 · ÖLÇÜM — MARKA SINIFI
+
+| Dosya | Marker |
+|---|---:|
+| `tr/brands/{avens,casals,flexiva,frekans-konvertoru,nicotra-gebhardt,vortice}.html` | **2** (altısının altısı) |
+| `en/brands/*.html` (aynı altı) | **2** |
+| `tr/brands.html` · `en/brands.html` (liste) | **2** |
+
+İki marker da **kök layout** kaynaklı: `vercel-analytics` ve `navigation-tracker` — yani
+anasayfa ilanındaki aynı iki ada. Marka sayfasının **kendi sayfa-düzeyi adası YOK**
+(HTML'deki iki marker da layout/footer bölgesinde).
+
+### Rota sınıfı ilanı — ayırt edici olan bu
+
+`src/app/[lang]/brands/[slug]/page.tsx` bugün `export const revalidate = 3600` +
+`generateStaticParams()` taşıyor, ama **`export const dynamic` ilanı YOK**.
+
+Bu, `#1196`'daki gerekçe düzeltmesiyle birebir uyumlu: ayırt edici şey bileşen değil **rota
+sınıfı ilanı.** İlanı olmayan rotada `useSearchParams()` çağıran adalar marker doğurur. Yani
+**2 sayısı bu rotanın bugünkü ilan durumunun sonucudur**; rota bir gün `force-static` ilan
+ederse sayı 0'a düşer ve tavan (üst sınır olduğu için) yeşil kalır.
+
+### ⚠105 vs 245 FARKI — ADIYLA
+
+Aynı dosyanın anasayfa bölümü "245 HTML'lik tek bir derleme" diyor; benim derlemem **105**
+HTML üretti. İki sayı iki farklı ana ait ve **fark ölçülmedi.** Buraya yazıyorum ki ileride
+biri iki sayıyı karşılaştırıp birini bozuk sanmasın.
+
+---
+
+## 2 · ⭐ASIL BULGU — MARKA DETAYINDA ÜRÜN LİSTESİ SUNUCUDAN GELMİYOR
+
+`.next/server/app/tr/brands/vortice.html` içinde:
+
+| Aranan | Sayı |
+|---|---:|
+| `<h1` | 1 |
+| "Vortice" (marka adı) | 39 |
+| `href="/tr/products/` | **0** |
+| `href="/tr/category/` | **0** |
+| `animate-pulse` (iskelet) | **4** |
+
+Yani sayfanın **başlığı ve marka anlatısı SSR'da**, **ürün listesi DEĞİL** — istemcide
+yükleniyor ve HTML'de yerine dört iskelet duruyor.
+
+### Bunun kapıya etkisi — ve niçin ölçütü gevşetmedim
+
+Marka kuralına "ürün bağlantısı var" işareti **KOYULMADI**. Üç seçenek vardı:
+
+1. İşareti koy → kapı **bugün kırmızı** olur (gerçeği söyler ama kimsenin kararı yok).
+2. İşareti koy, sonra ölçütü gevşet → kapı olmayan bir şeyi doğruladığı izlenimi verir.
+3. **İşareti koyma, sınırı ADIYLA yaz** → seçilen yol.
+
+Kapı yalnız ölçtüğünü iddia eder. Sınır koda sabit olarak yazıldı
+(`MARKA_DETAY_SSR_SINIRI`) ve kural bloğunun yorumunda tekrar edildi.
+
+⭐**BU BİR AÇIK KALEMDİR, SESSİZ GEÇİLMİYOR:** marka detayında ürün listesinin sunucuda
+üretilip üretilmemesi gerektiği bir **ÜRÜN kararıdır** (vitrin/SEO ekseni) ve bu dosyanın
+işi değil. Karar "SSR olsun" çıkarsa o gün bu bloğun yerine bir işaret eklenir.
+
+**Liste sayfasında durum FARKLI ve orada işaret KOYULDU:** `brands.html` altı
+`href="/tr/brands/` bağlantısı basıyor — yani liste SSR'da gerçekten var. Aynı sınıf ailesinde
+bir sayfanın verisi sunucudan gelirken diğerinin gelmemesi, ölçülmeden görülmezdi.
+
+---
+
+## 3 · ⛔ÇOK DAHA BÜYÜK BİR BOŞLUK ÖLÇÜLDÜ — AYRI KALEM GEREKTİRİR
+
+Marka sınıfını ölçerken bütün derlemeyi saydım. Sonuç:
+
+| Ölçüt | Değer |
+|---|---:|
+| Toplam rota sınıfı (HTML üreten) | **49** |
+| Marker'ı 0 olan | 11 |
+| **Marker'ı > 0 olan** | **38** |
+| Bu kapının izlediği sınıf (bu PR'dan sonra) | **7** |
+
+Yani **38 sınıf marker üretiyor ve kapı bunların 7'sine bakıyor.** Kalanı kimse izlemiyor —
+bu, kapanan açık kalemin **aynı sınıfından ama otuz kat büyük** bir boşluk.
+
+### Üçüncü bir ada var ve hiçbir yerde ilan edilmemiş
+
+Beş sınıf **3** marker veriyor: `auth/login`, `auth/callback`, `payment-success`,
+`destek/hesaplayicilar/hrv`, `destek/hesaplayicilar/hava-perdesi`.
+
+Üçüncü marker **sayfa düzeyinde** doğuyor (girişte `animate-spin` bekleme göstergesiyle
+sarılı bir ada). Marka sınıfında o yok — bu yüzden marka tavanı 2, 3 değil.
+*İki sınıfın aynı sayıyı vermesi tesadüf olabilir; ayrımı ölçmeden tek tavan yazmak iki
+sınıfı birbirine kefil yapardı.*
+
+### Niçin bu PR'da kapatmadım
+
+Bu iş **kapsam genişletmesi** olurdu ve üç sebeple ayrı kayıt gerektirir:
+
+1. 38 sınıfın her biri için **tavan ilanı** yazmak, her birinin adalarını ölçmeyi gerektirir
+   (bu kalemde altı HTML için yaptığım işin ~38 katı).
+2. `account/**` ve `auth/**` sınıfları **oturum arkasında**; duman kapısının onları nasıl
+   ölçeceği ayrı bir tasarım sorusudur (giriş yapmadan çekilen HTML temsili mi?).
+3. Hepsini bir kerede kapıya sokmak, kırmızı çıktığında **herkesin merge'ini** bloklardı —
+   bu dosyanın kendi doktrini bunu yasaklıyor ("kapıya yalnız SAĞLAM ölçütü olan sınıflar
+   girer").
+
+⭐**Ama ölçüm kayda geçti ve bu, boşluğun artık GÖRÜNÜR olduğu anlamına gelir.** Kapanan
+kalem "brands/[slug] kimse bakmıyor" idi; yerine daha büyük ve **sayılmış** bir kalem
+bırakıyorum: *kapı 38 sınıftan 7'sini izliyor.*
+
+---
+
+## 4 · ÖLÇÜM SIRASINDA ÇIKAN İKİ KENDİ KUSURUM
+
+1. **Yeni kontrolüm eski kontrolün mesajını çaldı.** `zorunluKontrol` içine marka kontrolünü
+   **başa** koydum; mevcut beş kol kategori/PDP hata metnini bekliyordu ve benim kontrolüm
+   onlardan önce atıp başka metin verdi → 6 kol kırmızı. Sıra sona alındı.
+   **Ders: yeni bir kontrol eklerken eski kontrolün mesajını çalmamak da ölçütün parçası.**
+2. **Fikstürler gerçek haritaya benzemiyordu.** Marka kontrolü fail-closed olunca yapay
+   sitemap'lerde hiç `/tr/brands/<slug>` olmadığı için beş kol daha düştü. İki yol vardı:
+   kontrolü gevşetmek ya da fikstürü gerçeğe benzetmek. **Fikstür seçildi** — gerçek site
+   haritası marka adreslerini HER ZAMAN ilan ediyor (`sitemap.ts` §3), yani marka yolu
+   olmayan harita ilgisiz bir kurguydu. *Kapıyı gevşetmek, olmayan bir dünyayı korumak için
+   gerçek bir güvenceyi düşürmek olurdu.*
+
+---
+
+## 5 · SABOTAJ VE MANDAL (koşuldu, iddia değil)
+
+- **Ölçüt ayırt ediyor:** liste kuralının işareti `href="/tr/brands/` → gerçek HTML'de
+  **var**; `href="/tr/SABOTAJ/` yapıldığında → **yok**. Yani işaret her şeye yeşil demiyor.
+- **Tavan mandal gibi çalışıyor:** iki sayfada da gerçek marker 2, tavan 2 → geçer. İlandan
+  **bir ada düşürülse** tavan 1 olur ve ikisi de **İHLAL** verir. Yani tavan ilana bağlı ve
+  ilan boşaltılamaz.
+- **Temsilci yoksa kapı KIRMIZI:** site haritası marka adresi ilan etmezse `zorunluKontrol`
+  ayrı bir hatayla düşer; sebebi (harita kusuru) mesajda yazılı. Ölçememek geçmek değildir.
+
+---
+
+## 6 · SINIRLAR (adıyla)
+
+1. Sayılar **tek derlemenin** çıktısı (105 HTML). Aynı ölçüm başka bir anda başka sayı
+   verebilir; tavan bu yüzden **üst sınır** olarak yazıldı, kesin sayı olarak değil.
+2. Marka detay temsilcisi **adresten** seçiliyor, içerikten değil — kategori sınıflarındaki
+   gibi bir belirsizlik olmadığı için (REC-286). Eğer bir gün iki farklı marka şablonu
+   doğarsa bu seçim yetersiz kalır.
+3. Bu kapı **repo/derleme** HTML'ini değil, duman koşumunda **canlı yanıtı** ölçer. Buradaki
+   sayılar beklentiyi kurmak için kullanıldı; canlıdaki sayı farklıysa kapı kırmızı verir —
+   fail-closed, sessiz geçmez.
+4. Üçüncü adanın **hangi bileşen** olduğu kesinleştirilmedi; yalnız sayfa düzeyinde doğduğu
+   ve `animate-spin` ile sarılı olduğu ölçüldü. Marka sınıfını etkilemediği için burada
+   kapatılmadı.
+
+
+---
 # FILE: docs\audits\registry-triyaj-2026-08-26.md
 
 # Registry Açık Kayıtlar — DEĞERLENDİRİLMİŞ Liste (2026-08-26)
@@ -14799,6 +19595,185 @@ Yeni bir sır türü eklemek için `scan.py` içindeki `SIGS` listesine
 
 
 ---
+# FILE: docs\audits\sema-graf-uretici-2026-09-16.md
+
+# Şema graf üreticisi — tasarım kararları ve aşama 1 ölçümü
+
+**Tarih:** 2026-09-16 · **Şerit:** ALTYAPI · **Kapı:** `INV-SEMA-GRAF-1`
+**İsteyen:** Recep — *"bu supabase tarafının bir haritasını çıkartmamız lazım, bu şekilde
+olmayacak, codegraph gibi bir şey lazım."*
+
+---
+
+## 1. Niçin graphify bu işi yapmıyor — ölçüldü, üç adımda
+
+Graphify'a SQL eklentisi kuruldu (`uv tool install "graphifyy[sql]"`), grafik **9.122 → 10.410
+düğüme** çıktı ve tablolar görünmeye başladı. Ama veritabanı haritası için **yetmedi**:
+
+| Nesne | Canlı gerçek | Graphify gördü |
+|---|---|---|
+| tablo (taze tabandan) | 66 | **39** |
+| politika | 163 | **1** |
+| indeks | 113 | **0** |
+
+**Sebep ayar değil, deneyle ayrıldı:**
+
+1. Dosya **yarıda kesiliyor** — 8616 satırlık dökümde düğümler `L2988–L5775` arasında;
+   politikalar `L6365`'te başlıyor, yani hiç sıraya gelmiyor.
+2. **Bölmek kesilmeyi çözüyor ama nesne eksiğini çözmüyor:** döküm 2900 satırlık üç parçaya
+   bölündü → ilk iki parça **sonuna kadar** işlendi (düğüm 210 → 275). Ama indeks+politika
+   taşıyan **üçüncü parça yalnız 4 düğüm** verdi (L3–L11) — boyut sınırının **altında**.
+3. Yani extractor `CREATE INDEX` ve `CREATE POLICY` nesnelerini **modellemiyor.**
+   (`--token-budget` semantik/LLM kısmı içindir, AST için değil.) Araç derlenmiş olduğu için
+   içi değiştirilemez.
+
+**Hüküm:** graphify **kod tarafında** kalır (orada iyi ve artık tabloları da görüyor);
+veritabanı yarısını **biz üretiriz** ve onun kendi `merge-graphs` komutuyla ekleriz.
+
+---
+
+## 2. Tasarım — Recep'in dört sorusuna dört cevap
+
+Recep'in sorusu: *"yama gibi mi olacak yoksa AST gibi mi olacak, bu bağlamları nasıl çekecek…
+bir ürün geliştirir gibi geliştirip bir başkası da kursaydı sağlıklı çalışır mantığı mı olacak?"*
+
+### 2.1 ⛔Metin taraması YOK — o yama olurdu
+
+SQL düzenli bir metin değildir: tırnaklama değişir, politika gövdesinde alt sorgu olur, satır
+sonu keyfîdir. Bugün bir dosyada çalışan desen yarın başka dökümde **sessizce yanlış sayı**
+verir. Kanıtı §1'de: graphify'ın kendi tarayıcısı tam bunu yaptı ve kimse fark etmedi.
+
+### 2.2 ⭐Kaynak veritabanının KENDİ KATALOĞU
+
+PostgreSQL *"bende hangi tablolar, hangi kısıtlar var"* sorusunun cevabını `pg_class`,
+`pg_constraint`, `pg_namespace` içinde tutar. **Otoriteye sorulur** — tahmin edilmez,
+ayrıştırılmaz. Üç üstünlüğü:
+
+- **Eksiksizlik tanım gereği** gelir; sayıyı veren şeyin kendisidir.
+- **Bağlantılar doğru** gelir: yabancı anahtarlar gerçek kısıt kayıtlarından, adıyla
+  (`products_brand_fkey`).
+- **Kayamaz**, çünkü kaynak gerçeğin kendisidir.
+
+### 2.3 Canlıya bağlanmak ZORUNLU değil — tek kod yolu, iki girdi
+
+Araç bir **bağlantı dizesi** alır. O dizenin ucundaki veritabanı canlı da olabilir, dökümden
+kurulmuş geçici bir küme de. **İkinci bir ayrıştırıcı yazılmaz** — iki girdi de aynı kataloğa
+aynı soruları sorar. (Dökümü boş bir kümeye uygulama yöntemi 2026-09-15'te ölçüldü: 0 hata,
+canlıyla 8/8 parite.)
+
+### 2.4 "Başkası kursa çalışır mı" — dört şart, dördü de kapıya bağlandı
+
+| Şart | Nasıl sağlandı | Hangi kol ölçüyor |
+|---|---|---|
+| Hiçbir proje adı gömülü olmasın | şema listesi `--semalar` ile dışarıdan; kodda tablo/şema adı yok | ⭐TASINABILIR kolu (kodda `venthub_`, `products`, `categories`, `iyzico` arar — **yorumda değil**) |
+| Bağlantı bilgisi kodda olmasın | yalnız **ortam değişkeni ADI** okunur; değer basılmaz, varlık **uzunlukla** ölçülür | ⭐SIR DEGERI BASILMAZ kolu |
+| Çıktı standart biçimde olsun | graphify node-link (`nodes` + `links` + `directed`/`multigraph`) | CIKTI graphify BICIMINDE kolu |
+| Çıkış kodları anlamlı olsun | 0 üretildi/atlandı · 1 parite tutmadı · 2 ölçemedi — **betiğin kendi başlığında yazılı** | ⭐CIKIS KODU SOZLESMESI kolu |
+
+### 2.5 Düğüm kimlikleri KENDİ AD ALANINDA (`db_` öneki)
+
+Gerekçe ölçülmüş: graphify SQL dosyalarından **da** tablo düğümü üretiyor ve kendi
+şartnamesinde *"aynı varlık her zaman aynı kimliği üretmeli, yoksa orphan ghost-duplicate
+düğüm doğar"* diye uyarıyor. Biçimde en küçük fark hayalet ikiz demek. Bizimkiler ayrı ad
+alanında durur: yan yana görünür, karışmaz, bir gün ayırmak istersek tek satırla ayrılır.
+
+---
+
+## 3. Aşama 1 ölçümü — yerel yığında koşuldu
+
+**Hedef:** yerel Supabase yığını (Docker, `127.0.0.1:54322`). **Prod'a dokunulmadı.**
+
+```
+sema-graf-uret: sir MEVCUT (uzunluk 55 karakter, deger BASILMADI).
+sema-graf-uret: hedef YEREL (TLS yok)
+sema-graf-uret: semalar=public · tablo=18 · fk=13
+sema-graf-uret: kapsam DISI fk=6 (hedef public disinda — cizilmedi)
+sema-graf-uret: DOGRULAMA TUTTU (tablo 18=18 · fk 13=13)
+```
+
+**Birleştirme kabul sınavı geçti:**
+
+```
+graphify merge-graphs graphify-out/graph.json graphify-out/db-graph.json
+→ Merged 2 graphs -> 10428 nodes, 19517 edges      (+18 düğüm / +13 kenar, tam beklenen)
+```
+
+**Ve veritabanı sorusu cevaplanıyor** — bu, işin asıl çıktısı:
+
+```
+graphify explain "repo-2::db_public_products"
+  Node: public.products      Source: db://public kolon=13 rls=on      Degree: 8
+  --> public.categories [references]      <-- public.cart_items [references]
+  --> public.brands [references]          <-- public.inventory_movements [references]
+                                          <-- public.venthub_order_items [references]
+                                          <-- public.product_documents [references]
+                                          <-- public.product_images [references]
+                                          <-- public.technical_specifications [references]
+```
+
+⚠**`merge-graphs` kimlikleri yeniden etiketliyor** (`repo-2::` öneki) çünkü onu iki AYRI depo
+grafiği sanıyor. Ölçüldü, sorun değil ama **bilinmesi gerekiyor**: birleşik grafta sorgu
+etiketli kimlikle yapılır. `explain "public.products"` dört adaya çıkar ve ayırt etmeyi ister.
+
+---
+
+## 4. ⭐ÜRETİCİ KENDİ HATASINI YAKALADI — doğrulama kolu ödedi
+
+İlk koşumda üretici **13** kenar verdi, doğrulama sorgusu **19** dedi. Kol kırmızı yandı.
+
+**Sebep, bu projede tekrar eden sınıf: ölçüt doğruydu, EVREN yanlıştı.** İlk doğrulama sorgusu
+`information_schema.table_constraints` kullanıyordu; o, **kaynak** tablosu kapsamda olan HER
+yabancı anahtarı sayar — hedefi `auth` gibi başka bir şemada olsa bile. Üretici ise **iki ucu
+da** kapsamda olanları çiziyor (bir ucu düğümsüz kalan kenar graphify'da orphan üretir).
+
+**Düzeltme iki parçalı:** parite **aynı evrende** ölçülür, **ve** kapsam dışına giden anahtarlar
+ayrı bir sayı olarak **raporlanır** (`kapsam DISI fk=6`). Gizlenmesi *"ilişki yok"* izlenimi
+verirdi. 13 + 6 = 19 → eski tutarsızlık **tam olarak** açıklandı.
+
+⭐**Bu kol olmasaydı araç sessizce yarım veri üretmeye başlayacaktı** ve biz aylar sonra
+öğrenecektik — bu depoda ölçülmüş bir kusur sınıfı.
+
+## 4.1 TLS kararı: sessiz geri düşme YASAK
+
+İlk koşumda kök sertifika dosyası varsa koşulsuz TLS veriyordum; yerel küme *"The server does
+not support SSL connections"* ile reddetti. **Akla gelen kolay çözüm — "hata alırsan SSL'siz
+tekrar dene" — reddedildi**, çünkü uzak bir sunucu TLS'i düşürdüğünde de aynı yola girer ve
+şifreleme **sessizce** kaybolur. Bu, `sslmode` tuzağının başka bir biçimi olurdu.
+
+Karar **hedefe** bakar: yerel döngü adresi → TLS yok (trafiğin makineyi terk etmediği
+ölçülebilir bir olgu). Başka her hedef → kök sertifika **zorunlu**; sertifika yoksa bağlanmayı
+**denemez** ve sebebini yazar. Kapının bir kolu bu geri düşmenin **yokluğunu** ölçüyor.
+
+## 4.2 Kapının kendisi de iki kez yanlış kırmızı verdi (yazılırken)
+
+1. *"Yasak kalıp"* arayan kol, o kalıbın **yasak olduğunu anlatan yorumun** üstünde tetiklendi
+   — yani kapı kendi belgesini ihlal sandı. Düzeltme: kalıp **kodda** aranır, yorumda değil.
+   (Aynı sınıf: `protect-config` kancası bu dosyayı yazarken **beni de bir kez durdurdu**,
+   çünkü yorumda bir tip-kaçış kalıbının adını anmıştım. Kanca doğru davrandı.)
+2. Çıkış kodu sözleşmesini arayan kol `uretildi` deseniyle yazılmıştı; betik `üretildi` diyor
+   ve **eşleşmedi**. Bu, Türkçe harf körlüğünün üçüncü sahada görülüşü.
+
+---
+
+## 5. Sınırlar, adıyla
+
+1. **Aşama 1 yalnız tablolar ve yabancı anahtarlar.** Politikalar aşama 2, fonksiyon/tetik
+   aşama 3, indeksler henüz kapsamda değil. Aşamalı olması bilinçli: her aşama kendi kapısıyla
+   iner (CLAUDE.md kural 14).
+2. **`INV-SEMA-GRAF-1` grafın DOĞRULUĞUNU ölçmez** — sözleşmeyi ölçer (sır, TLS, taşınabilirlik,
+   çıkış kodu, çıktı biçimi). Doğruluk ölçümü canlı/yerel bir veritabanı ister ve o ayrı bir
+   koşumdur. Bu ayrım kapının başlığında da yazılı; aksi hâlde *"kapı yeşil"* cümlesi
+   *"graf doğru"* gibi okunur.
+3. **Ölçüm yerel yığında yapıldı ve o yığın BAYAT** (18 tablo; canlıda 66). Yani sayılar aracın
+   **çalıştığını** kanıtlar, **canlı şemayı** anlatmaz. Canlı koşum ayrı bir adımdır.
+4. **`merge-graphs` etiketleme davranışı** bizim kontrolümüzde değil (`repo-2::`). Bir sonraki
+   graphify sürümü bunu değiştirirse birleşik graftaki kimlikler değişir.
+5. **Tazelik bağı henüz KURULMADI.** Tasarım kararı şudur: bu graf, taban tazeleme yoluna
+   bağlanacak (tek komut ikisini birden üretsin), yoksa **kendi başına bayatlar** ve bugün üç
+   kez bulduğumuz "atıl araç" hatasının dördüncüsü doğar. Bağ aşama 2'nin kapsamındadır.
+
+
+---
 # FILE: docs\audits\sir-ekrana-basma-olayi-2026-09-04.md
 
 # Olay kaydı — sır değeri ekrana basıldı (2026-09-04, ALTYAPI)
@@ -14967,6 +19942,85 @@ product UI için değil") bütün olarak alınmaz.
    yetenek gözden geçirilir (bayatlık sinyaliyle aynı mantık).
 
 — OPS · 2026-09-05
+
+
+---
+# FILE: docs\audits\skill-yuku-2026-09-12.md
+
+# Oturum başı skill yükü — ölçüm (2026-09-12, REC-304)
+
+**Soru:** her oturum açılışında skill'ler için ne ödüyoruz, ve eşik nereye konur?
+
+**Cevap:** `.claude/skills` için **16.6 KB ≈ 4.3K jeton** (tahmin). Kayıtta hedef olarak yazılan
+"≤5K" **zaten sağlanmış**. Kusur sayıda değil, ilk sayının **evreninde**ydi.
+
+---
+
+## 1. İki evren — ilk sayı hangisinden geldi
+
+| evren | `.claude/skills` (36 skill) | `.agent/skills` (35 skill) |
+|---|---|---|
+| TAM frontmatter | 28.4 KB (~7.3K jeton) | 26.8 KB (~6.9K jeton) |
+| oturuma giren (`name` + `description` [+ `argument-hint`]) | **16.6 KB (~4.3K jeton)** | 12.1 KB (~3.1K jeton) |
+| fark (yalnız diskte) | 11.8 KB | 14.7 KB |
+
+İlk ölçüm **7.4K jeton** demişti; tablodaki `.claude` TAM frontmatter satırı (~7.3K) ile aynı
+yer. Yani o sayı "host frontmatter'ın tamamını okur" varsayımıyla çıkmış. Oturuma giren liste
+`name` + `description` biçiminde; kalan anahtarlar o listede yok.
+
+⚠**Jeton sayıları TAHMİN** (4 karakter ≈ 1 jeton). Bayt ölçüm, jeton dönüşümü tahmindir.
+
+⚠**`.agent/skills` bütçeye SAYILMAZ:** o ağaç Antigravity işçisinin, Claude Code oturumuna
+girmiyor (ayrı host). Ölçüldü, raporda duruyor, ama bizim oturum bedelimiz değil — sayılsaydı
+başka bir ajanın maliyetini kendimize yazardık.
+
+## 2. İkinci yanlış evren: "okunmayan 6 anahtar temizlenmeli"
+
+Kayıt, host'un okumadığı anahtarların **temizlenmesini** öneriyordu. Ölçüm bunu çürüttü:
+host okumuyor ama **bizim araçlarımız okuyor.**
+
+| anahtar | kaç skill'de | okuyan bizim aracımız |
+|---|---|---|
+| `category` | 63 | `scripts/compile_skills.py:75` (manifest kategorisi) |
+| `metadata` | 63 | `scripts/compile_skills.py` (manifest gövdesi) |
+| `depends_on` | 56 | `scripts/skills-router.py:46`, `compile_skills.py:78` |
+| `next_steps` | 56 | `scripts/skills-router.py:47` |
+| `run_last` | 55 | `scripts/skills-router.py:48` |
+| `exclusions` | 55 | `scripts/skills-router.py:49` |
+
+Silinseler yönlendirici ve manifest bozulur. **Ölü yük değil, diskte yaşayan kendi verimiz** —
+oturum bedeli sıfır olduğu için önceliği de düşük. Temizlik işi olarak da anlamsız.
+
+## 3. Eşik nereye kondu ve niçin
+
+Kapı: `src/__tests__/conformance/skill-yuku-butcesi.test.ts` (4 kol).
+
+1. **Toplam bütçe 20 KB.** Bugün 16.6 KB → ~%20 baş payı. Eşiği bugünün sayısına yapıştırmak
+   bir kelime eklenince kırmızı veren, yani bir süre sonra okunmayan kapı üretir; çok yüksek
+   tutmak ise büyümeyi hiç göstermez. Baş payı **bir skill'in ortalama bedeli** mertebesinde.
+2. **Yeni açıklama tavanı 300 karakter.** Her açıklama her oturumda okunuyor.
+3. **Devralınan 18 uzun açıklama adıyla muaf** (en uzunu `maestro` 1157, en kısası
+   `skills-creator` 301). Muafiyet **kaçış kapısı olmasın diye** dördüncü kol var: aşan skill
+   sayısı bugünün üstüne **çıkamaz**. Kısaltma serbest, yeni muafiyet yasak.
+4. **Ölçüm evreni kolu:** dizin boş okunursa kapı "bütçe içinde" diye yeşil verirdi —
+   yokluk kanıtı değildir. Kol en az 30 skill okunduğunu doğruluyor.
+
+## 4. Bu ölçüm sırasında kendi düştüğüm tuzak (kayda geçer)
+
+Aşan açıklamaların listesini ilk yazdığımda **kırpılmış çıktıya** güvendim: ölçüm betiğim
+listeyi `ilk 8` ile basıyordu, ben de o sekizi tam liste sandım ve muafiyet listesini iki ağacın
+adlarını karıştırarak yazdım. **Kapı kendi listemi çürüttü** (1 kol kırmızı, 12 ad eksik/yanlış).
+Sayı (18) doğruydu, adlar yanlıştı.
+
+Ders: **kırpılmış çıktı, ölçüm sonucu değildir.** Liste üreten bir ölçümde `slice`/`head`
+varsa, karara giden kopya kırpılmamış olanı olmalı.
+
+## 5. Kapsam dışı, adıyla
+
+- 18 uzun açıklamanın **kısaltılması** — içerik işi, ayrı kalem; kapı bugün onları görünür
+  tutuyor, kısaltmıyor.
+- `.agent/skills` tarafının bütçesi — başka host, başka sahip.
+- `when_to_use` (4 skill) ve `license` (8 skill) anahtarlarının kime yaradığı ölçülmedi.
 
 
 ---
@@ -20829,6 +25883,181 @@ Sonuç: motor kurulduğunda **348 ürün otomatik fiyatlanır**; alış maliyeti
 
 
 ---
+# FILE: docs\plans\graphify-kurulum-emri-2026-09-16.md
+
+# graphify kurulum emri — ALTYAPI'ya, ölçülmüş ve tahminsiz
+
+**Tarih:** 2026-09-16 · **Yazan:** URUN · **Koşacak:** ALTYAPI
+**Recep onayı (aynen):** *"tam olarak graphify kur hayata geçir."* → sonra: *"tamam gerekeni
+ver altyapı yapsın."*
+**Cetvel:** `docs/standards/hukum-kaynak-standard.md` (bu belgedeki her satır A sınıfı — kaynak
+kodu bugün okundu, dosya:satır verildi)
+**YÖNTEM:** elle, tek komut. Şerit devri sebebi: hedef dosyalar (`.claude/**`, `CLAUDE.md`)
+ALTYAPI şeridinde; URUN oraya yazmaz.
+
+---
+
+## 0 · KOŞULACAK KOMUT — tam olarak bu
+
+```bash
+cd <ana depo ya da worktree kökü>
+graphify extract . --code-only      # ÖN ŞART, aşağıda niçin
+graphify install --project --platform claude
+```
+
+⛔**`--strict` VERİLMEYECEK.** Gerekçesi §3'te, Recep'e sunuldu ve kabul edildi.
+
+---
+
+## 1 · ÖN ŞART — grafik olmadan kurulum ÖLÜ gelir
+
+Kancalar grafik dosyası yoksa **hiçbir şey yapmaz** (`cli.py:814-832`, fail-open: hata ya da
+eşleşmeyen çağrı = çıktı yok, exit 0). Yani `install` tek başına koşarsa araç kurulu görünür
+ama hiç çalışmaz — bugün konuştuğumuz "atıl araç" durumunun aynısı doğar.
+
+`graphify extract . --code-only` ölçülmüş maliyeti (REC-313, 2026-09-13): **56,3 sn**,
+16 işçi paralel AST, **0 model çağrısı**, 9.002 düğüm, 17.885 kenar, kenarların
+**%100'ü** `_origin: ast` (LLM payı sıfır).
+
+Çıktı dizini `graphify-out/` **zaten `.gitignore` satır 144'te** — commitlenmiyor, üretilmiş
+artefakt sayılıyor. Yani grafiği **her makinede bir kez** üretmek gerekir; CI'da üretilmediği
+için kancalar CI'da sessiz kalır (fail-open, zarar yok).
+
+---
+
+## 2 · KURULUMUN ÜÇ ETKİSİ — üçü de kaynak kodundan okundu
+
+### 2.1 · Skill dosyası
+
+`.claude/skills/graphify/SKILL.md` + `references/` kopyalanır (`install.py:1624`,
+`_copy_skill_file`). Sonuç: `/graphify` komutu kullanılabilir hâle gelir.
+
+### 2.2 · `CLAUDE.md`'ye marker'lı bölüm — ⚠ **kök CLAUDE.md**
+
+`install.py:1778-1794` (`claude_install`): hedef `project_dir / "CLAUDE.md"`, yani **proje kök
+kural dosyamız.** Yazım şekli `_replace_or_append_section(content, _CLAUDE_MD_MARKER, …)` —
+marker'lı bir bölüm, varsa **değiştirilir**, yoksa **sonuna eklenir.** İçerik
+(`_skill_registration`, `install.py:352-359`) üç satır:
+
+```
+# graphify
+- **graphify** (`<skill yolu>`) - any input to knowledge graph. Trigger: `/graphify`
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+```
+
+⭐**Bu dosya bizim en hassas dosyamız** ve normalde akran isteğiyle düzenlenmez. Buradaki
+yetki **akrandan değil, Recep'in açık onayından** geliyor (yukarıda aynen alıntılı).
+İçerik değişmemişse araç *"already configured … (no change)"* basıp dosyaya dokunmuyor.
+
+### 2.3 · `.claude/settings.json`'a iki `PreToolUse` kancası
+
+`install.py:1806-1830` (`_install_claude_hook`) + `install.py:324-352`
+(`_claude_pretooluse_hooks`):
+
+| matcher | komut | davranış |
+|---|---|---|
+| `Bash\|Grep` | `graphify hook-guard search` | yumuşak dürtme |
+| `Read\|Glob` | `graphify hook-guard read` | yumuşak dürtme |
+
+`--project` verildiği için komut **çıplak** yazılır (`graphify …`, mutlak yol değil) — kodun
+kendi gerekçesi: bu yapılandırma commitlenir ve kuran makinenin yolu başkasında yanlış olur
+(#3129). Bu bizim mutlak-yol alışkanlığımızla çelişir ama burada **doğru olan çıplak ad**.
+
+### ⭐2.4 · MEVCUT KANCALARIMIZ GÜVENDE — ölçüldü, varsayılmadı
+
+Araç yalnız şu koşulu sağlayan girdileri siler (`install.py:1824`): matcher'ı
+`Glob|Grep` · `Bash` · `Bash|Grep` · `Read|Glob` **olan** VE içinde `graphify` kelimesi
+**geçen** girdiler.
+
+Bugün `.claude/settings.json`'daki `PreToolUse` girdileri sayıldı: **2 tane.**
+
+| matcher | içinde "graphify" | sonuç |
+|---|---|---|
+| `Edit\|Write\|MultiEdit` | yok | **korunur** |
+| `Bash` | yok | **korunur** |
+
+İkisi de silme koşulunu sağlamıyor. ⚠Yine de araç `_write_settings_with_backup` ile
+**yedek alıyor** (`install.py:1830`); koşumdan sonra iki girdinin yerinde olduğu
+**tekrar ölçülmeli** — "kod böyle yazıyor" ile "dosyada böyle oldu" ayrı şeylerdir.
+
+---
+
+## 3 · `--strict` NİÇİN VERİLMİYOR
+
+`--strict` ne yapar (`cli.py:55-70`, `cli.py:814-840`, `cli.py:934`): `Read` kancasına
+`--strict` eklenir; oturumun **ilk** ham dosya okuması `permissionDecision: deny` ile
+engellenir ve *"önce `graphify query` koş"* denir.
+
+Sınırları kodda yazılı ve dar: oturum başına **en fazla bir kez**
+(`_mark_session_denied`) · yalnız `Read` (Bash ve Glob dürtme-only kalır, çünkü bileşik
+kabuk komutunun tek ayrıştırılabilir hedefi yok ve dosya listelemeyi bloklamak gezinmeyi
+kilitler) · yalnız **proje içi** + grafikte **indeksli** + **taze** dosya · grafik o dosya
+için bayatsa bloklamıyor, yumuşak dürtmeye düşüyor · kodun kendi yorumu:
+*"can never strand the agent."*
+
+**Yani `--strict` tehlikeli değil.** Verilmemesinin sebebi risk değil, **fayda yokluğu:**
+
+> graphify **yalnız kodu** görüyor. REC-313 ölçümü: **252 SQL dosyasını hiç görmedi.**
+
+2026-09-16'da URUN'un beş geri alınan hükmünün hepsi ya **veritabanı şeması** ya **belge**
+okumamaktan çıktı — ikisi de graphify'ın kapsamı dışında. `--strict` o beş hatanın
+**hiçbirini** engellemezdi; yalnız her oturumda kod okumaya bir tur ek yükleyecekti.
+
+Çevrim içi anahtar var: `GRAPHIFY_HOOK_STRICT=1` ile yeniden kurulum yapmadan açılabilir
+(`cli.py:675-680`). Yani karar geri alınabilir, kalıcı değil.
+
+---
+
+## 4 · BENİMSENMEYECEKLER (REC-313 hükmü, geçerli)
+
+| Kalem | Sebep |
+|---|---|
+| `query` | Beş soruda **0 isabet** (3 yanlış, 2 eksik); başlangıç düğümünü kelime eşlemesiyle seçiyor ve Türkçe yorumlara çarpıyor |
+| `--strict` | §3 — fayda yok, kapsam dışı |
+| `--postgres` | Prod DB'ye dokunuyor; bu şeritte prod yazma yasak |
+
+**Kullanılacak üç komut:** `affected <ad>()` (ikinci, bağımsız "nereye dokunur" görüşü;
+ölçüldü **0,7 sn** ve **DOĞRU**) · `god-nodes` (paylaşılan-primitif riski, bizde karşılığı
+yok) · `diagnose multigraph` (grafik sağlığı).
+
+⚠`affected` **parantez gerektiriyor**: `productRoute` → *"No unique node match"*,
+`productRoute()` → doğru cevap. Bu kullanım bilgisi hiçbir belgede yazılı değil, ölçümle
+bulundu — skill dosyasına eklenmeye değer.
+
+**codegraph'ın yerine değil YANINA.** Sebep tercih değil ölçüm: codegraph birebir kaynak ve
+gerekçe döndürüyor, graphify düğüm adı döndürüyor.
+
+---
+
+## 5 · KOŞUMDAN SONRA YAPILACAKLAR
+
+1. **Ölç, varsayma:** `.claude/settings.json`'da `PreToolUse` girdi sayısı **4** olmalı
+   (bizim 2 + graphify 2) ve `Edit|Write|MultiEdit` ile `Bash` girdileri **yerinde** olmalı.
+2. **`CLAUDE.md` diff'ini gözden geçir** — eklenen bölüm üç satır olmalı, fazlası varsa dur.
+3. **Araç envanteri:** `node scripts/hijyen/arac-envanteri.cjs --yaz`, sonra yeni satırın
+   durum/sahip alanlarını elle doldur (AXIOM 3). Yoksa `INV-ARAC-1` CI'da kırmızı verir.
+4. **Aynı envanter borcu PR #1213'te de var:** `docs/standards/hukum-kaynak-standard.md`
+   ilan edilmemiş; `commit-uyari` kancası söyledi, URUN asmadı ve yazmadı.
+5. **Geri alma yolu hazır:** `graphify uninstall --project` — `CLAUDE.md` bölümünü,
+   skill dosyasını ve kancaları kaldırıyor; `settings.local.json`'ı da temizliyor
+   (`install.py:1832-1845`).
+
+---
+
+## 6 · BU EMRİN SINIRLARI (adıyla)
+
+1. **Kurulum KOŞULMADI.** Buradaki her satır kaynak kodu okumasıdır, koşum sonucu değil.
+   Dosyalarda ne olduğu ancak §5.1 ölçümüyle bilinir.
+2. **`extract` süresi başka makinenin ölçümü** (REC-313, 56,3 sn). Bu makinede yeniden
+   ölçülmedi — B sınıfı kaynak.
+3. **Ağ trafiği dinlenmedi.** REC-313 telemetri taramasını *statik okuma* olarak yaptı ve
+   sınırını adıyla yazdı; bu emir o sınırı devralır.
+4. **`query`'nin 0 isabeti tek koşumluk.** Beş soru, her biri bir kez. Eğilim değil.
+
+İlgili: REC-313 · REC-310
+
+
+---
 # FILE: docs\plans\i18n-jsx-literals-cleanup-2026-06-14.md
 
 # i18n Temizliği — `react/jsx-no-literals` Uyarıları (PLAN)
@@ -25012,6 +30241,363 @@ kural + niçin (`.vercel.app` paylaşılan son ektir) + ölçüm tablosu + kapı
 
 
 ---
+# FILE: docs\plans\rec340-faz1-plan-2026-09-15.md
+
+# REC-340 Faz 1 — Arama motorunun onarımı (PLAN v3, kod yok)
+
+> **DURUM (2026-09-15):** Adım 0 (cetvel) **BİTTİ** — `docs/standards/arama-standard.md`, #1204
+> master'da. Adım 1 (kapı) **BİTTİ** — `INV-SEARCH-BEHAVIOR-1`, ALTYAPI, PR #1208.
+> **Adım 2-3 Recep'in uygulama onayını bekliyor** (migration = prod, kural 13).
+>
+> **Kapı bugün ALTI vaka kırmızı ölçtü, benim beyanım BEŞTİ.** Altıncısı vaka 10
+> (`ISI GERI KAZANIM`): 3 sonuç dönüyor — yani **sıfır değil**, benim "sıfır dönenler" listemde
+> görünmezdi — ama vaka 6 (`ısı geri kazanım`) 9 dönüyor ve ilk satır kimliği farklı, yani
+> **aynı küme değil**. Ölçütün "aynı küme" olması yakaladı, "sıfır değil" olması yakalamazdı.
+> Cetveldeki K5.2 (iki biçimde küçültme) artık teorik kural değil, ölçülmüş kusur.
+>
+> **Kapının mandalı İKİ YÖNLÜ:** ilan edilen kırmızı vaka **geçmeye başlarsa** kapı kırmızı verir
+> ve ilan satırını sildirir. Yani Adım 2 inince vaka 2 ve 10 geçecek ve kapı beni o satırları
+> silmeye **zorlayacak**. Bu bilinçli: tek yönlü olsaydı "bilinen kırmızı" kalıcı kör noktaya
+> dönerdi.
+>
+> **Adım 3'ün sorgu kurucusu `src/lib/search/sorgu-kurucu.ts` yoluna gelecek** — kapının iskelet
+> kolu tam o yolu izliyor ve dosya doğduğunda kırmızı verip "iskeleti gerçek kollarla değiştir"
+> diyecek. Yol değiştirilmeyecek.
+
+**KAYNAK/CETVEL:** cetvel YOK — `docs/standards/arama-standard.md` yazımı bu işin kapsamındadır
+(CLAUDE.md kural 1). **Cetveli URUN yazar** (v1'deki açık kalem kapandı — gerekçe §7).
+İlgili mevcut cetveller: `rendering-cache-standard.md`, `product-schema-standard.md`,
+`category-taxonomy-standard.md`, `denetim-izi-standard.md`.
+**YÖNTEM:** plan-challenger ile iki eksende çürütme (yapıldı) → cetvel → INV-ARAMA-1 →
+migration (kural 13: Recep'in açık onayı şart, şerit merge ETMEZ).
+
+**Ölçüm tarihi:** 2026-09-15, canlı prod DB (SELECT), proje `tnofewwkwlyjsqgwjjga`, PostgreSQL 17.6.
+**v1'den v2'ye:** iki bağımsız çürütme koştu (DB ekseni 8 bulgu, kod/kapı ekseni 12 bulgu).
+İkisi de `CEKINCELI` döndü. **v1'in dört iddiası çürüdü**, aşağıda adlarıyla yazılı.
+
+---
+
+## 1. v1'in ÇÜRÜYEN iddiaları (önce bunlar, çünkü planın temeliydi)
+
+**Ç-1 — "`unaccent` eklentisi kurulu (1.1)" YANLIŞ.** İki ajan da bağımsız ölçtü:
+`pg_available_extensions`'ta `unaccent`, `vector`, `pgroonga`, `fuzzystrmatch` satırlarının
+`installed_version` değeri **NULL**. `pg_extension`'da kurulu olanlar: hypopg, index_advisor,
+pg_cron, pg_net, pg_stat_statements, **pg_trgm 1.6**, pgcrypto, plpgsql, supabase_vault,
+uuid-ossp. `pg_proc`'ta `unaccent` adlı fonksiyon **hiç yok**. Depoda da hiç geçmiyor.
+*Hatanın adı:* `default_version` sütunu "kurulu sürüm" sanıldı — ölçüt doğru, evren yanlış.
+*Sonucu:* Adım 3 bir `CREATE EXTENSION` migration'ı kadar büyüdü, yani **kural 13 kapsamında
+fazladan bir onay kalemi**.
+
+**Ç-2 — "Adım 2: üretilmiş sütun (`search_document tsvector`)" KURULAMAZ.** PostgreSQL'de
+`GENERATED ALWAYS AS` ifadesi yalnız **aynı satırın** sütunlarına bakabilir ve IMMUTABLE olmak
+zorundadır; başka tabloya JOIN yapamaz, tetikle de yazılamaz. Aile adı `product_families`,
+kategori adı `categories` tablosunda; `products`'ın 38 sütununun hepsi `is_generated = NEVER`.
+Yani v1 aynı cümlede hem "üretilmiş sütun" hem "tetikle tazelenir" diyordu — ikisi aynı anda
+mümkün değil. *Sonucu:* ilk migration `ERROR: cannot use column reference in generated
+expression` ile düşerdi.
+
+**Ç-3 — "tam arama 47 sonuç buluyor" iddiası YANLIŞ EVRENDE ölçüldü.** `/[lang]/search`
+rotası **yok**; tek arama yüzeyi `SearchOverlay` (`ssr: false`). Tam arama yalnız Enter
+basıldığında ve öneri listesinden seçim yapılmamışsa koşuyor, üstelik **`limit 20`** ile.
+Ben ölçümü `p_limit=100` ile aldım. Kullanıcının görebileceği üst sınır 20, 47 değil.
+
+**Ç-5 — "müşterinin yarısı sıfır sonuç görüyor" bir ÇIKARIMDI, ölçüm değil.** v1 bunu ölçüm gibi
+yazmıştı. Gerçek kullanıcı sorgu dağılımını bilmiyoruz çünkü **arama günlüğü yok** (Adım 6 zaten
+bu). Doğru cümle: "klavye alışkanlığı yüzünden noktasız yazan her kullanıcı sıfır sonuç görür;
+kaç kişi olduğunu ölçmüyoruz."
+
+**Ç-6 — aile sayımı yanlıştı.** v1 "18 aile adında `fan` geçiyor" diyordu; yeniden sayım **22**
+(toplam 47 aile). Kategori sayısı (10) ve gövde sayımı (66) tuttu. Hükmü değiştirmiyor ama cetvele
+sayı taşınacaksa tazelensin.
+
+**Ç-4 — "vaka 9'u da KS-4 açıklıyor" YANLIŞ.** "aspiratör" kelimesi ürün adında yok ama
+**25 ürünün açıklamasında var** ve mevcut gövde açıklamayı zaten arıyor. Gerçek sebep katı AND:
+`'duvar' & 'tip' & 'aspiratör'` → `duvar`=57, `aspiratör`=25, ikisi birlikte=**2**, üçü
+birlikte=**0**. Bu KS-2'nin vakası, KS-4'ün değil.
+
+## 2. Bugünkü durum — dokuz vaka (düzeltilmiş tablo)
+
+Sayılar iki ajan tarafından bağımsız yeniden üretildi, birebir tuttu.
+
+| # | Sorgu | RPC (limit 100) | Kullanıcının görebildiği (overlay, limit 20) | Öneri kutusu (tavan 4 ürün) |
+|---|---|---|---|---|
+| 1 | `havalandırma` | 47 | 20 | **1** |
+| 2 | `havalandirma` (noktasız) | **0** | **0** | **0** |
+| 3 | `jet fan` | **0** | **0** | **0** |
+| 4 | `fan jet` | **0** | **0** | **0** |
+| 5 | `vortis` (yazım hatası) | **0** | **0** | **0** |
+| 6 | `ısı geri kazanım` | 9 | 9 | **0** |
+| 7 | `VRT-17160` (SKU) | 1 | 1 | 1 ✔ |
+| 8 | `kanal tipi fan` | 52 | 20 | **1** |
+| 9 | `duvar tipi aspiratör` | **0** | **0** | **0** |
+
+**Öneri kutusu hakkında düzeltme:** kutunun az satır göstermesi tek başına kusur değil —
+`get_search_suggestions` tasarımı gereği en çok 4 ürün + 2 kategori + 2 marka döndürüyor.
+Kusur, kutunun baktığı **evrenin dar** olması (yalnız ad/SKU/model/marka, sıralı ILIKE).
+
+## 3. Kök sebepler (düzeltilmiş, yedi tane)
+
+**KS-1 — Türkçe karakter körlüğü.** Hiçbir yolda normalizasyon yok. `havalandirma` 0.
+*Eklenti kurulu değil — kurulum ayrı kalem (Ç-1).*
+
+**KS-2 — Çok kelimeli sorgu İKİ ayrı mekanizmadan çöküyor.** v1 bunu tek sebep sanıyordu.
+(a) `plainto_tsquery('turkish','jet fan')` → `'jet' & 'fan'` katı AND. `websearch_to_tsquery`
+de aynı sonucu veriyor — "websearch'e geçince OR gelir" varsayımı ölçümle çürütüldü.
+(b) ILIKE dalı `replace(v_raw,' ','%')` kullanıyor, yani **sıra duyarlı**: `'jet fan'` →
+`'%jet%fan%'`; `'fan jet'` eşleşmez. Vaka 3 ve 4'ün ayrı satır olmasının sebebi bu.
+İki dal birlikte yeniden yazılmazsa "düzelttik" beyanı ölçüsüz kalır.
+
+**KS-3 — Yazım hatası toleransı yok.** `pg_trgm` kurulu ve `idx_products_name_trgm` /
+`idx_products_brand_trgm` var, ama RPC yalnız `ILIKE '%...%'` kullanıyor. `vortis` → 0.
+*Ölçülen iki tuzak:* (a) trgm indeksini tetikleyen **`%` operatörüdür**, `similarity() > eşik`
+yazımı indeksi hiç kullanmaz (EXPLAIN ile `enable_seqscan=off` altında doğrulandı);
+(b) birleştirilmiş metin üzerinde mevcut tek-sütun indeksleri **kullanılamaz**.
+(c) Eşik için doğru fonksiyon `word_similarity`: `similarity('Vortice Vort Penta','vortis')`
+= 0,294 ama `word_similarity` aynı çiftte **0,714**. Yanlış fonksiyonla ölçülen eşik yanlış eşiktir.
+
+**KS-4 — Arama gövdesi ürünün kimliğini taşımıyor (doğrulandı, çürütülemedi).**
+Canlı `fts_search_products` gövdesi: `name, model_code, sku, brand, description_i18n->>'tr',
+technical_specs::text`. **Aile adı ve kategori adı yok.** Canlı tanım dosyayla birebir aynı,
+drift yok. `technical_specs::text` içinde "fan" geçen ürün **0**. Tam gövdede 'jet' ve 'fan'
+birlikte geçen ürün **0**.
+
+**KS-6 (YENİ, gstack incelemesi) — Ürün ADININ İngilizcesi hiç aranmıyor.** `products.name_i18n`
+sütunu canlıda **var** ve arama gövdesinde yok. v2 EN eksiğini yalnız `description_i18n->>'en'`
+üzerinden görüyordu; EN kullanıcı için ürün **adı** da kör. Gövde tanımı (Adım 2) ikisini de
+içermezse cetvel ilk günden eksik doğar.
+
+**KS-7 (YENİ, gstack incelemesi) — Hata sessizce "sıfır sonuç"a dönüşüyor.**
+`product.service.ts`'te `getSearchSuggestions` hata dalında `console.error` + `return []` yapıyor.
+Yani RPC çökse bile kullanıcı "sonuç yok" görüyor ve **Adım 6'nın günlüğü yalan söyler** —
+gerçek hata ile gerçek sıfır sonuç ayırt edilemez. Bu kural 14 ihlali ve Adım 6'nın ön şartı.
+Ayrıca aynı ekranda iki farklı hata politikası var: tam arama yolu `setError` çağırıyor, öneri
+yolu yalnız `console.error`. Adım 4 bu asimetriyi de kapatmalı.
+
+**KS-5 — İki RPC aynı ürün evrenini görmüyor.** `get_search_suggestions`'ta
+`deleted_at IS NULL` var, `fts_search_products`'ta **yok**. Bugünkü etkisi sıfır (silinmiş
+aktif ürün 0) ama Adım 4'ün "tek gövde" iddiası bunu kapsamalı.
+
+## 3b. Yapısal borçlar (kusur değil ama cetvele girer)
+
+- **tsvector indeksi yok** → `to_tsvector(...)` dalı her satırda hesaplanıyor. **Düzeltme:**
+  v1 buna "tam tablo taraması" diyordu, eksikti — iki trgm indeksi canlıda **var ve kullanılıyor**
+  (`idx_scan` 1424 ve 121). Yani ILIKE dalı bugün indeksli, yalnız tsvector dalı değil. Tablo
+  1,7 MB; borç gerçek, aciliyet sanıldığından düşük.
+- **Kurulmuş sanılan üç indeks canlıda YOK.** `20250919_fts_search_products.sql` beş indeks
+  yaratıyor (`idx_products_fts_tr`, `..._model_code_trgm`, `..._sku_trgm` dahil); canlıda yalnız
+  ikisi var. Migration ya geri alındı ya hiç uygulanmadı ve **hiçbir kapı görmedi**. "Bozukluk
+  sessiz kaldı" teşhisi sanılandan derin: **indeks varlığı da ölçülmüyor.** Adım 2'nin yeni GIN
+  indeksi için varlık guard'ı şart.
+- **"Hiçbir kapı aramayı ölçmüyor" cümlesi yanlıştı.** `INV-SEARCH-ROUTE-1` aramanın dil-güvenli
+  gezinme tarafını ölçüyor. Doğru cümle: arama **davranışını** (ne bulduğunu) ölçen kapı yok.
+- **Arama RPC'si iki değil ÜÇ.** `admin_search_products` da var; admin yüzeyi bu planın konusu
+  değil ama cetvel bunu bilmeli.
+- **441 üründen 254'ünün açıklaması boş.** Faz 2'nin gömme metni bundan besleneceği için KS-4'ün
+  düzeltmesi Faz 2'nin de ön şartı. Doldurma işi katalog şeridinin.
+- **İstemci gecikmesi yeniden tartılmalı.** Bugün tuş başına 200 ms bekleyip sorgu atılıyor ve
+  ILIKE ucuz. Adım 3'ten sonra her tuş vuruşu tsquery + (eşleşme yoksa) benzerlik taraması
+  tetikleyebilir; yedek yol tam da **yarıda kalmış sorgularda** devreye girer, yani en sık
+  durumda. Yedeği yalnız tam arama tarafında koşturmak kutuda koşturmaktan ucuz.
+
+## 4. Adım 2'nin gerçek etkisi — SİMÜLE EDİLDİ (v1'de yoktu)
+
+Aile adı + `name_i18n` (TR/EN) + kategori adı + üst kategori adı gövdeye eklenmiş hâliyle,
+441 aktif ürün üzerinde:
+
+| Vaka | Bugün | Adım 2 sonrası | Yorum |
+|---|---|---|---|
+| `jet fan` | 0 | **61** | düzeliyor |
+| `havalandirma` (unaccent taklidi) | 0 | **50** | düzeliyor |
+| `kanal tipi fan` | 52 | 59 | iyileşiyor |
+| `ısı geri kazanım` | 9 | **9** | **kıpırdamıyor** |
+| `duvar tipi aspiratör` | 0 | **0** | **kıpırdamıyor** |
+
+**İki ders.** (1) Adım 2 tek başına da vakaların hepsini kurtarmıyor — iki vaka ancak Adım 3'ün
+AND gevşetmesiyle düzelir. v1 bunun simetriğini yazmamıştı. (2) `jet fan` 0 → 61 sıçraması bir
+**hassasiyet riski**: kategori adı gövdeye girince "Fan" kategorisindeki her şey her sorguya
+karışabilir. Kapı yalnız alt sınır değil **üst sınır** da ölçmeli, yoksa sıfır-sonuç sorununu
+alakasız-sonuç sorununa çevirmiş oluruz.
+
+## 5. Adımlar (yeniden yazıldı)
+
+**Adım 0 — Cetvel.** `docs/standards/arama-standard.md`, URUN yazar. İçerik: aranan **alan**
+kümesi ve aranan **satır** kümesi (status + deleted_at + tenant) SSOT olarak · sorgu
+normalizasyonu · çok kelimeli sorgu semantiği · yazım hatası eşiği ve hangi fonksiyonla
+ölçüldüğü · sıralama ölçütü · öneri kutusu ile tam aramanın ilişkisi · her yeni alanın kapıya
+bağlanma zorunluluğu · şema-nitelikli çağrı kuralı (§6) · tenant kuralı (§6).
+
+**Adım 1 — INV-ARAMA-1, iki katmanlı.** v1 "tablo test olur" diyordu; nerede koşacağı yazılı
+değildi, bu yüzden CI'da sahte yeşil verirdi (`ci.yml` vitest'i `https://dummy.supabase.co` ile
+koşuyor). Doğrusu:
+- **Katman A (her PR):** sorgu kurucusunun semantiği saf fonksiyon olarak, fikstürle. Canlı DB
+  gerekmez.
+- **Katman B (canlı):** `db-advisor.yml`'e yeni iş, `db-gate-precheck.outputs.ready` koşuluna
+  bağlı, psql ile dokuz vakayı RPC üzerinden çağırır. Emsal `catalog-integrity` (INV-CATALOG-1) —
+  "ATLANMIS IS YESIL DEGILDIR" uyarısı dahil birebir kopyalanır.
+
+**İddialar sabit sayıya bağlanmaz** (katalog şeridi her gün ürün ekliyor; "havalandırma = 47"
+yarın sahte kırmızı yakar). Bunun yerine:
+- `havalandirma` sonucu `havalandırma` sonucunun **en az %90'ı** olmalı (oran, veri büyümesinden
+  etkilenmez).
+- `jet fan` ve `fan jet` **aynı kümeyi** dönmeli ve `> 0` (sıra bağımsızlığı).
+- `vortis` sonuçları arasında markası `Vortice` olan **en az 1** satır bulunmalı.
+- `VRT-17160` → sonuç listesinin **ilk satırı** o SKU olmalı.
+- `duvar tipi aspiratör` → `> 0`.
+- Öneri kutusu ile tam arama **aynı ilk ürünü** vermeli (Adım 4'ün gerçek kanıtı).
+- **Üst sınır:** hiçbir vaka aktif ürünlerin **%40'ından fazlasını** döndürmemeli (hassasiyet).
+- **REGRESYON (gstack incelemesi, tartışmaya kapalı):** vaka 7 (`VRT-17160`) bugün **kusursuz**
+  çalışıyor — tam 1 sonuç. Adım 3'ün yazım hatası yedeği benzer SKU'ları çekerek bunu bozabilir.
+  "Vaka 7 hâlâ tam olarak 1 sonuç döndürür" kapıya yazılır. Çalışan bir davranışı değiştiren her
+  değişiklik regresyon testi ister.
+- **Türkçe küçültme** hiçbir vakada ölçülmüyordu. `I/ı` ve `İ/i` ayrımı `lower()` ile TR yerel
+  ayarı olmadan yanlış çalışır — Faz 0'da tam bu yüzden bir kapı kör kalmıştı ("AI-powered"
+  metni `ai-powered` terimiyle eşleşmiyordu). En az iki vaka eklenir: `ISI GERI KAZANIM` ve `İSİ`.
+- **Tetik tazeliği:** aile adı değişince gövde tazelendi mi — Adım 2'nin ilanı bu; kapı ölçmezse
+  ilan bedavaya yazılmış olur.
+- **`display_price` korunumu (INV-PRICE-1):** Adım 4'te ortak gövdeye geçerken ham `price`'a geri
+  dönme riski var; emsal guard mevcut, kapıya yazılır.
+- **Kapı adı:** depoda zaten `INV-SEARCH-ROUTE-1` var. Aynı alanda biri Türkçe biri İngilizce iki
+  kapı ailesi taşımamak için ad mevcut aileyle hizalanır. Bedeli bugün sıfır, sonra pahalı.
+
+**Adım 2 — Arama gövdesini onar (KS-4 + KS-6), YAPI DEĞİŞTİ.**
+Gövdeye girecek alan kümesi (cetvelde SSOT olarak yazılır): `name` + **`name_i18n` (TR/EN)** +
+`model_code` + `sku` + `brand` + `description_i18n` (**TR ve EN**) + `technical_specs` +
+**aile adı (TR/EN)** + **kategori adı + üst kategori adı**. Yapı olarak üretilmiş sütun değil:
+**normal `tsvector` sütunu + kuyruk ile tazeleme.** Gerekçe Ç-2.
+Tetik tasarımı v1'de tehlikeliydi: `products` üzerinde zaten `on_products_change` var ve her
+satırda Vault'tan sır okuyup `net.http_post` atıyor; en kalabalık kategoride **361 ürün** var,
+yani tek bir kategori yeniden adlandırma **361 webhook POST'u** ve 361 `updated_at` bump'ı
+üretirdi. Üstelik kategori yeniden adlandırmanın vitrin tazelemesi **zaten var**
+(`on_categories_change` → handler'ın `categories` dalı), yani yeni tetik render'a hiçbir şey
+eklemez, yalnız gürültü ekler.
+Doğrusu: `search_reindex_queue` tablosuna aile/kategori id yazılır, `pg_cron` ile toplu
+`UPDATE ... WHERE id IN (...)` koşar, o toplu yazma sırasında products webhook tetiği atlanır.
+Tetiklere `WHEN (OLD.name IS DISTINCT FROM NEW.name)` koşulu konur.
+**Denetim izi:** türetilmiş sütun yazımı `admin_audit_log`'a girmez; izi tetikleyen KAYNAK
+değişikliktir (kategori/aile adı) ve o zaten `denetim_izi_categories` / `_product_families` ile
+kayıtlı. Bu karar cetvele **yazılır**, hatırlanmaz.
+**`rendering-cache-standard.md` atfı v1'de yanlıştı:** arama sonucu statik yüzeyde görünmüyor
+(overlay, `ssr:false`, rota yok), o yüzden "statik vitrinde görünen her tablo" kuralı arama
+sütununa uygulanmaz.
+
+**Adım 3 — Sorgu yolunu onar (KS-1/2/3).** Üç kalem:
+(a) **`CREATE EXTENSION unaccent`** — ayrı migration kalemi (Ç-1). Kurulduğu anda ilk iş
+`select proname, provolatile from pg_proc where proname='unaccent'` ölçümü ve sonucun migration
+guard'ına yazılması. STABLE çıkarsa `f_unaccent(text)` IMMUTABLE sarmalayıcı planın kalemi olur,
+sürprizi değil.
+(b) **Çok kelimeli sorgu:** iki dal birlikte yeniden yazılır (tsquery semantiği + sıralı ILIKE).
+(c) **Yazım hatası yedeği:** `%` / `word_similarity` operatörleriyle ve **yeni bir GIN trgm
+indeksiyle metin sütununun kendisi üzerinde**. Adım 2'nin sütunu iki indeks taşır: GIN tsvector
++ GIN trgm.
+
+**Adım 4 — İki RPC ORTAK GÖVDEYE bağlanır, imzalar KORUNUR.** v1 "tek gövde" derken imza
+birleştirmesi ima ediyordu; `RETURNS TABLE` değişikliği `drop` + `create` gerektirir, yani
+fazladan migration ve yetki kaybı riski. Doğrusu: ortak `search_document` + ortak yardımcı
+fonksiyon, **iki ayrı RPC imzası korunur**. Kabul ölçütüne "iki yol aynı WHERE evrenini kullanır"
+iddiası eklenir (KS-5; sıkı olan, yani `deleted_at` dahil olan seçilir).
+**Üç şey daha bu adıma ait:** (a) istemcideki hata asimetrisi kapatılır — öneri yolu da kullanıcıya
+hata gösterir, sessiz `[]` döndürmez (KS-7); (b) `display_price` korunumu guard'a yazılır, ortak
+gövdeye geçerken ham `price`'a dönme riski var (INV-PRICE-1); (c) dönüş tipindeki `family_slug` ve
+`cover_image_path` **daraltılmaz** — arama sonucunun ürüne gidebilmesi ve kapak görselini
+gösterebilmesi bunlara bağlı.
+
+**Adım 5 — A/B ölçümü — FAZ 1'DEN ÇIKARILDI (hüküm, 2026-09-15).** `pgroonga` canlıda kurulu
+değil; kurulumu kural 13 kapsamında prod'a otomatik uygulanan bir DDL ve geri alması kolay değil.
+Bir karşılaştırma ölçümü için prod şemasına üçüncü parti tam-metin motoru kurmak Faz 1'in risk
+bütçesini kat kat aşıyor, üstelik dokuz vakanın **hiçbirini** kurtarmıyor.
+**Ayrı kayıt açıldı: REC-346** — Faz 1 merge'ünden SONRA, gölge DB'de koşar; prod kurulumu
+Recep'in merge'üne bağlıdır.
+
+**Adım 6 — Arama günlüğü. ÖN ŞARTI VAR.** Hangi sorgu sıfır sonuç döndürdü, kaydedilir.
+**Önce KS-7 düzeltilir** — hata yolu sessiz `[]` döndürdüğü sürece günlük hatayı "sıfır sonuç"
+diye kaydeder ve "düzeldi mi" sorusu yine ölçülemez. Günlük yazma yüzeyi anonim kullanıcıya
+açılacağı için RLS ve kötüye kullanım sınırı cetvele yazılır.
+
+**Adım 7 (YENİ — Recep kararı 2026-09-15) — Arama sonuç sayfası.** Bugün yok; tek yüzey
+`SearchOverlay` ve `limit 20`. Açılacak sayfa: kendi adresi (`/[lang]/arama?q=...`, TR/EN slug
+`useLocalizedRoutes` ile), bütün sonuçlar, marka ve kategori filtresi, sayfalama, kanonik +
+hreflang. Kural 4 gereği RSC; `q` bir arama parametresi olduğu için rota sınıfı ve önbellek
+davranışı **ölçümle** belirlenir (kural 5: `useSearchParams` kullanan uç bileşen Suspense ile
+sarılır, sayfa kökü değil — REC-59'da ölçülmüş emsal var). Sıra: Adım 3 bittikten sonra, çünkü
+bozuk bir motorun sonuçlarını sayfalamak işe yaramaz.
+
+## 6. Güvenlik ve kural kapsamı (v1'de HİÇ YOKTU)
+
+**Tenant (kural 12) — bugün delik yok, ölçüldü.** `products.tenant_id` **var**;
+`relrowsecurity = true` (products, categories, product_families); `prod_public_read_opt` SELECT
+politikası `tenant_id = (SELECT jwt_tenant_id())`; üç arama RPC'si de `prosecdef = false`, yani
+**SECURITY INVOKER** — RLS uygulanıyor.
+**İki açık risk, plana adıyla yazılıyor:** (a) Adım 4 performans için `SECURITY DEFINER`'a
+kaydırılırsa tenant filtresi kalmaz; (b) tazeleme fonksiyonu `SECURITY DEFINER` yazılırsa
+(tetiklerde yaygın) kategori/aile adını RLS'siz okur ve **başka tenant'ın metnini kalıcı olarak
+ürün satırına gömer** — geri alınamayan bir sızıntı sınıfı.
+**Kural:** arama RPC'leri SECURITY INVOKER kalır; tazeleme tenant sınırını aşan JOIN yapamaz
+(`WHERE c.tenant_id = p.tenant_id`); kapıya `prosecdef = false` iddiası eklenir.
+
+**`search_path` tuzağı (sinsi).** Her iki RPC de `SET search_path TO 'pg_catalog','public'`
+taşıyor; `pg_trgm` ise `extensions` şemasında. Bu search_path altında
+`similarity('Vortice','vortis')` → `ERROR 42883: function similarity(unknown, unknown) does not
+exist` (canlıda üretildi). Aynısı kurulduğunda `unaccent` için de geçerli olacak.
+Migration `CREATE OR REPLACE` aşamasında **hata vermez** (plpgsql gövdesi geç bağlanır), yalnız
+çalışma anında patlar. Çözüm: ya şema-nitelikli çağrı (`extensions.unaccent`,
+`operator(extensions.%)`) ya da search_path'e `extensions` eklemek. İkincisi güvenlik
+denetimlerinde geri adım sayılabilir — **yapısal karar, pakete gömülmez.**
+
+## 7. Cetvel sahipliği — açık kalem KAPANDI
+
+v1 "docs/standards ALTYAPI'nın claim'inde" diye açık bırakmıştı. Ölçüm: `docs/standards/*.md`
+dosyalarını ekleyen commit'lerin şerit öneki sayıldığında **URUN 11, ALTYAPI 6, OPS 3**
+(kalanı şerit öneki öncesi dönem). URUN'un kendi konu cetvellerini kendisi yazdığı örnekler:
+`kategori-adlandirma-standard.md`, `i18n-ters-yon-standard.md`, `aile-metni-sayisal-standard.md`,
+`katalog-sayim-standard.md`, `urun-yapisal-veri-standard.md`. Depoda `docs/standards`'ı bir
+şeride bağlayan makine-okur claim dosyası bulunamadı.
+**Hüküm:** konu sahibi yazar; claim dizin değil **dosya** düzeyindedir. `arama-standard.md`'yi
+URUN yazar, ALTYAPI'ya bilgi notu geçilir (onay değil).
+**OPS teyit etti (2026-09-15): itiraz yok, bilgi notu yeterli.** Kalem kapandı.
+
+## 8. Recep'e gidecek yapısal kararlar (pakete gömülmez, tek tek sorulur)
+
+1. ~~**Arama sonuç sayfası açılacak mı?**~~ **KARAR VERİLDİ (Recep, 2026-09-15): EVET, açılacak.**
+   Kendi adresi olan tam sonuç sayfası: bütün sonuçlar, marka/kategori filtresi, sayfalama,
+   Google'ın görebildiği bir yüzey. Bu Adım 7 olarak plana girdi (§5). URL şeması ve sayfanın
+   `dynamic`/`revalidate` sınıfı ayrı ölçümle belirlenir (kural 4-5, `rendering-cache-standard`).
+2. **`search_path`'e `extensions` eklensin mi, yoksa her çağrı şema-nitelikli mi yazılsın?**
+   Birincisi kolay, güvenlik denetimlerinde geri adım sayılabilir.
+3. ~~**Faz 2 gömme boyutu.**~~ **KARAR GEREKMİYOR — olgu araştırıldı, çözüldü (2026-09-15).**
+   Sorun şuydu: Qwen `qwen3-embedding-8b` doğal olarak **4096 boyut** üretiyor; pgvector indeks
+   sınırları `vector` 2000 / `halfvec` 4000, yani 4096'lık vektör saklanabilir ama
+   **indekslenemez** (her benzerlik sorgusu tam tarama).
+   **Çözüm:** Qwen3-Embedding ailesi **Matryoshka (MRL) ile eğitilmiş** — üretici belgesi
+   32 ile 4096 arasında herhangi bir boyutu destekliyor, ve vektörü kesip yeniden normalize etmek
+   bu yüzden meşru bir işlem, kalite kaybı kabul edilebilir sınırda.
+   **Hüküm:** Recep'in kararı 6 (Qwen) **aynen durur**; Faz 2'de gömme boyutu **≤ 2000** seçilir
+   ve `vector(N)` üzerinde HNSW indekslenir. Hangi boyutun (1024 mü, 2000 mü) yeterli olduğu bir
+   **ölçüm** sorusudur, tercih değil — Faz 2'de aynı fikstürle ölçülür.
+   Kaynak: [Qwen3-Embedding (QwenLM)](https://github.com/QwenLM/Qwen3-Embedding) ·
+   [Qwen3-Embedding-8B (Hugging Face)](https://huggingface.co/Qwen/Qwen3-Embedding-8B)
+
+## 9. Kapı ve onay
+
+Adım 2, 3 ve 5 **migration içerir** → kural 13: master'a merge = prod DB'ye otomatik uygulama.
+Migration'lı PR **yalnız Recep'in açık onayıyla** merge edilir; şerit kendi merge etmez.
+Her migration guard bloğu taşır ve guard **davranış** ölçer (tanım metni okumak yetmez) —
+özellikle `search_path` tuzağı yalnız çalışma anında görüldüğü için.
+
+Faz 2 (anlam bazlı arama) bu plana dahil değildir; Adım 2'nin çıktısı onun ön şartıdır.
+Sohbet/asistan katmanı REC-341'dedir.
+
+## 10. Ölçülemeyenler (ihlal değil, boşluk)
+
+- `unaccent`'in bu veritabanındaki `provolatile` değeri — eklenti kurulu olmadığı için okunamadı.
+  STABLE iddiası PostgreSQL genel davranışına dayanıyor; kurulumdan sonra doğrulanmalı.
+- Generated column reddi canlıda denenmedi (DDL yasak); şema ölçümü + belgelenmiş kısıta dayanıyor.
+  Kesin kanıt için bir Supabase branch'inde tek ALTER denemesi yeterli.
+- pgvector 4096d davranışı canlıda denenmedi; Supabase dokümanına dayanıyor.
+- 361 satırlık toplu tazelemenin kilit süresi — yazma yasak; branch DB'de ölçülmeli, prod'da değil.
+- Öneri kutusunun tarayıcıdaki render'ı ölçülmedi (RPC düzeyinde doğrulandı).
+
+
+---
 # FILE: docs\plans\rec52-whsec-rotasyon-plani-2026-09-06.md
 
 # REC-52 — Supabase webhook sırrı (whsec) rotasyonu: kalan 5 adım Recep'te
@@ -25105,6 +30691,171 @@ sipariş/stok tetikleri durur ve bu, kırmızı bir kapı üretmez.
 - Rotasyon penceresi kapandı: `SUPABASE_WEBHOOK_SECRET_NEXT` **silindi**.
 - REC-52 kapanış yorumunda adım-adım zaman damgaları + 401 kanıtı yazılı.
 - Kayıt düzeltmesi yapıldı: *"kod tarafı bitti"* ile *"rotasyon bitti"* bir daha karışmıyor.
+
+
+---
+# FILE: docs\plans\rec59-adim2-anasayfa-statik-2026-09-09.md
+
+# REC-59 Adım 2 — Ana sayfa ve ürünler rotası GERÇEKTEN statik olsun (+ REC-297)
+
+**Tarih:** 2026-09-09 · **Şerit:** URUN (4a8eaf9c) · **Durum:** PLAN, onay bekliyor
+
+## KAYNAK / CETVEL
+
+- **Yöneten cetvel:** `docs/standards/rendering-cache-standard.md` (REC-59 kaydının kendisi bu
+  cetveli adıyla veriyor). Ek: `CLAUDE.md` kural 4 (RSC öncelikli), kural 5 (Suspense sınırı
+  yalnız uç bileşeni sarar), kural 12 (`tenantId` önbellek anahtarında).
+- **İkinci kayıt:** ~~REC-297 aynı PR'a alınıyor~~ → **BU CÜMLE BAYAT. REC-297 AYRI ve ÖNCE
+  yapıldı** (D2): PR #1153, merge 2026-09-09 09:57Z. Ayrı tutma hükmü benimdi, OPS önce
+  birleştirmişti, sonra çürütmede kendi hükmünü geri aldı. Bu plan artık **yalnız REC-59
+  Adım 2**'yi kapsar.
+- **Birlikte okunacak:** REC-128.
+
+### ⭐DAYANAK KARAR — atfı DÜZELTTİM (kendim okuyarak)
+
+OPS bu işi *"K10 mimari kararı, 09-08"* diye dayandırdı ve ben o belgeyi okumadan
+kabul etmemiştim. Okudum: **atıf yanlış, hüküm doğru.**
+
+- `docs/audits/karar-kayit-bagi-vitrin-15a-2026-09-07.md:39` → **K10 = "Liste ve
+  karşılaştırma — Ekran 11" (2026-09-04), bağlı kayıt REC-197.** Render/statik ile ilgisi
+  yok. (`K10` deposu genelinde ÜÇ ayrı konuda kullanılmış — Nicotra basınç kararı, bu, ve
+  satınalma belgeleri. Ad ölçüt değildir.)
+- **Gerçek dayanak** `docs/proje-takip/design/belge/kararlar-vitrin-15a-2026-09-04.md:102-103`,
+  Recep'in 2026-09-04 tarihli **numarasız** kararı, kaydın kendi dilinde "Adım B":
+  - **B/1 (satır 102):** *"kiracı çözümü derleme anında sabit; `getTenantConfig` istek başlığı
+    okumaz; çok kiracılı yetenek kodda kalır, kapalı. Hedef: ana sayfa önceden üretilir."*
+  - **B/2 (satır 103):** *"1. sayfa statik, `?page=N` ayrı dinamik yol, **adres değişmez**."*
+
+Sonuç: Recep'e yeni yapısal soru GİTMEZ — karar zaten verilmiş. OPS'un hükmü ayakta,
+yalnız gerekçesi başka bir belgeye aitti.
+
+### ⚠BU OKUMA PLANA EKSİK BİR ŞART GETİRDİ
+
+Kararın B/2 maddesi **"adres değişmez"** diyor; benim ilk taslağımda bu şart YOKTU.
+Yani sayfalamayı uç bileşene indirirken `?page=N` adres biçimi korunacak — `/products/2`
+gibi bir yola geçmek KARARA AYKIRI olurdu ve ilk taslağım bunu yasaklamıyordu.
+Ölçüt: mevcut `?page=N` adresleri merge sonrası aynı içeriği vermeye devam eder.
+
+## 1 · BUGÜN ÖLÇÜLEN DURUM (08-24 notuna DEĞİL, 09-09 ölçümüne dayanır)
+
+Canlı `X-Vercel-Cache` + `Cache-Control`, 2026-09-09 ~09:1xZ:
+
+| Rota | Cache-Control | X-Vercel-Cache | Hüküm |
+|---|---|---|---|
+| `/tr` | `private, no-cache, no-store` | MISS | **İSTEK BAŞINA** |
+| `/tr/products` | `private, no-cache, no-store` | MISS | **İSTEK BAŞINA** |
+| `/tr/category/fanlar` | `public, max-age=0, must-revalidate` | **HIT** | statik/ISR ✔ |
+
+Kategori rotası PR #1136 ile çözülmüştü; **çözümün deseni depoda hazır** ve
+`category/[categorySlug]/page.tsx:208`'de gerekçesiyle yazılı: *"DERLEME SABİTİ, `headers()`
+DEĞİL"*.
+
+## 2 · KÖK SEBEP (ölçüldü, tahmin değil)
+
+| Rota | Sebep | Kanıt |
+|---|---|---|
+| `/tr` | `await getTenantConfig()` | `src/app/[lang]/page.tsx:120` → `src/utils/tenantServer.ts:51` `await headers()` |
+| `/tr/products` | **İKİ** sebep: aynı `getTenantConfig()` **ve** gövdede `searchParams` | `products/page.tsx:85` ve `:77-83` |
+
+⚠**İki sebep ayrı ayrı yeterlidir.** Yalnız birini kaldırmak rotayı statik YAPMAZ; ürünler
+rotasında ikisi de kalkmadan ölçüm yeşile dönmez. (Bugünün dersi: "iş kırmızı" demek yetmez,
+hangi ADIM sorulur.)
+
+## 3 · YAPILACAK
+
+1. **`/tr` — tenant kimliği derleme sabitine.** Kategori rotasındaki desen aynen uygulanır.
+   `headers()` okumak RSC render yolundan çıkar; çok-kiracı gerekirse kiracı başına ayrı
+   yayın olur (kural 12 bozulmaz, cetvelin kendi hükmü bu).
+2. **`/tr/products` — aynı sabit + sayfa-1 statik deseni.** `searchParams` gövdeden çıkar;
+   sayfa 1 statik üretilir, sayfalama uç bileşene iner ve `<Suspense>` **yalnız o ucu** sarar
+   (kural 5 — sınır sayfa köküne konursa sunucu gövdeyi boş verir, 09-05'te ölçüldü).
+   ⛔**ADRES DEĞİŞMEZ** (Recep kararı B/2): `?page=N` biçimi korunur; yol-tabanlı sayfalamaya
+   (`/products/2`) GEÇİLMEZ. Merge sonrası mevcut `?page=N` adresleri aynı içeriği verir.
+3. ~~**REC-297 — `select` kolon listesi daraltılır.**~~ **BİTTİ, AYRI PR'DA** (#1153, 09:57Z).
+   Aşağıdaki tuzak notu KAYIT olarak kalıyor çünkü doğru çıktı ve uygulanışını yönetti;
+   ayrıca birim testi değişmezi daralttırdı (ayrıntı PR #1153 gövdesinde).
+
+   <details><summary>özgün madde (arşiv)</summary>
+
+   **REC-297 — `select` kolon listesi daraltılır.** `CATEGORY_COLUMNS` (`preload.ts:69`) ve
+   kategori sayfasındaki eşi (`page.tsx:232`) emekli `marketing_title`'ı taşımayı bırakır.
+   ⚠**Tuzak, önceden ölçüldü:** `type-converters.ts:42` hâlâ
+   `marketing_title: String(dbCat.marketing_title || dbCat.name || '')` yazıyor ve
+   `page.tsx:253` alanı eşliyor — kolon listesinden çıkarmak bu iki yeri **kırar**. Sıra:
+   önce okuyucular, sonra kolon. Admin yüzeylerine (`CategoriesTableBody`,
+   `CategoryBuilderView`, `ProductFormModal`) **DOKUNULMAZ** — orası veriyi yönetim için
+   okur, vitrin değil.
+
+   </details>
+
+## 3.5 · TAZELENME BORCU — ÖLÇÜLDÜ, ADIYLA YAZILIYOR (D1)
+
+Cetvelin hükmü: *statik vitrin sayfasında görünen HER tablonun DB tetiği + webhook handler
+dalı olmalı; yoksa veri değişir, sayfa değişmez ve hiçbir test görmez.* Ana sayfa ve ürünler
+rotası statiğe geçtiğinde bu hüküm onlara da bağlanır — o yüzden **"borç doğmuyor" demek
+ölçümsüz kalamazdı.**
+
+Ölçüm ALTYAPI tarafından yapıldı (2026-09-09 ~09:2xZ, prod'dan salt-okuma; ben yeniden
+ölçmedim, OPS öyle yönlendirdi):
+
+| Tablo | webhook tetiği | handler dalı |
+|---|---|---|
+| products · categories · product_families · product_images · brands | VAR | VAR |
+| product_prices · price_lists · inventory_movements | VAR | VAR |
+| **site_settings** | **YOK** | **YOK** |
+
+**TEK BOŞLUK: `site_settings`.** O tablo değişirse statik vitrin hiçbir şey duymaz; yalnız
+`revalidate = 3600` emniyet ağıyla, yani **en geç bir saat sonra** tazelenir.
+
+⚠**Ticari ağırlığı adıyla:** satış kipi anahtarı (fiyat görünürlüğü) `site_settings`'te.
+Yani en pahalı yüzey, tazelenmeyen tek tablonun üstünde duruyor. Bu, `rendering-cache-standard`
+cetvelinin doğduğu arızanın ta kendisidir (1044 fiyat satırı yazıldı, vitrin değişmedi).
+
+**Borç bu PR'a BİNMEZ, kaydı REC-298** (sahibi ALTYAPI): tetik = migration = Recep kapısı,
+handler dalı ise tetiksiz ölü doğar — ikisi aynı anda inmeli. Ters yönde borç YOK: handler'da
+dalı olan her tablonun tetiği var, ölü dal taşınmıyor. (hepsi sabotajla doğrulanır)
+
+| Kapı | Ne ölçer | Sabotaj |
+|---|---|---|
+| `INV-RENDER-*` (mevcut) | yasak liste | — |
+| **YENİ** `INV-ANASAYFA-STATIK-1` (AST) | `/[lang]/page.tsx` ve `products/page.tsx` RSC yolunda `getTenantConfig`/`headers()`/`cookies()` çağırmaz; `searchParams` sayfa gövdesinde okunmaz | her birini tek tek geri koy → ayrı ayrı kırmızı |
+| ~~`INV-MARKETING-YUK-1`~~ | REC-297 ile **indi** (#1153) | — |
+| `pnpm build` | REC-59'un kendi kabul ölçütü: 4 rota Static/ISR, **bailout hedefi 0** | — |
+
+**Kapı AST olacak (D4):** `ts.Node.getText()` yorumları da taşır ve bu iş boyunca dosyalara
+"niçin `headers()` okumuyoruz" diye yazılmış yorumlar girecek. Metin tabanlı bir kapı kendi
+gerekçesini ihlal sayardı — depoda bu tuzağa bir kez düşüldü, bugün ikinci kez az kalsın.
+
+### KABUL — ÜÇ KATMAN, HEPSİ DAMGALI (D4)
+
+⚠**Statik kapı bu işi TEK BAŞINA göremez:** "rota statik mi" sorusunun cevabı `tsc`/`lint`/
+`vitest` çıktısında YOKTUR. Bu yüzden kabul üç katmanlıdır ve üçü de damgayla yazılır
+(koşum kimliği + UTC):
+
+1. **Build:** `pnpm build` çıktısında dört rota Static/ISR, **bailout 0**.
+2. **Canlı:** merge sonrası `/tr` ve `/tr/products` için `X-Vercel-Cache` **HIT**
+   (bugün ikisi de `MISS` + `private, no-store` ölçüldü).
+3. **Webhook:** statiğe geçen rotanın okuduğu bir tabloya yazım sonrası tazelenme kanıtı —
+   `net._http_response` defterinden, isteğimden BAĞIMSIZ satırla. `REVALIDATED` görmek
+   TEK BAŞINA yetmez: `revalidate=3600` dolmuşsa aynı sonucu benim isteğim de üretir
+   (bu ayırt etmeyen ölçümü REC-59'un webhook kaleminde bir kez eledim).
+
+**PAGE_SIZE ölçülecek (D3), varsayılmayacak** — sayfa-1 sınırı koddan okunup plana yazılır.
+**Sayfa 2+ istek başına kalır ve bu KASITLIDIR**, cetvele öyle yazılır.
+
+## 5 · RİSK
+
+- **En büyük risk sessiz:** rota statik görünüp içeriğin bayatlaması. Emniyet ağı `revalidate`
+  zaten var (3600) ve birincil yol webhook. Yeni tablo bağlamıyorum, o yüzden cetvelin
+  "her tablonun tetiği olacak" hükmüne yeni borç doğmuyor.
+- **Ürünler rotası daha riskli:** sayfalama davranışı değişiyor. Sayfa 2+ istek başına kalır;
+  bu KASITLI ve cetvele yazılır.
+- **Migration YOK.** Prod DB'ye yazım YOK.
+
+## 6 · ÖLÇÜM BEYANI
+
+Paket iddiası **sayıyla** yazılacak (bugün "tüm paket" dedim, alt kümeydi ve CI kırmızı
+döndü): dosya sayısı + test sayısı, tam paket.
 
 
 ---
