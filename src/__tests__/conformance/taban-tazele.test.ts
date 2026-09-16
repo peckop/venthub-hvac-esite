@@ -221,7 +221,35 @@ describe('taban-tazele — --force-sync gercekten geciliyor', () => {
   })
 })
 
-describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', () => {
+/**
+ * ⏱BU BLOĞUN ZAMAN AŞIMI AYRIDIR — ÖLÇÜMLE KONDU, TAHMİNLE DEĞİL (2026-09-16).
+ *
+ * OLAY: URUN'un tam takım koşumunda bu dosyadan **iki test düştü**, ikisi de
+ * `Test timed out in 20000ms`. O an makine aynı anda bir `next build` ve bir Docker
+ * Postgres örneği taşıyordu. Aynı dosya tek başına koşturulunca **24/24 geçti**.
+ *
+ * ÖLÇÜM (yüksüz makine, tek dosya): bu bloğun testleri 938–4881 ms sürüyor; düşen
+ * ikisi tam olarak en yavaş ikisi — 4285 ms ve 4881 ms. Yüklü makinede 20 sn'yi
+ * aşmaları, gözlenen yavaşlamanın 4 katı geçtiği anlamına gelir.
+ *
+ * ⭐NİÇİN GENEL AYAR DEĞİL, BU BLOK: `vitest.config.ts` içindeki 20 sn bütün takımı
+ * yönetiyor. Onu yükseltmek, gerçekten ASILI KALAN bir testin de 20 sn yerine bir
+ * dakika beklemesi demek olurdu — yani bir dosyanın kırılganlığı için 900+ testin
+ * teşhis süresi bozulurdu.
+ *
+ * ⭐NİÇİN TESTLERİ HIZLANDIRMAK DEĞİL: bu blok GERÇEK git deposu kurup GERÇEK merge
+ * koşturuyor; yavaşlığı kusur değil, ölçtüğü şeyin bedeli. Zaman aşımının işi hızı
+ * denetlemek değil, ASILI KALMAYI yakalamak.
+ *
+ * ⛔NİÇİN SAHTE KIRMIZI CİDDİ: URUN'un raporu bu sınıfın bedelini gösterdi — o koşumda
+ * çıkış kodu 0 göründü ama sayılar "2 failed" diyordu. Sahte kırmızı, GERÇEK kırmızıyı
+ * görünmez yapar ve bir süre sonra kapı okunmaz olur.
+ *
+ * Tavan 60 sn = ölçülen en yavaş testin ~12 katı. Asılı kalan bir test yine yakalanır.
+ */
+const CANLI_ZAMAN_ASIMI = 60_000
+
+describe('taban-tazele — CANLI DAVRANIS (gercek depo, gercek merge)', { timeout: CANLI_ZAMAN_ASIMI }, () => {
   it('ILAN DISI cakismada DURUR: cikis 2, merge YARIM birakilir, kismi cozum YOK', () => {
     const f = fiksturKur(true)
     const r = f.kos(['--kapisiz'])
