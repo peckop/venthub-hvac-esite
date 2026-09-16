@@ -16,9 +16,10 @@
  * o komutun adını yorumda anmak zorunda. Bu yüzden ölçüm KOD üzerinde yapılır, yorum
  * satırları atılarak. Aynı tuzağa 2026-09-16'da iki kez düşüldü.
  */
-import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+
+import { describe, expect,it } from 'vitest'
 
 const YOL = resolve(process.cwd(), 'scripts/db/golge-kur.mjs')
 const kaynak = (): string => readFileSync(YOL, 'utf8')
