@@ -148,4 +148,118 @@ belirsiz kalır. Bugün zaten yaşadığımız sorun bu: kurulu araç çağrılm
 5. **Commit sayaçları 100'de tavanlı.** "100+" gerçek sayı değil, alt sınır.
 6. **codegraph'ın dil sayısı ölçülmedi** — tabloda boş bırakıldı, tahmin yazılmadı.
 
+---
+
+## 6 · DERİN ÖLÇÜM (aynı gün, 12 ajanlı koşum, 6 eksen + 6 bağımsız çürütme)
+
+**Yöntem:** Workflow — altı eksen paralel tarandı, her bulguyu **reddetmeye çalışan** ayrı bir
+ajan denetledi. 12 ajan · 0 hata · 31 dk · 532 araç çağrısı. Beş bulgu çürütmeden geçti,
+**bir bulgunun gerekçesi düzeltildi.**
+
+### 6.1 · Eksen sonuçları
+
+| Eksen | Önde | Ölçülen fark |
+|---|---|---|
+| **SQL / Postgres** | **graphify** | tek araçta canlı DB introspection VAR |
+| Boyut anatomisi | cbm | ama boyut **paketleme**, yetenek değil (aşağıda) |
+| Olgunluk / bakım | cbm | CI iş akışı **3 vs 22**, sanitizer **0 vs 5** |
+| Gerçek yetenek | cbm | graphify daha **GENİŞ**, cbm daha **DERİN** |
+| Kurulum ayak izi | cbm | cbm **repoya hiç dokunmuyor** |
+| Bizim yığına uyum | cbm | (gerekçesi düzeltildi, §6.5) |
+
+### 6.2 · ⭐SQL — İKİ İDDİA DA KISMEN YANLIŞTI, sebebi TEK SATIR
+
+İki çelişen iddia vardı: URUN *"graphify SQL görmüyor"* · ALTYAPI *"Supabase
+haritalandırması yapılabiliyor"*.
+
+**Sebep `pyproject.toml:87`:** `tree-sitter-sql` graphify'ın **temel bağımlılığı değil**,
+isteğe bağlı bir ekstra. Kurulmazsa `extractors/sql.py:284-286` boş sonuç döndürüyor ve
+**koşum BAŞARILI bitiyor** — yalnız stderr'e uyarı düşüyor (`extract.py:6572-6607`).
+⚠`README.md:342` ise `.sql`'i temel gramerler arasında, **ekstra işareti koymadan** listeliyor.
+**Tuzak tam burada:** REC-313'ün *"252 dosyayı hiç görmedi"* ölçümü **doğruydu**, ama sebebi
+kalıcı bir yetenek sınırı değil **kurulmamış bir pakettir.**
+
+**graphify'ın `.sql` ayrıştırıcısı 720 satır** (`extractors/sql.py`) ve **tipli kenar**
+üretiyor: tablo · view · fonksiyon · trigger · index düğümleri; `references` (FK) ·
+`indexes` · `triggers` · `reads_from` kenarları. `--postgres DSN` ile **canlı DB'den** şema
+çıkarıyor ve **salt okuma zorunlu**: `pg_introspect.py:31`
+`SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE`.
+
+⛔**Üç sınır, hepsi ölçüldü:** (1) **RLS / `CREATE POLICY` HİÇ YOK** — açık dert
+`Graphify-Labs/graphify#3401`, 2026-09-07'den beri **OPEN**. (2) **SÜTUN DÜĞÜMÜ YOK**; canlı DB
+yolu tabloyu `CREATE TABLE x (id INT)` **saplaması** olarak yazıyor, yani sütunu uyduruyor.
+(3) `pg_policy` / `pg_trigger` / `pg_index` sorgusu hiç yok.
+
+⭐**AJAN YENİ BİR HATA ÖLÇTÜ (fikstürle koştu):** PostgreSQL trigger'ında tablo bağı **yanlış**
+kuruluyor. `sql.py:474-481` `keyword_for`'dan sonraki referansı tablo sayıyor; PG sözdiziminde
+(`... ON public.orders FOR EACH ROW EXECUTE FUNCTION public.bump_order()`) bu **fonksiyonun**
+üstüne düşüyor. Koşum `trg_orders -triggers-> public_bump_order` verdi, `public.orders` trigger
+kenarını **hiç almadı**. Kod Firebird/T-SQL'in `CREATE TRIGGER x FOR <tablo>` kalıbına yazılmış.
+
+**cbm tarafı:** `.sql`'i **kutudan çıktığı gibi** görüyor (`src/discover/language.c:263`), grameri
+ikiliğe gömülü (`vendored/grammars/sql/parser.c`, 41,6 MB). ⭐**SÜTUNLAR `Field` düğümü oluyor**
+(`lang_specs.c:690`) — graphify'da karşılığı yok. Üstüne **dbt** desteği var
+(`extract_dbt.c`, `{{ ref() }}` köken izi). **Eksikleri:** FK kenarı yok · trigger/index/policy
+dağıtımı yok · **canlı DB bağlantısı hiç yok** (`libpq`/`PQconnectdb` aramaları 0).
+
+⚠**BENİM BİR ALINTIM KAYNAKTA DOĞRULANMADI:** *"cbm README'si SQL şemalarını indekslemiyor
+diyor"* demiştim. Ajan aradı: `README.md:835` SQL'i **"Good (75-89%)"** çözünürlük kuşağında
+listeliyor, `README.md:779` desteklenen diller satırında `sql` geçiyor, ve SQL'i **dışlayan bir
+cümle bulunamadı.** → karne maddesi.
+
+### 6.3 · Boyut — 54 KAT fark PAKETLEMEDEN geliyor, ÖLÇÜLDÜ
+
+Ajan **aynı 30 grameri** iki paketlemede yan yana ölçtü:
+
+| | cbm (üretilmiş ham `parser.c`) | graphify (PyPI wheel) | oran |
+|---|---:|---:|---:|
+| 30 gramerin toplamı | **425,69 MB** | **7,899 MB** | **54×** |
+| `sql` | 39,70 MB | 0,363 MB | 109× |
+| `fortran` | 34,71 MB | 0,391 MB | 89× |
+| `cpp` | 24,69 MB | 0,301 MB | 82× |
+
+⭐**Recep'in sorusunun cevabı:** boyut **gelişmişlik göstergesi değil**, paketleme tercihidir.
+cbm grameri üretilmiş C kaynağı olarak deposunda tutuyor, graphify aynısını paketten çekiyor.
+(Ajanın kendi sınırı: birinci-parti kod yalnız **bayt** olarak ölçüldü — cbm 33,43 MB `.c/.h`
+vs graphify 3,03 MB `.py`; C Python'dan kalabalık yazıldığı için bu 11 kat **mantık hacmini
+bilinmeyen bir çarpanla abartıyor.**)
+
+### 6.4 · Olgunluk — cbm önde, ama testte graphify önde
+
+| Ölçüt | graphify | cbm |
+|---|---:|---:|
+| Test dosyası | **283** | 256 |
+| Test/kaynak bayt oranı | **1,20** | 0,87 |
+| CI iş akışı / job | 3 / 3 | **22 / 12** |
+| Sanitizer bacağı | 0 | **5** (ASan/UBSan/MSan/LSan/TSan) |
+| **Bloklayan** güvenlik kapısı | **0** | **3** |
+| SHA-pinli action | 0 | **hepsi** |
+| İmzalı release | yok | **18** (cosign) |
+
+⚠graphify'ın `bandit` ve `pip-audit` adımları `ci.yml`'de açıkça `continue-on-error: true` —
+yani **bloklamıyor**. Bizim kendi doktrinimizle (fail-closed) çelişiyor.
+**İkisinde de satır kapsamı ölçülemedi:** hiçbirinin CI'ında kapsam adımı yok.
+
+### 6.5 · Çürütülen bulgu — hüküm kaldı, GEREKÇE düştü
+
+Uyum ekseninde *"cbm `path_alias.h` ile `@/*` takma adını çözüyor"* bir **ayırt edici** olarak
+yazılmıştı. Çürütücü ajan reddetti: **graphify da çözüyor ve daha genişini yapıyor**
+(`extractors/resolution.py:95-174` — `extends` zinciri, JSONC, `baseUrl`, en-yakın-ata).
+⭐**Paylaşılan yetenek kıyasta GEÇMEZ.** Windows ekseni ise birebir doğrulandı: graphify'ın üç
+iş akışı da yalnız `ubuntu-latest`; cbm `windows-latest` + `windows-11-arm` koşuyor.
+
+### 6.6 · ⛔EN ÖNEMLİ SINIR — HİÇBİR ARAÇ KOŞTURULMADI
+
+Altı eksenin **altısı** da aynı sınırı kendi ağzıyla yazdı: görev kuralı kurulumu yasakladığı
+için **tüm ölçüm kaynak kodu okumasıdır.** cbm bu makinede kurulu bile değil.
+
+Dolayısıyla **ölçülmeyenler:** iki aracın VentHub üzerinde ürettiği grafiğin **doğruluğu ve
+recall'ı** · sorgu gecikmesi · kurulumun diskte **önce/sonra diff'i** · ve **isabet** —
+yani aynı soruya hangisinin doğru cevap verdiği.
+
+⭐**Bu yüzden "cbm 4-1 önde" bir KURULUM ve BAKIM hükmüdür, İSABET hükmü değildir.** İsabeti
+ancak yan yana koşum ölçer ve o koşum yapılmadı. graphify'ın `query` komutu 118 bin yıldıza
+ve bu tablodaki iyi sayılara rağmen beş soruda **sıfır** isabet etmişti — bu tablo o dersi
+çürütmüyor, tekrarlıyor.
+
 İlgili: REC-313 · REC-310
