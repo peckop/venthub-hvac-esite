@@ -170,3 +170,27 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 - **CONTEXT.md NotebookLM tarafından üretilir** — "iyileştirme" adına yeniden yazma; not/ilave ekleyebilirsin.
 - Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
   NotebookLM "VentHub Proje Hafızası" defterine (dijital ikiz) yüklenir.
+
+## graphify
+
+Kod yapısı grafiği `graphify-out/` altında (üretilmiş artefakt, `.gitignore`'da — **her makinede
+bir kez** `graphify extract . --code-only`; yoksa kancalar sessiz kalır, fail-open).
+
+> ⚠**BU BÖLÜM ARACIN YAZDIĞI HÂLDEN DEĞİŞTİRİLDİ** (2026-09-16, REC-313 hükmü + Recep onayı).
+> Araç buraya *"For codebase questions, first run `graphify query`"* yazıyordu; **`query` bizde
+> ÖLÇÜLDÜ ve REDDEDİLDİ** (5 soruda 2 yanlış 2 eksik; başlangıç düğümünü kelime eşlemesiyle seçip
+> Türkçe yorumlara çarpıyor). Bir sonraki `graphify install` bu bölümü **geri yazar** — o zaman
+> bu not yeniden konur. Kanıt: `docs/audits/rec313-graphify-deneme-2026-09-13.md`.
+
+- **Kod yapısı sorusunda ÖNCE CodeGraph** (AST, ~1sn taze). graphify **ikinci bağımsız koldur**:
+  CodeGraph bayatlık uyarısı verdiğinde ya da paylaşılan-primitif riski ölçülecekken.
+- **Benimsenen fiiller yalnız üç tane:** `graphify affected "<ad>()"` (etki alanı — ⚠**parantez
+  ZORUNLU**, `productRoute` → *"No unique node match"*, `productRoute()` → doğru cevap; ölçüldü,
+  hiçbir belgede yazılı değil) · `graphify god-nodes` (mimari merkezler) · `graphify explain "<X>"`
+  (bir düğüm ve komşuları). Grafik sağlığı için `graphify diagnose multigraph`.
+- ⛔**`graphify query` KULLANILMAZ** — yukarıdaki gerekçe.
+- ⛔**VERİTABANI SORUSUNA CEVAP VERMEZ** (2026-09-16 ölçümü): SQL eklentisi kurulduktan sonra
+  tabloları görüyor, ama **163 politikanın 1'ini** ve indeksleri **hiç** görmüyor — aracın veri
+  modelinde o nesneler yok, ayarla açılmıyor. Şema sorusu → `docs/database_schema_master.md` +
+  `supabase/baselines/<tarih>_public_schema.sql`.
+- Kod değiştikten sonra `graphify update .` (yalnız AST, model çağrısı yok).
