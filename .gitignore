@@ -76,6 +76,7 @@ mcp_config_for_claude_code.json*
 .agent/scratch/
 .agent/call_graph.json
 scratch/
+scratchpad/
 !scratch/compile_skills.py
 
 # Auto-generated caches
