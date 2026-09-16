@@ -32,6 +32,31 @@
 - **PR #1237 (açık):** `verify-on-stop`'a `vitest related` koşumu + "testsiz değişiklik" sayacı.
   Simülasyon: 2 test dosyası geçti, `layout.tsx` testsiz 1/2. Bloklamaz; bir ay sonra kapı kararı.
 
+## 2.5 · Bu akşam (09-16): WrongStack'ten üç uyarlama — "var mı yok mu" ve plan
+
+Recep'in sorusu: Ersin Koç'un paylaşımındaki üç şey ("hataları yazıldığı anda bul",
+"Proof-Driven Bug Hunter", "testsiz kod geliştirmem") bizde var mı, uyarlanır mı?
+Ölçüm: WrongStack README + klon (`docs/feature-matrix.md`, `docs/slash/chimera.md`,
+`docs/collab-debug.md`) ve bizim `.claude/hooks`, CLAUDE.md, 70 cetvel (`grep`).
+
+| # | Özellik | WrongStack'te | Bizde olan parça | **Var mı?** | Uyarlama planı | Süre | Durum |
+|---|---|---|---|---|---|---|---|
+| 1 | Hatayı yazıldığı anda bul | `test-runner-gate`: düzenlenen dosyanın testini `PostToolUse`'ta koşar (paylaşım bunu Chimera sanıyor; Chimera oturum sonu) | `verify-on-stop` yalnız lint+tsc; test-önce kuralı/sayısı **yok** | **YOKTU** | `verify-on-stop`'a `vitest related` koşumu + "testsiz değişiklik" sayacı; bloklamaz, ölçer; bir ay sonra kapı kararı | yarım gün | **YAPILDI** → PR #1237 |
+| 2 | Chimera (oturum sonu inceleme) | `session.ended`'da değişen dosyalara inceleme ajanı; şiddet sıralı `dosya:satır`; bulgu yaşam döngüsü JSONL (30-90 gün); **pasif**, fixer manuel | `diff-review` (3 kalıp), `code-review` (elle), **PR kapı botu** (onarım commit'i atıyor: PR #1116'da iki kez) | **Kısmen** — PR katmanında bizimki daha güçlü | Kopya gereksiz. Tek eksik parça: bulgu yaşam döngüsü kaydı → `skill-gozlemleri` deseniyle | 1 gün → **öncelik düştü** | Bekliyor (Recep kararı) |
+| 3 | Proof-Driven Bug Hunter | `collab_debug`: BugHunter + RefactorPlanner + Critic paralel, FleetBus, ≤ 20-30 dosya; "proof/kanıt" şartı belgede **yok** | Workflow çürütme pası; 20-eksen "geri gelmesini önleyecek test"; `qa` regresyon testi | **YOK** (tek parça zincir olarak) | `kanit-avcisi` skill'i: kapsam → 3 avcı → **önce başarısız vitest** (kanıt; yazılamıyorsa bulgu düşer) → çürütücü → düzeltici. Kanıt şartı bizim katkımız | 1 gün | **Sırada, yerelde** |
+| — | Testsiz kod yazmam | Kişisel disiplin; zorlayan eklenti yok | Hiçbir kural/kanca/ölçüm yoktu | **YOK** | #1 ile sayı olarak ölçülüyor; kural değil ölçüm (Recep: "sayı düşmezse kapı") | — | #1 kapsıyor |
+| — | Hafıza çapası (bilgi sembole/commit'e bağlı, hash ile yeniden doğrulanır) | SAGE `anchors/` | claude-mem denemesi; defter bayatlık kancası | Kısmen | claude-mem 14. gün kararına bağlı; red olursa `task-observer` gözlemine `dosya + hash` alanı | — | 23 Eylül |
+
+**Yol boyunca düzeltilen hata:** depo okununca "Chimera yazıldığı anda çalışmıyor" ölçümü,
+fikrin değerine yapıştırıldı ve 1 numara geri çekilir gibi oldu. Recep: "reklam repodan
+öndeyse fikri niye saldın?" Doğru: fikir (yazıldığı anda) depodaki uygulamadan iyiydi; #1 tam
+o fikrin bizdeki halidir. Ders §4'te.
+
+**Hüküm (Recep sorusu "gerçekten bize sağlar mı"):** ürün olarak hayır (Claude Code'un
+alternatifi; 18 hook + 71 skill + pano onun üstüne kurulu). Fikir olarak üçü de sağlar; en
+değerlisi #1, ikincisi #3. Tebrik yerinde: tek kişi, tam ajan; ama 191 commit/7 gün ve
+~1,8 M satır tek insanın okuyabileceği hacim değil → **fikir kaynağı, bağımlılık değil**.
+
 ## 3 · Açık işler (sıra Recep'in)
 
 1. **`kanit-avcisi`** skill'i — kapsam ≤ 30 dosya → 3 paralel avcı (mantık, sınır değer, güvenlik)
