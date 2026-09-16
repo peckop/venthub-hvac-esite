@@ -1,6 +1,13 @@
 # Ledger ve Ölü Migration Dosyası Cetveli
 
-**Sürüm 1.1 · 2026-09-15 · Şerit: ALTYAPI · Kaynak: REC-321 (Recep kararı, SEÇENEK 1) + REC-336 (§10)**
+**Sürüm 1.2 · 2026-09-16 · Şerit: ALTYAPI · Kaynak: REC-321 (Recep kararı, SEÇENEK 1) + REC-336 (§10) + REC-352 (§2.1)**
+
+> ⭐**SÜRÜM 1.2 BİR İTİRAZDAN DOĞDU ve yön GENİŞLETMEDİR, daraltma değil.** Recep sordu:
+> *"biz neden cetvel oluşturuyoruz — kendimize sınır koymak için mi, yoksa geliştiricilerin
+> sunduklarını kendimize rehber edinmek için mi?"* Bu cetvel 1.1'e kadar Supabase'in o problem
+> için **ne sunduğunu hiç yazmamıştı** ve hükmü satıcının desteklediği bir yolu yasaklar hâle
+> gelmişti. §2.1 o boşluğu kapatır ve **hepimizi bağlayan genel bir kural** yazar. Eski §3
+> **silinmedi** — mekanizma reddi olarak geçerli, ama artık §2.1 ile okunur.
 
 Bu cetvel şu soruya cevap verir: **prod'a hiç uygulanmamış ama depoda duran bir
 migration dosyası ne olur?** 2026-09-14'e kadar bu sorunun yazılı cevabı **yoktu**;
@@ -33,7 +40,63 @@ migration depodan silinmiş, DB ile repo ayrışmış"* der ve tur **kırmızı*
 → Bu yüzden **"ölü dosyayı sil" kararı, teknik olarak "prod veritabanından satır sil"
 demektir** ve **kural 13 gereği Recep'in kapısıdır.** Bu cetvel o kapıyı gevşetmez.
 
+## 2.1 · ⭐⭐SUPABASE'İN KENDİ YOLU — BU BÖLÜM RECEP'İN İTİRAZINDAN DOĞDU (2026-09-16)
+
+Recep aynen: *"bizim cetvelimiz Supabase'den daha mı iyi biliyor? Ayrıca o cetvel Supabase'den
+esinlenmek zorunda idi. Biz neden standart ve cetvel oluşturuyoruz — kendimize sınır koymak
+için mi, yoksa geliştiricilerin sunduklarını kendimize rehber edinmek için mi?"*
+
+**Haklıydı ve bu cetvel o hatayı yapmıştı.** §3 aşağıda üç yolu reddediyor; ama Supabase'in o
+problem için **ne sunduğu** hiç yazılmamıştı. Cetvel tek bir olaydan (REC-321, beş dosya)
+doğdu, dış pratiğe bakmadı, ve hükmü **satıcının desteklediği bir yolu bize yasaklar** hâle
+geldi.
+
+### ⭐GENEL KURAL — BU CETVELDEN BÜYÜK, HEPİMİZİ BAĞLAR
+
+> **Bir cetvel bir YOLU REDDETMEDEN önce, satıcının o problem için NE SUNDUĞUNU yazmak
+> zorundadır.** Ölçmemişse açıkça *"dış pratik ÖLÇÜLMEDİ"* der ve o hüküm **ENGEL OLARAK
+> KULLANILAMAZ.**
+>
+> Cetvelin meşru alanı **YEREL OLGULARDIR**: bizim boru hattımızda migration'ın master'a merge
+> edilince prod'a **otomatik uygulanması**, deponun **PUBLIC** olması, parite globunun
+> **özyinelemeli olmaması**. Bunları satıcı bilemez.
+>
+> Satıcının **adı konmuş bir fiili** varsa varsayılan **onun yoludur**; cetvelin işi o yolun
+> **ETRAFINDAKİ yerel kısıtı** yazmaktır — yolu yasaklamak değil.
+
+⚠**Niçin tek vakadan büyük:** depoda **78 cetvel** var ve aynı hatanın kaç tanesinde olduğunu
+**bilmiyoruz.** Bu madde o taramanın ölçütüdür.
+
+### Supabase ne sunuyor — ölçüldü (`docs/audits/rec352-dis-pratik-2026-09-16.md`)
+
+| Fiil | Ne yapar | Bizim kısıtımız (HÜKÜM DEĞİL, KISIT) |
+|---|---|---|
+| **`migration squash`** | Geçmişi **tek dosyaya indirir**. Bayraklar: `--version` · `--local` · `--linked` · `--db-url` | ⛔**`--linked` BAĞLI PROJENİN defterine yazar** = prod yazması = **CLAUDE.md kural 13**, Recep'in kapısı. `--local` serbesttir. |
+| **`migration repair <sürüm> --status applied\|reverted`** | Defter tablosunu **onarır** | REC-321'de aynı işi **elle yazılmış bir migration ile** yaptık. Onların fiili daha dar ve niyeti açık; bir sonraki vakada **önce bu düşünülür.** |
+| **`db diff`** | İki durum arasındaki farkı üretir | Drift ölçümü için kullanılabilir; şema **üretmek** için kullanılmaz (bu proje imperative). |
+| **Declarative schemas** (`supabase/schemas` + `db diff`) | İstenen son hâli yazarsın, migration **üretilir** | ⛔**BİZE UYGUN DEĞİL** ve gerekçe **onların kendi belgesi**: `migra` `alter policy`'yi, kolon ayrıcalıklarını, grant'ları (default privileges'tan **mükerrer** üretiyor), comment'leri ve partition'ları **izlemiyor**. Bizde **163 politika / 379 grant** var. Ayrıca onların **kendi seçim ölçütü** bizi imperative sınıfa koyuyor: `supabase/schemas` YOK, `config.toml`'da `schema_paths` YOK. |
+
+### ⭐SIFIR NOKTASI İKİ AYRI SORUDUR — birleştirmek ölçümden geniş hüküm üretir
+
+2026-09-16'da ölçüldü: `supabase db reset` **233 migration'ın 2'sinde** düşüyor
+(`202508241205_rpc_admin_orders.sql` → `type "venthub_orders" does not exist`).
+
+- **`supabase db reset` (resmî yerel yol) için sıfır noktası GEREKLİ** — o yol 1. dosyadan
+  başlar ve zincir orada kırık.
+- **Gölge/taban yolu için GEREKLİ DEĞİL** — o yol tabandan başlar, kırık halkayı hiç görmez;
+  yani gölge **zaten sıfır noktası gibi** çalışıyor (`scripts/db/golge-kur.mjs`).
+
+⚠İlk yazımda bunu birleştirip *"zincir kırık → squash şart"* dedim; **akran ölçümle daralttı ve
+haklıydı.** İki soruyu ayırmadan verilen hüküm, ölçümden geniş çıkar.
+
+⛔**KAÇ YERDE KIRIK OLDUĞU HENÜZ ÖLÇÜLMEDİ.** Sayı 3 ise onarılır, 40 ise onarılmaz — ve karar
+o sayıya bağlıdır. Bu satır yazıldığı anda o ölçüm **açık borçtur**.
+
 ## 3 · REDDEDİLEN ÜÇ YOL, gerekçeleriyle
+
+⚠**BU BÖLÜM §2.1 İLE OKUNUR.** Aşağıdaki üç red **mekanizma** reddidir (ölçülmüş: glob
+özyinelemeli değil, istisna listesi kapıyı kör eder, yerinde tutmak kurtarmayı çözmez) —
+**sıfır noktası KAVRAMININ reddi DEĞİLDİR.** Satıcının o kavram için fiili vardır (§2.1).
 
 | Yol | Niçin reddedildi |
 |---|---|

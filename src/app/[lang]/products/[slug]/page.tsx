@@ -47,6 +47,25 @@ function pickLang(value: LocalizedText, lang: string): string | null {
   return preferred || value.tr || value.en || null
 }
 
+/**
+ * ROTA SINIFI İLANI (REC-348 / Recep kararı 21, 2026-09-16).
+ *
+ * NİÇİN: bu rota bugün zaten statik üretiliyor (`generateStaticParams` + ISR), ama sınıfını
+ * **ilan etmiyordu**. REC-59'un ölçülmüş hükmü şu: bir rotanın istemciye zorlanıp
+ * zorlanmadığını belirleyen şey ayırt edici bir bileşen değil, **rota sınıfı ilanının kendisi**.
+ * İlan yoksa kök düzeyindeki `useSearchParams` adaları sayfayı istemciye çekebiliyor ve bu
+ * sessizce olur — hiçbir kapı görmez.
+ *
+ * ⚠`revalidate` ile birlikte kullanılır ve onu iptal ETMEZ: sayfa statik üretilir, saatte bir
+ * yeniden doğrulanır. Birincil tazeleme yolu yine webhook (`rendering-cache-standard.md` §3-4);
+ * ISR yalnız yedektir.
+ *
+ * ⭐Güvenli olduğu ÖLÇÜLDÜ (2026-09-16): bu dosya `searchParams`, `cookies()` ve `headers()`
+ * çağrılarının hiçbirini kullanmıyor. `force-static` bu üçünü boşaltır; kullanılsalardı ilan
+ * davranışı sessizce bozardı.
+ */
+export const dynamic = 'force-static'
+
 /** ISR yedeği (1 saat) — birincil yol webhook; bkz. `rendering-cache-standard.md` §3-4. */
 export const revalidate = 3600
 
