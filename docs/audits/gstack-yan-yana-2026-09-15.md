@@ -162,6 +162,23 @@ O zaman araç yarın kaybolsa da kazanç depoda kalır.
 test-kapsamı + regresyon soruları). Bu dosya onu ADIYLA işaret eder; açılmadığı sürece bu hüküm
 "hatırlanan" kalır, "emre yazılan" olmaz.
 
+> ✅**TAŞINDI — REC-347, 2026-09-16 (ALTYAPI).** Dört soru `plan-challenger`'a **Adım 2** olarak
+> girdi (`.claude/skills/plan-challenger/SKILL.md` ve `.agent/skills/...`, iki ağaç): **S1**
+> gerekli mi (sayıyla; kurtarmıyorsa ÇIKAR) · **S2** zaten var mı (envanter; varsa yeniden
+> yazma) · **S3** kaç yol test ediliyor (sıfırsa "SINANMIYOR" damgası) · **S4** çalışan bir şeyi
+> bozuyor muyuz (canlı ÖNCE/SONRA; korunacak davranış kapıya yazılır). S4'ün altında CLAUDE.md
+> kural 13 ve 14 **sabit satır** olarak duruyor — gerekçe bu dosyanın kendi bulgusu: dış araç o
+> kuralı yalnız brief'e yazıldığı için gördü.
+> Cetvel satırı: `execution-method-standard.md` §2.2. AXIOM A6 ve A7 eklendi (tablo olmadan rapor
+> yok; hüküm S1'in sayısına dayanır). Sınav: `evals.json` 12/8, **`.claude` tarafında hiç yoktu**,
+> yazıldı.
+> **İlk gerçek koşum:** `docs/audits/rec347-dort-soru-2026-09-16.md` — REC-340 Faz 1 planı yeniden
+> denetlendi. Sonuç: yedi adımın beşi KALSIN, biri DARALT, biri (zaten) ÇIKAR; **iki adım yeni
+> "SINANMIYOR" damgası aldı** ve **bir ilan edilmiş kapı kolunun yazılmadığı** görüldü.
+> ⭐Bu dosyanın hükmü — "kalıcı değeri araçta değil sorularda ara" — ödedi: sorular taşındıktan
+> sonra ilk büyük bulgu planda değil **kendi yetenek dosyamızda** çıktı (on bölümün dokuzu zaten
+> başka yerde yazılıydı).
+
 ---
 
 ### gstack'in koşturulmayan kısımları (sapma listesi)
