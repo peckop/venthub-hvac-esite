@@ -638,3 +638,86 @@ silmek AXIOM 3 ihlali), yani iş şeridin sınırını aşar.
 dosyaları ne üretiyor ne okuyor. D2 ayrı bir PR'da, `taban-tazele`nin kendi kollarıyla
 birlikte yapılır. **Bu madde tek başına yeterlidir:** kapı artık bloklamadığı için üretim
 yapılmasa da kırmızı doğmaz.
+
+## AXIOM 12 — ÜRETİLMİŞ ARTEFAKT ile ÜRETİLDİĞİ KAYNAK ARASINDAKİ **DRIFT** ÖLÇÜLMEZSE, ARTEFAKT SESSİZCE YALAN SÖYLER (REC-121)
+
+Bu cetvel şimdiye kadar artefaktın **tazeliğini** (AXIOM 9), **ilanını** (AXIOM 9), **önbelleğini**
+(AXIOM 10) ve **kapısının dondurulmasını** (AXIOM 11) yönetti. Eksik olan eksen şuydu:
+artefakt **ilan edilmiş, taze görünen ve yine de YANLIŞ** olabilir — çünkü tazelik dosyanın
+**yaşını** ölçer, **doğruluğunu** ölçmez.
+
+### Saha kanıtı — iki bağımsız ölçüm, altı gün arayla
+
+`src/types/database.types.ts` canlı Postgres şemasından `supabase gen types` ile üretilir.
+
+* **2026-09-01 (URUN):** #946 sonrası `pnpm supabase:gen` koşuldu, diff **+76/-1** çıktı ve
+  içinde yalnız beklenen `products.name_i18n` yoktu: `venthub_orders.currency`,
+  `venthub_quotes` FK ilişkileri, PostgrestVersion 13.0.5→14.5. Yani **daha önce en az bir
+  migration inmiş, tipler yenilenmemişti.**
+* **2026-09-07 (ALTYAPI):** drift **hâlâ** duruyordu — `order_number_counters` tablosu ve
+  `generate_order_number_saat_tabanli_20260906` fonksiyonu commit'li tiplerde **yoktu**.
+
+Kök sebep bir **asimetri**: migration master'a merge edilince prod'a **OTOMATİK** uygulanır
+(kural 13, `supabase-migrate.yml`), tip dosyası ise **elle** üretilir. Otomatik ilerleyen bir
+kaynak ile elle güncellenen bir artefakt arasında kapı yoksa, açı her migration'da büyür ve
+**hiçbir yerde kırmızı yanmaz**.
+
+### HÜKÜM
+
+> **Kaynağı OTOMATİK ilerleyen her üretilmiş artefakt, kaynağıyla ARASINDAKİ FARKI ölçen bir
+> kapıya bağlanır.** Tazelik damgası bu kapının yerine geçmez: taze bir dosya yanlış olabilir.
+
+### ÖLÇÜT HAM DİFF DEĞİL, **ANLAM YÜZEYİ** — ve bu karar ölçümle alındı
+
+INV-TIP-DRIFT-1 yazılırken ilk aday ham metin diff'iydi. Aynı ölçümde görüldü ki diff'in
+**kalanı tamamen CLI sürüm gürültüsüydü**: dosya kuyruğundaki jenerik yardımcı tiplerde
+parantezleme değişmiş, 6 yerde. Ham diff'e bağlı bir kapı **kimsenin onaramayacağı bir kırmızı**
+üretirdi — CLI sürümü her değiştiğinde yanar, şema değişmese de.
+
+> **Sürekli kırmızı kapı, sürekli yanan lambanın kardeşidir: birkaç gün sonra kimse bakmaz.**
+
+Bu yüzden ölçüt **şema yüzeyi**: tablo · görünüm · kolon · fonksiyon · enum (+değerleri) ·
+bileşik tip. Biçim ve sürüm farkı **sessiz**, şema farkı **KIRMIZI**. Genel kural:
+
+> Drift ölçütü, artefaktın **taşıdığı anlamı** karşılaştırır; **biçimini** değil. Biçme ölçütü
+> gürültü üretir, gürültü kapıyı susturur.
+
+### Kapı ÖLÇER, ONARMAZ — ve onarımı ADIYLA söyler
+
+Kapı `src/types/database.types.ts`'i **yazmaz**, yalnız okur: dosya URUN şeridinin mülkü ve
+üretilmiş bir artefakt (AXIOM 3). Kırmızı çıktısı onarım komutunu (`pnpm supabase:gen`) ve
+sahibini yazar. Bir kapının en sinsi kusuru, onardığını sanmaktır.
+
+⚠**KIRMIZININ MUHATABI, KIRMIZIYI GÖREN PR OLMAYABİLİR.** Drift **depo durumudur**, PR durumu
+değil: bir migration inip tipler yenilenmediyse o günden sonraki **her** PR'da kapı yanar. Bu,
+kapının kusuru değil doğasıdır — ama **söylenmezse** kusur gibi davranır: kırmızıyı gören kişi
+kendi değişikliğinde sebep arar. Bu yüzden CI adımı, koşmadan önce bunu **yazar**.
+
+### Kapının kendi ölçüm sağlığı — vakumda yeşil YASAK
+
+İki taraf da **boş** ayrıştırılırsa kümeler eşit çıkar ve kapı "senkron" der. Bu, ölçüm evreni
+boşken yeşil vermenin ta kendisidir. Bu yüzden ayrıştırıcı sağlığı **ayrı bir kapı**: en az 20
+varlık ve 100 kolon (canlı ölçüm 62 varlık / 786 kolon — eşikler o ölçümün çok altında, amaç
+"şema küçüldü mü" demek değil, **ayrıştırıcının hiç çalışmadığı** hâli yakalamak). Sağlıksızsa
+çıkış **2** = ÖLÇEMEDİM; "ölçemedim" ile "temiz" aynı kovaya girmez.
+
+### SABOTAJ, BAŞKASININ ARTEFAKTINA YAZILARAK YAPILMAZ
+
+Kapının kırmızı tarafını göstermek için commit'li tip dosyasını bozmak gerekiyordu — ama o
+dosya URUN'un mülkü. Çözüm `--tip-dosyasi <yol>` bayrağı: yalnız **okunan** yolu değiştirir,
+canlı taraf her zaman API'den üretilir, yani "iki taraf da fikstür" hâli **mümkün değildir**.
+Aynı desen kardeş kapıda (`aile-kategori-tutarlilik.mjs` `--fikstur`) prod yazımı Recep kapısı
+olduğu için kurulmuştu.
+
+> **Genel kural:** bir kapının kırmızısını göstermek için **başkasının mülküne** ya da **prod'a**
+> yazmak gerekiyorsa, eksik olan cesaret değil **fikstür kolu**dur.
+
+### Bu maddenin kapısı
+
+`INV-TIP-DRIFT-1` — `scripts/db/checks/tip-drift.mjs`, CI'da `db-advisor.yml` içinde **ayrı iş**
+(`tip-drift` + `tip-drift-precheck`). ⭐Kardeşlerinden farkı **adıyla**: bu iş `pg` sürücüsü
+kullanmaz, kök sertifika okumaz, `SUPABASE_DB_URL`'e hiç bağlanmaz — kimliği
+`SUPABASE_ACCESS_TOKEN`'dır. Kardeş adımın kendi kuralı ("aynı sır + aynı sertifika → aynı iş")
+burada **tersine** döner ve ayrı iş verir; farklı kimlik + farklı araç + farklı hata kipi.
+Düzeneği `src/__tests__/conformance/tip-drift-kapisi.test.ts` (6 kol) korur — içlerinden biri
+**yanlış sırrın kopyalanmadığını** ölçer, çünkü bu ailede en olası kusur kardeşten kopyalamaktır.

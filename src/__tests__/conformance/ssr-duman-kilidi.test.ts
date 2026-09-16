@@ -20,10 +20,13 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+  ANASAYFA_BILINCLI_ADALAR,
+  ANASAYFA_MAX_BAILOUT,
   ihlaller,
   kurallar,
   PDP_BILINCLI_ADALAR,
   PDP_MAX_BAILOUT,
+  temsilcileriSec,
 } from '../../../tests/smoke/ssr-kurallari'
 
 /** Depo kökü GIT'ten türetilir — sabit yol yazmak INV-MUTLAK-YOL-1 ihlalidir. */
@@ -306,7 +309,7 @@ describe('INV-DUMAN-5: PR kapısı gerçekten ZORUNLU kontrolün içinde', () =>
   })
 })
 
-describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mandal)', () => {
+describe('INV-DUMAN-6: bailout tavanı İLAN edilmiş adalardan türer (PDP + anasayfa, mandal)', () => {
   /**
    * NİÇİN VAR: tavan çıplak bir sayı olarak yazıldığında onu büyütmek BEDAVA olur.
    * Bugün tam bu durum yaşandı — #989 dördüncü bir bilinçli ada (Vercel Analytics)
@@ -320,10 +323,14 @@ describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mand
    * yazılabilir bir ölçüt değildir — uygulanabilir tek ölçüt sayıdır.
    */
   const fakeTemsilciler = {
-    kokKategori: '/tr/category/a',
-    altKategori: '/tr/category/a/b',
+    altgrupluKategori: '/tr/category/a',
+    yaprakKategori: '/tr/category/a/b',
     pdp: '/tr/products/x',
-    sayimlar: { kokKategori: 1, altKategori: 1, pdp: 1 },
+    // REC-59 açık kalemi kapandı: marka sınıfı kural kümesine girdi, fikstür de onu taşır.
+    marka: '/tr/brands/x',
+    sayimlar: { kategori: 1, ikiSegmentli: 1, pdp: 1, marka: 1 },
+    secim: { icerikten: false, denenenAday: 0, adayTavani: 8 },
+    atlananlar: [],
   }
 
   it('her ilan kalemi DOLU ve TEKİL — boş kalemle sayı şişirilemez', () => {
@@ -352,6 +359,70 @@ describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mand
     expect(PDP_MAX_BAILOUT, 'dışa verilen sabit ilanla uyuşmuyor').toBe(toplam)
   })
 
+  /**
+   * ⭐ANASAYFA İLANI — PDP deseninin ikizi (REC-59 adım 2, 2026-09-14).
+   *
+   * NİÇİN AYRI KOLLAR: anasayfa tavanı `0` yazıldığında anasayfa DİNAMİKTİ; dinamik
+   * sayfada prerender markerı hiç doğmaz, yani o 0 hiçbir şeyi kısıtlamıyordu. Anasayfa
+   * statiğe geçince aynı sayı kök layout'taki meşru adaları yasaklayan bir tavana
+   * dönüştü — sayı değişmedi, SAYININ ÖLÇTÜĞÜ EVREN değişti. Kollar, tavanın yine
+   * ilandan türemesini ve ilan yazılmadan büyütülememesini zorlar.
+   */
+  it('ANASAYFA: her ilan kalemi DOLU ve TEKİL — boş kalemle sayı şişirilemez', () => {
+    expect(ANASAYFA_BILINCLI_ADALAR.length, 'ilan boş — tavan gerekçesiz kalır').toBeGreaterThan(0)
+    for (const a of ANASAYFA_BILINCLI_ADALAR) {
+      expect(a.ada.trim().length, `ada adı boş: ${JSON.stringify(a)}`).toBeGreaterThan(2)
+      expect(a.nicin.trim().length, `"${a.ada}" gerekçesi yok/çok kısa`).toBeGreaterThan(40)
+      expect(a.marker, `"${a.ada}" en az 1 marker katmalı`).toBeGreaterThanOrEqual(1)
+    }
+    const adlar = ANASAYFA_BILINCLI_ADALAR.map((a) => a.ada)
+    expect(new Set(adlar).size, `ilan mükerrer ada içeriyor: ${adlar.join(', ')}`).toBe(adlar.length)
+  })
+
+  it('ANASAYFA kuralının tavanı ilan toplamına EŞİT — literal sayı kaçağı yakalanır', () => {
+    const toplam = ANASAYFA_BILINCLI_ADALAR.reduce((n, a) => n + a.marker, 0)
+    const ana = kurallar(fakeTemsilciler).find((k) => k.sinif === 'anasayfa')
+    expect(ana, 'anasayfa kuralı kayıp').toBeTruthy()
+    expect(
+      ana?.maxBailout,
+      `Anasayfa tavanı (${ana?.maxBailout}) ilan toplamıyla (${toplam}) uyuşmuyor — ` +
+        'sayı ilan edilmeden büyütülmüş'
+    ).toBe(toplam)
+    expect(ANASAYFA_MAX_BAILOUT, 'dışa verilen sabit ilanla uyuşmuyor').toBe(toplam)
+  })
+
+  /**
+   * ⭐SABOTAJ: üçüncü bir ada İLAN EDİLMEDEN marker doğurursa kapı KIRMIZI olmalı.
+   * Bu kol, tavanın gerçekten bir SINIR olduğunu ölçer — ilan büyümeden sayı büyümez.
+   */
+  it('ANASAYFA DAVRANIŞ, sınırda: tavan kadar geçer, ÜÇÜNCÜ ada KIRMIZI', () => {
+    const ana = kurallar(fakeTemsilciler).find((k) => k.sinif === 'anasayfa')
+    if (!ana) throw new Error('anasayfa kuralı kayıp — kol ölçemez')
+    // İçerik markerı KASITLI sağlanıyor: ölçülen şey bailout SAYIMI, marker eksikliği değil.
+    const govde = (n: number): string =>
+      `<html><body><h1>VentHub</h1>${'<!--BAILOUT_TO_CLIENT_SIDE_RENDERING-->'.repeat(n)}</body></html>`
+
+    expect(ihlaller(ana, govde(ana.maxBailout)), 'tavan kadar bailout ihlal saymamalı').toEqual([])
+    const fazla = ihlaller(ana, govde(ana.maxBailout + 1))
+    expect(fazla.length, 'ucuncu ada ihlal DOĞURMADI — tavan sinir degil').toBe(1)
+    expect(fazla[0]).toContain(`${ana.maxBailout + 1} > ${ana.maxBailout}`)
+  })
+
+  /**
+   * ⭐AYIRT EDER — ANASAYFA DİNAMİKKEN DE YEŞİL: dinamik sayfada bailout 0 doğar ve
+   * tavanın altında kalır. Bu kol, tavanı büyütmenin dinamik hâli bozmadığını ölçer
+   * (OPS kabul ölçütü: "ana sayfa dinamikken de statikken de kapı yeşil").
+   *
+   * ⚠SINIRI: statik hâlin gerçek marker sayısı bu kolda DEĞİL, CI'daki duman kapısında
+   * ölçülür — ve master'da anasayfa hâlâ dinamik olduğu için o ölçüm ancak #1192
+   * indikten sonra gerçekleşir.
+   */
+  it('AYIRT EDER: anasayfa DİNAMİKKEN (bailout 0) tavan yeşil kalır', () => {
+    const ana = kurallar(fakeTemsilciler).find((k) => k.sinif === 'anasayfa')
+    if (!ana) throw new Error('anasayfa kuralı kayıp — kol ölçemez')
+    expect(ihlaller(ana, '<html><body><h1>VentHub</h1></body></html>')).toEqual([])
+  })
+
   it('DAVRANIŞ, sınırda: tavan kadar marker geçer, bir fazlası KIRMIZI', () => {
     /**
      * ⭐NİÇİN TEK SATIRDA: sayımın SATIR değil GEÇİŞ saydığını da kanıtlar. Üretilen
@@ -371,5 +442,172 @@ describe('INV-DUMAN-6: PDP bailout tavanı İLAN edilmiş adalardan türer (mand
     const fazla = ihlaller(pdp, govde(pdp.maxBailout + 1))
     expect(fazla.length, 'tavanın bir fazlası ihlal DOĞURMADI — sayım kör').toBe(1)
     expect(fazla[0]).toContain(`${pdp.maxBailout + 1} > ${pdp.maxBailout}`)
+  })
+})
+
+/**
+ * INV-DUMAN-7 — TEMSİLCİ SEÇİMİ İÇERİKTEN YAPILIR (REC-286).
+ *
+ * NİÇİN BU KOL VAR: 2026-09-08'de alarm 09-07 19:14Z'den beri HER yayında kırmızıydı ve
+ * canlıda hiçbir arıza yoktu. Sebep, temsilcinin ADRESTEN seçilmesiydi: iki segmentli yol
+ * kalmadığı için (REC-205) seçim ALFABETİK İKİNCİ yola düşüyor, o yol da DB'de kök olmayan
+ * bir kategori (`aksiyel-sanayi-fanlari`) oluyordu; alt grubu olmadığı için alt grup başlığı
+ * basmıyor ve sınıf ölçütü onu ihlal sayıyordu.
+ *
+ * ⛔BU KOLLAR OLMASA onarım SESSİZCE geri alınabilirdi: seçim tekrar alfabetiğe dönse
+ * canlıda hiçbir şey değişmez, yalnız alarm yine yanlış sayfayı seçer — yani kusur ancak
+ * bir yayın sonrası, gürültü olarak geri gelirdi.
+ */
+describe('INV-DUMAN-7: temsilci ADRESTEN değil İÇERİKTEN seçilir', () => {
+  /**
+   * ⭐FİKSTÜR GERÇEK HARİTAYA BENZETİLDİ (REC-59, 2026-09-15): marka sınıfı kapıya girince
+   * `zorunluKontrol` marka temsilcisini de FAIL-CLOSED aradı ve bu bloktaki beş kol düştü —
+   * çünkü yapay haritalarda hiç `/tr/brands/<slug>` yolu yoktu.
+   *
+   * İki yol vardı: (a) marka kontrolünü gevşetmek, (b) fikstürü gerçeğe benzetmek. (b)
+   * seçildi, çünkü GERÇEK site haritası marka adreslerini HER ZAMAN ilan ediyor
+   * (`sitemap.ts` §3 Brand Routes) — yani marka yolu olmayan bir harita, bu kolların
+   * ölçtüğü eksenle ilgisiz bir KURGUYDU. Kapıyı gevşetmek, olmayan bir dünyayı korumak
+   * için gerçek bir güvenceyi düşürmek olurdu.
+   *
+   * Marka yolu her fikstüre OTOMATİK eklenir; bu bloğun ölçtüğü eksen (temsilci İÇERİKTEN
+   * seçilir) marka sınıfından bağımsızdır ve tek satır gürültü eklemesin.
+   */
+  const MARKA_FIKSTUR_YOLU = '/tr/brands/fikstur-marka'
+  const SITEMAP = (yollar: string[]): string => {
+    const tam = yollar.some((y) => /^\/tr\/brands\/[^/]+$/.test(y))
+      ? yollar
+      : [...yollar, MARKA_FIKSTUR_YOLU]
+    return `<urlset>${tam.map((y) => `<loc>https://x${y}</loc>`).join('')}</urlset>`
+  }
+
+  /** Sahte ağ: her yola verilen gövdeyi döner; hangi yolların çekildiğini KAYDEDER. */
+  const sahteAg = (
+    sitemapYollari: string[],
+    govdeler: Record<string, string>
+  ): { getir: (u: string) => Promise<{ ok: boolean; status: number; text: () => Promise<string> }>; cekilen: string[] } => {
+    const cekilen: string[] = []
+    return {
+      cekilen,
+      getir: async (u: string) => {
+        if (u.endsWith('/sitemap.xml')) {
+          return { ok: true, status: 200, text: async () => SITEMAP(sitemapYollari) }
+        }
+        cekilen.push(u)
+        const g = govdeler[u]
+        if (g === undefined) return { ok: false, status: 404, text: async () => '' }
+        return { ok: true, status: 200, text: async () => g }
+      },
+    }
+  }
+
+  const ALTGRUPLU_GOVDE = '<html><h1>Fanlar</h1><h2>Alt Ürün Grupları</h2></html>'
+  const YAPRAK_GOVDE = '<html><h1>Aksesuarlar</h1><div data-ssr="family-card"></div></html>'
+  const PDP = '/tr/products/x'
+
+  it('⭐ALFABETİK İKİNCİ olan ama alt grubu OLMAYAN yol temsilci SEÇİLMEZ', async () => {
+    // 09-08 vakasının birebir kurgusu: alfabetik ilk iki yol da alt grup basmıyor,
+    // alt grup basan yol listede ÜÇÜNCÜ. Eski kod `[1]`i seçip kırmızı verirdi.
+    const yollar = ['/tr/category/aksesuarlar', '/tr/category/aksiyel-sanayi-fanlari', '/tr/category/fanlar', PDP]
+    const { getir } = sahteAg(yollar, {
+      '/tr/category/aksesuarlar': YAPRAK_GOVDE,
+      '/tr/category/aksiyel-sanayi-fanlari': YAPRAK_GOVDE,
+      '/tr/category/fanlar': ALTGRUPLU_GOVDE,
+    })
+    const t = await temsilcileriSec('', getir)
+    expect(t.secim.icerikten, 'iki segmentli yol yokken seçim İÇERİKTEN olmalı').toBe(true)
+    expect(
+      t.altgrupluKategori,
+      'alt gruplu temsilci alfabetik sıraya göre seçilmiş — 09-08 kusuru GERİ GELDİ'
+    ).toBe('/tr/category/fanlar')
+    expect(t.yaprakKategori, 'yaprak temsilcisi aile kartı basan İLK yol olmalı').toBe(
+      '/tr/category/aksesuarlar'
+    )
+    expect(t.atlananlar, 'her iki sınıf da bulundu, atlanan olmamalı').toEqual([])
+  })
+
+  it('SABOTAJ: hiçbir kategori alt grup basmazsa sınıf SESSİZ GEÇMEZ, SEBEBİYLE atlanır', async () => {
+    const yollar = ['/tr/category/a', '/tr/category/b', PDP]
+    const { getir } = sahteAg(yollar, {
+      '/tr/category/a': YAPRAK_GOVDE,
+      '/tr/category/b': YAPRAK_GOVDE,
+    })
+    const t = await temsilcileriSec('', getir)
+    expect(t.altgrupluKategori, 'temsilci yokken uydurulmuş').toBeNull()
+    // ⛔Kritik: yokluk YEŞİL değil, KAYITLI. Sebep metni koşum günlüğüne basılır.
+    expect(t.atlananlar.length, 'atlama kaydı YOK — sessiz yeşil sınıfı').toBe(1)
+    expect(t.atlananlar[0].sinif).toBe('altgruplu-kategori')
+    expect(t.atlananlar[0].sebep, 'sebep sayıyı taşımıyor').toContain('aday çekildi')
+    // Kural üretimi de o sınıfı ÜRETMEZ (kol "kural kayıp" diye kırmızı olmaz, atlanır).
+    expect(kurallar(t).some((k) => k.sinif === 'altgruplu-kategori')).toBe(false)
+    // Kapıda koşan sınıf ise DURUYOR: atlama yalnız alarm sınıfına özgü.
+    expect(kurallar(t, true).map((k) => k.sinif)).toContain('yaprak-kategori')
+  })
+
+  it('SABOTAJ: aile kartı basan hiçbir yol yoksa kapı KIRMIZI (fail-closed korunur)', async () => {
+    const yollar = ['/tr/category/a', PDP]
+    const { getir } = sahteAg(yollar, { '/tr/category/a': ALTGRUPLU_GOVDE })
+    // Yaprak sınıfı KAPIDA: temsilcisi bulunamazsa atlanmaz, HATA atar.
+    await expect(temsilcileriSec('', getir)).rejects.toThrow(/KAPIDA koşan sınıfların temsilcisi YOK/)
+  })
+
+  it('ADAY TAVANI aşılmaz ve tavan SESSİZ DEĞİL — denenen sayı raporlanır', async () => {
+    // 40 kategori, hiçbiri alt grup basmıyor: tavan devreye girer.
+    const cokYol = Array.from({ length: 40 }, (_, i) => `/tr/category/k${String(i).padStart(2, '0')}`)
+    const govdeler: Record<string, string> = {}
+    for (const y of cokYol) govdeler[y] = YAPRAK_GOVDE
+    const { getir, cekilen } = sahteAg([...cokYol, PDP], govdeler)
+    const t = await temsilcileriSec('', getir)
+    expect(t.secim.denenenAday, 'tavan aşıldı — her yayında 40 istek atan alarm').toBeLessThanOrEqual(
+      t.secim.adayTavani
+    )
+    expect(cekilen.length, 'çekilen istek sayısı tavanı aştı').toBeLessThanOrEqual(t.secim.adayTavani)
+    expect(t.atlananlar[0].sebep, 'tavan bilgisi sebepte YOK — sessiz cap').toContain(
+      `tavan ${t.secim.adayTavani}`
+    )
+  })
+
+  it('⭐YAPRAK ÖLÇÜTÜ İÇERİKTEN SEÇİMDE SIKI, doğrulanmamış seçimde GEVŞEK (ratchet)', async () => {
+    const yollar = ['/tr/category/a', '/tr/category/b', PDP]
+    const { getir } = sahteAg(yollar, {
+      '/tr/category/a': YAPRAK_GOVDE,
+      '/tr/category/b': ALTGRUPLU_GOVDE,
+    })
+    const icerikten = await temsilcileriSec('', getir)
+    const sikiKural = kurallar(icerikten).find((k) => k.sinif === 'yaprak-kategori')
+    if (!sikiKural) throw new Error('yaprak kuralı kayıp')
+    // SIKI: alt grup başlığı basan gövde artık yaprak sınıfını GEÇMEZ.
+    expect(
+      ihlaller(sikiKural, ALTGRUPLU_GOVDE).length,
+      'içerikten seçimde ölçüt gevşek kalmış — REC-286 ratchet kaybı'
+    ).toBe(1)
+    expect(ihlaller(sikiKural, YAPRAK_GOVDE), 'aile kartı basan gövde geçmeliydi').toEqual([])
+
+    // GEVŞEK: iki segmentli yol varsa seçim adrestendir, temsilci doğrulanmamıştır.
+    const { getir: g2 } = sahteAg(['/tr/category/a', '/tr/category/a/b', PDP], {})
+    const adresten = await temsilcileriSec('', g2)
+    expect(adresten.secim.icerikten, 'iki segmentli yol varken içerikten seçim yapılmamalı').toBe(
+      false
+    )
+    const gevsekKural = kurallar(adresten).find((k) => k.sinif === 'yaprak-kategori')
+    if (!gevsekKural) throw new Error('yaprak kuralı kayıp (geriye dönük kol)')
+    expect(
+      ihlaller(gevsekKural, ALTGRUPLU_GOVDE),
+      'doğrulanmamış temsilciye SIKI ölçüt uygulanmış — sahte kırmızı üretir'
+    ).toEqual([])
+  })
+
+  it('DETERMİNİZM: aynı sitemap aynı temsilciyi verir (sıra karışsa da)', async () => {
+    const govdeler = {
+      '/tr/category/a': YAPRAK_GOVDE,
+      '/tr/category/m': ALTGRUPLU_GOVDE,
+      '/tr/category/z': ALTGRUPLU_GOVDE,
+    }
+    const d1 = await temsilcileriSec('', sahteAg(['/tr/category/z', '/tr/category/m', '/tr/category/a', PDP], govdeler).getir)
+    const d2 = await temsilcileriSec('', sahteAg(['/tr/category/a', '/tr/category/z', '/tr/category/m', PDP], govdeler).getir)
+    expect(d1.altgrupluKategori, 'sitemap sırası temsilciyi değiştirdi — gürültü kaynağı').toBe(
+      d2.altgrupluKategori
+    )
+    expect(d1.altgrupluKategori, 'alfabetik ilk UYGUN aday seçilmeli').toBe('/tr/category/m')
   })
 })

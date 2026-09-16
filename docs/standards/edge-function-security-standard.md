@@ -507,6 +507,47 @@ bulunmaz; ön-yoklama işi kapıyı atlatır ve `::warning` basar. **Atlanmış 
 Uygulama: `.github/workflows/edge-shared-input-drift.yml` · kapı: `INV-EDGE-DRIFT-1`
 (bağlanma testi: `src/__tests__/conformance/edge-shared-input-drift.test.ts`).
 
+### 3.13 Köken allowlist'i **JOKER SON EK** içermez
+
+**KURAL.** `_shared/cors.ts` içindeki allowlist yalnız **bizim** kökenlerimizi kabul eder:
+kanonik alan adları tam eşleşmeyle, önizleme adresleri **başı ve sonu çivilenmiş** bir kalıpla.
+Paylaşılan bir barındırma son ekini (`.vercel.app`, `.netlify.app`, `.pages.dev` …) `endsWith`
+ile kabul etmek **YASAKTIR**.
+
+❌ **İHLAL**
+```ts
+const isVercel = origin.endsWith('.vercel.app')       // herkesin projesi geçer
+const isVercel = origin.startsWith('https://venthub') // venthub.evil.example de geçer
+```
+✅ **DOĞRU**
+```ts
+const ONIZLEME_KALIBI = /^https:\/\/venthub-hvac-esite[a-z0-9-]*\.vercel\.app$/
+const isVercel = ONIZLEME_KALIBI.test(origin)
+```
+
+**NEDEN.** `.vercel.app` **paylaşılan** bir son ektir — oraya isteyen herkes deploy edebilir.
+`endsWith('.vercel.app')` yazan bir allowlist "bizim önizlemelerimiz" değil, **"Vercel'e deploy
+eden herkes"** anlamına gelir; o kökenden gelen tarayıcı isteği kimlikli cevabı okuyabilir.
+Ölçüldü (2026-09-09): bu yardımcıyı **28 Edge fonksiyondan 21'i** kullanıyor, aralarında admin
+uçları da var. Yalnız `iyzico-payment` ve `iyzico-callback` ayrıca env güdümlü katı allowlist'e
+(`_shared/origins.ts` → `isOriginAccepted`) tabidir; kalanların tek savunması bu satırdır.
+
+**Kalıp neden sonu da çivilemek zorunda:** `startsWith`'le daraltmak bir güvenlik
+**yanılsamasıdır** — `https://venthub-hvac-esite.evil.example` kalıba uyar. `$` olmadan yapılan
+daraltma, kusuru kapatmaz yalnız GİZLER.
+
+**Yedek adres kuralı.** Köken reddedildiğinde `Access-Control-Allow-Origin` **kanonik/yedek bir
+adrese** düşer, isteğin kendi kökenine ASLA. Canlı ölçüm (OPTIONS, 2026-09-09 08:3xZ):
+`evil.example.com` → yedek adres; `venthub.com.tr` ve `venthub-hvac-esite*.vercel.app` → izinli.
+
+⚠**BU KUSURU HİÇBİR STATİK KAPI GÖRMEZ.** `tsc` için `endsWith` kusursuz bir çağrıdır, lint için
+de öyle. Kusur tipte değil, kabul edilen **kümenin genişliğinde** — o yüzden kapı konformans
+katmanındadır ve **ayırt edici çiftle** ölçer (3 kabul / 7 red); yalnız yeşil tarafı ölçen bir
+test, allowlist `() => true` yapılsa da yeşil kalır.
+
+Uygulama: `supabase/functions/_shared/cors.ts` · kapı: `INV-KOKEN-ALLOWLIST-1`
+(bağlanma testi: `src/__tests__/conformance/edge-koken-allowlist.test.ts`) · kayıt: REC-296.
+
 ## 4. Doğrulama — kaynağa bakarak değil, **ÇAĞIRARAK**
 
 **KURAL.** Bir fonksiyonun güvenli olduğu, kodunu okuyarak değil **prod'a istek atarak** kanıtlanır.

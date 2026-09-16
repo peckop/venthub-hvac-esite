@@ -142,9 +142,48 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                 onClick={() => handleSubSelect(getLocalizedCategorySlug(sub, lang))}
                             >
                                 <div className="relative z-10">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 mb-10 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
-                                        {getCategoryIcon(sub.slug, { size: 28 })}
-                                    </div>
+                                    {/* ⭐GÖRSEL (REC-291, Recep isteği: "görselli olması lazım bence").
+                                        ÖLÇÜM: bu bölümde `<img>` sayısı 0'dı — kart yalnız ikon + başlık
+                                        + metin çiziyordu. Oysa `categories.image_url` alt kategorilerin
+                                        10'unda DOLU; yani veri hazırdı, onu okuyan kart yoktu.
+
+                                        ⛔YER TUTUCU BİLEREK YOK: `VentImage` görsel bulunamayınca
+                                        `category-placeholder.png` basar. Onu her karta koymak, hangi
+                                        kategorinin görseli eksik olduğunu EKRANDA GÖRÜNMEZ yapardı.
+                                        Bu yüzden bileşen yalnız `image_url` doluyken çiziliyor; boşsa
+                                        kart aşağıdaki ikon düzeninde kalır — eksiklik hem ziyaretçiye
+                                        dürüst, hem bize görünür.
+
+                                        `alt=""` DEKORATİF, ve bu da ölçülmüş bir ders (REC-268/WCAG
+                                        1.1.1): kategori adı hemen altındaki `h3`'te zaten yazıyor;
+                                        görsele aynı adı vermek ekran okuyucuya AYNI ŞEYİ İKİ KEZ
+                                        okutur. Görsel burada bilgi taşımıyor, başlığı süslüyor.
+
+                                        CLS (kural 10): `fill` + sabit oranlı kapsayıcı — yükleme
+                                        sırasında yükseklik değişmez.
+
+                                        ⚠ORAN `aspect-square`, ve bu bir SEÇİM DEĞİL KURAL SONUCU:
+                                        ilk yazışta `aspect-[4/3]` koymuştum (kart 3 sütunlu ve altında
+                                        üç satır metin var, kare oran kartı uzatıyor), lint haklı olarak
+                                        kırmızı verdi — keyfi Tailwind değeri yasak (kural 8). Kare oran
+                                        ana sayfa kategori kartlarıyla da tutarlı; farklı bir oran
+                                        gerekirse `tokens.js`'te tanımlanır, satır içinde uydurulmaz. */}
+                                    {sub.image_url ? (
+                                        <div className="relative aspect-square w-full mb-10 overflow-hidden rounded-hvac-xl bg-white">
+                                            <VentImage
+                                                src={sub.image_url}
+                                                alt=""
+                                                aria-hidden
+                                                fill
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                                className="object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 mb-10 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
+                                            {getCategoryIcon(sub.slug, { size: 28 })}
+                                        </div>
+                                    )}
                                     <h3 className="text-2xl font-bold text-slate-950 mb-4 tracking-tight">{subVm?.displayName}</h3>
                                     <p className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm?.description}</p>
                                     <div className="flex items-center gap-3 text-xs font-black uppercase tracking-hvac-relaxed text-slate-400 group-hover:text-cyan-600 transition-colors">

@@ -39,7 +39,10 @@ export const mapDatabaseCategoryToDomain = (dbCat: DbCategory): DomainCategory =
     ...dbCat,
     name: String(dbCat.name || ''),
     menu_label: String(dbCat.menu_label || dbCat.name || ''),
-    marketing_title: String(dbCat.marketing_title || dbCat.name || ''),
+    // ⭐`marketing_title` TAŞINMIYOR (REC-297) — alan EMEKLİ (Recep kararı 2026-09-09,
+    // `categoryHelpers.ts` §emekli notu). Buradaki satır `name`'e düşen bir YEDEK üretiyordu;
+    // kimse okumadığı için ürettiği değer RSC yüküne binip ziyaretçiye gidiyordu, o kadar.
+    // Ölçüm: canlı kategori HTML'inde kolon 11 kez taşınıyordu, görünen yüzeyde 0 kez.
     description: String(dbCat.description || ''),
   }
 }

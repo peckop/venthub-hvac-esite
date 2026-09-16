@@ -68,7 +68,8 @@ const BrandsPage: React.FC = () => {
                 >
                   {/* Floating Logo Container */}
                   <div className="aspect-3/2 relative flex items-center justify-center mb-12 grayscale opacity-40 transition-transform duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110">
-                    <BrandIcon brand={brand.name} className="w-full h-full max-h-24" />
+                    {/* Marka adı kartın h2'sinde yazıyor — logo dekoratif (REC-268). */}
+                    <BrandIcon brand={brand.name} className="w-full h-full max-h-24" dekoratif />
                   </div>
 
                   {/* Info Layer */}

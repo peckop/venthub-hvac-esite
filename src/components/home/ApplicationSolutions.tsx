@@ -180,7 +180,15 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
             href={localizedHref(Routes.products(), lang)}
             className="inline-flex items-center gap-4 group"
           >
-            <span className="text-sm font-bold uppercase tracking-widest text-slate-400 group-hover:text-cyan-600 transition-colors">
+            {/* ⭐KONTRAST ONARIMI (REC-268). Ölçüldü (Lighthouse a11y, master'ın yerel üretim
+                derlemesi, 2026-09-08): bu bağlantı `text-slate-400` ile beyaz zemin üzerinde
+                **2,51:1** kontrast veriyordu; WCAG AA normal metinde en az 4,5:1 ister. Yani
+                sayfanın "tümünü gör" çıkışı, düşük görme keskinliğinde okunmuyordu.
+                `industrial-gray` token'ı seçildi: aynı zeminde **9,9:1** (kendi hesabım
+                Lighthouse'un 2,51 ölçümünü 2,52 olarak yeniden ürettiği için yöntem doğrulandı).
+                `steel-gray` de geçerdi (4,76:1) ama payı ince; çıkış bağlantısı zaten vurgulu
+                olmalı. YAN FAYDA: ham `slate-*` yerine token — kural 8. */}
+            <span className="text-sm font-bold uppercase tracking-widest text-industrial-gray group-hover:text-cyan-600 transition-colors">
               {t.viewAll}
             </span>
             <div className="w-12 h-px bg-slate-200 group-hover:w-20 group-hover:bg-cyan-600 transition-colors duration-500" />

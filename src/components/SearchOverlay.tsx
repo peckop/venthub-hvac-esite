@@ -505,12 +505,21 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             <svg className="w-5 h-5 text-primary-ocean" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35" />
             </svg>
+            {/*
+              ⭐`placeholderAi` KALDIRILDI (REC-340 Faz 0, Recep onayı 2026-09-15).
+              O metin "yapay zeka destekli arama" diyordu ve ARKASINDA YAPAY ZEKA YOKTU:
+              bu kutu `ftsSearchProducts` → RPC `fts_search_products` çağırır; prod'da
+              ölçüldü (`pg_proc.prosrc`): `to_tsvector` + `plainto_tsquery` VAR, embedding
+              YOK, vektör YOK, dış HTTP çağrısı YOK — yani düz PostgreSQL tam-metin arama.
+              Zaten sözlükte duran doğru metin kullanılıyor; yeni metin UYDURULMADI.
+              Yetenek gerçekten geldiğinde (REC-340 Faz 2/3) iddia hak edilerek geri konur.
+            */}
             <input
               ref={inputRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={t('search.placeholderAi')}
+              placeholder={t('search.placeholder')}
               className="flex-1 text-lg placeholder:text-gray-400 focus-visible:outline-none text-industrial-gray bg-transparent font-medium"
             />
             {loading && (

@@ -60,10 +60,92 @@ function fiksturBelgesi(donustur: (metin: string) => string): string {
   return hedef
 }
 
+/** Markdown ayraç satırı (`|---|:--:|`) mı. */
+const ayracMi = (satir: string): boolean => /^\s*\|[\s:|-]+\|?\s*$/.test(satir)
+
+/**
+ * Belgedeki ardışık `|` satırlarını öbeklere böler ve ayraç satırı OLMAYAN öbekleri
+ * döndürür. Gerçek bir markdown tablosunun ikinci satırı daima ayraçtır; ayracı olmayan
+ * bir `|` öbeği tablo değil ENKAZDIR.
+ */
+function enkazObekleri(satirlar: string[]): string[] {
+  const enkaz: string[] = []
+  let i = 0
+  while (i < satirlar.length) {
+    if (!satirlar[i].trimStart().startsWith('|')) {
+      i++
+      continue
+    }
+    let j = i
+    while (j < satirlar.length && satirlar[j].trimStart().startsWith('|')) j++
+    const obek = satirlar.slice(i, j)
+    if (obek.length < 2 || !ayracMi(obek[1])) {
+      enkaz.push(`satir ${i + 1}-${j} (${obek.length} satir, ilki ${obek[0].length} bayt)`)
+    }
+    i = j
+  }
+  return enkaz
+}
+
+const enkazMesaji = (enkaz: string[]): string =>
+  'Ayraci OLMAYAN `|` obegi var — yani tablo gibi gorunen ama tablo OLMAYAN satirlar.\n' +
+  'Bir elle duzenleme hucreleri satir basina/sonuna yigmis olabilir: #1185 te tam bu\n' +
+  'oldu (belgenin 1. satiri 1968 bayta cikti) ve UC KOL DA 17/17 YESIL kaldi.\n' +
+  'Enkaz: ' + enkaz.join(' · ')
+
 describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
   it('betik ve envanter belgesi VAR (kapi KOR kosmasin)', () => {
     expect(fs.existsSync(BETIK), 'kapi betigi yok — kapi hicbir sey olcmuyor ama yesil yanardi').toBe(true)
     expect(fs.existsSync(path.join(KOK, GERCEK_ENVANTER)), 'envanter belgesi yok').toBe(true)
+  })
+
+  /**
+   * ⭐BELGE YAPISI SAĞLAM — 2026-09-14'te SAHADA ölçülen bir boşluk.
+   *
+   * #1185 (REC-327, alt-ajan) belgenin BİRİNCİ SATIRINA yedi tablo parçası yazdı ve
+   * `# Araç Envanteri` başlığını o satırın SONUNA itti. Satır 1968 bayta çıktı. Üç kapı
+   * kolu da (INV-ARAC-1..3) 17/17 YEŞİL kaldı, çünkü hepsi `### 3.x` bölümlerinin İÇİNİ
+   * ölçüyor — belgenin GÖVDESİNE bakan hiçbir kol yoktu.
+   *
+   * Üretici bunu yapamaz (satırı daima başlık genişliğine tamamlar, `durumuDegistir`
+   * hücre sayısı yetmezse satıra DOKUNMAZ ve yazma indeksleri ayrıştırılmış tablo
+   * aralığından gelir) — yani bu bir ELLE düzenleme kazasıydı. Kapının işi kazanın
+   * KİM yaptığını değil, BELGENİN BOZULDUĞUNU yakalamaktır.
+   *
+   * İki şey ölçülür: (a) ilk satır gerçekten başlık mı, (b) her `|` satırı GERÇEK bir
+   * tabloya mı ait.
+   *
+   * ⚠(b)'nin ilk yazımı yanlıştı ve bunu yazarken ölçtüm: "`|` ile başlayan satırı muaf
+   * tut, gerisinde boru arayan" bir ölçüt kurmuştum — oysa asıl arıza satırı `|` İLE
+   * BAŞLIYORDU, yani kolum tam olarak yakalaması gereken şeyi muaf tutuyordu. Doğru
+   * ölçüt: ardışık `|` satırları bir ÖBEK sayılır ve her öbeğin İKİNCİ satırı markdown
+   * ayraç satırı (`|---|---|`) olmalıdır. Belgenin başına düşen tek satırlık bir enkaz
+   * öbeğinin ayracı yoktur ve bu ölçütten KAÇAMAZ.
+   */
+  it('BELGE YAPISI SAGLAM: ilk satir baslik ve her tablo satiri gercek bir tabloya ait', () => {
+    const satirlar = fs.readFileSync(path.join(KOK, GERCEK_ENVANTER), 'utf8').split(/\r?\n/)
+
+    expect(satirlar[0], 'Belgenin ilk satiri `# Arac Envanteri` basligi OLMALI.').toMatch(
+      /^# Araç Envanteri/,
+    )
+
+    expect(enkazObekleri(satirlar), enkazMesaji(enkazObekleri(satirlar))).toEqual([])
+  })
+
+  it('SABOTAJ 4 — bozuk belge basi BELGE YAPISI kolunu KIRMIZI yapar (FIKSTUR)', () => {
+    // Kol kendi ölçütünü kanıtlar: gerçek arızanın ta kendisi taklit edilir — hücreler
+    // belgenin BİRİNCİ satırına yığılır ve başlık o satırın SONUNA itilir.
+    const bozukSatirlar = (() => {
+      const s = fs.readFileSync(path.join(KOK, GERCEK_ENVANTER), 'utf8').split(/\r?\n/)
+      s[0] = '| a | KAYIP (onceki: X) | b |' + s[0]
+      return s
+    })()
+
+    expect(bozukSatirlar[0], 'fikstur gercekten bozuk olmali').not.toMatch(/^# Araç Envanteri/)
+    expect(
+      enkazObekleri(bozukSatirlar),
+      'SABOTAJ TUTMADI: belgenin basina yigilan hucreler enkaz sayilmadi — kol KOR.',
+    ).not.toEqual([])
   })
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -278,7 +360,26 @@ describe('INV-ARAC-1..3: arac envanteri gercekle esit, sahipli ve taze', () => {
   it('YAZMA KIPI KORUR: yeni satir eklenirken MEVCUT satirlar bayt bayt ayni kalir', () => {
     const belge = fiksturBelgesi((m) => m)
     const oncekiSatirlar = fs.readFileSync(belge, 'utf8').split(/\r?\n/)
-    const sahte = path.join(KOK, 'scripts', 'zz-koruma-gecici.mjs')
+    /**
+     * ⛔UZANTI `.ps1`, VE BU BİR TERCİH DEĞİL ZORUNLULUK — ÖLÇÜLDÜ (2026-09-15, REC-336 adım 3).
+     *
+     * Bu kol, üreticinin YENİ bir araç görmesi için canlı `scripts/` dizinine gerçek bir dosya
+     * yazmak zorunda (üretici `scripts` kökünü sabit tarıyor, fikstür kökü almıyor). Dosya
+     * `.mjs` iken **kardeş bir kapıyı rastgele düşürüyordu:**
+     * `render-revalidation-contract.test.ts` modül yüklenirken
+     * `import.meta.glob('/scripts/**\/*.{js,mjs,cjs,ts,json,txt,sql}', {eager:true})` çalıştırıyor.
+     * İki dosya aynı koşumda paralel gidince glob geçici dosyayı LİSTEDE görüyor, okumaya
+     * geldiğinde dosya `finally` ile silinmiş oluyor → `ENOENT` → o paket HİÇ toplanamıyor
+     * (0 test) ve koşum kırmızı. Sıraya bağlı olduğu için bazen geçiyor: yani KIRILGAN bir kapı.
+     *
+     * ⭐NİÇİN UZANTI ÇÖZÜYOR: üretici `.cjs .mjs .js .py .ps1 .sh .ts` tarıyor; kardeş kapının
+     * globu `.ps1` İÇERMİYOR. Yani dosya üretici için hâlâ "yeni araç", kardeş kapı için hiç
+     * yok. Kolun ölçtüğü şey değişmedi, yalnız çakışma kalktı.
+     *
+     * ⚠KIRILGAN KAPI, OLMAYAN KAPIDAN KÖTÜDÜR: rastgele kırmızı, ekibi "bir daha koştur"
+     * alışkanlığına iter ve o alışkanlık gerçek kırmızıyı da yutar.
+     */
+    const sahte = path.join(KOK, 'scripts', 'zz-koruma-gecici.ps1')
     fs.writeFileSync(sahte, '// gecici koruma kolu dosyasi\n', 'utf8')
     try {
       const r = kostur(['--yaz', '--envanter', belge])

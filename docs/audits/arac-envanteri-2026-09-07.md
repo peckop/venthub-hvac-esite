@@ -5,6 +5,50 @@
 > **ilk envanteridir**; sonraki üretim `scripts/hijyen/arac-envanteri.cjs` (REC-185) — o betik
 > koşana kadar bu belge elle derlenmiştir ve AXIOM 1 gereği bu haliyle "var" sayılır.
 
+## 0 · ⚠AXIOM 3'ÜN SINIRI — üretilen satırın `durum` sütunu insan metni TUTMAZ
+
+**Ölçüldü 2026-09-14 (REC-333 / #1188, ve #1185'te sessizce kaybedilmişti):** AXIOM 3
+"üretilen dosya elle düzenlenmez, yalnız insan hükmü kolonları elle yazılır" der. Bu izin
+**YENİ eklenen satırlar** içindir. Üreticinin **KAYIP** işaretlediği bir satırın `durum`
+sütunu **üreticinin malıdır**, insanın değil: konformansın `YAZMA KIPI IDEMPOTENT` kolu
+kendi içinde `--yaz` koşar ve o sütunu kanonik hâline **geri yazar.**
+
+#1185'te o sütuna elle yazdığım hüküm **commit'ten önce silinmişti** ve ben Recep'e
+"yazdım" demiştim; master'da olmadığını sonradan ölçtüm. Ders: **hüküm ÜRETİLMEYEN yere
+yazılır** — anlatı satırına, denetim belgesine, PR gövdesine. Üretilen tabloya yazılan
+hüküm sessizce kaybolur ve kaybı hiçbir kapı söylemez.
+
+## 0.1 · ⚠BELGENİN GÖVDESİ DE ÖLÇÜLÜR — üç kol içeriyi ölçüyordu, kimse belgeye bakmıyordu
+
+**Ölçüldü 2026-09-14:** #1185 bu belgenin **birinci satırına** yedi tablo parçası yazdı ve
+`# Araç Envanteri` başlığını o satırın sonuna itti; satır **1968 bayta** çıktı. `INV-ARAC-1..3`
+üç kolu da **17/17 yeşil** kaldı, çünkü hepsi `### 3.x` bölümlerinin **içini** ölçüyordu.
+
+Üretici bunu yapamaz (satırı daima başlık genişliğine tamamlar, hücre sayısı yetmezse satıra
+dokunmaz, yazma indeksleri ayrıştırılmış tablo aralığından gelir) — yani bu bir **elle
+düzenleme kazası**ydı. Yeni kol `BELGE YAPISI SAGLAM` iki şey arar: ilk satır başlık mı, ve
+her `|` öbeğinin ikinci satırı ayraç mı. Gerçek arızada kırmızı, onarımdan sonra yeşil
+olduğu **ölçülerek** doğrulandı.
+
+→ Aynı cümle `docs/standards/arac-envanteri-standard.md` AXIOM 3 bölümüne **yazıldı**
+(2026-09-14, OPS onaylı: dosya panoda kimsede değildi, bu PR süresince ALTYAPI claim'ine alındı).
+
+## 0.2 · §3.3'teki 13 kalemin KAL hükmü NEYE dayanıyor
+
+13 yetenek kaleminin 26 satırında (her kalem `.claude` + `.agent` ağacında) `kanıt` hücresine
+**tetiklenebilirlik sınavı** damgası elle yazıldı. Tam tablo, sınavın beş sınırı, düzeltilen
+maliyet tabanı ve kaybolan üç alt-ajan raporunun kaydı:
+**`docs/audits/rec314-tetiklenebilirlik-sinavi-2026-09-14.md`**.
+
+Kısaca: 13 kalemin 13'ü de tetiklendi (parti 1 6/6, parti 2 20/20, `without` kolu her yerde 0).
+Üçü "hiç çağrılmamış" listesindeydi ve **sökme sırasının başındaydı** — atıl liste bir sökme
+listesi olarak kullanılsaydı çalışan üç araç silinecekti. ⚠Altı vakada koşum
+`max turns (4)` ile bittiği için **"tetikleniyor" kanıtlı, "işi bitiriyor" ölçülmedi.**
+
+⚠Bu satırların insan kolonlarının gerçekten insanın olduğu **ölçüldü**: elle yazımdan sonra
+`--yaz` koşuldu ve fark **0 bayt** çıktı, `INV-ARAC-1..3` 19/19 yeşil. Yani bölüm 0'daki sınır
+yalnız KAYIP satırının durum sütunu içindir; mevcut satırın kanıt/kapı/durum hücreleri değil.
+
 ---
 
 ## 1 · Recep tek sayfası
@@ -27,7 +71,7 @@
   **OPS**'a yazılır (her birine en yakın şerit "devir adayı" notuyla) → nihai: ALTYAPI 29 ·
   **OPS 81** (10 asıl + 71 devir-adaylı) · URUN 3 · URUN-KATALOG 6. Cetvellerde aynı mekanik: 57
   sahipsiz satır OPS'a yazıldı (nihai OPS 59, ALTYAPI 5, URUN 3).
-- **CI'da `disabled_manually` olanlar (8):** `jules-a11y.yml`, `jules-dependency-update.yml`,
+- **CI'da `disabled_manually` olanlar (8 — 2026-09-14'te SEKİZİ DE SİLİNDİ: yedisi REC-327 / #1185, `ai-auto-repair.yml` ise REC-333 / #1188 ile):** `jules-a11y.yml`, `jules-dependency-update.yml`,
   `jules-i18n-sync.yml`, `jules-lint-fix.yml`, `jules-performance.yml`, `jules-security-audit.yml`,
   `jules-test-coverage.yml`, `ai-auto-repair.yml` — GitHub tarafında elle KAPATILMIŞ, `workflow_dispatch`
   bile çalışmaz. Sonnet `ai-auto-repair.yml`'i "skipped" görüp KAL saymıştı; çürütme bunu düzeltti
@@ -94,19 +138,21 @@ hatasını tekrarlar.
 | `.claude/hooks/bash-write-guard.cjs` | hook | PreToolUse: Bash yazma kapısı (lane-guard + protect-config'in Bash karşılığı) | ALTYAPI | `hook:PreToolUse Bash` | bağlı | bash-write-guard-muafiyet.test.ts, sir-basan-kalip.test.ts | KAL |
 | `.claude/hooks/bash-write-targets.cjs` | hook (kütüphane) | Bash komutundan yazma hedeflerini çıkaran saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:87 | dolaylı | bash-write-gate.test.ts | KAL |
 | `.claude/hooks/board-brief.cjs` | hook | UserPromptSubmit: sessiz pano brifingi + kira yenileme | ALTYAPI | `hook:UserPromptSubmit *` | bağlı | board-invariants.test.ts, fleet-mechanism-integrity.test.ts | KAL |
-| `.claude/hooks/board-release.cjs` | hook | SessionEnd: şeridi bırak (kira serbest bırakma) | ALTYAPI | `hook:SessionEnd *` | bağlı | yok | KAL |
-| `.claude/hooks/lane-guard.cjs` | hook | PreToolUse: şerit koruması (çok-oturumlu çakışma engeli) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | yok | KAL |
+| `.claude/hooks/board-release.cjs` | hook | SessionEnd: şeridi bırak (kira serbest bırakma) | ALTYAPI | `hook:SessionEnd *` | bağlı | kanca-board-release.test.ts | KAL |
+| `.claude/hooks/lane-guard.cjs` | hook | PreToolUse: şerit koruması (çok-oturumlu çakışma engeli) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-lane-guard.test.ts | KAL |
 | `.claude/hooks/precompact-durum-kapisi.cjs` | hook | PreCompact: durum kapısı (REC-86 Faz 1) | ALTYAPI | `hook:PreCompact *`; ayrıca `require()` ← session-board.cjs:176 | bağlı | precompact-durum-kapisi.test.ts | KAL |
-| `.claude/hooks/protect-config.cjs` | hook | PreToolUse: kalite ağı (config-protection + içerik taraması) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | auth-role-source.test.ts, stock-restore-evidence.test.ts (dolaylı) | KAL |
-| `.claude/hooks/sensitive-path-guard.cjs` | hook | PreToolUse: iki hassas yol sınıfını korur | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | yok | KAL |
+| `.claude/hooks/protect-config.cjs` | hook | PreToolUse: kalite ağı (config-protection + içerik taraması) | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-protect-config.test.ts | KAL |
+| `.claude/hooks/sensitive-path-guard.cjs` | hook | PreToolUse: iki hassas yol sınıfını korur | ALTYAPI | `hook:PreToolUse Edit\|Write\|MultiEdit` | bağlı | kanca-sensitive-path-guard.test.ts | KAL |
 | `.claude/hooks/session-board.cjs` | hook | SessionStart: oturum kimliği + pano durumu bağlamı enjekte eder | ALTYAPI | `hook:SessionStart *` | `.git/venthub-sid`, 2026-09-07 | bash-write-audit-tree, companion-defter, fleet-mechanism-integrity, precompact-durum-kapisi.test.ts | KAL |
 | `.claude/hooks/sir-basan-kalip.cjs` | hook (kütüphane) | Bir Bash komutunun SIR değerini basıp basmadığını ölçen saf fonksiyon | ALTYAPI | `require()` ← bash-write-guard.cjs:67 | dolaylı | sir-basan-kalip.test.ts | KAL |
-| `.claude/hooks/son-soz-gate.cjs` | hook | Stop kapısı: turda kullanıcı mesajı varsa SON SÖZ kullanıcıya mı yazılmış | ALTYAPI | `hook:Stop *` | bağlı | yok | KAL |
+| `.claude/hooks/son-soz-gate.cjs` | hook | Stop kapısı: turda kullanıcı mesajı varsa SON SÖZ kullanıcıya mı yazılmış | ALTYAPI | `hook:Stop *` | bağlı | kanca-son-soz-gate.test.ts | KAL |
 | `.claude/hooks/verify-on-stop.cjs` | hook | Stop (async): JS/TS düzenlendiyse eslint --fix + tsc doğrulaması | ALTYAPI | `hook:Stop *` (async, timeout 120) | `.cwd-ayrisma-sayaci.json`, 2026-09-07 | board-invariants.test.ts | KAL |
 | `.claude/hooks/defter-bayatlik-olcumu.cjs` | hook | Stop hook — PROJE TAKİP DEFTERİ BAYATLIK ÖLÇÜMÜ (yalnız ÖLÇER ve UYARIR). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/defter-bayatlik-olcumu.test.ts | YENI |
+| `.claude/hooks/defter-tazelik-satiri.cjs` | hook | UserPromptSubmit — defter tazelik satırı: son eşitleme yaşı + değişen demet (önbellekten) + Kararlar kopyası yaşı; eşik aşılınca ⚠, ölçemezse sebep yazar | ALTYAPI | `hook:UserPromptSubmit *` (timeout 10) | 2026-09-15, elle koşturuldu: `⚠DEFTER: son esitleme 2026-09-08 (7 gun) · olc 14 degisen/22 · Kararlar kopyasi 3 gun`; süre 266-298 ms (çıplak node açılışı ~187 ms) | src/\_\_tests\_\_/conformance/kanca-defter-tazelik.test.ts (11 kol, iki yön + ölçemedi + bayat önbellek) | KAL |
 | `.claude/hooks/eylem-defteri.cjs` | hook | PostToolUse hook — EYLEM DEFTERİ (git'in GÖRMEDİĞİ taşıma/silmeleri kaydeder). | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/eylem-defteri.test.ts | YENI |
 | `.claude/hooks/hafiza-sorusu-yonlendirme.cjs` | hook | UserPromptSubmit hook — HAFIZA SORUSU YÖNLENDİRME. | OPS | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/hafiza-sorusu-yonlendirme.test.ts | YENI |
 | `.claude/hooks/soguk-okuyucu-sinavi.cjs` | hook | PostToolUse hook — SOĞUK OKUYUCU SINAVI ÇAĞRISI (yalnız HATIRLATIR, sınavı ajan koşar). | OPS | docs/standards/hafiza-kancalari-standard.md, src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/soguk-okuyucu-sinavi.test.ts | YENI |
+| `.claude/hooks/hafiza-indeks-bekcisi.cjs` | hook | HAFIZA İNDEKSİ BEKÇİSİ (REC-280), iki kol: (A) `MEMORY.md` **yumuşak eşik 15800** — satır eklemeden önce katla; (B) ⭐**kayıp yazım dedektörü** — kaybolan satır `dizin-*.md`'ye katlanmamışsa uyarır. ⛔BLOKLAMAZ, daima çıkış 0; ağ/LLM/DB yok. Mutlak yol YAZMAZ (§24), dizin `os.homedir()`+transcript'ten türer. | ALTYAPI | `.claude/settings.json` PreToolUse `Edit\|Write\|MultiEdit` — yazımdan ÖNCE | fikstürle 7 koşum 2026-09-08: katlanmış satır **SESSİZ** · silinmiş satır **UYARI** (satır gösterildi) · yalnız boşluk farkı SESSİZ · 15917 baytta uyarı, eşik altında sessiz · MEMORY.md dışı hedef sessiz · proje dizini çözülemeyince "ATLANDI" satırı + çıkış 0 | `hafiza-indeks-bekcisi-kilidi` konformans kolları (7) | KAL |
 
 **Not (companion, envanter dışı — cetvel §1):** `accumulate-edits.md`, `bash-write-audit.md`,
 `bash-write-guard.md`, `bash-write-targets.md`, `board-brief.md`, `board-release.md`,
@@ -128,11 +174,11 @@ madde 1 gereği araç sayılmaz.
 | `scripts/apply-stock-fix.mjs` | Stok düzeltmesi uygular (kök scripts/'ten bir üst) | OPS *(devir adayı: ALTYAPI)* | `cagiran-yok` | pano 2026-08-27 yalnız companion listesi, koşum değil | yok | OLU-DOGRULANDI |
 | `scripts/assert-node-major.mjs` | INV-NODE-1 3. yüzey: derlemenin GERÇEK Node ana sürümünü ölçer | OPS *(devir adayı: ALTYAPI)* | `docs/standards/runtime-version-alignment-standard.md`, `package.json` | 2026-08-19 | yok | KAL |
 | `scripts/board/board.cjs` | Çok-oturumlu controller panosu | ALTYAPI | `.githooks/lib/{companion-defter,doc-scope}.cjs` | 2026-09-05 | yok | KAL |
-| `scripts/board/gozcu.cjs` | Filo gözcüsü (pano izleyicisi) | ALTYAPI | `scripts/board/{board,mechanism-setup}.cjs` | 2026-08-24 | yok | KAL |
+| `scripts/board/gozcu.cjs` | Filo gözcüsü (pano izleyicisi) | ALTYAPI | ⛔KURULMAZ — filo `SendMessage` ile çalışır (REC-328) | 2026-09-14 (son koşum; kapatıldığı gün) | yok | **EMEKLİ** — Recep 2026-09-14 (REC-328); dosya duruyor, oturumlarda kurulmaz |
 | `scripts/board/izin-reddi-gunlugu.cjs` | İzin-reddi olay günlüğü (filo-görünür ret sayacı) | ALTYAPI | `docs/standards/fleet-mechanism-standard.md` | 2026-08-31 | yok | KAL |
 | `scripts/board/kimlik.cjs` | "Bu commit'i hangi oturum yapıyor" TEK cevap | ALTYAPI | `.claude/hooks/{bash-write-audit,session-board}.cjs` | 2026-08-31 | yok | KAL |
 | `scripts/board/lane-precommit.cjs` | Pre-commit 2. katman şerit kapısı (E1) | ALTYAPI | `.githooks/pre-commit`, `.claude/hooks/bash-write-audit.cjs` | 2026-08-31 | yok | KAL |
-| `scripts/board/mechanism-setup.cjs` | Mekanik otonomi kurulumu/doğrulaması (T115-VH) | ALTYAPI | `.claude/hooks/{board-brief,session-board}.cjs` | 2026-09-06 | yok | KAL |
+| `scripts/board/mechanism-setup.cjs` | Mekanik otonomi kurulumu/doğrulaması (T115-VH) | ALTYAPI | ⛔ÇAĞIRAN YOK — kanca atıfları REC-328 ile kaldırıldı | 2026-09-14 (son koşum; emeklilik günü) | `INV-MECH-1` (artık TERSİNİ zorlar: kanca bu betiğe yollamaz) | **EMEKLİ** — Recep 2026-09-14 (REC-328) |
 | `scripts/board/registry-autosync.cjs` | Registry oto-senkronu (oturum açılışı, arka plan) | ALTYAPI | `.claude/hooks/session-board.cjs` | 2026-08-15 | yok | KAL |
 | `scripts/board/registry-sync.cjs` | Orion registry senkronu — kalıcı iş durumu | ALTYAPI | `.githooks/post-merge`, `docs/standards/multi-session-coordination-standard.md` | 2026-08-15 | yok | KAL |
 | `scripts/ci/apt-hardening.sh` | Koşucuda apt'yi sınırlı sürede başarısız olmaya zorlar | ALTYAPI | `.github/workflows/e2e-smoke.yml` | 2026-08-19 | yok | KAL |
@@ -278,23 +324,44 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/kimlik-kurali.mjs` | ÜRÜN KİMLİK KURALI — TEK KAYNAK (REC-226 / REC-272 / REC-275) | URUN-KATALOG | import edilir (kural tek kaynak; kademe2-load + icerik-hatti kullanir) | PR #1109 · 442 urunde cakisma 0 olculdu | cagiranin on kosul kapisi | KAL |
 | `scripts/icerik-hatti/uydurma-kimlik-tek-kural.mjs` | UYDURMA KİMLİĞİ TEK KURALA GETİRİR — REC-226 / REC-272 / REC-275 | URUN-KATALOG | elle (kuru kosum varsayilan; --yaz + CANLI_YAZIM_ONAYI) | PR #1109 · uc yonlu sabotaj | iki on kosul kapisi (sku yedegi + benzersizlik) | KAL |
 | `scripts/icerik-hatti/kimlik-kurali-kapisi.mjs` | KİMLİK KURALI KAPISI — INV-KIMLIK-TEK-KURAL-1 (REC-275) | URUN-KATALOG | elle / CI (ALTYAPI'dan baglanmasi istenecek) | PR #1109 · iki yonlu sabotaj: ardisik-sayi uydurma ve kodsuz-satir dusurme KIRMIZI verdirdi | INV-KIMLIK-TEK-KURAL-1 (kendisi kapi) | KAL |
+| `scripts/nlm/linear_arsiv.py` | Linear GraphQL: kim / say / arsivle <no...> / arsivle done / arsivle canceled — Done kayitlar 7 gun sonra arsiv (250 sinir); LINEAR_API_KEY ortamdan | OPS | insan (OPS rutin, haftalik) | 2026-09-08 · PR #1118 | yok (cetvel: work-tracking-ssot-standard, arsiv rutini) | KAL-KAPISIZ |
+| `scripts/media/gorsel-envanteri.mjs` | GÖRSEL ENVANTERİ — mükerrer görseller + "yeni fotoğraf gerekli" listesi (REC-282 / REC-284) | URUN-KATALOG | elle (SALT OKUMA; `--yaz` kolu BİLEREK YOK — envanterden çıkacak düzeltme Recep kapısı) | 2026-09-08 koşuldu: 442 ürün · 1042 görsel · 898 hash · 3 kategori-aşan grup · 103 görselsiz ürün; rapor `docs/audits/icerik-hatti-gorsel-envanteri-2026-09-08.{md,json}` | yok — **KAL-KAPISIZ**: çıktısı kapıya bağlı değil, kapı REC-284'te kurulacak | KAL-KAPISIZ |
+| `scripts/db/checks/tip-drift.mjs` | INV-TIP-DRIFT-1 — `src/types/database.types.ts` CANLI ŞEMAYLA SENKRON MU (REC-121). Ölçüt ŞEMA YÜZEYİ (tablo/görünüm/kolon/fonksiyon/enum/bileşik); biçim ve CLI sürüm farkı sessiz. | ALTYAPI | **CI — `db-advisor.yml`, AYRI iş** (`tip-drift` + `tip-drift-precheck`). ⭐Kardeşlerden farklı: sır `SUPABASE_ACCESS_TOKEN`, `pg` sürücüsü ve kök sertifika YOK — betik DB'ye bağlanmaz, Supabase API'sinden tip üretir. | kapı koşumu 2026-09-08: 62 tablo/786 kolon iki tarafta = çıkış 0 YEŞİL · aynı gün `--tip-dosyasi` fikstürüyle bayat tipe karşı **çıkış 1**, iki yön de adıyla basıldı (3 eksik + 3 fazla) — iki yönlü | INV-TIP-DRIFT-1 (kendisi kapı) · düzeneği `tip-drift-kapisi` konformans kolları (6 kol: CI çağırıyor · doğru sır · yanlış sır/pg kopyalanmamış · atlanmış iş uyarır · artefakta yazmaz · fail-closed) | KAL |
+| `scripts/db/checks/aile-kategori-tutarlilik.mjs` | INV-AILE-KATEGORI-1 — ürünün kategorisi ile AİLESİNİN kategorisi AYRIŞMASIN (REC-290). Vitrin ürün değil AİLE listeler; ayrışma = veri doğru, vitrin sessizce yanlış. SALT OKUR. | ALTYAPI | CI — `db-advisor.yml` `catalog-integrity` işine adım olarak bağlı (kardeşiyle aynı sır + kök sertifika); `--fikstur` ile ağsız da koşar | canlı koşum 2026-09-08: ürün 442 · ailesi olan 442 · aktif aile 47 · evren 442 · **ihlal 0** (KATALOG'un 11'lik onarımı sonrası). İki yönlü: ters sorgu 442 örtüşen sayıyor → ölçüt kör değil. Fikstür üç kol: temiz→0, ihlal→1, evren 0→**2** | INV-AILE-KATEGORI-1 (kendisi kapı) · düzeneği `ssr`-benzeri konformans kolu ile kilitli | KAL |
+| `scripts/hijyen/commit-oncesi-uyarilar.cjs` | COMMIT ÖNCESİ İKİ UYARI (REC-267): (1) yeni betik araç envanterinde ilan edilmemiş → betik adı + koşulacak komut yazılır, (2) şerit önekli dal ANA REPO ağacında. ⛔BLOKLAMAZ, daima çıkış 0; ağ/LLM/DB yok. | ALTYAPI | `.githooks/pre-commit` — şerit kapısından ÖNCE (bloklayan çıktının ardındaki uyarı okunmaz), `|| true` ile | 2026-09-08: kol 1 kendi betiğimde yandı (adı + komut basıldı) · kol 2 ana repo ağacında GERÇEK hâli yakaladı (`urun/rec286-kapi-siniri` ana repoda duruyordu) · maliyet 5 koşum **264-300 ms** | uyarı-only, kapı DEĞİL — düzeneği `commit-oncesi-uyarilar-kilidi` konformans kolları ölçer | KAL |
+| `scripts/db/checks/denetim-izi-tetik-kapisi.mjs` | INV-DENETIM-IZI-1 — denetim tetiği CANLI DB'de duruyor mu, HÂLÂ fail-closed mı, ve `products` kolon süzgeci yerinde mi (REC-292). ⭐Metin taraması yetmez: bu depoda migration dosyası "prod'da hangi tetik var" sorusunda YETKİLİ KAYNAK DEĞİL (`on_products_change` migration'larda yok, `scripts/webhook_setup.sql` ile kurulmuş). SALT OKUR. | ALTYAPI | CI — `db-advisor.yml` `rls-role-coverage` işine adım olarak bağlı (kardeşleriyle aynı sır + kök sertifika; yeni iş adı açmak açık PR'ları kilitler, gerekçesi o işte yazılı); `--fixture` ile ağsız da koşar | fikstür 6 kol, hepsi beklendiği gibi: tam→0 ihlal · `site_settings` tetiği silinmiş→**TETIK-YOK** · gövdeye `exception when` girmiş→**FAIL-OPEN** · süzgeç kalkmış→**SUZGEC-YOK** · süzgeçten `price` çıkmış→**SUZGEC-DAR** · webhook tetikleri sayıma girmiyor (7). ⛔Canlı koşum HENÜZ YOK: ölçeceği tetikler migration Recep kapısından geçmeden var olmayacak — kapı ile migration AYNI PR'da iner | INV-DENETIM-IZI-1 (kendisi kapı) · düzeneği `denetim-izi-kapisi.test.ts` 21 kolu ile kilitli | YENI |
+| `scripts/db/checks/lib/denetim-izi-hukum.mjs` | REC-292 denetim izi kapısının **SAF HÜKÜM KATMANI** (`degerlendir` + `KAPSAM` + zorunlu kolonlar). ⛔İçinde shebang · yan etki · ağ · dosya sistemi · `process.exit` YOK; yalnız veri alır, hüküm döndürür. Niçin ayrı dosya: CLI betiği shebang taşıyor ve `vite-node` shebang'ı sökerken satır sonunu LF varsayıyor — CRLF'li ağaçlarda kalan `\r` `SyntaxError` veriyor ve kapının **ayırt edici altı kolu** sessizce düşüyordu (KATALOG üç ağaçta ölçtü, 2026-09-09). Ayrım hem o sınıfı hem de "import edince kapı kendini koşuyor" kusurunu kaldırır. | **ALTYAPI** | CLI betiği (`denetim-izi-tetik-kapisi.mjs`) **statik import** ile buradan besleniyor; konformans testi de aynı modülü kullanır — CLI ve test AYNI kaynak | `kapi-import-guvenligi.test.ts` + `denetim-izi-kapisi.test.ts` birlikte **31/31 geçti** (2026-09-09 ~10:1xZ, LF'li ağaç). ⚠CRLF'li ağaçta doğrulama URUN/KATALOG'da — kusur benim ağacımda GÖRÜNMÜYOR | INV-KAPI-IMPORT-1 (shebang yok · `\r` yok · `main()` koşulsuz çağrılmaz) · INV-DENETIM-IZI-1 | **AKTIF** |
+| `scripts/icerik-hatti/katalog-paket-uret.mjs` | TAŞINABİLİR KATALOG — İNSAN-OKUR PAKET ÜRETİCİ (REC-212 F1, adım 1-2) | URUN-KATALOG | elle (`--hedef=<paket>`), `katalog-disa-aktar.mjs`'ten SONRA | 2026-09-09: koştu, 7 CSV/8088 satır + 1146 görsel üretti, başarısız 0 | yok | AKTİF |
+| `scripts/icerik-hatti/paket-belgeler-uret.mjs` | PAKET BELGE TABLOSU — belgeler.csv (REC-212 F1 eki, OPS emri 2026-09-09 12:02Z) | URUN-KATALOG | elle kosulur (paket uretimi sonrasi) | 2026-09-09 (60 belge / 65 satir) | yok | AKTIF |
+| `scripts/icerik-hatti/kaynak-eslemesi.mjs` | ADIM 3 — KAYNAK EŞLEMESİ: her teknik değer ↔ kaynak dizini (REC-212 F1, OPS emri 12:13Z) | URUN-KATALOG | elle kosulur (paket uretimi sonrasi, adim 3) | 2026-09-09 (5168 deger, VAR 2205, tesadduf tabani 355) | yok | AKTIF |
+| `scripts/icerik-hatti/paket-karnesi.mjs` | KATALOG KARNESİ — EVREN = PAKET (OPS hükmü 2026-09-09 12:32Z, Recep kararı K13) | URUN-KATALOG | elle kosulur (karne istendiginde) | 2026-09-09 (8 eksen, genel %57) | yok | AKTIF |
+| `scripts/icerik-hatti/defter-sorgu.mjs` | DEFTER SORGUSU — aile × alan soruları, ham cevaplar jsonl'e (OPS emri 2026-09-10 06:37Z) | URUN-KATALOG | elle kosulur (aile aile, seri — CLI kotali) | 2026-09-10 (3 aile pilot) | yok | AKTIF |
+| `scripts/icerik-hatti/defter-tablo-uret.mjs` | DEFTER TABLO ÜRETİMİ — aile başına kaynak-kısıtlı data-table (OPS kararı 2026-09-10 07:05Z) | URUN-KATALOG | elle kosulur (aile aile, kota gozetilir) | 2026-09-10 (yayim baslamadi; 'ready' kaynak kapisi eklendi) | yok | AKTIF |
+| `scripts/skills-eval-run.mjs` | SKILL YÖNLENDİRME SINAVINI KOŞAR (REC-303). | ALTYAPI | .github/workflows/skills-gate.yml, package.json (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts (saf cekirdek) | KAL |
+| `scripts/skills-eval/lib.mjs` | SKILL YÖNLENDİRME SINAVI — SAF ÇEKİRDEK (ağ yok, dosya yazımı yok). | ALTYAPI | scripts/skills-eval-run.mjs, src/__tests__/conformance/skills-eval-puanlama.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skills-eval-puanlama.test.ts | KAL |
+| `scripts/hijyen/skill-bitis-blogu.mjs` | ORTAK BİTİŞ BLOĞUNU 71 SKILL.md'ye GEÇİRİR (REC-305). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/skill-bitis-blogu.test.ts | KAL |
+| `scripts/skills-eval-convert.mjs` | evals.json → YERLEŞİK eval vaka ağacı dönüştürücüsü (REC-319 adım 2b). | ALTYAPI | .gitignore (betik taramasi) | 2026-09-13 (pilot: 18 vaka uretildi, 36 kosum kosuldu) | testi YOK — cikti .gitignore da, kapi kosamaz; KANIT pilot kosumu (docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md bolum 7-8) | KAL |
+| `scripts/board/linear-okundu.cjs` | Linear yorum sayacinin esik damgasini "simdi"ye ceker (`--goster`, `--geri`) | OPS *(yazan: ALTYAPI)* | ELLE kosulur, yorumlari okuyan kisi tarafindan; sayac satiri komutu kendi ciktisinda gosterir | 2026-09-14 yazildi ve kosuldu (kabul sinavi: okundu+geri gidis-donus) | INV-MECH-1 (sira ve sessizlik kolu) | KAL |
+| `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
+| `scripts/db/checks/arama-davranisi.mjs` | INV-SEARCH-BEHAVIOR-1 — arama DAVRANIŞI kapısı (Katman B, canlı): on vakayı gerçek RPC üzerinden ölçer, ölçüt biçimleri oran/sıfır-değil/aynı-küme/marka-var/tam-SKU (sabit sayı YOK), hassasiyet tavanı %40, bilinen kırmızılar adıyla ilan edilir ve mandal İKİ YÖNLÜ (ilanlı vaka geçmeye başlarsa KIRMIZI) | ALTYAPI | `.github/workflows/db-advisor.yml` → `catalog-integrity` işine ADIM olarak bağlı, `db-gate-precheck.outputs.ready == 'true'` koşuluyla (yeni iş adı AÇILMADI: açık PR'ları "beklenen kontrol gelmedi"de kilitler) | 2026-09-15, REC-340 Faz 1 Adım 1. Prod'da salt-okuma ölçüldü (Supabase MCP): on vakanın **altısı** kırmızı (2,3,4,5,9,10), dördü geçiyor (1→47, 6→9, 7→1 doğru SKU, 8→52); aktif ürün 441, hiçbir vaka %40 tavanını aşmıyor. Betik sırsız koşturuldu → çıkış 0 + "OLCULEMEDI" + "ATLANMIS IS YESIL DEGILDIR" (konformans kolu bunu DAVRANIŞLA ölçüyor) | `src/__tests__/conformance/arama-davranisi.test.ts` (INV-SEARCH-BEHAVIOR-1 Katman A, 15 kol) | KAL |
+| `scripts/db/sema-graf-uret.mjs` | ŞEMA GRAF ÜRETİCİSİ (aşama 1: tablolar + yabancı anahtarlar) — veritabanının KENDİ KATALOĞUNDAN graphify node-link biçiminde graf üretir. Metin taraması YOK, `pg_class`/`pg_constraint` okunur. Çıktı `graphify-out/db-graph.json` (üretilmiş, gitignore), `graphify merge-graphs` ile kod grafiğine eklenir. Düğümler `db_` ad alanında (ghost-duplicate riski). Çıkış 0=üretildi/atlandı · 1=parite TUTMADI · 2=ÖLÇEMEDİ | ALTYAPI (Recep istedi 2026-09-16: "supabase tarafının bir haritası lazım, codegraph gibi bir şey") | `src/__tests__/conformance/sema-graf-uretici.test.ts` (INV-SEMA-GRAF-1, 12 kol) + `docs/audits/sema-graf-uretici-2026-09-16.md` | 2026-09-16 yazıldı ve KOŞULDU: yerel yığında tablo 18=18 · fk 13=13 parite TUTTU, kapsam dışı 6 fk ADIYLA raporlandı; `merge-graphs` ile birleşti (+18 düğüm/+13 kenar) ve `explain` veritabanı sorusuna cevap verdi (8 ilişki, yönlü) | INV-SEMA-GRAF-1 — sır/TLS/taşınabilirlik/çıkış kodu/çıktı biçimi ölçülür; **graf DOĞRULUĞU ölçülmez** (o canlı koşum ister, sınır kapının başlığında yazılı) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
 | # | Ad | Ağaç | ne_yapar | sahip (manifest kategorisi) | tetik | kanıt (son değişiklik · manifest) | kapı | durum |
 |---|---|---|---|---|---|---|---|---|
-| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) | 09-05 §3 KAL kararı | KAL |
-| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet | manifest kaydı | KAL |
+| 1 | ui-ux-pro-max | .claude | UI/UX renk·Tailwind·HSL öneri | guards | `skill:ui-ux-pro-max` | 2026-08-11 · manifest yok (.claude kapsam dışı) · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | 09-05 §3 KAL kararı | KAL |
+| 2 | ui-ux-pro-max | .agent | (aynı) | guards | `skill:ui-ux-pro-max` | 2026-09-01 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
 | 3 | typography | .claude | font/okunabilirlik/tip ölçeği | guards | `skill:typography` | 2026-08-11 · manifest yok | 09-05 §3 | KAL |
 | 4 | typography | .agent | (aynı) | guards | `skill:typography` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
-| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok | 09-05 §3 | KAL |
-| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet | manifest kaydı | KAL |
-| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok | 09-05 §3 | KAL |
-| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok | 09-05 §3 | KAL |
-| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
+| 5 | web-design-guidelines | .claude | a11y/Web Interface Guidelines denetimi | guards | `skill:web-design-guidelines` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 6 | web-design-guidelines | .agent | (aynı) | guards | `skill:web-design-guidelines` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 7 | threejs-webgl-performance | .claude | R3F/Three.js draw-call·gölge·Lighthouse | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 8 | threejs-webgl-performance | .agent | (aynı) | guards | `skill:threejs-webgl-performance` | 2026-06-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 9 | vercel-composition-patterns | .claude | compound component/context deseni | guards | `skill:vercel-composition-patterns` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 10 | vercel-composition-patterns | .agent | (aynı) | guards | `skill:vercel-composition-patterns` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 11 | venthub-architecture | .claude | RSC/App Router/render-cache kuralları | guards | `skill:venthub-architecture` | 2026-08-18 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | 09-05 §3 | KAL |
+| 12 | venthub-architecture | .agent | (aynı) | guards | `skill:venthub-architecture` | 2026-08-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
 | 13 | codegraph | .claude | CodeGraph MCP caller/callee/impact | intelligence | `skill:codegraph` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
 | 14 | codegraph | .agent | (aynı) | intelligence | `skill:codegraph` | 2026-06-11 · manifest evet | manifest kaydı | KAL |
 | 15 | diff-review | .claude | git diff yıkıcı/tehlikeli örüntü tespiti | audit | `skill:diff-review` | 2026-08-25 · manifest yok | yok | ENVANTER-DISI |
@@ -317,22 +384,22 @@ madde 1 gereği araç sayılmaz.
 | 32 | plan-challenger | .agent | (aynı) | audit | `skill:plan-challenger` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 33 | skills-creator | .claude | yeni skill oluşturma/manifest derleme | orchestration | `skill:skills-creator` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 34 | skills-creator | .agent | (aynı) | orchestration | `skill:skills-creator` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok | yok | ENVANTER-DISI |
-| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 35 | supabase-security | .claude | RLS policy/migration/middleware kuralı | guards | `skill:supabase-security` | 2026-08-13 · manifest yok · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | yok | ENVANTER-DISI |
+| 36 | supabase-security | .agent | (aynı) | guards | `skill:supabase-security` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
 | 37 | supabase | .claude | Supabase client/servis/db query kuralı | guards | `skill:supabase` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 38 | supabase | .agent | (aynı) | guards | `skill:supabase` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
-| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet | manifest kaydı | KAL |
-| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok | yok | ENVANTER-DISI |
-| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
-| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
-| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
-| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
-| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet | manifest kaydı | KAL |
+| 39 | to-issues | .claude | plan/PRD'yi issue'lara böler | utils | `skill:to-issues` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 40 | to-issues | .agent | (aynı) | utils | `skill:to-issues` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 41 | to-prd | .claude | konuşma transkriptini PRD'ye çevirir | utils | `skill:to-prd` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | yok | ENVANTER-DISI |
+| 42 | to-prd | .agent | (aynı) | utils | `skill:to-prd` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p1: 2/2 geçti, without 0 | manifest kaydı | KAL |
+| 43 | venthub-auditor | .claude | pre-commit/bütünlük denetimi | audit | `skill:venthub-auditor` | 2026-08-27 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 44 | venthub-auditor | .agent | (aynı) | audit | `skill:venthub-auditor` | 2026-08-25 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 45 | venthub-enterprise-audit | .claude | L1-L12 "10/10 onay" teslim denetimi | audit | `skill:venthub-enterprise-audit` | 2026-08-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 46 | venthub-enterprise-audit | .agent | (aynı) | audit | `skill:venthub-enterprise-audit` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 47 | venthub-global-rontgen | .claude | proje-geneli fiziki radar/rontgen taraması | audit | `skill:venthub-global-rontgen` | 2026-08-27 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 48 | venthub-global-rontgen | .agent | (aynı) | audit | `skill:venthub-global-rontgen` | 2026-08-18 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
+| 49 | vercel-react-best-practices | .claude | React/Next.js performans/waterfall kuralları | guards | `skill:vercel-react-best-practices` | 2026-06-11 · manifest yok · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | ENVANTER-DISI |
+| 50 | vercel-react-best-practices | .agent | (aynı) | guards | `skill:vercel-react-best-practices` | 2026-06-10 · manifest evet · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | manifest kaydı | KAL |
 | 51 | agy-orchestrate | .claude | Antigravity CLI'a geniş taramayı delege eder | orchestration | `skill:agy-orchestrate` | 2026-06-11 · manifest yok | yok | ENVANTER-DISI |
 | 52 | create-migration | .claude | güvenli Supabase migration oluşturma akışı | OPS *(sahipsiz — kategori/manifest yok)* | `skill:create-migration` | 2026-08-26 · manifest yok | yok | ENVANTER-DISI |
 | 53 | maestro | .claude | bölünebilir büyük kod değişikliğini paralel dalga olarak orkestre eder | orchestration | `skill:maestro` | 2026-08-27 · manifest yok | yok | ENVANTER-DISI |
@@ -347,13 +414,16 @@ madde 1 gereği araç sayılmaz.
 | 62 | maestro-combine | .agent | çakışmasız paralel merge (JSON delta) | orchestration | `skill:maestro-combine` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
 | 63 | maestro-feature | .agent | worker-judge çok-ajan özellik geliştirme | orchestration | `skill:maestro-feature` | 2026-08-18 · manifest evet | manifest kaydı | KAL |
 | 64 | maestro-refactor | .agent | bölünebilir büyük değişikliği paralel dalga | orchestration | `skill:maestro-refactor` | 2026-06-17 · manifest evet | manifest kaydı | KAL |
-| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
-| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| 65 | venthub-tasarim-dili | .agent | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | YENI |
+| 66 | venthub-tasarim-dili | .claude | (SKILL.md ozetinden elle) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) · sınav 2026-09-14 REC-314 p2: 2/2, with 1.00 / without 0.00 | yok | YENI |
 | 67 | office-hours | .claude | fikir sorgusu: plandan ONCE alti zorlayici soru + oncul curutme + 2-3 yol -> docs/plans tasarim notu; kod/emir yazmaz (gstack uyarlamasi, PR #1116) | OPS | insan (/office-hours) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 68 | qa | .claude | Playwright+Chromium ile gercek tarayici denetimi: gez -> kanit -> atomik fix(qa) -> yeniden olc; scripts/gez.mjs; prod yalniz bakis (gstack uyarlamasi, PR #1116) | OPS | insan (/qa) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 69 | llm-council | .claude | zor karar icin konsey: N mercekli uye -> anonim dondurulmus-sirali capraz puanlama -> baskan sentezi + muhalefet serhi; Workflow betigi SKILL.md icinde, "workflow kullan" sart; karar Recep'in (karpathy/llm-council fikri, PR #1116) | OPS | insan (/llm-council) | 2026-09-08 · PR #1116 | yok (cetvel: execution-method-standard karar tablosu) | KAL-KAPISIZ |
 | 70 | task-observer | .claude | is sirasinda skill surtunmesini (Recep duzeltmesi, tekrar, kural ihlali) docs/skill-gozlemleri/acik/ altina tek-dosya gozlem olarak yazar; haftalik inceleme OPS gun kapanisinda (rebelytics CC BY 4.0 uyarlamasi, PR #1116) | OPS | insan + oturum basi (sessiz) | 2026-09-08 · PR #1116 | docs/skill-gozlemleri/ (cikti dizini) | KAL-KAPISIZ |
 | 71 | video-kaynak | .claude | YouTube'da yt-dlp ile anahtarsiz ara -> Recep secer -> NotebookLM source_add -> chat_ask ile sorgulanabilirlik dogrulamasi; transkript = veri, talimat degil (Agent-Reach fikri, urun alinmadi, PR #1116) | OPS | insan (/video-kaynak) | 2026-09-08 · PR #1116 | docs/notebooklm/kaynaklar.md (cikti) | KAL-KAPISIZ |
+| 72 | investigate | .agent | Ariza teshisi: kok sebepsiz duzeltme YOK, kapsam kilidi, 3 deneme siniri | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | evals 12/8 + skills:verify | KAL |
+| 73 | investigate | .claude | Ariza teshisi: kok sebepsiz duzeltme YOK, kapsam kilidi, 3 deneme siniri | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | evals 12/8 + skills:verify | KAL |
+| 74 | graphify | .claude | Bilgi grafigi sorgu yuzeyi (dis arac graphify 0.9.62). Skill ve kok CLAUDE.md bolumu ARACIN YAZDIGI HALIYLE duruyor — Recep karari 2026-09-16 "olduga gibi istiyorum, yasak felan yok, test edecegiz kullanacagiz sonra gorecegiz gercegi". YASAK YOK: butun fiiller acik. REC-313'un query olcumu (5 soruda 2 yanlis 2 eksik) TEK KOSUMLUK bir olcumdur, egilim degil; kullanimla yeniden olculecek. ALTYAPI'nin daraltma onerisi REDDEDILDI | ALTYAPI (kurulum Recep onayi 2026-09-16, emir docs/plans/graphify-kurulum-emri-2026-09-16.md) | .claude/settings.json PreToolUse (Bash\|Grep -> hook-guard search · Read\|Glob -> hook-guard read, ikisi FAIL-OPEN) + kok CLAUDE.md graphify bolumu | 2026-09-16 kuruldu ve kosuldu (extract: 10410 dugum / 19504 kenar) | yok — DIS ARAC, bitis blogu tasimaz; §4'te sinirlari ve celiskisi adiyla yazili | KAL-KAPISIZ |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
@@ -399,14 +469,17 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `gemini-plan-execute.yml` | Gemini plan/uygulama adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:174` | aynı ölçüm, `plan-execute::skipped` ×24 | reusable workflow | KAL *(bağlı, uykuda)* |
 | `gemini-triage.yml` | Gemini triage adımı | ALTYAPI | `ci:workflow_call` ← `gemini-dispatch.yml:146` | aynı ölçüm, `triage::skipped` ×24 | reusable workflow | KAL *(bağlı, uykuda)* |
 | `db-advisor-fix.yml` | DB advisor bulgularını otomatik düzeltme | ALTYAPI | `ci:workflow_dispatch` (tek satır) | son koşum 2025-12-08T07:41:35Z failure (9 ay); `gh workflow list --all` state `active` | — | OLU-DOGRULANDI |
-| `jules-a11y.yml` | A11y denetimi (Jules AI) | ALTYAPI | `ci:workflow_dispatch` | `gh workflow list --all` state **disabled_manually** | — | OLU-DOGRULANDI |
-| `jules-dependency-update.yml` | Bağımlılık güncelleme önerisi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-i18n-sync.yml` | TR/EN sözlük paritesi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-lint-fix.yml` | Lint/TS otomatik düzeltme dalgası (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | OLU-DOGRULANDI |
-| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | **OLU-DOGRULANDI** *(sonnet'in KAL hükmü çürütüldü)* |
+| `jules-a11y.yml` | A11y denetimi (Jules AI) | ALTYAPI | `ci:workflow_dispatch` | `gh workflow list --all` state **disabled_manually** | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-dependency-update.yml` | Bağımlılık güncelleme önerisi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-i18n-sync.yml` | TR/EN sözlük paritesi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-lint-fix.yml` | Lint/TS otomatik düzeltme dalgası (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-performance.yml` | Performans denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-security-audit.yml` | Güvenlik denetimi (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `jules-test-coverage.yml` | Test kapsam artırma (Jules) | ALTYAPI | `ci:workflow_dispatch` | state disabled_manually | — | KAYIP (onceki: OLU-DOGRULANDI) |
+| `ai-auto-repair.yml` | CI kırmızıysa otomatik onarım denemesi (Jules) | ALTYAPI | `ci:workflow_run(CI tamamlanınca)` | `gh workflow list --all` state **disabled_manually**; sonnet "skipped" gördü, KAL sandı — **YANLIŞ** | — | KAYIP (onceki: OLU-DOGRULANDI (sonnet'in KAL hükmü çürütüldü)) |
+| `skills-gate.yml` | SKILL KAPISI — sayaç her PR'da (ücretsiz), yönlendirme sınavı yalnız skill değişince (ücretli). | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi | KAL |
+| `migration-linter.yml` | INV-MIGRATION-3 — migration linter PR kapısı (squawk) | ALTYAPI | .squawk.toml (betik taramasi) | olculemedi (repo disi izler taranmadi) | kendisi kapi — SABOTAJ KANITLI (2026-09-13: sabotaj dosyasi 5 kol, cikis 123 = KIRMIZI; geri alinca 0 dosya = yesil) | KAL |
+| `sema-tabani-uret.yml` | prod şemasının GERÇEK `--schema-only` dökümünü alır (salt-okuma), boş dökümü reddeder, artefakt bırakır | ALTYAPI | `elle` (`workflow_dispatch`; push/schedule BİLEREK yok — prod'a bağlanan iş akışı insan kararıyla koşar) | yok — 2026-09-15'te yazıldı, henüz koşmadı | `src/__tests__/conformance/sema-tabani-is-akisi.test.ts` (INV-SEMA-TABAN-1, 10 kol + sabotaj) | KAL |
 
 **Envanter dışı ek bulgu (29'a dahil değil):** `tmp-lf-fix.yml` — `gh workflow list --all` bunu
 `active` listeliyor, ama `.github/workflows/` dizininde YOK ve `git log --all` boş dönüyor.
@@ -414,7 +487,7 @@ GitHub tarafında bayat/hayalet bir kayıt; repo tarafı hiç izlemedi. Durum: *
 tarafı hayalet)** — OPS'un GitHub Actions ayarlarından elle temizlemesi gerekir (repo commit'i
 gerektirmez).
 
-### 3.6 · cetvel — `docs/standards/*.md` (67 araç)
+### 3.6 · cetvel — `docs/standards/*.md` (68 araç)
 
 > Kapı sütunu cetveller.md'deki kapı aynen taşındı. Durum: KAPILI→**KAL**, HARİTADA-KAPISIZ ve
 > YETİM→**KAL-KAPISIZ** (AXIOM 3 madde 3: kapısı yok ama var — kapı borcu). Sahip: sahipsiz
@@ -422,6 +495,7 @@ gerektirmez).
 
 | dosya | ne_yapar | sahip | tetik | kanıt | kapı | durum |
 |---|---|---|---|---|---|---|
+| arama-standard | Sitedeki ürün aramasının cetveli: aranan alan ve satır kümesi (SSOT), sorgu normalizasyonu, eşleştirme semantiği, tenant/yetki sınırı, iki katmanlı kapı, on iki maddelik asgari vaka kümesi, tazeleme ve migration kuralları | URUN | REC-340 Faz 1 | 2026-09-15, REC-340 Faz 1. ⭐Satır URUN'un hükmüyle ALTYAPI tarafından yazıldı: dosya ALTYAPI claim'inde, URUN kapıya takıldı, AŞMADI, değişikliği geri alıp hükmü mesajla verdi. Ve satır bu PR'da duruyor çünkü KUPLAJ ölçüldü — envanter DİSKLE karşılaştırılır, satır ile dosya AYNI AĞAÇTA olmak zorunda (ayrı PR denendi: envanter 77 / disk 76, beş kol kırmızı) | `INV-SEARCH-*` — **HENÜZ YAZILMADI**, Faz 1 Adım 1'in konusu (kapı sütunu boş bırakılmadı: boşluk kapı varmış gibi okunur) | KAL-KAPISIZ |
 | 3d-scene-lighting-research | 3D vitrin sahne/ışık araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
 | 3d-showroom-ux-research | 3D vitrin bilgi paneli/UX araştırma raporu | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-18 | yok | KAL-KAPISIZ |
 | 3d-webgl-standard | 3D/WebGL standardı | OPS *(devir adayı: URUN)* | haritada değil | 2026-06-19 | yok | KAL-KAPISIZ |
@@ -492,6 +566,13 @@ gerektirmez).
 | arac-envanteri-standard | Araç Envanteri Standardı (v1.0 — 2026-09-07) | OPS | docs/README.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | satis-kipi-gecis-standard | Satış Kipi Geçiş Cetveli — v1.0 | OPS | cagiran-yok (betik taramasi; anma: docs/plans/rec168-migration-taslagi-2026-09-06.md) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | hafiza-kancalari-standard | Hafıza Kancaları Standardı (REC-177) | OPS | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| urun-yapisal-veri-standard | VentHub Ürün Yapısal Verisi Standardı (Cetvel) — v1.0 | URUN | src/__tests__/conformance/jsonld-urungrubu-gorsel.test.ts (INV-URUNGRUBU-GORSEL-1) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| kategori-adlandirma-standard | Kategori Adlandırma Cetveli — hangi alan NEREDE kazanır | URUN | docs/README.md (soru→otorite tablosu) | 2026-09-09 (§4 açık karar KAPANDI: `marketing_title` emekli, Recep) | kategori-adi-tek-kaynak.test.ts (INV-KATEGORI-ADI-1) — **KISMEN**: zincirin 1. adımını ve sözlüksüz çağrıyı ölçer, sıranın kendisini ölçmez | KAL |
+| denetim-izi-standard | Cetvel — Denetim izi bütünlüğü: hangi veri yazımı denetim izine düşmek ZORUNDA, nasıl ölçülür, kim neyi üstlenir (REC-292). Yazma yüzeyi evreni (7 kalem, ikisi dosya DEĞİL), fail-closed hükmü + ispat yükü, tetiğin GÖRMEDİĞİ yollar (TRUNCATE / sahip rolü), dört yasak. | ALTYAPI | `docs/plans/rec292-denetim-izi-2026-09-09.md` · kapı `scripts/db/checks/denetim-izi-tetik-kapisi.mjs` · `CLAUDE.md` kural 11'in tek yazılı karşılığı | 2026-09-09 prod ölçümüyle yazıldı: yazan 14 betiğin 0'ı denetim yazıyor · 09-08'de hiçbir tablodan satır yok · `site_settings`'te `tenant_id` YOK · `exec` RPC YOK · TRUNCATE yetkisi `anon`'a kadar açık | `denetim-izi-kapisi.test.ts` — cetvelin fail-closed hükmünü, TRUNCATE kapsam-dışı beyanını, geriye-dönük-üretim yasağını ve tenant borcunu ADIYLA arar (cetvel sessizleşirse KIRMIZI) | YENI |
+| bagimlilik-guvenlik-yukseltme-standard | Bağımlılık Güvenlik Yükseltme Cetveli | ALTYAPI | `pnpm audit --prod` işleri (REC-323 ve halefleri) | 2026-09-13 · REC-323 (yazıldığı iş) | yok — kapı borcu | KAL-KAPISIZ |
+| ledger-ve-olu-migration-standard | Ledger ve Ölü Migration Dosyası Cetveli — prod a hic uygulanmamis migration dosyasi ne olur | ALTYAPI | REC-321 silme migration yorumu (20260914090000) + supabase-migrate.yml parite adimi + REC-322 karsilikli EK | 2026-09-14 yazildi (REC-321, Recep karari SECENEK 1) | INV-MIGRATION-3 (parite adimi) | KAL |
+| rls-yetki-karari-standard | RLS Yetki Kararı Cetveli — bir politika "bu kullanıcı yönetici mi" sorusunu nereden okur | ALTYAPI | INV-AUTH-ROLE-2 kapisi (src/__tests__/conformance/rls-yetki-karari.test.ts) + REC-322 migration yorumu + borc ilani docs/rls-yetki-karari-borc-ilani.json | 2026-09-14 yazildi (REC-322) | INV-AUTH-ROLE-2 | KAL |
+| hukum-kaynak-standard | Hüküm-Kaynak Cetveli — Recep'e giden her hüküm cümlesi kaynağını taşır; üç kaynak sınıfı (A kendi ölçümüm · B belgeden okudum · C bilmiyorum) karıştırılamaz, ve geri alınan hüküm karneye yazılır | URUN (yazan) — kural FİLO GENELİ, üç şeridi de bağlar | atıf YOK (ölçüldü 2026-09-16: depoda hiçbir dosya bu cetveli anmıyor) — cetvel bunu §3.1'de KENDİSİ ilan ediyor: "Otomatik kapı YOK, bugün bir alışkanlık sözleşmesidir" | 2026-09-16 yazıldı — doğuran olay aynı oturumda dört yanlış hüküm; Recep kararı 27 KABUL ("ölçüm olmalı evet"), kararı 26 RED (karar yetkisi şeride devredilmedi, ispata bağlandı) | yok — **ALTYAPI BORCU, cetvel §3.2 adıyla yazıyor:** §2'nin kapıya bağlanması `.claude/hooks/**` şeridindedir, kolu ALTYAPI yazar | KAL-KAPISIZ |
 
 ---
 
@@ -507,6 +588,32 @@ gerektirmez).
   betik/skill/githook/ci/cetvel sınıflarının hiçbirine girmiyor) → **envanter dışı artık, silme
   adayı (OPS ölçüp siler)**. Silmeden önce canlılık kontrolü yapılmalı (hafıza:
   silmeden-once-canlilik-ve-taze-dal).
+- **`graphify` 0.9.62** (`uv tool install "graphifyy[sql]"`) — **ARTIK KURULU, ENVANTER-DIŞI
+  DEĞİL.** 2026-09-16'da Recep onayıyla projeye bağlandı (emir: `docs/plans/graphify-kurulum-emri-2026-09-16.md`,
+  #1214). Aracın kendisi hâlâ dış araç (kullanıcı kapsamında, altı sınıfın hiçbirine girmiyor) ama
+  **skill'i depoya girdi** → `.claude/skills/graphify/` satırı §3.3'te.
+  **Bağlı adım (REC-313 hükmü, geçerli):** codegraph bayatlık uyarısı verdiğinde ya da
+  paylaşılan-primitif riski ölçülecekken ikinci bağımsız kol — yalnız üç komut
+  (`affected <ad>()`, `god-nodes`, `diagnose multigraph`). `query` **KULLANILMAZ** (5 soruda
+  2 yanlış 2 eksik, sessiz yanlış üretir).
+  ⚠**KURULUMUN YAZDIĞI METİN BU HÜKÜMLE ÇELİŞİYOR** (ölçüldü 2026-09-16): araç kök `CLAUDE.md`'ye
+  *"For codebase questions, first run `graphify query`"* diye **on satır** yazdı. Yani bizim
+  ölçtüğümüz "query kullanılmaz" kararının **tersini** öneriyor. Kalem açık, düzeltme Recep'in
+  onayına bağlı (CLAUDE.md onun cetveli).
+  ⚠**`affected` PARANTEZ GEREKTİRİYOR** (URUN ölçtü, hiçbir belgede yazılı değil):
+  `productRoute` → *"No unique node match"*, `productRoute()` → doğru cevap.
+  ⭐**SQL KÖRLÜĞÜ KAPANDI, KISMEN** (2026-09-16 ölçümü): `tree-sitter-sql` eksik olduğu için
+  araç **251 `.sql` dosyasını hiç görmüyordu** (REC-313'ün "252 SQL dosyası görülmedi" bulgusunun
+  sebebi buydu — kalıcı bir sınır değil, **eksik bağımlılık**). `uv tool install "graphifyy[sql]"`
+  ile kapatıldı; grafik 9.122 → **10.410 düğüm**, 18.010 → **19.504 kenar**; 250 SQL dosyasından
+  758 içerik düğümü. **AMA TAM DEĞİL:** taze tabandan **39 tablo** görüyor (canlıda 66) ve
+  **163 politikanın 1'i**. Yani veritabanı haritası ihtiyacını **karşılamıyor**; o ihtiyacın
+  karşılığı `docs/database_schema_master.md` + `supabase/baselines/2026-09-15_public_schema.sql`.
+  **Son kullanım:** 2026-09-16 (kurulum + SQL ölçümü).
+  **Kanıt:** `docs/audits/rec313-graphify-deneme-2026-09-13.md` (ilk ölçüm) ·
+  `docs/plans/graphify-kurulum-emri-2026-09-16.md` (emir) · bu satır (kurulum ölçümü).
+  Çıktı dizini `graphify-out/` üretilmiş artefakttır, `.gitignore`'da — **her makinede bir kez**
+  `graphify extract . --code-only` koşulur, yoksa kancalar sessiz kalır (fail-open).
 - **`tmp-lf-fix.yml`** — bkz. §3.5 son not: GitHub Actions tarafında `active` görünen ama repoda
   hiç var olmamış hayalet kayıt; 29'luk dosya sayımına dahil değildir, OPS'un GitHub ayarlarından
   temizlemesi gerekir.

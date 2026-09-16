@@ -82,9 +82,19 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     const productNode: Record<string, unknown> = {
       '@type': 'Product',
       name: getProductDisplayName(variant, family, lang),
-      // `sku` SATICININ kendi kodudur — bizim olduğu için yayınlanması doğrudur.
-      sku: variant.sku,
     }
+
+    // ⭐`sku` ARTIK YAYINLANMIYOR (REC-146, 2026-09-09).
+    //
+    // Eskiden `sku: variant.sku` koşulsuz yazılıyordu ve gerekçesi "satıcının kendi kodu,
+    // bizim olduğu için yayınlanması doğrudur" idi. Hüküm değişti: müşteriye — ve arama
+    // motoru müşterinin gördüğü yüzeydir — görünen kod YALNIZ `model_code` olacak.
+    // İki sebep: (a) `sku` bizim İÇ kimliğimizdir, dışarıya taahhüt etmediğimiz bir şey;
+    // (b) uydurma kod taşıyan üründe o uydurmayı arama motoruna BEYAN ederdik.
+    //
+    // Ürün kimliği yayınlama yolu artık tek: aşağıdaki `mpn`, yani `model_code`. O da
+    // yoksa hiçbir kod alanı yazılmaz — kardeş kuralın (REC-272) cümlesiyle: eksik alan,
+    // yanlış alandan iyidir. `sku` gerekirse ayrı ve bilinçli bir kararla geri gelir.
 
     // REC-272: `mpn` ÜRETİCİ kodudur. `model_code` yoksa iç SKU'ya düşmek, arama
     // motoruna "üreticinin kodu budur" diye YANLIŞ BEYAN etmektir. productHelpers'ın
@@ -123,10 +133,29 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     return productNode
   })
 
+  // ⭐GRUP GÖRSELİ (REC-269 bulgu 3). Google'ın ürün zengin sonuçlarında görsel fiilen
+  // zorunludur; görselsiz kayıt çoğu yüzeyde HİÇ gösterilmez. Ölçüldü (2026-09-07,
+  // canlı): üç aile sayfasının ÜÇÜNDE de `ProductGroup.image` yoktu.
+  //
+  // KURAL ÜÇÜNCÜ KEZ YAZILMADI — VAR OLAN KAPAK KURALI KULLANILDI: "varyant sırasına
+  // göre ilk varyantın ilk görseli" (`family.service.ts` `getSeriesLanding`, ve aynı
+  // kuralı RPC de uyguluyor). Burada `hasVariant` zaten o sırayı koruyor ve her düğüme
+  // görselini yazmış durumda; ilk görselli düğümü seçmek, kuralı KOPYALAMADAN aynı
+  // sonucu verir. Ayrı bir "grup kapağı" kuralı icat etmek üçüncü bir doğruluk kaynağı
+  // olurdu ve gün gelir üçü ayrışırdı.
+  //
+  // GÖRSEL YOKSA ALAN HİÇ YAZILMAZ — `mpn` ile aynı ilke: eksik alan, uydurulmuş
+  // alandan iyidir. Yedek/temsili bir görsel koymak, arama motoruna o ailenin ürünü
+  // buymuş gibi YANLIŞ BEYAN olurdu.
+  // ÖLÇÜLDÜ (canlı, 2026-09-08): 47 ailenin 34'ü bu kuralla görsel türetir, 13'ünde
+  // hiç ürün görseli YOK — o 13'ü kod değil KATALOG VERİSİ kapatır (ilgili: REC-269).
+  const grupGorseli = hasVariant.find((v) => typeof v.image === 'string')?.image
+
   return {
     '@context': 'https://schema.org',
     '@type': 'ProductGroup',
     productGroupID: family.slug,
+    ...(grupGorseli ? { image: grupGorseli } : {}),
     // REC-108: yapısal veri de dili bilir — bot EN sayfada TR ad görmemeli.
     name: familyName(family, lang),
     description,

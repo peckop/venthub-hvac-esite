@@ -1,9 +1,9 @@
 ---
 name: venthub-catalog-importer
-description: HVAC katalog PDF'lerinden görsel çoklu-ajanla ürün verisi çıkarıp CSV üretir (Kademe 1).
+description: 'HVAC katalog PDF''lerinden görsel çoklu-ajanla ürün verisi çıkarıp CSV üretir (Kademe 1).
   ⚠BU DOSYA YALNIZ YÖNLENDİRİCİDİR — çalıştırma mekaniği venthub-pdf-ingestor deposundadır.
   Tetik: katalog oku, pdf scan, hvac catalog import, Vortice/Avensair katalog işleme.
-  DB'ye YAZMAZ. Birim test/git branch/db reset için KULLANMA.
+  DB''ye YAZMAZ. Birim test/git branch/db reset için KULLANMA.'
 when_to_use: 'Kullan: katalog PDF çıkarımı gerektiğinde — ama işi BURADA yapma, ingestor deposuna geç.'
 allowed-tools:
 - view_file
@@ -61,3 +61,30 @@ depoda (venthub-hvac) katalog **tüketilir**, üretilmez: CSV → DB yüklemesi 
 
 **Not:** `scripts/visual_ingest_page.py` (ingestor) TERK EDİLMİŞTİR — MIMO servisine bağlıdır ve
 o anahtar ölüdür (401, 2026-09-07). Kanonik yol yukarıdaki skill'dir.
+
+<!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
+## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt
+
+**Bitiş durumu — son satırda `DURUM: <kelime>` biçiminde söylenir.** Kelime **yalnız şu dörtten
+biri** olabilir: `BITTI` (istenen yapıldı ve ölçüldü) · `CEKINCELI` (yapıldı ama adı konmuş bir
+çekince var) · `ENGELLI` (dışarıdan bir şey bekliyor) · `BAGLAM-EKSIK` (soru cevaplanmadan devam
+edilemez).
+
+⚠**Beşinci kelime uydurulmaz.** "BEKLEMEDE", "KISMEN", "DEVAM EDIYOR" gibi kelimeler bu listede
+yoktur; beklemek `ENGELLI`dir, yarım kalmak `CEKINCELI`dir. Kapalı liste bilinçli: kelime serbest
+kalırsa her çağrı kendi sözlüğünü yazar ve durum makine tarafından okunamaz hâle gelir.
+
+`BITTI` dışındaki her durum şu üçünü de yazar: **SEBEP** (tek cümle) · **DENENEN** (ne denendi,
+sonucu ne oldu) · **ÖNERİ** (bir sonraki somut adım, kimde).
+
+**Karışıklık:** yüksek riskli bir belirsizlikte tahminle devam edilmez — **DURULUR**, iki üç
+seçenek gerekçesiyle yazılır ve biri önerilir. Yüksek risk: geri alınması pahalı olan, prod'a
+dokunan, başka şeridin dosyasını değiştiren, para veya sır ilgilendiren iş.
+
+**Kanıtsız kısıt yoktur:** *"olmuyor / erişemiyorum / araç desteklemiyor"* tek başına sonuç
+değildir. Kısıt iddiası **birebir hata metni**, **belgeden alıntı** ya da **canlı ölçüm** ile
+gelir. Kanıt yoksa doğru cümle *"ölçemedim"*dir, *"yapılamaz"* değil.
+
+⚠**Ölçemedim ile ihlal ayrı sonuçlardır.** İkisini aynı kovaya koymak, bozuk bir ölçümü
+gerçek bir kusur gibi raporlar.
+<!-- ORTAK-BITIS-SON -->

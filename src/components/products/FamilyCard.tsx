@@ -110,7 +110,8 @@ const FamilyCard: React.FC<FamilyCardProps> = React.memo(function FamilyCard({
           </div>
           {family.brand_name && (
             <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 border border-light-gray shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <BrandIcon brand={family.brand_name} />
+              {/* Marka adı kartta zaten yazıyla var — logo dekoratif (REC-268). */}
+              <BrandIcon brand={family.brand_name} dekoratif />
             </div>
           )}
         </div>

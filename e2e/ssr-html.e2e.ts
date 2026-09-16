@@ -43,7 +43,7 @@ test.describe('SSR HTML PR kapısı — içerik sunucudan gelmeli', () => {
     }
   })
 
-  for (const sinif of ['anasayfa', 'liste', 'alt-kategori', 'pdp'] as const) {
+  for (const sinif of ['anasayfa', 'liste', 'yaprak-kategori', 'pdp'] as const) {
     test(sinif, async ({ request }, testInfo) => {
       const kural = secilen.find((k) => k.sinif === sinif)
       expect(kural, `${sinif} sınıfının kuralı üretilmedi — temsilci seçimi başarısız`).toBeTruthy()

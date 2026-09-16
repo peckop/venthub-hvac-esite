@@ -112,3 +112,86 @@ aynı PR'da: (1) gerçek stdin ile koşum kanıtı, (2) "ötmemeli" kolu, (3) §
 (4) varsa "bir şeyin olmadığını ölçen" kol. **Koda bakarak sınama kanıt sayılmaz** — dört
 kancanın üçünde kusurlar ancak gerçek koşumla çıktı (tilde çözülmemesi, worktree'lerin depo dışı
 sayılması, MSYS `/c/` yolunun Windows'ta olmayan yere çözülmesi, basename çarpışması).
+
+## ORTAK HAFIZA İNDEKSİ — İKİ EŞİK, KATLAMA ve ÇOK-YAZAR YARIŞI (REC-280)
+
+`MEMORY.md` her oturumun açılışında yüklenen **ortak** indekstir ve dört şerit aynı dosyaya
+kendi satırını ekler. İki ayrı kusuru bu bölüm yönetir; ikisi de 2026-09-07 20:41–20:57Z
+arasında **sahada** ölçüldü.
+
+### Kusur 1 — TAŞMA SESSİZDİR
+
+Dosya **16384 baytı** aşınca alt satırlar **sessizce kırpılır**: uyarı yok, hata yok. O gece
+dosya 16414 → 16510 bayta çıktı ve en alttaki dersler **hiçbir oturuma yüklenmedi**; kimse
+görmedi. Ölçü **bayttır, satır değil** — kırpma bayta bakıyor.
+
+**İKİ EŞİK, İKİ AD.** Aynı sayıya iki anlam yüklemek, ikisinden birinin sessizce yanlış
+olması demektir:
+
+| eşik | değer | ne der |
+|---|---|---|
+| **yumuşak** | **15800** | *"satır EKLEME, önce katla"* — taşmaya ~584 bayt var, hâlâ pay var |
+| **sert** | **16384** | *"taşma OLDU"* — bu bir haber değil **otopsidir**, alt satırlar gitmiş olabilir |
+
+Sert eşik tek başına yetmezdi: ancak taşma **olduktan sonra** yanar.
+
+### Kusur 2 — KAYIP YAZIM HİÇ GÖRÜNMÜYORDU
+
+Aynı dakikalarda üç şerit ayrı ayrı kısalttı (16199 · 16482 · 14021) ve **son yazan
+öncekini ezdi**. KATALOG'un cümlesiyle: *"uyarı kolu taşmayı görür, KAYIP YAZIMI görmez."*
+
+> **HÜKÜM — TEK YAZAR DEĞİL: APPEND + KAYIP-YAZIM DEDEKTÖRÜ.**
+>
+> Tek yazara (ör. "yalnız OPS katlar, şeritler satırını panoyla bildirir") bağlamak
+> **reddedildi**, gerekçesi: dört şerit kendi satırını ekliyor ve o şerit compact'a giriyor —
+> indeks satırı bir kuyruğa girer ve compact anında kaybolur. Yani tek yazar, kaybı
+> **azaltmaz**, yalnız **yerini değiştirir** ve görünmez kılar.
+>
+> Yerine: yazma **serbest**, kayıp **görünür**. `hafiza-indeks-bekcisi.cjs` (PreToolUse)
+> yazımdan önce diskteki satırlarla yeni içeriği karşılaştırır; bir satır kayboluyorsa ve
+> metni hafıza dizininde **hiçbir dosyada** bulunamıyorsa uyarır ve satırı gösterir.
+>
+> **Kaybı görmeyen bir yasak, görünür bir kayıptan kötüdür.**
+
+### Katlama — kalıcı kural (indeksin küçülme yolu)
+
+Eski ders satırları `dizin-*.md` dosyalarına **bölüm olarak taşınır**; indekste yalnız
+**dizin işaretçisi** kalır. Bu, indeksin tek meşru küçülme yoludur — satırı silmek değil,
+**taşımak**.
+
+⭐**Bu yüzden dedektörün ölçütü "satır kayboldu mu" DEĞİL.** Katlanmış satır da indeksten
+çıkar; ayırt etmeyen bir kol her katlamada yanar ve iki günde mobilyaya döner. Ölçüt:
+kaybolan satırın **metni** hafıza dizinindeki başka bir dosyada var mı. Varsa katlanmıştır
+(**susar**), yoksa silinmiştir (**uyarır**).
+
+### Karşılaştırma NORMALİZE edilir
+
+Satır eşitliği **ham metinle** ölçülmez: CRLF→LF, kenar boşlukları atılır, iç boşluk
+dizileri tek boşluğa indirgenir. Sebep: satır sonundaki tek bir boşluk "kayıp" sanılır ve
+kol **her dokunuşta** yalancı uyarı basar. Yalancı uyarı üreten kol görmezden gelinir.
+12 karakterden kısa satırlar (tek başına `---`, `-`) ölçüme girmez.
+
+### ⛔Bloklamaz — ve niçin
+
+Bekçi **daima çıkış 0** verir. İki sebep: (1) kanca cetveli hızlı ve çevrimdışı olmayı şart
+koşar; (2) hafıza yazımını bloklamak **oturumun kaydını kaybettirir** — `pre-commit`
+2026-08-15'te tam bu sebeple uyarı-only yapıldı ve o karar geri alınmıyor.
+
+Bekçi **kendi hatasında da susmaz**: tek satır *"BEKCI CALISAMADI"* basar. Sessiz kalsaydı
+ölü ama yeşil olurdu — *"uyarı gelmedi"* ile *"bekçi çalışmadı"* ayırt edilemezdi.
+
+### ⛔Mutlak yol yazılmaz
+
+Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
+gömülmez: depo 2026-08-15'ten beri PUBLIC ve kullanıcı adı taşıyan yol kimlik sızdırır
+(§24). Türetim `precompact-durum-kapisi.cjs` ile aynı mantığı kullanır ve aynı ölçülmüş
+sebeple: worktree'de açılan oturumların kendi proje dizini vardır ve orada `memory/` **yok**;
+cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 ölçümü).
+
+### Kapı
+
+`src/__tests__/conformance/hafiza-indeks-bekcisi-kilidi.test.ts`, yedi kol: `settings.json`'a
+bağlı · exit 2 yok + kendi hatasını söyler · mutlak yol yok, dizin türetilir · ⭐**katlanmış
+satır sessiz / silinmiş satır uyarır** (ayırt edici çift) · yalnız boşluk farkı uyarı üretmez
+· yumuşak eşik üstünde uyarır, altında susar (ikinci ayırt edici çift) · precompact iki eşiği
+taşır ve **farklı** şey söyler.

@@ -76,6 +76,7 @@ mcp_config_for_claude_code.json*
 .agent/scratch/
 .agent/call_graph.json
 scratch/
+scratchpad/
 !scratch/compile_skills.py
 
 # Auto-generated caches
@@ -128,3 +129,17 @@ supabase/.temp/
 
 # /qa skill geçici ekran görüntüleri (kanıt olarak gerekenler docs/audits/qa-ekran/ altına kopyalanır)
 qa-raporlari/
+
+# REC-319: yerlesik eval vaka agaci URETILIR, commitlenmez
+# (uretici: scripts/skills-eval-convert.mjs — deterministik, idempotent)
+.claude/evals-yerlesik/
+.agent/evals-yerlesik/
+# Ilk denemenin yeri (skill basina) — yerlesik kosucu orada ARAMIYOR, olculdu.
+# Yerel agaclarda kalmis kopyalar depoya sizmasin diye desen burada duruyor.
+.claude/skills/*/evals-yerlesik/
+.agent/skills/*/evals-yerlesik/
+
+# REC-313: graphify cikti dizini URETILMIS ARTEFAKTTIR, commitlenmez.
+# 09-13 olculdu: 15 MB (graph.json 10.181.569 bayt) + cache/, tek komutla
+# yeniden uretilir: graphify extract . --code-only (56 sn, LLM yok).
+graphify-out/

@@ -1,10 +1,98 @@
-# Filo Mekanizması — Cetvel v1.0
+# Filo Mekanizması — Cetvel v2.0
 
-> **Kapsam:** çok-oturumlu filonun **hayatta kalma katmanı** — bir şeridin panoyu duyması,
-> düzenli uyanması ve bunların *kanıtlanması*. Tek soru: *bu oturum, kendisine yazılanı
-> gerçekten duyuyor mu — ve bunu nereden biliyoruz?*
+> **v2.0 (2026-09-14, REC-328, Recep kararı — kendi sözü "1"): FİLO DOĞRUDAN MESAJLA ÇALIŞIR.**
 > **Zorlayan kapı:** `INV-MECH-1` → `src/__tests__/conformance/fleet-mechanism-integrity.test.ts`
-> **İlk yazım:** 2026-08-20 · **Ölçüm sahibi:** ALTYAPI · **İş emri:** T115-VH
+> **İlk yazım:** 2026-08-20 (v1.0) · **Ölçüm sahibi:** ALTYAPI · **Kayıt:** T115-VH → REC-328
+
+## 0. YÜRÜRLÜKTEKİ MODEL — bunu oku, aşağısı büyük ölçüde tarihseldir
+
+| Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
+|---|---|---|
+| Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
+| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
+| Uyanma | cron + tur-sonu `ScheduleWakeup` | **cron KURULMAZ** (Recep 09-06) · uyandırma = mesaj |
+| Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
+
+**Niçin değişti — ölçüldü 2026-09-14, üç kalem:**
+
+1. Gözcü bugüne kadar **tek bir not yakalamadı**. Pano `SES` sütunu iki şerit için de
+   **~2700 dk (45 saat)** sessizdi; bekçiliği yapılan kanal fiilen kullanılmıyordu.
+2. Lider oturumun `TARAMA` katmanı **asılmış**, `TESLIM` kanıtı **6955 dk (~4,8 gün)** bayattı —
+   ve filo o süre boyunca **kayıpsız** çalıştı. Bütün emirler `SendMessage` ile gitti.
+3. ALTYAPI gözcüsü **kapatıldıktan sonra** pano `who` canlılığı **0 dk** kaldı: canlılık
+   **claim atışından** gelir, gözcüden değil. Üçlünün koruduğu sanılan şey zaten başka
+   yerden geliyordu.
+
+Buna karşılık maliyeti **her turda bir uyarı satırı** ve **her açılışta bir kurulum ritüeliydi**.
+Hiçbir şey yakalamayan bir uyarı, üçüncü günde bakılmayan bir uyarıdır — bu, "yeşil kapı
+bakmadığı şeyi kanıtlamaz" dersinin aynadaki hâli: **kırmızı da bakmadığı şeyi kanıtlamaz.**
+
+**v1.0'dan GEÇERLİ KALANLAR** (silinmedi, çünkü hâlâ ölçülmüş gerçek):
+
+- **§9 kanca yazım kuralları** tamamen geçerli: `cwd` kök değildir · `venthub-sid` kimliği ·
+  `git status -uall` · `windowsHide: true` · kanıtın taşıyıcısı sorusu.
+- **Teslimat katmanında YEŞİL YOKTUR** (REC-287). Artık o katmanı ölçmüyoruz, ama ilke
+  duruyor: bir kanıtın sınıfı, dayandığı varsayımdan okunur.
+- **"Talimat davranış üretmez, mekanizma üretir"** (2026-08-20, dört oturumun sağır kalması).
+  ⭐v2.0 bunu **çürütmüyor, kapsamını daraltıyor**: mekanizma gerekiyordu çünkü *kanal* pano
+  notuydu ve pano notu pasif bir kutudur. `SendMessage` **itici** bir kanaldır — mesaj
+  konuşmaya düşer, okunmak için bir bekçi gerekmez. Yani doğru ders şu olmalıydı:
+  **pasif kanal mekanizma ister; itici kanal istemez.**
+- **2026-09-01'in 62 dakikalık kaybı** hâlâ geçerli: o gün kanıtlanamayan bir katmana
+  güvenildi. Çözüm o katmanı daha iyi ölçmek değil, **ona ihtiyaç duymamak** oldu.
+
+⚠**Bu bölümün kendi sınırı:** üç ölçüm de **tek bir günün** fotoğrafıdır ve `SendMessage`in
+kayıpsızlığı **iki günlük** gözlemdir (09-13 gece, 09-14 sabah). ⭐Daha önemlisi: o iki gün
+boyunca pano `who`'da **en çok iki canlı şerit** vardı. Yani ölçülen şey "mesajlaşma ölçeklenir"
+değil, **"bir-iki pencerede mesajlaşma yeter"**dir.
+
+### 0.1 Kararın yeniden açılma tetikleri — ikisi de OLAY tetikli, takvim değil
+
+**Tetik 1 — mesaj kaybı.** Bir emir gönderildiği hâlde muhataba ulaşmadıysa karar yeniden
+açılır. O gün aranacak şey `pano notu` değil **mesaj teslim kanıtıdır** (gönderildi / cevap
+geldi / kayıp), gözcü değil.
+
+**Tetik 2 — ölçek.** Pano `who`'da **aynı anda 3 veya daha fazla canlı şerit** göründüğü
+**ilk gün**: o gün **ve ertesi gün** mesaj teslim kanıtı ölçülür — kaç emir gönderildi, kaçına
+cevap geldi, kaç tanesi kayboldu — ve sonuç Recep'e **tek madde** olarak gider.
+
+**Niçin takvim değil olay:** Recep 2026-09-14, *"ölçmek önemli tabii, zamanı geldiğinde
+hatırlayana"*. Bir kararı "ileride tekrar bakarız"a bağlamak onu kimsenin bakmadığı bir nota
+çevirir. Bu yüzden yeniden ölçüm **cetvele yazılı bir tetiğe** bağlandı: ekip büyüdüğü gün
+ölçüm kendiliğinden gündeme gelir, kimsenin hatırlamasına gerek kalmaz.
+(Sabah yoklamasında bu tetik kontrol edilir.)
+
+### 0.2 ⭐"Küçük tek amaçlı otomasyon" serbest — gözcü değil, KANCA
+
+v2.0 gözcü/prob/doğrula üçlüsünü emekli etti. Bu, **her otomasyonu** yasaklamak
+değildir. Ayrım **kanalın yönünde**:
+
+> **PASİF kanal mekanizma ister, İTİCİ kanal istemez.**
+
+`SendMessage` **itici**: gönderilen mesaj karşı tarafın turuna kendiliğinden düşer, bekçi
+gerekmez. Linear **proje yorumu pasif**: bir kutuya yazılır ve kimse bakmazsa bekler.
+
+**Ölçülmüş bedel (REC-329):** 2026-09-09'da iki Design mesajı 1,5 saat, 2026-09-13
+18:23Z'deki DESIGN-KATALOG teslim yorumları **13+ saat** cevapsız kaldı. Emekli edilen
+üçlü Linear'a **hiç bakmıyordu**; bu boşluk yeni değil, **hiç kapatılmamıştı.**
+
+**Serbest olanın sınırları — beşi birlikte sağlanmalı:**
+
+1. **Süreç kurmaz.** Cron yok, `Monitor` yok, `ScheduleWakeup` yok, koparılmış süreç yok.
+2. **Zaten koşan bir kancanın içinde** yaşar; kendi tetiği yoktur.
+3. **Tek sorgu, tek satır.** Anlatmaz, sayar.
+4. **Fail-open ve SESSİZ:** anahtar yok / ağ yok / zaman aşımı → satır yok, hata **yok**.
+   ⚠Ama sessizlik **teşhis edilebilir** olmalı: sebebi soran bir kip (`--tani`) bulunur.
+   *Sessiz bir fail-open'ın bedeli, sessizliğin sebebinin sorulamamasıdır.*
+5. **Sessizlik kuralına DAHİL EDİLİR, altına konmaz.** Satır, brifingin sessizlik
+   kontrolünden **önce** hesaplanır; yoksa pano sessizken hiç basılmaz — yani **en çok
+   gerektiği anda susar.** (Bu kusur REC-329'da ilk yazımda yapıldı, kabul sınavı
+   yakaladı, `INV-MECH-1`'e sıra kolu eklendi.)
+
+**Adı böyle konur:** *"Linear yorum sayacı = kanca, gözcü değil."* Bir otomasyonun
+hangi sınıfta olduğu, ne kadar küçük olduğuna değil, **kendi tetiği olup olmadığına**
+bakılarak söylenir.
 
 ---
 
@@ -307,6 +395,35 @@ tutmuşken. Betik bunu `UYGULANAMADI (desen tutmadı)` diye bildirdiği için fa
 "iki sabotajdan biri yakalandı" diyen **yanlış bir kanıt** yazılacaktı. Çok satırlı sabotaj deseni
 Windows checkout'unda **EOL-bağımsız** (`\r?\n`) olmalıdır. Bu, §9.5'teki "ölçüm aracının kendisi
 kör olabilir" dersinin ikinci örneğidir; ölçüm aracı da ölçülür.
+
+---
+
+### 9.7 BOZUK / BOŞ `stdin`: fail-OPEN ama SESSİZ DEĞİL (REC-308)
+
+**Kural.** Bir kanca `stdin`den beklediği JSON'u okuyamazsa (bozuk ya da boş):
+
+1. **İşi DURDURMAZ** — `exit 0`, yazım serbest kalır.
+2. **SESSİZ KALMAZ** — `stderr`e tek satır düşer: `[<kanca>] stdin okunamadi, karisilmadi`.
+3. Karar üretmez: hiçbir şeyi onaylamaz, hiçbir şeyi reddetmez. "Ölçemedi" hâli, "geçti"
+   hâlinden **ayrı** yazılır.
+
+**Niçin `exit 2` değil.** Bozuk `stdin` **harness/süreç sınıfı** bir arızadır; kancanın gördüğü
+tek dosyanın özelliği değildir. O anda `exit 2` vermek, sebebi hiç ilgili olmayan **bütün
+yazımları** durdurur — yani katmanın kendisi kesinti kaynağı olur (kendi kendine kesinti).
+`lane-guard` bunu 2026-08 ölçümünden beri böyle yapıyor ve gerekçesi dosyasının başında yazılı.
+
+**Niçin sessiz de olmaz.** Sessiz fail-open, kapının **çalışmış gibi görünüp hiçbir şey
+ölçmediği** hâldir — bu projede en pahalı kusur sınıfı (§9.5 companion sessizliği: üç gün fark
+edilmedi; 2026-09-12 kanca yolu vakası: `MODULE_NOT_FOUND` düştü, kapı yeşil göründü). Bir satır
+`stderr`, o hâli görünür yapmanın en ucuz biçimidir.
+
+**Kapsam.** Kural PreToolUse / Stop / SessionEnd / PreCompact kancalarının hepsi için geçerlidir.
+Güvenlik kancaları da dahildir: `sensitive-path-guard` bozuk girdide `.env` yazımını **durdurmaz**
+ama durduramadığını **söyler**. Sınıf ayrımı yok; ayrım yapmak "hangi kanca hangi hâlde ne yapar"
+sorusunu yeniden hatırlamaya bağlar.
+
+**Ölçüt (test biçimi).** Her kanca testinde bir kol: bozuk girdi → `exit 0` **ve** `stderr`
+boş değil. Tek başına "exit 0" kolu bu kuralı ölçmez — sessizlik tam orada saklanır.
 
 ---
 
@@ -2161,6 +2278,37 @@ cevap verirdi — yani ölçülen kusur testin içinde tekrarlanırdı.
 kancaya eklendi. Sebep: yeni kanca kaydı `.claude/settings.json` düzenlemek demektir, yani
 **config** — ve bu iş akran iletisiyle geldi. **Config'e akran sözüyle dokunulmaz.**
 
+### ⭐ÖLÇÜLMÜŞ VAKA (2026-09-08, URUN-KATALOG) — RİSK ÖLÇÜMDE DEĞİL, **YAZMADA**
+
+**Olan:** `git add -A && git commit`, worktree'de sanılarak **ANA REPODA** koşuldu (dizin
+beyan edilmedi). Sonuç: ana repo `master` dalına, **BAŞKA ŞERİTLERİN beş ekran görüntüsü**
+(`rec213a-*.png` ×4, `rec266-mobil-aciklama.png`) **başkasının commit mesajıyla** yazıldı —
+commit `f2b59c7b7`. **Pushlanmadı.** Yakalayan: bu bölümün §28 kancası, bir sonraki turda.
+Onarım: `git -C <ana> reset --mixed HEAD~1` ile ana repo oturum başı hâline döndü, metin
+doğru ağaca commit edildi ve niçin commit mesajına yazıldı. Vakayı **sahibi kendisi bildirdi.**
+
+⭐**VAKANIN CETVELE KATTIĞI ŞEY — kendi metnimin eksiği:** §28 buraya kadar riski
+*"ölçüm ayrışır, yanlış ağacı ölçersin"* diye anlatıyordu. Bu vaka onu **eksik** gösterdi.
+Kanca uyarısını "beyansız **ölçüm**" diye bastı, oysa gerçekleşen zarar **yazma**
+tarafındaydı ve iki kat daha ağırdı:
+
+1. **Yanlış yere yazar** — beklenen zarar.
+2. ⛔**ÖNÜNE GELEN HERKESİN KİRLİ DOSYASINI ALIR.** `git add -A` ana repoda çalışınca
+   o an paylaşılan ağaçta duran *başka şeritlerin* izlenmeyen dosyalarını da commit'ler.
+   Yani hata tek şeridin işini bozmakla kalmaz, **başkasının yarım işini yabancı bir
+   commit'e hapseder** ve sahibi onu kendi ağacında arar.
+
+**HÜKÜM (iki parça, ikisi de kanonik):**
+- Git komutu **daima `git -C <ağaç>`** — ortam cwd'sine yaslanmak §9.1 ihlalidir.
+- **`git add -A` YASAK; `add` her zaman AÇIK DOSYA YOLU alır.** Gerekçe artık ölçülmüş:
+  `-A`'nın kapsamı "benim değişikliklerim" değil, "bu ağaçta ne varsa"dır.
+
+⚠**Ve kancanın kendi sınırı, adıyla:** kayıt "ölçüm komutu" sınıfı üzerinden tuttu —
+yani bu vakayı **doğru yakaladı ama yanlış adla** anlattı. Uyarı metni "beyansız ölçüm"
+derken okuyan "zararsız, sadece yanlış dizinde saydım" diye anlayabilir. Bir sonraki
+düzeltme kancanın **yazan fiilleri ayrı sınıf olarak adlandırması** olmalıdır; bu satır
+o işin gerekçesidir ve şimdilik **açık kalem** olarak yazılıdır (kanca değiştirilmedi).
+
 ---
 
 ## 29. KARARA GİDEN ÖLÇÜM BETİKTEN GELİR — kaynak gösterilmeyen sayı karar dayanağı değildir
@@ -2267,6 +2415,14 @@ Komşuları: §28 (ayrışma tur başına ölçülür) · §22 (ağaç tazeleme)
 ---
 
 ## 31. TESLİMAT KANITI BAĞIMSIZ TANIK İSTER — sınavın cevabı sınava girene verilmez
+
+> ⛔**BU BÖLÜMÜN "YEŞİL" HÜKMÜ §34 İLE GEÇERSİZ (2026-09-08, REC-287).** Aşağıdaki üç koşul
+> (bağımsız atan + eşleşme + tazelik) **yürürlüktedir** ve hâlâ gereklidir; **yetersiz** olan,
+> onları sağlayan kanıta **YEŞİL** demekti. Ölçüldü: jeton atanın **kendi gözcü bildirimine de**
+> düşüyor (gözcü `to` süzmez) ve pano dosyası `cat`lenebilir. Kanıt sınıfı bu yüzden
+> **`ZAYIF-PAYLASILAN`**dır ve bu katmanda **yeşil YOKTUR**. §34'ü okumadan bu bölümü kanıt
+> dayanağı olarak kullanma — 2026-09-08'de tam bu bölüme dayanılarak **üç kez** (KATALOG, URUN,
+> OPS) "bağımsız tanık" hükmü verildi.
 
 Mekanizmanın üç katmanından ikisi (gözcü, teslimat) ölçülebilir. Bu bölüm, **ölçülebilir olanın
 nasıl ölçüldüğünü** yönetir — çünkü 2026-09-06'da ölçüldü ki kapı, denetlediği ajanın *beyanına*
@@ -2491,3 +2647,95 @@ sızmaz · eski tek yuva okunmaya devam eder. Ayrıca cron etiketi kolu (plan ç
 verdi (23 testten 4 düştü); geri alındığında 23/23 yeşil. Ezme kontrolü ayrıca **izole pano
 dizininde** uçtan uca ölçüldü: başkasının canlı kaydında **DURDU (çıkış 2)**; kendi kaydını
 tazelemede, tüketilmiş kayıtta ve `--yine-de` ile **yol verdi** — yani ölçüt ayırt ediyor.
+
+## 34. TESLİMAT KATMANINDA **YEŞİL YOKTUR** — kanıt sınıfı `ZAYIF-PAYLASILAN` (REC-287)
+
+§31 doğru koşulları koydu (bağımsız atan + eşleşme + tazelik) ve o koşullar **yürürlükte**.
+Yanlış olan, onları sağlayan kanıta **YEŞİL** demekti. Bu bölüm o adı geri alır ve **niçin geri
+alınamayacak bir tavan olduğunu** yazar.
+
+### 34.1 Ölçüm (2026-09-08, üç bağımsız gözlem üst üste)
+
+1. **Araç kendi hikâyesiyle çelişiyordu.** `prob --to` yardım metni *"Jeton ATANIN ekranina
+   basilir"* diyordu; kod bağımsız kipte jetonu stdout'a **basmıyordu**. İkisinden biri yanlıştı
+   sanıldı; ölçüm ikisinin de yanlış olduğunu gösterdi — çünkü asıl sorun **stdout değildi**.
+2. **Jeton atanın bildirimine düşüyor.** `gozcu.cjs`, `type:'note'` olan **her** olayı basar;
+   **`to` süzgeci yoktur**. Prob olayının sid'i hedeften türetilmiş **sentetik** bir uuid olduğu
+   için atanın kendi gözcüsü onu elemez. Saha kanıtı: ALTYAPI'nın URUN'a attığı prob **ALTYAPI'nın
+   kendi bildirimine** düştü; OPS gözcüsü de kendisine ait **olmayan** iki probu (3a79 ve 4a8e
+   hedefli) gördü. Yani ekrandan gizlemek bir **hız tümseği**, bariyer değil.
+3. **Ve pano düz bir dosya dizinidir.** Jetonu görmek için hiçbir bildirime gerek yok: `cat`
+   yeter. Bu üçüncüsü ötekileri yutar.
+
+**Sonuç:** kapı fail-open değildi — **sahte-bağımsız**dı. Ve bu, kapının işe yaramadığı anlamına
+gelmez: koşullar gerçek kusurları (öz-prob, kimlik taklidi, bayat/tüketilmiş jeton) hâlâ eliyor.
+Yanlış olan tek şey, geçen kanıtın **ADI**ydı.
+
+### 34.2 Niçin "hedefin kendi koşumunda üretilen ikinci sır" ONARMAZ
+
+Kayıtta üçüncü seçenek olarak duruyordu: jeton, gözcü bildiriminde değil **hedefin kendi
+`dogrula` koşumunda üretilen** ikinci bir sırla eşleşsin; atan onu bilemez.
+
+**Uygulanmadı, ve gerekçesi şudur:** sınanan kanalın **kendisi panodur**, dolayısıyla test
+malzemesi **panodan geçmek zorundadır**. Panodan geçen her şey **dosya erişimiyle okunabilir**.
+İkinci sır, sırrın **yazarını** değiştirir; **okunabilirliğini** değiştirmez. Hangi taraf üretirse
+üretsin, geri yazılan bir jeton şu ikisini **ayırt edemez**:
+
+* bildirim **konuşmaya ulaştı** (ölçmek istediğimiz şey),
+* ajan **dosyayı okudu** (bildirim hiç ulaşmasa da mümkün).
+
+Ayırt etmeyen ölçüt kanıt değildir. Bu yüzden seçenek 3 **reddedildi** ve gerekçesi hem cetvele
+hem `mechanism-setup.cjs` gövdesine yazıldı — yoksa altı ay sonra *"bir nonce ekleyelim"* diye
+yeniden açılır ve aynı yanılsama **daha karmaşık bir kılıkla** geri gelir.
+
+### 34.3 HÜKÜM — üç sınıf, ve en üstteki de yeşil değil
+
+| sınıf | ne zaman | sonuca etkisi |
+|---|---|---|
+| **`ZAYIF-PAYLASILAN`** | akranın attığı **taze** jeton geri yazıldı — bu katmanın **TAVANI** | **kırmızı SAYMAZ**, damga yazılır |
+| **`ZAYIF-OZ`** | kendi probunun jetonu — tavanın **altında**, üstü erişilebilir | **KIRMIZI sayar** |
+| **`KIRMIZI`** | ölçülemedi · eşleşmedi · bayat · kimlik taklidi · tüketilmiş | KIRMIZI |
+
+**`YESIL` sınıfı bu katmanda YOKTUR.** `teslimatKaniti` onu **döndürmez**; `dogrula` ekranına
+**yazmaz**. Tek meşru yeşil **TARAMA** katmanındadır (gözcü imleç ofseti): onu gözcü **süreci**
+yazar, beyanla üretilemez.
+
+**Tavan niçin kırmızı da sayılmıyor:** kanıtlanması **mümkün olmayan** bir katmanı kırmızı saymak
+fail-closed değil **gürültü**dür — her oturum kalıcı ceza alır ve gerçek kırmızılar gölgelenir.
+Aynı hüküm CRON katmanı için **Recep kararıyla** (2026-09-06) zaten verildi; tek fark, orada ölçüm
+**yasak**, burada **imkânsız**.
+
+### 34.4 Sınıf DAMGAYA yazılır — yoksa yeşil yer değiştirir
+
+Kanıt sınıfı `.mekanizma-durum.<sid8>.json` içine **`teslimKanitSinifi`** alanı olarak yazılır ve
+yaşı okuyan her yüzey **sınıfı da** okur (`board.cjs teslimKanitSinifi`). Sebep ölçülmüş:
+`session-board` açılış satırı *"TESLIMAT 45dk once **KANITLI**"* yazıyordu. Sahte-yeşili yalnız
+`mechanism-setup`tan kaldırmak, onu **taşımak** olurdu — ve açılış satırı her oturumun bu katman
+hakkındaki kanaatini tek başına kuran satırdır. `yoklama`nın `TESLIM` sütunu da sınırını
+**koşulsuz** basar: yalnız teslimatsız şerit varken basmak, tam da yanlış kanaatin serbest kaldığı
+günü (hepsi taze) açıkta bırakırdı.
+
+### 34.5 GENEL DERS — adlandırma bir süsleme değil, işin kendisi
+
+Bu vakada **ölçüm doğruydu**: jeton gerçekten eşleşiyordu, gerçekten tazeydi, gerçekten başka bir
+oturum atmıştı. Yanlış olan **tek şey adıydı** — ve üç şerit o ada güvenerek karar verdi.
+`board.cjs`'te zaten yazılı olan ilke (§23) burada bedelini ikinci kez tahsil etti:
+
+> **Bir ölçümün adı, ölçtüğü şeyin sınırını taşımak zorundadır — paneli okuyan, ölçümün kodunu
+> okumaz.**
+
+İkinci ders bunun tersi yönde: **kanıt hijyeni araca yazılamıyorsa, araç bunu SÖYLEMEK
+zorundadır.** `prob --to` artık *"senden istenen, aracın sağlayamadığı şey: jetonu hedefe
+iletme"* der. Disipline dayanan bir garanti, **disipline dayandığını söylediği sürece** meşrudur;
+söylemediği anda sahte kanıt olur.
+
+### 34.6 Kapı
+
+`INV-MECH-BAGIMSIZLIK-1` (`src/__tests__/conformance/fleet-mechanism-integrity.test.ts`):
+çekirdek **hiçbir** fikstürde `YESIL` dönmez (evren kolu) · tavan sınıfı sınırını sebebinde yazar ·
+**CLI gerçekten koşulur** (fikstür pano): akran jetonunda ekranda `TESLIMAT : YESIL` **yok**, sınıf
+adı **var**, çıkış **0**; öz-probda çıkış **1** (ayırt edici çift) · sınıf damgaya yazılır ·
+yardım metninden *"atanin ekranina basilir"* **kalktı** · `gozcu.cjs` basım bloğunda `to` süzgeci
+**yok** (gerekçenin dayanağı; süzgeç eklenirse kol kırmızı verip gerekçenin yeniden ölçülmesini
+ister) · açılış satırı *"KANITLI"* demez ve sınıfı **damgadan** okur · yoklama sınırı koşulsuz
+basar · cetvel bu hükmü taşır.

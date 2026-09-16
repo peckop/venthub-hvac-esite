@@ -3,46 +3,18 @@ import { cache } from 'react';
 
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static';
 
-import { DEFAULT_TENANT_ID } from './tenantConstants';
+import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID, type TenantConfig } from './tenantConstants';
 
-export interface TenantConfig {
-  id: string;
-  name: string;
-  subdomain: string | null;
-  custom_domain: string | null;
-  is_active: boolean;
-  features: {
-    viewer3d?: boolean;
-    engineeringCalculators?: boolean;
-    pdfExports?: boolean;
-    [key: string]: unknown;
-  };
-  styles: {
-    primaryColor?: string;
-    secondaryColor?: string;
-    logoUrl?: string;
-    [key: string]: unknown;
-  };
-}
-
-export { DEFAULT_TENANT_ID };
-
-export const DEFAULT_TENANT_CONFIG: TenantConfig = {
-  id: DEFAULT_TENANT_ID,
-  name: 'Default Tenant',
-  subdomain: 'default',
-  custom_domain: null,
-  is_active: true,
-  features: {
-    viewer3d: true,
-    engineeringCalculators: true,
-    pdfExports: true,
-  },
-  styles: {
-    primaryColor: '#0f172a',
-    secondaryColor: '#3b82f6',
-  },
-};
+/**
+ * ⭐TANIMLAR `tenantConstants.ts`'E TAŞINDI (REC-59 adım 2, 2026-09-14) — burası yalnız
+ * yeniden dışa aktarır, böylece mevcut tüketiciler (`admin/layout`, `urunler` rotası,
+ * `useTenant`) hiç değişmeden çalışmaya devam eder. NİÇİN taşındı: bu dosya modül
+ * düzeyinde `next/headers` import eder; vitrin rotası sabiti buradan alırsa o modül
+ * vitrinin grafiğinde kalır ve sonradan eklenecek bir modül-düzeyi başlık okuması ana
+ * sayfayı SESSİZCE dinamiğe düşürebilir. Tek tanım hâlâ TEK yerde.
+ */
+export { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID };
+export type { TenantConfig };
 
 export const getTenantConfig = cache(async function getTenantConfig(): Promise<TenantConfig> {
   let tenantId: string | null = null;

@@ -58,18 +58,20 @@ describe('INV-PROB-KUYRUK: bekleyen jeton KUYRUKTUR, tek slot DEGIL', () => {
         ],
       },
     }
-    expect(olc(damga, 'PROB-ac03-OS4P8W').sinif, 'yeni jeton dogrulanamadi').toBe('YESIL')
+    expect(olc(damga, 'PROB-ac03-OS4P8W').sinif, 'yeni jeton dogrulanamadi').toBe('ZAYIF-PAYLASILAN')
     expect(
       olc(damga, 'PROB-ac03-2Y5YEB').sinif,
       'ONCEKI jeton kayboldu — ayni atanin ikinci probu birincisini EZIYOR (asil kusur)',
-    ).toBe('YESIL')
+      // REC-287: sinif adi YESIL'den ZAYIF-PAYLASILAN'a cekildi. Bu kolun OLCTUGU sey
+      // degismedi — ezilme olup olmadigi. Ad degisti, anlam ayni.
+    ).toBe('ZAYIF-PAYLASILAN')
   })
 
   it('ESKI TEK-NESNE bicimi hala okunur (filo bir anda kor kalmaz)', () => {
     const damga = {
       bekleyenler: { [OPS]: { jeton: 'PROB-ac03-TEKNESNE', atildiTs: new Date(T0).toISOString() } },
     }
-    expect(olc(damga, 'PROB-ac03-TEKNESNE').sinif).toBe('YESIL')
+    expect(olc(damga, 'PROB-ac03-TEKNESNE').sinif).toBe('ZAYIF-PAYLASILAN')
   })
 
   /**
@@ -94,7 +96,9 @@ describe('INV-PROB-KUYRUK: bekleyen jeton KUYRUKTUR, tek slot DEGIL', () => {
     expect(
       r.sinif,
       'tuketilmis bekleyen hala golgeliyor — sebep: ' + r.sebep,
-    ).toBe('ZAYIF')
+      // REC-287: kendi probunun sinifi artik ZAYIF-OZ (tavanin ALTI). Kolun olctugu sey ayni:
+      // tuketilmis bir bekleyenin, oturumun KENDI kanitini golgelememesi.
+    ).toBe('ZAYIF-OZ')
     expect(r.sebep, 'sebep YANLIS: "beklenen <jeton>" degil "KENDI probun" olmali').toContain('KENDI probunun')
   })
 
@@ -174,7 +178,7 @@ describe('INV-PROB-KUYRUK: bekleyen jeton KUYRUKTUR, tek slot DEGIL', () => {
    */
   it('BAGIMSIZ PROBDA jeton ATANIN ekranina BASILMAZ (oz-probda basilir)', () => {
     const kaynak = req('node:fs').readFileSync(BETIK, 'utf8') as string
-    const bagimsizDal = kaynak.slice(kaynak.indexOf('BAGIMSIZ PROB — hedef'))
+    const bagimsizDal = kaynak.slice(kaynak.indexOf('AKRAN PROBU — hedef'))
     expect(
       bagimsizDal.slice(0, 400),
       'bagimsiz prob dalinda jeton DEGERI basiliyor — aklama yolu acik',

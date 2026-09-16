@@ -39,6 +39,25 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 
+# Node betikleri — LF ZORUNLU (2026-09-09, üç ağaçta ölçüldü)
+#
+# ⛔NİÇİN: `* text=auto` + Windows `core.autocrlf`, `scripts/**` altındaki `.mjs`/`.cjs`
+# dosyalarını çalışma kopyasına CRLF yazıyordu. `vite-node` bu dosyaları bir fonksiyon
+# gövdesine sarıp çalıştırır ve **shebang'ı sökerken satır sonunu LF varsayar**; CRLF'te
+# geriye kalan `\r` gövdede `SyntaxError: Invalid or unexpected token` verir.
+#
+# Bedeli ÖLÇÜLDÜ: `denetim-izi-kapisi` konformans testinin **ayırt edici altı kolu**
+# (yeşil taraf + dört kırmızı sınıf + ayıklayıcı) CRLF'li iki ağaçta sessizce düşüyordu,
+# LF'li ağaçta geçiyordu. Üç ağaç, üç sonuç, korelasyon kusursuz — ve üçünde de aynı
+# sürümler (vitest 4.1.3 / vite 6.4.2 / Node v22.16.0), yani değişken SÜRÜM DEĞİL SATIR SONU.
+# CI Linux olduğu için master yeşildi ve hiçbir kapı bunu görmedi.
+#
+# ⚠SINIRI, ADIYLA: bu satır **yeni checkout'larda** etkilidir, MEVCUT ağaçları düzeltmez
+# (onlar için `git add --renormalize .` ya da yeniden checkout gerekir). Mevcut ağaçlardaki
+# kusuru kapatan şey, betikten shebang'ın KALDIRILMASIDIR — ikisi birlikte gerekiyor.
+scripts/**/*.mjs text eol=lf
+scripts/**/*.cjs text eol=lf
+
 # Lockfile (CI pnpm kullanıyor)
 pnpm-lock.yaml text
 

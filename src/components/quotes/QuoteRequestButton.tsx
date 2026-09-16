@@ -1,20 +1,21 @@
 'use client'
 
 import { FileText } from 'lucide-react'
-import { usePathname, useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { toast } from 'sonner'
 
-import { useAuth } from '../../hooks/useAuth'
-import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { QuoteSource } from '../../lib/services/quoteService'
 import QuoteRequestModal, { type QuoteRequestModalItem } from './QuoteRequestModal'
 
 /**
- * "Teklif İste" CTA'sı — login kapısı + modal tetikleyicisi (cetvel Q4).
- * Oturum yoksa login'e yönlendirir; dönüş yolu `?redirect=` ile korunur
- * (LoginPage ?redirect= ve ?from= ikisini de okur — AUTH T056 sözleşmesi).
+ * "Teklif İste" CTA'sı — modal tetikleyicisi (cetvel Q4).
+ *
+ * ⭐LOGIN KAPISI KALDIRILDI (REC-117, Recep kararı 2026-09-01, yazılı):
+ * *"Zorunlu olmamalı; kullanıcı rahat hissetmeli; biz bir arzu meydana getirebilirsek
+ * zaten abone olur; ama belirli bilgiler olmadan da teklif ve bilgilendirme yürümez."*
+ * Yani hesap ZORUNLU değil, KİMLİK zorunlu — ad/e-posta/telefon modalda toplanır ve
+ * DB'de zaten NOT NULL'dır. Oturumlu akış aynen korunur (alanlar profilden/oturumdan
+ * dolar); değişen tek şey, oturumsuz ziyaretçinin artık login'e ITILMEMESİ.
  */
 
 interface QuoteRequestButtonProps {
@@ -33,20 +34,9 @@ const QuoteRequestButton: React.FC<QuoteRequestButtonProps> = ({
   className,
 }) => {
   const { t } = useI18n()
-  const { user } = useAuth()
-  const Routes = useLocalizedRoutes()
-  const router = useRouter()
-  const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  const handleClick = () => {
-    if (!user) {
-      toast.error(t('quotes.request.loginRequired'))
-      router.push(Routes.auth.login(pathname ?? undefined))
-      return
-    }
-    setOpen(true)
-  }
+  const handleClick = () => setOpen(true)
 
   return (
     <>

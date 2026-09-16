@@ -104,15 +104,21 @@ for (const { ad, sirala: kol } of TABLOLAR) {
   console.log(`  ${ad.padEnd(18)} ${String(satirlar.length).padStart(5)} satır  ${hash.slice(0, 12)}  (okundu)`)
 }
 
-mkdirSync(HEDEF, { recursive: true })
-for (const { ad, govde } of govdeler) writeFileSync(join(HEDEF, `${ad}.jsonl`), govde, 'utf8')
+// ⭐jsonl HAM/ ALTINA yazılır (REC-212 F1, OPS hükmü 2026-09-09): insan-okur CSV'ler bundan
+// ÜRETİLİR (uretilmis-artefakt kuralı) ve elle düzenlenmez. Round-trip eşitlik kapısı da
+// CSV üzerinde DEĞİL, bu jsonl'ler üzerinde ölçülür — CSV'de bayt eşitliği işletim sistemine
+// bağlıdır (bugün ölçüldü: CRLF/LF farkı aynı dosyayı farklı gösterdi).
+const HAM = join(HEDEF, 'ham')
+mkdirSync(HAM, { recursive: true })
+for (const { ad, govde } of govdeler) writeFileSync(join(HAM, `${ad}.jsonl`), govde, 'utf8')
 
 // Görseller: dosyaların KENDİSİ pakette değil, yolları var. Bunu saklamıyoruz.
 const gorselYolu = govdeler.find(g => g.ad === 'product_images')?.ornek || {}
 manifest.uyari = [
-  'Görsel DOSYALARI bu pakette YOKTUR — yalnız product_images.path yolları var. Görselsiz bir hedefe yüklenirse ürünler görselsiz açılır.',
+  'Bu betik paketin HAM yarısıdır: ham/*.jsonl üretir. İnsan-okur CSV ve görsel DOSYALARI için `katalog-paket-uret.mjs` koşulmalıdır; o koşulmadan paket EKSİKTİR.',
   'Geri yükleyici bu pakette YOKTUR. Paket tek başına "taşınabilir katalog" değildir; geri yüklenebildiği ölçüde taşınabilirdir.',
   'tenant_id kolonları olduğu gibi taşınır — başka bir kuruluma yüklenirken yeniden eşlenmelidir.',
+  'PAKET GİT\'E GİRMEZ: fiyat (Euro) ve ~36 MB görsel taşır, ingestor deposu REC-215 ile PUBLIC olacak. `paket/` .gitignore\'dadır; USB kopyası = dizinin KENDİSİ.',
 ]
 manifest.toplam_satir = toplam
 writeFileSync(join(HEDEF, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf8')

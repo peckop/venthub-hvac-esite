@@ -227,6 +227,101 @@ ve kategori kolonlarını çekmiyordu, dolayısıyla kilit iki kapsam için sess
 kurduktan sonra **kusuru birebir geri koyup** kırmızı gördüğünü kanıtla; "eski testle yeşil,
 yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğünün tek kanıtıdır.
 
+### 3.2 ⛔DIFF-REVIEW SONUCU İKİ SATIRDIR — eksen hükmü YALNIZ BAŞINA "GEÇ" DEĞİLDİR (2026-09-09, OPS hükmü)
+
+Bir şeridin başka şeridin PR'ına verdiği diff-review sonucu **iki satır** olmak zorundadır:
+
+1. **EKSEN HÜKMÜ** — `GEÇ` / `DÜZELT`, incelenen eksende (güvenlik · veri bütünlüğü · kapı
+   tasarımı · ne istendiyse).
+2. **PAKET SATIRI** — tam konformans paketi koşuldu mu, **sayıyla**: `Test Files N/N`,
+   `Tests N/N`.
+
+⛔**Sayı yoksa `GEÇ` YAZILAMAZ.** Yazılırsa o sonuç bir eksen görüşüdür, kapı hükmü değildir
+ve öyle adlandırılmalıdır.
+
+**NİÇİN — ölçülmüş vaka, 2026-09-09 (ALTYAPI'nın kendi hatası):**
+ALTYAPI, #1143'e güvenlik ekseninde `GEÇ` verdi. Hüküm o eksende doğruydu ve doğru kaldı
+(beş zorunlu güvenlik kalemi gerçekten kapanmıştı). Ama **paket koşulmadı** ve PR merge
+kuyruğunda `i18n-dead-key` kapısında **CI KIRMIZI** düştü. Yazan şerit de aynı boşluktaydı:
+43/43 **el seçimi** alt küme koşmuştu.
+
+⭐**Sınıf, bir gün önce yazılmış olanın aynısı ve bu kez İNCELEYEN tarafta tekrarlandı:**
+2026-09-08'de ALTYAPI, sınıf/ad değişikliğinde doğru evrenin grep çıktısı değil **paketin
+kendisi** olduğunu yazdı (kendi CI kırmızısından). Ertesi gün aynı şerit, incelemede el
+seçimine güvendi. Ders: **"el seçimi yetmez" kuralı yazana da bağlıdır** ve yalnız kod
+yazarken değil **inceleme yaparken de** geçerlidir.
+
+**Bedeli somut:** paket koşulmuş olsaydı kırmızı bir turda görülür, yazan şerit tek düzeltmeyle
+kapatırdı. Koşulmadığı için PR merge kuyruğuna girdi, orada düştü ve bir tur kaybedildi.
+
+⚠**Bu kural inceleyenin işini iki katına çıkarmaz:** paket zaten koşulabilir bir komuttur ve
+maliyeti dakikalarla ölçülür; kaybedilen tur ise saatlerle. Sayı yazmak, koşmadığını
+gizlememenin de tek yoludur — "baktım, iyi görünüyor" bir ölçüm değildir.
+
+### 3.3 ⛔BAŞKASINI DÜZELTİRKEN ÖLÇÜMÜN DAMGASI DA SÖYLENİR (2026-09-09, OPS hükmü)
+
+Bir şeridin başka bir şeridin (veya OPS'un) bulgusunu **düzelttiği** her not, düzeltmenin
+dayandığı ölçümün **damgasını** taşımak zorundadır:
+
+- **hangi koşum / hangi kayıt** (run kimliği, commit, dosya + satır — ne ölçüldüyse onun kimliği),
+- **hangi UTC an** (`date -u`, hatırlanan saat değil).
+
+⛔**Damgasız bir düzeltme, düzeltme sayılmaz** ve emre çevrilmez. Çünkü düzeltmenin kendisi
+bayat olabilir ve bayat bir düzeltme, düzelttiğini sandığı hatadan **daha pahalıdır**: yayılır.
+
+**NİÇİN — ölçülmüş vaka, 2026-09-09 (ALTYAPI'nın kendi hatası):**
+ALTYAPI, "master'daki `catalog-integrity` kırmızısı TLS değil, gerçek veri ihlali" diyerek
+OPS'u düzeltti. OPS bunu KATALOG'a **iş emri** olarak geçirdi. KATALOG adım adım ölçtü ve
+**tersini** buldu.
+
+Adım kırılımı, iki koşumda:
+
+| koşum | UTC | `Catalog integrity gate` | `Aile-kategori` adımı |
+|---|---|---|---|
+| 34319782643 | 06:35:45Z | **failure** (exit 1, veri ihlali) | **skipped** |
+| 34325812774 | 07:49:16Z | **success** | **failure** (exit 2, TLS) |
+
+İkisi de doğruydu. Veri ihlali 06:35'te vardı, 07:49'da yoktu (arada onu kapatan PR indi).
+ALTYAPI'nın ölçümü **yanlış değil, BAYATTI** — ve damgası söylenmediği için bayatlığı
+görünmedi. Bedeli: KATALOG artık var olmayan bir ihlali aradı.
+
+⭐**AYNI VAKADAN İKİNCİ KURAL — "İŞ KIRMIZI" BİR ÖLÇÜT DEĞİLDİR:**
+Bir işte birden çok kapı adımı varsa, `set -Eeuo pipefail` ile **ilk düşen adım işi keser ve
+sonrakiler `skipped` olur** — yani ilk arıza ikinciyi **gizler**. Yukarıdaki tabloda 06:35
+koşumunda TLS arızası hiç görünmedi, çünkü o adım hiç koşmadı.
+Dolayısıyla kırmızı bildirilirken sıra şudur: **önce HANGİ ADIM, sonra sahip.** İş düzeyi
+çıkış koduna bakıp adım düzeyini atlamak, gizlenmiş ikinci arızayı da atlamaktır.
+
+### 3.4 ⛔"İŞ MASTER'DA MI" SORUSU **İÇERİKLE** ÖLÇÜLÜR, COMMIT KİMLİĞİYLE DEĞİL (2026-09-09)
+
+**KURAL.** Bir işin master'a girip girmediği **içerik** üzerinden ölçülür:
+
+```bash
+git show origin/master:<dosya> | grep -F '<eklenen ayırt edici satır>'
+```
+
+⛔**Commit kimliği (SHA) bir içerik kanıtı DEĞİLDİR.** `squash` ve `cherry-pick` kimliği
+**değiştirir**, içeriği **korur**. Dolayısıyla `git merge-base --is-ancestor`, `git log
+origin/master..HEAD` ve "SHA master'da mı" gibi ölçütler bu iki işlemde **yanılır**.
+
+**Bu ölçüm iki yerde ZORUNLUDUR:**
+1. **Dal silmeden önce** — dalın taşıdığı değer gerçekten başka yerde mi?
+2. **Kapalı bir PR'ın dalına iş eklemeden önce** — kapalı PR yeni commit **almaz**.
+
+**NİÇİN — aynı gün, iki şerit, iki yön (ölçülmüş):**
+
+| şerit | ne yaptı | ölçüt neyi verdi | gerçek |
+|---|---|---|---|
+| ALTYAPI | cherry-pick'lenmiş §3.3 commit'inin dalını silecek | `--is-ancestor` → **HAYIR** | içerik master'da **VARDI** (yanlış NEGATİF) |
+| KATALOG | merge sonrası aynı dala 3 commit itti | push başarılı, ağaç temiz, `..HEAD` boş | üçü de master'a **GİRMEDİ** (yanlış GÜVEN) |
+
+Aynı gün ALTYAPI bu dersi yazdıktan **beş dakika sonra** kendi şeridindeki 66 uzak dalı yine
+SHA ile ölçtü ve "0'ı birleşmiş" dedi. Yama denkliğiyle yeniden ölçüm: **18 tamamen master'da,
+2 kısmen, 45 hiç.** Yani ders yazılmıştı ama **ölçüm alışkanlığı** değişmemişti.
+
+⭐**EN TEHLİKELİ SINIF "KISMEN GİRMİŞ" DALDIR:** yeşil görünür, eksiğini gizler. O yüzden
+silme kararı toplu verilemez — dal başına içerik eşleşmesi ya da açıkça yazılmış "ÇÜRÜDÜ" hükmü.
+
 ---
 
 ## 4. Standart-Önce (No-Standard-No-Code)
@@ -277,6 +372,38 @@ yeni testle kırmızı" farkı, kapının gerçekten yeni bir şey ölçtüğün
 - Bir iş bitmeden ikincisine başlama; **dallar/şeritler karışmasın**.
 - `.agent/skills/` (Antigravity) ile `.claude/skills/` (Claude Code) **ayrı ve kasıtlı** — birleştirme/karıştırma yok.
 
----
+### 8.1 ⛔ARA PUSH YASAK — her push bir dağıtım kaydı üretir ve KOTAYI YER (2026-09-08, OPS hükmü)
+
+**KURAL:** dal üzerindeki ara commit'ler **yerelde kalır**. `git push` yalnız **iki anda** yapılır:
+PR **açılırken** ve PR **güncellenirken** (kapı kırmızısını onarmak, rebase, gözden geçirme
+düzeltmesi). "Kaydolsun diye" ya da "her commit'te" push YOK.
+
+**NİÇİN — ölçülmüş, tahmin değil.** Vercel Git entegrasyonu **her push için bir dağıtım kaydı
+oluşturur**; şerit dalı kapısı (#1117) o kaydı **oluştuktan SONRA** iptal eder (Ignored Build
+Step olarak koşar), yani **oluşumu engellemez**. İptal edilen kayıt da kabul edilmiş kayıttır ve
+kotayı yer. 2026-09-08 ölçümü, kapıdan **sonraki** 25 saat:
+
+- **37 önizleme kaydı** (25 iptal · 12 hazır) + 23 production kaydı = 60 kayıt
+- ~10 PR için 37 önizleme → **PR başına ~3,7 push**
+- Bedeli: kota kilidi **iki kez** kapandı ve canlı site 11:29Z–13:14Z arası **beş
+  birleştirme geride** kaldı; müşteri o süre boyunca eski vitrini gördü.
+
+⚠**KİLİTLİYKEN VERCEL HİÇ KAYIT OLUŞTURMUYOR** (aynı ölçümde 16,5 saatlik boşluk). Yani
+"kaç dağıtım engellendi" sorusunun cevabı hiçbir yerde yoktur ve kota tavanı ölçülemez.
+Ölçülemeyen bir tavanın altında kalmanın tek yolu **tüketimi azaltmaktır**.
+
+**NİÇİN AYAR DEĞİL DAVRANIŞ:** depo tarafında "yalnız master dağıtsın" diyen bir ayar **yok**.
+`vercel.json` `git.deploymentEnabled` ya **boolean `false`** (o zaman master'ın production
+yayını da durur) ya da **belirli dal adlarını** eşler — belgesi *"unspecified branches default
+to true"* diyor, **joker yok** (#1117'nin bulgusu, belgeden teyitli). Dal adları iş başına
+üretildiği için sayarak kapatmak sonlu değildir. Bu kural, ayarla kapatılamayan bir sızıntının
+**tek bedelsiz** kapatma yoludur; tüketimin ~%60'ını keser.
+
+**ÖLÇÜT:** PR başına push sayısı. Bugünün tabanı **3,7**; hedef **1–2**.
+
+**SINIR — adıyla:** bu bir **kural**, kapı DEĞİL. Bir kanca ile zorlanmıyor, çünkü push'un
+"PR açılışı mı, ara mı" olduğunu yerel kanca ölçemez (PR'ın varlığı ağ sorusudur ve kanca
+cetveli çevrimdışı olmayı şart koşuyor). Zorlanamayan kural, **ölçülerek** yaşar: sayı
+büyüyorsa kural çürümüştür ve o gün yeniden konuşulur.
 
 *SSOT: bu dosya. Controller'lar = Claude Code (eş, çoğul) · ortak Worker = Antigravity CLI · onay & relay = Recep.*

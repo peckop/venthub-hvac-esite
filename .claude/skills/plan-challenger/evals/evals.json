@@ -1,0 +1,28 @@
+{
+  "skill_name": "plan-challenger",
+  "version": "1.1.0",
+  "should_trigger": [
+    "planı çürüt",
+    "şu planı çürüt: docs/plans/rec340-faz1-plan-2026-09-15.md",
+    "red team denetle",
+    "bu mimari planı uygulamadan önce red team denetle",
+    "plan challenge",
+    "migration planı stress-test et, prod riski var mı",
+    "plandaki varsayımları çürüt ve koddan kanıtla",
+    "plan red team raporu çıkar (red_team_report.md)",
+    "bu adım gerekli mi, hangi vakayı kurtarıyor",
+    "planı kapsam açısından denetle, çıkarılacak adım var mı",
+    "bu adım zaten var mı diye plana bak, yeniden mi yazıyoruz",
+    "plan çalışan bir şeyi bozuyor mu, regresyon riski ölç"
+  ],
+  "should_not_trigger": [
+    "kodu commit et",
+    "bu bileşeni stille ve renk seç",
+    "vitest testlerini çalıştır",
+    "veritabanını sıfırla",
+    "yeni React bileşeni oluştur",
+    "kod integrity check, bütünlük denetle",
+    "enterprise teslim denetimi yap (10/10 check)",
+    "PDF kataloğunu tara ve CSV çıkar"
+  ]
+}

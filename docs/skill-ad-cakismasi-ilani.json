@@ -1,0 +1,38 @@
+{
+  "surum": 4,
+  "nicin_var": "Bir skill adi HEM depo kapsaminda (.claude/skills) HEM kullanici kapsaminda (~/.claude/skills) varsa, oturuma YALNIZ BIRININ ICERIGI yuklenir ve digeri GOLGELENIR. Golgelenen dosya yerinde durur, ama yonlendirme onu adiyla secemez. Bu, atil-arac temizliginin girdisini bozar: golgelenmis bir skill 'ise yaramaz' gibi gorunur, oysa sorun dosyada degil YERLESIMDEDIR. Bu dosya bilinen her cakismayi GORUNUR ve SINIRLI kilar; YENISI eklenirse kapi KIRMIZI verir.",
+  "kapi": "src/__tests__/conformance/skill-ad-cakismasi.test.ts",
+  "olcum_tarihi": "2026-09-14",
+  "_kapinin_siniri": "Kapi kullanici kapsamini YALNIZ OKUR, asla yazmaz. CI'da kullanici agaci YOKTUR -> kapi orada OLCEMEDI der ve GECER (fail-open), gerekcesini stderr'e tek satir yazar. Yani CI'daki yesil 'cakisma yok' kaniti DEGILDIR; kapi yerel gelistirme makinesinde anlamlidir. Cakisma YALNIZ AD uzerinden aranir, icerik benzerligi olculmez.",
+  "_nicin_agent_agaci_kapsamda_degil": "`.agent/skills` Antigravity/worker agacidir ve Claude Code'un sistem istemine HIC girmez; `~/.claude` ile ad uzayi paylasmaz. `.claude` ile `.agent`ta ayni adin bulunmasi CAKISMA DEGIL, KASITLI cift agactir (CLAUDE.md: 'IKISI DE AKTIF ve KASITLI'). Kapi o kolu KIRMIZI YAPMAZ.",
+  "_yon_nasil_olculur": "⛔`/skill-doctor` raporunun `source` SUTUNU YON KANITI DEGILDIR. Olculdu (2026-09-14): rapor `office-hours` ve `qa` icin `projectSettings` yaziyordu, AMA canli oturumun skill listesinde o iki adin ACIKLAMASI kullanici surumunun aciklamasiydi. Yani `source` sutunu adin NEREDE KAYITLI oldugunu soyluyor, ICERIGI KIMIN KAZANDIGINI soylemiyor. YON KANITI: canli oturumun skill listesindeki ACIKLAMA METNI hangi dosyaninki ise o kazanmistir.",
+  "cakismalar": [],
+  "_cakismalar_nicin_bos": "⭐UC CAKISMA DA COZULDU (2026-09-14 sabah, Recep sozuyle uygulandi): kullanici kapsamindaki uc surum `gstack-` oneki aldi. Olculdu — kullanici kapsaminda artik `investigate`/`office-hours`/`qa` YOK, yerine `gstack-investigate`/`gstack-office-hours`/`gstack-qa` var; depo surumlerinin ucu de yerinde. Yani uc proje disiplinimiz (kok sebep, fikir tartismasi, kanit-uretir QA dongusu) ADIYLA YENIDEN ERISILEBILIR. Liste bos olmasi 'cakisma olmadi' demek DEGIL, 'bilinen cakisma kalmadi' demektir; kapinin bayatlik kolu bu dosyayi bos tutmaya ZORLAR.",
+  "cozulmus_kayit": [
+    {
+      "ad": "investigate",
+      "cozum": "kullanici kapsamindaki surum `gstack-investigate` olarak yeniden adlandirildi",
+      "kaybedilen_disiplin": "Kok sebep bulunmadan duzeltme yazilmamasi (#1171 / REC-307, 119 satir, kuru kosuyu 2. adimda durduran akis)",
+      "tarih": "2026-09-14",
+      "karar": "RECEP",
+      "uygulayan": "OPS (~/.claude ALTYAPI'nin yazma alani DEGIL)"
+    },
+    {
+      "ad": "office-hours",
+      "cozum": "kullanici kapsamindaki surum `gstack-office-hours` olarak yeniden adlandirildi",
+      "kaybedilen_disiplin": "Is emri ACILMADAN ve plan YAZILMADAN once fikri tartisma; tetikleyicileri Recep'in kullandigi Turkce ifadelere gore yazilmisti ('bu fikir deger mi', 'sunu yapsak mi', 'buna gerek var mi')",
+      "tarih": "2026-09-14",
+      "karar": "RECEP",
+      "uygulayan": "OPS"
+    },
+    {
+      "ad": "qa",
+      "cozum": "kullanici kapsamindaki surum `gstack-qa` olarak yeniden adlandirildi",
+      "kaybedilen_disiplin": "KANIT URETEN QA dongusu (ekran goruntusu, konsol hatasi, kirik link, sunucu HTML kelime sayisi — REC-150 dersinden). ⚠BU KALEM EN RISKLIYDI: golgeleyen surum 'test et ve bulduklarini duzelt' diyordu, yani KANIT SARTI OLMADAN kod degistirmeye yoneltiyordu.",
+      "tarih": "2026-09-14",
+      "karar": "RECEP",
+      "uygulayan": "OPS"
+    }
+  ],
+  "_ne_ogrendik": "Bu dosyanin omru BIR GUNDEN KISA oldu ve bu bir kusur DEGIL, kapinin CALISTIGININ kanitidir: cakisma 2026-09-14 gecesi olculdu, ilan edildi, sabah cozuldu, ve kapinin BAYATLIK kolu ilanin temizlenmesini ZORLADI (cozulmus bir cakisma ilanda kalsa kapi o ad icin KOR kalirdi). Ilan dosyasi bir gunluk kayit degil, bir BORC DEFTERIDIR: dolu kaldigi surece borc vardir."
+}

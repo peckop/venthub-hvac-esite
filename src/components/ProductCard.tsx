@@ -150,7 +150,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             </div>
           )}
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-1 border border-light-gray shadow-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <BrandIcon brand={product.brand} />
+            {/* Marka adı kartta zaten yazıyla var — logo dekoratif (REC-268). */}
+            <BrandIcon brand={product.brand} dekoratif />
           </div>
         </div>
 

@@ -175,8 +175,8 @@ export const en: typeof tr = {
     detailedSearch: 'detailed search for',
     keyboardHint: 'Navigate with arrow keys',
     enterHint: 'For all results',
+    // `placeholderAi` removed (REC-340 Phase 0) — see the TR dictionary for the measurement.
     placeholder: 'Search products, categories, brands...',
-    placeholderAi: 'Search products, categories, or AI-powered search...',
     noResultsAdvice: 'Try different keywords',
     brandPrefix: 'Brand: ',
     fuzzyMatchNotice: 'No exact match found, showing similar results.'
@@ -672,6 +672,11 @@ export const en: typeof tr = {
     nextAria: 'Next'
   },
   products: {
+    // REC-338 — see the TR dictionary for the measurement that motivated these keys.
+    discovery: {
+      seoTitle: 'All Products | Industrial Ventilation and HVAC — VentHub',
+      seoDesc: 'Every VentHub product family in one list: fans, heat recovery, air curtains, ducting and accessories. Engineering-led selection.',
+    },
     orbital: {
       dragHint: 'Drag to Spin',
     },
@@ -2379,12 +2384,20 @@ export const en: typeof tr = {
       contactPhone: 'Phone',
       contactPhonePh: '+90 5xx xxx xx xx',
       contactEmailNote: 'The quote will be sent to this email address',
-      contactRequired: 'Full name and phone are required — a quote must name its recipient',
+      contactEmail: 'Email',
+      contactEmailPh: 'you@company.com',
+      contactEmailGuestNote: 'Your quote and updates will be sent to this address',
+      contactRequired: 'Full name, phone and email are required — a quote must name its recipient',
+      kvkkConsent: 'I have read the privacy notice',
+      kvkkRequired: 'Please confirm you have read the privacy notice to continue',
+      duplicateToast: 'You just sent this request — our team is already on it',
+      rateLimitToast: 'Too many requests sent; please try again a little later',
+      guestSignupInvite: 'Create an account to track this request and your future quotes.',
+      guestSignupCta: 'Create Account',
       note: 'Note (optional)',
       notePh: 'A short note about your project/needs (optional)',
       submit: 'Send Quote Request',
       cancel: 'Cancel',
-      loginRequired: 'You need to sign in to request a quote',
       successToast: 'Your quote request has been received',
       errorToast: 'Could not create quote request',
     },

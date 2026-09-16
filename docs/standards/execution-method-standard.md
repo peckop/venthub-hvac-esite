@@ -43,7 +43,7 @@
 | Repo çapında **geniş tarama** ("her X'i bul", 50+ dosya) | **agy-orchestrate** (ucuz) → CodeGraph doğrulama | Yargı gerektiren her adım (agy tarar, karar vermez) | `docs/audits/` |
 | **Aynı yapısal değişiklik çok hedefe** (24 admin sayfası → ortak kit; 40 bileşen → aynı hook) | **maestro** | Tek dosya · hedefler birbirinden farklı (o zaman şerit içinde sıralı) | Dalga PR'ları |
 | **Fikir / "şunu yapsak mı"** — emir açılmadan, plan yazılmadan ÖNCE ("doğru problem mi, talep kanıtı ne, en dar dilim ne") | **office-hours** (altı zorlayıcı soru + öncül çürütme + 2-3 yol → tasarım notu) | Kapsamı belli tek iş · Kararlar defterinde kapanmış konu (yeniden açma) · yazılmış planın red-team'i (→ plan-challenger) | `docs/plans/<konu>-tasarim-notu-*.md` + Recep'e ödev |
-| **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → plana "ÇELİŞEN-MEVCUT" |
+| **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team + **DÖRT SORU**, §2.2) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → **adım × dört soru tablosu** en başta + plana "ÇELİŞEN-MEVCUT" |
 | **PR diff** incelemesi | **diff-review** / **code-review** | — | PR yorumu |
 | **Uygulama gerçekten çalışıyor mu** — görsel/etkileşimli değişiklik, "öyle mi oldu", PR öncesi tarayıcı kanıtı, hidrasyon/Suspense-kökte şüphesi | **qa** (Playwright+Chromium ile gez → kanıt → atomik düzeltme → yeniden ölç) | Kod okuma denetimi (→ 20-eksen/auditor) · birim test · prod'da eylem (yalnız bakış) · uzak konteynerde dış URL (yerel `pnpm start`) | `docs/audits/qa-<hedef>-<tarih>.md` + ekran görüntüsü |
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
@@ -71,6 +71,33 @@ girer — girmezse "elle" kovasına düşer ve maliyeti hiç ölçülmez.
 ⚠**Sınır:** plan modunda **yazma yapılmaz**; plan onaylandıktan sonra uygulama normal yöntemle
 koşar. Kapsam sorusu **Recep'e** gider ve *yapısal karar pakete gömülmez* — menü yeri, URL şeması,
 sayfa mimarisi gibi kalemler tek tek sorulur, toplu onaya eklenmez.
+
+### 2.2 `plan-challenger` DÖRT SORU taşır — "yanlış mı" yanına "gerekli mi" (REC-347, 2026-09-16)
+
+**Ölçüm (REC-310 Faz 1, `docs/audits/gstack-yan-yana-2026-09-15.md`):** aynı plan iki araçla
+denetlendi, **35 bulgunun yalnız 6'sı örtüştü** — yani bulguların **%83'ü tek eksende** doğdu.
+Bizim `plan-challenger` "bu plan **YANLIŞ** mı" diye soruyordu (canlıda çürütme: EXPLAIN, hata
+üretme, simülasyon) ve iki P0 buldu. Öteki araç "bu plan **GEREKLİ** mi" diye sordu (depo
+envanteri, kapsam daraltma) ve bir adımın dokuz vakanın **hiçbirini** kurtarmadığını göstererek
+fazı küçülttü (→ REC-346). İkinci soru bizim skill'imizde **hiç yoktu**.
+
+**Kural:** her plan **ADIMI** için dördü de cevaplanır ve tablo raporun **EN BAŞINA** konur:
+**S1** bu adım gerekli mi (hangi vakayı/ölçütü kurtarıyor, **sayıyla**; hiçbirini kurtarmıyorsa
+**ÇIKAR**) · **S2** bu zaten var mı (depo/DB/eklenti envanteri; varsa **YENİDEN YAZMA**) ·
+**S3** kaç yol test ediliyor (kapı/fikstür **sayısı**; sıfırsa adım çıkmaz ama **"SINANMIYOR"
+damgası** alır ve damga plan metnine taşınır) · **S4** çalışan bir şeyi bozuyor muyuz (dokunulan
+yüzeyin **canlı ÖNCE/SONRA** satırı; korunacak davranış **kapıya** yazılır, nota değil).
+Hüküm kümesi: **KALSIN · DARALT · ÇIKAR · AYRI KAYIT**.
+
+**S4'ün altına CLAUDE.md kural 13 ve 14 SABİT SATIR olarak konur.** Gerekçe URUN'un çekincesi ve
+ölçülmüş: dış araç "migration merge = prod" kuralını **yalnız brief'e yazıldığı için** gördü,
+projeyi bilmiyordu. Brief'e yazılmayı bekleyen kural, yazılmadığı gün görünmez.
+
+⭐**İLK KOŞUMUN SONUCU** (`docs/audits/rec347-dort-soru-2026-09-16.md`): REC-340 Faz 1 planı
+dört soruyu geçti (yedi adımın beşi KALSIN, biri DARALT, biri zaten ÇIKAR) — ama aynı sorular
+**kendi yetenek dosyamıza** uygulandığında on bölümün **dokuzunun** ya CLAUDE.md'de ya ESLint
+kapısında ya kardeş skill'de **zaten yazılı** olduğunu gösterdi. Yani "bu zaten var mı"
+sorusunun ilk kurbanı biz olduk; kapsam denetimi önce **içeriye** bakınca ödüyor.
 
 ---
 
@@ -194,6 +221,71 @@ parite yine sağlanmazdı** — kapı bile fark etmezdi, çünkü kapı da aynı
 
 ⚠**Sapma notu:** emir "üç satır" diyordu; ikisi zaten yazılı olduğu için **bir kural + iki kanıt**
 yazıldı. Sebep burada, kararı veren ALTYAPI (§3.2: yazılmamış sapma hatadır, yazılmış sapma değil).
+
+---
+
+## 8. TAM İŞ İLKESİ (REC-302) — eksik bırakmak artık tasarruf değil
+
+**Recep, 2026-09-12:** *"doğru bir proje geliştirme ve yönetme derdindeyim; hataları minimize
+eden, çözen, oluşmasını baştan önleyen test vs."*
+
+**Niçin bu bölüm var.** "Fazlasına girme, kapsamı küçük tut" öğüdü, mühendis saatinin darboğaz
+olduğu dönemde doğruydu: son %10'luk tamlık günlere mal oluyordu, o yüzden atlanıyordu. O dönem
+bitti. Aynı tamlık bugün dakikalarla ölçülüyor — yani eski temkinlilik sessizce **bahaneye**
+dönüştü. Kaynak: gstack `ETHOS.md` §1; ölçüm REC-301 ÖLÇÜM 2.
+
+⚠**Kota ile ilke ayrı şeylerdir.** Bir günün kota darlığı **geçici bir durumdur**; "bugün kota
+%5, yalnız şu işi yap" bir emirdir ve emre uyulur. Ama o emir bu bölümü askıya almaz: kapsamı
+kota daraltır, **tamlık ölçütünü daraltmaz**. Daraltılan kapsam §3.2'ye göre yazılır.
+
+### 8.1 Test aynı PR'da yazılır, sonraki işe bırakılmaz
+
+Kapıyı/testi ayrı bir kayda bırakmak, işi **ölçülmemiş** indirmektir. Ölçüt basittir: bir işin
+davranış değiştiren parçası varsa, o davranışı ölçen kol **aynı dalda** doğar. Test yazmak, bu
+cetvelin ölçtüğü en ucuz iştir; erteleme gerekçesi "zaman" olamaz.
+
+Bunun bir istisnası vardır ve adı konur: **ilke/metin işi** (bu bölüm gibi) davranış
+değiştirmez, ona kapı açılmaz. İstisnayı kullanan, gerekçesini kayda yazar.
+
+### 8.2 Tam çözüm ile %90 çözüm arasında tam çözüm seçilir
+
+Karar kuralı: iki yaklaşım arasındaki fark **yalnız satır sayısıysa**, tam olan seçilir.
+*"B daha az kodla %90'ını kapsıyor"* bir gerekçe değildir — 70 satırlık fark, insan saatinin
+darboğaz olduğu dönemin muhasebesidir.
+
+Fark satır sayısı **değilse** (yeni bağımlılık, yeni yüzey, başka şeridin dosyası, migration)
+bu kural geçmez; o zaman karar bu cetvelin değil, ilgili kapının konusudur.
+
+### 8.3 Hata yolları kodla birlikte yazılır
+
+Ağ yok, veri boş, yetki yok, dosya bulunamadı: bunlar "sonra eklenecek dallar" değil, işin
+kendisidir. Yazılmamış hata yolu, arızayı **sessiz** yapar — ve bu projede ölçülmüş en pahalı
+kusur sınıfı tam budur (§6, companion sessizliği: üç gün fark edilmedi).
+
+⭐**Geri düşme biçimi seçilir, patlama biçimi seçilmez.** Bir mekanizma, dayandığı şey yoksa
+ya **bugünkü davranışa** geri düşmeli ya **görünür biçimde** durmalı; sessizce kapanmamalı.
+
+### 8.4 Kapsam dışı olan tek şey gerçekten ilgisiz iştir
+
+"Kapsam dışı" etiketi, işin bir parçasını gizlemek için kullanılamaz. Gerçekten ilgisiz iş
+(başka bir şeridin yüzeyi, ayrı bir göç, başka bir modül) **ayrı kayıt** olarak açılır ve
+kaydın numarası işin raporunda geçer. Adı konmayan eksik, kabul edilmiş eksik değildir.
+
+### 8.5 Bu ilke hiçbir kapıyı gevşetmez
+
+Tam iş ilkesi **kapsam** hakkındadır, **yetki** hakkında değildir. Migration içeren PR yine
+Recep kapısındadır (CLAUDE.md kural 13), başka şeridin dosyası yine yazılmaz, kota emri yine
+emirdir. *"Tam yapıyordum"* bir kapıyı aşma gerekçesi olarak kullanılamaz.
+
+### 8.6 Ölçülmüş vaka (2026-09-12, aynı gün)
+
+Kanca komutlarının yolu depo köküne bağlanırken iki biçim vardı. Kısa biçim (`$CLAUDE_PROJECT_DIR`)
+ve geri düşmeli biçim (`${CLAUDE_PROJECT_DIR:-.}`). Fark **dört karakter**.
+
+Kısa biçimde değişken bir gün tanımsız kalırsa yol `/.claude/...` olur ve **on altı kapının
+tamamı filo çapında sessizce düşer** — ekranda hiçbir şey değişmez. Geri düşmeli biçimde en kötü
+hâl **o günkü hâldir**. Dört karakterlik fark, §8.2 ile §8.3'ün aynı anda karşılığıdır; kabul
+ölçütü de ona göre yazıldı (değişken boşken çıkış 0 **ölçüldü**, varsayılmadı).
 
 ---
 

@@ -1190,6 +1190,21 @@ export type Database = {
           },
         ]
       }
+      order_number_counters: {
+        Row: {
+          gun: string
+          son_no: number
+        }
+        Insert: {
+          gun: string
+          son_no?: number
+        }
+        Update: {
+          gun?: string
+          son_no?: number
+        }
+        Relationships: []
+      }
       order_refund_events: {
         Row: {
           actor_user_id: string | null
@@ -1945,6 +1960,52 @@ export type Database = {
           },
         ]
       }
+      product_search_index: {
+        Row: {
+          product_id: string
+          search_body: string
+          search_document: unknown
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          product_id: string
+          search_body: string
+          search_document: unknown
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          product_id?: string
+          search_body?: string
+          search_document?: unknown
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_search_index_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "inventory_summary"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_search_index_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "inventory_velocity"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_search_index_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           barcode: string | null
@@ -2489,6 +2550,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      search_reindex_queue: {
+        Row: {
+          eklenme: string
+          id: number
+          kapsam: string
+          ref_id: string
+        }
+        Insert: {
+          eklenme?: string
+          id?: number
+          kapsam: string
+          ref_id: string
+        }
+        Update: {
+          eklenme?: string
+          id?: number
+          kapsam?: string
+          ref_id?: string
+        }
+        Relationships: []
       }
       shipping_email_events: {
         Row: {
@@ -4146,6 +4228,8 @@ export type Database = {
         Args: { p_dry_run?: boolean; p_request_id?: string; p_user_id: string }
         Returns: Json
       }
+      arama_indeksi_tazele: { Args: { p_ids?: string[] }; Returns: number }
+      arama_kuyrugu_bosalt: { Args: { p_tavan?: number }; Returns: number }
       bump_rate_limit: {
         Args: { p_key: string; p_limit: number; p_window_seconds: number }
         Returns: {
@@ -4279,6 +4363,10 @@ export type Database = {
         }[]
       }
       generate_order_number: { Args: never; Returns: string }
+      generate_order_number_saat_tabanli_20260906: {
+        Args: never
+        Returns: string
+      }
       get_admin_users: {
         Args: never
         Returns: {
@@ -4351,7 +4439,6 @@ export type Database = {
       is_staff_user: { Args: never; Returns: boolean }
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
       jwt_price_segment: { Args: never; Returns: string }
-      jwt_role: { Args: never; Returns: string }
       jwt_tenant_id: { Args: never; Returns: string }
       process_goods_receipt: {
         Args: {
@@ -4439,12 +4526,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4468,11 +4555,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4493,11 +4580,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4518,11 +4605,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -4535,11 +4622,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

@@ -17,9 +17,45 @@ import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlu
 import HomePage from '../../views/HomePage'
 
 /**
+ * ⭐ROTA SINIFINI AÇIKÇA İLAN ET (REC-59) — ve bunu KAPI ÖĞRETTİ, tahmin etmedim.
+ *
+ * Ana sayfa statiğe geçince `admin-smoke` kırmızı verdi: üretilen HTML'de 2 adet
+ * `BAILOUT_TO_CLIENT_SIDE_RENDERING` işareti. Kusuru o değişiklik ÜRETMEDİ, MASKEYİ
+ * KALDIRDI: işaretler çatıdaki iki BİLİNÇLİ adadan geliyor — kök layout'taki `<Analytics/>`
+ * ve `ClientLayout` içindeki `NavigationTracker`; ikisi de `useSearchParams()` çağırıyor ve
+ * ikisi de ZATEN Suspense ile sarılı (kural 5'e uygun). **Suspense işareti kaldırmaz,
+ * KAPSAR** (`app/layout.tsx`'in kendi notu) — yani "daha çok Suspense" bir çözüm değildi.
+ *
+ * ÖLÇÜM (2026-09-14, tek build, 245 üretilmiş HTML): `about` 0 · kategori 0 · ana sayfa 2 ·
+ * marka sayfası 2. Ayırt edici değişken bileşenler DEĞİL, **rota sınıfı ilanıydı**: ilan
+ * edenlerde 0, etmeyenlerde 2. `force-static` altında `useSearchParams()` boş döner ve
+ * bailout üretmez. Aynı dosyada A/B denendi: ilan eklenince 2 → 0.
+ *
+ * ⭐KABUL ŞARTI DEPLOY'DAN ÖNCE ÖLÇÜLDÜ — `force-static` altında `useSearchParams()`
+ * SUNUCUDA boş döner, bu yüzden "analitik bozulur mu" sorusu gerçekti. Cevap ölçüldü:
+ * ilanı ZATEN taşıyan `/tr/category/fanlar` canlıda (gerçek tarayıcı, ağ istekleri)
+ * Vercel Analytics betiğini yüklüyor VE `view` olayını POST ediyor — ilansız kontrol
+ * sayfasıyla (`/tr/brands/vortice`) birebir aynı. Yani istemci tarafı ETKİLENMİYOR.
+ * ⚠TUZAK, sonraki ölçen için: Vercel bu isteklerin yolunu KARARTIR
+ * (`/c017d035d1065e5f/script.js`, POST `/c017d035d1065e5f/view`). `_vercel/insights` diye
+ * aramak BOŞ döner ve "analitik hiç çalışmıyor" sanılır. Ada göre değil OLAYA göre ölçülür.
+ * ⚠ÖLÇÜLMEDİ: `NavigationTracker` ağ isteği üretmez (istemci içi gezinme yığını), dışarıdan
+ * ölçülebilir sinyali yok. Mekanizma aynı ve kategori rotası 09-08'den beri bu ilanla
+ * canlıda — emsalle kabul, ölçümle değil. Susarak geçmiyorum.
+ *
+ * İLAN, ADA BİLDİRİMİNİ GEÇERSİZ KILMAZ: `ANASAYFA_BILINCLI_ADALAR` (ALTYAPI, #1193) hangi
+ * adaların bilinçli olduğunu söyler ve ÜST SINIR olarak bekçi kalır; bu ilan o adaların
+ * işaret BIRAKMAMASINI sağlar. İkisi birbirinin yerine geçmez — yarın kazara doğacak
+ * üçüncü bir ada yine kırmızı verir.
+ */
+export const dynamic = 'force-static'
+
+/**
  * ISR YEDEĞİ (1 saat) — birincil tazeleme yolu webhook'tur (`rendering-cache-standard.md` §3);
  * bu yalnız EMNİYET AĞIDIR. Yedek olmadan kaçan tek bir webhook sayfayı SONSUZA DEK eski
  * bırakır ve bunu hiçbir şey söylemez — 2026-08-15'te fiyatlar yazıldı, vitrin değişmedi.
+ * (`force-static` bunu İPTAL ETMEZ: kategori ve ürünler rotaları aynı ikiliyi taşıyor ve
+ * ikisinin de canlıda tazelendiği ölçüldü.)
  */
 export const revalidate = 3600
 
@@ -90,7 +126,7 @@ import { unstable_cache } from 'next/cache'
 
 import { TenantProvider } from '../../hooks/useTenant'
 import { HOME_DATA_TAG, homeDataTag } from '../../lib/cache/tags'
-import { getTenantConfig } from '../../utils/tenantServer'
+import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
@@ -117,8 +153,34 @@ export default async function RootPage({ params }: Props) {
   const { lang } = await params
   const dict = lang === 'en' ? en : tr
 
-  const tenantConfig = await getTenantConfig()
-  const tenantId = tenantConfig.id
+  // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59 Adım B/1 — Recep kararı 2026-09-04:
+  // *"kiracı çözümü derleme anında sabit; `getTenantConfig` istek başlığı okumaz; çok
+  // kiracılı yetenek kodda kalır, kapalı. Hedef: ana sayfa önceden üretilir."*)
+  //
+  // ÖLÇÜM, 2026-09-09 canlı başlıklar: `/tr` → `private, no-cache, no-store` + MISS,
+  // yani ana sayfa HER ZİYARETÇİ İÇİN sıfırdan üretiliyordu. Tek sebep buydu:
+  // `getTenantConfig()` → `utils/tenantServer.ts` → `await headers()`.
+  // Aynı ölçümde `/tr/category/fanlar` → `public, must-revalidate` + HIT; o rota bu deseni
+  // PR #1136'da almıştı. Yani desen yeni değil, YERİ eksikti.
+  //
+  // NİÇİN GÜVENLİ: kategori rotasının başlığında ölçümüyle yazılı — `categories`,
+  // `product_families` ve `products` satırlarının TAMAMI tek `tenant_id` taşıyor ve o değer
+  // `DEFAULT_TENANT_ID` ile birebir aynı. Sabit, bugün zaten dönen değerdir.
+  //
+  // ⭐SESSİZ RİSKİ DE KAPATIR: tazeleme webhook'u `tenantId`yi DB SATIRINDAN alır, sayfa
+  // ise BAŞLIKTAN alıyordu. İkisi ayrışsaydı webhook bir etiketi tazeler, sayfa başka
+  // etiketle önbelleklenmiş olurdu; tazeleme ıskalardı ve hiçbir kapı görmezdi.
+  //
+  // ⭐SABİT ile DB SATIRI BİREBİR AYNI — ölçüldü, varsayılmadı (2026-09-09, prod SELECT):
+  // `tenants` tablosunda TEK satır var ve alanları `DEFAULT_TENANT_CONFIG` ile aynı
+  // (id, name "Default Tenant", subdomain "default", custom_domain null, is_active true,
+  // features {viewer3d,pdfExports,engineeringCalculators}, styles {#0f172a,#3b82f6}).
+  // Yani bu değişiklik bugün hiçbir değeri değiştirmiyor; yalnız okuma YOLUNU değiştiriyor.
+  //
+  // Çok-kiracılı yapı PARK'ta (REC-88). Geri açılırsa doğru yol kiracı başına ayrı yayın.
+  // Bekçi: INV-ANASAYFA-STATIK-1.
+  const tenantConfig = DEFAULT_TENANT_CONFIG
+  const tenantId = DEFAULT_TENANT_ID
 
   let categories: DomainCategory[] = []
   let products: Product[] = []

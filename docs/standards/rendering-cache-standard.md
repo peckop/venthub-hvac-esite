@@ -23,6 +23,44 @@
 **`ssr: false` ana rotalarda YASAK** (CLAUDE.md kural 4). İstemci-tarafı veri gerektiren
 parçalar `<Suspense fallback={<Skeleton/>}>` ile akıtılır, sayfanın tamamı CSR'a düşürülmez.
 
+### 1.1 Vitrin rotasını SESSİZCE dinamikleştiren iki desen (REC-59, ölçüm 2026-09-08)
+
+Yukarıdaki tablo bir **beyandır**; rota o sınıfa ait olduğunu `revalidate` yazarak ilan eder.
+Ama iki desen bu beyanı **hiçbir hata vermeden** geçersiz kılar — sayfa yine istek anında
+üretilir, `revalidate` satırı ölü bir cümleye döner ve **hiçbir kapı bunu görmez**:
+
+| desen | niçin dinamikleştirir |
+|---|---|
+| sayfanın `searchParams` alması | Next 15'te `searchParams` alan sayfa build'de prerender EDİLEMEZ |
+| render yolunda `headers()` okunması (ör. tenant çözümü) | build: *"couldn't be rendered statically because it used `headers`"* |
+
+**İkisi VE ilişkisiyle bağlıdır — üç kollu sabotajla ölçüldü (kategori rotası):**
+
+| kol | üretilen HTML |
+|---|---|
+| taban (ikisi de var) | **0** |
+| yalnız `searchParams` kaldırıldı | **0** |
+| yalnız `headers()` kaldırıldı | **0** |
+| **ikisi birden kaldırıldı** | **46** ✔ |
+
+Yani **birini onarmak hiçbir kazanım vermez.** Bir rotayı statiğe döndüren iş, ikisini birden
+kaldırdığını ölçmeden "onarıldı" diyemez.
+
+**⚠BUILD ÇIKTISININ ETİKETİ AYIRT ETMEZ.** `next build` bu rotayı `● (SSG)` işaretliyor ve
+46 yolu listeliyordu — diskte **0 HTML** varken. "Static/ISR işaretli mi" ölçütü bu yüzden
+yetersizdir; **kabul ölçütü ÜRETİLEN DOSYA SAYISIDIR**:
+`find .next/server -path "*category*" -name "*.html" | wc -l`.
+
+**⭐VE MASKE KALKAR:** rota dinamikken her istek taze render edilir, yani **tazeleme webhook'u
+bozuk olsa bile kimse fark etmez.** Statiğe geçen her rota için, geçişten SONRA bir veri
+değişikliğinin sayfaya gerçekten yansıdığı **canlıda** ölçülür (hiç sorulmamış adres,
+`MISS`/`Age 0`). Bu ölçülmeden iş bitmiş sayılmaz — §3'ün tazeleme sözleşmesi ancak o zaman
+kanıtlanmış olur.
+
+**Kapı:** `INV-KATEGORI-STATIK-1` (`kategori-rotasi-statik.test.ts`) iki deseni birden bekler
+ve AST ile ölçer (metin taraması yorumla tatmin olur — ilk sürümü kendi gerekçe yorumunu ihlal
+saydı). Kapının sınırı kendi dosyasında yazılı: kaynak kodu ölçer, `.next` çıktısını değil.
+
 ## 2. Fiyat hangi yüzeyde görünür
 
 **Karar (Recep, 2026-08-15): fiyat YALNIZ ürün satış sayfasında (PDP) gösterilir.**
@@ -119,6 +157,117 @@ ayrı ayrı kırmızı yanar.
 > **Açık kalem:** ilk üç tetiğin repoda hiçbir migration karşılığı olmaması gerçek bir drift riskidir —
 > prod'da elle düşürülseler repo bunu göremez. Bunları idempotent bir migration'la repoya yazmak
 > gerekir; migration prod'a otomatik uygulandığı için (CLAUDE.md kural 13) kullanıcı onayı ister.
+
+### 3.1 Ana sayfa (`/[lang]`) — yüzeyden tabloya, ölçüm 2026-09-14 (REC-59 adım 2)
+
+Yukarıdaki §3 tablosu **tablo başına** yazılmıştır: bir tablonun tetiği ve handler dalı var mı.
+Bu alt bölüm ters yönü kapatır — **bir SAYFANIN gösterdiği her tablo o zincirde var mı.** İkisi
+ayrı sorulardır ve 08-15 hatası tam bu boşlukta yaşadı.
+
+Ana sayfanın RSC'si üç şey okur (`src/app/[lang]/page.tsx`, `getCachedHomeData`):
+
+| Ana sayfada görünen | Kaynak | Tetik + handler | Ana sayfa etiketini tazeliyor mu |
+|---|---|---|---|
+| Kategori ızgarası (ad, açıklama, görsel, slug) | `categories` | `on_categories_change` + handler var | **EVET** — `revalidateTag(HOME_DATA_TAG)` |
+| Öne çıkan 12 ürün kartı | `products` | `on_products_change` + handler var | **EVET** — `revalidateTag(HOME_DATA_TAG)`; ayrıca `UPDATE` dalında `homeDataTag(tenantId)` |
+| Boş-kategori gizleme sayacı | `get_category_counts()` RPC → `products` + `categories` | üstteki iki tetik | **EVET** (türev; kendi tablosu yok) |
+
+Yani ana sayfanın tazeleme borcu **YOKTUR**; ayrı kayıt açılmadı. `product_prices` dalının ana
+sayfa etiketine bilerek dokunmaması kusur değil kuraldır: fiyat yalnız PDP'de görünür (§2), ana
+sayfa kartları `hidePrice` geçer.
+
+**⭐ETİKETİN İKİ UCU AYNI KİRACIYI SÖYLEMELİDİR.** Sayfa etiketi `homeDataTag(tenantId)` ile
+kurar, webhook ise `tenantId`yi **DB satırından** okur. Sayfa bu değeri eskiden istek
+başlığından alıyordu (`getTenantConfig()` → `headers()`); ikisi ayrışsaydı webhook bir etiketi
+tazeler, sayfa başka etiketle önbelleklenmiş olurdu — **tazeleme ıskalar ve hata sessizdir.**
+Sayfa artık `DEFAULT_TENANT_ID` derleme sabitini kullanıyor; sabitin canlı `tenants` satırıyla
+birebir aynı olduğu prod SELECT ile ölçüldü (2026-09-09, tablo TEK satır).
+
+**Sınıf değişimi ve kanıtı.** Ana sayfa `revalidate = 3600` beyan ediyordu ama beyan ÖLÜYDÜ:
+canlı ölçüm (2026-09-14, `curl -I`) `/tr` ve `/en` için `Cache-Control: private, no-cache,
+no-store` + `X-Vercel-Cache: MISS` verdi — yani §1'deki "statik + ISR" sınıfında görünüp
+gerçekte **istek başına** üretiliyordu. Tek sebep `headers()` okumasıydı. Kaldırıldıktan sonra
+`pnpm build` rota tablosu `● /[lang]` (`/tr`, `/en`) ve `Revalidate 1h` yazdı.
+
+**Kapı:** `INV-ANASAYFA-STATIK-1`
+(`src/__tests__/conformance/anasayfa-rotasi-statik.test.ts`) — `headers()`/`cookies()` çağrısını,
+başlık okuyan modülün import'unu ve `searchParams` bağını ayrı ayrı yasaklar; `revalidate`
+beyanının ve kiracı-kapsamlı önbellek anahtarı/etiketinin (kural 12) durduğunu ayrıca zorlar.
+Sabotajla doğrulandı: eski desen geri konduğunda K2 ve K3 kırmızı yanıyor.
+
+### 3.2 Ürünler listesi (`/[lang]/products`) — ölçüm 2026-09-14 (REC-59 adım 2 ikinci yarı)
+
+Bu rota `revalidate` beyanı bile taşımıyordu ve **iki** sebeple dinamikti (her biri tek başına
+yeterli): `getTenantConfig()` → `headers()`, ve gövdedeki `searchParams` (`?page=`).
+
+| Ürünler listesinde görünen | Kaynak | Tetik + handler | Keşif etiketini tazeliyor mu |
+|---|---|---|---|
+| Aile kartları (47 satır, tek sayfa) | `product_families` + `products` | `on_product_families_change`, `on_products_change` | **EVET** — `revalidateTag(PRODUCTS_DISCOVERY_TAG)` |
+| Kategori kapısı ızgarası | `categories` | `on_categories_change` | **EVET** |
+| Boş-kategori gizleme sayacı | `get_category_counts()` RPC | üstteki tetikler | **EVET** (türev) |
+
+Ana sayfanın etiketi (`HOME_DATA_TAG`) bilerek KULLANILMIYOR: bir yüzeyin tazelenmesi
+ötekini sessizce ısıtır/soğuturdu (PS-042). Keşif yüzeyinin kendi etiketi var.
+
+**Sayfalama kalktı, adres DEĞİŞMEDİ.** `?page=` ve `parsePageParam` kaldırıldı, `PAGE_SIZE`
+24 → 72 yükseltildi. Ölçüm (prod SELECT, 2026-09-14): `product_families` = **47** satır, yani
+tamamı tek sayfaya sığıyor. Eski `?page=2` adresi **bizim verdiğimiz sinyalde hiç yoktu**
+(canlı `sitemap.xml`'de `page=` geçişi 0; üretici `src/app/sitemap.ts` böyle bir adres
+yazmıyor). Google'ın kendi keşfiyle dizine almış olması **ölçülmedi** — kanonik adres
+konduğu için risk oradan kapanır.
+
+**Boyut (build çıktısı, `gzip -9`, 2026-09-14):** `/tr/products` **111 KB** (ham 488 KB),
+`/en/products` 103 KB, 47 ailenin tamamı sayfada. Kabul edilen üst sınır ölçülenin 1,5 katı,
+yuvarlanmış: **170 KB**. Karşılaştırma: `/tr/category/fanlar` (34 aile, aynı deseni 09-08'de
+almıştı) canlıda 105 KB.
+
+**REC-338 aynı PR'da kapandı:** rotanın `generateMetadata`'sı **hiç yoktu**. Canlı ölçüm
+(2026-09-14): `/tr/products` ve `/en/products` HTML'inde `rel="canonical"` **0**, `<title>`
+kök layout'un varsayılanı. Artık kendi başlığı (sözlükten, kural 7), kanonik adresi ve
+`tr`/`en`/`x-default` hreflang üçlüsü var.
+
+**Kapı:** `INV-URUNLER-STATIK-1` (`src/__tests__/conformance/urunler-rotasi-statik.test.ts`,
+9 kol, AST). Sabotajla doğrulandı: eski desen geri konunca K3, K4, K5 ve K7 kırmızı yanıyor.
+
+### 3.3 ⭐ROTA SINIFI İLANI — `force-static` bir üslup tercihi değil, ölçülmüş bir kaldıraç
+
+Statik üretilen bir sayfada, çatıdaki `useSearchParams()` çağıran bileşenler (kök layout'taki
+`<Analytics/>`, `ClientLayout` içindeki `NavigationTracker`) HTML'e
+`BAILOUT_TO_CLIENT_SIDE_RENDERING` işareti bırakır. **Suspense bu işareti kaldırmaz, KAPSAR**
+(`app/layout.tsx`'in kendi notu) — yani "daha çok Suspense" bir çözüm değildir.
+
+Ölçüm (2026-09-14, tek build, 245 üretilmiş HTML):
+
+| Rota | `dynamic = 'force-static'` | HTML'de bailout işareti |
+|---|---|---|
+| `/[lang]/about` | var | **0** |
+| `/[lang]/category/[slug]` | var | **0** |
+| `/[lang]` (ilan YOKKEN — 09-14 sabahı) | yok | **2** |
+| `/[lang]/brands/[slug]` | yok | **2** |
+| `/[lang]` (ilan EKLENDİKTEN sonra) | var | **0** |
+| `/[lang]/products` | var | **0** |
+
+Üçüncü satır bir **A/B ölçümüdür**: ana sayfa dosyasına tek satır eklenip aynı build
+tekrarlandı ve işaret 2 → 0'a düştü. Değişen başka hiçbir şey yok.
+
+**Ana sayfa ve ürünler rotası artık `about`/kategori ile TEK SINIFTA.** Geriye ilan taşımayan
+tek vitrin sınıfı `brands` kaldı (aşağıdaki açık kalem).
+
+> **İlan, ada bildirimini geçersiz kılmaz.** `ANASAYFA_BILINCLI_ADALAR` / `PDP_BILINCLI_ADALAR`
+> listeleri **hangi adaların bilinçli olduğunu** söyler; `force-static` ise o adaların işaret
+> BIRAKMAMASINI sağlar. İlan altında işaret 0 çıkması, ada bildiriminin yanlış olduğu anlamına
+> gelmez — bildirim üst sınır olarak bekçi kalır ve yarın kazara doğacak üçüncü bir ada yine
+> kırmızı verir. İkisi birbirinin yerine geçmez.
+
+Ayırt edici değişken bileşenler değil, **sınıf ilanıydı**: `force-static` altında
+`useSearchParams()` boş döner ve bailout üretmez. Vitrin sınıfına giren her yeni rota bu
+satırı yazar; yazmazsa `admin-smoke` SSR kapısı (`e2e/ssr-html.e2e.ts`) kırmızı verir ve
+o kırmızı **kapının tavanı büyütülerek kapatılmaz** — `tests/smoke/ssr-kurallari.ts`'in kendi
+notu bunu açıkça yasaklıyor.
+
+> **Açık kalem (marka sayfaları):** `/[lang]/brands/[slug]` hâlâ ilan taşımıyor ve 2 işaret
+> üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
+> yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
 
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 

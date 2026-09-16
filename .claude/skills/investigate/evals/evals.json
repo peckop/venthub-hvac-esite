@@ -1,0 +1,26 @@
+{
+  "should_trigger": [
+    "bu test neden bozuldu",
+    "kok sebebi bul",
+    "dun calisiyordu bugun 500 veriyor",
+    "why is this failing, find the root cause",
+    "kirmizi adimin sebebini olc",
+    "sayfa 500 donuyor, sebebini bulalim",
+    "bu bulgu sahte mi, olcum yanlis yerde mi",
+    "ayni kirmiziya uc sebep yazildi, hangisi dogru",
+    "investigate: deploy sonrasi kategori sayfasi bos",
+    "arizanin sebebini once teshis et sonra duzeltme onerelim",
+    "bu hata neden olusuyor, hipotezleri curut",
+    "regression appeared after the merge, diagnose it"
+  ],
+  "should_not_trigger": [
+    "bu hatayi duzelt ve PR ac",
+    "yeni skill olustur",
+    "git diff i incele ve yikici desen ara",
+    "commit mesaji yaz",
+    "kategori aciklamalarini Turkceye cevir",
+    "urun kartina fiyat etiketi ekle",
+    "migration dosyasi olustur",
+    "lighthouse performans raporu al"
+  ]
+}

@@ -30,12 +30,18 @@ const ProductsDiscoveryView = dynamic(() => import('./ProductsDiscoveryView'))
  * NİÇİN VAR (canlı ölçüm, 2026-08-26): `CategoryShowcaseView` yalnız `subCategories` alır,
  * `families` ALMAZ; showcase'te sayfalama da kapalıdır. Yani **alt kategorisi olmayan** bir
  * showcase kategorisi müşteriye HİÇBİR ŞEY listelemez — ileriye giden tek bir bağlantı bile
- * çıkmaz. Canlıda iki bağımsız örnekte ölçüldü (ana içerik bölgesi, footer hariç):
- *   /tr/category/isi-geri-kazanim                (16 aktif ürün) → 0 ürün, 0 kategori bağlantısı
- *   /tr/category/endustriyel-tavan-vantilatorleri ( 7 aktif ürün) → 0 ürün, 0 kategori bağlantısı
- * Ayırt edici kontrol: aynı görünüm alt kategorisi OLAN kategoride çalışıyor
- * (/tr/category/endustriyel-havalandirma → 7 alt kategori kartı). Yani bileşen bozuk değil,
- * **veri yokken boşa düşüyor**. Etkilenen: 27 aktif ürün (16 + 7 + 4 akıllı-ev).
+ * çıkmaz. O gün canlıda iki bağımsız örnekte ölçülmüştü ve etkilenen 27 aktif üründü.
+ *
+ * ⚠ **TAZELİK NOTU (2026-09-08): YUKARIDAKİ ÖRNEK ADRESLER ARTIK GEÇERLİ DEĞİL.**
+ * Bu yorum bugün bir ölçümü yanlış yola soktu: içindeki `/tr/category/endustriyel-havalandirma`
+ * adresi "7 alt kategorili çalışan örnek" diye anılıyordu, oysa DB'de **öyle bir slug yok** —
+ * ne kanonik kolonda ne `metadata.slug.{tr,en}` içinde. Örnekler silindi, gerekçe bırakıldı:
+ * vakanın kendisi gerçekti, adresleri bayattı. Yalan söyleyen bir yorum, olmayan bir yorumdan
+ * daha pahalıdır.
+ *
+ * **Bugünkü ölçüm (prod, yalnız SELECT):** `display_mode='showcase'` olup alt kategorisi
+ * sıfır olan kategori **YOK** — yani aşağıdaki fonksiyonun düzelttiği hâl bugün hiç oluşmuyor.
+ * Fonksiyon yine de duruyor ve durmalı: veri yarın yeniden o hâle gelebilir, koruma ucuz.
  *
  * NİÇİN AYRI FONKSİYON: mod İKİ yerde okunuyor — hangi görünümün çizileceği ve sayfalamanın
  * gösterilip gösterilmeyeceği. İkisi ayrı ayrı hesaplanırsa sessizce ayrışır (bu dosyada zaten
@@ -126,11 +132,31 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
     return sorted
   }, [families, filters, lang])
 
-  const pagination = (
+  /**
+   * ⭐SAYFALAMA YALNIZ GERÇEKTEN BİRDEN ÇOK SAYFA VARSA ÇİZİLİR (REC-59, ölçüm 2026-09-08).
+   *
+   * `Pagination` içinde zaten `if (pageCount <= 1) return null` var — ama o kontrol
+   * HOOK'LARDAN SONRA çalışır. Bileşen render edildiği an `useSearchParams()` çağrılır ve
+   * bu, STATİK prerender'da o alt ağacı Suspense fallback'ine düşürür (CSR bailout).
+   * Yani "hiçbir şey çizmeyen" bir bileşen, çizilmediği hâlde sayfanın bir parçasını
+   * istemciye taşıyordu.
+   *
+   * ÖLÇÜLDÜ: kategori rotası statiğe geçtikten sonra üretilen HTML'de
+   * `BAILOUT_TO_CLIENT_SIDE_RENDERING` işareti — `aksesuarlar.html` 3, `fanlar.html` 2.
+   * Dosyalar üretilmişti ve İÇLERİ DOLUYDU; "46 dosya üretildi" ve "içerik var" ölçütlerinin
+   * İKİSİ DE bunu ayırt etmedi. Kusuru ALTYAPI'nın e2e kapısı yakaladı (maxBailout 0).
+   *
+   * Koşulu ÇAĞIRANA taşımak hook'u hiç çağırmaz. Kategori rotasında `total > pageSize` artık
+   * asla doğru olmaz (sayfa boyu 48, en kalabalık kategori 34) — yani orada sayfalama tümüyle
+   * devre dışı. `/products` rotası aynı bileşeni kullanıyor ve orada sayfalama HÂLÂ GEÇERLİ;
+   * o rota `searchParams` aldığı için zaten dinamik, dolayısıyla bailout'un bedeli yok.
+   */
+  const cokSayfaVar = total > pageSize
+  const pagination = cokSayfaVar ? (
     <React.Suspense fallback={<div className="py-10" />}>
       <Pagination page={page} pageSize={pageSize} total={total} />
     </React.Suspense>
-  )
+  ) : null
 
   if (!category && !loading) {
     return (

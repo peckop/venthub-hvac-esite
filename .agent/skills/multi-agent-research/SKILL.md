@@ -139,3 +139,30 @@ Use the following curated repositories and NotebookLM digital twins as primary r
    - **Scope:** In-depth documentation on custom MCP servers, agent configurations, commands, and orchestration strategies.
 2. **Antigravity: Yapay Zeka İçin 1400+ Ajan Yeteneği Kütüphanesi** (ID: `fe83b525-4562-461d-b73f-b3f03edc2fa0`):
    - **Scope:** Full dictionary and descriptions of pre-built skill models across all domains.
+
+<!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
+## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt
+
+**Bitiş durumu — son satırda `DURUM: <kelime>` biçiminde söylenir.** Kelime **yalnız şu dörtten
+biri** olabilir: `BITTI` (istenen yapıldı ve ölçüldü) · `CEKINCELI` (yapıldı ama adı konmuş bir
+çekince var) · `ENGELLI` (dışarıdan bir şey bekliyor) · `BAGLAM-EKSIK` (soru cevaplanmadan devam
+edilemez).
+
+⚠**Beşinci kelime uydurulmaz.** "BEKLEMEDE", "KISMEN", "DEVAM EDIYOR" gibi kelimeler bu listede
+yoktur; beklemek `ENGELLI`dir, yarım kalmak `CEKINCELI`dir. Kapalı liste bilinçli: kelime serbest
+kalırsa her çağrı kendi sözlüğünü yazar ve durum makine tarafından okunamaz hâle gelir.
+
+`BITTI` dışındaki her durum şu üçünü de yazar: **SEBEP** (tek cümle) · **DENENEN** (ne denendi,
+sonucu ne oldu) · **ÖNERİ** (bir sonraki somut adım, kimde).
+
+**Karışıklık:** yüksek riskli bir belirsizlikte tahminle devam edilmez — **DURULUR**, iki üç
+seçenek gerekçesiyle yazılır ve biri önerilir. Yüksek risk: geri alınması pahalı olan, prod'a
+dokunan, başka şeridin dosyasını değiştiren, para veya sır ilgilendiren iş.
+
+**Kanıtsız kısıt yoktur:** *"olmuyor / erişemiyorum / araç desteklemiyor"* tek başına sonuç
+değildir. Kısıt iddiası **birebir hata metni**, **belgeden alıntı** ya da **canlı ölçüm** ile
+gelir. Kanıt yoksa doğru cümle *"ölçemedim"*dir, *"yapılamaz"* değil.
+
+⚠**Ölçemedim ile ihlal ayrı sonuçlardır.** İkisini aynı kovaya koymak, bozuk bir ölçümü
+gerçek bir kusur gibi raporlar.
+<!-- ORTAK-BITIS-SON -->

@@ -41,7 +41,55 @@ dayanıklı bir plan oluşturulmasını sağlar. **Rapor üretir; kod yazmaz/de�
 3. Planın uyması gereken cetvel = **`CLAUDE.md` Mutlak Kurallar (31 madde)** + `CONTEXT.md §14`. Plan
    bunlardan birini ihlal ediyor mu, ölç.
 
-### Adım 2 — Zayıf Noktaları Zorla (Red-Teaming)
+### Adım 2 — DÖRT SORU: her plan ADIMI için ZORUNLU (kapsam denetimi)
+Adım 3'teki red-teaming "bu plan YANLIŞ mı" diye sorar. Bu adım farklı bir şey sorar: **"bu plan
+GEREKLİ mi."** İkisi ayrı eksendir ve **biri diğerinin yerine geçmez** — ölçüldü (REC-310 Faz 1,
+`docs/audits/gstack-yan-yana-2026-09-15.md`): iki araç 35 bulgu üretti, yalnız **6'sı örtüştü**;
+yani bulguların **%83'ü tek eksende** doğdu. Çürütme iki P0 buldu, kapsam denetimi bir adımın
+dokuz vakanın **hiçbirini** kurtarmadığını gösterip fazı küçülttü (REC-346).
+
+Plandaki **her adım için dördünü de** cevapla. Cevap yoksa "ÖLÇÜLEMEDİ" yaz — boş bırakmak
+"sorun yok" demek DEĞİLDİR.
+
+**S1 — BU ADIM GEREKLİ Mİ?** Adım hangi vakayı / hangi ölçütü kurtarıyor, **sayıyla**. Plan bir
+vaka tablosu taşıyorsa adımdan önce ve sonra kaç vaka geçiyor, ikisini de yaz. Hiçbir vakayı
+kurtarmıyorsa hüküm **ÇIKAR** — riski ve maliyeti kalır, getirisi yoktur.
+
+**S2 — BU ZATEN VAR MI?** Adımın yazmayı önerdiği şeyin **mevcut varlık envanterini** çıkar:
+`codegraph_explore` (fonksiyon/bileşen), `docs/standards/` (cetvel), `docs/audits/` (ölçüm),
+veritabanı tarafında `pg_available_extensions` ve `pg_extension` (**ikisi ayrı sorudur:
+`default_version` dolu olmak KURULU demek değildir** — `installed_version` NULL'sa eklenti
+yoktur), `pg_indexes` (indeks gerçekten var mı), `pg_proc` (fonksiyon gerçekten var mı). Varsa
+hüküm **YENİDEN YAZMA**; adım "mevcut olanı kapıya bağla"ya dönüşür.
+
+**S3 — KAÇ YOL TEST EDİLİYOR?** Adım için kaç kapı / kaç fikstür / kaç kol var, **sayıyla**.
+Sıfırsa adım plandan **çıkmaz** ama raporda **"SINANMIYOR" damgası** alır ve damga plan metnine
+taşınır. Damgasız sıfır, sessiz sıfırdır.
+
+**S4 — ÇALIŞAN BİR ŞEYİ BOZUYOR MUYUZ?** Adımın dokunduğu yüzeyin **bugünkü canlı davranışı
+ÖNCE ölçülür**; rapora **canlı ÖNCE / SONRA satırı** yazılır. Bugün doğru çalışan bir davranış
+varsa onun korunması **kapıya yazılır** (regresyon kolu), plana not olarak değil.
+> **SABİT SATIR — CLAUDE.md kural 13 ve 14 (her S4 cevabının altına aynen konur):**
+> **Kural 13** — adım `supabase/migrations/*.sql` içeriyorsa master'a merge **prod DB'ye
+> otomatik uygular**; PR yalnız kullanıcının açık onayıyla merge edilir, şerit kendi merge etmez.
+> **Kural 14** — testi/kapıyı sonraki işe bırakmak adımı tamamlamaz; hata yolları (ağ yok, veri
+> boş, yetki yok) aynı adımın kapsamındadır.
+>
+> ⚠**BU SATIR NİÇİN SABİT:** kapsam denetimini ilk kez dışarıdan bir araçla koştuğumuzda o araç
+> "migration merge = prod" kuralını **yalnız brief'e yazıldığı için** gördü; projeyi bilmiyordu.
+> Kural brief'e yazılmayı bekliyorsa, yazılmadığı gün görünmez. Bu yüzden burada sabittir.
+
+**Çıktı biçimi — adım × dört soru tablosu, raporun EN BAŞINA, red-teaming bulgularından ÖNCE:**
+
+| Adım | S1 gerekli mi (sayı) | S2 zaten var mı | S3 kaç yol test ediliyor | S4 neyi bozabilir (canlı ÖNCE/SONRA) | Hüküm |
+|---|---|---|---|---|---|
+| Adım N | 9 vakadan 2'si | yok (ölçüldü: …) | 1 kol | bugün 1 sonuç → 1 kalmalı | KALSIN |
+| Adım M | 0 vaka | **var** (`docs/standards/x.md`) | 0 → ⚠SINANMIYOR | dokunmuyor | **ÇIKAR** |
+
+Hüküm kümesi: **KALSIN · DARALT · ÇIKAR · AYRI KAYIT**. "AYRI KAYIT", adımın değerli ama bu
+fazın risk bütçesini aştığı durum içindir; numarası raporda geçer (CLAUDE.md kural 14).
+
+### Adım 3 — Zayıf Noktaları Zorla (Red-Teaming)
 Planı şu **beş VentHub-özel** başlık altında eleştir. Listelenen tuzaklar sahada yaşanmış gerçek
 olaylardır — plan bunlardan birine düşüyorsa **Kritik** işaretle.
 
@@ -89,7 +137,7 @@ olaylardır — plan bunlardan birine düşüyorsa **Kritik** işaretle.
   donması yaşandı). **Statik kapı bunu görmez** → plan bir **runtime smoke** (Playwright e2e) öngörüyor mu?
 - **Design token:** Arbitrary Tailwind (`w-[92vw]`), HEX renk, `PCFSoftShadowMap` var mı?
 
-### Adım 3 — Kanıta Dayalı Çürütme Raporu Üret
+### Adım 4 — Kanıta Dayalı Çürütme Raporu Üret
 Bulguları **şu şablona** göre `red_team_report.md` olarak yaz:
 
 ```markdown
@@ -124,6 +172,11 @@ testine bağla" diye KALICI katman öner — hand-patch değil.]
 - **A4 — Kod kazanır:** Plan varsayımı kod ile çelişirse koddan/CodeGraph'tan doğrulamadan "geçerli" sayma.
 - **A5 — Statik kapı runtime'ı görmez:** Bir riski `tsc`/`lint`/`test` görmüyorsa bunu rapor et ve plana
   **runtime kapısı** (`next build` prerender, Playwright e2e smoke, keycheck) ekletmeyi öner.
+- **A6 — DÖRT SORU TABLOSU OLMADAN RAPOR YOKTUR.** Adım 2'nin tablosu raporun ilk bölümüdür; bir
+  adım için dördünden biri boşsa oraya `ÖLÇÜLEMEDİ` yazılır. Gerekçe: "yanlış mı" ekseni bir adımı
+  DOĞRU ama GEREKSİZ bulduğunda sessiz kalır — ölçüldü, bulguların %83'ü tek eksende doğdu.
+- **A7 — "ÇIKAR" hükmü GEREKÇESİZ verilmez, "KALSIN" da.** Her hüküm S1'in sayısına dayanır. Sayı
+  yoksa hüküm yoktur; o adım `ÖLÇÜLEMEDİ` ile geçer ve bu raporun kendi sınırı olarak yazılır.
 
 ## İlgili Skiller (sınır)
 - Kod bütünlüğü / mimari integrity taraması → **venthub-auditor**
@@ -132,3 +185,30 @@ testine bağla" diye KALICI katman öner — hand-patch değil.]
 - Yapısal kod sorgusu (kim çağırıyor / blast radius) → **codegraph**
 
 Bu skill yalnız **PLAN-belgesinin uygulama-öncesi red-team'i** içindir.
+
+<!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
+## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt
+
+**Bitiş durumu — son satırda `DURUM: <kelime>` biçiminde söylenir.** Kelime **yalnız şu dörtten
+biri** olabilir: `BITTI` (istenen yapıldı ve ölçüldü) · `CEKINCELI` (yapıldı ama adı konmuş bir
+çekince var) · `ENGELLI` (dışarıdan bir şey bekliyor) · `BAGLAM-EKSIK` (soru cevaplanmadan devam
+edilemez).
+
+⚠**Beşinci kelime uydurulmaz.** "BEKLEMEDE", "KISMEN", "DEVAM EDIYOR" gibi kelimeler bu listede
+yoktur; beklemek `ENGELLI`dir, yarım kalmak `CEKINCELI`dir. Kapalı liste bilinçli: kelime serbest
+kalırsa her çağrı kendi sözlüğünü yazar ve durum makine tarafından okunamaz hâle gelir.
+
+`BITTI` dışındaki her durum şu üçünü de yazar: **SEBEP** (tek cümle) · **DENENEN** (ne denendi,
+sonucu ne oldu) · **ÖNERİ** (bir sonraki somut adım, kimde).
+
+**Karışıklık:** yüksek riskli bir belirsizlikte tahminle devam edilmez — **DURULUR**, iki üç
+seçenek gerekçesiyle yazılır ve biri önerilir. Yüksek risk: geri alınması pahalı olan, prod'a
+dokunan, başka şeridin dosyasını değiştiren, para veya sır ilgilendiren iş.
+
+**Kanıtsız kısıt yoktur:** *"olmuyor / erişemiyorum / araç desteklemiyor"* tek başına sonuç
+değildir. Kısıt iddiası **birebir hata metni**, **belgeden alıntı** ya da **canlı ölçüm** ile
+gelir. Kanıt yoksa doğru cümle *"ölçemedim"*dir, *"yapılamaz"* değil.
+
+⚠**Ölçemedim ile ihlal ayrı sonuçlardır.** İkisini aynı kovaya koymak, bozuk bir ölçümü
+gerçek bir kusur gibi raporlar.
+<!-- ORTAK-BITIS-SON -->

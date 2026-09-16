@@ -361,6 +361,31 @@ function requiredTablesFromStandard(md: string): string[] {
 
 const REQUIRED_TABLES = requiredTablesFromStandard(standardSources[STANDARD_PATH] ?? '')
 
+/**
+ * ⭐ADLANDIRMA İSTİSNASI: GÖLGE ÖNSÖZÜ — ÖLÇÜT DOĞRU, EVREN YANLIŞTI (REC-336, 2026-09-15).
+ *
+ * "Her SQL kaynağı tarihle başlar" kolu, gerekçesini KENDİ mesajında yazıyor: Supabase
+ * adlandırma sözleşmesi, `supabase migration list` ve DEFTER. Yani ölçüt **migration'lar** ve
+ * **tarihli anlık görüntüler** için doğrudur. Ama evrenine `supabase/baselines/**` tümüyle
+ * girdiği için ÜÇÜNCÜ bir tür de kapsama düştü: `00_golge_onsoz.sql`.
+ *
+ * O dosya ne migration ne de anlık görüntüdür — boş bir gölge veritabanına Supabase'in
+ * iskelesini kuran ÖNSÖZDÜR ve **DAİMA İLK** uygulanmak zorundadır. Tam bu yüzden adı `00_`
+ * ile başlar. Ona tarih vermek YANLIŞ olurdu: tarih, dosyanın bir anlık görüntü ya da bir
+ * migration olduğunu ima eder; oysa o prod'a hiç uygulanmaz ve defterde HİÇ yer almaz.
+ *
+ * ⭐NİÇİN KÖRLEŞME DEĞİL: istisna `baselines/` klasörünü BLOKETEN muaf tutmaz. Üç şartın
+ * ÜÇÜ birden aranır — klasör `baselines/`, ad `00_` ile başlıyor, VE dosya kendi başlığında
+ * ÖNSÖZ olduğunu ilan ediyor. Tarihsiz bir DÖKÜM ya da `01_` diye eklenen ikinci bir dosya
+ * bu süzgeçten geçmez ve kol onu KIRMIZI sayar. Alttaki kol bunu adıyla ölçüyor.
+ */
+const ONSOZ_ILAN_IZI = 'GÖLGE VERİTABANI ÖNSÖZÜ'
+
+const onsozMu = (yol: string): boolean =>
+  yol.includes('/baselines/') &&
+  /\/00_[^/]*\.sql$/.test(yol) &&
+  (baselineSql[yol] ?? '').includes(ONSOZ_ILAN_IZI)
+
 describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
   it('kaynaklar bulunabiliyor (stale-guard: glob boşa düşerse test sessizce yeşil kalmasın)', () => {
     expect(Object.keys(baselineSql).length, 'supabase/baselines/*.sql bulunamadı').toBeGreaterThan(0)
@@ -371,6 +396,7 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
 
   it('her SQL kaynağı tarihle başlıyor (sıralamanın ön koşulu)', () => {
     const undated = [...Object.keys(baselineSql), ...Object.keys(migrationSql)]
+      .filter((p) => !onsozMu(p))
       .filter((p) => leadingDigits(p).length < 8)
       .sort()
     expect(
@@ -383,6 +409,32 @@ describe('INV-RENDER-2 · tazeleme sözleşmesi (tetik ⇄ handler)', () => {
         'Şimdiki model CI\'ın bayt sırasının aynısı olduğu için tarihsiz dosya da CI\'ın koyduğu ' +
         'yere oturur — denetimde iki uçta da ölçüldü.',
     ).toEqual([])
+  })
+
+  it('⭐İSTİSNA DAR VE ÖLÇÜLÜ — önsöz muafiyeti baselines klasörünü KÖRLEŞTİRMİYOR', () => {
+    // Bir muafiyet, ancak DAR olduğu ölçüldüğünde muafiyettir; ölçülmeyen muafiyet körlüktür.
+    const yollar = Object.keys(baselineSql)
+    const muaf = yollar.filter(onsozMu)
+
+    // 1) Muafiyet GERÇEKTEN kullanılıyor — kural ölü kalmasın, aksi halde kimse fark etmeden
+    //    süzgeç bozulur ve ilk gerçek ihlalde kol yanlış sebeple kırmızı yanar.
+    expect(muaf.length, 'Önsöz muafiyeti hiçbir dosyayı tutmuyor — süzgeç bozulmuş olabilir.').toBe(
+      1,
+    )
+
+    // 2) Muafiyet TEK dosya için; baselines'ın geri kalanı HÂLÂ ölçülüyor.
+    const olculen = yollar.filter((p) => !onsozMu(p))
+    expect(olculen.length, 'baselines altında ölçülen dosya kalmadı — muafiyet taştı.').toBeGreaterThan(0)
+    for (const p of olculen) {
+      expect(leadingDigits(p).length, `${p} tarihsiz ama muaf DEĞİL — kol bunu görmeliydi.`).toBeGreaterThanOrEqual(8)
+    }
+
+    // 3) ÜÇ ŞART BİRLİKTE aranıyor: sahte adaylar süzgeçten GEÇMEZ. Klasör doğru ve ad `00_`
+    //    olsa bile ilan izi yoksa muafiyet YOK — yani biri gelip `00_` diye bir döküm koyarak
+    //    kolu susturamaz.
+    expect(onsozMu('/supabase/baselines/00_ilansiz.sql'), 'ilan izi olmayan 00_ dosyası muaf sayıldı').toBe(false)
+    expect(onsozMu('/supabase/migrations/00_golge_onsoz.sql'), 'migrations altındaki dosya muaf sayıldı').toBe(false)
+    expect(onsozMu(muaf[0].replace('/00_', '/01_')), '01_ ile başlayan ikinci dosya muaf sayıldı').toBe(false)
   })
 
   it('cetvel §3 tablosu okunabiliyor (SSOT boşa düşerse tüm iddialar anlamsızlaşır)', () => {

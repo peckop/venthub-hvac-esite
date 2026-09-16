@@ -103,32 +103,26 @@ export const getLocalizedCategorySlug = (
     return canonical
 }
 
-/**
- * Resolves the marketing-focused title for a category.
- * Returns the dedicated `marketing_title` from the database if available, otherwise falls back to the standard display name.
+/*
+ * ⭐`getCategoryMarketingTitle` SİLİNDİ — `marketing_title` EMEKLİ (Recep kararı, 2026-09-09).
  *
- * @param category - The database category object
- * @returns The marketing title or fallback display name
+ * Ölçüm (2026-09-08): alan 23 kategorinin 12'sinde DOLUYDU ama hiçbir yüzeyde görünmüyordu —
+ * bu çözücünün ürün kodunda 0 çağıranı, `useCategoryViewModel.marketingTitle` alanının 0
+ * tüketicisi vardı. Yani birileri 12 satır için emek harcamış, metin hiç render edilmemişti.
  *
- * @example
- * getCategoryMarketingTitle(category) // returns "Premium Havalandırma Çözümleri"
+ * Karar (b) "emekli" seçildi: kategori adı TEK zincirden gelmeye devam eder
+ * (`translation_key → menu_label → name`, cetvel §2). Alanı `h1`'e bağlamak, adı İKİ BAŞLI
+ * yapardı — menüde kısa ad, sayfada uzun pazarlama başlığı.
+ *
+ * KOLON SİLİNMEDİ: `categories.marketing_title` DB'de duruyor ve 12 satırdaki metin yerinde;
+ * veri silmek geri dönüşsüzdür ve bu bir içerik kararıydı, temizlik değil. Silinen yalnız
+ * ÖLÜ ÇÖZÜCÜ — emekli bir alanın çözücüsünü bırakmak, sonraki geliştiriciye "demek ki
+ * kullanılıyor" dedirtirdi.
+ *
+ * Bekçi: `INV-KATEGORI-MARKETING-EMEKLI-1` (kategori-adi-marketing-emekli.test.ts) —
+ * hiçbir render yolu bu alanı okuyamaz. Emeklilik bir niyet değil, ölçülen bir hâl.
+ * Cetvel: docs/standards/kategori-adlandirma-standard.md §4.
  */
-export const getCategoryMarketingTitle = (
-    category: DbCategory | null | undefined,
-    t?: (key: string) => string,
-): string => {
-    if (!category) return ''
-
-    if (category.marketing_title) {
-        return category.marketing_title
-    }
-
-    // ⭐REC-103: burası `t`'siz çağırıyordu; yani pazarlama başlığı olmayan her kategori
-    // bu yoldan TÜRKÇE ad alıyordu. Kapı (INV-KATEGORI-ADI-1) bunu ben listeyi
-    // çıkarırken gözden kaçırmışken yakaladı — 12 çağrı sanıyordum, 13'müş.
-    // Ürün kodunda bugün çağıran yok (yalnız birim testi), ama imza sızıntıya açıktı.
-    return getCategoryDisplayName(category, t)
-}
 
 /**
  * Açıklama çözümü için gereken EN AZ alan kümesi. `DbCategory`, `DomainCategory` ve

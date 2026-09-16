@@ -1,0 +1,94 @@
+# SKILL KAPISI — sayaç her PR'da (ücretsiz), yönlendirme sınavı yalnız skill değişince (ücretli).
+#
+# NİÇİN VAR (ölçüldü 2026-09-12, REC-303): `.claude/skills` 36 skill / 25'inde ve
+# `.agent/skills` 35/35'inde `evals/evals.json` var, ama `pnpm skills:verify` HİÇBİR workflow
+# dosyasında geçmiyordu (ölçüm: 0 dosya). Yani 60 dosyalık sınav yatırımı kâğıt üstündeydi:
+# kimse koşmuyor, kimse kırmızı görmüyor.
+#
+# İKİ AYRI KAPI, BİLİNÇLİ:
+#   · `sayac` — ücretsiz, deterministik, her PR'da. 12/8 kuralı + tetik çakışması.
+#   · `sinav` — modele soru sorar, PARA HARCAR. Yalnız skill dosyaları değişen PR'larda ve
+#     yalnız anahtar varsa koşar. Anahtar yoksa adım ATLANIR (SARI) — KIRMIZI DEĞİL, çünkü
+#     anahtarın yokluğu bir skill kusuru değildir (OPS hükmü 2026-09-12).
+permissions:
+  contents: read
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: skills-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sayac:
+    name: skills sayac (ucretsiz)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: pyyaml
+        run: pip install --quiet pyyaml
+      - name: skills:verify
+        run: python scripts/skills-evaluator.py
+
+  sinav:
+    name: skills yonlendirme sinavi (ucretli, skill degisince)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # Skill dosyası değişmediyse sınav koşmaz: her PR'da para harcamanın anlamı yok.
+      - name: skill degisti mi
+        id: fark
+        run: |
+          taban="${{ github.event.pull_request.base.sha }}"
+          if [ -z "$taban" ]; then taban="$(git rev-parse HEAD~1 2>/dev/null || echo HEAD)"; fi
+          degisen="$(git diff --name-only "$taban" HEAD -- '.claude/skills' '.agent/skills' | wc -l)"
+          echo "degisen=$degisen" >> "$GITHUB_OUTPUT"
+          echo "skill dosyasi degisimi: $degisen"
+
+      # ⚠Anahtarın VARLIĞI iş düzeyinde ölçülür; değeri hiçbir yere basılmaz (repo PUBLIC).
+      - name: anahtar var mi
+        id: anahtar
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ]; then echo "var=1" >> "$GITHUB_OUTPUT"; else echo "var=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: ATLANDI raporu (anahtar yok ya da skill degismedi)
+        if: steps.anahtar.outputs.var != '1' || steps.fark.outputs.degisen == '0'
+        run: |
+          echo "::notice title=skills sinavi atlandi::anahtar=${{ steps.anahtar.outputs.var }} degisen=${{ steps.fark.outputs.degisen }} — SARI, kirmizi degil"
+
+      - name: skills:eval
+        if: steps.anahtar.outputs.var == '1' && steps.fark.outputs.degisen != '0'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/skills-eval-run.mjs
+
+      - name: rapor dosyasini sakla
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills-eval-raporu
+          path: docs/audits/skills-eval-*.json
+          if-no-files-found: ignore

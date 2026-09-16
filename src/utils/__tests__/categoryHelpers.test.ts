@@ -5,7 +5,6 @@ import type { CategoryDescriptionSource } from '../categoryHelpers'
 import {
     getCategoryDescription,
     getCategoryDisplayName,
-    getCategoryMarketingTitle,
     parsePriceToNumber
 } from '../categoryHelpers'
 
@@ -52,22 +51,10 @@ describe('categoryHelpers', () => {
         })
     })
 
-    describe('getCategoryMarketingTitle', () => {
-        it('should return empty string if category is null or undefined', () => {
-             expect(getCategoryMarketingTitle(null)).toBe('')
-             expect(getCategoryMarketingTitle(undefined)).toBe('')
-        })
-
-        it('should return marketing_title if it exists', () => {
-            const cat = { marketing_title: 'Marketing Value', name: 'Original Name' } as DbCategory
-            expect(getCategoryMarketingTitle(cat)).toBe('Marketing Value')
-        })
-
-        it('should fallback to display name if marketing_title is absent', () => {
-            const cat = { menu_label: 'Menu Label', name: 'Original Name' } as DbCategory
-            expect(getCategoryMarketingTitle(cat)).toBe('Menu Label')
-        })
-    })
+    // `getCategoryMarketingTitle` testleri SİLİNDİ — fonksiyon emekli oldu
+    // (Recep 2026-09-09; cetvel kategori-adlandirma-standard §4). Emekliliğin bekçisi
+    // artık bu birim testi değil, `kategori-adi-marketing-emekli.test.ts` içindeki
+    // INV-KATEGORI-MARKETING-EMEKLI-1: hiçbir RENDER yolu alanı okuyamaz.
 
     // ⭐REC-161: `lang` ZORUNLU. Fixture'lar `CategoryDescriptionSource`'u karşıladığı
     // için artık tip dökümü GEREKMİYOR — döküm kuralı susturur, sağlamaz.

@@ -85,7 +85,8 @@ const CartPage: React.FC = () => {
                 <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
                   {/* Product Image Placeholder */}
                   <div className="w-20 h-20 bg-gradient-to-br from-air-blue to-light-gray rounded-lg flex items-center justify-center flex-shrink-0">
-                    <BrandIcon brand={item.product.brand} />
+                    {/* Marka adı satırda "marka • sku" olarak yazıyor — logo dekoratif (REC-268). */}
+                    <BrandIcon brand={item.product.brand} dekoratif />
                   </div>
 
                   {/* Product Info */}

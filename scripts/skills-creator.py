@@ -152,7 +152,23 @@ Describe when the agent should use this skill.
 1. Step one
 2. Step two
 """
-    
+
+    # ORTAK BİTİŞ BLOĞU (REC-305) — tek kaynaktan, GÖVDEYE eklenir.
+    # Niçin gövde: oturum açılışında yalnız name+description okunuyor (REC-304 ölçümü);
+    # gövde skill çağrıldığında yüklenir, yani always-on yük artmaz.
+    # Niçin burada: yeni skill'in bloğu hatırlamaya bağlı kalmasın. Kaynak dosya yoksa
+    # SESSİZ geçilmez — uyarı basılır, çünkü blok konformans kapısında aranıyor.
+    ortak_blok_yolu = get_repo_root() / ".claude" / "skills" / "_ortak" / "bitis-durumu.md"
+    if ortak_blok_yolu.exists():
+        ortak = ortak_blok_yolu.read_text(encoding="utf-8").rstrip()
+        skill_body += (
+            "\n<!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->\n"
+            + ortak
+            + "\n<!-- ORTAK-BITIS-SON -->\n"
+        )
+    else:
+        print(f"  [Warning] ortak bitis blogu bulunamadi: {ortak_blok_yolu} — SKILL.md bloksuz yazildi")
+
     with open(skill_md_path, "w", encoding="utf-8") as f:
         f.write(f"---\n{yaml_text}---\n\n{skill_body}")
         

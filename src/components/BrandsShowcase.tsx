@@ -34,7 +34,8 @@ const Lane: React.FC<{ items: typeof HVAC_BRANDS; durationSec?: number }> = ({ i
             <div className="flex flex-col items-center justify-center gap-6 transition-colors duration-700">
               {/* Ultra-Minimalist Floating Logo */}
               <div className="relative flex h-24 w-48 items-center justify-center transition-filter-transform duration-700 grayscale opacity-30 group-hover/brand:grayscale-0 group-hover/brand:opacity-100 group-hover/brand:scale-110">
-                <BrandIcon brand={brand.name} />
+                {/* Marka adı aşağıda yazıyla basılıyor — logo dekoratif (REC-268). */}
+                <BrandIcon brand={brand.name} dekoratif />
               </div>
               
               {/* Subtle Indicator */}

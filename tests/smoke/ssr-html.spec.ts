@@ -44,34 +44,52 @@ describe('SSR HTML duman alarmı (PROD) — içerik sunucudan gelmeli', () => {
   })
 
   let secilen: Kural[] = []
+  // Atlama sebebini kol mesajına taşımak için tutulur — sebepsiz atlama YASAK (REC-286).
+  let secilenTemsilciler: Temsilciler | null = null
 
   beforeAll(async () => {
     if (!BASE) return
     // Sitemap erişilemez/boşsa `temsilcileriSec` HATA atar → beforeAll düşer → kollar
     // kırmızı. Sessizce sıfır rotayla yeşil dönmek bilerek imkânsız.
     const temsilciler: Temsilciler = await temsilcileriSec(BASE, getir)
+    secilenTemsilciler = temsilciler
     secilen = kurallar(temsilciler)
     // Hangi temsilci seçildi GÖRÜNSÜN: yarın "dün geçti bugün düştü" sorusunun cevabı
     // koşum günlüğünde dursun (katalog her gün değişiyor).
     console.log(
       '[ssr-duman] temsilciler: ' +
         secilen.map((k) => `${k.sinif}=${k.yol}${k.kapida ? '' : ' (yalniz ALARM)'}`).join(' · ') +
-        ` | sitemap sayimlari: kok=${temsilciler.sayimlar.kokKategori}` +
-        ` alt=${temsilciler.sayimlar.altKategori} pdp=${temsilciler.sayimlar.pdp}`
+        ` | sitemap sayimlari: kategori=${temsilciler.sayimlar.kategori}` +
+        ` iki-segmentli=${temsilciler.sayimlar.ikiSegmentli} pdp=${temsilciler.sayimlar.pdp}` +
+        ` | secim: ${temsilciler.secim.icerikten ? 'ICERIKTEN' : 'adresten (iki segmentli yol var)'}` +
+        ` denenen aday=${temsilciler.secim.denenenAday}/${temsilciler.secim.adayTavani}` +
+        // ⛔ATLAMA SESSİZ KALMAZ: sebebiyle birlikte koşum günlüğüne basılır (REC-286).
+        (temsilciler.atlananlar.length
+          ? ' | ⛔ATLANAN: ' +
+            temsilciler.atlananlar.map((a) => `${a.sinif} — ${a.sebep}`).join(' ; ')
+          : ' | atlanan yok')
     )
   })
 
   // Sınıflar SABİT, temsilciler DİNAMİK: kol adı sınıfı taşır, yol koşumda öğrenilir.
-  for (const sinif of ['anasayfa', 'liste', 'kok-kategori', 'alt-kategori', 'pdp'] as const) {
+  for (const sinif of [
+    'anasayfa',
+    'liste',
+    'altgruplu-kategori',
+    'yaprak-kategori',
+    'pdp',
+  ] as const) {
     it.skipIf(!BASE)(sinif, async () => {
       const kural = secilen.find((k) => k.sinif === sinif)
-      // Kök kategori sitemap'te olmayabilir (hepsi pasifse) — o hâlde sınıf atlanır ama
-      // SESSİZ kalmaz: sebep yazılır. Zorunlu sınıfların yokluğu `temsilcileriSec`te
-      // zaten hata atar, yani buraya düşen tek şey gerçekten isteğe bağlı olandır.
+      // Alt gruplu kategori bulunamayabilir (hiçbir kategorinin alt grubu yoksa) — o hâlde
+      // sınıf atlanır ama SESSİZ kalmaz: sebep yukarıda günlüğe, aşağıda kol mesajına yazılır.
+      // Kapıda koşan sınıfların yokluğu `temsilcileriSec`te zaten HATA atar, yani buraya
+      // düşen tek şey gerçekten isteğe bağlı olandır.
       if (!kural) {
-        expect(sinif, `${sinif} sınıfının temsilcisi yok — sitemap'te hiç üyesi bulunamadı`).toBe(
-          'kok-kategori'
-        )
+        const sebep =
+          secilenTemsilciler?.atlananlar.find((a) => a.sinif === sinif)?.sebep ??
+          'sebep KAYDEDİLMEMİŞ — bu başlı başına kusurdur'
+        expect(sinif, `${sinif} sınıfının temsilcisi yok → ${sebep}`).toBe('altgruplu-kategori')
         return
       }
       const res = await getir(`${BASE}${kural.yol}`)

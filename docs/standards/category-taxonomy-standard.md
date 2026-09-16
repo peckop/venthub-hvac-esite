@@ -56,6 +56,34 @@ Kategori sistemi **bilinçli olarak genişletilebilir** tasarlandı (admin `Cate
 - ✅ TR sızıntı düzeltildi (PR #456: PDP breadcrumb+özellik, Footer, kategori SEO metadata) ·
   ✅ eksik/bozuk `translation_key`'ler onarıldı (PR #457 migration).
 
+### 4.1 Bir adres BİRDEN ÇOK satıra uyarsa hangisi kazanır (REC-286, 2026-09-08)
+
+Yukarıdaki kural adresin nasıl **üretildiğini** söylüyordu; **nasıl çözüleceğini** söylemiyordu.
+Çözücü üç koşulu birden sorar (`slug` · `metadata.slug.tr` · `metadata.slug.en`), yani bir
+adrese birden çok satır uyabilir. Bu boşluk sessiz bir yanlış-sayfa kolu üretmişti.
+
+**Kural — öncelik, §4'ün dil hiyerarşisiyle AYNI sırada:**
+
+| # | eşleşme | anlamı |
+|---|---|---|
+| 0 | `categories.slug` (kanonik EN) | kimliğin kendisi — daima kazanır |
+| 1 | `metadata.slug.tr` | TR yüzeyinin görünen adresi |
+| 2 | `metadata.slug.en` | EN yüzeyinin görünen adresi |
+| 3 | hiçbiri | **`null`** — satır uydurulmaz |
+
+Üç ek şart, üçü de ölçülür (`INV-KATEGORI-COZUCU-1`):
+1. **Seçim giriş sırasından bağımsızdır.** PostgREST sırasız döner; sıraya bağlı bir seçim
+   "bazen doğru" olur ve tam o yüzden hiçbir ölçüm onu yakalayamaz.
+2. **Hiçbir satır adresi iddia etmiyorsa `null` döner** — eldeki ilk satır "bulundu" sayılamaz.
+   Eksik alan, uydurulmuş alandan yeğdir.
+3. **Aynı öncelikte iki satır bir VERİ kusurudur.** Çözücü doğruyu bilemez; deterministik
+   seçer **ve sessiz kalmaz** (uyarı yazar). Çakışan kategori adresi düzeltilmesi gereken
+   veridir, tolere edilecek bir hâl değil.
+
+**Değiştirme kuralı:** bu öncelik sırası değişecekse önce `INV-KATEGORI-COZUCU-1` değişir ve
+sabotajla doğrulanır (kuralı bozan kod kapıyı KIRMIZI yapmalı). Kapının kendisi ağ/DB
+kullanmaz — seçim mantığı `kategoriSatiriSec` olarak saf ve dışa açıktır.
+
 ## 5. HRV slug tekilleştir + seed
 
 - `heat-recovery-vmc` BOŞ ama mimari en olgun dal (EN 308 hesaplayıcı + HRVModel 3D + katalog entegrasyonu kurulu).
@@ -105,3 +133,89 @@ bloklamaz); **her YENİ slug İngilizce açılır** + `translation_key` zorunlu 
 4. HRV slug (`heat-recovery-vmc` zaten kanonik; `heat-recovery`/`hrv` varyantları kodda kontrol) + seed.
 5. Çatı fanlarını yatay/dikey/F400 ayır (taksonomi kararı → ben).
 > Sıra: bunlar bitince → full ürün load (catalog-ingestion-standard) güvenle başlar.
+
+## 8. ⭐ÜRÜN TAŞIMA İKİ TABLODUR — vitrin AİLE listeler (2026-09-08, sahada ölçüldü)
+
+**Kural:** bir ürünü başka kategoriye taşımak, `products` satırını güncellemekle **tamamlanmış
+sayılmaz.** Kategori vitrini **ürün değil AİLE** listeler (sayfa metni: *"N ürün ailesi"*).
+
+| güncellenecek | tablo |
+|---|---|
+| `category_id` + `subcategory_id` | `products` |
+| `category_id` + `subcategory_id` | **`product_families`** |
+
+İkisi **birlikte** yazılmazsa: **veri doğru, vitrin sessizce yanlış** kalır. Aile listeye hiç
+girmediği için ürünler müşteriye görünmez — ve **hiçbir test bunu yakalamaz.**
+
+### Kanıt satırı (beyan yeterli değil)
+Taşıma sonrası **vitrin sayımı** ölçülür: **hiç sorulmamış adres** (`?v=<damga>`),
+`X-Vercel-Cache: MISS`, `Age: 0`, ve kategori sayfasındaki *"N ürün ailesi"* sayısı **artmış** olmalı.
+
+### Kapı (INV-AILE-KATEGORI-1 → REC-290, ALTYAPI)
+```sql
+select count(*) from products p join product_families f on f.id = p.family_id
+where f.deleted_at is null
+  and (p.subcategory_id is distinct from f.subcategory_id
+    or p.category_id   is distinct from f.category_id);
+-- beklenen: 0
+```
+
+### ⭐Bu maddeyi doğuran vaka — ölçüm kapıyı ilk koşuşunda haklı çıkardı
+2026-09-08, Recep kararıyla iki taşıma yapıldı. **İkisi de yarım kaldı, ikisi de aynı sebeple:**
+
+| taşıma | ürün | aile | sonuç |
+|---|---|---|---|
+| 7 AVenS → `duct-fans` | ✅ taşındı | ⛔`subcategory_id` pasif kategoride kaldı | vitrinde **yoktu** |
+| 11 VORTICENT ATEX → `axial-industrial-fans` | ✅ taşındı | ⛔aynı hata | vitrinde **yoktu** |
+
+Birincisi vitrin ölçülünce (5→6 ürün ailesi), **ikincisi bu maddenin SQL'i ilk koşulduğunda**
+yakalandı: sayı 0 değil **11** çıktı ve 11'in hepsi az önce "taşındı" diye raporlanan ürünlerdi.
+Onarım sonrası **0**; vitrin `aksiyel-sanayi-fanlari` **3 ürün ailesi**, VORTICENT sayfada.
+
+⛔**Genel ders:** *"taşıdım" bir beyandır; kanıt vitrindedir.* Bu, `rendering-cache-standard`'ın
+**"veri değişti, sayfa değişmedi"** deseninin taksonomi tarafındaki karşılığıdır — çapraz atıf oraya.
+
+### §1 ile çelişki — kayda geçirilir, karar Recep'in
+§1 *"kategori ASLA boş diye silinmez"* der. **2026-09-08'de Recep 7 boş kategoriyi sildirdi**
+(hepsi `is_active=false`, ürün/alt kategori/aile bağı **0** ölçülerek). Karar cetveli ezer;
+madde burada kayıtlıdır ki cetvel sahada yanlış bilgi vermesin. §1'in yeniden yazımı Recep kapısında.
+
+---
+
+## 9. ⭐GERİ DÖNÜŞSÜZ BETİK YAZIMI: ÖNCE DÖKÜM, SONRA BETİK, SONRA YAZIM (2026-09-08, OPS emri)
+
+**Kapsam:** kategori/ürün/aile/görsel üzerinde **geri dönüşü olmayan** her betik yazımı —
+`delete`, kimlik değiştiren `update` (kategori/aile taşıma), toplu görsel değişimi.
+*(Buraya yazıldı çünkü §1 silmeyi, §8 taşımayı yönetiyor; ikisinin ortak kusuru buydu.)*
+
+### Zorunlu sıra — üçü de yazımdan ÖNCE
+1. **DÖKÜM belgeye yazılır:** etkilenen her satırın **id · slug · ad · önceki değerler**.
+   Sayı yeterli DEĞİLDİR.
+2. **Betik depoya girer:** `scripts/` altına commit edilir — **scratchpad'e değil**.
+3. **Yazım koşulur.**
+
+### ⛔NİÇİN — ölçülmüş vaka (2026-09-08, bu şerit)
+7 boş kategori silindi. Belgeye yalnız *"7 kategori silindi, bağımlılık kapısı ölçüldü"* yazıldı.
+Aynı gün URUN *"DB'de `endustriyel-havalandirma` yok"* bulgusunu bildirdi ve **"onu ben mi sildim"
+sorusu CEVAPLANAMADI:**
+
+| kaynak | sildiklerimin adı var mı |
+|---|---|
+| denetim belgesi | ❌ yalnız sayı (7) |
+| `admin_audit_log` | ❌ o günün (2026-09-08) yazımlarından **hiçbir tabloda satır yok** |
+| betik | ❌ scratchpad'de kalmamış |
+| oturum kaydı (`.jsonl`) | ✅ — ama bu bir **denetim kaydı değil**, tesadüfen duran transkript |
+
+**Sayı kimlik taşımaz.** "7 sildim" cümlesi, geri dönüşü olmayan bir işlemi **denetlenebilir
+kılmaz**. Kurtaran şey bir mekanizma değil, şanstı.
+
+### Bitti ölçütü
+Geri dönüşsüz yazım içeren her PR'da: dökümde satır sayısı = yazımda etkilenen satır sayısı,
+ve dökümdeki her satır **id + ad** taşıyor.
+
+> **Ayrı ve daha büyük kusur (bu cetvelin kapsamı DIŞINDA, ALTYAPI'ya gitti):** betikle yapılan
+> doğrudan DB yazımları `admin_audit_log`'a **düşmüyor** — kural 11 ihlali. ⚠Tablo BOŞ DEĞİL:
+> `categories` için 12 satır var ama hepsi **admin panelinden** ve eski (2025-12, 2026-03);
+> ayırt edici ölçüt tablonun doluluğu değil **O GÜNÜN yazımları** — 2026-09-08'de hiçbir tablodan
+> satır yok. (Ölçümü ALTYAPI genişletti; "tablo boş" demek yanlış iş emri doğururdu.) Bu madde onun
+> yerine geçmez, yalnız o mekanizma gelene kadar **belge düzeyinde** izlenebilirlik sağlar.

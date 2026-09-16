@@ -1,0 +1,85 @@
+{
+  "_nicin": "Admin panelinin TARAYICI istemcisiyle yazdigi her tablo icin, o yazmaya karsilik gelen RLS politikasinin prod'da VAR olup olmadigini ilan eder. INV-ADMIN-YAZMA-1 kapisi bu dosyayi okur.",
+  "_kusur_sinifi": "RLS acik + yazma politikasi YOK = istemci yazmasi SESSIZCE reddedilir. Statik kapilar (tsc/lint/test) bunu GORMEZ; kullaniciya 'kaydedilemedi' olarak dusen bir islev hatasidir. Olculmus vaka: error_groups (REC-321, 2026-09-13) - admin panelde durum/atama/not yazma dort yerden RLS'e takiliyordu.",
+  "_kapinin_siniri": "Bu kapi CANLI VERITABANINA BAKAMAZ (CI'da kimlik yok, prod sorgusu da istenmez). Olctugu sey: her istemci yazmasinin BU DOSYADA ilan edilmis olmasi. 'kural_var' alani INSAN OLCUMUDUR, damgasiyla birlikte yazilir; kapi onun DOGRULUGUNU degil VARLIGINI ve tutarliligini dogrular. Yeni bir istemci yazmasi eklendiginde kapi kirmizi verir ve yazari olcmeye zorlar - islevin canlida sessizce dusmesini beklemek yerine.",
+  "_olcum_yontemi": "pg_policies uzerinden, roles icinde authenticated ya da public bulunan politikalarin cmd kumesi. Salt okuma; prod'a yazma YOK.",
+  "_kaynak_notu": "'kaynak' alani politikanin depodaki dogum yerini soyler. PROD-ELLE = politika prod'da VAR ama onu olusturan bir migration dosyasi depoda YOK (olculdu). Bu, depo ile prod arasindaki PARCALI iliskinin kanitidir ve ayri bir borctur (bkz. REC-321 yan bulgu, REC-322).",
+  "olcum_damgasi": "2026-09-13",
+  "tablolar": {
+    "products": {
+      "istemci_islemleri": ["update", "insert", "delete", "upsert"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations (3 dosya create policy tasiyor)"
+    },
+    "categories": {
+      "istemci_islemleri": ["update", "delete", "insert"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations (3 dosya create policy tasiyor)"
+    },
+    "coupons": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "PROD-ELLE"
+    },
+    "inventory_settings": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "UPDATE"],
+      "kural_var": true,
+      "kaynak": "PROD-ELLE"
+    },
+    "order_notes": {
+      "istemci_islemleri": ["insert", "delete"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "PROD-ELLE"
+    },
+    "pricing_policy": {
+      "istemci_islemleri": ["update", "insert"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations (1 dosya create policy tasiyor)"
+    },
+    "site_settings": {
+      "istemci_islemleri": ["upsert"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations (1 dosya create policy tasiyor)"
+    },
+    "venthub_orders": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations (1 dosya create policy tasiyor)"
+    },
+    "venthub_returns": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations (3 dosya create policy tasiyor)"
+    },
+    "venthub_quotes": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE"],
+      "kural_var": true,
+      "kaynak": "prod politikalari: quotes_update_admin, quotes_update_customer_decision",
+      "_not": "DELETE politikasi yok ve istemcide delete de YOK - tasarim, bosluk degil."
+    },
+    "venthub_quote_items": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "INSERT", "UPDATE"],
+      "kural_var": true,
+      "kaynak": "prod politikasi: quote_items_update_admin"
+    },
+    "error_groups": {
+      "istemci_islemleri": ["update"],
+      "prod_politika_islemleri": ["SELECT", "UPDATE"],
+      "prod_politika_islemleri_eski": ["SELECT"],
+      "kural_var": true,
+      "kaynak": "supabase/migrations/20260913182000_error_groups_yazma_politikasi.sql (UYGULANDI)",
+      "_not": "KAPANDI 2026-09-13. Once OLCULMUS ISLEV HATASIYDI: RLS acik, tek politika SELECT, admin panelde durum/atama/not yazma (ErrorGroupsTableBody.tsx satir 313/346/377/408) RLS'e takiliyordu. Migration PR #1173 ile master'a indi, supabase-migrate kosusu 34775094857 success ile prod'a uyguladi (18:39Z) ve prod'dan dogrulandi: error_groups_update_admin | UPDATE | {authenticated} | is_admin_user() (USING + WITH CHECK). ⚠SINIR: bu politikanin VARLIGI olculdu, DUGMENIN calistigi degil - gercek bir yonetici token'iyla panel denemesi Recep'te (service_role ile deneme RLS'i baypas eder, kanit sayilmaz)."
+    }
+  }
+}

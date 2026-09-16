@@ -184,6 +184,14 @@ export const tr = {
     nextAria: 'Sonraki'
   },
   products: {
+    // REC-338 — keşif listesinin (`/[lang]/products`) KENDİ başlığı ve açıklaması.
+    // Eskiden bu rotanın `generateMetadata`'sı HİÇ YOKTU: canlı ölçümde (2026-09-14)
+    // `/tr/products` ve `/en/products` kök layout'un varsayılan başlığını basıyordu
+    // ve `rel="canonical"` etiketi de yoktu.
+    discovery: {
+      seoTitle: 'Tüm Ürünler | Endüstriyel Havalandırma ve HVAC — VentHub',
+      seoDesc: 'VentHub ürün ailelerinin tamamı tek listede: fanlar, ısı geri kazanım, hava perdeleri, kanal ve aksesuarlar. Mühendislik destekli seçim.',
+    },
     orbital: {
       dragHint: 'Tut Çevir',
     },
@@ -240,8 +248,10 @@ export const tr = {
     detailedSearch: 'için detaylı ara',
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
     enterHint: 'Tüm sonuçlar için',
+    // `placeholderAi` SİLİNDİ (REC-340 Faz 0) — "yapay zeka destekli arama" diyordu ve
+    // arkasında yapay zeka yoktu. Ölü bırakılmadı, kaldırıldı; tek tüketicisi
+    // `SearchOverlay` artık aşağıdaki doğru metni kullanıyor.
     placeholder: 'Ürün, kategori veya marka ara...',
-    placeholderAi: 'Ürün, kategori veya yapay zeka destekli arama...',
     noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
     brandPrefix: 'Marka: ',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
@@ -2384,12 +2394,20 @@ export const tr = {
       contactPhone: 'Telefon',
       contactPhonePh: '05xx xxx xx xx',
       contactEmailNote: 'Teklif bu e-posta adresine iletilecek',
-      contactRequired: 'Ad soyad ve telefon zorunludur — teklif belgesinde muhatap yazmalıdır',
+      contactEmail: 'E-posta',
+      contactEmailPh: 'ornek@firmaniz.com',
+      contactEmailGuestNote: 'Teklifiniz ve bilgilendirmeler bu adrese gönderilecek',
+      contactRequired: 'Ad soyad, telefon ve e-posta zorunludur — teklif belgesinde muhatap yazmalıdır',
+      kvkkConsent: 'aydınlatma metnini okudum',
+      kvkkRequired: 'Devam etmek için aydınlatma metnini okuduğunuzu onaylayın',
+      duplicateToast: 'Bu talebi az önce gönderdiniz — ekibimiz üzerinde çalışıyor',
+      rateLimitToast: 'Çok fazla talep gönderildi, lütfen bir süre sonra tekrar deneyin',
+      guestSignupInvite: 'Hesap oluşturursanız bu talebi ve sonraki tekliflerinizi hesabınızdan takip edebilirsiniz.',
+      guestSignupCta: 'Hesap Oluştur',
       note: 'Not (opsiyonel)',
       notePh: 'Projeniz/ihtiyacınız hakkında kısa not (opsiyonel)',
       submit: 'Teklif Talebi Gönder',
       cancel: 'Vazgeç',
-      loginRequired: 'Teklif istemek için giriş yapmalısınız',
       successToast: 'Teklif talebiniz alındı',
       errorToast: 'Teklif talebi oluşturulamadı',
     },

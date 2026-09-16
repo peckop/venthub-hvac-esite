@@ -256,17 +256,34 @@ export const WhatsAppIcon: React.FC<IconProps> = ({ className = '', size = 24 })
 }
 
 // Brand specific icons using real images from public/images/ekran
-export const BrandIcon: React.FC<{ brand: string; className?: string }> = ({ 
-  brand, 
-  className = '' 
+/**
+ * ⭐`dekoratif` NİÇİN VAR (REC-268 · WCAG 1.1.1, `image-redundant-alt`).
+ *
+ * ÖLÇÜLDÜ (Lighthouse a11y, master'ın yerel üretim derlemesi, 2026-09-08): anasayfada **15**
+ * ihlal. Sebebi: logo `alt="Vortice"` diyor, hemen yanındaki yazı da "Vortice" diyor. Ekran
+ * okuyucu aynı adı İKİ KEZ okuyor — gürültü, bilgi değil.
+ *
+ * ÇÖZÜM ÇAĞIRANA BIRAKILDI, çünkü doğru cevap ÇAĞRI YERİNE bağlıdır: adı yanında yazan bir
+ * kart için logo dekoratiftir (`alt=""`), yalnız logonun göründüğü bir yer için DEĞİLDİR.
+ * Bileşen bunu kendi başına bilemez.
+ *
+ * VARSAYILAN BİLEREK `false`: sessiz bir `alt=""` varsayılanı, yarın adı yazmayan bir çağıran
+ * eklendiğinde o logoyu ekran okuyucuya GÖRÜNMEZ yapardı ve hiçbir kapı bunu görmezdi.
+ * Bugünkü dört çağıranın DÖRDÜ de adı yazıyla basıyor (ölçüldü: BrandsShowcase, ProductCard,
+ * FamilyCard, ProductDetailPageView) ve dördü de `dekoratif` geçer.
+ */
+export const BrandIcon: React.FC<{ brand: string; className?: string; dekoratif?: boolean }> = ({
+  brand,
+  className = '',
+  dekoratif = false
 }) => {
   const normalizedBrand = brand.toLowerCase()
-  
+
   // Base path for brand images
   const basePath = '/images/ekran'
-  
+
   let src = ''
-  const alt = brand
+  const alt = dekoratif ? '' : brand
 
   switch (normalizedBrand) {
     case 'avens':
@@ -290,8 +307,13 @@ export const BrandIcon: React.FC<{ brand: string; className?: string }> = ({
       break
     default:
       // Fallback to a placeholder or generic icon if needed
+      // Logosu olmayan marka: ad METİN olarak çizilir. `dekoratif` ise bu metin de erişilebilirlik
+      // ağacından çıkarılır — yoksa görsel yedeği, kaldırdığımız mükerrer okumayı geri getirirdi.
       return (
-        <div className={`flex items-center justify-center bg-slate-100 rounded-lg p-2 ${className}`}>
+        <div
+          className={`flex items-center justify-center bg-slate-100 rounded-lg p-2 ${className}`}
+          aria-hidden={dekoratif || undefined}
+        >
           <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{brand}</span>
         </div>
       )

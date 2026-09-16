@@ -1,0 +1,234 @@
+{
+  "damga": "2026-09-12T11:53:02.844Z",
+  "model": "claude-haiku-4-5-20251001",
+  "arkaUc": "cli",
+  "kuru": false,
+  "ornek": {
+    "kosan": 10,
+    "toplam": 60,
+    "atlanan": 50
+  },
+  "agaclar": [
+    {
+      "agac": ".claude/skills",
+      "skill": 36,
+      "sinavli": 25,
+      "sinavsiz": [
+        "agy-orchestrate",
+        "create-migration",
+        "llm-council",
+        "maestro",
+        "office-hours",
+        "plan-challenger",
+        "prd-complexity-audit",
+        "qa",
+        "task-observer",
+        "venthub-20-eksen-denetimi",
+        "video-kaynak"
+      ]
+    },
+    {
+      "agac": ".agent/skills",
+      "skill": 35,
+      "sinavli": 35,
+      "sinavsiz": []
+    }
+  ],
+  "istek": 60,
+  "sonuclar": [
+    {
+      "ad": "codegraph",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "diff-review",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "fallow",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "find-skills",
+      "durum": "DUSTU",
+      "tetik": {
+        "dogru": 6,
+        "toplam": 12,
+        "oran": 0.5
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 6,
+      "dogru": 14,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "git-commit",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "i18n-conventions",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "notebook-navigator",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 11,
+        "toplam": 12,
+        "oran": 0.917
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 1,
+      "dogru": 19,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "notebooklm-sync",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "orion-cli",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    },
+    {
+      "ad": "skills-creator",
+      "durum": "GECTI",
+      "tetik": {
+        "dogru": 12,
+        "toplam": 12,
+        "oran": 1
+      },
+      "tetiklemez": {
+        "dogru": 8,
+        "toplam": 8,
+        "oran": 1
+      },
+      "olcemedi": 0,
+      "yanlis": 0,
+      "dogru": 20,
+      "agac": ".claude/skills"
+    }
+  ],
+  "ozet": {
+    "toplam": 10,
+    "gecti": 9,
+    "dustu": 1,
+    "olcemedi": 0,
+    "cikis": 1
+  },
+  "sureSaniye": 274.8,
+  "maliyet": {
+    "girisJetonu": null,
+    "cikisJetonu": null,
+    "usd": null,
+    "not": "CLI arka ucu jeton kullanimini bildirmez -> OLCULEMEDI (abonelikten gider)"
+  }
+}

@@ -60,14 +60,26 @@ const SCRIPT = join(REPO_KOK, 'scripts/vercel-ignore-build.sh')
 /** exit 0 = ATLA, exit 1 = BUILD. */
 type Karar = 'ATLA' | 'BUILD'
 
-function kararVer(degisenDosyalar: string[]): Karar {
+/**
+ * ⚠️ ORTAM AÇIKÇA KURULUR — miras alınan `VERCEL_GIT_COMMIT_REF` bu kapıyı TOPTAN
+ * anlamsızlaştırırdı: dal kapısı (2026-09-08) üretim dalı dışındaki her ref'te
+ * ATLA döndürdüğü için, ortamda gezen tek bir değişken bu dosyadaki BÜTÜN
+ * "build gerektirir" kollarını sessizce yeşile çevirirdi. Bu yüzden değişken
+ * ya ADIYLA verilir ya da SİLİNİR; "olduğu gibi bırak" seçeneği yok.
+ */
+function kararVer(degisenDosyalar: string[], ortam: Record<string, string> = {}): Karar {
   const dir = mkdtempSync(join(tmpdir(), 'inv-build-skip-'))
   const listFile = join(dir, 'files.txt')
   writeFileSync(listFile, degisenDosyalar.join('\n'), 'utf8')
 
+  const env = { ...process.env }
+  delete env.VERCEL_GIT_COMMIT_REF
+  delete env.VERCEL_GIT_REPO_DEFAULT_BRANCH
+  Object.assign(env, ortam)
+
   try {
     // Hata fırlatmazsa exit 0 demektir → ATLA
-    execFileSync('sh', [SCRIPT, listFile], { stdio: 'pipe' })
+    execFileSync('sh', [SCRIPT, listFile], { stdio: 'pipe', env })
     return 'ATLA'
   } catch (err) {
     const status = (err as { status?: number }).status
@@ -81,6 +93,67 @@ function kararVer(degisenDosyalar: string[]): Karar {
     return 'BUILD'
   }
 }
+
+/**
+ * INV-BUILD-SKIP-DAL · üretim dalı DIŞINDAKİ hiçbir ref derleme yakmaz.
+ *
+ * NİÇİN AYRI KOL (ölçüldü 2026-09-07/08): REC-217 "PR dalları yayın üretmesin"
+ * diye `vercel.json`'a `git.deploymentEnabled {"*": false, "master": true}`
+ * yazdı ve İŞLEMEDİ — Vercel belgesi nesne biçimi için "unspecified branches
+ * default to true" diyor, JOKER YOK. Kuralı taşıyan dört dal (#1107, #1108,
+ * rec121, #1109) yine önizleme üretti. Gece 60+ dağıtım birikti, kota 21:14Z'de
+ * doldu, master'ın üç commit'i "Deployment rate limited" ile REDDEDİLDİ ve
+ * Recep'in seçtiği düzen siteye HİÇ çıkmadı.
+ *
+ * ⭐O KUSURU YAKALAMASI GEREKEN KAPI VARDI VE KÖRDÜ: `vercel.json`'un İÇERİĞİNE
+ * bakıyordu, SONUCUNA değil. Dosyada doğru dizeyi görüp yeşil yanıyordu. Bu
+ * yüzden buradaki kollar dosya okumaz — betiği ÇALIŞTIRIP çıkış kodunu ölçer.
+ */
+describe('INV-BUILD-SKIP-DAL · üretim dalı dışındaki ref derleme yakmaz', () => {
+  it('üretim dalında kaynak değişikliği DERLENİR (kapı fazla geniş değil)', () => {
+    expect(kararVer(['src/app/page.tsx'], { VERCEL_GIT_COMMIT_REF: 'master' })).toBe('BUILD')
+  })
+
+  it('üretim dalında belge değişikliği ATLANIR (eski davranış korunuyor)', () => {
+    expect(kararVer(['docs/audits/x.md'], { VERCEL_GIT_COMMIT_REF: 'master' })).toBe('ATLA')
+  })
+
+  // ⭐AYIRT EDİCİ KOL: bu satır, dal kapısı OLMADAN 'BUILD' verirdi (dosya sınıfı
+  // `src/**` derlemeyi zorlar). Yani kol, kapının VARLIĞINI ölçüyor — kaldırılırsa
+  // kırmızı olur. Ölçüldü: kapı öncesi exit 1, kapı sonrası exit 0.
+  it('ÖZELLİK DALINDA kaynak değişikliği bile ATLANIR', () => {
+    expect(kararVer(['src/app/page.tsx'], { VERCEL_GIT_COMMIT_REF: 'urun/rec269-x' })).toBe('ATLA')
+  })
+
+  it('özellik dalında belge değişikliği de ATLANIR', () => {
+    expect(kararVer(['docs/a.md'], { VERCEL_GIT_COMMIT_REF: 'altyapi/y' })).toBe('ATLA')
+  })
+
+  // ⭐FAIL-SAFE YÖNÜ: boş ref "üretim dalı değil" DEĞİL, "ÖLÇEMEDİM" demektir.
+  // Ters yazılsaydı (boş ref → ATLA) üretim dağıtımı SESSİZCE ölürdü ve hiçbir
+  // kırmızı doğmazdı — bu dosyanın baştan beri kovaladığı vacuous-skip sınıfı.
+  it('ref BOŞSA atlanmaz — ölçemediğini atlamaya çevirmez', () => {
+    expect(kararVer(['src/app/page.tsx'])).toBe('BUILD')
+  })
+
+  // Üretim dalının adı ORTAMDAN okunur, koda gömülü 'master' DEĞİL. Bu kol
+  // olmasaydı betik `master` sabitine bağlanır ve varsayılan dal bir gün
+  // yeniden adlandırıldığında üretim dağıtımı sessizce atlanırdı.
+  it('üretim dalının adı ortamdan gelir (gömülü "master" değil)', () => {
+    expect(
+      kararVer(['src/app/page.tsx'], {
+        VERCEL_GIT_COMMIT_REF: 'master',
+        VERCEL_GIT_REPO_DEFAULT_BRANCH: 'main',
+      }),
+    ).toBe('ATLA')
+    expect(
+      kararVer(['src/app/page.tsx'], {
+        VERCEL_GIT_COMMIT_REF: 'main',
+        VERCEL_GIT_REPO_DEFAULT_BRANCH: 'main',
+      }),
+    ).toBe('BUILD')
+  })
+})
 
 describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir', () => {
   it('ölçüm aracı gerçekten çalışıyor (vacuous-pass koruması)', () => {

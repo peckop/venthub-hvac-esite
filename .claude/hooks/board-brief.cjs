@@ -66,37 +66,67 @@ const others = hepsi.filter(c => c.sid !== sid)
 // hatırlatmasını almalı — Recep'in sabah "günaydın" yazıp başka hiçbir şey yazmaması için
 // komutu İNSAN değil bu kanca taşıyor. Şerit alınınca hatırlatma kendiliğinden kapanır.
 
-// MEKANIZMA SATIRI (T115-VH) — sessizlik kuralindan ONCE olculur ve ONA TABI DEGILDIR.
-// Nicin: 2026-08-20 sabahi dort oturum panoya sagir kaldi ve sagirlik SESSIZ oldugu icin
-// hicbir satir uretmedi. Sessizligi "sakin gun" sanan bir brifing, tam da olcmesi gereken
-// arizayi susarak gecirir. Gozcu kanitli DEGILSE bu satir HER TURDA basilir.
-let mekanizmaSatiri = null
+// ⛔MEKANIZMA SATIRI KALDIRILDI (REC-328, Recep karari 2026-09-14, kendi sozu "1").
+//
+// Eskiden burada her turda "gozcun KANITLANMADI / TESLIMAT kanitin bayat" uyarisi basilirdi
+// ve ajani `mechanism-setup.cjs plan|prob|dogrula` ucluusunu kurmaya yollardi. Uclu EMEKLI:
+// filo artik DOGRUDAN MESAJLA calisir (SendMessage + notify_when_idle), pano ise not kutusu
+// degil yalniz CLAIM + CANLILIK yuzeyidir.
+//
+// NICIN KALDIRILDI — olculdu 2026-09-14:
+//   · Gozcu bugune kadar TEK BIR NOT yakalamadi; pano SES sutunu iki serit icin de
+//     ~2700 dk (45 saat) SESSIZ. Yani uyari, var olmayan bir kanalin bekciligini yapiyordu.
+//   · Lider oturumun (OPS) TARAMA katmani ASILMIS ve TESLIM kaniti 6955 dk (~4,8 gun) bayatti;
+//     filo o sure boyunca kayipsiz calisti — butun emirler SendMessage ile gitti.
+//   · ALTYAPI gozcusu KAPATILDIKTAN SONRA pano `who` canliligi 0 dk kaldi: canlilik
+//     CLAIM ATISINDAN gelir, gozcuden DEGIL. Yani bu satirin korudugu sey zaten korunuyordu.
+//
+// Her turda basilan ve hicbir seyi yakalamayan bir uyari, ucuncu gunde bakilmayan bir uyaridir
+// ([[yesil-kapi-gorundugunu-kanitlamaz]] dersinin aynadaki hali: kirmizi da bakmadigi seyi
+// kanitlamaz). Cetvel: docs/standards/fleet-mechanism-standard.md.
+//
+// ⭐LINEAR YENI-YORUM SAYACI (REC-329) — Recep karari 2026-09-14 ("3. evet").
+//
+// NICIN BURADA: Design seritleri kararlarini Linear PROJE yorumlarina yaziyor ve o
+// yuzey PASIF — kimse bakmazsa bekler. Olculen bedel: 2026-09-09'da iki Design mesaji
+// 1,5 saat, 2026-09-13 18:23Z'deki DESIGN-KATALOG teslim yorumlari 13+ saat cevapsiz
+// kaldi. Emekli edilen gozcu uclusu (REC-328) Linear'a HIC bakmiyordu; bu bosluk yeni
+// degil, HIC KAPATILMAMISTI.
+//
+// ⭐CETVEL AYRIMI (fleet-mechanism-standard v2.0): PASIF kanal mekanizma ister, ITICI
+// kanal istemez. Linear yorumu pasif bir kutu -> mekanizma hak ediyor. Ama bu GOZCU
+// DEGIL: surec kurmaz, cron kurmaz, Monitor kurmaz. Zaten kosan bu kancanin icinde TEK
+// sorgu, TEK satir, 60 sn onbellek. "Linear yorum sayaci = kanca, gozcu degil."
+//
+// ⚠SESSIZLIK KURALINDAN ONCE hesaplaniyor ve kurala DAHIL: pano sessiz oldugunda da
+// bu satir akmali, cunku itilmesi gereken sey tam olarak o. Once yazdigim sirada
+// satir sessizlik kontrolunun ALTINDA kaliyordu ve pano bos oldugunda HIC basilmiyordu
+// — yani en cok gerektigi anda susuyordu.
+let linearSatiri = null
 try {
-  // §23: iki kavram iki olcum. TARAMA gozcu surecini, TESLIM bildirimin konusmaya ULASTIGINI
-  // olcer; ikisi ayri yone dustugu gun tek sutun SAHTE YESIL verir (olculdu 2026-09-01).
-  const esik = board.esikleriOku ? board.esikleriOku() : null
-  const tarama = board.taramaDurumu
-    ? board.taramaDurumu(sid, Date.now(), esik ? esik.TARAMA_ESIK_TUR : 3)
-    : 'KANITSIZ'
-  const teslim = board.teslimDurumu ? board.teslimDurumu(sid, Date.now()) : 'KANITSIZ'
-  if (tarama !== 'TARIYOR') {
-    mekanizmaSatiri =
-      'MEKANIZMA: gozcun KANITLANMADI (TARAMA=' + tarama + '). Panoyu okudugun kanitli degil — ' +
-      'adresli emir sana ULASMAYABILIR. Kur ve KANITLA: node scripts/board/mechanism-setup.cjs ' +
-      'plan --sid ' + sid + ' --serit <SERIT>  (sonra: prob, dogrula)'
-  } else if (teslim === 'KANITSIZ' || (esik && teslim > esik.TESLIM_ESIK_DK)) {
-    mekanizmaSatiri =
-      'MEKANIZMA — YARIM: gozcu panoyu OKUYOR ama TESLIMAT kanitin ' +
-      (teslim === 'KANITSIZ' ? 'HIC YOK' : teslim + 'dk once, bayat') + '. Imlec tazeligi ' +
-      'teslimati kanitlamaz. Kanitla: mechanism-setup.cjs prob --sid ' + sid + ', sonra ' +
-      'dogrula --sid ' + sid + ' --jeton <bildirimde gordugun>'
-  }
-} catch { /* olcum aracinin kendisi patlarsa brifing yine aksin (fail-open) */ }
+  linearSatiri = require('../../scripts/board/linear-yeni-yorum.cjs')
+} catch {
+  linearSatiri = null // betik yok/bozuk: sayac YOK, kanca calismaya devam eder
+}
 
-if (others.length === 0 && notes.length === 0 && seritAldiMi && !mekanizmaSatiri) process.exit(0)
+async function linearCizgisi() {
+  if (!linearSatiri || typeof linearSatiri.satir !== 'function') return null
+  try {
+    return await linearSatiri.satir()
+  } catch {
+    return null // anahtar yok / ag yok / zaman asimi: SESSIZ, hata basmaz
+  }
+}
+
+void (async () => {
+const linear = await linearCizgisi()
+
+// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok ise
+// brifing hic akmaz.
+if (others.length === 0 && notes.length === 0 && seritAldiMi && !linear) process.exit(0)
 
 const lines = []
-if (mekanizmaSatiri) lines.push(mekanizmaSatiri)
+if (linear) lines.push(linear)
 if (others.length > 0) {
   lines.push('PANO: ' + others.map(c => {
     const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
@@ -124,3 +154,4 @@ process.stdout.write(JSON.stringify({
     additionalContext: lines.join('\n'),
   },
 }))
+})()

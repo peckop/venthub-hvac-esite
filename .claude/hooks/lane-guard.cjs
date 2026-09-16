@@ -21,8 +21,18 @@ function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
 }
 
+// §9.7: bozuk/boş stdin → fail-OPEN ama SESSİZ DEĞİL. Bu kanca pano hatalarında zaten
+// stderr'e yazıyordu; stdin hâli sessizdi — aynı kurala getirildi.
 let input = {}
-try { input = JSON.parse(readStdin() || '{}') } catch { process.exit(0) }
+const hamGirdi = readStdin()
+if (!String(hamGirdi).trim()) {
+  process.stderr.write('[lane-guard] stdin okunamadi (bos), karisilmadi\n')
+  process.exit(0)
+}
+try { input = JSON.parse(hamGirdi) } catch {
+  process.stderr.write('[lane-guard] stdin okunamadi (bozuk JSON), karisilmadi\n')
+  process.exit(0)
+}
 
 const filePath = (input.tool_input && input.tool_input.file_path) || ''
 const sid = input.session_id || ''

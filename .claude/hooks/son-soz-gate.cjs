@@ -10,8 +10,16 @@ const fs = require('fs');
 let raw = '';
 process.stdin.on('data', (c) => { raw += c; });
 process.stdin.on('end', () => {
+  // §9.7: bozuk/boş stdin → fail-OPEN ama SESSİZ DEĞİL (turu bloklamaz, ölçemediğini söyler).
   let input;
-  try { input = JSON.parse(raw); } catch { process.exit(0); }
+  if (!String(raw).trim()) {
+    process.stderr.write('[son-soz-gate] stdin okunamadi (bos), karisilmadi\n');
+    process.exit(0);
+  }
+  try { input = JSON.parse(raw); } catch {
+    process.stderr.write('[son-soz-gate] stdin okunamadi (bozuk JSON), karisilmadi\n');
+    process.exit(0);
+  }
   if (input.stop_hook_active) process.exit(0); // döngü koruması: kapı zaten devrede
   const tp = input.transcript_path;
   if (!tp || !fs.existsSync(tp)) process.exit(0);
