@@ -7,10 +7,10 @@
     "03-planlar": "97a728e96160b3fc14fefd0fb101c1649665a163f70ebd2dbdf90cbdccd2702d",
     "04-olcumler-audits": "9389cac80fd356e5c10984404191058aad82efc8033f75a08af029e5acf380af",
     "05-arsiv": "de99a6033b921171334913dcc1e7e9a92b3368e723c87f4ab3161effc47d2753",
-    "06-hafiza-notlari-1": "47cad026ac5e2a01b3fcadb0630d364119be275bde8bdf8994dab12ddba89f12",
-    "06-hafiza-notlari-2": "df3c4a2e724f5fd75c9e03e52809edf0290a48b8aeff3283639259e09ba25c2a",
-    "06-hafiza-notlari-3": "fc9ef1095a33e0ea94cf2a2806b1fa66d735bc80c472ff966adb93fc8bb2de07",
-    "07-hafiza-gunluk-ops": "54395f5765c4c964c0606218bb3d17cd7c7af70895a8419ac5679aafc8fa170b",
+    "06-hafiza-notlari-1": "c98fe3fd91116c20baa2236b83f7759a35f340f644aebf8d270c215fe4c5c893",
+    "06-hafiza-notlari-2": "1d37e9f885b238dad97533c791b03a075075804bd98973ff56c3710a745fd967",
+    "06-hafiza-notlari-3": "991bb7d39f98799877af6f376db5561839096cd1f3c5b20a7c14516ad4da5818",
+    "07-hafiza-gunluk-ops": "bc0f91f11e226c805661e206aee358b373e3ae8ed1c8fb0941a840bde72221a6",
     "08-linear-kararlar": "afec80e7cf442c49d73f802277d3e457efd1c212a7ef04d6fb0cc70ff43b25e6",
     "09-linear-anahtar-ve-is-kayitlari": "a142af3dcc3c110e0fee1a3a7003cc17daf9d2db8643e1629020266c51e1993c",
     "10-design-15a-briefler": "42004b01f2f31aebd7bcf47fa6d15310606adf2bebe38df4227ddaf664e78b12",
@@ -28,7 +28,7 @@
     "14-design-notlari-2": "b03cbb35fbacc04a6f7dd4b30e05f4984cdfdb93392d151d43f6a815fe79a93b",
     "15-linear-is-dagilimi": "243d684ca726d362d7dc9e2c37ab2b83c6a73aa10c889c2d819ea503a17215db",
     "16-kurulum-ve-kapi-notlari": "e9678667841e257f961b0d03acfd4fa3611a52ffd48ba8866246ff0e49b35629",
-    "06-hafiza-notlari-4": "110c3c421f18908d32e03e0c426820ffe2ddfd4b506dd9970dcd32461eda250f"
+    "06-hafiza-notlari-4": "df8133103ff83eb6257e811627e44e51e405d95881725c4bd77c3fa6bec82610"
   },
   "gun_kapanisi": {
     "damga": "2026-09-07T21:02:54Z",
