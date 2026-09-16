@@ -360,3 +360,135 @@ describe('INV-KANCA-DEFTER-2 · olc cikis 3 bir CEVAPTIR, ariza degil', () => {
     expect(cetvel, 'cetvel cikis 3 sozlesmesini yazmiyor').toMatch(/çıkış 3 = değişen var/i)
   })
 })
+
+/**
+ * INV-KANCA-DEFTER-4 — ŞEMA TABANI satırı (Recep sorusu, 2026-09-16).
+ *
+ * Recep aynen: *"bende DB'de değişiklik yaptığım an senin kendi yedeğin bayat olacak;
+ * tekrardan onu tazelemek yine 2 gün mü sürecek?"*
+ *
+ * ⭐SATIR NİÇİN BU KANCADA: aynı ölçümü yapan bir CI kapısı var (`taban-tazeligi.test.ts`)
+ * ama o yalnız PR'da konuşur. Recep'in sorduğu an PR anı DEĞİL, **karar anıdır** — REC-342'nin
+ * dersi tam buydu. Ayrıca yeni bir kanca eklemek node açılışını (170-292 ms) ikinci kez
+ * öder; satır MEVCUT kancaya eklendi.
+ *
+ * ⭐ÖLÇÜT SIR GEREKTİRMEZ ve bunu Recep'in kendi düzeltmesi mümkün kıldı: *"ben kendim bir
+ * müdahale ile yapmıyorum, size yaptırıyorum ve gerekirse migration onayı veriyorum."*
+ * Yani DB'ye giden her değişiklik onaylanmış bir migration DOSYASIDIR → bayatlık sorusu
+ * tamamen dosya adlarından cevaplanır.
+ */
+describe('INV-KANCA-DEFTER-4 · sema tabani tazeligi satiri', () => {
+  /** Taban + migration taşıyan geçici depo. `politika` = taban TAM mı (create policy var mı). */
+  function tabanliDepoKur(
+    tabanTarih: string | null,
+    migrationAdlari: string[],
+    opts: { politika?: boolean; ekTaban?: { tarih: string; politika: boolean } } = {},
+  ): string {
+    const kok = depoKur(0, new Date().toISOString().slice(0, 10))
+    const tabanDizin = path.join(kok, 'supabase', 'baselines')
+    const migDizin = path.join(kok, 'supabase', 'migrations')
+    fs.mkdirSync(tabanDizin, { recursive: true })
+    fs.mkdirSync(migDizin, { recursive: true })
+
+    const govde = (tam: boolean): string =>
+      tam
+        ? 'CREATE TABLE "public"."x" (id int);\nCREATE POLICY "p" ON "public"."x" USING (true);\n'
+        : 'CREATE TABLE "public"."x" (id int);\n'
+
+    if (tabanTarih) {
+      fs.writeFileSync(
+        path.join(tabanDizin, `${tabanTarih}_public_schema.sql`),
+        govde(opts.politika !== false),
+        'utf8',
+      )
+    }
+    if (opts.ekTaban) {
+      fs.writeFileSync(
+        path.join(tabanDizin, `${opts.ekTaban.tarih}_public_schema.sql`),
+        govde(opts.ekTaban.politika),
+        'utf8',
+      )
+    }
+    for (const ad of migrationAdlari) {
+      fs.writeFileSync(path.join(migDizin, ad), 'select 1;\n', 'utf8')
+    }
+    return kok
+  }
+
+  const tabanSatiri = (cikti: string): string =>
+    cikti.split('\n').find((s) => s.includes('TABAN')) ?? ''
+
+  it('⭐ASIL İDDİA — taban TAZEYSE satır ⚠ TAŞIMAZ ve TARİHİ yazar', () => {
+    const kok = tabanliDepoKur('2026-09-15', ['20260914090000_bir_sey.sql'])
+    const satir = tabanSatiri(kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK)).stdout)
+    expect(satir, 'TABAN satiri hic basilmadi').toContain('TABAN:')
+    expect(satir, 'taze tabanda ⚠ var').not.toContain('⚠')
+    expect(satir).toContain('2026-09-15')
+    expect(satir).toContain('sonrasinda migration yok')
+  })
+
+  it('⭐DÖNÜŞ YÖNÜ — tabandan SONRA migration varsa ⚠ ve SAYI yazılır (kapı iki yönlü)', () => {
+    const kok = tabanliDepoKur('2026-09-15', [
+      '20260916120000_yeni_bir_sey.sql',
+      '20260917130000_baska_sey.sql',
+    ])
+    const r = kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK))
+    const satir = tabanSatiri(r.stdout)
+    expect(satir).toContain('⚠TABAN:')
+    expect(satir, 'sonradan gelen migration SAYISI yazilmamis').toContain('SONRASINDA 2 migration')
+    // Kırmızı gören kişinin NE YAPACAĞI satırda olmalı; yoksa uyarı bir bilmeceye döner.
+    expect(r.stdout, 'ONARIM yolu yazilmamis').toContain('sema-tabani-uret.yml')
+  })
+
+  it('⭐KISMİ TABAN SEÇİLMEZ — "en yeni dosya bir seçim kuralı değildir" (2026-09-14 hatası)', () => {
+    // Daha YENİ ama KISMİ (create policy YOK) bir dosya var; kanca ESKİ ama TAM olanı seçmeli.
+    const kok = tabanliDepoKur('2026-09-15', ['20260916120000_yeni.sql'], {
+      politika: true,
+      ekTaban: { tarih: '2026-09-20', politika: false },
+    })
+    const satir = tabanSatiri(kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK)).stdout)
+    expect(satir, 'KISMI dosya taban secilmis (2026-09-20)').not.toContain('2026-09-20')
+    expect(satir, 'TAM taban secilmemis').toContain('2026-09-15')
+    // Ve seçim doğru yapıldığı için 09-16'lı migration BAYAT olarak görünmeli.
+    expect(satir).toContain('⚠TABAN:')
+  })
+
+  it('⭐ÖLÇEMEDİ ≠ TAZE — TAM taban yoksa satır SEBEBİ YAZAR, sessiz kalmaz', () => {
+    const kok = tabanliDepoKur('2026-09-15', ['20260914090000_bir_sey.sql'], { politika: false })
+    const satir = tabanSatiri(kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK)).stdout)
+    expect(satir).toContain('⚠TABAN: OLCULEMEDI')
+    expect(satir, 'sebep yazilmamis').toMatch(/TAM taban yok/i)
+  })
+
+  it('⭐ÜÇ DAMGA BİÇİMİ DE GÖRÜLÜR — 12 haneli dosya sessizce düşmez (yazarını yakalayan kol)', () => {
+    // Sahada ÜÇ biçim var: 14, 12 ve 8 hane. Bu kapı ilk yazıldığında 12 hane TANINMIYORDU ve
+    // 13 dosya karşılaştırmadan sessizce düşüyordu — kol o kusuru yakaladı.
+    const kok = tabanliDepoKur('2026-09-15', ['202609161200_oniki_haneli.sql'])
+    const satir = tabanSatiri(kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK)).stdout)
+    expect(satir, '12 haneli damga GORULMEDI — kapi yanlis yesil verir').toContain(
+      'SONRASINDA 1 migration',
+    )
+
+    const kok8 = tabanliDepoKur('2026-09-15', ['20260916_sekiz_haneli.sql'])
+    const satir8 = tabanSatiri(kos(SATIR_KANCA, kok8, panoKur(TAZE_ONBELLEK)).stdout)
+    expect(satir8, '8 haneli damga GORULMEDI').toContain('SONRASINDA 1 migration')
+  })
+
+  it('DAMGASI ÇÖZÜLEMEYEN dosya SESSİZ GEÇMEZ — sayısı satıra yazılır', () => {
+    const kok = tabanliDepoKur('2026-09-15', ['damgasiz_dosya.sql'])
+    const satir = tabanSatiri(kos(SATIR_KANCA, kok, panoKur(TAZE_ONBELLEK)).stdout)
+    expect(satir).toContain('⚠TABAN:')
+    expect(satir, 'cozulemeyen damga sayisi yazilmamis').toContain('damgasi cozulemeyen 1')
+  })
+
+  it('CI KAPISI ile BU SATIR AYNI ÖLÇÜTÜ paylaşır — ikisi de orphan değil', () => {
+    // Satır karar anında konuşur, kapı PR'da bloklar. Biri silinirse öteki yalnız kalır;
+    // bu kol ikisinin de VAR olduğunu ölçer.
+    const kapi = path.resolve(__dirname, 'taban-tazeligi.test.ts')
+    expect(fs.existsSync(kapi), `CI kapisi YOK: ${kapi}`).toBe(true)
+    const kapiMetin = fs.readFileSync(kapi, 'utf8')
+    expect(kapiMetin, 'kapi ayni olcutu (create policy) kullanmiyor').toMatch(/create\\s\+policy/i)
+    const kanca = fs.readFileSync(SATIR_KANCA, 'utf8')
+    expect(kanca, 'kanca ayni olcutu kullanmiyor').toMatch(/create\\s\+policy/i)
+  })
+})
