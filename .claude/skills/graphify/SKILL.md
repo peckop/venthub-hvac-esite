@@ -1,6 +1,6 @@
 ---
 name: graphify
-description: "Codebase structure via the knowledge graph in graphify-out/. Adopted verbs ONLY: affected <name>() for blast radius, god-nodes for hubs, explain for a concept and its neighbors, diagnose multigraph for graph health. Second opinion when codegraph is stale. NOT for DB policies or indexes."
+description: "Use for any question about a codebase, its architecture, file relationships, or project content — especially when graphify-out/ exists, where the question is treated as a graphify query first. Verbs: query, path, explain, affected, god-nodes, diagnose multigraph, update."
 ---
 
 # /graphify
