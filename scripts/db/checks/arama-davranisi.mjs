@@ -77,21 +77,32 @@ const VAKALAR = [
 ]
 
 /**
- * BİLİNEN KIRMIZILAR — 2026-09-15 prod ölçümü, REC-340 Faz 1 Adım 1.
+ * BİLİNEN KIRMIZILAR — ⭐LİSTE 09-16'DA KÜÇÜLDÜ (mandalın ikinci yönü işledi).
  *
- * Ölçülen sonuç sayıları: 1→47 · 2→**0** · 3→**0** · 4→**0** · 5→**0** · 6→9 · 7→1 ·
- * 8→52 · 9→**0** · 10→3 (vaka 6'nın kümesiyle AYNI DEĞİL; ilk satır kimliği de farklı).
+ * 2026-09-15 prod ölçümü (Adım 1): 1→47 · 2→**0** · 3→**0** · 4→**0** · 5→**0** · 6→9 ·
+ * 7→1 · 8→52 · 9→**0** · 10→3.
+ *
+ * 2026-09-16 prod ölçümü (REC-340 Faz 1 **Adım 2** canlıya indi, PR #1221 · squash 70a81b11):
+ * vaka 3 "jet fan" **0 → 61** · vaka 4 "fan jet" **0 → 61 (vaka 3 ile AYNI KÜME)** ·
+ * yan ölçümler: "asit dayanımlı fan" 0 → 80, "banyo" 4 → 40, "kanal tipi fan" 52 → 66,
+ * "havalandırma" 47 → 50, VRT-17160 **1** (kesinlik regresyonu YOK).
+ *
+ * ⭐3 VE 4 BU YÜZDEN LİSTEDEN ÇIKARILDI. Mandalın ikinci yönü tam bunun için var: düzeltme
+ * geldiğinde ilan satırının kalması kapıyı KIRMIZI yapar ve nitekim yaptı (master be88580ea,
+ * "İHLAL 2 — ilan BAYAT"). Satırı silmek düzeltme işinin PARÇASIdır, ayrı bir iş değil.
+ *
+ * ⚠VAKA 9'UN GEREKÇESİ DEĞİŞTİ, KOPYALANMADI: eskiden "vaka 3 ile aynı kök" yazıyordu.
+ * Adım 2 gövde genişletmesini canlıya indirdi ve vaka 3 düzeldi, ama vaka 9 HÂLÂ 0 —
+ * yani kök AYNI DEĞİLDİ. Ölçüm bir varsayımı çürüttü; satır ona göre yazıldı.
  *
  * Her satır NİÇİN kırmızı olduğunu ve düzeltmenin HANGİ adımda geldiğini yazar. Gerekçesiz
  * satır kabul edilmez (kardeş kapı `catalog-integrity` ile aynı kural).
  */
 const BILINEN_KIRMIZI = {
-  2: 'Turkce karakter normalizasyonu YOK: "havalandirma" (noktasiz) 0 donuyor, "havalandırma" 47. Duzeltme: REC-340 Faz 1 Adim 2 (unaccent).',
-  3: 'Aile/kategori adi arama govdesine GIRMIYOR: "jet fan" 0. Duzeltme: REC-340 Faz 1 Adim 3 (govde genisletme).',
-  4: 'Vaka 3 e bagli: referans kume bos oldugu icin kelime sirasi olculemez. Vaka 3 duzelince kendiliginden olculur.',
+  2: 'Turkce karakter normalizasyonu YOK: "havalandirma" (noktasiz) 0 donuyor, "havalandırma" 50. Duzeltme: REC-340 Faz 1 Adim 3 (unaccent) — Adim 2 govdeyi genisletti ama normalizasyon getirmedi.',
   5: 'Yazim hatasi toleransi YOK: "vortis" 0. Duzeltme: REC-340 Faz 1 Adim 3 (trigram yedegi).',
-  9: '"duvar tipi aspirator" 0: terim urun ADINDA gecmiyor, kategori/aile adi govdede olmadigi icin bulunamiyor. Vaka 3 ile ayni kok.',
-  10: 'Buyuk harf + noktasiz "ISI GERI KAZANIM" 3 sonuc veriyor, kucuk harfli hali 9 — AYNI KUME DEGIL (ilk satir kimligi de farkli). Duzeltme: REC-340 Faz 1 Adim 2.',
+  9: '"duvar tipi aspirator" HALA 0 — Adim 2 govde genisletmesi canliya indi ve vaka 3 duzeldi, bu duzelmedi; yani kok vaka 3 ile AYNI DEGILDI (eski ilan boyle saniyordu, olcum curuttu). Duzeltme: REC-340 Faz 1 Adim 3.',
+  10: 'Buyuk harf + noktasiz "ISI GERI KAZANIM" 3 sonuc veriyor, kucuk harfli hali 9 — AYNI KUME DEGIL (ilk satir kimligi de farkli). Duzeltme: REC-340 Faz 1 Adim 3 (normalizasyon).',
 }
 
 function baglantiDizesi() {
