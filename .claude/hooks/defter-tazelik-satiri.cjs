@@ -205,4 +205,66 @@ try {
   process.stdout.write('⚠BAGIMLILIK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+/**
+ * ÜÇÜNCÜ SATIR — ŞEMA TABANI TAZELİĞİ (INV-TABAN-TAZE-1'in görünen yüzü)
+ *
+ * ⭐NİÇİN BURADA, YENİ BİR KANCADA DEĞİL: node yorumlayıcısının açılışı tek başına
+ * 170-292 ms ölçüldü (REC-345). İkinci bir kanca eklemek aynı bilgiyi iki kat bedelle
+ * gösterir. Bu yüzden satır MEVCUT kancaya ekleniyor; kancanın kendi işi ~135-240 ms
+ * bandında kalır.
+ *
+ * ⭐NİÇİN GÖRÜNÜR OLMASI ŞART (REC-342 dersi): aynı ölçümü yapan bir CI kapısı var
+ * (`taban-tazeligi.test.ts`) ama o yalnız PR'da konuşur. Recep'in sorusu *"DB'de değişiklik
+ * yaptığım an yedeğin bayat olacak, tazelemek yine 2 gün mü sürecek"* — o an PR anı DEĞİL,
+ * karar anıdır. Ölçen ama kararın verildiği yerde görünmeyen kapı, görünmeyen kapıdır.
+ *
+ * ÖLÇÜT tamamen dosya adlarından: en yeni TAM taban tarihi ↔ en yeni migration damgası.
+ * Sır yok, ağ yok. Gerekçe Recep'in kendi düzeltmesi: DB'ye giden her değişiklik onaylanmış
+ * bir migration dosyasıdır.
+ */
+try {
+  const TABAN_DIZIN = path.join(DEPO, 'supabase', 'baselines')
+  const MIG_DIZIN = path.join(DEPO, 'supabase', 'migrations')
+
+  // TAM/KISMİ ayrımı dosya ADIYLA değil İÇERİKLE yapılır: tam döküm RLS politikası taşır.
+  // (2026-09-14'te "en yeni dosya" seçilip kısmi bir döküm taban sanılmıştı.)
+  const tabanlar = fs
+    .readdirSync(TABAN_DIZIN)
+    .filter((a) => /^\d{4}-\d{2}-\d{2}_public_schema\.sql$/.test(a))
+    .filter((a) => /create\s+policy/i.test(fs.readFileSync(path.join(TABAN_DIZIN, a), 'utf8')))
+    .sort()
+  if (tabanlar.length === 0) throw new Error('TAM taban yok (create policy gecen dosya 0)')
+  const tabanTarih = tabanlar.slice(-1)[0].slice(0, 10)
+
+  // Sahada ÜÇ damga biçimi var: 14, 12 ve 8 hane. Üçü de ayrıştırılır — okunamayan dosya
+  // karşılaştırmadan sessizce düşerse satır YANLIŞ "taze" der.
+  const damga = (ad) => {
+    const m = /^(\d{8})(\d{4}|\d{6})?_/.exec(ad)
+    return m ? m[1].slice(0, 4) + '-' + m[1].slice(4, 6) + '-' + m[1].slice(6, 8) : null
+  }
+  const migler = fs.readdirSync(MIG_DIZIN).filter((a) => a.endsWith('.sql'))
+  const cozulemeyen = migler.filter((a) => damga(a) === null).length
+  const sonra = migler.filter((a) => {
+    const t = damga(a)
+    return t !== null && t > tabanTarih
+  })
+
+  const gun = Math.floor((Date.now() - Date.parse(tabanTarih)) / 86_400_000)
+  const parca = ['taban ' + tabanTarih + ' (' + gun + ' gun)']
+  if (sonra.length > 0) parca.push('SONRASINDA ' + sonra.length + ' migration')
+  else parca.push('sonrasinda migration yok')
+  if (cozulemeyen > 0) parca.push('⚠damgasi cozulemeyen ' + cozulemeyen)
+
+  const uyar = sonra.length > 0 || cozulemeyen > 0
+  process.stdout.write((uyar ? '⚠TABAN: ' : 'TABAN: ') + parca.join(' · ') + '\n')
+  if (sonra.length > 0) {
+    process.stdout.write(
+      '  ONARIM: sema-tabani-uret.yml elle tetiklenir (salt-okuma, ~57 sn), cikti artefakt, INSAN PR acar\n',
+    )
+  }
+} catch (e) {
+  // ÖLÇEMEDİM ≠ TAZE.
+  process.stdout.write('⚠TABAN: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)
