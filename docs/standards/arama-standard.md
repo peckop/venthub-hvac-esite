@@ -164,6 +164,35 @@ bulmalıdır. İki ölçülmüş tuzak:
 
 **K6.6 — Yazım hatası yedeği hassasiyeti düşürür; tavanı vardır.** Bkz. K8.4.
 
+**⛔K6.4a — TRIGRAM YAZIM HATASI İÇİN YANLIŞ ARAÇTIR.** *(2026-09-16, 442 ürünle ölçüldü —
+K6.4'ün trigram önerisini ÇÜRÜTÜR; K6.4 oradaki iki tuzak için doğru kalır ama araç seçimi
+yanlıştı.)* Eşikli trigram bazı hatayı affeder bazısını affetmez: `vortis`/`santrifuj`/`aspiratr`
+geçerken `nikotra`/`plug fen`/`kanal tipi fann` düşüyordu. Eşiksiz sıralama **daha kötüdür**:
+`"kanal tipi fann"` → *"12 kW Elektrikli Isıtıcı"*, `"zzzqqq"` → Vortice ürünleri.
+**Doğru ölçüt harf mesafesidir** (`levenshtein`), üç-harf parçacığı benzerliği değil.
+
+**⭐K6.4b — ADAY ÜRET + DOĞRULA.** Yazım hatası dalı tek araçla kurulmaz: hızlı bir indeks
+(pgroonga `fuzzy_search`) **aday** üretir, harf mesafesi bu adayları **doğrular**. Doğrulama iki
+kural taşır ve ikisi de ölçülmüştür:
+- **İlk üç harf tutmalıdır.** `vortis`→`vortice` tutar (meşru), `kasals`→`kanal` tutmaz. Bu şart
+  olmadan `"kasals"` araması **224 alakasız kanal ürünü** döndürüyordu.
+- **Gövde kelimesi sorgu uzunluğuna kırpılır.** Türkçe eki mesafeyi şişirir:
+  `aspiratr` ↔ `aspiratorler` mesafe **4**, kırpınca **1**.
+
+**K6.4c — Yazım hatası düzeltmesi önce MARKA sözlüğüne bakar, sözlük SABİT DEĞİLDİR.** Marka
+kelimeleri `brands` tablosundan türetilir; yeni marka eklenince düzeltme kendiliğinden kapsar.
+Katalogda **olmayan** bir marka arandığında doğru davranış **boş dönmektir** (ölçüldü: `kasals`,
+`fleksiva` → 0).
+
+**⭐K6.7 — TOKENIZER SEÇİMİ TÜRKÇE İÇİN YAPILANDIRMA DEĞİL, DOĞRULUK MESELESİDİR.**
+pgroonga'nın varsayılan tokenizer'ı alfabetik dizileri **kelime bazlı** işler; Türkçe sondan
+eklemeli olduğu için `"fanlar"` tek token olur ve `"fan"` araması onu **bulamaz**. Ölçüldü
+(442 ürün): varsayılanla `jet`+`fan` kesişimi **0**, `TokenBigramSplitSymbolAlphaDigit` ile
+**61** — sıralı taramayla birebir.
+⚠**Aynı indeks ek toleransı ile yazım hatası toleransını BİRLİKTE veremez:** ek toleranslı
+indekste `fuzzy_search` bigram'lar üzerinde çalışır ve anlamsızlaşır (`vortis` mesafe 2 →
+**442/442**). Bu yüzden **iki sütun, iki indeks** gerekir: aynı metin, iki tokenizer.
+
 ## 7. Tenant ve yetki (kural 12)
 
 **K7.1** — Arama RPC'leri **`SECURITY INVOKER`** kalır (`prosecdef = false`). Bugün üçü de öyle ve
@@ -308,11 +337,24 @@ TRUNCATE/REFERENCES/TRIGGER) veriyor — ölçüldü. RLS yazmayı zaten reddede
 tek katmana güvenilmez: içeriği zehirlenirse kullanıcıya **yanlış ürün** gösterilir. Bu yüzden
 `REVOKE ALL` + `GRANT SELECT` yazılır ve kuyruk tablosunda okuma da kapatılır.
 
-**K12.2 — `unaccent` IMMUTABLE değildir** (STABLE'dır), bu yüzden indeks ifadesinde ya da
-üretilmiş sütunda doğrudan kullanılamaz; IMMUTABLE sarmalayıcı gerekir. **Kurulumdan sonra
-`select proname, provolatile from pg_proc where proname='unaccent'` ile doğrulanır ve sonuç
-migration guard'ına yazılır.** *(Bu satır belge okumasına dayanıyor; bu veritabanında henüz
-ölçülmedi çünkü eklenti kurulu değil.)*
+**K12.1c — K12.1'in yasağı TÜREV sütunları kapsamaz.** K12.1 gövdenin kendisi içindir: gövde
+başka tablolara (aile, kategori) bakmak zorunda olduğu için üretilmiş sütun olamaz. Ama
+gövdeden **aynı satır içinde** türetilen sütunlar (normalize edilmiş arama metni gibi)
+üretilmiş sütun **olmalıdır** — böylece tetik değişikliği gerekmez, gövde değişince türev
+kendiliğinden tazelenir. Şart: ifade IMMUTABLE olmalı (`lower`, `translate` öyledir).
+
+**⛔K12.5 — pgroonga indeksi o sütundaki `LIKE` SORGULARINI DA ELE GEÇİRİR.** Bir sütuna
+pgroonga indeksi kurulduğunda mevcut `LIKE '%...%'` sorguları da indeksten cevaplanır ve
+**yanlış tokenizer ile yanlış sonuç verirler.** Ölçüldü: sıralı tarama 61 satır dönerken
+indeksli aynı sorgu **0** döndü; doğru tokenizer'la ikisi birebir aynı oldu. Bu yüzden pgroonga
+eklenen her sütun için, o sütunu okuyan **mevcut** sorgular da yeniden ölçülür — indeks eklemek
+burada "yalnız hızlandırma" değildir, **sonuç değiştirebilir.**
+
+**K12.2 — `unaccent` GEREKMEDİ; kalem ölçümle DÜŞTÜ.** *(2026-09-16)* `translate(lower(x),
+'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu')` hem aksan körlüğünü hem Türkçe küçültmeyi çözüyor ve
+IMMUTABLE olduğu için üretilmiş sütunda doğrudan kullanılabiliyor. Bu ölçüm bir migration
+kalemini ve bir onay adımını tamamen düşürdü. *(Eklenti yine de kurulursa eski uyarı geçerlidir:
+`unaccent` STABLE'dır, indeks ifadesinde IMMUTABLE sarmalayıcı ister.)*
 
 **K12.3 — RPC imzası (`RETURNS TABLE`) değiştirilmez.** İmza değişikliği `drop` + `create`
 gerektirir; `drop` mevcut `GRANT`'leri de götürür ve arama anonim kullanıcıda **sessizce ölür**.
@@ -332,6 +374,30 @@ tuzağı yalnız çalışma anında görünür — tanım metni temiz görünür
 
 **K13.3 — Guard yetkiyi de doğrular.** `has_function_privilege('anon', ...)` — "değişmedi"
 varsayımı ölçüm değildir.
+
+**⭐K13.4 — ARAMA MIGRATION'I KONTROL LİSTESİ.** *(2026-09-16: tek bir migration'da İKİ kusur
+bırakıldı, ikisinin de emsali depoda yazılıydı. Kapıya bağlı tek madde yakalandı, kapısız
+dördünden ikisi kaçtı. Bu liste hatırlanmaz, **okunur.**)* Arama migration'ı açılmadan önce
+her madde tek tek işaretlenir:
+
+1. **`lock_timeout` + `statement_timeout` yazıldı mı** ve süre **ölçülerek mi** seçildi?
+   (Emsalden kopyalanan süre gerekçe değildir; koşum süresi ölçülür, pay yazılır.)
+2. **Yeni fonksiyonlardan `EXECUTE` açıkça geri alındı mı?** `pg_default_acl` bu veritabanında
+   her yeni fonksiyona `EXECUTE to PUBLIC` verir. Dışa açık uçlar **tek tek** `GRANT` edilir.
+3. **Yeni tablolarda `REVOKE ALL` + hedefli `GRANT` yazıldı mı?** (K12.1b)
+4. **`pnpm supabase:gen` koşturuldu mu?** Yeni tablo/sütun tip dosyasına yansımazsa filo-geniş
+   `INV-TIP-DRIFT-1` kırmızısı doğar.
+   ⚠**Sıra inceliği:** `supabase:gen` **canlıdan** üretir, yani migration merge olmadan yeni
+   sütunları göremez. Bu yüzden tip tazelemesi aynı PR'a **konamaz**; merge'den hemen sonra
+   ayrı ve küçük bir PR olarak gelir. Bu borç, migration PR'ının gövdesinde **adıyla yazılır**
+   — yoksa kapı ertesi gün başkasının PR'ında kırmızı yanar.
+5. **Opclass, operatör ve fonksiyonlar şema-nitelikli mi** ya da `search_path`'e `extensions`
+   eklendi mi? (K5.3, K5.3a — tanım metni temiz görünür, yalnız çalışma anında patlar.)
+6. **Guard davranış ölçüyor mu**, sabit sayı kullanıyor mu (K8.3 ihlali), **boş veritabanında
+   `NOTICE` ile atlıyor mu**?
+7. **Migration gölgede koşturuldu mu**, ve **ikinci kez** koşturulunca hatasız geçiyor mu?
+8. **Bu sütunu okuyan MEVCUT sorgular yeniden ölçüldü mü?** (K12.5 — indeks eklemek sonuç
+   değiştirebilir.)
 
 ---
 
