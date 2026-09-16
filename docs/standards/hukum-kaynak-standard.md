@@ -67,6 +67,12 @@ hüküm buraya yazılır. Sayı düşerse devir tartışılabilir; düşmezse ta
 | 2 | "kategoriler boş, veri bozuk, plan değişsin" | 433/441 alt kategorili, katalog sağlam | tek alana bakıldı, şema okunmadı |
 | 3 | "graphify'ın komutu bozuk" | komut yanlış kullanılmış; `affected` ile **doğru** cevap veriyor | B sınıfı kaynak A gibi sunuldu ve bozularak özetlendi |
 | 4 | "kurulum kural dosyasına kalıcı blok yazıyor, kurmayalım" | üç satırlık ad kaydı; tehlikeli olan `--strict` ve o **opsiyonel** | kurulumun ne yaptığı ölçülmeden hüküm verildi |
+| 5 | "kurulum **sadece** üç satır kaydediyor" | ayrıca **iki `PreToolUse` kancası** kuruyor (`Bash\|Grep` → `hook-guard search`, `Read\|Glob` → `hook-guard read`), yani her arama ve her dosya okumasına takılıyor | 4'ü düzeltirken **ikinci kez eksik ölçtüm**: yardım metnine ve başka şeridin özetine dayandım, **kaynak kodu okumadım** |
+
+⭐**5 numara ayrı bir sınıf:** bu, 4 numaranın *düzeltmesiydi* ve düzeltme de eksik çıktı.
+Bir hükmü düzeltmek, düzeltmenin ölçülmüş olduğu anlamına gelmez — **düzeltme de A sınıfı
+kaynak ister.** Kaynak kodu okunduğunda (`install.py:324-352`, `cli.py:55-70, 814-840`)
+kurulumun üç ayrı etkisi olduğu görüldü: skill dosyası · üç satır kayıt · iki kanca.
 
 ⭐**2 numara en pahalısı:** yanlış sayı yalnız yanlış bilgi değil, **iş sırasını da değiştirdi** —
 Recep'e "bu adımı yapma, önce kataloğu düzelt" denildi. Ölçüm yanlışsa plan da yanlış kurulur.
