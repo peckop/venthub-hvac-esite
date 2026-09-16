@@ -32,7 +32,30 @@
 - **PR #1237 (açık):** `verify-on-stop`'a `vitest related` koşumu + "testsiz değişiklik" sayacı.
   Simülasyon: 2 test dosyası geçti, `layout.tsx` testsiz 1/2. Bloklamaz; bir ay sonra kapı kararı.
 
-## 2.5 · Bu akşam (09-16): WrongStack'ten üç uyarlama — "var mı yok mu" ve plan
+## 2.4 · Bu akşam (09-16), ilk paylaşım: WrongStack'in kod-anlama katmanı — "var mı yok mu"
+
+Recep'in ilk paylaştığı metin: "read/tree/grep/glob verince model projeyi anladığını sanır;
+WrongStack codebase index, code skeleton, codemap, import graph, impact analysis ile haritalar;
+Sage Memory bilgiyi sembole/commit'e/dosyaya iliştirir." Ölçüm: WrongStack README +
+`packages/codebase-index-mcp/README.md` + `packages/sage/README.md` (klon) ve bizim CodeGraph
+skill'i, `docs/audits/kod-grafigi-uc-arac-mukayese-2026-09-16.md` (#1218), graphify kurulumu (#1217).
+
+| Özellik | WrongStack'te | Bizde | **Var mı?** | Uyarlama | Süre | Durum |
+|---|---|---|---|---|---|---|
+| Codebase index + import graph | SQLite/FTS5 indeks; `codebase_search/stats/package_graph/file_graph/symbol_graph` (MCP olarak dışa açık) | **CodeGraph MCP** (AST, ~1 sn taze: `explore`, `search`, `node`, `callers`, `callees`, `files`); graphify bugün kuruldu; codebase-memory-mcp aday | **VAR** | Gerek yok. #1218 bulgusu: URUN bugün 5 yanlış hüküm verdi ve **hiçbirinde codegraph'a danışmadı** → sorun araç değil, kullanım; "kurulu aracın kullanım yeri emre yazılır" | — | Kullanım işi, OPS |
+| Impact analysis ("neresi etkilenir, hangi dosyalar birlikte ele alınmalı") | codemap/impact | `codegraph_impact`; graphify `affected` (0,7 sn, parantez şart) | **VAR** | Gerek yok | — | — |
+| Code skeleton (gövdesiz AST özeti, sözleşme korunur) | `codebase-skeleton` aracı | Orion companion `.md`'leri (fonksiyon grupları, importlar, sabitler) yakın; gövdesiz çıktı komutu yok | **Kısmen** | Tek betik (ts-morph) ya da CodeGraph'a "skeleton" komutu; **önce ölç**: gövdesiz özet bağlam tasarrufu sağlıyor mu? | yarım gün | Bekliyor (Recep kararı) |
+| CodeMap (etkileşimli görsel bağımlılık grafiği) | WebUI'de canlı graf | Yok | **YOK** | LLM için gereksiz (CodeGraph metin verir). **Recep için** görsel harita istenirse archify yeniden değerlendirilir | — | İstenirse |
+| Sage Memory (bilgi sembole/commit/test/paket'e çapalı, hash ile yeniden doğrulanır) | `.wrongstack/memories/` SQLite/FTS5, `anchors/`, "anchored memories re-verified as targets change" | NotebookLM ikizi + `docs/` + Kararlar + eylem defteri (**küratörlü**); claude-mem denemesi (**otomatik**); defter bayatlık kancası | **Kısmen** | En güçlü fikir: **çapa + hash ile bayatlık ölçümü**. claude-mem 14. gün kararına bağlı; red olursa `task-observer` gözlemine `dosya + hash` alanı, bayatlık kancası okur | — | 23 Eylül |
+| `codebase-index-mcp`'yi bize bağlamak | stdio MCP, salt-okuma | 3 kod grafiği aracı zaten var | — | **Şimdi değil**: #1218 kuralı "sahiplik ölçüt değildir", hangisi iyi bulur ancak **yan yana koşum** ile; o ölçüm graphify için bile yapılmadı. Sıra: önce graphify ↔ codegraph, sonra dördüncü | — | Ertelendi |
+| Veritabanı şeması haritası (Recep'in asıl isteği) | WrongStack de görmez | Üç kod aracının hiçbiri görmez; ALTYAPI **şema graf üreticisi** (#1220, DB'nin kendi kataloğundan) | **Ayrı iş, başladı** | Recep: "Supabase'i gördük, hallettik" | — | Kapandı |
+
+**Hüküm:** paylaşımın anlattığı sorun gerçek ("grep ile dolaşan model"), ama bizde CodeGraph
+kuralıyla bir ay önce çözülmüş; yeni olan iki şey **skeleton** (küçük iş) ve **hafıza çapası**
+(claude-mem'e bağlı). WrongStack'i **kullanmak** gerekmiyor: Claude Code'un alternatifi ve tüm
+mekanizma Claude Code'a yazılı.
+
+## 2.5 · Bu akşam (09-16), ikinci paylaşım: WrongStack'ten üç uyarlama — "var mı yok mu" ve plan
 
 Recep'in sorusu: Ersin Koç'un paylaşımındaki üç şey ("hataları yazıldığı anda bul",
 "Proof-Driven Bug Hunter", "testsiz kod geliştirmem") bizde var mı, uyarlanır mı?
