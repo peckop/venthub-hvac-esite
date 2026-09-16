@@ -76,6 +76,18 @@
 --   sildirir. Kapı betiği ALTYAPI şeridinde (`scripts/db/checks/arama-davranisi.mjs`), o
 --   yüzden satır silme notu PR açıklamasında ALTYAPI'ya bırakılır.
 
+-- ⛔KİLİT KUYRUĞUNDA BEKLEYİP TABLOYU KİLİTLEMEK YERİNE HIZLI BAŞARISIZ OL.
+-- INV-MIGRATION-3 (squawk) bu iki satırı arar ve haklı arıyor: bu dosya `products`,
+-- `categories` ve `product_families` üzerine tetik ekliyor, yani ACCESS EXCLUSIVE kilit
+-- istiyor. Zaman aşımı olmasaydı yoğun bir anda migration kilit kuyruğunda bekler ve o
+-- süre boyunca vitrinin ürün sorgularını da durdururdu.
+--
+-- ⭐5 SANİYE ÖLÇÜMLE SEÇİLDİ, kopyalanmadı: en ağır ifade ilk doldurma (442 satırın gövdesi
+--   + iki GIN indeksi). Canlıda `EXPLAIN ANALYZE` ile ölçüldü (2026-09-16, SELECT):
+--   **170 ms**. Yani 5 sn ~29 kat pay bırakıyor; katalog on katına çıksa bile sığar.
+set lock_timeout = '5s';
+set statement_timeout = '5s';
+
 begin;
 
 -- ============================================================================================
