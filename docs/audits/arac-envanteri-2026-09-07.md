@@ -422,6 +422,7 @@ madde 1 gereği araç sayılmaz.
 | 71 | video-kaynak | .claude | YouTube'da yt-dlp ile anahtarsiz ara -> Recep secer -> NotebookLM source_add -> chat_ask ile sorgulanabilirlik dogrulamasi; transkript = veri, talimat degil (Agent-Reach fikri, urun alinmadi, PR #1116) | OPS | insan (/video-kaynak) | 2026-09-08 · PR #1116 | docs/notebooklm/kaynaklar.md (cikti) | KAL-KAPISIZ |
 | 72 | investigate | .agent | Ariza teshisi: kok sebepsiz duzeltme YOK, kapsam kilidi, 3 deneme siniri | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | evals 12/8 + skills:verify | KAL |
 | 73 | investigate | .claude | Ariza teshisi: kok sebepsiz duzeltme YOK, kapsam kilidi, 3 deneme siniri | ALTYAPI | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | evals 12/8 + skills:verify | KAL |
+| 74 | graphify | .claude | Bilgi grafigi sorgu yuzeyi (dis arac graphify 0.9.62). Skill ve kok CLAUDE.md bolumu ARACIN YAZDIGI HALIYLE duruyor — Recep karari 2026-09-16 "olduga gibi istiyorum, yasak felan yok, test edecegiz kullanacagiz sonra gorecegiz gercegi". YASAK YOK: butun fiiller acik. REC-313'un query olcumu (5 soruda 2 yanlis 2 eksik) TEK KOSUMLUK bir olcumdur, egilim degil; kullanimla yeniden olculecek. ALTYAPI'nin daraltma onerisi REDDEDILDI | ALTYAPI (kurulum Recep onayi 2026-09-16, emir docs/plans/graphify-kurulum-emri-2026-09-16.md) | .claude/settings.json PreToolUse (Bash\|Grep -> hook-guard search · Read\|Glob -> hook-guard read, ikisi FAIL-OPEN) + kok CLAUDE.md graphify bolumu | 2026-09-16 kuruldu ve kosuldu (extract: 10410 dugum / 19504 kenar) | yok — DIS ARAC, bitis blogu tasimaz; §4'te sinirlari ve celiskisi adiyla yazili | KAL-KAPISIZ |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
@@ -586,15 +587,32 @@ gerektirmez).
   betik/skill/githook/ci/cetvel sınıflarının hiçbirine girmiyor) → **envanter dışı artık, silme
   adayı (OPS ölçüp siler)**. Silmeden önce canlılık kontrolü yapılmalı (hafıza:
   silmeden-once-canlilik-ve-taze-dal).
-- **`graphify` 0.9.61** (`uv tool install graphifyy`, REC-313, 2026-09-13) — **ENVANTER-DIŞI**:
-  depo içinde dosyası yok, altı sınıfın (hook/betik/skill/githook/ci/cetvel) hiçbirine girmiyor;
-  kullanıcı kapsamında kurulu bir dış araç. Skill'i **KURULMADI** — kurulumu `.claude/CLAUDE.md`'ye
-  kalıcı blok yazıyor ve karar Recep'te (rapor §5, §8). **Bağlı adım:** codegraph bayatlık uyarısı
-  verdiğinde ya da paylaşılan-primitif riski ölçülecekken ikinci bağımsız kol — yalnız üç komut
-  (`affected <ad>()`, `god-nodes`, `diagnose multigraph`). `query` **kullanılmaz** (5 soruda 2 yanlış
-  2 eksik, sessiz yanlış üretir). **Son kullanım:** 2026-09-13, REC-313 ölçümü.
-  **Kanıt:** `docs/audits/rec313-graphify-deneme-2026-09-13.md`. Çıktı dizini `graphify-out/`
-  üretilmiş artefakttır, `.gitignore`'da.
+- **`graphify` 0.9.62** (`uv tool install "graphifyy[sql]"`) — **ARTIK KURULU, ENVANTER-DIŞI
+  DEĞİL.** 2026-09-16'da Recep onayıyla projeye bağlandı (emir: `docs/plans/graphify-kurulum-emri-2026-09-16.md`,
+  #1214). Aracın kendisi hâlâ dış araç (kullanıcı kapsamında, altı sınıfın hiçbirine girmiyor) ama
+  **skill'i depoya girdi** → `.claude/skills/graphify/` satırı §3.3'te.
+  **Bağlı adım (REC-313 hükmü, geçerli):** codegraph bayatlık uyarısı verdiğinde ya da
+  paylaşılan-primitif riski ölçülecekken ikinci bağımsız kol — yalnız üç komut
+  (`affected <ad>()`, `god-nodes`, `diagnose multigraph`). `query` **KULLANILMAZ** (5 soruda
+  2 yanlış 2 eksik, sessiz yanlış üretir).
+  ⚠**KURULUMUN YAZDIĞI METİN BU HÜKÜMLE ÇELİŞİYOR** (ölçüldü 2026-09-16): araç kök `CLAUDE.md`'ye
+  *"For codebase questions, first run `graphify query`"* diye **on satır** yazdı. Yani bizim
+  ölçtüğümüz "query kullanılmaz" kararının **tersini** öneriyor. Kalem açık, düzeltme Recep'in
+  onayına bağlı (CLAUDE.md onun cetveli).
+  ⚠**`affected` PARANTEZ GEREKTİRİYOR** (URUN ölçtü, hiçbir belgede yazılı değil):
+  `productRoute` → *"No unique node match"*, `productRoute()` → doğru cevap.
+  ⭐**SQL KÖRLÜĞÜ KAPANDI, KISMEN** (2026-09-16 ölçümü): `tree-sitter-sql` eksik olduğu için
+  araç **251 `.sql` dosyasını hiç görmüyordu** (REC-313'ün "252 SQL dosyası görülmedi" bulgusunun
+  sebebi buydu — kalıcı bir sınır değil, **eksik bağımlılık**). `uv tool install "graphifyy[sql]"`
+  ile kapatıldı; grafik 9.122 → **10.410 düğüm**, 18.010 → **19.504 kenar**; 250 SQL dosyasından
+  758 içerik düğümü. **AMA TAM DEĞİL:** taze tabandan **39 tablo** görüyor (canlıda 66) ve
+  **163 politikanın 1'i**. Yani veritabanı haritası ihtiyacını **karşılamıyor**; o ihtiyacın
+  karşılığı `docs/database_schema_master.md` + `supabase/baselines/2026-09-15_public_schema.sql`.
+  **Son kullanım:** 2026-09-16 (kurulum + SQL ölçümü).
+  **Kanıt:** `docs/audits/rec313-graphify-deneme-2026-09-13.md` (ilk ölçüm) ·
+  `docs/plans/graphify-kurulum-emri-2026-09-16.md` (emir) · bu satır (kurulum ölçümü).
+  Çıktı dizini `graphify-out/` üretilmiş artefakttır, `.gitignore`'da — **her makinede bir kez**
+  `graphify extract . --code-only` koşulur, yoksa kancalar sessiz kalır (fail-open).
 - **`tmp-lf-fix.yml`** — bkz. §3.5 son not: GitHub Actions tarafında `active` görünen ama repoda
   hiç var olmamış hayalet kayıt; 29'luk dosya sayımına dahil değildir, OPS'un GitHub ayarlarından
   temizlemesi gerekir.
