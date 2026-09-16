@@ -1,4 +1,5 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { restSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
@@ -184,6 +185,30 @@ Deno.serve(async (req) => {
           yazilamayan.push({ id: o.id, detay })
         }
       }
+    }
+
+    /**
+     * ⭐RAPORA YAZMAK, OKUNDUĞU ANLAMINA GELMEZ (REC-355, akran bulgusu).
+     *
+     * `inceleme_bekleyen` gövdeye eklendi ama bu gövdeyi bir cron çağırıyor ve kimse
+     * okumuyor. Eşleşmeyen ödeme artık otomatik iptal EDİLMEDİĞİ için o sipariş
+     * `pending` durumunda SONSUZA KADAR kalabilir — para çekilmiş, kimse görmemiş.
+     *
+     * Eski hâlin en az bir faydası vardı: sipariş iptal olurdu ve en azından bir
+     * SONUÇ üretirdi. Yeni hâl doğru ama SESSİZ; sessizlik burada iptalden daha
+     * kötü olabilir. Bu yüzden kalıcı bir yere yazılıyor.
+     *
+     * ⚠Bu, `iyzico-callback`teki alarmın MÜKERRERİ DEĞİL: orada "bu çağrıda eşleşme
+     * olmadı" yazıyor, burada "bu sipariş hâlâ çözülmedi ve üzerinden 15 dakika geçti"
+     * yazıyor. Birincisi olay, ikincisi BİRİKMİŞ BORÇ.
+     */
+    if (incelemeBekleyen.length > 0) {
+      await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+        fn: 'order-housekeeping',
+        code: 'PAYMENT_NEEDS_REVIEW_BEKLIYOR',
+        message: `${incelemeBekleyen.length} siparis odeme dogrulamasi bekliyor; otomatik iptal EDILMEDI, insan mudahalesi gerekiyor.`,
+        extra: { adet: incelemeBekleyen.length, order_ids: incelemeBekleyen },
+      })
     }
 
     // Yazması düşen varsa `ok: true` DÖNMEZ: bu fonksiyonun tek işi durumu ilerletmek;

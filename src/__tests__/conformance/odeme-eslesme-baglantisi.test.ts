@@ -121,6 +121,18 @@ describe('INV-PAY-ESLESME-2 — hata yolu OKUYAN tarafla birlikte yazılmış', 
     expect(k).toMatch(/inceleme_bekleyen:/)
   })
 
+  it('⭐RAPORA YAZMAK YETMEZ — kova doluysa KALICI bir yere de yazılıyor', () => {
+    // Akran bulgusu: `inceleme_bekleyen` gövdeye konuldu ama gövdeyi bir cron çağırıyor
+    // ve kimse okumuyor. Eşleşmeyen ödeme artık otomatik iptal edilmediği için sipariş
+    // `pending` durumunda sonsuza kadar kalabilir — para çekilmiş, kimse görmemiş.
+    // Eski hâlin bir faydası vardı: bir SONUÇ üretirdi. Yeni hâl doğru ama sessiz.
+    const k = kodu(HK)
+    expect(k).toMatch(/raiseRevenueAlarm/)
+    expect(k).toMatch(/PAYMENT_NEEDS_REVIEW_BEKLIYOR/)
+    // Ve alarm yalnız kova DOLUYSA atılmalı — her koşumda atan bir alarm okunmaz olur.
+    expect(k).toMatch(/incelemeBekleyen\.length > 0/)
+  })
+
   it('eşleşmeyen ödeme ALARMA yazılıyor (sessiz değil)', () => {
     const k = kodu(CB)
     expect(k).toMatch(/raiseRevenueAlarm/)
