@@ -579,6 +579,18 @@ gerektirmez).
 
 ## 4 · Özel satırlar
 
+- **`tools/wrongstack-mcp/` — `wrongstack-sage` (çapalı hafıza) + `wrongstack-codebase-index`
+  (kod dizini), MCP, `.mcp.json` ile proje kapsamında kayıtlı** — durum **KAL (PİLOT)**, sahip
+  ALTYAPI. 2026-09-17 Recep onayı (OPS penceresi + ALTYAPI teyidi "evet kur"), kayıt REC-345 Kova C.
+  Altı sınıfın hiçbirine girmiyor (MCP sunucusu) → bu bölümde. Kurulum lock commit'li,
+  `npm ci --ignore-scripts`; kod dizini **salt-okuma**, `--writable` yalnız sage. Proje başına ayrık
+  daemon pencere kapanınca ayakta kalır (**kalıcı servis ilanı**, durdurma yolu README'de). CodeGraph
+  yerinde kalır; hangisinin kalacağı OPS'un 10 soruluk kıyasıyla. Kapı: `INV-WRONGSTACK-MCP-1`.
+  **Bilinen uyumsuzluk, çalışıyor:** `undici@8.10.2` `node >=22.19.0` istiyor, makinede 22.16.0
+  (ölçüldü: iki sunucu da el sıkışıp araç listesi döndü); Node yükseltmesi ayrı iş, şimdi değil.
+  **Açık ön şart:** sage veritabanı (`~/.wrongstack/projects/<ad-hash>/`) git dışında ve hafıza
+  yedeğine girmiyor — `memory_for_file` kancası PR'ından ÖNCE kapanır.
+
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
   hem de içeriğinde hatalı kod barındırıyor (curutme.md, pano 2026-09-07T07:00:51Z bağımsız

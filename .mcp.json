@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "wrongstack-sage": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/sage-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio",
+        "--writable"
+      ]
+    },
+    "wrongstack-codebase-index": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/codebase-index-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio"
+      ]
+    }
+  }
+}
