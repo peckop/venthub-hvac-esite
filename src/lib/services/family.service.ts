@@ -131,7 +131,16 @@ function parseFamilyDetail(data: unknown): FamilyDetail | null {
   const variants = obj.variants
   if (typeof family !== 'object' || family === null || !Array.isArray(variants)) return null
   const taxIncluded = typeof obj.price_tax_included === 'boolean' ? obj.price_tax_included : null
-  return { family, variants, price_tax_included: taxIncluded } as FamilyDetail
+  // Metin alanları vitrin sözleşmesine indirilir (yalnız tr/en) — bu nesne istemci
+  // bileşenine serileştirilir; depo anahtarları (bloklar_tr, maddeler_tr) sayfaya gömülmez.
+  const aile = family as Record<string, unknown>
+  const vitrinAilesi = {
+    ...aile,
+    description: asLocalizedText(aile.description),
+    meta_title: asLocalizedText(aile.meta_title),
+    meta_description: asLocalizedText(aile.meta_description),
+  }
+  return { family: vitrinAilesi, variants, price_tax_included: taxIncluded } as FamilyDetail
 }
 
 export async function getFamilyDetail(
@@ -283,10 +292,30 @@ function embeddedBrandName(brands: { name: string } | { name: string }[] | null)
   return Array.isArray(brands) ? (brands[0]?.name ?? null) : brands.name
 }
 
+/**
+ * jsonb metin alanını VİTRİN SÖZLEŞMESİNE indirir: yalnız `tr` ve `en` dizeleri kalır.
+ *
+ * NİÇİN AYIKLIYOR, YALNIZ TİP DEĞİL (REC-206 / karar 42, 2026-09-17 canlı ölçüm):
+ * `product_families.description` vitrinde gösterilen `tr`/`en`'in yanında içerik hattının
+ * DEPODA tuttuğu `bloklar_tr` ve `maddeler_tr` anahtarlarını da taşıyor. Bu anahtarlar
+ * hiçbir bileşende çizilmiyor, ama eski hâl yalnız TİPİ daraltıyordu — nesnenin kendisi
+ * istemci bileşenine olduğu gibi gidiyor ve sayfa verisine gömülüyordu. Ölçüm: 16 ailenin
+ * blok metnindeki iç editör notları ("kaynakta yok — blok bilinçli olarak boş bırakıldı")
+ * müşteri ekranında 0, sayfanın HTML'inde gömülü veride VAR (jet-serisi TR sayfası 77 geçiş).
+ * Kaynağı açan herkes ve betik okuyan tarayıcılar görüyordu; ayrıca sayfa ağırlığı boşa şişiyordu.
+ * Blok render'ı (REC-164) geldiğinde o bileşen kendi alanını AÇIKÇA ister.
+ */
 function asLocalizedText(value: unknown): { tr?: string | null; en?: string | null } | null {
-  return typeof value === 'object' && value !== null
-    ? (value as { tr?: string | null; en?: string | null })
-    : null
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null
+  const kaynak = value as Record<string, unknown>
+  const dize = (v: unknown): string | null | undefined =>
+    typeof v === 'string' ? v : v === null ? null : undefined
+  const sonuc: { tr?: string | null; en?: string | null } = {}
+  const tr = dize(kaynak.tr)
+  const en = dize(kaynak.en)
+  if (tr !== undefined) sonuc.tr = tr
+  if (en !== undefined) sonuc.en = en
+  return sonuc
 }
 
 /**
