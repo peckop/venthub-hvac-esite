@@ -166,15 +166,14 @@ export const en: typeof tr = {
       enterKey: 'Enter ↵',
       arrowUp: '↑',
       arrowDown: '↓',
-      allResultsFor: 'View all results ("{{term}}")',
     },
     recentSearches: 'Recent Searches',
     clearRecent: 'Clear',
     popularCategories: 'Popular Categories',
     noResults: 'No results found',
-    detailedSearch: 'detailed search for',
     keyboardHint: 'Navigate with arrow keys',
-    enterHint: 'For all results',
+    // REC-340: Enter now goes to the SELECTED item, not to a second "all results" step.
+    enterHint: 'To select',
     // `placeholderAi` removed (REC-340 Phase 0) — see the TR dictionary for the measurement.
     placeholder: 'Search products, categories, brands...',
     noResultsAdvice: 'Try different keywords',

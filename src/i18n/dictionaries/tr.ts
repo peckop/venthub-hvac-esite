@@ -239,15 +239,14 @@ export const tr = {
       enterKey: 'Enter ↵',
       arrowUp: '↑',
       arrowDown: '↓',
-      allResultsFor: 'Tüm sonuçları gör ("{{term}}")',
     },
     recentSearches: 'Son Aramalar',
     clearRecent: 'Temizle',
     popularCategories: 'Popüler Kategoriler',
     noResults: 'Sonuç bulunamadı',
-    detailedSearch: 'için detaylı ara',
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
-    enterHint: 'Tüm sonuçlar için',
+    // REC-340: Enter artık "tüm sonuçlar"a değil, SEÇİLİ kaleme gider — arama tek aşamalı.
+    enterHint: 'Seçmek için',
     // `placeholderAi` SİLİNDİ (REC-340 Faz 0) — "yapay zeka destekli arama" diyordu ve
     // arkasında yapay zeka yoktu. Ölü bırakılmadı, kaldırıldı; tek tüketicisi
     // `SearchOverlay` artık aşağıdaki doğru metni kullanıyor.
