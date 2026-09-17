@@ -97,8 +97,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 `bottom-24` (6rem) çubuğun 44px dokunma hedefi + güvenli alanını aşar.
                 Ölçek değeri, keyfi Tailwind değeri değil (kural 8).
                 Bayrak KAPALIYKEN bugünkü konum aynen sürer. */}
+            {/* Katman `sticky` (90), `toast` (9999) DEĞİL: yüzen düğmeler bildirim değildir.
+                2026-09-17 canlı ölçüm (375px): `toast` katmanındaki dil seçici arama penceresinin
+                (`modal`, 100) alt ipucu satırının ÜSTÜNE biniyordu; aynısı her modal için geçerliydi.
+                Sayfa içeriğinin üstünde kalır, açılan pencerelerin altına iner. */}
             <div
-                className={`fixed right-6 z-toast flex flex-col items-end gap-3 pointer-events-none ${
+                className={`fixed right-6 z-sticky flex flex-col items-end gap-3 pointer-events-none ${
                     YENI_KABUK_GEZINMESI ? 'bottom-24 md:bottom-6' : 'bottom-6'
                 }`}
             >
