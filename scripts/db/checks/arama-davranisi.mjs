@@ -124,6 +124,55 @@ async function olc(client, vaka) {
   return rows
 }
 
+/**
+ * ⭐ROL KOLU (INV-SEARCH-BEHAVIOR-1 · 2026-09-17).
+ *
+ * Kapı bağlantı dizesinin kullanıcısıyla (postgres) ölçüyordu. #1235 canlıya inince
+ * yardımcı fonksiyonlardan EXECUTE alındı, dış uçlar SECURITY INVOKER kaldı ve arama
+ * ziyaretçide + girişli müşteride TAMAMEN BOŞ döndü (anon REST: 42501 permission denied for
+ * function arama_eslesen_urunler). Kapı o gün "jet fan 61" diye YEŞİL verdi — yetki kusuru
+ * yalnız o rolde görünür; sahibin rolüyle ölçen kapı onu tanım gereği göremez.
+ *
+ * Bu yüzden her vaka vitrinin GERÇEK rolleriyle de koşar: `set local role` bir işlem içinde,
+ * sonunda ROLLBACK (yazma yok, oturum rolü sızmaz). Ölçüt sabit sayı değil: sahip rolü sonuç
+ * bulurken vitrin rolü hata veriyor ya da BOŞ dönüyorsa İHLAL.
+ */
+const VITRIN_ROLLERI = ['anon', 'authenticated']
+
+/**
+ * ⭐ROL TEK BAŞINA GERÇEK İSTEK DEĞİL — JWT iddiaları da vitrindeki gibi kurulur.
+ *
+ * 2026-09-17 ölçüldü: `set local role authenticated` iddiasız koşunca `fts_search_products`
+ * 54001 stack depth ile patlıyor (display_price → is_user_admin → user_profiles politikası →
+ * is_admin_user → iddia yoksa YİNE user_profiles …). Ama canlıda `custom_access_token_hook`
+ * ETKİN (Auth config: hook_custom_access_token_enabled=true) ve her jetona `user_role` yazıyor
+ * — profili olmayana bile "user". Yani iddiasız authenticated jeton vitrinde ÜRETİLMEZ; iddiasız
+ * ölçmek müşterinin görmediği bir kırmızıyı ölçer. İddiasız hâl GERÇEK bir kusurdur (REC-355,
+ * VULN) ve onarımıyla AYNI PR'da ayrı kol olarak gelir.
+ * Kanca çıktısının biçimi birebir: kök + app_metadata altında user_role.
+ */
+const VITRIN_IDDIALARI = {
+  anon: { role: 'anon' },
+  authenticated: { role: 'authenticated', user_role: 'user', app_metadata: { user_role: 'user' } },
+}
+
+async function olcRolle(client, vaka, rol) {
+  await client.query('begin')
+  try {
+    await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(VITRIN_IDDIALARI[rol])])
+    await client.query(`set local role ${rol}`)
+    const { rows } = await client.query(
+      'select id from public.fts_search_products($1, 500, $2::jsonb)',
+      [vaka.q, '{}'],
+    )
+    return { n: rows.length, hata: null }
+  } catch (e) {
+    return { n: 0, hata: `${e.code ?? ''} ${e.message}`.trim() }
+  } finally {
+    await client.query('rollback')
+  }
+}
+
 async function main() {
   const dizi = baglantiDizesi()
   if (!dizi) {
@@ -173,11 +222,24 @@ async function main() {
 
   const sonuclar = new Map()
   for (const v of VAKALAR) sonuclar.set(v.no, await olc(client, v))
-  await client.end()
 
   const ihlaller = []
   const uyarilar = []
   const gecenler = []
+
+  // Rol kolu İLANA TABİ DEĞİL: vitrinde aramanın çalışmaması "bilinen kırmızı" olamaz.
+  for (const v of VAKALAR) {
+    const sahipN = sonuclar.get(v.no).length
+    for (const rol of VITRIN_ROLLERI) {
+      const r = await olcRolle(client, v, rol)
+      if (r.hata) {
+        ihlaller.push(`[vaka ${v.no}] "${v.q}" ROL ${rol} — sorgu HATA verdi: ${r.hata}`)
+      } else if (sahipN > 0 && r.n === 0) {
+        ihlaller.push(`[vaka ${v.no}] "${v.q}" ROL ${rol} — BOS (sahip rolu ${sahipN} sonuc buluyor)`)
+      }
+    }
+  }
+  await client.end()
 
   const kimlikKumesi = (rows) => new Set(rows.map((r) => String(r.id)))
 
