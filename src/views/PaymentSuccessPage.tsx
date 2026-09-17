@@ -23,7 +23,10 @@ const PaymentSuccessPage: React.FC = () => {
   const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
   const { clearCart } = useCart()
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
+  // 'inceleme' = iyzico-callback'in needs_review cevabi (REC-355 Faz 1): para CEKILMIS ama
+  // odeme-siparis eslesmesi dogrulanamamis. 'error' ile birlestirilemez — o ekran tekrar
+  // odemeye yonlendirir ve musteri ikinci kez oder.
+  const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'inceleme'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
 
@@ -73,6 +76,24 @@ const PaymentSuccessPage: React.FC = () => {
           return
         }
 
+        // 1b) Callback eslesmeyi dogrulayamadiysa: para alindi, siparis beklemede.
+        // Sepet temizlenir (odeme gerceklesti) ama tekrar odeme yolu KAPALI kalir.
+        if (statusParam === 'needs_review') {
+          setStatus('inceleme')
+          setPaymentInfo({ conversationId: conversationId || orderId, token })
+          clearCart({ silent: true })
+          try {
+            localStorage.removeItem('venthub-cart');
+            localStorage.removeItem('venthub-cart-version');
+            localStorage.removeItem('venthub-cart-owner');
+            localStorage.removeItem('vh_pending_order');
+            localStorage.setItem('vh_last_order_status', 'needs_review');
+            localStorage.setItem('vh_clear_server_cart_once', '1');
+          } catch { }
+          if (orderId) await fetchOrderDetails(orderId)
+          return
+        }
+
         // 2) Token varsa, Functions üzerinden doğrula
         if (token) {
           const { data, error } = await supabase.functions.invoke('iyzico-callback', {
@@ -84,6 +105,22 @@ const PaymentSuccessPage: React.FC = () => {
             setStatus('error')
             setPaymentInfo({ errorMessage: error.message || t('payment.verifyError') })
             toast.error(t('payment.verifyError'))
+            return
+          }
+
+          if (data?.status === 'needs_review') {
+            setStatus('inceleme')
+            setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
+            clearCart({ silent: true })
+            try {
+              localStorage.removeItem('venthub-cart');
+              localStorage.removeItem('venthub-cart-version');
+              localStorage.removeItem('venthub-cart-owner');
+              localStorage.removeItem('vh_pending_order');
+              localStorage.setItem('vh_last_order_status', 'needs_review');
+              localStorage.setItem('vh_clear_server_cart_once', '1');
+            } catch { }
+            await fetchOrderDetails(orderId)
             return
           }
 
@@ -186,6 +223,50 @@ const PaymentSuccessPage: React.FC = () => {
           <p className="text-steel-gray">
             {t('payment.verifyingDesc')}
           </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Para cekilmis, eslesme dogrulanmamis. Bu ekranda checkout'a giden HICBIR baglanti yok:
+  // "tekrar dene" burada ikinci bir tahsilat demektir (REC-355 Faz 1).
+  if (status === 'inceleme') {
+    return (
+      <div className="min-h-screen bg-light-gray flex items-center justify-center">
+        {/* Köşe yarıçapı tasarım ölçeğinden (`rounded-hvac-*`); ham `rounded-xl` INV-9
+            stil sayacını artırır ve tavanı yükseltmek çözüm sayılmaz. */}
+        <div className="bg-white rounded-hvac-md shadow-lg p-8 max-w-md w-full text-center">
+          <div className="bg-warning-orange/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
+            <ShieldCheck size={32} className="text-warning-orange" />
+          </div>
+          <h2 className="text-2xl font-bold text-industrial-gray mb-4">
+            {t('payment.reviewTitle')}
+          </h2>
+          <p className="text-steel-gray mb-4">
+            {t('payment.reviewDesc')}
+          </p>
+          <p className="text-industrial-gray font-semibold mb-6">
+            {t('payment.reviewWarning')}
+          </p>
+          {paymentInfo?.conversationId && (
+            <p className="text-sm text-steel-gray mb-6">
+              {t('payment.orderNoLabel')}: <span className="font-mono">{paymentInfo.conversationId}</span>
+            </p>
+          )}
+          <div className="space-y-3">
+            <Link
+              href={Routes.account.orders()}
+              className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-blue"
+            >
+              {t('payment.viewOrderDetails')}
+            </Link>
+            <Link
+              href={Routes.home()}
+              className="w-full border-2 border-primary-navy text-primary-navy hover:bg-primary-navy hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-blue"
+            >
+              {t('payment.reviewBackHome')}
+            </Link>
+          </div>
         </div>
       </div>
     )

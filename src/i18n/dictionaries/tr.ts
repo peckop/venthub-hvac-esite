@@ -1307,6 +1307,12 @@ export const tr = {
     verifyingDesc: 'İşlemi bankanızla teyit ediyoruz. Lütfen bekleyin.',
     failedTitle: 'Ödeme Başarısız',
     retry: 'Tekrar Dene',
+    // REC-355 Faz 1: ödeme alındı ama sipariş eşleşmesi doğrulanamadı (needs_review).
+    // Bu ekranda ASLA "tekrar dene" gösterilmez — para çekilmiştir, ikinci ödeme riski doğar.
+    reviewTitle: 'Ödemeniz Alındı, Doğrulama Sürüyor',
+    reviewDesc: 'Ödemeniz bankanızdan başarıyla alındı. Siparişinizle eşleştirme kontrolümüz sürüyor ve kısa süre içinde tamamlanacak.',
+    reviewWarning: 'Lütfen tekrar ödeme yapmayın. Ekip doğrulamayı tamamladığında size e-posta ile bilgi verilecektir.',
+    reviewBackHome: 'Ana Sayfaya Dön',
     orderCompletedTitle: 'Siparişiniz Tamamlandı!',
     orderNoLabel: 'Sipariş No',
     orderCompletedDesc: 'Siparişiniz başarıyla alındı. Onay e-postası kısa süre içinde gönderilecektir.',

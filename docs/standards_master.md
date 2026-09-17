@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-09T12:24:57.098003+00:00
-total_compiled_files: 78
-source_commit: 59eaa47f6
+compiled_at: 2026-09-17T06:08:21.519316+00:00
+total_compiled_files: 83
+source_commit: 20b9298d2
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -2927,13 +2927,50 @@ OPS ilk fırsatta bir şeride devreder ya da ölü sayar. "Sahipsiz" envanterde 
 
 ## AXIOM 3 — Kanıtsız araç ÖLÜ ADAYDIR; ölü aday karantinaya gider, silme Recep kapısıdır
 
-Bir araç şu üç sorudan geçer; ilk "hayır" sınıfı belirler:
+Bir araç şu **dört** sorudan geçer; ilk "hayır" sınıfı belirler:
 
 | # | Soru | Hayır ise |
 |---|---|---|
 | 1 | **Çağıranı var mı?** (package.json `scripts`, CI `run:`, kanca komutu, `.claude/settings.json`, başka betik, skill, cetvel, komut rehberi) | ÖLÜ ADAY |
 | 2 | **Son 30 günde koşum izi var mı?** (CI run damgası, pano/log dosyası, ürettiği çıktının commit tarihi) | ÖLÜ ADAY |
 | 3 | **Bir kapı ya da test onu sınıyor mu?** | KAL (kapısız) — kapı borcu satıra yazılır |
+| 4 | **Ürettiği çıktı KABUL EDİLİYOR mu?** — yalnız çıktı üreten araçlar için (PR, öneri, rapor, ticket). Ölçüt **çıktı kabul oranı**: üretilenin kaçı merge/uygulandı. | ÇIKTISI REDDEDİLDİ |
+
+### AXIOM 3'ün dördüncü sorusu niçin var (ölçüldü 2026-09-14, REC-333)
+
+`ai-auto-repair.yml` ilk **üç** sorudan **geçiyordu**: çağıranı vardı (`ci.yml:201`), koşum
+izi vardı, Jules'a fiilen görev gidiyor ve dal yaratıyordu. Ama ürettiği **10 PR'ın hepsi
+CLOSED — 0/10 merge.**
+
+Yani ne **KAL** (bir gün işe yarar) ne **ONAR** (zincir kırık) doğruydu: **araç çalışıyordu,
+çıktısı kabul edilmiyordu.** Bu, atıl araçtan **ayrı bir sınıftır**: atıl araç
+**çağrılmaz**; bu araç **çağrılıyor ama çıktısı kabul edilmiyor.** Üç soru bu sınıfa kör
+olduğu için dördüncüsü eklendi.
+
+⚠**Sınırı:** soru yalnız **çıktı üreten** araçlara sorulur. Bir kapının ya da ölçüm
+betiğinin "çıktısı" onun kırmızı/yeşil hükmüdür; orada kabul oranı anlamsızdır ve alan
+`yok` yazılır. Ayrıca kabul oranı **ölçülmeden** yazılmaz: sayıyı veren kaynak (örneğin
+`gh pr list --search ...` çıktısı) satırın kanıtına eklenir.
+
+⚠**`CIKTISI-REDDEDILDI` durumunun kapı tarafı boştur:** `INV-ARAC-3` yalnız `OLU-ADAY`
+satırlarının bayatlığını ölçer, bu durumu ölçmez. Yani bu hüküm bugün **insan
+hükmüdür** ve mekanik bir tazelik kapısı yoktur — bu, bilinen ve yazılı bir kapı borcudur.
+
+### ⚠AXIOM 3'ün SINIRI — üretilen satırın `durum` sütunu insan metni TUTMAZ
+
+**Ölçüldü 2026-09-14 (#1185'te sessizce kaybedildi, #1188'de yeniden ölçüldü):**
+"üretilen dosya elle düzenlenmez, yalnız insan hükmü kolonları elle yazılır" izni
+**mevcut ve YENİ satırlar** içindir.
+
+Üreticinin **KAYIP** işaretlediği bir satırın `durum` sütunu **üreticinin malıdır**:
+konformansın `YAZMA KIPI IDEMPOTENT` kolu kendi içinde `--yaz` koşar ve o sütunu kanonik
+hâline **geri yazar.** #1185'te o sütuna elle yazılan hüküm **commit'ten önce silinmişti**
+ve "yazıldı" diye rapor edilmişti; master'da olmadığı sonradan ölçüldü.
+
+→ **Kural:** hüküm **üretilmeyen yere** yazılır — anlatı satırına, denetim belgesine, PR
+gövdesine. Mevcut bir satırın insan kolonları (`kanit`, `kapi`, `durum`) gerçekten
+insanındır ve üretici onlara dokunmaz; bu 2026-09-14'te ölçüldü (26 satıra elle sınav
+kanıtı yazıldı, `--yaz` sonrası fark **0 bayt**).
 
 - **ÖLÜ ADAY** hükmü tek taramayla verilmez: ikinci bir göz (bağımsız ajan ya da başka şerit)
   çağıran kanallarını yeniden arar ve **ÖLÜ DOĞRULANDI / CANLI / ÖLÇÜLEMEDİ** yazar.
@@ -2954,7 +2991,17 @@ Bir araç şu üç sorudan geçer; ilk "hayır" sınıfı belirler:
 | `tetik` | nereden çağrılır | `package.json:<script>` · `ci:<dosya>` · `hook:<olay>` · `githook:<ad>` · `skill:<ad>` · `elle` · `cagiran-yok` |
 | `kanit` | son koşum izi | damga + kaynak (`ci-run 2026-09-06T20:44Z` · `pano .bash-audit 2026-09-07` · `cikti docs/x.md 2026-09-05`) ya da `yok` |
 | `kapi` | sınayan test/betik | dosya adı ya da `yok` |
-| `durum` | KAL · KAL-KAPISIZ · OLU-ADAY · OLU-DOGRULANDI · KARANTINA · SILINDI · OLCULEMEDI | AXIOM 3 |
+| `durum` | KAL · KAL-KAPISIZ · OLU-ADAY · OLU-DOGRULANDI · CIKTISI-REDDEDILDI · KARANTINA · SILINDI · OLCULEMEDI | AXIOM 3 |
+
+⚠**`cikti_kabul` bugün AYRI BİR KOLON DEĞİL, `kanit` içine yazılır** — biçim
+`cikti-kabul <kabul>/<uretilen> (<kaynak>)`, örnek `cikti-kabul 0/10 (gh pr list)`.
+Çıktı üretmeyen araçlarda hiç yazılmaz.
+
+Niçin kolon değil: envanter tablosu **üretilen** bir artefakttır ve yeni bir kolon
+üreticinin başlık okuma/hücre doldurma mantığını değiştirmeyi gerektirir. Cetvele
+uygulanamayan bir alan yazmak, belgenin kendi cetvelini ihlal etmesi olurdu. **Ayrı kolon
+bilinen bir borçtur** ve üretici o kolonu doldurabildiği gün açılır; o güne kadar ölçüt
+`kanit` içindeki damgadır.
 
 Companion `.md` dosyaları (`*.cjs` yanındaki açıklama), `__pycache__`, `README.md` **araç
 değildir**; envantere girmez (2026-09-07 dersi: 13 companion "kanca" sayıldı, evren yanlıştı).
@@ -3001,6 +3048,357 @@ canlı mı" sorusuna envanter satırıyla cevap verir; cevap veremiyorsa envante
 - **Tek göz yetmez:** ölü hükmü pahalıdır (silinen araç geri gelmez); ikinci göz zorunlu.
 - **Kapı hatırlamaya bağlı değil:** cetvel tek başına "hatırlarsam uygularım"dır; INV-ARAC-1
   unutmayı mekanik olarak yakalar.
+
+
+---
+# FILE: docs\standards\arama-standard.md
+
+# Arama Cetveli (`arama-standard.md`)
+
+> **Bu cetvel neyi yönetir:** müşterinin sitede bir şey araması — ne aranır, nasıl normalize
+> edilir, ne bulunur, ne sırayla gösterilir, hangi yüzeyde görünür ve hangi kapı ölçer.
+>
+> **Niçin var:** 2026-09-15'te ölçüldü — dokuz gerçek aramanın **beşi tam sıfır** dönüyordu ve
+> **hiçbir kapı bunu görmüyordu**. 76 cetvelin hiçbiri aramayı yönetmiyordu. Arama, hata yapmanın
+> serbest olduğu tek yüzeydi. Bu dosya o boşluğu kapatır.
+>
+> **Sahibi:** URUN şeridi. (Ölçüm: `docs/standards/*.md` ekleyen commit'lerin şerit öneki —
+> URUN 11, ALTYAPI 6, OPS 3; konu sahibi kendi cetvelini yazar, claim dizin değil **dosya**
+> düzeyindedir. OPS teyit etti 2026-09-15.)
+>
+> **İlgili cetveller:** `product-schema-standard.md` (aranan alanların kaynağı) ·
+> `category-taxonomy-standard.md` (kategori adı/slug SSOT) · `denetim-izi-standard.md` ·
+> `rendering-cache-standard.md` (yalnız arama **sayfası** için — overlay için değil, §2).
+
+---
+
+## 1. Kapsam ve yüzeyler
+
+Sitede arama **üç** yüzeyde yaşar. Üçü de bu cetvele tabidir.
+
+| # | Yüzey | Nerede | RPC | Bugünkü tavan |
+|---|---|---|---|---|
+| Y1 | Öneri kutusu | `SearchOverlay`, yazarken | `get_search_suggestions` | 4 ürün + 2 kategori + 2 marka |
+| Y2 | Tam arama listesi | `SearchOverlay`, Enter | `fts_search_products` | 20 satır (istemcide) |
+| Y3 | Arama sonuç sayfası | **henüz yok**, Recep kararı 2026-09-15 ile açılacak | Y2 ile aynı gövde | sayfalama |
+
+**Dördüncü bir RPC daha var:** `admin_search_products`. Admin yüzeyi müşteri aramasından ayrı bir
+sorundur ve **bu cetvelin kapsamı dışındadır** — ama var olduğu burada yazılıdır ki "iki RPC"
+diye sayılmasın.
+
+**K1.1** — Yeni bir arama yüzeyi eklenirse bu tabloya satır eklenir. Tabloda olmayan yüzey
+kapısızdır ve kapısız yüzey sessizce bozulur.
+
+## 2. Hangi cetvel neyi yönetir (yanlış atıf yapılmasın)
+
+**K2.1** — Y1 ve Y2 **istemci tarafı** yüzeylerdir (`SearchOverlay`, `ssr: false`). Bunlar statik
+vitrinde görünmez, bu yüzden `rendering-cache-standard.md`'nin *"statik vitrinde görünen her
+tablonun DB tetiği + webhook handler dalı olmalı"* kuralı **bunlara uygulanmaz.**
+
+**K2.2** — Y3 (arama sonuç sayfası) bir rotadır ve `rendering-cache-standard.md`'ye **tabidir**:
+rota sınıfını ilan eder, önbellek anahtarı `lang` ve `tenantId` içerir.
+
+*(Niçin bu ayrım yazılı: REC-340 Faz 1 planının ilk sürümü overlay'i sayfa sanıp yanlış cetvele
+atıf yaptı. Atıf yanlışsa kural da yanlış yere uygulanır.)*
+
+## 3. Aranan ALAN kümesi (SSOT)
+
+**K3.1** — Bir ürün şu alanların birleşiminden aranır. Liste burada tutulur; kodda ikinci bir
+liste tutulmaz.
+
+| Alan | Kaynak | Diller | Ağırlık |
+|---|---|---|---|
+| Ürün adı | `products.name` | — | **A** |
+| Ürün adı (çeviri) | `products.name_i18n` | TR + EN | **A** |
+| Model kodu | `products.model_code` | — | **B** |
+| SKU | `products.sku` | — | **B** |
+| Marka | `products.brand` | — | **B** |
+| **Aile adı** | `product_families.name` + `name_i18n` | TR + EN | **C** |
+| **Üst kategori adı** | `categories.name` (üzerinden `products.category_id`) | TR | **D** |
+| **ALT kategori adı** | `categories.name` (üzerinden `products.subcategory_id`) | TR | **D** |
+| Açıklama | `products.description_i18n` | **TR + EN** | **D** |
+| Teknik özellikler | `products.technical_specs` | — | **D** |
+
+**K3.1a — AĞIRLIK ZORUNLU, SÜS DEĞİL (2026-09-16 ölçümü).** Kategori adı gövdeye girince tek
+kelimelik genel sorgular çok geniş sonuç döndürüyor: `fan` eski gövdede 157/441 (%36), yeni
+gövdede **360/441 (%81,6)**. Sayıyı kısmak yanlış olurdu — 441 aktif ürünün çoğu gerçekten fan,
+yani 360 **doğru cevap**. Doğru çözüm sayı değil **sıralama**: `setweight` ile adında geçen ürün,
+yalnız kategorisinde geçenden önce gelir (`ts_rank` varsayılan dizisi `{D,C,B,A}={0,1 · 0,2 ·
+0,4 · 1,0}`). Ağırlıksız bir gövde bu cetvele uymaz.
+
+**K3.1b — ALT KATEGORİ (2026-09-16'da eklendi, plan bunu kaçırıyordu).** `products` tablosunda
+kategori bağı **iki** alanda: `category_id` (üst) **ve** `subcategory_id` (alt). 442 üründen
+**434'ü** alt kategorili, 18 alt kategori kullanımda. Ölçülen kazanç: `asit dayanımlı fan`
+0 → **80**, `banyo` 4 → **40**. Alt kategori olmadan bu iki sorgu onarımdan sonra **da** sıfır
+dönerdi. En kalabalık alt kategoriler: Santrifüj/Radyal 133 · Asit Dayanımlı 80 · Kanal Tipi 43
+· Banyo-Tuvalet 40 · Frekans Konvertörlü 35.
+
+**K3.1c — "ÜST KATEGORİ" AYRI JOIN İSTEMEZ (ölçüldü).** Alt kategorili 434 ürünün **434'ünde**
+`subcategory.parent_id = products.category_id`. Yani `category_id` zaten üst kategoridir; ayrıca
+parent zinciri yürümek aynı adı iki kez saymak olur. Bu eşitlik bozulursa (üç seviyeli ağaç
+gelirse) gövde üreticisi güncellenir — kapı kolu bu eşitliği ölçer.
+
+**⛔K3.1d — SINIR: KATEGORİ ADININ İNGİLİZCESİ VERİTABANINDA YOK (ölçüldü, 2026-09-16).**
+`categories` tablosunda `name_i18n` sütunu **yok**; `metadata` yalnız `slug`, `hide_price`,
+`description_i18n` taşıyor (31/31 satırda `name`/`name_en` anahtarı **0**). İngilizce kategori adı
+`translation_key` üzerinden **kod sözlüğünden** (`common.categoryList.*`) çözülüyor
+(`getCategoryDisplayName`). Sonuç: **EN kullanıcı kategori adıyla arama yapamaz.** Aile adının
+İngilizcesi gövdede **var** (`product_families.name_i18n`), o yüzden EN tarafı tamamen kör değil.
+Bu sınırın kapatılması = kategori adı çevirisini DB'ye taşımak; **ayrı iştir**, bu cetvelin
+kapsamında değildir ama burada adıyla yazılıdır ki "unutulmuş" sanılmasın.
+
+**K3.2** — Kalın satırlar (aile, üst kategori, alt kategori) **zorunludur ve sebebi ölçülmüştür.** Ürün adlarımız teknik künye
+biçimindedir (`JET 20 · 1400 d/dk · 0,18 kW · 220V`); "fan", "aspiratör" gibi kelimeler ürün adında
+değil **kategorisinde** yaşar. 2026-09-15 ölçümü: 441 aktif üründen ad+açıklama gövdesinde "fan"
+geçen 66, ama "fan" 10 kategori ve 22 aile adında var. Bu yüzden `jet fan` sorgusu bugün
+matematiksel olarak imkânsız — hiçbir tek üründe iki kelime bir arada yok.
+
+**K3.3** — Bu tabloya alan eklemek **kapıya kol eklemeyi kapsar** (kural 14). Kapısız alan,
+sessizce aranmamaya başlayabilir ve kimse görmez.
+
+## 4. Aranan SATIR kümesi (SSOT)
+
+**K4.1** — Her arama yüzeyi **aynı** satır evrenini görür:
+`status = 'active'` **VE** `deleted_at IS NULL` **VE** tenant sınırı (§7).
+
+**K4.2** — İki yüzeyin farklı evren görmesi kusurdur, tasarım değildir. *(2026-09-15 ölçümü:
+`get_search_suggestions` `deleted_at IS NULL` süzüyor, `fts_search_products` süzmüyor. Bugünkü
+etkisi sıfır çünkü yumuşak silinmiş aktif ürün yok — ama kural bugünkü veriye değil, kuralın
+kendisine dayanır.)*
+
+## 5. Sorgu normalizasyonu
+
+**K5.1 — Aksan/Türkçe karakter körlüğü yasaktır.** `havalandirma` ile `havalandırma` **aynı**
+sonucu vermelidir. Kullanıcının klavye alışkanlığı arama sonucunu belirlememelidir.
+
+**K5.2 — Küçültme iki biçimde yapılır.** Türkçe yerel ayarında büyük `I` noktasız `ı` olur; bu
+yüzden tek biçimli küçültme metinleri kaçırır. *(Aynı körlük 2026-09-15'te vaat kapısında sahada
+görüldü: ekrandaki "AI-powered" metni `ai-powered` terimiyle hiç eşleşmiyordu. Aynı hata ödeme
+kapısında da vardı — "Installment" ve "PCI DSS" görünmüyordu.)*
+
+**K5.3 — Normalizasyon fonksiyonları ŞEMA-NİTELİKLİ çağrılır.** Arama RPC'leri
+`SET search_path TO 'pg_catalog','public'` ile koşuyor; `pg_trgm` ve `unaccent` ise `extensions`
+şemasında. Niteliksiz çağrı **çalışma anında** `ERROR 42883: function does not exist` verir ve
+migration `CREATE OR REPLACE` aşamasında **hiç uyarmaz** (plpgsql gövdesi geç bağlanır).
+Bu yüzden: `extensions.unaccent(...)`, `operator(extensions.%)` biçiminde yazılır.
+
+**K5.3a — OPERATÖR SINIFI da şema-niteliklidir** (2026-09-16'da ölçüldü, kural bu satırla
+genişledi): `gin_trgm_ops` ve `gist_trgm_ops` `pg_opclass`'ta **`extensions`** şemasında duruyor.
+`CREATE INDEX ... USING gin (x gin_trgm_ops)` niteliksiz yazıldığında yalnız o anki `search_path`
+uygun olduğu için çalışır — migration bağlamında bu **kırılgan bir varsayımdır.** Doğrusu:
+`USING gin (x extensions.gin_trgm_ops)`. *(K5.3 yalnız fonksiyondan söz ediyordu; kusur sınıfı
+aynı ama fonksiyon kuralını okuyan biri indeks satırını gözden kaçırır.)*
+
+**K5.4 — Eklenti kurulumu ayrı bir kalemdir.** `unaccent`, `vector`, `pgroonga`, `fuzzystrmatch`
+2026-09-15 itibarıyla **kurulu değildir** (yalnız kurulabilir durumda). `pg_available_extensions`
+tablosundaki `default_version` "kurulu sürüm" **değildir**; kurulu olan `installed_version`'dır.
+Her `CREATE EXTENSION` kendi migration'ıdır ve kural 13 kapsamındadır.
+
+## 6. Eşleştirme semantiği
+
+**K6.1 — Çok kelimeli sorgu, kelime sırasına bağlı olmamalıdır.** `jet fan` ile `fan jet` **aynı
+kümeyi** döndürür.
+
+**K6.2 — Katı "hepsi eşleşmeli" davranışı tek başına yeterli değildir.** `plainto_tsquery` ve
+`websearch_to_tsquery` ikisi de boşluğu **VE** olarak yorumlar (2026-09-15'te ölçüldü — "websearch
+kullanınca VEYA gelir" **yanlıştır**). Terimler ayrı ayrı değerlendirilir ve hepsi eşleşen üste
+sıralanır.
+
+**K6.3 — Sıralı alt-dize eşleştirmesi tek dal olarak bırakılmaz.** `ILIKE '%a%b%'` biçimi
+kelimelerin metinde **o sırada** geçmesini şart koşar. Bu, K6.1'i tek başına ihlal eder.
+
+**K6.4 — Yazım hatası toleransı zorunludur.** `vortis` yazan kullanıcı `Vortice` ürünlerini
+bulmalıdır. İki ölçülmüş tuzak:
+- Trigram indeksini tetikleyen **`%` operatörüdür**; `similarity(...) > eşik` yazımı indeksi
+  **hiç kullanmaz** (2026-09-15, `enable_seqscan=off` altında EXPLAIN ile).
+- Uzun metinde doğru fonksiyon `word_similarity`'dir:
+  `similarity('Vortice Vort Penta','vortis')` = 0,294 ama `word_similarity` aynı çiftte **0,714**.
+  Yanlış fonksiyonla ölçülen eşik yanlış eşiktir.
+
+**K6.5 — Eşik tahminle değil ölçümle belirlenir** ve hangi fonksiyonun eşiği olduğu yazılır.
+
+**K6.6 — Yazım hatası yedeği hassasiyeti düşürür; tavanı vardır.** Bkz. K8.4.
+
+## 7. Tenant ve yetki (kural 12)
+
+**K7.1** — Arama RPC'leri **`SECURITY INVOKER`** kalır (`prosecdef = false`). Bugün üçü de öyle ve
+RLS uygulanıyor; `products.tenant_id` mevcut, `prod_public_read_opt` politikası
+`tenant_id = (SELECT jwt_tenant_id())` diyor. Performans gerekçesiyle `SECURITY DEFINER`'a geçmek
+**tenant filtresini tümüyle kaldırır** — bu kural 12 ihlalidir.
+
+**K7.2** — Arama metnini üreten/tazeleyen fonksiyon **tenant sınırını aşan JOIN yapamaz**
+(`WHERE c.tenant_id = p.tenant_id`). Bu fonksiyon `SECURITY DEFINER` yazılırsa (tetiklerde yaygın
+bir alışkanlık) başka tenant'ın kategori adını **kalıcı olarak** ürün satırına gömer — geri
+alınamayan bir sızıntı sınıfıdır.
+
+**K7.3** — Faz 2 (multi-tenant) PARK'ta olması bu kuralları askıya **almaz**.
+
+## 8. Kapı: INV-SEARCH-* ailesi
+
+**K8.1 — Kapı iki katmanlıdır.**
+- **Katman A (her PR'da):** sorgu kurucusunun semantiği saf fonksiyon olarak, fikstürle. Canlı DB
+  gerekmez. *(Gerekçe: CI'daki vitest `https://dummy.supabase.co` ile koşuyor — canlı DB'ye bakan
+  bir test orada sessizce yanlış ölçer.)*
+- **Katman B (canlı):** `db-advisor.yml` içinde, `db-gate-precheck.outputs.ready` koşuluna bağlı,
+  psql ile RPC'leri gerçekten çağırır. Emsal: `catalog-integrity` / INV-CATALOG-1 — **"ATLANMIS IS
+  YESIL DEGILDIR"** uyarısı dahil.
+
+**K8.2 — Kapı adı mevcut aileyle hizalanır.** Depoda `INV-SEARCH-ROUTE-1` var
+(`search-route-ssot.test.ts`, aramanın dil-güvenli gezinme tarafını ölçüyor). Aynı alanda biri
+Türkçe biri İngilizce iki kapı ailesi taşınmaz.
+
+**K8.3 — İddialar sabit sayıya bağlanmaz.** Katalog şeridi her gün ürün ekliyor; `= 47` diyen bir
+kapı ilk ürün eklemede kırmızı yanar ve kimse ona güvenmez. İddia biçimleri: **oran**,
+**sıfır-değil**, **adıyla bilinen bir ürünün varlığı**, **sıralamadaki yeri**. Kesin sayı yalnız
+SKU vakasında anlamlıdır.
+
+**K8.4 — Kapı hem alt hem ÜST sınır ölçer.** Arama düzeltmesi sıfır-sonuç sorununu
+**alakasız-sonuç** sorununa çevirebilir. *(Ölçüm: aile+kategori adı gövdeye girince `jet fan`
+0 → 61'e çıkıyor, yani "Fan" kategorisindeki her şey sorguya karışma riski taşıyor.)* Hiçbir vaka
+aktif ürünlerin **%40'ından fazlasını** döndürmemelidir.
+
+**K8.5 — Bugün çalışan davranış regresyon testine bağlanır.** `VRT-17160` gibi tam SKU araması
+bugün **kusursuz** çalışıyor (tam 1 sonuç); yazım hatası yedeği eklenince benzer SKU'larla
+kirlenebilir. Çalışan bir davranışı değiştiren her değişiklik regresyon kolu ister; bu tartışmaya
+kapalıdır.
+
+**K8.6 — Kapı, aranan alanın TAZELİĞİNİ de ölçer.** Aile adı değişince arama metni tazelendi mi —
+ölçülmeyen tazeleme ilanı bedavaya yazılmış olur.
+
+**K8.7 — İndeksin VARLIĞI ölçülür.** *(Niçin: `20250919_fts_search_products.sql` beş indeks
+yaratıyor; canlıda yalnız ikisi var. Migration ya geri alındı ya hiç uygulanmadı ve hiçbir kapı
+görmedi. "Uygulandı" ile "işe yaradı" arasındaki fark burada yaşıyor.)*
+
+**K8.8 — Fiyat korunumu ölçülür.** Arama sonucu `display_price(p)` döndürür, ham `products.price`
+değil (INV-PRICE-1). Ortak gövdeye geçişte kaybolma riski gerçektir.
+
+### Asgari vaka kümesi
+
+Aşağıdaki vakalar **taban**dır; genişletilebilir, daraltılamaz.
+
+| # | Sorgu | Neyi ölçer | İddia biçimi |
+|---|---|---|---|
+| 1 | `havalandırma` | temel eşleşme | `> 0` |
+| 2 | `havalandirma` | Türkçe karakter körlüğü (K5.1) | vaka 1'in **≥ %90'ı** |
+| 3 | `jet fan` | gövdede aile/kategori adı (K3.2) | `> 0` |
+| 4 | `fan jet` | kelime sırası bağımsızlığı (K6.1) | vaka 3 ile **aynı küme** |
+| 5 | `vortis` | yazım hatası toleransı (K6.4) | markası `Vortice` olan **≥ 1** |
+| 6 | `ısı geri kazanım` | çok kelimeli tamlama (K6.2) | `> 0` |
+| 7 | `VRT-17160` | kesinlik **regresyonu** (K8.5) | **tam 1**, ilk satır o SKU |
+| 8 | `kanal tipi fan` | üç kelime + kategori | `> 0` |
+| 9 | `duvar tipi aspiratör` | dört kelime, ad'da geçmeyen terim | `> 0` |
+| 10 | `ISI GERI KAZANIM` | büyük harf + noktasız (K5.2) | vaka 6 ile aynı küme |
+| 11 | — (her vaka) | hassasiyet tavanı (K8.4) | aktif ürünlerin **≤ %40'ı** |
+| 12 | — (Y1 ↔ Y2) | iki yüzey aynı gövde (K4.1) | **aynı ilk ürün** |
+
+## 9. Hata yolları (kural 14)
+
+**K9.1 — Hata, "sıfır sonuç" olarak gösterilemez.** *(2026-09-15 ölçümü: `getSearchSuggestions`
+hata dalında `console.error` + `return []` yapıyor. Yani RPC çökse bile kullanıcı "sonuç yok"
+görüyor.)* İki ayrı durum, iki ayrı ekran: **bulunamadı** ayrı, **arama çalışmadı** ayrı.
+
+**K9.2 — Aynı ekranda iki hata politikası olamaz.** Bugün tam arama yolu kullanıcıya hata
+gösteriyor, öneri yolu yalnız konsola yazıyor.
+
+**K9.3 — Arama günlüğünün ön şartı K9.1'dir.** Hata sessizce sıfıra dönüştüğü sürece günlük
+hatayı "sıfır sonuç" diye kaydeder; günlük yalan söyler ve "düzeldi mi" sorusu ölçülemez kalır.
+
+## 10. Arama günlüğü
+
+**K10.1** — Sıfır sonuç dönen her sorgu kaydedilir. Bu, "arama düzeldi mi" sorusunun **tek**
+ölçülebilir cevabıdır.
+
+**K10.2** — Günlük yazma yüzeyi anonim kullanıcıya açıktır; RLS ve kötüye kullanım sınırı
+(oran sınırı, uzunluk tavanı) yazılmadan açılmaz.
+
+**K10.3** — Günlük olmadan kullanıcı davranışı hakkında **ölçüm gibi cümle kurulmaz.** *(Niçin:
+REC-340 planının ilk sürümü "müşterinin yarısı sıfır sonuç görüyor" diyordu; bu bir çıkarımdı,
+ölçüm değil.)*
+
+## 11. Tazeleme
+
+**K11.1 — Türetilmiş arama metni, kaynak veri değişince tazelenir.** Kaynaklar: ürünün kendi
+alanları, aile adı, kategori adı, kategori ağacındaki yer.
+
+**K11.2 — Kaynağa göre İKİ yol.** Ürünün kendi alanı değişince **anında** tazelenir (arama
+tazeliği gecikmesin, etkilenen satır bir tane). Aile ya da kategori adı değişince **kuyruğa**
+yazılır ve toplu iş koşar. *(Ölçüm: en kalabalık alt kategoride 133, en kalabalık üst kategoride
+361 ürün var; bunu tetiğin içinde satır satır yapmak yazma işlemini uzatır ve kilit süresini
+şişirir.)*
+
+**K11.3 — Aile/kategori tetikleri koşulludur:** `WHEN (OLD.name IS DISTINCT FROM NEW.name)`.
+Adı değişmeyen güncelleme (sıra numarası, meta alanı) tazeleme tetiklemez. Ürün tetiği ise
+`UPDATE OF <alan listesi>` ile sınırlıdır; stok ve fiyat değişikliği gövdeyi etkilemez.
+
+**K11.4 — Tazeleme `products` tablosuna YAZMAZ.** *(2026-09-16 ölçümü, bu satır yapı kararını
+değiştirdi.)* `products` üzerinde iki koşulsuz tetik var: `products_set_updated_at` (BEFORE UPDATE,
+`updated_at := now()`) ve `on_products_change` (AFTER INSERT/UPDATE/DELETE → Vault'tan sır okur +
+`net.http_post`). Türetilmiş metni `products`'ta tutmak, her tazelemede vitrin önbelleğini boşuna
+tazelemek ve 442 webhook POST'u üretmek demekti. Planın çözümü "toplu yazmada tetiği atla" idi;
+o da her tazelemede `ALTER TABLE ... DISABLE TRIGGER`, yani ACCESS EXCLUSIVE kilit ve o pencerede
+**gerçek** ürün değişikliklerinin webhook kaybı demektir. **Doğrusu: gövde ayrı tabloda tutulur**
+(`product_search_index`), `products`'a hiç yazılmaz ve bu tetiklerin hiçbiri uyanmaz.
+
+**K11.5 — Türetilmiş arama metninin yazımı `admin_audit_log`'a girmez.** Denetim izini üreten
+**kaynak** değişikliktir (kategori/aile adı) ve o zaten `denetim_izi_categories` /
+`denetim_izi_product_families` ile kayıtlıdır. *(Bu bir karardır ve burada yazılıdır — "hatırlanan"
+değil.)*
+
+## 12. Yapı kısıtları (uygulayan kişi için)
+
+**K12.1 — Arama metni sütunu ÜRETİLMİŞ SÜTUN (`GENERATED ALWAYS AS`) olamaz.** PostgreSQL'de
+üretilmiş sütun ifadesi yalnız **aynı satırın** sütunlarına bakabilir; alt sorgu ve başka tabloya
+başvuru yasaktır. Aile adı `product_families`'te, kategori adı `categories`'tedir.
+
+**K12.1a — Gövde `products` tablosunda DEĞİL, ayrı tabloda tutulur** (`product_search_index`,
+`product_id` birincil anahtar + `ON DELETE CASCADE`). Gerekçe K11.4'te ölçülmüştür. İki alan
+taşır: `search_body text` (ILIKE ve trigram benzerliği için ham metin — `technical_specs`
+**girmez**, JSON anahtar adları benzerlik skorunu bozar ve indeksi şişirir) ve
+`search_document tsvector` (ağırlıklı, K3.1a). Ölçülen boyut: gövde ortalama 307, en uzun 694
+karakter.
+
+**K12.1b — Yeni tabloda yetki AÇIKÇA daraltılır.** Bu veritabanında `pg_default_acl`, public
+şemasındaki her yeni tabloya `anon`/`authenticated` için `arwdDxtm` (INSERT/SELECT/UPDATE/DELETE/
+TRUNCATE/REFERENCES/TRIGGER) veriyor — ölçüldü. RLS yazmayı zaten reddeder, ama arama indeksinde
+tek katmana güvenilmez: içeriği zehirlenirse kullanıcıya **yanlış ürün** gösterilir. Bu yüzden
+`REVOKE ALL` + `GRANT SELECT` yazılır ve kuyruk tablosunda okuma da kapatılır.
+
+**K12.2 — `unaccent` IMMUTABLE değildir** (STABLE'dır), bu yüzden indeks ifadesinde ya da
+üretilmiş sütunda doğrudan kullanılamaz; IMMUTABLE sarmalayıcı gerekir. **Kurulumdan sonra
+`select proname, provolatile from pg_proc where proname='unaccent'` ile doğrulanır ve sonuç
+migration guard'ına yazılır.** *(Bu satır belge okumasına dayanıyor; bu veritabanında henüz
+ölçülmedi çünkü eklenti kurulu değil.)*
+
+**K12.3 — RPC imzası (`RETURNS TABLE`) değiştirilmez.** İmza değişikliği `drop` + `create`
+gerektirir; `drop` mevcut `GRANT`'leri de götürür ve arama anonim kullanıcıda **sessizce ölür**.
+Ortak gövde paylaşmak imza birleştirmek demek değildir.
+
+**K12.4 — Dönüş tipi daraltılmaz.** `family_slug` ve `cover_image_path` arama sonucunun ürüne
+gidebilmesi ve kapak görselini gösterebilmesi için gereklidir.
+
+## 13. Migration kuralları
+
+**K13.1** — Arama migration'ları kural 13 kapsamındadır: master'a merge = prod DB'ye **otomatik**
+uygulama. Migration'lı PR yalnız Recep'in açık onayıyla merge edilir; şerit kendi merge etmez.
+
+**K13.2 — Her migration guard bloğu taşır ve guard DAVRANIŞ ölçer.** Fonksiyon tanımının metnini
+okumak yetmez: fonksiyon **çağrılır** ve çıktısına bakılır. *(Özellikle K5.3'teki `search_path`
+tuzağı yalnız çalışma anında görünür — tanım metni temiz görünür.)*
+
+**K13.3 — Guard yetkiyi de doğrular.** `has_function_privilege('anon', ...)` — "değişmedi"
+varsayımı ölçüm değildir.
+
+---
+
+## Ek: bu cetvelin kendi ölçüm tabanı
+
+Bu dosyadaki her sayı 2026-09-15'te canlı prod veritabanında (`SELECT`) ölçüldü ve üç bağımsız
+inceleme tarafından doğrulandı (`plan-challenger` DB ekseni + kod/kapı ekseni, gstack
+`/plan-eng-review`). Ölçüm dökümü: REC-340 yorumları · yan yana inceleme:
+`docs/audits/gstack-yan-yana-2026-09-15.md`.
+
+**Ölçülmemiş olup burada belge bilgisine dayanan tek kalem K12.2'dir** (unaccent volatilitesi) ve
+bu açıkça yazılmıştır. Eklenti kurulduğunda ölçülür ve bu satır güncellenir.
 
 
 ---
@@ -3218,6 +3616,210 @@ yalnız AUTH ZİNCİRİNİ (giriş/şifre/callback/oturum, A1–A10) yönetir.
 ## Muafiyetler
 
 Yok. Muafiyet gerekirse buraya **adla** yazılır ve INV-AUTH-1/INV-AUTH-3'te aynı adla sabitlenir.
+
+
+---
+# FILE: docs\standards\bagimlilik-guvenlik-yukseltme-standard.md
+
+# Bağımlılık Güvenlik Yükseltme Cetveli
+
+> Bu cetvel REC-323 ile yazıldı. Sebebi: 2026-09-13'te `pnpm audit --prod` iki CRITICAL döktü ve
+> ortada **yöneten bir cetvel yoktu** — "cetvel yok" geçerli bir cevaptı ama bedava değildi
+> (CLAUDE.md kural 1). Aşağıdaki her madde o günün **ölçülmüş** bir olayından çıktı; hiçbiri
+> genel iyi-niyet tavsiyesi değil.
+
+## 1 · Kim, ne sıklıkla ölçer
+
+Ölçüm **ALTYAPI şeridinin** işidir ve `pnpm audit --prod` ile yapılır. `--prod` bayrağı
+zorunludur: geliştirme zincirindeki yüzlerce uyarı canlı yüzeyle karışırsa **gerçek kalem
+kaybolur**.
+
+**Sıklık (Recep kararı 13, 2026-09-15 — kendi sözü: *"13 ve 14 evet"*):** **iki haftada bir tam
+tarama** (`pnpm outdated` + `pnpm audit --prod` → `docs/audits/bagimlilik-YYYY-MM-DD.md`) **+
+her güvenlik olayında anlık tarama.** Ayrıca her `next` / `@sentry/*` / `supabase-js`
+yükseltmesinden sonra.
+
+> ⚠**BU SATIR 2026-09-15'te "haftada bir"den GEVŞETİLDİ.** Gevşetme sessizce yapılmadı: iki
+> yönün gerekçesi §1.1'de duruyor ve karar Recep'e **gevşetme olarak** sunuldu. ALTYAPI'nın
+> önerisi haftalığı korumaktı; karar aksi yönde verildi ve uygulandı. Eski satırın
+> silinmemesi kasıtlı — bir kuralın hangi yönde değiştiği, kuralın kendisi kadar bilgidir.
+
+Otomatik kapı **bilinçli olarak yok** — audit çıktısı her gün değişir ve her gün kırmızı veren
+bir kapı, üçüncü günde bakılmayan bir kapıdır (aynı sınıf: `docs/audits/` içindeki
+"yeşil kapı bakmadığı şeyi kanıtlamaz" dersleri).
+
+### 1.1 · SIKLIK REVİZYONU — **KARAR VERİLDİ** (REC-345, 2026-09-15)
+
+✅**KARAR 13 = EVET.** Recep'in kendi sözü kayda geçti (`REC-345` yorumu, 2026-09-15 08:27Z):
+*"13 ve 14 evet"*. Yukarıdaki §1 satırı buna göre güncellendi; **bu paragraf artık taslak
+değil, kararın gerekçe kaydıdır.**
+
+⚠**KARAR BİR GEVŞETMEYDİ VE ÖYLE SUNULDU:** §1 "haftada bir" diyordu, yeni satır "iki
+haftada bir". Bu bir netleştirme değil **gevşetme**; onay veren kişinin neyi gevşettiğini
+bilmesi gerekiyordu, o yüzden karara gevşetme olarak sunuldu. Gevşetmeyi sessizce yapmak,
+cetvelin kendi geçmişini silmek olurdu.
+
+⭐**ALTYAPI'NIN ÖNERİSİ AKSİ YÖNDEYDİ VE BU DA KAYDA GEÇİYOR:** öneri haftalığı KORUYUP
+görünürlüğe güvenmekti (aşağıdaki gerekçe). Karar aksi yönde verildi; karar Recep'in,
+uygulandı. Bir önerinin reddedildiğinin yazılı kalması, bir sonraki tartışmada aynı yolun
+ikinci kez önerilmesini engeller.
+
+Gevşetme lehine ölçülmüş gerekçe: tarama çıktısı her gün değişir ve haftalık tam tarama
+pratikte **koşturulmadı** — 2026-09-15'te ölçüldü, son yazılı kayıt bu tarihten öncesine ait
+değil, yani haftalık kural yazılıydı ve **tutulmadı.** Tutulmayan bir sıklık, olmayan bir
+sıklıktan daha kötüdür: kayda uyulduğu sanılır.
+
+Gevşetme aleyhine gerekçe (aynı ölçümde): bugün **11 yüksek** kayıt var ve hepsi tek bir
+doğrudan bağımlılıktan geliyor (`docs/audits/bagimlilik-2026-09-15.md` §2). İki haftalık
+pencere, böyle bir kalemin görünmesini geciktirir.
+
+⭐**ASIL DÜZELTME SIKLIK DEĞİL, GÖRÜNÜRLÜK OLABİLİR:** haftalık kural tutulmadı çünkü
+hatırlanması gerekiyordu. REC-345 ile tarama tazeliği artık her turun başında görünen bir
+satıra bağlandı (`⚠BAGIMLILIK: son tarama N gun · high H`). Yani sıklık kuralının
+tutulmasını sağlayan şey sayının kendisi değil, **görünürlüğü**. Karar bu iki seçenek ayrı
+ayrı sunularak istendi; Recep gevşetmeyi seçti. ⭐**Bu yüzden görünürlük şimdi tek savunma:**
+haftalık pencere gitti, yerine iki haftalık pencere ve her turda görünen bir satır geldi. O
+satır susarsa kuralı tutan hiçbir şey kalmaz — kapının kendi kapısı (`INV-KANCA-DEFTER-3`)
+bu yüzden var.
+
+**Eşik: 14 gün, SABİT** (Recep kararı 13; `VENTHUB_BAGIMLILIK_ESIK_GUN` ile geçici olarak
+değiştirilebilir ama varsayılan budur). Sayı kararın sıklığıyla hizalı: **iki hafta = 14
+gün.** Sıklık bir gün yeniden değişirse eşik de **aynı commit'te** değişir; ikisinin
+ayrışması, kapının cetveli değil kendini ölçmesi demek olurdu.
+
+## 2 · Şiddet tek başına süre belirlemez — MARUZİYET ölçülür
+
+⛔**Manşet şiddeti bir eylem emri değildir.** "2 CRITICAL" gördüğünde önce beş soruyu ölç:
+
+1. **Barındırıcı beyanı var mı?** Platform açığı kendi tarafında kapattıysa, canlı maruziyet
+   düşer. Kaynak **birincil** olmalı (satıcının kendi changelog'u), blog/haber **kanıt değildir**.
+2. **İlgili özellik bizde açık mı?** (2026-09-13 örneği: `images.unoptimized: true` olduğu için
+   AVIF kolu bizde kapalıydı.)
+3. **Açığın hedeflediği kod deseni bizde var mı?** (`'use server'` sayısı 0 → iki Server Actions
+   advisory'si uygulanmıyordu. `async rewrites()` yok → üçüncüsü de.)
+4. **Yalnız belirli bir işletim sistemini mi vuruyor?** ⭐O gün asıl açık kol buradan çıktı:
+   Windows RCE canlıda yoktu (Linux) ama **geliştirme makinesi Windows**. En sağlam gerekçe
+   canlı değil, **yerel ortam** oldu.
+5. **Platform beyanı KAÇ kalemi kapsıyor?** O beyan yalnız o iki kritik içindi; aynı yükseltme
+   hattının kapattığı 4 high + 5 moderate **kapsam dışıydı**.
+
+Süre eşiği bu beş ölçümden sonra yazılır:
+kimliksiz uzaktan kod çalıştırma **ve** maruziyet doğrulanmış → **aynı gün**;
+maruziyet platform/yapılandırma ile düşmüş → **o haftanın bir gece işi**;
+yalnız geliştirme zinciri → **kuyruğa**.
+
+## 3 · Tek PR = tek zincir
+
+Bir PR'da **bir paket ailesi** yükseltilir. Gerekçe ölçülmüş: üç ayrı zinciri (next, sentry,
+postcss) tek PR'a koymak, kapı kırmızı verdiğinde **hangi adımın kırdığını ölçülemez** yapar —
+"iş kırmızı değil ADIM kırmızı" (`memory/is-kirmizi-degil-adim-kirmizi`).
+
+## 4 · `pnpm.overrides` yazma kalıbı
+
+Dolaylı bir bağımlılık (ör. `. > isomorphic-dompurify > jsdom > undici`) doğrudan yükseltilemez;
+`pnpm.overrides` kullanılır.
+
+⛔**ÜST SINIR ZORUNLUDUR.** `">=7.29.0"` yazmak **ana sürüm atlatır**: 2026-09-13'te tam bu
+kalıp `undici`'yi **8.10.2**'ye çıkardı ve bunu ancak kilit dosyasını okuduğum için yakaladım.
+Doğrusu `">=7.29.0 <8.0.0"`. Kural: **override daima aralıklıdır, açık uçlu değil.**
+
+⚠`package.json` katı JSON'dur, **yorum kabul etmez** — gerekçe PR gövdesine ve bu cetvele
+yazılır, dosyaya yazılamaz. (REC-323 planı "gerekçe yorumuyla" diyordu; ölçümde bunun
+imkânsız olduğu görüldü, plan düzeltildi.)
+
+Override doğrudan beyanı **bastırır**: bir paket hem doğrudan bağımlılık hem override ise,
+kilit dosyasında override'ın aralığı görünür. Bu kasıtlı olabilir (taban tek yerden gelir) ama
+**bilinerek** yapılmalı.
+
+## 5 · "Çağıranı yok" iddiası DİNAMİK İMPORT'U DA ARAR
+
+⭐Bu madde bir hatadan doğdu ve cetvelin en pahalı satırı.
+
+2026-09-13'te bir paketin kaldırılmasına karar verilmek üzereydi; gerekçe "kodda çağıranı yok"
+ölçümüydü. **İki ayrı şerit bağımsız ölçtü ve İKİSİ DE aynı yanlışa düştü**, çünkü ikisi de
+statik kalıbı aradı:
+
+```
+from 'paket'   ·   require('paket')
+```
+
+Oysa sekiz betik paketi **çalışma anında** yüklüyordu:
+
+```js
+const { default: sharp } = await import('sharp');
+```
+
+Kaldırılsaydı katalog görsel dönüştürme hattı kırılacaktı ve **hiçbir kapı görmeyecekti**
+(o betikler CI'da koşmuyor).
+
+**Kural:** bir bağımlılığı kaldırmadan önce arama **dört kalıbı** kapsar —
+`from 'x'` · `require('x')` · `import('x')` · `importSync/createRequire('x')`.
+Ve pnpm'in katı yerleşiminde **yalnız doğrudan bağımlılıklar** proje kökünden çözülebilir:
+paket başka bir paketin altında duruyor diye betiklerin onu `import` edebileceği **varsayılamaz**.
+
+## 6 · Worktree tuzağı — `node_modules` PAYLAŞILABİLİR
+
+⛔Bu depoda bazı worktree'lerin `node_modules` dizini **ana depoya bir sembolik bağdır**
+(2026-09-06'da disk tasarrufu için bilinçli kurulmuş). Sonucu şudur:
+
+**Böyle bir worktree'de `pnpm install` koşmak, ANA DEPONUN bağımlılıklarını o worktree'nin
+`package.json`'ına göre yeniden kurar** — yani başka şeritlerin ağacını sessizce değiştirir.
+pnpm bunu "will be removed and reinstalled from scratch" diye sorar; o soru bir uyarıdır.
+
+**Kural:** bağımlılık işinde önce ölç —
+`ls -ld node_modules` sembolik bağ mı?
+Bağsa **`pnpm install` KOŞULMAZ**; yerine `pnpm install --lockfile-only` kullanılır: kilit
+dosyasını üretir, `node_modules`'a **dokunmaz** (ölçüldü: önce/sonra `.pnpm` paket sayısı 1247 = 1247).
+
+## 7 · Kapı stratejisi: doğrulama yeri CI'dır, ve bu SÖYLENİR
+
+Yukarıdaki kısıtın doğal sonucu: yükseltmenin gerçek kapıları (`build`, `type-check`, test,
+smoke) **yerelde koşamaz**, çünkü yerel ağaçtaki paketler hâlâ eski sürümdedir. Yerelde koşulan
+bir kapı "yeşil" derse **yanlış şeyi ölçmüş olur**.
+
+**Kural — fail-open ama SESSIZ DEĞİL:** bu durumda
+(a) yerelde **package.json'u okuyan** kapılar koşulur (`dependency-pins`,
+`peer-dependency-integrity` — bunlar anlamlıdır);
+(b) kilit dosyası **elle okunarak** çözülen sürümler doğrulanır (kanıt satırı PR'a yazılır);
+(c) kalan kapıların **CI'da** koştuğu ve yerelde **koşulamadığı** PR gövdesinde **adıyla**
+belirtilir. Atlanan kapı, atlandığı yazılmadıkça atlanmamış sayılır.
+
+## 8 · Canlı doğrulama ölçütü "200" olmak zorunda değil
+
+Deploy sonrası ölçütü **mevcut davranıştan** türet, varsayımdan değil — ve o davranışı
+**ölç**, bir yorumdan ya da başka bir şeritten **aktarma**.
+
+2026-09-13'te `/_next/image` ucu için "200 bekle" ölçütü **yanlış** olurdu. Ama bu maddenin ilk
+hâli de yanlıştı: beklenen kodu **402** diye yazdım, çünkü `next.config.mjs` içindeki yorumdan
+ve akranın emrinden öyle aktardım. **Ölçüm başka çıktı: 404.**
+
+Ayırt edici ölçüm (çünkü 404 "kaynak görsel yok" da demek olabilirdi):
+`/_next/image` ucu **parametresiz**, **uydurma kaynakla** ve **var olan gerçek bir görselle**
+denendi → **üçü de 404**; aynı görsel doğrudan servis edildiğinde **200 / 72.932 bayt**.
+Yani uç **hiç kayıtlı değil** — `images.unoptimized: true` olduğunda Next optimizasyon rotasını
+**kurmuyor bile**. 402 rakamı optimizasyonun **kapatılmasından önceki** hâldi (kota reddi);
+kapatıldıktan sonra kod 402 değil **404** oldu ve yorum bu geçişte bayatladı.
+
+⭐Bunun güvenlik tarafında bir yan faydası var ve ölçülmüş bir kanıttır: o günün AVIF kritik
+açığı **Image Optimization API'nin içinde** yaşıyor ve **o uç bizde 404 veriyor**. Bu, platform
+beyanından bağımsız, kendi ölçtüğümüz ikinci kanıttır.
+
+**Kural:** beklenen kodu bir **yorumdan** ya da bir **akran mesajından** almak, onu ölçmek
+değildir. Deploy öncesi ve sonrası **aynı ucu** ölç; ölçüt **"değişmemiş olması"**, ve
+"değişmemiş"in referansı **senin kendi ölçümün** olmalı.
+(Aynı sınıf: yorumlar bayatlar — `memory/duzeltilmis-ama-kosulmamis-arac`.)
+
+⚠Ölçütü seçerken **kanonik davranışı** da ölç: kök adres `/` **308** veriyor ve dil ekli
+`/tr` 200 — "ana sayfa 200" ölçütü `/` üzerinde koşulursa yanlış kırmızı verir.
+
+## 9 · Bu cetvelin kendi sınırları
+
+Örneklerin tamamı **tek bir günün** (2026-09-13) ölçümlerinden geliyor; ikinci bir vakayla
+sınanmadı. Şiddet→süre eşiği bir **öneri**, ölçülmüş bir eşik değil. Madde 6'daki sembolik bağ
+ölçümü **bu makinede** yapıldı; başka bir kurulumda düzen farklı olabilir — o yüzden kural
+"varsay" değil "ölç" diyor.
+
+İlgili: REC-323 · `memory/is-kirmizi-degil-adim-kirmizi` · `memory/yesil-kapi-gorundugunu-kanitlamaz`
 
 
 ---
@@ -4238,6 +4840,39 @@ Recep'in gözle kontrolü **paket CSV'leri üzerinde** yapılır, **tek geçişt
 
 ---
 
+## 6.6 BAĞ KURMA — tekillik gereklidir ama YETERLİ DEĞİLDİR (2026-09-09, OPS kabulü)
+
+Belge ↔ aile, kod ↔ ürün, değer ↔ kaynak: bu hattın işi büyük ölçüde **bağ kurmaktır.**
+Bağların çoğu bir **simge eşleşmesiyle** kurulur (dizin adı, dosya adı, kod parçası).
+Kural üç maddedir ve üçü de sahada ödenmiştir.
+
+**1. Simgenin TEKİL olması bağın DOĞRU olduğunu göstermez — alanın ANLAMI da ölçüte girer.**
+`belgeler.csv` koşumunda `jet` simgesi tüm ailelerde tekildi; buna rağmen Vortice'in
+*"vort jet fan system"* broşürü SEAT'in **JET ailesine** bağlandı. İki ayrı ürün dünyası,
+aynı kelime. Kapı **anlam ekseninden** geldi: belgenin markası ile ailenin markası
+ayrışıyorsa bağ **kurulmaz**. Ölçüt keskin olabilir ve yine de yanlış EVRENDE ölçüyor olabilir.
+
+**2. Karşılaştırılan alanın kendisi de ölçülür, varsayılmaz.**
+Aynı kapıyı kurarken ailenin markasını `brand_id`'den okumak yetmedi: **kolon çoğu üründe
+BOŞTU** (JET serisinin 21 ürününün hepsinde), marka serbest metin `brand` kolonunda
+duruyordu. Tek kaynağa güvenen kapı **sessizce kör** olurdu — hiçbir bağı reddetmez,
+yeşil görünürdü. *Kolonun dolu olduğu varsayılmaz, sayılır.*
+
+**3. Genel kelime simge değildir.**
+`atex` · `evo` · `range` · `serisi` gibi son ekler tesadüfen eşleşip **dört yanlış bağ**
+üretti (`vort-e-atex` → `vorticent-cms-atex`, `radon-range` → `deumido-range`).
+Simge kademesi **kısa ayırt edici koda** (≤5 karakter, genel-kelime listesi dışı) sınırlanır.
+
+### Bağ bir KANIT MI, NOT MU — kolonda yazar
+
+Dizin adından ya da dosya adından türetilen bağ bir **tahmindir**. Tabloda kalır ama
+**hangi kademeden geldiği kolonda adıyla yazılır** (`eslesme_kaynagi`). Hiçbir kademe
+tutmazsa satır **yine yazılır**, hedef hücre **boş kalır**: belgeyi tablodan düşürmek onu
+görünmez yapardı, kanıtsız bağ kurmak ise yalan olurdu. Bu, `url_kaynagi` kuralının
+(`web_kaynagi_ekle.py`, §6.3) aynı kalıbıdır — hat boyunca **tek kalıp**.
+
+---
+
 ## 7. Provenance / ilişki
 
 Kaynak: çapraz-sorgu (`cross_notebook_query` Vortice-Full + Avensair, 2026-06-19) → Avensair'in 27 gerçek bölümü atıfla.
@@ -5109,6 +5744,36 @@ sonrakiler `skipped` olur** — yani ilk arıza ikinciyi **gizler**. Yukarıdaki
 koşumunda TLS arızası hiç görünmedi, çünkü o adım hiç koşmadı.
 Dolayısıyla kırmızı bildirilirken sıra şudur: **önce HANGİ ADIM, sonra sahip.** İş düzeyi
 çıkış koduna bakıp adım düzeyini atlamak, gizlenmiş ikinci arızayı da atlamaktır.
+
+### 3.4 ⛔"İŞ MASTER'DA MI" SORUSU **İÇERİKLE** ÖLÇÜLÜR, COMMIT KİMLİĞİYLE DEĞİL (2026-09-09)
+
+**KURAL.** Bir işin master'a girip girmediği **içerik** üzerinden ölçülür:
+
+```bash
+git show origin/master:<dosya> | grep -F '<eklenen ayırt edici satır>'
+```
+
+⛔**Commit kimliği (SHA) bir içerik kanıtı DEĞİLDİR.** `squash` ve `cherry-pick` kimliği
+**değiştirir**, içeriği **korur**. Dolayısıyla `git merge-base --is-ancestor`, `git log
+origin/master..HEAD` ve "SHA master'da mı" gibi ölçütler bu iki işlemde **yanılır**.
+
+**Bu ölçüm iki yerde ZORUNLUDUR:**
+1. **Dal silmeden önce** — dalın taşıdığı değer gerçekten başka yerde mi?
+2. **Kapalı bir PR'ın dalına iş eklemeden önce** — kapalı PR yeni commit **almaz**.
+
+**NİÇİN — aynı gün, iki şerit, iki yön (ölçülmüş):**
+
+| şerit | ne yaptı | ölçüt neyi verdi | gerçek |
+|---|---|---|---|
+| ALTYAPI | cherry-pick'lenmiş §3.3 commit'inin dalını silecek | `--is-ancestor` → **HAYIR** | içerik master'da **VARDI** (yanlış NEGATİF) |
+| KATALOG | merge sonrası aynı dala 3 commit itti | push başarılı, ağaç temiz, `..HEAD` boş | üçü de master'a **GİRMEDİ** (yanlış GÜVEN) |
+
+Aynı gün ALTYAPI bu dersi yazdıktan **beş dakika sonra** kendi şeridindeki 66 uzak dalı yine
+SHA ile ölçtü ve "0'ı birleşmiş" dedi. Yama denkliğiyle yeniden ölçüm: **18 tamamen master'da,
+2 kısmen, 45 hiç.** Yani ders yazılmıştı ama **ölçüm alışkanlığı** değişmemişti.
+
+⭐**EN TEHLİKELİ SINIF "KISMEN GİRMİŞ" DALDIR:** yeşil görünür, eksiğini gizler. O yüzden
+silme kararı toplu verilemez — dal başına içerik eşleşmesi ya da açıkça yazılmış "ÇÜRÜDÜ" hükmü.
 
 ---
 
@@ -9416,7 +10081,7 @@ onu **yürüten kararı** okumak gerekir. Ben ekranı ölçüp kararı okumadan 
 | Repo çapında **geniş tarama** ("her X'i bul", 50+ dosya) | **agy-orchestrate** (ucuz) → CodeGraph doğrulama | Yargı gerektiren her adım (agy tarar, karar vermez) | `docs/audits/` |
 | **Aynı yapısal değişiklik çok hedefe** (24 admin sayfası → ortak kit; 40 bileşen → aynı hook) | **maestro** | Tek dosya · hedefler birbirinden farklı (o zaman şerit içinde sıralı) | Dalga PR'ları |
 | **Fikir / "şunu yapsak mı"** — emir açılmadan, plan yazılmadan ÖNCE ("doğru problem mi, talep kanıtı ne, en dar dilim ne") | **office-hours** (altı zorlayıcı soru + öncül çürütme + 2-3 yol → tasarım notu) | Kapsamı belli tek iş · Kararlar defterinde kapanmış konu (yeniden açma) · yazılmış planın red-team'i (→ plan-challenger) | `docs/plans/<konu>-tasarim-notu-*.md` + Recep'e ödev |
-| **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → plana "ÇELİŞEN-MEVCUT" |
+| **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team + **DÖRT SORU**, §2.2) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → **adım × dört soru tablosu** en başta + plana "ÇELİŞEN-MEVCUT" |
 | **PR diff** incelemesi | **diff-review** / **code-review** | — | PR yorumu |
 | **Uygulama gerçekten çalışıyor mu** — görsel/etkileşimli değişiklik, "öyle mi oldu", PR öncesi tarayıcı kanıtı, hidrasyon/Suspense-kökte şüphesi | **qa** (Playwright+Chromium ile gez → kanıt → atomik düzeltme → yeniden ölç) | Kod okuma denetimi (→ 20-eksen/auditor) · birim test · prod'da eylem (yalnız bakış) · uzak konteynerde dış URL (yerel `pnpm start`) | `docs/audits/qa-<hedef>-<tarih>.md` + ekran görüntüsü |
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
@@ -9444,6 +10109,33 @@ girer — girmezse "elle" kovasına düşer ve maliyeti hiç ölçülmez.
 ⚠**Sınır:** plan modunda **yazma yapılmaz**; plan onaylandıktan sonra uygulama normal yöntemle
 koşar. Kapsam sorusu **Recep'e** gider ve *yapısal karar pakete gömülmez* — menü yeri, URL şeması,
 sayfa mimarisi gibi kalemler tek tek sorulur, toplu onaya eklenmez.
+
+### 2.2 `plan-challenger` DÖRT SORU taşır — "yanlış mı" yanına "gerekli mi" (REC-347, 2026-09-16)
+
+**Ölçüm (REC-310 Faz 1, `docs/audits/gstack-yan-yana-2026-09-15.md`):** aynı plan iki araçla
+denetlendi, **35 bulgunun yalnız 6'sı örtüştü** — yani bulguların **%83'ü tek eksende** doğdu.
+Bizim `plan-challenger` "bu plan **YANLIŞ** mı" diye soruyordu (canlıda çürütme: EXPLAIN, hata
+üretme, simülasyon) ve iki P0 buldu. Öteki araç "bu plan **GEREKLİ** mi" diye sordu (depo
+envanteri, kapsam daraltma) ve bir adımın dokuz vakanın **hiçbirini** kurtarmadığını göstererek
+fazı küçülttü (→ REC-346). İkinci soru bizim skill'imizde **hiç yoktu**.
+
+**Kural:** her plan **ADIMI** için dördü de cevaplanır ve tablo raporun **EN BAŞINA** konur:
+**S1** bu adım gerekli mi (hangi vakayı/ölçütü kurtarıyor, **sayıyla**; hiçbirini kurtarmıyorsa
+**ÇIKAR**) · **S2** bu zaten var mı (depo/DB/eklenti envanteri; varsa **YENİDEN YAZMA**) ·
+**S3** kaç yol test ediliyor (kapı/fikstür **sayısı**; sıfırsa adım çıkmaz ama **"SINANMIYOR"
+damgası** alır ve damga plan metnine taşınır) · **S4** çalışan bir şeyi bozuyor muyuz (dokunulan
+yüzeyin **canlı ÖNCE/SONRA** satırı; korunacak davranış **kapıya** yazılır, nota değil).
+Hüküm kümesi: **KALSIN · DARALT · ÇIKAR · AYRI KAYIT**.
+
+**S4'ün altına CLAUDE.md kural 13 ve 14 SABİT SATIR olarak konur.** Gerekçe URUN'un çekincesi ve
+ölçülmüş: dış araç "migration merge = prod" kuralını **yalnız brief'e yazıldığı için** gördü,
+projeyi bilmiyordu. Brief'e yazılmayı bekleyen kural, yazılmadığı gün görünmez.
+
+⭐**İLK KOŞUMUN SONUCU** (`docs/audits/rec347-dort-soru-2026-09-16.md`): REC-340 Faz 1 planı
+dört soruyu geçti (yedi adımın beşi KALSIN, biri DARALT, biri zaten ÇIKAR) — ama aynı sorular
+**kendi yetenek dosyamıza** uygulandığında on bölümün **dokuzunun** ya CLAUDE.md'de ya ESLint
+kapısında ya kardeş skill'de **zaten yazılı** olduğunu gösterdi. Yani "bu zaten var mı"
+sorusunun ilk kurbanı biz olduk; kapsam denetimi önce **içeriye** bakınca ödüyor.
 
 ---
 
@@ -9570,6 +10262,71 @@ yazıldı. Sebep burada, kararı veren ALTYAPI (§3.2: yazılmamış sapma hatad
 
 ---
 
+## 8. TAM İŞ İLKESİ (REC-302) — eksik bırakmak artık tasarruf değil
+
+**Recep, 2026-09-12:** *"doğru bir proje geliştirme ve yönetme derdindeyim; hataları minimize
+eden, çözen, oluşmasını baştan önleyen test vs."*
+
+**Niçin bu bölüm var.** "Fazlasına girme, kapsamı küçük tut" öğüdü, mühendis saatinin darboğaz
+olduğu dönemde doğruydu: son %10'luk tamlık günlere mal oluyordu, o yüzden atlanıyordu. O dönem
+bitti. Aynı tamlık bugün dakikalarla ölçülüyor — yani eski temkinlilik sessizce **bahaneye**
+dönüştü. Kaynak: gstack `ETHOS.md` §1; ölçüm REC-301 ÖLÇÜM 2.
+
+⚠**Kota ile ilke ayrı şeylerdir.** Bir günün kota darlığı **geçici bir durumdur**; "bugün kota
+%5, yalnız şu işi yap" bir emirdir ve emre uyulur. Ama o emir bu bölümü askıya almaz: kapsamı
+kota daraltır, **tamlık ölçütünü daraltmaz**. Daraltılan kapsam §3.2'ye göre yazılır.
+
+### 8.1 Test aynı PR'da yazılır, sonraki işe bırakılmaz
+
+Kapıyı/testi ayrı bir kayda bırakmak, işi **ölçülmemiş** indirmektir. Ölçüt basittir: bir işin
+davranış değiştiren parçası varsa, o davranışı ölçen kol **aynı dalda** doğar. Test yazmak, bu
+cetvelin ölçtüğü en ucuz iştir; erteleme gerekçesi "zaman" olamaz.
+
+Bunun bir istisnası vardır ve adı konur: **ilke/metin işi** (bu bölüm gibi) davranış
+değiştirmez, ona kapı açılmaz. İstisnayı kullanan, gerekçesini kayda yazar.
+
+### 8.2 Tam çözüm ile %90 çözüm arasında tam çözüm seçilir
+
+Karar kuralı: iki yaklaşım arasındaki fark **yalnız satır sayısıysa**, tam olan seçilir.
+*"B daha az kodla %90'ını kapsıyor"* bir gerekçe değildir — 70 satırlık fark, insan saatinin
+darboğaz olduğu dönemin muhasebesidir.
+
+Fark satır sayısı **değilse** (yeni bağımlılık, yeni yüzey, başka şeridin dosyası, migration)
+bu kural geçmez; o zaman karar bu cetvelin değil, ilgili kapının konusudur.
+
+### 8.3 Hata yolları kodla birlikte yazılır
+
+Ağ yok, veri boş, yetki yok, dosya bulunamadı: bunlar "sonra eklenecek dallar" değil, işin
+kendisidir. Yazılmamış hata yolu, arızayı **sessiz** yapar — ve bu projede ölçülmüş en pahalı
+kusur sınıfı tam budur (§6, companion sessizliği: üç gün fark edilmedi).
+
+⭐**Geri düşme biçimi seçilir, patlama biçimi seçilmez.** Bir mekanizma, dayandığı şey yoksa
+ya **bugünkü davranışa** geri düşmeli ya **görünür biçimde** durmalı; sessizce kapanmamalı.
+
+### 8.4 Kapsam dışı olan tek şey gerçekten ilgisiz iştir
+
+"Kapsam dışı" etiketi, işin bir parçasını gizlemek için kullanılamaz. Gerçekten ilgisiz iş
+(başka bir şeridin yüzeyi, ayrı bir göç, başka bir modül) **ayrı kayıt** olarak açılır ve
+kaydın numarası işin raporunda geçer. Adı konmayan eksik, kabul edilmiş eksik değildir.
+
+### 8.5 Bu ilke hiçbir kapıyı gevşetmez
+
+Tam iş ilkesi **kapsam** hakkındadır, **yetki** hakkında değildir. Migration içeren PR yine
+Recep kapısındadır (CLAUDE.md kural 13), başka şeridin dosyası yine yazılmaz, kota emri yine
+emirdir. *"Tam yapıyordum"* bir kapıyı aşma gerekçesi olarak kullanılamaz.
+
+### 8.6 Ölçülmüş vaka (2026-09-12, aynı gün)
+
+Kanca komutlarının yolu depo köküne bağlanırken iki biçim vardı. Kısa biçim (`$CLAUDE_PROJECT_DIR`)
+ve geri düşmeli biçim (`${CLAUDE_PROJECT_DIR:-.}`). Fark **dört karakter**.
+
+Kısa biçimde değişken bir gün tanımsız kalırsa yol `/.claude/...` olur ve **on altı kapının
+tamamı filo çapında sessizce düşer** — ekranda hiçbir şey değişmez. Geri düşmeli biçimde en kötü
+hâl **o günkü hâldir**. Dört karakterlik fark, §8.2 ile §8.3'ün aynı anda karşılığıdır; kabul
+ölçütü de ona göre yazıldı (değişken boşken çıkış 0 **ölçüldü**, varsayılmadı).
+
+---
+
 İlgili: `collaboration-protocol.md` §2.1 · `measurement-discipline-standard.md` ·
 `session-loop-ritual.md` · CLAUDE.md kural 1 (No-Plan-No-Code: plan hangi cetvelle yönetildiğini söyler —
 artık **hangi yöntemle koşacağını da**).
@@ -9578,13 +10335,101 @@ artık **hangi yöntemle koşacağını da**).
 ---
 # FILE: docs\standards\fleet-mechanism-standard.md
 
-# Filo Mekanizması — Cetvel v1.0
+# Filo Mekanizması — Cetvel v2.0
 
-> **Kapsam:** çok-oturumlu filonun **hayatta kalma katmanı** — bir şeridin panoyu duyması,
-> düzenli uyanması ve bunların *kanıtlanması*. Tek soru: *bu oturum, kendisine yazılanı
-> gerçekten duyuyor mu — ve bunu nereden biliyoruz?*
+> **v2.0 (2026-09-14, REC-328, Recep kararı — kendi sözü "1"): FİLO DOĞRUDAN MESAJLA ÇALIŞIR.**
 > **Zorlayan kapı:** `INV-MECH-1` → `src/__tests__/conformance/fleet-mechanism-integrity.test.ts`
-> **İlk yazım:** 2026-08-20 · **Ölçüm sahibi:** ALTYAPI · **İş emri:** T115-VH
+> **İlk yazım:** 2026-08-20 (v1.0) · **Ölçüm sahibi:** ALTYAPI · **Kayıt:** T115-VH → REC-328
+
+## 0. YÜRÜRLÜKTEKİ MODEL — bunu oku, aşağısı büyük ölçüde tarihseldir
+
+| Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
+|---|---|---|
+| Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
+| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
+| Uyanma | cron + tur-sonu `ScheduleWakeup` | **cron KURULMAZ** (Recep 09-06) · uyandırma = mesaj |
+| Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
+
+**Niçin değişti — ölçüldü 2026-09-14, üç kalem:**
+
+1. Gözcü bugüne kadar **tek bir not yakalamadı**. Pano `SES` sütunu iki şerit için de
+   **~2700 dk (45 saat)** sessizdi; bekçiliği yapılan kanal fiilen kullanılmıyordu.
+2. Lider oturumun `TARAMA` katmanı **asılmış**, `TESLIM` kanıtı **6955 dk (~4,8 gün)** bayattı —
+   ve filo o süre boyunca **kayıpsız** çalıştı. Bütün emirler `SendMessage` ile gitti.
+3. ALTYAPI gözcüsü **kapatıldıktan sonra** pano `who` canlılığı **0 dk** kaldı: canlılık
+   **claim atışından** gelir, gözcüden değil. Üçlünün koruduğu sanılan şey zaten başka
+   yerden geliyordu.
+
+Buna karşılık maliyeti **her turda bir uyarı satırı** ve **her açılışta bir kurulum ritüeliydi**.
+Hiçbir şey yakalamayan bir uyarı, üçüncü günde bakılmayan bir uyarıdır — bu, "yeşil kapı
+bakmadığı şeyi kanıtlamaz" dersinin aynadaki hâli: **kırmızı da bakmadığı şeyi kanıtlamaz.**
+
+**v1.0'dan GEÇERLİ KALANLAR** (silinmedi, çünkü hâlâ ölçülmüş gerçek):
+
+- **§9 kanca yazım kuralları** tamamen geçerli: `cwd` kök değildir · `venthub-sid` kimliği ·
+  `git status -uall` · `windowsHide: true` · kanıtın taşıyıcısı sorusu.
+- **Teslimat katmanında YEŞİL YOKTUR** (REC-287). Artık o katmanı ölçmüyoruz, ama ilke
+  duruyor: bir kanıtın sınıfı, dayandığı varsayımdan okunur.
+- **"Talimat davranış üretmez, mekanizma üretir"** (2026-08-20, dört oturumun sağır kalması).
+  ⭐v2.0 bunu **çürütmüyor, kapsamını daraltıyor**: mekanizma gerekiyordu çünkü *kanal* pano
+  notuydu ve pano notu pasif bir kutudur. `SendMessage` **itici** bir kanaldır — mesaj
+  konuşmaya düşer, okunmak için bir bekçi gerekmez. Yani doğru ders şu olmalıydı:
+  **pasif kanal mekanizma ister; itici kanal istemez.**
+- **2026-09-01'in 62 dakikalık kaybı** hâlâ geçerli: o gün kanıtlanamayan bir katmana
+  güvenildi. Çözüm o katmanı daha iyi ölçmek değil, **ona ihtiyaç duymamak** oldu.
+
+⚠**Bu bölümün kendi sınırı:** üç ölçüm de **tek bir günün** fotoğrafıdır ve `SendMessage`in
+kayıpsızlığı **iki günlük** gözlemdir (09-13 gece, 09-14 sabah). ⭐Daha önemlisi: o iki gün
+boyunca pano `who`'da **en çok iki canlı şerit** vardı. Yani ölçülen şey "mesajlaşma ölçeklenir"
+değil, **"bir-iki pencerede mesajlaşma yeter"**dir.
+
+### 0.1 Kararın yeniden açılma tetikleri — ikisi de OLAY tetikli, takvim değil
+
+**Tetik 1 — mesaj kaybı.** Bir emir gönderildiği hâlde muhataba ulaşmadıysa karar yeniden
+açılır. O gün aranacak şey `pano notu` değil **mesaj teslim kanıtıdır** (gönderildi / cevap
+geldi / kayıp), gözcü değil.
+
+**Tetik 2 — ölçek.** Pano `who`'da **aynı anda 3 veya daha fazla canlı şerit** göründüğü
+**ilk gün**: o gün **ve ertesi gün** mesaj teslim kanıtı ölçülür — kaç emir gönderildi, kaçına
+cevap geldi, kaç tanesi kayboldu — ve sonuç Recep'e **tek madde** olarak gider.
+
+**Niçin takvim değil olay:** Recep 2026-09-14, *"ölçmek önemli tabii, zamanı geldiğinde
+hatırlayana"*. Bir kararı "ileride tekrar bakarız"a bağlamak onu kimsenin bakmadığı bir nota
+çevirir. Bu yüzden yeniden ölçüm **cetvele yazılı bir tetiğe** bağlandı: ekip büyüdüğü gün
+ölçüm kendiliğinden gündeme gelir, kimsenin hatırlamasına gerek kalmaz.
+(Sabah yoklamasında bu tetik kontrol edilir.)
+
+### 0.2 ⭐"Küçük tek amaçlı otomasyon" serbest — gözcü değil, KANCA
+
+v2.0 gözcü/prob/doğrula üçlüsünü emekli etti. Bu, **her otomasyonu** yasaklamak
+değildir. Ayrım **kanalın yönünde**:
+
+> **PASİF kanal mekanizma ister, İTİCİ kanal istemez.**
+
+`SendMessage` **itici**: gönderilen mesaj karşı tarafın turuna kendiliğinden düşer, bekçi
+gerekmez. Linear **proje yorumu pasif**: bir kutuya yazılır ve kimse bakmazsa bekler.
+
+**Ölçülmüş bedel (REC-329):** 2026-09-09'da iki Design mesajı 1,5 saat, 2026-09-13
+18:23Z'deki DESIGN-KATALOG teslim yorumları **13+ saat** cevapsız kaldı. Emekli edilen
+üçlü Linear'a **hiç bakmıyordu**; bu boşluk yeni değil, **hiç kapatılmamıştı.**
+
+**Serbest olanın sınırları — beşi birlikte sağlanmalı:**
+
+1. **Süreç kurmaz.** Cron yok, `Monitor` yok, `ScheduleWakeup` yok, koparılmış süreç yok.
+2. **Zaten koşan bir kancanın içinde** yaşar; kendi tetiği yoktur.
+3. **Tek sorgu, tek satır.** Anlatmaz, sayar.
+4. **Fail-open ve SESSİZ:** anahtar yok / ağ yok / zaman aşımı → satır yok, hata **yok**.
+   ⚠Ama sessizlik **teşhis edilebilir** olmalı: sebebi soran bir kip (`--tani`) bulunur.
+   *Sessiz bir fail-open'ın bedeli, sessizliğin sebebinin sorulamamasıdır.*
+5. **Sessizlik kuralına DAHİL EDİLİR, altına konmaz.** Satır, brifingin sessizlik
+   kontrolünden **önce** hesaplanır; yoksa pano sessizken hiç basılmaz — yani **en çok
+   gerektiği anda susar.** (Bu kusur REC-329'da ilk yazımda yapıldı, kabul sınavı
+   yakaladı, `INV-MECH-1`'e sıra kolu eklendi.)
+
+**Adı böyle konur:** *"Linear yorum sayacı = kanca, gözcü değil."* Bir otomasyonun
+hangi sınıfta olduğu, ne kadar küçük olduğuna değil, **kendi tetiği olup olmadığına**
+bakılarak söylenir.
 
 ---
 
@@ -9887,6 +10732,35 @@ tutmuşken. Betik bunu `UYGULANAMADI (desen tutmadı)` diye bildirdiği için fa
 "iki sabotajdan biri yakalandı" diyen **yanlış bir kanıt** yazılacaktı. Çok satırlı sabotaj deseni
 Windows checkout'unda **EOL-bağımsız** (`\r?\n`) olmalıdır. Bu, §9.5'teki "ölçüm aracının kendisi
 kör olabilir" dersinin ikinci örneğidir; ölçüm aracı da ölçülür.
+
+---
+
+### 9.7 BOZUK / BOŞ `stdin`: fail-OPEN ama SESSİZ DEĞİL (REC-308)
+
+**Kural.** Bir kanca `stdin`den beklediği JSON'u okuyamazsa (bozuk ya da boş):
+
+1. **İşi DURDURMAZ** — `exit 0`, yazım serbest kalır.
+2. **SESSİZ KALMAZ** — `stderr`e tek satır düşer: `[<kanca>] stdin okunamadi, karisilmadi`.
+3. Karar üretmez: hiçbir şeyi onaylamaz, hiçbir şeyi reddetmez. "Ölçemedi" hâli, "geçti"
+   hâlinden **ayrı** yazılır.
+
+**Niçin `exit 2` değil.** Bozuk `stdin` **harness/süreç sınıfı** bir arızadır; kancanın gördüğü
+tek dosyanın özelliği değildir. O anda `exit 2` vermek, sebebi hiç ilgili olmayan **bütün
+yazımları** durdurur — yani katmanın kendisi kesinti kaynağı olur (kendi kendine kesinti).
+`lane-guard` bunu 2026-08 ölçümünden beri böyle yapıyor ve gerekçesi dosyasının başında yazılı.
+
+**Niçin sessiz de olmaz.** Sessiz fail-open, kapının **çalışmış gibi görünüp hiçbir şey
+ölçmediği** hâldir — bu projede en pahalı kusur sınıfı (§9.5 companion sessizliği: üç gün fark
+edilmedi; 2026-09-12 kanca yolu vakası: `MODULE_NOT_FOUND` düştü, kapı yeşil göründü). Bir satır
+`stderr`, o hâli görünür yapmanın en ucuz biçimidir.
+
+**Kapsam.** Kural PreToolUse / Stop / SessionEnd / PreCompact kancalarının hepsi için geçerlidir.
+Güvenlik kancaları da dahildir: `sensitive-path-guard` bozuk girdide `.env` yazımını **durdurmaz**
+ama durduramadığını **söyler**. Sınıf ayrımı yok; ayrım yapmak "hangi kanca hangi hâlde ne yapar"
+sorusunu yeniden hatırlamaya bağlar.
+
+**Ölçüt (test biçimi).** Her kanca testinde bir kol: bozuk girdi → `exit 0` **ve** `stderr`
+boş değil. Tek başına "exit 0" kolu bu kuralı ölçmez — sessizlik tam orada saklanır.
 
 ---
 
@@ -12521,6 +13395,116 @@ taşır ve **farklı** şey söyler.
 
 
 ---
+# FILE: docs\standards\hukum-kaynak-standard.md
+
+# Hüküm-Kaynak Cetveli — her hükmün arkasında bugün koşulmuş bir ölçüm olur
+
+> **Doğuran olay:** 2026-09-16, URUN şeridi Recep'e **aynı oturumda dört yanlış hüküm** verdi.
+> Dördünün de cevabı elimizdeki belgelerde yazılıydı ve okunmadı. Recep'in sözü:
+> *"ben bu senin bug'ından çok sıkıldım"* · *"tekrar eden döngülerdeyiz… patinaj yapıyoruz."*
+>
+> **Recep kararı 27 (2026-09-16): KABUL** — *"ölçüm olmalı evet."*
+> **Recep kararı 26 (aynı gün): RED** — *"bunu size bırakıyorum ve bıraktığım zaman işe
+> bugünkü durum oluyor… bu önerin benim için anlamsız. var ise tersini ispatla!"*
+> Yani karar yetkisi şeride devredilmedi ve devredilmesi **ispata bağlandı.** Bu cetvel o
+> ispatın nasıl ölçüleceğini tanımlar.
+
+---
+
+## 1 · KURAL
+
+Recep'e giden her **hüküm cümlesi** — "şu bozuk", "şu boş", "şu sayı şudur", "şu çalışmıyor",
+"şu değerli değil" — yanında **kaynağını taşır.** Üç kaynak sınıfı vardır ve karıştırılamaz:
+
+| Sınıf | Nasıl yazılır | Örnek |
+|---|---|---|
+| **A · Kendi ölçümüm** | "bugün ölçtüm: …" + komut/sorgu | *"bugün ölçtüm: 441 aktif üründen 433'ü alt kategorili"* |
+| **B · Başkasının ölçümü** | "şu belgede yazılı, ölçen ben değilim" | *"REC-313 belgesinde yazılı, ölçümü ALTYAPI üç gün önce yaptı"* |
+| **C · Ölçmedim** | "bilmiyorum, bakıyorum" | — |
+
+⛔**B'yi A gibi sunmak yasak.** 2026-09-16'da graphify hükmü tam bu şekilde verildi: başka
+şeridin üç gün önceki ölçümü kendi hükmüm gibi aktarıldı, üstelik özetlenirken bozuldu.
+
+⛔**Simülasyon sayısı ölçüm sayısı değildir.** Aynı gün "jet fan 0→61" denildi; gerçek ölçüm
+21 çıktı. Bir sorgunun *tahmini* çıktısı, o sorgunun *koşulmuş* çıktısı değildir.
+
+---
+
+## 2 · VERİTABANI HÜKMÜ İÇİN EK ŞART (bugünkü hatanın doğrudan kapatılması)
+
+Bir tablonun **verisi** hakkında hüküm vermeden önce o tablonun **alan listesi** okunur:
+
+```sql
+SELECT column_name, data_type FROM information_schema.columns
+WHERE table_schema='public' AND table_name='<tablo>';
+```
+
+Bir **ilişki** ölçülüyorsa (kategori, aile, marka, üst/alt) o ilişkiyi taşıyabilecek **her
+alan** aranır: `%categ%` · `%family%` · `%parent%` · `%sub%` · `%group%`.
+
+**Niçin:** 2026-09-16'da `products.category_id`'ye bakılıp *"441 ürünün 360'ı tek kategoride,
+kategori ağacı kullanılmıyor, veri bozuk"* hükmü verildi. Tabloda `subcategory_id` diye
+**ikinci bir alan** vardı ve 441 ürünün **433'ü** dolu. Katalog sağlamdı.
+
+⭐**Ve cevap zaten yazılıydı:** `docs/database_schema_master.md` satır 370 `subcategory_id`'yi
+listeliyor; aynı belgenin 969-970. satırları `ON p.category_id = c.id OR p.subcategory_id = c.id`
+diyen mevcut bir sorguyu gösteriyor. Yani eksik olan araç değil, **var olan haritanın
+okunmasıydı** → `docs/README.md` "hangi soru → hangi dosya" haritası bu iş için var.
+
+---
+
+## 3 · KARNE — "tersini ispatla" buradan ölçülür
+
+Recep karar 26'yı reddederken ispat istedi. İspat söz değil **sayı** olacak: her geri alınan
+hüküm buraya yazılır. Sayı düşerse devir tartışılabilir; düşmezse tartışılmaz.
+
+### Taban çizgisi — 2026-09-16 (URUN, tek oturum): **4 geri alınan hüküm**
+
+| # | Verilen hüküm | Gerçek | Kök sebep |
+|---:|---|---|---|
+| 1 | "jet fan 0→61 sonuç" | ürün adında "jet" 21, JET Serisi ailesi 21 | simülasyon sayısı ölçüm gibi sunuldu |
+| 2 | "kategoriler boş, veri bozuk, plan değişsin" | 433/441 alt kategorili, katalog sağlam | tek alana bakıldı, şema okunmadı |
+| 3 | "graphify'ın komutu bozuk" | komut yanlış kullanılmış; `affected` ile **doğru** cevap veriyor | B sınıfı kaynak A gibi sunuldu ve bozularak özetlendi |
+| 4 | "kurulum kural dosyasına kalıcı blok yazıyor, kurmayalım" | üç satırlık ad kaydı; tehlikeli olan `--strict` ve o **opsiyonel** | kurulumun ne yaptığı ölçülmeden hüküm verildi |
+| 5 | "kurulum **sadece** üç satır kaydediyor" | ayrıca **iki `PreToolUse` kancası** kuruyor (`Bash\|Grep` → `hook-guard search`, `Read\|Glob` → `hook-guard read`), yani her arama ve her dosya okumasına takılıyor | 4'ü düzeltirken **ikinci kez eksik ölçtüm**: yardım metnine ve başka şeridin özetine dayandım, **kaynak kodu okumadım** |
+
+⭐**5 numara ayrı bir sınıf:** bu, 4 numaranın *düzeltmesiydi* ve düzeltme de eksik çıktı.
+Bir hükmü düzeltmek, düzeltmenin ölçülmüş olduğu anlamına gelmez — **düzeltme de A sınıfı
+kaynak ister.** Kaynak kodu okunduğunda (`install.py:324-352`, `cli.py:55-70, 814-840`)
+kurulumun üç ayrı etkisi olduğu görüldü: skill dosyası · üç satır kayıt · iki kanca.
+
+⭐**2 numara en pahalısı:** yanlış sayı yalnız yanlış bilgi değil, **iş sırasını da değiştirdi** —
+Recep'e "bu adımı yapma, önce kataloğu düzelt" denildi. Ölçüm yanlışsa plan da yanlış kurulur.
+
+### Aynı gün doğru yapılan tek şey — kayda geçer, çünkü kural bundan çıktı
+
+Taze derleme ölçümünde `products/<slug>` HTML'i yok görünüyordu. **Bulgu diye yazılmadı,
+"soru işareti" diye yazıldı ve ölçüldü** — bayat derleme çıktı. Bulgu yazılsaydı olmayan bir
+arıza için iş emri doğacaktı. Doğru davranış budur: *ölçülmemiş şey hükme dönüşmez.*
+
+### Kayıt usulü
+
+Bir hüküm geri alındığında satır **aynı oturumda** eklenir; "sonra yazarım" yoktur.
+Satır: tarih · şerit · verilen hüküm · gerçek · kök sebep (yukarıdaki dört sınıftan biri).
+Karne **yalnız büyüyebilir**; bir satır silinmez, çünkü silinebilen karne karne değildir.
+
+---
+
+## 4 · BU CETVELİN SINIRLARI (adıyla)
+
+1. **Otomatik kapı YOK.** Bu cetvel bugün bir alışkanlık sözleşmesidir; "hüküm cümlesi"ni
+   makine tespit etmiyor. Ölçülebilir tek şey §3'teki karnedir.
+2. **§2'nin kapıya bağlanması ayrı iştir** ve `.claude/hooks/**` ALTYAPI şeridindedir —
+   bu şerit oraya yazmaz. Şartname §2'de hazır; kolu ALTYAPI yazar.
+3. **Karnenin tek oturumluk tabanı vardır.** Dört sayısı bir gündür, eğilim değil. İkinci
+   ölçüm noktası olmadan "iyileşti/kötüleşti" denemez.
+4. **Bu cetvel kendi kuralına tabidir:** içindeki her sayı bu belgede ölçümüyle yazılı
+   (441/433, satır 370, 21, üç satır). Kaynaksız sayı buraya da giremez.
+
+İlgili: REC-340 · REC-313 · REC-310
+
+
+---
 # FILE: docs\standards\i18n-localization-standard.md
 
 # VentHub i18n / Localization Standardı (Cetvel)
@@ -13161,6 +14145,440 @@ yarı bağlı bir alan ise iki yüzeyde iki farklı ad demekti.
 - Sözlüğe yeni `translation_key` eklendiğinde `kategori-adi-tek-kaynak.test.ts` içindeki
   dondurulmuş liste de güncellenir (o kapının sınırı kendi dosyasında yazılı: liste DB'den
   okunmaz, ayrışmayı ölçmez).
+
+
+---
+# FILE: docs\standards\ledger-ve-olu-migration-standard.md
+
+# Ledger ve Ölü Migration Dosyası Cetveli
+
+**Sürüm 1.3 · 2026-09-16 · Şerit: ALTYAPI · Kaynak: REC-321 (Recep kararı, SEÇENEK 1) + REC-336 (§10) + REC-352 (§2.1) + Recep sorusu "bu işi neden Supabase tarafında döndüremiyoruz" (§1.1)**
+
+> ⭐**SÜRÜM 1.2 BİR İTİRAZDAN DOĞDU ve yön GENİŞLETMEDİR, daraltma değil.** Recep sordu:
+> *"biz neden cetvel oluşturuyoruz — kendimize sınır koymak için mi, yoksa geliştiricilerin
+> sunduklarını kendimize rehber edinmek için mi?"* Bu cetvel 1.1'e kadar Supabase'in o problem
+> için **ne sunduğunu hiç yazmamıştı** ve hükmü satıcının desteklediği bir yolu yasaklar hâle
+> gelmişti. §2.1 o boşluğu kapatır ve **hepimizi bağlayan genel bir kural** yazar. Eski §3
+> **silinmedi** — mekanizma reddi olarak geçerli, ama artık §2.1 ile okunur.
+
+Bu cetvel şu soruya cevap verir: **prod'a hiç uygulanmamış ama depoda duran bir
+migration dosyası ne olur?** 2026-09-14'e kadar bu sorunun yazılı cevabı **yoktu**;
+altı dosya yıllardır depoda duruyordu ve kimse ne yapılacağını bilmiyordu.
+
+## 1 · MODEL — defter tek otoritedir
+
+Bu projede migration'lar Supabase CLI'ın defterini **kullanmaz**. `psql` ile uygulanır
+ve `public._migration_ledger` tablosuna kaydedilir. Defterde adı görünen dosya
+**atlanır**.
+
+> ⚠**BU CÜMLE 2026-09-16'YA KADAR GEREKÇESİZ DURUYORDU** — bilgi vardı, NİÇİN'i yoktu.
+> Recep sordu: *"bu işi neden Supabase tarafında döndüremiyoruz, defter işini?"* ve cevap
+> hiçbir yerde yazılı değildi. §1.1 o boşluğu ölçümle kapatır. Bir cetvelin
+> gerekçesiz maddesi, bir sonraki okuyucuya "öyle karar verilmiş" demekten başka bir şey
+> söylemez; bugün o maddeyi ben savunamadım.
+
+**İlk koşu baseline'ı:** defter boşken koşan tur, o andaki **tüm** dosyaları "zaten
+uygulanmış" kabul edip yalnız **kaydeder**, çalıştırmaz. Bu, workflow'un devraldığı
+tarihsel durumdur.
+
+## 1.1 · NİÇİN KENDİ DEFTERİMİZ — İKİ DEFTER YAN YANA ÖLÇÜLDÜ (2026-09-16)
+
+Karar **tercih değil, devralınmış bir durumdu** ve bu bölüm onu ölçümle sabitler.
+
+### Ölçüm (prod, salt-okuma)
+
+| | `public._migration_ledger` (bizim) | `supabase_migrations.schema_migrations` (satıcının) |
+|---|---|---|
+| Kayıt | **235** | 110 |
+| Depodaki dosya ile parite | **235 = 235, birebir** (ad ad `md5`, bayt sırasıyla) | — |
+| Karşı defterde OLMAYAN kaydı | 232 | 108 |
+| Ortak | **3** | 2 |
+| Son yazım | **2026-09-16 12:14** (bugün, canlı) | damgaya göre **2026-04-30**'da donmuş |
+| `statements` kolonu | yok (yalnız `name` + `applied_at`) | 110/110 dolu |
+
+⭐**SATICININ DEFTERİ BU PROJEDE HİÇ TAM OLMADI.** Nisan'da donduğu anda bile 110 kayıt
+tutuyordu, o tarihe kadarki dosya sayısı ise 160'tı. Yani "kullanmayalım" kararından
+önce o defter zaten eksikti; kimse çalışan bir şeyi bırakmadı.
+
+### Kendi defterimizin verdiği — ve satıcının vermediği
+
+**Çift yönlü parite kapısı.** `supabase-migrate.yml`'ın son adımı depodaki dosya listesi
+ile defter kayıtlarını **iki yönde** karşılaştırır: dosya var/kayıt yok da hata, kayıt
+var/dosya yok da hata. Satıcının akışı bu ikinci yönü ölçmez — silinmiş bir migration
+sessizce fark edilmez.
+
+**İşlem denetimi dosya başına.** `psql` ile uygulanan dosya, kendi içinde işlem denetimi
+taşımıyorsa `--single-transaction` ile sarılır; taşıyorsa sarılmaz. Bu ayrım dosya
+düzeyindedir ve satıcı akışında yoktur.
+
+### Kendi defterimizin BEDELİ — ve bugün tam onu ödedik
+
+⛔**Satıcının migration araçlarının HİÇBİRİ bize dokunmuyor.** `supabase migration squash`,
+`migration repair`, `db push`, `db reset`, veritabanı dalları (branching) — hepsi
+`supabase_migrations.schema_migrations`'a bakıyor, bizim deftere bakmıyor.
+
+⭐**2026-09-16 kaydı, adıyla:** o gün "zincir kırık, sıfır noktası gerekiyor, Supabase
+bunun için `migration squash` sunuyor" diye bir yol önerdim ve **o yol bize kapalıydı** —
+çünkü o komut bizim defteri görmüyor. Bunu ancak canlı defteri okuyabildiğim an gördüm.
+İki defterin varlığı yazılı olsa bu tur hiç yapılmazdı.
+
+### Geçiş ne demek — ve niçin bugün yapılmıyor
+
+Satıcının rayına geçmek, 235 kaydı 110 kayıtla barıştırmak demek: satıcının defterine
+yazma, yani **prod veritabanına yazma** → CLAUDE.md kural 13, Recep'in kapısı.
+
+**HÜKÜM (ALTYAPI, 2026-09-16): bugün geçilmiyor.** Gerekçe: bizim defterimiz ÇALIŞIYOR
+(235=235 birebir, bugün yazıldı) ve çalışan bir defteri, kullanmadığımız araçlara erişmek
+için yeniden yazmanın getirisi bugünkü riski karşılamıyor.
+
+⭐**AMA BU HÜKÜM SÜRESİZ DEĞİL.** Şu üçünden biri olursa geçiş yeniden ÖLÇÜLÜR:
+1. Satıcının bir aracına **gerçekten ihtiyaç duyulursa** (veritabanı dalları en olası
+   aday: PR başına izole DB, bugün elimizde yok).
+2. Kendi akışımız bir kusur üretirse — özellikle parite kapısının **göremediği** bir
+   sınıf (kapı ADI karşılaştırır, İÇERİĞİ değil: aynı adla değişmiş bir dosyayı GÖRMEZ).
+3. Sıfırdan kurulum yolu bozulursa. Bugün o yol **taban dökümü**dür, `migrations/` DEĞİL
+   (ölçüldü: 233 dosyanın 170'i boş veritabanında düşüyor; taban dökümü 0 hatayla kuruyor
+   ve canlıyla 4/4 parite veriyor).
+
+### ⛔SIFIRDAN KURULUM: `migrations/` KULLANILMAZ
+
+Bir geliştirici ya da felaket-kurtarma senaryosu sıfırdan veritabanı kuracaksa **taban
+dökümünden** başlar (`supabase/baselines/` — en yeni **TAM** dosya, kapsamını kendi
+başlığı söyler), sonra taban tarihinden **sonraki** migration'ları uygular.
+
+`migrations/` klasörünü baştan oynatmak **çalışmaz** ve bu bir kusur değil, tarihsel
+durumun sonucudur: klasör bir **kayıt**tır, kurulum betiği değildir. Ölçüm ve gerekçe:
+`supabase/baselines/README.md`.
+
+⭐**Ölü dosya tam buradan doğar:** baseline turundan önce depoya girmiş ama prod'a hiç
+uygulanmamış bir dosya, defterde "görülmüş" olarak durur ve **bir daha asla koşmaz.**
+İçindeki SQL geçersiz olsa bile kimse fark etmez.
+
+## 2 · ⭐KURAL — ölü dosya SİLİNİR, ve defter satırı da silinir
+
+> Prod'a hiç uygulanmamış bir migration dosyası **silinir.** Silme, **aynı migration
+> içinde** `public._migration_ledger`'dan o adların da silinmesini **zorunlu kılar.**
+
+**Niçin zorunlu:** `supabase-migrate.yml`'ın son adımı bir **ledger paritesi** kapısı —
+depodaki dosya adları listesi ile defter kayıt listesi **birebir** aynı olmak zorunda ve
+**iki yön de** hata. Dosya silinir de defter satırı kalırsa kapı *"uygulanmış bir
+migration depodan silinmiş, DB ile repo ayrışmış"* der ve tur **kırmızı** yanar.
+
+→ Bu yüzden **"ölü dosyayı sil" kararı, teknik olarak "prod veritabanından satır sil"
+demektir** ve **kural 13 gereği Recep'in kapısıdır.** Bu cetvel o kapıyı gevşetmez.
+
+## 2.1 · ⭐⭐SUPABASE'İN KENDİ YOLU — BU BÖLÜM RECEP'İN İTİRAZINDAN DOĞDU (2026-09-16)
+
+Recep aynen: *"bizim cetvelimiz Supabase'den daha mı iyi biliyor? Ayrıca o cetvel Supabase'den
+esinlenmek zorunda idi. Biz neden standart ve cetvel oluşturuyoruz — kendimize sınır koymak
+için mi, yoksa geliştiricilerin sunduklarını kendimize rehber edinmek için mi?"*
+
+**Haklıydı ve bu cetvel o hatayı yapmıştı.** §3 aşağıda üç yolu reddediyor; ama Supabase'in o
+problem için **ne sunduğu** hiç yazılmamıştı. Cetvel tek bir olaydan (REC-321, beş dosya)
+doğdu, dış pratiğe bakmadı, ve hükmü **satıcının desteklediği bir yolu bize yasaklar** hâle
+geldi.
+
+### ⭐GENEL KURAL — BU CETVELDEN BÜYÜK, HEPİMİZİ BAĞLAR
+
+> **Bir cetvel bir YOLU REDDETMEDEN önce, satıcının o problem için NE SUNDUĞUNU yazmak
+> zorundadır.** Ölçmemişse açıkça *"dış pratik ÖLÇÜLMEDİ"* der ve o hüküm **ENGEL OLARAK
+> KULLANILAMAZ.**
+>
+> Cetvelin meşru alanı **YEREL OLGULARDIR**: bizim boru hattımızda migration'ın master'a merge
+> edilince prod'a **otomatik uygulanması**, deponun **PUBLIC** olması, parite globunun
+> **özyinelemeli olmaması**. Bunları satıcı bilemez.
+>
+> Satıcının **adı konmuş bir fiili** varsa varsayılan **onun yoludur**; cetvelin işi o yolun
+> **ETRAFINDAKİ yerel kısıtı** yazmaktır — yolu yasaklamak değil.
+
+⚠**Niçin tek vakadan büyük:** depoda **78 cetvel** var ve aynı hatanın kaç tanesinde olduğunu
+**bilmiyoruz.** Bu madde o taramanın ölçütüdür.
+
+### Supabase ne sunuyor — ölçüldü (`docs/audits/rec352-dis-pratik-2026-09-16.md`)
+
+| Fiil | Ne yapar | Bizim kısıtımız (HÜKÜM DEĞİL, KISIT) |
+|---|---|---|
+| **`migration squash`** | Geçmişi **tek dosyaya indirir**. Bayraklar: `--version` · `--local` · `--linked` · `--db-url` | ⛔**`--linked` BAĞLI PROJENİN defterine yazar** = prod yazması = **CLAUDE.md kural 13**, Recep'in kapısı. `--local` serbesttir. |
+| **`migration repair <sürüm> --status applied\|reverted`** | Defter tablosunu **onarır** | REC-321'de aynı işi **elle yazılmış bir migration ile** yaptık. Onların fiili daha dar ve niyeti açık; bir sonraki vakada **önce bu düşünülür.** |
+| **`db diff`** | İki durum arasındaki farkı üretir | Drift ölçümü için kullanılabilir; şema **üretmek** için kullanılmaz (bu proje imperative). |
+| **Declarative schemas** (`supabase/schemas` + `db diff`) | İstenen son hâli yazarsın, migration **üretilir** | ⛔**BİZE UYGUN DEĞİL** ve gerekçe **onların kendi belgesi**: `migra` `alter policy`'yi, kolon ayrıcalıklarını, grant'ları (default privileges'tan **mükerrer** üretiyor), comment'leri ve partition'ları **izlemiyor**. Bizde **163 politika / 379 grant** var. Ayrıca onların **kendi seçim ölçütü** bizi imperative sınıfa koyuyor: `supabase/schemas` YOK, `config.toml`'da `schema_paths` YOK. |
+
+### ⭐SIFIR NOKTASI İKİ AYRI SORUDUR — birleştirmek ölçümden geniş hüküm üretir
+
+2026-09-16'da ölçüldü: `supabase db reset` **233 migration'ın 2'sinde** düşüyor
+(`202508241205_rpc_admin_orders.sql` → `type "venthub_orders" does not exist`).
+
+- **`supabase db reset` (resmî yerel yol) için sıfır noktası GEREKLİ** — o yol 1. dosyadan
+  başlar ve zincir orada kırık.
+- **Gölge/taban yolu için GEREKLİ DEĞİL** — o yol tabandan başlar, kırık halkayı hiç görmez;
+  yani gölge **zaten sıfır noktası gibi** çalışıyor (`scripts/db/golge-kur.mjs`).
+
+⚠İlk yazımda bunu birleştirip *"zincir kırık → squash şart"* dedim; **akran ölçümle daralttı ve
+haklıydı.** İki soruyu ayırmadan verilen hüküm, ölçümden geniş çıkar.
+
+⛔**KAÇ YERDE KIRIK OLDUĞU HENÜZ ÖLÇÜLMEDİ.** Sayı 3 ise onarılır, 40 ise onarılmaz — ve karar
+o sayıya bağlıdır. Bu satır yazıldığı anda o ölçüm **açık borçtur**.
+
+## 3 · REDDEDİLEN ÜÇ YOL, gerekçeleriyle
+
+⚠**BU BÖLÜM §2.1 İLE OKUNUR.** Aşağıdaki üç red **mekanizma** reddidir (ölçülmüş: glob
+özyinelemeli değil, istisna listesi kapıyı kör eder, yerinde tutmak kurtarmayı çözmez) —
+**sıfır noktası KAVRAMININ reddi DEĞİLDİR.** Satıcının o kavram için fiili vardır (§2.1).
+
+| Yol | Niçin reddedildi |
+|---|---|
+| **Alt dizine taşı** (`uygulanmaz/`) | Hem uygulama hem parite adımı `supabase/migrations/*.sql` globunu kullanıyor ve glob **özyinelemeli değil**. Alt dizine taşımak, parite açısından **silmekle aynı** sonucu verir — yani ayrı bir yol değil. |
+| **Parite kapısına istisna listesi** | Kapının amacını yok eder: defter, "atla" kararının **tek** dayanağı; istisna listesi o dayanağın **kör bir sınıfını** yaratır. Üstelik konformans kolu R3 parite adımının **varlığını** ölçüyor, **katılığını ölçmüyor** — istisna eklenince kapı **yeşil görünmeye devam eder.** |
+| **Yerinde tut, başına "ÖLÜ" notu düş** | Prod'a dokunmaması cazipti (ALTYAPI ve OPS bunu önerdi). Ama **felaket kurtarmayı çözmüyor** — aşağıya bakınız. |
+
+## 4 · ⛔FELAKET KURTARMA — İLK YAZDIĞIM BU BÖLÜM YANLIŞTI, bağımsız çürütme çürüttü
+
+Bu bölümün ilk hâli *"replay bugün patlıyor, silme bunu çözüyor"* diyordu. **Yanlıştı.**
+Bağımsız çürütme (plan-challenger, 2026-09-14) çürüttü; ben de kendim ölçüp doğruladım.
+Yanlış cümle silinmiyor, **düzeltilmiş hâliyle burada duruyor** — çünkü bu cetvelin en
+öğretici maddesi bu.
+
+### Ölçülen gerçek
+
+| | Replay nerede durur | Hata türü |
+|---|---|---|
+| **Silmeden önce** | `20250907_admin_audit_log.sql` | sözdizimi hatası (`CREATE POLICY IF NOT EXISTS`) |
+| **Silmeden sonra** | `20250908_enable_realtime_error_tables.sql` | `relation "error_groups" does not exist` |
+
+→ **Replay iki hâlde de imkânsız.** Silme, kırılma noktasını **bir gün** ileri kaydırıyor
+ve hata türünü değiştiriyor. **Net durum değişmiyor.**
+
+### Ve altında daha ciddi bir şey var (yeni bulgu)
+
+**Üç tabloyu hayatta kalan HİÇBİR migration yaratmıyor:** `client_errors`,
+`error_groups`, `user_invoice_profiles`. Buna karşılık o tablolara dokunan hayatta kalan
+migration sayısı **9 · 9 · 8** (GRANT, `CREATE INDEX`, `ALTER TABLE`, `CREATE POLICY`).
+`admin_audit_log` tek istisna: onu `20250910_fix_admin_audit_log_policies.sql` yeniden
+yaratıyor.
+
+⭐**Yani bu depo, migration geçmişinden veritabanını yeniden kuramıyor.** Tablolar
+prod'da **var** (8-9 migration onlara başarıyla dokunmuş), ama depoda **onları yaratan
+bir migration yok** — yani prod'un şeması, migration geçmişinin **üretebileceğinden
+farklı.** Bu, REC-321'den **bağımsız ve daha büyük** bir açık: bugün bir felaket
+kurtarma denenirse migration geçmişi yetmez. **Ayrı kayıt gerektirir.**
+
+⚠**Bir kayıp da var, adıyla:** silinen `202508261956_user_invoice_profiles.sql`
+**geçerli SQL** taşıyordu (politikaları `DO $$ ... EXCEPTION WHEN duplicate_object`
+ile korumalı) ve `user_invoice_profiles` tablosunun **tek yaratıcısıydı.** Silmek o
+yaratıcıyı kaldırdı. Replay zaten daha erken kırıldığı için bugün **maskeli** bir
+kayıp — ama gerçek.
+
+### DERSLER (ikisi de ilk yazımdan farklı)
+
+1. ⭐**Bir öneri ölçülmemiş bir boyutta yanlış olabilir** — bu ders **ayakta**: ALTYAPI ve
+   OPS bağımsız olarak aynı seçeneği önerdi ve ikisi de DR boyutunu ölçmemişti. *İki
+   bağımsız önerinin uyuşması, ikisi de aynı şeye bakmadıysa doğrulama değildir.*
+2. ⛔**Ama "ölçtüm" demek de yetmiyor:** ben DR boyutunu ölçtüm ve **yarısını** ölçtüm.
+   *"Bu dosyalar patlıyor"* doğruydu; *"silmek bunu düzeltir"* **ölçülmemiş bir
+   çıkarımdı** — silme sonrasında replay'in nerede durduğunu ölçmemiştim. **Bir
+   düzeltmenin işe yaradığı, düzeltme SONRASI durum ölçülmeden söylenmez.**
+3. **Karar yine de doğru kalıyor** ama **başka bir sebeple:** dosyalar prod'da ölü, geri
+   dönüşü olmayan bir işlev taşımıyorlar ve depoda yanlış inanç üretiyorlar. DR gerekçesi
+   **geçersiz**; "ölü dosya tutulmaz" gerekçesi **geçerli.** Doğru hükmü yanlış sebeple
+   savunmak, bir sonraki kararda yanlış yere götürür.
+
+→ **KURAL:** ölü/geçersiz migration kararlarında DR replay boyutu **hem önce hem sonra**
+ölçülür ve **iki sayı** yazılır. "Bu düzeltme DR'ı iyileştirir" cümlesi, düzeltme
+sonrası kırılma noktası ölçülmeden yazılmaz.
+
+## 5 · POLİTİKA KAYBI SORUSU — ayrı borç, bu cetvel onu kapatmaz
+
+Ölü dosyaların **adları** bazı tablolara RLS politikası yazmayı vaat ediyordu
+(`admin_audit_log`, `client_errors`, `error_groups`, `product_images`,
+`user_invoice_profiles`). Dosyalar hiç uygulanmadığı için **o politikalar prod'da YOK.**
+
+⚠**Dosyaları silmek bu borcu KAPATMAZ** — yalnız **yanlış inancı** kaldırır. Gerçek
+politika işi ayrı kayıttır (REC-321 adım 2). Bir temizliğin, kapatmadığı borcu
+kapatmış gibi görünmesi bu cetvelin engellediği şeydir.
+
+## 5.1 · ⭐ÖLÜ OLMAK TEK BAŞINA SİLME GEREKÇESİ DEĞİLDİR
+
+REC-321 **altı** ölü dosyayla başladı, **beşi** silindi. Altıncısı
+(`202508261956_user_invoice_profiles.sql`) **duruyor** ve sebebi ölçüldü:
+
+| Ölçüt | Bu dosya |
+|---|---|
+| Prod'a uygulanmış mı | **hayır** (ölü) |
+| Geçersiz SQL taşıyor mu | **hayır** — politikaları `DO $$ … EXCEPTION WHEN duplicate_object` ile korumalı |
+| Replay'de işe yarıyor mu | **evet** — `public.user_invoice_profiles` tablosunun depodaki **tek yaratıcısı**, ve o tabloya dokunan sekiz migration hayatta |
+
+→ **KURAL:** silme gerekçesi **ölülük değil, GEÇERSİZLİK + İŞLEVSİZLİK.** Recep'in
+ilkesi *"işe yaramayan dosya tutulmaz"* idi; bu dosya **yarıyor**, dolayısıyla ilke onu
+**kapsamıyor.** Üç ölçüt de ayrı ayrı ölçülmeden bir dosya silinmez.
+
+⭐**Bunu bir SAYI düzeltmesi ortaya çıkardı.** "Altı dosyada 11 geçersiz ifade" sayısını
+yorumsuz kod üzerinde yeniden ölçünce **10 ve beş dosyada** çıktı; fazlalığın bu dosyanın
+**yorumundan** geldiği görüldü. Yani **sayıyı düzeltmek kararı düzeltti.** Bayat bir sayı,
+yanlış bir kapsam üretir — ve kapsam uygulanmış olsaydı geri dönüşü olmayacaktı.
+
+## 6 · SİLMEDEN ÖNCE YAZILAN KAYIT — zorunlu adım
+
+Ölü bir dosya silinmeden **önce**, o dosyanın **başka bir yerdeki ize sebep olup
+olmadığı** kayda geçirilir.
+
+**Ölçülmüş örnek:** silinen `20250909_fix_product_images_rls.sql`, REC-322'nin
+hedeflediği üç ölü `storage.objects` politikasını **düşüren** dosyaydı. Hiç
+uygulanmadığı için o düşürme **hiç olmadı** — yani *"üç ölü politikanın bugüne kadar
+yaşamış olabilmesinin sebebi, onları öldürecek dosyanın hiç koşmamış olması."*
+
+→ **KURAL:** ölü dosya silinmeden önce bu bağ **iş kaydına yorum olarak** yazılır. Dosya
+gidince iz kaybolur; *"bu niye böyle olmuş"* sorusunun cevabı o yorumda kalır.
+
+## 7 · ARİTMETİK YAZILIR, VARSAYILMAZ
+
+Silme PR'ında şu dört sayı **ölçülerek** yazılır:
+
+1. depodaki migration dosyası sayısı,
+2. **son yeşil parite koşumundaki** dosya sayısı (defterin o anki sayısı budur),
+3. o koşumdan sonra depoya giren migration sayısı (`git diff --diff-filter=A`),
+4. silinen ve eklenen dosya sayısı.
+
+Sonra iki taraf **eşit mi** diye gösterilir. Ayrıca **adım sırası** doğrulanır: uygulama
+adımı parite adımından **önce** koşmalı, yoksa silme turu kırmızı yanar.
+
+**REC-321'in sayıları (TAZELENMİŞ, bkz. §7.2):** 237 dosya · son yeşil koşum (`667a49ab`) 237 · sonradan giren
+**0** · silinen **5**, eklenen 1 → **dosya 233, defter 233** (ikisi de ÖLÇÜLDÜ, bkz. §7.1). Adım sırası: Baseline(80) →
+Apply(95) → Parite(179). ✓
+
+## 7.1 · ⭐DEFTER OKUNABİLİYORSA DOLAYLI KANITLA YETİNİLMEZ
+
+REC-321 ilk yazımında defterin sayısı **dolaylı** olarak çıkarılmıştı: *"son parite
+koşumu yeşil geçtiğine göre defter dosya sayısına eşitti."* Doğru bir çıkarımdı ama
+**o koşumun anı** için geçerliydi.
+
+Recep 2026-09-14'te prod defterini **salt-okuma** okuma iznini verdi. Ölçüm:
+
+| Ne | Değer |
+|---|---:|
+| `_migration_ledger` toplam kayıt | **237** |
+| depodaki migration dosyası | **237** |
+| silinecek beş addan defterde bulunan | **5** |
+| tutulan `202508261956_…` defterde | **1** |
+| REC-322 migration'ı (#1186) defterde | **1** |
+
+→ **Parite artık dolaylı değil, ÖLÇÜLMÜŞ.** Ve beklenen silme sayısı **tahmin değil,
+ölçüm**: tam beş.
+
+→ **KURAL:** defteri okumak mümkünse **dolaylı kanıtla yetinilmez.** Dolaylı kanıt
+(yeşil kapı) yokluk için yeterli olabilir, ama **bir sayıyı** dayandırmak için zayıftır;
+o sayıya bir kontrol bağlanacaksa doğrudan ölçülür.
+
+## 7.2 · ⚠TABAN KAYARSA ARİTMETİK YENİDEN ÖLÇÜLÜR
+
+REC-321'in sayıları **bir kez tazelendi** ve sebebi öğretici: ilk yazımda taban **236**,
+referans koşum `643c7089` idi. Sonra REC-322'nin migration'ı master'a girip prod'a
+uygulandı; yeni parite koşumu `667a49ab` **237** dosyayla yeşil geçti. **Defterin
+dayanağı değişti.**
+
+⚠**Eski sayı hâlâ "doğru görünüyordu"** — tutarlı bir üçlüydü (236/236/232) ve yalnız
+**yeniden ölçüm** yakaladı.
+
+→ **KURAL:** dal master'la tazelendiğinde **aritmetik de yeniden ölçülür.** Bu sayılar
+"bir kez yazılıp bırakılan" sayılar değil, **tabana bağlı** sayılardır.
+
+## 8 · DEFTER SİLMESİ DOĞRULANIR — "koştu" ile "yaptı" ayrı şeyler
+
+`delete` ifadesi **desen kullanmaz** (`LIKE '2025%'` gibi) — bir desen yarın eklenen bir
+dosyayı da kapsayabilir ve migration sessizce **yanlış satırı** siler. Adlar **tek tek**
+yazılır.
+
+Silmeden **sonra** kalan satır sayısı **aynı transaction içinde** doğrulanır; beklenen
+sayı çıkmazsa `raise exception` ile tur **kırmızı** yanar ve transaction geri alınır.
+Sessiz bir kısmi silme, paritenin bozulması demekti.
+
+## 9 · BU CETVELİN SINIRLARI (adıyla)
+
+- ⭐**Defter DOĞRUDAN okundu** (2026-09-14, Recep'in kendi izniyle, salt-okuma): 237
+  kayıt, silinecek beş addan defterde **5**. Yani bu cetvelin ilk yazımındaki "dolaylı
+  kanıt" sınırı **kapandı** ve beklenen silme sayısı migration'a **ölçülmüş** olarak
+  yazıldı (§7.1).
+  ⚠**Kalan sınır:** bu ölçüm de bir **ANA** aittir. Merge ile uygulama arasında defter
+  elle değiştirilirse migration **kırmızı** yanar (beklenen 5 tutmaz) — bu **istenen**
+  davranıştır, kusur değil.
+  ⚠**İzin disiplini de kayda geçti:** aynı izin önce bir **akran aktarımıyla** geldi ve
+  **kullanılmadı** — o çağrıyı reddeden şey Recep değil, oturumun izin katmanıydı;
+  reddedilmiş bir eylemi "onaylandı" denerek yeniden denemek o katmanı atlamak olur.
+  İzin Recep'in **kendi cümlesiyle** ulaştığında aynı turda koşuldu.
+- **REC-321'in "11 geçersiz ifade" sayısı düzeltildi:** yorumlar çıkarıldıktan sonra
+  gerçek sayı **10** ve **beş** dosyada. Altıncısı
+  (`202508261956_user_invoice_profiles.sql`) geçersiz SQL **taşımıyor** — içindeki
+  `IF NOT EXISTS`'lerin hepsi geçerli `CREATE TABLE`/`CREATE INDEX` biçimi; tek
+  `CREATE POLICY IF NOT EXISTS` geçişi bir **yorum** satırında. 11 sayısı o yorumu da
+  saymıştı. O dosya ölü ama "geçersiz" değil, yalnız hiç uygulanmamış.
+- **Bu cetvel tek bir vakadan yazıldı.** İkinci bir ölü dosya kümesi çıkarsa buradaki
+  kural sınanmış olacak; bugün sınanmamış durumda.
+
+## 10 · ⭐ŞEMA YARATAN MIGRATION VERİ KOŞULU ARAMAZ (REC-336, 2026-09-15)
+
+**Sürüm 1.1 ile eklendi. Kaynak: REC-336 şema replay ölçümü — `docs/audits/rec336-baseline-2026-09-15.md`.**
+
+### Kural (üç cümle)
+
+1. **Şema yaratan bir migration VERİ koşulu ARAMAZ.** `create table`, `alter table`,
+   `create index`, `create policy` yapan bir dosya "şu tabloda şu kadar satır olmalı"
+   diye bir ön koşul koymaz.
+2. **Veri koşulu AYRI DOSYAYA yazılır.** Aynı işi yapan iki dosya olur: biri şemayı
+   kurar, diğeri veriyi taşır ve kendi ön koşulunu arar.
+3. **Migration KENDİ İŞLEMİNİ COMMIT ETMEZ.** Sarmalamayı koşucu yapar; dosya kendi
+   `commit`ini yazarsa hata anındaki durum kısmi kalır ve kimse neyin uygulandığını
+   bilemez.
+
+### Niçin — ölçülmüş olay, varsayım değil
+
+REC-336'da boş bir gölge veritabanına taban dökümü + 63 migration oynatıldı: **25'i
+düştü.** Kök sebep **tek dosya**: `20260811_f2_split_model_schema.sql`.
+
+O dosya aynı işlem içinde üç şeyi birden yapıyor: `brands` ve `product_families`
+tablolarını (ve indekslerini) **yaratıyor**, "yeni kategori sayısı 4 değil" diye bir
+**veri koşulu arıyor**, ve **kendi işlemini commit ediyor.**
+
+Boş gölgede kategori verisi yoktur → koşul tutmaz → dosya işlemi geri alır → **yarattığı
+ŞEMA da geri gider** → ondan sonraki ~20 migration `brands` bulamadığı için domino gibi
+düşer.
+
+**Korumanın kendisi DOĞRU tasarımdır.** Sessiz kısmi göç yerine geri almak istenen
+davranıştır ve bu cetvelin §8'i de bunu söyler. Yanlış olan **YERİ**: şema ile veri koşulu
+aynı işlemde birleşince, **veri yoksa şema da üretilemez** hale gelir. Tek bir karışık
+dosya, bütün zincirin sıfırdan kurulabilirliğini imkânsız kılar.
+
+### ⭐NİÇİN BU BİR SİLME/DÜZELTME EMRİ DEĞİL
+
+Geçmiş bir migration'ı **değiştirmek yasaktır** (§1: defter tek otoritedir; dosyayı
+değiştirmek pariteyi bozar). O yüzden `20260811_f2_split_model_schema.sql`
+**değiştirilmedi** ve değiştirilmeyecek. Kural **bundan sonra yazılacak** dosyalar için
+geçerlidir; mevcut dosya **BORÇ** olarak ilan edilir
+(`docs/sema-replay-veri-korumali-migrationlar.json`, sınıf `SEMA-VERI-KARISIK`).
+
+Borcun çözüm yolu dosyayı geçmişte onarmak değil, **taze bir şema tabanı tutmaktır**:
+taban canlının o günkü hâli olduğu için karışık dosyanın üstünde durur ve zincir artık
+ondan başlamaz.
+
+### İLAN EDİLMİŞ İSTİSNA
+
+Kural mutlak değildir ama istisna **bedavaya alınmaz.** Bir dosya hem şema hem veri koşulu
+taşıyacaksa:
+
+- Dosya `docs/sema-replay-veri-korumali-migrationlar.json` içinde **`SEMA-VERI-KARISIK`**
+  sınıfıyla ilan edilir,
+- İlan kaleminde **`borc` alanı zorunludur** ve niçin başka yolu olmadığını yazar,
+- Kapı (`INV-SEMA-TABAN-2`) ilanı ve borcu ölçer; ilansız bir karışık dosya **KIRMIZI**.
+
+**Muafiyet ile sınıf ilanı aynı şey değildir:** muafiyet "hatasını görmezden gel" der,
+sınıf ilanı "bu bir kusurdur, adı yazılıdır, yenisi böyle yazılmaz" der.
+
+### SINIR (adıyla)
+
+- Bu kural **bir vakadan** yazıldı. İkinci bir karışık dosya çıkarsa kural sınanmış
+  olacak; bugün sınanmamış durumda.
+- Kapı, karışık dosyayı **ilan zorunluluğu** üzerinden ölçer; "şema mı veri mi" ayrımını
+  SQL'i anlayarak yapmaz. Yani yeni yazılan bir karışık dosya, kimse ilana koymazsa
+  **kapıya yakalanmaz**. Bu boşluk bilinçli olarak açık bırakıldı ve burada yazılıdır:
+  SQL'i anlamaya çalışan bir ölçüt, yanlış-kırmızı üretip kapatılma riskini taşır.
 
 
 ---
@@ -16467,8 +17885,60 @@ bulgu dosyaları `docs/proje-takip/design-15a/` altında yaşar (önceden yalnı
 kapı adayı: OPS açılış rutini iki damgayı karşılaştırır, ayrışınca uyarı (ALTYAPI kapı tarafını yazar). Aynı gün ikinci
 olay: damga elle yazılınca önce yanlış ofset (dosya doğuştan bayat), sonra gelecek tarih (kapı sonsuza kadar yeşil = kör)
 çıktı. Kural: **damga elle yazılmaz, `date -u` ile ölçülür; eşitleyici üretir (v1.1); kapı `kopya > şimdi` hâlini HATA sayar.**
-Bugün kapı yok; `olc` çıkış 3 iken merge'i durduran bir CI kolu NLM girişi olmadan kurulamaz. Aday: manifest kapsamındaki
-dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
+`olc` çıkış 3 iken merge'i durduran bir **CI** kolu NLM girişi olmadan kurulamaz; o hâlâ kurulu değil. Aday: manifest
+kapsamındaki dosya değişen PR'da `state.json` da değişmemişse UYARI (kırmızı değil) — "eşitleme borcu" görünür kılınır.
+
+### 5.1 · ⭐AÇILIŞ SATIRI KAPISI — KURULDU (REC-342, 2026-09-15)
+
+⛔**"Bugün kapı yok" cümlesi 2026-09-15'te ÖLÇÜLDÜ ve YANLIŞ ÇIKTI.** Kapı vardı:
+`.claude/hooks/defter-bayatlik-olcumu.cjs` Stop olayında kurulu, `settings.json`'da bağlı ve elle koşturulduğunda doğru
+cevabı veriyordu ("son eşitleme 178 saat önce"). Yani REC-342'nin açılış varsayımı da bu paragraf da yanlıştı.
+
+⭐**Eksik olan ölçüm değil, ölçümün GÖRÜNDÜĞÜ YÜZEYDİ.** Üç sebep ölçüldü: (a) kanca **Stop** olayında koşuyor, yani
+turun SONUNDA — açılışta karar veren kişi görmez, defterin bayat olduğunu onu KULLANDIKTAN sonra öğrenir; (b) `async:
+true` ile kurulu ve **stderr**'e yazıyor, eşzamansız bir kancanın stderr'i turun akışına girmez; (c) 2 saatlik soğuma
+penceresi gürültü için doğru ama "bugün defter kaç gün bayat" sorusunun cevabı HER TURDA gerekir.
+**Bir kapının var olması, kararın verildiği yerde GÖRÜNDÜĞÜ anlamına gelmez.**
+
+⭐**İKİNCİ VE DAHA SESSİZ KUSUR (aynı ölçümde bulundu):** Stop kancası `olc` fiilinin **çıkış kodu 3**'ünü ARIZA
+sayıyordu ve `catch`e düşüp "OLCULMEDI" basıyordu. Oysa 3 bu cetvelin yukarıdaki satırında ve betiğin kendi başlığında
+**yazılı sözleşmedir**: "değişen var". Sonuç: sayı **tam gerektiği anda** kayboluyordu — defter tazeyken (çıkış 0)
+kusur hiç görünmüyordu. *Sözleşmesi YAZILI bir betik için çıkış kodu bir CEVAPTIR; sözleşmesi olmayan bir komut için
+yalnız bir işarettir.*
+
+**KURULAN KAPI:** `.claude/hooks/defter-tazelik-satiri.cjs`, **UserPromptSubmit** olayında, her turun **başında** tek
+satır:
+
+```
+⚠DEFTER: son esitleme 2026-09-08 (7 gun) · olc 14 degisen/22 · Kararlar kopyasi 3 gun
+```
+
+- **Eşik (VEYA ile bağlı):** yaş ≥ 2 gün **YA DA** değişen demet ≥ 1 → satır `⚠` ile başlar. Defter bugün eşitlenmiş
+  olsa bile içerik kaymışsa "taze" demek yanlış olur.
+- **Yaş ölçütü** `git log origin/master -- docs/proje-takip/state.json` — dosya damgası **DEĞİL**, çünkü eşitleme başka
+  bir worktree'de koşar ve yerel damga yanıltır (2026-09-07'de ölçüldü).
+- **Bütçe: KANCANIN KENDİ İŞİ ≤ 300 ms — ve bu, TOPLAM süre DEĞİLDİR.** ⚠Bunu düzeltiyorum: REC-342'de "266-298 ms"
+  yazmıştım, ölçüm aracımın gürültüsüyle iyimser çıkmış. Temiz ölçüm (5 koşum, aynı makine): kanca toplamı **355-534
+  ms**, **çıplak node açılışı 170-292 ms**. Yani node tabanlı hiçbir kanca bu makinede 300 ms'nin altında TOPLAM süre
+  veremez; yorumlayıcının kendi açılışı tek başına bütçeyi yiyor. Ölçülebilir ve anlamlı olan ölçüt **kancanın kendi
+  işi**: ~135-240 ms (toplam eksi node açılışı). Bir bütçe yazılırken **hangi sürenin ölçüldüğü** de yazılmalıdır,
+  yoksa sayı ya erişilemez olur ya da sessizce gevşetilir.
+- **`olc` bu bütçeye SIĞMAZ:** ölçülen süreler `git log` 63 ms, `python olc` **631 ms**. Bu yüzden pahalı sayı burada
+  koşturulmaz; Stop kancasının yazdığı **önbellekten** okunur
+  (`.defter-olc-onbellek.json`, oturumdan bağımsız). Önbellek 24 saatten eskiyse **sayı KULLANILMAZ** ve satır
+  "önbellek bayat" der — *eski bir sayıyı taze gibi göstermek, hiç göstermemekten kötüdür.*
+- **Fail-open ama sessiz değil:** çıkış daima 0 (tur bloklanmaz), ama ölçemezse **"ölçülemedi (sebep)"** yazar.
+- ⛔**Dış servise çıkmaz:** NotebookLM'e hiçbir istek atılmaz; eşitlemeyi insan tetikler. Kapı bunu kaynakta da ölçer.
+
+**SINIRI (adıyla):** Kararlar kopyası ölçümü **dosya adındaki tarihi** okur, Linear belgesinin gerçek `updatedAt`
+değerini **değil**. Yani "kopya ne zaman alındı" sorusunu cevaplar, "kaynak o gün değişti mi" sorusunu **cevaplamaz** —
+o, API ister ve bu kanca çevrimdışıdır. Kopya bugünse kaynak yine de değişmiş olabilir; bu boşluk açıktır. Yukarıdaki
+damga-karşılaştırma adayı (v1.1) o boşluğun kapatma yolu olarak duruyor.
+
+**Kapı kendi kapısı:** `src/__tests__/conformance/kanca-defter-tazelik.test.ts` — 11 kol, iki bölüm. İki yön de ölçülür
+(bayatsa ⚠, tazeyse ⚠ YOK), "ölçemedi ≠ taze" ölçülür, bayat önbelleğin sayı olarak kullanılmadığı ölçülür, ve çıkış-3
+sözleşmesinin hem betikte hem **bu cetvelde** yazılı olduğu ölçülür — koda gömülü, yazılı olmayan bir sözleşme bir
+sonraki okuyucu için tuzaktır.
 
 **Hafıza sınavı (belgeler için kapı, v1.1):** `scripts/nlm/hafiza_sinavi.py` + `docs/proje-takip/hafiza-sinavi.json`
 (20 soru). Her soru deftere sorulur; cevap anahtarı Recep'ten değil YAZILI kararlardan gelir (Linear Kararlar, VISION,
@@ -17925,6 +19395,117 @@ ayrı ayrı kırmızı yanar.
 > prod'da elle düşürülseler repo bunu göremez. Bunları idempotent bir migration'la repoya yazmak
 > gerekir; migration prod'a otomatik uygulandığı için (CLAUDE.md kural 13) kullanıcı onayı ister.
 
+### 3.1 Ana sayfa (`/[lang]`) — yüzeyden tabloya, ölçüm 2026-09-14 (REC-59 adım 2)
+
+Yukarıdaki §3 tablosu **tablo başına** yazılmıştır: bir tablonun tetiği ve handler dalı var mı.
+Bu alt bölüm ters yönü kapatır — **bir SAYFANIN gösterdiği her tablo o zincirde var mı.** İkisi
+ayrı sorulardır ve 08-15 hatası tam bu boşlukta yaşadı.
+
+Ana sayfanın RSC'si üç şey okur (`src/app/[lang]/page.tsx`, `getCachedHomeData`):
+
+| Ana sayfada görünen | Kaynak | Tetik + handler | Ana sayfa etiketini tazeliyor mu |
+|---|---|---|---|
+| Kategori ızgarası (ad, açıklama, görsel, slug) | `categories` | `on_categories_change` + handler var | **EVET** — `revalidateTag(HOME_DATA_TAG)` |
+| Öne çıkan 12 ürün kartı | `products` | `on_products_change` + handler var | **EVET** — `revalidateTag(HOME_DATA_TAG)`; ayrıca `UPDATE` dalında `homeDataTag(tenantId)` |
+| Boş-kategori gizleme sayacı | `get_category_counts()` RPC → `products` + `categories` | üstteki iki tetik | **EVET** (türev; kendi tablosu yok) |
+
+Yani ana sayfanın tazeleme borcu **YOKTUR**; ayrı kayıt açılmadı. `product_prices` dalının ana
+sayfa etiketine bilerek dokunmaması kusur değil kuraldır: fiyat yalnız PDP'de görünür (§2), ana
+sayfa kartları `hidePrice` geçer.
+
+**⭐ETİKETİN İKİ UCU AYNI KİRACIYI SÖYLEMELİDİR.** Sayfa etiketi `homeDataTag(tenantId)` ile
+kurar, webhook ise `tenantId`yi **DB satırından** okur. Sayfa bu değeri eskiden istek
+başlığından alıyordu (`getTenantConfig()` → `headers()`); ikisi ayrışsaydı webhook bir etiketi
+tazeler, sayfa başka etiketle önbelleklenmiş olurdu — **tazeleme ıskalar ve hata sessizdir.**
+Sayfa artık `DEFAULT_TENANT_ID` derleme sabitini kullanıyor; sabitin canlı `tenants` satırıyla
+birebir aynı olduğu prod SELECT ile ölçüldü (2026-09-09, tablo TEK satır).
+
+**Sınıf değişimi ve kanıtı.** Ana sayfa `revalidate = 3600` beyan ediyordu ama beyan ÖLÜYDÜ:
+canlı ölçüm (2026-09-14, `curl -I`) `/tr` ve `/en` için `Cache-Control: private, no-cache,
+no-store` + `X-Vercel-Cache: MISS` verdi — yani §1'deki "statik + ISR" sınıfında görünüp
+gerçekte **istek başına** üretiliyordu. Tek sebep `headers()` okumasıydı. Kaldırıldıktan sonra
+`pnpm build` rota tablosu `● /[lang]` (`/tr`, `/en`) ve `Revalidate 1h` yazdı.
+
+**Kapı:** `INV-ANASAYFA-STATIK-1`
+(`src/__tests__/conformance/anasayfa-rotasi-statik.test.ts`) — `headers()`/`cookies()` çağrısını,
+başlık okuyan modülün import'unu ve `searchParams` bağını ayrı ayrı yasaklar; `revalidate`
+beyanının ve kiracı-kapsamlı önbellek anahtarı/etiketinin (kural 12) durduğunu ayrıca zorlar.
+Sabotajla doğrulandı: eski desen geri konduğunda K2 ve K3 kırmızı yanıyor.
+
+### 3.2 Ürünler listesi (`/[lang]/products`) — ölçüm 2026-09-14 (REC-59 adım 2 ikinci yarı)
+
+Bu rota `revalidate` beyanı bile taşımıyordu ve **iki** sebeple dinamikti (her biri tek başına
+yeterli): `getTenantConfig()` → `headers()`, ve gövdedeki `searchParams` (`?page=`).
+
+| Ürünler listesinde görünen | Kaynak | Tetik + handler | Keşif etiketini tazeliyor mu |
+|---|---|---|---|
+| Aile kartları (47 satır, tek sayfa) | `product_families` + `products` | `on_product_families_change`, `on_products_change` | **EVET** — `revalidateTag(PRODUCTS_DISCOVERY_TAG)` |
+| Kategori kapısı ızgarası | `categories` | `on_categories_change` | **EVET** |
+| Boş-kategori gizleme sayacı | `get_category_counts()` RPC | üstteki tetikler | **EVET** (türev) |
+
+Ana sayfanın etiketi (`HOME_DATA_TAG`) bilerek KULLANILMIYOR: bir yüzeyin tazelenmesi
+ötekini sessizce ısıtır/soğuturdu (PS-042). Keşif yüzeyinin kendi etiketi var.
+
+**Sayfalama kalktı, adres DEĞİŞMEDİ.** `?page=` ve `parsePageParam` kaldırıldı, `PAGE_SIZE`
+24 → 72 yükseltildi. Ölçüm (prod SELECT, 2026-09-14): `product_families` = **47** satır, yani
+tamamı tek sayfaya sığıyor. Eski `?page=2` adresi **bizim verdiğimiz sinyalde hiç yoktu**
+(canlı `sitemap.xml`'de `page=` geçişi 0; üretici `src/app/sitemap.ts` böyle bir adres
+yazmıyor). Google'ın kendi keşfiyle dizine almış olması **ölçülmedi** — kanonik adres
+konduğu için risk oradan kapanır.
+
+**Boyut (build çıktısı, `gzip -9`, 2026-09-14):** `/tr/products` **111 KB** (ham 488 KB),
+`/en/products` 103 KB, 47 ailenin tamamı sayfada. Kabul edilen üst sınır ölçülenin 1,5 katı,
+yuvarlanmış: **170 KB**. Karşılaştırma: `/tr/category/fanlar` (34 aile, aynı deseni 09-08'de
+almıştı) canlıda 105 KB.
+
+**REC-338 aynı PR'da kapandı:** rotanın `generateMetadata`'sı **hiç yoktu**. Canlı ölçüm
+(2026-09-14): `/tr/products` ve `/en/products` HTML'inde `rel="canonical"` **0**, `<title>`
+kök layout'un varsayılanı. Artık kendi başlığı (sözlükten, kural 7), kanonik adresi ve
+`tr`/`en`/`x-default` hreflang üçlüsü var.
+
+**Kapı:** `INV-URUNLER-STATIK-1` (`src/__tests__/conformance/urunler-rotasi-statik.test.ts`,
+9 kol, AST). Sabotajla doğrulandı: eski desen geri konunca K3, K4, K5 ve K7 kırmızı yanıyor.
+
+### 3.3 ⭐ROTA SINIFI İLANI — `force-static` bir üslup tercihi değil, ölçülmüş bir kaldıraç
+
+Statik üretilen bir sayfada, çatıdaki `useSearchParams()` çağıran bileşenler (kök layout'taki
+`<Analytics/>`, `ClientLayout` içindeki `NavigationTracker`) HTML'e
+`BAILOUT_TO_CLIENT_SIDE_RENDERING` işareti bırakır. **Suspense bu işareti kaldırmaz, KAPSAR**
+(`app/layout.tsx`'in kendi notu) — yani "daha çok Suspense" bir çözüm değildir.
+
+Ölçüm (2026-09-14, tek build, 245 üretilmiş HTML):
+
+| Rota | `dynamic = 'force-static'` | HTML'de bailout işareti |
+|---|---|---|
+| `/[lang]/about` | var | **0** |
+| `/[lang]/category/[slug]` | var | **0** |
+| `/[lang]` (ilan YOKKEN — 09-14 sabahı) | yok | **2** |
+| `/[lang]/brands/[slug]` | yok | **2** |
+| `/[lang]` (ilan EKLENDİKTEN sonra) | var | **0** |
+| `/[lang]/products` | var | **0** |
+
+Üçüncü satır bir **A/B ölçümüdür**: ana sayfa dosyasına tek satır eklenip aynı build
+tekrarlandı ve işaret 2 → 0'a düştü. Değişen başka hiçbir şey yok.
+
+**Ana sayfa ve ürünler rotası artık `about`/kategori ile TEK SINIFTA.** Geriye ilan taşımayan
+tek vitrin sınıfı `brands` kaldı (aşağıdaki açık kalem).
+
+> **İlan, ada bildirimini geçersiz kılmaz.** `ANASAYFA_BILINCLI_ADALAR` / `PDP_BILINCLI_ADALAR`
+> listeleri **hangi adaların bilinçli olduğunu** söyler; `force-static` ise o adaların işaret
+> BIRAKMAMASINI sağlar. İlan altında işaret 0 çıkması, ada bildiriminin yanlış olduğu anlamına
+> gelmez — bildirim üst sınır olarak bekçi kalır ve yarın kazara doğacak üçüncü bir ada yine
+> kırmızı verir. İkisi birbirinin yerine geçmez.
+
+Ayırt edici değişken bileşenler değil, **sınıf ilanıydı**: `force-static` altında
+`useSearchParams()` boş döner ve bailout üretmez. Vitrin sınıfına giren her yeni rota bu
+satırı yazar; yazmazsa `admin-smoke` SSR kapısı (`e2e/ssr-html.e2e.ts`) kırmızı verir ve
+o kırmızı **kapının tavanı büyütülerek kapatılmaz** — `tests/smoke/ssr-kurallari.ts`'in kendi
+notu bunu açıkça yasaklıyor.
+
+> **Açık kalem (marka sayfaları):** `/[lang]/brands/[slug]` hâlâ ilan taşımıyor ve 2 işaret
+> üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
+> yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
+
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 
 Statik kapı repo SQL'ini denetler; **prod'un gerçekten aynı hâlde olduğu ayrıca ölçülmelidir.** Ölçüm:
@@ -18023,6 +19604,198 @@ kaynağın varlığını doğruluyor.
 
 > v1.0 · 2026-08-15 · Bu cetvelin doğuş sebebi ölçülmüş bir olaydır, teorik bir tercih değil:
 > fiyatlar yazıldı, sayfa değişmedi, sebebi görünmedi çünkü kuralı yazan bir yer yoktu.
+
+
+---
+# FILE: docs\standards\rls-yetki-karari-standard.md
+
+# RLS Yetki Kararı Cetveli — bir politika "bu kullanıcı yönetici mi" sorusunu nereden okur
+
+**Sürüm 1.0 · 2026-09-14 · Şerit: ALTYAPI · Kaynak: REC-322 (REC-321 adım 1 ölçümünden çıktı)**
+
+Bu cetvel tek bir soruya cevap verir: **bir RLS politikası ya da yetki yardımcısı,
+uygulama rolünü (admin / moderator / user) hangi JWT talebinden okur.** Cetvel
+yazılmadan önce bu sorunun yazılı tek kaynağı yoktu; iki fonksiyon iki farklı
+yerden okuyordu ve hangisinin doğru olduğu yalnız birinin kod yorumunda yazıyordu.
+
+## 1 · KURAL (tek satır)
+
+> **Uygulama rolü kararı yalnız `public.is_admin_user()` üzerinden verilir.**
+> `request.jwt.claims ->> 'role'` **Postgres rolüdür** (`anon` / `authenticated` /
+> `service_role`) ve **yetki kararı için okunmaz.**
+
+## 2 · NİÇİN — ölçülmüş olay
+
+`public.jwt_role()` şunu yapıyordu:
+
+```sql
+SELECT COALESCE(NULLIF(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> 'role'
+```
+
+Supabase'de bu talep Postgres rolünü taşır. Dolayısıyla
+`jwt_role() IN ('admin','moderator')` biçimindeki bir koşul **normal bir kullanıcı
+için hiçbir zaman doğru olmaz.** `public.is_admin_user()` ise doğru kaynağı okur:
+
+```sql
+user_role := COALESCE(claims ->> 'user_role', claims -> 'app_metadata' ->> 'user_role')
+-- `user_metadata` BİLEREK YOK: kullanıcı onu yazabilir (CLAUDE.md kural 12).
+```
+
+**Ölçüm (2026-09-13, canlı, salt-okuma):** depoda `jwt_role` geçen 21 dosya (18'i
+migration); canlıda `jwt_role()` **çağıran politika 0**; aynı kalıbı satır içi
+taşıyan politika **3** (`storage.objects`, hepsi `roles = {public}`).
+
+## 3 · ⚠ASIL DERS: "uyuyan kapı" — yazıldığı gün değil, başka bir işin yan etkisiyle açılır
+
+Üç politika bugün zararsızdı çünkü koşulları asla doğru olmuyordu. Ama
+`roles = {public}` demek **`anon` dahil tüm roller** demektir. Biri ileride JWT'ye
+özel bir `role` talebi eklerse (custom access token hook ile mümkün), o üç politika
+**aynı anda canlanır** ve oturum açmamış kullanıcıyı da kapsayan bir yazma/silme
+yolu açar.
+
+**Sınıf adı: "yeşil görünen ölü kapı."** Ölü bir politika yalnız yer kaplamaz;
+**şartlı bir bomba** bırakır. Bu yüzden kural şudur: *bir politika hiçbir şey
+vermiyorsa kaldırılır, "zararsız" diye bırakılmaz.*
+
+## 4 · AYNI AD, FARKLI TABLO — silmeden önce şema/tablo yazılır
+
+REC-322 uygulanırken ölçülen tuzak: `product_images_insert_admin`,
+`product_images_update_admin`, `product_images_delete_admin` adları **iki farklı
+tabloda** yaşıyor.
+
+| Tablo | Durum | Kim yazdı |
+|---|---|---|
+| `storage.objects` | **ölü** (`roles={public}`, koşul asla doğru değil) | `20250908_storage_product_images.sql` |
+| `public.product_images` | **çalışıyor** | `20250909_product_images_rls_reset.sql`, sonra 20260119 / 20260120 / 20260224 |
+
+→ **Kural:** `DROP POLICY` ifadesi **daima** şema ve tabloyla yazılır. Yalnız
+politika adına dayanan bir silme, aynı adı taşıyan çalışan bir politikayı siler.
+Bu, "ad ölçüt değildir" dersinin RLS'teki hâlidir.
+
+## 5 · FONKSİYON EMEKLİ EDİLİRKEN `CASCADE` YAZILMAZ
+
+`drop function ... cascade` bağlı politikaları da **sessizce** siler. `cascade`
+olmadan ise bağımlılık varsa migration **kırmızı yanar**.
+
+→ **Kural:** bir yetki yardımcısı emekli edilirken `cascade` **kullanılmaz.**
+Böylece "canlıda çağıran yok" varsayımı yanlışsa sonuç **sessiz yetki kaybı değil,
+gürültülü hata** olur. Ölçüme güvenmek yerine **ölçüm yanlışsa kapanan** bir yol
+seçilir (fail-closed).
+
+## 5.1 · ⭐DÖRT YAZIM ARANIR — tek yazımı aramak ölçüm değildir
+
+JWT'den `role` talebini okumanın **en az dört** yazımı var. Kapının ilk hâli yalnız
+ikisini arıyordu ve Supabase'in **en yaygın kısayolu** sessizce geçiyordu:
+
+| # | Yazım | Durum |
+|---|---|---|
+| 1 | `current_setting('request.jwt.claims', …)::jsonb ->> 'role'` | aranıyordu |
+| 2 | `… jwt.claims ->> 'role'` | aranıyordu |
+| 3 | **`auth.jwt() ->> 'role'`** | **kaçıyordu** — depoda gerçek örneği var |
+| 4 | **`current_setting('request.jwt.claim.role', …)`** (eski tekil GUC) | **kaçıyordu** |
+
+→ **Kural:** bu sınıfta bir ölçüm yaparken **dört yazım da ayrı ayrı aranır.** Bu,
+projedeki *"çağıranı yok iddiası dört kalıbı arar"* dersinin RLS'teki karşılığıdır.
+
+## 5.2 · ⚠EN DERİN KÖR NOKTA: dinamik politika + ikilenmiş tırnak
+
+Bazı migration'lar politikayı **dinamik** üretiyor — ifadeyi bir **metin** olarak bir
+yardımcıya veriyor:
+
+```sql
+perform public._create_select_policy_if_absent(
+  'public','inventory_movements','p_admin_read_inventory',
+  'auth.jwt() ->> ''role'' = ''admin'''   -- ⚠tırnaklar İKİLENMİŞ
+);
+```
+
+SQL metin literalinde tırnak **ikilenir**, yani desen ham metinde `->> ''role''`
+olarak görünür ve tek tırnak arayan bir ölçüm onu **görmez.**
+
+⭐**Bu, iki bağımsız ölçümün aynı kör noktayı paylaşmasına örnektir:** bağımsız çürütme
+dosyayı buldu, ama **benim ilk ölçümüm de 0 demişti** ve sebebi ben ölçtüm. *İki
+bağımsız ölçümün aynı sonucu vermesi, ikisi de aynı kör noktayı paylaşıyorsa
+doğrulama değildir.*
+
+→ **Kural:** migration metni ölçülürken **iki normalizasyon** yapılır: yorumlar
+çıkarılır **ve** ikilenmiş tırnaklar düzleştirilir.
+
+## 5.3 · ⚠GEREKÇE DÜZELTMESİ — gerçek yükleme yolu `service_role`
+
+İlk yazımda "üç politikayı kaldırmak işlev kaybı üretmez çünkü
+`product_images_*_tenant` politikaları taşıyor" demiştim. **Bu gerekçe yanlış
+temellendirilmişti.** Bağımsız çürütmede ölçüldü: `product-images` kovasına yazan
+kod yolu `src/` altında **yok**; gerçek yükleme iki toplu betikte ve
+**`SUPABASE_SERVICE_ROLE_KEY`** ile yapılıyor. O rolde `bypassrls = true`, yani
+**hiçbir RLS politikası değerlendirilmiyor** — ne eski admin üçlüsü, ne yeni tenant
+üçlüsü.
+
+**Sonuç değişmiyor** (kaldırmak güvenli, hatta daha kuvvetli gerekçeyle: o politikalar
+zaten hiçbir akışta kullanılmıyor), ama **gerekçe** düzeltildi. Bir hükmü doğru
+sebeple vermek, doğru hükmü yanlış sebeple vermekten farklıdır: yanlış sebep bir
+sonraki kararda yanlış yere götürür.
+
+## 6 · KAPI VE SINIRI (adıyla)
+
+**Kapı:** `INV-AUTH-ROLE-2` — `src/__tests__/conformance/rls-yetki-karari.test.ts`.
+Hiçbir migration ifadesinde `jwt.claims ->> 'role'` kalıbının **yetki kararı olarak**
+geçmemesini arar.
+
+⚠**Kapının ölçüm yüzeyi `supabase/migrations/*.sql` METNİDİR, canlı veritabanı
+DEĞİL.** CI'da veritabanı kimliği yok. Yani bu kapı "depoya yeni bir yanlış politika
+girmesin" der; **"canlıda yanlış politika yok" DEMEZ.** Canlı taraf ancak elle,
+salt-okuma bir `pg_policies` sorgusuyla ölçülür ve o ölçüm bu kapının kapsamı
+dışındadır.
+
+## 7 · BORÇ SATIRININ SINIFI — "canlı temiz" borcu KAPATMAZ, SINIFINI değiştirir
+
+Borç defteri (`docs/rls-yetki-karari-borc-ilani.json`) **depo metnini** ölçer; canlı
+veritabanı **başka bir yüzeydir** (§6). Bu yüzden canlıda temiz çıkan bir kalemin
+satırı defterden **SİLİNMEZ**: silmek kapının bayatlık kolunu (R2) kırmızı yakar ve
+dahası kapıyı o dosya için **KÖR** bırakır — silinen ad, kaçak taramasından boşuna
+muaf kalır.
+
+Doğru hareket satırı silmek değil, **sınıfını** değiştirmektir. İki sınıf vardır:
+
+| Sınıf | Ne demek | Kapanma yolu |
+|---|---|---|
+| `ACIK-BORC` | Desen depo metninde duruyor **ve** canlıda yürürlükte. | Düzeltici migration. |
+| `TARIHSEL-ILAN` | Desen depo metninde duruyor (tarihsel migration dosyası asla değişmez) ama canlıda yürürlükte **değil**. | Yapılacak bir şey yok; satır yalnız kapıyı kör bırakmamak için durur. |
+
+⚠**`TARIHSEL-ILAN` bir ilan değil bir ÖLÇÜM SONUCUDUR.** Kapının **R4** kolu bu sınıfın
+`canli_durumu` alanında `CANLIDA TEMIZ` ibaresini arar; ölçüm yapılmadan sınıf verilemez.
+R4'ün sınırı da adıyla yazılı: kol **ölçümün yapıldığı İDDİASINI** ölçer, canlıyı ölçmez
+(CI'da kimlik yok) — canlı kanıt ayrı bir belgede durur (`canli_olcum_kaydi` alanı).
+
+## 8 · CANLI ÖLÇÜM YAPILDI (2026-09-14, REC-335)
+
+Recep 2026-09-14'te prod veritabanına salt-okuma izni verdi ve altı borcun tamamı
+canlıda ölçüldü: **altısı da `TARIHSEL-ILAN`.** Tam tablo ve yöntem:
+`docs/audits/rec335-rls-yetki-borclari-canli-olcum-2026-09-14.md`.
+
+§7'nin önceki hâlinde "ölçülmedi" diye duran iki madde şöyle kapandı:
+
+- **Üç depo politikasının çelişkisi çözüldü:** `storage.objects` üzerinde
+  `product_images_insert_admin` / `_update_admin` / `_delete_admin` adlı politika
+  **YOKTUR.** Aynı adlardan yalnız `product_images_update_admin`, `public.product_images`
+  tablosunda ayaktadır ve gövdesi `user_profiles.role` okur — JWT talebi okumaz. Yani
+  2026-09-13 ölçümü **tablo ayırt etmeden ada bakmış**: §4'ün dersi (aynı ad farklı tablo)
+  bu kez bir silme tuzağı değil bir **ölçüm** tuzağı olarak işledi.
+- **"Bu iş bir şey değiştirdi mi" sorusu cevaplandı: hayır.** REC-322 migration'ının üç
+  `drop policy if exists` satırı var olmayan politikaları düşürmeye çalıştı ve sessizce
+  geçti. `IF EXISTS` fail-closed niyetiyle **doğru** yazılmıştı; yanlış olan, geçmenin
+  değişiklik kanıtı sayılmasıydı.
+
+⚠Hâlâ ölçülmemiş olan: **canlı token denemesi.** Yukarıdaki hüküm `pg_policies` ve
+`pg_proc` katalog okumasına dayanır, gerçek bir `anon` / `authenticated` token'ıyla
+`select` denemesine dayanmaz. ⛔`service_role` ile yapılan deneme **kanıt sayılmaz** —
+o rolde `bypassrls = true`, yani politikalar hiç değerlendirilmez.
+
+⚠Bir yardımcıyı **çağırmak**, doğru kaynağı **okumak** demek değildir: bir politikanın
+`is_admin_user()` çağırması tek başına yeşil hükmü vermez, çünkü karar o fonksiyonun
+içinde verilir. O yüzden karar mercii hâline gelmiş yardımcıların **tam gövdesi** ayrı
+okundu. `is_admin_user` yalnız `claims ->> 'user_role'` ve `app_metadata ->> 'user_role'`
+dallarını okuyor, `user_metadata`'yı bilerek okumuyor (CLAUDE.md kural 12).
 
 
 ---
