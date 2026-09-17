@@ -1962,6 +1962,8 @@ export type Database = {
       }
       product_search_index: {
         Row: {
+          arama_ek: string | null
+          arama_kelime: string | null
           product_id: string
           search_body: string
           search_document: unknown
@@ -1969,6 +1971,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          arama_ek?: string | null
+          arama_kelime?: string | null
           product_id: string
           search_body: string
           search_document: unknown
@@ -1976,6 +1980,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          arama_ek?: string | null
+          arama_kelime?: string | null
           product_id?: string
           search_body?: string
           search_document?: unknown
@@ -4228,8 +4234,25 @@ export type Database = {
         Args: { p_dry_run?: boolean; p_request_id?: string; p_user_id: string }
         Returns: Json
       }
+      arama_bulanik_ifade: { Args: { p_q: string }; Returns: string }
+      arama_dogrula: {
+        Args: { p_govde: string; p_q: string }
+        Returns: boolean
+      }
+      arama_eslesen_urunler: {
+        Args: { p_q: string }
+        Returns: {
+          basamak: number
+          product_id: string
+        }[]
+      }
       arama_indeksi_tazele: { Args: { p_ids?: string[] }; Returns: number }
+      arama_kelimeler: { Args: { p_q: string }; Returns: string[] }
+      arama_kesin_ifade: { Args: { p_q: string }; Returns: string }
       arama_kuyrugu_bosalt: { Args: { p_tavan?: number }; Returns: number }
+      arama_marka_es: { Args: { p_k: string }; Returns: string }
+      arama_marka_kelimeleri: { Args: never; Returns: string[] }
+      arama_normalize: { Args: { p_t: string }; Returns: string }
       bump_rate_limit: {
         Args: { p_key: string; p_limit: number; p_window_seconds: number }
         Returns: {
