@@ -35,7 +35,7 @@
  *   · `paths:`/`paths-ignore:` süzgeci YOK — varsa ilgisiz bir PR'da doğmaması DOĞRUdur
  *     (ölçüldü: `rls-guard`, `edge-shared-input-drift`), VE
  *   · job'da `if:` YOK — koşullu job `skipping` kovasına düşer ve **`skipping` düşen değildir**
- *     (ölçüldü: `gemini-dispatch`in 7 job'u, `db-advisor`ın 2 job'u).
+ *     (ölçüldü: `gemini-dispatch`in 7 job'u — 2026-09-17 REC-353 ile silindi —, `db-advisor`ın 2 job'u).
  *
  * Bu kriterle türetilen küme PR #965'te doğan workflow kapılarının TAM OLARAK aynısı çıktı.
  *
