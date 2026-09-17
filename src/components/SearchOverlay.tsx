@@ -575,7 +575,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
           {/* Footer Hint */}
           {viewState === 'RESULTS' && (suggestions.length > 0 || results.length > 0) && (
-            <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-100 flex justify-between items-center text-xs text-steel-gray">
+            // Klavye ipucu (ok tuşları / Enter) dokunmatik genişlikte anlamsız: yalnız md ve üstünde.
+            <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-100 hidden md:flex justify-between items-center text-xs text-steel-gray">
               <span className="flex items-center gap-1">
                 <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">{t('search.overlay.arrowUp')}</span>
                 <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">{t('search.overlay.arrowDown')}</span>
