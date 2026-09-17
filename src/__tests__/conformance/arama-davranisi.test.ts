@@ -177,6 +177,10 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
     const s = jsYorumsuz(betik())
     expect(s, 'vitrin rolleri tanimli degil').toMatch(/VITRIN_ROLLERI\s*=\s*\[\s*'anon'\s*,\s*'authenticated'\s*\]/)
     expect(s, 'rol gercekten degistirilmiyor').toMatch(/set local role \$\{rol\}/)
+    // Iddiasiz authenticated vitrinde uretilmez (kanca her jetona user_role yazar); iddia
+    // kurulmazsa kol musterinin gormedigi 54001 i olcer. Iddia IŞLEM-YEREL (true) olmali.
+    expect(s, 'JWT iddialari islem-yerel kurulmuyor').toMatch(/set_config\('request\.jwt\.claims', \$1, true\)/)
+    expect(s, 'authenticated iddiasi kancanin bicimini taklit etmiyor').toMatch(/authenticated:\s*\{[^}]*user_role:\s*'user'/)
     expect(s, 'rol olcumu islem icinde ROLLBACK ile bitmiyor').toMatch(/finally\s*\{\s*await client\.query\('rollback'\)/)
     const kol = s.slice(s.indexOf('for (const rol of VITRIN_ROLLERI)'), s.indexOf('await client.end()'))
     expect(kol.length, 'rol dongusu client.end ONCESINDE degil').toBeGreaterThan(0)

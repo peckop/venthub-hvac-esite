@@ -139,9 +139,27 @@ async function olc(client, vaka) {
  */
 const VITRIN_ROLLERI = ['anon', 'authenticated']
 
+/**
+ * ⭐ROL TEK BAŞINA GERÇEK İSTEK DEĞİL — JWT iddiaları da vitrindeki gibi kurulur.
+ *
+ * 2026-09-17 ölçüldü: `set local role authenticated` iddiasız koşunca `fts_search_products`
+ * 54001 stack depth ile patlıyor (display_price → is_user_admin → user_profiles politikası →
+ * is_admin_user → iddia yoksa YİNE user_profiles …). Ama canlıda `custom_access_token_hook`
+ * ETKİN (Auth config: hook_custom_access_token_enabled=true) ve her jetona `user_role` yazıyor
+ * — profili olmayana bile "user". Yani iddiasız authenticated jeton vitrinde ÜRETİLMEZ; iddiasız
+ * ölçmek müşterinin görmediği bir kırmızıyı ölçer. İddiasız hâl GERÇEK bir kusurdur (REC-355,
+ * VULN) ve onarımıyla AYNI PR'da ayrı kol olarak gelir.
+ * Kanca çıktısının biçimi birebir: kök + app_metadata altında user_role.
+ */
+const VITRIN_IDDIALARI = {
+  anon: { role: 'anon' },
+  authenticated: { role: 'authenticated', user_role: 'user', app_metadata: { user_role: 'user' } },
+}
+
 async function olcRolle(client, vaka, rol) {
   await client.query('begin')
   try {
+    await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(VITRIN_IDDIALARI[rol])])
     await client.query(`set local role ${rol}`)
     const { rows } = await client.query(
       'select id from public.fts_search_products($1, 500, $2::jsonb)',
