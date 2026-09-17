@@ -4234,6 +4234,10 @@ export type Database = {
         Args: { p_dry_run?: boolean; p_request_id?: string; p_user_id: string }
         Returns: Json
       }
+      arama_ad_isabeti: {
+        Args: { p_ad_metni: string; p_q: string }
+        Returns: number
+      }
       arama_bulanik_ifade: { Args: { p_q: string }; Returns: string }
       arama_dogrula: {
         Args: { p_govde: string; p_q: string }
