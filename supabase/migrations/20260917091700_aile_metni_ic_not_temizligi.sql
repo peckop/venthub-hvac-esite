@@ -10,10 +10,13 @@
 --   sayfa atıflarını arıyordu; yıldız-parantez biçimli notu görmedi.
 --
 -- EVREN (ölçüldü): vitrinde ÇİZİLEN anahtarlar (`description.tr/en`, `meta_title`, `meta_description`,
---   `products.description_i18n.tr/en`) içinde not deseni taşıyan TEK kayıt bu. 16 ailenin
---   `description.bloklar_tr` alanında da not var ama o anahtar hiçbir bileşende çizilmiyor; sayfa
---   verisine gömülmesi aynı PR'daki kod değişikliğiyle kesildi (family.service asLocalizedText).
---   Blok metinlerinin temizliği blok render'ının (REC-164) ön şartıdır — bu migration'a KATILMADI.
+--   `products.description_i18n.tr/en`) içinde not deseni taşıyan TEK kayıt bu. `description.bloklar_tr`
+--   alanında da not var (geniş desenle 16 aile, bu dosyanın dar guard deseniyle 9 aile) ama o anahtar
+--   hiçbir bileşende çizilmiyor. Aynı PR'daki kod değişikliği onu SAYFA VERİSİNE gömülmekten kesiyor
+--   (family.service: detay VE liste yolu). ⚠Veri yine de herkese açık kalır: anon rolü
+--   `get_family_detail` / `get_product_families_enriched` RPC'lerini ve kolonu okuyabiliyor. Asıl
+--   kapanış blok metinlerinin temizliğidir = blok render'ının (REC-164) ön şartı — bu migration'a
+--   KATILMADI.
 --
 -- NE DEĞİŞİR: yalnız not parçası çıkar; iki anlatı cümlesi AYNEN kalır. İki cümle de kaynakla
 --   doğrulandı (kaynak dizini: avens_fiyat_listesi_2026_HQ.pdf s.43 — "JET SERİSİ KİMYASALLARA VE
@@ -42,9 +45,17 @@ declare
   v_yeni constant text := 'Çatı ve duvar uygulamaları için, yatay ve dikey montaja uygun santrifüj çatı fanları. Kimyasallara ve aşındırıcı gazlara karşı dayanıklı santrifüj fanlar.';
   v_simdiki text;
   v_var     boolean;
+  v_adet    int;
 begin
   if md5(v_eski) <> '7910e007d5a7bbe35c32a514604b57fd' then
     raise exception 'AİLE METNİ: v_eski sabiti canlıda ölçülen değerle aynı değil (md5) — dosya bozulmuş';
+  end if;
+
+  -- Benzersizlik (tenant_id, slug) üzerinde (kural 12). Bugün canlıda tek satır; ikinci bir
+  -- kiracıda aynı slug doğarsa hangi satırın kastedildiği belirsizleşir → DURUR, tahmin etmez.
+  select count(*) into v_adet from public.product_families where slug = 'jet-serisi';
+  if v_adet > 1 then
+    raise exception 'AİLE METNİ: jet-serisi % satır (birden çok kiracı?) — hedef belirsiz, YAZILMADI', v_adet;
   end if;
 
   select true, description->>'tr' into v_var, v_simdiki

@@ -19,7 +19,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { Database } from '@/types/database.types'
 
-import { getFamilyDetail } from '../family.service'
+import { getFamiliesEnriched, getFamilyDetail } from '../family.service'
 
 function jsonResponse(body: unknown) {
   return new Response(JSON.stringify(body), {
@@ -95,5 +95,36 @@ describe('INV-AILE-VITRIN-METNI-1 — aile metni istemciye yalnız tr/en taşır
     expect(detay?.family.meta_title).toBeNull()
     expect(detay?.family.meta_description).toBeNull()
     expect(JSON.stringify(detay)).not.toContain('boş bırakıldı')
+  })
+
+  // Bağımsız çürütücü yakaladı (2026-09-17): detay yolu kapanmıştı ama LİSTE yolu
+  // (`get_product_families_enriched` → /products, kategori sayfası, marka sayfası) aynı jsonb'yi
+  // süzmeden 'use client' bileşenlere veriyordu. Canlı /tr/products HTML'inde `bloklar_tr` 37 kez.
+  it('LİSTE yolu da (getFamiliesEnriched) description içindeki depo anahtarlarını taşımaz', async () => {
+    const fakeFetch: typeof fetch = async (input) => {
+      const url =
+        typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+      if (url.includes('/rpc/get_product_families_enriched')) {
+        return jsonResponse([
+          {
+            id: 'fam-1',
+            name: 'JET Serisi',
+            slug: 'jet-serisi',
+            total_count: 1,
+            description: { tr: 'Santrifüj çatı fanları.', bloklar_tr: { Gövde: IC_NOT }, maddeler_tr: ['x'] },
+          },
+        ])
+      }
+      if (url.includes('/product_families')) return jsonResponse([{ id: 'fam-1', name_i18n: null }])
+      throw new Error('beklenmeyen istek: ' + url)
+    }
+    const supabase = createClient<Database>('https://ornek.supabase.co', 'anon-anahtar', {
+      global: { fetch: fakeFetch },
+    })
+    const sayfa = await getFamiliesEnriched(supabase, {})
+
+    expect(sayfa.items).toHaveLength(1)
+    expect(Object.keys(sayfa.items[0]?.description ?? {})).toEqual(['tr'])
+    expect(JSON.stringify(sayfa)).not.toContain('boş bırakıldı')
   })
 })

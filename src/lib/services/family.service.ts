@@ -38,6 +38,13 @@ export async function getFamiliesEnriched(
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
 
+  // REC-206 / karar 42: liste RPC'si `f.description` jsonb'sini OLDUĞU GİBİ döndürüyor
+  // (bloklar_tr, maddeler_tr dahil). Bu liste 'use client' bileşenlere (CategoryGridView,
+  // FamilyCard, BrandDetailPage) gider ve sayfa verisine gömülür. Canlı ölçüm: /tr/products
+  // HTML'inde `bloklar_tr` 37 kez; 47 ailenin description'ı 71.233 karakter, bunun yalnız
+  // 11.855'i tr/en. Detay yolu (parseFamilyDetail) ile AYNI daraltma burada da uygulanır.
+  for (const item of items) item.description = asLocalizedText(item.description)
+
   // REC-108: liste RPC'si de ham `f.name` döndürüyor. Dönen id kümesi için ad çevirileri
   // TEK sorguyla çekilip gömülür; hiç satır yoksa hiç sorgu atılmaz. Çeviri BURADA
   // ÇÖZÜLMEZ — sayfa verisi `unstable_cache` içinde tutuluyor ve çözüm burada yapılsaydı
