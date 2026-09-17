@@ -1479,7 +1479,7 @@ yok **ve** job'da `if:` yok. Üç süzgecin üçü de gerçek bir workflow'da ö
 |---|---|---|
 | `types: [opened]` | `auto-label`, `auto-reviewer` | yalnız PR **açılışında** koşar, itişte doğmaz |
 | `paths:` | `rls-guard`, `edge-shared-input-drift` | ilgisiz PR'da doğmaması **DOĞRUdur** |
-| `if:` | `gemini-dispatch` (7 job), `db-advisor` (2 job) | `skipping` kovasına düşer — **`skipping` düşen DEĞİLDİR** |
+| `if:` | `gemini-dispatch` (7 job; 2026-09-17 REC-353 ile silindi), `db-advisor` (2 job) | `skipping` kovasına düşer — **`skipping` düşen DEĞİLDİR** |
 
 Bu kriterle türetilen küme, PR #965'te doğan workflow kapılarının **tam olarak aynısı** çıktı.
 
