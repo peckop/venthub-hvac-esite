@@ -223,7 +223,9 @@ describe('INV-EOL-1 · index satır sonu', () => {
       arsiv.length,
       '.archive/ altında hiç izlenen dosya yok — ya arşiv silindi ya ölçüm yolu bozuldu. ' +
         'Her iki hâlde de aşağıdaki "i/crlf yok" iddiası orayı ölçmediği hâlde yeşil kalır.',
-    ).toBeGreaterThan(100)
+      // 2026-09-17 REC-353: Gemini CLI arşivi + JULES_TASKS.md BİLEREK silindi → 99 dosya.
+      // Eşik boşluğu değil TABANI ölçer; bilinçli silmede ölçülen sayının hemen altına çekilir.
+    ).toBeGreaterThan(90)
 
     const dislanan = arsiv.filter(k => MUAF_ONEKLER.some(onek => k.yol.startsWith(onek)))
     expect(

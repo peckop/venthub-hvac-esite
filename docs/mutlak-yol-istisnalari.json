@@ -76,9 +76,9 @@
     }
   ],
   "prose_mandali": {
-    "sinir": 480,
-    "olculen": 480,
-    "nicin_sayi": "2026-09-01 olcumu: `.md` dosyalarinda (arsiv DISI) kimlik yolu tasiyan satirlardan companion `source_path:` olanlar dusuldukten sonra kalan PROSE satiri = 480. Sinir ARTMAMA sartidir: sayi buyurse biri belgeye elle yol yazmis demektir ve kapi KIRMIZI verir. Sayi DUSERSE kapi yesil kalir ama sinir da guncellenmelidir (mandal geri kacmasin) — bunun kendi kolu var ve cetvelde hukum olarak yazili.",
+    "sinir": 461,
+    "olculen": 461,
+    "nicin_sayi": "2026-09-17 REC-353: Gemini CLI arsivi + .jules + JULES belgeleri silindi, sayi 480 -> 461 (CI kosum 35194640367 olcumu); mandal yeni degere cekildi. 2026-09-01 olcumu:`.md` dosyalarinda (arsiv DISI) kimlik yolu tasiyan satirlardan companion `source_path:` olanlar dusuldukten sonra kalan PROSE satiri = 480. Sinir ARTMAMA sartidir: sayi buyurse biri belgeye elle yol yazmis demektir ve kapi KIRMIZI verir. Sayi DUSERSE kapi yesil kalir ama sinir da guncellenmelidir (mandal geri kacmasin) — bunun kendi kolu var ve cetvelde hukum olarak yazili.",
     "sayi_nicin_degisti": "⭐ILK ENVANTER 323 DEMISTI, GERCEK 480. Sebep envanterin ELLE yazilmis grep olcutuydu: yalnizca BUYUK harfli `C:` ve yalnizca Windows bicimi araniyordu. Kacanlar: kucuk harfli `c:\\Users\\...` (iki CANLI betikte — scripts/clean_root.ps1 ve scripts/generate/generate-next-routes.js, ikisi de bu emirde onarildi) ve POSIX bicimleri (`/home/<ad>/`, `/Users/<ad>/`). DERS: envanteri ELLE yazilan bir grep ile cikarip sonra kapiyi AYRI bir olcutle yazmak, iki olcut arasinda sessiz bir fark birakir; kapinin kendi taban kosusu bu farki gosterdi. Kapi ile envanter AYNI olcutu paylasmali — bu dosyadaki sayi artik kapinin olcutuyle uretilmistir.",
     "haric_tutulan_alan": "source_path"
   },
