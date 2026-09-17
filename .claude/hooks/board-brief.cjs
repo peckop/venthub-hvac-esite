@@ -127,10 +127,38 @@ if (others.length === 0 && notes.length === 0 && seritAldiMi && !linear) process
 
 const lines = []
 if (linear) lines.push(linear)
+/**
+ * ⭐ÖZET SATIR (REC-345 Kova C, 2026-09-17) — tam desen listesi HER TURDA basılmaz.
+ *
+ * Ölçüldü (09-16'dan beri, transkript): bu satır OPS'ta 543 kez · 1.278 KB, URUN'da 332 kez ·
+ * 681 KB — iki pencerede de TEK en büyük bağlam kalemi (OPS'ta tüm Bash çıktısı 626 KB).
+ * Kaynağı ALTYAPI'nın ~90 desenlik claim listesiydi. Oysa satırın işi "kim canlı, ne zamandır"
+ * sorusudur; desen ayrıntısı yalnız ÇAKIŞMA anında gerekir ve o an zaten lane-guard kancası
+ * düzenlemeyi durdurup sahibini söyler.
+ *
+ * Biçim: `AD=sid8 (N desen, Xdk)`. İstem metninde geçen bir yol başka bir şeridin desenine
+ * değiyorsa YALNIZ o desen(ler) eklenir — "bu dosya kimin" sorusunun cevabı tam gerektiği yerde.
+ * Tam liste: `node scripts/board/board.cjs who` (SessionStart zaten tam listeyi basıyor).
+ */
+function istemYollari(metin) {
+  const out = new Set()
+  for (const m of String(metin || '').matchAll(/[A-Za-z0-9_.\-*]+(?:\/[A-Za-z0-9_.\-*]+)+/g)) {
+    out.add(m[0].replace(/^\.\//, ''))
+  }
+  return [...out]
+}
+
 if (others.length > 0) {
+  const yollar = istemYollari(input.prompt)
   lines.push('PANO: ' + others.map(c => {
     const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
-    return `${c.lane}=${String(c.sid).slice(0, 8)} (${c.globs.join(' ')}, ${c.yasDk}dk)${bayat}`
+    const globs = Array.isArray(c.globs) ? c.globs : []
+    let degen = []
+    try {
+      degen = globs.filter(g => yollar.some(y => board.globToRegExp(g).test(y)))
+    } catch { degen = [] } // eşleyici yoksa özet yine basılır; ayrıntı düşer, satır düşmez
+    const ek = degen.length > 0 ? `; istemdeki yola değen: ${degen.join(' ')}` : ''
+    return `${c.lane}=${String(c.sid).slice(0, 8)} (${globs.length} desen, ${c.yasDk}dk${ek})${bayat}`
   }).join(' · '))
 }
 if (!seritAldiMi) {
