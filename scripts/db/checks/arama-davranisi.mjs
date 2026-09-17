@@ -95,14 +95,18 @@ const VAKALAR = [
  * Adım 2 gövde genişletmesini canlıya indirdi ve vaka 3 düzeldi, ama vaka 9 HÂLÂ 0 —
  * yani kök AYNI DEĞİLDİ. Ölçüm bir varsayımı çürüttü; satır ona göre yazıldı.
  *
+ * 2026-09-17 prod ölçümü (URUN #1235, pgroonga + tek arama gövdesi canlıda, merge 92049ac2f):
+ * vaka 2 "havalandirma" **0 → 50** · vaka 9 "duvar tipi aspiratör" **0 → 40** · vaka 10
+ * "ISI GERI KAZANIM" **3 → 20 (vaka 6 ile AYNI KÜME)**. ⭐2, 9, 10 LİSTEDEN ÇIKTI — mandalın
+ * ikinci yönü PR #1240'ta KIRMIZI verdi, satırlar o yüzden silindi.
+ * Vaka 5 "vortis" 0 → 184 geçti ama TAVAN kolu kırmızı: ilanın GEREKÇESİ değişti (arama hatası
+ * değil, marka vakasında tavan kuralının kendisi yanlış) — satır yeni gerekçeyle yazıldı.
+ *
  * Her satır NİÇİN kırmızı olduğunu ve düzeltmenin HANGİ adımda geldiğini yazar. Gerekçesiz
  * satır kabul edilmez (kardeş kapı `catalog-integrity` ile aynı kural).
  */
 const BILINEN_KIRMIZI = {
-  2: 'Turkce karakter normalizasyonu YOK: "havalandirma" (noktasiz) 0 donuyor, "havalandırma" 50. Duzeltme: REC-340 Faz 1 Adim 3 (unaccent) — Adim 2 govdeyi genisletti ama normalizasyon getirmedi.',
-  5: 'Yazim hatasi toleransi YOK: "vortis" 0. Duzeltme: REC-340 Faz 1 Adim 3 (trigram yedegi).',
-  9: '"duvar tipi aspirator" HALA 0 — Adim 2 govde genisletmesi canliya indi ve vaka 3 duzeldi, bu duzelmedi; yani kok vaka 3 ile AYNI DEGILDI (eski ilan boyle saniyordu, olcum curuttu). Duzeltme: REC-340 Faz 1 Adim 3.',
-  10: 'Buyuk harf + noktasiz "ISI GERI KAZANIM" 3 sonuc veriyor, kucuk harfli hali 9 — AYNI KUME DEGIL (ilk satir kimligi de farkli). Duzeltme: REC-340 Faz 1 Adim 3 (normalizasyon).',
+  5: 'Arama DOGRU, tavan kurali marka vakasinda YANLIS: "vortis" 184 donuyor ve aktif Vortice urunu de TAM 184 (2026-09-17 prod: brand ilike vortice = 184 / aktif 441, yani marka katalogun yuzde 42 si). Yuzde 40 tavani, katalogun yuzde 40 indan buyuk bir markanin TUM urunlerini getiren dogru sonucu kirmizi sayiyor. Duzeltme: REC-340 cetvel K8.4 (URUN) — marka-var vakasinda tavan = o markanin aktif urun sayisi.',
 }
 
 function baglantiDizesi() {
