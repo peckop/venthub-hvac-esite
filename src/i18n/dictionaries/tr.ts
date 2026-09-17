@@ -252,6 +252,9 @@ export const tr = {
     // `SearchOverlay` artık aşağıdaki doğru metni kullanıyor.
     placeholder: 'Ürün, kategori veya marka ara...',
     noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
+    // Arama isteği HATA verdiğinde (boş sonuçtan ayrı): müşteriye "ürün yok" denmez.
+    failed: 'Arama şu an yapılamadı.',
+    retry: 'Tekrar dene',
     brandPrefix: 'Marka: ',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
   },

@@ -42,6 +42,8 @@ const sabitCeviri = vi.hoisted(() => {
     'search.noResultsAdvice': 'Farklı bir terim deneyin',
     'search.keyboardHint': 'Ok tuşları ile gezinebilirsiniz',
     'search.enterHint': 'Seçmek için',
+    'search.failed': 'Arama şu an yapılamadı.',
+    'search.retry': 'Tekrar dene',
     'common.close': 'Kapat',
   }
   const t = (k: string) => s[k] || k
@@ -135,5 +137,29 @@ describe('SearchOverlay — arama TEK AŞAMALI (REC-340)', () => {
     expect(kalemler('Jet Fan 20')).toHaveLength(1)
     // Marka kısayolu ise kendi kalemi olarak durur (ürün satırlarındaki marka etiketinden ayrı).
     expect(kalemler('SEAT').some((b) => !(b.textContent ?? '').includes('Jet Fan'))).toBe(true)
+  })
+
+  // 2026-09-17 canlı: `İNLİNE` araması veritabanı süre aşımına düştü ve ekran "Sonuç bulunamadı"
+  // dedi — oysa 24 ürün vardı. Hata, boş sonuç gibi SÖYLENMEZ ve müşteriye yeniden deneme yolu verilir.
+  it('arama HATA verirse "sonuç bulunamadı" demez; tekrar dene aynı sorguyu yeniden çalıştırır', async () => {
+    ftsCagrisi.mockReset()
+    oneriCagrisi.mockReset()
+    ftsCagrisi.mockRejectedValueOnce({ code: '57014', message: 'canceling statement due to statement timeout' })
+    ftsCagrisi.mockResolvedValue(URUNLER)
+    oneriCagrisi.mockResolvedValue([])
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    render(<SearchOverlay open onClose={vi.fn()} />)
+    await userEvent.type(screen.getByPlaceholderText('Ara'), 'inline')
+
+    await waitFor(() => expect(ekranMetni()).toContain('Arama şu an yapılamadı.'), { timeout: 3000 })
+    expect(ekranMetni()).not.toContain('Sonuç bulunamadı')
+    const cagriOnce = ftsCagrisi.mock.calls.length
+
+    await userEvent.click(screen.getByRole('button', { name: 'Tekrar dene' }))
+
+    await waitFor(() => expect(ekranMetni()).toContain('Jet Fan 20'), { timeout: 3000 })
+    expect(ftsCagrisi.mock.calls.length).toBe(cagriOnce + 1)
+    expect(ekranMetni()).not.toContain('Arama şu an yapılamadı.')
   })
 })

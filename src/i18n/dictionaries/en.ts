@@ -177,6 +177,8 @@ export const en: typeof tr = {
     // `placeholderAi` removed (REC-340 Phase 0) — see the TR dictionary for the measurement.
     placeholder: 'Search products, categories, brands...',
     noResultsAdvice: 'Try different keywords',
+    failed: 'Search is unavailable right now.',
+    retry: 'Try again',
     brandPrefix: 'Brand: ',
     fuzzyMatchNotice: 'No exact match found, showing similar results.'
   },

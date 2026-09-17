@@ -53,6 +53,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [results, setResults] = React.useState<FtsProductResult[]>([])
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
+  // "Tekrar dene" aynı sorguyu yeniden çalıştırır: debounced değişmediği için effect'i bu sayaç tetikler.
+  const [denemeNo, setDenemeNo] = React.useState(0)
 
   // Popüler kategorileri merkezi hiyerarşiden çek
   const popularCategories = React.useMemo(() => {
@@ -129,7 +131,10 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           setSuggestions([])
           setResults([])
           setViewState('RESULTS')
-          setError(t('search.noResults'))
+          // "Sonuç bulunamadı" DEĞİL: 2026-09-17 canlıda `İNLİNE` araması veritabanı süre
+          // aşımına düştü (57014) ve ekran "Sonuç bulunamadı" dedi — oysa 24 ürün vardı.
+          // Hata ile boş sonuç müşteriye farklı söylenir; hatada yeniden deneme yolu verilir.
+          setError(t('search.failed'))
         }
       } finally {
         if (active) setLoading(false)
@@ -140,7 +145,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     return () => { active = false }
     // `t` hata mesajı için kullanılıyor; `useI18n` onu kararlı döndürür (aynı desen
     // PaymentSuccessPage'de de var), bu yüzden bağımlılığa girmesi yeniden çağrı üretmez.
-  }, [debounced, open, t])
+  }, [debounced, open, t, denemeNo])
 
   // Focus management
   React.useEffect(() => {
@@ -547,7 +552,18 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
           {/* Content Body */}
           <div className="flex-1 overflow-y-auto custom-scrollbar relative z-0">
-            {error && <div className="p-4 bg-red-50 text-red-600 text-sm font-medium">{error}</div>}
+            {error && (
+              <div role="alert" className="p-4 bg-red-50 text-red-600 text-sm font-medium flex items-center justify-between gap-3">
+                <span>{error}</span>
+                <button
+                  type="button"
+                  onClick={() => setDenemeNo(n => n + 1)}
+                  className="shrink-0 px-3 py-1.5 text-xs font-bold text-red-700 bg-white rounded-lg border border-red-200 hover:bg-red-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
+                >
+                  {t('search.retry')}
+                </button>
+              </div>
+            )}
 
             {!error && !loading && (
               <>
