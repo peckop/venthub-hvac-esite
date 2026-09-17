@@ -1,33 +1,77 @@
--- REC-340 — Arama sıralaması: ürün ADINDA geçen kelime, yalnız aile/kategoride geçenden önce gelir.
+-- REC-340 — Arama sıralaması + büyük "İ" normalizasyonu (#1235'ten kalan iki kusur).
 --
--- NİÇİN (canlı ölçüm 2026-09-17, #1235 sonrası):
---   `jet fan` 61 ürün buluyor (40 SEAT + 21 JET, hepsi basamak 1). Ama ilk 20'nin 20'si SEAT:
---   JET ürünü 0,30 puan, SEAT 0,51 puan alıyor. Sebep ts_rank'in AND sorgusundaki birleşimi:
---   JET ürününde `jet` adda (A) ama `fan` yalnız teknik metinde (D); SEAT ürününde iki kelime de
---   aile adında (C, "SEAT Storm Jet … Fanlar"). Cetvel K3.1a "adında geçen ürün önce gelir" diyor;
---   canlı bunun tersini yapıyordu. Arayüz tek listeye geçince (#1238) JET ürünleri ilk 20'den
---   tamamen düşüyordu — eski öneri kutusu onları yalnız alfabetik şansla (J < S) gösteriyordu.
+-- KUSUR 1 — SIRA (canlı ölçüm 2026-09-17, #1238 tarayıcı ölçümünde bulundu):
+--   `jet fan` 61 ürün buluyor (40 SEAT + 21 JET, hepsi basamak 1). İlk 20'nin 20'si SEAT: JET ürünü
+--   0,30, SEAT ürünü 0,51 puan alıyor. ts_rank AND sorgusunda kelime puanlarını birleştiriyor:
+--   JET'te `jet` adda (A) ama `fan` yalnız teknik metinde (D); SEAT'te iki kelime de aile adında
+--   (C, "SEAT Storm Jet … Fanlar"). Cetvel K3.1a "adında geçen ürün önce gelir" diyor; canlı tersini
+--   yapıyordu. Arayüz tek listeye geçince (#1238) JET ürünleri ilk 20'den tamamen düşüyordu.
+--   KURAL (K3.1e): sıra = basamak ↑ · ad isabeti ↓ · ts_rank ↓ · ad ↑ — iki yüzeyde de AYNI.
+--   Ad isabeti = normalize edilmiş sorgu köklerinden kaçı normalize edilmiş ürün adı (ad + TR/EN
+--   çeviri, K3.1'in A alanları) köklerinde var. İki taraf da arama_normalize'dan geçer; aksi hâlde
+--   doğru yazılmış Türkçe sorgu (`ısı` → kök `ıs`) büyük harfli addaki `ISI` (→ `is`) ile eşleşmez
+--   (bağımsız çürütücü ölçtü: normalize etmeden `ısı geri kazanım` ad isabeti 1, `isi…` 3).
 --
--- KURAL (cetvel K3.1e): sıra = basamak ↑ · ad isabeti ↓ · ts_rank ↓ · ad ↑.
---   ad isabeti = sorgu kelimelerinden (turkish kökü) kaçı ürünün A ağırlıklı (ad) sözcüklerinde var.
---   Eski ifade `ts_rank - basamak/100` basamağı da kesin ayırmıyordu (0,02'lik basamak farkını
---   0,02'den büyük bir ts_rank farkı ters çevirebiliyordu); sıra artık açık sütunlarla kurulur.
+-- KUSUR 2 — BÜYÜK "İ" (canlı ölçüm): `lower('İ')` Postgres'te `i` + birleşik nokta (U+0307) üretir;
+--   translate bunu yakalamaz. `arama_normalize('GERİ')` 5 karakter. Sonuç: `ISI GERİ KAZANIM` 3 ürün
+--   (küçük harfle 20), `İNLİNE` 0 ürün (`inline` 24). Aynı ifade tetikte de var: 28 satırın
+--   arama_ek/arama_kelime metninde birleşik nokta duruyor.
+--   ONARIM: "İ" lower'dan ÖNCE `i` yapılır, artakalan U+0307 silinir; tetik aynı ifadeyi kullanır;
+--   yalnız farklı çıkan satırlar yeniden yazılır (search_body değişmez → başka tetik tetiklenmez;
+--   pgroonga indeksleri satır güncellemesiyle kendiliğinden tazelenir). arama_normalize hiçbir
+--   indeks ifadesinde kullanılmıyor (pg_index ölçüldü) → yeniden indeksleme gerekmez.
 --
--- Gölge ölçümü (arama_golge, canlıyla aynı 442 ürün, 12 vaka): değişen yalnız `jet fan` / `fan jet`
---   (ilk 20'de adda geçen 0 → 20) ve `ısı geri kazanım` (ilk 3 Vortice → AVenS, adda geçen 3/3 ilk
---   20'de her iki sürümde de var). Kalan 9 vakanın ilk 3'ü birebir aynı; sonuç KÜMELERİ değişmez.
---
--- YETKİ: yeni yardımcı fonksiyon YOK (ifade iki fonksiyona gömülü) → yeni GRANT gerekmez.
---   Öneri kutusunun ürün kısmı AYNI dört anahtarla sıralanır (eski ad-önek + is_featured anahtarları
---   kaldırıldı; iki yüzey farklı ilk ürünü gösteriyordu). Guard iki yüzeyin ilk ürününün EŞİT
---   olduğunu ölçer.
---   İki dış uç imzası ve SECURITY INVOKER hâli AYNEN korunur; mevcut EXECUTE yetkileri
---   `create or replace` ile düşmez. Guard ZİYARETÇİ rolüyle (anon) koşar (cetvel K13.4 m.9).
+-- YETKİ (K13.4 m.2 + m.9): yeni yardımcı `arama_ad_isabeti` → PUBLIC'ten geri alınır, dış uçlar
+--   SECURITY INVOKER olduğu için anon + authenticated'a AÇIKÇA verilir. Guard ZİYARETÇİ rolüyle
+--   çağırır. `rank` sütununun anlamı DEĞİŞMEZ (ts_rank - basamak/100); sıra açık sütunlarla kurulur.
 
 set lock_timeout = '5s';
 set statement_timeout = '30s';
 
 begin;
+
+-- ── KUSUR 2: normalizasyon ──────────────────────────────────────────────────
+create or replace function public.arama_normalize(p_t text)
+returns text language sql immutable
+set search_path to 'pg_catalog','public'
+as $$
+  select replace(
+           translate(lower(translate(coalesce(p_t,''), 'İ', 'i')),
+                     'ıİşŞğĞüÜöÖçÇâîû', 'iisSgGuUoOcCaiu'),
+           chr(775), '')
+$$;
+
+create or replace function public.tg_arama_metin_doldur()
+returns trigger language plpgsql
+set search_path to 'pg_catalog','public'
+as $$
+begin
+  -- arama_normalize ile BİREBİR aynı ifade (tetik yardımcıya EXECUTE bağımlılığı taşımasın diye gömülü).
+  new.arama_ek     := replace(translate(lower(translate(coalesce(new.search_body,''), 'İ', 'i')),
+                                        'ıİşŞğĞüÜöÖçÇâîû', 'iisSgGuUoOcCaiu'), chr(775), '');
+  new.arama_kelime := new.arama_ek;
+  return new;
+end;
+$$;
+
+update public.product_search_index
+   set arama_ek     = public.arama_normalize(search_body),
+       arama_kelime = public.arama_normalize(search_body)
+ where arama_ek     is distinct from public.arama_normalize(search_body)
+    or arama_kelime is distinct from public.arama_normalize(search_body);
+
+-- ── KUSUR 1: ad isabeti ─────────────────────────────────────────────────────
+create or replace function public.arama_ad_isabeti(p_ad_metni text, p_q text)
+returns int language sql immutable
+set search_path to 'pg_catalog','public'
+as $$
+  select count(*)::int
+    from unnest(tsvector_to_array(to_tsvector('turkish', public.arama_normalize(p_q)))) k
+   where k = any (tsvector_to_array(to_tsvector('turkish', public.arama_normalize(p_ad_metni))))
+$$;
+
+revoke execute on function public.arama_ad_isabeti(text, text) from public;
+grant  execute on function public.arama_ad_isabeti(text, text) to anon, authenticated;
 
 create or replace function public.fts_search_products(p_q text, p_limit integer default 20, p_filters jsonb default '{}'::jsonb)
  returns table(id uuid, name text, sku text, brand text, price numeric, rank real, family_slug text, cover_image_path text)
@@ -36,27 +80,22 @@ create or replace function public.fts_search_products(p_q text, p_limit integer 
  set search_path to 'pg_catalog', 'public', 'extensions'
 as $function$
 declare
-  v_limit   int;
-  v_tsq     tsquery;
-  v_kelime  text[];
+  v_limit int;
+  v_tsq   tsquery;
 begin
   -- Tavan 500: kapı betiği geniş vakalarda GERÇEK sayıyı okuyabilsin diye (istemci 20 yollar).
-  v_limit  := least(greatest(p_limit, 1), 500);
-  v_tsq    := plainto_tsquery('turkish', coalesce(p_q,''));
-  v_kelime := tsvector_to_array(to_tsvector('turkish', coalesce(p_q,'')));
+  v_limit := least(greatest(p_limit, 1), 500);
+  v_tsq   := plainto_tsquery('turkish', coalesce(p_q,''));
 
   return query
   select s.id, s.name, s.sku, s.brand, s.price,
-         -- Bilgi amaçlı tek sayı; sıralamanın kendisi aşağıdaki açık sütunlardır.
-         (10000 - s.basamak * 100 + s.ad_isabet + s.metin_rank)::real as rank,
+         (s.metin_rank - (s.basamak::real / 100.0::real))::real as rank,   -- anlamı eskisiyle aynı
          s.family_slug, s.cover_image_path
     from (
       select p.id, p.name, p.sku, p.brand,
              public.display_price(p) as price,          -- INV-PRICE-1: ham p.price DEĞİL
              e.basamak,
-             (select count(*)::int
-                from unnest(tsvector_to_array(ts_filter(psi.search_document, '{a}'))) l
-               where l = any (v_kelime)) as ad_isabet,
+             public.arama_ad_isabeti(concat_ws(' ', p.name, p.name_i18n->>'tr', p.name_i18n->>'en'), p_q) as ad_isabet,
              ts_rank(psi.search_document, v_tsq) as metin_rank,
              f.slug as family_slug,
              img.path as cover_image_path
@@ -79,6 +118,7 @@ begin
          and p.status = 'active'
          and p.deleted_at is null
     ) s
+   -- K3.1e: sıra açık sütunlarla. Öneri kutusu AYNI dört anahtarı kullanır.
    order by s.basamak asc, s.ad_isabet desc, s.metin_rank desc, s.name asc
    limit v_limit;
 end;
@@ -91,20 +131,20 @@ create or replace function public.get_search_suggestions(p_q text, p_limit integ
  set search_path to 'pg_catalog', 'public', 'extensions'
 as $function$
 declare
-  v_limit  int;
-  v_raw    text;
-  v_norm   text;
-  v_kelime text[];
+  v_limit int;
+  v_raw   text;
+  v_norm  text;
 begin
   v_limit := least(greatest(p_limit, 1), 20);
   v_raw   := coalesce(trim(p_q), '');
   if v_raw = '' then return; end if;
-  v_norm   := public.arama_normalize(v_raw);
-  v_kelime := tsvector_to_array(to_tsvector('turkish', v_raw));
+  v_norm  := public.arama_normalize(v_raw);
 
   return query
   (
-    -- Ürünler (en çok 4) — TEK gövdeden, fts_search_products ile AYNI sıra kuralı (K3.1e)
+    -- Ürünler (en çok 4) — TEK gövdeden, fts_search_products ile AYNI sıra (K3.1e).
+    -- Eski ek anahtarlar (ad-önek eşleşmesi, is_featured) kaldırıldı: iki yüzey farklı ilk ürünü
+    -- gösteriyordu (gölgede `kanal tipi fan`: liste Vortice, öneri AVENS ile başlıyordu).
     select 'product'::text,
            p.name::text,
            (case
@@ -123,12 +163,8 @@ begin
       join public.product_search_index psi on psi.product_id = p.id
       left join public.product_families f on f.id = p.family_id and f.deleted_at is null
      where p.status = 'active' and p.deleted_at is null
-     -- Eski ek kurallar (ad-önek eşleşmesi, is_featured) KALDIRILDI: iki yüzey farklı sıra
-     -- gösteriyordu (gölgede `kanal tipi fan`: liste Vortice, öneri AVENS ile başlıyordu).
      order by e.basamak,
-              (select count(*)
-                 from unnest(tsvector_to_array(ts_filter(psi.search_document, '{a}'))) l
-                where l = any (v_kelime)) desc,
+              public.arama_ad_isabeti(concat_ws(' ', p.name, p.name_i18n->>'tr', p.name_i18n->>'en'), v_raw) desc,
               ts_rank(psi.search_document, plainto_tsquery('turkish', v_raw)) desc,
               p.name
      limit least(v_limit, 4)
@@ -158,48 +194,72 @@ begin
 end;
 $function$;
 
--- GUARD — ZİYARETÇİ rolüyle (anon). Sabit sayı yok (K8.3): davranış ölçülür.
+-- ── GUARD — ZİYARETÇİ rolüyle (anon). Sabit sayı yok (K8.3): davranış ölçülür. ──
 do $$
 declare
+  v_urun        int;
+  v_ids         uuid[];
   v_ilk_ad      text;
   v_ilk_oneri   text;
-  v_jet_sayi    int;
+  v_ilk_isabet  int;
+  v_max_isabet  int;
   v_vortis      int;
   v_sku         int;
-  v_anon_exec   boolean;
-  v_urun        int;
+  v_i_buyuk     int;
+  v_i_kucuk     int;
+  v_nokta       int;
 begin
-  -- Yetki ölçümü veriye bağlı değil: boş veritabanında da koşar.
-  v_anon_exec := has_function_privilege('anon', 'public.fts_search_products(text,integer,jsonb)', 'EXECUTE')
-             and has_function_privilege('anon', 'public.get_search_suggestions(text,integer)', 'EXECUTE');
-  if not v_anon_exec then
-    raise exception 'ARAMA SIRA GUARD: anon iki dış uca EXECUTE yetkisini kaybetti';
+  -- Yetki ve normalizasyon ölçümü veriye bağlı değil: boş veritabanında da koşar.
+  if not (has_function_privilege('anon', 'public.fts_search_products(text,integer,jsonb)', 'EXECUTE')
+      and has_function_privilege('anon', 'public.get_search_suggestions(text,integer)', 'EXECUTE')
+      and has_function_privilege('anon', 'public.arama_ad_isabeti(text,text)', 'EXECUTE')
+      and has_function_privilege('authenticated', 'public.arama_ad_isabeti(text,text)', 'EXECUTE')) then
+    raise exception 'ARAMA SIRA GUARD: anon/authenticated arama uçlarına EXECUTE yetkisi eksik';
+  end if;
+  if public.arama_normalize('ISI GERİ KAZANIM İNLİNE') <> 'isi geri kazanim inline' then
+    raise exception 'ARAMA SIRA GUARD: arama_normalize büyük İ''yi indiremedi: %',
+      public.arama_normalize('ISI GERİ KAZANIM İNLİNE');
   end if;
 
-  -- Davranış ölçümü veri ister (cetvel K13.4 m.6): boş veritabanında NOTICE ile atlar.
+  -- Davranış ölçümü veri ister (K13.4 m.6): boş veritabanında NOTICE ile atlar.
   select count(*) into v_urun from public.product_search_index;
   if v_urun = 0 then
     raise notice 'ARAMA SIRA GUARD ATLANDI — product_search_index BOŞ (kurulum/gölge koşumu).';
     return;
   end if;
 
+  select count(*) into v_nokta from public.product_search_index
+   where arama_ek like '%' || chr(775) || '%' or arama_kelime like '%' || chr(775) || '%';
+  if v_nokta > 0 then
+    raise exception 'ARAMA SIRA GUARD: % satırda birleşik nokta (U+0307) kaldı', v_nokta;
+  end if;
+
   set local role anon;
-  select count(*) into v_jet_sayi from public.fts_search_products('jet fan', 500);
+  select array_agg(r.id order by r.ord) into v_ids
+    from public.fts_search_products('jet fan', 500) with ordinality
+         as r(id, name, sku, brand, price, rank, family_slug, cover_image_path, ord);
   select r.name into v_ilk_ad from public.fts_search_products('jet fan', 20) r limit 1;
   select s.label into v_ilk_oneri from public.get_search_suggestions('jet fan', 6) s
    where s.type = 'product' limit 1;
-  select count(*) into v_vortis from public.fts_search_products('vortis', 500);
-  select count(*) into v_sku from public.fts_search_products('VRT-17160', 500);
+  select count(*) into v_vortis  from public.fts_search_products('vortis', 500);
+  select count(*) into v_sku     from public.fts_search_products('VRT-17160', 500);
+  select count(*) into v_i_buyuk from public.fts_search_products('ISI GERİ KAZANIM', 500);
+  select count(*) into v_i_kucuk from public.fts_search_products('ısı geri kazanım', 500);
   reset role;
 
-  -- Adında JET geçen aktif ürün varsa, `jet fan` aramasının ilk satırı onlardan biri olmalı.
-  if exists (select 1 from public.products p
-              where p.status = 'active' and p.deleted_at is null
-                and p.name ilike 'jet %')
-     and (v_ilk_ad is null or v_ilk_ad not ilike 'jet %'
-          or v_ilk_oneri is null or v_ilk_oneri not ilike 'jet %') then
-    raise exception 'ARAMA SIRA GUARD: jet fan ilk sonuç=% ilk öneri=% (adında JET geçen ürün başta değil)',
-      v_ilk_ad, v_ilk_oneri;
+  if coalesce(array_length(v_ids, 1), 0) = 0 or v_vortis = 0 or v_sku <> 1 then
+    raise exception 'ARAMA SIRA GUARD: jet fan=% vortis=% VRT-17160=% (küme bozuldu)',
+      coalesce(array_length(v_ids, 1), 0), v_vortis, v_sku;
+  end if;
+
+  -- Davranış: ilk satırın ad isabeti, kümedeki en yüksek ad isabetine eşit olmalı.
+  select max(public.arama_ad_isabeti(concat_ws(' ', p.name, p.name_i18n->>'tr', p.name_i18n->>'en'), 'jet fan'))
+    into v_max_isabet from public.products p where p.id = any (v_ids);
+  select public.arama_ad_isabeti(concat_ws(' ', p.name, p.name_i18n->>'tr', p.name_i18n->>'en'), 'jet fan')
+    into v_ilk_isabet from public.products p where p.id = v_ids[1];
+  if v_ilk_isabet < v_max_isabet then
+    raise exception 'ARAMA SIRA GUARD: jet fan ilk satır ad isabeti=% ama kümede % var (ilk=%)',
+      v_ilk_isabet, v_max_isabet, v_ilk_ad;
   end if;
 
   -- İki yüzey aynı sıra kuralını kullanır: ilk ürün aynı olmalı.
@@ -208,13 +268,14 @@ begin
       v_ilk_ad, v_ilk_oneri;
   end if;
 
-  if v_jet_sayi = 0 or v_vortis = 0 or v_sku <> 1 then
-    raise exception 'ARAMA SIRA GUARD: jet fan=% vortis=% VRT-17160=% (küme bozuldu)',
-      v_jet_sayi, v_vortis, v_sku;
+  -- Büyük harf körlüğü yok (K5.2): büyük ve küçük yazım aynı sayıyı verir.
+  if v_i_buyuk <> v_i_kucuk then
+    raise exception 'ARAMA SIRA GUARD: ISI GERİ KAZANIM=% ama ısı geri kazanım=% (büyük İ körlüğü)',
+      v_i_buyuk, v_i_kucuk;
   end if;
 
-  raise notice 'ARAMA SIRA GUARD GEÇTİ (anon rolüyle): jet fan=% ilk=% öneri=%',
-    v_jet_sayi, v_ilk_ad, v_ilk_oneri;
+  raise notice 'ARAMA SIRA GUARD GEÇTİ (anon rolüyle): jet fan=% ilk=% (isabet %/%) öneri=% · İ büyük/küçük=%/%',
+    array_length(v_ids, 1), v_ilk_ad, v_ilk_isabet, v_max_isabet, v_ilk_oneri, v_i_buyuk, v_i_kucuk;
 end;
 $$;
 

@@ -99,14 +99,16 @@ diğerinin A'sını ezer. Canlı vaka: `jet fan` 61 ürün (40 SEAT + 21 JET). J
 (A), `fan` yalnız teknik metinde (D) → **0,30**; SEAT ürününde iki kelime de aile adında (C,
 "SEAT Storm Jet … Fanlar") → **0,51**. İlk 20'nin **20'si SEAT** çıktı; adında JET yazan ürün
 listeye hiç girmedi. Eski öneri kutusu JET'i yalnız alfabetik şansla (J < S) başa koyuyordu.
-Kural: iki yüzeyde de sıra **basamak ↑ · ad isabeti ↓ · `ts_rank` ↓ · ad ↑**. *Ad isabeti* =
-sorgu kelimelerinden (turkish kökü) kaçının ürünün A ağırlıklı sözcüklerinde bulunduğu. Gölge
-ölçümü (442 ürün, 15 vaka): değişen yalnız `jet fan`/`fan jet` (ilk 20'de adda geçen 0 → 20) ve
-`ısı geri kazanım` (ilk 3 AVenS); sonuç **kümeleri** değişmedi, iki yüzeyin ilk ürünü 15/15 eşit.
-*(Bilinen sınır: ad isabeti ham sorgu kökü ile ad kökünü karşılaştırır; K5.1 normalizasyonu bu
-anahtara uygulanmaz. `isi geri kazanim` yine de aynı sırayı verdi çünkü AVenS adları kökte
-eşleşiyor; eşleşmeyen bir vaka çıkarsa anahtar yalnız `ts_rank`'e düşer, sonuç kaybolmaz.)*
-Tüketici tarafı: `rank` sütunu bilgi amaçlıdır; istemci ona göre sıralamaz (ölçüldü).
+Kural: iki yüzeyde de sıra **basamak ↑ · ad isabeti ↓ · `ts_rank` ↓ · ad ↑**. *Ad isabeti*
+(`arama_ad_isabeti`) = normalize edilmiş sorgu köklerinden kaçının normalize edilmiş ürün adında
+(ad + TR/EN çeviri, K3.1'in A alanları) bulunduğu. **İki taraf da `arama_normalize`'dan geçer:**
+geçmezse doğru yazılmış Türkçe sorgu sessizce kaybeder (`ısı` kökü `ıs`, büyük harfli addaki
+`ISI` ise `is` olur; normalizesiz ölçümde `ısı geri kazanım` ad isabeti 1, `isi geri kazanim` 3 —
+bağımsız çürütücü ölçtü). Gölge ölçümü (442 ürün, 22 vaka, anon rolüyle): sıra değişen yalnız
+`jet fan`/`fan jet` (ilk 20'de adda geçen 0 → 20) ve `ısı geri kazanım` (ilk 3 AVenS); sonuç
+**kümeleri** canlıyla aynı, iki yüzeyin ilk ürünü **22/22 eşit**. `rank` sütununun anlamı
+değişmedi (`ts_rank − basamak/100`); sıra açık sütunlarla kurulur, istemci `rank`'e göre
+sıralamaz (ölçüldü).
 
 **K3.2** — Kalın satırlar (aile, üst kategori, alt kategori) **zorunludur ve sebebi ölçülmüştür.** Ürün adlarımız teknik künye
 biçimindedir (`JET 20 · 1400 d/dk · 0,18 kW · 220V`); "fan", "aspiratör" gibi kelimeler ürün adında
@@ -136,6 +138,14 @@ sonucu vermelidir. Kullanıcının klavye alışkanlığı arama sonucunu belirl
 yüzden tek biçimli küçültme metinleri kaçırır. *(Aynı körlük 2026-09-15'te vaat kapısında sahada
 görüldü: ekrandaki "AI-powered" metni `ai-powered` terimiyle hiç eşleşmiyordu. Aynı hata ödeme
 kapısında da vardı — "Installment" ve "PCI DSS" görünmüyordu.)*
+
+**⛔K5.2a — BÜYÜK "İ" `lower()`'dan ÖNCE indirilir (2026-09-17 ölçümü).** Postgres `lower('İ')`
+tek harf değil **`i` + birleşik nokta (U+0307)** üretir; ardından gelen `translate` onu yakalamaz.
+`arama_normalize('GERİ')` 5 karakter çıkıyordu. Etki: `ISI GERİ KAZANIM` 3 ürün (küçük harfle 20),
+`İNLİNE` **0** (`inline` 24); aynı ifade tetikte olduğu için 28 satırın arama metninde de nokta
+kalmıştı. Doğrusu: `translate(p,'İ','i')` → `lower` → Türkçe `translate` → `replace(…, chr(775), '')`.
+Guard `arama_normalize('ISI GERİ KAZANIM İNLİNE') = 'isi geri kazanim inline'` eşitliğini ve
+tabloda U+0307 kalmadığını ölçer; ziyaretçi rolüyle büyük/küçük yazım aynı sayıyı vermelidir.
 
 **K5.3 — Normalizasyon fonksiyonları ŞEMA-NİTELİKLİ çağrılır.** Arama RPC'leri
 `SET search_path TO 'pg_catalog','public'` ile koşuyor; `pg_trgm` ve `unaccent` ise `extensions`
@@ -287,7 +297,8 @@ Aşağıdaki vakalar **taban**dır; genişletilebilir, daraltılamaz.
 | 10 | `ISI GERI KAZANIM` | büyük harf + noktasız (K5.2) | vaka 6 ile aynı küme |
 | 11 | — (her vaka) | hassasiyet tavanı (K8.4) | aktif ürünlerin **≤ %40'ı** |
 | 12 | — (Y1 ↔ Y2) | iki yüzey aynı gövde (K4.1) | **aynı ilk ürün** |
-| 13 | `jet fan` | ad isabeti sırası (K3.1e) | adında `JET` geçen aktif ürün varsa **ilk satır onlardan biri** |
+| 13 | `jet fan` | ad isabeti sırası (K3.1e) | ilk satırın ad isabeti = kümedeki **en yüksek** ad isabeti (ada göre değil davranışa göre; katalog "Jet …" adlı başka ürün eklese de kırılmaz) |
+| 15 | `ISI GERİ KAZANIM`, `İNLİNE` | büyük İ (K5.2a) | küçük harfli yazımla **aynı sayı** |
 | 14 | `vortis` | marka tavanı (K8.4a) | ≤ Vortice aktif ürün sayısı, marka dışı **0** |
 
 ## 9. Hata yolları (kural 14)
