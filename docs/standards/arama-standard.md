@@ -92,6 +92,22 @@ gelirse) gövde üreticisi güncellenir — kapı kolu bu eşitliği ölçer.
 Bu sınırın kapatılması = kategori adı çevirisini DB'ye taşımak; **ayrı iştir**, bu cetvelin
 kapsamında değildir ama burada adıyla yazılıdır ki "unutulmuş" sanılmasın.
 
+**⭐K3.1e — SIRA KURALI AÇIK SÜTUNLARLA KURULUR, `ts_rank` TEK BAŞINA DEĞİL (2026-09-17 ölçümü).**
+K3.1a'daki ağırlık dizisi **tek kelimede** "adında geçen önce" sonucunu verir, **çok kelimede
+vermez**: `ts_rank` AND sorgusunda kelime puanlarını birleştirir, bir kelimenin düşük ağırlığı
+diğerinin A'sını ezer. Canlı vaka: `jet fan` 61 ürün (40 SEAT + 21 JET). JET ürününde `jet` adda
+(A), `fan` yalnız teknik metinde (D) → **0,30**; SEAT ürününde iki kelime de aile adında (C,
+"SEAT Storm Jet … Fanlar") → **0,51**. İlk 20'nin **20'si SEAT** çıktı; adında JET yazan ürün
+listeye hiç girmedi. Eski öneri kutusu JET'i yalnız alfabetik şansla (J < S) başa koyuyordu.
+Kural: iki yüzeyde de sıra **basamak ↑ · ad isabeti ↓ · `ts_rank` ↓ · ad ↑**. *Ad isabeti* =
+sorgu kelimelerinden (turkish kökü) kaçının ürünün A ağırlıklı sözcüklerinde bulunduğu. Gölge
+ölçümü (442 ürün, 15 vaka): değişen yalnız `jet fan`/`fan jet` (ilk 20'de adda geçen 0 → 20) ve
+`ısı geri kazanım` (ilk 3 AVenS); sonuç **kümeleri** değişmedi, iki yüzeyin ilk ürünü 15/15 eşit.
+*(Bilinen sınır: ad isabeti ham sorgu kökü ile ad kökünü karşılaştırır; K5.1 normalizasyonu bu
+anahtara uygulanmaz. `isi geri kazanim` yine de aynı sırayı verdi çünkü AVenS adları kökte
+eşleşiyor; eşleşmeyen bir vaka çıkarsa anahtar yalnız `ts_rank`'e düşer, sonuç kaybolmaz.)*
+Tüketici tarafı: `rank` sütunu bilgi amaçlıdır; istemci ona göre sıralamaz (ölçüldü).
+
 **K3.2** — Kalın satırlar (aile, üst kategori, alt kategori) **zorunludur ve sebebi ölçülmüştür.** Ürün adlarımız teknik künye
 biçimindedir (`JET 20 · 1400 d/dk · 0,18 kW · 220V`); "fan", "aspiratör" gibi kelimeler ürün adında
 değil **kategorisinde** yaşar. 2026-09-15 ölçümü: 441 aktif üründen ad+açıklama gövdesinde "fan"
@@ -231,6 +247,13 @@ SKU vakasında anlamlıdır.
 0 → 61'e çıkıyor, yani "Fan" kategorisindeki her şey sorguya karışma riski taşıyor.)* Hiçbir vaka
 aktif ürünlerin **%40'ından fazlasını** döndürmemelidir.
 
+**K8.4a — Marka vakasında tavan MARKANIN aktif ürün sayısıdır, %40 değil (2026-09-17, ALTYAPI
+önerisi, ölçüldü).** Bir marka kataloğun büyük payını tutabilir: `vortis` 184 sonuç = aktif
+ürünlerin **%41,6'sı**, genel tavan bu vakayı yanlışlıkla kırmızı yapar. Oysa 184'ün 184'ü
+Vortice ve Vortice'in aktif ürün sayısı tam 184. Marka ölçütlü vakada iki iddia birlikte kurulur:
+**sonuç ≤ o markanın aktif ürün sayısı** ve **marka dışı sonuç = 0**. Canlı ölçüm: vortis
+184/184 · nikotra 35/35 · avnes 106/106 · danfos 35/35, dördünde de marka dışı 0.
+
 **K8.5 — Bugün çalışan davranış regresyon testine bağlanır.** `VRT-17160` gibi tam SKU araması
 bugün **kusursuz** çalışıyor (tam 1 sonuç); yazım hatası yedeği eklenince benzer SKU'larla
 kirlenebilir. Çalışan bir davranışı değiştiren her değişiklik regresyon kolu ister; bu tartışmaya
@@ -264,6 +287,8 @@ Aşağıdaki vakalar **taban**dır; genişletilebilir, daraltılamaz.
 | 10 | `ISI GERI KAZANIM` | büyük harf + noktasız (K5.2) | vaka 6 ile aynı küme |
 | 11 | — (her vaka) | hassasiyet tavanı (K8.4) | aktif ürünlerin **≤ %40'ı** |
 | 12 | — (Y1 ↔ Y2) | iki yüzey aynı gövde (K4.1) | **aynı ilk ürün** |
+| 13 | `jet fan` | ad isabeti sırası (K3.1e) | adında `JET` geçen aktif ürün varsa **ilk satır onlardan biri** |
+| 14 | `vortis` | marka tavanı (K8.4a) | ≤ Vortice aktif ürün sayısı, marka dışı **0** |
 
 ## 9. Hata yolları (kural 14)
 
@@ -408,6 +433,16 @@ her madde tek tek işaretlenir:
 7. **Migration gölgede koşturuldu mu**, ve **ikinci kez** koşturulunca hatasız geçiyor mu?
 8. **Bu sütunu okuyan MEVCUT sorgular yeniden ölçüldü mü?** (K12.5 — indeks eklemek sonuç
    değiştirebilir.)
+9. **⛔Yetki ZİYARETÇİ rolüyle mi doğrulandı?** Guard ve canlı ölçüm dış ucu `set local role anon`
+   (ya da anon anahtarıyla REST) üzerinden **çağırır**. *(2026-09-17: dış uçlar SECURITY INVOKER;
+   yardımcılardan EXECUTE geri alınınca ziyaretçi 42501 aldı ve canlı arama ~1 saat boş döndü.
+   Guard, "canlı ölçüm" ve arama kapısı üçü de `postgres` rolüyle koştuğu için hiçbiri görmedi —
+   doğru sayı, yanlış kişi. `has_function_privilege` tek başına yetmez: çağrı zincirindeki her
+   fonksiyonu tek tek saymak gerekir, çağrı bunu kendiliğinden yapar.)* Giriş yapmış müşteri
+   senaryosu `display_price`'a dokunuyorsa `user_role` iddialı JWT ile kurulur (iddiasız jeton
+   bugün ayrı bir kusurla 54001 veriyor, REC-355).
+10. **Sıra da ölçüldü mü, yalnız sayı değil?** Sonuç kümesi doğru olup ilk 20 yanlış olabilir
+    (K3.1e). Arayüz kaç satır gösteriyorsa guard o kadarının içeriğine bakar.
 
 ---
 
