@@ -24,6 +24,20 @@ try { input = JSON.parse(readStdin() || '{}'); } catch { /* yoksay */ }
 const sessionId = (input && input.session_id) || 'nosession';
 
 /**
+ * ⭐ZAMAN BÜTÇESİ — kancanın DIŞ zaman aşımı `.claude/settings.json`'da (Stop → timeout: 120).
+ * Dış süre dolunca kanca ÖLDÜRÜLÜR ve hiçbir satır basılmaz; yani içerideki bir adıma dış
+ * süreyle AYNI zaman aşımını vermek, o adımın "ÖLÇEMEDİM" satırını erişilemez yapar
+ * (#1237 ilk sürümü: vitest 120 sn + öncesinde eslint + tsc). Her iç adım KALAN süreden,
+ * basım payı düşülerek bütçelenir. Dış süre değişirse bu sabit de değişmeli — uyum testi
+ * ikisinin eşitliğini ölçer (INV-VERIFY-STOP-1).
+ */
+const KANCA_BASLANGIC = Date.now();
+const KANCA_DIS_ZAMAN_ASIMI_MS = 120_000;
+const BASIM_PAYI_MS = 15_000;
+const VITEST_ASGARI_BUTCE_MS = 20_000;
+const kalanButceMs = () => KANCA_DIS_ZAMAN_ASIMI_MS - (Date.now() - KANCA_BASLANGIC) - BASIM_PAYI_MS;
+
+/**
  * ⭐§28 · TUR-SONU AĞAÇ AYRIŞMA UYARISI — Recep onaylı hüküm: KAPI DEĞİL, UYARI + SAYIM.
  *
  * NİÇİN TUR SONU: tehlike ölçüm komutunun kendisinde değil, ARADAKİ masum yardımcı
@@ -168,16 +182,92 @@ const typeErrors = out
     return editedRel.has(m[1].replace(/\\/g, '/'));
   });
 
+/**
+ * ⭐3) YAZILDIĞI ANDA TEST KOŞUMU (Recep kararı 2026-09-16; WrongStack `test-runner-gate`
+ * fikri, uygulama bizden).
+ *
+ * NİÇİN: hatayı yazıldığı anda bulmanın tek deterministik yolu, düzenlenen dosyanın testini
+ * o turda koşmaktır. Bu kanca bugüne dek lint+tsc koşuyordu; tip hatası olmayan mantık hatası
+ * ancak PR'da (kapı botu) ya da hiç görünüyordu. Ayrıca repoda "test-önce" diye hiçbir kural
+ * veya sayı YOKTU (2026-09-16 ölçüldü: CLAUDE.md ve 70 cetvelde geçmiyor). Kural koymak yerine
+ * ÖLÇÜYORUZ: "testsiz değişiklik" sayılır; sayı bir ay düşmezse kapıya çevrilir (Recep kararı).
+ *
+ * NASIL: `vitest related <src dosyaları> --run` — vitest import grafiğinden o dosyayı çeken
+ * test dosyalarını bulur ve yalnız onları koşar (2026-09-16 ölçüldü: tek dosya ~11 sn;
+ * testi olmayan dosyada "No test files found"). Adla eşleme YAPILMAZ; `__tests__/x.test.ts`
+ * de, `conformance/*.test.ts` de import ediyorsa gelir.
+ * "Testsiz" sayımı ayrı ve ucuz: hiçbir test dosyası bu modülü import etmiyorsa testsizdir
+ * (`git grep` ile statik; vitest'i dosya başına koşmak N×11 sn olurdu).
+ *
+ * SINIR: yalnız `src/**` kaynak dosyaları (test, d.ts, __tests__ hariç). BLOKLAMAZ (exit 0):
+ * kanca bir kalite ağıdır, kapı değil — kapı PR'dadır. 120 sn zaman aşımı: aşarsa "ölçemedim"
+ * yazar, "temiz" DEMEZ (ölçememek geçmek değildir).
+ */
+let testOzeti = '';
+try {
+  const srcFiles = uniq
+    .map((f) => path.relative(repoRoot, f).replace(/\\/g, '/'))
+    .filter((f) => /^src\//.test(f) && /\.(ts|tsx)$/.test(f) && !/\.test\.tsx?$/.test(f) && !/\.d\.ts$/.test(f) && !/__tests__\//.test(f));
+  if (srcFiles.length > 0) {
+    // (a) testsiz dosyalar — statik: hiçbir *.test.ts(x) bu modülü import etmiyor.
+    // Eşleme "üst dizin/ad" ya da "./ad" ile — yalnız ad ile eşleme çok gevşek (2026-09-16
+    // ölçüldü: `app/layout.tsx` için `components/layout` import eden test "var" sayıldı).
+    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const testsiz = [];
+    for (const f of srcFiles) {
+      const base = path.basename(f).replace(/\.(ts|tsx)$/, '');
+      const ust = path.basename(path.dirname(f));
+      const desen = `from ['"]([^'"]*/${esc(ust)}/${esc(base)}|\\.\\.?/${esc(base)})(\\.tsx?)?['"]`;
+      const g = spawnSync('git', ['grep', '-l', '-E', desen, '--', '*.test.ts', '*.test.tsx'], { encoding: 'utf8' });
+      if (!(g.stdout || '').trim()) testsiz.push(f);
+    }
+    // (b) ilgili testleri koş — YALNIZ kalan bütçe yetiyorsa (bkz. ZAMAN BÜTÇESİ)
+    const butce = kalanButceMs();
+    const vt = butce >= VITEST_ASGARI_BUTCE_MS
+      ? spawnSync('pnpm', ['exec', 'vitest', 'related', ...srcFiles, '--run', '--reporter=dot'], {
+        shell: true, encoding: 'utf8', timeout: butce,
+        env: Object.assign({}, process.env, { CI: '1' }),
+      })
+      : null;
+    const vo = vt ? ((vt.stdout || '') + (vt.stderr || '')).toString() : '';
+    const kosulanM = vo.match(/Test Files\s+(.+)/);
+    const kaldi = vo.split('\n').filter((l) => /^\s*(FAIL|×|✗)\s/.test(l) || /\bFAIL\b.*\.test\.tsx?/.test(l)).slice(0, 10);
+    let satir;
+    if (!vt) satir = `🧪 tur-sonu test: ÖLÇEMEDİM (bütçe yok: lint+tsc sonrası kalan ${Math.max(0, Math.round(butce / 1000))} sn < ${VITEST_ASGARI_BUTCE_MS / 1000} sn) — bu satır "temiz" demek değil.`;
+    else if (vt.error && vt.error.code === 'ETIMEDOUT') satir = `🧪 tur-sonu test: ÖLÇEMEDİM (${Math.round(butce / 1000)} sn bütçe aşıldı) — bu satır "temiz" demek değil.`;
+    else if (/No test files found/.test(vo)) satir = `🧪 tur-sonu test: ${srcFiles.length} kaynak dosya düzenlendi, HİÇBİRİNİN testi yok.`;
+    else if (kosulanM) satir = `🧪 tur-sonu test (vitest related): Test Files ${kosulanM[1].trim()}` + (kaldi.length ? '\n' + kaldi.map((l) => '   ' + l.trim()).join('\n') : '');
+    else satir = '🧪 tur-sonu test: çıktı ayrıştırılamadı — ÖLÇEMEDİM (vitest exit ' + (vt ? vt.status : 'yok') + ').';
+    if (testsiz.length) satir += `\n   testsiz değişiklik: ${testsiz.length}/${srcFiles.length} — ${testsiz.slice(0, 8).join(', ')}${testsiz.length > 8 ? ' …' : ''}`;
+    testOzeti = satir;
+    // (c) sayaç — OTURUM BAŞINA AYRI DOSYA, pano dizininde (ölçüm; bir ay sonra kapı kararı Recep'in).
+    // Tek ortak dosya oku-değiştir-yaz ile yarışlıydı: üç şerit aynı anda tur bitirince son yazan
+    // kazanır, ötekilerin turu sessizce kaybolurdu. Her oturum yalnız kendi dosyasına yazar.
+    try {
+      const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'));
+      const guvenliSid = String(sessionId).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 64);
+      const sayacYolu = path.join(board.BOARD_DIR, `.test-kosum-sayaci-${guvenliSid}.json`);
+      let s = { tur: 0, kaynak: 0, testsiz: 0, kalan: 0 };
+      try { const o = JSON.parse(fs.readFileSync(sayacYolu, 'utf8')); if (o && typeof o === 'object') s = { ...s, ...o }; } catch { /* ilk tur */ }
+      s.tur += 1; s.kaynak += srcFiles.length; s.testsiz += testsiz.length; s.kalan += kaldi.length; s.son = new Date().toISOString();
+      fs.writeFileSync(sayacYolu, JSON.stringify(s), 'utf8');
+    } catch { /* sayaç kolaylıktır, uyarı asıl iş */ }
+  }
+} catch { /* kanca hiçbir koşulda turu düşürmez */ }
+
+const parcalar = [];
+if (konumUyarisi) parcalar.push(konumUyarisi);
 if (typeErrors.length > 0) {
-  const summary =
+  parcalar.push(
     `⚠️ verify-on-stop: bu turda düzenlenen dosyalarda tip hatası var:\n` +
     typeErrors.slice(0, 20).join('\n') +
-    (typeErrors.length > 20 ? `\n… (+${typeErrors.length - 20} daha)` : '');
-  // İKİ UYARI VARSA İKİSİ DE GÖRÜNÜR: tek JSON satırında birleştirilir, yoksa biri
-  // diğerini bastırır ve "sessizce kaybolan uyarı" sınıfı doğar.
-  process.stdout.write(JSON.stringify({
-    systemMessage: konumUyarisi ? konumUyarisi + '\n\n' + summary : summary,
-  }) + '\n');
-  process.exit(0);
+    (typeErrors.length > 20 ? `\n… (+${typeErrors.length - 20} daha)` : ''),
+  );
 }
-cikis(0);
+if (testOzeti) parcalar.push(testOzeti);
+// BİRDEN ÇOK UYARI VARSA HEPSİ GÖRÜNÜR: tek JSON satırında birleştirilir, yoksa biri
+// diğerini bastırır ve "sessizce kaybolan uyarı" sınıfı doğar.
+if (parcalar.length > 0) {
+  process.stdout.write(JSON.stringify({ systemMessage: parcalar.join('\n\n') }) + '\n');
+}
+process.exit(0);
