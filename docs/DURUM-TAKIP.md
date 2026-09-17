@@ -378,6 +378,13 @@ ALTYAPI-NLM=`ac03ce11` · OPS-AUDIT=`cb0467f1`.
   sessiz-arıza alarmı → olay defteri → hız sınırı yayma (maestro) → uptime → pgTAP RLS → staging+strix
   → k6 → Stryker → mekanizma budaması. Kod yok; her madde ayrı emir. **OPS: 1 ve 3 doğrudan emir
   açılabilir (kod yok); 2/4/6 plan-challenger ister.**
+- **2026-09-16 — WrongStack incelemesi → "yazıldığı anda test" (Recep "evet, 1 ile başla"):**
+  depo klonlanıp ölçüldü (9.076 dosya, 35 paket, 3.442 test dosyası, tek yazar, 191 commit/7 gün);
+  Chimera **oturum sonu** ve pasif, paylaşımın "yazıldığı anda"sı `test-runner-gate`. Bizde test-önce
+  kuralı/sayısı YOKTU → `verify-on-stop`'a **`vitest related`** koşumu (düzenlenen `src/` dosyasını
+  import eden testler o turda koşar, tek dosya ~11 sn) + **"testsiz değişiklik" sayacı** (şerit
+  başına, pano dizini). Bloklamaz; bir ay sonra sayı düşmezse kapı kararı Recep'in. Sıradaki:
+  `kanit-avcisi` (bul → önce başarısız test → düzelt; Workflow). WrongStack ürün olarak alınmadı.
 - **Ölçülen kısıt:** uzak Claude Code konteynerinde Chromium dış siteye çıkamıyor (proxy CONNECT
   reddi); orada `qa` hedefi yerel `pnpm start`, preview/prod bakışı yerel makineden. Pano notları
   (`C:/tmp/venthub-board`) konteynerde yerel kalıyor, eş-Controller'a ULAŞMIYOR — bu yüzden not
