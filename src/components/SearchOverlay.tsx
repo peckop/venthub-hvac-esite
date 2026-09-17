@@ -22,7 +22,19 @@ interface SearchOverlayProps {
   onClose: () => void
 }
 
-type ViewState = 'IDLE' | 'SUGGESTING' | 'RESULTS'
+/**
+ * ⭐REC-340: `SUGGESTING` durumu KALDIRILDI — arama artık TEK AŞAMALI.
+ *
+ * NİÇİN: Recep canlıda aradı ve *"ben bu şekilde 2 aramalı bir arama motoru bilmiyorum,
+ * kullanıcı olarak ben de zorlandıysam bir yerde sorun var değil mi?"* dedi. Haklıydı.
+ * Yazarken açılan kutu ile "tüm sonuçlar" adımı AYRI İKİ RPC'ye bağlıydı ve farklı sonuç
+ * veriyorlardı: "jet fan" öneri kutusunda 0, tam aramada 20 sonuç (canlıda ölçüldü).
+ *
+ * Gövde tarafı migration ile tek koda indirildi; burası da tek listeye iner. Kullanıcı
+ * yazarken ürünleri fiyat ve görseliyle doğrudan görür; kategori/marka kısayolları listenin
+ * üstünde durur. Ara bir "tüm sonuçları göster" adımı YOKTUR.
+ */
+type ViewState = 'IDLE' | 'RESULTS'
 
 const RECENT_SEARCHES_KEY = 'venthub_recent_searches'
 
@@ -41,6 +53,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [results, setResults] = React.useState<FtsProductResult[]>([])
   const [recentSearches, setRecentSearches] = React.useState<string[]>([])
   const [error, setError] = React.useState<string | null>(null)
+  // "Tekrar dene" aynı sorguyu yeniden çalıştırır: debounced değişmediği için effect'i bu sayaç tetikler.
+  const [denemeNo, setDenemeNo] = React.useState(0)
 
   // Popüler kategorileri merkezi hiyerarşiden çek
   const popularCategories = React.useMemo(() => {
@@ -96,15 +110,32 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
       try {
         setLoading(true)
-        const { getSearchSuggestions } = await import('../lib/services/product.service')
-        const items = await getSearchSuggestions(supabaseBrowserClient, debounced, 6)
+        setError(null)
+        const { getSearchSuggestions, ftsSearchProducts } = await import('../lib/services/product.service')
+        // İkisi PARALEL ve ikisi de artık AYNI eşleştirme gövdesini kullanıyor (migration
+        // 20260916132052). Ürünler listeyi kurar; öneri çağrısından yalnız kategori/marka
+        // kısayolları alınır — ürün kalemleri yinelenmesin diye süzülür.
+        const [items, rows] = await Promise.all([
+          getSearchSuggestions(supabaseBrowserClient, debounced, 6),
+          ftsSearchProducts(supabaseBrowserClient, debounced, 20),
+        ])
 
         if (active) {
-          setSuggestions(items)
-          setViewState('SUGGESTING')
+          setSuggestions(items.filter(s => s.type !== 'product'))
+          setResults(rows)
+          setViewState('RESULTS')
         }
       } catch (err) {
         console.error(err)
+        if (active) {
+          setSuggestions([])
+          setResults([])
+          setViewState('RESULTS')
+          // "Sonuç bulunamadı" DEĞİL: 2026-09-17 canlıda `İNLİNE` araması veritabanı süre
+          // aşımına düştü (57014) ve ekran "Sonuç bulunamadı" dedi — oysa 24 ürün vardı.
+          // Hata ile boş sonuç müşteriye farklı söylenir; hatada yeniden deneme yolu verilir.
+          setError(t('search.failed'))
+        }
       } finally {
         if (active) setLoading(false)
       }
@@ -112,7 +143,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
     fetchData()
     return () => { active = false }
-  }, [debounced, open])
+    // `t` hata mesajı için kullanılıyor; `useI18n` onu kararlı döndürür (aynı desen
+    // PaymentSuccessPage'de de var), bu yüzden bağımlılığa girmesi yeniden çağrı üretmez.
+  }, [debounced, open, t, denemeNo])
 
   // Focus management
   React.useEffect(() => {
@@ -212,29 +245,30 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     return s.label ?? ''
   }
 
-  const performFullSearch = async (term: string) => {
-    if (!term.trim()) return
-    setLoading(true)
-    setError(null)
-    setViewState('RESULTS')
-    addToRecent(term)
-    setActiveIndex(-1)
+  /**
+   * ⭐TEK GEZİNME UZAYI. Liste artık tek parça: önce kategori/marka kısayolları, sonra
+   * ürünler. Klavye ok tuşları ikisinin arasında kesintisiz gezer — eskiden iki ayrı
+   * görünümün iki ayrı dizini vardı ve Enter kullanıcıyı ikinci bir aramaya sokuyordu.
+   */
+  const gezinmeUzunlugu = suggestions.length + results.length
 
-    try {
-      const { ftsSearchProducts } = await import('../lib/services/product.service')
-      const rows = await ftsSearchProducts(supabaseBrowserClient, term, 20)
-      setResults(rows)
-    } catch {
-      setError(t('search.noResults'))
-    } finally {
-      setLoading(false)
+  const aktifKalemeGit = (idx: number) => {
+    if (idx < 0) return
+    if (idx < suggestions.length) {
+      const s = suggestions[idx]
+      // Klavye yolu da çözülmüş etiketi geçirir (REC-114 / NOT-3): ham `s.label` gitseydi
+      // İngilizce gezen müşterinin arama geçmişine TÜRKÇE kategori adı yazılırdı.
+      goToSuggestion(s, oneriEtiketi(s))
+      return
     }
+    const res = results[idx - suggestions.length]
+    if (res) goToResult(res)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') handleClose()
 
-    const maxIndex = viewState === 'SUGGESTING' ? suggestions.length - 1 : viewState === 'RESULTS' ? results.length - 1 : -1
+    const maxIndex = viewState === 'RESULTS' ? gezinmeUzunlugu - 1 : -1
 
     if (e.key === 'ArrowDown') {
       e.preventDefault()
@@ -244,21 +278,13 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       setActiveIndex(prev => (prev > -1 ? prev - 1 : -1))
     } else if (e.key === 'Enter') {
       e.preventDefault()
+      // Seçili kalem varsa oraya git; yoksa listenin ilk kalemine. İkinci bir arama
+      // adımı YOK — kullanıcı zaten sonuçlara bakıyor.
       if (activeIndex > -1) {
-        if (viewState === 'SUGGESTING') {
-          const s = suggestions[activeIndex]
-          // ⭐Klavye yolu da çözülmüş etiketi geçirir (REC-114 / NOT-3): eskiden ham
-          // `s.label` gidiyordu ve İngilizce gezen müşterinin arama geçmişine TÜRKÇE
-          // kategori adı yazılıyordu. Fare yolu kullanıcının yazdığı `q`'yu geçirir;
-          // bu ikisinin farklı olması ayrı bir tutarsızlık ve bu turun kapsamı DIŞINDA
-          // — burada yalnız dil sızıntısı kapatıldı.
-          goToSuggestion(s, oneriEtiketi(s))
-        } else if (viewState === 'RESULTS') {
-          const res = results[activeIndex]
-          goToResult(res)
-        }
-      } else {
-        performFullSearch(q)
+        aktifKalemeGit(activeIndex)
+      } else if (gezinmeUzunlugu > 0) {
+        addToRecent(debounced)
+        aktifKalemeGit(0)
       }
     }
   }
@@ -334,7 +360,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             {recentSearches.map((term, i) => (
               <li key={i}>
                 <button
-                  onClick={() => { setQ(term); performFullSearch(term); }}
+                  onClick={() => setQ(term)}
                   className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-left text-sm text-industrial-gray group transition-colors"
                 >
                   <svg className="w-4 h-4 text-steel-gray group-hover:text-primary-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -387,42 +413,25 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
     </div>
   )
 
-  // --- VIEW: SUGGESTING ---
-  const renderSuggestions = () => {
-    if (suggestions.length === 0) {
-      return (
-        <div className="px-4 py-12 text-center text-sm text-steel-gray flex flex-col items-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <svg className="w-12 h-12 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <span className="font-medium">{t('search.noResults')}</span>
-          <button
-            onClick={() => performFullSearch(debounced)}
-            className="text-primary-ocean font-bold mt-2 hover:underline inline-flex items-center gap-1"
-          >
-            <span>"{debounced}"</span> {t('search.detailedSearch')}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-          </button>
-        </div>
-      )
-    }
-
+  /**
+   * Kategori/marka kısayolları — listenin ÜSTÜNDE durur, ürünlerle aynı gezinme uzayında.
+   * Ürün önerileri burada YOK: onlar asıl listede fiyat ve görseliyle görünür, iki kez
+   * gösterilmeleri kullanıcıya iki ayrı sonuç kümesi varmış izlenimi verirdi.
+   */
+  const renderKisayollar = () => {
+    if (suggestions.length === 0) return null
     return (
-      <div className="py-2" ref={listRef}>
-        <div className="divide-y divide-gray-100">
-          {suggestions.map((s, idx) => renderSuggestion(s, idx))}
-        </div>
-        <button
-          onClick={() => performFullSearch(debounced)}
-          className="w-full text-center py-3 text-sm text-primary-ocean font-medium hover:bg-gray-50 border-t transition-colors focus:bg-air-blue/10 focus-visible:outline-none"
-        >
-          {t('search.overlay.allResultsFor', { term: debounced })}
-        </button>
+      <div className="divide-y divide-gray-100 border-b border-gray-100 bg-slate-50/50">
+        {suggestions.map((s, idx) => renderSuggestion(s, idx))}
       </div>
     )
   }
 
-  // --- VIEW: RESULTS (Full Search) ---
+  // --- VIEW: RESULTS (tek liste) ---
   const renderResults = () => {
-    if (results.length === 0) {
+    // Boş durum: ne ürün ne kısayol. Artık "detaylı ara" teklifi YOK — bu kutu zaten
+    // detaylı aramanın kendisi; kullanıcıyı ikinci bir aramaya göndermek onu oyalıyordu.
+    if (results.length === 0 && suggestions.length === 0) {
       return (
         <div className="p-12 text-center text-industrial-gray flex flex-col items-center animate-in zoom-in-95 duration-300">
           <svg className="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -442,8 +451,12 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
             <span>{t('search.fuzzyMatchNotice')}</span>
           </div>
         )}
+        {renderKisayollar()}
         <ul className="divide-y">
-          {results.map((r, idx) => {
+          {results.map((r, i) => {
+            // Kısayollar listenin başında olduğu için ürün dizinleri onların sayısı kadar
+            // kaydırılır — tek gezinme uzayı budur.
+            const idx = i + suggestions.length
             const isActive = idx === activeIndex
             const rImgUrl = resolveProductImageUrl(r)
             return (
@@ -539,19 +552,29 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
 
           {/* Content Body */}
           <div className="flex-1 overflow-y-auto custom-scrollbar relative z-0">
-            {error && <div className="p-4 bg-red-50 text-red-600 text-sm font-medium">{error}</div>}
+            {error && (
+              <div role="alert" className="p-4 bg-red-50 text-red-600 text-sm font-medium flex items-center justify-between gap-3">
+                <span>{error}</span>
+                <button
+                  type="button"
+                  onClick={() => setDenemeNo(n => n + 1)}
+                  className="shrink-0 px-3 py-1.5 text-xs font-bold text-red-700 bg-white rounded-lg border border-red-200 hover:bg-red-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy"
+                >
+                  {t('search.retry')}
+                </button>
+              </div>
+            )}
 
             {!error && !loading && (
               <>
                 {viewState === 'IDLE' && renderIdle()}
-                {viewState === 'SUGGESTING' && renderSuggestions()}
                 {viewState === 'RESULTS' && renderResults()}
               </>
             )}
           </div>
 
           {/* Footer Hint */}
-          {(viewState === 'SUGGESTING' || viewState === 'RESULTS') && (suggestions.length > 0 || results.length > 0) && (
+          {viewState === 'RESULTS' && (suggestions.length > 0 || results.length > 0) && (
             <div className="bg-slate-50 px-4 py-2.5 border-t border-slate-100 flex justify-between items-center text-xs text-steel-gray">
               <span className="flex items-center gap-1">
                 <span className="bg-white px-1 py-0.5 rounded border border-slate-200 shadow-sm leading-none">{t('search.overlay.arrowUp')}</span>
