@@ -16,6 +16,9 @@ metadata:
   - planı stress-test et
   - varsayımları çürüt
   - plan red team
+  - bu adım gerekli mi
+  - kapsam açısından denetle
+  - çalışan bir şeyi bozuyor mu
   inputs:
   - docs/plans/implementation_plan.md
   outputs:
@@ -48,7 +51,43 @@ dayanarak** çürütür ve daha dayanıklı bir plan oluşturulmasını sağlar.
    Plandaki hiçbir varsayımı doğrulamadan geçme. CLAUDE.md'deki **Mutlak Kurallar (31 madde)** ve
    `CONTEXT.md §14` planın uyması gereken cetveldir — plan bunları ihlal ediyor mu, ölç.
 
-### Adım 2 — Zayıf Noktaları Arama ve Zorlama (Red-Teaming)
+### Adım 2 — DÖRT SORU: her plan ADIMI için ZORUNLU (kapsam denetimi)
+Adım 3'teki red-teaming "bu plan YANLIŞ mı" diye sorar. Bu adım **"bu plan GEREKLİ mi"** diye
+sorar. İkisi ayrı eksendir ve biri diğerinin yerine geçmez — ölçüldü (REC-310 Faz 1,
+`docs/audits/gstack-yan-yana-2026-09-15.md`): iki araç 35 bulgu üretti, yalnız **6'sı örtüştü**.
+
+Plandaki **her adım için dördünü de** cevapla. Cevap yoksa `ÖLÇÜLEMEDİ` yaz — boş bırakmak
+"sorun yok" demek DEĞİLDİR.
+
+**S1 — BU ADIM GEREKLİ Mİ?** Hangi vakayı / ölçütü kurtarıyor, **sayıyla**; adımdan önce ve sonra
+kaç vaka geçiyor. Hiçbirini kurtarmıyorsa hüküm **ÇIKAR**.
+
+**S2 — BU ZATEN VAR MI?** Mevcut varlık envanteri: `codegraph_explore`, `docs/standards/`,
+`docs/audits/`, ve DB tarafında `pg_available_extensions` + `pg_extension` (**ayrı iki sorudur:
+`default_version` dolu olmak KURULU demek değildir — `installed_version` NULL'sa eklenti yoktur**),
+`pg_indexes`, `pg_proc`. Varsa hüküm **YENİDEN YAZMA**; adım "mevcudu kapıya bağla"ya döner.
+
+**S3 — KAÇ YOL TEST EDİLİYOR?** Kaç kapı / fikstür / kol var, **sayıyla**. Sıfırsa adım plandan
+çıkmaz ama **"SINANMIYOR" damgası** alır ve damga plan metnine taşınır.
+
+**S4 — ÇALIŞAN BİR ŞEYİ BOZUYOR MUYUZ?** Dokunulan yüzeyin **bugünkü canlı davranışı ÖNCE
+ölçülür**; rapora **canlı ÖNCE / SONRA satırı** yazılır. Bugün doğru çalışan davranışın korunması
+**kapıya** yazılır, plana not olarak değil.
+> **SABİT SATIR — CLAUDE.md kural 13 ve 14 (her S4 cevabının altına aynen konur):**
+> **Kural 13** — adım `supabase/migrations/*.sql` içeriyorsa master'a merge **prod DB'ye otomatik
+> uygular**; PR yalnız kullanıcının açık onayıyla merge edilir, şerit kendi merge etmez.
+> **Kural 14** — testi/kapıyı sonraki işe bırakmak adımı tamamlamaz; hata yolları (ağ yok, veri
+> boş, yetki yok) aynı adımın kapsamındadır.
+>
+> ⚠**NİÇİN SABİT:** kapsam denetimini dışarıdan bir araçla ilk koştuğumuzda o araç "migration
+> merge = prod" kuralını **yalnız brief'e yazıldığı için** gördü; projeyi bilmiyordu. Brief'e
+> yazılmayı bekleyen kural, yazılmadığı gün görünmez.
+
+**Çıktı biçimi — adım × dört soru tablosu, raporun EN BAŞINA, red-teaming bulgularından ÖNCE.**
+Sütunlar: `Adım | S1 gerekli mi (sayı) | S2 zaten var mı | S3 kaç yol test ediliyor | S4 canlı
+ÖNCE/SONRA | Hüküm`. Hüküm kümesi: **KALSIN · DARALT · ÇIKAR · AYRI KAYIT**.
+
+### Adım 3 — Zayıf Noktaları Arama ve Zorlama (Red-Teaming)
 Planı şu **beş VentHub-özel** başlık altında eleştir. Her başlıkta listelenen tuzaklar sahada
 yaşanmış gerçek olaylardır — plan bunlardan birine düşüyorsa **Kritik** işaretle.
 
@@ -99,7 +138,7 @@ yaşanmış gerçek olaylardır — plan bunlardan birine düşüyorsa **Kritik*
      (Playwright e2e) kapısı öngörüyor mu?
    * **Design token:** Arbitrary Tailwind değeri (`w-[92vw]`), HEX renk, `PCFSoftShadowMap` var mı?
 
-### Adım 3 — Teknik Çürütme Raporu Hazırlama
+### Adım 4 — Teknik Çürütme Raporu Hazırlama
 Analizleri içeren bir markdown raporu üret. **Her zaman** şu şablona göre oluştur ve `red_team_report.md`
 olarak yaz:
 
@@ -137,6 +176,11 @@ Mümkünse "şu cetvele/INV-* conformance testine bağla" diye kalıcı katman �
   "geçerli" sayma.
 - **A5:** Statik kapı (tsc/lint/test) bir riski **görmüyorsa**, bunu rapor et ve plana **runtime kapısı**
   (`next build` prerender, Playwright e2e smoke, keycheck) ekletmeyi öner — "yapı runtime davranışını görmez".
+- **A6 — DÖRT SORU TABLOSU OLMADAN RAPOR YOKTUR.** Adım 2'nin tablosu raporun ilk bölümüdür; bir
+  adım için dördünden biri boşsa oraya `ÖLÇÜLEMEDİ` yazılır. Gerekçe: "yanlış mı" ekseni bir adımı
+  DOĞRU ama GEREKSİZ bulduğunda sessiz kalır — ölçüldü, bulguların %83'ü tek eksende doğdu.
+- **A7 — "ÇIKAR" hükmü GEREKÇESİZ verilmez, "KALSIN" da.** Her hüküm S1'in sayısına dayanır. Sayı
+  yoksa hüküm yoktur; o adım `ÖLÇÜLEMEDİ` ile geçer ve bu raporun kendi sınırı olarak yazılır.
 
 <!-- ORTAK-BITIS-BASLANGIC (kaynak: .claude/skills/_ortak/bitis-durumu.md) -->
 ## Bitiş Durumu, Karışıklık ve Kanıtsız Kısıt

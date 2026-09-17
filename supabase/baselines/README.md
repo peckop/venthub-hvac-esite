@@ -71,6 +71,48 @@ olarak KOŞTURULABİLİR.* Eski ifade bir varsayımdı ve "felaket kurtarma yap�
 veriyordu. Önsöz niçin gerekli: döküm Supabase'in kendi iskelesini (auth/extensions şemaları,
 dokuz rol, `auth.users`, `vault`, `net`, `cron`) **hazır varsayar**.
 
+## ⏰TAZELİK ALARMI — INV-TABAN-TAZE-1 (2026-09-16, Recep sorusu)
+
+Recep aynen: *"ben DB'de değişiklik yaptığım an senin kendi yedeğin bayat olacak; tekrardan
+onu tazelemek yine 2 gün mü sürecek?"*
+
+**Ölçülmüş cevap: tazelemek iki gün DEĞİL.** Döküm CI'da **57 saniyede** alınıyor (koşum
+`34950954930`). İki gün süren şey **keşifti** — hangi dosyanın taban olduğunu bulmak, birinin
+KISMİ olduğunu görmek, gölge kümeyi elle kurmak. O keşif bir kez yapıldı ve bu README'ye yazıldı.
+
+⛔**Eksik olan şey ölçüm değil, ALARM'dı:** bugüne kadar tabanın bayatladığını söyleyen hiçbir
+şey yoktu. Fark edildiği gün yeniden keşfe başlanır ve **o zaman** gerçekten iki gün gider.
+
+**Alarm iki yerde konuşur, ikisi de aynı ölçütü kullanır:**
+
+| Nerede | Ne zaman | Ne yapar |
+|---|---|---|
+| `src/__tests__/conformance/taban-tazeligi.test.ts` | her PR (CI) | taban geride kalmışsa **bloklar** |
+| `.claude/hooks/defter-tazelik-satiri.cjs` (`TABAN:` satırı) | her turda, oturum içinde | **görünür** uyarı + onarım yolu |
+
+İkincisi niçin şart: ölçen ama **kararın verildiği yerde görünmeyen** kapı, görünmeyen kapıdır
+(REC-342'de ölçüldü — defter bayatlık kancası 7 gün doğru kırmızı verdi ve kimse görmedi).
+
+**ÖLÇÜT — sır gerektirmez, ağ gerektirmez.** Recep'in kendi düzeltmesi bunu mümkün kıldı:
+*"ben kendim bir müdahale ile yapmıyorum, size yaptırıyorum ve gerekirse migration onayı
+veriyorum."* Yani DB'ye giden her değişiklik **onaylanmış bir migration dosyasıdır**; o zaman
+soru tamamen dosya adlarından cevaplanır: **en yeni TAM taban tarihi ↔ en yeni migration damgası.**
+
+Üç ayrıntı ölçümle geldi ve ikisi kapının kendi yazarını yakaladı:
+1. **TAM/KISMİ ayrımı dosya adıyla değil İÇERİKLE yapılır** — tam döküm `create policy` taşır
+   (06-12 → 101, 09-15 → 163), kısmi olan taşımaz (08-13 → 0). Yukarıdaki "en yeni dosya bir
+   seçim kuralı değildir" dersinin makine karşılığı budur.
+2. **Sahada ÜÇ damga biçimi var:** 14 hane (kanonik), **12 hane (13 dosya)**, 8 hane (tarihsel).
+   Kapı ilk yazıldığında 12 haneliyi tanımıyordu ve o 13 dosya **sessizce karşılaştırmadan
+   düşüyordu**. Biçim kuralı (14 hane zorunlu) ayrı kapıdadır: `INV-MIGRATION-2`.
+3. **ÖLÇEMEDİ ≠ TAZE:** TAM taban bulunamazsa satır `⚠TABAN: OLCULEMEDI` basar ve sebebini yazar.
+
+⚠**ALARMIN GÖRMEDİĞİ ŞEY, ADIYLA:** bir migration merge edilip **canlıya uygulanmamış** olabilir.
+2026-09-15'te ölçüldü: `20250919_fts_search_products.sql` beş indeks yaratıyor, canlıda yalnız
+**ikisi** var ve hiçbir kapı görmemişti. Yani **dosya tarihi "uygulandı" demek değildir.** O
+eksiği ancak **sayarak doğrulama** kapatır (canlı sayım ↔ taban sayımı) ve o AYRI bir adımdır
+(`db-advisor.yml` hattı, sır gerektirir). Bu alarm yalnız *"taban geride mi"* der.
+
 ## Geçmiş
 
 | Tarih | Dosya | Kapsam | Not |
@@ -78,3 +120,26 @@ dokuz rol, `auth.users`, `vault`, `net`, `cron`) **hazır varsayar**.
 | 2026-06-12 | `2026-06-12_public_schema.sql` | **TAM** (pg_dump) | İlk tam baseline. 38 tablo, PK 39, 113 kısıt, 78 indeks, 61 FK, 101 politika, 237 GRANT. pg_dump 17.4 → server 17.6. |
 | 2026-08-13 | `2026-08-13_public_schema.sql` | ⚠**KISMİ — TABAN DEĞİL** | **pg_dump DEĞİL.** orion belge üretimi için alınmış bir **kolon anlık görüntüsü**: 41 tablo listesi, ama PK 1, kısıt 0, indeks 0, FK 0, politika 0, GRANT 0. Dosya bunu kendi 5. satırında yazıyor. **Şema tabanı olarak KULLANILMAZ** — 2026-09-14'te tam bu hata yapıldı. |
 | 2026-09-15 | `2026-09-15_public_schema.sql` | **TAM** (supabase db dump) | CI iş akışıyla (Yol A) alındı, koşum `34950954930`, 57 sn. 8616 satır / 340 KB. 66 `create table`, 56 PK, 113+11 indeks, 110 FK, 163 politika, 67 fonksiyon, 48 tetik, 379 GRANT. Gölgede **0 hata**, canlıyla **8/8 parite**. Sır taraması yapıldı: 13 imza, **hepsi 0** (depo PUBLIC). |
+| 2026-09-16 | `2026-09-16_public_schema.sql` | **TAM** (supabase db dump) | CI iş akışıyla (Yol A) alındı, koşum `35091853687`. 8910 satır / 344 KB. **57 tablo · 57 PK · 20 unique · 111 FK · 205 indeks · 164 politika · 72 fonksiyon**. Gölgede (`taban_0916`) **7 hata** — hepsi ortam/yetki (extension yalnız `postgres` DB'sinde, `supabase_realtime` publication yok, `secrets` zaten var, `net` şeması `pg_net` üyesi değil), **şema parçası kaybı YOK**. Canlıyla **4/4 parite**: tablo 57=57 · politika 164=164 · indeks 205=205 · FK 111=111. Sır taraması: 13 imza; `service_role` 203 eşleşme ama hepsi **rol ADI** (GRANT/`auth.role()` karşılaştırması), anahtar DEĞİL — önceki tabanda da 195 vardı, aynı sınıf. Diğer 12 imza **0**. |
+
+## ⭐2026-09-16 TAZELEMESİ — NİÇİN VE FARKI (REC-340 Adım 2 sonrası)
+
+Bu taban, arama gövdesi genişletmesi canlıya indiği için (#1221) alındı. Önceki tabana
+göre fark ölçüldü ve **yalnız EKLEME çıktı, kayıp YOK** (`diff` ile, nesne adı düzeyinde):
+
+| Sınıf | Eklenen |
+|---|---|
+| Tablo (2) | `product_search_index`, `search_reindex_queue` |
+| Fonksiyon (5) | `arama_indeksi_tazele`, `arama_kuyrugu_bosalt`, `tg_arama_aile_kuyrukla`, `tg_arama_kategori_kuyrukla`, `tg_arama_urun_tazele` |
+| Politika (1) | `product_search_index_tenant_read` |
+| Sayılar | indeks 124 → 128 (dosyada), FK 110 → 111, politika 163 → 164 |
+
+⭐**FARK ÖLÇÜMÜ "SAYI KARŞILAŞTIRMASI" DEĞİL, AD KARŞILAŞTIRMASIDIR.** Sayı eşitliği
+bir şeyin gidip başka bir şeyin gelmesini gizler; `diff` ile ad listesi karşılaştırınca
+kayıp olup olmadığı görünür. Bu tazelemede `<` işaretli (kaybolan) tek satır çıkmadı.
+
+⚠**BİR ÖLÇÜM TUZAĞI, ADIYLA:** ilk farkı `diff A && diff B && diff C` diye zincirlemiştim;
+`diff` fark bulduğunda **1 döndürdüğü için zincir ilk farkta KESİLDİ** ve fonksiyon/politika
+farkları hiç koşmadı — ama ekranda hata da görünmedi. Farklar `;` ile ayrılıp yeniden
+ölçüldü. ⭐Ders: `&&` ile zincirlenen ölçüm, başarısızlığı "fark" sayan bir araçla
+kullanılamaz; sessiz eksik ölçüm üretir.

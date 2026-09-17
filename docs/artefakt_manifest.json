@@ -2,9 +2,9 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "e3e2c503b5ffb3c4c1083e3c7de01741e2b8e2acd1f6ad6608cfb399b1642f74",
+      "icerik_sha256": "0c3b5efb56450e8279933202d8b277e335be8fa6743264bff41e7f82959dd5aa",
       "kaynak": {
-        "dosya_sayisi": 184,
+        "dosya_sayisi": 216,
         "dosyalar": {
           "CHANGELOG.md": "eb01e14c93b6de5095df49ecf4e36d500aee787b",
           "CONTEXT.md": "8c21e5ea5bd31a1e362d62526464d7e523b213bf",
@@ -19,11 +19,14 @@
           "docs/audits/admin-cetvel-scores-2026-06-18.md": "655885a1f90d99f1246424fb2833aa5ba0c661ef",
           "docs/audits/admin-panel-audit-2026-06-11.md": "c72bc338ffdace3f8d81d0ebb450a4692a429c93",
           "docs/audits/aile-adi-en-cevirileri-2026-08-23.md": "37304bb18ea07c4c904304aa8fdffb4afff7a47d",
-          "docs/audits/arac-envanteri-2026-09-07.md": "61cac485433080df6dfa07e39fb742d04d664f0d",
+          "docs/audits/arac-envanteri-2026-09-07.md": "154cdbeba73222e92fcbd4fc067c7040ee6b72a8",
+          "docs/audits/bagimlilik-2026-09-15.md": "918666b6c072910ebcf760cd6caf3b27bd784fce",
           "docs/audits/build-skip-canli-olcum-2026-08-28.md": "706e3e8a94c6df60ec6c4822eaeeff2f787cdccd",
           "docs/audits/canliya-alma-hazirlik-2026-08-15.md": "3f1e9b70d4434ac82142a92578b14cdfc791a99e",
           "docs/audits/dealer-data-ground-truth-2026-06-11.md": "cb6db5669a7269f2bc4195d7e8f0d9ba9ad86b59",
           "docs/audits/fiyatsiz-27-ayrim-2026-09-06.md": "011fbf08b9e58c20fc5d4be6a6ae112d565076bc",
+          "docs/audits/gstack-skill-envanteri-2026-09-15.md": "070fa8a2e3959fa2e38c2d57beda72572a3fc9bf",
+          "docs/audits/gstack-yan-yana-2026-09-15.md": "eb9914a2cdcaf924ef54316d36b3008a0d363092",
           "docs/audits/i18n-sozluk-render-denetimi-2026-08-23.md": "c323cb80d7bbfa0d7396b6a4f0d8ba155ce9bc8f",
           "docs/audits/icerik-hatti-1000-satir-tavani-filo-notu-2026-09-06.md": "f85f78b2466d0060cf746d7f98e0ca3c3fa60ce7",
           "docs/audits/icerik-hatti-anlatim-derinligi-2026-09-05.md": "4e3c43e87679e953820d95905ebac61595ef0923",
@@ -33,6 +36,8 @@
           "docs/audits/icerik-hatti-avens-katalog-hatalari-2026-09-05.md": "e87c1a749cea63be9f923f55290b20c983bca487",
           "docs/audits/icerik-hatti-birim-olcek-kusurlari-2026-09-07.md": "b646ff70a4b2fa5fcb2a6298673f7041e6b00b6f",
           "docs/audits/icerik-hatti-bolum-aile-eslemesi-2026-09-05.md": "82a743c6955a9ec07d69cabf31c12596735eac56",
+          "docs/audits/icerik-hatti-carm-hukum-geri-cekildi-2026-09-10.md": "21f88658f8b1ec31c2a4910c54a5c09f993933d8",
+          "docs/audits/icerik-hatti-defter-iki-yol-2026-09-10.md": "45a73181610061511a28f1b8c69b3b88ce755acb",
           "docs/audits/icerik-hatti-faz2-inceleme-2026-09-07.md": "3c2733ee44e9ba32cc87761664db80eae2e21e46",
           "docs/audits/icerik-hatti-faz4-canli-yazim-2026-09-07.md": "fd6669f622f2b689ac8186026b436cb9d24cd611",
           "docs/audits/icerik-hatti-faz4-hazirlik-2026-09-07.md": "b36502fd1eb6dc5717adccf0a1fe81492d0b981d",
@@ -43,6 +48,7 @@
           "docs/audits/icerik-hatti-kayip-urun-aktarimi-2026-09-07.md": "0f120d624c850eb83f6175894c05bc0e337f6b22",
           "docs/audits/icerik-hatti-kaynak-dizini-olcumu-2026-09-06.md": "958a5708f1b771f7dd52c583054c36c119ee5426",
           "docs/audits/icerik-hatti-kaynak-dizini-tazeleme-2026-09-07.md": "fb51986622739753c165f799626435b70ed25ba2",
+          "docs/audits/icerik-hatti-kaynak-eslemesi-2026-09-09.md": "625e215129d4d530440c518bf77162b4221aaa35",
           "docs/audits/icerik-hatti-musteri-belgeleri-2026-09-06.md": "346d221c4d155e5c2652153616238e12c3705e6e",
           "docs/audits/icerik-hatti-pdf-yapisi-2026-09-05.md": "24234d336024f81e4726c457e3176de8c1efb34c",
           "docs/audits/icerik-hatti-rec178-olu-aday-olcumu-2026-09-07.md": "952f09070e7d7d6e216298364ec4447805b329b1",
@@ -70,14 +76,18 @@
           "docs/audits/icerik-hatti-taslak-vortice-tekiller-2026-09-06.md": "5ddfcaf9dad000260fce18c0024ed685f1ec19c2",
           "docs/audits/icerik-hatti-taslak-vortice-ticari-2026-09-06.md": "7338661feb17f107e9243be9a8f2e9f0d616558d",
           "docs/audits/icerik-hatti-toplu-sunum-2026-09-06.md": "94f8080b2a9fc110f02c705a9de59f7cae6855fd",
+          "docs/audits/investigate-kuru-kosu-2026-09-12.md": "c815286e19c7f92416d38e66ceea36baa85a4338",
+          "docs/audits/kacirma-listesi-2026-09-16.md": "29fe32d8dca39f8c7e334c68fb3abcdaa772ed47",
           "docs/audits/karar-kayit-bagi-vitrin-15a-2026-09-07.md": "436533485f63874f7675e05357ef867f90e80d8b",
           "docs/audits/kasa-ve-siralama-denetimi-2026-08-23.md": "47d2772f316459b13ac48374b4788584e8fa565c",
           "docs/audits/katalog-karnesi-2026-09-09.md": "ce868459ff88b828d25eb8a0c19909dfc9e6c265",
           "docs/audits/katalog-sayim-2026-09-03.md": "748e3ac0dd6713346d30241f57ef39b9357596b8",
+          "docs/audits/kod-grafigi-uc-arac-mukayese-2026-09-16.md": "b061ef69cf85d1908398149ab2d674fc6240c332",
           "docs/audits/legal-i18n-scope-antigravity-2026-06-16.md": "e165c30c8a61e48d7aa875fd9f86d3093b15fc25",
           "docs/audits/lighthouse_diagnostic_2026-06-10.md": "33b315201410e9e92011b749c44dd94f2828aa41",
           "docs/audits/locale-kasa-envanteri-2026-08-23.md": "4dfe74b1e13a44ffe9b1e3c905f3b1f10f378595",
           "docs/audits/matris-sutun-doluluk-2026-09-05.md": "2c32f7343dbc0b44d364cfb7992c01a43973957a",
+          "docs/audits/ocr-kiyas-2026-09-16-pr1221.md": "85ff0b0e959788fceb4a612e04da67f35c788219",
           "docs/audits/odeme-yolu-denetimi-2026-08-15.md": "16f4c5c9edb58db56c47b35e8c7ece53b322c925",
           "docs/audits/olu-sozluk-anahtari-olcumu-2026-09-06.md": "c5f702112502a42a5cbf5ffb5b8ded868541baeb",
           "docs/audits/operasyon-dongusu-denetimi-2026-08-15.md": "0092e78a7ec51bec0a0d13024f517211be144e44",
@@ -90,11 +100,30 @@
           "docs/audits/rec162-evren-muhafizi-adaylari-2026-09-06.md": "0b386a8ea69a953f1f1e72aeb42cdd6da8c2472b",
           "docs/audits/rec176-skill-dogrulama-2026-09-07.md": "a18a22ba7825511da009aaa03b818352ed215b7f",
           "docs/audits/rec179-evren-muhafizi-sinavi-2026-09-07.md": "9c3a9cb164117a2a6275596e3b38d2a1493257e7",
+          "docs/audits/rec313-graphify-deneme-2026-09-13.md": "044a021baf7ca45afae832992ade24cbf65aa9b4",
+          "docs/audits/rec314-tetiklenebilirlik-sinavi-2026-09-14.md": "55ee06df2e5989e7020f83a2d0890ebbfda50329",
+          "docs/audits/rec315-squawk-ilk-tarama-2026-09-13.md": "796f7709524ac06d22b2a5ea9608030f5b58e38e",
+          "docs/audits/rec319-yerlesik-skill-araclari-2026-09-13.md": "2b59d09a828ac4480795d8f2186a629f4d269ae8",
+          "docs/audits/rec321-ek-silme-uygulandi-2026-09-14.md": "7e0137b798f81105af6190b4663258c725d7df3c",
+          "docs/audits/rec321-olu-migration-secenekleri-2026-09-14.md": "d44fce7d642dcf45a5042ad92837c9cdffac5196",
+          "docs/audits/rec326-sentry-postcss-zinciri-2026-09-14.md": "c02439639f8b57009573e8edc68b9c76a580c86e",
+          "docs/audits/rec327-workflow-envanteri-2026-09-14.md": "083f3bb1103bd2e96c5c04ba210a5e9a9595b661",
+          "docs/audits/rec333-ai-auto-repair-2026-09-14.md": "b863f66b5ae0f66816d004ed956a7fe8bed9ad05",
+          "docs/audits/rec335-rls-yetki-borclari-canli-olcum-2026-09-14.md": "0b57f036f10d54c87ac1b29435a10735cc4bacc5",
+          "docs/audits/rec336-baseline-2026-09-15.md": "b3c90cb7422eb9f40354525202c4f5a7f7e08294",
+          "docs/audits/rec347-dort-soru-2026-09-16.md": "4ed0a8cf3fa204b6b0c047915165c406285ddd12",
+          "docs/audits/rec348-rota-sinif-kapsami-2026-09-16.md": "17c2ade1610d30e8c4455e01f75b4854e40226eb",
+          "docs/audits/rec348-taze-derleme-marker-2026-09-16.md": "649caf33ec5345645799a214e66e52b620105945",
+          "docs/audits/rec352-dis-pratik-2026-09-16.md": "5cd04d18ed95804e9824a1fe82b8495db5052b09",
+          "docs/audits/rec352-sifir-noktasi-kaniti-2026-09-16.md": "deaf6e1af03b1ab051e14b9f5a2e2caa97fd1d0d",
+          "docs/audits/rec59-marka-kapi-kurali-2026-09-15.md": "76c98c82de3aac51771e6dbba31fa5a338fef2d9",
           "docs/audits/registry-triyaj-2026-08-26.md": "11e5cffde855644a8742a50f932d7e85fa3ece5f",
           "docs/audits/render-stratejisi-denetimi-2026-08-16.md": "a188c2b0481c07ece241c359eeeefb92ed929223",
           "docs/audits/secret-exposure-audit-2026-08-15.md": "56dea0411598b1389195ae601070c31a370814a3",
+          "docs/audits/sema-graf-uretici-2026-09-16.md": "a8e07d82f1ea6d6544a61615cc39cc5bf9220f6b",
           "docs/audits/sir-ekrana-basma-olayi-2026-09-04.md": "412fa95ea8aff384c6637fe60c294c9c926cc45f",
           "docs/audits/skill-envanteri-2026-09-05.md": "188fe697aa77df3539303412bf34bec796f6ab58",
+          "docs/audits/skill-yuku-2026-09-12.md": "92525db6e44db3ef6944fa4eb97a2c53b58b6b60",
           "docs/audits/t021-analytics-coverage-2026-08-19.md": "00c1d00d2186257706da9ed7eb0f5dbd2c53b471",
           "docs/audits/t077-ad-arayan-iddia-taramasi-2026-08-17.md": "ceb30a9692873ccc01da5e48e19efae53b189f80",
           "docs/audits/t099-aile-icerik-uyumu-2026-08-18.md": "0b97cf0800c43dd0f5fe0bda77186e36a52420b2",
@@ -137,6 +166,7 @@
           "docs/plans/faz1-remaining-divided-2026-06-13.md": "eaf214673b02d520bd081c1dafe05dfa17826354",
           "docs/plans/faz2-admin-backlog.md": "e95bf513c9b8fd4e0a818bd2d802d2a776818be4",
           "docs/plans/fiyat-motoru-plan-2026-08-13.md": "8d4b150842010b77524d8a579ae8169912ef71e7",
+          "docs/plans/graphify-kurulum-emri-2026-09-16.md": "750decc2ba58296eaf545591833c535a66107daf",
           "docs/plans/i18n-jsx-literals-cleanup-2026-06-14.md": "e59cb9327406f888960370729da9ded90372b79d",
           "docs/plans/j1-dashboard-data-brief.md": "9990c4c329aabea6f57e3183e4fa2872451d44dc",
           "docs/plans/j10-inventorysettings-refactor-brief.md": "1e97ddcc0c3038ceb3997d64d7e2d217f3c9e684",
@@ -171,7 +201,9 @@
           "docs/plans/rec168-migration-taslagi-2026-09-06.md": "c2f3b9ff3afb52d96f03da1ae2e36a8e5fe7331b",
           "docs/plans/rec292-denetim-izi-2026-09-09.md": "f276cb80f6929bddf722d5eb1ce3797ab38b4fcd",
           "docs/plans/rec296-koken-allowlist-2026-09-09.md": "21005d53b74a0182009cbf58ada23513c7ab2cdc",
+          "docs/plans/rec340-faz1-plan-2026-09-15.md": "250b19925e07be35fb3b2681ded98a9dbb0d5abf",
           "docs/plans/rec52-whsec-rotasyon-plani-2026-09-06.md": "10bf9ab619c0d51849db82651f63d2b4ca5e0759",
+          "docs/plans/rec59-adim2-anasayfa-statik-2026-09-09.md": "8d826bd748e5532263842db0014601b2883370a3",
           "docs/plans/red-team-rec129-faz1-2026-09-04.md": "d099567a778eca1ba0e2c3ecd557ee87dfafa852",
           "docs/plans/red-team-teklif-modu-2026-09-04.md": "7d4eb76311ce408cf2f8714fd8ff89e9a968a30a",
           "docs/plans/render-dalga1-plan-2026-08-17.md": "2f2bb7f9c6997cab746a0496ee6c4e3a7da67e99",
@@ -189,12 +221,12 @@
           "docs/plans/venthub_hvac_unified_refactor_plan.md": "91872b3835444bce317477cf0d7c649584630158",
           "docs/plans/venthub_saas_faz1_prompt.md": "c874969b99b46565010882bbd7c198b8de32150f",
           "docs/plans/venthub_saas_master_roadmap.md": "30ca1b0a82531d8bb5a9a0691adb98d1ef2d737b",
-          "docs/system_tree.md": "8ade8a793ca5cdd4d71b035a7f1e2c14b77ae3b6"
+          "docs/system_tree.md": "688ff7fa4340571613bc0e9d238dff636a3453cd"
         },
         "izlenmeyen": [],
-        "ozet": "1cc144071cb1d970d4bdbaed4e6167c770b889fb7c74fa1dc17c0dddc6a7475b"
+        "ozet": "0fb7364634938ba4256f04f2dcf1aeb01d3283b5892dc24663372b52bd40b3d8"
       },
-      "kaynak_commit": "59eaa47f6a3c540226774ac20259c10f9ad2d064",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -211,9 +243,9 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "0212ab447504539f6265a4fe190f04273eb0f8b64e85832c53c8713f29095eca",
+      "icerik_sha256": "0cd14a5477c8fb921e897668f3db43a24f571a148bd4f5320524c37f6246b1cb",
       "kaynak": {
-        "dosya_sayisi": 78,
+        "dosya_sayisi": 83,
         "dosyalar": {
           "docs/reference/supabase/auth-hooks.md": "bc0a4d34ede33a271325f3d0c65fb1d92713309a",
           "docs/reference/supabase/custom-claims-and-role-based-access-control-rbac.md": "0ab154329dc304b720152b3fec1b03b5d1c23b36",
@@ -229,15 +261,17 @@
           "docs/standards/admin-standard.md": "ac7f3eb3272c2c5cc353385bf89094eb09befb26",
           "docs/standards/aile-metni-sayisal-standard.md": "ec1bc62792611ee8f7e9a094c85ab31b87dcf069",
           "docs/standards/analytics-standard.md": "690a337fb84183f677c2c56bed6c9550a7a075b4",
-          "docs/standards/arac-envanteri-standard.md": "95a9d7fd0803b4f0985cf564e4ba966002e422fb",
+          "docs/standards/arac-envanteri-standard.md": "43476b750113cf2b4ecabad01fcd4fe8fca71c65",
+          "docs/standards/arama-standard.md": "f30c27a452cf4c2c4f5470cf3e10fee065c5be07",
           "docs/standards/auth-account-standard.md": "06fac0bcc55d7406119c54b54c670a02285e0707",
+          "docs/standards/bagimlilik-guvenlik-yukseltme-standard.md": "f51cdb2b3f1a80ef7865d6539dc80d04fc08d637",
           "docs/standards/canonical-url-standard.md": "8f85ad5b532688183d8e88f672e1fd18d6c5f993",
           "docs/standards/catalog-depth-standard.md": "3a62ad8cb588b6abf11b0c59d66f4c75e5116207",
-          "docs/standards/catalog-ingestion-standard.md": "deea079dde767302b548ce48c4c7abd7c29a7400",
+          "docs/standards/catalog-ingestion-standard.md": "119ef2c483915d9f830fe95251b50277aa99d9e7",
           "docs/standards/category-taxonomy-standard.md": "017ac781fdc68d57870e6fa85817c713406c929b",
           "docs/standards/checkout-payment-standard.md": "85882be4b27838ddc20e8a0c997a441d2e03d116",
           "docs/standards/ci-runner-install-standard.md": "dc37f4c5e08a22d03f34ff82c87775de858ffba4",
-          "docs/standards/collaboration-protocol.md": "c18ca1c1a617da56ba32e3233e4251f26c2a5149",
+          "docs/standards/collaboration-protocol.md": "83bbf3e25643ee0c276c28fdbc264394b09b8bb9",
           "docs/standards/commerce-domain-map-standard.md": "205440e349935c2ca7cfa28cabfe2ff81d023f8b",
           "docs/standards/companion-doc-standard.md": "841060c2e6685ad79b11ea366140799dc3fdeb04",
           "docs/standards/crm-standard.md": "1fc10cba5e0fc3f3915ea20e2b4679729f59b70d",
@@ -254,15 +288,17 @@
           "docs/standards/edge-function-security-standard.md": "ec427dc6431a2eb3717eb6acc872d1c054b2de22",
           "docs/standards/email-template-standard.md": "7978a9193c18819cd2a1de9a87842d3569e54d5c",
           "docs/standards/erp-workspace-design-standard.md": "0b9c05a654a0eaef701cfac1cb81f9c613fc2565",
-          "docs/standards/execution-method-standard.md": "8a955b53d61ae8583b8c0c55c8f00827bd3fa8d2",
-          "docs/standards/fleet-mechanism-standard.md": "6c82f1cb172106cd7c5fa404af453bf380b00ba7",
+          "docs/standards/execution-method-standard.md": "5a2633f1ed31a4cf5d2685d3f227f18d696c1ef8",
+          "docs/standards/fleet-mechanism-standard.md": "4a5b880698a6c5eecd86be4bc005848f46346b82",
           "docs/standards/form-submission-standard.md": "db8615f18333451cf5ac75dde586079612b91067",
           "docs/standards/hafiza-kancalari-standard.md": "46a49d5b418910699efb3dc129a7c6d4d41cc560",
+          "docs/standards/hukum-kaynak-standard.md": "35e58777803febcdbed815b269f40802fc241fb7",
           "docs/standards/i18n-localization-standard.md": "39bf7db79fc731c354a12631c19da66480b3c8a6",
           "docs/standards/i18n-ters-yon-standard.md": "7a25fd2c05350408c949bd9a3e97a7281e2c1508",
           "docs/standards/is-kayit-duzeni-standard.md": "575239e83d0a0ce0675f4197d735f85f87bfedeb",
           "docs/standards/katalog-sayim-standard.md": "e827c9344a8584cfbc1f762c41b4a515ef7c7605",
           "docs/standards/kategori-adlandirma-standard.md": "a4f16c23f9feb0c8f2afb8ee005d84053d9c25c2",
+          "docs/standards/ledger-ve-olu-migration-standard.md": "c2c7d101bd9245a9295bae5429b7118d5c15602d",
           "docs/standards/legal-compliance-standard.md": "765aa60b58eed3045e9ca4f4a09f9ef27af69ea5",
           "docs/standards/marka-token-eslemesi-standard.md": "867bc9466559ef9c8be5d731f1e3ae9db2aa8322",
           "docs/standards/matris-gorunum-standard.md": "a0ca25cf3aaa0c1cf185f4f3a28aed7166fb2aaa",
@@ -276,10 +312,11 @@
           "docs/standards/pricing-standard.md": "684c82951ab1c664cff850c59399629d412fcb24",
           "docs/standards/product-image-standard.md": "7144db1142e1b44905bd4cf0b9ada9c5a6963b34",
           "docs/standards/product-schema-standard.md": "d70f25836c3532daa7ecd15e3b82f292de9f7790",
-          "docs/standards/proje-takip-defteri-standard.md": "bee811149e30d7e02e9ce6588eefe69d5385fbc2",
+          "docs/standards/proje-takip-defteri-standard.md": "348fa4530feeeafc608237484ad053a1476c6fc1",
           "docs/standards/purchasing-standard.md": "aa9b0aa0c25e105df4dfed59c24653d369dee1a6",
           "docs/standards/quote-standard.md": "3ebf771c606a3419c918f2cb7df157a1a7fc6bb0",
-          "docs/standards/rendering-cache-standard.md": "b29708913a0dbbf6862b3fc4659fd9c657586a60",
+          "docs/standards/rendering-cache-standard.md": "4ada220120ce6cdceb4964a71a5f6367ab377750",
+          "docs/standards/rls-yetki-karari-standard.md": "e0cda841a649ff31661c08d2865272cebdaa8eb4",
           "docs/standards/runtime-version-alignment-standard.md": "5e1d1ebbf84268f2b2d4fbcbdb893e0fc8e52855",
           "docs/standards/satis-kipi-gecis-standard.md": "07a5ed109b4ce97ffd67a752b3dec4004d9f7b03",
           "docs/standards/session-loop-ritual.md": "32bcc5c0e9aad0f8ed6f59a18c6ff1a8f30b8e8a",
@@ -295,9 +332,9 @@
           "docs/standards/work-tracking-ssot-standard.md": "2b71fb015785477afd3df97b659bb76e702e1cef"
         },
         "izlenmeyen": [],
-        "ozet": "9c84ae0a3a6d87f31c68aa191998ff0036671b951620381183c5432d6e30194d"
+        "ozet": "46a1a751ed446699fa94c4b083ea9848dbdce87453c23f4d4456a731d8442e9c"
       },
-      "kaynak_commit": "59eaa47f6a3c540226774ac20259c10f9ad2d064",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -306,7 +343,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "0aca560d96711550a1ec98392c590c85e03f297139820341cd3c3a27a536586d",
+      "icerik_sha256": "206a48054d5813fd9921ebcead3754c22e1f73d8a75b9aba4abc11b20a4ecbb4",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -353,7 +390,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "59eaa47f6a3c540226774ac20259c10f9ad2d064",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -361,7 +398,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "03c62089c5fbfd1417813e59adbe8fc9e5b12ad847d587a4c307cd5deacafc25",
+      "icerik_sha256": "7f1a64f41d638f7b247d71908c0fc03803c139361496a9ee56fd23071e1e4c88",
       "kaynak": {
         "dosya_sayisi": 659,
         "dosyalar": {
@@ -1028,7 +1065,7 @@
         "izlenmeyen": [],
         "ozet": "7ba79896f9ae6bfcd64c05e014c2e9665f3d710ef8864bc2ee4414921684e25e"
       },
-      "kaynak_commit": "59eaa47f6a3c540226774ac20259c10f9ad2d064",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -1036,8 +1073,8 @@
       "yol": "docs/venthub_hvac_master.md"
     }
   ],
-  "calisma_agaci": "ana",
-  "derlendi": "2026-09-09T12:25:34.107106+00:00",
-  "kaynak_commit": "59eaa47f6a3c540226774ac20259c10f9ad2d064",
+  "calisma_agaci": "worktree",
+  "derlendi": "2026-09-16T13:56:24.560350+00:00",
+  "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
   "surum": 1
 }

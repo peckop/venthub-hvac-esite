@@ -43,7 +43,7 @@
 | Repo çapında **geniş tarama** ("her X'i bul", 50+ dosya) | **agy-orchestrate** (ucuz) → CodeGraph doğrulama | Yargı gerektiren her adım (agy tarar, karar vermez) | `docs/audits/` |
 | **Aynı yapısal değişiklik çok hedefe** (24 admin sayfası → ortak kit; 40 bileşen → aynı hook) | **maestro** | Tek dosya · hedefler birbirinden farklı (o zaman şerit içinde sıralı) | Dalga PR'ları |
 | **Fikir / "şunu yapsak mı"** — emir açılmadan, plan yazılmadan ÖNCE ("doğru problem mi, talep kanıtı ne, en dar dilim ne") | **office-hours** (altı zorlayıcı soru + öncül çürütme + 2-3 yol → tasarım notu) | Kapsamı belli tek iş · Kararlar defterinde kapanmış konu (yeniden açma) · yazılmış planın red-team'i (→ plan-challenger) | `docs/plans/<konu>-tasarim-notu-*.md` + Recep'e ödev |
-| **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → plana "ÇELİŞEN-MEVCUT" |
+| **Plan** yazıldı, uygulanmadan önce — özellikle **migration / veri göçü / rota değişikliği** | **plan-challenger** (red-team + **DÖRT SORU**, §2.2) | Docs-only plan, geri alınabilir tek PR | `red_team_report.md` → **adım × dört soru tablosu** en başta + plana "ÇELİŞEN-MEVCUT" |
 | **PR diff** incelemesi | **diff-review** / **code-review** | — | PR yorumu |
 | **Uygulama gerçekten çalışıyor mu** — görsel/etkileşimli değişiklik, "öyle mi oldu", PR öncesi tarayıcı kanıtı, hidrasyon/Suspense-kökte şüphesi | **qa** (Playwright+Chromium ile gez → kanıt → atomik düzeltme → yeniden ölç) | Kod okuma denetimi (→ 20-eksen/auditor) · birim test · prod'da eylem (yalnız bakış) · uzak konteynerde dış URL (yerel `pnpm start`) | `docs/audits/qa-<hedef>-<tarih>.md` + ekran görüntüsü |
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
@@ -71,6 +71,33 @@ girer — girmezse "elle" kovasına düşer ve maliyeti hiç ölçülmez.
 ⚠**Sınır:** plan modunda **yazma yapılmaz**; plan onaylandıktan sonra uygulama normal yöntemle
 koşar. Kapsam sorusu **Recep'e** gider ve *yapısal karar pakete gömülmez* — menü yeri, URL şeması,
 sayfa mimarisi gibi kalemler tek tek sorulur, toplu onaya eklenmez.
+
+### 2.2 `plan-challenger` DÖRT SORU taşır — "yanlış mı" yanına "gerekli mi" (REC-347, 2026-09-16)
+
+**Ölçüm (REC-310 Faz 1, `docs/audits/gstack-yan-yana-2026-09-15.md`):** aynı plan iki araçla
+denetlendi, **35 bulgunun yalnız 6'sı örtüştü** — yani bulguların **%83'ü tek eksende** doğdu.
+Bizim `plan-challenger` "bu plan **YANLIŞ** mı" diye soruyordu (canlıda çürütme: EXPLAIN, hata
+üretme, simülasyon) ve iki P0 buldu. Öteki araç "bu plan **GEREKLİ** mi" diye sordu (depo
+envanteri, kapsam daraltma) ve bir adımın dokuz vakanın **hiçbirini** kurtarmadığını göstererek
+fazı küçülttü (→ REC-346). İkinci soru bizim skill'imizde **hiç yoktu**.
+
+**Kural:** her plan **ADIMI** için dördü de cevaplanır ve tablo raporun **EN BAŞINA** konur:
+**S1** bu adım gerekli mi (hangi vakayı/ölçütü kurtarıyor, **sayıyla**; hiçbirini kurtarmıyorsa
+**ÇIKAR**) · **S2** bu zaten var mı (depo/DB/eklenti envanteri; varsa **YENİDEN YAZMA**) ·
+**S3** kaç yol test ediliyor (kapı/fikstür **sayısı**; sıfırsa adım çıkmaz ama **"SINANMIYOR"
+damgası** alır ve damga plan metnine taşınır) · **S4** çalışan bir şeyi bozuyor muyuz (dokunulan
+yüzeyin **canlı ÖNCE/SONRA** satırı; korunacak davranış **kapıya** yazılır, nota değil).
+Hüküm kümesi: **KALSIN · DARALT · ÇIKAR · AYRI KAYIT**.
+
+**S4'ün altına CLAUDE.md kural 13 ve 14 SABİT SATIR olarak konur.** Gerekçe URUN'un çekincesi ve
+ölçülmüş: dış araç "migration merge = prod" kuralını **yalnız brief'e yazıldığı için** gördü,
+projeyi bilmiyordu. Brief'e yazılmayı bekleyen kural, yazılmadığı gün görünmez.
+
+⭐**İLK KOŞUMUN SONUCU** (`docs/audits/rec347-dort-soru-2026-09-16.md`): REC-340 Faz 1 planı
+dört soruyu geçti (yedi adımın beşi KALSIN, biri DARALT, biri zaten ÇIKAR) — ama aynı sorular
+**kendi yetenek dosyamıza** uygulandığında on bölümün **dokuzunun** ya CLAUDE.md'de ya ESLint
+kapısında ya kardeş skill'de **zaten yazılı** olduğunu gösterdi. Yani "bu zaten var mı"
+sorusunun ilk kurbanı biz olduk; kapsam denetimi önce **içeriye** bakınca ödüyor.
 
 ---
 
