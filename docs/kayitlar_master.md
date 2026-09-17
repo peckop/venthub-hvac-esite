@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-16T13:15:39.565832+00:00
-total_compiled_files: 215
-source_commit: 33c5fcb22
+compiled_at: 2026-09-16T13:56:23.823673+00:00
+total_compiled_files: 216
+source_commit: 2aa90653a
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -996,6 +996,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/board/linear-okundu.cjs` | Linear yorum sayacinin esik damgasini "simdi"ye ceker (`--goster`, `--geri`) | OPS *(yazan: ALTYAPI)* | ELLE kosulur, yorumlari okuyan kisi tarafindan; sayac satiri komutu kendi ciktisinda gosterir | 2026-09-14 yazildi ve kosuldu (kabul sinavi: okundu+geri gidis-donus) | INV-MECH-1 (sira ve sessizlik kolu) | KAL |
 | `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
 | `scripts/db/checks/arama-davranisi.mjs` | INV-SEARCH-BEHAVIOR-1 — arama DAVRANIŞI kapısı (Katman B, canlı): on vakayı gerçek RPC üzerinden ölçer, ölçüt biçimleri oran/sıfır-değil/aynı-küme/marka-var/tam-SKU (sabit sayı YOK), hassasiyet tavanı %40, bilinen kırmızılar adıyla ilan edilir ve mandal İKİ YÖNLÜ (ilanlı vaka geçmeye başlarsa KIRMIZI) | ALTYAPI | `.github/workflows/db-advisor.yml` → `catalog-integrity` işine ADIM olarak bağlı, `db-gate-precheck.outputs.ready == 'true'` koşuluyla (yeni iş adı AÇILMADI: açık PR'ları "beklenen kontrol gelmedi"de kilitler) | 2026-09-15, REC-340 Faz 1 Adım 1. Prod'da salt-okuma ölçüldü (Supabase MCP): on vakanın **altısı** kırmızı (2,3,4,5,9,10), dördü geçiyor (1→47, 6→9, 7→1 doğru SKU, 8→52); aktif ürün 441, hiçbir vaka %40 tavanını aşmıyor. Betik sırsız koşturuldu → çıkış 0 + "OLCULEMEDI" + "ATLANMIS IS YESIL DEGILDIR" (konformans kolu bunu DAVRANIŞLA ölçüyor) | `src/__tests__/conformance/arama-davranisi.test.ts` (INV-SEARCH-BEHAVIOR-1 Katman A, 15 kol) | KAL |
+| `scripts/db/golge-kur.mjs` | GÖLGE VERİTABANI KURUCUSU — tek komutla geçerli test ortamı: mevcut Docker konteynerinin İÇİNDE ayrı bir DB açar, önsöz → en yeni TAM taban → tabandan sonraki migration'lar → (`--migration`) uygular ve **sadakati SAYARAK** doğrular. `postgres` DB'sine dokunmaz, `initdb`/port GEREKMEZ. ⛔`supabase db reset` İÇERMEZ (o komut aynı kümedeki AKRANIN gölgesini siliyor — 2026-09-16'da yaşandı). ⛔VAR OLAN DB EZİLMEZ: ad çakışırsa çıkış 3 ile DURUR. ⭐`--dusur` = YALNIZ kendi DB sini düşürür (küme sıfırlayan komutun YERİNE; küme altyapısı adlarını reddeder, çıkış 2). Çıkış 0=hazır · 1=sadakat TUTMADI · 2=ÖLÇEMEDİ · 3=ad çakıştı | ALTYAPI (Recep 2026-09-16: "geçerli test ortamı için her türlü izni veririm") | `docs/audits/sema-graf-uretici-2026-09-16.md` yanı sıra kendi başlığı; çağıran yok (elle koşulur) | 2026-09-16 yazıldı ve KOŞULDU: tablo 55 · **politika 163** · fonksiyon 67 · tetik 48 · indeks 199 — politika/fonksiyon/tetik/indeks CANLIYLA BİREBİR. Ad çakışma kolu AKRANIN DB'sini korudu (çıkış 3, dokunulmadı) | **INV-GOLGE-1** `src/__tests__/conformance/golge-kurucu.test.ts` 13 kol — SÖZLEŞME ölçer (yıkıcı komutun yokluğu İKİ biçimde, akran koruması, ad allowlist, çıkış kodları, eşikler, taşınabilirlik). ⚠İlk hâli KÖRDÜ: yalnız kabuk dizgesini arıyordu, argv dizisi biçimini görmüyordu; negatif sınamada yakalandı ve iki biçim de ölçülür oldu (ikisi de KIRMIZI verdirildi); sadakat eşikleri betiğin İÇİNDE (boş gölgeyi reddeder: tablo≥50, politika≥100, fonksiyon≥40, tetik≥20, indeks≥100) | KAL |
 | `scripts/db/sema-graf-uret.mjs` | ŞEMA GRAF ÜRETİCİSİ (aşama 1: tablolar + yabancı anahtarlar) — veritabanının KENDİ KATALOĞUNDAN graphify node-link biçiminde graf üretir. Metin taraması YOK, `pg_class`/`pg_constraint` okunur. Çıktı `graphify-out/db-graph.json` (üretilmiş, gitignore), `graphify merge-graphs` ile kod grafiğine eklenir. Düğümler `db_` ad alanında (ghost-duplicate riski). Çıkış 0=üretildi/atlandı · 1=parite TUTMADI · 2=ÖLÇEMEDİ | ALTYAPI (Recep istedi 2026-09-16: "supabase tarafının bir haritası lazım, codegraph gibi bir şey") | `src/__tests__/conformance/sema-graf-uretici.test.ts` (INV-SEMA-GRAF-1, 12 kol) + `docs/audits/sema-graf-uretici-2026-09-16.md` | 2026-09-16 yazıldı ve KOŞULDU: yerel yığında tablo 18=18 · fk 13=13 parite TUTTU, kapsam dışı 6 fk ADIYLA raporlandı; `merge-graphs` ile birleşti (+18 düğüm/+13 kenar) ve `explain` veritabanı sorusuna cevap verdi (8 ilişki, yönlü) | INV-SEMA-GRAF-1 — sır/TLS/taşınabilirlik/çıkış kodu/çıktı biçimi ölçülür; **graf DOĞRULUĞU ölçülmez** (o canlı koşum ister, sınır kapının başlığında yazılı) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
@@ -18829,6 +18830,103 @@ bekliyor), bizdeki **bayat fork ayrılacak** — dış metin plugin'e bırakıl�
 5. **Rails / Django / Flyway karşılaştırması YAPILMADI.** Dün "hiçbirine bakmadık" diye yazdım;
    bugün de bakmadım. Supabase birincil kaynak olduğu için önce o ölçüldü; diğer ekosistemler
    **açık kalem**.
+
+
+---
+# FILE: docs\audits\rec352-sifir-noktasi-kaniti-2026-09-16.md
+
+# REC-352 — SIFIR NOKTASI: gölgede ölçülmüş kanıt (2026-09-16)
+
+**Soru:** sıfır noktası kurmak canlı şemaya dokunur mu?
+**Cevap:** HAYIR. Gölgede ölçüldü, şema parmak izi **birebir aynı** kaldı.
+
+Bu belge Recep'in şu itirazından doğdu: *"hem Docker'da zincir kırık diyorsun hem kendi
+yaptığımızda kırılmıyor diyorsun... 2 farklı yerden bakınca ben sana güvenemiyorum."*
+İtiraz yerindeydi — iki farklı artefakt aynı cümlede anlatılmıştı. Bu belge ikisini
+ayırır ve iddiayı ÖLÇÜMLE kapatır.
+
+## 1. İKİ AYRI ARTEFAKT (çelişki değil)
+
+| | `supabase/migrations/` | `supabase/baselines/2026-09-15_public_schema.sql` |
+|---|---|---|
+| Ne | 233 ileri-yönlü talimat dosyası | canlı `public` şemasının tam anlık görüntüsü |
+| Sıfırdan koşum | **170/233 DÜŞER** (63 OK) | **0 hata**, canlıyla 8/8 parite |
+| Rolü | tarihsel kayıt | sıfır noktasının kendisi |
+
+Canlı veritabanı hiçbir zaman bu 233 dosyayla kurulmadı; her dosya o günün şemasının
+üzerine koştu ve arada beş tablo panelden ELLE kuruldu (`supabase/baselines/README.md`).
+Kırık olan makine değil, DEFTER.
+
+## 2. ⭐YENİ BULGU — DEFTER 233 DOSYAYI TEMSİL EDEMİYOR (bugün ölçüldü)
+
+Supabase'in defteri (`supabase_migrations.schema_migrations`) `version` kolonuna göre
+tekildir ve `version` = dosya adının damgası. 233 dosyanın damgaları ölçüldü:
+
+- Damga uzunlukları: **158 dosya 8 hane**, 62 dosya 14 hane, 13 dosya 12 hane.
+- **26 damga PAYLAŞILIYOR; toplam 138 dosya çakışıyor.** En kalabalığı `20250910` → **19 dosya**.
+- Sonuç: 233 dosya deftere yazıldığında **121 satır** oluştu. 112 dosya adı temsil edilemedi.
+
+Ölçüm: `insert ... on conflict (version) do nothing` ile 233 satır denendi, `count(*)` = **121**.
+
+⭐**DERS:** 8 haneli `YYYYMMDD_` damga biçimi (CLAUDE.md'de zaten INV-MIGRATION-2 kapısında
+KIRMIZI) yalnız bir biçim tercihi değil — **aynı gün yazılan dosyaları tek kimliğe
+çöktürüyor.** Bu, sıfır noktasının tercih değil ZORUNLULUK olmasının İKİNCİ bağımsız
+sebebidir (birincisi: 11 sert sözdizimi hatası + yaratıcı migration'ı olmayan beş tablo).
+
+## 3. ÖLÇÜM — DEFTER YAZIMI ŞEMAYA DOKUNUYOR MU?
+
+Gölge: `sifir_kanit` (paylaşılan kümede AYRI veritabanı; URUN'un `arama_golge`'sine
+dokunulmadı, ölçüldü: 57 tablo / 164 politika işlem boyunca sabit).
+
+Kurulum: `scripts/db/golge-kur.mjs --ad sifir_kanit` → önsöz + 2026-09-15 tabanı.
+Sadakat: **55 tablo · 163 politika · 199 indeks · 67 fonksiyon · 48 tetik.**
+
+**Parmak izi** = altı sorgunun birleşimi; kolon/tip/null/default, kısıt tanımları,
+indeks DDL'i, politika `qual`/`with_check` metinleri, fonksiyon gövde md5'i, tetik md5'i.
+Toplam **1404 satır** (786'sı kolon satırı, 163'ü politika).
+
+| | md5 |
+|---|---|
+| Defter yazımı ÖNCESİ | `f787d59dd777b2b6e37fbc6ad81da6b8` |
+| Defter yazımı SONRASI | `f787d59dd777b2b6e37fbc6ad81da6b8` |
+| `diff` | **boş** |
+
+Sayımlar sonrasında da aynı: 55 / 163 / 199 / 67 / 48.
+
+**HÜKÜM:** defter yazımı `public` şemasında tek bir kolon, kısıt, indeks, politika,
+fonksiyon ya da tetik değiştirmiyor. Sıfır noktası bir şema işlemi DEĞİL, bir
+KAYIT işlemidir.
+
+## 4. ⚠ÖLÇÜLEMEYEN — CANLI DEFTERİN ŞU ANKİ İÇERİĞİ
+
+Canlı defterde bugün kaç satır olduğu **ölçülmedi**: salt-okuma sorgusu bu oturumun
+izin katmanında ("Production Reads") reddedildi. Dolayısıyla şu soru AÇIK:
+canlı defter 121 satırı mı, 233'ü mü, yoksa bambaşka bir kümeyi mi taşıyor.
+
+Bu, hükmü değiştirmez (şemaya dokunmama ölçümü canlı defterin içeriğinden bağımsız),
+ama uygulama planının İLK adımı bu okumadır. Adım atlanamaz: neyin üzerine yazdığını
+bilmeden defter yazılmaz.
+
+## 5. SINIRLAR, ADIYLA
+
+1. Gölgede `auth.uid()` NULL — **yetki davranışı ölçülmedi**, yalnız şema/DDL.
+2. Gölgede `pg_cron` yok (konteynerde yalnız `postgres` DB'sinde kurulabilir) — beklendi.
+3. Parmak izi `public` şemasını kapsar; `auth`, `storage`, `net`, `vault` kapsam DIŞI.
+4. Defter yazımı burada elle SQL ile benzetildi; `supabase migration squash --linked`
+   komutunun kendisi canlıda koşmadı ve koşmayacak — **o adım Recep'in kapısı** (kural 13).
+5. Merge edilmiş bir migration'ın canlıda uygulanmış olması bu ölçümle kanıtlanmaz
+   (`supabase/baselines/README.md` tazelik alarmı bölümü aynı sınırı yazıyor).
+6. Damga çakışması ölçümü DOSYA ADLARINDAN okundu; canlı defterin o damgaları nasıl
+   taşıdığı §4 yüzünden bilinmiyor.
+
+## 6. SIRADAKİ — TEK KARAR RECEP'TE
+
+Uygulama planı, onay gelirse: (1) canlı defteri OKU, (2) tabanı tek sıfır noktası
+migration'ı olarak ilan et, (3) taban sonrası dosyaları koru, (4) eski damgaları
+"tabanda içeriliyor" diye kaydet, (5) tek PR. Adım 2-5 migration içerdiği için
+merge = prod'a otomatik uygulama → kural 13, Recep onayı ZORUNLU.
+
+Yöneten cetvel: `docs/standards/ledger-ve-olu-migration-standard.md` §2.1 (v1.2).
 
 
 ---

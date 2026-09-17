@@ -2,9 +2,9 @@
   "artefaktlar": [
     {
       "ad": "kayitlar_master.md",
-      "icerik_sha256": "e3020dae32650ea780ea6483f67212fda33eea3df72abd20f24ac2cce6c94b35",
+      "icerik_sha256": "0c3b5efb56450e8279933202d8b277e335be8fa6743264bff41e7f82959dd5aa",
       "kaynak": {
-        "dosya_sayisi": 215,
+        "dosya_sayisi": 216,
         "dosyalar": {
           "CHANGELOG.md": "eb01e14c93b6de5095df49ecf4e36d500aee787b",
           "CONTEXT.md": "8c21e5ea5bd31a1e362d62526464d7e523b213bf",
@@ -19,7 +19,7 @@
           "docs/audits/admin-cetvel-scores-2026-06-18.md": "655885a1f90d99f1246424fb2833aa5ba0c661ef",
           "docs/audits/admin-panel-audit-2026-06-11.md": "c72bc338ffdace3f8d81d0ebb450a4692a429c93",
           "docs/audits/aile-adi-en-cevirileri-2026-08-23.md": "37304bb18ea07c4c904304aa8fdffb4afff7a47d",
-          "docs/audits/arac-envanteri-2026-09-07.md": "45d782ef0793e25c804784356eae53a5e2c959d7",
+          "docs/audits/arac-envanteri-2026-09-07.md": "154cdbeba73222e92fcbd4fc067c7040ee6b72a8",
           "docs/audits/bagimlilik-2026-09-15.md": "918666b6c072910ebcf760cd6caf3b27bd784fce",
           "docs/audits/build-skip-canli-olcum-2026-08-28.md": "706e3e8a94c6df60ec6c4822eaeeff2f787cdccd",
           "docs/audits/canliya-alma-hazirlik-2026-08-15.md": "3f1e9b70d4434ac82142a92578b14cdfc791a99e",
@@ -115,6 +115,7 @@
           "docs/audits/rec348-rota-sinif-kapsami-2026-09-16.md": "17c2ade1610d30e8c4455e01f75b4854e40226eb",
           "docs/audits/rec348-taze-derleme-marker-2026-09-16.md": "649caf33ec5345645799a214e66e52b620105945",
           "docs/audits/rec352-dis-pratik-2026-09-16.md": "5cd04d18ed95804e9824a1fe82b8495db5052b09",
+          "docs/audits/rec352-sifir-noktasi-kaniti-2026-09-16.md": "deaf6e1af03b1ab051e14b9f5a2e2caa97fd1d0d",
           "docs/audits/rec59-marka-kapi-kurali-2026-09-15.md": "76c98c82de3aac51771e6dbba31fa5a338fef2d9",
           "docs/audits/registry-triyaj-2026-08-26.md": "11e5cffde855644a8742a50f932d7e85fa3ece5f",
           "docs/audits/render-stratejisi-denetimi-2026-08-16.md": "a188c2b0481c07ece241c359eeeefb92ed929223",
@@ -223,9 +224,9 @@
           "docs/system_tree.md": "688ff7fa4340571613bc0e9d238dff636a3453cd"
         },
         "izlenmeyen": [],
-        "ozet": "2cde321261dc24dd591cee8d709cbed0d721b0eaad76dd7f492fb936a4e7cd8a"
+        "ozet": "0fb7364634938ba4256f04f2dcf1aeb01d3283b5892dc24663372b52bd40b3d8"
       },
-      "kaynak_commit": "33c5fcb2203ab567f52d281952169a2abee51bd6",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         "CHANGELOG.md",
         "CONTEXT.md",
@@ -242,7 +243,7 @@
     },
     {
       "ad": "standards_master.md",
-      "icerik_sha256": "e8efa0ef8a9c73e511a2051340762015d1fb1864bb72dd825bfae8daf456c778",
+      "icerik_sha256": "0cd14a5477c8fb921e897668f3db43a24f571a148bd4f5320524c37f6246b1cb",
       "kaynak": {
         "dosya_sayisi": 83,
         "dosyalar": {
@@ -333,7 +334,7 @@
         "izlenmeyen": [],
         "ozet": "46a1a751ed446699fa94c4b083ea9848dbdce87453c23f4d4456a731d8442e9c"
       },
-      "kaynak_commit": "33c5fcb2203ab567f52d281952169a2abee51bd6",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         "docs/reference",
         "docs/standards"
@@ -342,7 +343,7 @@
     },
     {
       "ad": "supabase_functions_master.md",
-      "icerik_sha256": "a6f0393debd924834a9ac36adce07ffb35c47602366427ce899c240a55ed2f9c",
+      "icerik_sha256": "206a48054d5813fd9921ebcead3754c22e1f73d8a75b9aba4abc11b20a4ecbb4",
       "kaynak": {
         "dosya_sayisi": 39,
         "dosyalar": {
@@ -389,7 +390,7 @@
         "izlenmeyen": [],
         "ozet": "69c1ce416bf4f9721056c9c42db91b30221db4781a3267ee6b7e074b46d49881"
       },
-      "kaynak_commit": "33c5fcb2203ab567f52d281952169a2abee51bd6",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         "supabase/functions"
       ],
@@ -397,7 +398,7 @@
     },
     {
       "ad": "venthub_hvac_master.md",
-      "icerik_sha256": "d6ba1a607b23e066b9a66a1e98f4ebe78807b67aa588f75f1fc817260a484dea",
+      "icerik_sha256": "7f1a64f41d638f7b247d71908c0fc03803c139361496a9ee56fd23071e1e4c88",
       "kaynak": {
         "dosya_sayisi": 659,
         "dosyalar": {
@@ -1064,7 +1065,7 @@
         "izlenmeyen": [],
         "ozet": "7ba79896f9ae6bfcd64c05e014c2e9665f3d710ef8864bc2ee4414921684e25e"
       },
-      "kaynak_commit": "33c5fcb2203ab567f52d281952169a2abee51bd6",
+      "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
       "kaynak_kumesi": [
         ".",
         "src"
@@ -1073,7 +1074,7 @@
     }
   ],
   "calisma_agaci": "worktree",
-  "derlendi": "2026-09-16T13:15:40.113744+00:00",
-  "kaynak_commit": "33c5fcb2203ab567f52d281952169a2abee51bd6",
+  "derlendi": "2026-09-16T13:56:24.560350+00:00",
+  "kaynak_commit": "2aa90653ac46b17ede606fe7d0724a997b9e6dda",
   "surum": 1
 }
