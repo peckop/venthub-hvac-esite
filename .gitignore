@@ -143,3 +143,8 @@ qa-raporlari/
 # 09-13 olculdu: 15 MB (graph.json 10.181.569 bayt) + cache/, tek komutla
 # yeniden uretilir: graphify extract . --code-only (56 sn, LLM yok).
 graphify-out/
+
+# REC-345: WrongStack sage hafiza verisi PROJE DIZININDE durur (.wrongstack/memories/sage.db,
+# 09-17 olculdu: 217 KB + wal/shm + server.json auth token). Icerik ic dersler + ACIK guvenlik
+# kusuru tarifleri; repo PUBLIC → commitlenirse geri donusu yok. Desen sonda / ile her derinlikte.
+.wrongstack/

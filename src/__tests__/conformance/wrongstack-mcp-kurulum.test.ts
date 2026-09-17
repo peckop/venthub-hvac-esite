@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -68,6 +69,19 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
     }
     expect(sage?.args, 'sage --writable degil — hafiza yazamaz').toContain('--writable')
     expect(dizin?.args, 'kod dizini --writable — salt-okuma karari geri kacti').not.toContain('--writable')
+  })
+
+  it('sage verisi (.wrongstack/) git DISI: her derinlikte yok sayilir ve izlenen dosya YOK', () => {
+    // 09-17 olculdu: sage.db ana agacin ICINDE (.wrongstack/memories/), .gitignore eslesmesi 0 idi.
+    // Icerik ic dersler + acik guvenlik kusuru tarifi; repo PUBLIC → tek `git add -A` geri donussuz.
+    const git = (...a: string[]) =>
+      execFileSync('git', ['-C', KOK, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+    for (const yol of ['.wrongstack/memories/sage.db', '.wrongstack/memories/server.json', 'tools/wrongstack-mcp/.wrongstack/memories/sage.db']) {
+      // check-ignore eşleşirse 0 döner; eşleşmezse 1 ile FIRLATIR → test kırmızı.
+      expect(git('check-ignore', '--no-index', yol).trim(), `${yol} yok sayilmiyor`).toBe(yol)
+    }
+    const izlenen = git('ls-files').split('\n').filter((f) => /(^|\/)\.wrongstack\//.test(f))
+    expect(izlenen, 'depoda izlenen .wrongstack dosyasi var').toEqual([])
   })
 
   it('envanterde satiri ve README de KAYNAK blogu var', () => {
