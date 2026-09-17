@@ -130,6 +130,10 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
       'kanal tipi fan',
       'duvar tipi aspiratör',
       'ISI GERI KAZANIM',
+      // cetvel §8 vaka 13/14/15 (URUN #1246, 2026-09-17)
+      'ISI GERİ KAZANIM',
+      'İNLİNE',
+      'inline',
     ]
     const eksik = sorgular.filter((q) => !s.includes(`'${q}'`))
     expect(eksik, `vaka kumesi DARALMIS — eksik sorgular: ${eksik.join(' | ')}`).toEqual([])
@@ -142,7 +146,7 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
      * bu kol, biri gelip araya çıplak bir beklenen-sayı yazmasını engeller.
      */
     const s = jsYorumsuz(betik())
-    for (const bicim of ['sifir-degil', 'oran', 'ayni-kume', 'marka-var', 'tam-tek-sku']) {
+    for (const bicim of ['sifir-degil', 'oran', 'ayni-kume', 'marka-var', 'tam-tek-sku', 'marka-tavani', 'ayni-sayi', 'ad-isabeti-sira']) {
       expect(s, `olcut bicimi kayip: ${bicim}`).toContain(bicim)
     }
     // Vaka tanımlarında `beklenen: <sayı>` gibi çıplak bir sayı ölçütü OLMAMALI.
@@ -155,13 +159,20 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
     const s = jsYorumsuz(betik())
     expect(s).toMatch(/TAVAN_ORAN\s*=\s*0\.4/)
     expect(s, 'tavan hicbir vakaya uygulanmiyor').toMatch(/hassasiyet TAVANI asildi/)
+    // K8.4a: marka olcutlerinde genel tavan YERINE marka tavani — ikisi birden eksilemez.
+    expect(s, 'marka olcutleri genel tavandan ayrilmamis').toMatch(/!MARKA_OLCUTLERI\.has\(v\.olcut\)/)
+    expect(s, 'marka tavani kolu yok').toMatch(/marka TAVANI asildi/)
+    expect(s, 'marka disi sonuc olculmuyor').toMatch(/marka disi sonuc/)
+    expect(s, 'tanimsiz olcut sessizce gecebiliyor').toMatch(/TANIMSIZ olcut/)
   })
 
   it('⭐BILINEN KIRMIZI ILANI: her satir GEREKCELI ve REC-340 a bagli', () => {
     const s = betik()
     const blok = s.slice(s.indexOf('const BILINEN_KIRMIZI'), s.indexOf('function baglantiDizesi'))
+    expect(blok.length, 'BILINEN_KIRMIZI blogu bulunamadi — ilan kolu OLCULEMEDI').toBeGreaterThan(0)
+    // 2026-09-17: liste BOSALDI (son satir vaka 5, K8.4a ile kapandi). Bos liste HEDEFTIR;
+    // mandalin ikinci yonu yeni bir satirin gerekcesiz girmesini asagidaki dongude olcer.
     const satirlar = [...blok.matchAll(/^\s*(\d+):\s*'([^']+)'/gm)]
-    expect(satirlar.length, 'ilan BOS — bugun bes vaka kirmizi, ilan olmadan kapi master i bloklar').toBeGreaterThan(0)
     for (const [, no, gerekce] of satirlar) {
       expect(gerekce.length, `vaka ${no} ilani cok kisa — gerekcesiz ilan kabul edilmez`).toBeGreaterThan(60)
       expect(gerekce, `vaka ${no} ilani duzeltmenin HANGI adimda geldigini yazmiyor`).toMatch(/REC-340|Vaka \d/)

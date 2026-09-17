@@ -74,7 +74,18 @@ const VAKALAR = [
   { no: 8, q: 'kanal tipi fan', olcut: 'sifir-degil', nicin: 'üç kelime + kategori' },
   { no: 9, q: 'duvar tipi aspiratör', olcut: 'sifir-degil', nicin: "dört kelime, ad'da geçmeyen terim" },
   { no: 10, q: 'ISI GERI KAZANIM', olcut: 'ayni-kume', referans: 6, nicin: 'büyük harf + noktasız (K5.2)' },
+  // ── 2026-09-17, URUN #1246 (cetvel §8 vaka 13/14/15) ──
+  { no: 13, q: 'jet fan', olcut: 'ad-isabeti-sira', nicin: 'ilk satır = kümedeki en yüksek ad isabeti (K3.1e)' },
+  { no: 14, q: 'vortis', olcut: 'marka-tavani', marka: 'vortice', nicin: 'marka tavanı: ≤ marka aktif sayısı, marka dışı 0 (K8.4a)' },
+  { no: 15, q: 'ISI GERİ KAZANIM', olcut: 'ayni-sayi', referans: 6, nicin: 'büyük İ lower() öncesi indirilir (K5.2a)' },
+  // Cetvel vaka 15'in ikinci sorgusu ("İNLİNE") küçük harfli karşılığa ihtiyaç duyar; o karşılık
+  // tabloda ayrı vaka değil, bu yüzden 16 (referans) + 17 (büyük İ) olarak iki satıra açıldı.
+  { no: 16, q: 'inline', olcut: 'sifir-degil', nicin: 'vaka 17 referansı (küçük harf)' },
+  { no: 17, q: 'İNLİNE', olcut: 'ayni-sayi', referans: 16, nicin: 'büyük İ lower() öncesi indirilir (K5.2a, cetvel vaka 15)' },
 ]
+
+/** K8.4a: bu ölçütlerde genel %40 tavanı UYGULANMAZ — tavan markanın aktif ürün sayısıdır. */
+const MARKA_OLCUTLERI = new Set(['marka-var', 'marka-tavani'])
 
 /**
  * BİLİNEN KIRMIZILAR — ⭐LİSTE 09-16'DA KÜÇÜLDÜ (mandalın ikinci yönü işledi).
@@ -106,7 +117,8 @@ const VAKALAR = [
  * satır kabul edilmez (kardeş kapı `catalog-integrity` ile aynı kural).
  */
 const BILINEN_KIRMIZI = {
-  5: 'Arama DOGRU, tavan kurali marka vakasinda YANLIS: "vortis" 184 donuyor ve aktif Vortice urunu de TAM 184 (2026-09-17 prod: brand ilike vortice = 184 / aktif 441, yani marka katalogun yuzde 42 si). Yuzde 40 tavani, katalogun yuzde 40 indan buyuk bir markanin TUM urunlerini getiren dogru sonucu kirmizi sayiyor. Duzeltme: REC-340 cetvel K8.4 (URUN) — marka-var vakasinda tavan = o markanin aktif urun sayisi.',
+  // 2026-09-17: vaka 5 ilanı SİLİNDİ — cetvel K8.4a (URUN #1246) marka vakasında genel %40
+  // tavanını kaldırdı, kapı ona göre güncellendi (MARKA_OLCUTLERI). Liste BOŞ: hedef budur.
 }
 
 function baglantiDizesi() {
@@ -223,6 +235,31 @@ async function main() {
   const sonuclar = new Map()
   for (const v of VAKALAR) sonuclar.set(v.no, await olc(client, v))
 
+  // K8.4a: marka vakalarının tavanı = markanın aktif ürün sayısı (sabit sayı değil, canlıdan).
+  const markaAktif = new Map()
+  for (const v of VAKALAR.filter((x) => x.olcut === 'marka-tavani')) {
+    const r = await client.query(
+      "select count(*)::int as n from public.products where status='active' and deleted_at is null and brand ilike $1",
+      [`%${v.marka}%`],
+    )
+    markaAktif.set(v.no, r.rows[0].n)
+  }
+
+  // K3.1e: ad isabeti canlı fonksiyonla ölçülür. Fonksiyon YOKSA bu bir ihlal değil ÖLÇEMEMEKTİR
+  // → exit 2 (catch). Aynı fonksiyonu kapıda yeniden yazmak iki uygulama doğururdu.
+  const adIsabeti = new Map()
+  for (const v of VAKALAR.filter((x) => x.olcut === 'ad-isabeti-sira')) {
+    const idler = sonuclar.get(v.no).map((r) => r.id)
+    if (idler.length === 0) { adIsabeti.set(v.no, new Map()); continue }
+    const r = await client.query(
+      `select p.id::text as id,
+              public.arama_ad_isabeti(concat_ws(' ', p.name, p.name_i18n->>'tr', p.name_i18n->>'en'), $1)::float8 as puan
+         from public.products p where p.id = any($2::uuid[])`,
+      [v.q, idler],
+    )
+    adIsabeti.set(v.no, new Map(r.rows.map((x) => [x.id, Number(x.puan)])))
+  }
+
   const ihlaller = []
   const uyarilar = []
   const gecenler = []
@@ -269,10 +306,32 @@ async function main() {
     } else if (v.olcut === 'tam-tek-sku') {
       if (n !== 1) hata = `tam 1 sonuc beklenirken ${n}`
       else if (String(rows[0].sku) !== v.sku) hata = `ilk satir SKU ${rows[0].sku}, beklenen ${v.sku}`
+    } else if (v.olcut === 'marka-tavani') {
+      const tavan = markaAktif.get(v.no) ?? 0
+      const disi = rows.filter((r) => !String(r.brand ?? '').toLowerCase().includes(v.marka)).length
+      if (tavan === 0) hata = `markanin aktif urun sayisi 0 — tavan olculemez (marka "${v.marka}")`
+      else if (n === 0) hata = `0 sonuc (marka "${v.marka}" aktif ${tavan})`
+      else if (n > tavan) hata = `marka TAVANI asildi: ${n} > ${v.marka} aktif ${tavan}`
+      else if (disi > 0) hata = `marka disi sonuc ${disi} (beklenen 0)`
+    } else if (v.olcut === 'ayni-sayi') {
+      const refN = sonuclar.get(v.referans).length
+      if (refN === 0) hata = `referans vaka ${v.referans} BOS — sayi karsilastirmasi anlamsiz`
+      else if (n !== refN) hata = `vaka ${v.referans} ile AYNI SAYI DEGIL (${n} vs ${refN})`
+    } else if (v.olcut === 'ad-isabeti-sira') {
+      const puanlar = adIsabeti.get(v.no) ?? new Map()
+      if (n === 0) hata = '0 sonuc — sira olculemez'
+      else {
+        const ilk = puanlar.get(String(rows[0].id))
+        const enYuksek = Math.max(...puanlar.values())
+        if (ilk === undefined) hata = 'ilk satirin ad isabeti olculemedi'
+        else if (ilk < enYuksek) hata = `ilk satir ad isabeti ${ilk.toFixed(2)} < kumedeki en yuksek ${enYuksek.toFixed(2)}`
+      }
+    } else {
+      hata = `TANIMSIZ olcut "${v.olcut}" — kapi bu vakayi OLCMUYOR`
     }
 
-    // Hassasiyet tavanı — HER vakaya uygulanır (cetvel K8.4 / vaka 11).
-    if (!hata && aktif > 0 && n > aktif * TAVAN_ORAN) {
+    // Hassasiyet tavanı — marka ölçütleri DIŞINDAKİ her vakaya (cetvel K8.4; marka için K8.4a).
+    if (!hata && !MARKA_OLCUTLERI.has(v.olcut) && aktif > 0 && n > aktif * TAVAN_ORAN) {
       hata = `hassasiyet TAVANI asildi: ${n} > aktif ${aktif} x ${TAVAN_ORAN}`
     }
 
