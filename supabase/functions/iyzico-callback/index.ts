@@ -13,6 +13,8 @@ import Iyzipay from "npm:iyzipay";
 import { tenantFromRow } from '../_shared/tenant.ts'
 import { buildAllowedOrigins, isAllowedRedirectTarget, normalizeOrigin } from '../_shared/origins.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
+import { odemeSiparisleEslesiyorMu, type SiparisSatiri } from '../_shared/odeme_eslesme.ts'
+import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 
 // Minimal types to avoid `any` while keeping integration flexible
 type CheckoutRetrieveResponse = {
@@ -111,6 +113,10 @@ Deno.serve(async (req) => {
     let tenantId = tenantFromRow(null).tenantId
     let tenantIsDerived = false
     let orderPaymentToken: string | undefined
+    // ⭐EŞLEŞME KAPISININ GİRDİSİ — AYNI SORGUDA ÇEKİLİR, İKİNCİ İSTEK YOK (REC-355).
+    // Niçin burada: tenant türetmesi zaten bu satırı okuyor. Eşleşme alanlarını ayrı bir
+    // istekle çekmek, aynı satırı iki kez okuyup ARADA DEĞİŞEBİLECEĞİ bir pencere açar.
+    let siparisSatiri: SiparisSatiri | null = null
     if (orderId || conversationId) {
       try {
         const su = Deno.env.get('SUPABASE_URL') || ''
@@ -119,7 +125,8 @@ Deno.serve(async (req) => {
           const filter = orderId
             ? `id=eq.${encodeURIComponent(orderId)}`
             : `conversation_id=eq.${encodeURIComponent(conversationId as string)}`
-          const got = await fetch(`${su}/rest/v1/venthub_orders?${filter}&select=tenant_id,payment_token`, {
+          const alanlar = 'id,tenant_id,payment_token,conversation_id,total_amount,currency,payment_status'
+          const got = await fetch(`${su}/rest/v1/venthub_orders?${filter}&select=${alanlar}`, {
             headers: { Authorization: `Bearer ${sk}`, apikey: sk }
           })
           const arr = await got.json().catch(() => [])
@@ -129,6 +136,7 @@ Deno.serve(async (req) => {
           tenantId = decision.tenantId
           tenantIsDerived = decision.source === 'resource_row'
           if (row?.payment_token) orderPaymentToken = String(row.payment_token)
+          if (row) siparisSatiri = row as SiparisSatiri
         }
       } catch {}
     }
@@ -202,22 +210,33 @@ Deno.serve(async (req) => {
     const baseUrl = iyzicoCfg.base;
     const sdk = new IyziCb({ apiKey, secretKey, uri: baseUrl });
 
-    const retrieveReq: { locale: string; token: string; conversationId?: string } = {
+    // ⛔`conversationId` BİLEREK GÖNDERİLMİYOR (REC-355) — ESKİDEN GÖNDERİLİYORDU.
+    //
+    // Eski hâl: `if (conversationId) retrieveReq.conversationId = conversationId`.
+    // Ölçümle görüldü ki İyzico bu alanı kendi kaydından DÖNDÜRMÜYOR, bizim verdiğimizi
+    // YANSITIYOR: gönderilen 11 koşumda yanıtta var, gönderilmeyen 2 koşumda hiç yok
+    // (`docs/archive/db-backup-pre-kademe2/venthub_orders.json`, 13 gerçek yanıt).
+    //
+    // Yani isteğin verdiği değeri gönderip yanıtta geri almak, saldırganın seçtiği değeri
+    // "doğrulanmış" gibi geri getirir. Eşleşme kapısının çapası bu yüzden `basketId`;
+    // `conversationId`i göndermemek o totolojiyi kaynağında keser.
+    // ⚠GERİ EKLEMEYİN: eklenirse kapı kendi kendini onaylar hâle gelir.
+    const retrieveReq: { locale: string; token: string } = {
       locale: "tr",
       token,
     };
-    if (conversationId) retrieveReq.conversationId = conversationId;
 
-    // Token geldiyse hemen DB'ye yaz (denetim ve reconcile için)
-    try {
-      if (token && orderId) {
-        await fetch(`${supabaseUrl}/rest/v1/venthub_orders?id=eq.${encodeURIComponent(orderId)}${orderTenantFilter}`, {
-          method: 'PATCH',
-          headers: { Authorization: `Bearer ${serviceRoleKey}`, apikey: serviceRoleKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-          body: JSON.stringify({ payment_token: token })
-        })
-      }
-    } catch {}
+    // ⛔BURADA ESKİDEN DOĞRULANMADAN `payment_token` YAZILIYORDU — KALDIRILDI (REC-355).
+    //
+    // Eski hâl `retrieve`den ÖNCE `payment_token = token` PATCH'liyordu. İki sakıncası
+    // vardı: (1) saldırgan herhangi bir siparişe istediği token'ı damgalayabiliyordu —
+    // denetim izi kirleniyor ve sonraki çağrıda token-fallback yolu açılıyordu;
+    // (2) o satırı `order-housekeeping` "tokenli bekleyen sipariş" diye topluyor.
+    //
+    // Yazım, eşleşme kapısı geçildikten SONRAYA taşındı. Denetim gerekçesi kaybolmuyor:
+    // token'ı `iyzico-payment` checkout form kurulurken ZATEN yazıyor — yani buradaki
+    // yazım büyük ölçüde MÜKERRERDİ (ölçüldü: `payment_token` tüketicilerinin hepsi o
+    // yazıma dayanıyor, buradakine değil).
 
     let result: CheckoutRetrieveResponse | null = null;
     try {
@@ -235,8 +254,39 @@ Deno.serve(async (req) => {
       result = null;
     }
 
-    // İyzico sonucu yorumla
-    const paid = !!(result && result.paymentStatus === "SUCCESS");
+    // ── EŞLEŞME KAPISI (VULN-001 · REC-355) ─────────────────────────────────────
+    //
+    // ⛔ESKİ HÂL TEK SORU SORUYORDU: "ödeme başarılı mı?" — `paid = paymentStatus ===
+    // "SUCCESS"`. "Bu ödeme HANGİ siparişe ait?" sorusu hiç sorulmuyordu. Saldırgan kendi
+    // 1 TL'lik ödemesinin token'ını alıp yanına başka bir `orderId` yazarak POST eder ve o
+    // siparişi ödenmiş yapardı. `service_role` ile yazıldığı için RLS de durduramıyordu
+    // (`bypassrls = true`).
+    //
+    // Artık İKİ soru var ve ikisi de geçilmek zorunda. Karar mantığı ayrı ve SAF bir
+    // modülde (`_shared/odeme_eslesme.ts`), çünkü 13 GERÇEK arşiv yanıtı üzerinde
+    // çevrimdışı sınanabilmesi gerekiyordu — uydurma yanıtla sınanan bir ödeme kapısı
+    // kördür ve ilk tasarımım tam bu yüzden çökmüştü.
+    const odemeBasarili = !!(result && result.paymentStatus === "SUCCESS");
+    const eslesme = odemeBasarili
+      ? odemeSiparisleEslesiyorMu(result, siparisSatiri)
+      : { gecti: false, bicim: null, sebep: 'odeme_basarili_degil' as string | null }
+
+    // ⭐`paid` ARTIK EŞLEŞMEYİ DE İÇERİYOR. Aşağıdaki bütün yazım dalları `paid`e bakıyor;
+    // kapıyı oraya koymak, "bir dalda kontrol edip diğerinde unutmak" sınıfını kapatır.
+    const paid = odemeBasarili && eslesme.gecti;
+
+    // Ödeme İyzico'da BAŞARILI ama sipariş eşleşmedi: bu ya saldırı ya biçim değişikliği.
+    // İkisi de SESSİZ kalamaz — para hareket etti, kaydımız hareket etmedi.
+    if (odemeBasarili && !eslesme.gecti) {
+      await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+        fn: 'iyzico-callback',
+        code: 'PAYMENT_ORDER_MISMATCH',
+        message: 'Odeme BASARILI ama siparisle eslesmedi; siparise YAZILMADI.',
+        // ⭐DEĞER YAZILMIYOR, yalnız hangi alanın uymadığı ve hedef siparişin kimliği.
+        // Tutar/token/basketId dökmek denetim kaydını sır taşıyıcı yapar.
+        extra: { sebep: eslesme.sebep, order_id: siparisSatiri?.id ?? null, satir_bulundu: !!siparisSatiri },
+      })
+    }
 
     // Debug bilgisi hazırla
     const debugInfo: Record<string, unknown> = result ? {
@@ -282,7 +332,7 @@ Deno.serve(async (req) => {
     // denemeyi kapatırdı (CLAUDE.md §11: durumlar monoton). Süresi dolan rezervasyonları
     // `release-expired-reservations` zaten `payment_status='failed'` ile temizliyor —
     // aynı sözlük, aynı kolon, tutarlı.
-    async function patchOrder(fields: { status?: string; payment_status?: string }) {
+    async function patchOrder(fields: { status?: string; payment_status?: string; payment_token?: string }) {
       const filterById = orderId ? `id=eq.${encodeURIComponent(orderId)}` : '';
       const filterByConv = (!orderId && (result?.conversationId || conversationId)) ? `conversation_id=eq.${encodeURIComponent(result?.conversationId || conversationId!)}` : '';
       const filter = filterById || filterByConv;
@@ -304,7 +354,10 @@ Deno.serve(async (req) => {
     let _stockResult: unknown = null;
     if (paid) {
       // Yaşam döngüsü: 'confirmed' · Ödeme: 'paid'. Tek PATCH, deneme-yanılma yok.
-      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid' });
+      // ⭐`payment_token` ARTIK BURADA YAZILIYOR — doğrulamadan ÖNCE değil (REC-355).
+      // Aynı PATCH'e binmesi bilinçli: ayrı bir istek, birinin geçip diğerinin düştüğü
+      // bir ara durum üretir. Denetim izi tek atomik yazımda tamamlanır.
+      const r = await patchOrder({ status: 'confirmed', payment_status: 'paid', payment_token: token });
       updateOk = !!(r && r.ok);
       if (!updateOk) {
         console.error(`[iyzico-callback] BASARILI odeme yazilamadi (status=${r ? r.status : 'yok'}) — para cekildi, siparis guncellenmedi.`);
@@ -524,6 +577,21 @@ Deno.serve(async (req) => {
           }
         }
       } catch { /* best-effort */ }
+    } else if (odemeBasarili && !eslesme.gecti) {
+      // ⛔EŞLEŞMEYEN ÖDEME: SİPARİŞE HİÇBİR ŞEY YAZILMAZ — `payment_status='failed'` DAHİL.
+      //
+      // Bu dal AÇIKÇA yazıldı, örtük bırakılmadı. Aşağıdaki "başarısız" dalının koşulu
+      // zaten `paymentStatus !== 'SUCCESS'` olduğu için eşleşmeyen ödeme oraya DÜŞMÜYOR —
+      // ama bu bir TESADÜFE bağlı korunma olurdu. Biri o koşulu sadeleştirip `else`
+      // yaparsa, eşleşmeyen ödeme kurbanın siparişine `failed` yazar ve saldırgan
+      // **istediği siparişin ödemesini başarısız damgalayabilir.** Bu dal o sadeleştirmeyi
+      // engellemek için var.
+      //
+      // Niçin 'failed' yazmak yanlış: İyzico tarafında ödeme BAŞARILI. 'failed' yazmak
+      // hem yalan olur hem gerçek siparişin akışını bozar. Kayıt `raiseRevenueAlarm` ile
+      // yukarıda `client_errors`'a düştü; sipariş satırı DOKUNULMAMIŞ kalır.
+      updateOk = false;
+      console.error('[iyzico-callback] ESLESMEYEN ODEME — siparise YAZILMADI, alarm kaydedildi.');
     } else if (result && result.paymentStatus && String(result.paymentStatus).toUpperCase() !== 'SUCCESS') {
       // Yalnız ödeme durumu yazılır; `status` 'pending' kalır (tekrar deneme açık).
       const r = await patchOrder({ payment_status: 'failed' });
@@ -533,8 +601,25 @@ Deno.serve(async (req) => {
       }
     }
 
+    /**
+     * ⭐ÜÇÜNCÜ CEVAP DEĞERİ: `needs_review` — VE NİÇİN ZORUNLU OLDUĞU (REC-355).
+     *
+     * Bu uç iki değer döndürüyordu: `success` ve `failure`/`pending`. Eşleşmeyen ödemeye
+     * `failure` demek, ÇAĞIRANIN kararını değiştiriyor: `order-housekeeping` bu ucu
+     * yalnız `{orderId}` ile çağırıyor ve cevap `'success'` değilse siparişi
+     * **`cancelled` + `payment_status='failed'`** yapıyor. Yani parası çekilmiş bir sipariş
+     * 15 dakikada iptal edilirdi.
+     *
+     * ⭐DERS: bir uca fail-closed eklemek, o ucun CEVABINI OKUYAN başka bir ucun kararını
+     * da değiştirir. Hata yolu, onu okuyan tarafla BİRLİKTE yazılır (CLAUDE.md kural 14).
+     * `order-housekeeping` bu değeri sonlandırma sebebi SAYMAZ — orada da adıyla yazılı.
+     */
     const responseBody = {
-      status: paid ? "success" : (result ? "failure" : "pending"),
+      status: paid
+        ? "success"
+        : (odemeBasarili && !eslesme.gecti)
+          ? "needs_review"
+          : (result ? "failure" : "pending"),
       iyzico: result,
       updated: updateOk,
     };
@@ -555,7 +640,13 @@ Deno.serve(async (req) => {
         const target = new URL(finalSuccess);
         if (orderId) target.searchParams.set('orderId', orderId);
         if (conversationId) target.searchParams.set('conversationId', conversationId);
-        target.searchParams.set('status', paid ? 'success' : 'failure');
+        // ⭐MÜŞTERİYE "BAŞARISIZ" DENMEZ: parası çekilmiş müşteri hata ekranı görürse
+        // büyük olasılıkla İKİNCİ KEZ öder. Eşleşmeyen ödemede üçüncü değer gider ve ön
+        // yüz "ödemeniz alındı, doğrulama sürüyor" der (yeniden ödeme düğmesi kapalı).
+        target.searchParams.set(
+          'status',
+          paid ? 'success' : (odemeBasarili && !eslesme.gecti) ? 'needs_review' : 'failure',
+        );
         const t = target.toString();
         const html = `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${t}"><title>Redirecting...</title></head><body><a href=${JSON.stringify(t)}>Devam etmek için tıklayın</a><script>try{window.top.location.replace(${JSON.stringify(t)});}catch(_e){try{window.parent.location.replace(${JSON.stringify(t)});}catch(e2){location.href=${JSON.stringify(t)}}};</script></body></html>`;
         return new Response(html, { status: 200, headers: { ...corsHeaders, 'Content-Type': 'text/html' } });
