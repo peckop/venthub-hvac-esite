@@ -73,7 +73,8 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
 
   it('sage verisi (.wrongstack/) git DISI: her derinlikte yok sayilir ve izlenen dosya YOK', () => {
     // 09-17 olculdu: sage.db ana agacin ICINDE (.wrongstack/memories/), .gitignore eslesmesi 0 idi.
-    // Icerik ic dersler + acik guvenlik kusuru tarifi; repo PUBLIC → tek `git add -A` geri donussuz.
+    // Git disi cunku: ikili SQLite (uc pencere yazar → cakisir, diff okunmaz) · secret-scan ikili
+    // dosyanin icini goremez · icerik PR gozunden gecmez. Repo PUBLIC → yayin geri donussuz.
     const git = (...a: string[]) =>
       execFileSync('git', ['-C', KOK, ...a], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
     for (const yol of ['.wrongstack/memories/sage.db', '.wrongstack/memories/server.json', 'tools/wrongstack-mcp/.wrongstack/memories/sage.db']) {

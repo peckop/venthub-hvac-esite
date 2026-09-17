@@ -43,8 +43,9 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
 3. **Veri iki ayrı yerde (2026-09-17 düzeltildi, önceki satır yanlıştı).** Kod dizini
    `~/.wrongstack/projects/<ad-hash>/codebase-index/` altında. **Sage hafızası ise PROJE DİZİNİNİN
    İÇİNDE**: `.wrongstack/memories/sage.db` (+ wal/shm, `server.json` yerel yetki anahtarı). Depo PUBLIC
-   olduğu için `.gitignore`'da `.wrongstack/` satırı var ve INV-WRONGSTACK-MCP-1 bunu ölçer; bu satırı
-   kaldırmak iç dersleri ve açık kusur tariflerini yayınlamak demektir. Hafıza yedeği kancası bu dosyayı
+   olduğu için `.gitignore`'da `.wrongstack/` satırı var ve INV-WRONGSTACK-MCP-1 bunu ölçer. Gerekçe:
+   ikili SQLite dosyası (üç pencere yazar → git'te çakışır, diff okunmaz) · sır taraması ikili dosyanın
+   içini göremez (hafızaya düşen sır/müşteri verisi kapıdan geçer) · içerik PR gözünden geçmeden yazılır. Hafıza yedeği kancası bu dosyayı
    kapsamıyor (REC-345 İŞ 5).
    **Kimlik harfe duyarlı:** `<ad-hash>` = sha256(`path.resolve(kök)`) ilk 6 hane; `c:\…` (VS Code) →
    `7e017f`, `C:\…` (terminal) → `1088d5`. Kanonik kimlik küçük harfli olandır; sage bundan etkilenmez

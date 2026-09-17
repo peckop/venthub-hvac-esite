@@ -145,6 +145,8 @@ qa-raporlari/
 graphify-out/
 
 # REC-345: WrongStack sage hafiza verisi PROJE DIZININDE durur (.wrongstack/memories/sage.db,
-# 09-17 olculdu: 217 KB + wal/shm + server.json auth token). Icerik ic dersler + ACIK guvenlik
-# kusuru tarifleri; repo PUBLIC → commitlenirse geri donusu yok. Desen sonda / ile her derinlikte.
+# 09-17 olculdu: 217 KB + wal/shm + server.json yerel yetki anahtari). Git disi cunku:
+# (1) ikili SQLite, uc pencere her yazimda degistirir → cakisir/siser, diff okunmaz;
+# (2) secret-scan ikili dosyanin icini goremez → hafizaya dusen sir/musteri verisi kapidan gecer;
+# (3) icerik PR gozunden gecmeden yazilir. Desen sonda / ile her derinlikte.
 .wrongstack/

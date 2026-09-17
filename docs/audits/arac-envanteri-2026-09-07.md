@@ -591,8 +591,10 @@ gerektirmez).
   (ölçüldü: iki sunucu da el sıkışıp araç listesi döndü); Node yükseltmesi ayrı iş, şimdi değil.
   **Veri yeri (2026-09-17 düzeltildi, önceki satır yanlıştı):** sage verisi PROJE DİZİNİNDE
   (`.wrongstack/memories/sage.db` + `server.json` yerel yetki anahtarı) ve **git DIŞI tutulur**:
-  `.gitignore` `.wrongstack/` (her derinlik) + INV-WRONGSTACK-MCP-1 kolu (depo PUBLIC; içerik iç
-  dersler ve açık kusur tarifleri). Kod dizini `~/.wrongstack/projects/<ad-hash>/codebase-index/`;
+  `.gitignore` `.wrongstack/` (her derinlik) + INV-WRONGSTACK-MCP-1 kolu. Gerekçe: (1) ikili SQLite,
+  üç pencere her yazımda değiştirir → git'te çakışır/şişer, diff okunmaz; (2) sır taraması ikili
+  dosyanın içini göremez → hafızaya düşen sır/müşteri verisi kapıdan görünmeden geçer; (3) içerik
+  PR gözünden geçmeden yazılır. Kod dizini `~/.wrongstack/projects/<ad-hash>/codebase-index/`;
   kimlik sürücü harfine duyarlı, kanonik `venthub-hvac-7e017f` (küçük `c:`), `1088d5` (büyük `C:`)
   yetim. **Açık ön şart:** sage.db hafıza yedeğine girmiyor — `memory_for_file` kancası PR'ından
   ÖNCE kapanır (REC-345 İŞ 5).
