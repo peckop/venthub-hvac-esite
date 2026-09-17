@@ -8606,16 +8606,22 @@ GRANT ALL ON FUNCTION "public"."anonymize_user_personal_data"("p_user_id" "uuid"
 
 REVOKE ALL ON FUNCTION "public"."arama_bulanik_ifade"("p_q" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_bulanik_ifade"("p_q" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_bulanik_ifade"("p_q" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_bulanik_ifade"("p_q" "text") TO "authenticated";
 
 
 
 REVOKE ALL ON FUNCTION "public"."arama_dogrula"("p_govde" "text", "p_q" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_dogrula"("p_govde" "text", "p_q" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_dogrula"("p_govde" "text", "p_q" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_dogrula"("p_govde" "text", "p_q" "text") TO "authenticated";
 
 
 
 REVOKE ALL ON FUNCTION "public"."arama_eslesen_urunler"("p_q" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_eslesen_urunler"("p_q" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_eslesen_urunler"("p_q" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_eslesen_urunler"("p_q" "text") TO "authenticated";
 
 
 
@@ -8626,11 +8632,15 @@ GRANT ALL ON FUNCTION "public"."arama_indeksi_tazele"("p_ids" "uuid"[]) TO "serv
 
 REVOKE ALL ON FUNCTION "public"."arama_kelimeler"("p_q" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_kelimeler"("p_q" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_kelimeler"("p_q" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_kelimeler"("p_q" "text") TO "authenticated";
 
 
 
 REVOKE ALL ON FUNCTION "public"."arama_kesin_ifade"("p_q" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_kesin_ifade"("p_q" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_kesin_ifade"("p_q" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_kesin_ifade"("p_q" "text") TO "authenticated";
 
 
 
@@ -8641,16 +8651,22 @@ GRANT ALL ON FUNCTION "public"."arama_kuyrugu_bosalt"("p_tavan" integer) TO "ser
 
 REVOKE ALL ON FUNCTION "public"."arama_marka_es"("p_k" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_marka_es"("p_k" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_marka_es"("p_k" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_marka_es"("p_k" "text") TO "authenticated";
 
 
 
 REVOKE ALL ON FUNCTION "public"."arama_marka_kelimeleri"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_marka_kelimeleri"() TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_marka_kelimeleri"() TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_marka_kelimeleri"() TO "authenticated";
 
 
 
 REVOKE ALL ON FUNCTION "public"."arama_normalize"("p_t" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."arama_normalize"("p_t" "text") TO "service_role";
+GRANT ALL ON FUNCTION "public"."arama_normalize"("p_t" "text") TO "anon";
+GRANT ALL ON FUNCTION "public"."arama_normalize"("p_t" "text") TO "authenticated";
 
 
 
