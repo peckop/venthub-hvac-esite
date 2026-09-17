@@ -31,45 +31,104 @@
 -- şema-nitelikli · K6.1 kelime sırası · K6.4 yazım hatası · K8.5 kesinlik regresyonu · K12.1b
 -- yetki daraltma). Ölçüm: docs/audits/rec340-pgroonga-olcum-2026-09-16.md
 
--- Kilit süresi: bu dosya product_search_index'e GENERATED sütun ekliyor → tablo yeniden yazımı
--- + ACCESS EXCLUSIVE kilit. Gölgede 442 satırla ölçüldü (aşağıdaki guard süreyi de basar).
--- 5 sn, ölçülen süreye karşı geniş bir pay bırakır; emsalden kopyalanmadı.
+-- ⭐ÜÇ ADIMLI YAPI (INV-MIGRATION-3 / squawk kırmızısından sonra, 2026-09-17):
+--   A) işlem: eklentiler + NULL'a izin veren iki sütun + doldurma tetiği + mevcut satırları doldur
+--   B) işlem DIŞI: iki indeks CONCURRENTLY — yazmayı kilitlemez (pgroonga destekliyor; gölgede
+--      ölçüldü, indisvalid = true)
+--   C) işlem: fonksiyonlar + yetkiler + guard — indeksler HAZIR olduktan sonra.
+-- C'nin B'den SONRA gelmesi bilinçli: yeni gövde `&\`` script sözdizimini kullanıyor ve o yalnız
+-- indeks taramasında çalışıyor. Fonksiyonlar indeksten önce değişseydi, arada koşan canlı
+-- aramalar hata verirdi. Bu sırayla eski fonksiyonlar indeksler bitene kadar hizmet vermeye
+-- devam eder; sitede arama bir an bile bozulmaz.
+--
+-- İlk sürüm ÜRETİLMİŞ sütun kullanıyordu; squawk haklı olarak uyardı: üretilmiş sütun eklemek
+-- tabloyu baştan yazar ve ACCESS EXCLUSIVE kilit tutar. Yardım belgesinin yolu izlendi
+-- (.github/migration-linter-yardim.md): NULL'a izin veren sütun + doldurma + yazımda tetik.
+-- Kural SUSTURULMADI.
+--
+-- Kilit süreleri ölçüldü: eski yapı gölgede 442 satırla 694 ms. 5 sn / 30 sn pay bırakır.
 set lock_timeout = '5s';
 set statement_timeout = '30s';
 
+-- ═════════════════════════════════════════════════════════════════════════════
+-- A) SÜTUNLAR VE DOLDURMA
+-- ═════════════════════════════════════════════════════════════════════════════
 begin;
 
--- ─────────────────────────────────────────────────────────────────────────────
 -- 1) EKLENTİLER — Supabase resmî yolu: `with schema extensions`
--- ─────────────────────────────────────────────────────────────────────────────
 create extension if not exists pgroonga      with schema extensions;
 create extension if not exists fuzzystrmatch with schema extensions;  -- levenshtein()
 
--- ─────────────────────────────────────────────────────────────────────────────
--- 2) ARAMA SÜTUNLARI — ikisi de AYNI ifade, farkı indeks yapılandırması
---    Üretilmiş (generated) sütun seçildi ki tetik değişikliği GEREKMESİN: gövde değişince
---    bu iki sütun kendiliğinden tazelenir. translate() ve lower() IMMUTABLE olduğu için
---    üretilmiş sütunda kullanılabilirler.
+-- 2) ARAMA SÜTUNLARI — ikisi de AYNI normalize metin, farkı indeks yapılandırması.
 --    ⚠unaccent eklentisi GEREKMİYOR — translate() hem aksan körlüğünü hem TR küçültmeyi
 --    çözüyor (ölçüldü). Bir migration kalemi ve bir onay bu ölçümle düştü.
--- ─────────────────────────────────────────────────────────────────────────────
 alter table public.product_search_index
-  add column if not exists arama_ek text
-    generated always as (translate(lower(search_body),'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu')) stored,
-  add column if not exists arama_kelime text
-    generated always as (translate(lower(search_body),'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu')) stored;
+  add column if not exists arama_ek text,
+  add column if not exists arama_kelime text;
+
+-- Yazımda doldurma tetiği: gövde her yazıldığında iki sütun da tazelenir. Tazeleme yolu
+-- (arama_indeksi_tazele) search_body'yi INSERT/UPDATE ettiği için ek bir değişiklik GEREKMEZ.
+create or replace function public.tg_arama_metin_doldur()
+returns trigger language plpgsql
+set search_path to 'pg_catalog','public'
+as $$
+begin
+  new.arama_ek     := translate(lower(coalesce(new.search_body,'')),'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu');
+  new.arama_kelime := new.arama_ek;
+  return new;
+end;
+$$;
+
+drop trigger if exists arama_metin_doldur on public.product_search_index;
+create trigger arama_metin_doldur
+  before insert or update of search_body on public.product_search_index
+  for each row execute function public.tg_arama_metin_doldur();
+
+-- Mevcut satırları doldur (442 satır; tabloda başka tetik YOK — ölçüldü, yan etki yok).
+update public.product_search_index
+   set arama_ek     = translate(lower(coalesce(search_body,'')),'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu'),
+       arama_kelime = translate(lower(coalesce(search_body,'')),'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu')
+ where arama_ek is null or arama_kelime is null;
+
+revoke all on public.product_search_index from anon, authenticated;
+grant select on public.product_search_index to anon, authenticated;
+revoke execute on function public.tg_arama_metin_doldur() from public, anon, authenticated;
+
+commit;
+
+-- ═════════════════════════════════════════════════════════════════════════════
+-- B) İNDEKSLER — CONCURRENTLY, işlem DIŞINDA
+-- ═════════════════════════════════════════════════════════════════════════════
+-- ⚠CONCURRENTLY yarıda kalırsa GEÇERSİZ bir indeks bırakır ve `if not exists` onu "var" sayıp
+-- atlar. Yeniden koşumda sessizce geçersiz indeksle kalmamak için önce geçersiz olan düşürülür;
+-- C adımındaki guard ayrıca iki indeksin de `indisvalid` olduğunu ölçer.
+do $$
+declare i text;
+begin
+  foreach i in array array['product_search_index_arama_ek_pgroonga',
+                           'product_search_index_arama_kelime_pgroonga'] loop
+    if exists (select 1 from pg_index x join pg_class c on c.oid = x.indexrelid
+                join pg_namespace n on n.oid = c.relnamespace
+               where n.nspname = 'public' and c.relname = i and not x.indisvalid) then
+      execute format('drop index public.%I', i);
+      raise notice 'GEÇERSİZ indeks düşürüldü, yeniden kurulacak: %', i;
+    end if;
+  end loop;
+end $$;
 
 -- EK TOLERANSLI indeks: "fan" → "fanlar"ı bulur. Türkçe için ZORUNLU ayar.
-create index if not exists product_search_index_arama_ek_pgroonga
+create index concurrently if not exists product_search_index_arama_ek_pgroonga
   on public.product_search_index using pgroonga (arama_ek)
   with (tokenizer = 'TokenBigramSplitSymbolAlphaDigit', normalizer = 'NormalizerAuto');
 
 -- KELİME BAZLI indeks: yalnız fuzzy_search() için. Varsayılan tokenizer ŞART.
-create index if not exists product_search_index_arama_kelime_pgroonga
+create index concurrently if not exists product_search_index_arama_kelime_pgroonga
   on public.product_search_index using pgroonga (arama_kelime);
 
-revoke all on public.product_search_index from anon, authenticated;
-grant select on public.product_search_index to anon, authenticated;
+-- ═════════════════════════════════════════════════════════════════════════════
+-- C) FONKSİYONLAR + YETKİLER + GUARD
+-- ═════════════════════════════════════════════════════════════════════════════
+begin;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 3) YARDIMCI FONKSİYONLAR — hiçbiri dışarıya açık değil (aşağıda REVOKE var)
@@ -400,6 +459,20 @@ declare
   v_jet   int; v_fanjet int; v_vortis int; v_sku int; v_zzz int; v_oneri int;
   v_bas   timestamptz := clock_timestamp();
 begin
+  -- İndeksler GEÇERLİ mi (CONCURRENTLY yarıda kalırsa geçersiz kalır ve arama sessizce bozulur).
+  if (select count(*) from pg_index x join pg_class c on c.oid = x.indexrelid
+       where c.relname in ('product_search_index_arama_ek_pgroonga',
+                           'product_search_index_arama_kelime_pgroonga')
+         and x.indisvalid) <> 2 then
+    raise exception 'ARAMA GUARD: iki pgroonga indeksinden en az biri YOK ya da GEÇERSİZ.';
+  end if;
+
+  -- Doldurma tamam mı (tetik + ilk doldurma).
+  if exists (select 1 from public.product_search_index
+              where arama_ek is null or arama_kelime is null) then
+    raise exception 'ARAMA GUARD: arama_ek/arama_kelime boş satır var — doldurma eksik.';
+  end if;
+
   select count(*) into v_urun from public.product_search_index;
   if v_urun = 0 then
     raise notice 'ARAMA GUARD ATLANDI — product_search_index BOŞ (bu bir kurulum/gölge koşumu).';

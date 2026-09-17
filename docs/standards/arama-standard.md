@@ -337,11 +337,21 @@ TRUNCATE/REFERENCES/TRIGGER) veriyor — ölçüldü. RLS yazmayı zaten reddede
 tek katmana güvenilmez: içeriği zehirlenirse kullanıcıya **yanlış ürün** gösterilir. Bu yüzden
 `REVOKE ALL` + `GRANT SELECT` yazılır ve kuyruk tablosunda okuma da kapatılır.
 
-**K12.1c — K12.1'in yasağı TÜREV sütunları kapsamaz.** K12.1 gövdenin kendisi içindir: gövde
-başka tablolara (aile, kategori) bakmak zorunda olduğu için üretilmiş sütun olamaz. Ama
-gövdeden **aynı satır içinde** türetilen sütunlar (normalize edilmiş arama metni gibi)
-üretilmiş sütun **olmalıdır** — böylece tetik değişikliği gerekmez, gövde değişince türev
-kendiliğinden tazelenir. Şart: ifade IMMUTABLE olmalı (`lower`, `translate` öyledir).
+**⛔K12.1c — TÜREV sütun da ÜRETİLMİŞ SÜTUN OLARAK EKLENMEZ (mevcut tabloda).** *(2026-09-16'da
+bu madde "türev sütun üretilmiş olmalıdır" diyordu; 2026-09-17'de INV-MIGRATION-3 (squawk)
+kırmızısıyla ÇÜRÜDÜ.)* Dolu bir tabloya üretilmiş sütun eklemek tabloyu **baştan yazar** ve
+ACCESS EXCLUSIVE kilit tutar — squawk `adding-field-with-default`. Doğru yol yardım belgesindeki
+yoldur (`.github/migration-linter-yardim.md`): **NULL'a izin veren sütun + mevcut satırları
+doldurma + `BEFORE INSERT OR UPDATE OF <kaynak>` tetiği.** Tetik fonksiyonundan `EXECUTE` geri
+alınır (K12.1b). Küçük tablo gerekçesiyle kural susturulmaz.
+
+**K12.1d — pgroonga indeksi `CONCURRENTLY` kurulur, fonksiyonlar indeksten SONRA değişir.**
+pgroonga `create index concurrently`'yi destekler (gölgede ölçüldü, `indisvalid = true`).
+CONCURRENTLY işlem içinde koşamaz; dosya kendi `begin;/commit;`ini yazar ve indeksi iki işlemin
+**arasında** kurar. Yeni gövde `&\`` script sözdizimini kullanır ve o **yalnız indeks taramasında**
+çalışır — fonksiyonlar indeksten önce değişirse arada gelen canlı aramalar hata verir.
+Yarıda kalan CONCURRENTLY geçersiz indeks bırakır ve `if not exists` onu atlar: bu yüzden önce
+geçersiz indeks düşürülür, guard da `indisvalid`'i ölçer.
 
 **⛔K12.5 — pgroonga indeksi o sütundaki `LIKE` SORGULARINI DA ELE GEÇİRİR.** Bir sütuna
 pgroonga indeksi kurulduğunda mevcut `LIKE '%...%'` sorguları da indeksten cevaplanır ve

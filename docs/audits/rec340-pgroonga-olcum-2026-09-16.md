@@ -150,18 +150,23 @@ hatası için yanlış araçtır**, doğru ölçüt harf mesafesidir.
 
 | Ne | Ölçüm |
 |---|---|
-| Sıfırdan koşum (442 ürün, eklenti kurulumu dahil) | **694 ms** |
-| Guard bloğunun kendi süresi | 44 ms |
-| İkinci koşum (idempotentlik) | hatasız geçti, çıkış kodu 0 |
-| `lock_timeout` | **5 s** — ölçülen süreye karşı ~7 kat pay |
-| `statement_timeout` | **30 s** — ~43 kat pay |
+| Ne | İlk sürüm (09-16) | ⭐Son sürüm (09-17) |
+|---|---|---|
+| Sütun ekleme | üretilmiş sütun (tablo yeniden yazımı) | NULL'a izin veren sütun + doldurma + tetik |
+| İndeks | işlem içinde, yazmayı kilitler | `CONCURRENTLY`, işlem dışında |
+| squawk (INV-MIGRATION-3) | **4 bulgu, kırmızı** | **0 bulgu** (yerelde 2.65.0 ile koşturuldu) |
+| Sıfırdan koşum (442 ürün) | 694 ms | **755 ms** |
+| Guard süresi | 44 ms | 66 ms |
+| İkinci koşum | hatasız | hatasız, guard yine yeşil |
+| `lock_timeout` / `statement_timeout` | 5 s / 30 s | 5 s / 30 s |
 
-Kilit gerekçesi: dosya `product_search_index`'e **üretilmiş (generated) sütun** ekliyor; bu
-tablo yeniden yazımı ve ACCESS EXCLUSIVE kilit demektir. Süre emsalden **kopyalanmadı**,
-ölçülerek seçildi.
-
-**Üretilmiş sütun tercih edildi** ki tetik değişikliği gerekmesin: gövde değişince iki arama
-sütunu kendiliğinden tazelenir. `translate()` ve `lower()` IMMUTABLE olduğu için bu mümkün.
+**Neden değişti (09-17):** Recep onay verdikten sonra merge öncesi kontrol edildi; migration
+kontrolü kırmızıydı. Kural susturulmadı, yardım belgesinin yolu izlendi. Dosya üç adımdır:
+(A) işlem: eklenti + sütun + tetik + doldurma · (B) işlem dışı: iki indeks `CONCURRENTLY`
+(pgroonga destekliyor, gölgede `indisvalid = true` ölçüldü) · (C) işlem: fonksiyonlar + yetki +
+guard. C'nin B'den sonra gelmesi bilinçli: yeni gövde yalnız indeks taramasında çalışan bir
+sözdizimi kullanıyor; bu sırayla eski fonksiyonlar indeks bitene kadar hizmet verir, sitede arama
+kesilmez. Guard ayrıca iki indeksin **geçerli** olduğunu ve doldurmanın **tam** olduğunu ölçer.
 
 **`unaccent` eklentisi gereksiz çıktı** — `translate()` hem aksan körlüğünü hem Türkçe
 küçültmeyi çözüyor. Bu ölçüm bir migration kalemini ve bir onay adımını tamamen düşürdü.
