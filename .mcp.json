@@ -18,6 +18,19 @@
         ".",
         "--stdio"
       ]
+    },
+    "wrongstack-kanban": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio",
+        "--writable"
+      ],
+      "env": {
+        "WRONGSTACK_KANBAN_VERIFIER_COMMANDS": "+gh"
+      }
     }
   }
 }
