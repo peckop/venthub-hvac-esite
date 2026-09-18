@@ -196,6 +196,51 @@ gerekirse dizin dosyasına katlanır (indeks 16384 baytta sessizce kırpılır, 
 
 ---
 
+## §7 SAGE YEDEĞİ — tek depo tek arıza noktasıdır (2026-09-18)
+
+Dersler puanlı tek depoya (`.wrongstack/memories/sage.db`) taşınıyor ve o dosya **git dışıdır**
+(bilerek: ikili SQLite üç pencerede çatışır, sır taraması ikiliyi görmez, içerik PR incelemesini
+atlar). Sonuç: depoyu kaybetmek dersleri kaybetmektir ve **geri dönüşü yoktur**. Yedeksiz depoya
+ders yığmak, yazdığı şeyi koruyamayan bir hafıza kurmaktır.
+
+### §7.1 ⛔CANLI DOSYA KOPYASI YEDEK DEĞİLDİR — ÖLÇÜLDÜ
+
+Veritabanı **WAL** kipindedir: yeni yazımlar `sage.db`ye değil yanındaki `sage.db-wal`a düşer.
+`sage.db`yi tek başına kopyalamak bekleyen yazımları **atlar** ve kaybın derecesi duruma göre
+değişir — ikisi de sahada ölçüldü:
+
+| Durum | `sage.db` | `-wal` | Düz kopyadan okunan |
+|---|---|---|---|
+| gerçek depo (09-18 12:20) | 217 KB | 758 KB | **20 kayıt** (gerçek: 26) |
+| taze WAL (kapı fikstürü) | — | var | **tablo bile yok** ("no such table") |
+
+Yani en makul görünen yedekleme biçimi altı dersi **sessizce** kaybediyordu ve hiçbir şey
+uyarmıyordu. Bu yüzden yedek **`VACUUM INTO`** ile alınır: kaynak salt-okuma açılır, çıktı WAL
+dahil tek tutarlı dosyadır.
+
+### §7.2 Zorunlu kurallar
+
+1. **YEDEK DOĞRULANMADAN YEDEK SAYILMAZ.** Her koşum ürettiği dosyayı salt-okuma açar ve
+   **kayıt sayısı + aktif sayısı + tablo listesini** kaynakla karşılaştırır. Tutmazsa çıkış
+   kırmızıdır ve dosya `.DOGRULANMADI` ile bırakılır (kanıt silinmez, budama ona dokunmaz).
+2. **YEDEK GIT'E KONMAZ.** Özel hafıza deposu bile üç pencerenin yazdığı bir git deposudur;
+   ikili çatışma birleştirilemez. Hedef git dışı bir dizindir
+   (`%LOCALAPPDATA%/venthub-sage-yedek`, ya da `VENTHUB_SAGE_YEDEK_DIZINI`).
+3. **KAYNAĞA YAZILMAZ:** her açılış `readOnly: true`. Kapı bunu kaynakta ölçer.
+4. **KAYNAK YOKSA "yedek aldım" DENMEZ:** durum `kaynak-yok` yazılır, çıkış 0 (sage kurulu
+   olmayan makinede kanca/araç gürültü yapmaz) ama hiçbir dosya üretilmez.
+5. **SONSUZ BÜYÜME DE ARIZADIR:** en yeni 14 yedek tutulur.
+
+### §7.3 sage'in kendi sınırları (salt-okuma ölçüm, 2026-09-18)
+
+| Soru | Ölçülen cevap |
+|---|---|
+| `remember` metin sınırı var mı | **var: 20000 karakter** (`MAX_MEMORY_TEXT_CHARS`), aşınca açık hata. Alt sınır: normalleştirilmiş metin ≥ 4 karakter. MCP şemasında `maxLength` YOK — sınır depoda uygulanır |
+| `memory_hygiene`/triage MCP kipinde LLM'li mi | **LLM'siz**: MCP katmanında evaluator hiç bağlanmıyor (kaynakta `llm/evaluator` geçişi 0). Deterministik puan (`vs.total/100`), tekilleştirme, çapa doğrulama, saklama süresi/düşük güven eşiğiyle bayat işaretleme ve inceleme adayları **koşar** |
+| LLM'siz neyin ATLANDIĞI | LLM'e bağlı kararlar: `keep_llm_override`, LLM puanıyla güven/önem kalibrasyonu, LLM'in bayat hükmü ve **"önem ≥ 0.9 → insan incelemesi" güvenlik kapısı** (o kapıya ancak LLM hükmüyle varılıyor). Ayrıca hiçbir kipte canlı hafıza **otomatik silinmez** |
+
+---
+
 ## ORTAK HAFIZA İNDEKSİ — İKİ EŞİK, KATLAMA ve ÇOK-YAZAR YARIŞI (REC-280)
 
 `MEMORY.md` her oturumun açılışında yüklenen **ortak** indekstir ve dört şerit aynı dosyaya
