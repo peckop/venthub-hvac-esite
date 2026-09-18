@@ -231,6 +231,28 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
     expect(ikinci.log, 'atlama sebebi loga yazilmadi').toContain('ATLANDI')
   })
 
+  it('⭐AYARA KAYITLI: SessionEnd grubunda kanca var, zaman butcesi yazili (karar 51, Recep onayi 2026-09-18)', () => {
+    /**
+     * ⭐KURULU OLMAK KAYITLI OLMAK DEĞİLDİR. Bu depoda ölçülmüş sınıf: dosya var, kimse
+     * çağırmıyor, kimse fark etmiyor. Yedeğin tamamı bu satıra bağlı — satır düşerse yedek
+     * sessizce elle kalır ve "otomatik" sanılır.
+     *
+     * Onay: Recep, ALTYAPI penceresi, 2026-09-18, "51 evet".
+     */
+    const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8')) as {
+      hooks?: { SessionEnd?: { matcher?: string; hooks?: { command?: string; timeout?: number }[] }[] }
+    }
+    const gruplar = ayar.hooks?.SessionEnd ?? []
+    const kanca = gruplar
+      .flatMap((g) => g.hooks ?? [])
+      .find((h) => String(h.command ?? '').includes('sage-yedek-oturum-sonu.cjs'))
+    expect(kanca, 'SessionEnd grubunda sage yedek kancasi YOK — yedek sessizce elle kaldi').toBeDefined()
+    expect(String(kanca?.command), 'kancada mutlak yol var (kimlik sizintisi, depo PUBLIC)').not.toMatch(
+      /[A-Za-z]:[\\/]|\/Users\/|\/home\//,
+    )
+    expect(kanca?.timeout, 'zaman butcesi yazili degil — oturum kapanisi kancaya kilitlenebilir').toBeGreaterThan(0)
+  })
+
   it('⭐ISTEM SATIRI ESIKLIDIR: taze yedekte SUSAR, yedek yokken ve DOGRULANMAMIS dosyada KONUSUR', () => {
     /**
      * ⭐NİÇİN EŞİKLİ: her turda "her şey yolunda" yazan satır, bağlamdan yer alır ve hiçbir
