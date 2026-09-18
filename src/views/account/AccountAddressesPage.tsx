@@ -281,10 +281,10 @@ export default function AccountAddressesPage() {
                     </h3>
 
                     <div className="flex items-center gap-2">
-                      <button onClick={() => startEdit(a)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-navy hover:bg-primary-navy/5 transition-colors focus-visible:outline-none" title={t('admin.ui.edit')}>
+                      <button onClick={() => startEdit(a)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-primary-navy hover:bg-primary-navy/5 transition-colors focus-visible:outline-none" title={t('common.edit')}>
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button onClick={() => handleDelete(a.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors focus-visible:outline-none" title={t('admin.ui.delete')}>
+                      <button onClick={() => handleDelete(a.id)} className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors focus-visible:outline-none" title={t('common.delete')}>
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>

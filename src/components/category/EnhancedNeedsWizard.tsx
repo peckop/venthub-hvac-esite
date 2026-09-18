@@ -292,12 +292,12 @@ const EnhancedNeedsWizard: React.FC<EnhancedWizardProps> = ({ isOpen, onClose, p
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                 <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'yes' })); nextStep() }} className="focus-ring p-8 rounded-hvac-2xl border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-colors">
                                     <div className="text-4xl mb-4">{t('needsWizard.enhanced.iconHeat')}</div>
-                                    <div className="font-bold">{t('admin.common.yes')}</div>
+                                    <div className="font-bold">{t('common.yes')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingYesDesc')}</div>
                                 </button>
                                 <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'no' })); nextStep() }} className="focus-ring p-8 rounded-hvac-2xl border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-colors">
                                     <div className="text-4xl mb-4">{t('needsWizard.enhanced.iconAmbient')}</div>
-                                    <div className="font-bold">{t('admin.common.no')}</div>
+                                    <div className="font-bold">{t('common.no')}</div>
                                     <div className="text-xs text-slate-400 mt-2">{t('needsWizard.heatingNoDesc')}</div>
                                 </button>
                                 <button type="button" onClick={() => { setState(prev => ({ ...prev, heatingNeeded: 'unsure' })); nextStep() }} className="focus-ring p-8 rounded-hvac-2xl border border-slate-100 bg-slate-50 hover:border-cyan-500 hover:bg-white transition-colors">
