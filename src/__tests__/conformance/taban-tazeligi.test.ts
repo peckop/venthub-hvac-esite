@@ -185,11 +185,11 @@ describe('INV-TABAN-TAZE-1 · sema tabani son migration dan geri kalmaz', () => 
       )
     } catch {
       dalinKendisi = []
-      console.log('[INV-TABAN-TAZE-1] git okunamadi — hicbir dosya DISLANMADI (fail-closed)')
+      console.warn('[INV-TABAN-TAZE-1] git okunamadi — hicbir dosya DISLANMADI (fail-closed)')
     }
     if (dalinKendisi.length > 0) {
       // Sessiz dışlama YOK: neyin sayılmadığı çıktıda görünür.
-      console.log(
+      console.warn(
         `[INV-TABAN-TAZE-1] dalin KENDI migration'lari sayilmadi (${dalinKendisi.length}): ` +
           `${dalinKendisi.join(', ')} — master'a inince taban TAZELENMELI (README Yol A).`,
       )
