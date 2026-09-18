@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -145,7 +146,55 @@ describe('INV-TABAN-TAZE-1 · sema tabani son migration dan geri kalmaz', () => 
 
   it('TAZELIK: en yeni migration damgasi, TABAN tarihinden YENI OLAMAZ', () => {
     const tabanTarih = enYeniTaban!.tarih
-    const geride = migrationlar.filter((m) => m.tarih > tabanTarih)
+    /**
+     * ⭐DALIN KENDİ MIGRATION'I SAYILMAZ (REC-351 hükmü (a), 2026-09-18'de uygulandı).
+     *
+     * Ölçülmüş tasarım kusuru: taban ancak migration prod'a UYGULANDIKTAN sonra tazelenebilir
+     * (README Yol A: dökümü CI canlıdan alır). Dolayısıyla migration içeren HER PR kendi kapısını
+     * kırmızı yapıyordu — 09-17'de karar 40, 09-18'de URUN'un karar 45 PR'ı aynı yere takıldı ve
+     * tek çıkış yolu ya kapıyı görmezden gelmek ya tabanı elle uydurmaktı; ikisi de kapının
+     * anlamını öldürür.
+     *
+     * Kural: `origin/master` ile birleşme tabanından SONRA bu dalda EKLENEN (ve çalışma ağacında
+     * henüz commit edilmemiş) migration'lar sayılmaz. Master'a inince aynı dosyalar sayılır ve
+     * taban tazelenmezse kapı yine kırmızıdır — yani alarm kaybolmuyor, PR'dan master'a ÖTELENİYOR.
+     * Git okunamazsa HİÇBİR ŞEY dışlanmaz (fail-closed): ölçemediğimizde taze saymayız.
+     */
+    const git = (...a: string[]) =>
+      execFileSync('git', a, { cwd: KOK, encoding: 'utf8', timeout: 20000, stdio: ['ignore', 'pipe', 'pipe'] })
+    let dalinKendisi: string[] = []
+    try {
+      const taban = git('merge-base', 'HEAD', 'origin/master').trim()
+      const eklenen = git('diff', '--name-only', '--diff-filter=A', taban, '--', 'supabase/migrations')
+      // ⚠Commit edilmemiş dosya da dalın kendisidir: `git diff` izlenmeyeni görmez ve ilk sürüm
+      // tam bu yüzden yine kırmızı verdi (2026-09-18). CI'da bu küme boştur.
+      const calisma = git('status', '--porcelain', '--', 'supabase/migrations')
+      dalinKendisi = Array.from(
+        new Set(
+          [
+            ...eklenen.split('\n').map((s) => s.trim()),
+            ...calisma
+              .split('\n')
+              .map((s) => s.trim())
+              .filter((s) => /^(\?\?|A |AM|M )/.test(s))
+              .map((s) => s.replace(/^\S+\s+/, '')),
+          ]
+            .filter(Boolean)
+            .map((s) => s.split('/').pop() as string),
+        ),
+      )
+    } catch {
+      dalinKendisi = []
+      console.warn('[INV-TABAN-TAZE-1] git okunamadi — hicbir dosya DISLANMADI (fail-closed)')
+    }
+    if (dalinKendisi.length > 0) {
+      // Sessiz dışlama YOK: neyin sayılmadığı çıktıda görünür.
+      console.warn(
+        `[INV-TABAN-TAZE-1] dalin KENDI migration'lari sayilmadi (${dalinKendisi.length}): ` +
+          `${dalinKendisi.join(', ')} — master'a inince taban TAZELENMELI (README Yol A).`,
+      )
+    }
+    const geride = migrationlar.filter((m) => m.tarih > tabanTarih && !dalinKendisi.includes(m.dosya))
     expect(
       geride.map((m) => m.dosya),
       `⚠TABAN BAYAT. Secilen taban: ${enYeniTaban!.dosya} (${tabanTarih}).\n` +
