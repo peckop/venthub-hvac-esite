@@ -311,6 +311,19 @@ try {
   context += `⚠ana agac tazelik modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — tazelik OLCULMEDI.\n`
 }
 
+// SAGE DOSYA DERSİ İŞARETLERİ (Recep 2026-09-18: "gün içinde defalarca compact oluyor").
+// Dersler dosya başına BİR KEZ gösterilir; compact bağlamı kırpınca o "bir kez" kaybolur ve
+// hafıza yine okunmamış olur. Bu yüzden compact/clear dönüşünde nesil artırılır — işaretler
+// geçersizleşir, dersler kırpılmış bağlamda bir kez daha görünür. Sessiz ve fail-open.
+if (source === 'compact' || source === 'clear') {
+  try {
+    require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'sage-dosya-dersi.cjs'))
+      .isaretleriTemizle(input.session_id)
+  } catch {
+    /* ders kancası yoksa oturum yine açılır — koordinasyon katmanı fail-open */
+  }
+}
+
 // YÖNTEM GÖSTERGESİ (T144-VH, Recep 08-21): ajan panoya baktığında cetveli de görsün —
 // tarayıcıda ayrı sayfa değil, bakılan yerin yanında. Öneri, dayatma değil; sapma yazılır.
 context += 'YÖNTEM CETVELİ (docs/standards/execution-method-standard.md): iş emrinde YÖNTEM: satırı ' +

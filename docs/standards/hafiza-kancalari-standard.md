@@ -96,6 +96,8 @@ bir durum değil, bir boşluktur.
 | `hafiza-sorusu-yonlendirme.cjs` | kanca | hafıza sorusunu deftere/CodeGraph'e yönlendirir | UserPromptSubmit | ALTYAPI | `…/hafiza-sorusu-yonlendirme.test.ts` (16 kol) |
 | `defter-bayatlik-olcumu.cjs` | kanca | takip defterinin yaşını ölçer, eşitlemeyi TETİKLEMEZ | Stop | ALTYAPI | `…/defter-bayatlik-olcumu.test.ts` (7 kol) |
 | `soguk-okuyucu-sinavi.cjs` | kanca | iki kayıt yüzeyinde soğuk okuyucu sınavı ister | PostToolUse | ALTYAPI | `…/soguk-okuyucu-sinavi.test.ts` (13 kol) |
+| `sage-dosya-dersi.cjs` | kanca | dokunulan dosyaya **çapalı** sage derslerini bağlama koyar | PreToolUse (`Read\|Edit\|Write\|MultiEdit`) | ALTYAPI | `…/sage-dosya-dersi.test.ts` (6 kol) |
+| `scripts/hijyen/sage-dosya-dersi.cjs` | modül | puanlama, bütçe, "dosya başına bir kez", compact sıfırlaması | kanca + oturum açılışı | ALTYAPI | aynı kapı |
 
 ⚠**AYARA KAYIT RECEP KAPISI:** dördü de `.claude/settings.json`'a bağlanmadıkça **dosya olarak
 var, tetik olarak ölüdür.** Akran isteğiyle ayar dosyasına dokunulmaz. Kayıt satırları Recep'e
@@ -112,6 +114,61 @@ aynı PR'da: (1) gerçek stdin ile koşum kanıtı, (2) "ötmemeli" kolu, (3) §
 (4) varsa "bir şeyin olmadığını ölçen" kol. **Koda bakarak sınama kanıt sayılmaz** — dört
 kancanın üçünde kusurlar ancak gerçek koşumla çıktı (tilde çözülmemesi, worktree'lerin depo dışı
 sayılması, MSYS `/c/` yolunun Windows'ta olmayan yere çözülmesi, basename çarpışması).
+
+## §6 SAGE DOSYA DERSİ — yazılan hafıza OKUNMUYORSA yazılmamıştır (Recep, 2026-09-18)
+
+Recep sordu: *"çapalı hafıza kullanılmıyor mu?"* Dürüst cevap **hayır**dı. Ölçüm: sage
+veritabanında 26 kayıt vardı, bir kısmı dosya/dizin çapalı; ama bir dosyaya dokunan hiçbir
+pencere onları görmüyordu, çünkü okumak için bir aracı **kasıtlı** çağırmak gerekiyordu ve
+kimse çağırmıyordu. Bu, REC-342 dersinin hafıza hâlidir: *bir kapının var olması, kararın
+verildiği yerde göründüğü anlamına gelmez.*
+
+### §6.1 Yukarı akım ölçüldü, taklit edilmedi
+
+WrongStack'in kendi ajanı bunu bir ara katmanla yapıyor
+(`@wrongstack/sage/middleware/tool-call-memory.js`). Ölçülen varsayılanlar ve bizim seçimimiz:
+
+| Ayar | Yukarı akım | Biz | Niçin farklı |
+|---|---|---|---|
+| araç başına ders | 8 | **2** | bizim yüzeyimiz tur bağlamı; sekiz ders okunmaz |
+| araç başına karakter | 2800 | **1024 bayt** | Recep'in bütçesi |
+| tekrar bekleme | 0 ms | — | biz süre değil **dosya başına bir kez** sayıyoruz |
+| getirme bütçesi | 5000 ms | **800 ms** | kanca her araç çağrısında koşar; 5 sn turu keser |
+| asgari önem | 0.5 | **0.5** | ölçülen varsayılan korundu |
+| çapa gücü | dosya 0.9 · dizin 0.5 | **aynı** | `memory_for_file` gerçek çıktısından alındı |
+
+Yukarı akımın iki yeteneği bizde **bilerek yok**: bağlamda görünen dersi yeniden basmama
+(`containsMemoryText`) ve çeşitlilik seçimi (`selectDiverseMemories`). Dosya başına bir kez
+konuşan bir kolda tekrar riski zaten düşüktür; gerekirse ölçümle eklenir.
+
+### §6.2 Zorunlu kurallar
+
+1. **SAGE DERSİ TEK İŞ SÖYLER.** Ders metni tek satıra indirilir ve ~300 karakterde kırpılır.
+   Çok işi bir arada anlatan ders, dokunulan dosyada okunmaz — uzun blok gürültüdür.
+2. **DOSYA BAŞINA BİR KEZ, COMPACT'TA SIFIRLANIR.** Recep: *"gün içinde defalarca compact
+   oluyor."* Compact bağlamı kırpar; kırpılmış bağlamda ders bir daha görünmezse hafıza yine
+   okunmamış olur. İşaretler oturum + **nesil** ile anahtarlanır, nesil compact/clear
+   dönüşünde artar (oturum açılışından `isaretleriTemizle`).
+3. **SESSİZ VE FAIL-OPEN.** Ders yoksa, veritabanı yoksa, ölçüm düşerse **hiçbir şey basılmaz**
+   ve çıkış 0'dır. Her araç çağrısında uyarı basan bir kanca üç turda görmezden gelinir.
+4. **BÜTÇE SAYIYLA YAZILI.** Duvar saati bütçesi, ders sayısı, karakter ve bayt tavanı modülde
+   sabit olarak durur ve kapı onları **değerleriyle** ölçer; yorumda kalan bütçe bütçe değildir.
+5. **TANIMADIĞIM ÇAPA TİPİNE PUAN VERİLMEZ** (fail-closed puanlama): yeni bir çapa tipi
+   gelirse sessizce yüksek puan almaz, önce buraya yazılır.
+
+### §6.3 Hangi ders nereye yazılır
+
+| Ders | Yer | Niçin |
+|---|---|---|
+| Belirli bir dosya/dizinle ilgili kusur kökü, tuzak, komut notu | **sage** (çapalı) | dokunulunca görünür; dosya taşınırsa çapa taşınır |
+| Recep'in kalıcı sözü, üslup, yetki, iş düzeni | **MEMORY.md + dosya hafızası** | her oturum yüklenir, dosyaya bağlı değil |
+| Kararın kendisi (numara, onay, tarih) | **karar defteri (OPS)** | numara tek sahipli; iki yerde numara çakışır |
+| Nasıl ölçüldüğü, yan yana sayılar | **`docs/audits/`** | ölçüm kaydı uzundur, derse sığmaz |
+
+Kural: bir ders **iki** yere yazılmaz. sage'e yazılan bir ders MEMORY.md'ye satır eklemez;
+gerekirse dizin dosyasına katlanır (indeks 16384 baytta sessizce kırpılır, yumuşak eşik 15800).
+
+---
 
 ## ORTAK HAFIZA İNDEKSİ — İKİ EŞİK, KATLAMA ve ÇOK-YAZAR YARIŞI (REC-280)
 
