@@ -239,6 +239,57 @@ dahil tek tutarlı dosyadır.
 | `memory_hygiene`/triage MCP kipinde LLM'li mi | **LLM'siz**: MCP katmanında evaluator hiç bağlanmıyor (kaynakta `llm/evaluator` geçişi 0). Deterministik puan (`vs.total/100`), tekilleştirme, çapa doğrulama, saklama süresi/düşük güven eşiğiyle bayat işaretleme ve inceleme adayları **koşar** |
 | LLM'siz neyin ATLANDIĞI | LLM'e bağlı kararlar: `keep_llm_override`, LLM puanıyla güven/önem kalibrasyonu, LLM'in bayat hükmü ve **"önem ≥ 0.9 → insan incelemesi" güvenlik kapısı** (o kapıya ancak LLM hükmüyle varılıyor). Ayrıca hiçbir kipte canlı hafıza **otomatik silinmez** |
 
+### §7.4 ⛔KÖK `cwd` DEĞİL ANA AĞAÇTIR — kural bu cetvelde ZATEN yazılıydı (2026-09-18)
+
+Bu dosyanın "⛔Mutlak yol yazılmaz" bölümü 2026-08-28'de şunu yazmıştı: *"worktree'de açılan
+oturumların kendi proje dizini vardır ve orada `memory/` yok; cwd'ye güvenen bir kapı en çok
+ihtiyaç duyulan yerde kör olur."* **Aynı sınıfı, aynı cetvelin içinde, üç hafta sonra tekrar
+ürettim.** Kuralı yazmak uygulamak değildir; bu yüzden artık kural bir MODÜLE bağlıdır.
+
+Ölçülen arıza (`CLAUDE_PROJECT_DIR || __dirname/../..` ile kök çözümü):
+
+| Tüketici | Worktree'de olan | Görünen |
+|---|---|---|
+| `sage-yedek.cjs` | `.wrongstack` yok → "sage kurulu degil" | **çıkış 0** — yedek hiç alınmaz, başarılı görünür |
+| `sage-dosya-dersi.cjs` | dosyanın ana ağaca göre yolu `..` ile başlar → `goreliYol` null | ders satırı **boş**, sebep hiçbir yere yazılmaz |
+
+Aynı dosya, iki ağaç: ana ağaçta **1751 karakter** ders · worktree'de **0**.
+
+Kurallar:
+
+1. **İKİ AYRI KÖK VARDIR, EŞİTLENMEZ.** `scripts/hijyen/ana-kok.cjs`: `anaKok()` = VERİNİN
+   kökü (`git rev-parse --git-common-dir`ın ebeveyni, worktree'den bile ana ağaç);
+   `agacKoku()` = DOSYANIN kökü (`--show-toplevel`). Çapa yolları depoya görelidir, bir
+   worktree dosyasının doğru yolu ancak KENDİ ağacının kökünden çıkar.
+2. **"Bilmiyorum" hâlinin cevabı dosyanın dizini DEĞİL proje köküdür.** Git konuşmazsa ikisi
+   de `CLAUDE_PROJECT_DIR`/betik köküne düşer. İlk yazımda `agacKoku` başlangıç dizinine
+   düşüyordu; `goreliYol` o zaman `hedef.ts` üretiyor, çapa `src/lib/hedef.ts` olduğu için
+   eşleşme yine sessizce kaçıyordu (testte yakalandı).
+3. **"Kaynak yok" bir BAŞARI satırı değildir.** CLI artık çıkış 0 vermez, aranan yolu ve
+   çözülen ana ağacı yazar. Fail-open KANCANIN özelliğidir, betiğin değil.
+4. Kapı: `src/__tests__/conformance/sage-ana-kok.test.ts` — **gerçek** bir git worktree kurar.
+   Sahte dizin bu arızayı taklit edemez; arıza tam olarak "aynı deponun iki ayrı dizini"
+   durumunda doğar.
+
+### §7.5 Yedek ELLE kalmaz — oturum kapanışına bağlanır (karar 51)
+
+Recep'in sorusu: *"neden elle, avantajı ne, unutulursa ne olacak."* Cevap tek cümle:
+**elle = unutulur**, ve unutulan yedek kaybın sessiz hâlidir.
+
+1. **Olay, zamanlayıcı değil.** Gözcü/cron kurulmaz (REC-328); yedek, pencerenin kapanışına
+   (`SessionEnd`) binen `.claude/hooks/sage-yedek-oturum-sonu.cjs` ile alınır.
+2. **24 saat kuralı.** Son yedek 24 saatten yeniyse koşum atlanır — üç pencere aynı ana ağacı
+   paylaşır, her kapanışta kopyalamak aynı veriyi günde onlarca kez yazmaktır.
+3. **Sessiz ≠ başarılı.** Her koşum sonucunu (`ALINDI` / `ATLANDI` / hata / bütçe aşımı) yedek
+   dizinindeki `son-kosum.log`a yazar. Çıkış DAİMA 0: kanca oturum kapanışını bloklayamaz.
+4. **Gecikme karar anında görünür.** `defter-tazelik-satiri.cjs` **eşikli** bir SAGE satırı
+   yazar: doğrulanamamış yedek varsa, hiç yedek yoksa ya da son yedek 2 günden eskiyse.
+   Komşu satırlar (DEFTER, TABAN) her turda konuşur çünkü sayıları sürekli lazımdır; yedek
+   öyle değildir — her şey yolundayken yazılan satır, bağlamdan yer alan boş satırdır.
+5. **"Son bakım" ÖLÇÜLMÜYOR, uydurulmuyor.** `memory_hygiene` MCP üzerinden koşuyor ve hiçbir
+   damga bırakmıyor; damgasız "14 gündür bakım yok" cümlesi ölçüm değil tahmindir. Bakım
+   damgası ayrı ve küçük bir iştir.
+
 ---
 
 ## ORTAK HAFIZA İNDEKSİ — İKİ EŞİK, KATLAMA ve ÇOK-YAZAR YARIŞI (REC-280)

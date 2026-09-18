@@ -134,10 +134,15 @@ function tekSatir(metin) {
  * @returns {{id:string, kind:string, puan:number, metin:string}[]}
  * Ölçemezse FIRLATIR — çağıran sessiz düşer, "ders yok" DEMEZ.
  */
-function dersleriBul(kok, dosya, simdi = Date.now()) {
+/**
+ * @param {string} kok   DOSYANIN ağacının kökü — çapa yolu buna göre hesaplanır.
+ * @param {string} dbKok VERİNİN ağacının kökü (ana ağaç). Worktree'de `.wrongstack` YOKTUR;
+ *   ikisini eşitlemek, worktree penceresinde dersin sessizce hiç görünmemesi demekti (ölçüldü).
+ */
+function dersleriBul(kok, dosya, simdi = Date.now(), dbKok = kok) {
   const goreli = goreliYol(kok, dosya)
   if (!goreli) return []
-  const yol = dbYolu(kok)
+  const yol = dbYolu(dbKok)
   if (!fs.existsSync(yol)) return []
 
   // ⚠node:sqlite deneysel: uyarı stderr'e düşer ve kanca gürültüsü olur. Dinleyici
@@ -278,14 +283,14 @@ function isaretle(oturum, goreli) {
  * Kancanın tek girişi. Ölçemezse ya da ders yoksa BOŞ dize döner (sessizlik kuralı).
  * @param {{kok:string, dosya:string, oturum:string}} girdi
  */
-function satir({ kok, dosya, oturum }) {
+function satir({ kok, dosya, oturum, dbKok = kok }) {
   const t0 = Date.now()
   const goreli = goreliYol(kok, dosya)
   if (!goreli) return ''
   if (gorulduMu(oturum, goreli)) return ''
   let dersler
   try {
-    dersler = dersleriBul(kok, dosya, t0)
+    dersler = dersleriBul(kok, dosya, t0, dbKok)
   } catch {
     return '' // fail-open: ölçemedik, turu bloklamıyoruz
   }

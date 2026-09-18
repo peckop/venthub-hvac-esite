@@ -267,4 +267,34 @@ try {
   process.stdout.write('⚠TABAN: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+/**
+ * ── SAGE YEDEĞİ (REC-345, karar 51) ──
+ *
+ * ⭐BU BLOK EŞİKLİDİR, KOMŞULARI DEĞİL. DEFTER ve TABAN her turda yazar çünkü ikisi de
+ * karar anında sürekli lazım olan sayılardır. Yedek öyle değil: her şey yolundayken her tura
+ * bir satır eklemek, hiçbir şey söylemeyen bir satırdır. Bu yüzden yalnız ÜÇ hâlde konuşur:
+ *   · doğrulanamamış bir yedek dosyası duruyor (bir koşum DÜŞMÜŞ — en ağırı, hep görünür),
+ *   · hiç yedek yok,
+ *   · son yedek 2 günden eski.
+ *
+ * ⛔"SON BAKIM" BURADA ÖLÇÜLMÜYOR ve uydurulmuyor. Sage'in `memory_hygiene` işlemi MCP
+ * üzerinden koşuyor ve hiçbir yere damga bırakmıyor; damga olmadan "14 gündür bakım yok"
+ * cümlesi ölçüm değil tahmindir. Bakım damgası ayrı ve küçük bir iştir; o gelene kadar bu
+ * satır yalnız ölçebildiğini söyler.
+ */
+try {
+  const sy = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'sage-yedek.cjs'))
+  const d = sy.sonDurum()
+  const parca = []
+  if (d.dogrulanmadi.length > 0) parca.push('⛔DOGRULANMAMIS ' + d.dogrulanmadi.length + ' dosya (bir kosum DUSTU)')
+  if (d.gun === null) parca.push('HIC YEDEK YOK')
+  else if (d.gun > 2) parca.push('son yedek ' + d.gun + ' gun once')
+  if (parca.length > 0) {
+    process.stdout.write('⚠SAGE: ' + parca.join(' · ') + '\n')
+    process.stdout.write('  ONARIM: node scripts/hijyen/sage-yedek.cjs (salt-okuma, ~1 sn, git disina yazar)\n')
+  }
+} catch (e) {
+  process.stdout.write('⚠SAGE: YEDEK DURUMU OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)

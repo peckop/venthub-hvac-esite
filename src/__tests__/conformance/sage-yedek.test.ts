@@ -23,6 +23,8 @@ import { afterEach, describe, expect, it } from 'vitest'
  */
 const KOK = process.cwd()
 const MODUL_YOLU = path.join(KOK, 'scripts', 'hijyen', 'sage-yedek.cjs')
+const KANCA_OTURUM_SONU = path.join(KOK, '.claude', 'hooks', 'sage-yedek-oturum-sonu.cjs')
+const KANCA_ISTEM = path.join(KOK, '.claude', 'hooks', 'defter-tazelik-satiri.cjs')
 const require_ = createRequire(import.meta.url)
 
 interface SqliteDb {
@@ -121,7 +123,8 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
     db.close()
   })
 
-  it('KAYNAK YOKSA sessizce "yedek aldim" DEMEZ (cikis 0 ama durum kaynak-yok)', () => {
+  // CLI'nin çıkış kodu artık 0 DEĞİL (bkz. INV-SAGE-ANA-KOK-1); burada kütüphane hükmü ölçülür.
+  it('KAYNAK YOKSA sessizce "yedek aldim" DEMEZ (durum kaynak-yok, dosya uretilmez)', () => {
     process.env.CLAUDE_PROJECT_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-bos-'))
     process.env.VENTHUB_SAGE_YEDEK_DIZINI = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-hedef-'))
     const s = modul.yedekAl()
@@ -191,5 +194,70 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
     })
     expect(r.status).toBe(0)
     expect(r.stdout, 'bos dizinde sebep yazilmiyor').toMatch(/yedek YOK/)
+  })
+
+  /**
+   * ══════════════════════════════════════════════════════════════════════════════
+   * OTOMATİKLEŞTİRME (karar 51) — Recep'in sorusu: "neden elle, unutulursa ne olacak"
+   * ══════════════════════════════════════════════════════════════════════════════
+   * Cevap: elle = unutulur. Aşağıdaki iki kol, otomatiğin İKİ ayrı arıza biçimini ölçer:
+   *   1. Kanca çalışıyor ama HİÇBİR ŞEY yapmıyor (sessiz atlama) → log satırı zorunlu.
+   *   2. Kanca oturum kapanışını bloklıyor ya da hata kusuyor → çıkış DAİMA 0 olmalı.
+   */
+  it('⭐OTURUM SONU KANCASI: bayatsa ALIR, tazeyse ATLAR, her iki halde de CIKIS 0 ve LOG yazar', () => {
+    const { kok, db } = depoKur(5)
+    db.close()
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-oto-'))
+    const kos = (): { kod: number | null; log: string } => {
+      const r = spawnSync(process.execPath, [KANCA_OTURUM_SONU], {
+        input: '{"session_id":"t","reason":"clear"}',
+        encoding: 'utf8',
+        env: { ...process.env, CLAUDE_PROJECT_DIR: kok, VENTHUB_SAGE_YEDEK_DIZINI: dizin },
+        timeout: 60_000,
+      })
+      const l = path.join(dizin, 'son-kosum.log')
+      return { kod: r.status, log: fs.existsSync(l) ? fs.readFileSync(l, 'utf8') : '' }
+    }
+
+    const birinci = kos()
+    expect(birinci.kod, 'kanca oturum kapanisini BLOKLADI').toBe(0)
+    expect(modul.liste(dizin).filter((y) => y.ad.endsWith('.db')), 'bayatken yedek ALINMADI').toHaveLength(1)
+    expect(birinci.log, 'alinan yedek loga yazilmadi — sessizlik BASARI degildir').toContain('ALINDI')
+
+    // İkinci koşum: son yedek 24 saatten yeni → yeni dosya ÜRETİLMEMELİ, ama sebebi YAZILMALI.
+    const ikinci = kos()
+    expect(ikinci.kod, 'ikinci kosumda cikis 0 degil').toBe(0)
+    expect(modul.liste(dizin).filter((y) => y.ad.endsWith('.db')), '24 saat kurali calismadi').toHaveLength(1)
+    expect(ikinci.log, 'atlama sebebi loga yazilmadi').toContain('ATLANDI')
+  })
+
+  it('⭐ISTEM SATIRI ESIKLIDIR: taze yedekte SUSAR, yedek yokken ve DOGRULANMAMIS dosyada KONUSUR', () => {
+    /**
+     * ⭐NİÇİN EŞİKLİ: her turda "her şey yolunda" yazan satır, bağlamdan yer alır ve hiçbir
+     * karar değiştirmez. Ama sessizlik de bedava değildir — bu yüzden ÜÇ hâlde konuşur.
+     * (Recep'in 09-18 hükmü: bağlam bütçesi adına kalite kısılmaz; kısılacak şey GÜRÜLTÜDÜR.)
+     */
+    const kos = (dizin: string): string => {
+      const r = spawnSync(process.execPath, [KANCA_ISTEM], {
+        input: '{"session_id":"t"}',
+        encoding: 'utf8',
+        env: { ...process.env, VENTHUB_SAGE_YEDEK_DIZINI: dizin },
+        timeout: 60_000,
+      })
+      return `${r.stdout ?? ''}${r.stderr ?? ''}`
+    }
+
+    const bos = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-esik-bos-'))
+    expect(kos(bos), 'yedek yokken satir CIKMADI').toContain('SAGE:')
+
+    const taze = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-esik-taze-'))
+    fs.writeFileSync(path.join(taze, 'sage-2999-01-01T0000Z.db'), 'x', 'utf8')
+    expect(kos(taze), 'taze yedekte satir YAZILDI — esik calismiyor, her tur gurultu').not.toContain('SAGE:')
+
+    const dusmus = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-esik-dusmus-'))
+    fs.writeFileSync(path.join(dusmus, 'sage-2999-01-01T0000Z.db'), 'x', 'utf8')
+    fs.writeFileSync(path.join(dusmus, 'sage-2999-01-01T0001Z.db.DOGRULANMADI'), 'x', 'utf8')
+    const metin = kos(dusmus)
+    expect(metin, 'DUSMUS kosum taze yedek yaninda GIZLENDI — en agir sinyal susturuldu').toContain('DOGRULANMAMIS')
   })
 })
