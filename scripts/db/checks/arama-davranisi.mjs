@@ -149,7 +149,14 @@ async function olc(client, vaka) {
  * sonunda ROLLBACK (yazma yok, oturum rolü sızmaz). Ölçüt sabit sayı değil: sahip rolü sonuç
  * bulurken vitrin rolü hata veriyor ya da BOŞ dönüyorsa İHLAL.
  */
-const VITRIN_ROLLERI = ['anon', 'authenticated']
+const VITRIN_ROLLERI = ['anon', 'authenticated', 'authenticated-iddiasiz']
+
+/** Kol adı → gerçek Postgres rolü (iddiasız kol da `authenticated` rolüyle koşar). */
+const ROL_PG = {
+  anon: 'anon',
+  authenticated: 'authenticated',
+  'authenticated-iddiasiz': 'authenticated',
+}
 
 /**
  * ⭐ROL TEK BAŞINA GERÇEK İSTEK DEĞİL — JWT iddiaları da vitrindeki gibi kurulur.
@@ -162,17 +169,25 @@ const VITRIN_ROLLERI = ['anon', 'authenticated']
  * ölçmek müşterinin görmediği bir kırmızıyı ölçer. İddiasız hâl GERÇEK bir kusurdur (REC-355,
  * VULN) ve onarımıyla AYNI PR'da ayrı kol olarak gelir.
  * Kanca çıktısının biçimi birebir: kök + app_metadata altında user_role.
+ *
+ * ⭐İDDİASIZ KOL EKLENDİ (REC-355 onarımı, 2026-09-18 — yukarıdaki söz burada kapanıyor):
+ * `authenticated-iddiasiz` kolu `user_role` taşımayan bir jetonu taklit eder. Bu hâl vitrinde
+ * hook açıkken üretilmez ama hook kapanırsa, hook'tan önce üretilmiş uzun ömürlü bir jeton
+ * kullanılırsa ya da PostgREST doğrudan çağrılırsa üretilir. Onarımdan ÖNCE bu kol 54001
+ * veriyordu (gölgede ölçüldü); onarımdan sonra hata vermemeli. Kol kırmızıya dönerse döngü geri
+ * gelmiş demektir — onarımın kalıcı bekçisi bu satırdır.
  */
 const VITRIN_IDDIALARI = {
   anon: { role: 'anon' },
   authenticated: { role: 'authenticated', user_role: 'user', app_metadata: { user_role: 'user' } },
+  'authenticated-iddiasiz': { role: 'authenticated' },
 }
 
 async function olcRolle(client, vaka, rol) {
   await client.query('begin')
   try {
     await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(VITRIN_IDDIALARI[rol])])
-    await client.query(`set local role ${rol}`)
+    await client.query(`set local role ${ROL_PG[rol]}`)
     const { rows } = await client.query(
       'select id from public.fts_search_products($1, 500, $2::jsonb)',
       [vaka.q, '{}'],
@@ -216,9 +231,17 @@ async function main() {
   }
 
   const kokSertifika = path.join(KOK, 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem')
+  /**
+   * ⭐YEREL HEDEF TLS İSTEMEZ (2026-09-18 ölçüldü): kök sertifika dosyası depoda durduğu için
+   * betik yerel gölgeye de TLS ile bağlanmaya çalışıyordu ve "server does not support SSL
+   * connections" ile düşüyordu — yani onarımların kolları gölgede HİÇ koşulamıyordu. Uzak hedefte
+   * davranış değişmedi: sertifika varsa TLS zorunlu. Yerel hedef adres üzerinden ayırt edilir.
+   */
+  const yerelHedef = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(temizDizi)
+  if (yerelHedef) console.log('arama-davranisi: hedef YEREL — TLS aranmadi')
   const client = new pg.Client({
     connectionString: temizDizi,
-    ssl: fs.existsSync(kokSertifika) ? { ca: fs.readFileSync(kokSertifika, 'utf8') } : undefined,
+    ssl: !yerelHedef && fs.existsSync(kokSertifika) ? { ca: fs.readFileSync(kokSertifika, 'utf8') } : undefined,
   })
   await client.connect()
 

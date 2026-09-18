@@ -186,8 +186,13 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
      * Bu kol silinir ya da ilana bağlanırsa aynı körlük geri gelir.
      */
     const s = jsYorumsuz(betik())
-    expect(s, 'vitrin rolleri tanimli degil').toMatch(/VITRIN_ROLLERI\s*=\s*\[\s*'anon'\s*,\s*'authenticated'\s*\]/)
-    expect(s, 'rol gercekten degistirilmiyor').toMatch(/set local role \$\{rol\}/)
+    expect(s, 'vitrin rolleri tanimli degil').toMatch(
+      /VITRIN_ROLLERI\s*=\s*\[\s*'anon'\s*,\s*'authenticated'\s*,\s*'authenticated-iddiasiz'\s*\]/,
+    )
+    // REC-355 onarımıyla üçüncü kol geldi: iddiasız jeton. Kol adı Postgres rolü DEĞİL, eşlemeden
+    // geçer — aksi hâlde `set local role authenticated-iddiasiz` diye var olmayan bir rol denenir.
+    expect(s, 'iddiasiz kol icin iddia tanimi yok').toMatch(/'authenticated-iddiasiz': \{ role: 'authenticated' \}/)
+    expect(s, 'rol gercekten degistirilmiyor').toMatch(/set local role \$\{ROL_PG\[rol\]\}/)
     // Iddiasiz authenticated vitrinde uretilmez (kanca her jetona user_role yazar); iddia
     // kurulmazsa kol musterinin gormedigi 54001 i olcer. Iddia IŞLEM-YEREL (true) olmali.
     expect(s, 'JWT iddialari islem-yerel kurulmuyor').toMatch(/set_config\('request\.jwt\.claims', \$1, true\)/)
