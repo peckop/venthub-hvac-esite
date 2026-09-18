@@ -122,6 +122,35 @@ eksiği ancak **sayarak doğrulama** kapatır (canlı sayım ↔ taban sayımı)
 | 2026-09-15 | `2026-09-15_public_schema.sql` | **TAM** (supabase db dump) | CI iş akışıyla (Yol A) alındı, koşum `34950954930`, 57 sn. 8616 satır / 340 KB. 66 `create table`, 56 PK, 113+11 indeks, 110 FK, 163 politika, 67 fonksiyon, 48 tetik, 379 GRANT. Gölgede **0 hata**, canlıyla **8/8 parite**. Sır taraması yapıldı: 13 imza, **hepsi 0** (depo PUBLIC). |
 | 2026-09-16 | `2026-09-16_public_schema.sql` | **TAM** (supabase db dump) | CI iş akışıyla (Yol A) alındı, koşum `35091853687`. 8910 satır / 344 KB. **57 tablo · 57 PK · 20 unique · 111 FK · 205 indeks · 164 politika · 72 fonksiyon**. Gölgede (`taban_0916`) **7 hata** — hepsi ortam/yetki (extension yalnız `postgres` DB'sinde, `supabase_realtime` publication yok, `secrets` zaten var, `net` şeması `pg_net` üyesi değil), **şema parçası kaybı YOK**. Canlıyla **4/4 parite**: tablo 57=57 · politika 164=164 · indeks 205=205 · FK 111=111. Sır taraması: 13 imza; `service_role` 203 eşleşme ama hepsi **rol ADI** (GRANT/`auth.role()` karşılaştırması), anahtar DEĞİL — önceki tabanda da 195 vardı, aynı sınıf. Diğer 12 imza **0**. |
 | 2026-09-17 | `2026-09-17_public_schema.sql` | **TAM** (supabase db dump) | CI iş akışıyla (Yol A) alındı, koşum `35192173375`. 9595 satır / 351 KB. Canlı sayılar: **57 tablo · 57 PK · 20 unique · 111 FK · 207 indeks · 164 politika** (09-16'ya göre +2 indeks = URUN #1235 pgroonga). **ACİL TAZELEME:** karar 40 onarımı (#1241, migration `20260917064515`) INV-TABAN-TAZE-1'de bloklu, canlı arama ziyaretçide kapalıydı. ⚠İlk döküm #1241'in GRANT'larını içermiyordu. **AYNI GÜN YENİLENDİ** (koşum `35197184207`, #1241 migrate `35195260054` sonrası): 9611 satır, farkı **yalnız +16 GRANT satırı** (8 arama yardımcısı × anon/authenticated), başka satır değişmedi; canlı sayılar aynı; sır taraması 12 imza 0. ⚠Gölge geri yükleme bu turda **KOŞULMADI** (aciliyet); dökümü üreten iş akışı ve biçim 09-16 ile aynı. Sır taraması: 12 imza (JWT, sb_secret, sk_live, sk-ant, AIza, ghp, whsec, re_, parolalı postgres URI, AKIA, xox, özel anahtar) **0**. |
+| 2026-09-18 | `2026-09-18_public_schema.sql` | **TAM** (supabase db dump) | CI iş akışıyla (Yol A) alındı, koşum `35323138737`. 9692 satır / 356 KB. Canlı sayılar: **57 tablo · 57 PK · 20 unique · 111 FK · 207 indeks · 164 politika**. Sebep: iki migration canlıya indi (karar 45 `20260918062422`, karar 43 `20260918063600`) ve `INV-TABAN-TAZE-1` migration'sız bir kod PR'ını (URUN #1259) kırmızı yaktı. Yapı sayıları 09-17 ile **birebir aynı** (68 create table · 58 PK · 188 ADD CONSTRAINT · 118 CREATE INDEX · 164 politika) — şema kaybı YOK; fark yalnız fonksiyon 81→**83** ve GRANT/REVOKE ON FUNCTION 182→187 / 49→51. ⚠**Yeni kör nokta bulundu:** fazladan gelen ikinci fonksiyon `arama_ad_isabeti` idi, yani 09-17 tabanı **aynı gün kendisinden sonra** uygulanan `20260917080416`'yı içermiyordu ve kapı tarih karşılaştırdığı için bunu hiç saymadı (detay aşağıdaki bölümde). Sır taraması 12 imza **0**; `service_role` 216 eşleşme, hepsi rol ADI. ⚠Gölge geri yükleme bu turda KOŞULMADI. |
+
+## ⭐2026-09-18 TAZELEMESİ — VE AYNI GÜN MİGRATION'IN KÖR NOKTASI (REC-351/REC-355)
+
+Tazeleme sebebi: iki migration canlıya indi ve `INV-TABAN-TAZE-1`, **içinde hiç migration
+olmayan** bir kod PR'ını (URUN #1259) kırmızı yaktı — kol üçüncü kez ilgisiz bir PR'ı vurdu.
+Uygulanan iki migration: `20260918062422_aile_blok_notu_temizligi` (karar 45, URUN) ve
+`20260918063600_yetki_dongusu_kesildi` (karar 43, ALTYAPI). İkisi de `public._migration_ledger`
+kaydıyla doğrulandı; tazeleme tek turda ikisini birden kapatır.
+
+⚠**BU TURDA BULUNAN KÖR NOKTA — TARİHE BAKAN KOL AYNI GÜNÜ GÖRMEZ.** Yeni dökümde 09-17
+tabanına göre **iki** fonksiyon fazla çıktı: `is_admin_claim` (beklenen, karar 43) ve
+`arama_ad_isabeti` (BEKLENMEYEN — URUN'un `20260917080416_arama_sirala_ad_isabeti` migration'ı).
+Yani 09-17 tabanı, aynı gün kendisinden **sonra** uygulanan bir migration'ı içermiyordu ve kapı
+bunu hiç saymadı: kol tabanı **dosya adındaki tarihle** karşılaştırıyor, o migration'ın damgası
+da `20260917…`. Sonuç: aynı güne düşen her migration taban için görünmez. Kapı "1 geride" derken
+gerçek fark **2** idi. Bu, kolun kapsam daraltma işine (REC-351 kalıcı kalem) ayrı bir gerekçe
+olarak eklendi; çare ya damga karşılaştırmasını **saate** indirmek ya da tabanı migrate işinin
+sonunda otomatik üretip PR açmaktır.
+
+Ölçümler: **68 create table · 58 PK · 188 ADD CONSTRAINT · 118 CREATE INDEX · 164 politika**
+(09-17 ile birebir aynı — şema parçası kaybı YOK) · fonksiyon 81 → **83** · GRANT ALL ON FUNCTION
+182 → **187** · REVOKE ALL ON FUNCTION 49 → **51** (karar 43'ün EXECUTE daraltması). `user_profiles`
+politika **adları 09-17 ile birebir aynı** (gövdeleri claim-only merciye geçti, adlar korundu).
+Canlı sayılar (iş akışının kendi ölçümü): 57 tablo · 57 PK · 20 unique · 111 FK · 207 indeks ·
+164 politika. Sır taraması 12 imza **0**; `service_role` 216 eşleşme ama hepsi **rol ADI**
+(GRANT / `auth.role()` karşılaştırması), anahtar değil — önceki tabanlarla aynı sınıf.
+⚠Gölge geri yükleme bu turda **KOŞULMADI** (URUN'un PR'ı bloklu); dökümü üreten iş akışı ve biçim
+09-16/09-17 ile aynı.
 
 ## ⭐2026-09-16 TAZELEMESİ — NİÇİN VE FARKI (REC-340 Adım 2 sonrası)
 
