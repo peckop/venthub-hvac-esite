@@ -1,4 +1,8 @@
-import { admin } from './admin/en'
+/**
+ * ⛔ADMIN SÖZLÜĞÜ BURADAN İMPORT EDİLMEZ — gerekçesi `tr.ts` başındaki notta (REC-59 Faz 2).
+ * Kısaca: admin sözlüğü müşteri paketine giriyordu (ölçüldü: 356.040 baytlık parça, ana
+ * sayfa indiriyordu). Artık yalnız admin ekranlarında dinamik import ile yükleniyor.
+ */
 import { tr } from './tr'
 
 export const en: typeof tr = {
@@ -843,7 +847,6 @@ export const en: typeof tr = {
     preInformationTitle: 'Pre-Information Form (Draft)',
     termsTitle: 'Terms of Use (Draft)'
   },
-  admin,
   footer: {
     quickLinks: 'Quick Links',
     categories: 'Categories',
