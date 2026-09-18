@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@wrongstack/codebase-index-mcp": "1.0.19",
+    "@wrongstack/kanban-mcp": "1.0.19",
+    "@wrongstack/mailbox-mcp": "1.0.19",
     "@wrongstack/sage-mcp": "1.0.19"
   }
 }

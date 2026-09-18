@@ -91,6 +91,38 @@ Duraklatılmış bir şerit yeniden açılırken:
 3. Triyaj/audit belgelerinde işin geçmişi kontrol edilir (yapılmış kısmı tekrar yapılmaz).
 4. Şerit, kapanışlarını `Fixes REC-nn` ile Linear'a bağlar.
 
+## 6.1 PİLOT — iş kartı panosu (karar 46, Recep onayı 2026-09-18)
+
+**Kapsam:** bundan sonraki her **yeni ALTYAPI işi** için bir kart açılır. Linear **aynen yaşar**;
+pilot onun yerine geçmez, yanında koşar ve karşılaştırılır. Süre: pilot Recep durdurana kadar.
+
+**Kart biçimi:** başlığın ilk satırı `REC-nn` ile başlar (numara defterden alınır, uydurulmaz).
+Kartın **Done**'a geçmesi için kanıt zorunludur: `gh pr checks <PR>` çıktısı ya da eşdeğeri.
+"Bitti", "tamam", "çalışıyor" gibi tek kelimelik özet **reddedilir** (aracın kendi belirsizlik
+süzgeci de bunları eliyor — ölçüldü).
+
+**Ölçülmüş tuzaklar ve karşılıkları:**
+
+| Tuzak | Ölçüm | Karşılık |
+|---|---|---|
+| İçe aktarılan pano **yönetilen değildir** | Done kanıtsız geçer | Kart panoda **doğrudan** açılır, dışarıdan aktarılmaz |
+| Doğrulayıcının izin listesi **çok dar** | varsayılan `["pwd","true","false","test"]` | `WRONGSTACK_KANBAN_VERIFIER_COMMANDS=+gh` (yalnız `gh`; `+` ekler, yasak listesi her hâlde üstün) |
+| Silme yüzeyi | `--destructive` silme/birleştirme/devretme açar | Pilotta **kapalı**; kayıt yalnız gerekçeyle küçülür |
+| Alt süreç `process.env` **kalıtır** | sırlar çocuk sürece geçer | Doğrulayıcı komutları `gh` ile sınırlı; `curl/wget/npm/node` **yasak listesinde**. Yine de bu bir **azaltma**, sıfırlama değil — kart açıklamasına sır yazılmaz |
+| Proje kimliği **sürücü harfine duyarlı** | `c:\…` → `7e017f`, `C:\…` → `1088d5` | Pano küçük harfli kökle açılır ve kimlik **ölçülür** |
+
+**Mesaj kutusu (mailbox) pilotun parçası DEĞİL — ölçüm bekliyor:** paket kurulu, ama kayıt
+yapılmadı. Sebep: sunucu zorunlu `--actor <id>` istiyor ve `.mcp.json` üç pencerenin paylaştığı
+tek dosyadır; sabit bir actor yazılırsa üç pencere aynı kimlikle konuşur ve mesajlar yanlış
+pencereye düşer. Kayıt, kimlik ölçümünden sonra ayrı adımdır (`INV-WRONGSTACK-MCP-1` bu
+"kayıtlı DEĞİL" hükmünü kolla tutar).
+
+**Pilotun kendi ölçütü:** iki hafta sonra üç sayı karşılaştırılır — (a) kart açılmadan kalan iş
+sayısı, (b) Done'a kanıtsız geçme denemesi sayısı, (c) Linear ile pano arasındaki sapma. Pilot
+"iyi hissettirdi" diye sürdürülmez.
+
+---
+
 ## 7. Bu cetvelin kendi kapıları (uygulama sırası)
 
 | Kapı | Soru | Durum |
