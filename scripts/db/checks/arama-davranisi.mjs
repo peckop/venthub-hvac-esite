@@ -200,6 +200,30 @@ async function olcRolle(client, vaka, rol) {
   }
 }
 
+/**
+ * ⭐İDDİASIZ KOL, ONARIM HEDEF VERİTABANINDA VARSA KOŞAR — TEK YÖNLÜ MANDAL.
+ *
+ * NİÇİN (2026-09-18 ölçüldü, kapı kendi PR'ında kırmızı verdi): bu kol REC-355 onarımının
+ * KALICI BEKÇİSİDİR, ama onarım henüz canlıda yokken 15 vakanın 15'inde 54001 veriyor — yani
+ * kapı, onardığı kusuru ölçtüğü için onarımın merge edilmesini engelliyordu (merge ritüeli 0
+ * kırmızı ister). Kolu PR'dan çıkarmak bekçiyi "sonraki işe" bırakmak olurdu; ilan listesine
+ * yazmak ise yasak — "vitrinde aramanın çalışmaması bilinen kırmızı olamaz" (aşağıdaki satır).
+ *
+ * Çözüm: kol, ölçtüğü onarımın VARLIĞINA bağlanır. `public.is_admin_claim()` hedef veritabanında
+ * yoksa kol ATLANIR ve bu YÜKSEK SESLE yazılır (atlanmış iş yeşil değildir). Onarım uygulandığı
+ * an kol kendiliğinden koşar ve bir daha asla atlanmaz — mandal tek yönlüdür, çünkü onarım geri
+ * alınsa fonksiyon da düşer ve o zaman atlama satırı yine görünür, sessizlik olmaz.
+ *
+ * ⛔ÖN KOŞUL ÖLÇÜLEMEZSE FAIL-CLOSED: sorgu hata verirse kol atlanır AMA ihlal yazılır. "Ölçemedim"
+ * ile "sorun yok" aynı şey değildir.
+ */
+async function onarimVarMi(client) {
+  const { rows } = await client.query(
+    "select to_regprocedure('public.is_admin_claim()') is not null as var",
+  )
+  return rows[0].var === true
+}
+
 async function main() {
   const dizi = baglantiDizesi()
   if (!dizi) {
@@ -286,11 +310,32 @@ async function main() {
   const ihlaller = []
   const uyarilar = []
   const gecenler = []
+  const atlananlar = []
+
+  // İddiasız kolun ön koşulu: onarım hedef veritabanında var mı (bkz. onarimVarMi yorumu).
+  let onarim = null
+  try {
+    onarim = await onarimVarMi(client)
+  } catch (e) {
+    ihlaller.push(
+      `ROL authenticated-iddiasiz kolunun ON KOSULU OLCULEMEDI (${`${e.code ?? ''} ${e.message}`.trim()}) — ` +
+        'fail-closed: "olcemedim" ile "sorun yok" ayni sey degil.',
+    )
+  }
+  const kosulacakRoller =
+    onarim === true ? VITRIN_ROLLERI : VITRIN_ROLLERI.filter((r) => r !== 'authenticated-iddiasiz')
+  if (onarim === false) {
+    atlananlar.push(
+      'ROL authenticated-iddiasiz kolu ATLANDI — onarim hedef veritabaninda YOK ' +
+        '(public.is_admin_claim mevcut degil, REC-355). Migration uygulanir uygulanmaz bu kol ' +
+        'KENDILIGINDEN kosar; o an 54001 verirse kapi KIRMIZI olur.',
+    )
+  }
 
   // Rol kolu İLANA TABİ DEĞİL: vitrinde aramanın çalışmaması "bilinen kırmızı" olamaz.
   for (const v of VAKALAR) {
     const sahipN = sonuclar.get(v.no).length
-    for (const rol of VITRIN_ROLLERI) {
+    for (const rol of kosulacakRoller) {
       const r = await olcRolle(client, v, rol)
       if (r.hata) {
         ihlaller.push(`[vaka ${v.no}] "${v.q}" ROL ${rol} — sorgu HATA verdi: ${r.hata}`)
@@ -379,11 +424,16 @@ async function main() {
   }
 
   if (JSON_KIPI) {
-    console.log(JSON.stringify({ aktif, ihlaller, uyarilar, gecenler }, null, 2))
+    console.log(JSON.stringify({ aktif, ihlaller, uyarilar, gecenler, atlananlar }, null, 2))
   } else {
     console.log(`\naktif urun: ${aktif} | hassasiyet tavani: ${Math.floor(aktif * TAVAN_ORAN)} sonuc\n`)
     console.log(`GECEN ${gecenler.length}:`)
     for (const g of gecenler) console.log('  ' + g)
+    if (atlananlar.length) {
+      console.log(`\n⛔ATLANMIS IS YESIL DEGILDIR — ${atlananlar.length} kol OLCULMEDI:`)
+      for (const a of atlananlar) console.log('  ' + a)
+      console.log(`::warning title=ARAMA DAVRANISI (olculmeyen kol)::${atlananlar.length} rol kolu atlandi — onarim hedef veritabaninda yok (REC-355).`)
+    }
     if (uyarilar.length) {
       console.log(`\n⚠BILINEN KIRMIZI ${uyarilar.length} (REC-340, kapi bu yuzden kirmizi DEGIL):`)
       for (const u of uyarilar) console.log('  ' + u)

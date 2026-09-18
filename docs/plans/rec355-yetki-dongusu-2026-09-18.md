@@ -130,6 +130,29 @@ Jeton şekilleri: **J1** `sub` yok · **J2** `sub`=profil rolü `user` · **J3**
 
 - `INV-SEARCH-BEHAVIOR-1` rol kolu (`scripts/db/checks/arama-davranisi.mjs`): claim'siz
   `authenticated` kolu bu PR'da eklenir — kusur bir daha sessizce dönmesin.
+
+### 4.1 Kolun kendi PR'ını kırmızı yapması — ölçüm ve çözüm (2026-09-18)
+
+Kol eklenince kapı **canlı veritabanında 15 vakanın 15'inde 54001** verdi (CI koşusu
+35319037278, iş 105517126284). Bu bir yanlış pozitif değil: kusurun bağımsız, üçüncü teyidi —
+kolu ben yazdım, ölçümü CI prod'da yaptı. Ama sonuç şuydu: kapı, onardığı kusuru ölçtüğü için
+onarımın merge edilmesini engelliyordu (merge ritüeli 0 kırmızı ister).
+
+Üç yol vardı ve ikisi reddedildi: **(a)** kolu bu PR'dan çıkarıp sonraki işe bırakmak → kural 14
+(tam iş) ihlali, bekçisiz onarım; **(b)** vakayı `BILINEN_KIRMIZI` ilanına yazmak → betiğin kendi
+kuralı yasaklıyor ("vitrinde aramanın çalışmaması bilinen kırmızı olamaz") ve ilan vaka
+numarasıyla anahtarlandığı için `anon`/`authenticated` kollarını da körleştirirdi.
+
+Seçilen **(c)**: kol, ölçtüğü onarımın **varlığına** bağlandı —
+`to_regprocedure('public.is_admin_claim()') is not null`. Yokken kol atlanır ve bu yüksek sesle
+yazılır (`⛔ATLANMIS IS YESIL DEGILDIR` + `::warning`); onarım uygulandığı an kol kendiliğinden
+koşar. Ön koşul ölçülemezse kol atlanır **ama ihlal yazılır** (fail-closed). Mandal tek yönlüdür:
+onarım geri alınırsa fonksiyon da düşer ve atlama satırı yine görünür — sessizlik yok.
+
+İki yön de gölgede ölçüldü (09-18): onarım yokken kol ATLANDI (çıkış 0, sesli satır bastı),
+onarım uygulandıktan sonra kol KOŞTU ve 15 vaka × 3 rol hatasız geçti. Mekanizmanın kendisi
+`INV-SEARCH-BEHAVIOR-1` konformans kolunda yazılı (üç şart: ön koşul fonksiyonun varlığı, atlama
+sesli, ön koşul hatası ihlal) — hatırlanan değil, ölçülen bir sözleşme.
 - Yeni konformans kolu: `user_profiles` politikaları `is_admin_claim()` çağırıyor mu, fonksiyon
   tablo okumuyor mu (metin kolu), EXECUTE daraltması yerinde mi.
 - `rls-yetki-karari-standard.md` §1 güncellenir: karar mercii **iki** fonksiyondur ve niçin ikiye

@@ -41,6 +41,13 @@
 -- `public.is_admin_user()` ile yeniden yaz ve `drop function public.is_admin_claim();`.
 -- Böyle bir geri alma kusuru da geri getirir; sebebi bilinerek yapılır.
 
+-- ⭐ZAMAN AŞIMLARI İŞLEMDEN ÖNCE (INV-MIGRATION-3 / squawk require-lock-timeout, 09-18 kırmızı
+-- verdi): bu dosya `user_profiles` politikalarını DROP/CREATE ediyor ve o iş tablo üzerinde kilit
+-- ister. Kilit beklerse tabloya gelen tüm istekler süresiz durur; zaman aşımı "beklemek" yerine
+-- "hızlı başarısız olmak" demektir — migration kırmızı olur ama vitrin ayakta kalır.
+set lock_timeout = '5s';
+set statement_timeout = '30s';
+
 BEGIN;
 
 -- 1) CLAIM-ONLY YETKİ OKUYUCU — tablo okuması YOK, bu yüzden hiçbir politikadan döngü doğuramaz.
