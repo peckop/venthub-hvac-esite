@@ -66,7 +66,24 @@ function kurulum(geride: number): { ana: string; wt: string; kok: string } {
   return { ana, wt, kok }
 }
 
-describe('INV-ANA-AGAC-TAZE-1 ana ağaç tazeliği', () => {
+/**
+ * ⭐KOL SÜRESİ GENEL SINIRDAN AYRILDI (2026-09-18 ölçüldü, ikinci vaka).
+ *
+ * Bu dosyanın kolları GERÇEK git deposu kuruyor (bare origin + ana ağaç + worktree, commit,
+ * push, fetch). Tek başına koşumda dosyanın tamamı 18 sn; tam konformans paketinde (aynı anda
+ * ~237 dosya + docker yüklü) TEK KOL 34 sn sürdü ve `vitest.config.ts` içindeki genel
+ * `testTimeout: 20000` sınırını aştı → kol KIRMIZI oldu. Aynı gün bir başka kol da (9 kol
+ * içinden bir diğeri) aynı sebeple düşmüştü.
+ *
+ * ⛔GENEL SINIR YÜKSELTİLMEDİ: 20 sn bütün depo için doğru bir sınır ve onu yükseltmek gerçek
+ * bir askıda kalmayı gizler. Süre yalnız GERÇEK GİT İŞİ yapan bu kollara verilir — kardeş
+ * onarımların ikisiyle aynı sınıf: `ana-agac-tazelik.cjs` git zaman aşımı 15→60 sn (#1257) ve
+ * `kanca-defter-tazelik` BÜTÇE kolunda ölçütün en iyi süreye çevrilmesi (#1260).
+ * Kırılgan kapı, kırmızısına bakılmayan kapıdır.
+ */
+const GIT_SURE = 120_000
+
+describe('INV-ANA-AGAC-TAZE-1 ana ağaç tazeliği', { timeout: GIT_SURE }, () => {
   it('worktree içinden ana ağacı bulur ve geride sayısını ağ olmadan ölçer', () => {
     const { ana, wt } = kurulum(3)
     expect(fs.realpathSync(tazelik.anaAgacYolu(wt))).toBe(fs.realpathSync(ana))
