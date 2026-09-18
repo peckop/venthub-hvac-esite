@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { admin } from '../../i18n/dictionaries/admin/tr'
 import { tr } from '../../i18n/dictionaries/tr'
 
 /**
@@ -840,7 +841,22 @@ const KANARYA_AYRACLI = [
 
 describe('INV-6: sözlükte tüketicisi olmayan anahtar bırakılmaz', () => {
   const tarama = tara()
-  const yapraklar = leafKeys(tr)
+  /**
+   * ⭐EVREN İKİ SÖZLÜKTEN KURULUR — 2026-09-18, REC-59 Faz 2.
+   *
+   * Admin sözlüğü vitrin paketinden çıkarıldı (müşteri sayfaları 144.244 bayt küçüldü,
+   * URUN ölçtü). Doğru iş; ama bu kapı evrenini yalnız `tr`den kuruyordu ve admin oradan
+   * ayrılınca taranan anahtar sayısı 3000+'dan 2364'e düştü: 314 `admin.*` anahtarı
+   * "artık ölü değil" göründü. **Ölü olup olmadıkları DEĞİŞMEDİ — yalnız ölçülmez oldular.**
+   *
+   * ⛔ÇÖZÜM BORÇ LİSTESİNİ BUDAMAK DEĞİLDİR. 314 satırı silmek borcu azaltmaz, ölçümü
+   * bırakır: kapsam kaybını borç azalması gibi gösterir. Evren geri getirilir.
+   *
+   * `Set` ZORUNLU: Faz 2 inene kadar `tr` admin'i hâlâ statik taşıyor, iki kaynak aynı
+   * anahtarı verir. Tekilleştirme, bu kapının Faz 2'den ÖNCE de SONRA da aynı cevabı
+   * vermesini sağlar — iki şerit birbirini beklemez.
+   */
+  const yapraklar = Array.from(new Set([...leafKeys(tr), ...leafKeys(admin, 'admin')]))
 
   it('KAPSAM KANARYASI: tarama gerçekten bir şeye baktı', () => {
     // "0 ihlal" cümlesi, ancak tarama gerçekten çalıştıysa bilgi taşır. Glob bozulur ya da

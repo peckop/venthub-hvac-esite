@@ -136,6 +136,12 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/board-release.cjs\"",
             "statusMessage": "board-release"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-yedek-oturum-sonu.cjs\"",
+            "statusMessage": "sage-yedek",
+            "timeout": 30
           }
         ]
       }

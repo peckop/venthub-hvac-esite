@@ -26,11 +26,20 @@ try {
   const dosya = girdi?.tool_input?.file_path
   if (typeof dosya !== 'string' || !dosya) process.exit(0)
 
-  // Sage verisi PROJENİN İÇİNDE (ana ağaç) yaşar; worktree'de yoktur. Kancalar da ana
-  // ağaçtan yüklenir, bu yüzden CLAUDE_PROJECT_DIR doğru kök.
-  const kok = process.env.CLAUDE_PROJECT_DIR || path.resolve(__dirname, '..', '..')
+  /**
+   * ⛔İKİ AYRI KÖK — eşitlemek sessiz körlüktü (2026-09-18 ölçüldü).
+   *   dbKok : sage.db yalnız ANA AĞAÇTA vardır (`.wrongstack/` worktree'de hiç yoktur).
+   *   kok   : çapa yolu DOSYANIN kendi ağacına göredir; worktree dosyasını ana ağaca göre
+   *           ölçmek `..` ile başlayan bir yol üretiyor, `goreliYol` null dönüyor ve ders
+   *           satırı sebebi yazılmadan BOŞ çıkıyordu (aynı dosya: ana ağaçta 1751 karakter,
+   *           worktree'de 0).
+   */
+  const tamYol = path.resolve(dosya)
+  const { anaKok, agacKoku } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs'))
+  const dbKok = anaKok()
+  const kok = agacKoku(path.dirname(tamYol))
   const { satir } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'sage-dosya-dersi.cjs'))
-  const metin = satir({ kok, dosya: path.resolve(dosya), oturum: girdi.session_id })
+  const metin = satir({ kok, dbKok, dosya: tamYol, oturum: girdi.session_id })
   if (!metin) process.exit(0)
 
   process.stdout.write(

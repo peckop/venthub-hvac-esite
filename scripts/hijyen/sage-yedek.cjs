@@ -34,11 +34,18 @@
 const fs = require('fs')
 const path = require('path')
 
+const { anaKok } = require('./ana-kok.cjs')
+
 /** Kaç yedek tutulur (en yenileri). Eski olanlar silinir — sonsuz büyüme de bir arızadır. */
 const TUTULACAK = 14
 
+/**
+ * ⛔KÖK = ANA AĞAÇ, `cwd` DEĞİL. Ölçüldü 2026-09-18: worktree'den koşulunca eski kök çözümü
+ * kendi kopyasına bakıyor, orada `.wrongstack` hiç yok, betik "sage kurulu degil" deyip
+ * ÇIKIŞ 0 ile dönüyordu. Oturum kapanışı kancasına bağlansa yedek HİÇ alınmaz, başarılı görünürdü.
+ */
 function kok() {
-  return process.env.CLAUDE_PROJECT_DIR || path.resolve(__dirname, '..', '..')
+  return anaKok()
 }
 
 function kaynakYolu(k = kok()) {
@@ -194,7 +201,28 @@ function liste(dizin = yedekDizini()) {
   }
 }
 
-module.exports = { TUTULACAK, kaynakYolu, yedekDizini, parmakIzi, yedekAl, budama, liste, damga }
+/**
+ * "Yedeğim ne kadar eski" sorusunun TEK cevabı — istem satırı ve oturum kancası bunu okur.
+ *
+ * ⛔`.DOGRULANMADI` dosyaları YEDEK SAYILMAZ: onlar bir koşumun düştüğünün kanıtıdır.
+ * Doğrulanmamış bir dosyayı "son yedek" saymak, kaybı taze gösterir.
+ *
+ * @returns {{sonYedek: string|null, gun: number|null, dogrulanmadi: string[], adet: number}}
+ */
+function sonDurum(dizin = yedekDizini(), simdi = Date.now()) {
+  const hepsi = liste(dizin)
+  const saglam = hepsi.filter((y) => /^sage-.*\.db$/.test(y.ad))
+  const dogrulanmadi = hepsi.filter((y) => y.ad.endsWith('.DOGRULANMADI')).map((y) => y.ad)
+  const son = saglam.length ? saglam[saglam.length - 1] : null
+  return {
+    sonYedek: son ? son.tarih : null,
+    gun: son ? Math.floor((simdi - Date.parse(son.tarih)) / 86_400_000) : null,
+    dogrulanmadi,
+    adet: saglam.length,
+  }
+}
+
+module.exports = { TUTULACAK, kaynakYolu, yedekDizini, parmakIzi, yedekAl, budama, liste, damga, sonDurum }
 
 if (require.main === module) {
   if (process.argv.includes('--liste')) {
@@ -212,8 +240,19 @@ if (require.main === module) {
     process.exit(0)
   }
   if (s.durum === 'kaynak-yok') {
-    process.stdout.write(`sage-yedek: KAYNAK YOK (${s.sebep}) — bu makinede sage kurulu degil, yedek ALINMADI\n`)
-    process.exit(0)
+    /**
+     * ⛔SESSIZ ATLAMA YOK. Eskiden burada çıkış 0 vardı ve "yedek alınmadı" cümlesi başarı
+     * gibi okunuyordu. Ölçülen arıza: worktree'den koşumda kaynak HER ZAMAN bulunamıyordu.
+     * Artık kök ana ağaca bağlı; orada da yoksa bu ya gerçek bir kayıptır ya da sage bu
+     * makinede hiç kurulmamıştır — ikisi de "yedeğim var" demenin karşıtıdır, kırmızıdır.
+     */
+    process.stderr.write(
+      `sage-yedek: ⛔KAYNAK YOK — yedek ALINMADI (bu satir BASARI DEGILDIR)\n` +
+        `  aranan   : ${s.sebep}\n` +
+        `  ana agac : ${kok()}  (git --git-common-dir ile cozuldu)\n` +
+        `  sage bu makinede kurulu degilse beklenen durumdur; kuruluysa KAYIP sinyalidir.\n`,
+    )
+    process.exit(2)
   }
   process.stderr.write(`sage-yedek: ${s.durum.toUpperCase()} — ${s.sebep}\n`)
   process.exit(1)
