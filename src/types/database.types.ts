@@ -4462,6 +4462,7 @@ export type Database = {
         Returns: undefined
       }
       is_admin: { Args: never; Returns: boolean }
+      is_admin_claim: { Args: never; Returns: boolean }
       is_admin_user: { Args: never; Returns: boolean }
       is_staff_user: { Args: never; Returns: boolean }
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
