@@ -10,33 +10,47 @@
 --
 -- EVREN (olculdu): 38 aile / 274 blok-madde parcasi. Uc bagimsiz salt-okuma alt ajani her parcayi
 --   kaynak dizinine (sayfalar.jsonl) karsi dogruladi; PDF acilmadi. Siniflama:
---     TEMIZ                                      38 aile / 215 parca  -> dokunulmaz
---     not parcasi cikar (cumle kalir)            15 aile /  32 parca  -> CIKAR
---     metnin tamami not (blok anahtari kalkar)    3 aile /   5 parca  -> CIKAR
---     not cikinca cumle oznesiz kaliyor           2 aile /   2 parca  -> CIKAR (minimum yeniden yazim)
---     yalniz `---` / bos `>` artigi              14 aile /  16 parca  -> KALIR (bicim, dokunulmaz)
+--     TEMIZ (bu desen 0 eslesme verdi)           38 aile / 215 parca  -> dokunulmaz
+--     not parcasi cikar (cumle kalir)            14 aile /  31 parca  -> CIKAR
+--     metnin tamami not (blok anahtari kalkar)    4 aile /   7 parca  -> CIKAR
+--     not cikinca cumle oznesiz kaliyor           1 aile /   1 parca  -> CIKAR (minimum yeniden yazim)
+--     bicim artigi / mesru blockquote            14 aile /  16 parca  -> KALIR (dokunulmaz)
 --     yapi hatasi (Kontrol icerigi Koruma'da)     3 aile /   3 parca  -> AYRI LISTE (i)
 --     dogrulanmamis deger (birimsiz olcu)         1 aile /   1 parca  -> AYRI LISTE (ii)
---   Bu dosya yalniz CIKAR satirlarini uygular: 39 oge / 17 aile.
+--   Bu dosya yalniz CIKAR satirlarini uygular: 39 oge / 17 aile (7'sinde blok anahtari kalkar).
+--   ⚠"TEMIZ" = "bu desende 0 eslesme", "her turlu editor izinden arindi" DEGIL: bagimsiz curutucu
+--   215 parcanin 11'inde POZITIF kaynak atfi buldu ("TR kaynak ... olarak listeler", "esleme
+--   tabloda verilir" gibi). Bunlar K2 tanimiyla "kendine dusulen not" olmadigi icin 45 kapsamina
+--   girmiyor; REC-206 ayri listesine yazildilar.
 --
 -- KAPSAM SINIRI: 45 = YALNIZ ic editor notu cikarma. Yapi hatasi, dogrulanmamis teknik deger ve
 --   anlati cumlelerinin dogruluk duzeltmeleri KAPSAM DISI ve REC-206'da ayri liste olarak durur
 --   (nicotra adh/rdh govde-eki yorumu, storm-serisi guc araligi, fc51 model kodu vb.).
---   `---` ve bos `>` isaretleri BICIMDIR: guard 3c bu 16 ogenin md5'inin DEGISMEDIGINI dogrular.
+--   `---` ve bos `>` BICIMDIR; iki `> *...*` ogesi ise bicim DEGIL ama icerigi de not degil
+--   (biri urun bilgisi, biri katalog serhi) -> ikisi de guard 3b'de ADIYLA muaf.
+--   Guard 3c dokunulmamasi gereken 20 ogenin md5'inin DEGISMEDIGINI dogrular.
 --
--- IKI YENIDEN YAZIM - kaynak dizininden dogrulandi:
+-- BIR YENIDEN YAZIM - kaynak dizininden dogrulandi:
 --   * vortice-deumido-range / bloklar_tr.Motor
 --     "220-240 V besleme, 260 W (NG 10) ile 500 W (NG 20) arasinda guc"
 --     kanit: markalar/vortice/konut-fanlari/deumido-range/01-input/
 --            Doc_Pubblicita_Air_treatment_Deumido_Range_1.pdf
---            s.7 -> "26020 DEUMIDO NG 10 ... 220 - 240 [V] 260 [W]"
---            s.9 -> "26022 DEUMIDO NG 20 ... 220 - 240 [V] 500 [W]" (NG 16 = 340 W, aralik ici)
---   * vortice-vortice-bravo-s / bloklar_tr.Motor -> "BRA.VO S bir sensordur; motor icermez."
---     kanit: markalar/vortice/isi-geri-kazanim/01-input/vort-hr-w-all-100-df.pdf s.12
---            -> "BRA.VO S1 Wireless remote sensor for monitoring temperature, relative humidity
---                and VOC concentration in the target room"
---            markalar/vortice/konut-fanlari/brochures/01-input/vortice-brochure-radon-en.pdf s.40
---            -> "Compatible with BRA.VO S, an air quality meter"
+--            s.7 satiri -> "26020 / DEUMIDO NG 10 / 10 / 220 - 240 / 260 / 1,3"
+--            s.9 satiri -> "26022 / DEUMIDO NG 20 / 20 / 220 - 240 / 500 / 2,4"
+--            (birimler baslik satirinda: "V - 50 Hz", "W", "A". NG 16 = 340 W, aralik ici;
+--             s.4 aileyi "3 models" ilan ediyor, dizinde baska NG boyu yok.)
+--
+-- ⭐IKINCI YENIDEN YAZIM GERI CEKILDI (bagimsiz curutucu, 2026-09-18): vortice-vortice-bravo-s
+--   icin "BRA.VO S bir sensordur; motor icermez." yazilacakti. "Sensordur" kismi destekli
+--   (vort-hr-w-all-100-df.pdf s.12 "BRA.VO S1 Wireless remote sensor for monitoring temperature,
+--   relative humidity and VOC concentration"; vortice-brochure-radon-en.pdf s.40 "an air quality
+--   meter") ama "MOTOR ICERMEZ" kismi kaynakta YOK - dizinin tamaminda BRA.VO ile iliskili hicbir
+--   fan/motor/guc verisi gecmiyor. Kaynak cihazin NE YAPTIGINI soyluyor, NE ICERMEDIGINI
+--   soylemiyor; kanit SESSIZLIKTIR ve sessizlik kanit degildir. Ayni kusur Cark blogunda birakilan
+--   "hava hareket ettirmez" cumlesinde de vardi.
+--   KARAR: bravo-s'in Cark ve Motor anahtarlarinin IKISI DE kalkar (CIKAR_ANAHTAR). Dayanak
+--   cetvel K4 - kaynak bu aile icin cark/motor verisi vermiyorsa o blok hic yazilmaz. Boylece
+--   dogrulanmamis olumsuz iddia da vitrine gitmez.
 --
 -- ELLE DEGISIKLIK KAPISI (42 yontemi, 39 ogeye uyarlandi): aile basina tek md5 yerine "maske md5"
 --   kullanilir = description'dan bu dosyanin dokundugu yollar CIKARILDIKTAN sonra kalan jsonb'nin
@@ -408,7 +422,7 @@ declare
    "Çark"
   ],
   "eski": "— **bu ürün tipi için geçersiz.** BRA.VO S bir sensördür; hava hareket ettirmez.",
-  "yeni": "BRA.VO S bir sensördür; hava hareket ettirmez."
+  "yeni": null
  },
  {
   "slug": "vortice-vortice-bravo-s",
@@ -417,7 +431,7 @@ declare
    "Motor"
   ],
   "eski": "— **bu ürün tipi için geçersiz.** Aynı sebep.",
-  "yeni": "BRA.VO S bir sensördür; motor içermez."
+  "yeni": null
  }
 ]$plan$::jsonb;
   v_maske jsonb := $maske${
@@ -459,6 +473,24 @@ begin
     raise exception 'K45: planda maske karsiligi olmayan aile var - dosya bozulmus';
   end if;
 
+  -- ⭐DIZI INDEKSI ON KOSULU, YAZILI DEGIL KAPIYA BAGLI (bagimsiz curutucu 2026-09-18).
+  -- Asagidaki maske dongusu yollari `#-` ile SIRAYLA cikariyor. Bir jsonb DIZISINDEN eleman
+  -- cikarmak kalan elemanlarin indeksini KAYDIRIR, bu yuzden ayni ailede birden cok dizi yolu
+  -- olursa cikarma SIRASI sonucu degistirir. Canlida olculdu:
+  --   '{"a":["x","y","z"]}' #- '{a,0}' #- '{a,2}'  ->  {"a":["y","z"]}
+  --   '{"a":["x","y","z"]}' #- '{a,2}' #- '{a,0}'  ->  {"a":["y"]}
+  -- Bugunku planda ihlal YOK (iki dizi yolu var, AYRI ailelerde) ama 40. oge eklendiginde
+  -- sessizce yanlis eleman silinirdi. Bu yuzden hal bir ON KOSUL olarak yazilmakla kalmiyor,
+  -- kapiya baglaniyor: ayni ailede ikinci bir dizi yolu dogarsa dosya DURUR.
+  if exists (
+    select 1 from jsonb_array_elements(v_plan) p
+     where (p.value->'yol'->>0) = 'maddeler_tr'
+     group by p.value->>'slug'
+    having count(*) > 1
+  ) then
+    raise exception 'K45: bir ailede birden cok dizi (maddeler_tr) yolu var - `#-` indeks kaydirmasi yuzunden cikarma sirasi sonucu degistirir. Plan ya aile basina tek dizi yoluna indirilir ya da yollar indekse gore AZALAN sirada cikarilacak sekilde dosya degistirilir. YAZILMADI';
+  end if;
+
   for r in select key as slug, value #>> '{}' as beklenen from jsonb_each(v_maske) loop
     select count(*) into v_adet from public.product_families where slug = r.slug;
     if v_adet = 0 then
@@ -473,7 +505,10 @@ begin
     select description into v_desc from public.product_families where slug = r.slug;
     for r2 in select p.value->'yol' as yol from jsonb_array_elements(v_plan) p
                where p.value->>'slug' = r.slug loop
-      v_desc := v_desc #- (select array_agg(t) from jsonb_array_elements_text(r2.yol) e(t));
+      -- array_agg SIRA GARANTISI VERMEZ: yol parcalari ters gelirse `#-` bambaska bir sey
+      -- cikarir. `with ordinality` + ORDER BY ile sira sabitlenir.
+      v_desc := v_desc #- (select array_agg(t order by o)
+                             from jsonb_array_elements_text(r2.yol) with ordinality as e(t, o));
     end loop;
 
     if md5(v_desc::text) <> r.beklenen then
@@ -831,7 +866,7 @@ declare
    "Çark"
   ],
   "eski": "— **bu ürün tipi için geçersiz.** BRA.VO S bir sensördür; hava hareket ettirmez.",
-  "yeni": "BRA.VO S bir sensördür; hava hareket ettirmez."
+  "yeni": null
  },
  {
   "slug": "vortice-vortice-bravo-s",
@@ -840,7 +875,7 @@ declare
    "Motor"
   ],
   "eski": "— **bu ürün tipi için geçersiz.** Aynı sebep.",
-  "yeni": "BRA.VO S bir sensördür; motor içermez."
+  "yeni": null
  }
 ]$plan$::jsonb;
   r         record;
@@ -857,7 +892,8 @@ begin
       continue;
     end if;
 
-    v_yol := (select array_agg(t) from jsonb_array_elements_text(r.o->'yol') e(t));
+    v_yol := (select array_agg(t order by o)
+                from jsonb_array_elements_text(r.o->'yol') with ordinality as e(t, o));
     select description #>> v_yol into v_simdiki
       from public.product_families where slug = r.o->>'slug';
 
@@ -904,16 +940,27 @@ declare
   --     "Isitici ac/kapa komutu bu ailede YOKTUR - o islev yalniz AIR DOOR H modelleri icindir"
   --     cumlesi URUN BILGISIDIR (kaynagin eksigi degil, urunun ozelligi) ve musteriye anlamlidir
   --     -> KALIR. Bu yuzden YOKTUR yalniz kaynak/katalog gondermesiyle birlikte yakalanir.
+  --     (Kaynak dogrulamasi: Air_Conditioning_Air_Door_2.pdf s.6 "Heating elements switch On/Off
+  --      (AIR DOOR H models only)"; s.7 tablosunda isitmasiz dort modelde Heating Power bos.)
   --   * "kaynak" kelimesi musteriye anlamli oldugunda (isi kaynagi, kaynak islemi) yakalanmaz;
   --     desen "kaynakta/katalogda + eksiklik fiili" kalibini arar.
+  --
+  -- ⭐`> *` KOLU BAGIMSIZ CURUTUCUNUN BULGUSUYLA EKLENDI (2026-09-18): desen kendi pozitif
+  -- kumesinin %10'unu kaciriyordu - plandaki 39 ogenin 4'unu gormuyordu, cunku blockquote-italik
+  -- not bicimi (`> *...*`) desende hic karsiligi yoktu (`\*\(` parantez-yildiz arar, `> *` degil).
+  -- Curutucu bunu dogrudan kanitladi: silinen notun birebir biciminde bir metni baska bir parcaya
+  -- yazdi, guard KIPIRDAMADI ve migration COMMIT etti. Iki mesru `> *` ogesi (hava-perdesi Kontrol
+  -- urun bilgisi, lineo Govde katalog serhi) bu yuzden ADIYLA muaf listesindedir ve md5'leri
+  -- guard 3c'de olculur - muafiyet kor nokta degil, olculen istisnadir.
   v_desen constant text :=
     '\*\(|\(\*|\[MANIFEST\]|\[DB\]|\[s\.\s*[0-9]|\mTODO\M'
+    '|\>\s*\*'
     '|[Kk]aynakta yok|[Bb]u ürün tipi için geçersiz'
     '|[Kk]aynakta[^.]{0,80}YOKTUR|[Kk]atalo[^.]{0,80}YOKTUR|bilgisi \*\*YOKTUR\*\*'
     '|boş bırakıldı|tutarsızlık notu|[Bb]kz\. yukarı|kaynak başlığı|asıl bloğu|o kısım boş'
     '|birim yazmıyor|doğrulanmalı|tabloda yer almaz'
     '|[Kk]aynakta [^.]{0,80}(verilmem|anlatılm|yazm|açıklan|belirtilmem|bulunmaz)';
-  v_muaf constant text[] := array['danfoss-fc101|bloklar_tr.Koruma', 'danfoss-fc102|bloklar_tr.Koruma', 'danfoss-fc51|bloklar_tr.Koruma', 'vortice-vort-industrial-ventilation-roof|bloklar_tr.Gövde'];
+  v_muaf constant text[] := array['danfoss-fc101|bloklar_tr.Koruma', 'danfoss-fc102|bloklar_tr.Koruma', 'danfoss-fc51|bloklar_tr.Koruma', 'vortice-vort-industrial-ventilation-roof|bloklar_tr.Gövde', 'vortice-hava-perdesi|bloklar_tr.Kontrol', 'vortice-lineo|bloklar_tr.Gövde'];
   v_dokunma jsonb := $dokunma$[
  {
   "slug": "vortice-hava-perdesi",
@@ -1084,7 +1131,10 @@ declare
   v_md5   text;
   v_bozuk int := 0;
 begin
-  -- 3a) Vitrinde CIZILEN alanlarda (karar 42 evreni) not deseni hala 0 olmali.
+  -- 3a) Vitrinde CIZILEN alanlarda not deseni hala 0 olmali.
+  --     ⭐`products.description_i18n` KOLU GERI EKLENDI (curutucu bulgusu): karar 42'nin guard'i
+  --     SEKIZ alan olcuyordu, bu dosyanin ilk hali ALTIYA dusmustu ve urun aciklamalari kapi
+  --     disinda kalmisti - oysa cetvel K1 onlari "CIZILIYOR" sayiyor. Kapi daralmasi sessizdi.
   select count(*), min(k) into v_kalan, v_ornek
     from (
       select f.slug || ':' || a.alan as k, a.metin
@@ -1098,13 +1148,23 @@ begin
           ('meta_description.en', f.meta_description->>'en')
         ) as a(alan, metin)
        where f.deleted_at is null
+      union all
+      select p.sku || ':' || a.alan, a.metin
+        from public.products p
+        cross join lateral (values
+          ('description_i18n.tr', p.description_i18n->>'tr'),
+          ('description_i18n.en', p.description_i18n->>'en')
+        ) as a(alan, metin)
+       where p.deleted_at is null
     ) x
    where x.metin ~ v_desen;
   if v_kalan > 0 then
     raise exception 'K45 GUARD 3a: vitrinde cizilen aile metninde % editor notu var (ilk: %)', v_kalan, v_ornek;
   end if;
 
-  -- 3b) bloklar_tr + maddeler_tr: hazirlik notu yalniz AYRI LISTE'ye alinan 4 ogede kalabilir.
+  -- 3b) bloklar_tr + maddeler_tr: desen yalniz ADIYLA muaf 6 ogede eslesebilir (4'u ayri listede,
+  --     2'si mesru `> *...*`). Muafiyet kor nokta DEGIL: alti ogenin de md5'i guard 3c'de olculur,
+  --     yani iclerinde yeni bir not dogarsa 3c kirmizi yanar.
   select count(*), min(k) into v_kalan, v_ornek
     from (
       select f.slug || '|bloklar_tr.' || e.k as k, e.v #>> '{}' as metin
@@ -1133,7 +1193,8 @@ begin
     if v_var = 0 then
       continue;  -- bos veritabani / golge
     end if;
-    v_yol := (select array_agg(t) from jsonb_array_elements_text(r.yol) e(t));
+    v_yol := (select array_agg(t order by o)
+                from jsonb_array_elements_text(r.yol) with ordinality as e(t, o));
     select md5(description #>> v_yol) into v_md5
       from public.product_families where slug = r.slug;
     if v_md5 is null or v_md5 <> r.md5 then
@@ -1146,7 +1207,7 @@ begin
     raise exception 'K45 GUARD 3c: dokunulmamasi gereken % oge degismis - ayrintilar yukaridaki uyarilarda', v_bozuk;
   end if;
 
-  raise notice 'K45 GUARD GECTI: vitrin metni 0 not - blok/madde metninde muaf 4 oge disinda 0 not - dokunulmayan 20 oge birebir.';
+  raise notice 'K45 GUARD GECTI: vitrin metni (aile 6 alan + urun 2 alan) 0 not - blok/madde metninde muaf 6 oge disinda 0 eslesme - dokunulmayan 20 oge md5 birebir.';
 end;
 $$;
 
