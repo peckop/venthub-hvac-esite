@@ -33,13 +33,11 @@ const require_ = createRequire(import.meta.url)
 const modul = require_(MODUL_YOLU) as {
   CAPA_GUCU: Record<string, number>
   ASGARI_ONEM: number
-  ASGARI_PUAN: number
   EN_FAZLA_DERS: number
-  DERS_KARAKTER: number
-  TOPLAM_BAYT: number
+  TOPLAM_KARAKTER: number
   BUTCE_MS: number
   capaGucu: (a: unknown[], g: string) => number
-  kisalt: (m: string, s?: number) => string
+  tekSatir: (m: string) => string
   bicimlendir: (g: string, d: { kind: string; metin: string; puan: number }[]) => string
   yolAdaylari: (g: string) => string[]
 }
@@ -84,8 +82,13 @@ function depoKur(): string {
   ekle('m-dosya', 'DOSYA DERSI: bu dosyada tek is soylenir.', 'bug_root_cause', 0.9, [
     { type: 'file', path: 'src/lib/hedef.ts' },
   ])
-  ekle('m-dizin', 'DIZIN DERSI: onemi dusuk, esigi gecmemeli.', 'command_note', 0.6, [
+  // Dizin çapası: önem 0.6 ≥ 0.5 → GÖRÜNÜR. (0.72 puan eşiği alınmadı; sebebi modül başlığında.)
+  ekle('m-dizin', 'DIZIN DERSI: dizin capasi da gorunur.', 'command_note', 0.6, [
     { type: 'directory', path: 'src/lib' },
+  ])
+  // Önem tabanının ALTINDA: tek süzgeç bu ve gerçekten süzmeli.
+  ekle('m-onemsiz', 'ONEMSIZ DERS: taban altinda, gorunmemeli.', 'fact', 0.4, [
+    { type: 'file', path: 'src/lib/hedef.ts' },
   ])
   ekle(
     'm-silinmis',
@@ -129,12 +132,21 @@ describe('INV-SAGE-DERS-1 · capali sage dersi dokunulan dosyada gorunur', () =>
     }
     expect(cikti.hookSpecificOutput.hookEventName, 'olay adi PreToolUse degil').toBe('PreToolUse')
     expect(
-      Buffer.byteLength(cikti.hookSpecificOutput.additionalContext, 'utf8'),
-      'gercek cikti 1 KB tavanini asti',
-    ).toBeLessThanOrEqual(modul.TOPLAM_BAYT)
+      cikti.hookSpecificOutput.additionalContext.length,
+      'gercek cikti karakter tavanini asti',
+    ).toBeLessThanOrEqual(modul.TOPLAM_KARAKTER)
 
-    // Düşük önemli dizin çapası eşiği geçmez; silinmiş kayıt hiç görünmez.
-    expect(birinci.stdout, 'esigi gecmemesi gereken DIZIN dersi basildi').not.toContain('DIZIN DERSI')
+    /**
+     * ⭐DİZİN ÇAPASI DA GÖRÜNÜR: puan eşiği (yukarı akımın 0.72'si) ALINMADI, çünkü bizim
+     * puanımız `çapa gücü × önem` ve o ölçekte dizin çapasının azamisi 0.50 — eşik bütün
+     * dizin çapalı dersleri SESSİZCE silerdi. Tek süzgeç `asgari önem 0.5`.
+     */
+    expect(birinci.stdout, 'dizin capali ders gorunmedi — sessiz daralma geri gelmis').toContain('DIZIN DERSI')
+    // Sıralama puana göre: dosya çapası (0.9×0.9) dizinden (0.5×0.6) ÖNCE gelir.
+    const g = cikti.hookSpecificOutput.additionalContext
+    expect(g.indexOf('DOSYA DERSI'), 'siralama puana gore degil').toBeLessThan(g.indexOf('DIZIN DERSI'))
+    // Önem tabanı ve silinmiş kayıt: ikisi de görünmez.
+    expect(birinci.stdout, 'onem tabaninin ALTINDAKI ders basildi').not.toContain('ONEMSIZ DERS')
     expect(birinci.stdout, 'status=deleted kayit gorundu').not.toContain('SILINMIS DERS')
 
     const ikinci = kancayiKos(kok, pano, 'oturum-a', hedef)
@@ -159,7 +171,9 @@ describe('INV-SAGE-DERS-1 · capali sage dersi dokunulan dosyada gorunur', () =>
   it('CAPASIZ dosyada, BOZUK girdide ve VERITABANI YOKKEN sessiz, cikis 0', () => {
     const kok = depoKur()
     const pano = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-pano-'))
-    const capasiz = kancayiKos(kok, pano, 'oturum-b', path.join(kok, 'src', 'lib', 'baska.ts'))
+    // ⚠ÇAPASIZ dosya, HİÇBİR çapanın altında olmalı: `src/lib/baska.ts` dizin çapasının
+    // İÇİNDEDİR ve ders alması DOĞRUDUR (ilk yazımda bu kol yanlış evreni ölçüyordu).
+    const capasiz = kancayiKos(kok, pano, 'oturum-b', path.join(kok, 'docs', 'capasiz.md'))
     expect(capasiz.kod).toBe(0)
     expect(capasiz.stdout).toBe('')
 
@@ -179,26 +193,40 @@ describe('INV-SAGE-DERS-1 · capali sage dersi dokunulan dosyada gorunur', () =>
     expect(dbsiz.stdout).toBe('')
   })
 
-  it('⭐BUTCE — Recep in sinirlari SAYIYLA yazili ve cikti tavani ASILMAZ', () => {
-    expect(modul.EN_FAZLA_DERS, 'ders sayisi 2 degil').toBe(2)
-    expect(modul.DERS_KARAKTER, 'ders basina ~300 karakter siniri yok').toBe(300)
-    expect(modul.TOPLAM_BAYT, 'toplam 1 KB tavani yok').toBe(1024)
+  it('⭐BUTCE — yukari akim varsayilanlari AYNEN, ders KIRPILMAZ, atlanan ders ADRESIYLE yazilir', () => {
+    // Yukarı akımın ölçülen varsayılanları (tool-call-memory.js, 2026-09-18).
+    expect(modul.EN_FAZLA_DERS, 'DEFAULT_MAX_HINTS (8) alinmamis').toBe(8)
+    expect(modul.TOPLAM_KARAKTER, 'DEFAULT_MAX_CHARS (2800) alinmamis').toBe(2800)
+    expect(modul.ASGARI_ONEM, 'DEFAULT_MIN_IMPORTANCE (0.5) alinmamis').toBe(0.5)
     expect(modul.BUTCE_MS, 'duvar saati butcesi yok').toBeGreaterThan(0)
     expect(modul.BUTCE_MS, 'butce turu kesecek kadar buyuk').toBeLessThanOrEqual(1000)
-    // Yukarı akımın ölçülen varsayılanı korundu (DEFAULT_MIN_IMPORTANCE = 0.5).
-    expect(modul.ASGARI_ONEM).toBe(0.5)
 
-    // Tavan gerçekten uygulanıyor mu: üç uzun ders verildiğinde çıktı 1 KB'ı AŞMAZ.
+    /**
+     * ⛔DERS KIRPILMAZ (Recep 09-18: "sıkıştırmanın kaliteyi düşürme / hatayı artırma riski
+     * varsa Ersin'in yaklaşımını tercih ederim"). Kırpılan ders yanlış ders üretebilir.
+     * `tekSatir` yalnız boşlukları birleştirir — uzunluğu DEĞİŞTİRMEZ.
+     */
     const uzun = 'x'.repeat(5000)
+    expect(modul.tekSatir(uzun).length, 'ders KIRPILMIS — kirpma yasak').toBe(5000)
+    expect(modul.tekSatir('bir\niki\nuc'), 'ders tek satira indirilmiyor').toBe('bir iki uc')
+
+    // Sığmayan ders BÜTÜN atlanır ve kaç ders atlandığı adresiyle yazılır.
     const cikti = modul.bicimlendir('a/b/c.ts', [
-      { kind: 'fact', metin: modul.kisalt(uzun), puan: 0.9 },
-      { kind: 'fact', metin: modul.kisalt(uzun), puan: 0.8 },
-      { kind: 'fact', metin: modul.kisalt(uzun), puan: 0.7 },
+      { kind: 'fact', metin: 'kisa ders bir', puan: 0.9 },
+      { kind: 'fact', metin: modul.tekSatir(uzun), puan: 0.8 },
+      { kind: 'fact', metin: modul.tekSatir(uzun), puan: 0.7 },
     ])
-    expect(Buffer.byteLength(cikti, 'utf8'), 'toplam bayt tavani asildi').toBeLessThanOrEqual(modul.TOPLAM_BAYT)
-    expect(modul.kisalt(uzun).length, 'ders karakter siniri uygulanmiyor').toBeLessThanOrEqual(modul.DERS_KARAKTER)
-    // Ders TEK SATIR olur: çok satırlı blok okunmaz (cetvel kuralı).
-    expect(modul.kisalt('bir\niki\nuc'), 'ders tek satira indirilmiyor').toBe('bir iki uc')
+    expect(cikti, 'ilk kisa ders basilmadi').toContain('kisa ders bir')
+    expect(cikti.length, 'karakter tavani asildi').toBeLessThanOrEqual(modul.TOPLAM_KARAKTER)
+    expect(cikti, 'atlanan ders SAYISI yazilmamis — atlanmis is yesil degildir').toContain('2 ders daha')
+    expect(cikti, 'atlananin ADRESI yazilmamis').toContain('memory_for_file')
+
+    /**
+     * ⚠TEK DERS TAVANDAN BÜYÜKSE YİNE BASILIR: tek dersi de basmayan bir kol, dersi olan
+     * dosyada SESSİZ kalır — bu kancanın onardığı kusurun aynısı olurdu.
+     */
+    const tekBuyuk = modul.bicimlendir('a/b/c.ts', [{ kind: 'fact', metin: modul.tekSatir(uzun), puan: 0.9 }])
+    expect(tekBuyuk, 'tavandan buyuk TEK ders sessizce dusuruldu').toContain('xxxx')
   })
 
   it('⭐PUANLAMA — capa gucu OLCULEN degerlerle ayni, TANIMSIZ capa tipi puan ALMAZ', () => {
