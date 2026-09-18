@@ -48,8 +48,8 @@ biçimleri (2026-09-17/18, 38 aile / 274 parça):
 | 6 | Taslak içi çapraz atıf | `FC101 ile aynı gerekçe`, `Aynı sebep.` |
 | 7 | Doğrulama hatırlatması | `Vitrine yazılmadan önce doğrulanmalı.` |
 | 8 | Kalan iş işareti | `TODO` |
-
 | 9 | Blockquote-italik not | `> *DB'deki bugünkü metin V0 sınıfını gövdeye atfediyor…*` |
+| 10 | Tek-yıldız italik eksiklik notu | `*Kaynakta ayrı bir motor tanımı YOK* — föy … vermez.` |
 
 **Kapı deseni** — bugün yalnız **veri onarımı migration'larının guard'larında** kullanılır:
 
@@ -58,6 +58,8 @@ biçimleri (2026-09-17/18, 38 aile / 274 parça):
 |\>\s*\*
 |[Kk]aynakta yok|[Bb]u ürün tipi için geçersiz
 |[Kk]aynakta[^.]{0,80}YOKTUR|[Kk]atalo[^.]{0,80}YOKTUR|bilgisi \*\*YOKTUR\*\*
+|[Kk]aynakta[^.]{0,80}\mYOK\M
+|([Kk]aynak|[Kk]atalo|[Ff]iyat listesi|[Ff]öy)[^.]{0,80}(vermez|vermiyor|yazmaz|belirtmez|anlatmaz)
 |boş bırakıldı|tutarsızlık notu|[Bb]kz\. yukarı|kaynak başlığı|asıl bloğu|o kısım boş
 |birim yazmıyor|doğrulanmalı|tabloda yer almaz
 |[Kk]aynakta [^.]{0,80}(verilmem|anlatılm|yazm|açıklan|belirtilmem|bulunmaz)
@@ -65,15 +67,35 @@ biçimleri (2026-09-17/18, 38 aile / 274 parça):
 
 ⛔**YAZMA ANINDAKİ KAPI BU DESENİ KULLANMIYOR — ölçüldü, cetvelin ilk hâli yanlış söylüyordu.**
 [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) yalnız **atıf biçimlerini**
-arıyor (`[s.NN]`, `[DB]`, `Kaynak s.NN`); yukarıdaki dokuz biçimin sekizi oradan sessizce geçer.
+arıyor (`[s.NN]`, `[DB]`, `Kaynak s.NN`); yukarıdaki on biçimin dokuzu oradan sessizce geçer.
 Karar 42 migration'ı bunu kendi yorumunda zaten yazıyordu. Deseni KAPI 5'e genişletmek
 **ALTYAPI şeridinin borcudur** (dosya o şeritte), K8 tablosunda adıyla duruyor.
 
-⚠**`> *` kolu sonradan eklendi ve niçin eklendiği ölçümdür.** İlk hâlinde desen kendi pozitif
-kümesinin %10'unu kaçırıyordu: karar 45 planındaki 39 parçanın 4'ünü görmüyordu, çünkü
-blockquote-italik biçimin karşılığı yoktu (`\*\(` parantez-yıldız arar, `> *` değil). Bağımsız
-çürütücü bunu doğrudan kanıtladı — silinen notun birebir biçimini başka bir parçaya yazdı, guard
-kıpırdamadı, migration COMMIT etti. Kol eklendikten sonra aynı kurulum çıkış 3 veriyor.
+⚠**Desen iki turda ölçülerek genişletildi ve ilk teşhis yarım doğruydu.** İlk hâlinde desen kendi
+pozitif kümesinin %10'unu kaçırıyordu: karar 45 planındaki 39 parçanın 4'ünü görmüyordu. Birinci
+tur bunu tek sebebe bağladı (`> *` biçimi); ikinci tur sebebin **üç** olduğunu ölçtü:
+
+| Kaçak | Sebep | Sonuç |
+|---|---|---|
+| 2 parça | blockquote-italik biçim (`> *…*`) | `\>\s*\*` kolu eklendi |
+| 1 parça (`deumido` Motor) | `>` olmadan tek-yıldız italik · `YOKTUR` değil çıplak `YOK` · alternasyonda `verilmem` vardı ama `vermez` yoktu | iki kol eklendi |
+| 1 parça (`nicotra-dd` madde) | kaynak-belgesi yorumu ("Fiyat listesi ikiye ayırır: …") | **bilinçli olarak kapsam dışı** |
+
+Son satırın gerekçesi: aynı kalıp "temiz" sayılan 215 parçanın **13'ünde** var (pozitif kaynak
+atfı) ve onlar K2 tanımıyla iç not değil. Kol eklenirse guard 13 meşru parçada yanlış kırmızı
+verir. O parça karar 45 planında elle listeli olduğu için temizlendi; sınıfın tamamı REC-206 ayrı
+listesinde. **Desenin bu sınıfı görmediği yazılıdır** — bir kapının görmediği şeyi yazmak, onu
+görüyormuş gibi bırakmaktan iyidir.
+
+Körlüğün kanıtı doğrudan alındı: bağımsız çürütücü silinen notun birebir biçimini başka bir parçaya
+yazdı, guard kıpırdamadı, migration COMMIT etti. Kol eklendikten sonra aynı kurulum çıkış 3 veriyor.
+
+⚠**`\>\s*\*` kolunun bedeli yazılır:** kol geniştir, blockquote+vurgu yapısının tamamını yakalar ve
+not olup olmadığına bakmaz. Bugün iki meşru parça (K3'te adları yazılı) yalnız **elle yazılmış muaf
+listesi** sayesinde geçiyor. Yani yarın yazılacak her meşru `> **…**` bloğu, biri muaf listesine
+satır eklemeden yanlış kırmızı verecek. Bugün karşılanmamış yanlış pozitif 0, ama liste her meşru
+blokla elle büyüyorsa bu bir borçtur: muafiyeti "kaynak/katalog göndermesi içermeyen blockquote"
+kuralına bağlamak (K5 ayrımını desene taşımak) o borcu kapatır ve ayrı iştir.
 
 ## K3 — Biçim işareti not DEĞİLDİR, dokunulmaz
 
@@ -82,13 +104,23 @@ Karar 45'te 14 ailenin 16 parçası bu yüzden dokunulmadan bırakıldı; migrat
 **dokunulmaması gereken 20 parçanın** (bu 16 + ayrı listeye alınan 4) md5'inin değişmediğini
 kanıt olarak doğruluyor.
 
-⚠**16'nın 14'ü saf biçimdi, 2'si DEĞİLDİ — ölçüldü (bağımsız çürütücü, 2026-09-18).** Cetvelin ilk
-hâli "silinecek başka hiçbir şey yoktu" diyordu; iki parçada **dolu** blockquote vardı:
+⚠**16'nın 14'ünde K2 notu yok, 2'sinde DOLU blockquote var — ölçüldü (bağımsız çürütücü,
+2026-09-18).** Cetvelin ilk hâli "silinecek başka hiçbir şey yoktu" diyordu; iki düzeltme gerekti.
+Birincisi, o 14 parça için doğru ifade "saf biçim" değil **"K2 notu barındırmıyor, kalan tek
+editoryal iz biçim işareti"**: en az ikisi ` ---` dışında bir kaynak-provenans cümlesi de taşıyor
+(`vortice-vort-e-atex` Montaj → "Kaynak, bu cihazların duvara, tavana ve hatta kanal içine
+kurulabildiğini belirtir."; `vortice-vort-commercial-in-line-circular` Montaj → "Fiyat listesinde
+de standart montaj ayağı ürüne dahildir."). İkisi de aşağıda ölçüm geçmişinde anılan provenans
+sınıfına ait. İkincisi, iki parçada **dolu** blockquote vardı:
 - `vortice-hava-perdesi` / `bloklar_tr.Kontrol` → `> **Isıtıcı aç/kapa komutu bu ailede YOKTUR**
   — kumandadaki o işlev yalnızca AIR DOOR H > modelleri içindir.` Bu **ürün bilgisidir** (K5) ve
   kalır; cümlenin ortasındaki kaçak `>` bir satır kaydırma artığıdır.
 - `vortice-lineo` / `bloklar_tr.Gövde` → `> *Sınıflandırma yalnızca kurallara uygun monte edilmiş
-  ürün için geçerlidir.*` Katalogdan gelen bir **standart şerhidir**, not değil; kalır.
+  ürün için geçerlidir.*` Katalogdan gelen bir **standart şerhidir**, not değil; kalır. Kaynağı
+  ölçüldü: `markalar/vortice/konut-fanlari/lineo-quiet/01-input/LINEO_QUITE_KATALOG.pdf` s.5 →
+  *"the classification only applies to a properly installed product"* — TR metin bunun birebir
+  çevirisi. (Dosya `lineo-quiet` altında, parça `vortice-lineo` ailesinde; iki aile katalogda
+  ortak anlatılıyor.)
 
 İkisi de guard 3b'de **adıyla muaf** ve md5'leri 3c'de ölçülür. Muafiyet kör nokta değildir:
 içlerinde yeni bir not doğarsa md5 değişir ve 3c kırmızı yanar. Bu, cetvelin kendi içinde
@@ -126,6 +158,29 @@ aynı kusuru taşıyordu.
 ⚠Bu, "kaynak doğrulaması yapıldı" raporunun nasıl yanlış olabileceğini gösterir: cümlenin bir
 yarısı doğrulanıp diğer yarısı gözden kaçabilir. Doğrulama **cümlenin her iddiası için ayrı**
 yapılır ve olumsuz iddia için kaynakta **açık** bir ifade aranır.
+
+⛔**BU MADDE YAZILDIĞI GÜN, YAZILDIĞI DOSYADA ÇİĞNENDİ.** K4.1 karar 45'in migration'ına eklendi ve
+aynı migration'ın hedef metinlerinde beş parça daha aynı kusuru taşıyordu — üçü bu maddenin adıyla
+saydığı ibareyi birebir kullanıyordu ("havayı kendisi hareket ettirmez"):
+
+| Parça | Hedef metin | Kaynakta |
+|---|---|---|
+| `avens-elektrikli-isiticilar` Çark | "…çarkı yoktur, havayı kendisi hareket ettirmez…" | yok |
+| `avens-elektrikli-isiticilar` Motor | "Isıtıcının motoru yoktur." | yok |
+| `avens-sulu-batarya` Çark | "Sulu batarya bir fan değildir; çarkı yoktur." | yok |
+| `avens-sulu-batarya` Motor | "Bataryanın motoru yoktur." | yok |
+| `danfoss-fc101` Çark | "…çark yoktur; ürün hava taşımaz, … motorunu sürer." | son kısım var, olumsuz kısım yok |
+
+Kaynak ölçümü: `ticaret/avensair-fiyat-listesi-2026/01-input/avens_fiyat_listesi_2026_HQ.pdf` s.69 bu
+ürünlerin **ne olduğunu** söylüyor ("ELEKTRİKLİ ISITICILAR | Trifaze 380V, 50Hz", "SULU BATARYALAR …
+kontrol paneli ile birlikte kullanılır") ama dizinin tamamında motor/çark **yokluğunu** söyleyen
+hiçbir ifade yok. Beşi de K4'e döndürüldü: anahtarlar tamamen kaldırıldı. `fc101` Çark'ta kalan tek
+pozitif bilgi ("hava taşıyan fanın motorunu sürer") aynı ailenin Motor bloğunda zaten duruyor ve o
+cümle **pozitif ve kaynakta destekli** (`FC51-DataSheet.pdf`, FC102 kapağı "VLT® HVAC Drive FC 102").
+
+**Ders, kuralın kendisinden ayrı yazılır: bir kuralı yazmak onu uygulamak değildir.** Bu beş parçayı
+yakalayan şey kuralın varlığı değil, **ikinci bir bağımsız gözdü**. Yeni bir kural yazıldığında aynı
+değişikliğin kendi içeriği o kurala karşı yeniden taranır.
 
 ## K5 — Ürün bilgisi ile kaynak eksikliği AYRI şeylerdir
 
@@ -172,7 +227,7 @@ birlikte yapılır (REC-206 ayrı liste (i)).
 | Migration guard 3a | veri onarımı migration'ı | çizilen **8** alanda (aile 6 + `products.description_i18n` 2) not deseni = 0 | koşum başına bir kez |
 | Migration guard 3b | veri onarımı migration'ı | `bloklar_tr` + `maddeler_tr`'de desen, **adıyla muaf 6 parça dışında** 0 eşleşme | koşum başına bir kez |
 | Migration guard 3c | veri onarımı migration'ı | dokunulmaması gereken **20** parçanın md5'i birebir (K3'ün ve muafiyetin kanıtı) | koşum başına bir kez |
-| KAPI 5 | [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) | yazma anında **yalnız atıf biçimleri** (`[s.NN]`, `[DB]`, `Kaynak s.NN`) | ⛔K2'nin dokuz biçiminden sekizi kapı dışı — **ALTYAPI borcu**, karar 42'den devir |
+| KAPI 5 | [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) | yazma anında **yalnız atıf biçimleri** (`[s.NN]`, `[DB]`, `Kaynak s.NN`) | ⛔K2'nin on biçiminden dokuzu kapı dışı — **ALTYAPI borcu**, karar 42'den devir |
 | Canlı ölçüm | merge sonrası, elle | anon rolüyle `get_family_detail` + `get_product_families_enriched` çıktısında desen, **muaf 6 parça dışında** 0 | ⛔kod karşılığı YOK (elle prosedür) |
 
 ⚠**Üç migration guard'ı yalnız o migration koşarken bir kez çalışır.** Merge'ten sonra muaf
@@ -229,14 +284,17 @@ katmandır**, biri ölçülünce diğerleri ölçülmüş sayılmaz.
 | Tarih | Ölçüm | Sonuç |
 |---|---|---|
 | 2026-09-17 | karar 42, çizilen 8 alan | 1 kayıt kirli (`jet-serisi`), onarıldı |
-| 2026-09-17/18 | karar 45, `bloklar_tr` + `maddeler_tr` | 38 aile / 274 parça: **215'te bu desen 0 eşleşme** · 39 not (onarıldı, 7'sinde anahtar kalktı) · 16 dokunulmadı (14 saf biçim + 2 meşru blockquote) · 4 ayrı liste |
-| 2026-09-18 | karar 45, bağımsız çürütme | 10 eksen ölçüldü, 8 madde düzeltildi: 1 içerik doğruluğu (bravo-s olumsuz iddia) + 7 cetvel/kapı doğruluğu |
+| 2026-09-17/18 | karar 45, `bloklar_tr` + `maddeler_tr` | 38 aile / 274 parça: **215'te bu desen 0 eşleşme** · 39 not (onarıldı, **12'sinde anahtar kalktı**) · 16 dokunulmadı (14'ünde K2 notu yok + 2 meşru blockquote) · 4 ayrı liste |
+| 2026-09-18 | karar 45, bağımsız çürütme 1. tur | 10 eksen ölçüldü, 8 madde düzeltildi: 1 içerik doğruluğu (bravo-s olumsuz iddia) + 7 cetvel/kapı doğruluğu |
+| 2026-09-18 | karar 45, bağımsız çürütme 2. tur (dar, 4 eksen) | 5 içerik doğruluğu kusuru daha (K4.1 kendi dosyasında çiğnenmiş) + desenin 4 kaçağının teşhisi düzeltildi (sebep 1 değil 3) + 2 provenans parçası + lineo şerhinin kaynağı bulundu |
 
 ⚠**"215'te desen 0 eşleşme verdi" ile "215 parça temiz" AYNI ŞEY DEĞİL.** Bağımsız çürütücü bu 215
 parçayı elle tarayıp **11'inde pozitif kaynak atfı** buldu: sekizi düpedüz atıf ("TR kaynak … olarak
 listeler", "kaynak bu ürünleri … olarak tanımlar"), üçü müşterinin göremediği bir tabloya gönderme
-("eşleşme tabloda verilir", "katalogda A/B/C/D olarak verilir"). Desen bunları göremez, çünkü
-**negatif** kalıbı (`kaynakta … verilmemiştir`) arıyor, pozitifini bilerek dışarıda bırakıyor —
-"kaynak" kelimesi müşteriye anlamlı olabildiği için (K5). Bu 11 parça K2 tanımıyla "kendine düşülen
-not" olmadığı için 45 kapsamına girmedi; REC-206 ayrı listesine yazıldı. Bir cetvelin "temiz" demesi
-her zaman "şu desende eşleşme yok" demektir; desenin görmediği sınıf ayrıca yazılır.
+("eşleşme tabloda verilir", "katalogda A/B/C/D olarak verilir"). İkinci tur, dokunulmayan 16 parçanın
+içinde **2 tane daha** buldu (K3'te adları yazılı), yani sınıfın bugünkü sayımı **13**. Desen bunları
+göremez, çünkü **negatif** kalıbı (`kaynakta … verilmemiştir`) arıyor, pozitifini bilerek dışarıda
+bırakıyor — "kaynak" kelimesi müşteriye anlamlı olabildiği için (K5). Bu 13 parça K2 tanımıyla
+"kendine düşülen not" olmadığı için 45 kapsamına girmedi; REC-206 ayrı listesine yazıldı. Bir
+cetvelin "temiz" demesi her zaman "şu desende eşleşme yok" demektir; desenin görmediği sınıf ayrıca
+yazılır.

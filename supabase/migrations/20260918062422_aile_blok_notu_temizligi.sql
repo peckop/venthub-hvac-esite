@@ -11,13 +11,13 @@
 -- EVREN (olculdu): 38 aile / 274 blok-madde parcasi. Uc bagimsiz salt-okuma alt ajani her parcayi
 --   kaynak dizinine (sayfalar.jsonl) karsi dogruladi; PDF acilmadi. Siniflama:
 --     TEMIZ (bu desen 0 eslesme verdi)           38 aile / 215 parca  -> dokunulmaz
---     not parcasi cikar (cumle kalir)            14 aile /  31 parca  -> CIKAR
---     metnin tamami not (blok anahtari kalkar)    4 aile /   7 parca  -> CIKAR
+--     not parcasi cikar (cumle kalir)            14 aile /  26 parca  -> CIKAR
+--     metnin tamami not (blok anahtari kalkar)    7 aile /  12 parca  -> CIKAR
 --     not cikinca cumle oznesiz kaliyor           1 aile /   1 parca  -> CIKAR (minimum yeniden yazim)
 --     bicim artigi / mesru blockquote            14 aile /  16 parca  -> KALIR (dokunulmaz)
 --     yapi hatasi (Kontrol icerigi Koruma'da)     3 aile /   3 parca  -> AYRI LISTE (i)
 --     dogrulanmamis deger (birimsiz olcu)         1 aile /   1 parca  -> AYRI LISTE (ii)
---   Bu dosya yalniz CIKAR satirlarini uygular: 39 oge / 17 aile (7'sinde blok anahtari kalkar).
+--   Bu dosya yalniz CIKAR satirlarini uygular: 39 oge / 17 aile (12 blok anahtari 7 ailede kalkar).
 --   ⚠"TEMIZ" = "bu desende 0 eslesme", "her turlu editor izinden arindi" DEGIL: bagimsiz curutucu
 --   215 parcanin 11'inde POZITIF kaynak atfi buldu ("TR kaynak ... olarak listeler", "esleme
 --   tabloda verilir" gibi). Bunlar K2 tanimiyla "kendine dusulen not" olmadigi icin 45 kapsamina
@@ -51,6 +51,29 @@
 --   KARAR: bravo-s'in Cark ve Motor anahtarlarinin IKISI DE kalkar (CIKAR_ANAHTAR). Dayanak
 --   cetvel K4 - kaynak bu aile icin cark/motor verisi vermiyorsa o blok hic yazilmaz. Boylece
 --   dogrulanmamis olumsuz iddia da vitrine gitmez.
+--
+-- ⭐⭐IKINCI TUR: AYNI KUSUR BES OGEDE DAHA VARDI - kendi yazdigim kurali kendi dosyamda cignemisim.
+--   Dar ikinci tur curutucu, yukaridaki K4.1 maddesi YAZILDIKTAN SONRA planin 39 hedef metnini
+--   tarayip bes ogede ayni dayanaksiz olumsuz iddiayi buldu. Uc tanesi K4.1'in ADIYLA saydigi
+--   ibareyi birebir tasiyordu ("havayi kendisi hareket ettirmez"):
+--     · avens-elektrikli-isiticilar / Cark  "...carki yoktur, havayi kendisi hareket ettirmez..."
+--     · avens-elektrikli-isiticilar / Motor "Isiticinin motoru yoktur."
+--     · avens-sulu-batarya / Cark           "Sulu batarya bir fan degildir; carki yoktur."
+--     · avens-sulu-batarya / Motor          "Bataryanin motoru yoktur."
+--     · danfoss-fc101 / Cark                "...cark yoktur; urun hava tasimaz, ... motorunu surer."
+--   Kaynak olcumu: avens ailelerinin dizindeki tek ticari kaynagi
+--   ticaret/avensair-fiyat-listesi-2026/01-input/avens_fiyat_listesi_2026_HQ.pdf s.69 urunlerin NE
+--   OLDUGUNU soyluyor ("ELEKTRIKLI ISITICILAR | Trifaze 380V, 50Hz", "SULU BATARYALAR ... kontrol
+--   paneli ile birlikte kullanilir", "ISITICI GUCU (Kcal/h)" kolonu) ama dizinin tamaminda bu iki
+--   aile icin motor/cark YOKLUGUNU soyleyen hicbir ifade yok - tipki BRA.VO S'te oldugu gibi kanit
+--   sessizlik.
+--   KARAR: bes ogenin BESI de CIKAR_ANAHTAR. fc101 Cark'ta kalan tek pozitif bilgi ("hava tasiyan
+--   fanin motorunu surer") ayni ailenin Motor blogunda ZATEN duruyor ("urun motor degil, motor
+--   surucusudur" - bu POZITIF ve kaynakta destekli: FC51-DataSheet.pdf, fc51Design-Guide.pdf,
+--   FC102 kapagi "VLT(R) HVAC Drive FC 102"), yani anahtari kaldirmak bilgi kaybettirmiyor.
+--   Boylece uc Danfoss ailesinin Cark anahtari da tutarli bicimde kalkmis olur.
+--   ⚠DERS: bir kurali yazmak onu uygulamak DEGILDIR. K4.1 bu dosyada yazildi ve ayni dosyanin
+--   hedef metinlerinde cignendi; yakalayan sey ikinci bir bagimsiz goz oldu.
 --
 -- ELLE DEGISIKLIK KAPISI (42 yontemi, 39 ogeye uyarlandi): aile basina tek md5 yerine "maske md5"
 --   kullanilir = description'dan bu dosyanin dokundugu yollar CIKARILDIKTAN sonra kalan jsonb'nin
@@ -89,7 +112,7 @@ declare
    "Çark"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Elektrikli ısıtıcı bir fan değildir; çarkı yoktur, havayı kendisi hareket ettirmez — bağlı olduğu ısı geri kazanım cihazının debisiyle eşleştirilir.",
-  "yeni": "Elektrikli ısıtıcı bir fan değildir; çarkı yoktur, havayı kendisi hareket ettirmez — bağlı olduğu ısı geri kazanım cihazının debisiyle eşleştirilir."
+  "yeni": null
  },
  {
   "slug": "avens-elektrikli-isiticilar",
@@ -107,7 +130,7 @@ declare
    "Motor"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Isıtıcının motoru yoktur.",
-  "yeni": "Isıtıcının motoru yoktur."
+  "yeni": null
  },
  {
   "slug": "avens-isi-geri-kazanim",
@@ -170,7 +193,7 @@ declare
    "Çark"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Sulu batarya bir fan değildir; çarkı yoktur.",
-  "yeni": "Sulu batarya bir fan değildir; çarkı yoktur."
+  "yeni": null
  },
  {
   "slug": "avens-sulu-batarya",
@@ -188,7 +211,7 @@ declare
    "Motor"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Bataryanın motoru yoktur.",
-  "yeni": "Bataryanın motoru yoktur."
+  "yeni": null
  },
  {
   "slug": "danfoss-fc101",
@@ -197,7 +220,7 @@ declare
    "Çark"
   ],
   "eski": "**Bu ürün tipi için geçersiz.** Frekans konvertöründe çark yoktur; ürün hava taşımaz, hava taşıyan fanın motorunu sürer.",
-  "yeni": "Frekans konvertöründe çark yoktur; ürün hava taşımaz, hava taşıyan fanın motorunu sürer."
+  "yeni": null
  },
  {
   "slug": "danfoss-fc101",
@@ -533,7 +556,7 @@ declare
    "Çark"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Elektrikli ısıtıcı bir fan değildir; çarkı yoktur, havayı kendisi hareket ettirmez — bağlı olduğu ısı geri kazanım cihazının debisiyle eşleştirilir.",
-  "yeni": "Elektrikli ısıtıcı bir fan değildir; çarkı yoktur, havayı kendisi hareket ettirmez — bağlı olduğu ısı geri kazanım cihazının debisiyle eşleştirilir."
+  "yeni": null
  },
  {
   "slug": "avens-elektrikli-isiticilar",
@@ -551,7 +574,7 @@ declare
    "Motor"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Isıtıcının motoru yoktur.",
-  "yeni": "Isıtıcının motoru yoktur."
+  "yeni": null
  },
  {
   "slug": "avens-isi-geri-kazanim",
@@ -614,7 +637,7 @@ declare
    "Çark"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Sulu batarya bir fan değildir; çarkı yoktur.",
-  "yeni": "Sulu batarya bir fan değildir; çarkı yoktur."
+  "yeni": null
  },
  {
   "slug": "avens-sulu-batarya",
@@ -632,7 +655,7 @@ declare
    "Motor"
   ],
   "eski": "*Bu ürün tipi için geçersiz.* Bataryanın motoru yoktur.",
-  "yeni": "Bataryanın motoru yoktur."
+  "yeni": null
  },
  {
   "slug": "danfoss-fc101",
@@ -641,7 +664,7 @@ declare
    "Çark"
   ],
   "eski": "**Bu ürün tipi için geçersiz.** Frekans konvertöründe çark yoktur; ürün hava taşımaz, hava taşıyan fanın motorunu sürer.",
-  "yeni": "Frekans konvertöründe çark yoktur; ürün hava taşımaz, hava taşıyan fanın motorunu sürer."
+  "yeni": null
  },
  {
   "slug": "danfoss-fc101",
@@ -945,18 +968,34 @@ declare
   --   * "kaynak" kelimesi musteriye anlamli oldugunda (isi kaynagi, kaynak islemi) yakalanmaz;
   --     desen "kaynakta/katalogda + eksiklik fiili" kalibini arar.
   --
-  -- ⭐`> *` KOLU BAGIMSIZ CURUTUCUNUN BULGUSUYLA EKLENDI (2026-09-18): desen kendi pozitif
-  -- kumesinin %10'unu kaciriyordu - plandaki 39 ogenin 4'unu gormuyordu, cunku blockquote-italik
-  -- not bicimi (`> *...*`) desende hic karsiligi yoktu (`\*\(` parantez-yildiz arar, `> *` degil).
-  -- Curutucu bunu dogrudan kanitladi: silinen notun birebir biciminde bir metni baska bir parcaya
-  -- yazdi, guard KIPIRDAMADI ve migration COMMIT etti. Iki mesru `> *` ogesi (hava-perdesi Kontrol
-  -- urun bilgisi, lineo Govde katalog serhi) bu yuzden ADIYLA muaf listesindedir ve md5'leri
-  -- guard 3c'de olculur - muafiyet kor nokta degil, olculen istisnadir.
+  -- ⭐DESEN IKI TURDA OLCULEREK GENISLETILDI (bagimsiz curutucu, 2026-09-18). Ilk hali kendi
+  -- pozitif kumesinin %10'unu kaciriyordu: plandaki 39 ogenin 4'unu gormuyordu. ⚠ILK TESHIS
+  -- YARIM DOGRUYDU ve ikinci tur onu duzeltti - kacagin SEBEBI tek degil, UC:
+  --   · 2 oge: blockquote-italik bicim (`> *...*`) -> `\>\s*\*` kolu ekledi (1. tur).
+  --   · 1 oge (deumido Motor): `*Kaynakta ayri bir motor tanimi YOK* - foy ... vermez` — UC ayri
+  --     sebeple kaciyordu: `>` olmadan tek-yildiz italik · `YOKTUR` degil ciplak `YOK` ·
+  --     alternasyonda `verilmem` vardi ama `vermez` yoktu -> son iki kol eklendi (2. tur).
+  --   · 1 oge (nicotra-dd maddeler_tr[0]): "Fiyat listesi ikiye ayirir: ... ikisinin de tanim
+  --     cumlesi aynidir." Bu bir KAYNAK-BELGESI YORUMU ve deseni buna genisletmek BILINCLI OLARAK
+  --     YAPILMADI: ayni kalip TEMIZ sayilan 215 parcanin 13'unde var (pozitif kaynak atfi) ve
+  --     onlar K2 tanimiyla "kendine dusulen not" degil. Kol eklenirse guard 13 mesru parcada
+  --     yanlis kirmizi verir. Bu oge planda ELLE listeli oldugu icin bu kosumda temizlenir;
+  --     sinifin tamami REC-206 ayri listesinde durur. Yani desenin bu sinifi GORMEDIGI yazilidir.
+  -- Curutucu korlugu dogrudan kanitladi: silinen notun birebir biciminde bir metni baska bir
+  -- parcaya yazdi, guard KIPIRDAMADI ve migration COMMIT etti; kol eklendikten sonra ayni kurulum
+  -- cikis 3 verdi.
+  -- ⚠`\>\s*\*` kolu GENIS: blockquote+vurgu yapisinin tamamini yakalar, not olup olmadigina
+  -- bakmaz. Iki mesru oge (hava-perdesi Kontrol urun bilgisi, lineo Govde katalog serhi) bu yuzden
+  -- ADIYLA muaf listesindedir ve md5'leri guard 3c'de olculur - muafiyet kor nokta degil, olculen
+  -- istisnadir. Bedeli soyle yazilir: yarin yazilacak her mesru `> **...**` blogu, biri muaf
+  -- listesine satir eklemeden yanlis kirmizi verir. Bugun karsilanmamis yanlis pozitif 0.
   v_desen constant text :=
     '\*\(|\(\*|\[MANIFEST\]|\[DB\]|\[s\.\s*[0-9]|\mTODO\M'
     '|\>\s*\*'
     '|[Kk]aynakta yok|[Bb]u ürün tipi için geçersiz'
     '|[Kk]aynakta[^.]{0,80}YOKTUR|[Kk]atalo[^.]{0,80}YOKTUR|bilgisi \*\*YOKTUR\*\*'
+    '|[Kk]aynakta[^.]{0,80}\mYOK\M'
+    '|([Kk]aynak|[Kk]atalo|[Ff]iyat listesi|[Ff]öy)[^.]{0,80}(vermez|vermiyor|yazmaz|belirtmez|anlatmaz)'
     '|boş bırakıldı|tutarsızlık notu|[Bb]kz\. yukarı|kaynak başlığı|asıl bloğu|o kısım boş'
     '|birim yazmıyor|doğrulanmalı|tabloda yer almaz'
     '|[Kk]aynakta [^.]{0,80}(verilmem|anlatılm|yazm|açıklan|belirtilmem|bulunmaz)';
