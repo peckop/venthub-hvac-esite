@@ -35,7 +35,13 @@ const path = require('path')
 /** Ana ağacın ölçüm sonucunu etkileyen yollar: bunlara dokunan merge ana ağacı ileri sardırır. */
 const AYAR_YOLLARI = [/^\.claude\//, /^\.mcp\.json$/, /^CLAUDE\.md$/, /^tools\//, /^\.githooks\//]
 
-function git(agac, args, zamanAsimi = 15000) {
+/**
+ * ⚠ZAMAN AŞIMI CÖMERT (60 sn): 15 sn ile INV-ANA-AGAC-TAZE-1 kolları paralel test koşumunda
+ * (aynı anda vitest + docker yüklüyken) zaman zaman düşüyordu — kapı KIRILGAN olmuş oluyordu ve
+ * kırılgan kapı, kırmızısına bakılmayan kapıdır. Aynı kollar tek başına 9/9 geçiyordu; fark
+ * yükten geliyordu (2026-09-18 ölçüldü).
+ */
+function git(agac, args, zamanAsimi = 60000) {
   return execFileSync('git', ['-C', agac, ...args], {
     encoding: 'utf8',
     timeout: zamanAsimi,
