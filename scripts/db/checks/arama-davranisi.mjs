@@ -149,7 +149,14 @@ async function olc(client, vaka) {
  * sonunda ROLLBACK (yazma yok, oturum rolü sızmaz). Ölçüt sabit sayı değil: sahip rolü sonuç
  * bulurken vitrin rolü hata veriyor ya da BOŞ dönüyorsa İHLAL.
  */
-const VITRIN_ROLLERI = ['anon', 'authenticated']
+const VITRIN_ROLLERI = ['anon', 'authenticated', 'authenticated-iddiasiz']
+
+/** Kol adı → gerçek Postgres rolü (iddiasız kol da `authenticated` rolüyle koşar). */
+const ROL_PG = {
+  anon: 'anon',
+  authenticated: 'authenticated',
+  'authenticated-iddiasiz': 'authenticated',
+}
 
 /**
  * ⭐ROL TEK BAŞINA GERÇEK İSTEK DEĞİL — JWT iddiaları da vitrindeki gibi kurulur.
@@ -162,17 +169,25 @@ const VITRIN_ROLLERI = ['anon', 'authenticated']
  * ölçmek müşterinin görmediği bir kırmızıyı ölçer. İddiasız hâl GERÇEK bir kusurdur (REC-355,
  * VULN) ve onarımıyla AYNI PR'da ayrı kol olarak gelir.
  * Kanca çıktısının biçimi birebir: kök + app_metadata altında user_role.
+ *
+ * ⭐İDDİASIZ KOL EKLENDİ (REC-355 onarımı, 2026-09-18 — yukarıdaki söz burada kapanıyor):
+ * `authenticated-iddiasiz` kolu `user_role` taşımayan bir jetonu taklit eder. Bu hâl vitrinde
+ * hook açıkken üretilmez ama hook kapanırsa, hook'tan önce üretilmiş uzun ömürlü bir jeton
+ * kullanılırsa ya da PostgREST doğrudan çağrılırsa üretilir. Onarımdan ÖNCE bu kol 54001
+ * veriyordu (gölgede ölçüldü); onarımdan sonra hata vermemeli. Kol kırmızıya dönerse döngü geri
+ * gelmiş demektir — onarımın kalıcı bekçisi bu satırdır.
  */
 const VITRIN_IDDIALARI = {
   anon: { role: 'anon' },
   authenticated: { role: 'authenticated', user_role: 'user', app_metadata: { user_role: 'user' } },
+  'authenticated-iddiasiz': { role: 'authenticated' },
 }
 
 async function olcRolle(client, vaka, rol) {
   await client.query('begin')
   try {
     await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(VITRIN_IDDIALARI[rol])])
-    await client.query(`set local role ${rol}`)
+    await client.query(`set local role ${ROL_PG[rol]}`)
     const { rows } = await client.query(
       'select id from public.fts_search_products($1, 500, $2::jsonb)',
       [vaka.q, '{}'],
@@ -183,6 +198,30 @@ async function olcRolle(client, vaka, rol) {
   } finally {
     await client.query('rollback')
   }
+}
+
+/**
+ * ⭐İDDİASIZ KOL, ONARIM HEDEF VERİTABANINDA VARSA KOŞAR — TEK YÖNLÜ MANDAL.
+ *
+ * NİÇİN (2026-09-18 ölçüldü, kapı kendi PR'ında kırmızı verdi): bu kol REC-355 onarımının
+ * KALICI BEKÇİSİDİR, ama onarım henüz canlıda yokken 15 vakanın 15'inde 54001 veriyor — yani
+ * kapı, onardığı kusuru ölçtüğü için onarımın merge edilmesini engelliyordu (merge ritüeli 0
+ * kırmızı ister). Kolu PR'dan çıkarmak bekçiyi "sonraki işe" bırakmak olurdu; ilan listesine
+ * yazmak ise yasak — "vitrinde aramanın çalışmaması bilinen kırmızı olamaz" (aşağıdaki satır).
+ *
+ * Çözüm: kol, ölçtüğü onarımın VARLIĞINA bağlanır. `public.is_admin_claim()` hedef veritabanında
+ * yoksa kol ATLANIR ve bu YÜKSEK SESLE yazılır (atlanmış iş yeşil değildir). Onarım uygulandığı
+ * an kol kendiliğinden koşar ve bir daha asla atlanmaz — mandal tek yönlüdür, çünkü onarım geri
+ * alınsa fonksiyon da düşer ve o zaman atlama satırı yine görünür, sessizlik olmaz.
+ *
+ * ⛔ÖN KOŞUL ÖLÇÜLEMEZSE FAIL-CLOSED: sorgu hata verirse kol atlanır AMA ihlal yazılır. "Ölçemedim"
+ * ile "sorun yok" aynı şey değildir.
+ */
+async function onarimVarMi(client) {
+  const { rows } = await client.query(
+    "select to_regprocedure('public.is_admin_claim()') is not null as var",
+  )
+  return rows[0].var === true
 }
 
 async function main() {
@@ -216,9 +255,17 @@ async function main() {
   }
 
   const kokSertifika = path.join(KOK, 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem')
+  /**
+   * ⭐YEREL HEDEF TLS İSTEMEZ (2026-09-18 ölçüldü): kök sertifika dosyası depoda durduğu için
+   * betik yerel gölgeye de TLS ile bağlanmaya çalışıyordu ve "server does not support SSL
+   * connections" ile düşüyordu — yani onarımların kolları gölgede HİÇ koşulamıyordu. Uzak hedefte
+   * davranış değişmedi: sertifika varsa TLS zorunlu. Yerel hedef adres üzerinden ayırt edilir.
+   */
+  const yerelHedef = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(temizDizi)
+  if (yerelHedef) console.log('arama-davranisi: hedef YEREL — TLS aranmadi')
   const client = new pg.Client({
     connectionString: temizDizi,
-    ssl: fs.existsSync(kokSertifika) ? { ca: fs.readFileSync(kokSertifika, 'utf8') } : undefined,
+    ssl: !yerelHedef && fs.existsSync(kokSertifika) ? { ca: fs.readFileSync(kokSertifika, 'utf8') } : undefined,
   })
   await client.connect()
 
@@ -263,11 +310,32 @@ async function main() {
   const ihlaller = []
   const uyarilar = []
   const gecenler = []
+  const atlananlar = []
+
+  // İddiasız kolun ön koşulu: onarım hedef veritabanında var mı (bkz. onarimVarMi yorumu).
+  let onarim = null
+  try {
+    onarim = await onarimVarMi(client)
+  } catch (e) {
+    ihlaller.push(
+      `ROL authenticated-iddiasiz kolunun ON KOSULU OLCULEMEDI (${`${e.code ?? ''} ${e.message}`.trim()}) — ` +
+        'fail-closed: "olcemedim" ile "sorun yok" ayni sey degil.',
+    )
+  }
+  const kosulacakRoller =
+    onarim === true ? VITRIN_ROLLERI : VITRIN_ROLLERI.filter((r) => r !== 'authenticated-iddiasiz')
+  if (onarim === false) {
+    atlananlar.push(
+      'ROL authenticated-iddiasiz kolu ATLANDI — onarim hedef veritabaninda YOK ' +
+        '(public.is_admin_claim mevcut degil, REC-355). Migration uygulanir uygulanmaz bu kol ' +
+        'KENDILIGINDEN kosar; o an 54001 verirse kapi KIRMIZI olur.',
+    )
+  }
 
   // Rol kolu İLANA TABİ DEĞİL: vitrinde aramanın çalışmaması "bilinen kırmızı" olamaz.
   for (const v of VAKALAR) {
     const sahipN = sonuclar.get(v.no).length
-    for (const rol of VITRIN_ROLLERI) {
+    for (const rol of kosulacakRoller) {
       const r = await olcRolle(client, v, rol)
       if (r.hata) {
         ihlaller.push(`[vaka ${v.no}] "${v.q}" ROL ${rol} — sorgu HATA verdi: ${r.hata}`)
@@ -356,11 +424,16 @@ async function main() {
   }
 
   if (JSON_KIPI) {
-    console.log(JSON.stringify({ aktif, ihlaller, uyarilar, gecenler }, null, 2))
+    console.log(JSON.stringify({ aktif, ihlaller, uyarilar, gecenler, atlananlar }, null, 2))
   } else {
     console.log(`\naktif urun: ${aktif} | hassasiyet tavani: ${Math.floor(aktif * TAVAN_ORAN)} sonuc\n`)
     console.log(`GECEN ${gecenler.length}:`)
     for (const g of gecenler) console.log('  ' + g)
+    if (atlananlar.length) {
+      console.log(`\n⛔ATLANMIS IS YESIL DEGILDIR — ${atlananlar.length} kol OLCULMEDI:`)
+      for (const a of atlananlar) console.log('  ' + a)
+      console.log(`::warning title=ARAMA DAVRANISI (olculmeyen kol)::${atlananlar.length} rol kolu atlandi — onarim hedef veritabaninda yok (REC-355).`)
+    }
     if (uyarilar.length) {
       console.log(`\n⚠BILINEN KIRMIZI ${uyarilar.length} (REC-340, kapi bu yuzden kirmizi DEGIL):`)
       for (const u of uyarilar) console.log('  ' + u)
