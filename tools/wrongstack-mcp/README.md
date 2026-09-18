@@ -40,8 +40,16 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    Oturum sonu kancasına bağlanmadı: bir pencerenin kapanması öteki pencerelerin sunucusunu öldürürdü.
 2. **Node sürümü.** `undici@8.10.2` `node >=22.19.0` istiyor; makinede 22.16.0 var (npm EBADENGINE
    uyarısı). Her iki sunucu 22.16'da el sıkışıp araç listesi döndü (ölçüldü); Node yükseltmesi ayrı iş.
-3. **Veri git dışında.** Hafıza ve dizin `~/.wrongstack/projects/<ad-hash>/` altında. Hafıza yedeği
-   kancası bu dizini (yalnız sage veritabanı) kapsamıyor — kullanıcı ayarı, ALTYAPI'nın dosyası değil.
+3. **Veri iki ayrı yerde (2026-09-17 düzeltildi, önceki satır yanlıştı).** Kod dizini
+   `~/.wrongstack/projects/<ad-hash>/codebase-index/` altında. **Sage hafızası ise PROJE DİZİNİNİN
+   İÇİNDE**: `.wrongstack/memories/sage.db` (+ wal/shm, `server.json` yerel yetki anahtarı). Depo PUBLIC
+   olduğu için `.gitignore`'da `.wrongstack/` satırı var ve INV-WRONGSTACK-MCP-1 bunu ölçer. Gerekçe:
+   ikili SQLite dosyası (üç pencere yazar → git'te çakışır, diff okunmaz) · sır taraması ikili dosyanın
+   içini göremez (hafızaya düşen sır/müşteri verisi kapıdan geçer) · içerik PR gözünden geçmeden yazılır. Hafıza yedeği kancası bu dosyayı
+   kapsamıyor (REC-345 İŞ 5).
+   **Kimlik harfe duyarlı:** `<ad-hash>` = sha256(`path.resolve(kök)`) ilk 6 hane; `c:\…` (VS Code) →
+   `7e017f`, `C:\…` (terminal) → `1088d5`. Kanonik kimlik küçük harfli olandır; sage bundan etkilenmez
+   (verisi proje dizininde).
 4. **Dizin tazeleme.** Kod dizini salt-okuma kayıtlı; yeniden dizinleme `--writable` ister ve bu
    yüzey bilinçli kapalı. Tazeleme ayrı, elle koşan komut olarak gelecek (REC-345).
 5. **Companion `.md` gürültüsü.** Sembollerin çoğu üretilmiş `.md` dosyalarından (OPS: 43 bin sembolün

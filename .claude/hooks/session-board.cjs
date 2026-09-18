@@ -301,6 +301,16 @@ try {
   context += `(pano okunamadı: ${e && e.message})\n`
 }
 
+// ANA AĞAÇ TAZELİĞİ (REC-345, karar 44 — ölçüldü 2026-09-17): kancalar/CLAUDE.md/.mcp.json ana
+// ağaçtan yüklenir; ana ağaç 50 commit gerideyken dört merge'lü düzenek hiçbir pencerede etkin
+// değildi ve hiçbir kapı görmedi. Güncelse satır basılmaz (sessizlik kuralı). Ağ beklemez.
+try {
+  context += require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'))
+    .acilisSatiri(input.cwd || process.cwd())
+} catch (e) {
+  context += `⚠ana agac tazelik modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — tazelik OLCULMEDI.\n`
+}
+
 // YÖNTEM GÖSTERGESİ (T144-VH, Recep 08-21): ajan panoya baktığında cetveli de görsün —
 // tarayıcıda ayrı sayfa değil, bakılan yerin yanında. Öneri, dayatma değil; sapma yazılır.
 context += 'YÖNTEM CETVELİ (docs/standards/execution-method-standard.md): iş emrinde YÖNTEM: satırı ' +
