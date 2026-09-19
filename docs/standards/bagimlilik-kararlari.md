@@ -31,6 +31,18 @@ Kapı evreni `package.json`'dan **ölçer**, buradan okumaz:
 değildir. Bu sınır bilinçlidir, muafiyet listesi değildir: gönüllü olarak eklenen satır (evrende
 olmasa da) aynı kurallara tabi olur.
 
+### 2.1 · ⭐TAM PİN İSTİSNADIR — Recep kuralı, 2026-09-19
+
+> *"salak saçma gereksiz sebeplerle kendimizi sabitlemeyelim; gerçek bir sebep varsa da bilelim."*
+
+Tam pin (aralıksız, tek sürüm) **varsayılan değil istisnadır.** Gerekçesi **ölçülmemiş** her tam
+pin bir **GEVŞETME ADAYI**dır: kaldırılması gerektiği değil, **sınanması gerektiği** anlamına
+gelir. Kapı bunları ayrı sayar ve sayı **artamaz** (`GEVSETME_ADAYI_TAVANI`).
+
+⛔"Sebep yok" demek bir **denemeyi** gerektirir, bir çıkarımı değil: ayrı dalda gevşet, derle,
+testleri koştur, etkilenen ekranı **görsel olarak** doğrula. Deneme yapılmadan bir pin
+gevşetilmez; ama gerekçesi de yazılmadan **KARAR** sayılmaz. İkisinin arası `BORÇ`tur.
+
 ## 3 · Sütunlar
 
 | sütun | anlamı |
@@ -58,11 +70,11 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 | paket | aralık | tarih | durum | gerekçe |
 |---|---|---|---|---|
 | next | 15.5.24 | 2026-09-13 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. |
-| react | 19.0.0 | — | BORÇ | — |
-| react-dom | 19.0.0 | — | BORÇ | — |
+| react | 19.0.0 | 2026-03-17 | BORÇ | KÖKEN ÖLÇÜLDÜ, GEREKÇE DEĞİL: `06e940580` diff'i React 18→19 GÖÇÜ (`^18.3.1` → `19.0.0`, aynı commit'te `next` ^14.2.35→15.1.0). Tam pin göç anının temkini; sonradan gevşetilmemiş. Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
+| react-dom | 19.0.0 | 2026-03-17 | BORÇ | `react` ile aynı commit, aynı göç (`06e940580`). Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
 | react-day-picker | 9.14.0 | 2026-08-19 | KARAR | PR #698: v9 geçişi iki peer bağımlılık ihlalini kapattı ve o sırada tarih filtresinin **hiç çalışmadığı** ölçüldü. 9.14.0 sabit, çünkü v9 API'si tarih seçici bileşenini doğrudan besliyor. |
-| @types/react | 19.0.1 | — | BORÇ | — |
-| @types/react-dom | 19.0.1 | — | BORÇ | — |
+| @types/react | 19.0.1 | 2026-03-17 | BORÇ | `06e940580`, aynı göç (`^18.3.28` → `19.0.1`). Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
+| @types/react-dom | 19.0.1 | 2026-03-17 | BORÇ | `06e940580`, aynı göç. Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
 | eslint-config-next | 15.1.0 | — | BORÇ | — |
 | eslint-plugin-react-compiler | 19.1.0-rc.2 | 2026-08-19 | KARAR | RC sürümü (19.1.0-rc.2) semver garantisi taşımaz — iki RC arası kırıcı değişiklik olağandır. Sabit pin zorunludur, aralık yazılamaz. |
 | minimatch | 9.0.7 | — | BORÇ | — |

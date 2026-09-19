@@ -57,6 +57,18 @@ const BORC_TAVANI = 20
  */
 const ACIK_UCLU_TAVANI = 17
 
+/**
+ * ⭐GEVŞETME ADAYI = gerekçesi ölçülmemiş TAM PİN (kayıt §2.1, Recep kuralı 2026-09-19:
+ * "salak saçma gereksiz sebeplerle kendimizi sabitlemeyelim; gerçek bir sebep varsa da
+ * bilelim"). Tam pin varsayılan değil istisnadır; gerekçesizi sınanmayı bekler.
+ *
+ * Bu sayı BORÇ tavanından AYRI tutuluyor, çünkü iki borç aynı şey değil: açık uçlu bir
+ * override'ın gerekçesizliği sürüm AKIŞINI serbest bırakır, tam pininki AKIŞI KİLİTLER.
+ * İkincisi sessizce maliyet üretir — react 19.0.0 pini üç küçük sürümü engelliyordu ve
+ * bunu kimse ölçmemişti (köken: 18→19 göçünün temkini, `06e940580`, 2026-03-17).
+ */
+const GEVSETME_ADAYI_TAVANI = 7
+
 type Satir = { paket: string; aralik: string; tarih: string; durum: string; gerekce: string }
 
 type Paket = {
@@ -194,6 +206,19 @@ describe('INV-DEP-KARAR-1 · sürüm kararı gerekçesiz değişemez', () => {
       `Gerekçesi yazılmamış satır sayısı ARTTI (${borclu.length} > ${BORC_TAVANI}):\n  ${borclu.join('\n  ')}\n\n` +
         `Yeni bir paket BORÇ olarak doğamaz. Borç kapandıkça bu tavan da düşürülür.`,
     ).toBeLessThanOrEqual(BORC_TAVANI)
+  })
+
+  it(`⭐gevşetme adayı (gerekçesiz TAM PİN) tavanı sıkışır (tavan ${GEVSETME_ADAYI_TAVANI})`, () => {
+    const adaylar = KAYIT.filter((s) => s.durum === 'BORÇ' && sabitPinMi(s.aralik)).map(
+      (s) => `${s.paket} = "${s.aralik}"`,
+    )
+    expect(
+      adaylar.length,
+      `Gerekçesi ölçülmemiş TAM PİN sayısı ARTTI (${adaylar.length} > ${GEVSETME_ADAYI_TAVANI}):\n  ${adaylar.join('\n  ')}\n\n` +
+        `Kayıt §2.1: tam pin İSTİSNADIR. Yeni bir tam pin ya gerekçesiyle gelir (KARAR) ya da\n` +
+        `hiç gelmez. "Sebep yok" demek bir DENEME gerektirir: ayrı dalda gevşet, derle, testleri\n` +
+        `koştur, etkilenen ekranı görsel doğrula.`,
+    ).toBeLessThanOrEqual(GEVSETME_ADAYI_TAVANI)
   })
 
   it(`cetvel §4: açık uçlu override tavanı sıkışır (tavan ${ACIK_UCLU_TAVANI})`, () => {
