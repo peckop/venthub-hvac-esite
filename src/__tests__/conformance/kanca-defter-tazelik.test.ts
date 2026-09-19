@@ -251,6 +251,33 @@ describe('INV-KANCA-DEFTER-3 · bagimlilik tarama tazeligi satiri', () => {
     expect(satir, `satir yok: ${r.stdout}`).toMatch(/^BAGIMLILIK: son tarama 0 gun · high 11$/)
   })
 
+  it('⭐DEPODAKİ EN YENİ KAYIT GERÇEKTEN OKUNABİLİYOR (kurgu değil, asıl dosya)', () => {
+    /**
+     * ⭐NİÇİN VAR — 2026-09-19'da sahada yaşandı. Yukarıdaki kollar KURGU kayıtlarla koşuyor;
+     * hepsi yeşilken depoya yazılan GERÇEK kayıt, tablo başlığı farklı olduğu için okunamadı
+     * ve satır "high OKUNAMADI" dedi. Kanca dürüsttü (K4: ölçemedim ≠ geçti), ama hiçbir kapı
+     * bunu yakalamıyordu: kurgu fikstürü her zaman doğru biçimde yazılır, gerçek dosya yazılmaz.
+     *
+     * Bu kol, kayıt biçimi ile kancayı okuyan desen arasındaki SÖZLEŞMEYİ asıl dosyada ölçer.
+     * Yeni bir bağımlılık kaydı yazan herkes, satırı sessizce kör etmeden önce burada durur.
+     */
+    const dizin = path.join(process.cwd(), 'docs', 'audits')
+    const kayitlar = fs
+      .readdirSync(dizin)
+      .filter((a) => /^bagimlilik-\d{4}-\d{2}-\d{2}\.md$/.test(a))
+      .sort()
+    expect(kayitlar.length, 'hic bagimlilik kaydi yok — kol kor').toBeGreaterThan(0)
+
+    const enYeni = kayitlar[kayitlar.length - 1]
+    const metin = fs.readFileSync(path.join(dizin, enYeni), 'utf8')
+    const m = /Yüksek önemde güvenlik kaydı[^|]*\|\s*\*\*(\d+)\*\*/.exec(metin)
+    expect(
+      m === null ? null : m[1],
+      `EN YENI kayit (${enYeni}) istem satirinin desenine UYMUYOR → satir "high OKUNAMADI" der. ` +
+        'Tabloya su bicimde bir satir yaz: "| Yüksek önemde güvenlik kaydı (prod) | **N** | ..."',
+    ).not.toBeNull()
+  })
+
   it('⭐high ≥ 1 TEK BAŞINA UYARI SEBEBİ DEĞİLDİR (her turda kırmızı = görmezden gelinen kapı)', () => {
     // Bu kol gevşeklik değil, TASARIM KARARININ ölçümü. Kaldırılırsa satır her turda ⚠
     // yanar ve üç günde okunmaz hale gelir — bu projede ölçülmüş bir kusur sınıfı.
