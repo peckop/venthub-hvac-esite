@@ -42,3 +42,25 @@ Bu kaynakların çoğunun resmi PDF'i **yok**; ama NLM'e PDF'ten **daha iyi** be
 
 > **Not (gürültü kontrolü):** Tüm repoyu değil, yukarıda "ne çıkaracağız" sütunundaki **parçaları** al.
 > Kalite > nicelik (NLM kaynak limiti + alaka).
+
+---
+
+## C. LİSANS KAYDI (2026-09-19, Recep kararı — her kaynak için ZORUNLU)
+
+> Kural: bu belgeye giren her kaynağın lisansı ve **kullanım biçimi** (referans/yöntem mi, kod
+> mu) burada yazılır. **Kod alınıyorsa** lisans uyumluluğu (MIT/BSD/Apache → uyumlu; GPL/AGPL →
+> uyumsuz, kod alınmaz; belirsiz → alınmaz) ve `NOTICE.md` satırı şarttır. Yalnız okuyup öğrenmek
+> (referans) lisans yükümlülüğü doğurmaz. "Doğrulanacak" = lisans bugün ölçülmedi, kod
+> alınmadan önce bakılır.
+
+| # | Kaynak | Lisans | Kullanım | NOTICE gerekli mi |
+|---|--------|--------|----------|-------------------|
+| A1 | Refine | MIT | referans (desen) | hayır (kod alınmadı) |
+| A2 | Shopify Polaris | MIT (kod) · belge içeriği Shopify © — **doğrulanacak** | referans (UX kalıpları) | hayır |
+| A3 | TanStack Table | MIT | kod (npm bağımlılığı) | hayır (npm) |
+| A4 | Medusa Admin | MIT | referans | hayır |
+| A5 | Saleor Dashboard | BSD-3-Clause | referans | hayır |
+| B1 | shadcn/ui | MIT | kod (bileşen temeli) | **evet** — NOTICE'ta |
+| B2 | shadcn-admin | MIT | referans (iskelet) | hayır |
+| B3 | Origin UI / shadcn Blocks | MIT — **doğrulanacak** (blok bazında) | araç; blok alınırsa kod | alınırsa evet |
+| — | 21st.dev bileşen havuzu (2026-09-19 değerlendirmesi) | havuz karışık; TailwindUI kökenli bloklar **ticari lisans** | yalnız referans; kod alınmaz | — |
