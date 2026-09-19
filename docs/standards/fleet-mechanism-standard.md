@@ -11,7 +11,7 @@
 | Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
 | Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
 | Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
-| Uyanma | cron + tur-sonu `ScheduleWakeup` | **cron KURULMAZ** (Recep 09-06) · uyandırma = mesaj |
+| Uyanma | cron + tur-sonu `ScheduleWakeup` | eski üçlü **EMEKLİ** · uyandırma = mesaj. ⚠**Karar 53 (2026-09-19):** cron / zamanlayıcı / loop genel olarak yasak **değil** — dönemsel bir karardı; gerekiyorsa **önce Recep'le konuşulur** |
 | Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
 
 **Niçin değişti — ölçüldü 2026-09-14, üç kalem:**
