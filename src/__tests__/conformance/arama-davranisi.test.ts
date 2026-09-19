@@ -130,6 +130,10 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
       'kanal tipi fan',
       'duvar tipi aspiratör',
       'ISI GERI KAZANIM',
+      // cetvel §8 vaka 13/14/15 (URUN #1246, 2026-09-17)
+      'ISI GERİ KAZANIM',
+      'İNLİNE',
+      'inline',
     ]
     const eksik = sorgular.filter((q) => !s.includes(`'${q}'`))
     expect(eksik, `vaka kumesi DARALMIS — eksik sorgular: ${eksik.join(' | ')}`).toEqual([])
@@ -142,7 +146,7 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
      * bu kol, biri gelip araya çıplak bir beklenen-sayı yazmasını engeller.
      */
     const s = jsYorumsuz(betik())
-    for (const bicim of ['sifir-degil', 'oran', 'ayni-kume', 'marka-var', 'tam-tek-sku']) {
+    for (const bicim of ['sifir-degil', 'oran', 'ayni-kume', 'marka-var', 'tam-tek-sku', 'marka-tavani', 'ayni-sayi', 'ad-isabeti-sira']) {
       expect(s, `olcut bicimi kayip: ${bicim}`).toContain(bicim)
     }
     // Vaka tanımlarında `beklenen: <sayı>` gibi çıplak bir sayı ölçütü OLMAMALI.
@@ -155,17 +159,77 @@ describe('INV-SEARCH-BEHAVIOR-1 · ILAN DURUST KALIYOR', () => {
     const s = jsYorumsuz(betik())
     expect(s).toMatch(/TAVAN_ORAN\s*=\s*0\.4/)
     expect(s, 'tavan hicbir vakaya uygulanmiyor').toMatch(/hassasiyet TAVANI asildi/)
+    // K8.4a: marka olcutlerinde genel tavan YERINE marka tavani — ikisi birden eksilemez.
+    expect(s, 'marka olcutleri genel tavandan ayrilmamis').toMatch(/!MARKA_OLCUTLERI\.has\(v\.olcut\)/)
+    expect(s, 'marka tavani kolu yok').toMatch(/marka TAVANI asildi/)
+    expect(s, 'marka disi sonuc olculmuyor').toMatch(/marka disi sonuc/)
+    expect(s, 'tanimsiz olcut sessizce gecebiliyor').toMatch(/TANIMSIZ olcut/)
   })
 
   it('⭐BILINEN KIRMIZI ILANI: her satir GEREKCELI ve REC-340 a bagli', () => {
     const s = betik()
     const blok = s.slice(s.indexOf('const BILINEN_KIRMIZI'), s.indexOf('function baglantiDizesi'))
+    expect(blok.length, 'BILINEN_KIRMIZI blogu bulunamadi — ilan kolu OLCULEMEDI').toBeGreaterThan(0)
+    // 2026-09-17: liste BOSALDI (son satir vaka 5, K8.4a ile kapandi). Bos liste HEDEFTIR;
+    // mandalin ikinci yonu yeni bir satirin gerekcesiz girmesini asagidaki dongude olcer.
     const satirlar = [...blok.matchAll(/^\s*(\d+):\s*'([^']+)'/gm)]
-    expect(satirlar.length, 'ilan BOS — bugun bes vaka kirmizi, ilan olmadan kapi master i bloklar').toBeGreaterThan(0)
     for (const [, no, gerekce] of satirlar) {
       expect(gerekce.length, `vaka ${no} ilani cok kisa — gerekcesiz ilan kabul edilmez`).toBeGreaterThan(60)
       expect(gerekce, `vaka ${no} ilani duzeltmenin HANGI adimda geldigini yazmiyor`).toMatch(/REC-340|Vaka \d/)
     }
+  })
+
+  it('⭐ROL KOLU — vakalar VITRIN ROLLERIYLE de olculur, ilana TABI DEGIL, yazma sizmaz', () => {
+    /**
+     * 2026-09-17: #1235 sonrası arama anon + authenticated rolünde 42501 ile TAMAMEN boştu,
+     * kapı postgres rolüyle ölçtüğü için YEŞİL verdi. Yetki kusuru yalnız o rolde görünür.
+     * Bu kol silinir ya da ilana bağlanırsa aynı körlük geri gelir.
+     */
+    const s = jsYorumsuz(betik())
+    expect(s, 'vitrin rolleri tanimli degil').toMatch(
+      /VITRIN_ROLLERI\s*=\s*\[\s*'anon'\s*,\s*'authenticated'\s*,\s*'authenticated-iddiasiz'\s*\]/,
+    )
+    // REC-355 onarımıyla üçüncü kol geldi: iddiasız jeton. Kol adı Postgres rolü DEĞİL, eşlemeden
+    // geçer — aksi hâlde `set local role authenticated-iddiasiz` diye var olmayan bir rol denenir.
+    expect(s, 'iddiasiz kol icin iddia tanimi yok').toMatch(/'authenticated-iddiasiz': \{ role: 'authenticated' \}/)
+    expect(s, 'rol gercekten degistirilmiyor').toMatch(/set local role \$\{ROL_PG\[rol\]\}/)
+    // Iddiasiz authenticated vitrinde uretilmez (kanca her jetona user_role yazar); iddia
+    // kurulmazsa kol musterinin gormedigi 54001 i olcer. Iddia IŞLEM-YEREL (true) olmali.
+    expect(s, 'JWT iddialari islem-yerel kurulmuyor').toMatch(/set_config\('request\.jwt\.claims', \$1, true\)/)
+    expect(s, 'authenticated iddiasi kancanin bicimini taklit etmiyor').toMatch(/authenticated:\s*\{[^}]*user_role:\s*'user'/)
+    expect(s, 'rol olcumu islem icinde ROLLBACK ile bitmiyor').toMatch(/finally\s*\{\s*await client\.query\('rollback'\)/)
+    const kolBasi = s.indexOf('for (const rol of kosulacakRoller)')
+    expect(kolBasi, 'rol dongusu kosulacakRoller uzerinde donmuyor').toBeGreaterThan(-1)
+    const kol = s.slice(kolBasi, s.indexOf('await client.end()'))
+    expect(kol.length, 'rol dongusu client.end ONCESINDE degil').toBeGreaterThan(0)
+    expect(kol, 'rol hatasi ihlale yazilmiyor').toMatch(/ihlaller\.push\([^)]*ROL/)
+    expect(kol, 'rol kolu BILINEN_KIRMIZI ilanina baglanmis — vitrinde calismayan arama ilanlanamaz').not.toMatch(/BILINEN_KIRMIZI/)
+  })
+
+  it('⭐IDDIASIZ KOL ONARIMIN VARLIGINA BAGLI — atlama YUKSEK SESLE, on kosul FAIL-CLOSED', () => {
+    /**
+     * 2026-09-18: bu kol REC-355 onarımının kalıcı bekçisi, ama onarım canlıya inmeden önce 15
+     * vakanın 15'inde 54001 veriyordu — yani kapı, onardığı kusuru ölçtüğü için onarımın merge
+     * edilmesini engelliyordu. Kolu PR'dan çıkarmak bekçiyi sonraki işe bırakmak, ilana yazmak
+     * ise yasak olduğu için kol `public.is_admin_claim()` VARLIĞINA bağlandı.
+     *
+     * Bu kolun ölçtüğü şey o tasarımın üç şartı: (1) ön koşul gerçekten fonksiyonun varlığı,
+     * (2) atlama SESSİZ DEĞİL — "atlanmış iş yeşil değildir" satırı ve uyarı basılır,
+     * (3) ön koşul ölçülemezse ihlal yazılır (fail-closed). Biri kalkarsa kapı fail-open olur.
+     */
+    const s = jsYorumsuz(betik())
+    expect(s, 'on kosul fonksiyonun VARLIGI ile olculmuyor').toMatch(
+      /to_regprocedure\('public\.is_admin_claim\(\)'\) is not null/,
+    )
+    expect(s, 'iddiasiz kol yalniz onarim VARSA kosmuyor').toMatch(
+      /onarim === true \? VITRIN_ROLLERI : VITRIN_ROLLERI\.filter\(\(r\) => r !== 'authenticated-iddiasiz'\)/,
+    )
+    expect(s, 'atlanan kol raporlanmiyor — sessiz atlama fail-open').toMatch(/atlananlar\.push\(/)
+    expect(s, '"atlanmis is yesil degildir" hukmu basilmiyor').toContain('ATLANMIS IS YESIL DEGILDIR')
+    expect(s, 'atlama CI uyarisi basmiyor').toMatch(/::warning title=ARAMA DAVRANISI \(olculmeyen kol\)/)
+    // Ön koşul ölçülemezse: "ölçemedim" ihlaldir, yeşil değildir.
+    const onKosul = s.slice(s.indexOf('onarim = await onarimVarMi(client)'), s.indexOf('const kosulacakRoller'))
+    expect(onKosul, 'on kosul hatasi yutuluyor — fail-closed degil').toMatch(/ihlaller\.push\(/)
   })
 
   it('⭐MANDAL IKI YONLU — ilanli vaka GECERSE kapi KIRMIZI (ilan bayatlayamaz)', () => {

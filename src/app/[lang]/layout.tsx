@@ -6,7 +6,7 @@ import { SITE_URL } from '@/config/siteUrl'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
-import type { AppDictionary, Lang } from '../../i18n/I18nContext'
+import type { Lang } from '../../i18n/I18nContext'
 import { I18nProvider } from '../../i18n/I18nProvider'
 
 export type { Lang }
@@ -85,12 +85,36 @@ type Props = {
   params: Promise<{ lang: string }>
 }
 
+/**
+ * ⛔SÖZLÜK PROP'U BURADAN GEÇMEZ — ölçülmüş bir sayfa ağırlığı kusuru (2026-09-18).
+ *
+ * Eskiden bu satır `dictionary={dictionary as AppDictionary}` diyordu. `I18nProvider` bir
+ * `'use client'` bileşeni olduğu için prop RSC yükünde SERİLEŞİYOR ve sözlüğün TAMAMI (admin
+ * bölümü dahil) her sayfanın HTML'ine gömülüyordu. Canlı anonim ölçüm:
+ *   /tr/products/avens-bvu-ls  300,9 KB → gömülü sözlük ~196,4 KB (%65,3)
+ *   /tr/category/fanlar        318,5 KB → ~196,4 KB (%61,7)
+ *   /tr/products               425,6 KB → ~195,9 KB (%46,0)
+ *   /tr                        420,5 KB → ~194,3 KB (%46,2)
+ * Admin sözlüğünün 1008 ayırt edici anahtarının tamamı dört sayfada da vardı; ~51 KB'ı yalnız
+ * admin. Örnek (canlı HTML'den): fiyatlandırma yönetim ekranının yardım metni
+ * `defaultCharmEndingDesc` müşterinin ürün sayfasında duruyordu.
+ *
+ * PROP GEREKSİZDİ: `I18nProvider` modül düzeyinde `const DICTS = { en, tr }` tutuyor ve
+ * `dictionary || DICTS[lang]` diye okuyor; `lang` prop'u burada geçtiği için ilk render'da dil
+ * de doğru. Sunucu bileşenleri sözlüğü zaten KENDİLERİ import ediyor (products/[slug]/page.tsx,
+ * category/[categorySlug]/page.tsx, [lang]/page.tsx), yani provider'a bağlı değiller.
+ *
+ * ⚠Bu değişiklik istemci BUNDLE'ını küçültmez — `DICTS` iki sözlüğü de istemciye taşımaya devam
+ * eder. Admin sözlüğünü bundle'dan da çıkarmak AYRI iş (REC-59 "sonraki adım").
+ *
+ * Kapı: INV-SOZLUK-RSC-1 (src/i18n/__tests__/sozluk-rsc-yukune-gecmez.test.ts).
+ * Cetvel: docs/standards/rendering-cache-standard.md · docs/standards/vitrin-metni-standard.md K1.
+ */
 export default async function LangLayout({ children, params }: Props) {
   const { lang } = await params
-  const dictionary = lang === 'en' ? en : tr
 
   return (
-    <I18nProvider lang={lang as Lang} dictionary={dictionary as AppDictionary}>
+    <I18nProvider lang={lang as Lang}>
       {children}
     </I18nProvider>
   )

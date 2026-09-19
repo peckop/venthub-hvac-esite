@@ -854,6 +854,55 @@ describe('INV-BOARD-5 · loop hatırlatması', () => {
   })
 })
 
+/**
+ * INV-BOARD-BRIEF-OZET · pano satırı ÖZETTİR, tam desen listesi her turda basılmaz.
+ *
+ * REC-345 Kova C (2026-09-17 ölçümü): tam liste OPS'ta 543 kez · 1.278 KB, URUN'da 332 kez ·
+ * 681 KB — iki pencerede TEK en büyük bağlam kalemi. Satırın işi "kim canlı"; desen ayrıntısı
+ * yalnız istemdeki bir yol başka şeridin desenine değdiğinde basılır.
+ */
+describe('INV-BOARD-BRIEF-OZET · pano satiri ozet', () => {
+  const SID_BEN = '55555555-aaaa-4aaa-8aaa-555555555555'
+  const SID_OTEKI = '66666666-bbbb-4bbb-8bbb-666666666666'
+  const HOOK_YOLU = require.resolve('../../../.claude/hooks/board-brief.cjs')
+
+  function kostur(prompt: string): string {
+    const ciftler = Object.entries(process.env).filter(([k]) => k !== 'CLAUDE_SESSION_ID')
+    ciftler.push(['VENTHUB_BOARD_DIR', boardDir])
+    const r = spawnSync('node', [HOOK_YOLU], {
+      encoding: 'utf8',
+      env: Object.fromEntries(ciftler) as typeof process.env,
+      input: JSON.stringify({ session_id: SID_BEN, prompt }),
+    })
+    return r.stdout ?? ''
+  }
+
+  function kur(): void {
+    const board = loadBoard(boardDir)
+    board.append(SID_BEN, { ts: isoAgo(20_000), type: 'claim', lane: 'BEN', globs: ['docs/ben/**'] })
+    board.append(SID_OTEKI, {
+      ts: isoAgo(40_000), type: 'claim', lane: 'OTEKI',
+      globs: ['scripts/board/**', '.claude/hooks/**', 'docs/audits/rec999-*', 'src/lib/**'],
+    })
+  }
+
+  it('desen listesi BASILMAZ, yalniz sayi + yas', () => {
+    kur()
+    const cikti = kostur('merhaba, durum nedir?')
+    expect(cikti, 'pano satiri yok — testin on kosulu').toContain('PANO:')
+    expect(cikti, 'ozet bicimi yok').toMatch(/OTEKI=66666666 \(4 desen, \d+dk\)/)
+    expect(cikti, 'tam desen listesi hala her turda basiliyor').not.toContain('docs/audits/rec999-*')
+    expect(cikti).not.toContain('scripts/board/**')
+  })
+
+  it('istemdeki yol baska seridin desenine DEGERSE yalniz o desen basilir', () => {
+    kur()
+    const cikti = kostur('su dosyaya bakar misin: src/lib/services/urun.ts')
+    expect(cikti, 'degen desen basilmadi — cakisma aninda sahip gorunmez').toContain('istemdeki yola değen: src/lib/**')
+    expect(cikti, 'degmeyen desen de basildi — ozet bozuldu').not.toContain('scripts/board/**')
+  })
+})
+
 describe('INV-BOARD-1 · toRepoRelative git kökünden çözer', () => {
   it('cwd BAŞKA bir repoda olsa bile, dosyanın KENDİ git kökünden repo-göreli yol üretir', () => {
     const board = loadBoard(boardDir)

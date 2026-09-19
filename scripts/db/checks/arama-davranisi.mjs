@@ -74,7 +74,18 @@ const VAKALAR = [
   { no: 8, q: 'kanal tipi fan', olcut: 'sifir-degil', nicin: 'üç kelime + kategori' },
   { no: 9, q: 'duvar tipi aspiratör', olcut: 'sifir-degil', nicin: "dört kelime, ad'da geçmeyen terim" },
   { no: 10, q: 'ISI GERI KAZANIM', olcut: 'ayni-kume', referans: 6, nicin: 'büyük harf + noktasız (K5.2)' },
+  // ── 2026-09-17, URUN #1246 (cetvel §8 vaka 13/14/15) ──
+  { no: 13, q: 'jet fan', olcut: 'ad-isabeti-sira', nicin: 'ilk satır = kümedeki en yüksek ad isabeti (K3.1e)' },
+  { no: 14, q: 'vortis', olcut: 'marka-tavani', marka: 'vortice', nicin: 'marka tavanı: ≤ marka aktif sayısı, marka dışı 0 (K8.4a)' },
+  { no: 15, q: 'ISI GERİ KAZANIM', olcut: 'ayni-sayi', referans: 6, nicin: 'büyük İ lower() öncesi indirilir (K5.2a)' },
+  // Cetvel vaka 15'in ikinci sorgusu ("İNLİNE") küçük harfli karşılığa ihtiyaç duyar; o karşılık
+  // tabloda ayrı vaka değil, bu yüzden 16 (referans) + 17 (büyük İ) olarak iki satıra açıldı.
+  { no: 16, q: 'inline', olcut: 'sifir-degil', nicin: 'vaka 17 referansı (küçük harf)' },
+  { no: 17, q: 'İNLİNE', olcut: 'ayni-sayi', referans: 16, nicin: 'büyük İ lower() öncesi indirilir (K5.2a, cetvel vaka 15)' },
 ]
+
+/** K8.4a: bu ölçütlerde genel %40 tavanı UYGULANMAZ — tavan markanın aktif ürün sayısıdır. */
+const MARKA_OLCUTLERI = new Set(['marka-var', 'marka-tavani'])
 
 /**
  * BİLİNEN KIRMIZILAR — ⭐LİSTE 09-16'DA KÜÇÜLDÜ (mandalın ikinci yönü işledi).
@@ -95,14 +106,19 @@ const VAKALAR = [
  * Adım 2 gövde genişletmesini canlıya indirdi ve vaka 3 düzeldi, ama vaka 9 HÂLÂ 0 —
  * yani kök AYNI DEĞİLDİ. Ölçüm bir varsayımı çürüttü; satır ona göre yazıldı.
  *
+ * 2026-09-17 prod ölçümü (URUN #1235, pgroonga + tek arama gövdesi canlıda, merge 92049ac2f):
+ * vaka 2 "havalandirma" **0 → 50** · vaka 9 "duvar tipi aspiratör" **0 → 40** · vaka 10
+ * "ISI GERI KAZANIM" **3 → 20 (vaka 6 ile AYNI KÜME)**. ⭐2, 9, 10 LİSTEDEN ÇIKTI — mandalın
+ * ikinci yönü PR #1240'ta KIRMIZI verdi, satırlar o yüzden silindi.
+ * Vaka 5 "vortis" 0 → 184 geçti ama TAVAN kolu kırmızı: ilanın GEREKÇESİ değişti (arama hatası
+ * değil, marka vakasında tavan kuralının kendisi yanlış) — satır yeni gerekçeyle yazıldı.
+ *
  * Her satır NİÇİN kırmızı olduğunu ve düzeltmenin HANGİ adımda geldiğini yazar. Gerekçesiz
  * satır kabul edilmez (kardeş kapı `catalog-integrity` ile aynı kural).
  */
 const BILINEN_KIRMIZI = {
-  2: 'Turkce karakter normalizasyonu YOK: "havalandirma" (noktasiz) 0 donuyor, "havalandırma" 50. Duzeltme: REC-340 Faz 1 Adim 3 (unaccent) — Adim 2 govdeyi genisletti ama normalizasyon getirmedi.',
-  5: 'Yazim hatasi toleransi YOK: "vortis" 0. Duzeltme: REC-340 Faz 1 Adim 3 (trigram yedegi).',
-  9: '"duvar tipi aspirator" HALA 0 — Adim 2 govde genisletmesi canliya indi ve vaka 3 duzeldi, bu duzelmedi; yani kok vaka 3 ile AYNI DEGILDI (eski ilan boyle saniyordu, olcum curuttu). Duzeltme: REC-340 Faz 1 Adim 3.',
-  10: 'Buyuk harf + noktasiz "ISI GERI KAZANIM" 3 sonuc veriyor, kucuk harfli hali 9 — AYNI KUME DEGIL (ilk satir kimligi de farkli). Duzeltme: REC-340 Faz 1 Adim 3 (normalizasyon).',
+  // 2026-09-17: vaka 5 ilanı SİLİNDİ — cetvel K8.4a (URUN #1246) marka vakasında genel %40
+  // tavanını kaldırdı, kapı ona göre güncellendi (MARKA_OLCUTLERI). Liste BOŞ: hedef budur.
 }
 
 function baglantiDizesi() {
@@ -118,6 +134,94 @@ async function olc(client, vaka) {
     [vaka.q, '{}'],
   )
   return rows
+}
+
+/**
+ * ⭐ROL KOLU (INV-SEARCH-BEHAVIOR-1 · 2026-09-17).
+ *
+ * Kapı bağlantı dizesinin kullanıcısıyla (postgres) ölçüyordu. #1235 canlıya inince
+ * yardımcı fonksiyonlardan EXECUTE alındı, dış uçlar SECURITY INVOKER kaldı ve arama
+ * ziyaretçide + girişli müşteride TAMAMEN BOŞ döndü (anon REST: 42501 permission denied for
+ * function arama_eslesen_urunler). Kapı o gün "jet fan 61" diye YEŞİL verdi — yetki kusuru
+ * yalnız o rolde görünür; sahibin rolüyle ölçen kapı onu tanım gereği göremez.
+ *
+ * Bu yüzden her vaka vitrinin GERÇEK rolleriyle de koşar: `set local role` bir işlem içinde,
+ * sonunda ROLLBACK (yazma yok, oturum rolü sızmaz). Ölçüt sabit sayı değil: sahip rolü sonuç
+ * bulurken vitrin rolü hata veriyor ya da BOŞ dönüyorsa İHLAL.
+ */
+const VITRIN_ROLLERI = ['anon', 'authenticated', 'authenticated-iddiasiz']
+
+/** Kol adı → gerçek Postgres rolü (iddiasız kol da `authenticated` rolüyle koşar). */
+const ROL_PG = {
+  anon: 'anon',
+  authenticated: 'authenticated',
+  'authenticated-iddiasiz': 'authenticated',
+}
+
+/**
+ * ⭐ROL TEK BAŞINA GERÇEK İSTEK DEĞİL — JWT iddiaları da vitrindeki gibi kurulur.
+ *
+ * 2026-09-17 ölçüldü: `set local role authenticated` iddiasız koşunca `fts_search_products`
+ * 54001 stack depth ile patlıyor (display_price → is_user_admin → user_profiles politikası →
+ * is_admin_user → iddia yoksa YİNE user_profiles …). Ama canlıda `custom_access_token_hook`
+ * ETKİN (Auth config: hook_custom_access_token_enabled=true) ve her jetona `user_role` yazıyor
+ * — profili olmayana bile "user". Yani iddiasız authenticated jeton vitrinde ÜRETİLMEZ; iddiasız
+ * ölçmek müşterinin görmediği bir kırmızıyı ölçer. İddiasız hâl GERÇEK bir kusurdur (REC-355,
+ * VULN) ve onarımıyla AYNI PR'da ayrı kol olarak gelir.
+ * Kanca çıktısının biçimi birebir: kök + app_metadata altında user_role.
+ *
+ * ⭐İDDİASIZ KOL EKLENDİ (REC-355 onarımı, 2026-09-18 — yukarıdaki söz burada kapanıyor):
+ * `authenticated-iddiasiz` kolu `user_role` taşımayan bir jetonu taklit eder. Bu hâl vitrinde
+ * hook açıkken üretilmez ama hook kapanırsa, hook'tan önce üretilmiş uzun ömürlü bir jeton
+ * kullanılırsa ya da PostgREST doğrudan çağrılırsa üretilir. Onarımdan ÖNCE bu kol 54001
+ * veriyordu (gölgede ölçüldü); onarımdan sonra hata vermemeli. Kol kırmızıya dönerse döngü geri
+ * gelmiş demektir — onarımın kalıcı bekçisi bu satırdır.
+ */
+const VITRIN_IDDIALARI = {
+  anon: { role: 'anon' },
+  authenticated: { role: 'authenticated', user_role: 'user', app_metadata: { user_role: 'user' } },
+  'authenticated-iddiasiz': { role: 'authenticated' },
+}
+
+async function olcRolle(client, vaka, rol) {
+  await client.query('begin')
+  try {
+    await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(VITRIN_IDDIALARI[rol])])
+    await client.query(`set local role ${ROL_PG[rol]}`)
+    const { rows } = await client.query(
+      'select id from public.fts_search_products($1, 500, $2::jsonb)',
+      [vaka.q, '{}'],
+    )
+    return { n: rows.length, hata: null }
+  } catch (e) {
+    return { n: 0, hata: `${e.code ?? ''} ${e.message}`.trim() }
+  } finally {
+    await client.query('rollback')
+  }
+}
+
+/**
+ * ⭐İDDİASIZ KOL, ONARIM HEDEF VERİTABANINDA VARSA KOŞAR — TEK YÖNLÜ MANDAL.
+ *
+ * NİÇİN (2026-09-18 ölçüldü, kapı kendi PR'ında kırmızı verdi): bu kol REC-355 onarımının
+ * KALICI BEKÇİSİDİR, ama onarım henüz canlıda yokken 15 vakanın 15'inde 54001 veriyor — yani
+ * kapı, onardığı kusuru ölçtüğü için onarımın merge edilmesini engelliyordu (merge ritüeli 0
+ * kırmızı ister). Kolu PR'dan çıkarmak bekçiyi "sonraki işe" bırakmak olurdu; ilan listesine
+ * yazmak ise yasak — "vitrinde aramanın çalışmaması bilinen kırmızı olamaz" (aşağıdaki satır).
+ *
+ * Çözüm: kol, ölçtüğü onarımın VARLIĞINA bağlanır. `public.is_admin_claim()` hedef veritabanında
+ * yoksa kol ATLANIR ve bu YÜKSEK SESLE yazılır (atlanmış iş yeşil değildir). Onarım uygulandığı
+ * an kol kendiliğinden koşar ve bir daha asla atlanmaz — mandal tek yönlüdür, çünkü onarım geri
+ * alınsa fonksiyon da düşer ve o zaman atlama satırı yine görünür, sessizlik olmaz.
+ *
+ * ⛔ÖN KOŞUL ÖLÇÜLEMEZSE FAIL-CLOSED: sorgu hata verirse kol atlanır AMA ihlal yazılır. "Ölçemedim"
+ * ile "sorun yok" aynı şey değildir.
+ */
+async function onarimVarMi(client) {
+  const { rows } = await client.query(
+    "select to_regprocedure('public.is_admin_claim()') is not null as var",
+  )
+  return rows[0].var === true
 }
 
 async function main() {
@@ -151,9 +255,17 @@ async function main() {
   }
 
   const kokSertifika = path.join(KOK, 'scripts', 'db', 'checks', 'supabase-root-2021-ca.pem')
+  /**
+   * ⭐YEREL HEDEF TLS İSTEMEZ (2026-09-18 ölçüldü): kök sertifika dosyası depoda durduğu için
+   * betik yerel gölgeye de TLS ile bağlanmaya çalışıyordu ve "server does not support SSL
+   * connections" ile düşüyordu — yani onarımların kolları gölgede HİÇ koşulamıyordu. Uzak hedefte
+   * davranış değişmedi: sertifika varsa TLS zorunlu. Yerel hedef adres üzerinden ayırt edilir.
+   */
+  const yerelHedef = /@(localhost|127\.0\.0\.1|\[::1\])[:/]/.test(temizDizi)
+  if (yerelHedef) console.log('arama-davranisi: hedef YEREL — TLS aranmadi')
   const client = new pg.Client({
     connectionString: temizDizi,
-    ssl: fs.existsSync(kokSertifika) ? { ca: fs.readFileSync(kokSertifika, 'utf8') } : undefined,
+    ssl: !yerelHedef && fs.existsSync(kokSertifika) ? { ca: fs.readFileSync(kokSertifika, 'utf8') } : undefined,
   })
   await client.connect()
 
@@ -169,11 +281,70 @@ async function main() {
 
   const sonuclar = new Map()
   for (const v of VAKALAR) sonuclar.set(v.no, await olc(client, v))
-  await client.end()
+
+  // K8.4a: marka vakalarının tavanı = markanın aktif ürün sayısı (sabit sayı değil, canlıdan).
+  const markaAktif = new Map()
+  for (const v of VAKALAR.filter((x) => x.olcut === 'marka-tavani')) {
+    const r = await client.query(
+      "select count(*)::int as n from public.products where status='active' and deleted_at is null and brand ilike $1",
+      [`%${v.marka}%`],
+    )
+    markaAktif.set(v.no, r.rows[0].n)
+  }
+
+  // K3.1e: ad isabeti canlı fonksiyonla ölçülür. Fonksiyon YOKSA bu bir ihlal değil ÖLÇEMEMEKTİR
+  // → exit 2 (catch). Aynı fonksiyonu kapıda yeniden yazmak iki uygulama doğururdu.
+  const adIsabeti = new Map()
+  for (const v of VAKALAR.filter((x) => x.olcut === 'ad-isabeti-sira')) {
+    const idler = sonuclar.get(v.no).map((r) => r.id)
+    if (idler.length === 0) { adIsabeti.set(v.no, new Map()); continue }
+    const r = await client.query(
+      `select p.id::text as id,
+              public.arama_ad_isabeti(concat_ws(' ', p.name, p.name_i18n->>'tr', p.name_i18n->>'en'), $1)::float8 as puan
+         from public.products p where p.id = any($2::uuid[])`,
+      [v.q, idler],
+    )
+    adIsabeti.set(v.no, new Map(r.rows.map((x) => [x.id, Number(x.puan)])))
+  }
 
   const ihlaller = []
   const uyarilar = []
   const gecenler = []
+  const atlananlar = []
+
+  // İddiasız kolun ön koşulu: onarım hedef veritabanında var mı (bkz. onarimVarMi yorumu).
+  let onarim = null
+  try {
+    onarim = await onarimVarMi(client)
+  } catch (e) {
+    ihlaller.push(
+      `ROL authenticated-iddiasiz kolunun ON KOSULU OLCULEMEDI (${`${e.code ?? ''} ${e.message}`.trim()}) — ` +
+        'fail-closed: "olcemedim" ile "sorun yok" ayni sey degil.',
+    )
+  }
+  const kosulacakRoller =
+    onarim === true ? VITRIN_ROLLERI : VITRIN_ROLLERI.filter((r) => r !== 'authenticated-iddiasiz')
+  if (onarim === false) {
+    atlananlar.push(
+      'ROL authenticated-iddiasiz kolu ATLANDI — onarim hedef veritabaninda YOK ' +
+        '(public.is_admin_claim mevcut degil, REC-355). Migration uygulanir uygulanmaz bu kol ' +
+        'KENDILIGINDEN kosar; o an 54001 verirse kapi KIRMIZI olur.',
+    )
+  }
+
+  // Rol kolu İLANA TABİ DEĞİL: vitrinde aramanın çalışmaması "bilinen kırmızı" olamaz.
+  for (const v of VAKALAR) {
+    const sahipN = sonuclar.get(v.no).length
+    for (const rol of kosulacakRoller) {
+      const r = await olcRolle(client, v, rol)
+      if (r.hata) {
+        ihlaller.push(`[vaka ${v.no}] "${v.q}" ROL ${rol} — sorgu HATA verdi: ${r.hata}`)
+      } else if (sahipN > 0 && r.n === 0) {
+        ihlaller.push(`[vaka ${v.no}] "${v.q}" ROL ${rol} — BOS (sahip rolu ${sahipN} sonuc buluyor)`)
+      }
+    }
+  }
+  await client.end()
 
   const kimlikKumesi = (rows) => new Set(rows.map((r) => String(r.id)))
 
@@ -203,10 +374,32 @@ async function main() {
     } else if (v.olcut === 'tam-tek-sku') {
       if (n !== 1) hata = `tam 1 sonuc beklenirken ${n}`
       else if (String(rows[0].sku) !== v.sku) hata = `ilk satir SKU ${rows[0].sku}, beklenen ${v.sku}`
+    } else if (v.olcut === 'marka-tavani') {
+      const tavan = markaAktif.get(v.no) ?? 0
+      const disi = rows.filter((r) => !String(r.brand ?? '').toLowerCase().includes(v.marka)).length
+      if (tavan === 0) hata = `markanin aktif urun sayisi 0 — tavan olculemez (marka "${v.marka}")`
+      else if (n === 0) hata = `0 sonuc (marka "${v.marka}" aktif ${tavan})`
+      else if (n > tavan) hata = `marka TAVANI asildi: ${n} > ${v.marka} aktif ${tavan}`
+      else if (disi > 0) hata = `marka disi sonuc ${disi} (beklenen 0)`
+    } else if (v.olcut === 'ayni-sayi') {
+      const refN = sonuclar.get(v.referans).length
+      if (refN === 0) hata = `referans vaka ${v.referans} BOS — sayi karsilastirmasi anlamsiz`
+      else if (n !== refN) hata = `vaka ${v.referans} ile AYNI SAYI DEGIL (${n} vs ${refN})`
+    } else if (v.olcut === 'ad-isabeti-sira') {
+      const puanlar = adIsabeti.get(v.no) ?? new Map()
+      if (n === 0) hata = '0 sonuc — sira olculemez'
+      else {
+        const ilk = puanlar.get(String(rows[0].id))
+        const enYuksek = Math.max(...puanlar.values())
+        if (ilk === undefined) hata = 'ilk satirin ad isabeti olculemedi'
+        else if (ilk < enYuksek) hata = `ilk satir ad isabeti ${ilk.toFixed(2)} < kumedeki en yuksek ${enYuksek.toFixed(2)}`
+      }
+    } else {
+      hata = `TANIMSIZ olcut "${v.olcut}" — kapi bu vakayi OLCMUYOR`
     }
 
-    // Hassasiyet tavanı — HER vakaya uygulanır (cetvel K8.4 / vaka 11).
-    if (!hata && aktif > 0 && n > aktif * TAVAN_ORAN) {
+    // Hassasiyet tavanı — marka ölçütleri DIŞINDAKİ her vakaya (cetvel K8.4; marka için K8.4a).
+    if (!hata && !MARKA_OLCUTLERI.has(v.olcut) && aktif > 0 && n > aktif * TAVAN_ORAN) {
       hata = `hassasiyet TAVANI asildi: ${n} > aktif ${aktif} x ${TAVAN_ORAN}`
     }
 
@@ -231,11 +424,16 @@ async function main() {
   }
 
   if (JSON_KIPI) {
-    console.log(JSON.stringify({ aktif, ihlaller, uyarilar, gecenler }, null, 2))
+    console.log(JSON.stringify({ aktif, ihlaller, uyarilar, gecenler, atlananlar }, null, 2))
   } else {
     console.log(`\naktif urun: ${aktif} | hassasiyet tavani: ${Math.floor(aktif * TAVAN_ORAN)} sonuc\n`)
     console.log(`GECEN ${gecenler.length}:`)
     for (const g of gecenler) console.log('  ' + g)
+    if (atlananlar.length) {
+      console.log(`\n⛔ATLANMIS IS YESIL DEGILDIR — ${atlananlar.length} kol OLCULMEDI:`)
+      for (const a of atlananlar) console.log('  ' + a)
+      console.log(`::warning title=ARAMA DAVRANISI (olculmeyen kol)::${atlananlar.length} rol kolu atlandi — onarim hedef veritabaninda yok (REC-355).`)
+    }
     if (uyarilar.length) {
       console.log(`\n⚠BILINEN KIRMIZI ${uyarilar.length} (REC-340, kapi bu yuzden kirmizi DEGIL):`)
       for (const u of uyarilar) console.log('  ' + u)

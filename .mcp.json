@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "wrongstack-sage": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/sage-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio",
+        "--writable"
+      ]
+    },
+    "wrongstack-codebase-index": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/codebase-index-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio"
+      ]
+    },
+    "wrongstack-kanban": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio",
+        "--writable"
+      ],
+      "env": {
+        "WRONGSTACK_KANBAN_VERIFIER_COMMANDS": "+gh"
+      }
+    }
+  }
+}

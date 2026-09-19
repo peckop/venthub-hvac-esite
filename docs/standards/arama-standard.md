@@ -92,6 +92,24 @@ gelirse) gövde üreticisi güncellenir — kapı kolu bu eşitliği ölçer.
 Bu sınırın kapatılması = kategori adı çevirisini DB'ye taşımak; **ayrı iştir**, bu cetvelin
 kapsamında değildir ama burada adıyla yazılıdır ki "unutulmuş" sanılmasın.
 
+**⭐K3.1e — SIRA KURALI AÇIK SÜTUNLARLA KURULUR, `ts_rank` TEK BAŞINA DEĞİL (2026-09-17 ölçümü).**
+K3.1a'daki ağırlık dizisi **tek kelimede** "adında geçen önce" sonucunu verir, **çok kelimede
+vermez**: `ts_rank` AND sorgusunda kelime puanlarını birleştirir, bir kelimenin düşük ağırlığı
+diğerinin A'sını ezer. Canlı vaka: `jet fan` 61 ürün (40 SEAT + 21 JET). JET ürününde `jet` adda
+(A), `fan` yalnız teknik metinde (D) → **0,30**; SEAT ürününde iki kelime de aile adında (C,
+"SEAT Storm Jet … Fanlar") → **0,51**. İlk 20'nin **20'si SEAT** çıktı; adında JET yazan ürün
+listeye hiç girmedi. Eski öneri kutusu JET'i yalnız alfabetik şansla (J < S) başa koyuyordu.
+Kural: iki yüzeyde de sıra **basamak ↑ · ad isabeti ↓ · `ts_rank` ↓ · ad ↑**. *Ad isabeti*
+(`arama_ad_isabeti`) = normalize edilmiş sorgu köklerinden kaçının normalize edilmiş ürün adında
+(ad + TR/EN çeviri, K3.1'in A alanları) bulunduğu. **İki taraf da `arama_normalize`'dan geçer:**
+geçmezse doğru yazılmış Türkçe sorgu sessizce kaybeder (`ısı` kökü `ıs`, büyük harfli addaki
+`ISI` ise `is` olur; normalizesiz ölçümde `ısı geri kazanım` ad isabeti 1, `isi geri kazanim` 3 —
+bağımsız çürütücü ölçtü). Gölge ölçümü (442 ürün, 22 vaka, anon rolüyle): sıra değişen yalnız
+`jet fan`/`fan jet` (ilk 20'de adda geçen 0 → 20) ve `ısı geri kazanım` (ilk 3 AVenS); sonuç
+**kümeleri** canlıyla aynı, iki yüzeyin ilk ürünü **22/22 eşit**. `rank` sütununun anlamı
+değişmedi (`ts_rank − basamak/100`); sıra açık sütunlarla kurulur, istemci `rank`'e göre
+sıralamaz (ölçüldü).
+
 **K3.2** — Kalın satırlar (aile, üst kategori, alt kategori) **zorunludur ve sebebi ölçülmüştür.** Ürün adlarımız teknik künye
 biçimindedir (`JET 20 · 1400 d/dk · 0,18 kW · 220V`); "fan", "aspiratör" gibi kelimeler ürün adında
 değil **kategorisinde** yaşar. 2026-09-15 ölçümü: 441 aktif üründen ad+açıklama gövdesinde "fan"
@@ -120,6 +138,14 @@ sonucu vermelidir. Kullanıcının klavye alışkanlığı arama sonucunu belirl
 yüzden tek biçimli küçültme metinleri kaçırır. *(Aynı körlük 2026-09-15'te vaat kapısında sahada
 görüldü: ekrandaki "AI-powered" metni `ai-powered` terimiyle hiç eşleşmiyordu. Aynı hata ödeme
 kapısında da vardı — "Installment" ve "PCI DSS" görünmüyordu.)*
+
+**⛔K5.2a — BÜYÜK "İ" `lower()`'dan ÖNCE indirilir (2026-09-17 ölçümü).** Postgres `lower('İ')`
+tek harf değil **`i` + birleşik nokta (U+0307)** üretir; ardından gelen `translate` onu yakalamaz.
+`arama_normalize('GERİ')` 5 karakter çıkıyordu. Etki: `ISI GERİ KAZANIM` 3 ürün (küçük harfle 20),
+`İNLİNE` **0** (`inline` 24); aynı ifade tetikte olduğu için 28 satırın arama metninde de nokta
+kalmıştı. Doğrusu: `translate(p,'İ','i')` → `lower` → Türkçe `translate` → `replace(…, chr(775), '')`.
+Guard `arama_normalize('ISI GERİ KAZANIM İNLİNE') = 'isi geri kazanim inline'` eşitliğini ve
+tabloda U+0307 kalmadığını ölçer; ziyaretçi rolüyle büyük/küçük yazım aynı sayıyı vermelidir.
 
 **K5.3 — Normalizasyon fonksiyonları ŞEMA-NİTELİKLİ çağrılır.** Arama RPC'leri
 `SET search_path TO 'pg_catalog','public'` ile koşuyor; `pg_trgm` ve `unaccent` ise `extensions`
@@ -164,6 +190,35 @@ bulmalıdır. İki ölçülmüş tuzak:
 
 **K6.6 — Yazım hatası yedeği hassasiyeti düşürür; tavanı vardır.** Bkz. K8.4.
 
+**⛔K6.4a — TRIGRAM YAZIM HATASI İÇİN YANLIŞ ARAÇTIR.** *(2026-09-16, 442 ürünle ölçüldü —
+K6.4'ün trigram önerisini ÇÜRÜTÜR; K6.4 oradaki iki tuzak için doğru kalır ama araç seçimi
+yanlıştı.)* Eşikli trigram bazı hatayı affeder bazısını affetmez: `vortis`/`santrifuj`/`aspiratr`
+geçerken `nikotra`/`plug fen`/`kanal tipi fann` düşüyordu. Eşiksiz sıralama **daha kötüdür**:
+`"kanal tipi fann"` → *"12 kW Elektrikli Isıtıcı"*, `"zzzqqq"` → Vortice ürünleri.
+**Doğru ölçüt harf mesafesidir** (`levenshtein`), üç-harf parçacığı benzerliği değil.
+
+**⭐K6.4b — ADAY ÜRET + DOĞRULA.** Yazım hatası dalı tek araçla kurulmaz: hızlı bir indeks
+(pgroonga `fuzzy_search`) **aday** üretir, harf mesafesi bu adayları **doğrular**. Doğrulama iki
+kural taşır ve ikisi de ölçülmüştür:
+- **İlk üç harf tutmalıdır.** `vortis`→`vortice` tutar (meşru), `kasals`→`kanal` tutmaz. Bu şart
+  olmadan `"kasals"` araması **224 alakasız kanal ürünü** döndürüyordu.
+- **Gövde kelimesi sorgu uzunluğuna kırpılır.** Türkçe eki mesafeyi şişirir:
+  `aspiratr` ↔ `aspiratorler` mesafe **4**, kırpınca **1**.
+
+**K6.4c — Yazım hatası düzeltmesi önce MARKA sözlüğüne bakar, sözlük SABİT DEĞİLDİR.** Marka
+kelimeleri `brands` tablosundan türetilir; yeni marka eklenince düzeltme kendiliğinden kapsar.
+Katalogda **olmayan** bir marka arandığında doğru davranış **boş dönmektir** (ölçüldü: `kasals`,
+`fleksiva` → 0).
+
+**⭐K6.7 — TOKENIZER SEÇİMİ TÜRKÇE İÇİN YAPILANDIRMA DEĞİL, DOĞRULUK MESELESİDİR.**
+pgroonga'nın varsayılan tokenizer'ı alfabetik dizileri **kelime bazlı** işler; Türkçe sondan
+eklemeli olduğu için `"fanlar"` tek token olur ve `"fan"` araması onu **bulamaz**. Ölçüldü
+(442 ürün): varsayılanla `jet`+`fan` kesişimi **0**, `TokenBigramSplitSymbolAlphaDigit` ile
+**61** — sıralı taramayla birebir.
+⚠**Aynı indeks ek toleransı ile yazım hatası toleransını BİRLİKTE veremez:** ek toleranslı
+indekste `fuzzy_search` bigram'lar üzerinde çalışır ve anlamsızlaşır (`vortis` mesafe 2 →
+**442/442**). Bu yüzden **iki sütun, iki indeks** gerekir: aynı metin, iki tokenizer.
+
 ## 7. Tenant ve yetki (kural 12)
 
 **K7.1** — Arama RPC'leri **`SECURITY INVOKER`** kalır (`prosecdef = false`). Bugün üçü de öyle ve
@@ -202,6 +257,13 @@ SKU vakasında anlamlıdır.
 0 → 61'e çıkıyor, yani "Fan" kategorisindeki her şey sorguya karışma riski taşıyor.)* Hiçbir vaka
 aktif ürünlerin **%40'ından fazlasını** döndürmemelidir.
 
+**K8.4a — Marka vakasında tavan MARKANIN aktif ürün sayısıdır, %40 değil (2026-09-17, ALTYAPI
+önerisi, ölçüldü).** Bir marka kataloğun büyük payını tutabilir: `vortis` 184 sonuç = aktif
+ürünlerin **%41,6'sı**, genel tavan bu vakayı yanlışlıkla kırmızı yapar. Oysa 184'ün 184'ü
+Vortice ve Vortice'in aktif ürün sayısı tam 184. Marka ölçütlü vakada iki iddia birlikte kurulur:
+**sonuç ≤ o markanın aktif ürün sayısı** ve **marka dışı sonuç = 0**. Canlı ölçüm: vortis
+184/184 · nikotra 35/35 · avnes 106/106 · danfos 35/35, dördünde de marka dışı 0.
+
 **K8.5 — Bugün çalışan davranış regresyon testine bağlanır.** `VRT-17160` gibi tam SKU araması
 bugün **kusursuz** çalışıyor (tam 1 sonuç); yazım hatası yedeği eklenince benzer SKU'larla
 kirlenebilir. Çalışan bir davranışı değiştiren her değişiklik regresyon kolu ister; bu tartışmaya
@@ -235,6 +297,9 @@ Aşağıdaki vakalar **taban**dır; genişletilebilir, daraltılamaz.
 | 10 | `ISI GERI KAZANIM` | büyük harf + noktasız (K5.2) | vaka 6 ile aynı küme |
 | 11 | — (her vaka) | hassasiyet tavanı (K8.4) | aktif ürünlerin **≤ %40'ı** |
 | 12 | — (Y1 ↔ Y2) | iki yüzey aynı gövde (K4.1) | **aynı ilk ürün** |
+| 13 | `jet fan` | ad isabeti sırası (K3.1e) | ilk satırın ad isabeti = kümedeki **en yüksek** ad isabeti (ada göre değil davranışa göre; katalog "Jet …" adlı başka ürün eklese de kırılmaz) |
+| 15 | `ISI GERİ KAZANIM`, `İNLİNE` | büyük İ (K5.2a) | küçük harfli yazımla **aynı sayı** |
+| 14 | `vortis` | marka tavanı (K8.4a) | ≤ Vortice aktif ürün sayısı, marka dışı **0** |
 
 ## 9. Hata yolları (kural 14)
 
@@ -308,11 +373,34 @@ TRUNCATE/REFERENCES/TRIGGER) veriyor — ölçüldü. RLS yazmayı zaten reddede
 tek katmana güvenilmez: içeriği zehirlenirse kullanıcıya **yanlış ürün** gösterilir. Bu yüzden
 `REVOKE ALL` + `GRANT SELECT` yazılır ve kuyruk tablosunda okuma da kapatılır.
 
-**K12.2 — `unaccent` IMMUTABLE değildir** (STABLE'dır), bu yüzden indeks ifadesinde ya da
-üretilmiş sütunda doğrudan kullanılamaz; IMMUTABLE sarmalayıcı gerekir. **Kurulumdan sonra
-`select proname, provolatile from pg_proc where proname='unaccent'` ile doğrulanır ve sonuç
-migration guard'ına yazılır.** *(Bu satır belge okumasına dayanıyor; bu veritabanında henüz
-ölçülmedi çünkü eklenti kurulu değil.)*
+**⛔K12.1c — TÜREV sütun da ÜRETİLMİŞ SÜTUN OLARAK EKLENMEZ (mevcut tabloda).** *(2026-09-16'da
+bu madde "türev sütun üretilmiş olmalıdır" diyordu; 2026-09-17'de INV-MIGRATION-3 (squawk)
+kırmızısıyla ÇÜRÜDÜ.)* Dolu bir tabloya üretilmiş sütun eklemek tabloyu **baştan yazar** ve
+ACCESS EXCLUSIVE kilit tutar — squawk `adding-field-with-default`. Doğru yol yardım belgesindeki
+yoldur (`.github/migration-linter-yardim.md`): **NULL'a izin veren sütun + mevcut satırları
+doldurma + `BEFORE INSERT OR UPDATE OF <kaynak>` tetiği.** Tetik fonksiyonundan `EXECUTE` geri
+alınır (K12.1b). Küçük tablo gerekçesiyle kural susturulmaz.
+
+**K12.1d — pgroonga indeksi `CONCURRENTLY` kurulur, fonksiyonlar indeksten SONRA değişir.**
+pgroonga `create index concurrently`'yi destekler (gölgede ölçüldü, `indisvalid = true`).
+CONCURRENTLY işlem içinde koşamaz; dosya kendi `begin;/commit;`ini yazar ve indeksi iki işlemin
+**arasında** kurar. Yeni gövde `&\`` script sözdizimini kullanır ve o **yalnız indeks taramasında**
+çalışır — fonksiyonlar indeksten önce değişirse arada gelen canlı aramalar hata verir.
+Yarıda kalan CONCURRENTLY geçersiz indeks bırakır ve `if not exists` onu atlar: bu yüzden önce
+geçersiz indeks düşürülür, guard da `indisvalid`'i ölçer.
+
+**⛔K12.5 — pgroonga indeksi o sütundaki `LIKE` SORGULARINI DA ELE GEÇİRİR.** Bir sütuna
+pgroonga indeksi kurulduğunda mevcut `LIKE '%...%'` sorguları da indeksten cevaplanır ve
+**yanlış tokenizer ile yanlış sonuç verirler.** Ölçüldü: sıralı tarama 61 satır dönerken
+indeksli aynı sorgu **0** döndü; doğru tokenizer'la ikisi birebir aynı oldu. Bu yüzden pgroonga
+eklenen her sütun için, o sütunu okuyan **mevcut** sorgular da yeniden ölçülür — indeks eklemek
+burada "yalnız hızlandırma" değildir, **sonuç değiştirebilir.**
+
+**K12.2 — `unaccent` GEREKMEDİ; kalem ölçümle DÜŞTÜ.** *(2026-09-16)* `translate(lower(x),
+'ıİşŞğĞüÜöÖçÇâîû','iisSgGuUoOcCaiu')` hem aksan körlüğünü hem Türkçe küçültmeyi çözüyor ve
+IMMUTABLE olduğu için üretilmiş sütunda doğrudan kullanılabiliyor. Bu ölçüm bir migration
+kalemini ve bir onay adımını tamamen düşürdü. *(Eklenti yine de kurulursa eski uyarı geçerlidir:
+`unaccent` STABLE'dır, indeks ifadesinde IMMUTABLE sarmalayıcı ister.)*
 
 **K12.3 — RPC imzası (`RETURNS TABLE`) değiştirilmez.** İmza değişikliği `drop` + `create`
 gerektirir; `drop` mevcut `GRANT`'leri de götürür ve arama anonim kullanıcıda **sessizce ölür**.
@@ -332,6 +420,40 @@ tuzağı yalnız çalışma anında görünür — tanım metni temiz görünür
 
 **K13.3 — Guard yetkiyi de doğrular.** `has_function_privilege('anon', ...)` — "değişmedi"
 varsayımı ölçüm değildir.
+
+**⭐K13.4 — ARAMA MIGRATION'I KONTROL LİSTESİ.** *(2026-09-16: tek bir migration'da İKİ kusur
+bırakıldı, ikisinin de emsali depoda yazılıydı. Kapıya bağlı tek madde yakalandı, kapısız
+dördünden ikisi kaçtı. Bu liste hatırlanmaz, **okunur.**)* Arama migration'ı açılmadan önce
+her madde tek tek işaretlenir:
+
+1. **`lock_timeout` + `statement_timeout` yazıldı mı** ve süre **ölçülerek mi** seçildi?
+   (Emsalden kopyalanan süre gerekçe değildir; koşum süresi ölçülür, pay yazılır.)
+2. **Yeni fonksiyonlardan `EXECUTE` açıkça geri alındı mı?** `pg_default_acl` bu veritabanında
+   her yeni fonksiyona `EXECUTE to PUBLIC` verir. Dışa açık uçlar **tek tek** `GRANT` edilir.
+3. **Yeni tablolarda `REVOKE ALL` + hedefli `GRANT` yazıldı mı?** (K12.1b)
+4. **`pnpm supabase:gen` koşturuldu mu?** Yeni tablo/sütun tip dosyasına yansımazsa filo-geniş
+   `INV-TIP-DRIFT-1` kırmızısı doğar.
+   ⚠**Sıra inceliği:** `supabase:gen` **canlıdan** üretir, yani migration merge olmadan yeni
+   sütunları göremez. Bu yüzden tip tazelemesi aynı PR'a **konamaz**; merge'den hemen sonra
+   ayrı ve küçük bir PR olarak gelir. Bu borç, migration PR'ının gövdesinde **adıyla yazılır**
+   — yoksa kapı ertesi gün başkasının PR'ında kırmızı yanar.
+5. **Opclass, operatör ve fonksiyonlar şema-nitelikli mi** ya da `search_path`'e `extensions`
+   eklendi mi? (K5.3, K5.3a — tanım metni temiz görünür, yalnız çalışma anında patlar.)
+6. **Guard davranış ölçüyor mu**, sabit sayı kullanıyor mu (K8.3 ihlali), **boş veritabanında
+   `NOTICE` ile atlıyor mu**?
+7. **Migration gölgede koşturuldu mu**, ve **ikinci kez** koşturulunca hatasız geçiyor mu?
+8. **Bu sütunu okuyan MEVCUT sorgular yeniden ölçüldü mü?** (K12.5 — indeks eklemek sonuç
+   değiştirebilir.)
+9. **⛔Yetki ZİYARETÇİ rolüyle mi doğrulandı?** Guard ve canlı ölçüm dış ucu `set local role anon`
+   (ya da anon anahtarıyla REST) üzerinden **çağırır**. *(2026-09-17: dış uçlar SECURITY INVOKER;
+   yardımcılardan EXECUTE geri alınınca ziyaretçi 42501 aldı ve canlı arama ~1 saat boş döndü.
+   Guard, "canlı ölçüm" ve arama kapısı üçü de `postgres` rolüyle koştuğu için hiçbiri görmedi —
+   doğru sayı, yanlış kişi. `has_function_privilege` tek başına yetmez: çağrı zincirindeki her
+   fonksiyonu tek tek saymak gerekir, çağrı bunu kendiliğinden yapar.)* Giriş yapmış müşteri
+   senaryosu `display_price`'a dokunuyorsa `user_role` iddialı JWT ile kurulur (iddiasız jeton
+   bugün ayrı bir kusurla 54001 veriyor, REC-355).
+10. **Sıra da ölçüldü mü, yalnız sayı değil?** Sonuç kümesi doğru olup ilk 20 yanlış olabilir
+    (K3.1e). Arayüz kaç satır gösteriyorsa guard o kadarının içeriğine bakar.
 
 ---
 

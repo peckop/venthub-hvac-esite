@@ -239,20 +239,22 @@ export const tr = {
       enterKey: 'Enter ↵',
       arrowUp: '↑',
       arrowDown: '↓',
-      allResultsFor: 'Tüm sonuçları gör ("{{term}}")',
     },
     recentSearches: 'Son Aramalar',
     clearRecent: 'Temizle',
     popularCategories: 'Popüler Kategoriler',
     noResults: 'Sonuç bulunamadı',
-    detailedSearch: 'için detaylı ara',
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
-    enterHint: 'Tüm sonuçlar için',
+    // REC-340: Enter artık "tüm sonuçlar"a değil, SEÇİLİ kaleme gider — arama tek aşamalı.
+    enterHint: 'Seçmek için',
     // `placeholderAi` SİLİNDİ (REC-340 Faz 0) — "yapay zeka destekli arama" diyordu ve
     // arkasında yapay zeka yoktu. Ölü bırakılmadı, kaldırıldı; tek tüketicisi
     // `SearchOverlay` artık aşağıdaki doğru metni kullanıyor.
     placeholder: 'Ürün, kategori veya marka ara...',
     noResultsAdvice: 'Farklı anahtar kelimeler deneyin',
+    // Arama isteği HATA verdiğinde (boş sonuçtan ayrı): müşteriye "ürün yok" denmez.
+    failed: 'Arama şu an yapılamadı.',
+    retry: 'Tekrar dene',
     brandPrefix: 'Marka: ',
     fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
   },
@@ -1308,6 +1310,12 @@ export const tr = {
     verifyingDesc: 'İşlemi bankanızla teyit ediyoruz. Lütfen bekleyin.',
     failedTitle: 'Ödeme Başarısız',
     retry: 'Tekrar Dene',
+    // REC-355 Faz 1: ödeme alındı ama sipariş eşleşmesi doğrulanamadı (needs_review).
+    // Bu ekranda ASLA "tekrar dene" gösterilmez — para çekilmiştir, ikinci ödeme riski doğar.
+    reviewTitle: 'Ödemeniz Alındı, Doğrulama Sürüyor',
+    reviewDesc: 'Ödemeniz bankanızdan başarıyla alındı. Siparişinizle eşleştirme kontrolümüz sürüyor ve kısa süre içinde tamamlanacak.',
+    reviewWarning: 'Lütfen tekrar ödeme yapmayın. Ekip doğrulamayı tamamladığında size e-posta ile bilgi verilecektir.',
+    reviewBackHome: 'Ana Sayfaya Dön',
     orderCompletedTitle: 'Siparişiniz Tamamlandı!',
     orderNoLabel: 'Sipariş No',
     orderCompletedDesc: 'Siparişiniz başarıyla alındı. Onay e-postası kısa süre içinde gönderilecektir.',

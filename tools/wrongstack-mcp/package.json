@@ -1,0 +1,15 @@
+{
+  "name": "venthub-wrongstack-mcp",
+  "private": true,
+  "description": "WrongStack sage-mcp (capali hafiza) + codebase-index-mcp (kod dizini) — kilitli kurulum. Ayrinti README.md.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "@wrongstack/codebase-index-mcp": "1.0.19",
+    "@wrongstack/kanban-mcp": "1.0.19",
+    "@wrongstack/mailbox-mcp": "1.0.19",
+    "@wrongstack/sage-mcp": "1.0.19"
+  }
+}

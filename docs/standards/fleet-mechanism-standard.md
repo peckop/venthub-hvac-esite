@@ -1479,7 +1479,7 @@ yok **ve** job'da `if:` yok. Üç süzgecin üçü de gerçek bir workflow'da ö
 |---|---|---|
 | `types: [opened]` | `auto-label`, `auto-reviewer` | yalnız PR **açılışında** koşar, itişte doğmaz |
 | `paths:` | `rls-guard`, `edge-shared-input-drift` | ilgisiz PR'da doğmaması **DOĞRUdur** |
-| `if:` | `gemini-dispatch` (7 job), `db-advisor` (2 job) | `skipping` kovasına düşer — **`skipping` düşen DEĞİLDİR** |
+| `if:` | `gemini-dispatch` (7 job; 2026-09-17 REC-353 ile silindi), `db-advisor` (2 job) | `skipping` kovasına düşer — **`skipping` düşen DEĞİLDİR** |
 
 Bu kriterle türetilen küme, PR #965'te doğan workflow kapılarının **tam olarak aynısı** çıktı.
 
@@ -1510,6 +1510,45 @@ sebeple kırmızı — aralarında *"türetmeyi tüm job'lara çevir"* (naif tü
 *"`skipping`i düşen say"* (yanlış alarm geri gelir), *"boş `merge_commit_sha`yı var say"* ve
 *"PR okunamadı ama geçti işaretle"* (fail-closed) var. Çekirdek **saf**tır (`turetCekirdek`
 bir dizin, `degerlendir` ölçülmüş değerler alır), böylece kollar ölçtüğü durumu **üretir** (§25).
+
+### 20.2 ⭐MERGE UZAKTA OLUR, PENCERELER ANA AĞAÇTAN YÜKLER (REC-345, karar 44)
+
+#### Ölçülmüş kusur (2026-09-17)
+
+Kancalar, `CLAUDE.md`, `.claude/settings.json` ve `.mcp.json` **ana ağaçtan** (`CLAUDE_PROJECT_DIR`)
+yüklenir. Şeritler worktree'de çalışır ve PR'ları uzakta merge eder; ana ağacı kimse çekmez.
+Sonuç: ana ağaç origin/master'dan **50 commit gerideydi**. graphify kancası, verify-on-stop onarımı,
+pano özeti ve WrongStack kurulumu merge edilmiş ama **hiçbir pencerede etkin değildi**. Hiçbir kapı
+görmedi, çünkü kapılar worktree'yi ölçüyordu. Ağacı kilitleyen şey de ölçüldü: Recep'in izin
+satırları `settings.json`'da commit'siz duruyordu; `pull` kirli dosyaya dokunmaz.
+
+#### Kural
+
+1. **Kullanıcıya özel ayar `.claude/settings.local.json`'a yazılır** (git-ignored). `settings.json`
+   yalnız depodaki hâldir; ana ağaçta orada commit'siz satır = ağacı kilitleyen satır.
+2. **Oturum açılışı tazeliği ölçer** (`session-board.cjs` → `ana-agac-tazelik.cjs acilisSatiri`):
+   geride ise `⚠ANA AGAC N COMMIT GERIDE` satırı ve ileri sarılabilir mi, değilse neden. Güncelse
+   sessiz. **Ağ beklemez** — `refs/remotes/origin/*` bütün worktree'lerde ortaktır.
+3. **Merge ritüeli, ayar yoluna değen merge'ten sonra ana ağacı ileri sarar** (`.claude/`,
+   `.mcp.json`, `CLAUDE.md`, `tools/`, `.githooks/`). Yalnız üç şart birlikteyse: `master` dalı ·
+   izlenen dosyada değişiklik yok · ana ağaçta fazladan commit yok. Yalnız `merge --ff-only`;
+   **stash/reset/checkout YOK** (kirli ağaç birinin yarım işidir). Sonuç her koşulda yazılır;
+   merge zaten yapıldığı için çıkış kodunu değiştirmez.
+
+#### Ölçülmüş yükleme davranışı (aynı gün, üç pencere)
+
+| Değişiklik | Yeniden başlatma gerekir mi |
+|---|---|
+| `settings.json` kanca listesi (yeni PreToolUse/UserPromptSubmit) | **Hayır** — sonraki araç çağrısında/istemde tetiklendi |
+| Kanca betiğinin içeriği (`board-brief.cjs`) | **Hayır** — her koşumda dosyadan okunur |
+| `.mcp.json` sunucuları | **Evet** — araç listesine yalnız pencere açılışında girer |
+
+#### Kanıt
+
+Kollar: `src/__tests__/conformance/ana-agac-tazelik.test.ts` (INV-ANA-AGAC-TAZE-1) — geçici gerçek
+git depolarında: geride sayımı · temiz ağaç ileri sarılır · kirli/başka dal/fazladan commit **dokunulmaz**
+ve sebep yazılır · izlenmeyen dosya engel değildir · açılış satırı güncelse boş · ritüel ve açılış
+kancası modülü gerçekten çağırır.
 
 ---
 

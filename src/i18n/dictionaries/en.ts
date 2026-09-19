@@ -166,18 +166,19 @@ export const en: typeof tr = {
       enterKey: 'Enter ↵',
       arrowUp: '↑',
       arrowDown: '↓',
-      allResultsFor: 'View all results ("{{term}}")',
     },
     recentSearches: 'Recent Searches',
     clearRecent: 'Clear',
     popularCategories: 'Popular Categories',
     noResults: 'No results found',
-    detailedSearch: 'detailed search for',
     keyboardHint: 'Navigate with arrow keys',
-    enterHint: 'For all results',
+    // REC-340: Enter now goes to the SELECTED item, not to a second "all results" step.
+    enterHint: 'To select',
     // `placeholderAi` removed (REC-340 Phase 0) — see the TR dictionary for the measurement.
     placeholder: 'Search products, categories, brands...',
     noResultsAdvice: 'Try different keywords',
+    failed: 'Search is unavailable right now.',
+    retry: 'Try again',
     brandPrefix: 'Brand: ',
     fuzzyMatchNotice: 'No exact match found, showing similar results.'
   },
@@ -1866,6 +1867,12 @@ export const en: typeof tr = {
     verifyingDesc: 'We are confirming the transaction with your bank. Please wait a moment.',
     failedTitle: 'Payment Failed',
     retry: 'Try Again',
+    // REC-355 Phase 1: payment captured but order match unverified (needs_review).
+    // This screen NEVER offers "try again" — the money is taken; a retry risks a double charge.
+    reviewTitle: 'Payment Received, Verification in Progress',
+    reviewDesc: 'Your payment was successfully received from your bank. We are still verifying the match with your order and will complete it shortly.',
+    reviewWarning: 'Please do not pay again. We will notify you by email once verification is complete.',
+    reviewBackHome: 'Back to Home',
     orderCompletedTitle: 'Your Order is Complete!',
     orderNoLabel: 'Order No',
     orderCompletedDesc: 'Your order has been received successfully. A confirmation email will be sent shortly.',

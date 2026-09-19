@@ -9,9 +9,47 @@ yerden okuyordu ve hangisinin doğru olduğu yalnız birinin kod yorumunda yazı
 
 ## 1 · KURAL (tek satır)
 
-> **Uygulama rolü kararı yalnız `public.is_admin_user()` üzerinden verilir.**
+> **Uygulama rolü kararı yalnız `public.is_admin_user()` üzerinden verilir** — tek istisna
+> `public.user_profiles` politikalarıdır; onlar **`public.is_admin_claim()`** kullanır.
 > `request.jwt.claims ->> 'role'` **Postgres rolüdür** (`anon` / `authenticated` /
 > `service_role`) ve **yetki kararı için okunmaz.**
+
+### 1.1 · İSTİSNA: `user_profiles` politikaları (REC-355, karar 43, 2026-09-18)
+
+**Kural:** yetki kararını veren fonksiyon, o kararın kullanıldığı tablonun kendisini **okuyamaz.**
+
+`is_admin_user()` SECURITY INVOKER'dır ve JWT'de `user_role` yoksa yedek dalda `user_profiles`
+okur. `user_profiles` politikaları onu çağırdığı sürece zincir kendine dönüyordu:
+politika → fonksiyon → politika → **`54001 stack depth limit exceeded`**.
+
+Ölçüm (2026-09-18, ikisi de rollback'li): canlıda claim'siz `authenticated` ile arama
+`display_price → is_user_admin → user_profiles politikası → is_admin_user → …` zinciriyle 54001
+verdi; gölgede claim'siz üç jeton şekli de 54001 verdi. Sonuç **kararsızdı** — aynı jeton canlıda
+`super_admin` için çalışıp normal kullanıcı için patlıyordu, çünkü özyineleme ancak yedek dalın
+kendi satırını `id = auth.uid()` kolundan görebildiği hâlde duruyor.
+
+Bu yüzden `user_profiles`ın dört politikası **`is_admin_claim()`** çağırır: yalnız
+`claims ->> 'user_role'` ve `claims -> 'app_metadata' ->> 'user_role'` okur, **tablo okuması
+yoktur**, dolayısıyla hiçbir politikadan döngü doğuramaz. `user_metadata` burada da **yasak**
+(kural 12). EXECUTE yüzeyi dardır: `PUBLIC` ve `anon` geri alınır, yalnız `authenticated` ve
+`service_role`.
+
+`is_admin_user()` **değişmedi** ve diğer tabloların mercii olarak kalır; onarımdan sonra yedek
+dalının okuduğu politika artık onu çağırmadığı için o dal da döngüsüz çalışır. Aynı sebeple
+`is_user_admin(uuid)` üzerinden geçen 20 politika (`coupons`, `product_prices`, `price_lists`,
+`order_notes`, `order_attachments`, `inventory_movements`, `inventory_settings`) ve
+`security_invoker` görünümler (`view_admin_orders`, `admin_users`,
+`view_admin_uninvoiced_orders`) de döngüsüzleşir.
+
+**Ölçülmüş takas (Recep kararı 43 ile kabul edildi):** claim'siz bir yönetici jetonu
+`user_profiles` üzerinde artık yönetici sayılmaz — yalnız kendi satırını görür, silme reddedilir.
+Karşılığında claim'siz normal kullanıcı hata almaz. Hook biçimli jetonlarda (bugünkü normal akış)
+davranış birebir aynıdır.
+
+**Kapılar:** `INV-AUTH-YETKI-DONGUSU-1` (migration metni + bu cetvel) · migration içindeki
+`DO $guard$` bloğu · `scripts/db/checks/arama-davranisi.mjs` `authenticated-iddiasiz` kolu.
+⚠`INV-AUTH-ROLE-2` bu sapmayı **görmez** (dedektörü `->> 'role'` arar), yani yazılı tek fren bu
+bölümdür.
 
 ## 2 · NİÇİN — ölçülmüş olay
 

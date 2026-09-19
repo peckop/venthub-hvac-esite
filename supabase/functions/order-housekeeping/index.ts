@@ -1,4 +1,5 @@
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
 import { restSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
@@ -89,6 +90,15 @@ Deno.serve(async (req) => {
 
     const reconciled: string[] = []
     const failed: string[] = []
+    /**
+     * ⭐İNCELEME BEKLEYEN — SONLANDIRILMAYAN AMA SESSİZ DE BIRAKILMAYAN SİPARİŞLER.
+     *
+     * `iyzico-callback` "ödeme başarılı ama siparişle eşleşmedi" derse (`needs_review`)
+     * sipariş iptal EDİLMEZ: para çekilmiş olabilir. Ama `reconciled` de sayılamaz,
+     * çünkü durumu ilerlemedi. Üçüncü kova bu yüzden var — "atlanmış iş yeşil değildir":
+     * kovaya girmeyen bir vaka raporda görünmez ve insan müdahalesi hiç gelmez.
+     */
+    const incelemeBekleyen: string[] = []
     /** Yazması GERÇEKTEN düşenler — rapor bunları saklamaz (aşağıdaki gerekçeye bak). */
     const yazilamayan: Array<{ id: string; detay: string }> = []
 
@@ -139,6 +149,21 @@ Deno.serve(async (req) => {
         const body = await cb.json().catch(() => ({})) as { status?: string }
         if (body?.status === 'success') {
           reconciled.push(o.id)
+        } else if (body?.status === 'needs_review') {
+          // ⛔SONLANDIRMA YOK — BU DAL BİR GELİR KAYBI YOLUNU KAPATIYOR (REC-355).
+          //
+          // `iyzico-callback` artık ödemenin HANGİ siparişe ait olduğunu da doğruluyor.
+          // Doğrulama geçmezse İyzico tarafında ödeme BAŞARILI olabilir — yani para
+          // çekilmiş olabilir. O cevabı "success değil" sayıp burada siparişi
+          // `cancelled` + `payment_status='failed'` yapmak, parası çekilmiş siparişi
+          // 15 dakikada iptal etmek demektir.
+          //
+          // ⭐DERS: bir ucun hata yolu, o ucun CEVABINI OKUYAN yerle birlikte yazılır.
+          // Bu iki dosya aynı işte değişti; biri olmadan diğeri yanlış davranır.
+          //
+          // Sipariş `pending` kalır ve `incelemeBekleyen` olarak RAPORLANIR — sessiz
+          // bırakılmaz, çünkü insan müdahalesi gerekiyor (ödeme var, eşleşme yok).
+          incelemeBekleyen.push(o.id)
         } else {
           // Tek deneme sonrası hâlâ success değil → siparişi sonlandır.
           sonlandir = true
@@ -162,6 +187,30 @@ Deno.serve(async (req) => {
       }
     }
 
+    /**
+     * ⭐RAPORA YAZMAK, OKUNDUĞU ANLAMINA GELMEZ (REC-355, akran bulgusu).
+     *
+     * `inceleme_bekleyen` gövdeye eklendi ama bu gövdeyi bir cron çağırıyor ve kimse
+     * okumuyor. Eşleşmeyen ödeme artık otomatik iptal EDİLMEDİĞİ için o sipariş
+     * `pending` durumunda SONSUZA KADAR kalabilir — para çekilmiş, kimse görmemiş.
+     *
+     * Eski hâlin en az bir faydası vardı: sipariş iptal olurdu ve en azından bir
+     * SONUÇ üretirdi. Yeni hâl doğru ama SESSİZ; sessizlik burada iptalden daha
+     * kötü olabilir. Bu yüzden kalıcı bir yere yazılıyor.
+     *
+     * ⚠Bu, `iyzico-callback`teki alarmın MÜKERRERİ DEĞİL: orada "bu çağrıda eşleşme
+     * olmadı" yazıyor, burada "bu sipariş hâlâ çözülmedi ve üzerinden 15 dakika geçti"
+     * yazıyor. Birincisi olay, ikincisi BİRİKMİŞ BORÇ.
+     */
+    if (incelemeBekleyen.length > 0) {
+      await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+        fn: 'order-housekeeping',
+        code: 'PAYMENT_NEEDS_REVIEW_BEKLIYOR',
+        message: `${incelemeBekleyen.length} siparis odeme dogrulamasi bekliyor; otomatik iptal EDILMEDI, insan mudahalesi gerekiyor.`,
+        extra: { adet: incelemeBekleyen.length, order_ids: incelemeBekleyen },
+      })
+    }
+
     // Yazması düşen varsa `ok: true` DÖNMEZ: bu fonksiyonun tek işi durumu ilerletmek;
     // ilerletemediyse "başarılı" demek, çağıranı (cron/izleme) kör eder.
     const govde = {
@@ -170,6 +219,9 @@ Deno.serve(async (req) => {
       cancelled_count: cancelledGercekSayi,
       reconciled,
       failed,
+      // ⭐Boşken de yazılır: alanın yokluğu "hiç olmadı" ile "hiç bakılmadı"yı ayırt
+      // ettirmez. İzleyen taraf sıfırı GÖRMELİ.
+      inceleme_bekleyen: incelemeBekleyen,
       ...(yazilamayan.length > 0 ? { yazilamayan } : {})
     }
     return new Response(JSON.stringify(govde), { status: yazilamayan.length === 0 ? 200 : 500, headers: { ...cors, 'Content-Type': 'application/json' } })

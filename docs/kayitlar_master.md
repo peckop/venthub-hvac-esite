@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-09-16T13:15:39.565832+00:00
-total_compiled_files: 215
-source_commit: 33c5fcb22
+compiled_at: 2026-09-17T06:08:21.826614+00:00
+total_compiled_files: 218
+source_commit: 20b9298d2
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -996,6 +996,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/board/linear-okundu.cjs` | Linear yorum sayacinin esik damgasini "simdi"ye ceker (`--goster`, `--geri`) | OPS *(yazan: ALTYAPI)* | ELLE kosulur, yorumlari okuyan kisi tarafindan; sayac satiri komutu kendi ciktisinda gosterir | 2026-09-14 yazildi ve kosuldu (kabul sinavi: okundu+geri gidis-donus) | INV-MECH-1 (sira ve sessizlik kolu) | KAL |
 | `scripts/board/linear-yeni-yorum.cjs` | Linear PROJE yorumlarinda okunmamis Design notlarini sayar, tek satir uretir; GOZCU DEGIL kanca | OPS *(yazan: ALTYAPI)* | `.claude/hooks/board-brief.cjs` her turda cagiriyor (tek GraphQL sorgusu, 60 sn onbellek, 3 sn zaman asimi) | 2026-09-14 canli kosuldu: 20 yeni yorum, 1,05 sn (onbellekten 0,29 sn) | INV-MECH-1 (sira + sessizlik + `!linear` kolu) | KAL |
 | `scripts/db/checks/arama-davranisi.mjs` | INV-SEARCH-BEHAVIOR-1 — arama DAVRANIŞI kapısı (Katman B, canlı): on vakayı gerçek RPC üzerinden ölçer, ölçüt biçimleri oran/sıfır-değil/aynı-küme/marka-var/tam-SKU (sabit sayı YOK), hassasiyet tavanı %40, bilinen kırmızılar adıyla ilan edilir ve mandal İKİ YÖNLÜ (ilanlı vaka geçmeye başlarsa KIRMIZI) | ALTYAPI | `.github/workflows/db-advisor.yml` → `catalog-integrity` işine ADIM olarak bağlı, `db-gate-precheck.outputs.ready == 'true'` koşuluyla (yeni iş adı AÇILMADI: açık PR'ları "beklenen kontrol gelmedi"de kilitler) | 2026-09-15, REC-340 Faz 1 Adım 1. Prod'da salt-okuma ölçüldü (Supabase MCP): on vakanın **altısı** kırmızı (2,3,4,5,9,10), dördü geçiyor (1→47, 6→9, 7→1 doğru SKU, 8→52); aktif ürün 441, hiçbir vaka %40 tavanını aşmıyor. Betik sırsız koşturuldu → çıkış 0 + "OLCULEMEDI" + "ATLANMIS IS YESIL DEGILDIR" (konformans kolu bunu DAVRANIŞLA ölçüyor) | `src/__tests__/conformance/arama-davranisi.test.ts` (INV-SEARCH-BEHAVIOR-1 Katman A, 15 kol) | KAL |
+| `scripts/db/golge-kur.mjs` | GÖLGE VERİTABANI KURUCUSU — tek komutla geçerli test ortamı: mevcut Docker konteynerinin İÇİNDE ayrı bir DB açar, önsöz → en yeni TAM taban → tabandan sonraki migration'lar → (`--migration`) uygular ve **sadakati SAYARAK** doğrular. `postgres` DB'sine dokunmaz, `initdb`/port GEREKMEZ. ⛔`supabase db reset` İÇERMEZ (o komut aynı kümedeki AKRANIN gölgesini siliyor — 2026-09-16'da yaşandı). ⛔VAR OLAN DB EZİLMEZ: ad çakışırsa çıkış 3 ile DURUR. ⭐`--dusur` = YALNIZ kendi DB sini düşürür (küme sıfırlayan komutun YERİNE; küme altyapısı adlarını reddeder, çıkış 2). Çıkış 0=hazır · 1=sadakat TUTMADI · 2=ÖLÇEMEDİ · 3=ad çakıştı | ALTYAPI (Recep 2026-09-16: "geçerli test ortamı için her türlü izni veririm") | `docs/audits/sema-graf-uretici-2026-09-16.md` yanı sıra kendi başlığı; çağıran yok (elle koşulur) | 2026-09-16 yazıldı ve KOŞULDU: tablo 55 · **politika 163** · fonksiyon 67 · tetik 48 · indeks 199 — politika/fonksiyon/tetik/indeks CANLIYLA BİREBİR. Ad çakışma kolu AKRANIN DB'sini korudu (çıkış 3, dokunulmadı) | **INV-GOLGE-1** `src/__tests__/conformance/golge-kurucu.test.ts` 13 kol — SÖZLEŞME ölçer (yıkıcı komutun yokluğu İKİ biçimde, akran koruması, ad allowlist, çıkış kodları, eşikler, taşınabilirlik). ⚠İlk hâli KÖRDÜ: yalnız kabuk dizgesini arıyordu, argv dizisi biçimini görmüyordu; negatif sınamada yakalandı ve iki biçim de ölçülür oldu (ikisi de KIRMIZI verdirildi); sadakat eşikleri betiğin İÇİNDE (boş gölgeyi reddeder: tablo≥50, politika≥100, fonksiyon≥40, tetik≥20, indeks≥100) | KAL |
 | `scripts/db/sema-graf-uret.mjs` | ŞEMA GRAF ÜRETİCİSİ (aşama 1: tablolar + yabancı anahtarlar) — veritabanının KENDİ KATALOĞUNDAN graphify node-link biçiminde graf üretir. Metin taraması YOK, `pg_class`/`pg_constraint` okunur. Çıktı `graphify-out/db-graph.json` (üretilmiş, gitignore), `graphify merge-graphs` ile kod grafiğine eklenir. Düğümler `db_` ad alanında (ghost-duplicate riski). Çıkış 0=üretildi/atlandı · 1=parite TUTMADI · 2=ÖLÇEMEDİ | ALTYAPI (Recep istedi 2026-09-16: "supabase tarafının bir haritası lazım, codegraph gibi bir şey") | `src/__tests__/conformance/sema-graf-uretici.test.ts` (INV-SEMA-GRAF-1, 12 kol) + `docs/audits/sema-graf-uretici-2026-09-16.md` | 2026-09-16 yazıldı ve KOŞULDU: yerel yığında tablo 18=18 · fk 13=13 parite TUTTU, kapsam dışı 6 fk ADIYLA raporlandı; `merge-graphs` ile birleşti (+18 düğüm/+13 kenar) ve `explain` veritabanı sorusuna cevap verdi (8 ilişki, yönlü) | INV-SEMA-GRAF-1 — sır/TLS/taşınabilirlik/çıkış kodu/çıktı biçimi ölçülür; **graf DOĞRULUĞU ölçülmez** (o canlı koşum ister, sınır kapının başlığında yazılı) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
@@ -18832,6 +18833,260 @@ bekliyor), bizdeki **bayat fork ayrılacak** — dış metin plugin'e bırakıl�
 
 
 ---
+# FILE: docs\audits\rec352-sifir-noktasi-kaniti-2026-09-16.md
+
+# REC-352 — SIFIR NOKTASI: gölgede ölçülmüş kanıt (2026-09-16)
+
+**Soru:** sıfır noktası kurmak canlı şemaya dokunur mu?
+**Cevap:** HAYIR. Gölgede ölçüldü, şema parmak izi **birebir aynı** kaldı.
+
+Bu belge Recep'in şu itirazından doğdu: *"hem Docker'da zincir kırık diyorsun hem kendi
+yaptığımızda kırılmıyor diyorsun... 2 farklı yerden bakınca ben sana güvenemiyorum."*
+İtiraz yerindeydi — iki farklı artefakt aynı cümlede anlatılmıştı. Bu belge ikisini
+ayırır ve iddiayı ÖLÇÜMLE kapatır.
+
+## 1. İKİ AYRI ARTEFAKT (çelişki değil)
+
+| | `supabase/migrations/` | `supabase/baselines/2026-09-15_public_schema.sql` |
+|---|---|---|
+| Ne | 233 ileri-yönlü talimat dosyası | canlı `public` şemasının tam anlık görüntüsü |
+| Sıfırdan koşum | **170/233 DÜŞER** (63 OK) | **0 hata**, canlıyla 8/8 parite |
+| Rolü | tarihsel kayıt | sıfır noktasının kendisi |
+
+Canlı veritabanı hiçbir zaman bu 233 dosyayla kurulmadı; her dosya o günün şemasının
+üzerine koştu ve arada beş tablo panelden ELLE kuruldu (`supabase/baselines/README.md`).
+Kırık olan makine değil, DEFTER.
+
+## 2. ⭐YENİ BULGU — DEFTER 233 DOSYAYI TEMSİL EDEMİYOR (bugün ölçüldü)
+
+Supabase'in defteri (`supabase_migrations.schema_migrations`) `version` kolonuna göre
+tekildir ve `version` = dosya adının damgası. 233 dosyanın damgaları ölçüldü:
+
+- Damga uzunlukları: **158 dosya 8 hane**, 62 dosya 14 hane, 13 dosya 12 hane.
+- **26 damga PAYLAŞILIYOR; toplam 138 dosya çakışıyor.** En kalabalığı `20250910` → **19 dosya**.
+- Sonuç: 233 dosya deftere yazıldığında **121 satır** oluştu. 112 dosya adı temsil edilemedi.
+
+Ölçüm: `insert ... on conflict (version) do nothing` ile 233 satır denendi, `count(*)` = **121**.
+
+⭐**DERS:** 8 haneli `YYYYMMDD_` damga biçimi (CLAUDE.md'de zaten INV-MIGRATION-2 kapısında
+KIRMIZI) yalnız bir biçim tercihi değil — **aynı gün yazılan dosyaları tek kimliğe
+çöktürüyor.** Bu, sıfır noktasının tercih değil ZORUNLULUK olmasının İKİNCİ bağımsız
+sebebidir (birincisi: 11 sert sözdizimi hatası + yaratıcı migration'ı olmayan beş tablo).
+
+## 3. ÖLÇÜM — DEFTER YAZIMI ŞEMAYA DOKUNUYOR MU?
+
+Gölge: `sifir_kanit` (paylaşılan kümede AYRI veritabanı; URUN'un `arama_golge`'sine
+dokunulmadı, ölçüldü: 57 tablo / 164 politika işlem boyunca sabit).
+
+Kurulum: `scripts/db/golge-kur.mjs --ad sifir_kanit` → önsöz + 2026-09-15 tabanı.
+Sadakat: **55 tablo · 163 politika · 199 indeks · 67 fonksiyon · 48 tetik.**
+
+**Parmak izi** = altı sorgunun birleşimi; kolon/tip/null/default, kısıt tanımları,
+indeks DDL'i, politika `qual`/`with_check` metinleri, fonksiyon gövde md5'i, tetik md5'i.
+Toplam **1404 satır** (786'sı kolon satırı, 163'ü politika).
+
+| | md5 |
+|---|---|
+| Defter yazımı ÖNCESİ | `f787d59dd777b2b6e37fbc6ad81da6b8` |
+| Defter yazımı SONRASI | `f787d59dd777b2b6e37fbc6ad81da6b8` |
+| `diff` | **boş** |
+
+Sayımlar sonrasında da aynı: 55 / 163 / 199 / 67 / 48.
+
+**HÜKÜM:** defter yazımı `public` şemasında tek bir kolon, kısıt, indeks, politika,
+fonksiyon ya da tetik değiştirmiyor. Sıfır noktası bir şema işlemi DEĞİL, bir
+KAYIT işlemidir.
+
+## 4. ⚠ÖLÇÜLEMEYEN — CANLI DEFTERİN ŞU ANKİ İÇERİĞİ
+
+Canlı defterde bugün kaç satır olduğu **ölçülmedi**: salt-okuma sorgusu bu oturumun
+izin katmanında ("Production Reads") reddedildi. Dolayısıyla şu soru AÇIK:
+canlı defter 121 satırı mı, 233'ü mü, yoksa bambaşka bir kümeyi mi taşıyor.
+
+Bu, hükmü değiştirmez (şemaya dokunmama ölçümü canlı defterin içeriğinden bağımsız),
+ama uygulama planının İLK adımı bu okumadır. Adım atlanamaz: neyin üzerine yazdığını
+bilmeden defter yazılmaz.
+
+## 5. SINIRLAR, ADIYLA
+
+1. Gölgede `auth.uid()` NULL — **yetki davranışı ölçülmedi**, yalnız şema/DDL.
+2. Gölgede `pg_cron` yok (konteynerde yalnız `postgres` DB'sinde kurulabilir) — beklendi.
+3. Parmak izi `public` şemasını kapsar; `auth`, `storage`, `net`, `vault` kapsam DIŞI.
+4. Defter yazımı burada elle SQL ile benzetildi; `supabase migration squash --linked`
+   komutunun kendisi canlıda koşmadı ve koşmayacak — **o adım Recep'in kapısı** (kural 13).
+5. Merge edilmiş bir migration'ın canlıda uygulanmış olması bu ölçümle kanıtlanmaz
+   (`supabase/baselines/README.md` tazelik alarmı bölümü aynı sınırı yazıyor).
+6. Damga çakışması ölçümü DOSYA ADLARINDAN okundu; canlı defterin o damgaları nasıl
+   taşıdığı §4 yüzünden bilinmiyor.
+
+## 6. SIRADAKİ — TEK KARAR RECEP'TE
+
+Uygulama planı, onay gelirse: (1) canlı defteri OKU, (2) tabanı tek sıfır noktası
+migration'ı olarak ilan et, (3) taban sonrası dosyaları koru, (4) eski damgaları
+"tabanda içeriliyor" diye kaydet, (5) tek PR. Adım 2-5 migration içerdiği için
+merge = prod'a otomatik uygulama → kural 13, Recep onayı ZORUNLU.
+
+Yöneten cetvel: `docs/standards/ledger-ve-olu-migration-standard.md` §2.1 (v1.2).
+
+
+---
+# FILE: docs\audits\rec355-plan-curutuldu-2026-09-16.md
+
+# REC-355 — İLK PLAN ÇÜRÜTÜLDÜ (BLOK), ölçümle. 2026-09-16
+
+Bağımsız bir çürütme denetimi ilk onarım planına **BLOK** verdi. Bulguları **kendim yeniden
+ölçtüm ve hepsi doğru çıktı.** Bu belge, onarımın niçin yeniden yazıldığının kaydıdır.
+
+## 0. ⭐EN AĞIR BULGU BİR YÖNTEM HATASI: ÖLÇÜM REPODA DURUYORDU
+
+Planım *"`retrieve` gerçekten `basketId` echo ediyor mu? PROD'DA ÖLÇMEDİM, izin reddedildi"*
+diyordu ve **bütün tasarımı o belirsizliğin üzerine kurmuştu** ("en az biri eşleşsin").
+
+Oysa ölçüm prod erişimi İSTEMİYORDU: `docs/archive/db-backup-pre-kademe2/venthub_orders.json`
+içinde **13 gerçek İyzico `retrieve` yanıtı** `payment_debug.raw` olarak duruyor. Dosya
+2026-09-06'dan beri depoda.
+
+⭐**DERS: "izin reddedildi" cümlesi ölçümü bitirmez.** Reddedilen YOL bir tanesiydi; veri
+çevrimdışı ve elin altındaydı. Belirsizliğe karşı tasarım yazmak yerine belirsizliği
+ölçmeliydim — ölçünce tasarımın ÖNCÜLÜ çöktü.
+
+## 1. KENDİ YENİDEN ÖLÇÜMÜM (13 gerçek yanıt, hepsi `payment_status='paid'`)
+
+| Ölçüt | Sonuç |
+|---|---|
+| `raw` yanıt taşıyan satır | **13** |
+| `raw.basketId` VAR | 13/13 |
+| `raw.basketId`, siparişin `id` ya da `order_number` ile eşleşiyor | ⛔**0/13** |
+| `raw.conversationId` VAR | **11/13** (2 satırda alan HİÇ YOK) |
+| `raw.conversationId`, satırın `conversation_id` ile eşleşiyor | 11/13 |
+| İki çapadan HİÇBİRİ kullanılabilir | ⛔**2/13** |
+| `raw.signature` VAR | **13/13** |
+| `raw.price` == `total_amount` | 13/13 (birebir) |
+| `raw.paidPrice` == `total_amount` | 13/13 (birebir) |
+| `installment` | 13/13 = 1 (taksitli koşum evrende YOK) |
+
+Örnek satır: `order_number = VH-20250903-4973` · `conversation_id = CONV-1756904973154` ·
+`raw.basketId = VH-1756904973154-a4bv8k`. Aynı epoch'u taşıyorlar ama **hiçbir kolonda o
+dize yok.**
+
+## 2. PLANIN ÜÇ ÖNCÜLÜ DE YANLIŞTI
+
+### 2.1 `basketId` kolu ÖLÜ — hiçbir sipariş alanıyla eşleşemez
+
+`iyzico-payment` İyzico'ya `basketId: orderId` gönderiyor, ama oradaki `orderId` DB kimliği
+DEĞİL: aynı fonksiyonda üretilmiş `VH-${Date.now()}-${rnd}` biçiminde ve **hiçbir kolona
+yazılmayan** bir dize. DB kimliği ayrı bir değişken (`dbGeneratedId`, UUID).
+**Ölçüm: 0/13.** Yani planın "iki çapa" dediği şey tek çapaydı.
+
+### 2.2 `conversationId` kolu TOTOLOJİ — saldırganın kontrolünde
+
+Uç, **isteğin verdiği** `conversationId` değerini `retrieveReq` içine koyuyor ve İyzico onu
+yanıtta GERİ VERİYOR. Echo semantiği ölçümle kanıtlı: gönderilen koşumlarda alan var,
+gönderilmeyen 2 koşumda **hiç yok**. Yani İyzico kendi kayıtlı değerini döndürmüyor, bizim
+verdiğimizi yansıtıyor.
+
+⛔Sonuç: saldırgan `orderId=X` ile birlikte X'in `conversation_id` değerini de verir, İyzico
+onu echo eder, kapı "eşleşti" der ve **AÇILIR.** Planın *"saldırı bu kolda ölür"* cümlesi
+YANLIŞTI.
+
+### 2.3 Tutar toleransı gerekçesi ÇÜRÜK, ama ASIL RİSK BAŞKA
+
+`total_amount` ile `paidPrice` aynı formülün aynı girdilerle iki kez koşumu; ölçüm 13/13
+birebir. Gerekçe gösterdiğim 0,01 toleransı ise İSTEMCİNİN tutarıyla sunucu toplamını
+karşılaştıran ilgisiz bir satırdan ödünç alınmıştı.
+
+⚠Asıl risk taksit: kodun kendi yorumu *"paidPrice >= price olabilir"* diyor ve taksit
+`[1,2,3,6,9,12]` ile AÇIK. Ölçtüğüm 13 koşumun hepsi taksitsiz — yani sapma
+**gözlenmedi, çürütülmedi de.** Vade farkı müşteriye yansıyan bir kurulumda planım
+gerçek taksitli ödemeyi REDDEDERDİ.
+
+## 3. ⛔EN CİDDİSİ: PLANIM GERÇEK ÖDEMELERİ 15 DAKİKADA İPTAL ETTİRİRDİ
+
+Planım *"ret dalında sipariş satırına HİÇBİR ŞEY yazılmaz"* diyordu ve şunu taahhüt ediyordu:
+*"`payment_status='failed'` YAZILMAZ — failed yazmak yalan olur."*
+
+Bu taahhüt **planın dokunmadığı bir kod tarafından ihlal ediliyor.** Ölçtüm:
+
+`order-housekeeping`, `status='pending'` ve `payment_token` dolu, 15 dakikadan eski
+siparişleri alıp callback'i çağırıyor — ve çağrıyı **yalnız `{orderId}` ile** yapıyor,
+`conversationId` GÖNDERMEDEN. Yanıt `status === 'success'` değilse siparişi
+`{status:'cancelled', payment_status:'failed'}` yapıyor.
+
+Zincir: `conversationId` gönderilmediği için echo yok → `basketId` zaten eşleşemiyor →
+**planımın kapısı yapısal olarak reddeder** → yanıt `pending` → 15 dakika sonra
+**parası çekilmiş sipariş `cancelled` + ödeme `failed` damgalanır.**
+
+Ayrıca ikinci bir iptal yolu var: `release-expired-reservations`, `status='pending'` ve
+`payment_status='pending'` satırları 24 saat sonra aynı şekilde iptal ediyor.
+
+⭐**DERS: bir uca fail-closed eklemek, o ucun CEVABINI okuyan başka bir ucun kararını da
+değiştirir.** Ret dalı yazarken "kim bu cevabı okuyor" sorusu kodla birlikte cevaplanmalıydı
+(CLAUDE.md kural 14). Bir deliği kapatırken gelir yolunu kesmek, deliğin kendisinden pahalı
+olabilir.
+
+## 4. GÖZDEN KAÇIRDIĞIM İKİNCİ YAZMA YÜZEYİ
+
+Bir DB tetiği (`sync_payment_status_with_status`) `status` değeri `confirmed` yapıldığında
+`payment_status` değerini kendiliğinden `paid` yapıyor. Yani `status` değerini `confirmed`
+yazan HER yol aynı zamanda bir ödeme beyanıdır — admin kargo ucu, admin sipariş panosu ve bir
+SECURITY DEFINER fonksiyon dahil. Bu yüzeyler saldırgana doğrudan açık değil (admin ya da
+`service_role` gerekiyor) ama *"delik kapandı"* beyanını geçersiz kılar.
+Planım bir **yazma yüzeyi envanteri** çıkarmamıştı.
+
+## 5. CLAUDE.md KURAL 11 İHLALİ — VE ÇÖZÜMÜN KENDİSİ ORADA
+
+Kural 11 webhook'lar için **HMAC-SHA256 + replay guard** istiyor. Planım HMAC'ten hiç söz
+etmiyordu. Oysa **İyzico'nun kendi imzası ölçülen 13 yanıtın 13'ünde geliyor** (`raw.signature`).
+
+O imza `paymentId · currency · basketId · conversationId · paidPrice · price · token`
+üzerinden gizli anahtarla üretiliyor. Yani elle kurmaya çalıştığım "hangi ödeme hangi
+siparişe ait" bağını **sağlayıcı imzalı olarak veriyor** ve ben onu kullanmıyordum.
+Replay guard da yoktu: aynı token sınırsız kez POST edilebilir.
+
+## 6. DÜZELTİLMİŞ ONARIM ŞEKLİ — İKİ AŞAMA, SIRASI ZORUNLU
+
+⚠Bu, ilk planın "tek uç, migration yok, tek PR" kapsamından DAHA GENİŞ. Kapsam değişikliği
+Recep'e bildirilir (kural 14: kapsam dışı iş ayrı kayıt olarak açılır ve numarası geçer).
+
+**Aşama 0 — `iyzico-payment`: `basketId` GERÇEK sipariş kimliğini taşısın.**
+Bugün taşıdığı dize hiçbir kolonda yok (0/13). Bu düzeltilmeden imza doğrulaması bile
+kimlik bağı KURMAZ — imza doğru olur ama imzaladığı `basketId` hiçbir şeye karşılık gelmez.
+⚠Geçiş penceresi: deploy anında uçuşta olan ödemeler eski biçimi taşır; eski satırlar için
+kimlik bağı KURULAMAZ ve bu adıyla yazılmalı.
+
+**Aşama 1 — `iyzico-callback`:**
+
+1. `result.signature` gizli anahtarla doğrulanır (kural 11'in istediği HMAC budur). Böylece
+   `basketId`, `price`, `paidPrice`, `paymentId` GÜVENİLİR değer olur.
+2. Kimlik: güvenilir `basketId` == siparişin `id` değeri. Tek çapa; ikinci çapa yok.
+3. İsteğin verdiği `conversationId` değeri `retrieveReq` içinden **KALDIRILIR** — totolojiyi
+   o üretiyor ve hiçbir şey kazandırmıyor.
+4. Tutar çapası `result.price` (sepet toplamı) == `total_amount`; ikinci koşul
+   `paidPrice >= price` — bu, kodun kendi yazdığı kuralın aynısı, yeni cetvel icat edilmiyor.
+5. Replay guard: `paymentId` üzerinden idempotency.
+6. Ret dalı `order-housekeeping` ucunun "sonlandır" kararını TETİKLEMEYEN ayrı bir cevap
+   taşır ve `order-housekeeping` o cevabı sonlandırma sebebi saymaz. **Bu iki uç aynı işte
+   değişir** — hata yolu kodla birlikte yazılır.
+7. Müşteri yüzü: parası çekilmiş müşteriye "başarısız" gösterilmez; "ödemeniz alındı,
+   doğrulama sürüyor" der ve ikinci ödemeyi engeller.
+
+## 7. HÂLÂ ÖLÇÜLMEYEN, ADIYLA
+
+1. **Taksitli bir koşumda `paidPrice` sepet toplamından sapıyor mu?** Evrende taksitli
+   koşum YOK (13/13 `installment=1`). Sapma gözlenmedi, çürütülmedi de.
+2. **Sömürülmüş mü?** Canlı salt-okuma izni bu oturumda iki kez reddedildi; Recep'e iletildi.
+3. **İmzanın alan sırası** İyzico dokümanından alınacak ve 13 arşiv yanıtıyla ÇEVRİMDIŞI
+   doğrulanacak — imza doğrulaması, doğruladığı 13 yanıtta yeşil vermeden yazılmış sayılmaz.
+4. Tetik yüzeyi (§4) bu işin kapsamında DEĞİL; ayrı kayıt olarak açılacak.
+
+## 8. AÇIK HÜKÜM
+
+⛔**ZAFİYET AÇIK.** İlk planım uygulanmadı ve uygulanmaması doğru oldu: hem saldırıyı
+geçiriyordu hem gerçek ödemeleri iptal ettiriyordu. Onarım §6'daki biçimde, iki aşamada
+ve Recep'in kapsam onayıyla yazılacak.
+
+
+---
 # FILE: docs\audits\rec59-marka-kapi-kurali-2026-09-15.md
 
 # REC-59 açık kalemi · marka sınıfı kapı kuralı — ÖLÇÜM KAYDI
@@ -30497,6 +30752,125 @@ Sohbet/asistan katmanı REC-341'dedir.
 - pgvector 4096d davranışı canlıda denenmedi; Supabase dokümanına dayanıyor.
 - 361 satırlık toplu tazelemenin kilit süresi — yazma yasak; branch DB'de ölçülmeli, prod'da değil.
 - Öneri kutusunun tarayıcıdaki render'ı ölçülmedi (RPC düzeyinde doğrulandı).
+
+
+---
+# FILE: docs\plans\rec355-odeme-siparis-eslesmesi-2026-09-16.md
+
+# REC-355 — VULN-001: ödeme sonucu ile sipariş EŞLEŞTİRİLMİYOR
+
+> ⛔**BU PLAN ÇÜRÜTÜLDÜ VE UYGULANMADI (2026-09-16).** Bağımsız denetim BLOK verdi;
+> bulguları yeniden ölçtüm ve hepsi doğru çıktı. Üç öncülü de yanlıştı ve ret dalı gerçek
+> ödemeleri 15 dakikada iptal ettirecekti. **Geçerli kayıt:**
+> `docs/audits/rec355-plan-curutuldu-2026-09-16.md` §6 (düzeltilmiş onarım şekli).
+> Aşağıdaki metin, niçin yanlış olduğunun anlaşılması için OLDUĞU GİBİ bırakıldı.
+
+
+**Uç:** `supabase/functions/iyzico-callback/index.ts` · **Cetvel:** `CLAUDE.md` §11 (webhook/durum
+monotonluğu) + `docs/standards/denetim-izi-standard.md`. Bu plan bir cetvel değişikliği ÖNERMİYOR.
+
+## 1. ZAFİYET — ölçülmüş zincir
+
+Uç `verify_jwt = false` (herkese açık). Beş halka:
+
+1. `orderId` ve `conversationId` **istekten** okunuyor: form, JSON ve URL query (satır 84-103).
+2. Sipariş satırı o değerle bulunuyor; tenant satırdan TÜRETİLİYOR (satır 113-134).
+3. `token` de istekten geliyor; İyzico'ya `retrieve` ile soruluyor (satır 216-230).
+4. `paid = result.paymentStatus === "SUCCESS"` (satır 238) — **yalnız ödemenin başarılı olup
+   olmadığına** bakıyor, **hangi siparişe ait olduğuna BAKMIYOR.**
+5. `patchOrder({status:'confirmed', payment_status:'paid'})` `id=eq.${orderId}` ile ve
+   `service_role` anahtarıyla yazıyor (satır 285-301). `service_role` `bypassrls = true`.
+
+**Saldırı:** 1 TL'lik gerçek bir ödeme yap, `token`'ı yakala, callback'e o token ile ama
+**başka bir `orderId`** ile POST et. Uç İyzico'ya sorar, "SUCCESS" alır ve **senin
+göstermediğin siparişi ödenmiş işaretler.** Aynı yolla başka bir müşterinin siparişi de
+ödenmiş yapılabilir.
+
+⚠**Ayrıca doğrulamadan ÖNCE yazım var:** satır 205-219 `payment_token = token` yazıyor,
+`retrieve` daha koşmadan. Yani saldırgan herhangi bir siparişe istediği token'ı damgalayabilir;
+bu hem denetim izini kirletir hem de sonraki çağrıda token-fallback yolunu açar.
+
+## 2. NİÇİN MEVCUT KORUMALAR YETMİYOR
+
+- Tenant türetmesi **satırdan** yapılıyor, yani isteğin verdiği tenant sorgunun kapsamını
+  belirlemiyor (bu daha önce onarılmış, doğru). Ama tenant türetmesi **hangi sipariş**
+  sorusunu cevaplamıyor: saldırgan zaten o siparişin gerçek tenant'ını alıyor.
+- `orderTenantFilter` aynı sebeple işe yaramıyor.
+- Durum monotonluğu (§11) `pending → confirmed` geçişini meşru sayar; ihlal yok.
+- Hiçbir yerde `result.conversationId` / `result.basketId` / `result.paidPrice` ile sipariş
+  satırı KARŞILAŞTIRILMIYOR. Ölçtüm: dosyada `basketId` hiç geçmiyor, `conversationId`
+  yalnız istek tarafında kullanılıyor.
+
+## 3. ÖNERİLEN ONARIM — üç kol, tek ilke
+
+⭐**İLKE: yazılacak sipariş, İyzico'nun DOĞRULADIĞI bir değerle eşleşmek zorundadır;
+çağıranın verdiği değer yalnız satırı SEÇER, seçimi MEŞRULAŞTIRMAZ.**
+
+### Kol 1 — KİMLİK KAPISI (asıl onarım)
+
+`retrieve` döndükten sonra, herhangi bir yazımdan önce: sipariş satırının `conversation_id`
+ya da `id` değeri, İyzico'nun döndürdüğü `conversationId` ya da `basketId` ile eşleşmeli.
+
+- Ödeme kurulurken ikisi de İyzico'ya GÖNDERİLİYOR (ölçüldü: `iyzico-payment` satır 759
+  `conversationId`, satır 762 `basketId: orderId`), dolayısıyla `retrieve` ikisini de
+  ECHO etmeli.
+- **İkisinden EN AZ BİRİ hem var hem eşleşiyorsa** kapı açılır. Niçin "en az biri" ve
+  ikisi birden şart değil: `retrieveReq`'e `conversationId` yalnız istekte varsa
+  konuyor (satır 202), yani her koşumda echo geleceğini VARSAYAMAM. İki alanın olması
+  yanlış-red riskini düşürür.
+- **İkisi de yoksa ya da ikisi de eşleşmiyorsa → YAZIM YOK.** Fail-closed.
+
+Saldırı bu kolda ölür: saldırgan `orderId=X` verir ama token `Y` siparişine aittir;
+İyzico `Y`'nin `conversationId`/`basketId`'sini döndürür, `X`'in satırıyla eşleşmez.
+
+### Kol 2 — TUTAR KAPISI (derinlik)
+
+`result.paidPrice`, sipariş satırının `total_amount` değeriyle **0,01 toleransla** eşleşmeli;
+`result.currency` varsa `TRY` olmalı.
+
+⚠**Tolerans TAHMİN DEĞİL, ölçüme dayanıyor:** iki değer AYNI şeyin İKİ AYRI türevi.
+`total_amount = validation.totals.subtotal` (satır 380/472) iken `paidPrice` kuruş bazında
+yeniden toplanıyor (`subtotalCents/100`, satır 730-732). `iyzico-payment` kendi içinde de
+bu iki türevi 0,01 toleransla karşılaştırıyor (satır 393). Toleranssız bir kapı, bir
+kuruşluk yuvarlama farkında **gerçek ödemeyi reddeder** — yani deliği kapatırken geliri keser.
+
+Tutar okunamıyorsa (alan yok / sayıya çevrilemiyor) → **YAZIM YOK.**
+
+### Kol 3 — `payment_token` YAZIMI DOĞRULAMADAN SONRAYA
+
+Satır 205-219'daki erken PATCH kaldırılıp doğrulanmış yola taşınır. Denetim gerekçesi
+("token'ı hemen yaz") korunur ama artık **doğrulanmış** token yazılır.
+
+### Ret davranışı — SESSİZ DEĞİL, ama SİPARİŞE DOKUNMADAN
+
+- Sipariş satırına **hiçbir şey** yazılmaz (`payment_debug` bile — o da o satıra gider).
+- `raiseRevenueAlarm` (`_shared/revenue_alarm.ts`, DI'lı) ile `client_errors`'a yazılır:
+  kod `PAYMENT_ORDER_MISMATCH`, `extra` içine eşleşmeyen alanlar (değerler değil, hangi
+  alanın uyuşmadığı + siparişin id'si).
+- Cevap: `wantsJson` ise `{status:'pending', reason:'verification_failed'}`, değilse
+  mevcut pending yönlendirmesi. ⭐Saldırgana "neyin tutmadığı" söylenmez.
+- ⚠`payment_status='failed'` YAZILMAZ: İyzico tarafında ödeme BAŞARILI; 'failed' yazmak
+  yalan olur ve gerçek siparişin akışını bozabilir.
+
+## 4. NE DEĞİŞMİYOR (kapsam sınırı)
+
+- Migration YOK, şema değişikliği YOK.
+- `iyzico-payment` ve `iyzico-refund` DOKUNULMUYOR.
+- Deploy YOK: Edge fonksiyonu deploy'u prod'dur, Recep'in kapısıdır. Bu iş **PR açar.**
+- VULN-002 (`orders_update_policy`) bu planın KAPSAMINDA DEĞİL, ayrı kayıt.
+
+## 5. ÖLÇÜLMEYEN, ADIYLA
+
+1. **Sömürülmüş mü?** Salt-okuma sorgusu bu oturumun izin katmanında iki kez reddedildi
+   ("Production Reads"). Recep'e iletildi; onay gelirse ölçülecek.
+2. **`retrieve` gerçekten `basketId` echo ediyor mu?** İyzico dokümanına göre evet, ama
+   PROD'DA ÖLÇMEDİM. Kol 1'in "en az biri" tasarımı bu belirsizliğe karşı yazıldı; yine de
+   canlıda ilk koşumda iki alanın da gelmediği bir vaka çıkarsa gerçek ödemeler pending'de
+   kalır. ⭐Bu yüzden deploy öncesi bir `payment_debug` örneği okunmalı — yukarıdaki 1 numaralı
+   iznin ikinci gerekçesi budur.
+3. Testler `_shared/__tests__` kalıbıyla yazılacak; gerçek İyzico çağrısı yok, `retrieve`
+   sahtelenecek. **Sahte gerçeği taklit etmiyorsa test kördür** — bu yüzden sahte yanıt
+   alanları prod `payment_debug` biçiminden alınmalı (bkz. 2).
 
 
 ---

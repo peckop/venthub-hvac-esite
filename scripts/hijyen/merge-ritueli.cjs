@@ -35,7 +35,7 @@
  *   · `paths:`/`paths-ignore:` süzgeci YOK — varsa ilgisiz bir PR'da doğmaması DOĞRUdur
  *     (ölçüldü: `rls-guard`, `edge-shared-input-drift`), VE
  *   · job'da `if:` YOK — koşullu job `skipping` kovasına düşer ve **`skipping` düşen değildir**
- *     (ölçüldü: `gemini-dispatch`in 7 job'u, `db-advisor`ın 2 job'u).
+ *     (ölçüldü: `gemini-dispatch`in 7 job'u — 2026-09-17 REC-353 ile silindi —, `db-advisor`ın 2 job'u).
  *
  * Bu kriterle türetilen küme PR #965'te doğan workflow kapılarının TAM OLARAK aynısı çıktı.
  *
@@ -506,6 +506,23 @@ if (require.main === module) {
       process.stderr.write('merge-ritueli: kapi YESIL ama gh pr merge BASARISIZ: ' +
         String(e.message).slice(0, 200) + '\n')
       process.exit(3)
+    }
+    // ANA AĞAÇ İLERİ SARMA (REC-345, karar 44, cetvel §20.2). Kancalar/CLAUDE.md/.mcp.json ana
+    // ağaçtan yüklenir; 09-17'de ana ağaç 50 commit gerideydi ve dört merge'lü düzenek hiçbir
+    // pencerede etkin değildi. Merge ZATEN yapıldı: buradaki hiçbir sonuç çıkış kodunu değiştirmez,
+    // ama sonuç her koşulda GÖRÜNÜR yazılır. Yalnız ff-only; stash/reset/checkout yok.
+    try {
+      const tazelik = require(path.join(__dirname, 'ana-agac-tazelik.cjs'))
+      const dosyalar = JSON.parse(gh(['pr', 'view', pr, '--json', 'files'])).files.map((f) => f.path)
+      if (tazelik.ayarYolunaDeger(dosyalar)) {
+        try { git(['fetch', 'origin', 'master', '-q']) } catch { /* ölçüm bayatsa ileriSar 'guncel' der; aşağıda yazılır */ }
+        const s = tazelik.ileriSar(tazelik.anaAgacYolu(AGAC))
+        yaz('ANA AGAC: ' + s.durum + (s.geride != null ? ' (geride ' + s.geride + ')' : '') +
+          (s.sebep ? ' — ' + s.sebep : '') +
+          (s.durum === 'ilerlendi' ? ' — yeni kancalar sonraki turda, .mcp.json pencere yeniden acilinca etkin' : ''))
+      }
+    } catch (e) {
+      yaz('ANA AGAC: OLCEMEDI — ' + String((e && e.message) || e).slice(0, 160) + ' (merge etkilenmedi)')
     }
   }
   process.exit(0)

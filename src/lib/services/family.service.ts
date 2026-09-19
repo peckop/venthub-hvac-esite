@@ -38,6 +38,13 @@ export async function getFamiliesEnriched(
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
 
+  // REC-206 / karar 42: liste RPC'si `f.description` jsonb'sini OLDUĞU GİBİ döndürüyor
+  // (bloklar_tr, maddeler_tr dahil). Bu liste 'use client' bileşenlere (CategoryGridView,
+  // FamilyCard, BrandDetailPage) gider ve sayfa verisine gömülür. Canlı ölçüm: /tr/products
+  // HTML'inde `bloklar_tr` 37 kez; 47 ailenin description'ı 71.233 karakter, bunun yalnız
+  // 11.855'i tr/en. Detay yolu (parseFamilyDetail) ile AYNI daraltma burada da uygulanır.
+  for (const item of items) item.description = asLocalizedText(item.description)
+
   // REC-108: liste RPC'si de ham `f.name` döndürüyor. Dönen id kümesi için ad çevirileri
   // TEK sorguyla çekilip gömülür; hiç satır yoksa hiç sorgu atılmaz. Çeviri BURADA
   // ÇÖZÜLMEZ — sayfa verisi `unstable_cache` içinde tutuluyor ve çözüm burada yapılsaydı
@@ -131,7 +138,16 @@ function parseFamilyDetail(data: unknown): FamilyDetail | null {
   const variants = obj.variants
   if (typeof family !== 'object' || family === null || !Array.isArray(variants)) return null
   const taxIncluded = typeof obj.price_tax_included === 'boolean' ? obj.price_tax_included : null
-  return { family, variants, price_tax_included: taxIncluded } as FamilyDetail
+  // Metin alanları vitrin sözleşmesine indirilir (yalnız tr/en) — bu nesne istemci
+  // bileşenine serileştirilir; depo anahtarları (bloklar_tr, maddeler_tr) sayfaya gömülmez.
+  const aile = family as Record<string, unknown>
+  const vitrinAilesi = {
+    ...aile,
+    description: asLocalizedText(aile.description),
+    meta_title: asLocalizedText(aile.meta_title),
+    meta_description: asLocalizedText(aile.meta_description),
+  }
+  return { family: vitrinAilesi, variants, price_tax_included: taxIncluded } as FamilyDetail
 }
 
 export async function getFamilyDetail(
@@ -283,10 +299,30 @@ function embeddedBrandName(brands: { name: string } | { name: string }[] | null)
   return Array.isArray(brands) ? (brands[0]?.name ?? null) : brands.name
 }
 
+/**
+ * jsonb metin alanını VİTRİN SÖZLEŞMESİNE indirir: yalnız `tr` ve `en` dizeleri kalır.
+ *
+ * NİÇİN AYIKLIYOR, YALNIZ TİP DEĞİL (REC-206 / karar 42, 2026-09-17 canlı ölçüm):
+ * `product_families.description` vitrinde gösterilen `tr`/`en`'in yanında içerik hattının
+ * DEPODA tuttuğu `bloklar_tr` ve `maddeler_tr` anahtarlarını da taşıyor. Bu anahtarlar
+ * hiçbir bileşende çizilmiyor, ama eski hâl yalnız TİPİ daraltıyordu — nesnenin kendisi
+ * istemci bileşenine olduğu gibi gidiyor ve sayfa verisine gömülüyordu. Ölçüm: 16 ailenin
+ * blok metnindeki iç editör notları ("kaynakta yok — blok bilinçli olarak boş bırakıldı")
+ * müşteri ekranında 0, sayfanın HTML'inde gömülü veride VAR (jet-serisi TR sayfası 77 geçiş).
+ * Kaynağı açan herkes ve betik okuyan tarayıcılar görüyordu; ayrıca sayfa ağırlığı boşa şişiyordu.
+ * Blok render'ı (REC-164) geldiğinde o bileşen kendi alanını AÇIKÇA ister.
+ */
 function asLocalizedText(value: unknown): { tr?: string | null; en?: string | null } | null {
-  return typeof value === 'object' && value !== null
-    ? (value as { tr?: string | null; en?: string | null })
-    : null
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null
+  const kaynak = value as Record<string, unknown>
+  const dize = (v: unknown): string | null | undefined =>
+    typeof v === 'string' ? v : v === null ? null : undefined
+  const sonuc: { tr?: string | null; en?: string | null } = {}
+  const tr = dize(kaynak.tr)
+  const en = dize(kaynak.en)
+  if (tr !== undefined) sonuc.tr = tr
+  if (en !== undefined) sonuc.en = en
+  return sonuc
 }
 
 /**
