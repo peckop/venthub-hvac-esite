@@ -1,6 +1,6 @@
-# Kararlar — Altyapı, Kapılar ve Belge Hattı (Linear belgesinin TAM dışa aktarımı · 2026-09-16 ayna: K1–K10)
+# Kararlar — Altyapı, Kapılar ve Belge Hattı (Linear belgesinin TAM dışa aktarımı · 2026-09-19 ayna: K1–K10)
 
-<!-- kaynak_id: 5f43fac5-f2a9-40d7-8da5-86bf5235764e · kaynak_updatedAt: 2026-09-08T12:19:34.533Z · kopya: 2026-09-16T06:21Z -->
+<!-- kaynak_id: 5f43fac5-f2a9-40d7-8da5-86bf5235764e · kaynak_updatedAt: 2026-09-16T11:34:27.859Z · kopya: 2026-09-19T11:19Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.
@@ -37,7 +37,7 @@ Gözcü + cron + prob/doğrula ritüeli; "koptu" hükmü çift sinyal ister (nab
 
 ## K8 · Üretilmiş toplamalar DONDURULUR (2026-09-04; Recep yetkiyi OPS'a bıraktı, OPS kararı)
 
-8 üretilmiş dosya (docs/*_master.md, system_tree.md, artefakt_manifest.json) özellik PR'larında YENİDEN ÜRETİLMEZ; depoda kalır. Yeniden üretim yalnız dijital ikize yükleme öncesi tek "belge tazeleme" PR'ında. Kapı kolları dondurulmuş modda uyarı + sayım, tazeleme PR'ında kırmızı. Sıfır tüketicili standards_master.md ve kayitlar_master.md git'ten çıkar. "Hepsi çıkar" (A) ikiz kararı sonrasına ertelendi. Sebep: günde 5 taban tazelemesi; 27 tüketici; INV-DOC-4b'nin "ikize giden = depo hali" güvencesi korunur. İş: REC-132.
+8 üretilmiş dosya (docs/\*\_master.md, system_tree.md, artefakt_manifest.json) özellik PR'larında YENİDEN ÜRETİLMEZ; depoda kalır. Yeniden üretim yalnız dijital ikize yükleme öncesi tek "belge tazeleme" PR'ında. Kapı kolları dondurulmuş modda uyarı + sayım, tazeleme PR'ında kırmızı. Sıfır tüketicili standards_master.md ve kayitlar_master.md git'ten çıkar. "Hepsi çıkar" (A) ikiz kararı sonrasına ertelendi. Sebep: günde 5 taban tazelemesi; 27 tüketici; INV-DOC-4b'nin "ikize giden = depo hali" güvencesi korunur. İş: REC-132.
 
 ## K9 · Companion sistemi UYKU KİPİ — tek taşıyıcı anahtarı (2026-09-05, Recep; emir REC-142)
 
@@ -64,3 +64,7 @@ DURUM: İŞ → REC-59 (Backlog; Recep "go" bekliyor). Kiracı şartı → REC-8
 ---
 
 *2026-09-04 ilk sürüm (OPS). 2026-09-05 K9 eklendi, K2 notu (OPS). 2026-09-08 K10 eklendi (OPS, Recep talimatıyla; yorum arşive gider, karar belgesi kalır).*
+
+## 2026-09-16 — Karar 33: migration merge kapısı SINIFLI (Recep EVET)
+
+Recep: "migration konusundaki benden geçer kısmını sana mı devretsem, konuyu tam anlamadığım için süreci uzatıyorum" → "yapma dediğin gibi yap, en azından bana gelenler azalır, gerçekten gelmesi gereken gelmiş olur." Hüküm: tam devir değil, iki sınıf. **Ekleme sınıfı** (yalnız yeni nesne ekleyen, var olana dokunmayan, gölgede geçmiş, kapılar yeşil) şerit ritüelle merge eder, Recep'e bilgi satırı. **Yıkıcı sınıf** (DROP/ALTER/RENAME, DML, var olan fonksiyon-tetik-politika değişimi, GRANT genişletme, security definer, tenant sınırı) Recep kapısında kalır; soru üç ölçülmüş satır: gölge sonucu · geri alma yolu · kilit süresi. Sınıf tespiti betikle (fail-closed: betik yokken her migration yıkıcı). Uygulama: ALTYAPI kaydı (karar defteri REC-318). Kural 13 metni bu kararla güncellenir.
