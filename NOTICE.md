@@ -18,6 +18,20 @@
 | henchmarketing-rgb/headroom | MIT | Bağlam-doluluk çubuğu fikri (uygulama bizden) | `.claude/statusline.cjs` |
 | WrongStack (Ersin Koç) | MIT | "Düzenlenen dosyanın testini o anda koş" fikri (`test-runner-gate`); uygulama bizden | `.claude/hooks/verify-on-stop.cjs` |
 | shadcn/ui | MIT © shadcn | Bileşen temeli (stack'te) | `src/components/ui/` |
+| `fallow` skill'i — Bart Waardenburg, `docs.fallow.tools` | MIT (skill künyesinde yazılı) | Skill dosyası **olduğu gibi** (yöntem değil, metnin kendisi) | `.claude/skills/fallow/`, `.agent/skills/fallow/` |
+| `git-commit` skill'i | MIT (skill künyesinde yazılı) | Skill dosyası olduğu gibi | `.claude/skills/git-commit/`, `.agent/skills/git-commit/` |
+| Vercel — `vercel-react-best-practices` skill'i | MIT © vercel | Skill dosyası olduğu gibi | `.claude/skills/vercel-react-best-practices/`, `.agent/skills/…` |
+| Vercel — `vercel-composition-patterns` skill'i | MIT © vercel | Skill dosyası olduğu gibi | `.claude/skills/vercel-composition-patterns/`, `.agent/skills/…` |
+
+**⛔İKİ SKILL AĞACI DA SAYILIR.** `.claude/skills/` (Claude Code) ve `.agent/skills/`
+(Antigravity/worker) **ikisi de aktif ve kasıtlıdır** (CLAUDE.md). Aynı skill iki ağaçta
+duruyorsa atıf **iki yolu da** gösterir; yalnız birini yazmak, ötekini künyesiz kullanmaktır.
+
+**Ölçülmüş yokluk — `graphify` NİÇİN BURADA DEĞİL:** kaynağında (`.claude/skills/graphify/SKILL.md`)
+**hiçbir lisans ya da yazar ibaresi yok** (2026-09-19 tarandı). Recep'in kalıbı gereği ibaresiz
+kaynaktan kod alınmaz; graphify bizde **araç olarak kullanılıyor**, metni uyarlanmıyor. Bu yüzden
+`SOURCES.md`'de referans olarak durur, burada satırı yoktur. *Bu bir atlama değil, yazılı hükümdür.*
 
 Eksik satır görürsen (uyarlanmış ama burada olmayan kaynak) bu bir kusurdur; `task-observer`
-gözlemi aç ya da doğrudan satırı ekle.
+gözlemi aç ya da doğrudan satırı ekle. **Kapı:** `src/__tests__/conformance/notice-kapsami.test.ts`
+— lisans/yazar ibaresi taşıyan her skill dosyasının bu listede geçtiğini ölçer.

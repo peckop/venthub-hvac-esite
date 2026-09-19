@@ -63,4 +63,19 @@ Bu kaynakların çoğunun resmi PDF'i **yok**; ama NLM'e PDF'ten **daha iyi** be
 | B1 | shadcn/ui | MIT | kod (bileşen temeli) | **evet** — NOTICE'ta |
 | B2 | shadcn-admin | MIT | referans (iskelet) | hayır |
 | B3 | Origin UI / shadcn Blocks | MIT — **doğrulanacak** (blok bazında) | araç; blok alınırsa kod | alınırsa evet |
-| — | 21st.dev bileşen havuzu (2026-09-19 değerlendirmesi) | havuz karışık; TailwindUI kökenli bloklar **ticari lisans** | yalnız referans; kod alınmaz | — |
+| — | 21st.dev bileşen havuzu (2026-09-19 değerlendirmesi) | **bileşen bazında** — havuz karışık; depo MIT ama bileşenlerin kendi lisansı yok, şartlar "yazarların ve 21st Labs'in münhasır mülkiyeti" | **bileşenin KENDİ kaynağında** açık MIT/Apache/BSD ibaresi varsa kod alınır; yoksa **yalnız referans** | kod alınırsa **evet** |
+
+### C.1 Kalıp: lisans HAVUZDA değil, BİLEŞENDE aranır (Recep kararı, 2026-09-19)
+
+Recep'in sözü: *"önerin için ben de evet diyorum."*
+
+Ölçüm şuydu: 21st.dev deposunun kendi lisansı MIT, ama havuzdaki bileşenlerin **tek tek** lisansı
+yok ve kullanım şartları içeriğin "yazarların ve 21st Labs'in münhasır mülkiyeti" olduğunu
+söylüyor. Yani **havuzun lisansı bileşenin lisansı değildir** — bu, Origin UI'da da geçerli
+olan genel kalıptır ve her karışık havuz için aynı şekilde uygulanır:
+
+1. **Kod alınacaksa** bileşenin kendi dosyasında/sayfasında açık bir MIT/Apache/BSD ibaresi
+   aranır. Varsa alınır ve `NOTICE.md`'ye satır yazılır.
+2. **İbare yoksa alınmaz** — yalnız bakılır, öğrenilir, kendi kodumuz yazılır. Referans lisans
+   yükümlülüğü doğurmaz.
+3. **Belirsizlik "muhtemelen MIT" diye çözülmez.** Depo PUBLIC; yanlış alınan kod geri alınamaz.
