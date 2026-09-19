@@ -1,4 +1,18 @@
-import { admin } from './admin/tr'
+/**
+ * ⛔ADMIN SÖZLÜĞÜ BURADAN İMPORT EDİLMEZ (REC-59 Faz 2, karar 47).
+ *
+ * Eskiden `import { admin } from './admin/tr'` satırı buradaydı ve sonucu canlıda ölçüldü
+ * (2026-09-18): yönetim panelinin sözlüğü, müşteri sayfalarının indirdiği JS paketinin
+ * içine giriyordu — `static/chunks/7681-*.js` 356.040 bayt ve ana sayfa bunu indiriyordu.
+ * Müşteri "Kuponlar", "Stok Hareketleri", "Denetim Kaydı" gibi hiç görmeyeceği yazıları
+ * her sayfada taşıyordu.
+ *
+ * Admin sözlüğü artık YALNIZ admin ekranlarında, dinamik import ile yükleniyor
+ * (`I18nProvider.ensureAdminDict`). Tip tarafı kaybolmuyor: `I18nContext.ts` admin
+ * sözlüğünü `import type` ile alır — tip-only import derlemede SİLİNİR, pakete girmez.
+ *
+ * Kapı: `src/i18n/__tests__/admin-sozlugu-vitrin-paketine-girmez.test.ts` (INV-ADMIN-SOZLUK-2).
+ */
 
 export const tr = {
   whatsappMessages: {
@@ -844,7 +858,6 @@ export const tr = {
       instagram: 'Instagram'
     }
   },
-  admin,
   auth: {
     pwStrength: {
       weak: 'Zayıf',
