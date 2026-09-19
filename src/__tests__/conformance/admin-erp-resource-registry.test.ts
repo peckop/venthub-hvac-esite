@@ -4,6 +4,8 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { ADMIN_RESOURCES } from '../../config/admin-resources'
+import { admin as adminEn } from '../../i18n/dictionaries/admin/en'
+import { admin as adminTr } from '../../i18n/dictionaries/admin/tr'
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
@@ -61,10 +63,20 @@ describe('INV-ERP-RESOURCE-1 · admin kaynak registry bütünlüğü', () => {
   })
 
   it('her labelKey HEM tr HEM en sözlüğünde ÇÖZÜLÜR (ham anahtar dönmez)', () => {
+    /**
+     * ⭐EVREN İKİ SÖZLÜKTEN KURULUR — REC-59 Faz 2, 2026-09-19.
+     *
+     * Admin sözlüğü vitrin paketinden çıkarıldı (müşteri sayfalarının indirdiği parça 144.244
+     * bayt küçüldü). Menü etiketlerinin tamamı `admin.menu.*`tir; `tr`/`en` tek sözlük sayılınca
+     * 50 etiket "çözülmüyor" göründü. **Etiketler bozulmadı — kapının baktığı yer eksildi.**
+     * Sıra önemsiz: Faz 2 inene kadar `tr` admin'i zaten taşıyor ve nesne AYNI.
+     */
+    const tamTr = { ...tr, admin: adminTr }
+    const tamEn = { ...en, admin: adminEn }
     const kirik: string[] = []
     for (const r of ADMIN_RESOURCES) {
-      if (getDictValue(tr, r.labelKey) === r.labelKey) kirik.push(`tr · ${r.key} → ${r.labelKey}`)
-      if (getDictValue(en, r.labelKey) === r.labelKey) kirik.push(`en · ${r.key} → ${r.labelKey}`)
+      if (getDictValue(tamTr, r.labelKey) === r.labelKey) kirik.push(`tr · ${r.key} → ${r.labelKey}`)
+      if (getDictValue(tamEn, r.labelKey) === r.labelKey) kirik.push(`en · ${r.key} → ${r.labelKey}`)
     }
     expect(kirik, `Sözlükte çözülmeyen labelKey (menüde HAM ANAHTAR görünür): ${kirik.join(' · ')}`).toEqual([])
   })
