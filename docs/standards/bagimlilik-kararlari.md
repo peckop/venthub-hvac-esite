@@ -44,16 +44,25 @@ olmasa da) aynı kurallara tabi olur.
 ⛔**BORÇ satırı uydurma gerekçeye yeğdir.** Bir satırın gerekçesi ölçülmediyse `BORÇ` yazılır.
 Borç sayısı teste **dondurulmuştur ve yalnız azalabilir**: yeni bir paket borç olarak doğamaz.
 
+⭐**BU KURAL İLK GÜN BANA UYGULANDI.** Kaydın ilk hâlinde `react` / `react-dom` /
+`@types/react` / `@types/react-dom` satırları `KARAR` yazılıydı; gerekçe olarak "React Compiler
+RC eşleşmesi" gösteriliyor ve `0ab8b38e1` commit'ine dayandırılıyordu. **Ölçüldü: o commit
+React'ten hiç söz etmiyor** (içeriği Supabase CLI pini, `"latest"` temizliği, Node 22 ve git
+kancalarıdır). Tam pin aslında `06e940580` adlı ilgisiz bir commit'te, gerekçesiz doğmuş.
+Yani gerekçe **çıkarımdı, ölçüm değildi** — tam olarak bu kaydın yasakladığı şey. Dördü de
+`BORÇ`a alındı ve doğuş tavanı 16'dan **20**'ye düzeltildi. Tavan **doğduğu anda ölçümle
+kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın düzeltilmesidir.
+
 ## 4 · KAYIT
 
 | paket | aralık | tarih | durum | gerekçe |
 |---|---|---|---|---|
 | next | 15.5.24 | 2026-09-13 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. |
-| react | 19.0.0 | 2026-08-19 | KARAR | Commit `0ab8b38e1` akan sürümleri sabitledi. 19.0.0 sabit tutuluyor çünkü React Compiler eklentisi hâlâ RC sürümünde (`eslint-plugin-react-compiler` 19.1.0-rc.2) ve derleyici eşleşmesi yama sürümünde bile ayrı doğrulama ister. |
-| react-dom | 19.0.0 | 2026-08-19 | KARAR | `react` ile AYNI sürümde olmak zorunda (React çekirdeği ile DOM sürücüsü ayrışırsa çalışma anında hata verir). 19.0.0, `react` satırıyla birlikte hareket eder. |
+| react | 19.0.0 | — | BORÇ | — |
+| react-dom | 19.0.0 | — | BORÇ | — |
 | react-day-picker | 9.14.0 | 2026-08-19 | KARAR | PR #698: v9 geçişi iki peer bağımlılık ihlalini kapattı ve o sırada tarih filtresinin **hiç çalışmadığı** ölçüldü. 9.14.0 sabit, çünkü v9 API'si tarih seçici bileşenini doğrudan besliyor. |
-| @types/react | 19.0.1 | 2026-08-19 | KARAR | Tip paketleri React ile eşleşmek zorundadır; 19.0.1, `react` 19.0.0 hattının tip karşılığıdır. Akmaya bırakılırsa tip hataları sürüm çözümleme anında doğar. |
-| @types/react-dom | 19.0.1 | 2026-08-19 | KARAR | `@types/react` 19.0.1 ile aynı hatta olmak zorunda; ayrışırsa `tsc` iki farklı React tip ağacı görür. |
+| @types/react | 19.0.1 | — | BORÇ | — |
+| @types/react-dom | 19.0.1 | — | BORÇ | — |
 | eslint-config-next | 15.1.0 | — | BORÇ | — |
 | eslint-plugin-react-compiler | 19.1.0-rc.2 | 2026-08-19 | KARAR | RC sürümü (19.1.0-rc.2) semver garantisi taşımaz — iki RC arası kırıcı değişiklik olağandır. Sabit pin zorunludur, aralık yazılamaz. |
 | minimatch | 9.0.7 | — | BORÇ | — |
@@ -137,10 +146,23 @@ ve tip paketi. (Kısıt kodun içinde olabilir; orası bu ölçümün kapsamı d
 geliştirme aracıdır, canlıya girmez; etkisi lint kurallarının Next'in yeni uyarılarını
 görmemesidir. Kayıtta **BORÇ** olarak duruyor çünkü niçin geride bırakıldığı ölçülemedi.
 
-### `react` niçin 19.0.0'da sabit — ve bunun bugün bir bedeli yok
+### ⭐`react` pini ÜÇ KÜÇÜK SÜRÜM ENGELLİYOR — ve gerekçesi yok
 
-`react` ve `react-dom` **eskiyen listesinde hiç yok**: 19.0.0 bugün son sürüm. Yani sabit pin
-şu an hiçbir yükseltmeyi engellemiyor.
+⛔**BU BÖLÜMÜN İLK HÂLİ YANLIŞTI.** *"`react` eskiyen listesinde hiç yok, 19.0.0 bugün son
+sürüm, pin hiçbir şeyi engellemiyor"* yazmıştım. Hatanın mekaniği: kendi betiğimin **yalnız
+ana-sürüm-geride** çıktısına baktım, `react` orada yoktu (19 → 19 ana sürüm farkı değil) ve
+bundan "listede hiç yok" sonucunu çıkardım. **Tam listede vardı.** Ölçüm (`npm view`, aynı gün):
+
+| paket | kurulu | son |
+|---|---|---|
+| `react` | 19.0.0 | **19.3.0** |
+| `react-dom` | 19.0.0 | **19.3.0** |
+| `@types/react` | 19.0.1 | **19.3.0** |
+| `@types/react-dom` | 19.0.1 | **19.3.0** |
+
+Yani tam pin **üç küçük sürümü engelliyor** ve bunu yapmasının **yazılı hiçbir sebebi yok**
+(§4'te dördü de `BORÇ`). Alt küme çıktısından bütün hakkında hüküm kurmak, bu kaydın kendi
+kurduğu kapıya düşmektir; hata ilk gün, kendi dosyamda yakalandı ve burada duruyor.
 
 ### Node motoru: uyuşmazlık YERELDE, canlıda değil
 

@@ -40,8 +40,15 @@ const KOK = path.resolve(__dirname, '../../..')
 const PKG_YOLU = path.join(KOK, 'package.json')
 const KAYIT_YOLU = path.join(KOK, 'docs', 'standards', 'bagimlilik-kararlari.md')
 
-/** BORÇ = aralığı gerçeğe göre kayıtlı ama gerekçesi henüz ölçülmemiş satır. */
-const BORC_TAVANI = 16
+/**
+ * BORÇ = aralığı gerçeğe göre kayıtlı ama gerekçesi henüz ölçülmemiş satır.
+ *
+ * ⭐16 DEĞİL 20, ve sebebi kayda geçiyor: ilk sayımda `react`/`react-dom`/`@types/react`/
+ * `@types/react-dom` satırları `KARAR` yazılmıştı, gerekçeleri ÇIKARIMDI ve dayandırıldıkları
+ * commit ölçüldüğünde React'ten hiç söz etmediği görüldü. Dördü BORÇ'a alındı, tavan doğuş
+ * anında düzeltildi. Tavan doğduğunda ÖLÇÜMLE kurulur; ondan sonra yalnız AZALIR.
+ */
+const BORC_TAVANI = 20
 
 /**
  * Cetvel §4: override DAİMA aralıklıdır, açık uçlu değil (">=7.29.0" ana sürüm atlatır —
