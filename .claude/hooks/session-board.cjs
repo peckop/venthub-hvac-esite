@@ -151,8 +151,10 @@ if (source === 'resume') {
   context +=
     // ⛔REC-328: "uclunu yeniden kur" talimati kaldirildi (gozcu/cron EMEKLI).
     // Resume'da gercekten kaybolan sey MEKANIZMA degil, KIMIN NEREDE OLDUGU bilgisidir.
-    'RESUME ACILISI — makine geri dondu. Gozcu/cron KURULMAZ (REC-328); filo dogrudan ' +
-    'mesajla calisir.\n' +
+    // KARAR 53 (2026-09-19): "gozcu/cron KURULMAZ" GENEL YASAK DEGILDI — kota sikisikken
+    // alinmis donemsel bir karardi ve genelleme olarak gecmisti. Emekli olan ESKI UCLU.
+    'RESUME ACILISI — makine geri dondu. Eski gozcu uclusu EMEKLI (REC-328); filo dogrudan ' +
+    'mesajla calisir. Zamanlayici / cron / loop gerekiyorsa ONCE Recep ile konus (karar 53).\n' +
     (lider
       ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele ve ' +
         'uyuyan her birine SendMessage at: "makine dondu, hangi isteydin, serit talebini tazele". ' +

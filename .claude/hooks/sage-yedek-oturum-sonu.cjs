@@ -11,7 +11,10 @@
  * kopyadır; unutulan bir yedek, kaybın sessiz hâlidir. Yedeğin kendisi 2026-09-18'de yazıldı
  * ve doğrulandı (`scripts/hijyen/sage-yedek.cjs`); eksik olan tek şey onu ÇAĞIRAN yerdi.
  *
- * ⛔GÖZCÜ/CRON KURULMAZ (REC-328). Bu yüzden zamanlayıcı değil, OLAY seçildi: oturum
+ * ⛔Eski gözcü üçlüsü EMEKLİ (REC-328). ⚠KARAR 53 (2026-09-19): bu bir GENEL YASAK
+ * değildi — kota sıkışıkken alınmış dönemsel bir karardı; zamanlayıcı / cron / loop
+ * gerekiyorsa ÖNCE Recep'le konuşulur. Burada zamanlayıcı değil OLAY seçildi ve seçim
+ * bugün de doğru, çünkü yedeğin doğal tetiği zaten kapanıştır: oturum
  * kapanışı. Pencere kapanırken zaten çalışan bir kanca var (`board-release.cjs`), yedek de
  * aynı olaya binerse yeni bir süreç/servis doğmaz.
  *

@@ -276,7 +276,9 @@ Kurallar:
 Recep'in sorusu: *"neden elle, avantajı ne, unutulursa ne olacak."* Cevap tek cümle:
 **elle = unutulur**, ve unutulan yedek kaybın sessiz hâlidir.
 
-1. **Olay, zamanlayıcı değil.** Gözcü/cron kurulmaz (REC-328); yedek, pencerenin kapanışına
+1. **Olay, zamanlayıcı değil.** Eski gözcü üçlüsü emekli (REC-328). ⚠**Karar 53
+   (2026-09-19):** bu genel bir yasak değildi, dönemsel bir karardı — zamanlayıcı / cron /
+   loop gerekiyorsa **önce Recep'le konuşulur**. Burada olay yeterli: yedek, pencerenin kapanışına
    (`SessionEnd`) binen `.claude/hooks/sage-yedek-oturum-sonu.cjs` ile alınır.
 2. **24 saat kuralı.** Son yedek 24 saatten yeniyse koşum atlanır — üç pencere aynı ana ağacı
    paylaşır, her kapanışta kopyalamak aynı veriyi günde onlarca kez yazmaktır.
