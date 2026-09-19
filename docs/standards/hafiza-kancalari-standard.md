@@ -290,6 +290,31 @@ Recep'in sorusu: *"neden elle, avantajı ne, unutulursa ne olacak."* Cevap tek c
    damga bırakmıyor; damgasız "14 gündür bakım yok" cümlesi ölçüm değil tahmindir. Bakım
    damgası ayrı ve küçük bir iştir.
 
+### §7.6 YEDEK "sage" DEMEK DEĞİL — `.wrongstack/` altındaki HER depo (2026-09-19)
+
+İş kartı panosu açılınca ölçüldü: pano da aynı yerde, aynı biçimde yaşıyor —
+`.wrongstack/kanbans/_kanban.sqlite`, **WAL kipli, git DIŞI, yedeksiz**. Ölçüm anında ana dosya
+**4 KB**, WAL'ı **148 KB** idi: panonun içeriği pratikte tamamen WAL'daydı ve düz bir kopya
+neredeyse boş bir pano verirdi. Ders zaten yazılıydı ("WAL kipli HERHANGİ bir SQLite verisi");
+eksik olan, yedeğin o dersi **uygulaması**ydı.
+
+1. **Depo listesi veridir, varsayım değil.** `DEPOLAR` dizisi betiğin içinde yazılıdır; yeni bir
+   `.wrongstack` deposu doğarsa listeye girer. Her depo kendi öneki ve uzantısıyla yedeklenir,
+   budama **önek başına** çalışır (yoksa biri ötekinin yedeklerini yer).
+2. **"Biri alındı" HEPSİ alındı demek değildir.** CLI ve oturum kancası her depoyu **ayrı**
+   raporlar. Çıkış kodu: kaynağı olan bir depo düşerse kırmızı; hiçbiri yedek üretemediyse de
+   kırmızı. Kaynağı hiç olmayan depo (ör. pano bu makinede açılmamış) tek başına kırmızı yapmaz
+   ama **satırı yazılır**.
+3. **İstem satırı EN KÖTÜ depoyu anlatır.** İki depodan biri dün, öteki hiç yedeklenmişse "son
+   yedek dün" demek yalandır. Ölçüt: bu makinede **kaynağı olan** depoların en kötüsü.
+4. **Parmak izi artık HER TABLONUN satır sayısıdır** (eskiden yalnız `memories`). Tablo listesi
+   tek başına yetmez: boş bir kopya da aynı listeyi taşır.
+5. **⛔SANAL TABLO SAYILMAZ, ama listede kalır.** Ölçüldü: sage'in `memories_fts` tablosu harici
+   içerikli bir FTS5 sanal tablosudur ve `count(*)` *"no such column: T.text"* ile patlar. Genel
+   parmak izinin ilk yazımı bu yüzden **sage yedeğini tamamen düşürdü** — ve iyi ki düşürdü:
+   sessiz kalsaydı yedek alınmadan "alındı" denecekti. Gölge tabloları (`*_fts_data`, `*_fts_idx`,
+   `*_fts_docsize`) gerçek tablodur ve sayılır.
+
 ---
 
 ## ORTAK HAFIZA İNDEKSİ — İKİ EŞİK, KATLAMA ve ÇOK-YAZAR YARIŞI (REC-280)

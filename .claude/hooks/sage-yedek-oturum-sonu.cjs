@@ -70,14 +70,23 @@ try {
     process.exit(0)
   }
 
-  const s = yedek.yedekAl()
-  const sure = Date.now() - t0
-  if (s.durum === 'alindi') {
-    logaYaz(dizin, `${damga} ALINDI ${path.basename(s.yol)} — kayit ${s.yedek.sayi}/${s.yedek.aktif}, ${sure} ms`)
-  } else {
-    // ⛔"kaynak-yok" DA BAŞARISIZLIKTIR. Ana ağaçta veri yoksa ya sage kurulu değildir ya kayıp vardır.
-    logaYaz(dizin, `${damga} ⛔${String(s.durum).toUpperCase()} — ${s.sebep || ''} (${sure} ms)`)
+  /**
+   * ⭐HER DEPO AYRI: sage hafızası VE iş kartı panosu. İkisi de `.wrongstack/` altında, WAL
+   * kipli, git DIŞI. 2026-09-19 ölçüldü: panonun ana dosyası 4 KB, WAL'ı 148 KB — içerik
+   * pratikte tamamen WAL'da. Tek satırda "alındı" demek, ötekinin düştüğünü örter.
+   */
+  for (const s of yedek.hepsiniAl()) {
+    const sure = Date.now() - t0
+    if (s.durum === 'alindi') {
+      const aktif = s.yedek.aktif === null ? '' : `/${s.yedek.aktif}`
+      logaYaz(dizin, `${damga} [${s.depo}] ALINDI ${path.basename(s.yol)} — kayit ${s.yedek.sayi}${aktif}, ${sure} ms`)
+    } else if (s.durum === 'kaynak-yok') {
+      logaYaz(dizin, `${damga} [${s.depo}] kaynak YOK — ${s.sebep || ''} (bu makinede kurulu degil)`)
+    } else {
+      logaYaz(dizin, `${damga} [${s.depo}] ⛔${String(s.durum).toUpperCase()} — ${s.sebep || ''} (${sure} ms)`)
+    }
   }
+  const sure = Date.now() - t0
   if (sure > BUTCE_MS) logaYaz(dizin, `${damga} ⚠BUTCE ASILDI — ${sure} ms > ${BUTCE_MS} ms`)
 } catch (e) {
   try {
