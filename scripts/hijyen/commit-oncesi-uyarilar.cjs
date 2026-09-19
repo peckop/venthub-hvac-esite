@@ -95,7 +95,22 @@ function kol1IlanEdilmemisBetik(kok, eklenen) {
 
   // Ölçüt: betiğin YOLU envanter metninde geçiyor mu. Yol araması ad aramasından
   // daha sıkı — iki dizinde aynı adlı betik varsa biri diğerini ilan etmiş saymaz.
-  return adaylar.filter((y) => !envanter.includes(y))
+  //
+  // ⭐İSTİSNA — §3.6 CETVELLER (2026-09-19'da ÖLÇÜLDÜ, REC-359): `arac-envanteri.cjs`
+  // cetvel satırlarını YOLLA değil, **uzantısız taban adıyla** üretir
+  // (`| bagimlilik-kararlari | ... |`). Yol ölçütü bu bölümde HER yeni cetvelde YANLIŞ
+  // ALARM verirdi: INV-ARAC-1 yeşilken bu uyarı "ilan edilmemiş" diyordu. Ölçülen vaka:
+  // `docs/standards/bagimlilik-kararlari.md` envantere usulüne göre yazıldı, kapı geçti,
+  // uyarı yine yandı. Yanlış yanan uyarı, yanmayan uyarıdan beterdir — üçüncü kez
+  // görüldüğünde hepsi görmezden gelinir. Kimliği envanterin KENDİ biçiminden okuyoruz.
+  return adaylar.filter((y) => {
+    if (envanter.includes(y)) return false
+    if (/^docs\/standards\/.+\.md$/.test(y)) {
+      const ad = path.basename(y, '.md').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      return !new RegExp(`^\\|\\s*${ad}\\s*\\|`, 'm').test(envanter)
+    }
+    return true
+  })
 }
 
 function kol2SeritDaliAnaAgacta(kok) {

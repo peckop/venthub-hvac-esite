@@ -9,6 +9,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -96,6 +97,57 @@ describe('REC-267: commit öncesi uyarılar kancaya bağlı ve UYARI olarak kal�
       'node scripts/hijyen/arac-envanteri.cjs --yaz'
     )
     expect(s, 'ilan edilmemiş betiğin YOLU basılmıyor').toMatch(/\$\{y\}|\$\{yol\}/)
+  })
+
+  it('⭐CETVEL satırı TABAN ADLA aranır — yol ölçütü her yeni cetvelde yanlış alarm veriyordu', () => {
+    /**
+     * ÖLÇÜLDÜ 2026-09-19 (REC-359): `docs/standards/bagimlilik-kararlari.md` envantere
+     * usulünce yazıldı, `INV-ARAC-1` YEŞİL geçti, bu uyarı yine "ILAN EDILMEMIS" dedi.
+     * Sebep: `arac-envanteri.cjs` cetvel satırlarını YOLLA değil **uzantısız taban adıyla**
+     * üretiyor (`| bagimlilik-kararlari | ... |`), uyarı ise yolu arıyordu.
+     * Yanlış yanan uyarı, yanmayan uyarıdan beterdir — üçüncüsünde hepsi görmezden gelinir.
+     * Bu kol hem yanlış alarmın gittiğini hem de kolun KÖRLEŞMEDİĞİNİ ölçer.
+     */
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'uyari-cetvel-'))
+    const g = (...a: string[]): void => {
+      execFileSync('git', a, { cwd: tmp, stdio: 'pipe' })
+    }
+    try {
+      g('init', '-q')
+      g('config', 'user.email', 'x@y.z')
+      g('config', 'user.name', 'x')
+      fs.mkdirSync(path.join(tmp, 'docs', 'audits'), { recursive: true })
+      fs.mkdirSync(path.join(tmp, 'docs', 'standards'), { recursive: true })
+      fs.writeFileSync(
+        path.join(tmp, 'docs', 'audits', 'arac-envanteri-2026-01-01.md'),
+        '| ad | baslik | sahip |\n|---|---|---|\n| ilan-edilmis-cetvel | X | ALTYAPI |\n',
+      )
+      fs.writeFileSync(path.join(tmp, 'temel.txt'), 'x')
+      g('add', '.')
+      g('commit', '-qm', 'taban')
+
+      // (a) Envanterde TABAN ADIYLA ilan edilmiş cetvel → uyarı YANMAMALI.
+      fs.writeFileSync(path.join(tmp, 'docs', 'standards', 'ilan-edilmis-cetvel.md'), '# X\n')
+      g('add', 'docs/standards/ilan-edilmis-cetvel.md')
+      const temiz = kos(tmp)
+      expect(temiz.kod).toBe(0)
+      expect(
+        temiz.cikti,
+        'envanterde taban adıyla ilan edilmiş cetvel için YANLIŞ ALARM verildi',
+      ).not.toContain('ilan-edilmis-cetvel')
+
+      // (b) Hiç ilan edilmemiş cetvel → uyarı YANMALI (kol körleşmedi).
+      fs.writeFileSync(path.join(tmp, 'docs', 'standards', 'ilansiz-cetvel.md'), '# Y\n')
+      g('add', 'docs/standards/ilansiz-cetvel.md')
+      const kirli = kos(tmp)
+      expect(kirli.kod).toBe(0)
+      expect(
+        kirli.cikti,
+        'ilan edilmemiş cetvel için uyarı YANMADI — istisna kolu tümden körleştirmiş',
+      ).toContain('ilansiz-cetvel.md')
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true })
+    }
   })
 
   it('⛔ÜRETİLMİŞ ENVANTERE YAZMAZ (AXIOM 3) ve AĞ/DB kullanmaz (kanca cetveli)', () => {
