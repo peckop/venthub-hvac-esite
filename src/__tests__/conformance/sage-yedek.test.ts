@@ -33,15 +33,34 @@ interface SqliteDb {
   close: () => void
 }
 
+type Iz = {
+  tablolar: string[]
+  satirlar: Record<string, number | string>
+  sayi: number
+  aktif: number | null
+}
+
 const modul = require_(MODUL_YOLU) as {
   TUTULACAK: number
-  kaynakYolu: (k?: string) => string
+  DEPOLAR: { ad: string; onek: string; uzanti: string; ana: string | null }[]
+  kaynakYolu: (k?: string, depo?: string) => string
   yedekDizini: () => string
-  parmakIzi: (y: string) => { tablolar: string[]; sayi: number; aktif: number }
-  yedekAl: (simdi?: Date) => { durum: string; yol?: string; sebep?: string; yedek?: { sayi: number; aktif: number } }
-  budama: (d?: string) => string[]
-  liste: (d?: string) => { ad: string }[]
+  parmakIzi: (y: string, ana?: string | null) => Iz
+  yedekAl: (simdi?: Date, depo?: string) => { durum: string; depo?: string; yol?: string; sebep?: string; yedek?: Iz }
+  hepsiniAl: (simdi?: Date) => { depo: string; durum: string; yol?: string; sebep?: string; yedek?: Iz }[]
+  budama: (d?: string, depo?: string) => string[]
+  liste: (d?: string, onek?: string | null) => { ad: string }[]
   damga: (d: Date) => string
+  sonDurum: (
+    d?: string,
+    simdi?: number,
+  ) => {
+    sonYedek: string | null
+    gun: number | null
+    dogrulanmadi: string[]
+    adet: number
+    depolar: { depo: string; kaynakVar: boolean; sonYedek: string | null; gun: number | null; adet: number }[]
+  }
 }
 
 const ESKI_ENV = { kok: process.env.CLAUDE_PROJECT_DIR, dizin: process.env.VENTHUB_SAGE_YEDEK_DIZINI }
@@ -231,6 +250,71 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
     expect(ikinci.log, 'atlama sebebi loga yazilmadi').toContain('ATLANDI')
   })
 
+  it('⭐PANO DA YEDEKLENIR: kanban deposu listede, WAL tuzagi onda da uretilir ve DOGRULANIR', () => {
+    /**
+     * ⭐NİÇİN (2026-09-19 ölçümü): iş kartı panosu sage ile AYNI yerde, AYNI biçimde yaşıyor —
+     * `.wrongstack/kanbans/_kanban.sqlite`, WAL kipli, git DIŞI. Ölçüm anında ana dosya 4 KB,
+     * WAL'ı 148 KB idi: panonun içeriği pratikte TAMAMEN WAL'daydı. Yedeklenmeseydi pilotun
+     * bütün kartları tek dosyayla yok olurdu; düz kopya da neredeyse boş bir pano verirdi.
+     */
+    const depolar = modul.DEPOLAR.map((d) => d.ad)
+    expect(depolar, 'kanban deposu yedek listesinde YOK — pilot verisi yedeksiz birikir').toContain('kanban')
+
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-yedek-'))
+    fs.mkdirSync(path.join(kok, '.wrongstack', 'kanbans'), { recursive: true })
+    const { DatabaseSync } = sqlite()
+    // ⛔Bağlantı AÇIK kalır: kapanış checkpoint yapar ve WAL tuzağı kaybolur (fikstür sahteleşir).
+    const db = new DatabaseSync(path.join(kok, '.wrongstack', 'kanbans', '_kanban.sqlite'))
+    db.exec('pragma journal_mode = WAL')
+    db.exec('create table boards (id TEXT PRIMARY KEY, title TEXT NOT NULL)')
+    db.exec('create table tasks (id TEXT PRIMARY KEY, board_id TEXT NOT NULL, title TEXT NOT NULL)')
+    db.prepare('insert into boards (id,title) values (?,?)').run('b1', 'VentHub ALTYAPI')
+    for (let i = 0; i < 7; i++) {
+      db.prepare('insert into tasks (id,board_id,title) values (?,?,?)').run(`t-${i}`, 'b1', `REC-345 kart ${i}`)
+    }
+
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-hedef-'))
+
+    const s = modul.yedekAl(new Date(), 'kanban') as {
+      durum: string
+      yol?: string
+      yedek?: { sayi: number; tablolar: string[] }
+    }
+    expect(s.durum, 'pano yedegi alinamadi').toBe('alindi')
+    expect(s.yedek?.sayi, 'pano yedegi EKSIK — WAL bekleyen yazimlar atlandi').toBe(8) // 1 pano + 7 kart
+    expect(path.basename(String(s.yol)), 'pano yedegi sage onekiyle yazilmis (budama birbirini yer)').toMatch(
+      /^kanban-.*\.sqlite$/,
+    )
+    db.close()
+  })
+
+  it('⭐SANAL TABLO parmak izini PATLATMAZ: sayilamaz ama LISTEDE kalir', () => {
+    /**
+     * Sahada ölçüldü 2026-09-19: sage'in `memories_fts` tablosu harici içerikli bir FTS5 sanal
+     * tablosudur ve `count(*)` "no such column: T.text" ile patlar. Genel parmak izinin ilk
+     * yazımı bu yüzden sage yedeğini TAMAMEN düşürdü. Sanal tablo listede kalmalı (varlığı
+     * karşılaştırılır) ama satır sayımının dışında tutulmalı.
+     */
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-fts-'))
+    const yol = path.join(kok, 'x.db')
+    const { DatabaseSync } = sqlite()
+    const db = new DatabaseSync(yol)
+    db.exec('create table memories (id TEXT PRIMARY KEY, data TEXT NOT NULL)')
+    db.exec("create virtual table memories_fts using fts5(text, content='memories', content_rowid='rowid')")
+    db.prepare('insert into memories (id,data) values (?,?)').run('m1', 'x')
+    db.close()
+
+    const iz = modul.parmakIzi(yol, 'memories') as {
+      tablolar: string[]
+      satirlar: Record<string, number | string>
+      sayi: number
+    }
+    expect(iz.tablolar, 'sanal tablo listeden DUSTU — varligi artik karsilastirilmiyor').toContain('memories_fts')
+    expect(iz.satirlar.memories_fts, 'sanal tablo sayilmaya calisildi — parmak izi patlar').toBe('SANAL')
+    expect(iz.sayi, 'ana tablo sayimi bozuldu').toBe(1)
+  })
+
   it('⭐AYARA KAYITLI: SessionEnd grubunda kanca var, zaman butcesi yazili (karar 51, Recep onayi 2026-09-18)', () => {
     /**
      * ⭐KURULU OLMAK KAYITLI OLMAK DEĞİLDİR. Bu depoda ölçülmüş sınıf: dosya var, kimse
@@ -273,7 +357,10 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
     expect(kos(bos), 'yedek yokken satir CIKMADI').toContain('SAGE:')
 
     const taze = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-esik-taze-'))
+    // ⛔HER DEPO icin taze dosya. Satır EN KÖTÜ depoyu anlatır; biri eksikse HAKLI olarak konuşur
+    // (2026-09-19: pano deposu eklenince bu kol düştü ve doğrusu buydu — fikstür eksikti, kapı değil).
     fs.writeFileSync(path.join(taze, 'sage-2999-01-01T0000Z.db'), 'x', 'utf8')
+    fs.writeFileSync(path.join(taze, 'kanban-2999-01-01T0000Z.sqlite'), 'x', 'utf8')
     expect(kos(taze), 'taze yedekte satir YAZILDI — esik calismiyor, her tur gurultu').not.toContain('SAGE:')
 
     const dusmus = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sage-esik-dusmus-'))
