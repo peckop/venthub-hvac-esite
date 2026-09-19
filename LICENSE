@@ -1,0 +1,63 @@
+VentHub HVAC — Tescilli Yazılım Lisansı / Proprietary Software License
+
+Copyright (c) 2026 Recep Varlık ("VentHub" markası). Tüm hakları saklıdır. / All rights reserved.
+
+Not: Telif sahibi gerçek kişidir; şirket henüz kurulmamıştır (2026-09-19). Şirket kurulduğunda
+haklar yazılı devir sözleşmesiyle şirkete geçer ve bu satır güncellenir.
+Note: The copyright holder is a natural person; no company has been incorporated yet
+(2026-09-19). Upon incorporation, rights will be assigned to the company in writing and
+this line updated.
+
+TÜRKÇE
+
+Bu depo ("Yazılım") kaynak kodu herkese açık bir GitHub deposunda BARINDIRILMAKTADIR;
+bu, Yazılım'ın açık kaynak olduğu ya da kullanımına izin verildiği anlamına GELMEZ.
+Depo, sürekli entegrasyon (CI) hizmetlerinin herkese açık depolarda ücretsiz olması
+nedeniyle 2026-08-15 tarihinde herkese açık hâle getirilmiştir; dağıtım ya da lisans
+verme niyeti yoktur.
+
+Telif sahibinin önceden yazılı izni olmaksızın Yazılım'ın tamamı ya da bir kısmı:
+  - kopyalanamaz, çoğaltılamaz, değiştirilemez, türev eser oluşturulamaz;
+  - dağıtılamaz, yayımlanamaz, alt lisansla verilemez, satılamaz;
+  - ticari ya da ticari olmayan herhangi bir amaçla çalıştırılamaz, barındırılamaz
+    ya da bir hizmet olarak sunulamaz.
+
+Yalnızca şu izinler verilmiştir: kaynak kodu GitHub üzerinde görüntülemek ve GitHub
+Hizmet Şartları'nın zorunlu kıldığı ölçüde çatallamak (fork). Çatallanan kopyalar da
+bu lisansa tabidir.
+
+Yazılım "OLDUĞU GİBİ" sunulur; açık ya da zımni hiçbir garanti verilmez. Telif sahibi,
+Yazılım'dan ya da kullanımından doğan hiçbir zarardan sorumlu tutulamaz.
+
+Üçüncü taraf bileşenler kendi lisanslarına tabidir; liste ve atıflar NOTICE.md
+dosyasındadır. Bu lisans o bileşenlerin lisanslarını değiştirmez.
+
+Uygulanacak hukuk: Türkiye Cumhuriyeti hukuku (5846 sayılı Fikir ve Sanat Eserleri
+Kanunu dâhil).
+
+ENGLISH
+
+This repository (the "Software") is HOSTED in a public GitHub repository; this does
+NOT mean the Software is open source or that any use is permitted. The repository was
+made public on 2026-08-15 because continuous-integration services are free for public
+repositories; there is no intent to distribute or license.
+
+Without the prior written permission of the copyright holder, the Software, in whole
+or in part, may not be:
+  - copied, reproduced, modified, or used to create derivative works;
+  - distributed, published, sublicensed, or sold;
+  - executed, hosted, or offered as a service for any commercial or non-commercial
+    purpose.
+
+The only permissions granted are: viewing the source on GitHub and forking to the
+extent required by the GitHub Terms of Service. Forked copies remain subject to this
+license.
+
+The Software is provided "AS IS", without warranty of any kind, express or implied.
+The copyright holder shall not be liable for any damages arising from the Software or
+its use.
+
+Third-party components are subject to their own licenses; the list and attributions
+are in NOTICE.md. This license does not alter those licenses.
+
+Governing law: the laws of the Republic of Türkiye.
