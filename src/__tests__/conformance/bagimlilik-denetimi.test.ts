@@ -30,8 +30,11 @@ const KAYIT = 'docs/standards/bagimlilik-kararlari.md'
  * Yalnız AZALABİLİR: Sentry işi (karar 17) inince sıfıra iner. Yeni bir kabul, bu sayıyı
  * bilerek artıran ayrı bir karardır; sessizce büyüyen bastırma listesi, bastırılmamış
  * açıktan beterdir.
+ *
+ * 11 → 8 (2026-09-21): bot'un güvenlik PR'ı (#1285) brace-expansion'ı 5.0.12'ye çekip üç kaydı
+ * kapattı; kapı aynı PR'da "BAYAT KABUL" dedi ve üç satır silindi. Tavan ilk kez SIKIŞTI.
  */
-const KABUL_TAVANI = 11
+const KABUL_TAVANI = 8
 
 function kostur(args: string[]): { kod: number; cikti: string } {
   try {
