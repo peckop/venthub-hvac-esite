@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -125,8 +126,11 @@ describe('INV-DEP-DENETIM-1 · karar 52 düzeneği', () => {
 
   it('§8: KARAR durumundaki her override\'ın kaldırma şartı var', () => {
     const metin = oku(KAYIT)
-    const pkg = JSON.parse(oku('package.json')) as { pnpm?: { overrides?: Record<string, string> } }
-    const overrideAdlari = new Set(Object.keys(pkg.pnpm?.overrides ?? {}))
+    // Override'lar pnpm-workspace.yaml'da (2026-09-21); okuma tek noktadan.
+    const { overridesOku } = createRequire(import.meta.url)(
+      path.join(KOK, 'scripts', 'hijyen', 'pnpm-overrides.cjs'),
+    ) as { overridesOku: (k: string) => { overrides: Record<string, string> } }
+    const overrideAdlari = new Set(Object.keys(overridesOku(KOK).overrides))
     const b4 = (metin.split(/^##\s*4\s*·/m)[1] ?? '').split(/^##\s/m)[0]
     const kararli = b4
       .split('\n')

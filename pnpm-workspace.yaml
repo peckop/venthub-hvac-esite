@@ -1,3 +1,45 @@
 packages:
   - '.'
   - 'avens-integration'
+
+# ══════════════════════════════════════════════════════════════════════════════
+# OVERRIDES BURADA YAŞAR — package.json'daki `pnpm.overrides` alanı DEĞİL (2026-09-21).
+#
+# ÖLÇÜLDÜ: Dependabot kilit dosyasını pnpm 11 ile üretiyor ve pnpm 11 `package.json`
+# içindeki `pnpm` alanını HİÇ OKUMUYOR. Karar 52'nin ilk turunda bot'un açtığı dört PR'ın
+# kilit dosyasında `overrides:` bölümü TAMAMEN YOKTU — 22 override'ın 22'si düşmüştü;
+# kapattığımız açıklar (postcss ×2, rollup) geri geldi ve CI kurulumu
+# ERR_PNPM_LOCKFILE_CONFIG_MISMATCH ile reddetti. Denetim kapısı
+# (`bagimlilik-denetimi.yml`) üç yeni yüksek kaydı ilk gününde yakaladı.
+#
+# NİÇİN BURASI GÜVENLİ: pnpm 10 overrides'ı bu dosyadan da okur. Ölçüldü: Vercel derlemesi
+# pnpm 10.28.0 ("based on project creation date"), CI pnpm 10, yerel 10.15.0. Yani üç
+# ortam da (ve Dependabot'un pnpm 11'i) AYNI yeri okur. Dış kaynak: dependabot-core#16232.
+#
+# ⛔GERİ TAŞIMA: `package.json`'a `pnpm.overrides` eklemek bot'u yeniden kırar —
+# INV-DEP-KARAR-1 bunu kırmızıyla yakalar. Her girdinin gerekçesi ve kaldırma şartı:
+# docs/standards/bagimlilik-kararlari.md §4 ve §8. Yazma kalıbı: cetvel §4 (üst sınır zorunlu).
+# ══════════════════════════════════════════════════════════════════════════════
+overrides:
+  minimatch: 9.0.7
+  minimatch@3: '>=3.1.4'
+  minimatch@9: 9.0.7
+  basic-ftp: '>=5.2.0'
+  glob@10: '>=10.5.0'
+  '@remix-run/router': '>=1.23.2'
+  rollup@4: '>=4.59.0'
+  rollup: '>=4.22.4'
+  flatted: 3.4.2
+  happy-dom: '>=20.8.8'
+  dompurify: '>=3.4.0'
+  ws: '>=8.20.1'
+  uuid: '>=11.1.1'
+  picomatch: '>=2.3.2'
+  anymatch>picomatch: '>=4.0.4'
+  readdirp>picomatch: '>=4.0.4'
+  lodash: '>=4.18.1'
+  postcss: '>=8.5.19 <9.0.0'
+  brace-expansion@4: '>=5.0.6'
+  brace-expansion@5: '>=5.0.6'
+  undici: '>=7.29.0 <8.0.0'
+  sharp: '>=0.35.4'

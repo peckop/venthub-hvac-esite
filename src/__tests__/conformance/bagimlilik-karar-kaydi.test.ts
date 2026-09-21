@@ -1,7 +1,24 @@
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
+
+/**
+ * Override'lar `pnpm-workspace.yaml`'da yaşar (2026-09-21 — pnpm 11 `package.json`'daki
+ * `pnpm` alanını okumuyor, Dependabot 22 override'ı kilit dosyasından düşürdü). Okuma TEK
+ * noktadan yapılır: iki kapının iki ayrıştırıcısı zamanla ayrışır.
+ */
+const { overridesOku } = createRequire(import.meta.url)(
+  path.resolve(__dirname, '../../../scripts/hijyen/pnpm-overrides.cjs'),
+) as {
+  overridesOku: (kok: string) => {
+    overrides: Record<string, string>
+    hatalar: string[]
+    bulundu: boolean
+    eskiYerDolu: boolean
+  }
+}
 
 /**
  * INV-DEP-KARAR-1 · Sürüm kararı GEREKÇESİZ DEĞİŞEMEZ.
@@ -78,8 +95,12 @@ type Paket = {
   pnpm?: { overrides?: Record<string, string> }
 }
 
+const OVR = overridesOku(KOK)
+
+/** package.json + overrides (pnpm-workspace.yaml'dan) — kapının geri kalanı tek nesne görür. */
 function pkgOku(): Paket {
-  return JSON.parse(fs.readFileSync(PKG_YOLU, 'utf8')) as Paket
+  const ham = JSON.parse(fs.readFileSync(PKG_YOLU, 'utf8')) as Paket
+  return { ...ham, pnpm: { overrides: OVR.overrides } }
 }
 
 /** Sabit pin = aralık işareti taşımayan, doğrudan sürümle yazılmış değer ("15.5.24"). */
@@ -136,6 +157,23 @@ describe('INV-DEP-KARAR-1 · sürüm kararı gerekçesiz değişemez', () => {
     // testlerin hepsi boş küme üzerinde koşup GEÇER. O yüzden taban burada ölçülür.
     expect(KAYIT.length, 'karar kaydı tablosu ayrıştırılamadı ya da boşaldı').toBeGreaterThan(25)
     expect(EVREN.size, 'package.json evreni boş — ayrıştırma kırık').toBeGreaterThan(25)
+  })
+
+  it('⭐override\'lar pnpm-workspace.yaml\'da — package.json\'a GERİ DÖNMEZ (Dependabot/pnpm 11)', () => {
+    /**
+     * ÖLÇÜLDÜ 2026-09-21: pnpm 11 `package.json` içindeki `pnpm` alanını okumuyor. Dependabot
+     * kilit dosyasını pnpm 11 ile üretti ve 22 override'ın 22'sini düşürdü; kapattığımız
+     * açıklar (postcss ×2, rollup) bot PR'larında geri geldi. Eski yere tek bir satır eklemek
+     * bu gerilemeyi geri getirir — ve pnpm 10 iki yeri birleştirdiği için yerelde FARK
+     * EDİLMEZ, yalnız bot'un PR'ında görünür. Bu kol o yüzden var.
+     */
+    expect(OVR.bulundu, 'pnpm-workspace.yaml içinde `overrides:` bloğu yok').toBe(true)
+    expect(OVR.hatalar, `overrides bloğunda ayrıştırılamayan satır: ${OVR.hatalar.join(' · ')}`).toEqual([])
+    expect(
+      OVR.eskiYerDolu,
+      'package.json → pnpm.overrides DOLU: pnpm 11 (Dependabot) bu alanı okumaz, override\'lar\n' +
+        'bot\'un kilit dosyasından DÜŞER. Override\'ı pnpm-workspace.yaml → overrides: altına yaz.',
+    ).toBe(false)
   })
 
   it('evrendeki HER paketin kayıtta satırı var', () => {
