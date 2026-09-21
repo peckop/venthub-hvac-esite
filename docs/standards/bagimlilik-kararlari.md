@@ -194,3 +194,50 @@ reddediyor — cetvel: `docs/standards/runtime-version-alignment-standard.md`.
 `pnpm outdated` **kayıt defterinin bugünkü hâlini** söyler; hangi yükseltmenin güvenli olduğunu
 söylemez. Yükseltme kararı bu tablodan çıkmaz — her hat kendi PR'ında, cetvel §3 uyarınca
 (*bir PR = bir zincir*) ölçülür.
+
+## 7 · KABUL EDİLMİŞ AÇIKLAR — karar 52 (2026-09-21)
+
+> Bu tablo `scripts/hijyen/bagimlilik-denetimi.cjs`'in **verisidir**. CI (`bagimlilik-denetimi.yml`)
+> üretim ağacındaki her **yüksek / kritik** kaydı bu listeyle karşılaştırır — **iki yönde**:
+> listede olmayan yeni kayıt KIRMIZI, listede kalan ama artık var olmayan kayıt da KIRMIZI.
+> Kabul **bilinçli ertelemedir**, görmezden gelme değil: her satır bir **kaldırma şartı** taşır.
+> Satır sayısı teste dondurulmuştur (`KABUL_TAVANI`), yalnız azalabilir.
+
+⭐**Hepsinin ortak kökü aynı:** `@sentry/nextjs` → `@sentry/webpack-plugin` — yani **derleme
+aracı**; ne sunucu yanıt yolunda ne tarayıcı paketinde (`docs/audits/bagimlilik-2026-09-19.md` §2).
+Recep 2026-09-19'da Sentry'yi sıranın **sonuna** koydu (karar 17). O yüzden tek kaldırma şartı
+hepsi için aynıdır.
+
+| GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
+|---|---|---|---|---|---|
+| `GHSA-3jxr-9vmj-r5cp` | brace-expansion | high | 2026-09-21 | derleme aracı zinciri; girdi bizim glob kalıplarımız | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-mh99-v99m-4gvg` | brace-expansion | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-rgw5-rvv9-x895` | brace-expansion | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-c83g-rgw3-j3cx` | browserslist | high | 2026-09-21 | derleme aracı; girdi bizim `browserslist` yapılandırmamız | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-73wf-gq98-2v4g` | browserslist | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-v2hh-gcrm-f6hx` | fast-uri | high | 2026-09-21 | webpack yapılandırma şeması ayrıştırır, kullanıcı URL'i değil | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-7p8r-x3mc-p8w7` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-f65p-4m7j-42xc` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-fph4-wmhf-6fwf` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-jqff-g426-hqxp` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+| `GHSA-4c8g-83qw-93j6` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
+
+## 8 · OVERRIDE KALDIRMA ŞARTI — karar 52
+
+Bir override **geçici bir müdahaledir**; ne zaman kaldırılacağı yazılmazsa kalıcılaşır ve
+sebebi unutulur (§6'daki `react` pini bunun tam örneği: göç anının temkini iki ay kilit kaldı).
+`KARAR` durumundaki her override için kaldırma şartı burada durur. Şart **ölçülebilir** yazılır:
+"artık gerek yok" değil, **hangi komutun ne söylediği**.
+
+`BORÇ` durumundaki override'ların şartı yazılamaz, çünkü niçin konduğu bilinmiyor; önce
+gerekçe ölçülür (§4).
+
+| override | kaldırma şartı (ölçüm komutuyla) |
+|---|---|
+| flatted | `pnpm why flatted` çıktısındaki her tüketici 3.4.2 ve üstünü **kendi aralığıyla** çekiyor |
+| dompurify | `isomorphic-dompurify`'nin kendi `dompurify` aralığının tabanı 3.4.0 ve üstü (`pnpm view isomorphic-dompurify dependencies`) |
+| postcss | `pnpm why postcss` çıktısındaki her tüketicinin aralığı 8.5.19 ve üstünü zorluyor |
+| brace-expansion@4 | `pnpm why brace-expansion` çıktısında 4.x hattını çeken tüketici kalmadı ya da 5.0.6 ve üstünü kendisi çekiyor |
+| brace-expansion@5 | aynı ölçüm, 5.x hattı için |
+| undici | `jsdom`'un kendi `undici` aralığının tabanı 7.29.0 ve üstü (`pnpm view jsdom dependencies`) |
+| sharp | `pnpm why sharp` doğrudan bağımlılık dışında tüketici göstermiyor (doğrudan bağımlılık zaten `^0.35.4` taşıyor, override o zaman tekrar olur) |

@@ -117,6 +117,24 @@ tek dosyadır; sabit bir actor yazılırsa üç pencere aynı kimlikle konuşur 
 pencereye düşer. Kayıt, kimlik ölçümünden sonra ayrı adımdır (`INV-WRONGSTACK-MCP-1` bu
 "kayıtlı DEĞİL" hükmünü kolla tutar).
 
+**⭐KART KANIT KOMUTU — TEK KOMUT, BORU YOK (2026-09-21, ölçüldü):** doğrulayıcının güvenlik
+kapısı `|` `&&` `||` `;` `>` `<` `` ` `` `$()` içeren komutu **hiç koşmaz**: *"Command contains shell
+operators … which are not permitted in the verifier."* Hüküm `needs_human`a düşer ve kart
+kapanmaz. İlk gerçek atamada (kart `2e5fb1ce`, OPS'un yazdığı `gh pr view … | grep -qx MERGED`)
+tam bu oldu. Kural:
+1. Kanıt komutu **tek komuttur**; boru, yönlendirme, zincir yok.
+2. Komut **çıkış koduyla** konuşur — çıktının metnine bakan bir `grep` gerekiyorsa komut yanlış
+   seçilmiştir.
+3. Yazmadan önce **bir olumlu bir olumsuz** örnekte ayırt ediciliği ölçülür.
+
+Standart kalıp — "PR birleşti mi": `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge`
+(GitHub 204 → çıkış 0; 404 → çıkış 1). Ölçüldü: birleşmiş #1276'da 0, açık #1270'te 1.
+
+**Bedel (2026-09-21, ölçüldü):** her yazma çağrısı panonun **tamamını** geri döndürüyor —
+`start_task` 13.171 bayt, `update_check` 13.706, `verify_completion` 18.992 ve 18.048 bayt;
+tek kart kapatmak ~64 KB bağlam. Tek `get_task` ~4 KB. Bu, pano değerlendirmesinin en ağır
+eksisidir; toplu giriş tek çağrıyla (`create_from_graph`) yapılır.
+
 **Pilotun kendi ölçütü:** iki hafta sonra üç sayı karşılaştırılır — (a) kart açılmadan kalan iş
 sayısı, (b) Done'a kanıtsız geçme denemesi sayısı, (c) Linear ile pano arasındaki sapma. Pilot
 "iyi hissettirdi" diye sürdürülmez.

@@ -228,3 +228,46 @@ yalnız azalabilir; yeni bir paket borç olarak doğamaz.
 yani bu cetvelin kendi kuralı bugün 17 yerde çiğneniyor. Kapı bunu **kapatmıyor**, çünkü tek
 seferde düzeltmek her birinin ayrı ölçümünü gerektirir; **tavan olarak donduruyor**: sayı
 artamaz, yalnız azalabilir. Borcun adı konmuştur, görünürdür ve büyüyemez.
+
+---
+
+## 11 · SÜRÜM TAKİBİNİN TETİĞİ BİZİM HAFIZAMIZ DEĞİL — karar 52 (2026-09-21)
+
+**Karar:** Recep 2026-09-19, ALTYAPI penceresinde ilk elden: *"ops ile konuştuğum konu için bana
+soracağın onaya evet diyorum."* OPS penceresindeki gerekçesi: *"sürüm takibini canlı tutmamak
+ihmal, çözmezsek tekrar eder."*
+
+**Ölçülmüş boşluk (2026-09-19):** depoda `dependabot.yml` yoktu, Dependabot uyarıları ve güvenlik
+güncellemeleri **kapalıydı**, `.github/workflows/` altında hiçbir `pnpm audit` adımı yoktu. §1'deki
+iki haftalık tarama kuralının tetiği bir şeridin hatırlamasıydı. Açık depoda **ücretsiz** gelen
+yerleşik mekanizma tümüyle kullanılmıyordu — Recep'in 2026-09-16 ilkesinin (*"yama değil
+profesyonel araç"*) tam karşılığı.
+
+**Kurulan dört parça:**
+
+| parça | ne yapar | nerede |
+|---|---|---|
+| Dependabot sürüm güncellemeleri | haftalık, gruplu; tavan 3; React/Next ve 3D **ayrı** grup (görsel doğrulama ister) | `.github/dependabot.yml` |
+| Dependabot güvenlik güncellemeleri | güvenlik PR'ları tek grupta | depo ayarı + aynı dosya |
+| CI denetimi | kilit dosyası değişince + haftalık: yüksek/kritik her kayıt §7'de kabul edilmiş mi, her kabul gerçek mi | `bagimlilik-denetimi.yml` + `scripts/hijyen/bagimlilik-denetimi.cjs` |
+| Kabul + kaldırma şartı | ertelenen her açık ve her override **ne zaman kalkacağını** taşır | `bagimlilik-kararlari.md` §7-§8 |
+
+**§1 ile ilişkisi:** §1'deki "otomatik kapı bilinçli olarak yok" hükmü **her gün** kırmızı veren
+kapı içindi. Bu kapı her gün koşmaz: yalnız kilit dosyası değiştiğinde ve haftada bir. Haftalık
+kırmızı, kilitli sürüme **sonradan** yayımlanan bir kayıttır — görünmesi gereken şeyin ta kendisi.
+Zamanlayıcı kullanımı karar 53 ile açıktır.
+
+**Bot kendiliğinden birleşmez.** Her bot PR'ı merge ritüelinden geçer. Bot bir sabit pini ya da
+override'ı değiştirirse `INV-DEP-KARAR-1` kayıt güncellenmeden kırmızı kalır: **bot sürümü
+değiştirir, gerekçeyi insan yazar.** Bu kasıtlıdır.
+
+**Maliyet ölçüldü (2026-09-21):** bot dalları `dependabot/...` adını taşır; `scripts/vercel-ignore-build.sh`
+`master` dışındaki her dalı atladığı için Vercel'de **sıfır derleme** harcar. Actions dakikası açık
+depoda ücretsizdir.
+
+**Sınırları — adıyla:**
+- Kabul listesinin iki yönlü eşitliği **kimlik** düzeyindedir (GHSA). Aynı açığın farklı kimlikle
+  yeniden yayımlanması yeni kayıt sayılır — doğru davranış, ama gürültü üretebilir.
+- Aksiyonlar depo geleneğine uyarak **etiketle** sabitli (`@v4`), SHA ile değil. Bot sürümleri
+  görünür tutar; SHA sabitleme ayrı bir karardır, burada yapılmadı.
+- Bot PR'larının iş akışı gürültüsü ilk haftalarda ölçülecek; tavan ölçüme göre değişir.
