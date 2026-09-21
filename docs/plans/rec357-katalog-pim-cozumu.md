@@ -73,6 +73,27 @@ tazelik kanıtı DEĞİL. **Tazelik ölçütü = seçilen ailenin satırlarını
 6. Ölçüt: 7/7 konteyner sağlıklı, `http://127.0.0.1:8000/admin` 200, TR dil paketi seçilebiliyor.
 7. **Durdurma yolu yazılır** (`docker compose down`; veri hacmi kalır) — kalıcı servis ilanı, araç envanteri satırı.
 
+**§3.1 SONUÇ (2026-09-21 ~16:25, ölçüldü):**
+
+| ölçüt | sonuç |
+|---|---|
+| konteyner | **7/7 sağlıklı** (proje adı `pim-unopim`) |
+| yönetim ekranı | `http://localhost:8000/admin/login` → **200** ("Sign In") |
+| bağlama | `netstat`: 8000 **yalnız 127.0.0.1**; mailpit 8025 yalnız 127.0.0.1 |
+| TR dil paketi | `lang/tr_TR` **var** |
+| bellek | UnoPim yığını ~1,35 GiB (ES 1,1 GiB) |
+| yönetici kimliği | `admin-credentials.txt` konteynerden `.sirlar/`'a alındı, konteynerdeki **silindi** (doğrulandı); içerik basılmadı |
+
+⚠**Sahada düzeltilen (plan yanılmıştı):** `APP_URL=http://127.0.0.1:8000` yazınca uygulama **sağlıksız** kaldı —
+sağlık kontrolü `http://localhost/up` çağırıyor, Laravel güvenilir-ana-makine denetimi `localhost`'u reddetti
+(400; aynı istek `Host: 127.0.0.1:8000` ile 200). Doğrusu **`APP_URL=http://localhost:8000`** (bağlama yine
+`127.0.0.1`). Tarayıcıdan adres `localhost:8000`, `127.0.0.1:8000` DEĞİL.
+⚠Git Bash `docker exec … rm /var/...` yolunu Windows yoluna çeviriyor ve komut **sessizce boşa** gidiyor —
+konteyner içi yol daima `sh -c '…'` içinde verilir.
+**Açık:** yönetici parolası ilk girişte değiştirilecek (tarayıcı adımı); köprü için salt-okuma API kullanıcısı §3.3'te.
+
+**Durdurma:** `cd C:/tmp/pim-unopim && docker compose -p pim-unopim down` (veri hacimleri kalır; silmek için `-v` — yapılmaz).
+
 ### 3.2 CSV üretici (gölge DB → UnoPim içe alım biçimi)
 
 - Kaynak **`arama_golge`**, yalnız **SELECT** (red-team B4: ona yazılmaz). Seçilen ailenin satırları önce

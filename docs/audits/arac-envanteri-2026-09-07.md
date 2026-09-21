@@ -592,6 +592,14 @@ gerektirmez).
 
 ## 4 · Özel satırlar
 
+- **UnoPim PIM yığını (depo DIŞI: `C:/tmp/pim-unopim/`, compose projesi `pim-unopim`)** — durum **PİLOT**
+  (REC-357, karar 35/36), sahip ALTYAPI. **Kalıcı servis ilanı:** 7 konteyner (`unopim` 3.1.1, queue,
+  scheduler, postgres 16, redis 7.2, elasticsearch 8.17, mailpit) `restart: unless-stopped` — makine
+  açılınca Docker ile birlikte kalkar. Portlar yalnız 127.0.0.1 (8000 yönetim, 8025 posta). Sırlar
+  `C:/tmp/pim-unopim/.sirlar/` (git dışı). **Durdurma:** `cd C:/tmp/pim-unopim && docker compose -p
+  pim-unopim down` (hacimler kalır). Lisans MIT. Plan + ölçüm: `docs/plans/rec357-katalog-pim-cozumu.md`.
+  Karar 36 "hayır" çıkarsa `down -v` + dizin silinir.
+
 - **`tools/wrongstack-mcp/` — `wrongstack-sage` (çapalı hafıza) + `wrongstack-codebase-index`
   (kod dizini), MCP, `.mcp.json` ile proje kapsamında kayıtlı** — durum **KAL (PİLOT)**, sahip
   ALTYAPI. 2026-09-17 Recep onayı (OPS penceresi + ALTYAPI teyidi "evet kur"), kayıt REC-345 Kova C.
