@@ -76,6 +76,13 @@ updates:
         versions: ['>=19.3.0']
       - dependency-name: '@types/react-dom'
         versions: ['>=19.3.0']
+      # NEXT 16 = GÖÇ, gevşetme değil — REC-364. Bot'un react-next PR'ı (#1279) Next 16'yı getirdi,
+      # CI'da 16 tip hatası (revalidateTag Next 16'da iki argüman). Göç plan-challenger'lı ayrı iş.
+      # KALDIRMA ŞARTI: REC-364 kapandığı gün bu iki satır silinir.
+      - dependency-name: 'next'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'eslint-config-next'
+        update-types: ['version-update:semver-major']
 
   # İş akışlarındaki aksiyonlar (actions/checkout@v4 …) — depo etiketle sabitliyor, SHA ile
   # değil; bot en azından sürüm akışını görünür tutar.
