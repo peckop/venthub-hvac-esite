@@ -211,11 +211,15 @@ aracı**; ne sunucu yanıt yolunda ne tarayıcı paketinde (`docs/audits/bagimli
 Recep 2026-09-19'da Sentry'yi sıranın **sonuna** koydu (karar 17). O yüzden tek kaldırma şartı
 hepsi için aynıdır.
 
+⭐**2026-09-21 — İLK KAPANIŞ, bot eliyle:** Dependabot'un güvenlik grubu (#1285) `brace-expansion`'ı
+5.0.6'dan 5.0.12'ye çekti ve üç kaydı (`GHSA-3jxr-9vmj-r5cp`, `GHSA-mh99-v99m-4gvg`,
+`GHSA-rgw5-rvv9-x895`) **Sentry'yi beklemeden** kapattı. Denetim kapısı aynı PR'da "BAYAT KABUL"
+diye kırmızı verdi — kapanan kayıt listede kalamaz; üç satır silindi, tavan 11 → 8. Kaldırma
+şartı "Sentry 10.x" yazıyordu, gerçekte daha erken geldi: şart **yeterli** koşuldu, **gerekli**
+değil. Bu yüzden kabul listesi elle değil ölçümle temizlenir.
+
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
-| `GHSA-3jxr-9vmj-r5cp` | brace-expansion | high | 2026-09-21 | derleme aracı zinciri; girdi bizim glob kalıplarımız | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-mh99-v99m-4gvg` | brace-expansion | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-rgw5-rvv9-x895` | brace-expansion | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
 | `GHSA-c83g-rgw3-j3cx` | browserslist | high | 2026-09-21 | derleme aracı; girdi bizim `browserslist` yapılandırmamız | `@sentry/nextjs` 10.x (karar 17) |
 | `GHSA-73wf-gq98-2v4g` | browserslist | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
 | `GHSA-v2hh-gcrm-f6hx` | fast-uri | high | 2026-09-21 | webpack yapılandırma şeması ayrıştırır, kullanıcı URL'i değil | `@sentry/nextjs` 10.x (karar 17) |
