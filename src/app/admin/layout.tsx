@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 
+import { AdminSozlukKapisi } from '../../components/admin/AdminSozlukKapisi'
 import { NAV_COLLAPSED_VALUE,navCookieName } from '../../components/admin/shell/navCookie'
 import { adminThemeCookieName, parseAdminTheme } from '../../components/admin/shell/themeCookie'
 import { TenantProvider } from '../../hooks/useTenant'
@@ -28,13 +29,21 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   return (
     <TenantProvider value={tenantConfig}>
-      <LayoutComponent
-        defaultNavCollapsed={navCollapsed}
-        defaultThemePreference={theme.preference}
-        defaultThemeResolved={theme.resolved}
-      >
-        {children}
-      </LayoutComponent>
+      {/*
+        Admin sözlüğü artık vitrin paketinde DEĞİL, dinamik yükleniyor (REC-59 Faz 2).
+        Kapı KABUĞUN DIŞINDA duruyor, bilerek: sol menü, başlıklar ve araç çubuğu da
+        `admin.*` anahtarları kullanıyor — kapıyı içeriye koysaydık menü bir kare boyunca
+        ham anahtar basardı.
+      */}
+      <AdminSozlukKapisi>
+        <LayoutComponent
+          defaultNavCollapsed={navCollapsed}
+          defaultThemePreference={theme.preference}
+          defaultThemeResolved={theme.resolved}
+        >
+          {children}
+        </LayoutComponent>
+      </AdminSozlukKapisi>
     </TenantProvider>
   )
 }
