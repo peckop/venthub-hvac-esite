@@ -426,7 +426,9 @@ function summary(sid) {
     const bayat = c.bayat
       ? ` ⚠ BAYAT (${c.yasDk}dk atış yok — bırakılmadı, SAHİPSİZ olabilir; bloklamıyor)`
       : ''
-    return `  · ${c.lane}${mine}${dup}${bayat} — ${c.globs.join(', ')} [${c.sid.slice(0, 8)}, ${c.yasDk}dk önce]`
+    // TAM oturum numarası (karar 54, 2026-09-21): posta kutusu alıcıyı TAM UUID ile eşler; kısa
+    // 8 hane SESSİZCE düşer (ölçüldü: OPS'un to="ac03ce11" mesajı alıcının unread'ine girmedi).
+    return `  · ${c.lane}${mine}${dup}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
   })
   const bayatSayi = hepsi.filter(c => c.bayat).length
   const bas = bayatSayi > 0

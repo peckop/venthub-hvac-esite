@@ -77,6 +77,18 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    dosyasındaki `sessionId`'den alır (ölçüldü: MCP'nin ebeveyni = `CLAUDE_PID`); bulamazsa **çıkış 1**,
    kutu açılmaz. (2) Claude Code'un **iç dosyası**, belgelenmiş arayüz değil — biçimi değişirse kutu
    kapanır, yanlış kimlikle açılmaz. `.mcp.json`'a `--actor`/`${` yazılması INV-WRONGSTACK-MCP-1'de KIRMIZI.
+   **Pencere içi ölçüm (2026-09-21, #1288 sonrası kapat-aç) ✔:** OPS ve ALTYAPI tam UUID'lerini aldı,
+   kutudan karşılıklı mesaj ulaştı. **Alıcı = TAM oturum numarası** — kısa 8 hane hata vermeden DÜŞER.
+   Filtresiz `query` herkesin mesajını listeler ve alıcı denetimi yoktur (başkasının mesajı ack
+   edilebiliyor) → kutuya sır ve Recep onayı yazılmaz.
+   **⛔İKİ KUTU TUZAĞI (ölçüldü):** kutu deposu kök yolunun karmasından türüyor ve sürücü harfine
+   duyarlı — `c:\…` → `~/.wrongstack/projects/venthub-hvac-7e017f` (pencereler), `C:\…` → `…-1088d5`.
+   Worktree kökünü sunucu git ile ana ağaca çevirip büyük `C:` veriyor → yine 1088d5. Sarmalayıcı
+   (`kanonikKok`) kökü ana ağaca çözüp harfi küçültür. **Terminalden elle kutu sunucusu başlatırken
+   kök daima `c:\Users\…\venthub-hvac` (küçük) verilir**, yoksa mesaj pencerenin görmediği kutuya düşer.
+   **Açılış sayacı:** `scripts/hijyen/posta-kutusu-sayac.cjs`, SessionStart'ta `session-board.cjs`
+   çağırır; okunmamış > 0 ise "📬 KUTUNDA OKUNMAMIS N", ölçülemezse uyarı satırı. Kendi gönderdiğin
+   mesaj sayılmaz (ölçüldü).
    **Ölçülen (sahte kimliklerle gerçek sunucu):** A gönderip kapandı → sonra açılan B okunmamış 1
    gördü (kapalı pencereye mesaj DURUYOR); C'ye giden mesaj B'nin kutusuna düşmedi (B 0, C 1);
    `--project-root .` worktree'den de ana ağacın kutusunu açıyor (tek kutu). **Bilinen bayatlık:**
