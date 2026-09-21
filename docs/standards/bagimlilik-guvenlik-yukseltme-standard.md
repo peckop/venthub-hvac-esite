@@ -108,6 +108,27 @@ Override doğrudan beyanı **bastırır**: bir paket hem doğrudan bağımlılı
 kilit dosyasında override'ın aralığı görünür. Bu kasıtlı olabilir (taban tek yerden gelir) ama
 **bilinerek** yapılmalı.
 
+### 4.1 · ⭐OVERRIDE'LAR `pnpm-workspace.yaml`'DA YAŞAR — `package.json`'da DEĞİL (2026-09-21)
+
+**Ölçülmüş olay:** karar 52'nin ilk bot turunda (PR #1278-#1282) Dependabot kilit dosyasını
+pnpm 11 ile üretti. pnpm 11 `package.json` içindeki `pnpm` alanını **okumuyor**; dört PR'ın
+dördünde kilit dosyasındaki `overrides:` bölümü **tamamen yoktu** — 22 override'ın 22'si düştü.
+Sonuç iki kapıda birden görüldü: `ci` kurulumu `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` ile reddetti,
+ve `bagimlilik-denetimi.yml` kapattığımız üç açığın (postcss ×2, rollup) **geri geldiğini**
+yakaladı. Bot PR'ı birleşseydi güvenlik düzeltmelerimiz sessizce geri alınacaktı.
+(Dış kaynak: dependabot-core#16232 — aynı olay başka depolarda da ölçülmüş.)
+
+**Düzeltme ve ölçümü:** override'lar `pnpm-workspace.yaml` → `overrides:` altına taşındı,
+`package.json`'dan `pnpm` alanı silindi. pnpm 10 iki yeri de okur; üç ortam da pnpm 10'dur
+(Vercel **10.28.0** — derleme günlüğünden, CI `version: 10`, yerel **10.15.0**). Taşıma sonrası
+`pnpm install --lockfile-only` kilit dosyasını **içerikte birebir aynı** üretti (satır sonu
+normalize sha256 eşit, 22 override yerinde).
+
+**Kural:** override **yalnız** `pnpm-workspace.yaml`'a yazılır. `package.json`'a tek satır
+eklemek gerilemeyi geri getirir ve **yerelde fark edilmez** (pnpm 10 iki yeri birleştirir);
+yalnız bot'un PR'ında görünür. Bu yüzden `INV-DEP-KARAR-1` eski yeri kırmızıyla tutar.
+Override'ı okuyan her kapı tek noktadan okur: `scripts/hijyen/pnpm-overrides.cjs`.
+
 ## 5 · "Çağıranı yok" iddiası DİNAMİK İMPORT'U DA ARAR
 
 ⭐Bu madde bir hatadan doğdu ve cetvelin en pahalı satırı.
