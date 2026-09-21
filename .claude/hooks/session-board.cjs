@@ -289,7 +289,10 @@ try {
   context +=
     'FILO ILETISIMI: dogrudan mesaj (SendMessage) + is bitince notify_when_idle. ' +
     'Pano = claim (dosya sahipligi) + canlilik; NOT KUTUSU DEGIL. Emir = Linear kaydi ' +
-    '(Recep sozu ONCE kayda yazilir, sonra serit emri alir). Gozcu/cron KURULMAZ — REC-328.\n'
+    '(Recep sozu ONCE kayda yazilir, sonra serit emri alir). Eski gozcu uclusu EMEKLI (REC-328); ' +
+    'zamanlayici/cron/loop gerekiyorsa ONCE Recep ile konus (karar 53). ' +
+    'POSTA KUTUSU (karar 54): kapali pencereye mesaj = mailbox_manage send, alici = TAM oturum ' +
+    'numarasi (asagidaki panoda); kisa 8 hane SESSIZCE duser. Kutuya sir ve Recep onayi yazilmaz.\n'
 
   context += board.summary(sid) + '\n'
 
@@ -334,9 +337,23 @@ context += 'YÖNTEM CETVELİ (docs/standards/execution-method-standard.md): iş 
   'aynı değişiklik çok hedefe=maestro · geniş tarama=agy-orchestrate · plan→plan-challenger (migration/veri göçü ZORUNLU) · ' +
   'PR=diff-review · tek dosya=elle. İkiz şerit açılmaz; canlı şerit tavanı 2-3.\n'
 
-process.stdout.write(JSON.stringify({
-  hookSpecificOutput: {
-    hookEventName: 'SessionStart',
-    additionalContext: context,
-  },
-}))
+// POSTA KUTUSU SAYACI (karar 54, 2026-09-21): açılışta kutuya bakılmazsa kapalı pencereye
+// bırakılan mesaj yine kaybolur. 0 → satır yok; ölçülemezse "ölçülemedi" satırı (temiz sayılmaz).
+// Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
+const yaz = () =>
+  process.stdout.write(JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'SessionStart',
+      additionalContext: context,
+    },
+  }))
+;(async () => {
+  try {
+    const sayac = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'posta-kutusu-sayac.cjs'))
+    const kok = path.join(__dirname, '..', '..')
+    context += sayac.acilisSatiri(await sayac.okunmamis(sid, { kok, zamanAsimiMs: 5000 }))
+  } catch (e) {
+    context += `⚠posta kutusu sayaci yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — kutu OLCULMEDI.\n`
+  }
+  yaz()
+})()

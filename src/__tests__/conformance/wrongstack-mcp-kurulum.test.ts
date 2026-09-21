@@ -175,6 +175,46 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
     }
   })
 
+  it('⭐KANONIK KOK: surucu harfi KUCUK, worktree ANA AGACA cozulur — iki kutu olusmaz', () => {
+    /**
+     * ÖLÇÜLDÜ 2026-09-21: WrongStack kutu deposunu kök yolunun karmasından türetiyor ve karma
+     * sürücü harfinin büyük/küçüğüne duyarlı: `c:\…` → venthub-hvac-7e017f (pencereler),
+     * `C:\…` → venthub-hvac-1088d5. Terminalden başlayan sayaç ilk hâliyle BOŞ kutuyu sayıp
+     * "0" dedi, pencere 1 görüyordu. Worktree ise sunucu tarafından git ile ana ağaca çevrilip
+     * büyük `C:` alıyordu. İkisi de burada kilitli.
+     */
+    const { kanonikKok } = createRequire(import.meta.url)(path.join(ARAC, 'posta-kutusu.cjs')) as {
+      kanonikKok: (p: string) => string
+    }
+    const kok = kanonikKok(KOK)
+    expect(kok, 'surucu harfi kucuge cevrilmedi — pencereler ile ayri kutu').not.toMatch(/^[A-Z]:/)
+    if (process.platform === 'win32') {
+      expect(kanonikKok(KOK.replace(/^[a-z]:/, (h) => h.toUpperCase())), 'buyuk harfli ayni kok FARKLI kutuya gidiyor').toBe(kok)
+    }
+    // Ana ağaç = git ortak dizininin üstü; worktree'den çağrılsa da aynı kök çıkmalı.
+    const ortak = execFileSync('git', ['-C', KOK, 'rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      encoding: 'utf8',
+    }).trim()
+    expect(kok.toLowerCase(), 'worktree ana agaca cozulmedi').toBe(path.dirname(path.resolve(ortak)).toLowerCase())
+  })
+
+  it('⭐ACILIS SAYACI: 0 → SESSIZ, n>0 → satir, olculemedi → UYARI (temiz sayilmaz)', async () => {
+    const sayac = createRequire(import.meta.url)(path.join(KOK, 'scripts', 'hijyen', 'posta-kutusu-sayac.cjs')) as {
+      acilisSatiri: (s: { durum: string; n?: number; sebep?: string }) => string
+      okunmamis: (sid: string, o: { kok: string }) => Promise<{ durum: string; sebep?: string }>
+    }
+    expect(sayac.acilisSatiri({ durum: 'sayildi', n: 0 })).toBe('')
+    expect(sayac.acilisSatiri({ durum: 'sayildi', n: 3 })).toContain('OKUNMAMIS 3')
+    expect(sayac.acilisSatiri({ durum: 'olculemedi', sebep: 'x' }), 'olculemeyen kutu SESSIZ gecti').toContain('OLCULEMEDI')
+    // Geçersiz kimlik sunucuya HİÇ gitmez (ortak kimlikle açılan kutu = yanlış kutu).
+    expect((await sayac.okunmamis('${CLAUDE_CODE_SESSION_ID}', { kok: KOK })).durum).toBe('olculemedi')
+    const kanca = fs.readFileSync(path.join(KOK, '.claude', 'hooks', 'session-board.cjs'), 'utf8')
+    expect(kanca, 'acilis kancasi sayaci cagirmiyor').toContain('posta-kutusu-sayac.cjs')
+    // Yorum satırları eski metni ALINTILAYABİLİR (niçin değiştiği yazılı kalsın); basılan dize yapamaz.
+    const basilan = kanca.split('\n').filter((s) => !/^\s*\/\//.test(s) && /cron KURULMAZ/i.test(s))
+    expect(basilan, 'karar 53: "cron KURULMAZ" genel yasak DEGIL — eski metin acilisa geri geldi').toEqual([])
+  })
+
   it('sage verisi (.wrongstack/) git DISI: her derinlikte yok sayilir ve izlenen dosya YOK', () => {
     // 09-17 olculdu: sage.db ana agacin ICINDE (.wrongstack/memories/), .gitignore eslesmesi 0 idi.
     // Git disi cunku: ikili SQLite (uc pencere yazar → cakisir, diff okunmaz) · secret-scan ikili

@@ -103,10 +103,22 @@ function kapsamDisiMi(goreliYol: string): boolean {
   return KAPSAM_DISI_DESENLER.some(p => goreliYol.includes(p))
 }
 
+/**
+ * Yorumları düşürür. ⚠NİÇİN GEREKLİ (2026-09-18, Faz 2'de ölçüldü): kapı, `I18nContext.ts`
+ * içindeki bir AÇIKLAMA satırını ihlal saydı — orada `t('admin.users.title')` ifadesi örnek
+ * olarak geçiyordu. Yorumdaki örnek pakete girmez, yani yanlış KIRMIZI'ydı. Yanlış kırmızı
+ * da bedava değildir: kapıyı gürültülü yapar, gürültülü kapı da susturulur.
+ */
+function yorumsuz(kaynak: string): string {
+  return kaynak
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')
+}
+
 /** Bir metinde kullanılan admin anahtarlarını çıkarır. Saf fonksiyon — çapa testi bunu ölçer. */
 export function adminAnahtarlari(kaynak: string): string[] {
   const bulunan = new Set<string>()
-  for (const m of kaynak.matchAll(ADMIN_ANAHTAR_DESENI)) bulunan.add(m[1])
+  for (const m of yorumsuz(kaynak).matchAll(ADMIN_ANAHTAR_DESENI)) bulunan.add(m[1])
   return [...bulunan].sort()
 }
 
@@ -172,6 +184,11 @@ describe('INV-ADMIN-SOZLUK-1 · admin sözlüğü vitrin dosyasında kullanılma
     // NEGATİF: vitrin anahtarı yakalanmaz (kapı her şeyi reddetmiyor)
     expect(adminAnahtarlari("<div>{t('common.yes')}</div>")).toEqual([])
     expect(adminAnahtarlari("<div>{t('account.adminPanel')}</div>")).toEqual([])
+    // YORUMDAKİ ÖRNEK ihlal DEĞİLDİR — pakete girmez (Faz 2'de yanlış kırmızı verdi)
+    expect(adminAnahtarlari("// ornek: t('admin.users.title')")).toEqual([])
+    expect(adminAnahtarlari("/* ornek: t('admin.users.title') yazilabilir */")).toEqual([])
+    // ...ama yorumun YANINDAKİ gerçek kullanım hâlâ yakalanır
+    expect(adminAnahtarlari("// aciklama\nconst x = t('admin.ui.edit')")).toEqual(['admin.ui.edit'])
   })
 
   it('⭐ÇAPA: onarılan dört çağrı yeri vitrin anahtarını kullanıyor', () => {

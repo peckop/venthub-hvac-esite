@@ -355,6 +355,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/hijyen/bagimlilik-denetimi.cjs` | BAĞIMLILIK DENETİMİ — karar 52. Üretim ağacındaki her yüksek/kritik kayıt `bagimlilik-kararlari.md` §7'de kabul edilmiş mi, her kabul gerçek bir kayda karşılık geliyor mu (iki yönlü). Çıkış 0 temiz · 1 yeni/bayat · 2 ÖLÇÜLEMEDİ (fail-closed) | ALTYAPI | `.github/workflows/bagimlilik-denetimi.yml` (CI: kilit dosyası değişince + haftalık) · cetvel §11 | 2026-09-21 yazıldı; gerçek audit çıktısında 11/11 kabul, çıkış 0 | `bagimlilik-denetimi.test.ts` (INV-DEP-DENETIM-1) — dört durum gerçek alt süreçle koşulur ve çıkış kodu ölçülür | KAL |
 | `scripts/hijyen/kanban-toplu.cjs` | KANBAN TOPLU GİRİŞ — iş kartı panosuna bir sırayı TEK KOŞUMDA yazar; kanban sunucusunu stdio ile sürer, bağlama yalnız özet düşer. Kipler: `<sira.json>` yaz · `--kuru` doğrula · `--pano <id>` kart başına tek satır · `--degerlendir <id>` bölünebilirlik hükmünü yeniden hesapla. Borulu komutu ve ölçütsüz kartı YAZMAZ | ALTYAPI | elle (şerit sırasını panoya girerken) · is-kayit-duzeni pilot bölümü | 2026-09-21: 11 kart / 38 çağrı — sunucu 983.776 bayt döndürdü, bağlama ~150 bayt girdi. Yeniden değerlendirme 13 kart / 514.614 bayt | `kanban-toplu.test.ts` (INV-KANBAN-TOPLU-1) — kabuk işleci ve ölçütsüz kart reddi | KAL |
 | `scripts/hijyen/pnpm-overrides.cjs` | PNPM OVERRIDES — tek okuma noktası: `pnpm-workspace.yaml` → `overrides:` bloğunu ayrıştırır ve `package.json`'da eski `pnpm.overrides` alanının kalıp kalmadığını söyler (pnpm 11 / Dependabot o alanı okumaz) | ALTYAPI | `bagimlilik-karar-kaydi.test.ts` (INV-DEP-KARAR-1) · `bagimlilik-denetimi.test.ts` (INV-DEP-DENETIM-1) · cetvel §4.1 | 2026-09-21 yazıldı; taşıma sonrası kilit dosyası içerikte birebir aynı, 22 override okundu | INV-DEP-KARAR-1 — blok var, ayrıştırılamayan satır 0, eski yer BOŞ (sabotajla doğrulandı) | KAL |
+| `scripts/hijyen/posta-kutusu-sayac.cjs` | POSTA KUTUSU SAYACI (karar 54) — açılışta kutu sunucusunu oturumun kimliğiyle kısa süre açıp `unread` sorar; 0 → sessiz, > 0 → "📬 KUTUNDA OKUNMAMIS N", ölçülemezse uyarı (temiz sayılmaz). Kök `kanonikKok` ile pencerelerin kutusuna sabit | ALTYAPI | `.claude/hooks/session-board.cjs` (SessionStart) | 2026-09-21 yazıldı; ~0,8–1,2 sn, üst sınır 5 sn; başka kimlikten gelen mesaj 1 sayıldı, pencere aracı da 1 gördü; kendi gönderdiğin sayılmaz | INV-WRONGSTACK-MCP-1 — sayaç kolu + kanonik kök kolu (sabotajla doğrulandı: harf küçültme kaldırılınca KIRMIZI) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -614,6 +615,9 @@ gerektirmez).
   alıcıya düşmüyor. İlk kayıttaki `${CLAUDE_CODE_SESSION_ID}` pencerede GENİŞLEMEDİ (bütün pencereler
   aynı düz metin kimlik) → kimlik artık **`tools/wrongstack-mcp/posta-kutusu.cjs`** sarmalayıcısında
   çözülür (ortam değişkeni ya da ebeveyn oturum dosyası; yoksa kutu açılmaz). Ayrıntı README madde 8.
+  Sarmalayıcı kökü de **kanonikleştirir** (ana ağaç + küçük sürücü harfi): `C:`/worktree ile açılan
+  süreç ayrı bir kutuya (`…-1088d5`) düşüyordu, ölçüldü.
+  Açılış sayacı: `scripts/hijyen/posta-kutusu-sayac.cjs` (betik tablosunda satırı var).
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
