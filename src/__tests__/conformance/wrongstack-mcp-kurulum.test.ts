@@ -1,6 +1,8 @@
 // @vitest-environment node
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
+import os from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -34,7 +36,12 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
 
   it('surumler sabit ve lock ayni surumu kilitliyor', () => {
     const adlar = Object.keys(deps)
-    expect(adlar.sort(), 'beklenen iki paket degil').toEqual(['@wrongstack/codebase-index-mcp', '@wrongstack/sage-mcp'])
+    expect(adlar.sort(), 'beklenen paket kumesi degil').toEqual([
+      '@wrongstack/codebase-index-mcp',
+      '@wrongstack/kanban-mcp',
+      '@wrongstack/mailbox-mcp',
+      '@wrongstack/sage-mcp',
+    ])
     for (const [ad, surum] of Object.entries(deps)) {
       expect(surum, `${ad} surumu sabit degil (caret/tilde/aralik)`).toMatch(/^\d+\.\d+\.\d+$/)
     }
@@ -69,6 +76,103 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
     }
     expect(sage?.args, 'sage --writable degil — hafiza yazamaz').toContain('--writable')
     expect(dizin?.args, 'kod dizini --writable — salt-okuma karari geri kacti').not.toContain('--writable')
+  })
+
+  it('⭐KANBAN kaydi: writable AMA destructive DEGIL, dogrulayici izni +gh ile GENISLETILMIS', () => {
+    /**
+     * Pano pilotu (karar 46, Recep onayi 2026-09-18 ALTYAPI penceresinde). Üç ölçüm bu kolu
+     * yazdırdı:
+     *  1. `--destructive` silme/birleştirme/devretme açar; pilot bunu İSTEMEZ — kart silmek
+     *     kaydı sessizce yok etmektir, bizim kural "kayıt yalnız küçülebilir ve GEREKÇEYLE".
+     *  2. Doğrulayıcının varsayılan izin listesi ÇOK DAR ölçüldü:
+     *     `DEFAULT_ALLOWED_COMMANDS = ["pwd","true","false","test"]`. Yani "Done = kanıt"
+     *     kuralı, izin genişletilmeden HİÇBİR gerçek kanıt komutu koşturamaz.
+     *  3. Genişletme dilbilgisi ölçüldü: `+x` ekler, `-x` çıkarır, çıplak `x` de ekler; ve
+     *     `BLOCKED_COMMANDS` (rm, curl, wget, npm/npx/pnpm/yarn/bun, node, kill …) HER HÂLDE
+     *     üstündür. `gh` yasak listesinde YOK, bu yüzden `+gh` geçerli ve dar bir genişletme.
+     */
+    const mcp = json<Mcp>(path.join(KOK, '.mcp.json'))
+    const kanban = (mcp.mcpServers ?? {})['wrongstack-kanban'] as
+      | (McpSunucu & { env?: Record<string, string> })
+      | undefined
+    expect(kanban, 'wrongstack-kanban kaydi yok').toBeDefined()
+    const cagri = [kanban?.command ?? '', ...(kanban?.args ?? [])].join(' ')
+    expect(cagri, 'kanban npx/uzak paket cagiriyor').not.toMatch(/\bnpx\b|\bpnpm dlx\b|\bbunx\b/)
+    expect(cagri, 'kanban kilitli yerel yolu cagirmiyor').toContain(
+      'tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp',
+    )
+    expect(cagri, 'kanban kaydinda mutlak yol var (kimlik sizintisi)').not.toMatch(/[A-Za-z]:[\\/]|\/Users\/|\/home\//)
+    expect(kanban?.args, 'kanban --writable degil — kart acilamaz').toContain('--writable')
+    expect(kanban?.args, '--destructive ACIK: silme/birlestirme/devretme yuzeyi pilot kapsaminda DEGIL').not.toContain(
+      '--destructive',
+    )
+    expect(
+      kanban?.env?.WRONGSTACK_KANBAN_VERIFIER_COMMANDS,
+      'dogrulayici izni genisletilmemis — varsayilan liste pwd/true/false/test, gercek kanit kosamaz',
+    ).toBe('+gh')
+  })
+
+  it('⭐MAILBOX kaydi: SARMALAYICI uzerinden, .mcp.json da kimlik YAZILMAZ, admin DEGIL', () => {
+    /**
+     * Karar 54 (Recep ilk elden teyit 2026-09-21, ALTYAPI penceresi). `.mcp.json` BÜTÜN PENCERELERİN
+     * PAYLAŞTIĞI tek dosyadır: dosyaya yazılan her `--actor` bütün pencerelere AYNI kimliği verir ve
+     * mesajlar yanlış pencereye düşer — bir mesaj kutusu için en kötü arıza.
+     *
+     * ⭐ÖLÇÜLDÜ (2026-09-21, #1287 sonrası kapat-aç): `--actor ${CLAUDE_CODE_SESSION_ID}` GENİŞLEMEDİ;
+     * iki pencerede de agentId düz metin "${CLAUDE_CODE_SESSION_ID}" geldi ve sunucu buna rağmen AÇILDI.
+     * Bu yüzden kimlik dosyada değil, sarmalayıcıda (`tools/wrongstack-mcp/posta-kutusu.cjs`) çözülür.
+     * Bu kol, dosyaya herhangi bir `--actor` / `${` geri yazılmasını KIRMIZI yapar.
+     */
+    const kilit = json<Kilit>(path.join(ARAC, 'package-lock.json'))
+    expect(kilit.packages['node_modules/@wrongstack/mailbox-mcp']?.version, 'mailbox paketi kurulu degil').toBe('1.0.19')
+    const mcp = json<Mcp>(path.join(KOK, '.mcp.json'))
+    const kutu = (mcp.mcpServers ?? {})['wrongstack-mailbox']
+    expect(kutu, 'wrongstack-mailbox kaydi yok (karar 54)').toBeDefined()
+    const args = kutu?.args ?? []
+    const cagri = [kutu?.command ?? '', ...args].join(' ')
+    expect(cagri, 'mailbox npx/uzak paket cagiriyor').not.toMatch(/\bnpx\b|\bpnpm dlx\b|\bbunx\b/)
+    expect(cagri, 'mailbox sarmalayiciyi cagirmiyor — kimlik dosyada cozulmeye kalkar').toContain(
+      'tools/wrongstack-mcp/posta-kutusu.cjs',
+    )
+    expect(cagri, 'mailbox kaydinda mutlak yol var (kimlik sizintisi)').not.toMatch(/[A-Za-z]:[\\/]|\/Users\/|\/home\//)
+    expect(args, '--actor .mcp.json a YAZILMIS — butun pencereler ayni kimlik olur').not.toContain('--actor')
+    expect(args, '--session-id .mcp.json a YAZILMIS').not.toContain('--session-id')
+    expect(cagri, '.mcp.json da ${…} var — bu dosyada GENISLEMEDIGI olculdu').not.toContain('${')
+    expect(args, 'mailbox --writable degil — gonderemez').toContain('--writable')
+    expect(args, '--admin ACIK: toplu silme/kimlik yonetimi pilot kapsaminda DEGIL').not.toContain('--admin')
+  })
+
+  it('⭐SARMALAYICI kimligi AYIRT EDER: gecerli UUID alir, duz metni reddeder, bulamazsa null', () => {
+    const { kimlikBul } = createRequire(import.meta.url)(path.join(ARAC, 'posta-kutusu.cjs')) as {
+      kimlikBul: (a: { env: Record<string, string | undefined>; ppid: number; oturumDizini: string }) =>
+        | { kimlik: string; kaynak: string }
+        | null
+    }
+    const A = 'ac03ce11-c975-478d-bf30-66afb7c00f15'
+    const B = 'cb0467f1-0000-4000-8000-000000000001'
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'posta-kutusu-'))
+    try {
+      fs.writeFileSync(path.join(dizin, '4242.json'), JSON.stringify({ pid: 4242, sessionId: B }))
+      fs.writeFileSync(path.join(dizin, '5151.json'), JSON.stringify({ pid: 5151, sessionId: '${CLAUDE_CODE_SESSION_ID}' }))
+      // (1) ortam değişkeni geçerli → o kazanır
+      expect(kimlikBul({ env: { CLAUDE_CODE_SESSION_ID: A }, ppid: 4242, oturumDizini: dizin })).toEqual({
+        kimlik: A,
+        kaynak: 'ortam',
+      })
+      // (2) BUGÜNKÜ VAKA: değişken düz metin → reddedilir, ebeveyn dosyasına düşülür
+      expect(
+        kimlikBul({ env: { CLAUDE_CODE_SESSION_ID: '${CLAUDE_CODE_SESSION_ID}' }, ppid: 4242, oturumDizini: dizin }),
+      ).toEqual({ kimlik: B, kaynak: 'oturum-dosyasi' })
+      // (3) iki farklı ebeveyn → iki farklı kimlik (pencereler ayrışır)
+      fs.writeFileSync(path.join(dizin, '4343.json'), JSON.stringify({ sessionId: A }))
+      expect(kimlikBul({ env: {}, ppid: 4343, oturumDizini: dizin })?.kimlik).toBe(A)
+      // (4) dosya da düz metin taşıyorsa → null (fail-closed)
+      expect(kimlikBul({ env: {}, ppid: 5151, oturumDizini: dizin })).toBeNull()
+      // (5) hiçbir kaynak yok → null
+      expect(kimlikBul({ env: {}, ppid: 9999, oturumDizini: dizin })).toBeNull()
+    } finally {
+      fs.rmSync(dizin, { recursive: true, force: true })
+    }
   })
 
   it('sage verisi (.wrongstack/) git DISI: her derinlikte yok sayilir ve izlenen dosya YOK', () => {

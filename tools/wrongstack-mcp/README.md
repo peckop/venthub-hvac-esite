@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.19`, `@wrongstack/codebase-index-mcp@1.0.19`, lisans **MIT** (npm `license` alanı, 2026-09-17 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.19`, `@wrongstack/codebase-index-mcp@1.0.19`, `@wrongstack/kanban-mcp@1.0.19`, `@wrongstack/mailbox-mcp@1.0.19`, lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
 | **ALINMAYAN** | WrongStack ajan ürünü (Claude Code'un alternatifi), WebUI/CodeMap, kod dizininin `--writable` yüzeyi. CodeGraph **yerinde kalır**; hangisinin kalacağı OPS kıyasıyla belli olacak (REC-345). |
@@ -45,8 +45,10 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    İÇİNDE**: `.wrongstack/memories/sage.db` (+ wal/shm, `server.json` yerel yetki anahtarı). Depo PUBLIC
    olduğu için `.gitignore`'da `.wrongstack/` satırı var ve INV-WRONGSTACK-MCP-1 bunu ölçer. Gerekçe:
    ikili SQLite dosyası (üç pencere yazar → git'te çakışır, diff okunmaz) · sır taraması ikili dosyanın
-   içini göremez (hafızaya düşen sır/müşteri verisi kapıdan geçer) · içerik PR gözünden geçmeden yazılır. Hafıza yedeği kancası bu dosyayı
-   kapsamıyor (REC-345 İŞ 5).
+   içini göremez (hafızaya düşen sır/müşteri verisi kapıdan geçer) · içerik PR gözünden geçmeden yazılır.
+   **Yedeği artık VAR (2026-09-18, #1267):** `node scripts/hijyen/sage-yedek.cjs` — `VACUUM INTO`
+   ile WAL dahil tutarlı kopya, git dışı dizine, her koşumda kaynakla doğrulanır. ⚠Düz dosya
+   kopyası yedek DEĞİLDİR: ölçüldü, 26 kaydın 20'sini veriyordu.
    **Kimlik harfe duyarlı:** `<ad-hash>` = sha256(`path.resolve(kök)`) ilk 6 hane; `c:\…` (VS Code) →
    `7e017f`, `C:\…` (terminal) → `1088d5`. Kanonik kimlik küçük harfli olandır; sage bundan etkilenmez
    (verisi proje dizininde).
@@ -55,3 +57,33 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
 5. **Companion `.md` gürültüsü.** Sembollerin çoğu üretilmiş `.md` dosyalarından (OPS: 43 bin sembolün
    28,9 bini). Aramada dil süzgeci kullan.
 6. **Bağlam yükü.** Kayıtlı araç sayısı: sage 15, dizin 6 (salt-okuma) — her pencerenin bağlamına biner.
+   Kanban eklenince bu sayı artar; pilot değerlendirmesinde **ölçülecek** kalem budur.
+7. **Kanban (2026-09-18, karar 46 — pilot).** `--writable` AÇIK, `--destructive` **KAPALI**
+   (silme/birleştirme/devretme yüzeyi pilot kapsamında değil). Doğrulayıcının varsayılan izin
+   listesi **çok dar** ölçüldü: `["pwd","true","false","test"]` — yani izin genişletilmeden
+   "Done = kanıt" kuralı hiçbir gerçek komut koşturamaz. Bu yüzden `.mcp.json`'da
+   `WRONGSTACK_KANBAN_VERIFIER_COMMANDS=+gh`. Dilbilgisi ölçüldü: `+x` ekler, `-x` çıkarır, çıplak
+   `x` de ekler; `BLOCKED_COMMANDS` (rm, curl, wget, npm/npx/pnpm/yarn/bun, node, kill, diskpart …)
+   **her hâlde üstündür** ve `gh` o listede yok. `git` yasak değil — kanban kendi git kanıtını
+   doğrudan `spawn("git", …)` ile alıyor.
+8. **Mailbox KAYITLI (2026-09-21, karar 54 — pilot).** Sunucu zorunlu `--actor <id>` istiyor;
+   `.mcp.json` ise **bütün pencerelerin paylaştığı tek dosya**. Sabit actor = bütün pencereler aynı
+   kimlik = mesaj yanlış pencereye düşer. `--writable` açık, `--admin` **kapalı**.
+   **⛔İLK DENEME DÜŞTÜ (#1287):** `.mcp.json`'a `--actor ${CLAUDE_CODE_SESSION_ID}` yazıldı; kapat-aç
+   sonrası iki pencerede (OPS, ALTYAPI) agentId **düz metin** `${CLAUDE_CODE_SESSION_ID}` geldi —
+   değişken GENİŞLEMEDİ ve sunucu yine de AÇILDI ("ulaşmazsa açılmaz" varsayımı yanlıştı).
+   **Çare: `posta-kutusu.cjs` sarmalayıcısı.** Kimliği sırayla (1) UUID biçimli
+   `CLAUDE_CODE_SESSION_ID`'den, (2) ebeveyn Claude sürecinin `~/.claude/sessions/<ppid>.json`
+   dosyasındaki `sessionId`'den alır (ölçüldü: MCP'nin ebeveyni = `CLAUDE_PID`); bulamazsa **çıkış 1**,
+   kutu açılmaz. (2) Claude Code'un **iç dosyası**, belgelenmiş arayüz değil — biçimi değişirse kutu
+   kapanır, yanlış kimlikle açılmaz. `.mcp.json`'a `--actor`/`${` yazılması INV-WRONGSTACK-MCP-1'de KIRMIZI.
+   **Ölçülen (sahte kimliklerle gerçek sunucu):** A gönderip kapandı → sonra açılan B okunmamış 1
+   gördü (kapalı pencereye mesaj DURUYOR); C'ye giden mesaj B'nin kutusuna düşmedi (B 0, C 1);
+   `--project-root .` worktree'den de ana ağacın kutusunu açıyor (tek kutu). **Bilinen bayatlık:**
+   kapanan sürecin `agents` kaydı `online:true` kalıyor → canlılık bu listeden OKUNMAZ, pano `who`
+   kullanılır. **Pencere içi ölçüm açık:** genişleme + kimliğin MCP sürecine ulaşması + iki pencerenin
+   farklı kimlik alması, ana ağaç güncellenip pencereler kapatılıp açıldıktan sonra ölçülür.
+   `INV-WRONGSTACK-MCP-1` kaydı ve kimlik biçimini kolla tutar.
+9. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
+   kümesi `gh` ile sınırlı ve ağ/paket komutları yasak listesinde. Ama bu bir **azaltmadır**,
+   sıfırlama değil — kart açıklamasına ve doğrulayıcı komutuna sır yazılmaz.

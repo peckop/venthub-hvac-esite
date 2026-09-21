@@ -2,6 +2,9 @@
 
 HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium enterprise e-ticaret platformu.
 
+> **Lisans:** Tescilli yazılım, tüm hakları saklıdır (`LICENSE`). Depo herkese açık **barındırılır**,
+> açık kaynak **değildir**; görüntüleme dışında kullanım izni yoktur. Üçüncü taraf atıfları: `NOTICE.md`.
+
 ---
 
 ## 📊 Teknoloji Yığını & Proje Metrikleri

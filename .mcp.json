@@ -18,6 +18,29 @@
         ".",
         "--stdio"
       ]
+    },
+    "wrongstack-kanban": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--stdio",
+        "--writable"
+      ],
+      "env": {
+        "WRONGSTACK_KANBAN_VERIFIER_COMMANDS": "+gh"
+      }
+    },
+    "wrongstack-mailbox": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/posta-kutusu.cjs",
+        "--project-root",
+        ".",
+        "--stdio",
+        "--writable"
+      ]
     }
   }
 }

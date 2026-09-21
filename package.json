@@ -2,6 +2,7 @@
   "name": "venthub-hvac",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "engines": {
     "node": "24.x"
@@ -109,35 +110,9 @@
     "supabase": "^2.80.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.57.1",
-    "vite": "^6.4.2",
+    "vite": "^6.4.3",
     "vitest": "^4.1.3",
     "vitest-axe": "^0.1.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "minimatch": "9.0.7",
-      "minimatch@3": ">=3.1.4",
-      "minimatch@9": "9.0.7",
-      "basic-ftp": ">=5.2.0",
-      "glob@10": ">=10.5.0",
-      "@remix-run/router": ">=1.23.2",
-      "rollup@4": ">=4.59.0",
-      "rollup": ">=4.22.4",
-      "flatted": "3.4.2",
-      "happy-dom": ">=20.8.8",
-      "dompurify": ">=3.4.0",
-      "ws": ">=8.20.1",
-      "uuid": ">=11.1.1",
-      "picomatch": ">=2.3.2",
-      "anymatch>picomatch": ">=4.0.4",
-      "readdirp>picomatch": ">=4.0.4",
-      "lodash": ">=4.18.1",
-      "postcss": ">=8.5.19 <9.0.0",
-      "brace-expansion@4": ">=5.0.6",
-      "brace-expansion@5": ">=5.0.6",
-      "undici": ">=7.29.0 <8.0.0",
-      "sharp": ">=0.35.4"
-    }
   },
   "browserslist": [
     "chrome >= 90",

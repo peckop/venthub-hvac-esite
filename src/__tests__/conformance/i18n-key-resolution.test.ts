@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { admin } from '../../i18n/dictionaries/admin/tr'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 
@@ -83,6 +84,24 @@ function toRelPath(globKey: string): string {
  */
 const KNOWN_UNRESOLVED = new Set<string>([])
 
+/**
+ * ⭐EVREN İKİ SÖZLÜKTEN KURULUR — REC-59 Faz 2, 2026-09-19.
+ *
+ * Admin sözlüğü vitrin paketinden çıkarıldı (müşteri sayfalarının indirdiği parça 144.244 bayt
+ * küçüldü). Doğru iş; ama bu kapı `tr`yi TEK sözlük sayıyordu ve admin oradan ayrılınca
+ * `admin.menu.*` gibi 50 anahtar "çözülmüyor" göründü. **Anahtarlar bozulmadı — kapının
+ * baktığı yer eksildi.** Ölçüldü: Faz 2 sözlüğüyle bu dosya ve `admin-erp-resource-registry`
+ * kırmızı, geri kalan 238 uyum dosyası yeşil.
+ *
+ * ⛔DOĞRU ONARIM ANAHTARLARI MUAFİYET LİSTESİNE YAZMAK DEĞİLDİR: ratchet'ı gevşetmek,
+ * kapsam kaybını "bilinen borç" gibi gösterir. Evren geri getirilir.
+ *
+ * Yayılma sırası önemsiz: Faz 2 inene kadar `tr` admin'i zaten taşıyor ve `admin` AYNI nesne;
+ * sonra da bu satır onu geri koyuyor. Kapı iki durumda da aynı cevabı verir, şeritler
+ * birbirini beklemez.
+ */
+const TAM_TR = { ...tr, admin }
+
 describe('INV-5 · i18n key-resolution conformance', () => {
   it("her statik t('...') anahtarı sözlükte çözülmeli (ham-key render yasak)", () => {
     const unresolved: { file: string; key: string }[] = []
@@ -111,7 +130,7 @@ describe('INV-5 · i18n key-resolution conformance', () => {
         if (seen.has(dedup)) continue
         seen.add(dedup)
 
-        if (getDictValue(tr, key) === key) {
+        if (getDictValue(TAM_TR, key) === key) {
           unresolved.push({ file: rel, key })
         }
       }
@@ -131,7 +150,7 @@ describe('INV-5 · i18n key-resolution conformance', () => {
 
   it('RATCHET bayatlamamalı: allowlist anahtarı artık çözülüyorsa listeden çıkar', () => {
     const stale = [...KNOWN_UNRESOLVED].filter(
-      (k) => k !== '__PLACEHOLDER__' && getDictValue(tr, k) !== k,
+      (k) => k !== '__PLACEHOLDER__' && getDictValue(TAM_TR, k) !== k,
     )
     expect(
       stale,

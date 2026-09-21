@@ -108,6 +108,27 @@ Override doğrudan beyanı **bastırır**: bir paket hem doğrudan bağımlılı
 kilit dosyasında override'ın aralığı görünür. Bu kasıtlı olabilir (taban tek yerden gelir) ama
 **bilinerek** yapılmalı.
 
+### 4.1 · ⭐OVERRIDE'LAR `pnpm-workspace.yaml`'DA YAŞAR — `package.json`'da DEĞİL (2026-09-21)
+
+**Ölçülmüş olay:** karar 52'nin ilk bot turunda (PR #1278-#1282) Dependabot kilit dosyasını
+pnpm 11 ile üretti. pnpm 11 `package.json` içindeki `pnpm` alanını **okumuyor**; dört PR'ın
+dördünde kilit dosyasındaki `overrides:` bölümü **tamamen yoktu** — 22 override'ın 22'si düştü.
+Sonuç iki kapıda birden görüldü: `ci` kurulumu `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` ile reddetti,
+ve `bagimlilik-denetimi.yml` kapattığımız üç açığın (postcss ×2, rollup) **geri geldiğini**
+yakaladı. Bot PR'ı birleşseydi güvenlik düzeltmelerimiz sessizce geri alınacaktı.
+(Dış kaynak: dependabot-core#16232 — aynı olay başka depolarda da ölçülmüş.)
+
+**Düzeltme ve ölçümü:** override'lar `pnpm-workspace.yaml` → `overrides:` altına taşındı,
+`package.json`'dan `pnpm` alanı silindi. pnpm 10 iki yeri de okur; üç ortam da pnpm 10'dur
+(Vercel **10.28.0** — derleme günlüğünden, CI `version: 10`, yerel **10.15.0**). Taşıma sonrası
+`pnpm install --lockfile-only` kilit dosyasını **içerikte birebir aynı** üretti (satır sonu
+normalize sha256 eşit, 22 override yerinde).
+
+**Kural:** override **yalnız** `pnpm-workspace.yaml`'a yazılır. `package.json`'a tek satır
+eklemek gerilemeyi geri getirir ve **yerelde fark edilmez** (pnpm 10 iki yeri birleştirir);
+yalnız bot'un PR'ında görünür. Bu yüzden `INV-DEP-KARAR-1` eski yeri kırmızıyla tutar.
+Override'ı okuyan her kapı tek noktadan okur: `scripts/hijyen/pnpm-overrides.cjs`.
+
 ## 5 · "Çağıranı yok" iddiası DİNAMİK İMPORT'U DA ARAR
 
 ⭐Bu madde bir hatadan doğdu ve cetvelin en pahalı satırı.
@@ -197,3 +218,77 @@ sınanmadı. Şiddet→süre eşiği bir **öneri**, ölçülmüş bir eşik de�
 "varsay" değil "ölç" diyor.
 
 İlgili: REC-323 · `memory/is-kirmizi-degil-adim-kirmizi` · `memory/yesil-kapi-gorundugunu-kanitlamaz`
+
+---
+
+## 10 · SÜRÜM KARARI GEREKÇESİZ DEĞİŞEMEZ — `INV-DEP-KARAR-1` (2026-09-19, REC-359)
+
+Kayıt: `docs/standards/bagimlilik-kararlari.md` · Kapı:
+`src/__tests__/conformance/bagimlilik-karar-kaydi.test.ts`
+
+**Niçin:** Recep'in ilkesi (2026-09-19, birebir): *"her yapılanın izi olmalı takip edilebilmeli
+tetiklenebilmeli .. otonom bir yapıya gelemeyen herşey bir gün unutulacak."* Bu cetvelin
+kendisi de o sınıftaydı: §4'teki üst sınır kuralı, §3'teki tek-zincir kuralı **yazılıydı** ama
+hiçbiri ölçülmüyordu. Yazmak uygulamak değildir.
+
+**Kural:** `package.json`'da **sabit pinlenmiş** her bağımlılığın ve **her** `pnpm.overrides`
+girdisinin kayıtta bir satırı olur; satırdaki aralık gerçekle **birebir** eşittir ve `KARAR`
+satırının gerekçesi **aralıktaki sürüm numarasını içerir**. Sürüm değişip kayıt güncellenmezse
+kapı kırmızı verir. Tetik **cron değil değişikliğin kendisidir** (REC-328).
+
+**§1 ile çelişmez:** §1'deki "otomatik kapı bilinçli olarak yok" hükmü **audit çıktısı**
+içindir — o sayı her gün değişir ve her gün kırmızı veren kapı bakılmayan kapıdır. Bu kapı
+audit sayısına hiç bakmaz; yalnız **bizim yazdığımız** sürüm ile **bizim yazdığımız** gerekçe
+arasındaki tutarlılığı ölçer. O ikisi ancak biz değiştirirsek değişir.
+
+**Gerekçesi ölçülemeyen satır `BORÇ` yazılır, uydurulmaz.** Borç sayısı teste dondurulur ve
+yalnız azalabilir; yeni bir paket borç olarak doğamaz.
+
+⚠**KURULUŞ ANINDA ÖLÇÜLEN İHLAL:** §4 "override daima aralıklıdır, açık uçlu değil" diyor.
+2026-09-19 ölçümünde 22 override'ın **17'si açık uçlu** (`>=x` biçiminde, üst sınırsız) çıktı —
+yani bu cetvelin kendi kuralı bugün 17 yerde çiğneniyor. Kapı bunu **kapatmıyor**, çünkü tek
+seferde düzeltmek her birinin ayrı ölçümünü gerektirir; **tavan olarak donduruyor**: sayı
+artamaz, yalnız azalabilir. Borcun adı konmuştur, görünürdür ve büyüyemez.
+
+---
+
+## 11 · SÜRÜM TAKİBİNİN TETİĞİ BİZİM HAFIZAMIZ DEĞİL — karar 52 (2026-09-21)
+
+**Karar:** Recep 2026-09-19, ALTYAPI penceresinde ilk elden: *"ops ile konuştuğum konu için bana
+soracağın onaya evet diyorum."* OPS penceresindeki gerekçesi: *"sürüm takibini canlı tutmamak
+ihmal, çözmezsek tekrar eder."*
+
+**Ölçülmüş boşluk (2026-09-19):** depoda `dependabot.yml` yoktu, Dependabot uyarıları ve güvenlik
+güncellemeleri **kapalıydı**, `.github/workflows/` altında hiçbir `pnpm audit` adımı yoktu. §1'deki
+iki haftalık tarama kuralının tetiği bir şeridin hatırlamasıydı. Açık depoda **ücretsiz** gelen
+yerleşik mekanizma tümüyle kullanılmıyordu — Recep'in 2026-09-16 ilkesinin (*"yama değil
+profesyonel araç"*) tam karşılığı.
+
+**Kurulan dört parça:**
+
+| parça | ne yapar | nerede |
+|---|---|---|
+| Dependabot sürüm güncellemeleri | haftalık, gruplu; tavan 3; React/Next ve 3D **ayrı** grup (görsel doğrulama ister) | `.github/dependabot.yml` |
+| Dependabot güvenlik güncellemeleri | güvenlik PR'ları tek grupta | depo ayarı + aynı dosya |
+| CI denetimi | kilit dosyası değişince + haftalık: yüksek/kritik her kayıt §7'de kabul edilmiş mi, her kabul gerçek mi | `bagimlilik-denetimi.yml` + `scripts/hijyen/bagimlilik-denetimi.cjs` |
+| Kabul + kaldırma şartı | ertelenen her açık ve her override **ne zaman kalkacağını** taşır | `bagimlilik-kararlari.md` §7-§8 |
+
+**§1 ile ilişkisi:** §1'deki "otomatik kapı bilinçli olarak yok" hükmü **her gün** kırmızı veren
+kapı içindi. Bu kapı her gün koşmaz: yalnız kilit dosyası değiştiğinde ve haftada bir. Haftalık
+kırmızı, kilitli sürüme **sonradan** yayımlanan bir kayıttır — görünmesi gereken şeyin ta kendisi.
+Zamanlayıcı kullanımı karar 53 ile açıktır.
+
+**Bot kendiliğinden birleşmez.** Her bot PR'ı merge ritüelinden geçer. Bot bir sabit pini ya da
+override'ı değiştirirse `INV-DEP-KARAR-1` kayıt güncellenmeden kırmızı kalır: **bot sürümü
+değiştirir, gerekçeyi insan yazar.** Bu kasıtlıdır.
+
+**Maliyet ölçüldü (2026-09-21):** bot dalları `dependabot/...` adını taşır; `scripts/vercel-ignore-build.sh`
+`master` dışındaki her dalı atladığı için Vercel'de **sıfır derleme** harcar. Actions dakikası açık
+depoda ücretsizdir.
+
+**Sınırları — adıyla:**
+- Kabul listesinin iki yönlü eşitliği **kimlik** düzeyindedir (GHSA). Aynı açığın farklı kimlikle
+  yeniden yayımlanması yeni kayıt sayılır — doğru davranış, ama gürültü üretebilir.
+- Aksiyonlar depo geleneğine uyarak **etiketle** sabitli (`@v4`), SHA ile değil. Bot sürümleri
+  görünür tutar; SHA sabitleme ayrı bir karardır, burada yapılmadı.
+- Bot PR'larının iş akışı gürültüsü ilk haftalarda ölçülecek; tavan ölçüme göre değişir.
