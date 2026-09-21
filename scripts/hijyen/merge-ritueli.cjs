@@ -502,6 +502,18 @@ if (require.main === module) {
         ['pr', 'merge', pr, '--squash', '--delete-branch', '--repo', depo],
         { encoding: 'utf8', cwd: require('os').tmpdir() })
       yaz('MERGE YAPILDI (bu betik, --merge, uzak dal silindi): ' + (cikti.trim().split('\n')[0] || depo + '#' + pr))
+      // ⭐GERÇEK MERGE COMMIT'İ AYRICA BASILIR (2026-09-21, iki kez ölçüldü): 1. maddedeki
+      // `merge_commit_sha` GitHub'ın birleştirme ÖNİZLEME ref'idir (refs/pull/N/merge) —
+      // birleştirmeden ÖNCEKİ sınama commit'i. Squash merge master'da BAŞKA bir commit üretir.
+      // #1276'da 2571399f ≠ b26dbce8, #1277'de 38051b8c ≠ 24b0959c; ikisinde de ritüelin
+      // çıktısı "merge commit" diye akrana ve karta yanlış SHA taşıttı. Okunamazsa yazılır.
+      try {
+        const mc = JSON.parse(gh(['pr', 'view', pr, '--repo', depo, '--json', 'mergeCommit'])).mergeCommit
+        yaz('MERGE COMMIT (master\'daki gercek commit — 1. maddedeki on-izleme ref\'i DEGIL): ' +
+          (mc && mc.oid ? mc.oid.slice(0, 9) : 'OKUNAMADI'))
+      } catch (e) {
+        yaz('MERGE COMMIT: OKUNAMADI — ' + String(e.message).split('\n')[0].slice(0, 120))
+      }
     } catch (e) {
       process.stderr.write('merge-ritueli: kapi YESIL ama gh pr merge BASARISIZ: ' +
         String(e.message).slice(0, 200) + '\n')
