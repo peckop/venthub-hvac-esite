@@ -197,3 +197,34 @@ sınanmadı. Şiddet→süre eşiği bir **öneri**, ölçülmüş bir eşik de�
 "varsay" değil "ölç" diyor.
 
 İlgili: REC-323 · `memory/is-kirmizi-degil-adim-kirmizi` · `memory/yesil-kapi-gorundugunu-kanitlamaz`
+
+---
+
+## 10 · SÜRÜM KARARI GEREKÇESİZ DEĞİŞEMEZ — `INV-DEP-KARAR-1` (2026-09-19, REC-359)
+
+Kayıt: `docs/standards/bagimlilik-kararlari.md` · Kapı:
+`src/__tests__/conformance/bagimlilik-karar-kaydi.test.ts`
+
+**Niçin:** Recep'in ilkesi (2026-09-19, birebir): *"her yapılanın izi olmalı takip edilebilmeli
+tetiklenebilmeli .. otonom bir yapıya gelemeyen herşey bir gün unutulacak."* Bu cetvelin
+kendisi de o sınıftaydı: §4'teki üst sınır kuralı, §3'teki tek-zincir kuralı **yazılıydı** ama
+hiçbiri ölçülmüyordu. Yazmak uygulamak değildir.
+
+**Kural:** `package.json`'da **sabit pinlenmiş** her bağımlılığın ve **her** `pnpm.overrides`
+girdisinin kayıtta bir satırı olur; satırdaki aralık gerçekle **birebir** eşittir ve `KARAR`
+satırının gerekçesi **aralıktaki sürüm numarasını içerir**. Sürüm değişip kayıt güncellenmezse
+kapı kırmızı verir. Tetik **cron değil değişikliğin kendisidir** (REC-328).
+
+**§1 ile çelişmez:** §1'deki "otomatik kapı bilinçli olarak yok" hükmü **audit çıktısı**
+içindir — o sayı her gün değişir ve her gün kırmızı veren kapı bakılmayan kapıdır. Bu kapı
+audit sayısına hiç bakmaz; yalnız **bizim yazdığımız** sürüm ile **bizim yazdığımız** gerekçe
+arasındaki tutarlılığı ölçer. O ikisi ancak biz değiştirirsek değişir.
+
+**Gerekçesi ölçülemeyen satır `BORÇ` yazılır, uydurulmaz.** Borç sayısı teste dondurulur ve
+yalnız azalabilir; yeni bir paket borç olarak doğamaz.
+
+⚠**KURULUŞ ANINDA ÖLÇÜLEN İHLAL:** §4 "override daima aralıklıdır, açık uçlu değil" diyor.
+2026-09-19 ölçümünde 22 override'ın **17'si açık uçlu** (`>=x` biçiminde, üst sınırsız) çıktı —
+yani bu cetvelin kendi kuralı bugün 17 yerde çiğneniyor. Kapı bunu **kapatmıyor**, çünkü tek
+seferde düzeltmek her birinin ayrı ölçümünü gerektirir; **tavan olarak donduruyor**: sayı
+artamaz, yalnız azalabilir. Borcun adı konmuştur, görünürdür ve büyüyemez.
