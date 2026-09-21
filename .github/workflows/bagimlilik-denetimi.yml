@@ -1,0 +1,77 @@
+name: Bagimlilik denetimi
+
+# ══════════════════════════════════════════════════════════════════════════════
+# KARAR 52 (Recep, 2026-09-19) — sürüm takibinin TETİĞİ bizim hafızamız olamaz.
+#
+# ÖLÇÜLDÜ 2026-09-19: bu dizinde hiçbir `pnpm audit` adımı YOKTU. İki haftalık tarama kuralı
+# (karar 13) yazılıydı, tetiği ise bir şeridin hatırlamasıydı; dört günde bir unutulabildi.
+#
+# NE ZAMAN KOŞAR — ve niçin HER GÜN koşmaz:
+#   · Kilit dosyası ya da package.json değiştiğinde (PR + master push, `paths` süzgeçli).
+#   · Haftada bir (pazartesi) — kilitli sürüme SONRADAN yayımlanan kayıtlar için. Kilit
+#     dosyası değişmese de yeni bir kayıt çıkabilir; o kayıt ancak böyle görünür.
+#   · Elle (`workflow_dispatch`).
+#   Cetvel §1 "otomatik kapı bilinçli olarak yok" diyordu, çünkü HER GÜN kırmızı veren kapı
+#   bakılmayan kapıdır. Bu iş akışı her gün koşmaz; kırmızısı ya bizim değişikliğimizden ya
+#   da haftalık yeni bir kayıttan gelir — ikisi de görünmesi gereken şeydir.
+#   (Zamanlayıcı kullanımı karar 53 ile açık: REC-328 dönemsel bir karardı.)
+#
+# `pnpm install` YOK: audit kilit dosyasından okur, bağımlılık kurmaz. Kurulum hem süre hem
+# saldırı yüzeyi demek (postinstall betikleri).
+#
+# Kabul listesi: docs/standards/bagimlilik-kararlari.md §7 — iki yönlü eşitlik: listede
+# olmayan yeni kayıt KIRMIZI, listede kalan ama kapanmış kayıt da KIRMIZI.
+# Cetvel: docs/standards/bagimlilik-guvenlik-yukseltme-standard.md §11.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'docs/standards/bagimlilik-kararlari.md'
+      - 'scripts/hijyen/bagimlilik-denetimi.cjs'
+      - '.github/workflows/bagimlilik-denetimi.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'docs/standards/bagimlilik-kararlari.md'
+  schedule:
+    # Pazartesi 04:17 UTC (İstanbul 07:17). Dakika tam saat değil: GitHub tam saatlerde
+    # zamanlanmış işleri geciktiriyor, ve Dependabot'un haftalık turu da pazartesi sabahı.
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+# Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU
+# (CLAUDE.md Notlar — yoksa checkout "Repository not found" verir).
+permissions:
+  contents: read
+
+concurrency:
+  group: bagimlilik-denetimi-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  denetim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Uretim agaci guvenlik taramasi (kabul listesiyle iki yonlu)
+        run: node scripts/hijyen/bagimlilik-denetimi.cjs

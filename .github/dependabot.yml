@@ -1,0 +1,102 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# KARAR 52 (Recep, 2026-09-19, ilk elden: "ops ile konuştuğum konu için bana soracağın
+# onaya evet diyorum") — sürüm takibi GitHub'ın yerleşik mekanizmasına devredildi.
+#
+# NİÇİN: Recep — "sürüm takibini canlı tutmamak ihmal, çözmezsek tekrar eder." Ölçüldü
+# 2026-09-19: 77 bağımlılığın 63'ünün yeni sürümü, 28'inin ana sürüm atlaması var; ve bunu
+# söyleyen tek şey elle koşulan bir tarama betiğiydi.
+#
+# BOT PR'I VERCEL'DE DERLEME HARCAMAZ (ölçüldü 2026-09-21): `scripts/vercel-ignore-build.sh`
+# `master` dışındaki HER dalı atlıyor; bot dalları `dependabot/...`. Actions ise depo public
+# olduğu için ücretsiz.
+#
+# ⛔BOT PR'I KENDİLİĞİNDEN BİRLEŞMEZ: her PR merge ritüelinden geçer (INV-DEP-KARAR-1 dahil —
+# bot bir SABİT PİNİ ya da override'ı değiştirirse kayıt güncellenmeden kırmızı kalır;
+# bu kasıtlı: bot sürümü değiştirir, gerekçeyi insan yazar).
+#
+# Cetvel: docs/standards/bagimlilik-guvenlik-yukseltme-standard.md §11.
+# ══════════════════════════════════════════════════════════════════════════════
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Istanbul
+    # Tavan DÜŞÜK başlar (OPS 09-19: 3-5). 63 eskiyen paket bir haftada PR selidir; önce
+    # akışın taşınabildiği ölçülür, sonra tavan yükseltilir.
+    open-pull-requests-limit: 3
+    labels: [dependencies]
+    commit-message:
+      prefix: 'chore(deps)'
+    # Grup SIRASI önemli: bir paket eşleştiği İLK gruba girer.
+    groups:
+      # GÜVENLİK güncellemeleri tek PR — acil olanlar sürüm gürültüsünde kaybolmasın.
+      guvenlik:
+        applies-to: security-updates
+        patterns: ['*']
+      # React + Next BİRLİKTE hareket eder ve GÖRSEL doğrulama ister (URUN şeridi).
+      # Tam pinli dörtlü burada: §2.1 "gevşetme adayı" — bot PR'ı gevşetme DENEMESİ değildir,
+      # ama o denemenin başlangıç noktası olur.
+      react-next:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+          - 'next'
+          - 'eslint-config-next'
+          - '@next/*'
+      # 3D — carousel ve ürün görüntüleyici; görsel doğrulama ister (URUN).
+      uc-boyut:
+        patterns:
+          - 'three'
+          - '@types/three'
+          - '@react-three/*'
+      # Ana sürüm OLMAYAN her şey tek PR. Ana sürümler bu gruba girmez → ayrı ayrı PR.
+      kucuk-ve-yama:
+        update-types: [minor, patch]
+    ignore:
+      # KABUL EDİLMİŞ ERTELEME — karar 17: Sentry sıranın EN SONUNDA, Recep 2026-09-19.
+      # 11 yüksek güvenlik kaydının hepsi bunun altından geliyor ve hepsi DERLEME aracında
+      # (docs/audits/bagimlilik-2026-09-19.md). Bot her hafta 8→10 PR'ı açmasın.
+      # KALDIRMA ŞARTI: Sentry işi (karar 17) başladığı gün bu blok silinir.
+      - dependency-name: '@sentry/*'
+        update-types: ['version-update:semver-major']
+
+  # İş akışlarındaki aksiyonlar (actions/checkout@v4 …) — depo etiketle sabitliyor, SHA ile
+  # değil; bot en azından sürüm akışını görünür tutar.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Istanbul
+    open-pull-requests-limit: 2
+    labels: [dependencies]
+    commit-message:
+      prefix: 'chore(ci)'
+    groups:
+      aksiyonlar:
+        patterns: ['*']
+
+  # WrongStack MCP araçları — kendi kilit dosyası var (`npm ci --ignore-scripts`, ANA ağaçta).
+  # Paketler 1.0.19'da bilinçli sabit; pilot ölçümü sürerken sürüm kayarsa karşılaştırma
+  # bozulur. Takip edilir ama tek PR'a gruplanır ve tavan 1.
+  - package-ecosystem: npm
+    directory: /tools/wrongstack-mcp
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Istanbul
+    open-pull-requests-limit: 1
+    labels: [dependencies]
+    commit-message:
+      prefix: 'chore(tools)'
+    groups:
+      wrongstack:
+        patterns: ['*']
