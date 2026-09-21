@@ -25,6 +25,43 @@ const { pathToFileURL } = require('node:url')
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+/**
+ * ⭐KANONİK KÖK (2026-09-21, ÖLÇÜLDÜ): WrongStack proje deposunu kök yolunun KARMASINDAN türetir
+ * ve karma sürücü harfinin büyük/küçüğüne DUYARLI. `c:\Users\…` → `venthub-hvac-7e017f`,
+ * `C:\Users\…` → `venthub-hvac-1088d5`: AYNI proje İKİ AYRI KUTU. Pencereler (VSCode) küçük `c:`
+ * ile açılıyor; terminalden başlatılan süreç büyük `C:` ile açılıp öbür kutuya yazdı ve pencere
+ * o mesajı hiç görmedi. Sürücü harfi burada KÜÇÜĞE sabitlenir (kanonik = 7e017f, pencerelerin
+ * zaten kullandığı).
+ *
+ * ⚠WORKTREE: sunucu worktree kökünü git üzerinden ANA AĞACA çeviriyor ve git yolu BÜYÜK `C:` ile
+ * veriyor (ölçüldü: `c:\tmp\vh-altyapi-kip` → `C:\Users\…` → 1088d5). O yüzden ana ağaç burada,
+ * sunucudan ÖNCE çözülür (`git rev-parse --git-common-dir` → üst dizin), sonra harf küçültülür.
+ * git yoksa/başarısızsa verilen yol kullanılır.
+ */
+function kanonikKok(p) {
+  let kok = path.resolve(p)
+  try {
+    const ortak = require('node:child_process')
+      .execFileSync('git', ['-C', kok, 'rev-parse', '--path-format=absolute', '--git-common-dir'], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      })
+      .trim()
+    if (ortak && path.basename(ortak) === '.git') kok = path.dirname(path.resolve(ortak))
+  } catch {
+    // git yok ya da depo değil — verilen yol kalır
+  }
+  return kok.replace(/^([A-Za-z]):/, (_, h) => h.toLowerCase() + ':')
+}
+
+/** argv içindeki `--project-root <yol>` değerini kanonik köke çevirir. */
+function kokuKanonikle(args) {
+  const out = [...args]
+  const i = out.indexOf('--project-root')
+  if (i >= 0 && out[i + 1] !== undefined) out[i + 1] = kanonikKok(out[i + 1])
+  return out
+}
+
 /** Kimliği bulur; bulamazsa null. Yan etkisiz — test bu fonksiyonu fikstürle çağırır. */
 function kimlikBul({ env, ppid, oturumDizini }) {
   const d = env.CLAUDE_CODE_SESSION_ID
@@ -55,7 +92,7 @@ async function calistir() {
   process.argv = [
     process.argv[0],
     cli,
-    ...process.argv.slice(2),
+    ...kokuKanonikle(process.argv.slice(2)),
     '--actor',
     bulunan.kimlik,
     '--session-id',
@@ -71,4 +108,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { kimlikBul }
+module.exports = { kimlikBul, kanonikKok, kokuKanonikle }
