@@ -1,6 +1,8 @@
 // @vitest-environment node
 import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
+import os from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -110,21 +112,16 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
     ).toBe('+gh')
   })
 
-  it('⭐MAILBOX kaydi: kimlik PENCERE BASINA (oturum kimligi), varsayilansiz, admin DEGIL', () => {
+  it('⭐MAILBOX kaydi: SARMALAYICI uzerinden, .mcp.json da kimlik YAZILMAZ, admin DEGIL', () => {
     /**
-     * Karar 54 (Recep ilk elden teyit 2026-09-21, ALTYAPI penceresi). `.mcp.json` ÜÇ PENCERENİN
-     * PAYLAŞTIĞI tek dosyadır: sabit bir `--actor` yazılırsa bütün pencereler AYNI kimlikle
-     * konuşur ve mesajlar yanlış pencereye düşer — bir mesaj kutusu için en kötü arıza. Bu yüzden
-     * kimlik `${CLAUDE_CODE_SESSION_ID}` ile pencere başına verilir.
+     * Karar 54 (Recep ilk elden teyit 2026-09-21, ALTYAPI penceresi). `.mcp.json` BÜTÜN PENCERELERİN
+     * PAYLAŞTIĞI tek dosyadır: dosyaya yazılan her `--actor` bütün pencerelere AYNI kimliği verir ve
+     * mesajlar yanlış pencereye düşer — bir mesaj kutusu için en kötü arıza.
      *
-     * ⭐VARSAYILAN YASAK (`${CLAUDE_CODE_SESSION_ID:-x}`): değişken sürece ulaşmazsa varsayılan
-     * sessizce devreye girer ve bütün pencereler `x` olur — tam da önlenen arıza. Varsayılansız
-     * yazımda değişken yoksa YALNIZ bu sunucu açılmaz (fail-closed), diğerleri etkilenmez.
-     *
-     * Ölçülen (2026-09-21, sahte iki kimlikle gerçek sunucu): A gönderip KAPANDI, B sonra açıldı
-     * ve okunmamış 1 gördü; C'ye giden mesaj B'nin kutusuna DÜŞMEDİ (B 0, C 1). Pencere içinden
-     * genişlemenin ve kimliğin ulaştığı ölçümü kapat-aç sonrasına kalır (README madde 8).
-     * `--admin` KAPALI: toplu silme / kimlik bilgisi yönetimi pilot kapsamında değil.
+     * ⭐ÖLÇÜLDÜ (2026-09-21, #1287 sonrası kapat-aç): `--actor ${CLAUDE_CODE_SESSION_ID}` GENİŞLEMEDİ;
+     * iki pencerede de agentId düz metin "${CLAUDE_CODE_SESSION_ID}" geldi ve sunucu buna rağmen AÇILDI.
+     * Bu yüzden kimlik dosyada değil, sarmalayıcıda (`tools/wrongstack-mcp/posta-kutusu.cjs`) çözülür.
+     * Bu kol, dosyaya herhangi bir `--actor` / `${` geri yazılmasını KIRMIZI yapar.
      */
     const kilit = json<Kilit>(path.join(ARAC, 'package-lock.json'))
     expect(kilit.packages['node_modules/@wrongstack/mailbox-mcp']?.version, 'mailbox paketi kurulu degil').toBe('1.0.19')
@@ -134,21 +131,48 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
     const args = kutu?.args ?? []
     const cagri = [kutu?.command ?? '', ...args].join(' ')
     expect(cagri, 'mailbox npx/uzak paket cagiriyor').not.toMatch(/\bnpx\b|\bpnpm dlx\b|\bbunx\b/)
-    expect(cagri, 'mailbox kilitli yerel yolu cagirmiyor').toContain(
-      'tools/wrongstack-mcp/node_modules/@wrongstack/mailbox-mcp',
+    expect(cagri, 'mailbox sarmalayiciyi cagirmiyor — kimlik dosyada cozulmeye kalkar').toContain(
+      'tools/wrongstack-mcp/posta-kutusu.cjs',
     )
     expect(cagri, 'mailbox kaydinda mutlak yol var (kimlik sizintisi)').not.toMatch(/[A-Za-z]:[\\/]|\/Users\/|\/home\//)
-    const deger = (bayrak: string): string | undefined => {
-      const i = args.indexOf(bayrak)
-      return i >= 0 ? args[i + 1] : undefined
-    }
-    expect(
-      deger('--actor'),
-      '--actor pencere basina degil — sabit ya da varsayilanli kimlik butun pencereleri AYNI kimlik yapar',
-    ).toBe('${CLAUDE_CODE_SESSION_ID}')
-    expect(deger('--session-id'), '--session-id oturum kimligi degil').toBe('${CLAUDE_CODE_SESSION_ID}')
+    expect(args, '--actor .mcp.json a YAZILMIS — butun pencereler ayni kimlik olur').not.toContain('--actor')
+    expect(args, '--session-id .mcp.json a YAZILMIS').not.toContain('--session-id')
+    expect(cagri, '.mcp.json da ${…} var — bu dosyada GENISLEMEDIGI olculdu').not.toContain('${')
     expect(args, 'mailbox --writable degil — gonderemez').toContain('--writable')
     expect(args, '--admin ACIK: toplu silme/kimlik yonetimi pilot kapsaminda DEGIL').not.toContain('--admin')
+  })
+
+  it('⭐SARMALAYICI kimligi AYIRT EDER: gecerli UUID alir, duz metni reddeder, bulamazsa null', () => {
+    const { kimlikBul } = createRequire(import.meta.url)(path.join(ARAC, 'posta-kutusu.cjs')) as {
+      kimlikBul: (a: { env: Record<string, string | undefined>; ppid: number; oturumDizini: string }) =>
+        | { kimlik: string; kaynak: string }
+        | null
+    }
+    const A = 'ac03ce11-c975-478d-bf30-66afb7c00f15'
+    const B = 'cb0467f1-0000-4000-8000-000000000001'
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'posta-kutusu-'))
+    try {
+      fs.writeFileSync(path.join(dizin, '4242.json'), JSON.stringify({ pid: 4242, sessionId: B }))
+      fs.writeFileSync(path.join(dizin, '5151.json'), JSON.stringify({ pid: 5151, sessionId: '${CLAUDE_CODE_SESSION_ID}' }))
+      // (1) ortam değişkeni geçerli → o kazanır
+      expect(kimlikBul({ env: { CLAUDE_CODE_SESSION_ID: A }, ppid: 4242, oturumDizini: dizin })).toEqual({
+        kimlik: A,
+        kaynak: 'ortam',
+      })
+      // (2) BUGÜNKÜ VAKA: değişken düz metin → reddedilir, ebeveyn dosyasına düşülür
+      expect(
+        kimlikBul({ env: { CLAUDE_CODE_SESSION_ID: '${CLAUDE_CODE_SESSION_ID}' }, ppid: 4242, oturumDizini: dizin }),
+      ).toEqual({ kimlik: B, kaynak: 'oturum-dosyasi' })
+      // (3) iki farklı ebeveyn → iki farklı kimlik (pencereler ayrışır)
+      fs.writeFileSync(path.join(dizin, '4343.json'), JSON.stringify({ sessionId: A }))
+      expect(kimlikBul({ env: {}, ppid: 4343, oturumDizini: dizin })?.kimlik).toBe(A)
+      // (4) dosya da düz metin taşıyorsa → null (fail-closed)
+      expect(kimlikBul({ env: {}, ppid: 5151, oturumDizini: dizin })).toBeNull()
+      // (5) hiçbir kaynak yok → null
+      expect(kimlikBul({ env: {}, ppid: 9999, oturumDizini: dizin })).toBeNull()
+    } finally {
+      fs.rmSync(dizin, { recursive: true, force: true })
+    }
   })
 
   it('sage verisi (.wrongstack/) git DISI: her derinlikte yok sayilir ve izlenen dosya YOK', () => {
