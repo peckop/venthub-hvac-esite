@@ -65,6 +65,17 @@ updates:
       # KALDIRMA ŞARTI: Sentry işi (karar 17) başladığı gün bu blok silinir.
       - dependency-name: '@sentry/*'
         update-types: ['version-update:semver-major']
+      # 3D SINIRI — @react-three/fiber 9.5.0 peer `react '>=19 <19.3'` (2026-09-21 ölçüldü,
+      # kayıt §4 react satırı). Bot React'i 19.3'e çekerse 3D sahneleri kırılabilir.
+      # KALDIRMA ŞARTI: fiber'ın peer aralığı 19.3'ü kapsadığı gün bu dört satır silinir.
+      - dependency-name: 'react'
+        versions: ['>=19.3.0']
+      - dependency-name: 'react-dom'
+        versions: ['>=19.3.0']
+      - dependency-name: '@types/react'
+        versions: ['>=19.3.0']
+      - dependency-name: '@types/react-dom'
+        versions: ['>=19.3.0']
 
   # İş akışlarındaki aksiyonlar (actions/checkout@v4 …) — depo etiketle sabitliyor, SHA ile
   # değil; bot en azından sürüm akışını görünür tutar.

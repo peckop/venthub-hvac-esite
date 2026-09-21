@@ -73,11 +73,11 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 | paket | aralık | tarih | durum | gerekçe |
 |---|---|---|---|---|
 | next | 15.5.24 | 2026-09-13 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. |
-| react | 19.0.0 | 2026-03-17 | BORÇ | KÖKEN ÖLÇÜLDÜ, GEREKÇE DEĞİL: `06e940580` diff'i React 18→19 GÖÇÜ (`^18.3.1` → `19.0.0`, aynı commit'te `next` ^14.2.35→15.1.0). Tam pin göç anının temkini; sonradan gevşetilmemiş. Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
-| react-dom | 19.0.0 | 2026-03-17 | BORÇ | `react` ile aynı commit, aynı göç (`06e940580`). Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
+| react | ~19.2.8 | 2026-09-21 | KARAR | Tam pin 19.0.0 gevşetildi ama ÜST SINIRLI: `@react-three/fiber` 9.5.0 (son kararlı) peer `react: '>=19 <19.3'` ilan ediyor (reconciler iç API'sine bağlı) → 19.3 3D'yi kırabilir. ~19.2.8 = 19.2 yamaları akar. Kaldırma şartı: fiber peer'i 19.3'ü kapsayınca `^19`. |
+| react-dom | ~19.2.8 | 2026-09-21 | KARAR | `react` ile aynı sınır: fiber 9.5.0 peer `react-dom: '>=19 <19.3'`. ~19.2.8, react ile aynı yama çizgisi. |
 | react-day-picker | 9.14.0 | 2026-08-19 | KARAR | PR #698: v9 geçişi iki peer bağımlılık ihlalini kapattı ve o sırada tarih filtresinin **hiç çalışmadığı** ölçüldü. 9.14.0 sabit, çünkü v9 API'si tarih seçici bileşenini doğrudan besliyor. |
-| @types/react | 19.0.1 | 2026-03-17 | BORÇ | `06e940580`, aynı göç (`^18.3.28` → `19.0.1`). Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
-| @types/react-dom | 19.0.1 | 2026-03-17 | BORÇ | `06e940580`, aynı göç. Bağımsız teknik gerekçe **bulunamadı** → ⭐GEVŞETME ADAYI |
+| @types/react | ~19.2.18 | 2026-09-21 | KARAR | Tipler çalışma zamanıyla aynı ara sürümde tutulur: react ~19.2 (fiber sınırı) iken 19.3 tipleri var olmayan API'yi derletir. ~19.2.18. |
+| @types/react-dom | ~19.2.7 | 2026-09-21 | KARAR | `@types/react` ile aynı gerekçe; react-dom ~19.2 çizgisi. ~19.2.7. |
 | eslint-config-next | 15.1.0 | — | BORÇ | — |
 | eslint-plugin-react-compiler | 19.1.0-rc.2 | 2026-08-19 | KARAR | RC sürümü (19.1.0-rc.2) semver garantisi taşımaz — iki RC arası kırıcı değişiklik olağandır. Sabit pin zorunludur, aralık yazılamaz. |
 | minimatch | 9.0.7 | — | BORÇ | — |
@@ -178,6 +178,18 @@ bundan "listede hiç yok" sonucunu çıkardım. **Tam listede vardı.** Ölçüm
 Yani tam pin **üç küçük sürümü engelliyor** ve bunu yapmasının **yazılı hiçbir sebebi yok**
 (§4'te dördü de `BORÇ`). Alt küme çıktısından bütün hakkında hüküm kurmak, bu kaydın kendi
 kurduğu kapıya düşmektir; hata ilk gün, kendi dosyamda yakalandı ve burada duruyor.
+
+**GEVŞETİLDİ (2026-09-21, ilk gevşetme denemesi) — ve deneme GERÇEK bir sebep buldu.** İlk
+deneme `^19.3.0` idi; kilit dosyası üretilirken `@react-three/fiber` 9.5.0'ın (son kararlı)
+`react '>=19 <19.3'` peer sınırı çıktı. Yani 19.3 engelinin gerçek bir sebebi VARDI ama hiçbir
+yerde yazılı değildi (pin ise onu değil, 18→19 göçünün temkinini taşıyordu). Dördü `~19.2.x`'e
+alındı ve §4'te **KARAR** oldu (gönüllü satır: `~` evren dışı ama sebep kayda değer). BORÇ tavanı
+20→16, gevşetme adayı tavanı 7→3. Bu, §2.1'in "gerçek bir sebep varsa da bilelim" cümlesinin
+ilk sahadaki karşılığıdır. Bot'un `react-next` grubu (#1279) React ile **Next 16 ana sürümünü** birlikte
+getiriyordu ve CI'da 16 tip hatası verdi (`revalidateTag` Next 16'da iki argüman istiyor) —
+bu gevşetme değil **göç**tür, ayrı iş olarak ölçülür; `next` 15.5.24 satırı yerinde kalır.
+Deneme ölçütü: CI (tsc + build + admin-smoke) yeşil + vitrin ve admin ekranlarının görsel
+doğrulaması (URUN).
 
 ### Node motoru: uyuşmazlık YERELDE, canlıda değil
 
