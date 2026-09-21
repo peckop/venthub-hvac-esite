@@ -25,7 +25,10 @@ Kapı evreni `package.json`'dan **ölçer**, buradan okumaz:
 1. `dependencies` / `devDependencies` / `optionalDependencies` içinde **sabit pinlenmiş**
    (aralık işareti taşımayan, doğrudan sürümle yazılmış) her paket. Sabit pin bir tercihtir;
    tercihin gerekçesi olur.
-2. `pnpm.overrides` içindeki **her** girdi. Override zaten tanımı gereği bir müdahaledir.
+2. `pnpm-workspace.yaml` → `overrides:` içindeki **her** girdi. Override zaten tanımı gereği
+   bir müdahaledir. ⚠2026-09-21'e kadar `package.json` → `pnpm.overrides` altındaydı; pnpm 11
+   o alanı okumadığı için Dependabot 22 override'ı kilit dosyasından düşürdü ve taşındı
+   (cetvel §4.1). Eski yere geri dönüş `INV-DEP-KARAR-1`'de kırmızıdır.
 
 `^` ile yazılmış aralıklar kapsam dışıdır — onlar bilerek akmaya bırakılmıştır, tekil bir karar
 değildir. Bu sınır bilinçlidir, muafiyet listesi değildir: gönüllü olarak eklenen satır (evrende
