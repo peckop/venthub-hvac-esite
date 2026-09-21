@@ -68,9 +68,15 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    doğrudan `spawn("git", …)` ile alıyor.
 8. **Mailbox KAYITLI (2026-09-21, karar 54 — pilot).** Sunucu zorunlu `--actor <id>` istiyor;
    `.mcp.json` ise **bütün pencerelerin paylaştığı tek dosya**. Sabit actor = bütün pencereler aynı
-   kimlik = mesaj yanlış pencereye düşer. Bu yüzden `--actor ${CLAUDE_CODE_SESSION_ID}` (pencere
-   başına), **varsayılansız**: değişken ulaşmazsa yalnız bu sunucu açılmaz; `:-x` varsayılanı ise
-   bütün pencereleri sessizce `x` yapardı. `--writable` açık, `--admin` **kapalı**.
+   kimlik = mesaj yanlış pencereye düşer. `--writable` açık, `--admin` **kapalı**.
+   **⛔İLK DENEME DÜŞTÜ (#1287):** `.mcp.json`'a `--actor ${CLAUDE_CODE_SESSION_ID}` yazıldı; kapat-aç
+   sonrası iki pencerede (OPS, ALTYAPI) agentId **düz metin** `${CLAUDE_CODE_SESSION_ID}` geldi —
+   değişken GENİŞLEMEDİ ve sunucu yine de AÇILDI ("ulaşmazsa açılmaz" varsayımı yanlıştı).
+   **Çare: `posta-kutusu.cjs` sarmalayıcısı.** Kimliği sırayla (1) UUID biçimli
+   `CLAUDE_CODE_SESSION_ID`'den, (2) ebeveyn Claude sürecinin `~/.claude/sessions/<ppid>.json`
+   dosyasındaki `sessionId`'den alır (ölçüldü: MCP'nin ebeveyni = `CLAUDE_PID`); bulamazsa **çıkış 1**,
+   kutu açılmaz. (2) Claude Code'un **iç dosyası**, belgelenmiş arayüz değil — biçimi değişirse kutu
+   kapanır, yanlış kimlikle açılmaz. `.mcp.json`'a `--actor`/`${` yazılması INV-WRONGSTACK-MCP-1'de KIRMIZI.
    **Ölçülen (sahte kimliklerle gerçek sunucu):** A gönderip kapandı → sonra açılan B okunmamış 1
    gördü (kapalı pencereye mesaj DURUYOR); C'ye giden mesaj B'nin kutusuna düşmedi (B 0, C 1);
    `--project-root .` worktree'den de ana ağacın kutusunu açıyor (tek kutu). **Bilinen bayatlık:**

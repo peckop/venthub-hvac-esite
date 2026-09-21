@@ -35,13 +35,9 @@
     "wrongstack-mailbox": {
       "command": "node",
       "args": [
-        "tools/wrongstack-mcp/node_modules/@wrongstack/mailbox-mcp/dist/cli.js",
+        "tools/wrongstack-mcp/posta-kutusu.cjs",
         "--project-root",
         ".",
-        "--actor",
-        "${CLAUDE_CODE_SESSION_ID}",
-        "--session-id",
-        "${CLAUDE_CODE_SESSION_ID}",
         "--stdio",
         "--writable"
       ]

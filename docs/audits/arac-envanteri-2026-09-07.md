@@ -610,9 +610,10 @@ gerektirmez).
   yetim. **Açık ön şart:** sage.db hafıza yedeğine girmiyor — `memory_for_file` kancası PR'ından
   ÖNCE kapanır (REC-345 İŞ 5).
   **`wrongstack-mailbox` (2026-09-21, karar 54 — PİLOT):** pencereler arası kalıcı mesaj kutusu.
-  Kimlik `--actor ${CLAUDE_CODE_SESSION_ID}` (pencere başına, varsayılansız), `--writable`,
-  `--admin` kapalı. Sahte kimliklerle ölçüldü: kapalı alıcıya mesaj duruyor, yanlış alıcıya
-  düşmüyor. Pencere içi ölçüm (genişleme/kimlik) kapat-aç sonrası; ayrıntı README madde 8.
+  `--writable`, `--admin` kapalı. Sahte kimliklerle ölçüldü: kapalı alıcıya mesaj duruyor, yanlış
+  alıcıya düşmüyor. İlk kayıttaki `${CLAUDE_CODE_SESSION_ID}` pencerede GENİŞLEMEDİ (bütün pencereler
+  aynı düz metin kimlik) → kimlik artık **`tools/wrongstack-mcp/posta-kutusu.cjs`** sarmalayıcısında
+  çözülür (ortam değişkeni ya da ebeveyn oturum dosyası; yoksa kutu açılmaz). Ayrıntı README madde 8.
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
