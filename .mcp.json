@@ -31,6 +31,20 @@
       "env": {
         "WRONGSTACK_KANBAN_VERIFIER_COMMANDS": "+gh"
       }
+    },
+    "wrongstack-mailbox": {
+      "command": "node",
+      "args": [
+        "tools/wrongstack-mcp/node_modules/@wrongstack/mailbox-mcp/dist/cli.js",
+        "--project-root",
+        ".",
+        "--actor",
+        "${CLAUDE_CODE_SESSION_ID}",
+        "--session-id",
+        "${CLAUDE_CODE_SESSION_ID}",
+        "--stdio",
+        "--writable"
+      ]
     }
   }
 }

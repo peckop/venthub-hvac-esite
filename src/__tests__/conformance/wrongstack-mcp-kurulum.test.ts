@@ -110,24 +110,45 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
     ).toBe('+gh')
   })
 
-  it('⭐MAILBOX PAKETI KURULU AMA .mcp.json a KAYITLI DEGIL — sebebi OLCUMDUR, unutkanlik degil', () => {
+  it('⭐MAILBOX kaydi: kimlik PENCERE BASINA (oturum kimligi), varsayilansiz, admin DEGIL', () => {
     /**
-     * ⛔KİMLİK ÖLÇÜLMEDEN KAYIT YAPILMAZ. `mailbox-mcp` zorunlu `--actor <id>` istiyor ve
-     * `.mcp.json` ÜÇ PENCERENİN PAYLAŞTIĞI tek dosyadır: sabit bir actor yazılırsa üç pencere
-     * AYNI kimlikle konuşur ve mesajlar yanlış pencereye düşer — bir mesaj kutusu için
-     * düşünülebilecek en kötü arıza. `${...}` genişletmesinin bu dosyada gerçekten çalışıp
-     * çalışmadığı ve `CLAUDE_CODE_SESSION_ID`nin MCP sürecine ULAŞIP ulaşmadığı ölçülmedi;
-     * ölçülmeden kayıt, yanlış kimlikle çalışan bir kutu demektir.
+     * Karar 54 (Recep ilk elden teyit 2026-09-21, ALTYAPI penceresi). `.mcp.json` ÜÇ PENCERENİN
+     * PAYLAŞTIĞI tek dosyadır: sabit bir `--actor` yazılırsa bütün pencereler AYNI kimlikle
+     * konuşur ve mesajlar yanlış pencereye düşer — bir mesaj kutusu için en kötü arıza. Bu yüzden
+     * kimlik `${CLAUDE_CODE_SESSION_ID}` ile pencere başına verilir.
      *
-     * Paket bilerek KURULU: ölçüm o paketle yapılacak. Kayıt, ölçüm sonucuna bağlı ayrı adım.
+     * ⭐VARSAYILAN YASAK (`${CLAUDE_CODE_SESSION_ID:-x}`): değişken sürece ulaşmazsa varsayılan
+     * sessizce devreye girer ve bütün pencereler `x` olur — tam da önlenen arıza. Varsayılansız
+     * yazımda değişken yoksa YALNIZ bu sunucu açılmaz (fail-closed), diğerleri etkilenmez.
+     *
+     * Ölçülen (2026-09-21, sahte iki kimlikle gerçek sunucu): A gönderip KAPANDI, B sonra açıldı
+     * ve okunmamış 1 gördü; C'ye giden mesaj B'nin kutusuna DÜŞMEDİ (B 0, C 1). Pencere içinden
+     * genişlemenin ve kimliğin ulaştığı ölçümü kapat-aç sonrasına kalır (README madde 8).
+     * `--admin` KAPALI: toplu silme / kimlik bilgisi yönetimi pilot kapsamında değil.
      */
     const kilit = json<Kilit>(path.join(ARAC, 'package-lock.json'))
     expect(kilit.packages['node_modules/@wrongstack/mailbox-mcp']?.version, 'mailbox paketi kurulu degil').toBe('1.0.19')
     const mcp = json<Mcp>(path.join(KOK, '.mcp.json'))
+    const kutu = (mcp.mcpServers ?? {})['wrongstack-mailbox']
+    expect(kutu, 'wrongstack-mailbox kaydi yok (karar 54)').toBeDefined()
+    const args = kutu?.args ?? []
+    const cagri = [kutu?.command ?? '', ...args].join(' ')
+    expect(cagri, 'mailbox npx/uzak paket cagiriyor').not.toMatch(/\bnpx\b|\bpnpm dlx\b|\bbunx\b/)
+    expect(cagri, 'mailbox kilitli yerel yolu cagirmiyor').toContain(
+      'tools/wrongstack-mcp/node_modules/@wrongstack/mailbox-mcp',
+    )
+    expect(cagri, 'mailbox kaydinda mutlak yol var (kimlik sizintisi)').not.toMatch(/[A-Za-z]:[\\/]|\/Users\/|\/home\//)
+    const deger = (bayrak: string): string | undefined => {
+      const i = args.indexOf(bayrak)
+      return i >= 0 ? args[i + 1] : undefined
+    }
     expect(
-      Object.keys(mcp.mcpServers ?? {}),
-      'mailbox KAYDEDILMIS — once actor kimligi olculmeli (uc pencere ayni kimlikle konusur)',
-    ).not.toContain('wrongstack-mailbox')
+      deger('--actor'),
+      '--actor pencere basina degil — sabit ya da varsayilanli kimlik butun pencereleri AYNI kimlik yapar',
+    ).toBe('${CLAUDE_CODE_SESSION_ID}')
+    expect(deger('--session-id'), '--session-id oturum kimligi degil').toBe('${CLAUDE_CODE_SESSION_ID}')
+    expect(args, 'mailbox --writable degil — gonderemez').toContain('--writable')
+    expect(args, '--admin ACIK: toplu silme/kimlik yonetimi pilot kapsaminda DEGIL').not.toContain('--admin')
   })
 
   it('sage verisi (.wrongstack/) git DISI: her derinlikte yok sayilir ve izlenen dosya YOK', () => {

@@ -66,12 +66,18 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    `x` de ekler; `BLOCKED_COMMANDS` (rm, curl, wget, npm/npx/pnpm/yarn/bun, node, kill, diskpart …)
    **her hâlde üstündür** ve `gh` o listede yok. `git` yasak değil — kanban kendi git kanıtını
    doğrudan `spawn("git", …)` ile alıyor.
-8. **Mailbox KURULU ama KAYITLI DEĞİL — sebebi ölçümdür.** Sunucu zorunlu `--actor <id>` istiyor;
-   `.mcp.json` ise **üç pencerenin paylaştığı tek dosya**. Sabit bir actor yazılırsa üç pencere
-   aynı kimlikle konuşur ve mesajlar yanlış pencereye düşer. `${…}` genişletmesinin bu dosyada
-   çalışıp çalışmadığı ve `CLAUDE_CODE_SESSION_ID`nin MCP sürecine ulaşıp ulaşmadığı **ölçülmedi**;
-   ölçülmeden kayıt, yanlış kimlikle çalışan bir kutu demektir. Paket bilerek kurulu: ölçüm onunla
-   yapılacak. `INV-WRONGSTACK-MCP-1` bu "kayıtlı değil" hükmünü kolla tutar.
+8. **Mailbox KAYITLI (2026-09-21, karar 54 — pilot).** Sunucu zorunlu `--actor <id>` istiyor;
+   `.mcp.json` ise **bütün pencerelerin paylaştığı tek dosya**. Sabit actor = bütün pencereler aynı
+   kimlik = mesaj yanlış pencereye düşer. Bu yüzden `--actor ${CLAUDE_CODE_SESSION_ID}` (pencere
+   başına), **varsayılansız**: değişken ulaşmazsa yalnız bu sunucu açılmaz; `:-x` varsayılanı ise
+   bütün pencereleri sessizce `x` yapardı. `--writable` açık, `--admin` **kapalı**.
+   **Ölçülen (sahte kimliklerle gerçek sunucu):** A gönderip kapandı → sonra açılan B okunmamış 1
+   gördü (kapalı pencereye mesaj DURUYOR); C'ye giden mesaj B'nin kutusuna düşmedi (B 0, C 1);
+   `--project-root .` worktree'den de ana ağacın kutusunu açıyor (tek kutu). **Bilinen bayatlık:**
+   kapanan sürecin `agents` kaydı `online:true` kalıyor → canlılık bu listeden OKUNMAZ, pano `who`
+   kullanılır. **Pencere içi ölçüm açık:** genişleme + kimliğin MCP sürecine ulaşması + iki pencerenin
+   farklı kimlik alması, ana ağaç güncellenip pencereler kapatılıp açıldıktan sonra ölçülür.
+   `INV-WRONGSTACK-MCP-1` kaydı ve kimlik biçimini kolla tutar.
 9. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
    kümesi `gh` ile sınırlı ve ağ/paket komutları yasak listesinde. Ama bu bir **azaltmadır**,
    sıfırlama değil — kart açıklamasına ve doğrulayıcı komutuna sır yazılmaz.

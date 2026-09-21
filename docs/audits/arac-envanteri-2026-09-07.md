@@ -609,6 +609,10 @@ gerektirmez).
   kimlik sürücü harfine duyarlı, kanonik `venthub-hvac-7e017f` (küçük `c:`), `1088d5` (büyük `C:`)
   yetim. **Açık ön şart:** sage.db hafıza yedeğine girmiyor — `memory_for_file` kancası PR'ından
   ÖNCE kapanır (REC-345 İŞ 5).
+  **`wrongstack-mailbox` (2026-09-21, karar 54 — PİLOT):** pencereler arası kalıcı mesaj kutusu.
+  Kimlik `--actor ${CLAUDE_CODE_SESSION_ID}` (pencere başına, varsayılansız), `--writable`,
+  `--admin` kapalı. Sahte kimliklerle ölçüldü: kapalı alıcıya mesaj duruyor, yanlış alıcıya
+  düşmüyor. Pencere içi ölçüm (genişleme/kimlik) kapat-aç sonrası; ayrıntı README madde 8.
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
