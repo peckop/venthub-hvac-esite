@@ -116,7 +116,7 @@ for (const { ad, govde } of govdeler) writeFileSync(join(HAM, `${ad}.jsonl`), go
 const gorselYolu = govdeler.find(g => g.ad === 'product_images')?.ornek || {}
 manifest.uyari = [
   'Bu betik paketin HAM yarısıdır: ham/*.jsonl üretir. İnsan-okur CSV ve görsel DOSYALARI için `katalog-paket-uret.mjs` koşulmalıdır; o koşulmadan paket EKSİKTİR.',
-  'Geri yükleyici bu pakette YOKTUR. Paket tek başına "taşınabilir katalog" değildir; geri yüklenebildiği ölçüde taşınabilirdir.',
+  'Geri yükleme sınaması: `katalog-geri-yukle.mjs --paket=<dizin>` (kuru koşum; canlıyla satır satır karşılaştırır, sıfır fark = dışa aktarım TAM). CSV katmanı: `paket-csv-dogrula.mjs --paket=<dizin>`. Yazma kolu kapalıdır (upsert/tenant eşleme kararı Recep\'te).',
   'tenant_id kolonları olduğu gibi taşınır — başka bir kuruluma yüklenirken yeniden eşlenmelidir.',
   'PAKET GİT\'E GİRMEZ: fiyat (Euro) ve ~36 MB görsel taşır, ingestor deposu REC-215 ile PUBLIC olacak. `paket/` .gitignore\'dadır; USB kopyası = dizinin KENDİSİ.',
 ]
@@ -125,4 +125,7 @@ writeFileSync(join(HEDEF, 'manifest.json'), JSON.stringify(manifest, null, 2), '
 
 console.log(`\n✓ paket: ${HEDEF}  ·  ${TABLOLAR.length} tablo  ·  ${toplam} satır`)
 console.log(`  görsel yolu örneği: ${gorselYolu.path || '(yok)'}`)
-console.log(`\n⚠ Bu paket GERİ YÜKLENEBİLİRLİĞİ KANITLANMIŞ DEĞİLDİR — geri yükleyici henüz yok.`)
+// Eski satır "geri yükleyici henüz yok" diyordu; yükleyici 09-07'den beri var. Bayat uyarı,
+// gerçek uyarıyı (sınama koşulmadan paket kanıtsızdır) değersizleştirir.
+console.log(`\n⚠ Bu paket, sınama koşulana kadar KANITSIZDIR. Sıradaki adım:`)
+console.log(`  node scripts/icerik-hatti/katalog-geri-yukle.mjs --paket=${HEDEF}   (sıfır fark beklenir)`)

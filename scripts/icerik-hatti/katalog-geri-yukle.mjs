@@ -32,6 +32,12 @@ if (!existsSync(join(PAKET, 'manifest.json'))) {
 }
 const manifest = JSON.parse(readFileSync(join(PAKET, 'manifest.json'), 'utf8'))
 
+// JSONL YERİ: dışa aktarıcı 2026-09-09'dan beri tabloları `<paket>/ham/` altına yazıyor
+// (insan-okur CSV'ler kökte). Bu betik kökte aradığı için round-trip sınaması 13 gün boyunca
+// "brands.jsonl EKSİK" deyip DURUYORDU — hiç koşmadı, kimse görmedi (2026-09-22 ölçüldü).
+// Önce ham/, yoksa kök (09-09 öncesi paketler). İkisi de yoksa aşağıdaki kontrol durdurur.
+const HAM = existsSync(join(PAKET, 'ham')) ? join(PAKET, 'ham') : PAKET
+
 const env = Object.fromEntries(
   readFileSync(process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env'), 'utf8')
     .split(/\r?\n/).filter(s => s && !s.startsWith('#') && s.includes('='))
@@ -45,7 +51,7 @@ const SIRA = ['brands', 'categories', 'product_families', 'price_lists', 'produc
 
 // ---- 1) PAKET BÜTÜNLÜĞÜ: manifest hash'i tutmuyorsa yükleme YOK.
 for (const t of SIRA) {
-  const yol = join(PAKET, `${t}.jsonl`)
+  const yol = join(HAM, `${t}.jsonl`)
   if (!existsSync(yol)) { console.error(`⛔ ${t}.jsonl paketten EKSİK — yarım paket, yükleme yapılmadı`); process.exit(1) }
   const govde = readFileSync(yol, 'utf8')
   const hash = createHash('sha256').update(govde).digest('hex')
@@ -58,7 +64,7 @@ for (const t of SIRA) {
 console.log(`✓ paket bütünlüğü: ${SIRA.length} tablo, sha256 hepsi tuttu\n`)
 
 // ---- 2) FARK: paketteki her satır canlıda var mı, aynı mı?
-const oku = (t) => readFileSync(join(PAKET, `${t}.jsonl`), 'utf8').split('\n').filter(Boolean).map(s => JSON.parse(s))
+const oku = (t) => readFileSync(join(HAM, `${t}.jsonl`), 'utf8').split('\n').filter(Boolean).map(s => JSON.parse(s))
 const esitMi = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 
 let yeni = 0, degisik = 0, ayni = 0, fazlalik = 0
