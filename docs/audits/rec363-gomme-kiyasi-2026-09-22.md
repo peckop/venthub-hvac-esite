@@ -88,13 +88,15 @@ başarısı **tüm hafıza (~500 dosya)** üzerinde yeniden ölçülür — 20 d
   doğrudan etkiler.
 - C1'in ilk yüklemesi 63 sn (model indirme, bir kez); sonraki yüklemeler ~4 sn.
 
-## 6 · Ön şart ölçümü: BÜTÜN hafıza (501 dosya) — §4 önerisi DÜŞTÜ (2026-09-22, karar 57)
+## 6 · Ön şart ölçümü: BÜTÜN hafıza (500 dosya) — §4 önerisi DÜŞTÜ (2026-09-22, karar 57)
+
+> Sayım düzeltmesi: dizinde 501 `.md` var, biri `MEMORY.md` (indeks, evrende değil) → evren **500**.
 
 Recep karar 57'de "kur" dedi; OPS'un ön şartı: kurulumdan önce aynı 10 soru bütün hafızada, C1 ilk 10
 **≥ 20/24** değilse kurulmaz. Sage yedeği alındı ve doğrulandı (sage 164 kayıt, kanban 86). Koşum:
 `EVREN=tum` (betikte). Gömme ve sözcük kolları deterministik — tek tur, 3 tura eşdeğer.
 
-| Kol | 20 dersde ilk 10 | **501 dosyada** 1. | ilk 3 | ilk 10 | Beklenen dersin sırası (S1…S8) |
+| Kol | 20 dersde ilk 10 | **500 dosyada** 1. | ilk 3 | ilk 10 | Beklenen dersin sırası (S1…S8) |
 |---|---|---|---|---|---|
 | C0 İngilizce yerel | 18/24 | 1/8 | 4/8 | 4/8 | — |
 | C1 e5-small yerel | 24/24 | 1/8 | 1/8 | **4/8** | 29 · 29 · 9 · 1 · 6 · 10 · 31 · 29 |
@@ -104,7 +106,7 @@ Recep karar 57'de "kur" dedi; OPS'un ön şartı: kurulumdan önce aynı 10 soru
 | H50 (C1 ilk 50 → Haiku) | — | 5/8 | **8/8** | 8/8 | 1 · 1 · 1 · 3 · 1 · 2 · 2 · 1 — ama 48 sn, $0,052/soru |
 
 **Hüküm (OPS):** C1 tek başına **KURULMADI** — 4/8 (12/24) eşiğin çok altında. 20 derslik sınav küçük
-örneklemde şişmişti: 20 aday arasında ilk 10'a girmek, 501 arasında girmekle aynı iş değil.
+örneklemde şişmişti: 20 aday arasında ilk 10'a girmek, 500 arasında girmekle aynı iş değil.
 
 **Asıl bulgu:** ölçekte **sözcük araması gömmeden güçlü** (BM25 6/8 ↔ C1 4/8), ikisinin birleşimi en iyisi
 (RRF 7/8 = 21/24 eşdeğer, eşiğin üstünde). Bu tam da sage'in `vectorRecall` tasarımı (sözcük sonucu + vektör
@@ -113,7 +115,35 @@ yerel gömme". RRF puanı mutlak değildir → olumsuz soruları ("bulunamadı")
 
 **Sınırlar:** (1) L benim BM25 yaklaşığımdır (Türkçe küçük harf, kök bulma yok) — sage'in FTS5 sıralaması
 değil; kurulum öncesi son ölçüm sage'in gerçek sözcük aramasıyla yapılmalı. (2) Tek-doğru-cevap etiketi
-501 dosyada katı: ilk sıralardaki derslerin çoğu aynı soruya gerçekten cevap veriyor (ör. S7'de
+500 dosyada katı: ilk sıralardaki derslerin çoğu aynı soruya gerçekten cevap veriyor (ör. S7'de
 `deleted-capability-hides-as-dead-code`, S4'te `relationship-may-live-in-another-column`). Çok-doğrulu etiket
 (soru başına ≤3 kabul edilir ders) OPS'ta — hakem ayrı; ilk-10 listeleri ona verildi. (3) H50 kalıcı çözüm
 değil (OPS): yalnız üst sınır referansı.
+
+## 7 · SON ÖLÇÜM: sage'in GERÇEK sözcük araması — kurulum GEREKSİZ çıktı, KURULMADI (2026-09-22)
+
+§6'daki L kolu benim BM25 yaklaşığımdı. OPS eşiği: sage'in kendi sözcük araması + C1 RRF, ilk 10 **≥ 6/8**.
+Düzenek: **ayrı, geçici** bir sage kökü (`C:/tmp/rec363-sage`; projenin sage'ine yazılmadı), 500 metin
+`remember` ile yüklendi (dosya adı metne/etikete katılmadı), `memory_search` limit 100; 100 sonucun hepsi
+dosyalarla eşleşti. Ölçümden sonra geçici daemon durduruldu, kök silindi. Betikler:
+`scripts/hafiza/sage-sozcuk-sirasi.mjs` → `scripts/hafiza/sage-rrf-olcum.mjs`.
+
+| Kol (500 dosya) | 1. sırada | İlk 3 | İlk 10 | Beklenen dersin sırası (S1…S8) |
+|---|---|---|---|---|
+| **sage sözcük araması, tek başına (bugün çalışan)** | **4/8** | 6/8 | **7/8** | 1 · 70 · 3 · 1 · 1 · 4 · 3 · 1 |
+| RRF: sage sözcük + C1 (kurulacak olan) | 1/8 | 6/8 | 7/8 | 6 · 20 · 2 · 1 · 2 · 2 · 2 · 2 |
+| C1 tek başına (§6) | 1/8 | 1/8 | 4/8 | 29 · 29 · 9 · 1 · 6 · 10 · 31 · 29 |
+
+**Hüküm (OPS, ALTYAPI önerisi): KURULMADI.** RRF eşiği resmen geçiyor (7/8), ama sage'in bugün çalışan
+sözcük araması **tek başına aynı 7/8**'i veriyor. Yerel gömmeyi eklemek ilk 10'a **sıfır** katkı yapıyor ve
+ilk sıradaki isabeti **4'ten 1'e** düşürüyor. Bedeli ise sıfır değil: model indirme, wrongstack
+1.0.19 ↔ vector-memory 1.0.24 aile farkı, `.mcp.json` değişikliği (Recep kapısı). Tek kaçak (S2, sürüm
+sabitleme) iki yolda da kaçıyor.
+
+**Kalan açık soru (ayrı kayıt, acil değil):** 09-18 karar 50 denemesinde anlamca soruda "6/10" ölçülmüştü;
+bugün aynı sınıf sorularda sage'in sözcük araması 7/8. Fark büyük olasılıkla evrenden (09-18'de sage'de 135
+taşınmış ders vardı; bu ölçümde 500 dosyanın tam metni) ya da derslerin sage'e taşınma biçiminden — ölçülmedi.
+
+**Karar 57 sonucu:** Recep "kur" dedi; ön şart ölçümü kurulumun fayda getirmediğini gösterdi → kurulmadı
+(OPS Recep'e götürüyor). §4'teki öneri geçersizdir; §3'teki "Türkçe gömme şart" hükmü ise yalnız
+"gömme kullanılacaksa" koşuluyla geçerli kalır.
