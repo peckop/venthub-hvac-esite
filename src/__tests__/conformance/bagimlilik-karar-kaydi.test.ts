@@ -66,8 +66,9 @@ const KAYIT_YOLU = path.join(KOK, 'docs', 'standards', 'bagimlilik-kararlari.md'
  * anında düzeltildi. Tavan doğduğunda ÖLÇÜMLE kurulur; ondan sonra yalnız AZALIR.
  *
  * 20 → 16 (2026-09-21): dört React satırı `^19.3.0`'a gevşetildi, evrenden çıktı — ilk sıkışma.
+ * 16 → 15 (2026-09-22): `eslint-config-next` `next` ile aynı sürüme (15.5.25) geldi, KARAR oldu (#1293).
  */
-const BORC_TAVANI = 16
+const BORC_TAVANI = 15
 
 /**
  * Cetvel §4: override DAİMA aralıklıdır, açık uçlu değil (">=7.29.0" ana sürüm atlatır —
