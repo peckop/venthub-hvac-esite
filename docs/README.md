@@ -35,6 +35,7 @@
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
 | Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |
+| Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (TASLAK, karar 59) |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
 | Kapsamlı uçtan uca referans | `../CONTEXT.md` (NLM üretir) |
 
