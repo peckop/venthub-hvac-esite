@@ -1,89 +1,95 @@
-# REC-146 · Karar 70 — eksik ürün açıklamaları (TASLAK)
+# REC-146 · Karar 70 — eksik ürün açıklamaları (PLAN)
 
-> Durum: **TASLAK** (2026-09-22). Üretim BAŞLAMAZ: karar **79** (EN sayfada EN metin yoksa ne
-> gösterilir — yapısal, URUN kodu, OPS Recep'e soruyor) gelmeden bu plan kesinleşmez.
-> Canlıya yazım ayrıca Recep'in kendi sözüyle (iki anahtar).
+> Durum: **PLAN** (2026-09-22). Recep (OPS aktarımı): *eksik TR/EN metin karar konusu değil,
+> onarım.* Akış: plan → plan-challenger → üretim → taslaklar Recep'e **tek toplu tablo** (aile
+> başına 1 satır, tek seferde) → yazım URUN-KATALOG penceresinde Recep'in sözüyle (iki anahtar).
+> **79** (EN sayfada EN metin yoksa TR gösterilmez) = URUN'un gizleme onarımı; bu plandan bağımsız.
 
-## Ölçüm — emrin sayısı neden değişti (canlı, 2026-09-22)
-
-Karar 70'in çıkış sayısı: **255/442 üründe `description_i18n.tr` boş.** Müşterinin gördüğü şey farklı:
+## Ölçüm (canlı, 2026-09-22)
 
 | | TR sayfa | EN sayfa |
 |---|---|---|
 | Kendi açıklaması boş ürün | 255 | 255 |
-| Sayfada ne görünüyor | 251 → **aile metni** · 4 → hiçbir şey | 251 → **TÜRKÇE aile metni** · 4 → hiçbir şey |
+| Sayfada ne görünüyor | 251 → aile metni · 4 → hiçbir şey | 251 → **TÜRKÇE aile metni** · 4 → hiçbir şey |
 
-- PDP `src/app/_components/ProductDetailPageView.tsx:425`: `selectedVariant.description ||
-  pickLang(family.description, lang)`; `pickLang` (satır 124-128) `en → tr → en` düşer.
-  Canlı kanıt: `/en/products/avens-nimax?sku=AVE-NX313290` → "Product Description" altında
-  "Çelik gövdeli, direkt akuple…".
-- TR'de hiçbir şey görünmeyen 4 ürün (avens-bvu-ls 2, avens-hiz-anahtarlari 2) **Recep kararı
-  K7.10** ile bilerek yazılmadı (`icerik-hatti-taslak-kategori-rehber-2026-09-06.md:315`,
-  `aile-metni-yaz.mjs` `BEKLENEN_AILE` yorumu). **Bu plan onlara dokunmaz.**
-
-**Sonuç:** karar 70'in müşteriye görünen karşılığı TR boşluğu değil, **EN sayfada Türkçe metin.**
+PDP `src/app/_components/ProductDetailPageView.tsx:425` `selectedVariant.description ||
+pickLang(family.description)`; `pickLang` (124-128) `en → tr` düşer. Canlı kanıt:
+`/en/products/avens-nimax?sku=AVE-NX313290` → "Product Description" altında "Çelik gövdeli…".
+79 onarımı inince EN'de bu 251 ürünün açıklama kartı **boş** görünür → EN metin yazılana kadar
+EN sayfada açıklama olmaz. Bu plan o boşluğu kapatır.
 
 ## Kapsam
 
-| Kalem | Aile | Ürün | Not |
+| Kalem | Aile | Ürün | İş |
 |---|---|---|---|
-| A. EN aile metni (TR metni ONAYLI) | 16 | 184 | `is_description_manual=true` — TR metin K7.8 onaylı hattan geçti |
-| B. EN aile metni (TR metni onay durumu BELİRSİZ) | 7 | 67 | avens-nimax · avens-nimus · vortice-vorticent-cms-atex · avens-enkelfan-ec-plug · avens-qe-b-kasa · avens-dikdortgen-kanal-radyal · seat-atex-ptc-sensor (`is_description_manual=false`; REC-226 kayıp-ürün aktarımıyla gelen aileler) |
-| C. K7.10 — yazılmaz | 2 | 4 | avens-bvu-ls · avens-hiz-anahtarlari |
-| D. Aile metninden AYRIŞAN ürün | ölçülecek | ölçülecek | aile metninin iddiası ürüne uymuyorsa (ör. ATEX / ATEX'siz aynı ailede, farklı IP) ürün-başı metin |
+| A. EN aile metni — TR metni onaylı (`is_description_manual=true`) | 16 | 184 | onaylı TR'nin sadık EN'i |
+| B. EN aile metni — TR onayı belirsiz (`is_description_manual=false`) | 7 | 67 | TR metni + EN birlikte toplu tabloya (TR de onaya girer) |
+| C1. avens-hiz-anahtarlari — TR + EN | 1 | 2 | kısa kimlik metni, **yalnız kaynaktaki olgular** (aşağıda) |
+| C2. avens-bvu-ls — TR + EN | 1 | 2 | **KAYNAK YOK → yazılmaz**; AVenS föy listesine (71b) eklenir |
+| D. Aile metninden ayrışan ürün | ölçülecek | ölçülecek | ürün-başı metin (aynı motor, ayrı tur) |
 
-**B önce TR onayına gider:** onayı belirsiz TR metin çevrilirse kusur iki dile çoğalır. B'nin TR
-metinleri önce Recep'e sunulur (mevcut K7.8 sunum kalıbı: `toplu-sunum.py`), sonra çevrilir.
+B'deki 7 aile: avens-nimax · avens-nimus · vortice-vorticent-cms-atex · avens-enkelfan-ec-plug ·
+avens-qe-b-kasa · avens-dikdortgen-kanal-radyal · seat-atex-ptc-sensor (REC-226 kayıp-ürün
+aktarımıyla gelen aileler; TR metni K7.8 sunumundan geçmedi).
 
-**D'nin ölçümü (adım 1):** her ürün için aile metnindeki doğrulanabilir jetonlar (IP, ATEX, sayı,
-birim — `taslak-kaynak-kapisi.py`'nin jeton kümesi) ürünün `technical_specs`'iyle çelişiyor mu.
-Çelişen ürün D'ye girer. Sayı ölçülmeden tahmin yazılmaz.
+**C ve K7.10:** Recep 2026-09-06'da bu iki ailenin "satılabilir ürün sayfası yazılmayacak, kaynakta
+anlatım yok" dedi (K7.10). OPS aktarımı bugün "2 aile TR/EN + 4 ürün" diyor. Kaynak ölçüldü:
+- **Hız anahtarları: kaynak VAR** — AVenS fiyat listesi 2026 s.27 (`60006 AVenS 2,5 A HIZ ANAHTARI
+  2.5 A`, `01801 AVenS 5 A HIZ ANAHTARI 5 A`, aynı sayfada AVENS dikdörtgen kanal fanlarıyla
+  eşleşme tablosu) ve s.36. Metin YALNIZ bu olguları taşır (en yüksek akım, hangi fanlarla).
+- **BVU-LS: kaynak YOK** — `BVU`, `30110`, `30111` dizinde 0 eşleşme (2026-09-22). Uydurma yasak
+  → yazılmaz; föy AVenS'ten istenir.
+- K7.10'u değiştiren satır toplu tabloda **açıkça işaretlenir**; Recep'in onayı K7.10'un yerine geçer.
+
+**D ölçümü (adım 1):** aile metnindeki doğrulanabilir jetonlar (IP, ATEX, sayı+birim —
+`taslak-kaynak-kapisi.py` jeton kümesi) ürünün `technical_specs`'iyle çelişiyorsa ürün D'ye girer.
+Örnek şüphe: aynı ailede ATEX'li ve ATEX'siz ürün (storm-serisi, seat-serisi, jet-serisi).
 
 ## KAYNAK/CETVEL
 
-- `docs/standards/vitrin-metni-standard.md` (K4.1 olumsuz iddia, K7 blok anahtarı, iç not yasağı).
-  **EN metin için kural YOK** → yazımı bu işin kapsamında (adım 2): EN = onaylı TR'nin sadık
-  çevirisi; TR'de olmayan hiçbir iddia EN'e girmez; sayı/kod/birim jetonları iki dilde birebir.
-- `docs/standards/catalog-ingestion-standard.md` §6.3 — terim doğrulaması kaynak dizininden
-  (üretici EN belgesi varsa terim oradan: ör. "forward curved impeller", "class F insulation").
-- `scripts/icerik-hatti/taslak-kaynak-kapisi.py` — jeton kapısı dile bağlı değil (satır 9-10);
-  EN metne de uygulanır.
-- `scripts/icerik-hatti/aile-metni-yaz.mjs` — **`description.en`'e DOKUNMUYOR** (başlık yorumu:
-  "EN turu ayrı iş"). Yazıcı genişletilir (adım 5).
-- Karar 79 (bekliyor) — EN metin yokken PDP davranışı.
+- `docs/standards/vitrin-metni-standard.md` (K4.1, K7, iç not yasağı). **EN metin kuralı YOK →
+  yazımı bu işin kapsamında** (adım 2): EN = onaylı TR'nin sadık çevirisi; TR'de olmayan iddia
+  EN'e girmez; sayı/kod/birim jetonları iki dilde birebir; terim üreticinin EN belgesinden.
+- `docs/standards/catalog-ingestion-standard.md` §6.3 — kaynak dizini (PDF açılmaz).
+- `scripts/icerik-hatti/taslak-kaynak-kapisi.py` — jeton kapısı dile bağlı değil (satır 9-10).
+- `scripts/icerik-hatti/aile-metni-yaz.mjs` — **`description.en`'e dokunmuyor** ("EN turu ayrı
+  iş"); `BEKLENEN_AILE=38` sabit → genişletilir (adım 5).
+- `scripts/icerik-hatti/toplu-sunum.py` — K7.8 sunum kalıbı (onaylanan metin = yazılan metin).
 
 ## YÖNTEM
 
-OPS: "aynı motor — kaynak dizini → taslak CSV → Recep onayı → yazım; aile başına Sonnet + çürütme".
-Uygulanışı: **aile başına 1 Sonnet çevirmen** (girdi: onaylı TR metin + ailenin kaynak dizini
-sayfaları, yalnız terim için) + **aile başına 1 bağımsız çürütücü** (EN'deki her iddia TR'de var
-mı, jetonlar birebir mi, yeni iddia var mı). Çevirmen ≠ çürütücü (döngü yok). Toplam 23 aile →
-46 ajan (Workflow; karar 76'daki gibi Recep opt-in'i gerekir).
+Alt ajan (Agent aracı, Sonnet) — Workflow DEĞİL (Workflow Recep opt-in ister; iş aile başına iki
+ajanla yetiyor). Aile başına **1 yazar** (girdi: onaylı TR metin + ailenin kaynak dizini sayfaları)
++ **1 bağımsız çürütücü** (EN'deki her iddia TR'de/kaynakta var mı, jetonlar birebir mi, yeni iddia
+var mı). Yazar ≠ çürütücü. 25 aile → ~50 ajan çağrısı, dalgalar hâlinde.
+Deterministik kapı (jeton eşitliği, iç not süzgeci) ajanın sözüne değil koda bağlı.
 
 ## Adımlar
 
-1. **Ölç:** D kümesi (aile metni ↔ ürün teknik verisi jeton çelişkisi); B'nin TR onay geçmişi
-   (git/Linear'da K7.8 onayı var mı).
-2. **Cetvel:** `vitrin-metni-standard.md`'ye EN bölümü (sadık çeviri, jeton eşitliği, terim kaynağı).
-3. **B'nin TR metinleri Recep'e** (7 aile) — onaylanırsa A'ya katılır.
-4. **Taslak:** Workflow (çevirmen + çürütücü) → `paket/rec146-en-<damga>.csv` (aile, tr, en,
-   jeton_tr, jeton_en, çürütme hükmü) + sunum dosyası.
-5. **Yazıcı:** `aile-metni-yaz.mjs --dil en` — yalnız `description.en`; dolu EN'in üstüne yazmaz;
-   `admin_audit_log`; kuru koşum varsayılan; test (sabotaj: TR'yi silmez, dolu EN'i ezmez).
-6. **Recep onayı** → iki anahtarlı yazım → canlı ölçüm: 23 ailenin EN sayfasında Türkçe metin 0.
-7. D kümesi için ürün-başı metin: ayrı tur, aynı motor.
+1. **Ölç:** D kümesi · B ailelerinin TR onay geçmişi (git/Linear K7.8).
+2. **Cetvel:** `vitrin-metni-standard.md`'ye EN bölümü.
+3. **Taslak üretimi** (A+B+C1): yazar + çürütücü → `paket/rec146-metin-<damga>.csv`
+   (aile, ürün_sayisi, tr_mevcut, tr_yeni, en_yeni, kaynak_sayfalari, jeton_tr, jeton_en,
+   çürütme_hükmü, not[K7.10/onaysız TR]).
+4. **Kapı:** `taslak-kaynak-kapisi.py` her satıra (TR ve EN); KIRMIZI satır tabloya girmez.
+5. **Yazıcı:** `aile-metni-yaz.mjs --dil en` (+ B/C1 için tr) — yalnız boş alana yazar, dolu EN/TR
+   üstüne yazmaz; `BEKLENEN_AILE` yük dosyasından; `admin_audit_log`; kuru koşum varsayılan;
+   test (sabotaj: dolu metni ezmez, bloklara dokunmaz).
+6. **Recep'e TEK TOPLU TABLO** (aile başına 1 satır: aile · ürün sayısı · TR · EN · kaynak · not).
+   Tek tek soru yok. Onay → iki anahtarlı yazım.
+7. **Canlı ölçüm:** EN sayfada açıklaması boş ürün 251 → 0 (BVU-LS 2 hariç); TR'de hiç açıklama
+   görünmeyen 4 → 2 (BVU-LS); fark raporu + paket CSV yeniden üretilir.
+8. D kümesi: ayrı tur, aynı motor.
 
 ## Kabul ölçütü
 
-- EN sayfada Türkçe açıklama gösteren ürün: **251 → 0** (C'deki 4 hariç; karar 79'a göre).
-- Her EN metin: jeton kümesi TR ile birebir; çürütücü hükmü "yeni iddia yok".
-- TR metni ve bloklar değişmez (yazıcı testi).
-- Yazım idempotent; audit satırı aile başına 1.
+- Her metin: jeton kümesi kaynakla/TR ile birebir; çürütme hükmü "yeni iddia yok"; kapı YEŞİL.
+- EN açıklaması boş ürün **251 → 0**; BVU-LS 2 ürün gerekçesiyle boş (kaynak yok).
+- Mevcut TR metni ve bloklar değişmez (yazıcı testi); yazım idempotent; aile başına 1 audit.
 
 ## Açık
 
-| # | Soru | Kime |
+| Soru | Kime | Plan |
 |---|---|---|
-| 79 | EN metin yokken PDP: TR göster mi, kartı gizle mi | Recep (OPS soruyor) — yapısal, URUN kodu |
-| — | B'nin 7 ailesinin TR metni onaylı mı | ölçülecek (adım 1); değilse Recep'e sunum |
-| — | Workflow opt-in (46 ajan) | Recep (karar 76 ile aynı tür) |
+| BVU-LS föyü | AVenS (71b listesine eklenir) | yazılmaz |
+| B ailelerinin TR metni daha önce onaylandı mı | ölçülecek (adım 1) | tabloda işaretli |
