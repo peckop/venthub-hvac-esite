@@ -45,7 +45,37 @@ wrongstack toplam ~280 — hepsi tüm pencereler toplamı).
 - **MCP'leri kısmak belleği kurtarmaz:** pencere başına MCP toplamı ~180 MB; hiç/az kullanılan dört sunucu (browser-use,
   testsprite, markitdown, sentry) kapatılırsa pencere başına **~15 süreç ve tahminen 40–60 MB** — 4 pencerede ~0,2 GB.
   Süreç sayısını yarıya indirir ama belleği değil.
-- **Asıl kalem VS Code'un TypeScript sunucusu: ~6 GB.** Büyük depo + çok worktree açık olunca tsserver şişiyor.
-  Kazanç: kullanılmayan VS Code pencerelerini/worktree klasörlerini kapatmak ya da "TypeScript: Restart TS Server"
-  (anında), kalıcı olarak `typescript.tsserver.maxTsServerMemory` sınırı (kullanıcı ayarı — Recep kapısı).
+- ~~**Asıl kalem VS Code'un TypeScript sunucusu: ~6 GB.**~~ → **YANLIŞ, §4'te düzeltildi.** Asıl kalem TypeScript
+  sunucusu, ama VS Code'un değil: Claude pencerelerinin LSP eklentisi.
 - Ölçülmedi: pencere açılışındaki anlık tepe (bu ölçüm boşta), tsserver'ın hangi klasörü yüklediği.
+
+## 4 · DÜZELTME — tsserver'ı başlatan VS Code değil, Claude Code'un LSP eklentisi (OPS düzeltmesi, 15:40)
+
+§1-§3'teki "VS Code tsserver" hükmü **yanlıştı**; süreç adına bakıp ata zincirine bakmadan yazıldı. Ata zinciri
+(`Win32_Process.ParentProcessId`, bayrak adları dışında komut satırı basılmadı):
+
+| tsserver PID | MB | başlatan zincir | bellek sınırı |
+|---|---|---|---|
+| 37312 | **4449** | ← `typescript-language-server/lib/cli.mjs --stdio` ← **ALTYAPI penceresinin `claude.exe`'si** | **YOK** (`--max-old-space-size` verilmemiş) |
+| 8648 | 615 | ← aynı LSP ← URUN penceresinin `claude.exe`'si | YOK |
+| 38748 | 262 | ← editörün (Antigravity IDE) kendi TypeScript eklentisi | `--max-old-space-size=3072` |
+| diğerleri | 14–40 | LSP'lerin sözdizimi sunucuları (`--serverMode`) | — |
+
+**Kaynak:** kullanıcı eklentisi `typescript-lsp-win@recep-plugins` (yerel pazar `~/claude-plugins`,
+`.claude-plugin/marketplace.json` → `lspServers.typescript`). Editörün kendi sunucusu 3 GB sınırla 262 MB'ta dururken
+sınırsız LSP sunucusu 4,4 GB'a çıktı. Neden bu kadar büyüdüğü **ölçülmedi** (tsserver günlüğü kapalı); çıkarım:
+`--useInferredProjectPerProjectRoot` ile pencerenin dokunduğu her worktree ayrı proje olarak yükleniyor ve bu pencere
+gün içinde en az üç kökte (ana depo, `C:/tmp/vh-altyapi-kip`, `C:/tmp/pim-unopim`) dosya düzenledi.
+
+**Sınırlama yolu (resmi belge: code.claude.com/docs/en/plugins-reference#lsp-servers — `initializationOptions`
+destekleniyor; `typescript-language-server` 5.1.3 `maxTsServerMemory` seçeneğini okuyor, kurulu kodda ölçüldü):**
+
+- **Dosya:** `~/claude-plugins/.claude-plugin/marketplace.json` (kullanıcı klasörü altında)
+- **Değişiklik (tek satır):** `plugins[typescript-lsp-win].lspServers.typescript` içine
+  `"initializationOptions": { "maxTsServerMemory": 2048 }`
+- **Bedeli:** 2 GB'ı aşan projede tsserver yeniden başlar, o sırada birkaç saniye tanı gelmez; tanı kalitesi değişmez.
+  Uygulandıktan sonra pencereler yeniden açılınca etkin olur.
+- **Kim:** Recep (kullanıcı ayarı; ALTYAPI dokunmaz — karar 73).
+
+**Yeni tasarruf tahmini:** 2 LSP sunucusu bugün 5,0 GB; sınırla pencere başına en fazla 2 GB → makinede ~1–3 GB kazanç
+(pencere sayısına bağlı). MCP kısmak (karar 74) ~0,2 GB.
