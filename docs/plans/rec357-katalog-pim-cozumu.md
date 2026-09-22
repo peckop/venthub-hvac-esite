@@ -112,6 +112,34 @@ konteyner içi yol daima `sh -c '…'` içinde verilir.
   Ekrandan eklenemiyorsa bu da bulgudur.
 - Çıktı: içe alım raporu (girdi / düştü / sessiz atlanan / neden). Betik `scripts/pim/` altında, testli.
 
+**§3.2 SONUÇ (2026-09-22, ALTYAPI — koşuldu):** aile **vortice-lineo-quiet**, betik `scripts/pim/unopim.cjs`,
+kilit `INV-PIM-UNOPIM-1`.
+
+| Ölçüm | Sonuç |
+|---|---|
+| Gölge ↔ canlı tazelik (md5, `sku‖technical_specs`, sku sıralı) | **eşit** — ikisi de 12 satır, `641db5008cf7b4c3340abb1dffa7f333` |
+| m³/h birimi | UnoPim'de **yoktu**; REST ile eklendi (`CUBIC_METER_PER_HOUR`, mul 3600 — yön `MeasurementHelper`'dan okundu). Ekran gerekmedi |
+| Aile | 1 grup + 23 öznitelik (13 ölçülü, 3 evet/hayır, 6 metin, 1 uzun metin) → ailede **23/23** |
+| İçe alım | 12 satır girdi → **12 oluştu, 0 düştü, 0 hata**; aynı CSV ikinci kez → 12 güncellendi (idempotent) |
+| Değer eşitliği (sayım değil, hücre) | 12 ürün × (23 öznitelik + ad + adres) = **300 hücre, fark 0** |
+
+**Bu adımda çürüyen varsayımlar (plan metni yukarıda düzeltilmedi, burada düzeltilir):**
+1. *"`<kod>_value` + `<kod>_unit` iki sütun ister, biri eksikse sessiz atlar"* — **yanlış çıktı.** İki sütun da
+   dolu verildiğinde UnoPim 3.1.1 **12/12 satırı reddetti**: `Importer::addMeasurementValidationRules`
+   `<kod>(unit)` sütununa da `required_with:<kod>_value` koyuyor, yani `_value` kullanan her CSV bu kuralı
+   çiğniyor. Çalışan biçim `<kod>` + `<kod>(unit)`. Sessiz değil **gürültülü** bir red; ama belgelenen biçimin
+   hiç çalışmaması üretici tarafında bir hata (UnoPim'e bildirilebilir).
+2. `parent` ve `variant_structure` sütunları boş olsa da **zorunlu**.
+3. **tr_TR yerel ayarı kurulumda etkin değil** (Türkçe etiket 422 verdi). Kabul 3 (TR/EN) öncesi açılmalı.
+4. CSV'de `status=1` verildiği hâlde 12/12 ürün **pasif** girdi. Köprüyü etkilemez; kabulde not.
+5. Kurulum tuzağı (makine): içe alım dosyası `root` ile yazılınca kuyruk işçisi (www-data) göremiyor —
+   "source file could not be found". Betik `-u www-data` ile koşar.
+
+**Veri bulgusu:** ailede aynı büyüklük iki alanda duruyor (`max_delivery_ls` ↔ `max_delivery_m3h`). UnoPim'in
+taban birime çevirisi bunu görünür kıldı: 260 m³/h → 0,072222 m³/s, 72,22 l/s → 0,07222 m³/s (yuvarlama
+farkı). Birim sistemi olan bir PIM'de tek alan yeter; ikincisi türetilir — URUN'un aile şablonu kararı.
+**Sırada:** §3.3 köprü (salt-okuma API anahtarı + `pim_golge`).
+
 ### 3.3 Aktarım köprüsü (UnoPim REST → gölge Supabase)
 
 - UnoPim REST API — OAuth **password grant** (red-team B5): istemci kimliği + sırrı **ve** bir kullanıcı adı +
