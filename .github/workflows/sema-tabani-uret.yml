@@ -51,7 +51,7 @@ jobs:
       DB_URL: ${{ secrets.SUPABASE_DB_URL }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # ⭐SIR VARLIĞI UZUNLUKLA ÖLÇÜLÜR, DEĞERİYLE DEĞİL.
       # `${VAR:-VARSAYILAN}` kalıbı sır SET İSE değeri EKRANA BASAR; 2026-09-04'te
@@ -65,7 +65,7 @@ jobs:
           echo "SUPABASE_DB_URL mevcut (uzunluk ${#DB_URL} karakter, deger BASILMADI)."
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: 2.101.0
 
@@ -127,7 +127,7 @@ jobs:
           echo "doküm dolu — artefakt olarak yuklenebilir."
 
       - name: Artefakt yukle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: sema-tabani
           path: |

@@ -97,9 +97,13 @@ updates:
     labels: [dependencies]
     commit-message:
       prefix: 'chore(ci)'
+    # Aksiyonlar SHA + sürüm yorumuyla pinli (§12, INV-AKSIYON-SHA-1); Dependabot ikisini birlikte
+    # günceller. Grup YALNIZ küçük/yama sürümleri toplar: ANA sürüm atlaması her aksiyon için ayrı PR
+    # gelir — 2026-09-22'de #1278 sekiz ana sürümü tek PR'da getirdi ve ölçülemeden kapatıldı.
     groups:
       aksiyonlar:
         patterns: ['*']
+        update-types: [minor, patch]
 
   # WrongStack MCP araçları — kendi kilit dosyası var (`npm ci --ignore-scripts`, ANA ağaçta).
   # Paketler 1.0.19'da bilinçli sabit; pilot ölçümü sürerken sürüm kayarsa karşılaştırma
