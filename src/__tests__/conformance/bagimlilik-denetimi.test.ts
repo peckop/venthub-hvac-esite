@@ -33,8 +33,9 @@ const KAYIT = 'docs/standards/bagimlilik-kararlari.md'
  *
  * 11 → 8 (2026-09-21): bot'un güvenlik PR'ı (#1285) brace-expansion'ı 5.0.12'ye çekip üç kaydı
  * kapattı; kapı aynı PR'da "BAYAT KABUL" dedi ve üç satır silindi. Tavan ilk kez SIKIŞTI.
+ * 8 → 6 (2026-09-22): `kucuk-ve-yama` grubu (#1315) browserslist'in iki kaydını kapattı; aynı yol.
  */
-const KABUL_TAVANI = 8
+const KABUL_TAVANI = 6
 
 function kostur(args: string[]): { kod: number; cikti: string } {
   try {
