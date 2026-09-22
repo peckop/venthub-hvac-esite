@@ -1,0 +1,13 @@
+#!/bin/sh
+# Kapali dala push bekcisi (INV-KAPALI-DAL-1) — birlesmis ve acik PR'i olmayan dala push'u REDDEDER.
+#
+# NEDEN VAR (2026-09-22, #1305): squash-merge sonrasi ritüel uzak dali siliyor; ayni dala sonradan
+# itilen commit GitHub'da SESSIZCE yeni dal acar ve master'a hic girmez (9 commit 12 gun kayboldu).
+# Mantik ve testler: scripts/hijyen/kapali-dal-push.cjs. gh/ag yoksa UYARIR ve gecirir (fail-open).
+# Bilincli yeniden kullanim: VH_KAPALI_DAL_IZIN=1 git push ...
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+BETIK="$ROOT/scripts/hijyen/kapali-dal-push.cjs"
+[ -f "$BETIK" ] || exit 0
+command -v node >/dev/null 2>&1 || { echo "[kapali-dal] UYARI: node yok — kontrol YAPILMADI." >&2; exit 0; }
+exec node "$BETIK"

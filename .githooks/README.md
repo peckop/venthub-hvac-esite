@@ -52,6 +52,7 @@ doğru kalır.
 | `pre-commit` | Companion `.md` dokümanı olmayan **yeni** kaynak dosyaları listeler | **Hayır** — uyarı, `exit 0` |
 | `post-commit` | `system_tree.md` tazeler + son commit'in dosyaları için companion üretir (arka planda) | Hayır |
 | `post-merge` | Pull/merge ile **gelen** kod için companion + şema/edge master'ı tazeler, `registry-sync` koşturur | Hayır |
+| `pre-push` | Birleşmiş ve açık PR'ı olmayan dala push'u reddeder (INV-KAPALI-DAL-1, `scripts/hijyen/kapali-dal-push.cjs`) | **Evet** — `gh`/ağ yoksa uyarır ve geçirir; kaçış `VH_KAPALI_DAL_IZIN=1` |
 
 > `post-merge` bu dizine en son geldi (2026-08-15) ve o gecikme pahalıya patladı: diğer
 > ikisi versiyonlanırken o `.git/hooks/` içinde unutuldu, orada da log-yolu hatasını
