@@ -276,7 +276,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/nlm/yol_haritasi_dogrula.py` | Yol haritası doğrulayıcı — planın test dosyası (v1) | OPS | `docs/standards/proje-takip-defteri-standard.md` | 2026-09-06 | kendisi kapı | KAL |
 | `scripts/security/secret-scan.py` | Sır taraması (18 imza, geçmiş dahil tüm depo) | OPS *(devir adayı: ALTYAPI)* | `elle` | `docs/mutlak-yol-istisnalari.json:71` → `mutlak-yol-sizintisi.test.ts` okuyor; CLAUDE.md görünürlük öncesi zorunlu | mutlak-yol-sizintisi.test.ts | KAL |
 | `scripts/seo/indexnow-bildir.mjs` | IndexNow toplu bildirim (tek seferlik, REC-127) | URUN | `cagiran-yok` | 0 çağıran/0 pano izi; görev tamamlandı (GSC+sitemap OK) | yok | OLU-DOGRULANDI |
-| `scripts/setup-hooks.mjs` | `.githooks/`i git'e bağlar (`pnpm install` sonrası `prepare`) | OPS *(devir adayı: ALTYAPI)* | `.githooks/README.md`, `docs/standards/deploy-build-skip-standard.md` | 2026-08-15 | yok | KAL |
+| `scripts/setup-hooks.mjs` | `.githooks/`i git'e bağlar (`pnpm install` sonrası `prepare`) | ALTYAPI *(2026-09-22 OPS devretti, .githooks sahipliğiyle birlikte)* | `.githooks/README.md`, `docs/standards/deploy-build-skip-standard.md` | 2026-08-15 | yok | KAL |
 | `scripts/setup_webhooks.js` | Webhook kurulum yardımcısı (.env parse) | OPS *(devir adayı: ALTYAPI)* | `docs/standards/rendering-cache-standard.md`, `scripts/setup_webhooks_cli.js` | 2026-08-15 | yok | KAL |
 | `scripts/setup_webhooks_cli.js` | Webhook kurulum CLI'ı (.env parse) | OPS *(devir adayı: ALTYAPI)* | `docs/standards/rendering-cache-standard.md`, `scripts/setup_webhooks.js` | 2026-08-15 | yok | KAL |
 | `scripts/skills-creator.py` | Yeni skill oluşturma (name/description/category) | OPS | `elle` | `.claude/skills/skills-creator/SKILL.md:25,67`, `.agent/skills/…`, `manifest.yaml:162` `validate:` | skill validate adımı canlı | KAL |
@@ -365,6 +365,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/paket-sozlesme.test.ts` | REC-212 · paket kolon sözleşmesi + CSV katmanı round-trip kapısı + geri yükleyici yolu. | URUN-KATALOG | vitest (her PR) | 2026-09-22 (15/15) | kendisi | AKTIF |
 | `scripts/icerik-hatti/paket-csv-dogrula.mjs` | TAŞINABİLİR KATALOG — CSV KATMANI ROUND-TRIP KAPISI (REC-212, karar 66) | URUN-KATALOG | elle kosulur, paket uretiminden sonra (K3-b yayin sarti) | 2026-09-22 (442 urun · 17522 hucre · fark 0) | scripts/icerik-hatti/__tests__/paket-sozlesme.test.ts | AKTIF |
 | `scripts/icerik-hatti/paket-sozlesme.mjs` | TAŞINABİLİR KATALOG PAKETİ — KOLON SÖZLEŞMESİ (REC-212, sözleşme v1'in açılan 8 kolonu) | URUN-KATALOG | modul: katalog-paket-uret · kaynak-eslemesi · paket-csv-dogrula | 2026-09-22 | scripts/icerik-hatti/__tests__/paket-sozlesme.test.ts | AKTIF |
+| `scripts/hijyen/kapali-dal-push.cjs` | KAPALI DALA PUSH BEKÇİSİ — `.githooks/pre-push` çağırır (INV-KAPALI-DAL-1) | ALTYAPI | `.githooks/pre-push` | 2026-09-22 | kapali-dal-push.test.ts | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -461,6 +462,7 @@ alanı) → AXIOM 2 gereği OPS'a yazıldı.
 | `.githooks/post-merge` | `doc-scope.cjs` süzgeciyle `orion doc single/schema/batch/tree` + arka planda `registry-sync.cjs` | ALTYAPI | `githook:post-merge` (shim) | 2026-09-05; `.git/orion-postmerge.log` son 2 satır "UYKU KIPI" (2026-09-06) | githooks-integrity.test.ts | KAL *(üretim tarafı UYKU KİPİNDE)* |
 | `.githooks/lib/doc-scope.cjs` | Companion kapsam süzgecinin TEK uygulaması (SSOT `.cc_docs.yaml`) | ALTYAPI | `require()` ← pre-commit YOK, post-commit + post-merge EVET | — | githooks-doc-scope.test.ts (INV-HOOKS-2) | KAL |
 | `.githooks/lib/companion-defter.cjs` | Companion üretim başarısızlıklarını görünür deftere yazar (REC-67) | ALTYAPI | `require()` ← post-commit | — | companion-defter.test.ts | KAL |
+| `.githooks/pre-push` | Birleşmiş ve açık PR'ı olmayan dala push'u REDDEDER (INV-KAPALI-DAL-1; #1305 dersi) | ALTYAPI | `githook:pre-push` (shim `.git/hooks/pre-push`) | 2026-09-22 (gerçek gh ile #1306 dalına push → RED ölçüldü) | kapali-dal-push.test.ts | KAL |
 
 **Not:** `.githooks/README.md` (SSOT gerekçe dokümanı) ve `src/__tests__/conformance/{githooks-integrity,githooks-doc-scope,hook-referential-stability}.test.ts` yukarıdaki satırların doküman/kapı bileşenidir, ayrı araç sayılmadı.
 

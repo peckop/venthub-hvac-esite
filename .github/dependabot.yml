@@ -84,8 +84,8 @@ updates:
       - dependency-name: 'eslint-config-next'
         update-types: ['version-update:semver-major']
 
-  # İş akışlarındaki aksiyonlar (actions/checkout@v4 …) — depo etiketle sabitliyor, SHA ile
-  # değil; bot en azından sürüm akışını görünür tutar.
+  # İş akışlarındaki aksiyonlar — 2026-09-22'den beri SHA + sürüm yorumuyla sabitli (#1307,
+  # cetvel §12, INV-AKSIYON-SHA-1); bot SHA'yı ve yorumu birlikte günceller.
   - package-ecosystem: github-actions
     directory: /
     schedule:

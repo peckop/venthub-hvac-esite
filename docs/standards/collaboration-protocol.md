@@ -155,6 +155,14 @@ ayrışma yalnız **sözle** mümkündü, mekanik değil.
 - Bir ajan **SADECE kendi işine** dokunur. Yalnız kendi dosyalarını stage'le/commit'le.
 - İki iş aynı anda = **iki AYRI dal**. Yığma yasak — hızlı producer controller'ı geçse bile her bağımsız iş master'dan taze dala (tangled mega-PR yok).
 - **Master'a yalnız o şeridin sahibi Controller**, kapı yeşilse merge eder.
+- ⛔**BİRLEŞMİŞ DAL ÖLÜDÜR — yeni iş yeni dal (2026-09-22, INV-KAPALI-DAL-1).** Squash-merge sonrası
+  ritüel uzak dalı siler; aynı ada sonradan yapılan push GitHub'da **sessizce** yeni dal açar, PR'ı
+  yoktur ve master'a hiç girmez (#1162 → #1305: 9 commit 12 gün kayboldu). `.githooks/pre-push`
+  açık PR'ı olmayan birleşmiş dala push'u **reddeder**; `gh`/ağ yoksa uyarıp geçirir. Doğrusu
+  `git switch -c <dal>-2`; bilinçli yeniden kullanım `VH_KAPALI_DAL_IZIN=1`.
+  **GitHub tarafı da kapalı (karar 69, Recep 2026-09-22):** depo ayarı `delete_branch_on_merge=true`
+  (ölçüldü: `gh api repos/peckop/venthub-hvac-esite --jq .delete_branch_on_merge` → `true`) — ritüel
+  dışı merge'lerde de dal silinir. Silinmiş dala push'u yine kanca yakalar; ayar tek başına yetmez.
 
 ---
 
