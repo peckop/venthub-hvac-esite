@@ -138,6 +138,12 @@ kilit `INV-PIM-UNOPIM-1`.
 **Veri bulgusu:** ailede aynı büyüklük iki alanda duruyor (`max_delivery_ls` ↔ `max_delivery_m3h`). UnoPim'in
 taban birime çevirisi bunu görünür kıldı: 260 m³/h → 0,072222 m³/s, 72,22 l/s → 0,07222 m³/s (yuvarlama
 farkı). Birim sistemi olan bir PIM'de tek alan yeter; ikincisi türetilir — URUN'un aile şablonu kararı.
+**✔KARAR VERİLDİ + UYGULANDI (2026-09-22, URUN; posta 3c512522):** debi PIM'de **tek alan `max_delivery_m3h`**;
+`max_delivery_ls` PIM'de yok, dışa aktarımda **round(m3h/3.6, 2)** ile türetilir (URUN'un ölçümü: canlı 375
+üründe l/s×3,6 ile m³/h %2'den fazla ayrışan 0 → l/s bağımsız bilgi değil). Yuvarlama ALTYAPI ölçümü: pilot
+12 satırda 2 ondalık **12/12**, tam sayı **0/12** (URUN'un "tam sayı" varsayımı düzeltildi). UnoPim'de öznitelik
+silindi, aile 22/22, yeniden içe alım 12 güncellendi; doğrulama 300 hücre (12'si türetilen l/s) **fark 0**.
+Betikte `TURETILMIS` tablosu, kilidi `INV-PIM-UNOPIM-1`.
 **Sırada:** §3.3 köprü (salt-okuma API anahtarı + `pim_golge`).
 
 ### 3.3 Aktarım köprüsü (UnoPim REST → gölge Supabase)

@@ -7,7 +7,9 @@ import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
 
 const require = createRequire(import.meta.url)
-const { csvUret, urunFarklari, OZNITELIKLER } = require('../../../scripts/pim/unopim.cjs') as {
+const { csvUret, urunFarklari, OZNITELIKLER, TURETILMIS } = require('../../../scripts/pim/unopim.cjs') as {
+  TURETILMIS: Record<string, (s: Record<string, unknown>) => number | undefined>
+
   csvUret: (u: unknown[]) => { csv: string; eksik: string[]; sutun: number }
   urunFarklari: (u: unknown, api: unknown) => string[]
   OZNITELIKLER: [string, string, string, string?, string?, string?][]
@@ -38,10 +40,12 @@ describe('INV-PIM-UNOPIM-1 CSV biçimi', () => {
     expect(sutunlar).toContain('variant_structure')
   })
 
-  it('23 öznitelik, 13 ölçülü → 10 sabit + 36 sütun', () => {
-    expect(OZNITELIKLER).toHaveLength(23)
-    expect(OZNITELIKLER.filter(([, t]) => t === 'measurement')).toHaveLength(13)
-    expect(sutun).toBe(46)
+  it('22 öznitelik, 12 ölçülü → 10 sabit + 34 sütun (debi TEK alan: max_delivery_ls PIM\'de YOK)', () => {
+    expect(OZNITELIKLER).toHaveLength(22)
+    expect(OZNITELIKLER.filter(([, t]) => t === 'measurement')).toHaveLength(12)
+    expect(OZNITELIKLER.some(([k]) => k === 'max_delivery_ls')).toBe(false)
+    expect(sutunlar).not.toContain('max_delivery_ls')
+    expect(sutun).toBe(44)
     expect(eksik).toEqual([])
   })
 
@@ -68,6 +72,14 @@ describe('INV-PIM-UNOPIM-1 geri okuma karşılaştırması', () => {
   }
   it('eşit değerler fark vermez; 4 ondalık saklanan sayı sayısal karşılaştırılır', () => {
     expect(urunFarklari({ sku: 'A', name: 'V', slug: 'vortice-test', specs: { weight_kg: 12.5, erp_compliant: true, motor_type: 'AC' } }, api)).toEqual([])
+  })
+  it('türetilen l/s = round(m3h/3.6, 2) — kaynakla eşitse fark yok, değilse yakalanır (tam sayı 0/12 ölçüldü)', () => {
+    expect(TURETILMIS.max_delivery_ls({ max_delivery_m3h: 380 })).toBe(105.56)
+    expect(TURETILMIS.max_delivery_ls({ max_delivery_m3h: 2890 })).toBe(802.78)
+    expect(TURETILMIS.max_delivery_ls({})).toBeUndefined()
+    const a = { values: { common: { url_key: 's', max_delivery_m3h: { amount: '380.0000' } }, channel_locale_specific: { default: { en_US: { name: 'V' } } } } }
+    expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 105.56 } }, a)).toEqual([])
+    expect(urunFarklari({ sku: 'A', name: 'V', slug: 's', specs: { max_delivery_m3h: 380, max_delivery_ls: 106 } }, a)).toHaveLength(1)
   })
   it('farklı sayı, eksik öznitelik ve farklı ad yakalanır', () => {
     const f = urunFarklari({ sku: 'A', name: 'W', slug: 'vortice-test', specs: { weight_kg: 12.6, has_timer: false } }, api)

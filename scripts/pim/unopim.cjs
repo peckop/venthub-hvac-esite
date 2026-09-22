@@ -24,7 +24,10 @@
  */
 const fs = require('node:fs')
 
-// [kod, tip, etiket, ölçü ailesi, birim, doğrulama] — vortice-lineo-quiet'in 23 anahtarı (canlı SELECT 09-22).
+// [kod, tip, etiket, ölçü ailesi, birim, doğrulama] — vortice-lineo-quiet'in 23 anahtarından 22'si (canlı SELECT 09-22).
+// ⭐DEBİ TEK ALAN (URUN hükmü 2026-09-22, posta 3c512522): PIM'de yalnız `max_delivery_m3h`. `max_delivery_ls`
+// bağımsız bilgi DEĞİL (canlı 375 üründe ls×3,6 ile m3h %2'den fazla ayrışan 0) → PIM'e girmez, dışa
+// aktarımda TURETILMIS ile üretilir. Çift alan tutulsaydı iki kaynak birbirinden kayardı.
 const OZNITELIKLER = [
   ['absorbed_current_a', 'measurement', 'Absorbed current', 'Intensity', 'AMPERE'],
   ['diameter_mm', 'measurement', 'Diameter', 'Length', 'MILLIMETER'],
@@ -35,7 +38,6 @@ const OZNITELIKLER = [
   ['insulation_class', 'text', 'Insulation class'],
   ['ip_rating', 'text', 'IP rating'],
   ['max_absorbed_power_w', 'measurement', 'Max absorbed power', 'Power', 'WATT'],
-  ['max_delivery_ls', 'measurement', 'Max delivery (l/s)', 'VolumeFlow', 'LITER_PER_SECOND'],
   ['max_delivery_m3h', 'measurement', 'Max delivery (m³/h)', 'VolumeFlow', 'CUBIC_METER_PER_HOUR'],
   ['max_static_pressure_pa', 'measurement', 'Max static pressure', 'Pressure', 'PASCAL'],
   ['motor_poles', 'text', 'Motor poles', null, null, 'number'],
@@ -50,6 +52,13 @@ const OZNITELIKLER = [
   ['voltage_v', 'measurement', 'Voltage', 'Voltage', 'VOLT'],
   ['weight_kg', 'measurement', 'Weight', 'Weight', 'KILOGRAM'],
 ]
+/**
+ * PIM'de tutulmayan, kaynaktan TÜRETİLEN alanlar. Yuvarlama ÖLÇÜLDÜ (2026-09-22): pilot 12 satırda
+ * kaynak l/s = round(m3h/3.6, 2) → 12/12 birebir; tam sayıya yuvarlama 0/12.
+ */
+const TURETILMIS = {
+  max_delivery_ls: (specs) => (typeof specs.max_delivery_m3h === 'number' ? Math.round((specs.max_delivery_m3h / 3.6) * 100) / 100 : undefined),
+}
 const GRUP = 'technical_specs'
 const AILE = 'vortice_lineo_quiet'
 
@@ -87,6 +96,13 @@ function urunFarklari(u, apiUrun) {
   if (u.name !== ad) fark.push(`${u.sku}.name: ${u.name} ≠ ${ad}`)
   if (u.slug !== c.url_key) fark.push(`${u.sku}.url_key: ${u.slug} ≠ ${c.url_key}`)
   for (const [k, v] of Object.entries(u.specs ?? {})) {
+    if (TURETILMIS[k]) {
+      // PIM'de yok: kaynak değer, PIM'deki tabandan türetilenle karşılaştırılır.
+      const kaynakSpecs = Object.fromEntries(Object.entries(c).map(([ak, av]) => [ak, typeof av === 'object' && av !== null ? Number(av.amount) : av]))
+      const t = TURETILMIS[k](kaynakSpecs)
+      if (!(typeof v === 'number' && Math.abs(t - v) <= 1e-9)) fark.push(`${u.sku}.${k} (türetilen): ${v} ≠ ${t}`)
+      continue
+    }
     const g = c[k]
     if (g === undefined) { fark.push(`${u.sku}.${k}: YOK`); continue }
     if (typeof v === 'number') {
@@ -172,6 +188,13 @@ async function aile(api) {
   const var_ = await api('GET', `families/${AILE}`)
   const r = var_.durum === 404 ? await api('POST', 'families', govde) : await api('PUT', `families/${AILE}`, govde)
   if (r.durum >= 300) { hata++; console.log('aile', kisa(r)) }
+  // Türetilen alan PIM'de öznitelik olarak DURMAZ (önceki kurulumdan kaldıysa silinir — pilot).
+  for (const kod of Object.keys(TURETILMIS)) {
+    if ((await api('GET', `attributes/${kod}`)).durum === 200) {
+      const s = await api('DELETE', `attributes/${kod}`)
+      console.log('turetilen oznitelik silindi', kod, kisa(s)); if (s.durum >= 300) hata++
+    }
+  }
   const son = await api('GET', `families/${AILE}`)
   const sayi = (son.json?.attribute_groups ?? []).find((x) => x.code === GRUP)?.custom_attributes?.length ?? 0
   console.log(`aile: hata=${hata}, teknik oznitelik ${sayi}/${OZNITELIKLER.length}`)
@@ -213,4 +236,4 @@ if (require.main === module) {
   main(process.argv.slice(2)).catch((e) => { console.error(String(e)); process.exitCode = 1 })
 }
 
-module.exports = { OZNITELIKLER, csvUret, urunFarklari, kacir }
+module.exports = { OZNITELIKLER, TURETILMIS, csvUret, urunFarklari, kacir }
