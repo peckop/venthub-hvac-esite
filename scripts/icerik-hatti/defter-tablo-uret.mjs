@@ -112,6 +112,16 @@ const dizindeVar = (kod) => {
   return dizinMetin.some(m => re.test(m))
 }
 const ARALIK = /\d\s*[-–/]\s*\d/
+// ⛔"KAYNAKTA YOK" BİR DEĞER DEĞİLDİR — ölçüldü ve düzeltildi (2026-09-10).
+// Defter, bulamadığı hücreye "Kaynağında yok" yazıyor (dürüst davranış). İlk ölçümüm o
+// metni aralık deseni taşımadığı için KESİN DEĞER saydı: JET ailesinde "141 kesin değer"
+// raporlandı, oysa hücrelerin neredeyse tamamı YOKLUK BEYANIYDI. Doluluğu sayarken
+// "bulunamadı" cevabını veri saymak, en kötü türden sahte doluluktur.
+const YOKLUK = /^(kayna[gğ]|source)|yok$|bulunamad|not (found|available)|^n\/?a$|^-+$/i
+const doluMu = (v) => {
+  const s = String(v || '').trim()
+  return s !== '' && !YOKLUK.test(s)
+}
 
 const hedefler = [...aileKaynak.keys()]
   .filter(a => !TEK_AILE || a === TEK_AILE)
@@ -126,9 +136,12 @@ for (const aile of hedefler) {
   if (TAVAN && sayac >= TAVAN) break
   const dosyaAd = aile.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 60)
   const hedefCsv = join(CIKTI, `${dosyaAd}.csv`)
-  if (existsSync(hedefCsv)) { console.log(`ATLANDI (zaten var): ${aile}`); continue }
+  // Zaten indirilmiş aile YENİDEN SORULMAZ (çağrı yavaş ve kotalı) ama ÖLÇÜLÜR:
+  // ölçüt değişince eski dosyaları yeniden indirmek gerekmesin diye. İlk yazımda
+  // burada `continue` vardı ve özet, düzeltilmiş ölçütle güncellenemiyordu.
+  const zatenVar = existsSync(hedefCsv)
 
-  const kaynaklar = [...aileKaynak.get(aile)]
+  const kaynaklar = zatenVar ? [] : [...aileKaynak.get(aile)]
   const soru = `"${aile}" ailesindeki TUM modeller: model adi, kod, hava debisi m3/h, ` +
     'statik basinc Pa, guc kW, gerilim V, faz, devir rpm, agirlik kg, IP sinifi. ' +
     'Her deger icin kaynak belge ve sayfa. Kaynakta olmayan degeri BOS birak, tahmin etme.'
@@ -138,11 +151,15 @@ for (const aile of hedefler) {
 
   const t0 = Date.now()
   try {
-    execFileSync('notebooklm', bayraklar, { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024, timeout: 450000 })
+    if (!zatenVar) execFileSync('notebooklm', bayraklar, { encoding: 'utf8', maxBuffer: 20 * 1024 * 1024, timeout: 450000 })
   } catch (e) {
     const m = String(e.message || e)
     // 429 = kota. Sessizce devam etmek, kalan aileleri de yakar; DURULUR ve sebep YAZILIR.
-    if (/429|rate limit|quota/i.test(m)) {
+    // ⛔DESEN ÖLÇÜLDÜ, VARSAYILMADI: ilk yazımda `rate limit` (boşluklu) arıyordum; CLI'nin
+    // gerçek metni `RateLimitError` (BOŞLUKSUZ). Kapı hiç tutmadı ve kota vurduktan sonra
+    // 20 aile daha boşuna denendi — her biri "hata" olarak kaydedildi, yani kotaya takılan
+    // aileler kalıcı başarısız gibi göründü. Boşluk opsiyonel: `rate.?limit`.
+    if (/429|rate.?limit|quota|too many requests/i.test(m)) {
       console.error(`\n⛔KOTA (429) — ${aile} çağrısında durduruldu. ${sayac} aile tamamlandı.`)
       break
     }
@@ -154,6 +171,7 @@ for (const aile of hedefler) {
 
   // İndirme: son artefakt geçici dizine iner, tek dosya olarak yeniden adlandırılır.
   const gecici = join(CIKTI, '_indir')
+  if (zatenVar) { /* dosya elde — indirme atlanır, ölçüme geçilir */ } else {
   rmSync(gecici, { recursive: true, force: true })
   mkdirSync(gecici, { recursive: true })
   try {
@@ -186,33 +204,35 @@ for (const aile of hedefler) {
   }
   renameSync(indirilen, hedefCsv)
   rmSync(gecici, { recursive: true, force: true })
+  }
 
   // ── ÖLÇÜM: kod dizinde var mı · hücre kesin mi aralık mı
   const satirlar = csvOku(hedefCsv, ',')
   const kodKolon = Object.keys(satirlar[0] || {}).find(k => /kod|code/i.test(k)) || 'kod'
-  const kodlar = satirlar.map(r => String(r[kodKolon] || '').trim()).filter(Boolean)
+  const kodlar = satirlar.map(r => String(r[kodKolon] || '').trim()).filter(doluMu)
   const eslesen = kodlar.filter(k => dizindeVar(k)).length
-  let kesin = 0, aralik = 0
+  let kesin = 0, aralik = 0, yokluk = 0
   const olcuKolon = Object.keys(satirlar[0] || {})
     .filter(k => /debi|basinc|guc|gerilim|devir|agirlik|ip/i.test(k))
   for (const r of satirlar) {
     for (const k of olcuKolon) {
       const v = String(r[k] || '').trim()
       if (!v) continue
+      if (!doluMu(v)) { yokluk++; continue }   // "Kaynağında yok" = veri DEĞİL
       if (ARALIK.test(v)) aralik++; else kesin++
     }
   }
   const sn = Math.round((Date.now() - t0) / 1000)
-  ozet.push({ aile, satir: satirlar.length, kod_eslesen: `${eslesen}/${kodlar.length}`,
-    kesin, aralik, not: `${sn} sn` })
-  console.log(`✓ ${aile} — ${satirlar.length} satır · kod ${eslesen}/${kodlar.length} dizinde · kesin ${kesin} / ARALIK ${aralik} · ${sn} sn`)
+  ozet.push({ aile, satir: satirlar.length, kod_eslesen: `${eslesen}/${kodlar.length || satirlar.length}`,
+    kesin, aralik, yokluk, not: `${sn} sn` })
+  console.log(`✓ ${aile} — ${satirlar.length} satır · kod ${eslesen}/${kodlar.length || satirlar.length} dizinde · kesin ${kesin} / ARALIK ${aralik} / "yok" ${yokluk} · ${sn} sn`)
   sayac++
   if (sayac % 5 === 0) console.log(`   … ${sayac} aile tamamlandı`)
 }
 
 // ── ÖZET
 const BOM = '﻿'
-const BAS = ['aile', 'satir', 'kod_eslesen', 'kesin', 'aralik', 'not']
+const BAS = ['aile', 'satir', 'kod_eslesen', 'kesin', 'aralik', 'yokluk', 'not']
 const hucre = (v) => {
   const s = String(v ?? '').replace(/\r?\n/g, ' ').trim()
   return (s.includes(';') || s.includes('"')) ? '"' + s.replace(/"/g, '""') + '"' : s
@@ -220,8 +240,9 @@ const hucre = (v) => {
 writeFileSync(join(CIKTI, '_ozet.csv'),
   BOM + [BAS.join(';'), ...ozet.map(r => BAS.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
 
-const t = ozet.reduce((a, r) => ({ satir: a.satir + r.satir, kesin: a.kesin + r.kesin, aralik: a.aralik + r.aralik }),
-  { satir: 0, kesin: 0, aralik: 0 })
-console.log(`\nÖZET: ${ozet.length} aile · ${t.satir} satır · kesin ${t.kesin} / ARALIK ${t.aralik}`)
+const t = ozet.reduce((a, r) => ({ satir: a.satir + r.satir, kesin: a.kesin + (r.kesin || 0),
+  aralik: a.aralik + (r.aralik || 0), yokluk: a.yokluk + (r.yokluk || 0) }),
+  { satir: 0, kesin: 0, aralik: 0, yokluk: 0 })
+console.log(`\nÖZET: ${ozet.length} aile · ${t.satir} satır · kesin ${t.kesin} / ARALIK ${t.aralik} / "kaynakta yok" ${t.yokluk}`)
 console.log(`  → ${CIKTI}/_ozet.csv`)
 console.log('⛔ARALIK hücre ürün değeri SAYILMAZ — aile aralığıdır; kesin değer yalnız dizin satırından.')
