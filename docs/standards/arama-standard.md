@@ -455,6 +455,34 @@ her madde tek tek işaretlenir:
 10. **Sıra da ölçüldü mü, yalnız sayı değil?** Sonuç kümesi doğru olup ilk 20 yanlış olabilir
     (K3.1e). Arayüz kaç satır gösteriyorsa guard o kadarının içeriğine bakar.
 
+## 14. İstemci ön hazırlığı (ilk arama)
+
+Bu bölüm veritabanını değil **tarayıcıyı** yönetir: arama penceresi açılmadan önce ne hazırlanır.
+Kapı: **INV-ARAMA-ONHAZIRLIK-1** (`src/components/__tests__/aramaOnHazirlik.test.ts`). Uygulama:
+`src/components/aramaOnHazirlik.ts`.
+
+**K14.1 — İlk aramanın iki geç parçası vardır, ikisi de önceden iner.** Arama penceresi
+`dynamic(..., { ssr: false })` ile ilk tıklamada iner; arama servisi ise pencerenin içinde ilk
+aramada ayrıca iner. İkisi birlikte ~15 kB (gzip, 2026-09-22 üretim paketinde ölçüldü). Sayfa
+yüklendikten sonra **boşta** (`requestIdleCallback`, yoksa 2 sn) ve kullanıcı arama kutusuna
+**yöneldiğinde** (fare üstünde / odak / dokunuş) indirilir.
+
+**K14.2 — Ön yükleme, tıklamanın indirdiği modülle AYNI belirteci kullanır.** Belirteç ayrışırsa
+ön yükleme başka bir dosyayı ısıtır, ilk tıklama yine soğuk kalır ve hiçbir ölçüm bunu göstermez.
+Kapının (a) kolu bunu tutar; SearchOverlay'deki geç yükleme yolu değişirse kapı kırmızı yanar.
+
+**K14.3 — Veritabanı bağlantısı yalnız YÖNELİMDE açılır, boşta açılmaz.** Tarayıcı kullanılmayan
+ön bağlantıyı kısa sürede kapatır; sayfa yüklenirken açılan bağlantı arama anına kalmaz.
+`preconnect` kaynağı `NEXT_PUBLIC_SUPABASE_URL`'nin kökenidir, havuz `anonymous`'tır (supabase-js
+kimlik bilgisi taşımayan CORS isteği yapar; yanlış havuza açılan bağlantı kullanılmaz).
+
+**K14.4 — Ön hazırlık hiçbir yolu kırmaz.** Veritabanına istek ÜRETMEZ. İndirme düşerse bayrak geri
+alınır, bir sonraki yönelim yeniden dener; tıklama zaten kendi indirmesini yapar.
+
+**K14.5 — Bu bölüm aralıklı sunucu gecikmesini ÇÖZMEZ.** 2026-09-22 ölçümünde (temiz tarayıcı ×6)
+ikinci aramada da 1,6 sn'lik bir uç görüldü — o anda istemci tarafı tamamen ısınmıştı. Aralıklı
+uzun bekleme sunucu/veritabanı tarafındadır; ayrı ölçülür, bu bölümün başarı ölçütü değildir.
+
 ---
 
 ## Ek: bu cetvelin kendi ölçüm tabanı
