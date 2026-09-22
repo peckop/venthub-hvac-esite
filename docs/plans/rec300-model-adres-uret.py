@@ -39,22 +39,23 @@ TIP = {
     # Dal saf değil (SEAT + JET + STORM, plan v1 §2.5): gövde tipi iddia edilmez, yalnız korozyon.
     'acid-resistant-fans': ('korozyon dayanimli fan', 'corrosion resistant fan', FAN_RAD, []),
     'duct-fans': ('kanal tipi fan', 'inline duct fan', FAN_KAN, []),
-    'bathroom-toilet-fans': ('banyo fani', 'bathroom fan', FAN_KAN, []),
+    # Tip kelimeleri rakip taramasıyla düzeltildi: rec300-rakip-slug-taramasi-2026-09-22.md
+    'bathroom-toilet-fans': ('banyo aspiratoru', 'bathroom fan', FAN_KAN, []),
     'roof-fans': ('cati tipi fan', 'roof fan', FAN_KAN, []),
     'axial-industrial-fans': ('aksiyel fan', 'axial fan', ['cap', 'debi', 'basinc'], []),
     'smoke-exhaust-fans': ('duman egzoz fani', 'smoke exhaust fan', ['cap', 'debi'], []),
     'industrial-ceiling-fans': ('endustriyel tavan vantilatoru', 'industrial ceiling fan', ['cap', 'debi'], []),
     'chimney-fans': ('baca fani', 'chimney fan', ['cap', 'debi'], ['somine ve baca fani']),
-    'frequency-converters': ('frekans konvertoru', 'frequency converter', ['guc_kw', 'gerilim', 'faz'], ['frekans konvertoru']),
+    'frequency-converters': ('frekans invertoru', 'frequency converter', ['guc_kw', 'gerilim', 'faz'], ['frekans konvertoru']),
     'speed-controllers': ('hiz anahtari', 'speed controller', [], ['hiz anahtari']),
-    'ambient-air-curtains': ('ortam havali hava perdesi', 'ambient air curtain', ['uzunluk'], []),
-    'electric-heated-air-curtains': ('elektrikli isitmali hava perdesi', 'electric heated air curtain', ['uzunluk'], []),
+    'ambient-air-curtains': ('isiticisiz hava perdesi', 'ambient air curtain', ['uzunluk'], []),
+    'electric-heated-air-curtains': ('elektrikli isiticili hava perdesi', 'electric heated air curtain', ['uzunluk'], []),
     'air-curtains': ('hava perdesi', 'air curtain', ['uzunluk'], []),
     'ducted-central-hrv': ('isi geri kazanim cihazi', 'heat recovery unit', ['debi'], ['isi geri kazanim cihazi']),
-    'single-room-hrv': ('tek oda isi geri kazanim cihazi', 'single room heat recovery unit', ['debi'], []),
+    'single-room-hrv': ('oda tipi isi geri kazanim cihazi', 'single room heat recovery unit', ['debi'], []),
     'dehumidifiers': ('nem alma cihazi', 'dehumidifier', ['nem', 'guc_kw'], []),
-    'electric-duct-heaters': ('elektrikli kanal isiticisi', 'electric duct heater', ['isitma_kw', 'debi'], ['elektrikli isitici']),
-    'water-coil-duct-heaters': ('sulu batarya', 'water coil', ['isitma_kw', 'debi'], ['sulu batarya', 'kanal tipi']),
+    'electric-duct-heaters': ('kanal tipi elektrikli isitici', 'electric duct heater', ['isitma_kw', 'debi'], ['elektrikli isitici']),
+    'water-coil-duct-heaters': ('kanal tipi sulu isitici batarya', 'duct water coil', ['isitma_kw', 'debi'], ['sulu batarya', 'kanal tipi']),
     'spare-parts-sensors': ('yedek parca', 'spare part', [], []),
     'shelter-ventilation': ('siginak havalandirma unitesi', 'shelter ventilation unit', ['debi', 'guc_w'], []),
 }
@@ -62,7 +63,7 @@ TIP = {
 # dal başına anlamlı kısa ad. Verilmeyen dal için tip olduğu gibi kalır.
 KISA = {
     'acid-resistant-fans': ('korozyon dayanimli fan', 'corrosion resistant fan'),
-    'bathroom-toilet-fans': ('banyo fani', 'bathroom fan'),
+    'bathroom-toilet-fans': ('banyo aspiratoru', 'bathroom fan'),
     'smoke-exhaust-fans': ('duman egzoz fani', 'smoke exhaust fan'),
     'industrial-ceiling-fans': ('tavan vantilatoru', 'ceiling fan'),
     'ambient-air-curtains': ('hava perdesi', 'air curtain'),
@@ -70,7 +71,8 @@ KISA = {
     'ducted-central-hrv': ('isi geri kazanim', 'heat recovery'),
     'single-room-hrv': ('isi geri kazanim', 'heat recovery'),
     'shelter-ventilation': ('siginak unitesi', 'shelter unit'),
-    'electric-duct-heaters': ('kanal isiticisi', 'duct heater'),
+    'electric-duct-heaters': ('elektrikli isitici', 'duct heater'),
+    'water-coil-duct-heaters': ('sulu batarya', 'water coil'),
     'centrifugal-fans': ('radyal fan', 'centrifugal fan'),
     'cabinet-fans': ('hucreli aspirator', 'cabinet fan'),
     'duct-fans': ('kanal fani', 'duct fan'),
@@ -177,7 +179,10 @@ def uret(marka, model, tip, kisa, degerler, notlar):
     while asti(s) and secili:                              # sıra: 3. değer → 2. değer → …
         secili.pop(); notlar.add('deger-dustu')
         s = birlestir(secili, tip_s)
-    if asti(s) and kisa_s != tip_s:                        # … → tipin sıfatları
+    # … → tipin sıfatları. SAPMA (2026-09-22): tip yalnız 70 KARAKTER aşılınca kısalır; 10 kelime
+    # sınırı için kısalmaz — rakip taraması aranan kelimenin tam tip olduğunu gösterdi
+    # ("elektrikli ısıtıcılı hava perdesi", "oda tipi ısı geri kazanım"); kısaltmak onu siliyordu.
+    if len(s) > 70 and kisa_s != tip_s:
         s = birlestir(secili, kisa_s); notlar.add('tip-kisaldi')
     # Model adı kısaltılmaz (Recep 11-09: "kısaltma istemiyorum"); aşım işaretlenir, kırpılmaz.
     if len(s) > 70:
