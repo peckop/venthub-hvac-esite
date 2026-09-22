@@ -67,6 +67,28 @@ describe('üretici fark tablosu', () => {
     expect(readFileSync(join(kok, 'fark.csv'), 'utf8')).not.toMatch(/en yüksek debi/)
   })
 
+  it('rapor TÜM ürünleri marka → aile altında listeler; karşılaştırılamayanın NEDENİ yazılır; bayt-eşit', () => {
+    const veri = join(kok, 'rapor-urunler.json')
+    writeFileSync(veri, JSON.stringify([
+      { sku: 'AVE-NX313290', name: 'NIMAX 314 T2 1,5kW', brand: 'AVenS', family_slug: 'avens-nimax', deleted_at: null, technical_specs: {} },
+      { sku: 'AVE-1200', name: 'AVENS 40x20', brand: 'AVenS', family_slug: 'avens-dikdortgen-kanal-radyal', deleted_at: null, technical_specs: null },
+      { sku: 'VRT-1', name: 'Vortice Punto', brand: 'Vortice', family_slug: 'vortice-punto', deleted_at: null, technical_specs: null },
+    ]))
+    const dizin = yaz('rapor', [sayfa(CASALS, casalsMetni), sayfa(AVENS, '', avensTablo)])
+    const kosR = (ad: string) => spawnSync(process.execPath, [BETIK, '--dizin', dizin, '--veri', veri,
+      '--rapor', join(kok, ad), '--tarih', '2026-01-01'], { encoding: 'utf8' })
+    expect(kosR('r1.md').status).toBe(0)
+    expect(kosR('r2.md').status).toBe(0)
+    const r = readFileSync(join(kok, 'r1.md'), 'utf8')
+    expect(r).toBe(readFileSync(join(kok, 'r2.md'), 'utf8'))
+    expect(r.indexOf('## AVenS')).toBeLessThan(r.indexOf('## Vortice'))
+    expect(r).toMatch(/### avens-nimax — 1 ürün[\s\S]*\| en yüksek debi \| 5240 m³\/h \| 5500 m³\/h \|.*\*\*üretici\*\*/)
+    expect(r).toMatch(/web'de föy yok — AVenS'ten istendi \(1\): AVE-1200/)
+    expect(r).toMatch(/belgesi henüz okunmadı \(1\): VRT-1/)
+    expect(r).toMatch(/\| Katalogdaki ürün \| 3 \|/)
+    expect(r).not.toMatch(/1818/)
+  })
+
   it('girdi yoksa ÖLÇÜLEMEDİ (2)', () => {
     expect(kos(join(kok, 'yok.jsonl'), join(kok, 'urunler.json')).status).toBe(2)
     expect(kos(yaz('x', [sayfa(CASALS, casalsMetni)]), null).status).toBe(2)

@@ -22,9 +22,9 @@ const kesin = Number(kesinStr), turTavani = Math.floor(kesin/BOY)+2
 let out=[], from=0, tur=0
 for(;;){
   if(++tur > turTavani){ console.error(`DONGU TAVANI asildi: ${tur} tur, beklenen en cok ${turTavani}`); process.exit(1) }
-  const r = await fetch(`${U}/rest/v1/products?select=slug,sku,name,deleted_at,family_id,tenant_id,technical_specs&order=slug`,{headers:{...h,Range:`${from}-${from+BOY-1}`}})
+  const r = await fetch(`${U}/rest/v1/products?select=slug,sku,name,brand,deleted_at,family_id,tenant_id,technical_specs&order=slug`,{headers:{...h,Range:`${from}-${from+BOY-1}`}})
   const j = await r.json(); if(!j.length) break
-  out = out.concat(j.map(p=>({slug:p.slug, sku:p.sku, name:p.name, deleted_at:p.deleted_at, family_slug:famMap[p.family_id]||null, tenant_id:p.tenant_id, technical_specs:p.technical_specs})))
+  out = out.concat(j.map(p=>({slug:p.slug, sku:p.sku, name:p.name, brand:p.brand, deleted_at:p.deleted_at, family_slug:famMap[p.family_id]||null, tenant_id:p.tenant_id, technical_specs:p.technical_specs})))
   if(j.length<BOY) break; from+=BOY
 }
 if(out.length !== kesin){ console.error(`EKSIK VERI: cekilen ${out.length}, sunucu ${kesin} — cikti uretilmedi`); process.exit(1) }
