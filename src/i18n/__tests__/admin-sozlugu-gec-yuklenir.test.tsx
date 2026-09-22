@@ -18,6 +18,14 @@ import { I18nProvider, useI18n } from '@/i18n/I18nProvider'
  * DEĞİL. Tarayıcı ölçümü ayrı bir adım ve raporda ayrı yazılır.
  */
 
+/**
+ * Sözlüğün gelmesi için bekleme. `waitFor` varsayılanı 1 sn; admin sözlüğü büyük bir modül ve
+ * tam takımın yükü altında dinamik import 1 sn'yi aşabiliyor — 2026-09-22'de tam koşumda EN kolu
+ * bu yüzden düştü, tek başına koşumda geçti (dal ve master'da ayrı ayrı ölçüldü). Test HIZI
+ * değil GELİŞİ ölçer; süre gevşetmek iddiayı değiştirmez.
+ */
+const SOZLUK_BEKLEME = { timeout: 10_000 }
+
 function AdminYazisi() {
   const { t } = useI18n()
   return <div data-testid="yazi">{t('admin.common.yes')}</div>
@@ -38,7 +46,7 @@ describe('INV-ADMIN-SOZLUK-3 · admin sözlüğü geç yüklenir ama tam gelir',
     expect(screen.queryByTestId('yazi')).toBeNull()
 
     // 2. AN: dinamik import çözülür → çocuk çizilir ve admin yazısı GERÇEK karşılığıyla gelir
-    await waitFor(() => expect(screen.getByTestId('yazi')).toBeTruthy())
+    await waitFor(() => expect(screen.getByTestId('yazi')).toBeTruthy(), SOZLUK_BEKLEME)
     expect(screen.getByTestId('yazi').textContent).toBe('Evet')
   })
 
@@ -50,7 +58,7 @@ describe('INV-ADMIN-SOZLUK-3 · admin sözlüğü geç yüklenir ama tam gelir',
         </AdminSozlukKapisi>
       </I18nProvider>
     )
-    await waitFor(() => expect(screen.getByTestId('yazi')).toBeTruthy())
+    await waitFor(() => expect(screen.getByTestId('yazi')).toBeTruthy(), SOZLUK_BEKLEME)
     expect(screen.getByTestId('yazi').textContent).toBe('Yes')
   })
 
