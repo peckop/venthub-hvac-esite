@@ -236,4 +236,33 @@ if (require.main === module) {
   main(process.argv.slice(2)).catch((e) => { console.error(String(e)); process.exitCode = 1 })
 }
 
-module.exports = { OZNITELIKLER, TURETILMIS, csvUret, urunFarklari, kacir }
+/**
+ * Saf: UnoPim API ürününü gölgedeki `technical_specs` biçimine GERİ çevirir (§3.3 köprüsü).
+ * Tip OZNITELIKLER'den gelir: ölçülü → Number(amount), boolean → true/false, sayı doğrulamalı metin → Number,
+ * düz metin → string. TURETILMIS alanlar eklenir. Tanımsız öznitelik ÇIKTIYA GİRMEZ ve `bilinmeyen`de döner
+ * (sessiz düşme değil — köprü raporlar).
+ */
+function specsCevir(apiUrun, oznitelikler = OZNITELIKLER) {
+  const c = apiUrun?.values?.common ?? {}
+  const tip = new Map(oznitelikler.map(([kod, t, , , , dogrulama]) => [kod, { t, dogrulama }]))
+  const specs = {}
+  const bilinmeyen = []
+  for (const [k, v] of Object.entries(c)) {
+    if (k === 'sku' || k === 'url_key') continue
+    const o = tip.get(k)
+    if (!o) { bilinmeyen.push(k); continue }
+    if (v === null || v === undefined || v === '') continue
+    if (o.t === 'measurement') specs[k] = Number(v.amount)
+    else if (o.t === 'boolean') specs[k] = v === true || v === 'true' || v === '1' || v === 1
+    else if (o.dogrulama === 'number') specs[k] = Number(v)
+    else specs[k] = String(v)
+  }
+  for (const [k, f] of Object.entries(TURETILMIS)) {
+    const t = f(specs)
+    if (t !== undefined) specs[k] = t
+  }
+  const sirali = Object.fromEntries(Object.keys(specs).sort().map((k) => [k, specs[k]]))
+  return { specs: sirali, bilinmeyen }
+}
+
+module.exports = { OZNITELIKLER, TURETILMIS, csvUret, urunFarklari, kacir, specsCevir, istemci }
