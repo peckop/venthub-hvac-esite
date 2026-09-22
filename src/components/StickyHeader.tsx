@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useCallback,useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback,useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { YENI_KABUK_GEZINMESI } from '../config/features'
 import { useCategories } from '../contexts/CategoryContext'
@@ -20,7 +20,7 @@ import { trackEvent } from '../utils/analytics'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { localizedHref } from '../utils/routes'
-import { aramaNiyeti, aramaParcalariniOnYukle } from './aramaOnHazirlik'
+import { aramaNiyeti, aramaParcalariniOnYukle, hazirAramaPenceresi, hazirPencereAbone } from './aramaOnHazirlik'
 import LanguageSwitcher from './LanguageSwitcher'
 import HeaderTeklifPaneli from './navigation/HeaderTeklifPaneli'
 import NavActionButton from './navigation/NavActionButton'
@@ -137,6 +137,9 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [isScrolled])
+
+  // Sunucuda daima null (pencere yalnız tıklamadan sonra, istemcide çizilir).
+  const HazirAramaPenceresi = useSyncExternalStore(hazirPencereAbone, hazirAramaPenceresi, () => null)
 
   // Arama parçaları sayfa yüklendikten sonra BOŞTA iner (~15 kB gzip): "/" kısayolu ve fare
   // üstüne gelmeden tıklama da hazır pencereye düşer. Sayfanın kendi yüklemesiyle yarışmaz.
@@ -362,11 +365,15 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
           </>
         }
       />
-      {isSearchOverlayOpen && (
+      {isSearchOverlayOpen && (HazirAramaPenceresi ? (
+        // Önceden inmiş pencere doğrudan çizilir: tembel yolun askısı ve React'in 300 ms'lik
+        // gösterim ertelemesi olmaz (arama cetveli K14.6).
+        <HazirAramaPenceresi open={isSearchOverlayOpen} onClose={closeSearchOverlay} />
+      ) : (
         <React.Suspense fallback={<SearchOverlaySkeleton />}>
           <SearchOverlay open={isSearchOverlayOpen} onClose={closeSearchOverlay} />
         </React.Suspense>
-      )}
+      ))}
       {isMenuOpen && (
         <React.Suspense fallback={<MegaMenuSkeleton />}>
           <MegaMenu isOpen={isMenuOpen} onClose={closeMenu} />
