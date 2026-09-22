@@ -234,10 +234,13 @@ diye kırmızı verdi — kapanan kayıt listede kalamaz; üç satır silindi, t
 şartı "Sentry 10.x" yazıyordu, gerçekte daha erken geldi: şart **yeterli** koşuldu, **gerekli**
 değil. Bu yüzden kabul listesi elle değil ölçümle temizlenir.
 
+⭐**2026-09-22 — İKİNCİ KAPANIŞ, yine bot eliyle:** `kucuk-ve-yama` grubu (#1315, 33 güncelleme)
+browserslist zincirini tazeledi; denetim `GHSA-c83g-rgw3-j3cx` ve `GHSA-73wf-gq98-2v4g` için
+"BAYAT KABUL" dedi (CI: yüksek/kritik 6, kabul 8, yeni 0). İki satır silindi, tavan 8 → 6.
+Kalan altısının hepsi `fast-uri` (webpack şema zinciri).
+
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
-| `GHSA-c83g-rgw3-j3cx` | browserslist | high | 2026-09-21 | derleme aracı; girdi bizim `browserslist` yapılandırmamız | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-73wf-gq98-2v4g` | browserslist | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
 | `GHSA-v2hh-gcrm-f6hx` | fast-uri | high | 2026-09-21 | webpack yapılandırma şeması ayrıştırır, kullanıcı URL'i değil | `@sentry/nextjs` 10.x (karar 17) |
 | `GHSA-7p8r-x3mc-p8w7` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
 | `GHSA-f65p-4m7j-42xc` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
