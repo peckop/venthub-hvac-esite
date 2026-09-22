@@ -112,7 +112,7 @@ serve(async (req) => {
     const branding = await getTenantBranding(tenantId)
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
-    let emailFrom = branding.emailFrom
+    const emailFrom = branding.emailFrom
     const testMode = (Deno.env.get('EMAIL_TEST_MODE') || '').toLowerCase() === 'true'
     const testTo = Deno.env.get('EMAIL_TEST_TO') || 'delivered@resend.dev'
     const bccList = (Deno.env.get('SHIP_EMAIL_BCC') || '').split(',').map(s=>s.trim()).filter(Boolean)
@@ -215,14 +215,35 @@ serve(async (req) => {
       })
     }
 
-    let resp = await send()
+    // REC-368: gönderici doğrulanmamışsa Resend DENEME göndericisine (onboarding@resend.dev)
+    // SESSİZCE DÜŞÜLMEZ. Deneme göndericisi yalnız Resend hesap sahibine teslim eder: sahibin kendi
+    // adresiyle yapılan denemede e-posta gider ve her şey çalışıyor GÖRÜNÜR, aynı anda müşteriye
+    // hiçbir e-posta gitmez. Hata görünür olmalı: kayıt + hata izleme + 5xx (çağıran
+    // order-paid-webhook deftere `failed` yazar ve pg_net tekrar dener; sipariş geri alınmaz).
+    const resp = await send()
     if (!resp.ok) {
       const txt = await resp.text().catch(()=> '')
-      if (txt.toLowerCase().includes('domain') && txt.toLowerCase().includes('verify')) {
-        emailFrom = 'VentHub Test <onboarding@resend.dev>'
-        resp = await send()
+      const low = txt.toLowerCase()
+      const reason = (low.includes('domain') && low.includes('verify')) || low.includes('from address')
+        ? 'sender_unverified' : 'provider_error'
+      try {
+        await sentryCaptureException(new Error(`order-confirmation send failed (${reason}, ${resp.status})`), { fn: 'order-confirmation', tenant_id: tenantId })
+      } catch { /* izleme düşse bile kayıt ve yanıt aşağıda */ }
+      const denetim = await fetch(`${supabaseUrl}/rest/v1/admin_audit_log`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${serviceKey}`, apikey: serviceKey, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          table_name: 'venthub_orders',
+          row_pk: order_id,
+          action: 'email_send_failed',
+          after: { kind: 'order_confirmation', reason, provider_status: resp.status, provider_error: txt.slice(0, 500) },
+          tenant_id: tenantId,
+        }),
+      }).catch(() => null)
+      if (!denetim || !denetim.ok) {
+        console.error('[order-confirmation] admin_audit_log yazilamadi', { order_id, reason })
       }
-      if (!resp.ok) return new Response(JSON.stringify({ error: 'send_failed', body: txt }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ error: 'send_failed', reason, provider_status: resp.status, body: txt.slice(0, 500) }), { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
     const result = await resp.json().catch(()=> ({}))
 
