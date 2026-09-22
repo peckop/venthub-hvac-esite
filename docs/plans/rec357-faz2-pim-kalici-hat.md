@@ -1,10 +1,11 @@
-# REC-357 Faz 2 — PIM'i kataloğun kalıcı hattı yapmak (PLAN TASLAĞI — challenger bekliyor)
+# REC-357 Faz 2 — PIM'i kataloğun kalıcı hattı yapmak (PLAN — challenger: §6 BLOK, gölge KOŞULLU)
 
 > **KARAR 36 = EVET** (Recep, ALTYAPI penceresinde birinci ağızdan, 2026-09-22: *"36 için evet"*). Gerekçesi:
 > *"elle tutulur bir katalog altyapımız yok; ürün verisi güncellemesi pratik olsun; resim eşleştirmeleri dahil;
 > AI modelleriyle bu işi bir PIM uygulamasıyla yönetmek daha doğru."* ALTYAPI hükmü: evet, iki şartla — (1) §7
 > yedek + başka makinede geri kurma ölçümü her şeyden önce; (2) 73 boş ürünün doldurulması PIM'den bağımsız ilk iş.
-> **Sıradaki adım:** plan-challenger (ZORUNLU — veri göçü) → uygulama. §9 (PIM'siz yol) kıyas kaydı olarak kalır.
+> **Sıradaki adım:** challenger koştu (§12). Gölge adımları (§7 → §1 → §5) koşullu serbest; §6 yazma kolu §12'deki
+> beş koşul kapanmadan AÇILMAZ. §9 kıyas kaydı olarak kalır ama karar dayanağı DEĞİL (challenger 2.9).
 >
 > **MODEL (değişmez):** canlı sitenin veritabanı **Supabase kalır**. UnoPim = ürün verisinin düzenlendiği **yerel
 > çalışma tezgâhı** (Docker, bu makine), sunucu DB'si değil. Köprü **PIM → Supabase tek yönlü, tek yazıcı**.
@@ -115,7 +116,7 @@ sistemimizde yazılırsa — **tahmin, ölçüm değil** (kıyasa yalnız gün c
 ## 10 · Sıra (karar "evet" olursa)
 
 §7 yedek (önce — veri kaybı riski olan hiçbir adım yedeksiz başlamaz) → §1 tam yükleme (gölge) → §2 → §4 → §3 →
-§5 kapısı → gölgede 2 hafta fark 0 → §6 Recep kapısı. §8 paralel ölçüm.
+§5 kapısı → gölgede 2 hafta fark 0 → §12 beş koşul → §6 Recep kapısı. §8 paralel ölçüm.
 
 ## 11 · Riskler (challenger için)
 
@@ -124,3 +125,25 @@ sistemimizde yazılırsa — **tahmin, ölçüm değil** (kıyasa yalnız gün c
 3. UnoPim tuzakları (ölçülmüş): `status=1 → false`; silinen öznitelik değeri kalıyor; yanlış CSV başlığı tüm dosyayı
    reddediyor; imports/ izinleri (www-data). Her biri üreticide kapı olmalı.
 4. Üçüncü taraf sürüm: UnoPim 3.1.1 sabit; yükseltme ayrı karar (bağımlılık kayıt defteri).
+
+## 12 · Plan-challenger sonucu (2026-09-22, bağımsız alt ajan) — **§6 BLOK · gölge KOŞULLU**
+
+Denetçi planı yazan bağlamdan ayrı koştu (kod + şema + migration + tetik + cetvel okuması). Bulgular ve plana etkisi:
+
+| # | bulgu | risk | kanıt | plana etkisi |
+|---|---|---|---|---|
+| 2.1 | **Tek yazıcı bugün yanlış:** admin ürün formu `name` / `category_id` / `technical_specs` / `description_i18n`'i ticari alanlarla AYNI UPDATE'te yazıyor; CSV içe alımı SKU ile tüm kolonları upsert ediyor; kategori tablosu ve kategori kurucusu ad/slug/üst kategori yazıyor | Kritik | `src/components/admin/products/ProductFormModal.tsx`, `ProductCsvImport.tsx`, `src/views/admin/CategoriesTableBody.tsx`, `CategoryBuilderView.tsx` | §6 öncesi iş kalemi: dört yol PIM kolonlarında salt-okumaya iner (URUN) + AST conformance |
+| 2.2 | "Köprü dışı yazım = kırmızı" kapısı ölçemez: denetim tetiği service_role'de `actor` NULL yazıyor; köprü ile başka betik ayırt edilemez | Yüksek | `supabase/migrations/20260909071451_denetim_izi_dml_tetikleri.sql` | köprüye ayrı DB rolü ya da claim'li jeton → **migration, kural 13, ayrı PR** |
+| 2.3 | Kiracı sessiz: köprünün anahtarı, `tenant_id` kaynağı, RLS tavrı yazılmamış; "kiracıya özel açıklama" kolonu şemada YOK (tek açıklama `description_i18n`, o da PIM'in) | Yüksek | `products.tenant_id` NOT NULL; `scripts/kademe2-load/load.mjs` sabit TENANT_ID | kiracı kararı yazılır; kiracı açıklaması ya ayrı kolon (migration) ya kapsam dışı |
+| 2.4 | "Aile" iki şey: VentHub `product_families` (seri kimliği, PDP adresi) ≠ UnoPim attribute family; sahiplik listesinde `product_families`, `brands`, `name_i18n`, `slug`, `model_code` yok | Yüksek | `src/lib/services/family.service.ts` | sahiplik tablosu kolon bazında, beş tablo |
+| 2.5 | Kimlik: yeni ürünün SKU'su PIM'de elle girilir, `kimlik-kurali.mjs` PIM girişinde zorlanmıyor; ad değişikliği ↔ sipariş snapshot'ı/slug politikası yok; köprü adı yalnız `en_US`'den okuyor | Yüksek | `scripts/pim/unopim-kopru.cjs` | SKU kimlik kuralıyla üretilir, slug dondurulur, TR/EN ad ayrı okunur |
+| 2.6 | Tazelenme: webhook dalları var (08-15 fiyat vakası bu tablolarda tekrarlanmaz) ama keşif önbelleği `name` / `technical_specs` değişince tazelenmiyor (ÖLÇÜLMEDİ); tam senkron ~1600 webhook; aynı yola yazılan görsel CDN'de bayat kalır | Orta | `src/app/api/webhook/supabase/route.ts` | ölçüm + toplu tazeleme + içerik-hash'li görsel adı |
+| 2.7 | Denetim zaten satır tetikleriyle otomatik ve fail-closed (denetim satırı yazılamazsa köprü yazımı geri alınır); "migration gerekmez" iddiası 2.2 ve 2.3 ile çelişiyor | Orta | aynı migration | "her toplu yazım bir satır" maddesi düşer; migration ihtiyacı açıkça yazılır |
+| 2.8 | Yedekte `.env` / `APP_KEY` / API istemci sırları / compose dosyası yok; kabul edilen kayıp penceresi (RPO) tanımsız — köprüden geçmemiş PIM düzenlemesi yalnız bu makinede yaşar | Orta | §7 | §7'ye eklenir; geri kurma ölçümü §1'den ÖNCE koşulur |
+| 2.9 | §9 maliyeti dayanaksız: 2.1–2.5 işleri PIM sütununda yok, bakım gün olarak girilmemiş | Orta | §9 | §9 karar dayanağı değil; yeniden hesaplanır |
+
+**§6'yı açma koşulları (beşi birden):** (1) `docs/standards/pim-hatti-standard.md` kolon bazında sahiplik tablosuyla yazıldı
+ve conformance'a bağlandı; (2) dört admin yazma yolu PIM kolonlarında salt-okuma (URUN); (3) köprü rolü migration'ı Recep
+onayıyla indi; (4) kiracı kararı yazılı; (5) kimlik/slug/ad politikası köprüde uygulanıyor.
+**Gölge için koşul:** 2.8'deki yedek eksikleri + geri kurma ölçümü önce. Denetçinin ölçmediği iki şey (keşif önbelleğinin
+kart/filtrede ad-özellik kullanımı; temiz makinede `APP_KEY`'li geri yükleme) ALTYAPI'nın sıradaki ölçümleridir.
