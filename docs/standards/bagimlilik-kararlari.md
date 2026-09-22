@@ -72,13 +72,13 @@ kurulur**; ondan sonra yalnız azalır. Bu bir gevşetme değil, ilk sayımın d
 
 | paket | aralık | tarih | durum | gerekçe |
 |---|---|---|---|---|
-| next | 15.5.24 | 2026-09-13 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. |
+| next | 15.5.25 | 2026-09-22 | KARAR | REC-323 (commit `193db1437`): 15.5.24 yükseltmesi iki CRITICAL kaydı kapattı. Sabit pin, çünkü Next ana/ara sürümü App Router ve derleme davranışını değiştiriyor; yükseltme kendi başına bir iş olarak ölçülür. 15.5.25 = aynı ara sürümde yama (bot #1293; dependabot ana sürüm ignore'u Next 16'yı doğru tuttu), CI + URUN vitrin teyidiyle alındı. |
 | react | ~19.2.8 | 2026-09-21 | KARAR | Tam pin 19.0.0 gevşetildi ama ÜST SINIRLI: `@react-three/fiber` 9.5.0 (son kararlı) peer `react: '>=19 <19.3'` ilan ediyor (reconciler iç API'sine bağlı) → 19.3 3D'yi kırabilir. ~19.2.8 = 19.2 yamaları akar. Kaldırma şartı: fiber peer'i 19.3'ü kapsayınca `^19`. |
 | react-dom | ~19.2.8 | 2026-09-21 | KARAR | `react` ile aynı sınır: fiber 9.5.0 peer `react-dom: '>=19 <19.3'`. ~19.2.8, react ile aynı yama çizgisi. |
 | react-day-picker | 9.14.0 | 2026-08-19 | KARAR | PR #698: v9 geçişi iki peer bağımlılık ihlalini kapattı ve o sırada tarih filtresinin **hiç çalışmadığı** ölçüldü. 9.14.0 sabit, çünkü v9 API'si tarih seçici bileşenini doğrudan besliyor. |
 | @types/react | ~19.2.18 | 2026-09-21 | KARAR | Tipler çalışma zamanıyla aynı ara sürümde tutulur: react ~19.2 (fiber sınırı) iken 19.3 tipleri var olmayan API'yi derletir. ~19.2.18. |
 | @types/react-dom | ~19.2.7 | 2026-09-21 | KARAR | `@types/react` ile aynı gerekçe; react-dom ~19.2 çizgisi. ~19.2.7. |
-| eslint-config-next | 15.1.0 | — | BORÇ | — |
+| eslint-config-next | 15.5.25 | 2026-09-22 | KARAR | `next` ile AYNI sürümde tutulur: lint kuralları çalışan Next'in uyarılarını görsün. 15.1.0'da geride kalmıştı (gerekçesiz, §5 "kopukluk"); bot #1293 ikisini birlikte 15.5.25'e taşıdı. Sabit pin, çünkü `next` sabit; ikisi aynı satırda yükselir. |
 | eslint-plugin-react-compiler | 19.1.0-rc.2 | 2026-08-19 | KARAR | RC sürümü (19.1.0-rc.2) semver garantisi taşımaz — iki RC arası kırıcı değişiklik olağandır. Sabit pin zorunludur, aralık yazılamaz. |
 | minimatch | 9.0.7 | — | BORÇ | — |
 | minimatch@3 | >=3.1.4 | — | BORÇ | — |
@@ -137,7 +137,7 @@ kuralı: `0.x` ana sürüm garantisi vermez). `three` 0.183.2 → 0.186.0 bu yü
 | paket | kurulu | son | not |
 |---|---|---|---|
 | `@sentry/nextjs` | 8.55.2 | 10.75.0 | 11 yüksek güvenlik kaydının tamamı bunun altından geliyor (`bagimlilik-2026-09-19.md`); karar 17'ye bağlı, Recep sıralamada sona bıraktı |
-| `next` | 15.5.24 | 16.3.5 | tek başına bir iş; App Router davranışı değişir |
+| `next` | 15.5.25 | 16.3.5 | tek başına bir iş; App Router davranışı değişir |
 | `tailwindcss` | 3.4.19 | 4.3.3 | v4 yapılandırma biçimini tamamen değiştirdi (tasarım token'ları etkilenir) |
 | `zod` | 3.25.76 | 4.6.5 | doğrulama şemaları uçtan uca yeniden sınanmalı |
 | `framer-motion` | 11.18.2 | 13.4.0 | iki ana sürüm |
@@ -156,6 +156,9 @@ package.json'da **yok**. `@react-three/fiber` ve `drei` zaten güncel; geride ol
 ve tip paketi. (Kısıt kodun içinde olabilir; orası bu ölçümün kapsamı değil.)
 
 ### Ürünü etkilemeyen ama görünen kopukluk
+
+✔**KAPANDI 2026-09-22 (bot #1293):** ikisi de 15.5.25; satır §4'te KARAR oldu, BORÇ tavanı 16→15.
+Aşağıdaki paragraf kapanmadan önceki hâldir.
 
 `next` 15.5.24 iken `eslint-config-next` **15.1.0** — aynı ana sürüm, ara sürüm geride. Bu bir
 geliştirme aracıdır, canlıya girmez; etkisi lint kurallarının Next'in yeni uyarılarını
@@ -187,7 +190,8 @@ alındı ve §4'te **KARAR** oldu (gönüllü satır: `~` evren dışı ama sebe
 20→16, gevşetme adayı tavanı 7→3. Bu, §2.1'in "gerçek bir sebep varsa da bilelim" cümlesinin
 ilk sahadaki karşılığıdır. Bot'un `react-next` grubu (#1279) React ile **Next 16 ana sürümünü** birlikte
 getiriyordu ve CI'da 16 tip hatası verdi (`revalidateTag` Next 16'da iki argüman istiyor) —
-bu gevşetme değil **göç**tür, ayrı iş olarak ölçülür; `next` 15.5.24 satırı yerinde kalır.
+bu gevşetme değil **göç**tür, ayrı iş olarak ölçülür; `next` 15.5.24 satırı yerinde kalır
+(2026-09-22: aynı ara sürümdeki yama 15.5.25 alındı, #1293).
 Deneme ölçütü: CI (tsc + build + admin-smoke) yeşil + vitrin ve admin ekranlarının görsel
 doğrulaması (URUN).
 
