@@ -114,7 +114,11 @@ const violations = [];
 
 // Ö4 — manifest iç tutarlılığı (DB'ye hiç gitmeden ölçülür)
 for (const it of manifest.items) {
-  const beklenen = `AVE-${it.next_model_code}`;
+  // Önek MEVCUT SKU'dan okunur (REC-186, 2026-09-22): betik ilk kez AVenS için yazılmıştı ve
+  // 'AVE-' sabitti — NIC-11921 gibi başka markanın satırı Ö4'te haksız yere düşüyordu.
+  // Kural gevşemedi: marka değişemez, yalnız aynı markanın öneki beklenir.
+  const onek = String(it.current_sku).split('-')[0];
+  const beklenen = `${onek}-${it.next_model_code}`;
   if (it.next_sku !== beklenen) violations.push(`${it.current_sku}: next_sku "${it.next_sku}" != "${beklenen}" (degismez ihlali)`);
   if (it.katalog_kod !== it.next_model_code) violations.push(`${it.current_sku}: katalog_kod "${it.katalog_kod}" != next_model_code "${it.next_model_code}"`);
   if (!it.next_slug.endsWith(`-${it.next_model_code}`)) violations.push(`${it.current_sku}: next_slug "${it.next_slug}" model_code ile bitmiyor (kurulu kalip)`);
@@ -132,7 +136,10 @@ for (const sku of currentSkus) {
 const nextSkus = manifest.items.map(i => i.next_sku);
 const nextSlugs = manifest.items.map(i => i.next_slug);
 const clashSku = await rest(`products?sku=in.(${nextSkus.join(',')})&select=sku`);
-for (const c of clashSku) violations.push(`HEDEF CAKISMASI: sku "${c.sku}" DB'de ZATEN VAR`);
+// SKU'su DEĞİŞMEYEN düzeltme (yalnız ad/slug) kendi satırını "çakışma" sanmasın. Muafiyet
+// yalnız next_sku === current_sku olan kaleme; başka bir kalemin hedefi yine çakışma sayılır.
+const kendiSkusu = new Set(manifest.items.filter(i => i.next_sku === i.current_sku).map(i => i.current_sku));
+for (const c of clashSku) if (!kendiSkusu.has(c.sku)) violations.push(`HEDEF CAKISMASI: sku "${c.sku}" DB'de ZATEN VAR`);
 const clashSlug = await rest(`products?slug=in.(${nextSlugs.map(encodeURIComponent).join(',')})&select=slug`);
 for (const c of clashSlug) violations.push(`HEDEF CAKISMASI: slug "${c.slug}" DB'de ZATEN VAR`);
 

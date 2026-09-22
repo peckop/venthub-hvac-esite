@@ -1,0 +1,15 @@
+{
+  "_nicin": "REC-186 / Katalog K12 (Recep 2026-09-07 'düzelt'; canlı yazım onayı 2026-09-22 URUN-KATALOG penceresinde: 'DD evet'). NIC-11921'in adında ve slug'ında 6N090P yazıyor; kaynak katalog 61090P diyor (OCR benzeri okuma hatası: '1' → 'N').",
+  "_kanit": "docs/audits/icerik-hatti-faz2-inceleme-2026-09-07.md 6-A: kaynak PDF s.47 satır 93 kodu 61090P. model_code (11921) ve sku DEĞİŞMEZ.",
+  "_yonlendirme": "Eski slug için next.config.mjs'te kalıcı yönlendirme ZATEN var: /:lang/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921 → aile sayfası (?sku=NIC-11921). Adlandırmadan bağımsız canlı hedef; bu yazım onu bozmaz.",
+  "items": [
+    {
+      "current_sku": "NIC-11921",
+      "next_sku": "NIC-11921",
+      "next_model_code": "11921",
+      "katalog_kod": "11921",
+      "next_name": "DD 12/12 1500W 3F 4P 2V** - 61090P",
+      "next_slug": "dd-12-12-1500w-3f-4p-2v-61090p-11921"
+    }
+  ]
+}
