@@ -64,8 +64,10 @@ const KAYIT_YOLU = path.join(KOK, 'docs', 'standards', 'bagimlilik-kararlari.md'
  * `@types/react-dom` satırları `KARAR` yazılmıştı, gerekçeleri ÇIKARIMDI ve dayandırıldıkları
  * commit ölçüldüğünde React'ten hiç söz etmediği görüldü. Dördü BORÇ'a alındı, tavan doğuş
  * anında düzeltildi. Tavan doğduğunda ÖLÇÜMLE kurulur; ondan sonra yalnız AZALIR.
+ *
+ * 20 → 16 (2026-09-21): dört React satırı `^19.3.0`'a gevşetildi, evrenden çıktı — ilk sıkışma.
  */
-const BORC_TAVANI = 20
+const BORC_TAVANI = 16
 
 /**
  * Cetvel §4: override DAİMA aralıklıdır, açık uçlu değil (">=7.29.0" ana sürüm atlatır —
@@ -83,8 +85,10 @@ const ACIK_UCLU_TAVANI = 17
  * override'ın gerekçesizliği sürüm AKIŞINI serbest bırakır, tam pininki AKIŞI KİLİTLER.
  * İkincisi sessizce maliyet üretir — react 19.0.0 pini üç küçük sürümü engelliyordu ve
  * bunu kimse ölçmemişti (köken: 18→19 göçünün temkini, `06e940580`, 2026-03-17).
+ *
+ * 7 → 3 (2026-09-21): o dört pin gevşetildi (`^19.3.0`). Kalan üç aday aynı sınamayı bekler.
  */
-const GEVSETME_ADAYI_TAVANI = 7
+const GEVSETME_ADAYI_TAVANI = 3
 
 type Satir = { paket: string; aralik: string; tarih: string; durum: string; gerekce: string }
 
