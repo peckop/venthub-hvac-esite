@@ -175,6 +175,57 @@ yetim değeri temizlemiyor. Köprü bunu "tanımsız öznitelik" diye raporlar v
 m³/h'ten hesaplanır (eski değerden değil).
 **Sırada (kabul 3-6):** tamlık ekranı (URUN), veri modeli tablosu (OPS), Recep'e tek soru (OPS).
 
+### 3.4 Tamlık ölçümü + yan yana veri modeli (kabul 3 ve 5'e ALTYAPI verisi)
+
+**§3.4 SONUÇ (2026-09-22, ALTYAPI — koşuldu):**
+
+*UnoPim tarafı.* Tamlık ayarı boştu (`completeness_settings` 0 satır → hiçbir ürüne puan yok). Pilot ailenin 22
+özniteliği + `name`, `default` kanalında **zorunlu** işaretlendi (UnoPim'in kendi `CompletenessSettingsController`
+yolu: ayar satırı + `BulkProductCompletenessJob`). Sonuç (`product_completeness`):
+
+| dil | ürün | puan | eksik |
+|---|---|---|---|
+| en_US | 12 | **100** | 0 |
+| tr_TR | 12 | **96** | 1 (Türkçe `name` — pilot içe alımı yalnız en_US adı taşıdı) |
+
+Puan düzeneği **ayırt ediyor**: dil başına ayrı sayar, eksik alanı adıyla listeler. Ama pilot aile eksiksiz seçildiği
+için bu 12 ürün kataloğun durumunu **söylemez** — asıl ölçüm aşağıda.
+
+*Bizim taraf (bütün katalog, `arama_golge` = canlının yerel gölgesi, salt okuma).* Bizde aile nitelik şablonu **yok**;
+vekil şablon = "ailenin ürünlerinin en az yarısında dolu alan". Ürün puanı = dolu / şablon.
+
+| ölçüm | değer |
+|---|---|
+| ürün / aile | 442 / 47 (ailesiz ürün 0) |
+| şablona göre **%100** | **332** |
+| %80–99 | 11 |
+| %80 altı | 24 |
+| şablonlu ürünlerde ortalama | %96,7 |
+| **şablonu boş aile** (hiçbir alan ürünlerin yarısında yok) | **8 aile · 75 ürün — 73'ünde `technical_specs` TAMAMEN BOŞ** |
+
+Boş aileler: avens-nimus 15 · avens-nimax 15 · vortice-vorticent-cms-atex 11 · avens-qe-b-kasa 9 ·
+avens-enkelfan-ec-plug 9 · avens-sulu-batarya 8 (6'sı boş) · avens-dikdortgen-kanal-radyal 7 · seat-atex-ptc-sensor 1.
+⚠Vekil şablon **cömert**tir (nadir alan eksikliği sayılmaz); gerçek şablon aileye göre elle yazılır ve puanı düşürür.
+**Kataloğun eksik yeri "az dolu alan" değil "hiç girilmemiş aile"dir** — PIM'in tamlık ekranı bunu aile bazında
+görünür yapar; bizde bugün hiçbir ekran bu 73 ürünü göstermiyor.
+
+*KATALOG sorusu (`rpm_max` birimi):* UnoPim'de devir ölçü ailesi **yok** (23 ölçü ailesi okundu; Frequency =
+Hz/kHz…, Speed = doğrusal hız). Gerekirse `VolumeFlow`'a m³/h eklediğimiz yolla özel `RotationalSpeed` ailesi (RPM)
+açılır — bugün birimsiz sayı metni olarak taşınıyor, kayıp yok.
+
+*Yan yana veri modeli (kabul 5, §4 tablosunun ölçülmüş hâli):*
+
+| kavram | UnoPim (ölçüldü) | bizde bugün (ölçüldü) |
+|---|---|---|
+| aile şablonu | aile → öznitelik grubu → öznitelik; zorunlu alanlar kanal başına | `product_families` 47 — şablon yok |
+| tip + birim | 12 ölçülü öznitelik {miktar, birim}, dönüşümlü; select/boolean/text | `technical_specs` JSONB, birim alan adında |
+| tamlık | aile + kanal + dil başına puan, eksik listesi (ekranda) | yok — bu ölçüm elle SQL |
+| kategori | `categories` kod listesi, üst kategori kendiliğinden eklenmez | `category_id` + `subcategory_id` |
+| fiyat | para birimi başına sütun `<kod> (TRY)`; net/brüt iki öznitelik | `product_prices` (`net_price`, `gross_price`, `currency`, `price_list_id`) + `products.price` |
+| görsel alt metni | image/gallery'de yok → ayrı dil başına text öznitelik | `product_images.alt` |
+| çok dil | tr_TR/en_US locale, etiket CSV ya da REST ile | `name_i18n`, `metadata->>lang` |
+| aktarım | REST (salt-okuma anahtarı) → `pim_golge` köprüsü, fark 0 (§3.3) | — |
+
 ## 4 · Kıyas için veri (OPS'un tablosuna ALTYAPI katkısı)
 
 | kavram | UnoPim | bizde bugün |
