@@ -1,0 +1,15 @@
+{
+  "_nicin": "Karar 75 (Recep, OPS penceresinde EVET 2026-09-22; canlı yazım Recep'in URUN-KATALOG penceresindeki sözüyle): VRT-253490106XN adında '4kW' yazıyor; üretici föyü 'VORTICENT CMS ATEX 35/14 T4 3kW' ve TECHNICAL DATA 'Power 3 kW' diyor. Üretici baz (karar 71c).",
+  "_kanit": "ingestor kaynak-dizini: markalar/vortice/vorticent-cms-atex/01-input/11032611474469b15660e015d_VORTICENT-CMS-ATEX-35-14-T4-3kW.pdf s.1 başlık + s.2 'Power | 3 kW'. Fark tablosu REC-370 (hüküm: üretici). model_code (253490106XN) ve sku DEĞİŞMEZ.",
+  "_yonlendirme": "Eski slug canlıda ZATEN 308 → /:lang/products/vortice-vorticent-cms-atex?sku=VRT-253490106XN (2026-09-22 ölçüldü); site ürüne bu biçimle bağlanıyor. Yeni slug URUN'un 308 tablosuna eklenmeli (K3-b).",
+  "items": [
+    {
+      "current_sku": "VRT-253490106XN",
+      "next_sku": "VRT-253490106XN",
+      "next_model_code": "253490106XN",
+      "katalog_kod": "253490106XN",
+      "next_name": "VORTICENT CMS ATEX 35/14 T4 3kW",
+      "next_slug": "vorticent-cms-atex-35-14-t4-3kw-253490106xn"
+    }
+  ]
+}

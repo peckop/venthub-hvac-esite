@@ -36,6 +36,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { manifestIhlalleri } from './identity-fix-kurallar.mjs';
 import { tumSatirlar } from '../../icerik-hatti/_veri.mjs';  // 1000 satir tavani (REC-178)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -110,19 +111,8 @@ const manifestPath = path.isAbsolute(manifestArg) ? manifestArg : path.join(__di
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 console.log(`MANIFEST: ${path.basename(manifestPath)} — ${manifest.items.length} kimlik duzeltmesi`);
 
-const violations = [];
-
-// Ö4 — manifest iç tutarlılığı (DB'ye hiç gitmeden ölçülür)
-for (const it of manifest.items) {
-  // Önek MEVCUT SKU'dan okunur (REC-186, 2026-09-22): betik ilk kez AVenS için yazılmıştı ve
-  // 'AVE-' sabitti — NIC-11921 gibi başka markanın satırı Ö4'te haksız yere düşüyordu.
-  // Kural gevşemedi: marka değişemez, yalnız aynı markanın öneki beklenir.
-  const onek = String(it.current_sku).split('-')[0];
-  const beklenen = `${onek}-${it.next_model_code}`;
-  if (it.next_sku !== beklenen) violations.push(`${it.current_sku}: next_sku "${it.next_sku}" != "${beklenen}" (degismez ihlali)`);
-  if (it.katalog_kod !== it.next_model_code) violations.push(`${it.current_sku}: katalog_kod "${it.katalog_kod}" != next_model_code "${it.next_model_code}"`);
-  if (!it.next_slug.endsWith(`-${it.next_model_code}`)) violations.push(`${it.current_sku}: next_slug "${it.next_slug}" model_code ile bitmiyor (kurulu kalip)`);
-}
+// Ö4 — manifest iç tutarlılığı (DB'ye hiç gitmeden ölçülür; kurallar ayrı modülde, testli)
+const violations = manifestIhlalleri(manifest.items);
 
 // Ö1 — kaynak satırlar
 const currentSkus = manifest.items.map(i => i.current_sku);
