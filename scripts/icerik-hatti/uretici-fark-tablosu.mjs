@@ -25,7 +25,12 @@
  * görünmez ama özet "okuyucusu yok" sayısını basar — sessiz eksik yok.
  *
  * SALT OKUMA. Canlıya yazmaz.
+ * ── RAPOR (karar 75 ile Recep şartı): `--rapor <md>` TÜM ürünleri marka → aile → ürün gruplar,
+ * AVenS'e gönderilebilir biçimde; karşılaştırılamayan ürünün nedeni yazılır. Her çıkarımdan sonra
+ * yeniden üretilir: docs/audits/urun-veri-fark-raporu-<tarih>.md + .csv
+ *
  * KOŞUM: node uretici-fark-tablosu.mjs --veri <urunler.json> [--dizin <sayfalar.jsonl>] [--cikti <csv>]
+ *          [--rapor <md>] [--tarih YYYY-AA-GG]
  * Çıkış: 0 üretildi · 1 alıntı doğrulanamadı · 2 ÖLÇÜLEMEDİ (girdi yok/boş).
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
@@ -35,7 +40,9 @@ import { join } from 'node:path'
 const arg = (n, d = null) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : d }
 const DIZIN = arg('dizin', process.env.VENTHUB_KAYNAK_DIZINI ||
   join(homedir(), 'venthub-pdf-ingestor', 'kaynak-dizini', 'sayfalar.jsonl'))
-const VERI = arg('veri'), CIKTI = arg('cikti')
+const VERI = arg('veri'), CIKTI = arg('cikti'), RAPOR = arg('rapor')
+// Tarih rapora girer; verilmezse bugün (UTC). Determinizm sınavı --tarih ile sabitler.
+const TARIH = arg('tarih', new Date().toISOString().slice(0, 10))
 
 if (!VERI || !existsSync(VERI) || !existsSync(DIZIN)) {
   console.error(`ÖLÇÜLEMEDİ — girdi yok: --veri ${VERI} · dizin ${DIZIN}`); process.exit(2)
@@ -157,14 +164,22 @@ const ekle = (u, alan, bizim, bizimKaynak, ur, ayniBuyukluk = true, not = '') =>
     not, _parcalar: ur.alintiParcalari || [ur.alinti] })
 }
 
+// Web'de üretici belgesi OLMADIĞI ölçülen aileler (ingestor kaynak-dizini/edinme-2026-09-22.json
+// "disarida", 2026-09-22) — "henüz okunmadı" ile karışmasın: burada okunacak belge YOK, AVenS'ten istendi.
+const BELGESIZ_AILE = {
+  'avens-dikdortgen-kanal-radyal': 'web\'de föy yok — AVenS\'ten istendi',
+  'avens-sulu-batarya': 'web\'de föy yok — AVenS\'ten istendi',
+}
 // bizdeDegerYok: üretici kaynağı var ama bizde karşılaştırılacak değer YOK — fark değil BOŞLUK;
 // sessizce düşmesin diye ayrı sayılır (ilk koşumda Enkelfan 9 ürün böyle kayboluyordu).
 let okuyucusuz = 0, eslesmeyen = [], bizdeDegerYok = []
+// Rapor için her ürünün durumu: karşılaştırıldı · kaynakta yok · bizde değer yok · okuyucu yok
+const durum = new Map()
 for (const u of urunler) {
   const a = anahtarBul(u.name || '')
   if (a) {
     const ur = uretici.get(a)
-    if (!ur) { eslesmeyen.push(`${u.sku} ${u.name}`); continue }
+    if (!ur) { eslesmeyen.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'kaynakta yok'); continue }
     const kaynak = { belge: ur.belge, sayfa: ur.sayfa, tur: ur.tur, alinti: ur.alinti, alintiParcalari: ur.alintiParcalari }
     ekle(u, 'motor_gucu_kw', adKw(u.name), 'ürün adı (canlı)', { ...kaynak, deger: ur.alanlar.motor_gucu_kw })
     const av = avensListe.get(a)
@@ -177,7 +192,7 @@ for (const u of urunler) {
     const ts = u.technical_specs || {}
     if (ts.max_delivery_m3h != null) ekle(u, 'debi_m3h', sayi(ts.max_delivery_m3h), 'canlı teknik veri', { ...kaynak, deger: ur.alanlar.debi_m3h })
     if (ts.rpm_max != null) ekle(u, 'devir_rpm', sayi(ts.rpm_max), 'canlı teknik veri', { ...kaynak, deger: ur.alanlar.devir_rpm })
-    if (!satirlar.some(r => r.sku === u.sku)) bizdeDegerYok.push(`${u.sku} ${u.name}`)
+    if (!satirlar.some(r => r.sku === u.sku)) { bizdeDegerYok.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'bizde değer yok') }
     continue
   }
   // STORM: üretici (SEAT) sayfasında güç YOK (ölçüldü 2026-09-22) → tek karşı kaynak AVenS listesi (distribütör)
@@ -186,13 +201,14 @@ for (const u of urunler) {
     const kod = u.sku.replace(/^SEA-/, '')
     const av = avensStorm.find(r => r.kod === kod) ||
       avensStorm.find(r => !r.kod && r.model === `STORM ${s[1]}${s[2] || ''}` && r.rpm === +s[3] && r.volt === +s[4])
-    if (!av) { eslesmeyen.push(`${u.sku} ${u.name}`); continue }
+    if (!av) { eslesmeyen.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'kaynakta yok'); continue }
     ekle(u, 'cekilen_guc_kw', u.technical_specs.max_absorbed_power_w / 1000, 'canlı teknik veri (max_absorbed_power_w)',
       { belge: av.belge, sayfa: av.sayfa, tur: 'distribütör', alinti: av.alinti, deger: av.kw }, false,
       'farklı büyüklük: bizde çekilen güç, listede motor (plaka) gücü — üretici (SEAT) sayfasında güç yok')
     continue
   }
   okuyucusuz++
+  durum.set(u.sku, BELGESIZ_AILE[u.family_slug] ? 'belge yok' : 'okuyucu yok')
 }
 
 // ── KAPI: her alıntı dizindeki sayfada birebir geçmeli (kaynak yok → satır yok)
@@ -219,3 +235,72 @@ for (const e of bizdeDegerYok) console.log(`    bizde yok: ${e}`)
 for (const r of satirlar.filter(r => r.hukum !== 'aynı'))
   console.log(`  [${r.hukum}] ${r.sku} ${r.alan}: bizim ${r.bizim_deger} · kaynak ${r.uretici_deger} ${r.birim}`)
 if (CIKTI) console.log(`CSV: ${CIKTI}`)
+
+// ── RAPOR (Recep şartı, karar 75 ile): TÜM ürünler, marka → aile → ürün; AVenS'e gönderilebilir.
+// Karşılaştırılamayan ürün de rapordadır ve NEDENİ yazılır — sessiz eksik yok.
+if (RAPOR) {
+  const md = t => String(t ?? '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim()
+  // Dış okuyucu (AVenS) için belge adı: indirme önekleri atılır, tanınan belgeye ad verilir
+  const kaynakAdi = (belge, sayfa) => {
+    const ad = belge.split('/').pop()
+    const fb = /flipbook__(\d+)/.exec(ad)
+    if (fb) return `Casals teknik katalog, s.${fb[1]}`
+    if (/avens_fiyat_listesi_2026/.test(ad)) return `AVenS fiyat listesi 2026, s.${sayfa}`
+    if (/plug-fans_casals/.test(ad)) return `Casals plug-fan kataloğu, s.${sayfa}`
+    return `${md(ad.replace(/^[0-9a-f]{20,}_/, '').replace(/\.pdf$/, ''))} föyü, s.${sayfa}`
+  }
+  const sayiYaz = v => typeof v === 'number' ? String(v).replace('.', ',') : md(v)
+  const satirSku = new Map()
+  for (const r of satirlar) { if (!satirSku.has(r.sku)) satirSku.set(r.sku, []); satirSku.get(r.sku).push(r) }
+  const agac = new Map()
+  for (const u of [...urunler].sort((a, b) => a.sku.localeCompare(b.sku))) {
+    const marka = u.brand || '(marka yok)', aile = u.family_slug || '(aile yok)'
+    if (!agac.has(marka)) agac.set(marka, new Map())
+    if (!agac.get(marka).has(aile)) agac.get(marka).set(aile, [])
+    agac.get(marka).get(aile).push(u)
+  }
+  const d = s => [...durum.values()].filter(x => x === s).length
+  const o = []
+  o.push(`# Ürün verisi fark raporu — ${TARIH}`, '')
+  o.push('Bu rapor katalogdaki her ürünü üreticinin belgesiyle karşılaştırır. Her değer, üretici belgesinin',
+    'ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmada yazılıdır. Karşılaştırılamayan',
+    'ürünler de listelenir ve nedeni belirtilir.', '')
+  o.push('## Özet', '', '| | Sayı |', '|---|---|')
+  o.push(`| Katalogdaki ürün | ${urunler.length} |`, `| Karşılaştırılan ürün | ${satirSku.size} |`,
+    `| Karşılaştırılan değer | ${satirlar.length} |`, `| — aynı | ${say('aynı')} |`,
+    `| — üretici değeri alınmalı | ${say('üretici')} |`, `| — belirsiz (teyit gerekiyor) | ${say('belirsiz')} |`,
+    `| Üretici belgesi bulunamayan ürün | ${d('kaynakta yok') + d('belge yok')} |`,
+    `| Belge var, bizde karşılaştırılacak değer yok | ${d('bizde değer yok')} |`,
+    `| Belgesi henüz okunmamış ürün | ${d('okuyucu yok')} |`, '')
+  o.push('**Hüküm:** *aynı* — fark yok (%0,5 tolerans) · *üretici* — aynı büyüklük, üretici belgesi farklı diyor;',
+    'üreticinin değeri esas alınır · *belirsiz* — iki taraf farklı büyüklük ölçüyor, kaynak üretici değil ya da',
+    'ürün kodu farklı; teyit gerekir.', '')
+  for (const [marka, aileler] of [...agac].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const n = [...aileler.values()].reduce((s, l) => s + l.length, 0)
+    o.push(`## ${md(marka)} (${n} ürün)`, '')
+    for (const [aile, liste] of [...aileler].sort((a, b) => a[0].localeCompare(b[0]))) {
+      const kars = liste.filter(u => satirSku.has(u.sku))
+      o.push(`### ${md(aile)} — ${liste.length} ürün`, '')
+      if (kars.length) {
+        o.push('| Ürün | Alan | Bizim değer | Üretici | Fark | Kaynak | Hüküm |', '|---|---|---|---|---|---|---|')
+        for (const u of kars) for (const r of satirSku.get(u.sku)) {
+          const fark = r.fark === '' ? '—' : `${sayiYaz(r.fark)}${r.fark_yuzde !== '' ? ` (%${sayiYaz(r.fark_yuzde)})` : ''}`
+          const kaynak = kaynakAdi(r.kaynak_belge, r.kaynak_sayfa)
+          o.push(`| ${md(u.sku)} ${md(u.name)} | ${md(r.alan)} | ${sayiYaz(r.bizim_deger)} ${md(r.birim)} | ${sayiYaz(r.uretici_deger)} ${md(r.birim)} | ${fark} | ${kaynak} | **${r.hukum}** |`)
+        }
+        o.push('')
+      }
+      const kalan = liste.filter(u => !satirSku.has(u.sku))
+      if (kalan.length) {
+        const gruplar = new Map()
+        for (const u of kalan) { const s = durum.get(u.sku) || 'okuyucu yok'; if (!gruplar.has(s)) gruplar.set(s, []); gruplar.get(s).push(u) }
+        const neden = { 'kaynakta yok': 'üretici belgesi bulunamadı', 'bizde değer yok': 'belge var, bizde karşılaştırılacak değer yok',
+          'okuyucu yok': 'belgesi henüz okunmadı', 'belge yok': BELGESIZ_AILE[aile] || 'üretici belgesi yok' }
+        for (const [s, us] of gruplar) o.push(`- ${neden[s] || s} (${us.length}): ${us.map(u => `${md(u.sku)} ${md(u.name)}`).join(' · ')}`)
+        o.push('')
+      }
+    }
+  }
+  writeFileSync(RAPOR, o.join('\n'), 'utf8')
+  console.log(`RAPOR: ${RAPOR}`)
+}
