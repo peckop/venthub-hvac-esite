@@ -19,7 +19,7 @@ Ek (bilgi, kıyasa girmez): Recep düzeltmesi sayısı ve şeridin kendi bildird
 | ölçüt | değer | döküm |
 |---|---|---|
 | biten iş | **17** (13 ALTYAPI + 4 bot) | ALTYAPI: #1289 #1295 #1297 #1298 #1300 #1302 #1303 #1306 #1307 #1313 #1317 #1318 #1319 · bot: #1293 #1311 #1312 #1315 |
-| kırmızı CI | **1** ALTYAPI PR'ı (+1 bot) | #1295 (simple-import-sort, push öncesi eslint koşulmadı); bot #1315 "BAYAT KABUL" → ALTYAPI onardı |
+| kırmızı CI | **2** ALTYAPI PR'ı (+1 bot) | #1295 (simple-import-sort, push öncesi eslint koşulmadı) · #1321 (bu belgenin PR'ı: INV-MUTLAK-YOL-1, belgeye kullanıcı klasörü yolu yazıldı; push öncesi tam conformance koşulmadı) · bot #1315 "BAYAT KABUL" → ALTYAPI onardı |
 | OPS düzeltmesi | **2** | (1) mcp-bellek: 4,4 GB tsserver'ı "VS Code" dedim, gerçekte ALTYAPI penceresinin LSP eklentisi; (2) #1280/#1301 URUN teyidi gelmişti, "gelmedi" diye raporladım (kutu okunmamıştı) |
 | /usage | **Recep'ten bekleniyor** | — |
 | (bilgi) Recep düzeltmesi | 5 | Vercel Pro önerisi (karar 60 zaten "hayır"dı) · panel talimatını araç çağrılı mesaja gömme · linksiz hatırlatma · Resend bölge seçimini talimatta söylememe (Tokyo) · Supabase linkinde organizasyon kimliği (kırık link) |
