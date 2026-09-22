@@ -159,6 +159,22 @@ Betikte `TURETILMIS` tablosu, kilidi `INV-PIM-UNOPIM-1`.
   koşum **idempotent** (aynı veri, değişiklik 0).
 - Köprü tek yönlüdür; gölgeden UnoPim'e geri yazma yok.
 
+**§3.3 SONUÇ (2026-09-22, ALTYAPI — koşuldu):** betik `scripts/pim/unopim-kopru.cjs`, kilit `INV-PIM-UNOPIM-1` (§3.3 kolu).
+
+| Ölçüm | Sonuç |
+|---|---|
+| Salt-okuma API anahtarı (`venthub-kopru-okuma`, izin: katalog/ürün/öznitelik/aile okuma) | okuma 3/3 **200**; yazma (PATCH ürün, POST öznitelik, DELETE öznitelik) 3/3 **403** |
+| `pim_golge` | yoktu → `arama_golge`'den şablonla bir kez kopyalandı (kaynakta bağlantı 0); 442 ürün, aile md5 = canlı |
+| İlk koşum | 12 eklendi; **gölge `products` ↔ `pim_onizleme` farkı 0** → gölge → CSV → UnoPim → API → geri çeviri 12 üründe **birebir** (türetilen l/s dahil) |
+| İkinci koşum | 0 değişiklik (idempotent) |
+| Uçtan uca | UnoPim'de VRT-17160 `ip_rating` IP44 → IP45 → köprü: 1 güncellendi, fark 1 (`golge="IP44" pim="IP45"`); geri alındı → 1 güncellendi, fark 0; tekrar → 0 |
+| Yazma sınırı | `pim_onizleme` şeması yalnız `pim_golge`'de; `arama_golge`'de 0. Hedef DB adı sabit + koşumda `current_database()` ile doğrulanıyor; testte sabotajla kırmızı verdiği görüldü |
+
+**Yeni UnoPim bulgusu:** öznitelik silinince (`max_delivery_ls`) ürünlerin içindeki **değer kalıyor** — UnoPim
+yetim değeri temizlemiyor. Köprü bunu "tanımsız öznitelik" diye raporlar ve önizlemeye yazmaz; türetilen l/s
+m³/h'ten hesaplanır (eski değerden değil).
+**Sırada (kabul 3-6):** tamlık ekranı (URUN), veri modeli tablosu (OPS), Recep'e tek soru (OPS).
+
 ## 4 · Kıyas için veri (OPS'un tablosuna ALTYAPI katkısı)
 
 | kavram | UnoPim | bizde bugün |
