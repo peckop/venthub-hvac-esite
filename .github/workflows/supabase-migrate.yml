@@ -22,7 +22,7 @@ jobs:
       DB_URL: ${{ secrets.SUPABASE_DB_URL }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       # ══════════════════════════════════════════════════════════════════════
       # apt ADIMI KALDIRILDI (2026-08-19, ölçüldü — tahmin edilmedi)

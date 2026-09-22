@@ -289,6 +289,24 @@ depoda ücretsizdir.
 **Sınırları — adıyla:**
 - Kabul listesinin iki yönlü eşitliği **kimlik** düzeyindedir (GHSA). Aynı açığın farklı kimlikle
   yeniden yayımlanması yeni kayıt sayılır — doğru davranış, ama gürültü üretebilir.
-- Aksiyonlar depo geleneğine uyarak **etiketle** sabitli (`@v4`), SHA ile değil. Bot sürümleri
-  görünür tutar; SHA sabitleme ayrı bir karardır, burada yapılmadı.
+- ~~Aksiyonlar etiketle sabitli~~ → **§12 ile SHA'ya geçildi (2026-09-22).**
 - Bot PR'larının iş akışı gürültüsü ilk haftalarda ölçülecek; tavan ölçüme göre değişir.
+
+## 12 · DIŞ AKSİYON ETİKETLE DEĞİL SHA İLE SABİTLENİR — `INV-AKSIYON-SHA-1` (2026-09-22)
+
+**Karar:** OPS kabulü, 2026-09-22 (ALTYAPI hükmü). Biçim: `uses: sahip/ad@<40 hex SHA> # vX.Y.Z`.
+Yerel aksiyonlar (`./...`) kapsam dışı.
+
+**Niçin:** Etiket değiştirilebilir bir işaretçidir; aksiyon deposu ele geçirilirse etiket kötü
+commit'e taşınır ve bizim iş akışımız onu **sessizce** koşar (tj-actions/changed-files, Mart 2025:
+etiket taşındı, iş akışı sırları loglara döküldü). Repo **PUBLIC** — log herkese açık.
+**Ölçülen maruziyet (2026-09-22):** 55 `uses:` satırının **0**'ı SHA'lıydı; üçüncü taraf aksiyon
+(`pnpm/action-setup`, `supabase/setup-cli`, `denoland/setup-deno`) ile sır AYNI işte 5 iş
+akışında buluşuyordu — en ağırı `deploy-functions.yml`: üretime edge fonksiyonu dağıtan token.
+
+**Güncelleme:** Dependabot SHA'yı ve sürüm yorumunu birlikte günceller. `aksiyonlar` grubu yalnız
+küçük/yama sürümleri toplar; ana sürüm her aksiyon için ayrı PR gelir ve ayrı ölçülür
+(2026-09-22: #1278 sekiz ana sürümü tek PR'da getirdi, ölçülemeden kapatıldı).
+
+**Bekçi:** `src/__tests__/conformance/aksiyon-sha-pin.test.ts` — dış `uses:` satırı SHA + sürüm
+yorumu taşımıyorsa KIRMIZI; sabotaj kolu etiketli satırı yakaladığını kanıtlar.
