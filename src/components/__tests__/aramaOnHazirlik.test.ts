@@ -51,6 +51,14 @@ describe('INV-ARAMA-ONHAZIRLIK-1 (b) düğmeler niyete bağlı', () => {
     }
   })
 
+  it('inmiş pencere askısız yoldan çizilir, inmemişse tembel yol kalır (K14.6)', () => {
+    const baslik = oku('StickyHeader.tsx')
+    expect(baslik).toContain('useSyncExternalStore(hazirPencereAbone, hazirAramaPenceresi, () => null)')
+    expect(baslik).toMatch(/isSearchOverlayOpen && \(HazirAramaPenceresi \?/)
+    // Tembel yol yedek olarak DURUR: ön yükleme düşerse tıklama yine pencereyi açar.
+    expect(baslik).toContain('<SearchOverlay open={isSearchOverlayOpen} onClose={closeSearchOverlay} />')
+  })
+
   it('boşta ön yükleme sayfa yüklendikten sonra kurulur', () => {
     const baslik = oku('StickyHeader.tsx')
     expect(baslik).toContain('aramaParcalariniOnYukle')
@@ -105,7 +113,32 @@ describe('INV-ARAMA-ONHAZIRLIK-1 (c) davranış', () => {
     expect(mod.__aramaOnHazirlikDurumu().parcalarIstendi).toBe(true)
     await bekle()
     expect(mod.__aramaOnHazirlikDurumu().parcalarIstendi).toBe(false)
-    vi.doUnmock('../SearchOverlay')
+    // doUnmock GERÇEK dosyaya döndürür (ağır, sonraki testi zaman aşımına sokar) — başarılı sahteyi geri kur.
+    vi.doMock('../SearchOverlay', () => ({ default: () => null }))
+  })
+
+  it('pencere inince bileşen hazır olur ve aboneler haber alır (K14.6)', async () => {
+    const mod = await import('../aramaOnHazirlik')
+    expect(mod.hazirAramaPenceresi()).toBeNull()
+    const dinleyici = vi.fn()
+    const birak = mod.hazirPencereAbone(dinleyici)
+    mod.aramaParcalariniOnYukle()
+    await bekle()
+    expect(dinleyici).toHaveBeenCalledTimes(1)
+    expect(typeof mod.hazirAramaPenceresi()).toBe('function')
+    birak()
+  })
+
+  it('pencere indirmesi düşerse hazır bileşen null kalır (tembel yola düşülür)', async () => {
+    vi.doMock('../SearchOverlay', () => {
+      throw new Error('ağ yok')
+    })
+    await expect(import('../SearchOverlay')).rejects.toThrow()
+    const mod = await import('../aramaOnHazirlik')
+    mod.aramaParcalariniOnYukle()
+    await bekle()
+    expect(mod.hazirAramaPenceresi()).toBeNull()
+    vi.doMock('../SearchOverlay', () => ({ default: () => null }))
   })
 
   it('başarılı indirmeden sonra bayrak kalır (ikinci indirme başlamaz)', async () => {

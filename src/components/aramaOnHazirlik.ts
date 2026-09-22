@@ -9,8 +9,21 @@
 // ÜRETMEZ (veritabanına çağrı yok) — yalnız ağ ve kod hazırlığı.
 import { preconnect } from 'react-dom'
 
+import type SearchOverlay from './SearchOverlay'
+
+type AramaPenceresi = typeof SearchOverlay
+
 let parcalarIstendi = false
 let baglantiAcildi = false
+/**
+ * İnmiş pencere bileşeni. ⭐Niçin tutuluyor (2026-09-22 canlı ölçüm): pencere önceden inse bile
+ * `dynamic()` onu tembel (lazy) yoldan açar; tembel bileşen ilk çiziminde bir an askıya alınır ve
+ * React askıdan dönüşü son bekleme anından 300 ms sonraya erteler (react-dom `globalMostRecentFallbackTime
+ * + 300`). Sayfa içinden ölçüldü: tık → girdi 306–320 ms, SABİT. İnmiş bileşen doğrudan çizilirse
+ * askı olmaz, erteleme olmaz.
+ */
+let hazirPencere: AramaPenceresi | null = null
+const dinleyiciler = new Set<() => void>()
 
 /**
  * Arama penceresi ve arama servisi parçalarını önceden indirir. Tekrar çağrı bedavadır.
@@ -23,9 +36,27 @@ export function aramaParcalariniOnYukle(): void {
   // Belirteçler StickyHeader'daki `dynamic(() => import('./SearchOverlay'))` ve
   // SearchOverlay'deki `import('../lib/services/product.service')` ile AYNI modüle çözülür;
   // böylece aynı parça iner, ikinci kopya oluşmaz (INV-ARAMA-ONHAZIRLIK-1).
-  Promise.all([import('./SearchOverlay'), import('../lib/services/product.service')]).catch(() => {
-    parcalarIstendi = false
-  })
+  Promise.all([import('./SearchOverlay'), import('../lib/services/product.service')])
+    .then(([pencere]) => {
+      hazirPencere = pencere.default
+      dinleyiciler.forEach((d) => d())
+    })
+    .catch(() => {
+      parcalarIstendi = false
+    })
+}
+
+/** `useSyncExternalStore` aboneliği: pencere indiğinde başlık yeniden çizilir. */
+export function hazirPencereAbone(dinleyici: () => void): () => void {
+  dinleyiciler.add(dinleyici)
+  return () => {
+    dinleyiciler.delete(dinleyici)
+  }
+}
+
+/** İnmiş pencere bileşeni; henüz inmediyse `null` (çağıran tembel yola düşer). */
+export function hazirAramaPenceresi(): AramaPenceresi | null {
+  return hazirPencere
 }
 
 /**
@@ -48,6 +79,6 @@ export function aramaNiyeti(): void {
 }
 
 /** Yalnız testler için: bayrakları okur (INV-ARAMA-ONHAZIRLIK-1). */
-export function __aramaOnHazirlikDurumu(): { parcalarIstendi: boolean; baglantiAcildi: boolean } {
-  return { parcalarIstendi, baglantiAcildi }
+export function __aramaOnHazirlikDurumu(): { parcalarIstendi: boolean; baglantiAcildi: boolean; pencereHazir: boolean } {
+  return { parcalarIstendi, baglantiAcildi, pencereHazir: hazirPencere !== null }
 }

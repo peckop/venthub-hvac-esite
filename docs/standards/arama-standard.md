@@ -479,6 +479,15 @@ kimlik bilgisi taşımayan CORS isteği yapar; yanlış havuza açılan bağlant
 **K14.4 — Ön hazırlık hiçbir yolu kırmaz.** Veritabanına istek ÜRETMEZ. İndirme düşerse bayrak geri
 alınır, bir sonraki yönelim yeniden dener; tıklama zaten kendi indirmesini yapar.
 
+**K14.6 — İnmiş pencere TEMBEL YOLDAN açılmaz.** *(2026-09-22, K14.1 canlıya indikten sonra
+ölçüldü.)* Parçalar önceden inse bile `dynamic()` bileşeni tembel yoldan açar: ilk çizimde bir an
+askıya alınır ve React askıdan dönüşü son bekleme anından **300 ms** sonraya erteler (react-dom:
+`globalMostRecentFallbackTime + 300`). Sayfa içinden ölçüldü (tık → girdi DOM'da): 8 denemede
+306–320 ms, sapma ±7 ms — indirme ya da işlemci değil, sabit erteleme. Çözüm: ön yükleme inen
+bileşeni tutar (`hazirAramaPenceresi`), başlık onu `useSyncExternalStore` ile okur ve varsa
+**doğrudan** çizer; yoksa tembel yol yedek olarak kalır. ⚠Ders: "parça önceden indi" ile "pencere
+hızlı açılır" aynı iddia değildir — ikincisi ayrı ölçülür (ilk ölçümde yalnız birincisi doğrulanmıştı).
+
 **K14.5 — Bu bölüm aralıklı sunucu gecikmesini ÇÖZMEZ.** 2026-09-22 ölçümünde (temiz tarayıcı ×6)
 ikinci aramada da 1,6 sn'lik bir uç görüldü — o anda istemci tarafı tamamen ısınmıştı. Aralıklı
 uzun bekleme sunucu/veritabanı tarafındadır; ayrı ölçülür, bu bölümün başarı ölçütü değildir.
