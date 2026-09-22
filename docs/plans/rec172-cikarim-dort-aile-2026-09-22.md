@@ -1,160 +1,180 @@
 # REC-172 — 4 ailenin teknik veri çıkarımı (NIMUS · NIMAX · Enkelfan EEC · Vorticent CMS ATEX)
 
-> Durum: **PLAN v2** (2026-09-22). v1 bağımsız çürütmede **BLOK** aldı (9 bulgu, aşağıda
-> "v1 → v2" tablosu); v2 hepsini işler. Çıkarım koşumu Recep "başla" demeden AÇILMAZ (karar 76).
-> Canlıya yazım ayrıca Recep'in kendi sözüyle (iki anahtar: `--yaz` + `CANLI_YAZIM_ONAYI`).
+> Durum: **PLAN v3** (2026-09-22). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (4 kısmen +
+> 6 yeni bulgu, 8 ek madde); v3 hepsini işler — belgenin sonunda "v1 → v2" ve "v2 → v3" tabloları.
+> Çıkarım koşumu Recep "başla" demeden AÇILMAZ (karar 76). Canlıya yazım ayrıca Recep'in kendi
+> sözüyle (iki anahtar: `--yaz` + `CANLI_YAZIM_ONAYI`).
 
 ## KAYNAK/CETVEL
 
 - `docs/standards/catalog-ingestion-standard.md` §6.3 — kaynak dizini tek kaynak, PDF açılmaz.
-  Tazelik YEŞİL 2026-09-22 (70 PDF + 17 web, 2211 sayfa; 26 dosya bugün girdi, ingestor `c9a5e58`).
-- `docs/standards/product-schema-standard.md` — bu planı yöneten cetvel. Özellikle: §Gerilim
-  ("bir alan bir bilgi": `voltage_v` · `voltage_alt_v` · `wiring` · `phase`), §ATEX (K11-a:
-  `atex_marking` ≠ `atex_zone`), §Ses (`noise_level_db_a` legacy), K9 güç ayrımı
-  (`rated_power_w` = motor gücü, `max_absorbed_power_w` = çekilen güç).
+  Tazelik YEŞİL 2026-09-22 (70 PDF + 17 web, 2211 sayfa; ingestor `c9a5e58`).
+- `docs/standards/product-schema-standard.md` — bu planı yöneten cetvel: §11.7 semantik sözleşme
+  (`max_` = kaynağın verdiği üst sınır; nominal nokta `max_`'a yazılmaz; ölçüt ADA girer),
+  §Gerilim (`voltage_v` · `voltage_alt_v` · `wiring` · `phase`), §ATEX (K11-a), §Ses, K9 güç.
   **Akım için cetvel satırı YOK** → yazımı bu işin kapsamında (adım 1).
-- INV-PIM-UNOPIM-1 — PIM kolonu `<kod>` + `<kod>(unit)`; pilot listesi `scripts/pim/unopim.cjs`
-  (22 öznitelik / 12 ölçülü, kilit `src/__tests__/conformance/pim-unopim-csv.test.ts:46-47`).
+- INV-PIM-UNOPIM-1 — `scripts/pim/unopim.cjs` (22/12, kilit `src/__tests__/conformance/pim-unopim-csv.test.ts:46-47`).
 - Fark tablosu `scripts/icerik-hatti/uretici-fark-tablosu.mjs` (REC-370).
-- Tazelik: canlı ölçüm 2026-09-22 — 4 ailenin 50 ürününde `technical_specs` **NULL**.
+- Canlı ölçüm 2026-09-22: 4 ailenin 50 ürününde `technical_specs` NULL; `products.updated_at` var,
+  `products_set_updated_at` BEFORE UPDATE tetiği her güncellemede `now()` basar; `denetim_izi_products_upd`
+  tetiği UPDATE'te `admin_audit_log`'a before/after yazar (REC-292).
 
 ## YÖNTEM
 
-**Çıkarım: deterministik okuyucu** (regex/tablo) — dil modeli değer OKUMAZ; her değer kaynaktaki
-satırın kendisidir, iki koşum bayt-eşit. Dört kaynak da düzenli tablo (ölçüldü).
-**Doğrulama: ZORUNLU ve farklı yöntemle** — okuyucu hem çıkarıp hem doğrularsa kendi hatasını
-göremez (v1'in kabul 2'si döngüseldi). İki bağımsız kol:
-1. **Workflow (karar 76, OPS önerisi):** bağımsız ajanlar çıkarım CSV'sini sayfa METNİNDEN
-   (regex'in okuduğu yapıdan değil) okuyarak çürütür; her aile en az 1 ajan, her alan örneklenir.
-2. Karar 76 hayır olursa yedek: ikinci okuyucu aynı değeri **düz metinden** (`metin`) okur,
-   birincisi **tablo hücresinden** (`tablo.satirlar`) ya da tersi; iki yol ayrışırsa KIRMIZI.
-   Bu, v1'deki "aynı okuyucu iki kez" değil, iki ayrı çıkarım yoludur.
+**Çıkarım: deterministik okuyucu** — dil modeli değer OKUMAZ; iki koşum bayt-eşit.
+**Doğrulama: ZORUNLU ve çıkarımdan farklı yöntemle.** Kaynak yapısına göre dürüst dağılım:
+
+| Kaynak | Dizindeki yapı | Doğrulama yolu |
+|---|---|---|
+| Casals flipbook 191/192/199/200 (NIMUS/NIMAX) | **yalnız metin** (`tablo: 0`) | **Ajan zorunlu** (kol 1) |
+| CMS föy s.1 (zone, marking, gerilim, IP) | yalnız metin | **Ajan zorunlu** (kol 1) |
+| CMS föy s.2 "TECHNICAL DATA" | metin + tablo | kol 1 ya da kol 2 (metin ↔ tablo hücresi) |
+| Enkelfan s.16 | metin + tablo | kol 1 ya da kol 2 |
+
+- **Kol 1 (karar 76):** bağımsız ajanlar çıkarım CSV'sini sayfa metninden okuyarak çürütür.
+- **Kol 2:** ikinci okuyucu düz metinden, birincisi tablo hücresinden; ayrışırsa KIRMIZI.
+- **Karar 76 HAYIR olursa:** NIMUS/NIMAX'ın tüm alanları ve CMS s.1 alanları **yazılmaz** (ikinci
+  yolları yok); iş Enkelfan + CMS s.2 alanlarıyla daralır (489 → 109) — durmaz, ama kapsam düşer.
 
 ### Yöntem kıyası (OPS isteği, karar 76 girdisi)
 
 | Yöntem | Ne okur | Güçlü olduğu belge tipi | Zayıf yanı | Bu hatta daha önce |
 |---|---|---|---|---|
-| **`cikar.py`** (PyMuPDF, deterministik) → kaynak dizini `metin` + `tablo.satirlar` | PDF'i BİR KEZ; sayfa metni + tablo hücreleri | **Düzenli tablo** (föy "TECHNICAL DATA", katalog model satırı) | Grafik/görsel tablo ve bölünmüş hücre (ör. "K"+"OD", REC-146 09-09); okuyucu belge tipine özel yazılır | Dizin 09-06'dan beri tek kaynak (K15); fark tablosu okuyucuları (REC-370, 09-22) |
-| **markitdown MCP** (PDF → Markdown) | PDF'i yeniden açar, Markdown'a çevirir | Serbest metin, başlık yapısı | **K15 ihlali** (PDF ikinci kez açılır; dizinde olmayan ikinci bir metin kaynağı doğar), tablo sadakati ölçülmedi, hash/tazelik kapısı yok | Çıkarımda kullanılmadı (7 günde 1 çağrı, `mcp-bellek-2026-09-22.md`) |
-| **Alt ajan okuma** (dil modeli) | Sayfa metni ya da görüntü | **Serbest metin, görsel tablo**, bağlam gerektiren yorum (ör. "absorbed power" dipnotu) | Değer uydurma/yanlış sütun riski; tekrarlanabilir değil | **Faz 2 (09-06, OPS): çıkarım + doğrulama ajanları, 8 aile · 764 satır → doğrulanan 659 · çürütülen 62 · belirsiz 43** (`rec172-faz2-sonuc-2026-09-06.md`, dal `ops/rec172-faz2`). T119 (08-20): 25 Sonnet ajanı 74 sayfayı görsel okudu. |
+| **`cikar.py`** (PyMuPDF, deterministik) → kaynak dizini `metin` + `tablo.satirlar` | PDF'i BİR KEZ | **Düzenli tablo** | Grafik tablo, bölünmüş hücre ("K"+"OD", REC-146 09-09); okuyucu belgeye özel | Dizin 09-06'dan beri tek kaynak (K15); fark tablosu okuyucuları (REC-370) |
+| **markitdown MCP** (PDF → Markdown) | PDF'i yeniden açar | Serbest metin | **K15 ihlali** (ikinci metin kaynağı), tablo sadakati ölçülmedi, tazelik kapısı yok | Çıkarımda kullanılmadı |
+| **Alt ajan okuma** | Sayfa metni/görüntü | Serbest metin, görsel tablo, bağlam yorumu | Uydurma/yanlış sütun riski; tekrarlanamaz | **Faz 2 (09-06): 764 satır → doğrulanan 659 · çürütülen 62 · belirsiz 43** (`rec172-faz2-sonuc-2026-09-06.md`, dal `ops/rec172-faz2`); T119 (08-20) 25 Sonnet ajanı |
 
-**Hüküm:** bu 4 ailenin dördü de düzenli tablo → **çıkarım `cikar.py` dizini + deterministik okuyucu**
-(faz 2'den FARKLI; sebep: faz 2'de ajan çıkarımının %14'ü kabul görmedi — 105/764 — ve o kaynakların
-bir kısmı serbest metin/grafikti; burada değil). **Doğrulama ajan ile** (faz 2'deki doğrulama
-kolunun aynısı, ama bu kez çıkarımdan farklı yöntemle — döngü kırılır). markitdown kullanılmaz (K15).
-Serbest metin/grafik kaynaklı aileler (QE-B, dikdörtgen kanal, sulu batarya föyü gelince) için
-faz 2 kalıbı (ajan çıkarım + ajan doğrulama) geçerli kalır.
+**Hüküm:** çıkarım deterministik (faz 2'den farklı; ajan çıkarımının %14'ü kabul görmedi),
+doğrulama ajan (metin-yalnız kaynaklarda tek bağımsız yol). markitdown kullanılmaz.
 
 ## Aile → belge/sayfa
 
 Eşleme **model ADIYLA** (AVenS kodu ≠ Casals kodu, 15/30 — REC-370).
 
-| Aile | Ürün | Değer tablosu | Genel özellik metni |
+| Aile | Ürün | Değer satırı | Genel özellik metni |
 |---|---|---|---|
-| NIMUS | 15/15 (ölçüldü) | Casals flipbook 192 | flipbook 191 ("IP-55 protection and class F", gerilim cümlesi) |
-| NIMAX | 15/15 (ölçüldü) | Casals flipbook 200 | flipbook 199 (aynı cümleler) |
-| Enkelfan EEC | 9/9 | plug-fans PDF s.16 tablo | s.16 metni ("Single-phase 230V … 155 to 310 … three-phase 400V … 355 to 630. IP54 motor and class B insulation", "external rotor EC motor") |
-| CMS ATEX | **9** (11 ürün − 14/5 T2 föysüz − 35/14 karar 75'e bağlı) | föy s.2 "TECHNICAL DATA" | föy s.1 başlık (zone + kodlar) ve gerilim cümlesi |
+| NIMUS | 15/15 | Casals flipbook 192 | flipbook 191 |
+| NIMAX | 15/15 | Casals flipbook 200 | flipbook 199 |
+| Enkelfan EEC | 9/9 | plug-fans PDF s.16 tablo | s.16 metni |
+| CMS ATEX | **10** (11 − 14/5 T2 föysüz; 35/14 karar 75 ile 12:44Z'den beri "3kW", föyü tam) | föy s.2 | föy s.1 |
 
 ## Hedef alanlar (cetvele uygun)
 
 | Kaynak | Anahtar | NIMUS/NIMAX | Enkelfan | CMS ATEX |
 |---|---|---|---|---|
-| R.P.M. | `rpm_max` | ✓ | ✓ | ✓ — **12/5 ve 14/5 HARİÇ** (fan 1450 ↔ motor 1346 çelişkisi, boş + AVenS sorusu) |
-| Rated I / I max. | `absorbed_current_a` | ✓ 400V sütunu | ✓ | ✓ I max. (400V) |
-| Rated Power kW / Motor Power | `rated_power_w` (kW×1000) | ✓ | ✓ | ✓ |
-| Air flow / Max. Flow | `max_delivery_m3h` | ✓ | ✓ | ✓ |
-| türetilen | `max_delivery_ls` = round(m³/h ÷ 3,6; 2) | türetilir | türetilir | türetilir |
-| Weight Kg | `weight_kg` | ✓ | ✓ | **✗** (fan 63 + motor 23 kg — anlamı belirsiz, AVenS sorusu) |
+| R.P.M. | `rpm_max` | ✓ | ✓ | ✓ — 12/5, 14/5 **✗** (fan 1450 ↔ motor 1346) |
+| Rated I (anma) | `absorbed_current_a` (anma yükünde çekilen akım) | ✓ 400V sütunu | ✓ | — |
+| I max. (400V) | **`max_current_a`** (canlıda 2 üründe var) | — | — | ✓ |
+| Rated Power / Motor Power | `rated_power_w` (kW×1000) | ✓ | ✓ | ✓ |
+| Air flow | — | **✗** (kaynak üst sınır mı nominal mi SÖYLEMİYOR — §11.7; dizinde tanım yok, 191-205 + plug-fans tarandı) | **✗** (aynı) | — |
+| Max. Flow | `max_delivery_m3h` + türetilen `max_delivery_ls` | — | — | ✓ (kaynak "Max." diyor) |
+| Weight Kg | `weight_kg` | ✓ | ✓ | **✗** (fan 63 + motor 23 kg) |
 | T2/T4/T6 | `motor_poles` | ✓ | — | ✓ |
-| gerilim cümlesi | `voltage_v` | 400 | 230 (155-310) · 400 (355-630) | 400 |
-| gerilim cümlesi | `voltage_alt_v` | 230 (≤4 kW) · 690 (>4 kW) | — | 230 (≤4 kW) · 690 (>4 kW) |
-| gerilim cümlesi | `phase` | 3 ("THREE PHASE RANGE") | 1 · 3 (kaynak cümlesi) | **✗** (föy tek/üç fazı model başına söylemiyor) |
-| — | `wiring` | **✗** (kaynak bağlantı tipini yazmıyor; gerilimden TÜRETİLMEZ) | ✗ | ✗ |
+| gerilim cümlesi | `voltage_v` | 400 | 230 (155-310) · **✗** (355-630: s.16 "400V" ↔ s.17 şema "AC380V") | 400 |
+| gerilim cümlesi | `voltage_alt_v` | 230 (≤4 kW, "up to 4kW" dahil) · 690 (>4 kW) | — | 230 (≤4 kW) · 690 (>4 kW) |
+| faz | `phase` | 3 ("THREE PHASE RANGE") | 1 (155-310) · **✗** (355-630, gerilimle birlikte) | 3 — **gerilimle AYNI kanıt**: s.1 "230/400V … for three phase motors" + s.2 "I max. (400V)"; biri yazılırsa ikisi, biri düşerse ikisi |
+| — | `wiring` | ✗ (kaynak yazmıyor; TÜRETİLMEZ — SEAT'te dolu olması tutarsız görünür, bilerek) | ✗ | ✗ |
 | IP / yalıtım | `ip_rating`, `insulation_class` | IP55 · Class F (191/199) | IP54 · Class B | IP55 · Class F |
 | motor tipi | `motor_type` | — | EC | — |
-| s.1 başlık | `atex_zone` | — | — | `Zone 2` (8 föy) · `Zone 1` (12/5, 14/5) |
-| s.1 başlık | `atex_marking` | — | — | FAN + MOTOR kodları (ör. `Fan: Ex h IIB T3 Gc · Motor: Ex ec IIC T3 Gc`) — bölge YAZILMAZ (K11-a) |
-| Sound dB(A) | — | **✗** | ✗ | — |
-| Model A B C | — | — | **✗** (dizinde ölçü çizimi yok; tr.ts "Genişlik/Derinlik/Yükseklik" anlamı doğrulanmadı) | — |
-
-- **Ses:** "dizinde tanımı yok" (Casals 191-205 tarandı; katalog giriş sayfası dizinde değil).
-  Ölçütü belirsiz değer `noise_level_db_a`'ya (legacy) da yazılmaz.
-- **ATEX biçim birliği:** canlıdaki 14 Vortice ürünü `atex_marking`'i tek dize (`II 2G/D h T3/125°C
-  X Gb/Db`) taşıyor; CMS föyü fan ve motor için AYRI kod veriyor. Yazım biçimi: `Fan: … · Motor: …`
-  (kaynağın ayrımı korunur). Bu biçim cetvelin ATEX bölümüne örnek olarak eklenir (adım 1).
+| s.1 başlık | `atex_zone` | — | — | kanonik biçim (adım 1): `Zone 2` / `Zone 1` — föy kategori vermiyor, uydurulmaz |
+| s.1 başlık | `atex_marking` | — | — | `Fan: Ex h IIB T3 Gc · Motor: Ex ec IIC T3 Gc` (grup/kategori yok → yalnız Ex kodu; cetvele not) |
+| Sound dB(A) · Model A B C | — | ✗ | ✗ | — |
 
 ## Beklenen satır sayısı
 
-| Aile | Ürün | Alıntılı alan/ürün | Alıntılı | Türetilen (l/s) |
+| Aile | Ürün | Alıntılı alan/ürün | Alıntılı | Türetilen |
 |---|---|---|---|---|
-| NIMUS | 15 | 11 | 165 | 15 |
-| NIMAX | 15 | 11 | 165 | 15 |
-| Enkelfan EEC | 9 | 9 (rpm, akım, güç, debi, ağırlık, gerilim, faz, IP, yalıtım) + motor tipi = 10 | 90 | 9 |
-| CMS ATEX | 9 | 11 (rpm, akım, güç, debi, kutup, gerilim, alt gerilim, IP, yalıtım, zone, marking) | 99 − 2 (12/5, 14/5 rpm) = **97** | 9 |
-| **Toplam** | **48** | | **517** | **48** |
+| NIMUS | 15 | 10 (rpm, akım, güç, ağırlık, kutup, faz, gerilim, alt gerilim, IP, yalıtım) | 150 | 0 |
+| NIMAX | 15 | 10 | 150 | 0 |
+| Enkelfan EEC | 9 | 7 (rpm, akım, güç, ağırlık, IP, yalıtım, motor tipi) + 155-310'da (4 ürün) gerilim+faz | 63 + 8 = **71** | 0 |
+| CMS ATEX | 10 | 12 (rpm, I max, güç, max debi, kutup, faz, gerilim, alt gerilim, IP, yalıtım, zone, marking) | 120 − 2 = **118** | 10 |
+| **Toplam** | **49** | | **489** | **10** |
 
-Kesin sayı kuru koşumda basılır; sapma varsa sebebi yazılır, sessizce kabul edilmez.
+Karar 76 hayır → NIMUS/NIMAX 300 + CMS s.1 alanları (kutup, faz, gerilim, alt gerilim, IP,
+yalıtım, zone, marking: 8×10 = 80) düşer; kalan Enkelfan 71 + CMS s.2 (rpm, I max, güç, max debi:
+4×10 − 2 = 38) = **109 + 10**.
+Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 
 ## Kabul ölçütü
 
-1. **Alıntılı her değerin atfı var** (belge + sayfa + alıntı); alıntı dizinde yeniden aranır,
-   bulunamazsa KIRMIZI. **Türetilen değerler** (`max_delivery_ls`) bu kapıdan muaf, satırda
-   `kaynak=türetildi (max_delivery_m3h ÷ 3,6)` yazar.
-2. **Bağımsız doğrulama zorunlu** (YÖNTEM kol 1 ya da 2): 517 alıntılı değerin tamamı ikinci
-   yoldan okunur; ayrışma 0.
-3. Fark tablosu yeniden koşulur: 48 ürün için canlı ↔ üretici `aynı` (bu tek başına kanıt DEĞİL,
-   yalnız yükleme sonrası tutarlılık ölçüsü).
+1. Alıntılı her değerin atfı var (belge + sayfa + alıntı); alıntı dizinde yeniden aranır —
+   **boşluk/satır sonu normalize edilerek** ("Ex h\nIIB"). Türetilen (`max_delivery_ls`) muaf, satırda
+   `kaynak=türetildi`.
+2. **Bağımsız doğrulama** YÖNTEM tablosuna göre: metin-yalnız kaynaklar kol 1 ile, tablolu kaynaklar
+   kol 1 ya da 2 ile; ayrışma 0. Doğrulanamayan değer yazılmaz.
+3. Fark tablosu yeniden koşulur (tutarlılık ölçüsü; tek başına kanıt değil).
 4. İki koşum bayt-eşit.
-5. Birim: sözlükteki birim; PIM kolonu `<kod>(unit)`.
-6. Uydurma yok: kaynakta olmayan / çelişkili alan boş kalır (✗ satırları).
-7. Yükleme idempotent (ikinci koşum 0 değişiklik), yalnız boş (NULL) `technical_specs`'e yazar;
-   dolu bir anahtarın üstüne YAZMAZ; her ürün için `admin_audit_log` satırı (before/after).
+5. Birim sözlükteki birim; PIM kolonu `<kod>(unit)` — PIM paketi ALTYAPI öznitelikleri ekledikten sonra.
+6. Uydurma yok: ✗ satırları boş.
+7. **Yazım tek atomik koşullu PATCH:** `products?id=eq.<id>&technical_specs=is.null&updated_at=eq.<okunan>`
+   (`prefer: return=representation`); 0 satır dönerse KIRMIZI (okuma–yazma yarışı kapanır).
+   Denetim kaydı **tetiğe bırakılır** (`denetim_izi_products_upd`); yükleyici ikinci audit satırı
+   YAZMAZ. İkinci koşum 0 değişiklik.
 
 ## Adımlar (hepsi bu işin kapsamında — kural 14)
 
-1. **Cetvel:** `product-schema-standard.md`'ye akım satırı (`absorbed_current_a` = kaynaktaki
-   anma/I max akımı, `voltage_v` gerilimindeki; hangisi olduğu satırın `alinti`sında) + ATEX
-   `Fan: … · Motor: …` biçim örneği.
-2. **Okuyucular:** fark tablosu okuyucularını tüm alanlara genişlet + ikinci (düz metin) okuyucu;
-   test + sabotaj (bir hücre bozulunca KIRMIZI).
-3. **Yükleyici:** `faz4-teknik-yukle.py` parametrelenir (`--girdi <csv>`, sabit 8-dosya evreni
-   yalnız eski kipte), `admin_audit_log` yazımı, NULL-yalnız yazım, `updated_at` ile eşzamanlılık
-   kontrolü (okuduktan sonra değiştiyse yazmaz) — test dahil.
-4. **Kuru koşum** → `paket/rec172-cikarim-<damga>.csv` (sku, alan, deger, birim, belge, sayfa,
-   alinti, kaynak_turu) + satır sayısı.
-5. **Bağımsız doğrulama** (karar 76 → Workflow; hayır → ikinci okuyucu).
-6. **Recep'e sunum:** 517+48 değer, 3 örnek ürün, ✗ listesi → "yaz" sözü → iki anahtarlı yükleme.
-7. **Canlı ölçüm:** 48 ürün sayfası, fark tablosu, paket CSV round-trip.
+1. **Cetvel** (`product-schema-standard.md`): akım satırı (`absorbed_current_a` = anma yükünde çekilen
+   akım · `max_current_a` = kaynağın "I max" değeri · ölçüt ADA girer); `atex_zone` kanonik biçimi
+   (`Zone <n>[, Category <k>]`; kaynak kategori vermiyorsa yazılmaz); `atex_marking` için "grup/kategori
+   yoksa yalnız Ex kodu, `Fan: … · Motor: …`" notu.
+2. **Okuyucular** tüm alanlara + ikinci (tablo) okuyucu Enkelfan/CMS s.2 için; test + sabotaj.
+   Okuyucu sütunu doğrudan eşler — `alan-etiket-sozlugu.json`'a dayanmaz (sözlükte "power" →
+   `max_absorbed_power_w`, "rated current" → `rated_output_current_a` eşlemeleri bu kaynaklar için
+   yanlış; sözlük düzeltmesi ayrı iş olarak REC-172'ye yazılır).
+3. **Yükleyici:** `faz4-teknik-yukle.py --girdi <csv>` (sabit 8-dosya evreni yalnız eski kipte) +
+   kabul 7'deki atomik koşullu PATCH + test (sabotaj: dolu `technical_specs`'e yazmaz, `updated_at`
+   değişince yazmaz).
+4. **Kuru koşum** → `paket/rec172-cikarim-<damga>.csv` + sayılar.
+5. **Doğrulama** (karar 76'ya göre).
+6. **Recep'e sunum** (tek tablo) → "yaz" → iki anahtarlı yazım.
+7. **Canlı ölçüm:** 49 ürün sayfası, fark raporu yeniden, paket CSV round-trip.
 
-## Başka şeritlere düşen parçalar (koordinasyon, bu planın bağımlılığı)
+## Sıra ve başka şeritler
 
-| Parça | Sahibi | Ne |
+| Parça | Sahibi | Yazımdan önce mi? |
 |---|---|---|
-| PIM öznitelikleri | ALTYAPI | `rated_power_w(W)`, `voltage_alt_v(V)`, `atex_marking`, `atex_zone` eklenir; kilit 22/12 → 26/14 |
-| Vitrin etiketi | URUN | `atex_zone` için TR/EN etiket + `spec-keys.manifest.json` kaydı (canlıda 19 üründe zaten var, INV-SPEC-LABEL-1 görmüyor) |
+| `atex_zone` TR/EN etiket + `spec-keys.manifest.json` | URUN | **ÖNCE** — yoksa vitrinde ham anahtar görünür (canlıda 19 üründe bugün de etiketsiz) |
+| `max_current_a` etiketi var mı | URUN | **ÖNCE** — adım 1'de ölçülür |
+| PIM öznitelikleri `rated_power_w(W)`, `voltage_alt_v(V)`, `max_current_a(A)`, `atex_marking`, `atex_zone` (22/12 → 27/15) | ALTYAPI | **SONRA olabilir** — DB yazımı PIM'e bağlı değil; PIM paketi öznitelikler eklenince üretilir |
 
 ## Açık sorular
 
 | # | Soru | Kime | Plan ne yapıyor |
 |---|---|---|---|
-| 1 | CMS ATEX 35/14: 3 kW mı 4 kW mı | Recep — **karar 75 EVET: üreticiye göre (3 kW), ad+slug düzeltilir** (OPS aktarımı 2026-09-22; canlı yazım Recep'in KATALOG penceresindeki sözüyle) | ad düzeltmesi canlıya yazılınca çıkarıma girer: +1 ürün, +11 değer (toplam 49 ürün · 528 + 49) |
-| 2 | NIMAX 314 T2 debi 5.500 / 5.240 | Recep — **karar 75 EVET: 5.500** | 5.500 yazılır |
-| 3 | CMS ağırlığı fan mı toplam mı | AVenS | alan boş |
-| 4 | CMS 12/5, 14/5 fan 1450 / motor 1346 d/dk | AVenS | devir boş |
-| 5 | Casals ses değeri LwA mı LpA mı, mesafe | AVenS / katalog giriş sayfası | alan boş |
-| 6 | QE-B (9 ürün) kaynağı dizinde | — | kapsam dışı, sonraki okuyucu |
+| 1 | Casals/Enkelfan "Air flow" üst sınır mı nominal mi | AVenS (71b listesine eklenir) | debi yazılmaz |
+| 2 | CMS ağırlığı fan mı toplam mı | AVenS | boş |
+| 3 | CMS 12/5, 14/5 fan 1450 / motor 1346 d/dk | AVenS | devir boş |
+| 4 | Enkelfan 355-630 gerilimi 400 V mı 380 V mı | AVenS | gerilim + faz boş |
+| 5 | Casals ses LwA mı LpA mı | AVenS | boş |
+| 6 | Canlıda `atex_marking` alanında bölge taşıyan 6 ürün (K11-a ihlali) | ayrı iş (Linear sınırı dolu → REC-172 yorumu) | bu plan dokunmaz |
+| 7 | QE-B (9 ürün) | — | kapsam dışı, sonraki okuyucu |
+| — | NIMAX 314 T2 debi (karar 75: 5.500) | — | debi bu turda ✗ (soru 1) → karar 75 debi kısmı soru 1 cevabına kadar bekler |
 
-## v1 → v2 (çürütme bulguları ve karşılığı)
+## v1 → v2 (1. çürütme, BLOK)
 
 | v1 bulgusu (risk) | v2 |
 |---|---|
-| ATEX bölge `atex_marking`'e yazılıyordu; 12/5, 14/5 Zone 1 (Kritik) | `atex_zone` / `atex_marking` ayrı; föy başına okunur |
-| Gerilim tek sayı, 230/690 atılıyor, atıf yanlış sayfa (Yüksek) | `voltage_v` + `voltage_alt_v`; atıf 191/199; `wiring` türetilmez |
-| NIMUS/NIMAX IP-55 / Class F eksik (Orta) | eklendi |
-| Akım anlamı cetvelsiz; 12/5-14/5 devir çelişkisi (Orta) | cetvel satırı adım 1; devir boş |
-| Enkelfan A/B/C anlamı doğrulanmadı (Orta) | çıkarılmaz |
-| Sayılar tutarsız (Orta) | yeniden hesaplandı: 48 ürün, 517 + 48 |
-| Kabul 2 döngüsel (Yüksek) | bağımsız doğrulama ZORUNLU, farklı yol |
-| Yükleyici bu işi yapamaz, audit yok (Kritik) | adım 3: parametre + audit + NULL-yalnız + eşzamanlılık + test |
-| PIM'de eksik öznitelikler; l/s alıntı kapısında; `{}` ≠ NULL (Orta/Düşük) | koordinasyon tablosu; l/s muaf; NULL düzeltildi |
+| ATEX bölge `atex_marking`'e (Kritik) | `atex_zone` / `atex_marking` ayrı |
+| Gerilim tek sayı, yanlış atıf (Yüksek) | `voltage_v` + `voltage_alt_v`; atıf 191/199 |
+| IP-55 / Class F eksik (Orta) | eklendi |
+| Akım cetvelsiz; devir çelişkisi (Orta) | cetvel satırı; devir boş |
+| Enkelfan A/B/C (Orta) | çıkarılmaz |
+| Sayılar (Orta) | yeniden hesaplandı |
+| Kabul döngüsel (Yüksek) | bağımsız doğrulama zorunlu |
+| Yükleyici audit'siz, sabit evren (Kritik) | yükleyici kapsamda |
+| PIM eksik; l/s; NULL (Orta/Düşük) | koordinasyon; l/s muaf; NULL |
+
+## v2 → v3 (2. çürütme, KOŞULLU)
+
+| v2 bulgusu | v3 |
+|---|---|
+| "Rated I" ve "I max" aynı alana; sözlük eşlemeleri yanlış | `absorbed_current_a` / `max_current_a` ayrı; okuyucu sözlüğe dayanmaz, sözlük düzeltmesi ayrı iş |
+| Kol 2 flipbook ve CMS s.1'de yok (tablo 0) | YÖNTEM tablosu: metin-yalnız kaynakta ajan zorunlu; 76 hayır → o alanlar yazılmaz, sayı 109+10 |
+| Çift audit; TOCTOU; tüm-JSON PATCH | audit tetiğe bırakıldı; atomik koşullu PATCH (`is.null` + `updated_at=eq`) |
+| Sayılar bayat (35/14 canlıda 3kW) | 49 ürün; CMS 10 |
+| CMS faz boş ama gerilim yazılıyor (aynı kanıt) | faz + gerilim birlikte, aynı atıfla |
+| `atex_zone` biçimi 3. biçim; 6 üründe marking'de bölge | kanonik biçim cetvele; 6 ürün ayrı iş |
+| `atex_marking` "Fan/Motor" anlam farkı; satır kırılımı | cetvel notu; alıntı araması normalize |
+| "Air flow" `max_` değil (§11.7) | Casals/Enkelfan debisi ✗ + AVenS sorusu; CMS "Max. Flow" yazılır |
+| Enkelfan 400V ↔ AC380V | 355-630 gerilim + faz ✗ |
+| Yazım ↔ PIM/etiket sırası belirsiz | sıra tablosu |
