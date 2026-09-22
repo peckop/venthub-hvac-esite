@@ -30,13 +30,18 @@ async function withDisplayPricesSafe<T extends { id: string }>(
 export async function getSearchSuggestions(
   supabase: SupabaseClient<Database>,
   q: string,
-  limit: number = 6
+  limit: number = 6,
+  signal?: AbortSignal
 ): Promise<SearchSuggestion[]> {
-  const { data, error } = await supabase.rpc('get_search_suggestions', {
+  let istek = supabase.rpc('get_search_suggestions', {
     p_q: q,
     p_limit: limit
   })
+  // Kullanıcı yazmaya devam ettiyse eskimiş istek iptal edilir (arama cetveli K14.7).
+  if (signal) istek = istek.abortSignal(signal)
+  const { data, error } = await istek
 
+  if (signal?.aborted) return []
   if (error) {
     console.error('getSearchSuggestions error:', error)
     return []
@@ -50,10 +55,15 @@ export async function ftsSearchProducts(
   supabase: SupabaseClient<Database>,
   q: string,
   limit = 20,
-  filters?: { category_id?: string }
+  filters?: { category_id?: string },
+  signal?: AbortSignal
 ): Promise<FtsProductResult[]> {
   const payload = { p_q: q, p_limit: limit, p_filters: filters || {} }
-  const { data, error } = await supabase.rpc('fts_search_products', payload)
+  let istek = supabase.rpc('fts_search_products', payload)
+  if (signal) istek = istek.abortSignal(signal)
+  const { data, error } = await istek
+  // İptal edilen istek hata DEĞİLDİR: çağıran zaten yeni aramayı bekliyor.
+  if (signal?.aborted) return []
   if (error) throw error
   // W4b: RPC'nin döndürdüğü `price` ZATEN motor fiyatıdır (migration: `display_price(p) AS price`).
   // Burada ikinci bir get_display_prices turu açmak, her tuş vuruşunda (debounce'lu arama)

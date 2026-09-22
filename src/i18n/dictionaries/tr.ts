@@ -270,7 +270,10 @@ export const tr = {
     failed: 'Arama şu an yapılamadı.',
     retry: 'Tekrar dene',
     brandPrefix: 'Marka: ',
-    fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.'
+    fuzzyMatchNotice: 'Tam eşleşme bulunamadı, benzer sonuçlar gösteriliyor.',
+    // Arama 600 ms'yi geçince (karar 59 ölçümü: sunucu ara sıra 1–3 sn duraklıyor) önceki
+    // sonuçlar ekranda kalır, üstünde bu satır belirir — boş ekran + dönen yuvarlak yerine.
+    slowHint: 'Aranıyor, sonuçlar geliyor…'
   },
   knowledge: {
     hub: {
