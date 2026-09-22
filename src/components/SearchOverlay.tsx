@@ -38,6 +38,13 @@ type ViewState = 'IDLE' | 'RESULTS'
 
 const RECENT_SEARCHES_KEY = 'venthub_recent_searches'
 
+/**
+ * Bu süreyi geçen aramada "aranıyor" satırı görünür (arama cetveli K14.7). 2026-09-22 ölçümü:
+ * sıcak arama p50 30 ms / p95 186 ms (sunucu), yani normal arama bu eşiğin çok altında kalır;
+ * satır yalnız sunucu duraklamasında (0,4–10 sn) çıkar.
+ */
+const YAVAS_ESIK_MS = 600
+
 const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const { t, lang } = useI18n()
   const { categories: globalCategories, getCategoryBySlug } = useCategories()
@@ -45,6 +52,9 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   const [q, setQ] = React.useState('')
   const [debounced, setDebounced] = React.useState('')
   const [loading, setLoading] = React.useState(false)
+  // Arama YAVAŞ_ESIK_MS'yi geçti mi (K14.7): ipucu satırı yalnız o zaman görünür — hızlı
+  // cevapta (çoğu arama <300 ms) yanıp sönen bir yazı olmasın.
+  const [yavas, setYavas] = React.useState(false)
   const [viewState, setViewState] = React.useState<ViewState>('IDLE')
   const [activeIndex, setActiveIndex] = React.useState(-1)
 
@@ -97,11 +107,18 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   // Main search logic
   React.useEffect(() => {
     let active = true
+    // Yeni harf gelince bu etki temizlenir: eskimiş iki RPC ağda da iptal edilir.
+    const iptal = new AbortController()
+    let yavasZamanlayici: ReturnType<typeof setTimeout> | undefined
 
     async function fetchData() {
       if (!open) return
 
       if (!debounced) {
+        // Önceki arama sürerken kutu boşaltıldıysa onun `finally`'si çalışmaz (etki temizlendi);
+        // bekleme durumu burada kapatılmazsa dönen yuvarlak takılı kalır.
+        setLoading(false)
+        setYavas(false)
         setViewState('IDLE')
         setSuggestions([])
         setResults([])
@@ -111,13 +128,14 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
       try {
         setLoading(true)
         setError(null)
+        yavasZamanlayici = setTimeout(() => { if (active) setYavas(true) }, YAVAS_ESIK_MS)
         const { getSearchSuggestions, ftsSearchProducts } = await import('../lib/services/product.service')
         // İkisi PARALEL ve ikisi de artık AYNI eşleştirme gövdesini kullanıyor (migration
         // 20260916132052). Ürünler listeyi kurar; öneri çağrısından yalnız kategori/marka
         // kısayolları alınır — ürün kalemleri yinelenmesin diye süzülür.
         const [items, rows] = await Promise.all([
-          getSearchSuggestions(supabaseBrowserClient, debounced, 6),
-          ftsSearchProducts(supabaseBrowserClient, debounced, 20),
+          getSearchSuggestions(supabaseBrowserClient, debounced, 6, iptal.signal),
+          ftsSearchProducts(supabaseBrowserClient, debounced, 20, undefined, iptal.signal),
         ])
 
         if (active) {
@@ -126,6 +144,8 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           setViewState('RESULTS')
         }
       } catch (err) {
+        // İptal edilen eski istek hata değildir; yeni arama zaten yolda.
+        if (iptal.signal.aborted) return
         console.error(err)
         if (active) {
           setSuggestions([])
@@ -137,12 +157,20 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
           setError(t('search.failed'))
         }
       } finally {
-        if (active) setLoading(false)
+        clearTimeout(yavasZamanlayici)
+        if (active) {
+          setLoading(false)
+          setYavas(false)
+        }
       }
     }
 
     fetchData()
-    return () => { active = false }
+    return () => {
+      active = false
+      clearTimeout(yavasZamanlayici)
+      iptal.abort()
+    }
     // `t` hata mesajı için kullanılıyor; `useI18n` onu kararlı döndürür (aynı desen
     // PaymentSuccessPage'de de var), bu yüzden bağımlılığa girmesi yeniden çağrı üretmez.
   }, [debounced, open, t, denemeNo])
@@ -151,6 +179,10 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
   React.useEffect(() => {
     if (open) {
       setQ('')
+      // Odak AÇILIŞ ANINDA verilir: pencere artık önceden inip askısız çiziliyor (K14.6), açılıştan
+      // sonraki ilk tuş odaksız bir aralığa düşerse harf kaybolur (2026-09-22 görsel kanıtta
+      // "lineo" → "ineo"). 50 ms'lik ikinci deneme, açılış animasyonunda odağı kaçıran tarayıcılar için.
+      inputRef.current?.focus()
       setTimeout(() => inputRef.current?.focus(), 50)
     }
   }, [open])
@@ -565,11 +597,19 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({ open, onClose }) => {
               </div>
             )}
 
-            {!error && !loading && (
-              <>
+            {yavas && !error && (
+              <p role="status" className="px-4 py-2 text-xs font-medium text-steel-gray bg-air-blue/10 border-b border-light-gray">
+                {t('search.slowHint')}
+              </p>
+            )}
+
+            {/* K14.7: yeni sonuç gelene kadar ÖNCEKİ içerik ekranda kalır (soluk). Eskiden bekleme
+                sırasında gizleniyordu: sunucu duraklayınca ekran boş + dönen yuvarlak kalıyordu. */}
+            {!error && (
+              <div aria-busy={loading} className={`transition-opacity duration-200 ${loading && viewState === 'RESULTS' ? 'opacity-60' : 'opacity-100'}`}>
                 {viewState === 'IDLE' && renderIdle()}
                 {viewState === 'RESULTS' && renderResults()}
-              </>
+              </div>
             )}
           </div>
 

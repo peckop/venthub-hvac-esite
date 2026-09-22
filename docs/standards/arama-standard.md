@@ -488,6 +488,18 @@ bileşeni tutar (`hazirAramaPenceresi`), başlık onu `useSyncExternalStore` ile
 **doğrudan** çizer; yoksa tembel yol yedek olarak kalır. ⚠Ders: "parça önceden indi" ile "pencere
 hızlı açılır" aynı iddia değildir — ikincisi ayrı ölçülür (ilk ölçümde yalnız birincisi doğrulanmıştı).
 
+**K14.7 — Sunucu duraklayınca ekran BOŞALMAZ.** *(2026-09-22, karar 59 ölçümü:
+`docs/audits/rec340-karar59-olcum/`.)* Nano makine ara sıra 0,4–10 sn duraklıyor; sıcak arama p50
+30 ms / p95 186 ms. Bu yüzden: (a) yeni sonuç gelene kadar önceki içerik ekranda kalır (soluk,
+`aria-busy`), bekleme sırasında gizlenmez; (b) bekleme **600 ms**'yi geçerse `search.slowHint`
+satırı (`role="status"`) çıkar — hızlı cevapta çıkmaz, yanıp sönmez; (c) yeni harf eski iki RPC'yi
+`AbortSignal` ile iptal eder, iptal hata sayılmaz (`search.failed` gösterilmez); (d) arama sürerken
+kutu boşaltılırsa bekleme durumu kapanır; (e) odak açılış ANINDA verilir (pencere askısız
+çizildiği için 50 ms'lik gecikme ilk harfi yutuyordu — görsel kanıtta "lineo" → "ineo").
+Kapı: **INV-ARAMA-KESINTISIZ-1** (`src/components/__tests__/SearchOverlayKesintisiz.test.tsx`;
+çapa: eski kodda 5 kolun 4'ü kırmızı). Görsel kanıt: `docs/audits/rec340-karar59-olcum/k147-*.png`.
+Bu madde duraklamayı KESMEZ, boş ekranı keser; duraklamanın kendisi için bkz. REC-340 seçenek 1–2.
+
 **K14.5 — Bu bölüm aralıklı sunucu gecikmesini ÇÖZMEZ.** 2026-09-22 ölçümünde (temiz tarayıcı ×6)
 ikinci aramada da 1,6 sn'lik bir uç görüldü — o anda istemci tarafı tamamen ısınmıştı. Aralıklı
 uzun bekleme sunucu/veritabanı tarafındadır; ayrı ölçülür, bu bölümün başarı ölçütü değildir.
