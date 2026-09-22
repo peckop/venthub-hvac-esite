@@ -305,7 +305,7 @@ ${companyFooter}
     }
 
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || ''
-    let EMAIL_FROM = branding.emailFrom
+    const EMAIL_FROM = branding.emailFrom
     const notifyDebug = Deno.env.get('NOTIFY_DEBUG') === 'true'
     // İşletme kopyası. VARSAYILAN YOK — bu satırda bir zamanlar gömülü bir KİŞİSEL adres
     // vardı (`|| 'recep.varlik@gmail.com'`) ve iki ayrı soruna yol açıyordu:
@@ -374,19 +374,33 @@ ${companyFooter}
       })
     }
 
-    // Try configured sender; if the domain is not verified, retry ONCE with the Resend test sender
-    let resp = await sendEmail(EMAIL_FROM, toList, bcc)
+    // REC-368: gönderici doğrulanmamışsa Resend DENEME göndericisine (onboarding@resend.dev)
+    // SESSİZCE DÜŞÜLMEZ — deneme göndericisi yalnız Resend hesap sahibine teslim eder; sahibin
+    // kendi adresiyle yapılan denemede her şey çalışıyor görünür, müşteriye hiçbir e-posta gitmez.
+    // Hata görünür olur: denetim kaydı (shipping_email_events'te durum sütunu yok) + hata izleme
+    // + 5xx. Çağıran admin-update-shipping kargo kaydını geri almaz, `emailResult.sent=false` döner.
+    const resp = await sendEmail(EMAIL_FROM, toList, bcc)
     if (!resp.ok) {
       const errorText = await resp.text().catch(()=>'')
       const normalized = errorText.toLowerCase()
-      if ((normalized.includes('domain') && normalized.includes('verify')) || normalized.includes('from address')) {
-        EMAIL_FROM = 'VentHub Test <onboarding@resend.dev>'
-        resp = await sendEmail(EMAIL_FROM, toList, bcc)
+      const reason = (normalized.includes('domain') && normalized.includes('verify')) || normalized.includes('from address')
+        ? 'sender_unverified' : 'provider_error'
+      try { await sentryCaptureException(new Error(`shipping-notification send failed (${reason}, ${resp.status})`), { fn: 'shipping-notification', tenant_id: tenantId }) } catch { /* izleme düşse bile kayıt aşağıda */ }
+      if (SUPABASE_URL && SERVICE_KEY) {
+        const denetim = await fetch(`${SUPABASE_URL}/rest/v1/admin_audit_log`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY, Prefer: 'return=minimal' },
+          body: JSON.stringify({
+            table_name: 'venthub_orders',
+            row_pk: order_id,
+            action: 'email_send_failed',
+            after: { kind: 'shipping_notification', reason, provider_status: resp.status, provider_error: errorText.slice(0, 500) },
+            tenant_id: tenantId,
+          }),
+        }).catch(() => null)
+        if (!denetim || !denetim.ok) console.error('[shipping-notification] admin_audit_log yazilamadi', { order_id, reason })
       }
-      if (!resp.ok) {
-        try { await sentryCaptureException(new Error(`Email send failed: ${errorText}`), { fn: 'shipping-notification', tenant_id: tenantId }) } catch { /* swallow */ }
-        throw new Error(`Email send failed: ${errorText}`)
-      }
+      throw new Error(`Email send failed (${reason}, ${resp.status}): ${errorText.slice(0, 500)}`)
     }
 
     const result = await resp.json().catch(()=>({})) as ResendResult
