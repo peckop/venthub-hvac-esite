@@ -61,7 +61,7 @@ wrongstack toplam ~280 — hepsi tüm pencereler toplamı).
 | 38748 | 262 | ← editörün (Antigravity IDE) kendi TypeScript eklentisi | `--max-old-space-size=3072` |
 | diğerleri | 14–40 | LSP'lerin sözdizimi sunucuları (`--serverMode`) | — |
 
-**Kaynak:** kullanıcı eklentisi `typescript-lsp-win@recep-plugins` (yerel pazar `C:\Users\alize\claude-plugins`,
+**Kaynak:** kullanıcı eklentisi `typescript-lsp-win@recep-plugins` (yerel pazar `~/claude-plugins`,
 `.claude-plugin/marketplace.json` → `lspServers.typescript`). Editörün kendi sunucusu 3 GB sınırla 262 MB'ta dururken
 sınırsız LSP sunucusu 4,4 GB'a çıktı. Neden bu kadar büyüdüğü **ölçülmedi** (tsserver günlüğü kapalı); çıkarım:
 `--useInferredProjectPerProjectRoot` ile pencerenin dokunduğu her worktree ayrı proje olarak yükleniyor ve bu pencere
@@ -70,7 +70,7 @@ gün içinde en az üç kökte (ana depo, `C:/tmp/vh-altyapi-kip`, `C:/tmp/pim-u
 **Sınırlama yolu (resmi belge: code.claude.com/docs/en/plugins-reference#lsp-servers — `initializationOptions`
 destekleniyor; `typescript-language-server` 5.1.3 `maxTsServerMemory` seçeneğini okuyor, kurulu kodda ölçüldü):**
 
-- **Dosya:** `C:\Users\alize\claude-plugins\.claude-plugin\marketplace.json`
+- **Dosya:** `~/claude-plugins/.claude-plugin/marketplace.json` (kullanıcı klasörü altında)
 - **Değişiklik (tek satır):** `plugins[typescript-lsp-win].lspServers.typescript` içine
   `"initializationOptions": { "maxTsServerMemory": 2048 }`
 - **Bedeli:** 2 GB'ı aşan projede tsserver yeniden başlar, o sırada birkaç saniye tanı gelmez; tanı kalitesi değişmez.
