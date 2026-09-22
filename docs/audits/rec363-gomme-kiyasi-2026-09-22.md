@@ -87,3 +87,33 @@ başarısı **tüm hafıza (~500 dosya)** üzerinde yeniden ölçülür — 20 d
   --system-prompt …` ister (betikte yazılı). Bu, compact'ta başsız model kullanma adayını (REC-363 "aday ek")
   doğrudan etkiler.
 - C1'in ilk yüklemesi 63 sn (model indirme, bir kez); sonraki yüklemeler ~4 sn.
+
+## 6 · Ön şart ölçümü: BÜTÜN hafıza (501 dosya) — §4 önerisi DÜŞTÜ (2026-09-22, karar 57)
+
+Recep karar 57'de "kur" dedi; OPS'un ön şartı: kurulumdan önce aynı 10 soru bütün hafızada, C1 ilk 10
+**≥ 20/24** değilse kurulmaz. Sage yedeği alındı ve doğrulandı (sage 164 kayıt, kanban 86). Koşum:
+`EVREN=tum` (betikte). Gömme ve sözcük kolları deterministik — tek tur, 3 tura eşdeğer.
+
+| Kol | 20 dersde ilk 10 | **501 dosyada** 1. | ilk 3 | ilk 10 | Beklenen dersin sırası (S1…S8) |
+|---|---|---|---|---|---|
+| C0 İngilizce yerel | 18/24 | 1/8 | 4/8 | 4/8 | — |
+| C1 e5-small yerel | 24/24 | 1/8 | 1/8 | **4/8** | 29 · 29 · 9 · 1 · 6 · 10 · 31 · 29 |
+| C2 MiniLM çok dilli | 24/24 | 0/8 | 1/8 | 3/8 | — |
+| L sözcük BM25 | — | 3/8 | 4/8 | 6/8 | 1 · 56 · 10 · 1 · 2 · 20 · 10 · 1 |
+| **R RRF (C1 + BM25)** | (20 dersde 1. sırada **8/8**) | 2/8 | 4/8 | **7/8** | 7 · 25 · 3 · 1 · 2 · 4 · 4 · 1 |
+| H50 (C1 ilk 50 → Haiku) | — | 5/8 | **8/8** | 8/8 | 1 · 1 · 1 · 3 · 1 · 2 · 2 · 1 — ama 48 sn, $0,052/soru |
+
+**Hüküm (OPS):** C1 tek başına **KURULMADI** — 4/8 (12/24) eşiğin çok altında. 20 derslik sınav küçük
+örneklemde şişmişti: 20 aday arasında ilk 10'a girmek, 501 arasında girmekle aynı iş değil.
+
+**Asıl bulgu:** ölçekte **sözcük araması gömmeden güçlü** (BM25 6/8 ↔ C1 4/8), ikisinin birleşimi en iyisi
+(RRF 7/8 = 21/24 eşdeğer, eşiğin üstünde). Bu tam da sage'in `vectorRecall` tasarımı (sözcük sonucu + vektör
+sonucu RRF ile birleşir). Yani kurulacak şey "yerel gömme tek başına" değil, "sage'in kendi sözcük araması +
+yerel gömme". RRF puanı mutlak değildir → olumsuz soruları ("bulunamadı") ayırmaz; yalnız sıra okunur.
+
+**Sınırlar:** (1) L benim BM25 yaklaşığımdır (Türkçe küçük harf, kök bulma yok) — sage'in FTS5 sıralaması
+değil; kurulum öncesi son ölçüm sage'in gerçek sözcük aramasıyla yapılmalı. (2) Tek-doğru-cevap etiketi
+501 dosyada katı: ilk sıralardaki derslerin çoğu aynı soruya gerçekten cevap veriyor (ör. S7'de
+`deleted-capability-hides-as-dead-code`, S4'te `relationship-may-live-in-another-column`). Çok-doğrulu etiket
+(soru başına ≤3 kabul edilir ders) OPS'ta — hakem ayrı; ilk-10 listeleri ona verildi. (3) H50 kalıcı çözüm
+değil (OPS): yalnız üst sınır referansı.
