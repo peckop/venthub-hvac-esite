@@ -79,7 +79,7 @@ jobs:
           echo "::notice::PR #${pr} merge-ref'i test edilecek (dal ucu DEĞİL)."
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Boş dize = varsayılan davranış (pull_request'te zaten merge-ref).
           # Yalnız elle tetiklemede ve açık PR varken dolu gelir.
@@ -105,12 +105,12 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: 'pnpm'

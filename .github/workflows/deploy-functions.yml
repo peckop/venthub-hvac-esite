@@ -69,13 +69,13 @@ jobs:
       count: ${{ steps.pick.outputs.count }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Değişen dosyaları hesaplayabilmek için önceki commit'e erişim şart.
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 
@@ -144,7 +144,7 @@ jobs:
       SLUGS: ${{ needs.select.outputs.slugs }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Surum PINLI: `@v1` yalnizca action'i sabitler, KURULAN CLI'yi degil — runner
       # bugune kadar 2.20.3 kuruyordu. drift-check.mjs `functions download --use-api`
@@ -152,7 +152,7 @@ jobs:
       # dedektor SESSIZCE yanlis sonuc verebilir. 2.101.0 = `--use-api` davranisinin
       # yerelde birebir olculdugu surum (repo == prod, 26/26 fonksiyon).
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v3
         with:
           version: 2.101.0
 
@@ -216,10 +216,10 @@ jobs:
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
 
@@ -235,7 +235,7 @@ jobs:
       # dedektor SESSIZCE yanlis sonuc verebilir. 2.101.0 = `--use-api` davranisinin
       # yerelde birebir olculdugu surum (repo == prod, 26/26 fonksiyon).
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v3
         with:
           version: 2.101.0
 
