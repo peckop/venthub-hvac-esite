@@ -32,6 +32,7 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { TEKNIK_BASLIK_ADIM3 } from './paket-sozlesme.mjs'
 
 const arg = (ad, vars) => process.argv.find(a => a.startsWith(`--${ad}=`))?.slice(ad.length + 3) || vars
 const HEDEF = arg('hedef', 'katalog-paketi')
@@ -518,7 +519,9 @@ if (YAZ) {
     let s = String(v).replace(/\r?\n/g, ' ').trim()
     return (s.includes(';') || s.includes('"')) ? '"' + s.replace(/"/g, '""') + '"' : s
   }
-  const BAS = ['sku', 'urun', 'alan', 'deger', 'durum', 'kaynak_tur', 'kaynak_dosya', 'kaynak_sayfa', 'alinti']
+  // Liste ORTAK sözleşmeden: burada sabit tutulsaydı üreticinin eklediği kolon (birim,
+  // baslik_tr) bu yeniden yazımda SESSİZCE silinirdi.
+  const BAS = TEKNIK_BASLIK_ADIM3
   writeFileSync(join(HEDEF, 'teknik-ozellikler.csv'),
     BOM + [BAS.join(';'), ...sonuc.map(r => BAS.map(b => hucre(r[b])).join(';'))].join('\r\n') + '\r\n', 'utf8')
   const CB = ['sku', 'urun', 'alan', 'paket_degeri', 'sinif', 'karar', 'kaynak_dosya', 'kaynak_sayfa']

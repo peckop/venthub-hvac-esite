@@ -36,6 +36,13 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, dirname, basename } from 'node:path'
+import {
+  URUN_BASLIK, TEKNIK_BASLIK, GORSEL_BASLIK, FIYAT_BASLIK, turkceBasliklar, birimler, paketHucresi,
+} from './paket-sozlesme.mjs'
+
+// Fail-closed: okunamazsa betik DURUR (başlıksız paket üretmek, eksikliği gizler).
+const BASLIK_TR = turkceBasliklar()
+const BIRIM = birimler()
 
 const env = Object.fromEntries(
   readFileSync(process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env'), 'utf8')
@@ -59,9 +66,8 @@ if (!existsSync(HAM)) {
 // okunamayan dosya işe yaramaz.
 const BOM = '﻿'
 const csvHucre = (v) => {
-  if (v == null) return ''                       // K7: boş hücre, tire YOK
-  let s = typeof v === 'object' ? JSON.stringify(v) : String(v)
-  s = s.replace(/\r?\n/g, ' ').trim()
+  // K7: boş hücre, tire YOK. Biçim kuralı ORTAK (paketHucresi) — round-trip kapısı aynısını kullanır.
+  let s = paketHucresi(v)
   if (s.includes(';') || s.includes('"')) s = '"' + s.replace(/"/g, '""') + '"'
   return s
 }
@@ -96,9 +102,13 @@ const fiyatlar = oku('product_prices')
 const fiyatListeleri = oku('price_lists')
 const gorseller = oku('product_images')
 
+// `brands` pakette tablo olarak KALIR (round-trip onu da ölçer) ama ürün satırı ona bağlanmaz:
+// `products.brand_id` diye bir kolon YOK (DESIGN-KATALOG sözleşme v1, bulgu 5, 2026-09-10).
+// Eski `markaAdi.get(u.brand_id)` dalı hiç çalışmayan ölü koddu; marka `products.brand`dır.
+void markalar
+
 const aileAdi = new Map(aileler.map(a => [a.id, a.name]))
 const kategoriAdi = new Map(kategoriler.map(k => [k.id, k.name]))
-const markaAdi = new Map(markalar.map(m => [m.id, m.name]))
 const listeAdi = new Map(fiyatListeleri.map(l => [l.id, l.name]))
 const urunSku = new Map(urunler.map(u => [u.id, u.sku]))
 const urunAdi = new Map(urunler.map(u => [u.id, u.name]))
@@ -108,13 +118,16 @@ const sayim = {}
 
 // ── 1. ÜRÜNLER
 sayim['urunler.csv'] = csvYaz(join(HEDEF, 'urunler.csv'),
-  ['sku', 'ad', 'model_kodu', 'marka', 'aile', 'kategori', 'durum', 'slug',
-   'kaynak_dosya', 'kaynak_sayfa', 'alinti'],
+  URUN_BASLIK,
   urunler.map(u => ({
     sku: u.sku, ad: u.name, model_kodu: u.model_code,
-    marka: u.brand ?? markaAdi.get(u.brand_id) ?? '',
+    marka: u.brand ?? '',
     aile: aileAdi.get(u.family_id) ?? '',
-    kategori: kategoriAdi.get(u.subcategory_id) ?? kategoriAdi.get(u.category_id) ?? '',
+    // İKİ KADEME AYRI KOLON. Eski tek `kategori` kolonu alt kademe yoksa KÖKÜ yazıyordu;
+    // o 8 üründe kök ile alt kademe aynı hücrede görünüyor, hangisi olduğu okunamıyordu
+    // (sayım standardı §2 tuzağı). Alt kademe yoksa hücre BOŞ kalır, köke DÜŞÜRÜLMEZ.
+    ust_kategori: kategoriAdi.get(u.category_id) ?? '',
+    alt_kategori: kategoriAdi.get(u.subcategory_id) ?? '',
     durum: u.status, slug: u.slug, ...kaynakKolon,
   })))
 
@@ -131,32 +144,44 @@ for (const u of urunler) {
     teknikSatirlar.push({
       sku: u.sku, urun: u.name, alan,
       deger: typeof deger === 'object' ? JSON.stringify(deger) : deger,
+      birim: BIRIM.get(alan) ?? '', baslik_tr: BASLIK_TR.get(alan) ?? '',
       ...kaynakKolon,
     })
   }
 }
 sayim['teknik-ozellikler.csv'] = csvYaz(join(HEDEF, 'teknik-ozellikler.csv'),
-  ['sku', 'urun', 'alan', 'deger', 'kaynak_dosya', 'kaynak_sayfa', 'alinti'], teknikSatirlar)
+  TEKNIK_BASLIK, teknikSatirlar)
 
 // ── 3. GÖRSEL BAĞI
 sayim['gorseller.csv'] = csvYaz(join(HEDEF, 'gorseller.csv'),
-  ['sku', 'urun', 'dosya', 'paket_yolu', 'sira', 'kaynak_dosya', 'kaynak_sayfa', 'alinti'],
+  GORSEL_BASLIK,
   gorseller.map(g => ({
     sku: urunSku.get(g.product_id) ?? '', urun: urunAdi.get(g.product_id) ?? '',
     dosya: g.path ? basename(g.path) : '',
     paket_yolu: g.path ? `gorseller/${g.path}` : '',
-    sira: g.sort_order ?? g.position ?? '', ...kaynakKolon,
+    sira: g.sort_order ?? g.position ?? '',
+    alt_metin: g.alt ?? '', ...kaynakKolon,
   })))
 
 // ── 4. FİYATLAR (kaynaklı tablo — alinti ZORUNLU)
+// `fiyat` NET (KDV hariç), `brut_fiyat` BRÜT (KDV dahil) — OPS hükmü 2026-09-11.
+// ⛔`base_price` KULLANILMAZ: Standart listede brüte, Bayi/Kurumsal listede nete eşit; aynı
+// kolon bir satırda KDV dahil bir satırda KDV hariç değer taşırdı. Eski `f.price ?? f.amount`
+// ise hiç var olmayan iki kolonu okuyordu → 1044 satırın 1044'ünde fiyat BOŞ gidiyordu.
+// `kdv` · `kaynak_fiyat_eur` · `fiyat_kaynak_sayfa` KAYNAK DİZİNİNDEN gelir (fiyat listesi
+// sayfasının kendi beyanı); DB'de karşılıkları YOKTUR. Bu koşumda BOŞ — fiyatın kaynak
+// eşlemesi ayrı adımdır. Kolon şimdiden açık: şema sonradan değişirse gözle kontrol edilmiş
+// dosyalar bozulur. `kdv` ile `products.tax_rate` AYRI şeydir, aynı kolona konmaz.
 sayim['fiyatlar.csv'] = csvYaz(join(HEDEF, 'fiyatlar.csv'),
-  ['sku', 'urun', 'liste', 'fiyat', 'para_birimi', 'gecerli_baslangic', 'aktif',
-   'kaynak_dosya', 'kaynak_sayfa', 'alinti'],
+  FIYAT_BASLIK,
   fiyatlar.map(f => ({
     sku: urunSku.get(f.product_id) ?? '', urun: urunAdi.get(f.product_id) ?? '',
-    liste: listeAdi.get(f.price_list_id) ?? '', fiyat: f.price ?? f.amount ?? '',
+    liste: listeAdi.get(f.price_list_id) ?? '',
+    fiyat: f.net_price ?? '', brut_fiyat: f.gross_price ?? '',
     para_birimi: f.currency ?? '', gecerli_baslangic: f.valid_from ?? '',
-    aktif: f.is_active ?? '', ...kaynakKolon,
+    aktif: f.is_active ?? '',
+    kdv: '', kaynak_fiyat_eur: '', fiyat_kaynak_sayfa: '',
+    ...kaynakKolon,
   })))
 
 // ── 5. AİLELER
