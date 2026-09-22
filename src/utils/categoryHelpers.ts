@@ -177,13 +177,17 @@ export const getCategoryDescription = (
             if (typeof value === 'string' && value.length > 0) return value
         }
 
-        // 2. Legacy tek-dilli hero metni (alan yoksa davranış eskisiyle AYNI)
-        const hero = (meta as { hero_description?: unknown }).hero_description
-        if (typeof hero === 'string' && hero.length > 0) return hero
+        // 2. Legacy tek-dilli hero metni — TÜRKÇEDİR, yalnız TR sayfada.
+        // INV-DIL-DUSUSU-1 (2026-09-22 ölçümü): 24 kategorinin description_i18n'inde EN 0; EN
+        // sayfa buraya düşüp Türkçe paragraf basıyordu (hero_description 2 kategoride dolu).
+        if (lang !== 'en') {
+            const hero = (meta as { hero_description?: unknown }).hero_description
+            if (typeof hero === 'string' && hero.length > 0) return hero
+        }
     }
 
-    // 3. Düz kolon → 4. boş dize
-    return category.description || ''
+    // 3. Düz kolon (tek dilli, Türkçe; canlıda 37/37 NULL) — yalnız TR → 4. boş dize
+    return lang === 'en' ? '' : category.description || ''
 }
 
 /**
