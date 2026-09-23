@@ -22,11 +22,14 @@
 // seçilerek uç, kapının KAPSAMI İÇİNDE doğar — sonradan "acaba kapsıyor mu" sorusu kalmaz.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
+import { checkRateLimit } from '../_shared/rate_limit.ts'
 import { DEFAULT_TENANT_ID } from '../_shared/tenant.ts'
 import { getTenantBranding } from '../_shared/tenant_config.ts'
 import { icBildirimOlustur, kacir, musteriOnayAnahtari } from './ic_bildirim.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (returns-webhook ile aynı pencere)
+const KULLANICI_SAATLIK = 5 // REC-380: oturumlu kullanıcı başına saatlik teklif e-postası (misafir e-posta sınırıyla aynı)
+const KIRACI_SAATLIK = 30 // REC-380: kiracı başına saatlik iç bildirim (Resend günlük kota 100)
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -239,6 +242,29 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // ⛔HIZ SINIRI — OTURUMLU YOL (REC-380, güvenlik incelemesi 2026-09-23 bulgu 1). `authenticated`
+    // rolü venthub_quotes'a PostgREST'ten doğrudan yazabiliyor; misafir ucun IP/e-posta sayaçları bu
+    // yolu GÖRMÜYOR. Bir hesap döngüyle satır yazıp her satırda iki e-posta (keyfi adrese müşteri
+    // onayı + kiracıya iç bildirim) ürettirebilirdi. Kullanıcı başına saatte 5 (misafir e-posta
+    // sınırıyla aynı). Aşılırsa HİÇBİR e-posta gitmez, defter + log'a yazılır, 429.
+    // Sayaç ÖLÇÜLEMEZSE gönderim sürer (fail-open) ve bu log'a düşer: satır zaten DB'de, bildirimi
+    // düşürmek meşru talebi sessizce kaybettirirdi (notification-standard §B4) — kötüye kullanım
+    // riski ise tek istek kadar.
+    const sayac = async (anahtar: string, limit: number): Promise<boolean> => {
+      try {
+        const { result } = await checkRateLimit(anahtar, supabaseUrl, serviceKey, { limit, windowSec: 3600 })
+        return result.allowed
+      } catch (e) {
+        console.error('[quote-notification-webhook] hiz sayaci olculemedi (fail-open)', { anahtar, hata: String(e) })
+        return true
+      }
+    }
+    if (quote.user_id && !(await sayac(`quote-notify-user:${quote.user_id}`, KULLANICI_SAATLIK))) {
+      console.warn('[quote-notification-webhook] kullanici hiz siniri asildi, e-posta YOK', { quote_id: quote.id })
+      await deftereYaz({ email_to: to, subject, status: 'failed', error: `hiz_siniri: kullanici saatte ${KULLANICI_SAATLIK}` })
+      return json({ error: 'rate_limited', quote_id: quote.id }, 429)
+    }
+
     // Katman 1 (§B3.1): Resend Idempotency-Key — eşzamanlı ya da 24 saat içindeki tekrar
     // çağrıda ikinci e-posta ÜRETİLMEZ. Katman 2 = `request_email_sent_at` (yukarıda okunur).
     const resendGonder = (govde: Record<string, unknown>, anahtar: string) =>
@@ -311,6 +337,14 @@ Deno.serve(async (req: Request) => {
       await deftereYaz({ email_to: '', subject: 'ic bildirim', status: 'failed', error: 'supportEmail bos' })
       return json({ error: 'internal_recipient_missing', quote_id: quote.id }, 500)
     }
+    // Kiracı başına iç bildirim tavanı (REC-380): Resend günlük kotası 100; bir saatte 30'dan fazla
+    // iç bildirim kötüye kullanım işaretidir. Aşılırsa iç bildirim ATLANIR (müşteri onayı gitti),
+    // defter + log'a yazılır ve damga basılır — talep panelde görünür, kota korunur.
+    const icIzinli = await sayac(`quote-notify-tenant:${quote.tenant_id}`, KIRACI_SAATLIK)
+    if (!icIzinli) {
+      console.warn('[quote-notification-webhook] kiraci ic bildirim tavani asildi, ic bildirim ATLANDI', { quote_id: quote.id })
+      await deftereYaz({ email_to: icAlici, subject: 'ic bildirim', status: 'failed', error: `hiz_siniri: kiraci saatte ${KIRACI_SAATLIK}` })
+    }
     const ic = icBildirimOlustur({
       quoteId: quote.id,
       source: quote.source,
@@ -320,28 +354,30 @@ Deno.serve(async (req: Request) => {
       kalemler: items ?? [],
       panelTabanUrl: Deno.env.get('SITE_URL') || 'https://venthub.com.tr',
     })
-    const icResp = await resendGonder(
-      { from: marka.emailFrom || emailFrom, to: [icAlici], reply_to: to, subject: ic.subject, html: ic.html, text: ic.text },
-      ic.idempotencyKey,
-    )
-    if (!icResp.ok && icResp.status !== 409) {
-      const govde = await icResp.text().catch(() => '')
-      console.error('[quote-notification-webhook] ic bildirim basarisiz', {
-        quote_id: quote.id,
-        status: icResp.status,
-        govde: govde.slice(0, 300),
+    if (icIzinli) {
+      const icResp = await resendGonder(
+        { from: marka.emailFrom || emailFrom, to: [icAlici], reply_to: to, subject: ic.subject, html: ic.html, text: ic.text },
+        ic.idempotencyKey,
+      )
+      if (!icResp.ok && icResp.status !== 409) {
+        const govde = await icResp.text().catch(() => '')
+        console.error('[quote-notification-webhook] ic bildirim basarisiz', {
+          quote_id: quote.id,
+          status: icResp.status,
+          govde: govde.slice(0, 300),
+        })
+        await deftereYaz({ email_to: icAlici, subject: ic.subject, status: 'failed', error: `resend ${icResp.status}: ${govde.slice(0, 300)}` })
+        return json({ error: 'internal_notify_failed', status: icResp.status, quote_id: quote.id }, 502)
+      }
+      const icSonuc = icResp.ok ? ((await icResp.json().catch(() => null)) as { id?: string } | null) : null
+      await deftereYaz({
+        email_to: icAlici,
+        subject: ic.subject,
+        status: 'sent',
+        provider_message_id: icSonuc?.id ?? null,
+        error: icResp.ok ? null : 'resend 409: idempotent — onceden gonderilmis sayildi',
       })
-      await deftereYaz({ email_to: icAlici, subject: ic.subject, status: 'failed', error: `resend ${icResp.status}: ${govde.slice(0, 300)}` })
-      return json({ error: 'internal_notify_failed', status: icResp.status, quote_id: quote.id }, 502)
     }
-    const icSonuc = icResp.ok ? ((await icResp.json().catch(() => null)) as { id?: string } | null) : null
-    await deftereYaz({
-      email_to: icAlici,
-      subject: ic.subject,
-      status: 'sent',
-      provider_message_id: icSonuc?.id ?? null,
-      error: icResp.ok ? null : 'resend 409: idempotent — onceden gonderilmis sayildi',
-    })
 
     // Damgayı ancak GÖNDERİM BAŞARILI olduktan sonra at.
     const { error: stampErr } = await supabase

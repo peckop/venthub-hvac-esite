@@ -114,6 +114,17 @@ describe('INV-TEKLIF-IC-BILDIRIM-1 — webhook kablolaması (kaynak)', () => {
     expect(KAYNAK).toMatch(/for \(let deneme = 0; deneme < 4; deneme\+\+\)/)
   })
 
+  it('REC-380 hız sınırı: oturumlu kullanıcı başına sayaç e-postalardan ÖNCE, kiracı iç bildirim tavanı', () => {
+    const kullaniciSayac = KAYNAK.indexOf('quote-notify-user:')
+    const musteriGonderim = KAYNAK.indexOf('musteriOnayAnahtari(quote.id)')
+    expect(kullaniciSayac).toBeGreaterThan(0)
+    expect(kullaniciSayac).toBeLessThan(musteriGonderim)
+    expect(KAYNAK).toMatch(/rate_limited[\s\S]{0,40}429/)
+    expect(KAYNAK).toMatch(/quote-notify-tenant:\$\{quote\.tenant_id\}/)
+    expect(KAYNAK).toMatch(/if \(icIzinli\) \{/)
+    expect(KAYNAK).toMatch(/const KULLANICI_SAATLIK = 5\b/)
+  })
+
   it('yorumlar olmayan yeniden denemeye yaslanmıyor (pg_net tek atım, bulgu 3)', () => {
     expect(KAYNAK).not.toMatch(/pg_net tekrar dener/)
   })
