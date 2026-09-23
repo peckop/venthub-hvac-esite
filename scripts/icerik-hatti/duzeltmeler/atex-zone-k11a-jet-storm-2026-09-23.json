@@ -1,0 +1,32 @@
+{
+  "_nicin": [
+    "K11-a (Recep 2026-09-07) kalıntısı + atex_zone kanonik biçimi (product-schema-standard §ATEX, 2026-09-23).",
+    "JET ATEX 7 ürün: atex_zone 'Zone II, Category 3G (Directive 94/9/CE)' — 'II' bölge değil ekipman grubu; biçim ihlali.",
+    "STORM ATEX 6 ürün: bölge beyanı atex_marking alanında (K11-a ihlali: bölge beyanı marking'e yazılmaz); atex_zone boş.",
+    "Hedef değer, aynı üretici cümlesinden SEAT ATEX'in 12 ürününde canlıda zaten duran değerle AYNI: 'Zone 2, Category 3G, Directive 94/9/CE'."
+  ],
+  "_kanit": {
+    "kaynak": [
+      "JET.pdf s.1 — 'available in ATEX Zone II, known outside Europe as explosion proof category 3 G execution in accordance with ATEX directive 94/9/CE'",
+      "Storm_series.pdf s.1 — aynı cümle",
+      "avens_fiyat_listesi_2026_HQ.pdf s.45 — STORM ATEX / JET ATEX kutusu: 'ATEX Zone 2 Category 3 GAS' (kutu metni SEAT'ten kopya — DUZELTME-LISTESI veri notu; tek başına dayanak sayılmadı)"
+    ],
+    "zone_2_gerekcesi": "Üreticinin 'Zone II'si Roma rakamıyla bölge 2'dir: aynı cümle kategori 3 G diyor ve ATEX'te kategori 3 G ekipman gaz bölgesi 2 içindir; AVenS aynı seri için 'Zone 2' yazıyor. SEAT 12 ürün aynı cümleden bu biçimle canlıda.",
+    "canli_olcum": "2026-09-23: 13 ürün, hepsi active."
+  },
+  "skus": {
+    "SEA-71201003": { "_urun": "JET 20 ATEX 950 d/dk 0,18 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-71202003": { "_urun": "JET 20 ATEX 1400 d/dk 0,18 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-71203003": { "_urun": "JET 20 ATEX 2800 d/dk 0,75 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-71251003": { "_urun": "JET 25 ATEX 900 d/dk 0,18 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-71252003": { "_urun": "JET 25 ATEX 1400 d/dk 0,37 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-71253003": { "_urun": "JET 25 ATEX 2800 d/dk 2,2 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-71302003": { "_urun": "JET 30 ATEX 1400 d/dk 1,1 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "onceki": { "atex_zone": "Zone II, Category 3G (Directive 94/9/CE)" } },
+    "SEA-61102003": { "_urun": "STORM 10 ATEX 1400 d/dk 0,06 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "sil": ["atex_marking"], "onceki": { "atex_zone": null, "atex_marking": "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" } },
+    "SEA-61103003": { "_urun": "STORM 10 ATEX 2800 d/dk 0,12 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "sil": ["atex_marking"], "onceki": { "atex_zone": null, "atex_marking": "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" } },
+    "SEA-61122003": { "_urun": "STORM 12 ATEX 1400 d/dk 0,25 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "sil": ["atex_marking"], "onceki": { "atex_zone": null, "atex_marking": "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" } },
+    "SEA-61123003": { "_urun": "STORM 12 ATEX 2800 d/dk 0,37 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "sil": ["atex_marking"], "onceki": { "atex_zone": null, "atex_marking": "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" } },
+    "SEA-61143003": { "_urun": "STORM 14 ATEX 2800 d/dk 1,1 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "sil": ["atex_marking"], "onceki": { "atex_zone": null, "atex_marking": "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" } },
+    "SEA-61163003": { "_urun": "STORM 16 ATEX 2800 d/dk 2,2 kW", "degistir": { "atex_zone": "Zone 2, Category 3G, Directive 94/9/CE" }, "sil": ["atex_marking"], "onceki": { "atex_zone": null, "atex_marking": "ATEX Zone II, category 3 G, ATEX directive 94/9/CE" } }
+  }
+}
