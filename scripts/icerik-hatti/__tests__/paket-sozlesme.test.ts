@@ -71,6 +71,44 @@ describe('Türkçe başlık ve birim kaynakları', () => {
   })
 })
 
+describe('alan-etiket sözlüğü kapısı (REC-172, 2026-09-23)', () => {
+  type Sozluk = { alanlar: Record<string, { birim: string | null; etiketler: string[] }>; _cok_anlamli: Record<string, unknown> }
+  const s: Sozluk = JSON.parse(readFileSync(join(DIZIN, 'alan-etiket-sozlugu.json'), 'utf8'))
+  const etiketAlanlari = () => {
+    const m = new Map<string, string[]>()
+    for (const [alan, v] of Object.entries(s.alanlar)) for (const e of v.etiketler) m.set(e, [...(m.get(e) || []), alan])
+    return m
+  }
+
+  it('birden çok alana giden her etiket `_cok_anlamli`de AYNI alanlarla ilan edilmiş (bilinçsiz çakışma yok)', () => {
+    const ilan = Object.fromEntries(Object.entries(s._cok_anlamli).filter(([k]) => !k.startsWith('_')))
+    const cok = Object.fromEntries([...etiketAlanlari()].filter(([, a]) => a.length > 1).map(([e, a]) => [e, [...a].sort()]))
+    const ilanSirali = Object.fromEntries(Object.entries(ilan).map(([e, a]) => [e, [...(a as string[])].sort()]))
+    expect(cok).toEqual(ilanSirali)
+  })
+
+  it('bağlamsız "power"/"güç" hiçbir alana gitmez; "rated power" yalnız rated_power_w', () => {
+    const m = etiketAlanlari()
+    for (const e of ['power', 'güç', 'guc', 'potenza']) expect(m.get(e), e).toBeUndefined()
+    expect(m.get('rated power')).toEqual(['rated_power_w'])
+  })
+
+  it('"rated current" / "rated i" anma akımıdır (absorbed_current_a); "i max" max_current_a; sürücü çıkışı ayrı', () => {
+    const m = etiketAlanlari()
+    expect(m.get('rated current')).toEqual(['absorbed_current_a'])
+    expect(m.get('rated i')).toEqual(['absorbed_current_a'])
+    expect(m.get('i max')).toEqual(['max_current_a'])
+    expect(m.get('output current')).toEqual(['rated_output_current_a'])
+    expect(birimler().get('max_current_a')).toBe('A')
+  })
+
+  it('sayısal son ekli her alanın birimi var (PIM ölçülü öznitelik birim ister)', () => {
+    const son = /_(w|a|v|kg|mm|pa|hz|m3h|ls|db|db_a)$/
+    const birimsiz = Object.entries(s.alanlar).filter(([a, v]) => son.test(a) && !v.birim).map(([a]) => a)
+    expect(birimsiz).toEqual([])
+  })
+})
+
 describe('csvOku / paketHucresi', () => {
   it('tırnak içi ; ve "" doğru okunur, BOM atılır', () => {
     const { basliklar, satirlar } = csvOku('﻿a;b\r\n"x;y";"he ""dedi"""\r\n')
