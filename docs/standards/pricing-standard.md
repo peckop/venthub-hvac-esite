@@ -66,6 +66,72 @@ tek-alan varsayımı bugünkü sessiz yanlışın kaynağıydı.
   (TL base→USD/EUR vitrin, canlı) **farklı sayılardır.** ⚠️ **Bilinen sapma:** bugün `currency_rates` tek
   satır kümesiyle her iki rolü de besliyor (rol ayrımı kolonu yok) — T010 ile `rate_role` eklenecek.
 
+### 2.1 Alış iskontosu zinciri — B tabanının girişi (TASLAK · REC-55 v2 · 2026-09-23)
+
+> **Durum: TASLAK.** Recep'in isteği (2026-09-23): *"alış iskontosu girebileceğim değil mi? … iskonton şudur
+> dediklerinde ne yapacağız?"* Bu bölüm o sorunun cetvelidir. Uygulanması migration gerektirir →
+> plan-challenger ZORUNLU, merge Recep onayıyla (kural 13). Kod URUN (fiyat motoru + admin ekranı), CLI ALTYAPI.
+
+**Bugün ölçülen (2026-09-23, canlı + kod):**
+
+| Soru | Ölçüm |
+|---|---|
+| İskonto nereye girilir? | **Hiçbir yere.** Şemada alış iskontosu kolonu/tablosu yok (`suppliers` yalnız kimlik; `purchase_order_items.unit_cost` sipariş anı fiyatı, iskonto zinciri değil). |
+| Kaç fiyat kuralı var? | **1:** `scope 4 · cost_plus · base 'cost' · margin 0 · KDV %20 hariç · round 0,01`. |
+| Kural `base` alanı kullanılıyor mu? | **Hayır.** `computePriceFromRule` (`pricing.service.ts`) `base`'i okumaz; `cost_plus` daima `cost_in_base`'ten hesaplar. `percent_off_list` "W1 kapsamı dışı" → null. |
+| `cost_in_base` neyi taşıyor? | **Liste fiyatının TL'si** (§2 geçiş kaydı): 416 EUR üründe `purchase_price` = AVenS 2026 liste; 348'inde kur 55,3213 (15 Ağu), 68'inde henüz NULL. |
+
+**⛔ Kilit risk:** bugünkü kural "maliyet + %0". İskontolu maliyet bugünkü `cost_in_base`'e yazılırsa **satış fiyatı
+aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzden iskonto verisi, aşağıdaki K1 bitmeden
+canlıya YAZILMAZ.
+
+**Kurallar:**
+
+- **K1 · Satış tabanı listedir.** Motor `base = 'list_price'`i gerçekten uygular: satış = liste × kur × (1 + marj).
+  Global kural `base 'cost' → 'list_price'` çevrilir. **Sıra zorunlu:** önce motor + kural (canlı fiyat değişmeden
+  — liste ve bugünkü maliyet aynı sayı olduğu için fark 0 olmalı; bu, geçişin kendi sınavıdır), SONRA iskonto verisi.
+- **K2 · Liste ile maliyet ayrı alan.** Liste = A tabanı (bugünkü `purchase_price` + `purchase_currency`, anlamı
+  cetvelde "liste" olarak sabitlenir); beklenen alış maliyeti = B tabanı, ayrı alanda. Tek alanda iki anlam YASAK (§2).
+- **K3 · Zincir çarpımsaldır, toplamsal değil.** `maliyet = liste × Π (1 − dᵢ)`. Örnek: 1.000 € liste, AVenS
+  "%30 + %10" → 1.000 × 0,70 × 0,90 = **630 €** (toplam %37, %40 değil). Zincir sıralı yazılır, en fazla 4 halka.
+- **K4 · Kapsam merdiveni (en özel kazanır, §3.1 ile aynı mantık):** ürün > tedarikçi × marka > tedarikçi.
+  "AVenS'ten alınan bütün Vortice %30+%10" TEK satırdır; ürün başına satır gerekmez. Geçerlilik tarihleri
+  (`valid_from`/`valid_to`) zorunlu — iskonto değişince eski satır kapanır, üstüne yazılmaz (geçmiş maliyet izlenir).
+- **K5 · İki maliyet ayrı.** *Beklenen* alış maliyeti (liste × zincir × **güncel** kur) fiyat/marj görünürlüğü
+  içindir; *gerçekleşen* maliyet satınalmanın mal kabulünden gelir (`last_purchase_cost`, donmuş kur, §2 B).
+  Satınalma köprüsü (REC-55 v2) kapanana kadar marj beklenen maliyetle gösterilir ve öyle etiketlenir.
+- **K6 · Zarar koruması.** Materialize, net satış < beklenen maliyet olan satırı **yazmaz, raporlar**
+  (sessiz kırpma yok). Bayi/segment kuralları (§8) maliyetin altına inemez.
+- **K7 · Gizlilik ve iz.** İskonto ve maliyet **ticari sırdır:** RLS yalnız admin okur; vitrin/anon API'de yok;
+  PUBLIC depoya, pakete (bayi sürümü), panoya değer girmez. Her iskonto ekle/kapat `admin_audit_log`'a düşer.
+- **K8 · Kaynak.** Her iskonto satırı dayanağını taşır (tedarikçi yazısı/e-posta tarihi, belge adı); kaynaksız
+  iskonto satırı girilmez (katalogdaki "kaynaksız değer yazılmaz" kuralının fiyattaki karşılığı).
+
+**Veri modeli önerisi (plan-challenger'a girdi, KARAR DEĞİL):**
+
+```sql
+CREATE TABLE supplier_discounts (
+  id uuid PRIMARY KEY, tenant_id uuid NOT NULL,
+  supplier_id uuid NOT NULL REFERENCES suppliers(id),
+  brand text NULL,            -- products.brand ile eşleşir (brand_id köprüsü kırılgan, §13 notu)
+  product_id uuid NULL,       -- dolu = ürün override (K4)
+  zincir numeric(5,2)[] NOT NULL CHECK (array_length(zincir,1) BETWEEN 1 AND 4),  -- [30,10]
+  valid_from date NOT NULL, valid_to date NULL,
+  kaynak text NOT NULL,       -- K8
+  created_by uuid, created_at timestamptz DEFAULT now()
+);
+-- products: expected_cost_in_base numeric(14,4) (türetilmiş, B tabanı) — cost_in_base'in anlam göçü
+-- plan-challenger'da ayrıca tartışılır (yeniden adlandırma mı, yeni alan mı).
+```
+
+**Bitti ölçütü (sayı):** (1) K1 geçişi sonrası 348 fiyatlı ürünün satış fiyatı **birebir aynı** (fark 0);
+(2) test: 1.000 € · [30,10] → 630 €; [30,10] ile [10,30] aynı sonuç; 5 halkalı zincir reddedilir;
+(3) anon rol `supplier_discounts`'u okuyamaz (RLS sınavı); (4) net < beklenen maliyet satırı materialize'da
+yazılmaz ve raporda görünür (sabotaj sınavı).
+
+**Recep'e gidecek ticari sorular (içerikleriyle, numarasız):** iskonto AVenS'te marka marka mı, tek oran mı
+değişiyor; bayi fiyatları liste eksi yüzde mi, maliyet artı yüzde mi kurulacak.
+
 ---
 
 ## 3. Marj kuralı motoru + ÖNCELİK merdiveni ⭐ (cetvelin kalbi)
