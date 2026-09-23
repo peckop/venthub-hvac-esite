@@ -1,7 +1,7 @@
-# REC-146 · Karar 70 — eksik ürün açıklamaları (PLAN v2)
+# REC-146 · Karar 70 — eksik ürün açıklamaları (PLAN v3)
 
-> Durum: **PLAN v2** (2026-09-23). v1 3. çürütmede **BLOK** (9 madde) — belgenin sonunda "v1 → v2"
-> tablosu. Recep (OPS aktarımı): *eksik TR/EN metin karar konusu değil, onarım.* Akış: plan →
+> Durum: **PLAN v3** (2026-09-23). v1 3. çürütmede **BLOK** (9 madde), v2 4. çürütmede **BLOK**
+> (9 madde) — belgenin sonunda "v1 → v2" ve "v2 → v3" tabloları. Recep (OPS aktarımı): *eksik TR/EN metin karar konusu değil, onarım.* Akış: plan →
 > plan-challenger → üretim → taslaklar Recep'e **tek toplu tablo** (aile başına 1 satır) → yazım
 > URUN-KATALOG penceresinde Recep'in sözüyle (iki anahtar). **79** (EN sayfada EN metin yoksa TR
 > gösterilmez) = URUN'un gizleme onarımı; bu plandan bağımsız.
@@ -43,12 +43,28 @@ B'deki 7 aile: avens-nimax 15 · avens-nimus 15 · vortice-vorticent-cms-atex 11
 avens-qe-b-kasa 9 · avens-dikdortgen-kanal-radyal 7 · seat-atex-ptc-sensor 1 = 67 (REC-226 kayıp-ürün
 aktarımıyla gelen aileler; TR metni K7.8 sunumundan geçmedi).
 
+### B'nin bugünkü TR metninde müşteriye görünen iki olgu hatası (ölçüldü 2026-09-23)
+
+| Aile | Canlı TR | Kaynak dizini |
+|---|---|---|
+| vortice-vorticent-cms-atex | "alüminyum sacdan yapılmış öne eğik pervane" | 10 föyün s.1'i: "Galvanised steel sheet simple inlet forward curved impeller" |
+| avens-enkelfan-ec-plug | "Sürekli çalışma sıcaklık aralığı -20 °C ile +60 °C" (ailenin tamamı için) | plug-fans s.16: −20/60 yalnız 155-310; 355-450 −25/60; 500 −30/50; 560-630 −30/40 |
+
+İkisi de jeton kapısından YEŞİL geçer (sayı/birim doğru, anlam yanlış). Onarım bu planın B hattıdır:
+iki ailenin TR'si yeniden yazılır, toplu tabloda **"canlıda olgu hatası"** işaretiyle gelir; ayrıca
+yazılmaz (müşteriye görünen metin = Recep kapısı, iki anahtar). Bu iki vaka anlamsal çürütmenin
+(adım 4) sabotaj örnekleridir.
+
 ### Onay sonrası değişen TR (A için ek sütun)
 
 jet-serisi TR metni 2026-09-17'de değişti; K7.8 onayı 09-06'da. Onaylanan metin ile bugünkü metin
-aynı değilse EN "onaylı TR"nin çevirisi sayılamaz. Adım 1'de her A ailesi için K7.8 yük dosyasındaki
-onaylanan `kimlik_tr` ↔ canlı `description.tr` karşılaştırılır; farklı olan aile tabloda **"TR onaydan
-sonra değişti"** sütunuyla gelir ve TR'si de onaya girer (B kuralı).
+aynı değilse EN "onaylı TR"nin çevirisi sayılamaz. Onay kanıtı = K7.8 yükü, kalıcı konumda:
+ingestor `venthub/icerik-hatti/k78-onayli-aile-yuku-2026-09-06.json` (38 aile, md5
+`80dafc1e18214299f5fd3bb0e59880f1`, commit `66c296a`; 09-06 yazımının `admin_audit_log` izi yok —
+aile tetiği 09-17'de başlıyor, bu dosya tek kanıt). Adım 1'de her A ailesi için yükteki `kimlik_tr` ↔
+canlı `description.tr` md5 karşılaştırılır. 4. çürütme ölçümü: 17 aile aynı, **jet-serisi farklı**
+(onaylanan metindeki iç not 09-17'de temizlenmiş). Farklı olan aile tabloda **"TR onaydan sonra
+değişti"** sütunuyla gelir ve TR'si de onaya girer (B kuralı).
 
 ### C — K7.10 (ayrı soru)
 
@@ -70,16 +86,23 @@ gerekçeyle düşülür.
 ### D — ölçüt (v1'deki ölçüt kördü)
 
 v1 ölçütü "aile metnindeki jeton ↔ ürün specs çelişkisi" idi; ATEX'li ürünü yakalamaz, çünkü jet/seat/storm
-aile metninde ATEX jetonu yok (jet 7/21 · seat 13/40 · storm 7/19 üründe `atex_*` dolu). Yeni ölçüt:
-**ailede heterojen jeton** — bir ayırt edici özellik (ATEX, gerilim, faz, IP, motor tipi) ailenin bir
-kısmında var, bir kısmında yoksa, aile metni o özellik hakkında hiçbir şey söyleyemez **ve** o özelliği
-taşıyan ürünler D'ye girer. `technical_specs` boş ürün "ölçülemedi" diye ayrı sayılır, D dışı sanılmaz.
+aile metninde ATEX jetonu yok. `atex_*` anahtarı dolu ürün: jet 7/21 · seat 12/40 · storm 6/19; buna
+adında "ATEX" geçip specs'inde ATEX anahtarı olmayan 2 ürün eklenir (SEA-51201003 "SEAT 20 ATEX",
+SEA-61183003 "STORM 18 ATEX") → 13 ve 7. Yeni ölçüt: **ailede heterojen özellik** — bir ayırt edici
+özellik (ATEX, gerilim, faz, IP, motor tipi, **çalışma sıcaklığı aralığı, çark/gövde malzemesi**) ailenin
+bir kısmında var ya da farklıysa, aile metni onu ailenin tamamına mal edemez **ve** o özelliği taşıyan
+ürünler D'ye girer. Kaynak: `technical_specs` **ve ürün adı** (specs'te olmayan ATEX adda olabilir) **ve**
+ailenin kaynak sayfası (Enkelfan: çark 155/190 polyamid, diğerleri alüminyum; sıcaklık dört aralık).
+`technical_specs` boş ürün "ölçülemedi" diye ayrı sayılır, D dışı sanılmaz.
 
 ## KAYNAK/CETVEL
 
-- `docs/standards/vitrin-metni-standard.md` (K4.1, K7, K10 dil düşüşü, iç not yasağı). **EN metin kuralı
-  YOK → yazımı bu işin kapsamında** (adım 2): EN = onaylı TR'nin sadık çevirisi; TR'de olmayan iddia
-  EN'e girmez; sayı/kod/birim jetonları iki dilde birebir; terim üreticinin EN belgesinden.
+- `docs/standards/vitrin-metni-standard.md` (K4.1, K7, iç not yasağı). **K10 (dil düşüşü) master'da
+  henüz YOK** — URUN'un açık onarım dalında (79). URUN'un K10 metni "EN gövde metni boş 25 aile" der; bu
+  plan 27 der — fark, TR'si de boş olan C'nin 2 ailesi. **EN metin kuralı YOK → yazımı bu işin
+  kapsamında** (adım 2), **K10'un alt maddesi olarak ve URUN'un K10'u master'a girdikten SONRA** (aynı
+  dosyada çakışmasın): EN = onaylı TR'nin sadık çevirisi; TR'de olmayan iddia EN'e girmez; sayı/kod/birim
+  jetonları iki dilde birebir (eşdeğerlik tablosuyla); terim üreticinin EN belgesinden.
 - `docs/standards/catalog-ingestion-standard.md` §6.3 — kaynak dizini (PDF açılmaz).
 - `scripts/icerik-hatti/taslak-kaynak-kapisi.py` — ⚠ **PDF'i `fitz` ile açıyor (satır 44, 112) — §6.3
   ihlali**; girdi `.md` + `[KAYNAK s.NN]` (CSV değil); jeton desenleri (83-96) `A`/`mA` akımını
@@ -88,7 +111,8 @@ taşıyan ürünler D'ye girer. `technical_specs` boş ürün "ölçülemedi" di
   `BEKLENEN_AILE=38` sabit (27); KAPI 3 `kimlik_tr` ister ve "38/38" basar (89-94); tüm `description`
   JSON'unu koşulsuz PATCH'liyor (159-166). `denetim_izi_product_families` tetiği UPDATE'te
   `admin_audit_log`'a zaten yazıyor → yazıcı ikinci audit satırı yazmaz.
-- `scripts/icerik-hatti/toplu-sunum.py` — K7.8 sunum kalıbı (onaylanan metin = yazılan metin).
+- `scripts/icerik-hatti/toplu-sunum.py` — K7.8 sunum kalıbı (onaylanan metin = yazılan metin). `--yuk`
+  bugün yalnız `kimlik_tr`, `maddeler_tr`, `bloklar_tr` üretir (405-420) → EN sütunu eklenir (adım 5).
 
 ## YÖNTEM
 
@@ -96,49 +120,81 @@ Alt ajan (Agent aracı) — Workflow DEĞİL (karar 76'dan ayrı; Workflow Recep
 **1 yazar (Sonnet)** + **1 çürütücü (Opus — farklı model)**: EN'deki her iddia TR'de/kaynakta var mı,
 yeni iddia var mı. v1'de ikisi de Sonnet'ti; aynı modelin aynı körlüğü doğrulama sayılmaz. Ajanın sözü
 kapı değildir: **deterministik jeton farkı** (adım 4) her satıra koşar ve ajan hükmünden bağımsız
-KIRMIZI verebilir. 27 aile → ~54 ajan çağrısı, dalgalar hâlinde.
+KIRMIZI verebilir. Yeni yazılan her **TR** metni (B + "değişti" satırları) ayrıca **anlamsal çürütmeden**
+geçer: ikinci bir ajan (Opus) her cümleyi ailenin kaynak dizini sayfa metnine karşı okur — malzeme,
+aralık, "tüm modeller" kapsamı, işlev iddiası. Jeton kapısı anlamı görmez (CMS malzemesi, Enkelfan
+sıcaklığı YEŞİL geçerdi); bu adım onu kapatır. 25 aile + TR'si yazılacak 8 → ~66 ajan çağrısı, dalgalar hâlinde.
 
 ## Adımlar
 
-1. **Ölç:** D kümesi (heterojen jeton) · A ailelerinde onaylanan ↔ bugünkü TR farkı · evren sayıları
-   (bu belgedeki tablo) betikle yeniden basılır.
-2. **Cetvel:** `vitrin-metni-standard.md`'ye EN bölümü (yukarıdaki dört kural).
+1. **Ölç:** D kümesi (heterojen özellik) · A ailelerinde onaylanan (K7.8 yükü, md5 sabit) ↔ bugünkü TR
+   farkı · evren sayıları (bu belgedeki tablo) betikle yeniden basılır.
+2. **Cetvel:** `vitrin-metni-standard.md` — EN kuralı K10'un alt maddesi; **URUN'un K10'u master'a
+   girdikten sonra** yazılır.
 3. **Taslak üretimi:** aile başına `paket/rec146/<slug>.tr.md` + `<slug>.en.md` (her cümle
    `[KAYNAK s.NN]`) + özet `paket/rec146-metin-<damga>.csv` (aile, ürün_sayisi, tr_onayli, tr_degisti,
-   tr_yeni, en_yeni, kaynak_sayfalari, jeton_tr, jeton_en, curutme_hukmu, not).
+   canli_olgu_hatasi, tr_yeni, en_yeni, kaynak_sayfalari, jeton_tr, jeton_en, curutme_hukmu, not).
 4. **Kapılar:**
    - `taslak-kaynak-kapisi.py` kaynak dizininden okur (`fitz` kalkar; sayfa metni
      `sayfalar.jsonl`'dan) + jeton desenine `A`/`mA` + "90%" biçimi; test + sabotaj (PDF yolu verilse
      de açılmaz).
-   - **Yeni `en-jeton-kapisi.py`:** TR ↔ EN jeton kümesi birebir (`%90`≡`90%`, `1,5`≡`1.5`, `IP55`≡`IP 55`);
-     EN'de TR'de olmayan jeton = KIRMIZI. İç not süzgeci iki dile. KIRMIZI satır tabloya girmez.
-5. **Yazıcı** `aile-metni-yaz.mjs`:
-   - `--dil en`: yalnız `description.en` boşsa yazar. Atomik koşullu PATCH:
-     `product_families?slug=eq.<s>&updated_at=eq.<okunan>` + gövdede okunan JSON'a yalnız `en`
-     eklenmiş hâli; 0 satır dönerse KIRMIZI, yeniden oku, 1 kez dene.
-   - `--dil tr` (B): onaylı TR'yi yazar ve `is_description_manual=true` yapar; yalnız
-     `is_description_manual=false` ailede (onaylı TR'nin üstüne yazmaz).
-   - Beklenen aile sayısı yük dosyasından (sabit 38 kalkar); KAPI 3 `--dil en`'de `en` alanını ölçer.
+   - **Yeni `en-jeton-kapisi.py`:** TR ↔ EN jeton kümesi birebir; EN'de TR'de olmayan jeton = KIRMIZI.
+     Eşdeğerlik tablosu (her biri için sabotaj testi):
+
+     | Kural | TR | EN |
+     |---|---|---|
+     | yüzde | `%90` | `90%` |
+     | ondalık | `1,5` | `1.5` |
+     | binlik ayırıcı (3 hane grubu, ondalık değil) | `25.000` / `25000` | `25,000` / `25000` |
+     | birim çevirisi | `d/dk` | `rpm` |
+     | faz | `trifaze` / `monofaze` | `three-phase` / `single-phase` |
+     | boşluk | `IP55`, `380V` | `IP 55`, `380 V` |
+
+     Ondalık ile binlik ayırıcı ayrımı: virgülden/noktadan sonra tam 3 hane ve sayı ≥ 1000 ise binlik.
+     İç not süzgeci iki dile. KIRMIZI satır tabloya girmez.
+   - **Anlamsal çürütme (TR):** B + "değişti" satırlarının her cümlesi kaynak sayfa metnine karşı (YÖNTEM);
+     sabotaj: CMS "alüminyum pervane" ve Enkelfan "tek sıcaklık aralığı" metinleri KIRMIZI vermeli.
+5. **Sunum ve yük** `toplu-sunum.py`: EN sütunu (ve B için TR) sunum tablosuna **ve** `--yuk`'a aynı
+   ayrıştırıcıdan yazılır (onaylanan metin = yazılan metin, iki dilde).
+6. **Yazıcı** `aile-metni-yaz.mjs`:
+   - Okuma `select=id,tenant_id,slug,description,is_description_manual,updated_at`.
+   - Atomik koşullu PATCH: `product_families?id=eq.<id>&tenant_id=eq.<t>&updated_at=eq.<kodlu>` —
+     `updated_at` ham dize `encodeURIComponent` ile (`+00:00`'daki `+` kodlanmazsa eşleşme hiç olmaz);
+     `prefer: return=representation`; 0 satır → yeniden oku, 1 kez dene; yine 0 → KIRMIZI.
+   - `--dil en` (A, A'): gövde = okunan JSON'a yalnız `en` eklenmiş hâli; `en` doluysa yazmaz.
+   - B: **tek PATCH** — `tr` + `en` + `is_description_manual=true` birlikte; yalnız
+     `is_description_manual=false` ailede ya da tabloda "değişti" işaretli ailede (onaylı TR'nin
+     üstüne işaretsiz yazmaz).
+   - KAPI 1 beklenen sayı yükten BAĞIMSIZ: onaylı sunum tablosunun satır sayısı (yük kendisiyle
+     kıyaslanmaz). Bugünkü beklenti A+A' 18, B 7, "değişti" 1. KAPI 3 dile göre ölçer.
    - Audit tetiğe bırakılır. Kuru koşum varsayılan.
-   - Test + sabotaj: dolu `en`'i ezmez, `bloklar_tr`/`maddeler_tr`'ye dokunmaz, `updated_at` değişince
-     yazmaz, onaylı TR'nin üstüne `--dil tr` yazmaz.
-6. **Recep'e TEK TOPLU TABLO** (aile başına 1 satır: aile · ürün sayısı · TR (B ve "değişti" satırlarında) ·
-   EN · kaynak · not). Onay → iki anahtarlı yazım. C bu tabloda değil; ayrı sorunun cevabına göre.
-7. **Canlı ölçüm:** EN PDP'de açıklaması aile metninden TR gelen ürün **250 → 0**; EN meta/OG/JSON-LD
-   `description` alanında Türkçe metin → 0 (A+B aileleri, sayfa HTML'inden ölçülür); A' ailelerinin
-   EN seri sayfası; fark raporu + paket CSV yeniden üretilir.
-8. **`bloklar_en`:** bu planın kapsamında DEĞİL — `bloklar_tr`'nin vitrinde render'ı bile yok
-   (REC-164, URUN). REC-146'ya yorum olarak ayrı kayıt düşülür (Linear ücretsiz sınır dolu).
-9. D kümesi: ayrı tur, aynı motor.
+   - Test + sabotaj: dolu `en`'i ezmez, `bloklar_tr`/`maddeler_tr`'ye dokunmaz, `+` içeren damga eşleşir,
+     değişmiş damgada 0 satır, başka `tenant_id`'ye yazmaz, onaylı TR'nin üstüne işaretsiz yazmaz.
+7. **Recep'e TEK TOPLU TABLO** (aile başına 1 satır: aile · ürün sayısı · TR (B, "değişti", "canlıda
+   olgu hatası" satırlarında) · EN · kaynak · not). Onay → iki anahtarlı yazım. C bu tabloda değil.
+8. **Canlı ölçüm — OLUMLU** (URUN'un 79 onarımı da EN'deki Türkçeyi kaldırır; "TR → 0" tek başına bu
+   planın kanıtı olamaz). Ölçüm URUN merge'ünden önce ve sonra koşar; sayfa aile başınadır:
+   - 25 ailenin EN aile/ürün sayfasında açıklama bölümü **dolu ve DB'deki `description.en` ile aynı**
+     (A 16 + B 7 + A' 2 seri sayfası);
+   - `<meta name="description">` = `description.en`'in ilk 160 karakteri (yedek "VentHub Product
+     Details" değil) — `meta_description` 27 ailenin hepsinde boş, bu yüzden aile metni kullanılır;
+   - JSON-LD `description` = `description.en`;
+   - EN sayfalar bugün noindex (`EN_YAYIN=false`); ölçüm HTML'den (curl), arama motorundan değil.
+   - Fark raporu + paket CSV yeniden üretilir.
+9. **`bloklar_en`:** bu planın kapsamında DEĞİL — `bloklar_tr`'nin vitrinde render'ı bile yok
+   (REC-164, URUN). REC-146'ya yorum olarak ayrı kayıt düşüldü (Linear ücretsiz sınır dolu).
+10. D kümesi: ayrı tur, aynı motor.
 
 ## Kabul ölçütü
 
 - Her metin: TR ↔ EN jeton kümesi birebir (`en-jeton-kapisi.py` YEŞİL); TR taslakta kaynak kapısı
-  YEŞİL; çürütme hükmü "yeni iddia yok".
-- EN PDP'de TR aile metni gösteren ürün **250 → 0**; EN meta/JSON-LD'de TR → 0.
+  YEŞİL; EN çürütme hükmü "yeni iddia yok"; TR anlamsal çürütme "kaynakla çelişki yok".
+- 25 ailenin EN sayfasında açıklama = DB `description.en`; meta description ve JSON-LD aynı metinden
+  (olumlu ölçüm, adım 8). Vitrinde açıklamasız kalan EN ürün: 250 → 0.
+- CMS ATEX ve Enkelfan'ın canlı TR olgu hataları → 0 (onaylı yeni TR ile).
 - C: Recep'in K7.10 cevabına göre 4 → 0 ya da gerekçeyle 4.
 - Mevcut onaylı TR ve bloklar değişmez (yazıcı testi); yazım idempotent (ikinci koşum 0 değişiklik);
-  aile başına 1 audit satırı (tetikten).
+  **PATCH başına 1 audit satırı** (tetikten; B'de tek PATCH → aile başına 1).
 
 ## Açık
 
@@ -161,3 +217,17 @@ KIRMIZI verebilir. 27 aile → ~54 ajan çağrısı, dalgalar hâlinde.
 | D ölçütü ATEX'i göremez | heterojen jeton ölçütü; boş specs = ölçülemedi |
 | Yazar ve çürütücü aynı model | çürütücü Opus + deterministik jeton farkı |
 | jet-serisi TR onaydan sonra değişti | "onaylanan ↔ bugünkü" karşılaştırması, fark varsa TR de onaya |
+
+## v2 → v3 (4. çürütme, BLOK)
+
+| v2 bulgusu | v3 |
+|---|---|
+| A-1 B'nin TR'sini anlamca doğrulayan yok; canlıda 2 olgu hatası (CMS malzeme, Enkelfan sıcaklık) | TR anlamsal çürütme (Opus, kaynak sayfasına karşı) + 2 vaka sabotaj testi; tabloda "canlıda olgu hatası" |
+| A-2 "TR → 0" ölçütü URUN onarımıyla kendiliğinden sağlanır | olumlu ölçüt: EN sayfa/meta/JSON-LD = DB `en`; URUN merge öncesi ve sonrası |
+| A-3 yazımda `updated_at` select'te yok, `+` kodlanmıyor, `slug=eq` kiracısız | `id` + `tenant_id` + `encodeURIComponent(updated_at)`, select'e eklendi, test |
+| A-4 EN sunum↔yük aynı ayrıştırıcıdan değil; KAPI 1 yükü kendisiyle kıyaslıyor | `toplu-sunum.py` EN'i sunuma ve yüke yazar; beklenen sayı onaylı tablodan |
+| A-5 onay kanıtı (K7.8 yükü) geçici dizinde | ingestor'a taşındı (`66c296a`), md5 sabit |
+| A-6 jeton kapısında binlik ayırıcı, d/dk↔rpm, trifaze↔three-phase yok | eşdeğerlik tablosu + her kurala sabotaj testi |
+| A-7 D sayıları yanlış (12/6 anahtar + 2 adda); sıcaklık/malzeme yok | sayılar düzeltildi; ölçüt ad + kaynak sayfasını da okur; iki özellik eklendi |
+| A-8 K10 master'da yok; 25↔27 farkı açıklanmamış | K10 URUN dalında; EN kuralı K10 alt maddesi, URUN merge'ünden sonra; fark = C'nin 2 ailesi |
+| A-9 B'de iki PATCH → iki audit | B tek PATCH; ölçüt "PATCH başına 1" |

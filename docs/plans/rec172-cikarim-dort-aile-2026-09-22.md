@@ -1,7 +1,7 @@
 # REC-172 — 4 ailenin teknik veri çıkarımı (NIMUS · NIMAX · Enkelfan EEC · Vorticent CMS ATEX)
 
-> Durum: **PLAN v4** (2026-09-23). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (8 madde), v3
-> **KOŞULLU** (5 madde); v4 hepsini işler — belgenin sonunda "v1 → v2", "v2 → v3", "v3 → v4" tabloları.
+> Durum: **PLAN v5** (2026-09-23). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (8 madde), v3
+> **KOŞULLU** (5 madde), v4 **KOŞULLU** (6 madde); v5 hepsini işler — belgenin sonunda sürüm tabloları.
 > Çıkarım koşumu Recep "başla" demeden AÇILMAZ (karar 76). Canlıya yazım ayrıca Recep'in kendi
 > sözüyle (iki anahtar: `--yaz` + `CANLI_YAZIM_ONAYI`).
 
@@ -34,7 +34,7 @@
 - **Kol 1 (karar 76):** bağımsız ajanlar çıkarım CSV'sini sayfa metninden okuyarak çürütür.
 - **Kol 2:** ikinci okuyucu düz metinden, birincisi tablo hücresinden; ayrışırsa KIRMIZI.
 - **Karar 76 HAYIR olursa:** NIMUS/NIMAX'ın tüm alanları ve CMS s.1 alanları **yazılmaz** (ikinci
-  yolları yok); iş Enkelfan + CMS s.2 alanlarıyla daralır (489 → 109) — durmaz, ama kapsam düşer.
+  yolları yok); iş Enkelfan + CMS s.2 alanlarıyla daralır (480 → 100) — durmaz, ama kapsam düşer.
 
 ### Yöntem kıyası (OPS isteği, karar 76 girdisi)
 
@@ -62,13 +62,13 @@ Eşleme **model ADIYLA** (AVenS kodu ≠ Casals kodu, 15/30 — REC-370).
 
 | Kaynak | Anahtar | NIMUS/NIMAX | Enkelfan | CMS ATEX |
 |---|---|---|---|---|
-| R.P.M. | `rpm_max` | ✓ | ✓ | ✓ — 12/5, 14/5 **✗** (fan 1450 ↔ motor 1346) |
+| R.P.M. | `rpm_max` (sabit devirli AC motorda anma devri; cetvel notu, adım 1) | ✓ | ✓ | ✓ — fan bölümünün RPM'i; 12/5, 14/5 **✗** (fan 1450 ↔ motor 1346) |
 | Rated I (anma) | `absorbed_current_a` (anma yükünde çekilen akım) | ✓ 400V sütunu | ✓ | — |
 | I max. (400V) | **`max_current_a`** (canlıda 2 üründe var) | — | — | ✓ |
-| Rated Power / Motor Power | `rated_power_w` (kW×1000) | ✓ | ✓ | ✓ |
+| Rated Power / Motor Power | `rated_power_w` (kW×1000) | ✓ (311 T2: √3·400·2,33 ≈ 1,6 kVA giriş ↔ 1,1 kW mil, tutarlı) | **✗** — kaynak kendi içinde çelişik: 155'te 230 V × 0,25 A = 57,5 VA ama "Rated Power" 60 W; mil gücü olamaz, çekilen güç olması yuvarlama sınırında → anlamı belirsiz, AVenS sorusu (K9) | ✓ |
 | Air flow | — | **✗** (kaynak üst sınır mı nominal mi SÖYLEMİYOR — §11.7; dizinde tanım yok, 191-205 + plug-fans tarandı) | **✗** (aynı) | — |
 | Max. Flow | `max_delivery_m3h` + türetilen `max_delivery_ls` | — | — | ✓ (kaynak "Max." diyor) |
-| Weight Kg | `weight_kg` | ✓ | ✓ | **✗** (fan 63 + motor 23 kg) |
+| Weight Kg | `technical_specs.weight_kg` (vitrin bunu okur; `products.weight_kg` sütununu `src/` hiçbir yerde okumuyor — iki depo ayrı kayıt, bu plan sütuna yazmaz) | ✓ | ✓ | **✗** (fan 63 + motor 23 kg) |
 | T2/T4/T6 | `motor_poles` | ✓ | — | ✓ |
 | gerilim cümlesi | `voltage_v` | 400 | 230 (155-310) · **✗** (355-630: s.16 "400V" ↔ s.17 şema "AC380V") | 400 |
 | gerilim cümlesi | `voltage_alt_v` | 230 (≤4 kW, "up to 4kW" dahil) · 690 (>4 kW) | — | 230 (≤4 kW) · 690 (>4 kW) |
@@ -86,20 +86,21 @@ Eşleme **model ADIYLA** (AVenS kodu ≠ Casals kodu, 15/30 — REC-370).
 |---|---|---|---|---|
 | NIMUS | 15 | 10 (rpm, akım, güç, ağırlık, kutup, faz, gerilim, alt gerilim, IP, yalıtım) | 150 | 0 |
 | NIMAX | 15 | 10 | 150 | 0 |
-| Enkelfan EEC | 9 | 7 (rpm, akım, güç, ağırlık, IP, yalıtım, motor tipi) + 155-310'da (4 ürün) gerilim+faz | 63 + 8 = **71** | 0 |
+| Enkelfan EEC | 9 | 6 (rpm, akım, ağırlık, IP, yalıtım, motor tipi) + 155-310'da (4 ürün) gerilim+faz | 54 + 8 = **62** | 0 |
 | CMS ATEX | 10 | 12 (rpm, I max, güç, max debi, kutup, faz, gerilim, alt gerilim, IP, yalıtım, zone, marking) | 120 − 2 = **118** | 10 |
-| **Toplam** | **49** | | **489** | **10** |
+| **Toplam** | **49** | | **480** | **10** |
 
 Karar 76 hayır → NIMUS/NIMAX 300 + CMS s.1 alanları (kutup, faz, gerilim, alt gerilim, IP,
-yalıtım, zone, marking: 8×10 = 80) düşer; kalan Enkelfan 71 + CMS s.2 (rpm, I max, güç, max debi:
-4×10 − 2 = 38) = **109 + 10**.
+yalıtım, zone, marking: 8×10 = 80) düşer; kalan Enkelfan 62 + CMS s.2 (rpm, I max, güç, max debi:
+4×10 − 2 = 38) = **100 + 10**.
 Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 
 ## Kabul ölçütü
 
 1. Alıntılı her değerin atfı var (belge + sayfa + alıntı); alıntı dizinde yeniden aranır —
    **boşluk/satır sonu normalize edilerek** ("Ex h\nIIB"). Türetilen (`max_delivery_ls`) muaf, satırda
-   `kaynak=türetildi`.
+   `kaynak=türetildi`. Koşullu atama (`voltage_alt_v`, CMS `phase`) `kaynak=koşullu` — alıntı aramasına
+   ek olarak kol 1 doğrulaması zorunlu.
 2. **Bağımsız doğrulama** YÖNTEM tablosuna göre: metin-yalnız kaynaklar kol 1 ile, tablolu kaynaklar
    kol 1 ya da 2 ile; ayrışma 0. Doğrulanamayan değer yazılmaz.
 3. Fark tablosu yeniden koşulur (tutarlılık ölçüsü; tek başına kanıt değil).
@@ -125,7 +126,26 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
    7 satır ayrı düzeltme işi (REC-172 yorumu), bu plan dokunmaz. CMS'e kaynağın verdiği kadarı yazılır
    (`Zone 2` / `Zone 1`). `atex_marking` için "föyde kategori öneki yoksa yazılmaz, fan ve motor ayrı
    işaretliyse `Fan: … · Motor: …`" notu.
+   **K11-a metninin kendisi de düzeltilir:** `product-schema-standard.md:421` örneği
+   `Zone II, Category 3G (…)` → `Zone 2, Category 3G, Directive 94/9/CE`; satır 424-425 "baştaki `II`
+   … `atex_zone`'da bölge numarası" cümlesi → "`atex_zone`'da bölge 0/1/2 (gaz) ya da 20/21/22 (toz)
+   sayısıdır; `II` ekipman grubudur ve yalnız `atex_marking`'te geçer". K11-a'nın kararı (iki ayrı
+   alan) değişmez, yalnız örneği ve açıklaması düzelir; Kararlar belgesine not düşülür ve OPS
+   üzerinden Recep'e bilgi olarak iletilir.
+   `rpm_max` notu: "sabit devirli AC motorda kaynağın verdiği anma devri `rpm_max`'e yazılır" (canlıda
+   tek devir anahtarı `rpm_max`, 229 ürün; §11.7'nin "üst sınır" koşulu bu motor tipinde anma devriyle
+   sağlanır — değişken devirli/EC motorda kaynak "max" demiyorsa geçerli değil).
 2. **Okuyucular** tüm alanlara + ikinci (tablo) okuyucu Enkelfan/CMS s.2 için; test + sabotaj.
+   **CMS s.2 tuzakları:** tabloda "RPM" ve "Approx. weight" hem "Fan" hem "Motor" bölümünde geçiyor ve
+   satır konumu föyden föye kayıyor (12/5'te ağırlık 1. satır, 45/18'de 3.). Her iki okuyucu da
+   **bölüm etiketini** ("Fan"/"Motor") okuyarak değer seçer; "ilk RPM" kuralı yasak (iki okuyucu aynı
+   hatada anlaşır, bu bağımsız doğrulama sayılmaz). Ürün ↔ föy eşleme anahtarı **boyut + kutup (T) + kW**
+   (ör. `14/5 T4 0,09kW`); gevşek "14/5" eşlemesi yasak. Sabotaj: 14/5 T2 föysüz kalmalı; fan ve motor
+   RPM'i yer değiştirilmiş sahte sayfada KIRMIZI.
+   **Koşullu atamalar:** `voltage_alt_v` (≤4 kW → 230, >4 kW → 690; NIMUS 401 T2 4 kW'ta 230 V akımı
+   var, 7,5 kW'ta "-" — "4 kW dahil" veriyle doğrulandı) ve CMS `phase` (s.1 hem "230V … single phase"
+   hem "400V … three phase" der; 3'e s.2 "I max. (400V)" bağlar) genel cümlenin ürüne uygulanmasıdır.
+   Satırda `kaynak=koşullu` + kural metni; alıntı araması bunları doğrulamaz, kol 1'de ayrıca doğrulanır.
    Okuyucu sütunu doğrudan eşler — `alan-etiket-sozlugu.json`'a dayanmaz (sözlükte "power" →
    `max_absorbed_power_w`, "rated current" → `rated_output_current_a` eşlemeleri bu kaynaklar için
    yanlış; sözlük düzeltmesi ayrı iş olarak REC-172'ye yazılır).
@@ -153,6 +173,8 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 | 2 | CMS ağırlığı fan mı toplam mı | AVenS | boş |
 | 3 | CMS 12/5, 14/5 fan 1450 / motor 1346 d/dk | AVenS | devir boş |
 | 4 | Enkelfan 355-630 gerilimi 400 V mı 380 V mı | AVenS | gerilim + faz boş |
+| 4b | Enkelfan "Rated Power" mil gücü mü çekilen elektrik gücü mü (155: 57,5 VA ↔ 60 W) | AVenS (71b listesine eklenir) | güç boş (9 ürün) |
+| 4c | `products.weight_kg` sütunu (245 dolu) ↔ `technical_specs.weight_kg` (303 dolu) iki depo | REC-172 yorumu (ayrı iş) | yalnız specs'e yazılır |
 | 5 | Casals ses LwA mı LpA mı | AVenS | boş |
 | 6 | Canlıda `atex_marking` alanında bölge taşıyan 6 ürün (K11-a ihlali) | ayrı iş (Linear sınırı dolu → REC-172 yorumu) | bu plan dokunmaz |
 | 7 | QE-B (9 ürün) | — | kapsam dışı, sonraki okuyucu |
@@ -198,3 +220,14 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 | `atex_zone` kanonik biçimi canlıyla uzlaşmıyor | canlı ölçüldü (12 + 7); kanonik biçim ilk grubu kapsar, `Zone II` 7 satır ayrı iş |
 | Fark raporu "Air flow"u "en yüksek debi" diye etiketliyordu; karar 75 öncülü | fark raporu düzeltildi (merge); karar 75 notu Recep'e (açık sorular) |
 | Sözlük düzeltmesi + 6 üründe marking'de bölge "ayrı kayıt" ama kayıt yok | REC-172'ye yorum olarak yazıldı (Linear sınırı dolu); URUN'un 3 veri şüphesi de aynı yorumda |
+
+## v4 → v5 (4. çürütme, KOŞULLU)
+
+| v4 bulgusu | v5 |
+|---|---|
+| B-1 Enkelfan "Rated Power" mil gücü değil (155: 57,5 VA ↔ 60 W) | Enkelfan güç ✗, AVenS sorusu 4b; sayı 489 → 480, 76 hayır → 100 + 10; REC-172 yorumundaki "Enkelfan = `rated_power_w`" düzeltildi |
+| B-2 cetvelin K11-a örneği `Zone II` ve "II = bölge" cümlesi planla çelişik | adım 1: satır 421 ve 424-425 düzelir; karar (iki alan) aynı; Kararlar notu + Recep'e bilgi |
+| B-3 CMS s.2'de Fan/Motor çift RPM ve ağırlık, kayan satırlar; gevşek ad eşlemesi | okuyucu bölüm etiketiyle okur; eşleme boyut + T + kW; iki sabotaj testi |
+| B-4 `rpm_max` §11.7 ile tutarsız görünüyor | cetvel notu: sabit devirli AC motorda anma devri |
+| B-5 ağırlık iki depoda | vitrin specs'i okur (ölçüldü); sütun ayrı kayıt (4c) |
+| B-6 koşullu atamalar alıntı aramasıyla doğrulanmıyor | `kaynak=koşullu` + kol 1 zorunlu |

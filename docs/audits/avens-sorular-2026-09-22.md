@@ -69,6 +69,7 @@ Aşağıdaki ürünlerin teknik föyünü web'de bulamadık. **Föylerini gönde
 | VORTICENT CMS ATEX ağırlığı | Föyde fan 63 kg, motor 23 kg (35/14 örneği) | Ürünün sevk ağırlığı toplam mı, yalnız fan mı? |
 | VORTICENT CMS ATEX 12/5 ve 14/5 devri | Fan 1450 d/dk, motor 1346 d/dk (doğrudan tahrikli) | Doğru devir hangisi? |
 | ENKELFAN EEC 355-630 gerilimi | Metinde "400V", bağlantı şemasında "AC380V" | Çalışma gerilimi 400 V mı 380 V mı? |
+| ENKELFAN EEC gücü | "Rated Power kW" — ENKELFAN 155: 230 V, 0,25 A, 0,06 kW (230 × 0,25 = 57,5 VA) | Bu değer motorun mil (çıkış) gücü mü, şebekeden çekilen elektrik gücü mü? |
 
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.
