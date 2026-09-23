@@ -377,6 +377,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/toplu-sunum-k70.test.ts` | REC-146 · toplu sunum karar 70 kipi: sunum = yük, kırmızı aile tabloya girmez | URUN-KATALOG | vitest (her PR) | 2026-09-23 (2/2) | kendisi | AKTIF |
 | `scripts/icerik-hatti/aile-metni-kurallar.mjs` | Aile metni yazıcısının saf kuralları (küme kapısı, yazım planı, atomik PATCH yolu) | URUN-KATALOG | `aile-metni-yaz.mjs` | 2026-09-23 | `__tests__/aile-metni-yaz.test.ts` | AKTIF |
 | `scripts/icerik-hatti/en-jeton-kapisi.py` | TR ↔ EN jeton eşitliği kapısı (sayı dile göre, birim/faz eşdeğerliği) — karar 70 | URUN-KATALOG | `toplu-sunum.py --k70` | 2026-09-23 | `__tests__/en-jeton-kapisi.test.ts` | AKTIF |
+| `scripts/icerik-hatti/karar70-hazirla.mjs` | Karar 70 hazırlık: canlıdan (salt okuma) kip ayrımı, onaylı↔canlı TR md5, plan.json + onaylı TR taslakları | URUN-KATALOG | `elle` | 2026-09-23 ilk koşum: en 17 · b 8 (jet değişti) · 2 K7.10 dışarıda | yok (salt okuma; çıktısı ingestor 2d06af1) | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
