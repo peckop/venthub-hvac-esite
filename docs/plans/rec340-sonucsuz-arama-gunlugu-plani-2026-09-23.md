@@ -1,4 +1,4 @@
-# Sonuçsuz arama günlüğü (K10.1) — plan v3
+# Sonuçsuz arama günlüğü (K10.1) — plan v4
 
 > **REC-340 · URUN · 2026-09-23 · PLAN (kod yok, migration yok).** Uygulama plan-challenger'dan
 > sonra; migration'lı PR yalnız Recep onayıyla merge edilir (kural 13; onay URUN penceresinde,
@@ -42,7 +42,7 @@
 arama_sonucsuz_gunlugu(tenant_id uuid, gun date, dil text check in ('tr','en'),
   sorgu text check (char_length between 2 and 100), adet int check > 0,
   primary key (tenant_id, gun, dil, sorgu))
-arama_gunlugu_tasma(tenant_id uuid, gun date, sebep text check in ('tavan','oran'), adet int,
+arama_gunlugu_tasma(tenant_id uuid, gun date, sebep text check in ('tavan','oran','hata'), adet int,
   primary key (tenant_id, gun, sebep))            -- sorgu metni YOK; taşma işareti ayrı tablo (düşük bulgu)
 arama_gunlugu_oran(anahtar text, saat timestamptz, adet int, primary key (anahtar, saat))
 arama_gunlugu_tuz(gun date primary key, tuz bytea not null)
@@ -54,37 +54,69 @@ arama_gunlugu_tuz(gun date primary key, tuz bytea not null)
 
 ### 2.1 Sahip rol — kiracı sınırı DEFINER içinde de geçerli (v2 Y1)
 
-`create role arama_gunlugu_yazar nologin noinherit nobypassrls;` Fonksiyonun sahibi bu roldür, `postgres`
-değil. Böylece fonksiyon içindeki doğrulama araması **anon ile aynı RLS görünümünü** alır
-(`jwt_tenant_id()` isteğin JWT'sinden okunur). Yetkiler en dar hâliyle:
-- `grant usage on schema public, extensions`; arama fonksiyonlarında `execute`; aramanın okuduğu
-  tablolarda (`products`, `product_search_index`, `categories`, `product_families`, `product_images`,
-  `brands` — gerçek liste gölgede `arama_eslesen_urunler` gövdesinden çıkarılır) `select`.
-- Mevcut okuma politikaları `to anon, authenticated` ise bu role de **ayrı okuma politikası** eklenir,
-  aynı `tenant_id = jwt_tenant_id()` koşuluyla (politikayı genişletmek değil, yanına eklemek).
-- Dört günlük tablosunda `select, insert, update, delete` + aynı kiracı koşullu politika (oran ve tuz
-  tabloları kiracısız; politika `true`, erişim yine yalnız bu rol).
-- `extensions.gen_random_bytes` için `execute`.
-- Sahiplik ataması `alter function … owner to arama_gunlugu_yazar` (migration `postgres` olarak koşar ve
-  rolü kendisi yarattığı için yetkilidir — gölgede ölçülür).
+Fonksiyonun sahibi `arama_gunlugu_yazar` rolüdür, `postgres` değil (`postgres.rolbypassrls = true`).
+Böylece fonksiyon içindeki doğrulama araması **anon ile aynı RLS görünümünü** alır.
+
+**Kuruluş sırası (v3 K2 — canlı: `postgres` süper kullanıcı DEĞİL, `rolcreaterole = true`, PG 17.6,
+`createrole_self_grant = ''`; yaratıcı yeni role yalnız ADMIN OPTION ile üye olur):**
+1. Rol küme genelidir → idempotent: `do $$ begin if not exists (select 1 from pg_roles where rolname =
+   'arama_gunlugu_yazar') then create role arama_gunlugu_yazar nologin noinherit nobypassrls; end if; end $$;`
+2. `grant arama_gunlugu_yazar to postgres with inherit true, set true;` (ileride `create or replace` da
+   koşabilsin — eşik migration'ı).
+3. `grant create on schema public to arama_gunlugu_yazar;` → `alter function … owner to …;` →
+   `revoke create on schema public from arama_gunlugu_yazar;`
+
+**Yetki listesi — kesin (v3 Y1, canlı `proacl`/`pg_policies` ölçümü):**
+- Şema: `usage on schema public`. `auth` şemasına usage **verilemez** (postgres'te grant option yok) →
+  fonksiyon `auth.*` ve `is_admin_claim()` **çağırmaz** (bkz. m.1).
+- `execute` (PUBLIC'te açık olmayanlar): `arama_eslesen_urunler`, `arama_kelimeler`, `arama_kesin_ifade`,
+  `arama_marka_es`, `arama_marka_kelimeleri`, `arama_bulanik_ifade`, `arama_dogrula`, `arama_ad_isabeti`,
+  `arama_normalize`, **`jwt_tenant_id`** (her RLS politikası çağırır). PUBLIC'te açık olanlar
+  (`fts_search_products`, `get_search_suggestions`, `display_price`, `jwt_price_segment`,
+  `extensions.levenshtein`, pgroonga, `extensions.gen_random_bytes`) için ek grant yok.
+- `select`: `products`, `product_search_index`, `categories`, `product_families`, `product_images`,
+  `brands`, `product_prices`, `price_lists`. İlk altısının okuma politikaları zaten **PUBLIC** rolüne
+  tanımlı (`tenant_id = (select jwt_tenant_id())`) → **yeni politika eklenmez**. `product_prices` /
+  `price_lists` politikaları yalnız anon/authenticated'a → rol orada 0 satır görür, `display_price` NULL
+  döner; sonuç yalnız boş/dolu diye okunduğu için zararsız, politika eklenmez.
+- Dört günlük tablosu: `select, insert, update, delete`. Politikalar: günlük ve taşma için yazma/okuma
+  `tenant_id = jwt_tenant_id()`; **silme politikası kiracısız** `for delete to arama_gunlugu_yazar using
+  (gun < current_date - 90)` (v3 Y2: günün ilk çağıranı yalnız kendi kiracısını silmesin — KVKK). Oran ve
+  tuz tabloları kiracısız, politika `true`.
+- Migration sonu guard her kalemi `has_function_privilege` / `has_table_privilege('arama_gunlugu_yazar', …)`
+  ile doğrular; `rolbypassrls = false`; `pg_proc.proowner` = rol.
+
+**Gölge ön koşulu (v3 Y4):** gölge `postgres` süper kullanıcıysa K2/K1 gölgede yeşil, canlıda kırmızı
+çıkar. Gölge senaryosunun ilk adımı `select rolsuper from pg_roles where rolname = current_user` →
+`false` ister; değilse migration `set role` ile süper olmayan, `createrole`'lü bir rolle uygulanır ve
+`auth` şeması ACL'i canlıyla eşitlenir. `00_golge_onsoz.sql`'e rol eklenir (ALTYAPI dosyası → ondan
+istenir); yoksa `OWNER TO` hatası "beklenen ortam hatası" sayılıp fonksiyon sessizce postgres'te kalır.
 
 ### 2.2 Tek yazma yolu: `arama_sonucsuz_yaz(p_sorgu text, p_dil text) returns void`
 
 `SECURITY DEFINER`, sahip §2.1, `SET search_path = public, extensions, pg_temp`, `VOLATILE`.
 `revoke all on function … from public;` → `grant execute … to anon, authenticated;`.
-Her adımda koşul tutmazsa **sessizce döner**. Gövdenin tamamı `exception when others then return`
-ile sarılı: **doğrulamada hata (57014 zaman aşımı dahil) → yazılmaz** (v2 O2, K9.3).
+Her adımda koşul tutmazsa **sessizce döner**. Gövde `exception when others` ile sarılı: hata
+**yazmaz**, yalnız iç blokta `arama_gunlugu_tasma(sebep='hata')` artar (v3 O1: izin/yapılandırma kırığı
+"sonuçsuz arama yok" ile karışmasın; rapor ayrı gösterir). **Zaman aşımı (57014) `OTHERS`'a girmez**
+(PL/pgSQL belgesi: `QUERY_CANCELED` hariç) → istemciye hata olarak döner, yazılmaz; istemci `.then`
+ile yutar (v3 K3). anon `statement_timeout` 3 sn, authenticated 8 sn.
 
-1. **İç trafik:** `is_admin_claim()` doğruysa döner (v2 O5). Anonim iç ölçümler ayıklanamaz → §5
-   sınırlama olarak yazılı.
+0. **Ucuz ön kontrol (v3 Y3):** `p_sorgu` ham uzunluğu > 200 → döner (regex'ten önce).
+1. **İç trafik (v3 K1):** `is_admin_claim()` rol yetkisiyle çağrılamaz; aynı mantık gövdede:
+   `c := current_setting('request.jwt.claims', true)::jsonb`; `c->>'role' = 'service_role'` ya da
+   `coalesce(c->>'user_role', c->'app_metadata'->>'user_role')` ∈ {admin, super_admin} → döner.
+   `user_metadata` okunmaz (kural 12). Anonim iç ölçümler ayıklanamaz → §5 sınırlama.
 2. **Girdi:** `p_dil` ∉ {tr, en} → döner. `ham := regexp_replace(trim(p_sorgu), '\s+', ' ', 'g')`;
    `v := arama_normalize(ham)`. `v` null/boş, < 2 ya da > 100 karakter → döner.
 3. **Kişisel veri süzgeci:** `@` varsa döner. Sonra `rakam := regexp_replace(ham, '[\s().+-]', '', 'g')`
    üzerinde, rakam dizisi sınırlarıyla (`(^|\D)` … `(\D|$)`):
-   - **cep telefonu:** `(90|0)?5\d{9}` ; **sabit hat:** `(90|0)?[2-4]\d{9}` → döner.
+   - ayraç listesine `/` da girer; **cep telefonu:** `(0090|90|0)?5\d{9}` ; **sabit hat:**
+     `(0090|90|0)?[2-4]\d{9}` → döner. IBAN (`TR` + 24 rakam) → döner.
    - **TCKN:** 11 haneli dizi, `d1 ≠ 0`,
      `d10 = ((d1+d3+d5+d7+d9)·7 − (d2+d4+d6+d8)) mod 10` (negatifse +10),
      `d11 = (d1+…+d10) mod 10` → tutuyorsa döner. Sağlaması tutmayan 11 hane yazılır.
+     PG'de `-3 % 10 = -3` → `((x % 10) + 10) % 10` biçimi; negatif dalı sınayan vektör gölgede.
    - Test vektörleri (gölge): `0532 123 45 67`, `+90 532-123-4567`, `0212 555 12 12` → yazılmaz;
      `10000000146` (geçerli sağlama) → yazılmaz; `10000000147` → yazılır; `SEA-51151000` → yazılır.
    - İsim-soyisim süzülemez → §5 rapor kuralları.
@@ -100,11 +132,12 @@ ile sarılı: **doğrulamada hata (57014 zaman aşımı dahil) → yazılmaz** (
    oran satırları, 90 günden eski günlük ve taşma satırları silinir (günde bir kez; v2 düşük bulgu).
    **Nitelik:** bu anonimleştirme değil **takma adlandırmadır** — tuz 48 saat DB'de durduğu için servis
    rolüne erişen biri bu sürede IPv4 uzayını tarayıp anahtarı çözebilir; tuz silinince bağ kopar.
+4b. **Günlük tavan ÖNCE (v3 Y3):** o gün o kiracıda tekil satır ≥ 500 ise `tasma/tavan` artar, döner —
+   pahalı doğrulamadan önce, ucuz `count` ile.
 5. **Sunucu doğrulaması:** `fts_search_products(ham, 1, '{}')` ve `get_search_suggestions(ham, 1)`
    **ham metinle** (istemcinin aradığıyla aynı) koşar; ikisi de boşsa devam. Sahip rol RLS'e tabi
    olduğundan doğrulama ziyaretçinin kiracısında olur (v2 Y1).
-6. **Günlük tavan:** o gün o kiracıda tekil satır ≥ 500 ise `arama_gunlugu_tasma(sebep='tavan')` artar,
-   döner.
+6. (tavan m.4b'ye taşındı.)
 7. `insert into arama_sonucsuz_gunlugu (…, sorgu) values (…, v) on conflict … do update set adet = adet + 1`.
 
 Migration sonunda guard: dört tablonun anon/authenticated için 7 yetkisi `false`; fonksiyon
@@ -142,8 +175,17 @@ kiracıya yazılır. Bugün ürün okumasında da aynı durum var; çözümü te
   gider · yönetici JWT'si yazmaz · doğrulamada `statement_timeout` → yazılmaz, hata dışarı sızmaz ·
   91 gün önceki satır ve 3 gün önceki tuz/oran satırı günün ilk çağrısında silinir · `pgcrypto`/`sha256`
   `search_path` ile çözülür · sahip rolün `rolbypassrls = false`.
+- **v4 ek gölge senaryoları:** `rolsuper = false` ön koşulu · anon JWT ile gerçek satır oluşur (K1'i
+  yakalar) · iki kiracıda 91 günlük satır temizliği (Y2) · eşik migration'ı `create or replace`'i postgres
+  koşabilir (K2) · migration iki kez uygulanır (rol idempotent) · tavan dolunca doğrulama hiç koşmaz
+  (Y3) · yönetici olmayan authenticated JWT yazar · 57014 istemciye hata döner ve satır yok (K3) ·
+  izin hatası `tasma/hata`'yı artırır (O1).
+- **Merge'den hemen sonra canlı duman testi (v3 Y4):** anon anahtarıyla bilinen sonuçsuz bir sorgu →
+  satırın oluştuğu SELECT ile görülür. Asıl kanıt budur; bir ay sonraki sağlık kontrolü değil. Test
+  satırı 90 gün kuralıyla kendiliğinden silinir (elle prod silme yok); raporda test günü not edilir.
 - `pnpm build` + tam birim takımı + `diff-review`; PR-A merge'ünden sonra **aynı turda** `supabase:gen`
   ve şema tabanı.
+- PR gövdesi Supabase danışmanının "anon'a açık SECURITY DEFINER" uyarısını önceden ilan eder (v3 D7).
 
 ## 5. Rapor (aylık, REC-369 pazar ölçümü 6. kol)
 
@@ -157,6 +199,9 @@ kiracıya yazılır. Bugün ürün okumasında da aynı durum var; çözümü te
   sonuçsuz sorgu → satır oluşuyor mu); "sonuçsuz arama yok" hükmü bundan sonra kurulur (K10.3).
 - Çıktı: en sık 30 sonuçsuz sorgu · taşma adetleri (`oran`, `tavan`) · anahtar kaynak dağılımı
   (cf/real/xff/yok — tek kaynak baskınsa sınır fiilen site geneli demektir, §6) · aylık toplam.
+- Taşma satırlarına `hata` eklendi; `hata > 0` ise önce yazma yolu onarılır.
+- **Sınırlamalar (K10.4'e yazılır):** gün kovası UTC (Türkiye'de 3 saat kayar) · filtreli aramanın sıfır
+  sonucu kaydedilmez (sunucu filtresiz doğrular — temkinli yön) · oran sınırı kiracılar arası ortak.
 - **Sınırlama:** ekibin anonim canlı ölçümleri ayıklanamaz; rapor ölçüm günlerini (Linear'daki kanıt
   kayıtlarından) not olarak yazar.
 
@@ -164,8 +209,9 @@ kiracıya yazılır. Bugün ürün okumasında da aynı durum var; çözümü te
 
 - **PostgREST'e hangi istemci başlığının ulaştığı** (v2 Y2 ikinci risk). Gölgede ağ geçidi yok. Yol:
   PR-A'dan **önce** ayrı, küçük, salt-okuma bir tanı fonksiyonu değil — o da migration'dır. Bu yüzden
-  PR-A **ölçüm kipinde** iner: oran sınırı eşiği ilk gün yalnız sayar, reddetmez (`tasma/oran` yine
-  artar); ben iki farklı ağdan (ev, mobil) bilinen sonuçsuz bir sorguyla çağırırım ve oran tablosunda
+  PR-A **ölçüm kipinde** iner: 30'luk eşik ilk gün yalnız sayar, reddetmez (`tasma/oran` yine
+  artar) — **ama saatte 300'lük sert sınır ölçüm kipinde de reddeder** (v3 Y3: her çağrı iki tam arama
+  koşturur, anon anahtarı açık); ben iki farklı ağdan (ev, mobil) bilinen sonuçsuz bir sorguyla çağırırım ve oran tablosunda
   **iki farklı anahtar** oluştuğunu ölçerim. Tek anahtar çıkarsa (başlık iç adres veriyor) sınır site
   geneli olur → eşik kapalı kalır, yalnız günlük tavan korur, cetvele yazılır. Kip, eşiği açan tek satırlık
   ikinci migration'la kapanır (Recep onayı). Bu, v2'deki "inince canlıda ölç" sırasının bozuk sınırı
@@ -204,4 +250,13 @@ kiracıya yazılır. Bugün ürün okumasında da aynı durum var; çözümü te
 **Ayrı kayıt (bu planın dışında):** `rate_limits`'te 12 satır ham IPv4 (`iyzico:`, `coupon:` anahtarları)
 ve tablonun hiç temizlenmemesi — REC-294 kapsamına yorum olarak eklenir.
 
-*Yazan: URUN şeridi, 2026-09-23. v1 (karar 64, sayaç) ve v2 bu dosyanın git geçmişindedir.*
+**v3 denetimi (BLOK) → v4:** K1 `is_admin_claim`/`auth` şeması erişilemez → m.1 gövdede JWT okuması ·
+K2 `OWNER TO` şartları → §2.1 kuruluş sırası + idempotent rol · K3 57014 yakalanmaz → metin + kapı
+düzeltildi · Y1 eksik yetki listesi → §2.1 kesin liste, gereksiz politika yok · Y2 kiracıya bağlı
+temizlik → kiracısız silme politikası · Y3 maliyet → m.0 ham uzunluk, m.4b tavan önce, ölçüm kipinde
+300 sert sınır · Y4 gölge süper kullanıcı → ön koşul + canlı duman testi · O1 hata sayımı → `tasma/hata`
+· O2 ikinci migration için K2 grant'ı (ayar tablosu yerine migration seçildi: eşik açma kararı kayıt ve
+onayla gitsin) · O3 oran sınırı kiracılar arası ortak → K10.4 · D1–D8 işlendi (negatif mod, `0090`, `/`,
+IBAN, UTC, filtre, danışman uyarısı).
+
+*Yazan: URUN şeridi, 2026-09-23. v1 (karar 64, sayaç), v2 ve v3 bu dosyanın git geçmişindedir.*
