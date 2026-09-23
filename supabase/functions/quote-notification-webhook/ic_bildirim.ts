@@ -35,6 +35,17 @@ export const kacir = (s: unknown): string =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
 
+/** Kontrol karakterlerini (0-31, 127) boşluğa çevirir, fazla boşluğu sıkıştırır. */
+export const temizle = (s: unknown): string =>
+  Array.from(String(s ?? ''))
+    .map((ch) => {
+      const k = ch.charCodeAt(0)
+      return k < 32 || k === 127 ? ' ' : ch
+    })
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim()
+
 const KAYNAK_ADI: Record<string, string> = { pdp: 'Ürün sayfası', cart: 'Sepet', project: 'Proje' }
 
 /** Panel adresini güvenle kurar: yalnız http(s) taban kabul edilir, sondaki / temizlenir. */
@@ -46,8 +57,10 @@ export function panelLinki(taban: string): string {
 
 export function icBildirimOlustur(g: IcBildirimGirdisi): IcBildirim {
   const kisaId = g.quoteId.slice(0, 8).toUpperCase()
-  const ad = (g.contactName || '').trim() || 'Adsız'
-  const subject = `Yeni teklif talebi #${kisaId} — ${ad}`.slice(0, 200)
+  // Kontrol karakteri (\r\n dahil) atılır, konuda ad 60 karakterle sınırlı (güvenlik incelemesi
+  // 2026-09-23, bulgu 5: müşteri girdisi kiracının kendi alan adından gelen konu satırına giriyor).
+  const ad = temizle(g.contactName).slice(0, 60) || 'Adsız'
+  const subject = `Yeni teklif talebi #${kisaId} — ${ad}`
   const link = panelLinki(g.panelTabanUrl)
   const kaynak = g.source ? KAYNAK_ADI[g.source] ?? g.source : '—'
 

@@ -65,6 +65,12 @@ describe('INV-TEKLIF-IC-BILDIRIM-1 — içerik kurucusu', () => {
     expect(panelLinki('')).toBe('https://venthub.com.tr/admin/quotes')
   })
 
+  it('konu satırı: kontrol karakteri atılır, ad 60 karakterle sınırlı (bulgu 5)', () => {
+    const b = icBildirimOlustur({ ...ornek, contactName: `Ali\r\nBcc: x@y.z ${'a'.repeat(200)}` })
+    expect(b.subject).not.toMatch(/[\r\n]/)
+    expect(b.subject.length).toBeLessThanOrEqual('Yeni teklif talebi #9F2C1A7B — '.length + 60)
+  })
+
   it('boş değerler: ad/telefon/kalem yoksa gövde yine kurulur', () => {
     const b = icBildirimOlustur({ ...ornek, contactName: null, contactPhone: null, kalemler: [] })
     expect(b.subject).toContain('Adsız')
@@ -92,6 +98,24 @@ describe('INV-TEKLIF-IC-BILDIRIM-1 — webhook kablolaması (kaynak)', () => {
     expect(icGonderim).toBeGreaterThan(0)
     expect(damga).toBeGreaterThan(icGonderim)
     expect(KAYNAK).toMatch(/internal_notify_failed[\s\S]{0,80}502/)
+  })
+
+  it('kiracı sızıntısı kapısı: varsayılan dışı kiracıda alıcı kendi config\'inden, okunamazsa 503 (bulgu 2)', () => {
+    expect(KAYNAK).toMatch(/quote\.tenant_id === DEFAULT_TENANT_ID/)
+    expect(KAYNAK).toMatch(/tenant_lookup_failed[\s\S]{0,40}503/)
+  })
+
+  it('Resend 409 (idempotent) hata sayılmaz — iki gönderimde de (bulgu 4)', () => {
+    expect(KAYNAK).toMatch(/!resp\.ok && resp\.status !== 409/)
+    expect(KAYNAK).toMatch(/!icResp\.ok && icResp\.status !== 409/)
+  })
+
+  it('kalem yarışı: kalemler boşsa bekleyip yeniden okunur (bulgu 4)', () => {
+    expect(KAYNAK).toMatch(/for \(let deneme = 0; deneme < 4; deneme\+\+\)/)
+  })
+
+  it('yorumlar olmayan yeniden denemeye yaslanmıyor (pg_net tek atım, bulgu 3)', () => {
+    expect(KAYNAK).not.toMatch(/pg_net tekrar dener/)
   })
 
   it('defter hem başarıda hem başarısızlıkta yazılıyor (§B3.3) ve yalnız izinli durumlar', () => {
