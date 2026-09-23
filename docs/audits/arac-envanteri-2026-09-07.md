@@ -378,6 +378,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/aile-metni-kurallar.mjs` | Aile metni yazıcısının saf kuralları (küme kapısı, yazım planı, atomik PATCH yolu) | URUN-KATALOG | `aile-metni-yaz.mjs` | 2026-09-23 | `__tests__/aile-metni-yaz.test.ts` | AKTIF |
 | `scripts/icerik-hatti/en-jeton-kapisi.py` | TR ↔ EN jeton eşitliği kapısı (sayı dile göre, birim/faz eşdeğerliği) — karar 70 | URUN-KATALOG | `toplu-sunum.py --k70` | 2026-09-23 | `__tests__/en-jeton-kapisi.test.ts` | AKTIF |
 | `scripts/icerik-hatti/karar70-hazirla.mjs` | Karar 70 hazırlık: canlıdan (salt okuma) kip ayrımı, onaylı↔canlı TR md5, plan.json + onaylı TR taslakları | URUN-KATALOG | `elle` | 2026-09-23 ilk koşum: en 17 · b 8 (jet değişti) · 2 K7.10 dışarıda | yok (salt okuma; çıktısı ingestor 2d06af1) | AKTIF |
+| `scripts/gsc/gsc-token.cjs` | Google Search Console erişim jetonu — HİZMET HESABI ile (süresi dolmayan kalıcı yol). Anahtar `GSC_SA_ANAHTAR` (depo dışı; depo içindeyse reddeder), stdout'a yalnız 1 saatlik jeton; `--dene <site>` erişimi ölçer. OAuth "Testing" kipinin 7 günlük yenileme jetonunun yerine | ALTYAPI | elle — OPS REC-369 taban ölçümü + search-console skill'i (`Authorization: Bearer $(node scripts/gsc/gsc-token.cjs)`) | 2026-09-23 koşuldu: venthub-gsc@venthub-507309 → sc-domain:venthub.com.tr siteRestrictedUser | INV-GSC-TOKEN-1 (`gsc-token.test.ts`) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
