@@ -11,9 +11,9 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | Katalogdaki ürün | 442 |
 | Karşılaştırılan ürün | 69 |
 | Karşılaştırılan değer | 138 |
-| — aynı | 114 |
-| — üretici değeri alınmalı | 2 |
-| — belirsiz (teyit gerekiyor) | 22 |
+| — aynı | 115 |
+| — üretici değeri alınmalı | 0 |
+| — belirsiz (teyit gerekiyor) | 23 |
 | Üretici belgesi bulunamayan ürün | 16 |
 | Belge var, bizde karşılaştırılacak değer yok | 0 |
 | Belgesi henüz okunmamış ürün | 357 |
@@ -40,23 +40,23 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 
 | Ürün | Alan | Bizim değer | Üretici | Fark | Kaynak | Hüküm |
 |---|---|---|---|---|---|---|
-| AVE-ENKEC155 ENKELFAN 155 EEC | en yüksek debi | 460 m³/h | 460 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC155 ENKELFAN 155 EEC | debi (kaynakta tanımsız: Air flow) | 460 m³/h | 460 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC155 ENKELFAN 155 EEC | üretici kodu | ENKEC155  | ENKEC155  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC190 ENKELFAN 190 EEC | en yüksek debi | 760 m³/h | 760 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC190 ENKELFAN 190 EEC | debi (kaynakta tanımsız: Air flow) | 760 m³/h | 760 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC190 ENKELFAN 190 EEC | üretici kodu | ENKEC190  | ENKEC190  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC250 ENKELFAN 250 EEC | en yüksek debi | 1640 m³/h | 1640 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC250 ENKELFAN 250 EEC | debi (kaynakta tanımsız: Air flow) | 1640 m³/h | 1640 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC250 ENKELFAN 250 EEC | üretici kodu | ENKEC250  | ENKEC250  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC310 ENKELFAN 310 EEC | en yüksek debi | 3160 m³/h | 3160 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC310 ENKELFAN 310 EEC | debi (kaynakta tanımsız: Air flow) | 3160 m³/h | 3160 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC310 ENKELFAN 310 EEC | üretici kodu | ENKEC310  | ENKEC310  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC355 ENKELFAN 355 EEC | en yüksek debi | 4890 m³/h | 4890 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC355 ENKELFAN 355 EEC | debi (kaynakta tanımsız: Air flow) | 4890 m³/h | 4890 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC355 ENKELFAN 355 EEC | üretici kodu | ENKEC355  | ENKEC355  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC450 ENKELFAN 450 EEC | en yüksek debi | 6955 m³/h | 6955 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC450 ENKELFAN 450 EEC | debi (kaynakta tanımsız: Air flow) | 6955 m³/h | 6955 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC450 ENKELFAN 450 EEC | üretici kodu | ENKEC450  | ENKEC450  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC500 ENKELFAN 500 EEC | en yüksek debi | 13850 m³/h | 13850 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC500 ENKELFAN 500 EEC | debi (kaynakta tanımsız: Air flow) | 13850 m³/h | 13850 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC500 ENKELFAN 500 EEC | üretici kodu | ENKEC500  | ENKEC500  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC560 ENKELFAN 560 EEC | en yüksek debi | 16100 m³/h | 16100 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC560 ENKELFAN 560 EEC | debi (kaynakta tanımsız: Air flow) | 16100 m³/h | 16100 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC560 ENKELFAN 560 EEC | üretici kodu | ENKEC560  | ENKEC560  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
-| AVE-ENKEC630 ENKELFAN 630 EEC | en yüksek debi | 18600 m³/h | 18600 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
+| AVE-ENKEC630 ENKELFAN 630 EEC | debi (kaynakta tanımsız: Air flow) | 18600 m³/h | 18600 m³/h | 0 (%0) | Casals plug-fan kataloğu, s.16 | **aynı** |
 | AVE-ENKEC630 ENKELFAN 630 EEC | üretici kodu | ENKEC630  | ENKEC630  | — | Casals plug-fan kataloğu, s.16 | **aynı** |
 
 ### avens-hiz-anahtarlari — 2 ürün
@@ -79,49 +79,49 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 
 | Ürün | Alan | Bizim değer | Üretici | Fark | Kaynak | Hüküm |
 |---|---|---|---|---|---|---|
-| AVE-NX10034250 NIMAX 1004 T4 55kW | en yüksek debi | 88010 m³/h | 88010 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX10034250 NIMAX 1004 T4 55kW | debi (kaynakta tanımsız: Air flow) | 88010 m³/h | 88010 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX10034250 NIMAX 1004 T4 55kW | motor gücü | 55 kW | 55 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX10034250 NIMAX 1004 T4 55kW | üretici kodu | NX10034250  | NX10044250  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX313290 NIMAX 314 T2 1,5kW | en yüksek debi | 5240 m³/h | 5500 m³/h | 260 (%5) | Casals teknik katalog, s.200 | **üretici** |
+| AVE-NX313290 NIMAX 314 T2 1,5kW | debi (kaynakta tanımsız: Air flow) | 5240 m³/h | 5500 m³/h | 260 (%5) | Casals teknik katalog, s.200 | **belirsiz** |
 | AVE-NX313290 NIMAX 314 T2 1,5kW | motor gücü | 1,5 kW | 1,5 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX313290 NIMAX 314 T2 1,5kW | üretici kodu | NX313290  | NX314290  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX353290 NIMAX 354 T2 3kW | en yüksek debi | 7880 m³/h | 7870 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX353290 NIMAX 354 T2 3kW | debi (kaynakta tanımsız: Air flow) | 7880 m³/h | 7870 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353290 NIMAX 354 T2 3kW | motor gücü | 3 kW | 3 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353290 NIMAX 354 T2 3kW | üretici kodu | NX353290  | NX3542100  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX353471 NIMAX 354 T4 0,37kW | en yüksek debi | 3940 m³/h | 3940 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX353471 NIMAX 354 T4 0,37kW | debi (kaynakta tanımsız: Air flow) | 3940 m³/h | 3940 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353471 NIMAX 354 T4 0,37kW | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353471 NIMAX 354 T4 0,37kW | üretici kodu | NX353471  | NX354471  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX4032112 NIMAX 404 T2 5,5kW | en yüksek debi | 11270 m³/h | 11260 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX4032112 NIMAX 404 T2 5,5kW | debi (kaynakta tanımsız: Air flow) | 11270 m³/h | 11260 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX4032112 NIMAX 404 T2 5,5kW | motor gücü | 5,5 kW | 5,5 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX4032112 NIMAX 404 T2 5,5kW | üretici kodu | NX4032112  | NX4042132  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX403480 NIMAX 404 T4 0,55kW | en yüksek debi | 5640 m³/h | 5630 m³/h | -10 (%-0,2) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX403480 NIMAX 404 T4 0,55kW | debi (kaynakta tanımsız: Air flow) | 5640 m³/h | 5630 m³/h | -10 (%-0,2) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX403480 NIMAX 404 T4 0,55kW | motor gücü | 0,55 kW | 0,55 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX403480 NIMAX 404 T4 0,55kW | üretici kodu | NX403480  | NX404480  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX4532132 NIMAX 454 T2 11kW | en yüksek debi | 16040 m³/h | 16040 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX4532132 NIMAX 454 T2 11kW | debi (kaynakta tanımsız: Air flow) | 16040 m³/h | 16040 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX4532132 NIMAX 454 T2 11kW | motor gücü | 11 kW | 11 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX4532132 NIMAX 454 T2 11kW | üretici kodu | NX4532132  | NX4542160  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX453490 NIMAX 454 T4 1,1kW | en yüksek debi | 8020 m³/h | 8020 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX453490 NIMAX 454 T4 1,1kW | debi (kaynakta tanımsız: Air flow) | 8020 m³/h | 8020 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX453490 NIMAX 454 T4 1,1kW | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX453490 NIMAX 454 T4 1,1kW | üretici kodu | NX453490  | NX454490  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX5032160 NIMAX 504 T2 15kW | en yüksek debi | 22010 m³/h | 22000 m³/h | -10 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX5032160 NIMAX 504 T2 15kW | debi (kaynakta tanımsız: Air flow) | 22010 m³/h | 22000 m³/h | -10 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX5032160 NIMAX 504 T2 15kW | motor gücü | 15 kW | 15 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX5032160 NIMAX 504 T2 15kW | üretici kodu | NX5032160  | NX5042160  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX503490 NIMAX 504 T4 2,2kW | en yüksek debi | 11010 m³/h | 11000 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX503490 NIMAX 504 T4 2,2kW | debi (kaynakta tanımsız: Air flow) | 11010 m³/h | 11000 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX503490 NIMAX 504 T4 2,2kW | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX503490 NIMAX 504 T4 2,2kW | üretici kodu | NX503490  | NX5044100  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX5634100 NIMAX 564 T4 3kW | en yüksek debi | 15460 m³/h | 15460 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX5634100 NIMAX 564 T4 3kW | debi (kaynakta tanımsız: Air flow) | 15460 m³/h | 15460 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX5634100 NIMAX 564 T4 3kW | motor gücü | 3 kW | 3 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX5634100 NIMAX 564 T4 3kW | üretici kodu | NX5634100  | NX5644100  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX6334132 NIMAX 634 T4 5,5kW | en yüksek debi | 22010 m³/h | 22010 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX6334132 NIMAX 634 T4 5,5kW | debi (kaynakta tanımsız: Air flow) | 22010 m³/h | 22010 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX6334132 NIMAX 634 T4 5,5kW | motor gücü | 5,5 kW | 5,5 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX6334132 NIMAX 634 T4 5,5kW | üretici kodu | NX6334132  | NX6344132  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX7144160 NIMAX 714 T4 11kW | en yüksek debi | 31500 m³/h | 31500 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX7144160 NIMAX 714 T4 11kW | debi (kaynakta tanımsız: Air flow) | 31500 m³/h | 31500 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX7144160 NIMAX 714 T4 11kW | motor gücü | 11 kW | 11 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX7144160 NIMAX 714 T4 11kW | üretici kodu | NX7144160  | NX7144160  | — | Casals teknik katalog, s.200 | **aynı** |
-| AVE-NX8034180 NIMAX 804 T4 18,5kW | en yüksek debi | 45060 m³/h | 45060 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX8034180 NIMAX 804 T4 18,5kW | debi (kaynakta tanımsız: Air flow) | 45060 m³/h | 45060 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX8034180 NIMAX 804 T4 18,5kW | motor gücü | 18,5 kW | 18,5 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX8034180 NIMAX 804 T4 18,5kW | üretici kodu | NX8034180  | NX8044180  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX9034200 NIMAX 904 T4 37kW | en yüksek debi | 64160 m³/h | 64160 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX9034200 NIMAX 904 T4 37kW | debi (kaynakta tanımsız: Air flow) | 64160 m³/h | 64160 m³/h | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX9034200 NIMAX 904 T4 37kW | motor gücü | 37 kW | 37 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX9034200 NIMAX 904 T4 37kW | üretici kodu | NX9034200  | NX9044225  | — | Casals teknik katalog, s.200 | **belirsiz** |
 
@@ -129,49 +129,49 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 
 | Ürün | Alan | Bizim değer | Üretici | Fark | Kaynak | Hüküm |
 |---|---|---|---|---|---|---|
-| AVE-NS10014225 NIMUS 1001 T4 45kW | en yüksek debi | 75390 m³/h | 75390 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS10014225 NIMUS 1001 T4 45kW | debi (kaynakta tanımsız: Air flow) | 75390 m³/h | 75390 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS10014225 NIMUS 1001 T4 45kW | motor gücü | 45 kW | 45 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS10014225 NIMUS 1001 T4 45kW | üretici kodu | NS10014225  | NS10014225  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS311280 NIMUS 311 T2 1,1kW | en yüksek debi | 4710 m³/h | 4720 m³/h | 10 (%0,2) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS311280 NIMUS 311 T2 1,1kW | debi (kaynakta tanımsız: Air flow) | 4710 m³/h | 4720 m³/h | 10 (%0,2) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS311280 NIMUS 311 T2 1,1kW | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS311280 NIMUS 311 T2 1,1kW | üretici kodu | NS311280  | NS311280  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS351290 NIMUS 351 T2 2,2kW | en yüksek debi | 6750 m³/h | 6750 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS351290 NIMUS 351 T2 2,2kW | debi (kaynakta tanımsız: Air flow) | 6750 m³/h | 6750 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS351290 NIMUS 351 T2 2,2kW | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS351290 NIMUS 351 T2 2,2kW | üretici kodu | NS351290  | NS351290  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS351471 NIMUS 351 T4 0,37kW | en yüksek debi | 3370 m³/h | 3370 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS351471 NIMUS 351 T4 0,37kW | debi (kaynakta tanımsız: Air flow) | 3370 m³/h | 3370 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS351471 NIMUS 351 T4 0,37kW | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS351471 NIMUS 351 T4 0,37kW | üretici kodu | NS351471  | NS351471  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS4012100 NIMUS 401 T2 4kW | en yüksek debi | 9650 m³/h | 9660 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS4012100 NIMUS 401 T2 4kW | debi (kaynakta tanımsız: Air flow) | 9650 m³/h | 9660 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4012100 NIMUS 401 T2 4kW | motor gücü | 4 kW | 4 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4012100 NIMUS 401 T2 4kW | üretici kodu | NS4012100  | NS4012100  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS401480 NIMUS 401 T4 0,55kW | en yüksek debi | 4830 m³/h | 4830 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS401480 NIMUS 401 T4 0,55kW | debi (kaynakta tanımsız: Air flow) | 4830 m³/h | 4830 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS401480 NIMUS 401 T4 0,55kW | motor gücü | 0,55 kW | 0,55 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS401480 NIMUS 401 T4 0,55kW | üretici kodu | NS401480  | NS401480  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS4512132 NIMUS 451 T2 7,5kW | en yüksek debi | 13740 m³/h | 13750 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS4512132 NIMUS 451 T2 7,5kW | debi (kaynakta tanımsız: Air flow) | 13740 m³/h | 13750 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4512132 NIMUS 451 T2 7,5kW | motor gücü | 7,5 kW | 7,5 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4512132 NIMUS 451 T2 7,5kW | üretici kodu | NS4512132  | NS4512132  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS451480 NIMUS 451 T4 0,75kW | en yüksek debi | 6870 m³/h | 6870 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS451480 NIMUS 451 T4 0,75kW | debi (kaynakta tanımsız: Air flow) | 6870 m³/h | 6870 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS451480 NIMUS 451 T4 0,75kW | motor gücü | 0,75 kW | 0,75 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS451480 NIMUS 451 T4 0,75kW | üretici kodu | NS451480  | NS451480  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS5012160 NIMUS 501 T2 11kW | en yüksek debi | 18850 m³/h | 18850 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS5012160 NIMUS 501 T2 11kW | debi (kaynakta tanımsız: Air flow) | 18850 m³/h | 18850 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS5012160 NIMUS 501 T2 11kW | motor gücü | 11 kW | 11 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS5012160 NIMUS 501 T2 11kW | üretici kodu | NS5012160  | NS5012160  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS501490 NIMUS 501 T4 1,5kW | en yüksek debi | 9420 m³/h | 9420 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS501490 NIMUS 501 T4 1,5kW | debi (kaynakta tanımsız: Air flow) | 9420 m³/h | 9420 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS501490 NIMUS 501 T4 1,5kW | motor gücü | 1,5 kW | 1,5 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS501490 NIMUS 501 T4 1,5kW | üretici kodu | NS501490  | NS501490  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS5624100 NIMUS 561 T4 2,2kW | en yüksek debi | 13250 m³/h | 13240 m³/h | -10 (%-0,1) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS5624100 NIMUS 561 T4 2,2kW | debi (kaynakta tanımsız: Air flow) | 13250 m³/h | 13240 m³/h | -10 (%-0,1) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS5624100 NIMUS 561 T4 2,2kW | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS5624100 NIMUS 561 T4 2,2kW | üretici kodu | NS5624100  | NS5614100  | — | Casals teknik katalog, s.192 | **belirsiz** |
-| AVE-NS6314112 NIMUS 631 T4 4kW | en yüksek debi | 18850 m³/h | 18850 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS6314112 NIMUS 631 T4 4kW | debi (kaynakta tanımsız: Air flow) | 18850 m³/h | 18850 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS6314112 NIMUS 631 T4 4kW | motor gücü | 4 kW | 4 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS6314112 NIMUS 631 T4 4kW | üretici kodu | NS6314112  | NS6314112  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS7114132 NIMUS 711 T4 7,5kW | en yüksek debi | 26980 m³/h | 26980 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS7114132 NIMUS 711 T4 7,5kW | debi (kaynakta tanımsız: Air flow) | 26980 m³/h | 26980 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS7114132 NIMUS 711 T4 7,5kW | motor gücü | 7,5 kW | 7,5 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS7114132 NIMUS 711 T4 7,5kW | üretici kodu | NS7114132  | NS7114132  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS8014160 NIMUS 801 T4 15kW | en yüksek debi | 38600 m³/h | 38600 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS8014160 NIMUS 801 T4 15kW | debi (kaynakta tanımsız: Air flow) | 38600 m³/h | 38600 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS8014160 NIMUS 801 T4 15kW | motor gücü | 15 kW | 15 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS8014160 NIMUS 801 T4 15kW | üretici kodu | NS8014160  | NS8014160  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS9014200 NIMUS 901 T4 30kW | en yüksek debi | 54960 m³/h | 54960 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS9014200 NIMUS 901 T4 30kW | debi (kaynakta tanımsız: Air flow) | 54960 m³/h | 54960 m³/h | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS9014200 NIMUS 901 T4 30kW | motor gücü | 30 kW | 30 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS9014200 NIMUS 901 T4 30kW | üretici kodu | NS9014200  | NS9014200  | — | Casals teknik katalog, s.192 | **aynı** |
 
@@ -359,7 +359,7 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | VRT-253320106XN VORTICENT CMS ATEX 25/10 T4 0,75kW | motor gücü | 0,75 kW | 0,75 kW | 0 (%0) | VORTICENT-CMS-ATEX-25-10-T4-0-75kW föyü, s.2 | **aynı** |
 | VRT-253410106XN VORTICENT CMS ATEX 28/11 T4 1,1kW | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | VORTICENT-CMS-ATEX-28-11-T4-1-1kW föyü, s.2 | **aynı** |
 | VRT-253420106XN VORTICENT CMS ATEX 31/12 T4 2,2kW | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | VORTICENT-CMS-ATEX-31-12-T4-2-2kW föyü, s.2 | **aynı** |
-| VRT-253490106XN VORTICENT CMS ATEX 35/14 T4 4kW | motor gücü | 4 kW | 3 kW | -1 (%-25) | VORTICENT-CMS-ATEX-35-14-T4-3kW föyü, s.2 | **üretici** |
+| VRT-253490106XN VORTICENT CMS ATEX 35/14 T4 3kW | motor gücü | 3 kW | 3 kW | 0 (%0) | VORTICENT-CMS-ATEX-35-14-T4-3kW föyü, s.2 | **aynı** |
 | VRT-253510106XN VORTICENT CMS ATEX 40/16 T4 7,5kW | motor gücü | 7,5 kW | 7,5 kW | 0 (%0) | VORTICENT-CMS-ATEX-40-16-T4-7-5kW föyü, s.2 | **aynı** |
 | VRT-253530121XN VORTICENT CMS ATEX 45/18 T4 11kW | motor gücü | 11 kW | 11 kW | 0 (%0) | VORTICENT-CMS-ATEX-45-18-T4-11kW föyü, s.2 | **aynı** |
 
