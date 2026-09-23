@@ -255,11 +255,15 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
   const finalMessage = template ? formatTemplate(template, data) : message
   const from = config?.from || data?.emailFrom || 'VentHub <noreply@venthub.com>'
   
+  // notification-standard B3 katman 1: çağıran olay kimliğini (`data.idempotencyKey`, ör. `stok-ozet/<gün>/<küme>`)
+  // verirse Resend aynı anahtarla gelen ikinci isteği yeni e-posta saymaz (24 sa). Anahtar yoksa davranış aynı.
+  const idempotencyKey = typeof data?.idempotencyKey === 'string' ? data.idempotencyKey.slice(0, 256) : ''
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${config.apiKey}`,
       'Content-Type': 'application/json',
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
     body: JSON.stringify({
       from,
