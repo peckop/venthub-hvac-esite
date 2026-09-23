@@ -131,11 +131,19 @@ function istemci() {
     return jeton
   }
   return async function api(method, yol_, govde) {
-    const r = await fetch(`${adres}/api/v1/rest/${yol_}`, {
-      method,
-      headers: { authorization: `Bearer ${await token()}`, 'content-type': 'application/json', accept: 'application/json' },
-      body: govde === undefined ? undefined : JSON.stringify(govde),
-    })
+    // ⚠UnoPim API hız sınırı (2026-09-23 tam yüklemede ölçüldü: ~60 istek sonra 429). 429 gelince
+    // Retry-After (yoksa artan bekleme) kadar beklenip AYNI istek tekrarlanır; 6 denemeden sonra 429 döner.
+    let r
+    for (let deneme = 0; deneme < 6; deneme++) {
+      r = await fetch(`${adres}/api/v1/rest/${yol_}`, {
+        method,
+        headers: { authorization: `Bearer ${await token()}`, 'content-type': 'application/json', accept: 'application/json' },
+        body: govde === undefined ? undefined : JSON.stringify(govde),
+      })
+      if (r.status !== 429) break
+      const sn = Number(r.headers.get('retry-after')) || 5 * (deneme + 1)
+      await new Promise((ok) => setTimeout(ok, sn * 1000))
+    }
     const metin = await r.text()
     let json = null
     try { json = JSON.parse(metin) } catch { /* düz metin */ }
