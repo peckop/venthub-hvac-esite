@@ -88,6 +88,23 @@ Bugün köprü yalnız `pim_golge`'ye yazıyor (hedef DB sabit, sabotajla kırm�
 - **Başka makinede ayağa kalkma — ölçülecek (kabul ölçütü):** temiz makinede `docker compose up` (imaj 1,35 GB
   indirme) + `pg_restore` + storage geri yükleme + dizin yeniden kurma. Hedef ≤ 30 dk; ilk koşumda gerçek süre
   yazılır. Bugünkü kurulum süresi (§3.1) bilgi amaçlı taban.
+- **ÖLÇÜLDÜ 2026-09-23 (`scripts/pim/unopim-yedek.cjs`, INV-PIM-YEDEK-1):**
+
+  | adım | sonuç |
+  |---|---|
+  | `al` (pg_dump + storage birimi + compose/.env/sırlar + şifreli paket) | 2–4 sn; paket 108 KB (12 ürün) |
+  | şifreleme | AES-256-GCM, anahtar yedeğin DIŞINDA ayrı dosyada; yanlış anahtar → reddedildi; anahtar yedek dizininde → `al` reddetti |
+  | `coz` + `dene` (ayrı proje `pim-geri`, boş birimler) | 48–56 sn · ürün 12/12 · kategori 1/1 · giriş 200 · API anahtarıyla okuma 200 · APP_KEY yedekten |
+  | sabotaj: `.app_key`'siz yedek | ürün yine 12/12 göründü ama anahtar YENİDEN ÜRETİLDİ → betik KIRMIZI (sayı kontrolü tek başına bunu görmezdi) |
+  | temiz makine indirme | 6 imaj ≈ 1,37 GB sıkıştırılmış; Docker Hub'dan ölçülen hız 12 MB/sn → ≈ 2 dk |
+  | **temiz makinede toplam (Docker kurulu varsayımıyla)** | **≈ 4–5 dk** (hedef ≤ 30 dk karşılandı; Docker Desktop kurulumu hariç) |
+
+  **APP_KEY bulgusu (challenger 2.8):** `.env`'de APP_KEY YOK; imajın `ensure-app-key.sh`'ı anahtarı
+  `storage/app/private/.app_key`'e üretip saklıyor → storage birimi yedeklenince anahtar da girer, `al` tarda
+  anahtarı görmezse durur.
+  **Karar 81 = EVET** (Recep, OPS aktarımı): yedek makineden çıkmadan önce şifrelenir, Recep'in Google Drive'ında
+  özel klasör; şifre anahtarı yedekle aynı yerde tutulmaz. **Karar 82 = EVET:** 442 ürün yüklenene kadar yedek
+  elle ve her toplu düzenlemeden ÖNCE zorunlu; 442'nin yüklendiği gün günlük otomatik yedeğe geçilir (RPO 24 sa).
 - Tek makine riski: bugün PIM yalnız bu bilgisayarda. Barındırma (karar 59) ile birlikte ele alınır — PIM bir
   sunucuya taşınırsa aylık bedel tabloya girer.
 
