@@ -75,11 +75,17 @@ DECLARE
   n int;
   r record;
 BEGIN
-  -- ── KAPI 0: boş veritabanı (gölge tabanı) → NOTICE ile atla, sessizce değil ─────────────
-  IF NOT EXISTS (SELECT 1 FROM public.product_families WHERE id = a_kentalfan) THEN
-    RAISE NOTICE 'Faz 1-B: hedef aileler yok (boş taban) — veri adımı ATLANDI';
+  -- ── KAPI 0: YALNIZ gerçekten boş veritabanı (gölge tabanı) atlanır ───────────────────────
+  -- Güvenlik incelemesi: tek bir aileye bakan atlama, prod'da o aile silinmişse bütün
+  -- migration'ı NOTICE ile "başarılı" geçirip hiçbir şey yazmazdı (defter uygulandı sayar).
+  IF NOT EXISTS (SELECT 1 FROM public.product_families WHERE tenant_id = v_t) THEN
+    RAISE NOTICE 'Faz 1-B: kiracıda hiç aile yok (boş taban) — veri adımı ATLANDI';
     RETURN;
   END IF;
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus, a_hfs, a_hffw, a_ad, a_had)
+     AND deleted_at IS NULL;
+  IF n <> 8 THEN RAISE EXCEPTION 'KAPI 0: 8 hedef aile bekleniyordu, % var — veri değişmiş, incele', n; END IF;
 
   -- ── KAPI 1: kiracı (kural 12) — dokunulan her satır tek kiracıda ─────────────────────────
   SELECT count(*) INTO n FROM public.product_families
@@ -89,12 +95,23 @@ BEGIN
   SELECT count(*) INTO n FROM public.categories
    WHERE id IN (k_fanlar, k_perde, k_radyal, k_korozyon, k_yedek) AND tenant_id <> v_t;
   IF n > 0 THEN RAISE EXCEPTION 'KAPI 1: % kategori başka kiracıda', n; END IF;
+  SELECT count(*) INTO n FROM public.products
+   WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus, a_hfs, a_hffw, a_ad, a_had)
+     AND tenant_id <> v_t;
+  IF n > 0 THEN RAISE EXCEPTION 'KAPI 1: % ürün aile kiracısından farklı kiracıda', n; END IF;
+  -- Yeni dal adresleri boş mu (EN slug tekil kısıtlı; TR slug metadata'da, kısıt YOK → elle ölçülür).
+  SELECT count(*) INTO n FROM public.categories
+   WHERE id NOT IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli, k_korozyon)  -- kendileri: ikinci koşum
+     AND (slug IN ('plug-fans','cabinet-fans','unheated-air-curtains','electric-heated-air-curtains')
+          OR metadata->'slug'->>'tr' IN ('plug-fanlar','hucreli-aspiratorler','isiticisiz-hava-perdeleri',
+                                         'elektrikli-isiticili-hava-perdeleri','korozyon-dayanimli-fanlar'));
+  IF n > 0 THEN RAISE EXCEPTION 'KAPI 1: % kategori yeni dal adreslerinden birini zaten kullanıyor', n; END IF;
 
   -- ── 1) CASALS MARKASI ────────────────────────────────────────────────────────────────────
   INSERT INTO public.brands (id, tenant_id, name, slug)
   VALUES (m_casals, v_t, 'Casals', 'casals')
   ON CONFLICT (tenant_id, slug) DO NOTHING;
-  IF NOT EXISTS (SELECT 1 FROM public.brands WHERE id = m_casals AND slug = 'casals') THEN
+  IF NOT EXISTS (SELECT 1 FROM public.brands WHERE id = m_casals AND slug = 'casals' AND tenant_id = v_t) THEN
     RAISE EXCEPTION '1: casals markası başka kimlikle var — elle incele';
   END IF;
 
@@ -113,9 +130,13 @@ BEGIN
      true, false, 'series', 'sub.electric-curtain',
      '{"slug":{"tr":"elektrikli-isiticili-hava-perdeleri","en":"electric-heated-air-curtains"},"hide_price":true}')
   ON CONFLICT (id) DO NOTHING;
+  -- Satırın VARLIĞI yetmez, DEĞERLERİ ölçülür: aynı kimlikle elle değiştirilmiş bir satır
+  -- (başka üst dal, başka adres) ON CONFLICT DO NOTHING'den geçerdi.
   SELECT count(*) INTO n FROM public.categories
-   WHERE id IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli) AND tenant_id = v_t;
-  IF n <> 4 THEN RAISE EXCEPTION '2: 4 yeni dal bekleniyordu, % var', n; END IF;
+   WHERE tenant_id = v_t AND level = 1 AND (id, parent_id, slug) IN (
+     (k_plug, k_fanlar, 'plug-fans'), (k_hucreli, k_fanlar, 'cabinet-fans'),
+     (k_isiticisiz, k_perde, 'unheated-air-curtains'), (k_elektrikli, k_perde, 'electric-heated-air-curtains'));
+  IF n <> 4 THEN RAISE EXCEPTION '2: 4 yeni dal beklenen değerlerde değil (% eşleşti) — elle incele', n; END IF;
 
   -- ── 3) KOROZYON DALI (karar 84) — ad + TR slug + yeni sözlük anahtarı; kanonik EN slug SABİT ──
   UPDATE public.categories
@@ -153,9 +174,10 @@ BEGIN
   IF n <> 4 THEN RAISE EXCEPTION '5: 4 Casals ailesi bekleniyordu, %', n; END IF;
 
   UPDATE public.products SET brand = 'Casals', updated_at = now()
-   WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND brand = 'AVenS';
+   WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND tenant_id = v_t AND brand = 'AVenS';
   SELECT count(*) INTO n FROM public.products
-   WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND deleted_at IS NULL AND brand = 'Casals';
+   WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND tenant_id = v_t
+     AND deleted_at IS NULL AND brand = 'Casals';
   IF n <> 53 THEN RAISE EXCEPTION '5: 53 Casals ürünü bekleniyordu, %', n; END IF;
 
   -- ── 6) TAŞIMA — İKİ TABLO BİRLİKTE (taksonomi cetveli §8) ──────────────────────────────
@@ -171,16 +193,20 @@ BEGIN
     UPDATE public.product_families SET subcategory_id = r.yeni_dal, updated_at = now()
      WHERE id = r.aile AND category_id = r.kok AND subcategory_id IS NOT DISTINCT FROM r.eski_dal;
     UPDATE public.products SET subcategory_id = r.yeni_dal, updated_at = now()
-     WHERE family_id = r.aile AND subcategory_id IS NOT DISTINCT FROM r.eski_dal;
+     WHERE family_id = r.aile AND tenant_id = v_t AND category_id = r.kok
+       AND subcategory_id IS NOT DISTINCT FROM r.eski_dal;
+    -- Kök de ölçülür (güvenlik incelemesi): başka kökteki bir ürün yeni dala taşınsaydı dal ile
+    -- kök birbirini tutmazdı ve sayım kapısı bunu göremezdi. Ölçüm 2026-09-23: 44/44 doğru kökte.
     IF EXISTS (SELECT 1 FROM public.product_families WHERE id = r.aile
-                 AND subcategory_id IS DISTINCT FROM r.yeni_dal)
+                 AND (subcategory_id IS DISTINCT FROM r.yeni_dal OR category_id IS DISTINCT FROM r.kok))
        OR EXISTS (SELECT 1 FROM public.products WHERE family_id = r.aile AND deleted_at IS NULL
-                 AND subcategory_id IS DISTINCT FROM r.yeni_dal) THEN
-      RAISE EXCEPTION '6: aile % taşınamadı (ne eski ne yeni dalda satır var)', r.aile;
+                 AND (subcategory_id IS DISTINCT FROM r.yeni_dal OR category_id IS DISTINCT FROM r.kok)) THEN
+      RAISE EXCEPTION '6: aile % taşınamadı (dal ya da kök beklenen değerde değil)', r.aile;
     END IF;
   END LOOP;
   SELECT count(*) INTO n FROM public.products
-   WHERE subcategory_id IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli) AND deleted_at IS NULL;
+   WHERE subcategory_id IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli) AND deleted_at IS NULL
+     AND tenant_id = v_t;
   IF n <> 44 THEN RAISE EXCEPTION '6: yeni dallarda 44 ürün bekleniyordu, %', n; END IF;
 
   -- ── 7) 40 AİLE SLUG'I (karar 86 + istisnalar) — eski → yeni; takma adı Faz 1-A tetiği yazar ──
@@ -247,11 +273,15 @@ BEGIN
   IF n <> 40 THEN RAISE EXCEPTION '7: 40 yeni slug bekleniyordu, %', n; END IF;
 
   -- ── 8) GUARD — Faz 1-A tetiği eski adları yazdı mı (adres kırılmaz kanıtı) ───────────────
-  SELECT count(*) INTO n FROM faz1b_aile p JOIN public.url_takma_adlari t
-      ON t.tur = 'aile' AND t.eski_slug = p.eski AND t.tenant_id = v_t;
+  -- Takma adın VARLIĞI yetmez, DOĞRU aileyi göstermesi ölçülür (güvenlik incelemesi).
+  SELECT count(*) INTO n FROM faz1b_aile p
+    JOIN public.product_families f ON f.slug = p.yeni AND f.tenant_id = v_t AND f.deleted_at IS NULL
+    JOIN public.url_takma_adlari t
+      ON t.tur = 'aile' AND t.eski_slug = p.eski AND t.tenant_id = v_t AND t.hedef_id = f.id;
   IF n <> 40 THEN RAISE EXCEPTION '8: 40 aile takma adı bekleniyordu, % — eski adresler 404 olurdu', n; END IF;
   IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
-                  WHERE tur = 'kategori' AND dil = 'tr' AND eski_slug = 'asit-dayanikli-fanlar') THEN
+                  WHERE tur = 'kategori' AND dil = 'tr' AND eski_slug = 'asit-dayanikli-fanlar'
+                    AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
     RAISE EXCEPTION '8: korozyon dalının eski TR adresi takma ada yazılmadı';
   END IF;
 
