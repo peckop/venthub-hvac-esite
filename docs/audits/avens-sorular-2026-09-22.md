@@ -58,6 +58,18 @@ Aşağıdaki ürünlerin teknik föyünü web'de bulamadık. **Föylerini gönde
 - **Dikdörtgen kanal radyal fanlar (7):** AVENS 40x20 · 50x25 · 60x30 · 60x35 · 70x40 · 80x50 · 100x50
 - **Sulu bataryalar (6):** 11 · 14 · 20 · 28 · 36 · 40 kW kanal tipi (90/70°C)
 - **VORTICENT CMS ATEX 14/5 T2 0,25kW (1):** avensair.com ürün sayfasında bu modelin föyü yok.
+- **BVU-LS 1000 · BVU-LS 2000/3000 (2):** elimizdeki hiçbir belgede bu ürünler geçmiyor.
+
+## 5. Teknik değerlerin anlamı (üretici belgelerinden)
+
+| Konu | Belgede ne yazıyor | Soru |
+|---|---|---|
+| NIMUS / NIMAX / Enkelfan debisi | Casals tablosunda "Air flow m3/h" | Bu değer serbest üfleme (en yüksek) debisi mi, belirli bir basınçtaki çalışma noktası mı? |
+| NIMUS / NIMAX / Enkelfan ses değeri | "Sound dB(A)" | Ses gücü (LwA) mı, ses basıncı (LpA) mı; basınçsa hangi mesafede? |
+| VORTICENT CMS ATEX ağırlığı | Föyde fan 63 kg, motor 23 kg (35/14 örneği) | Ürünün sevk ağırlığı toplam mı, yalnız fan mı? |
+| VORTICENT CMS ATEX 12/5 ve 14/5 devri | Fan 1450 d/dk, motor 1346 d/dk (doğrudan tahrikli) | Doğru devir hangisi? |
+| ENKELFAN EEC 355-630 gerilimi | Metinde "400V", bağlantı şemasında "AC380V" | Çalışma gerilimi 400 V mı 380 V mı? |
+| ENKELFAN EEC gücü | "Rated Power kW" — ENKELFAN 155: 230 V, 0,25 A, 0,06 kW (230 × 0,25 = 57,5 VA) | Bu değer motorun mil (çıkış) gücü mü, şebekeden çekilen elektrik gücü mü? |
 
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.
