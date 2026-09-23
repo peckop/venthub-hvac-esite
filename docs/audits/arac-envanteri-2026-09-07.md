@@ -370,6 +370,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/paket-csv-dogrula.mjs` | TAŞINABİLİR KATALOG — CSV KATMANI ROUND-TRIP KAPISI (REC-212, karar 66) | URUN-KATALOG | elle kosulur, paket uretiminden sonra (K3-b yayin sarti) | 2026-09-22 (442 urun · 17522 hucre · fark 0) | scripts/icerik-hatti/__tests__/paket-sozlesme.test.ts | AKTIF |
 | `scripts/icerik-hatti/paket-sozlesme.mjs` | TAŞINABİLİR KATALOG PAKETİ — KOLON SÖZLEŞMESİ (REC-212, sözleşme v1'in açılan 8 kolonu) | URUN-KATALOG | modul: katalog-paket-uret · kaynak-eslemesi · paket-csv-dogrula | 2026-09-22 | scripts/icerik-hatti/__tests__/paket-sozlesme.test.ts | AKTIF |
 | `scripts/hijyen/kapali-dal-push.cjs` | KAPALI DALA PUSH BEKÇİSİ — `.githooks/pre-push` çağırır (INV-KAPALI-DAL-1) | ALTYAPI | `.githooks/pre-push` | 2026-09-22 | kapali-dal-push.test.ts | KAL |
+| `scripts/pim/unopim-yedek.cjs` | REC-357 §7 — UnoPim YEDEK AL + GERİ KURMA DENEMESİ (karar 36 şartı: yedeksiz faz 2 adımı başlamaz). `al` (pg_dump + storage birimi = APP_KEY dahil + compose/.env/sırlar → AES-256-GCM şifreli `.vhenc`), `coz`, `dene` (ayrı `pim-geri` projesine kurar, sayı + giriş + anahtar kaynağı kontrolü, yalnız onu siler) | ALTYAPI | elle — karar 82: her toplu PIM düzenlemesinden ÖNCE; 442 ürün yüklenince günlük otomatik | 2026-09-23 koşuldu: yedek 2–4 sn, şifreli tur (al→coz→dene) 48 sn 12/12; sabotaj (anahtarsız yedek, yanlış anahtar, anahtar yedek içinde) üçü de KIRMIZI | INV-PIM-YEDEK-1 (`pim-unopim-yedek.test.ts`) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
