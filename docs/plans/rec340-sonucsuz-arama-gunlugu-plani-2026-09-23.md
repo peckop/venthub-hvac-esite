@@ -1,4 +1,4 @@
-# Sonuçsuz arama günlüğü (K10.1) — plan v5
+# Sonuçsuz arama günlüğü (K10.1) — plan v6
 
 > **REC-340 · URUN · 2026-09-23 · PLAN (kod yok, migration yok).** Uygulama plan-challenger'dan
 > sonra; migration'lı PR yalnız Recep onayıyla merge edilir (kural 13; onay URUN penceresinde,
@@ -90,7 +90,13 @@ Böylece fonksiyon içindeki doğrulama araması **anon ile aynı RLS görünüm
 - **Temizlik ayrı fonksiyonda (v4 Y-1):** kiracısız DELETE politikası işe yaramaz — PG, WHERE'li
   DELETE'te SELECT politikasını da AND'ler, günün ilk çağıranı yalnız kendi kiracısını silerdi.
   `arama_gunlugu_temizle()` **postgres sahipli** DEFINER (RLS dışında, bütün kiracılar), WHERE'li dört
-  DELETE; `execute` yalnız `arama_gunlugu_yazar` ve `service_role`'e. Yazma yolu günün ilk çağrısında
+  DELETE, `set search_path = public, pg_temp` ve tablo adları şemayla tam (v5 O-B). **Yetki (v5 Y-A):**
+  canlıda `pg_default_acl` postgres'in `public`'te yarattığı her fonksiyona anon/authenticated'a
+  otomatik EXECUTE veriyor → `revoke all on function public.arama_gunlugu_temizle() from public, anon,
+  authenticated;` sonra `grant execute … to arama_gunlugu_yazar, service_role;`. Guard:
+  `has_function_privilege('anon', …, 'EXECUTE') = false` ve `authenticated` için de `false`. Aynı
+  otomatik yetki `arama_sonucsuz_yaz` için de gelir; orada anon/authenticated'a zaten veriliyor, `public`
+  revoke'u korunur. Yazma yolu günün ilk çağrısında
   bunu çağırır. **Zamanlayıcı kullanılmaz** (pg_cron canlıda kurulu, ama karar 53: zamanlayıcı önce Recep
   ile konuşulur); bedeli trafiğe bağlı saklama → §5 K10.4 cümlesi: "satır en az 90 gün, en çok 90 gün +
   sonraki ilk sonuçsuz aramaya kadar; tuz en az 48 saat, en çok bir sonraki çağrıya kadar". Trafiksiz
@@ -102,7 +108,9 @@ Böylece fonksiyon içindeki doğrulama araması **anon ile aynı RLS görünüm
   `pg_proc.proowner` = rol. **Gerçek çalıştırma kanıtı** (yetki tablosu şema usage'ını göstermez):
   guard içinde `set local role arama_gunlugu_yazar; perform fts_search_products('x',1,'{}');
   perform get_search_suggestions('x',1); perform extensions.gen_random_bytes(1); reset role;` —
-  biri hata verirse migration düşer (prod'a yarım inmez).
+  biri hata verirse migration düşer (prod'a yarım inmez). `'x'` ilk basamakta sonuç verdiği için
+  **ikinci deneme sonuçsuz bir sorguyla** (`'qzxqzxqv'`) yapılır: bulanık eşleştirme + levenshtein
+  basamakları da yazar rolüyle gerçekten koşar (v5 düşük bulgu).
 - **Ön koşul PR (v4 O-2):** `supabase/baselines/00_golge_onsoz.sql`'e `arama_gunlugu_yazar` rolü (ALTYAPI
   dosyası) PR-A'dan **önce** merge edilir, ayrı kayıt numarasıyla; yoksa PR-A sonrası şema tabanı
   replay'i kırılır.
@@ -209,6 +217,10 @@ kiracıya yazılır. Bugün ürün okumasında da aynı durum var; çözümü te
   günün ilk çağrısında **ikisi de** silinir (temizlik fonksiyonu) · `request.jwt.claims = ''` iken hata
   dalına düşmez · gölgede `extensions` şema yetkisi canlıyla eşit (anon usage) — değilse önce eşitlenir,
   yoksa senaryo yanlış nedenle yanar.
+- **v6 ek gölge senaryoları:** anon ve authenticated `arama_gunlugu_temizle`'yi çağıramaz (yetki +
+  `/rpc` reddi) · gölgedeki `pg_default_acl` canlıyla eşit (değilse önceki senaryo yanlış nedenle
+  yeşil) · temizlik hata verince tuz geri alınır ve `tasma/hata` artar · guard gölgede de
+  `psql --single-transaction` ile koşar (prod yolu).
 - **Merge'den hemen sonra canlı duman testi (v3 Y4):** anon anahtarıyla bilinen sonuçsuz bir sorgu →
   satırın oluştuğu SELECT ile görülür. Asıl kanıt budur; bir ay sonraki sağlık kontrolü değil. Test
   satırı 90 gün kuralıyla kendiliğinden silinir (elle prod silme yok); raporda test günü not edilir.
@@ -294,4 +306,9 @@ postgres sahipli temizlik fonksiyonu, zamanlayıcısız (karar 53), saklama cüm
 biçiminde · O-1 politika türleri açık + `adet = 2` senaryosu · O-2 önsöz rolü ön koşul PR · D1 `nullif`
 · D2 CREATE revoke guard'ı · D3 moderator sınırlaması.
 
-*Yazan: URUN şeridi, 2026-09-23. v1 (karar 64, sayaç), v2, v3 ve v4 bu dosyanın git geçmişindedir.*
+**v5 denetimi (KOŞULLU) → v6:** Y-A temizlik fonksiyonu varsayılan yetkiyle anon'a açık kalırdı → açık
+revoke + guard · O-B `search_path` · düşük: guard'a sonuçsuz ikinci deneme · O-C saklama süresinin üst
+sınırı yok (KVKK md. 4/2-ç "belirli süre") → **Recep'e karar sorusu:** günlük tek pg_cron işi (karar 53).
+Cevap gelene kadar sağlık kontrolü tuz yaşını ve en uzun trafiksiz boşluğu izler.
+
+*Yazan: URUN şeridi, 2026-09-23. v1 (karar 64, sayaç), v2–v5 bu dosyanın git geçmişindedir.*
