@@ -185,7 +185,10 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         </div>
                                     )}
                                     <h3 className="text-2xl font-bold text-slate-950 mb-4 tracking-tight">{subVm?.displayName}</h3>
-                                    <p className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm?.description}</p>
+                                    {/* INV-DIL-DUSUSU-1: bu dilde metin yoksa boş paragraf çizilmez. */}
+                                    {subVm?.description ? (
+                                        <p data-testid="alt-kategori-aciklama" className="text-slate-500 text-sm font-light leading-relaxed line-clamp-3 mb-10">{subVm.description}</p>
+                                    ) : null}
                                     <div className="flex items-center gap-3 text-xs font-black uppercase tracking-hvac-relaxed text-slate-400 group-hover:text-cyan-600 transition-colors">
                                         <span>{t('category.showcase.exploreSeries')}</span>
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />

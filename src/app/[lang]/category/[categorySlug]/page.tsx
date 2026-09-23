@@ -17,6 +17,8 @@ import type { DomainCategory } from '../../../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../types/db-rows'
 import type { FamilyListItem } from '../../../../types/ui-models'
+import { kategoriMetniniIndir } from '../../../../utils/categoryHelpers'
+import { aileMetniniIndir } from '../../../../utils/dilMetni'
 import { DEFAULT_TENANT_ID } from '../../../../utils/tenantConstants'
 import PageComponent from '../../../../views/CategoryPage'
 
@@ -261,7 +263,9 @@ export default async function Page({
     const categoryIds = [category.id, ...subCategories.map(s => s.id)]
 
     const familiesPage = await getCachedFamilies(lang, tenantId, category.id, page, categoryIds)
-    families = familiesPage.items
+    // INV-DIL-DUSUSU-1: aile satırı {tr,en} açıklamayı taşır; kart göstermese de istemciye
+    // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
+    families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
     total = familiesPage.total
   }
 
@@ -288,13 +292,14 @@ export default async function Page({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
       <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
+        {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
         <PageComponent
-          initialCategory={category}
+          initialCategory={kategoriMetniniIndir(category, lang)}
           families={families}
           total={total}
           page={page}
           pageSize={PAGE_SIZE}
-          initialSubCategories={subCategories}
+          initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
         />
       </React.Suspense>
     </>

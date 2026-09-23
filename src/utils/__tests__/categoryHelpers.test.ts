@@ -92,20 +92,22 @@ describe('categoryHelpers', () => {
              expect(getCategoryDescription(cat, 'en')).toBe('English text')
          })
 
-         it('aktif dilin metni yoksa legacy zincire duser (geriye uyum)', () => {
+         // INV-DIL-DUSUSU-1 / vitrin-metni K10: legacy zincir (hero_description, kolon) TEK DILLI
+         // ve Turkcedir → yalniz TR sayfada. EN sayfada karsilik yoksa bos dize (yuzey gizlenir).
+         it('aktif dilin metni yoksa legacy zincir yalniz TR sayfada, EN bos', () => {
              const sadeceTr: CategoryDescriptionSource = {
                  metadata: { description_i18n: { tr: 'Sadece TR' }, hero_description: 'Hero TR' },
                  description: 'Kolon',
              }
-             // EN karsiligi yok → bugunku davranis (hero_description) aynen korunur
-             expect(getCategoryDescription(sadeceTr, 'en')).toBe('Hero TR')
+             expect(getCategoryDescription(sadeceTr, 'en')).toBe('')
 
              const bosDize: CategoryDescriptionSource = {
                  metadata: { description_i18n: { tr: '', en: '' } },
                  description: 'Kolon',
              }
-             // Bos dize "yok" sayilir — bos paragraf basmak yerine kolona duser
-             expect(getCategoryDescription(bosDize, 'en')).toBe('Kolon')
+             // Bos dize "yok" sayilir — TR'de kolona duser, EN'de Turkce kolon basilmaz
+             expect(getCategoryDescription(bosDize, 'tr')).toBe('Kolon')
+             expect(getCategoryDescription(bosDize, 'en')).toBe('')
          })
 
          it('bilinmeyen dil kodu TR gibi cozulur (getLocalizedCategorySlug ile ayni kural)', () => {

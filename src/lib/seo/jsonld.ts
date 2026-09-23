@@ -15,20 +15,18 @@
  */
 
 import type { FamilyListItem } from '../../types/ui-models'
+import { dildekiMetin } from '../../utils/dilMetni'
 import { getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
 import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../services/family.service'
 
-type LocalizedText = { tr?: string | null; en?: string | null } | null
-
-/** Aile description/meta alanları için dil çözümü (tercih edilen dil → tr → en). */
-function pickLocalized(value: LocalizedText, lang: string): string | null {
-  if (!value) return null
-  const preferred = lang === 'en' ? value.en : value.tr
-  return preferred || value.tr || value.en || null
-}
+/**
+ * Aile description/meta alanları için dil çözümü — YALNIZ sayfanın dili (INV-DIL-DUSUSU-1).
+ * Metin yoksa yapısal veride `description` alanı hiç yazılmaz; yanlış dilde metin yayınlanmaz.
+ */
+const pickLocalized = dildekiMetin
 
 /** Site adı — root layout'taki WebSite JSON-LD ("isPartOf" hedefi) ile aynı. */
 const SITE_NAME = 'VentHub'
