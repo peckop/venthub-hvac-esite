@@ -11,8 +11,9 @@
 - **Emir:** REC-300 (kapsam 1–6, KAPILAR, EK 09-12 linkinator + unlighthouse). Plan kaynağı
   REC-191. Yan kayıtlar: REC-331 (39 aile, karar 86), REC-270, REC-289, REC-373, REC-374, REC-367
   (barındırma, karar 59).
-- **Kararlar:** SEO ve Yayın **K3-b** · Katalog **K17 + EK** · Vitrin 15A · karar **59** (barındırma:
-  zamanı gelince Cloudflare Workers + OpenNext, yedek DigitalOcean; tetik fiyatlar açılmadan önce) ·
+- **Kararlar:** SEO ve Yayın **K3-b** · Katalog **K17 + EK** · Vitrin 15A · karar **59** (barındırma
+  ERTELENDİ; sıra 1 Cloudflare Workers + OpenNext, 2 DigitalOcean, 3 Vercel Pro; tetik: ödeme/fiyat
+  canlıya açılmadan önce ya da kota dağıtımı durdurursa) · karar **60** (dağıtım depolaması temizliği) ·
   **68** (tek yayın, REC-212 sonrası, ön izleme) · **78b** (iki perde dalı pazar kelimesi) · **84**
   (korozyon dalı model adresi `korozyon-dayanimli-asit-fani`) · **86** (2026-09-23: 39 aile adres
   metni Design `seo_slug`'ına geçer; istisna Casals 4 aile K17 + 2 perde ailesi 78b; yayından önce
@@ -107,8 +108,8 @@ sınıra yaslanan tasarım iki kez yazılır.
 **Hazır araç ölçüldü — Vercel Bulk Redirects KULLANILMAZ** (v3 çürütmesi, belge: vercel.com/docs/routing/
 redirects/bulk-redirects): (a) *"`source` … does not support query parameters. Vercel ignores any
 query parameters"* → `?sku=` (442 × 2) bununla çözülemez; (b) *"not available on the Hobby plan"* —
-bugün Hobby'deyiz, Pro karar 60 ile HAYIR; (c) karar 59 barındırmayı Cloudflare'e taşıyacak → Vercel'e
-özgü proje ayarı taşınmaz, göçte ikinci kez yazılır. Harita bu üç sınırın hiçbirine takılmaz.
+bugün Hobby'deyiz; (c) karar 59 barındırma sırasını koydu (1 Cloudflare Workers + OpenNext, 2
+DigitalOcean, 3 Vercel Pro) → Vercel'e özgü proje ayarı birinci adaya taşınmaz, göçte ikinci kez yazılır. Harita bu üç sınırın hiçbirine takılmaz.
 
 Sıra kuralı: `next.config` redirect'leri middleware'den önce koşar → config'de eski ürün/aile/kategori
 deseni **kalmaz**, yoksa harita hiç çalışmaz (v3'ün 2 hop'u buradan doğuyordu).
