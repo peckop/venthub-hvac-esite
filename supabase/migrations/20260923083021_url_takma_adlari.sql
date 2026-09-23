@@ -41,7 +41,11 @@
 -- GERİ ALMA (elle, tek işlem): drop trigger url_takma_ad_urun on public.products;
 --   drop trigger url_takma_ad_aile on public.product_families;
 --   drop trigger url_takma_ad_kategori on public.categories;
---   drop function public.tg_url_takma_ad_yaz(); drop table public.url_takma_adlari;
+--   drop trigger url_takma_ad_urun_ekle on public.products;
+--   drop trigger url_takma_ad_aile_ekle on public.product_families;
+--   drop trigger url_takma_ad_kategori_ekle on public.categories;
+--   drop function public.tg_url_takma_ad_yaz(); drop function public.url_takma_ad_coz(text, text, text);
+--   drop table public.url_takma_adlari;
 --   alter table public.products drop constraint products_sku_adres_ayirici_yok;
 --   alter table public.product_families drop constraint product_families_slug_adres_ayirici_yok;
 --   alter table public.categories drop constraint categories_slug_adres_ayirici_yok;
@@ -56,6 +60,13 @@ set lock_timeout = '5s';
 set statement_timeout = '60s';
 
 BEGIN;
+
+-- ⭐KİLİTLER BAŞTA, SABİT SIRADA, TEK SEFERDE (güvenlik incelemesi bulgu 1). Bu dosya üç tabloya hem
+-- tetik (SHARE ROW EXCLUSIVE) hem kısıt (ACCESS EXCLUSIVE) ekliyor. Kilitler sırayla alınıp işlem
+-- ortasında yükseltilseydi, aynı anda `products`'ı okuyup sonra güncelleyen bir sipariş işlemiyle
+-- çıkmaz (deadlock) doğabilirdi. Hepsi baştan en güçlü kipte alınır: tablolar küçük (442 / 47 / 31
+-- satır), pencere milisaniyeler; kilit alınamazsa lock_timeout 5 sn sonra migration düşer, vitrin değil.
+lock table public.categories, public.product_families, public.products in access exclusive mode;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 1) TABLO
@@ -75,21 +86,43 @@ create table if not exists public.url_takma_adlari (
 
 comment on table public.url_takma_adlari is
   'REC-300 Faz 1-A: eski slug → bugünkü nesne. Yeniden adlandırma anında tetik yazar '
-  '(tg_url_takma_ad_yaz). Sayfa "bulunamadı" dalında okur ve 308 verir. Yazma yalnız tetik; '
-  'okuma kiracı kapsamlı. Plan: docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md §4.';
+  '(tg_url_takma_ad_yaz). Sayfa "bulunamadı" dalında url_takma_ad_coz() ile TEK slug sorar ve 308 '
+  'verir. Tabloya doğrudan erişim YOK. Plan: docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md §4.';
 
 -- Çözücünün soru biçimi: "bu kiracıda bu türde bu eski slug kime gidiyor?" — PK tam bunu karşılar.
 create index if not exists url_takma_adlari_hedef_idx on public.url_takma_adlari (tenant_id, tur, hedef_id);
 
 alter table public.url_takma_adlari enable row level security;
 
+-- ⛔TABLO ANON'A KAPALI (güvenlik incelemesi bulgu 4): tam liste okunabilseydi taslak/silinmiş
+-- ürünlerin eski slug'ları (ürün adını taşır) `GET /rest/v1/url_takma_adlari` ile dökülürdü. Okuma
+-- yalnız aşağıdaki dar fonksiyondan: tek (tür, dil, slug) sorusuna tek hedef kimliği; hedef nesne
+-- sonra çağıranın kendi RLS'iyle okunur (taslak görünmez).
 revoke all on table public.url_takma_adlari from public, anon, authenticated;
-grant select on table public.url_takma_adlari to anon, authenticated;
 
-drop policy if exists url_takma_adlari_kiraci_okuma on public.url_takma_adlari;
-create policy url_takma_adlari_kiraci_okuma on public.url_takma_adlari
-  for select to anon, authenticated
-  using (tenant_id = public.jwt_tenant_id());
+create or replace function public.url_takma_ad_coz(p_tur text, p_dil text, p_eski_slug text)
+returns uuid
+language sql
+stable
+security definer
+set search_path to 'public', 'pg_temp'
+as $function$
+  select t.hedef_id
+    from public.url_takma_adlari t
+   where t.tenant_id = public.jwt_tenant_id()
+     and t.tur = p_tur
+     and t.dil in (p_dil, '*')
+     and t.eski_slug = lower(p_eski_slug)
+   order by (t.dil = p_dil) desc
+   limit 1;
+$function$;
+
+revoke all on function public.url_takma_ad_coz(text, text, text) from public, anon, authenticated;
+grant execute on function public.url_takma_ad_coz(text, text, text) to anon, authenticated;
+
+comment on function public.url_takma_ad_coz(text, text, text) is
+  'REC-300 Faz 1-A: eski slug → hedef kimliği (yoksa NULL). Kiracı jwt_tenant_id() ile; tam liste '
+  'dökmez. Hedef nesne çağıranın RLS''iyle ayrıca okunur.';
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- 2) TETİK FONKSİYONU
@@ -103,8 +136,12 @@ as $function$
 declare
   v_sebep text := 'tetik: ' || tg_table_name || ' ' || to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"');
 begin
+  -- INSERT'te yalnız "canlı slug önceliği" silmeleri koşar (güvenlik incelemesi bulgu 6: eski adı X
+  -- olan bir takma ad varken slug'ı X olan YENİ bir nesne eklenirse takma ad kalkmalı). Eski değer
+  -- yazımları yalnız UPDATE'te; boş dize eski değer hiç yazılmaz (bulgu 3 — `eski_slug <> ''`
+  -- kısıtına çarpıp admin UPDATE'ini düşürmesin; canlıda boş değer 0, ölçüldü 2026-09-23).
   if tg_table_name = 'products' then
-    if old.slug is not null and old.slug is distinct from new.slug then
+    if tg_op = 'UPDATE' and nullif(old.slug, '') is not null and old.slug is distinct from new.slug then
       insert into public.url_takma_adlari (tenant_id, tur, dil, eski_slug, hedef_id, sebep)
       values (new.tenant_id, 'urun', '*', lower(old.slug), new.id, v_sebep)
       on conflict (tenant_id, tur, dil, eski_slug)
@@ -115,17 +152,17 @@ begin
        where tenant_id = new.tenant_id and tur = 'urun' and dil = '*' and eski_slug = lower(new.slug);
     end if;
 
-    if old.sku is distinct from new.sku then
+    if tg_op = 'UPDATE' and nullif(old.sku, '') is not null and old.sku is distinct from new.sku then
       insert into public.url_takma_adlari (tenant_id, tur, dil, eski_slug, hedef_id, sebep)
       values (new.tenant_id, 'sku', '*', lower(old.sku), new.id, v_sebep)
       on conflict (tenant_id, tur, dil, eski_slug)
       do update set hedef_id = excluded.hedef_id, sebep = excluded.sebep, created_at = now();
-      delete from public.url_takma_adlari
-       where tenant_id = new.tenant_id and tur = 'sku' and dil = '*' and eski_slug = lower(new.sku);
     end if;
+    delete from public.url_takma_adlari
+     where tenant_id = new.tenant_id and tur = 'sku' and dil = '*' and eski_slug = lower(new.sku);
 
   elsif tg_table_name = 'product_families' then
-    if old.slug is distinct from new.slug then
+    if tg_op = 'UPDATE' and nullif(old.slug, '') is not null and old.slug is distinct from new.slug then
       insert into public.url_takma_adlari (tenant_id, tur, dil, eski_slug, hedef_id, sebep)
       values (new.tenant_id, 'aile', '*', lower(old.slug), new.id, v_sebep)
       on conflict (tenant_id, tur, dil, eski_slug)
@@ -137,13 +174,13 @@ begin
   elsif tg_table_name = 'categories' then
     -- EN: kanonik `slug` (bugün 31/31 satırda metadata.slug.en ile eşit — ölçüldü 2026-09-23;
     -- ikisi ayrışırsa ikisinin eski değeri de kaydedilir).
-    if old.slug is distinct from new.slug then
+    if tg_op = 'UPDATE' and nullif(old.slug, '') is not null and old.slug is distinct from new.slug then
       insert into public.url_takma_adlari (tenant_id, tur, dil, eski_slug, hedef_id, sebep)
       values (new.tenant_id, 'kategori', 'en', lower(old.slug), new.id, v_sebep)
       on conflict (tenant_id, tur, dil, eski_slug)
       do update set hedef_id = excluded.hedef_id, sebep = excluded.sebep, created_at = now();
     end if;
-    if nullif(old.metadata -> 'slug' ->> 'en', '') is not null
+    if tg_op = 'UPDATE' and nullif(old.metadata -> 'slug' ->> 'en', '') is not null
        and (old.metadata -> 'slug' ->> 'en') is distinct from (new.metadata -> 'slug' ->> 'en')
        and lower(old.metadata -> 'slug' ->> 'en') is distinct from lower(old.slug) then
       insert into public.url_takma_adlari (tenant_id, tur, dil, eski_slug, hedef_id, sebep)
@@ -151,7 +188,7 @@ begin
       on conflict (tenant_id, tur, dil, eski_slug)
       do update set hedef_id = excluded.hedef_id, sebep = excluded.sebep, created_at = now();
     end if;
-    if nullif(old.metadata -> 'slug' ->> 'tr', '') is not null
+    if tg_op = 'UPDATE' and nullif(old.metadata -> 'slug' ->> 'tr', '') is not null
        and (old.metadata -> 'slug' ->> 'tr') is distinct from (new.metadata -> 'slug' ->> 'tr') then
       insert into public.url_takma_adlari (tenant_id, tur, dil, eski_slug, hedef_id, sebep)
       values (new.tenant_id, 'kategori', 'tr', lower(old.metadata -> 'slug' ->> 'tr'), new.id, v_sebep)
@@ -202,8 +239,25 @@ create trigger url_takma_ad_kategori
   when (old.slug is distinct from new.slug or (old.metadata -> 'slug') is distinct from (new.metadata -> 'slug'))
   execute function public.tg_url_takma_ad_yaz();
 
+-- INSERT: yalnız canlı slug önceliği (yeni nesnenin slug'ıyla çakışan takma ad silinir).
+drop trigger if exists url_takma_ad_urun_ekle on public.products;
+create trigger url_takma_ad_urun_ekle
+  after insert on public.products
+  for each row execute function public.tg_url_takma_ad_yaz();
+
+drop trigger if exists url_takma_ad_aile_ekle on public.product_families;
+create trigger url_takma_ad_aile_ekle
+  after insert on public.product_families
+  for each row execute function public.tg_url_takma_ad_yaz();
+
+drop trigger if exists url_takma_ad_kategori_ekle on public.categories;
+create trigger url_takma_ad_kategori_ekle
+  after insert on public.categories
+  for each row execute function public.tg_url_takma_ad_yaz();
+
 -- ─────────────────────────────────────────────────────────────────────────────
--- 4) KISITLAR — önce NOT VALID (kısa kilit), sonra VALIDATE (satır okuyan, yazmayı bloklamayan kilit)
+-- 4) KISITLAR — tablolar dosya başında ACCESS EXCLUSIVE kilitli (bulgu 1); NOT VALID + VALIDATE ayrımı
+--    burada kilit kazancı SAĞLAMAZ (aynı işlem), yalnız idempotent kurulum için korunur.
 -- ─────────────────────────────────────────────────────────────────────────────
 do $$
 begin
@@ -245,6 +299,7 @@ select distinct on (p.tenant_id, lower(a.before ->> 'slug'))
    and nullif(a.before ->> 'slug', '') is not null
    and (a.before ->> 'slug') is distinct from (a.after ->> 'slug')
    and lower(a.before ->> 'slug') is distinct from lower(p.slug)
+   and p.deleted_at is null
    and not exists (select 1 from public.products o
                     where o.tenant_id = p.tenant_id and lower(o.slug) = lower(a.before ->> 'slug'))
  order by p.tenant_id, lower(a.before ->> 'slug'), a.at desc
@@ -259,18 +314,20 @@ declare
   v_tohum    integer;
   v_tetik    integer;
 begin
-  -- Yetki: anon okur ama yazamaz; tetik fonksiyonu RPC olarak çağrılamaz.
-  if not has_table_privilege('anon', 'public.url_takma_adlari', 'SELECT') then
-    raise exception 'GUARD: anon url_takma_adlari okuyamiyor (cozucu sayfa katmani anon istemciyle okur)';
+  -- Yetki (bulgu 4 + 7): tabloya anon/authenticated HİÇBİR ayrıcalıkla erişemez (TRUNCATE RLS'e tabi
+  -- değildir, ayrıca sayılır); okuma yalnız dar çözücüden; tetik fonksiyonu çağrılamaz.
+  if exists (select 1
+               from unnest(array['anon', 'authenticated']) r(rol),
+                    unnest(array['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) y(yetki)
+              where has_table_privilege(r.rol, 'public.url_takma_adlari', y.yetki)) then
+    raise exception 'GUARD: url_takma_adlari anon/authenticated icin ACIK (pg_default_acl sizintisi)';
   end if;
-  if has_table_privilege('anon', 'public.url_takma_adlari', 'INSERT')
-     or has_table_privilege('anon', 'public.url_takma_adlari', 'UPDATE')
-     or has_table_privilege('anon', 'public.url_takma_adlari', 'DELETE')
-     or has_table_privilege('authenticated', 'public.url_takma_adlari', 'INSERT') then
-    raise exception 'GUARD: url_takma_adlari anon/authenticated yazmaya ACIK (pg_default_acl sizintisi)';
+  if has_function_privilege('anon', 'public.tg_url_takma_ad_yaz()', 'EXECUTE')
+     or has_function_privilege('authenticated', 'public.tg_url_takma_ad_yaz()', 'EXECUTE') then
+    raise exception 'GUARD: tg_url_takma_ad_yaz anon/authenticated tarafindan cagrilabiliyor';
   end if;
-  if has_function_privilege('anon', 'public.tg_url_takma_ad_yaz()', 'EXECUTE') then
-    raise exception 'GUARD: tg_url_takma_ad_yaz anon tarafindan cagrilabiliyor';
+  if not has_function_privilege('anon', 'public.url_takma_ad_coz(text, text, text)', 'EXECUTE') then
+    raise exception 'GUARD: anon url_takma_ad_coz cagiramiyor (cozucu sayfa katmani anon istemciyle sorar)';
   end if;
   if not (select relrowsecurity from pg_class where oid = 'public.url_takma_adlari'::regclass) then
     raise exception 'GUARD: url_takma_adlari RLS kapali';
@@ -278,9 +335,11 @@ begin
 
   select count(*) into v_tetik
     from pg_trigger
-   where tgname in ('url_takma_ad_urun', 'url_takma_ad_aile', 'url_takma_ad_kategori') and not tgisinternal;
-  if v_tetik <> 3 then
-    raise exception 'GUARD: 3 tetik bekleniyordu, % bulundu', v_tetik;
+   where tgname in ('url_takma_ad_urun', 'url_takma_ad_aile', 'url_takma_ad_kategori',
+                    'url_takma_ad_urun_ekle', 'url_takma_ad_aile_ekle', 'url_takma_ad_kategori_ekle')
+     and not tgisinternal;
+  if v_tetik <> 6 then
+    raise exception 'GUARD: 6 tetik bekleniyordu, % bulundu', v_tetik;
   end if;
 
   -- Tohum: denetim izindeki farklı eski ürün slug'ı sayısı = yazılan tohum sayısı.
@@ -292,6 +351,7 @@ begin
      and nullif(a.before ->> 'slug', '') is not null
      and (a.before ->> 'slug') is distinct from (a.after ->> 'slug')
      and lower(a.before ->> 'slug') is distinct from lower(p.slug)
+     and p.deleted_at is null
      and not exists (select 1 from public.products o
                       where o.tenant_id = p.tenant_id and lower(o.slug) = lower(a.before ->> 'slug'));
   select count(*) into v_tohum from public.url_takma_adlari where sebep like 'tohum:%';
