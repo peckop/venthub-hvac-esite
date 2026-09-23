@@ -36,6 +36,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { kaynakHassasiyetindeAyni } from './fark-hassasiyet.mjs'
 
 const arg = (n, d = null) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : d }
 const DIZIN = arg('dizin', process.env.VENTHUB_KAYNAK_DIZINI ||
@@ -74,6 +75,7 @@ const okuyucular = {
     for (const m of (k.metin || '').matchAll(d)) {
       out.push({ anahtar: `${m[2].split(' ')[0]} ${m[3]} T${m[4]}`, model: m[0].split(/\s+/).slice(1, 5).join(' '),
         kod: m[1], alanlar: { motor_gucu_kw: sayi(m[8]), debi_m3h: sayi(m[9], true), devir_rpm: sayi(m[5]) },
+        ham: { motor_gucu_kw: m[8], debi_m3h: m[9], devir_rpm: m[5] },
         belge: k.dosya, sayfa: `flipbook ${/flipbook__(\d+)/.exec(k.dosya)[1]}`, alinti: m[0], tur: 'üretici' })
     }
     return out
@@ -84,6 +86,7 @@ const okuyucular = {
     return tabloSatirlari(k).filter(r => /^ENKEC\d+$/.test(r[0] || '') && /^ENKELFAN \d+ EEC$/.test(r[1] || ''))
       .map(r => ({ anahtar: `ENKELFAN ${/\d+/.exec(r[1])[0]}`, model: r[1], kod: r[0],
         alanlar: { motor_gucu_kw: sayi(r[4]), debi_m3h: sayi(r[5], true), devir_rpm: sayi(r[2]) },
+        ham: { motor_gucu_kw: r[4], debi_m3h: r[5], devir_rpm: r[2] },
         belge: k.dosya, sayfa: k.sayfa, alinti: satirMetni(r), tur: 'üretici' }))
   },
   // Vorticent CMS ATEX föyü (PDF, s.2 tablo): 'Power | 3 kW' · 'Max. Flow | 5870 m³/h' · fan 'RPM | 1420'
@@ -97,6 +100,7 @@ const okuyucular = {
     if (!fan || !mot) return []
     return [{ anahtar: `CMS ATEX ${ust[1]} T${ust[2]}`, model: ust[0].split(':')[0].trim(), kod: null,
       alanlar: { motor_gucu_kw: sayi(mot[1]), debi_m3h: sayi(fan[5]), devir_rpm: sayi(fan[1]) }, debiTanimli: true,
+      ham: { motor_gucu_kw: mot[1], debi_m3h: fan[5], devir_rpm: fan[1] },
       belge: k.dosya, sayfa: 2, alinti: `${satirMetni(fan)} // ${satirMetni(mot)}`, tur: 'üretici',
       alintiParcalari: [satirMetni(fan), satirMetni(mot)] }]
   },
@@ -121,7 +125,7 @@ for (const k of sayfalar.filter(s => /avens_fiyat_listesi_2026/.test(s.dosya))) 
     if (kodlu || kodsuz) {
       const [model, , volt, kw, rpm] = kodlu ? r.slice(1) : r
       avensStorm.push({ kod: kodlu ? r[0] : null, model: model.replace(/\s*\(\*\)$/, ''), volt: sayi(volt.replace('V', '')),
-        kw: sayi(kw), rpm: sayi(rpm), belge: k.dosya, sayfa: k.sayfa, alinti: satirMetni(r.slice(0, kodlu ? 6 : 5)) })
+        kw: sayi(kw), kwHam: kw, rpm: sayi(rpm), belge: k.dosya, sayfa: k.sayfa, alinti: satirMetni(r.slice(0, kodlu ? 6 : 5)) })
     }
   }
 }
@@ -150,8 +154,9 @@ const ALAN = {
   cekilen_guc_kw: { ad: 'güç (bizde çekilen güç, kaynakta motor gücü)', birim: 'kW' },
 }
 const satirlar = []
-const hukum = (b, u, ayniBuyukluk, tur) => {
-  if (typeof b === 'number' && typeof u === 'number' && Math.abs(b - u) <= Math.abs(u) * 0.005) return 'aynı'
+// Fark kıyası kaynağın ondalık hassasiyetinde (fark-hassasiyet.mjs; eski %0,5 tolerans kalktı).
+const hukum = (b, u, ayniBuyukluk, tur, ham, binlik) => {
+  if (typeof b === 'number' && typeof u === 'number' && kaynakHassasiyetindeAyni(b, u, ham, binlik)) return 'aynı'
   if (b === u) return 'aynı'
   return ayniBuyukluk && tur === 'üretici' ? 'üretici' : 'belirsiz'
 }
@@ -161,7 +166,7 @@ const ekle = (u, alan, bizim, bizimKaynak, ur, ayniBuyukluk = true, not = '') =>
   const yuzde = typeof bizim === 'number' && bizim !== 0 ? +((ur.deger - bizim) / bizim * 100).toFixed(1) : ''
   satirlar.push({ sku: u.sku, urun: u.name, alan: ALAN[alan].ad, birim: ALAN[alan].birim, bizim_deger: bizim,
     bizim_kaynak: bizimKaynak, uretici_deger: ur.deger, fark, fark_yuzde: yuzde, kaynak_belge: ur.belge,
-    kaynak_sayfa: ur.sayfa, kaynak_turu: ur.tur, alinti: ur.alinti, hukum: hukum(bizim, ur.deger, ayniBuyukluk, ur.tur),
+    kaynak_sayfa: ur.sayfa, kaynak_turu: ur.tur, alinti: ur.alinti, hukum: hukum(bizim, ur.deger, ayniBuyukluk, ur.tur, ur.ham, ur.binlik),
     not, _parcalar: ur.alintiParcalari || [ur.alinti] })
 }
 
@@ -182,7 +187,8 @@ for (const u of urunler) {
     const ur = uretici.get(a)
     if (!ur) { eslesmeyen.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'kaynakta yok'); continue }
     const kaynak = { belge: ur.belge, sayfa: ur.sayfa, tur: ur.tur, alinti: ur.alinti, alintiParcalari: ur.alintiParcalari }
-    ekle(u, 'motor_gucu_kw', adKw(u.name), 'ürün adı (canlı)', { ...kaynak, deger: ur.alanlar.motor_gucu_kw })
+    const h = (alan, binlik = false) => ({ ham: ur.ham?.[alan] ?? null, binlik })
+    ekle(u, 'motor_gucu_kw', adKw(u.name), 'ürün adı (canlı)', { ...kaynak, deger: ur.alanlar.motor_gucu_kw, ...h('motor_gucu_kw') })
     const av = avensListe.get(a)
     if (av) {
       // DEBİNİN ANLAMI KAYNAĞA BAĞLI (§11.7, 2026-09-22 çürütmede bulundu): Casals/Enkelfan tablosu
@@ -190,7 +196,7 @@ for (const u of urunler) {
       // değerler "en yüksek debi" diye etiketlenemez ve fark "üretici" hükmü alamaz (aynı büyüklük
       // olduğu kanıtlanmadı) → 'belirsiz'. Yalnız "Max. Flow" diyen kaynak (CMS föyü) en yüksektir.
       const debiAlani = ur.debiTanimli ? 'debi_m3h' : 'debi_tanimsiz'
-      ekle(u, debiAlani, av.debi_m3h, `AVenS fiyat listesi 2026 s.${av.sayfa}: ${av.alinti}`, { ...kaynak, deger: ur.alanlar.debi_m3h },
+      ekle(u, debiAlani, av.debi_m3h, `AVenS fiyat listesi 2026 s.${av.sayfa}: ${av.alinti}`, { ...kaynak, deger: ur.alanlar.debi_m3h, ...h('debi_m3h', true) },
         !!ur.debiTanimli, ur.debiTanimli ? '' : 'kaynak "Air flow" diyor: en yüksek debi mi çalışma noktası mı belirtilmemiş — AVenS\'e sorulur')
       // PDF çıkarımı kodun içine boşluk sokabiliyor ("ENKEC 155") — biçim farkı, kod farkı değil
       if (ur.kod) ekle(u, 'kod', av.kod.replace(/\s+/g, ''),`AVenS fiyat listesi 2026 s.${av.sayfa}`, { ...kaynak, deger: ur.kod }, false,
@@ -198,21 +204,29 @@ for (const u of urunler) {
     }
     const ts = u.technical_specs || {}
     if (ts.max_delivery_m3h != null) ekle(u, ur.debiTanimli ? 'debi_m3h' : 'debi_tanimsiz', sayi(ts.max_delivery_m3h),
-      'canlı teknik veri (max_delivery_m3h)', { ...kaynak, deger: ur.alanlar.debi_m3h }, !!ur.debiTanimli)
-    if (ts.rpm_max != null) ekle(u, 'devir_rpm', sayi(ts.rpm_max), 'canlı teknik veri', { ...kaynak, deger: ur.alanlar.devir_rpm })
+      'canlı teknik veri (max_delivery_m3h)', { ...kaynak, deger: ur.alanlar.debi_m3h, ...h('debi_m3h', true) }, !!ur.debiTanimli)
+    if (ts.rpm_max != null) ekle(u, 'devir_rpm', sayi(ts.rpm_max), 'canlı teknik veri', { ...kaynak, deger: ur.alanlar.devir_rpm, ...h('devir_rpm') })
     if (!satirlar.some(r => r.sku === u.sku)) { bizdeDegerYok.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'bizde değer yok') }
     continue
   }
   // STORM: üretici (SEAT) sayfasında güç YOK (ölçüldü 2026-09-22) → tek karşı kaynak AVenS listesi (distribütör)
   const s = /^STORM (\d+)( ATEX| XRM)? · (\d+) d\/dk · [\d,]+ kW · (\d+)V/.exec(u.name || '')
-  if (s && u.technical_specs?.max_absorbed_power_w != null) {
+  // 2026-09-23 güç alanı göçü: 13 STORM'da değer artık `rated_power_w` (motor anma gücü) — listedeki motor
+  // gücüyle AYNI büyüklük. Göç edilmeyen 7'si hâlâ `max_absorbed_power_w` (farklı büyüklük, eski satır).
+  const st = u.technical_specs || {}
+  if (s && (st.rated_power_w != null || st.max_absorbed_power_w != null)) {
     const kod = u.sku.replace(/^SEA-/, '')
     const av = avensStorm.find(r => r.kod === kod) ||
       avensStorm.find(r => !r.kod && r.model === `STORM ${s[1]}${s[2] || ''}` && r.rpm === +s[3] && r.volt === +s[4])
     if (!av) { eslesmeyen.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'kaynakta yok'); continue }
-    ekle(u, 'cekilen_guc_kw', u.technical_specs.max_absorbed_power_w / 1000, 'canlı teknik veri (max_absorbed_power_w)',
-      { belge: av.belge, sayfa: av.sayfa, tur: 'distribütör', alinti: av.alinti, deger: av.kw }, false,
-      'farklı büyüklük: bizde çekilen güç, listede motor (plaka) gücü — üretici (SEAT) sayfasında güç yok')
+    const listeKaynak = { belge: av.belge, sayfa: av.sayfa, tur: 'distribütör', alinti: av.alinti, deger: av.kw, ham: av.kwHam ?? null }
+    if (st.rated_power_w != null) {
+      ekle(u, 'motor_gucu_kw', st.rated_power_w / 1000, 'canlı teknik veri (rated_power_w)', listeKaynak, true,
+        'üretici (SEAT) sayfasında güç yok — karşı kaynak distribütör listesi')
+    } else {
+      ekle(u, 'cekilen_guc_kw', st.max_absorbed_power_w / 1000, 'canlı teknik veri (max_absorbed_power_w)', listeKaynak, false,
+        'farklı büyüklük: bizde çekilen güç, listede motor (plaka) gücü — üretici (SEAT) sayfasında güç yok')
+    }
     continue
   }
   okuyucusuz++

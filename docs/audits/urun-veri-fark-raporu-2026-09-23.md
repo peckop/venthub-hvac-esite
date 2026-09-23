@@ -11,9 +11,9 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | Katalogdaki ürün | 442 |
 | Karşılaştırılan ürün | 69 |
 | Karşılaştırılan değer | 195 |
-| — aynı | 172 |
+| — aynı | 163 |
 | — üretici değeri alınmalı | 0 |
-| — belirsiz (teyit gerekiyor) | 23 |
+| — belirsiz (teyit gerekiyor) | 32 |
 | Üretici belgesi bulunamayan ürün | 16 |
 | Belge var, bizde karşılaştırılacak değer yok | 0 |
 | Belgesi henüz okunmamış ürün | 357 |
@@ -96,7 +96,7 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NX313290 NIMAX 314 T2 1,5kW | devir | 2865 d/dk | 2865 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX313290 NIMAX 314 T2 1,5kW | motor gücü | 1,5 kW | 1,5 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX313290 NIMAX 314 T2 1,5kW | üretici kodu | NX313290  | NX314290  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX353290 NIMAX 354 T2 3kW | debi (kaynakta tanımsız: Air flow) | 7880 m³/h | 7870 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX353290 NIMAX 354 T2 3kW | debi (kaynakta tanımsız: Air flow) | 7880 m³/h | 7870 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **belirsiz** |
 | AVE-NX353290 NIMAX 354 T2 3kW | devir | 2880 d/dk | 2880 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353290 NIMAX 354 T2 3kW | motor gücü | 3 kW | 3 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353290 NIMAX 354 T2 3kW | üretici kodu | NX353290  | NX3542100  | — | Casals teknik katalog, s.200 | **belirsiz** |
@@ -104,11 +104,11 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NX353471 NIMAX 354 T4 0,37kW | devir | 1400 d/dk | 1400 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353471 NIMAX 354 T4 0,37kW | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX353471 NIMAX 354 T4 0,37kW | üretici kodu | NX353471  | NX354471  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX4032112 NIMAX 404 T2 5,5kW | debi (kaynakta tanımsız: Air flow) | 11270 m³/h | 11260 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX4032112 NIMAX 404 T2 5,5kW | debi (kaynakta tanımsız: Air flow) | 11270 m³/h | 11260 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **belirsiz** |
 | AVE-NX4032112 NIMAX 404 T2 5,5kW | devir | 2910 d/dk | 2910 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX4032112 NIMAX 404 T2 5,5kW | motor gücü | 5,5 kW | 5,5 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX4032112 NIMAX 404 T2 5,5kW | üretici kodu | NX4032112  | NX4042132  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX403480 NIMAX 404 T4 0,55kW | debi (kaynakta tanımsız: Air flow) | 5640 m³/h | 5630 m³/h | -10 (%-0,2) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX403480 NIMAX 404 T4 0,55kW | debi (kaynakta tanımsız: Air flow) | 5640 m³/h | 5630 m³/h | -10 (%-0,2) | Casals teknik katalog, s.200 | **belirsiz** |
 | AVE-NX403480 NIMAX 404 T4 0,55kW | devir | 1400 d/dk | 1400 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX403480 NIMAX 404 T4 0,55kW | motor gücü | 0,55 kW | 0,55 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX403480 NIMAX 404 T4 0,55kW | üretici kodu | NX403480  | NX404480  | — | Casals teknik katalog, s.200 | **belirsiz** |
@@ -120,11 +120,11 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NX453490 NIMAX 454 T4 1,1kW | devir | 1450 d/dk | 1450 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX453490 NIMAX 454 T4 1,1kW | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX453490 NIMAX 454 T4 1,1kW | üretici kodu | NX453490  | NX454490  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX5032160 NIMAX 504 T2 15kW | debi (kaynakta tanımsız: Air flow) | 22010 m³/h | 22000 m³/h | -10 (%0) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX5032160 NIMAX 504 T2 15kW | debi (kaynakta tanımsız: Air flow) | 22010 m³/h | 22000 m³/h | -10 (%0) | Casals teknik katalog, s.200 | **belirsiz** |
 | AVE-NX5032160 NIMAX 504 T2 15kW | devir | 2935 d/dk | 2935 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX5032160 NIMAX 504 T2 15kW | motor gücü | 15 kW | 15 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX5032160 NIMAX 504 T2 15kW | üretici kodu | NX5032160  | NX5042160  | — | Casals teknik katalog, s.200 | **belirsiz** |
-| AVE-NX503490 NIMAX 504 T4 2,2kW | debi (kaynakta tanımsız: Air flow) | 11010 m³/h | 11000 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **aynı** |
+| AVE-NX503490 NIMAX 504 T4 2,2kW | debi (kaynakta tanımsız: Air flow) | 11010 m³/h | 11000 m³/h | -10 (%-0,1) | Casals teknik katalog, s.200 | **belirsiz** |
 | AVE-NX503490 NIMAX 504 T4 2,2kW | devir | 1435 d/dk | 1435 d/dk | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX503490 NIMAX 504 T4 2,2kW | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | Casals teknik katalog, s.200 | **aynı** |
 | AVE-NX503490 NIMAX 504 T4 2,2kW | üretici kodu | NX503490  | NX5044100  | — | Casals teknik katalog, s.200 | **belirsiz** |
@@ -157,7 +157,7 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NS10014225 NIMUS 1001 T4 45kW | devir | 1475 d/dk | 1475 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS10014225 NIMUS 1001 T4 45kW | motor gücü | 45 kW | 45 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS10014225 NIMUS 1001 T4 45kW | üretici kodu | NS10014225  | NS10014225  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS311280 NIMUS 311 T2 1,1kW | debi (kaynakta tanımsız: Air flow) | 4710 m³/h | 4720 m³/h | 10 (%0,2) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS311280 NIMUS 311 T2 1,1kW | debi (kaynakta tanımsız: Air flow) | 4710 m³/h | 4720 m³/h | 10 (%0,2) | Casals teknik katalog, s.192 | **belirsiz** |
 | AVE-NS311280 NIMUS 311 T2 1,1kW | devir | 2800 d/dk | 2800 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS311280 NIMUS 311 T2 1,1kW | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS311280 NIMUS 311 T2 1,1kW | üretici kodu | NS311280  | NS311280  | — | Casals teknik katalog, s.192 | **aynı** |
@@ -169,7 +169,7 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NS351471 NIMUS 351 T4 0,37kW | devir | 1400 d/dk | 1400 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS351471 NIMUS 351 T4 0,37kW | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS351471 NIMUS 351 T4 0,37kW | üretici kodu | NS351471  | NS351471  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS4012100 NIMUS 401 T2 4kW | debi (kaynakta tanımsız: Air flow) | 9650 m³/h | 9660 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS4012100 NIMUS 401 T2 4kW | debi (kaynakta tanımsız: Air flow) | 9650 m³/h | 9660 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **belirsiz** |
 | AVE-NS4012100 NIMUS 401 T2 4kW | devir | 2880 d/dk | 2880 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4012100 NIMUS 401 T2 4kW | motor gücü | 4 kW | 4 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4012100 NIMUS 401 T2 4kW | üretici kodu | NS4012100  | NS4012100  | — | Casals teknik katalog, s.192 | **aynı** |
@@ -177,7 +177,7 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NS401480 NIMUS 401 T4 0,55kW | devir | 1400 d/dk | 1400 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS401480 NIMUS 401 T4 0,55kW | motor gücü | 0,55 kW | 0,55 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS401480 NIMUS 401 T4 0,55kW | üretici kodu | NS401480  | NS401480  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS4512132 NIMUS 451 T2 7,5kW | debi (kaynakta tanımsız: Air flow) | 13740 m³/h | 13750 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS4512132 NIMUS 451 T2 7,5kW | debi (kaynakta tanımsız: Air flow) | 13740 m³/h | 13750 m³/h | 10 (%0,1) | Casals teknik katalog, s.192 | **belirsiz** |
 | AVE-NS4512132 NIMUS 451 T2 7,5kW | devir | 2910 d/dk | 2910 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4512132 NIMUS 451 T2 7,5kW | motor gücü | 7,5 kW | 7,5 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS4512132 NIMUS 451 T2 7,5kW | üretici kodu | NS4512132  | NS4512132  | — | Casals teknik katalog, s.192 | **aynı** |
@@ -193,7 +193,7 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | AVE-NS501490 NIMUS 501 T4 1,5kW | devir | 1440 d/dk | 1440 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS501490 NIMUS 501 T4 1,5kW | motor gücü | 1,5 kW | 1,5 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS501490 NIMUS 501 T4 1,5kW | üretici kodu | NS501490  | NS501490  | — | Casals teknik katalog, s.192 | **aynı** |
-| AVE-NS5624100 NIMUS 561 T4 2,2kW | debi (kaynakta tanımsız: Air flow) | 13250 m³/h | 13240 m³/h | -10 (%-0,1) | Casals teknik katalog, s.192 | **aynı** |
+| AVE-NS5624100 NIMUS 561 T4 2,2kW | debi (kaynakta tanımsız: Air flow) | 13250 m³/h | 13240 m³/h | -10 (%-0,1) | Casals teknik katalog, s.192 | **belirsiz** |
 | AVE-NS5624100 NIMUS 561 T4 2,2kW | devir | 1435 d/dk | 1435 d/dk | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS5624100 NIMUS 561 T4 2,2kW | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | Casals teknik katalog, s.192 | **aynı** |
 | AVE-NS5624100 NIMUS 561 T4 2,2kW | üretici kodu | NS5624100  | NS5614100  | — | Casals teknik katalog, s.192 | **belirsiz** |
@@ -281,25 +281,25 @@ ilgili sayfasından okunmuştur; sayfa ve kaynak satırı her karşılaştırmad
 | Ürün | Alan | Bizim değer | Üretici | Fark | Kaynak | Hüküm |
 |---|---|---|---|---|---|---|
 | SEA-61102000 STORM 10 · 1400 d/dk · 0,06 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,09 kW | 0,06 kW | -0,03 (%-33,3) | AVenS fiyat listesi 2026, s.42 | **belirsiz** |
-| SEA-61102003 STORM 10 ATEX · 1400 d/dk · 0,06 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,06 kW | 0,06 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
+| SEA-61102003 STORM 10 ATEX · 1400 d/dk · 0,06 kW · 380V | motor gücü | 0,06 kW | 0,06 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
 | SEA-61102010 STORM 10 XRM · 1400 d/dk · 0,06 kW · 220V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,09 kW | 0,06 kW | -0,03 (%-33,3) | AVenS fiyat listesi 2026, s.42 | **belirsiz** |
 | SEA-61103000 STORM 10 · 2800 d/dk · 0,09 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,12 kW | 0,09 kW | -0,03 (%-25) | AVenS fiyat listesi 2026, s.42 | **belirsiz** |
-| SEA-61103003 STORM 10 ATEX · 2800 d/dk · 0,12 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,12 kW | 0,12 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
+| SEA-61103003 STORM 10 ATEX · 2800 d/dk · 0,12 kW · 380V | motor gücü | 0,12 kW | 0,12 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
 | SEA-61103010 STORM 10 · 2800 d/dk · 0,09 kW · 220V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,12 kW | 0,09 kW | -0,03 (%-25) | AVenS fiyat listesi 2026, s.42 | **belirsiz** |
-| SEA-61103110 STORM 10 · 1400 d/dk · 0,06 kW · 220V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,06 kW | 0,06 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61103110 STORM 10 · 1400 d/dk · 0,06 kW · 220V | motor gücü | 0,06 kW | 0,06 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
 | SEA-61122000 STORM 12 · 1400 d/dk · 0,25 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,18 kW | 0,25 kW | 0,07 (%38,9) | AVenS fiyat listesi 2026, s.42 | **belirsiz** |
 | SEA-61122003 STORM 12 ATEX · 1400 d/dk · 0,25 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,18 kW | 0,25 kW | 0,07 (%38,9) | AVenS fiyat listesi 2026, s.45 | **belirsiz** |
 | SEA-61122010 STORM 12 · 1400 d/dk · 0,25 kW · 220V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,18 kW | 0,25 kW | 0,07 (%38,9) | AVenS fiyat listesi 2026, s.42 | **belirsiz** |
-| SEA-61123000 STORM 12 · 2800 d/dk · 0,37 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,37 kW | 0,37 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
-| SEA-61123003 STORM 12 ATEX · 2800 d/dk · 0,37 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,37 kW | 0,37 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
-| SEA-61123010 STORM 12 · 2800 d/dk · 0,37 kW · 220V | güç (bizde çekilen güç, kaynakta motor gücü) | 0,37 kW | 0,37 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
-| SEA-61143000 STORM 14 · 2800 d/dk · 1,1 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 1,1 kW | 1,1 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
-| SEA-61143003 STORM 14 ATEX · 2800 d/dk · 1,1 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 1,1 kW | 1,1 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
-| SEA-61143010 STORM 14 · 2800 d/dk · 1,1 kW · 220V | güç (bizde çekilen güç, kaynakta motor gücü) | 1,1 kW | 1,1 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
-| SEA-61163000 STORM 16 · 2800 d/dk · 2,2 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 2,2 kW | 2,2 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
-| SEA-61163003 STORM 16 ATEX · 2800 d/dk · 2,2 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 2,2 kW | 2,2 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
-| SEA-61183000 STORM 18 · 2800 d/dk · 7,5 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 7,5 kW | 7,5 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
-| SEA-61183003 STORM 18 ATEX · 2800 d/dk · 7,5 kW · 380V | güç (bizde çekilen güç, kaynakta motor gücü) | 7,5 kW | 7,5 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
+| SEA-61123000 STORM 12 · 2800 d/dk · 0,37 kW · 380V | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61123003 STORM 12 ATEX · 2800 d/dk · 0,37 kW · 380V | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
+| SEA-61123010 STORM 12 · 2800 d/dk · 0,37 kW · 220V | motor gücü | 0,37 kW | 0,37 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61143000 STORM 14 · 2800 d/dk · 1,1 kW · 380V | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61143003 STORM 14 ATEX · 2800 d/dk · 1,1 kW · 380V | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
+| SEA-61143010 STORM 14 · 2800 d/dk · 1,1 kW · 220V | motor gücü | 1,1 kW | 1,1 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61163000 STORM 16 · 2800 d/dk · 2,2 kW · 380V | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61163003 STORM 16 ATEX · 2800 d/dk · 2,2 kW · 380V | motor gücü | 2,2 kW | 2,2 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
+| SEA-61183000 STORM 18 · 2800 d/dk · 7,5 kW · 380V | motor gücü | 7,5 kW | 7,5 kW | 0 (%0) | AVenS fiyat listesi 2026, s.42 | **aynı** |
+| SEA-61183003 STORM 18 ATEX · 2800 d/dk · 7,5 kW · 380V | motor gücü | 7,5 kW | 7,5 kW | 0 (%0) | AVenS fiyat listesi 2026, s.45 | **aynı** |
 
 ## Vortice (184 ürün)
 
