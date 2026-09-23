@@ -104,6 +104,12 @@ sınıra yaslanan tasarım iki kez yazılır.
 | **2. Takma ad tablosu** (`url_takma_adlari`, DB) — **sayfa** okur | derlemeden SONRA değişen slug'lar (admin düzenlemesi, katalog düzeltmesi) | harita bir sonraki derlemeye kadar bayattır; sayfa "bulunamadı" dalında tabloya bakar → 308 (`dynamicParams` true: istek anında render, sonuç önbelleğe) |
 | **3. `next.config`** | yalnız kalıcı, veriden bağımsız desenler: `/tr/brands/*` → `/tr/markalar/*` · `/tr/products` → `/tr/urunler` · `destek/hesaplayicilar` | birkaç satır; 13 dilsiz kategori kuralı ve 6 ürün kuralı **silinir** (haritaya taşınır) |
 
+**Hazır araç ölçüldü — Vercel Bulk Redirects KULLANILMAZ** (v3 çürütmesi, belge: vercel.com/docs/routing/
+redirects/bulk-redirects): (a) *"`source` … does not support query parameters. Vercel ignores any
+query parameters"* → `?sku=` (442 × 2) bununla çözülemez; (b) *"not available on the Hobby plan"* —
+bugün Hobby'deyiz, Pro karar 60 ile HAYIR; (c) karar 59 barındırmayı Cloudflare'e taşıyacak → Vercel'e
+özgü proje ayarı taşınmaz, göçte ikinci kez yazılır. Harita bu üç sınırın hiçbirine takılmaz.
+
 Sıra kuralı: `next.config` redirect'leri middleware'den önce koşar → config'de eski ürün/aile/kategori
 deseni **kalmaz**, yoksa harita hiç çalışmaz (v3'ün 2 hop'u buradan doğuyordu).
 
