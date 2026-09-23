@@ -345,6 +345,9 @@ Deno.serve(async (req: Request) => {
       console.warn('[quote-notification-webhook] kiraci ic bildirim tavani asildi, ic bildirim ATLANDI', { quote_id: quote.id })
       await deftereYaz({ email_to: icAlici, subject: 'ic bildirim', status: 'failed', error: `hiz_siniri: kiraci saatte ${KIRACI_SAATLIK}` })
     }
+    // SITE_URL yoksa panel bağlantısı konmaz (sabit adrese düşüş YOK, INV-CONFIG-1) ve bu görünür olur.
+    const siteUrl = Deno.env.get('SITE_URL') ?? null
+    if (!siteUrl) console.warn('[quote-notification-webhook] SITE_URL tanimsiz — ic bildirimde panel baglantisi YOK', { quote_id: quote.id })
     const ic = icBildirimOlustur({
       quoteId: quote.id,
       source: quote.source,
@@ -352,7 +355,7 @@ Deno.serve(async (req: Request) => {
       contactEmail: to,
       contactPhone: quote.contact_phone,
       kalemler: items ?? [],
-      panelTabanUrl: Deno.env.get('SITE_URL') || 'https://venthub.com.tr',
+      panelTabanUrl: siteUrl,
     })
     if (icIzinli) {
       const icResp = await resendGonder(

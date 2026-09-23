@@ -13,7 +13,7 @@ export interface IcBildirimGirdisi {
   contactEmail: string
   contactPhone: string | null
   kalemler: Array<{ product_name: string | null; qty: number | string | null; note?: string | null }>
-  panelTabanUrl: string
+  panelTabanUrl: string | null
 }
 
 export interface IcBildirim {
@@ -48,10 +48,14 @@ export const temizle = (s: unknown): string =>
 
 const KAYNAK_ADI: Record<string, string> = { pdp: 'Ürün sayfası', cart: 'Sepet', project: 'Proje' }
 
-/** Panel adresini güvenle kurar: yalnız http(s) taban kabul edilir, sondaki / temizlenir. */
-export function panelLinki(taban: string): string {
+/**
+ * Panel adresini güvenle kurar: yalnız http(s) taban kabul edilir, sondaki / temizlenir.
+ * Taban yoksa ya da geçersizse `null` — sabit bir adrese DÜŞÜLMEZ (INV-CONFIG-1: yapılandırma
+ * boşluğu sessizce davranış değiştiremez; başka kiracının personeli VentHub paneline yönlenmesin).
+ */
+export function panelLinki(taban: string | null | undefined): string | null {
   const t = (taban || '').trim().replace(/\/+$/, '')
-  if (!/^https?:\/\/[^\s/]+/i.test(t)) return 'https://venthub.com.tr/admin/quotes'
+  if (!/^https?:\/\/[^\s/]+/i.test(t)) return null
   return `${t}/admin/quotes`
 }
 
@@ -87,7 +91,7 @@ export function icBildirimOlustur(g: IcBildirimGirdisi): IcBildirim {
     `<tr><td><strong>Kaynak</strong></td><td>${kacir(kaynak)}</td></tr>`,
     '</table>',
     kalemHtml ? `<p><strong>Ürünler</strong></p><ul>${kalemHtml}</ul>` : '<p>Kalem bulunamadı.</p>',
-    `<p><a href="${kacir(link)}">Yönetim panelinde aç</a></p>`,
+    link ? `<p><a href="${kacir(link)}">Yönetim panelinde aç</a></p>` : '<p>Talep yönetim panelinin Teklifler bölümünde.</p>',
     '<p style="color:#666;font-size:12px">Müşteriye onay e-postası ayrıca gönderildi. Bu e-postayı yanıtlarsanız müşteriye gider.</p>',
     '</div>',
   ].join('')
@@ -101,7 +105,7 @@ export function icBildirimOlustur(g: IcBildirimGirdisi): IcBildirim {
     '',
     kalemMetin || 'Kalem bulunamadı.',
     '',
-    `Panel: ${link}`,
+    link ? `Panel: ${link}` : 'Panel: yönetim paneli → Teklifler',
   ].join('\n')
 
   return { subject, html, text, idempotencyKey: icBildirimAnahtari(g.quoteId) }

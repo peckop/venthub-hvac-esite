@@ -61,8 +61,12 @@ describe('INV-TEKLIF-IC-BILDIRIM-1 — içerik kurucusu', () => {
 
   it('panel linki: yalnız http(s) taban, aksi hâlde güvenli varsayılan', () => {
     expect(panelLinki('https://ornek.com//')).toBe('https://ornek.com/admin/quotes')
-    expect(panelLinki('javascript:alert(1)')).toBe('https://venthub.com.tr/admin/quotes')
-    expect(panelLinki('')).toBe('https://venthub.com.tr/admin/quotes')
+    // Geçersiz/boş taban → bağlantı YOK (sabit adrese düşüş INV-CONFIG-1 ihlali olurdu)
+    expect(panelLinki('javascript:alert(1)')).toBeNull()
+    expect(panelLinki('')).toBeNull()
+    const b = icBildirimOlustur({ ...ornek, panelTabanUrl: '' })
+    expect(b.html).not.toContain('<a href=')
+    expect(b.text).toContain('Panel: yönetim paneli')
   })
 
   it('konu satırı: kontrol karakteri atılır, ad 60 karakterle sınırlı (bulgu 5)', () => {
