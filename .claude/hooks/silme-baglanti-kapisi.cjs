@@ -45,7 +45,10 @@ function silmeHedefleri(komut) {
       const bayrak = t.slice(1).filter((a) => a.startsWith('-')).join('')
       if (/r|R|--recursive/.test(bayrak)) for (const a of t.slice(1)) if (!a.startsWith('-')) hedefler.push({ yol: a, bicim: 'rm -r' })
     } else if (ad === 'rmdir' || ad === 'rd') {
-      if (t.slice(1).some((a) => /^\/s$/i.test(a))) for (const a of t.slice(1)) if (!a.startsWith('/')) hedefler.push({ yol: a, bicim: 'rmdir /s' })
+      // cmd anahtarı = "/" + TEK harf (/s, /q). Eskiden "/ ile başlayan her şey anahtar" sayılıyordu →
+      // POSIX mutlak yol (/tmp/x, /c/tmp/x) HEDEF olarak görülmüyordu (CI Linux'ta ölçüldü, 2026-09-23).
+      const anahtarMi = (a) => /^\/[a-z?]$/i.test(a)
+      if (t.slice(1).some((a) => /^\/s$/i.test(a))) for (const a of t.slice(1)) if (!anahtarMi(a)) hedefler.push({ yol: a, bicim: 'rmdir /s' })
     } else if (/^remove-item$/i.test(ad) || /^(ri|del)$/i.test(ad)) {
       if (t.some((a) => /^-rec/i.test(a))) {
         for (let k = 1; k < t.length; k++) {
