@@ -1,194 +1,176 @@
 #!/usr/bin/env node
 /**
- * AILE METNI YAZICI — REC-146 Adim 3 (K7.8 onayindan SONRA).
+ * AILE METNI YAZICI — REC-146 karar 70 (EN aile metni + onaysiz TR'nin onayli hali).
+ * Plan: docs/plans/rec146-karar70-aciklama-2026-09-22.md v3.1 adim 6. Kurallar:
+ * `aile-metni-kurallar.mjs` (saf, testli).
  *
- * VARSAYILAN KURU KOSUM. Prod'a yalniz `--yaz` ile dokunur ve `--yaz` bile
- * asagidaki kapilarin HEPSI yesil degilse reddeder.
+ * VARSAYILAN KURU KOSUM. Prod'a yalniz IKI ANAHTARLA dokunur: `--yaz` bayragi VE ortamda
+ * `CANLI_YAZIM_ONAYI=evet` (Recep'in kendi penceresindeki sozuyle). Kapilarin HEPSI yesil
+ * degilse `--yaz` bile reddedilir; hicbir aile yazilmaz (kismi yazim yok).
  *
  * NICIN AYRI YUK DOSYASI: yazilacak metin, insanin ONAYLADIGI sunumu ureten AYNI koddan
- * (toplu-sunum.py --yuk) cikar. Bu betik taslak .md'leri OKUMAZ. Iki ayri ayristirici
- * olsaydi "onaylanan metin" ile "yazilan metin" sessizce ayrisabilirdi.
+ * (toplu-sunum.py --yuk) cikar. Bu betik taslak .md'leri OKUMAZ.
+ * NICIN AYRI BEKLENEN DOSYASI: yuk kendisiyle kiyaslanmaz. `--beklenen` = Recep'in onayladigi
+ * aile listesi {"en":[slug…],"b":[slug…]}; yukun slug kumesi bununla KUME olarak karsilastirilir.
  *
- * ⚠ ANON ANAHTAR KULLANILMAZ. Olculdu (Tier C temizligi, 2026-09-05): RLS yazmayi sessizce
- * bosaltir, betik "0 satir" doner ve bu BASARI gibi gorunur. Servis anahtari zorunlu.
+ * ⚠ ANON ANAHTAR KULLANILMAZ: RLS yazmayi sessizce bosaltir, "0 satir" basari gibi gorunur.
+ * ⚠ DENETIM IZI TETIKTE: `denetim_izi_product_families` UPDATE'te admin_audit_log'a yazar;
+ *   bu betik ikinci audit satiri YAZMAZ (PATCH basina 1 satir).
+ * ⚠ YARIS: PATCH `updated_at=eq.<okunan>` kosulludur; 0 satir donerse aile yeniden okunur,
+ *   plan yeniden kurulur ve 1 kez denenir; yine 0 → KIRMIZI.
  *
- * ⚠ NE YAZILIR:
- *   description.tr            <- kimlik cumlesi (GORUNUR; alan bugun vitrinde bu)
- *   description.bloklar_tr    <- dolu yapisal bloklar (DEPODA; render REC-164, URUN)
- *   description.maddeler_tr   <- maddeler (DEPODA)
- *   description.en            <- DOKUNULMAZ (EN turu ayri is; silmek vitrinde gerileme olur)
- *   is_description_manual     <- true
- * BOS BLOK ANAHTARI YAZILMAZ: "hic olmadi" ile "vardi silindi" ayirt edilebilir kalsin.
+ * KULLANIM:
+ *   node scripts/icerik-hatti/aile-metni-yaz.mjs --yuk <yuk.json> --beklenen <onay.json> [--yedek <yol>] [--yaz]
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-
-const BEKLENEN_AILE = 38 // 40 aile - K7.10 geregi yazilmayan 2 (BVU-LS, hiz anahtarlari)
+import { kumeKapisi, metinKapisi, yazimPlani, patchYolu, OKUMA_SECIMI } from './aile-metni-kurallar.mjs'
 
 const argv = process.argv.slice(2)
-const bayrak = (ad) => argv.includes(ad)
 const deger = (ad, vars) => {
   const i = argv.indexOf(ad)
   return i >= 0 && i + 1 < argv.length ? argv[i + 1] : vars
 }
-
-const YUK_YOL = deger('--yuk', 'aile-yuku.json')
+const YUK_YOL = deger('--yuk', null)
+const BEKLENEN_YOL = deger('--beklenen', null)
 const YEDEK_YOL = deger('--yedek', 'aile-metni-yedek.json')
-const YAZ = bayrak('--yaz')
+const YAZ = argv.includes('--yaz')
+
+if (!YUK_YOL || !BEKLENEN_YOL) {
+  console.error('⛔ ONKOSUL: --yuk ve --beklenen zorunlu (beklenen = Recep\'in onayladigi aile listesi).')
+  process.exit(2)
+}
 
 const ENV_YOL = process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env')
-const ortam = Object.fromEntries(
-  readFileSync(ENV_YOL, 'utf8')
-    .split(/\r?\n/)
-    .filter((s) => s && !s.startsWith('#') && s.includes('='))
-    .map((s) => {
-      const i = s.indexOf('=')
-      return [s.slice(0, i).trim(), s.slice(i + 1).trim().replace(/^["']|["']$/g, '')]
-    }),
-)
+let ortam
+try {
+  ortam = Object.fromEntries(
+    readFileSync(ENV_YOL, 'utf8')
+      .split(/\r?\n/)
+      .filter((s) => s && !s.startsWith('#') && s.includes('='))
+      .map((s) => {
+        const i = s.indexOf('=')
+        return [s.slice(0, i).trim(), s.slice(i + 1).trim().replace(/^["']|["']$/g, '')]
+      }),
+  )
+} catch {
+  console.error('⛔ ONKOSUL: ortam dosyasi okunamadi:', ENV_YOL)
+  process.exit(2)
+}
 const URL_ = ortam.SUPABASE_URL || ortam.NEXT_PUBLIC_SUPABASE_URL
 const ANAHTAR = ortam.SUPABASE_SERVICE_ROLE_KEY
 if (!URL_ || !ANAHTAR) {
-  console.error('⛔ SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY yok:', ENV_YOL)
+  console.error('⛔ ONKOSUL: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY yok:', ENV_YOL)
   process.exit(2)
 }
 const basliklar = { apikey: ANAHTAR, Authorization: `Bearer ${ANAHTAR}`, 'Content-Type': 'application/json' }
 
 const yuk = JSON.parse(readFileSync(YUK_YOL, 'utf8'))
-console.log(`YUK: ${YUK_YOL} · ${yuk.length} aile`)
+const beklenen = JSON.parse(readFileSync(BEKLENEN_YOL, 'utf8'))
+console.log(`YUK: ${yuk.length} aile (en ${yuk.filter((y) => y.kip === 'en').length} · b ${yuk.filter((y) => y.kip === 'b').length})`)
 
-// ---- KAPI 1: beklenen aile sayisi
-if (yuk.length !== BEKLENEN_AILE) {
-  console.error(`⛔ KAPI 1 KIRMIZI — beklenen ${BEKLENEN_AILE} aile, yukte ${yuk.length}.`)
-  console.error('   Sapma sebebi ANLASILMADAN yazilmaz. (K7.10 atlamalari beklenen sayiya dahildir.)')
+const kirmizi = (baslik, satirlar) => {
+  console.error(`⛔ ${baslik} KIRMIZI`)
+  for (const s of satirlar) console.error('   ' + s)
+  console.error('   Hicbir aile yazilmadi.')
   process.exit(1)
 }
-console.log(`  KAPI 1 YESIL — aile sayisi ${yuk.length}`)
 
-// ---- KAPI 2: her aile DB'de var mi + mevcut deger yedegi
+// ---- KAPI 1: yuk kumesi = Recep'in onayladigi kume
+const k1 = kumeKapisi(yuk, beklenen)
+if (k1.length) kirmizi('KAPI 1 (onaylanan kume)', k1)
+console.log('  KAPI 1 YESIL — yuk kumesi onaylanan kumeyle ayni')
+
+// ---- KAPI 2: her aile DB'de var mi
+const oku = async (filtre) => {
+  const r = await fetch(`${URL_}/rest/v1/product_families?select=${OKUMA_SECIMI}&${filtre}`, { headers: basliklar })
+  if (!r.ok) {
+    console.error('⛔ aile sorgusu basarisiz:', r.status, await r.text())
+    process.exit(1)
+  }
+  return r.json()
+}
 const sluglar = yuk.map((y) => y.slug)
-const yanit = await fetch(
-  `${URL_}/rest/v1/product_families?select=id,slug,description,is_description_manual&slug=in.(${sluglar.join(',')})`,
-  { headers: basliklar },
-)
-if (!yanit.ok) {
-  console.error('⛔ aile sorgusu basarisiz:', yanit.status)
-  process.exit(1)
-}
-const mevcut = await yanit.json()
+const mevcut = await oku(`slug=in.(${sluglar.join(',')})`)
 const bulunan = new Map(mevcut.map((a) => [a.slug, a]))
 const eksik = sluglar.filter((s) => !bulunan.has(s))
-if (eksik.length) {
-  console.error(`⛔ KAPI 2 KIRMIZI — DB'de bulunamayan aile ${eksik.length}: ${eksik.join(', ')}`)
-  process.exit(1)
-}
-console.log(`  KAPI 2 YESIL — ${bulunan.size}/${sluglar.length} aile DB'de bulundu`)
+if (eksik.length) kirmizi('KAPI 2 (DB\'de aile)', [`bulunamayan: ${eksik.join(', ')}`])
+if (mevcut.length !== new Set(mevcut.map((a) => a.slug)).size) kirmizi('KAPI 2 (DB\'de aile)', ['ayni slug birden cok kiracida — kiraci belirsiz'])
+console.log(`  KAPI 2 YESIL — ${bulunan.size}/${sluglar.length} aile DB'de`)
 
-// ---- KAPI 3: kimlik cumlesi bos olan var mi
-const bosKimlik = yuk.filter((y) => !y.kimlik_tr || y.kimlik_tr.trim().length < 20)
-if (bosKimlik.length) {
-  console.error(`⛔ KAPI 3 KIRMIZI — kimlik cumlesi bos/kisa: ${bosKimlik.map((x) => x.slug).join(', ')}`)
-  process.exit(1)
-}
-console.log('  KAPI 3 YESIL — 38/38 kimlik cumlesi dolu')
+// ---- KAPI 3/5: metin dolu, ic referans yok, kaynak/jeton kapilari yesil
+const k3 = yuk.flatMap(metinKapisi)
+if (k3.length) kirmizi('KAPI 3 (metin)', k3)
+console.log('  KAPI 3 YESIL — metinler dolu, ic referans yok, kapi sonuclari yesil')
 
-// ---- KAPI 4: kapidan DUSEN iddia tasiyan aile var mi
-const dusenli = yuk.filter((y) => (y.kapi?.dusen ?? 0) > 0)
-if (dusenli.length) {
-  console.error(`⛔ KAPI 4 KIRMIZI — kaynagiyla CELISEN iddia tasiyan aile: ${dusenli.map((x) => x.slug).join(', ')}`)
-  process.exit(1)
-}
-console.log('  KAPI 4 YESIL — dusen iddia tasiyan aile yok')
+// ---- KAPI 4: yazim plani (dolu EN'i ezmez; onayli TR'nin ustune isaretsiz yazmaz)
+const planlar = yuk.map((y) => ({ y, p: yazimPlani(bulunan.get(y.slug), y) }))
+const k4 = planlar.filter(({ p }) => p.hata).map(({ y, p }) => `${y.slug}: ${p.hata}`)
+if (k4.length) kirmizi('KAPI 4 (yazim plani)', k4)
+const atlanan = planlar.filter(({ p }) => p.atla)
+const yazilacak = planlar.filter(({ p }) => p.govde)
+console.log(`  KAPI 4 YESIL — yazilacak ${yazilacak.length} · atlanan ${atlanan.length}`)
+for (const { y, p } of atlanan) console.log(`     atla ${y.slug}: ${p.atla}`)
 
-// ---- KAPI 5: vitrine cikacak metinde IC KAYNAK REFERANSI kalmis mi
-// ⛔ OLCULMUS KUSUR: ilk yazimda 38/38 ailenin kimlik cumlesi "[s.41]" gibi bir referansla
-// canliya gitti — musteri bizim ic kaynak notumuzu okuyacakti. Kanit taslakta ve kanit
-// satirlarinda durur, VITRINDE durmaz. Bu kapi o hatanin tekrarini imkansiz kilar.
-// "Kaynak s.NN" bicimi de kapsanir: bir madde bu ATIF bicimini tasiyorsa musteri cumlesi
-// degil, taslaktaki denetim notudur (olculdu: punto-evo-flexo, canliya gitmisti).
-const REF_DESENI = /\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]|\[DB\]|[Kk]aynak\s*s\.\s*[0-9]/
-const refliler = yuk.filter((y) => {
-  const parcalar = [y.kimlik_tr, ...(y.maddeler_tr || []), ...Object.values(y.bloklar_tr || {})]
-  return parcalar.some((s) => REF_DESENI.test(s || ''))
-})
-if (refliler.length) {
-  console.error(`⛔ KAPI 5 KIRMIZI — vitrine cikacak metinde ic kaynak referansi kalmis: ${refliler.length} aile`)
-  for (const r of refliler.slice(0, 5)) console.error(`   ${r.slug}: ${r.kimlik_tr.slice(0, 90)}`)
-  console.error('   Referanslar taslakta KALIR, DB metnine GIRMEZ. toplu-sunum.py --yuk temizler.')
-  process.exit(1)
-}
-console.log('  KAPI 5 YESIL — vitrin metninde ic kaynak referansi yok')
+// ---- YEDEK
+writeFileSync(YEDEK_YOL, JSON.stringify(mevcut, null, 2) + '\n', 'utf8')
+console.log(`  YEDEK: ${YEDEK_YOL} (${mevcut.length} kayit, updated_at dahil)`)
 
-// ---- YEDEK: yazmadan once mevcut degerler diske
-writeFileSync(
-  YEDEK_YOL,
-  JSON.stringify(
-    mevcut.map((a) => ({ slug: a.slug, description: a.description, is_description_manual: a.is_description_manual })),
-    null,
-    2,
-  ) + '\n',
-  'utf8',
-)
-console.log(`  YEDEK yazildi: ${YEDEK_YOL} (${mevcut.length} kayit)`)
-
-// ---- OZET
-let blokToplam = 0
-let maddeToplam = 0
-let enKorunan = 0
-for (const y of yuk) {
-  blokToplam += Object.keys(y.bloklar_tr || {}).length
-  maddeToplam += (y.maddeler_tr || []).length
-  if (bulunan.get(y.slug)?.description?.en) enKorunan++
-}
-console.log('')
-console.log(`YAZILACAK: ${yuk.length} aile · kimlik cumlesi ${yuk.length} · blok anahtari ${blokToplam} · madde ${maddeToplam}`)
-console.log(`EN metni DOKUNULMAYAN aile: ${enKorunan} (EN turu ayri is; silmek vitrinde gerileme olurdu)`)
-
-if (!YAZ) {
+if (!YAZ || process.env.CANLI_YAZIM_ONAYI !== 'evet') {
   console.log('')
-  console.log('KURU KOSUM — hicbir sey yazilmadi. Gercekten yazmak icin: --yaz')
+  console.log('KURU KOSUM — hicbir sey yazilmadi. Yazim icin iki anahtar: --yaz VE CANLI_YAZIM_ONAYI=evet')
   process.exit(0)
 }
 
-// ---- YAZIM
-let basarili = 0
-const hatalar = []
-for (const y of yuk) {
-  const a = bulunan.get(y.slug)
-  const yeni = { ...(a.description || {}) }
-  yeni.tr = y.kimlik_tr
-  if (Object.keys(y.bloklar_tr || {}).length) yeni.bloklar_tr = y.bloklar_tr
-  if ((y.maddeler_tr || []).length) yeni.maddeler_tr = y.maddeler_tr
-  const r = await fetch(`${URL_}/rest/v1/product_families?id=eq.${a.id}`, {
+// ---- YAZIM (atomik kosullu PATCH, 0 satirda 1 yeniden deneme)
+const patch = async (a, govde) => {
+  const r = await fetch(`${URL_}/rest/v1/${patchYolu(a)}`, {
     method: 'PATCH',
     headers: { ...basliklar, Prefer: 'return=representation' },
-    body: JSON.stringify({ description: yeni, is_description_manual: true }),
+    body: JSON.stringify(govde),
   })
-  if (!r.ok) {
-    hatalar.push(`${y.slug}: ${r.status} ${await r.text()}`)
-    continue
-  }
-  const donen = await r.json()
-  if (Array.isArray(donen) && donen.length === 1) basarili++
-  else hatalar.push(`${y.slug}: donen satir ${Array.isArray(donen) ? donen.length : '?'}`)
+  if (!r.ok) return { hata: `${r.status} ${await r.text()}` }
+  const d = await r.json()
+  return { satir: Array.isArray(d) ? d.length : -1 }
 }
-
+let basarili = 0
+const hatalar = []
+for (const { y, p } of yazilacak) {
+  let a = bulunan.get(y.slug)
+  let s = await patch(a, p.govde)
+  if (!s.hata && s.satir === 0) {
+    // yaris: aile okunmasindan sonra degismis. Yeniden oku, plani yeniden kur, 1 kez dene.
+    const [taze] = await oku(`id=eq.${a.id}&tenant_id=eq.${a.tenant_id}`)
+    const p2 = taze ? yazimPlani(taze, y) : { hata: 'aile artik yok' }
+    if (!p2.govde) {
+      hatalar.push(`${y.slug}: yeniden okumada yazilamaz — ${p2.hata || p2.atla}`)
+      continue
+    }
+    a = taze
+    s = await patch(a, p2.govde)
+  }
+  if (s.hata) hatalar.push(`${y.slug}: ${s.hata}`)
+  else if (s.satir === 1) basarili++
+  else hatalar.push(`${y.slug}: donen satir ${s.satir} (yaris ikinci denemede de surdu)`)
+}
 console.log('')
-console.log(`YAZILAN: ${basarili}/${yuk.length}`)
+console.log(`YAZILAN: ${basarili}/${yazilacak.length}`)
+
+// ---- YAZIM SONRASI DOGRULAMA (beyan degil, olcum)
+const son = new Map((await oku(`slug=in.(${sluglar.join(',')})`)).map((a) => [a.slug, a]))
+const uymayan = yazilacak
+  .map(({ y }) => y)
+  .filter((y) => {
+    const d = son.get(y.slug)?.description || {}
+    return d.en !== y.kimlik_en || (y.kip === 'b' && (d.tr !== y.kimlik_tr || son.get(y.slug)?.is_description_manual !== true))
+  })
+  .map((y) => y.slug)
+console.log(`DOGRULAMA (canlidan okundu): yuk ile birebir ${yazilacak.length - uymayan.length}/${yazilacak.length}`)
+if (uymayan.length) hatalar.push(`canlida yukle uymayan: ${uymayan.join(', ')}`)
 if (hatalar.length) {
   console.error(`⛔ HATA ${hatalar.length}:`)
   for (const h of hatalar) console.error('   ' + h)
+  process.exit(1)
 }
-
-// ---- YAZIM SONRASI DOGRULAMA (beyan degil, olcum)
-const kontrol = await fetch(
-  `${URL_}/rest/v1/product_families?select=slug,description,is_description_manual&slug=in.(${sluglar.join(',')})`,
-  { headers: basliklar },
-)
-const son = await kontrol.json()
-const trDolu = son.filter((a) => a.description?.tr && a.description.tr.length >= 20).length
-const elle = son.filter((a) => a.is_description_manual === true).length
-const blokDolu = son.filter((a) => a.description?.bloklar_tr).length
-console.log(`DOGRULAMA (canlidan okundu): tr dolu ${trDolu}/${sluglar.length} · is_description_manual=true ${elle}/${sluglar.length} · bloklar_tr ${blokDolu}`)
-process.exit(hatalar.length ? 1 : 0)
+process.exit(0)

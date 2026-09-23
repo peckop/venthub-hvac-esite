@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import { createRedirectResponse,resolveUserClaims } from '@/utils/router'
 
 import { resolveTenant } from './lib/tenantResolver'
+import { tercihEdilenDil } from './utils/dilTespiti'
 import { Routes } from './utils/routes'
 
 export const config = {
@@ -16,16 +17,14 @@ export const config = {
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const ADMIN_ROLES = new Set(['super_admin', 'admin', 'moderator', 'warehouse', 'sales', 'viewer'])
 const LOCALES = ['tr', 'en'] as const
-const DEFAULT_LOCALE = 'tr'
+const DEFAULT_LOCALE = 'tr' as const
 
 function detectLocale(request: NextRequest): string {
   const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
   if (cookieLocale === 'tr' || cookieLocale === 'en') return cookieLocale
   
-  const acceptLang = request.headers.get('accept-language') || ''
-  if (acceptLang.toLowerCase().includes('en')) return 'en'
-  
-  return 'tr'
+  // Öncelik sırasıyla (q ağırlığı) — `includes('en')` Türkçe tarayıcıyı İngilizceye yolluyordu.
+  return tercihEdilenDil(request.headers.get('accept-language'), DEFAULT_LOCALE)
 }
 
 export async function middleware(request: NextRequest) {
