@@ -51,8 +51,11 @@ describe('üretici fark tablosu', () => {
     expect(r.status, r.stderr).toBe(0)
     const csv = readFileSync(join(kok, 'fark.csv'), 'utf8')
     const satir = (sku: string, alan: string) => csv.split('\n').find(l => l.startsWith(`${sku};`) && l.includes(`;${alan};`)) ?? ''
-    expect(satir('AVE-NX313290', 'en yüksek debi')).toMatch(/;5240;.*;5500;.*;üretici;/)
-    expect(satir('AVE-NX353290', 'en yüksek debi')).toMatch(/;aynı;/)
+    // Casals "Air flow" üst sınır mı çalışma noktası mı söylemez → etiket "tanımsız", fark 'belirsiz' (§11.7)
+    const debi = 'debi (kaynakta tanımsız: Air flow)'
+    expect(satir('AVE-NX313290', debi)).toMatch(/;5240;.*;5500;.*;belirsiz;/)
+    expect(satir('AVE-NX353290', debi)).toMatch(/;aynı;/)
+    expect(csv).not.toMatch(/;en yüksek debi;/)
     expect(satir('AVE-NX313290', 'üretici kodu')).toMatch(/;belirsiz;/)
     expect(satir('AVE-NX353290', 'üretici kodu')).toMatch(/;aynı;/)
     // ana depo PUBLIC: AVenS fiyat hücresi (1818, 2173) alıntıya sızmaz
@@ -64,7 +67,7 @@ describe('üretici fark tablosu', () => {
     expect(r.status, r.stderr).toBe(0)
     expect(r.stdout).toMatch(/bizde karşılaştırılacak değer yok 0/)
     // ad kW'ı her zaman var → motor gücü satırları yine çıkar, debi satırı ÇIKMAZ
-    expect(readFileSync(join(kok, 'fark.csv'), 'utf8')).not.toMatch(/en yüksek debi/)
+    expect(readFileSync(join(kok, 'fark.csv'), 'utf8')).not.toMatch(/debi/)
   })
 
   it('rapor TÜM ürünleri marka → aile altında listeler; karşılaştırılamayanın NEDENİ yazılır; bayt-eşit', () => {
@@ -82,7 +85,7 @@ describe('üretici fark tablosu', () => {
     const r = readFileSync(join(kok, 'r1.md'), 'utf8')
     expect(r).toBe(readFileSync(join(kok, 'r2.md'), 'utf8'))
     expect(r.indexOf('## AVenS')).toBeLessThan(r.indexOf('## Vortice'))
-    expect(r).toMatch(/### avens-nimax — 1 ürün[\s\S]*\| en yüksek debi \| 5240 m³\/h \| 5500 m³\/h \|.*\*\*üretici\*\*/)
+    expect(r).toMatch(/### avens-nimax — 1 ürün[\s\S]*\| debi \(kaynakta tanımsız: Air flow\) \| 5240 m³\/h \| 5500 m³\/h \|.*\*\*belirsiz\*\*/)
     expect(r).toMatch(/web'de föy yok — AVenS'ten istendi \(1\): AVE-1200/)
     expect(r).toMatch(/belgesi henüz okunmadı \(1\): VRT-1/)
     expect(r).toMatch(/\| Katalogdaki ürün \| 3 \|/)

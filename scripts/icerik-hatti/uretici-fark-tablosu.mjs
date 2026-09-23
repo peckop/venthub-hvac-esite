@@ -96,7 +96,7 @@ const okuyucular = {
     const fan = r.find(x => x[0] === 'RPM' && x[4] === 'Max. Flow'), mot = r.find(x => x[0] === 'Power')
     if (!fan || !mot) return []
     return [{ anahtar: `CMS ATEX ${ust[1]} T${ust[2]}`, model: ust[0].split(':')[0].trim(), kod: null,
-      alanlar: { motor_gucu_kw: sayi(mot[1]), debi_m3h: sayi(fan[5]), devir_rpm: sayi(fan[1]) },
+      alanlar: { motor_gucu_kw: sayi(mot[1]), debi_m3h: sayi(fan[5]), devir_rpm: sayi(fan[1]) }, debiTanimli: true,
       belge: k.dosya, sayfa: 2, alinti: `${satirMetni(fan)} // ${satirMetni(mot)}`, tur: 'üretici',
       alintiParcalari: [satirMetni(fan), satirMetni(mot)] }]
   },
@@ -144,6 +144,7 @@ const anahtarBul = ad => {
 const ALAN = {
   motor_gucu_kw: { ad: 'motor gücü', birim: 'kW' },
   debi_m3h: { ad: 'en yüksek debi', birim: 'm³/h' },
+  debi_tanimsiz: { ad: 'debi (kaynakta tanımsız: Air flow)', birim: 'm³/h' },
   devir_rpm: { ad: 'devir', birim: 'd/dk' },
   kod: { ad: 'üretici kodu', birim: '' },
   cekilen_guc_kw: { ad: 'güç (bizde çekilen güç, kaynakta motor gücü)', birim: 'kW' },
@@ -184,13 +185,20 @@ for (const u of urunler) {
     ekle(u, 'motor_gucu_kw', adKw(u.name), 'ürün adı (canlı)', { ...kaynak, deger: ur.alanlar.motor_gucu_kw })
     const av = avensListe.get(a)
     if (av) {
-      ekle(u, 'debi_m3h', av.debi_m3h, `AVenS fiyat listesi 2026 s.${av.sayfa}: ${av.alinti}`, { ...kaynak, deger: ur.alanlar.debi_m3h })
+      // DEBİNİN ANLAMI KAYNAĞA BAĞLI (§11.7, 2026-09-22 çürütmede bulundu): Casals/Enkelfan tablosu
+      // "Air flow" der — üst sınır mı çalışma noktası mı SÖYLEMEZ; AVenS listesi de tanımsız. Bu
+      // değerler "en yüksek debi" diye etiketlenemez ve fark "üretici" hükmü alamaz (aynı büyüklük
+      // olduğu kanıtlanmadı) → 'belirsiz'. Yalnız "Max. Flow" diyen kaynak (CMS föyü) en yüksektir.
+      const debiAlani = ur.debiTanimli ? 'debi_m3h' : 'debi_tanimsiz'
+      ekle(u, debiAlani, av.debi_m3h, `AVenS fiyat listesi 2026 s.${av.sayfa}: ${av.alinti}`, { ...kaynak, deger: ur.alanlar.debi_m3h },
+        !!ur.debiTanimli, ur.debiTanimli ? '' : 'kaynak "Air flow" diyor: en yüksek debi mi çalışma noktası mı belirtilmemiş — AVenS\'e sorulur')
       // PDF çıkarımı kodun içine boşluk sokabiliyor ("ENKEC 155") — biçim farkı, kod farkı değil
       if (ur.kod) ekle(u, 'kod', av.kod.replace(/\s+/g, ''),`AVenS fiyat listesi 2026 s.${av.sayfa}`, { ...kaynak, deger: ur.kod }, false,
         'kod farkı: sürüm farkı mı yazım hatası mı — AVenS\'e sorulur')
     }
     const ts = u.technical_specs || {}
-    if (ts.max_delivery_m3h != null) ekle(u, 'debi_m3h', sayi(ts.max_delivery_m3h), 'canlı teknik veri', { ...kaynak, deger: ur.alanlar.debi_m3h })
+    if (ts.max_delivery_m3h != null) ekle(u, ur.debiTanimli ? 'debi_m3h' : 'debi_tanimsiz', sayi(ts.max_delivery_m3h),
+      'canlı teknik veri (max_delivery_m3h)', { ...kaynak, deger: ur.alanlar.debi_m3h }, !!ur.debiTanimli)
     if (ts.rpm_max != null) ekle(u, 'devir_rpm', sayi(ts.rpm_max), 'canlı teknik veri', { ...kaynak, deger: ur.alanlar.devir_rpm })
     if (!satirlar.some(r => r.sku === u.sku)) { bizdeDegerYok.push(`${u.sku} ${u.name}`); durum.set(u.sku, 'bizde değer yok') }
     continue
