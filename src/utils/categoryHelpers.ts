@@ -1,5 +1,6 @@
 import type { DbCategory } from '../types/db-rows'
 import type { DomainCategory } from '../types/ui-models'
+import { metniIndir } from './dilMetni'
 
 /**
  * Minimal shape needed to resolve a category URL slug: both `DbCategory` and
@@ -209,4 +210,26 @@ export const parsePriceToNumber = (val: unknown): number => {
         return isNaN(parsed) ? 0 : parsed
     }
     return 0
+}
+
+/**
+ * INV-DIL-DUSUSU-1 · sunucudan istemciye giden kategori satırını SAYFANIN DİLİNE indirir:
+ * `metadata.description_i18n` tek dile, tek dilli (Türkçe) legacy alanlar (`metadata.hero_description`,
+ * `description`) EN'de düşer. `metadata.slug` {tr,en} İKİ DİLDE kalır — dil değiştirici ve hreflang
+ * ona muhtaç. Bu dosyada durur çünkü kategori metadata metnine dokunan meşru tek yer burasıdır (INV-4).
+ */
+export function kategoriMetniniIndir<T extends { description?: unknown; metadata?: unknown }>(
+    kategori: T,
+    lang: string
+): T {
+    const cikti = { ...kategori }
+    const meta = cikti.metadata
+    if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
+        const m = { ...(meta as Record<string, unknown>) }
+        if ('description_i18n' in m) m.description_i18n = metniIndir(m.description_i18n, lang)
+        if (lang === 'en') delete m.hero_description
+        ;(cikti as Record<string, unknown>).metadata = m
+    }
+    if (lang === 'en' && 'description' in cikti) (cikti as Record<string, unknown>).description = null
+    return cikti
 }

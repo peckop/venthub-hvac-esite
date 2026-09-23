@@ -29,7 +29,8 @@ import {
 import type { ProductRouteResolution } from '../../../../lib/data/productRoute'
 import { resolveProductRoute } from '../../../../lib/data/productRoute'
 import { familyName } from '../../../../lib/i18n/familyName'
-import { aileMetniniIndir, dildekiMetin, kategoriMetniniIndir } from '../../../../utils/dilMetni'
+import { kategoriMetniniIndir } from '../../../../utils/categoryHelpers'
+import { aileMetniniIndir, dildekiMetin } from '../../../../utils/dilMetni'
 import { Routes } from '../../../../utils/routes'
 import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 

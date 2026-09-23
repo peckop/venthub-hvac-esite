@@ -24,7 +24,7 @@ export function dildekiMetin(value: DilliMetin, lang: string): string | null {
  * sayfaya gömülü veride (RSC akışı) VARDI; istemci bileşenine iki dilin metni birden gidiyordu.
  * Gömülü katman ekran katmanından ayrı ölçülür ve ayrı onarılır.
  */
-function metniIndir(value: unknown, lang: string): { tr?: string | null; en?: string | null } | null {
+export function metniIndir(value: unknown, lang: string): { tr?: string | null; en?: string | null } | null {
   if (!value || typeof value !== 'object') return null
   const v = value as { tr?: unknown; en?: unknown }
   const metin = lang === 'en' ? v.en : v.tr
@@ -40,26 +40,5 @@ export function aileMetniniIndir<T extends { description?: unknown; meta_title?:
   for (const alan of ['description', 'meta_title', 'meta_description'] as const) {
     if (alan in cikti) (cikti as Record<string, unknown>)[alan] = metniIndir(cikti[alan], lang)
   }
-  return cikti
-}
-
-/**
- * Kategori satırının metin alanları sayfanın diline iner: `metadata.description_i18n` tek dile,
- * tek dilli (Türkçe) legacy alanlar (`metadata.hero_description`, `description`) EN'de düşer.
- * `metadata.slug` {tr,en} İKİ DİLDE kalır — dil değiştirici ve hreflang ona muhtaç.
- */
-export function kategoriMetniniIndir<T extends { description?: unknown; metadata?: unknown }>(
-  kategori: T,
-  lang: string
-): T {
-  const cikti = { ...kategori }
-  const meta = cikti.metadata
-  if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
-    const m = { ...(meta as Record<string, unknown>) }
-    if ('description_i18n' in m) m.description_i18n = metniIndir(m.description_i18n, lang)
-    if (lang === 'en') delete m.hero_description
-    ;(cikti as Record<string, unknown>).metadata = m
-  }
-  if (lang === 'en' && 'description' in cikti) (cikti as Record<string, unknown>).description = null
   return cikti
 }
