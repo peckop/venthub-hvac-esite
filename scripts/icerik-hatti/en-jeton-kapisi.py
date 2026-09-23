@@ -71,6 +71,9 @@ TR_HARF = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
 
 
 def temizle(metin):
+    # Markdown basliklari ("### Kimlik cümlesi") taslak iskeletidir, vitrine gitmez; Turkce
+    # baslik EN dosyada "Turkce harf" yanlis kirmizisi uretiyordu (olculdu, k70 sinavi).
+    metin = re.sub(r"(?m)^\s*#{1,6}\s.*$", " ", metin)
     return IC_ISARET.sub(" ", metin)
 
 
