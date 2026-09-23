@@ -1225,7 +1225,8 @@ export const en: typeof tr = {
   },
   pdp: {
     // Teknik ozellik ALAN adlari — specLabel.ts 'pdp.specs.<anahtar>' yolunu arar.
-    // Kaynak: canli DB technical_specs anahtarlari (2026-08-22, 73 tekil anahtar).
+    // Kaynak: canli DB technical_specs anahtarlari (2026-08-22, 73 tekil anahtar; 2026-09-23 77 —
+    // atex_zone, max_total_pressure_pa, permissible_motor_power_w eklendi, product-schema-standard).
     // Birim etikete GIRMEZ — deger tarafi formatSpecValue ile birimi kendi ekler.
     // TEK ISTISNA: max_delivery_m3h / max_delivery_ls ayni 180 uründe BIRLIKTE bulunur;
     // birim yazilmazsa iki satir ayni etiketle farkli sayi gosterir ve celiskili okunur.
@@ -1234,6 +1235,7 @@ export const en: typeof tr = {
       airflow_speed_max_ms: '2nd Stage Air Velocity',
       airflow_speed_min_ms: '1st Stage Air Velocity',
       atex_marking: 'ATEX Marking',
+      atex_zone: 'ATEX Zone',
       blade_diameter_mm: 'Blade Diameter',
       co2_sensor: 'CO2 Sensor',
       compatible_model: 'Compatible Model',
@@ -1266,6 +1268,7 @@ export const en: typeof tr = {
       max_delivery_m3h: 'Max. Airflow (m³/h)',
       max_operating_temperature_c: 'Max. Operating Temperature',
       max_static_pressure_pa: 'Max. Static Pressure',
+      max_total_pressure_pa: 'Max. Total Pressure',
       max_voltage_v: 'Max. Voltage',
       min_delivery_m3h: 'Min. Airflow',
       min_operating_temperature_c: 'Min. Operating Temperature',
@@ -1281,6 +1284,7 @@ export const en: typeof tr = {
       number_of_speeds: 'Number of Speeds',
       operating_temperature_c: 'Operating Temperature',
       optional_heater_power_w: 'Optional Heater Power',
+      permissible_motor_power_w: 'Max. Permissible Motor Power',
       phase: 'Phase',
       pm10_sensor: 'PM10 Sensor',
       pm2_5_sensor: 'PM2.5 Sensor',

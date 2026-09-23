@@ -13,6 +13,7 @@ import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { familyName } from '../../lib/i18n/familyName'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { dildekiMetin } from '../../utils/dilMetni'
 
 /**
  * T138-VH K1 — SERİ LANDING görünümü.
@@ -47,11 +48,10 @@ const SeriesLandingView: React.FC<SeriesLandingViewProps> = ({ series, models, l
   const gorunenSeriAdi = familyName(series, lang)
   const Routes = useLocalizedRoutes()
 
+  // INV-DIL-DUSUSU-1: seri metni yalnız sayfanın dilinde; yoksa sözlükteki (aynı dildeki) genel
+  // cümle. Başka dile düşmez — EN sayfada Türkçe gövde metni bir kusurdur (Recep 2026-09-22).
   const description =
-    (lang === 'en' ? series.description?.en : series.description?.tr) ||
-    series.description?.tr ||
-    series.description?.en ||
-    t('category.landing.descriptionFallback')
+    dildekiMetin(series.description, lang) || t('category.landing.descriptionFallback')
 
   // Seri satırının kendi görseli yoktur (doğrudan varyantı yok) — kapak ilk modelden gelir.
   const heroImage =

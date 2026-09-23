@@ -185,7 +185,9 @@ describe('INV-KATEGORI-ACIKLAMA-1 · kategori açıklaması dile göre çözül�
   })
 
   // -------------------------------------------------------------------------
-  it('K2 · description_i18n YOKKEN sonuç, eski algoritmayla BİREBİR aynı (geriye uyum)', () => {
+  // INV-DIL-DUSUSU-1 / K10 (vitrin-metni-standard): legacy alanlar tek dilli (Türkçe) → EN sayfada ASLA dönmez.
+  // Eski hâli "dil, legacy veride sonucu DEĞİŞTİRMEMELİ" diyordu = EN sayfa TR metne düşsün; K10 bunu yasakladı.
+  it('K2 · description_i18n YOKKEN TR eski algoritmayla aynı, EN boş (geriye uyum + K10)', () => {
     const legacyVakalari: CategoryDescriptionSource[] = [
       {},
       { description: 'sadece kolon' },
@@ -199,23 +201,14 @@ describe('INV-KATEGORI-ACIKLAMA-1 · kategori açıklaması dile göre çözül�
       { metadata: { hero_description: 'hero' }, description: null },
     ]
 
-    for (const lang of ['tr', 'en']) {
-      for (const vaka of legacyVakalari) {
-        expect(
-          getCategoryDescription(vaka, lang),
-          `geriye uyum KIRILDI (lang=${lang}): ${JSON.stringify(vaka)}`,
-        ).toBe(eskiCozucu(vaka))
-      }
+    for (const vaka of legacyVakalari) {
+      expect(getCategoryDescription(vaka, 'tr'), `geriye uyum KIRILDI (tr): ${JSON.stringify(vaka)}`).toBe(eskiCozucu(vaka))
+      expect(getCategoryDescription(vaka, 'en'), `EN sayfaya TR legacy düştü: ${JSON.stringify(vaka)}`).toBe('')
     }
 
     // null/undefined kolu da eski davranışı korumalı
     expect(getCategoryDescription(null, 'en')).toBe(eskiCozucu(null))
     expect(getCategoryDescription(undefined, 'tr')).toBe(eskiCozucu(undefined))
-
-    // Ve dil, legacy veride sonucu DEĞİŞTİRMEMELİ (tek dilli alanın doğası)
-    for (const vaka of legacyVakalari) {
-      expect(getCategoryDescription(vaka, 'tr')).toBe(getCategoryDescription(vaka, 'en'))
-    }
   })
 
   // -------------------------------------------------------------------------

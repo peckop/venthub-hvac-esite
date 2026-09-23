@@ -228,6 +228,7 @@ birlikte yapılır (REC-206 ayrı liste (i)).
 | Migration guard 3b | veri onarımı migration'ı | `bloklar_tr` + `maddeler_tr`'de desen, **adıyla muaf 6 parça dışında** 0 eşleşme | koşum başına bir kez |
 | Migration guard 3c | veri onarımı migration'ı | dokunulmaması gereken **20** parçanın md5'i birebir (K3'ün ve muafiyetin kanıtı) | koşum başına bir kez |
 | KAPI 5 | [aile-metni-yaz.mjs:110](scripts/icerik-hatti/aile-metni-yaz.mjs#L110) | yazma anında **yalnız atıf biçimleri** (`[s.NN]`, `[DB]`, `Kaynak s.NN`) | ⛔K2'nin on biçiminden dokuzu kapı dışı — **ALTYAPI borcu**, karar 42'den devir |
+| INV-DIL-DUSUSU-1 | [dil-dususu-yok.test.ts](src/test/dil-dususu-yok.test.ts) + [dil-dususu.e2e.ts](e2e/dil-dususu.e2e.ts) | K10: kaynakta çapraz dil düşüşü deseni 0; EN ürün ve kategori sayfasında TR gövde metni 0 (gerçek sunucu HTML'i) | yinelenen — her PR |
 | Canlı ölçüm | merge sonrası, elle | anon rolüyle `get_family_detail` + `get_product_families_enriched` çıktısında desen, **muaf 6 parça dışında** 0 | ⛔kod karşılığı YOK (elle prosedür) |
 
 ⚠**Üç migration guard'ı yalnız o migration koşarken bir kez çalışır.** Merge'ten sonra muaf
@@ -240,6 +241,30 @@ muaf 6 parça canlıda deseni taşımaya devam edecek. Cetvelin ilk hâli bu tuz
 
 ⚠Son satır ayrı yazılır: **ekranda görünen / sayfaya gömülü / API'den okunabilir üç ayrı
 katmandır**, biri ölçülünce diğerleri ölçülmüş sayılmaz.
+
+## K10 — Dil kuralı: vitrin metni yalnız sayfanın dilinde gösterilir
+
+**Kural:** vitrin metni (aile açıklaması, seri metni, kategori paragrafı, sayfa/yapısal veri
+açıklaması) **yalnız sayfanın dilinde** gösterilir. O dilde metin yoksa **yüzey gizlenir** — boş
+kutu, boş başlık, boş paragraf kalmaz. Aynı dilde genel bir sözlük cümlesi (ör.
+`category.landing.descriptionFallback`) kullanılabilir; **başka dile düşmek yasaktır**.
+
+**Karar değil onarımdır (Recep 2026-09-22):** *"müşteriye görünen dil/eksik içerik kusuru bana
+karar diye gelmez; affedilmez, düzeltilir."* Böyle bir kusur bulunduğunda seçenek sunulmaz,
+onarılır; yalnız onarımın yöntemi raporlanır.
+
+**Niçin (ölçüm 2026-09-22):** üç ayrı `pickLang` kopyası "tercih → tr → en" sırasıyla çözüyordu:
+47 ailenin 45'inde TR, 20'sinde EN açıklama vardı → **25 aile sayfası** `/en/` altında Türkçe
+gövde metni basıyordu. 24 kategorinin açıklamasında EN **0**; legacy `hero_description` (Türkçe)
+EN sayfaya düşüyordu. Ürün düzeyi (`products.description_i18n`) temizdi: TR 187 / EN 187.
+
+**Çözücü:** [`dildekiMetin`](src/utils/dilMetni.ts) — tek kaynak; yerel kopya yazılmaz. Tek dilli
+legacy alanlar (`hero_description`, `categories.description`) Türkçedir ve yalnız TR sayfada okunur.
+
+**Kapsam dışı (adıyla):** ürün/aile/kategori **ADLARI** bu kuralın konusu değildir — ad özel
+isimdir, gizlenemez; EN adı boş 7 ailenin adı EN sayfada Türkçe kalır, onarımı veri
+doldurmaktır (KATALOG, REC-300 madde 6). EN gövde metni boş 25 aile de veri işidir; EN vitrin
+(`EN_YAYIN`) açılmadan önce doldurulur.
 
 ## K9 — Veri onarımı migration'ının yöntemi
 

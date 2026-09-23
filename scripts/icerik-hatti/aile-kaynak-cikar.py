@@ -28,8 +28,8 @@ YERLESIK = {
     "MONO": "vortice_vort_mono_range_new.pdf",
 }
 HARITA_YORUM = re.compile(r"<!--\s*KAYNAK-HARITASI:\s*([^>]*?)-->")
-VARSAYILAN_YORUM = re.compile(r"<!--\s*VARSAYILAN-KAYNAK:\s*([A-Za-zÇĞİÖŞÜçğıöşü]+)\s*-->")
-REF = re.compile(r"\[([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+s\.\s*[0-9]")
+VARSAYILAN_YORUM = re.compile(r"<!--\s*VARSAYILAN-KAYNAK:\s*([A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*)\s*-->")
+REF = re.compile(r"\[([A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*)\s+s\.\s*[0-9]")
 # Adsiz referans: [s.41] — kaynak adi VARSAYILAN-KAYNAK yorumundan gelir.
 REF_ADSIZ = re.compile(r"\[s\.\s*[0-9]")
 BASLIK = re.compile(r"^#{2,4}\s+.*$", re.M)

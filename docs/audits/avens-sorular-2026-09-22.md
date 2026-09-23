@@ -70,6 +70,9 @@ Aşağıdaki ürünlerin teknik föyünü web'de bulamadık. **Föylerini gönde
 | VORTICENT CMS ATEX 12/5 ve 14/5 devri | Fan 1450 d/dk, motor 1346 d/dk (doğrudan tahrikli) | Doğru devir hangisi? |
 | ENKELFAN EEC 355-630 gerilimi | Metinde "400V", bağlantı şemasında "AC380V" | Çalışma gerilimi 400 V mı 380 V mı? |
 | ENKELFAN EEC gücü | "Rated Power kW" — ENKELFAN 155: 230 V, 0,25 A, 0,06 kW (230 × 0,25 = 57,5 VA) | Bu değer motorun mil (çıkış) gücü mü, şebekeden çekilen elektrik gücü mü? |
+| Sulu batarya ısıtma gücü (fiyat listesi s.69) | Ürün adındaki kW ile aynı satırdaki kcal/h (90/70 °C) değeri tutmuyor: "7 KW … 4700 kcal/h" (= 5,5 kW) · "11 KW … 11300" (= 13,1 kW) · "14 KW … 20700" (= 24,1 kW) · "20 KW … 33000" (= 38,4 kW) · "28 KW … 37400" (= 43,5 kW) · "36 KW … 42500" (= 49,4 kW) · "40 KW … 47300" (= 55,0 kW). Yalnız 8 KW / 7000 kcal/h tutarlı. | Ürünün ısıtma gücü hangisi: addaki kW mı, kcal/h değeri mi? Hangi hava debisi ve su sıcaklığında? |
+| Sulu batarya "DEBİ" sütunu | 750 … 5000 m³/h, "UYGUN MODEL" sütunuyla aynı sayı | Bu, bataryanın anma (tasarım) debisi mi, yoksa eşleştiği ısı geri kazanım cihazının debisi mi? |
+| QE-B kasa, K90 R ve K90 S metinleri | s.21'de iki satırın metni baştan kesik ("-ren TUM onaylı…", "Yangına dayanıklı K90 18017-3'e…") | Bu iki modelin tam teknik açıklaması (valf malzemesi dahil) nedir? |
 
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.

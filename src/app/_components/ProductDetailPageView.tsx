@@ -47,6 +47,7 @@ import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { FamilyListItem,Product } from '../../types/ui-models'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { dildekiMetin } from '../../utils/dilMetni'
 import { musteriyeGorunurAciklama } from '../../utils/icIngestNotu'
 import {
   formatSpecValue,
@@ -117,14 +118,6 @@ const SUTUN_SINIFI: Record<number, string> = {
   1: 'grid-cols-1',
   2: 'grid-cols-2',
   3: 'grid-cols-3',
-}
-
-type LocalizedText = { tr?: string | null; en?: string | null } | null
-
-function pickLang(value: LocalizedText, lang: string): string | null {
-  if (!value) return null
-  const preferred = lang === 'en' ? value.en : value.tr
-  return preferred || value.tr || value.en || null
 }
 
 const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
@@ -422,7 +415,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   //
   // ⭐Bu yüzden çözüm "origin'i tarayıcıdan al" DEĞİLDİR: öyle yapmak yukarıdaki K8
   // arızasını geri getirirdi. Doğru çözüm ikinci yazıcıyı kaldırmaktır.
-  const variantDescription = selectedVariant.description || pickLang(family.description, lang)
+  // INV-DIL-DUSUSU-1: aile metni yalnız sayfanın dilinde; yoksa açıklama bölümü hiç çizilmez
+  // (aşağıda `aciklamaMetni ?` koşulu). Varyant açıklaması RPC'de zaten dile göre çözülüyor.
+  const variantDescription = selectedVariant.description || dildekiMetin(family.description, lang)
   /**
    * AÇIKLAMA YOKSA SATIR HİÇ ÇİZİLMEZ (REC-148 A4, 2026-09-05) — K7 / K1.
    *
@@ -941,8 +936,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                               <Info className="text-primary-navy mr-2.5" size={16} />
                               {t('pdp.labels.productDescription')}
                             </h4>
-                            <div className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
-                              {/* RPC dil çözümünü ve aile fallback'ini zaten yaptı. */}
+                            <div data-testid="urun-aciklama" className="prose prose-slate max-w-none text-steel-gray leading-relaxed text-sm font-medium">
+                              {/* Varyant metni RPC'de dile göre çözülür; aile metni dildekiMetin ile (INV-DIL-DUSUSU-1). */}
                               <RichTextRenderer content={aciklamaMetni} />
                             </div>
                           </div>

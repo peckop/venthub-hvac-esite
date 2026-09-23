@@ -2890,6 +2890,36 @@ export type Database = {
         }
         Relationships: []
       }
+      url_takma_adlari: {
+        Row: {
+          created_at: string
+          dil: string
+          eski_slug: string
+          hedef_id: string
+          sebep: string
+          tenant_id: string
+          tur: string
+        }
+        Insert: {
+          created_at?: string
+          dil: string
+          eski_slug: string
+          hedef_id: string
+          sebep: string
+          tenant_id: string
+          tur: string
+        }
+        Update: {
+          created_at?: string
+          dil?: string
+          eski_slug?: string
+          hedef_id?: string
+          sebep?: string
+          tenant_id?: string
+          tur?: string
+        }
+        Relationships: []
+      }
       user_addresses: {
         Row: {
           address_line: string
@@ -4534,6 +4564,10 @@ export type Database = {
       update_inventory_thresholds: {
         Args: { p_default: number; p_reset_overrides?: boolean }
         Returns: undefined
+      }
+      url_takma_ad_coz: {
+        Args: { p_dil: string; p_eski_slug: string; p_tur: string }
+        Returns: string
       }
     }
     Enums: {

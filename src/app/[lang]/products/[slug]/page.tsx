@@ -29,6 +29,8 @@ import {
 import type { ProductRouteResolution } from '../../../../lib/data/productRoute'
 import { resolveProductRoute } from '../../../../lib/data/productRoute'
 import { familyName } from '../../../../lib/i18n/familyName'
+import { kategoriMetniniIndir } from '../../../../utils/categoryHelpers'
+import { aileMetniniIndir, dildekiMetin } from '../../../../utils/dilMetni'
 import { Routes } from '../../../../utils/routes'
 import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
 
@@ -39,13 +41,9 @@ import { ProductDetailPage as PageComponent } from '../../../_components/Product
  * 308 (permanentRedirect) ile aile URL'ine taşınır.
  */
 
-type LocalizedText = { tr?: string | null; en?: string | null } | null
-
-function pickLang(value: LocalizedText, lang: string): string | null {
-  if (!value) return null
-  const preferred = lang === 'en' ? value.en : value.tr
-  return preferred || value.tr || value.en || null
-}
+// INV-DIL-DUSUSU-1: başlık/açıklama yalnız sayfanın dilinde; yoksa zincirin sonraki (aynı dildeki)
+// halkasına düşer, başka dile düşmez.
+const pickLang = dildekiMetin
 
 /**
  * ROTA SINIFI İLANI (REC-348 / Recep kararı 21, 2026-09-16).
@@ -214,7 +212,7 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(seriesJsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
         />
-        <SeriesLandingView series={series} models={models} lang={lang} />
+        <SeriesLandingView series={aileMetniniIndir(series, lang)} models={models} lang={lang} />
       </>
     )
   }
@@ -302,7 +300,16 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
         />
       )}
       {/* W4b: KDV etiketi sabit değil — bireysel/anon brüt, bayi/kurumsal net görür. */}
-      <PageComponent family={family} variants={variants} priceTaxIncluded={detail?.price_tax_included ?? null} />
+      {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
+      <PageComponent
+        family={family ? {
+          ...aileMetniniIndir(family, lang),
+          category: family.category ? kategoriMetniniIndir(family.category, lang) : null,
+          subcategory: family.subcategory ? kategoriMetniniIndir(family.subcategory, lang) : null,
+        } : family}
+        variants={variants}
+        priceTaxIncluded={detail?.price_tax_included ?? null}
+      />
     </>
   )
 }

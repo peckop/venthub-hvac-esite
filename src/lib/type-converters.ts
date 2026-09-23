@@ -93,7 +93,10 @@ export const mapCategoryWithLocale = (
 
   const meta = dbCat.metadata
   // Retrieve the localized object or fallback to base metadata fields
-  const localized = (meta[lang] || meta['tr'] || meta) as CategoryMetadata
+  // INV-DIL-DUSUSU-1: aktif dilin nesnesi yoksa TÜRKÇE nesneye düşülmez (EN sayfada Türkçe
+  // alan yayılırdı); dil-nötr kök metadata kullanılır. Ölçüm 2026-09-22: canlıda hiçbir
+  // kategorinin metadata'sında `tr`/`en` alt nesnesi yok — dil metni `description_i18n`'de.
+  const localized = (meta[lang] || meta) as CategoryMetadata
 
   return {
     ...base,

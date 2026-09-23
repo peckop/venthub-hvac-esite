@@ -158,7 +158,8 @@ describe('type-converters', () => {
             expect(result.metadata?.hero_title).toBe('EN Title')
         })
 
-        it('istenen dil yoksa tr metadatasına düşer', () => {
+        // INV-DIL-DUSUSU-1 / vitrin-metni K10: yanlış dilde metin kusurdur — EN yoksa TR'ye DÜŞMEZ.
+        it('istenen dil yoksa tr metadatasına düşmez', () => {
             const dbCat: Partial<DbCategory> = {
                 ...baseCat,
                 metadata: {
@@ -166,7 +167,7 @@ describe('type-converters', () => {
                 },
             }
             const result = mapCategoryWithLocale(dbCat as DbCategory, 'en')
-            expect(result.metadata?.hero_title).toBe('TR Başlık')
+            expect(result.metadata?.hero_title).toBeUndefined()
         })
 
         it('lang verilmezse varsayılan olarak tr kullanır', () => {

@@ -1,0 +1,860 @@
+{
+ "_nicin": [
+  "Cetvel product-schema-standard §11.7 'Motor gücü' (K9) legacy borcu: SEAT/STORM (ve ölçümde KENTALFAN) ürünlerinde",
+  "max_absorbed_power_w değeri kaynağın motor gücü sütunundan geliyor — doğru alanı rated_power_w (anma mil gücü).",
+  "Kapsam: değeri ürün adındaki motor kW'ı ile BİREBİR aynı olan ürünler (değer taşınır, değişmez). Farklı olan 9 ürün",
+  "(STORM 7, SEAT 2) AVenS'e sorulan güç tutarsızlığıdır (avens-sorular §3) — DOKUNULMAZ."
+ ],
+ "_kanit": {
+  "olcum": "2026-09-23 canlı: SEAT 38, STORM 13, KENTALFAN 14 ürün max_absorbed_power_w == ad kW×1000, rated_power_w yok.",
+  "kaynak": "SEAT fiche technique 'Motor Power (kW)'; AVenS fiyat listesi s.39-45 'kW' sütunu (motor); Casals plug-fan kataloğu KENTALFAN 'Rated Power kW'.",
+  "fark_raporu": "kaynak-eslemesi 2026-09-23: bu değerlerde 'olcek (10 kati)' sahte çelişkisi (kW↔W) — REC-172 yorumu f6e945ac."
+ },
+ "skus": {
+  "AVE-248312106": {
+   "_urun": "KENTALFAN 315 T2 1,5kW",
+   "degistir": {
+    "rated_power_w": 1500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1500,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248314103": {
+   "_urun": "KENTALFAN 315 M4 0,25kW",
+   "degistir": {
+    "rated_power_w": 250
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 250,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248314106": {
+   "_urun": "KENTALFAN 315 T4 0,25kW",
+   "degistir": {
+    "rated_power_w": 250
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 250,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248354103": {
+   "_urun": "KENTALFAN 355 M4 0,25kW",
+   "degistir": {
+    "rated_power_w": 250
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 250,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248354106": {
+   "_urun": "KENTALFAN 355 T4 0,25kW",
+   "degistir": {
+    "rated_power_w": 250
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 250,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248404103": {
+   "_urun": "KENTALFAN 400 M4 0,55kW",
+   "degistir": {
+    "rated_power_w": 550
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 550,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248404106": {
+   "_urun": "KENTALFAN 400 T4 0,55kW",
+   "degistir": {
+    "rated_power_w": 550
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 550,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248454106": {
+   "_urun": "KENTALFAN 450 T4 1,1kW",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248504106": {
+   "_urun": "KENTALFAN 500 T4 1,5kW",
+   "degistir": {
+    "rated_power_w": 1500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1500,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248506106": {
+   "_urun": "KENTALFAN 500 T6 0,55kW",
+   "degistir": {
+    "rated_power_w": 550
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 550,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248564106": {
+   "_urun": "KENTALFAN 560 T4 3kW",
+   "degistir": {
+    "rated_power_w": 3000
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 3000,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248566106": {
+   "_urun": "KENTALFAN 560 T6 1,1kW",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248634106": {
+   "_urun": "KENTALFAN 630 T4 5,5kW",
+   "degistir": {
+    "rated_power_w": 5500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 5500,
+    "rated_power_w": null
+   }
+  },
+  "AVE-248636106": {
+   "_urun": "KENTALFAN 630 T6 1,5kW",
+   "degistir": {
+    "rated_power_w": 1500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51151000": {
+   "_urun": "SEAT 15 · 950 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51152000": {
+   "_urun": "SEAT 15 · 1400 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51152003": {
+   "_urun": "SEAT 15 ATEX · 1400 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51153000": {
+   "_urun": "SEAT 15 · 2800 d/dk · 0,37 kW · 380V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51153003": {
+   "_urun": "SEAT 15 ATEX · 2800 d/dk · 0,37 kW · 380V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51153010": {
+   "_urun": "SEAT 15 · 2800 d/dk · 0,37 kW · 220V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51201000": {
+   "_urun": "SEAT 20 · 950 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51201003": {
+   "_urun": "SEAT 20 ATEX · 950 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51202000": {
+   "_urun": "SEAT 20 · 1400 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51202003": {
+   "_urun": "SEAT 20 ATEX · 1400 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51203000": {
+   "_urun": "SEAT 20 · 2800 d/dk · 0,75 kW · 380V",
+   "degistir": {
+    "rated_power_w": 750
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 750,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51203001": {
+   "_urun": "SEAT 20 · 2800 d/dk · 1,1 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51203003": {
+   "_urun": "SEAT 20 ATEX · 2800 d/dk · 0,75 kW · 380V",
+   "degistir": {
+    "rated_power_w": 750
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 750,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51203010": {
+   "_urun": "SEAT 20 · 2800 d/dk · 0,75 kW · 220V",
+   "degistir": {
+    "rated_power_w": 750
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 750,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51251000": {
+   "_urun": "SEAT 25 · 950 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51251003": {
+   "_urun": "SEAT 25 ATEX · 950 d/dk · 0,18 kW · 380V",
+   "degistir": {
+    "rated_power_w": 180
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 180,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51252000": {
+   "_urun": "SEAT 25 · 1400 d/dk · 0,37 kW · 380V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51252003": {
+   "_urun": "SEAT 25 ATEX · 1400 d/dk · 0,37 kW · 380V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51252010": {
+   "_urun": "SEAT 25 · 1400 d/dk · 0,37 kW · 220V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51253000": {
+   "_urun": "SEAT 25 · 2800 d/dk · 2,2 kW · 380V",
+   "degistir": {
+    "rated_power_w": 2200
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 2200,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51253001": {
+   "_urun": "SEAT 25 · 2800 d/dk · 1,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51253003": {
+   "_urun": "SEAT 25 ATEX · 2800 d/dk · 2,2 kW · 380V",
+   "degistir": {
+    "rated_power_w": 2200
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 2200,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51253300": {
+   "_urun": "SEAT 25 · 2800 d/dk · 3 kW · 380V",
+   "degistir": {
+    "rated_power_w": 3000
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 3000,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51301000": {
+   "_urun": "SEAT 30 · 950 d/dk · 0,55 kW · 380V",
+   "degistir": {
+    "rated_power_w": 550
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 550,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51302000": {
+   "_urun": "SEAT 30 · 1400 d/dk · 1,1 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51302003": {
+   "_urun": "SEAT 30 ATEX · 1400 d/dk · 1,1 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51302010": {
+   "_urun": "SEAT 30 · 1400 d/dk · 1,1 kW · 220V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51350000": {
+   "_urun": "SEAT 35 · 750 d/dk · 1,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51351000": {
+   "_urun": "SEAT 35 · 950 d/dk · 2,2 kW · 380V",
+   "degistir": {
+    "rated_power_w": 2200
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 2200,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51351003": {
+   "_urun": "SEAT 35 ATEX · 950 d/dk · 2,2 kW · 380V",
+   "degistir": {
+    "rated_power_w": 2200
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 2200,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51352000": {
+   "_urun": "SEAT 35 · 1400 d/dk · 5,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 5500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 5500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51352001": {
+   "_urun": "SEAT 35 · 1400 d/dk · 7,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 7500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 7500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51352003": {
+   "_urun": "SEAT 35 ATEX · 1400 d/dk · 5,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 5500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 5500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51352004": {
+   "_urun": "SEAT 35 ATEX · 1400 d/dk · 7,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 7500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 7500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51352400": {
+   "_urun": "SEAT 35 · 1400 d/dk · 4 kW · 380V",
+   "degistir": {
+    "rated_power_w": 4000
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 4000,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51501000": {
+   "_urun": "SEAT 50 · 950 d/dk · 4 kW · 380V",
+   "degistir": {
+    "rated_power_w": 4000
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 4000,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51502000": {
+   "_urun": "SEAT 50 · 1400 d/dk · 5,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 5500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 5500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-51502003": {
+   "_urun": "SEAT 50 ATEX · 1400 d/dk · 5,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 5500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 5500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61102003": {
+   "_urun": "STORM 10 ATEX · 1400 d/dk · 0,06 kW · 380V",
+   "degistir": {
+    "rated_power_w": 60
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 60,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61103003": {
+   "_urun": "STORM 10 ATEX · 2800 d/dk · 0,12 kW · 380V",
+   "degistir": {
+    "rated_power_w": 120
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 120,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61103110": {
+   "_urun": "STORM 10 · 1400 d/dk · 0,06 kW · 220V",
+   "degistir": {
+    "rated_power_w": 60
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 60,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61123000": {
+   "_urun": "STORM 12 · 2800 d/dk · 0,37 kW · 380V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61123003": {
+   "_urun": "STORM 12 ATEX · 2800 d/dk · 0,37 kW · 380V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61123010": {
+   "_urun": "STORM 12 · 2800 d/dk · 0,37 kW · 220V",
+   "degistir": {
+    "rated_power_w": 370
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 370,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61143000": {
+   "_urun": "STORM 14 · 2800 d/dk · 1,1 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61143003": {
+   "_urun": "STORM 14 ATEX · 2800 d/dk · 1,1 kW · 380V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61143010": {
+   "_urun": "STORM 14 · 2800 d/dk · 1,1 kW · 220V",
+   "degistir": {
+    "rated_power_w": 1100
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 1100,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61163000": {
+   "_urun": "STORM 16 · 2800 d/dk · 2,2 kW · 380V",
+   "degistir": {
+    "rated_power_w": 2200
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 2200,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61163003": {
+   "_urun": "STORM 16 ATEX · 2800 d/dk · 2,2 kW · 380V",
+   "degistir": {
+    "rated_power_w": 2200
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 2200,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61183000": {
+   "_urun": "STORM 18 · 2800 d/dk · 7,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 7500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 7500,
+    "rated_power_w": null
+   }
+  },
+  "SEA-61183003": {
+   "_urun": "STORM 18 ATEX · 2800 d/dk · 7,5 kW · 380V",
+   "degistir": {
+    "rated_power_w": 7500
+   },
+   "sil": [
+    "max_absorbed_power_w"
+   ],
+   "onceki": {
+    "max_absorbed_power_w": 7500,
+    "rated_power_w": null
+   }
+  }
+ }
+}
