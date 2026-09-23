@@ -74,6 +74,24 @@ describe('taslak kaynak kapısı (kaynak dizini)', () => {
     expect(r.stdout + r.stderr).toMatch(/EVREN EKSIK/)
   })
 
+  it('rakamlı kısaltma ([CAS191 s.1]) referans sayılır — "ref 0" ile düşmez', () => {
+    const dizin = dizinYaz('rakam', [sayfa('web/www.casals.com__Casals_catalogue__flipbook__191.txt', 1, 'IEC motor with IP-55 protection')])
+    const t = join(kok, 'rakam.md')
+    writeFileSync(t, '<!-- KAYNAK-HARITASI: CAS191=www.casals.com__Casals_catalogue__flipbook__191.txt -->\nIP-55 koruma sınıflı motorla çalışır. [CAS191 s.1]\n')
+    const r = kos(t, dizin)
+    expect(r.status, r.stdout + r.stderr).toBe(0)
+    expect(r.stdout).toMatch(/dogrulanan 1 · DUSEN 0/)
+  })
+
+  it('TR binlik noktası: "25.000 m³/h" ↔ kaynak "25000m³/h" YEŞİL; kaynak ondalığı 1000 kat kaydırılamaz', () => {
+    const dizin = dizinYaz('binlik', [sayfa(AVENS, 28, 'AVENS-HF/S 500 11KW 25000m³/h · yardımcı fan 1.125 kW')])
+    expect(kos(taslakYaz('binlik.md', 'Ailede 25.000 m³/h debiye kadar model vardır. [AVenS s.28]'), dizin).status).toBe(0)
+    expect(kos(taslakYaz('binlik2.md', 'Ailede 26.000 m³/h debiye kadar model vardır. [AVenS s.28]'), dizin).status).toBe(1)
+    // kaynaktaki "1.125 kW" (ondalık) taslaktaki "1125 kW" ile eşleşmemeli
+    const r = kos(taslakYaz('binlik3.md', 'Yardımcı fan 1125 kW. [AVenS s.28]'), dizin)
+    expect(r.status, r.stdout).toBe(1)
+  })
+
   it('betik PDF açmaz (fitz içe aktarılmaz)', () => {
     expect(readFileSync(BETIK, 'utf8')).not.toMatch(/^\s*import fitz|^\s*from fitz/m)
   })

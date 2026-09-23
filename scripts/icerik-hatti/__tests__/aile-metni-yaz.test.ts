@@ -18,7 +18,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { execFile } from 'node:child_process'
 import { createServer, type Server } from 'node:http'
-import { patchYolu, kumeKapisi, yazimPlani } from '../aile-metni-kurallar.mjs'
+import { patchYolu, kumeKapisi, yazimPlani, metinKapisi } from '../aile-metni-kurallar.mjs'
 
 const BETIK = join(__dirname, '..', 'aile-metni-yaz.mjs')
 type Aile = { id: string; tenant_id: string; slug: string; description: Record<string, unknown>; is_description_manual: boolean; updated_at: string }
@@ -169,6 +169,10 @@ describe('aile metni kuralları (saf)', () => {
   it('kume kapısı yük ile onayı küme olarak karşılaştırır', () => {
     expect(kumeKapisi(YUK, ONAY)).toEqual([])
     expect(kumeKapisi(YUK.slice(1), ONAY).join()).toMatch(/onaylanan ama yukte YOK: seat-serisi/)
+  })
+  it('rakamlı kısaltmalı iç atıf ([CAS191 s.1]) vitrine gidemez', () => {
+    const h = metinKapisi({ slug: 's', kip: 'b', kimlik_tr: 'IP-55 motorla çalışan santrifüj fan. [CAS191 s.1]', kimlik_en: 'A centrifugal fan with an IP-55 motor.' })
+    expect(h.join()).toMatch(/kimlik_tr ic kaynak referansi/)
   })
   it('b kipi dolu EN\'i ezmez', () => {
     expect(yazimPlani({ is_description_manual: false, description: { tr: 'x', en: 'dolu' } }, YUK[2]).hata).toMatch(/en DOLU/)

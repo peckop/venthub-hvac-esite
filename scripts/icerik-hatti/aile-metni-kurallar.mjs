@@ -6,12 +6,14 @@
  *   en : yalniz `description.en` yazilir; `en` doluysa YAZILMAZ (onayli metni ezme yok).
  *   b  : TEK PATCH — `description.tr` + `description.en` + `is_description_manual=true`.
  *        Yalniz TR'si onaysiz aile (`is_description_manual=false`) ya da onay tablosunda
- *        "degisti" isaretli aile (onaydan sonra degismis TR; bugun jet-serisi).
+ *        "degisti" isaretli aile. `degisti` = "onayli TR YENIDEN onaya giriyor": onaydan sonra
+ *        degismis TR (jet-serisi) YA DA onayli TR'de curutucunun buldugu olgu hatasi (2026-09-23:
+ *        hf-s, sulu-batarya, fc51, h-ad). Sebep plan.json `not` alaninda yazilidir.
  * Bloklar (`bloklar_tr`, `maddeler_tr`) ve diger anahtarlar OKUNAN JSON'dan aynen tasinir.
  */
 
 // Vitrine cikacak metinde ic kaynak referansi (K7.8 dersi: 38/38 aile "[s.41]" ile canliya gitmisti)
-export const REF_DESENI = /\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]|\[DB\]|[Kk]aynak\s*s\.\s*[0-9]|<!--/
+export const REF_DESENI = /\[(?:[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*\s+)?s\.\s*[0-9][^\]]*\]|\[DB\]|[Kk]aynak\s*s\.\s*[0-9]|<!--/
 
 const kume = (a) => new Set(a)
 const fark = (a, b) => [...a].filter((x) => !b.has(x)).sort()

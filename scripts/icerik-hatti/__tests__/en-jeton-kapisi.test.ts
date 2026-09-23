@@ -65,6 +65,16 @@ describe('TR ↔ EN jeton kapısı', () => {
     expect(kos('faz', 'Trifaze motor.', 'Single-phase motor.').status).toBe(1)
   })
 
+  it('TR "Bölge 2" ↔ EN "Zone 2" denk; bölge numarası değişirse KIRMIZI', () => {
+    expect(kos('bolge', 'ATEX Bölge 2 ortamına uygun.', 'Suitable for ATEX Zone 2.').status).toBe(0)
+    expect(kos('bolge2', 'ATEX Bölge 1 ortamına uygun.', 'Suitable for ATEX Zone 2.').status).toBe(1)
+  })
+
+  it('rakamlı kısaltmalı atıf ([CAS191 s.1]) jeton sayılmaz', () => {
+    const r = kos('rakamli', 'IP-55 motor. [CAS191 s.1]', 'IP-55 motor.')
+    expect(r.status, r.stdout).toBe(0)
+  })
+
   it('EN metinde Türkçe harf KIRMIZI', () => {
     const r = kos('harf', 'IP55 koruma.', 'IP55 koruma sınıfı.')
     expect(r.status).toBe(1)

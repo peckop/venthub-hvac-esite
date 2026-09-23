@@ -29,7 +29,7 @@ KOK = Path(__file__).resolve().parents[2]
 TASLAK_DIZIN = KOK / "docs" / "audits"
 KAPI = Path(__file__).resolve().parent / "taslak-kaynak-kapisi.py"
 
-REF = re.compile(r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]")
+REF = re.compile(r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]")
 BLOKLAR = ["Gövde", "Çark", "Motor", "Koruma", "Kontrol", "Montaj"]
 
 
@@ -383,7 +383,7 @@ EN_KAPI = Path(__file__).resolve().parent / "en-jeton-kapisi.py"
 def _referanssiz(s):
     """Kaynak referanslarini ([AVenS s.28]) ve [DB] etiketini VITRIN METNINDEN temizler.
     (⛔ 2026-09-06: 38/38 aile "[s.41]" ile canliya gitti — kanit taslakta kalir, vitrinde durmaz.)"""
-    s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]", "", s)
+    s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*\s+)?s\.\s*[0-9][^\]]*\]", "", s)
     s = re.sub(r"\s*\[DB\]", "", s)
     return re.sub(r"\s{2,}", " ", s).strip()
 
@@ -447,7 +447,11 @@ def k70_sunum_yaz(kayitlar, hedef, tarih):
         if k in kirmizi:
             continue
         tr = k["kimlik_tr"] if k["kip"] == "b" else "*(onaylı, değişmiyor)*"
-        notlar = [x for x in (("Türkçesi onaydan sonra değişti" if k["degisti"] else ""), k["not"]) if x]
+        # `degisti` = onayli TR yeniden onaya giriyor; SEBEBI `not` alaninda (onaydan sonra degisim
+        # ya da curutucunun onayli metinde buldugu olgu hatasi).
+        kor = bool(k["kapi"]) and not k["kapi"].get("dogrulanan")
+        notlar = [x for x in (("Türkçesi yeniden onaya giriyor" if k["degisti"] else ""), k["not"],
+                              ("sayı/kod içermiyor — yalnız anlam denetimiyle doğrulandı" if kor else "")) if x]
         A(f"| `{k['slug']}` | {k['urun']} | {_hucre(tr)} | {_hucre(k['kimlik_en'])} | "
           f"{_hucre(k['kaynak'])} | {_hucre(' · '.join(notlar))} |")
     if kirmizi:
@@ -526,7 +530,7 @@ if __name__ == "__main__":
             urun sayfasinda bizim IC KAYNAK NOTUMUZU okuyacakti. Kanit taslakta ve kanit
             satirlarinda durur; VITRINDE DURMAZ. Iki yer ayni metni tasimaz.
             """
-            s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]", "", s)
+            s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*\s+)?s\.\s*[0-9][^\]]*\]", "", s)
             s = re.sub(r"\s*\[DB\]", "", s)
             return re.sub(r"\s{2,}", " ", s).strip()
         hedef = Path(sys.argv[sys.argv.index("--yuk") + 1])

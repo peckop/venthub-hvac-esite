@@ -33,7 +33,7 @@ for _akis in (sys.stdout, sys.stderr):
         pass
 
 # Taslak iç işaretleri (kaynak atfı, DB etiketi, HTML yorumu) jeton sayılmaz — vitrine gitmez.
-IC_ISARET = re.compile(r"<!--.*?-->|\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]|\[DB\]", re.S)
+IC_ISARET = re.compile(r"<!--.*?-->|\[(?:[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*\s+)?s\.\s*[0-9][^\]]*\]|\[DB\]", re.S)
 
 # Birim eşdeğerliği → kanonik ad. Uzun olan önce denenir (m³/h, `m` değil).
 BIRIMLER = [
@@ -60,7 +60,8 @@ KODLAR = [
     (re.compile(r"\bEN\s?([0-9]{3,5}(?:-[0-9]+)*)\b"), lambda m: f"EN{m.group(1)}"),
     (re.compile(r"\b(IE[1-5]|ATEX|EC|AC|PWM|MODBUS|Modbus|DALI|G[1-4]|F[5-9]|M5|ePM[0-9]+)\b"), lambda m: m.group(1).upper()),
     (re.compile(r"\bEx\s+[a-z]{1,3}\s+II[ABC]?(?:\+H2)?\s+T[1-6]\s+G[abc]\b"), lambda m: re.sub(r"\s+", " ", m.group(0))),
-    (re.compile(r"\bZone\s+(2[0-2]|[0-2])\b", re.I), lambda m: f"ZONE{m.group(1)}"),
+    # TR metin "Bölge 2" yazabilir (AVenS s.44: "ATEX Bölge 2"); EN'deki "Zone 2" ile aynı jeton.
+    (re.compile(r"\b(?:Zone|Bölge)\s+(2[0-2]|[0-2])\b", re.I), lambda m: f"ZONE{m.group(1)}"),
     (re.compile(r"\bT([1-6])\b"), lambda m: f"T{m.group(1)}"),
 ]
 FAZ = [

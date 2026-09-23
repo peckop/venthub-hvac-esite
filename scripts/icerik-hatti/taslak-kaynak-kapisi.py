@@ -111,8 +111,10 @@ VARSAYILAN_HARITA = {
 # Olculmus tuzak (alt-ajan buldu, 2026-09-06): ilk bicim regex'e UYMUYORDU ve referans
 # SESSIZCE ATLANIYORDU — o taslakta 3 iddia boyle kaybolmustu, kapi yine de "0 dusen" diyordu.
 # Sessiz atlama, kapinin en tehlikeli hatasidir: "bakmadim" ile "temiz" ayni gorunur.
+# Kisaltma harfle baslar, RAKAM icerebilir ("CAS191"): 2026-09-23'te rakamli kisaltma taninmadi,
+# referans sayilmadi ve kapi "ref 0" ile KIRMIZI verdi (sessiz kalmadi ama sebep yanlis gorundu).
 REF = re.compile(
-    r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]"
+    r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]"
 )
 
 # Doğrulanabilir jetonlar — dile bağlı OLMAYAN işaretler:
@@ -170,6 +172,12 @@ def norm(s):
     return re.sub(r"\s+", "", s).upper().replace("M3/H", "M³/H")
 
 
+def binliksiz(j):
+    """TR binlik bicimli sayinin noktalarini atar: '25.000 m³/h' -> '25000 m³/h'. Baska bicime dokunmaz."""
+    m = re.match(r"^([1-9][0-9]{0,2}(?:\.[0-9]{3})+)(?![0-9,])(.*)$", j.strip())
+    return m.group(1).replace(".", "") + m.group(2) if m else j
+
+
 def jetonlari_cikar(cumle):
     bulunan = []
     for rx in JETON_DESENLERI:
@@ -195,7 +203,7 @@ def taslagi_denetle(yol, ayrinti=False):
                 harita[k.strip()] = v.strip()
 
     # tek kaynakli taslakta [s.NN] icin varsayilan kaynak
-    vk = re.search(r"<!--\s*VARSAYILAN-KAYNAK:\s*([A-Za-z]+)\s*-->", metin)
+    vk = re.search(r"<!--\s*VARSAYILAN-KAYNAK:\s*([A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*)\s*-->", metin)
     varsayilan_kaynak = vk.group(1) if vk else (list(harita)[0] if len(harita) == 1 else None)
     if varsayilan_kaynak is None:
         # taslak metninde hangi kisaltmalar geciyorsa ve TEK ise onu kullan
@@ -305,6 +313,13 @@ def taslagi_denetle(yol, ayrinti=False):
                 return re.search(rf"(?<![A-Za-z0-9]){re.escape(j.strip())}(?![A-Za-z0-9])", havuz) is not None
             if norm(j) in havuz_n:
                 return True
+            # ⚠ TURKCE BINLIK NOKTASI (olculdu 2026-09-23): taslak "25.000 m³/h" yazar (TR bicim
+            # kurali), AVenS s.28 "25000m³/h" yazar — ayni sayi, kapi YANLIS KIRMIZI verdi.
+            # Yalniz TASLAK tarafi noktasizlastirilir ve yalniz tam TR binlik bicimi (1-3 hane +
+            # nokta + 3'lu gruplar): kaynaktaki "1.125 kW" (EN ondalik) donusturulmez, boylece
+            # 1000 kat kaymis bir uydurma ("1125 kW") kaynaktaki ondalikla eslesmez.
+            if norm(binliksiz(j)) in havuz_n:
+                return True
             # ⚠ YUZDE ISARETININ YERI DILE BAGLIDIR — kapinin temel varsayimindaki tek gedik.
             # "Sayilar dile bagli degildir" dogru, ama YUZDE ISARETI sayinin parcasi degil,
             # dilin parcasi: Turkce "%90", Ingilizce "90%". Olculdu (2026-09-06): VMC s.58
@@ -327,7 +342,7 @@ def taslagi_denetle(yol, ayrinti=False):
             if not m:
                 return False
             sayi, birim = m.group(1), m.group(2)
-            if norm(sayi) not in havuz_n:
+            if norm(sayi) not in havuz_n and norm(binliksiz(sayi)) not in havuz_n:
                 return False
             # birim sayfada HIC gecmiyorsa, ciplak sayi tesaduf demektir
             if norm(birim) not in havuz_n:
