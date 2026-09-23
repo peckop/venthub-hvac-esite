@@ -682,7 +682,7 @@ merge 3 (docs)              ->  D   <- kapı A..D bakar, package.json GÖRÜR, B
 4. **Yoğun günlerde atlama oranı DÜŞER.** Kota planlaması bunu hesaba katmalı: sakin günün
    ölçümü yoğun günü tahmin etmez.
 
-## D15 — Dal kapısı ve `vercel.json` dal haritası (09-08 "YAZILAMAZ" hükmü D15.3'te düzeltildi)
+## D15 — Dal kapısı ve `vercel.json` dal haritası (09-08 "YAZILAMAZ" hükmü D15.4'te düzeltildi)
 
 **HÜKÜM:** Üretim dalı dışındaki her ref için derleme atlanır, ve bu kural
 `scripts/vercel-ignore-build.sh` içindeki **dal kapısında** yaşar — `vercel.json`'da değil.
@@ -738,7 +738,7 @@ kaynak → BUILD** · üretim dalı adı ortamdan gelir (iki yönlü).
 yanıyordu, oysa kural hiç işlemiyordu. Sabotajla doğrulandı (2026-09-08): dal kapısının
 `exit 0`'ı kaldırıldığında iki kol kırmızı verdi, geri konunca 41/41 yeşil.
 
-### D15.3 — ÖNCÜL DÜZELTİLDİ (2026-09-23, ALTYAPI): dal önizlemeleri dal-kalıbıyla HİÇ oluşmaz
+### D15.4 — ÖNCÜL DÜZELTİLDİ (2026-09-23, ALTYAPI): dal önizlemeleri dal-kalıbıyla HİÇ oluşmaz
 
 **D15.1'in açık sorusu ÖLÇÜLDÜ:** iptal edilen dağıtım kaydı **kotaya sayılıyor**. 09-22 11:40Z
 → 09-23 11:23Z arasında 96 dağıtım: **71 önizleme CANCELED** (dal kapısının iptalleri), 14 üretim
