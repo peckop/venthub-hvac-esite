@@ -12,7 +12,9 @@ import { localizedHref, Routes } from '@/utils/routes'
  *   1. Aile + AKTİF VARYANT → PDP. (Aile slug'ı asla redirect üretmez → döngü yok.)
  *   2. Varyantsız aile satırı → SERİ mi? Öyleyse landing (200).
  *   3. Varyant slug'ı → kanonik aile URL'ine 308.
- *   4. Hiçbiri → GERÇEK 404.
+ *   4. Eski adres (`url_takma_adlari`, REC-300 Faz 1-A): yeniden adlandırılmış ürün ya da aile
+ *      slug'ı → bugünkü aile URL'ine 308. Tabloyu DB tetiği doldurur; elle config satırı gerekmez.
+ *   5. Hiçbiri → GERÇEK 404.
  *
  * `unavailable` ayrı bir sınıftır ve 404 DEĞİLDİR: "veri yok" ile "veriye ulaşamadım"
  * aynı şey değil. Ağ/RPC hatasında 404 basmak, önbelleğe alınabilen kalıcı bir yokluk
@@ -32,6 +34,10 @@ export interface ProductRouteDeps {
   seriesLanding: (slug: string) => Promise<SeriesLanding | null>
   variantBySlug: (slug: string) => Promise<{ sku: string; family_id: string | null } | null>
   familySlugById: (familyId: string) => Promise<string | null>
+  /** Eski slug → hedef kimliği (`url_takma_ad_coz`; kiracı sorgunun içinde süzülür). Hata FIRLATIR. */
+  takmaAd: (tur: 'urun' | 'aile', lang: string, slug: string) => Promise<string | null>
+  /** Ürün kimliği → SKU + aile. Hata FIRLATIR (rota kararı yutulmuş hatayı 404'e çevirmesin). */
+  variantById: (productId: string) => Promise<{ sku: string; family_id: string | null } | null>
 }
 
 export async function resolveProductRoute(
@@ -66,7 +72,28 @@ export async function resolveProductRoute(
       }
     }
 
-    // 4) Ne aile, ne seri, ne varyant. Varyantsız ve seri OLMAYAN aile de buraya düşer —
+    // 4) Eski adres — yeniden adlandırılmış ürün ya da aile (REC-300 Faz 1-A). Hedef bugünkü
+    // aile URL'i; hedef bu slug'ın kendisiyse yönlendirme üretilmez (döngü yok).
+    const urunId = await deps.takmaAd('urun', lang, slug)
+    if (urunId) {
+      const hedef = await deps.variantById(urunId)
+      if (hedef?.family_id) {
+        const familySlug = await deps.familySlugById(hedef.family_id)
+        if (familySlug && familySlug !== slug) {
+          const base = localizedHref(Routes.product(familySlug), lang)
+          return { kind: 'redirect', to: `${base}?sku=${encodeURIComponent(hedef.sku)}` }
+        }
+      }
+    }
+    const aileId = await deps.takmaAd('aile', lang, slug)
+    if (aileId) {
+      const familySlug = await deps.familySlugById(aileId)
+      if (familySlug && familySlug !== slug) {
+        return { kind: 'redirect', to: localizedHref(Routes.product(familySlug), lang) }
+      }
+    }
+
+    // 5) Ne aile, ne seri, ne varyant, ne eski adres. Varyantsız ve seri OLMAYAN aile de buraya düşer —
     // içi boş bir ürün sayfası 200 dönmemeli.
     return { kind: 'not-found' }
   } catch (err: unknown) {

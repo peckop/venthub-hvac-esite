@@ -1,6 +1,6 @@
 import { permanentRedirect } from 'next/navigation'
 
-import { getCachedCategoryData } from '../../../../../lib/data/preload'
+import { eskiKategoriHedefi, getCachedCategoryData } from '../../../../../lib/data/preload'
 import { getLocalizedCategorySlug } from '../../../../../utils/categoryHelpers'
 
 /**
@@ -41,7 +41,11 @@ export default async function AltKategoriYonlendirme({ params }: { params: Param
 
   // Kategori çözülebiliyorsa görünen (dile uygun) slug'a; çözülemiyorsa gelen slug'a
   // gönderilir — ikinci hâlde hedef rota 404'ü kendi verir, burada karar verilmez.
-  const hedefSlug = kategori ? getLocalizedCategorySlug(kategori, lang) || subCategorySlug : subCategorySlug
+  // Eski adres tablosu (REC-300 Faz 1-A) burada da okunur: yeniden adlandırılmış dal iki seviyeli
+  // eski adresten de TEK sıçramada bugünkü slug'a gider (tek hop kuralı).
+  const hedefSlug = kategori
+    ? getLocalizedCategorySlug(kategori, lang) || subCategorySlug
+    : (await eskiKategoriHedefi(subCategorySlug, lang)) ?? subCategorySlug
 
   permanentRedirect(`/${lang}/category/${hedefSlug}`)
 }
