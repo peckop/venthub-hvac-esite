@@ -53,10 +53,17 @@ describe('fiyat boşluk raporu', () => {
 describe('rapor YAZMAZ (iki yönlü)', () => {
   // Veritabanı yazması: REST fetch yöntemi ya da supabase-js zinciri. Düz `.delete(` sayılmaz —
   // fiyat-kaynak-esle.mjs bellek içi Map'ten siler (ilk sürüm onu yanlış yakaladı).
-  const YAZMA = /method\s*:\s*['"](POST|PATCH|PUT|DELETE)['"]|\.from\([^)]*\)\s*\.(upsert|insert|update|delete)\s*\(|\.rpc\s*\(/i
+  const YAZMA = /method\s*:\s*['"](POST|PATCH|PUT|DELETE)['"]|\.(from|table)\([^)]*\)\s*\.(upsert|insert|update|delete)\s*\(|\.rpc\s*\(/i
   const kaynak = (ad: string) => readFileSync(join(__dirname, '..', ad), 'utf8')
   it('karne ve rapor betiğinde yazma çağrısı yok', () => {
     for (const ad of ['katalog-karnesi.mjs', 'fiyat-bosluk.mjs', 'fiyat-kaynak-esle.mjs']) expect(kaynak(ad)).not.toMatch(YAZMA)
+  })
+  it('extract_brands.py yazmaz — eski hali 173 ürünün markasını AVenS yapacaktı (REC-209, 2026-09-23)', () => {
+    const py = kaynak('../tools/extract_brands.py')
+    expect(py).not.toMatch(YAZMA)
+    expect(py).not.toMatch(/\binput\s*\(/) // onay sorusu = yazma yolu vardı demek
+    // sabotaj: eski yazma satırı geri eklenirse yakalanır
+    expect(py + "\n    supabase.table('products').update({'brand': b}).eq('id', i).execute()").toMatch(YAZMA)
   })
   it('sabotaj: yazma çağrısı eklenmiş kaynak aynı denetimde yakalanır', () => {
     expect(kaynak('katalog-karnesi.mjs') + "\nawait fetch(u, { method: 'PATCH' })").toMatch(YAZMA)
