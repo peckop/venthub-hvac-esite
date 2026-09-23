@@ -1,7 +1,7 @@
 # REC-172 — 4 ailenin teknik veri çıkarımı (NIMUS · NIMAX · Enkelfan EEC · Vorticent CMS ATEX)
 
-> Durum: **PLAN v3** (2026-09-22). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (4 kısmen +
-> 6 yeni bulgu, 8 ek madde); v3 hepsini işler — belgenin sonunda "v1 → v2" ve "v2 → v3" tabloları.
+> Durum: **PLAN v4** (2026-09-23). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (8 madde), v3
+> **KOŞULLU** (5 madde); v4 hepsini işler — belgenin sonunda "v1 → v2", "v2 → v3", "v3 → v4" tabloları.
 > Çıkarım koşumu Recep "başla" demeden AÇILMAZ (karar 76). Canlıya yazım ayrıca Recep'in kendi
 > sözüyle (iki anahtar: `--yaz` + `CANLI_YAZIM_ONAYI`).
 
@@ -76,8 +76,8 @@ Eşleme **model ADIYLA** (AVenS kodu ≠ Casals kodu, 15/30 — REC-370).
 | — | `wiring` | ✗ (kaynak yazmıyor; TÜRETİLMEZ — SEAT'te dolu olması tutarsız görünür, bilerek) | ✗ | ✗ |
 | IP / yalıtım | `ip_rating`, `insulation_class` | IP55 · Class F (191/199) | IP54 · Class B | IP55 · Class F |
 | motor tipi | `motor_type` | — | EC | — |
-| s.1 başlık | `atex_zone` | — | — | kanonik biçim (adım 1): `Zone 2` / `Zone 1` — föy kategori vermiyor, uydurulmaz |
-| s.1 başlık | `atex_marking` | — | — | `Fan: Ex h IIB T3 Gc · Motor: Ex ec IIC T3 Gc` (grup/kategori yok → yalnız Ex kodu; cetvele not) |
+| s.1 başlık | `atex_zone` | — | — | **ürün başına** (föy başlığından): 8 ürün `Zone 2` · 12/5 ve 14/5 `Zone 1`. Biçim canlıyla uzlaşık (adım 1); föy ekipman kategorisini (2G/3G) yazmıyor → `Category` eklenmez, EPL'den türetilmez |
+| s.1 başlık | `atex_marking` | — | — | **ürün başına**: 8 ürün `Fan: Ex h IIB T3 Gc · Motor: Ex ec IIC T3 Gc` · 12/5, 14/5 `Fan: Ex h IIB+H2 T4 Gb · Motor: Ex eb IIC T4 Gb`. IIB/IIC = gaz grubu, T3/T4 = sıcaklık sınıfı, Gb/Gc = EPL; föyde olmayan tek şey `II 2G`/`II 3G` kategori öneki → yazılmaz |
 | Sound dB(A) · Model A B C | — | ✗ | ✗ | — |
 
 ## Beklenen satır sayısı
@@ -107,7 +107,11 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 5. Birim sözlükteki birim; PIM kolonu `<kod>(unit)` — PIM paketi ALTYAPI öznitelikleri ekledikten sonra.
 6. Uydurma yok: ✗ satırları boş.
 7. **Yazım tek atomik koşullu PATCH:** `products?id=eq.<id>&technical_specs=is.null&updated_at=eq.<okunan>`
-   (`prefer: return=representation`); 0 satır dönerse KIRMIZI (okuma–yazma yarışı kapanır).
+   (`prefer: return=representation`). `updated_at` okuma sorgusunun `select`'ine eklenir ve **ham dize
+   olarak, `urllib.parse.quote(..., safe='')` ile kodlanıp** filtreye konur (`+00:00`'daki `+` kodlanmazsa
+   PostgREST onu boşluk okur, eşleşme hiç olmaz ve her satır "yarış" görünür). 0 satır dönerse ürün yeniden
+   okunur, 1 kez denenir; yine 0 ise KIRMIZI (okuma–yazma yarışı kapanır). Test: `+` içeren damga ile
+   eşleşme, değişmiş damga ile 0 satır.
    Denetim kaydı **tetiğe bırakılır** (`denetim_izi_products_upd`); yükleyici ikinci audit satırı
    YAZMAZ. İkinci koşum 0 değişiklik.
 
@@ -115,8 +119,12 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 
 1. **Cetvel** (`product-schema-standard.md`): akım satırı (`absorbed_current_a` = anma yükünde çekilen
    akım · `max_current_a` = kaynağın "I max" değeri · ölçüt ADA girer); `atex_zone` kanonik biçimi
-   (`Zone <n>[, Category <k>]`; kaynak kategori vermiyorsa yazılmaz); `atex_marking` için "grup/kategori
-   yoksa yalnız Ex kodu, `Fan: … · Motor: …`" notu.
+   **canlıdaki 19 satırla uzlaştırılarak**: canlıda 12 satır `Zone 2, Category 3G, Directive 94/9/CE`,
+   7 satır `Zone II, Category 3G (…)`. Kanonik = `Zone <n>[, Category <k>][, Directive <d>]` —
+   ilk biçim buna uyar, dokunulmaz; `Zone II` bölge değil ekipman grubu (II = yerüstü), biçim ihlali →
+   7 satır ayrı düzeltme işi (REC-172 yorumu), bu plan dokunmaz. CMS'e kaynağın verdiği kadarı yazılır
+   (`Zone 2` / `Zone 1`). `atex_marking` için "föyde kategori öneki yoksa yazılmaz, fan ve motor ayrı
+   işaretliyse `Fan: … · Motor: …`" notu.
 2. **Okuyucular** tüm alanlara + ikinci (tablo) okuyucu Enkelfan/CMS s.2 için; test + sabotaj.
    Okuyucu sütunu doğrudan eşler — `alan-etiket-sozlugu.json`'a dayanmaz (sözlükte "power" →
    `max_absorbed_power_w`, "rated current" → `rated_output_current_a` eşlemeleri bu kaynaklar için
@@ -148,7 +156,9 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 | 5 | Casals ses LwA mı LpA mı | AVenS | boş |
 | 6 | Canlıda `atex_marking` alanında bölge taşıyan 6 ürün (K11-a ihlali) | ayrı iş (Linear sınırı dolu → REC-172 yorumu) | bu plan dokunmaz |
 | 7 | QE-B (9 ürün) | — | kapsam dışı, sonraki okuyucu |
-| — | NIMAX 314 T2 debi (karar 75: 5.500) | — | debi bu turda ✗ (soru 1) → karar 75 debi kısmı soru 1 cevabına kadar bekler |
+| — | NIMAX 314 T2 debi (karar 75: 5.500) | Recep'e bilgi (OPS) | debi bu turda ✗ (soru 1). Karar 75'in debi kısmı "5.500 = en yüksek debi" öncülüyle alınmıştı; fark raporu artık bu değeri "kaynakta tanımsız" diye gösteriyor (merge edildi). Debi kısmı soru 1 cevabına kadar bekler; ad kısmı canlıda |
+| 8 | URUN'un 3 veri şüphesi: 79 üründe addaki V ≠ `voltage_v` (380↔400, 220↔230) · 10 üründe addaki kW ≠ `max_absorbed_power_w` (ör. STORM 10) · SEAT 25/35 ve STORM 10'da farklı motorlu ürünlerde aynı debi/basınç | REC-172 yorumu (ayrı iş) | bu 4 ailede yok; SEAT/STORM sonraki okuyucu turunda kaynakla karşılaştırılır |
+| 9 | `alan-etiket-sozlugu.json` yanlış eşlemeleri ("power" → `max_absorbed_power_w`, "rated current" → `rated_output_current_a`) | REC-172 yorumu (ayrı iş) | okuyucu sözlüğe dayanmaz |
 
 ## v1 → v2 (1. çürütme, BLOK)
 
@@ -178,3 +188,13 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 | "Air flow" `max_` değil (§11.7) | Casals/Enkelfan debisi ✗ + AVenS sorusu; CMS "Max. Flow" yazılır |
 | Enkelfan 400V ↔ AC380V | 355-630 gerilim + faz ✗ |
 | Yazım ↔ PIM/etiket sırası belirsiz | sıra tablosu |
+
+## v3 → v4 (3. çürütme, KOŞULLU)
+
+| v3 bulgusu | v4 |
+|---|---|
+| `updated_at` filtresi: `+` kodlanmıyor, select'te yok, yeniden deneme yok | kabul 7: `select`'e eklendi, `quote(safe='')`, 0 satırda 1 yeniden okuma+deneme, test |
+| `atex_marking` tek değer; 12/5 ve 14/5 Zone 1 ve farklı işaretli; "IIB" terimi yanlış anlatılmış | ürün başına zone + marking (föy başlığından ölçüldü: 8 × Zone 2, 2 × Zone 1); terimler düzeltildi |
+| `atex_zone` kanonik biçimi canlıyla uzlaşmıyor | canlı ölçüldü (12 + 7); kanonik biçim ilk grubu kapsar, `Zone II` 7 satır ayrı iş |
+| Fark raporu "Air flow"u "en yüksek debi" diye etiketliyordu; karar 75 öncülü | fark raporu düzeltildi (merge); karar 75 notu Recep'e (açık sorular) |
+| Sözlük düzeltmesi + 6 üründe marking'de bölge "ayrı kayıt" ama kayıt yok | REC-172'ye yorum olarak yazıldı (Linear sınırı dolu); URUN'un 3 veri şüphesi de aynı yorumda |
