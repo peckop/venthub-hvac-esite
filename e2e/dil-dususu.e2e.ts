@@ -38,10 +38,26 @@ test.describe('INV-DIL-DUSUSU-1 — EN sayfada TR gövde metni yok', () => {
     const tr = await request.get(`/tr${ORNEK_KATEGORI}`)
     expect(tr.status()).toBe(200)
     const trMetin = testIdMetinleri(await tr.text(), 'alt-kategori-aciklama')
+    // Boş liste = boş geçiş; ölçülecek TR metin yoksa test hiçbir şey kanıtlamaz.
+    expect(trMetin.length, 'TR kategori sayfasında alt dal açıklaması bekleniyordu').toBeGreaterThan(0)
 
     const en = await request.get(`/en/category/fans`)
     expect(en.status()).toBe(200)
     const enHtml = await en.text()
     for (const parca of trMetin) expect(enHtml.includes(parca.slice(0, 60)), `EN sayfada TR metin: ${parca.slice(0, 60)}`).toBe(false)
+  })
+
+  // 2026-09-23 ölçümü: kategori sayfasının aile listesi {tr,en} açıklamayı gömülü veriye
+  // yazıyordu — kart göstermiyordu, ekran temizdi, HTML değildi. Ekran ve gömülü katman ayrı ölçülür.
+  test('kategori sayfasının gömülü aile listesi', async ({ request }) => {
+    const tr = await request.get(`/tr${ORNEK_AILE}`)
+    expect(tr.status()).toBe(200)
+    const trMetin = testIdMetinleri(await tr.text(), 'urun-aciklama')
+    expect(trMetin.length, 'TR sayfada açıklama bekleniyordu — örnek aile değişmiş olabilir').toBeGreaterThan(0)
+
+    const en = await request.get(`/en/category/fans`)
+    expect(en.status()).toBe(200)
+    const enHtml = await en.text()
+    for (const parca of trMetin) expect(enHtml.includes(parca.slice(0, 60)), `EN kategori sayfasında TR aile metni: ${parca.slice(0, 60)}`).toBe(false)
   })
 })

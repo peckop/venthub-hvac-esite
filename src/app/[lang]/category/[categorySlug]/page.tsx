@@ -17,7 +17,7 @@ import type { DomainCategory } from '../../../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../types/db-rows'
 import type { FamilyListItem } from '../../../../types/ui-models'
-import { kategoriMetniniIndir } from '../../../../utils/dilMetni'
+import { aileMetniniIndir, kategoriMetniniIndir } from '../../../../utils/dilMetni'
 import { DEFAULT_TENANT_ID } from '../../../../utils/tenantConstants'
 import PageComponent from '../../../../views/CategoryPage'
 
@@ -262,7 +262,9 @@ export default async function Page({
     const categoryIds = [category.id, ...subCategories.map(s => s.id)]
 
     const familiesPage = await getCachedFamilies(lang, tenantId, category.id, page, categoryIds)
-    families = familiesPage.items
+    // INV-DIL-DUSUSU-1: aile satırı {tr,en} açıklamayı taşır; kart göstermese de istemciye
+    // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
+    families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
     total = familiesPage.total
   }
 
