@@ -13,8 +13,8 @@ const { profilGuvenliMi, varsayilanChromeDizinleri, portGecerliMi } = require('.
   portGecerliMi: (p: unknown) => boolean
 }
 
-const ev = 'C:/Users/ornek'
-const varsayilan = varsayilanChromeDizinleri({ LOCALAPPDATA: 'C:/Users/ornek/AppData/Local' }, ev)
+const ev = 'D:/ev/ornek'
+const varsayilan = varsayilanChromeDizinleri({ LOCALAPPDATA: 'D:/ev/ornek/AppData/Local' }, ev)
 
 describe('INV-TARAYICI-PROFIL-1', () => {
   it('ayri dizin kabul edilir', () => {
@@ -22,16 +22,16 @@ describe('INV-TARAYICI-PROFIL-1', () => {
   })
 
   it('varsayilan Chrome kullanici dizini reddedilir (buyuk/kucuk harf ve ters bolu fark etmez)', () => {
-    expect(profilGuvenliMi('C:/Users/ornek/AppData/Local/Google/Chrome/User Data', varsayilan).ok).toBe(false)
-    expect(profilGuvenliMi('c:\\users\\ornek\\appdata\\local\\google\\chrome\\user data\\', varsayilan).ok).toBe(false)
+    expect(profilGuvenliMi('D:/ev/ornek/AppData/Local/Google/Chrome/User Data', varsayilan).ok).toBe(false)
+    expect(profilGuvenliMi('d:\\ev\\ornek\\appdata\\local\\google\\chrome\\user data\\', varsayilan).ok).toBe(false)
   })
 
   it('varsayilan dizinin ALTI da reddedilir (Default / Profile 1)', () => {
-    expect(profilGuvenliMi('C:/Users/ornek/AppData/Local/Google/Chrome/User Data/Default', varsayilan).ok).toBe(false)
+    expect(profilGuvenliMi('D:/ev/ornek/AppData/Local/Google/Chrome/User Data/Default', varsayilan).ok).toBe(false)
   })
 
   it('adi benzeyen kardes dizin reddedilmez (onek tuzagi)', () => {
-    expect(profilGuvenliMi('C:/Users/ornek/AppData/Local/Google/Chrome/User Data2', varsayilan).ok).toBe(true)
+    expect(profilGuvenliMi('D:/ev/ornek/AppData/Local/Google/Chrome/User Data2', varsayilan).ok).toBe(true)
   })
 
   it('bos dizin reddedilir', () => {
