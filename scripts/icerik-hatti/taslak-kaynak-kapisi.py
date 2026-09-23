@@ -4,8 +4,8 @@
 NİÇİN VAR: REC-146 taslakları alt-ajan dalgalarıyla üretilecek. Alt-ajanın tek gerçek riski
 UYDURMA'dır: metin doğru görünür, kaynağı yoktur. Bu kapı o riski ÖLÇÜLEBİLİR kılar.
 
-ÖLÇÜT (ve niçin işe yarıyor): taslaktaki her cümle `[KAYNAK s.NN]` ile bir PDF sayfasına
-bağlıdır. Metin Türkçe, kaynak çoğu zaman İngilizcedir — yani KELİMELER eşleşmez. Ama
+ÖLÇÜT (ve niçin işe yarıyor): taslaktaki her cümle `[KAYNAK s.NN]` ile bir kaynak belge
+sayfasına bağlıdır; sayfa metni KAYNAK DİZİNİNDEN okunur (PDF açılmaz, §6.3). Metin Türkçe, kaynak çoğu zaman İngilizcedir — yani KELİMELER eşleşmez. Ama
 SAYILAR ve KODLAR dile bağlı değildir: `IP55`, `400 °C`, `150 mm`, `%90`, `EC`, `ATEX`,
 `EN 12101-3`. Bir cümle "IP55" diyorsa, referans verdiği sayfada "IP55" GEÇMELİDİR.
 Geçmiyorsa ya referans yanlıştır ya bilgi uydurulmuştur — ikisi de KIRMIZI.
@@ -19,8 +19,11 @@ KULLANIM:
     python scripts/icerik-hatti/taslak-kaynak-kapisi.py docs/audits/icerik-hatti-taslak-*.md
     python scripts/icerik-hatti/taslak-kaynak-kapisi.py <dosya> --ayrinti   # her cümleyi bas
 
+    python scripts/icerik-hatti/taslak-kaynak-kapisi.py <dosya> --dizin <sayfalar.jsonl>
+
 ÇIKIŞ KODU: 0 = kapı YEŞİL · 1 = KIRMIZI (en az bir doğrulanabilir cümle düştü) · 2 = önkoşul
-CI'DA KOŞMAZ: PyMuPDF ve yerel PDF deposu gerekir; bu YEREL bir kapıdır, şerit sahibi koşar.
+Kaynak dizini yerel olduğundan CI'da gerçek taslağa koşmaz; sahte dizinle sınavı
+`__tests__/taslak-kaynak-kapisi.test.ts` CI'da koşar.
 """
 import os
 import re
@@ -40,19 +43,52 @@ for _akis in (sys.stdout, sys.stderr):
     except Exception:
         pass
 
-try:
-    import fitz  # PyMuPDF
-except ImportError:
-    print("ONKOSUL-HATASI: PyMuPDF yok. 'pip install pymupdf' ile kurun.")
-    sys.exit(2)
+import json
 
-# PDF deposunun koku. ORTAM DEGISKENIYLE EZILEBILIR + akilli varsayilan (ev dizini).
-# Nicin boyle: ilk surumde buraya kullanici adi iceren MUTLAK YOL yazmistim ve
-# INV-MUTLAK-YOL-1 kapisi CI'da beni DUSURDU — hakliydi. Iki zarar uretiyordu:
-# depo PUBLIC oldugu icin kimlik sizintisi, ve betik sessizce TEK MAKINEYE baglaniyordu.
-# Bu makinede davranis DEGISMEZ (home = ayni dizin), baska makinede ise
-# VENTHUB_PDF_KOK ile gosterilebilir.
-KOK = Path(os.environ.get("VENTHUB_PDF_KOK") or (Path.home() / "venthub-pdf-ingestor" / "venthub"))
+# ⛔ PDF ACILMAZ (catalog-ingestion-standard §6.3, K15). Ilk surum sayfa metnini `fitz` ile
+# PDF'ten okuyordu; REC-146 3. curutmesi yakaladi (2026-09-22). Sayfa metni artik KAYNAK
+# DIZININDEN gelir: `sayfalar.jsonl` (metin + tablo hucreleri), deterministik ve hash'li.
+# Dizin yolu: --dizin <yol> > VENTHUB_KAYNAK_DIZINI > ev dizini varsayilani. Mutlak yol
+# gomulmez (INV-MUTLAK-YOL-1): varsayilan ev dizininden turetilir.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _kaynak  # noqa: E402
+
+DIZIN_VARSAYILAN = Path.home() / "venthub-pdf-ingestor" / "kaynak-dizini" / "sayfalar.jsonl"
+_DIZIN = {"yol": None, "sayfalar": None}
+
+
+def dizin_yolu():
+    if "--dizin" in sys.argv:
+        i = sys.argv.index("--dizin")
+        if i + 1 < len(sys.argv):
+            return Path(sys.argv[i + 1])
+    return Path(os.environ.get("VENTHUB_KAYNAK_DIZINI") or DIZIN_VARSAYILAN)
+
+
+def dizini_yukle():
+    """(dosya taban adi, sayfa) -> sayfa metni + tablo hucreleri. Bir kez yuklenir."""
+    if _DIZIN["sayfalar"] is not None:
+        return _DIZIN["sayfalar"]
+    yol = dizin_yolu()
+    if not yol.exists():
+        print(f"ONKOSUL-HATASI: kaynak dizini yok: {yol} (--dizin ya da VENTHUB_KAYNAK_DIZINI)")
+        sys.exit(2)
+    sayfalar = {}
+    with open(yol, encoding="utf-8") as fh:
+        for satir in fh:
+            if not satir.strip():
+                continue
+            k = json.loads(satir)
+            metin = k.get("metin") or ""
+            # tablo hucreleri de aranir — deger cogu zaman TABLODADIR (kanit-tablosu.py ile ayni)
+            for t in k.get("tablo") or []:
+                for r in t.get("satirlar") or []:
+                    metin += "\n" + " ".join(str(h) for h in r if h)
+            sayfalar[(os.path.basename(k["dosya"]), int(k["sayfa"]))] = metin
+    # evren kapisi: dar/yanlis dizinle "sayfada YOK" hukmu verilmez
+    _kaynak.taban_dogrula(yol, len(sayfalar))
+    _DIZIN["yol"], _DIZIN["sayfalar"] = yol, sayfalar
+    return sayfalar
 
 # Kısaltma -> PDF dosya adı. Taslak kendi haritasını şu yorumla verebilir (öncelikli):
 #   <!-- KAYNAK-HARITASI: HSK=heat-master-slimroof-cati-fanlari-yeni.pdf, VLK=LINEO_QUITE_KATALOG.pdf -->
@@ -90,9 +126,15 @@ JETON_DESENLERI = [
     # ve kaynakta "0,18 kW" yazdigi halde "sayfada YOK: 18 kW" diye YANLIS KIRMIZI veriyordu.
     # Yanlis kirmizi de en az yanlis yesil kadar zararlidir: kapiya guveni bitirir, sonra
     # gercek kirmizilar da "herhalde yine yaniliyor" diye gecistirilir.
+    # ⚠ AKIM (A, mA) — REC-146 3. curutme: hiz anahtari "2,5 A" / "5 A" gibi akim iddialari
+    # jeton sayilmiyor, cumle sessizce "olculemeyen"e dusuyordu. `mA` `m`'den once denenir;
+    # `A` tek harf oldugu icin yalniz BUYUK harf ve kelime sinirinda (re.I bu desende YOK:
+    # "5 a" Turkce baglac/hece ile karisir).
     re.compile(r"(?<![0-9.,])[0-9]{1,5}(?:[.,][0-9]{1,3})?\s?(?:mm|m³/h|m3/h|m²|m2|Pa|kW|W|V|Hz|dB|°C|kg)\b", re.I),
+    re.compile(r"(?<![0-9.,])[0-9]{1,5}(?:[.,][0-9]{1,3})?\s?(?:mA|A)(?![A-Za-zÇĞİÖŞÜçğıöşü0-9])"),
     re.compile(r"\b(?:IE[3-5]|ATEX|EC|AC|PWM|MESH|Wi-Fi|G3|F400|HCS|V0)\b"),
-    re.compile(r"%\s?[0-9]{1,3}\b"),                            # %90
+    re.compile(r"%\s?[0-9]{1,3}\b"),                            # %90 (TR)
+    re.compile(r"(?<![0-9.,])[0-9]{1,3}\s?%"),                   # 90% (EN) — ilk surum gormuyordu
     re.compile(r"\b[0-9]{2,5}\s?°C\b"),
 ]
 
@@ -102,18 +144,8 @@ BLOK_ISARETI = re.compile(r"\*\*(Gövde|Çark|Motor|Koruma|Kontrol|Montaj)\.\*\*
 
 
 def sayfa_metni_getir(pdf_ad, sayfa, onbellek):
-    anahtar = (pdf_ad, sayfa)
-    if anahtar in onbellek:
-        return onbellek[anahtar]
-    yollar = list(KOK.rglob(pdf_ad))
-    if not yollar:
-        onbellek[anahtar] = None
-        return None
-    d = fitz.open(yollar[0])
-    t = d[sayfa - 1].get_text("text") if 0 < sayfa <= d.page_count else None
-    d.close()
-    onbellek[anahtar] = t
-    return t
+    # `onbellek` imzasi korunur (cagiranlar degismesin); dizin zaten bellekte.
+    return dizini_yukle().get((os.path.basename(pdf_ad), sayfa))
 
 
 def norm(s):
@@ -282,6 +314,9 @@ def taslagi_denetle(yol, ayrinti=False):
             _y = re.match(r"^%\s?([0-9]{1,3})$", j.strip())
             if _y and norm(_y.group(1) + "%") in havuz_n:
                 return True
+            _y = re.match(r"^([0-9]{1,3})\s?%$", j.strip())   # ters yon: EN taslak, TR kaynak
+            if _y and norm("%" + _y.group(1)) in havuz_n:
+                return True
             # SAYI-GERI-DUSUSU (birim baslik hucresindeyse tam jeton bitisik gecmez) —
             # ⛔ AMA BIRIM DE SAYFADA GECMELI. Olculmus kor nokta (alt-ajan SABOTAJ D, 2026-09-06):
             # uydurma "Motor 400 °C dayanikli, 315 mm cark" iddiasi YESIL gecti, cunku "400" ve
@@ -367,7 +402,11 @@ def taslagi_denetle(yol, ayrinti=False):
 
 
 def main():
-    argv = [a for a in sys.argv[1:] if not a.startswith("--")]
+    ham = sys.argv[1:]
+    if "--dizin" in ham:          # --dizin'in DEGERI taslak dosyasi sanilmasin
+        i = ham.index("--dizin")
+        ham = ham[:i] + ham[i + 2:]
+    argv = [a for a in ham if not a.startswith("--")]
     ayrinti = "--ayrinti" in sys.argv
     if not argv:
         print(__doc__)
