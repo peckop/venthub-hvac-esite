@@ -1,6 +1,6 @@
 # REC-172 — 4 ailenin teknik veri çıkarımı (NIMUS · NIMAX · Enkelfan EEC · Vorticent CMS ATEX)
 
-> Durum: **PLAN v5** (2026-09-23). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (8 madde), v3
+> Durum: **PLAN v5.1** (2026-09-23; 5. çürütme KOŞULLU, tek cümle → işlendi). v1 çürütmede **BLOK** (9 bulgu), v2 **KOŞULLU** (8 madde), v3
 > **KOŞULLU** (5 madde), v4 **KOŞULLU** (6 madde); v5 hepsini işler — belgenin sonunda sürüm tabloları.
 > Çıkarım koşumu Recep "başla" demeden AÇILMAZ (karar 76). Canlıya yazım ayrıca Recep'in kendi
 > sözüyle (iki anahtar: `--yaz` + `CANLI_YAZIM_ONAYI`).
@@ -133,8 +133,11 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
    alan) değişmez, yalnız örneği ve açıklaması düzelir; Kararlar belgesine not düşülür ve OPS
    üzerinden Recep'e bilgi olarak iletilir.
    `rpm_max` notu: "sabit devirli AC motorda kaynağın verdiği anma devri `rpm_max`'e yazılır" (canlıda
-   tek devir anahtarı `rpm_max`, 229 ürün; §11.7'nin "üst sınır" koşulu bu motor tipinde anma devriyle
-   sağlanır — değişken devirli/EC motorda kaynak "max" demiyorsa geçerli değil).
+   tek devir anahtarı `rpm_max`, 229 ürün). Bu bir **teamül istisnasıdır, fiziksel gerekçe değil**:
+   asenkron motorda anma devri tam yükteki devirdir, yük azaldıkça devir senkron devire yaklaşır ve anma
+   devrini aşar (T4: 1500 > 1400-1475) — yani anma devri üst sınır DEĞİLDİR. `rpm_max` bu motor tipinde
+   anma devrini taşır; §11.7'nin üst sınır anlamına açık istisna olarak yazılır ve ileride `nominal_rpm`
+   göçü adayıdır. Başka alana emsal olmaz.
 2. **Okuyucular** tüm alanlara + ikinci (tablo) okuyucu Enkelfan/CMS s.2 için; test + sabotaj.
    **CMS s.2 tuzakları:** tabloda "RPM" ve "Approx. weight" hem "Fan" hem "Motor" bölümünde geçiyor ve
    satır konumu föyden föye kayıyor (12/5'te ağırlık 1. satır, 45/18'de 3.). Her iki okuyucu da
@@ -231,3 +234,9 @@ Kesin sayı kuru koşumda basılır; sapma sebebiyle yazılır.
 | B-4 `rpm_max` §11.7 ile tutarsız görünüyor | cetvel notu: sabit devirli AC motorda anma devri |
 | B-5 ağırlık iki depoda | vitrin specs'i okur (ölçüldü); sütun ayrı kayıt (4c) |
 | B-6 koşullu atamalar alıntı aramasıyla doğrulanmıyor | `kaynak=koşullu` + kol 1 zorunlu |
+
+## v5 → v5.1 (5. çürütme, KOŞULLU — tek cümle)
+
+| v5 bulgusu | v5.1 |
+|---|---|
+| 7 `rpm_max` notu "anma devri üst sınırdır" diye yanlış fizik gerekçesi yazıyor | teamül istisnası olarak yazıldı (anma devri < senkron devir), `nominal_rpm` göçü adayı, emsal olmaz |

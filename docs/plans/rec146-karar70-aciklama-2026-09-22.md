@@ -1,7 +1,8 @@
 # REC-146 · Karar 70 — eksik ürün açıklamaları (PLAN v3)
 
-> Durum: **PLAN v3** (2026-09-23). v1 3. çürütmede **BLOK** (9 madde), v2 4. çürütmede **BLOK**
-> (9 madde) — belgenin sonunda "v1 → v2" ve "v2 → v3" tabloları. Recep (OPS aktarımı): *eksik TR/EN metin karar konusu değil, onarım.* Akış: plan →
+> Durum: **PLAN v3.1** (2026-09-23). v1 3. çürütmede **BLOK** (9 madde), v2 4. çürütmede **BLOK**
+> (9 madde), v3 5. çürütmede **KOŞULLU** (6 metin maddesi, "yeniden tam tur gerekmez") → v3.1 işler.
+> Sürüm tabloları belgenin sonunda. Recep (OPS aktarımı): *eksik TR/EN metin karar konusu değil, onarım.* Akış: plan →
 > plan-challenger → üretim → taslaklar Recep'e **tek toplu tablo** (aile başına 1 satır) → yazım
 > URUN-KATALOG penceresinde Recep'in sözüyle (iki anahtar). **79** (EN sayfada EN metin yoksa TR
 > gösterilmez) = URUN'un gizleme onarımı; bu plandan bağımsız.
@@ -123,14 +124,20 @@ kapı değildir: **deterministik jeton farkı** (adım 4) her satıra koşar ve 
 KIRMIZI verebilir. Yeni yazılan her **TR** metni (B + "değişti" satırları) ayrıca **anlamsal çürütmeden**
 geçer: ikinci bir ajan (Opus) her cümleyi ailenin kaynak dizini sayfa metnine karşı okur — malzeme,
 aralık, "tüm modeller" kapsamı, işlev iddiası. Jeton kapısı anlamı görmez (CMS malzemesi, Enkelfan
-sıcaklığı YEŞİL geçerdi); bu adım onu kapatır. 25 aile + TR'si yazılacak 8 → ~66 ajan çağrısı, dalgalar hâlinde.
+sıcaklığı YEŞİL geçerdi); bu adım onu kapatır. A'nın 09-06'da onaylanan TR'si yalnız jeton kapısından
+geçmişti; EN onun sadık çevirisi olacağı için oradaki olası olgu hatası iki dile taşınır → **örneklem:
+3 A ailesi** (en çok ürünlü seat-serisi, storm-serisi ve teknik iddiası en yoğun avens-hucreli-hf-s) aynı
+anlamsal çürütmeden geçer; bulgu çıkarsa 16 aileye genişler. Ajan sayısı: 25 yazar + 25 EN çürütücü +
+8 TR çürütücü + 3 örneklem = **61**, dalgalar hâlinde.
 
 ## Adımlar
 
 1. **Ölç:** D kümesi (heterojen özellik) · A ailelerinde onaylanan (K7.8 yükü, md5 sabit) ↔ bugünkü TR
    farkı · evren sayıları (bu belgedeki tablo) betikle yeniden basılır.
-2. **Cetvel:** `vitrin-metni-standard.md` — EN kuralı K10'un alt maddesi; **URUN'un K10'u master'a
-   girdikten sonra** yazılır.
+2. **Cetvel:** EN kuralı **şimdi bu planın eki olarak yazılır** (`docs/plans/rec146-en-metin-kurali.md`;
+   yukarıdaki dört kural + eşdeğerlik tablosu) ve adım 3-8 bu eke bağlıdır — URUN merge'ünü BEKLEMEZ.
+   URUN'un K10'u master'a girince ek, `vitrin-metni-standard.md`'ye K10'un alt maddesi olarak taşınır
+   (aynı dosyada çakışma olmasın diye önce değil).
 3. **Taslak üretimi:** aile başına `paket/rec146/<slug>.tr.md` + `<slug>.en.md` (her cümle
    `[KAYNAK s.NN]`) + özet `paket/rec146-metin-<damga>.csv` (aile, ürün_sayisi, tr_onayli, tr_degisti,
    canli_olgu_hatasi, tr_yeni, en_yeni, kaynak_sayfalari, jeton_tr, jeton_en, curutme_hukmu, not).
@@ -145,12 +152,15 @@ sıcaklığı YEŞİL geçerdi); bu adım onu kapatır. 25 aile + TR'si yazılac
      |---|---|---|
      | yüzde | `%90` | `90%` |
      | ondalık | `1,5` | `1.5` |
-     | binlik ayırıcı (3 hane grubu, ondalık değil) | `25.000` / `25000` | `25,000` / `25000` |
+     | binlik ayırıcı | `25.000` / `25000` | `25,000` / `25000` |
      | birim çevirisi | `d/dk` | `rpm` |
      | faz | `trifaze` / `monofaze` | `three-phase` / `single-phase` |
      | boşluk | `IP55`, `380V` | `IP 55`, `380 V` |
 
-     Ondalık ile binlik ayırıcı ayrımı: virgülden/noktadan sonra tam 3 hane ve sayı ≥ 1000 ise binlik.
+     Sayı ayrıştırması **dile göre** yapılır: TR'de `.` binlik, `,` ondalık; EN'de `,` binlik, `.`
+     ondalık. EN metinde "nokta + tam 3 hane" (`1.125`) belirsizdir → KIRMIZI (yazar `1,125` ya da
+     `1125` yazmalı). Sabotaj: TR `1.125 m³/h` ↔ EN `1.125 m³/h` KIRMIZI (değer 1000 kat kaymış olur);
+     TR `1.125` ↔ EN `1,125` YEŞİL; TR `1,5` ↔ EN `1.5` YEŞİL.
      İç not süzgeci iki dile. KIRMIZI satır tabloya girmez.
    - **Anlamsal çürütme (TR):** B + "değişti" satırlarının her cümlesi kaynak sayfa metnine karşı (YÖNTEM);
      sabotaj: CMS "alüminyum pervane" ve Enkelfan "tek sıcaklık aralığı" metinleri KIRMIZI vermeli.
@@ -161,12 +171,16 @@ sıcaklığı YEŞİL geçerdi); bu adım onu kapatır. 25 aile + TR'si yazılac
    - Atomik koşullu PATCH: `product_families?id=eq.<id>&tenant_id=eq.<t>&updated_at=eq.<kodlu>` —
      `updated_at` ham dize `encodeURIComponent` ile (`+00:00`'daki `+` kodlanmazsa eşleşme hiç olmaz);
      `prefer: return=representation`; 0 satır → yeniden oku, 1 kez dene; yine 0 → KIRMIZI.
-   - `--dil en` (A, A'): gövde = okunan JSON'a yalnız `en` eklenmiş hâli; `en` doluysa yazmaz.
+   - `--dil en` (A, A' — **"değişti" işaretli aile hariç**, bugün jet-serisi): gövde = okunan JSON'a
+     yalnız `en` eklenmiş hâli; `en` doluysa yazmaz. "Değişti" ailesi yalnız B yolundan (tek PATCH,
+     yeni TR + onun EN'i) geçer; iki kümede birden görünen aile → KIRMIZI.
    - B: **tek PATCH** — `tr` + `en` + `is_description_manual=true` birlikte; yalnız
      `is_description_manual=false` ailede ya da tabloda "değişti" işaretli ailede (onaylı TR'nin
      üstüne işaretsiz yazmaz).
-   - KAPI 1 beklenen sayı yükten BAĞIMSIZ: onaylı sunum tablosunun satır sayısı (yük kendisiyle
-     kıyaslanmaz). Bugünkü beklenti A+A' 18, B 7, "değişti" 1. KAPI 3 dile göre ölçer.
+   - KAPI 1 beklenen küme yazıcıya **dışarıdan** verilir: `--beklenen <dosya>` = Recep'in onayladığı
+     aile listesi (onay mesajındaki slug'lar, sunum ve yükten ayrı kaydedilir); yükün slug kümesi bununla
+     **küme olarak** kıyaslanır (sayı değil). Bugünkü beklenti: `--dil en` 17 (A 15 + A' 2), B yolu 8
+     (B 7 + jet). KAPI 3 dile göre ölçer.
    - Audit tetiğe bırakılır. Kuru koşum varsayılan.
    - Test + sabotaj: dolu `en`'i ezmez, `bloklar_tr`/`maddeler_tr`'ye dokunmaz, `+` içeren damga eşleşir,
      değişmiş damgada 0 satır, başka `tenant_id`'ye yazmaz, onaylı TR'nin üstüne işaretsiz yazmaz.
@@ -231,3 +245,14 @@ sıcaklığı YEŞİL geçerdi); bu adım onu kapatır. 25 aile + TR'si yazılac
 | A-7 D sayıları yanlış (12/6 anahtar + 2 adda); sıcaklık/malzeme yok | sayılar düzeltildi; ölçüt ad + kaynak sayfasını da okur; iki özellik eklendi |
 | A-8 K10 master'da yok; 25↔27 farkı açıklanmamış | K10 URUN dalında; EN kuralı K10 alt maddesi, URUN merge'ünden sonra; fark = C'nin 2 ailesi |
 | A-9 B'de iki PATCH → iki audit | B tek PATCH; ölçüt "PATCH başına 1" |
+
+## v3 → v3.1 (5. çürütme, KOŞULLU — metin düzeltmeleri)
+
+| v3 bulgusu | v3.1 |
+|---|---|
+| 1 binlik kuralı dilden bağımsız; `1.125` EN'e aynen kopyalanınca YEŞİL | dile göre ayrıştırma; EN "nokta + 3 hane" KIRMIZI; 3 sabotaj örneği |
+| 2 jet iki yazım yolunda | "değişti" ailesi `--dil en`'den çıkar (17 / 8); kesişim KIRMIZI |
+| 3 KAPI 1 sunumu yükle kıyaslıyor (aynı ayrıştırıcı) | `--beklenen` = Recep'in onayladığı slug listesi, küme kıyası |
+| 4 iş sırası URUN merge'üne bağlı mı belirsiz | EN kuralı şimdi plan eki; üretim beklemez; merge sonrası K10'a taşınır |
+| 5 A'nın onaylı TR'si anlamca hiç çürütülmedi | 3 ailelik örneklem; bulgu çıkarsa 16'ya genişler |
+| 6 ajan sayısı ~66 tutmuyor | 61 (25 + 25 + 8 + 3) |
