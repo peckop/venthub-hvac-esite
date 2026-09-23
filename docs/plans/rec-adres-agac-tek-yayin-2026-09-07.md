@@ -1,338 +1,308 @@
-# Adres şeması (K3-b) + kategori ağacı (K17) + Casals — TEK YAYIN planı · v3
+# Adres şeması (K3-b) + kategori ağacı (K17) + Casals — TEK YAYIN planı · v4
 
-> **REC-191 → REC-300 · URUN · v1 2026-09-07 · v2 2026-09-22 · v3 2026-09-23**
+> **REC-191 → REC-300 · URUN · v1 2026-09-07 · v2 2026-09-22 · v3/v4 2026-09-23**
 > **Bu belge PLAN'dır. Kod YOK, migration YOK, prod yazımı YOK.** Uygulama REC-300 emriyle,
 > REC-212 (katalog paketi) bittikten sonra ve **Recep ön izleme kapısından** geçerek koşar (karar 68).
-> v2'nin bağımsız çürütmesi **BLOK** verdi (11 bulgu, §12); v3 o bulguların her birine bir tasarım
-> cevabı verir (§12 tablosunun "v3 cevabı" sütunu) ve Recep'in 09-22/09-23 hükümlerini işler.
+> v2 çürütmesi BLOK (11 bulgu, §13) → v3 → v3 çürütmesi BLOK (3 KRİTİK, 4 YÜKSEK, 7 ORTA, 4 DÜŞÜK;
+> §12) → **v4**: eski adres çözümü config satırlarından **tek bir eski-adres haritasına** taşındı
+> (barındırma sağlayıcısının yönlendirme sınırına dayanmaz — karar 59).
 
 **KAYNAK/CETVEL:**
-- **Emir:** REC-300 (kapsam 1–6, KAPILAR, EK 09-12 kabul ölçütü: linkinator + unlighthouse). Plan
-  kaynağı REC-191. Yan kayıtlar: REC-331 (39 aile `seo_slug`), REC-270 (bulgu 5 döngü), REC-289
-  (Edge'de DB), REC-373 (EN `html lang`), REC-374 (`src/data/brands.ts`).
-- **Kararlar:** SEO ve Yayın **K3-b** (2026-09-11) · Katalog **K17 + K17 EK** · Vitrin 15A · karar
-  **68** (tek yayın, REC-212 sonrası, ön izleme kapısı) · karar **78** (rakip terimleri; 78b iki yeni
-  hava perdesi dalının slug'ı) · karar **84** (2026-09-23, korozyon dalı model adresi
-  `korozyon-dayanimli-asit-fani`).
-- **Recep hükümleri (plan yazımı sırasında):** 09-22 "aile adresi `/tr/urun/`'e **geçer**" (değişmez
-  diyen K3-b cümlesi eski bilgi — R2 kapandı) · 09-22 ağaç = **bugünkü 18 dal slug'ı + K17'nin 4 yeni
-  dalı** (R1 kapandı; Design'ın 26 dallık tablosu uygulanmaz) · 09-22 442 model adresini URUN üretir.
-- Design-Menü teslimleri (2026-09-11, depoda): [adres şeması v3](rec300-design-adres-semasi-v3-2026-09-11.md)
-  · [slug üretim kuralı](rec300-design-slug-uretim-kurali-2026-09-11.md) ·
-  [kategori ağacı SQL hazırlığı](rec300-design-kategori-agaci-sql-2026-09-11.md).
-- **Ek dosyalar (bu dal):** [442 model adresi](rec300-model-adres-listesi-2026-09-22.csv) ·
+- **Emir:** REC-300 (kapsam 1–6, KAPILAR, EK 09-12 linkinator + unlighthouse). Plan kaynağı
+  REC-191. Yan kayıtlar: REC-331 (39 aile, karar 86), REC-270, REC-289, REC-373, REC-374, REC-367
+  (barındırma, karar 59).
+- **Kararlar:** SEO ve Yayın **K3-b** · Katalog **K17 + EK** · Vitrin 15A · karar **59** (barındırma:
+  zamanı gelince Cloudflare Workers + OpenNext, yedek DigitalOcean; tetik fiyatlar açılmadan önce) ·
+  **68** (tek yayın, REC-212 sonrası, ön izleme) · **78b** (iki perde dalı pazar kelimesi) · **84**
+  (korozyon dalı model adresi `korozyon-dayanimli-asit-fani`) · **86** (2026-09-23: 39 aile adres
+  metni Design `seo_slug`'ına geçer; istisna Casals 4 aile K17 + 2 perde ailesi 78b; yayından önce
+  GSC taban ölçümü).
+- **Recep hükümleri (09-22):** aile adresi `/tr/urun/`'e geçer (R2 kapandı) · ağaç = bugünkü 18 dal +
+  K17'nin 4 dalı (R1 kapandı) · 442 model adresini URUN üretir.
+- Design-Menü teslimleri (depoda): [adres şeması v3](rec300-design-adres-semasi-v3-2026-09-11.md) ·
+  [slug kuralı](rec300-design-slug-uretim-kurali-2026-09-11.md) ·
+  [ağaç SQL hazırlığı](rec300-design-kategori-agaci-sql-2026-09-11.md).
+- **Ek dosyalar:** [442 model adresi](rec300-model-adres-listesi-2026-09-22.csv) ·
   [üretici](rec300-model-adres-uret.py) · [rakip taraması](rec300-rakip-slug-taramasi-2026-09-22.md).
-- Cetveller: `canonical-url-standard.md` · `category-taxonomy-standard.md` (§4.1, §8, §9) ·
-  `rendering-cache-standard.md` · `vitrin-metni-standard.md` (K10 dil kuralı) ·
-  `docs/plans/slug-localization-2026-08-10.md`. **Adres şemasının cetveli YOK** →
-  `docs/standards/adres-semasi-standard.md` bu işin kapsamında (Faz 0).
-- **Ölçüm tazeliği:** canlı DB SELECT + canlı site, 2026-09-22 11:3x–11:5xZ (§3.1); model adres
-  listesi 2026-09-23 06:5xZ taze veriyle yeniden üretildi.
+- Cetveller: `canonical-url-standard.md` · `category-taxonomy-standard.md` · `rendering-cache-standard.md`
+  · `vitrin-metni-standard.md` (K10) · `barindirma-standard.md` (taslak, PR #1306) ·
+  `slug-localization-2026-08-10.md`. **Adres şeması cetveli YOK** → Faz 0.
+- **Ölçüm tazeliği:** canlı DB SELECT + canlı site 2026-09-22/23; çürütme ölçümleri 2026-09-23 (§12).
 
-**YÖNTEM:** şerit (URUN) · plan → **plan-challenger v3 turu** (zorunlu: adres = SEO, 308 geri
-dönüşsüz) · her PR `diff-review` · migration'lı PR kural 13 · canlı doğrulama `qa` · REC-300 EK:
-gstack zinciri yan yana, OPS ölçer.
+**YÖNTEM:** şerit (URUN) · plan → plan-challenger (**v4 turu zorunlu**) · her PR `diff-review` ·
+migration'lı PR kural 13 · canlı doğrulama `qa` · REC-300 EK: gstack zinciri yan yana, OPS ölçer.
 
 ---
 
 ## 1. Ne değişiyor — tek cümle
 
-TR yüzeyde önekler Türkçeleşir (`/tr/kategori/`, `/tr/urun/`, `/tr/markalar/`, `/tr/urunler`), dal
-adresi iki seviyeli olur, her model (442) kendi kanonik adresini alır (`/tr/urun/<slug>-p-<sku>`),
-`?sku=` kalkar; aynı yayında ağaç 4 dal kazanır, 44 ürün dal değiştirir, 4 aile Casals'a geçer.
-EN'de önek değişmez, **model adresleri EN'de de doğar** (EN bugün `EN_YAYIN=false`: noindex, site
-haritası dışı — adresler yine üretilir, yayın EN açılınca görünür).
+TR önekleri Türkçeleşir (`/tr/kategori/`, `/tr/urun/`, `/tr/markalar/`, `/tr/urunler`), dal adresi iki
+seviyeli olur, her model (442) kendi kanonik adresini alır (`…-p-<sku>`), `?sku=` kalkar, 39 aile adres
+metni düzelir (karar 86); aynı yayında ağaç 4 dal kazanır, 44 ürün dal değiştirir, 4 aile Casals'a
+geçer. EN'de önek değişmez; model adresleri ve iki seviyeli dal EN'de de doğar (EN bugün `EN_YAYIN=
+false`: noindex — adresler yine doğru kurulur).
 
 ## 2. Hedef şema
 
 | Nesne | TR | EN | Çözüm |
 |---|---|---|---|
 | Tüm ürünler | `/tr/urunler` | `/en/products` | — |
-| Kök kategori | `/tr/kategori/<kök>` | `/en/category/<kök>` | slug çözücü (cetvel §4.1) |
-| Dal | `/tr/kategori/<kök>/<dal>` | `/en/category/<kök>/<dal>` | **iki seviye kanonik** (§4 Faz 3 madde 1) |
-| Aile (seri) | `/tr/urun/<aile-slug>` | `/en/products/<aile-slug>` | son `-p-` yok → aile; **slug metni bugünkü** (REC-331 açık, §8 R3) |
-| **Model** | `/tr/urun/<slug_tr>-p-<sku>` | `/en/products/<slug_en>-p-<sku>` | son `-p-`'den böl; sağ = SKU (harf duyarsız), sol serbest |
+| Kök | `/tr/kategori/<kök>` | `/en/category/<kök>` | slug çözücü |
+| Dal | `/tr/kategori/<kök>/<dal>` | `/en/category/<kök>/<dal>` | iki seviye kanonik, **iki dilde** |
+| Aile | `/tr/urun/<aile>` | `/en/products/<aile>` | son `-p-` yok → aile |
+| **Model** | `/tr/urun/<slug_tr>-p-<sku>` | `/en/products/<slug_en>-p-<sku>` | son `-p-`'den böl, SKU harf duyarsız |
 | Marka | `/tr/markalar/<marka>` | `/en/brands/<marka>` | — |
 
-Kurallar (Design slug kuralı): SKU adreste küçük harf; büyük harfli → 308 küçüğe · `-p-` slug metninde
-geçemez · slug ≤ 70 karakter · teknik değer yalnız `technical_specs`'ten.
+Kurallar: SKU adreste küçük harf · `-p-` slug metninde geçemez · SKU `P-` ile başlayamaz (D1) · slug
+≤ 70 · teknik değer yalnız `technical_specs`'ten · **slug metni yanlışsa 308 doğru slug'a** (O1; yol
+bazlı karar, ISR'da güvenle önbelleklenir — bugün `products/[slug]/page.tsx:183` aynısını yapıyor).
 
-**⚠ REC-205 dersi:** 2026-09-07'de Google iki seviyeli dal adresimizi "kopya" sayıp eledi; sebep iki
-adresin **aynı anda 200 dönmesi** ve iki seviyelinin zayıf (og:url/JSON-LD'siz, 2 satır kırıntı)
-olmasıydı. v3'te iki seviyeli adres kanonik olur; **tek seviyeli adres yayın anında yalnız 308 verir,
-hiçbir an iki adres birden 200 dönmez** (kapı: §6 INV-ADRES-TEK-KANONIK-1). og:url, JSON-LD ve 5
-satırlı kırıntı iki seviyeli rotaya taşınır.
+**REC-205 dersi, iki dilde:** iki seviyeli adres kanonik olur; tek seviyeli adres **TR'de de EN'de de**
+yalnız 308 verir; hiçbir an bir dal iki adresten 200 dönmez (INV-ADRES-TEK-KANONIK-1, dil = tr ve en).
 
 ## 3. Bugünkü durum
 
-### 3.1 Canlı ölçüm (2026-09-22) — v2'den aynen, iki güncellemeyle
+### 3.1 Canlı ölçüm
 
-| ölçüm | değer | nasıl |
+| ölçüm | değer | kaynak |
 |---|---|---|
-| ürün (silinmemiş) | **442** (441 active, 1 archived) | DB |
-| tekil `lower(sku)` | **442**; hepsi `^[A-Z0-9-]+$`, `-p-` yok | DB |
-| ürün slug'ı dolu/tekil | 442/442; aile slug'ıyla çakışan 0 | DB |
-| aile | **47**, hepsi ürünlü | DB |
-| aktif kök / dal | **6 / 18** → hedef 6 / 22 (+Sığınak köke çıkarsa 7 / 21, §3.2 F6) | DB |
-| `brands` | 5; **casals yok** | DB |
-| site haritası | kategori 24 · ürün 48 · marka 7 | `sitemap.xml` |
-| `/tr/kategori/…` `/tr/urun/…` `/tr/markalar/…` `/tr/urunler` | 404 | curl |
-| `/tr/cart` · `/tr/checkout` | 200 — **dokunulmaz** (OPS RED 09-11, K1); yayın ölçümünde yine 200 olmalı | curl |
-| elle adres kuran dosya | `/category/` 9 dosya 22 satır · `/products/` 9 · `/brands/` 2 (+ çürütmenin ekledikleri §12 #5) | grep |
-| adres üreten DB fonksiyonu | 1: `get_search_suggestions` | `pg_proc` |
-| **ürün slug'ı değişmiş ürün** (güncelleme 09-23) | **7** — 5 VRT-CA-IL RECT (09-09) + NIC-11921 (09-22) + **VRT-253490106XN (09-22, karar 75, 4kW→3kW)**; kaynak `admin_audit_log` | SELECT |
-| `next.config` elle ürün yönlendirmesi | 6 (hedefi `?sku=`); **VRT-253490106XN'nin eski slug'ı için satır YOK** — bugün aile `?sku=`'ya düşüyor | dosya |
+| ürün | 442 (441 active); SKU'nun **442'si büyük harfli** (`^[A-Z0-9-]+$` kısıtı) | DB |
+| aile / aktif kök / aktif dal | 47 / 6 / 18 (+7 pasif satır) | DB |
+| kategorilerde `metadata.slug.tr ≠ slug` | **24/24** (TR adreste EN slug'lı eski adresler de canlı: `/tr/category/fans` → 308) | DB + curl |
+| `brands` | 5; casals yok; `products.brand` 53 üründe "AVenS" | DB |
+| slug'ı değişmiş ürün (`admin_audit_log`) | 7; **aile tablosu için iz 2026-09-17'den başlıyor** (öncesi bilinmiyor, O6) | DB |
+| `next.config` | 13 dilsiz eski kategori kuralı (`/category/<tr>/:path*` → `/category/<en>/:path*`) + 6 ürün kuralı; **bugün 4 hop'luk zincir var**: `/category/fanlar` → `/category/fans/` → `/category/fans` → 307 `/tr/category/fans` → 308 `/tr/category/fanlar` | dosya + curl (K3) |
+| admin slug düzenlemesi | `authenticated` rol (`prod_admin_update_opt`, `product_families_admin_write`) | `pg_policies` |
+| webhook tazeleme | `familyTag` tüketen `unstable_cache` YOK (no-op, `route.ts:416-420`); `old_record.slug` ve `subcategory_id` kullanılmıyor; IndexNow listesi `revalidatedPaths`'ten | kod (Y3, O5) |
+| `/tr/cart` · `/tr/checkout` | 200 — **dokunulmaz** (K1) | curl |
 
-### 3.2 Design dosyalarıyla farklar — v2 §3.2 (F1–F8) geçerli; iki hüküm kapandı
+### 3.2 Design farkları
+v2 §3.2 F1–F8 geçerli. **R1 kapandı** (bugünkü 18 + 4, Sığınak dal kalır). **78b:** perde dalları
+`isiticisiz-hava-perdeleri` · `elektrikli-isiticili-hava-perdeleri`. **Karar 86:** 39 aile `seo_slug`
+(tablo: OPS'a 2026-09-23 iletilen liste); 4 Casals ailesi `casals-…` (K17); 2 perde ailesinin
+`seo_slug`'ı 78b kelimesiyle düzeltilir (`…-elektrikli-isiticili-hava-perdeleri`,
+`…-isiticisiz-hava-perdeleri`).
 
-- **F2 / R1 kapandı (Recep 09-22):** 26 dallık Design tablosu uygulanmaz; bugünkü 18 dal slug'ı kalır,
-  K17'nin 4 yeni dalı eklenir, **yalnız korozyon dalının TR slug'ı** değişir (K17).
-- **F6 Sığınak:** köke çıkıp çıkmadığı Design v3'te kategori, canlıda dal. R1 cevabı "bugünkü ağaç"
-  olduğu için **Sığınak dal olarak kalır** (bu yayında köke çıkmaz; ayrı ağaç kararı olursa kendi
-  308'iyle gelir).
-- **78b:** iki yeni hava perdesi dalının TR slug'ı pazar kelimesini alır:
-  `isiticisiz-hava-perdeleri` · `elektrikli-isiticili-hava-perdeleri` (EN: `ambient-air-curtains`,
-  `electric-heated-air-curtains`). Dal henüz yok → 308 maliyeti 0.
+### 3.3 Ek kusurlar
+REC-289 (Edge'de DB) · breadcrumb `İ` (özel ad alanlarında `text-transform` yasağı; `lang` kökü
+REC-373) · 7 ailenin EN adı boş (Faz 2 ön koşulu, KATALOG) · dil düşüşü (PR #1329; yeni rotalar aynı
+katmandan geçer).
 
-### 3.3 Planın konusu olan ek kusurlar
+## 4. Mimari karar: eski adresler NEREDE çözülür (v3 K1–K3'ün cevabı)
 
-- **REC-289 · Edge'de DB sorgusu** (`src/middleware.ts:123-156`): UUID yönlendirmesi sayfa katmanına
-  taşınır; middleware'e yeni DB sorgusu eklenmez, mevcut olan kalkar.
-- **Breadcrumb `İ`** (REC-300 madde 6): EN kırıntıda CSS `uppercase` + `lang="tr"` → `i`→`İ`. Bu
-  yayında düzeltme: **özel ad alanlarına (`ad`, marka, seri, kategori adı) `text-transform` yasak**;
-  kapı tüm bileşenleri tarar (§6). `<html lang>` kökten düzeltmesi **REC-373**'te (çürütme #10) —
-  `text-transform` yasağı `lang`'dan bağımsız çalışır.
-- **AVenS name_en** (REC-300 madde 6): EN adı boş aile **7**. EN model slug'ı ada dayanır → **Faz 2 ön
-  koşulu** (KATALOG). Liste bugün boş EN adı için TR addan türetmiyor; EN adı gelince yeniden üretilir.
-- **Dil düşüşü** (INV-DIL-DUSUSU-1, PR #1329): EN sayfada TR gövde metni kaldırıldı; yeni rotalar aynı
-  `dildekiMetin` / `aileMetniniIndir` / `kategoriMetniniIndir` katmanından geçer.
+v3 eski adresleri `next.config` satırlarına yazıyordu. Çürütme üç şey ölçtü: (K1) `has: query sku`
+kuralı query'yi hedefe taşır ve kendi hedefinde yeniden eşleşir → döngü; (K2) 884 + 884 satır Vercel'in
+**2048 rota** sınırına dayanır, tek desen kuralı ise büyük harfli SKU yüzünden 2 hop yapar; (K3) dilsiz
+eski kurallar bugün 4 hop. Ayrıca karar 59 barındırmayı Cloudflare'e taşıyacak — sağlayıcıya özgü bir
+sınıra yaslanan tasarım iki kez yazılır.
 
-## 4. Fazlar
+**v4 kararı — üç katman, her katmanın tek işi:**
 
-Sıra kasıtlı ve **çürütme #3'ün cevabıdır**: (A) eski adresleri tanıyan kod → (B) veri → (C) yeni
-adresin açılışı. Her adım tek başına canlıda güvenlidir; adım sırası ters dönerse bir sonraki adım
-kırılmaz, yalnız bekler.
+| katman | ne çözer | niçin orada |
+|---|---|---|
+| **1. Eski-adres haritası** (`src/data/generated/eski-adres-haritasi.json`, derleme anında DB'den üretilir; kiracı anahtarlı) — **middleware** okur | bugün var olan her eski adres: kategori (TR/EN slug'lı, tek/iki seviye), aile (eski slug + karar 86 + Casals), ürün slug'ı, `?sku=`, dilsiz eski adresler | istek başına **tek sözlük araması**, DB sorgusu YOK (kural 12, REC-289 uyumlu); hedef query'siz kurulur → döngü yok (K1); satır sınırı yok (K2); dilsiz adreste dil tespiti + hedef aynı adımda → **tek 307** (K3); Vercel'de de Cloudflare/OpenNext'te de aynı çalışır (karar 59) |
+| **2. Takma ad tablosu** (`url_takma_adlari`, DB) — **sayfa** okur | derlemeden SONRA değişen slug'lar (admin düzenlemesi, katalog düzeltmesi) | harita bir sonraki derlemeye kadar bayattır; sayfa "bulunamadı" dalında tabloya bakar → 308 (`dynamicParams` true: istek anında render, sonuç önbelleğe) |
+| **3. `next.config`** | yalnız kalıcı, veriden bağımsız desenler: `/tr/brands/*` → `/tr/markalar/*` · `/tr/products` → `/tr/urunler` · `destek/hesaplayicilar` | birkaç satır; 13 dilsiz kategori kuralı ve 6 ürün kuralı **silinir** (haritaya taşınır) |
 
-### Faz 0 — cetvel (kod yok)
-`docs/standards/adres-semasi-standard.md`: §2 şeması · çözüm kuralı · rezerve kelimeler (Design v3 §4
-+ `api`, `admin`, `_next`) · **hop bütçesi** (dil önekli adres ≤ 1 hop, dil öneksiz eski adres ≤ 2
-hop: middleware 307 dil + 308 hedef) · "iki adres aynı anda 200 dönmez" ilkesi (REC-205) · yayın
-kontrol listesi. Kanonik-URL cetveline çapraz bağlantı.
+Sıra kuralı: `next.config` redirect'leri middleware'den önce koşar → config'de eski ürün/aile/kategori
+deseni **kalmaz**, yoksa harita hiç çalışmaz (v3'ün 2 hop'u buradan doğuyordu).
 
-### Faz 1-A — takma ad tablosu + onu okuyan kod (migration + kod, canlıda görünmez)
-Çürütme #3 ve #6'nın cevabı: yeniden adlandırma bir **veri olayıdır**, config satırı değil.
-1. Migration: `url_takma_adlari(tenant_id, tur, dil, eski_slug, hedef_id, sebep, created_at)`;
-   `unique(tenant_id, tur, dil, eski_slug)`; RLS salt okuma (anon SELECT, yazma yalnız servis rolü) ·
-   `products`: `unique(tenant_id, lower(sku))` + `check (sku !~* '-p-')` · aile slug'ı için
-   `check (slug !~ '-p-')`.
-2. Tohum: bugün bilinen eski slug'lar — 7 ürün (`admin_audit_log`'dan, §3.1) + 4 Casals ailesinin eski
-   slug'ı (Faz 1-B'de değişecek olanlar, **önceden** yazılır).
-3. Tetik: `products.slug` / `product_families.slug` / `products.sku` değişince eski değer takma ad
-   tablosuna yazılır (bir daha elle config satırı gerekmez; `admin_audit_log` zaten yazılıyor, kural 11).
-4. Kod: ürün/aile çözücüsü "slug bulunamadı" dalında takma ad tablosuna bakar → 308 kanoniğe
-   (bugünkü `/products/` rotasında; yeni rotalar Faz 3'te aynı çözücüyü kullanır).
-Kapı: gölgede 4 senaryo (temiz · ikinci koşum · iki kiracı · slug güncellemesi tetiği yazıyor mu),
-çıkış kodlarıyla (karar 45 kalıbı).
+Harita boyutu: ~442×2 ürün + 442×2 `?sku=` anahtarı (aynı sözlük, sku→model) + 47×2 aile + ~100
+kategori → birkaç yüz KB; Cloudflare Workers paket sınırı (Paid 10 MiB, bugün 3,0 MiB — REC-367) içinde.
+**Ölçülecek:** middleware'in harita yükü ile soğuk başlangıç süresi (Faz 3 kapısı).
 
-### Faz 1-B — ağaç + Casals verisi (migration, Recep merge, kural 13)
-Faz 1-A canlıdayken iner; yeni slug'lar takma ad tablosu sayesinde eski adreste 308 alır.
-1. `brands`'a Casals (`tenant_id` dahil) · **`products.brand` metin sütunu 53 üründe** "Casals"
-   (çürütme #8).
-2. +4 dal (plug-fans, cabinet-fans, ambient-air-curtains, electric-heated-air-curtains; TR slug'lar
-   78b); `level` / `sort_order` komşudan ölçülerek.
-3. 6 aile + 44 ürün taşıma — iki tablo birlikte (cetvel §8).
-4. Korozyon dalı adı + `metadata.slug.tr` · `sub.spare-parts` translation_key · 4 Casals ailesi
-   (`brand_id`, ad, slug `casals-…`).
-5. `products.slug_i18n jsonb` (boş açılır) + `get_family_detail` onu döndürür + tip üretimi
-   (`pnpm supabase:gen`) aynı PR'da (çürütme #6).
-Migration kalıbı karar 45: plan bütünlüğü kapısı · kiracı tek satır · her hedef satırın eski değeri
-doğrulanır · idempotent · gölgede 4 senaryo.
-**⚠ Yeni dallar eski adres şemasıyla doğar** (çürütme #3): Faz 1-B → Faz 3-C arası 4 yeni dal
-`/tr/category/<dal>` adresinde yayında olur. Kabul: bu dalların eski adresi de Faz 3-C'de 308 alır
-(§5 satır 2, 22 dal).
+## 5. Fazlar
 
-### Faz 2 — model slug'ları (veri migration'ı, kural 13)
-Kaynak: **URUN'un ürettiği liste** (bu dalda, 442 satır, Recep kabulü 09-22) — REC-212 paketi
-`slug_tr`/`slug_en` taşırsa paket kazanır, liste doğrulayıcıyla karşılaştırılır. Doğrulayıcı (URUN):
-uzunluk ≤ 70 · `-p-` yok · rezerve kelime yok · `(tenant, dil, slug)` tekil · teknik değer
-`technical_specs`'te var · EN slug'da Türkçe harf yok · karar 84 (korozyon dalı 81/81) · 7 eski slug
-takma adda. Ön koşul: 7 ailenin EN adı (§3.3). Yazım `slug_i18n`'e.
-Bugünkü liste ölçümü (2026-09-23): 442/442 TR + EN tekil · en uzun 70/69 · 7 eski slug ·
-KELIME>10 82 (Design'ın 10 kelime sınırı tip kelimesini kesmesin diye bilinçli sapma; listede notlu).
+Sıra (çürütme #3): **(A) eski adresleri tanıyan kod → (B) veri → (C) yeni adresin açılışı.**
 
-### Faz 3 — kod (bayrak = derleme sabiti, canlıda görünmez)
-Çürütme #1, #2, #4, #5, #7, #9'un cevabı.
+### Faz 0 — cetvel
+`adres-semasi-standard.md`: §2 şeması · §4 üç katman ve sıra kuralı · rezerve kelimeler (+`api`,
+`admin`, `_next`) · **hop bütçesi: dil önekli eski adres 1 hop (308), dilsiz eski adres 1 hop (307)** ·
+"iki adres aynı anda 200 dönmez" (iki dil) · slug metni yanlış → 308 · dilsiz **yeni** adreste EN
+ziyaretçi davranışı (D3: `/kategori/x` → `/en/…` karşılığına, `/en/kategori` 404'e değil) · yayın
+kontrol listesi.
 
-1. **Gerçek rotalar, rewrite YOK** (çürütme #1): `app/[lang]/kategori/[kok]/[[...dal]]`,
-   `app/[lang]/urun/[slug]`, `app/[lang]/urunler`, `app/[lang]/markalar/[slug]` klasörleri **mevcut
-   görünümleri** (`views/category/*`, `ProductDetailPageView`) çağırır — görünüm kodu kopyalanmaz.
-   `lang !== 'tr'` → `notFound()` (EN bu rotaları kullanmaz). EN tarafında `category/[categorySlug]/
-   [subCategorySlug]` **içerik üreten** rotaya çevrilir (bugün koşulsuz `permanentRedirect`). Tek seviyeli
-   eski rota yalnız 308 verir. Döngü imkânsızdır çünkü hiçbir rota bir diğerine geri yönlendirmez; kapı
-   yine ölçer (§6).
-2. **Tek adres SSOT** `adresUret(nesne, dil)` (`src/utils/routes.ts` içinde): canonical, hreflang,
-   og:url, JSON-LD, site haritası, kırıntı, kart bağlantısı hepsi buradan. Sayfaların kendi `/category/`
-   birleştirmesi kalkar (çürütme #1'in ikinci yarısı: `[categorySlug]/page.tsx:129-131,194`).
-3. **Model çözücü** (`productRoute.ts` genişler): son `-p-` → SKU (harf duyarsız) → model; SKU büyük
-   harf → 308 küçüğe; `-p-` yok → aile; aile/ürün slug'ı bulunamazsa → **takma ad tablosu** → 308;
-   yoksa 404; ağ hatası → "unavailable" (bugünkü ayrım korunur). **Slug metni yanlışsa 308 değil 200 +
-   doğru canonical** (çürütme #2: sayfa `force-static`, istek başına karar verilemez; Google canonical'ı
-   izler).
-4. **`?sku=`** (çürütme #2): `next.config` `has: [{ type: 'query', key: 'sku' }]` kuralı →
-   `/:lang/urun/:aile` ve `/en/products/:aile` için sku değeri → model adresi. SKU→slug eşlemesi derleme
-   anında 442 satırlık üretilmiş dosyadan (`src/data/generated/model-adresleri.json`, Faz 2 verisinden
-   betikle); veri değişince yeniden üretim kapısı (§6 INV-ADRES-TAZELIK-1). Eski ürün slug'ı
-   (`/tr/products/<ürün-slug>`) aile desen kuralından **önce** ayrı kuralla ele alınır → tek hop.
-5. **Dilsiz eski adresler** (çürütme #9): dil eklemesi middleware'in 307'sinde kalır, config hedefi
-   `/tr/`'ye sabitlenmez. Bütçe ≤ 2 hop (Faz 0).
-6. **UUID yönlendirmesi** middleware'den sayfa çözücüsüne (REC-289).
-7. **Yüzeyler** (çürütme #5): v2 listesi + `LanguageSwitcher` (bugün ilk segmenti değiştiriyor →
-   `/tr/kategori/` ↔ `/en/category/` eşlemesi gerekir) · `ClientLayout.tsx:77` ·
-   `MobilAltSekmeCubugu.tsx:128` · `Seo.tsx:52` · PDP'nin `?sku=` yazıcısı (varyant seçimi artık model
-   adresine gider) · `public/llms.txt` · `ApplicationSolutions.tsx` 49/55 · `SearchOverlay.tsx` 373-374.
-   Mevcut `localized-route-ssot` + `canonical-url-ssot` kapıları genişler; evrene `public/` girer.
-8. **Arama** (çürütme #7): `get_search_suggestions` adres **üretmez**; `sku`, `slug_i18n`,
-   `family_slug`, `tur` döndürür, adresi istemci `adresUret` ile kurar → migration (kural 13); imza
-   değişimi, eski istemciyle uyum için geçiş: yeni kolonlar **eklenir**, eski `url` kolonu Faz 3-C'ye
-   kadar kalır.
-9. **Webhook tazeleme** (çürütme #4): iç yollar (`/[lang]/category/…`, `/[lang]/products/…`) korunur,
-   yeni rotalar için dal eklenir; **442 model yolu tek tek değil etiketle** (`revalidateTag('product-
-   <sku>')` + `lang` + `tenantId`, kural 12); `revalidatePath`'in yeni rotada çalıştığı `next start`
-   üstünde ölçülür (çürütme "ölçülmeyen" satırı).
-10. **Site haritası** tip başına ayrılır + 442 model; hreflang TR↔EN; `x-default`. EN kısmı
-    `EN_YAYIN` sabitine bağlı kalır.
-11. **Product JSON-LD** fiyatsız (K1): `sku`, `brand`, `additionalProperty[]`.
-12. **Sözlük** (REC-300 terminoloji 09-11): ekranda "alt kategori" ve "seri"; yeni anahtarlar TR/EN
-    parite + keycheck.
-13. **Bayrak** (çürütme #3): `ADRES_SEMASI_K3B` derleme sabiti (`src/config/features.ts`, mevcut
-    `EN_YAYIN` kalıbı). Kapalıyken yeni rotalar 404, eski adresler bugünkü gibi; açıkken eski adresler
-    308. Çalışma zamanı bayrağı değildir — açma = sabit değişikliği + deploy.
+### Faz 1-A — takma ad tablosu + onu okuyan kod (migration, kural 13; canlıda görünmez)
+1. `url_takma_adlari(tenant_id, tur, dil, eski_slug, hedef_id, sebep, created_at)`,
+   `unique(tenant_id, tur, dil, eski_slug)`. **RLS okuma `tenant_id = jwt_tenant_id()`** (mevcut
+   kalıp, O4); yazma yalnız tetik.
+2. **Tetik fonksiyonu `SECURITY DEFINER` + `SET search_path`** (Y1; emsal `denetim_izi_yaz`) —
+   admin `authenticated` rolle slug düzenler, invoker yetkisi RLS'e takılıp UPDATE'i geri alırdı.
+   `INSERT … ON CONFLICT (tenant_id, tur, dil, eski_slug) DO UPDATE SET hedef_id, created_at` (Y2:
+   A→B→A→B); yeni slug bir takma adla çakışırsa o takma ad **silinir** (canlı slug önceliklidir).
+   İzlenen: `products.slug`, `products.sku`, `product_families.slug`, **`categories.slug` +
+   `metadata.slug`** (O4: kategori yeniden adlandırması da elle config istemesin).
+3. Kısıtlar: `check (sku !~* '(^p-|-p-)')` (D1) · aile ve kategori slug'ında `-p-` yok · tekillik:
+   bugünkü küresel `UNIQUE(sku)` ve `uq_products_slug_lower` **kalır** (tek kiracı, kural 12 PARK
+   notu); `(tenant_id, …)` sürümü çok kiracılı yapı açılınca — cetvele yazılır (D2).
+4. Tohum: 7 ürün (audit) + 4 Casals ailesi + 39 aile (karar 86) **önceden**; evren ayrıca geçmiş site
+   haritası dökümleri ve GSC sayfa listesiyle birleştirilir (O6: aile izi 09-17'de başlıyor).
+5. Kod: ürün/aile/kategori çözücüsü "bulunamadı" dalında tabloya bakar → 308; kiracı sorguda açıkça
+   süzülür.
+Gölgede senaryolar (çıkış kodlarıyla): temiz · ikinci koşum · **authenticated admin slug günceller →
+takma ad yazılır, UPDATE kalır** · A→B→A→B · iki kiracı.
 
-### Faz 3-C — adres açılışı (tek PR: bayrak `true` + §5 config satırları)
-Önceki fazların hepsi canlıdayken iner. Tek geri dönüşsüz adım budur.
+### Faz 1-B — ağaç + Casals + 39 aile verisi (migration, Recep merge)
+1. Casals `brands` + `products.brand` 53 üründe (#8).
+2. +4 dal (78b TR slug'ları); `level`/`sort_order` komşudan ölçülerek.
+3. 6 aile + 44 ürün taşıma, iki tablo birlikte (cetvel §8).
+4. Korozyon dalı adı + `metadata.slug.tr` · `sub.spare-parts` translation_key · 4 Casals ailesi.
+5. **39 aile slug'ı** (karar 86; 2 perde ailesi 78b kelimesiyle) — Faz 1-A tetiği eski slug'ları
+   takma ada yazar.
+6. `products.slug_i18n jsonb` + `get_family_detail` onu döndürür + `pnpm supabase:gen` aynı PR'da.
+Kalıp karar 45 (plan bütünlüğü · kiracı tek satır · eski değer doğrulaması · idempotent · gölge).
+Faz 1-B ile Faz 3-C arasında yeni slug'lar **bugünkü** `/tr/products/` ve `/tr/category/` rotalarında
+yaşar; eski slug'lar takma adla 308 alır. Bu ara dönemde kırık adres yoktur.
 
-### Faz 4 — Recep ön izleme kapısı (karar 68 şartı)
-Vercel önizlemesi (Faz 3-C dalı) ya da yerel üretim paketi. Recep'e **gezinme listesi**: menü → her kök
-kategori → 4 yeni dal (iki perde dalı pazar adıyla) → bir Casals ailesi → bir korozyon dalı modeli
-(adreste "asit-fani") → bir model sayfası TR + EN → eski adres örnekleri (tek seviyeli dal, iki
-seviyeli eski dal, aile, `?sku=`, eski ürün slug'ı, 09-22'de değişen VRT-253490106XN'nin eski adresi,
-büyük harfli SKU) yeni adrese tek sıçramada gidiyor mu → arama önerisinden bir ürüne tık → EN kırıntıda
-`İ` yok → `/tr/cart` 200. **Recep "gördüm, tamam" demeden Faz 3-C merge edilmez.**
+### Faz 2 — model slug'ları (veri migration'ı)
+Kaynak: URUN listesi (bu dal; REC-212 paketi `slug_tr/en` taşırsa paket kazanır, doğrulayıcı
+karşılaştırır). Doğrulayıcı: ≤ 70 · `-p-` yok · rezerve kelime yok · `(tenant, dil, slug)` tekil ·
+teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81) · 7 eski slug takma adda.
+Ön koşul: 7 ailenin EN adı. Bugün: 442/442 tekil, en uzun 70/69.
+
+### Faz 3 — kod (bayrak = derleme sabiti `ADRES_SEMASI_K3B`, canlıda görünmez)
+1. **Gerçek rotalar, rewrite yok:** `app/[lang]/kategori/[kok]/[[...dal]]`, `app/[lang]/urun/[slug]`,
+   `app/[lang]/urunler`, `app/[lang]/markalar/[slug]` mevcut görünümleri çağırır; `lang !== 'tr'` →
+   `notFound()`. EN `category/[categorySlug]/[subCategorySlug]` içerik üreten rotaya döner;
+   **EN tek seviyeli dal adresi sayfa katmanında 308** (Y4). Bayrak kapalıyken yeni rotalar 404.
+2. **`adresUret(nesne, dil)`** tek SSOT: canonical, hreflang, og:url, JSON-LD, site haritası, kırıntı,
+   kart, **IndexNow listesi** (Y3 ek bulgu: iç yollardan değil), arama sonucu.
+3. **Model çözücü:** son `-p-` → SKU → model; büyük harf SKU → 308; slug metni yanlış → **308** (O1);
+   `-p-` yok → aile; bulunamadı → takma ad → 308; yoksa 404; ağ hatası → unavailable.
+4. **Eski-adres haritası üreticisi** (`scripts/` değil `src/data/generated/` + üretim betiği; derleme
+   öncesi adım) ve **middleware eşleyicisi**: yol + `?sku=` + dil → tek hedef; dilsiz yolda dil tespiti
+   (bugünkü `detectLocale`) ile **tek 307**, dilli yolda **tek 308**; hedefte query yok. 13 dilsiz
+   kategori kuralı + 6 ürün kuralı `next.config`'ten silinir.
+5. **Eski TR kategori rotaları** (bayrak açıkken): her çözülebilir slug (TR ya da EN biçimli) için
+   doğrudan `adresUret(kategori,'tr')`'ye 308 (O2) — harita kaçırsa da tek hop.
+6. **UUID yönlendirmesi** middleware'den sayfaya (REC-289).
+7. **Yüzeyler:** v3 listesi (LanguageSwitcher, ClientLayout:77, MobilAltSekmeCubugu:128, Seo:52, PDP
+   `?sku=` yazıcısı, `public/llms.txt`, ApplicationSolutions 49/55, SearchOverlay 373-374, webhook,
+   JSON-LD, config/applications, applicationLinks, Breadcrumb). Kapılar genişler, evrene `public/`.
+8. **Arama:** `get_search_suggestions` adres yerine kimlik döndürür (`sku`, `slug_i18n`, `family_slug`,
+   `tur`); dönüş tipi değiştiği için **DROP + CREATE aynı işlemde**; tek tüketici `product.service.ts:36`
+   aynı PR'da. Eski `url` kolonu Faz 3-C'ye kadar kalır.
+9. **Tazeleme** (Y3, O5): model/aile sayfa verisi `unstable_cache(…, { tags: [modelTag(sku, lang,
+   tenantId)] })` ile okunur (etiket ancak böyle sayfayı tazeler); webhook `products` + `price_lists` +
+   `product_families` dallarına etiket çağrısı; **slug değişince `old_record.slug` yolu da**, **eski ve
+   yeni `subcategory_id` dalları da** tazelenir; `route.tags.test.ts` genişler. Kural 12: etikette
+   `lang` + `tenantId`.
+10. **Site haritası** tip başına + 442 model; hreflang; `x-default`; EN kısmı `EN_YAYIN`'a bağlı.
+11. **Product JSON-LD** (O7): fiyatlı modelde `offers` **korunur**; fiyatsız modelde tür `Product`
+    kalır ama `offers` yerine hiçbir şey uydurulmaz → GSC "geçersiz öğe" riski **ölçülür**
+    (Rich Results Test, 3 örnek); sonuç cetvele yazılır, gerekirse fiyatsız modelde yalnız
+    `BreadcrumbList` + `ItemPage`.
+12. **Sözlük:** "alt kategori", "seri" (TR/EN parite + keycheck).
+13. **Önceden üretim** (D4): model sayfalarında `generateStaticParams` **boş**, `dynamicParams` ile
+    talep üzerine üretim (derleme 94 → ~1000 sayfaya çıkmasın); aile ve kategori önceden üretilir.
+    Derleme süresi Faz 3 kapısında ölçülür.
+
+### Faz 3-C — adres açılışı (tek PR: bayrak `true` + harita + config'ten 19 satırın silinmesi)
+Önceki fazlar canlıdayken iner. Tek geri dönüşsüz adım.
+
+### Faz 4 — Recep ön izleme kapısı (karar 68)
+Önizleme ya da yerel üretim paketi. Gezinme listesi: menü → her kök → 4 yeni dal (perde dalları pazar
+adıyla) → bir Casals ailesi → karar 86'dan iki aile (eski adres → yeni) → korozyon dalından bir model
+("asit-fani") → bir model TR + EN → eski adres örnekleri (`/category/fanlar` dilsiz, `/tr/category/fans`
+EN slug'lı, iki seviyeli eski dal, aile, `?sku=`, eski ürün slug'ı, VRT-253490106XN eski adresi, büyük
+harf SKU) **tek sıçramada** yeni adrese → arama önerisinden tık → EN kırıntıda `İ` yok → `/tr/cart`
+200. **"Gördüm, tamam" olmadan Faz 3-C merge edilmez.**
 
 ### Faz 5 — yayın
-Faz 3-C merge → Vercel deploy → yayın ölçümü (§6 son madde) → site haritası GSC'ye + IndexNow (K4) →
-iki hafta izleme (§7).
+**Ön koşullar:** REC-212 paketi bitti · 7 ailenin EN adı dolu · **GSC taban ölçümü alındı** (karar 86
+şartı; erişim ALTYAPI'da) · linkinator + unlighthouse yayın öncesi taraması alındı · Faz 4 onayı.
+Sonra: Faz 3-C merge → deploy → yayın ölçümü (§7) → site haritası GSC'ye + IndexNow (K4) → iki hafta
+izleme (§8).
 
-## 5. Yönlendirme tablosu
+## 6. Eski adres envanteri (haritanın içeriği; config satırı değil)
 
-| # | eski (canlı) | yeni | adet | nerede |
+| # | eski | yeni | adet (kaynak başına) | katman |
 |---|---|---|---|---|
-| 1 | `/tr/category/<kök>` | `/tr/kategori/<kök>` | 6 | config |
-| 2 | `/tr/category/<dal>` (tek seviye, bugün kanonik) | `/tr/kategori/<kök>/<dal>` | 22 (18 + 4 yeni dalın Faz 1-B–3-C arası adresi) | config (statik eşleme) |
-| 3 | `/tr/category/<kök>/<dal>` | `/tr/kategori/<kök>/<dal>` | 18 | config — hedef doğrudan, zincir yok |
-| 4 | `/tr/category/korozyon-…` eski TR slug | yeni korozyon adresi | 1 | config |
-| 5 | `/tr/products` | `/tr/urunler` | 1 | config |
-| 6 | `/tr/products/<aile>` | `/tr/urun/<aile>` | 47 | config (desen; #7'den SONRA) |
-| 7 | `/(tr\|en)/products/<ürün-slug>` (442 × 2) | model kanoniği | 884 | config, üretilmiş dosyadan (Vercel sınırı §11) — ya da çözücü |
-| 8 | `?sku=` (TR + EN aile) | model kanoniği | 442 × 2 | config `has: query` |
-| 9 | 4 Casals ailesinin eski slug'ı | `casals-…` | 4 × 2 dil | **takma ad tablosu** (Faz 1-A) |
-| 10 | 7 ürünün eski slug'ı | model kanoniği | 7 × 2 dil | **takma ad tablosu** |
-| 11 | `/tr/brands/*` | `/tr/markalar/*` | desen | config |
-| 12 | `next.config` 6 elle kural | doğrudan `-p-<sku>` | 6 | config (hedef yeniden yazılır) |
+| 1 | `/tr/category/<kök>` (TR ve EN slug'lı) | `/tr/kategori/<kök>` | 6 × 2 biçim | harita + sayfa (O2) |
+| 2 | `/tr/category/<dal>` (TR ve EN slug'lı; 18 + 4 yeni dalın ara dönem adresi) | `/tr/kategori/<kök>/<dal>` | 22 × 2 biçim | harita + sayfa |
+| 3 | `/tr/category/<kök>/<dal>` | `/tr/kategori/<kök>/<dal>` | 18 | harita |
+| 4 | **EN** `/en/category/<dal>` (tek seviye) | `/en/category/<kök>/<dal>` | 22 | sayfa (Y4) + harita |
+| 5 | dilsiz `/category/<eski-tr>/:yol` (bugünkü 13 kural) | dile göre son hedef | 13 kök × alt yollar | harita, **tek 307** |
+| 6 | `/tr/products` | `/tr/urunler` | 1 | config |
+| 7 | `/(tr\|en)/products/<aile>` (bugünkü 47 + karar 86'nın 39 eski slug'ı + 4 Casals) | `/tr/urun/<aile-yeni>` · `/en/products/<aile-yeni>` | 47 × 2 | harita |
+| 8 | `/(tr\|en)/products/<ürün-slug>` + 7 eski ürün slug'ı | model kanoniği | 442 × 2 + 7 × 2 | harita (+ takma ad) |
+| 9 | `?sku=` (TR + EN aile adresi, eski ve yeni önekte) | model kanoniği | 442 × 2 | harita (middleware query'yi okur, hedefte düşürür) |
+| 10 | `/tr/brands/*` | `/tr/markalar/*` | desen | config |
 | — | `/tr/cart` · `/tr/checkout` | dokunulmaz | 0 | — |
 
-REC-300 "442 + 33 + 4" sayısıyla fark: kategori tarafı 6 + 22 + 18 + 1 = **47** (33 Design'ın 7+26
-ağacıydı, R1 ile düştü); model tarafı TR+EN **884** + `?sku=` 884 (EN_YAYIN kapalı olsa da EN adresler
-308 alır, dış bağlantı olabilir). Tam eşleme dosyası (eski → yeni, her satır) Faz 3-C PR'ında
-commit'lenir ve kapı testi onu okur.
+v3'teki "korozyon satırı" ikinci kez sayılıyordu (O3): korozyon dalının eski TR slug'ı
+(`asit-dayanikli-fanlar`) satır 2'nin içindedir. Tam envanter (her satır, eski → yeni) Faz 3-C PR'ında
+commit'lenir; kapı onu okur.
 
-## 6. Kapılar (uygulamayla birlikte yazılır)
+## 7. Kapılar (uygulamayla birlikte)
 
-- **INV-ADRES-SEMASI-1:** her iç bağlantı `adresUret`/`Routes`'tan; `'/category/'`, `'/products/'`,
-  `'/brands/'` dizesi SSOT dışında 0 (evren: `src/**`, `supabase/functions/**`, `public/**`; test hariç).
-- **INV-ADRES-CAKISMA-1:** slug'lar rezerve kelimeyle kesişmez; aile slug'ında `-p-` yok; `(tenant,
-  dil, slug)` tekil. Rota listesi dosya sisteminden türetilir.
-- **INV-ADRES-COZUCU-1:** çözücünün 10 dalı birim testte (model · büyük harf · yanlış slug metni →
-  200 + canonical · yanlış dil · aile · eski ürün slug · takma ad · UUID · yok → 404 · ağ hatası →
-  unavailable).
-- **INV-ADRES-TEK-KANONIK-1** (REC-205): bayrak açıkken her dal için tek seviyeli adres 308, iki
-  seviyeli 200; hiçbir dal iki adresten 200 dönmez. `next start` üstünde.
-- **INV-ADRES-TAZELIK-1:** `model-adresleri.json` DB'deki `slug_i18n` + sku ile birebir (CI'da
-  tip-drift kalıbı).
-- **INV-OZEL-AD-BUYUK-HARF-1** (REC-300 madde 6): özel ad taşıyan elemanlarda `uppercase`/
-  `text-transform` sınıfı yok; evren tüm bileşenler.
-- **Yayın ölçüm betiği** (`docs/audits/rec300-*`): site haritasındaki her adres 200 · §5 eşleme
-  dosyasının her satırı **tek hop** ve doğru hedef · `/tr/cart` + `/tr/checkout` 200 · redirect döngüsü
-  yok. **REC-300 EK kabul ölçütü:** yayın öncesi ve sonrası **linkinator** (kırık 0, zincir 0) +
-  **unlighthouse** (SEO ortalaması düşmez) fark tablosu, OPS yan yana ölçer.
-- `pnpm build` (prerender) + **tam birim takımı** + keycheck + Playwright smoke (kategori → dal → aile
-  → model; TR + EN) + INV-DIL-DUSUSU-1 e2e yeni rotalarda da.
+- **INV-ADRES-SEMASI-1:** iç bağlantılar `adresUret`/`Routes`'tan; `'/category/'`, `'/products/'`,
+  `'/brands/'` SSOT dışında 0 (evren `src/**`, `supabase/functions/**`, `public/**`).
+- **INV-ADRES-CAKISMA-1:** rezerve kelime · `-p-` · `^p-` · `(tenant, dil, slug)` tekil.
+- **INV-ADRES-COZUCU-1:** çözücünün dalları birim testte (model · büyük harf · yanlış slug → 308 ·
+  aile · takma ad · UUID · 404 · unavailable).
+- **INV-ADRES-HARITA-1:** harita her satırı **tek hop** ve hedef 200; `?sku=` hedefinde query yok;
+  hiçbir hedef yine haritada kaynak değil (döngü yok); harita DB ile birebir (üretim tazeliği, CI).
+- **INV-ADRES-TEK-KANONIK-1:** bayrak açıkken **tr ve en**: tek seviyeli dal 308, iki seviyeli 200.
+- **INV-OZEL-AD-BUYUK-HARF-1:** özel ad elemanlarında `text-transform` yok.
+- **Yayın ölçüm betiği** (`docs/audits/rec300-*`): §6 envanterinin her satırı tek hop + hedef 200 ·
+  bugünkü 4 hop'luk `/category/fanlar` zinciri **1 hop** · `/tr/cart` + `/tr/checkout` 200 · site
+  haritasındaki her adres 200. **REC-300 EK:** linkinator (kırık 0, zincir 0) + unlighthouse (SEO
+  ortalaması düşmez) öncesi/sonrası fark tablosu (OPS ölçer).
+- `pnpm build` + **tam birim takımı** + keycheck + Playwright smoke (kategori → dal → aile → model, TR
+  + EN) + INV-DIL-DUSUSU-1 e2e yeni rotalarda.
 
-## 7. Yayın sonrası (iki hafta)
+## 8. Yayın sonrası (iki hafta)
+GSC "bulunamadı" birikimi 0 · eski adres örneklemi tek hop · GSC taban ölçümüne göre tıklama
+karşılaştırması (karar 86 şartı) · trafik geçici düşebilir, kalıcı düşüş beklenmez.
 
-GSC kapsam raporunda "bulunamadı" birikimi 0 · eski adres örneklemi tek hop · trafik geçici düşebilir,
-kalıcı düşüş beklenmez. Asıl risk 24 kategori + 47 aile adresinde (model adresleri bugün site
-haritasında yok).
+## 9. Recep'e giden kararlar
+- R1 (ağaç), R2 (aile öneki), **R3 = karar 86** (39 aile) — **kapandı.**
+- Açık yapısal soru yok. Kalan Recep adımları kararla değil onayla: Faz 1-A/1-B/2/arama migration'ları
+  (kural 13) ve Faz 4 ön izleme.
 
-## 8. Recep'e gidecek karar (tek başına, numarası OPS'tan)
+## 10. Kapsam dışı ve yan bulgular
+REC-95 (faset) · REC-374 (`brands.ts`) · REC-373 (`<html lang>` kökü) · breadcrumb JSON-LD hidrasyon ·
+`assertNoUuid` 500 · Sığınak'ın köke çıkması · REC-145 belge bölümü · barındırma taşıması (REC-367,
+karar 59 — bu plan ona bağımlı değil, §4) · katalog veri şüpheleri (KATALOG'a iletildi).
 
-- ~~R1 ağaç~~ **kapandı** (09-22: bugünkü 18 + 4). ~~R2 aile adresi~~ **kapandı** (09-22: `/tr/urun/`'e
-  geçer).
-- **R3 · REC-331 — 39 ailenin adres metni de değişsin mi?** Design'ın `seo_slug`'ı 47 ailenin 39'unda
-  bugünkü slug'dan farklı (marka iki kez: `vortice-vortice-bravo-s`; ad yerine dizin adı:
-  `vortice-vort-heatmaster-slimroof-smoke`). Önek bu yayında zaten değişiyor; metin de değişecekse
-  **aynı yayında** değişmeli, yoksa aileler ikinci kez taşınır. Karar öncesi ölçüm (REC-331): 39
-  adresin son 28 gün GSC tıklaması. Plan iki cevaba da hazır: evet → Faz 1-B'ye 39 aile slug'ı +
-  takma ad; hayır → `seo_slug` öneri kalır. **Bu karar Faz 1-B migration'ı yazılmadan alınmalı.**
+## 11. Geri alma
+İleri düzeltme esastır: harita ve envanter commit'li; yanlış satır düzeltilir, yeniden derlenir. Faz
+3-C geri alınırsa yeni adresler 404 olur (dizine girmişse kayıp) → yalnız kitlesel hata hâlinde,
+Recep kararıyla. Faz 1-A/1-B/2/3 tek başına geri alınabilir.
 
-## 9. Kapsam dışı ve yan bulgular
+## 12. Bağımsız çürütme v3 (2026-09-23) — **BLOK** → v4 cevapları
 
-- Nitelik/faset katmanı (REC-95).
-- `src/data/brands.ts` DB ile uyumsuz → **REC-374**.
-- EN `<html lang>` kökten → **REC-373** (bu yayında `text-transform` yasağı `İ`'yi zaten keser).
-- Breadcrumb JSON-LD hidrasyon uyarısı, `assertNoUuid` geliştirme 500'ü — ayrı.
-- Sığınak'ın köke çıkması (F6) — ayrı ağaç kararı.
-- Belge bölümü (REC-145) — REC-300 kapsamı dışı.
-- Katalog veri şüpheleri (79 üründe ad/teknik voltaj farkı, 10 üründe kW) → KATALOG'a iletildi; model
-  adresinde ayırt edici değer **üründeki ad** önceliklidir (liste üreticisi yorumu).
-
-## 10. Geri alma
-
-İleri düzeltme esastır: eşleme dosyası commit'li; yanlış satır düzeltilir. Faz 3-C geri alınırsa
-(bayrak `false` + config satırları kaldırılır) yeni adresler 404 olur — dizine girmişse kayıp;
-bu yüzden **geri alma yalnız kitlesel hata hâlinde, Recep kararıyla**. Faz 1-A/1-B/2/3 tek başına geri
-alınabilir (canlı adresi değiştirmezler).
-
-## 11. Neyi ölçmedim
-
-- GSC dizin durumu (R3 ölçümüyle birlikte yapılacak).
-- Vercel `redirects` sayı sınırı: §5 satır 7 + 8 config'e girerse ~1800 satır. **Faz 3 başında belgeden
-  ölçülür**; sınır aşılıyorsa satır 7 çözücüye (sayfa katmanı) döner, satır 8 `has: query` tek desen
-  kuralıyla kalır (442 satır değil, eşleme dosyasından middleware'siz çözüm: aile sayfası sku'yu okuyamaz
-  — bu yüzden **ölçüm Faz 3 öncesi zorunlu**).
-- `revalidatePath`'in yeni gerçek rotalarda davranışı.
-- `supabase-migrate` Action ile Vercel build'in gerçek sırası (Faz 1-A/1-B sıralı olduğu için tasarım
-  bu sıraya bağlı değil).
-
----
-
-## 12. Bağımsız çürütme v2 (plan-challenger, 2026-09-22) — **BLOK** → v3 cevapları
-
-| # | bulgu | derece | v3 cevabı |
+| # | bulgu | derece | v4 cevabı |
 |---|---|---|---|
-| 1 | rewrite + tek seviyeli koşulsuz `permanentRedirect` → sonsuz 308; sayfalar canonical'ı kendi kuruyor | KRİTİK | Faz 3 m.1–2: gerçek rotalar, rewrite yok; `adresUret` SSOT; INV-ADRES-TEK-KANONIK-1 + döngü ölçümü |
-| 2 | `?sku=` `force-static` sayfada 308'lenemez; aile desen kuralı eski ürün slug'ını 2 hop yapıyor | KRİTİK | Faz 3 m.3–4: `has: query sku` config; yanlış slug metni 200 + canonical; eski ürün slug'ı ayrı kural, desenden önce |
-| 3 | yayın atomik değil; Casals slug'ı iki sırada da kırılır; bayrak yok | KRİTİK | Faz 1-A takma ad tablosu + tetik → 1-B veri → 3-C açılış; bayrak = derleme sabiti |
-| 4 | webhook ISR yolları + 884 model tazeleme dalı yok | YÜKSEK | Faz 3 m.9: iç yollar korunur, model etiketle; `next start` ölçümü |
-| 5 | yüzey sayımı eksik | YÜKSEK | Faz 3 m.7 genişletilmiş liste + kapı evrenine `public/` |
-| 6 | `slug_i18n` fonksiyon/tip/tekillik; `lower(sku)` ve `-p-` DB'de korunmuyor; SKU düzelince eski adres 404 | YÜKSEK | Faz 1-A m.1 kısıtlar + tetik (sku değişimi takma ada); Faz 1-B m.5 |
-| 7 | arama fonksiyonu dil almıyor | YÜKSEK | Faz 3 m.8: fonksiyon adres değil kimlik döndürür |
-| 8 | `products.brand` metni 53 üründe | ORTA | Faz 1-B m.1 |
-| 9 | dilsiz eski kural hedefi `/tr/`'ye sabit | ORTA | Faz 3 m.5: middleware 307'de kalır, bütçe ≤ 2 hop |
-| 10 | `<html lang>` tek satır değil | ORTA | REC-373 (ayrı); `İ` bu yayında `text-transform` yasağıyla |
-| 11 | K3-b çelişkisi (aile adresi); `/tr/markalar/` yalnız Design'da; EN_YAYIN kapalı | YÜKSEK | R2 kapandı (Recep 09-22); markalar Design v3 + REC-300 kapsamıyla; EN adresleri üretilir, yayın EN_YAYIN'a bağlı |
+| K1 | `has: query sku` query'yi hedefe taşır, hedefte yeniden eşleşir → döngü | KRİTİK | §4: `?sku=` middleware haritasında, hedef query'siz; INV-ADRES-HARITA-1 döngü + query kontrolü |
+| K2 | 884+884 config satırı Vercel 2048 rota sınırına dayanır; tek desen büyük harf SKU yüzünden 2 hop | KRİTİK | §4: config'te yalnız 3 desen; harita sınırsız ve sağlayıcıdan bağımsız (karar 59); SKU haritada doğrudan küçük harfli hedefe |
+| K3 | bugün 4 hop'luk dilsiz kategori zinciri; K3-b ile 5 | KRİTİK | 13 kural silinir, harita dilsiz yolu tek 307 ile son hedefe götürür; yayın ölçümünde bu zincir 1 hop |
+| Y1 | tetik invoker yetkisiyle admin slug düzenlemesini düşürür | YÜKSEK | Faz 1-A m.2 `SECURITY DEFINER` + gölge senaryosu |
+| Y2 | A→B→A→B'de unique ihlali | YÜKSEK | `ON CONFLICT DO UPDATE` + canlı slug çakışmasında takma ad silinir |
+| Y3 | etiketle tazeleme bugün no-op; IndexNow iç yolları bildirir | YÜKSEK | Faz 3 m.9 `unstable_cache` etiketi; m.2 IndexNow `adresUret`'ten |
+| Y4 | EN tek seviyeli dal: REC-205 EN'de tekrar | YÜKSEK | §2 + Faz 3 m.1 + INV iki dil; §6 satır 4 |
+| O1 | "200 + canonical" gerekçesi çürük | ORTA | yol bazlı 308 (§2) |
+| O2 | `/tr/category/<EN-slug>` eski adresleri yok | ORTA | §6 satır 1–2 iki biçim + Faz 3 m.5 sayfa katmanı |
+| O3 | korozyon satırı çift sayım | ORTA | §6 notu |
+| O4 | takma ad RLS kiracısız; kategori slug'ı izlenmiyor | ORTA | `jwt_tenant_id()` kalıbı; tetik kategoriyi de izler |
+| O5 | webhook eski slug'ı ve eski dalı tazelemiyor | ORTA | Faz 3 m.9 |
+| O6 | tohum evreni audit başlangıcıyla sınırlı | ORTA | Faz 1-A m.4 site haritası + GSC ile birleşik |
+| O7 | fiyatsız Product JSON-LD geçersiz öğe | ORTA | Faz 3 m.11 ölçüm + cetvel |
+| D1 | `P-` ile başlayan SKU yanlış bölünür | DÜŞÜK | check `(^p-\|-p-)` |
+| D2 | küresel/kiracılı tekillik belirsiz | DÜŞÜK | Faz 1-A m.3: küresel kalır, cetvele yazılır |
+| D3 | dilsiz yeni adres EN ziyaretçide 404 | DÜŞÜK | Faz 0 cetvel + harita dilsiz yeni adresleri de eşler |
+| D4 | önceden üretim ~10 kat | DÜŞÜK | Faz 3 m.13 model sayfaları talep üzerine |
 
-**v3 için yeni çürütme turu zorunludur** (özellikle Faz 1-A takma ad tasarımı, Faz 3 m.4 `has: query`
-+ Vercel sınırı, gerçek rota + `[lang]` çakışması).
+Denetçinin doğruladıkları: rota çakışması yok (`urun-secici` ≠ `urun/[slug]`) · config redirect'leri
+middleware'den önce koşar · takma ad statik sayfada çalışır (`dynamicParams`) · tetik adlarında çakışma
+yok · §6 sayıları DB ile tutuyor (6/18, Casals 53, taşıma 44) · DB'de iç bağlantı taşıyan kolon yok.
 
-*Yazan: URUN şeridi, v3 2026-09-23.*
+## 13. Bağımsız çürütme v2 (2026-09-22) — v3'te cevaplandı, v4'te yerini koruyor
+
+1 rewrite döngüsü → gerçek rotalar · 2 `?sku=` force-static → §4 harita · 3 atomik değil → A/B/C sırası
++ takma ad · 4 webhook → Faz 3 m.9 · 5 yüzey sayımı → m.7 · 6 `slug_i18n` + kısıtlar → Faz 1-A/1-B ·
+7 arama dil almıyor → m.8 · 8 `products.brand` → Faz 1-B · 9 dilsiz kural `/tr/`'ye sabit → §4 tek 307 ·
+10 `<html lang>` → REC-373 · 11 K3-b çelişkisi → R2 kapandı.
+
+*Yazan: URUN şeridi, v4 2026-09-23. v4 bağımsız çürütme turundan geçmeden Faz 1-A başlamaz.*
