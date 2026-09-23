@@ -461,6 +461,20 @@ anlam taşır — §11'in ses ve gerilim bölümlerinde kapatılan kusurun aynı
 
 **Uygulandı:** 19 satır (JET 7 + SEAT 12) `atex_zone`'a taşındı ve yükleme listesine girdi.
 
+### Türetilen değer: kaynak basılıysa KAYNAK kazanır (OPS hükmü, 2026-09-23)
+
+**Nereden çıktı (PIM §1 fark 2, 2026-09-23):** Punto Evo Flexo'da `max_delivery_ls` kaynakta **48,6**
+basılı (katalog tek ondalık); m³/h'den türetme 175 / 3,6 = **48,61**. İki yol aynı büyüklüğü farklı
+hassasiyette veriyor ve fark ölçümü bunu "çelişki" sayıyordu.
+
+**Kural:**
+- Kaynak değeri **basılıysa** o yazılır; türetme (`max_delivery_ls = m³/h ÷ 3,6`, `rated_power_w = kW × 1000` vb.)
+  **yalnız kaynakta o alan yoksa** yapılır ve satırda `kaynak=türetildi` işaretlenir.
+- Kaynak değer ile türetilen/bizdeki değer arasındaki **fark kıyası, kaynağın ondalık hassasiyetinde**
+  yapılır: kaynak 48,6 (1 ondalık) ise bizdeki değer 1 ondalığa yuvarlanıp kıyaslanır (48,61 → 48,6 = aynı).
+  Kaynak hassasiyetinin ötesindeki basamak farkı çelişki değildir.
+- ❌ Basılı kaynak değeri, türetmeyle "daha hassas" diye ezmek yasak — kanıtı olan değer kaynaktakidir.
+
 ### Sayısal alanda birim, DEĞERE gömülmez
 
 **Ölçüm (2026-09-07, 375 ürün):** canlının teamülü sayıdır — `int` 2990 hücre, `float` 639.
