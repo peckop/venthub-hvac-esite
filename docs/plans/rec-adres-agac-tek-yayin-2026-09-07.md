@@ -1,4 +1,4 @@
-# Adres şeması (K3-b) + kategori ağacı (K17) + Casals — TEK YAYIN planı · v4
+# Adres şeması (K3-b) + kategori ağacı (K17) + Casals — TEK YAYIN planı · v5
 
 > **REC-191 → REC-300 · URUN · v1 2026-09-07 · v2 2026-09-22 · v3/v4 2026-09-23**
 > **Bu belge PLAN'dır. Kod YOK, migration YOK, prod yazımı YOK.** Uygulama REC-300 emriyle,
@@ -101,9 +101,9 @@ sınıra yaslanan tasarım iki kez yazılır.
 
 | katman | ne çözer | niçin orada |
 |---|---|---|
-| **1. Eski-adres haritası** (`src/data/generated/eski-adres-haritasi.json`, derleme anında DB'den üretilir; kiracı anahtarlı) — **middleware** okur | bugün var olan her eski adres: kategori (TR/EN slug'lı, tek/iki seviye), aile (eski slug + karar 86 + Casals), ürün slug'ı, `?sku=`, dilsiz eski adresler | istek başına **tek sözlük araması**, DB sorgusu YOK (kural 12, REC-289 uyumlu); hedef query'siz kurulur → döngü yok (K1); satır sınırı yok (K2); dilsiz adreste dil tespiti + hedef aynı adımda → **tek 307** (K3); Vercel'de de Cloudflare/OpenNext'te de aynı çalışır (karar 59) |
+| **1. Eski-adres haritası** (`src/data/generated/eski-adres-haritasi.json`, derleme anında **iki kaynaktan** üretilir: (a) DB, (b) commit'li **eski adres tohum dosyası** `src/data/eski-adres-tohum.json` — DB'de hiç olmamış eski adresler, bkz. §4.1; kiracı anahtarlı) — **middleware** okur | bugün var olan her eski adres: kategori (TR/EN slug'lı, tek/iki seviye), aile (eski slug + karar 86 + Casals), ürün slug'ı, `?sku=`, dilsiz eski adresler | istek başına **tek sözlük araması**, DB sorgusu YOK (kural 12, REC-289 uyumlu); hedef query'siz kurulur → döngü yok (K1); satır sınırı yok (K2); dilsiz adreste dil tespiti + hedef aynı adımda → **tek 307** (K3); Vercel'de de Cloudflare/OpenNext'te de aynı çalışır (karar 59) |
 | **2. Takma ad tablosu** (`url_takma_adlari`, DB) — **sayfa** okur | derlemeden SONRA değişen slug'lar (admin düzenlemesi, katalog düzeltmesi) | harita bir sonraki derlemeye kadar bayattır; sayfa "bulunamadı" dalında tabloya bakar → 308 (`dynamicParams` true: istek anında render, sonuç önbelleğe) |
-| **3. `next.config`** | yalnız kalıcı, veriden bağımsız desenler: `/tr/brands/*` → `/tr/markalar/*` · `/tr/products` → `/tr/urunler` · `destek/hesaplayicilar` | birkaç satır; 13 dilsiz kategori kuralı ve 6 ürün kuralı **silinir** (haritaya taşınır) |
+| **3. `next.config`** | yalnız kalıcı, veriden bağımsız desenler: `/tr/brands/*` → `/tr/markalar/*` · `/tr/products` → `/tr/urunler` (**birebir**, `:path*` YOK — joker olursa bütün eski ürün adreslerini middleware'den önce yakalar, D3) · `destek/hesaplayicilar` | birkaç satır; **25 satır silinir** (haritaya taşınır): 13 dilsiz kategori + 6 Lineo çap + 6 ürün kuralı |
 
 **Hazır araç ölçüldü — Vercel Bulk Redirects KULLANILMAZ** (v3 çürütmesi, belge: vercel.com/docs/routing/
 redirects/bulk-redirects): (a) *"`source` … does not support query parameters. Vercel ignores any
@@ -114,9 +114,42 @@ DigitalOcean, 3 Vercel Pro) → Vercel'e özgü proje ayarı birinci adaya taş�
 Sıra kuralı: `next.config` redirect'leri middleware'den önce koşar → config'de eski ürün/aile/kategori
 deseni **kalmaz**, yoksa harita hiç çalışmaz (v3'ün 2 hop'u buradan doğuyordu).
 
-Harita boyutu: ~442×2 ürün + 442×2 `?sku=` anahtarı (aynı sözlük, sku→model) + 47×2 aile + ~100
-kategori → birkaç yüz KB; Cloudflare Workers paket sınırı (Paid 10 MiB, bugün 3,0 MiB — REC-367) içinde.
-**Ölçülecek:** middleware'in harita yükü ile soğuk başlangıç süresi (Faz 3 kapısı).
+**Harita boyutu (v4 çürütmesi O5):** bugün geçerli sınır **Vercel Edge middleware kodu gzip sonrası
+Hobby 1 MB** (Pro 2 MB); bugünkü middleware 103 kB. Harita **yapısal** tutulur (kartezyen tam adres değil:
+`sku → {slug_tr, slug_en}`, `eskiSlug → hedef kimliği`; önek ve dil kodda birleşir) → tahmin ≈ 100 kB
+gzip. Faz 3 kapısı gzip sonrası boyutu **1 MB'a karşı** ölçer. Kaçış yolu yok: Node middleware'e geçmek
+Vercel'de sınırı kaldırır ama OpenNext/Cloudflare Node middleware'i desteklemiyor (karar 59) → middleware
+Edge'de kalır. Cloudflare'de Workers **Paid** (10 MiB) gerekir; Free 3 MiB zaten bugün dolu (REC-367).
+Kiracı başına harita tek pakette — çok kiracı açılınca yeniden tasarlanır (cetvele not).
+
+**Taşınabilirlik (karar 59):** Cloudflare Workers + OpenNext'te koşullu aynen çalışır — Edge middleware
+destekli, JSON import standart, `cookies`/`headers` dışında Node API yok. Koşul: OpenNext'in önbellek
+yakalamasının middleware'den SONRA koştuğu göç sırasında ölçülür. Vercel'de middleware önbellekten önce
+koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfasının önünde yakalanır.
+
+### 4.1 Harita üretimi, bayatlık ve dil (v4 çürütmesi Y1, Y2, Y3, O1, O3)
+
+- **Tohum dosyası (Y1):** DB'de hiç var olmamış ama bugün yönlendirilen eski adresler: 13 dilsiz kategori
+  kuralının kaynakları (7'si DB'de hiç yok) + 6 Lineo çap adresi (aile izi 09-17'de başlıyor, Lineo 08-23'te
+  kapandı). **Bugün 404'e giden 4 hedef** (`heat-recovery-units`, `air-purifiers`, `flexible-air-ducts`,
+  `industrial-ventilation`) için hedef tohumda **en yakın canlı kategoriye** yazılır (ısı geri kazanım →
+  `heat-recovery-vmc` kökü; diğer üçü karşılığı olmayan eski kök → `/tr/urunler`), 404 zinciri biter.
+- **Derleme fail-closed (Y2):** üretici DB'ye ulaşamazsa ya da ürün sayısı bir önceki haritanın %90'ının
+  altındaysa **derleme düşer** — boş haritayla yayın yok (bugünkü `generateStaticParams` gibi `console.warn`
+  ile yutulmaz). CI'da DB yok (`build:ci` → `dummy.supabase.co`) → CI commit'li **fikstür** haritayla koşar;
+  DB ile birebirlik **zamanlanmış iş** olarak prod DB'ye karşı ölçülür (INV-ADRES-HARITA-1'in DB kolu).
+  Çelişki giderildi: **harita commit'lenmez** (derleme çıktısı); **envanter dosyası** (§6, eski → yeni tam
+  liste) commit'lenir ve kapı onu okur.
+- **Dil (Y3, ölçüldü):** bugünkü `detectLocale` `accept-language` içinde `en` geçiyor mu diye bakıyor;
+  Türkçe Chrome'un varsayılanı `tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7` → Türkçe ziyaretçi `/category/fans`'ta
+  EN (noindex) sayfaya düşüyor. v5: **slug'ı Türkçe olan dilsiz eski adres deterministik TR'ye 308**
+  (içerik zaten Türkçe); slug'ı dilden bağımsız olanlarda `detectLocale` **birincil dili / q değerini**
+  esas alır. Bu düzeltme bugünkü davranışı da onarır (ayrı kusur, aynı PR).
+- **Joker ve eğik çizgi (O3):** eşleyici birebir anahtar değil **segment öneki** eşler (`/category/fanlar/<x>`
+  dahil); sondaki `/` önce normalize edilir (bugün `/tr/category/fans/` 2 hop).
+- **Bayat harita (O1):** derlemeden sonra değişen slug'da zincir en çok **2 hop** (harita → eski hedef → sayfa
+  308) — cetvele yazılır. Slug değişince tazeleme: webhook dalı Vercel **deploy hook**'unu tetikler (gün
+  içinde ≤ 1 yeniden derleme, sıraya alınır) + gecelik derleme yedeği.
 
 ## 5. Fazlar
 
@@ -180,8 +213,14 @@ teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81
    öncesi adım) ve **middleware eşleyicisi**: yol + `?sku=` + dil → tek hedef; dilsiz yolda dil tespiti
    (bugünkü `detectLocale`) ile **tek 307**, dilli yolda **tek 308**; hedefte query yok. 13 dilsiz
    kategori kuralı + 6 ürün kuralı `next.config`'ten silinir.
-5. **Eski TR kategori rotaları** (bayrak açıkken): her çözülebilir slug (TR ya da EN biçimli) için
-   doğrudan `adresUret(kategori,'tr')`'ye 308 (O2) — harita kaçırsa da tek hop.
+5. **Eski TR rotaları sayfa katmanında da** (bayrak açıkken; harita kaçırsa ikinci ağ): `/tr/category/*`
+   her çözülebilir slug (TR ya da EN biçimli) için ve **`/tr/products/*` her çözülebilir aile/ürün/SKU
+   için** doğrudan `adresUret(…,'tr')`'ye 308 (v3 O2 + v4 Y4) — `/tr/products/<x>` hiçbir durumda 200
+   dönmez (REC-205). EN `products/[slug]` yeni adreslerin de rotası olduğundan yerinde kalır.
+   **Kök değişimi (v4 O6):** dal slug'la bulunur; adresteki kök segmenti dalın bugünkü köküne uymuyorsa
+   308 doğru köke (`parent_id` değişince eski `/kategori/<eski-kök>/<dal>` kırılmaz).
+   **Pasif kategoriler (v4 O4):** bugün 7 pasif satır canlıda 200 dönüyor (`/tr/category/ticari-havalandirma`
+   → 200). Bayrak açıkken pasif kategori → aktif üst köke 308; üstü de pasifse `/tr/urunler`.
 6. **UUID yönlendirmesi** middleware'den sayfaya (REC-289).
 7. **Yüzeyler:** v3 listesi (LanguageSwitcher, ClientLayout:77, MobilAltSekmeCubugu:128, Seo:52, PDP
    `?sku=` yazıcısı, `public/llms.txt`, ApplicationSolutions 49/55, SearchOverlay 373-374, webhook,
@@ -191,9 +230,12 @@ teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81
    aynı PR'da. Eski `url` kolonu Faz 3-C'ye kadar kalır.
 9. **Tazeleme** (Y3, O5): model/aile sayfa verisi `unstable_cache(…, { tags: [modelTag(sku, lang,
    tenantId)] })` ile okunur (etiket ancak böyle sayfayı tazeler); webhook `products` + `price_lists` +
-   `product_families` dallarına etiket çağrısı; **slug değişince `old_record.slug` yolu da**, **eski ve
-   yeni `subcategory_id` dalları da** tazelenir; `route.tags.test.ts` genişler. Kural 12: etikette
-   `lang` + `tenantId`.
+   `product_families` dallarına etiket çağrısı; **slug değişince hem `old_record.slug` hem yeni slug'ın
+   yolu** (v4 O2: A→B→A geri alındığında A'daki önbellekli 308 döngü yapmasın), **eski ve yeni
+   `subcategory_id` dalları da** tazelenir; slug değişimi ayrıca deploy hook'unu kuyruğa alır (§4.1);
+   `route.tags.test.ts` genişler. Kural 12: etikette `lang` + `tenantId`. Yeni 308'ler bugünkü
+   `Cache-Control: max-age=0, must-revalidate` başlığını korur (v4 D4: tarayıcı 308'i kalıcı önbelleğe
+   almasın — EN'de iki seviye → tek seviye yönü tersine dönüyor).
 10. **Site haritası** tip başına + 442 model; hreflang; `x-default`; EN kısmı `EN_YAYIN`'a bağlı.
 11. **Product JSON-LD** (O7): fiyatlı modelde `offers` **korunur**; fiyatsız modelde tür `Product`
     kalır ama `offers` yerine hiçbir şey uydurulmaz → GSC "geçersiz öğe" riski **ölçülür**
@@ -227,13 +269,15 @@ izleme (§8).
 |---|---|---|---|---|
 | 1 | `/tr/category/<kök>` (TR ve EN slug'lı) | `/tr/kategori/<kök>` | 6 × 2 biçim | harita + sayfa (O2) |
 | 2 | `/tr/category/<dal>` (TR ve EN slug'lı; 18 + 4 yeni dalın ara dönem adresi) | `/tr/kategori/<kök>/<dal>` | 22 × 2 biçim | harita + sayfa |
-| 3 | `/tr/category/<kök>/<dal>` | `/tr/kategori/<kök>/<dal>` | 18 | harita |
+| 3 | `/tr/category/<kök>/<dal>` (TR ve EN slug'lı: `/tr/category/fans/duct-fans`) | `/tr/kategori/<kök>/<dal>` | 18 × 2 biçim | harita |
 | 4 | **EN** `/en/category/<dal>` (tek seviye) | `/en/category/<kök>/<dal>` | 22 | sayfa (Y4) + harita |
-| 5 | dilsiz `/category/<eski-tr>/:yol` (bugünkü 13 kural) | dile göre son hedef | 13 kök × alt yollar | harita, **tek 307** |
+| 5 | dilsiz `/category/<eski-tr>/:yol` (bugünkü 13 kural: 3 aktif kök, 3 dal, 2 pasif kök, 1 pasif dal, 4 ölü hedef) | Türkçe slug → **TR'ye 308**; dilden bağımsız → dile göre tek 307 | 13 × segment öneki | harita + tohum (§4.1) |
+| 5b | 6 Lineo çap adresi (`/(tr\|en)/products/vortice-lineo-<çap>-quiet`) | Lineo Quiet ailesinin yeni adresi | 6 × 2 | tohum |
+| 5c | 7 pasif kategori (bugün 200) | aktif üst kök ya da `/tr/urunler` | 7 × 2 biçim | sayfa katmanı (Faz 3 m.5) |
 | 6 | `/tr/products` | `/tr/urunler` | 1 | config |
-| 7 | `/(tr\|en)/products/<aile>` (bugünkü 47 + karar 86'nın 39 eski slug'ı + 4 Casals) | `/tr/urun/<aile-yeni>` · `/en/products/<aile-yeni>` | 47 × 2 | harita |
+| 7 | `/(tr\|en)/products/<aile>` (bugünkü 47; karar 86'nın 39'u + 4 Casals slug değiştirir) | `/tr/urun/<aile-yeni>` · `/en/products/<aile-yeni>` | TR 47 + EN yalnız slug'ı değişen 43 (**eski = yeni olan EN satırı haritaya girmez**, kendine yönlenmesin — v4 O4) | harita |
 | 8 | `/(tr\|en)/products/<ürün-slug>` + 7 eski ürün slug'ı | model kanoniği | 442 × 2 + 7 × 2 | harita (+ takma ad) |
-| 9 | `?sku=` (TR + EN aile adresi, eski ve yeni önekte) | model kanoniği | 442 × 2 | harita (middleware query'yi okur, hedefte düşürür) |
+| 9 | `?sku=` (TR + EN aile adresi, eski ve yeni önekte) | model kanoniği | 442 × 2 | harita (middleware query'yi **ayrıştırır**: SKU harf duyarsız, `utm_*` gibi ek parametrelere dayanıklı; hedefte query yok — utm'nin düşmesi bilinçli, cetvele yazılır, v4 D2) |
 | 10 | `/tr/brands/*` | `/tr/markalar/*` | desen | config |
 | — | `/tr/cart` · `/tr/checkout` | dokunulmaz | 0 | — |
 
@@ -277,6 +321,28 @@ karar 59 — bu plan ona bağımlı değil, §4) · katalog veri şüpheleri (KA
 İleri düzeltme esastır: harita ve envanter commit'li; yanlış satır düzeltilir, yeniden derlenir. Faz
 3-C geri alınırsa yeni adresler 404 olur (dizine girmişse kayıp) → yalnız kitlesel hata hâlinde,
 Recep kararıyla. Faz 1-A/1-B/2/3 tek başına geri alınabilir.
+
+## 12a. Bağımsız çürütme v4 (2026-09-23) — **KOŞULLU** → v5 cevapları
+
+Ana fikir ayakta (middleware + derleme anı haritası; Vercel'de middleware önbellekten önce koşar, boyut
+sınırına uzak; Cloudflare/OpenNext'te koşullu aynen çalışır). Kapanan: v3 K1, K2, Y1, Y2, O4.
+
+| # | bulgu | derece | v5 cevabı |
+|---|---|---|---|
+| Y1 | DB'den üretilen harita, DB'de hiç olmamış eski adresleri (13 dilsiz kural kaynağının 7'si, 6 Lineo) kaybeder; 4 hedef bugün 404 | YÜKSEK | §4.1 tohum dosyası; ölü hedefler en yakın canlı adrese; silinen satır 25 |
+| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; harita commit'lenmez, envanter commit'lenir |
+| Y3 | `detectLocale` Türkçe Chrome'u EN'e yolluyor (ölçüldü) | YÜKSEK | §4.1 Türkçe slug'lı dilsiz adres → TR 308; q değeri ayrıştırma |
+| Y4 | `/tr/products/<x>` için sayfa katmanı dalı yok | YÜKSEK | Faz 3 m.5 genişledi |
+| O1 | bayat harita 2 hop | ORTA | §4.1 cetvel + deploy hook + gecelik derleme |
+| O2 | A→B→A'da önbellekli 308 döngüsü | ORTA | m.9 yeni slug yolu da tazelenir; gölgede HTTP senaryosu |
+| O3 | `:path*` joker ve sondaki `/` | ORTA | §4.1 segment öneki + normalizasyon |
+| O4 | envanter sayıları (13 kuralın dökümü, 7 pasif kategori, EN özdeş satırlar, iki seviyeli EN slug'lı TR) | ORTA | §6 satır 3, 5, 5b, 5c, 7 |
+| O5 | geçerli sınır Vercel Edge gzip 1 MB (Hobby); Node middleware kaçışı OpenNext'te yok | ORTA | §4 boyut paragrafı; harita yapısal |
+| O6 | `parent_id` değişince eski iki seviyeli adres | ORTA | m.5 kök uyuşmazlığı → 308 |
+| D1–D4 | `metadata.slug` tetik koşulu · `?sku=` ayrıştırma · config birebir · 308 önbellek başlığı | DÜŞÜK | Faz 1-A tetik `WHEN (old.slug IS DISTINCT FROM new.slug OR old.metadata->'slug' IS DISTINCT FROM new.metadata->'slug')`; §6 satır 9; §4 katman 3; m.9 |
+
+**v5 için tur:** Faz 1-A (takma ad tablosu) v5 ile başlayabilir; Faz 3 başlamadan önce §4.1 tasarımına
+kısa bir doğrulama turu (özellikle deploy hook tetiği ve fail-closed eşiği) koşulur.
 
 ## 12. Bağımsız çürütme v3 (2026-09-23) — **BLOK** → v4 cevapları
 
