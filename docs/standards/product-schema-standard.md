@@ -389,6 +389,31 @@ anlamsızlaşır.
   STORM'da **29** `max_absorbed_power_w` değeri kaynağın *"Motor Power (kW)"* sütunundan
   geliyor — doğru karşılığı `rated_power_w`. Alan adı göçü listesine yazıldı.
 
+### Akım: "anma akımı" ile "en yüksek akım" ayrı alanlardır (REC-172, 2026-09-23)
+
+Bu satır yazılana kadar akım için cetvel satırı **yoktu**; kaynaklar iki ayrı büyüklük veriyor.
+
+| Alan | Anlamı | Kaynak tipik ifadesi |
+|---|---|---|
+| `absorbed_current_a` | Motorun **anma yükünde çektiği** akım | "Rated I (A)" (Casals) |
+| `max_current_a` | Kaynağın verdiği **en yüksek** akım | "I max. (400V)" (Vortice föyü), "maks. akım" (AVenS) |
+
+- Kaynak birden çok gerilim sütunu veriyorsa (`230 V` · `400 V`), yazılan akım **`voltage_v` ile
+  aynı gerilimin** sütunudur; diğer sütun yazılmaz.
+- ❌ İkisini tek alanda toplamak yasak; ölçüt ADA girer (ses ve güçle aynı ilke).
+- `alan-etiket-sozlugu.json`'daki "rated current" → `rated_output_current_a` eşlemesi bu kaynaklar
+  için yanlıştır (sürücü çıkış akımı başka büyüklük); sözlük düzeltmesi ayrı iş (REC-172 yorumu).
+
+### Devir: `rpm_max` — sabit devirli AC motorda anma devri (TEAMÜL İSTİSNASI)
+
+Canlıda tek devir anahtarı `rpm_max`'tir (229 ürün). Sabit devirli asenkron (AC) motorda kaynağın
+verdiği **anma devri** `rpm_max`'e yazılır. Bu **fiziksel bir gerekçe değil, teamül istisnasıdır**:
+asenkron motorda anma devri tam yükteki devirdir; yük azaldıkça devir senkron devire yaklaşır ve
+anma devrini aşar (4 kutup: senkron 1500 > anma 1400-1475). Yani anma devri üst sınır **değildir**;
+`rpm_max` bu motor tipinde §11.7'nin "üst sınır" anlamına **açık istisna** olarak anma devrini taşır.
+- `nominal_rpm` göçünün adayıdır; **başka alana emsal olmaz**.
+- Fan ve motor devri kaynakta farklı verilmişse (ör. kayış tahrik ya da çelişik föy) **yazılmaz**.
+
 ### Basınç: "toplam" ile "statik" ayrı alanlardır
 
 **Nereden çıktı (ölçüm, 2026-09-07):** Nicotra katalogları fan eğrisini **toplam basınç**
@@ -418,11 +443,19 @@ anlam taşır — §11'in ses ve gerilim bölümlerinde kapatılan kusurun aynı
 | Alan | Anlamı | Kaynak tipik ifadesi | Örnek |
 |---|---|---|---|
 | `atex_marking` | Ekipman **grubu/kategorisi** işaretlemesi — ürünün üstündeki damga | "ATEX marking" | `II 2G/D h T3/125°C X Gb/Db` |
-| `atex_zone` | Ürünün kurulabileceği **kullanım bölgesi** beyanı | "suitable for Zone …" | `Zone II, Category 3G (Directive 94/9/CE)` |
+| `atex_zone` | Ürünün kurulabileceği **kullanım bölgesi** beyanı | "suitable for Zone …" | `Zone 2, Category 3G, Directive 94/9/CE` |
 
 - ❌ Bölge beyanını `atex_marking`'e yazmak yasak (ve tersi).
-- Baştaki `II` iki alanda **farklı şey** demektir: `atex_marking`'te ekipman grubu,
-  `atex_zone`'da bölge numarası. Ayrım tam olarak bu yüzden alan düzeyinde yapılır.
+- `atex_zone`'da bölge **0/1/2 (gaz) ya da 20/21/22 (toz)** sayısıdır; `II` ekipman grubudur
+  (yerüstü) ve yalnız `atex_marking`'te geçer. *(2026-09-23 düzeltmesi, REC-172 plan v5.1: bu
+  maddenin ilk örneği `Zone II, …` idi ve "baştaki II `atex_zone`'da bölge numarası" diyordu —
+  ikisi de yanlıştı. K11-a'nın kararı, yani iki ayrı alan, değişmedi; yalnız örnek ve açıklama.)*
+- **`atex_zone` kanonik biçimi:** `Zone <n>[, Category <k>][, Directive <d>]` — kaynağın verdiği
+  kadarı yazılır, eksik parça **türetilmez** (ör. föy yalnız bölge veriyorsa `Zone 2`; kategori
+  EPL'den ya da gaz grubundan çıkarılmaz). Canlıda 12 satır (`Zone 2, Category 3G, Directive
+  94/9/CE`) bu biçimdedir; 7 satır `Zone II, …` biçim ihlalidir → ayrı düzeltme işi (REC-172 yorumu).
+- **`atex_marking`:** föyde kategori öneki (`II 2G` / `II 3G`) yoksa **eklenmez**. Fan ve motor
+  ayrı işaretliyse tek değerde ikisi: `Fan: Ex h IIB T3 Gc · Motor: Ex ec IIC T3 Gc`.
 - ATEX bilgisi teknik tabloda **kod olarak** yaşar; ürün açıklamasındaki **cümle** ayrı
   yüzeydir ve bu alanların yerine geçmez (K11).
 
