@@ -37,7 +37,9 @@ TIP = {
     'plug-fans': ('plug fan', 'plug fan', FAN_RAD, []),
     'cabinet-fans': ('hucreli aspirator', 'cabinet fan', FAN_RAD, []),
     # Dal saf değil (SEAT + JET + STORM, plan v1 §2.5): gövde tipi iddia edilmez, yalnız korozyon.
-    'acid-resistant-fans': ('korozyon dayanimli fan', 'corrosion resistant fan', FAN_RAD, []),
+    # Recep kararı 2026-09-23: iki arama kelimesi tek adreste — "korozyon dayanımlı" (dal adı)
+    # + "asit fanı" (pazarın kelimesi, rakip taraması). EN değişmedi.
+    'acid-resistant-fans': ('korozyon dayanimli asit fani', 'corrosion resistant fan', FAN_RAD, []),
     'duct-fans': ('kanal tipi fan', 'inline duct fan', FAN_KAN, []),
     # Tip kelimeleri rakip taramasıyla düzeltildi: rec300-rakip-slug-taramasi-2026-09-22.md
     'bathroom-toilet-fans': ('banyo aspiratoru', 'bathroom fan', FAN_KAN, []),
@@ -62,7 +64,8 @@ TIP = {
 # Uzunluk aşılınca sıfatlar düşer ama tip YARIM kelimeye inmez ("perdesi", "cihazi" olmaz):
 # dal başına anlamlı kısa ad. Verilmeyen dal için tip olduğu gibi kalır.
 KISA = {
-    'acid-resistant-fans': ('korozyon dayanimli fan', 'corrosion resistant fan'),
+    # Kısalınca da iki kelime birlikte kalır (Recep kararı 2026-09-23) — tip kısaltılmaz.
+    'acid-resistant-fans': ('korozyon dayanimli asit fani', 'corrosion resistant fan'),
     'bathroom-toilet-fans': ('banyo aspiratoru', 'bathroom fan'),
     'smoke-exhaust-fans': ('duman egzoz fani', 'smoke exhaust fan'),
     'industrial-ceiling-fans': ('tavan vantilatoru', 'ceiling fan'),
@@ -187,11 +190,14 @@ def uret(marka, model, tip, kisa, degerler, notlar):
     # Model adı kısaltılmaz (Recep 11-09: "kısaltma istemiyorum"); aşım işaretlenir, kırpılmaz.
     if len(s) > 70:
         notlar.add('UZUN>70')
+    # Ayırt edici ek (aşağıda, grup düzeyinde) sonradan eklenir; o zaman yine önce BETİMLEYİCİ
+    # değer düşsün diye değer öncesi gövde ve seçili değerler ayrıca döner.
+    govde = s[:len(s) - len('-'.join(secili)) - 1] if secili else s
     if len(s.split('-')) > 10:
         notlar.add('KELIME>10')
     if re.search(r'(^|-)p(-|$)', s):
         notlar.add('P-KELIMESI')
-    return s
+    return s, govde, secili
 
 
 def eski_config_sluglari(next_config):
@@ -206,11 +212,22 @@ def main():
     ap.add_argument('--veri', required=True)
     ap.add_argument('--aile-seo', required=True, help='Design-Katalog aile-foyu seo_slug eşlemesi (json)')
     ap.add_argument('--next-config', required=True)
+    ap.add_argument('--audit-slug', required=True,
+                    help="admin_audit_log'daki products.slug değişiklikleri [{sku, eski}] — sorgu: before/after "
+                         "slug farklı satırlar (2026-09-23: 7 kayıt). next.config yalnız ELLE yazılanı bilir; "
+                         "veri onarımıyla değişen slug'lar burada")
     ap.add_argument('--cikti', required=True)
     a = ap.parse_args()
     d = json.loads(pathlib.Path(a.veri).read_text(encoding='utf-8'))
     aile_seo = json.loads(pathlib.Path(a.aile_seo).read_text(encoding='utf-8'))
-    eski = eski_config_sluglari(a.next_config)
+    # Bir SKU'nun birden çok eski adresi olabilir: iki kaynak birleşir, bugünkü slug hariç.
+    eski_kume = {}
+    for sku, s in eski_config_sluglari(a.next_config).items():
+        eski_kume.setdefault(sku, set()).add(s)
+    for r in json.loads(pathlib.Path(a.audit_slug).read_text(encoding='utf-8')):
+        eski_kume.setdefault(r['sku'], set()).add(r['eski'])
+    bugun = {p['sku']: p['slug'] for p in d['products']}
+    eski = {sku: ','.join(sorted(s - {bugun.get(sku)})) for sku, s in eski_kume.items()}
     cat = {c['id']: c for c in d['categories']}
     fam = {f['id']: f for f in d['families']}
     brands = {b['id']: b for b in d['brands']}
@@ -232,8 +249,8 @@ def main():
             notlar.add('model-bos')
         vals = [deger(x, sp) for x in sira]
         k_tr, k_en = KISA.get(dal, (tip_tr, tip_en))
-        slug_tr = uret(marka, model, tip_tr, k_tr, vals, notlar)
-        slug_en = uret(marka, model, tip_en, k_en, vals, set())
+        slug_tr, govde_tr, sec_tr = uret(marka, model, tip_tr, k_tr, vals, notlar)
+        slug_en, govde_en, sec_en = uret(marka, model, tip_en, k_en, vals, set())
         sku = p['sku'].lower()
         # Ayırt edici değer önce ÜRÜN ADINDAN (müşterinin gördüğü değer): SEAT adları
         # "· 1400 d/dk · 0,06 kW · 380V" taşıyor, teknik özellik ise ölçülen tüketimi (0,09 kW) ve
@@ -255,6 +272,7 @@ def main():
             'slug_tr': slug_tr, 'slug_en': slug_en,
             'adres_tr': f'/tr/urun/{slug_tr}-p-{sku}', 'adres_en': f'/en/products/{slug_en}-p-{sku}',
             'uzunluk_tr': len(slug_tr), 'not': ' '.join(sorted(notlar)), '_ayirt': ayirt,
+            '_parca': {'tr': [govde_tr, sec_tr, []], 'en': [govde_en, sec_en, []]},
         })
     # Aynı slug metni iki üründe: adres SKU ile yine tekil, ama iki sayfa aynı metni taşımasın.
     # Ayırt edici değer (gerilim → faz → devir) sırayla eklenir; biterse işaretlenir.
@@ -272,7 +290,15 @@ def main():
                     if None not in vals and len(set(vals)) > 1 and not any(
                             model_tasiyor(r['slug_' + dil], v) and v in r['slug_' + dil] for r, v in zip(g, vals)):
                         for r, v in zip(g, vals):
-                            r['slug_' + dil] += '-' + v
+                            govde, sec, ek = r['_parca'][dil]
+                            ek.append(v)
+                            # Ayırt edici değer ürünleri ayırır, betimleyici değer yalnız anlatır:
+                            # 70'i aşarsa önce betimleyici değerler sondan düşer (ek hep kalır).
+                            while len('-'.join([govde, *sec, *ek])) > 70 and sec:
+                                sec.pop()
+                                if dil == 'tr':
+                                    r['not'] = (r['not'] + ' deger-dustu-ayirt').strip()
+                            r['slug_' + dil] = '-'.join([govde, *sec, *ek])
                             if dil == 'tr':
                                 r['not'] = (r['not'] + ' ayirt-eklendi').strip()
                         degisti = True
@@ -289,7 +315,7 @@ def main():
         r['adres_tr'] = f"/tr/urun/{r['slug_tr']}-p-{sku}"
         r['adres_en'] = f"/en/products/{r['slug_en']}-p-{sku}"
         r['uzunluk_tr'] = len(r['slug_tr'])
-        del r['_ayirt']
+        del r['_ayirt'], r['_parca']
     with open(a.cikti, 'w', encoding='utf-8-sig', newline='') as fh:
         w = csv.DictWriter(fh, fieldnames=list(satirlar[0].keys()), delimiter=';')
         w.writeheader(); w.writerows(satirlar)
