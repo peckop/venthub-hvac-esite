@@ -1,4 +1,4 @@
-# Sonuçsuz arama günlüğü (K10.1) — plan v4
+# Sonuçsuz arama günlüğü (K10.1) — plan v5
 
 > **REC-340 · URUN · 2026-09-23 · PLAN (kod yok, migration yok).** Uygulama plan-challenger'dan
 > sonra; migration'lı PR yalnız Recep onayıyla merge edilir (kural 13; onay URUN penceresinde,
@@ -67,7 +67,11 @@ Böylece fonksiyon içindeki doğrulama araması **anon ile aynı RLS görünüm
    `revoke create on schema public from arama_gunlugu_yazar;`
 
 **Yetki listesi — kesin (v3 Y1, canlı `proacl`/`pg_policies` ölçümü):**
-- Şema: `usage on schema public`. `auth` şemasına usage **verilemez** (postgres'te grant option yok) →
+- Şema: `usage on schema public, extensions` (v4 K-1: `extensions` PUBLIC'e kapalı, yalnız anon/
+  authenticated/service_role'e açık; arama gövdeleri `&\``, `extensions.pgroonga_escape`,
+  `extensions.levenshtein` kullanıyor, usage olmadan her çağrı hata dalına düşer; postgres'in orada
+  grant option'ı var). `pgroonga` şeması gerekmiyor (anon'da da usage yok, arama çalışıyor).
+  `auth` şemasına usage **verilemez** (postgres'te grant option yok) →
   fonksiyon `auth.*` ve `is_admin_claim()` **çağırmaz** (bkz. m.1).
 - `execute` (PUBLIC'te açık olmayanlar): `arama_eslesen_urunler`, `arama_kelimeler`, `arama_kesin_ifade`,
   `arama_marka_es`, `arama_marka_kelimeleri`, `arama_bulanik_ifade`, `arama_dogrula`, `arama_ad_isabeti`,
@@ -79,12 +83,29 @@ Böylece fonksiyon içindeki doğrulama araması **anon ile aynı RLS görünüm
   tanımlı (`tenant_id = (select jwt_tenant_id())`) → **yeni politika eklenmez**. `product_prices` /
   `price_lists` politikaları yalnız anon/authenticated'a → rol orada 0 satır görür, `display_price` NULL
   döner; sonuç yalnız boş/dolu diye okunduğu için zararsız, politika eklenmez.
-- Dört günlük tablosu: `select, insert, update, delete`. Politikalar: günlük ve taşma için yazma/okuma
-  `tenant_id = jwt_tenant_id()`; **silme politikası kiracısız** `for delete to arama_gunlugu_yazar using
-  (gun < current_date - 90)` (v3 Y2: günün ilk çağıranı yalnız kendi kiracısını silmesin — KVKK). Oran ve
-  tuz tabloları kiracısız, politika `true`.
-- Migration sonu guard her kalemi `has_function_privilege` / `has_table_privilege('arama_gunlugu_yazar', …)`
-  ile doğrular; `rolbypassrls = false`; `pg_proc.proowner` = rol.
+- Dört günlük tablosu: yazar role `select, insert, update` (silme YOK). Politikalar **tür tür açık**
+  (v4 O-1; upsert mevcut satır için SELECT + UPDATE, yeni satır için INSERT ister; tavan sayımı SELECT):
+  günlük ve taşma için `for select using (t)`, `for insert with check (t)`, `for update using (t) with
+  check (t)`, `t = tenant_id = (select jwt_tenant_id())`. Oran ve tuz tabloları kiracısız, üç türde `true`.
+- **Temizlik ayrı fonksiyonda (v4 Y-1):** kiracısız DELETE politikası işe yaramaz — PG, WHERE'li
+  DELETE'te SELECT politikasını da AND'ler, günün ilk çağıranı yalnız kendi kiracısını silerdi.
+  `arama_gunlugu_temizle()` **postgres sahipli** DEFINER (RLS dışında, bütün kiracılar), WHERE'li dört
+  DELETE; `execute` yalnız `arama_gunlugu_yazar` ve `service_role`'e. Yazma yolu günün ilk çağrısında
+  bunu çağırır. **Zamanlayıcı kullanılmaz** (pg_cron canlıda kurulu, ama karar 53: zamanlayıcı önce Recep
+  ile konuşulur); bedeli trafiğe bağlı saklama → §5 K10.4 cümlesi: "satır en az 90 gün, en çok 90 gün +
+  sonraki ilk sonuçsuz aramaya kadar; tuz en az 48 saat, en çok bir sonraki çağrıya kadar". Trafiksiz
+  günde yeni satır da oluşmaz; uzayan yalnız son satırın ömrüdür. Tutarlı saklama istenirse pg_cron
+  Recep'e ayrı sorulur (numarayı OPS verir).
+- Migration sonu guard her kalemi `has_function_privilege` / `has_table_privilege` /
+  `has_schema_privilege('arama_gunlugu_yazar', 'extensions', 'USAGE')` ile doğrular;
+  `has_schema_privilege(…, 'public', 'CREATE') = false` (v4 D2); `rolbypassrls = false`;
+  `pg_proc.proowner` = rol. **Gerçek çalıştırma kanıtı** (yetki tablosu şema usage'ını göstermez):
+  guard içinde `set local role arama_gunlugu_yazar; perform fts_search_products('x',1,'{}');
+  perform get_search_suggestions('x',1); perform extensions.gen_random_bytes(1); reset role;` —
+  biri hata verirse migration düşer (prod'a yarım inmez).
+- **Ön koşul PR (v4 O-2):** `supabase/baselines/00_golge_onsoz.sql`'e `arama_gunlugu_yazar` rolü (ALTYAPI
+  dosyası) PR-A'dan **önce** merge edilir, ayrı kayıt numarasıyla; yoksa PR-A sonrası şema tabanı
+  replay'i kırılır.
 
 **Gölge ön koşulu (v3 Y4):** gölge `postgres` süper kullanıcıysa K2/K1 gölgede yeşil, canlıda kırmızı
 çıkar. Gölge senaryosunun ilk adımı `select rolsuper from pg_roles where rolname = current_user` →
@@ -104,9 +125,10 @@ ile yutar (v3 K3). anon `statement_timeout` 3 sn, authenticated 8 sn.
 
 0. **Ucuz ön kontrol (v3 Y3):** `p_sorgu` ham uzunluğu > 200 → döner (regex'ten önce).
 1. **İç trafik (v3 K1):** `is_admin_claim()` rol yetkisiyle çağrılamaz; aynı mantık gövdede:
-   `c := current_setting('request.jwt.claims', true)::jsonb`; `c->>'role' = 'service_role'` ya da
+   `c := nullif(current_setting('request.jwt.claims', true), '')::jsonb` (v4 D1); `c->>'role' = 'service_role'` ya da
    `coalesce(c->>'user_role', c->'app_metadata'->>'user_role')` ∈ {admin, super_admin} → döner.
-   `user_metadata` okunmaz (kural 12). Anonim iç ölçümler ayıklanamaz → §5 sınırlama.
+   `user_metadata` okunmaz (kural 12). Anonim iç ölçümler ve `moderator` (katalog yazıcısı) ayıklanmaz
+   → §5 sınırlama (v4 D3).
 2. **Girdi:** `p_dil` ∉ {tr, en} → döner. `ham := regexp_replace(trim(p_sorgu), '\s+', ' ', 'g')`;
    `v := arama_normalize(ham)`. `v` null/boş, < 2 ya da > 100 karakter → döner.
 3. **Kişisel veri süzgeci:** `@` varsa döner. Sonra `rakam := regexp_replace(ham, '[\s().+-]', '', 'g')`
@@ -128,10 +150,12 @@ ile yutar (v3 K3). anon `statement_timeout` 3 sn, authenticated 8 sn.
    artar ve döner (v2 O3: sınıra takılan da sayılır).
    **Tuz:** `insert into arama_gunlugu_tuz values (current_date, extensions.gen_random_bytes(32)) on
    conflict do nothing` **ardından yeniden SELECT** (eşzamanlı iki istek aynı tuzu görür). Insert
-   gerçekten satır açtıysa (günün ilk çağrısı) temizlik dalı koşar: 2 günden eski tuz, 2 günden eski
-   oran satırları, 90 günden eski günlük ve taşma satırları silinir (günde bir kez; v2 düşük bulgu).
-   **Nitelik:** bu anonimleştirme değil **takma adlandırmadır** — tuz 48 saat DB'de durduğu için servis
-   rolüne erişen biri bu sürede IPv4 uzayını tarayıp anahtarı çözebilir; tuz silinince bağ kopar.
+   gerçekten satır açtıysa (`GET DIAGNOSTICS row_count = 1`, günün ilk çağrısı) `arama_gunlugu_temizle()`
+   çağrılır (§2.1; postgres sahipli, bütün kiracılar): 2 günden eski tuz ve oran satırları, 90 günden eski
+   günlük ve taşma satırları silinir.
+   **Nitelik:** bu anonimleştirme değil **takma adlandırmadır** — tuz en az 48 saat, en çok bir sonraki
+   çağrıya kadar DB'de durur (v4 Y-1 ikinci kusur: "48 saat" tavan değil taban); servis rolüne erişen biri
+   bu sürede IPv4 uzayını tarayıp anahtarı çözebilir; tuz silinince bağ kopar.
 4b. **Günlük tavan ÖNCE (v3 Y3):** o gün o kiracıda tekil satır ≥ 500 ise `tasma/tavan` artar, döner —
    pahalı doğrulamadan önce, ucuz `count` ile.
 5. **Sunucu doğrulaması:** `fts_search_products(ham, 1, '{}')` ve `get_search_suggestions(ham, 1)`
@@ -180,6 +204,11 @@ kiracıya yazılır. Bugün ürün okumasında da aynı durum var; çözümü te
   koşabilir (K2) · migration iki kez uygulanır (rol idempotent) · tavan dolunca doğrulama hiç koşmaz
   (Y3) · yönetici olmayan authenticated JWT yazar · 57014 istemciye hata döner ve satır yok (K3) ·
   izin hatası `tasma/hata`'yı artırır (O1).
+- **v5 ek gölge senaryoları:** yazar rolüyle `fts_search_products` gerçekten sonuç döndürür (şema
+  usage'ı) · aynı sorgu ikinci kez → `adet = 2` (upsert politikaları) · iki kiracının 91 günlük satırı
+  günün ilk çağrısında **ikisi de** silinir (temizlik fonksiyonu) · `request.jwt.claims = ''` iken hata
+  dalına düşmez · gölgede `extensions` şema yetkisi canlıyla eşit (anon usage) — değilse önce eşitlenir,
+  yoksa senaryo yanlış nedenle yanar.
 - **Merge'den hemen sonra canlı duman testi (v3 Y4):** anon anahtarıyla bilinen sonuçsuz bir sorgu →
   satırın oluştuğu SELECT ile görülür. Asıl kanıt budur; bir ay sonraki sağlık kontrolü değil. Test
   satırı 90 gün kuralıyla kendiliğinden silinir (elle prod silme yok); raporda test günü not edilir.
@@ -259,4 +288,10 @@ temizlik → kiracısız silme politikası · Y3 maliyet → m.0 ham uzunluk, m.
 onayla gitsin) · O3 oran sınırı kiracılar arası ortak → K10.4 · D1–D8 işlendi (negatif mod, `0090`, `/`,
 IBAN, UTC, filtre, danışman uyarısı).
 
-*Yazan: URUN şeridi, 2026-09-23. v1 (karar 64, sayaç), v2 ve v3 bu dosyanın git geçmişindedir.*
+**v4 denetimi (BLOK, dar) → v5:** K-1 `extensions` şema usage'ı → verildi + guard + migration içinde
+gerçek çalıştırma kanıtı · Y-1 kiracısız DELETE politikası çalışmaz (SELECT politikası AND'lenir) →
+postgres sahipli temizlik fonksiyonu, zamanlayıcısız (karar 53), saklama cümlesi "en az / en çok"
+biçiminde · O-1 politika türleri açık + `adet = 2` senaryosu · O-2 önsöz rolü ön koşul PR · D1 `nullif`
+· D2 CREATE revoke guard'ı · D3 moderator sınırlaması.
+
+*Yazan: URUN şeridi, 2026-09-23. v1 (karar 64, sayaç), v2, v3 ve v4 bu dosyanın git geçmişindedir.*
