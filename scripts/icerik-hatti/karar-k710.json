@@ -3,12 +3,12 @@
   "_kaynak": "Kararlar - Katalog belgesi K7.10",
   "kararlar": {
     "avens-bvu-ls": {
-      "durum": "SAYFA YAZILMAYACAK",
-      "gerekce": "Kaynakta satilabilir anlatim yok (yalniz kod ve fiyat). AVenS'ten teknik foy istenecek; gelene kadar sayfa kod+fiyat kisa kimlik halinde kalir. Tarama listesinden DUSMEZ."
+      "durum": "KISA KIMLIK YAZILIR",
+      "gerekce": "Karar 85 (2026-09-23, K7.10 degisti): fiyat listesi olgularindan 1-2 cumle kimlik metni (uyumlu BVU modeli + debi). Satilabilir anlatim yine yazilmaz; AVenS teknik foyu gelince genisler."
     },
     "avens-hiz-anahtarlari": {
-      "durum": "SAYFA YAZILMAYACAK",
-      "gerekce": "BVU-LS ile ayni: kaynak satilabilir anlatim vermiyor. Teknik foy beklenir; kisa kimlik halinde kalir, tarama listesinde kalir."
+      "durum": "KISA KIMLIK YAZILIR",
+      "gerekce": "Karar 85 (2026-09-23, K7.10 degisti): fiyat listesi olgularindan 1-2 cumle kimlik metni (kod, maks. akim, eslestigi fanlar). Satilabilir anlatim yine yazilmaz."
     },
     "avens-elektrikli-isiticilar": {
       "durum": "YALNIZ AKSESUAR",

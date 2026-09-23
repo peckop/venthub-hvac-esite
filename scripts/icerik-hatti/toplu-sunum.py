@@ -29,7 +29,7 @@ KOK = Path(__file__).resolve().parents[2]
 TASLAK_DIZIN = KOK / "docs" / "audits"
 KAPI = Path(__file__).resolve().parent / "taslak-kaynak-kapisi.py"
 
-REF = re.compile(r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü]+)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]")
+REF = re.compile(r"\[(?:([A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*)\s+)?s\.\s*([0-9]+(?:\s*[,–-]\s*(?:s\.\s*)?[0-9]+)*)\]")
 BLOKLAR = ["Gövde", "Çark", "Motor", "Koruma", "Kontrol", "Montaj"]
 
 
@@ -369,6 +369,137 @@ def sunum_yaz(kayitlar, hedef, db_durum=None):
     return len(L)
 
 
+# ============================================================================================
+# KARAR 70 KIPI (REC-146 plan v3.1 adim 5): EN aile metni + onaysiz TR'nin yeniden yazimi.
+# Taslak duzeni: <dizin>/plan.json + aile basina <slug>.tr.md ve <slug>.en.md (her biri
+# "### Kimlik cümlesi" bolumu tasir). plan.json: [{slug, kip: en|b, urun, degisti?, not?}].
+#   kip en : .tr.md = ONAYLI canli TR (degismez, referanssiz olabilir); .en.md = cevirisi
+#   kip b  : .tr.md = YENI TR (her cumle [KAYNAK s.NN]); .en.md = onun cevirisi
+# SUNUM ve YUK AYNI kayitlardan uretilir: Recep'in onayladigi metin = yazilan metin (iki dilde).
+# ============================================================================================
+EN_KAPI = Path(__file__).resolve().parent / "en-jeton-kapisi.py"
+
+
+def _referanssiz(s):
+    """Kaynak referanslarini ([AVenS s.28]) ve [DB] etiketini VITRIN METNINDEN temizler.
+    (⛔ 2026-09-06: 38/38 aile "[s.41]" ile canliya gitti — kanit taslakta kalir, vitrinde durmaz.)"""
+    s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*\s+)?s\.\s*[0-9][^\]]*\]", "", s)
+    s = re.sub(r"\s*\[DB\]", "", s)
+    return re.sub(r"\s{2,}", " ", s).strip()
+
+
+def _en_kapi_kos(tr_yol, en_yol):
+    p = subprocess.run([sys.executable, str(EN_KAPI), "--tr", str(tr_yol), "--en", str(en_yol)],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    cikti = (p.stdout or "") + (p.stderr or "")
+    return {"kirmizi": p.returncode != 0, "kod": p.returncode,
+            "satirlar": [s.strip() for s in cikti.splitlines() if "⛔" in s]}
+
+
+def k70_kayitlar(dizin):
+    import json as _json
+    dizin = Path(dizin)
+    plan = _json.loads((dizin / "plan.json").read_text(encoding="utf-8"))
+    kayitlar = []
+    for p in plan:
+        tr_yol, en_yol = dizin / f"{p['slug']}.tr.md", dizin / f"{p['slug']}.en.md"
+        if not tr_yol.exists() or not en_yol.exists():
+            raise SystemExit(f"⛔ ONKOSUL: {p['slug']} icin .tr.md / .en.md eksik — sunum uretilmedi.")
+        tr_ham, en_ham = tr_yol.read_text(encoding="utf-8"), en_yol.read_text(encoding="utf-8")
+        tr_k, en_k = kimlik_cumlesi(tr_ham), kimlik_cumlesi(en_ham)
+        # b kipinde YENI TR kaynaga karsi olculur; en kipinde TR onayli canli metindir.
+        kapi = kapi_kos("", tr_ham) if p["kip"] == "b" else None
+        kayitlar.append({
+            "slug": p["slug"], "kip": p["kip"], "urun": p.get("urun", "?"),
+            "degisti": bool(p.get("degisti")), "not": p.get("not", ""),
+            "kimlik_tr": _referanssiz(tr_k), "kimlik_en": _referanssiz(en_k),
+            "kaynak": kaynak_ozeti(tr_ham + "\n" + en_ham),
+            "kapi": kapi, "en_kapi": _en_kapi_kos(tr_yol, en_yol),
+        })
+    return kayitlar
+
+
+def _hucre(s):
+    return (s or "—").replace("|", "\\|").replace("\n", " ")
+
+
+def k70_sunum_yaz(kayitlar, hedef, tarih):
+    L = []
+    A = L.append
+    kirmizi = [k for k in kayitlar if k["en_kapi"]["kirmizi"] or (k["kapi"] and k["kapi"]["dusen"])]
+    A(f"# Eksik aile açıklamaları — TEK TABLO (onay için) · {tarih}")
+    A("")
+    A("**Bu dosya elle yazılmadı** — taslaklardan makineyle üretildi: "
+      "`python scripts/icerik-hatti/toplu-sunum.py --k70 <dizin> --sunum <md>`.")
+    A("Onayın, aşağıdaki her satırın metnini **olduğu gibi** veritabanına yazdırır; yazılan metin "
+      "bu tablodaki metinle aynı dosyadan çıkar.")
+    A("")
+    A("| | |")
+    A("|---|---|")
+    A(f"| Aile | **{len(kayitlar)}** |")
+    A(f"| Yalnız İngilizce eklenecek (Türkçesi onaylı) | {sum(1 for k in kayitlar if k['kip'] == 'en')} |")
+    A(f"| Türkçesi de yeniden yazılan | {sum(1 for k in kayitlar if k['kip'] == 'b')} |")
+    A(f"| Otomatik kontrolden geçemeyen (tabloya girmedi) | **{len(kirmizi)}** |")
+    A("")
+    A("| Aile | Ürün | Türkçe | İngilizce | Kaynak | Not |")
+    A("|---|---|---|---|---|---|")
+    for k in kayitlar:
+        if k in kirmizi:
+            continue
+        tr = k["kimlik_tr"] if k["kip"] == "b" else "*(onaylı, değişmiyor)*"
+        # `degisti` = onayli TR yeniden onaya giriyor; SEBEBI `not` alaninda (onaydan sonra degisim
+        # ya da curutucunun onayli metinde buldugu olgu hatasi).
+        kor = bool(k["kapi"]) and not k["kapi"].get("dogrulanan")
+        notlar = [x for x in (("Türkçesi yeniden onaya giriyor" if k["degisti"] else ""), k["not"],
+                              ("sayı/kod içermiyor — yalnız anlam denetimiyle doğrulandı" if kor else "")) if x]
+        A(f"| `{k['slug']}` | {k['urun']} | {_hucre(tr)} | {_hucre(k['kimlik_en'])} | "
+          f"{_hucre(k['kaynak'])} | {_hucre(' · '.join(notlar))} |")
+    if kirmizi:
+        A("")
+        A("## Kontrolden geçemeyenler (düzeltilmeden sana gelmez)")
+        A("")
+        for k in kirmizi:
+            sebep = k["en_kapi"]["satirlar"] + ([f"kaynakla çelişen iddia {k['kapi']['dusen']}"]
+                                                 if k["kapi"] and k["kapi"]["dusen"] else [])
+            A(f"* `{k['slug']}` — {'; '.join(sebep)}")
+    Path(hedef).write_text(chr(10).join(L) + chr(10), encoding="utf-8")
+    return len(kirmizi)
+
+
+def k70_yuk(kayitlar):
+    """Yazici (aile-metni-yaz.mjs) yuku. Kirmizi aile de yuke girer ama kapi alanlari yazici
+    KAPI 3'te onu durdurur — sessizce dusurulmez (dusurulseydi KAPI 1 kume farkini gorurdu)."""
+    out = []
+    for k in kayitlar:
+        e = {"slug": k["slug"], "kip": k["kip"], "kimlik_en": k["kimlik_en"], "kaynak": k["kaynak"],
+             "kapi": {"dusen": (k["kapi"] or {}).get("dusen", 0),
+                      "en_kirmizi": 1 if k["en_kapi"]["kirmizi"] else 0}}
+        if k["kip"] == "b":
+            e["kimlik_tr"] = k["kimlik_tr"]
+            e["degisti"] = k["degisti"]
+        out.append(e)
+    return out
+
+
+if __name__ == "__main__" and "--k70" in sys.argv:
+    import json as _json
+    _dz = sys.argv[sys.argv.index("--k70") + 1]
+    _kay = k70_kayitlar(_dz)
+    _sonuc = 0
+    if "--sunum" in sys.argv:
+        _kir = k70_sunum_yaz(_kay, sys.argv[sys.argv.index("--sunum") + 1],
+                             sys.argv[sys.argv.index("--tarih") + 1] if "--tarih" in sys.argv else "")
+        print(f"SUNUM YAZILDI · {len(_kay)} aile · kontrolden geçemeyen {_kir}")
+        _sonuc = 1 if _kir else 0
+    if "--yuk" in sys.argv:
+        _h = Path(sys.argv[sys.argv.index("--yuk") + 1])
+        _h.parent.mkdir(parents=True, exist_ok=True)
+        _h.write_text(_json.dumps(k70_yuk(_kay), ensure_ascii=False, indent=2, sort_keys=True) + chr(10),
+                      encoding="utf-8")
+        print(f"YUK YAZILDI: {_h} · {len(_kay)} aile")
+    sys.exit(_sonuc)
+
+
 if __name__ == "__main__":
     kayitlar = main()
     # --aile <slug>: TEK ailenin kapi raporunu tam basar. K7.10 gibi "bu aile kapidan
@@ -399,7 +530,7 @@ if __name__ == "__main__":
             urun sayfasinda bizim IC KAYNAK NOTUMUZU okuyacakti. Kanit taslakta ve kanit
             satirlarinda durur; VITRINDE DURMAZ. Iki yer ayni metni tasimaz.
             """
-            s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü]+\s+)?s\.\s*[0-9][^\]]*\]", "", s)
+            s = re.sub(r"\s*\[(?:[A-Za-zÇĞİÖŞÜçğıöşü][A-Za-z0-9ÇĞİÖŞÜçğıöşü]*\s+)?s\.\s*[0-9][^\]]*\]", "", s)
             s = re.sub(r"\s*\[DB\]", "", s)
             return re.sub(r"\s{2,}", " ", s).strip()
         hedef = Path(sys.argv[sys.argv.index("--yuk") + 1])
