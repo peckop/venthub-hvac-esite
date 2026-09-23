@@ -88,6 +88,20 @@ function csvUret(urunler, oznitelikler = OZNITELIKLER, aile = AILE) {
   return { csv: [bas.join(','), ...satirlar].join('\n') + '\n', eksik, sutun: bas.length }
 }
 
+/** Saf: kaynak sayının ondalık basamak sayısı (48.6 → 1, 175 → 0, 1e-7 → 7). */
+function ondalikSayisi(v) {
+  if (!Number.isFinite(v)) return 0
+  const [govde, us] = String(v).toLowerCase().split('e')
+  const kesir = (govde.split('.')[1] || '').length
+  return Math.max(0, kesir - Number(us || 0))
+}
+
+/** Saf: türetilen `t`'yi kaynak `v`'nin hassasiyetine yuvarlar. */
+function kaynakHassasiyetindeYuvarla(t, v) {
+  const d = Math.min(ondalikSayisi(v), 12)
+  return Number(t.toFixed(d))
+}
+
 /** Saf: bir ürünün gölge değerleri ↔ UnoPim API cevabı → fark listesi. */
 function urunFarklari(u, apiUrun) {
   const fark = []
@@ -100,7 +114,12 @@ function urunFarklari(u, apiUrun) {
       // PIM'de yok: kaynak değer, PIM'deki tabandan türetilenle karşılaştırılır.
       const kaynakSpecs = Object.fromEntries(Object.entries(c).map(([ak, av]) => [ak, typeof av === 'object' && av !== null ? Number(av.amount) : av]))
       const t = TURETILMIS[k](kaynakSpecs)
-      if (!(typeof v === 'number' && Math.abs(t - v) <= 1e-9)) fark.push(`${u.sku}.${k} (türetilen): ${v} ≠ ${t}`)
+      // KAYNAK BASILIYSA KAYNAK KAZANIR (OPS/KATALOG hükmü, 2026-09-23): katalog l/s'yi 48.6 basar,
+      // tabandan türetilen 175/3.6 = 48.61 çıkar. Kıyas KAYNAĞIN hassasiyetinde yapılır — türetilen,
+      // kaynağın ondalık sayısına yuvarlanır. Aksi hâlde doğru veri "fark" diye görünürdü.
+      if (!(typeof v === 'number' && Number.isFinite(t) && Math.abs(kaynakHassasiyetindeYuvarla(t, v) - v) <= 1e-9)) {
+        fark.push(`${u.sku}.${k} (türetilen): ${v} ≠ ${t}`)
+      }
       continue
     }
     const g = c[k]
@@ -273,4 +292,4 @@ function specsCevir(apiUrun, oznitelikler = OZNITELIKLER) {
   return { specs: sirali, bilinmeyen }
 }
 
-module.exports = { OZNITELIKLER, TURETILMIS, csvUret, urunFarklari, kacir, specsCevir, istemci }
+module.exports = { OZNITELIKLER, TURETILMIS, csvUret, urunFarklari, kacir, specsCevir, istemci, ondalikSayisi, kaynakHassasiyetindeYuvarla }
