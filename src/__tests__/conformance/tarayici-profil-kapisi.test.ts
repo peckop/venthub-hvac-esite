@@ -2,10 +2,11 @@
  * INV-TARAYICI-PROFIL-2 — browser-use MCP araçları ve CLI'ı ayrı profil adresi olmadan çalışamaz.
  * Kaynak: .claude/hooks/tarayici-profil-kapisi.cjs (2026-09-23: adressiz çağrı Recep'in varsayılan profiline gider).
  */
-import { describe, expect, it } from 'vitest'
-import { createRequire } from 'node:module'
 import { spawnSync } from 'node:child_process'
+import { createRequire } from 'node:module'
 import path from 'node:path'
+
+import { describe, expect, it } from 'vitest'
 
 const require = createRequire(import.meta.url)
 const KANCA = path.resolve(__dirname, '../../../.claude/hooks/tarayici-profil-kapisi.cjs')

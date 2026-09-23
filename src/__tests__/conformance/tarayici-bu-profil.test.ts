@@ -2,8 +2,9 @@
  * INV-TARAYICI-PROFIL-1 — browser-use ayrı Chrome profili Recep'in varsayılan profilini ASLA seçemez.
  * Kaynak: scripts/tarayici/bu-profil.cjs (browser-use BU_CDP_URL verilmezse varsayılan profile bağlanır, 2026-09-23 ölçüldü).
  */
-import { describe, expect, it } from 'vitest'
 import { createRequire } from 'node:module'
+
+import { describe, expect, it } from 'vitest'
 
 const require = createRequire(import.meta.url)
 const { profilGuvenliMi, varsayilanChromeDizinleri, portGecerliMi } = require('../../../scripts/tarayici/bu-profil.cjs') as {
