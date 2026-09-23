@@ -22,6 +22,9 @@
 // seçilerek uç, kapının KAPSAMI İÇİNDE doğar — sonradan "acaba kapsıyor mu" sorusu kalmaz.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
+import { getTenantBranding } from '../_shared/tenant_config.ts'
+import { icBildirimOlustur, kacir, musteriOnayAnahtari } from './ic_bildirim.ts'
+
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (returns-webhook ile aynı pencere)
 
 function json(body: unknown, status = 200): Response {
@@ -104,7 +107,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: quote, error: quoteErr } = await supabase
       .from('venthub_quotes')
-      .select('id, user_id, status, created_at, request_email_sent_at, contact_email')
+      .select('id, tenant_id, user_id, status, created_at, request_email_sent_at, contact_email, contact_name, contact_phone, source')
       .eq('id', quoteId)
       .maybeSingle()
     // Okuma düştüyse 503: "bakamadım" ile "yok" AYNI cevaba düşmemeli (pg_net tekrar dener).
@@ -162,7 +165,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: items } = await supabase
       .from('venthub_quote_items')
-      .select('product_name, qty')
+      .select('product_name, qty, note')
       .eq('quote_id', quote.id)
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
@@ -176,14 +179,8 @@ Deno.serve(async (req: Request) => {
     // adresini, ürün adına `<a href="https://evil.tld">Ödemeyi tamamlayın</a>` yazar ve
     // kurban VentHub alan adından bir KİMLİK AVI e-postası alırdı. İki kapı birden kondu:
     // misafir uçta ad artık DB'den çözülüyor (istemciden alınmıyor) ve burada kaçış var.
-    // İkisi ayrı katman: biri kaynağı, diğeri çıktıyı korur.
-    const kacir = (s: unknown): string =>
-      String(s ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
+    // İkisi ayrı katman: biri kaynağı, diğeri çıktıyı korur. (`kacir` artık `ic_bildirim.ts`'te;
+    // iç bildirim de aynı kaçışı kullanır ve kapı onu orada test eder.)
 
     const kalemler = (items ?? [])
       .map((i) => `<li>${kacir(i.product_name)} — ${kacir(i.qty)} adet</li>`)
@@ -206,11 +203,44 @@ Deno.serve(async (req: Request) => {
       '</div>',
     ].join('')
 
-    const resp = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: emailFrom, to: [to], subject, html, text: subject }),
-    })
+    // notification-standard §B3.3: defter hem başarıda hem başarısızlıkta satır bırakır.
+    // Defter yazımı düşerse yutulmaz, log'a çıkar (§B4) — gönderimin sonucunu DEĞİŞTİRMEZ.
+    const deftereYaz = async (satir: {
+      email_to: string
+      subject: string
+      status: 'sent' | 'failed'
+      provider_message_id?: string | null
+      error?: string | null
+    }) => {
+      const { error: defterErr } = await supabase
+        .from('quote_email_events')
+        .insert({ quote_id: quote.id, provider: 'resend', ...satir })
+      if (defterErr) {
+        console.error('[quote-notification-webhook] defter yazilamadi', {
+          quote_id: quote.id,
+          status: satir.status,
+          detay: defterErr.message,
+        })
+      }
+    }
+
+    // Katman 1 (§B3.1): Resend Idempotency-Key — eşzamanlı ya da 24 saat içindeki tekrar
+    // çağrıda ikinci e-posta ÜRETİLMEZ. Katman 2 = `request_email_sent_at` (yukarıda okunur).
+    const resendGonder = (govde: Record<string, unknown>, anahtar: string) =>
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+          'Idempotency-Key': anahtar,
+        },
+        body: JSON.stringify(govde),
+      })
+
+    const resp = await resendGonder(
+      { from: emailFrom, to: [to], subject, html, text: subject },
+      musteriOnayAnahtari(quote.id),
+    )
 
     if (!resp.ok) {
       const govde = await resp.text().catch(() => '')
@@ -221,8 +251,49 @@ Deno.serve(async (req: Request) => {
         status: resp.status,
         govde: govde.slice(0, 300),
       })
+      await deftereYaz({ email_to: to, subject, status: 'failed', error: `resend ${resp.status}: ${govde.slice(0, 300)}` })
       return json({ error: 'send_failed', status: resp.status }, 502)
     }
+    const musteriSonuc = (await resp.json().catch(() => null)) as { id?: string } | null
+    await deftereYaz({ email_to: to, subject, status: 'sent', provider_message_id: musteriSonuc?.id ?? null })
+
+    // ⭐İÇ BİLDİRİM (2026-09-23): kiracının destek adresine (VentHub: info@venthub.com.tr) yeni
+    // talep haberi. Alıcı KİRACIDAN çözülür (CLAUDE.md kural 12) — sabit adres yazılmaz.
+    // Başarısızsa damga ATILMAZ ve 502 döner: talep "işlendi" sayılmaz, arıza pg_net yanıt
+    // defterinde + quote_email_events'te görünür. Aynı olayın yeniden çağrısında müşteri onayı
+    // 24 saat içinde Idempotency-Key ile tekrar ÜRETİLMEZ.
+    const marka = await getTenantBranding(quote.tenant_id)
+    const icAlici = (marka.supportEmail || '').trim()
+    if (!icAlici) {
+      console.error('[quote-notification-webhook] kiracinin destek adresi yok', { quote_id: quote.id })
+      await deftereYaz({ email_to: '', subject: 'ic bildirim', status: 'failed', error: 'supportEmail bos' })
+      return json({ error: 'internal_recipient_missing', quote_id: quote.id }, 500)
+    }
+    const ic = icBildirimOlustur({
+      quoteId: quote.id,
+      source: quote.source,
+      contactName: quote.contact_name,
+      contactEmail: to,
+      contactPhone: quote.contact_phone,
+      kalemler: items ?? [],
+      panelTabanUrl: Deno.env.get('SITE_URL') || 'https://venthub.com.tr',
+    })
+    const icResp = await resendGonder(
+      { from: emailFrom, to: [icAlici], reply_to: to, subject: ic.subject, html: ic.html, text: ic.text },
+      ic.idempotencyKey,
+    )
+    if (!icResp.ok) {
+      const govde = await icResp.text().catch(() => '')
+      console.error('[quote-notification-webhook] ic bildirim basarisiz', {
+        quote_id: quote.id,
+        status: icResp.status,
+        govde: govde.slice(0, 300),
+      })
+      await deftereYaz({ email_to: icAlici, subject: ic.subject, status: 'failed', error: `resend ${icResp.status}: ${govde.slice(0, 300)}` })
+      return json({ error: 'internal_notify_failed', status: icResp.status, quote_id: quote.id }, 502)
+    }
+    const icSonuc = (await icResp.json().catch(() => null)) as { id?: string } | null
+    await deftereYaz({ email_to: icAlici, subject: ic.subject, status: 'sent', provider_message_id: icSonuc?.id ?? null })
 
     // Damgayı ancak GÖNDERİM BAŞARILI olduktan sonra at.
     const { error: stampErr } = await supabase
