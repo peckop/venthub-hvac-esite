@@ -217,10 +217,12 @@ yüksekliği uyarısı) ve teknik sorumluluk notuyla sağlanır.
 `/en/knowledge-hub` rotası üretilmez**: arama getirisi 0, doğrulama maliyeti tam. Bugünkü 5 EN bilgi
 merkezi adresi o süre EN kategori/destek karşılığına kalıcı yönlendirilir (R6). Bayrak açılınca EN ayrı yazılır, aynı doğrulamadan geçer; EN yoksa
 EN sayfa **yoktur** (başka dile düşme yasak, `vitrin-metni-standard.md` K10).
-**Yazar ve yapay zekâ açıklaması — AÇIK SORU (Recep):** yazı imzası Kurum (VentHub) + teknik sorumluluk
-notu olarak öneriliyor. Google'ın faydalı içerik rehberi "otomasyon/yapay zekâ kullanımı ziyaretçiye
-açık mı" diye soruyor; açıklamanın biçimi bir yayın kararıdır ve ilk yazının onay özetinde tek soru
-olarak Recep'e gider. Emsal ölçümü (BLOG, 2026-09-24, A sınıfı: tarayıcıda işlenmiş sayfa, metin + HTML +
+**Yazar ve yapay zekâ açıklaması — KARAR 106 (Recep, 2026-09-24): yapay zekâ notu KONMAZ.** İmza Kurum
+(VentHub); okuyucuyu koruyan şey kaynak beyanıdır: cümle düzeyinde `[n]`, kaynak listesi, teknik
+sorumluluk notu. Recep'in gerekçesi: bir çalışmayı mühendise yaptırınca da sayfaya onun kimliğini
+yazmıyoruz. Google açıklamayı zorunlu tutmuyor: *"Consider adding these when it would be reasonably
+expected"* (developers.google.com/search/docs/fundamentals/creating-helpful-content, ham HTML, erişim
+2026-09-24). Emsal ölçümü (BLOG, 2026-09-24, A sınıfı: tarayıcıda işlenmiş sayfa, metin + HTML +
 JSON-LD taranarak): emsal yazıda yapay zekâ açıklaması **yok**; yazar `Organization` (şirket adı), tarih
 görünür, "gözden geçiren" satırı yok. Sitede geçen tek "yapay zeka" ifadesi alt menüdeki sohbet asistanı
 bağlantısıdır, yazıyla ilgili değildir.
@@ -289,7 +291,7 @@ Fable 18; Fable bir bayat alıntıyı "birebir doğru" onayladı; Fable'ın biri
 
 İki parça birlikte gider; biri eksikse sunum yapılmamış sayılır:
 1. **Önizleme:** yazının sitedeki görünüşüne yakın, okunabilir sayfa: başlık, tarih satırı, bölümler,
-   tablolar, SSS, kaynaklar, teknik sorumluluk notu ve (karar verildiyse) yapay zekâ notu yerinde.
+   tablolar, SSS, kaynaklar ve teknik sorumluluk notu yerinde (yapay zekâ notu yok — karar 106).
    Sayfa metnin sha256'sının ilk 12 hanesini gösterir; önizlemedeki metin doğrulanan metinle aynıdır.
    Yer: R5.6 rotası; o gelene kadar R5.7.
 2. **Özet**, BLOG penceresinde, düz cümleyle: konu ve neden bu konu (R1.2 tablosu), kaynak sayısı ve
