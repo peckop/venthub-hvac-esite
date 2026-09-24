@@ -24,7 +24,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
 
 import { checkRateLimit } from '../_shared/rate_limit.ts'
 import { DEFAULT_TENANT_ID } from '../_shared/tenant.ts'
-import { getTenantBranding } from '../_shared/tenant_config.ts'
+import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
 import { icBildirimOlustur, kacir, musteriOnayAnahtari } from './ic_bildirim.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (returns-webhook ile aynı pencere)
@@ -188,7 +188,7 @@ Deno.serve(async (req: Request) => {
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY') || ''
     if (!resendApiKey) return json({ error: 'CONFIG_MISSING' }, 500)
-    const emailFrom = Deno.env.get('EMAIL_FROM') || 'VentHub <onboarding@resend.dev>'
+    const emailFrom = Deno.env.get('EMAIL_FROM') || VARSAYILAN_GONDERICI
 
     // ⭐HTML KAÇIŞI — ZORUNLU (güvenlik incelemesi 2026-09-09, KRİTİK bulgu 1).
     //

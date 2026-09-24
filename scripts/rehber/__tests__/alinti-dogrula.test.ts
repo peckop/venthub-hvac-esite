@@ -55,6 +55,25 @@ describe('INV-REHBER-ALINTI-1', () => {
     const html = '<p>can only be used with <a href="#">JobPosting</a> or <a href="#">BroadcastEvent</a> embedded in a <a href="#">VideoObject</a>.</p>'
     expect(alintiBul(htmlMetin(html), 'with JobPosting or BroadcastEvent embedded in a VideoObject.').bulundu).toBe(true)
   })
+  it('PDF satır sonu hecelemesi birleşir (kaynak dizini metni)', () => {
+    const dizin = 'Extra cooling or derating of the motor is not required in\nvariable torque applications where the torque is propor-\ntional to the square of the speed'
+    expect(alintiBul(dizin, 'where the torque is proportional to the square of the speed').bulundu).toBe(true)
+  })
+  it('parçalı alıntı: her parça ayrı aranır; biri yoksa KALDI (birleşik dize hiç geçmez)', () => {
+    const metin = 'Power range: 0.18-2.2 kW. Some other text here. Three phase 380-480 V AC: 0.37-22 kW.'
+    const iyi = alintiBul(metin, 'Power range: 0.18-2.2 kW [...] Three phase 380-480 V AC: 0.37-22 kW')
+    expect(iyi).toMatchObject({ bulundu: true, parca: 2 })
+    const kotu = alintiBul(metin, 'Power range: 0.18-2.2 kW / Three phase 380-480 V AC: 0.55-30 kW')
+    expect(kotu).toMatchObject({ bulundu: false, sebep: 'PARCA-YOK' })
+    expect(kotu.eksikParca).toEqual(['Three phase 380-480 V AC: 0.55-30 kW'])
+  })
+  it('PDF bitişik harfi (ﬂ) ve rakamlı tireli kırılma normal yazımla eşleşir', () => {
+    expect(alintiBul('the air ﬂow is reduced', 'the air flow is reduced').bulundu).toBe(true)
+    expect(alintiBul('convert 3-\nphase AC voltage', 'convert 3-phase AC voltage').bulundu).toBe(true)
+  })
+  it('bitişik "shielded/armored" parçalayıcı sayılmaz (boşluklu " / " değil)', () => {
+    expect(alintiBul('Maximum motor cable length, shielded/armored 15 m', 'shielded/armored 15 m').bulundu).toBe(true)
+  })
   it('script içeriği görünür metne girmez', () => {
     expect(htmlMetin('<p>a</p><script>gizli metin</script>')).toBe('a')
   })

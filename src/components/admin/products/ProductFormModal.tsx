@@ -9,10 +9,10 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useI18n } from '@/i18n/I18nProvider';
-import { VARIANT_DETAIL_COLUMNS } from '@/lib/services/product.columns'
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
 import type { DbCategory, DbJson,DbProductInsert, DbProductUpdate } from '../../../types/db-rows'
+import { ADMIN_PRODUCT_FORM_COLUMNS } from './productForm.columns'
 
 // Form schema
 const getProductSchema = (t: (key: string) => string) => z.object({
@@ -63,7 +63,7 @@ const ProductFormModal: React.FC<ProductFormModalProps> = ({ _productId, open, o
     const loadProduct = useCallback(async (id: string) => {
         setLoading(true)
         try {
-            const { data: product, error } = await supabase.from('products').select(VARIANT_DETAIL_COLUMNS).eq('id', id).single()
+            const { data: product, error } = await supabase.from('products').select(ADMIN_PRODUCT_FORM_COLUMNS).eq('id', id).single()
             if (error) throw error
 
             reset({
