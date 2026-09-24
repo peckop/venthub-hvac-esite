@@ -849,7 +849,17 @@ export const tr = {
     cookieTitle: 'Çerez Politikası (Taslak)',
     distanceSalesTitle: 'Mesafeli Satış Sözleşmesi (Taslak)',
     preInformationTitle: 'Ön Bilgilendirme Formu (Taslak)',
-    termsTitle: 'Kullanım Koşulları (Taslak)'
+    termsTitle: 'Kullanım Koşulları (Taslak)',
+    // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: yasal sayfalar varsayılan site
+    // açıklamasını basıyordu. Yalnız belgenin konusu adlandırılır.
+    seo: {
+      kvkk: '6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni.',
+      privacy: 'VentHub web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu.',
+      cookie: 'VentHub web sitesinde kullanılan çerezler ve çerez tercihlerinin yönetimi.',
+      terms: 'VentHub web sitesinin kullanım koşulları.',
+      distanceSales: 'VentHub üzerinden yapılan satışlara ilişkin mesafeli satış sözleşmesi.',
+      preInformation: 'Mesafeli satış öncesinde tüketiciye sunulan ön bilgilendirme formu.',
+    }
   },
   footer: {
     quickLinks: 'Hızlı Linkler',
@@ -1917,6 +1927,16 @@ export const tr = {
     home: {
       subtitle: 'İhtiyacınız olan bilgilere hızlıca ulaşın.',
       warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgileri',
+    },
+    // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: bu dört sayfa varsayılan site
+    // açıklamasını basıyordu. Yeni vaat YOK: yalnız sayfanın zaten anlattığı konu adlandırılır.
+    seo: {
+      // Sekme başlığı: sayfa H1'i "SSS" kısaltmasıdır; arama sonucunda tam ad okunur.
+      faqTitle: 'Sık Sorulan Sorular',
+      faq: 'Teklif, ödeme ve kurulum hakkında sık sorulan sorular ve cevapları.',
+      shipping: 'Teslimat süresi, kargo ücreti ve gönderi takibi hakkında bilgi.',
+      returns: 'Cayma hakkı, iade koşulları ve iade talebinin nasıl yapılacağı.',
+      warranty: 'Garanti kapsamı ve yetkili servis bilgileri.',
     },
     returns: {
       title: 'İade ve Değişim',

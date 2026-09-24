@@ -5,7 +5,6 @@ import Link from 'next/link'
 import React from 'react'
 
 import { BrandIcon } from '../components/HVACIcons'
-import Seo from '../components/Seo'
 import { brandText, HVAC_BRANDS } from '../data/brands'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAnimation'
@@ -24,10 +23,7 @@ const BrandsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Seo
-        /* site adi Seo bileseninde eklenir — REC-148 */ title={t('brands.pageTitle')}
-        description={t('brands.seoDesc')}
-      />
+      {/* Üst veri rotada (`brands/page.tsx` generateMetadata) — istemci Seo ikinci <title> basıyordu. */}
 
       {/* Hero: Ultra Minimalist Apple Style */}
       <section className="pt-32 pb-20 bg-slate-50/50 border-b border-slate-100">

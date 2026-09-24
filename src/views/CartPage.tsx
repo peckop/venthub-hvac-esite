@@ -31,9 +31,11 @@ const CartPage: React.FC = () => {
             <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-sm">
               <ShoppingBag size={48} className="text-steel-gray" />
             </div>
-            <h2 className="text-2xl font-bold text-industrial-gray mb-4">
+            {/* H1 (PR-1, 2026-09-24 ölçümü): boş sepette sayfanın TEK başlığı buydu ve h2'ydi —
+                çizilmiş DOM'da H1 sayısı 0. Dolu sepet kolunun H1'i aşağıda (`cart.title`). */}
+            <h1 className="text-2xl font-bold text-industrial-gray mb-4">
               {t('cart.emptyTitle')}
-            </h2>
+            </h1>
             <p className="text-steel-gray mb-8">
               {t('cart.emptyDesc')}
             </p>
