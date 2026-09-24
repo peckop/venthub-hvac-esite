@@ -64,7 +64,8 @@ Ziyaretçi ve sıradan müşteri bu dört tablodan satır GÖREMEZ (politika yok
 3. **authenticated, rol ∉ {admin, super_admin}** (user, moderator, warehouse, sales, viewer): aynı — okuyamaz. Ölçüm: moderatör JWT claim'i taklit edilerek (`set local request.jwt.claims`).
 4. **admin / super_admin:** bugünkü tüm admin ekranları aynı veriyi görür (maliyet önizleme, fiyat üretimi, maliyet tazeleme, envanter sermaye/tedarikçi).
 5. **Vitrin fiyatı değişmez:** `get_display_prices`, arama, aile detay/listesi aynı fiyatları döner (önce/sonra fark 0, 442 ürün).
-6. **Karar 95 diğer tablolar:** pricing_rule, purchase_orders, purchase_order_items, suppliers okuma politikasından `moderator` çıkar.
+6. **Her RPC ve görünüm, iki rolle (OPS 2026-09-24):** §1.5 C sınıfındaki 8 nesne + `admin_search_products` + `inventory_summary` + `inventory_velocity`, önce `anon` sonra müşteri (`authenticated`, rol=user) claim'iyle çağrılır → dönen satırlarda 8 hassas kolon adı ve değeri sayımı **0** (hata da kabul; sızıntı değil). Her faz sonrası tekrarlanır; Faz 3 sonrası kapı INV-MALIYET-HTML-1'in DB kolu olur.
+7. **Karar 95 diğer tablolar:** pricing_rule, purchase_orders, purchase_order_items, suppliers okuma politikasından `moderator` çıkar.
 
 ---
 
@@ -109,6 +110,7 @@ Ziyaretçi ve sıradan müşteri bu dört tablodan satır GÖREMEZ (politika yok
 - **Senkron tetik `products → product_costs`** (geçiş dönemi): `SECURITY DEFINER`, `set search_path = pg_catalog, public`; `tenant_id` = `NEW.tenant_id` (`jwt_tenant_id()` DEĞİL); AFTER INSERT (satır yarat) ve AFTER UPDATE (yalnız `IS DISTINCT FROM OLD` olan kolonlar); UPDATE dalı `insert … on conflict (product_id) do update` (satır yoksa sessiz 0-satır güncelleme olmaz); `pg_trigger_depth` koruması YOK (akış tek yönlü; koruma ileride sessiz atlama doğururdu — challenger v2 2.B.8). Yön TEK: products → product_costs. Bayat-üzerine-yazma riski (challenger 2.3): Faz 2 boyunca **yazıcı kuralı** — hiçbir yeni kod product_costs'a DOĞRUDAN yazmaz; tüm yazımlar products üzerinden gider ve tetik taşır. Böylece tek yön tutarlı kalır. Doğrudan yazım Faz 3'te açılır. Kapı: conformance — `src/` altında Faz 3'e kadar `from('product_costs').insert|update|upsert|delete` YASAK.
 - **Denetim izi:** product_costs'a `denetim_izi_yaz()` tetiği, products süzgeciyle aynı mantık — otomasyon kolonları (`cost_in_base`, `purchase_rate_to_base`, `last_*`) DIŞARIDA (aksi hâlde her maliyet tazelemesi ~348 satır). Senkron tetik aynı değişiklik için ikinci satır doğurmasın diye Faz 1'de product_costs denetim tetiği **kurulmaz**, Faz 3'te products tetiğinden devralınır. `denetim-izi-hukum.mjs` KAPSAM listesine product_costs Faz 3'te eklenir.
 - **Kabul (Faz 1):** anon ve moderatör claim taklidiyle `select … from product_costs` → 0 satır/izin yok; admin claim → 442. Gölgede üretilen tipte products↔product_costs ilişkisi `isOneToOne: true` + gömme duman sorgusu nesne döndürür (§9).
+- **`admin_search_products` anon EXECUTE revoke Faz 1'e ALINDI** (OPS/URUN security-reviewer 2026-09-24: REST dışında ikinci sızıntı yolu; 09-17 "liste RPC'si sızdırıyordu" dersinin aynı sınıfı). Fonksiyon INVOKER, anon kolon yetkisiyle `purchase_price` döndürüyor; tek çağıranı admin ekranı (authenticated) → anon'dan kaldırmak hiçbir tüketiciyi kırmaz. authenticated tarafı (moderatör/müşteri) Faz 2-DB'de gövde product_costs'a geçince kapanır.
 - **Moderatör DEĞİŞİKLİĞİ YOK** (v1'de vardı; v2'de Faz 1b'ye taşındı — challenger 2.4).
 
 ### Faz 1b — karar 95 moderatör kapsamı (migration + kod, AYNI PR)
@@ -119,7 +121,7 @@ Ziyaretçi ve sıradan müşteri bu dört tablodan satır GÖREMEZ (politika yok
 
 ### Faz 2-DB — migration 2 (kural 13)
 - `inventory_summary`, `inventory_velocity` → `product_costs`'a LEFT JOIN ile yeniden tanım (moderatör/müşteri: NULL). Görünümler authenticated'a açık kalıyorsa sermaye/tedarikçi kolonu RLS'le NULL döner (ölçülür).
-- `admin_search_products`: anon EXECUTE **revoke**; `purchase_price` product_costs'tan LEFT JOIN.
+- `admin_search_products`: (anon EXECUTE Faz 1'de kaldırıldı) `purchase_price` product_costs'tan LEFT JOIN → admin olmayan authenticated NULL görür.
 - `process_goods_receipt` (DEFINER): `last_purchase_*` yazımı products üzerinden kalır (tetik taşır) — Faz 3'te product_costs'a çevrilir.
 - Guard E: `admin_search_products` ve `process_goods_receipt` işlem içinde gerçekten çağrılıp geri alınır.
 
