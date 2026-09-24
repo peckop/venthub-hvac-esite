@@ -35,7 +35,7 @@ describe('INV-REHBER-IC-BAGLANTI-1 · ağsız yarı (metin)', () => {
   it('bilinmeyen kimlik türü ve bozuk biçim KIRMIZI', () => {
     expect(sinif('[x](vh:urun/fc51)')).toEqual(['IC-KIMLIK-BICIMI'])
     expect(sinif('[x](vh:model)')).toEqual(['IC-KIMLIK-BICIMI'])
-    expect(sinif('[x](vh:model/FC 51)')).toEqual(['IC-KIMLIK-BICIMI'])
+    expect(sinif('[x](vh:model/FC51!)')).toEqual(['IC-KIMLIK-BICIMI'])
     expect(sinif('[x](vh:model/-fc51)')).toEqual(['IC-KIMLIK-BICIMI'])
   })
   it('büyük harfli SKU geçer (çözücü harf duyarsız)', () => {
