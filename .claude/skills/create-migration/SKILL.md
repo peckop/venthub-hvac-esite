@@ -24,6 +24,14 @@ başındaki adımları standartlaştırır.
      mevcut satırlara da uygulanır — canlıda patlar)
    - Sır/duz-metin anahtar YOK (Vault kullan); repo PUBLIC
    - Geri alma notu: bu migration nasıl geri alınır, dosyanın başına yorum olarak yaz
+   - **Şemanın GÖRÜNEN yüzü değişiyorsa (yeni tablo/kolon/görünüm kolonu/fonksiyon imzası) tip
+     dosyası:** `src/types/database.types.ts` (URUN alanı) merge ile AYNI SAATTE güncellenir ve
+     sahibine merge'ten ÖNCE haber verilir. Canlı şema değişip tip dosyası değişmezse INV-TIP-DRIFT-1
+     bütün şeritlerin PR'larında kırmızıya döner (2026-09-24, REC-140 Faz 1: filo-geneli kırmızı).
+     Tip dosyası migration inmeden canlıdan üretilemez → sıra: sahibine haber → merge → uygulama
+     yeşil → sahibi `pnpm supabase:gen` PR'ı hemen. Ayrıca HER migration sonrası şema tabanı
+     (`sema-tabani-uret.yml`) aynı gün yenilenir, yoksa INV-TABAN-TAZE-1 filoda kırmızı
+     (migration-safety-standard, tip/taban maddesi).
 5. **Yerel doğrulama:** mümkünse `supabase db diff` ile beklenen fark; testler
    (`pnpm test -- --run`) yeşil.
 6. **PR ve kapanış uyarısı:** PR açıklamasına şu satır AYNEN girer:
