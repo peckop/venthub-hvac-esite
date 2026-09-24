@@ -866,12 +866,8 @@ export const en: typeof tr = {
     // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
     // is published. Restored together with the TR dictionary (parity) once real.
     email: 'info@venthub.com.tr',
-    social: {
-      facebook: 'Facebook',
-      instagram: 'Instagram',
-      linkedin: 'LinkedIn',
-      twitter: 'Twitter'
-    }
+    // social DELIBERATELY ABSENT (REC-285, 2026-09-24): links pointed at platform home pages.
+    // Restored together with the TR dictionary (parity) once real account URLs exist.
   },
   contactPage: {
     form: {

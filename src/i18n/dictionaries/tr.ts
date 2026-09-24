@@ -862,12 +862,8 @@ export const tr = {
     // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
     // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
     email: 'info@venthub.com.tr',
-    social: {
-      facebook: 'Facebook',
-      twitter: 'Twitter',
-      linkedin: 'LinkedIn',
-      instagram: 'Instagram'
-    }
+    // social BİLİNÇLİ YOK (REC-285, 2026-09-24): bağlantılar platform ana sayfasına gidiyordu.
+    // Gerçek hesap adresleri gelince EN sözlüğüyle BİRLİKTE geri eklenir (parite).
   },
   auth: {
     pwStrength: {
