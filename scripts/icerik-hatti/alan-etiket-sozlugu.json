@@ -41,6 +41,8 @@
     "noise_lpa_3m_db":          { "birim": "dB",    "etiketler": ["lpa", "l pa", "sound pressure", "ses basıncı", "db"] },
     "ip_rating":                { "birim": null,    "etiketler": ["ip", "protection", "koruma", "protection degree", "grado di protezione"] },
     "insulation_class":         { "birim": null,    "etiketler": ["insulation", "izolasyon", "insulation class", "classe di isolamento"] },
+    "electrical_protection_class": { "birim": null, "etiketler": ["electrical insulation class", "electric insulation class", "protection class", "koruma sınıfı"] },
+    "motor_efficiency_class":   { "birim": null,    "etiketler": ["efficiency class", "ie class", "verim sınıfı", "classe di efficienza"] },
     "motor_poles":              { "birim": null,    "etiketler": ["poles", "kutup", "poli", "pole"] },
     "phase":                    { "birim": null,    "etiketler": ["phase", "faz", "fase", "single-phase", "three-phase", "monofase", "trifase"] },
 
@@ -64,7 +66,8 @@
     "Etiket tek başına alanı belirlemediğinde karar KAYNAĞA göre verilir ve burada yazılır (etiket eşlemesi bunu bilemez):",
     "Enkelfan EEC (plug-fans_casals s.16) 'Rated Power kW': mil gücü mü çekilen güç mü BELİRSİZ (155: 230 V × 0,25 A = 57,5 VA ↔ 60 W) → hiçbir alana yazılmaz (plan açık soru 4b).",
     "Vorticent CMS ATEX föyü s.2: 'RPM' ve 'Approx. weight' hem Fan hem Motor bölümünde — alan BÖLÜM etiketiyle seçilir (rec172-cikarim.py).",
-    "Casals NIMUS/NIMAX 'Rated I (A)' iki sütun (230 V · 400 V): yazılan akım voltage_v ile aynı gerilimin sütunu (400 V)."
+    "Casals NIMUS/NIMAX 'Rated I (A)' iki sütun (230 V · 400 V): yazılan akım voltage_v ile aynı gerilimin sütunu (400 V).",
+    "Vortice 'Insulation class: II' (Roma rakamı I/II/III) = IEC 61140 koruma sınıfı → electrical_protection_class; harf (B/F/H) = ısıl sınıf → insulation_class. Alan DEĞERİN biçimiyle seçilir, 'insulation class' kelimesiyle değil (REC-172 tur 2, 82 ürün)."
   ],
   "_cok_anlamli": {
     "_nicin": "Birden çok alana giden etiket BİLİNÇLİ olmalı; kapı (paket-sozlesme.test.ts) listede olmayan yeni çakışmada KIRMIZI verir.",
