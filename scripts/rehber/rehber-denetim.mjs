@@ -183,8 +183,9 @@ export function kalipDenetle(md) {
  * NİÇİN (2026-09-24, Recep: "URL değişirse sorun olmaz mı?"): adres ağacı tek yayında değişecek
  * (ürün/aile/kategori önekleri Türkçeleşiyor). Düz adres yazan yazı kırılmaz — eski adres 308 verir —
  * ama her tıklama bir yönlendirme durağından geçer ve yazı eski adresi kalıcı taşır.
- * Anahtarlar: model = SKU (adreste kalıcı), kategori = kanonik EN slug (CLAUDE.md kural 7),
- * aile = URUN rota işinin belirleyeceği kalıcı kimlik (aile adres metni değişiyor, karar 86).
+ * Anahtarlar (URUN ile kesinleşti, 2026-09-24): model = SKU, kategori = kanonik EN slug (CLAUDE.md kural 7),
+ * aile = aile slug'ı (Faz 1-B'de değişirse çözücü `url_takma_adlari`'na bakar). Çözülemeyen bağlantı
+ * derlemeyi düşürür (URUN, adresUret).
  */
 export const KIMLIK_TURLERI = ['model', 'aile', 'kategori', 'marka', 'hesaplayici', 'sayfa']
 const SITE = /^https?:\/\/(?:www\.)?venthub\.com\.tr(?:[/?#]|$)/i
@@ -194,7 +195,8 @@ export function icBaglantiDenetle(govde) {
   for (const m of govde.matchAll(/\]\(\s*([^)\s]+)[^)]*\)/g)) {
     const h = m[1]
     if (/^vh:/i.test(h)) {
-      const k = h.match(/^vh:([a-z]+)\/([a-z0-9][a-z0-9._-]*)$/)
+      // Anahtar harf duyarsız: SKU DB'de büyük harfli olabilir, çözücü (adresUret) harf duyarsız çözer
+      const k = h.match(/^vh:([a-z]+)\/([A-Za-z0-9][A-Za-z0-9._-]*)$/)
       if (!k || !KIMLIK_TURLERI.includes(k[1])) kirmizi.push({ sinif: 'IC-KIMLIK-BICIMI', ayrinti: `${h} (beklenen vh:<${KIMLIK_TURLERI.join('|')}>/<anahtar>)` })
     } else if (SITE.test(h) || !/^(?:https?:|mailto:|tel:|#)/i.test(h)) {
       kirmizi.push({ sinif: 'IC-ADRES-DUZ', ayrinti: `${h} → site içi bağlantı kimlikle yazılır: [metin](vh:<tür>/<anahtar>)` })
