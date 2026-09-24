@@ -1,6 +1,6 @@
 # REC-140 · Ürün maliyet alanlarının kilidi (2026-09-24, ALTYAPI)
 
-**Durum:** PLAN v2 — v1 plan-challenger (Opus) sonucu KOŞULLU: Faz 0 üç ekle geçti, Faz 1–3 BLOK (8 zorunlu değişiklik). v2 bunları işler (§7 izlenebilirlik tablosu) ve yeniden challenger'a gider. Migration içerir → kural 13: merge = prod'a otomatik uygulanır, **Recep onayı** ALTYAPI penceresinde.
+**Durum:** PLAN v3 — challenger v1 KOŞULLU (Faz 1–3 BLOK) → v2; challenger v2 KOŞULLU (v1'in 14 bulgusundan 9 KAPANDI, 5 KISMEN, 0 AÇIK; mimari sağlam, 8 metin düzeltmesi) → v3 bunları işler (§8). Faz 0: PASS. Faz 1/1b: v3 ekleri + §9 gölge ölçümleriyle yürür. Faz 2-kod ve Faz 3: maddeler yazıldı, açılış kapıyla. Migration içerir → kural 13: merge = prod'a otomatik uygulanır, **Recep onayı** ALTYAPI penceresinde.
 **Cetvel:** `migration-safety-standard.md` (Guard A/B/E, süpürmeler) · `pricing-standard.md` v1.1 (§2 liste ≠ maliyet) · `purchasing-standard.md` (§5.2 maliyet, §8.1 UI izni ⊆ DB izni) · `rls-yetki-karari-standard.md` (§1 `is_admin_user()` biçimi, §5 CASCADE yazılmaz) · `denetim-izi-standard.md` · CLAUDE.md kural 11/12/13/14 · karar 95 (Recep 2026-09-24: moderatör maliyeti ve alış iskontosunu GÖRMEZ, yalnız yönetici görür).
 
 ### 0 · Anlam düzeltmesi (v2, challenger 2.6 — kendi doğrulamam)
@@ -102,12 +102,13 @@ Ziyaretçi ve sıradan müşteri bu dört tablodan satır GÖREMEZ (politika yok
 (URUN'a iletildi: 08:19Z + 08:49Z ek.)
 
 ### Faz 1 — migration 1 (ekleyici; veri + tablo + senkron). Dosya: `supabase/migrations/2026092xHHMMSS_rec140_product_costs_ekle.sql` (14 hane)
-- **Tablo:** `product_costs (product_id uuid, tenant_id uuid not null, <8 kolon, products'taki tip/NOT NULL/DEFAULT birebir>, updated_at)`; `primary key (product_id)`; products'a `unique (id, tenant_id)` + product_costs'ta `foreign key (product_id, tenant_id) references products(id, tenant_id) on update cascade on delete cascade` (kiracı ayrışamaz, kural 12).
-- **RLS:** enable (FORCE yazılabilir ama güvence SAYILMAZ: postgres `rolbypassrls=true` ölçüldü, service_role da atlar). Politikalar SELECT/INSERT/UPDATE/DELETE: `tenant_id = (select public.jwt_tenant_id()) and (select public.is_admin_user())`. GRANT: anon HİÇ; authenticated yalnız `select, insert, update, delete` (TRUNCATE yok — RLS'e tabi değil).
+- **Migration başı:** `set local lock_timeout = '5s'; set local statement_timeout = '60s';` — products'a `unique` eklemek ACCESS EXCLUSIVE kilit ister; açık uzun işlem varsa kilit sırası vitrin okumalarını da bekletir. Kilit alınamazsa migration KIRMIZI biter, yeniden koşulur (CONCURRENTLY yok: atomiklik).
+- **Tablo:** `product_costs (product_id uuid, tenant_id uuid not null, <8 kolon, products'taki tip/NOT NULL/DEFAULT birebir>, updated_at)`; `primary key (product_id)` + `unique (product_id, tenant_id)` (FK kolonları bir unique kısıtla birebir eşleşsin → PostgREST ilişkiyi bire bir sayar; aksi hâlde gömme dizi döner, `||0` sessiz 0 üretir — challenger v2 2.B.7); products'a `unique (id, tenant_id)` + product_costs'ta `foreign key (product_id, tenant_id) references products(id, tenant_id) on update cascade on delete cascade` (kiracı ayrışamaz, kural 12).
+- **RLS:** enable (FORCE yazılabilir ama güvence SAYILMAZ: postgres `rolbypassrls=true` ölçüldü, service_role da atlar). Politikalar SELECT/INSERT/UPDATE/DELETE: `tenant_id = (select public.jwt_tenant_id()) and (select public.is_admin_user())`. GRANT: `revoke all on public.product_costs from anon, public` AÇIKÇA (Supabase public şemada yeni tabloya varsayılan ALL verir); authenticated **Faz 3'e kadar YALNIZ `select`** — yazıcı kuralı veritabanında zorlanır (challenger v2 2.B.2); insert/update/delete Faz 3 migration'ında açılır. TRUNCATE hiçbir zaman.
 - **Kopya + tetik AYNI işlemde:** `insert … select … from products` (442) → Guard A: sayım + satır satır `is not distinct from` eşitliği; fark ≠ 0 ise `raise exception` (migration geri döner).
-- **Senkron tetik `products → product_costs`** (geçiş dönemi): `SECURITY DEFINER`, `set search_path = pg_catalog, public`; `tenant_id` = `NEW.tenant_id` (`jwt_tenant_id()` DEĞİL); AFTER INSERT (satır yarat) ve AFTER UPDATE (yalnız `IS DISTINCT FROM OLD` olan kolonlar); `pg_trigger_depth() > 1` ise çık (özyineleme koruması). Yön TEK: products → product_costs. Bayat-üzerine-yazma riski (challenger 2.3): Faz 2 boyunca **yazıcı kuralı** — hiçbir yeni kod product_costs'a DOĞRUDAN yazmaz; tüm yazımlar products üzerinden gider ve tetik taşır. Böylece tek yön tutarlı kalır. Doğrudan yazım Faz 3'te açılır.
+- **Senkron tetik `products → product_costs`** (geçiş dönemi): `SECURITY DEFINER`, `set search_path = pg_catalog, public`; `tenant_id` = `NEW.tenant_id` (`jwt_tenant_id()` DEĞİL); AFTER INSERT (satır yarat) ve AFTER UPDATE (yalnız `IS DISTINCT FROM OLD` olan kolonlar); UPDATE dalı `insert … on conflict (product_id) do update` (satır yoksa sessiz 0-satır güncelleme olmaz); `pg_trigger_depth` koruması YOK (akış tek yönlü; koruma ileride sessiz atlama doğururdu — challenger v2 2.B.8). Yön TEK: products → product_costs. Bayat-üzerine-yazma riski (challenger 2.3): Faz 2 boyunca **yazıcı kuralı** — hiçbir yeni kod product_costs'a DOĞRUDAN yazmaz; tüm yazımlar products üzerinden gider ve tetik taşır. Böylece tek yön tutarlı kalır. Doğrudan yazım Faz 3'te açılır. Kapı: conformance — `src/` altında Faz 3'e kadar `from('product_costs').insert|update|upsert|delete` YASAK.
 - **Denetim izi:** product_costs'a `denetim_izi_yaz()` tetiği, products süzgeciyle aynı mantık — otomasyon kolonları (`cost_in_base`, `purchase_rate_to_base`, `last_*`) DIŞARIDA (aksi hâlde her maliyet tazelemesi ~348 satır). Senkron tetik aynı değişiklik için ikinci satır doğurmasın diye Faz 1'de product_costs denetim tetiği **kurulmaz**, Faz 3'te products tetiğinden devralınır. `denetim-izi-hukum.mjs` KAPSAM listesine product_costs Faz 3'te eklenir.
-- **Kabul (Faz 1):** anon ve moderatör claim taklidiyle `select … from product_costs` → 0 satır/izin yok; admin claim → 442.
+- **Kabul (Faz 1):** anon ve moderatör claim taklidiyle `select … from product_costs` → 0 satır/izin yok; admin claim → 442. Gölgede üretilen tipte products↔product_costs ilişkisi `isOneToOne: true` + gömme duman sorgusu nesne döndürür (§9).
 - **Moderatör DEĞİŞİKLİĞİ YOK** (v1'de vardı; v2'de Faz 1b'ye taşındı — challenger 2.4).
 
 ### Faz 1b — karar 95 moderatör kapsamı (migration + kod, AYNI PR)
@@ -123,20 +124,22 @@ Ziyaretçi ve sıradan müşteri bu dört tablodan satır GÖREMEZ (politika yok
 - Guard E: `admin_search_products` ve `process_goods_receipt` işlem içinde gerçekten çağrılıp geri alınır.
 
 ### Faz 2-kod — okuyucular (URUN admin + ALTYAPI servisleri)
-Okuma noktaları `product_costs`'tan: v1'in 20'si + challenger'ın eklediği `pricingAdmin.service.ts:301,322` (`purchase_currency` NOT NULL varsayımı → satır yoksa açık hata), `CostRefreshModal`, `MaterializePricesModal`, `resourceSearchers.ts:28`, `InventoryTable.tsx`. Yazıcılar Faz 2'de products'a yazmaya DEVAM eder (yazıcı kuralı). Betik/dış depo yazıcıları (`katalog-karnesi.mjs:53`, `fiyat-bosluk.mjs`, `katalog-paket-uret.mjs`, `kademe2-load/load.mjs`, `venthub-pdf-ingestor/paket/*.sql`) **ayrı kayıt**la KATALOG'a envanterlenir (Faz 3 öncesi taşınmaları şart).
+⚠ **ProductFormModal bu fazın DIŞINDA** (challenger v2 2.B.1): okuyucu product_costs'a geçip yazıcı products'ta kalırsa moderatör formu 0 yükler, kaydeder, DEFINER tetik 0'ı product_costs'a taşır → maliyet kalıcı 0. Form Faz 3'e kadar Faz 0'ın admin kolon listesiyle products'tan okur; Faz 3'te koşullu yazıma (yalnız admin + alan değiştiyse) geçer. Test: "moderatör kaydı maliyeti değiştirmez". Pencere (adıyla): moderatör `/admin/products` listesinde (`ProductsTableBody.tsx:60`) liste fiyatını Faz 2-kod'a kadar görmeye devam eder.
+Okuma noktaları `product_costs`'tan: v1'in 20'si (ProductFormModal HARİÇ) + challenger'ın eklediği `pricingAdmin.service.ts:301,322` (`purchase_currency` NOT NULL varsayımı → satır yoksa açık hata), `CostRefreshModal`, `MaterializePricesModal`, `resourceSearchers.ts:28`, `InventoryTable.tsx`. Yazıcılar Faz 2'de products'a yazmaya DEVAM eder (yazıcı kuralı). Betik/dış depo yazıcıları (`katalog-karnesi.mjs:53`, `fiyat-bosluk.mjs`, `katalog-paket-uret.mjs`, `kademe2-load/load.mjs`, `venthub-pdf-ingestor/paket/*.sql`) **REC-383** (KATALOG, açıldı 2026-09-24) ile taşınır — Faz 3 önkoşulu.
 
 ### Faz 3 — migration 3 (kaldırıcı; en riskli)
-Önkoşul: Faz 2-kod ve betik taşımaları canlıda; `src/`+`scripts/`+dış depo taramasında 8 kolon adı products bağlamında 0.
-1. `denetim_izi_products_upd` 8 kolon OLMADAN yeniden kurulur; product_costs'a eşdeğer süzgeçli denetim tetiği kurulur. **CASCADE YASAK** (rls-yetki-karari §5).
-2. Görünüm/fonksiyon bağımlılıkları Faz 2-DB'de çözülmüş olmalı; Guard B: `pg_proc.prosrc` regex taraması (plpgsql bağımlılığı izlenmez) → 8 kolon adı products bağlamında 0.
+Açılış şartı TAKVİM DEĞİL KAPI (challenger v2 2.C): Faz 2-kod ve REC-383 canlıda; gölge `drop column` denemesi yeşil; yazım dondurma prosedürü hazır; `src/`+`scripts/`+dış depo taramasında 8 kolon adı products bağlamında 0.
+0. **Yazım dondurma (elle prosedür, tek operatör):** merge penceresinde maliyet tazeleme, fiyat üretimi, KATALOG betikleri ve ürün formu KULLANILMAZ; supabase-migrate ve Vercel dağıtımı ayrı iner (challenger v2 2.B.3). Tercih: yazıcı geçişi + senkron tetik kaldırma + DROP TEK migration'da, kod PR'ı hemen ardından.
+1. `denetim_izi_products_upd` 8 kolon OLMADAN yeniden kurulur; product_costs'a eşdeğer süzgeçli denetim tetiği kurulur. `denetim_izi_yaz()` satır kimliğini `id`'den okur, product_costs'ta `id` yok → **product_costs'a `id uuid default gen_random_uuid() unique`** (7 tetiği etkileyen fonksiyon değişikliği yerine); kapıya "row_pk NULL değil" kolu (challenger v2 2.B.6). **CASCADE YASAK** (rls-yetki-karari §5).
+2. Görünüm/fonksiyon bağımlılıkları Faz 2-DB'de çözülmüş olmalı; Guard B: `pg_proc.prosrc` regex taraması (plpgsql bağımlılığı izlenmez) + **izin listesi** (`process_goods_receipt`, `admin_search_products` — gövdeleri aynı migration'da product_costs'a yeniden yazılır; regex products bağlamını ayırt edemez). Asıl güvence Guard E: iki fonksiyon DROP'tan SONRA işlem içinde gerçekten çağrılıp geri alınır (challenger v2 2.B.5).
 3. Guard A: DROP öncesi products ↔ product_costs satır satır eşitlik.
-4. Senkron tetik kaldırılır; yerine **kalıcı** DEFINER `AFTER INSERT ON products` tetiği product_costs satırını yaratır (yeni ürün + CSV upsert INSERT'i); `purchase_currency NOT NULL DEFAULT 'TRY'` product_costs'ta korunur.
+4. Senkron tetik ÖNCE kaldırılır; yerine **kalıcı** DEFINER `AFTER INSERT ON products` tetiği `on conflict (product_id) do nothing` ile product_costs satırını yaratır (yeni ürün + CSV upsert INSERT'i); `purchase_currency NOT NULL DEFAULT 'TRY'` product_costs'ta korunur.
 5. `alter table products drop column …` (8 kolon, CASCADE'siz). Önce GÖLGE DB'de denenir (challenger önerisi).
-6. Yazıcılar product_costs'a çevrilir (ProductFormModal koşullu: yalnız admin ve alan değiştiyse; InventoryTableBody supplier_name; pricingMaterialize; process_goods_receipt).
+6. Yazıcılar product_costs'a **upsert/update** ile çevrilir (satır INSERT tetiğiyle zaten var — insert çakışır) (ProductFormModal koşullu: yalnız admin ve alan değiştiyse; InventoryTableBody supplier_name; pricingMaterialize; process_goods_receipt).
 7. Tip sırası: Faz 1 PR'ında product_costs tipi gölgeden/elle; Faz 3 PR'ında `db-rows.ts` `Omit<…, 8 kolon>` + tip daraltma; tip-drift merge'e kadar kırmızı → merge sonrası yeşil (PR açıklamasına yazılır).
 → Kabul 2–5 bu fazdan sonra ölçülür.
 
-**Sıra ve pencere:** Faz 0 bugün. Faz 1 → 1b → 2-DB → 2-kod → 3. REST/müşteri sızıntısı Faz 3'e kadar açık; **hedef süre: Faz 3 canlı ≤ 7 gün** (2026-10-01). **Faz B (gerçek maliyet girişi) Faz 3 canlı olmadan açılmaz** (OPS kilidi).
+**Sıra ve pencere:** Faz 0 bugün. Faz 1 → 1b → 2-DB → 2-kod → 3. **Hedef: Faz 1, 1b, 2-DB ≤ 7 gün (2026-10-01).** Faz 3 takvimle değil kapıyla açılır. SINIR (adıyla): yazıcı kuralı yüzünden products'taki değerler Faz 3'ten önce boşaltılamaz → REST sızıntısının kapanışı Faz 3'e bağlıdır; müşteri görünüm sızıntısı Faz 2-DB ile, HTML/ağ sızıntısı Faz 0 ile daha önce kapanır. Sızan veri kamusal liste fiyatı + marj çıkarımı (§0); gerçek maliyet Faz 3'ten önce girmez. **Faz B (gerçek maliyet girişi) Faz 3 canlı olmadan açılmaz** (OPS kilidi).
 
 ---
 
@@ -172,3 +175,28 @@ Okuma noktaları `product_costs`'tan: v1'in 20'si + challenger'ın eklediği `pr
 | 2.10 | Kiracı/FORCE | Bileşik FK; FORCE güvence sayılmaz |
 | 2.11 | Ad/tip/GRANT/initplan | 14 hane, asgari GRANT, `(select …)` biçimi |
 | 2.14 | fail-open | INV-MALIYET-KOLON-2 ad yasak listesi |
+
+## 8 · İzlenebilirlik (challenger v2 → v3)
+
+| v2 | Konu | v3'te |
+|---|---|---|
+| 2.B.1 | Moderatör formu 0 yazar | ProductFormModal Faz 2-kod dışı; Faz 3 koşullu yazım + test; moderatör liste penceresi yazıldı |
+| 2.B.2 | Yazıcı kuralı yalnız metinde | authenticated Faz 3'e kadar yalnız SELECT; conformance yazım yasağı; UPDATE dalı upsert |
+| 2.B.3 | Faz 3 kod/migration eşzamansız | Yazım dondurma prosedürü / tek migration tercihi |
+| 2.B.4 | unique kilidi | lock_timeout 5s + statement_timeout 60s |
+| 2.B.5 | Guard B yanlış alarm | izin listesi + Guard E DROP sonrası |
+| 2.B.6 | row_pk NULL | product_costs.id + kapı kolu |
+| 2.B.7 | PostgREST bire bir | unique(product_id, tenant_id) + gölge isOneToOne ölçümü |
+| 2.B.8 | pg_trigger_depth sessiz atlama | kaldırıldı |
+| 2.B.9 | INSERT tetik çakışması / upsert | eski tetik önce kaldırılır, do nothing; yazıcılar upsert |
+| 2.7 | Ayrı kayıt numarası | REC-383 |
+| 2.C | 7 gün | Faz 1/1b/2-DB hedefli; Faz 3 kapıyla; sınır yazıldı |
+| 2.11 | anon varsayılan ALL | açık revoke all from anon, public |
+
+## 9 · Faz 1 öncesi gölge ölçümleri (challenger v2 önerisi)
+
+1. `supabase gen types` → products↔product_costs ilişkisi `isOneToOne` değeri.
+2. Gömme sorgusu `products?select=id,product_costs(purchase_price)` dönüş biçimi (nesne mi dizi mi).
+3. product_costs'a UPDATE sonrası `admin_audit_log.row_pk` dolu mu.
+4. products'a `unique(id, tenant_id)` ekleme süresi + `lock_timeout` davranışı.
+5. Faz 3 provası: `alter table products drop column supplier_name` (CASCADE'siz) → bağımlılık hatası listesi.
