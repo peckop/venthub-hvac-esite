@@ -389,6 +389,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/fiyat-kaynak-esle.test.ts` | REC-212 · paket `fiyatlar.csv` kaynak kolonları (kdv · kaynak_fiyat_eur · fiyat_kaynak_sayfa). | URUN-KATALOG | vitest (`pnpm test`) | 2026-09-23 (13/13) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/__tests__/fiyat-bosluk.test.ts` | REC-209 C · fiyat boşluk raporu. Ağa, DB'ye, diske çıkmaz. ⛔ Fiyatlar UYDURMA. | URUN-KATALOG | vitest (`pnpm test`) | 2026-09-23 (4/4, sabotaj yönü dahil) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/fiyat-bosluk.mjs` | FİYAT BOŞLUK RAPORU — saf çekirdek (REC-209 C). Katalog hattı fiyat YAZMAZ (Recep kararı | URUN-KATALOG | `katalog-karnesi.mjs` | 2026-09-23 | `__tests__/fiyat-bosluk.test.ts` | AKTIF |
+| `scripts/seo/bot-karnesi.mjs` | BOT KALİTESİ KARNESİ — canlı sitenin her sayfa türünü arama motoru ve yapay zekâ botu gözüyle ölçer (durum, bot başına kelime, title, canonical, hreflang düşüşü, JSON-LD, robots, site haritası; bilinçli kararlar ayrı) | BLOG (kapıya bağlama ALTYAPI) | elle: `node scripts/seo/bot-karnesi.mjs --cikti <dizin>`; Linear REC-369 F1b | 2026-09-24 ilk iki koşum: 45 adres, 32 sorunlu (REC-369 karne yorumu) | yok — ALTYAPI kapıya bağlayacak (OPS emri F1b) | KAL-KAPISIZ |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
