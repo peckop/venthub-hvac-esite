@@ -33,8 +33,17 @@
 -- anon'un venthub_orders'a INSERT yolu YOK (tek INSERT politikası authenticated'a, diğeri
 -- service_role'a) — misafir akışı kırılmaz.
 --
--- Gövde DEĞİŞMİYOR: set_order_number birebir aynı mantık, yalnız fonksiyon çağrısı şemayla
--- nitelendi (DEFINER altında arama yolu sabit olsa da açık yazım tercih edilir).
+-- Gövde DEĞİŞMİYOR: set_order_number birebir aynı mantık (supabase/baselines/2026-09-23 dökümüyle
+-- karşılaştırıldı), yalnız fonksiyon çağrısı şemayla nitelendi. Not: bu tetiğin tanımı migration
+-- ZİNCİRİNDE yoktu (yalnız baselines şema dökümlerinde duruyordu); zincire ilk kez burada yazılıyor.
+--
+-- ⛔ KAPSAM SINIRI — bu dosya aynı saldırı sınıfının YALNIZ RPC kapısını kapatır. Açık kalanlar
+--   (canlıda ölçüldü, REC-355 VULN-002 ekinde, ALTYAPI; satış kipi açılmadan kapanmalı):
+--   · authenticated venthub_orders'a doğrudan INSERT atabiliyor (GRANT ALL + orders_insert_policy):
+--     order_number boş her satır tetikten sayacı KALICI artırır — RPC'siz aynı tüketim.
+--   · authenticated order_number'ı INSERT/UPDATE ile ELLE yazabiliyor (kolon yetkisi var, bekçi tetik
+--     yok): sıradaki numarayı yazan tek satır, UNIQUE çakışmasıyla o günün bütün siparişlerini düşürür.
+--   Bu dosya "sipariş sayacı güvende" DEMEZ; anon'un üyeliksiz kullandığı yolu kapatır.
 --
 -- GERİ ALMA (elle): `alter function public.set_order_number() security invoker;`
 --   `grant execute on function public.generate_order_number() to anon, authenticated;`
