@@ -12,6 +12,11 @@ name: E2E Smoke (admin + checkout)
 # PR'ı "beklenen kontrol gelmedi" ile kilitler. Ad değişecekse önce branch protection
 # kuralı güncellenmeli, sonra job — bu sırayla.
 # Ayrı workflow: ana CI'ı bloklamaz; oturana kadar iterasyon, sonra istenirse required yapılır.
+#
+# ⚠️ `vars.E2E_SUPABASE_URL` = CANLI proje (2026-09-24 ölçüldü, değer basılmadan eşitlik). Bu iş her
+# PR'da canlı veritabanına bağlanır: admin-smoke yalnız okur; checkout-smoke test hesabının sepetine
+# 1 ürün ekler, ödeme adımına bilinçli girmez; teklif-eposta-smoke CI'da atlanır (E2E_TEKLIF_EPOSTA yok).
+# Canlıya YAZAN spec buraya (`e2e/`) KONMAZ — `e2e-canli/` + canli-kanit-tek-sefer.yml (INV-CANLI-KANIT-1).
 
 on:
   pull_request:

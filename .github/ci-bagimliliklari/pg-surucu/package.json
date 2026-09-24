@@ -1,0 +1,8 @@
+{
+  "name": "venthub-ci-pg-surucu",
+  "private": true,
+  "description": "CI (db-advisor): yalniz pg surucusu, KILITLI. Kok package.json'dan bagimsiz kurulur; sebep .github/ci-bagimliliklari/README.md",
+  "dependencies": {
+    "pg": "8.23.0"
+  }
+}

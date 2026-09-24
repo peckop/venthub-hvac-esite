@@ -14,7 +14,6 @@ import type { DbAdminSearchResult } from '@/types/db-rows'
 import AdminEmptyState from '../../components/admin/AdminEmptyState'
 import AdminToolbar from '../../components/admin/AdminToolbar'
 import { type BulkAction, BulkBar } from '../../components/admin/data-table/BulkBar'
-import { BulkPricePanel } from '../../components/admin/data-table/BulkPricePanel'
 import { DataTableKit } from '../../components/admin/data-table/DataTableKit'
 import type { AdminColumn } from '../../components/admin/data-table/types'
 import ExportMenu from '../../components/admin/ExportMenu'
@@ -38,10 +37,17 @@ import {
 } from '../../utils/adminUi'
 
 /* ---- model ---- */
-// W4b: `price` domain tipinden çıkarıldı (satış fiyatı artık motorun işi). Admin ham
-// kolonu görmeye devam edebilir — bu yüzden burada AÇIKÇA geri ekleniyor; müşteri
-// yüzeyinde aynı şeyi yapmak INV-PRICE-1 ihlalidir.
-type ProductRow = DomainProduct & { cover_path?: string; price?: number | null }
+// ⭐FİYAT SÜTUNU SATIŞ SATIRINDAN OKUNUR, `products.price`'tan DEĞİL (2026-09-24, REC-182 yan bulgusu).
+// `products.price` W4b'den beri EMEKLİ: vitrin onu okumuyor, fiyatı motorun yazdığı `product_prices`
+// satırından alıyor (`display_price`). Tablo emekli alanı gösterip ona yazıyordu → yönetici fiyatı
+// değiştirdiğini sanıyor, vitrin değişmiyordu (08-15 "1044 satır yazıldı, vitrin değişmedi" sınıfı).
+// ÖLÇÜLDÜ (canlı, SELECT): emekli alan 441 aktif üründen yalnız 68'inde dolu ve o 68'in HİÇBİRİNİN
+// satış satırı yok; satış satırı olan 347 üründe ise tabloda fiyat boş görünüyordu.
+// `satis_fiyati`: number = Standart (bireysel) listenin KDV dahil satış fiyatı — müşterinin satış kipinde
+// göreceği sayı · null = satış satırı yok (ürün teklifle satılır) · undefined = OKUNAMADI (ağ/yetki).
+// null ile undefined AYRI tutulur: okunamayan fiyatı "teklif" diye göstermek yanlış bilgi olurdu.
+// Fiyat bu tablodan DEĞİŞTİRİLEMEZ; değiştirmenin tek yolu fiyat kuralları + yeniden hesap (pricing-standard).
+type ProductRow = DomainProduct & { cover_path?: string; satis_fiyati?: number | null }
 
 /**
  * NİÇİN slug + metadata DA ÇEKİLİYOR: CSV içe aktarımı kategoriyi SLUG ile eşler
@@ -56,18 +62,64 @@ interface CategoryOpt {
   metadata?: unknown
 }
 
+// REC-140 Faz 2-kod ilk adım (2026-09-24): `purchase_price` bu listeden ÇIKTI. Çekiliyordu
+// ama hiçbir hücre göstermiyordu (toUIProductList düşürüyor); bu sayfayı moderatör de açıyor
+// ve karar 95'e göre moderatör liste fiyatını/maliyeti GÖRMEZ — ağ yanıtında da görmemeli.
+// Maliyet kolonu gerekirse product_costs'tan okunur (yalnız admin, RLS). GERİ EKLEME.
+// Emekli `price` de bu listeden ÇIKTI (2026-09-24) — fiyat attachSatisFiyati ile satış satırından gelir.
 const PRODUCT_SELECT =
-  'id,name,sku,model_code,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug'
+  'id,name,sku,model_code,brand,status,category_id,stock_qty,low_stock_threshold,is_featured,slug'
 
 const STATUS_KEYS = ['active', 'inactive', 'out_of_stock'] as const
 
-/* anahtar → server-side sıralanabilir kolon (category server-side ad-sıralaması YOK → name fallback) */
+/* anahtar → server-side sıralanabilir kolon (category server-side ad-sıralaması YOK → name fallback).
+   Fiyat sıralanamaz: başka tablodan (product_prices) sayfa başına ekleniyor; sunucu tarafında o kolona
+   göre sıralamak için görünüm/RPC gerekir. Sayfa içi sıralama yanıltıcı olurdu (yalnız 25 satırı sıralar). */
 const SORT_COLUMN_MAP: Record<string, string> = {
   name: 'name',
   sku: 'sku',
   status: 'status',
-  price: 'price',
   stock: 'stock_qty',
+}
+
+/** Vitrinin herkese açık listesi: `display_price` bireysel segmente `gross_price` gösterir. */
+const BIREYSEL_LISTE_TURU = 'individual'
+
+/* ---- satış fiyatı: rows için Standart listenin KDV dahil fiyatı (100'lük chunk) ----
+   Hata NON-FATAL ama SESSİZ DEĞİL: okunamazsa satis_fiyati undefined kalır ve hücre "okunamadı" der. */
+async function attachSatisFiyati(
+  supabase: SupabaseClient<Database>,
+  rows: ProductRow[],
+): Promise<ProductRow[]> {
+  const ids = rows.map((r) => r.id)
+  if (ids.length === 0) return rows
+  try {
+    const chunkSize = 100
+    const chunks: string[][] = []
+    for (let i = 0; i < ids.length; i += chunkSize) chunks.push(ids.slice(i, i + chunkSize))
+    const results = await Promise.all(
+      chunks.map((c) =>
+        supabase
+          .from('product_prices')
+          .select('product_id,gross_price,price_lists!inner(user_type)')
+          .in('product_id', c)
+          .eq('is_active', true)
+          .eq('currency', 'TRY')
+          .eq('price_lists.user_type', BIREYSEL_LISTE_TURU),
+      ),
+    )
+    const map: Record<string, number> = {}
+    for (const { data, error } of results) {
+      if (error) throw error
+      for (const r of data ?? []) {
+        if (r.gross_price != null && map[r.product_id] == null) map[r.product_id] = Number(r.gross_price)
+      }
+    }
+    return rows.map((r) => ({ ...r, satis_fiyati: map[r.id] ?? null }))
+  } catch (err) {
+    console.warn('Satış fiyatı okunamadı (non-fatal, hücre "okunamadı" gösterir):', err)
+    return rows
+  }
 }
 
 /* ---- kapak görselleri: rows için product_images ilk path (20'lik chunk, non-fatal) ---- */
@@ -131,8 +183,11 @@ async function productsFetcher(
     // NOT: client-süzmeyle bu sayı yaklaşık olur — eski davranış, KORUNUR.
     const totalMatched =
       results.length > 0 ? Number(results[0].total_count || results.length) : 0
-    const withCovers = await attachCovers(supabase, rows)
-    return { rows: withCovers, totalMatched }
+    const [withCovers, fiyatli] = await Promise.all([
+      attachCovers(supabase, rows),
+      attachSatisFiyati(supabase, rows),
+    ])
+    return { rows: withCovers.map((r, i) => ({ ...r, satis_fiyati: fiyatli[i].satis_fiyati })), totalMatched }
   }
 
   /* ── normal query yolu (arama terimi yoksa) ── */
@@ -155,8 +210,11 @@ async function productsFetcher(
 
   const rows = toUIProductList((data as DbProduct[]) || []) as ProductRow[]
   const totalMatched = typeof count === 'number' ? count : 0
-  const withCovers = await attachCovers(supabase, rows)
-  return { rows: withCovers, totalMatched }
+  const [withCovers, fiyatli] = await Promise.all([
+    attachCovers(supabase, rows),
+    attachSatisFiyati(supabase, rows),
+  ])
+  return { rows: withCovers.map((r, i) => ({ ...r, satis_fiyati: fiyatli[i].satis_fiyati })), totalMatched }
 }
 
 /* ---- lazy genişleyen satır: kit yalnız açıkken mount eder → mount'ta technical_specs yükle ---- */
@@ -501,60 +559,6 @@ const ProductsTableBody: React.FC = () => {
     }
   }, [hasWriteAccess, t, table, confirm])
 
-  /* ---- (e) toplu fiyat — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ---- */
-  const bulkPriceAdjust = useCallback(
-    async (mode: 'percent' | 'fixed', value: number) => {
-      const ids = table.selection.selectedIds
-      if (ids.length === 0) return
-      const ok = await confirm({
-        description: t('admin.products.bulk.priceConfirm', { count: String(ids.length) }),
-      })
-      if (!ok) return
-      try {
-        await mutateWithAudit(supabaseBrowserClient, {
-          resource: 'products',
-          canWrite: hasWriteAccess,
-          action: 'UPDATE',
-          rowPk: null,
-          before: null,
-          after: { mode, value, ids },
-          auditedByEdge: false,
-          fn: async () => {
-            const { data: products, error: fetchErr } = await supabaseBrowserClient
-              .from('products')
-              .select('id,price')
-              .in('id', ids)
-            if (fetchErr) throw fetchErr
-            const updates = (products || []).map((p: { id: string; price: number | null }) => {
-              const currentPrice = p.price ?? 0
-              const newPrice =
-                mode === 'percent'
-                  ? Math.round(currentPrice * (1 + value / 100) * 100) / 100
-                  : Math.round((currentPrice + value) * 100) / 100
-              return { id: p.id, price: Math.max(0, newPrice) }
-            })
-            const results = await Promise.all(
-              updates.map((u) =>
-                supabaseBrowserClient.from('products').update({ price: u.price }).eq('id', u.id),
-              ),
-            )
-            const errorResult = results.find((r) => r.error)
-            if (errorResult?.error) throw errorResult.error
-          },
-        })
-        table.selection.clear()
-        await table.reload()
-      } catch (e) {
-        toast.error(
-          e instanceof AdminPermissionError
-            ? t('admin.products.toasts.noPermission')
-            : t('admin.products.bulk.priceFailed'),
-        )
-      }
-    },
-    [hasWriteAccess, t, table, confirm],
-  )
-
   /**
    * Toplu işlem eylemleri — ortak `BulkBar` sözleşmesi.
    *
@@ -562,7 +566,11 @@ const ProductsTableBody: React.FC = () => {
    * MÜKERRERDİ (aynı işi yapan iki yapışkan çubuk) ve ÜSTELİK farklı görünüyordu:
    * biri koyu cam, diğeri açık zeminli emoji'li. Aynı işlemin sayfadan sayfaya
    * farklı görünmesi cetvel §4'ün doğrudan ihlaliydi. Artık tek bileşen.
-   * Fiyat paneli `BulkPricePanel` olarak çıkarıldı ve `panel` render-prop'una bağlandı.
+   *
+   * ⛔"Fiyat Güncelle" (toplu yüzde/sabit tutar) KALDIRILDI (2026-09-24): emekli `products.price`'a
+   * yazıyordu, vitrin o alanı okumuyor — düğme bir şey yapıyormuş gibi görünüp hiçbir şeyi
+   * değiştirmiyordu. Toplu fiyat değişikliğinin doğru yolu fiyat KURALI (marj/kapsam) + yeniden
+   * hesaptır (pricing-standard). Buraya geri eklenecekse emekli alana DEĞİL kurala yazmalı.
    */
   const bulkActions = useMemo<BulkAction[]>(
     () => [
@@ -585,29 +593,24 @@ const ProductsTableBody: React.FC = () => {
         onRun: () => bulkFeatureToggle(true),
       },
       {
-        key: 'price',
-        label: t('admin.toolbar.updatePrice'),
-        tone: 'default',
-        panel: (close) => <BulkPricePanel onApply={bulkPriceAdjust} onClose={close} />,
-      },
-      {
         key: 'delete',
         label: t('admin.common.delete'),
         tone: 'danger',
         onRun: () => bulkDelete(),
       },
     ],
-    [t, bulkStatusChange, bulkFeatureToggle, bulkPriceAdjust, bulkDelete],
+    [t, bulkStatusChange, bulkFeatureToggle, bulkDelete],
   )
 
-  /* ---- (f) inline-edit kaydet — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ---- */
+  /* ---- (f) inline-edit kaydet — UPDATE, mutateWithAudit kapısından (audit boşluğu kapandı) ----
+     Yalnız STOK. Fiyat buradan yazılmaz (emekli alan; bkz. ProductRow notu). */
   const saveInlineEdit = useCallback(
-    async (r: ProductRow, field: 'price' | 'stock_qty', raw: string | number) => {
+    async (r: ProductRow, field: 'stock_qty', raw: string | number) => {
       const num = typeof raw === 'number' ? raw : parseFloat(String(raw))
       if (Number.isNaN(num)) return
-      const prev = field === 'price' ? r.price : r.stock_qty
+      const prev = r.stock_qty
       if (prev === num) return
-      const payload = field === 'price' ? { price: num } : { stock_qty: num }
+      const payload = { stock_qty: num }
       try {
         await mutateWithAudit(supabaseBrowserClient, {
           resource: 'products',
@@ -757,21 +760,22 @@ const ProductsTableBody: React.FC = () => {
       {
         key: 'price',
         header: t('admin.products.table.price'),
-        sortable: true,
+        sortable: false,
         hideable: true,
         align: 'right',
+        // SALT OKUNUR — yetkiden bağımsız (bkz. ProductRow notu). Üç durum ayrı yazılır.
         cell: (r) =>
-          hasWriteAccess ? (
-            <InlineNumberCell
-              value={r.price != null ? String(r.price) : ''}
-              display={r.price != null ? formatCurrency(Number(r.price), lang, { currency: SYSTEM_CURRENCY }) : '-'}
-              widthClass="w-24"
-              ariaLabel={t('admin.products.table.price')}
-              onSave={(num) => saveInlineEdit(r, 'price', num)}
-            />
+          r.satis_fiyati === undefined ? (
+            <span className="text-sm text-admin-fg-muted" title={t('admin.products.table.priceHint')}>
+              {t('admin.products.table.priceUnreadable')}
+            </span>
+          ) : r.satis_fiyati === null ? (
+            <span className="text-sm text-admin-fg-muted" title={t('admin.products.table.priceHint')}>
+              {t('admin.products.table.priceQuote')}
+            </span>
           ) : (
-            <span className="text-sm font-semibold text-admin-fg">
-              {r.price != null ? formatCurrency(Number(r.price), lang, { currency: SYSTEM_CURRENCY }) : '-'}
+            <span className="text-sm font-semibold text-admin-fg" title={t('admin.products.table.priceHint')}>
+              {formatCurrency(r.satis_fiyati, lang, { currency: SYSTEM_CURRENCY })}
             </span>
           ),
       },
@@ -855,7 +859,10 @@ const ProductsTableBody: React.FC = () => {
   /* ---- export (CSV, tüm filtreli sonuç fetchAllForExport) ---- */
   const exportCsv = useCallback(async () => {
     const rows = await table.fetchAllForExport()
-    const cols = ['id', 'name', 'sku', 'category_id', 'status', 'price', 'stock_qty']
+    // Fiyat sütununun adı BİLEREK `price` DEĞİL: içe aktarma eskiden `price` sütununu emekli alana
+    // yazıyordu; dışa aktarılan dosya geri yüklendiğinde satış fiyatı emekli alana dökülmesin diye
+    // ad ayrı. Değer: satış fiyatı (KDV dahil) · boş = teklif · `?` = okunamadı.
+    const cols = ['id', 'name', 'sku', 'category_id', 'status', 'satis_fiyati_kdv_dahil', 'stock_qty']
     const header = cols.join(',')
     const lines = rows.map((r) =>
       [
@@ -864,7 +871,7 @@ const ProductsTableBody: React.FC = () => {
         r.sku,
         r.category_id || '',
         r.status || '',
-        r.price != null ? String(r.price) : '',
+        r.satis_fiyati === undefined ? '?' : r.satis_fiyati === null ? '' : String(r.satis_fiyati),
         r.stock_qty != null ? String(r.stock_qty) : '',
       ].join(','),
     )

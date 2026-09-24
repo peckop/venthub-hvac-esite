@@ -9,7 +9,6 @@ import { localizedHref, Routes } from '@/utils/routes';
 
 import { BrandIcon } from '../components/HVACIcons'
 import { ScrollReveal } from '../components/ScrollReveal'
-import Seo from '../components/Seo'
 import { HVAC_BRANDS } from '../data/brands'
 import { en } from '../i18n/dictionaries/en'
 import { tr } from '../i18n/dictionaries/tr'
@@ -66,10 +65,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Seo
-        /* site adi Seo bileseninde eklenir — REC-148 */ title={t('aboutPage.title')}
-        description={t('aboutPage.seoDescription')}
-      />
+      {/* Üst veri rotada (`about/page.tsx` generateMetadata) — istemci Seo ikinci <title> basıyordu. */}
 
       {/* Cinematic Hero */}
       <section className="relative h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">

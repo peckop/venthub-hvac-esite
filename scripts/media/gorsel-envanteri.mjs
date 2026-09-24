@@ -33,6 +33,7 @@ import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { mukerrerGruplari, mukerrerKapisi, BILINEN_KATEGORI_ASAN } from './gorsel-mukerrer.mjs'
 
 const env = Object.fromEntries(
   readFileSync(process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env'), 'utf8')
@@ -122,34 +123,9 @@ console.log(`    ${sayac}/${adaylar.length} indirildi        \n`)
 
 const hashOf = new Map(hashler.filter(h => h.hash).map(h => [h.yol, h.hash]))
 
-// ── 4. Aynı hash'i paylaşan dosyalar → hangi ürünler, hangi kategoriler
-const hashGrup = new Map()
-for (const g of gorseller) {
-  const h = hashOf.get(g.path)
-  if (!h) continue
-  if (!hashGrup.has(h)) hashGrup.set(h, [])
-  hashGrup.get(h).push(g)
-}
-
-const mukerrer = []
-for (const [h, kayitlar] of hashGrup) {
-  const urunSeti = [...new Set(kayitlar.map(k => k.product_id))]
-  if (urunSeti.length < 2) continue
-  const kats = [...new Set(urunSeti.map(id => katOf(urunById.get(id))))]
-  mukerrer.push({
-    hash: h,
-    dosya_sayisi: kayitlar.length,
-    urun_sayisi: urunSeti.length,
-    kategoriler: kats,
-    kategori_sinirini_asiyor: kats.length > 1,
-    urunler: urunSeti.map(id => {
-      const p = urunById.get(id)
-      return { sku: p?.sku ?? '(bilinmiyor)', ad: p?.name ?? '', kategori: katOf(p) }
-    }).sort((a, b) => a.sku.localeCompare(b.sku)),
-  })
-}
-mukerrer.sort((a, b) =>
-  (b.kategori_sinirini_asiyor - a.kategori_sinirini_asiyor) || (b.urun_sayisi - a.urun_sayisi))
+// ── 4. Aynı hash'i paylaşan dosyalar → hangi ürünler, hangi kategoriler (saf çekirdek: gorsel-mukerrer.mjs)
+const mukerrer = mukerrerGruplari(gorseller, hashOf, urunById, katOf)
+const kapi = mukerrerKapisi(mukerrer)
 
 // ── 5. Görselsiz ürünler
 const gorselli = new Set(gorseller.map(g => g.product_id))
@@ -195,3 +171,9 @@ if (asan.length) {
     if (m.urunler.length > 8) console.log(`      ... +${m.urunler.length - 8} urun daha`)
   }
 }
+
+// ── 7. Kapı (REC-282): bilinen istisnalar Recep kararıyla yerinde; YENİ aşım ya da yayılma KIRMIZI.
+// --kapi bayrağıyla çıkış 1; bayraksız koşum eskisi gibi yalnız raporlar.
+console.log(`\n== KAPI: ${kapi.kirmizi ? 'KIRMIZI' : 'YESIL'} (bilinen istisna ${Object.keys(BILINEN_KATEGORI_ASAN).length} grup donmus)`)
+for (const i of kapi.ihlal) console.log(`  ⛔ ${i}`)
+if (process.argv.includes('--kapi') && kapi.kirmizi) process.exit(1)

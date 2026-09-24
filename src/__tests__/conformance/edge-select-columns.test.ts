@@ -60,6 +60,19 @@ function parseRowColumns(typesSource: string, table: string): Set<string> | null
   return cols.size > 0 ? cols : null
 }
 
+/**
+ * PostgREST HESAPLANAN ALANLARI (computed field): tek argümanı o tablonun `Row`'u olan fonksiyonlar
+ * select listesinde kolon gibi okunur (`select=id,display_price`). Kolon değildir ama PostgREST'in
+ * resmi özelliğidir; tipi `Functions` bloğunda `Args: { p: …["Tables"]["<tablo>"]["Row"] }` olarak üretilir.
+ * Bekçi GEVŞEMEZ: yalnız tipte o tabloya bağlı tanımlı fonksiyon kabul edilir (REC-376: stock-alert `display_price`).
+ */
+function parseComputedFields(typesSource: string, table: string): Set<string> {
+  const alanlar = new Set<string>()
+  const re = new RegExp(`\\b(\\w+):\\s*\\{\\s*Args:\\s*\\{\\s*\\w+:\\s*Database\\["public"\\]\\["Tables"\\]\\["${table}"\\]\\["Row"\\]\\s*\\}`, 'g')
+  for (const m of typesSource.matchAll(re)) alanlar.add(m[1])
+  return alanlar
+}
+
 /** Select listesini kolon token'larına indirger; doğrulanamayan token'lar elenir (konservatif). */
 function selectTokens(rawList: string): string[] {
   let list = rawList
@@ -118,6 +131,10 @@ describe('INV-8 · edge function select listeleri database.types ile eşleşmeli
     expect(products!.has('name')).toBe(true)
     // D4'te DROP edilen kolon üretilmiş tiplerde OLMAMALI — parser bayatlarsa burası kırılır.
     expect(products!.has('image_url')).toBe(false)
+    // Hesaplanan alan ayrıştırıcısı: display_price products'a bağlı; kolon DEĞİL; başka tabloya sızmaz.
+    expect(parseComputedFields(typesSource, 'products').has('display_price')).toBe(true)
+    expect(products!.has('display_price')).toBe(false)
+    expect(parseComputedFields(typesSource, 'categories').has('display_price')).toBe(false)
   })
 
   it('tarama sağlık kontrolü (bayat-bekçi): en az bir statik select bulunuyor', () => {
@@ -132,8 +149,9 @@ describe('INV-8 · edge function select listeleri database.types ile eşleşmeli
       for (const usage of extractUsages(file, source)) {
         const rowCols = parseRowColumns(typesSource, usage.table)
         if (!rowCols) continue // types'ta olmayan tablo (rpc/storage vb.) — sınıf dışı
+        const hesaplanan = parseComputedFields(typesSource, usage.table)
         for (const col of usage.cols) {
-          if (!rowCols.has(col)) {
+          if (!rowCols.has(col) && !hesaplanan.has(col)) {
             violations.push(`${file}: ${usage.table}.${col}`)
           }
         }
