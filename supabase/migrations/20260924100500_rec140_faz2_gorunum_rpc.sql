@@ -17,6 +17,9 @@
 --
 -- GERİ ALMA: üç nesnenin önceki tanımları 2026-09-23 tabanında (inventory_summary, inventory_velocity,
 -- admin_search_products) — aynı imzayla `create or replace` ile geri yazılır; veri değişmez.
+-- SIRA: Faz 1 (product_costs) geri alınacaksa ÖNCE bu migration geri alınır. Bu migration'dan sonra iki
+-- görünüm product_costs'a bağımlıdır; `drop table public.product_costs` görünüm bağımlılığı yüzünden
+-- DURUR. CASCADE YASAK (görünümleri sessizce düşürür, istemci ekranları kırılır; rls-yetki-karari §5).
 
 begin;
 
