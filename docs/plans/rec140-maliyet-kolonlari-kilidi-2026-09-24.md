@@ -202,3 +202,25 @@ Açılış şartı TAKVİM DEĞİL KAPI (challenger v2 2.C): Faz 2-kod ve REC-38
 3. product_costs'a UPDATE sonrası `admin_audit_log.row_pk` dolu mu.
 4. products'a `unique(id, tenant_id)` ekleme süresi + `lock_timeout` davranışı.
 5. Faz 3 provası: `alter table products drop column supplier_name` (CASCADE'siz) → bağımlılık hatası listesi.
+
+### 9.1 · Gölge sonuçları (2026-09-24 ~09:30Z, `golge_rec140`, taban 2026-09-23 + Faz 1 taslağı; ölçüm sonrası silindi)
+
+| # | Ölçüm | Sonuç |
+|---|---|---|
+| G1 | Migration uygulanması | OK (önsöz/taban beklenen ortam hataları dışında 0 hata) |
+| G2 | INSERT tetiği | 100 EUR "Ted A" birebir; `product_costs.id` dolu |
+| G3 | UPDATE tetiği (yalnız fiyat) | 150 ✓ |
+| G4 | Alakasız UPDATE (ad) | `product_costs.updated_at` DEĞİŞMEDİ ✓ (WHEN süzgeci) |
+| G5 | CSV yolu `on conflict (sku) do update` + yeni satır | A 175, B 50 ✓ |
+| G6 | anon `select product_costs` | permission denied ✓ |
+| G7 | Moderatör / müşteri / başka kiracı admini | 0 / 0 / 0 satır ✓ |
+| G8 | Admin | 1 satır ✓ (tek deneme satırı) |
+| G9 | Admin doğrudan `update product_costs` | permission denied ✓ (yazıcı kuralı DB'de) |
+| G10 | Yazma izni OLMAYAN moderatör products UPDATE/INSERT | tetik (DEFINER) taşıdı: 777 ✓, yeni satır 33 ✓ |
+| G11 | DELETE cascade | yetim 0 ✓ |
+| G12 | anon `admin_search_products` | permission denied ✓ |
+| G13 | `supabase gen types` | `product_costs_product_fk` → **isOneToOne: true** ✓ (2.B.7 kapandı) |
+| G14 | Guard A negatif | bozuk satırda `raise exception` ✓ |
+| G15 | Faz 3 provası `drop column supplier_name` / `purchase_price` | DURDU (CASCADE'siz): `inventory_velocity` / `inventory_summary`, `denetim_izi_products_upd`, `trg_product_costs_senkron_upd` bağımlı — Faz 3 madde 1-2-4'ün sırası doğrulandı |
+
+**Gölge sınırları (adıyla):** `auth.uid()` gölgede NULL → products RLS'li UPDATE admin için bile 0 satır; G10 bu yüzden products RLS'i YALNIZ gölgede kapatarak ölçüldü (tetik davranışı ölçüldü, politika değil). `handle_supabase_webhook` (vault yok) yalnız gölgede kapatıldı. authenticated'a `auth` şema erişimi canlıdaki gibi gölgede verildi. `unique(id, tenant_id)` kilit süresi 1 satırda anlamsız → canlıda `lock_timeout` korur. `row_pk` (2.B.6) Faz 3 kapsamı, ölçülmedi.
