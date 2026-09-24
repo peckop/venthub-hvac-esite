@@ -30,7 +30,7 @@ const TAM_SATIR: Record<string, unknown> = {
   stock_qty: 3,
   low_stock_threshold: 5,
   low_stock_override: null,
-  technical_specs: {},
+  technical_specs: { airflow_m3h: 1200 },
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
   warehouse_location: 'A-1',
@@ -89,5 +89,26 @@ describe('ProductFormModal — düzenle ve kaydet alış fiyatını korur', () =
     expect(sb.kayit.secilen.some(k => k.split(',').map(s => s.trim()).includes('purchase_price'))).toBe(true)
     expect(sb.kayit.guncelleme).not.toBeNull()
     expect(sb.kayit.guncelleme?.purchase_price).toBe(1234.5)
+  })
+
+  it('güncelleme yüküne giden HER alan önce okunmuştur — okunmayan alan boşla ezilemez', async () => {
+    sb.satir.deger = TAM_SATIR
+    // Object.assign: doğrudan `= null` ataması TS'te alanı `null`a daraltır, sonraki okumalar `never` olur.
+    Object.assign(sb.kayit, { secilen: [], guncelleme: null })
+    const onSuccess = vi.fn()
+    render(<ProductFormModal _productId="p1" open onClose={() => {}} onSuccess={onSuccess} />)
+
+    await waitFor(() => expect(screen.getByDisplayValue('Test Fanı')).toBeInTheDocument())
+    const form = document.querySelector('form')
+    if (!(form instanceof HTMLFormElement)) throw new Error('form bulunamadı')
+    fireEvent.submit(form)
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+
+    const okunan = new Set(sb.kayit.secilen.flatMap(k => k.split(',').map(s => s.trim())))
+    const yazilan = Object.keys(sb.kayit.guncelleme ?? {})
+    expect(yazilan.filter(k => !okunan.has(k))).toEqual([])
+    // Vitrin listesinden bağımsızlığın kanıtı: iki JSONB alan da AYNEN geri gider.
+    expect(sb.kayit.guncelleme?.technical_specs).toEqual({ airflow_m3h: 1200 })
+    expect(sb.kayit.guncelleme?.description_i18n).toEqual({ tr: 'açıklama', en: 'description' })
   })
 })

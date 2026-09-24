@@ -28,7 +28,37 @@ import {
  * tablosundan bu kolonları doğrudan okuyabiliyor — kolon yetkisi (REVOKE) ayrı iş, DB tarafı.
  */
 
-const MALIYET = ['purchase_price', 'cost_in_base', 'last_purchase_cost', 'supplier_name', 'warehouse_location'] as const
+// products maliyet/tedarik kolonları + başka tablolardaki birim maliyet ve bağlı sermaye.
+const MALIYET = [
+  'purchase_price', 'cost_in_base', 'last_purchase_cost', 'supplier_name', 'warehouse_location',
+  'purchase_currency', 'purchase_rate_to_base', 'last_purchase_currency', 'last_purchased_at',
+  'unit_cost', 'capital_tied_up',
+] as const
+
+/** Maliyet kolonu adı ya da gömülü tam satır: `products(*)`, `products!inner(*)`, `products!fk( * )`. */
+const SATIR_DESENI = new RegExp(`\\b(${MALIYET.join('|')})\\b|\\bproducts(![\\w]+)?\\s*\\(\\s*\\*\\s*\\)`)
+
+/** products'tan tüm kolonlar, satır sonları dahil: `.from('products')\n  .select('*', { count })` ya da boş `select()`. */
+const TAM_SECIM_DESENI = /from\(\s*['"]products['"]\s*\)\s*\.select\(\s*(['"]\s*\*\s*['"]\s*)?[,)]/
+
+/** Satır ve blok yorumlarını boşaltır, satır numaralarını korur. `https://` gibi dizgeler kalır. */
+function yorumsuz(metin: string): string[] {
+  let blokta = false
+  return metin.split(/\r?\n/).map(satir => {
+    let kod = satir
+    if (blokta) {
+      const son = kod.indexOf('*/')
+      if (son === -1) return ''
+      kod = kod.slice(son + 2)
+      blokta = false
+    }
+    kod = kod.replace(/\/\*.*?\*\//g, '')
+    const bas = kod.indexOf('/*')
+    if (bas !== -1) { kod = kod.slice(0, bas); blokta = true }
+    // `//` yalnız satır başında ya da boşluktan sonra yorumdur; `https://` dizgede kalır.
+    return kod.replace(/(^|\s)\/\/.*$/, '$1')
+  })
+}
 
 function kolonlar(liste: string): string[] {
   return liste.split(',').map(k => k.trim())
@@ -58,7 +88,9 @@ function yoneticiYaDaMotor(goreli: string): boolean {
     y.startsWith('app/[lang]/admin') ||
     y.startsWith('types/') ||
     y.startsWith('i18n/') ||
+    // Fiyat motoru SUNUCUDA maliyetten satış fiyatı türetir; yönetici servisleri adında Admin taşır.
     /^lib\/services\/(pricing|purchasing)[^/]*\.ts$/.test(y) ||
+    /^lib\/services\/[^/]*Admin[^/]*\.ts$/.test(y) ||
     y === 'lib/services/product.columns.ts'
   )
 }
@@ -89,17 +121,43 @@ describe('vitrin kaynak ağacı maliyet kolonu adı içermez', () => {
     expect(ihlal).toEqual([])
   })
 
-  it('maliyet kolonu adı ve gömülü products(*) vitrin kodunda geçmez', () => {
-    const desen = new RegExp(`\\b(${MALIYET.join('|')})\\b|products\\(\\*\\)`)
+  it('desenler bilinen ihlal biçimlerini yakalar (kapının kendisi kör değil)', () => {
+    for (const ornek of ["select('*, product:products(*)')", "select('x, p:products!inner( * )')", "select('id, purchase_price')", "a.unit_cost"]) {
+      expect(SATIR_DESENI.test(ornek), ornek).toBe(true)
+    }
+    for (const ornek of [".from('products').select('*')", ".from(\"products\")\n    .select('*', { count: 'exact' })", ".from('products').select()"]) {
+      expect(TAM_SECIM_DESENI.test(ornek), ornek).toBe(true)
+    }
+    expect(TAM_SECIM_DESENI.test(".from('products').select(VARIANT_DETAIL_COLUMNS)")).toBe(false)
+  })
+
+  it('maliyet kolonu adı ve gömülü tam ürün satırı vitrin kodunda geçmez', () => {
+    const desen = SATIR_DESENI
     const ihlal: string[] = []
     for (const { yol, goreli } of kaynaklar) {
       if (yoneticiYaDaMotor(goreli)) continue
-      // CRLF: Windows çıkışında `.` \r'yi yutmaz, `$` eşleşmez — yorum ayıklanmazdı.
-      readFileSync(yol, 'utf8').split(/\r?\n/).forEach((satir, i) => {
-        const kod = satir.replace(/\/\/.*$/, '').replace(/^\s*\*.*$/, '')
+      yorumsuz(readFileSync(yol, 'utf8')).forEach((kod, i) => {
         if (desen.test(kod)) ihlal.push(`${goreli}:${i + 1}`)
       })
     }
     expect(ihlal).toEqual([])
+  })
+
+  it('vitrin kodu products tablosundan tüm kolonları çekmez: select(\'*\') ya da boş select()', () => {
+    const desen = TAM_SECIM_DESENI
+    const ihlal = kaynaklar
+      .filter(({ goreli }) => !yoneticiYaDaMotor(goreli))
+      .filter(({ yol }) => desen.test(yorumsuz(readFileSync(yol, 'utf8')).join('\n')))
+      .map(({ goreli }) => goreli)
+    expect(ihlal).toEqual([])
+  })
+
+  it('yorum ayıklayıcı dizgedeki kolon adını kaçırmaz, yorumdakini yakalamaz', () => {
+    const [dizge, yorum, blok] = yorumsuz(
+      "fetch('https://x/rest/v1/products?select=purchase_price')\n// purchase_price\n/* purchase_price */ const a = 1",
+    )
+    expect(dizge).toContain('purchase_price')
+    expect(yorum).not.toContain('purchase_price')
+    expect(blok).not.toContain('purchase_price')
   })
 })
