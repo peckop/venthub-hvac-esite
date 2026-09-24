@@ -3,7 +3,8 @@
 -- Plan: docs/plans/rec140-maliyet-kolonlari-kilidi-2026-09-24.md (v3, §4 Faz 2-DB). Faz 1 canlıda (765235da3).
 -- Karar 95: maliyet yalnız admin/super_admin. Karar 99: liste fiyatı da gizli.
 --
--- NE YAPAR (üç nesne, imza/kolon listesi DEĞİŞMEZ → GRANT'lar ve istemci kodu aynen çalışır):
+-- NE YAPAR (üç nesne, imza/kolon listesi DEĞİŞMEZ → istemci kodu aynen çalışır; görünüm yetkileri §2b'de
+-- canlıdakiyle birebir yeniden kurulur, fonksiyon GRANT'ı create or replace ile korunur):
 --   1. inventory_summary.capital_tied_up = product_costs.purchase_price × stok
 --      (security_invoker → admin değeri görür; admin olmayan NULL görür — 0 DEĞİL: 0 yanlış bilgi olurdu).
 --   2. inventory_velocity.supplier_name ← product_costs.supplier_name (admin olmayan NULL).
@@ -80,6 +81,22 @@ select p.id as product_id,
 from public.products p
 left join reserved r on r.product_id = p.id
 left join public.product_costs c on c.product_id = p.id;
+
+-- 2b ── görünüm yetkileri (INV-VIEW-GRANT-1) ─────────────────────────────────────────────────
+-- public şemasında varsayılan ayrıcalık anon/authenticated/service_role'e sekiz yetki verir; tek düzeltici
+-- REVOKE'tur. Canlı ölçüm 2026-09-24 (aclexplode): iki görünümde de authenticated=SELECT, service_role=SELECT,
+-- anon YOK. Aşağıdaki blok o durumu BİREBİR yeniden kurar — net yetki değişikliği sıfır.
+revoke all on public.inventory_summary from public;
+revoke all on public.inventory_summary from anon;
+revoke all on public.inventory_summary from authenticated;
+revoke all on public.inventory_summary from service_role;
+grant select on public.inventory_summary to authenticated, service_role;
+
+revoke all on public.inventory_velocity from public;
+revoke all on public.inventory_velocity from anon;
+revoke all on public.inventory_velocity from authenticated;
+revoke all on public.inventory_velocity from service_role;
+grant select on public.inventory_velocity to authenticated, service_role;
 
 -- 3 ── admin_search_products (imza + dönüş tipi AYNI → GRANT korunur) ──────────────────────────
 create or replace function public.admin_search_products(p_q text, p_limit integer default 50,
@@ -202,6 +219,14 @@ begin
   if has_table_privilege('anon', 'public.inventory_summary', 'select')
      or has_table_privilege('anon', 'public.inventory_velocity', 'select') then
     raise exception 'REC-140 Faz 2-DB: anon envanter görünümlerini okuyabiliyor';
+  end if;
+  if not has_table_privilege('authenticated', 'public.inventory_summary', 'select')
+     or not has_table_privilege('authenticated', 'public.inventory_velocity', 'select') then
+    raise exception 'REC-140 Faz 2-DB: authenticated envanter görünümlerini okuyamıyor (admin stok ekranı kırılır)';
+  end if;
+  if has_table_privilege('authenticated', 'public.inventory_summary', 'insert,update,delete,truncate')
+     or has_table_privilege('authenticated', 'public.inventory_velocity', 'insert,update,delete,truncate') then
+    raise exception 'REC-140 Faz 2-DB: authenticated envanter görünümlerinde yazma yetkisi taşıyor';
   end if;
   raise notice 'REC-140 Faz 2-DB öz-kontrol GEÇTİ';
 end $$;
