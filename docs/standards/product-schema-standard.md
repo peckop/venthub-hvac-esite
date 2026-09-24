@@ -414,6 +414,34 @@ anma devrini aşar (4 kutup: senkron 1500 > anma 1400-1475). Yani anma devri üs
 - `nominal_rpm` göçünün adayıdır; **başka alana emsal olmaz**.
 - Fan ve motor devri kaynakta farklı verilmişse (ör. kayış tahrik ya da çelişik föy) **yazılmaz**.
 
+### Frekans, yalıtım sınıfı, sıcaklık (REC-172 tur 2, 2026-09-23)
+
+Bu satırlar yazılana kadar dört alanın anlamı cetvelde **yoktu**; canlıda 193 / 231 / 20 / 3 üründe dolu
+olmalarına rağmen. Tur 2 çıkarımı (`<ingestor>/venthub/icerik-hatti/rec172/tur2/OZET.md`) kaynak ifadelerini
+aşağıdaki gibi eşledi; kural o eşlemeyi bağlar.
+
+| Alan | Anlamı | Kaynak tipik ifadesi | Yazılmaz |
+|---|---|---|---|
+| `frequency_hz` | Şebeke frekansı, **tek sayı** | "230V 50Hz", "1~ 50" | "50/60 Hz" çift frekans (tek sayıya sıkışmaz; kural gelene kadar boş) · kaynak basmıyorsa "Avrupa'da 50 Hz" çıkarımı |
+| `insulation_class` | Motor sargısının **ısıl** yalıtım sınıfı (IEC 60085), biçim `Class F` | "insulation class F", "thermal class F" | motorsuz gövdede (motoru anlatan cümle ürünü anlatmaz) |
+| `max_ambient_temp_c` | Motorun/ünitenin bulunduğu **ortamın** üst sıcaklığı | "ambient 60ºC", "ortam sıcaklığı" | taşınan havanın sıcaklığı ("transported air", "(°C)/air") |
+| `min_` / `max_operating_temperature_c` | Kaynağın **çalışma sıcaklığı aralığı** — hava mı ortam mı olduğunu söylemeyen | "working temperature −20…60ºC", "Operating Temperature Range" | aralığın tek ucu, öbür uç kaynakta varken (§11.7 çift kuralı) |
+| `electrical_protection_class` | **Elektrik koruma sınıfı** (IEC 61140: topraklama gerekir mi), küme `Class I` · `Class II` · `Class III` | "Electrical insulation class: II (earthing not required)", "Class II insulation" | ısıl sınıf harfi (B, F, H) — o `insulation_class` |
+| `motor_efficiency_class` | Motor **verim sınıfı** (IEC 60034-30-1), küme `IE1` … `IE5` | "IE3 motor", "IE4 motors for 75 kW or higher" | kaynağın güç eşiği ürünün motor gücünü kapsamıyorsa |
+
+- Kaynağın "insulation class" kelimesi iki ayrı büyüklük için kullanılıyor: harf (F, B) = ısıl sınıf,
+  Roma rakamı (I, II) = koruma sınıfı. Alan **değerin biçimine göre** seçilir, kelimeye göre değil.
+- Küme dışı değer (ör. `IE6`, `Class IV`) yazılmaz; yazım betiği girdiyi kümeye karşı denetler
+  (`<ingestor>/venthub/icerik-hatti/rec172/tur2/duzeltme-uret.py`).
+- ⚠**Açık iki anlam çakışması (ölçüldü, bu satırın getirdiği değil):**
+  - `insulation_class` Vortice'te **82 üründe** `Class I` / `Class II` taşıyor — koruma sınıfı, ısıl sınıf
+    değil. Onarım: değer `electrical_protection_class`'a taşınır (OPS hükmü 2026-09-23: müşteriye görünen yanlış
+    bilgi = onarım; canlı yazım Recep'in toplu onayıyla, URUN'un vitrin etiketinden sonra).
+  - `max_ambient_temp_c`'de HEATMASTER **10 üründe** değer "(°C)/air", yani taşınan hava; SLIMROOF **9 üründe**
+    değer bir aralığın üst ucu, alt uç yazılmamış.
+- Taşınan hava sıcaklığı için alan **yok**; kaynaklar 171 üründe veriyor (tur 2 `belirsiz.csv`). Alan açılana
+  kadar hiçbir alana yazılmaz.
+
 ### Basınç: "toplam" ile "statik" ayrı alanlardır
 
 **Nereden çıktı (ölçüm, 2026-09-07):** Nicotra katalogları fan eğrisini **toplam basınç**

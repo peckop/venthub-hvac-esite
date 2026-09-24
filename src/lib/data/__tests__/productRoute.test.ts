@@ -94,6 +94,8 @@ function deps(overrides: Partial<ProductRouteDeps> = {}): ProductRouteDeps {
     seriesLanding: vi.fn(async () => null),
     variantBySlug: vi.fn(async () => null),
     familySlugById: vi.fn(async () => null),
+    takmaAd: vi.fn(async () => null),
+    variantById: vi.fn(async () => null),
     ...overrides,
   }
 }
@@ -170,5 +172,77 @@ describe('INV-SERIES-LANDING-1: seri landing 200, ürünsüz aile gerçek 404', 
   it('hiçbir kayıt yok → 404', async () => {
     const result = await resolveProductRoute('boyle-bir-sey-yok', 'tr', deps())
     expect(result.kind).toBe('not-found')
+  })
+})
+
+/**
+ * INV-TAKMA-AD-OKUMA-1 (REC-300 Faz 1-A): yeniden adlandırılmış ürün/aile slug'ı 404 değil,
+ * bugünkü aile adresine 308. Tabloyu DB tetiği doldurur (`url_takma_adlari`); bu blok zincirin
+ * onu OKUDUĞUNU ve sırasını korur.
+ */
+describe('INV-TAKMA-AD-OKUMA-1: eski ürün/aile slug’ı → bugünkü aile adresi', () => {
+  it('eski ÜRÜN slug’ı → aile URL’i + ?sku=', async () => {
+    const takmaAd = vi.fn(async (tur: 'urun' | 'aile') => (tur === 'urun' ? 'urun-id-1' : null))
+    const d = deps({
+      takmaAd,
+      variantById: vi.fn(async () => ({ sku: 'VRT-253490106XN', family_id: 'fam-1' })),
+      familySlugById: vi.fn(async () => 'vorticent-cms-atex'),
+    })
+
+    const result = await resolveProductRoute('vorticent-cms-atex-35-14-t4-4kw-253490106xn', 'tr', d)
+
+    expect(result).toEqual({ kind: 'redirect', to: '/tr/products/vorticent-cms-atex?sku=VRT-253490106XN' })
+    expect(takmaAd).toHaveBeenCalledWith('urun', 'tr', 'vorticent-cms-atex-35-14-t4-4kw-253490106xn')
+  })
+
+  it('eski AİLE slug’ı → yeni aile URL’i (sku yok)', async () => {
+    const d = deps({
+      takmaAd: vi.fn(async (tur: 'urun' | 'aile') => (tur === 'aile' ? 'fam-9' : null)),
+      familySlugById: vi.fn(async () => 'yeni-aile'),
+    })
+
+    const result = await resolveProductRoute('eski-aile', 'en', d)
+
+    expect(result).toEqual({ kind: 'redirect', to: '/en/products/yeni-aile' })
+  })
+
+  it('canlı aile/varyant slug’ı takma ada HİÇ bakmaz (sıra bekçisi)', async () => {
+    const takmaAd = vi.fn(async () => 'x')
+    const d = deps({ familyDetail: vi.fn(async () => familyDetailFixture(2)), takmaAd })
+
+    const result = await resolveProductRoute('lineo-100-quiet', 'tr', d)
+
+    expect(result.kind).toBe('family')
+    expect(takmaAd).not.toHaveBeenCalled()
+  })
+
+  it('hedef slug bu slug’ın kendisiyse yönlendirme yok → 404 (döngü yok)', async () => {
+    const d = deps({
+      takmaAd: vi.fn(async (tur: 'urun' | 'aile') => (tur === 'aile' ? 'fam-9' : null)),
+      familySlugById: vi.fn(async () => 'ayni-slug'),
+    })
+
+    const result = await resolveProductRoute('ayni-slug', 'tr', d)
+
+    expect(result.kind).toBe('not-found')
+  })
+
+  it('silinmiş hedef ürün → 404', async () => {
+    const d = deps({
+      takmaAd: vi.fn(async (tur: 'urun' | 'aile') => (tur === 'urun' ? 'silinmis' : null)),
+      variantById: vi.fn(async () => null),
+    })
+
+    expect((await resolveProductRoute('eski-urun', 'tr', d)).kind).toBe('not-found')
+  })
+
+  it('takma ad sorgusu HATA verirse 404 DEĞİL unavailable', async () => {
+    const d = deps({
+      takmaAd: vi.fn(async () => {
+        throw new Error('fetch failed')
+      }),
+    })
+
+    expect((await resolveProductRoute('eski-urun', 'tr', d)).kind).toBe('unavailable')
   })
 })

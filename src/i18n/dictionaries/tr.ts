@@ -127,7 +127,15 @@ export const tr = {
         'ducted-central-hrv': 'Kanallı Merkezi Üniteler',
         'single-room-hrv': 'Tekil Oda Üniteleri',
         'speed-controllers': 'Hız Anahtarları',
-        'water-coils': 'Sulu Batarya Kanal Tipi'
+        'water-coils': 'Sulu Batarya Kanal Tipi',
+        // REC-300 Faz 1-B (K17 ağacı, karar 78b + 84): anahtarı veritabanı migration'ı bağlar.
+        // Korozyon dalı YENİ anahtara geçer (`acid-fans` değişmez) → ad ile adres aynı anda döner.
+        'corrosion-fans': 'Korozyon Dayanımlı Fanlar',
+        'plug-fans': 'Plug Fanlar',
+        'cabinet-fans': 'Hücreli Aspiratörler',
+        'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
+        'electric-curtain': 'Elektrikli Isıtıcılı Hava Perdeleri',
+        'spare-parts': 'Yedek Parça ve Sensörler'
       }
     },
     viewAll: 'Tümü',
