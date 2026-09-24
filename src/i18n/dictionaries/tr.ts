@@ -2524,7 +2524,7 @@ export const tr = {
         noPermission: 'Bu işlem için yetkiniz yok',
         pricesSaved: 'Fiyatlar kaydedildi',
         pricesSaveFailed: 'Fiyatlar kaydedilemedi',
-        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat girin'
+        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat, aynı para birimi ve ileri tarihli geçerlilik girin'
       }
     }
   },

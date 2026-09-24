@@ -2500,7 +2500,7 @@ export const en: typeof tr = {
         noPermission: 'You do not have permission for this action',
         pricesSaved: 'Prices saved',
         pricesSaveFailed: 'Could not save prices',
-        priceRequired: 'Enter a price for every item before sending the quote'
+        priceRequired: 'Before sending the quote, give every item a price, the same currency and a future validity date'
       }
     }
   },
