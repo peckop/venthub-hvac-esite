@@ -265,6 +265,8 @@ async function main() {
       s.hreflang = Object.fromEntries(a.hreflang.map((h) => [h.dil, yol(h.href)]))
       if (!a.hreflang.length) s.sorunlar.push('HREFLANG-YOK')
       else {
+        // x-default: Bing'in kök adres sorunu (REC-127) bu etiketin yokluğuyla ilişkiliydi; ölçüt olarak sayılır.
+        if (!a.hreflang.some((h) => (h.dil || '').toLowerCase() === 'x-default')) s.sorunlar.push('HREFLANG-XDEFAULT-YOK')
         const dil = s.son.split('/')[1]
         const kendi = s.hreflang[dil]
         const anaya = Object.entries(s.hreflang).filter(([, h]) => /^\/(tr|en)$/.test(h))
