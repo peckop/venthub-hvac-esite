@@ -42,7 +42,7 @@ describe('INV-GSC-TABAN-1', () => {
     expect(depoIcinde('C:/tmp/depo/docs/x', 'C:/tmp/depo')).toBe(true)
     expect(depoIcinde('C:/tmp/depo', 'C:/tmp/depo')).toBe(true)
     expect(depoIcinde('C:/tmp/depo-baska/x', 'C:/tmp/depo')).toBe(false)
-    expect(depoIcinde('C:/Users/a/AppData/Local/Temp/x', 'C:/tmp/depo')).toBe(false)
+    expect(depoIcinde('C:/gecici/oturum/x', 'C:/tmp/depo')).toBe(false)
   })
   it('betikte sır ve gömülü anahtar yolu yok', () => {
     const k = readFileSync(join(__dirname, '..', 'gsc-taban.mjs'), 'utf8')
