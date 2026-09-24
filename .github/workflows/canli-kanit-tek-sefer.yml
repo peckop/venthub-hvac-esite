@@ -1,0 +1,106 @@
+name: Canli kanit (tek sefer)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TEK SEFERLİK CANLI YAZIM — karar 104 (2026-09-24)
+#
+# Ne: Recep'in 09-01 deneme teklifine YÖNETİCİ YOLUNDAN fiyat girilip yayımlandığının canlı kanıtı.
+# Spec'i AUTH yazar: `e2e-canli/karar104-teklif-yayim.e2e.ts`. Hedef canlı site; Supabase adresi
+# `vars.E2E_SUPABASE_URL` = canlı proje (2026-09-24 ölçüldü, değer basılmadan eşitlik).
+#
+# KİLİTLER (bekçi: src/__tests__/conformance/canli-kanit-yalitimi.test.ts · INV-CANLI-KANIT-1):
+#   1) Tetik YALNIZ workflow_dispatch — push/PR/zamanlama YOK; kendiliğinden hiç koşmaz.
+#   2) `onay` girdisi birebir `karar-104-canli-yazim` değilse iş ilk adımda durur.
+#   3) Spec yolu SABİT; `e2e-canli/` altında ondan başka spec varsa iş durur (başka spec toplamaz).
+#   4) `retries: 0` (e2e-canli/playwright.config.ts) — yeniden deneme ikinci yazım demektir.
+#   5) Artefakt yüklenmez, trace kapalı — repo PUBLIC, trace parolayı kaydeder.
+# Dispatch CANLI YAZIMDIR: Recep'in o pencerede işlem düzeyindeki cümlesi olmadan tetiklenmez.
+#
+# ÖMÜR: kanıt alınıp Linear'a yazıldıktan sonra bu dosya ve spec AYRI bir PR ile SİLİNİR.
+# Dosya kalırsa kilitler yine geçerli; ama tek sefer için kurulan bir yazım yolu kalıcı olmaz.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      onay:
+        description: 'Canlı yazım onayı — birebir: karar-104-canli-yazim'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canli-kanit-tek-sefer
+  cancel-in-progress: false
+
+jobs:
+  canli-kanit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Onay kilidi
+        env:
+          ONAY: ${{ inputs.onay }}
+        run: |
+          if [ "$ONAY" != "karar-104-canli-yazim" ]; then
+            echo "::error::onay girdisi eşleşmedi — canlı yazım yapılmadı."
+            exit 1
+          fi
+          if [ "${GITHUB_REF_NAME}" != "master" ]; then
+            echo "::error::Yalnız master'dan tetiklenir (dal: ${GITHUB_REF_NAME})."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Spec kilidi (tek spec, sabit yol)
+        run: |
+          set -euo pipefail
+          hedef="e2e-canli/karar104-teklif-yayim.e2e.ts"
+          [ -f "$hedef" ] || { echo "::error::$hedef yok — spec henüz master'da değil."; exit 1; }
+          sayi=$(find e2e-canli -name '*.e2e.ts' | wc -l)
+          if [ "$sayi" -ne 1 ]; then
+            echo "::error::e2e-canli altında $sayi spec var; yalnız $hedef olmalı."
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline --config.allow-scripts true
+
+      - name: apt sertlestirmesi
+        timeout-minutes: 3
+        run: bash scripts/ci/apt-hardening.sh
+
+      - name: Playwright sistem bagimliliklari (en iyi caba)
+        continue-on-error: true
+        timeout-minutes: 11
+        env:
+          RETRY_APT_TEMIZLE: '1'
+        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install-deps chromium
+
+      - name: Install Playwright Chromium
+        timeout-minutes: 11
+        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install chromium
+
+      - name: Canli kanit spec'i
+        run: pnpm exec playwright test --config e2e-canli/playwright.config.ts e2e-canli/karar104-teklif-yayim.e2e.ts
+        env:
+          E2E_BASE_URL: https://venthub.com.tr
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.E2E_SUPABASE_ANON_KEY }}
+          E2E_ADMIN_EMAIL: ${{ vars.E2E_ADMIN_EMAIL }}
+          E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}

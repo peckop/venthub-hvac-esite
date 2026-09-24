@@ -69,7 +69,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // KENDİ adresleri sitemap'te YOK ve bu kasıtlı — arama motoruna verilen kapı tek
     // olsun; araçlar bu sayfadan bulunur.
     '/urun-secici',
-    '/cart',
+    // `/cart` YOK (PR-1, bot karnesi 2026-09-24): sepet X-Robots noindex taşır; dizine
+    // kapalı adresi site haritasında ilan etmek Search Console'da "gönderildi ama noindex"
+    // hatası üretir.
     '/legal/kvkk',
     '/legal/gizlilik-politikasi',
     '/legal/cerez-politikasi',

@@ -24,10 +24,8 @@
         <!-- REC-154: marka adı "VentHub" ve logo burada SABİT KODLUYDU. index.ts zaten
              brand_name / brand_primary_color / brand_logo_url geçiyordu ama şablonda
              KARŞILIĞI YOKTU — üç alan sessizce çöpe gidiyordu. -->
+        <!-- REC-382: logo resmi yok — renkli şeritte marka adı yazıyla (tek görünüm). -->
         <div class="header" style="background: {{brand_primary_color}};">
-          {{#if brand_logo_url}}
-          <img src="{{brand_logo_url}}" alt="{{brand_name}}" style="max-height:32px;" />
-          {{/if}}
           <h1 class="brand">{{brand_name}}</h1>
         </div>
         <div class="content">

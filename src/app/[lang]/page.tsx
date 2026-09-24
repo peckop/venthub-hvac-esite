@@ -141,7 +141,13 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
     for (const row of countRes.data ?? []) {
       productCounts[row.category_id] = row.product_count ?? 0
     }
-    return { catData, prodData, productCounts }
+    // `kolonKumesi` (REC-140, 2026-09-24): önbellek anahtarı = bu fonksiyonun METNİ + anahtar
+    // parçaları (next/dist/.../unstable-cache.js `fixedKey`). Kolon listesi içe aktarılan bir
+    // sabit olduğundan anahtar onu görmez; Vercel veri önbelleği dağıtımlar arası paylaşılır.
+    // Bu dizge değişmeseydi yeni dağıtım alış fiyatlı eski `prodData` kaydını ≤1 saat sunardı.
+    // Dizge küçültmede korunur (kullanılan değer). Vitrin kolon kümesi değişince artırılır.
+    // Anahtar parçası yerine burada: `anasayfa-rotasi-statik` testi parçaları birebir sabitler.
+    return { catData, prodData, productCounts, kolonKumesi: 'vitrin-v2-rec140' }
   },
   ['home-page-data', lang, tenantId],
   // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)

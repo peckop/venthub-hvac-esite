@@ -56,8 +56,12 @@ interface CategoryOpt {
   metadata?: unknown
 }
 
+// REC-140 Faz 2-kod ilk adım (2026-09-24): `purchase_price` bu listeden ÇIKTI. Çekiliyordu
+// ama hiçbir hücre göstermiyordu (toUIProductList düşürüyor); bu sayfayı moderatör de açıyor
+// ve karar 95'e göre moderatör liste fiyatını/maliyeti GÖRMEZ — ağ yanıtında da görmemeli.
+// Maliyet kolonu gerekirse product_costs'tan okunur (yalnız admin, RLS). GERİ EKLEME.
 const PRODUCT_SELECT =
-  'id,name,sku,model_code,brand,status,category_id,price,purchase_price,stock_qty,low_stock_threshold,is_featured,slug'
+  'id,name,sku,model_code,brand,status,category_id,price,stock_qty,low_stock_threshold,is_featured,slug'
 
 const STATUS_KEYS = ['active', 'inactive', 'out_of_stock'] as const
 

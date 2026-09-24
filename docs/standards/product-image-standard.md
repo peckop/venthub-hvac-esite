@@ -58,13 +58,27 @@
 - `product_images`'ta bugün INSERT/DELETE politikası YOK → admin-UI yüklemesi (T069) için
   **politika-önce-ekran**: ekran işi politika migration'ı (Recep kapısı) inmeden başlayamaz.
 
-## 7. Kapı önerileri (henüz yazılmadı — sıradaki iş)
+## 7. Kapılar (2026-09-24, REC-209 / REC-282)
 
-- **INV-IMG-1 (statik):** scripts/media betikleri şartları ihlal edemez — paralel indirme
-  deseni, boyut-varyant üretimi, bucket-önekli path yazımı kırmızıdır.
-- **INV-IMG-2 (davranışsal, sabotajla kanıtlanacak):** `product_images`'a satır ekleyen test
-  akışı üç yüzeyin (keşif RPC + get_family_detail + admin sorgusu) yeni satırı gördüğünü
-  doğrular.
+- **Veri kapısı — görsel sözleşmesi** (`scripts/icerik-hatti/gorsel-sozlesme.mjs`, karne
+  `katalog-karnesi.mjs --kapi`): yetim satır, tenant, kova öneki, tam URL, path↔satır uyumu,
+  şema dışı path, kapaksız ürün, sıra/path tekrarı, boş alt — her biri KIRMIZI. `foto.webp`
+  adlı 97 kapak (KATALOG'un 09-08 tek seferlik yüklemesi, betiği ve `source_url` manifesti
+  depoya girmedi) **donmuş istisnadır**: azalabilir, artamaz. Sınav `__tests__/gorsel-sozlesme.test.ts`.
+- **INV-IMG-1 (statik, sabotajlı):** scripts/media betikleri tek varyant üretir (1600px,
+  büyütme yok), üretici sitesine paralel istek atmaz, kova önekli path yazmaz. Tek istisna
+  gerekçesiyle yazılı: `gorsel-envanteri.mjs` (yalnız kendi kovamızı okur). Aynı sınav dosyası.
+- **Mükerrer / aidiyet kapısı** (`scripts/media/gorsel-mukerrer.mjs`, `gorsel-envanteri.mjs --kapi`):
+  aynı dosya (sha256) farklı KATEGORİLERDEKİ ürünlerde = "yanlış ürüne yapıştırılmış" şüphesi →
+  KIRMIZI. Aile içi paylaşım meşrudur. Bilinen istisna: ısı geri kazanım fotoğrafının 3 dosyası
+  × 9 ürün (6 sulu batarya dahil) — Recep kararı 09-08 *"aynen kalsınlar … yeni foto lazım"*;
+  grup yeni ürüne yayılırsa KIRMIZI. Sınav `scripts/media/__tests__/gorsel-mukerrer.test.ts`.
+- **INV-IMG-2 (davranışsal, AÇIK):** `product_images`'a satır ekleyen akışın üç yüzeyde
+  (keşif RPC + get_family_detail + admin sorgusu) göründüğünü doğrulamak DB ister; CI'da DB yok →
+  canlı sonda (`BEGIN; … ROLLBACK`) olarak ALTYAPI CLI'sına önerildi.
+- **Kaynak dizini görsel kolu** (ingestor `scripts/kaynak_dizini/gorsel_cikar.py`): PDF
+  görselleri bir kez, sha256'lı ve konumlu çıkarılır (`kaynak-dizini/gorseller.jsonl`); doğru
+  ürün fotoğrafı PDF açmadan dizinden aranır (K15). Görsel dizini ürüne bağlamaz — bağlama §8'e tabidir.
 
 ## 8. İçerik kuralı — hangi fotoğraf bir ürüne bağlanabilir (Recep, 2026-08-21)
 
