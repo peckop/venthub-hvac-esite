@@ -188,6 +188,24 @@ dışıdır** (§14).
   tarafında, yalnız okuma amaçlı üretir (§12) ve kabul aksiyonu taşımaz.
 - Tüm politikalar `tenant_id = jwt_tenant_id()` kapsamında kalır (v0.1 Q3, T057 dersi).
 
+### 3.4 Yazım yolu — başlık + kalemler TEK transaction (REC-295)
+
+> **DURUM: HEDEF.** Fonksiyon PR-A ile iner; iki çağıran (oturumlu servis, misafir Edge) PR-B/C ile
+> geçer. O ana kadar iki adımlı yazım canlıdadır ve bu bölüm onların **varacağı** yeri tarif eder.
+
+- Teklif talebi **yalnız** `public.create_quote_with_items(p_quote jsonb, p_items jsonb)` ile açılır;
+  başlık ve kalemler aynı transaction'dadır. Kalem düşerse başlık da yazılmaz ve AFTER INSERT
+  bildirimi (pg_net) de geri alınır — kuyruk isteği commit'e kadar bekler (yerelde ölçüldü, pg_net
+  0.20.4; prod 0.19.5'te varsayım).
+- **SECURITY INVOKER**, DEFINER değil: oturumlu çağrıda §3.3'ün politikaları ve kolon GRANT'leri
+  aynen yürürlükte kalır. DEFINER'da gövde tek koruma olurdu.
+- **İki dal, oturum rolüne göre** (`current_user`, JWT claim'i değil): `service_role` (misafir uç) —
+  tenant zorunlu, `user_id` NULL, 1..50 kalem, adet 1..9999; aksi — `user_id = auth.uid()`,
+  `tenant_id = jwt_tenant_id()`. Bir DEFINER'ın içinden çağrılırsa "aksi" dala düşer ve
+  `auth.uid()` NULL olduğu için reddeder (fail-closed).
+- İki dalda da en az 1 kalem şarttır; `status` ve `user_id` hiçbir dalda girdiden okunmaz.
+- Bekçi: `src/__tests__/conformance/quote-atomik-yazim.test.ts` (INV-QUOTE-ATOMIK-1).
+
 ## 4) Durum makinesi v2
 
 ```
