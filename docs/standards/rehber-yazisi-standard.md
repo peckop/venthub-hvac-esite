@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.2 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.3 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -24,9 +24,10 @@
 **Ad notu:** kayıttaki ilk ad `icerik-hatti-standard.md` idi, kullanılmadı. "İçerik hattı" KATALOG'un
 aile açıklaması hattının adıdır (`scripts/icerik-hatti/**`, REC-146); iki ayrı iş aynı adı taşımasın.
 
-**Durum:** TASLAK v0.2. v0.1'e iki bağımsız çürütme koşuldu (Fable 5.1 ve Opus 5.5, 2026-09-24; ikisi de
-BLOK). Birleşik 29 gerçek bulgu bu sürüme işlendi (Ölçüm geçmişi). Yayın, R8'deki kapılar kendi
-PR'larında doğmadan yapılmaz.
+**Durum:** TASLAK v0.3. v0.1'e iki bağımsız çürütme koşuldu (Fable 5.1 ve Opus 5.5, 2026-09-24; ikisi de
+BLOK), v0.2'ye dar ikinci tur (Opus; hüküm KOŞULLU: 35 kalemden 20 karşılandı, 14 kısmen, 1 bilinçli ret).
+İkinci turun yüksek bulguları (T2-1…T2-4) bu sürümde; orta bulgular ilgili PR'ların kabul ölçütüne
+bağlandı (Ölçüm geçmişi). Yayın, R8'deki kapılar kendi PR'larında doğmadan yapılmaz.
 
 ---
 
@@ -43,17 +44,25 @@ Rehber yazısı ürün satmaz, soruyu cevaplar; ürüne **bağlantı** verir (R3
 K2 (iç not yasağı), K4.1 (olumsuz iddia) ve K10 (dil) maddeleri rehber yazısına uygulanır; K2'nin
 **deseni** ise rehbere birebir taşınmaz (R8.2).
 
-### R0.1 Bugünkü 4 konu bu cetveli bugün çiğniyor — onarım, karar değil
+### R0.1 Bugünkü 4 konu bu cetveli çiğniyor — onarım, karar değil
 
-Ölçüldü (2026-09-24, kod + canlı): dört konu kaynaksız teknik sayı basıyor ("çıkış hızı 7–9 m/s",
-"itme kuvveti 50–100 N", "%70–85 verim"; `hrv` debi adımı ücretli bir standarda — "EN 16798-1/ASHRAE
-62.1 aralıkları" — yaslanıyor, R2.2'nin KAPALI sınıfından sayı alınamaz). `air-curtain` ile `hava-perdesi` aynı adım/tuzak metnini taşıyor ve ikisi de kendini kanonik
-ilan ediyor (R1.3 ihlali). Adım ve sık hata listeleri sunucu HTML'inde **boş** (R6, istemci bailout).
+Sözlükteki dört konu kaynaksız teknik sayı **taşıyor** ("çıkış hızı 7–9 m/s", "itme kuvveti 50–100 N",
+"%70–85 verim"; `hrv` debi adımı ücretli bir standarda — "EN 16798-1/ASHRAE 62.1 aralıkları" — yaslanıyor,
+R2.2'nin KAPALI sınıfından sayı alınamaz). `air-curtain` ile `hava-perdesi` aynı adım/tuzak metnini
+taşıyor ve ikisi de kendini kanonik ilan ediyor (R1.3 ihlali).
 
-Müşteriye görünen kusurdur, **seçenek sunulmaz, onarılır**. Onarım karar 92 taşımasıyla aynı işte
-yapılır (URUN rota + BLOG içerik): her konu ya R3/R5'ten geçerek yeni adreste yeniden yazılır ya da
-kaldırılıp en yakın yazıya/kategoriye kalıcı yönlendirilir; `air-curtain` → `hava-perdesi`. Kaynağa
-bağlanamayan sayı kalkar. **10 canlı adresin her biri için hedef yazılır, 404'e düşen adres 0.**
+⚠**v0.2 bu sayıların müşteriye "basıldığını" yazıyordu; YANLIŞ** (ikinci tur denetçisi ölçtü, BLOG kodda
+doğruladı: [TopicPage.tsx:55-59](../../src/views/knowledge/TopicPage.tsx#L55) çeviri dönüşü dizi değilse
+listeyi `[]` yapıyor). Sayılar bugün ne sunucu HTML'inde ne tarayıcıda görünüyor. Müşterinin gördüğü
+kusur başka: **iki boş bölüm başlığı** (adımlar, sık hatalar) ve yüklemeden sonra site varsayılanına dönen
+sekme başlığı. ⚠**Gizli risk:** listeler onarılırsa kaynaksız sayılar canlıya **ilk kez** çıkar.
+
+Onarım iki adımdır, ikisi de seçenek değildir:
+1. **Hemen (taşımayı beklemez, URUN):** kaynaksız sayılar sözlükten silinir; boş bölüm başlıkları
+   gizlenir; `air-curtain` → `hava-perdesi` kalıcı yönlendirme.
+2. **Karar 92 taşımasında (URUN rota + BLOG içerik):** konular yeni adrese **kaldırılıp yönlendirilir**;
+   yeniden yazım R9 ritmine girer (R8.1 sayacı). **10 canlı adresin her biri için hedef yazılır, 404'e
+   düşen adres 0.**
 
 ## R1 — Konu seçimi
 
@@ -114,9 +123,11 @@ kaynağı gösterilmeyen blog.
 | **AÇIK** | Tam metin herkese açık | İddia + sayı |
 | **ÖZET** | Yalnız özet açık (ör. dergi özeti) | Yalnız özette geçen ifade, atıf özete yapılır |
 | **KAPALI** | Ücretli (EN, ISO standart metni, ücretli makale) | Yalnız adı ve kapsamı; **sayı yok** |
+| **İÇ-DİZİN** | Üretici teknik belgesi, kaynak dizininde var, herkese açık adresi yok | İddia + sayı; kanıt iç kayıtta (`pdf_hash` + sayfa + alıntı); müşteriye R2.4 biçimiyle |
 
-Metindeki her sayı, birim, oran ve teknik iddia en az bir AÇIK kaynağa (ya da ÖZET'in kendi ifadesine)
-bağlıdır. **Açılmamış kaynak atıf alamaz.**
+Metindeki her sayı, birim, oran ve teknik iddia en az bir AÇIK ya da İÇ-DİZİN kaynağa (ya da ÖZET'in kendi
+ifadesine) bağlıdır. **Açılmamış kaynak atıf alamaz.** (v0.2'de İÇ-DİZİN sınıfı yoktu; 1. öncelikli
+kaynak kendi tanımına girmiyordu — ikinci tur T2-2.)
 
 ### R2.3 Alıntı HAM kaynaktan doğrulanır — özetleyici araç kanıt değildir
 
@@ -131,9 +142,15 @@ HTML'i `curl` ile çeken denetçi (Opus) yakaladı.
 1. Ham kaynak çekilir: `curl -sS -o /dev/null -w "%{http_code} -> %{redirect_url}"` (yönlendirme) →
    `curl -sSL` (ham HTML). Özetleyici araçlar keşif içindir, kanıt değildir.
 2. Kayıt: ilk adres · son adres · HTTP durumu · yönlendirme zinciri · sayfanın "son güncelleme"
-   tarihi · ham metnin sha256'sı · birebir alıntı · erişim tarihi.
+   tarihi · **etiketi soyulmuş metnin** sha256'sı (ham HTML'in hash'i her çekimde değişir — ikinci tur
+   ölçtü) · birebir alıntı · erişim tarihi.
 3. Alıntının **çevresi** okunur: tarih, "deprecated/removed/no longer" notu, daha yeni bir girdi.
+   **Adres başka bir yola taşındıysa** bu en güvenilir bayatlık işaretidir (SSS vakası).
 4. Kaynak dizini atfında: `pdf_hash` + sayfa + alıntı (dizin zaten belirlenimci).
+5. **Tek kaynak betiktir:** [alinti-dogrula.mjs](../../scripts/rehber/alinti-dogrula.mjs) (normalize tanımı,
+   hash, yönlendirme ve bayatlık işareti orada). Sonuç `GECTI` / `INCELE` / `KALDI`; `INCELE` alıntıyı
+   düşürmez, çevre metni R5.1 3d'ye gider — kelime sezgisi ayırt etmez (ölçüldü: olağan "pages are added
+   or removed" cümlesi de işaret verdi).
 
 ### R2.4 Müşteriye görünen atıf biçimi
 
@@ -170,11 +187,12 @@ soruları (R1'deki arama önerileri + SSS) cevaplandı mı. Kelime sayısı ve H
 | Kaynaklar | R2.4 |
 | Teknik sorumluluk notu | Sabit metin, sözlükten: yazı genel bilgidir, proje hesabının yerini tutmaz |
 | Tarih | Yayın ve güncelleme tarihi görünür |
-| Görsel (isteğe bağlı) | Yazıya özgü (bugünkü konular genel kurulum görseli kullanıyor, ikisi aynı dosya — tekrar edilmez); hakkı belli (Design System varlığı ya da üretici görseli); alt metin zorunlu; `<Image>` genişlik/yükseklik (kural 10) |
+| Görsel (isteğe bağlı) | Yazıya özgü (bugünkü dört konunun üçü aynı genel kurulum görselini kullanıyor — ikinci tur ölçümü; tekrar edilmez); hakkı belli (Design System varlığı ya da üretici görseli); alt metin zorunlu; `<Image>` genişlik/yükseklik (kural 10) |
 
 **Üslup:** sade Türkçe; SI birimleri (m³/h, Pa, kW); ondalık virgül; kısaltma ilk geçişte açılır.
-**Dil:** TR önce. `EN_YAYIN` kapalıyken (bugün `false`, EN ağacı `noindex`) **EN yazılmaz**: arama
-getirisi 0, doğrulama maliyeti tam. Bayrak açılınca EN ayrı yazılır, aynı doğrulamadan geçer; EN yoksa
+**Dil:** TR önce. `EN_YAYIN` kapalıyken (bugün `false`, EN ağacı `noindex`) **EN yazılmaz ve
+`/en/knowledge-hub` rotası üretilmez**: arama getirisi 0, doğrulama maliyeti tam. Bugünkü 5 EN bilgi
+merkezi adresi o süre EN kategori/destek karşılığına kalıcı yönlendirilir (R6). Bayrak açılınca EN ayrı yazılır, aynı doğrulamadan geçer; EN yoksa
 EN sayfa **yoktur** (başka dile düşme yasak, `vitrin-metni-standard.md` K10).
 **Yazar ve yapay zekâ açıklaması — AÇIK SORU (Recep):** yazı imzası Kurum (VentHub) + teknik sorumluluk
 notu olarak öneriliyor. Google'ın faydalı içerik rehberi "otomasyon/yapay zekâ kullanımı ziyaretçiye
@@ -214,9 +232,9 @@ Recep metni satır satır okumaz. Doğruluğu ajan düzeni taşır; Recep'e öze
 | 3a. Kapsam çıkarımı | Doğrulayıcı, **iddia tablosunu görmeden** | Metnin TAMAMINDAN kendi iddia listesi: gövde, tablo hücreleri, SSS, `<title>`, meta açıklama, JSON-LD `headline`, görsel alt metni, hesap örneği. Yazarın tablosuyla eşlenir; **eşlenmeyen iddia = 0** olmadıkça tur geçersiz |
 | 3b. Atıf betiği | belirlenimci betik (BLOG) | Sayı, birim, yüzde, "zorunlu", olumsuz fiil taşıyan her cümlede `[n]` var mı; listede olmayan `[n]` ya da kullanılmayan liste maddesi var mı |
 | 3c. Alıntı betiği | belirlenimci betik (BLOG) | Her alıntı ham kaynakta (R2.3) normalize edilerek aranır; bulunamayan = DESTEKSİZ. LLM bu adımı yapmaz |
-| 3d. Yargı | Doğrulayıcı alt ajan | Her iddia: DOĞRULANDI / DESTEKSİZ / ÇELİŞİYOR / BAYAT (alıntı var ama güncel değil). Birim/dönüşüm, sayının bağlamı (model mi seri mi), cümle içindeki **her iddia ayrı** (K4.1 vakası), olumsuz iddia için açık ifade |
-| 3e. Sabotaj kolu | BLOG, doğrulayıcı bilmeden | Her turda **en az 3 tuzak** eklenir (yanlış sayı, yanlış kaynak sayfası, bayat alıntı, desteksiz olumsuz iddia). Hepsi yakalanmadıkça tur **geçersiz** (emsal: `vitrin-metni-standard.md` K9.7) |
-| 3f. Örnekleme | BLOG | DOĞRULANDI satırlarından en az 3'ü BLOG tarafından ham kaynaktan yeniden açılır (`execution-method-standard.md` §4: alt ajan yargı vermez, örneklenir) |
+| 3d. Sınıflama | Doğrulayıcı alt ajan | Her iddia için öneri sınıfı: DOĞRULANDI / DESTEKSİZ / ÇELİŞİYOR / BAYAT (alıntı var ama güncel değil) + gerekçe. Birim/dönüşüm, sayının bağlamı (model mi seri mi), cümle içindeki **her iddia ayrı** (K4.1 vakası), olumsuz iddia için açık ifade, 3c'nin `INCELE` çevreleri. **Hüküm BLOG'dadır** (`execution-method-standard.md` §4: alt ajan yargı vermez) |
+| 3e. Sabotaj kolu | BLOG, doğrulayıcı bilmeden | Tuzaklar **metnin KOPYASINA** konur (asıl metin tuzaksız kalır; kopya ile asıl arasındaki farkın yalnız tuzak satırları olduğu betikle gösterilir). Her turda **en az 3 tuzak**; **en az biri** betiklerin yakalayamayacağı türden: alıntısı kaynakta birebir geçen ama bağlamı ya da güncelliği yanlış iddia (SSS vakası gibi). Hepsi yakalanmadıkça tur **geçersiz** (emsal: `vitrin-metni-standard.md` K9.7) |
+| 3f. Örnekleme | BLOG | DOĞRULANDI satırlarından en az 3'ü BLOG tarafından ham kaynaktan yeniden açılır. **Örneklenen satırlardan biri yanlışsa tur geçersizdir** |
 | 4. Düzeltme | BLOG | DESTEKSİZ / ÇELİŞİYOR / BAYAT satırlar düzeltilir ya da silinir; tuzaklar çıkarılır |
 | 5. İkinci tur | aynı doğrulayıcı | **Tüm metin** 3a'dan yeniden geçer (yalnız değişen satırlar değil: düzeltmede eklenen yeni iddia tabloya girmemiş olabilir) |
 
@@ -224,7 +242,8 @@ Recep metni satır satır okumaz. Doğruluğu ajan düzeni taşır; Recep'e öze
 
 Doğrulayıcı **Opus** alt ajanıdır (`execution-method-standard.md` §5.2: çürütme → opus). Ölçüm
 (2026-09-24, bu cetvelin v0.1 çürütmesi, aynı talimat iki kol): birleşik 29 gerçek bulgudan Opus 26,
-Fable 18; Fable bir bayat alıntıyı "birebir doğru" onayladı; Fable'ın birim fiyatı 2,5 kat. Fable yalnız
+Fable 18; Fable bir bayat alıntıyı "birebir doğru" onayladı; Fable'ın birim fiyatı 2,5 kat (girdi/çıktı
+10/50 $'a 4/20 $ /MTok, platform.claude.com fiyat sayfası ham HTML, BLOG ölçümü 2026-09-24). Fable yalnız
 ölçülmüş bir kaçırmadan sonra, gerekçesi yazılarak kullanılır.
 ⚠**Bağımsızlık model farkıyla değil yöntemle sağlanır:** aynı ölçümde farklı model (Fable) yazarla
 (Opus) **aynı** hatayı yaptı; farkı ham kaynağı kendisi çekmek yarattı. Bağımsızlık = ayrı bağlam +
@@ -249,7 +268,7 @@ sözüyle ve bu pencerede alınır; başka pencereden aktarılan söz onay sayı
 | Durum | Geçiş şartı | Kayıt |
 |---|---|---|
 | taslak | — | — |
-| doğrulandı | R5.3 tam | doğrulanan metnin **sha256**'sı + doğrulama raporu |
+| doğrulandı | R5.3 tam **ve** 3b/3c betik çıktıları kayıtlı (tablo gelince geçiş DB kısıtıyla bu kayda bağlanır — kapı yayın geçişindedir, yalnız CI'da değil) | **tuzaksız asıl** metnin sha256'sı + doğrulama raporu + betik çıktıları |
 | onaylı | Recep sözü; metnin sha256'sı doğrulananla **aynı** | onay kaydı (kim, ne zaman, hangi sha256) + `admin_audit_log` |
 | yayında | onaylı sha256 = yayına giden sha256 | `admin_audit_log` |
 
@@ -262,7 +281,18 @@ yayındaki sürümün yerine geçer; o ana kadar eski sürüm yayında kalır.
 Recep'e giden önizleme yalnız yönetici oturumuyla açılan, `force-dynamic` + `noindex` **ayrı bir
 rota**dır. Vitrin rotasına sorgu parametresi (`?onizleme=`) eklenmez: `searchParams` alan sayfa
 sessizce dinamikleşir (`rendering-cache-standard.md` §1.1). Dal önizlemeleri kapalıdır ve içerik
-zaten veritabanındadır; önizleme için ayrı dağıtım açılmaz.
+zaten veritabanındadır; önizleme için ayrı dağıtım açılmaz. Önizleme **revizyon kimliğini** ve metnin
+sha256'sının ilk 12 hanesini gösterir; Recep'in onayladığı metin doğrulananla aynı olmalıdır.
+
+### R5.7 Ara düzen — tablo ve rota gelene kadar (F4)
+
+Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü). İlk yazı beklemez; yayın bekler:
+- Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Linear REC-369 ekinde** tutulur
+  (özel; PUBLIC depo değil — R4.8).
+- Recep'e önizleme bağlantısı yerine R5.4 özeti + ekteki taslak + sha256'nın ilk 12 hanesi gider.
+- Onaylanan sha256, tablo geldiğinde yazının ilk revizyonu olarak yazılır; farklıysa akış baştan.
+- Bağımlı işler (sırasıyla, URUN): karar 92 rotası + rehber tablosu migration'ı (kural 13) → önizleme
+  rotası. Hepsi REC-369 altında izlenir (Linear aktif kayıt sınırı dolu, yeni kayıt açılmıyor).
 
 ## R6 — Yer ve teknik gereklilikler (uygulayan URUN)
 
@@ -277,13 +307,15 @@ girer. Bugünkü 10 adres (R0.1) kalıcı yönlendirmeyle taşınır; hedefsiz a
 | **Gövdenin tamamı sunucu HTML'inde** — istemci bailout işareti 0; mevcut `'use client'` `TopicPage` yeniden kullanılmaz; `tests/smoke/ssr-kurallari.ts`'e rehber kuralı | Bugünkü konu sayfalarında adım/hata listeleri sunucu HTML'inde boş, 2 bailout işareti (ölçüldü). "Bot ve ziyaretçi aynı HTML'i alır" ölçütü tek başına yetmez: ikisi de aynı eksik HTML'i alabilir |
 | Kanonik ve başlık yalnız RSC `generateMetadata`'dan; **tek** `<title>`; kendi `alternates`'ı (layout varsayılanına düşmez) | Bot karnesi (F1b, 2026-09-24): 28 adreste hreflang ana sayfaya düşüyor, 15 adreste iki `<title>` |
 | Gövde markdown; sunucuda, izin listeli etiketlerle render; ayrıştırıcı bağımlılığı `bagimlilik-kararlari.md`'ye satır; biçim tasarım token'larıyla (kural 8) | URUN ile netleşti; ayrıştırıcı bugün depoda yok |
-| JSON-LD: `Article` + `BreadcrumbList`; BreadcrumbList **tek kaynaktan** (`buildBreadcrumbJsonLd`) | Google: *"Article objects must be based on one of the following schema.org types: Article, NewsArticle, BlogPosting."* (ham HTML, "Last updated 2026-09-08"). `TechArticle` bu listede yok; schema.org'da Article'ın alt türüdür ve Google'ın alt türü kabul edip etmediği **ölçülmedi** — bu yüzden `Article`. Önerilen alanlar: `author`, `dateModified`, `datePublished`, `headline`, `image` |
+| JSON-LD: `Article` + `BreadcrumbList`; BreadcrumbList **tek kaynaktan** (`buildBreadcrumbJsonLd`) | Google: *"Article objects must be based on one of the following schema.org types: Article, NewsArticle, BlogPosting."* (ham HTML, "Last updated 2026-09-08"). `TechArticle` bu listede yok; schema.org'da Article'ın alt türüdür ve Google'ın alt türü kabul edip etmediği **ölçülmedi** — bu yüzden `Article`. Önerilen alanlar: `author` (`author.name` + `author.url` dahil), `dateModified`, `datePublished`, `headline`, `image` |
 | **`FAQPage` işaretlemesi konmaz** | Google SSS zengin sonucunu kaldırdı: *"This feature will no longer appear in Google Search starting May 7, 2026."* (developers.google.com/search/updates, ham HTML). SSS bölümü okuyucu için kalır |
 | Site haritasında her yayındaki yazı; `lastmod` = güncelleme tarihi; `alternates` yalnız iki dil de yayındaysa | Bugünkü `sitemap.ts` her satıra koşulsuz tr+en alternates yazıyor |
 | `hreflang` yalnız iki dil de varsa; kanonik adres tek | `canonical-url-standard.md` |
+| `EN_YAYIN` kapalıyken `/en/knowledge-hub` rotası üretilmez; bugünkü 5 EN bilgi merkezi adresi EN karşılığına kalıcı yönlendirilir; bayrak açılınca rota ve yönlendirme birlikte değişir | R3 dil kuralı; "404'e düşen adres 0" (R0.1) EN tarafında da geçerli |
+| Bağlantılar `useLocalizedRoutes` ile (`Routes`'a `bilgiMerkezi` girişi); elle `/tr/` eklenmez | CLAUDE.md kural 7 |
 | **Kiracı:** rota kiracıyı `DEFAULT_TENANT_ID`'den çözer (`headers()` değil); önbellek anahtarı `lang` **ve** `tenantId`; `UNIQUE (tenant_id, dil, slug)`; servis DI (kural 2) + `React.cache` (kural 6) | Kural 12; `headers()` rotayı sessizce dinamikleştirir (`rendering-cache-standard.md` §1.1) |
-| **Veri ve yetki:** yayındaki metin ile iç veri (iddia tablosu, doğrulama raporu, dizin kanıtı, onay kaydı) **ayrı tablolarda**; ziyaretçi rolü yalnız yayındaki metin tablosunu, yalnız `yayında` satırları okur; durum **dil başına**; yeni tablolarda `anon`/`authenticated` yazma yetkisi REVOKE; ziyaretçi rolüyle üç kollu test (yayındaki okunur · taslak okunmaz · yazma reddedilir) | RLS satırı süzer, sütunu süzmez (`vitrin-metni-standard.md` K1 dersi). Prod `public` şemasında yeni tablonun varsayılan yetkisi `anon=arwdDxtm` (ölçüldü, `pg_default_acl`) |
-| **Tazeleme, aynı PR'da:** `rendering-cache-standard.md` §3 tablosuna satır + tetik (`scripts/webhook_setup.sql`) + handler dalı + `revalidatePath('/sitemap.xml')`. **Ters yön:** yazıda görünen aile/kategori değişince yazı yolu da tazelenir (§3.1 sorusu) | INV-RENDER-2 tablo listesini §3 tablosundan okur; satırı olmayan yeni tabloyu **görmez** — "tablo gelince otomatik" DEĞİL |
+| **Veri ve yetki:** yayındaki metin ile iç veri (iddia tablosu, doğrulama raporu, dizin kanıtı, onay kaydı) **ayrı tablolarda**; ziyaretçi rolü yalnız yayındaki metin tablosunu, yalnız `yayında` satırları okur; durum **dil başına**; yeni tablolarda `anon`/`authenticated` yazma yetkisi REVOKE; ziyaretçi rolüyle üç kollu test (yayındaki okunur · taslak okunmaz · yazma reddedilir) | RLS satırı süzer, sütunu süzmez (`vitrin-metni-standard.md` K1 dersi). Prod `public` şemasında yeni tablonun varsayılan yetkisi `anon=arwdDxtm` (BLOG ölçümü, `pg_default_acl`, 2026-09-24). ⚠**Kural 7 sapması, bilerek:** kural 7 DB çevirilerini JSONB ister; dil başına durum gerektiği için (TR yayındayken EN taslağı sızmasın) metin **dil başına satır** tutulur. Sapma migration PR'ında gerekçesiyle yazılır |
+| **Tazeleme, aynı PR'da:** `rendering-cache-standard.md` §3 **ana** tablosuna satır (INV-RENDER-2 §3'ü ilk alt başlıkta keser) + tetik (migration **ve** `scripts/webhook_setup.sql`) + handler dalı + `revalidatePath('/sitemap.xml')`. **Ters yön:** yazıda görünen aile/kategori değişince yazı yolu da tazelenir (§3.1 sorusu) | INV-RENDER-2 tablo listesini §3 tablosundan okur; satırı olmayan yeni tabloyu **görmez** — "tablo gelince otomatik" DEĞİL |
 | Migration kural 13 (Recep onayı, URUN penceresi) | Migration merge = prod |
 
 ## R7 — Ölçüm (yayından sonra)
@@ -303,9 +335,16 @@ girer. Bugünkü 10 adres (R0.1) kalıcı yönlendirmeyle taşınır; hedefsiz a
 
 ### R8.1 Her kapı onu gerektiren PR'da doğar
 
-⚠Bugün bu cetveli zorlayan otomatik kapı **yok**. Kapılar "ilk yazıdan önce bir gün" kurulmaz: her kapı,
-koruduğu şeyi getiren PR'ın içinde doğar (kural 14) ve en az bir sabotaj koluyla kırmızı yandığı
-gösterilmeden kapı sayılmaz (`rendering-cache-standard.md` §3 dersi).
+Kapılar "ilk yazıdan önce bir gün" kurulmaz: her kapı, koruduğu şeyi getiren PR'ın içinde doğar
+(kural 14) ve en az bir sabotaj koluyla kırmızı yandığı gösterilmeden kapı sayılmaz
+(`rendering-cache-standard.md` §3 dersi). Bugün var olanlar: INV-REHBER-DENETIM-1 ve INV-REHBER-ALINTI-1
+(`scripts/rehber/__tests__/`, vitest `ci` işinde; betiklerin **kendi** doğruluğunu sınar).
+⚠**Betik testleri yazıyı denetlemez.** Yazının kendisi ancak yayın geçişi betik çıktısına bağlanınca
+(R5.5, tablo kısıtı) kapı altına girer; o güne kadar ara düzende (R5.7) betikler elle koşar ve çıktıları
+Linear ekine girer.
+⚠**Kapının koştuğu ortam:** DB kapıları (ziyaretçi rolü, durum ↔ sha256) prod'a değil **Supabase dalına**
+karşı koşar — tablo ancak merge'ten sonra prod'da olur. SSR kapısı yayında yazı yokken **fikstür yazıyla**
+koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil verir.
 
 | Kapı | Ne ölçer | Hangi PR'da doğar | Sahip |
 |---|---|---|---|
@@ -315,12 +354,12 @@ gösterilmeden kapı sayılmaz (`rendering-cache-standard.md` §3 dersi).
 | Vaat / rakip / fiyat deseni (R4.2, R4.3, R3) | "en iyi", "%100", "garanti"; rakip ad listesi (Linear'dan, depoya girmez); `₺ TL € EUR USD` + rakam = 0 | BLOG doğrulama betikleri PR'ı | BLOG |
 | Olumsuz iddia (R4.5) | olumsuz fiilli her cümle iddia tablosunda `tur = olumsuz` + açık alıntı | BLOG doğrulama betikleri PR'ı | BLOG |
 | Mevzuat (R4.6) | "zorunlu/yasaktır/yönetmelik" cümlesi → resmî kaynak + yürürlük tarihi | BLOG doğrulama betikleri PR'ı | BLOG |
-| Toplu üretim (R4.1) | 7 günde yayına geçen yazı sayısı > 2 → KIRMIZI; her yayında doğrulama + onay kaydı | migration PR'ı (onay kaydı) | URUN + BLOG |
+| Toplu üretim (R4.1) | 7 günde yayına geçen **yeni** yazı sayısı > eşik → KIRMIZI (revizyon sayılmaz; eşik Recep'in ritim tercihidir, öneri 2); her yayında doğrulama + onay kaydı | migration PR'ı (onay kaydı) | URUN + BLOG |
 | Durum ↔ sha256 (R5.5) | onaylı/yayında sha256 = doğrulanan sha256 | migration PR'ı | URUN |
 | Ziyaretçi rolü (R6) | yayındaki okunur · taslak okunmaz · yazma reddedilir · iç tablo okunmaz | migration PR'ı | URUN |
 | Sunucu HTML (R6) | bailout 0; gövde ifadeleri sunucu HTML'inde | rota PR'ı (`ssr-kurallari.ts`) | URUN |
 | JSON-LD + site haritası (R6) | `Article` + `BreadcrumbList` tek; haritada; FAQPage yok | rota PR'ı | URUN |
-| Tazeleme (R6) | §3 satırı + tetik + handler + sitemap dalı | migration PR'ı (INV-RENDER-2 satırı okur) | URUN |
+| Tazeleme (R6) | §3 satırı + tetik + handler; **site haritası dalı için INV-RENDER-2'de ayrı kol** (bugün testte "sitemap" 0 kez geçiyor — ikinci tur ölçtü) | migration PR'ı | URUN (+ ALTYAPI kol) |
 | Önizleme (R5.6) | ziyaretçi rolüyle 401/404; `noindex` | rota PR'ı | URUN |
 | Bot karnesi | yazı adreslerinde hreflang/title/canonical/harita temiz | ALTYAPI kapıya bağlar | ALTYAPI |
 
@@ -336,8 +375,9 @@ biçim listesinin **yanlış pozitif ölçümüyle** birlikte kurulur.
 ## R9 — Ritim
 
 Orta yol: planlı üretim. Başlangıç önerisi **haftada bir yazı**, ilk dört yazının R7 ölçümü bitene
-kadar; sonra ölçüme göre artırılır. Üst sınır R8.1'deki toplu üretim kapısıdır (7 günde en fazla 2).
-Ritim Recep'in tercihidir; bu satır öneridir.
+kadar; sonra ölçüme göre artırılır. Üst sınır R8.1'deki toplu üretim kapısıdır (önerilen eşik 7 günde
+2 yeni yazı; revizyon sayılmaz). Karar 92 taşımasında eski konular **kaldırılıp yönlendirilir**, yeniden
+yazımları bu ritme girer. Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
 
 ---
 
@@ -354,6 +394,8 @@ Kaynak sınıfı (`hukum-kaynak-standard.md`): **A** = BLOG'un kendi ölçümü 
 | 2026-09-24 | F1b bot karnesi (BLOG, 45 adres × 5 kimlik) | A | 45/45 adreste beş kimlik aynı HTML; 32 adreste sorun (hreflang düşüşü 28, iki title 15, varsayılan başlık + canonical yok 13) |
 | 2026-09-24 | Google belgeleri, ham HTML (BLOG) | A | Article türleri Article/NewsArticle/BlogPosting · SSS zengin sonucu 2026-05-07'de kaldırıldı · spam politikası alıntıları birebir · Indexing API yalnız JobPosting/BroadcastEvent |
 | 2026-09-24 | v0.1 çürütmesi, iki kol (Fable 5.1 / Opus 5.5) | A | Birleşik 29 gerçek bulgu: Fable 18, Opus 26, ortak 15; Fable 1 bayat alıntı onayı. v0.2'ye işlendi. Raporlar `docs/audits/rec369-rehber-cetveli-red-team-2026-09-24.md` ve `…-opus-2026-09-24.md` |
+| 2026-09-24 | v0.2 dar ikinci tur (Opus) | A | KOŞULLU: 35 kalem → 20 karşılandı, 14 kısmen, 1 bilinçli ret; yeni 4 yüksek (tuzak ↔ sha256, İÇ-DİZİN sınıfı, kapı yayın geçişinde değil, F4 ara düzeni yok) v0.3'e işlendi; v0.2'nin R0.1 olgusu yanlıştı (sayılar görünmüyor, listeler boş). Rapor `…-tur2-2026-09-24.md` |
+| 2026-09-24 | Alıntı betiği canlı (BLOG) | A | Cetvelin 5 Google alıntısı: GECTI 2 · INCELE 3 · KALDI 0; bayat SSS alıntısı yol değişikliğiyle yakalandı; bayatlık kelimesi olağan cümlede de işaret verdi (ayırt etmez) |
 
 ⚠**v0.1'de bu cetvelin kendisi R2'yi çiğnedi:** SSS alıntısı özetleyici araçla "ölçüldü" diye yazıldı ve
 bayattı (R2.3 vakası). Kuralı yazmak onu uygulamak değildir; bu sürümün de her olgusal cümlesi aynı
