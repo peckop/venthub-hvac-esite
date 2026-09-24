@@ -55,8 +55,9 @@ function yorumsuz(metin: string): string[] {
     kod = kod.replace(/\/\*.*?\*\//g, '')
     const bas = kod.indexOf('/*')
     if (bas !== -1) { kod = kod.slice(0, bas); blokta = true }
-    // `//` yalnız satır başında ya da boşluktan sonra yorumdur; `https://` dizgede kalır.
-    return kod.replace(/(^|\s)\/\/.*$/, '$1')
+    // Şema-güvenli (INV-SCRUB-1 kanonik biçim): iki noktadan sonraki `//` yorum değildir,
+    // `https://…?select=purchase_price` dizgede kalır.
+    return kod.replace(/(?<!:)\/\/.*$/, '')
   })
 }
 
