@@ -202,7 +202,9 @@ const RATCHETS: Ratchet[] = [
     // Lighthouse ölçümü). `industrial-gray` token'ına geçti, aynı zeminde 9,9:1. Yani
     // ham gri borcunun bu satırı, bir ERİŞİLEBİLİRLİK kusuruydu — token'a geçmek ikisini
     // birden kapattı. Kazanç yan ürün değil, tam olarak hedefti.
-    tavan: 1456,
+    // 2026-09-24 · 1456 -> 1452: REC-285 — altbilgideki dört sahte sosyal bağlantı
+    // (platform ana sayfalarına gidiyordu) kaldırıldı; `text-gray-300` ×4 gitti. Kazanç yan ürün.
+    tavan: 1452,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },

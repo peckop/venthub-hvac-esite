@@ -1,4 +1,10 @@
+import type { Metadata } from 'next'
 import React, { Suspense } from 'react'
+
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
+import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
+import { Routes } from '@/utils/routes'
 
 import { satisKipiOku } from '../../../lib/kip/satisKipi'
 import OdemeKapaliBilgi from '../../../views/checkout/OdemeKapaliBilgi'
@@ -30,6 +36,19 @@ import CheckoutPage from '../../../views/CheckoutPage'
  * RSC: bu sayfa Server Component'tir, `satisKipiOku()` sunucuda koşar ve istemciye YALNIZ
  * hangi bileşenin render edildiği gider — anahtarın kendisi, kaynağı ve damgası sızmaz.
  */
+/** İşlem yüzeyi: dizin dışı (bot karnesi 2026-09-24: bu sayfa dizine AÇIKTI); gerekçe `cart/page.tsx`'te. */
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  const dict = lang === 'en' ? en : tr
+  return sayfaUstVerisi({
+    lang,
+    yol: Routes.checkout(),
+    baslik: `${dict.checkout.title} | VentHub`,
+    aciklama: dict.meta.siteDesc,
+    dizinDisi: true,
+  })
+}
+
 export default async function Page() {
   const kip = await satisKipiOku()
 
