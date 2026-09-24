@@ -162,10 +162,14 @@ test('karar 104 · 09-01 teklifi yönetici ekranından fiyatlanır ve yayımlan�
   const yayimDugmesi = satir.getByRole('button', { name: /^(Teklif Verildi olarak işaretle|Mark as Quoted)$/ })
   await expect(yayimDugmesi, 'yayım düğmesi görünmedi').toBeVisible({ timeout: 20_000 })
   await yayimDugmesi.click()
-  // Ekranın verdiği bildirim de kanıttır (başarı ya da düşme sebebi); kişisel veri içermez.
+  // Ekranın verdiği bildirim de kanıttır (başarı ya da düşme sebebi). YALNIZ teklif ekranının kendi
+  // sabit metinleri basılır: aynı anda başka bir bildirim (ör. yeni sipariş uyarısı) müşteri adı taşıyabilir.
+  const TEKLIF_BILDIRIMI =
+    /^(Teklif durumu güncellendi: .{1,30}|Teklif durumu güncellenemedi|Teklif göndermeden önce .+ girin|Quote status updated: .{1,30}|Could not update quote status|Before sending the quote, .+ date)$/
   const bildirim = page.locator('[data-sonner-toast]').last()
   await bildirim.waitFor({ state: 'visible', timeout: 20_000 }).catch(() => undefined)
-  kanit(`[K104] ekran bildirimi: ${(await bildirim.textContent().catch(() => null)) ?? 'YOK'}`)
+  const metin = ((await bildirim.textContent().catch(() => null)) ?? '').trim()
+  kanit(`[K104] ekran bildirimi: ${metin === '' ? 'YOK' : TEKLIF_BILDIRIMI.test(metin) ? metin : 'teklif disi bildirim (basilmadi)'}`)
 
   await expect.poll(async () => (await olc(db)).durum, { message: 'teklif yayımlanmadı', timeout: 30_000 }).toBe('quoted')
   const sonra = await olc(db)
