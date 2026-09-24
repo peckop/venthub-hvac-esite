@@ -1,3 +1,6 @@
+'use client'
+
+// İstemci sınırı BURADA: rota üst veri yazdığı için Server Component (bot karnesi 2026-09-24).
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'

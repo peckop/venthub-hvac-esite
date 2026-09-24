@@ -162,6 +162,12 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
   dönüşü YOK, görünürlükten önce betiği koş; (2) **self-hosted runner KULLANMA** — public
   repoda fork PR'ı yabancı kodu makinede çalıştırır; (3) `permissions:` bloğu yazıyorsan
   `contents: read` yine ZORUNLU (varsayılanlar düşer, checkout "Repository not found" verir).
+- **Worktree `node_modules` (karar 88, 2026-09-23):** her worktree **kendi** kurulumunu yapar:
+  `pnpm install --frozen-lockfile --offline` (pnpm sabit bağlantı kullanır → disk maliyeti ~0, ölçüldü;
+  kilit dosyası değişmemeli). Ana depoya **junction/symlink ile paylaşım YASAK** — 09-23'te `git worktree remove`
+  junction'dan geçip ana deponun node_modules'unu sildi. Eski bağlantı varsa önce YALNIZ bağlantı kaldırılır
+  (`cmd //c "rmdir <yol>"`, `/s` YOK), ana deponun `.bin`'i doğrulanır. Özyinelemeli silmeyi
+  `silme-baglanti-kapisi` kancası dışa giden bağlantı varken durdurur.
 - **Git kancaları (2026-08-15):** `pre-commit` artık **bloklamaz** — hızlı, çevrimdışı,
   uyarı-only (companion dosyası var mı diye bakar, LLM skoruna DEĞİL). Companion üretimi
   `post-commit`te arka planda (log: `.git/orion-doc.log`). Yedekler: `*.oncesi-2026-08-15`.

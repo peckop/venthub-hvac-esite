@@ -153,6 +153,12 @@ export const formatSpecValue = (key: string, value: unknown): string => {
  * //   other: { label: 'Diğer Özellikler', icon: [Function: Settings], specs: {} }
  * // }
  */
+/**
+ * Adıyla elektrik grubuna giren anahtarlar (REC-172 tur 2). Alt dize kuralı bunları yakalamıyor ve
+ * genişletilemez: `efficiency` isı geri kazanım verimini, `class` yalıtım sınıfını da çekerdi.
+ */
+const ELEKTRIK_ANAHTARLARI = new Set(['motor_efficiency_class', 'electrical_protection_class'])
+
 export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | undefined) => {
   if (!specs) return null;
 
@@ -187,7 +193,7 @@ export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | unde
       groups.performance.specs[key] = value;
     } else if (k.includes('size') || k.includes('weight') || k.includes('width') || k.includes('height') || k.includes('depth') || k.includes('dim_')) {
       groups.physical.specs[key] = value;
-    } else if (k.includes('voltage') || k.includes('power') || k.includes('hz') || k.includes('absorbed') || k.includes('current') || k.includes('phase')) {
+    } else if (ELEKTRIK_ANAHTARLARI.has(k) || k.includes('voltage') || k.includes('power') || k.includes('hz') || k.includes('absorbed') || k.includes('current') || k.includes('phase')) {
       groups.electrical.specs[key] = value;
     } else {
       groups.other.specs[key] = value;
