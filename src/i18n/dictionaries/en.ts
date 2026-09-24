@@ -853,7 +853,16 @@ export const en: typeof tr = {
     cookieTitle: 'Cookie Policy (Draft)',
     distanceSalesTitle: 'Distance Sales Agreement (Draft)',
     preInformationTitle: 'Pre-Information Form (Draft)',
-    termsTitle: 'Terms of Use (Draft)'
+    termsTitle: 'Terms of Use (Draft)',
+    // Page metadata (meta description) — see tr.ts.
+    seo: {
+      kvkk: 'Clarification text on the processing of personal data under Turkish Law No. 6698 (KVKK).',
+      privacy: 'How personal data is collected, used and protected on the VentHub website.',
+      cookie: 'Cookies used on the VentHub website and how to manage cookie preferences.',
+      terms: 'Terms of use of the VentHub website.',
+      distanceSales: 'Distance sales agreement for purchases made through VentHub.',
+      preInformation: 'Pre-information form provided to the consumer before a distance sale.',
+    }
   },
   footer: {
     quickLinks: 'Quick Links',
@@ -1981,6 +1990,14 @@ export const en: typeof tr = {
     home: {
       subtitle: 'Quickly find the information you need.',
       warrantyDesc: 'Warranty coverage and authorized service',
+    },
+    // Page metadata (meta description) — see tr.ts.
+    seo: {
+      faqTitle: 'Frequently Asked Questions',
+      faq: 'Frequently asked questions about quotes, payment and installation, with answers.',
+      shipping: 'Information on delivery times, shipping costs and shipment tracking.',
+      returns: 'Right of withdrawal, return conditions and how to request a return.',
+      warranty: 'Warranty coverage and authorized service information.',
     },
     returns: {
       title: 'Returns & Exchanges',
