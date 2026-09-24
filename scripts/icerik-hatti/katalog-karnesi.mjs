@@ -20,6 +20,11 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { fiyatDizini } from './fiyat-kaynak-esle.mjs'
 import { fiyatBoslukSatirlari, boslukOzeti, BOSLUK_BASLIK } from './fiyat-bosluk.mjs'
+import { gorselSozlesmesi, DONMUS_FOTO_WEBP } from './gorsel-sozlesme.mjs'
+
+// --kapi: karne bir sayaçtır; bu bayrakla GÖRSEL SÖZLEŞMESİ kırmızıysa çıkış 1 (REC-209,
+// product-image-standard §7 veri kapısı). Bayraksız koşum eskisi gibi yalnız raporlar.
+const KAPI = process.argv.includes('--kapi')
 
 // Fiyat boşluk satırı (REC-209 C) kaynak dizinini okur; dizin yoksa satır "ölçülmedi" der, diğer
 // satırlar etkilenmez (karne bir sayaçtır, kapı değil — katalog-sayim cetveli).
@@ -53,7 +58,7 @@ async function hepsi(t, sec) {
 // REC-383 (REC-140 Faz 3): liste/maliyet alanları products'ta DEĞİL, admin-yalnız product_costs'ta.
 // Her ürünün maliyet satırı olmalı (products INSERT tetiği yaratır); eksik satır = sessiz "fiyat yok"
 // demek olurdu → karne ÜRETİLMEZ (fail-closed).
-const urunHam = await hepsi('products', 'id,sku,name,brand,name_i18n,description_i18n,technical_specs,category_id,subcategory_id,family_id,model_code')
+const urunHam = await hepsi('products', 'id,sku,name,brand,status,tenant_id,name_i18n,description_i18n,technical_specs,category_id,subcategory_id,family_id,model_code')
 const maliyet = new Map((await hepsi('product_costs', 'id,product_id,purchase_price,purchase_currency')).map(m => [m.product_id, m]))
 const maliyetsiz = urunHam.filter(u => !maliyet.has(u.id))
 if (maliyetsiz.length) { console.error(`⛔ ${maliyetsiz.length} ürünün product_costs satırı YOK (ör. ${maliyetsiz.slice(0, 3).map(u => u.sku).join(', ')}) — KARNE ÜRETİLMEDİ (fail-closed)`); process.exit(1) }
@@ -61,7 +66,7 @@ const urun = urunHam.map(u => ({ ...u, purchase_price: maliyet.get(u.id).purchas
 const kategori = await hepsi('categories', 'id,name,metadata,description')
 const aile = await hepsi('product_families', 'id,name,slug,name_i18n,description')
 const fiyat = await hepsi('product_prices', 'id,product_id')
-const gorsel = await hepsi('product_images', 'id,product_id')
+const gorsel = await hepsi('product_images', 'id,product_id,tenant_id,path,alt,sort_order')
 
 const dolu = (v) => v != null && v !== '' && !(typeof v === 'object' && Object.keys(v).length === 0)
 const alanSayisi = (x) => Object.keys(x.technical_specs || {}).length
@@ -76,6 +81,8 @@ const bosKategori = [...kategorideUrun.values()].filter(n => n === 0).length
 const fiyatliIdler = new Set(fiyat.map(f => f.product_id))
 const fiyatliUrun = fiyatliIdler.size
 const gorselliUrun = new Set(gorsel.map(g => g.product_id)).size
+const gs = gorselSozlesmesi(urun, gorsel)
+const gsIhlal = Object.entries(gs.ihlal).filter(([, v]) => v.length).map(([a, v]) => `${a} ${v.length} (ör. ${v.slice(0, 3).join(', ')})`)
 
 // Fiyat boşluğu: fiyat satırı olmayan ürün × liste fiyatı × kaynak sayfası. YAZMAZ, fiyat değeri basmaz.
 let boslukSatir = ['Fiyat satırı OLMAYAN ürün', urun.length - fiyatliUrun, 'kaynak dizini yok — durum dağılımı ÖLÇÜLMEDİ']
@@ -100,7 +107,9 @@ const satir = [
   ['EN açıklaması olan ürün', urun.filter(u => dolu(u.description_i18n?.en)).length + ' / ' + urun.length, 'description_i18n.en'],
   ['Fiyat satırı olan ürün', fiyatliUrun + ' / ' + urun.length, `product_prices ${fiyat.length} satır`],
   boslukSatir,
-  ['Görseli olan ürün', gorselliUrun + ' / ' + urun.length, `product_images ${gorsel.length} kayıt`],
+  ['Görseli olan ürün', gorselliUrun + ' / ' + urun.length, `product_images ${gorsel.length} kayıt · görselsiz AKTİF ${gs.aktif_gorselsiz.length}`],
+  ['Görsel sözleşmesi ihlali', gs.ihlal_toplam + (gs.mandal_asildi ? ' ⛔' : ''),
+    (gsIhlal.join(' · ') || 'yok') + ` — foto.webp ${gs.foto_webp}/${DONMUS_FOTO_WEBP} (donmuş istisna, yukarı çıkamaz)`],
   ['TR metni olan kategori', kategori.filter(c => dolu(c.metadata?.description_i18n?.tr)).length + ' / ' + kategori.length, 'metadata.description_i18n.tr'],
   ['BOŞ kategori (ürünü yok)', bosKategori + ' / ' + kategori.length, '⚠ category_id VEYA subcategory_id — vitrinin yolu'],
   ['TR metni olan aile', aile.filter(a => dolu(a.description?.tr)).length + ' / ' + aile.length, 'description.tr'],
@@ -113,4 +122,8 @@ if (process.argv.includes('--json')) {
   console.log(`KATALOG KARNESİ — ${new Date().toISOString()}\n`)
   for (const [ad, deg, not] of satir) console.log(`  ${ad.padEnd(32)} ${String(deg).padStart(12)}   ${not}`)
   console.log(`\n  Her satır kendi ölçüt yolunu yazar. Yol değişirse SAYI DEĞİŞİR — kıyaslamadan önce yola bak.`)
+}
+if (KAPI && gs.kirmizi) {
+  console.error(`⛔ GÖRSEL SÖZLEŞMESİ KIRMIZI: ihlal ${gs.ihlal_toplam}${gs.mandal_asildi ? ` · foto.webp ${gs.foto_webp} > ${DONMUS_FOTO_WEBP}` : ''}`)
+  process.exit(1)
 }
