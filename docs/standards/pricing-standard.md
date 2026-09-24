@@ -153,16 +153,21 @@ aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzd
     da içerir; istemci düğmesi ya da doğrudan PostgREST yazımı atlatamaz.
   - **Maliyet yönü:** iskonto ya da kur değişince beklenen maliyet artabilir ve **mevcut** fiyat zarara düşebilir; bu
     yönde fiyat tablosuna yazım olmadığı için yukarıdaki tetik ateşlenmez. `product_costs` AFTER INSERT/UPDATE tetiği
-    ürünün aktif fiyat satırlarını kontrol eder; zarardaki satır için davranış **Recep'in ticari kararıdır** (aşağıda soru).
-    Karar gelene kadar varsayılan: satır pasifleşir, ürün "Teklif Alın"a düşer (zararına satış yapılmaz), olay denetim
-    izine ve rapora düşer. `product_costs`'u kimin ne zaman tazelediği `rendering-cache-standard.md`'ye kaydedilir.
+    ürünün aktif fiyat satırlarını kontrol eder. **Recep kararı (2026-09-24):** zarardaki satır pasifleşir, ürün "Teklif
+    Alın"a düşer — *"zararına satış tehlikelidir, olmaz"*; olay denetim izine ve rapora düşer. `product_costs`'u kimin ne
+    zaman tazelediği `rendering-cache-standard.md`'ye kaydedilir.
+  - **Bilinçli istisna (aynı karar):** *"ben bilerek yaparsam o ayrı."* Yönetici, elle-ezme satırında (`is_derived=false`)
+    açık bir **zarar onayı** verirse (onay bayrağı + gerekçe metni zorunlu, onaylayanın kimliği ve zaman denetim izine
+    yazılır) o satır iki yönde de korumadan geçer. Onaysız hiçbir yol — materialize, bayi/segment kuralı, doğrudan
+    yazım — zararına fiyat yazamaz. Onay yalnız o satıra aittir; ürünün maliyeti yeniden değişirse onay düşer ve satır
+    yeniden denetlenir.
 - **K7 · Gizlilik ve iz.** İskonto ve beklenen maliyet **ticari sırdır.**
   - Beklenen maliyet `products`'a KONMAZ; admin-only RLS'li ayrı tabloda durur (öneri `product_costs`), anon ve
     authenticated tablo grant'i `revoke` edilir.
   - Politikalar **kiracı koşulu + rol** taşır: `tenant_id = jwt_tenant_id() AND is_user_admin()` (kural 12).
     `is_user_admin()` yalnız admin ve super_admin'i kabul eder; fiyat paneli moderatöre de açık olduğundan moderatör
-    maliyeti **boş** görür. Panel bu boşluğu "sıfır" değil "yetki yok" diye ayrı gösterir. Moderatörün maliyeti görüp
-    görmeyeceği **Recep'e sorulacak ticari karar**.
+    maliyeti **boş** görür. Panel bu boşluğu "sıfır" değil "yetki yok" diye ayrı gösterir. **Recep kararı
+    (2026-09-24): moderatör iskontoyu ve maliyeti GÖRMEZ** — fiyatı görür, kârı görmez.
   - `supplier_discounts`, `product_costs` ve `pricing_rule` tablolarına `denetim_izi_yaz()` tetiği (INSERT/UPDATE/DELETE)
     — iz istemciye (`mutateWithAudit`) bırakılmaz.
   - PUBLIC depoya, pakete (bayi sürümü), panoya, konsola **gerçek oran ya da tutar** girmez; örnekler varsayımsal ve adsızdır.
@@ -220,21 +225,25 @@ CREATE TABLE supplier_discounts (
 - **B2:** CHECK sabotajları — boş zincir, 2B zincir, `{150}`, `{-20}`, NULL halka, 5 halka, `{0}`, boş kaynak, çelişik
   kapsam reddedilir (v2 CHECK'i 2026-09-24'te 9 girdiyle salt SELECT'le sınandı: doğru).
 - **B3:** anon ve admin olmayan authenticated `supplier_discounts` ve `product_costs`'u okuyamaz, tabloya doğrudan yazamaz.
-- **B4:** zarar sabotajı — doğrudan upsert ve `is_derived=false` satırı **yazılmaz** (dönen satır 0); maliyet yönünde
-  zarara düşen fiyat Recep kararındaki davranışı gösterir.
+- **B4:** zarar sabotajı — doğrudan upsert ve onaysız `is_derived=false` satırı **yazılmaz** (dönen satır 0); zarar
+  onaylı elle satır yazılır ve denetim izinde onaylayanla görünür; maliyet yönünde zarara düşen fiyat pasifleşir
+  (ürün "Teklif Alın"), onaylı satır pasifleşmez ama maliyet değişince onayı düşer.
 - **B5:** RPC — aynı kapsamda örtüşen tarih reddedilir; iki eşzamanlı çağrıdan biri kazanır; kapanış `valid_from − 1`.
 - **B6:** her iskonto ekle/kapat için `admin_audit_log`'da DB tetiği satırı var.
 
-**Recep'e gidecek ticari sorular (içerikleriyle, numarasız):** iskonto tedarikçide marka marka mı, tek oran mı
-değişiyor; bayi fiyatları liste eksi yüzde mi, maliyet artı yüzde mi kurulacak; moderatör alış iskontosunu görebilir mi;
-maliyet arttığı için zarara düşen mevcut fiyat "Teklif Alın"a mı düşsün, yoksa satış sürüp yalnız uyarı mı versin.
+**Recep'in cevapladığı ticari sorular (2026-09-24):** zarara düşen fiyat → "Teklif Alın" (bilinçli elle istisna hariç,
+K6); moderatör maliyeti görmez (K7). **Açık kalanlar** (iskonto rakamları gelince sorulur, Recep: *"şimdinin konusu
+değil"*): iskonto tedarikçide marka marka mı, tek oran mı değişiyor; bayi fiyatları liste eksi yüzde mi, maliyet artı
+yüzde mi kurulacak.
+
+**Faz B zamanlaması:** Recep kararıyla Faz B, tedarikçiden iskonto rakamları gelince açılır; o güne kadar park.
 
 **Bağlı kayıtlar:** fiyatların otomatik tazelenmemesi (vitrin 15 Ağu kurunda) → REC-182 (onarım); `products` maliyet
 kolonlarının ziyaretçi okuma yetkisi şüphesi → REC-140 (ALTYAPI, öncelikli); `create-migration` skill'inin 8 haneli ad
 örneği → ALTYAPI.
 
 **Faz A'nın başlama şartı:** yukarıdaki A1a/A1b ölçütleri + bağımsız denetimin Faz A için verdiği KOŞULLU hükmün
-koşulları (bu bölümde karşılandı). **Faz B'nin başlama şartı:** ticari soruların cevabı + yeniden plan-challenger.
+koşulları (bu bölümde karşılandı). **Faz B'nin başlama şartı:** iskonto rakamlarının gelmesi + açık kalan iki ticari sorunun cevabı + yeniden plan-challenger.
 
 ---
 
