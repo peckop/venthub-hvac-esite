@@ -14,13 +14,14 @@ DESIGN-KATALOG sözleşme v1 (Linear P-REC-11 yorumları 2026-09-10 07:11Z / 07:
 | `alt_metin` | gorseller.csv | `product_images.alt` | **1146 / 1146** |
 | `fiyat` | fiyatlar.csv | `product_prices.net_price` (KDV hariç) | **1044 / 1044** |
 | `brut_fiyat` | fiyatlar.csv | `product_prices.gross_price` (KDV dahil) | **1044 / 1044** |
-| `kdv` | fiyatlar.csv | kaynak fiyat sayfasının beyanı — **kaynak dizininden** | **0 / 1044** |
+| `kdv` | fiyatlar.csv | kaynak fiyat sayfasının beyanı — **kaynak dizininden** | **1029 / 1044** (09-23, §7) |
 | `ust_kategori` | urunler.csv | `category_id` → ad | **442 / 442** |
 | `alt_kategori` | urunler.csv | `subcategory_id` → ad; yoksa BOŞ (köke düşmez) | **434 / 442** |
 | `birim` | teknik-ozellikler.csv | `alan-etiket-sozlugu.json` | **3311 / 5168** |
 | `baslik_tr` | teknik-ozellikler.csv | `tr.ts` → `pdp.specs` (müşterinin ürün sayfasında gördüğü ad) | **5119 / 5168** |
 
-Aynı PR'da açılan ek iki kolon: `kaynak_fiyat_eur`, `fiyat_kaynak_sayfa` — ikisi de **0 / 1044**.
+Aynı PR'da açılan ek iki kolon: `kaynak_fiyat_eur`, `fiyat_kaynak_sayfa` — ikisi de **0 / 1044**
+(09-22); 09-23'te ikisi de **1029 / 1044** (§7).
 
 ⚠`birim` / `baslik_tr`'nin dosyası Design yorumunda açık yazmıyor; "teknik-ozellikler 9+2" sayımından
 okundu. Design'a tek soru soruldu (P-REC-11, 2026-09-22 10:29Z).
@@ -86,7 +87,38 @@ yazılır. Denenmemiş satırlar ALTYAPI ölçümüyle güncellenir.
 
 ## 6 · Açık kalan
 
-- `kdv` · `kaynak_fiyat_eur` · `fiyat_kaynak_sayfa` doldurma = fiyatın kaynak eşlemesi (ayrı adım).
+- ~~`kdv` · `kaynak_fiyat_eur` · `fiyat_kaynak_sayfa` doldurma~~ → **yapıldı 2026-09-23, §7.**
 - Yazma kolu (upsert / sil-yaz, `tenant_id` eşleme) = karar 36 ile birlikte Recep'e (OPS hükmü); PIM geçerse
   yazma yönü PIM köprüsü olur, iki yazıcı olmaz.
 - Görsel DOSYALARI bu ölçümde indirilmedi (`--gorsel-atla`); görsel bağı (1146 satır) ölçüldü.
+
+## 7 · Fiyatın kaynak eşlemesi (2026-09-23)
+
+Araç: `scripts/icerik-hatti/fiyat-kaynak-esle.mjs` (saf; test `__tests__/fiyat-kaynak-esle.test.ts`, uydurma
+fiyatla). Paket üreticisi onu çağırır; kaynak dizini yoksa **durur** (`--fiyat-kaynaksiz` bilinçli kaçış).
+Kaynak: kaynak dizinindeki **tek** fiyat belgesi — AVenS 2026 fiyat listesi (bütün markaların alış fiyatı).
+
+| ölçüm (348 fiyatlı ürün × 3 liste = 1044 satır) | ürün |
+|---|---|
+| listede bulundu | **343** |
+| … kod tablodan | 305 |
+| … kod metinden, tablo satırıyla birebir doğrulanmış (STORM/JET: tabloda KOD sütunu düşmüş) | 27 |
+| … aynı kod listede farklı fiyatla iki kez — ürün ADINA göre tek geçiş seçildi | 11 |
+| listede yok (16076–16080 dikdörtgen kanal fanları; kod 58 belgenin hiçbirinde yok) | 5 |
+| bulunan değer **DB alış fiyatından farklı** | **2** (DAN-80101, VRT-11528) |
+
+KDV: dolu 1029 hücrenin hepsi `hariç %20` — sayfanın kendi beyanı ("Fiyatlarımıza %20 KDV dahil değildir.").
+İki koşum bayt-eşit; `paket-csv-dogrula` SIFIR FARK. Fiyat değerleri bu belgeye YAZILMAZ (depo PUBLIC);
+farklar paketteki `fiyat-kaynak-farklari.csv`'de (git'e girmez).
+
+**İki fark, iki ayrı sebep:**
+- DAN-80101: AVenS listesinde **80101 kodu iki üründe** (FC-51 0,37 kW ve FC101 0,75 kW). DB'deki ürün adı
+  FC-51, alış fiyatı ise FC101 satırınınki — kod çakışması DB'ye yanlış fiyat taşımış. Fiyat değişikliği
+  Recep kararı; bu iş yazmaz.
+- VRT-11528 (QE 60/35 LL T): listede tek geçiş, değer DB'den farklı. Sebebi ölçülmedi.
+
+**AVenS listesindeki kod çakışmaları (13 kod):** 11903 · 12828 · 43151 · 43153 · 43154 · 43155 · 43156 · 43157 ·
+43158 · 43159 · 43161 · 80101 · 80102 — aynı kod farklı ürün ve fiyatla. `avens-sorular` §6'ya yazıldı.
+
+⛔ `kaynak_fiyat_eur` = AVenS **alış** fiyatı (maliyet). Paket iç ana kopyadır (K13); bayiye verilecek bir
+sürüm üretilirse bu kolon o sürümde çıkarılmalıdır.
