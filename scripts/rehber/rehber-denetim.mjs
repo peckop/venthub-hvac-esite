@@ -6,7 +6,7 @@
  * denetlenmiyordu; K2 not deseni JS'e birebir taşınınca `\mTODO\M` sessizce ölüyordu (ölçüldü: false).
  * Bu modül LLM'e bırakılmaması gereken, belirlenimci kısmı yapar: numara ↔ kaynak listesi eşleşmesi,
  * numarasız iddia cümlesi, vaat/fiyat/not/rakip desenleri, olumsuz ve mevzuat cümlelerinin iddia
- * tablosunda türüyle yer alması, R3 kalıbının zorunlu bölümleri.
+ * tablosunda türüyle yer alması, R3 kalıbının zorunlu bölümleri, site içi bağlantının kimlikle yazılması.
  *
  * Ağa, DB'ye, diske ÇIKMAZ (saf fonksiyonlar). CI kapısı yalnız bu modülü çalıştırır (ALTYAPI şartı,
  * 2026-09-24). Ağlı alıntı doğrulaması `alinti-dogrula.mjs`'tedir.
@@ -176,6 +176,37 @@ export function kalipDenetle(md) {
   return kirmizi
 }
 
+// ─── iç bağlantı (R3) ──────────────────────────────────────────────────────────
+/**
+ * Site içi bağlantı metne düz adresle yazılmaz, KİMLİKLE yazılır: `[metin](vh:<tür>/<anahtar>)`.
+ * Sayfa üretilirken kimlik güncel adrese çözülür (URUN rota işi, Routes yardımcıları).
+ * NİÇİN (2026-09-24, Recep: "URL değişirse sorun olmaz mı?"): adres ağacı tek yayında değişecek
+ * (ürün/aile/kategori önekleri Türkçeleşiyor). Düz adres yazan yazı kırılmaz — eski adres 308 verir —
+ * ama her tıklama bir yönlendirme durağından geçer ve yazı eski adresi kalıcı taşır.
+ * Anahtarlar: model = SKU (adreste kalıcı), kategori = kanonik EN slug (CLAUDE.md kural 7),
+ * aile = URUN rota işinin belirleyeceği kalıcı kimlik (aile adres metni değişiyor, karar 86).
+ */
+export const KIMLIK_TURLERI = ['model', 'aile', 'kategori', 'marka', 'hesaplayici', 'sayfa']
+const SITE = /^https?:\/\/(?:www\.)?venthub\.com\.tr(?:[/?#]|$)/i
+
+export function icBaglantiDenetle(govde) {
+  const kirmizi = []
+  for (const m of govde.matchAll(/\]\(\s*([^)\s]+)[^)]*\)/g)) {
+    const h = m[1]
+    if (/^vh:/i.test(h)) {
+      const k = h.match(/^vh:([a-z]+)\/([a-z0-9][a-z0-9._-]*)$/)
+      if (!k || !KIMLIK_TURLERI.includes(k[1])) kirmizi.push({ sinif: 'IC-KIMLIK-BICIMI', ayrinti: `${h} (beklenen vh:<${KIMLIK_TURLERI.join('|')}>/<anahtar>)` })
+    } else if (SITE.test(h) || !/^(?:https?:|mailto:|tel:|#)/i.test(h)) {
+      kirmizi.push({ sinif: 'IC-ADRES-DUZ', ayrinti: `${h} → site içi bağlantı kimlikle yazılır: [metin](vh:<tür>/<anahtar>)` })
+    }
+  }
+  // Köşeli parantezsiz çıplak site adresi de düz adrestir
+  for (const m of govde.matchAll(/(?<!\]\()\bhttps?:\/\/(?:www\.)?venthub\.com\.tr[^\s)>\]]*/gi)) {
+    kirmizi.push({ sinif: 'IC-ADRES-DUZ', ayrinti: m[0] })
+  }
+  return kirmizi
+}
+
 // ─── denetimler ────────────────────────────────────────────────────────────────
 /**
  * Tek girişli denetim. Dönen `kirmizi` boşsa yazı bu modülün gördüğü her sınıfta temizdir —
@@ -230,6 +261,9 @@ export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
 
   // 5. R3 kalıbı (zorunlu bölümler; Kaynaklar yoksa zaten 1. adımda kırmızı — tekrar yazılmaz)
   for (const k of kalipDenetle(md)) if (!(k.sinif === 'ZORUNLU-BOLUM-YOK' && k.ayrinti === '`## Kaynaklar`')) kirmizi.push(k)
+
+  // 6. İç bağlantı kimlikle (R3; ağlı yarısı `ic-baglanti-denetle.mjs`)
+  kirmizi.push(...icBaglantiDenetle(taranan))
 
   return { kirmizi, ozet: { cumle: birimler.length, atif: kullanilan.size, kaynak: kaynaklar.size, olumsuz: olumsuzlar.length, mevzuat: mevzuatlar.length } }
 }
