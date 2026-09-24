@@ -362,6 +362,15 @@ export const tr = {
     siteDesc: 'Otopark jet fanı, hava perdesi, ısı geri kazanım cihazı ve kanal fanı çözümleri; mühendislik destekli ürün seçimi ve teknik danışmanlık.',
   },
 
+  // 404 sayfası (src/app/not-found.tsx). Next.js'in hazır sayfası İngilizce metin + ikinci bir
+  // <title> basıyordu (2026-09-24 canlı ölçüm: /tr/... adresinde iki başlık).
+  sayfaBulunamadi: {
+    baslik: 'Sayfa bulunamadı',
+    aciklama: 'Aradığınız sayfa taşınmış ya da kaldırılmış olabilir. Ürünlere göz atabilir ya da ana sayfaya dönebilirsiniz.',
+    anaSayfa: 'Ana sayfaya dön',
+    urunler: 'Ürünlere göz at',
+  },
+
   home: {
     seoTitle: 'VentHub | Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri',
     seoDesc: 'Doğru ürün, doğru hesap, doğru çözüm. Otopark havalandırmasından ısı geri kazanımına, mühendislik destekli seçim VentHub\'da.',
