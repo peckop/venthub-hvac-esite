@@ -65,6 +65,10 @@ describe('INV-CANLI-KANIT-1 · canlı yazım yalıtımı', () => {
     expect(kokAyar).toMatch(/testDir:\s*'\.\/e2e'/)
   })
 
+  it('e2e-smoke başlığı "adres canlı proje" gerçeğini yazıyor (yazılı değilse biri e2e/ altına yazan spec koyar)', () => {
+    expect(oku('.github/workflows/e2e-smoke.yml')).toMatch(/E2E_SUPABASE_URL` = CANLI proje/)
+  })
+
   it('canlı ayarda yeniden deneme yok, trace/video/ekran görüntüsü kapalı', () => {
     expect(ayar).toMatch(/retries:\s*0\b/)
     expect(ayar).toMatch(/trace:\s*'off'/)
