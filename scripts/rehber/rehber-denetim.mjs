@@ -6,7 +6,7 @@
  * denetlenmiyordu; K2 not deseni JS'e birebir taşınınca `\mTODO\M` sessizce ölüyordu (ölçüldü: false).
  * Bu modül LLM'e bırakılmaması gereken, belirlenimci kısmı yapar: numara ↔ kaynak listesi eşleşmesi,
  * numarasız iddia cümlesi, vaat/fiyat/not/rakip desenleri, olumsuz ve mevzuat cümlelerinin iddia
- * tablosunda türüyle yer alması.
+ * tablosunda türüyle yer alması, R3 kalıbının zorunlu bölümleri.
  *
  * Ağa, DB'ye, diske ÇIKMAZ (saf fonksiyonlar). CI kapısı yalnız bu modülü çalıştırır (ALTYAPI şartı,
  * 2026-09-24). Ağlı alıntı doğrulaması `alinti-dogrula.mjs`'tedir.
@@ -131,6 +131,51 @@ export const IC_NOT = new RegExp(
   'u',
 )
 
+// ─── kalıp (R3) ────────────────────────────────────────────────────────────────
+/**
+ * R3 kalıbının ZORUNLU bölümleri — başlık metni sabittir, eşleşme birebir başlıkla yapılır.
+ * NİÇİN (2026-09-24): ilk yazı iki doğrulama turundan geçti, onaya sunuldu; kalıptaki "fiyatı
+ * belirleyen etkenler" ve "teknik sorumluluk notu" yoktu ve bunu hiçbir kontrol görmedi — doğrulama
+ * iddiayı sınıyordu, kalıbı değil. Farkı OPS, emsal yazıyla (DEA) elle kıyaslarken buldu.
+ * Konuya uyan gövde bölümleri (nedir, montaj, bakım…) serbesttir; burada yalnız her yazıda
+ * bulunması gerekenler var.
+ */
+export const ZORUNLU_BOLUMLER = ['Fiyatı belirleyen etkenler', 'Sık sorulan sorular', 'Kaynaklar', 'Teknik sorumluluk notu']
+/** R3: sorumluluk notunun ilk cümlesi her yazıda aynıdır; ardından yazıya özgü uyarılar gelebilir. */
+export const SORUMLULUK_ILK_CUMLE =
+  'Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz.'
+export const SSS_ARALIGI = [5, 8]
+
+/** `## Başlık` → o başlıktan bir sonraki `## ` (ya da `# `) başlığına kadar olan metin. Yoksa null. */
+export function bolumMetni(md, baslik) {
+  const satirlar = md.replace(/\r\n/g, '\n').split('\n')
+  const i = satirlar.findIndex((s) => s.trim() === `## ${baslik}`)
+  if (i === -1) return null
+  const son = satirlar.findIndex((s, j) => j > i && /^#{1,2}\s/.test(s))
+  return satirlar.slice(i + 1, son === -1 ? undefined : son).join('\n')
+}
+
+/** R3 kalıp denetimi: zorunlu bölüm, tek H1, en az bir tablo, SSS sayısı, sorumluluk notunun sabit ilk cümlesi. */
+export function kalipDenetle(md) {
+  const kirmizi = []
+  const ekle = (sinif, ayrinti) => kirmizi.push({ sinif, ayrinti })
+  const metin = md.replace(/\r\n/g, '\n').replace(/^---\n[\s\S]*?\n---\n/, '')
+  const h1 = metin.split('\n').filter((s) => /^#\s/.test(s)).length
+  if (h1 !== 1) ekle('H1-SAYISI', `${h1} adet \`# \` başlığı (tam 1 olmalı)`)
+  for (const b of ZORUNLU_BOLUMLER) if (bolumMetni(metin, b) === null) ekle('ZORUNLU-BOLUM-YOK', `\`## ${b}\``)
+  if (!/^\|.*\|\s*\n\|?\s*:?-{3,}/m.test(metin)) ekle('TABLO-YOK', 'en az bir tablo (kıyas ya da boyutlandırma) zorunlu')
+  const sss = bolumMetni(metin, 'Sık sorulan sorular')
+  if (sss !== null) {
+    const n = sss.split('\n').filter((s) => /^###\s/.test(s)).length
+    if (n < SSS_ARALIGI[0] || n > SSS_ARALIGI[1]) ekle('SSS-SAYISI', `${n} soru (${SSS_ARALIGI[0]}–${SSS_ARALIGI[1]} olmalı)`)
+  }
+  const not = bolumMetni(metin, 'Teknik sorumluluk notu')
+  if (not !== null && !not.replace(/\s+/g, ' ').trim().startsWith(SORUMLULUK_ILK_CUMLE)) {
+    ekle('SORUMLULUK-NOTU-METNI', `ilk cümle sabit metin olmalı: "${SORUMLULUK_ILK_CUMLE}"`)
+  }
+  return kirmizi
+}
+
 // ─── denetimler ────────────────────────────────────────────────────────────────
 /**
  * Tek girişli denetim. Dönen `kirmizi` boşsa yazı bu modülün gördüğü her sınıfta temizdir —
@@ -182,6 +227,9 @@ export function denetle(md, { iddialar = [], rakipler = [] } = {}) {
   for (const c of olumsuzlar) if (!eslesen(c, 'olumsuz')) ekle('OLUMSUZ-IDDIA-TABLODA-YOK', c)
   for (const c of mevzuatlar) if (!eslesen(c, 'mevzuat')) ekle('MEVZUAT-IDDIA-TABLODA-YOK', c)
   for (const i of iddialar) for (const n of i.kaynak || []) if (!kaynaklar.has(n)) ekle('IDDIA-KAYNAGI-LISTEDE-YOK', `${i.metin} → [${n}]`)
+
+  // 5. R3 kalıbı (zorunlu bölümler; Kaynaklar yoksa zaten 1. adımda kırmızı — tekrar yazılmaz)
+  for (const k of kalipDenetle(md)) if (!(k.sinif === 'ZORUNLU-BOLUM-YOK' && k.ayrinti === '`## Kaynaklar`')) kirmizi.push(k)
 
   return { kirmizi, ozet: { cumle: birimler.length, atif: kullanilan.size, kaynak: kaynaklar.size, olumsuz: olumsuzlar.length, mevzuat: mevzuatlar.length } }
 }
