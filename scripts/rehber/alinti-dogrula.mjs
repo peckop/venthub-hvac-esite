@@ -39,9 +39,13 @@ export function htmlMetin(html) {
  */
 export function normalize(s) {
   return s
+    // PDF bitişik harfleri (ﬂ ﬁ ﬀ …) → düz harf: kaynak dizininde "ﬂow" U+FB02 ile geçiyordu (ölçüldü 2026-09-24).
+    .normalize('NFKC')
     // PDF satır sonu hecelemesi: "propor-\ntional" → "proportional" (kaynak dizini metni; ölçüldü 2026-09-24,
     // F4 araştırmasında 33 alıntının bir kısmı yalnız bu yüzden "yok" çıkıyordu). Yalnız küçük harf ↔ küçük harf.
     .replace(/(\p{Ll})-[ \t]*\r?\n[ \t]*(\p{Ll})/gu, '$1$2')
+    // Rakamdan sonra satır sonunda kırılan tireli bileşik: "3-\nphase" → "3-phase" (tire KALIR).
+    .replace(/(\p{N})-[ \t]*\r?\n[ \t]*(\p{L})/gu, '$1-$2')
     .replace(/[“”„"]/g, '"').replace(/[‘’']/g, "'").replace(/[–—‑]/g, '-')
     .replace(/\s+/g, ' ')
     .replace(/\s+([.,;:!?)])/g, '$1').replace(/([(])\s+/g, '$1')

@@ -67,6 +67,10 @@ describe('INV-REHBER-ALINTI-1', () => {
     expect(kotu).toMatchObject({ bulundu: false, sebep: 'PARCA-YOK' })
     expect(kotu.eksikParca).toEqual(['Three phase 380-480 V AC: 0.55-30 kW'])
   })
+  it('PDF bitişik harfi (ﬂ) ve rakamlı tireli kırılma normal yazımla eşleşir', () => {
+    expect(alintiBul('the air ﬂow is reduced', 'the air flow is reduced').bulundu).toBe(true)
+    expect(alintiBul('convert 3-\nphase AC voltage', 'convert 3-phase AC voltage').bulundu).toBe(true)
+  })
   it('bitişik "shielded/armored" parçalayıcı sayılmaz (boşluklu " / " değil)', () => {
     expect(alintiBul('Maximum motor cable length, shielded/armored 15 m', 'shielded/armored 15 m').bulundu).toBe(true)
   })
