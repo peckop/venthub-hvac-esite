@@ -271,6 +271,13 @@ export const en: typeof tr = {
     siteDesc: 'Car park jet fans, air curtains, heat recovery units and duct fans — engineering-led product selection and technical support.',
   },
 
+  sayfaBulunamadi: {
+    baslik: 'Page not found',
+    aciklama: 'The page you are looking for may have been moved or removed. You can browse our products or return to the home page.',
+    anaSayfa: 'Back to home',
+    urunler: 'Browse products',
+  },
+
   home: {
     seoTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
     seoDesc: 'The right product, the right calculation, the right solution. From parking ventilation to heat recovery — engineering-backed selection at VentHub.',
