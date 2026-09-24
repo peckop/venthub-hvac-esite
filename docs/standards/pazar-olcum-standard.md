@@ -38,6 +38,10 @@ yapılabiliyorsa neden ücret ödeyelim").
 
 ## P2 — Search Console kuralları (kol 1)
 
+- **Değişiklik öncesi taban:** adres ağacı, şablon ya da site haritası gibi arama görünürlüğünü etkileyen
+  bir yayından önce, **yayın günü** `scripts/rehber/gsc-taban.mjs` koşulur (90 gün, son 3 gün hariç;
+  sayfa×gün kırılımı dahil). Çıktı depoya değil Linear kaydına eklenir (P6). İlk taban 2026-09-24
+  (REC-369 eki); REC-300 adres yayını günü yenilenir.
 - **Veri gecikmesi:** Google'a göre veri normalde 2–3 günde gelir, son 2 günün verisi ön veridir
   (support.google.com/webmasters/answer/10083653). Haftalık koşu bu yüzden son 3 günü dışarıda bırakan
   7 günlük pencereyle yapılır.
