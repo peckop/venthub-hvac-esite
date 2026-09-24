@@ -14,8 +14,9 @@ başındaki adımları standartlaştırır.
 1. **Cetvel:** `docs/standards/migration-safety-standard.md` oku — plan bu cetvele atıf verir.
 2. **Plan + plan-challenger:** migration/veri göçü için plan-challenger ZORUNLUDUR
    (execution-method-standard). Önce plan yaz, `/plan-challenger` ile çürüttür, sonra dosya.
-3. **Adlandırma:** `supabase/migrations/YYYYMMDD_kisa_aciklama.sql` (bugünün tarihi; açıklama
-   snake_case Türkçe/İngilizce kısa).
+3. **Adlandırma:** `supabase/migrations/YYYYMMDDHHMMSS_kisa_aciklama.sql` — damga **14 hane** (UTC tarih+saat;
+   8 haneli `YYYYMMDD_` INV-MIGRATION-2 kapısında KIRMIZI verir, CLAUDE.md). Açıklama
+   snake_case, Türkçe/İngilizce, kısa.
 4. **İçerik kontrol listesi:**
    - İdempotent mi? (`IF NOT EXISTS` / `IF EXISTS`, tekrar koşulabilir)
    - RLS: yeni tabloya policy + **kolon grant'leri** birlikte (satır kapısı yetmez)
