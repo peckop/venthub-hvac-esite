@@ -328,7 +328,12 @@ sha256'sının ilk 12 hanesini gösterir; Recep'in onayladığı metin doğrulan
 Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü). İlk yazı beklemez; yayın bekler:
 - Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Linear REC-369 ekinde** tutulur
   (özel; PUBLIC depo değil — R4.8).
-- Önizleme (R5.4-1) rota gelene kadar **özel bir claude.ai sayfasıdır** (Artifact; varsayılan olarak
+- ⛔**Rota ve sayfa gelmeden Recep'e yayın onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
+  bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi). Yayına giremeyecek
+  metnin onayı karar değildir; "senden beklenen" diye sunulamaz. Ara önizleme yalnız **bilgi** içindir;
+  onay sorusu yazı gerçek sayfasında (R5.6) görülebildiğinde, tek soru olarak gider. Doğrulanmış metnin
+  sha256'sı o güne kadar değişmezse aynı metin gider.
+- Ara önizleme rota gelene kadar **özel bir claude.ai sayfasıdır** (Artifact; varsayılan olarak
   yalnız sahibine açık, arama motoruna kapalı — R4.8'i çiğnemez). Sayfa doğrulanan markdown'dan üretilir,
   sha256'nın ilk 12 hanesini gösterir; metin değişirse sayfa aynı adreste yeniden yayınlanır.
   ⚠Sitenin kendi bileşenleri değildir: yazı düzeni ve metin birebirdir, sayfa kabuğu (menü, alt bilgi,
