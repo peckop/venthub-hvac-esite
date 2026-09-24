@@ -682,7 +682,7 @@ merge 3 (docs)              ->  D   <- kapı A..D bakar, package.json GÖRÜR, B
 4. **Yoğun günlerde atlama oranı DÜŞER.** Kota planlaması bunu hesaba katmalı: sakin günün
    ölçümü yoğun günü tahmin etmez.
 
-## D15 — Dal kapısı: "yalnız üretim dalı dağıtsın" kuralı `vercel.json`'da YAZILAMAZ
+## D15 — Dal kapısı ve `vercel.json` dal haritası (09-08 "YAZILAMAZ" hükmü D15.4'te düzeltildi)
 
 **HÜKÜM:** Üretim dalı dışındaki her ref için derleme atlanır, ve bu kural
 `scripts/vercel-ignore-build.sh` içindeki **dal kapısında** yaşar — `vercel.json`'da değil.
@@ -737,6 +737,43 @@ kaynak → BUILD** · üretim dalı adı ortamdan gelir (iki yönlü).
 `vercel.json`'un **içeriğine** bakıyordu, **sonucuna** değil. Dosyada doğru dizeyi görüp yeşil
 yanıyordu, oysa kural hiç işlemiyordu. Sabotajla doğrulandı (2026-09-08): dal kapısının
 `exit 0`'ı kaldırıldığında iki kol kırmızı verdi, geri konunca 41/41 yeşil.
+
+### D15.4 — ÖNCÜL DÜZELTİLDİ (2026-09-23, ALTYAPI): dal önizlemeleri dal-kalıbıyla HİÇ oluşmaz
+
+**D15.1'in açık sorusu ÖLÇÜLDÜ:** iptal edilen dağıtım kaydı **kotaya sayılıyor**. 09-22 11:40Z
+→ 09-23 11:23Z arasında 96 dağıtım: **71 önizleme CANCELED** (dal kapısının iptalleri), 14 üretim
+READY, 2 üretim CANCELED. Tavan (Hobby: 100 / 86400 sn) 11:1xZ'de doldu; #1355'in önizlemesi
+"Deployment rate limited — retry in 24 hours" aldı. Dal kapısı derleme dakikasını kurtarıyor,
+**kotayı kurtarmıyor**.
+
+**Yukarıdaki "YAZILAMAZ" hükmü düzeltildi:** güncel Vercel belgesi (`project-configuration/git-configuration`)
+`deploymentEnabled` haritasında **minimatch kalıbı** tanır (`"internal-*": false` örneği). 09-08'deki
+`"*"` başarısızlığının açıklaması (çıkarım; kuralı getiren PR'ın kendisiyle ölçülür): minimatch'te
+`*` **`/` karakterini geçmez**, bizim dallarımız `altyapi/...` biçiminde. Kalıp bu yüzden önek + `/**`.
+
+**HÜKÜM:** `git.deploymentEnabled` her ölçülmüş dal öneki için `false` taşır (şerit dalları
+`altyapi/** urun/** urun-*/** ops/**` ve depodaki diğer tüm önekler; bot dalları `scribe-* jules-* …`).
+`"*"`/`"**"` YASAK (üretim dalını da kapatabilir, öncelik kuralı belgede yok); `master` haritada YOK
+→ varsayılan true. Kapı: INV-VERCEL-DAL-1 (`vercel-json-kapsam.test.ts`). **Yeni dal öneki** açan,
+onu aynı PR'da haritaya ekler; eklemezse o dal eskisi gibi kayıt açar, dal kapısı onu iptal eder
+(kota yer, derleme yakmaz).
+
+**Kabul ölçümü:** kuralı getiren PR'ın dalı (`altyapi/…`) kuralı taşır → o dalın commit'leri için
+Vercel'de dağıtım kaydı **oluşmamalı**. Oluşursa hipotez çürümüştür, kural geri alınır.
+
+**Bedeller (adıyla):**
+1. PR'larda Vercel kontrolü görünmez. Birleştirme ritüelinde Vercel çekirdek değil (türetilemez);
+   yokluğu madde 3'ü etkilemez.
+2. Önizleme adresi yok. Ölçüldü: hiçbir iş akışı önizlemeye bağlı değil (`deployment_status` tetiği
+   yok) ve önizlemeler SSO korumalıydı. **Elle görsel önizleme gerekirse:** dalın ağacında
+   `vercel deploy` (`--prod` YOK) — bilinçli, tek dağıtım; kotadan bir yuva yer.
+3. Derleme kırılması PR'da değil **master birleşmesinde** görünür; CI'daki `build:ci` Vercel'in
+   `next build`'iyle eşit değil. Kör nokta ayrı kayıtta: REC-381 (birleşme sonrası üretim dağıtım
+   sonucunu izleyen adım + eşitlik ölçümü).
+
+**Dal kapısı (ignore betiği) KALIR:** (a) haritada olmayan yeni önekler için derlemeyi hâlâ atlar;
+(b) master'da dosya-sınıfı atlaması derleme dakikası kurtarır — ama o da bir dağıtım KAYDI açar ve
+kotaya sayılır (D13).
 
 ## D16 — Vercel sonucunu okumadan "canlıda" denmez (üç gözlem, 2026-09-07)
 
