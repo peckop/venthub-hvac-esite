@@ -64,16 +64,21 @@ export default function CookieConsent() {
     setIsVisible(false)
   }
 
+  // ⭐MOBİLDE ALT KENARA OTURAN İNCE ŞERİT (REC-89, 2026-09-24). ÖLÇÜLDÜ (iPhone 13
+  // görünümü): kutu ekranın yaklaşık YARISINI kaplıyor, ana sayfanın iki düğmesini örtüyordu.
+  // Mobilde kenar boşluğu, simge ve büyük iç boşluk kalkar, metin bir kademe küçülür;
+  // masaüstü (md+) görünümü AYNEN korunur. Seçenekler ve metin değişmez — KVKK rızasının
+  // içeriği değil yalnız yerleşimi değişiyor.
   return (
     <div
-      className="fixed bottom-6 left-6 right-6 md:left-auto md:right-8 md:max-w-md z-toast animate-fadeInUp"
+      className="fixed bottom-0 left-0 right-0 md:bottom-6 md:left-auto md:right-8 md:max-w-md z-toast animate-fadeInUp"
       role="dialog"
       aria-live="polite"
       aria-label={t('cookieConsent.title')}
     >
-      <div className="glass-strong p-6 rounded-2xl shadow-2xl border border-white/10 cyan-glow flex flex-col gap-4 text-white">
+      <div className="glass-strong p-4 md:p-6 rounded-t-2xl md:rounded-2xl shadow-2xl border border-white/10 cyan-glow flex flex-col gap-3 md:gap-4 text-white">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0">
+          <div className="hidden md:block p-2 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -89,7 +94,7 @@ export default function CookieConsent() {
             <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">
               {t('cookieConsent.title')}
             </span>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">
+            <p className="text-xs md:text-sm text-slate-300 leading-relaxed font-medium">
               {t('cookieConsent.description')}
             </p>
           </div>
