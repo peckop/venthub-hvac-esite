@@ -1,7 +1,7 @@
 // Çağıran sınıfı: (b) sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { getTenantBranding } from '../_shared/tenant_config.ts'
+import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
 import {
   CallerConfigError,
   CallerLookupError,
@@ -253,7 +253,7 @@ async function sendEmail(to: string, message: string, template?: string, data?: 
 
   const subject = data?.subject || 'VentHub Bildirim'
   const finalMessage = template ? formatTemplate(template, data) : message
-  const from = config?.from || data?.emailFrom || 'VentHub <noreply@venthub.com>'
+  const from = config?.from || data?.emailFrom || VARSAYILAN_GONDERICI
   
   // notification-standard B3 katman 1: çağıran olay kimliğini (`data.idempotencyKey`, ör. `stok-ozet/<gün>/<küme>`)
   // verirse Resend aynı anahtarla gelen ikinci isteği yeni e-posta saymaz (24 sa). Anahtar yoksa davranış aynı.
