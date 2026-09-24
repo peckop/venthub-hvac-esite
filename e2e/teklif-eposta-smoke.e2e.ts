@@ -39,6 +39,10 @@ test.describe('REC-368 teklif formu → e-posta', () => {
 
     const ad = page.locator('#quote-request-contact-name')
     await expect(ad, 'misafir formu açılmadı (oturumlu kip e-postayı hesaptan alır — deneme misafir olmalı)').toBeVisible()
+    // 2026-09-24 ölçümü: form açıldıktan sonraki ilk ~300–800 ms içinde kendini BİR KEZ sıfırlıyor; o arada
+    // yazılan değerler siliniyor ve boş form hiçbir istek atmadan kalıyor (ilk GÖNDER koşumu böyle düştü).
+    // İnsan bu sürede yazamaz → müşteri etkisi yok; test ağ durulana kadar bekler ve basmadan önce değerleri doğrular.
+    await page.waitForLoadState('networkidle')
     await ad.fill('VentHub Otomatik Deneme')
     await page.locator('#quote-request-contact-phone').fill('05000000000')
     await page.locator('#quote-request-contact-email').fill(ALICI)
@@ -49,6 +53,10 @@ test.describe('REC-368 teklif formu → e-posta', () => {
 
     const gonder = page.getByRole('button', { name: 'Teklif Talebi Gönder', exact: true })
     await expect(gonder).toBeEnabled()
+    // Değerler basmadan önce HÂLÂ yerinde mi (sıfırlama geç gelirse kuru kip de kırmızı yanar, gönderim boşa gitmez).
+    await page.waitForTimeout(1500)
+    await expect(ad, 'form doldurulduktan sonra kendini sıfırladı').toHaveValue('VentHub Otomatik Deneme')
+    await expect(page.locator('#quote-request-contact-email')).toHaveValue(ALICI)
 
     if (!GONDER) {
       console.warn('KURU KİP: form hazır, gönder düğmesi etkin — BASILMADI (kayıt/e-posta yok)')
