@@ -82,6 +82,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/bash-write-guard.cjs\"",
             "statusMessage": "bash-write-guard"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/silme-baglanti-kapisi.cjs\"",
+            "statusMessage": "silme-baglanti-kapisi"
           }
         ]
       },
