@@ -1,5 +1,8 @@
-#!/usr/bin/env node
 /**
+ * ⚠Shebang (`#!/usr/bin/env node`) BİLEREK YOK: bu dosya testlerce içe aktarılır ve CRLF'li çalışma
+ * kopyasında vite-node shebang'ı söktükten sonra kalan `\r` SyntaxError verir (KATALOG ölçümü,
+ * 2026-09-09). Çalıştırma: `node scripts/seo/bot-karnesi.mjs`.
+ *
  * BOT KALİTESİ KARNESİ — canlı sitenin her sayfa türünü arama motoru ve yapay zekâ botu gözüyle ölçer.
  *
  * NİÇİN (REC-369 F1b, 2026-09-24): Recep "botlara yönelik kalitemiz doğru yolda mı" diye sordu. OPS'un spot
