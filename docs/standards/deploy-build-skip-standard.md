@@ -771,6 +771,19 @@ Vercel'de dağıtım kaydı **oluşmamalı**. Oluşursa hipotez çürümüştür
    `next build`'iyle eşit değil. Kör nokta ayrı kayıtta: REC-381 (birleşme sonrası üretim dağıtım
    sonucunu izleyen adım + eşitlik ölçümü).
 
+**Kabul ölçümü SONUCU (2026-09-24, ALTYAPI):** #1359 master'a girdi (07:24:59Z). Kotada 24 boş yer
+varken #1358'in dalı (`altyapi/ci-pg-kilitli`) update-branch ile master'ı aldı (07:29:37Z); iki bağımsız
+ölçümde (GitHub commit status + Vercel `list_deployments`) **0 kayıt**. Hipotez doğrulandı.
+
+**Açık liste unutulunca sızdı (aynı gün):** BLOG şeridi açıldı, `blog/**` haritada yoktu → #1362 önizleme
+açtı, dal kapısı iptal etti, kotadan yedi. Ders: şerit açılışı listeyi güncellemeyi hatırlamaz.
+**HÜKÜM (D15.4 eki):** haritanın ilk anahtarı `"*/**": false` — adında `/` geçen HER dalı kapatır
+(minimatch: `*` bir yol parçası, `/**` geri kalanı). `master` adında `/` YOK → kalıba hiç uymaz;
+öncelik sorusu doğmaz (`"**": false` + `"master": true` biçimi bu yüzden seçilmedi — çakışmada hangisinin
+kazandığı belgede yazmıyor, yanlışsa üretim durur). Açık önek listesi yedek olarak durur. Yalnız `/`
+içermeyen bot dalları (`jules-*` …) hâlâ tek tek yazılır. Kabul ölçümü: listede OLMAYAN bir önekle
+(`kalipdeneme/…`) açılan deneme dalında Vercel kaydı oluşmamalı.
+
 **Dal kapısı (ignore betiği) KALIR:** (a) haritada olmayan yeni önekler için derlemeyi hâlâ atlar;
 (b) master'da dosya-sınıfı atlaması derleme dakikası kurtarır — ama o da bir dağıtım KAYDI açar ve
 kotaya sayılır (D13).
