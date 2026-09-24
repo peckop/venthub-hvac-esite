@@ -74,5 +74,18 @@ Aşağıdaki ürünlerin teknik föyünü web'de bulamadık. **Föylerini gönde
 | Sulu batarya "DEBİ" sütunu | 750 … 5000 m³/h, "UYGUN MODEL" sütunuyla aynı sayı | Bu, bataryanın anma (tasarım) debisi mi, yoksa eşleştiği ısı geri kazanım cihazının debisi mi? |
 | QE-B kasa, K90 R ve K90 S metinleri | s.21'de iki satırın metni baştan kesik ("-ren TUM onaylı…", "Yangına dayanıklı K90 18017-3'e…") | Bu iki modelin tam teknik açıklaması (valf malzemesi dahil) nedir? |
 
+## 6. Aynı kodun iki farklı ürüne verilmesi (2026 fiyat listesi)
+
+Aşağıdaki kodlar listede **iki farklı ürün** için, farklı fiyatla geçiyor. Sipariş verirken kod tek başına
+hangi ürünün kastedildiğini göstermiyor. **Her ürünün doğru sipariş kodu nedir?**
+
+| Kod | Birinci geçiş | İkinci geçiş |
+|---|---|---|
+| 80101 | s.34 FC-51 - 220V - 0,37kW Frekans İnventörü | s.34 FC101PK75 0,75kW Frekans İnverteri (s.58'de de) |
+| 80102 | s.27 / s.36 FC-101 1,5kW Frekans Konvertörü (s.34, s.58'de de) | s.34 FC-51 - 220V - 0,55kW Frekans İnventörü |
+| 43151 · 43153 · 43154 · 43155 · 43156 · 43157 · 43158 · 43159 · 43161 | s.36 VORT QBK SAL KC EVO serisi | s.40 TORRETTE TR-A ATEX serisi |
+| 12828 | POT hız anahtarı — s.22, s.26, s.33, s.62'de dört geçiş | geçişlerin en az ikisi farklı fiyatlı |
+| 11903 | s.12 VORT NOTUS | s.52 DD 9/9 420W 1F 4P 3V - 6M0669 |
+
 ---
 Hazırlayan: VentHub katalog ekibi. Karşılaştırma tablosunun tamamı talep edilirse ayrıca iletilir.

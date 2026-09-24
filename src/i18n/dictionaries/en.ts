@@ -111,7 +111,14 @@ export const en: typeof tr = {
         'ducted-central-hrv': 'Ducted Central Units',
         'single-room-hrv': 'Single Room Units',
         'speed-controllers': 'Speed Controllers',
-        'water-coils': 'Water Coil Duct Heaters'
+        'water-coils': 'Water Coil Duct Heaters',
+        // REC-300 Faz 1-B: bound by the DB migration; the corrosion branch moves to a NEW key.
+        'corrosion-fans': 'Corrosion-Resistant Fans',
+        'plug-fans': 'Plug Fans',
+        'cabinet-fans': 'Cabinet Fans',
+        'unheated-curtain': 'Unheated Air Curtains',
+        'electric-curtain': 'Electrically Heated Air Curtains',
+        'spare-parts': 'Spare Parts and Sensors'
       }
     },
     viewAll: 'View all',
