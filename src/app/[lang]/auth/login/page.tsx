@@ -1,6 +1,25 @@
+import type { Metadata } from 'next'
 import React, { Suspense } from 'react'
 
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
+import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
+import { Routes } from '@/utils/routes'
+
 import LoginPage from '../../../../views/LoginPage'
+
+/** İşlem yüzeyi: dizin dışı; üst veri yine yazılır — gerekçe `cart/page.tsx`'te. */
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params
+  const dict = lang === 'en' ? en : tr
+  return sayfaUstVerisi({
+    lang,
+    yol: Routes.auth.login(),
+    baslik: `${dict.auth.loginTitle} | VentHub`,
+    aciklama: dict.meta.siteDesc,
+    dizinDisi: true,
+  })
+}
 
 export default function Page() {
   return (
