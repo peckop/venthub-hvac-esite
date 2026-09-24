@@ -209,6 +209,18 @@ teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81
    kart, **IndexNow listesi** (Y3 ek bulgu: iç yollardan değil), arama sonucu.
 3. **Model çözücü:** son `-p-` → SKU → model; büyük harf SKU → 308; slug metni yanlış → **308** (O1);
    `-p-` yok → aile; bulunamadı → takma ad → 308; yoksa 404; ağ hatası → unavailable.
+   **Seçili model SUNUCUDA çizilir (INV-MODEL-SSR-1, 2026-09-23 ek):** model rotası aile görünümüne
+   çözülen SKU'yu prop olarak verir; teknik tablo, başlık, görsel ve `og:*` o modelden üretilir.
+   Bugünkü `/tr/products/[slug]` `force-static` olduğu için `?sku=`'yu göremez ve **ailenin ilk
+   modelini** çizer (canlı ölçüm: `/tr/products/storm-serisi?sku=SEA-61143003` sunucu HTML'inde
+   STORM 10 değerleri; KATALOG buldu, OPS ölçtü; JS koşturmayan tarayıcılar ve paylaşım önizlemesi
+   yanlış modeli okur). "Mevcut görünümü çağır" bu kusuru yeni rotaya taşır; prop zorunludur.
+   **Kabul testi:** JS kapalı, en az 3 model (tek modelli aile, çok modelli ailenin ilk OLMAYAN modeli,
+   korozyon dalından bir model) → sunucu HTML'inde o modelin `rated_power_w` değeri var, ailenin ilk
+   modelinin farklı değeri yok; TR + EN. Faz 4 gezinme listesine de girer.
+   **Ara onarım yapılmaz (hüküm):** bugünkü rotada `searchParams` okumak `force-static`'i kaldırır →
+   39 aile × 2 dil sayfası her istekte veritabanından üretilir (Nano); zarar dizine girmiyor (canonical
+   aile adresi, JSON-LD 19 Product doğru), bedel kazançtan büyük. Yayın REC-212'den uzarsa yeniden tartılır.
 4. **Eski-adres haritası üreticisi** (`scripts/` değil `src/data/generated/` + üretim betiği; derleme
    öncesi adım) ve **middleware eşleyicisi**: yol + `?sku=` + dil → tek hedef; dilsiz yolda dil tespiti
    (bugünkü `detectLocale`) ile **tek 307**, dilli yolda **tek 308**; hedefte query yok. 13 dilsiz
@@ -252,7 +264,8 @@ teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81
 ### Faz 4 — Recep ön izleme kapısı (karar 68)
 Önizleme ya da yerel üretim paketi. Gezinme listesi: menü → her kök → 4 yeni dal (perde dalları pazar
 adıyla) → bir Casals ailesi → karar 86'dan iki aile (eski adres → yeni) → korozyon dalından bir model
-("asit-fani") → bir model TR + EN → eski adres örnekleri (`/category/fanlar` dilsiz, `/tr/category/fans`
+("asit-fani") → bir model TR + EN (çok modelli ailenin ilk olmayan modeli; teknik tablo o modelin,
+INV-MODEL-SSR-1) → eski adres örnekleri (`/category/fanlar` dilsiz, `/tr/category/fans`
 EN slug'lı, iki seviyeli eski dal, aile, `?sku=`, eski ürün slug'ı, VRT-253490106XN eski adresi, büyük
 harf SKU) **tek sıçramada** yeni adrese → arama önerisinden tık → EN kırıntıda `İ` yok → `/tr/cart`
 200. **"Gördüm, tamam" olmadan Faz 3-C merge edilmez.**

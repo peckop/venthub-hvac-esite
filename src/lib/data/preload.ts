@@ -3,6 +3,7 @@ import { cache } from 'react'
 import { getFamilyDetail, getSeriesLanding } from '@/lib/services/family.service'
 import { getProductBySlug } from '@/lib/services/product.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
+import { type CategorySlugSource, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
 import { mapDatabaseCategoryToDomain } from '../type-converters'
@@ -61,6 +62,58 @@ export const getCachedFamilySlugById = cache(async (familyId: string) => {
   if (error || !data) return null
   return data.slug
 })
+
+/**
+ * REC-300 Faz 1-A — eski slug → hedef kimliği (`url_takma_adlari`, DB tetiği doldurur).
+ * Rota kararı için: hata FIRLATILIR, `resolveProductRoute` onu `unavailable`a çevirir; yutulsaydı
+ * geçici bir RPC arızası "eski adres yok" → 404 olurdu. Kiracı süzgeci RPC'nin içinde
+ * (`jwt_tenant_id()`), anon statik istemci varsayılan kiracıyı çözer.
+ */
+export const getCachedTakmaAd = cache(async (tur: 'urun' | 'aile' | 'kategori', lang: string, slug: string) => {
+  const { data, error } = await supabase.rpc('url_takma_ad_coz', { p_tur: tur, p_dil: lang, p_eski_slug: slug })
+  if (error) throw error
+  return data ?? null
+})
+
+/** Takma adın gösterdiği ürün → SKU + aile. Silinmiş ürün hedef olamaz. Hata FIRLATILIR. */
+export const getCachedVariantById = cache(async (productId: string) => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('sku, family_id')
+    .eq('id', productId)
+    .is('deleted_at', null)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+  return data ?? null
+})
+
+/** Takma adın gösterdiği kategori → dile göre slug üretmek için yalnız `slug` + `metadata`. Hata FIRLATILIR. */
+export const getCachedCategorySlugSourceById = cache(async (categoryId: string) => {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('slug, metadata')
+    .eq('id', categoryId)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+  return data ?? null
+})
+
+/**
+ * Kategori slug'ı bulunamadığında eski adres tablosuna bakar; hedef varsa dile uygun bugünkü
+ * slug'ı, yoksa ya da hedef gelen slug'ın kendisiyse `null` döner (döngü yok). Hata FIRLATILIR —
+ * çağıran 404 basmadan önce bunu çağırır; ölçüm hatası 5xx olur, kalıcı yokluk beyanı değil.
+ */
+export async function eskiKategoriHedefi(slug: string, lang: string): Promise<string | null> {
+  const hedefId = await getCachedTakmaAd('kategori', lang, slug)
+  if (!hedefId) return null
+  const kaynak = await getCachedCategorySlugSourceById(hedefId)
+  const hedef = getLocalizedCategorySlug(kaynak as CategorySlugSource | null, lang)
+  return hedef && hedef !== slug ? hedef : null
+}
 
 export function preloadFamily(slug: string, lang: string) {
   void getCachedFamilyDetail(slug, lang)
