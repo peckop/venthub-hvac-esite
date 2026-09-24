@@ -6,7 +6,13 @@
 // artık ham fiyatı hiç ÇEKMEZ (INV-PRICE-1'in kaynaktaki karşılığı). Vitrin fiyatı
 // TÜRETİLİR: `display_price(products)` computed column'ı → `get_display_prices` RPC'si
 // → `displayPrice.service.ts`. Bu listelere `price` GERİ EKLEME.
-// `purchase_price` KALIR: o alış/liste fiyatıdır, fiyat motorunun girdisidir.
+
+// REC-140 (2026-09-24): `purchase_price`, `supplier_name` ve `warehouse_location` vitrin
+// listesinden ÇIKARILDI. VARIANT_DETAIL_COLUMNS vitrin sorgularının kümesidir (ana sayfa
+// RSC yükü, sepet, ürün seçici, sipariş detayı); alış fiyatı ana sayfa HTML'inde 12 kez
+// görünüyordu. Yönetici formu kendi listesini kullanır: ADMIN_PRODUCT_FORM_COLUMNS.
+// Vitrin listelerine maliyet/tedarikçi kolonu GERİ EKLEME — vitrin-maliyet-kolonu testi
+// kırmızı yanar.
 
 // F5-B D4 (2026-08-12): legacy kolonlar DROP edildi (description, image_url,
 // airflow_capacity, noise_level, pressure_rating, meta_title, meta_description,
@@ -16,7 +22,15 @@
 
 /** PDP ve tekil ürün okumaları — technical_specs dahil tam küme. */
 export const VARIANT_DETAIL_COLUMNS =
-  'id, name, brand, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description_i18n, family_id, stock_qty, low_stock_threshold, low_stock_override, technical_specs, created_at, updated_at, warehouse_location, supplier_name, purchase_price'
+  'id, name, brand, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description_i18n, family_id, stock_qty, low_stock_threshold, low_stock_override, technical_specs, created_at, updated_at'
+
+/**
+ * Yönetici ürün formu — vitrin kümesi + alış fiyatı. Form alış fiyatını okuyup geri
+ * yazar; bu kolon okunmazsa kaydedilen ürünün alış fiyatı 0'a ezilir. YALNIZ yönetici
+ * yüzeyi (RLS yazmayı zaten yöneticiye kısıtlar; okuma kısıtı DB tarafında ayrı iş).
+ */
+export const ADMIN_PRODUCT_FORM_COLUMNS =
+  'id, name, brand, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description_i18n, family_id, stock_qty, low_stock_threshold, low_stock_override, technical_specs, created_at, updated_at, purchase_price'
 
 /**
  * Liste/kart bağlamları — technical_specs taşınmaz (PS-041: spec'ler liste
