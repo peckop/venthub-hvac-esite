@@ -109,3 +109,19 @@ export const YENI_KABUK_GEZINMESI = false
  */
 export const EN_YAYIN = false
 
+/**
+ * ⭐K3-b ADRES ŞEMASI (REC-300 Faz 3) — DERLEME SABİTİ. `false` iken canlı adresler BUGÜNKÜ gibi.
+ *
+ * Plan: docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md §2 (hedef şema) + §5 Faz 3.
+ * Açıkken: `/tr/urunler` · `/tr/kategori/<kök>/<dal>` · `/tr/urun/<aile>` · `/tr/urun/<slug>-p-<sku>` ·
+ * `/tr/markalar/<marka>` (EN'de önek değişmez: `/en/products`, `/en/category`, `/en/brands`).
+ *
+ * TEK ÜRETİCİ: bütün adresler `src/utils/adresUret.ts`'ten çıkar; o fonksiyon bu bayrağa bakar. Faz 3
+ * alt PR'larında yüzeyler (canonical, hreflang, site haritası, JSON-LD, kırıntı, kart, arama) tek tek
+ * `adresUret`'e bağlanır — bayrak kapalı olduğu için her bağlama CANLIDA DEĞİŞİKLİK YAPMAZ.
+ *
+ * AÇMA (Faz 3-C, tek PR, geri dönüşsüz adım): yalnız Faz 4 ön izlemesinde Recep "gördüm, tamam"
+ * dedikten sonra (karar 68). Aynı PR eski-adres haritasını ve `next.config`'ten silinecek satırları taşır.
+ */
+export const ADRES_SEMASI_K3B = false
+
