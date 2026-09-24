@@ -66,13 +66,15 @@ tek-alan varsayımı bugünkü sessiz yanlışın kaynağıydı.
   (TL base→USD/EUR vitrin, canlı) **farklı sayılardır.** ⚠️ **Bilinen sapma:** bugün `currency_rates` tek
   satır kümesiyle her iki rolü de besliyor (rol ayrımı kolonu yok) — T010 ile `rate_role` eklenecek.
 
-### 2.1 Alış iskontosu zinciri — B tabanının girişi (TASLAK v2 · REC-55 v2 · 2026-09-24)
+### 2.1 Alış iskontosu zinciri — B tabanının girişi (TASLAK v3 · REC-55 v2 · 2026-09-24)
 
 > **Durum: TASLAK v2.** Recep'in isteği (2026-09-23): *"alış iskontosu girebileceğim değil mi? … iskonton şudur
 > dediklerinde ne yapacağız?"* v1 bağımsız plan-challenger'dan **BLOK** aldı (2026-09-24): teşhis kodla doğrulandı,
 > çözümün üç ayağı kırıktı (sıfır-fark ölçütü, maliyet kolonunun anon'a açılması, istemcide kalan zarar koruması).
-> v2 bu bulgularla yeniden yazıldı ve **yeniden çürütülür**; Faz B için plan-challenger ZORUNLU, merge Recep
-> onayıyla (kural 13). Kod URUN (fiyat motoru + admin ekranı), CLI ALTYAPI.
+> v2 ikinci denetimden **Faz A: KOŞULLU, Faz B: BLOK** aldı (16 düzeltmenin 7'si tam, 9'u kısmen karşılanmıştı; yeni
+> bulgular: zarar tetiğinin parti davranışı, canlı ölçütün koşulamaması, örtüşme yarışı, CI'da DB yokluğu). v3 bunları
+> karşılar. Faz B için plan-challenger yeniden ZORUNLU, merge Recep onayıyla (kural 13). Kod URUN (fiyat motoru + admin
+> ekranı), CLI ve canlı sonda ALTYAPI.
 
 **Bugün ölçülen (kod + canlı sayım; sayılar sabit değil, Faz A PR'ında sorguyla yeniden ölçülür):**
 
@@ -100,8 +102,13 @@ aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzd
 
 - **K1 · Satış tabanı listedir.** Motor `base = 'list_price'`i gerçekten uygular: satış = liste TL'si × (1 + marj).
   **Liste TL'sinin kaynağı:** Faz A'da `listInBase := products.cost_in_base` (bugünkü anlamıyla). `PricingProductInput`'a
-  ayrı `listInBase` alanı eklenir; `costInBase` adı B tabanına (beklenen maliyet) ayrılır. `PRODUCT_SCOPE_COLUMNS`,
-  `computePriceFromRule` ve kural formu (`base` alanı bugün sabit `'cost'`, düzenlenemiyor) birlikte güncellenir.
+  ayrı `listInBase` alanı eklenir. **Faz A'da `costInBase := products.cost_in_base` de aynen kalır** (B tabanı henüz
+  yok); iki girdi aynı sayıyı taşıdığı için kod ile kural verisi hangi sırayla yayına çıkarsa çıksın fiyat değişmez ve
+  `base='cost'` duran kural hiçbir ürünü "Teklif Alın"a düşürmez. `costInBase` Faz B'de beklenen maliyete bağlanır.
+  Güncellenecek yerler: `PRODUCT_SCOPE_COLUMNS`, `computePriceFromRule` ve **dört** çağıran — materialize, `resolvePrice`,
+  admin önizleme ve kural formunun kendi hesabı (`PricingRuleFormModal`, fiyat önizlemesi). Formda `base` düzenlenebilir
+  olur, yeni kural varsayılanı `list_price`; canlı kuralın `cost → list_price` çevrimi **form + `mutateWithAudit`** ile
+  yapılır (`pricing_rule`'da DB denetim tetiği Faz B'ye kadar yok; SQL ile yazım iz bırakmaz, YASAK).
   `cost_plus` + `list_price` birlikteliğinde `min/max_margin_abs` kelepçesi **beklenen maliyete** göre çalışır; beklenen
   maliyet yoksa kelepçe atlanır ve raporda sayılır.
 - **K2 · Liste ile maliyet ayrı alan.** Liste = A tabanı (`purchase_price` + `purchase_currency`, anlamı "liste");
@@ -113,32 +120,49 @@ aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzd
   ara yuvarlama YASAK (her halkada yuvarlama rastgele örneklerin ~%21'inde farklı sonuç verdi). Varsayımsal örnek:
   1.000 € liste, bir tedarikçinin "%30 + %10"u → 1.000 × 0,70 × 0,90 = **630 €** (toplam %37, %40 değil).
   En fazla 4 halka. *(Örnek oran uydurmadır; gerçek oranlar K7 gereği depoya girmez.)*
-- **K4 · Kapsam merdiveni — mevcut merdivenin içinde.** ürün > tedarikçi × marka > tedarikçi; eşleşme `scopeMatchesProduct`
-  ile yapılır, ikinci eşleştirici yazılmaz (INV-PRICE-7). Marka **`brand_id` FK** ile tutulur (metin değil, §8.3).
-  - **Ürün→tedarikçi köprüsü** Faz B'nin ön koşuludur (`products.supplier_id` FK ya da `product_suppliers`; çoklu
-    tedarikçide hangisi — karar Faz B planında). Köprü kurulana kadar "tedarikçi kapsamının eşleştirdiği ürün sayısı"
-    raporlanır (bugün 0); 0 iken tedarikçi kapsamlı satır girişi reddedilir.
+- **K4 · Kapsam merdiveni — mevcut merdivenin içinde.** ürün > tedarikçi × marka > marka > tedarikçi; eşleşme
+  `scopeMatchesProduct` ile yapılır, ikinci eşleştirici yazılmaz. `ScopedTarget`'a tedarikçi boyutu eklenir ve
+  INV-PRICE-7 bekçisi iskonto çözücüsünü de tarar. Marka **`brand_id` FK** ile tutulur (metin değil, §8.3).
+  - **Yalnız-marka satırı izinlidir** (tedarikçi NULL). Bugün tek tedarikçi döneminde "bütün Vortice %X" talimatı
+    böyle TEK satırdır; §8.3'teki "marka kapsamı vekildir" cümlesiyle aynı anlam. Ürün ürün satır gerekmez.
+  - **Ürün→tedarikçi köprüsü** (`products.supplier_id` FK ya da `product_suppliers`) ikinci tedarikçi geldiğinde gerekir;
+    kararı ayrı. Köprü yokken tedarikçi kapsamlı satır reddedilir ve "tedarikçi kapsamının eşleştirdiği ürün sayısı"
+    raporlanır (bugün 0).
   - **Tarih:** `valid_to` **kapsayıcıdır**; yeni satır girilince eski satırın `valid_to`'su `yeni.valid_from − 1` güne
     yazılır (üstüne yazılmaz). "Bugün" **İstanbul günüdür** (§8.2.1) — materialize'ın UTC günü (`todayIso`) bu işte düzeltilir.
-  - **Aynı kapsamda tarih örtüşmesi DB'de reddedilir** (BEFORE INSERT/UPDATE tetiği; `btree_gist` + `EXCLUDE` alternatifi
-    eklenti migration'ı ister). `priority` ile kırma yolu kullanılmaz: aynı kapsamda iki geçerli oran = veri hatası.
-- **K5 · İki maliyet ayrı.** *Beklenen* alış maliyeti (liste × zincir × **güncel** kur) marj görünürlüğü içindir;
-  *gerçekleşen* maliyet satınalmanın mal kabulünden gelir (`last_purchase_cost`, donmuş kur, §2 B). Marj beklenen
+  - **Tek yazma yolu: SECURITY DEFINER RPC** (`iskonto_tanimla`). Tek işlemde: kapsam anahtarına advisory lock alır,
+    aynı kapsamdaki açık satırı kapatır, yenisini ekler, örtüşme varsa reddeder. Kapsam karşılaştırması
+    `IS NOT DISTINCT FROM` ile (NULL kolonlar `=` ile hiç eşleşmez). Tabloya doğrudan INSERT/UPDATE grant'i yoktur;
+    böylece eşzamanlı iki giriş ve "kapat + ekle" arasında kalan yarım durum oluşamaz. `priority` ile kırma yolu
+    kullanılmaz: aynı kapsamda iki geçerli oran = veri hatası.
+- **K5 · İki maliyet ayrı.** *Beklenen* alış maliyeti (liste × zincir × kur) marj görünürlüğü içindir. **Kur, liste
+  TL'sinin kuruyla aynıdır** (`products.purchase_rate_to_base`): aksi hâlde satış tabanı 15 Ağu kuruyla, maliyet bugünkü
+  kurla hesaplanır ve aradaki fark (2026-09-24'te %0,93) sahte marj/zarar üretir. Kurların güncel tutulması REC-182'nin işi;
+  iki taban her zaman **aynı tazelemede** birlikte yenilenir.
+  *Gerçekleşen* maliyet satınalmanın mal kabulünden gelir (`last_purchase_cost`, donmuş kur, §2 B). Marj beklenen
   maliyetle gösterilir ve öyle etiketlenir. **Motorun gerçekleşen maliyeti kullanması** `purchasing-standard.md` §5.4'ün
   beş açılış şartına tabidir ve bu işin kapsamında DEĞİLDİR. fx_lock'lu kapsamda beklenen maliyet **tazelenmez**
   (W5'in `cost_in_base` kararıyla aynı).
-- **K6 · Zarar koruması DB'dedir.** `product_prices` üzerinde BEFORE INSERT/UPDATE tetiği (ya da tek yazma yolu olarak
-  SECURITY DEFINER RPC): net satış < beklenen maliyet (**kuruşa yuvarlanmış iki değer**) ise satır reddedilir. Kapsam
-  `is_derived=false` elle-ezme satırlarını da içerir; istemci düğmesi ya da doğrudan PostgREST yazımı atlatamaz.
-  - Beklenen maliyeti **olmayan** üründe (iskonto satırı yok) koruma atlanır — "beklenen = liste" alınmaz (marj %0 ve
-    kuruş yuvarlamasıyla bugün ~163/347 üründe yanlış alarm verirdi).
-  - Reddedilen satırda **eski fiyat korunur** (bayat-satır tasfiyesine girmez; ürün "Teklif Alın"a düşmez) ve materialize
-    raporunda `zarardan_durdurulan` sayacıyla adı/SKU'suyla görünür.
-  - Bayi/segment kuralları (§8) aynı tetikten geçer, maliyetin altına inemez.
+- **K6 · Zarar koruması DB'dedir, iki yönden.** Kuruşa yuvarlanmış net satış < kuruşa yuvarlanmış beklenen maliyet
+  = zarar. Beklenen maliyeti **olmayan** üründe (iskonto satırı yok) koruma atlanır — "beklenen = liste" alınmaz (marj %0
+  ve kuruş yuvarlamasıyla bugün ~163/347 üründe yanlış alarm verirdi).
+  - **Fiyat yazımı yönü:** `product_prices` BEFORE INSERT/UPDATE tetiği zararlı satırı **sessizce atlar** (`RETURN NULL`);
+    RAISE kullanılmaz, çünkü materialize 500'lük partileri tek upsert'le yazar ve bir red bütün partiyi düşürüp bayat-satır
+    tasfiyesini de durdururdu. Materialize upsert'ü `.select()` ile döner; **gönderilen − dönen = `zarardan_durdurulan`**
+    sayacı, adı/SKU'suyla rapora yazılır. Kapsam `is_derived=false` elle-ezme satırlarını ve bayi/segment kurallarını (§8)
+    da içerir; istemci düğmesi ya da doğrudan PostgREST yazımı atlatamaz.
+  - **Maliyet yönü:** iskonto ya da kur değişince beklenen maliyet artabilir ve **mevcut** fiyat zarara düşebilir; bu
+    yönde fiyat tablosuna yazım olmadığı için yukarıdaki tetik ateşlenmez. `product_costs` AFTER INSERT/UPDATE tetiği
+    ürünün aktif fiyat satırlarını kontrol eder; zarardaki satır için davranış **Recep'in ticari kararıdır** (aşağıda soru).
+    Karar gelene kadar varsayılan: satır pasifleşir, ürün "Teklif Alın"a düşer (zararına satış yapılmaz), olay denetim
+    izine ve rapora düşer. `product_costs`'u kimin ne zaman tazelediği `rendering-cache-standard.md`'ye kaydedilir.
 - **K7 · Gizlilik ve iz.** İskonto ve beklenen maliyet **ticari sırdır.**
   - Beklenen maliyet `products`'a KONMAZ; admin-only RLS'li ayrı tabloda durur (öneri `product_costs`), anon ve
     authenticated tablo grant'i `revoke` edilir.
-  - Okuma yetkisi ev deseniyle (`is_user_admin()`); moderatörün okuması **Recep'e sorulacak ticari karar**.
+  - Politikalar **kiracı koşulu + rol** taşır: `tenant_id = jwt_tenant_id() AND is_user_admin()` (kural 12).
+    `is_user_admin()` yalnız admin ve super_admin'i kabul eder; fiyat paneli moderatöre de açık olduğundan moderatör
+    maliyeti **boş** görür. Panel bu boşluğu "sıfır" değil "yetki yok" diye ayrı gösterir. Moderatörün maliyeti görüp
+    görmeyeceği **Recep'e sorulacak ticari karar**.
   - `supplier_discounts`, `product_costs` ve `pricing_rule` tablolarına `denetim_izi_yaz()` tetiği (INSERT/UPDATE/DELETE)
     — iz istemciye (`mutateWithAudit`) bırakılmaz.
   - PUBLIC depoya, pakete (bayi sürümü), panoya, konsola **gerçek oran ya da tutar** girmez; örnekler varsayımsal ve adsızdır.
@@ -165,35 +189,52 @@ CREATE TABLE supplier_discounts (
     AND 0 < ALL (zincir) AND 100 > ALL (zincir)),          -- boş, 2B, NULL, ≤0, ≥100 reddedilir
   CONSTRAINT kaynak_dolu CHECK (btrim(kaynak) <> ''),
   CONSTRAINT kapsam CHECK (
-    (product_id IS NOT NULL AND supplier_id IS NULL AND brand_id IS NULL)
-    OR (product_id IS NULL AND supplier_id IS NOT NULL)),  -- ürün satırı ya da tedarikçi[×marka] satırı
+    (product_id IS NOT NULL AND supplier_id IS NULL AND brand_id IS NULL)          -- ürün
+    OR (product_id IS NULL AND (supplier_id IS NOT NULL OR brand_id IS NOT NULL))), -- tedarikçi×marka / marka / tedarikçi
   CONSTRAINT tarih_sirasi CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
 -- product_costs(product_id, tenant_id, expected_cost_in_base numeric(14,4), discount_id, computed_at) — admin-only.
--- Her iki tablo: RLS açık, dört politika is_user_admin(), anon/authenticated grant revoke, denetim_izi_yaz tetiği.
--- Örtüşme tetiği (K4), zarar tetiği product_prices'ta (K6).
+-- Her iki tablo: RLS açık, politikalar tenant_id = jwt_tenant_id() AND is_user_admin(), anon/authenticated
+-- tablo grant'i revoke (supplier_discounts'a yazma yalnız iskonto_tanimla RPC'si), denetim_izi_yaz tetiği.
+-- iskonto_tanimla RPC (K4: advisory lock, kapat+ekle tek işlem, IS NOT DISTINCT FROM); zarar tetikleri (K6):
+-- product_prices BEFORE (RETURN NULL) + product_costs AFTER.
 -- cost_in_base YENİDEN ADLANDIRILMAZ (PostgREST fiyat select'lerini 400'ler; migration-safety yıkıcı sınıfı).
 -- Dosya adı 14 haneli damga (CLAUDE.md); create-migration skill'inin 8 haneli örneği bayat — AYRI KAYIT.
 ```
 
-**Bitti ölçütü (tek komut: `pnpm test -- --run pricing-supplier-discount`, INV-PRICE-9 adayı):**
+**Bitti ölçütü — iki koşum yeri, çünkü CI'da veritabanı yok:**
 
-- **A1 (Faz A):** aynı donmuş girdide (aynı `today`, aynı ürün satırları, dryRun) **eski motor ↔ yeni motor** çıktısı
-  birebir aynı. Cache ↔ cache karşılaştırılmaz: cache bugün motordan bağımsız sebeplerle farklı satır taşıyor
-  (arşivli ürünün bayat satırları + bir aktif üründe önceden farklı satırlar); bu istisnalar ölçümden önce sorguyla
-  sayılıp yazılır. `cost_in_base`'i boş ürünler Faz A'da da fiyatsız kalır (yeni fiyatlanan ürün = 0). Ölçüm süresince
-  "maliyet tazele" düğmesine basılmaz.
+*CI (tek komut `pnpm test -- --run pricing-supplier-discount`, INV-PRICE-9 adayı) — saf hesap ve metin:*
+
+- **A1a (Faz A, sentetik):** motorun ayrıştığı durumları sınayan fikstürler — `listInBase ≠ costInBase`, `base`'in üç
+  değeri, kelepçe açık/kapalı. Canlıda iki girdi aynı sayı olduğu için canlı karşılaştırma tek başına bunu kanıtlayamaz.
 - **B1:** K3 permütasyon özellik testi — rastgele liste × zincir sırası, 4 ondalıkta eşitlik; ara yuvarlama yok.
-- **B2:** CHECK sabotajları — boş zincir, 2B zincir, `{150}`, `{-20}`, NULL halka, 5 halka, boş kaynak, çelişik kapsam
-  reddedilir.
-- **B3:** anon ve authenticated (admin olmayan) `supplier_discounts` ve `product_costs`'u **okuyamaz**; yetki ziyaretçi
-  rolüyle doğrulanır.
-- **B4:** zarar tetiği sabotajı — doğrudan PostgREST upsert ve `is_derived=false` satırı da reddedilir; eski fiyat yerinde kalır.
-- **B5:** aynı kapsamda örtüşen tarih reddedilir; kapanış `valid_from − 1` gününe yazılır.
+- **B0:** migration metni sınavı — RLS açık, politikada kiracı koşulu, grant revoke, denetim tetiği, RPC dışında yazma yok.
+
+*Canlı sonda (ALTYAPI CLI, `BEGIN; SET LOCAL ROLE …; … ROLLBACK`, hiçbir şey kalıcı yazılmaz) — DB davranışı:*
+
+- **A1b (Faz A, canlı):** değişiklikten önce ve sonra materialize **dryRun'ın üç listedeki bütün satırlarının** dökümü
+  (yalnız `individual` örneği değil); iki döküm birebir aynı. PR'a **yalnız döküm hash'i ve satır sayısı** yazılır (fiyat
+  PUBLIC depoya girmez). Bilinen istisnalar (arşivli ürünün bayat satırları, önceden farklı satırlar, `cost_in_base`'i
+  boş ürünler) ölçümden önce sorguyla sayılır. Ölçüm süresince "maliyet tazele" düğmesine basılmaz.
+- **B2:** CHECK sabotajları — boş zincir, 2B zincir, `{150}`, `{-20}`, NULL halka, 5 halka, `{0}`, boş kaynak, çelişik
+  kapsam reddedilir (v2 CHECK'i 2026-09-24'te 9 girdiyle salt SELECT'le sınandı: doğru).
+- **B3:** anon ve admin olmayan authenticated `supplier_discounts` ve `product_costs`'u okuyamaz, tabloya doğrudan yazamaz.
+- **B4:** zarar sabotajı — doğrudan upsert ve `is_derived=false` satırı **yazılmaz** (dönen satır 0); maliyet yönünde
+  zarara düşen fiyat Recep kararındaki davranışı gösterir.
+- **B5:** RPC — aynı kapsamda örtüşen tarih reddedilir; iki eşzamanlı çağrıdan biri kazanır; kapanış `valid_from − 1`.
 - **B6:** her iskonto ekle/kapat için `admin_audit_log`'da DB tetiği satırı var.
 
 **Recep'e gidecek ticari sorular (içerikleriyle, numarasız):** iskonto tedarikçide marka marka mı, tek oran mı
-değişiyor; bayi fiyatları liste eksi yüzde mi, maliyet artı yüzde mi kurulacak; moderatör alış iskontosunu görebilir mi.
+değişiyor; bayi fiyatları liste eksi yüzde mi, maliyet artı yüzde mi kurulacak; moderatör alış iskontosunu görebilir mi;
+maliyet arttığı için zarara düşen mevcut fiyat "Teklif Alın"a mı düşsün, yoksa satış sürüp yalnız uyarı mı versin.
+
+**Bağlı kayıtlar:** fiyatların otomatik tazelenmemesi (vitrin 15 Ağu kurunda) → REC-182 (onarım); `products` maliyet
+kolonlarının ziyaretçi okuma yetkisi şüphesi → REC-140 (ALTYAPI, öncelikli); `create-migration` skill'inin 8 haneli ad
+örneği → ALTYAPI.
+
+**Faz A'nın başlama şartı:** yukarıdaki A1a/A1b ölçütleri + bağımsız denetimin Faz A için verdiği KOŞULLU hükmün
+koşulları (bu bölümde karşılandı). **Faz B'nin başlama şartı:** ticari soruların cevabı + yeniden plan-challenger.
 
 ---
 
