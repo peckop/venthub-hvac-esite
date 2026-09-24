@@ -3,8 +3,9 @@ import { join, relative, sep } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { ADMIN_PRODUCT_FORM_COLUMNS } from '@/components/admin/products/productForm.columns'
+
 import {
-  ADMIN_PRODUCT_FORM_COLUMNS,
   FAMILY_LIST_COLUMNS,
   VARIANT_DETAIL_COLUMNS,
   VARIANT_LIST_COLUMNS,
