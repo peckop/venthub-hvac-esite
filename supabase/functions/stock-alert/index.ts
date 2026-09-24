@@ -1,5 +1,6 @@
 // Çağıran sınıfı: (b) cron/sunucu→sunucu service_role + (a) oturumlu admin — resolveCaller kapısı
 import { getCorsHeaders } from '../_shared/cors.ts'
+import { teklifModundaMi } from './teklif_modu.ts'
 import { supabaseSayfaOkuyucu, tumSatirlar } from '../_shared/tum_satirlar.ts'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
@@ -31,7 +32,12 @@ interface Product {
   name: string
   stock_qty: number
   low_stock_threshold: number
+  family_id: string | null
+  /** Vitrin fiyatı — `display_price(products)` hesaplanan alanı (`get_family_detail`'in `price`'ı). */
+  display_price: number | string | null
 }
+
+const URUN_ALANLARI = 'id, name, stock_qty, low_stock_threshold, family_id, display_price'
 
 interface AlertRecipient {
   name: string
@@ -190,14 +196,22 @@ async function checkAllProducts(supabase: SupabaseClient) {
       supabase
         .from('products')
         // ⚠count SELECT çağrısına verilir; filtre zincirinin sonuna eklenirse sessizce yutulur.
-        .select('id, name, stock_qty, low_stock_threshold', secenek)
+        .select('id, name, stock_qty, low_stock_threshold, family_id, display_price', secenek)
         .filter('stock_qty', 'lte', enBuyukEsik),
     ),
     { ad: 'stock-alert/products' },
   )
 
-  const productsToAlert = allLowStock.filter(p => p.stock_qty <= (p.low_stock_threshold || VARSAYILAN_ESIK))
-  console.warn(`[JOB] Found ${productsToAlert.length} products requiring alerts`)
+  const esikAltinda = allLowStock.filter(p => p.stock_qty <= (p.low_stock_threshold || VARSAYILAN_ESIK))
+  // ── TEKLİF MODU EVRENDEN ÇIKAR (REC-376) ─────────────────────────────────────
+  // Teklif modundaki ürünün stoğu takip edilmez (müşteri "Teklif İste" görür, fiyat/stok yok).
+  // 2026-09-22: eşik altındaki 68 ürünün 68'i teklif modundaydı → günde 60 sahte "KRİTİK" e-posta.
+  const teklif = await teklifModuHaritasi(supabase, esikAltinda)
+  const productsToAlert = esikAltinda.filter(p => !teklif.get(p.id))
+  console.warn(
+    `[JOB] esik alti ${esikAltinda.length} · teklif modu (atlandi) ${esikAltinda.length - productsToAlert.length} · uyarilacak ${productsToAlert.length}`,
+  )
+  if (productsToAlert.length === 0) return []
 
   // Fetch recipients once globally (N+1 query optimization)
   const recipients = await getAlertRecipients(supabase)
@@ -220,17 +234,106 @@ async function checkAllProducts(supabase: SupabaseClient) {
     )
   }
 
-  const results = []
-  for (const product of productsToAlert) {
-    results.push(await processProductAlert(supabase, product, recipients))
+  // ── TEK ÖZET, ÜRÜN BAŞINA E-POSTA DEĞİL (REC-376) ───────────────────────────
+  // Eskiden her ürün için ayrı bildirim gidiyordu: 68 ürün = 68 çağrı, 8'i hız sınırında düştü,
+  // Resend günlük kotasının (Free: 100) %60'ı stok uyarısına gidiyordu. Artık alıcı başına TEK özet.
+  const sonuclar = await ozetGonder(productsToAlert, recipients)
+  const basarisiz = sonuclar.filter(s => !s.success)
+  if (basarisiz.length > 0) {
+    // B4 sessizlik yasağı: gönderilemeyen özet 200'e gömülmez → cron koşumu KIRMIZI görünür.
+    throw new Error(`Stok ozeti gonderilemedi (${basarisiz.length}/${sonuclar.length}): ${basarisiz.map(s => `${s.type}:${s.status}`).join(', ')}`)
   }
-  return results
+  return sonuclar
+}
+
+/**
+ * Ürün → teklif modunda mı. Vitrinle AYNI girdiler: ailenin ana kategorisi (`product_families.category_id`)
+ * ve `display_price`. Aile/kategori okunamazsa hata fırlatılır (sessizce "hepsi uyarılır" ya da "hiçbiri
+ * uyarılmaz"a düşmez); aile/kategori YOKSA vitrin kuralı gereği teklif modu sayılır.
+ */
+async function teklifModuHaritasi(supabase: SupabaseClient, urunler: Product[]): Promise<Map<string, boolean>> {
+  const aileIdleri = [...new Set(urunler.map(u => u.family_id).filter((x): x is string => !!x))]
+  const aileKategori = new Map<string, string | null>()
+  const kategoriMeta = new Map<string, unknown>()
+  if (aileIdleri.length > 0) {
+    const { data: aileler, error: aErr } = await supabase.from('product_families').select('id, category_id').in('id', aileIdleri)
+    if (aErr) throw aErr
+    for (const a of aileler ?? []) aileKategori.set(a.id, a.category_id ?? null)
+    const kategoriIdleri = [...new Set([...aileKategori.values()].filter((x): x is string => !!x))]
+    if (kategoriIdleri.length > 0) {
+      const { data: kategoriler, error: kErr } = await supabase.from('categories').select('id, metadata').in('id', kategoriIdleri)
+      if (kErr) throw kErr
+      for (const k of kategoriler ?? []) kategoriMeta.set(k.id, k.metadata ?? null)
+    }
+  }
+  const sonuc = new Map<string, boolean>()
+  for (const u of urunler) {
+    const kategoriId = u.family_id ? aileKategori.get(u.family_id) : null
+    const kategori = kategoriId && kategoriMeta.has(kategoriId) ? { metadata: kategoriMeta.get(kategoriId) } : null
+    sonuc.set(u.id, teklifModundaMi({ kategori, fiyat: u.display_price }))
+  }
+  return sonuc
+}
+
+/** Olay kimliği (notification-standard B3.2): gün + ürün kümesi. Aynı gün aynı küme = aynı anahtar. */
+async function ozetAnahtari(urunler: Product[]): Promise<string> {
+  const gun = new Date().toISOString().slice(0, 10)
+  const kume = urunler.map(u => `${u.id}:${u.stock_qty}`).sort().join(',')
+  const ozet = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(kume)))
+  const kisa = [...ozet.slice(0, 6)].map(b => b.toString(16).padStart(2, '0')).join('')
+  return `stok-ozet/${gun}/${kisa}`
+}
+
+async function ozetGonder(urunler: Product[], recipients: AlertRecipient[]) {
+  const tukenen = urunler.filter(u => u.stock_qty <= 0)
+  const azalan = urunler.filter(u => u.stock_qty > 0)
+  const satir = (u: Product) => `• ${u.name} — ${u.stock_qty} adet (eşik: ${u.low_stock_threshold || VARSAYILAN_ESIK})`
+  const mesaj = [
+    tukenen.length ? `STOKTA KALMAYAN (${tukenen.length}):\n${tukenen.map(satir).join('\n')}` : '',
+    azalan.length ? `STOĞU AZALAN (${azalan.length}):\n${azalan.map(satir).join('\n')}` : '',
+    'Teklif modundaki ürünler bu listeye girmez (stokları takip edilmez).',
+  ].filter(Boolean).join('\n\n')
+  const konu = tukenen.length
+    ? `🚨 Stok özeti: ${tukenen.length} ürün tükendi${azalan.length ? `, ${azalan.length} azaldı` : ''}`
+    : `⚠️ Stok özeti: ${azalan.length} ürün azaldı`
+  const oncelik = tukenen.length ? 'critical' : 'high'
+  const idempotencyKey = await ozetAnahtari(urunler)
+
+  const sonuclar: { type: string; success: boolean; status: number }[] = []
+  for (const r of recipients) {
+    const turAcik = (tukenen.length && r.notifications.out_of_stock) || (azalan.length && r.notifications.low_stock)
+    if (!turAcik) continue
+    if (r.notifications.email && r.email) {
+      sonuclar.push(await bildirimCagir('email', r.email, mesaj, oncelik, { subject: konu, idempotencyKey }))
+    }
+    if (r.notifications.sms && r.phone) sonuclar.push(await bildirimCagir('sms', r.phone, konu, oncelik, {}))
+    if (r.notifications.whatsapp && r.whatsapp) sonuclar.push(await bildirimCagir('whatsapp', r.whatsapp, konu, oncelik, {}))
+  }
+  return sonuclar
+}
+
+/** notification-service çağrısı; başarısızlık DURUM KODU ve gövdesiyle görünür kalır (B4). */
+async function bildirimCagir(type: string, to: string, message: string, priority: string, data: Record<string, unknown>) {
+  try {
+    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/notification-service`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, to, priority, message, data }),
+    })
+    if (!response.ok) {
+      console.error(`[ERROR] ozet bildirimi reddedildi (${type}): ${response.status} ${(await response.text()).slice(0, 300)}`)
+    }
+    return { type, success: response.ok, status: response.status }
+  } catch (err) {
+    console.error(`[ERROR] ozet bildirimi gonderilemedi (${type}):`, err)
+    return { type, success: false, status: 0 }
+  }
 }
 
 async function checkSpecificProduct(supabase: SupabaseClient, _productId: string) {
   const { data: product, error } = await supabase
     .from('products')
-    .select('id, name, stock_qty, low_stock_threshold')
+    .select(URUN_ALANLARI)
     .eq('id', _productId)
     .single()
 
@@ -238,6 +341,11 @@ async function checkSpecificProduct(supabase: SupabaseClient, _productId: string
 
   if (product.stock_qty > (product.low_stock_threshold || 5)) {
     return [{ product: product.name, message: 'Stock above threshold' }]
+  }
+  // Sipariş sonrası tek-ürün yolu da AYNI evreni kullanır (REC-376): teklif modundaki ürün uyarılmaz.
+  const teklif = await teklifModuHaritasi(supabase, [product as Product])
+  if (teklif.get(product.id)) {
+    return [{ product: product.name, message: 'Teklif modu — stok takip edilmez, uyari yok' }]
   }
 
   // Fetch recipients once (N+1 query optimization)
@@ -258,7 +366,7 @@ async function processProductAlert(supabase: SupabaseClient, product: Product, r
     alertType
   }
 
-  const notifications = []
+  const notifications: { type: string; recipient: string; success: boolean }[] = []
   for (const recipient of recipients) {
     if (!recipient.notifications[alertType]) continue
 

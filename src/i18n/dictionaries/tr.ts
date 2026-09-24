@@ -127,7 +127,15 @@ export const tr = {
         'ducted-central-hrv': 'Kanallı Merkezi Üniteler',
         'single-room-hrv': 'Tekil Oda Üniteleri',
         'speed-controllers': 'Hız Anahtarları',
-        'water-coils': 'Sulu Batarya Kanal Tipi'
+        'water-coils': 'Sulu Batarya Kanal Tipi',
+        // REC-300 Faz 1-B (K17 ağacı, karar 78b + 84): anahtarı veritabanı migration'ı bağlar.
+        // Korozyon dalı YENİ anahtara geçer (`acid-fans` değişmez) → ad ile adres aynı anda döner.
+        'corrosion-fans': 'Korozyon Dayanımlı Fanlar',
+        'plug-fans': 'Plug Fanlar',
+        'cabinet-fans': 'Hücreli Aspiratörler',
+        'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
+        'electric-curtain': 'Elektrikli Isıtıcılı Hava Perdeleri',
+        'spare-parts': 'Yedek Parça ve Sensörler'
       }
     },
     viewAll: 'Tümü',
@@ -352,6 +360,15 @@ export const tr = {
   meta: {
     siteTitle: 'VentHub — Premium HVAC Çözümleri',
     siteDesc: 'Otopark jet fanı, hava perdesi, ısı geri kazanım cihazı ve kanal fanı çözümleri; mühendislik destekli ürün seçimi ve teknik danışmanlık.',
+  },
+
+  // 404 sayfası (src/app/not-found.tsx). Next.js'in hazır sayfası İngilizce metin + ikinci bir
+  // <title> basıyordu (2026-09-24 canlı ölçüm: /tr/... adresinde iki başlık).
+  sayfaBulunamadi: {
+    baslik: 'Sayfa bulunamadı',
+    aciklama: 'Aradığınız sayfa taşınmış ya da kaldırılmış olabilir. Ürünlere göz atabilir ya da ana sayfaya dönebilirsiniz.',
+    anaSayfa: 'Ana sayfaya dön',
+    urunler: 'Ürünlere göz at',
   },
 
   home: {
@@ -841,7 +858,17 @@ export const tr = {
     cookieTitle: 'Çerez Politikası (Taslak)',
     distanceSalesTitle: 'Mesafeli Satış Sözleşmesi (Taslak)',
     preInformationTitle: 'Ön Bilgilendirme Formu (Taslak)',
-    termsTitle: 'Kullanım Koşulları (Taslak)'
+    termsTitle: 'Kullanım Koşulları (Taslak)',
+    // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: yasal sayfalar varsayılan site
+    // açıklamasını basıyordu. Yalnız belgenin konusu adlandırılır.
+    seo: {
+      kvkk: '6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni.',
+      privacy: 'VentHub web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu.',
+      cookie: 'VentHub web sitesinde kullanılan çerezler ve çerez tercihlerinin yönetimi.',
+      terms: 'VentHub web sitesinin kullanım koşulları.',
+      distanceSales: 'VentHub üzerinden yapılan satışlara ilişkin mesafeli satış sözleşmesi.',
+      preInformation: 'Mesafeli satış öncesinde tüketiciye sunulan ön bilgilendirme formu.',
+    }
   },
   footer: {
     quickLinks: 'Hızlı Linkler',
@@ -854,12 +881,8 @@ export const tr = {
     // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
     // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
     email: 'info@venthub.com.tr',
-    social: {
-      facebook: 'Facebook',
-      twitter: 'Twitter',
-      linkedin: 'LinkedIn',
-      instagram: 'Instagram'
-    }
+    // social BİLİNÇLİ YOK (REC-285, 2026-09-24): bağlantılar platform ana sayfasına gidiyordu.
+    // Gerçek hesap adresleri gelince EN sözlüğüyle BİRLİKTE geri eklenir (parite).
   },
   auth: {
     pwStrength: {
@@ -1674,6 +1697,7 @@ export const tr = {
       drive_code: 'Sürücü Kodu',
       enclosure_class: 'Muhafaza Tipi',
       enclosure_size: 'Muhafaza Boyutu',
+      electrical_protection_class: 'Elektrik Koruma Sınıfı',
       erp_compliant: 'ErP Uyumlu',
       filter_classes: 'Filtre Sınıfı',
       fire_rating: 'Yangın Sınıfı',
@@ -1701,6 +1725,7 @@ export const tr = {
       min_operating_temperature_c: 'Minimum Çalışma Sıcaklığı',
       min_static_pressure_pa: 'Minimum Statik Basınç',
       min_voltage_v: 'Minimum Voltaj',
+      motor_efficiency_class: 'Motor Verim Sınıfı',
       motor_poles: 'Motor Kutup Sayısı',
       motor_type: 'Motor Tipi',
       noise_level_db_a: 'Ses Seviyesi',
@@ -1907,6 +1932,16 @@ export const tr = {
     home: {
       subtitle: 'İhtiyacınız olan bilgilere hızlıca ulaşın.',
       warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgileri',
+    },
+    // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: bu dört sayfa varsayılan site
+    // açıklamasını basıyordu. Yeni vaat YOK: yalnız sayfanın zaten anlattığı konu adlandırılır.
+    seo: {
+      // Sekme başlığı: sayfa H1'i "SSS" kısaltmasıdır; arama sonucunda tam ad okunur.
+      faqTitle: 'Sık Sorulan Sorular',
+      faq: 'Teklif, ödeme ve kurulum hakkında sık sorulan sorular ve cevapları.',
+      shipping: 'Teslimat süresi, kargo ücreti ve gönderi takibi hakkında bilgi.',
+      returns: 'Cayma hakkı, iade koşulları ve iade talebinin nasıl yapılacağı.',
+      warranty: 'Garanti kapsamı ve yetkili servis bilgileri.',
     },
     returns: {
       title: 'İade ve Değişim',
@@ -2514,7 +2549,7 @@ export const tr = {
         noPermission: 'Bu işlem için yetkiniz yok',
         pricesSaved: 'Fiyatlar kaydedildi',
         pricesSaveFailed: 'Fiyatlar kaydedilemedi',
-        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat girin'
+        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat, aynı para birimi ve ileri tarihli geçerlilik girin'
       }
     }
   },

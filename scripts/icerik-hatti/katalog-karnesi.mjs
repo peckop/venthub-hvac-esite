@@ -15,9 +15,23 @@
  * hangi yolu kullandığını her satırda yazar — çünkü "31 boş kategori" diye rapor edilen
  * sayı 2026-09-07'de tam bu yüzden yanlıştı.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { fiyatDizini } from './fiyat-kaynak-esle.mjs'
+import { fiyatBoslukSatirlari, boslukOzeti, BOSLUK_BASLIK } from './fiyat-bosluk.mjs'
+import { gorselSozlesmesi, DONMUS_FOTO_WEBP } from './gorsel-sozlesme.mjs'
+
+// --kapi: karne bir sayaçtır; bu bayrakla GÖRSEL SÖZLEŞMESİ kırmızıysa çıkış 1 (REC-209,
+// product-image-standard §7 veri kapısı). Bayraksız koşum eskisi gibi yalnız raporlar.
+const KAPI = process.argv.includes('--kapi')
+
+// Fiyat boşluk satırı (REC-209 C) kaynak dizinini okur; dizin yoksa satır "ölçülmedi" der, diğer
+// satırlar etkilenmez (karne bir sayaçtır, kapı değil — katalog-sayim cetveli).
+const DIZIN = process.argv.find(a => a.startsWith('--dizin='))?.slice(8)
+  || join(homedir(), 'venthub-pdf-ingestor', 'kaynak-dizini', 'sayfalar.jsonl')
+const FIYAT_BELGESI = 'ticaret/avensair-fiyat-listesi-2026/01-input/avens_fiyat_listesi_2026_HQ.pdf'
+const BOSLUK_CIKTI = process.argv.find(a => a.startsWith('--fiyat-bosluk='))?.slice(15)
 
 const env = Object.fromEntries(
   readFileSync(process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env'), 'utf8')
@@ -41,11 +55,11 @@ async function hepsi(t, sec) {
   return out
 }
 
-const urun = await hepsi('products', 'id,sku,name,name_i18n,description_i18n,technical_specs,category_id,subcategory_id,family_id')
+const urun = await hepsi('products', 'id,sku,name,brand,status,tenant_id,name_i18n,description_i18n,technical_specs,category_id,subcategory_id,family_id,model_code,purchase_price,purchase_currency')
 const kategori = await hepsi('categories', 'id,name,metadata,description')
-const aile = await hepsi('product_families', 'id,name,name_i18n,description')
+const aile = await hepsi('product_families', 'id,name,slug,name_i18n,description')
 const fiyat = await hepsi('product_prices', 'id,product_id')
-const gorsel = await hepsi('product_images', 'id,product_id')
+const gorsel = await hepsi('product_images', 'id,product_id,tenant_id,path,alt,sort_order')
 
 const dolu = (v) => v != null && v !== '' && !(typeof v === 'object' && Object.keys(v).length === 0)
 const alanSayisi = (x) => Object.keys(x.technical_specs || {}).length
@@ -57,8 +71,26 @@ for (const u of urun) {
 }
 const bosKategori = [...kategorideUrun.values()].filter(n => n === 0).length
 
-const fiyatliUrun = new Set(fiyat.map(f => f.product_id)).size
+const fiyatliIdler = new Set(fiyat.map(f => f.product_id))
+const fiyatliUrun = fiyatliIdler.size
 const gorselliUrun = new Set(gorsel.map(g => g.product_id)).size
+const gs = gorselSozlesmesi(urun, gorsel)
+const gsIhlal = Object.entries(gs.ihlal).filter(([, v]) => v.length).map(([a, v]) => `${a} ${v.length} (ör. ${v.slice(0, 3).join(', ')})`)
+
+// Fiyat boşluğu: fiyat satırı olmayan ürün × liste fiyatı × kaynak sayfası. YAZMAZ, fiyat değeri basmaz.
+let boslukSatir = ['Fiyat satırı OLMAYAN ürün', urun.length - fiyatliUrun, 'kaynak dizini yok — durum dağılımı ÖLÇÜLMEDİ']
+if (existsSync(DIZIN)) {
+  const dizin = fiyatDizini(readFileSync(DIZIN, 'utf8').split(/\n/).filter(Boolean).map(s => JSON.parse(s)), FIYAT_BELGESI)
+  const aileSlug = new Map(aile.map(a => [a.id, a.slug]))
+  const bosluk = fiyatBoslukSatirlari(urun.map(u => ({ ...u, family_slug: aileSlug.get(u.family_id) })), fiyatliIdler, dizin)
+  const oz = boslukOzeti(bosluk)
+  boslukSatir = ['Fiyat satırı OLMAYAN ürün', bosluk.length,
+    Object.entries(oz).sort().map(([d, n]) => `${d} ${n}`).join(' · ') + ' — HAZIR = liste fiyatı var ve kaynakla aynı']
+  if (BOSLUK_CIKTI) {
+    const h = (v) => { const s = String(v ?? ''); return /[;"]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s }
+    writeFileSync(BOSLUK_CIKTI, '﻿' + [BOSLUK_BASLIK.join(';'), ...bosluk.map(r => BOSLUK_BASLIK.map(k => h(r[k])).join(';'))].join('\r\n') + '\r\n', 'utf8')
+  }
+}
 
 const satir = [
   ['Ürün', urun.length, ''],
@@ -67,7 +99,10 @@ const satir = [
   ['TR açıklaması olan ürün', urun.filter(u => dolu(u.description_i18n?.tr)).length + ' / ' + urun.length, 'description_i18n.tr'],
   ['EN açıklaması olan ürün', urun.filter(u => dolu(u.description_i18n?.en)).length + ' / ' + urun.length, 'description_i18n.en'],
   ['Fiyat satırı olan ürün', fiyatliUrun + ' / ' + urun.length, `product_prices ${fiyat.length} satır`],
-  ['Görseli olan ürün', gorselliUrun + ' / ' + urun.length, `product_images ${gorsel.length} kayıt`],
+  boslukSatir,
+  ['Görseli olan ürün', gorselliUrun + ' / ' + urun.length, `product_images ${gorsel.length} kayıt · görselsiz AKTİF ${gs.aktif_gorselsiz.length}`],
+  ['Görsel sözleşmesi ihlali', gs.ihlal_toplam + (gs.mandal_asildi ? ' ⛔' : ''),
+    (gsIhlal.join(' · ') || 'yok') + ` — foto.webp ${gs.foto_webp}/${DONMUS_FOTO_WEBP} (donmuş istisna, yukarı çıkamaz)`],
   ['TR metni olan kategori', kategori.filter(c => dolu(c.metadata?.description_i18n?.tr)).length + ' / ' + kategori.length, 'metadata.description_i18n.tr'],
   ['BOŞ kategori (ürünü yok)', bosKategori + ' / ' + kategori.length, '⚠ category_id VEYA subcategory_id — vitrinin yolu'],
   ['TR metni olan aile', aile.filter(a => dolu(a.description?.tr)).length + ' / ' + aile.length, 'description.tr'],
@@ -80,4 +115,8 @@ if (process.argv.includes('--json')) {
   console.log(`KATALOG KARNESİ — ${new Date().toISOString()}\n`)
   for (const [ad, deg, not] of satir) console.log(`  ${ad.padEnd(32)} ${String(deg).padStart(12)}   ${not}`)
   console.log(`\n  Her satır kendi ölçüt yolunu yazar. Yol değişirse SAYI DEĞİŞİR — kıyaslamadan önce yola bak.`)
+}
+if (KAPI && gs.kirmizi) {
+  console.error(`⛔ GÖRSEL SÖZLEŞMESİ KIRMIZI: ihlal ${gs.ihlal_toplam}${gs.mandal_asildi ? ` · foto.webp ${gs.foto_webp} > ${DONMUS_FOTO_WEBP}` : ''}`)
+  process.exit(1)
 }

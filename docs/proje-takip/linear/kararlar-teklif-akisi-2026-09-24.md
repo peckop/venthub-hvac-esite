@@ -1,6 +1,6 @@
-# Kararlar — Teklif Akışı ve Müşteri Paneli (Linear belgesinin TAM dışa aktarımı · 2026-09-19 ayna: K1–K6)
+# Kararlar — Teklif Akışı ve Müşteri Paneli (Linear belgesinin TAM dışa aktarımı · 2026-09-24 ayna: K1–K6)
 
-<!-- kaynak_id: 52206cde-64f5-4517-b80b-0bffa9cbcdb4 · kaynak_updatedAt: 2026-09-03T13:34:09.174Z · kopya: 2026-09-19T11:19Z -->
+<!-- kaynak_id: 52206cde-64f5-4517-b80b-0bffa9cbcdb4 · kaynak_updatedAt: 2026-09-03T13:34:09.174Z · kopya: 2026-09-24T08:58Z -->
 <!-- Tazelik yalnız yukarıdaki damgayla ölçülür (kaynak_updatedAt > kopya ise bayat). Tek kopya kuralı: bu dosyanın başka yerde ikinci kopyası tutulmaz. -->
 
 > Karar SSOT'u Linear'dır; bu dosya NotebookLM defteri ve Design projeleri için kopyadır. Çelişkide Linear kazanır.

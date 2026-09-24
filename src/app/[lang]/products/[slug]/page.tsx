@@ -23,6 +23,8 @@ import {
   getCachedFamilySlugById,
   getCachedProductBySlug,
   getCachedSeriesLanding,
+  getCachedTakmaAd,
+  getCachedVariantById,
   getFamilyDetailForRoute,
   preloadFamily,
 } from '../../../../lib/data/preload'
@@ -175,6 +177,8 @@ export default async function Page({ params }: { params: Promise<{ lang: string,
           seriesLanding: getCachedSeriesLanding,
           variantBySlug: getCachedProductBySlug,
           familySlugById: getCachedFamilySlugById,
+          takmaAd: getCachedTakmaAd,
+          variantById: getCachedVariantById,
         })
 
   // permanentRedirect / notFound birer istisna fırlatır — koşulsuz, en üstte çağrılır.

@@ -1,0 +1,20 @@
+{
+  "_nicin": [
+    "Vortice Air Door H-AD (elektrikli ısıtıcılı) 4 ürün: max_absorbed_power_w fan gücü ile ısıtma gücünün TOPLAMI yazılmış",
+    "(6160 = 6000 + 160 W). Alan 'fanın çektiği güç' der (cetvel §11.7 K9); ısıtma gücü ayrı alandır (heating_power_w).",
+    "Bulgu: alan-etiket sözlüğü düzeltmesinin ölçümü (REC-172 yorumu f6e945ac, 2026-09-23)."
+  ],
+  "_kanit": {
+    "belge": "markalar/vortice/hava-perdesi/01-input/Air_Conditioning_Air_Door_2.pdf",
+    "sayfa": 7,
+    "alinti": "TECHNICAL DATA — Fan Power min./max. W · Heating Power min./mid./max. kW: H AD 900 M 110/160 · 2/4/6 · H AD 900 T 110/160 · 2/4/6 · H AD 1200 T 150/200 · 4/6/8 · H AD 1500 T 180/230 · 6/8/10",
+    "kural": "max_absorbed_power_w = fan gücünün max'ı (W) · heating_power_w = ısıtma gücünün max'ı (kW × 1000)",
+    "dokunulmayan": "Isıtıcısız AD 900/1200/1500/2000 (160/200/230/350 W) kaynakla zaten tutarlı."
+  },
+  "skus": {
+    "VRT-65155": { "_urun": "Vortice Air Door H AD 900 M", "degistir": { "max_absorbed_power_w": 160, "heating_power_w": 6000 }, "onceki": { "max_absorbed_power_w": 6160, "heating_power_w": null } },
+    "VRT-65156": { "_urun": "Vortice Air Door H AD 900 T", "degistir": { "max_absorbed_power_w": 160, "heating_power_w": 6000 }, "onceki": { "max_absorbed_power_w": 6160, "heating_power_w": null } },
+    "VRT-65157": { "_urun": "Vortice Air Door H AD 1200 T", "degistir": { "max_absorbed_power_w": 200, "heating_power_w": 8000 }, "onceki": { "max_absorbed_power_w": 8200, "heating_power_w": null } },
+    "VRT-65158": { "_urun": "Vortice Air Door H AD 1500 T", "degistir": { "max_absorbed_power_w": 230, "heating_power_w": 10000 }, "onceki": { "max_absorbed_power_w": 10230, "heating_power_w": null } }
+  }
+}

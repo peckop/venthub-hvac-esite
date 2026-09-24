@@ -1706,6 +1706,59 @@ export type Database = {
           },
         ]
       }
+      product_costs: {
+        Row: {
+          cost_in_base: number | null
+          id: string
+          last_purchase_cost: number | null
+          last_purchase_currency: string | null
+          last_purchased_at: string | null
+          product_id: string
+          purchase_currency: string
+          purchase_price: number
+          purchase_rate_to_base: number | null
+          supplier_name: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          cost_in_base?: number | null
+          id?: string
+          last_purchase_cost?: number | null
+          last_purchase_currency?: string | null
+          last_purchased_at?: string | null
+          product_id: string
+          purchase_currency?: string
+          purchase_price?: number
+          purchase_rate_to_base?: number | null
+          supplier_name?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          cost_in_base?: number | null
+          id?: string
+          last_purchase_cost?: number | null
+          last_purchase_currency?: string | null
+          last_purchased_at?: string | null
+          product_id?: string
+          purchase_currency?: string
+          purchase_price?: number
+          purchase_rate_to_base?: number | null
+          supplier_name?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_costs_product_fk"
+            columns: ["product_id", "tenant_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id", "tenant_id"]
+          },
+        ]
+      }
       product_families: {
         Row: {
           brand_id: string
@@ -2887,6 +2940,36 @@ export type Database = {
           styles?: Json
           subdomain?: string | null
           theme_config?: Json
+        }
+        Relationships: []
+      }
+      url_takma_adlari: {
+        Row: {
+          created_at: string
+          dil: string
+          eski_slug: string
+          hedef_id: string
+          sebep: string
+          tenant_id: string
+          tur: string
+        }
+        Insert: {
+          created_at?: string
+          dil: string
+          eski_slug: string
+          hedef_id: string
+          sebep: string
+          tenant_id: string
+          tur: string
+        }
+        Update: {
+          created_at?: string
+          dil?: string
+          eski_slug?: string
+          hedef_id?: string
+          sebep?: string
+          tenant_id?: string
+          tur?: string
         }
         Relationships: []
       }
@@ -4534,6 +4617,10 @@ export type Database = {
       update_inventory_thresholds: {
         Args: { p_default: number; p_reset_overrides?: boolean }
         Returns: undefined
+      }
+      url_takma_ad_coz: {
+        Args: { p_dil: string; p_eski_slug: string; p_tur: string }
+        Returns: string
       }
     }
     Enums: {

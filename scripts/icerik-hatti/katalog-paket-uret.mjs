@@ -39,6 +39,7 @@ import { join, dirname, basename } from 'node:path'
 import {
   URUN_BASLIK, TEKNIK_BASLIK, GORSEL_BASLIK, FIYAT_BASLIK, turkceBasliklar, birimler, paketHucresi,
 } from './paket-sozlesme.mjs'
+import { fiyatDizini, urunFiyatKaynagi } from './fiyat-kaynak-esle.mjs'
 
 // Fail-closed: okunamazsa betik DURUR (başlıksız paket üretmek, eksikliği gizler).
 const BASLIK_TR = turkceBasliklar()
@@ -54,6 +55,13 @@ if (!U) { console.error('⛔ SUPABASE_URL yok'); process.exit(1) }
 const HEDEF = process.argv.find(a => a.startsWith('--hedef='))?.slice(8) || 'katalog-paketi'
 const HAM = join(HEDEF, 'ham')
 const GORSEL_ATLA = process.argv.includes('--gorsel-atla')
+// Fiyatın kaynak eşlemesi KAYNAK DİZİNİNDEN (K15). Dizin yoksa betik DURUR: üç kaynak kolonunu
+// sessizce boş bırakmak "kaynağı yok" ile "okunmadı"yı ayırt edilemez yapar. Bilerek kaynaksız
+// paket isteyen `--fiyat-kaynaksiz` verir; o zaman kolonlar boş gider ve özet bunu söyler.
+const DIZIN = process.argv.find(a => a.startsWith('--dizin='))?.slice(8)
+  || join(homedir(), 'venthub-pdf-ingestor', 'kaynak-dizini', 'sayfalar.jsonl')
+const FIYAT_KAYNAKSIZ = process.argv.includes('--fiyat-kaynaksiz')
+const FIYAT_BELGESI = 'ticaret/avensair-fiyat-listesi-2026/01-input/avens_fiyat_listesi_2026_HQ.pdf'
 
 if (!existsSync(HAM)) {
   console.error(`⛔ ham dizini YOK: ${HAM}`)
@@ -169,9 +177,37 @@ sayim['gorseller.csv'] = csvYaz(join(HEDEF, 'gorseller.csv'),
 // kolon bir satırda KDV dahil bir satırda KDV hariç değer taşırdı. Eski `f.price ?? f.amount`
 // ise hiç var olmayan iki kolonu okuyordu → 1044 satırın 1044'ünde fiyat BOŞ gidiyordu.
 // `kdv` · `kaynak_fiyat_eur` · `fiyat_kaynak_sayfa` KAYNAK DİZİNİNDEN gelir (fiyat listesi
-// sayfasının kendi beyanı); DB'de karşılıkları YOKTUR. Bu koşumda BOŞ — fiyatın kaynak
-// eşlemesi ayrı adımdır. Kolon şimdiden açık: şema sonradan değişirse gözle kontrol edilmiş
-// dosyalar bozulur. `kdv` ile `products.tax_rate` AYRI şeydir, aynı kolona konmaz.
+// sayfasının kendi beyanı); DB'de karşılıkları YOKTUR. Eşleme `fiyat-kaynak-esle.mjs`'te: kod →
+// liste satırı, kod çakışmasında ada göre, bulunamazsa hücre BOŞ (K7, uydurma yok).
+// `kdv` ile `products.tax_rate` AYRI şeydir, aynı kolona konmaz.
+// ⛔ kaynak_fiyat_eur = AVenS ALIŞ fiyatı (maliyetimiz). Paket iç ana kopyadır (K13) ve git'e
+// girmez; bayiye verilecek bir sürüm üretilirse bu kolon orada ÇIKARILMALIDIR.
+let fiyatKaynak = null
+if (!FIYAT_KAYNAKSIZ) {
+  if (!existsSync(DIZIN)) {
+    console.error(`⛔ kaynak dizini YOK: ${DIZIN} — fiyat kaynak kolonları okunamaz.`)
+    console.error('   --dizin=<sayfalar.jsonl> ver ya da bilerek boş bırakmak için --fiyat-kaynaksiz')
+    process.exit(2)
+  }
+  const sayfalar = readFileSync(DIZIN, 'utf8').split(/\n/).filter(Boolean).map(s => JSON.parse(s))
+  fiyatKaynak = fiyatDizini(sayfalar, FIYAT_BELGESI)
+  if (!fiyatKaynak.kayit.size) {
+    console.error(`⛔ dizinde fiyat belgesi satırı YOK (${FIYAT_BELGESI}) — fail-closed`)
+    process.exit(2)
+  }
+}
+const urunById = new Map(urunler.map(u => [u.id, u]))
+const fiyatEsleme = new Map() // product_id → urunFiyatKaynagi sonucu (liste başına tekrar hesaplanmaz)
+const fiyatHucreleri = (productId) => {
+  if (!fiyatKaynak) return { kdv: '', kaynak_fiyat_eur: '', fiyat_kaynak_sayfa: '', ...kaynakKolon }
+  if (!fiyatEsleme.has(productId)) fiyatEsleme.set(productId, urunFiyatKaynagi(urunById.get(productId), fiyatKaynak))
+  const r = fiyatEsleme.get(productId)
+  if (r.durum !== 'bulundu') return { kdv: '', kaynak_fiyat_eur: '', fiyat_kaynak_sayfa: '', ...kaynakKolon }
+  return {
+    kdv: r.kayit.kdv, kaynak_fiyat_eur: r.kayit.eur, fiyat_kaynak_sayfa: r.kayit.sayfa,
+    kaynak_dosya: basename(FIYAT_BELGESI), kaynak_sayfa: r.kayit.sayfa, alinti: r.kayit.alinti,
+  }
+}
 sayim['fiyatlar.csv'] = csvYaz(join(HEDEF, 'fiyatlar.csv'),
   FIYAT_BASLIK,
   fiyatlar.map(f => ({
@@ -180,9 +216,35 @@ sayim['fiyatlar.csv'] = csvYaz(join(HEDEF, 'fiyatlar.csv'),
     fiyat: f.net_price ?? '', brut_fiyat: f.gross_price ?? '',
     para_birimi: f.currency ?? '', gecerli_baslangic: f.valid_from ?? '',
     aktif: f.is_active ?? '',
-    kdv: '', kaynak_fiyat_eur: '', fiyat_kaynak_sayfa: '',
-    ...kaynakKolon,
+    ...fiyatHucreleri(f.product_id),
   })))
+
+// Kaynak ↔ DB alış fiyatı farkı: pakete AYRI dosya (git'e girmez). Konsola fiyat BASILMAZ,
+// yalnız sayı ve SKU — konsol çıktısı kayıtlara/panoya yapıştırılır.
+if (fiyatKaynak) {
+  const durum = { bulundu: [], yok: [], cakisma: [] }
+  const farklar = []
+  for (const [pid, r] of fiyatEsleme) {
+    const u = urunById.get(pid)
+    durum[r.durum].push(u.sku)
+    if (r.durum === 'bulundu' && u.purchase_currency === 'EUR' && u.purchase_price != null
+      && Math.abs(Number(u.purchase_price) - r.kayit.eur) >= 0.005) {
+      farklar.push({ sku: u.sku, urun: u.name, db_alis_eur: u.purchase_price, kaynak_eur: r.kayit.eur,
+        kaynak_sayfa: r.kayit.sayfa, yol: r.kayit.yol, alinti: r.kayit.alinti })
+    }
+  }
+  sayim['fiyat-kaynak-farklari.csv'] = csvYaz(join(HEDEF, 'fiyat-kaynak-farklari.csv'),
+    ['sku', 'urun', 'db_alis_eur', 'kaynak_eur', 'kaynak_sayfa', 'yol', 'alinti'], farklar.sort((a, b) => a.sku.localeCompare(b.sku)))
+  const adaGore = [...fiyatEsleme.values()].filter(r => /ada göre/.test(r.kayit?.yol ?? '')).length
+  console.log(`FİYAT KAYNAĞI: fiyatlı ürün ${fiyatEsleme.size} · bulundu ${durum.bulundu.length}`
+    + ` (kod çakışması ada göre ${adaGore}) · listede yok ${durum.yok.length} · çözülemeyen çakışma ${durum.cakisma.length}`
+    + ` · DB alış fiyatından FARKLI ${farklar.length}`)
+  if (durum.yok.length) console.log(`   listede yok: ${durum.yok.sort().join(' ')}`)
+  if (durum.cakisma.length) console.log(`   çözülemeyen çakışma: ${durum.cakisma.sort().join(' ')}`)
+  if (farklar.length) console.log(`   DB'den farklı: ${farklar.map(f => f.sku).join(' ')} → fiyat-kaynak-farklari.csv`)
+} else {
+  console.log('FİYAT KAYNAĞI: --fiyat-kaynaksiz — kdv/kaynak_fiyat_eur/fiyat_kaynak_sayfa BOŞ gitti')
+}
 
 // ── 5. AİLELER
 sayim['aileler.csv'] = csvYaz(join(HEDEF, 'aileler.csv'),
@@ -287,6 +349,6 @@ Dosyalar \`;\` ayırıcılı, UTF-8 BOM'lu, CRLF satır sonlu — Türkçe karak
 `, 'utf8')
 
 console.log(`\n✓ PAKET HAZIR: ${HEDEF}`)
-console.log(`  7 CSV · ${Object.values(sayim).reduce((a, b) => a + b, 0)} satır · görsel ${indirilen + atlanan} dosya`)
+console.log(`  ${Object.keys(sayim).length} CSV · ${Object.values(sayim).reduce((a, b) => a + b, 0)} satır · görsel ${indirilen + atlanan} dosya`)
 console.log(`  ürün evreni: ${Object.entries(durumSayim).map(([s, n]) => `${s} ${n}`).join(' · ')} = ${urunler.length}`)
 if (basarisiz.length) { console.error(`\n⛔ ${basarisiz.length} görsel İNDİRİLEMEDİ — paket EKSİK`); process.exit(1) }

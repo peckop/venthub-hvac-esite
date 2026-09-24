@@ -389,6 +389,59 @@ anlamsızlaşır.
   STORM'da **29** `max_absorbed_power_w` değeri kaynağın *"Motor Power (kW)"* sütunundan
   geliyor — doğru karşılığı `rated_power_w`. Alan adı göçü listesine yazıldı.
 
+### Akım: "anma akımı" ile "en yüksek akım" ayrı alanlardır (REC-172, 2026-09-23)
+
+Bu satır yazılana kadar akım için cetvel satırı **yoktu**; kaynaklar iki ayrı büyüklük veriyor.
+
+| Alan | Anlamı | Kaynak tipik ifadesi |
+|---|---|---|
+| `absorbed_current_a` | Motorun **anma yükünde çektiği** akım | "Rated I (A)" (Casals) |
+| `max_current_a` | Kaynağın verdiği **en yüksek** akım | "I max. (400V)" (Vortice föyü), "maks. akım" (AVenS) |
+
+- Kaynak birden çok gerilim sütunu veriyorsa (`230 V` · `400 V`), yazılan akım **`voltage_v` ile
+  aynı gerilimin** sütunudur; diğer sütun yazılmaz.
+- ❌ İkisini tek alanda toplamak yasak; ölçüt ADA girer (ses ve güçle aynı ilke).
+- `alan-etiket-sozlugu.json`'daki "rated current" → `rated_output_current_a` eşlemesi bu kaynaklar
+  için yanlıştır (sürücü çıkış akımı başka büyüklük); sözlük düzeltmesi ayrı iş (REC-172 yorumu).
+
+### Devir: `rpm_max` — sabit devirli AC motorda anma devri (TEAMÜL İSTİSNASI)
+
+Canlıda tek devir anahtarı `rpm_max`'tir (229 ürün). Sabit devirli asenkron (AC) motorda kaynağın
+verdiği **anma devri** `rpm_max`'e yazılır. Bu **fiziksel bir gerekçe değil, teamül istisnasıdır**:
+asenkron motorda anma devri tam yükteki devirdir; yük azaldıkça devir senkron devire yaklaşır ve
+anma devrini aşar (4 kutup: senkron 1500 > anma 1400-1475). Yani anma devri üst sınır **değildir**;
+`rpm_max` bu motor tipinde §11.7'nin "üst sınır" anlamına **açık istisna** olarak anma devrini taşır.
+- `nominal_rpm` göçünün adayıdır; **başka alana emsal olmaz**.
+- Fan ve motor devri kaynakta farklı verilmişse (ör. kayış tahrik ya da çelişik föy) **yazılmaz**.
+
+### Frekans, yalıtım sınıfı, sıcaklık (REC-172 tur 2, 2026-09-23)
+
+Bu satırlar yazılana kadar dört alanın anlamı cetvelde **yoktu**; canlıda 193 / 231 / 20 / 3 üründe dolu
+olmalarına rağmen. Tur 2 çıkarımı (`<ingestor>/venthub/icerik-hatti/rec172/tur2/OZET.md`) kaynak ifadelerini
+aşağıdaki gibi eşledi; kural o eşlemeyi bağlar.
+
+| Alan | Anlamı | Kaynak tipik ifadesi | Yazılmaz |
+|---|---|---|---|
+| `frequency_hz` | Şebeke frekansı, **tek sayı** | "230V 50Hz", "1~ 50" | "50/60 Hz" çift frekans (tek sayıya sıkışmaz; kural gelene kadar boş) · kaynak basmıyorsa "Avrupa'da 50 Hz" çıkarımı |
+| `insulation_class` | Motor sargısının **ısıl** yalıtım sınıfı (IEC 60085), biçim `Class F` | "insulation class F", "thermal class F" | motorsuz gövdede (motoru anlatan cümle ürünü anlatmaz) |
+| `max_ambient_temp_c` | Motorun/ünitenin bulunduğu **ortamın** üst sıcaklığı | "ambient 60ºC", "ortam sıcaklığı" | taşınan havanın sıcaklığı ("transported air", "(°C)/air") |
+| `min_` / `max_operating_temperature_c` | Kaynağın **çalışma sıcaklığı aralığı** — hava mı ortam mı olduğunu söylemeyen | "working temperature −20…60ºC", "Operating Temperature Range" | aralığın tek ucu, öbür uç kaynakta varken (§11.7 çift kuralı) |
+| `electrical_protection_class` | **Elektrik koruma sınıfı** (IEC 61140: topraklama gerekir mi), küme `Class I` · `Class II` · `Class III` | "Electrical insulation class: II (earthing not required)", "Class II insulation" | ısıl sınıf harfi (B, F, H) — o `insulation_class` |
+| `motor_efficiency_class` | Motor **verim sınıfı** (IEC 60034-30-1), küme `IE1` … `IE5` | "IE3 motor", "IE4 motors for 75 kW or higher" | kaynağın güç eşiği ürünün motor gücünü kapsamıyorsa |
+
+- Kaynağın "insulation class" kelimesi iki ayrı büyüklük için kullanılıyor: harf (F, B) = ısıl sınıf,
+  Roma rakamı (I, II) = koruma sınıfı. Alan **değerin biçimine göre** seçilir, kelimeye göre değil.
+- Küme dışı değer (ör. `IE6`, `Class IV`) yazılmaz; yazım betiği girdiyi kümeye karşı denetler
+  (`<ingestor>/venthub/icerik-hatti/rec172/tur2/duzeltme-uret.py`).
+- ⚠**Açık iki anlam çakışması (ölçüldü, bu satırın getirdiği değil):**
+  - `insulation_class` Vortice'te **82 üründe** `Class I` / `Class II` taşıyor — koruma sınıfı, ısıl sınıf
+    değil. Onarım: değer `electrical_protection_class`'a taşınır (OPS hükmü 2026-09-23: müşteriye görünen yanlış
+    bilgi = onarım; canlı yazım Recep'in toplu onayıyla, URUN'un vitrin etiketinden sonra).
+  - `max_ambient_temp_c`'de HEATMASTER **10 üründe** değer "(°C)/air", yani taşınan hava; SLIMROOF **9 üründe**
+    değer bir aralığın üst ucu, alt uç yazılmamış.
+- Taşınan hava sıcaklığı için alan **yok**; kaynaklar 171 üründe veriyor (tur 2 `belirsiz.csv`). Alan açılana
+  kadar hiçbir alana yazılmaz.
+
 ### Basınç: "toplam" ile "statik" ayrı alanlardır
 
 **Nereden çıktı (ölçüm, 2026-09-07):** Nicotra katalogları fan eğrisini **toplam basınç**
@@ -418,15 +471,37 @@ anlam taşır — §11'in ses ve gerilim bölümlerinde kapatılan kusurun aynı
 | Alan | Anlamı | Kaynak tipik ifadesi | Örnek |
 |---|---|---|---|
 | `atex_marking` | Ekipman **grubu/kategorisi** işaretlemesi — ürünün üstündeki damga | "ATEX marking" | `II 2G/D h T3/125°C X Gb/Db` |
-| `atex_zone` | Ürünün kurulabileceği **kullanım bölgesi** beyanı | "suitable for Zone …" | `Zone II, Category 3G (Directive 94/9/CE)` |
+| `atex_zone` | Ürünün kurulabileceği **kullanım bölgesi** beyanı | "suitable for Zone …" | `Zone 2, Category 3G, Directive 94/9/CE` |
 
 - ❌ Bölge beyanını `atex_marking`'e yazmak yasak (ve tersi).
-- Baştaki `II` iki alanda **farklı şey** demektir: `atex_marking`'te ekipman grubu,
-  `atex_zone`'da bölge numarası. Ayrım tam olarak bu yüzden alan düzeyinde yapılır.
+- `atex_zone`'da bölge **0/1/2 (gaz) ya da 20/21/22 (toz)** sayısıdır; `II` ekipman grubudur
+  (yerüstü) ve yalnız `atex_marking`'te geçer. *(2026-09-23 düzeltmesi, REC-172 plan v5.1: bu
+  maddenin ilk örneği `Zone II, …` idi ve "baştaki II `atex_zone`'da bölge numarası" diyordu —
+  ikisi de yanlıştı. K11-a'nın kararı, yani iki ayrı alan, değişmedi; yalnız örnek ve açıklama.)*
+- **`atex_zone` kanonik biçimi:** `Zone <n>[, Category <k>][, Directive <d>]` — kaynağın verdiği
+  kadarı yazılır, eksik parça **türetilmez** (ör. föy yalnız bölge veriyorsa `Zone 2`; kategori
+  EPL'den ya da gaz grubundan çıkarılmaz). Canlıda 12 satır (`Zone 2, Category 3G, Directive
+  94/9/CE`) bu biçimdedir; 7 satır `Zone II, …` biçim ihlalidir → ayrı düzeltme işi (REC-172 yorumu).
+- **`atex_marking`:** föyde kategori öneki (`II 2G` / `II 3G`) yoksa **eklenmez**. Fan ve motor
+  ayrı işaretliyse tek değerde ikisi: `Fan: Ex h IIB T3 Gc · Motor: Ex ec IIC T3 Gc`.
 - ATEX bilgisi teknik tabloda **kod olarak** yaşar; ürün açıklamasındaki **cümle** ayrı
   yüzeydir ve bu alanların yerine geçmez (K11).
 
 **Uygulandı:** 19 satır (JET 7 + SEAT 12) `atex_zone`'a taşındı ve yükleme listesine girdi.
+
+### Türetilen değer: kaynak basılıysa KAYNAK kazanır (OPS hükmü, 2026-09-23)
+
+**Nereden çıktı (PIM §1 fark 2, 2026-09-23):** Punto Evo Flexo'da `max_delivery_ls` kaynakta **48,6**
+basılı (katalog tek ondalık); m³/h'den türetme 175 / 3,6 = **48,61**. İki yol aynı büyüklüğü farklı
+hassasiyette veriyor ve fark ölçümü bunu "çelişki" sayıyordu.
+
+**Kural:**
+- Kaynak değeri **basılıysa** o yazılır; türetme (`max_delivery_ls = m³/h ÷ 3,6`, `rated_power_w = kW × 1000` vb.)
+  **yalnız kaynakta o alan yoksa** yapılır ve satırda `kaynak=türetildi` işaretlenir.
+- Kaynak değer ile türetilen/bizdeki değer arasındaki **fark kıyası, kaynağın ondalık hassasiyetinde**
+  yapılır: kaynak 48,6 (1 ondalık) ise bizdeki değer 1 ondalığa yuvarlanıp kıyaslanır (48,61 → 48,6 = aynı).
+  Kaynak hassasiyetinin ötesindeki basamak farkı çelişki değildir.
+- ❌ Basılı kaynak değeri, türetmeyle "daha hassas" diye ezmek yasak — kanıtı olan değer kaynaktakidir.
 
 ### Sayısal alanda birim, DEĞERE gömülmez
 

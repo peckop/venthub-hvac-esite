@@ -12,6 +12,7 @@ import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { kaynakHassasiyetindeAyni, ondalik, ondalikHam } from '../fark-hassasiyet.mjs'
 
 const BETIK = join(__dirname, '..', 'uretici-fark-tablosu.mjs')
 let kok = ''
@@ -44,6 +45,22 @@ const avensTablo = [
   ['NX313290', 'NIMAX 314 T2 1,5kW', '5240 m³/h', '1818'],
   ['NX 3542100', 'NIMAX 354 T2 3kW', '7870 m³/h', '2173'],
 ]
+
+describe('fark kıyası kaynak hassasiyetinde (cetvel "Türetilen değer")', () => {
+  it('kaynak 48,6 ↔ bizde 48,61 aynı; 1000 ↔ 1004 FARKLI (eski %0,5 tolerans yutuyordu)', () => {
+    expect(kaynakHassasiyetindeAyni(48.61, 48.6, '48,6')).toBe(true)
+    expect(kaynakHassasiyetindeAyni(48.66, 48.6, '48,6')).toBe(false)
+    expect(kaynakHassasiyetindeAyni(1004, 1000, '1000')).toBe(false)
+    expect(kaynakHassasiyetindeAyni(3.14, 3.14, '3,14')).toBe(true)
+  })
+  it('hassasiyet BASILI metinden: Casals "4,00" ↔ bizde 4,4 FARKLI (sayıya çevrilince sıfırlar kaybolurdu)', () => {
+    expect(kaynakHassasiyetindeAyni(4.4, 4, '4,00')).toBe(false)
+    expect(kaynakHassasiyetindeAyni(4, 4, '4,00')).toBe(true)
+    expect(ondalikHam('5.500', true)).toBe(0)
+    expect(ondalikHam('0,09 kW')).toBe(2)
+    expect(ondalik(5.83)).toBe(2)
+  })
+})
 
 describe('üretici fark tablosu', () => {
   it('farklı debi → "üretici", aynı debi → "aynı", koddaki boşluk fark değil', () => {

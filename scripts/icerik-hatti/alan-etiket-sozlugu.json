@@ -23,10 +23,11 @@
     "min_voltage_v":            { "birim": "V",     "etiketler": ["min voltage", "min gerilim", "voltage min"] },
     "frequency_hz":             { "birim": "Hz",    "etiketler": ["frequency", "frekans", "hz", "frequenza"] },
     "rpm_max":                  { "birim": "rpm",   "etiketler": ["rpm", "rpm min/max", "devir", "speed", "r.p.m", "min-1", "giri/min"] },
-    "max_absorbed_power_w":     { "birim": "W",     "etiketler": ["absorbed power", "w min/max", "power", "güç", "guc", "potenza", "max power", "assorbita"] },
+    "max_absorbed_power_w":     { "birim": "W",     "etiketler": ["absorbed power", "w min/max", "max power", "assorbita"] },
     "rated_power_w":            { "birim": "W",     "etiketler": ["rated power", "nominal power", "anma gücü", "potenza nominale"] },
-    "absorbed_current_a":       { "birim": "A",     "etiketler": ["current", "akım", "akim", "a min/max", "absorbed current", "corrente", "amp"] },
-    "rated_output_current_a":   { "birim": "A",     "etiketler": ["output current", "rated current", "çıkış akımı"] },
+    "absorbed_current_a":       { "birim": "A",     "etiketler": ["current", "akım", "akim", "a min/max", "absorbed current", "corrente", "amp", "rated i", "rated current"] },
+    "max_current_a":            { "birim": "A",     "etiketler": ["i max", "max current", "maks. akım", "maks akım"] },
+    "rated_output_current_a":   { "birim": "A",     "etiketler": ["output current", "rated output current", "çıkış akımı"] },
     "diameter_mm":              { "birim": "mm",    "etiketler": ["diameter", "çap", "cap", "ø d", "øa", "impeller diameter", "diametro", "ø"] },
     "size_a_mm":                { "birim": "mm",    "etiketler": ["a", "dimensions", "ölçü a", "boyut a"] },
     "size_b_mm":                { "birim": "mm",    "etiketler": ["b", "dimensions", "ölçü b", "boyut b"] },
@@ -40,6 +41,8 @@
     "noise_lpa_3m_db":          { "birim": "dB",    "etiketler": ["lpa", "l pa", "sound pressure", "ses basıncı", "db"] },
     "ip_rating":                { "birim": null,    "etiketler": ["ip", "protection", "koruma", "protection degree", "grado di protezione"] },
     "insulation_class":         { "birim": null,    "etiketler": ["insulation", "izolasyon", "insulation class", "classe di isolamento"] },
+    "electrical_protection_class": { "birim": null, "etiketler": ["electrical insulation class", "electric insulation class", "protection class", "koruma sınıfı"] },
+    "motor_efficiency_class":   { "birim": null,    "etiketler": ["efficiency class", "ie class", "verim sınıfı", "classe di efficienza"] },
     "motor_poles":              { "birim": null,    "etiketler": ["poles", "kutup", "poli", "pole"] },
     "phase":                    { "birim": null,    "etiketler": ["phase", "faz", "fase", "single-phase", "three-phase", "monofase", "trifase"] },
 
@@ -49,6 +52,36 @@
     "heating_power_w":          { "birim": "W",     "etiketler": ["heating power", "ısıtma gücü", "isitma gucu", "heater", "potenza riscaldamento"] },
     "permissible_motor_power_w": { "birim": "W",    "etiketler": ["motor power", "permissible power", "motor gücü", "potenza motore"] },
     "voltage_alt_v":            { "birim": "V",     "etiketler": ["voltage", "gerilim", "alternative voltage", "v ~"] }
+  },
+  "_duzeltme_2026_09_23": [
+    "REC-172 plan v5.1 + cetvel product-schema-standard §11.7 (Motor gücü K9, Akım):",
+    "(1) Bağlamsız 'power' / 'güç' / 'guc' / 'potenza' max_absorbed_power_w'dan ÇIKARILDI: Casals 'Rated Power kW'",
+    "    ve Vortice föyü Motor bölümü 'Power' anma MİL gücüdür (rated_power_w); Nicotra 'motor power' izinli tavandır",
+    "    (permissible_motor_power_w). Bağlamsız 'power' üç alandan hangisi olduğunu söylemez → sözlük DAR kalır.",
+    "(2) 'rated current' rated_output_current_a'dan absorbed_current_a'ya TAŞINDI; Casals 'Rated I (A)' için 'rated i'",
+    "    eklendi. Sürücü (Danfoss) çıkış akımı yalnız 'output current' / 'rated output current' ile eşlenir.",
+    "(3) max_current_a eklendi (Vortice föyü 'I max. (400V)', AVenS 'MAKS. AKIM')."
+  ],
+  "_baglam_istisnalari": [
+    "Etiket tek başına alanı belirlemediğinde karar KAYNAĞA göre verilir ve burada yazılır (etiket eşlemesi bunu bilemez):",
+    "Enkelfan EEC (plug-fans_casals s.16) 'Rated Power kW': mil gücü mü çekilen güç mü BELİRSİZ (155: 230 V × 0,25 A = 57,5 VA ↔ 60 W) → hiçbir alana yazılmaz (plan açık soru 4b).",
+    "Vorticent CMS ATEX föyü s.2: 'RPM' ve 'Approx. weight' hem Fan hem Motor bölümünde — alan BÖLÜM etiketiyle seçilir (rec172-cikarim.py).",
+    "Casals NIMUS/NIMAX 'Rated I (A)' iki sütun (230 V · 400 V): yazılan akım voltage_v ile aynı gerilimin sütunu (400 V).",
+    "Vortice 'Insulation class: II' (Roma rakamı I/II/III) = IEC 61140 koruma sınıfı → electrical_protection_class; harf (B/F/H) = ısıl sınıf → insulation_class. Alan DEĞERİN biçimiyle seçilir, 'insulation class' kelimesiyle değil (REC-172 tur 2, 82 ürün)."
+  ],
+  "_cok_anlamli": {
+    "_nicin": "Birden çok alana giden etiket BİLİNÇLİ olmalı; kapı (paket-sozlesme.test.ts) listede olmayan yeni çakışmada KIRMIZI verir.",
+    "db": ["noise_level_db_a", "noise_lpa_3m_db"],
+    "delivery": ["max_delivery_m3h", "max_delivery_ls"],
+    "dimensions": ["size_a_mm", "size_b_mm", "size_c_mm"],
+    "gerilim": ["voltage_v", "voltage_alt_v"],
+    "m3/h": ["max_delivery_m3h", "min_delivery_m3h"],
+    "m³/h": ["max_delivery_m3h", "min_delivery_m3h"],
+    "max airflow": ["max_delivery_m3h", "max_delivery_ls"],
+    "pa": ["max_static_pressure_pa", "min_static_pressure_pa", "max_total_pressure_pa"],
+    "static pressure": ["max_static_pressure_pa", "nominal_static_pressure_pa", "min_static_pressure_pa"],
+    "v ~": ["voltage_v", "voltage_alt_v"],
+    "voltage": ["voltage_v", "voltage_alt_v"]
   },
   "_kapsam_disi": [
     "erp_compliant · pq_curve · motor_type · has_humidistat · has_timer — bunlar TÜREV ya da",
