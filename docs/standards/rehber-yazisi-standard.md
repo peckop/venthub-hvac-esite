@@ -227,7 +227,7 @@ Recep metni satır satır okumaz. Doğruluğu ajan düzeni taşır; Recep'e öze
 
 | Adım | Kim | Çıktı |
 |---|---|---|
-| 1. Araştırma | Sonnet alt ajan × N (konu eksenlerine bölünür) | Kaynak listesi + her kaynaktan ham alıntı + R2.3 kaydı |
+| 1. Araştırma | Sonnet alt ajan × N (konu eksenlerine bölünür) | Kaynak listesi + her kaynaktan ham alıntı + R2.3 kaydı. Alıntı **tek parça ve birebir**; tablo değeri **hücre hücre** (not: satır/sütun başlığı). ⚠Ölçüldü (F4, 2026-09-24): ajanlar parçaları "[...]", " / ", " — " ile birleştirip tablo hücrelerini kendi biçiminde yeniden yazdı — ilk taramada 53 alıntının 22'si kaynakta birebir yoktu. Araştırma çıktısı 3c betiğinden KALDI 0 çıkmadan yazıma geçilmez |
 | 2. Yazım | BLOG | Taslak + **iddia tablosu** (her iddia → kaynak no + birebir alıntı + tür: sayı / olumsuz / mevzuat / genel) |
 | 3a. Kapsam çıkarımı | Doğrulayıcı, **iddia tablosunu görmeden** | Metnin TAMAMINDAN kendi iddia listesi: gövde, tablo hücreleri, SSS, `<title>`, meta açıklama, JSON-LD `headline`, görsel alt metni, hesap örneği. Yazarın tablosuyla eşlenir; **eşlenmeyen iddia = 0** olmadıkça tur geçersiz |
 | 3b. Atıf betiği | belirlenimci betik (BLOG) | Sayı, birim, yüzde, "zorunlu", olumsuz fiil taşıyan her cümlede `[n]` var mı; listede olmayan `[n]` ya da kullanılmayan liste maddesi var mı |

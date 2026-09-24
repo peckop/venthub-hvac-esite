@@ -39,6 +39,13 @@ export function htmlMetin(html) {
  */
 export function normalize(s) {
   return s
+    // PDF bitişik harfleri (ﬂ ﬁ ﬀ …) → düz harf: kaynak dizininde "ﬂow" U+FB02 ile geçiyordu (ölçüldü 2026-09-24).
+    .normalize('NFKC')
+    // PDF satır sonu hecelemesi: "propor-\ntional" → "proportional" (kaynak dizini metni; ölçüldü 2026-09-24,
+    // F4 araştırmasında 33 alıntının bir kısmı yalnız bu yüzden "yok" çıkıyordu). Yalnız küçük harf ↔ küçük harf.
+    .replace(/(\p{Ll})-[ \t]*\r?\n[ \t]*(\p{Ll})/gu, '$1$2')
+    // Rakamdan sonra satır sonunda kırılan tireli bileşik: "3-\nphase" → "3-phase" (tire KALIR).
+    .replace(/(\p{N})-[ \t]*\r?\n[ \t]*(\p{L})/gu, '$1-$2')
     .replace(/[“”„"]/g, '"').replace(/[‘’']/g, "'").replace(/[–—‑]/g, '-')
     .replace(/\s+/g, ' ')
     .replace(/\s+([.,;:!?)])/g, '$1').replace(/([(])\s+/g, '$1')
@@ -58,7 +65,24 @@ export const BAYATLIK = /\b(no longer|deprecat\w*|removed|retired|sunset|superse
  * cümleydi ve aynı uyarıyı verdi. Bu yüzden işaret alıntıyı DÜŞÜRMEZ: sonuç `INCELE` olur ve `baglam`
  * R5.1 3d yargısına (doğrulayıcı) gider. Kelime sezgisi yargının yerini tutmaz, yalnız dikkat çeker.
  */
+/**
+ * Parçalı alıntı: araştırma ajanları birbirinden uzak iki cümleyi `[...]`, `…`, `...` ya da ` / ` ile
+ * birleştirebiliyor (ölçüldü 2026-09-24). Birleşik dize kaynakta hiçbir zaman birebir geçmez; bu yüzden
+ * parçalara bölünür ve HER parça ayrı ayrı aranır. Bir parça bile yoksa alıntı KALDI.
+ */
+export function alintiParcalari(alinti) {
+  return alinti.split(/\s*(?:\[\s*(?:\.\.\.|…)\s*\]|…|\.\.\.|\s\/\s)\s*/u).map((p) => p.trim()).filter((p) => p.length >= 8)
+}
+
 export function alintiBul(metin, alinti, pencere = 400) {
+  const parcalar = alintiParcalari(alinti)
+  if (parcalar.length > 1) {
+    const sonuclar = parcalar.map((p) => ({ parca: p, ...alintiBul(metin, p, pencere) }))
+    const eksik = sonuclar.filter((s) => !s.bulundu)
+    if (eksik.length) return { bulundu: false, sebep: 'PARCA-YOK', parca: parcalar.length, eksikParca: eksik.map((s) => s.parca) }
+    const isaretli = sonuclar.find((s) => s.bayatlikIsareti)
+    return { ...sonuclar[0], parca: parcalar.length, bayatlikIsareti: isaretli ? isaretli.bayatlikIsareti : null }
+  }
   const m = normalize(metin)
   const a = normalize(alinti)
   if (!a) return { bulundu: false, sebep: 'ALINTI-BOS' }
