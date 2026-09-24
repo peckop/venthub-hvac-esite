@@ -31,6 +31,7 @@
 | Hangi sayfa **nasıl üretilir**, veri değişince **ne tazelenir**, fiyat **hangi yüzeyde** görünür? | `standards/rendering-cache-standard.md` |
 | Müşterinin gördüğü ürün metnine **ne girer, ne girmez** (iç editör notu, doğrulanmamış değer)? | `standards/vitrin-metni-standard.md` |
 | Rehber (bilgi) yazısının **konusu nasıl seçilir, kaynağı ne, nasıl doğrulanır**, yayından sonra ne ölçülür? | `standards/rehber-yazisi-standard.md` (TASLAK, karar 62) |
+| Aramada ve pazarda **nasıl göründüğümüz hangi kaynaktan ölçülür**, haftalık takip nasıl, hangi veri depoya girmez? | `standards/pazar-olcum-standard.md` (TASLAK, karar 93) |
 | Bir kategorinin **adı hangi kolondan** gelir (menüde, başlıkta, kırıntıda)? | `standards/kategori-adlandirma-standard.md` |
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır? | `standards/multi-session-coordination-standard.md` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
