@@ -1,3 +1,6 @@
+'use client'
+
+// İstemci sınırı BURADA ilan edilir: rota metadata yazdığı için Server Component (REC-150 Adım 5).
 import { ArrowDownUp, Car, Gauge, MapPin,RotateCcw, Wind } from 'lucide-react'
 import React, { useMemo,useState } from 'react'
 

@@ -4,6 +4,7 @@ import React, { useEffect,useState } from 'react'
 
 import { useCategories } from '../contexts/CategoryContext'
 import { useI18n } from '../i18n/I18nProvider'
+import LanguageSwitcher from './LanguageSwitcher'
 import EliteMegaMenu, { MobileMegaMenu } from './navigation/EliteMegaMenu'
 
 interface MegaMenuProps {
@@ -32,7 +33,14 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           </div>
           <span className="font-bold text-slate-900 tracking-tight text-lg">{t('megamenu.classic.title')}</span>
         </div>
-        <button 
+        {/* Mobildeki dil seçici BURADA (REC-89, 2026-09-24): yüzen düğme mobilde içeriğin
+            üstüne biniyordu, MainLayout'ta `hidden lg:block` oldu. Bu küme `lg:hidden` — menü
+            düğmesinin göründüğü kırılımla aynı. Yeni kabukta (bayrak açık) menünün yerini alt
+            sekme çubuğu alır; orada kendi dil seçicisi var, burası hiç açılmaz. */}
+        <div className="lg:hidden ml-auto mr-2">
+          <LanguageSwitcher id="menu-dil-secici" />
+        </div>
+        <button
           onClick={onClose}
           className="p-2 hover:bg-slate-50 rounded-full transition-colors text-slate-400 hover:text-slate-600"
         >
