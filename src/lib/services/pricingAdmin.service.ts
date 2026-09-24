@@ -136,6 +136,10 @@ export function toPricingProductInput(row: ProductScopeRow, brandIdByName: Map<s
     brandId: brandIdByName.get(row.brand) ?? brandIdByName.get(row.brand.trim()) ?? null,
     categoryId: row.category_id ?? null,
     costInBase: row.cost_in_base ?? null,
+    // Faz A (iskonto v3 K1): liste TL'si bugün cost_in_base'in taşıdığı sayıdır (§2 geçiş kaydı).
+    // İki alan AYNI değeri alır → kuralın tabanı cost ya da list_price olsun fiyat değişmez.
+    // Faz B'de costInBase beklenen maliyete bağlanır; listInBase burada kalır.
+    listInBase: row.cost_in_base ?? null,
     name: row.name,
     sku: row.sku,
   }

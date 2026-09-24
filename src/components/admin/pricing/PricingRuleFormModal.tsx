@@ -70,6 +70,9 @@ const getPricingRuleSchema = (t: (key: string) => string) =>
       brand_id: z.string().nullable(),
       category_id: z.string().nullable(),
       method: z.enum(['cost_plus', 'fixed']),
+      // Faz A (iskonto v3 K1): motor artık `base`'i OKUR. `parent_book` şemada KALIR ki o tabandaki
+      // bir kural formdan kaydedilince sessizce `cost`a dönmesin; seçenek olarak sunulmaz.
+      base: z.enum(['cost', 'list_price', 'parent_book']),
       margin_pct: z.number().nullable(),
       fixed_price: z.number().nullable(),
       price_is_vat_inclusive: z.boolean(),
@@ -176,6 +179,9 @@ const EMPTY_VALUES: PricingRuleFormValues = {
   brand_id: null,
   category_id: null,
   method: 'cost_plus',
+  // Yeni kural varsayılanı LİSTE (K1 "satış tabanı listedir"). Faz A'da liste = maliyet sayısı,
+  // fiyat farkı yok; Faz B'de maliyet iskontoyla ayrışınca satış tabanı liste kalır.
+  base: 'list_price',
   margin_pct: 40,
   fixed_price: null,
   price_is_vat_inclusive: false,
@@ -200,6 +206,7 @@ function ruleToFormValues(rule: PricingRuleRow): PricingRuleFormValues {
     brand_id: rule.brand_id,
     category_id: rule.category_id,
     method: rule.method === 'fixed' ? 'fixed' : 'cost_plus',
+    base: rule.base === 'list_price' || rule.base === 'parent_book' ? rule.base : 'cost',
     margin_pct: rule.margin_pct,
     fixed_price: rule.fixed_price,
     price_is_vat_inclusive: rule.price_is_vat_inclusive,
@@ -431,7 +438,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
       brand_id: values.scope === 2 ? values.brand_id : null,
       category_id: values.scope === 3 ? values.category_id : null,
       method: values.method,
-      base: rule?.base ?? 'cost',
+      base: values.base,
       margin_pct: values.method === 'cost_plus' ? values.margin_pct : null,
       surcharge: values.surcharge,
       fixed_price: values.method === 'fixed' ? values.fixed_price : null,
@@ -581,6 +588,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
         brand_id: v.scope === 2 ? v.brand_id : null,
         category_id: v.scope === 3 ? v.category_id : null,
         method: v.method,
+        base: v.base,
         margin_pct: v.method === 'cost_plus' ? v.margin_pct : null,
         fixed_price: v.method === 'fixed' ? v.fixed_price : null,
         price_is_vat_inclusive: v.method === 'fixed' ? v.price_is_vat_inclusive : false,
@@ -1063,7 +1071,11 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
                     </p>
                     <ul className="space-y-2">
                       {impactSamples.map(({ product, beforeGross }) => {
-                        const after = computePriceFromRule(draftRule, product.costInBase ?? null, [])
+                        const after = computePriceFromRule(
+                          draftRule,
+                          { costInBase: product.costInBase ?? null, listInBase: product.listInBase ?? null },
+                          [],
+                        )
                         const loses = draftLosesFor(product)
                         return (
                           <li

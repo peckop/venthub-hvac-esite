@@ -211,8 +211,25 @@ export interface PricingProductInput {
   id: string
   brandId?: string | null
   categoryId?: string | null
-  /** Donmuş TL maliyet (products.cost_in_base). null → yalnız 'fixed' kural fiyatlayabilir. */
+  /**
+   * BEKLENEN maliyet TL'si — marj kelepçesinin ölçüsü ve `base='cost'` kuralın tabanı.
+   * Faz A'da (iskonto v3, pricing-standard §2.1 K1) = products.cost_in_base; Faz B'de beklenen
+   * maliyete (liste × iskonto zinciri × kur) bağlanır. null → kelepçe atlanır, `base='cost'` fiyatlayamaz.
+   */
   costInBase?: number | null
+  /**
+   * LİSTE fiyatının TL'si — `base='list_price'` kuralın tabanı (K1 "satış tabanı listedir").
+   * Faz A'da costInBase ile AYNI sayı (products.cost_in_base); iki girdi aynı değeri taşıdığı için
+   * kural `cost → list_price` çevrilse de kod önce/sonra yayına çıksa da fiyat değişmez (ölçüt A1).
+   */
+  listInBase?: number | null
+}
+
+/** computePriceFromRule'a giren iki taban. İkisi de ZORUNLU alan: çağıran liste fiyatını unutursa
+ *  `base='list_price'` kural sessizce "Teklif Alın"a düşerdi — derleyici bunu yakalasın diye nesne. */
+export interface FiyatTabanlari {
+  costInBase: number | null
+  listInBase: number | null
 }
 
 export interface PricingContext {
@@ -347,16 +364,35 @@ export function sortRules(rules: PricingRuleRow[], priceBookId: string | null): 
 /**
  * Tek kuraldan net/gross hesabı (KDV + kelepçe + yuvarlama dahil). Hesaplanamazsa null.
  * 'percent_off_list' W1'de bilinçli kapsam dışı (liste-fiyat altyapısı W2) — null döner.
+ *
+ * ⭐`rule.base` OKUNUR (iskonto v3 Faz A, pricing-standard §2.1 K1). 2026-09-24'e kadar alan tabloda
+ * vardı (W1 CHECK: cost | list_price | parent_book) ama motor onu HİÇ okumuyordu: her `cost_plus`
+ * maliyetten hesaplanıyordu. Taban seçimi:
+ *   cost → costInBase · list_price → listInBase · parent_book → kapsam dışı (null + trace).
+ * Marj kelepçesi (`min/max_margin_abs`) tabandan bağımsız olarak HER ZAMAN beklenen maliyete
+ * (costInBase) göre çalışır; maliyet yoksa kelepçe atlanır ve trace'e yazılır.
  */
 export function computePriceFromRule(
   rule: PricingRuleRow,
-  costInBase: number | null,
+  tabanlar: FiyatTabanlari,
   trace: string[],
 ): { net: number; gross: number } | null {
+  const { costInBase } = tabanlar
   let p: number
   if (rule.method === 'cost_plus') {
-    if (costInBase == null || rule.margin_pct == null) return null
-    p = costInBase * (1 + rule.margin_pct / 100)
+    const base = rule.base ?? 'cost'
+    let taban: number | null
+    if (base === 'cost') taban = costInBase
+    else if (base === 'list_price') taban = tabanlar.listInBase
+    else {
+      trace.push(`kural ${rule.id}: taban '${base}' kapsam dışı — atlandı`)
+      return null
+    }
+    if (taban == null || rule.margin_pct == null) {
+      if (taban == null) trace.push(`kural ${rule.id}: taban '${base}' değeri YOK — atlandı`)
+      return null
+    }
+    p = taban * (1 + rule.margin_pct / 100)
   } else if (rule.method === 'fixed') {
     if (rule.fixed_price == null) return null
     p = rule.fixed_price
@@ -367,6 +403,9 @@ export function computePriceFromRule(
   p += rule.surcharge
 
   // Marj kelepçesi (mutlak TL) — yalnız maliyet biliniyorsa anlamlı
+  if (costInBase == null && (rule.min_margin_abs != null || rule.max_margin_abs != null)) {
+    trace.push(`kural ${rule.id}: marj kelepçesi ATLANDI — beklenen maliyet yok`)
+  }
   if (costInBase != null) {
     const margin = p - costInBase
     if (rule.min_margin_abs != null && margin < rule.min_margin_abs) {
@@ -426,7 +465,10 @@ export function resolvePriceWithRules(
   const today = context.today ?? new Date().toISOString().slice(0, 10)
   const priceBookId = context.priceBookId ?? null
   const cost = product.costInBase ?? null
-  trace.push(`girdi: ürün=${product.id} adet=${qty} para=${currency} kitap=${priceBookId ?? 'base'} maliyet=${cost ?? 'YOK'}`)
+  const liste = product.listInBase ?? null
+  trace.push(
+    `girdi: ürün=${product.id} adet=${qty} para=${currency} kitap=${priceBookId ?? 'base'} maliyet=${cost ?? 'YOK'} liste=${liste ?? 'YOK'}`,
+  )
 
   const allRules = inputs.rules
   trace.push(`kural havuzu: ${allRules.length}`)
@@ -446,7 +488,7 @@ export function resolvePriceWithRules(
   }
 
   for (const rule of sortRules(candidates, priceBookId)) {
-    const computed = computePriceFromRule(rule, cost, trace)
+    const computed = computePriceFromRule(rule, { costInBase: cost, listInBase: liste }, trace)
     if (!computed) continue
     trace.push(
       `KAZANAN: kural ${rule.id} (scope=${rule.scope} method=${rule.method}` +
@@ -500,7 +542,7 @@ export async function resolvePrice(
     return {
       price: null,
       trace: [
-        `girdi: ürün=${product.id} adet=${qty} para=${currency} kitap=${priceBookId ?? 'base'} maliyet=${cost ?? 'YOK'}`,
+        `girdi: ürün=${product.id} adet=${qty} para=${currency} kitap=${priceBookId ?? 'base'} maliyet=${cost ?? 'YOK'} liste=${product.listInBase ?? 'YOK'}`,
         `pricing_rule okunamadı: ${rulesError.message}`,
       ],
     }
