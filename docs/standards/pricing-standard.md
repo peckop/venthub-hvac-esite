@@ -66,9 +66,11 @@ tek-alan varsayımı bugünkü sessiz yanlışın kaynağıydı.
   (TL base→USD/EUR vitrin, canlı) **farklı sayılardır.** ⚠️ **Bilinen sapma:** bugün `currency_rates` tek
   satır kümesiyle her iki rolü de besliyor (rol ayrımı kolonu yok) — T010 ile `rate_role` eklenecek.
 
-### 2.1 Alış iskontosu zinciri — B tabanının girişi (TASLAK v3 · REC-55 v2 · 2026-09-24)
+### 2.1 Alış iskontosu zinciri — B tabanının girişi (v3 · Faz A GEÇERLİ · Faz B TASLAK/PARK · REC-55 v2 · 2026-09-24)
 
-> **Durum: TASLAK v2.** Recep'in isteği (2026-09-23): *"alış iskontosu girebileceğim değil mi? … iskonton şudur
+> **Durum (2026-09-24, merge anı): Faz A = GEÇERLİ KURAL** (iki bağımsız denetimden sonra v3; fiyat motoru işi URUN'da,
+> kod bu bölüme atıf verir). **Faz B = TASLAK, PARK** — veri modeli öneridir, karar DEĞİLDİR; tablo migration'dır, Recep
+> onayı ister (kural 13). Recep'in isteği (2026-09-23): *"alış iskontosu girebileceğim değil mi? … iskonton şudur
 > dediklerinde ne yapacağız?"* v1 bağımsız plan-challenger'dan **BLOK** aldı (2026-09-24): teşhis kodla doğrulandı,
 > çözümün üç ayağı kırıktı (sıfır-fark ölçütü, maliyet kolonunun anon'a açılması, istemcide kalan zarar koruması).
 > v2 ikinci denetimden **Faz A: KOŞULLU, Faz B: BLOK** aldı (16 düzeltmenin 7'si tam, 9'u kısmen karşılanmıştı; yeni
@@ -85,7 +87,7 @@ tek-alan varsayımı bugünkü sessiz yanlışın kaynağıydı.
 | Kural `base` alanı okunuyor mu? | **Hayır.** Fiyatı hesaplayan tek çekirdek `computePriceFromRule`; üç çağıran (materialize, `resolvePrice`, admin önizleme) oradan geçer. SQL (`display_price`, `get_display_prices`) ve `order-validate` yalnız `product_prices` cache'ini okur. `list_price` değeri W1 CHECK'inde **zaten izinli** → kural tarafı migration istemez. |
 | `cost_in_base` neyi taşıyor? | **Liste fiyatının TL'si** (§2 geçiş kaydı). Aktif + maliyetli ürün ~347, alış fiyatı olup `cost_in_base`'i boş 68. |
 | Cache ne kadar taze? | Son materialize 2026-08-15; maliyet tazeleme + materialize **otomatik değil** (cron'da yok) → §8.1 madde 3 ile ayrışma, AYRI KAYIT. |
-| Maliyet kolonları kime açık? | `products` SELECT politikası kiracı filtresi; anon'un `cost_in_base`, `purchase_price`, `last_purchase_cost` üzerinde kolon SELECT yetkisi var (plan-challenger ölçümü) → AYRI KAYIT (güvenlik). Yeni maliyet kolonu `products`'a konursa bu yetkiyi **devralır**. |
+| Maliyet kolonları kime açık? | `products` SELECT politikası kiracı filtresi; anon'un `cost_in_base`, `purchase_price`, `last_purchase_cost` üzerinde kolon SELECT yetkisi var (plan-challenger ölçümü) → REC-140 (güvenlik). Yeni maliyet kolonu `products`'a konursa bu yetkiyi **devralır**. **Güncelleme (merge anı):** REC-140 Faz 1 master'da — admin-only `product_costs` tablosu VAR (8 maliyet kolonu `products`'tan senkron tetikle kopyalanır; RLS kiracı + admin, anon grant'i yok). Faz 3'te kolonlar `products`'tan düşer; o güne kadar TÜM yazım `products` üzerinden (`docs/plans/rec140-maliyet-kolonlari-kilidi-2026-09-24.md`). |
 
 **⛔ Kilit risk:** bugünkü kural "maliyet + %0". İskontolu maliyet bugünkü `cost_in_base`'e yazılırsa **satış fiyatı
 aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzden iskonto verisi Faz A bitmeden canlıya YAZILMAZ.
@@ -105,6 +107,9 @@ aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzd
   ayrı `listInBase` alanı eklenir. **Faz A'da `costInBase := products.cost_in_base` de aynen kalır** (B tabanı henüz
   yok); iki girdi aynı sayıyı taşıdığı için kod ile kural verisi hangi sırayla yayına çıkarsa çıksın fiyat değişmez ve
   `base='cost'` duran kural hiçbir ürünü "Teklif Alın"a düşürmez. `costInBase` Faz B'de beklenen maliyete bağlanır.
+  **REC-140 Faz 3 ile kesişme:** Faz 3'te `cost_in_base` `products`'tan düşer ve `product_costs`'tan okunur. Faz A kodu
+  bu kolonu **tek bir okuma noktasından** alır (kaynak tablo adı tek yerde); Faz 3 günü yalnız o nokta değişir.
+  Hangisi önce yayına çıkarsa çıksın A1b ölçütü (fiyat dökümü birebir aynı) yeniden koşulur.
   Güncellenecek yerler: `PRODUCT_SCOPE_COLUMNS`, `computePriceFromRule` ve **dört** çağıran — materialize, `resolvePrice`,
   admin önizleme ve kural formunun kendi hesabı (`PricingRuleFormModal`, fiyat önizlemesi). Formda `base` düzenlenebilir
   olur, yeni kural varsayılanı `list_price`; canlı kuralın `cost → list_price` çevrimi **form + `mutateWithAudit`** ile
@@ -162,8 +167,9 @@ aynı anda iskontolu maliyete düşer** — kârsız satış, sessizce. Bu yüzd
     yazım — zararına fiyat yazamaz. Onay yalnız o satıra aittir; ürünün maliyeti yeniden değişirse onay düşer ve satır
     yeniden denetlenir.
 - **K7 · Gizlilik ve iz.** İskonto ve beklenen maliyet **ticari sırdır.**
-  - Beklenen maliyet `products`'a KONMAZ; admin-only RLS'li ayrı tabloda durur (öneri `product_costs`), anon ve
-    authenticated tablo grant'i `revoke` edilir.
+  - Beklenen maliyet `products`'a KONMAZ; REC-140'ın kurduğu admin-only `product_costs` tablosuna **ek kolon** olarak
+    girer (ayrı tablo AÇILMAZ — aynı adla ikinci bir maliyet deposu iki gerçeklik üretir). Tablonun RLS'i ve anon'a
+    kapalı grant'i REC-140'ta kuruldu; Faz B migration'ı yalnız kolon + tetik ekler ve B3 ile yeniden ölçer.
   - Politikalar **kiracı koşulu + rol** taşır: `tenant_id = jwt_tenant_id() AND is_user_admin()` (kural 12).
     `is_user_admin()` yalnız admin ve super_admin'i kabul eder; fiyat paneli moderatöre de açık olduğundan moderatör
     maliyeti **boş** görür. Panel bu boşluğu "sıfır" değil "yetki yok" diye ayrı gösterir. **Recep kararı
@@ -198,8 +204,10 @@ CREATE TABLE supplier_discounts (
     OR (product_id IS NULL AND (supplier_id IS NOT NULL OR brand_id IS NOT NULL))), -- tedarikçi×marka / marka / tedarikçi
   CONSTRAINT tarih_sirasi CHECK (valid_to IS NULL OR valid_to >= valid_from)
 );
--- product_costs(product_id, tenant_id, expected_cost_in_base numeric(14,4), discount_id, computed_at) — admin-only.
--- Her iki tablo: RLS açık, politikalar tenant_id = jwt_tenant_id() AND is_user_admin(), anon/authenticated
+-- product_costs VAR (REC-140 Faz 1, 2026-09-24). Faz B yalnız kolon ekler:
+--   ALTER TABLE product_costs ADD expected_cost_in_base numeric(14,4), ADD discount_id uuid REFERENCES supplier_discounts(id),
+--   ADD expected_computed_at timestamptz;  -- yazan: iskonto/kur tazelemesi; REC-140 Faz 3 öncesi senkron tetiğine DOKUNMAZ
+-- supplier_discounts ve product_costs: RLS açık, politikalar tenant_id = jwt_tenant_id() AND is_user_admin(), anon/authenticated
 -- tablo grant'i revoke (supplier_discounts'a yazma yalnız iskonto_tanimla RPC'si), denetim_izi_yaz tetiği.
 -- iskonto_tanimla RPC (K4: advisory lock, kapat+ekle tek işlem, IS NOT DISTINCT FROM); zarar tetikleri (K6):
 -- product_prices BEFORE (RETURN NULL) + product_costs AFTER.
