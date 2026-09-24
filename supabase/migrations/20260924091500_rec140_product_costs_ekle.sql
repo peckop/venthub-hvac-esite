@@ -16,18 +16,27 @@
 -- KAPANMAZ (kapanış Faz 3). Moderatör politikaları (Faz 1b) ve görünümler (Faz 2-DB) ayrı migration.
 -- product_costs denetim tetiği Faz 3'te (senkron aynı değişiklik için ikinci satır doğurmasın).
 --
--- GERİ ALMA: drop trigger trg_product_costs_senkron_ins/upd on public.products;
+-- GERİ ALMA (tek işlemde): drop trigger trg_product_costs_senkron_ins/upd on public.products;
 --            drop function public.product_costs_senkron(); drop table public.product_costs;
 --            alter table public.products drop constraint products_id_tenant_uk;
 --            grant execute on function public.admin_search_products(text,integer,integer,uuid) to anon;
 --            (veri kaybı yok: products'taki kolonlara dokunulmadı.)
 
+-- İşlem bloğu AÇIK (INV-MIGRATION-3 / squawk prefer-robust-stmts). `set local` BEGIN'den SONRA —
+-- öncesinde kalırsa Postgres yalnız WARNING verir ve zaman aşımları uygulanmaz (challenger v3 2.A).
+begin;
+
 set local lock_timeout = '5s';
 set local statement_timeout = '60s';
+
+-- Kopya → Guard A → tetik sırasının kilide dayandığı AÇIK olsun (tekrar koşumda ALTER atlanırsa da).
+lock table public.products in share row exclusive mode;
 
 -- 1 ── bileşik FK hedefi ─────────────────────────────────────────────────────────────────────
 do $$
 begin
+  -- ⚠ ACCESS EXCLUSIVE kilit BİLİNÇLİ (442 satır, lock_timeout 5s). squawk DO gövdesini okumaz, bu
+  -- kilidi raporlamaz — sonraki yazar bilsin.
   if not exists (select 1 from pg_constraint where conname = 'products_id_tenant_uk'
                  and conrelid = 'public.products'::regclass) then
     alter table public.products add constraint products_id_tenant_uk unique (id, tenant_id);
@@ -42,11 +51,14 @@ create table if not exists public.product_costs (
   tenant_id               uuid          not null,
   purchase_price          numeric(12,2) not null default 0
                                         constraint product_costs_purchase_price_nonneg check (purchase_price >= 0),
-  purchase_currency       varchar(3)    not null default 'TRY',
+  -- text + uzunluk CHECK (squawk prefer-text-field / ban-char-field); products'taki varchar(3)/char(3) ile
+  -- Guard A karşılaştırması (is distinct from) 3 harfli kodlarda birebir.
+  purchase_currency       text          not null default 'TRY'
+                                        constraint product_costs_purchase_currency_len check (char_length(purchase_currency) = 3),
   purchase_rate_to_base   numeric(18,6),
   cost_in_base            numeric(14,4),
   last_purchase_cost      numeric       constraint product_costs_last_purchase_cost_check check (last_purchase_cost >= 0),
-  last_purchase_currency  char(3),
+  last_purchase_currency  text          constraint product_costs_last_purchase_currency_len check (char_length(last_purchase_currency) = 3),
   last_purchased_at       timestamptz,
   supplier_name           text,
   updated_at              timestamptz   not null default now(),
@@ -116,7 +128,7 @@ create or replace function public.product_costs_senkron()
 returns trigger
 language plpgsql
 security definer
-set search_path = pg_catalog, public
+set search_path = pg_catalog, public, pg_temp
 as $$
 begin
   insert into public.product_costs as c (product_id, tenant_id, purchase_price, purchase_currency,
@@ -169,3 +181,29 @@ create trigger trg_product_costs_senkron_upd
 -- 6 ── admin_search_products: anon EXECUTE kaldır (OPS/URUN security-reviewer 2026-09-24) ──────
 -- INVOKER; anon'un kolon yetkisiyle purchase_price döndürüyordu. Tek çağıran admin ekranı (authenticated).
 revoke execute on function public.admin_search_products(text, integer, integer, uuid) from anon, public;
+
+-- 7 ── yetki öz-kontrolü: gölgede doğruydu ama canlının varsayılan ayrıcalıkları farklıysa BURADA düşsün
+-- (challenger v3 2.E). Herhangi biri doğruysa migration geri döner.
+do $$
+begin
+  if has_table_privilege('anon', 'public.product_costs', 'select') then
+    raise exception 'REC-140 yetki: anon product_costs okuyabiliyor';
+  end if;
+  if has_table_privilege('authenticated', 'public.product_costs', 'insert')
+     or has_table_privilege('authenticated', 'public.product_costs', 'update')
+     or has_table_privilege('authenticated', 'public.product_costs', 'delete') then
+    raise exception 'REC-140 yetki: authenticated product_costs''a yazabiliyor (yazıcı kuralı Faz 3''e kadar kapalı)';
+  end if;
+  if has_function_privilege('anon', 'public.admin_search_products(text,integer,integer,uuid)', 'execute') then
+    raise exception 'REC-140 yetki: anon admin_search_products çalıştırabiliyor';
+  end if;
+  if has_function_privilege('authenticated', 'public.product_costs_senkron()', 'execute') then
+    raise exception 'REC-140 yetki: authenticated tetik fonksiyonunu çalıştırabiliyor';
+  end if;
+  if not (select relrowsecurity from pg_class where oid = 'public.product_costs'::regclass) then
+    raise exception 'REC-140 yetki: product_costs RLS kapalı';
+  end if;
+  raise notice 'REC-140 yetki öz-kontrolü GEÇTİ';
+end $$;
+
+commit;
