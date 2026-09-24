@@ -218,13 +218,17 @@ jobs:
         with:
           node-version: '24'
 
-      # --legacy-peer-deps ZORUNLU: depo pnpm ile yonetiliyor ve package.json'da onceden
-      # var olan bir peer catismasi bulunuyor (react-day-picker 8 -> date-fns ^2||^3, depoda
-      # date-fns 4). pnpm buna izin veriyor, npm vermiyor; bayrak olmadan kurulum patliyor ve
-      # kapi VERIYLE ilgisi olmayan bir sebeple kirmizi donuyor. --ignore-scripts: yalnizca
-      # surucu gerekiyor, paket yasam-dongusu betikleri kosmasin.
-      - name: Install pg driver only
-        run: npm install --no-save --no-audit --no-fund --ignore-scripts --legacy-peer-deps pg@8
+      # ⭐KILITLI, KOKTEN BAGIMSIZ KURULUM (2026-09-23). Eskiden kok dizinde
+      # `npm install --no-save pg@8` kosuyordu: npm bu durumda KOK package.json'daki TUM
+      # bagimliliklari kilitsiz (en yeni) cozer. Olculen kirmizi: supabase-js 2.117.1
+      # 09:35:44Z'de yayinlandi, bagimliligi functions-js 2.117.1 09:37'de npm'de henuz yoktu
+      # (ETARGET) → kapi VERIYLE ilgisi olmayan bir yayin yarisiyla kirmizi. Artik yalniz
+      # pg + 13 alt paketi, kilit dosyasindan, RUNNER_TEMP'e kurulur (yerel olcum 2,3 sn);
+      # ESM cozumlemesi icin kokte node_modules baglantisi acilir (bu iste baska node_modules yok).
+      # Yukseltme: .github/ci-bagimliliklari/pg-surucu/ altinda surum + kilit birlikte degisir.
+      - name: Install pg driver only (kilitli)
+        timeout-minutes: 5
+        run: bash .github/ci-bagimliliklari/kur.sh pg-surucu
 
       - name: Catalog integrity gate
         env:
@@ -346,14 +350,12 @@ jobs:
         with:
           node-version: '24'
 
-      # Kardes is (catalog-integrity) ile AYNI gerekce: --legacy-peer-deps zorunlu
-      # (depoda onceden var olan react-day-picker/date-fns peer catismasi npm'i patlatir),
-      # --ignore-scripts ise yalnizca surucu gerektigi icin.
+      # Kardes is (catalog-integrity) ile AYNI gerekce: kilitli, kokten bagimsiz kurulum.
       # ADIM DUZEYINDE zaman siniri: is butcesi 10dk, ama asilan bir kurulum adiminin
       # kendisi daha once olmelidir (ci-runner-install-standard §2 kural 1).
-      - name: Install pg driver only
+      - name: Install pg driver only (kilitli)
         timeout-minutes: 5
-        run: npm install --no-save --no-audit --no-fund --ignore-scripts --legacy-peer-deps pg@8
+        run: bash .github/ci-bagimliliklari/kur.sh pg-surucu
 
       - name: RLS role coverage gate
         env:
