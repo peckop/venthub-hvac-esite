@@ -1,0 +1,18 @@
+{
+  "kimlik": "STD-EN-14986",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://single-market-economy.ec.europa.eu/document/download/49c372bc-1a5c-44aa-a1b2-22a14bb24e80_en?filename=Summary%20List_ATEX%2017.9.2025.pdf",
+      "son_url": "https://single-market-economy.ec.europa.eu/document/download/49c372bc-1a5c-44aa-a1b2-22a14bb24e80_en?filename=Summary%20List_ATEX%2017.9.2025.pdf",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Komisyon'un resmi ATEX uyumlaştırılmış standartlar özet listesi (2026-09-04 üretim tarihli); EN 14986:2017 satırında herhangi bir withdrawal/end-of-legal-effect tarihi YOK, yani halen yürürlükte.",
+      "alinti": "2014/34/EU - CEN EN 14986:2007 Design of fans working in potentially explosive atmospheres 20.04.2016 OJ C 126 08.04.2016 31.01.2020 OJ C 183 09.06.2017 / 2014/34/EU - CEN EN 14986:2017 Design of fans working in potentially explosive atmospheres 09.06.2017 OJ C 183 09.06.2017",
+      "alinti_dogrulandi": true
+    }
+  ]
+}
