@@ -32,8 +32,9 @@ const { execFileSync } = require('child_process')
 // Çıkış 0 yollarındaki uyarılar (ORTAK AGAC UYARISI, taban notları) stderr'de kalıyor ve modele
 // ULAŞMIYORDU (2026-09-25 denetimi); kopyası additionalContext olarak da gider. Çıkış 2
 // (alarm) yolunda stderr zaten modele gider, yardımcı o yola dokunmaz.
+let modeleIlet = { oturum() {} }
 try {
-  require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PostToolUse')
+  modeleIlet = require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PostToolUse')
 } catch {
   /* yardımcı yok: uyarı yalnız stderr'de kalır */
 }
@@ -65,6 +66,7 @@ try {
 }
 
 const sid = girdi.session_id || ''
+modeleIlet.oturum(sid) // aynı uyarı bu oturumda modele bir kez gider
 if (!sid || girdi.tool_name !== 'Bash') process.exit(0)
 
 const cwdKok = path.resolve(girdi.cwd || process.cwd()).replace(/\\/g, '/')
