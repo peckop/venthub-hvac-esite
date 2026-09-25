@@ -43,6 +43,14 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 
+// Uyarılar stderr + çıkış 0 ile modele ULAŞMIYORDU (2026-09-25 denetimi); kopyası
+// additionalContext olarak da gider. Yardımcı yüklenemezse kanca eskisi gibi çalışır.
+try {
+  require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PreToolUse')
+} catch {
+  /* yardımcı yok: uyarı yalnız stderr'de kalır */
+}
+
 /** Yumuşak eşik — satır eklemeden önce katlamayı söyler. Sert eşik (16384) precompact'ta. */
 const YUMUSAK_ESIK = 15800
 

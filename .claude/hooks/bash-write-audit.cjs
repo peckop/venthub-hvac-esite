@@ -29,6 +29,15 @@ const fs = require('fs')
 const path = require('path')
 const { execFileSync } = require('child_process')
 
+// Çıkış 0 yollarındaki uyarılar (ORTAK AGAC UYARISI, taban notları) stderr'de kalıyor ve modele
+// ULAŞMIYORDU (2026-09-25 denetimi); kopyası additionalContext olarak da gider. Çıkış 2
+// (alarm) yolunda stderr zaten modele gider, yardımcı o yola dokunmaz.
+try {
+  require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PostToolUse')
+} catch {
+  /* yardımcı yok: uyarı yalnız stderr'de kalır */
+}
+
 /**
  * IKI AD, TEK KAVRAM — OLCULMUS KUSUR (2026-08-23): bu dosya VENTHUB_PANO_DIR okuyordu,
  * board.cjs ise VENTHUB_BOARD_DIR (board.cjs:28). Panoyu bir kopyaya yonlendirip kanarya
