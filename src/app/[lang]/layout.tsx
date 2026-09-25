@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import React from 'react'
 
 import { EN_YAYIN } from '@/config/features'
-import { SITE_URL } from '@/config/siteUrl'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
@@ -59,17 +58,11 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
      * basmaz, yani varsayilan (indexlenebilir) davranis korunur.
      */
     robots: lang === 'en' && !EN_YAYIN ? { index: false, follow: true } : undefined,
-    // hreflang TABANI — kendi `alternates`ini yazmayan HER alt sayfa bunu miras alır
-    // (ör. /tr/products canlıda `tr-TR`/`en-US` basıyordu, REC-127'de ölçüldü).
-    // Bu yüzden biçim burada da alt sayfalarla aynı olmalı: `tr` / `en` / `x-default`.
-    // Sayfa kendi `alternates`ini yazarsa bu blok geçersiz kalır — miras eden yüzeyler için.
-    alternates: {
-      languages: {
-        tr: `${SITE_URL}/tr`,
-        en: `${SITE_URL}/en`,
-        'x-default': `${SITE_URL}/tr`,
-      },
-    },
+    // hreflang TABANI YOK (PR-1, bot karnesi 2026-09-24): burada `tr=/tr, en=/en` vardı ve
+    // kendi `alternates`ini yazmayan her alt sayfa onu miras alıyordu — yani sayfa, dil
+    // karşılığı olarak ANA SAYFAYI gösteriyordu (yanlış hreflang, yanlış olmayandan kötüdür).
+    // Dizine açık her sayfa artık kendi alternates'ini `sayfaUstVerisi` ile yazar; yazmayanlar
+    // (hesap/giriş/ödeme sonucu) zaten X-Robots noindex. Bu bloğu GERİ EKLEME.
     openGraph: {
       title: dict.meta.siteTitle,
       description: dict.meta.siteDesc,

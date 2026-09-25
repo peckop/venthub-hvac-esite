@@ -19,8 +19,6 @@ const sb = vi.hoisted(() => {
       brand: 'AVenS',
       status: 'active',
       category_id: 'c1',
-      price: 1999.9,
-      purchase_price: 1499.5,
       stock_qty: 42,
       low_stock_threshold: 10,
       is_featured: true,
@@ -34,8 +32,6 @@ const sb = vi.hoisted(() => {
       brand: 'AVenS',
       status: 'inactive',
       category_id: 'c2',
-      price: 850,
-      purchase_price: 600,
       stock_qty: 3,
       low_stock_threshold: 10,
       is_featured: false,
@@ -90,8 +86,38 @@ const sb = vi.hoisted(() => {
     },
   }
 
+  // product_prices satış fiyatı: select(...).in(...).eq(...)x3 → await {data,error}.
+  // p1 → Standart listede satış satırı VAR; p2 → YOK (teklif). `fiyatHatasi` okunamama yolunu açar.
+  const durum = { fiyatHatasi: false, productsSelect: [] as string[], fiyatSelect: [] as string[] }
+  const productPricesChain = {
+    in() {
+      return productPricesChain
+    },
+    eq() {
+      return productPricesChain
+    },
+    then(res: (v: unknown) => unknown) {
+      return Promise.resolve(
+        durum.fiyatHatasi
+          ? { data: null, error: { message: 'izin yok' } }
+          : {
+              data: [{ product_id: 'p1aaaa11bbbb2222', gross_price: 2399.88, price_lists: { user_type: 'individual' } }],
+              error: null,
+            },
+      ).then(res)
+    },
+  }
+
   const client = {
     from(table: string) {
+      if (table === 'product_prices') {
+        return {
+          select(cols: string) {
+            durum.fiyatSelect.push(cols)
+            return productPricesChain
+          },
+        }
+      }
       if (table === 'categories') {
         return {
           select() {
@@ -110,6 +136,7 @@ const sb = vi.hoisted(() => {
       return {
         select(cols: string) {
           if (cols === 'technical_specs') return techSpecsChain
+          durum.productsSelect.push(cols)
           return productsChain
         },
         update() {
@@ -121,7 +148,7 @@ const sb = vi.hoisted(() => {
       }
     },
   }
-  return { productsData, categoriesData, client }
+  return { productsData, categoriesData, client, durum }
 })
 
 vi.mock('@/lib/services/product.service', () => ({
@@ -158,6 +185,50 @@ describe('AdminProductsPage (kit göçü) — integration + a11y', () => {
     expect(headers.some((h) => h.getAttribute('aria-sort') === 'ascending')).toBe(true)
     // diğer sıralanabilir başlık aria-sort='none'
     expect(headers.some((h) => h.getAttribute('aria-sort') === 'none')).toBe(true)
+  })
+
+  /* ⭐FİYAT SÜTUNU SATIŞ SATIRINDAN (2026-09-24). Emekli `products.price` gösteriliyor ve ona
+     yazılıyordu; vitrin onu okumuyor. Bu üç test o kusurun üç yüzünü ayrı ayrı kilitler. */
+  it('fiyat sütunu Standart listenin KDV dahil satış fiyatını gösterir; satırı olmayan ürün "teklif"', async () => {
+    sb.durum.fiyatHatasi = false
+    render(
+      <ConfirmProvider>
+        <AdminProductsPage />
+      </ConfirmProvider>,
+    )
+    await screen.findByText('Kanal Tipi Fan')
+    // p1: 2399.88 satış satırından (formatCurrency tr → "2.399,88")
+    expect(await screen.findByText(/2\.399,88/)).toBeTruthy()
+    // p2: satış satırı yok → teklif; "0" ya da emekli değer DEĞİL
+    expect(screen.getByText('admin.products.table.priceQuote')).toBeTruthy()
+    // fiyat okuması bireysel listeye süzülmüş olmalı (display_price'ın herkese açık kolu)
+    expect(sb.durum.fiyatSelect.at(-1)).toContain('price_lists!inner(user_type)')
+  })
+
+  it('ürün sorgusu emekli price ve maliyet kolonlarını ÇEKMEZ', async () => {
+    render(
+      <ConfirmProvider>
+        <AdminProductsPage />
+      </ConfirmProvider>,
+    )
+    await screen.findByText('Kanal Tipi Fan')
+    const cols = (sb.durum.productsSelect.at(-1) ?? '').split(',').map((c) => c.trim())
+    expect(cols).not.toContain('price')
+    expect(cols).not.toContain('purchase_price')
+    expect(cols).toContain('stock_qty')
+  })
+
+  it('fiyat okunamazsa hücre "okunamadı" der — "teklif" DEMEZ (yanlış bilgi olurdu)', async () => {
+    sb.durum.fiyatHatasi = true
+    render(
+      <ConfirmProvider>
+        <AdminProductsPage />
+      </ConfirmProvider>,
+    )
+    await screen.findByText('Kanal Tipi Fan')
+    expect((await screen.findAllByText('admin.products.table.priceUnreadable')).length).toBe(2)
+    expect(screen.queryByText('admin.products.table.priceQuote')).toBeNull()
+    sb.durum.fiyatHatasi = false
   })
 
   it('a11y ihlali yok (axe 0)', async () => {

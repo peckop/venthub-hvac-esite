@@ -206,10 +206,10 @@ const nextConfig = {
                 // `follow` KASITLI: sayfa dizine girmesin ama içindeki bağlantılar izlensin —
                 // hesap/sepet sayfasından vitrine giden yollar kapanmasın.
                 //
-                // KAPSAM SINIRI: `/checkout` bilerek YOK — o yüzey ALTYAPI şeridinin claim'inde
-                // (`src/app/[lang]/checkout/**`). Aynı kusuru taşıyorsa sahibi kapatır; başka
-                // şeridin dosyasına buradan uzanılmaz.
-                source: '/:lang(tr|en)/:yuzey(auth|account|cart)/:path*',
+                // `checkout` + `payment-success` (PR-1, bot karnesi 2026-09-24): ödeme sayfası
+                // dizine AÇIKTI. O gün burada "checkout ALTYAPI'nın claim'inde" diye bilerek dışarıda
+                // bırakılmıştı; yüzey artık URUN şeridinde (src/app/**), sahibi kapatıyor.
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart|checkout|payment-success)/:path*',
                 headers: [
                     { key: 'X-Robots-Tag', value: 'noindex, follow' },
                 ],
@@ -218,7 +218,7 @@ const nextConfig = {
                 // Yüzeyin kendisi (alt yol olmadan): /tr/account · /tr/cart · /en/cart …
                 // Yukarıdaki desen `:path*` ile eşleşiyor ama kökü ayrıca yazmak, deseni
                 // okuyanın "kök dahil mi" diye tereddüt etmesini önler.
-                source: '/:lang(tr|en)/:yuzey(auth|account|cart)',
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart|checkout|payment-success)',
                 headers: [
                     { key: 'X-Robots-Tag', value: 'noindex, follow' },
                 ],

@@ -12,7 +12,7 @@ import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/catego
 
 import { SITE_URL } from '../../../../config/siteUrl'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../../../lib/cache/tags'
-import { getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
+import { eskiKategoriHedefi, getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
 import type { DomainCategory } from '../../../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../types/db-rows'
@@ -185,6 +185,10 @@ export default async function Page({
   // sorgu düştüğünde `throw` eder (5xx, önbelleğe girmez), yalnız gerçekten satır yoksa null
   // döner. Bu ayrım olmadan geçici bir DB arızası kalıcı 404 üretirdi.
   if (!category) {
+    // REC-300 Faz 1-A: yeniden adlandırılmış kategorinin eski slug'ı → bugünkü slug'a 308
+    // (tabloyu DB tetiği doldurur). Sorgu hatası fırlar (5xx), 404'e dönüşmez.
+    const eskiHedef = await eskiKategoriHedefi(categorySlug, lang)
+    if (eskiHedef) permanentRedirect(`/${lang}/category/${eskiHedef}`)
     notFound()
   }
 

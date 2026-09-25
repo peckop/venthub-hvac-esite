@@ -15,7 +15,7 @@
  * ⛔NE ÖLÇMEZ: hesap motorlarının doğru sonuç verdiğini. Bu kapı YAPIYI ölçer
  * (giriş var mı, araçlar duruyor mu, bağlantılar doğru mu), ANLAMI değil.
  */
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -195,7 +195,14 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
         // (2) "VentHub Mühendislik Araçları": her hesaplayıcı sayfasının SEKME başlığında
         //     duruyordu, sabit kodlu ve TÜRKÇE. Sayfanın gövdesinde görünmediği için hiçbir
         //     inceleme fark etmemişti; İngilizce ziyaretçi sekmesinde Türkçe ad görüyordu.
+        //
+        // REC-150 Adım 5 (2026-09-24): sekme başlığı artık `CalculatorLayout`'ta değil, dört
+        // hesaplayıcı ROTASININ `generateMetadata`'sında (`sayfaUstVerisi`) yazılır; layout'tan
+        // `<Seo>` silindi. Ölçüt yeri değişti, iddia aynı: tek ad sözlükten gelir.
         const LAYOUT = govde(oku('src', 'components', 'calculators', 'CalculatorLayout.tsx'))
+        const HESAPLAYICI_ROTALARI = ['kanal', 'jet-fan', 'hrv', 'hava-perdesi'].map(ad =>
+            govde(oku('src', 'app', '[lang]', 'destek', 'hesaplayicilar', ad, 'page.tsx')),
+        )
 
         expect(
             /Hesap Makinesi/.test(govde(TR)),
@@ -203,30 +210,54 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
                 'derken bir arac baska turlu adlandirilamaz.',
         ).toBe(false)
 
-        expect(
-            /Mühendislik Araçları/.test(LAYOUT),
-            'Hesaplayici sayfasinin sekme basligina SABIT KODLU ad geri konmus. Iki kusur: ' +
-                'yetenegin onuncu adi olur (K17) ve Turkce sabit, Ingilizce ziyaretcinin ' +
-                'sekmesinde Turkce cikar (kural 7).',
-        ).toBe(false)
+        for (const [i, kaynak] of [LAYOUT, ...HESAPLAYICI_ROTALARI].entries()) {
+            expect(
+                /Mühendislik Araçları/.test(kaynak),
+                `Hesaplayici sekme basligina SABIT KODLU ad geri konmus (dosya #${i}). Iki kusur: ` +
+                    'yetenegin onuncu adi olur (K17) ve Turkce sabit, Ingilizce ziyaretcinin ' +
+                    'sekmesinde Turkce cikar (kural 7).',
+            ).toBe(false)
+        }
 
-        expect(
-            LAYOUT.includes("t('urunSecici.ustBaslik')"),
-            'Sekme basligi TEK ADI sozlukten almiyor. Ad koda yazilirsa dil ile birlikte ' +
-                'degismez ve tekillik sessizce bozulur.',
-        ).toBe(true)
+        for (const [i, rota] of HESAPLAYICI_ROTALARI.entries()) {
+            expect(
+                rota.includes('dict.urunSecici.ustBaslik'),
+                `Hesaplayici rotasi #${i} sekme basligini TEK ADDAN (sozluk urunSecici.ustBaslik) ` +
+                    'almiyor. Ad koda yazilirsa dil ile birlikte degismez ve tekillik bozulur.',
+            ).toBe(true)
+        }
 
         // ⭐SİTE ADI İKİ KEZ YAZILMAZ — önizlemede ölçülerek yakalandı (2026-09-05).
-        // `Seo` bileşeni başlığın sonuna zaten "| VentHub" ekliyor. Bu satıra bir daha
-        // "VentHub" yazmak "… | Ürün Seçici · VentHub | VentHub" üretiyordu: mükerrerliği
-        // temizleyen PR'ın kendisi mükerrerlik getiriyordu. Ölçmeseydim inecekti.
-        const seoBasligiSatiri = /title=\{`\$\{title\}[^`]*`\}/.exec(LAYOUT)?.[0] ?? ''
-        expect(seoBasligiSatiri, 'Hesaplayici SEO baslik satiri BULUNAMADI — olcut kor.').not.toBe('')
+        // O gün `Seo` bileşeni "| VentHub"'ı kendisi ekliyordu ve satıra bir daha yazmak
+        // "… | VentHub | VentHub" üretti. Bugün başlığı `sayfaUstVerisi` AYNEN basar (kök
+        // layout'ta `title.template` YOK — ölçüldü), yani site adı rota satırında TAM BİR kez
+        // bulunmalı: sıfır = sekmede site adı yok, iki = mükerrer. Evren: `sayfaUstVerisi`
+        // çağıran bütün rotalar (bot karnesi 2026-09-24'teki yüzeylerin tamamı).
+        const rotaKoku = join(process.cwd(), 'src', 'app')
+        const baslikSatirlari: string[] = []
+        const hatalilar: string[] = []
+        const tara = (dizin: string) => {
+            for (const ad of readdirSync(dizin)) {
+                const yol = join(dizin, ad)
+                if (statSync(yol).isDirectory()) { tara(yol); continue }
+                if (ad !== 'page.tsx') continue
+                const g = govde(readFileSync(yol, 'utf8'))
+                if (!g.includes('sayfaUstVerisi(')) continue
+                for (const satir of g.split(/\r?\n/)) {
+                    if (!/^\s*baslik\s*:/.test(satir)) continue
+                    baslikSatirlari.push(satir)
+                    const adet = (satir.match(/VentHub/g) ?? []).length
+                    if (adet !== 1) hatalilar.push(`${yol} · ${adet}× · ${satir.trim()}`)
+                }
+            }
+        }
+        tara(rotaKoku)
         expect(
-            /VentHub/.test(seoBasligiSatiri),
-            'Hesaplayici SEO basligina site adi ELLE yazilmis. `Seo` zaten "| VentHub" ekliyor; ' +
-                'ikisi birlesince sekmede site adi IKI KEZ cikar.',
-        ).toBe(false)
+            hatalilar,
+            'Sayfa basliginda site adi TAM BIR KEZ gecmeli (sayfaUstVerisi basligi aynen basar):\n' +
+                hatalilar.join('\n'),
+        ).toEqual([])
+        expect(baslikSatirlari.length, 'sayfaUstVerisi baslik satiri bulunamadi — tarayici kor.').toBeGreaterThan(15)
 
         // ⭐KAPSAM TÜM `<Seo>` KULLANICILARINA GENİŞLETİLDİ (2026-09-05, OPS hükmü).
         // NİÇİN: yukarıdaki kol yalnız hesaplayıcıya bakıyordu ve aynı kusur canlıda BEŞ
@@ -234,15 +265,13 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
         // "İletişim | …", "Bilgi, Mühendisliğin Ham Maddesidir | …" ve "Hava Perdesi |
         // VentHub Teknik Bilgi | VentHub" (sonuncusu ayrıca fazladan bir AD varyantıydı).
         // Tek dosyayı kilitlemek kusuru DEĞİL yalnız o dosyadaki örneğini kapatır.
+        // REC-150 Adım 5 (2026-09-24): Hakkımızda, Markalar, İletişim ve hesaplayıcı layout'u
+        // `<Seo>`'yu bıraktı (başlıkları rotada, yukarıdaki kol ölçer). Kalan `<Seo>`
+        // kullanıcıları yalnız bilgi merkezinin iki görünümü; ratchet'i INV-METADATA-TEK-YAZICI-1
+        // tutar, karar 92 taşıması (PR-2) onları da kaldırır.
         const SEO_KULLANICILARI = [
-            ['src', 'views', 'AboutPage.tsx'],
-            ['src', 'views', 'BrandsPage.tsx'],
-            ['src', 'views', 'ContactPage.tsx'],
-            ['src', 'views', 'BrandDetailPage.tsx'],
             ['src', 'views', 'knowledge', 'HubPage.tsx'],
             ['src', 'views', 'knowledge', 'TopicPage.tsx'],
-            ['src', 'app', '_components', 'ProductDetailPageView.tsx'],
-            ['src', 'components', 'calculators', 'CalculatorLayout.tsx'],
         ] as const
         const elleYazanlar: string[] = []
         let bulunanBaslikSayisi = 0
@@ -275,7 +304,7 @@ describe('INV-SECICI-1 — Ürün Seçici girişi ve araçların korunması', ()
         expect(
             bulunanBaslikSayisi,
             'Hicbir `title={...}` bulunamadi — tarayici kor, kol sahte-yesil verir.',
-        ).toBeGreaterThan(4)
+        ).toBeGreaterThanOrEqual(SEO_KULLANICILARI.length)
 
         // AYIRT EDİCİ: ölçüt gerçekten TR sözlüğüne bakıyor mu — dosya boş/kırık gelirse
         // üstteki iki "false" beklentisi sahte-yeşil verirdi.

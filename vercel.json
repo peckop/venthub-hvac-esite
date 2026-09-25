@@ -1,3 +1,44 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "*/**": false,
+      "altyapi/**": false,
+      "urun/**": false,
+      "urun-*/**": false,
+      "katalog/**": false,
+      "ops/**": false,
+      "feat/**": false,
+      "fix/**": false,
+      "docs/**": false,
+      "i18n/**": false,
+      "otomasyon/**": false,
+      "edge/**": false,
+      "chore/**": false,
+      "auth/**": false,
+      "legal/**": false,
+      "scribe/**": false,
+      "audit/**": false,
+      "admin/**": false,
+      "skills/**": false,
+      "consul/**": false,
+      "refactor/**": false,
+      "plans/**": false,
+      "ci/**": false,
+      "bolt/**": false,
+      "claude/**": false,
+      "test/**": false,
+      "temizlik/**": false,
+      "tmp/**": false,
+      "yedek/**": false,
+      "dependabot/**": false,
+      "scribe-*": false,
+      "surgeon-*": false,
+      "jules-*": false,
+      "janitor-*": false,
+      "darwin-*": false,
+      "consul-*": false,
+      "blog/**": false
+    }
+  }
 }

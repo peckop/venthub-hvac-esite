@@ -136,8 +136,8 @@ FOR SELECT TO authenticated USING (user_id = (SELECT auth.uid()));
 
 ### Dosya Adlandırma
 ```
-YYYYMMDD_kisa_aciklama.sql
-Örnek: 20260123_add_inventory_batch_undo.sql
+YYYYMMDDHHMMSS_kisa_aciklama.sql   (damga 14 hane; 8 hane INV-MIGRATION-2 KIRMIZI)
+Örnek: 20260123101500_add_inventory_batch_undo.sql
 ```
 
 ### İdempotent Yazım (Tekrar Çalıştırılabilir)

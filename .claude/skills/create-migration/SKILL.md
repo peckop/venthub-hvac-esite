@@ -14,8 +14,9 @@ başındaki adımları standartlaştırır.
 1. **Cetvel:** `docs/standards/migration-safety-standard.md` oku — plan bu cetvele atıf verir.
 2. **Plan + plan-challenger:** migration/veri göçü için plan-challenger ZORUNLUDUR
    (execution-method-standard). Önce plan yaz, `/plan-challenger` ile çürüttür, sonra dosya.
-3. **Adlandırma:** `supabase/migrations/YYYYMMDD_kisa_aciklama.sql` (bugünün tarihi; açıklama
-   snake_case Türkçe/İngilizce kısa).
+3. **Adlandırma:** `supabase/migrations/YYYYMMDDHHMMSS_kisa_aciklama.sql` — damga **14 hane** (UTC tarih+saat;
+   8 haneli `YYYYMMDD_` INV-MIGRATION-2 kapısında KIRMIZI verir, CLAUDE.md). Açıklama
+   snake_case, Türkçe/İngilizce, kısa.
 4. **İçerik kontrol listesi:**
    - İdempotent mi? (`IF NOT EXISTS` / `IF EXISTS`, tekrar koşulabilir)
    - RLS: yeni tabloya policy + **kolon grant'leri** birlikte (satır kapısı yetmez)
@@ -23,6 +24,14 @@ başındaki adımları standartlaştırır.
      mevcut satırlara da uygulanır — canlıda patlar)
    - Sır/duz-metin anahtar YOK (Vault kullan); repo PUBLIC
    - Geri alma notu: bu migration nasıl geri alınır, dosyanın başına yorum olarak yaz
+   - **Şemanın GÖRÜNEN yüzü değişiyorsa (yeni tablo/kolon/görünüm kolonu/fonksiyon imzası) tip
+     dosyası:** `src/types/database.types.ts` (URUN alanı) merge ile AYNI SAATTE güncellenir ve
+     sahibine merge'ten ÖNCE haber verilir. Canlı şema değişip tip dosyası değişmezse INV-TIP-DRIFT-1
+     bütün şeritlerin PR'larında kırmızıya döner (2026-09-24, REC-140 Faz 1: filo-geneli kırmızı).
+     Tip dosyası migration inmeden canlıdan üretilemez → sıra: sahibine haber → merge → uygulama
+     yeşil → sahibi `pnpm supabase:gen` PR'ı hemen. Ayrıca HER migration sonrası şema tabanı
+     (`sema-tabani-uret.yml`) aynı gün yenilenir, yoksa INV-TABAN-TAZE-1 filoda kırmızı
+     (migration-safety-standard, tip/taban maddesi).
 5. **Yerel doğrulama:** mümkünse `supabase db diff` ile beklenen fark; testler
    (`pnpm test -- --run`) yeşil.
 6. **PR ve kapanış uyarısı:** PR açıklamasına şu satır AYNEN girer:

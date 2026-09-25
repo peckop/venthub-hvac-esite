@@ -100,6 +100,12 @@ export interface ReddedilenSatir {
 export interface HazirlamaSonucu {
   payloads: UrunYazimi[]
   reddedilen: ReddedilenSatir[]
+  /**
+   * `price` sütunu DOLU gelip YOK SAYILAN satır sayısı (2026-09-24). Emekli `products.price`'a
+   * yazılmaz: vitrin o alanı okumuyor, satış fiyatını fiyat motoru hesaplıyor
+   * (csv-import-export-standard: "TL gömme YOK"). Sessiz yok sayma değil — çağıran bunu gösterir.
+   */
+  yoksayilanFiyat: number
 }
 
 /**
@@ -120,6 +126,7 @@ export function hazirlaUrunSatirlari(
 ): HazirlamaSonucu {
   const payloads: UrunYazimi[] = []
   const reddedilen: ReddedilenSatir[] = []
+  let yoksayilanFiyat = 0
 
   for (const r of rows) {
     if (!r['sku'] || !r['name']) continue
@@ -133,7 +140,8 @@ export function hazirlaUrunSatirlari(
     else if (r['model']) p.model_code = r['model'].trim()
     if (r['brand']) p.brand = r['brand'].trim()
     if (r['status']) p.status = r['status'].trim() as UrunYazimi['status']
-    if (r['price']) p.price = Number(r['price'])
+    // ⛔`price` → emekli alan YAZILMAZ (bkz. HazirlamaSonucu.yoksayilanFiyat). Sayılır, uyarılır.
+    if (r['price']?.trim()) yoksayilanFiyat++
     if (r['stock_qty']) p.stock_qty = Number(r['stock_qty'])
     if (r['low_stock_threshold']) p.low_stock_threshold = Number(r['low_stock_threshold'])
 
@@ -150,5 +158,5 @@ export function hazirlaUrunSatirlari(
     payloads.push(p)
   }
 
-  return { payloads, reddedilen }
+  return { payloads, reddedilen, yoksayilanFiyat }
 }
