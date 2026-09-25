@@ -564,6 +564,27 @@ tutmazsa satır **yine yazılır**, hedef hücre **boş kalır**: belgeyi tablod
 görünmez yapardı, kanıtsız bağ kurmak ise yalan olurdu. Bu, `url_kaynagi` kuralının
 (`web_kaynagi_ekle.py`, §6.3) aynı kalıbıdır — hat boyunca **tek kalıp**.
 
+## 6.7 TAŞINABİLİR KATALOG PAKETİ — tazelik kuralı (REC-212, OPS hükmü 2026-09-24)
+
+Paket (`<ingestor>/paket/`, git'e girmez) canlı kataloğun dosya kopyasıdır: `ham/*.jsonl` (doğruluk kaynağı,
+`katalog-disa-aktar.mjs`) + insan-okur CSV'ler (`katalog-paket-uret.mjs`). İki sınama: ham↔canlı
+(`katalog-geri-yukle.mjs`, kuru koşum) ve CSV↔ham (`paket-csv-dogrula.mjs`); ikisi de **sıfır fark** ister.
+
+### ⛔KURAL — bayat paket hiçbir şeyin kaynağı olamaz
+
+Paket her canlı yazımda kendiliğinden bayatlar. **Olay (2026-09-24):** ham döküm 09-10 tarihliydi ve canlıdan
+316 satır farklıydı (281 ürün, 34 aile — iki haftanın onaylı yazımları); "paket kazanır" kuralıyla bir
+geri yükleme ya da slug/Faz 2 karşılaştırması o yazımları **sessizce geri alırdı**.
+
+- Paket bir işe kaynak olmadan önce (adres yayını, model slug'ı Faz 2, geri yükleme, bayi sürümü, PIM
+  aktarımı) `node scripts/icerik-hatti/katalog-karnesi.mjs --kapi` koşulur; **"Katalog paketi tazeliği"
+  satırı TAZE değilse iş başlamaz** (çıkış 1). Onarım tek: paketi yeniden üret (iki betik + iki sınama).
+- Ölçüt zaman damgası değil **tablo parmak izidir** (`paket-tazelik.mjs`): manifest'teki her tablonun sha256'sı
+  canlıdan aynı fonksiyonla yeniden hesaplanır. Damga kıyası körüdür — `categories.updated_at` tetiksiz,
+  `product_images`'ta updated_at yok, silinen satır iz bırakmaz.
+- Canlıya onaylı bir katalog yazımı yapan iş, yazımdan sonra paketi yeniden üretir ya da raporunda "paket
+  bayatladı" diye yazar.
+
 ---
 
 ## 7. Provenance / ilişki

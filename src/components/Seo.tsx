@@ -50,7 +50,8 @@ const Seo: React.FC<SeoProps> = ({
   // ikinci (yanlış) bir canonical/og üretiyordu. Bkz. `lib/seo/canonicalOrigin.ts`.
   const siteUrl = canonicalOrigin()
   const url = canonical || `${siteUrl}${pathname}`
-  const image = ogImage || `${siteUrl}/og-image.png`
+  // Eskiden `/og-image.png` — dosya yoktu, canlıda 500 dönüyordu (BLOG canlı tabanı, 2026-09-24).
+  const image = ogImage || `${siteUrl}/images/og-default.jpg`
 
   return (
     <>
