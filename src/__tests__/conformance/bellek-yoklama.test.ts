@@ -27,9 +27,13 @@ interface Onbellek {
   surecler: Surec[]
 }
 interface Yoklama {
-  satir: (ob: Onbellek | null, simdi: number) => string | null
+  satir: (ob: Onbellek | null, simdi: number, yasiyor?: (pid: number) => boolean) => string | null
   ipucu: (komut: string) => string
+  pidYasiyor: (pid: number) => boolean
 }
+
+/** Fikstür süreçleri gerçek değil; canlılığı test açıkça söyler. */
+const HEPSI_YASIYOR = (): boolean => true
 
 const KANCA = path.resolve(process.cwd(), '.claude', 'hooks', 'bellek-yoklama.cjs')
 const by = createRequire(import.meta.url)(KANCA) as Yoklama
@@ -39,21 +43,37 @@ const surec = (mb: number, ipucu = ''): Surec => ({ pid: 1234, ad: 'node', mb, i
 describe('INV-BELLEK-YOKLAMA-1: bellek satırı eşikli ve ayırt edici', () => {
   it('sağlıklı hâlde SESSİZ; 3 GB üstü tek süreçte KONUŞUR ve süreci adıyla söyler', () => {
     const saglikli = { ts: SIMDI - 60_000, bosMb: 8000, surecler: [surec(2900)] }
-    expect(by.satir(saglikli, SIMDI)).toBeNull()
+    expect(by.satir(saglikli, SIMDI, HEPSI_YASIYOR)).toBeNull()
 
     const sisik = { ts: SIMDI - 60_000, bosMb: 8000, surecler: [surec(3551, 'agent-a896 tsserver.js')] }
-    const s = by.satir(sisik, SIMDI)
+    const s = by.satir(sisik, SIMDI, HEPSI_YASIYOR)
     expect(s).toMatch(/^⚠BELLEK: /)
     expect(s).toMatch(/3,0 GB ustu: node 1234 3,5 GB \(agent-a896 tsserver\.js\)/)
   })
 
   it('boş bellek 2 GB altındaysa büyük süreç olmasa da KONUŞUR; 2 GB üstünde susar', () => {
-    expect(by.satir({ ts: SIMDI, bosMb: 700, surecler: [surec(900)] }, SIMDI)).toMatch(/bos 0,7 GB/)
-    expect(by.satir({ ts: SIMDI, bosMb: 2100, surecler: [surec(900)] }, SIMDI)).toBeNull()
+    expect(by.satir({ ts: SIMDI, bosMb: 700, surecler: [surec(900)] }, SIMDI, HEPSI_YASIYOR)).toMatch(/bos 0,7 GB/)
+    expect(by.satir({ ts: SIMDI, bosMb: 2100, surecler: [surec(900)] }, SIMDI, HEPSI_YASIYOR)).toBeNull()
+  })
+
+  /**
+   * ⭐İLK GÜN VAKASI (2026-09-25): 58400 kapatıldıktan sonra önbellek 10 dk boyunca onu
+   * göstermeye devam etti ve üç pencere aynı bayat uyarıyı Ops'a ayrı ayrı bildirdi.
+   * Ayırt edici çift: aynı önbellek, süreç yaşıyorsa KONUŞUR, ölmüşse SUSAR.
+   */
+  it('gösterilen büyük süreç ölmüşse satır SUSAR (bayat alarm yok); yaşıyorsa konuşur', () => {
+    const ob = { ts: SIMDI - 60_000, bosMb: 1500, surecler: [surec(3100, 'agent-a435 tsserver.js')] }
+    expect(by.satir(ob, SIMDI, HEPSI_YASIYOR)).toMatch(/node 1234 3,0 GB/)
+    expect(by.satir(ob, SIMDI, () => false), 'ölü süreç için uyarı verildi').toBeNull()
+  })
+
+  it('gerçek canlılık kontrolü: kendi süreci YAŞIYOR, kullanılmayan numara ÖLÜ', () => {
+    expect(by.pidYasiyor(process.pid)).toBe(true)
+    expect(by.pidYasiyor(2_147_483_000)).toBe(false)
   })
 
   it('bayat önbellek (60 dk üstü) sessiz kalmaz: OLCULEMEDI der; önbellek yoksa satır yok', () => {
-    expect(by.satir({ ts: SIMDI - 61 * 60_000, bosMb: 8000, surecler: [] }, SIMDI)).toMatch(/OLCULEMEDI/)
+    expect(by.satir({ ts: SIMDI - 61 * 60_000, bosMb: 8000, surecler: [] }, SIMDI, HEPSI_YASIYOR)).toMatch(/OLCULEMEDI/)
     expect(by.satir(null, SIMDI)).toBeNull()
   })
 
