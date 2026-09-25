@@ -521,25 +521,32 @@ föyünün sitede olmadığını buldu. Yükümlülük satıcıdadır. Bu alanla
 özellik gibi "yaklaşık doğru" olamaz. Bu yüzden kural diğer satırlardan serttir.
 
 **Yer:** `technical_specs` (JSONB). Yeni tablo kolonu **yok**, migration gerekmez. Anahtarlar
-1254/2014 Ek IV föy alanlarının birebir karşılığıdır:
+1254/2014 Ek IV föy alanlarının birebir karşılığıdır ve **hepsi `erp_` önekini taşır.**
+
+**Önek neden zorunlu (ölçüm, 2026-09-25):** föyün "maksimum debi" ve "ısıl verim"i, yönetmeliğin
+tanımladığı **referans koşulda** ölçülür; katalogdaki `max_delivery_m3h` / `thermal_efficiency_pct`
+ise üreticinin genel tanıtım değeridir. 11 üründe 20 hücre farklı çıktı (ör. VORT HRW 30 MONO EVO:
+katalog 38 m³/h · %90, föy 35 m³/h · %89). Aynı anahtara yazmak §11.7'nin yasakladığı semantik
+çakışmadır: ya yasal beyan ya tanıtım değeri sessizce kaybolur. Önek ayrıca vitrinin föyü **ayrı
+blok** olarak gösterebilmesini sağlar.
 
 | Anahtar | Föy alanı | Tip / birim |
 |---|---|---|
-| `sec_class_average` | SEC sınıfı, ortalama iklim | metin: `A+`, `A`, `B`… |
-| `sec_average_kwh_m2a` · `sec_cold_kwh_m2a` · `sec_warm_kwh_m2a` | Özgül enerji tüketimi (SEC), üç iklim | sayı, kWh/(m²·yıl) — negatif olağandır |
-| `ventilation_unit_type` | Tip: konut tek yönlü / çift yönlü | `UVU` · `BVU` |
-| `drive_type` | Sürücü tipi (çok kademeli / değişken hız) | metin, kaynaktaki ifade |
-| `heat_recovery_type` | Isı geri kazanım tipi (reküperatif / rejeneratif / yok) | metin |
-| `thermal_efficiency_pct` | Isıl verim | sayı, % |
-| `max_delivery_m3h` | Maksimum debi (mevcut alan, §11.7 anlamıyla) | sayı, m³/h |
-| `power_at_max_delivery_w` | Maksimum debide elektrik güç girişi | sayı, W |
-| `noise_lwa_db` | Ses gücü seviyesi LWA (föyün ölçütü; LpA ile karıştırılmaz, §11.7) | sayı, dB(A) |
-| `reference_delivery_m3s` · `reference_pressure_pa` | Referans debi ve referans basınç farkı | sayı |
-| `spi_w_m3h` | Özgül güç girişi | sayı, W/(m³/h) |
-| `control_factor` | Kontrol faktörü ve kontrol tipolojisi | sayı + metin kaynaktaki gibi |
-| `leakage_internal_pct` · `leakage_external_pct` | İç / dış kaçak oranı | sayı, % — UVU'da kaynak "NA" diyorsa anahtar YAZILMAZ |
-| `aec_kwh` · `ahs_average_kwh` | Yıllık elektrik tüketimi, yıllık tasarruf edilen ısıtma (ortalama iklim) | sayı, kWh |
-| `eprel_registration` | EPREL kayıt numarası | metin; yalnız üretici verdiyse |
+| `erp_sec_class_average` | SEC sınıfı, ortalama iklim | metin: `A+`, `A`, `B`… |
+| `erp_sec_average_kwh_m2a` · `erp_sec_cold_kwh_m2a` · `erp_sec_warm_kwh_m2a` | Özgül enerji tüketimi (SEC), üç iklim | sayı, kWh/(m²·yıl) — negatif olağandır |
+| `erp_ventilation_unit_type` | Tip: konut tek yönlü / çift yönlü | `UVU` · `BVU` |
+| `erp_drive_type` | Sürücü tipi (çok kademeli / değişken hız) | metin, kaynaktaki ifade (`VM`, `VSD`) |
+| `erp_heat_recovery_type` | Isı geri kazanım tipi | metin, kaynaktaki ifade |
+| `erp_thermal_efficiency_pct` | Referans debide ısıl verim | sayı, % |
+| `erp_max_delivery_m3h` | Föyün maksimum debisi | sayı, m³/h |
+| `erp_power_at_max_delivery_w` | Maksimum debide elektrik güç girişi | sayı, W |
+| `erp_noise_lwa_db` | Ses gücü seviyesi LWA (LpA ile karıştırılmaz, §11.7) | sayı, dB(A) |
+| `erp_reference_delivery_m3s` · `erp_reference_pressure_pa` | Referans debi ve referans basınç farkı | sayı |
+| `erp_spi_w_m3h` | Özgül güç girişi | sayı, W/(m³/h) |
+| `erp_control_factor` | Kontrol faktörü | sayı |
+| `erp_leakage_internal_pct` · `erp_leakage_external_pct` | İç / dış kaçak oranı | sayı, % — UVU'da kaynak "NA" diyorsa anahtar YAZILMAZ |
+| `erp_aec_kwh` · `erp_ahs_average_kwh` | Yıllık elektrik tüketimi, yıllık tasarruf edilen ısıtma (ortalama iklim) | sayı, kWh |
+| `erp_eprel_registration` | EPREL kayıt numarası | metin; yalnız üretici verdiyse |
 
 **Kurallar:**
 - ⛔ **Kaynaksız değer yazılmaz, çift bağımsız doğrulama şart.** İki ayrı çıkarım (metin yolu +
