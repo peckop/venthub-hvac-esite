@@ -265,7 +265,7 @@ değildir. Fark ancak emsal yazıyla elle kıyasla bulundu (OPS).
 | Teklif çağrısı (şablon, URUN) | Yazının altında tek kutu: iletişim/teklif sayfasına bağlantı, bir cümlelik açıklama. Ürün övgüsü ve vaat yok (R4.2). Emsalde var, v0.3'te kural yoktu (2026-09-24 kıyası) |
 | Görsel | **R3.1** (v0.7 taslak): kapak her yazıda; şema metnin anlattığı yapı ya da eğri için; hak, kaynak, alt metin ve doğrulama kuralları orada |
 
-### R3.1 Görsel — kapak ve şema (v0.7 TASLAK; karar 134 ve 135 bekleniyor)
+### R3.1 Görsel — kapak ve şema (v0.7 TASLAK; karar 134 ve 135 verildi)
 
 **Tetik (2026-09-25):** Recep ilk yazının ön izlemesini gördü: *"blog gibi, daha kaliteli görünmeli,
 kapak resmi bile yok"* (OPS aktarımı). Eleştiri metne değil sunuma. v0.6'da görsel "isteğe bağlı" idi;
@@ -278,11 +278,11 @@ kurallar şablon desteği gelince (URUN) uygulanır; o güne kadar görsel metne
 
 | Kural | İçerik |
 |---|---|
-| **Kapak** | **Her yazıda bir kapak** (öneri; karar 134 kaynağı, 135 yayının bunu bekleyip beklemeyeceğini belirler). Yazıya özgüdür: aynı görsel iki yazıda kullanılmaz. Liste kartında ve `Article` JSON-LD `image` alanında aynı görsel (R6) |
+| **Kapak — KARAR 134 (Recep, 2026-09-25, OPS aktarımı)** | *"Kapak = yazının konusuyla ilgili KENDİ ürün görselimiz (DB `product_images`); konuyla ilgili ürünümüz yoksa kapağı Recep verir (bulunan foto ya da Gemini üretimi)."* Her yazıda bir kapak. Aday seçilirken görsel **açılıp bakılır**: üzerinde yazıyla ilgisiz rozet/damga ya da yazı (ör. sertifika rozeti, "photo non contractuelle") olan görsel kırpılmadan kullanılmaz; eğri/tablo görseli kapak olmaz. Yazıya özgüdür: aynı görsel iki yazıda kullanılmaz. Liste kartında ve `Article` JSON-LD `image` alanında aynı görsel (R6). **KARAR 135 (Recep, 2026-09-25):** yazılar mevcut şablonla yayına girer, görsel yükseltme sonra gelir |
 | **Şema** | Metnin anlattığı bir yapı (bölümler, kesit, hava yolu) ya da ilişki (eğri, kıyas) okuru metinden daha hızlı taşıyorsa çizilir. Süs şeması yok: her şema bir bölüme bağlıdır ve o bölümde anılır |
 | **Şemadaki her sayı ve etiket iddiadır** | İddia tablosuna satır olarak girer (R5.1); doğrulayıcı şemayı da görür; tuzak şemaya da konabilir. Grafik verisi yazıdaki tablo ya da kaynak sayfasındaki değerle birebir aynıdır; okunan eğriden "göz kararı" değer alınmaz |
 | **Kaynak gösterimi** | Şemanın altında tek satır: *"VentHub çizimi; veriler: [n]"* ya da *"Temsilî çizim; ölçekli değildir"*. `[n]` yazının kaynak listesindeki numaradır (R2.4) |
-| **Hak (telif)** | Hakkı belgelenmemiş görsel kullanılmaz. Üretici kataloğundaki çizim ya da grafik **birebir kopyalanmaz**; gerekiyorsa verisi kaynaktan alınıp yeniden çizilir ve kaynak gösterilir. Ürün fotoğrafı yalnız sitede o ürün için zaten kullanılan medyadan (hakkı ürün kaydıyla aynı). Başka sitelerden görsel alınmaz. Kaynağın kendisi (üretici görseli / kendi çizimimiz / üretilmiş görsel) **karar 134** |
+| **Hak (telif)** | Hakkı belgelenmemiş görsel kullanılmaz. Üretici kataloğundaki çizim ya da grafik **birebir kopyalanmaz**; gerekiyorsa verisi kaynaktan alınıp yeniden çizilir ve kaynak gösterilir. Ürün fotoğrafı yalnız sitede o ürün için zaten kullanılan medyadan (hakkı ürün kaydıyla aynı). Başka sitelerden görsel alınmaz. Kapak kaynağı **karar 134** (yukarıda); şemalar VentHub çizimidir |
 | **Alt metin** | Zorunlu; görselin **ne gösterdiğini** anlatır (süs kelimesi değil): *"Frekans konvertörünün dört bölümü: doğrultucu, DC ara devre, evirici, kontrol birimi"*. Temsilî görselde alt metin bunu söyler; emsal biçim: *"temsili görsel; ölçekli teknik çizim veya belirli bir ürün modeli değildir"* (DEA, 2026-09-24). Şemadaki yazılar Türkçe, SI birimi, ondalık virgül (R3 üslup) |
 | **Teknik** | `<Image>` genişlik/yükseklik (CLAUDE.md kural 10); ekranın üst kısmındaki kapak dışında tembel yükleme; açık ve koyu temada okunur (renk token'ları, kural 8); dar ekranda yatay taşma 0 |
 | **Ürün kartı ve iç bağlantı** | Görsel değil ama aynı derste doğdu (2026-09-25): ön izleme betiği önceki yazının elle yazılmış ürün kartlarını taşıdı. Kart ve kategori yalnız yazının `vh:` bağlantılarından türetilir; bağlantı seçilmeden önce kategorideki tüm aileler veritabanından ve katalogdan okunur (R3 "İç bağlantı") |
