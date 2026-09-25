@@ -54,10 +54,15 @@ function yaziDilYollari(yazi: RehberYazisi): Partial<Record<YaziDili, string>> {
   return yollar
 }
 
-function listeDilYollari(): Partial<Record<YaziDili, string>> {
+/**
+ * Liste sayfasının dil yolları. Bulunulan bölüm dili HER ZAMAN içindedir (yazısızken de — yoksa
+ * `sayfaUstVerisi` canonical üretemez ve ATAR: #1416'nın ilk CI koşusunda `/tr/bilgi-merkezi`
+ * ön üretimi tam bu yüzden düştü). Diğer dil yalnız açık VE yazısı varsa eklenir (boş eşe hreflang yok).
+ */
+function listeDilYollari(bolumDili: YaziDili): Partial<Record<YaziDili, string>> {
   const yollar: Partial<Record<YaziDili, string>> = {}
   for (const dil of ['tr', 'en'] as const) {
-    if (bilgiMerkeziDilAcik(dil) && dildekiYazilar(dil).length > 0) yollar[dil] = bilgiMerkeziRotalari.liste(dil)
+    if (bilgiMerkeziDilAcik(dil) && (dil === bolumDili || dildekiYazilar(dil).length > 0)) yollar[dil] = bilgiMerkeziRotalari.liste(dil)
   }
   return yollar
 }
@@ -71,7 +76,7 @@ export async function listeUstVerisi(params: Params, bolumDili: YaziDili): Promi
   return sayfaUstVerisi({
     lang,
     yol: bilgiMerkeziRotalari.liste(bolumDili),
-    dilYollari: listeDilYollari(),
+    dilYollari: listeDilYollari(bolumDili),
     baslik: t('bilgiMerkezi.liste.seoBaslik'),
     aciklama: t('bilgiMerkezi.liste.seoAciklama'),
     // Yazısız liste = içeriksiz sayfa: dizine girmez, site haritasında da yok (siteHaritasi.ts).

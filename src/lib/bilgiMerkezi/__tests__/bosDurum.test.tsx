@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { SITE_URL } from '../../../config/siteUrl'
+import { YAZILAR } from '../../../data/bilgiMerkezi/yazilar'
 import { en } from '../../../i18n/dictionaries/en'
 import { tr } from '../../../i18n/dictionaries/tr'
 import BilgiMerkeziListe from '../../../views/knowledge/BilgiMerkeziListe'
-import { bolumAcik } from '../../../views/knowledge/bilgiMerkeziRotasi'
+import { bolumAcik, ListeRotasi, listeUstVerisi } from '../../../views/knowledge/bilgiMerkeziRotasi'
 import { ORNEK_YAZI } from './ornekYazi'
 
 /**
@@ -17,6 +19,17 @@ describe('Bilgi Merkezi — boş durum', () => {
   it('bölüm yazı sayısına bağlı değil: TR yazısızken de AÇIK (404 değil)', () => {
     expect(bolumAcik('tr', 'tr')).toBe(true)
     expect(bolumAcik('en', 'tr')).toBe(false)
+  })
+
+  it('⭐GERÇEK ROTA FONKSİYONLARI yazısızken ATMAZ: üst veri canonical + noindex, gövde boş durumu basar', async () => {
+    // #1416'nın ilk CI koşusu: bileşen testi yeşildi ama `/tr/bilgi-merkezi` ön üretimi düştü —
+    // `listeUstVerisi` dil yolu vermiyordu, `sayfaUstVerisi` attı. Bu test rotanın KENDİSİNİ çağırır.
+    const params = Promise.resolve({ lang: 'tr' })
+    const ust = await listeUstVerisi(params, 'tr')
+    expect(ust.alternates).toEqual({ canonical: `${SITE_URL}/tr/bilgi-merkezi` })
+    if (YAZILAR.length === 0) expect(ust.robots).toEqual({ index: false, follow: true })
+    render(await ListeRotasi({ params, bolumDili: 'tr' }))
+    if (YAZILAR.length === 0) expect(screen.getByText(tr.bilgiMerkezi.liste.bosBaslik)).toBeTruthy()
   })
 
   for (const [dil, dict] of [['tr', tr], ['en', en]] as const) {
