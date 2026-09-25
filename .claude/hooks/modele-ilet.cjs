@@ -24,6 +24,15 @@
  * Önbellek: `VENTHUB_MODELE_ILET_DIR` ya da işletim sisteminin geçici dizini; yazılamazsa
  * ileti yine gider (fail-open: tekrar, sessizlikten iyidir).
  *
+ * ⭐SATIR/BLOK DÜZEYİNDE (2026-09-25, ikinci ölçüm): ilk tekilleştirme BÜTÜN metnin özetini
+ * alıyordu. Gerçek oturumda metin çağrıdan çağrıya değişiyor (araya git'in "warning: unable
+ * to access" satırı ya da değişen bir PENCERE DISI listesi karışıyor) → özet her seferinde
+ * yeni, "KIMLIK YOK" Ops oturumunda yine her Bash'te gitti. Elle iki kez koşunca ikinci çağrı
+ * boştu; yani önbellek çalışıyordu, birim yanlıştı. Şimdi: metin bloklara bölünür (girintisiz
+ * satır blok başlatır, girintili satırlar ona aittir); bu oturumda iletilmiş satırlar atılır;
+ * bloğun en az bir yeni satırı varsa BAŞLIĞIYLA birlikte gider (başlıksız madde anlamsız
+ * kalmasın), hiç yeni satırı yoksa blok düşer.
+ *
  * ⚠Çıkış anında `fs.writeSync(1, …)`: `process.on('exit')` içinde akış yazımı Windows
  * borusunda eşzamansızdır ve süreç ölmeden boşalmayabilir.
  *
@@ -47,9 +56,23 @@ function stderrModeleIlet(olay) {
     return asil(parca, ...kalan)
   }
 
-  /** Bu metin bu oturumda daha önce iletildiyse true; değilse kaydeder ve false döner. */
-  const dahaOnceIletildi = (metin) => {
-    if (!/^[0-9a-f-]{8,64}$/i.test(sid)) return false
+  /** Girintisiz satır blok başlatır; girintili (ya da baştaki başlıksız) satırlar bloğa eklenir. */
+  const bloklaraBol = (metin) => {
+    const bloklar = []
+    for (const satir of metin.split(/\r?\n/)) {
+      if (!satir.trim()) continue
+      if (/^\s/.test(satir) && bloklar.length) bloklar[bloklar.length - 1].push(satir)
+      else bloklar.push([satir])
+    }
+    return bloklar
+  }
+
+  /**
+   * Bu oturumda daha önce iletilmiş satırları atar; kalan metni döner (boşsa ''). Oturum
+   * bilinmiyor ya da önbellek okunamıyorsa metni olduğu gibi döner (fail-open).
+   */
+  const yeniKismi = (metin) => {
+    if (!/^[0-9a-f-]{8,64}$/i.test(sid)) return metin
     try {
       const dizin = process.env.VENTHUB_MODELE_ILET_DIR || path.join(os.tmpdir(), 'venthub-modele-ilet')
       fs.mkdirSync(dizin, { recursive: true })
@@ -60,21 +83,35 @@ function stderrModeleIlet(olay) {
       } catch {
         gorulen = []
       }
-      const ozet = crypto.createHash('sha256').update(olay + '\n' + metin).digest('hex').slice(0, 16)
-      if (Array.isArray(gorulen) && gorulen.includes(ozet)) return true
-      gorulen = (Array.isArray(gorulen) ? gorulen : []).concat(ozet).slice(-200)
-      fs.writeFileSync(dosya, JSON.stringify(gorulen))
-      return false
+      if (!Array.isArray(gorulen)) gorulen = []
+      const bilinen = new Set(gorulen)
+      const ozet = (satir) =>
+        crypto.createHash('sha256').update(olay + '\n' + satir.trim()).digest('hex').slice(0, 16)
+      const giden = []
+      for (const blok of bloklaraBol(metin)) {
+        const yeniler = blok.slice(1).filter((s) => !bilinen.has(ozet(s)))
+        const baslikYeni = !bilinen.has(ozet(blok[0]))
+        if (!baslikYeni && yeniler.length === 0) continue
+        giden.push([blok[0], ...yeniler].join('\n'))
+        for (const s of blok) {
+          const o = ozet(s)
+          if (!bilinen.has(o)) {
+            bilinen.add(o)
+            gorulen.push(o)
+          }
+        }
+      }
+      fs.writeFileSync(dosya, JSON.stringify(gorulen.slice(-1000)))
+      return giden.join('\n')
     } catch {
-      return false
+      return metin
     }
   }
 
   process.on('exit', (kod) => {
     if (kod !== 0) return
-    const metin = toplanan.join('').trim()
+    const metin = yeniKismi(toplanan.join('').trim())
     if (!metin) return
-    if (dahaOnceIletildi(metin)) return
     try {
       fs.writeSync(
         1,
