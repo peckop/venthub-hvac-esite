@@ -1585,7 +1585,7 @@
         {
           "slug": "vortice-vort-commercial-in-line-circular",
           "etki": "kapsamda",
-          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+          "neden": "Üretici seriyi 1253/2014 kapsamında konut dışı ünite (NRVU-U) olarak beyan ediyor (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34); NRVU ekotasarım şartları üreticinin yükümlülüğü."
         },
         {
           "slug": "vortice-vort-commercial-in-line-rectangular",
@@ -1664,8 +1664,8 @@
         },
         {
           "slug": "vortice-vort-commercial-in-line-circular",
-          "etki": "kapsamda",
-          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+          "etki": "kapsam-disi",
+          "neden": "Sattığımız CA MD serisi (16107–16109, 16153, 16155–16157) üretici belgesinde \"NRVU-U\" beyanlı (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34; eski↔yeni kod s.39). En yüksek debi 340–1800 m³/h: 200/250/315 >1000 tanım gereği konut dışı; 100/125/150 (250–1000) üretici konut beyan etmediği için RVU değil → etiket yok. RVU-U tablolar (EP/ES sürümleri) satılmıyor. KATALOG ölçümü 2026-09-25."
         },
         {
           "slug": "vortice-vort-commercial-in-line-rectangular",
@@ -1739,7 +1739,7 @@
         {
           "slug": "vortice-vort-commercial-in-line-circular",
           "etki": "kapsamda",
-          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+          "neden": "Üretici seriyi 1253/2014 kapsamında konut dışı ünite (NRVU-U) olarak beyan ediyor (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34); NRVU ekotasarım şartları üreticinin yükümlülüğü."
         },
         {
           "slug": "vortice-vort-commercial-in-line-rectangular",
@@ -1810,8 +1810,8 @@
         },
         {
           "slug": "vortice-vort-commercial-in-line-circular",
-          "etki": "kapsamda",
-          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+          "etki": "kapsam-disi",
+          "neden": "Sattığımız CA MD serisi (16107–16109, 16153, 16155–16157) üretici belgesinde \"NRVU-U\" beyanlı (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34; eski↔yeni kod s.39). En yüksek debi 340–1800 m³/h: 200/250/315 >1000 tanım gereği konut dışı; 100/125/150 (250–1000) üretici konut beyan etmediği için RVU değil → etiket yok. RVU-U tablolar (EP/ES sürümleri) satılmıyor. KATALOG ölçümü 2026-09-25."
         },
         {
           "slug": "vortice-vort-commercial-in-line-rectangular",
