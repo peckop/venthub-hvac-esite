@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
@@ -26,7 +27,7 @@ const sahteJwt = (role: string) =>
   `eyJhbGciOiJIUzI1NiJ9.${Buffer.from(JSON.stringify({ role, iss: 'supabase' })).toString('base64url')}.imza`
 
 describe('INV-ONIZLEME-1 · yerel ön izleme yalıtımı', async () => {
-  const m = (await import(BETIK)) as Modul
+  const m = (await import(pathToFileURL(BETIK).href)) as Modul
 
   it('rol: anon anahtarı "anon", sunucu anahtarı "service_role" okunur; bozuk anahtar null', () => {
     expect(m.jwtRolu(sahteJwt('anon'))).toBe('anon')
