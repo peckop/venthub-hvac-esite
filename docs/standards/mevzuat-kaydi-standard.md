@@ -176,6 +176,21 @@ tutarlılığını da sınar: her aile slug'ı KATALOG paketinde var mı, her `k
 Bir kalem **durum değiştirdiğinde** (yeni aşama, kaldırılma, TR karşılığının yayımı) üç listenin
 hangisini etkilediği aynı gün yazılır ve ilgili şeride iletilir.
 
+### M6.0 Ürün sayfasında uygunluk satırı ("ErP Uyumlu" vb.) — gösterim kuralı (2026-09-25)
+
+KATALOG'un 187 değerlik `erp_compliant` denetimi için verildi (değerlerin hiçbirinin kaynağı yoktu).
+
+| Durum | Gösterim |
+|---|---|
+| Ürün o ürün grubunun tüzüğünün **kapsamında** ve **modeli adıyla anan** üretici belgesi (föy, uygunluk beyanı, EPREL) uygunluk diyor | "ErP Uyumlu" + hangi tüzük; kaynak sayfası satıra bağlı |
+| Ürünün kendisi kapsam dışı ya da beyan yok, ama üretici **yalnız motor** için 2019/1781 uygunluğu beyan ediyor | Daraltılmış satır: "Motor: AB 2019/1781 ekotasarım tüzüğüne uygun" |
+| Ürün tüzükten **muaf** (ATEX, duman tahliye, hava sirkülasyon fanı, aşındırıcı gaz…) | Satır **hiç gösterilmez**; "Hayır" da yazılmaz ("uymuyor" diye okunur) |
+| Seri/broşür geneli uygunluk cümlesi var, model adı geçmiyor | Yetmez; model belgesi gelene kadar satır gösterilmez |
+
+Dayanak: uygunluk model bazında beyan edilir (1253/2014 ve 1254/2014 bilgi şartları, TR SGM 2021/19 Md.5
+"her bir modeli için"). Muafiyet koşulları kayıttaki kalemin metnindedir; örneğin hava sirkülasyon fanı istisnası
+(2024/1834 Md.1(3)(p)), üretici sıfırdan farklı basınçta performans yayımlıyorsa düşer.
+
 ### M6.1 BLOG ↔ MEVZUAT iş bölümü (kalıcı — OPS/Recep, 2026-09-25)
 
 1. **Yazıdan önce mevzuat paketi.** BLOG konuyu MEVZUAT'a bildirir. MEVZUAT o konunun ürün
