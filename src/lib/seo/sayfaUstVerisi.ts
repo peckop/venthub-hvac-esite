@@ -37,6 +37,15 @@ export interface SayfaUstVerisiGirdisi {
    * dizine girmeyen sayfa için hreflang bir şey ifade etmez.
    */
   dizinDisi?: boolean
+  /**
+   * DİLE GÖRE FARKLI YOL (karar 92, Bilgi Merkezi): `/bilgi-merkezi/x` ↔ `/knowledge-hub/y`.
+   * Verilirse `yol` yerine bu kullanılır ve **yalnız var olan diller** yazılır: eşi olmayan
+   * sayfa hreflang taşımaz (rehber-yazisi-standard R6 — "hreflang yalnız iki dil de varsa";
+   * yanlış hreflang hiç olmamasından kötüdür). Bulunulan dilin yolu verilmemişse ATAR.
+   */
+  dilYollari?: Partial<Record<'tr' | 'en', string>>
+  /** OpenGraph türü; rehber yazısında `article`. Varsayılan `website`. */
+  ogTuru?: 'website' | 'article'
 }
 
 export function sayfaUstVerisi({
@@ -45,32 +54,40 @@ export function sayfaUstVerisi({
   baslik,
   aciklama,
   dizinDisi = false,
+  dilYollari,
+  ogTuru = 'website',
 }: SayfaUstVerisiGirdisi): Metadata {
-  const trUrl = `${SITE_URL}${localizedHref(yol, 'tr')}`
-  const enUrl = `${SITE_URL}${localizedHref(yol, 'en')}`
+  const trYol = dilYollari ? dilYollari.tr : yol
+  const enYol = dilYollari ? dilYollari.en : yol
+  const trUrl = trYol ? `${SITE_URL}${localizedHref(trYol, 'tr')}` : null
+  const enUrl = enYol ? `${SITE_URL}${localizedHref(enYol, 'en')}` : null
   const url = lang === 'en' ? enUrl : trUrl
+  if (!url) {
+    throw new Error(`sayfaUstVerisi: "${lang}" dili için yol verilmedi (dilYollari)`)
+  }
   const enKapali = lang === 'en' && !EN_YAYIN
 
   return {
     title: baslik,
     description: aciklama,
     ...(dizinDisi || enKapali ? { robots: { index: false, follow: true } } : {}),
-    alternates: dizinDisi
-      ? { canonical: url }
-      : {
-          canonical: url,
-          languages: {
-            tr: trUrl,
-            en: enUrl,
-            'x-default': trUrl,
+    alternates:
+      dizinDisi || !trUrl || !enUrl
+        ? { canonical: url }
+        : {
+            canonical: url,
+            languages: {
+              tr: trUrl,
+              en: enUrl,
+              'x-default': trUrl,
+            },
           },
-        },
     openGraph: {
       title: baslik,
       description: aciklama,
       url,
       siteName: 'VentHub',
-      type: 'website',
+      type: ogTuru,
       locale: lang === 'en' ? 'en_US' : 'tr_TR',
     },
   }

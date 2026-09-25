@@ -5,6 +5,7 @@ import React from 'react'
 import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
+import { bilgiMerkeziListeHref } from '../utils/bilgiMerkezi'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import BuildTag from './BuildTag'
 
@@ -19,6 +20,8 @@ const Footer: React.FC = () => {
   const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
   const { categories: globalCategories } = useCategories()
+  // Karar 92: Bilgi Merkezi adresi dile göre; EN kapalıyken bağlantı basılmaz.
+  const bilgiMerkeziHref = bilgiMerkeziListeHref(lang)
 
   const mainCategories = React.useMemo(() => {
     return globalCategories.filter(c => !c.parent_id).slice(0, 8);
@@ -78,11 +81,13 @@ const Footer: React.FC = () => {
                   {t('common.contact')}
                 </Link>
               </li>
-              <li>
-                <Link href={Routes.destek.home()} className="text-gray-300 hover:text-white transition-colors">
-                  {t('common.knowledgeHub')}
-                </Link>
-              </li>
+              {bilgiMerkeziHref && (
+                <li>
+                  <Link href={bilgiMerkeziHref} className="text-gray-300 hover:text-white transition-colors">
+                    {t('common.knowledgeHub')}
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link href={Routes.destek.sss()} className="text-gray-300 hover:text-white transition-colors text-sm">
                   • {t('support.links.faq')}
