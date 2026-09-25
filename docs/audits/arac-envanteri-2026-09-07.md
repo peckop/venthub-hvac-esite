@@ -422,6 +422,9 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/urun-ad-en.test.ts` | Karar 116 · ürün EN adı kural dönüşümü (REC-146). Ağa, DB'ye çıkmaz; adlar canlıdaki gerçek örneklerdir. | URUN-KATALOG | vitest (`scripts/icerik-hatti/__tests__`) | 2026-09-25 (3/3) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/urun-ad-en-yaz.mjs` | ÜRÜN EN ADINI CANLIYA YAZAR — karar 116, REC-146 (plan docs/audits/icerik-hatti-metin-boslugu-2026-09-25.md §3.2) | URUN-KATALOG | elle: `[--liste <csv>] [--yaz --yedek <json>]` + CANLI_YAZIM_ONAYI (karar 116) | 2026-09-25 kuru koşum: yazılacak 166 · gerekmez 251 · elle EN 24 · RED 0 | scripts/icerik-hatti/__tests__/urun-ad-en.test.ts (saf çekirdek) | AKTIF |
 | `scripts/icerik-hatti/urun-ad-en.mjs` | ÜRÜN EN ADI — kural tabanlı dönüşüm (saf çekirdek; ağa, diske, DB'ye çıkmaz). Karar 116, REC-146. | URUN-KATALOG | modul: urun-ad-en-yaz.mjs | 2026-09-25 | scripts/icerik-hatti/__tests__/urun-ad-en.test.ts | AKTIF |
+| `scripts/icerik-hatti/__tests__/urun-durum.test.ts` | Karar 130 · ürün durumu planı ve ters plan (REC-397). Ağa, DB'ye çıkmaz. | URUN-KATALOG | vitest (`scripts/icerik-hatti/__tests__`) | 2026-09-25 (4/4) | kendisi test | AKTIF |
+| `scripts/icerik-hatti/urun-durum-yaz.mjs` | ÜRÜN DURUMUNU CANLIYA YAZAR — REC-397, karar 130 (satıştan çekme; pasif, geri açılabilir). | URUN-KATALOG | elle: `--plan <json> [--yaz --yedek <json>]` + CANLI_YAZIM_ONAYI (karar 130); yedek = ters plan | 2026-09-25 kuru koşum: yazılacak 7 · aynı 0 · RED 0 | scripts/icerik-hatti/__tests__/urun-durum.test.ts (saf çekirdek) | AKTIF |
+| `scripts/icerik-hatti/urun-durum.mjs` | ÜRÜN DURUMU PLANI — saf çekirdek (DB'ye dokunmaz). Yazıcı: `urun-durum-yaz.mjs`. REC-397, karar 130. | URUN-KATALOG | modul: urun-durum-yaz.mjs | 2026-09-25 | scripts/icerik-hatti/__tests__/urun-durum.test.ts | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 

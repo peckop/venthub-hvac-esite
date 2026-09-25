@@ -229,6 +229,14 @@ kullanılabilen belgeli bir fandır.
    tablodadır; **E 354 M** ise AB tablosundadır. Türkiye AB dışı pazar olduğu için bu bir çelişki
    değil — ama vitrinde "Avrupa serisi / ErP kapsamında" gibi bir ifade kullanılırsa **yanlış olur**;
    kullanılmadı.
+   > **DÜZELTME NOTU (2026-09-25, REC-397):** "Türkiye AB dışı pazar olduğu için bu bir çelişki değil"
+   > cümlesi TR mevzuatına bakılmadan kurulmuş bir varsayımdı. "AB dışı pazar" üreticinin pazar ayrımıdır,
+   > yasal muafiyet değildir. Türkiye fan tüzüğü 327/2011'i SVGM 2019/15 ile (RG 20.12.2019/30984,
+   > yürürlük 20.12.2020), havalandırma ünitesi tüzüğü 1253/2014'ü SGM 2021/18 ile (RG 25.05.2021/31491,
+   > KDHÜ şartları 1/10/2021) uyguluyor. E 404/504/604 M için üretici yalnız "only for the extra EU
+   > market" diyor, "uygun değil" demiyor: uyumsuzluk **kesin değil**, satış sürüyor. Ancak vitrindeki
+   > "ErP Uyumlu: Evet" satırının dayanağı yok ve kaldırılacak (ErP temizliği kararı). Hüküm ve dayanak
+   > maddeleri: MEVZUAT, REC-397 yorumu. Asıl satır tarihsel kayıt olarak silinmeden bırakıldı.
 8. **A-E serisinin basınç sınıfı iki kaynakta farklı adlandırılıyor:** Vortice kataloğu başlığı
    "Low-pressure plate axial fans" (düşük basınçlı) [IND s.14], AVenS fiyat listesi ise "VORTICEL A-E
    ORTA BASINÇLI AKSİYEL FANLAR" der [AVenS s.30]. Taslak, blok metinlerinde A-E için basınç sınıfı
