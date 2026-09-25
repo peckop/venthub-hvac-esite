@@ -66,4 +66,5 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 | Tarih | Ölçüm | Sınıf | Sonuç |
 |---|---|---|---|
 | 2026-09-24 | Taban — adres denetimi (canlı, `--sayfa-denetimi --en-harita-disi-bilincli`) | A | Haritada 87 adres (yalnız TR; EN_YAYIN kapalı) · 87/87 doğrudan 200 · model adresi 0 (yayın öncesi beklenen) · canonical yanlış 0 · hreflang eksik 1 (`/tr/destek/merkez`: tr/en/x-default hiç yok → URUN) · EN bilinçli 86 |
+| 2026-09-24 | Taban — sayfa kalitesi (unlighthouse 0.18.1, telefon benzetimi) | A | **KISMİ: 59/87 sayfa** — tarama 35 dk sonra çıkış 0 verdi ama toplu raporu yazmadı; sayfa raporlarından okundu (sarmalayıcı artık bunu yapar ve EKSIK-TARAMA diye kırmızı verir). SEO 1,00 (59/59) · erişilebilirlik 0,957 · iyi uygulama 0,96 · performans 0,637 (bilgi). Yayın öncesi tam tarama yeniden koşulmalı |
 | 2026-09-24 | Taban — bağlantı taraması (linkinator 8.1.0) | A | 87 sayfa, 782 tekil adres · site içi yönlendirme 0 · kırık 3: `og-default.jpg` 404 (11 kategori sayfası), `hvac_heat_recovery_7.png` 404 (ana sayfa), `og-image.png` 500 (destek merkezi) → URUN |

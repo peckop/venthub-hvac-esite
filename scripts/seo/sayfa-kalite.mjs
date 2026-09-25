@@ -16,7 +16,7 @@
  * Çıkış: 0 temiz · 1 KIRMIZI (SEO < 1 olan sayfa ya da SEO ortalaması düştü) · 2 araç koşmadı.
  */
 import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { npxYolu } from './link-tara.mjs'
@@ -36,6 +36,30 @@ export function ozetle(rapor) {
   }))
   const seoEksik = sayfalar.filter((s) => typeof s.seo === 'number' && s.seo < 1)
   return { sayfa: sayfalar.length, ortalama: ort, seoEksik, sayfalar }
+}
+
+/**
+ * Toplu rapor (`ci-result.json`) yoksa sayfa başına `reports/**\/lighthouse.json` dosyalarından aynı biçimi kurar.
+ * NİÇİN (ölçüldü 2026-09-24): 87 sayfalık tarama 59 sayfada durdu, çıkış 0 verdi ve toplu raporu YAZMADI;
+ * sayfa raporları diskteydi. Kısmi sonuç sessiz sıfır olmasın diye okunur ve eksik sayfa sayısı ayrıca verilir.
+ */
+export function sayfaRaporlariniTopla(dizin) {
+  const routes = []
+  const gez = (d) => {
+    for (const ad of readdirSync(d, { withFileTypes: true })) {
+      const yol = join(d, ad.name)
+      if (ad.isDirectory()) gez(yol)
+      else if (ad.name === 'lighthouse.json') {
+        try {
+          const r = JSON.parse(readFileSync(yol, 'utf8'))
+          const url = r.finalDisplayedUrl || r.finalUrl || r.requestedUrl
+          routes.push({ path: url ? new URL(url).pathname : yol, categories: r.categories ?? {} })
+        } catch { /* bozuk rapor sayılmaz; eksik sayısına yansır */ }
+      }
+    }
+  }
+  if (existsSync(dizin)) gez(dizin)
+  return { routes }
 }
 
 /**
@@ -71,12 +95,19 @@ async function calistir() {
     { stdio: ['ignore', 'ignore', 'ignore'], timeout: 3 * 3600 * 1000 })
   } catch { /* budget verilmediği için çıkış kodu anlamlı değil; rapor dosyası esastır */ }
   const dosya = join(resolve(cikti), 'ci-result.json')
-  if (!existsSync(dosya)) { console.error('HATA: unlighthouse raporu üretilmedi (Chrome yok ya da site açılmadı)'); process.exit(2) }
-  const o = ozetle(JSON.parse(readFileSync(dosya, 'utf8')))
-  writeFileSync(join(resolve(cikti), 'sayfa-kalite-ozet.json'), JSON.stringify({ taban, alinma: new Date().toISOString(), surum: SURUM, ...o }, null, 1))
-  console.log(JSON.stringify({ taban, sayfa: o.sayfa, ortalama: o.ortalama, seoEksik: o.seoEksik.length }))
+  const toplu = existsSync(dosya)
+  const rapor = toplu ? JSON.parse(readFileSync(dosya, 'utf8')) : sayfaRaporlariniTopla(join(resolve(cikti), 'reports'))
+  if (!rapor.routes.length) { console.error('HATA: unlighthouse hiçbir sayfa raporu üretmedi (Chrome yok ya da site açılmadı)'); process.exit(2) }
+  const o = ozetle(rapor)
+  // Eksik sayfa: site haritasındaki adres sayısı − ölçülen sayfa
+  let haritaAdres = null
+  try { haritaAdres = [...(await (await fetch(`${taban}/sitemap.xml`)).text()).matchAll(/<loc>/g)].length } catch { /* ölçülemedi */ }
+  const eksik = haritaAdres == null ? null : Math.max(0, haritaAdres - o.sayfa)
+  writeFileSync(join(resolve(cikti), 'sayfa-kalite-ozet.json'), JSON.stringify({ taban, alinma: new Date().toISOString(), surum: SURUM, topluRapor: toplu, haritaAdres, eksik, ...o }, null, 1))
+  console.log(JSON.stringify({ taban, topluRapor: toplu, sayfa: o.sayfa, haritaAdres, eksik, ortalama: o.ortalama, seoEksik: o.seoEksik.length }))
+  if (!toplu || eksik) console.log(`EKSIK-TARAMA: ${o.sayfa}/${haritaAdres ?? '?'} sayfa ölçüldü${toplu ? '' : ' (toplu rapor yok, sayfa raporlarından okundu)'} — tam taban DEĞİL`)
   for (const s of o.seoEksik) console.log(`SEO<1 | ${s.yol} | ${s.seo}`)
-  process.exit(o.seoEksik.length ? 1 : 0)
+  process.exit(o.seoEksik.length || !toplu || eksik ? 1 : 0)
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

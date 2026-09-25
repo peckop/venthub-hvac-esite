@@ -9,7 +9,10 @@
  */
 import { describe, it, expect } from 'vitest'
 import { csvAyristir, ozetle as linkOzet, npxYolu } from '../link-tara.mjs'
-import { ozetle as kaliteOzet, kiyasla } from '../sayfa-kalite.mjs'
+import { ozetle as kaliteOzet, kiyasla, sayfaRaporlariniTopla } from '../sayfa-kalite.mjs'
+import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 const CSV = [
   'url,status,state,parent,failureDetails',
@@ -53,6 +56,17 @@ describe('INV-SEO-TARAMA-1 · unlighthouse', () => {
     expect(o.sayfa).toBe(2)
     expect(o.ortalama.seo).toBe(0.96)
     expect(o.seoEksik.map((s: { yol: string }) => s.yol)).toEqual(['/tr/a'])
+  })
+  it('⭐toplu rapor yoksa sayfa raporlarından okunur; bozuk rapor atlanır (09-24 vakası: 59/87 sayfada durdu)', () => {
+    const d = mkdtempSync(join(tmpdir(), 'unlh-'))
+    mkdirSync(join(d, 'a'), { recursive: true }); mkdirSync(join(d, 'b', 'c'), { recursive: true }); mkdirSync(join(d, 'bozuk'))
+    writeFileSync(join(d, 'a', 'lighthouse.json'), JSON.stringify({ finalDisplayedUrl: 'https://s.test/tr', categories: { seo: { score: 1 } } }))
+    writeFileSync(join(d, 'b', 'c', 'lighthouse.json'), JSON.stringify({ finalUrl: 'https://s.test/tr/a', categories: { seo: { score: 0.9 } } }))
+    writeFileSync(join(d, 'bozuk', 'lighthouse.json'), '{yarım')
+    const r = sayfaRaporlariniTopla(d)
+    expect(r.routes.map((x: { path: string }) => x.path).sort()).toEqual(['/tr', '/tr/a'])
+    expect(kaliteOzet(r).seoEksik.map((s: { yol: string }) => s.yol)).toEqual(['/tr/a'])
+    expect(sayfaRaporlariniTopla(join(d, 'yok')).routes).toEqual([])
   })
   it('boş rapor sessiz sıfır vermez: ortalama null', () => {
     expect(kaliteOzet({ routes: [] }).ortalama.seo).toBeNull()
