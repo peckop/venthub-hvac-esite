@@ -52,14 +52,42 @@ function ipucu(komut) {
 }
 
 /**
- * Önbellekten satır üretir; söyleyecek bir şey yoksa null.
+ * Süreç hâlâ yaşıyor mu? `process.kill(pid, 0)` sinyal GÖNDERMEZ, yalnız varlığı sorar (~0,4 ms,
+ * alt süreç yok). EPERM = var ama yetkimiz yok → yaşıyor sayılır.
+ */
+function pidYasiyor(pid) {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (e) {
+    return Boolean(e && e.code === 'EPERM')
+  }
+}
+
+/**
+ * Önbellekteki büyük süreçlerden ölmüş olan var mı? Varsa önbellek bayattır: boş bellek sayısı
+ * da o süreç ölmeden önceki hâli gösterir.
+ *
+ * ⭐NİÇİN (2026-09-25, ilk gün): 58400 kapatıldıktan sonra üç pencere 10 dk boyunca aynı bayat
+ * uyarıyı Ops'a ayrı ayrı bildirdi. Kapatılmış süreci göstermek, yanlış alarmdır.
+ */
+function oluVar(ob, yasiyor = pidYasiyor) {
+  if (!ob || !Array.isArray(ob.surecler)) return false
+  return ob.surecler.some((s) => s.mb >= ESIK_SUREC_MB && !yasiyor(s.pid))
+}
+
+/**
+ * Önbellekten satır üretir; söyleyecek bir şey yoksa null. Büyük süreçlerden biri ölmüşse
+ * satır SUSAR (önbellek bayat; kanca hemen yeniden ölçtürür).
  * @param {{ts:number,bosMb:number,surecler:Array<{pid:number,ad:string,mb:number,ipucu:string}>}|null} ob
  * @param {number} simdi
+ * @param {(pid:number)=>boolean} [yasiyor]
  */
-function satir(ob, simdi) {
+function satir(ob, simdi, yasiyor = pidYasiyor) {
   if (!ob || typeof ob.ts !== 'number') return null
   const yasDk = Math.round((simdi - ob.ts) / 60000)
   if (yasDk > BAYAT_DK) return '⚠BELLEK: OLCULEMEDI (onbellek ' + yasDk + ' dk bayat — arka plan olcumu dusuyor)'
+  if (oluVar(ob, yasiyor)) return null
   const buyukler = (ob.surecler || []).filter((s) => s.mb >= ESIK_SUREC_MB)
   const bosAz = typeof ob.bosMb === 'number' && ob.bosMb < ESIK_BOS_MB
   if (!buyukler.length && !bosAz) return null
@@ -81,11 +109,14 @@ function oku() {
   }
 }
 
-/** Önbellek eskiyse ölçümü arka planda, pencere açmadan başlatır. Kilit: 2 dk. */
+/**
+ * Önbellek eskiyse ya da gösterdiği büyük süreç ölmüşse ölçümü arka planda, pencere açmadan
+ * başlatır. Kilit: 2 dk.
+ */
 function gerekirseTazele(simdi) {
   if (process.platform !== 'win32') return
   const ob = oku()
-  if (ob && simdi - ob.ts < TAZELE_DK * 60000) return
+  if (ob && simdi - ob.ts < TAZELE_DK * 60000 && !oluVar(ob)) return
   const kilit = onbellekYolu() + '.kilit'
   try {
     if (simdi - fs.statSync(kilit).mtimeMs < 2 * 60000) return
@@ -141,4 +172,4 @@ if (require.main === module && process.argv.includes('--tazele')) {
   }
 }
 
-module.exports = { satir, ipucu, oku, gerekirseTazele, ESIK_SUREC_MB, ESIK_BOS_MB }
+module.exports = { satir, ipucu, oku, oluVar, pidYasiyor, gerekirseTazele, ESIK_SUREC_MB, ESIK_BOS_MB }
