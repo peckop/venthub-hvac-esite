@@ -57,7 +57,7 @@ Kurallar:
 
 ## G2 — Soru listesi
 
-- **Yer:** Linear kaydına ek (REC-369) + çalışma kopyası `C:/Users/alize/venthub-olcum/geo/`. **Depoya girmez**
+- **Yer:** Linear kaydına ek (REC-369) + çalışma kopyası `~/venthub-olcum/geo/`. **Depoya girmez**
   (`pazar-olcum-standard.md` P6: sorgu listesi, rakip adı).
 - **Sürüm:** liste sürüm numarası taşır (v0, v1…). Soru değiştirmek yeni sürümdür; eski sürümün sonucu yeni
   sürümle yalnız ortak sorular üzerinden kıyaslanır.
@@ -87,7 +87,7 @@ Kurallar:
 
 ## G4 — Kayıt biçimi
 
-Her cevap bir satır (JSON), `C:/Users/alize/venthub-olcum/geo/<tarih>/<motor>.jsonl`:
+Her cevap bir satır (JSON), `~/venthub-olcum/geo/<tarih>/<motor>.jsonl`:
 
 `soruNo · listeSurum · motor · model · zaman (UTC) · cevapMetni · kaynaklar[] (adres + başlık) · venthubMetinde
 (bool) · venthubKaynakta (bool) · venthubSayfalari[] · hata`

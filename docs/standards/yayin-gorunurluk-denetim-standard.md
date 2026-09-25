@@ -27,7 +27,7 @@
 Araçlar **kurulmaz**: sürüm sabitli `npx` ile koşar, `package.json`'a dokunulmaz (kalıcı kurulum kararı
 ALTYAPI'da, `bagimlilik-kararlari.md`). Her betik `--taban` alır: canlı, yerel ön izleme ya da dal önizlemesi.
 
-**Ölçüm verisinin yeri:** çalışma kopyası depo dışında sabit klasör `C:/Users/alize/venthub-olcum/<an>-<tarih>/`
+**Ölçüm verisinin yeri:** çalışma kopyası depo dışında sabit klasör `~/venthub-olcum/<an>-<tarih>/`
 (oturum geçici klasörü kalıcı yer değildir); kalıcı kopya ilgili Linear kaydına ek (REC-300 / REC-369). PUBLIC
 depoya yalnız özet sayı girer.
 
