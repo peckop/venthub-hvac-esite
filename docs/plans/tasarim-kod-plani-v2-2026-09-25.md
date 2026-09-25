@@ -1,9 +1,14 @@
 # Tasarım → Kod Planı v2 (2026-09-25, TASARIM) — TASLAK
 
-> **DURUM: TASLAK — ONAYSIZ, UYGULANMAZ.** plan-challenger (bağımsız red-team) 2026-09-25 öğlen başlatıldı,
-> pencere park edilmeden **tamamlanmadı** → bu taslak **çürütme incelemesinden GEÇMEMİŞTİR**. Tasarım haftasının
-> (2026-09-28) ilk adımı: plan-challenger'ı bu dosya üzerinde yeniden koşmak, bulguları işlemek, sonra Ops/Recep onayı.
-> Ölçülmemiş ön koşullar metinde "ölçülmedi" diye işaretli (özellikle çakışan token kümesinin tamamı ve admin etkisi).
+> **DURUM: TASLAK — ONAYSIZ, UYGULANMAZ.** plan-challenger (bağımsız red-team) koşuldu, hüküm **KOŞULLU**:
+> `red-team-tasarim-kod-plani-v2-2026-09-25.md` (1 Kritik, 3 Yüksek; ÇIKAR yok, 7 adım DARALT). **Bulgular bu metne
+> İŞLENMEDİ** (pencere park edildi). Tasarım haftasının (2026-09-28) ilk adımı: bulguları işlemek → v2.1 → Ops/Recep.
+> Kritik: Faz 2a'nın `--text-muted` eklemesi INV-PALET-1'in "geri gelmez" kolunu kırar ve DS'in `--text-muted`/`--warn-amber`/
+> `--action-terracotta` adları mevcut `--steel-gray`/`--marka-amber`/`--marka-kiremit` değerlerinin ikinci kopyası olur
+> (cetvel §2: yeni renk kaynağı açılamaz) → takma ad (`var(--marka-*)`) yolu. Yüksek: çakışan küme 4 ad (+`--action-terracotta-deep`,
+> `--font-sans`) · admin DEĞİŞİR (admin tema bu adları ezmiyor; font kökten gelir) → admin kararı Faz 2b'den önce ·
+> K-1 kapısının "Faz PR'ı" tanımı yok, bütün PR'lara uygulanırsa URUN'un adres/Bilgi Merkezi işini kırar; Faz 4(2)
+> "adres işiyle aynı yayında" karar 118'in "adres önce" sırasıyla çelişir → adres yayınından SONRA.
 
 **Ne:** Linear belgesi "Tasarım → Kod Planı" v1'in (OPS, 2026-09-06, `71cb352a`) ve onun Faz 2+3 kaydı REC-165'in
 19 günlük değişiklikle tazelenmiş hâli. v1'in fazları, kapı adları ve yöntemi **korunur**; bu belge yalnız
