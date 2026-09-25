@@ -56,12 +56,15 @@ comment on column public.venthub_quotes.published_email_sent_at is
 
 alter table public.quote_email_events add column if not exists event text not null default 'request_created';
 alter table public.quote_email_events drop constraint if exists quote_email_events_event_check;
+-- Kısıtlar NOT VALID eklenip ayrı adımda doğrulanır (INV-MIGRATION-3: doğrulama yazmayı kilitlemez).
 alter table public.quote_email_events add constraint quote_email_events_event_check
-  check (event = any (array['request_created', 'quote_published']));
+  check (event = any (array['request_created', 'quote_published'])) not valid;
+alter table public.quote_email_events validate constraint quote_email_events_event_check;
 -- REC-385: webhook bulgu 7 kaydini 'mismatch' ile yaziyordu, CHECK reddediyordu → iz hic yazilmiyordu.
 alter table public.quote_email_events drop constraint if exists quote_email_events_status_check;
 alter table public.quote_email_events add constraint quote_email_events_status_check
-  check (status = any (array['sent', 'failed', 'mismatch']));
+  check (status = any (array['sent', 'failed', 'mismatch'])) not valid;
+alter table public.quote_email_events validate constraint quote_email_events_status_check;
 
 -- ─── 3. BEFORE damga tetiği: sunucu fiyat kapısı + toplam + sent_at + numara
 create or replace function public.stamp_quote_published()
