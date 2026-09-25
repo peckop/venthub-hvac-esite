@@ -1,5 +1,5 @@
 {
-  "surum": "0.1-tohum",
+  "surum": "0.2",
   "uretildi": "2026-09-25",
   "cetvel": "docs/standards/mevzuat-kaydi-standard.md",
   "aile_kaynagi": "venthub-pdf-ingestor/paket/aileler.csv (2026-09-25T07:30Z)",
@@ -73,7 +73,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Katalogdaki fan ailelerinin büyük çoğunluğunda motor gövdeye entegre ve bağımsız test edilemez durumda görünüyor; bu durumda Md.2(2)(a) istisnası (fan içine gömülü, ayrılamayan motor) devreye girip ürünü kapsam dışı bırakabilir. Hangi aile/SKU'da motor GERÇEKTEN ayrılabilir/bağımsız satılan bir bileşen, hangisinde değil — bu, ürün teknik dosyası/kurulum kılavuzu düzeyinde ayrıca doğrulanmalı; burada resmi kaynaktan çıkarım yapılmamıştır.",
-        "avens-hiz-anahtarlari (Hız Anahtarları) ailesinin VSD tanımına (Md.3(2): sürekli frekans VE gerilim ayarı yapan elektronik güç dönüştürücü) girip girmediği ürün teknik özellikleriyle teyit edilmeli; basit kademeli/trafo tipi hız anahtarları VSD sayılmayabilir. BULUNAMADI — ayrı ürün-seviyesi inceleme gerekir."
+        "avens-hiz-anahtarlari (Hız Anahtarları) ailesinin VSD tanımına (Md.3(2): sürekli frekans VE gerilim ayarı yapan elektronik güç dönüştürücü) girip girmediği ürün teknik özellikleriyle teyit edilmeli; basit kademeli/trafo tipi hız anahtarları VSD sayılmayabilir. BULUNAMADI — ayrı ürün-seviyesi inceleme gerekir.",
+        "Konsolide sürümler (Yayın Ofisi SPARQL, 2026-09-25): 20191025, 20210701, 20230124. 2023/3 yalnız Almanca dil düzeltmesi; içerik değişikliği yalnız 2021/341."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "A"
@@ -199,7 +200,9 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
         "Ham metinde '(AB) 2019/1781 sayılı Komisyon Tüzüğü' için '1/9/2019 tarihli' (1 Eylül 2019), '(AB) 2021/341' için '17/12/2020 tarihli' ibaresi geçiyor; bunlar AB'nin resmi kabul tarihleriyle (sırasıyla 1 Ekim 2019 ve 23 Şubat 2021) UYUŞMUYOR. Bu, Resmî Gazete metnindeki bir yazım/çeviri hatası olabilir ya da Komisyon içi karar tarihine (C-numarası) atıf olabilir — kaynak metinde başka açıklama yok, düzeltme yapılmadan olduğu gibi raporlanmıştır.",
-        "Tebliğin bizzat kabul/imza tarihi (Bakanlık tebliğ numarasının verildiği tarih) Resmî Gazete metninde ayrıca yazmıyor; yalnız yayım tarihi (28/4/2021) var."
+        "Tebliğin bizzat kabul/imza tarihi (Bakanlık tebliğ numarasının verildiği tarih) Resmî Gazete metninde ayrıca yazmıyor; yalnız yayım tarihi (28/4/2021) var.",
+        "Tebliğ metni AB tüzük tarihlerini yanlış veriyor: 2019/1781 için 1/9/2019 (doğrusu 1 Ekim 2019), 2021/341 için 17/12/2020 (doğrusu 23 Şubat 2021). Ham metinden doğrulandı 2026-09-25.",
+        "Ek PDF taranmış görüntü (metin katmanı yok); madde doğrulaması görsel okumayla yapılır."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "A"
@@ -212,7 +215,7 @@
       "konu": [
         "erp"
       ],
-      "kapsam": "SGM:2021/16'nın Madde 2(2)(j) bendini ve Madde 13 (Yürürlük) ile EK-I'in 1-4. maddelerindeki '1/7/2021' ibarelerinin tamamını '15/8/2021' olarak değiştiren, salt tarih erteleme amaçlı bir değişiklik tebliğidir. AB'nin (EU) 2021/341'iyle içerik olarak İLGİSİZDİR — o değişiklik zaten SGM:2021/16'nın ilk metnine gömülmüştü; bu tebliğ yalnız TR'ye özgü bir uygulama-tarihi ertelemesidir.",
+      "kapsam": "SGM 2021/16 değişiklik tebliği. Md.1: Md.2(2)(j) ikame motor muafiyetini yeniden yazar (15/8/2021 öncesi ürünlere takılı motorların ikamesi, 1/7/2029 öncesi). Md.2: tebliğin genel yürürlüğünü (Md.13) 1/7/2021 → 15/8/2021 erteler. Md.3–6: Ek-I madde 1(1)(a) motor verimi, madde 2(2) motor ürün bilgisi, madde 3(1) değişken hız sürücüsü verimi ve madde 4(1) tarihlerini 1/7/2021 → 15/8/2021 erteler.",
       "tarihler": {
         "kabul": "BULUNAMADI",
         "yayim": "2021-06-29 (Resmî Gazete Sayı 31526)",
@@ -235,7 +238,8 @@
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [],
       "son_kontrol": "2026-09-25",
-      "eksen": "A"
+      "eksen": "A",
+      "notlar": "v0.1 bu kalemi \"yalnız tarih ertelemesi\" diye özetlemişti; Md.1 içerik değişikliğidir (2026-09-25 düzeltildi). Sürücü tarihi Md.5 ile değişir, Md.4 değil (Ek-I madde 2 = motor ürün bilgisi)."
     },
     {
       "kimlik": "AB-327/2011",
@@ -2703,6 +2707,206 @@
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-GURULTU-BINA-2017",
+      "ad": "Binaların Gürültüye Karşı Korunması Hakkında Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "ses",
+        "yapi-urunleri"
+      ],
+      "kapsam": "Binalarda akustik performans sınıfları (A–F) ve iç gürültü sınırları. Md.13: tesisat ve servis ekipmanı gürültüsü Ek-5 Tablo 5.1 (sürekli, LAeq,nT) ve 5.2 (kesikli, LAF,max,nT) değerlerini geçemez; yeni binalarda en az C sınıfı. Ek-8: mekanik sistemlerde gürültü kontrolü (kanal, fan, fancoil).",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2017-05-31",
+        "yururluk": "2018-05-31",
+        "asamalar": [
+          {
+            "tarih": "2018-05-31",
+            "ne": "Md.23: yayımından bir yıl sonra yürürlük"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [
+        "TR-YON-GURULTU-BINA-2018-DEG"
+      ],
+      "karsilik": [],
+      "iliski_notlari": [
+        "Değişiklik RG 31.05.2018/30437 (Md.5, Ek-3); Md.13/Ek-5/Ek-8 değişmedi (ajan ölçümü, değişiklik metni MEVZUAT tarafından ayrıca okunmadı)."
+      ],
+      "durum": "yururlukte",
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "avens-dikdortgen-kanal-radyal",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-vort-quadro-evo",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-punto-evo-flexo",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Binada servis ekipmanı olarak kurulan fan/ünitenin oda içi gürültüsü Ek-5 sınırına tabi; ürün değil bina/tesisat şartı."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "yazi_konusu": [
+        "Sessiz kanal fanı seçimi — yatak odasında gece 30 dB (C sınıfı) servis ekipmanı sınırı"
+      ],
+      "acik_sorular": [
+        "2018 sonrası değişiklik taraması yalnız arama motoruyla yapıldı.",
+        "Ekler taranmış PDF; Tablo 5.1/5.2 ve Ek-8 8.1/8.2.1 görsel okumayla doğrulandı (ek s.24–26, 30)."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "G",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-GURULTU-BINA-2017.json",
+      "resmi_kaynak_sayisi": 4
+    },
+    {
+      "kimlik": "TR-YON-CEVRE-GURULTU-2010",
+      "ad": "Çevresel Gürültünün Değerlendirilmesi ve Yönetimi Yönetmeliği",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "ses"
+      ],
+      "kapsam": "Çevresel gürültü ve titreşim. Md.26(1)(a): mevcut yapılarda fan, iklimlendirme ve hava kanalı gibi kaynaklardan hassas kullanımlara iletilen gürültü, arka plan gürültüsünü Leq cinsinden 5 dBA'dan fazla aşamaz. Md.25(1)(c): fan gibi makinelerin titreşimi Ek-VII Tablo-8 sınırını aşamaz.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2010-06-04",
+        "yururluk": "2010-06-04",
+        "asamalar": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "2011 değişikliği ve sonraki ad değişikliği iddiası doğrulanmadı."
+      ],
+      "durum": "yururlukte",
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "Mevcut binada kurulan fanın hassas mekâna ilettiği gürültü ve titreşim."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "Mevcut binada kurulan fanın hassas mekâna ilettiği gürültü ve titreşim."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Mevcut binada kurulan fanın hassas mekâna ilettiği gürültü ve titreşim."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "Mevcut binada kurulan fanın hassas mekâna ilettiği gürültü ve titreşim."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "yazi_konusu": [],
+      "acik_sorular": [
+        "Güncel hâli (2011 sonrası değişiklikler) doğrulanmadı; yazıda \"2010 tarihli yönetmelik\" diye anılır."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "G",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-CEVRE-GURULTU-2010.json",
+      "resmi_kaynak_sayisi": 1
+    },
+    {
+      "kimlik": "AB-BILDIRIM-2016/C416/06",
+      "ad": "Commission communication 2016/C 416/06 — transitional methods of measurement and calculation for Regulations (EU) No 1253/2014 and 1254/2014",
+      "tur": "rehber",
+      "yetki": "AB",
+      "konu": [
+        "ses",
+        "erp",
+        "enerji-etiketi"
+      ],
+      "kapsam": "Havalandırma üniteleri için uyumlaştırılmış standart yayımlanana kadar geçerli ölçüm yöntemleri. Gövde ses gücü (LWA) için EN ISO 9614-1/-2, EN ISO 3741, 3743-1/-2, 3744, 3745, 3746 veya ISO 13347'den biri.",
+      "tarihler": {
+        "kabul": null,
+        "yayim": "2016-11-11",
+        "yururluk": "2016-11-11",
+        "asamalar": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "AB-1253/2014 ve AB-1254/2014 ölçüm yöntemi."
+      ],
+      "durum": "yururlukte",
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Havalandırma ünitesi LWA beyanının ölçüm yöntemi."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Havalandırma ünitesi LWA beyanının ölçüm yöntemi."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Havalandırma ünitesi LWA beyanının ölçüm yöntemi."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "yazi_konusu": [],
+      "acik_sorular": [
+        "Sonradan uyumlaştırılmış standart yayımlanıp yayımlanmadığı kontrol edilmedi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "G",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-BILDIRIM-2016_C416_06.json",
+      "resmi_kaynak_sayisi": 1
     }
   ],
   "notlar": [
@@ -2931,5 +3135,6 @@
       "sebep": "HTTP 500 sunucu hatası (muhtemelen JS/session state gerektiren dinamik Oracle APEX uygulaması, curl ile çalışmıyor). cencenelec.eu kök domain robots.txt de 404 'Page not found' döndürdü.",
       "etki": "EN 12101-3'ün CPR altındaki resmi uyumlaştırılmış-standart statüsü ve F200/F300/F400/F600 sınıflarının tam tanımı CEN'in kendi kataloğundan doğrulanamadı; yalnız ikincil sanayi kataloğu siteleri (standards.iteh.ai, genorma.com — resmi değil) kullanıldı."
     }
-  ]
+  ],
+  "guncellendi": "2026-09-25"
 }
