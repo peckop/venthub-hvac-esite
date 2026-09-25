@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 
@@ -42,6 +43,8 @@ interface Lib {
   ozet: (s: Puan[]) => { toplam: number; gecti: number; dustu: number; olcemedi: number; cikis: number }
   istemKur: (katalog: Array<{ ad: string; aciklama: string }>, sorgular: string[]) => string
   jetonTahmini: (m: string) => number
+  frontmatterCoz: (ham: string) => { ad: string; aciklama: string } | null
+  CLI_SADE_BAYRAKLAR: string[]
   maliyetTahmini: (a: {
     girisJetonu: number
     cikisJetonu: number
@@ -165,5 +168,74 @@ describe('INV-SKILLS-EVAL-1 · istem ve maliyet', () => {
     })
     expect(usd).toBe(2)
     expect(lib.jetonTahmini('abcd')).toBe(1)
+  })
+})
+
+/**
+ * INV-SKILLS-EVAL-2 · Katalog açıklaması KIRPILMADAN okunur.
+ *
+ * ÖLÇÜLEN KUSUR (prompt denetimi 2026-09-25): okuyucu yalnız `description:` satırını alıyordu;
+ * `.claude/skills` 38 skill'in 33'ünde açıklama alt satıra taşıyor, 8'i `>-` biçiminde. Sınav
+ * kırpık kataloğu ölçüyordu. Yeni okuyucu 74/74 skill'de js-yaml ile aynı sonucu verdi
+ * (eskisi 10/74).
+ */
+describe('INV-SKILLS-EVAL-2 · frontmatter açıklaması', () => {
+  const fm = (govde: string) => `---\n${govde}\n---\n# Baslik\n`
+
+  it('>- blok skalerde tüm satırları birleştirir, ">-" metnini değer saymaz', () => {
+    const r = lib.frontmatterCoz(fm('name: a\ndescription: >-\n  birinci satir\n  ikinci satir\nallowed-tools: Bash'))
+    expect(r).toEqual({ ad: 'a', aciklama: 'birinci satir ikinci satir' })
+  })
+
+  it('düz değer alt satıra taştığında devamını alır, sonraki anahtarda durur', () => {
+    const r = lib.frontmatterCoz(fm('name: b\ndescription: Ilk kisim,\n  devam eden kisim.\nversion: 1'))
+    expect(r?.aciklama).toBe('Ilk kisim, devam eden kisim.')
+  })
+
+  it('| blok skalerde satır sonlarını korur', () => {
+    const r = lib.frontmatterCoz(fm('name: c\ndescription: |\n  satir 1\n  satir 2'))
+    expect(r?.aciklama).toBe('satir 1\nsatir 2')
+  })
+
+  it('çok satırlı tırnaklı değeri çözer', () => {
+    const r = lib.frontmatterCoz(fm('name: d\ndescription: "Uzun aciklama\n  ikinci satir"'))
+    expect(r?.aciklama).toBe('Uzun aciklama ikinci satir')
+  })
+
+  it('CRLF satır sonlarında da aynı sonucu verir', () => {
+    const r = lib.frontmatterCoz('---\r\nname: e\r\ndescription: >-\r\n  x\r\n  y\r\n---\r\n')
+    expect(r?.aciklama).toBe('x y')
+  })
+
+  it('tek satırlık değeri olduğu gibi okur; frontmatter yoksa null döner', () => {
+    expect(lib.frontmatterCoz(fm('name: f\ndescription: kisa'))?.aciklama).toBe('kisa')
+    expect(lib.frontmatterCoz('# frontmatter yok')).toBeNull()
+  })
+})
+
+/**
+ * EK-1 (2026-09-25): bayraksız `claude -p` TAM oturum açıyordu — kancalar koştu, gerçek
+ * `.claude/skills` listesi sınav kataloğuyla yarıştı, 120 sn'de üç skill zaman aşımına düştü.
+ * Sade set iki yerde korunur: sabitin içeriği VE koşucunun onu gerçekten spawn'a vermesi
+ * (sabit doğru ama bağlanmamışsa ölçüm yine kirli olur).
+ */
+describe('skills-eval CLI yolu SADE bağlamda koşar (EK-1)', () => {
+  const b = lib.CLI_SADE_BAYRAKLAR
+  const deger = (bayrak: string) => b[b.indexOf(bayrak) + 1]
+
+  it('araçlar, MCP, slash komutları, ayar kaynakları ve sistem istemi kapatılmış', () => {
+    expect(deger('--tools')).toBe('')
+    expect(b).toContain('--strict-mcp-config')
+    expect(JSON.parse(deger('--mcp-config'))).toEqual({ mcpServers: {} })
+    expect(b).toContain('--disable-slash-commands')
+    expect(deger('--setting-sources')).toBe('')
+    expect(deger('--system-prompt')).toMatch(/yonlendirme/)
+    expect(b, '--bare OAuth u kapatır; yerel koşu API anahtarı ister').not.toContain('--bare')
+  })
+
+  it('koşucu sabiti claude spawn argümanlarına yayıyor', () => {
+    const kaynak = fs.readFileSync(path.resolve(__dirname, '../../../scripts/skills-eval-run.mjs'), 'utf8')
+    expect(kaynak).toMatch(/import\s*\{[^}]*CLI_SADE_BAYRAKLAR[^}]*\}\s*from '\.\/skills-eval\/lib\.mjs'/)
+    expect(kaynak).toMatch(/spawnSync\('claude',\s*\['-p',\s*'--model',\s*MODEL,\s*\.\.\.CLI_SADE_BAYRAKLAR\]/)
   })
 })

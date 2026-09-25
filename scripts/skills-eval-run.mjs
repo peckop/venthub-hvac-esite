@@ -28,7 +28,7 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { cevabiCoz, istemKur, jetonTahmini, maliyetTahmini, ozet, puanla } from './skills-eval/lib.mjs'
+import { CLI_SADE_BAYRAKLAR, cevabiCoz, frontmatterCoz, istemKur, jetonTahmini, maliyetTahmini, ozet, puanla } from './skills-eval/lib.mjs'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 // Fiyat tablosu burada AÇIK durur ki maliyet satırı "nereden çıktı" sorusuna cevap verebilsin.
@@ -57,16 +57,9 @@ function arkaUcSec() {
   return 'yok'
 }
 
-/** SKILL.md frontmatter'ından ad ve açıklamayı çıkarır (yaml bağımlılığı olmadan). */
+/** SKILL.md frontmatter ayrıştırması saf çekirdekte: `frontmatterCoz` (lib.mjs). */
 function frontmatter(dosya) {
-  const ham = fs.readFileSync(dosya, 'utf8')
-  const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(ham)
-  if (!m) return null
-  const al = (anahtar) => {
-    const r = new RegExp('^' + anahtar + ':\\s*(.+)$', 'm').exec(m[1])
-    return r ? r[1].trim().replace(/^["']|["']$/g, '') : ''
-  }
-  return { ad: al('name'), aciklama: al('description') }
+  return frontmatterCoz(fs.readFileSync(dosya, 'utf8'))
 }
 
 /** Bir skill ağacını okur: katalog (hepsi) + sınavı olanlar (evals.json). */
@@ -111,7 +104,8 @@ function agaciOku(agac) {
  * Zaman aşımı ZORUNLU: takılan bir alt süreç sınavı sonsuza kilitler.
  */
 function cliyeSor(istem) {
-  const r = spawnSync('claude', ['-p', '--model', MODEL], {
+  // Sade bağlam (EK-1): bayraksız çağrı tam oturum açar, ölçümü kirletir — lib.mjs'teki gerekçe.
+  const r = spawnSync('claude', ['-p', '--model', MODEL, ...CLI_SADE_BAYRAKLAR], {
     input: istem,
     encoding: 'utf8',
     timeout: 120_000,
