@@ -344,7 +344,7 @@ export const tr = {
       },
       hrv: {
         title: 'Isı Geri Kazanım (HRV/ERV)',
-        image: '/images/hvac_installation_close_up_premium_4.png',
+        image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg',
         summary: 'Taze havayı ısı geri kazanımı ile sağlayan cihazlar; seçimde debi, verim/SFP ve harici statik basınç kritik.',
         steps: ['Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).', 'Verim/SFP: %70–85 verim, düşük SFP (işletme maliyeti).', 'Basınç: filtre/kanal kayıplarına uygun harici statik basınç.'],
         pitfalls: ['Yüksek verime bakıp harici statik basıncı atlamak']

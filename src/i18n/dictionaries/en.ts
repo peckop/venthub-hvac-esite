@@ -255,7 +255,7 @@ export const en: typeof tr = {
         summary: 'Provides fresh air with heat recovery; key criteria are airflow, efficiency/SFP and external static pressure.',
         steps: ['Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).', 'Efficiency/SFP: 70–85% efficiency, low SFP.', 'Pressure: external static matching filter/duct losses.'],
         pitfalls: ['Focusing on efficiency while ignoring external static'],
-        image: '/images/hvac_installation_close_up_premium_4.png'
+        image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg'
       },
       'air-curtain': {
         image: '/images/hvac_installation_close_up_premium_3.webp',

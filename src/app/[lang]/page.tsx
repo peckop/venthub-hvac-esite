@@ -101,7 +101,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'VentHub',
       images: [
         {
-          url: `${siteUrl}/images/hvac_heat_recovery_7.png`,
+          // Eskiden `hvac_heat_recovery_7.png` — dosya depoda HİÇ yoktu, paylaşım önizlemesi 404
+          // (BLOG canlı tabanı, 2026-09-24). Varsayılan kart; kapı: INV-GORSEL-VAR-1.
+          url: `${siteUrl}/images/og-default.jpg`,
           width: 1200,
           height: 630,
         },
@@ -113,7 +115,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: dict.home.seoTitle,
       description: dict.home.seoDesc,
-      images: [`${siteUrl}/images/hvac_heat_recovery_7.png`],
+      images: [`${siteUrl}/images/og-default.jpg`],
     },
     robots: {
       index: true,
