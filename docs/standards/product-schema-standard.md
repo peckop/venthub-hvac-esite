@@ -513,6 +513,57 @@ Buna karşın **38 hücre** sayısal anahtarda birimi değerin içinde taşıyor
 **Kural:** sayısal son ekli (`_w`, `_pa`, `_m3h`, `_kg`, `_mm`, `_v`, `_a`, `_hz`) her alan
 sayı tutar. Metin değer yazan betik **kırmızı verir**. Mevcut 38 hücre ayrı onarım kalemidir.
 
+### Enerji etiketi ve ürün bilgi föyü: yasal alanlar (REC-392, 2026-09-25)
+
+**Nereden çıktı:** MEVZUAT şeridi (REC-392) konut tipi ısı geri kazanım cihazlarının fiyatla
+satıldığını, ama AB 1254/2014'ün (TR karşılığı SGM-2021/19) istediği enerji sınıfı ve ürün bilgi
+föyünün sitede olmadığını buldu. Yükümlülük satıcıdadır. Bu alanlar **yasal beyan**dır; teknik
+özellik gibi "yaklaşık doğru" olamaz. Bu yüzden kural diğer satırlardan serttir.
+
+**Yer:** `technical_specs` (JSONB). Yeni tablo kolonu **yok**, migration gerekmez. Anahtarlar
+1254/2014 Ek IV föy alanlarının birebir karşılığıdır:
+
+| Anahtar | Föy alanı | Tip / birim |
+|---|---|---|
+| `sec_class_average` | SEC sınıfı, ortalama iklim | metin: `A+`, `A`, `B`… |
+| `sec_average_kwh_m2a` · `sec_cold_kwh_m2a` · `sec_warm_kwh_m2a` | Özgül enerji tüketimi (SEC), üç iklim | sayı, kWh/(m²·yıl) — negatif olağandır |
+| `ventilation_unit_type` | Tip: konut tek yönlü / çift yönlü | `UVU` · `BVU` |
+| `drive_type` | Sürücü tipi (çok kademeli / değişken hız) | metin, kaynaktaki ifade |
+| `heat_recovery_type` | Isı geri kazanım tipi (reküperatif / rejeneratif / yok) | metin |
+| `thermal_efficiency_pct` | Isıl verim | sayı, % |
+| `max_delivery_m3h` | Maksimum debi (mevcut alan, §11.7 anlamıyla) | sayı, m³/h |
+| `power_at_max_delivery_w` | Maksimum debide elektrik güç girişi | sayı, W |
+| `noise_lwa_db` | Ses gücü seviyesi LWA (föyün ölçütü; LpA ile karıştırılmaz, §11.7) | sayı, dB(A) |
+| `reference_delivery_m3s` · `reference_pressure_pa` | Referans debi ve referans basınç farkı | sayı |
+| `spi_w_m3h` | Özgül güç girişi | sayı, W/(m³/h) |
+| `control_factor` | Kontrol faktörü ve kontrol tipolojisi | sayı + metin kaynaktaki gibi |
+| `leakage_internal_pct` · `leakage_external_pct` | İç / dış kaçak oranı | sayı, % — UVU'da kaynak "NA" diyorsa anahtar YAZILMAZ |
+| `aec_kwh` · `ahs_average_kwh` | Yıllık elektrik tüketimi, yıllık tasarruf edilen ısıtma (ortalama iklim) | sayı, kWh |
+| `eprel_registration` | EPREL kayıt numarası | metin; yalnız üretici verdiyse |
+
+**Kurallar:**
+- ⛔ **Kaynaksız değer yazılmaz, çift bağımsız doğrulama şart.** İki ayrı çıkarım (metin yolu +
+  tablo yolu) aynı değeri vermiyorsa değer yazılmaz, AVenS/Vortice soru paketine gider.
+- ⛔ **Paylaşımlı sütun aktarılmaz.** Kaynak föyü iki koda tek sütun veriyorsa ("12106 / 10911"),
+  üretici ayrı föy ya da açık beyan vermeden ikinci koda değer yazılmaz.
+- Değer **kaynaktaki ondalıkla** yazılır; yuvarlanmaz, "düzeltilmez" (-44,5 kaynaksa -44.5).
+- **Etiket görseli ve föy belgesi veri değildir, dosyadır.** Mesafeli satışta etiketin fiyatın yanında
+  gösterilmesi ve föyün erişilebilir olması gerekir; bu dosyalar üreticiden (EPREL) alınır ve
+  görsel/belge katmanında durur. Bu anahtarlar dosyanın yerini tutmaz.
+
+### `erp_compliant`: yalnız kaynaklı, kapsam dışında hiç (REC-392 ek kapsam, Ops hükmü 2026-09-25)
+
+**Ölçüm (2026-09-25, katalog paketi):** 22 ailede 187 değer (true 159 · false 28), **187'sinin
+kaynak belgesi boş.** NORDIK HVLS'te "Evet"in belgede dayanağı yok; duman tahliye fanlarında
+dayanak motor tüzüğü (2019/1781), fan tüzüğü değil (AB 2024/1834 Md.1(3) duman tahliye ve hava
+sirkülasyon fanlarını kapsam dışı sayar); ATEX ailesinde "Hayır" uyumsuzluk gibi okunuyor.
+
+**Kural:**
+- Değer yalnız üretici belgesinde **hangi tüzüğe** uyduğu yazılıysa girer; alıntı ve sayfa zorunlu.
+- Kaynak bulunamazsa anahtar **silinir** — tahminle `true`/`false` yazılmaz.
+- Tüzüğün kapsamı dışındaki ailede (duman tahliye, HVLS, ATEX, frekans konvertörü…) anahtar **hiç
+  bulunmaz**; `false` "uyumsuz" diye okunur ve yanlıştır.
+
 ## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).
