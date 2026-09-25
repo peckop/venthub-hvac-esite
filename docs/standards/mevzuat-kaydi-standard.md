@@ -176,6 +176,23 @@ tutarlılığını da sınar: her aile slug'ı KATALOG paketinde var mı, her `k
 Bir kalem **durum değiştirdiğinde** (yeni aşama, kaldırılma, TR karşılığının yayımı) üç listenin
 hangisini etkilediği aynı gün yazılır ve ilgili şeride iletilir.
 
+### M6.1 BLOG ↔ MEVZUAT iş bölümü (kalıcı — OPS/Recep, 2026-09-25)
+
+1. **Yazıdan önce mevzuat paketi.** BLOG konuyu MEVZUAT'a bildirir. MEVZUAT o konunun ürün
+   ailelerine dokunan kalemleri çıkarır: yürürlükteki metin, AB/TR farkı, geçiş tarihleri, birebir
+   doğrulanmış alıntı ve kaynak. Paket kayıttaki kimliklere atıf yapar; kayıtta olmayan kalem pakete
+   girmeden önce kayda eklenir.
+2. **Mevzuat iddiası yalnız paketten.** BLOG yönetmelik yorumlamaz; pakette olmayan bir mevzuat
+   iddiasını önce MEVZUAT'a sorar.
+3. **Yazı bitince mevzuat kontrolü.** Yazıdaki her mevzuat cümlesini MEVZUAT kontrol eder: tarih,
+   madde numarası, AB/TR ayrımı, geçiş dönemi. Bu kontrol `rehber-yazisi-standard.md` R5.1 doğrulama
+   akışında ayrı bir adımdır.
+4. **Kayıt değişince güncelleme bildirimi.** Bir kalemin durumu ya da tarihi değişirse, o kaleme
+   dayanan yayındaki yazılar BLOG'a "güncelle" diye bildirilir. Bunun için her paket, dayandığı
+   kalem kimliklerini listeler; yazı yayımlanınca bu liste yazının kaydında tutulur.
+5. **"İlk anlatan" adayları.** Yaklaşan uygulama tarihleri BLOG'un konu sırasına öneri olarak verilir.
+   Sırayı Recep belirler, öneriyi OPS götürür.
+
 ---
 
 ## Ölçüm geçmişi
