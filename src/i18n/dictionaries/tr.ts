@@ -344,7 +344,7 @@ export const tr = {
       },
       hrv: {
         title: 'Isı Geri Kazanım (HRV/ERV)',
-        image: '/images/hvac_installation_close_up_premium_4.png',
+        image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg',
         summary: 'Taze havayı ısı geri kazanımı ile sağlayan cihazlar; seçimde debi, verim/SFP ve harici statik basınç kritik.',
         steps: ['Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).', 'Verim/SFP: %70–85 verim, düşük SFP (işletme maliyeti).', 'Basınç: filtre/kanal kayıplarına uygun harici statik basınç.'],
         pitfalls: ['Yüksek verime bakıp harici statik basıncı atlamak']
@@ -356,6 +356,44 @@ export const tr = {
         title: 'Hava Perdesi'
       }
     }
+  },
+  // BİLGİ MERKEZİ (karar 92, 2026-09-24) — rehber yazılarının liste ve yazı sayfası şablonu.
+  // Yazıların kendi metni sözlükte DEĞİL (src/data/bilgiMerkezi/yazilar.ts; ileride DB tablosu):
+  // burada yalnız şablonun sabit metinleri durur (rehber-yazisi-standard.md R3).
+  bilgiMerkezi: {
+    ad: 'Bilgi Merkezi',
+    anaSayfa: 'Ana sayfa',
+    liste: {
+      seoBaslik: 'Bilgi Merkezi — Havalandırma Rehber Yazıları | VentHub',
+      seoAciklama: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
+      baslik: 'Bilgi Merkezi',
+      altBaslik: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
+      aramaEtiketi: 'Yazılarda ara',
+      aramaYerTutucu: 'Konu ya da terim yazın',
+      sonucYok: 'Aramanıza uyan yazı bulunamadı.',
+      oku: 'Yazıyı oku',
+      seciciBaslik: 'Ürün Seçici',
+      seciciAciklama: 'Kanal, ısı geri kazanım, hava perdesi ve jet fan hesaplarını tek yerden yapın.',
+      seciciDugme: 'Ürün Seçici’yi aç',
+    },
+    yazi: {
+      yazar: 'VentHub',
+      okumaSuresi: '{{count}} dakika okuma',
+      guncelleme: 'Güncelleme',
+      icindekiler: 'İçindekiler',
+      urunlerBaslik: 'İlgili ürün aileleri',
+      urunDugme: 'Aileyi incele',
+      ilgiliBaslik: 'İlgili yazılar',
+      teklifBaslik: 'Projeniz için teklif alın',
+      teklifAciklama: 'İhtiyacınızı iletişim formundan yazın; uygun ürün için teklif hazırlayalım.',
+      teklifDugme: 'Teklif iste',
+      listeyeDon: 'Bilgi Merkezi’ne dön',
+    },
+    konular: {
+      konfor: 'Konfor',
+      guvenlik: 'Güvenlik',
+      verimlilik: 'Verimlilik',
+    },
   },
   meta: {
     siteTitle: 'VentHub — Premium HVAC Çözümleri',

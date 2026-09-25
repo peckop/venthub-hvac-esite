@@ -45,6 +45,9 @@ describe('INV-HAFIZA-SORUSU: hafıza sorusu ADRESE yönlendirilir, cevap ÜRETİ
       'nerede kalmıştık?',
       'bu kural nereden geliyor',
       'niçin böyle karar aldık',
+      'neden böyle yaptık',
+      'bunu daha önce konuşmuştuk',
+      'önce söylemiştin bunu',
     ]
     for (const s of sorular) {
       it(`"${s}" → yönlendirme`, () => {
@@ -66,12 +69,22 @@ describe('INV-HAFIZA-SORUSU: hafıza sorusu ADRESE yönlendirilir, cevap ÜRETİ
       'PR açabilir misin',
       'hatırlatıcı kur',
       'merge içeren her şekilde bana gelecek zaten',
+      // 2026-09-25 yanlış alarmları: hata ayıklama ve talimat cümleleri (boş seçenekli kalıp)
+      'neden böyle olmuş, test niye kırmızı',
+      'neden böyle bir hata veriyor',
+      'önce karar metnini oku sonra yaz',
+      'önce konuşalım sonra karar veririz',
     ]
     for (const s of sessiz) {
       it(`"${s}" → SESSİZ`, () => {
         expect(kancayiKostur(s), 'kanca gündelik cümlede öttü — her istemde öten kanca görmezden gelinir').toBe('')
       })
     }
+  })
+
+  it('makine mesajı taranmaz: alt ajan bildirimi ve oturumlar arası mesaj içinde kalıp olsa da SESSİZ', () => {
+    expect(kancayiKostur('<task-notification>\nRapor: bunu konuşmuş muyduk diye sordum, neden böyle yaptık\n</task-notification>')).toBe('')
+    expect(kancayiKostur('<cross-session-message from="x">OPS: daha önce konuşmuştuk</cross-session-message>')).toBe('')
   })
 
   it('KOD sorusu ayrı sınıf: CodeGraph önce, takip defteri DEĞİL', () => {

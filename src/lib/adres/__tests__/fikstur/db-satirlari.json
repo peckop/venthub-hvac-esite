@@ -1,0 +1,53 @@
+{
+  "aciklama": "REC-300 Faz 3 — CI fikstürü: canlı DB'nin (2026-09-24 SELECT ölçümü) küçük, gerçek slug'lı kesiti. Kimlikler uydurma. Bir satır BAŞKA kiracıya aittir (kiracı süzgeci testi) ve bir ürün arşivdedir (yalnız aktif ürün testi).",
+  "categories": [
+    { "id": "00000000-0000-4000-8000-0000000000c1", "slug": "fans", "metadata": { "slug": { "tr": "fanlar", "en": "fans" } }, "parent_id": null, "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c2", "slug": "duct-fans", "metadata": { "slug": { "tr": "kanal-tipi-fanlar", "en": "duct-fans" } }, "parent_id": "00000000-0000-4000-8000-0000000000c1", "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c3", "slug": "acid-resistant-fans", "metadata": { "slug": { "tr": "asit-dayanikli-fanlar", "en": "acid-resistant-fans" } }, "parent_id": "00000000-0000-4000-8000-0000000000c1", "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c4", "slug": "smoke-exhaust-fans", "metadata": { "slug": { "tr": "duman-egzoz-fanlari", "en": "smoke-exhaust-fans" } }, "parent_id": "00000000-0000-4000-8000-0000000000c1", "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c5", "slug": "jet-fans", "metadata": { "slug": { "tr": "otopark-jet-fanlari", "en": "jet-fans" } }, "parent_id": "00000000-0000-4000-8000-0000000000c1", "is_active": false, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c6", "slug": "air-curtains", "metadata": { "slug": { "tr": "hava-perdeleri", "en": "air-curtains" } }, "parent_id": null, "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c7", "slug": "heat-recovery-vmc", "metadata": { "slug": { "tr": "isi-geri-kazanim", "en": "heat-recovery-vmc" } }, "parent_id": null, "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c8", "slug": "single-room-hrv", "metadata": { "slug": { "tr": "tekil-oda-uniteleri", "en": "single-room-hrv" } }, "parent_id": "00000000-0000-4000-8000-0000000000c7", "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000c9", "slug": "control-systems", "metadata": { "slug": { "tr": "kontrol-sistemleri", "en": "control-systems" } }, "parent_id": null, "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000ca", "slug": "speed-controllers", "metadata": { "slug": { "tr": "hiz-anahtarlari", "en": "speed-controllers" } }, "parent_id": "00000000-0000-4000-8000-0000000000c9", "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000cb", "slug": "accessories", "metadata": { "slug": { "tr": "aksesuarlar", "en": "accessories" } }, "parent_id": null, "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000cc", "slug": "air-treatment", "metadata": { "slug": { "tr": "iklimlendirme-ve-hava-sartlandirma", "en": "air-treatment" } }, "parent_id": null, "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000cd", "slug": "dehumidifiers", "metadata": { "slug": { "tr": "nem-alma-cihazlari", "en": "dehumidifiers" } }, "parent_id": "00000000-0000-4000-8000-0000000000cc", "is_active": true, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000ce", "slug": "commercial-ventilation", "metadata": { "slug": { "tr": "ticari-havalandirma", "en": "commercial-ventilation" } }, "parent_id": null, "is_active": false, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000cf", "slug": "rectangular-duct-fans", "metadata": { "slug": { "tr": "dikdortgen-kanal-fanlari", "en": "rectangular-duct-fans" } }, "parent_id": "00000000-0000-4000-8000-0000000000ce", "is_active": false, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000d0", "slug": "residential-ventilation", "metadata": { "slug": { "tr": "konut-tipi-havalandirma", "en": "residential-ventilation" } }, "parent_id": null, "is_active": false, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-0000000000d1", "slug": "baska-kiraci-kategorisi", "metadata": null, "parent_id": null, "is_active": true, "tenant_id": "11111111-1111-4111-8111-111111111111" }
+  ],
+  "product_families": [
+    { "id": "00000000-0000-4000-8000-0000000000f1", "slug": "storm-serisi", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
+    { "id": "00000000-0000-4000-8000-0000000000f2", "slug": "vortice-lineo-quiet", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
+    { "id": "00000000-0000-4000-8000-0000000000f3", "slug": "nicotra-gebhardt-dd", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
+    { "id": "00000000-0000-4000-8000-0000000000f4", "slug": "vortice-vort-commercial-in-line-rectangular", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
+    { "id": "00000000-0000-4000-8000-0000000000f5", "slug": "vortice-vorticent-cms-atex", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000", "deleted_at": null },
+    { "id": "00000000-0000-4000-8000-0000000000f6", "slug": "baska-kiraci-ailesi", "tenant_id": "11111111-1111-4111-8111-111111111111", "deleted_at": null }
+  ],
+  "products": [
+    { "id": "00000000-0000-4000-8000-000000000a01", "sku": "SEA-61102000", "slug": "storm-10-61102000", "family_id": "00000000-0000-4000-8000-0000000000f1", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a02", "sku": "SEA-61143003", "slug": "storm-14-atex-61143003", "family_id": "00000000-0000-4000-8000-0000000000f1", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a03", "sku": "SEA-61102010", "slug": "storm-10-xrm-61102010", "family_id": "00000000-0000-4000-8000-0000000000f1", "status": "archived", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a04", "sku": "VRT-17160", "slug": "vortice-lineo-100-quiet-17160", "family_id": "00000000-0000-4000-8000-0000000000f2", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a05", "sku": "NIC-11921", "slug": "dd-12-12-1500w-3f-4p-2v-61090p-11921", "family_id": "00000000-0000-4000-8000-0000000000f3", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a06", "sku": "VRT-CA-IL-4020-ES-RECT", "slug": "vortice-ca-il-4020-es-rect", "family_id": "00000000-0000-4000-8000-0000000000f4", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a07", "sku": "VRT-CA-IL-5035-ES-RECT", "slug": "vortice-ca-il-5035-es-rect", "family_id": "00000000-0000-4000-8000-0000000000f4", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a08", "sku": "VRT-CA-IL-6040-ES-RECT", "slug": "vortice-ca-il-6040-es-rect", "family_id": "00000000-0000-4000-8000-0000000000f4", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a09", "sku": "VRT-CA-IL-7050-ES-RECT", "slug": "vortice-ca-il-7050-es-rect", "family_id": "00000000-0000-4000-8000-0000000000f4", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a10", "sku": "VRT-CA-IL-8060-ES-RECT", "slug": "vortice-ca-il-8060-es-rect", "family_id": "00000000-0000-4000-8000-0000000000f4", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a11", "sku": "VRT-253490106XN", "slug": "vorticent-cms-atex-35-14-t4-3kw-253490106xn", "family_id": "00000000-0000-4000-8000-0000000000f5", "status": "active", "deleted_at": null, "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "id": "00000000-0000-4000-8000-000000000a12", "sku": "BASKA-1", "slug": "baska-kiraci-urunu", "family_id": "00000000-0000-4000-8000-0000000000f6", "status": "active", "deleted_at": null, "tenant_id": "11111111-1111-4111-8111-111111111111" }
+  ],
+  "url_takma_adlari": [
+    { "tur": "urun", "dil": "*", "eski_slug": "dd-12-12-1500w-3f-4p-2v-6n090p-11921", "hedef_id": "00000000-0000-4000-8000-000000000a05", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "tur": "urun", "dil": "*", "eski_slug": "vortice-ca-il-4020-es-rect-16076", "hedef_id": "00000000-0000-4000-8000-000000000a06", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "tur": "urun", "dil": "*", "eski_slug": "vorticent-cms-atex-35-14-t4-4kw-253490106xn", "hedef_id": "00000000-0000-4000-8000-000000000a11", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "tur": "aile", "dil": "*", "eski_slug": "seat-storm", "hedef_id": "00000000-0000-4000-8000-0000000000f1", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "tur": "sku", "dil": "*", "eski_slug": "sea-eski-61143003", "hedef_id": "00000000-0000-4000-8000-000000000a02", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "tur": "kategori", "dil": "tr", "eski_slug": "kanal-fanlari", "hedef_id": "00000000-0000-4000-8000-0000000000c2", "tenant_id": "d3b07384-d113-495f-a558-8c38634e0000" },
+    { "tur": "urun", "dil": "*", "eski_slug": "baska-kiraci-eski-urun", "hedef_id": "00000000-0000-4000-8000-000000000a12", "tenant_id": "11111111-1111-4111-8111-111111111111" }
+  ]
+}

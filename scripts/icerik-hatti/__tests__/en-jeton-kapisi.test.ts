@@ -65,6 +65,12 @@ describe('TR ↔ EN jeton kapısı', () => {
     expect(kos('faz', 'Trifaze motor.', 'Single-phase motor.').status).toBe(1)
   })
 
+  it('TR "tek faz / üç faz" (-lı eksiz) faz jetonu üretir; "fazla" üretmez (karar 115 kategori metni)', () => {
+    expect(kos('faz-kisa', 'Besleme (tek faz / üç faz).', 'Supply (single-phase / three-phase).').status).toBe(0)
+    expect(kos('faz-kisa2', 'Besleme üç faz.', 'Single-phase supply.').status).toBe(1)
+    expect(kos('fazla', 'Tek fazla seçenek.', 'One option too many, single-phase.').status).toBe(1)
+  })
+
   it('TR "Bölge 2" ↔ EN "Zone 2" denk; bölge numarası değişirse KIRMIZI', () => {
     expect(kos('bolge', 'ATEX Bölge 2 ortamına uygun.', 'Suitable for ATEX Zone 2.').status).toBe(0)
     expect(kos('bolge2', 'ATEX Bölge 1 ortamına uygun.', 'Suitable for ATEX Zone 2.').status).toBe(1)

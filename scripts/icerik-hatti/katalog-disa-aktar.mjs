@@ -26,9 +26,11 @@
  * projede tam bu tuzağa daha önce düşüldü (veri tavanı, REC-124).
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
-import { createHash } from 'node:crypto'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+
+// Gövde + parmak izi TEK KAYNAKTAN: karnenin tazelik satırı aynı fonksiyonla canlıyı ölçer (REC-212).
+import { parmakIzi, tabloGovdesi } from './paket-tazelik.mjs'
 
 const env = Object.fromEntries(
   readFileSync(process.env.VENTHUB_ENV || join(homedir(), 'venthub-hvac', '.env'), 'utf8')
@@ -51,13 +53,6 @@ const TABLOLAR = [
   { ad: 'product_prices',   sirala: 'id' },
   { ad: 'product_images',   sirala: 'id' },
 ]
-
-const sirala = (o) => {
-  // Anahtar sırası sabit olmalı: aynı veri iki koşumda aynı baytı vermeli.
-  const y = {}
-  for (const k of Object.keys(o).sort()) y[k] = o[k]
-  return y
-}
 
 async function kesinSayi(t) {
   const r = await fetch(`${U}/rest/v1/${t}?select=id`, { headers: { ...H, Prefer: 'count=exact', Range: '0-0' } })
@@ -96,8 +91,8 @@ for (const { ad, sirala: kol } of TABLOLAR) {
     console.error(`⛔ ${ad}: çekilen ${satirlar.length} ≠ sunucu ${kesin} — EKSİK VERİ, HİÇBİR ŞEY yazılmadı`)
     process.exit(1)
   }
-  const govde = satirlar.map(s => JSON.stringify(sirala(s))).join('\n') + '\n'
-  const hash = createHash('sha256').update(govde).digest('hex')
+  const govde = tabloGovdesi(satirlar)
+  const hash = parmakIzi(satirlar)
   govdeler.push({ ad, govde, ornek: satirlar[0] })
   manifest.tablolar[ad] = { satir: satirlar.length, kolon: Object.keys(satirlar[0] || {}).length, sha256: hash }
   toplam += satirlar.length

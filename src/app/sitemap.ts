@@ -3,6 +3,7 @@ import { MetadataRoute } from 'next'
 import { EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
+import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { getCategories } from '../lib/services/category.service'
 import { getAllFamilySlugs } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
@@ -21,6 +22,7 @@ import { Routes } from '../utils/routes'
  * webhook arızasında fark edilmeyecek kadar bayat.
  */
 export const revalidate = 21600
+
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
@@ -64,7 +66,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/brands',
     '/contact',
     '/about',
-    '/destek/merkez',
+    // `/destek/merkez` ÇIKTI (karar 92): adres 308 verir; Bilgi Merkezi aşağıda kendi bloğunda
+    // (bölüm adı dile göre değiştiği için bu ortak listeye giremez).
     // Ürün Seçici (karar K17): hesaplama araçlarının tek kalıcı girişi. Dört aracın
     // KENDİ adresleri sitemap'te YOK ve bu kasıtlı — arama motoruna verilen kapı tek
     // olsun; araçlar bu sayfadan bulunur.
@@ -160,5 +163,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // `subCategoryRoutes` KALDIRILDI (REC-205) — alt kategoriler `categoryRoutes` içinde
   // zaten tek seviyeli kanonik adresleriyle var; ikinci kez eklemek çift yayın demekti.
-  return [...staticRoutes, ...categoryRoutes, ...brandRoutes, ...productRoutes]
+  return [...staticRoutes, ...bilgiMerkeziSiteHaritasi(baseUrl), ...categoryRoutes, ...brandRoutes, ...productRoutes]
 }

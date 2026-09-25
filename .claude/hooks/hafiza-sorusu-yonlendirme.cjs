@@ -44,9 +44,21 @@ const KALIPLAR = [
   { re: /(ne|nas[iı]l)\s+karar\s+(verdik|vermi[sş]tik|alm[iı][sş]t[iı]k)/i, sinif: 'KARAR' },
   { re: /karar\s+verilmi[sş]\s*(miydi|mi)/i, sinif: 'KARAR' },
   { re: /hat[iı]rl[iı]yor\s+musun/i, sinif: 'KARAR' },
-  { re: /(daha\s+)?[oö]nce\s+(konu[sş]|karar|s[oö]ylemi[sş]|demi[sş])/i, sinif: 'KARAR' },
+  // ⚠"önce" tek başına geçmiş sorusu DEĞİL ("önce karar metnini oku", "önce konuşalım").
+  // Eşleşme yalnız GEÇMİŞ ZAMAN fiiliyle: konuştuk/konuşmuştuk, karar verdik, söylemiştin, demiştik.
+  // `(?<!\p{L})` = kelime başı; JS `\b` Türkçe harfleri (ö, ş) kelime saymaz, bu yüzden kullanılmaz.
+  {
+    re: /(?<!\p{L})(daha\s+)?[oö]nce\s+(konu[sş](tuk|mu[sş]tuk)|karar\s+(verdik|vermi[sş]tik|alm[iı][sş]t[iı]k)|s[oö]yle(din|mi[sş]tin|mi[sş]tim|mi[sş]tik)|de(din|dik|mi[sş]tin|mi[sş]tim|mi[sş]tik))/iu,
+    sinif: 'KARAR',
+  },
   { re: /ne\s+planlam[iı][sş]t[iı]k/i, sinif: 'KARAR' },
-  { re: /(niçin|nicin|neden)\s+(b[oö]yle|bu\s+[sş]ekilde|[oö]yle)\s*(yapt|karar|olmu[sş]|)/i, sinif: 'KARAR' },
+  // ⚠Son grupta BOŞ SEÇENEK vardı (`|)`): "neden böyle" geçen her cümle, örneğin hata ayıklarken
+  // "neden böyle olmuş", hafıza sorusu sayılıyordu (2026-09-25 prompt denetimi, defalarca gözlendi).
+  // "olmuş" da çıkarıldı: o bir hata sorusudur, geçmiş karar sorusu değil.
+  {
+    re: /(niçin|nicin|neden)\s+(b[oö]yle|bu\s+[sş]ekilde|[oö]yle)\s+(yapt[iı]k|yapm[iı][sş]t[iı]k|karar\s+(verdik|vermi[sş]tik|ald[iı]k|alm[iı][sş]t[iı]k))/iu,
+    sinif: 'KARAR',
+  },
   { re: /nerede\s+kalm[iı][sş]t[iı]k/i, sinif: 'KARAR' },
   { re: /bu\s+(kural|hükü?m|hukum)\s+nereden/i, sinif: 'KARAR' },
   // KOD sınıfı: "hangi dosya / neyi çağırıyor" — cevabı CodeGraph'te, deftere sorulmaz.
@@ -70,6 +82,11 @@ try {
 
 const istem = String(girdi.prompt || '')
 if (!istem) process.exit(0)
+
+// Makine mesajları taranmaz: alt ajan bildirimi (<task-notification>) ve başka oturumdan gelen
+// mesaj (<cross-session-message>) Recep'in sorusu değildir; raporların içindeki "neden böyle",
+// "önce karar" gibi ifadeler yanlış alarm üretiyordu (2026-09-25).
+if (/^\s*<(task-notification|cross-session-message)\b/.test(istem)) process.exit(0)
 
 const eslesen = KALIPLAR.filter((k) => k.re.test(istem))
 if (eslesen.length === 0) process.exit(0)

@@ -212,7 +212,7 @@ supabase <group> <command> --help  # Flags for a specific command
 
 **Supabase CLI Known gotchas:**
 
-- `supabase db query` requires **CLI v2.79.0+** → use MCP `execute_sql` or `psql` as fallback
+- `supabase db query` requires **CLI v2.79.0+** → use MCP `execute_sql` (read-only SELECT only in VentHub) or `psql` as fallback
 - `supabase db advisors` requires **CLI v2.81.3+** → use MCP `get_advisors` as fallback
 - When you need a new migration SQL file, **always** create it with `supabase migration new <name>` first. Never invent a migration filename or rely on memory for the expected format.
 
@@ -253,16 +253,11 @@ For setup instructions, server URL, and configuration, see the [MCP setup guide]
 
 ## Making and Committing Schema Changes
 
-**To make schema changes, use `execute_sql` (MCP) or `supabase db query` (CLI).** These run SQL directly on the database without creating migration history entries, so you can iterate freely and generate a clean migration when ready.
+**VentHub'da şema değişikliği `execute_sql` ile YAPILMAZ.** Bu projede Supabase MCP canlı (prod) veritabanına bağlıdır; `execute_sql` ile çalıştırılan her DDL doğrudan canlıya yazar, migration geçmişine girmez ve hiçbir kapıdan geçmez. Aynı sebeple `apply_migration` da kullanılmaz.
 
-Do NOT use `apply_migration` to change a local database schema — it writes a migration history entry on every call, which means you can't iterate, and `supabase db diff` / `supabase db pull` will produce empty or conflicting diffs. If you use it, you'll be stuck with whatever SQL you passed on the first try.
-
-**When ready to commit** your changes to a migration file:
-
-1. **Run advisors** → `supabase db advisors` (CLI v2.81.3+) or MCP `get_advisors`. Fix any issues.
-2. **Review the Security Checklist above** if your changes involve views, functions, triggers, or storage.
-3. **Generate the migration** → `supabase db pull <descriptive-name> --local --yes`
-4. **Verify** → `supabase migration list --local`
+- **Şema değişikliği** → `create-migration` skill'i (14 haneli `YYYYMMDDHHMMSS_description.sql`, `supabase/migrations/` altında) + **CLAUDE.md kural 13**: migration'lı dal master'a merge edilince prod'a otomatik uygulanır; merge yalnız kullanıcı onayıyla.
+- **`execute_sql` yalnız salt okuma içindir** (`SELECT`, `information_schema`, `pg_proc` taraması gibi). `INSERT/UPDATE/DELETE`, `CREATE/ALTER/DROP`, `GRANT/REVOKE` bu araçla çalıştırılmaz.
+- Migration yazmadan önce ve sonra: **advisors** → MCP `get_advisors`; views/functions/triggers/storage değişiyorsa yukarıdaki Security Checklist.
 
 ## Reference Guides
 
