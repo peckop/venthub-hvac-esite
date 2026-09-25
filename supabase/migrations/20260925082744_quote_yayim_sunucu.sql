@@ -55,15 +55,21 @@ comment on column public.venthub_quotes.published_email_sent_at is
   'REC-384: yayim e-postasinin GERCEKTEN gonderildigi an (Edge yazar). sent_at = yayim ani (cetvel §12).';
 
 alter table public.quote_email_events add column if not exists event text not null default 'request_created';
-alter table public.quote_email_events drop constraint if exists quote_email_events_event_check;
--- Kısıtlar NOT VALID eklenip ayrı adımda doğrulanır (INV-MIGRATION-3: doğrulama yazmayı kilitlemez).
-alter table public.quote_email_events add constraint quote_email_events_event_check
-  check (event = any (array['request_created', 'quote_published'])) not valid;
+-- KISITLAR — url_takma_adlari (20260923083021) emsali: ekleme NOT VALID + idempotent blokta, doğrulama ayrı.
+-- Dürüst not: aynı işlem içinde olduğu için kilit kazancı SAĞLAMAZ; tablo canlıda 0 satır (2026-09-25
+-- salt okuma ölçümü), tarama anlıktır. REC-385: webhook bulgu 7 kaydını 'mismatch' ile yazıyordu,
+-- eski CHECK reddediyordu → iz hiç yazılmıyordu.
+do $$
+begin
+  alter table public.quote_email_events drop constraint if exists quote_email_events_event_check;
+  alter table public.quote_email_events add constraint quote_email_events_event_check
+    check (event = any (array['request_created', 'quote_published'])) not valid;
+  alter table public.quote_email_events drop constraint if exists quote_email_events_status_check;
+  alter table public.quote_email_events add constraint quote_email_events_status_check
+    check (status = any (array['sent', 'failed', 'mismatch'])) not valid;
+end
+$$;
 alter table public.quote_email_events validate constraint quote_email_events_event_check;
--- REC-385: webhook bulgu 7 kaydini 'mismatch' ile yaziyordu, CHECK reddediyordu → iz hic yazilmiyordu.
-alter table public.quote_email_events drop constraint if exists quote_email_events_status_check;
-alter table public.quote_email_events add constraint quote_email_events_status_check
-  check (status = any (array['sent', 'failed', 'mismatch'])) not valid;
 alter table public.quote_email_events validate constraint quote_email_events_status_check;
 
 -- ─── 3. BEFORE damga tetiği: sunucu fiyat kapısı + toplam + sent_at + numara
