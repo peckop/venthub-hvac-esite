@@ -275,6 +275,24 @@ function agaclariCoz() {
   }
 }
 
+/**
+ * ~/.claude ALTINDAKİ DEPOLAR DENETİM DIŞI (2026-09-25, Ops ölçtü): hafıza dizini kendi git
+ * deposu (`~/.claude/projects/<proje>/memory`). Komut oradan koşunca o deponun kökü "ORTAK ana
+ * ağaç" sayılıyor ve her yazımda "⛔ORTAK AGAC UYARISI … tazelemede SİLİNİR" basılıyordu. O depoda
+ * şerit, worktree ya da ana ağaç tazelemesi yok; commit oturum sonunda kancayla yapılıyor. Yani
+ * uyarı yanlış ve #1400'den beri her Bash'te modele gidiyordu. Yol kullanıcı adı taşımasın diye
+ * `os.homedir()`'den türetilir (depo PUBLIC). Test depoları geçici dizinde → etkilenmez.
+ */
+{
+  const ustKok = (gitOku(cwdKok, '--show-toplevel') || '').replace(/\\/g, '/').toLowerCase()
+  // VENTHUB_CLAUDE_KOK yalnız test içindir: gerçek ~/.claude'a dokunmadan kolu sınamak için.
+  const claudeKok = (process.env.VENTHUB_CLAUDE_KOK || path.join(require('os').homedir(), '.claude'))
+    .replace(/\\/g, '/')
+    .replace(/\/+$/, '')
+    .toLowerCase()
+  if (ustKok && (ustKok === claudeKok || ustKok.startsWith(claudeKok + '/'))) process.exit(0)
+}
+
 const { kaynaklar, kimlikSayisi, sebep } = agaclariCoz()
 const denetlenecek = [...kaynaklar.keys()]
 /**
