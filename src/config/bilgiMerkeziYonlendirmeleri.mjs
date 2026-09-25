@@ -67,7 +67,25 @@ export function enYayinOku(kaynak) {
 }
 
 /**
- * @typedef {{ source: string, destination: string, permanent: true }} Yonlendirme
+ * YAYINDAN GEÇİCİ KALKAN YAZILAR — karar 121/c (Recep, 2026-09-25): eski konulardan taşınan üç yazı
+ * ("çok kaba bilgiler") yayından kalktı; BLOG'un profesyonel yazısı AYNI adreste dönecek.
+ *
+ * ⚠NİÇİN 307 (GEÇİCİ), 308 DEĞİL — REC-300 cetvelinden (plan §4.1 "308 her yerde, dilsiz → tek 307")
+ * bilinçli sapma: 308 tarayıcıda ve arama motorunda KALICI önbelleklenir ve adresin değerini hedefe
+ * (liste sayfasına) devreder. Bu adresler yazı dönünce yeniden 200 verecek; kalıcı yönlendirme o gün
+ * ziyaretçinin tarayıcısında liste sayfasına kilitli kalırdı. Geçici yönlendirme "adres yaşıyor,
+ * içerik geliyor" demektir.
+ *
+ * YAZI DÖNÜNCE: slug buradan SİLİNİR, aynı PR'da yazı `yazilar.ts`'e girer. İkisi aynı anda var
+ * olursa yazı erişilmez olur — test (`yonlendirmeler.test.ts`) bu çakışmada kırmızı yanar.
+ */
+export const YAYINDAN_KALKAN = /** @type {const} */ ({
+  tr: ['hava-perdesi', 'otopark-jet-fan', 'isi-geri-kazanim'],
+  en: ['air-curtain', 'car-park-jet-fan', 'heat-recovery'],
+})
+
+/**
+ * @typedef {{ source: string, destination: string, permanent: boolean }} Yonlendirme
  */
 
 /**
@@ -79,27 +97,36 @@ export function bilgiMerkeziYonlendirmeleri(enYayin) {
   /** @type {Yonlendirme[]} */
   const liste = []
   const ekle = (source, destination) => liste.push({ source, destination, permanent: true })
+  const geciciEkle = (source, destination) => liste.push({ source, destination, permanent: false })
 
   const trListe = `/tr/${BILGI_MERKEZI_BOLUMU.tr}`
   const enListe = enYayin ? `/en/${BILGI_MERKEZI_BOLUMU.en}` : EN_KAPALI_LISTE_HEDEFI
+  /** @type {(dil: 'tr' | 'en', slug: string) => boolean} */
+  const kalkti = (dil, slug) => /** @type {readonly string[]} */ (YAYINDAN_KALKAN[dil]).includes(slug)
 
-  // TR
+  // TR — kalkan yazının eski adresi de GEÇİCİ olarak listeye gider (tek hop). Yazı dönünce eski
+  // adres yeniden yazıya 308 verir.
   ekle('/tr/destek/merkez', trListe)
   for (const [eski, hedef] of Object.entries(ESKI_KONULAR)) {
-    ekle(`/tr/destek/konular/${eski}`, `${trListe}/${hedef.tr}`)
+    if (kalkti('tr', hedef.tr)) geciciEkle(`/tr/destek/konular/${eski}`, trListe)
+    else ekle(`/tr/destek/konular/${eski}`, `${trListe}/${hedef.tr}`)
   }
   ekle('/tr/destek/konular', trListe)
   // Eski rota `dynamicParams = false` idi: bilinmeyen konu zaten 404'tü. Yine de dışarıda
   // bilinmeyen bir eski bağlantı kalmışsa en yakın canlı adrese gitsin (hedefsiz adres 0).
   ekle('/tr/destek/konular/:eski*', trListe)
+  for (const slug of YAYINDAN_KALKAN.tr) geciciEkle(`${trListe}/${slug}`, trListe)
 
-  // EN
+  // EN — bayrak kapalıyken EN karşılıkları gerçek sayfalardır (kategori/hesaplayıcı), kalıcı kalır.
   ekle('/en/destek/merkez', enListe)
   for (const [eski, hedef] of Object.entries(ESKI_KONULAR)) {
-    ekle(`/en/destek/konular/${eski}`, enYayin ? `/en/${BILGI_MERKEZI_BOLUMU.en}/${hedef.en}` : hedef.enKapaliHedef)
+    if (!enYayin) ekle(`/en/destek/konular/${eski}`, hedef.enKapaliHedef)
+    else if (kalkti('en', hedef.en)) geciciEkle(`/en/destek/konular/${eski}`, enListe)
+    else ekle(`/en/destek/konular/${eski}`, `/en/${BILGI_MERKEZI_BOLUMU.en}/${hedef.en}`)
   }
   ekle('/en/destek/konular', enListe)
   ekle('/en/destek/konular/:eski*', enListe)
+  if (enYayin) for (const slug of YAYINDAN_KALKAN.en) geciciEkle(`${enListe}/${slug}`, enListe)
 
   return liste
 }

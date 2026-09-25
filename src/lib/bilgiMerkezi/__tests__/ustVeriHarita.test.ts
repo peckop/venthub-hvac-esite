@@ -5,23 +5,31 @@ import { YAZILAR } from '../../../data/bilgiMerkezi/yazilar'
 import { sayfaUstVerisi } from '../../seo/sayfaUstVerisi'
 import { makaleJsonLd } from '../jsonld'
 import { bilgiMerkeziSiteHaritasi } from '../siteHaritasi'
+import { ORNEK_YAZI } from './ornekYazi'
 
 /**
  * INV-BILGI-MERKEZI-SEO-1 — site haritası, hreflang ve yapısal veri (rehber-yazisi-standard.md R6):
  * EN yalnız `EN_YAYIN` açıkken; hreflang yalnız iki dil de yayındaysa; JSON-LD `Article` (FAQPage yok).
  */
 describe('bilgiMerkeziSiteHaritasi', () => {
-  it('EN kapalı: yalnız TR liste + TR yazılar, alternates YOK', () => {
-    const satirlar = bilgiMerkeziSiteHaritasi(SITE_URL, false)
+  it('YAZI YOKSA haritada Bilgi Merkezi satırı YOK (boş liste sayfası dizin dışı, karar 121/c)', () => {
+    expect(bilgiMerkeziSiteHaritasi(SITE_URL, false, [])).toEqual([])
+    expect(bilgiMerkeziSiteHaritasi(SITE_URL, true, [])).toEqual([])
+    // Yayındaki evren: satır sayısı = yazı varsa 1 liste + TR yazı sayısı, yoksa 0.
     const trYazi = YAZILAR.filter((y) => y.diller.tr).length
-    expect(satirlar.length).toBe(1 + trYazi)
+    expect(bilgiMerkeziSiteHaritasi(SITE_URL, false).length).toBe(trYazi > 0 ? 1 + trYazi : 0)
+  })
+
+  it('EN kapalı: yalnız TR liste + TR yazılar, alternates YOK', () => {
+    const satirlar = bilgiMerkeziSiteHaritasi(SITE_URL, false, [ORNEK_YAZI])
+    expect(satirlar.length).toBe(2)
     expect(satirlar.every((s) => s.url.startsWith(`${SITE_URL}/tr/bilgi-merkezi`))).toBe(true)
     expect(satirlar.some((s) => s.alternates)).toBe(false)
     expect(satirlar.some((s) => s.url.includes('/destek/'))).toBe(false)
   })
 
   it('EN açık: iki dilde satır, her satır iki dilli alternates taşır', () => {
-    const satirlar = bilgiMerkeziSiteHaritasi(SITE_URL, true)
+    const satirlar = bilgiMerkeziSiteHaritasi(SITE_URL, true, [ORNEK_YAZI])
     expect(satirlar.some((s) => s.url === `${SITE_URL}/en/knowledge-hub`)).toBe(true)
     for (const s of satirlar) {
       expect(Object.keys(s.alternates?.languages ?? {}).sort(), s.url).toEqual(['en', 'tr'])
@@ -29,7 +37,7 @@ describe('bilgiMerkeziSiteHaritasi', () => {
   })
 
   it('yalnız TR metni olan yazı EN açıkken de tek dilli kalır (hreflang yazılmaz)', () => {
-    const [a] = YAZILAR
+    const a = ORNEK_YAZI
     const yalnizTr = [{ ...a, diller: { tr: a.diller.tr } }]
     const satirlar = bilgiMerkeziSiteHaritasi(SITE_URL, true, yalnizTr)
     expect(satirlar.map((s) => s.url)).toEqual([`${SITE_URL}/tr/bilgi-merkezi`, `${SITE_URL}/tr/bilgi-merkezi/${a.diller.tr?.slug}`])
