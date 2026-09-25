@@ -51,14 +51,13 @@ import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/ca
 import { dildekiMetin } from '../../utils/dilMetni'
 import { musteriyeGorunurAciklama } from '../../utils/icIngestNotu'
 import {
-  formatSpecValue,
   getProductDisplayName,
   getProductModelLabel,
   groupTechnicalSpecs,
   SPEC_SORT_ORDER,
   translateSpecKey} from '../../utils/productHelpers'
 import { localizedHref, Routes } from '../../utils/routes'
-import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
+import { specFieldLabel, specGroupLabel, specValueLabel } from '../../utils/specLabel'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -1030,7 +1029,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
                                         <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
+                                        <span className="text-xs font-black text-industrial-gray">{specValueLabel(key, val, t)}</span>
                                       </div>
                                     ))}
                                   </div>

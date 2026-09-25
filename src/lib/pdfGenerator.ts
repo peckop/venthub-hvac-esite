@@ -5,7 +5,7 @@ import type { Product } from '@/types/ui-models';
 
 import { SITE_URL } from '../config/siteUrl';
 import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
-import { specFieldLabel, specGroupLabel } from '../utils/specLabel';
+import { specFieldLabel, specGroupLabel, specValueLabel } from '../utils/specLabel';
 import { getAbsoluteAssetUrl,getBase64ImageFromUrl, PDF_COLORS, PDF_FONTS } from './pdfAssets';
 
 /** `specLabel.ts` ile AYNI imza — ikinci bir tip tanımı, ikinci bir davranış kapısıdır. */
@@ -39,8 +39,9 @@ export function buildSpecRows(
             // ETİKET: `t` varsa vitrinin TAM yolu (i18n sözlüğü → küratörlü → humanize).
             // Yoksa eski parametre yolu — ayrışır, ve bu ayrışma kapıda ADIYLA ölçülür.
             const label = t ? specFieldLabel(key, t) : (translateKey ? translateKey(key) : key);
-            // DEĞER: `t` GEREKTİRMEZ — birim eklemesi her hâlde uygulanır.
-            satirlar.push([label, formatSpecValue(key, value)]);
+            // DEĞER: birim eklemesi `t` GEREKTİRMEZ, her hâlde uygulanır. `t` varsa kod değerler
+            // (REC-392: BVU, VSD…) vitrinle AYNI fonksiyonla sözlükten çevrilir; yoksa ham kalır.
+            satirlar.push([label, t ? specValueLabel(key, value, t) : formatSpecValue(key, value)]);
         }
     }
     return satirlar;

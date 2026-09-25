@@ -1400,6 +1400,22 @@ export const en: typeof tr = {
       electrical: 'Electrical Specifications',
       other: 'Other Specifications'
     },
+    // Spec VALUE translations — specLabel.ts looks up 'pdp.specValues.<key>.<VALUE>'; an
+    // unknown value is printed as-is. REC-392 codes per Vortice fiche footnote + 1254/2014 Annex IV.
+    specValues: {
+      erp_ventilation_unit_type: {
+        UVU: 'Unidirectional (UVU)',
+        BVU: 'Bidirectional (BVU)'
+      },
+      erp_drive_type: {
+        VM: 'Multi-speed (VM)',
+        VSD: 'Variable Speed Drive (VSD)'
+      },
+      erp_heat_recovery_type: {
+        recovery: 'Heat Recovery',
+        absent: 'None'
+      }
+    },
     variant: {
       heading: 'Model Selection',
       count: '{{count}} models',

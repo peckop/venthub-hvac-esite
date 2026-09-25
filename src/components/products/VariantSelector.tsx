@@ -6,8 +6,8 @@ import React, { useMemo, useState } from 'react'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import type { FamilyVariant } from '../../lib/services/family.service'
-import { formatSpecValue, getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
-import { specFieldLabel } from '../../utils/specLabel'
+import { getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
+import { specFieldLabel, specValueLabel } from '../../utils/specLabel'
 
 /**
  * F5-B W2.2 — Aile varyant seçici.
@@ -305,7 +305,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                     </span>
                     {specKeys.map((key) => (
                       <span key={key} className="text-xs font-bold text-industrial-gray truncate">
-                        {formatSpecValue(key, v.technical_specs?.[key] ?? null)}
+                        {specValueLabel(key, v.technical_specs?.[key] ?? null, t)}
                       </span>
                     ))}
                     <span className="text-xs font-black text-primary-navy text-right whitespace-nowrap">

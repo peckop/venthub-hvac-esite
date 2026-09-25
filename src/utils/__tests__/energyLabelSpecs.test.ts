@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
+import { buildSpecRows } from '../../lib/pdfGenerator'
 import { formatSpecValue, groupTechnicalSpecs, isEnergyLabelSpecKey } from '../productHelpers'
-import { humanizeSpecKey, specFieldLabel, specGroupLabel } from '../specLabel'
+import { humanizeSpecKey, specFieldLabel, specGroupLabel, specValueLabel } from '../specLabel'
 
 /**
  * REC-392 — konut tipi havalandırma ünitelerinin enerji etiketi / ürün bilgi formu alanları
@@ -222,5 +223,63 @@ describe('REC-392 · föy birimleri', () => {
     expect(humanizeSpecKey('erp_leakage_internal_pct')).toBe('Erp Leakage Internal (%)')
     // İki parçalı arama mevcut anahtarları etkilemez.
     expect(humanizeSpecKey('max_delivery_m3h')).toBe('Max Delivery (m³/h)')
+  })
+})
+
+describe('REC-392 · föy KOD değerleri sözlükten çevrilir (TR müşteri "BVU" görmez)', () => {
+  /**
+   * Evren: KATALOG yazım planı (venthub-pdf-ingestor/venthub/icerik-hatti/rec392-erp/
+   * yazim-plani.json, 2026-09-25): UVU 8 · BVU 3 · VM 8 · VSD 3 · recovery 10. `absent`
+   * kaynak dizininde (VORT PENTA HCS föyü, s.13) görülen ek değer. Anlamlar Vortice föy
+   * dipnotundan: "VM: Multiple speeds. VSD: Variable Speed Drive."
+   * [anahtar, kod, TR, EN]
+   */
+  const KODLAR: ReadonlyArray<readonly [string, string, string, string]> = [
+    ['erp_ventilation_unit_type', 'UVU', 'Tek Yönlü (UVU)', 'Unidirectional (UVU)'],
+    ['erp_ventilation_unit_type', 'BVU', 'Çift Yönlü (BVU)', 'Bidirectional (BVU)'],
+    ['erp_drive_type', 'VM', 'Çok Kademeli (VM)', 'Multi-speed (VM)'],
+    ['erp_drive_type', 'VSD', 'Değişken Devirli (VSD)', 'Variable Speed Drive (VSD)'],
+    ['erp_heat_recovery_type', 'recovery', 'Isı Geri Kazanımlı', 'Heat Recovery'],
+    ['erp_heat_recovery_type', 'absent', 'Yok', 'None'],
+  ]
+
+  it('her kod iki dilde sözlük karşılığıyla basılır', () => {
+    const hatalar: string[] = []
+    for (const [k, kod, trB, enB] of KODLAR) {
+      if (specValueLabel(k, kod, tTr) !== trB) hatalar.push(`tr/${k}.${kod}: '${specValueLabel(k, kod, tTr)}'`)
+      if (specValueLabel(k, kod, tEn) !== enB) hatalar.push(`en/${k}.${kod}: '${specValueLabel(k, kod, tEn)}'`)
+    }
+    expect(hatalar).toEqual([])
+  })
+
+  it('TANINMAYAN değer olduğu gibi kalır — sessiz boş ya da ham sözlük yolu DEĞİL', () => {
+    for (const t of [tTr, tEn]) {
+      expect(specValueLabel('erp_drive_type', 'MSD', t)).toBe('MSD')
+      expect(specValueLabel('erp_heat_recovery_type', 'recuperative', t)).toBe('recuperative')
+      expect(specValueLabel('erp_heat_recovery_type', 'plate heat exchanger', t)).toBe('plate heat exchanger')
+      expect(specValueLabel('erp_drive_type', 'vsd', t)).toBe('vsd') // büyük/küçük harf duyarlı
+      expect(specValueLabel('erp_drive_type', 'a.b', t)).toBe('a.b') // nokta yola girmez
+    }
+  })
+
+  it('kod dışı değerler formatSpecValue ile AYNI kalır (birim, sayı, başka anahtarlar)', () => {
+    for (const t of [tTr, tEn]) {
+      expect(specValueLabel('erp_sec_average_kwh_m2a', -44.5, t)).toBe('-44.5 kWh/(m²·a)')
+      expect(specValueLabel('ip_rating', 'IP44', t)).toBe(formatSpecValue('ip_rating', 'IP44'))
+      expect(specValueLabel('erp_sec_class_average', 'A+', t)).toBe('A+')
+      expect(specValueLabel('weight_kg', null, t)).toBe('-')
+    }
+  })
+
+  it('föy PDF\'i (buildSpecRows) vitrinle AYNI çeviriyi basar', () => {
+    const specs = { erp_ventilation_unit_type: 'BVU', erp_drive_type: 'VSD', erp_heat_recovery_type: 'recovery' }
+    const tr = Object.fromEntries(buildSpecRows(specs, { t: tTr }).map(([l, v]) => [l, v]))
+    expect(tr['Beyan Edilen Tipoloji (Tek Yönlü / Çift Yönlü)']).toBe('Çift Yönlü (BVU)')
+    expect(tr['Sürücü Tipi']).toBe('Değişken Devirli (VSD)')
+    expect(tr['Isı Geri Kazanım Sistemi Tipi']).toBe('Isı Geri Kazanımlı')
+    const en = buildSpecRows(specs, { t: tEn }).map(([, v]) => v)
+    expect(en).toEqual(['Bidirectional (BVU)', 'Variable Speed Drive (VSD)', 'Heat Recovery'])
+    // `t` yoksa değer ham kalır (etiket de zaten ayrışır; kabul edilen sınır).
+    expect(buildSpecRows(specs, {}).map(([, v]) => v)).toEqual(['BVU', 'VSD', 'recovery'])
   })
 })

@@ -1835,6 +1835,27 @@ export const tr = {
       electrical: 'Elektriksel Veriler',
       other: 'Diğer Özellikler'
     },
+    // Teknik özellik DEĞER çevirileri — specLabel.ts 'pdp.specValues.<anahtar>.<DEĞER>' arar;
+    // bulunamayan değer olduğu gibi basılır (formatSpecValue). REC-392: kodlar KATALOG yazım
+    // planındaki değerler; anlamları Vortice föy dipnotu ("UVR-U: Unidirectional", "VM: Multiple
+    // speeds. VSD: Variable Speed Drive") + SGM-2021/19 Ek-IV (d) "tek yönlü veya çift yönlü",
+    // (e) "çok kademeli veya değişken devirli", (f) "rekuperatif, rejeneratif, hiçbiri".
+    specValues: {
+      erp_ventilation_unit_type: {
+        UVU: 'Tek Yönlü (UVU)',
+        BVU: 'Çift Yönlü (BVU)'
+      },
+      erp_drive_type: {
+        VM: 'Çok Kademeli (VM)',
+        VSD: 'Değişken Devirli (VSD)'
+      },
+      erp_heat_recovery_type: {
+        // Kaynak yalnız "recovery" diyor; rekuperatif/rejeneratif ayrımını VERMİYOR — bu yüzden
+        // çeviri de ayrım uydurmaz.
+        recovery: 'Isı Geri Kazanımlı',
+        absent: 'Yok'
+      }
+    },
     variant: {
       heading: 'Model Seçimi',
       count: '{{count}} model',

@@ -1,4 +1,4 @@
-import { translateSpecKey } from './productHelpers'
+import { formatSpecValue, translateSpecKey } from './productHelpers'
 
 /**
  * F5-B W2.2 — Teknik özellik ETİKET çözümü (asla ham anahtar yolu render etme).
@@ -97,6 +97,32 @@ export function specFieldLabel(key: string, t: TranslateFn): string {
     .join(' ')
 
   return curated === genericFallback ? humanizeSpecKey(key) : curated
+}
+
+/** Sözlük yoluna güvenle konabilecek değer kodu (nokta/boşluk yok: `pdp.specValues.k.V`). */
+const DEGER_KODU = /^[A-Za-z0-9_-]+$/
+
+/**
+ * Spec DEĞERİ, dil bilen katmanda: sözlük (`pdp.specValues.<anahtar>.<DEĞER>`) → formatSpecValue.
+ *
+ * NİÇİN (REC-392): `formatSpecValue` dil bilmez; metin değeri olduğu gibi döndürür. Föy
+ * alanlarının değerleri KOD (`BVU`, `VSD`): TR müşteri "BVU" görürdü. Çeviri `t`'nin erişildiği
+ * katmanda yapılır — vitrin (ProductDetailPageView, VariantSelector) ve föy PDF'i (buildSpecRows)
+ * AYNI fonksiyonu çağırır, parite korunur.
+ *
+ * Tanınmayan değer SESSİZCE BOŞ KALMAZ: sözlükte yoksa formatSpecValue'nun çıktısı döner
+ * (kaynaktaki ifade, varsa birimiyle). Eşleşme BÜYÜK/küçük harfe duyarlıdır — kod neyse o.
+ */
+export function specValueLabel(key: string, value: unknown, t: TranslateFn): string {
+  if (typeof value === 'string') {
+    const kod = value.trim()
+    if (DEGER_KODU.test(kod)) {
+      const dictKey = `pdp.specValues.${key}.${kod}`
+      const translated = t(dictKey)
+      if (!isUnresolved(dictKey, translated)) return translated
+    }
+  }
+  return formatSpecValue(key, value)
 }
 
 /**
