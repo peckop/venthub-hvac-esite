@@ -34,7 +34,10 @@ const oku = (...p: string[]) => readFileSync(join(KOK, ...p), 'utf8')
 const govde = (k: string) => k.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
 
 const PDP = ['src', 'app', '_components', 'ProductDetailPageView.tsx'] as const
-const ROTA = ['src', 'app', '[lang]', 'products', '[slug]', 'page.tsx'] as const
+// REC-300 Faz 3b (2026-09-24): aile sayfasının üst verisi ve gövdesi rota dosyasından
+// `app/_components/aileSayfasi.tsx`'e taşındı (iki rota — /products ve K3-b /urun — aynı çekirdek).
+// Süzgeç ölçütü kodun YAŞADIĞI dosyada koşar; rota dosyası artık yalnız sınıf ilanı + sarmalayıcı.
+const ROTA = ['src', 'app', '_components', 'aileSayfasi.tsx'] as const
 
 /** Canlıda ölçülmüş GERÇEK metinler — uydurma değil, DB'den alındı. */
 const GERCEK_IC_NOTLAR = [
