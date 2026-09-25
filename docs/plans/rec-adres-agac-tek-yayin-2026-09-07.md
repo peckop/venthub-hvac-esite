@@ -182,17 +182,28 @@ kontrol listesi.
 Gölgede senaryolar (çıkış kodlarıyla): temiz · ikinci koşum · **authenticated admin slug günceller →
 takma ad yazılır, UPDATE kalır** · A→B→A→B · iki kiracı.
 
-### Faz 1-B — ağaç + Casals + 39 aile verisi (migration, Recep merge)
+### Faz 1-B — ağaç + Casals + 40 aile verisi (migration, Recep merge, **YAYIN SIRASINDA**)
 1. Casals `brands` + `products.brand` 53 üründe (#8).
-2. +4 dal (78b TR slug'ları); `level`/`sort_order` komşudan ölçülerek.
+2. +4 dal (78b TR slug'ları); `level`/`sort_order` komşudan ölçülerek (**ölçüldü: level 1, sort 0** —
+   09-11 Design taslağındaki level 2 / 60–70 yanlıştı).
 3. 6 aile + 44 ürün taşıma, iki tablo birlikte (cetvel §8).
 4. Korozyon dalı adı + `metadata.slug.tr` · `sub.spare-parts` translation_key · 4 Casals ailesi.
-5. **39 aile slug'ı** (karar 86; 2 perde ailesi 78b kelimesiyle) — Faz 1-A tetiği eski slug'ları
-   takma ada yazar.
-6. `products.slug_i18n jsonb` + `get_family_detail` onu döndürür + `pnpm supabase:gen` aynı PR'da.
+   **Kategori adı sözlükten gelir** (`getCategoryDisplayName`): adı değişen/yeni dallar yeni
+   anahtarlara bağlanır, anahtarlar ayrı kod PR'ıyla önce iner (#1349).
+5. **40 aile slug'ı** (karar 86'nın 39'u + `avens-plug-fanlar`; Casals 4 aile K17 kısa biçim — OPS
+   hükmü 2026-09-23, 86 metni; 2 perde ailesi 78b kelimesiyle) — Faz 1-A tetiği eski slug'ları takma
+   ada yazar. (Önceki "39 + 4 = 43" çift sayımdı: 3 Casals ailesi zaten 39'un içinde.)
+6. ~~`products.slug_i18n` + `get_family_detail` aynı PR~~ → **Faz 2'ye taşındı** (Faz 2'nin ön şartı,
+   Faz 1-B'nin değil; RPC dönüş tipi değişimi ayrı risk sınıfı).
 Kalıp karar 45 (plan bütünlüğü · kiracı tek satır · eski değer doğrulaması · idempotent · gölge).
-Faz 1-B ile Faz 3-C arasında yeni slug'lar **bugünkü** `/tr/products/` ve `/tr/category/` rotalarında
-yaşar; eski slug'lar takma adla 308 alır. Bu ara dönemde kırık adres yoktur.
+Uygulama: PR #1352 (taslak), gölge 8 senaryo.
+
+**⛔ DÜZELTME (OPS 2026-09-23, karar 68):** önceki metin "Faz 1-B ile Faz 3-C arasında yeni slug'lar
+bugünkü rotalarda yaşar" diyordu. Bu, 40 aile adresini ve ağacı **yayından önce** canlıya çıkarıp
+yayında aynı sayfaları **ikinci kez** taşımak demekti — karar 68'in (tek yayın) önlediği tam şey.
+**Faz 1-B migration'ı yayın sırasında merge edilir:** REC-212 bitti → Faz 3 kodu (bayrak kapalı) →
+Faz 4 ön izleme (68, "gördüm, tamam") → Faz 1-B merge → Faz 3-C. Faz 1-A (tablo + okuyucu) önden
+inmiş olarak kalır; görünür bir şey değiştirmez.
 
 ### Faz 2 — model slug'ları (veri migration'ı)
 Kaynak: URUN listesi (bu dal; REC-212 paketi `slug_tr/en` taşırsa paket kazanır, doğrulayıcı
@@ -273,6 +284,10 @@ harf SKU) **tek sıçramada** yeni adrese → arama önerisinden tık → EN kı
 ### Faz 5 — yayın
 **Ön koşullar:** REC-212 paketi bitti · 7 ailenin EN adı dolu · **GSC taban ölçümü alındı** (karar 86
 şartı; erişim ALTYAPI'da) · linkinator + unlighthouse yayın öncesi taraması alındı · Faz 4 onayı.
+**Sıra (68 düzeltmesi):** Faz 4 ön izlemesi yeni ağacı ve aile adreslerini gösterebilsin diye **Faz 1-B
+uygulanmış bir kopyada** koşar (yerel üretim paketi + gölge veri; prod'a yazılmaz). Onaydan sonra
+Faz 1-B merge (Recep onayı, kural 13) → canlı ölçüm (40 eski aile adresi tek 308) → hemen ardından
+Faz 3-C; ikisi arasındaki pencere dakikalarla sınırlı tutulur.
 Sonra: Faz 3-C merge → deploy → yayın ölçümü (§7) → site haritası GSC'ye + IndexNow (K4) → iki hafta
 izleme (§8).
 
@@ -288,7 +303,7 @@ izleme (§8).
 | 5b | 6 Lineo çap adresi (`/(tr\|en)/products/vortice-lineo-<çap>-quiet`) | Lineo Quiet ailesinin yeni adresi | 6 × 2 | tohum |
 | 5c | 7 pasif kategori (bugün 200) | aktif üst kök ya da `/tr/urunler` | 7 × 2 biçim | sayfa katmanı (Faz 3 m.5) |
 | 6 | `/tr/products` | `/tr/urunler` | 1 | config |
-| 7 | `/(tr\|en)/products/<aile>` (bugünkü 47; karar 86'nın 39'u + 4 Casals slug değiştirir) | `/tr/urun/<aile-yeni>` · `/en/products/<aile-yeni>` | TR 47 + EN yalnız slug'ı değişen 43 (**eski = yeni olan EN satırı haritaya girmez**, kendine yönlenmesin — v4 O4) | harita |
+| 7 | `/(tr\|en)/products/<aile>` (bugünkü 47; karar 86'nın 39'u + `avens-plug-fanlar` = 40 slug değiştirir) | `/tr/urun/<aile-yeni>` · `/en/products/<aile-yeni>` | TR 47 + EN yalnız slug'ı değişen 40 (**eski = yeni olan EN satırı haritaya girmez**, kendine yönlenmesin — v4 O4) | harita |
 | 8 | `/(tr\|en)/products/<ürün-slug>` + 7 eski ürün slug'ı | model kanoniği | 442 × 2 + 7 × 2 | harita (+ takma ad) |
 | 9 | `?sku=` (TR + EN aile adresi, eski ve yeni önekte) | model kanoniği | 442 × 2 | harita (middleware query'yi **ayrıştırır**: SKU harf duyarsız, `utm_*` gibi ek parametrelere dayanıklı; hedefte query yok — utm'nin düşmesi bilinçli, cetvele yazılır, v4 D2) |
 | 10 | `/tr/brands/*` | `/tr/markalar/*` | desen | config |

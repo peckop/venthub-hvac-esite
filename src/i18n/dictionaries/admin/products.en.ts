@@ -15,8 +15,6 @@ export const products = {
     featureFailed: 'Featured update error',
     deleteConfirm: 'Are you sure you want to DELETE {{count}} selected products? This action cannot be undone!',
     deleteFailed: 'Bulk delete error',
-    priceConfirm: 'A price update will be applied to {{count}} selected products. Do you confirm?',
-    priceFailed: 'Price update error',
   },
   toolbar: {
     categoryTitle: 'Category',
@@ -37,7 +35,10 @@ export const products = {
     category: 'Category',
     status: 'Status',
     health: 'Performance',
-    price: 'Price',
+    price: 'Sales price (incl. VAT)',
+    priceHint: 'Standard list sales price; computed from the pricing rule, not editable here.',
+    priceQuote: 'Quote',
+    priceUnreadable: 'Unavailable',
     stock: 'Stock',
     actions: 'Actions',
   },
@@ -61,6 +62,8 @@ export const products = {
     closeSymbol: '✕',
     moreRows: '... and {{count}} more rows.',
     processing: 'Processing...',
+    priceIgnored: 'The "price" column is not imported; the sales price is computed from pricing rules.',
+    priceIgnoredCount: 'Price values in {{count}} rows were not imported; the sales price is computed from pricing rules.',
     // Unknown-SKU guard. Wording is a ROUTE, not a diagnosis. Counts are interpolated and
     // the phrasing is deliberately count-agnostic — "1 SKU are ..." must never happen.
     unknownSkuTitle: 'SKUs not found in the database: {{count}}',
