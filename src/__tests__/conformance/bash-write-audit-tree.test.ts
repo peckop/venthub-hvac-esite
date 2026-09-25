@@ -138,7 +138,7 @@ function kimlikYaz(k: Kurulum, agac: string): void {
  * Kancayı koşturur. `cwd` KASTEN ana depo: ölçülmüş arıza tam bu — şerit worktree'de çalışıyor
  * ama kancaya gelen cwd ana dizine resetlenmiş oluyor.
  */
-function auditKostur(k: Kurulum, cwd?: string): { status: number; stderr: string } {
+function auditKostur(k: Kurulum, cwd?: string): { status: number; stderr: string; stdout: string } {
   const ciftler = Object.entries(process.env).filter(([ad]) => ad !== 'CLAUDE_SESSION_ID')
   ciftler.push(['VENTHUB_BOARD_DIR', k.panoDir])
   const env = Object.fromEntries(ciftler) as typeof process.env
@@ -147,7 +147,7 @@ function auditKostur(k: Kurulum, cwd?: string): { status: number; stderr: string
     env,
     input: JSON.stringify({ session_id: k.sid, tool_name: 'Bash', cwd: cwd ?? k.ana }),
   })
-  return { status: typeof r.status === 'number' ? r.status : -1, stderr: r.stderr ?? '' }
+  return { status: typeof r.status === 'number' ? r.status : -1, stderr: r.stderr ?? '', stdout: r.stdout ?? '' }
 }
 
 describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => {
@@ -269,6 +269,10 @@ describe('INV-BASH-WRITE-2 · bash-write-audit hangi ağacı denetliyor', () => 
     const r = auditKostur(k, k.wtB)
 
     expect(r.stderr, 'ortak agactaki commit siz is GORUNMEZ kalmamali').toContain('ORTAK AGAC UYARISI')
+    // 2026-09-25: çıkış 0 da stderr modele gitmez; uyarı stdout JSON additionalContext ile de çıkmalı.
+    const modele = JSON.parse(r.stdout) as { hookSpecificOutput?: { hookEventName?: string; additionalContext?: string } }
+    expect(modele.hookSpecificOutput?.hookEventName).toBe('PostToolUse')
+    expect(modele.hookSpecificOutput?.additionalContext, 'uyari modele ulasmiyor (yalniz stderr)').toContain('ORTAK AGAC UYARISI')
     expect(r.stderr, 'dosya adiyla yazilmali').toContain(CLAIM_YOLU)
     expect(
       r.stderr,
