@@ -83,7 +83,7 @@ export default function BilgiMerkeziListe({ dil }: { dil: YaziDili }) {
           <p className="mt-3 text-base text-industrial-gray">{t('bilgiMerkezi.liste.seciciAciklama')}</p>
           <Link
             href={localizedHref(Routes.urunSecici(), dil)}
-            className="mt-6 inline-flex items-center rounded-hvac-sm bg-primary-navy px-6 py-3 font-semibold text-clean-white hover:bg-brand-cyan-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan-ink"
+            className="mt-6 inline-flex items-center rounded-hvac-sm border border-primary-navy px-6 py-3 font-semibold text-primary-navy hover:border-brand-cyan-ink hover:text-brand-cyan-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan-ink"
           >
             {t('bilgiMerkezi.liste.seciciDugme')}
           </Link>

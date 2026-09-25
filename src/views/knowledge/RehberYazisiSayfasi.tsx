@@ -34,10 +34,11 @@ function Icindekiler({ ogeler, baslik }: { ogeler: YaziSayfasi['icindekiler']; b
   return (
     <nav aria-label={baslik}>
       <p className="mb-3 text-sm font-semibold uppercase tracking-hvac-tight text-primary-navy">{baslik}</p>
-      <ol className="space-y-2 text-base">
+      <ol className="text-base">
         {ogeler.map((o) => (
           <li key={o.id}>
-            <a href={`#${o.id}`} className={`text-industrial-gray hover:text-brand-cyan-ink ${odakSinifi}`}>
+            {/* Dokunma hedefi ≥ 44 px (`min-h-11`). */}
+            <a href={`#${o.id}`} className={`flex min-h-11 items-center text-industrial-gray hover:text-brand-cyan-ink ${odakSinifi}`}>
               {o.metin}
             </a>
           </li>
@@ -104,7 +105,7 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
 
         {icindekiler.length > 0 && (
           <details className="mt-8 rounded-hvac-sm border border-light-gray p-4 lg:hidden">
-            <summary className={`cursor-pointer font-semibold text-primary-navy ${odakSinifi}`}>{icindekilerBasligi}</summary>
+            <summary className={`flex min-h-11 cursor-pointer items-center font-semibold text-primary-navy ${odakSinifi}`}>{icindekilerBasligi}</summary>
             <div className="mt-4">
               <Icindekiler ogeler={icindekiler} baslik={icindekilerBasligi} />
             </div>
@@ -121,7 +122,10 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
           )}
 
           <div className={`min-w-0 max-w-content ${icindekiler.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-            <RehberGovdesi bloklar={ayrismis.bloklar} hrefler={hrefler} />
+            {/* Gövde satır uzunluğu `max-w-prose` (65ch); kart ızgaraları sütun genişliğinde kalır. */}
+            <div className="max-w-prose">
+              <RehberGovdesi bloklar={ayrismis.bloklar} hrefler={hrefler} />
+            </div>
 
             {urunKartlari.length > 0 && (
               <section aria-labelledby="ilgili-urunler" className="mt-16">
@@ -148,7 +152,7 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
               <h2 id="teklif-cagrisi" className="text-2xl font-bold tracking-tight">
                 {t('bilgiMerkezi.yazi.teklifBaslik')}
               </h2>
-              <p className="mt-3 text-clean-white/80">{t('bilgiMerkezi.yazi.teklifAciklama')}</p>
+              <p className="mt-3 text-light-gray">{t('bilgiMerkezi.yazi.teklifAciklama')}</p>
               <Link
                 href={localizedHref(Routes.contact(), dil)}
                 className="mt-6 inline-flex items-center rounded-hvac-sm bg-clean-white px-6 py-3 font-semibold text-primary-navy hover:bg-light-gray focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clean-white"
