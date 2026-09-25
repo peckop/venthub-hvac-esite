@@ -25,18 +25,18 @@ exclusions: []
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 
-Bu skill'i kullanmadan önce aşağıdaki kontrolleri sırayla yap. Herhangi biri başarısızsa, **DURMA** ve kullanıcıya bildir.
+Bu skill'i kullanmadan önce aşağıdaki kontrolleri sırayla yap. Herhangi biri başarısızsa, **DUR** (devam etme) ve kullanıcıya bildir.
 
 1. **Supabase Proje Bağlantısı:**
    - `GEMINI.md` veya `.env.local` dosyasında `NEXT_PUBLIC_SUPABASE_URL` tanımlı mı kontrol et.
-   - Boş veya placeholder ise → ❌ DURMA. Kullanıcıdan gerçek proje URL'sini iste.
+   - Boş veya placeholder ise → ❌ DUR. Kullanıcıdan gerçek proje URL'sini iste.
 
 2. **Migration Dizini:**
    - `supabase/migrations/` klasörünün var olduğunu doğrula.
-   - Yoksa → ❌ DURMA. Önce `supabase init` gerekebilir.
+   - Yoksa → ❌ DUR. Önce `supabase init` gerekebilir.
 
 3. **Yıkıcı SQL Kontrolü:**
-   - Yazacağın SQL içinde `DROP TABLE`, `DROP COLUMN`, `TRUNCATE` varsa → ❌ DURMA.
+   - Yazacağın SQL içinde `DROP TABLE`, `DROP COLUMN`, `TRUNCATE` varsa → ❌ DUR. SQL'i çalıştırma; kullanıcıya göster ve açık onay iste.
    - Kullanıcıdan açık onay (`/override`) almadan bu komutları çalıştırma.
 
 # Supabase Security Skill

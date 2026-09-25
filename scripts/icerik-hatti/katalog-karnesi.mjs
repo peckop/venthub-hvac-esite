@@ -21,10 +21,16 @@ import { join } from 'node:path'
 import { fiyatDizini } from './fiyat-kaynak-esle.mjs'
 import { fiyatBoslukSatirlari, boslukOzeti, BOSLUK_BASLIK } from './fiyat-bosluk.mjs'
 import { gorselSozlesmesi, DONMUS_FOTO_WEBP } from './gorsel-sozlesme.mjs'
+import { parmakIzi, tazelik, tazelikNotu } from './paket-tazelik.mjs'
 
-// --kapi: karne bir sayaçtır; bu bayrakla GÖRSEL SÖZLEŞMESİ kırmızıysa çıkış 1 (REC-209,
-// product-image-standard §7 veri kapısı). Bayraksız koşum eskisi gibi yalnız raporlar.
+// --kapi: karne bir sayaçtır; bu bayrakla GÖRSEL SÖZLEŞMESİ ya da PAKET TAZELİĞİ kırmızıysa çıkış 1
+// (REC-209 product-image-standard §7 · REC-212 tazelik, OPS hükmü 2026-09-24: yayından ve Faz 2'den ÖNCE).
+// Bayraksız koşum eskisi gibi yalnız raporlar.
 const KAPI = process.argv.includes('--kapi')
+
+// Taşınabilir katalog paketi: ingestor'da, git'e girmez. Tazelik satırı onun manifest'ini canlıyla kıyaslar.
+const PAKET = process.argv.find(a => a.startsWith('--paket='))?.slice(8)
+  || join(homedir(), 'venthub-pdf-ingestor', 'paket')
 
 // Fiyat boşluk satırı (REC-209 C) kaynak dizinini okur; dizin yoksa satır "ölçülmedi" der, diğer
 // satırlar etkilenmez (karne bir sayaçtır, kapı değil — katalog-sayim cetveli).
@@ -60,6 +66,17 @@ const kategori = await hepsi('categories', 'id,name,metadata,description')
 const aile = await hepsi('product_families', 'id,name,slug,name_i18n,description')
 const fiyat = await hepsi('product_prices', 'id,product_id')
 const gorsel = await hepsi('product_images', 'id,product_id,tenant_id,path,alt,sort_order')
+
+// Paket tazeliği: manifest'teki HER tablo canlıdan tam (select=*, id sırası) okunur ve dışa aktarıcıyla
+// aynı fonksiyonla izlenir. Zaman damgası kıyası kullanılmaz: silinen satırı ve tetiksiz tabloyu görmez.
+const manifestYolu = join(PAKET, 'manifest.json')
+const paketManifest = existsSync(manifestYolu) ? JSON.parse(readFileSync(manifestYolu, 'utf8')) : null
+const canliIz = {}
+for (const t of Object.keys(paketManifest?.tablolar || {})) {
+  const satirlar = await hepsi(t, '*')
+  canliIz[t] = { satir: satirlar.length, sha256: parmakIzi(satirlar) }
+}
+const tz = tazelik(paketManifest, canliIz)
 
 const dolu = (v) => v != null && v !== '' && !(typeof v === 'object' && Object.keys(v).length === 0)
 const alanSayisi = (x) => Object.keys(x.technical_specs || {}).length
@@ -107,6 +124,7 @@ const satir = [
   ['BOŞ kategori (ürünü yok)', bosKategori + ' / ' + kategori.length, '⚠ category_id VEYA subcategory_id — vitrinin yolu'],
   ['TR metni olan aile', aile.filter(a => dolu(a.description?.tr)).length + ' / ' + aile.length, 'description.tr'],
   ['EN metni olan aile', aile.filter(a => dolu(a.description?.en)).length + ' / ' + aile.length, 'description.en'],
+  ['Katalog paketi tazeliği', tz.durum === 'TAZE' ? 'TAZE' : `${tz.durum} ⛔`, tazelikNotu(tz)],
 ]
 
 if (process.argv.includes('--json')) {
@@ -118,5 +136,9 @@ if (process.argv.includes('--json')) {
 }
 if (KAPI && gs.kirmizi) {
   console.error(`⛔ GÖRSEL SÖZLEŞMESİ KIRMIZI: ihlal ${gs.ihlal_toplam}${gs.mandal_asildi ? ` · foto.webp ${gs.foto_webp} > ${DONMUS_FOTO_WEBP}` : ''}`)
+  process.exit(1)
+}
+if (KAPI && tz.durum !== 'TAZE') {
+  console.error(`⛔ KATALOG PAKETİ ${tz.durum}: ${tazelikNotu(tz)}`)
   process.exit(1)
 }

@@ -9,12 +9,15 @@
  *   3. Vaat, fiyat, iç not (K2'nin JS karşılığı), rakip adı. Okuyucuya not bloğu (`> **Not:**`) meşru.
  *   4. Olumsuz / mevzuat cümlesi iddia tablosunda türüyle ve alıntısıyla.
  *   5. Modül ağa çıkmaz (CI şartı).
+ *   6. R3 kalıbı: zorunlu bölümler (fiyat etkenleri, SSS, kaynaklar, teknik sorumluluk notu), tek H1,
+ *      en az bir tablo, SSS 5–8 soru, sorumluluk notunun sabit ilk cümlesi. ⭐2026-09-24 vakası: ilk
+ *      yazı fiyat bölümü ve başlıklı sorumluluk notu olmadan iki doğrulama turundan geçti.
  * Yazı taslakları depoya GİRMEZ (R4.8) — buradaki metinler UYDURMA örnektir, gerçek yazı değil.
  */
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT } from '../rehber-denetim.mjs'
+import { denetle, cumleler, atifNumaralari, bolumle, IC_NOT, kalipDenetle, bolumMetni, SORUMLULUK_ILK_CUMLE } from '../rehber-denetim.mjs'
 
 const TEMIZ = `---
 baslik: Örnek cihaz nedir, nasıl seçilir?
@@ -35,11 +38,41 @@ meta_aciklama: Örnek cihazın ne işe yaradığı ve seçimde bakılacak ölç�
 
 Cihaz kendi başına ısıtma yapmaz [2]. Kapalı otoparkta mekanik havalandırma zorunludur [3].
 
+## Fiyatı belirleyen etkenler
+
+Fiyat güce ve koruma sınıfına göre değişir; güncel fiyat ürün sayfasında görünür.
+
+## Sık sorulan sorular
+
+### Örnek cihaz ne işe yarar?
+
+Havayı bir kanaldan diğerine taşır [1].
+
+### Hangi hızda çalışır?
+
+Çıkış hızı 7–9 m/s aralığındadır [1].
+
+### Koruma sınıfı nedir?
+
+Koruma sınıfı IP45'tir [2].
+
+### Nereye takılır?
+
+Kanal üzerine takılır [1].
+
+### Bakımı nasıl yapılır?
+
+Üretici kılavuzundaki aralıklarla yapılır [1].
+
 ## Kaynaklar
 
 1. Üretici A, Tasarım kılavuzu, s. 12.
 2. Üretici A, Ürün föyü, s. 3.
 3. Resmî Gazete, Otopark Yönetmeliği, madde 7.
+
+## Teknik sorumluluk notu
+
+${SORUMLULUK_ILK_CUMLE} Kurulum yetkili personel tarafından yapılmalıdır.
 `
 
 const IDDIALAR = [
@@ -150,6 +183,56 @@ describe('INV-REHBER-DENETIM-1 · iddia tablosu', () => {
   it('iddianın kaynağı listede yoksa KIRMIZI', () => {
     const k = denetle(TEMIZ, { iddialar: [...IDDIALAR, { metin: 'x', kaynak: [7], alinti: 'y', tur: 'genel' }] }).kirmizi.map((x: { sinif: string }) => x.sinif)
     expect(k).toContain('IDDIA-KAYNAGI-LISTEDE-YOK')
+  })
+})
+
+describe('INV-REHBER-DENETIM-1 · R3 kalıbı', () => {
+  const sss = (n: number) => Array.from({ length: n }, (_, i) => `### Soru ${i + 1}?\n\nCevap ${i + 1} [1].\n`).join('\n')
+  const sssKoy = (n: number) => TEMIZ.replace(/## Sık sorulan sorular\n[\s\S]*?(?=## Kaynaklar)/, `## Sık sorulan sorular\n\n${sss(n)}\n`)
+
+  it('temiz örnekte kalıp kırmızısı yok ve bölümler gerçekten okunuyor (sessiz sıfır değil)', () => {
+    expect(kalipDenetle(TEMIZ)).toEqual([])
+    expect(bolumMetni(TEMIZ, 'Sık sorulan sorular')).toMatch(/### Bakımı/)
+    expect(bolumMetni(TEMIZ, 'Teknik sorumluluk notu')).toContain(SORUMLULUK_ILK_CUMLE)
+    expect(bolumMetni(TEMIZ, 'Olmayan bölüm')).toBeNull()
+  })
+  it('her zorunlu bölüm tek tek kaldırılınca KIRMIZI', () => {
+    for (const b of ['Fiyatı belirleyen etkenler', 'Sık sorulan sorular', 'Teknik sorumluluk notu']) {
+      const k = denetle(TEMIZ.replace(`## ${b}`, '## Başka bir başlık'), { iddialar: IDDIALAR }).kirmizi
+      expect(k, b).toContainEqual({ sinif: 'ZORUNLU-BOLUM-YOK', ayrinti: `\`## ${b}\`` })
+    }
+  })
+  it('⭐09-24 vakası: fiyat bölümü yok, sorumluluk yalnız "> Not:" satırı → iki KIRMIZI', () => {
+    const vaka = TEMIZ.replace(/## Fiyatı belirleyen etkenler\n[\s\S]*?(?=## Sık sorulan)/, '').replace(/\n## Teknik sorumluluk notu\n[\s\S]*$/, '\n')
+    const k = denetle(vaka, { iddialar: IDDIALAR }).kirmizi.filter((x: { sinif: string }) => x.sinif === 'ZORUNLU-BOLUM-YOK')
+    expect(k.map((x: { ayrinti: string }) => x.ayrinti)).toEqual(['`## Fiyatı belirleyen etkenler`', '`## Teknik sorumluluk notu`'])
+  })
+  it('Kaynaklar yoksa KAYNAK-BOLUMU-YOK verilir, kalıp aynı eksikliği ikinci kez yazmaz', () => {
+    const k = siniflar(TEMIZ.replace('## Kaynaklar', '## Okuma listesi'))
+    expect(k).toContain('KAYNAK-BOLUMU-YOK')
+    expect(k).not.toContain('ZORUNLU-BOLUM-YOK')
+  })
+  it('SSS 5–8 dışında KIRMIZI, sınırlar geçer', () => {
+    expect(siniflar(sssKoy(4))).toContain('SSS-SAYISI')
+    expect(siniflar(sssKoy(9))).toContain('SSS-SAYISI')
+    expect(siniflar(sssKoy(5))).not.toContain('SSS-SAYISI')
+    expect(siniflar(sssKoy(8))).not.toContain('SSS-SAYISI')
+  })
+  it('tablo yoksa KIRMIZI', () => {
+    const tablosuz = TEMIZ.replace(/\| Ölçüt[\s\S]*?\| Sınıf \| IP45 \[2\] \|\n/, '')
+    expect(tablosuz).not.toMatch(/\| Ölçüt/)
+    expect(siniflar(tablosuz)).toContain('TABLO-YOK')
+  })
+  it('ikinci H1 KIRMIZI; ön bilgideki satırlar H1 sayılmaz', () => {
+    expect(siniflar(TEMIZ.replace('## Kaynaklar', '# Kaynaklar dışı başlık\n\n## Kaynaklar'))).toContain('H1-SAYISI')
+    expect(siniflar(TEMIZ)).not.toContain('H1-SAYISI')
+  })
+  it('sorumluluk notu sabit cümleyle başlamıyorsa KIRMIZI (yazıya özgü ek cümle serbest)', () => {
+    expect(siniflar(TEMIZ.replace(SORUMLULUK_ILK_CUMLE, 'Bu yazı bilgi amaçlıdır.'))).toContain('SORUMLULUK-NOTU-METNI')
+    expect(siniflar(TEMIZ.replace(' Kurulum yetkili personel', ' Bakım ve kurulum yetkili personel'))).not.toContain('SORUMLULUK-NOTU-METNI')
+  })
+  it('Windows satır sonu (CRLF) bölümleri bozmaz', () => {
+    expect(kalipDenetle(TEMIZ.replace(/\n/g, '\r\n'))).toEqual([])
   })
 })
 
