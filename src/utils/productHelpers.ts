@@ -1,4 +1,4 @@
-import { Ruler,Settings } from 'lucide-react'
+import { Leaf,Ruler,Settings } from 'lucide-react'
 import React from 'react'
 
 /**
@@ -86,6 +86,13 @@ export const translateSpecKey = (key: string): string => {
 const UNIT_SUFFIXES: ReadonlyArray<readonly [string, string]> = (
   [
     ['_db_a', 'dB(A)'],
+    // REC-392 enerji etiketi / ürün bilgi föyü (AB 1254/2014 Ek IV). Birim AB etiketinin kendi
+    // yazımıdır ve dilden bağımsızdır: `formatSpecValue` dil bilmez, "yıl" yazsaydık EN sayfada
+    // Türkçe kalırdı. `_w_m3h` (SPI) uzunluk sıralaması sayesinde `_m3h`'den ÖNCE denenir.
+    ['_kwh_m2a', 'kWh/(m²·a)'],
+    ['_w_m3h', 'W/(m³/h)'],
+    ['_kwh', 'kWh'],
+    ['_m3s', 'm³/s'],
     ['_m3h', 'm³/h'],
     ['_pct', '%'],
     ['_kw', 'kW'],
@@ -107,6 +114,9 @@ const UNIT_SUFFIXES: ReadonlyArray<readonly [string, string]> = (
 /** Son-ek kuralına uymayan tekil anahtarlar. Genel kural uydurmak yerine ADIYLA yazılır. */
 const UNIT_BY_KEY: Readonly<Record<string, string>> = {
   humidity_removed_l_24h: 'L/24h',
+  // Föyün ses gücü seviyesi A-ağırlıklıdır (LWA, dB(A)). Genel `_db` kuralı (`noise_lpa_3m_db` →
+  // dB) DEĞİŞTİRİLMEZ; bu anahtar adıyla yazılır (REC-392).
+  erp_noise_lwa_db: 'dB(A)',
 }
 
 export const formatSpecValue = (key: string, value: unknown): string => {
@@ -159,10 +169,32 @@ export const formatSpecValue = (key: string, value: unknown): string => {
  */
 const ELEKTRIK_ANAHTARLARI = new Set(['motor_efficiency_class', 'electrical_protection_class'])
 
+/**
+ * Enerji etiketi / ürün bilgi föyü alanı mı (REC-392, AB 1254/2014 Ek IV, TR SGM-2021/19)?
+ * Föy anahtarlarının HEPSİ `erp_` önekini taşır (product-schema-standard.md "Enerji etiketi ve
+ * ürün bilgi föyü"). `erp_compliant` bu önekle başlar ama föy alanı DEĞİLDİR (Ecodesign uygunluk
+ * beyanı, canlıda 187 üründe): adıyla dışarıda bırakılır ve bugünkü grubunda (`other`) kalır.
+ * Alt dize kuralından ÖNCE denenir: aksi hâlde `erp_max_delivery_m3h` performansa,
+ * `erp_power_at_max_delivery_w` elektriğe dağılır ve föy tek blok olarak okunamaz.
+ */
+const FOY_DISI_ERP_ANAHTARLARI = new Set(['erp_compliant'])
+export const isEnergyLabelSpecKey = (key: string): boolean => {
+  const k = key.toLowerCase()
+  return k.startsWith('erp_') && !FOY_DISI_ERP_ANAHTARLARI.has(k)
+}
+
 export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | undefined) => {
   if (!specs) return null;
 
   const groups: Record<string, { label: string; icon: React.ComponentType<{ size?: string | number; className?: string }>; specs: Record<string, unknown> }> = {
+    // Yasal beyan bloğu İLK sırada: vitrin ve föy grupları bu nesnenin sırasıyla basar.
+    // Boşsa aşağıda SİLİNİR — föy verisi olmayan ürünlerde boş bir "Enerji etiketi" başlığı
+    // çıkmaz (boş başlık "etiket yok" diye okunur; yasal yüzeyde yanlış ifade).
+    energyLabel: {
+      label: 'Enerji Etiketi / Ürün Bilgi Formu',
+      icon: Leaf,
+      specs: {}
+    },
     performance: {
       label: 'Performans Ölçüleri',
       icon: Settings,
@@ -189,7 +221,9 @@ export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | unde
     if (value === null || value === undefined || value === '') return;
     
     const k = key.toLowerCase();
-    if (k.includes('airflow') || k.includes('speed') || k.includes('rpm') || k.includes('delivery') || k.includes('pressure')) {
+    if (isEnergyLabelSpecKey(k)) {
+      groups.energyLabel.specs[key] = value;
+    } else if (k.includes('airflow') || k.includes('speed') || k.includes('rpm') || k.includes('delivery') || k.includes('pressure')) {
       groups.performance.specs[key] = value;
     } else if (k.includes('size') || k.includes('weight') || k.includes('width') || k.includes('height') || k.includes('depth') || k.includes('dim_')) {
       groups.physical.specs[key] = value;
@@ -199,6 +233,8 @@ export const groupTechnicalSpecs = (specs: Record<string, unknown> | null | unde
       groups.other.specs[key] = value;
     }
   });
+
+  if (Object.keys(groups.energyLabel.specs).length === 0) delete groups.energyLabel;
 
   return groups;
 };

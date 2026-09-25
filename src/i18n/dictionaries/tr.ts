@@ -1737,6 +1737,31 @@ export const tr = {
       enclosure_size: 'Muhafaza Boyutu',
       electrical_protection_class: 'Elektrik Koruma Sınıfı',
       erp_compliant: 'ErP Uyumlu',
+      // REC-392 — enerji etiketi / ürün bilgi formu alanları. Terimler SGM-2021/19 Ek-IV
+      // (Ürün Bilgi Formu) Türkçe metninden. İki alan (`erp_max_delivery_m3h`,
+      // `erp_thermal_efficiency_pct`) katalogdaki `max_delivery_m3h` / `thermal_efficiency_pct`
+      // ile AYNI üründe farklı değerle bulunur: "(Ürün Bilgi Formu)" eki ikisini ayırır
+      // (föy PDF'i grup başlığı basmaz, ayrım etiketin kendisinde olmalı).
+      erp_sec_class_average: 'SEC Sınıfı (Ortalama İklim)',
+      erp_sec_average_kwh_m2a: 'Özgül Enerji Tüketimi (SEC), Ortalama İklim',
+      erp_sec_cold_kwh_m2a: 'Özgül Enerji Tüketimi (SEC), Soğuk İklim',
+      erp_sec_warm_kwh_m2a: 'Özgül Enerji Tüketimi (SEC), Sıcak İklim',
+      erp_ventilation_unit_type: 'Beyan Edilen Tipoloji (Tek Yönlü / Çift Yönlü)',
+      erp_drive_type: 'Sürücü Tipi',
+      erp_heat_recovery_type: 'Isı Geri Kazanım Sistemi Tipi',
+      erp_thermal_efficiency_pct: 'Isı Geri Kazanımının Termal Verimi (Ürün Bilgi Formu)',
+      erp_max_delivery_m3h: 'Azami Debi (Ürün Bilgi Formu)',
+      erp_power_at_max_delivery_w: 'Azami Debide Elektrik Giriş Gücü',
+      erp_noise_lwa_db: 'Ses Gücü Seviyesi (LWA)',
+      erp_reference_delivery_m3s: 'Referans Debi',
+      erp_reference_pressure_pa: 'Referans Basınç Farkı',
+      erp_spi_w_m3h: 'Özgül Güç Girişi (SPI)',
+      erp_control_factor: 'Kontrol Faktörü',
+      erp_leakage_internal_pct: 'Beyan Edilen Azami İç Sızıntı Oranı',
+      erp_leakage_external_pct: 'Beyan Edilen Azami Dış Sızıntı Oranı',
+      erp_aec_kwh: 'Yıllık Elektrik Tüketimi (AEC)',
+      erp_ahs_average_kwh: 'Yıllık Isıtma Tasarrufu (AHS), Ortalama İklim',
+      erp_eprel_registration: 'EPREL Kayıt Numarası',
       filter_classes: 'Filtre Sınıfı',
       fire_rating: 'Yangın Sınıfı',
       frequency_hz: 'Frekans',
@@ -1804,6 +1829,7 @@ export const tr = {
     // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
     // EN sayfada da Turkce basiyordu (CLAUDE.md Kural 7 ihlali).
     specGroups: {
+      energyLabel: 'Enerji Etiketi / Ürün Bilgi Formu',
       performance: 'Performans Ölçüleri',
       physical: 'Fiziksel Ölçüler',
       electrical: 'Elektriksel Veriler',

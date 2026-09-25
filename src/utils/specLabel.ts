@@ -20,6 +20,12 @@ type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string)
 const UNIT_SUFFIXES: Record<string, string> = {
   m3h: 'm³/h',
   m3s: 'm³/s',
+  // REC-392: föy son ekleri. İki parçalı olanlar (`kwh_m2a`, `w_m3h`) humanizeSpecKey'de
+  // tek parçalılardan ÖNCE denenir; yoksa `erp_spi_w_m3h` "Erp Spi W (m³/h)" olurdu.
+  kwh_m2a: 'kWh/(m²·a)',
+  w_m3h: 'W/(m³/h)',
+  kwh: 'kWh',
+  pct: '%',
   ls: 'l/s',
   ms: 'm/s',
   mm: 'mm',
@@ -57,8 +63,12 @@ export function humanizeSpecKey(key: string): string {
   if (parts.length === 0) return key
 
   const lastLower = parts[parts.length - 1].toLowerCase()
-  const unit = parts.length > 1 ? UNIT_SUFFIXES[lastLower] : undefined
-  const words = unit ? parts.slice(0, -1) : parts
+  const lastTwoLower = parts.slice(-2).join('_').toLowerCase()
+  // İki parçalı birim yalnız tabloda ALT ÇİZGİLİ bir girdi varsa eşleşir (`a_b` biçimli
+  // arama, alt çizgisiz girdiye hiç denk gelmez); mevcut anahtarların davranışı değişmez.
+  const unit2 = parts.length > 2 ? UNIT_SUFFIXES[lastTwoLower] : undefined
+  const unit = unit2 ?? (parts.length > 1 ? UNIT_SUFFIXES[lastLower] : undefined)
+  const words = unit2 ? parts.slice(0, -2) : unit ? parts.slice(0, -1) : parts
 
   const label = words.map(titleCaseWord).join(' ')
   return unit ? `${label} (${unit})` : label

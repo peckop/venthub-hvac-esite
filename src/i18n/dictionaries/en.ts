@@ -1304,6 +1304,29 @@ export const en: typeof tr = {
       enclosure_size: 'Enclosure Size',
       electrical_protection_class: 'Electrical Protection Class',
       erp_compliant: 'ErP Compliant',
+      // REC-392 — energy label / product fiche fields, terms from Regulation (EU) 1254/2014
+      // Annex IV. "(Product Fiche)" separates the two fiche values that coexist with the
+      // catalogue's own max_delivery_m3h / thermal_efficiency_pct on the same product.
+      erp_sec_class_average: 'SEC Class (Average Climate)',
+      erp_sec_average_kwh_m2a: 'Specific Energy Consumption (SEC), Average Climate',
+      erp_sec_cold_kwh_m2a: 'Specific Energy Consumption (SEC), Cold Climate',
+      erp_sec_warm_kwh_m2a: 'Specific Energy Consumption (SEC), Warm Climate',
+      erp_ventilation_unit_type: 'Declared Typology (Unidirectional / Bidirectional)',
+      erp_drive_type: 'Type of Drive',
+      erp_heat_recovery_type: 'Type of Heat Recovery System',
+      erp_thermal_efficiency_pct: 'Thermal Efficiency of Heat Recovery (Product Fiche)',
+      erp_max_delivery_m3h: 'Maximum Flow Rate (Product Fiche)',
+      erp_power_at_max_delivery_w: 'Electric Power Input at Maximum Flow Rate',
+      erp_noise_lwa_db: 'Sound Power Level (LWA)',
+      erp_reference_delivery_m3s: 'Reference Flow Rate',
+      erp_reference_pressure_pa: 'Reference Pressure Difference',
+      erp_spi_w_m3h: 'Specific Power Input (SPI)',
+      erp_control_factor: 'Control Factor',
+      erp_leakage_internal_pct: 'Declared Maximum Internal Leakage Rate',
+      erp_leakage_external_pct: 'Declared Maximum External Leakage Rate',
+      erp_aec_kwh: 'Annual Electricity Consumption (AEC)',
+      erp_ahs_average_kwh: 'Annual Heating Saved (AHS), Average Climate',
+      erp_eprel_registration: 'EPREL Registration Number',
       filter_classes: 'Filter Class',
       fire_rating: 'Fire Rating',
       frequency_hz: 'Frequency',
@@ -1371,6 +1394,7 @@ export const en: typeof tr = {
     // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
     // EN sayfada da Turkce basiyordu (CLAUDE.md Kural 7 ihlali).
     specGroups: {
+      energyLabel: 'Energy Label / Product Fiche',
       performance: 'Performance Specifications',
       physical: 'Physical Dimensions',
       electrical: 'Electrical Specifications',

@@ -155,7 +155,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   const [quoteOpen, setQuoteOpen] = useState(false)
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false)
   const [isNavSticky, setIsNavSticky] = useState(false)
-  const [openSpecSections, setOpenSpecSections] = useState<string[]>(['performance'])
+  // `energyLabel` varsayılan AÇIK (REC-392): ürün bilgi formu yasal beyandır, erişimi bir tık
+  // arkasına saklanmaz. Föy verisi olmayan üründe grup hiç üretilmez, bu giriş etkisizdir.
+  const [openSpecSections, setOpenSpecSections] = useState<string[]>(['energyLabel', 'performance'])
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
