@@ -44,7 +44,9 @@ export const NAVIGATION_SECONDARY_ITEMS: NavigationItemConfig[] = [
     {
         id: 'knowledgeHub',
         labelKey: 'common.knowledgeHub',
-        href: '/destek/merkez',
+        // Karar 92: TR bölüm yolu. Başlık adresi DİLE göre `bilgiMerkeziListeHref`'ten çözer
+        // (StickyHeader); EN kapalıyken öğe basılmaz.
+        href: '/bilgi-merkezi',
         minWidthClass: 'min-w-[126px]',
         showInCompact: false,
     },

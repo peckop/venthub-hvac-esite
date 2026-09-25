@@ -25,14 +25,14 @@ exclusions: []
 
 ## 🛫 Prerequisites (Ön Koşul Kontrolü)
 
-Bu skill'i kullanmadan önce aşağıdaki kontrolleri yap. Herhangi biri başarısızsa, **DURMA** ve kullanıcıya bildir.
+Bu skill'i kullanmadan önce aşağıdaki kontrolleri yap. Herhangi biri başarısızsa, **DUR** (devam etme) ve kullanıcıya bildir.
 
 1. **Bütünlük Scripti Erişimi:**
    - `.agent/scripts/check_integrity.py` dosyasının mevcut olduğunu doğrula.
-   - Dosya yoksa veya çalıştırılamıyorsa → ❌ DURMA.
+   - Dosya yoksa veya çalıştırılamıyorsa → ❌ DUR.
 
 2. **Git Durumu:**
-   - `git status` çalıştır. Eğer "not a git repository" hatası gelirse → ❌ DURMA.
+   - `git status` çalıştır. Eğer "not a git repository" hatası gelirse → ❌ DUR.
    - Commit edilmemiş kritik değişiklikler varsa, önce kullanıcıyı uyar.
 
 3. **Korunan Varlık Kontrolü:**

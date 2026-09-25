@@ -17,6 +17,7 @@ import { SYSTEM_CURRENCY } from '../i18n/currency'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { trackEvent } from '../utils/analytics'
+import { bilgiMerkeziListeHref } from '../utils/bilgiMerkezi'
 import { NAVIGATION_PRIMARY_ITEMS, NAVIGATION_SECONDARY_ITEMS } from '../utils/navigationConfig'
 import { prefetchProductsPage } from '../utils/prefetch'
 import { localizedHref } from '../utils/routes'
@@ -215,8 +216,17 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
     return [...temel, { id: 'urunSecici', href: Routes.urunSecici(), label: t('urunSecici.ustBaslik') }]
   }, [t, lang, Routes])
 
+  // Bilgi Merkezi (karar 92): bölüm adı dile göre değişir ve EN `EN_YAYIN` kapalıyken YOKTUR →
+  // adres `bilgiMerkeziListeHref`'ten gelir; o dilde yoksa öğe hiç basılmaz (404'e bağlantı yok).
   const secondaryItems = useMemo(
-    () => NAVIGATION_SECONDARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) })),
+    () =>
+      NAVIGATION_SECONDARY_ITEMS.flatMap((item): { id: string; href?: string; label: string }[] => {
+        if (item.id === 'knowledgeHub') {
+          const href = bilgiMerkeziListeHref(lang)
+          return href ? [{ id: item.id, href, label: t(item.labelKey) }] : []
+        }
+        return [{ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) }]
+      }),
     [t, lang]
   )
 
