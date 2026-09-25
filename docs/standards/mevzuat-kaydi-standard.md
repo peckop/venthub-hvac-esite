@@ -226,6 +226,13 @@ Dayanak: uygunluk model bazında beyan edilir (1253/2014 ve 1254/2014 bilgi şar
   (Ek-8 8.2.1 fıkra metni, Tablo 5.1 dipnotunun yanlış tabloya bağlanması).
   (2) Madde numarası varsayılmaz: "Ek-I madde 2 = sürücü" varsayımı yanlıştı (madde 2 motor ürün
   bilgisi, madde 3 sürücü); BLOG'a yanlış madde gitti, aynı gün düzeltildi.
+  (4) **Kapsam istisnası kelimesi kelimesine okunur ve üretici beyanıyla çaprazlanır** (v0.3): 1253/2014
+  Md.1(2)(c) "axial or centrifugal fans only equipped with a housing" diyor; MEVZUAT bunu "gövdeli kanal
+  fanı kapsam dışı" diye genelleştirip BLOG'a paket verdi. BLOG, üreticinin 1253/2014 beyanıyla
+  itiraz etti. Karışık akışlı fan istisnada yok, üretici CA kanal fanlarını "RVU-U" beyan edip SEC
+  sınıfı yayımlıyor. Kural: bir ürün ailesini "kapsam dışı" ilan etmeden önce kaynak dizininde o ailenin
+  aynı tüzüğe atfı aranır (`sayfalar.jsonl`'da tüzük numarası); atıf varsa hüküm üretici beyanıyla
+  uzlaştırılmadan verilmez.
   (3) AB konsolide sürüm listesi Yayın Ofisi SPARQL servisinden tek sorguyla alınır
   (`cdm:resource_legal_id_celex`, `STRSTARTS("0<CELEX>")`); M5.1 takip betiği için en ucuz değişiklik
   algılayıcısıdır.
