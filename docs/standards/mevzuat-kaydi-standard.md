@@ -142,8 +142,26 @@ demek kontrol değildir.
 | `yururlukte` | üç ayda bir |
 | `kaldirildi` | kontrol edilmez (yalnız `yerine_gelen` izlenir) |
 
-Takip betiği ve zamanlaması bu cetvelin **madde 4** işidir; zamanlayıcı kurulmadan önce Recep'e
-sorulur (karar 53). O gelene kadar kontrol elle koşulur ve tarihi `son_kontrol`a yazılır.
+Takip düzeni önerisi M5.1'dedir; zamanlayıcı kurulmadan önce Recep'e sorulur (karar 53). O gelene
+kadar kontrol elle koşulur ve tarihi `son_kontrol`a yazılır.
+
+### M5.1 Takip düzeni — ÖNERİ (kurulmadı)
+
+> **Durum:** yalnız öneri. Recep kararı (2026-09-25, OPS aktarımı): MEVZUAT şeridi tohum işinden sonra
+> park eder; betik yazılmaz, zamanlayıcı kurulmaz. Şerit yeniden açıldığında bu bölümden başlanır.
+
+| Kaynak | Ne izlenir | Yol | Sıklık |
+|---|---|---|---|
+| AB metinleri | Konsolide sürüm tarihi, değişiklik ve kaldırma zinciri | Yayın Ofisi veri servisi (M3/5) — CELEX başına ham çekim, metin sha256'sı öncekiyle kıyas | M5 tablosu |
+| AB Resmî Gazetesi uyumlaştırılmış standart listeleri | ATEX, EMC, alçak gerilim, makine listelerinde baskı ve geri çekilme tarihi | Komisyonun single-market-economy sayfalarındaki liste dosyası | üç ayda bir |
+| Komisyon ecodesign gözden geçirme sayfaları | Motor (2019/1781) ve havalandırma ünitesi (1253/2014) revizyon taslakları | energy-efficient-products.ec.europa.eu | ayda bir |
+| Resmî Gazete | Yeni SGM tebliği, yönetmelik değişikliği | Günlük fihrist sayfası; "çevreye duyarlı tasarım", "enerji etiket", "patlayıcı ortam", "florlu sera" anahtar sözcükleri | haftada bir |
+
+**Önerilen biçim:** elle koşulan tek betik (ALTYAPI'nın `scripts/` alanında, sahibi ALTYAPI) — kayıttaki her
+kalem için `kaynaklar_kanit` dosyasındaki adresi yeniden çeker, sha256'yı ve durum satırını karşılaştırır,
+değişenleri listeler; **kayda yazmaz**, listeyi MEVZUAT okur ve kaydı elle günceller. Aynı betik kayıt
+tutarlılığını da sınar: her aile slug'ı KATALOG paketinde var mı, her `karsilik` kimliği kayıtta var mı.
+İlk elle koşum tarihi önerisi: şerit yeniden açıldığı gün. Zamanlayıcıya bağlamak ayrı karardır (karar 53).
 
 ---
 
