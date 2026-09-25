@@ -1,0 +1,44 @@
+{
+  "kimlik": "TR-YON-GURULTU-BINA-2017",
+  "eksen": "G",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm",
+      "http": 200,
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "erisim_tarihi": "2026-09-25",
+      "alinti": "MADDE 13 – (1) Sürekli gürültü üreten servis ekipmanlarından kaynaklanan gürültü düzeyleri, EK-5 Tablo 5.1'deki değerleri geçemez. (2) Kesikli gürültü üreten servis ekipmanlarından kaynaklanan gürültü düzeyleri, EK-5 Tablo 5.2’deki değerleri geçemez.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7.htm",
+      "http": 200,
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "erisim_tarihi": "2026-09-25",
+      "alinti": "(3) Yeni yapılacak binalarda en az C akustik performans sınıfı sağlanır.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7-1.pdf",
+      "http": 200,
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "erisim_tarihi": "2026-09-25",
+      "alinti": "Ek-5 Tablo 5.1 (LAeq,nT, dB, A/B/C/D/E/F) — Konut, Yatak Odaları, Gece: 22/26/30/34/38/42; Yaşam Alanları 24 saat: 27/31/35/39/43/47; Mutfaklar 24 saat: 27/31/35/39/43/47. Dipnot: \"Tablo 4.1'de verilen iç gürültü düzeylerinden 4 dBA çıkartılarak bulunmaktadır.\"",
+      "alinti_dogrulandi": true,
+      "not": "Taranmış PDF; ek s.24–25 görsel okumayla (MEVZUAT, 2026-09-25)."
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2017/05/20170531-7-1.pdf",
+      "http": 200,
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "erisim_tarihi": "2026-09-25",
+      "alinti": "8.2.1) Fanlar – Fancoiller 1) Fanların ve fancoiller için EK-5'te verilen değerlerin sağlanması bakımından gerekli önlemler alınır. ... 3) Gürültü emisyonu azaltılmış sessiz fan tipi seçimine, hava akımı, fan hızı, statik basınç ayarları ile gürültünün azaltılmasına ve fanın hava türbülansını azaltacak biçimde yönlendirilmesine dikkat edilir.",
+      "alinti_dogrulandi": true,
+      "not": "Taranmış PDF; ek s.30 görsel okumayla. Alt ajan transkripsiyonu 1. fıkrada hatalıydı (\"boyutları belirlenecektir\"), düzeltildi."
+    }
+  ]
+}

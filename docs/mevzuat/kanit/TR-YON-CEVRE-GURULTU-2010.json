@@ -1,0 +1,16 @@
+{
+  "kimlik": "TR-YON-CEVRE-GURULTU-2010",
+  "eksen": "G",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2010/06/20100604-5.htm",
+      "http": 200,
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "erisim_tarihi": "2026-09-25",
+      "alinti": "a) Mevcut yapılarda; tesisat dairelerinde veya yapı içinde veya dışında herhangi bir yerde bulunan soğutma fanı, iklimlendirme sistemleri, hava kanalları, ... hassas kullanımlara iletilen gürültü seviyesi Leq gürültü göstergesi cinsinden arka plan gürültü seviyesini 5 dBA'dan fazla aşamaz.",
+      "alinti_dogrulandi": true,
+      "not": "Alt ajan HTML metinden grep ile doğruladı."
+    }
+  ]
+}
