@@ -8,7 +8,7 @@
 > ön koşulları (Search Console tabanı, linkinator + unlighthouse taraması) ve §7 yayın ölçümü yazılıydı ama
 > **hangi komutla, hangi evrende, hangi eşikle** koşulacağı yazılı değildi (OPS emri 2026-09-24: "cetvel
 > yoksa yazımı bu işin kapsamında").
-> **Sahibi:** BLOG (karar 93: arama görünürlüğü). Betikleri kapıya/zamanlamaya bağlama: ALTYAPI. Sayfa
+> **Sahibi:** GEO-SEO (karar 124, 2026-09-25; önceki sahibi BLOG, karar 93). Betikleri kapıya/zamanlamaya bağlama: ALTYAPI. Sayfa
 > kusurunun onarımı: URUN. Yönlendirme ve başlık (robots, `next.config`, middleware haritası): ALTYAPI + URUN
 > (adres haritası URUN'un REC-300 işidir).
 > **İlgili:** `pazar-olcum-standard.md` P2 (Search Console tabanı), `rehber-yazisi-standard.md` R8 (iç
@@ -59,7 +59,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 | sayfa 404/500, eksik canonical/hreflang, kırık görsel, SEO puanı düşen sayfa | URUN |
 | eski adres zinciri, yanlış hedef, eksik harita satırı | URUN (adres haritası REC-300) |
 | robots, başlık (`X-Robots-Tag`), `next.config` yönlendirmesi, zamanlama/kapı | ALTYAPI |
-| ölçümün kendisi (betik hatası, yanlış kırmızı) | BLOG |
+| ölçümün kendisi (betik hatası, yanlış kırmızı) | GEO-SEO |
 
 ## Ölçüm geçmişi
 
