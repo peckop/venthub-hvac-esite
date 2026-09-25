@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.4 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.5 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -32,6 +32,9 @@ bağlandı (Ölçüm geçmişi). Yayın, R8'deki kapılar kendi PR'larında doğ
 bölümü (fiyatı belirleyen etkenler, teknik sorumluluk notu) eksik çıktı; hiçbir kontrol görmedi, OPS emsal
 yazıyla elle kıyaslarken buldu. Recep "görmeden onay yok" dedi. Değişenler: R3 zorunlu bölümler + kalıp
 kapısı (R8), sorumluluk notunun sabit ilk cümlesi, R5 girişi ve R5.4 (önizleme şart), R5.7 ara önizleme.
+**v0.5 (2026-09-25):** karar 121 (içerik stratejisi) kalıcı kural oldu: R1.4 konu sırası ve içerik türleri;
+R2.1'de eski destek sayfası içerikleri kaynak değildir; R0.1 ve R9'da taşınan eski konular yayından kalkar,
+sırası gelince sıfırdan yazılır.
 
 ---
 
@@ -67,6 +70,9 @@ Onarım iki adımdır, ikisi de seçenek değildir:
 2. **Karar 92 taşımasında (URUN rota + BLOG içerik):** konular yeni adrese **kaldırılıp yönlendirilir**;
    yeniden yazım R9 ritmine girer (R8.1 sayacı). **10 canlı adresin her biri için hedef yazılır, 404'e
    düşen adres 0.**
+3. **Karar 121c (2026-09-25):** Bilgi Merkezi'ne taşınan üç konu da yayından kalkar (URUN); konu sırası
+   (R1.4) gelince aynı adreste sıfırdan, kaynaklı yazıyla döner. Taşınan metin yeniden yazımda kaynak
+   olarak kullanılmaz (R2.1).
 
 ## R1 — Konu seçimi
 
@@ -105,6 +111,38 @@ Aynı sorguya iki yazı yarışmaz. Yeni konu açılmadan önce Search Console'd
 küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişletilmesi** (R5.5 revizyonu)
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 
+### R1.4 Konu sırası ve içerik türleri (karar 121, Recep 2026-09-24/25)
+
+**Konu sırası** (kayıt: REC-369 yorumu 2026-09-24):
+
+| Sıra | Konu | Durum 2026-09-25 |
+|---|---|---|
+| 1 | Frekans konvertörü | doğrulandı; yerel önizlemede Recep'e gösterilecek (karar 120) |
+| 2 | Radyal fan mı aksiyel fan mı, fan nasıl seçilir | üç doğrulama turu bitti |
+| 3 | Vortice sessiz fanlar | sırada |
+| 4 | Korozyona dayanıklı (asit) fanlar | sırada |
+| 5 | Isı geri kazanım | sırada; REC-392 (enerji etiketi) bu konuya değer |
+| 6 | Çatı fanları | sırada |
+| 7 | Banyo fanları | sırada |
+
+Sırayı **yalnız Recep** değiştirir. Hacim ve mevsim verisi (pazar ölçüm düzeni kol 2) geldiğinde BLOG
+ölçer, öneriyi OPS götürür; öneri sırayı kendiliğinden değiştirmez. Blog üretimi durmaz.
+
+**İçerik türleri:**
+
+| Tür | Durum | Not |
+|---|---|---|
+| "Doğrusu ve yanlışı" dizisi (yaygın yanlış + kaynaklı doğrusu) | EVET | yanlış da doğru da kaynağa bağlanır; kaynaksız "yaygın yanlış" yazılmaz |
+| Mevzuatı ilk anlatan yazı | EVET | konu listesi MEVZUAT şeridinden gelir; resmî metin R2.1/2'dir, BLOG kendi indirdiği ham metinle doğrular |
+| Hesaplayıcıyla birleşen yazı | EVET | R2.5: hesap örneğinin sonucu hesaplayıcıyla aynıdır, bağlantı `vh:hesaplayici/…` |
+| Saha deneyimi yazıları, Türkçe iklimlendirme terimleri sözlüğü | SONRA | sözlük Bilgi Merkezi alt kırılımı; bilgi mimarisi kararı TASARIM'dan sonra |
+| Tedarikçi yazıları | ŞİMDİLİK YOK | |
+| ESP yazısı | MÜMKÜN | üçüncü bir firmanın iç bilgisi ve o firma için yazılmış metin kullanılmaz; farklı açı (ayrıntı Kararlar belgesinde, PUBLIC depoya girmez) |
+
+**Eski içerik** (karar 121c): Bilgi Merkezi'ne taşınan üç eski konu (hava perdesi, otopark jet fan, ısı
+geri kazanım) yayından kalkar (URUN); konu sırası geldiğinde aynı adreste **sıfırdan, kaynaklı** yeni
+yazıyla döner. Eski metin kaynak değildir (R2.1).
+
 ## R2 — Kaynak
 
 ### R2.1 Öncelik sırası
@@ -118,7 +156,10 @@ yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 4. **Diğer** — sektör yayını. Yalnız bağlam için; **sayı bu sınıftan alınmaz**.
 
 **Kaynak olmayanlar:** rakip sitesi, forum, yapay zekâ cevabı (ChatGPT, Gemini, Perplexity dahil),
-kaynağı gösterilmeyen blog.
+kaynağı gösterilmeyen blog, **sitenin eski destek sayfası içerikleri** (karar 121c: sözlükteki
+`knowledge.topics` metinleri ve onlardan Bilgi Merkezi'ne taşınan yazılar; Recep 2026-09-25: "çok kaba
+bilgiler, faydası yok bize"). Eski metinden cümle, sayı ya da yapı alınmaz; aynı konu yeniden
+yazılırken araştırma sıfırdan yapılır.
 
 ### R2.2 Erişim sınıfı — açılamayan kaynak atıf alamaz
 
@@ -428,7 +469,7 @@ biçim listesinin **yanlış pozitif ölçümüyle** birlikte kurulur.
 Orta yol: planlı üretim. Başlangıç önerisi **haftada bir yazı**, ilk dört yazının R7 ölçümü bitene
 kadar; sonra ölçüme göre artırılır. Üst sınır R8.1'deki toplu üretim kapısıdır (önerilen eşik 7 günde
 2 yeni yazı; revizyon sayılmaz). Karar 92 taşımasında eski konular **kaldırılıp yönlendirilir**, yeniden
-yazımları bu ritme girer. Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
+yazımları bu ritme ve R1.4 sırasına girer (karar 121: eski metinden alıntı yok, sıfırdan). Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
 
 ---
 
