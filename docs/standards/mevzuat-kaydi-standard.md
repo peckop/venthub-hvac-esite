@@ -57,7 +57,7 @@ Her kalem bir mevzuat metnidir. Bir AB tüzüğü ile onun TR karşılığı **i
 | `kimlik` | ✅ | metin | Kararlı anahtar. Biçim: `<YETKİ>-<numara>` → `AB-2024/1834`, `TR-SGM-2026/2`, `STD-IEC-61800-3`. Bir kez verilir, değişmez |
 | `ad` | ✅ | metin | Resmî tam ad, kaynağın dilinde |
 | `ad_tr` | — | metin | AB metni için Türkçe kısa ad (yazılarda kullanılan) |
-| `tur` | ✅ | sabit | `tuzuk` · `direktif` · `uygulama-karari` · `yonetmelik` · `teblig` · `standart` · `rehber` |
+| `tur` | ✅ | sabit | `kanun` · `tuzuk` · `direktif` · `uygulama-karari` · `yonetmelik` · `teblig` · `standart` · `rehber` |
 | `yetki` | ✅ | sabit | `AB` · `TR` · `ULUSLARARASI` |
 | `konu` | ✅ | liste | M0'daki eksenler: `erp` · `enerji-etiketi` · `atex` · `emc` · `alcak-gerilim` · `makine` · `yangin-duman` · `f-gaz` · `yapi-urunleri` · `ses` · `cerceve` |
 | `kapsam` | ✅ | metin | Kendi cümlemizle, Türkçe, en fazla üç cümle. Standart metninden kopya **yasak** (M4) |
@@ -233,6 +233,11 @@ Dayanak: uygunluk model bazında beyan edilir (1253/2014 ve 1254/2014 bilgi şar
   sınıfı yayımlıyor. Kural: bir ürün ailesini "kapsam dışı" ilan etmeden önce kaynak dizininde o ailenin
   aynı tüzüğe atfı aranır (`sayfalar.jsonl`'da tüzük numarası); atıf varsa hüküm üretici beyanıyla
   uzlaştırılmadan verilmez.
+  (5) **Açık bir hükmü kapatan tur, kaydın kendi "okunmadı" notlarını da kapatır** (v0.4): SVGM 2019/15
+  yürürlüğü REC-397 hükmünde Md.10 ile kullanıldığı hâlde kayıtta "okunmadı" yazıyordu. Karar yorumu
+  kayıttan güçlü olmamalı. v0.4'te üç kalem eklendi ya da tamamlandı: SGM 2021/18 Ek-III (AB 2018
+  aşaması değerleri 1/10/2021'den itibaren) ve Md.2(2)(c) açık sorusu, SVGM 2019/15 Md.10 (20.12.2020),
+  yeni `TR-KANUN-7223` (`tur` listesine `kanun` eklendi). 46 kalem.
   (3) AB konsolide sürüm listesi Yayın Ofisi SPARQL servisinden tek sorguyla alınır
   (`cdm:resource_legal_id_celex`, `STRSTARTS("0<CELEX>")`); M5.1 takip betiği için en ucuz değişiklik
   algılayıcısıdır.
