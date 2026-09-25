@@ -74,7 +74,9 @@ export async function middleware(request: NextRequest) {
     // dil-enjeksiyon kolu bu ölçütü SAĞLAMIYOR, oraya bak.
     if (effectiveSegments[0] === 'admin') {
       const url = request.nextUrl.clone()
-      url.pathname = `/admin${pathname.substring(3 + firstSegment.length)}`
+      // Dil önekini (`/<dil>`) söker, `/admin…` kalır. Eskiden `/admin${substring(3 + dil)}` idi:
+      // hem öneki hem `/a`yı yiyordu → canlıda `/tr/admin` 308 `/admindmin` (2026-09-25 ölçüldü).
+      url.pathname = pathname.substring(1 + firstSegment.length)
       return redirectResponse(url, 308)
     }
   } else {
