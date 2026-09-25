@@ -827,7 +827,9 @@ describe('INV-BOARD-5 · loop hatırlatması', () => {
         'komutu yine insan taşır (T085\'in tam sebebi)',
     ).toContain('LOOP:')
     expect(cikti, 'hatırlatma hangi dosyaya bakılacağını söylemiyor').toContain('session-loop-ritual.md')
-    expect(cikti, 'yedek cron adımı hatırlatmada yok').toContain('CronCreate')
+    // Karar 117 (2026-09-25): hatırlatma zamanlayıcıyı KURDURMAZ, önce Recep'e sordurur.
+    expect(cikti, 'karar 117: hatırlatma zamanlayıcıyı KURDURMAMALI').not.toContain('CronCreate')
+    expect(cikti, "karar 117: tur gerekiyorsa önce Recep'e sorulmalı").toMatch(/Recep ile konuş/)
   })
 
   it('şerit ALAN oturumda hatırlatma SUSAR — hook KONUŞURKEN bile', () => {
