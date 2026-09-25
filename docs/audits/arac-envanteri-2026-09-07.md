@@ -422,6 +422,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/urun-ad-en.test.ts` | Karar 116 · ürün EN adı kural dönüşümü (REC-146). Ağa, DB'ye çıkmaz; adlar canlıdaki gerçek örneklerdir. | URUN-KATALOG | vitest (`scripts/icerik-hatti/__tests__`) | 2026-09-25 (3/3) | kendisi test | AKTIF |
 | `scripts/icerik-hatti/urun-ad-en-yaz.mjs` | ÜRÜN EN ADINI CANLIYA YAZAR — karar 116, REC-146 (plan docs/audits/icerik-hatti-metin-boslugu-2026-09-25.md §3.2) | URUN-KATALOG | elle: `[--liste <csv>] [--yaz --yedek <json>]` + CANLI_YAZIM_ONAYI (karar 116) | 2026-09-25 kuru koşum: yazılacak 166 · gerekmez 251 · elle EN 24 · RED 0 | scripts/icerik-hatti/__tests__/urun-ad-en.test.ts (saf çekirdek) | AKTIF |
 | `scripts/icerik-hatti/urun-ad-en.mjs` | ÜRÜN EN ADI — kural tabanlı dönüşüm (saf çekirdek; ağa, diske, DB'ye çıkmaz). Karar 116, REC-146. | URUN-KATALOG | modul: urun-ad-en-yaz.mjs | 2026-09-25 | scripts/icerik-hatti/__tests__/urun-ad-en.test.ts | AKTIF |
+| `scripts/onizleme.mjs` | YEREL ÖN İZLEME — bir dalı ya da PR'ı bu makinede üretim derlemesiyle ayağa kaldırır (OPS 2026-09-25, REC-300 1a). Canlı DB yalnız anon anahtarla, ayrı ağaç (C:/tmp/vh-onizleme), .env* kopyalanmaz | ALTYAPI | elle (`node scripts/onizleme.mjs <dal|PR> [--port 3100]`) | 2026-09-25 kuruldu | `src/__tests__/conformance/onizleme-yalitimi.test.ts` (INV-ONIZLEME-1) | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
