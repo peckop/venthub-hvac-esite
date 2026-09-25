@@ -7,6 +7,11 @@
 > **Ritüel (3 adım):** (1) Tüm pencereleri aç. (2) Bu dosyayı aç. (3) Her pencereye aşağıdaki
 > İLGİLİ komutu yapıştır — OPS-AUDIT penceresine KOMUT-A, diğer HERKESE KOMUT-B (aynı metin).
 >
+> **Karar 117 (2026-09-25):** tekrarlanan tur (loop / cron / uyandırma) **Recep'in işidir**:
+> komutu Recep yapıştırır, yapıştırmak onayıdır. Ajan kendiliğinden tur kurmaz; gerekli gördüğü
+> tur varsa önce Recep'e sorar ve gerekliliği ölçümle gösterir. Recep'in sözü: *"ihtiyaca göre
+> önce konu bana gelir, gerekiyorsa da gerçekten ölçüm ile karar verilir."*
+>
 > Oturum→rol eşlemesi panodadır (`node scripts/board/board.cjs who`); şerit adları akışkandır,
 > komut metni şerit adı İÇERMEZ — şerit, atanan işle gelir.
 
@@ -43,11 +48,12 @@ kur, yoksa zincir sessizce ölür. İşim varken sık (5-10dk), boşken seyrek (
 
 ---
 
-## Her iki komuttan SONRA: YEDEK CRON (zorunlu adım)
+## YEDEK CRON — yalnız Recep isterse (karar 117)
 
 Dinamik zincir (`ScheduleWakeup`) **tek noktadan** kopabiliyor: Recep araya girdiğinde tur
-biter ve zincir yeniden kurulmazsa oturum sessizce uyur. Bu yüzden komutu yapıştırdıktan
-sonra her oturum **ikinci bir kanal** kurar:
+biter ve zincir yeniden kurulmazsa oturum sessizce uyur. Bu kopma bir pencerede **ölçülürse**
+ajan bunu Recep'e söyler ve ikinci kanal önerir; **Recep evet derse** kurulur. Kendiliğinden,
+her oturumda zorunlu adım olarak KURULMAZ (eski hâli buydu; karar 53 ve 117 ile çelişiyordu):
 
 ```
 CronCreate ile 30 dakikalık recurring iş: prompt = o pencerenin KOMUT-A/KOMUT-B metni
@@ -61,9 +67,9 @@ CronCreate ile 30 dakikalık recurring iş: prompt = o pencerenin KOMUT-A/KOMUT-
   siler. Yani sabah pencere yenilendiğinde bu adım da yeniden yapılır.
 - Kurduktan sonra **iş kimliğini panoya bildir** — "kurdum" demek yetmez, kanıt iş kimliğidir.
 
-> Bu adımı **insan hatırlatmaz**: `board-brief` kancası, şerit talep etmemiş taze bir oturuma
-> `LOOP:` satırıyla bunu kendisi söyler (T085-VH, bekçi `INV-BOARD-5`). Şerit alınınca satır
-> kendiliğinden susar — sessizlik kuralı korunur.
+> `board-brief` kancası şerit talep etmemiş taze bir oturuma `LOOP:` satırıyla **kurmayı değil
+> sormayı** hatırlatır: "tur gerekiyorsa kurmadan önce Recep ile konuş; gereklilik ölçümle
+> gösterilir (karar 117)" (bekçi `INV-BOARD-5`). Şerit alınınca satır kendiliğinden susar.
 
 ## Notlar
 
