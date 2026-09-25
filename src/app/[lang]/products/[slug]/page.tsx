@@ -1,5 +1,5 @@
 import { ADRES_SEMASI_K3B } from '@/config/features'
-import { urunSegmentiniCoz } from '@/lib/data/urunSegmenti'
+import { eskiTrUrunAdresiniYonlendir, urunSegmentiniCoz } from '@/lib/data/urunSegmenti'
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 import { modelAdresiCoz } from '@/utils/adresUret'
@@ -42,13 +42,12 @@ export async function generateStaticParams() {
   try {
     // Yalnız AİLE slug'ları prerender edilir — varyant slug'ı statik yol üretmez.
     const families = await getAllFamilySlugs(supabase)
+    // K3-b açıkken TR adresi yalnız 308 verir → önceden üretilmez (içerik `/tr/urun/...`'da).
+    const diller = ADRES_SEMASI_K3B ? ['en'] : ['tr', 'en']
 
     return families
       .filter((f) => !!f.slug)
-      .flatMap((f) => [
-        { lang: 'tr', slug: f.slug },
-        { lang: 'en', slug: f.slug },
-      ])
+      .flatMap((f) => diller.map((lang) => ({ lang, slug: f.slug })))
   } catch (e) {
     console.warn('generateStaticParams error for product families:', e)
     return []
@@ -59,12 +58,16 @@ export async function generateStaticParams() {
  * K3-b EN model adresi (`/en/products/<slug>-p-<sku>`) — EN'de önek değişmediği için bu rotadan
  * geçer (plan §2). YALNIZ bayrak açıkken ve yalnız EN'de çözülür; bayrak kapalıyken bu dosyanın
  * davranışı BİREBİR bugünkü (segment aile/varyant slug'ı olarak `AileSayfasi`'na gider).
- * TR'de bayrak açıkken eski `/tr/products/*` → `/tr/urun/*` 308'i Faz 3b-2'de (plan madde 5).
+ * TR'de bayrak açıkken eski `/tr/products/*` → `/tr/urun/*` TEK 308 (Faz 3b-2, plan madde 5, v4 Y4):
+ * `/tr/products/<x>` hiçbir durumda 200 dönmez — karar `eskiTrUrunAdresiniYonlendir`'de.
  */
 const enModelRotasi = (lang: string) => ADRES_SEMASI_K3B && lang === 'en'
+const eskiTrUrunRotasi = (lang: string) => ADRES_SEMASI_K3B && lang === 'tr'
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string, slug: string }> }) {
   const { lang, slug } = await params
+  // Eski TR adresi çizilmez (308) → üst veri yazılmaz.
+  if (eskiTrUrunRotasi(lang)) return {}
   if (enModelRotasi(lang) && modelAdresiCoz(slug)) {
     const { aileSlug } = await urunSegmentiniCoz(slug, 'en')
     return aileSayfasiUstVerisi(lang, aileSlug)
@@ -74,6 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 export default async function Page({ params }: { params: Promise<{ lang: string, slug: string }> }) {
   const { lang, slug } = await params
+  if (eskiTrUrunRotasi(lang)) return eskiTrUrunAdresiniYonlendir(slug)
   if (enModelRotasi(lang) && modelAdresiCoz(slug)) {
     const { aileSlug, sunucuSku } = await urunSegmentiniCoz(slug, 'en')
     return <AileSayfasi lang={lang} slug={aileSlug} sunucuSku={sunucuSku} />

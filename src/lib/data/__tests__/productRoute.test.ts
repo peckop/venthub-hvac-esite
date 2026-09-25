@@ -154,6 +154,8 @@ describe('INV-SERIES-LANDING-1: seri landing 200, ürünsüz aile gerçek 404', 
     expect(result.kind).toBe('redirect')
     if (result.kind !== 'redirect') throw new Error('redirect beklenirken ' + result.kind)
     expect(result.to).toBe('/en/products/lineo-100-quiet?sku=A%2FB%20100')
+    // K3-b (REC-300 Faz 3b-2): hedefin kimliği de taşınır — yeni adres `to` ayrıştırılmadan kurulur.
+    expect(result.hedef).toEqual({ aileSlug: 'lineo-100-quiet', sku: 'A/B 100' })
   })
 
   it('VERİYE ULAŞILAMADI 404 DEĞİLDİR — geçici arıza kalıcı yokluk beyanına dönüşmez', async () => {
@@ -191,7 +193,11 @@ describe('INV-TAKMA-AD-OKUMA-1: eski ürün/aile slug’ı → bugünkü aile ad
 
     const result = await resolveProductRoute('vorticent-cms-atex-35-14-t4-4kw-253490106xn', 'tr', d)
 
-    expect(result).toEqual({ kind: 'redirect', to: '/tr/products/vorticent-cms-atex?sku=VRT-253490106XN' })
+    expect(result).toEqual({
+      kind: 'redirect',
+      to: '/tr/products/vorticent-cms-atex?sku=VRT-253490106XN',
+      hedef: { aileSlug: 'vorticent-cms-atex', sku: 'VRT-253490106XN' },
+    })
     expect(takmaAd).toHaveBeenCalledWith('urun', 'tr', 'vorticent-cms-atex-35-14-t4-4kw-253490106xn')
   })
 
@@ -203,7 +209,7 @@ describe('INV-TAKMA-AD-OKUMA-1: eski ürün/aile slug’ı → bugünkü aile ad
 
     const result = await resolveProductRoute('eski-aile', 'en', d)
 
-    expect(result).toEqual({ kind: 'redirect', to: '/en/products/yeni-aile' })
+    expect(result).toEqual({ kind: 'redirect', to: '/en/products/yeni-aile', hedef: { aileSlug: 'yeni-aile', sku: null } })
   })
 
   it('canlı aile/varyant slug’ı takma ada HİÇ bakmaz (sıra bekçisi)', async () => {

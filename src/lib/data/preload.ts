@@ -121,6 +121,32 @@ export const getCachedCategorySlugSourceById = cache(async (categoryId: string) 
   return data ?? null
 })
 
+/** Kategori çözücüsünün üst kategoriden okuduğu alanlar (REC-300 Faz 3b-2). */
+export interface KategoriUst {
+  id: string
+  slug: string
+  metadata: unknown
+  is_active: boolean | null
+  parent_id: string | null
+}
+
+/**
+ * REC-300 Faz 3b-2 — kategori kimliği → üst bilgisi (kanonik iki seviyeli adres + pasif kategorinin
+ * aktif üste yönlendirilmesi için). Hata FIRLATILIR: yutulsaydı geçici arıza "üst yok" sayılır ve dal
+ * adresi yanlış (tek seviyeli) kanoniğe yönlenirdi.
+ */
+export const getCachedKategoriUstById = cache(async (categoryId: string): Promise<KategoriUst | null> => {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id, slug, metadata, is_active, parent_id')
+    .eq('id', categoryId)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+  return data ?? null
+})
+
 /**
  * Kategori slug'ı bulunamadığında eski adres tablosuna bakar; hedef varsa dile uygun bugünkü
  * slug'ı, yoksa ya da hedef gelen slug'ın kendisiyse `null` döner (döngü yok). Hata FIRLATILIR —
