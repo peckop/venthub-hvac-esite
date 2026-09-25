@@ -73,9 +73,15 @@
   KIRMIZI. Aile içi paylaşım meşrudur. Bilinen istisna: ısı geri kazanım fotoğrafının 3 dosyası
   × 9 ürün (6 sulu batarya dahil) — Recep kararı 09-08 *"aynen kalsınlar … yeni foto lazım"*;
   grup yeni ürüne yayılırsa KIRMIZI. Sınav `scripts/media/__tests__/gorsel-mukerrer.test.ts`.
-- **INV-IMG-2 (davranışsal, AÇIK):** `product_images`'a satır ekleyen akışın üç yüzeyde
-  (keşif RPC + get_family_detail + admin sorgusu) göründüğünü doğrulamak DB ister; CI'da DB yok →
-  canlı sonda (`BEGIN; … ROLLBACK`) olarak ALTYAPI CLI'sına önerildi.
+- **INV-IMG-2 (davranışsal, gölgede)** (`scripts/media/gorsel-uc-yuzey-sinavi.mjs`, saf parça
+  `gorsel-uc-yuzey.mjs`): `product_images`'a eklenen satır üç yüzeyde görünür — keşif listesi kapağı
+  (`get_product_families_enriched`, anon), aile sayfası varyant görselleri `sort_order` sırasıyla
+  (`get_family_detail`, anon), yönetim paneli sorgusu (authenticated). Negatif kollar: taslak ürünün görseli
+  vitrinde yok, panelde var; başka kiracının satırı hiçbir yüzeyde yok. CI'da DB olmadığı için **yerel gölgede**
+  koşar (`golge-kur.mjs --ad img2_golge`), tek işlem + ROLLBACK. `--kanit` temiz koşumu ve dört sabotajı
+  (aile sayfası, kapak, kiracı koşulu, panel yetkisi) birlikte koşar; 2026-09-24: temiz YEŞİL, 4/4 sabotaj KIRMIZI.
+  Çıkış 2 = ölçemedi (gölge yok / kurulum tutmadı), geçti sayılmaz. Hakemin sınavı
+  `scripts/media/__tests__/gorsel-uc-yuzey.test.ts`. Şema değişikliği bu üç yüzeye dokunuyorsa PR'da koşulur.
 - **Kaynak dizini görsel kolu** (ingestor `scripts/kaynak_dizini/gorsel_cikar.py`): PDF
   görselleri bir kez, sha256'lı ve konumlu çıkarılır (`kaynak-dizini/gorseller.jsonl`); doğru
   ürün fotoğrafı PDF açmadan dizinden aranır (K15). Görsel dizini ürüne bağlamaz — bağlama §8'e tabidir.
