@@ -45,8 +45,9 @@ const path = require('path')
 
 // Uyarılar stderr + çıkış 0 ile modele ULAŞMIYORDU (2026-09-25 denetimi); kopyası
 // additionalContext olarak da gider. Yardımcı yüklenemezse kanca eskisi gibi çalışır.
+let modeleIlet = { oturum() {} }
 try {
-  require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PreToolUse')
+  modeleIlet = require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PreToolUse')
 } catch {
   /* yardımcı yok: uyarı yalnız stderr'de kalır */
 }
@@ -152,6 +153,7 @@ function main() {
   } catch {
     process.exit(0)
   }
+  modeleIlet.oturum(girdi.session_id) // aynı uyarı bu oturumda modele bir kez gider
   const ti = girdi.tool_input || {}
   const filePath = ti.file_path || ''
   if (!indeksMi(filePath)) process.exit(0)
