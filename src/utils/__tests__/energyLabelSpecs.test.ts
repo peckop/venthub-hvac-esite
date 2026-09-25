@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { en } from '../../i18n/dictionaries/en'
@@ -281,5 +284,15 @@ describe('REC-392 · föy KOD değerleri sözlükten çevrilir (TR müşteri "BV
     expect(en).toEqual(['Bidirectional (BVU)', 'Variable Speed Drive (VSD)', 'Heat Recovery'])
     // `t` yoksa değer ham kalır (etiket de zaten ayrışır; kabul edilen sınır).
     expect(buildSpecRows(specs, {}).map(([, v]) => v)).toEqual(['BVU', 'VSD', 'recovery'])
+  })
+
+  it('vitrin yüzeyleri değeri specValueLabel ile basar (formatSpecValue\'ya doğrudan dönülmez)', () => {
+    // Bileşenler burada render edilmez; bağlantı KAYNAKTA ölçülür. Biri çağrıyı eski hâline
+    // döndürürse çeviri yalnız föy PDF'inde kalır ve vitrin yine "BVU" basar.
+    for (const dosya of ['src/app/_components/ProductDetailPageView.tsx', 'src/components/products/VariantSelector.tsx']) {
+      const kaynak = readFileSync(join(process.cwd(), dosya), 'utf8')
+      expect(kaynak, `${dosya}: specValueLabel çağrısı yok`).toMatch(/specValueLabel\(/)
+      expect(kaynak, `${dosya}: değer hâlâ formatSpecValue ile basılıyor`).not.toMatch(/formatSpecValue\(/)
+    }
   })
 })
