@@ -1,0 +1,476 @@
+{
+  "surum": 1,
+  "uretildi": "2026-09-24T00:00:00.000Z",
+  "kiracilar": {
+    "d3b07384-d113-495f-a558-8c38634e0000": {
+      "urunSayisi": 10,
+      "aileler": [
+        "nicotra-gebhardt-dd",
+        "storm-serisi",
+        "vortice-lineo-quiet",
+        "vortice-vort-commercial-in-line-rectangular",
+        "vortice-vorticent-cms-atex"
+      ],
+      "modeller": {
+        "NIC-11921": {
+          "aile": 0,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61102000": {
+          "aile": 1,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "SEA-61143003": {
+          "aile": 1,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-17160": {
+          "aile": 2,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-253490106XN": {
+          "aile": 4,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-4020-ES-RECT": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-5035-ES-RECT": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-6040-ES-RECT": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-7050-ES-RECT": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        },
+        "VRT-CA-IL-8060-ES-RECT": {
+          "aile": 3,
+          "slug": {
+            "tr": null,
+            "en": null
+          }
+        }
+      },
+      "eskiSkular": {
+        "SEA-ESKI-61143003": "SEA-61143003"
+      },
+      "urunSluglari": {
+        "dd-12-12-1500w-3f-4p-2v-61090p-11921": "NIC-11921",
+        "dd-12-12-1500w-3f-4p-2v-6n090p-11921": "NIC-11921",
+        "storm-10-61102000": "SEA-61102000",
+        "storm-14-atex-61143003": "SEA-61143003",
+        "vortice-ca-il-4020-es-rect": "VRT-CA-IL-4020-ES-RECT",
+        "vortice-ca-il-4020-es-rect-16076": "VRT-CA-IL-4020-ES-RECT",
+        "vortice-ca-il-5035-es-rect": "VRT-CA-IL-5035-ES-RECT",
+        "vortice-ca-il-5035-es-rect-16077": "VRT-CA-IL-5035-ES-RECT",
+        "vortice-ca-il-6040-es-rect": "VRT-CA-IL-6040-ES-RECT",
+        "vortice-ca-il-6040-es-rect-16078": "VRT-CA-IL-6040-ES-RECT",
+        "vortice-ca-il-7050-es-rect": "VRT-CA-IL-7050-ES-RECT",
+        "vortice-ca-il-7050-es-rect-16079": "VRT-CA-IL-7050-ES-RECT",
+        "vortice-ca-il-8060-es-rect": "VRT-CA-IL-8060-ES-RECT",
+        "vortice-ca-il-8060-es-rect-16080": "VRT-CA-IL-8060-ES-RECT",
+        "vortice-lineo-100-quiet-17160": "VRT-17160",
+        "vorticent-cms-atex-35-14-t4-3kw-253490106xn": "VRT-253490106XN",
+        "vorticent-cms-atex-35-14-t4-4kw-253490106xn": "VRT-253490106XN"
+      },
+      "aileSluglari": {
+        "nicotra-gebhardt-dd": 0,
+        "seat-storm": 1,
+        "storm-serisi": 1,
+        "vortice-lineo-100-quiet": 2,
+        "vortice-lineo-125-quiet": 2,
+        "vortice-lineo-150-quiet": 2,
+        "vortice-lineo-200-quiet": 2,
+        "vortice-lineo-250-quiet": 2,
+        "vortice-lineo-315-quiet": 2,
+        "vortice-lineo-quiet": 2,
+        "vortice-vort-commercial-in-line-rectangular": 3,
+        "vortice-vorticent-cms-atex": 4
+      },
+      "kategoriler": [
+        {
+          "tr": "aksesuarlar",
+          "en": "accessories",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "asit-dayanikli-fanlar",
+          "en": "acid-resistant-fans",
+          "ust": 8,
+          "aktif": true
+        },
+        {
+          "tr": "hava-perdeleri",
+          "en": "air-curtains",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "iklimlendirme-ve-hava-sartlandirma",
+          "en": "air-treatment",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "ticari-havalandirma",
+          "en": "commercial-ventilation",
+          "ust": null,
+          "aktif": false
+        },
+        {
+          "tr": "kontrol-sistemleri",
+          "en": "control-systems",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "nem-alma-cihazlari",
+          "en": "dehumidifiers",
+          "ust": 3,
+          "aktif": true
+        },
+        {
+          "tr": "kanal-tipi-fanlar",
+          "en": "duct-fans",
+          "ust": 8,
+          "aktif": true
+        },
+        {
+          "tr": "fanlar",
+          "en": "fans",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "isi-geri-kazanim",
+          "en": "heat-recovery-vmc",
+          "ust": null,
+          "aktif": true
+        },
+        {
+          "tr": "otopark-jet-fanlari",
+          "en": "jet-fans",
+          "ust": 8,
+          "aktif": false
+        },
+        {
+          "tr": "dikdortgen-kanal-fanlari",
+          "en": "rectangular-duct-fans",
+          "ust": 4,
+          "aktif": false
+        },
+        {
+          "tr": "konut-tipi-havalandirma",
+          "en": "residential-ventilation",
+          "ust": null,
+          "aktif": false
+        },
+        {
+          "tr": "tekil-oda-uniteleri",
+          "en": "single-room-hrv",
+          "ust": 9,
+          "aktif": true
+        },
+        {
+          "tr": "duman-egzoz-fanlari",
+          "en": "smoke-exhaust-fans",
+          "ust": 8,
+          "aktif": true
+        },
+        {
+          "tr": "hiz-anahtarlari",
+          "en": "speed-controllers",
+          "ust": 5,
+          "aktif": true
+        }
+      ],
+      "kategoriSluglari": {
+        "accessories": {
+          "hedef": {
+            "kategori": 0
+          },
+          "bicim": "en"
+        },
+        "acid-resistant-fans": {
+          "hedef": {
+            "kategori": 1
+          },
+          "bicim": "en"
+        },
+        "air-curtains": {
+          "hedef": {
+            "kategori": 2
+          },
+          "bicim": "en"
+        },
+        "air-purifiers": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "en"
+        },
+        "air-treatment": {
+          "hedef": {
+            "kategori": 3
+          },
+          "bicim": "en"
+        },
+        "aksesuarlar": {
+          "hedef": {
+            "kategori": 0
+          },
+          "bicim": "tr"
+        },
+        "asit-dayanikli-fanlar": {
+          "hedef": {
+            "kategori": 1
+          },
+          "bicim": "tr"
+        },
+        "commercial-ventilation": {
+          "hedef": {
+            "kategori": 4
+          },
+          "bicim": "en"
+        },
+        "control-systems": {
+          "hedef": {
+            "kategori": 5
+          },
+          "bicim": "en"
+        },
+        "dehumidifiers": {
+          "hedef": {
+            "kategori": 6
+          },
+          "bicim": "en"
+        },
+        "dikdortgen-kanal-fanlari": {
+          "hedef": {
+            "kategori": 11
+          },
+          "bicim": "tr"
+        },
+        "duct-fans": {
+          "hedef": {
+            "kategori": 7
+          },
+          "bicim": "en"
+        },
+        "duman-egzoz-fanlari": {
+          "hedef": {
+            "kategori": 14
+          },
+          "bicim": "tr"
+        },
+        "endustriyel-havalandirma": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "tr"
+        },
+        "fanlar": {
+          "hedef": {
+            "kategori": 8
+          },
+          "bicim": "tr"
+        },
+        "fans": {
+          "hedef": {
+            "kategori": 8
+          },
+          "bicim": "en"
+        },
+        "flexible-air-ducts": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "en"
+        },
+        "flexible-hava-kanallari": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "tr"
+        },
+        "hava-perdeleri": {
+          "hedef": {
+            "kategori": 2
+          },
+          "bicim": "tr"
+        },
+        "hava-temizleyiciler-anti-viral-urunler": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "tr"
+        },
+        "heat-recovery-units": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "en"
+        },
+        "heat-recovery-vmc": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "en"
+        },
+        "hiz-anahtarlari": {
+          "hedef": {
+            "kategori": 15
+          },
+          "bicim": "tr"
+        },
+        "hiz-kontrolu-cihazlari": {
+          "hedef": {
+            "kategori": 15
+          },
+          "bicim": "tr"
+        },
+        "iklimlendirme-ve-hava-sartlandirma": {
+          "hedef": {
+            "kategori": 3
+          },
+          "bicim": "tr"
+        },
+        "industrial-ventilation": {
+          "hedef": {
+            "urunler": true
+          },
+          "bicim": "en"
+        },
+        "isi-geri-kazanim": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "tr"
+        },
+        "isi-geri-kazanim-cihazlari": {
+          "hedef": {
+            "kategori": 9
+          },
+          "bicim": "tr"
+        },
+        "jet-fans": {
+          "hedef": {
+            "kategori": 10
+          },
+          "bicim": "en"
+        },
+        "kanal-fanlari": {
+          "hedef": {
+            "kategori": 7
+          },
+          "bicim": "tr"
+        },
+        "kanal-tipi-fanlar": {
+          "hedef": {
+            "kategori": 7
+          },
+          "bicim": "tr"
+        },
+        "kontrol-sistemleri": {
+          "hedef": {
+            "kategori": 5
+          },
+          "bicim": "tr"
+        },
+        "konut-tipi-havalandirma": {
+          "hedef": {
+            "kategori": 12
+          },
+          "bicim": "tr"
+        },
+        "nem-alma-cihazlari": {
+          "hedef": {
+            "kategori": 6
+          },
+          "bicim": "tr"
+        },
+        "otopark-jet-fanlari": {
+          "hedef": {
+            "kategori": 10
+          },
+          "bicim": "tr"
+        },
+        "rectangular-duct-fans": {
+          "hedef": {
+            "kategori": 11
+          },
+          "bicim": "en"
+        },
+        "residential-ventilation": {
+          "hedef": {
+            "kategori": 12
+          },
+          "bicim": "en"
+        },
+        "single-room-hrv": {
+          "hedef": {
+            "kategori": 13
+          },
+          "bicim": "en"
+        },
+        "smoke-exhaust-fans": {
+          "hedef": {
+            "kategori": 14
+          },
+          "bicim": "en"
+        },
+        "speed-controllers": {
+          "hedef": {
+            "kategori": 15
+          },
+          "bicim": "en"
+        },
+        "tekil-oda-uniteleri": {
+          "hedef": {
+            "kategori": 13
+          },
+          "bicim": "tr"
+        },
+        "ticari-havalandirma": {
+          "hedef": {
+            "kategori": 4
+          },
+          "bicim": "tr"
+        }
+      }
+    }
+  }
+}
