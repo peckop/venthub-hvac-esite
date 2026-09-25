@@ -617,6 +617,34 @@ Aynı projede farklı taraflara farklı fiyat uyarısı için satıcı-tarafı p
   §15/R6 bunu ölçer.
 - Bildirim **best-effort** kalır: e-posta hatası statüyü geri almaz (iade deseniyle aynı). R6
   bildirimin **çağrıldığını** ölçer, teslim edildiğini değil.
+
+### 12.1 Yayım anında ne olur — SUNUCUDA (REC-384, 2026-09-25) · durum: MIGRATION PR'DA
+
+Karar 104 canlı koşumu (2026-09-24) üç kusur ölçtü: yayım bildirimi tarayıcıdan, yayım döndükten
+**sonra** ateşleniyordu ve oturum kapanınca iz bırakmadan kayboldu; `sent_at` ve `quote_no` yazılmadı.
+Hesapsız muhatap bu yoldan hiç e-posta almıyordu. Kural artık:
+
+| Ne | Nerede | Kural |
+|---|---|---|
+| Sunucu fiyat kapısı | BEFORE tetiği `trg_stamp_quote_published` | Kalem ≥1, hiçbir kalem fiyatsız değil, hepsi belge para biriminde, iskontolu kalem yok (toplam iskontoyu hesaba katmıyor) → değilse yayım DÜŞER. İstemcideki `derivePublishHeader` yalnız kullanıcıya erken uyarıdır. |
+| `total_amount` | aynı tetik | `round(Σ qty × unit_price, 2)` snapshot, **KDV hariç** (vergi alanı dolana kadar). |
+| `sent_at` | aynı tetik | **Yayım anı** (§4: quoted = fiyatlandı VE iletildi). E-postanın gerçekten gittiği an ayrı damgadadır: `published_email_sent_at` (Edge yazar, `request_email_sent_at` simetriği). |
+| `quote_no` | aynı tetik | document-numbering §2.1. |
+| Müşteri bildirimi | AFTER tetiği → `_quote_published_enqueue` → pg_net → `quote-notification-webhook` (`event: quote_published`) | Yayımla AYNI transaction'da kuyruklanır; yayım düşerse istek de düşer. Alıcı belgedeki `contact_email` (hesaplı ve hesapsız aynı yol). **Vault bayrağı** `quote_published_webhook_enabled` = `on` değilse atlanır: webhook yayım dalını tanıyana kadar kapalı kalır (bayrağı ALTYAPI, Edge canlıda ölçüldükten sonra Recep'in cümlesiyle açar; kapatma cümlesi de aynı yoldan). |
+| Kayıp e-posta | `admin_resend_quote_published` | Yalnız yönetici, yalnız `quoted` ve e-postası gitmemiş belge, satır kilidi, 15 dk tavan, denetim satırı; bayrak kapalıyken HATA (sessiz geçmez). |
+| Kalem kilidi | `trg_quote_items_durum_kilidi` | Belge `requested`/`draft` dışındaysa kalem eklenemez, değişmez, silinmez — gönderilen fiyat ile portalda görünen fiyat ayrışmaz. |
+
+**E-posta içeriği (cetvel sapması, PDF gelene kadar):** Design e-posta notu "e-posta sayı ve numara
+taşır, kalemler ekteki belgede" diyor; ama PDF bugün **yok** (REC-388) ve hesapsız muhatabın portalı da
+yok (§8). Bu yüzden yayım e-postası kalem listesini (ad, adet, birim fiyat, satır tutarı) kaçışlı basar;
+toplam "KDV hariç" ibaresiyle; numara `#`'siz tam biçimde (document-numbering §3); hesaplıya portal
+bağlantısı, hesapsıza "kabul için bu e-postayı yanıtlayın / arayın" (§7.1), yanıt adresi kiracının destek
+adresi. PDF inince e-posta Design kalıbına döner. Uygulama: ALTYAPI (webhook yayım dalı).
+
+**Kalan aşamalar:** (1) bu migration (SATIS) · (2) webhook yayım dalı (ALTYAPI; Edge = Recep) · (3) Edge
+canlıda ölçülür, bayrak açılır, arada yayımlanıp e-postası gitmeyenler `admin_resend` ile süpürülür ·
+(4) istemcideki `notification-service` çağrısı kaldırılır (bayraktan hemen sonra, ayrı PR) · (5) canlı
+doğrulama: 89024b5f yeniden gönderim + yeni hesapsız deneme teklifi (Recep'in cümlesiyle).
 ## 13) Otonom / Config / Kullanıcı haritası
 
 T134 sentez tablosunun bu modüle düşen hâli. Kural: **sektörde tam-otonom kritik karar yok;
