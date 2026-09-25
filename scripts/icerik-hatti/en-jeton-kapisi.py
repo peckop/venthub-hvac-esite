@@ -65,8 +65,10 @@ KODLAR = [
     (re.compile(r"\bT([1-6])\b"), lambda m: f"T{m.group(1)}"),
 ]
 FAZ = [
-    (re.compile(r"\b(?:trifaze|üç\s?fazlı|3\s?fazlı|three[\s-]?phase|3[\s-]?phase)\b", re.I), "FAZ3"),
-    (re.compile(r"\b(?:monofaze|tek\s?fazlı|single[\s-]?phase|1[\s-]?phase)\b", re.I), "FAZ1"),
+    # "tek faz / üç faz" (-lı eksiz) de faz iddiasıdır (karar 115: iki kategori metni böyle yazılı,
+    # kapı onu görmüyor ve sadık EN çeviriyi "yeni iddia" diye KIRMIZI veriyordu). "fazla" eşleşmez: \b.
+    (re.compile(r"\b(?:trifaze|üç\s?faz(?:lı)?|3\s?faz(?:lı)?|three[\s-]?phase|3[\s-]?phase)\b", re.I), "FAZ3"),
+    (re.compile(r"\b(?:monofaze|tek\s?faz(?:lı)?|single[\s-]?phase|1[\s-]?phase)\b", re.I), "FAZ1"),
 ]
 TR_HARF = re.compile(r"[çğıöşüÇĞİÖŞÜ]")
 
