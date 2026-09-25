@@ -144,6 +144,32 @@ describe('REC-280 · hafıza indeksi bekçisi UYARI olarak kalıyor ve AYIRT ED�
     expect(sessiz.stdout.trim(), 'uyarı yokken modele boş bağlam gönderildi').toBe('')
   })
 
+  /**
+   * OTURUM BAŞINA BİR KEZ (2026-09-25 yan etkisi): aynı uyarı her çağrıda modele gitseydi
+   * "her turda tekrar eden metin" olurdu. Aynı oturumda ikinci kez stdout boş, stderr yine dolu;
+   * farklı oturumda yeniden gider.
+   */
+  it('⭐aynı uyarı aynı oturumda modele BİR KEZ gider; stderr her seferinde yazılır', () => {
+    const { idx, transcript, ham } = fiksturKur()
+    const onbellek = fs.mkdtempSync(path.join(os.tmpdir(), 'modele-ilet-'))
+    const icerik = ham.split('\n').filter((s) => !s.includes('Numara 13')).join('\n')
+    const kostur = (sid: string) =>
+      spawnSync(process.execPath, [path.join(KOK, KANCA)], {
+        input: JSON.stringify({ session_id: sid, transcript_path: transcript, tool_name: 'Write', tool_input: { file_path: idx, content: icerik } }),
+        encoding: 'utf8',
+        env: { ...process.env, VENTHUB_MODELE_ILET_DIR: onbellek },
+      })
+    const A = 'aaaaaaaa-1111-4111-8111-111111111111'
+    const B = 'bbbbbbbb-2222-4222-8222-222222222222'
+
+    const ilk = kostur(A)
+    expect(ilk.stdout, 'ilk çağrıda uyarı modele gitmedi').toMatch(/KAYIP YAZIM SUPHESI/)
+    const ikinci = kostur(A)
+    expect(ikinci.stdout.trim(), 'aynı uyarı aynı oturumda ikinci kez modele gitti — her turda tekrar').toBe('')
+    expect(ikinci.stderr, 'stderr kopyası da kesildi — oturum kaydı kör kalır').toMatch(/KAYIP YAZIM SUPHESI/)
+    expect(kostur(B).stdout, 'başka oturum uyarıyı hiç görmedi').toMatch(/KAYIP YAZIM SUPHESI/)
+  })
+
   it('NORMALİZE: yalnız boşluk farkı kayıp sayılmaz (yalancı uyarı yasağı — OPS şartı)', () => {
     const { idx, transcript, ham } = fiksturKur()
     const bosluklu = ham

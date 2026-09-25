@@ -1,0 +1,30 @@
+{
+  "kimlik": "AB-2014/30",
+  "eksen": "D",
+  "kaynaklar": [
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0030",
+      "son_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0030",
+      "http": 202,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "ERİŞİLMEDİ: EUR-Lex tüm yollarda (homepage dahil) AWS WAF JS-challenge döndürüyor (HTTP 202, x-amzn-waf-action: challenge, boş gövde) — robots.txt boş/izinli olmasına rağmen otomatik istemciye teknik engel var.",
+      "alinti": "",
+      "alinti_dogrulandi": false
+    },
+    {
+      "url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/electromagnetic-compatibility-emc-directive_en",
+      "son_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/electromagnetic-compatibility-emc-directive_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "yururlukte (repeal tarihi verilmiş, kendisi hâlâ geçerli)",
+      "alinti": "The (EMC) Directive 2014/30/EU was published in the Official Journal of the European Union L 96/79, 29 March 2014, and repealed Directive 2004/108/EC as from 20 April 2016. This directive is aligned to the new legislative framework policy and will keep the same scope as Directive 2004/108/EC.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

@@ -72,6 +72,18 @@ ON CONFLICT (gun) DO UPDATE SET son_no = c.son_no + 1
 
 **Eski üretici SİLİNMEZ:** adıyla saklanır (`…_saat_tabanli_YYYYMMDD`) ki geri dönüş tek adım olsun.
 
+### 2.1 Teklif numarası (`TK`) — REC-384, 2026-09-25
+
+Biçim ve kemerler §2 ile aynı; üç madde teklife özgüdür:
+
+| Madde | Kural | Gerekçe |
+|---|---|---|
+| **Atama anı** | Numara **yayımda** (`draft → quoted`) basılır, talepte (`requested`) DEĞİL. | (1) Cetvel numarayı "müşteriye verilen belge"ye bağlar; talep bir gelen kutusu kaydıdır, belge değildir (quote-standard §4). (2) Talep aşamasında atama, oturumlu kullanıcının doğrudan INSERT izniyle günlük sayacı tüketip 9999'da o günün TÜM taleplerini düşürürdü — `generate_order_number`'ın kapatılan açığıyla aynı sınıf. (3) Satıcı taslakları ve revizyonlar `requested`'tan geçmez; her belgenin geçtiği tek kapı `draft → quoted`'dır. Talep e-postası numarasız kalır, referansı §3 yedek yolu (kimliğin son 8 hanesi) verir. |
+| **Sayaç anahtarı** | `(tenant_id, gun)` — ayrı tablo `quote_number_counters`. ⚠**§2 örneğinden sapma** (`order_number_counters` yalnız `gun`). | Teklif numarasının benzersizliği zaten kiracı içindedir (`uq_venthub_quotes_tenant_quote_no`). Global sayaçta bir kiracı numara boşluklarından diğerinin günlük hacmini okur (kural 12) ve kiracı başına boşluksuzluk bozulur. Sipariş sayacının aynı sapması ayrı kayıtta: REC-386. |
+| **Revizyon** | Numara yalnız **kök** belgeye (`amended_from IS NULL`) ve bir kez basılır; revizyon satırında `quote_no` NULL kalır, gösterim kök numara + "Rev N". | `(tenant_id, quote_no)` benzersiz olduğu için revizyon aynı numarayı taşıyamaz; her revizyona yeni numara vermek zincir kimliğini yok ederdi. |
+
+Üretim bir **tetik** içindedir (`trg_stamp_quote_published`, DEFINER): çağrılabilir ayrı bir üretici fonksiyon yoktur, yani sayacı tüketecek bir RPC yüzeyi de yoktur. Tetik `draft → quoted`'a giden her yolda (RPC, service_role, gelecekteki revizyon RPC'si) aynı numarayı üretir. Bekçi: INV-QUOTE-YAYIM-1.
+
 ---
 
 ## 3. GÖSTERİM kuralı (İHLAL ETME)

@@ -1,0 +1,18 @@
+{
+  "kimlik": "TR-YON-LVD-2006/95",
+  "eksen": "D",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "kaldirildi (2016-10-02 itibarıyla)",
+      "alinti": "GEÇİCİ MADDE 1 – (1) Bakanlık, 30/12/2006 tarihli ve 26392 sayılı Resmî Gazete'de yayımlanan Belirli Gerilim Sınırları Dahilinde Kullanılmak Üzere Tasarlanmış Elektrikli Teçhizat ile İlgili Yönetmelik (2006/95/AT)'e uygun olan ve bu Yönetmeliğin yürürlük tarihinden önce piyasaya arz edilen elektrikli ekipmanların piyasada bulundurulmasını engellemez.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

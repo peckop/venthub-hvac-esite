@@ -4,8 +4,11 @@ import { NextResponse } from 'next/server'
 
 import { createRedirectResponse,resolveUserClaims } from '@/utils/router'
 
+import { ADRES_SEMASI_K3B } from './config/features'
+import { eskiAdresEsle } from './lib/adres/eslestirici'
+import { ESKI_ADRES_HARITASI } from './lib/adres/haritaKaynagi'
 import { resolveTenant } from './lib/tenantResolver'
-import { tercihEdilenDil } from './utils/dilTespiti'
+import { type DesteklenenDil, tercihEdilenDil } from './utils/dilTespiti'
 import { Routes } from './utils/routes'
 
 export const config = {
@@ -19,7 +22,7 @@ const ADMIN_ROLES = new Set(['super_admin', 'admin', 'moderator', 'warehouse', '
 const LOCALES = ['tr', 'en'] as const
 const DEFAULT_LOCALE = 'tr' as const
 
-function detectLocale(request: NextRequest): string {
+function detectLocale(request: NextRequest): DesteklenenDil {
   const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
   if (cookieLocale === 'tr' || cookieLocale === 'en') return cookieLocale
   
@@ -55,6 +58,29 @@ export async function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl
+
+  // ── REC-300 Faz 3: ESKİ ADRES HARİTASI (yalnız `ADRES_SEMASI_K3B` açıkken) ──
+  // Dil önekinden ÖNCE: dilsiz eski adres (`/category/fanlar`) dil tespiti + hedef tek adımda → tek
+  // hop (bugün 4). Harita derleme anında üretilmiş JSON; burada DB sorgusu YOK (kural 12, REC-289).
+  // Kiracı yalnız kendi haritasını okur. Kurallar ve niçin: src/lib/adres/eslestirici.ts.
+  if (ADRES_SEMASI_K3B) {
+    const eslesme = eskiAdresEsle(ESKI_ADRES_HARITASI?.kiracilar[tenantId], {
+      yol: pathname,
+      sku: request.nextUrl.searchParams.get('sku'),
+      dilTespit: () => detectLocale(request),
+    })
+    if (eslesme) {
+      const url = request.nextUrl.clone()
+      url.pathname = eslesme.hedef
+      url.search = ''
+      const yanit = redirectResponse(url, eslesme.durum)
+      // Tarayıcı 308'i kalıcı önbelleğe almasın (plan §5 m.9, v4 D4): bayat harita düzeltilince
+      // ziyaretçi eski hedefe kilitli kalmasın.
+      yanit.headers.set('Cache-Control', 'max-age=0, must-revalidate')
+      return yanit
+    }
+  }
+
   const segments = pathname.split('/').filter(Boolean)
   const firstSegment = segments[0]
 

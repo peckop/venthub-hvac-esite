@@ -1,0 +1,30 @@
+{
+  "kimlik": "TR-YON-FGAZ-2024",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://iklim.gov.tr/db/turkce/icerikler/files/FlorluSeraGazlar%C4%B1na%C4%B0li%C5%9FkinY%C3%B6netmelik_RG_32693_15.10.2024.pdf",
+      "son_url": "https://iklim.gov.tr/db/turkce/icerikler/files/FlorluSeraGazlar%C4%B1na%C4%B0li%C5%9FkinY%C3%B6netmelik_RG_32693_15.10.2024.pdf",
+      "http": 200,
+      "robots": "dosya-yok",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "iklim.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Çevre, Şehircilik ve İklim Değişikliği Bakanlığı'nın kendi sitesinden (iklim.gov.tr) PDF doğrudan curl ile indirildi, pdftotext ile metne çevrildi, grep ile doğrulandı. iklim.gov.tr robots.txt boş/kısıtlama yok.",
+      "alinti": "MADDE 4- (1) Bu Yönetmelik 16/4/2014 tarihli (AB) 517/2014 sayılı ve 7/2/2024 tarihli (AB) 2024/573 sayılı Florlu Sera Gazlarına İlişkin Avrupa Parlamentosu ve Konsey Tüzükleri dikkate alınarak Avrupa Birliği mevzuatına uyum çerçevesinde hazırlanmıştır.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://iklim.gov.tr/db/turkce/icerikler/files/FlorluSeraGazlar%C4%B1na%C4%B0li%C5%9FkinY%C3%B6netmelik_RG_32693_15.10.2024.pdf",
+      "son_url": "",
+      "http": 200,
+      "robots": "dosya-yok",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "iklim.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Aynı PDF, aynı yöntemle doğrulandı.",
+      "alinti": "MADDE 24- (1) 29/6/2022 tarihli ve 31881 sayılı Resmî Gazete'de yayımlanan Florlu Sera Gazlarına İlişkin Yönetmelik yürürlükten kaldırılmıştır. ... MADDE 25- (1) Bu Yönetmeliğin; a) 9 uncu maddesinin ikinci fıkrası ile 10 uncu maddesinin dördüncü fıkrası 1/1/2025 tarihinde, b) Diğer hükümleri yayımı tarihinde, yürürlüğe girer.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "kimlik": "TR-YON-ERP-2009/125",
+  "eksen": "E",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Bu, yönetmeliğin kendisi değil SGM-2021/18 tebliğinin dayanak maddesinden dolaylı teyit; yönetmeliğin kendi RG metni bu eksende ayrıca çekilmedi.",
+      "alinti": "23/6/2010 tarihli ve 2010/643 sayılı Bakanlar Kurulu Kararı ile yürürlüğe konulan Enerji ile İlgili Ürünlerin Çevreye Duyarlı Tasarımına İlişkin Yönetmeliğe dayanılarak hazırlanmıştır.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

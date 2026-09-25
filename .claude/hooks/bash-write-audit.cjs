@@ -32,8 +32,9 @@ const { execFileSync } = require('child_process')
 // Çıkış 0 yollarındaki uyarılar (ORTAK AGAC UYARISI, taban notları) stderr'de kalıyor ve modele
 // ULAŞMIYORDU (2026-09-25 denetimi); kopyası additionalContext olarak da gider. Çıkış 2
 // (alarm) yolunda stderr zaten modele gider, yardımcı o yola dokunmaz.
+let modeleIlet = { oturum() {} }
 try {
-  require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PostToolUse')
+  modeleIlet = require(path.join(__dirname, 'modele-ilet.cjs')).stderrModeleIlet('PostToolUse')
 } catch {
   /* yardımcı yok: uyarı yalnız stderr'de kalır */
 }
@@ -65,6 +66,7 @@ try {
 }
 
 const sid = girdi.session_id || ''
+modeleIlet.oturum(sid) // aynı uyarı bu oturumda modele bir kez gider
 if (!sid || girdi.tool_name !== 'Bash') process.exit(0)
 
 const cwdKok = path.resolve(girdi.cwd || process.cwd()).replace(/\\/g, '/')
@@ -271,6 +273,24 @@ function agaclariCoz() {
     kimlikSayisi,
     sebep: kimlikSayisi ? '' : 'bu sid hicbir agacin venthub-sid dosyasinda kayitli degil',
   }
+}
+
+/**
+ * ~/.claude ALTINDAKİ DEPOLAR DENETİM DIŞI (2026-09-25, Ops ölçtü): hafıza dizini kendi git
+ * deposu (`~/.claude/projects/<proje>/memory`). Komut oradan koşunca o deponun kökü "ORTAK ana
+ * ağaç" sayılıyor ve her yazımda "⛔ORTAK AGAC UYARISI … tazelemede SİLİNİR" basılıyordu. O depoda
+ * şerit, worktree ya da ana ağaç tazelemesi yok; commit oturum sonunda kancayla yapılıyor. Yani
+ * uyarı yanlış ve #1400'den beri her Bash'te modele gidiyordu. Yol kullanıcı adı taşımasın diye
+ * `os.homedir()`'den türetilir (depo PUBLIC). Test depoları geçici dizinde → etkilenmez.
+ */
+{
+  const ustKok = (gitOku(cwdKok, '--show-toplevel') || '').replace(/\\/g, '/').toLowerCase()
+  // VENTHUB_CLAUDE_KOK yalnız test içindir: gerçek ~/.claude'a dokunmadan kolu sınamak için.
+  const claudeKok = (process.env.VENTHUB_CLAUDE_KOK || path.join(require('os').homedir(), '.claude'))
+    .replace(/\\/g, '/')
+    .replace(/\/+$/, '')
+    .toLowerCase()
+  if (ustKok && (ustKok === claudeKok || ustKok.startsWith(claudeKok + '/'))) process.exit(0)
 }
 
 const { kaynaklar, kimlikSayisi, sebep } = agaclariCoz()

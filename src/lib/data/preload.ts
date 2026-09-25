@@ -89,6 +89,25 @@ export const getCachedVariantById = cache(async (productId: string) => {
   return data ?? null
 })
 
+/**
+ * REC-300 Faz 3b — model adresi (`/tr/urun/<slug>-p-<sku>`) → SKU'nun ürünü + ailesi.
+ * SKU DB'de büyük harf (`^[A-Z0-9-]+$`); çağıran `modelAdresiCoz` ile büyük harfe çevirir.
+ * Silinmiş ürün model sayfası açmaz. Hata FIRLATILIR (rota `unavailable`a çevirir; yutulsaydı
+ * geçici bir arıza "model yok" → 404 olurdu — getCachedVariantById ile aynı gerekçe).
+ */
+export const getCachedModelBySku = cache(async (sku: string) => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('sku, family_id')
+    .eq('sku', sku)
+    .is('deleted_at', null)
+    .limit(1)
+    .maybeSingle()
+
+  if (error) throw error
+  return data ?? null
+})
+
 /** Takma adın gösterdiği kategori → dile göre slug üretmek için yalnız `slug` + `metadata`. Hata FIRLATILIR. */
 export const getCachedCategorySlugSourceById = cache(async (categoryId: string) => {
   const { data, error } = await supabase

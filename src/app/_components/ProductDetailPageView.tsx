@@ -46,6 +46,7 @@ import { getProductById } from '../../lib/services/product.service'
 import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { FamilyListItem,Product } from '../../types/ui-models'
+import { adresUret } from '../../utils/adresUret'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { dildekiMetin } from '../../utils/dilMetni'
 import { musteriyeGorunurAciklama } from '../../utils/icIngestNotu'
@@ -86,6 +87,13 @@ export interface ProductDetailPageProps {
    * ve KDV etiketi HİÇ çizilmez; yanlış etiket, eksik etiketten kötüdür.
    */
   priceTaxIncluded?: boolean | null
+  /**
+   * REC-300 Faz 3b (INV-MODEL-SSR-1) — model rotasının (`/tr/urun/<slug>-p-<sku>`) SUNUCUDA
+   * seçtiği SKU. Verilirse `?sku=` köprüsü hiç kurulmaz: seçili model ilk HTML'de çizilir
+   * (JS koşturmayan tarayıcı ve paylaşım önizlemesi de o modeli görür) ve model değişimi o
+   * modelin KENDİ adresine gider. Aile rotası vermez → bugünkü `?sku=` davranışı aynen.
+   */
+  sunucuSku?: string | null
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -125,6 +133,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   variants,
   selectedSku: skuParam,
   priceTaxIncluded = null,
+  sunucuSku = null,
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
@@ -287,12 +296,22 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   // Varyant seçimi yalnız ?sku='yı günceller — sayfa yeniden yüklenmez, kaydırma korunur.
   const handleSelectVariant = useCallback((sku: string) => {
+    // Model rotası: her modelin kendi kanonik adresi var → o adrese GİDİLİR (push: geri tuşu
+    // önceki modele döner). Slug metni Faz 2'de `slug_i18n`'den gelecek; o güne kadar aile slug'ı
+    // metin olarak kullanılır — rota modeli SKU'dan çözdüğü için adres yine doğru sayfayı açar.
+    if (sunucuSku && family) {
+      router.push(
+        adresUret({ tur: 'model', aileSlug: family.slug, sku, slug: family.slug }, lang === 'en' ? 'en' : 'tr'),
+        { scroll: false },
+      )
+      return
+    }
     // Tıklama yalnız istemcide olur — mevcut query'yi konumdan okumak useSearchParams
     // bağımlılığını (ve tüm gövdenin Suspense'e düşmesini) gereksiz kılar.
     const next = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search)
     next.set('sku', sku)
     router.replace(`${pathname}?${next.toString()}` as Route, { scroll: false })
-  }, [pathname, router])
+  }, [pathname, router, sunucuSku, family, lang])
 
   // Galeri: seçili varyantın görselleri → yoksa ailedeki ilk görselli varyant.
   const galleryImages = useMemo(() => {
@@ -1078,8 +1097,12 @@ const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
  * tam gövdedir: statik ön-render'da HTML gerçek ürün içeriğiyle çıkar (SEO/LCP),
  * istemci hidrasyonunda ?sku= seçimi devralır.
  */
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) => (
-  <Suspense fallback={<ProductDetailBody {...props} selectedSku={null} />}>
-    <PdpSkuBridge {...props} />
-  </Suspense>
-)
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) =>
+  // Model rotası seçimi sunucuda yaptı: köprü ve Suspense GEREKMEZ (useSearchParams yok).
+  props.sunucuSku ? (
+    <ProductDetailBody {...props} selectedSku={props.sunucuSku} />
+  ) : (
+    <Suspense fallback={<ProductDetailBody {...props} selectedSku={null} />}>
+      <PdpSkuBridge {...props} />
+    </Suspense>
+  )

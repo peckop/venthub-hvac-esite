@@ -1,0 +1,30 @@
+{
+  "kimlik": "AB-2024/573",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://climate.ec.europa.eu/areas-action/fluorinated-greenhouse-gases/f-gas-legislation_en",
+      "son_url": "https://climate.ec.europa.eu/areas-action/fluorinated-greenhouse-gases/f-gas-legislation_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "climate.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Resmi AB Komisyonu (DG CLIMA) sayfası, doğrudan curl ile okundu ve grep ile doğrulandı.",
+      "alinti": "the F-gas Regulation (EU) 2024/573 was adopted on 7 February 2024 and started to apply on 11 March 2024.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/573/oj/eng",
+      "son_url": "",
+      "http": 202,
+      "robots": "dosya-yok",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "ERİŞİLMEDİ: AWS WAF JS-challenge, aynı domain engeli (bkz. diğer EUR-Lex kayıtları).",
+      "alinti": "",
+      "alinti_dogrulandi": false
+    }
+  ]
+}
