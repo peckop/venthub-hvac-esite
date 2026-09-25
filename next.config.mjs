@@ -1,5 +1,16 @@
+import { readFileSync } from 'node:fs';
+
 import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from "@sentry/nextjs";
+
+import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
+
+/**
+ * `EN_YAYIN` bayrağının TEK kaynağı `src/config/features.ts`. Bu dosya TypeScript içe aktaramadığı
+ * için değer metinden okunur; okunamazsa `enYayinOku` ATAR (sessizce "kapalı" varsaymaz).
+ * Test aynı okuyucunun `features.ts`'teki gerçek değeri verdiğini ölçer (INV-BILGI-MERKEZI-YONLENDIRME-1).
+ */
+const EN_YAYIN = enYayinOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -161,6 +172,12 @@ const nextConfig = {
                 destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT',
                 permanent: true,
             },
+
+            // ── KARAR 92 (Recep, 2026-09-24) — Bilgi Merkezi kendi adresine taşındı.
+            // `/destek/merkez` + `/destek/konular/*` → `/tr/bilgi-merkezi` · `/en/knowledge-hub`
+            // (EN yalnız `EN_YAYIN` açıkken; kapalıyken EN kategori/destek karşılığı). Liste ve
+            // gerekçe tek dosyada: src/config/bilgiMerkeziYonlendirmeleri.mjs. Hepsi tek hop.
+            ...bilgiMerkeziYonlendirmeleri(EN_YAYIN),
         ];
     },
     async headers() {

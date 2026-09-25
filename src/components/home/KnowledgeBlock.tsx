@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { bilgiMerkeziListeHref } from '../../utils/bilgiMerkezi'
+import { bilgiMerkeziRotalari } from '../../utils/bilgiMerkeziRotalari'
 import { localizedHref, Routes } from '../../utils/routes'
 import { getWhatsAppNumber } from '../../utils/whatsapp'
 import { ClientLeadButton } from './ClientLeadButton'
@@ -12,9 +14,11 @@ interface KnowledgeItem {
 }
 
 const knowledgeItems: KnowledgeItem[] = [
-  { 
-    id: 'guides', 
-    href: Routes.destek.home(),
+  {
+    id: 'guides',
+    // Karar 92: Bilgi Merkezi bölüm adı DİLE göre değişir ve EN kapalıyken yoktur — adres
+    // render anında `bilgiMerkeziListeHref(lang)`'ten gelir; o dilde yoksa kart basılmaz.
+    href: bilgiMerkeziRotalari.liste('tr'),
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -117,7 +121,11 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
         <div 
           className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
-          {knowledgeItems.map((item, index) => {
+          {knowledgeItems.flatMap((item) => {
+            if (item.id !== 'guides') return [{ item, href: localizedHref(item.href, lang) }]
+            const href = bilgiMerkeziListeHref(lang)
+            return href ? [{ item, href }] : []
+          }).map(({ item, href }, index) => {
             const delayClass = ['delay-0', 'delay-100', 'delay-200'][index % 3];
             return (
               <div 
@@ -126,7 +134,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                 className={`opacity-0 translate-y-8 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass}`}
               >
                 <Link
-                  href={localizedHref(item.href, lang)}
+                  href={href}
                   className="group relative block h-full overflow-hidden rounded-hvac-2xl border border-white/10 bg-white/2 p-10 backdrop-blur-md transition-colors duration-500 hover:border-cyan-500/40 hover:bg-white/5"
                 >
                   <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">
