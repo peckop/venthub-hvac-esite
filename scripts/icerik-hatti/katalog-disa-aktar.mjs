@@ -50,6 +50,9 @@ const TABLOLAR = [
   { ad: 'product_families', sirala: 'id' },
   { ad: 'price_lists',      sirala: 'id' },
   { ad: 'products',         sirala: 'id' },
+  // REC-383 (REC-140 Faz 3): liste/maliyet alanları products'tan düştü, admin-yalnız product_costs'ta.
+  // Pakette ayrı tablo olmazsa `select=*` maliyeti SESSİZCE bırakır ve round-trip yine "0 fark" der.
+  { ad: 'product_costs',    sirala: 'product_id' },
   { ad: 'product_prices',   sirala: 'id' },
   { ad: 'product_images',   sirala: 'id' },
 ]

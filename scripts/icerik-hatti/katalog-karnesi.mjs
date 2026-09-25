@@ -61,7 +61,14 @@ async function hepsi(t, sec) {
   return out
 }
 
-const urun = await hepsi('products', 'id,sku,name,brand,status,tenant_id,name_i18n,description_i18n,technical_specs,category_id,subcategory_id,family_id,model_code,purchase_price,purchase_currency')
+// REC-383 (REC-140 Faz 3): liste/maliyet alanları products'ta DEĞİL, admin-yalnız product_costs'ta.
+// Her ürünün maliyet satırı olmalı (products INSERT tetiği yaratır); eksik satır = sessiz "fiyat yok"
+// demek olurdu → karne ÜRETİLMEZ (fail-closed).
+const urunHam = await hepsi('products', 'id,sku,name,brand,status,tenant_id,name_i18n,description_i18n,technical_specs,category_id,subcategory_id,family_id,model_code')
+const maliyet = new Map((await hepsi('product_costs', 'id,product_id,purchase_price,purchase_currency')).map(m => [m.product_id, m]))
+const maliyetsiz = urunHam.filter(u => !maliyet.has(u.id))
+if (maliyetsiz.length) { console.error(`⛔ ${maliyetsiz.length} ürünün product_costs satırı YOK (ör. ${maliyetsiz.slice(0, 3).map(u => u.sku).join(', ')}) — KARNE ÜRETİLMEDİ (fail-closed)`); process.exit(1) }
+const urun = urunHam.map(u => ({ ...u, purchase_price: maliyet.get(u.id).purchase_price, purchase_currency: maliyet.get(u.id).purchase_currency }))
 const kategori = await hepsi('categories', 'id,name,metadata,description')
 const aile = await hepsi('product_families', 'id,name,slug,name_i18n,description')
 const fiyat = await hepsi('product_prices', 'id,product_id')

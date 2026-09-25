@@ -4,7 +4,8 @@
  * kaynağı nerede" sorusunu cevaplar. Yazma kararı REC-193 / Recep'tedir.
  *
  * Satır = `product_prices` satırı OLMAYAN canlı ürün. Sütunlar:
- *   liste_fiyati_db  — `products.purchase_price` dolu mu (AVenS LİSTE fiyatı; pricing-standard §2 A)
+ *   liste_fiyati_db  — `product_costs.purchase_price` dolu mu (AVenS LİSTE fiyatı; pricing-standard §2 A;
+ *                      REC-140 Faz 3'ten beri products'ta değil — çağıran birleştirip verir)
  *   listede          — fiyat listesinde bulundu mu (`fiyat-kaynak-esle.mjs`): bulundu · yok · cakisma
  *   kaynak_sayfa     — bulunduysa sayfa
  *   db_kaynak_ayni   — DB liste fiyatı kaynakla aynı mı (evet · hayır · —)
