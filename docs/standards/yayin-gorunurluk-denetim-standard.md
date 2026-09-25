@@ -21,11 +21,15 @@
 | Search Console tabanı | tık, gösterim, sıra; sayfa×gün | `scripts/rehber/gsc-taban.mjs` | çıktı depoya girmez (pazar-olcum P6) |
 | Adres denetimi | eski adres → aynı ya da **tek** 308 → 200; haritada yönlendirme 0; model sayısı; canonical kendini gösterir; hreflang tr/en/x-default | `scripts/seo/adres-yayin-denetim.mjs` | TAM liste, örneklem değil; yönlendirme izlenmez |
 | Bağlantı taraması | site haritasındaki sayfalardaki site içi bağlantı + ürün görseli: kırık, yönlendirme | `scripts/seo/link-tara.mjs` (linkinator 8.1.0) | `--sitemap-url` + CSV (8.1.0'da JSON raporu site haritası kipinde boş — ölçüldü) |
-| Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | `scripts/seo/sayfa-kalite.mjs` (unlighthouse 0.18.1) | örnekleme kapalı; ölçüt SEO; performans bilgi |
+| Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | **PageSpeed Insights API v5** (Google sunucusunda Lighthouse, mobil; anahtar `PAGESPEED_API_KEY`, karar 127) — `scripts/seo/sayfa-kalite.mjs` PSI kipi yazılana kadar depo dışı betikle | örnekleme kapalı; ölçüt SEO; performans bilgi (REC-398). Yerel unlighthouse 0.18.1 **yedek**: 2026-09-25'te makinede boş bellek ~1 GB iken üç koşuda "Unable to get browser page" ile düştü (59→24→3 sayfa) |
 | Bot kalitesi karnesi | 5 bot kimliği × adres: aynı HTML, title, canonical, hreflang, JSON-LD | `scripts/seo/bot-karnesi.mjs --taban` | ön izleme sitesinde de koşar |
 
 Araçlar **kurulmaz**: sürüm sabitli `npx` ile koşar, `package.json`'a dokunulmaz (kalıcı kurulum kararı
 ALTYAPI'da, `bagimlilik-kararlari.md`). Her betik `--taban` alır: canlı, yerel ön izleme ya da dal önizlemesi.
+
+**Ölçüm verisinin yeri:** çalışma kopyası depo dışında sabit klasör `C:/Users/alize/venthub-olcum/<an>-<tarih>/`
+(oturum geçici klasörü kalıcı yer değildir); kalıcı kopya ilgili Linear kaydına ek (REC-300 / REC-369). PUBLIC
+depoya yalnız özet sayı girer.
 
 ## Y2 — Ne zaman ne koşulur
 
@@ -61,10 +65,19 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 | robots, başlık (`X-Robots-Tag`), `next.config` yönlendirmesi, zamanlama/kapı | ALTYAPI |
 | ölçümün kendisi (betik hatası, yanlış kırmızı) | GEO-SEO |
 
+**Bilinçli istisna (2026-09-25, URUN):** yalnız TR'de yayında olan sayfa (EN karşılığı yok) hreflang basmaz —
+`rehber-yazisi-standard.md` R6 "hreflang yalnız iki dil de yayındaysa". Adres denetiminin `SAYFA/HREFLANG`
+kırmızısı bu sayfalarda ölçüm hatasıdır (GEO-SEO); betik bu istisnayı öğrenene kadar elle ayıklanır.
+**PSI geçici hatası:** `FAILED_DOCUMENT_REQUEST` ilk koşuda 86 sayfanın 6'sında çıktı, aynı sayfalar yeniden
+denemede ölçüldü (sayfa curl ile 200, <0,6 sn). Tek deneme hatası kusur sayılmaz; en az iki ayrı yeniden deneme.
+
 ## Ölçüm geçmişi
 
 | Tarih | Ölçüm | Sınıf | Sonuç |
 |---|---|---|---|
 | 2026-09-24 | Taban — adres denetimi (canlı, `--sayfa-denetimi --en-harita-disi-bilincli`) | A | Haritada 87 adres (yalnız TR; EN_YAYIN kapalı) · 87/87 doğrudan 200 · model adresi 0 (yayın öncesi beklenen) · canonical yanlış 0 · hreflang eksik 1 (`/tr/destek/merkez`: tr/en/x-default hiç yok → URUN) · EN bilinçli 86 |
 | 2026-09-24 | Taban — sayfa kalitesi (unlighthouse 0.18.1, telefon benzetimi) | A | **KISMİ: 59/87 sayfa** — tarama 35 dk sonra çıkış 0 verdi ama toplu raporu yazmadı; sayfa raporlarından okundu (sarmalayıcı artık bunu yapar ve EKSIK-TARAMA diye kırmızı verir). SEO 1,00 (59/59) · erişilebilirlik 0,957 · iyi uygulama 0,96 · performans 0,637 (bilgi). Yayın öncesi tam tarama yeniden koşulmalı |
+| 2026-09-25 | Taban — adres denetimi (canlı, aynı bayraklar) | A | Haritada 90 adres · 90/90 doğrudan 200 · canonical yanlış 0 · hreflang "eksik" 4 = TR-yalnız Bilgi Merkezi sayfaları, bilinçli istisna (Y4 notu). Aynı gün URUN 4 sayfayı yayından kaldırdı → harita 86 |
+| 2026-09-25 | Taban — bağlantı taraması (linkinator 8.1.0) | A | 90 sayfa, 780 tekil adres · **kırık 0 · yönlendirme 0** (09-24'ün 3 kırığı #1399'la kapandı). İlk koşuda 62 sayfada `main-app-*.js` 404 = tarama deploy anına denk geldi; ikinci koşu temiz |
+| 2026-09-25 | **Taban — sayfa kalitesi, TAM (PSI v5 mobil, Lighthouse 13.5.0)** | A | **86/86 sayfa** (ilk koşu 80 + 6 yeniden deneme). SEO **1,00 (86/86, en düşük 1,00)** · erişilebilirlik 0,954 (en düşük 0,94; n=85) · iyi uygulama 0,960 (n=85) · performans 0,732 (en düşük 0,52; bilgi — REC-398 hız teşhisi ayrı). Yayın sonrası kıyasın tabanı bu satırdır; ham veri depo dışı `venthub-olcum/taban-2026-09-25/psi/` |
 | 2026-09-24 | Taban — bağlantı taraması (linkinator 8.1.0) | A | 87 sayfa, 782 tekil adres · site içi yönlendirme 0 · kırık 3: `og-default.jpg` 404 (11 kategori sayfası), `hvac_heat_recovery_7.png` 404 (ana sayfa), `og-image.png` 500 (destek merkezi) → URUN |
