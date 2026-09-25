@@ -72,5 +72,8 @@ describe('INV-ONIZLEME-1 · yerel ön izleme yalıtımı', async () => {
     expect(k).toMatch(/\/\^\\\.env\//)
     expect(k).toMatch(/cwd: ONIZLEME_AGACI, env: surecOrtami/)
     expect(k, 'sunucu anahtarı hiçbir yerde okunmaz').not.toMatch(/envOku\([^)]*SERVICE_ROLE/)
+    // push edilmemiş yerel dal ön izlenebilmeli (R4.8) ve sahibinin ağacı değil commit'i ayrık alınmalı
+    expect(k).toMatch(/refs\/heads\/\$\{dal\}\^\{commit\}/)
+    expect(k).toMatch(/'--detach', commit/)
   })
 })

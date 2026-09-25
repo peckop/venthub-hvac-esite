@@ -8,7 +8,9 @@
  *   Recep yalnız o adresi tarayıcıda açar. Durdurmak: pencerede Ctrl+C.
  *
  * NE YAPAR:
- *   1. Dalı `C:/tmp/vh-onizleme` çalışma ağacına ayrık (detached) olarak alır; ağaç varsa yeniden kullanır.
+ *   1. Dalın commit'ini `C:/tmp/vh-onizleme` çalışma ağacına ayrık (detached) alır; ağaç varsa yeniden kullanır.
+ *      Kaynak önce YEREL daldır (push edilmemiş iş ön izlenebilir; yalnız commit'li değişiklikler görünür),
+ *      yerelde yoksa origin. Dalın sahibinin ağacına ve dalına dokunulmaz.
  *   2. `pnpm install --frozen-lockfile --offline` (karar 88: her ağaç kendi kurulumu; bağlantı YOK).
  *   3. `next build` + `next start -p <port>`.
  *
@@ -122,13 +124,22 @@ function ana(argv) {
   if (!env.NEXT_PUBLIC_SUPABASE_URL?.includes(`${CANLI_PROJE}.supabase.co`)) dur('NEXT_PUBLIC_SUPABASE_URL canlı proje değil')
   if (jwtRolu(env.NEXT_PUBLIC_SUPABASE_ANON_KEY) !== 'anon') dur('okuma anahtarının rolü anon DEĞİL — sunucu anahtarı ön izlemeye verilmez')
 
-  // Ağaç: yoksa kur, varsa aynı ağacı yeni dala çevir.
-  console.log(`[onizleme] dal: ${dal}`)
-  if (git(['fetch', 'origin', dal], depo).kod !== 0) dur(`origin/${dal} alınamadı`)
+  // Kaynak: ÖNCE yerel dal (push edilmemiş yazı ön izlenebilsin — R4.8), yoksa origin. Yerel dal başka bir
+  // ağaçta açık olabilir; o yüzden dal değil COMMIT ayrık (detached) alınır, sahibinin ağacına dokunulmaz.
+  const yerel = git(['rev-parse', '--verify', '--quiet', `refs/heads/${dal}^{commit}`], depo)
+  let commit
+  if (yerel.kod === 0 && yerel.cikti) {
+    commit = yerel.cikti
+    console.log(`[onizleme] kaynak: YEREL dal ${dal} @ ${commit.slice(0, 9)} (yalnız commit'li değişiklikler görünür)`)
+  } else {
+    if (git(['fetch', 'origin', dal], depo).kod !== 0) dur(`${dal} ne yerelde ne origin'de bulundu`)
+    commit = git(['rev-parse', `origin/${dal}`], depo).cikti
+    console.log(`[onizleme] kaynak: origin/${dal} @ ${commit.slice(0, 9)}`)
+  }
   if (fs.existsSync(ONIZLEME_AGACI)) {
     if (git(['status', '--porcelain'], ONIZLEME_AGACI).cikti) dur(`${ONIZLEME_AGACI} kirli — elle bak`)
-    if (git(['checkout', '--detach', `origin/${dal}`], ONIZLEME_AGACI).kod !== 0) dur('ağaç dala çevrilemedi')
-  } else if (git(['worktree', 'add', '--detach', ONIZLEME_AGACI, `origin/${dal}`], depo).kod !== 0) {
+    if (git(['checkout', '--detach', commit], ONIZLEME_AGACI).kod !== 0) dur('ağaç commit\'e çevrilemedi')
+  } else if (git(['worktree', 'add', '--detach', ONIZLEME_AGACI, commit], depo).kod !== 0) {
     dur('çalışma ağacı kurulamadı')
   }
   const envDosyalari = fs.readdirSync(ONIZLEME_AGACI).filter((f) => /^\.env/.test(f) && !/example/.test(f))
