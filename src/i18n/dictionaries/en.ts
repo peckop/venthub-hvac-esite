@@ -255,7 +255,7 @@ export const en: typeof tr = {
         summary: 'Provides fresh air with heat recovery; key criteria are airflow, efficiency/SFP and external static pressure.',
         steps: ['Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).', 'Efficiency/SFP: 70–85% efficiency, low SFP.', 'Pressure: external static matching filter/duct losses.'],
         pitfalls: ['Focusing on efficiency while ignoring external static'],
-        image: '/images/hvac_installation_close_up_premium_4.png'
+        image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg'
       },
       'air-curtain': {
         image: '/images/hvac_installation_close_up_premium_3.webp',
@@ -265,6 +265,42 @@ export const en: typeof tr = {
         title: 'Air Curtain Selection'
       }
     }
+  },
+  // KNOWLEDGE HUB (decision 92, 2026-09-24) — template texts only; article bodies live elsewhere.
+  bilgiMerkezi: {
+    ad: 'Knowledge Hub',
+    anaSayfa: 'Home',
+    liste: {
+      seoBaslik: 'Knowledge Hub — Ventilation Guides | VentHub',
+      seoAciklama: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',
+      baslik: 'Knowledge Hub',
+      altBaslik: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',
+      aramaEtiketi: 'Search articles',
+      aramaYerTutucu: 'Type a topic or term',
+      sonucYok: 'No article matches your search.',
+      oku: 'Read the article',
+      seciciBaslik: 'Product Selector',
+      seciciAciklama: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
+      seciciDugme: 'Open the Product Selector',
+    },
+    yazi: {
+      yazar: 'VentHub',
+      okumaSuresi: '{{count}} min read',
+      guncelleme: 'Updated',
+      icindekiler: 'Contents',
+      urunlerBaslik: 'Related product families',
+      urunDugme: 'View family',
+      ilgiliBaslik: 'Related articles',
+      teklifBaslik: 'Get a quote for your project',
+      teklifAciklama: 'Describe your needs in the contact form; we will prepare a quote for the right product.',
+      teklifDugme: 'Request a quote',
+      listeyeDon: 'Back to the Knowledge Hub',
+    },
+    konular: {
+      konfor: 'Comfort',
+      guvenlik: 'Safety',
+      verimlilik: 'Efficiency',
+    },
   },
   meta: {
     siteTitle: 'VentHub — Premium HVAC Solutions',

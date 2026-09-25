@@ -121,6 +121,29 @@ describe('REC-280 · hafıza indeksi bekçisi UYARI olarak kalıyor ve AYIRT ED�
     expect(silinmis.cikti, 'kaybolan satır GÖSTERİLMİYOR; okuyan neyin gittiğini bilemez').toMatch(/Numara 13/)
   })
 
+  /**
+   * MODELE ULAŞIR (2026-09-25 denetimi): Claude Code çıkış 0'da stderr'i modele göstermez.
+   * Uyarı stdout'ta additionalContext olarak da çıkmalı; sessiz durumda stdout boş kalmalı.
+   */
+  it('⭐uyarı modelin kanalına da gider (stdout JSON additionalContext), sessizken stdout boş', () => {
+    const { idx, transcript, ham } = fiksturKur()
+    const satirlar = ham.split('\n')
+    const girdi = (content: string) =>
+      JSON.stringify({ session_id: 'sahte', transcript_path: transcript, tool_name: 'Write', tool_input: { file_path: idx, content } })
+
+    const silinmis = spawnSync(process.execPath, [path.join(KOK, KANCA)], {
+      input: girdi(satirlar.filter((s) => !s.includes('Numara 13')).join('\n')),
+      encoding: 'utf8',
+    })
+    expect(silinmis.status).toBe(0)
+    const j = JSON.parse(silinmis.stdout) as { hookSpecificOutput?: { hookEventName?: string; additionalContext?: string } }
+    expect(j.hookSpecificOutput?.hookEventName).toBe('PreToolUse')
+    expect(j.hookSpecificOutput?.additionalContext, 'uyarı yalnız stderr de — model görmez').toMatch(/KAYIP YAZIM SUPHESI/)
+
+    const sessiz = spawnSync(process.execPath, [path.join(KOK, KANCA)], { input: girdi(ham), encoding: 'utf8' })
+    expect(sessiz.stdout.trim(), 'uyarı yokken modele boş bağlam gönderildi').toBe('')
+  })
+
   it('NORMALİZE: yalnız boşluk farkı kayıp sayılmaz (yalancı uyarı yasağı — OPS şartı)', () => {
     const { idx, transcript, ham } = fiksturKur()
     const bosluklu = ham
