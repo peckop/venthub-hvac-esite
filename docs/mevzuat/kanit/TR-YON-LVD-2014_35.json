@@ -1,0 +1,18 @@
+{
+  "kimlik": "TR-YON-LVD-2014/35",
+  "eksen": "D",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/10/20161002-1.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "yürürlükte; 30/12/2006 tarihli 26392 sayılı 'Belirli Gerilim Sınırları Dahilinde Kullanılmak Üzere Tasarlanmış Elektrikli Teçhizat ile İlgili Yönetmelik (2006/95/AT)' yürürlükten kaldırılmıştır.",
+      "alinti": "MADDE 2 – (1) Bu Yönetmelik, Ek-II'de listelenen ekipman ve durumlar dışında, alternatif akım için 50 V - 1000 V, doğru akım için 75 V - 1500 V arasındaki gerilimlerde kullanılmak üzere tasarlanan elektrikli ekipmanları kapsar.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

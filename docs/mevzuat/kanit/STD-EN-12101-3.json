@@ -1,0 +1,19 @@
+{
+  "kimlik": "STD-EN-12101-3",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://standards.cencenelec.eu/dyn/www/f?p=CENSEARCH:22",
+      "son_url": "",
+      "http": 500,
+      "robots": "dosya-yok",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "standards.cencenelec.eu",
+      "resmi": false,
+      "durum_satiri": "ERİŞİLMEDİ: CEN'in resmi katalog/arama portalı curl'de HTTP 500 döndürdü (muhtemelen JS/session gerektiren dinamik uygulama). cencenelec.eu kök robots.txt de 404 'Page not found' döndürdü (dosya-yok).",
+      "alinti": null,
+      "alinti_dogrulandi": false,
+      "not": "resmi olmayan kaynak: alinti depoya alinmadi (M3)"
+    }
+  ]
+}
