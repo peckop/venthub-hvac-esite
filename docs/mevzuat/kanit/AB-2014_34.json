@@ -1,0 +1,42 @@
+{
+  "kimlik": "AB-2014/34",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/equipment-potentially-explosive-atmospheres-atex_en",
+      "son_url": "https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/equipment-potentially-explosive-atmospheres-atex_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Avrupa Komisyonu (DG GROW) resmi ATEX sayfasında direktif hâlâ birincil kaynak olarak listeleniyor; yürürlükten kaldırıldığına dair ifade yok.",
+      "alinti": "The ATEX Directive 2014/34/EU covers equipment and protective systems intended for use in potentially explosive atmospheres. ... It is aligned with the new legislative framework policy, and it is applicable from 20 April 2016, replacing the previous Directive 94/9/EC.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://ec.europa.eu/docsroom/documents/13132/attachments/1/translations",
+      "son_url": "https://ec.europa.eu/docsroom/documents/13132/attachments/1/translations",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Avrupa Komisyonu'nun 94/9/EC->2014/34/EU geçiş rehberi (resmi SSS belgesi); yürürlük/geçiş kurallarını doğruluyor.",
+      "alinti": "EU declarations of conformity and certificates must be in accordance to the new Directive 2014/34/EU as of 20 April 2016 for ATEX products placed on the EU market or put into service for the first time as by that date.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0034",
+      "son_url": "",
+      "http": 202,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "robots.txt boş/kısıtlama yok ancak site AWS WAF JS-challenge sayfası döndürüyor (HTTP 202, 'window.awsWafCookieDomainList'); curl ile ham metne ulaşılamadı. Aynı engel /eli/dir/2014/34/oj, PDF endpoint, homepage.html ve LSU (legal status) sayfalarında da tekrarlandı.",
+      "alinti": "ERİŞİLEMEDİ",
+      "alinti_dogrulandi": false
+    }
+  ]
+}

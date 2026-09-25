@@ -32,6 +32,7 @@
 | Müşterinin gördüğü ürün metnine **ne girer, ne girmez** (iç editör notu, doğrulanmamış değer)? | `standards/vitrin-metni-standard.md` |
 | Rehber (bilgi) yazısının **konusu nasıl seçilir, kaynağı ne, nasıl doğrulanır**, yayından sonra ne ölçülür? | `standards/rehber-yazisi-standard.md` (TASLAK, karar 62) |
 | Aramada ve pazarda **nasıl göründüğümüz hangi kaynaktan ölçülür**, haftalık takip nasıl, hangi veri depoya girmez? | `standards/pazar-olcum-standard.md` (TASLAK, karar 93) |
+| Bir ürün ailesine **hangi tüzük, tebliğ ya da standart** dokunuyor, ne zaman yürürlüğe giriyor, Türkiye karşılığı ne? | `mevzuat/kayit.json` (veri) + `standards/mevzuat-kaydi-standard.md` (kurallar, TASLAK) |
 | Adres/şablon **yayınından önce, yayın günü ve sonra** arama görünürlüğü nasıl denetlenir (eski adres tek 308, kırık bağlantı, SEO puanı), kusur kimin? | `standards/yayin-gorunurluk-denetim-standard.md` (TASLAK, REC-300) |
 | Bir kategorinin **adı hangi kolondan** gelir (menüde, başlıkta, kırıntıda)? | `standards/kategori-adlandirma-standard.md` |
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır? | `standards/multi-session-coordination-standard.md` |

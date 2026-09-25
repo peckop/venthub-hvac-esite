@@ -1,0 +1,18 @@
+{
+  "kimlik": "TR-SGM-2021/23",
+  "eksen": "A",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/06/20210629-12.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/06/20210629-12.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "TEBLİĞ, Sanayi ve Teknoloji Bakanlığından — MADDE 7: Bu Tebliğ yayımı tarihinde yürürlüğe girer",
+      "alinti": "MADDE 2 – Aynı Tebliğin 13 üncü maddesinin birinci fıkrasında yer alan \"1/7/2021\" ibaresi \"15/8/2021\" olarak değiştirilmiştir.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

@@ -1,0 +1,2935 @@
+{
+  "surum": "0.1-tohum",
+  "uretildi": "2026-09-25",
+  "cetvel": "docs/standards/mevzuat-kaydi-standard.md",
+  "aile_kaynagi": "venthub-pdf-ingestor/paket/aileler.csv (2026-09-25T07:30Z)",
+  "kalemler": [
+    {
+      "kimlik": "AB-2019/1781",
+      "ad": "Commission Regulation (EU) 2019/1781 of 1 October 2019 laying down ecodesign requirements for electric motors and variable speed drives pursuant to Directive 2009/125/EC of the European Parliament and of the Council, amending Regulation (EC) No 641/2009 with regard to ecodesign requirements for glandless standalone circulators and glandless circulators integrated in products and repealing Commission Regulation (EC) No 640/2009",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "50/60 Hz sinüzoidal gerilimle çalışan, fırçasız/komütatörsüz/rotora elektrik bağlantısız, 2-4-6-8 kutuplu, 0,12-1000 kW anma gücünde, 50-1000 V anma gerilimli endüksiyon motorlarını; ve bu motorlarla (0,12-1000 kW aralığında) çalışacak 3 fazlı, 100-1000 V AC değişken hız sürücülerini (VSD) kapsar. Motora tamamen entegre olup bağımsız test edilemeyen ürünler (örn. fan/pompa/kompresör içine gömülü motor), patlayıcı ortam/nükleer/özel sıcaklık-yükseklik motorları, çok hızlı sarımlı motorlar ve araç çekiş motorları kapsam dışıdır. IE3 (≥0,75 kW üç fazlı motorlar) ve IE2 (<0,75 kW üç fazlı, tek fazlı, Ex eb motorlar) eşiği 1 Temmuz 2021'de; 75-200 kW 2/4/6 kutuplu üç fazlı motorlar için IE4 eşiği 1 Temmuz 2023'te başlar. VSD'ler için 1 Temmuz 2021'den itibaren IE2 güç kaybı sınırı uygulanır.",
+      "tarihler": {
+        "kabul": "2019-10-01",
+        "yayim": "2019-10-25 (OJ L 272, s. 74-94; belge no C/2019/2125)",
+        "yururluk": "OJ'de yayımını izleyen 20. gün (Md.12/1. fıkra)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2019-11-14",
+            "ne": "Md.7 1. fıkra (yenilenemez/etkisizleştirilemez tasarım) ve Md.11 (641/2009 değişikliği) yürürlüğe girer"
+          },
+          {
+            "tarih": "2021-07-01",
+            "ne": "Genel uygulama başlangıcı: üç fazlı motor 0,75-1000 kW → en az IE3; üç fazlı motor 0,12-<0,75 kW → en az IE2; VSD 0,12-1000 kW → en az IE2 güç kaybı seviyesi"
+          },
+          {
+            "tarih": "2023-07-01",
+            "ne": "Ex eb motorlar (0,12-1000 kW) ve tek fazlı motorlar (≥0,12 kW) → en az IE2; üç fazlı motor (fren/Ex hariç) 75-200 kW, 2/4/6 kutup → en az IE4"
+          },
+          {
+            "tarih": "2023-11-14",
+            "ne": "Komisyonun, Md.9 uyarınca teknolojik gelişme ışığında Tüzüğü gözden geçirip sonuçları (gerekirse revizyon taslağıyla) Danışma Forumu'na sunması için yasal son tarih"
+          },
+          {
+            "tarih": "2029-07-01",
+            "ne": "1 Temmuz 2022'den önce piyasaya arz edilmiş ürünlerdeki özdeş motorların yedek parça istisnasının bitiş tarihi"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-640/2009"
+      ],
+      "degistirenler": [
+        "AB-2021/341"
+      ],
+      "karsilik": [
+        "TR-SGM-2021/16"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2019_1781.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "3 fazlı giriş, elektronik frekans/gerilim dönüştürücü (VSD) — Tüzük Md.2(1)(b) kapsamına doğrudan girer"
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "3 fazlı giriş, elektronik frekans/gerilim dönüştürücü (VSD) — Tüzük Md.2(1)(b) kapsamına doğrudan girer"
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "3 fazlı giriş, elektronik frekans/gerilim dönüştürücü (VSD) — Tüzük Md.2(1)(b) kapsamına doğrudan girer"
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Katalogdaki fan ailelerinin büyük çoğunluğunda motor gövdeye entegre ve bağımsız test edilemez durumda görünüyor; bu durumda Md.2(2)(a) istisnası (fan içine gömülü, ayrılamayan motor) devreye girip ürünü kapsam dışı bırakabilir. Hangi aile/SKU'da motor GERÇEKTEN ayrılabilir/bağımsız satılan bir bileşen, hangisinde değil — bu, ürün teknik dosyası/kurulum kılavuzu düzeyinde ayrıca doğrulanmalı; burada resmi kaynaktan çıkarım yapılmamıştır.",
+        "avens-hiz-anahtarlari (Hız Anahtarları) ailesinin VSD tanımına (Md.3(2): sürekli frekans VE gerilim ayarı yapan elektronik güç dönüştürücü) girip girmediği ürün teknik özellikleriyle teyit edilmeli; basit kademeli/trafo tipi hız anahtarları VSD sayılmayabilir. BULUNAMADI — ayrı ürün-seviyesi inceleme gerekir."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "A"
+    },
+    {
+      "kimlik": "AB-2021/341",
+      "ad": "Commission Regulation (EU) 2021/341 of 23 February 2021 amending Regulations (EU) 2019/424, (EU) 2019/1781, (EU) 2019/2019, (EU) 2019/2020, (EU) 2019/2021, (EU) 2019/2022, (EU) 2019/2023 and (EU) 2019/2024 with regard to ecodesign requirements for servers and data storage products, electric motors and variable speed drives, refrigerating appliances, light sources and separate control gears, electronic displays, household dishwashers, household washing machines and household washer-dryers and refrigerating appliances with a direct sales function",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "Sekiz ayrı ecodesign tüzüğünü (aralarında 2019/1781 de var) tek seferde değiştiren şemsiye değişiklik tüzüğü; imalatçı/ithalatçı/yetkili temsilci beyanları ile doğrulama toleransları arasındaki karışıklığı önlemek için 'beyan edilen değer' tanımını ekler ve doğrulama prosedürlerini netleştirir. 2019/1781'e ilişkin değişiklikler (Md.2) 1 Temmuz 2021'den uygulanır — yani 2019/1781'in kendi ilk uygulama tarihiyle aynı gün.",
+      "tarihler": {
+        "kabul": "2021-02-23",
+        "yayim": "2021-02-26 (OJ L 68, s. 108-148; belge no C/2021/923)",
+        "yururluk": "Metinde ayrıca belirtilmemiş; maddeler kademeli tarihlerle uygulanır",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2021-05-01",
+            "ne": "Md.1(3), Md.3(4), Md.5(6), Md.6(3), Md.7(4), Md.8(3) uygulanmaya başlar (diğer ürün gruplarına ilişkin)"
+          },
+          {
+            "tarih": "2021-07-01",
+            "ne": "Md.2 (2019/1781 değişiklikleri) ve Md.4(4) uygulanmaya başlar"
+          },
+          {
+            "tarih": "2021-09-01",
+            "ne": "Md.4(1),(2),(5) uygulanmaya başlar (2019/2019 refrigerating appliances)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "TR-SGM-2021/16 (ilk yayımında doğrudan gömülü — ayrı bir TR transpozisyon tebliği BULUNAMADI)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2021_341.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "2019/1781'in VSD tanımı/doğrulama toleransı hükmünü değiştirdiği için VSD ailesini dolaylı etkiler"
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "2019/1781'in VSD tanımı/doğrulama toleransı hükmünü değiştirdiği için VSD ailesini dolaylı etkiler"
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "2019/1781'in VSD tanımı/doğrulama toleransı hükmünü değiştirdiği için VSD ailesini dolaylı etkiler"
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "A"
+    },
+    {
+      "kimlik": "TR-SGM-2021/16",
+      "ad": "Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (2019/1781/AB) (SGM: 2021/16)",
+      "tur": "teblig",
+      "yetki": "TR",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "Sanayi ve Teknoloji Bakanlığı tarafından, 2010/643 sayılı Bakanlar Kurulu Kararı ile yürürlüğe konulan 'Enerji ile İlgili Ürünlerin Çevreye Duyarlı Tasarımına İlişkin Yönetmelik'in uygulanması amacıyla çıkarılmıştır. Kendi metninde açıkça hem (AB) 2019/1781 hem de onu değiştiren (AB) 2021/341 esas alınarak hazırlandığı belirtilmiştir; yani AB'nin iki ayrı tüzüğünü tek TR tebliğinde birleştirmiştir. Kapsam/eşikler AB metniyle aynıdır (motor ve VSD tanımları, IE2/IE3/IE4 eşikleri, muafiyetler).",
+      "tarihler": {
+        "kabul": "BULUNAMADI (tebliğ imza/kabul tarihi ayrıca belirtilmemiş, yalnız Resmî Gazete yayım tarihi var)",
+        "yayim": "2021-04-28 (Resmî Gazete Sayı 31468)",
+        "yururluk": "Md.9(1) yayım tarihinde; diğer maddeler 1/7/2021 (sonradan SGM:2021/23 ile 15/8/2021'e ertelendi)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2021-04-28",
+            "ne": "Md.9 1. fıkra (test sonucunu manipüle eden tasarım yasağı) yürürlüğe girer, tebliğ yayımlanır"
+          },
+          {
+            "tarih": "2021-08-15",
+            "ne": "Diğer tüm maddeler yürürlüğe girer (SGM:2021/23 ile 1/7/2021'den ertelenmiş hali)"
+          },
+          {
+            "tarih": "2023-07-01",
+            "ne": "EK-I'deki ikinci aşama eşikleri (Ex eb/tek fazlı IE2, 75-200kW üç fazlı IE4) uygulanır — AB ile aynı tarih"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "TR-SGM-2012/2"
+      ],
+      "degistirenler": [
+        "TR-SGM-2021/23"
+      ],
+      "karsilik": [
+        "AB-2019/1781",
+        "AB-2021/341"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_16.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "TR tebliği AB'nin VSD kapsamını birebir aktarır — Türkiye pazarına arz edilen frekans konvertörleri bu tebliğe tabidir"
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "TR tebliği AB'nin VSD kapsamını birebir aktarır — Türkiye pazarına arz edilen frekans konvertörleri bu tebliğe tabidir"
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "TR tebliği AB'nin VSD kapsamını birebir aktarır — Türkiye pazarına arz edilen frekans konvertörleri bu tebliğe tabidir"
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Ham metinde '(AB) 2019/1781 sayılı Komisyon Tüzüğü' için '1/9/2019 tarihli' (1 Eylül 2019), '(AB) 2021/341' için '17/12/2020 tarihli' ibaresi geçiyor; bunlar AB'nin resmi kabul tarihleriyle (sırasıyla 1 Ekim 2019 ve 23 Şubat 2021) UYUŞMUYOR. Bu, Resmî Gazete metnindeki bir yazım/çeviri hatası olabilir ya da Komisyon içi karar tarihine (C-numarası) atıf olabilir — kaynak metinde başka açıklama yok, düzeltme yapılmadan olduğu gibi raporlanmıştır.",
+        "Tebliğin bizzat kabul/imza tarihi (Bakanlık tebliğ numarasının verildiği tarih) Resmî Gazete metninde ayrıca yazmıyor; yalnız yayım tarihi (28/4/2021) var."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "A"
+    },
+    {
+      "kimlik": "TR-SGM-2021/23",
+      "ad": "Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (2019/1781/AB) (SGM: 2021/16)'de Değişiklik Yapılmasına Dair Tebliğ (SGM: 2021/23)",
+      "tur": "teblig",
+      "yetki": "TR",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "SGM:2021/16'nın Madde 2(2)(j) bendini ve Madde 13 (Yürürlük) ile EK-I'in 1-4. maddelerindeki '1/7/2021' ibarelerinin tamamını '15/8/2021' olarak değiştiren, salt tarih erteleme amaçlı bir değişiklik tebliğidir. AB'nin (EU) 2021/341'iyle içerik olarak İLGİSİZDİR — o değişiklik zaten SGM:2021/16'nın ilk metnine gömülmüştü; bu tebliğ yalnız TR'ye özgü bir uygulama-tarihi ertelemesidir.",
+      "tarihler": {
+        "kabul": "BULUNAMADI",
+        "yayim": "2021-06-29 (Resmî Gazete Sayı 31526)",
+        "yururluk": "2021-06-29 (yayımı tarihinde — Md.7)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2021-06-29",
+            "ne": "Tebliğ yürürlüğe girer ve SGM:2021/16'daki tüm '1/7/2021' tarihlerini '15/8/2021' yapar"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_23.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "A"
+    },
+    {
+      "kimlik": "AB-327/2011",
+      "ad": "Commission Regulation (EU) No 327/2011 of 30 March 2011 implementing Directive 2009/125/EC of the European Parliament and of the Council with regard to ecodesign requirements for fans driven by motors with an electric input power between 125 W and 500 kW",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "125 W ile 500 kW arası elektrik giriş gücüne sahip motorla tahrik edilen fanlar (diğer ürünlere entegre olanlar dahil) için asgari verim (FMEG) şartlarını belirleyen ilk AB çevreye duyarlı tasarım tüzüğü. (EU) 2024/1834 tarafından yerini alınmış, genel hükümleri 24 Temmuz 2026'da yürürlükten kalkmış; ancak Ek I-III'ü entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar geçiş hükmü olarak uygulanmaya devam ediyor.",
+      "tarihler": {
+        "kabul": "2011-03-30",
+        "yayim": "2011-04-06 (OJ L 90, s.8-21)",
+        "yururluk": "2011-04-26 (yayım +20 gün, Madde 8)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2026-07-24",
+            "ne": "327/2011'in genel hükümleri (EU) 2024/1834 Md.9(1) uyarınca yürürlükten kalktı (EUR-Lex 'Date of end of validity: 23/07/2026; Partial end of validity')"
+          },
+          {
+            "tarih": "2027-07-24",
+            "ne": "Ek I, II, III'ün 'diğer ürünlere entegre edilen fanlar' için uygulanma süresi sona eriyor (2025/2481 ile değiştirilen Md.9(1))"
+          },
+          {
+            "tarih": "2037-07-24",
+            "ne": "Ek I, II, III'ün 'yedek parça fanlar' için uygulanma süresi sona eriyor / tam kaldırma (EUR-Lex 'Date of end of validity: 23/07/2037; Repealed by 32024R1834')"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [
+        "AB-2024/1834"
+      ],
+      "karsilik": [
+        "TR-SVGM-2019/15"
+      ],
+      "iliski_notlari": [
+        "EU-2013/666 (kısmi)",
+        "EU-2016/2282 (kısmi)"
+      ],
+      "durum": "kaldirildi",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-327_2011.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "robots.txt curl ile çekilemedi (eur-lex.europa.eu ana domain AWS WAF JS-challenge döndürüyor, x-amzn-waf-action: challenge, HTTP 202 boş gövde) — gerçek tarayıcı oturumu (Kernel) ile erişildi; robots.txt sonradan tarayıcıdan okundu: /legal-content/*/TXT/DOC/ ve /TXT/SIG/ (indirme formatları) disallow, kullanılan /legal-content/EN/ALL/ ve /EN/TXT/?uri= yolları disallow DEĞİL.",
+        "Alıntılar curl+grep yerine gerçek tarayıcı DOM metninde JS indexOf ile doğrulandı (WAF engeli nedeniyle curl kullanılamadı); metod sapması olarak not edildi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "B"
+    },
+    {
+      "kimlik": "AB-2024/1834",
+      "ad": "Commission Regulation (EU) 2024/1834 of 3 July 2024 implementing Directive 2009/125/EC of the European Parliament and of the Council with regard to ecodesign requirements for fans driven by motors with an electric input power between 125 W and 500 kW, repealing Commission Regulation (EU) No 327/2011",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "327/2011'in yerini alan yeni çevreye duyarlı tasarım tüzüğü; aynı güç aralığını (125 W-500 kW) kapsar ama istisna listesini genişletir (jet fan <750W, ≥8000 rpm fanlar, nükleer tesis, askeri sığınak/sivil savunma, biyotehlike/karsinojen gaz, malzeme taşıma, kablosuz/el tipi/mobil teçhizat, hava-sirkülasyon fanı gibi yeni kalemler eklenmiş) ve ürün bilgi şartlarını (Ek II) teknik dosya + kullanım kılavuzu + üretici/ithalatçı web sitesinde 20 yıl süreyle yayımlama zorunluluğuna bağlar. 2025/2481 ile bir kez değiştirilmiştir (madde 6 silindi, madde 9/10 ve bazı ekler değişti).",
+      "tarihler": {
+        "kabul": "2024-07-03",
+        "yayim": "2024-07-04 civarı (Md.10: yayımı +20 gün yürürlük)",
+        "yururluk": "2024-07-24",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2024-07-24",
+            "ne": "Tüzük yürürlüğe girdi; Md.9(2) (geçiş uygunluk karinesi) bu tarihten itibaren uygulanır"
+          },
+          {
+            "tarih": "2026-07-24",
+            "ne": "Tüzüğün geneli uygulanmaya başlar (Md.10); 327/2011 bu tarihte yürürlükten kalkar (Md.9.1) — değişmemiş, hem orijinal hem 2025/2481 ile güncellenmiş konsolide metinde aynı tarih"
+          },
+          {
+            "tarih": "2027-07-24",
+            "ne": "(2025/2481 ile değişen Md.9.1) Ek I-III'ün 'diğer ürünlere entegre fanlar' için uygulanma süresi burada sona erer (orijinal metinde tek tarih 2037'ydi, değişiklikle ikiye bölündü)"
+          },
+          {
+            "tarih": "2030-07-27",
+            "ne": "Komisyon'un teknolojik gelişme ışığında gözden geçirme raporu sunma son tarihi (Md.8)"
+          },
+          {
+            "tarih": "2037-07-24",
+            "ne": "Ek I-III'ün 'yedek parça fanlar' için uygulanma süresi sona erer"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-327/2011"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-SGM-2026/2"
+      ],
+      "iliski_notlari": [
+        "EU-2013/666 (Md.8, zımni kısmi ilga)",
+        "EU-2016/2282 (Md.10, zımni kısmi ilga)",
+        "EU-2025/2481 (2025-12-02 kabul, 2025-12-28 yürürlük; Md.6 silindi, Md.9(1) ve Md.10 değiştirildi, Ek I/II/III/IV değişti)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_1834.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "Kanal tipi (in-line) fan, 125W-500kW motorlu, hiçbir istisnaya girmiyor"
+        },
+        {
+          "slug": "avens-hucreli-hf-s",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal endüstriyel fan, standart FMEG kapsamında"
+        },
+        {
+          "slug": "avens-dikdortgen-kanal-radyal",
+          "etki": "kapsamda",
+          "neden": "Kanal tipi radyal fan, standart kapsam"
+        },
+        {
+          "slug": "avens-nimax",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Kanallı ısı geri kazanım ünitesi; Md.1(1) 'diğer ürünlere entegre edilen fanlar dahil' hükmü gereği içindeki fan bileşeni kapsamda"
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-axial",
+          "etki": "kapsamda",
+          "neden": "Aksiyel endüstriyel fan, standart kapsam"
+        },
+        {
+          "slug": "avens-hucreli-aspiratorler",
+          "etki": "kapsamda",
+          "neden": "Endüstriyel hücreli aspiratör (ev tipi davlumbaz değil), standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-qbk-sal-kc-evo",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "EC plug-fan, santrifüj tip, standart kapsam"
+        },
+        {
+          "slug": "avens-qe-b-kasa",
+          "etki": "kapsamda",
+          "neden": "Banyo/tuvalet egzoz fanı; ev tipi kurutma makinesi/davlumbaz istisnasına girmiyor, standart kapsam"
+        },
+        {
+          "slug": "vortice-vortice-bravo-s",
+          "etki": "kapsamda",
+          "neden": "Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Kanal tipi fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-radon-range-circular",
+          "etki": "kapsamda",
+          "neden": "Radon tahliye amaçlı kanal fanı; istisna listesinde radon fanı için özel muafiyet yok, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-quadro-evo",
+          "etki": "kapsamda",
+          "neden": "Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-punto-evo-flexo",
+          "etki": "kapsamda",
+          "neden": "Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "Kanal tipi fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "Kanal tipi fan, standart kapsam"
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "Plug-fan, santrifüj tip, standart kapsam"
+        },
+        {
+          "slug": "vortice-hava-perdesi",
+          "etki": "kapsamda",
+          "neden": "Hava perdesi; motor gücü 125W-500kW aralığındaysa fan bileşeni kapsamda (aralık dışı düşük güçlü modeller için Ek soru: açık_sorular)"
+        },
+        {
+          "slug": "vortice-h-ad-elektrikli",
+          "etki": "kapsamda",
+          "neden": "Elektrikli hava perdesi; içindeki fan motoru 125W-500kW aralığındaysa kapsamda"
+        },
+        {
+          "slug": "nicotra-gebhardt-rdh",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "nicotra-gebhardt-at",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "nicotra-gebhardt-dd",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "nicotra-gebhardt-adh",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "avens-nimus",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-roof",
+          "etki": "kapsamda",
+          "neden": "Standart çatı tipi fan (duman/F-sınıfı versiyonu değil), standart kapsam"
+        },
+        {
+          "slug": "vortice-radon-range-roof",
+          "etki": "kapsamda",
+          "neden": "Çatı tipi radon tahliye fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-roof",
+          "etki": "kapsamda",
+          "neden": "Şömine/baca fanı; çalışma gazı sıcaklığı 100°C'yi aşmıyorsa standart kapsamda (aşıyorsa Md.1.3(e) istisnası devreye girebilir, açık soru)"
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Tekil oda ısı geri kazanım ünitesi; içindeki fan bileşeni Md.1(1) gereği kapsamda"
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Kanallı ısı geri kazanım ünitesi; entegre fan bileşeni kapsamda"
+        },
+        {
+          "slug": "vortice-vorticent-cms-atex",
+          "etki": "kapsam-disi",
+          "neden": "ATEX (Direktif 2014/34/AB) — Md.1.3(a) muhtemel patlayıcı ortam istisnası, teblig Md.2.3(a) ile birebir"
+        },
+        {
+          "slug": "vortice-vort-e-atex",
+          "etki": "kapsam-disi",
+          "neden": "ATEX aksiyel fan — Md.1.3(a) istisnası"
+        },
+        {
+          "slug": "seat-atex-ptc-sensor",
+          "etki": "kapsam-disi",
+          "neden": "ATEX'e özgü yedek parça/sensör — hem ATEX istisnası hem de fan değil, sensör/yedek parça"
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsam-disi",
+          "neden": "Duman tahliye fanı; Md.1.3(b) 'acil durum, 300°C ve üzeri sıcaklıkta 1 saat+ kısa süreli çalışma' tanımına uyan F300/F400 sertifikalı modeller için istisna geçerli — sertifikaya göre değişebileceğinden açık_sorular'da da işaretlendi"
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsam-disi",
+          "neden": "Askeri tesis (yeraltı sığınağı) ve sivil savunma tesisi (bomba sığınağı) havalandırması — Md.1.3(ç)/EN Md.1.3(d) ile birebir örtüşüyor"
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsam-disi",
+          "neden": "'Asit Dayanımlı Fanlar' kategorisi — zehirli/aşındırıcı/yanıcı gaz taşıma amaçlı tasarlanıp pazarlanan fanlar için Md.1.3(g)/EN Md.1.3(h) istisnası (dikkat: ad 'jet-serisi' olsa da EU'nun tanımladığı 'jet fan' kategorisiyle karıştırılmamalı — bu ürün ailesi asit/korozif gaz hattı fanı, thrust/jet fanı değil)"
+        },
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsam-disi",
+          "neden": "Asit dayanımlı fan — aynı korozif gaz istisnası (Md.1.3(g)/(h))"
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsam-disi",
+          "neden": "Asit dayanımlı fan — aynı korozif gaz istisnası (Md.1.3(g)/(h))"
+        },
+        {
+          "slug": "vortice-vort-nordik-hvls",
+          "etki": "kapsam-disi",
+          "neden": "Endüstriyel tavan vantilatörü (HVLS) — Ek I madde 31 tanımına göre 'air-circulating fan' (kanala bağlı olmayan, bir mekanda havayı serbestçe döndüren fan) niteliğinde; Md.1.3(p) istisnası"
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsam-disi",
+          "neden": "Frekans konvertörü — fan değil, ayrı bir ekodizayn tüzüğü (2019/1781, motor/VSD) kapsamında"
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsam-disi",
+          "neden": "Frekans konvertörü — fan değil, ayrı tüzük kapsamında"
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsam-disi",
+          "neden": "Frekans konvertörü — fan değil, ayrı tüzük kapsamında"
+        },
+        {
+          "slug": "avens-elektrikli-isiticilar",
+          "etki": "kapsam-disi",
+          "neden": "Elektrikli kanal ısıtıcısı — fan değil, bu tüzüğün konusu dışında"
+        },
+        {
+          "slug": "avens-hiz-anahtarlari",
+          "etki": "kapsam-disi",
+          "neden": "Hız anahtarı/kontrolörü — fan değil, aksesuar; VSD kullanımı yalnız fan verim hesabında bilgi şartı (Ek II 2(c)) olarak geçiyor"
+        },
+        {
+          "slug": "avens-sulu-batarya",
+          "etki": "kapsam-disi",
+          "neden": "Sulu batarya (su serpantini) kanal seksiyonu — fan değil, ısıtma/soğutma bataryası"
+        },
+        {
+          "slug": "avens-bvu-ls",
+          "etki": "kapsam-disi",
+          "neden": "Yedek parça/sensör kategorisi — kendisi bir fan değil (içerikte gerçek yedek fan varsa Md.9(1) geçiş hükmü ayrıca değerlendirilmeli, açık soru)"
+        },
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsam-disi",
+          "neden": "Nem alma cihazı; ürün kendisi 'fan' olarak pazarlanmıyor, cihazın bütünü ayrı bir ürün kategorisi (bkz. açık_sorular — içindeki fan bileşeni teorik olarak Md.1(1) kapsamına girebilir)"
+        }
+      ],
+      "urun_sayfasi_sartlari": [
+        "Ek II madde 2: fan tipi (aksiyel/santrifüj ileri-geri-eğik kanatlı/çapraz akışlı/karışık akışlı/jet fan)",
+        "Fan verimi (η veya ηr) sayı veya yüzde olarak",
+        "VSD (frekans konvertörü) kullanılıp kullanılmadığı ve entegre mi harici mi olduğu",
+        "Ölçüm kategorisi (A-E)",
+        "Verim kategorisi (statik/toplam) — jet fanlar hariç",
+        "Verim sınıfı N (BEP veya Tm'de) — çapraz akışlı fanlar hariç",
+        "Elektrik giriş gücü Pe (kW), hacimsel debi qv (m3/h veya m3/s), basınç farkı Δp (Pa) — BEP veya Tm'de",
+        "Özel karakteristikler: çift kullanımlı/tersinir/düşük gürültülü fan",
+        "DC voltajın 100V'dan düşük olup olmadığı (evet/hayır)",
+        "Fanla birlikte verilen tüm önemli bileşenlerin listesi",
+        "Özgül hız σBEP (yalnız belirli santrifüj fanlar için)",
+        "Fan hızı (rpm, BEP veya Tm'de)",
+        "Özgül oran (iki ondalığa yuvarlanmış)",
+        "Üretici adı/tescilli ticari unvanı/markası ve iletişim adresi",
+        "Model tanımlayıcısı ve varsa diğer kodlar",
+        "Bu bilgiler: (a) teknik veri sayfası/kullanım kılavuzunda VEYA QR kod/link ile ücretsiz erişilen web sitesinde; (b) uygunluk değerlendirmesi teknik dosyasında; (c) üretici/yetkili temsilci/ithalatçının son birim piyasaya sürüldükten sonra en az 20 yıl boyunca erişilebilir ücretsiz web sitesinde yayımlanmalı — VentHub bir bayi/perakendeci olduğundan yükümlülük doğrudan üretici/ithalatçıya ait, ancak ürün sayfasında bu bilgilerin şeffaflık amacıyla gösterilmesi önerilir; VentHub ithalatçı sıfatı taşıdığı markalarda yükümlülük doğrudan kendisine de düşebilir (açık soru)"
+      ],
+      "acik_sorular": [
+        "2025/2481'in Ek I/II/III/IV üzerindeki tam değişiklik metni (madde ekleme/çıkarma/değiştirme listesi EUR-Lex ilişki tablosunda görüldü ama madde madde tam metni bu araştırmada okunmadı) — ürün bilgi şartı formüllerinde (Ek IV tablo 3, Ek II nokta 3) küçük farklar olabilir, bir sonraki turda konsolide Ek metinleri okunmalı",
+        "Hava perdesi (vortice-hava-perdesi, vortice-h-ad-elektrikli) ve tekil oda ünitelerindeki (vortice-vort-mono) fan motorlarının gerçek elektrik giriş gücünün 125W eşiğinin altında kalıp kalmadığı ürün bazında doğrulanmalı — eşik altındaysa o SKU kapsam dışı kalır",
+        "'Duman Egzoz Fanları' (vortice-vort-heatmaster-slimroof-smoke) ailesindeki her SKU'nun gerçekten 300°C/1 saat+ F-sınıfı sertifikaya sahip olup olmadığı teyit edilmeli; sertifikasız/düşük sınıf varyantlar istisna kapsamına girmeyebilir",
+        "'Şömine ve Baca Fanları' (vortice-vort-industrial-ventilation-roof) için taşınan gazın çalışma sıcaklığının 100°C'yi aşıp aşmadığı ürün bazında kontrol edilmeli (aşıyorsa Md.1.3(e) istisnası)",
+        "BLOG'un 'konut fanları hariç tutuldu' iddiası bu araştırmada DOĞRULANAMADI: Madde 1'de yalnız (i) ≤3kW çamaşır kurutma makinesine entegre fan ve (ii) <280W mutfak davlumbazına entegre fan gibi DAR istisnalar var; genel 'konut/ev tipi banyo-tuvalet fanı' kategorisi için blanket bir istisna YOK — VentHub'ın sattığı banyo/tuvalet fanları (Bravo, Punto Evo, Quadro Evo vb.) tüzüğün TAM kapsamında"
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "B"
+    },
+    {
+      "kimlik": "TR-SVGM-2019/15",
+      "ad": "Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gereklerine Dair Tebliğ (SVGM: 2019/15)",
+      "tur": "teblig",
+      "yetki": "TR",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "327/2011'i Türk mevzuatına aktaran eski teblig. Sanayi ve Teknoloji Bakanlığı tarafından yayımlanmış, 5187 sayılı Enerji ile İlgili Ürünlerin Çevreye Duyarlı Tasarımına İlişkin Yönetmelik çerçevesinde çıkarılmıştır. Yeni teblig SGM-2026/2'nin 11. maddesiyle yürürlükten kaldırılmıştır, ANCAK bu kaldırma hükmünün kendisi 24 Temmuz 2027'de yürürlüğe girecektir (SGM-2026/2 Madde 12/b) — yani bugün (2026-09-25) itibarıyla SVGM:2019/15 hâlâ resmen yürürlüktedir.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2019-12-20 (RG Sayı 30984)",
+        "yururluk": "belirtilmedi (bu araştırmada teblig metninin kendi yürürlük maddesi okunmadı, yalnız yeni teblig atfı üzerinden tarih doğrulandı)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-327/2011"
+      ],
+      "iliski_notlari": [
+        "TR-SGM-2026-2 (Madde 11 ile ilga; ilga hükmü 24/7/2027'de yürürlüğe girecek)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SVGM-2019_15.json",
+      "resmi_kaynak_sayisi": 2,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Teblig metninin kendi 'Yürürlük' maddesi (2019 tarihli asıl metin) bu araştırmada ayrıca okunmadı; sadece yeni teblig üzerinden atıf doğrulandı. Ek I/II/III içeriği de okunmadı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "B"
+    },
+    {
+      "kimlik": "TR-SGM-2026/2",
+      "ad": "Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (2024/1834/AB) (SGM-2026/2)",
+      "tur": "teblig",
+      "yetki": "TR",
+      "konu": [
+        "erp"
+      ],
+      "kapsam": "(EU) 2024/1834'ü (ve onu değiştiren (EU) 2025/2481'i) Türk mevzuatına aktaran yeni teblig. Sanayi ve Teknoloji Bakanlığı tarafından RG 07.02.2026/33161'de yayımlanmıştır. Kapsam/istisna listesi AB metniyle madde madde örtüşüyor (ATEX, F300/F400 acil durum fanı, nükleer tesis, askeri sığınak/sivil savunma, jet fan <750W, ≥8000rpm, vb.). Eski teblig SVGM:2019/15'i ilga ediyor ANCAK ilga hükmünün kendisi ile tüzüğün esas maddeleri 24 Temmuz 2027'de yürürlüğe giriyor (yalnız Madde 1/amaç, geçici madde 1 fıkra 2 ve yürürlük/yürütme maddeleri yayım tarihinde yürürlüğe girmiş durumda) — bu, AB'nin genel uygulama tarihinden (24 Temmuz 2026) TAM BİR YIL SONRAYA denk geliyor.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2026-02-07 (RG Sayı 33161)",
+        "yururluk": "kısmi: 2026-02-07 (Md.1, Geçici Md.1/2, Md.12, Md.13); diğer tüm hükümler (istisnalar hariç Md.2-11 dahil asıl ecodesign şartları ve ilga hükmü) 2027-07-24'te",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2026-02-07",
+            "ne": "Teblig yayımlandı; Md.1 (amaç), Geçici Md.1 fıkra 2 (24/7/2027'ye kadarki piyasaya arz karinesi), Md.12 (yürürlük) ve Md.13 (yürütme) bu tarihte yürürlüğe girdi"
+          },
+          {
+            "tarih": "2027-07-24",
+            "ne": "Teblığın diğer tüm hükümleri (Md.11 ilga hükmü dahil) yürürlüğe girer — SVGM:2019/15'in fiilî sonu bu tarih"
+          },
+          {
+            "tarih": "2028-07-24",
+            "ne": "SVGM:2019/15 Ek I-III'ün 'diğer ürünlere entegre fanlar' için geçiş uygulaması sona erer (AB'deki 2027 tarihinden 1 yıl geç)"
+          },
+          {
+            "tarih": "2037-07-24",
+            "ne": "SVGM:2019/15 Ek I-III'ün 'yedek parça fanlar' için geçiş uygulaması sona erer (AB ile aynı tarih)"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "TR-SVGM-2019/15"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2024/1834"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2026_2.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "Kanal tipi fan; TR teblig kapsamı AB ile birebir, standart kapsamda"
+        },
+        {
+          "slug": "avens-hucreli-hf-s",
+          "etki": "kapsamda",
+          "neden": "Santrifüj/radyal fan, standart kapsam"
+        },
+        {
+          "slug": "vortice-vortice-bravo-s",
+          "etki": "kapsamda",
+          "neden": "Banyo/tuvalet fanı, standart kapsam"
+        },
+        {
+          "slug": "vortice-vorticent-cms-atex",
+          "etki": "kapsam-disi",
+          "neden": "TR teblig Md.2.3(a): ATEX (2014/34/AB'yi aktaran TR Yönetmeliği) istisnası"
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsam-disi",
+          "neden": "TR teblig Md.2.3(ç): 'Askeri tesisler (yeraltı sığınakları) ve sivil savunma tesisleri (bomba sığınakları)' istisnası — isim birebir örtüşüyor"
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsam-disi",
+          "neden": "TR teblig Md.2.3(g): zehirli/aşındırıcı/yanıcı gaz istisnası (asit dayanımlı fan ailesi)"
+        },
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsam-disi",
+          "neden": "Aynı korozif gaz istisnası"
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsam-disi",
+          "neden": "Aynı korozif gaz istisnası"
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Teblığın Ek II/III/IV'ünün (ürün bilgi şartları, ölçüm/hesaplama yöntemleri) AB Ek II/III/IV ile birebir mi yoksa TR'ye özgü ufak farklar mı içerdiği bu araştırmada okunmadı ('Ekleri için tıklayınız' linki takip edilmedi) — VentHub ürün sayfası şartları için bir sonraki turda TR Ek II doğrudan okunmalı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "B"
+    },
+    {
+      "kimlik": "AB-2014/34",
+      "ad": "Directive 2014/34/EU of the European Parliament and of the Council on the harmonisation of the laws of the Member States relating to equipment and protective systems intended for use in potentially explosive atmospheres (ATEX ekipman direktifi)",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "Muhtemel patlayıcı ortamlarda (gaz/buhar/sis/toz) kullanılması amaçlanan ekipman ve koruyucu sistemleri kapsar; temel sağlık ve güvenlik gerekliliklerini ve uygunluk değerlendirme prosedürlerini tanımlar. Ekipman Grup I (madenler) ve Grup II (diğer tüm uygulamalar) olarak ayrılır; Grup II kategori 1, 2, 3 (gerekli koruma seviyesine göre) ve G (gaz) / D (toz) ortam ayrımı yapılır. Yeni Yaklaşım (New Legislative Framework) çerçevesine göre revize edilmiştir.",
+      "tarihler": {
+        "kabul": "26/2/2014 (Avrupa Parlamentosu ve Konseyi Direktifi olarak; TR yönetmeliğinin dayanak maddesinde bu tarihle anılıyor)",
+        "yayim": "BULUNAMADI (bu oturumda EUR-Lex ham metnine erişilemedi; OJ referansı doğrulanmadı)",
+        "yururluk": "20 Nisan 2016 itibarıyla uygulanır (\"applicable from 20 April 2016\")",
+        "uygulama_asamalari": [
+          {
+            "tarih": "20 Nisan 2016",
+            "ne": "Direktif uygulanmaya başladı; 94/9/EC'nin yerini aldı. Bu tarihten itibaren piyasaya arz edilen/ilk kez hizmete alınan ATEX ürünleri için AB Uygunluk Beyanı ve yeni sertifikalar 2014/34/EU'ya göre düzenlenmek zorunda (transition guidance, bkz. kaynak 2)."
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-94/9"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-ATEX-2014/34"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_34.json",
+      "resmi_kaynak_sayisi": 2,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "EUR-Lex'e ham erişim WAF tarafından engellendiği için OJ yayım tarihi/sayısı ve resmi 'in force' durum etiketi bu oturumda birincil kaynaktan doğrulanamadı; ikincil resmi kaynak (Komisyon ATEX sayfası) durumun 'yürürlükte' olduğunu teyit ediyor.",
+        "Komisyonun 2014/34/AB'yi kapsayan aktif bir mevzuat revizyonu/değerlendirme (evaluation/REFIT) çalışmasına dair resmi kaynakta kanıt BULUNAMADI. Tek güncelleme, idari rehber belgesinin ('ATEX 2014-34-EU Guidelines') Ocak 2026'da yayımlanan 6. baskısı — bu mevzuat değişikliği değil, yorum rehberi güncellemesi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "TR-YON-ATEX-2014/34",
+      "ad": "Muhtemel Patlayıcı Ortamda Kullanılan Teçhizat ve Koruyucu Sistemler ile İlgili Yönetmelik (2014/34/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "2014/34/AB'yi Türk mevzuatına aktaran yönetmelik. Grup I (madenlerin yeraltı bölümleri) ve Grup II teçhizatı, kategori 1/2/3 ayrımını ve CE işaretlemesini düzenler; eski 94/9/AT yönetmeliğini yürürlükten kaldırır.",
+      "tarihler": {
+        "kabul": "BULUNAMADI (Bakanlar Kurulu/Bakanlık onay tarihi ayrı doğrulanmadı)",
+        "yayim": "30 Haziran 2016",
+        "yururluk": "30 Haziran 2016 (Madde 43(1): \"Bu Yönetmelik yayımı tarihinde yürürlüğe girer.\")",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2014/34"
+      ],
+      "iliski_notlari": [
+        "TR-94/9-AT-yonetmelik (eski, ad/RG detayı bu oturumda ayrıca doğrulanmadı)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-2014_34.json",
+      "resmi_kaynak_sayisi": 2,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Bakanlık adı 2016'dan bu yana değişti (Bilim, Sanayi ve Teknoloji Bakanlığı -> Sanayi ve Teknoloji Bakanlığı); yönetmeliğin güncel resmi yürütücüsü ayrıca teyit edilmedi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "AB-1999/92",
+      "ad": "Directive 1999/92/EC of the European Parliament and of the Council on minimum requirements for improving the safety and health protection of workers potentially at risk from explosive atmospheres (ATEX 137 / kullanıcı direktifi)",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "İşyerlerinde patlayıcı ortam riskine maruz kalabilecek çalışanların korunması için asgari gereklilikleri düzenler; işyerlerini/ekipman kullanım alanlarını Bölge 0/1/2 (gaz) ve Bölge 20/21/22 (toz) olarak sınıflandırır ve bu bölgelerde hangi ATEX kategorisindeki ekipmanın kullanılabileceğini belirler.",
+      "tarihler": {
+        "kabul": "16/12/1999 (TR yönetmeliğinin dayanak maddesinde bu tarihle anılıyor: \"16/12/1999 tarihli ve 1999/92/EC sayılı Avrupa Parlamentosu ve Konseyi Direktifi\")",
+        "yayim": "BULUNAMADI (EUR-Lex ham metnine bu oturumda erişilemedi)",
+        "yururluk": "BULUNAMADI (EUR-Lex ham metnine bu oturumda erişilemedi)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-ATEX-1999/92"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1999_92.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "EUR-Lex erişilemediği için 1999/92/EC'nin resmi yayım/yürürlük tarihleri ve güncel EUR-Lex durum etiketi bu oturumda birincil kaynaktan teyit edilemedi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "TR-YON-ATEX-1999/92",
+      "ad": "Çalışanların Patlayıcı Ortamların Tehlikelerinden Korunması Hakkında Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "1999/92/EC'yi Türk mevzuatına aktarır; işyerlerinde patlayıcı ortam risk değerlendirmesi, bölgelendirme (Bölge 0/1/2, Bölge 20/21/22) ve bu bölgelerde kullanılacak ekipmanın ATEX kategorisi ile eşleştirilmesini düzenler.",
+      "tarihler": {
+        "kabul": "BULUNAMADI",
+        "yayim": "30 Nisan 2013",
+        "yururluk": "BULUNAMADI (yürürlük maddesi bu oturumda ayrıca doğrulanmadı; RG yayım tarihiyle örtüştüğü varsayılabilir ama teyit edilmedi)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-1999/92"
+      ],
+      "iliski_notlari": [
+        "TR-eski-2003-yonetmelik (26/12/2003, RG 25328 — bu oturumda resmi kaynaktan doğrulanmadı, yalnız arama motoru özetiyle görüldü)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ATEX-1999_92.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Yönetmeliğin yürürlük maddesi ve varsa sonraki değişiklikleri (madde bazlı) bu oturumda ayrıca taranmadı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "AB-94/9",
+      "ad": "Directive 94/9/EC (ATEX 95 - eski ekipman direktifi)",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "2014/34/EU'dan önceki ATEX ekipman direktifi; 20 Nisan 2016'da 2014/34/EU tarafından yürürlükten kaldırıldı. Bu tarihten önce düzenlenmiş AT-tipi inceleme sertifikaları ve kalite güvence sertifikaları, sabit geçerlilik tarihlerine kadar 2014/34/EU altında geçerliliğini korur; ancak 20 Nisan 2016'dan itibaren piyasaya arz edilen/ilk kez hizmete alınan ürünler için AB uygunluk beyanları 2014/34/EU'ya göre düzenlenmek ZORUNDADIR.",
+      "tarihler": {
+        "kabul": "BULUNAMADI (bu oturumda EUR-Lex'e erişilemediği için orijinal kabul/yayım tarihi -genel bilgiyle 23 Mart 1994 olduğu hatırlanıyor ama resmi kaynaktan DOĞRULANAMADI, bu yüzden yazılmadı)",
+        "yayim": "BULUNAMADI",
+        "yururluk": "BULUNAMADI",
+        "uygulama_asamalari": [
+          {
+            "tarih": "20 Nisan 2016",
+            "ne": "2014/34/EU tarafından yürürlükten kaldırıldı (repealed); geçiş kuralları Komisyon'un resmi SSS/rehber belgesinde tanımlı."
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "TR-94/9-AT-yonetmelik (eski, bu oturumda ayrıca doğrulanmadı)"
+      ],
+      "durum": "kaldirildi",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-94_9.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsamda",
+          "neden": "Kaynak dizini (venthub-pdf-ingestor/kaynak-dizini/sayfalar.jsonl) içindeki SEAT marka kaynak PDF'leri (SEAT.pdf, SEAT-CATALOGUE.pdf, Installation-guide_ATEX_fans_english1.pdf) 'ATEX ZONE 2 CATEGORY 3G DIRECTIVE 94/9/CE' ifadesini birebir içeriyor; bu metin ürün açıklamalarına kaynaklık ediyorsa güncel (2014/34/EU) atıf yerine kaldırılmış direktife atıf yapılıyor demektir."
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsamda",
+          "neden": "Aynı SEAT marka kaynak dizini altındaki Storm_series.pdf dosyasında da 'ATEX directive 94/9/CE' ifadesi birebir geçiyor (dosya: markalar/seat/endustriyel-fan-serisi/01-input/Storm_series.pdf)."
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsamda",
+          "neden": "Aynı SEAT marka kaynak dizini altındaki JET.pdf dosyasında 'ATEX directive 94/9/CE' ifadesi birebir geçiyor (dosya: markalar/seat/endustriyel-fan-serisi/01-input/JET.pdf); JET-20/25/30-Specifications.pdf alt dosyalarında bu ifade bu oturumda ayrıca aranmadı."
+        },
+        {
+          "slug": "seat-atex-ptc-sensor",
+          "etki": "kapsamda",
+          "neden": "Bu aile için kaynak dizininde ayrı bir PDF bulunamadı; SEAT ATEX fan serisinin bir aksesuarı/sensörü olduğu için muhtemelen aynı SEAT kataloglarından (94/9/CE ifadesi geçen) metin/tanım devralıyor olabilir — DOĞRULANMADI, yalnız çıkarım."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "vortice-vorticent-cms-atex ve vortice-vort-e-atex aileleri kontrol edildi: kaynak PDF'lerinde '94/9' YOK, doğrudan '2014/34' referansı var — bu iki aile için eski direktif sorunu YOK.",
+        "Kapsam dışı ek bulgu: nicotra-gebhardt-adh, nicotra-gebhardt-rdh, nicotra-gebhardt-at aileleri (aileler.txt'de mevcut ama görev talimatındaki ATEX listesinde yok) kendi kaynak PDF'lerinde (479-series-adh.pdf, 481-series-rdh.pdf, 480-series-at.pdf) 'EC Directive 94/9/EG (ATEX 95)' ifadesini içeriyor — opsiyonel ATEX koruma notu olarak.",
+        "Ek bulgu: danfoss-fc102 ailesinin kaynak PDF'inde (MG16Z102-Guia-Design-FC102-355-800K-E-Ing.pdf) genel bir güvenlik uyarısı içinde 'EU Directive 94/9/EC (ATEX 95)' ifadesi geçiyor; bu ürünün kendi sertifikasyonu değil, genel bir kurulum uyarısı metni gibi görünüyor — düşük öncelik."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "STD-EN-ISO-80079-36",
+      "ad": "EN ISO 80079-36:2016",
+      "tur": "standart",
+      "yetki": "ULUSLARARASI",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "Explosive atmospheres — Part 36: Non-electrical equipment for explosive atmospheres — Basic method and requirements (ISO 80079-36:2016). Mekanik/elektriksel olmayan ekipmanlar için 'Ex h' türü koruma ailesinin temel yöntem ve gerekliliklerini tanımlar.",
+      "tarihler": {
+        "kabul": "2016",
+        "yayim": "BULUNAMADI (CEN yayım tarihi ayrıca doğrulanmadı)",
+        "yururluk": "12.08.2016 (2014/34/EU kapsamında uyumlaştırılmış standart olarak AB Resmi Gazetesi'nde OJ C 293 referansıyla listelendi)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-ISO-80079-36.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "STD-EN-ISO-80079-37",
+      "ad": "EN ISO 80079-37:2016",
+      "tur": "standart",
+      "yetki": "ULUSLARARASI",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "Explosive atmospheres — Part 37: Non-electrical equipment for explosive atmospheres — Non-electrical type of protection constructional safety 'c', control of ignition sources 'b', liquid immersion 'k' (ISO 80079-37:2016).",
+      "tarihler": {
+        "kabul": "2016",
+        "yayim": "BULUNAMADI",
+        "yururluk": "12.08.2016 (OJ C 293)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-ISO-80079-37.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "STD-EN-14986",
+      "ad": "EN 14986:2017 (önceki: EN 14986:2007)",
+      "tur": "standart",
+      "yetki": "ULUSLARARASI",
+      "konu": [
+        "atex"
+      ],
+      "kapsam": "Design of fans working in potentially explosive atmospheres — patlayıcı ortamlarda çalışan fanların tasarımına ilişkin uyumlaştırılmış standart. VentHub'ın fan aileleri (santrifüj/aksiyel/kanal tipi vb.) için doğrudan ilgili standarttır.",
+      "tarihler": {
+        "kabul": "2017 (güncel sürüm); önceki sürüm 2007",
+        "yayim": "BULUNAMADI",
+        "yururluk": "EN 14986:2007 için 20.04.2016 (OJ C 126) başladı, 31.01.2020'de geri çekildi (withdrawal, OJ C 183 09.06.2017 kararına istinaden); EN 14986:2017 için 09.06.2017 (OJ C 183) başladı ve halen geri çekilme tarihi YOK.",
+        "uygulama_asamalari": [
+          {
+            "tarih": "20.04.2016",
+            "ne": "EN 14986:2007 uyumlaştırılmış standart listesine girdi"
+          },
+          {
+            "tarih": "09.06.2017",
+            "ne": "EN 14986:2017 uyumlaştırılmış standart listesine girdi (2007 sürümünün yerini almaya başladı)"
+          },
+          {
+            "tarih": "31.01.2020",
+            "ne": "EN 14986:2007'nin uyumlaştırma karinesi (presumption of conformity) sona erdi/geri çekildi"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "STD-EN-14986:2007"
+      ],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-14986.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "C"
+    },
+    {
+      "kimlik": "AB-2014/30",
+      "ad": "Directive 2014/30/EU of the European Parliament and of the Council of 26 February 2014 on the harmonisation of the laws of the Member States relating to electromagnetic compatibility (recast)",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "emc"
+      ],
+      "kapsam": "Donanımın (aparat + sabit tesisat) piyasaya arzı/hizmete sunulması öncesi elektromanyetik emisyon ve bağışıklık (immunity) gerekliliklerini düzenler; New Legislative Framework (NLF)'e hizalıdır ve öncekiyle (2004/108/EC) aynı kapsamı korur. Frekans konvertörleri ve motorlu HVAC ürünleri gibi elektronik donanım doğrudan kapsam içindedir (telsiz/havacılık/amatör telsiz istisnaları dışında).",
+      "tarihler": {
+        "kabul": "2014-02-26",
+        "yayim": "2014-03-29 (OJ L 96/79)",
+        "yururluk": "BULUNAMADI (EUR-Lex'e erişilemedi; EC kaynağında ayrı belirtilmemiş)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2016-04-20",
+            "ne": "2014/30/EU uygulanabilir hale geldi; 2004/108/EC'yi yürürlükten kaldırdı (EC kaynağı: 'repealed Directive 2004/108/EC as from 20 April 2016')"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-2004/108"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-EMC-2014/30"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_30.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü — elektronik güç sürücüsü, EMC gerekliliklerine (emisyon+bağışıklık) tabi donanım."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü — aynı gerekçe."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü — aynı gerekçe."
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "EC motorlu fan — entegre elektronik sürücü nedeniyle EMC kapsamında."
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "Plug fanlarda sıkça EC/frekans kontrollü motor kullanılır — elektronik sürücü EMC kapsamında."
+        },
+        {
+          "slug": "avens-hiz-anahtarlari",
+          "etki": "kapsamda",
+          "neden": "Hız anahtarları/kontrol elektroniği — EMC emisyon/bağışıklık gerekliliğine tabi donanım."
+        },
+        {
+          "slug": "vortice-vort-nordik-hvls",
+          "etki": "kapsamda",
+          "neden": "HVLS tavan vantilatörlerinde genellikle elektronik hız kontrolü/sürücü bulunur."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Direktifin yürürlük (entry into force) tarihi EUR-Lex erişilemediği için doğrulanamadı; yalnız 'uygulanabilir olma' (20.4.2016) tarihi EC sayfasından doğrulandı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "TR-YON-EMC-2014/30",
+      "ad": "Elektromanyetik Uyumluluk Yönetmeliği (2014/30/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "emc"
+      ],
+      "kapsam": "Donanımın elektromanyetik uyumluluğunu düzenler ve donanımın yeterli EMC seviyesine uyacak şekilde piyasanın işleyişini sağlar (Madde 1); Madde 5'te tanımlanan donanımı kapsar, telsiz/havacılık/amatör telsiz vb. istisnalar hariç (Madde 2). 2014/30/AB'ye AB mevzuatına uyum çerçevesinde hazırlanmıştır (Madde 4).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2016-10-02 (RG Sayı 29845)",
+        "yururluk": "2016-10-02 (yayımı tarihinde yürürlüğe girer — Madde 46)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [
+        "TR-YON-EMC-2004/108"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2014/30"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-EMC-2014_30.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü — TR piyasasında CE/EMC uyumluluk yükümlülüğü bu yönetmelikle uygulanır."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "TR-YON-EMC-2004/108",
+      "ad": "Elektromanyetik Uyumluluk Yönetmeliği (2004/108/AT)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "emc"
+      ],
+      "kapsam": "2016 yönetmeliğinin yerini aldığı önceki (2004/108/AT'ye dayalı) TR EMC yönetmeliği.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2007-10-24 (RG Sayı 26680)",
+        "yururluk": "BULUNAMADI (yalnız yürürlükten kaldırma referansı doğrulandı, kendi metni ayrıca açılmadı)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2004/108"
+      ],
+      "iliski_notlari": [],
+      "durum": "kaldirildi",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-EMC-2004_108.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Bu eski yönetmeliğin kendi RG metni (26680 sayılı) doğrudan açılıp doğrulanmadı; yalnız halefin atıf metninden teyit edildi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "AB-2014/35",
+      "ad": "Directive 2014/35/EU of the European Parliament and of the Council of 26 February 2014 on the harmonisation of the laws of the Member States relating to the making available on the market of electrical equipment designed for use within certain voltage limits (recast)",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "alcak-gerilim"
+      ],
+      "kapsam": "50-1000V AC / 75-1500V DC aralığında kullanılmak üzere tasarlanan elektrikli ekipmanın (Ek-II istisnaları hariç) sağlık/güvenlik gerekliliklerini düzenler (Alçak Gerilim Direktifi/LVD). NLF'e hizalıdır, 2006/95/EC'nin yerini almış, aynı kapsam/güvenlik hedeflerini korumuştur.",
+      "tarihler": {
+        "kabul": "2014-02-26",
+        "yayim": "2014-03-29 (OJ L 96, EC/harici kaynaklarda 'OJ L 96, 29.3.2014' olarak anılıyor; EUR-Lex'ten birebir doğrulanamadı)",
+        "yururluk": "BULUNAMADI (EUR-Lex'e erişilemedi)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2016-04-20",
+            "ne": "'It has been applicable since 20 April 2016' (EC kaynağı) — 2006/95/EC'nin yerini aldığı tarih"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-2006/95"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-LVD-2014/35"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2014_35.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü 50-1000V AC aralığında elektrikli teçhizat — LVD kapsamında (EMC ile birlikte çifte direktif)."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        },
+        {
+          "slug": "avens-elektrikli-isiticilar",
+          "etki": "kapsamda",
+          "neden": "Elektrikli kanal ısıtıcıları düşük gerilim sınırları içinde elektrikli ekipman — LVD kapsamında."
+        },
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsamda",
+          "neden": "Şebeke gerilimiyle çalışan elektrikli cihaz — LVD kapsamında."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "OJ L 96 sayfa numarası (357) EUR-Lex'ten birebir teyit edilemedi; ikincil kaynaklardan (WebSearch özet) alınmıştır, resmi alıntı değildir — ayrı doğrulama gerekir."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "TR-YON-LVD-2014/35",
+      "ad": "Belirli Gerilim Sınırları İçin Tasarlanan Elektrikli Ekipman ile İlgili Yönetmelik (2014/35/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "alcak-gerilim"
+      ],
+      "kapsam": "Alternatif akım için 50V-1000V, doğru akım için 75V-1500V aralığındaki gerilimlerde kullanılmak üzere tasarlanan elektrikli ekipmanı kapsar (Ek-II istisnaları hariç); iç pazarın işleyişini sağlarken insan/hayvan/mal sağlık ve güvenliğini korur (Madde 1-2).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2016-10-02 (RG Sayı 29845)",
+        "yururluk": "2016-10-02 (yayımı tarihinde yürürlüğe girer — Madde 26)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [
+        "TR-YON-LVD-2006/95"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2014/35"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-LVD-2014_35.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü — LVD Türkiye uygulaması bu yönetmelikle yürütülür."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "TR-YON-LVD-2006/95",
+      "ad": "Belirli Gerilim Sınırları Dahilinde Kullanılmak Üzere Tasarlanmış Elektrikli Teçhizat ile İlgili Yönetmelik (2006/95/AT)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "alcak-gerilim"
+      ],
+      "kapsam": "2016 yönetmeliğinin yerini aldığı önceki (2006/95/AT'ye dayalı) TR LVD yönetmeliği.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2006-12-30 (RG Sayı 26392)",
+        "yururluk": "BULUNAMADI (kendi metni doğrudan açılmadı, yalnız halef atfı doğrulandı)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2006/95"
+      ],
+      "iliski_notlari": [],
+      "durum": "kaldirildi",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-LVD-2006_95.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "STD-IEC-61800-3",
+      "ad": "IEC 61800-3:2022 — Adjustable speed electrical power drive systems - Part 3: EMC requirements and specific test methods for PDS and machine tools",
+      "tur": "standart",
+      "yetki": "ULUSLARARASI",
+      "konu": [
+        "emc"
+      ],
+      "kapsam": "PDS (güç sürücü sistemleri) ve takım tezgahları (MT) için EMC (emisyon+bağışıklık) gereklilikleri; AC/DC PDS, 35 kV AC RMS'e kadar giriş/çıkış gerilimi, her güç seviyesinde geçerli. Trafik uygulamaları ve elektrikli araçlar hariç; CISPR 11:2015 grup 2 ekipman hariç. 4. baskı (2022-11-30), 3. baskıyı (2017) iptal eder; kapsam takım tezgahlarına genişletildi, radyasyonlu bağışıklık test frekans aralığı 6 GHz'e çıkarıldı. Düzeltme (Corrigendum) 1 (2025-04) bu kopyaya dahil edilmiştir. NOT: IEC webstore kapsam/özet sayfasında C1/C2/C3/C4 kategorileri veya 'birinci/ikinci çevre' terimleri geçmiyor — bu ayrıntı standardın telifli gövdesinde; kapsam düzeyinde doğrulanamadı.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2022-11-30",
+        "yururluk": "",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2017",
+            "ne": "Önceki baskı (3. baskı, IEC 61800-3:2017) — 2022 baskısı tarafından iptal edilip yerini aldı"
+          },
+          {
+            "tarih": "2025-04",
+            "ne": "Corrigendum 1 mevcut kopyaya dahil edildi"
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "STD-IEC-61800-3:2017"
+      ],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/STD-IEC-61800-3.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "Frekans konvertörü — adjustable speed PDS; IEC 61800-3'ün doğrudan kapsamı."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe."
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "EC/frekans kontrollü plug fan motor sürücüleri PDS tanımına girebilir."
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "EC motor + entegre sürücü — PDS kapsamına girebilir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "C1/C2/C3/C4 kategori tanımları ve 'birinci/ikinci çevre' kavramı IEC webstore kapsam sayfasında yok; standardın kendisi (telifli) olmadan doğrulanamaz — BULUNAMADI olarak işaretlendi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "AB-2011/65",
+      "ad": "Directive 2011/65/EU (RoHS) on the restriction of the use of certain hazardous substances in electrical and electronic equipment",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "cerceve"
+      ],
+      "kapsam": "Elektrikli/elektronik ekipmanda belirli tehlikeli maddelerin kullanımını kısıtlar (yalnız ad + TR karşılığı düzeyinde tutuldu, derinleşilmedi).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "",
+        "yururluk": "",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-ROHS-2011/65"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2011_65.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "TR-YON-ROHS-2011/65",
+      "ad": "Elektrikli ve Elektronik Eşyalarda Bazı Zararlı Maddelerin Kullanımının Kısıtlanmasına İlişkin Yönetmelik (2011/65/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "cerceve"
+      ],
+      "kapsam": "RoHS'un TR karşılığı; Çevre, Şehircilik ve İklim Değişikliği Bakanlığı tarafından yayımlanmıştır (yalnız ad+RG düzeyinde, derinleşilmedi).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2022-12-26 (RG Sayı 32055)",
+        "yururluk": "",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2011/65"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ROHS-2011_65.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "AB-2012/19",
+      "ad": "Directive 2012/19/EU (WEEE) on waste electrical and electronic equipment",
+      "tur": "direktif",
+      "yetki": "AB",
+      "konu": [
+        "cerceve"
+      ],
+      "kapsam": "Atık elektrikli/elektronik ekipmanın yönetimini düzenler (yalnız ad + TR karşılığı düzeyinde tutuldu, derinleşilmedi).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "",
+        "yururluk": "",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-WEEE-2012/19"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2012_19.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "TR-YON-WEEE-2012/19",
+      "ad": "Atık Elektrikli ve Elektronik Eşyaların Yönetimi Hakkında Yönetmelik (2012/19/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "cerceve"
+      ],
+      "kapsam": "WEEE'nin TR karşılığı; Çevre, Şehircilik ve İklim Değişikliği Bakanlığı tarafından RoHS yönetmeliği ile aynı gün yayımlanmıştır (yalnız ad+RG düzeyinde, derinleşilmedi).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2022-12-26 (RG Sayı 32055)",
+        "yururluk": "",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2012/19"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-WEEE-2012_19.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "D"
+    },
+    {
+      "kimlik": "AB-1253/2014",
+      "ad": "Commission Regulation (EU) No 1253/2014 of 7 July 2014 implementing Directive 2009/125/EC with regard to ecodesign requirements for ventilation units",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp",
+        "enerji-etiketi"
+      ],
+      "kapsam": "Havalandırma ünitelerinin (VU) piyasaya arzı/hizmete sunulması için çevreye duyarlı tasarım (ecodesign) şartlarını belirler. Kapsam dışı: tek yönlü ünitelerde hava akımı başına <30W elektrik giriş gücü (bilgi şartları hariç); çift yönlü (BVU) ünitelerde fan başına <30W toplam elektrik giriş gücü (bilgi şartları hariç); sadece gövdeye sahip aksiyel/santrifüj fanlar (327/2011 kapsamı); patlayıcı ortamda çalışanlar; acil/yangın güvenliği amaçlı kısa süreli çalışanlar (305/2011 temel şartlarına uygun); 100°C üzeri/-65°C motor sıcaklığı sınırları dışı çalışanlar; mutfak davlumbazları (66/2014 kapsamı). RVU (konut tipi, azami debi ≤250 m3/h veya 250-1000 m3/h arası ve konut kullanımı beyanlı) / NRVU (konut dışı) ayrımı yapılır. Çift yönlü ünitelerde (BVU) ısı geri kazanım sistemi (HRS) ve termal bypass tesisatı zorunludur; filtreli ünitelerde görsel filtre değişim uyarı sinyali şarttır.",
+      "tarihler": {
+        "kabul": "2014-07-07",
+        "yayim": "2014-11-25 (OJ L 337/8)",
+        "yururluk": "OJ yayımını izleyen 20. gün (AB tüzük genel kuralı; metinde ayrıca kademeli uygulama tarihleri var)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2016-01-01",
+            "ne": "RVU/NRVU için Ek II/III madde-1 ecodesign şartları yürürlüğe girer (SEC≤0, gürültü ≤45 dB, çok/değişken hızlı tahrik, tüm BVU'larda HRS+termal bypass, min. termal verimlilik η_t_nrvu ≥%67); bilgi şartları (Ek IV/V) başlar."
+          },
+          {
+            "tarih": "2018-01-01",
+            "ne": "Ek II/III madde-2 ikinci kademe şartları yürürlüğe girer (SEC≤ -20 kWh/(m2.a), gürültü ≤40 dB, min. termal verimlilik ≥%73)."
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-SGM-2021/18"
+      ],
+      "iliski_notlari": [
+        "Directive 2009/125/EC çerçevesinde ilk kez havalandırma üniteleri için uygulama tüzüğü — önceki ayrı bir ecodesign tüzüğünün yerini almıyor, yeni bir ürün grubu düzenliyor.",
+        "(EU) 2016/2282 — 30 Kasım 2016, yalnız Ek VI (piyasa gözetimi doğrulama toleransları) değiştirildi"
+      ],
+      "durum": "gecis-doneminde",
+      "durum_notu": "yururlukte (ESPR (EU) 2024/1781 çerçevesinde havalandırma üniteleri özelinde eski Ecodesign Direktifi hükümleri 31 Aralık 2026'ya kadar geçiş rejimiyle uygulanmaya devam ediyor — bkz. EU-2024/1781 kalemi)",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1253_2014.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Kanallı ısı geri kazanımlı merkezi havalandırma üniteleri — BVU tanımına girer, HRS+termal bypass ve kademeli verim şartlarına tabi."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Kanallı ısı geri kazanımlı merkezi havalandırma üniteleri — BVU tanımına girer, HRS+termal bypass ve kademeli verim şartlarına tabi."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Tekil oda ısı geri kazanım üniteleri — akış debisine ve fan başına elektrik gücüne göre BVU/RVU kapsamına girebilir; 30W eşiği model bazında kontrol edilmeli."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "Duman egzoz fanı — Md.1(2)(e) istisnası: acil/yangın güvenliği amaçlı kısa süreli çalışma, Regulation 305/2011 temel şartlarına uygun ünitler kapsam dışı (istisna kapsamında olduğu ayrıca doğrulanmalı)."
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsamda",
+          "neden": "Sığınak havalandırma üniteleri muhtemelen acil durum/özel amaç istisnası (Md.1(2)(d)/(e)) kapsamına girebilir — model bazında doğrulama gerekir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [
+        "Bkz. EU-1254/2014 kalemi — internet satışına özgü şartlar orada."
+      ],
+      "acik_sorular": [
+        "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
+    },
+    {
+      "kimlik": "AB-1254/2014",
+      "ad": "Commission Delegated Regulation (EU) No 1254/2014 of 11 July 2014 supplementing Directive 2010/30/EU with regard to energy labelling of residential ventilation units",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "erp",
+        "enerji-etiketi"
+      ],
+      "kapsam": "Konut tipi havalandırma ünitelerinin (RVU) enerji etiketlemesi şartlarını belirler. NRVU'lar (konut dışı) etiketleme kapsamı dışıdır. Etiket sınıfları A+ (en verimli) → G (en az verimli), 7 sınıf, ortalama iklim için SEC (kWh/a.m2) eşiklerine göre. Md.4(1)(b): dealer'lar, internet üzerinden satışta Ek VII hükümlerine tabidir — etiket ve ürün bilgi föyü, fiyatın yakınında, 'nested display' ile (ilk tıklama/dokunmada) gösterilmelidir. Md.7: Komisyon bu Tüzüğü teknolojik gelişme ışığında en geç 1 Ocak 2020'de Danışma Forumu'na sunmalıydı (bkz. EU-1253/2014 revizyon kalemi, gecikmiş durumda).",
+      "tarihler": {
+        "kabul": "2014-07-11",
+        "yayim": "2014-11-25 (OJ L 337/27)",
+        "yururluk": "OJ yayımını izleyen 20. gün",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2016-01-01",
+            "ne": "Etiket/ürün bilgi föyü/teknik dokümantasyon/tanıtım malzemesi şartları (Md.3-4) yürürlüğe girer; Tablo-1 SEC sınıfları (A+ ... G) uygulanır."
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-SGM-2021/19"
+      ],
+      "iliski_notlari": [
+        "(EU) 2017/254 — 30 Kasım 2016 tarihli, yalnız Ek IX (doğrulama toleransları) değiştirildi"
+      ],
+      "durum": "yururlukte",
+      "durum_notu": "yururlukte (2010/30/EU çerçeve direktifi 2017/1369 ile yürürlükten kaldırılmış olsa da, delege tüzük olarak 1254/2014 ayrıca yürürlükten kaldırılana kadar geçerliliğini korur; EPREL kayıt zorunluluğu 2017/1369 Md.4 ile bu tüzük kapsamındaki ürünlere de geriye dönük uygulanır)",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-1254_2014.json",
+      "resmi_kaynak_sayisi": 3,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Konut tipi (RVU, ≤1000 m3/h) ısı geri kazanımlı üniteler enerji etiketi ve internet satış (Ek VII) şartlarına tabi olabilir — model bazında RVU/NRVU ayrımı ürün sayfasında belirtilmeli."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Konut tipi (RVU, ≤1000 m3/h) ısı geri kazanımlı üniteler enerji etiketi ve internet satış (Ek VII) şartlarına tabi olabilir."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Tekil oda ısı geri kazanım üniteleri düşük debili konut tipi RVU olabilir, etiketleme ve Ek VII internet satış şartlarına tabi olabilir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [
+        "Fiyatın yakınında enerji etiketi görüntülenmeli (nested display kullanılıyorsa ilk tıklama/dokunmada açılmalı, Ek VII madde 2-4).",
+        "Fiyatın yakınında ürün bilgi föyü ('Product fiche' linki açıkça etiketlenmiş olarak) görüntülenmeli (Ek VII madde 5).",
+        "Enerji ile ilgili veya fiyat bilgisi içeren her reklam/teknik tanıtım materyalinde spesifik enerji tüketim sınıfı belirtilmeli (Md.3-4).",
+        "Model, piyasaya arzdan önce AB Enerji Etiketleme Ürün Veritabanı'na (EPREL, dayanak: (EU) 2017/1369 Md.4) tedarikçi tarafından kaydedilmeli."
+      ],
+      "acik_sorular": [
+        "EPREL kaydı VentHub ürün sayfalarında görünürlük/doğrulama linki olarak sunuluyor mu — bu eksen kapsamında kod/CMS tarafı incelenmedi, yalnız mevzuat şartı doğrulandı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
+    },
+    {
+      "kimlik": "TR-SGM-2021/18",
+      "ad": "Havalandırma Ünitelerinin Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (1253/2014/AB) (SGM: 2021/18)",
+      "tur": "teblig",
+      "yetki": "TR",
+      "konu": [
+        "erp",
+        "enerji-etiketi"
+      ],
+      "kapsam": "1253/2014/AB'nin doğrudan TR karşılığı; aynı tanımlar (KTHÜ/HÜ, ÇYHÜ/TYHÜ), aynı 30 W eşiği ve aynı istisnalar Türkçeleştirilerek aktarılmış. Sanayi ve Teknoloji Bakanlığı tarafından yürütülür. Dayanağı: 7223 sayılı Ürün Güvenliği ve Teknik Düzenlemeler Kanunu ve 2010/643 sayılı BKK ile yürürlüğe konan çerçeve yönetmelik.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2021-05-25 (RG Sayı 31491)",
+        "yururluk": "2021-05-25 (yayım tarihinde yürürlüğe girer, Md.12)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-1253/2014"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_18.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "EU-1253/2014 ile birebir aynı kapsam/tanım/eşikler — TR pazarında CE/uygunluk yerine bu tebliğ referans alınır."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "EU-1253/2014 ile birebir aynı kapsam/tanım/eşikler."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "EU-1253/2014 ile birebir aynı kapsam/tanım/eşikler."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
+    },
+    {
+      "kimlik": "TR-SGM-2021/19",
+      "ad": "Konut Tipi Havalandırma Ünitelerinin Enerji Etiketlemesine Dair Tebliğ (1254/2014/AB) (SGM: 2021/19)",
+      "tur": "teblig",
+      "yetki": "TR",
+      "konu": [
+        "erp",
+        "enerji-etiketi"
+      ],
+      "kapsam": "1254/2014/AB'nin TR karşılığı; SGM-2015/7 (aspiratör tebliği) kapsamındaki ürünler hariç tutulur. Tedarikçiler için 1/10/2021 tarihinden itibaren etiket/ürün bilgi föyü/reklam bilgilendirme yükümlülükleri başlar.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2021-05-25 (RG Sayı 31491)",
+        "yururluk": "2021-05-25 (yayım tarihinde yürürlüğe girer, Md.11)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2021-10-01",
+            "ne": "Tedarikçi etiketleme/ürün bilgi föyü yükümlülükleri başlar (Md.5)."
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-1254/2014"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-SGM-2021_19.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Konut tipi (RVU) kanallı ısı geri kazanım üniteleri TR pazarında bu tebliğ kapsamında etiketlenmeli."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Konut tipi (RVU) kanallı ısı geri kazanım üniteleri TR pazarında bu tebliğ kapsamında etiketlenmeli."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Tekil oda tipi konut ısı geri kazanım üniteleri TR pazarında bu tebliğ kapsamında etiketlenebilir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [
+        "EU-1254/2014 ile aynı — VentHub ürün sayfasında etiket + ürün bilgi föyü fiyatın yakınında gösterilmeli (EU Ek VII'nin TR karşılığı hükümleri)."
+      ],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
+    },
+    {
+      "kimlik": "TR-YON-ERP-2009/125",
+      "ad": "Enerji ile İlgili Ürünlerin Çevreye Duyarlı Tasarımına İlişkin Yönetmelik (2009/125/AT çerçeve direktifinin TR karşılığı)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "cerceve",
+        "erp"
+      ],
+      "kapsam": "TR'nin ecodesign çerçeve yönetmeliği; 23/6/2010 tarihli ve 2010/643 sayılı Bakanlar Kurulu Kararı ile yürürlüğe konmuştur. SGM tebliğleri (2021/18 dahil) bu yönetmeliğe dayanılarak çıkarılır.",
+      "tarihler": {
+        "kabul": "2010-06-23 (BKK 2010/643)",
+        "yayim": "BULUNAMADI (bu eksende RG tarih/sayısı ayrıca doğrulanmadı, yalnız SGM-2021/18 tebliğinin dayanak maddesinden BKK tarih/no teyit edildi)",
+        "yururluk": "BULUNAMADI",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "EU-2009/125/EC (çerçeve direktif)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-ERP-2009_125.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Yönetmeliğin kendi RG tarih/sayısı ve tam metni bu araştırmada doğrudan çekilmedi — yalnız dayanak referansından teyit edildi."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
+    },
+    {
+      "kimlik": "AB-2024/1781",
+      "ad": "Regulation (EU) 2024/1781 establishing a framework for setting ecodesign requirements for sustainable products (ESPR)",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "cerceve",
+        "erp"
+      ],
+      "kapsam": "Directive 2009/125/EC'yi 18 Temmuz 2024 itibarıyla yürürlükten kaldırır, ANCAK havalandırma üniteleri dahil belirli ürün gruplarına ilişkin eski Direktifin belirli maddeleri (1,2,8(2),11,14,15,18,19 + Ek I,II,IV,V,VII) 31 Aralık 2026'ya kadar geçiş rejimiyle uygulanmaya devam eder — yani mevcut 1253/2014 tüzüğü bu tarihe kadar (veya ESPR temelli yeni bir uygulama tedbiri kabul edilene kadar) geçerliliğini fiilen korur. Dijital ürün pasaportu (DPP) şartı, ürün grubu bazında ayrı delege tüzüklerle (ilk çalışma planı öncelikleri: demir-çelik, alüminyum, tekstil, mobilya, lastik, deterjan, boya, kimyasallar, BİT/elektronik ve ekodesign şartı ilk kez konacak/gözden geçirilecek enerji ile ilgili ürünler) devreye girecek; ilk çalışma planı listesinde havalandırma üniteleri açıkça adı geçmiyor (bu eksende doğrulanan metinde).",
+      "tarihler": {
+        "kabul": "2024-06-13",
+        "yayim": "2024-07 (OJ, tam RG tarihi bu eksende ayrıca doğrulanmadı)",
+        "yururluk": "2024-07-18 (2009/125/EC'nin ilgası bu tarihte başlıyor)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2026-12-31",
+            "ne": "Havalandırma üniteleri dahil listelenen ürün gruplarında eski Direktif maddelerinin geçiş rejimi sona erer (ve/veya ESPR temelli yeni uygulama tedbiri kabul edilene kadar devam)."
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "Directive 2009/125/EC (kısmen ve kademeli, geçiş hükümleriyle)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_1781.json",
+      "resmi_kaynak_sayisi": 2,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "1253/2014'ün geçiş rejimi kapsamında adı açıkça geçen 'ventilation units' grubuna dahil; 2026 sonrası rejim netliği takip gerektirir."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe — ventilation units geçiş rejimi."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Aynı gerekçe — ventilation units geçiş rejimi."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "31 Aralık 2026 sonrası havalandırma üniteleri için ESPR temelli yeni bir uygulama tedbiri kabul edilmiş mi/edilecek mi — bu eksende ayrıca izlenmedi, DG GROW revizyon çalışmasıyla (bkz. EU-1253/2014 kalemi) ilişkisi teyit edilmedi.",
+        "ESPR ilk çalışma planının tam listesi ve tarihi (resmî Komisyon çalışma planı belgesi) bu araştırmada ayrıca çekilip doğrulanmadı; yalnız ESPR metnindeki recital'den çıkarım yapıldı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
+    },
+    {
+      "kimlik": "AB-2023/1230",
+      "ad": "Regulation (EU) 2023/1230 on machinery (Makine Tüzüğü)",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "makine"
+      ],
+      "kapsam": "Makine ve ilgili ürünlerin (kısmen tamamlanmış makine dahil) piyasaya arzı için sağlık/güvenlik şartlarını düzenler; 2006/42/EC Makine Direktifi'nin yerini alır. Fanlar (Ek I kapsamındaki makineler) dahildir.",
+      "tarihler": {
+        "kabul": "2023-06-14",
+        "yayim": "2023-06-29 (OJ)",
+        "yururluk": "2023-06-29 civarı (tüzük olarak yayımla yürürlüğe girer)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2027-01-20",
+            "ne": "Tüzük zorunlu uygulamaya girer; bu tarihten önce piyasaya arz edilen makine 2006/42/EC'ye tabi kalır. 42 ay geçiş süresi (2023-06-29 + 42 ay)."
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-2006/42"
+      ],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-MAKINE-2006/42"
+      ],
+      "iliski_notlari": [],
+      "durum": "gecis-doneminde",
+      "durum_notu": "yururlukte (uygulaması 2027-01-20'de başlayacak; geçiş döneminde)",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2023_1230.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-h-ad-elektrikli",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-hucreli-hf-s",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-dikdortgen-kanal-radyal",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vorticent-cms-atex",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-nimax",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-axial",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-hucreli-aspiratorler",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-qbk-sal-kc-evo",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-qe-b-kasa",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "seat-atex-ptc-sensor",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-bvu-ls",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vortice-bravo-s",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-radon-range-circular",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-quadro-evo",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-punto-evo-flexo",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-elektrikli-isiticilar",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-hiz-anahtarlari",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-hava-perdesi",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-e-atex",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "nicotra-gebhardt-rdh",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-sulu-batarya",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-nimus",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-roof",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-radon-range-roof",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-roof",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "nicotra-gebhardt-at",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "nicotra-gebhardt-dd",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "nicotra-gebhardt-adh",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "vortice-vort-nordik-hvls",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "Makine Tüzüğü yatay bir çerçevedir; hareketli parçası olan ve enerjiyle tahrik edilen tüm fan/vantilatör/ısıtıcı/frekans konvertörü ürünleri Ek I kapsamında 'makine' veya 'ilgili ürün' sayılır, CE işaretlemesinin temel dayanağıdır."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Dijital kullanım kılavuzu/uygunluk beyanı izni (madde bazlı) yalnız EC özet sayfasından doğrulandı ('clarifies conditions under which the instructions for use and the declaration of conformity can be provided in a digital format... mandatory as of 20 January 2027'); EUR-Lex madde numarası (muhtemelen Md. 10) birincil metinden teyit edilemedi.",
+        "Kurumsal yapıya ilişkin diğer fark maddeleri (AI destekli güvenlik fonksiyonları, siber güvenlik) yalnız EC özetinden; birebir tüzük maddesi alıntısı yok."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-MAKINE-2006/42",
+      "ad": "Makina Emniyeti Yönetmeliği (2006/42/AT)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "makine"
+      ],
+      "kapsam": "2006/42/EC Makine Direktifi'nin TR mevzuatına aktarımı; Sanayi ve Ticaret Bakanlığı tarafından yayımlandı. Şu an yürürlükteki tek TR makine emniyeti düzenlemesi.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2009-03-03, RG Sayı 27158",
+        "yururluk": "2009-03-03 (yayım tarihi; asıl yürürlük detayı yönetmelik metninde ayrı madde)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2014-09-28",
+            "ne": "RG 29133 sayılı değişiklik yönetmeliği yayımlandı (ikincil kaynak: LEXPERA/resmigazete başlığı; birincil metin doğrudan okunmadı)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2023/1230"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-MAKINE-2006_42.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-h-ad-elektrikli",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-hucreli-hf-s",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "jet-serisi",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-dikdortgen-kanal-radyal",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vorticent-cms-atex",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "seat-serisi",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "danfoss-fc102",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-nimax",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-axial",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-hucreli-aspiratorler",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-qbk-sal-kc-evo",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-enkelfan-ec-plug",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-qe-b-kasa",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "seat-atex-ptc-sensor",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-bvu-ls",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vortice-bravo-s",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-radon-range-circular",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-quadro-evo",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-punto-evo-flexo",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-elektrikli-isiticilar",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-hiz-anahtarlari",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-plug-fanlar",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-hava-perdesi",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-e-atex",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "nicotra-gebhardt-rdh",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-sulu-batarya",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "storm-serisi",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-nimus",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-roof",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-radon-range-roof",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-roof",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "danfoss-fc51",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "nicotra-gebhardt-at",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "avens-isi-geri-kazanim",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "nicotra-gebhardt-dd",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "nicotra-gebhardt-adh",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "vortice-vort-nordik-hvls",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        },
+        {
+          "slug": "danfoss-fc101",
+          "etki": "kapsamda",
+          "neden": "2023/1230 uygulamaya girene kadar (2027-01-20) tüm fan/vantilatör ürünleri için CE'nin TR dayanağı bu yönetmeliktir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "2023/1230'u uygulayacak YENİ bir TR yönetmeliği (taslak dahil) resmi bir kaynakta BULUNAMADI. Sanayi odaları/danışmanlık siteleri (kso.org.tr, electrotest.com.tr) 'Bakanlık taslak hazırlıyor' diyor ama resmi taslak metni veya RG duyurusu tespit edilemedi — ikincil kaynak, doğrulanmadı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "AB-305/2011",
+      "ad": "Regulation (EU) No 305/2011 — Construction Products Regulation (eski CPR)",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "yapi-urunleri",
+        "yangin-duman"
+      ],
+      "kapsam": "Yapı ürünlerinin performans beyanı ve CE işaretlemesi için uyumlaştırılmış şartlar. Duman/ısı tahliye fanları gibi uyumlaştırılmış standardı (EN 12101-3) OJ'de atıflanmış ürünler bu çerçeveye tabidir.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2011 (ilk yayım)",
+        "yururluk": "2011",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-YAPI-305/2011"
+      ],
+      "iliski_notlari": [
+        "EU-2024/3110 (kademeli olarak; 2011 tüzüğü 2039'da tamamen kaldırılacak)"
+      ],
+      "durum": "gecis-doneminde",
+      "durum_notu": "yururlukte (2039'da tamamen yürürlükten kalkacak, geçiş sürecinde)",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-305_2011.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "Duman/ısı tahliye fanı; EN 12101-3 uyumlaştırılmış standart CPR altında OJ'de atıflandığı sürece bu ürün için CPR/CE performans beyanı gerekir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "AB-2024/3110",
+      "ad": "Regulation (EU) 2024/3110 — yeni Yapı Ürünleri Tüzüğü (CPR-2024)",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "yapi-urunleri",
+        "yangin-duman"
+      ],
+      "kapsam": "305/2011'in yerini alacak yeni CPR; dijital ürün pasaportu, çevresel sürdürülebilirlik ve dijital dönüşüm unsurları ekler. 305/2011 ile aynı temel ilkelere dayanır.",
+      "tarihler": {
+        "kabul": "2024-11-27",
+        "yayim": "2024-12-18 (OJ)",
+        "yururluk": "2025-01-07",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2026-01-07",
+            "ne": "Tam uygulama başladı (EC resmi sayfası: 'in full application since 7 January 2026'). NOT: bazı ikincil kaynaklar '8 Ocak 2026' yazıyor — resmi EC sayfası 7 Ocak diyor, resmi kaynak esas alındı."
+          }
+        ]
+      },
+      "yerini_aldigi": [
+        "AB-305/2011"
+      ],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_3110.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "Duman egzoz fanı ailesi geçiş sürecinde önce 305/2011 altında kalıp, ilgili uyumlaştırılmış standart yeni çerçevede atıflandığında CPR-2024'e geçecek."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "Ürün ailesi bazında hangi tarihte 305/2011'den 2024/3110'a geçileceği (hangi hEN'in ne zaman yeniden atıflanacağı) EUR-Lex/CEN'den doğrulanamadı — bu ayrıntı 2040'a kadar sürebilecek kademeli bir standart-bazlı süreçtir (EC sayfasında genel ifade var, ürün-özel tarih yok)."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "STD-EN-12101-3",
+      "ad": "EN 12101-3 — Smoke and heat control systems, Part 3: Specification for powered smoke and heat control ventilators (fans)",
+      "tur": "standart",
+      "yetki": "ULUSLARARASI",
+      "konu": [
+        "yangin-duman"
+      ],
+      "kapsam": "Güç kumandalı duman ve ısı tahliye fanlarının ürün karakteristiklerini, test/değerlendirme yöntemlerini ve sınıflandırmasını (F200/F300/F400/F600 gibi sıcaklık-süre sınıfları) tanımlayan CEN standardı. CPR altında uyumlaştırılmış standart olarak OJ'de atıflanan güncel sürüm EN 12101-3:2015'tir (2002 sürümü ve AC:2005 eki geri çekilmiştir).",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2015 (güncel sürüm)",
+        "yururluk": "",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "EN 12101-3:2002 (+AC:2005) — geri çekildi",
+        "TS EN 12101-3 (TSE ulusal kabul)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/STD-EN-12101-3.json",
+      "resmi_kaynak_sayisi": 0,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "Bu aile 'Duman Egzoz Fanları' kategorisinde; ürünün F400 sınıfı iddiası (400°C/120dk gibi bir sınıf varsayımı) CEN'in resmi katalog sayfasından DOĞRULANAMADI — yalnız ikincil sanayi kataloğu siteleri (standards.iteh.ai, genorma.com) EN 12101-3:2015'in güncel harmonize standart olduğunu ve F200/F300/F400/F600 gibi sıcaklık/süre sınıflarının standartta tanımlı olduğunu teyit ediyor, ama HANGİ ürünün HANGİ sınıfa girdiği standardın kendisinde değil, o ürünün bağımsız test/sertifika raporunda (örn. 'xxx-CPR-xxxx' sertifika numarası) belirtilir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "F400 sınıfı iddiasının VentHub kataloğunda nereden geldiği (üretici teknik föyü mü, iç varsayım mı) bu araştırmanın kapsamı dışında — mevzuat/standart seviyesinde 'bu ürün ailesi F400'dür' diyen resmi bir kaynak YOK, sınıf ataması ürün-bazlı test sertifikasına aittir.",
+        "EN 12101-3'ün CPR (305/2011 veya 2024/3110) altında OJ'de hangi tarihte/hangi tüzükte atıflandığı CEN/EUR-Lex'ten birincil doğrulanamadı; yalnız ikincil kaynak."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-YAPI-305/2011",
+      "ad": "Yapı Malzemeleri Yönetmeliği (305/2011/AB)",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "yapi-urunleri"
+      ],
+      "kapsam": "305/2011 CPR'ın TR'ye aktarımı; yapı malzemelerinin performans beyanı ve CE işaretlemesi şartlarını düzenler.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2013-07-10, RG Sayı 28703",
+        "yururluk": "2013-07-10",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2026-02-20",
+            "ne": "RG 33174 sayılı değişiklik yönetmeliği yayımlandı (ikincil kaynak: WebSearch sonucu, birincil metin doğrudan curl ile okunmadı — sadece resmigazete arşiv URL'si tespit edildi: /eskiler/2026/02/20260220-2.htm)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-305/2011"
+      ],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-YAPI-305_2011.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "Duman egzoz fanı TR pazarında CE + bu yönetmelik kapsamında performans beyanına tabi olabilir (harmonize standart atıflandığı sürece)."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "2026-02-20 tarihli 33174 sayılı değişikliğin içeriği (ne değişti) doğrulanamadı — yalnız WebSearch başlığından tespit edildi, birincil metin bu oturumda okunmadı (zaman/kapsam kısıtı)."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-YANGIN-2007",
+      "ad": "Binaların Yangından Korunması Hakkında Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "yangin-duman"
+      ],
+      "kapsam": "Bina yangın güvenliği; duman kontrolü/tahliyesi, basınçlandırma, otopark havalandırması ve sığınak duman tahliyesi maddelerini içerir.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2007-12-19, RG Sayı 26735 (orijinal metin)",
+        "yururluk": "2007-12-19",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2021-11-20",
+            "ne": "RG 31665 sayılı, 4825 sayılı Cumhurbaşkanı Kararı ile değişiklik (ikincil kaynak, birincil metin bu oturumda doğrudan okunamadı — resmigazete eskiler/2021/11/... URL'si tahminle bulunamadı, zaman aşımı)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-YANGIN-2007.json",
+      "resmi_kaynak_sayisi": 2,
+      "etkilenen_aileler": [
+        {
+          "slug": "avens-siginak-havalandirma-uniteleri",
+          "etki": "kapsamda",
+          "neden": "Yönetmelik 'Sığınaklar, Otoparklar ve Çatılar' bölümünde sığınaklarda duman tahliye sistemi kurulmasını zorunlu kılıyor (Altıncı Kısım İkinci Bölüm atfı)."
+        },
+        {
+          "slug": "vortice-vort-heatmaster-slimroof-smoke",
+          "etki": "kapsamda",
+          "neden": "MADDE 85-91 arası 'Duman Kontrol Sistemi' bölümü mekanik duman tahliye tesisatının tasarım/tesis/işletme şartlarını (bağımsızlık, hava değişim sayısı, standartlara uygunluk) doğrudan düzenliyor."
+        },
+        {
+          "slug": "vortice-vort-industrial-ventilation-axial",
+          "etki": "kapsamda",
+          "neden": "MADDE 60(2) ve 88(3): kapalı otoparklarda (2000 m² üzeri) mekanik duman tahliye/havalandırma fanı zorunluluğu; aksiyel fanlar bu tip kurulumlarda tipik kullanılan üründür (genel çıkarım, madde ürün adı vermiyor)."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "'Son değişiklik tarihi' sorusu tam güven aralığında yanıtlanamadı: WebSearch 2015 (RG 29411), 2018 (2018/11347 K.) ve 2021 (RG 31665, CB Kararı 4825) değişikliklerinden bahsediyor ama en güncel konsolide metin bu oturumda birincil kaynaktan doğrulanmadı (zaman kısıtı + resmigazete eskiler arşivinde doğru URL bulunamadı). Yalnız 2007 orijinal metin doğrulandı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "AB-2024/573",
+      "ad": "Regulation (EU) 2024/573 on fluorinated greenhouse gases (F-gaz Tüzüğü)",
+      "tur": "tuzuk",
+      "yetki": "AB",
+      "konu": [
+        "f-gaz"
+      ],
+      "kapsam": "F-gazların üretim, ithalat/ihracat, piyasaya arz, kullanım ve geri kazanımını düzenler; 517/2014'ün yerini alır (kademeli 3 aşamalı yürürlükten kaldırma).",
+      "tarihler": {
+        "kabul": "2024-02-07",
+        "yayim": "2024-02-20 (OJ)",
+        "yururluk": "2024-03-11 (uygulama başlangıcı, EC resmi ifadesiyle)",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2025-01-01",
+            "ne": "Etiketleme/ürün bilgisi ve kota tahsisi kurallarının uygulanmaya başlaması (WebSearch özeti; birincil EUR-Lex madde numarası doğrulanamadı)"
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "TR-YON-FGAZ-2024"
+      ],
+      "iliski_notlari": [
+        "EU-517/2014 (3 aşamalı, üçüncüsü 2024-12-31'de tamamlanıyor — ikincil kaynak)"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/AB-2024_573.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsamda",
+          "neden": "Taşınabilir nem alma cihazları F-gaz soğutucu akışkan kullanır; Ek IV kapsamında GWP eşiği/yasak tarihleri bu ürün grubunu doğrudan etkiler."
+        },
+        {
+          "slug": "vortice-vort-mono",
+          "etki": "kapsamda",
+          "neden": "Tekil oda üniteleri (split klima/ısı pompası tipi olabilir) F-gaz soğutucu kullanıyorsa aynı Ek IV kısıtlarına tabi olabilir (ürün teknik detayı bu araştırmanın kapsamında doğrulanmadı)."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "SORULAN SPESİFİK VERİ BULUNAMADI: 'Taşınabilir nem alma ve klima cihazları için GWP yasakları/tarihleri' — Ek IV'ün (Annex IV) hangi maddesinin hangi ürün alt kategorisi için hangi GWP eşiğini hangi tarihte yasakladığı, EUR-Lex'e erişilemediği için birincil metinden doğrulanamadı. EC'nin genel sayfaları (climate.ec.europa.eu) yalnız genel çerçeveden bahsediyor, madde/tarih detayı yok. Bu, dokümanın en zayıf noktası — mevzuat metnine erişim sağlanana kadar 'BULUNAMADI' olarak işaretlenmelidir.",
+        "517/2014'ün 2024/573 tarafından resmen 'repealed' edildiği ifadesi yalnız ikincil kaynaklardan (europeansources.info, chemlinked) teyit edildi; EUR-Lex başlığından birebir alıntı alınamadı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    },
+    {
+      "kimlik": "TR-YON-FGAZ-2024",
+      "ad": "Florlu Sera Gazlarına İlişkin Yönetmelik",
+      "tur": "yonetmelik",
+      "yetki": "TR",
+      "konu": [
+        "f-gaz"
+      ],
+      "kapsam": "Montreal Protokolü ve AB F-gaz tüzükleri (517/2014 ve 2024/573) dikkate alınarak hazırlanmış; F-gaz yönetimi, hidroflorokarbon kota/lisans sistemi, ekipman operatörü yükümlülükleri, etiketleme.",
+      "tarihler": {
+        "kabul": "",
+        "yayim": "2024-10-15, RG Sayı 32693",
+        "yururluk": "2024-10-15 (çoğu hüküm, yayım tarihinde); MADDE 9(2) ve MADDE 10(4) için 2025-01-01",
+        "uygulama_asamalari": [
+          {
+            "tarih": "2025-01-01",
+            "ne": "MADDE 25(1)(a): 9. madde 2. fıkra ile 10. madde 4. fıkrası bu tarihte yürürlüğe girer."
+          }
+        ]
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [
+        "AB-2024/573",
+        "AB-517/2014"
+      ],
+      "iliski_notlari": [
+        "29/6/2022 tarihli ve 31881 sayılı RG'de yayımlanan önceki Florlu Sera Gazlarına İlişkin Yönetmelik"
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-YON-FGAZ-2024.json",
+      "resmi_kaynak_sayisi": 2,
+      "etkilenen_aileler": [
+        {
+          "slug": "vortice-deumido-range",
+          "etki": "kapsamda",
+          "neden": "F-gaz soğutucu akışkan içeren ekipman olarak MADDE 18 (ekipman operatörü yükümlülükleri) ve etiketleme (MADDE ~13-15 aralığı) hükümlerine tabi olabilir."
+        }
+      ],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "MADDE 9(2) ve MADDE 10(4)'ün tam içeriği (ne düzenledikleri) bu araştırmada okunmadı — yalnız yürürlük maddesindeki referans doğrulandı, kendi metinleri incelenmedi (kapsam dışı, zaman kısıtı)."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "F"
+    }
+  ],
+  "notlar": [
+    {
+      "eksen": "A",
+      "not": "EU-2019/1781 Md.2(2)(a) istisnası, motoru bir ürüne (örnek olarak fan dahil) ayrılamaz şekilde entegre edilmiş ve bağımsız test edilemeyen motorları kapsam dışı bırakıyor. VentHub kataloğundaki fan ailelerinin çoğunda motor gövdeye entegre görünüyor; bu nedenle 'etkilenen_aileler' listesi bilinçli olarak yalnız VSD/frekans konvertörü ailelerini (Danfoss FC serisi) içeriyor. Fan ailelerinin motor bazında istisna kapsamına girip girmediği bu araştırmanın kapsamı dışındadır ve ürün teknik dosyası seviyesinde ayrıca doğrulanmalıdır."
+    },
+    {
+      "eksen": "A",
+      "not": "AB tarafında Komisyon, 2019/1781'i Madde 9 (statutory review) ve 2025-2030 Ecodesign/Energy Labelling Çalışma Planı kapsamında ARALIK 2024 - BAHAR 2027 takviminde aktif olarak gözden geçiriyor (DG ENER, Fraunhofer ISI koordinatörlüğünde, back-to-back evaluation + impact assessment). Bu, olası IE4 genişletmesi dahil bir revizyon teklifine yol açabilir ama henüz bir taslak tüzük metni YAYIMLANMAMIŞ (BULUNAMADI)."
+    },
+    {
+      "eksen": "A",
+      "not": "TR tarafında SGM:2021/16'dan sonra yalnız bir değişiklik tebliği (SGM:2021/23, salt tarih ertelemesi) bulundu; AB'nin devam eden revizyon çalışmasına (2025-2030 plan) karşılık gelecek bir TR taslak/değişiklik tebliği BULUNAMADI — bu doğaldır çünkü AB tarafında da henüz yayımlanmış bir revizyon metni yok."
+    },
+    {
+      "eksen": "B",
+      "not": "EUR-Lex ana domain (eur-lex.europa.eu) curl/wget gibi doğrudan HTTP istemcilerini AWS WAF JS-challenge (HTTP 202, x-amzn-waf-action: challenge, boş gövde) ile engelliyor. Bu araştırmada gerçek tarayıcı oturumu (Kernel/Playwright, stealth kapalı, doğrudan bağlantı) kullanılarak sayfalar okundu; robots.txt da aynı yöntemle ayrıca çekilip /legal-content/*/TXT/DOC/ ve /TXT/SIG/ dışında disallow olmadığı doğrulandı."
+    },
+    {
+      "eksen": "B",
+      "not": "mevzuat.gov.tr içerikleri Angular SPA + iframe (MevzuatFihristDetayIframe) üzerinden geliyor; düz curl ile HTML gövdesi boş dönüyor, bu yüzden tarayıcı oturumu kullanıldı. robots.txt curl ile temiz şekilde çekildi (HTTP 200, yalnız belirli eski PDF'ler için Noindex, genel Disallow yok)."
+    },
+    {
+      "eksen": "B",
+      "not": "BLOG iddiasının EU tarafı (327/2011, 2024/1834 ile kaldırıldı, kaldırma 24 Temmuz 2026'da gerçekleşti) KISMEN doğru: repeal tarihi (24 Temmuz 2026) hem orijinal hem 2025/2481 ile güncellenmiş konsolide EU metninde teyit edildi, AMA 'tam kaldırma' değil — Ek I-III entegre fanlar için 2027'ye, yedek parça fanlar için 2037'ye kadar geçiş hükmü olarak yaşıyor. TR tarafında ise durum daha da farklı: TR'nin kendi teblig ilgası (SVGM:2019/15) ancak 24 Temmuz 2027'de yürürlüğe giriyor — yani Türkiye'de eski teblig bugün (2026-09-25) itibarıyla hâlâ resmen yürürlükte, AB'deki kaldırmadan tam bir yıl geriden geliyor."
+    },
+    {
+      "eksen": "C",
+      "not": "mevzuat.gov.tr ve resmigazete.gov.tr'ye ilk denemelerde IPv6 rotası 15-30 saniyede zaman aşımına uğradı (0 bayt); curl'e '-4' (IPv4 zorla) eklenince anında 200 döndü. Bu, ağ/DNS kaynaklı bir engel olup robots veya içerik kısıtlaması DEĞİL."
+    },
+    {
+      "eksen": "C",
+      "not": "resmigazete.gov.tr'nin genel robots.txt'si yalnız belirli eski PDF/HTML dosyalarını (arşiv, ilan) Noindex yapıyor; bu görevde kullanılan '/eskiler/2013/04/20130430-6.htm' ve '/eskiler/2016/06/20160630-13.htm' yollarının hiçbiri bu listede değil -> izinli."
+    },
+    {
+      "eksen": "C",
+      "not": "mevzuat.gov.tr'nin robots.txt'si yalnız belirli MevzuatNo'ları Noindex yapıyor; kullanılan MevzuatNo=18335 bu listede değil -> izinli."
+    },
+    {
+      "eksen": "C",
+      "not": "PDF metin çıkarımı için 'pdftotext -layout' (mingw64/bin) kullanıldı; Python bu ortamda kurulu değil."
+    },
+    {
+      "eksen": "D",
+      "not": "EUR-Lex'e bu ortamdan (curl, çeşitli User-Agent ve path denemeleri) hiçbir şekilde erişilemedi; AB direktiflerinin birincil metni yerine Avrupa Komisyonu'nun single-market-economy.ec.europa.eu sayfaları (izin verilen 'Avrupa Komisyonu' kaynak türü) kullanıldı. Bu sayfalar OJ cilt/sayfa ve repeal tarihini teyit etti ama direktifin madde metnini (kapsam istisnaları, tanımlar) içermiyor."
+    },
+    {
+      "eksen": "D",
+      "not": "En önemli bulgu: EMC Direktifi altında EN 61800-3'ün OJEU'daki uyumlaştırılmış standart atfı hâlâ ESKİ baskı (EN 61800-3:2004+A1:2012); ne EN IEC 61800-3:2018 ne de 2022/2023 baskısı OJEU'da atıflı — Komisyon'un resmi belge indirmesiyle (xlsx, 19.9.2022 üretilmiş) doğrulandı. Frekans konvertörü aileleri (danfoss-fc51/101/102) için bu, 'yeni baskıya göre test edilmiş cihaz otomatik karine kazanmaz, üretici teknik dosyasında hangi baskıya göre değerlendirildiği kontrol edilmeli' sonucunu doğuruyor."
+    },
+    {
+      "eksen": "D",
+      "not": "TR tarafında EMC ve LVD yönetmelikleri aynı gün (2 Ekim 2016, RG 29845) art arda (sayfa -1 ve -2) yayımlanmış; RoHS ve WEEE yönetmelikleri de aynı gün (26 Aralık 2022, RG 32055) art arda (sayfa -1 ve -2) yayımlanmış — dört kalemin ikisi ikişerli 'paket' halinde çıkmış."
+    },
+    {
+      "eksen": "D",
+      "not": "Kategori C1-C4 / birinci-ikinci çevre kavramları IEC webstore kapsam sayfasında yer almıyor; bu ayrıntı yalnız standardın (telifli) gövdesinde olduğundan görev kısıtı gereği araştırılmadı, BULUNAMADI olarak işaretlendi."
+    },
+    {
+      "eksen": "D",
+      "kimlik": "EN-IEC-61800-3-OJEU-durum",
+      "ozet": "Avrupa Komisyonu'nun EMC Direktifi (2014/30/AB) altında uyumlaştırılmış standartlar listesinde (İİK 2019/1326 ve tadilleri) adjustable speed electrical power drive systems için hâlâ referans verilen standart 'EN 61800-3:2004, EN 61800-3:2004/A1:2012' — yani ESKİ baskı. İİK 2019/1326'ya en son tadil 9 Haziran 2022'de yapılmış; bu tarihten sonra hiçbir yeni EMC uyumlaştırılmış standart atıfı OJEU'da yayımlanmamıştır (yapısal sebep: Public.Resource.Org davası sonrası ISO/IEC kökenli Avrupa standartlarının atıf süreci donmuş durumda — bu neden ikincil kaynaktan [spilma.com blogu], resmi olarak doğrulanmadı). SONUÇ: EN IEC 61800-3:2018 (3. baskı temelli) ve EN IEC 61800-3:2023/2022 (4. baskı temelli) OJEU'da EMC Direktifi kapsamında HENÜZ uyumlaştırılmış standart olarak yayımlanmamıştır; presumption of conformity hâlâ eski EN 61800-3:2004+A1:2012 atfına dayanır.",
+      "kaynaklar": [
+        {
+          "url": "https://single-market-economy.ec.europa.eu/single-market/goods/european-standards/harmonised-standards/electromagnetic-compatibility-emc_en",
+          "son_url": "https://single-market-economy.ec.europa.eu/single-market/goods/european-standards/harmonised-standards/electromagnetic-compatibility-emc_en",
+          "http": 200,
+          "robots": "izinli",
+          "erisim": "2026-09-25",
+          "alinti": "Since 1 December 2018 the references of harmonised standards are published in, and withdrawn from the Official Journal of the European Union by means of 'Commission implementing decisions'. The references published under Directive 2014/30/EU on electromagnetic compatibility are found in the Commission communication published in OJ C 246 of 13 July 2018 and in the Commission implementing decisions listed below. [...] Commission Implementing Decision (EU) 2019/1326 of 5 August 2019 [...] OJ L 206, 6 August 2019, p. 27–30 [...] Amendment of 9 June 2022 to Implementing Decision (EU) 2019/1326",
+          "alinti_dogrulandi": true,
+          "durum_satiri": "yururlukte (son tadil 2022-06-09; sayfanın kendi ekli özet dosyası '19.9.2022 tarihinde üretilmiş' olarak işaretli)"
+        },
+        {
+          "url": "https://single-market-economy.ec.europa.eu/document/download/0af395ce-e9e0-417c-a7d4-988f5ef3ef7d_en?filename=2014_30_EU_EMC_Summary%20list%20of%20harmonised%20standards_Generated%20on%2019.9.2022.xlsx",
+          "son_url": "https://single-market-economy.ec.europa.eu/document/download/0af395ce-e9e0-417c-a7d4-988f5ef3ef7d_en?filename=2014_30_EU_EMC_Summary%20list%20of%20harmonised%20standards_Generated%20on%2019.9.2022.xlsx",
+          "http": 200,
+          "robots": "izinli",
+          "erisim": "2026-09-25",
+          "alinti": "EN 61800-3:2004, EN 61800-3:2004/A1:2012 — Adjustable speed electrical power drive systems - Part 3: EMC requirements and specific test methods",
+          "alinti_dogrulandi": true,
+          "durum_satiri": "Bu satır listede halen 'aktif atıf' olarak görünüyor; EN IEC 61800-3:2018 veya 2022/2023 baskısı listede YOK."
+        }
+      ]
+    },
+    {
+      "eksen": "E",
+      "not": "TR'de tebliğler (SGM-2021/18, SGM-2021/19) mevzuat.gov.tr konsolide veritabanında değil, doğrudan Resmi Gazete arşivinde (resmigazete.gov.tr/eskiler) bulunuyor ve orada 1:1 doğrulandı."
+    },
+    {
+      "eksen": "E",
+      "not": "1253/2014 ve 1254/2014'ün EUR-Lex 'in force' konsolide etiketi görülemediği için 'durum' alanları bu eksende yalnız bilinen değişiklik tüzükleri (2016/2282, 2017/254) ve ESPR geçiş hükmünden çıkarım yapılarak 'yururlukte' olarak işaretlendi; tam resmî konsolidasyon teyidi için EUR-Lex'e tarayıcı/insan erişimi (WAF'ı geçebilen) gerekir."
+    },
+    {
+      "eksen": "E",
+      "not": "47 ürün ailesinin tamamı tek tek taranmadı; yalnız ısı geri kazanımlı/konut tipi üniteler, nem alma cihazları ve açıkça istisna metnine uyan aileler (duman egzoz, sığınak) gerekçelendirildi. Kanal tipi fan aileleri ile santrifüj/aksiyel/çatı tipi 'çıplak fan' aileleri için 1253/2014 mü yoksa 327/2011 (Industrial Fans, bu eksenin kapsamı dışı) mü uygulanacağı açık soru olarak bırakıldı."
+    },
+    {
+      "eksen": "E",
+      "kimlik": "BULGU-NemAlma-Yok",
+      "ozet": "AB Komisyonu'nun resmî enerji etiketi/ecodesign portalı, nem alma cihazlarının hem 626/2011 (klima enerji etiketi) hem de 206/2012 (klima/konfor fanı ecodesign) kapsamı dışında olduğunu ve başka hiçbir enerji etiketleme tüzüğünün de bu ürünleri kapsamadığını açıkça belirtiyor: AB, nem alma cihazları için bir enerji sınıflandırması tanımlamamıştır.",
+      "kaynaklar": [
+        {
+          "url": "https://energy-efficient-products.ec.europa.eu/faqs-0/there-any-system-energy-rating-dehumidifiers_en",
+          "son_url": "https://energy-efficient-products.ec.europa.eu/faqs-0/there-any-system-energy-rating-dehumidifiers_en",
+          "http": 200,
+          "robots": "izinli",
+          "erisim": "2026-09-25",
+          "alinti": "Dehumidifiers are excluded from the scope of Regulation (EU) 626/2011 on the energy label of air conditioners and from the scope of Ecodesign Regulation (EU) 206/2012 for air conditioners and comfort fans, and are not covered by other Energy Labelling regulations: the EU has not defined energy rating for dehumidifiers.",
+          "alinti_dogrulandi": true,
+          "durum_satiri": "Resmî Komisyon FAQ sayfası; hukuken bağlayıcı yorum değildir (sayfanın kendi feragatnamesi: 'European Commission cannot provide a legally binding interpretation')."
+        }
+      ]
+    },
+    {
+      "eksen": "F",
+      "not": "EUR-Lex ve mevzuat.gov.tr erişim engelleri bu SANDBOX ortamına özgü olabilir (curl/bot-koruması); farklı bir ağdan veya headless-browser ile tekrar denenmesi önerilir. Bu rapordaki EU tüzük tarihleri Avrupa Komisyonu'nun kendi resmi özet sayfalarından (single-market-economy.ec.europa.eu, climate.ec.europa.eu) alınmıştır — bunlar 'resmi kaynak' kategorisine girer ama EUR-Lex'in birebir madde metni DEĞİLDİR."
+    },
+    {
+      "eksen": "F",
+      "not": "F-gaz Tüzüğü'nün taşınabilir nem alma/klima cihazları için ÜRÜN-ÖZEL GWP yasak tarihleri (Ek IV) sorusu BULUNAMADI olarak işaretlenmiştir — bu, EKSEN F'in en kritik açık sorusudur ve mevzuat metnine (EUR-Lex veya resmi PDF) erişim sağlandığında öncelikle kapatılmalıdır."
+    },
+    {
+      "eksen": "F",
+      "not": "EN 12101-3 sınıflandırması (F200/F300/F400/F600) standardın kendisinde tanımlıdır ama HANGİ VentHub ürününün HANGİ sınıfa girdiği mevzuat/standart seviyesinde değil, ürün bazlı test sertifikasında belirtilir — 'vortice-vort-heatmaster-slimroof-smoke ailesi F400'dür' iddiası bu araştırmayla ne doğrulandı ne çürütüldü; kaynağı (muhtemelen üretici teknik föyü) ayrıca sorgulanmalı."
+    }
+  ],
+  "erisilemeyenler": [
+    {
+      "eksen": "A",
+      "kaynak": "eur-lex.europa.eu (tüm yollar, robots.txt dahil)",
+      "sebep": "AWS WAF (x-amzn-waf-action: challenge) JS doğrulaması istiyor; curl ile HTTP 202 boş/HTML-challenge sayfası dönüyor, gerçek robots.txt veya sayfa içeriği alınamıyor. robots.txt'nin kendisi de bu duvarın arkasında olduğu için 'izinli/yasak' değerlendirmesi yapılamadı.",
+      "cozum": "Aynı sayfaların archive.org (Wayback Machine) üzerindeki arşivlenmiş kopyaları kullanıldı — bunlar eur-lex.europa.eu'nun kendi yayımladığı ham HTML'in birebir kopyası; son_url alanında hangi wayback anlık görüntüsünün kullanıldığı kayıtlıdır."
+    },
+    {
+      "eksen": "A",
+      "kaynak": "ec.europa.eu/info/law/better-regulation/have-your-say/initiatives/1962-Energy-efficiency-ecodesign-requirements-for-electric-motors_en",
+      "sebep": "Sayfa bir Angular tek-sayfa-uygulaması kabuğu döndürüyor (curl ile içerik JS olmadan gelmiyor); asıl 'Have your say' geri bildirim içeriği alınamadı.",
+      "cozum": "Bu sayfaya dayanan hiçbir iddia rapora eklenmedi; yerine energy-efficient-products.ec.europa.eu'daki statik inceleme (review) sayfası kanıt olarak kullanıldı."
+    },
+    {
+      "eksen": "B",
+      "kaynak": "urunkurallari.ticaret.gov.tr sektörel rehber (Çevreye Duyarlı Tasarım Gereklilikleri)",
+      "sebep": "Sayfa yüklendi ve okundu ancak 327/2011 / 2024/1834 / SGM-2026-2 / SVGM-2019-15 için hiçbir kayıt içermiyor (yalnız klima/vantilatör <125W, ev tipi fırın-ocak-aspiratör gibi başka ürün grupları listelenmiş) — bu spesifik fan tüzüğü için kaynak olarak kullanılamadı"
+    },
+    {
+      "eksen": "B",
+      "kaynak": "sanayi.gov.tr",
+      "sebep": "curl isteği WAF tarafından reddedildi ('Request Rejected', support ID döndü); tarayıcı ile de denenmedi (mevzuat.gov.tr üzerinden aynı resmi teblig metnine ulaşıldığı için gerek kalmadı)"
+    },
+    {
+      "eksen": "C",
+      "url": "eur-lex.europa.eu (tüm CELEX/ELI/LSU/PDF endpointleri)",
+      "neden": "robots.txt boş/kısıtlama yok (izinli) ancak AWS WAF JavaScript challenge sayfası dönüyor (HTTP 202, 'challenge-container' / 'AwsWafIntegration'); curl/otomatik erişimle ham metin alınamadı. Denenen: /legal-content/EN/TXT/HTML, /legal-content/EN/TXT/PDF, /eli/dir/2014/34/oj, /legal-content/EN/LSU, /homepage.html — hepsi aynı sonucu verdi."
+    },
+    {
+      "eksen": "C",
+      "url": "https://publications.europa.eu/resource/cellar/... (Cellar RDF)",
+      "neden": "303 yönlendirme http://publications.europa.eu/resource/cellar/.../rdf/object/full adresine gidiyor; zaman kısıtı nedeniyle bu oturumda takip edilmedi/doğrulanmadı."
+    },
+    {
+      "eksen": "C",
+      "url": "https://osha.europa.eu/en/legislation/directives/directive-workers-exposed-explosive-atmospheres",
+      "neden": "URL tahmini yanlış çıktı; sayfa genel 'Legislation' listesine düştü (200 ama '1999/92' metni içermiyor). Doğru EU-OSHA sayfası bu oturumda bulunamadı; EU-1999/92 kalemi bu yüzden TR yönetmeliğin dayanak maddesi üzerinden ikincil doğrulandı."
+    },
+    {
+      "eksen": "D",
+      "kaynak": "eur-lex.europa.eu (tüm yollar: /legal-content/..., /eli/dir/..., / (root))",
+      "sebep": "AWS WAF JS-challenge — HTTP 202, header x-amzn-waf-action: challenge, boş gövde (Content-Length: 0). robots.txt boş/izinli ama otomatik istemci teknik olarak engelleniyor.",
+      "etkilenen_kalemler": [
+        "EU-2014/30",
+        "EU-2014/35"
+      ]
+    },
+    {
+      "eksen": "D",
+      "kaynak": "standards.cencenelec.eu",
+      "sebep": "robots.txt: 'Disallow: /' (tüm site) — CENELEC katalog sayfasına (EN IEC 61800-3 CENELEC onay/geçerlilik tarihi) erişilmedi.",
+      "etkilenen_kalemler": [
+        "IEC-61800-3",
+        "EN-IEC-61800-3-OJEU-durum"
+      ]
+    },
+    {
+      "eksen": "D",
+      "kaynak": "mevzuat.gov.tr (genel)",
+      "sebep": "İlk robots.txt denemesi 30sn timeout verdi; ikinci denemede robots.txt başarıyla okundu (yalnız Googlebot'a özel birkaç PDF noindex'i var, genel engel yok) ama zaman kısıtı nedeniyle mevzuat.gov.tr üzerinden ayrıca doğrudan doğrulama yapılmadı — tüm TR yönetmelik doğrulamaları resmigazete.gov.tr üzerinden yapıldı.",
+      "etkilenen_kalemler": []
+    },
+    {
+      "eksen": "E",
+      "kaynak": "eur-lex.europa.eu (tüm domain)",
+      "sebep": "AWS WAF bot koruması — curl her istekte HTTP 202 + 'x-amzn-waf-action: challenge' ile karşılık veriyor, robots.txt dahil hiçbir yol curl ile okunamadı; JS tabanlı challenge çözülemedi. Alternatif: publications.europa.eu/op.europa.eu Cellar content-negotiation (http://publications.europa.eu/resource/celex/<CELEX>, Accept: application/xhtml+xml, Accept-Language: eng) ile aynı OJ metinlerine ulaşıldı ve bu eksendeki tüm AB tüzük alıntıları o yoldan alındı. EUR-Lex'in kendi 'in force/repealed' konsolide durum etiketi bu nedenle hiçbir kalemde doğrudan görülemedi."
+    },
+    {
+      "eksen": "E",
+      "kaynak": "sanayi.gov.tr",
+      "sebep": "İlk istekte robots.txt döndü ama takip eden içerik isteklerinde F5/TSPD JavaScript bot-challenge sayfası döndü (gerçek içerik yerine). Tebliğ metinleri bunun yerine resmigazete.gov.tr/eskiler/ üzerinden doğrudan RG arşiv sayfalarıyla teyit edildi."
+    },
+    {
+      "eksen": "E",
+      "kaynak": "ec.europa.eu/info/law/better-regulation/have-your-say (Have Your Say portalı, 'ventilation units' girişimi)",
+      "sebep": "Sayfa tamamen Angular SPA (boş <app-root> + JS bundle), curl ile arama sonucu/girişim detayı okunamadı. robots.txt bu yolu yasaklamıyor (izinli), engel teknik (JS-render), robots değil. Revizyon durumu bunun yerine energy-efficient-products.ec.europa.eu/ecodesignenergy-labelling-review-ventilation-units_en sayfasından (DG GROW resmî sayfası) teyit edildi."
+    },
+    {
+      "eksen": "E",
+      "kaynak": "mevzuat.gov.tr",
+      "sebep": "robots.txt 'Disallow: /search/' ve '/index.php/search/' içeriyor; arama üzerinden tebliğ bulma denenmedi, doğrudan resmigazete.gov.tr arşiv URL'si kullanıldı."
+    },
+    {
+      "eksen": "F",
+      "kaynak": "eur-lex.europa.eu (tüm CELEX/eli yolları)",
+      "sebep": "AWS WAF JS-challenge: robots.txt dahil her istek HTTP 202 + boş gövde (bazen 'window.awsWafCookie' içeren küçük bir JS-challenge HTML'i) döndürüyor. curl bu challenge'ı geçemiyor. Homepage dahi aynı sonucu veriyor — path-bağımlı bir engel değil, domain-geneli bot koruması.",
+      "etki": "2023/1230, 305/2011, 2024/3110 ve 2024/573'ün BİREBİR tüzük metni/madde numaraları bu oturumda doğrulanamadı; yalnız Avrupa Komisyonu'nun (single-market-economy.ec.europa.eu, climate.ec.europa.eu) resmi özet sayfalarından tarih/olgu teyidi yapılabildi. Bu sayfalar 'Avrupa Komisyonu' kaynak kategorisine girdiği için kural ihlali değil, ama EUR-Lex'in kendisi kadar madde-seviyesinde ayrıntılı değil."
+    },
+    {
+      "eksen": "F",
+      "kaynak": "www.mevzuat.gov.tr (tüm yollar, http ve https)",
+      "sebep": "Her istek 15-30 saniye içinde TCP seviyesinde zaman aşımına uğruyor (curl: (28) Operation timed out, 0 bytes received). http:// (TLS olmayan) istek 302 ile https'e yönlendiriyor ama sonraki https isteği yine zaman aşımına uğruyor. resmigazete.gov.tr aynı ağdan sorunsuz çalıştığı için bu, genel bir ağ engeli değil, mevzuat.gov.tr'ye özel bir engelleme/rate-limit görünüyor.",
+      "etki": "TR yönetmeliklerinin KONSOLİDE (güncel, tüm değişikliklerle birleştirilmiş) metnine mevzuat.gov.tr'den erişilemedi. Bunun yerine Resmî Gazete arşivindeki ORİJİNAL yayım metinleri kullanıldı (resmigazete.gov.tr çalışıyor) — bu, en güncel hali değil, ilk yayım halini yansıtır. Sonraki değişiklikler ayrı ayrı RG sayılarında ve bu oturumda tam doğrulanmadı."
+    },
+    {
+      "eksen": "F",
+      "kaynak": "standards.cencenelec.eu (CEN resmi katalog/arama portalı)",
+      "sebep": "HTTP 500 sunucu hatası (muhtemelen JS/session state gerektiren dinamik Oracle APEX uygulaması, curl ile çalışmıyor). cencenelec.eu kök domain robots.txt de 404 'Page not found' döndürdü.",
+      "etki": "EN 12101-3'ün CPR altındaki resmi uyumlaştırılmış-standart statüsü ve F200/F300/F400/F600 sınıflarının tam tanımı CEN'in kendi kataloğundan doğrulanamadı; yalnız ikincil sanayi kataloğu siteleri (standards.iteh.ai, genorma.com — resmi değil) kullanıldı."
+    }
+  ]
+}

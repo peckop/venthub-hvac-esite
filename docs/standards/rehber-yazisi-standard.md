@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.4 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.6 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -32,6 +32,11 @@ bağlandı (Ölçüm geçmişi). Yayın, R8'deki kapılar kendi PR'larında doğ
 bölümü (fiyatı belirleyen etkenler, teknik sorumluluk notu) eksik çıktı; hiçbir kontrol görmedi, OPS emsal
 yazıyla elle kıyaslarken buldu. Recep "görmeden onay yok" dedi. Değişenler: R3 zorunlu bölümler + kalıp
 kapısı (R8), sorumluluk notunun sabit ilk cümlesi, R5 girişi ve R5.4 (önizleme şart), R5.7 ara önizleme.
+**v0.5 (2026-09-25):** karar 121 (içerik stratejisi) kalıcı kural oldu: R1.4 konu sırası ve içerik türleri;
+R2.1'de eski destek sayfası içerikleri kaynak değildir; R0.1 ve R9'da taşınan eski konular yayından kalkar,
+sırası gelince sıfırdan yazılır.
+**v0.6 (2026-09-25):** MEVZUAT şeridiyle iş bölümü (OPS): R2.6 mevzuat paketi, R5.1 3g mevzuat kontrolü,
+AB/TR tarih kuralı.
 
 ---
 
@@ -67,6 +72,9 @@ Onarım iki adımdır, ikisi de seçenek değildir:
 2. **Karar 92 taşımasında (URUN rota + BLOG içerik):** konular yeni adrese **kaldırılıp yönlendirilir**;
    yeniden yazım R9 ritmine girer (R8.1 sayacı). **10 canlı adresin her biri için hedef yazılır, 404'e
    düşen adres 0.**
+3. **Karar 121c (2026-09-25):** Bilgi Merkezi'ne taşınan üç konu da yayından kalkar (URUN); konu sırası
+   (R1.4) gelince aynı adreste sıfırdan, kaynaklı yazıyla döner. Taşınan metin yeniden yazımda kaynak
+   olarak kullanılmaz (R2.1).
 
 ## R1 — Konu seçimi
 
@@ -105,6 +113,38 @@ Aynı sorguya iki yazı yarışmaz. Yeni konu açılmadan önce Search Console'd
 küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişletilmesi** (R5.5 revizyonu)
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 
+### R1.4 Konu sırası ve içerik türleri (karar 121, Recep 2026-09-24/25)
+
+**Konu sırası** (kayıt: REC-369 yorumu 2026-09-24):
+
+| Sıra | Konu | Durum 2026-09-25 |
+|---|---|---|
+| 1 | Frekans konvertörü | doğrulandı; yerel önizlemede Recep'e gösterilecek (karar 120) |
+| 2 | Radyal fan mı aksiyel fan mı, fan nasıl seçilir | üç doğrulama turu bitti |
+| 3 | Vortice sessiz fanlar | sırada |
+| 4 | Korozyona dayanıklı (asit) fanlar | sırada |
+| 5 | Isı geri kazanım | sırada; REC-392 (enerji etiketi) bu konuya değer |
+| 6 | Çatı fanları | sırada |
+| 7 | Banyo fanları | sırada |
+
+Sırayı **yalnız Recep** değiştirir. Hacim ve mevsim verisi (pazar ölçüm düzeni kol 2) geldiğinde BLOG
+ölçer, öneriyi OPS götürür; öneri sırayı kendiliğinden değiştirmez. Blog üretimi durmaz.
+
+**İçerik türleri:**
+
+| Tür | Durum | Not |
+|---|---|---|
+| "Doğrusu ve yanlışı" dizisi (yaygın yanlış + kaynaklı doğrusu) | EVET | yanlış da doğru da kaynağa bağlanır; kaynaksız "yaygın yanlış" yazılmaz |
+| Mevzuatı ilk anlatan yazı | EVET | konu listesi MEVZUAT şeridinden gelir; resmî metin R2.1/2'dir, BLOG kendi indirdiği ham metinle doğrular |
+| Hesaplayıcıyla birleşen yazı | EVET | R2.5: hesap örneğinin sonucu hesaplayıcıyla aynıdır, bağlantı `vh:hesaplayici/…` |
+| Saha deneyimi yazıları, Türkçe iklimlendirme terimleri sözlüğü | SONRA | sözlük Bilgi Merkezi alt kırılımı; bilgi mimarisi kararı TASARIM'dan sonra |
+| Tedarikçi yazıları | ŞİMDİLİK YOK | |
+| ESP yazısı | MÜMKÜN | üçüncü bir firmanın iç bilgisi ve o firma için yazılmış metin kullanılmaz; farklı açı (ayrıntı Kararlar belgesinde, PUBLIC depoya girmez) |
+
+**Eski içerik** (karar 121c): Bilgi Merkezi'ne taşınan üç eski konu (hava perdesi, otopark jet fan, ısı
+geri kazanım) yayından kalkar (URUN); konu sırası geldiğinde aynı adreste **sıfırdan, kaynaklı** yeni
+yazıyla döner. Eski metin kaynak değildir (R2.1).
+
 ## R2 — Kaynak
 
 ### R2.1 Öncelik sırası
@@ -118,7 +158,10 @@ yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 4. **Diğer** — sektör yayını. Yalnız bağlam için; **sayı bu sınıftan alınmaz**.
 
 **Kaynak olmayanlar:** rakip sitesi, forum, yapay zekâ cevabı (ChatGPT, Gemini, Perplexity dahil),
-kaynağı gösterilmeyen blog.
+kaynağı gösterilmeyen blog, **sitenin eski destek sayfası içerikleri** (karar 121c: sözlükteki
+`knowledge.topics` metinleri ve onlardan Bilgi Merkezi'ne taşınan yazılar; Recep 2026-09-25: "çok kaba
+bilgiler, faydası yok bize"). Eski metinden cümle, sayı ya da yapı alınmaz; aynı konu yeniden
+yazılırken araştırma sıfırdan yapılır.
 
 ### R2.2 Erişim sınıfı — açılamayan kaynak atıf alamaz
 
@@ -173,6 +216,22 @@ Hesap örneği "kaynaksız sayı yok" kuralıyla çelişmez, çünkü girdiler i
 metinde "örnek varsayım" diye işaretlenir (ör. "7.200 m³'lük bir otopark varsayalım"). Formül ve
 katsayılar kaynaklıdır (R2.2). Sonuç sitedeki ilgili hesaplayıcının aynı girdiyle verdiği sonuçla
 **aynı** çıkmalıdır; farklıysa ya yazı ya hesaplayıcı yanlıştır ve yayın durur.
+
+### R2.6 Mevzuat iddiası MEVZUAT şeridinin paketinden gelir (OPS iş bölümü, 2026-09-25)
+
+Teknik mevzuat ve standart kaydının sahibi MEVZUAT şerididir. BLOG yönetmelik yorumlamaz.
+
+| # | Adım | Sahibi |
+|---|---|---|
+| 1 | Her yazıdan **önce** konu ve ürün aileleri MEVZUAT'a bildirilir; MEVZUAT **mevzuat paketi** verir: yürürlükteki metin, AB/TR farkı, geçiş tarihleri, birebir alıntı | BLOG ister, MEVZUAT verir |
+| 2 | Yazıdaki her mevzuat iddiası (`tur: mevzuat`) yalnız paketten yazılır; pakette olmayan önce MEVZUAT'a sorulur. Araştırma ajanları mevzuat eksenini ayrıca araştırmaz | BLOG |
+| 3 | Yazı bitince mevzuat cümlelerini MEVZUAT kontrol eder; bu, R5.1 akışının bir adımıdır (3d'ye ek, onun yerine geçmez) | MEVZUAT |
+| 4 | Kayıtta değişiklik olunca MEVZUAT yayındaki yazı için "güncelle" bildirir → R5.5 revizyonu | MEVZUAT bildirir, BLOG yazar |
+| 5 | "Mevzuatı ilk anlatan" yazı adaylarını MEVZUAT önerir; sırayı Recep belirler (R1.4) | MEVZUAT / Recep |
+
+**Tarih kuralı:** AB ile TR ayrı takvimdedir (ör. fan tebliği TR'de 24.7.2027'de yürürlüğe girer, o güne
+kadar eski tebliğ geçerli). Bir TR tebliğinin kendi metninde basılı AB tarihi AB metniyle çelişirse AB
+tarihi AB metninden yazılır; çelişki MEVZUAT paketinde belirtilir (MEVZUAT bulgusu, SGM 2021/16).
 
 ## R3 — Yazı kalıbı
 
@@ -268,6 +327,7 @@ yazının sitedeki görünüşüne yakın önizleme eklenir (R5.4).
 | 3d. Sınıflama | Doğrulayıcı alt ajan | Her iddia için öneri sınıfı: DOĞRULANDI / DESTEKSİZ / ÇELİŞİYOR / BAYAT (alıntı var ama güncel değil) + gerekçe. Birim/dönüşüm, sayının bağlamı (model mi seri mi), cümle içindeki **her iddia ayrı** (K4.1 vakası), olumsuz iddia için açık ifade, 3c'nin `INCELE` çevreleri. **Hüküm BLOG'dadır** (`execution-method-standard.md` §4: alt ajan yargı vermez) |
 | 3e. Sabotaj kolu | BLOG, doğrulayıcı bilmeden | Tuzaklar **metnin KOPYASINA** konur (asıl metin tuzaksız kalır; kopya ile asıl arasındaki farkın yalnız tuzak satırları olduğu betikle gösterilir). Her turda **en az 3 tuzak**; **en az biri** betiklerin yakalayamayacağı türden: alıntısı kaynakta birebir geçen ama bağlamı ya da güncelliği yanlış iddia (SSS vakası gibi). Hepsi yakalanmadıkça tur **geçersiz** (emsal: `vitrin-metni-standard.md` K9.7) |
 | 3f. Örnekleme | BLOG | DOĞRULANDI satırlarından en az 3'ü BLOG tarafından ham kaynaktan yeniden açılır. **Örneklenen satırlardan biri yanlışsa tur geçersizdir** |
+| 3g. Mevzuat kontrolü | MEVZUAT şeridi (R2.6) | `tur: mevzuat` satırlarının her biri yürürlükteki metne karşı: yürürlük, değişiklik, AB/TR takvimi. MEVZUAT "yanlış" ya da "bayat" derse tur geçersizdir |
 | 4. Düzeltme | BLOG | DESTEKSİZ / ÇELİŞİYOR / BAYAT satırlar düzeltilir ya da silinir; tuzaklar çıkarılır |
 | 5. İkinci tur | aynı doğrulayıcı | **Tüm metin** 3a'dan yeniden geçer (yalnız değişen satırlar değil: düzeltmede eklenen yeni iddia tabloya girmemiş olabilir) |
 
@@ -428,7 +488,7 @@ biçim listesinin **yanlış pozitif ölçümüyle** birlikte kurulur.
 Orta yol: planlı üretim. Başlangıç önerisi **haftada bir yazı**, ilk dört yazının R7 ölçümü bitene
 kadar; sonra ölçüme göre artırılır. Üst sınır R8.1'deki toplu üretim kapısıdır (önerilen eşik 7 günde
 2 yeni yazı; revizyon sayılmaz). Karar 92 taşımasında eski konular **kaldırılıp yönlendirilir**, yeniden
-yazımları bu ritme girer. Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
+yazımları bu ritme ve R1.4 sırasına girer (karar 121: eski metinden alıntı yok, sıfırdan). Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
 
 ---
 

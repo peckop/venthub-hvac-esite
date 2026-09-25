@@ -1,0 +1,18 @@
+{
+  "kimlik": "STD-EN-ISO-80079-37",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://single-market-economy.ec.europa.eu/document/download/49c372bc-1a5c-44aa-a1b2-22a14bb24e80_en?filename=Summary%20List_ATEX%2017.9.2025.pdf",
+      "son_url": "https://single-market-economy.ec.europa.eu/document/download/49c372bc-1a5c-44aa-a1b2-22a14bb24e80_en?filename=Summary%20List_ATEX%2017.9.2025.pdf",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Aynı resmi Komisyon listesi; withdrawal tarihi yok, hâlâ yürürlükte uyumlaştırılmış standart.",
+      "alinti": "2014/34/EU - CEN EN ISO 80079-37:2016 ... Explosive atmospheres - Part 37: Non-electrical equipment for explosive atmospheres - Non-electrical type of protection constructional safety ''c'', control of ignition sources ''b'', liquid immersion ''k'' (ISO 80079-37:2016) ... 12.08.2016 OJ C 293",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

@@ -122,10 +122,10 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
           )}
 
           <div className={`min-w-0 max-w-content ${icindekiler.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
-            {/* Gövde satır uzunluğu `max-w-prose` (65ch); kart ızgaraları sütun genişliğinde kalır. */}
-            <div className="max-w-prose">
-              <RehberGovdesi bloklar={ayrismis.bloklar} hrefler={hrefler} />
-            </div>
+            {/* Gövde genişliği bilerek sütun genişliğinde (`max-w-content`). Satır ölçüsü Design'da
+                çelişkili (DS 66ch/16px ↔ Menü v18 720px/17px); TASARIM geri aldı (c64cafc4, 2026-09-25),
+                karar DS geçişinde token düzeyinde uygulanır — burada tek seferlik sınıf açma. */}
+            <RehberGovdesi bloklar={ayrismis.bloklar} hrefler={hrefler} />
 
             {urunKartlari.length > 0 && (
               <section aria-labelledby="ilgili-urunler" className="mt-16">

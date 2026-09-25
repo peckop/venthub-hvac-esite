@@ -1,0 +1,42 @@
+{
+  "kimlik": "AB-1254/2014",
+  "eksen": "E",
+  "kaynaklar": [
+    {
+      "url": "http://publications.europa.eu/resource/celex/32014R1254",
+      "son_url": "http://publications.europa.eu/resource/cellar/168e9fda-747c-11e4-b593-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": "EUR-Lex konsolide durum satırı WAF nedeniyle doğrudan doğrulanamadı; içerik Cellar/OJ orijinal metninden alındı.",
+      "alinti": "ANNEX VII Information to be provided in the case of sale, hire or hire-purchase through the internet ... 2. The appropriate label made available by suppliers ... shall be shown on the display mechanism near the price of the product ... If nested display is applied, the label shall appear on the first mouse click, mouse roll-over or tactile screen expansion on the image. ... 5. The appropriate product fiche ... shall be shown on the display mechanism near the price of the product.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32014R1254",
+      "son_url": "http://publications.europa.eu/resource/cellar/168e9fda-747c-11e4-b593-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": null,
+      "alinti": "ANNEX II Specific energy consumption classes ... Table 1 Classification from 1 January 2016 SEC class ... A+ (most efficient) SEC < -42 ... G (least efficient) 0 ≤ SEC",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32017R1369",
+      "son_url": "http://publications.europa.eu/resource/cellar/49151917-7365-11e7-b2f2-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Bu tüzük (Enerji Etiketleme Çerçeve Tüzüğü) 'EPREL' kısaltmasını metinde kullanmıyor, 'product database' diyor; EPREL Komisyonun bu veritabanına verdiği kısaltılmış isimdir (Komisyon sitelerinde teyitli, bkz. menu linki /eprel_en).",
+      "alinti": "1. From 1 January 2019, the supplier shall, before placing on the market a unit of a new model covered by a delegated act, enter in the public and compliance parts of the product database the information for that model, as set out in Annex I. 2. Where units of models covered by a delegated act are placed on the market between 1 August 2017 and 1 January 2019, the supplier shall, by 30 June 2019, enter in the product [database ...]",
+      "alinti_dogrulandi": true
+    }
+  ]
+}
