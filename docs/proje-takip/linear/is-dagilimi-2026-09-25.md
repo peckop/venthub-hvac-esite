@@ -1,37 +1,42 @@
-<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-25T12:43:48Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
+<!-- uretilmis: Linear GraphQL disa aktarimi (scripts/nlm/linear_disa_aktar.py) · damga 2026-09-25T17:58:56Z · elle duzenlenmez; yenileme: gun kapanisi ritueli -->
 # Linear İş Dağılımı — Şantiye Durumu (2026-09-25)
 
-**Damga:** 2026-09-25T12:43:48Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 3 çağrı) · **Toplam iş:** 244
+**Damga:** 2026-09-25T17:58:56Z · **Kaynak:** Linear GraphQL `issues` (sayfalama 4 çağrı) · **Toplam iş:** 397
 
 > Okuma kılavuzu: her proje bir kat, her kilometre taşı bir dükkân sırası, her iş bir dükkân. **% bitti = Done / (Toplam − Canceled)**. Sorumluluk = şerit etiketi (assignee alanı çoğunlukla boş).
 
-Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 → **genel % bitti 0%**
+Durum dağılımı: Done 125 · In Progress 65 · Todo/Backlog 180 · Canceled 23 → **genel % bitti 33%**
 
 ## §1 ÖZET — proje başına
 
 | Proje | Toplam | Done | In Progress | Todo/Backlog | Canceled | % bitti |
 |---|---:|---:|---:|---:|---:|---:|
-| (projesiz) | 18 | 0 | 11 | 7 | 0 | 0% |
-| Altyapı, Kapılar ve Belge Hattı | 109 | 0 | 27 | 82 | 0 | 0% |
-| Katalog ve Ürün Verisi | 32 | 0 | 10 | 22 | 0 | 0% |
+| (projesiz) | 27 | 3 | 11 | 7 | 6 | 14% |
+| Altyapı, Kapılar ve Belge Hattı | 177 | 59 | 27 | 83 | 7 | 35% |
+| Katalog ve Ürün Verisi | 44 | 10 | 10 | 22 | 1 | 23% |
 | Kurumsal Belgeler (DESIGN-BELGE) | 2 | 0 | 0 | 2 | 0 | 0% |
 | Marka Kılavuzu (DESIGN-MARKA) | 3 | 0 | 0 | 3 | 0 | 0% |
-| SEO ve Yayın | 6 | 0 | 5 | 1 | 0 | 0% |
-| Teklif Akışı ve Müşteri Paneli | 29 | 0 | 4 | 25 | 0 | 0% |
-| Vitrin 15A Yeniden Tasarım (DESIGN-MENU) | 45 | 0 | 8 | 37 | 0 | 0% |
-| **TOPLAM** | 244 | 0 | 65 | 179 | 0 | 0% |
+| Q-Validator | 28 | 20 | 0 | 0 | 8 | 100% |
+| SEO ve Yayın | 13 | 6 | 5 | 1 | 1 | 50% |
+| Teklif Akışı ve Müşteri Paneli | 35 | 6 | 4 | 25 | 0 | 17% |
+| Vitrin 15A Yeniden Tasarım (DESIGN-MENU) | 68 | 21 | 8 | 37 | 0 | 31% |
+| **TOPLAM** | 397 | 125 | 65 | 180 | 23 | 33% |
 
 ## §2 ŞERİT (etiket) başına
 
 | Etiket | Toplam | Done | In Progress | Todo/Backlog | % bitti |
 |---|---:|---:|---:|---:|---:|
-| ALTYAPI | 76 | 0 | 18 | 58 | 0% |
+| ALTYAPI | 108 | 29 | 18 | 58 | 28% |
 | DESIGN | 6 | 0 | 0 | 6 | 0% |
-| OPS | 32 | 0 | 3 | 29 | 0% |
-| Recep kapısı | 13 | 0 | 5 | 8 | 0% |
-| URUN | 77 | 0 | 20 | 57 | 0% |
-| URUN-KATALOG | 15 | 0 | 10 | 5 | 0% |
-| (etiketsiz) | 45 | 0 | 15 | 30 | 0% |
+| OPS | 56 | 16 | 3 | 29 | 33% |
+| P01-Data | 4 | 3 | 0 | 0 | 100% |
+| P02-Constraint | 6 | 6 | 0 | 0 | 100% |
+| P03-API | 3 | 0 | 0 | 0 | - |
+| P04-Research | 3 | 3 | 0 | 0 | 100% |
+| Recep kapısı | 19 | 3 | 5 | 8 | 19% |
+| URUN | 114 | 33 | 20 | 58 | 29% |
+| URUN-KATALOG | 20 | 4 | 10 | 5 | 21% |
+| (etiketsiz) | 84 | 31 | 15 | 30 | 40% |
 
 ## §3 Proje → kilometre taşı → iş (açık işler; Done ayrı)
 
@@ -41,11 +46,17 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
+| REC-1 | Canceled | Get familiar with Linear | - | 0 | 2026-09-07 |
+| REC-2 | Canceled | Set up your teams | OPS | 0 | 2026-09-07 |
+| REC-3 | Canceled | Connect your tools | OPS | 0 | 2026-09-07 |
+| REC-4 | Canceled | Import your data | - | 0 | 2026-09-07 |
+| REC-33 | Canceled | P07-Enterprise-Search: Faz 0 - Envanter ve Zemin Etüdü | OPS | 0 | 2026-09-07 |
 | REC-140 | In Review | (ALTYAPI) anon rolüne tablo düzeyinde yazma GRANT'ları — derinlik savunması yok, | ALTYAPI | 3 | 2026-09-25 |
 | REC-269 | In Review | URUN (SEO ölçümü): Search Console + 3 aile PDP yapısal veri taraması — 8 günlük  | URUN | 0 | 2026-09-08 |
 | REC-271 | In Review | FİLO: kararla kod arasında kapı yok — 57 karar ölçüldü, 14'ü numarasız, 3 numara | URUN | 2 | 2026-09-07 |
 | REC-272 | In Review | URUN: uydurma kod SLUG'da da var — adres kararı + yönlendirme (VRT-16076..16080) | URUN | 3 | 2026-09-07 |
 | REC-275 | In Review | KATALOG: kodsuz ürün yükleme hattından GEÇEMİYOR — cetvelin kaçış valfi araçta y | URUN-KATALOG | 2 | 2026-09-22 |
+| REC-276 | Canceled | OPS: Linear kayıt sınırı ölçüm kaydı — arşiv sonrası deneme (Canceled'a çekilece | OPS | 0 | 2026-09-07 |
 | REC-283 | Backlog | URUN (ölçüm): pasif kategori vitrini KAPATMIYOR — is_active=false sayfa açık, di | URUN | 0 | 2026-09-08 |
 | REC-285 | In Review | URUN: altbilgideki DÖRT sosyal bağlantı bizim değil, platformların ana sayfasına | URUN | 0 | 2026-09-24 |
 | REC-294 | Backlog | rate_limits tablosunda HAM IP süresiz saklanıyor — KVKK: IP kişisel veridir, tem | ALTYAPI | 3 | 2026-09-23 |
@@ -60,6 +71,14 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-382 | In Review | E-posta logosu kırık: tenants.config.brand_logo_url 404 (vercel.app/images/logo. | - | 3 | 2026-09-24 |
 | REC-386 | Backlog | Sipariş numarası sayacı kiracısız (order_number_counters PK yalnız gun) — Faz 2  | OPS | 4 | 2026-09-24 |
 
+<details><summary>Done (3)</summary>
+
+- REC-266 · URUN: Kategori kartındaki açıklama paragrafı yalnız hover'da açılıyor — dokunmat · 2026-09-07
+- REC-270 · URUN (K3): kategori adresinden /category/ kalkacaktı — karar 4 gündür kodda yok, · 2026-09-11
+- REC-280 · ALTYAPI: MEMORY.md ortak hafıza indeksi — bayt tavanı uyarı kolu (eşik 15800) +  · 2026-09-17
+
+</details>
+
 ### Altyapı, Kapılar ve Belge Hattı
 
 **(kilometre taşı yok)**
@@ -72,6 +91,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-162 | In Review | Vercel günlük derleme sınırı: kapıda "rate limited" kolu = ÖLÇÜLEMEZ (madde 3 dı | ALTYAPI | 2 | 2026-09-07 |
 | REC-167 | Backlog | KVKK başvuru kaydı şeması: başvuru no (K19 önek KV), talep metni, ad soyad, tele | ALTYAPI | 4 | 2026-09-06 |
 | REC-168 | In Review | ALTYAPI: Satış kipine TEK ANAHTARLA geçiş — hide_price (37 kategori) + NEXT_PUBL | ALTYAPI, Recep kapısı | 3 | 2026-09-24 |
+| REC-173 | Canceled | Tasarım arşivi ve taşınabilirlik: 4 Claude Design projesi depoya günlük çekilir, | ALTYAPI, Recep kapısı | 2 | 2026-09-09 |
 | REC-177 | In Review | Hafıza kancaları: eylem defteri (mv/rm → state) · soru yönlendirme (hatırlıyor m | ALTYAPI | 2 | 2026-09-07 |
 | REC-178 | Backlog | 1000 satır tavanı — sahipsiz 8 kalemin sahip ataması (pricingMaterialize:126 YAZ | OPS | 2 | 2026-09-17 |
 | REC-181 | Todo | 20 eksen denetimi 3. koşum (v3): 2. koşumdan beri 466 commit, edge ortak katman  | OPS | 3 | 2026-09-16 |
@@ -79,6 +99,8 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-184 | In Review | REC-178/Katalog: generate-sitemap.mjs (limit 5000, çağıran yok = ÖLÜ ADAY ölçümü | URUN-KATALOG | 3 | 2026-09-22 |
 | REC-186 | In Review | URUN (K12): DD ailesi 6N090P → 61090P ad + slug düzeltmesi, eski slug 301, kanon | URUN | 3 | 2026-09-22 |
 | REC-187 | Backlog | Gün kapanışı v2: şerit dilim kaydı (DEVAM+ANLAM, numaralı) · iş kalemi sipariş y | OPS | 2 | 2026-09-17 |
+| REC-188 | Todo | REC-179/URUN: 11 fail-open konformans kapısına evren muhafızı — 3d-asset-validit | URUN | 2 | 2026-09-07 |
+| REC-194 | Canceled | Mekanizma CRON katmanı: Recep 2026-09-06 "cron kurulmasın, irtibat kopuyor, ayrı | OPS, Recep kapısı | 4 | 2026-09-24 |
 | REC-201 | Backlog | ALTYAPI (Kurumsal Belgeler K13 + SEO K4): PDF üreticide sayfa no / nakli yekûn f | ALTYAPI | 3 | 2026-09-09 |
 | REC-215 | Todo | Ingestor deposu PUBLIC yapılacak (Recep kararı 09-07) — ÖNCE 2 sır rotasyonu: Su | OPS, Recep kapısı | 2 | 2026-09-24 |
 | REC-216 | In Review | RLS politika şişmesi (153 katman) — kök sebep 7 izlenmeyen 8-haneli migration +  | ALTYAPI, Recep kapısı | 1 | 2026-09-07 |
@@ -88,6 +110,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-234 | Backlog | ALTYAPI: enforce_role_change v2 kapsam dışı kalanlar (admin→admin, düşürme gecik | ALTYAPI, Recep kapısı | 4 | 2026-09-07 |
 | REC-238 | Backlog | ALTYAPI: registry-sync GitHub merge'lerinde koşmuyor (Action yok) | ALTYAPI | 4 | 2026-09-07 |
 | REC-239 | Backlog | ALTYAPI: Master merge dağıtım gözcüsü (READY parite kapısı) | ALTYAPI | 4 | 2026-09-07 |
+| REC-240 | Canceled | ALTYAPI: Companion commit borcu temizliği (118 dosya, taşıyıcı kararına bağlı) | ALTYAPI | 4 | 2026-09-24 |
 | REC-241 | Backlog | ALTYAPI: Belgesiz-defter worktree körlüğü (.git dosya, is_dir() False dönüyor) | ALTYAPI | 4 | 2026-09-07 |
 | REC-242 | Backlog | ALTYAPI: Ana-dizin kaza önlemi yapısal katman | ALTYAPI | 4 | 2026-09-07 |
 | REC-243 | Backlog | ALTYAPI: Araç-zinciri sürüm süpürmesi (ruff/pnpm) | ALTYAPI | 4 | 2026-09-07 |
@@ -128,6 +151,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-317 | Todo | URUN (deneme-3): linkinator + unlighthouse — K3-b adres yayını sonrası site gene | - | 2 | 2026-09-12 |
 | REC-318 | In Progress | OPS: DENEME PROGRAMI 2026-09-12 — 12 deneme kaleminin tek sırası (üst kayıt; hiç | - | 1 | 2026-09-21 |
 | REC-321 | In Review | ALTYAPI: depoda geçersiz SQL taşıyan altı ölü migration dosyası — beşi `CREATE P | - | 3 | 2026-09-15 |
+| REC-324 | Duplicate | ALTYAPI: sentry + postcss zinciri güvenlik yükseltmesi (5 paket, 23 high'ın kala | - | 3 | 2026-09-15 |
 | REC-325 | Backlog | ALTYAPI: commit uyarı kancası cetvel sınıfında YAPISAL yanlış pozitif veriyor | - | 3 | 2026-09-16 |
 | REC-326 | In Review | ALTYAPI: kalan bağımlılık açıkları — @sentry/nextjs ve postcss zincirleri (brace | - | 3 | 2026-09-15 |
 | REC-329 | In Review | ALTYAPI: Linear yeni-yorum sayacı kancası — UserPromptSubmit'te "son okumadan be | - | 2 | 2026-09-15 |
@@ -144,6 +168,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-353 | In Review | ALTYAPI: Gemini + Jules düzeneğini TAMAMEN KALDIR (Recep 09-17: "evet temizle de | ALTYAPI | 2 | 2026-09-17 |
 | REC-354 | Backlog | URUN: shadcn/ui yapılandırması cetvellerle ters — components.json rsc:false + cs | URUN | 4 | 2026-09-16 |
 | REC-355 | In Review | ALTYAPI (security-check v3 güvenlik koşumu, 2026-09-16): 11 CONFIRMED — 1 CRITIC | ALTYAPI | 1 | 2026-09-24 |
+| REC-356 | Canceled | ALTYAPI (karar 33, Recep 09-16): MIGRATION MERGE KAPISI SINIFLI — ekleme sınıfı  | ALTYAPI | 2 | 2026-09-24 |
 | REC-358 | Backlog | ALTYAPI: venthub.com.tr'den ödeme/kupon/admin Edge çağrıları 403 forbidden_origi | - | 1 | 2026-09-17 |
 | REC-360 | Backlog | ALTYAPI: şema grafı aşama 2 — fonksiyon çağrı grafiği + rol yetkisi (EXECUTE) | ALTYAPI | 3 | 2026-09-21 |
 | REC-361 | Backlog | ALTYAPI: kanıt avı — investigate skill'ine "önce başarısız test" şartı (tek tur  | ALTYAPI | 4 | 2026-09-21 |
@@ -167,12 +192,15 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
 | REC-64 | Backlog | İkiz taraması: 20 aday eksik — koda karşı doğrula, haritaya işle | OPS | 3 | 2026-09-07 |
+| REC-67 | Canceled | Companion üreteci taşıyıcısı — mimo üyeliği iptal, 28'inden sonra Haiku masada | OPS | 3 | 2026-09-24 |
+| REC-84 | Canceled | Belge Tazeleme — companion + master MD + NLM ikizi, SIFIRLANANA KADAR | OPS | 0 | 2026-09-23 |
 | REC-102 | Backlog | Orion companion üreteci: 3 kalem — çıkış kodu dürüstlüğü, defter/batch yolu, mut | ALTYAPI | 3 | 2026-09-07 |
 
 **Kapı kör kolları**
 
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
+| REC-51 | Canceled | Supabase "leaked password protection" AÇ | OPS, Recep kapısı | 2 | 2026-09-07 |
 | REC-52 | Backlog | whsec_ webhook secret rotasyonu (repo PUBLIC) | ALTYAPI, Recep kapısı | 2 | 2026-09-08 |
 | REC-58 | Backlog | Onaysız tehlikeli butonlar: tekil iade + tekil rol değişikliği | ALTYAPI | 1 | 2026-09-07 |
 | REC-119 | Backlog | Sistematik ölü kod temizliği: knip 30 dosya + 67 export — CodeGraph çapraz doğru | ALTYAPI | 3 | 2026-09-07 |
@@ -190,6 +218,70 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-82 | Backlog | Pano v2: adresli görünürlük — yetkisiz oturum panonun tamamını görmez | ALTYAPI | 2 | 2026-09-03 |
 | REC-107 | Backlog | Hijyen: ortak depoda 36 worktree + 83 stash birikti — envanter ve bilinçli temiz | OPS | 4 | 2026-09-14 |
 | REC-126 | Backlog | Jules Darwin/Bolt önerileri — kapatılan #879/#878'in fikir kaydı (atama değil, d | OPS | 0 | 2026-09-07 |
+
+<details><summary>Done (59)</summary>
+
+- REC-34 · PR #799 — Bash yazma kapısı: üç katman + E1 pre-commit şerit kapısı · 2026-08-27
+- REC-35 · PR #804 — INV-EDGE-DRIFT-1: paylaşılan girdiye dokunan PR prod'u master'a karşı  · 2026-08-27
+- REC-37 · PR #800 — Gözcü onarımı: sessiz kırpma + arşiv patlaması + iki sessiz atlama · 2026-08-27
+- REC-38 · PR #801 — T160 §2.3: test ADA değil PARAGRAFA · 2026-08-27
+- REC-41 · Companion hattı: istem revizyonu + model mimo-2.5-pro + kirli 86 dosyanın yenide · 2026-08-25
+- REC-42 · Köprü Faz 2 tasarımı (ters yön) + [OPS] görev yönetimi Linear'a geçiş kararı · 2026-08-26
+- REC-53 · Registry göçü: kalan ~80 açık kaydın triyajı · 2026-08-26
+- REC-63 · PR envanteri eşitleme — 14 kayıtsız açık PR'ın triyajı · 2026-08-24
+- REC-66 · venthub companion+master CJK süpürmesi — ikize giden master'larda 4.519, 191 com · 2026-08-25
+- REC-68 · Tasarım gerekçesi companion'a BİREBİR taşınsın — T019 istem ailesi (Txxx: NİÇİN/ · 2026-08-25
+- REC-69 · T021 — Üretilen belge tazelik kapıları, venthub ayağı (Kapı A + Kapı C + cetvel) · 2026-09-23
+- REC-74 · Güvenlik açık işleri (registry taşıması) · 2026-09-07
+- REC-76 · Altyapı & Araç açık işleri (registry taşıması) · 2026-09-07
+- REC-83 · Companion sembol kaybı — ayrıştırıcı keşfi sembolleri düşürüyor, kalite kapısı k · 2026-08-28
+- REC-86 · Ajan hafıza sistemi — araştırma, karar ve Faz 1 (PreCompact kapısı) · 2026-09-23
+- REC-87 · Duman dedektörleri Faz-1.5: deploy bekçisi + NLM tazelik bekçisi + rozet bekçisi · 2026-08-30
+- REC-118 · PR #640 [BILINCLI-KIRMIZI] INV-DOC-3 yaml-defter paritesi — parkta; silahlandırm · 2026-09-05
+- REC-120 · INV-CETVEL-YAPI iki kapsam kusuru: HÜKÜM başlığı dosya-çapında tekil sanılıyor + · 2026-09-07
+- REC-130 · Ölçüm komutları çalışma dizinini beyan eder; oturum dizini şerit ağacından ayrış · 2026-09-17
+- REC-131 · Merge ritüeli betiği depoya alınır: 5 ölçüm (DIRTY değil · 7 kol listede · düşen · 2026-09-06
+- REC-132 · Üretilmiş toplamalar (master md + manifest) özellik PR'larında yol almasın; mast · 2026-09-23
+- REC-134 · SSR boş-kabuk kilidi CI'da HİÇ koşmuyor — SMOKE_BASE_URL hiçbir workflow'da tanı · 2026-09-06
+- REC-138 · SSR duman kilidi PR KAPISI olarak: CI kendi sunucusunu kaldırır — ama gerçek Sup · 2026-09-23
+- REC-142 · Companion sistemi UYKU KİPİ — tek taşıyıcı anahtarı, tüm kapılar say-raporla, ka · 2026-09-23
+- REC-158 · Föy PDF'i ile vitrin AYNI biçimlendiriciyi kullansın (INV-FOY-PARITE-1) — öncül  · 2026-09-23
+- REC-174 · Model yönlendirme cetvel satırı (WrongStack 2/3): mekanik iş ucuz modele/betiğe, · 2026-09-07
+- REC-175 · Tek ekran pano (WrongStack 3/3): gün kapanışı betiği her akşam tek dosya üretir  · 2026-09-25
+- REC-176 · venthub-tasarim-dili skill DOĞRULAMA: 14 kural × Kararlar gövdesi × Design dosya · 2026-09-07
+- REC-179 · Evren muhafızı sınavı: 53 aday konformans kapısı × sabotaj (evreni daralt, yeşil · 2026-09-07
+- REC-180 · Araç envanteri: 27 hook (9'u bağlı) · 119 betik · 64 skill · 5 git kancası · 29  · 2026-09-07
+- REC-183 · REC-178/ALTYAPI: supabase/functions order-housekeeping:63 (limit 1000, cron) + s · 2026-09-07
+- REC-185 · REC-180/ALTYAPI: araç envanteri KAPISI — scripts/hijyen/arac-envanteri.cjs (fs t · 2026-09-07
+- REC-189 · REC-179/ALTYAPI: 3 fail-open kapıya evren muhafızı — pricing-money-append-only · · 2026-09-07
+- REC-192 · ALTYAPI: mekanizma teslimat kanıtı "atıldı" ile "ULAŞTI"yı ayırt etmiyor — gözcü · 2026-09-17
+- REC-286 · SSR duman alarmı yanlış temsilci seçiyor: "kök kategori" = alfabetik ikinci yol  · 2026-09-08
+- REC-287 · Mekanizma probu "bağımsız tanık" değil: jeton hedef dışı her gözcü bildirimine d · 2026-09-17
+- REC-292 · ALTYAPI: betikle yapılan doğrudan DB yazımları admin_audit_log'a DÜŞMÜYOR — bugü · 2026-09-09
+- REC-296 · ALTYAPI: Edge CORS allowlist'i *.vercel.app son-ekini kabul ediyor — yalnız kend · 2026-09-17
+- REC-301 · OPS: gstack (Garry Tan, 23 skill) ile bizim skill/kanca setimizin ÖNYARGISIZ kar · 2026-09-12
+- REC-302 · ALTYAPI (gstack-1/6): "İŞİ TAM YAP" ilkesi cetvele — testi erteleme, %90 çözüm s · 2026-09-15
+- REC-303 · ALTYAPI (gstack-2/6): 60 evals.json'ı GERÇEKTEN KOŞ — yönlendirme sınavı betiği  · 2026-09-15
+- REC-304 · ALTYAPI (gstack-3/6): oturum başı skill yükü ölçümü ve eşiği — .claude 7.4K toke · 2026-09-15
+- REC-305 · ALTYAPI (gstack-4/6): skill'lere ortak "Bitiş Durumu + Karışıklık + Kanıtsız Kıs · 2026-09-15
+- REC-306 · ALTYAPI (gstack-5/6): testsiz 5 fail-closed kanca — board-release, lane-guard, p · 2026-09-15
+- REC-307 · ALTYAPI (gstack-6/6): `investigate` skill'i — kök sebep bulmadan yama YOK, 3 den · 2026-09-15
+- REC-308 · ALTYAPI (gstack-5b): bozuk stdin kuralı cetvele — fail-open ama SESSİZ DEĞİL; se · 2026-09-15
+- REC-314 · ALTYAPI: ATIL ARAÇ KAPISI — envantere "bağlı adım + son kullanım + sürüm tazeliğ · 2026-09-15
+- REC-315 · ALTYAPI (deneme-1): squawk — Postgres migration linter PR kapısı (migration merg · 2026-09-13
+- REC-319 · ALTYAPI (deneme-4): Claude Code YERLEŞİK skill sınavı (claude plugin eval) + /sk · 2026-09-13
+- REC-320 · OPS: hafıza dizini ÖZEL git deposuna — sürüm geçmişi + yedek (09-07 kırpılma kay · 2026-09-13
+- REC-322 · ALTYAPI: jwt_role() uygulama rolu yerine Postgres rolunu okuyor; storage.objects · 2026-09-17
+- REC-323 · ALTYAPI: Next.js 15.5.24 güvenlik yükseltmesi (2 CRITICAL) — PLAN · 2026-09-13
+- REC-327 · ALTYAPI: Jules workflow'ları (7 dosya) KALDIR — Mart'tan beri 4'ü kırmızı, zaman · 2026-09-17
+- REC-328 · ALTYAPI: Gözcü/prob/doğrula üçlüsü KAPATILIYOR — filo doğrudan mesajla çalışır;  · 2026-09-17
+- REC-333 · ALTYAPI: ai-auto-repair.yml GitHub'da disabled_manually ama depoda duruyor + ci. · 2026-09-17
+- REC-335 · ALTYAPI: products/inventory/stok RPC yetkileri — REC-322 ilanındaki 6 kalemin 3' · 2026-09-14
+- REC-336 · ALTYAPI: migration geçmişi prod şemasını YENİDEN ÜRETEMİYOR — client_errors · er · 2026-09-15
+- REC-347 · ALTYAPI (gstack Faz 2 çıktısı): plan-challenger'a DÖRT SORU — "bu adım gerekli m · 2026-09-17
+- REC-363 · ALTYAPI: LLM / gömme köprüsü — çapalı hafızada Türkçe anlamca arama (A başsız Ha · 2026-09-25
+
+</details>
 
 ### Katalog ve Ürün Verisi
 
@@ -209,6 +301,8 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-209 | In Review | KOL 6 — Yükleme yolları + kapılar + KATALOG KARNESİ betiği (en büyük yazıcı test | URUN-KATALOG | 2 | 2026-09-24 |
 | REC-211 | Todo | FAZ 4 artığı: yüklenmeyen 16 teknik değer — dört ayrı karar (ağırlık · çelişen g | Recep kapısı, URUN-KATALOG | 3 | 2026-09-22 |
 | REC-212 | In Review | TAŞINABİLİR KATALOG YOK: bugün USB/yeni makine ile 375 ürün baştan kurulamıyor — | URUN-KATALOG | 2 | 2026-09-25 |
+| REC-214 | Duplicate | Kategori doluluğu hangi sorguyla ölçülür — cetvelde yazılı değil; üç ölçüt üç fa | URUN | 3 | 2026-09-23 |
+| REC-264 | Canceled | URUN-KATALOG: İçerik kalite denetimi (spec/açıklama kapsama + PDF-DB örnekleme) | URUN-KATALOG | 4 | 2026-09-22 |
 | REC-265 | Backlog | OPS: Admin ürün formu — technical_specs düzenleme UI | OPS | 4 | 2026-09-07 |
 | REC-282 | In Review | KATALOG: altı SULU BATARYA ürünü YANLIŞ fotoğrafla satılıyor — ısı geri kazanım  | - | 2 | 2026-09-24 |
 | REC-284 | Backlog | KATALOG: kategori görselinin tek bir yolu yok — iki taşıyıcı yan yana, hiçbir ka | - | 3 | 2026-09-08 |
@@ -240,6 +334,21 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-122 | Backlog | EN marka şeridinde "Frekans Konvertörü" marka olarak listeleniyor + 6 marka 3x t | URUN | 2 | 2026-09-07 |
 | REC-135 | Todo | Kategori ağacı boşlukları: 10 dalsız ürün + 7 boş alt dal (365/375 zaten dalında | URUN | 2 | 2026-09-23 |
 
+<details><summary>Done (10)</summary>
+
+- REC-39 · PR #803 — Lineo birleşimi sonrası bayat taban temizliği (36→34) · 2026-08-27
+- REC-56 · Ürün-katalog hattı — cetveller indi, içerik/derinlik işleri açık · 2026-09-07
+- REC-124 · Katalog veri kusurları paketi: "Frenkans"/"Inventoru" yazımları CANLIDA + DAN-80 · 2026-09-23
+- REC-136 · Katalog sayımı TEK KAYNAK: sitenin okuduğu yolla sayan betik + günlük tablo; say · 2026-09-23
+- REC-155 · CANLI: 126/375 ürün sayfasında "Ürün Açıklaması" altında iç kademe notu görünüyo · 2026-09-07
+- REC-157 · Konformans kapısı: aile açıklamasındaki sayısal değer, ailenin ürünlerinden türe · 2026-09-17
+- REC-163 · KAYNAK DİZİNİ: tedarikçi PDF'leri bir kez, deterministik, sayfa+tablo düzeyinde  · 2026-09-22
+- REC-190 · Katalog: canlıda 38 teknik hücre sayısal anahtarda birim-gömülü metin taşıyor (m · 2026-09-22
+- REC-193 · KATALOG: AVE-20150 fiyatı canlıda 0,00 — içe alımda düşen tek satır; yazımı Rece · 2026-09-24
+- REC-207 · KOL 1 — Kaynak dizini tazeliği: 36 belge dizin dışında; yeni PDF inince dizin ba · 2026-09-07
+
+</details>
+
 ### Kurumsal Belgeler (DESIGN-BELGE)
 
 **(kilometre taşı yok)**
@@ -259,6 +368,46 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-151 | Backlog | Sorular — DESIGN-MARKA (sürekli açık soru/öneri kaydı) | DESIGN, OPS | 0 | 2026-09-05 |
 | REC-202 | Backlog | DESIGN-MARKA (K2): Marka projesi CLAUDE.md aynasında fiil düzeltmesi "Teklif al" | DESIGN, OPS | 4 | 2026-09-07 |
 
+### Q-Validator
+
+**(kilometre taşı yok)**
+
+| İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
+|---|---|---|---|---:|---|
+| REC-19 | Canceled | 001: Hypothesis Engine Scoring API | P03-API | 0 | 2026-09-07 |
+| REC-20 | Canceled | 002: Root Profiler API | P03-API | 0 | 2026-09-07 |
+| REC-21 | Canceled | 003: Hypothesis Test API | P03-API | 0 | 2026-09-07 |
+| REC-23 | Canceled | 004: Populate Technical Function Flags | P01-Data | 3 | 2026-09-07 |
+| REC-28 | Canceled | Implement Remaining 5 Constraint Engines (Phase 1 / V1) | - | 0 | 2026-09-07 |
+| REC-29 | Canceled | Enforce Principle 4: Semantic Void and Randomness Check (Opposition Constraint) | - | 0 | 2026-09-07 |
+| REC-30 | Canceled | Research & Implement Adaptive Alpha (Distance Decay) for Higher Orbits | - | 0 | 2026-09-07 |
+| REC-31 | Canceled | Topological Network Visualization (API & Next.js Bridge) | - | 0 | 2026-09-07 |
+
+<details><summary>Done (20)</summary>
+
+- REC-5 · [P01-001] Python venv + requirements.txt kurulumu · 2026-03-27
+- REC-6 · [P01-002] Klasör yapısı (models, importers, engine, api) setup · 2026-03-27
+- REC-7 · [P01-003] SQLAlchemy Modelleri (SQL schema mapping) · 2026-03-27
+- REC-8 · [P01-004] FastAPI Minimal Iskelet (Açılış) · 2026-03-27
+- REC-9 · [P01-005] Pytest Smoke Test Setup · 2026-03-27
+- REC-10 · 001: Full Schema — 10 Veri Modeli · 2026-03-28
+- REC-11 · 002: Tanzil Text Importer · 2026-03-28
+- REC-12 · 003: Quranic Corpus Morphology Importer · 2026-03-28
+- REC-13 · 001: Morphology Constraint · 2026-03-28
+- REC-14 · 002: Syntax Constraint · 2026-03-28
+- REC-15 · 003: Opposition Constraint · 2026-03-28
+- REC-16 · 004: Local Context Constraint · 2026-03-28
+- REC-17 · 005: Global Distribution Constraint · 2026-03-28
+- REC-18 · 006: Technical Function Constraint · 2026-03-28
+- REC-22 · 007: ConstraintBase ABC Refactoring · 2026-03-29
+- REC-24 · 008: Sentinel Guard Quality Gates (Coverage + Complexity) · 2026-03-29
+- REC-25 · 009: ConstraintBase ABC Refactoring (Kod Tekrarı Eliminasyonu) · 2026-03-28
+- REC-26 · P04-001: Gravity Engine (Semantic Neighborhood) Entegrasyonu · 2026-03-31
+- REC-27 · P04-005: Faz 2 - Kelime Form Çekim Desenleri · 2026-03-31
+- REC-32 · P04-007: Faz 4 - Harf Seviyesi α Tutarlılık Testi · 2026-03-31
+
+</details>
+
 ### SEO ve Yayın
 
 **(kilometre taşı yok)**
@@ -271,6 +420,23 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-297 | In Review | URUN: kategori sorgusu satırın tamamını çekiyor — emekli marketing_title kolonu  | - | 4 | 2026-09-09 |
 | REC-300 | In Review | URUN (K3-b): ADRES YAYINI — Türkçe önek (33×308) + model sayfası -p-<sku> (442 a | URUN | 2 | 2026-09-25 · BEKLİYOR: REC-212 |
 | REC-373 | Backlog | URUN: EN sayfalar <html lang="tr"> basıyor — kök layout dili sabit (çoklu kök la | URUN | 3 | 2026-09-22 |
+
+**Bing kökü ve hreflang**
+
+| İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
+|---|---|---|---|---:|---|
+| REC-105 | Canceled | Sitemap /tr/destek ve /en/destek ilan ediyor — ikisi de canlıda 404 | URUN | 3 | 2026-09-03 |
+
+<details><summary>Done (6)</summary>
+
+- REC-50 · venthub.com.tr DNS + kanonik SITE_URL · 2026-09-07
+- REC-90 · SEO + dürüstlük gece paketi: 5 PR (#894-#898) — domain açılışı ertesi vitrin kim · 2026-08-30
+- REC-100 · SEO: canlıda çift canonical + localhost:3000 — istemci Seo bileşeni yazılı kural · 2026-08-31
+- REC-111 · JSON-LD fiyat sızıntısı: 72/80 ürün sayfası Google'a fiyat beyan ediyor (696 ala · 2026-09-01
+- REC-127 · Bing kökü dizinleyemiyor: / → /tr 307 GEÇİCİ yönlendirme + hreflang x-default YO · 2026-09-24
+- REC-268 · URUN: erişilebilirlik (a11y) — canlı anasayfa 96/100, 3 kırmızı denetim; accessi · 2026-09-17
+
+</details>
 
 ### Teklif Akışı ve Müşteri Paneli
 
@@ -328,6 +494,17 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-54 | In Review | Teklif/RFQ modülü — v1 canlı, v2 uygulama açık | OPS | 2 | 2026-09-24 |
 | REC-384 | In Review | Teklif yayımı: müşteri bildirimi + sent_at + quote_no sunucu tarafında (tarayıcı | OPS | 2 | 2026-09-25 |
 
+<details><summary>Done (6)</summary>
+
+- REC-36 · PR #806 — Defter ADIM-1 GENİŞLET (MIGRATION — merge yalnız Recep) · 2026-08-27
+- REC-40 · PR #805 — Defter cetveli §6: "aynı PR" dağıtım garantisi değil, genişlet-daralt  · 2026-08-27
+- REC-73 · Ödeme & Finans açık işleri (registry taşıması) · 2026-09-07
+- REC-75 · ERP & Admin açık işleri (registry taşıması) · 2026-09-07
+- REC-112 · Google ile giriş kırık: "Error 401: deleted_client" — OAuth client Google tarafı · 2026-09-01
+- REC-117 · Misafir teklif akışı: teklif için üyelik zorunluluğu kalkıyor (Recep kararı) — a · 2026-09-17
+
+</details>
+
 ### Vitrin 15A Yeniden Tasarım (DESIGN-MENU)
 
 **(kilometre taşı yok)**
@@ -360,6 +537,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-277 | Backlog | URUN: Vitrin 15A kural-tipi kararlar için eksik kapılar — 17 karar (K7 K11 K22 K | URUN | 3 | 2026-09-07 |
 | REC-278 | Backlog | K42 uygulaması: Arama sonucu sayfası (ekran 08) | URUN | 3 | 2026-09-07 |
 | REC-279 | Backlog | K50 uygulaması: Gözden geçirme v1 kararları — /tr/teklif-listesi adresi, aylık e | URUN | 3 | 2026-09-07 |
+| REC-288 | Duplicate | Kategori rotası HİÇ prerender edilmiyor: revalidate=3600 ve ISR vaadi ölü, her i | - | 3 | 2026-09-08 |
 | REC-340 | In Review | URUN: ARAMA işlevsiz — Türkçe karakter (unaccent yok) ve yazım hatası (trgm yok) | URUN | 1 | 2026-09-23 |
 | REC-341 | Backlog | URUN + OPS: SİTE İÇİ DİL MODELİ ASİSTANI (sohbet · ürün seçim yardımcısı · tekni | URUN | 3 | 2026-09-18 |
 | REC-346 | Backlog | URUN: ARAMA metin motoru A/B — pgroonga vs tsvector+unaccent+rum, aynı dokuz vak | URUN | 3 | 2026-09-15 |
@@ -391,6 +569,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 
 | İş | Durum | Başlık | Şerit | Öncelik | Son güncelleme |
 |---|---|---|---|---:|---|
+| REC-65 | Duplicate | Ürün kartı + PDP fiyat/teknik özellik düzeni revizyonu | URUN | 2 | 2026-09-23 |
 | REC-95 | Backlog | Ürün özelliği katmanı: ATEX / mini aksiyel / asit dayanımlı kategori DEĞİL — roz | URUN | 3 | 2026-09-23 |
 
 **Faz 4 — Teklif Listesi ve Hesap**
@@ -405,6 +584,32 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 |---|---|---|---|---:|---|
 | REC-129 | Backlog | Kimlik + vitrin yeniden tasarımı — tek dil, fazlı üretim (logo/palet/ikon KAPALI | OPS | 2 | 2026-09-23 |
 
+<details><summary>Done (21)</summary>
+
+- REC-72 · Vitrin & Ürün açık işleri (registry taşıması) · 2026-09-07
+- REC-79 · Arama önerileri UUID'li dilsiz URL üretiyor — tıklanan öneri ölü sayfaya gidiyor · 2026-08-27
+- REC-80 · İletişim formu hiçbir şey kaydetmiyor — sahte başarı ekranı (KVKK riski) · 2026-08-27
+- REC-81 · Alt kategorisiz showcase sayfası hiçbir ürün göstermiyor — 27 ürün erişilemez · 2026-08-26
+- REC-85 · Sessiz kanal fanı anlatısı migration sonrası hiç açılmıyor (CategoryLandingView) · 2026-08-28
+- REC-97 · PDP fiyat sızıntısı: teklif-modlu üründe statik HTML fiyat basıyor, istemci sonr · 2026-09-02
+- REC-98 · Marka sayfası i18n karışımı: /en/brands/avens EN sayfada TR içerik (karma sözlük · 2026-09-02
+- REC-101 · Ana sayfadaki Otopark kartı BOŞ sayfaya gidiyor — kart kaldırılacak (kategori pa · 2026-08-31
+- REC-103 · EN ana sayfada kategori vitrini TR adlarla — kökten çözüm (ham name render kural · 2026-09-01
+- REC-104 · Eski ödeme vaadi kalıntıları: "12 ay taksit", "güvenli ödeme" — site geneli tara · 2026-09-01
+- REC-108 · EN sayfalarda TR ürün/aile adı — çeviri DB'de VAR, zincir kopuk (RPC taşımıyor + · 2026-09-01
+- REC-110 · Varyant adları için i18n şeması YOK — products.name_i18n kolonu (MIGRATION, Rece · 2026-09-02
+- REC-113 · Ters yön i18n taraması: TR sayfalarda EN sızıntısı var mı? (REC-103'ün ayna iddi · 2026-09-01
+- REC-114 · Arama önerilerinde ham kategori adı: get_search_suggestions SQL'de c.name basıyo · 2026-09-01
+- REC-115 · INV-7 çözücü genişlemesi eski iki ihlali görünür kıldı: CategoryHero + PDP 4. ih · 2026-09-02
+- REC-147 · DEĞERLENDİRME: Tasarım yetenek (skill) envanteri — 31 dış yetenek kuruldu, bizde · 2026-09-07
+- REC-203 · URUN: INV-TOKEN-SINIF-1 fail-open çıktı — sabotajla ölçüldü, boşluk muhafızı ekl · 2026-09-07
+- REC-210 · URUN: Site çatısı (menü + altbilgi) dil sağlayıcısının DIŞINDA — EN sayfada Türk · 2026-09-07
+- REC-281 · URUN: Ana sayfa kategori vitrini — mobilde yatay kaydırma karuseli UX gözden geç · 2026-09-17
+- REC-291 · URUN: "Alt Ürün Grupları" kartlarında GÖRSEL YOK — bölüm yalnız başlık + metin,  · 2026-09-17
+- REC-338 · URUN: /[lang]/products liste sayfasında generateMetadata YOK — canlıda kendi <ti · 2026-09-14
+
+</details>
+
 ## §4 BAYAT AÇIK İŞLER (started/unstarted, updatedAt > 7 gün)
 
 | İş | Durum | Başlık | Şerit | Son güncelleme |
@@ -413,6 +618,7 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 | REC-162 | In Review | Vercel günlük derleme sınırı: kapıda "rate limited" kolu = ÖLÇÜLEMEZ (madde 3 dı | ALTYAPI | 2026-09-07 |
 | REC-177 | In Review | Hafıza kancaları: eylem defteri (mv/rm → state) · soru yönlendirme (hatırlıyor m | ALTYAPI | 2026-09-07 |
 | REC-181 | Todo | 20 eksen denetimi 3. koşum (v3): 2. koşumdan beri 466 commit, edge ortak katman  | OPS | 2026-09-16 |
+| REC-188 | Todo | REC-179/URUN: 11 fail-open konformans kapısına evren muhafızı — 3d-asset-validit | URUN | 2026-09-07 |
 | REC-199 | In Review | URUN (K19): mobil kabuk v2 kodlaması — 4 sekme alt çubuk + İletişim header simge | URUN | 2026-09-17 |
 | REC-204 | In Review | URUN: İngilizce vitrin GEÇİCİ olarak dizinden çekilir — açılma şartı ölçülebilir | URUN | 2026-09-07 |
 | REC-205 | In Review | URUN: GSC dizinleme kusurları — çift adres kanonikleştirme (34 adres) + giriş sa | URUN | 2026-09-13 |
@@ -441,5 +647,5 @@ Durum dağılımı: Done 0 · In Progress 65 · Todo/Backlog 179 · Canceled 0 �
 
 ## §5 Ölçüm satırı
 
-çağrı 3 · kayıt 244 · proje 8 · etiket 6 · bayat açık 29/78 · damga 2026-09-25T12:43:48Z
+çağrı 4 · kayıt 397 · proje 9 · etiket 10 · bayat açık 30/79 · damga 2026-09-25T17:58:56Z
 
