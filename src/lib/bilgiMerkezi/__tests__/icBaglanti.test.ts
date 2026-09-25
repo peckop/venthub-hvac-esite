@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { YAZILAR } from '../../../data/bilgiMerkezi/yazilar'
 import { icBaglantiCoz, IcBaglantiHatasi, icBaglantilariCoz } from '../icBaglanti'
 import { yaziSayfasiHazirla } from '../sayfa'
+import { ORNEK_YAZI } from './ornekYazi'
 import { sahteKaynak } from './sahteKaynak'
 
 /**
@@ -65,8 +66,10 @@ describe('icBaglantiCoz', () => {
 })
 
 describe('yaziSayfasiHazirla — yazının bütün bağlantıları çözülmeden sayfa ÜRETİLMEZ', () => {
-  it('bugünkü yazıların hepsi (her dilde) sahte katalogla çözülür; kartlar ada sahip', async () => {
-    for (const yazi of YAZILAR) {
+  it('yayındaki yazılar + örnek yazı (her dilde) sahte katalogla çözülür; kartlar ada sahip', async () => {
+    // Yayındaki yazılar gerçek aileleri kullanır; sahte katalogda yoksa bu test onları sahte kataloğa
+    // eklemeyi hatırlatır (kırmızı). Örnek yazı döngünün boş kalmamasını garanti eder.
+    for (const yazi of [...YAZILAR, ORNEK_YAZI]) {
       for (const dil of ['tr', 'en'] as const) {
         if (!yazi.diller[dil]) continue
         const s = await yaziSayfasiHazirla(yazi, dil, sahteKaynak())
@@ -78,7 +81,7 @@ describe('yaziSayfasiHazirla — yazının bütün bağlantıları çözülmeden
   })
 
   it('⛔SABOTAJ: yazıya kırık bağlantı konursa sayfa ATAR', async () => {
-    const [ilk] = YAZILAR
+    const ilk = ORNEK_YAZI
     const tr = ilk.diller.tr
     if (!tr) throw new Error('fikstür: ilk yazının TR metni yok')
     const bozuk = { ...ilk, diller: { tr: { ...tr, govde: `${tr.govde}\n[kırık](vh:aile/boyle-bir-aile-yok)\n` } } }
@@ -86,7 +89,7 @@ describe('yaziSayfasiHazirla — yazının bütün bağlantıları çözülmeden
   })
 
   it('⛔SABOTAJ: yazıya düz site adresi konursa sayfa ATAR (kimlik kuralı, R3)', async () => {
-    const [ilk] = YAZILAR
+    const ilk = ORNEK_YAZI
     const tr = ilk.diller.tr
     if (!tr) throw new Error('fikstür: ilk yazının TR metni yok')
     const bozuk = { ...ilk, diller: { tr: { ...tr, govde: `${tr.govde}\n[düz](/tr/category/hava-perdeleri)\n` } } }
@@ -94,7 +97,7 @@ describe('yaziSayfasiHazirla — yazının bütün bağlantıları çözülmeden
   })
 
   it('ürün kartı aile dışı kimlikle yazılırsa ATAR', async () => {
-    const [ilk] = YAZILAR
+    const ilk = ORNEK_YAZI
     const bozuk = { ...ilk, urunler: ['vh:model/vrt-65195'] }
     await expect(yaziSayfasiHazirla(bozuk, 'tr', sahteKaynak())).rejects.toThrow(/yalnız aile/)
   })

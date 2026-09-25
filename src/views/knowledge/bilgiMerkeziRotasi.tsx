@@ -32,9 +32,13 @@ import RehberYazisiSayfasi from './RehberYazisiSayfasi'
 
 type Params = Promise<{ lang: string; yazi?: string }>
 
-/** Bu bölüm bu dilde yayında mı? */
+/**
+ * Bu bölüm bu dilde yayında mı? Yazı SAYISINA bağlı DEĞİL (karar 121/c, 2026-09-25): yazılar
+ * yayından kalkınca liste sayfası 404 vermez, boş durumu gösterir — menü/altbilgi bağlantıları ve
+ * geçici yönlendirmeler bu adrese gider. Yazısız liste dizin dışıdır (`listeUstVerisi`).
+ */
 export function bolumAcik(lang: string, bolumDili: YaziDili): boolean {
-  return lang === bolumDili && bilgiMerkeziDilAcik(lang) && dildekiYazilar(bolumDili).length > 0
+  return lang === bolumDili && bilgiMerkeziDilAcik(lang)
 }
 
 /** Sunucu tarafı çeviri: anahtar yolu `t('…')` biçiminde (INV-5/INV-6 kapıları bu biçimi okur). */
@@ -70,6 +74,8 @@ export async function listeUstVerisi(params: Params, bolumDili: YaziDili): Promi
     dilYollari: listeDilYollari(),
     baslik: t('bilgiMerkezi.liste.seoBaslik'),
     aciklama: t('bilgiMerkezi.liste.seoAciklama'),
+    // Yazısız liste = içeriksiz sayfa: dizine girmez, site haritasında da yok (siteHaritasi.ts).
+    dizinDisi: dildekiYazilar(bolumDili).length === 0,
   })
 }
 
