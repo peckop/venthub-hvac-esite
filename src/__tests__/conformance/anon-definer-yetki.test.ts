@@ -150,6 +150,26 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
     expect(sonHalKapali(zincir, AYO, 'authenticated', AYO_IMZA), 'admin_publish_quote authenticated icin KAPANMIS — yonetici yayimlayamaz').toBe(false)
   })
 
+  // REC-384 (2026-09-25): yayım bildiriminin iki DEFINER fonksiyonu aynı sınıftadır. Gönderim yardımcısı
+  // Vault sırlarını okuyup dışarıya istek atar → hiçbir istemci rolü çağıramaz. Yeniden gönderim yalnız
+  // yönetici içindir (gövde is_admin_user) → anon kapalı, authenticated açık (yönetici ekranı kolu).
+  it('⭐_quote_published_enqueue: public, anon, authenticated için son hâl KAPALI', () => {
+    for (const rol of ['public', 'anon', 'authenticated']) {
+      expect(
+        sonHalKapali(zincir, '_quote_published_enqueue', rol, ['uuid', 'boolean']),
+        `_quote_published_enqueue ${rol} icin acik — istemci Vault sirriyla disari istek attirabilir`,
+      ).toBe(true)
+    }
+  })
+
+  it('⭐admin_resend_quote_published: anon KAPALI, authenticated AÇIK', () => {
+    expect(sonHalKapali(zincir, 'admin_resend_quote_published', 'anon', ['uuid']), 'admin_resend_quote_published anon icin acik').toBe(true)
+    expect(
+      sonHalKapali(zincir, 'admin_resend_quote_published', 'authenticated', ['uuid']),
+      'admin_resend_quote_published authenticated icin KAPANMIS — yonetici yeniden gonderemez',
+    ).toBe(false)
+  })
+
   describe('AYIRT EDİCİLİK — değerlendirici her geri kaçışı reddediyor', () => {
     const taban: Mig[] = [
       { ad: '1.sql', sql: `create function public.${GON}() returns text language sql security definer as $$ select 'x' $$;` },
