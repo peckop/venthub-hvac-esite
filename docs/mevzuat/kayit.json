@@ -1,5 +1,5 @@
 {
-  "surum": "0.2",
+  "surum": "0.3",
   "uretildi": "2026-09-25",
   "cetvel": "docs/standards/mevzuat-kaydi-standard.md",
   "aile_kaynagi": "venthub-pdf-ingestor/paket/aileler.csv (2026-09-25T07:30Z)",
@@ -1581,13 +1581,34 @@
           "slug": "avens-siginak-havalandirma-uniteleri",
           "etki": "kapsamda",
           "neden": "Sığınak havalandırma üniteleri muhtemelen acil durum/özel amaç istisnası (Md.1(2)(d)/(e)) kapsamına girebilir — model bazında doğrulama gerekir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [
         "Bkz. EU-1254/2014 kalemi — internet satışına özgü şartlar orada."
       ],
       "acik_sorular": [
-        "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı."
+        "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı.",
+        "Md.1(2)(c) istisnası yalnız \"axial or centrifugal fans only equipped with a housing\" içindir; karışık akışlı ve ek parçalı kanal fanları kapsamda olabilir (2026-09-25, BLOG itirazıyla düzeltildi)."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
@@ -1640,6 +1661,26 @@
           "slug": "vortice-vort-mono",
           "etki": "kapsamda",
           "neden": "Tekil oda ısı geri kazanım üniteleri düşük debili konut tipi RVU olabilir, etiketleme ve Ek VII internet satış şartlarına tabi olabilir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [
@@ -1694,6 +1735,26 @@
           "slug": "vortice-vort-mono",
           "etki": "kapsamda",
           "neden": "EU-1253/2014 ile birebir aynı kapsam/tanım/eşikler."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [],
@@ -1746,6 +1807,26 @@
           "slug": "vortice-vort-mono",
           "etki": "kapsamda",
           "neden": "Tekil oda tipi konut ısı geri kazanım üniteleri TR pazarında bu tebliğ kapsamında etiketlenebilir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Üretici 1254/2014 tablosu yayımlıyor: CA EP/ES küçük modeller \"RVU-U\" (SEC F/E), büyükler \"NRVU-U\" (Commercial_Ventilation_in_Line_1.pdf s.29, 41, 47–48). Katalog SKU'larının hangi sürüm olduğu model bazında eşlenmeli (REC-392)."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [
