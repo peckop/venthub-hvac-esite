@@ -1,51 +1,20 @@
-import type { Route } from 'next'
-import { notFound,permanentRedirect } from 'next/navigation'
-
-import { en } from '@/i18n/dictionaries/en'
-import { tr } from '@/i18n/dictionaries/tr'
-import { getDictValue } from '@/i18n/getDictValue'
-import { storagePathToUrl } from '@/lib/images/productImage'
-import {
-  assertNoUuid,
-  buildBreadcrumbJsonLd,
-  buildProductGroupJsonLd,
-  buildSeriesLandingJsonLd,
-} from '@/lib/seo/jsonld'
+import { ADRES_SEMASI_K3B } from '@/config/features'
+import { urunSegmentiniCoz } from '@/lib/data/urunSegmenti'
 import { getAllFamilySlugs } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
-import { musteriyeGorunurAciklama } from '@/utils/icIngestNotu'
-import SeriesLandingView from '@/views/category/SeriesLandingView'
+import { modelAdresiCoz } from '@/utils/adresUret'
 
-import { SITE_URL } from '../../../../config/siteUrl'
-import {
-  getCachedFamilyDetail,
-  getCachedFamilySlugById,
-  getCachedProductBySlug,
-  getCachedSeriesLanding,
-  getCachedTakmaAd,
-  getCachedVariantById,
-  getFamilyDetailForRoute,
-  preloadFamily,
-} from '../../../../lib/data/preload'
-import type { ProductRouteResolution } from '../../../../lib/data/productRoute'
-import { resolveProductRoute } from '../../../../lib/data/productRoute'
-import { familyName } from '../../../../lib/i18n/familyName'
-import { kategoriMetniniIndir } from '../../../../utils/categoryHelpers'
-import { aileMetniniIndir, dildekiMetin } from '../../../../utils/dilMetni'
-import { Routes } from '../../../../utils/routes'
-import { ProductDetailPage as PageComponent } from '../../../_components/ProductDetailPageView'
+import { AileSayfasi, aileSayfasiUstVerisi } from '../../../_components/aileSayfasi'
 
 /**
  * F5-B W2.2 — PDP artık AİLE (product_families) kanoniktir.
  * `/[lang]/products/[slug]` slug'ı bir AİLE slug'ıdır; belirli varyant `?sku=` ile
  * ön-seçilir (canonical/metadata URL'lerine GİRMEZ). Eski varyant slug'ları
  * 308 (permanentRedirect) ile aile URL'ine taşınır.
+ *
+ * REC-300 Faz 3b: üst veri ve gövde `app/_components/aileSayfasi.tsx`'e taşındı (BİREBİR) —
+ * K3-b'nin `/tr/urun/...` rotası aynı çekirdeği çağırır. Bu dosyada yalnız rota sınıfı kaldı.
  */
-
-// INV-DIL-DUSUSU-1: başlık/açıklama yalnız sayfanın dilinde; yoksa zincirin sonraki (aynı dildeki)
-// halkasına düşer, başka dile düşmez.
-const pickLang = dildekiMetin
 
 /**
  * ROTA SINIFI İLANI (REC-348 / Recep kararı 21, 2026-09-16).
@@ -86,234 +55,28 @@ export async function generateStaticParams() {
   }
 }
 
+/**
+ * K3-b EN model adresi (`/en/products/<slug>-p-<sku>`) — EN'de önek değişmediği için bu rotadan
+ * geçer (plan §2). YALNIZ bayrak açıkken ve yalnız EN'de çözülür; bayrak kapalıyken bu dosyanın
+ * davranışı BİREBİR bugünkü (segment aile/varyant slug'ı olarak `AileSayfasi`'na gider).
+ * TR'de bayrak açıkken eski `/tr/products/*` → `/tr/urun/*` 308'i Faz 3b-2'de (plan madde 5).
+ */
+const enModelRotasi = (lang: string) => ADRES_SEMASI_K3B && lang === 'en'
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string, slug: string }> }) {
   const { lang, slug } = await params
-  preloadFamily(slug, lang)
-
-  try {
-    const detail = await getCachedFamilyDetail(slug, lang)
-
-    if (detail) {
-      const { family, variants } = detail
-      // ?sku= canonical'a GİRMEZ — aile URL'i tek kanonik adrestir.
-      //
-      // DİL ÖNEKİ ŞART (T083-VH). Eskiden burası `${SITE_URL}/products/${slug}` idi ve üç şeyi
-      // aynı anda bozuyordu: (1) `middleware.ts:86` dil öneksiz her kullanıcı rotasını 307 ile
-      // yönlendirdiği için kanonik bir YÖNLENDİRMEYİ gösteriyordu, (2) yönlendirmenin hedefi
-      // `Accept-Language`'a göre seçildiğinden kanonik ZİYARETÇİYE GÖRE değişiyordu,
-      // (3) en pahalısı: `/tr/...` ve `/en/...` sayfalarının İKİSİ DE aynı kanoniği bildiriyordu
-      // → arama motoru kopya sayıp bir dili indeksten düşürebilirdi. `sitemap.ts` doğruyu
-      // bildiriyordu, bu sayfa onu çürütüyordu.
-      // Cetvel: docs/standards/canonical-url-standard.md §4 · bekçi: INV-CANONICAL-2.
-      //
-      // `Routes.product` + dil öneki bileşimi KASITLI: `sitemap.ts` de birebir aynı ifadeyi
-      // kullanır, böylece iki yüzey aynı kaynaktan üretilir ve sessizce ayrışamaz.
-      const trUrl = `${SITE_URL}/tr${Routes.product(family.slug)}`
-      const enUrl = `${SITE_URL}/en${Routes.product(family.slug)}`
-      const canonicalUrl = lang === 'en' ? enUrl : trUrl
-      // REC-108: sekme başlığı ve arama sonucu başlığı da dili bilir.
-      const title = pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
-      // ⭐İÇ INGEST NOTU ARAMA SONUCUNA DA ÇIKAMAZ (canlı olay, 2026-09-05): aile
-      // açıklaması bu zincirin İKİNCİ halkası, yani 11/40 ailede Google'a "Avensair 2026
-      // fiyat listesinden aktarılan temel ürün (Tier C)." diye açıklama gidebilirdi.
-      // Süzgeç null döndürünce zincir bir sonraki halkaya düşer — davranış "açıklama yok"
-      // ile aynıdır, uydurma metin ÜRETİLMEZ.
-      const description =
-        pickLang(family.meta_description, lang) ||
-        musteriyeGorunurAciklama(pickLang(family.description, lang))?.substring(0, 160) ||
-        // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
-        (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
-      const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path
-
-      return {
-        title,
-        description,
-        alternates: {
-          canonical: canonicalUrl,
-          languages: {
-            tr: trUrl,
-            en: enUrl,
-            'x-default': trUrl,
-          },
-        },
-        openGraph: {
-          title,
-          description,
-          url: canonicalUrl,
-          siteName: 'VentHub',
-          images: [
-            {
-              url: coverPath ? storagePathToUrl(coverPath) : '/images/og-default.jpg',
-              width: 1200,
-              height: 630,
-            },
-          ],
-          locale: lang === 'en' ? 'en_US' : 'tr_TR',
-          type: 'website',
-        },
-      }
-    }
-  } catch (e) {
-    console.warn('generateMetadata error for product family:', e)
+  if (enModelRotasi(lang) && modelAdresiCoz(slug)) {
+    const { aileSlug } = await urunSegmentiniCoz(slug, 'en')
+    return aileSayfasiUstVerisi(lang, aileSlug)
   }
-
-  return {
-    title: 'Ürün Detayı | VentHub',
-    description: 'VentHub Endüstriyel Havalandırma Sistemleri Ürün Detayı',
-  }
+  return aileSayfasiUstVerisi(lang, slug)
 }
 
 export default async function Page({ params }: { params: Promise<{ lang: string, slug: string }> }) {
   const { lang, slug } = await params
-  preloadFamily(slug, lang)
-
-  // T138 K1: zincir kararı `resolveProductRoute`'ta (saf, DI'lı, test edilebilir);
-  // sayfa yalnız SONUCU uygular. 'generic' prerender tohumu sorgu yapmadan geçer.
-  const resolution: ProductRouteResolution =
-    slug === 'generic'
-      ? { kind: 'unavailable' }
-      : await resolveProductRoute(slug, lang, {
-          familyDetail: getFamilyDetailForRoute,
-          seriesLanding: getCachedSeriesLanding,
-          variantBySlug: getCachedProductBySlug,
-          familySlugById: getCachedFamilySlugById,
-          takmaAd: getCachedTakmaAd,
-          variantById: getCachedVariantById,
-        })
-
-  // permanentRedirect / notFound birer istisna fırlatır — koşulsuz, en üstte çağrılır.
-  if (resolution.kind === 'redirect') permanentRedirect(resolution.to as Route)
-
-  // SERİ → kendi landing'i (HTTP 200). Doğrudan varyantı olmadığı için PDP'ye giremez;
-  // K1 öncesinde burada "ürün bulunamadı" kutusu basılıyordu (soft-404: 200 + boş sayfa).
-  //
-  // T138-VH K7: K1 bu dalda HİÇ JSON-LD basmıyordu (`buildProductGroupJsonLd` yalnız aşağıdaki
-  // `family` dalında çağrılıyor, `variants` boş olduğu için seriye hiç girmiyordu — ölçüldü).
-  // `ProductGroup` burada UYGUN DEĞİL (seri satılabilir bir ürün değil, model listesi);
-  // `buildSeriesLandingJsonLd` CollectionPage + ItemList üretir (gerekçe: jsonld.ts yorumu).
-  if (resolution.kind === 'series') {
-    const { series, models } = resolution.landing
-    const gorunenSeriAdi = familyName(series, lang)
-    const description =
-      pickLang(series.description, lang) ||
-      (lang === 'en'
-        ? `${gorunenSeriAdi} models at VentHub`
-        : `VentHub'da ${gorunenSeriAdi} modelleri`)
-    const seriesJsonLd = buildSeriesLandingJsonLd({
-      lang,
-      baseUrl: SITE_URL,
-      seriesSlug: series.slug,
-      name: gorunenSeriAdi,
-      description,
-      models,
-    })
-
-    assertNoUuid(seriesJsonLd)
-
-    return (
-      <>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(seriesJsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
-        />
-        <SeriesLandingView series={aileMetniniIndir(series, lang)} models={models} lang={lang} />
-      </>
-    )
+  if (enModelRotasi(lang) && modelAdresiCoz(slug)) {
+    const { aileSlug, sunucuSku } = await urunSegmentiniCoz(slug, 'en')
+    return <AileSayfasi lang={lang} slug={aileSlug} sunucuSku={sunucuSku} />
   }
-
-  // GERÇEK 404 → ne aktif varyantlı aile, ne seri, ne varyant slug'ı. Varyantsız ve
-  // seri OLMAYAN aile de buraya düşer: içi boş bir ürün sayfası 200 dönmemeli.
-  if (resolution.kind === 'not-found') notFound()
-
-  // `unavailable` = veri yok DEĞİL, veriye ULAŞILAMADI (ağ/RPC/env). 404 basılmaz —
-  // önbelleğe alınabilen kalıcı bir yokluk beyanı olurdu; mevcut "bulunamadı" görünümü çizilir.
-  const detail = resolution.kind === 'family' ? resolution.detail : null
-  const family = detail?.family ?? null
-  const variants = detail?.variants ?? []
-
-  // ⭐REC-111: kategori JSON-LD'den ÖNCE çözülür — teklif modu kararı ona bağlı.
-  // Eskiden bu satırlar aşağıda, breadcrumb bloğunda duruyordu ve `buildProductGroupJsonLd`
-  // kategoriyi hiç görmüyordu; sonuç, vitrin "Teklif Alın" derken schema.org'da gerçek
-  // fiyatın yayınlanmasıydı (canlıda 80 adresin 72'si).
-  const mainCategory = family?.category ?? null
-  const subCategory = family?.subcategory ?? null
-
-  // W3.1: aile bulunamadıysa (not-found) JSON-LD hiç yazılmaz — tanımlanacak bir
-  // ürün yok; ProductGroup + hasVariant[] (teklif modunda offers HİÇ yazılmaz).
-  const jsonLd = family
-    ? buildProductGroupJsonLd({ family, variants, lang, baseUrl: SITE_URL, mainCategory })
-    : null
-
-  if (jsonLd) assertNoUuid(jsonLd)
-
-  // T154-VH bağlama — MODEL dalında BreadcrumbList JSON-LD.
-  //
-  // Kategori adları SUNUCUDA çözülür. Görsel breadcrumb (ProductDetailPageView) adları
-  // `useCategories()` istemci bağlamından alır; o bağlam ilk render'da BOŞTUR. Zinciri
-  // oradan üretseydik JSON-LD boş çıkardı ve iş "bitmiş görünüp" yüzey düzelmezdi —
-  // makine breadcrumb'ı yine göremezdi.
-  //
-  // Ham `category.name`/slug YAZILMAZ (Mutlak Kural 7): DB'deki ad İngilizce'dir ve TR
-  // sayfaya sızar. Sözlük → menu_label → name zinciri `getCategoryDisplayName` içinde.
-  const dict = lang === 'en' ? en : tr
-  const t = (key: string) => getDictValue(dict, key)
-
-  const mainName = mainCategory ? getCategoryDisplayName(mainCategory, t) : ''
-  const mainSlug = mainCategory ? getLocalizedCategorySlug(mainCategory, lang) : ''
-  const subName = subCategory ? getCategoryDisplayName(subCategory, t) : ''
-  const subSlug = subCategory ? getLocalizedCategorySlug(subCategory, lang) : ''
-
-  // Kategori çözülemezse basamak HİÇ eklenmez (zincir kısalır, kırılmaz) — görsel
-  // breadcrumb'ın ve CategoryLandingView'ın "parentVm yoksa basamak yok" kuralıyla aynı.
-  // Ad boşsa da eklenmez: `buildBreadcrumbJsonLd` boş adda ATAR, ve boş bir basamak
-  // zaten makineye hiçbir şey söylemez.
-  // REC-108: kırıntı yolunun son basamağı da görünen addır — hem boşluk kontrolü hem
-  // basılan değer TEK giriş noktasından gelir, ikisi ayrışamaz.
-  const gorunenAileAdi = family ? familyName(family, lang) : ''
-  const breadcrumbJsonLd =
-    family && gorunenAileAdi.trim()
-      ? buildBreadcrumbJsonLd({
-          lang,
-          baseUrl: SITE_URL,
-          steps: [
-            { name: t('category.breadcrumbHome'), path: '/' },
-            ...(mainName && mainSlug ? [{ name: mainName, path: Routes.category(mainSlug) }] : []),
-            ...(subName && subSlug && mainSlug && subSlug !== mainSlug
-              ? [{ name: subName, path: Routes.category(mainSlug, subSlug) }]
-              : []),
-            // Bulunulan sayfa: path NULL olmak ZORUNDA (helper sözleşmesi).
-            { name: gorunenAileAdi, path: null },
-          ],
-        })
-      : null
-
-  if (breadcrumbJsonLd) assertNoUuid(breadcrumbJsonLd)
-
-  return (
-    <>
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
-        />
-      )}
-      {breadcrumbJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
-        />
-      )}
-      {/* W4b: KDV etiketi sabit değil — bireysel/anon brüt, bayi/kurumsal net görür. */}
-      {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
-      <PageComponent
-        family={family ? {
-          ...aileMetniniIndir(family, lang),
-          category: family.category ? kategoriMetniniIndir(family.category, lang) : null,
-          subcategory: family.subcategory ? kategoriMetniniIndir(family.subcategory, lang) : null,
-        } : family}
-        variants={variants}
-        priceTaxIncluded={detail?.price_tax_included ?? null}
-      />
-    </>
-  )
+  return <AileSayfasi lang={lang} slug={slug} />
 }
