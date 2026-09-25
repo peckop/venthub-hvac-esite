@@ -357,6 +357,44 @@ export const tr = {
       }
     }
   },
+  // BİLGİ MERKEZİ (karar 92, 2026-09-24) — rehber yazılarının liste ve yazı sayfası şablonu.
+  // Yazıların kendi metni sözlükte DEĞİL (src/data/bilgiMerkezi/yazilar.ts; ileride DB tablosu):
+  // burada yalnız şablonun sabit metinleri durur (rehber-yazisi-standard.md R3).
+  bilgiMerkezi: {
+    ad: 'Bilgi Merkezi',
+    anaSayfa: 'Ana sayfa',
+    liste: {
+      seoBaslik: 'Bilgi Merkezi — Havalandırma Rehber Yazıları | VentHub',
+      seoAciklama: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
+      baslik: 'Bilgi Merkezi',
+      altBaslik: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
+      aramaEtiketi: 'Yazılarda ara',
+      aramaYerTutucu: 'Konu ya da terim yazın',
+      sonucYok: 'Aramanıza uyan yazı bulunamadı.',
+      oku: 'Yazıyı oku',
+      seciciBaslik: 'Ürün Seçici',
+      seciciAciklama: 'Kanal, ısı geri kazanım, hava perdesi ve jet fan hesaplarını tek yerden yapın.',
+      seciciDugme: 'Ürün Seçici’yi aç',
+    },
+    yazi: {
+      yazar: 'VentHub',
+      okumaSuresi: '{{count}} dakika okuma',
+      guncelleme: 'Güncelleme',
+      icindekiler: 'İçindekiler',
+      urunlerBaslik: 'İlgili ürün aileleri',
+      urunDugme: 'Aileyi incele',
+      ilgiliBaslik: 'İlgili yazılar',
+      teklifBaslik: 'Projeniz için teklif alın',
+      teklifAciklama: 'İhtiyacınızı iletişim formundan yazın; uygun ürün için teklif hazırlayalım.',
+      teklifDugme: 'Teklif iste',
+      listeyeDon: 'Bilgi Merkezi’ne dön',
+    },
+    konular: {
+      konfor: 'Konfor',
+      guvenlik: 'Güvenlik',
+      verimlilik: 'Verimlilik',
+    },
+  },
   meta: {
     siteTitle: 'VentHub — Premium HVAC Çözümleri',
     siteDesc: 'Otopark jet fanı, hava perdesi, ısı geri kazanım cihazı ve kanal fanı çözümleri; mühendislik destekli ürün seçimi ve teknik danışmanlık.',

@@ -266,6 +266,42 @@ export const en: typeof tr = {
       }
     }
   },
+  // KNOWLEDGE HUB (decision 92, 2026-09-24) — template texts only; article bodies live elsewhere.
+  bilgiMerkezi: {
+    ad: 'Knowledge Hub',
+    anaSayfa: 'Home',
+    liste: {
+      seoBaslik: 'Knowledge Hub — Ventilation Guides | VentHub',
+      seoAciklama: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',
+      baslik: 'Knowledge Hub',
+      altBaslik: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',
+      aramaEtiketi: 'Search articles',
+      aramaYerTutucu: 'Type a topic or term',
+      sonucYok: 'No article matches your search.',
+      oku: 'Read the article',
+      seciciBaslik: 'Product Selector',
+      seciciAciklama: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
+      seciciDugme: 'Open the Product Selector',
+    },
+    yazi: {
+      yazar: 'VentHub',
+      okumaSuresi: '{{count}} min read',
+      guncelleme: 'Updated',
+      icindekiler: 'Contents',
+      urunlerBaslik: 'Related product families',
+      urunDugme: 'View family',
+      ilgiliBaslik: 'Related articles',
+      teklifBaslik: 'Get a quote for your project',
+      teklifAciklama: 'Describe your needs in the contact form; we will prepare a quote for the right product.',
+      teklifDugme: 'Request a quote',
+      listeyeDon: 'Back to the Knowledge Hub',
+    },
+    konular: {
+      konfor: 'Comfort',
+      guvenlik: 'Safety',
+      verimlilik: 'Efficiency',
+    },
+  },
   meta: {
     siteTitle: 'VentHub — Premium HVAC Solutions',
     siteDesc: 'Car park jet fans, air curtains, heat recovery units and duct fans — engineering-led product selection and technical support.',
