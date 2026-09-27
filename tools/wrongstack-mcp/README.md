@@ -25,7 +25,13 @@ Ana depo kökünde (kısa yol şart — derin Temp yolunda npm 5 dk takıldı, O
 ```bash
 cd tools/wrongstack-mcp
 npm ci --ignore-scripts
+cd ../.. && for y in tools/wrongstack-mcp/yamalar/*.patch; do git apply "$y"; done
 ```
+
+**Yamalar (`yamalar/`) kurulumun parçasıdır.** `npm ci` her koşuda paketi yeniden yazar ve yamayı
+siler; bu yüzden ikinci satır atlanmaz. Yama uygulandıktan sonra MCP sunucusu yeniden bağlanana kadar
+(`/mcp` → yeniden bağlan ya da pencere kapat-aç) eski kod bellekte koşar. Durum ölçümü (repo kökünden):
+`git apply --reverse --check <yama>` çıkış 0 = uygulanmış. Kapı: `INV-WRONGSTACK-KANBAN-YAMA-1`.
 
 `pnpm` **kullanılmaz**: ana lockfile'a ve worktree'lerin `node_modules` bağına dokunmaz.
 Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açılışta onaya sorar.
@@ -96,6 +102,23 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    kullanılır. **Pencere içi ölçüm açık:** genişleme + kimliğin MCP sürecine ulaşması + iki pencerenin
    farklı kimlik alması, ana ağaç güncellenip pencereler kapatılıp açıldıktan sonra ölçülür.
    `INV-WRONGSTACK-MCP-1` kaydı ve kimlik biçimini kolla tutar.
-9. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
+9. **Kanban yazma dönüşü tüm panoyu taşıyordu → yamalı (2026-09-27, karar 144, REC-391 K1).**
+   `kanban-mcp` `callTool` sonucu `{ content: result }` diye olduğu gibi döndürüyor; aracın kendi
+   özet kesicisi (`kanbanTool.serialize` → pano okumayan eylemde panoyu {sütun → kart sayısı}
+   özetine indirir) MCP yolunda **hiç çağrılmıyor**. 1.0.26'da da aynı satır (ölçüldü). Bedel:
+   47 KB'lık panoda her `add_task`/`add_note`/`transition_task` 48,6 KB dönüyordu.
+   `yamalar/kanban-mcp-1.0.19-ozet-donus.patch` başarılı sonucu kesiciden geçirir; kesici girintili
+   metin döndürdüğü için sonuç `JSON.parse` ile nesneye çevrilir, sunucu sıkı biçimde yazar.
+   Yalnız panoyu döndüren eylemlerde (`add_note`, `update_task`, `move_task`, `assign_task`…)
+   özet kartı da kaybettirirdi; yama `args.taskId` kartını özetin yanına koyar.
+   ⛔**Yama İKİ dosyaya uygulanır: `dist/cli.js` ve `dist/index.js`.** `.mcp.json`'ın çalıştırdığı
+   `cli.js`, callTool'un kendi kopyasını taşır ve index.js'i yüklemez. İlk yama (#1437) yalnız
+   index.js'e uygulandı, kapı yeşildi, canlıda hiçbir şey değişmedi (09-27 akşam ölçüldü). Kapı artık
+   hedef dosyayı `.mcp.json`'dan okur.
+   Ölçüm (gerçek pano, yamalı cli.js stdio, 23 kart): `add_task` 58 KB → **1.297** bayt,
+   `add_note` → **1.778** bayt (etkilenen kart dahil), `get_board` 58.750 → 58.750 (değişmez).
+   Hata sonucu (`ok:false`) kesiciye girmez. Sürüm yükseltilince yama adı ve içeriği yeniden ölçülür;
+   kapı sürüm uyuşmazlığında KIRMIZI verir. Yukarı akış kaydı: WrongStack GitHub issue.
+10. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
    kümesi `gh` ile sınırlı ve ağ/paket komutları yasak listesinde. Ama bu bir **azaltmadır**,
    sıfırlama değil — kart açıklamasına ve doğrulayıcı komutuna sır yazılmaz.

@@ -81,8 +81,10 @@ const ESIK_GUN = Number(process.env.VENTHUB_DEFTER_ESIK_GUN || 2)
 /** Önbellek bu yaştan eskiyse SAYI KULLANILMAZ — bayat sayı yanlış güven üretir. */
 const ONBELLEK_ESIK_SAAT = Number(process.env.VENTHUB_DEFTER_ONBELLEK_SAAT || 24)
 
+/** Yalnız BELLEK bloğu kullanır: arka plan ölçümü gerçek oturumda (UUID kimlik) başlar, testte değil. */
+let girdi = {}
 try {
-  JSON.parse(fs.readFileSync(0, 'utf8') || '{}')
+  girdi = JSON.parse(fs.readFileSync(0, 'utf8') || '{}') || {}
 } catch {
   /* girdi okunamadı: bu kanca girdiye BAĞLI DEĞİL, ölçmeye devam eder */
 }
@@ -295,6 +297,23 @@ try {
   }
 } catch (e) {
   process.stdout.write('⚠SAGE: YEDEK DURUMU OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── BELLEK (Ops emri 2026-09-25) — EŞİKLİ, SAGE gibi ──
+ * 3 GB üstü tek süreç ya da 2 GB altı boş bellek varsa konuşur. Ölçüm arka planda ve
+ * önbellekten; bu blok bütçeye yalnız bir dosya okuması ekler. Gerekçe: bellek-yoklama.cjs.
+ */
+try {
+  const by = require(path.join(__dirname, 'bellek-yoklama.cjs'))
+  const simdi = Date.now()
+  const s = by.satir(by.oku(), simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    by.gerekirseTazele(simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠BELLEK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 process.exit(0)

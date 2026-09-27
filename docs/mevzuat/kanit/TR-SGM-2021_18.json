@@ -13,6 +13,42 @@
       "durum_satiri": null,
       "alinti": "HAVALANDIRMA ÜNİTELERİNİN ÇEVREYE DUYARLI TASARIM GEREKLİLİKLERİNE DAİR TEBLİĞ (1253/2014/AB) (SGM: 2021/18) ... MADDE 3 – (1) Bu Tebliğ; 5/3/2020 tarihli ve 7223 sayılı Ürün Güvenliği ve Teknik Düzenlemeler Kanununa ve 23/6/2010 tarihli ve 2010/643 sayılı Bakanlar Kurulu Kararı ile yürürlüğe konulan Enerji ile İlgili Ürünlerin Çevreye Duyarlı Tasarımına İlişkin Yönetmeliğe dayanılarak hazırlanmıştır. ... MADDE 12 – (1) Bu Tebliğ yayımı tarihinde yürürlüğe girer.",
       "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": null,
+      "alinti": "MADDE 2 – ... (2) Bu Tebliğ; ... c) Sadece 20/12/2019 tarihli ve 30984 sayılı Resmî Gazete’de yayımlanan ... (SVGM: 2019/15)’de belirtilen gövdeye sahip aksiyel veya santrifüj fanları, ... MADDE 5 – (1) KTHÜ’ler 1/10/2021 tarihinden itibaren bu Tebliğin Ek- II’sinin 1 inci maddesinde belirtilen çevreye duyarlı tasarım gerekliliklerini sağlar. (2) KDHÜ’ler 1/10/2021 tarihinden itibaren bu Tebliğin Ek- III’ünün 1 inci maddesinde belirtilen çevreye duyarlı tasarım gerekliliklerini sağlar.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5-1.pdf",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/05/20210525-5-1.pdf",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Taranmış PDF, metin katmanı yok: PDF s.7 (basılı \"18–10\") sayfa görüntüsünden MEVZUAT okudu, 2026-09-25.",
+      "alinti": "Ek-III 1. 1 Ekim 2021 tarihinden itibaren: ... tüm HRS’lerin asgari termal verimi % 73 ... TYHÜ’lerin asgari fan verimi (ηvu): % 6,2 * ln(P) + % 42,0 eğer P ≤ 30 kW",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://energy-efficient-products.ec.europa.eu/faqs-0/what-housing-terms-regulation-3272011-and-what-casing-terms-regulation-12532014-and-delegated_en",
+      "son_url": "aynı",
+      "http": 200,
+      "robots": "izinli (yalnız /core/, /profiles/ yasak)",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "energy-efficient-products.ec.europa.eu (Avrupa Komisyonu, DG ENER)",
+      "resmi": true,
+      "durum_satiri": "Komisyon SSS yorumu; sayfa hukuken bağlayıcı olmadığını kendisi yazıyor. Md.2(2)(c)/1253 Md.1(2)(c) yorumu için.",
+      "alinti": "This implies that such products are considered ‘fans’ and shall be treated according to Regulation (EU)327/2011. ... “housing” ... a casing around the impeller that guides the gas stream toward, through and from the impeller. ... Products that would normally be called ‘box-fans’ or ‘roof-fans’ are considered ventilation units.",
+      "alinti_dogrulandi": true
     }
   ]
 }

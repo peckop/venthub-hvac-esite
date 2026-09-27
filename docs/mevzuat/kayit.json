@@ -1,5 +1,5 @@
 {
-  "surum": "0.2",
+  "surum": "0.4",
   "uretildi": "2026-09-25",
   "cetvel": "docs/standards/mevzuat-kaydi-standard.md",
   "aile_kaynagi": "venthub-pdf-ingestor/paket/aileler.csv (2026-09-25T07:30Z)",
@@ -620,7 +620,7 @@
       "tarihler": {
         "kabul": "",
         "yayim": "2019-12-20 (RG Sayı 30984)",
-        "yururluk": "belirtilmedi (bu araştırmada teblig metninin kendi yürürlük maddesi okunmadı, yalnız yeni teblig atfı üzerinden tarih doğrulandı)",
+        "yururluk": "2020-12-20 (Md.10: yayımı tarihinden bir yıl sonra)",
         "uygulama_asamalari": []
       },
       "yerini_aldigi": [],
@@ -637,7 +637,7 @@
       "etkilenen_aileler": [],
       "urun_sayfasi_sartlari": [],
       "acik_sorular": [
-        "Teblig metninin kendi 'Yürürlük' maddesi (2019 tarihli asıl metin) bu araştırmada ayrıca okunmadı; sadece yeni teblig üzerinden atıf doğrulandı. Ek I/II/III içeriği de okunmadı."
+        "Ek I/II/III içeriği (verim hedefleri) bu kayıtta ayrıca okunmadı; değerlerin 327/2011 Annex I ikinci aşamasıyla aynı olduğu varsayılmaz, okunmalı."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "B"
@@ -1581,13 +1581,34 @@
           "slug": "avens-siginak-havalandirma-uniteleri",
           "etki": "kapsamda",
           "neden": "Sığınak havalandırma üniteleri muhtemelen acil durum/özel amaç istisnası (Md.1(2)(d)/(e)) kapsamına girebilir — model bazında doğrulama gerekir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Üretici seriyi 1253/2014 kapsamında konut dışı ünite (NRVU-U) olarak beyan ediyor (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34); NRVU ekotasarım şartları üreticinin yükümlülüğü."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [
         "Bkz. EU-1254/2014 kalemi — internet satışına özgü şartlar orada."
       ],
       "acik_sorular": [
-        "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı."
+        "Kanal tipi fan aileleri (vortice-lineo, avens-dikdortgen-kanal-radyal, vortice-vort-commercial-in-line-circular/rectangular, vortice-lineo-quiet, vortice-radon-range-circular/roof) 'ventilation unit' mi yoksa Md.1(2)(c) istisnasındaki 'sadece gövdeye sahip fan' (Regulation 327/2011 kapsamı) mı — model bazında ek fonksiyon (filtre/kontrol/ısı eşanjörü) kontrolü gerekir, bu eksende doğrulanmadı.",
+        "Md.1(2)(c) istisnası yalnız \"axial or centrifugal fans only equipped with a housing\" içindir; karışık akışlı ve ek parçalı kanal fanları kapsamda olabilir (2026-09-25, BLOG itirazıyla düzeltildi)."
       ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
@@ -1640,6 +1661,26 @@
           "slug": "vortice-vort-mono",
           "etki": "kapsamda",
           "neden": "Tekil oda ısı geri kazanım üniteleri düşük debili konut tipi RVU olabilir, etiketleme ve Ek VII internet satış şartlarına tabi olabilir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsam-disi",
+          "neden": "Sattığımız CA MD serisi (16107–16109, 16153, 16155–16157) üretici belgesinde \"NRVU-U\" beyanlı (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34; eski↔yeni kod s.39). En yüksek debi 340–1800 m³/h: 200/250/315 >1000 tanım gereği konut dışı; 100/125/150 (250–1000) üretici konut beyan etmediği için RVU değil → etiket yok. RVU-U tablolar (EP/ES sürümleri) satılmıyor. KATALOG ölçümü 2026-09-25."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [
@@ -1668,7 +1709,16 @@
         "kabul": "",
         "yayim": "2021-05-25 (RG Sayı 31491)",
         "yururluk": "2021-05-25 (yayım tarihinde yürürlüğe girer, Md.12)",
-        "uygulama_asamalari": []
+        "uygulama_asamalari": [
+          {
+            "tarih": "2021-10-01",
+            "ne": "KTHÜ: Ek-II madde 1; KDHÜ: Ek-III madde 1 (Md.5). Ek-III madde 1, AB 1253/2014 Annex III point 2 (1 Ocak 2018 aşaması) değerlerini taşır: HRS asgari termal verim %73, TYHÜ asgari fan verimi ηvu = %6,2·ln(P) + %42,0 (P ≤ 30 kW). AB 2016 aşaması TR'de hiç uygulanmadı."
+          },
+          {
+            "tarih": "2021-10-01",
+            "ne": "Bilgi gereklilikleri: KTHÜ Ek-IV, KDHÜ Ek-V (Md.6)."
+          }
+        ]
       },
       "yerini_aldigi": [],
       "degistirenler": [],
@@ -1694,10 +1744,32 @@
           "slug": "vortice-vort-mono",
           "etki": "kapsamda",
           "neden": "EU-1253/2014 ile birebir aynı kapsam/tanım/eşikler."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsamda",
+          "neden": "Üretici seriyi 1253/2014 kapsamında konut dışı ünite (NRVU-U) olarak beyan ediyor (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34); NRVU ekotasarım şartları üreticinin yükümlülüğü."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [],
-      "acik_sorular": [],
+      "acik_sorular": [
+        "Md.2(2)(c) \"yalnız gövdeye sahip aksiyel veya santrifüj fan\" istisnası Vortice CA MD (santrifüj, filtre/HRS yok) için metne göre uygulanabilir; ancak üretici seriyi NRVU-U beyan ediyor. Komisyon SSS'si (bağlayıcı değil) housing = pervaneyi saran ve akışı yönlendiren gövde; box-fan ve roof-fan ventilasyon ünitesidir. Gövde içinde housing dışı akış parçası var mı ve 150/200 MD'nin BEP gücü bilinmiyor (AVenS paketi A4/A6). Satış kararına dayanak yapılmaz (REC-397, 2026-09-25)."
+      ],
       "son_kontrol": "2026-09-25",
       "eksen": "E"
     },
@@ -1746,6 +1818,26 @@
           "slug": "vortice-vort-mono",
           "etki": "kapsamda",
           "neden": "Tekil oda tipi konut ısı geri kazanım üniteleri TR pazarında bu tebliğ kapsamında etiketlenebilir."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-circular",
+          "etki": "kapsam-disi",
+          "neden": "Sattığımız CA MD serisi (16107–16109, 16153, 16155–16157) üretici belgesinde \"NRVU-U\" beyanlı (Doc_Pubblicita_Commercial_ventilation_in_line_fans_1.pdf s.34; eski↔yeni kod s.39). En yüksek debi 340–1800 m³/h: 200/250/315 >1000 tanım gereği konut dışı; 100/125/150 (250–1000) üretici konut beyan etmediği için RVU değil → etiket yok. RVU-U tablolar (EP/ES sürümleri) satılmıyor. KATALOG ölçümü 2026-09-25."
+        },
+        {
+          "slug": "vortice-vort-commercial-in-line-rectangular",
+          "etki": "belirsiz",
+          "neden": "Aynı seri beyanı (s.3: \"conform to ... 1253/2014 and N° 1254/2014\"); model bazında tipoloji verisi kaynak dizininde bulunmadı."
+        },
+        {
+          "slug": "vortice-lineo",
+          "etki": "belirsiz",
+          "neden": "Karışık akışlı: 1253 Md.1(2)(c) istisnası (yalnız aksiyel/santrifüj) uygulanmaz; üretici 1253/2014 uygunluğu beyan ediyor. 30 W altı modeller yalnız bilgi şartı; 250–1000 m³/h modeller üreticinin konut beyanına bağlı."
+        },
+        {
+          "slug": "vortice-lineo-quiet",
+          "etki": "belirsiz",
+          "neden": "Lineo ile aynı; model bazında 1254 verisi kaynak dizininde yok."
         }
       ],
       "urun_sayfasi_sartlari": [
@@ -2907,6 +2999,40 @@
       "eksen": "G",
       "kaynaklar_kanit": "docs/mevzuat/kanit/AB-BILDIRIM-2016_C416_06.json",
       "resmi_kaynak_sayisi": 1
+    },
+    {
+      "kimlik": "TR-KANUN-7223",
+      "ad": "Ürün Güvenliği ve Teknik Düzenlemeler Kanunu (Kanun No. 7223)",
+      "tur": "kanun",
+      "yetki": "TR",
+      "konu": [
+        "cerceve"
+      ],
+      "kapsam": "Teknik düzenlemelerin (SGM/SVGM tebliğleri dahil) dayandığı çerçeve kanun; iktisadi işletmecilerin (imalatçı, ithalatçı, dağıtıcı) yükümlülüklerini ve piyasa gözetimini düzenler. Uygunsuz olduğu bilinen ya da bilinmesi gereken ürünü ithalatçı piyasaya arz edemez, dağıtıcı piyasada bulunduramaz. \"Piyasaya arz\" ürünün piyasada ilk kez bulundurulmasıdır; tebliğlerin tarih şartları bu ana bağlanır.",
+      "tarihler": {
+        "kabul": "2020-03-05",
+        "yayim": "2020-03-12 (RG Sayı 31066)",
+        "yururluk": "2021-03-12 (Md.26: yayımı tarihinden bir yıl sonra)",
+        "uygulama_asamalari": []
+      },
+      "yerini_aldigi": [],
+      "degistirenler": [],
+      "karsilik": [],
+      "iliski_notlari": [
+        "Geçici madde 1: 4703 sayılı Kanun'a dayanan teknik düzenlemelerin bu Kanuna aykırı olmayan hükümleri yenileri çıkana kadar uygulanır (4703'ün kaldırılma maddesi bu kayıtta okunmadı).",
+        "TR-SGM-2021/18 ve diğer SGM tebliğleri Md.3 dayanağında bu kanunu anar."
+      ],
+      "durum": "yururlukte",
+      "kaynaklar_kanit": "docs/mevzuat/kanit/TR-KANUN-7223.json",
+      "resmi_kaynak_sayisi": 1,
+      "etkilenen_aileler": [],
+      "urun_sayfasi_sartlari": [],
+      "acik_sorular": [
+        "VentHub'ın AB dışı pazar ürünlerinde ithalatçı mı dağıtıcı mı olduğu ve birimlerin TR'ye ilk arz tarihi ticari olgudur, bu kayıtta yok (REC-397, karar 130).",
+        "Kanunun sonradan değişip değişmediği (konsolide metin) bu kayıtta okunmadı."
+      ],
+      "son_kontrol": "2026-09-25",
+      "eksen": "E"
     }
   ],
   "notlar": [

@@ -9,7 +9,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { csvAyristir, ozetle as linkOzet, npxYolu } from '../link-tara.mjs'
-import { ozetle as kaliteOzet, kiyasla, sayfaRaporlariniTopla } from '../sayfa-kalite.mjs'
+import { ozetle as kaliteOzet, kiyasla, sayfaRaporlariniTopla, psiRota, anahtarGizle, yenidenDenenir } from '../sayfa-kalite.mjs'
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -78,5 +78,35 @@ describe('INV-SEO-TARAMA-1 · unlighthouse', () => {
     expect(k.seoDustu).toBe(true)
     expect(k.seoDusen).toEqual([{ yol: '/tr', once: 1, sonra: 0.92 }])
     expect(kiyasla(once, once).seoDustu).toBe(false)
+  })
+})
+
+describe('INV-SEO-TARAMA-1 · PSI kipi (Google sunucusunda Lighthouse)', () => {
+  const psi = (url: string, seo: number) => ({ lighthouseResult: { finalDisplayedUrl: url, categories: { seo: { score: seo }, performance: { score: 0.7 } } } })
+  it('PSI yanıtı rota biçimine çevrilir; özet ve kıyas aynı kalır', () => {
+    const r = [psiRota(psi('https://s.test/tr', 1), 'https://s.test/tr'), psiRota(psi('https://s.test/tr/a', 0.92), 'https://s.test/tr/a')]
+    expect(r.map((x) => x?.path)).toEqual(['/tr', '/tr/a'])
+    expect(kaliteOzet({ routes: r }).seoEksik.map((s: { yol: string }) => s.yol)).toEqual(['/tr/a'])
+  })
+  it('hata yanıtı ya da gövdesiz yanıt null (sessiz sıfır değil)', () => {
+    expect(psiRota({ error: { code: 400, message: 'x' } }, 'https://s.test/tr')).toBeNull()
+    expect(psiRota({}, 'https://s.test/tr')).toBeNull()
+    expect(psiRota(null, 'https://s.test/tr')).toBeNull()
+  })
+  it('⭐anahtar hiçbir hata metninde kalmaz (değerle ve key= parametresiyle)', () => {
+    const k = 'AIzaFAKEanahtar123'
+    const m = anahtarGizle(`fetch failed https://www.googleapis.com/x?url=a&key=${k}&strategy=mobile ${k}`, k)
+    expect(m).not.toContain(k)
+    expect(m).toContain('key=***')
+    expect(anahtarGizle('…?key=baskaDeger', undefined)).toBe('…?key=***')
+  })
+  it('⭐ayırt edici çift: geçici hata yeniden denenir, kimlik/kota hatası denenmez (09-25: 6/86 FAILED_DOCUMENT_REQUEST geçiciydi)', () => {
+    expect(yenidenDenenir({ code: 400, message: 'Lighthouse returned error: FAILED_DOCUMENT_REQUEST.' })).toBe(true)
+    expect(yenidenDenenir({ code: 429, message: 'quota' })).toBe(true)
+    expect(yenidenDenenir({ code: 500, message: 'x' })).toBe(true)
+    expect(yenidenDenenir({ ag: true, message: 'ECONNRESET' })).toBe(true)
+    expect(yenidenDenenir({ code: 400, message: 'API key not valid' })).toBe(false)
+    expect(yenidenDenenir({ code: 403, message: 'forbidden' })).toBe(false)
+    expect(yenidenDenenir(null)).toBe(false)
   })
 })

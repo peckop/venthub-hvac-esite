@@ -32,7 +32,8 @@ function gercekZincir(): Mig[] {
     .readdirSync(MIG_DIZIN)
     .filter((a) => a.endsWith('.sql'))
     .sort()
-    .map((ad) => ({ ad, sql: fs.readFileSync(path.join(MIG_DIZIN, ad), 'utf8') }))
+    // Windows kopyasında text=auto satır sonunu CRLF yazar; sabotaj kalıpları \n arar → tek biçime indirilir.
+    .map((ad) => ({ ad, sql: fs.readFileSync(path.join(MIG_DIZIN, ad), 'utf8').replace(/\r\n/g, '\n') }))
 }
 
 /** Zincirdeki SON fonksiyon tanımı (başlık + gövde), tek satıra indirilmiş. */
