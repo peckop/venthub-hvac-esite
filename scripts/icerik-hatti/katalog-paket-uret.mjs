@@ -102,7 +102,14 @@ const dil = (o, k) => (o && typeof o === 'object' ? (o[k] ?? '') : '')
 
 console.log(`PAKET ÜRETİLİYOR: ${HEDEF}`)
 
-const urunler = oku('products')
+// REC-383 (REC-140 Faz 3): liste/maliyet alanları products'ta değil product_costs'ta. Paket o tabloyu
+// taşımıyorsa (Faz 3 öncesi dışa aktarım) fail-closed oku() durdurur — sessizce "fiyat yok" üretmez.
+const maliyetler = new Map(oku('product_costs').map(m => [m.product_id, m]))
+const urunler = oku('products').map(u => {
+  const m = maliyetler.get(u.id)
+  if (!m) { console.error(`⛔ ${u.sku}: product_costs satırı YOK — paket tutarsız, fail-closed`); process.exit(2) }
+  return { ...u, purchase_price: m.purchase_price, purchase_currency: m.purchase_currency }
+})
 const aileler = oku('product_families')
 const kategoriler = oku('categories')
 const markalar = oku('brands')

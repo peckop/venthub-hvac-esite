@@ -47,7 +47,8 @@ const K = env.SUPABASE_SERVICE_ROLE_KEY
 if (!U || !K) { console.error('⛔ SUPABASE_URL / SERVICE_ROLE_KEY yok'); process.exit(1) }
 const H = { apikey: K, authorization: `Bearer ${K}`, 'content-type': 'application/json' }
 
-const SIRA = ['brands', 'categories', 'product_families', 'price_lists', 'products', 'product_prices', 'product_images']
+// REC-383: product_costs products'tan SONRA (FK: product_id, tenant_id → products).
+const SIRA = ['brands', 'categories', 'product_families', 'price_lists', 'products', 'product_costs', 'product_prices', 'product_images']
 
 // ---- 1) PAKET BÜTÜNLÜĞÜ: manifest hash'i tutmuyorsa yükleme YOK.
 for (const t of SIRA) {
