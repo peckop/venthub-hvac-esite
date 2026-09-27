@@ -591,8 +591,9 @@ export async function POST(request: NextRequest) {
      * Tek çağrı, tek yer: `revalidatedPaths` zaten bu isteğin biriktiricisi, dolayısıyla
      * her dala ayrı ayrı dokunmaya gerek yok (dokunsaydım 14+ çağrı yerinde risk üretirdim).
      * `await` ediliyor ki serverless çalışma zamanı isteği bitirip fetch'i KESMESİN;
-     * modül ASLA throw etmez ve anahtar yoksa no-op'tur, yani bu satır webhook'un asıl
-     * işini (önbellek tazeleme) hiçbir koşulda düşüremez.
+     * modül ASLA throw etmez, yani bu satır webhook'un asıl işini (önbellek tazeleme) hiçbir
+     * koşulda düşüremez. REC-405: K3-b bayrağı kapalıyken değişecek adresler (ürün/kategori/
+     * marka) modülün içinde süzülür; hepsi düşerse istek atılmaz (`atlandi/yayin-oncesi`).
      */
     const indexNow = await indexNowBildir(revalidatedPaths)
 
@@ -601,7 +602,8 @@ export async function POST(request: NextRequest) {
       event: { table, type },
       revalidatedPaths,
       revalidatedTags,
-      // Bildirimin ne yaptığı yanıtta GÖRÜNÜR: "atlandi/anahtar-yok" ile "gonderildi" ayrımı
+      // Bildirimin ne yaptığı yanıtta GÖRÜNÜR: "atlandi/yayin-oncesi" ile "gonderildi" ayrımı
+      // (ve kaç yolun süzüldüğü, `dusurulen`)
       // olmadan, çalışmayan bir bildirim çalışıyormuş gibi sessizce durur.
       indexNow,
       // PS-042: products UPDATE'inde old_record yoksa alan-bazlı karşılaştırma yapılamadı —
