@@ -21,7 +21,8 @@ import { describe, expect, it } from 'vitest'
  */
 
 const KOK = path.resolve(__dirname, '../../..')
-const oku = (p: string): string => fs.readFileSync(path.join(KOK, p), 'utf8')
+// Windows kopyasında text=auto satır sonunu CRLF yazar; kalıplar \n arar → tek biçime indirilir.
+const oku = (p: string): string => fs.readFileSync(path.join(KOK, p), 'utf8').replace(/\r\n/g, '\n')
 const BETIK = path.join(KOK, 'scripts', 'hijyen', 'bagimlilik-denetimi.cjs')
 const KAYIT = 'docs/standards/bagimlilik-kararlari.md'
 
