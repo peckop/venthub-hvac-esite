@@ -22,7 +22,11 @@ import { readFileSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { SIRA, hedefKilidi, tabloSirala, partiler, farkOlc, farkSifirMi, bitisSayilari } from './katalog-yukle.mjs'
+import { SIRA, hedefKilidi, tabloSirala, partiler, farkOlc, farkSifirMi, bitisSayilari, icerikTuru } from './katalog-yukle.mjs'
+import { sha256 } from './paket-gorsel.mjs'
+
+const KOVA = 'product-images'
+const gorsel = { dogrulanan: 0, eksik: [], bozuk: [] }
 
 const arg = (ad) => process.argv.find(a => a.startsWith(`--${ad}=`))?.slice(ad.length + 3)
 const PAKET = arg('paket')
@@ -120,6 +124,31 @@ if (yaz) {
     console.log(`  ${t.padEnd(18)} yazıldı ${yazilan}`)
   }
   console.log('')
+
+  // ---- 2b) GÖRSEL DOSYALARI: satır yetmez — dosyası olmayan satır yeni ortamda kırık resimdir.
+  // Aynı kilidin arkasında (hedef boş, canlı değil). Yüklenen her dosya geri okunur, sha256 ile
+  // paketteki kopyayla karşılaştırılır; tutmayan/eksik dosya round-trip'i KIRMIZI yapar.
+  const yollar = [...new Set(oku('product_images').map(g => g.path).filter(Boolean))]
+  for (const p of yollar) {
+    const yerel = join(PAKET, 'gorseller', p)
+    if (!existsSync(yerel)) { gorsel.eksik.push(p); continue }
+    const tur = icerikTuru(p)
+    if (!tur) { gorsel.eksik.push(`${p} (tanınmayan uzantı)`); continue }
+    const govde = readFileSync(yerel)
+    const r = await fetch(`${hedef.url}/storage/v1/object/${KOVA}/${p}`, {
+      method: 'POST', headers: { apikey: hedef.key, authorization: `Bearer ${hedef.key}`, 'content-type': tur }, body: govde,
+    })
+    if (!r.ok) {
+      console.error(`⛔ görsel ${p}: ${r.status} ${(await r.text()).slice(0, 200)}`)
+      console.error(`   Hedefte "${KOVA}" kovası yoksa önce migration zinciri uygulanmalı (kova migration'la kurulur).`)
+      process.exit(1)
+    }
+    const geri = await fetch(`${hedef.url}/storage/v1/object/public/${KOVA}/${p}`)
+    const gb = geri.ok ? Buffer.from(await geri.arrayBuffer()) : null
+    if (gb && sha256(gb) === sha256(govde)) gorsel.dogrulanan++
+    else gorsel.bozuk.push(p)
+  }
+  console.log(`  görsel dosyası       ${yollar.length} yol · yüklenip sha256 ile geri okunan ${gorsel.dogrulanan} · eksik ${gorsel.eksik.length} · tutmayan ${gorsel.bozuk.length}\n`)
 }
 
 // ---- 3) FARK: paketteki her satır hedefte var mı, aynı mı; kolon kümesi aynı mı?
@@ -145,13 +174,17 @@ for (const t of SIRA) {
 console.log(`\nTOPLAM  aynı ${toplam.ayni} · değişik ${toplam.degisik} · yeni ${toplam.yeni} · hedefte fazla ${toplam.fazla} · kolon farkı ${toplam.kolon}`)
 if (ornekler.length) { console.log('\nilk farklar:'); for (const d of ornekler.slice(0, 20)) console.log('  ' + d) }
 
-const roundTrip = toplam.sifir === true
+const gorselTamam = !yaz || (gorsel.eksik.length === 0 && gorsel.bozuk.length === 0)
+for (const p of [...gorsel.eksik, ...gorsel.bozuk].slice(0, 10)) console.log('  görsel dosyası SORUNLU: ' + p)
+const roundTrip = toplam.sifir === true && gorselTamam
 console.log(`\nROUND-TRIP: ${roundTrip ? '✓ SIFIR FARK — paket bu DB\'yi eksiksiz tarif ediyor (satır + kolon)' : '⚠ FARK VAR — paket bu DB\'yi tam tarif etmiyor ya da DB paket üretildikten sonra değişti'}`)
 
 if (yaz) {
   const p = bitisSayilari(oku('products'), oku('product_images'))
   const h = bitisSayilari(hedefUrun, hedefGorsel)
   console.log('\nBİTİŞ SAYILARI (paket → hedef):')
+  p.gorselDosya = new Set(oku('product_images').map(g => g.path).filter(Boolean)).size
+  h.gorselDosya = gorsel.dogrulanan
   for (const k of Object.keys(p)) console.log(`  ${k.padEnd(12)} ${String(p[k]).padStart(6)} → ${String(h[k]).padStart(6)} ${p[k] === h[k] ? '✓' : '✗'}`)
 } else {
   console.log('\nKURU KOŞUM — hiçbir şey yazılmadı. Boş hedefe kurmak için: --yaz --hedef-env=<dosya>')
