@@ -1,7 +1,8 @@
 # docs/ — Tek Giriş Haritası
 
 > "Bu iş nasıl yapılır / nereye bakılır?" dendiğinde **ön kapı**: hangi soru → hangi harita, hangi dosya.
-> `CLAUDE.md` yalnız bu dosyayı gösterir; harita kopyası tutmaz (`standards/belge-yonetimi-standard.md` B2).
+> `CLAUDE.md` bu dosyayı "Tek Giriş Haritası" bölümüyle gösterir; kendi kısa doküman listesi de karar 159 gereği
+> yerinde kalır (`standards/belge-yonetimi-standard.md` B2). Çelişirse bu dosya güncellenir, CLAUDE.md'ye haber verilir.
 > Kural: her konunun **tek otoritesi** vardır; diğer dosyalar onu tekrar etmez, **referans verir**.
 > Haritada olmayan belge ajan için yoktur: yeni cetvel bu dosyaya satırı eklenmeden bitmiş sayılmaz.
 
@@ -57,7 +58,6 @@
 | Birden çok Claude oturumu **nasıl çakışmadan** çalışır (şerit sahipliği, worktree izolasyonu, bir-iş-bir-dal)? | `standards/collaboration-protocol.md` · ⚠`standards/multi-session-coordination-standard.md` eski modeli anlatıyor (belge taraması YÜKSEK bulgu 4; düzeltmesi REC-400 D5) |
 | Bir iş **hangi yöntemle** koşar (şerit / alt ajan / Workflow / maestro / skill / elle), emirde `YÖNTEM:` satırı? | `standards/execution-method-standard.md` |
 | Katalogdan ticarete hat — ürün nasıl girer, CSV, fiyat, şema, kategori? | `plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan uca pano) + `standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`; veri deposu kardeş depo `venthub-pdf-ingestor` |
-| `CLAUDE.md`'deki bir kural **niçin** var? | `standards/claude-md-gerekceler.md` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
 | Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |

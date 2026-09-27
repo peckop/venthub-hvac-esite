@@ -1,8 +1,8 @@
 # CLAUDE.md — VentHub HVAC
 
-> Bu dosya her oturumda otomatik yüklenir: **anayasa + harita adresi.** Hikâye ve belge listesi burada durmaz.
-> **Hangi soru → hangi belge/araç:** `docs/README.md` (tek giriş haritası). Kural gerekçeleri:
-> `docs/standards/claude-md-gerekceler.md`. Belge düzeni: `docs/standards/belge-yonetimi-standard.md`.
+> Bu dosya her oturumda otomatik yüklenir. **Kısa ve yüksek sinyalli** tutulur.
+> Kapsamlı referans için → **`CONTEXT.md`** (NotebookLM üretir, elle yeniden yazma).
+> Milestone/DI detayı → `PROJECT.md` · Üretilmiş master MD'ler → `docs/`
 
 ## Proje Özeti
 
@@ -14,10 +14,14 @@ Birincil dil Türkçe, ikincil İngilizce.
 
 ## Teknoloji Yığını (özet)
 
-- **Next.js 15.5** (App Router, RSC, SSG + talep-üzerine ISR) + **React 19** (React Compiler) — **PPR KULLANILMIYOR**
-- **TypeScript 5.7** strict — `any` **yasak** · **Supabase** (PostgreSQL + Auth + Edge Functions + Realtime + Storage), RLS-first
+- **Next.js 15.5** (App Router, RSC, SSG + talep-üzerine ISR) + **React 19** (React Compiler)
+  — **PPR KULLANILMIYOR** (`next.config.mjs`'te `experimental.ppr` yok; 2026-08-15 ölçüldü)
+- **TypeScript 5.7** strict — `any` **yasak**
+- **Supabase** (PostgreSQL + Auth + Edge Functions + Realtime + Storage), RLS-first
 - **React Three Fiber 9** + Drei (3D), **Tailwind 3.4** (design tokens), Framer Motion
-- **Vitest** (Testing Library + axe a11y), **Sentry**, **Vercel** hosting · İyzico, Resend, Twilio · paket yöneticisi **pnpm**
+- **Vitest** (Testing Library + axe a11y), **Sentry**, **Vercel** hosting
+- Entegrasyonlar: İyzico (ödeme), Resend (e-posta), Twilio (SMS/WhatsApp)
+- Paket yöneticisi: **pnpm**
 
 ## Komutlar
 
@@ -48,29 +52,35 @@ supabase/
 ├── functions/   # Edge Functions (Deno/TS) · migrations/ # PostgreSQL migration'ları
 ```
 
-Karar: Rota mı → `src/app/` · Sayfa görünümü mü → `src/views/` · Tekrar kullanılır UI mı →
-`src/components/` · Veri/servis mi → `src/lib/services/` (DI) · Hook mu → `src/hooks/` ·
+Karar: Rota mı → `app/` · Sayfa görünümü mü → `views/` · Tekrar kullanılır UI mı →
+`components/` · Veri/servis mi → `lib/services/` (DI) · Hook mu → `hooks/` ·
 DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql` — damga **14 hane**;
-8 haneli biçim INV-MIGRATION-2'de KIRMIZI verir).
+8 haneli `YYYYMMDD_` biçimi INV-MIGRATION-2 kapısında KIRMIZI verir, 2026-08-31'de sahada ölçüldü).
 
 ## Mutlak Kurallar (ihlal etme)
 
 1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
-   **İş emri de aynı kurala tabidir (2026-08-20):** Linear'da açılan her görevin
+   **İş emri de aynı kurala tabidir (2026-08-20):** registry'de açılan her görevin
    açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
    karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
    Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
-   cetvel var mı" diye SORAR.
-2. **Dependency Injection:** Tüm `src/lib/services/*` fonksiyonları ilk parametre olarak
+   cetvel var mı" diye SORAR. (Niçin: 2026-08-20'de ERP yetenek çerçeveleri zaten yazılıyken
+   "yazılmadı" sanılıp sıfırdan emirler açıldı — belge vardı, emre bağlanmamıştı; el kitabı
+   "hatırlanan" değil "emre yazılan" şey olmalı.)
+   (Niçin: 2026-08-15'te 1044 fiyat satırı prod'a yazıldı ve vitrin değişmedi; sebebi render/önbellek
+   cetvelinin hiç yazılmamış olmasıydı — hata tam o boşlukta yaşadı ve hiçbir kapı görmedi.)
+2. **Dependency Injection:** Tüm `lib/services/*` fonksiyonları ilk parametre olarak
    `supabase: SupabaseClient<Database>` alır. Modül düzeyinde statik client importu yok.
    (ESLint `no-restricted-imports` + AST testi zorlar.)
 3. **Tip güvenliği:** `any` yasak, strict TypeScript.
 4. **RSC öncelikli:** `page.tsx` varsayılan Server Component; `'use client'` sadece
    etkileşimli uç bileşenlerde. Ana rotalarda `ssr: false` yasak.
 5. **Suspense sınırı:** `useSearchParams` kullanan her bileşen `<Suspense fallback={<Skeleton/>}>`
-   ile sarılmalı (SSR zehirlenmesini engellemek için). **Sınır yalnız o uç bileşeni sarar, sayfayı değil.**
+   ile sarılmalı (SSR zehirlenmesini engellemek için). **Sınır yalnız o uç bileşeni sarar, sayfayı değil**
+   (2026-09-05 ölçümü, REC-150 Adım 0: hrv ve hava-perdesi sayfalarında sınır sayfa kökündeydi → sunucu gövdeyi
+   0 kelime verdi, dört hesaplayıcı istemcide açıldı; kanal sayfasında sınır uçtaydı → 400+ kelime).
 6. **React.cache():** RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.
 7. **i18n:** Kullanıcıya görünen metin sözlükten gelir; URL'ler `useLocalizedRoutes`
    ile (manuel `/tr/` ekleme yasak); DB çevirileri JSONB (`metadata->>lang`).
@@ -89,45 +99,91 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
     (data bleeding = felaket). Yetki kararları `app_metadata` üzerinden (asla `raw_user_meta_data`).
     `unstable_cache`/`revalidateTag` anahtarlarına `lang` **ve** `tenantId` dahil.
     `middleware.ts` Edge'de DB sorgusu **yasak** (header/Edge Config ile tenant resolution).
+
 13. **Migration = prod:** migration içeren dal master'a merge edilince `supabase-migrate.yml`
     prod DB'ye **OTOMATİK uygular**. Migration'lı PR'ı yalnız kullanıcı onayıyla merge et; "sadece
     komutla uygulanacaksa" migration'ı merge ETME.
+
 14. **Tam iş:** Testi/kapıyı sonraki işe bırakma, hata yollarını (ağ yok, veri boş, yetki yok)
     kodla birlikte yaz, iki çözüm arasındaki fark **yalnız satır sayısıysa** tam olanı seç.
     Kapsam dışı sayılabilecek tek şey gerçekten ilgisiz iştir; o **ayrı kayıt** olarak açılır ve
     numarası raporda geçer. Bu kural kapsam hakkındadır, yetki hakkında değil — hiçbir kapıyı
     (özellikle kural 13'ü) gevşetmez. Cetvel: `docs/standards/execution-method-standard.md` §8.
 
-## Nereye bakılır (davranış kuralı; belge listesi `docs/README.md`'de)
+> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `CONTEXT.md §14`.
 
-- **Kod yapısı / "ne çağırıyor, neyi etkiler, nerede"** → önce **CodeGraph** (AST grafiği, ~1sn taze). grep'ten önce.
-- **"Katalog PDF'inde ne yazıyor"** → **KAYNAK DİZİNİ**, PDF'i AÇMA: `<ingestor>/kaynak-dizini/sayfalar.jsonl`
-  (`<ingestor>` = kardeş depo `venthub-pdf-ingestor`). Dizinde yoksa önce dizine eklenir
-  (`<ingestor>/scripts/kaynak_dizini/cikar.py`); cetvel `docs/standards/catalog-ingestion-standard.md` §6.3.
-- **Kural / niçin / mimari karar / SaaS plan** → NotebookLM dijital ikiz (`chat_ask`, ID `235043eb-970f-4a52-9f39-1d02b2621e9c`).
-  NLM auth bozulursa `notebooklm login`'i kendin koş; `auth check` kanıt değil, `notebooklm list` ile ölç.
-- **Çalışma düzeni:** çok oturumda şerit sahipliği + **worktree izolasyonu**, bir-iş-bir-dal
-  (`docs/standards/collaboration-protocol.md`); iş emrinde `YÖNTEM:` satırı — yöntemsiz emir eksik emirdir
-  (`docs/standards/execution-method-standard.md`).
-- **Vitrin tazeliği:** statik vitrin sayfasında görünen HER tablonun DB tetiği + webhook handler dalı olmalı
-  (yoksa veri değişir, sayfa değişmez ve hiçbir test görmez) — `docs/standards/rendering-cache-standard.md`.
-- **Çelişirse kod kazanır.** İkiz ve belgeler snapshot'tır, drift edebilir; tazelik her mesajdaki durum satırında.
-- `CONTEXT.md` NotebookLM üretimidir — elle yeniden yazma; not/ilave ekleyebilirsin.
-- `docs/` kökündeki master MD'ler **üretilmiştir** — elle düzenleme.
-- `.claude/skills/` ve `.agent/skills/` **İKİSİ DE AKTİF ve KASITLI** (çift ağaç); birleştirme/silme ÖNERME.
+## Tek Giriş Haritası — "hangi soru → hangi belge / hangi harita"
 
-## Notlar (ortam kuralları)
+**Nereye bakılacağını bilmiyorsan önce `docs/README.md`'yi aç.** Orada iki tablo var: "haritaların haritası"
+(kod → CodeGraph, kod + veritabanı → graphify + şema grafı, metin arama → WrongStack dizini, dosya dersi → sage,
+geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Linear, tazelik → durum satırları) ve
+"hangi soru → hangi cetvel". Yeni cetvel oraya satırı eklenmeden bitmiş sayılmaz. Belge bayatlığı her mesajdaki
+`BELGE` satırında görünür (`docs/standards/belge-yonetimi-standard.md`).
 
-- **Lokal `deno check`:** daima `--node-modules-dir=none` ile koş (`auto` pnpm yerleşimini bozar). CI etkilenmez.
-- **Repo PUBLIC (2026-08-15'ten beri):** (1) geçmiş dahil her şey herkese açık — yeni bir sır commit'lenirse
-  geri dönüşü YOK, görünürlükten önce betiği koş; (2) **self-hosted runner KULLANMA**; (3) `permissions:` bloğu
-  yazıyorsan `contents: read` yine ZORUNLU.
-- **Worktree `node_modules` (karar 88):** her worktree **kendi** kurulumunu yapar:
-  `pnpm install --frozen-lockfile --offline` (kilit dosyası değişmemeli). Ana depoya **junction/symlink ile
-  paylaşım YASAK.** Eski bağlantı varsa önce YALNIZ bağlantı kaldırılır (`cmd //c "rmdir <yol>"`, `/s` YOK),
-  ana deponun `.bin`'i doğrulanır. Özyinelemeli silmeyi `silme-baglanti-kapisi` kancası durdurur.
-- **Git kancaları:** `pre-commit` **bloklamaz** (hızlı, çevrimdışı, uyarı-only; companion var mı bakar, LLM skoruna değil); companion üretimi
-  `post-commit`te arka planda (log: `.git/orion-doc.log`).
+## Doküman Haritası
+
+- `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
+- `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
+- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
+- `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
+  skill / elle): karar tablosu + emirde `YÖNTEM:` satırı (öneri; sapma yazılır). Yöntemsiz emir eksik emirdir.
+- `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne
+  tazelenir, fiyat hangi yüzeyde görünür.** Statik vitrin sayfasında görünen HER tablonun DB tetiği +
+  webhook handler dalı olmalı (yoksa veri değişir, sayfa değişmez ve hiçbir test görmez).
+- `PROJECT.md` — DI & güvenlik milestone kayıtları + arayüz kontratları.
+- `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
+- **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)
+  + `docs/standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`.
+  Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). **KATALOG PDF'İNDE NE YAZDIĞI
+  sorusu → önce KAYNAK DİZİNİ:** `<ingestor>/kaynak-dizini/sayfalar.jsonl` (+ `manifest.json`);
+  **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`scripts/kaynak_dizini/cikar.py`,
+  tazelik kapısı `tazelik.py`). Cetvel: `catalog-ingestion-standard.md` §6.3.
+  NLM auth bozulursa → memory `nlm-auth-issue`
+  (**2026-08-17 ürün değişti:** paket `notebooklm-py`, CLI `notebooklm`, MCP sunucusu `notebooklm-py`;
+  çözüm `notebooklm login`. `auth check` tek başına kanıt DEĞİL — `notebooklm list` ile ölç).
+- `docs/` (kök) — **üretilmiş** master MD'ler (frontend, edge functions, DB şema) — elle düzenleme.
+- `.claude/skills/` = Claude Code yetenekleri · `.agent/skills/` = Antigravity/worker yetenekleri — **İKİSİ DE AKTİF ve KASITLI** (çift ağaç); birleştirme/silme ÖNERME.
+
+## Bilgi Kaynağı İş Akışı (dört katman)
+
+- **Kod yapısı / "ne çağırıyor, neyi etkiler, nerede" sorusu** → önce **CodeGraph** (AST grafiği,
+  ~1sn taze, kesin). grep'ten önce buna bak.
+- **"Katalog PDF'inde ne yazıyor" sorusu** → **KAYNAK DİZİNİ**, PDF'i AÇMA:
+  `<venthub-pdf-ingestor>/kaynak-dizini/sayfalar.jsonl` (sayfa metni + tablo hücreleri, hash'li,
+  deterministik). Dizinde yoksa **önce dizine eklenir** (`scripts/kaynak_dizini/cikar.py`);
+  tazelik `tazelik.py` ile ölçülür. Cetvel: `catalog-ingestion-standard.md` §6.3.
+  *(Niçin kural: PDF'i doğrudan tarayan her iş, aynı kataloğu üçüncü kez okur — patinajın sebebi buydu.)*
+- **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
+  ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `CONTEXT.md`.
+- **Çelişirse kod kazanır.** NLM ikizi snapshot'tır, drift edebilir (ör. tablo sayısı); kod
+  yapısı için daima CodeGraph/gerçek kaynağı doğrula. CLAUDE.md = her oturum yüklü çekirdek katman.
+
+## Notlar
+
+- **Lokal `deno check`:** daima `--node-modules-dir=none` ile koş — `auto` pnpm node_modules
+  yerleşimini BOZAR (build "Module not found" ile patlar; onarım `pnpm install`). CI etkilenmez.
+- **Repo 2026-08-15'ten beri PUBLIC** (öncesi private'tı). Karar ölçüme dayandı:
+  `docs/audits/secret-exposure-audit-2026-08-15.md` — 18 sır imzası × tüm geçmiş tarandı,
+  bulunan 4 kalemin 3'ü **API çağrılarak** ölü doğrulandı (401/403). Sebep: private repoda
+  Actions dakikası ücretli ve hesap iş başlatmayı reddetti; public'te ücretsiz/sınırsız.
+  **Sonuçları:** (1) geçmiş dahil her şey herkese açık — yeni bir sır commit'lenirse geri
+  dönüşü YOK, görünürlükten önce betiği koş; (2) **self-hosted runner KULLANMA** — public
+  repoda fork PR'ı yabancı kodu makinede çalıştırır; (3) `permissions:` bloğu yazıyorsan
+  `contents: read` yine ZORUNLU (varsayılanlar düşer, checkout "Repository not found" verir).
+- **Worktree `node_modules` (karar 88, 2026-09-23):** her worktree **kendi** kurulumunu yapar:
+  `pnpm install --frozen-lockfile --offline` (pnpm sabit bağlantı kullanır → disk maliyeti ~0, ölçüldü;
+  kilit dosyası değişmemeli). Ana depoya **junction/symlink ile paylaşım YASAK** — 09-23'te `git worktree remove`
+  junction'dan geçip ana deponun node_modules'unu sildi. Eski bağlantı varsa önce YALNIZ bağlantı kaldırılır
+  (`cmd //c "rmdir <yol>"`, `/s` YOK), ana deponun `.bin`'i doğrulanır. Özyinelemeli silmeyi
+  `silme-baglanti-kapisi` kancası dışa giden bağlantı varken durdurur.
+- **Git kancaları (2026-08-15):** `pre-commit` artık **bloklamaz** — hızlı, çevrimdışı,
+  uyarı-only (companion dosyası var mı diye bakar, LLM skoruna DEĞİL). Companion üretimi
+  `post-commit`te arka planda (log: `.git/orion-doc.log`). Yedekler: `*.oncesi-2026-08-15`.
+  Eskisi rastgele reddediyordu (aynı dosya 80/100 ↔ 100/100) ve 3 dalından 2'si sessizce ölüydü.
+
+- **CONTEXT.md NotebookLM tarafından üretilir** — "iyileştirme" adına yeniden yazma; not/ilave ekleyebilirsin.
+- Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
+  NotebookLM "VentHub Proje Hafızası" defterine (dijital ikiz) yüklenir.
 
 ## graphify
 

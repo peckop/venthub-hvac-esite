@@ -1,5 +1,10 @@
 {
-  "kirikYol": {},
+  "kirikYol": {
+    "CLAUDE.md": [
+      "lib/services/",
+      "scripts/kaynak_dizini/cikar.py"
+    ]
+  },
   "cetvelAlanEksik": [
     "docs/standards/3d-scene-lighting-research.md",
     "docs/standards/3d-showroom-ux-research.md",
