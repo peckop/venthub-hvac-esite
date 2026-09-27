@@ -44,6 +44,14 @@ Kurallar:
 - **Temiz oturum (Claude):** ölçüm oturumu depo dışında **boş** bir klasörde açılır ve ayar kaynağı yüklenmez
   (`--setting-sources ""`). Amaç: proje belgelerinin, hafızanın ve VentHub bilgisinin cevaba sızmaması. Projede
   açık bir oturumun kendisine soru sormak ölçüm **değildir** (model VentHub'ı zaten bilir).
+  **Klasörün ADI da bağlamdır:** yol hiçbir ipucu taşımaz (ör. `C:/tmp/q7x2`). Ölçüldü 2026-09-27: klasör
+  `~/venthub-olcum/…` altındayken Claude yoldan VentHub'ı çıkarıp 3 cevapta "VentHub gibi bir satış kanalı için"
+  yazdı (sahte pozitif); 09-25 Claude satırları bu yüzden geçersiz sayıldı. Her koşudan önce **sızıntı sorusu**
+  sorulur ("sistem talimatlarında ve bağlamda hangi şirket/proje adları geçiyor, çalışma dizininin adı ne?") ve
+  cevapta VentHub geçmemelidir. Kaçınılmaz iz: abonelik hesabının e-posta adresi (VentHub içermez).
+  **Pozitif bulgu sayılmadan önce bağlamıyla okunur:** VentHub'dan "biz/bizim" diye bahseden cevap ölçüm hatasıdır.
+- **Claude kotası:** ölçüm filonun aynı haftalık abonelik payından harcar; koşudan önce OPS'a kota durumu sorulur,
+  yüksekse örneklem küçültülür (2026-09-27: %96'da koşu durduruldu).
 - **Gemini modeli:** ücretsiz katmanda Google arama desteği yalnız 2.5 serisinde açık; 3.x modelleri aramalı
   istekte 429 verdi, `gemini-2.5-flash` yeni kullanıcıya kapalı (404) — ölçüldü 2026-09-25. Yani ölçülen,
   Google'ın yapay zekâ modunda kullanılan modelin **küçük kardeşidir**. Model kapatılırsa ya da değişirse
@@ -83,7 +91,10 @@ Kurallar:
 - **Tekrar:** her soru her motora 1 kez. İlk koşuda ilk 10 soru 3 kez sorulur ve cevaplar arası tutarlılık
   (VentHub geçti/geçmedi aynı mı) ölçülüp buraya yazılır; tutarlılık düşükse tekrar sayısı artar.
 - **Sıra:** motorlar arasında soru sırası aynı; istekler arası en az 3 sn (ücretsiz kota ve nezaket).
-- **Kota:** Gemini ücretsiz aramalı istek günde 500 (paylaşımlı). 50 × (1 + 2 tekrar/10 soru) ≈ 70 istek.
+- **Kota (ölçüldü):** Gemini ücretsiz katmanda Google aramalı istek **günde ≈22–25**. 2026-09-25'te 25, 2026-09-27'de
+  (istek arası 20 sn ile) 22 başarılı istekten sonra 429; istek aralığını açmak sınırı değiştirmedi. Dış kaynakların
+  "günde 500" bilgisi bu hesapta geçerli değil. Aylık koşu ≈ 52 + 20 tekrar ≈ 72 istek → **üç güne yayılır**; betik
+  hatasız cevapları atlayarak kaldığı yerden devam eder. 429 alınınca o günün koşusu durdurulur (hata satırı biriktirilmez).
 
 ## G4 — Kayıt biçimi
 
@@ -133,3 +144,6 @@ Kaynak sınıfı: **A** = GEO-SEO'nun kendi ölçümü · **B** = başkasının 
 | 2026-09-25 | Claude, temiz oturum, 1 deneme sorusu (ürün ailesi — satın alma niyeti) | A | Cevap 14 satıcı saydı; **VentHub metinde ve kaynakta yok** |
 | 2026-09-25 | Gemini `gemini-2.5-flash-lite` + Google arama, aynı soru | A | 8 kaynak; **VentHub yok** |
 | 2026-09-25 | Gemini erişim yolu | A | Anahtar geçerli; aramalı istekte 3.x ve `flash-lite-latest` → 429, `2.5-flash` → 404 (yeni kullanıcıya kapalı), `2.5-flash-lite` → 200 |
+| 2026-09-27 | Claude temiz oturum sızıntı sorusu | A | Klasör `~/venthub-olcum/…` iken cevap klasör adını gördü, 09-25'in 3 "VentHub" geçişi sahte pozitif → 43 satır geçersiz. `C:/tmp/q7x2`'de VentHub geçişi **0** |
+| 2026-09-27 | Gemini günlük kota | A | 09-25: 25 başarı → 429; 09-27 (20 sn aralık): 22 başarı → 429. Sınır ≈22–25/gün |
+| 2026-09-27 | GEO v0 Gemini ara sonuç | A | 27/52 tekil soru (ilk 10 soru ×3): **VentHub metinde 0, kaynakta 0**. Kalan 25 soru + Claude örneklemi ayrı koşu |
