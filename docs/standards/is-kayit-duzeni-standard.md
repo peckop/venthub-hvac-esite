@@ -93,8 +93,9 @@ Duraklatılmış bir şerit yeniden açılırken:
 
 ## 6.1 PİLOT — iş kartı panosu (karar 46, Recep onayı 2026-09-18)
 
-**Kapsam:** bundan sonraki her **yeni ALTYAPI işi** için bir kart açılır. Linear **aynen yaşar**;
-pilot onun yerine geçmez, yanında koşar ve karşılaştırılır. Süre: pilot Recep durdurana kadar.
+**Kapsam:** ~~bundan sonraki her **yeni ALTYAPI işi** için bir kart açılır~~ → **karar 144
+(2026-09-27) ile TÜM şeritlere genişledi; güncel kural §6.2'dedir.** Aşağıdaki ölçülmüş tuzaklar
+ve kanıt komutu kuralı §6.2 için de geçerlidir. Linear **aynen yaşar**; pano onun yerine geçmez.
 
 **Kart biçimi:** başlığın ilk satırı `REC-nn` ile başlar (numara defterden alınır, uydurulmaz).
 Kartın **Done**'a geçmesi için kanıt zorunludur: `gh pr checks <PR>` çıktısı ya da eşdeğeri.
@@ -111,7 +112,11 @@ süzgeci de bunları eliyor — ölçüldü).
 | Alt süreç `process.env` **kalıtır** | sırlar çocuk sürece geçer | Doğrulayıcı komutları `gh` ile sınırlı; `curl/wget/npm/node` **yasak listesinde**. Yine de bu bir **azaltma**, sıfırlama değil — kart açıklamasına sır yazılmaz |
 | Proje kimliği **sürücü harfine duyarlı** | `c:\…` → `7e017f`, `C:\…` → `1088d5` | Pano küçük harfli kökle açılır ve kimlik **ölçülür** |
 
-**Mesaj kutusu (mailbox) pilotun parçası DEĞİL — ölçüm bekliyor:** paket kurulu, ama kayıt
+**Mesaj kutusu (mailbox) — GÜNCEL NOT (2026-09-27):** karar 54 ile `.mcp.json`'a pencere başına
+kimlikle (`${CLAUDE_CODE_SESSION_ID}`) kaydedildi ve kullanılıyor; pilot ölçümü REC-401'de (ARAÇ).
+Aşağıdaki paragraf 09-18 tarihli kayıt öncesi durumu anlatır, tarihçe olarak durur.
+
+~~**Mesaj kutusu (mailbox) pilotun parçası DEĞİL — ölçüm bekliyor:**~~ paket kurulu, ama kayıt
 yapılmadı. Sebep: sunucu zorunlu `--actor <id>` istiyor ve `.mcp.json` üç pencerenin paylaştığı
 tek dosyadır; sabit bir actor yazılırsa üç pencere aynı kimlikle konuşur ve mesajlar yanlış
 pencereye düşer. Kayıt, kimlik ölçümünden sonra ayrı adımdır (`INV-WRONGSTACK-MCP-1` bu
@@ -135,9 +140,43 @@ Standart kalıp — "PR birleşti mi": `gh api repos/peckop/venthub-hvac-esite/p
 tek kart kapatmak ~64 KB bağlam. Tek `get_task` ~4 KB. Bu, pano değerlendirmesinin en ağır
 eksisidir; toplu giriş tek çağrıyla (`create_from_graph`) yapılır.
 
+**Bedel — GÜNCEL (2026-09-27, ölçüldü):** yukarıdaki "her yazma panonun tamamını döndürür"
+bulgusu yama ile kapandı (ARAÇ #1437 + onarım #1440 — yama sunucunun GERÇEKTEN çalıştırdığı
+`dist/cli.js`'e de uygulanır; ilk yama yalnız `index.js`'teydi ve canlıda etkisizdi). Yeni ölçüm:
+`add_task` 1.278 B (kart dahil), `add_note` 2.043 B (etkilenen kart dahil). Okuma eylemleri
+yamasızdır: `search_tasks` limit 5 ~2 KB · `get_task` ~1,5 KB · `workbench` limit 5 ~6 KB ·
+`ready_tasks` limit 5 ~13 KB · **`get_board` ~60 KB · `snapshot` ~133 KB → yalnız pano denetiminde.**
+
 **Pilotun kendi ölçütü:** iki hafta sonra üç sayı karşılaştırılır — (a) kart açılmadan kalan iş
 sayısı, (b) Done'a kanıtsız geçme denemesi sayısı, (c) Linear ile pano arasındaki sapma. Pilot
 "iyi hissettirdi" diye sürdürülmez.
+
+## 6.2 İŞ KARTI — TÜM ŞERİTLER (karar 144, Recep onayı 2026-09-27)
+
+**Kapsam:** her şerit (ALTYAPI, ARAÇ, HARİTA, ÜRÜN, KATALOG, BLOG, GEO-SEO, MEVZUAT, TASARIM ve
+sonradan açılan her şerit) **elindeki her iş için** kart tutar. Kartı olmayan iş kalmaz.
+**Deneme:** 2026-09-28 → 2026-10-04; sonunda §6.1'deki üç sayı + kartsız kayıt sayacı Recep'e.
+
+**Linear ↔ kart bölüşümü:** Linear = ana kayıt, karar, gerekçe, Design bağı, kapanış yorumu
+(`Fixes REC-nn` yalnız işi bitirene). Kart = şeridin o işteki küçük adımları, sıradaki adım,
+kanıt komutu. Linear'da kaydı olmayan iş için kart açılmaz → önce kayıt (OPS açar; Linear'ın
+250 arşivsiz kayıt sınırı yüzünden şeritler kendi başına yeni kayıt AÇMAZ, OPS'a yazar).
+
+**Kurallar:**
+1. **Kart işin BAŞINDA açılır**, sonunda değil. Başlığın ilk kelimesi `REC-nn`.
+2. **Açmadan önce ara:** `kanban_read search_tasks query="REC-nn" limit 5` — varsa yenisi açılmaz.
+3. **Açılış ölçümü:** yeni pencerede ilk `add_task` dönüşü ~1-3 KB olmalı. 10 KB'ı aşıyorsa o
+   pencerenin MCP süreci yamadan önce başlamıştır → dur, OPS'a yaz; Recep o pencerede `/mcp` ile
+   `wrongstack-kanban`'ı yeniden bağlar. Yama sonrası (ana ağaçta `tools/wrongstack-mcp/yamalar`
+   değişince) açık pencerelerin hepsi yeniden bağlanır.
+4. **Done yalnız kanıtla:** `verify_completion` (tek komut, boru yok — §6.1 kuralı) + `move_task`.
+   `transition_task` KULLANILMAZ (yönetilmeyen panoda reddediliyor, ölçüldü).
+5. **Ağır okumadan kaçın:** `get_board` / `snapshot` yalnız pano denetiminde; tek kart `get_task`.
+6. **Kartsız kayıt sayacı:** `node scripts/board/kartsiz-kayit.cjs` — Linear'da açık olup kartı
+   olmayan kayıtları sayar; OPS deneme boyunca günlük raporlar.
+7. **OPS yoklaması:** OPS her şeritten "elindeki işler: REC · Linear durumu · gerçek durum ·
+   kart var mı" beyanı ister; şerit kartsız işine aynı kodla kart açar. Karşılaştırmayı şerit
+   kendisi yapar, OPS toplar.
 
 ---
 
