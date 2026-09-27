@@ -24,6 +24,8 @@ interface Surec {
 interface Onbellek {
   ts: number
   bosMb: number
+  commitMb?: number
+  commitToplamMb?: number
   surecler: Surec[]
 }
 interface Yoklama {
@@ -48,7 +50,7 @@ describe('INV-BELLEK-YOKLAMA-1: bellek satırı eşikli ve ayırt edici', () => 
     const sisik = { ts: SIMDI - 60_000, bosMb: 8000, surecler: [surec(3551, 'agent-a896 tsserver.js')] }
     const s = by.satir(sisik, SIMDI, HEPSI_YASIYOR)
     expect(s).toMatch(/^⚠BELLEK: /)
-    expect(s).toMatch(/3,0 GB ustu: node 1234 3,5 GB \(agent-a896 tsserver\.js\)/)
+    expect(s).toMatch(/3,0 GB ustu \(ozel bellek\): node 1234 3,5 GB \(agent-a896 tsserver\.js\)/)
   })
 
   it('boş bellek 2 GB altındaysa büyük süreç olmasa da KONUŞUR; 2 GB üstünde susar', () => {
@@ -65,6 +67,24 @@ describe('INV-BELLEK-YOKLAMA-1: bellek satırı eşikli ve ayırt edici', () => 
     const ob = { ts: SIMDI - 60_000, bosMb: 1500, surecler: [surec(3100, 'agent-a435 tsserver.js')] }
     expect(by.satir(ob, SIMDI, HEPSI_YASIYOR)).toMatch(/node 1234 3,0 GB/)
     expect(by.satir(ob, SIMDI, () => false), 'ölü süreç için uyarı verildi').toBeNull()
+  })
+
+  /**
+   * ⭐2026-09-27 VAKASI: tsserver 32060 working set 4,4 GB, ÖZEL bellek 15,7 GB idi (dakikada
+   * ~120 MB büyüyordu); sanal bellek 49,3/63,7 GB. Working set'e bakan satır sızıntıyı küçük
+   * gösterdi, makine riskini hiç söylemedi. Ayırt edici çift: commit %85 altı SESSİZ, üstü KONUŞUR.
+   */
+  it('sanal bellek (commit) %85 üstünde büyük süreç olmasa da KONUŞUR; altında susar', () => {
+    const ob = (commitMb: number) => ({ ts: SIMDI, bosMb: 8000, commitMb, commitToplamMb: 65_000, surecler: [surec(900)] })
+    expect(by.satir(ob(50_000), SIMDI, HEPSI_YASIYOR)).toBeNull()
+    expect(by.satir(ob(58_000), SIMDI, HEPSI_YASIYOR)).toMatch(/SANAL BELLEK 56,6\/63,5 GB \(%89\)/)
+  })
+
+  it('ölçüm süreçleri ÖZEL belleğe göre sıralar ve okur (working set sızıntıyı gizler)', () => {
+    const kaynak = fs.readFileSync(KANCA, 'utf8')
+    expect(kaynak).toMatch(/Sort-Object PrivatePageCount -Descending/)
+    expect(kaynak).toMatch(/Number\(s\.PrivatePageCount\)/)
+    expect(kaynak, 'working set ölçüte geri döndü').not.toMatch(/WorkingSetSize/)
   })
 
   it('gerçek canlılık kontrolü: kendi süreci YAŞIYOR, kullanılmayan numara ÖLÜ', () => {
