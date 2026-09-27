@@ -30,6 +30,7 @@ import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
+import { ADRES_SEMASI_K3B } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCart } from '../../hooks/useCartHook'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -57,8 +58,9 @@ import {
   groupTechnicalSpecs,
   SPEC_SORT_ORDER,
   translateSpecKey} from '../../utils/productHelpers'
-import { localizedHref, Routes } from '../../utils/routes'
+import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
+import { adresDili, adresRotalari } from '../../utils/yuzeyAdresleri'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -137,6 +139,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
+  // REC-300 Faz 3d: kırıntı ve geri dönüş adresleri `adresUret`'ten (kapalıyken bugünkü `localizedHref(Routes…)`).
+  const yuzeyAdresi = adresRotalari(adresDili(lang))
   const pathname = usePathname()
   const { addToCart } = useCart()
   const { isFavorite, toggleFavorite } = useFavorites()
@@ -299,7 +303,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
     // Model rotası: her modelin kendi kanonik adresi var → o adrese GİDİLİR (push: geri tuşu
     // önceki modele döner). Slug metni Faz 2'de `slug_i18n`'den gelecek; o güne kadar aile slug'ı
     // metin olarak kullanılır — rota modeli SKU'dan çözdüğü için adres yine doğru sayfayı açar.
-    if (sunucuSku && family) {
+    // K3-b açıkken (REC-300 Faz 3d, plan §1 "`?sku=` kalkar") aile sayfasında da seçim modelin
+    // adresine gider — `?sku=` yazıcısı yalnız bayrak KAPALIYKEN (bugün) çalışır.
+    if ((sunucuSku || ADRES_SEMASI_K3B) && family) {
       router.push(
         adresUret({ tur: 'model', aileSlug: family.slug, sku, slug: family.slug }, lang === 'en' ? 'en' : 'tr'),
         { scroll: false },
@@ -499,13 +505,13 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             <ChevronRight size={10} className="flex-shrink-0" />
             {mainCategory && (
               <>
-                <Link href={localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang)), lang)} className="hover:text-primary-navy transition-colors">
+                <Link href={yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang))} className="hover:text-primary-navy transition-colors">
                   {getCategoryDisplayName(mainCategory, t)}
                 </Link>
                 {subCategory && subCategory.slug !== mainCategory.slug && (
                   <>
                     <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), lang)} className="hover:text-primary-navy transition-colors">
+                    <Link href={yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang))} className="hover:text-primary-navy transition-colors">
                       {getCategoryDisplayName(subCategory, t)}
                     </Link>
                   </>
@@ -529,8 +535,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
             if (lastSafeStop) { router.push(localizedHref(lastSafeStop, lang), { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), lang), { scroll: false }) }
-            else if (mainCategory) { router.push(localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang)), lang), { scroll: false }) }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), { scroll: false }) }
+            else if (mainCategory) { router.push(yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang)), { scroll: false }) }
             else { router.push(localizedHref('/', lang), { scroll: false }) }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-colors group font-bold text-xs uppercase tracking-widest"

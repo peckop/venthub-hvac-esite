@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import React from 'react'
 
 import { useI18n } from '../i18n/I18nProvider'
+import { dilDegistirYolu } from '../utils/yuzeyAdresleri'
 
 /**
  * `id` NİÇİN PROP OLDU (REC-129 Faz 1c): bayrak açıkken bu bileşen İKİ yerde çizilir —
@@ -40,16 +41,9 @@ const LanguageSwitcher: React.FC<{ id?: string }> = ({ id = 'language-switcher' 
     // İstemci tarafı state'ini anında güncelle (Buton ve client çevirileri için)
     setLang(newLang)
 
-    const segments = pathname.split('/').filter(Boolean)
-    const firstSegment = segments[0]
-
-    let newPath = '/'
-    if (firstSegment === 'tr' || firstSegment === 'en') {
-      segments[0] = newLang
-      newPath = '/' + segments.join('/')
-    } else {
-      newPath = '/' + newLang + (pathname === '/' ? '' : pathname)
-    }
+    // Yol dönüşümü tek yerde (REC-300 Faz 3d): K3-b açıkken bölüm adı da çevrilir
+    // (`/tr/urun/x` ↔ `/en/products/x`); kapalıyken yalnız dil segmenti değişir (bugünkü davranış).
+    const newPath = dilDegistirYolu(pathname, newLang)
 
     // SPA akışını ve pürüzsüzlüğü koruyarak yönlendir ve sunucu cache'ini yenile
     router.push(newPath as Route)
