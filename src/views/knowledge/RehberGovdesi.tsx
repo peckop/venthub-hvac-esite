@@ -64,7 +64,10 @@ function Satirlar({ icerik, hrefler }: { icerik: Satirici[]; hrefler: Map<string
 
 export default function RehberGovdesi({ bloklar, hrefler }: { bloklar: Blok[]; hrefler: Map<string, string> }) {
   return (
-    <div className="space-y-6 text-lg leading-relaxed text-industrial-gray">
+    // `break-words`: kaynak listesindeki uzun adresler mobilde satırı taşırıp sayfayı yana kaydırıyordu
+    // (390 px'te liste 847 px, 2026-09-25 ön izleme ölçümü). Tablolar kendi kaydırma kabında kalır:
+    // overflow-wrap:break-word tablonun en küçük genişliğini değiştirmez.
+    <div className="space-y-6 break-words text-lg leading-relaxed text-industrial-gray">
       {bloklar.map((b, i) => {
         switch (b.tur) {
           case 'baslik':
