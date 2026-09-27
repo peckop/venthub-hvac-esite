@@ -14,9 +14,15 @@ import path from 'node:path'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { musteriOnayAnahtari } from '../../../supabase/functions/quote-notification-webhook/ic_bildirim'
+import {
+  kacir as icKacir,
+  musteriOnayAnahtari,
+  temizle as icTemizle,
+} from '../../../supabase/functions/quote-notification-webhook/ic_bildirim'
 import {
   belgeNumarasi,
+  kacir as yayimKacir,
+  temizle as yayimTemizle,
   type DefterSatiri,
   kararVer409,
   olayCoz,
@@ -383,5 +389,28 @@ describe('REC-389 — talep e-postası numarası: İLK 8 hane + #', () => {
   it('talep dalı konusu `#<ilk 8>` biçiminde', () => {
     expect(KAYNAK).toMatch(/const kisaId = quote\.id\.slice\(0, 8\)\.toUpperCase\(\)/)
     expect(KAYNAK).toMatch(/Teklif talebiniz alındı \(#\$\{kisaId\}\)/)
+  })
+})
+
+// ⚠YAMA KİLİDİ (2026-09-27): yayim.ts, TS5097 yüzünden kacir/temizle'yi ic_bildirim.ts'ten içe aktaramıyor
+// ve kopya taşıyor. İki kopya AYRIŞIRSA yayım e-postası talep e-postasından farklı kaçış yapar (kimlik avı
+// bağlantısı riski). Bu kol iki kopyayı aynı zor girdilerle karşılaştırır. Kök çözüm (tsconfig
+// allowImportingTsExtensions) gelince kopya ve bu kol birlikte kalkar.
+describe('kaçış paritesi — yayim.ts kopyası ic_bildirim.ts ile birebir', () => {
+  const girdiler: unknown[] = [
+    '<script>alert("x")</script>',
+    `a & b ' " < >`,
+    'satır\nsonu\tsekme\u0000boş\u007fsil',
+    '  çok   boşluk  ',
+    null,
+    undefined,
+    42,
+    'Şğüİöç ✓',
+  ]
+  it('kacir aynı çıktıyı verir', () => {
+    for (const g of girdiler) expect(yayimKacir(g)).toBe(icKacir(g))
+  })
+  it('temizle aynı çıktıyı verir', () => {
+    for (const g of girdiler) expect(yayimTemizle(g)).toBe(icTemizle(g))
   })
 })

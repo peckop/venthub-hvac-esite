@@ -14,7 +14,29 @@
 // Dosya SAF tutulur (esm.sh/Deno API yok): DB, Resend ve kiracı okuması PORT olarak içeri verilir,
 // vitest sahte portlarla dalın davranışını uçtan uca koşar (INV-TEKLIF-YAYIM-1).
 
-import { kacir, temizle } from './ic_bildirim.ts'
+// ⚠YAMA (2026-09-27, CI TS5097): bu dosya vitest'ten içe aktarılır; kök tsconfig `.ts` uzantılı
+// içe aktarımı tanımaz (allowImportingTsExtensions kapalı; tsconfig korumalı, değişiklik Recep elle).
+// Depodaki emsal: testlerin içe aktardığı Edge modülleri (teklif_modu, return_transitions,
+// ic_bildirim) HİÇ import taşımaz. Bu yüzden iki yardımcı ic_bildirim.ts'ten BİREBİR kopyalandı;
+// iki kopyanın aynı davrandığı teklif-yayim-dali.test.ts "kaçış paritesi" koluyla kilitli.
+// KÖK ÇÖZÜM: tsconfig allowImportingTsExtensions → bu kopya kalkar, tek kaynaktan içe aktarılır.
+export const kacir = (s: unknown): string =>
+  String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+export const temizle = (s: unknown): string =>
+  Array.from(String(s ?? ''))
+    .map((ch) => {
+      const k = ch.charCodeAt(0)
+      return k < 32 || k === 127 ? ' ' : ch
+    })
+    .join('')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 /** notification-standard §B3.2: anahtar OLAYIN kimliğidir — talep dalının anahtarından AYRI. */
 export const yayimAnahtari = (quoteId: string): string => `teklif-yayim/${quoteId}`
