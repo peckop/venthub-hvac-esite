@@ -148,9 +148,9 @@ kadar vekil ölçü kullanılır.
 |---|---|---|
 | B2 tek giriş haritası, B1 çekirdek (`CLAUDE.md` harita hâli, `AGENTS.md`) | YOK | D3 (Recep onayı) |
 | B3 yazım kuralı, B4 sahiplik | Kural bu belgeyle yürürlükte; mevcut belgeler D5'te taşınır | D5 |
-| B5 tazelik göstergesi | Kısmen var (defter, bağımlılık, taban, bellek satırları) | D2 |
+| B5 tazelik göstergesi | Ölçüm VAR (`scripts/belge/belge-tazelik.cjs`, önbellek); her mesajdaki BELGE satırı ARAÇ'ın kanca PR'ıyla gelir | D2 |
 | B6 yönlendirici | Kısmen var (yalnız geçmiş-karar sorusu kalıbı) | D4 (Recep onayı) |
-| B7 kapılar | YOK | D2 |
+| B7.1 kırık yol, B7.2 başlık bloğu | VAR — `INV-BELGE-1` (`belge-tazelik.test.ts`), mandal tabanı `scripts/belge/belge-tazelik-taban.json` (CLAUDE.md 2 bilinen kırık yol → D3; 86 cetvel alan eksik → D5). B7.3 gövde bandı uyarısı YOK | D2 (B7.3 → D5) |
 | B8 oturum sürekliliği | Kısmen var (compact öncesi yazıldı-mı denetimi) | D6 |
 
 Dilim listesi ve ölçütler REC-400 planındadır.
