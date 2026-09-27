@@ -111,7 +111,7 @@ for (const { ad, govde } of govdeler) writeFileSync(join(HAM, `${ad}.jsonl`), go
 const gorselYolu = govdeler.find(g => g.ad === 'product_images')?.ornek || {}
 manifest.uyari = [
   'Bu betik paketin HAM yarısıdır: ham/*.jsonl üretir. İnsan-okur CSV ve görsel DOSYALARI için `katalog-paket-uret.mjs` koşulmalıdır; o koşulmadan paket EKSİKTİR.',
-  'Geri yükleme sınaması: `katalog-geri-yukle.mjs --paket=<dizin>` (kuru koşum; canlıyla satır satır karşılaştırır, sıfır fark = dışa aktarım TAM). CSV katmanı: `paket-csv-dogrula.mjs --paket=<dizin>`. Yazma kolu kapalıdır (upsert/tenant eşleme kararı Recep\'te).',
+  'Geri yükleme sınaması: `katalog-geri-yukle.mjs --paket=<dizin>` (kuru koşum; canlıyla satır ve kolon kümesi karşılaştırır, sıfır fark = dışa aktarım TAM). Boş ve canlı olmayan bir DB\'ye kurmak: `--yaz --hedef-env=<dosya>`. Canlıya ya da dolu DB\'ye yükleme YOK (upsert/tenant eşleme kararı Recep\'te). CSV katmanı: `paket-csv-dogrula.mjs --paket=<dizin>`.',
   'tenant_id kolonları olduğu gibi taşınır — başka bir kuruluma yüklenirken yeniden eşlenmelidir.',
   'PAKET GİT\'E GİRMEZ: fiyat (Euro) ve ~36 MB görsel taşır, ingestor deposu REC-215 ile PUBLIC olacak. `paket/` .gitignore\'dadır; USB kopyası = dizinin KENDİSİ.',
 ]
