@@ -35,7 +35,9 @@ export const TEKNIK_BASLIK_ADIM3 = ['sku', 'urun', 'alan', 'deger', 'birim', 'ba
   'durum', 'kaynak_tur', ...KAYNAK_KOLONLARI]
 
 // sha256 · bayt (REC-212, 2026-09-27): paketteki DOSYANIN kimliği — paket-gorsel.mjs doğrular.
-export const GORSEL_BASLIK = ['sku', 'urun', 'dosya', 'paket_yolu', 'sira', 'alt_metin', 'sha256', 'bayt', ...KAYNAK_KOLONLARI]
+// Sözleşme v1'e EN SONA eklendi (OPS hükmü): kolonları sırayla okuyan tüketicide mevcut
+// kolonların yeri kaymaz. Yeni kolon ancak sona eklenir; araya kolon sokmak sözleşme kırar.
+export const GORSEL_BASLIK = ['sku', 'urun', 'dosya', 'paket_yolu', 'sira', 'alt_metin', ...KAYNAK_KOLONLARI, 'sha256', 'bayt']
 
 export const FIYAT_BASLIK = ['sku', 'urun', 'liste', 'fiyat', 'brut_fiyat', 'para_birimi',
   'gecerli_baslangic', 'aktif', 'kdv', 'kaynak_fiyat_eur', 'fiyat_kaynak_sayfa', ...KAYNAK_KOLONLARI]
