@@ -110,6 +110,10 @@ function satirFarki(paketSatir, hedefSatir) {
   return { ayni, degisik, yeni, fazla, ornekler }
 }
 
+const TURLER = { webp: 'image/webp', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', avif: 'image/avif', gif: 'image/gif', svg: 'image/svg+xml' }
+/** Görsel dosyasının içerik türü; bilinmeyen uzantı = null (yüklenmez, sayılır). */
+export const icerikTuru = (yol) => TURLER[String(yol).split('.').pop().toLowerCase()] ?? null
+
 /** Kaydın bitiş ölçütündeki sayılar — iki taraf aynı fonksiyonla sayılır. */
 export function bitisSayilari(urunler, gorseller) {
   let teknikDeger = 0, aciklamaTr = 0, aciklamaEn = 0

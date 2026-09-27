@@ -18,9 +18,10 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { SIRA, bitisSayilari, farkOlc, farkSifirMi, hedefKilidi, projeKimligi, tabloSirala } from '../katalog-yukle.mjs'
+import { dosyaKarari, gorselIzi, paketGorselDogrula, sha256 } from '../paket-gorsel.mjs'
 
 const BETIK = join(__dirname, '..', 'katalog-geri-yukle.mjs')
 const CANLI = 'https://abcdefghijklmnop.supabase.co'
@@ -115,10 +116,29 @@ const PAKET_VERI: Record<string, Satir[]> = {
 }
 
 /** Şemalı bellek-içi PostgREST: POST doldurur (eksik kolon = null), GET sayar/okur, sıra ihlalini reddeder. */
-function sahteHedef(tohum: Record<string, Satir[]> = {}) {
+function sahteHedef(tohum: Record<string, Satir[]> = {}, bozanDepo = false) {
   const db: Record<string, Satir[]> = Object.fromEntries(SIRA.map((t: string) => [t, [...(tohum[t] ?? [])]]))
+  const depo = new Map<string, Buffer>()
   const sunucu = createServer((istek, cevap) => {
     const u = new URL(istek.url ?? '/', 'http://x')
+    // Storage: POST /storage/v1/object/<kova>/<yol> yazar, GET .../object/public/<kova>/<yol> okur.
+    // bozanDepo: yazılanı bozarak saklar (sha geri okumada tutmamalı).
+    if (u.pathname.startsWith('/storage/v1/object/')) {
+      const anahtar = u.pathname.replace(/^\/storage\/v1\/object\/(public\/)?/, '')
+      if (istek.method === 'POST') {
+        const parca: Buffer[] = []
+        istek.on('data', (p: Buffer) => parca.push(p))
+        istek.on('end', () => {
+          depo.set(anahtar, bozanDepo ? Buffer.from('bozuk') : Buffer.concat(parca))
+          cevap.writeHead(200).end('{}')
+        })
+        return
+      }
+      const b = u.pathname.startsWith('/storage/v1/object/public/') ? depo.get(anahtar) : undefined
+      if (!b) { cevap.writeHead(404).end(); return }
+      cevap.writeHead(200).end(b)
+      return
+    }
     const t = u.pathname.replace('/rest/v1/', '')
     if (!db[t]) { cevap.writeHead(404).end(); return }
     if (istek.method === 'POST') {
@@ -140,7 +160,7 @@ function sahteHedef(tohum: Record<string, Satir[]> = {}) {
     cevap.setHeader('content-range', `0-0/${db[t].length}`)
     cevap.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(db[t].slice(off, off + lim)))
   })
-  return { sunucu, db }
+  return { sunucu, db, depo }
 }
 
 function paketYaz(dizin: string, veri: Record<string, Satir[]>) {
@@ -152,6 +172,11 @@ function paketYaz(dizin: string, veri: Record<string, Satir[]>) {
     tablolar[t] = { sha256: createHash('sha256').update(govde).digest('hex') }
   }
   writeFileSync(join(dizin, 'manifest.json'), JSON.stringify({ tablolar }))
+  for (const g of veri.product_images) {
+    const y = join(dizin, 'gorseller', String(g.path))
+    mkdirSync(dirname(y), { recursive: true })
+    writeFileSync(y, Buffer.from(`webp-${String(g.id)}`))
+  }
 }
 
 const kos = (argv: string[], env: Record<string, string>) =>
@@ -169,11 +194,11 @@ describe('uçtan uca — sahte boş hedef', () => {
     writeFileSync(yol, `SUPABASE_URL=${url}\nSUPABASE_SERVICE_ROLE_KEY=sahte\n`)
     return yol
   }
-  const baslat = async (tohum?: Record<string, Satir[]>) => {
-    const h = sahteHedef(tohum)
+  const baslat = async (tohum?: Record<string, Satir[]>, bozanDepo = false) => {
+    const h = sahteHedef(tohum, bozanDepo)
     await new Promise<void>(r => h.sunucu.listen(0, '127.0.0.1', () => r()))
     sunucu = h.sunucu
-    return { url: `http://127.0.0.1:${(h.sunucu.address() as AddressInfo).port}`, db: h.db }
+    return { url: `http://127.0.0.1:${(h.sunucu.address() as AddressInfo).port}`, db: h.db, depo: h.depo }
   }
 
   beforeAll(() => { D = mkdtempSync(join(tmpdir(), 'rec212-')) })
@@ -225,5 +250,79 @@ describe('uçtan uca — sahte boş hedef', () => {
     expect(r.status).toBe(1)
     expect(r.out).toContain('PAKETTE EKSİK KOLON technical_specs')
     expect(r.out).toContain('FARK VAR')
+  })
+})
+
+// ---------------------------------------------------------------- görsel DOSYASI (2026-09-27, OPS GO)
+describe('görsel dosyası kimliği (paket-gorsel)', () => {
+  it('karar: yok → yeni, aynı bayt → aynı, AYNI ADLA değişen → güncellendi', () => {
+    const a = Buffer.from('foto-a')
+    expect(dosyaKarari(null, a)).toBe('yeni')
+    expect(dosyaKarari(Buffer.from('foto-a'), a)).toBe('ayni')
+    expect(dosyaKarari(Buffer.from('foto-ESKI'), a)).toBe('guncellendi')
+  })
+  it('iz: sıra değişimi izi değiştirmez, tek sha değişimi değiştirir', () => {
+    const k = [{ yol: 'a', sha256: '1' }, { yol: 'b', sha256: '2' }]
+    expect(gorselIzi([...k].reverse())).toBe(gorselIzi(k))
+    expect(gorselIzi([k[0], { yol: 'b', sha256: '3' }])).not.toBe(gorselIzi(k))
+  })
+  it('paket doğrulama: eksik, bozuk ve sha\'sız dosya ayrı ayrı sayılır', () => {
+    const P = mkdtempSync(join(tmpdir(), 'gorsel-'))
+    try {
+      mkdirSync(join(P, 'gorseller'), { recursive: true })
+      writeFileSync(join(P, 'gorseller', 'iyi.webp'), 'iyi')
+      writeFileSync(join(P, 'gorseller', 'bozuk.webp'), 'DEĞİŞTİ')
+      const sonuc = paketGorselDogrula(P, [
+        { paket_yolu: 'gorseller/iyi.webp', sha256: sha256(Buffer.from('iyi')) },
+        { paket_yolu: 'gorseller/bozuk.webp', sha256: sha256(Buffer.from('asil')) },
+        { paket_yolu: 'gorseller/yok.webp', sha256: 'x' },
+        { paket_yolu: 'gorseller/iyi.webp', sha256: '' },
+        { paket_yolu: '', sha256: '' },
+      ])
+      expect(sonuc).toEqual({ tamam: 1, eksik: ['gorseller/yok.webp'], bozuk: ['gorseller/bozuk.webp'], shasiz: ['gorseller/iyi.webp'] })
+    } finally { rmSync(P, { recursive: true, force: true }) }
+  })
+})
+
+describe('uçtan uca — görsel dosyaları hedef depoya', () => {
+  let D = ''
+  let sunucu: Server | null = null
+  beforeAll(() => { D = mkdtempSync(join(tmpdir(), 'rec212g-')) })
+  afterEach(() => { sunucu?.close(); sunucu = null })
+  afterAll(() => rmSync(D, { recursive: true, force: true }))
+  const kur = async (bozanDepo: boolean) => {
+    const h = sahteHedef({}, bozanDepo)
+    await new Promise<void>(r => h.sunucu.listen(0, '127.0.0.1', () => r()))
+    sunucu = h.sunucu
+    const url = `http://127.0.0.1:${(h.sunucu.address() as AddressInfo).port}`
+    const e = join(D, `h${bozanDepo ? 1 : 0}.env`); writeFileSync(e, `SUPABASE_URL=${url}\nSUPABASE_SERVICE_ROLE_KEY=sahte\n`)
+    const c = join(D, 'c.env'); writeFileSync(c, `SUPABASE_URL=${CANLI}\nSUPABASE_SERVICE_ROLE_KEY=sahte\n`)
+    return { e, c, depo: h.depo }
+  }
+
+  it('dosya yüklenir, geri okunur, sha tutar → gorselDosya 1 → 1', async () => {
+    const { e, c, depo } = await kur(false)
+    const P = join(D, 'g1'); paketYaz(P, PAKET_VERI)
+    const r = await kos([`--paket=${P}`, '--yaz', `--hedef-env=${e}`], { VENTHUB_ENV: c })
+    expect(r.out).toMatch(/gorselDosya\s+1 →\s+1 ✓/)
+    expect(r.status).toBe(0)
+    expect(depo.get('product-images/t/p1/00.webp')?.toString()).toBe('webp-g1')
+  })
+
+  it('SABOTAJ: pakette dosya YOKSA satırlar yazılır ama round-trip KIRMIZI', async () => {
+    const { e, c } = await kur(false)
+    const P = join(D, 'g2'); paketYaz(P, PAKET_VERI)
+    rmSync(join(P, 'gorseller'), { recursive: true, force: true })
+    const r = await kos([`--paket=${P}`, '--yaz', `--hedef-env=${e}`], { VENTHUB_ENV: c })
+    expect(r.status).toBe(1)
+    expect(r.out).toContain('görsel dosyası SORUNLU: t/p1/00.webp')
+  })
+
+  it('SABOTAJ: hedef depo dosyayı bozarsa sha tutmaz → KIRMIZI', async () => {
+    const { e, c } = await kur(true)
+    const P = join(D, 'g3'); paketYaz(P, PAKET_VERI)
+    const r = await kos([`--paket=${P}`, '--yaz', `--hedef-env=${e}`], { VENTHUB_ENV: c })
+    expect(r.status).toBe(1)
+    expect(r.out).toMatch(/tutmayan 1/)
   })
 })

@@ -34,7 +34,8 @@ export const TEKNIK_BASLIK = ['sku', 'urun', 'alan', 'deger', 'birim', 'baslik_t
 export const TEKNIK_BASLIK_ADIM3 = ['sku', 'urun', 'alan', 'deger', 'birim', 'baslik_tr',
   'durum', 'kaynak_tur', ...KAYNAK_KOLONLARI]
 
-export const GORSEL_BASLIK = ['sku', 'urun', 'dosya', 'paket_yolu', 'sira', 'alt_metin', ...KAYNAK_KOLONLARI]
+// sha256 · bayt (REC-212, 2026-09-27): paketteki DOSYANIN kimliği — paket-gorsel.mjs doğrular.
+export const GORSEL_BASLIK = ['sku', 'urun', 'dosya', 'paket_yolu', 'sira', 'alt_metin', 'sha256', 'bayt', ...KAYNAK_KOLONLARI]
 
 export const FIYAT_BASLIK = ['sku', 'urun', 'liste', 'fiyat', 'brut_fiyat', 'para_birimi',
   'gecerli_baslangic', 'aktif', 'kdv', 'kaynak_fiyat_eur', 'fiyat_kaynak_sayfa', ...KAYNAK_KOLONLARI]
