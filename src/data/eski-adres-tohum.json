@@ -1,0 +1,39 @@
+{
+  "aciklama": "REC-300 plan §4.1 (Y1): DB'de hiç olmamış ya da yalnız next.config satırıyla yaşayan eski adresler. Eski adres haritası üreticisi (src/lib/adres/haritaUret.ts) DB ile birlikte bunu okur. Hedefler KİMLİKLE yazılır (kategori = kanonik EN slug, aile = slug, ürün = SKU); adres şeması kodda kurulur. Canlı DB slug'ı her zaman önce gelir. Hedef bulunamazsa üretim düşer (fail-closed).",
+  "kiraci": "d3b07384-d113-495f-a558-8c38634e0000",
+  "kategoriler": [
+    { "eski": "fanlar", "bicim": "tr", "hedef": "fans", "kaynak": "next.config /category/fanlar/:path* → fans" },
+    { "eski": "hava-perdeleri", "bicim": "tr", "hedef": "air-curtains", "kaynak": "next.config /category/hava-perdeleri/:path* → air-curtains" },
+    { "eski": "isi-geri-kazanim-cihazlari", "bicim": "tr", "hedef": "heat-recovery-vmc", "kaynak": "next.config → heat-recovery-units (bugün 404); plan §4.1: en yakın canlı kök heat-recovery-vmc" },
+    { "eski": "hava-temizleyiciler-anti-viral-urunler", "bicim": "tr", "hedef": null, "kaynak": "next.config → air-purifiers (bugün 404); karşılığı olan kök yok → tüm ürünler" },
+    { "eski": "hiz-kontrolu-cihazlari", "bicim": "tr", "hedef": "speed-controllers", "kaynak": "next.config /category/hiz-kontrolu-cihazlari/:path* → speed-controllers" },
+    { "eski": "aksesuarlar", "bicim": "tr", "hedef": "accessories", "kaynak": "next.config /category/aksesuarlar/:path* → accessories" },
+    { "eski": "flexible-hava-kanallari", "bicim": "tr", "hedef": null, "kaynak": "next.config → flexible-air-ducts (bugün 404); karşılığı olan kök yok → tüm ürünler" },
+    { "eski": "nem-alma-cihazlari", "bicim": "tr", "hedef": "dehumidifiers", "kaynak": "next.config /category/nem-alma-cihazlari/:path* → dehumidifiers" },
+    { "eski": "endustriyel-havalandirma", "bicim": "tr", "hedef": null, "kaynak": "next.config → industrial-ventilation (bugün 404); karşılığı olan kök yok → tüm ürünler" },
+    { "eski": "ticari-havalandirma", "bicim": "tr", "hedef": "commercial-ventilation", "kaynak": "next.config → commercial-ventilation (pasif kök; eşleyici aktif üste ya da tüm ürünlere çözer)" },
+    { "eski": "konut-tipi-havalandirma", "bicim": "tr", "hedef": "residential-ventilation", "kaynak": "next.config → residential-ventilation (pasif kök)" },
+    { "eski": "duman-egzoz-fanlari", "bicim": "tr", "hedef": "smoke-exhaust-fans", "kaynak": "next.config /category/duman-egzoz-fanlari/:path* → smoke-exhaust-fans" },
+    { "eski": "otopark-jet-fanlari", "bicim": "tr", "hedef": "jet-fans", "kaynak": "next.config → jet-fans (pasif dal; eşleyici aktif üst köke çözer)" },
+    { "eski": "heat-recovery-units", "bicim": "en", "hedef": "heat-recovery-vmc", "kaynak": "next.config'in bugün 404 veren hedefi; plan §4.1" },
+    { "eski": "air-purifiers", "bicim": "en", "hedef": null, "kaynak": "next.config'in bugün 404 veren hedefi; plan §4.1" },
+    { "eski": "flexible-air-ducts", "bicim": "en", "hedef": null, "kaynak": "next.config'in bugün 404 veren hedefi; plan §4.1" },
+    { "eski": "industrial-ventilation", "bicim": "en", "hedef": null, "kaynak": "next.config'in bugün 404 veren hedefi; plan §4.1" }
+  ],
+  "aileler": [
+    { "eski": "vortice-lineo-100-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162 (Lineo çap aileleri 2026-08-23'te birleşti)" },
+    { "eski": "vortice-lineo-125-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-150-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-200-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-250-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" },
+    { "eski": "vortice-lineo-315-quiet", "hedef": "vortice-lineo-quiet", "kaynak": "next.config T162" }
+  ],
+  "urunler": [
+    { "eski": "dd-12-12-1500w-3f-4p-2v-6n090p-11921", "hedefSku": "NIC-11921", "kaynak": "next.config K12 (2026-09-07); url_takma_adlari'nda da var — commit'li kopya veri kaybına karşı" },
+    { "eski": "vortice-ca-il-4020-es-rect-16076", "hedefSku": "VRT-CA-IL-4020-ES-RECT", "kaynak": "next.config REC-146 (2026-09-09)" },
+    { "eski": "vortice-ca-il-5035-es-rect-16077", "hedefSku": "VRT-CA-IL-5035-ES-RECT", "kaynak": "next.config REC-146" },
+    { "eski": "vortice-ca-il-6040-es-rect-16078", "hedefSku": "VRT-CA-IL-6040-ES-RECT", "kaynak": "next.config REC-146" },
+    { "eski": "vortice-ca-il-7050-es-rect-16079", "hedefSku": "VRT-CA-IL-7050-ES-RECT", "kaynak": "next.config REC-146" },
+    { "eski": "vortice-ca-il-8060-es-rect-16080", "hedefSku": "VRT-CA-IL-8060-ES-RECT", "kaynak": "next.config REC-146" }
+  ]
+}

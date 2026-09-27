@@ -12,11 +12,16 @@ export function sahteKaynak(ek: Partial<BilgiMerkeziKaynagi> = {}): BilgiMerkezi
     ['avens-isi-geri-kazanim', 'AVenS Isı Geri Kazanım Cihazları'],
     ['vortice-vort-mono', 'Vortice VORT Mono'],
     ['yeni-aile-adi', 'Yeni Aile'],
+    // Frekans konvertörü yazısı (canlı DB'de aktif, 2026-09-25 BLOG ölçümü: 2/16/17 ürün).
+    ['danfoss-fc51', 'Danfoss VLT Micro Drive FC 51'],
+    ['danfoss-fc101', 'Danfoss VLT HVAC Basic Drive FC 101'],
+    ['danfoss-fc102', 'Danfoss VLT HVAC Drive FC 102'],
   ])
   const modeller = new Map([['VRT-65195', 'vortice-hava-perdesi']])
   const kategoriler: Record<string, { slug: string; metadata: unknown; ust: { slug: string; metadata: unknown } | null }> = {
     'air-curtains': { slug: 'air-curtains', metadata: { slug: { tr: 'hava-perdeleri', en: 'air-curtains' } }, ust: null },
     'heat-recovery-vmc': { slug: 'heat-recovery-vmc', metadata: { slug: { tr: 'isi-geri-kazanim', en: 'heat-recovery-vmc' } }, ust: null },
+    'frequency-converters': { slug: 'frequency-converters', metadata: { slug: { tr: 'frekans-konvertorleri', en: 'frequency-converters' } }, ust: null },
     'smoke-exhaust-fans': {
       slug: 'smoke-exhaust-fans',
       metadata: { slug: { tr: 'duman-egzoz-fanlari', en: 'smoke-exhaust-fans' } },

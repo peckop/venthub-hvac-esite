@@ -1,0 +1,18 @@
+{
+  "kimlik": "AB-2012/19",
+  "eksen": "D",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2022/12/20221226-1.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2022/12/20221226-1.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Derinleşilmedi — talep gereği yalnız ad/tarih düzeyi.",
+      "alinti": "2012/19/AB",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

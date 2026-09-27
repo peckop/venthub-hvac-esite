@@ -1,0 +1,18 @@
+{
+  "kimlik": "TR-YON-MAKINE-2006/42",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2009/03/20090303-4.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2009/03/20090303-4.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Resmî Gazete arşivinden doğrudan curl ile okundu, birebir doğrulandı.",
+      "alinti": "3 Mart 2009 SALI ... Sayı : 27158 ... Sanayi ve Ticaret Bakanlığından: MAKİNA EMNİYETİ YÖNETMELİĞİ (2006/42/AT)",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

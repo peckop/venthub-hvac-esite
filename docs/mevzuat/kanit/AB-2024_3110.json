@@ -1,0 +1,30 @@
+{
+  "kimlik": "AB-2024/3110",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr/cpr-overview_en",
+      "son_url": "https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr/cpr-overview_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Resmi AB Komisyonu sayfası; EUR-Lex birincil metnine erişilemedi.",
+      "alinti": "Regulation (EU) 2024/3110 (the 'new' CPR-2024), which entered into force on 7 January 2025 and has been in full application since 7 January 2026.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/3110/oj/eng",
+      "son_url": "",
+      "http": 202,
+      "robots": "dosya-yok",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "ERİŞİLMEDİ: AWS WAF JS-challenge (bkz. EU-2023/1230 kaydı, aynı domain aynı engel).",
+      "alinti": "",
+      "alinti_dogrulandi": false
+    }
+  ]
+}

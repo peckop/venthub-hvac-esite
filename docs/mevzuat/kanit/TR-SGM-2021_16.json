@@ -1,0 +1,42 @@
+{
+  "kimlik": "TR-SGM-2021/16",
+  "eksen": "A",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "TEBLİĞ, Sanayi ve Teknoloji Bakanlığından — yürürlükte, iptal/kaldırma ibaresi yok",
+      "alinti": "Bu Tebliğ, 2009/125/AT sayılı Avrupa Parlamentosu ve Konseyinin Tüzüğü uyarınca yayımlanan Elektrik Motorlarının ve Değişken Hız Sürücülerinin Çevre Duyarlı Tasarım Gerekliliklerini ve Bağımsız ve Ürünlere Entegre Salmastrasız Sirkülatörlerin Çevreye Duyarlı Tasarım Gerekliliklerini belirleyen, (AT) 641/2009 sayılı Tüzüğü Değiştiren, (AT) 640/2009 sayılı Tüzüğü yürürlükten kaldıran 1/9/2019 tarihli ve (AB) 2019/1781 sayılı Komisyon Tüzüğü ile bu Tüzükte değişiklik yapan 17/12/2020 tarihli ve (AB) 2021/341 sayılı Komisyon Tüzüğü esas alınarak AB mevzuatına uyum çerçevesinde hazırlanmıştır.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Yürürlük maddesi",
+      "alinti": "MADDE 13 – (1) Bu Tebliğin 9 uncu maddesinin birinci fıkrası yayımı tarihinde, diğer maddeleri ise 1/7/2021 tarihinde yürürlüğe girer.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2021/04/20210428-2.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Yürürlükten kaldırılan tebliğ maddesi — TR karşılığı EU 640/2009'un yerini alan tebliğ",
+      "alinti": "MADDE 12 – (1) 7/2/2012 tarihli ve 28197 sayılı Resmî Gazete'de yayımlanan Elektrik Motorları ile İlgili Çevreye Duyarlı Tasarım Gereklerine Dair Tebliğ (SGM: 2012/2) yürürlükten kaldırılmıştır.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

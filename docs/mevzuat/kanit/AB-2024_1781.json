@@ -1,0 +1,30 @@
+{
+  "kimlik": "AB-2024/1781",
+  "eksen": "E",
+  "kaynaklar": [
+    {
+      "url": "http://publications.europa.eu/resource/celex/32024R1781",
+      "son_url": "http://publications.europa.eu/resource/cellar/66b9f8da-34ea-11ef-b441-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Repeal and transitional provisions maddesi (Md. numarası bu alıntıda görünmüyor, dokümanın 'Repeal' başlıklı maddesi).",
+      "alinti": "Directive 2009/125/EC is repealed with effect from 18 July 2024, with the exception of: (a) Articles 1 and 2, Article 8(2), Articles 11, 14, 15, 18 and 19 of, and Annexes I, II, IV, V and VII to, Directive 2009/125/EC in the version applicable on 17 July 2024, ... shall continue to apply: (i) until 31 December 2026, as regards ... ventilation units ...",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32024R1781",
+      "son_url": "http://publications.europa.eu/resource/cellar/66b9f8da-34ea-11ef-b441-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Recital metni; havalandırma üniteleri ada bağlı olarak bu listede açıkça yok.",
+      "alinti": "In its first working plan, the Commission should prioritise iron, steel, aluminium, textiles, in particular garments and footwear, furniture, including mattresses, tyres, detergents, paints, lubricants, chemicals, information and communication technology products and other electronics, and energy-related products for which ecodesign requirements are to be set for the first time or for which existing measures adopted pursu[ant to Directive 2009/125/EC need review]",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

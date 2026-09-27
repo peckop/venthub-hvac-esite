@@ -1,0 +1,18 @@
+{
+  "kimlik": "TR-YON-YAPI-305/2011",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2013/07/20130710-10.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2013/07/20130710-10.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Resmî Gazete arşivinden doğrudan curl ile okundu, birebir doğrulandı. Sorumlu kurum: Çevre, Şehircilik ve İklim Değişikliği Bakanlığı (görev alanı; sayfa başlığında ayrıca teyit edilmedi, genel bilgi).",
+      "alinti": "10 Temmuz 2013 ÇARŞAMBA ... Sayı : 28703 ... YÖNETMELİK ... (305/2011/AB)",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

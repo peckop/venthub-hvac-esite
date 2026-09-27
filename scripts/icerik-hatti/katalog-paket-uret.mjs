@@ -40,6 +40,7 @@ import {
   URUN_BASLIK, TEKNIK_BASLIK, GORSEL_BASLIK, FIYAT_BASLIK, turkceBasliklar, birimler, paketHucresi,
 } from './paket-sozlesme.mjs'
 import { fiyatDizini, urunFiyatKaynagi } from './fiyat-kaynak-esle.mjs'
+import { sha256, dosyaKarari, gorselIzi } from './paket-gorsel.mjs'
 
 // Fail-closed: okunamazsa betik DURUR (başlıksız paket üretmek, eksikliği gizler).
 const BASLIK_TR = turkceBasliklar()
@@ -160,16 +161,8 @@ for (const u of urunler) {
 sayim['teknik-ozellikler.csv'] = csvYaz(join(HEDEF, 'teknik-ozellikler.csv'),
   TEKNIK_BASLIK, teknikSatirlar)
 
-// ── 3. GÖRSEL BAĞI
-sayim['gorseller.csv'] = csvYaz(join(HEDEF, 'gorseller.csv'),
-  GORSEL_BASLIK,
-  gorseller.map(g => ({
-    sku: urunSku.get(g.product_id) ?? '', urun: urunAdi.get(g.product_id) ?? '',
-    dosya: g.path ? basename(g.path) : '',
-    paket_yolu: g.path ? `gorseller/${g.path}` : '',
-    sira: g.sort_order ?? g.position ?? '',
-    alt_metin: g.alt ?? '', ...kaynakKolon,
-  })))
+// ── 3. GÖRSEL BAĞI — gorseller.csv DOSYALAR indikten SONRA yazılır (sha256/bayt dosyadan gelir);
+// bkz. aşağıdaki "GÖRSEL DOSYALARI" bölümü.
 
 // ── 4. FİYATLAR (kaynaklı tablo — alinti ZORUNLU)
 // `fiyat` NET (KDV hariç), `brut_fiyat` BRÜT (KDV dahil) — OPS hükmü 2026-09-11.
@@ -287,27 +280,65 @@ for (const [d, n] of Object.entries(sayim)) console.log(`  ${d.padEnd(24)} ${Str
 // ── GÖRSEL DOSYALARI — bağ değil, DOSYANIN KENDİSİ
 // Yalnız yolu taşımak paketi eksik yapar: alıcının Storage kovasına erişimi YOKTUR.
 // Ölçüldü (2026-09-09): 1188 dosya / 36 MB — USB için taşınabilir boyut.
-let indirilen = 0, atlanan = 0, basarisiz = []
+// ⚠2026-09-27 ÖNCESİ: diskte VAR olan dosya indirilmeden atlanıyordu → depoda aynı adla
+// değişen fotoğraf pakette sessizce eski kalırdı. Artık her dosya indirilir ve sha256 ile
+// karşılaştırılır: yeni / aynı / güncellendi. --gorsel-atla ağa çıkmaz; o zaman sha diskteki
+// kopyadan alınır ve gorsel-durum.json "depoyla DOĞRULANMADI" der (sessiz geçmez).
+let yeni = 0, ayni = 0, guncellendi = 0, basarisiz = []
+const dosyaBilgi = new Map() // path → {sha256, bayt}
+const yollar = [...new Set(gorseller.map(g => g.path).filter(Boolean))]
+const gorselBaslangic = process.hrtime.bigint()
 if (GORSEL_ATLA) {
-  console.log('\n⚠ --gorsel-atla verildi: görsel DOSYALARI indirilmedi, paket EKSİK.')
+  console.log('\n⚠ --gorsel-atla verildi: görsel dosyaları depodan İNDİRİLMEDİ; sha diskteki kopyadan.')
+  for (const p of yollar) {
+    const yol = join(HEDEF, 'gorseller', p)
+    if (!existsSync(yol)) { basarisiz.push(`${p} (diskte yok)`); continue }
+    const b = readFileSync(yol)
+    dosyaBilgi.set(p, { sha256: sha256(b), bayt: b.length })
+  }
 } else {
-  const yollar = [...new Set(gorseller.map(g => g.path).filter(Boolean))]
-  console.log(`\nGÖRSELLER indiriliyor: ${yollar.length} tekil dosya`)
+  console.log(`\nGÖRSELLER indiriliyor ve doğrulanıyor: ${yollar.length} tekil dosya`)
   for (const p of yollar) {
     const hedefDosya = join(HEDEF, 'gorseller', p)
-    if (existsSync(hedefDosya)) { atlanan++; continue }
     try {
       const r = await fetch(`${U}/storage/v1/object/public/product-images/${p}`)
       if (!r.ok) { basarisiz.push(`${p} (${r.status})`); continue }
-      mkdirSync(dirname(hedefDosya), { recursive: true })
-      writeFileSync(hedefDosya, Buffer.from(await r.arrayBuffer()))
-      indirilen++
-      if (indirilen % 100 === 0) console.log(`  ${indirilen}/${yollar.length}`)
+      const uzak = Buffer.from(await r.arrayBuffer())
+      const karar = dosyaKarari(existsSync(hedefDosya) ? readFileSync(hedefDosya) : null, uzak)
+      if (karar !== 'ayni') {
+        mkdirSync(dirname(hedefDosya), { recursive: true })
+        writeFileSync(hedefDosya, uzak)
+      }
+      if (karar === 'yeni') yeni++; else if (karar === 'ayni') ayni++; else guncellendi++
+      dosyaBilgi.set(p, { sha256: sha256(uzak), bayt: uzak.length })
+      const n = yeni + ayni + guncellendi
+      if (n % 200 === 0) console.log(`  ${n}/${yollar.length}`)
     } catch (e) { basarisiz.push(`${p} (${e.message})`) }
   }
-  console.log(`  indirildi ${indirilen} · zaten vardı ${atlanan} · BAŞARISIZ ${basarisiz.length}`)
-  for (const b of basarisiz.slice(0, 10)) console.log(`    ⛔ ${b}`)
 }
+const gorselSure = Number(process.hrtime.bigint() - gorselBaslangic) / 1e9
+console.log(`  yeni ${yeni} · aynı ${ayni} · GÜNCELLENDİ ${guncellendi} · BAŞARISIZ ${basarisiz.length} · ${gorselSure.toFixed(1)} sn`)
+for (const b of basarisiz.slice(0, 10)) console.log(`    ⛔ ${b}`)
+
+sayim['gorseller.csv'] = csvYaz(join(HEDEF, 'gorseller.csv'),
+  GORSEL_BASLIK,
+  gorseller.map(g => ({
+    sku: urunSku.get(g.product_id) ?? '', urun: urunAdi.get(g.product_id) ?? '',
+    dosya: g.path ? basename(g.path) : '',
+    paket_yolu: g.path ? `gorseller/${g.path}` : '',
+    sira: g.sort_order ?? g.position ?? '',
+    alt_metin: g.alt ?? '',
+    sha256: dosyaBilgi.get(g.path)?.sha256 ?? '', bayt: dosyaBilgi.get(g.path)?.bayt ?? '',
+    ...kaynakKolon,
+  })))
+const gorselDurum = {
+  dogrulandi: !GORSEL_ATLA && basarisiz.length === 0,
+  kaynak: GORSEL_ATLA ? 'disk (--gorsel-atla, depoyla KARŞILAŞTIRILMADI)' : 'depo (indirildi, sha256 karşılaştırıldı)',
+  dosya: dosyaBilgi.size, yeni, ayni, guncellendi, basarisiz: basarisiz.length,
+  sure_sn: Math.round(gorselSure * 10) / 10,
+  iz: gorselIzi([...dosyaBilgi].map(([yol, b]) => ({ yol, sha256: b.sha256 }))),
+}
+writeFileSync(join(HEDEF, 'gorsel-durum.json'), JSON.stringify(gorselDurum, null, 1) + '\n')
 
 // ── MANIFEST.md — insan için
 const hamManifest = existsSync(join(HEDEF, 'manifest.json'))
@@ -324,7 +355,7 @@ writeFileSync(join(HEDEF, 'MANIFEST.md'), `# VentHub Taşınabilir Katalog Paket
 | dosya | satır | ne |
 |---|---|---|
 ${Object.entries(sayim).map(([d, n]) => `| \`${d}\` | ${n} | |`).join('\n')}
-| \`gorseller/\` | ${indirilen + atlanan} dosya | görsellerin KENDİSİ |
+| \`gorseller/\` | ${dosyaBilgi.size} dosya | görsellerin KENDİSİ — ${gorselDurum.dogrulandi ? 'depoyla sha256 DOĞRULANDI' : '⚠ depoyla DOĞRULANMADI'} (\`gorsel-durum.json\`) |
 | \`ham/*.jsonl\` | ${hamManifest.toplam_satir ?? '?'} | makine kopyası — **doğruluk kaynağı** |
 
 ## Ürün evreni
@@ -349,6 +380,6 @@ Dosyalar \`;\` ayırıcılı, UTF-8 BOM'lu, CRLF satır sonlu — Türkçe karak
 `, 'utf8')
 
 console.log(`\n✓ PAKET HAZIR: ${HEDEF}`)
-console.log(`  ${Object.keys(sayim).length} CSV · ${Object.values(sayim).reduce((a, b) => a + b, 0)} satır · görsel ${indirilen + atlanan} dosya`)
+console.log(`  ${Object.keys(sayim).length} CSV · ${Object.values(sayim).reduce((a, b) => a + b, 0)} satır · görsel ${dosyaBilgi.size} dosya (${gorselDurum.dogrulandi ? 'depoyla doğrulandı' : 'DOĞRULANMADI'})`)
 console.log(`  ürün evreni: ${Object.entries(durumSayim).map(([s, n]) => `${s} ${n}`).join(' · ')} = ${urunler.length}`)
 if (basarisiz.length) { console.error(`\n⛔ ${basarisiz.length} görsel İNDİRİLEMEDİ — paket EKSİK`); process.exit(1) }

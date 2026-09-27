@@ -1,0 +1,30 @@
+{
+  "kimlik": "TR-YON-ATEX-2014/34",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "resmigazete.gov.tr arşivinde 30 Haziran 2016 tarihli, 29758 sayılı nüsha; belge doğrudan bu URL'de yer alıyor (günün fihrist sayfası https://www.resmigazete.gov.tr/eskiler/2016/06/20160630.htm üzerinden '20160630-13.htm' bağlantısıyla bulundu).",
+      "alinti": "Sayı : 29758 ... MUHTEMEL PATLAYICI ORTAMDA KULLANILAN TEÇHİZAT VE ... Bilim, Sanayi ve Teknoloji Bakanlığından: ... MADDE 43 – (1) Bu Yönetmelik yayımı tarihinde yürürlüğe girer.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Aynı belge; direktif dayanağı ve eski yönetmeliğin (94/9/AT karşılığı) kaldırıldığı teyit ediliyor.",
+      "alinti": "26/2/2014 tarihli ve 2014/34/AB ... (94/9/AT), yürürlükten kaldırılmıştır.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

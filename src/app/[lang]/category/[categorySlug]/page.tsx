@@ -1,83 +1,31 @@
-import { unstable_cache } from 'next/cache'
 import { notFound,permanentRedirect } from 'next/navigation'
-import React, { cache } from 'react'
 
-import { en } from '@/i18n/dictionaries/en'
-import { tr } from '@/i18n/dictionaries/tr'
-import { getDictValue } from '@/i18n/getDictValue'
-import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
-import { getFamiliesEnriched } from '@/lib/services/family.service'
+import { ADRES_SEMASI_K3B } from '@/config/features'
+import { kategoriBagimliliklari, kategoriRotasiniUygula, kategoriSegmentleriniCoz } from '@/lib/data/kategoriSegmenti'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
+import { adresUret } from '@/utils/adresUret'
+import { getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
-import { SITE_URL } from '../../../../config/siteUrl'
-import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../../../lib/cache/tags'
 import { eskiKategoriHedefi, getCachedCategoryData, preloadCategory } from '../../../../lib/data/preload'
-import type { DomainCategory } from '../../../../lib/type-converters'
-import { mapDatabaseCategoryToDomain } from '../../../../lib/type-converters'
-import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../../../types/db-rows'
-import type { FamilyListItem } from '../../../../types/ui-models'
-import { kategoriMetniniIndir } from '../../../../utils/categoryHelpers'
-import { aileMetniniIndir } from '../../../../utils/dilMetni'
-import { DEFAULT_TENANT_ID } from '../../../../utils/tenantConstants'
-import PageComponent from '../../../../views/CategoryPage'
+import {
+  kategoriBulunamadiUstVerisi,
+  KategoriSayfasi,
+  kategoriSayfasiUstVerisi,
+  kategoriSayfasiUstVerisiK3b,
+} from '../../../_components/kategoriSayfasi'
 
 /**
- * Sayfa başına AİLE sayısı.
+ * `/[lang]/category/<slug>` — tek seviyeli kategori adresi.
  *
- * ⭐24 → 48 (REC-59, 2026-09-08). NİÇİN: `?page=` sorgu parametresi bu rotayı DİNAMİK
- * yapıyordu (Next 15: `searchParams` alan sayfa build'de prerender edilemez). Parametreyi
- * kaldırmak için iki yol vardı — ayrı bir sayfalama segmenti açmak (`/sayfa/2`), ya da
- * sayfa boyunu bütün kategoriler tek sayfaya sığacak kadar büyütmek.
+ * REC-300 Faz 3b-2: üst veri ve gövde `app/_components/kategoriSayfasi.tsx`'e taşındı (BİREBİR) —
+ * K3-b'nin `/tr/kategori/...` rotası aynı çekirdeği çağırır. Bu dosyada rota sınıfı + rota kararı kaldı.
  *
- * ÖLÇÜM KARARI VERDİ: canlı DB'de 23 aktif kategoriden YALNIZ BİRİ 24'ü aşıyor (fans, 34
- * aile); ikincisi 12, üçüncüsü 6. Yani sayfalama 46 adresin yalnız birinde tetikleniyordu.
- * 48 sayfa boyu ile hepsi tek sayfaya sığar, parametre kalkar, ADRES DEĞİŞMEZ ve hiçbir
- * yönlendirme gerekmez. Segment açmak, bir adres için tüm adres şemasını değiştirmek olurdu.
- *
- * ⚠BU SAYI BİR TAVANDIR VE BÜYÜYEBİLİR: en kalabalık kategori 48'i aştığı gün sayfalama
- * sessizce eksik liste basar (48'den sonrası GÖRÜNMEZ). O yüzden `INV-KATEGORI-STATIK-1`
- * bir kol olarak "en kalabalık kategori ≤ PAGE_SIZE" ölçer ve aşıldığı gün KIRMIZI verir —
- * o gün ayrı segment işi açılır. Sessiz eksilme değil, açık kırmızı.
+ * BAYRAK KAPALIYKEN (`ADRES_SEMASI_K3B=false`, bugün) davranış BİREBİR bugünkü (aşağıdaki `bugun*` dalları).
+ * BAYRAK AÇIKKEN (plan §5 Faz 3 madde 1 + 5):
+ *  - TR: bu adres hiçbir durumda 200 dönmez; çözülebilen her slug (TR ya da EN biçimli, pasif dahil)
+ *    `adresUret(…, 'tr')`'nin verdiği `/tr/kategori/...` adresine TEK 308; çözülemeyen → 404.
+ *  - EN: kök adresi çizilir; tek seviyeli DAL adresi iki seviyeliye 308 (Y4); pasif → üst ya da ürünler.
  */
-const PAGE_SIZE = 48
-
-/**
- * Aile listesi önbelleği. Anahtar SaaS kuralı gereği hem `lang` hem `tenantId`
- * hem de kategori + sayfa içerir (kural 12); etiketler ana sayfa (home-data) değil
- * KEŞİF (discovery) alanıdır — stok hareketi bu listeyi thrash etmez (PS-042).
- */
-const getCachedFamilies = (
-  lang: string,
-  tenantId: string,
-  categoryId: string,
-  page: number,
-  categoryIds: string[]
-) => unstable_cache(
-  async () => getFamiliesEnriched(supabase, {
-    categoryIds,
-    limit: PAGE_SIZE,
-    offset: (page - 1) * PAGE_SIZE
-  }),
-  ['category-families', lang, tenantId, categoryId, String(page)],
-  // revalidate: 3600 = emniyet kemeri (webhook sinyali kaçarsa en fazla 1 saat bayat).
-  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
-)()
-
-/**
- * ⭐SAYFA DAİMA 1 (REC-59). `?page=` kalktı — `parsePageParam` ile birlikte, çünkü artık
- * okunacak bir parametre yok. Sabit, `unstable_cache` anahtarında ve JSON-LD'de niçin hâlâ
- * bir "sayfa" kavramı geçtiğini açıklamak için duruyor: veri katmanı sayfalamayı destekliyor,
- * bu rota onu KULLANMIYOR. Segment tabanlı sayfalama gerekirse (bkz. PAGE_SIZE notu) burası
- * yeniden okunur.
- */
-const SAYFA = 1
-
-// React.cache() ile bağımsız Supabase ORM sorgusu (L10_05 Kurumsal Disiplini)
-const _getCachedSupabaseData = cache((id: string) => {
-  return supabase.from('categories').select('*').eq('id', id).single()
-})
-
 
 /**
  * ⭐DENEY (REC-59, geri alınabilir): rota sınıfını AÇIKÇA ilan et.
@@ -94,10 +42,17 @@ export const revalidate = 3600
 export async function generateStaticParams() {
   const { data } = await supabase
     .from('categories')
-    .select('slug, metadata')
+    .select('slug, metadata, parent_id')
     .eq('is_active', true)
 
-  const categoriesList = (data || []) as { slug: string | null, metadata: unknown }[]
+  const categoriesList = (data || []) as { slug: string | null, metadata: unknown, parent_id: string | null }[]
+  // K3-b açıkken bu rotada içerik üreten tek adres EN KÖK adresidir (TR → /tr/kategori 308,
+  // EN dal → iki seviyeli 308); yönlendiren adresler önceden üretilmez (plan madde 13).
+  if (ADRES_SEMASI_K3B) {
+    return categoriesList
+      .filter((c) => !c.parent_id)
+      .map((c) => ({ lang: 'en', categorySlug: getLocalizedCategorySlug(c, 'en') }))
+  }
   // Her dil için O DİLİN görünen slug'ı üretilir (tr → metadata.slug.tr, en → kanonik).
   return categoriesList.flatMap((c) => [
     { lang: 'tr', categorySlug: getLocalizedCategorySlug(c, 'tr') },
@@ -105,69 +60,35 @@ export async function generateStaticParams() {
   ])
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ categorySlug: string, lang: string }> }) {
+type Params = { params: Promise<{ categorySlug: string, lang: string }> }
+
+export async function generateMetadata({ params }: Params) {
   const { categorySlug, lang } = await params
+  if (ADRES_SEMASI_K3B) {
+    // TR bu adreste hiç çizilmez (308) → üst veri yazılmaz. EN: çözüm kategori ise üst veri.
+    if (lang !== 'en') return {}
+    const cozum = await kategoriSegmentleriniCoz([categorySlug], 'en', kategoriBagimliliklari)
+    return cozum.tur === 'kategori' ? kategoriSayfasiUstVerisiK3b(lang, cozum.kategori, cozum.ust) : {}
+  }
+
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
-  
-  if (!category) {
-    return {
-      title: lang === 'en' ? 'Category Not Found | VentHub' : 'Kategori Bulunamadı | VentHub',
-    }
-  }
 
-  // SSOT: kategori adı DAİMA getCategoryDisplayName üzerinden çözülür
-  // (translation_key → menu_label → name). Server Component olduğumuz için useI18n yok;
-  // t'yi aktif dilin sözlüğünden kuruyoruz — aksi halde TR sayfada ham İngilizce DB adı sızar.
-  const dict = lang === 'en' ? en : tr
-  const t = (key: string) => getDictValue(dict, key)
-  const displayName = getCategoryDisplayName(category, t)
-
-  const desc = lang === 'en'
-    ? `Explore the highest quality and most economical ventilation products in the ${displayName} category.`
-    : `${displayName} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
-
-  // hreflang: her dil kendi görünen slug'ıyla bildirilir; x-default = TR.
-  const trUrl = `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
-  const enUrl = `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
-  const canonicalUrl = lang === 'en' ? enUrl : trUrl
-
-  return {
-    title: `${displayName} | VentHub`,
-    description: desc,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        tr: trUrl,
-        en: enUrl,
-        'x-default': trUrl,
-      },
-    },
-    openGraph: {
-      title: `${displayName} | VentHub`,
-      description: desc,
-      url: canonicalUrl,
-      siteName: 'VentHub',
-      images: [
-        {
-          url: category.image_url || '/images/og-default.jpg',
-          width: 1200,
-          height: 630,
-        },
-      ],
-      locale: lang === 'en' ? 'en_US' : 'tr_TR',
-      type: 'website',
-    },
-  }
+  if (!category) return kategoriBulunamadiUstVerisi(lang)
+  return kategoriSayfasiUstVerisi(lang, category)
 }
 
-export default async function Page({
-  params
-}: {
-  params: Promise<{ categorySlug: string, lang: string }>
-}) {
+export default async function Page({ params }: Params) {
   const { categorySlug, lang } = await params
-  const page = SAYFA
+
+  if (ADRES_SEMASI_K3B) {
+    // Eski TR adresi → yeni TR adresine (istenen = null: her çözümde 308). EN yerinde kalır.
+    const dil = lang === 'en' ? 'en' : 'tr'
+    const istenen = dil === 'en' ? adresUret({ tur: 'kategori', kok: categorySlug }, 'en') : null
+    const { kategori } = await kategoriRotasiniUygula([categorySlug], dil, istenen, kategoriBagimliliklari)
+    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={categorySlug} />
+  }
+
   preloadCategory(categorySlug)
   const category = await getCachedCategoryData(categorySlug)
 
@@ -201,111 +122,5 @@ export default async function Page({
     }
   }
 
-  const dict = lang === 'en' ? en : tr
-  // SSOT: JSON-LD adı da sözlükten çözülür (bkz. generateMetadata yorumu)
-  const t = (key: string) => getDictValue(dict, key)
-  const displayName = getCategoryDisplayName(category, t) || categorySlug
-
-  let families: FamilyListItem[] = []
-  let total = 0
-  let subCategories: DomainCategory[] = []
-
-  if (category) {
-    // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59). Eskiden `(await getTenantConfig()).id`
-    // idi ve o çağrı `next/headers` okuduğu için bu rotayı İSTEK ANINDA render edilmeye
-    // zorluyordu — build "Route ... couldn't be rendered statically because it used
-    // `headers`" diyordu ve 46 kategori adresinin HİÇBİRİ önceden üretilmiyordu.
-    //
-    // NİÇİN GÜVENLİ, ÖLÇÜLDÜ (2026-09-08, canlı DB): `categories` (30), `product_families`
-    // (47) ve `products` (442) satırlarının TAMAMI tek `tenant_id` taşıyor ve o değer
-    // `DEFAULT_TENANT_ID` ile BİREBİR aynı. Yani sabit, bugün zaten dönen değerdir.
-    //
-    // ⭐DAHASI: bu değişiklik SESSİZ BİR RİSKİ KAPATIYOR. Tazeleme webhook'u `tenantId`yi
-    // DB SATIRINDAN alıyor (`api/webhook/supabase/route.ts` → `activeRecord.tenant_id`),
-    // sayfa ise BAŞLIKTAN alıyordu. İkisi bir gün ayrışsaydı webhook
-    // `products-discovery-<X>` etiketini tazeler, sayfa `products-discovery-<Y>` ile
-    // önbelleklenmiş olurdu ve tazeleme ISKALARDI — hiçbir kapı görmeden. Tek sabit, iki
-    // kaynağı teke indirir.
-    //
-    // Çok-kiracılı yapı PARK'ta (Recep kararı 2026-08-28, REC-88). Geri açılırsa doğru yol
-    // kiracı başına ayrı yayın olur; RSC render yolunda `headers()` okumak değil.
-    const tenantId = DEFAULT_TENANT_ID
-
-    // SSR: Alt kategorilerin tam verisini çek — client-side hydration race'ini ortadan kaldır
-    const [{ data: subsData }, { data: countsData }] = await Promise.all([
-      supabase
-        .from('categories')
-        // `marketing_title` KASITEN YOK — emekli alan (REC-297); gerekçe `preload.ts`
-        // CATEGORY_COLUMNS başlığında. Bekçi: INV-MARKETING-YUK-1.
-        .select('id, name, parent_id, slug, is_active, sort_order, level, image_url, seo_title, seo_desc, created_at, updated_at, description, display_mode, is_featured, menu_label, metadata, translation_key, authority_content')
-        .eq('parent_id', category.id)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true }),
-      supabase.rpc('get_category_counts')
-    ])
-
-    // Ürünü OLMAYAN alt kategoriler gizlenir — CategoryContext istemcide aynı count>0
-    // süzgeçini uyguluyordu; SSR'da uygulanmayınca hydration'da kart zıplaması oluyordu.
-    const countMap = new Map<string, number>()
-    for (const row of countsData ?? []) {
-      countMap.set(row.category_id, row.product_count ?? 0)
-    }
-
-    const categoriesArray = (subsData || []) as DbCategory[]
-    subCategories = categoriesArray
-      .filter((s) => (countMap.get(s.id) ?? 0) > 0)
-      .map(s => mapDatabaseCategoryToDomain({
-        ...s,
-        name: s.name || '',
-        menu_label: s.menu_label as string | null,
-        translation_key: s.translation_key as string | null,
-        description: s.description as string | null,
-        metadata: s.metadata as CategoryMetadata | null,
-        authority_content: s.authority_content as AuthorityContent | null
-      } as DbCategory))
-
-    const categoryIds = [category.id, ...subCategories.map(s => s.id)]
-
-    const familiesPage = await getCachedFamilies(lang, tenantId, category.id, page, categoryIds)
-    // INV-DIL-DUSUSU-1: aile satırı {tr,en} açıklamayı taşır; kart göstermese de istemciye
-    // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
-    families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
-    total = familiesPage.total
-  }
-
-  // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
-  // içinde garanti edilir (eski kod dilsiz `${SITE_URL}/products/${slug}` yazıyordu).
-  const jsonLd = buildCategoryJsonLd({
-    lang,
-    baseUrl: SITE_URL,
-    categorySlug,
-    name: displayName,
-    description: lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
-    total,
-    page,
-    pageSize: PAGE_SIZE,
-    families,
-  })
-
-  assertNoUuid(jsonLd)
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
-      />
-      <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
-        {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
-        <PageComponent
-          initialCategory={kategoriMetniniIndir(category, lang)}
-          families={families}
-          total={total}
-          page={page}
-          pageSize={PAGE_SIZE}
-          initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
-        />
-      </React.Suspense>
-    </>
-  )
+  return <KategoriSayfasi lang={lang} category={category} categorySlug={categorySlug} />
 }

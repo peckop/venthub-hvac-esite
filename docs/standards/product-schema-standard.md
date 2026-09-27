@@ -513,6 +513,64 @@ Buna karşın **38 hücre** sayısal anahtarda birimi değerin içinde taşıyor
 **Kural:** sayısal son ekli (`_w`, `_pa`, `_m3h`, `_kg`, `_mm`, `_v`, `_a`, `_hz`) her alan
 sayı tutar. Metin değer yazan betik **kırmızı verir**. Mevcut 38 hücre ayrı onarım kalemidir.
 
+### Enerji etiketi ve ürün bilgi föyü: yasal alanlar (REC-392, 2026-09-25)
+
+**Nereden çıktı:** MEVZUAT şeridi (REC-392) konut tipi ısı geri kazanım cihazlarının fiyatla
+satıldığını, ama AB 1254/2014'ün (TR karşılığı SGM-2021/19) istediği enerji sınıfı ve ürün bilgi
+föyünün sitede olmadığını buldu. Yükümlülük satıcıdadır. Bu alanlar **yasal beyan**dır; teknik
+özellik gibi "yaklaşık doğru" olamaz. Bu yüzden kural diğer satırlardan serttir.
+
+**Yer:** `technical_specs` (JSONB). Yeni tablo kolonu **yok**, migration gerekmez. Anahtarlar
+1254/2014 Ek IV föy alanlarının birebir karşılığıdır ve **hepsi `erp_` önekini taşır.**
+
+**Önek neden zorunlu (ölçüm, 2026-09-25):** föyün "maksimum debi" ve "ısıl verim"i, yönetmeliğin
+tanımladığı **referans koşulda** ölçülür; katalogdaki `max_delivery_m3h` / `thermal_efficiency_pct`
+ise üreticinin genel tanıtım değeridir. 11 üründe 20 hücre farklı çıktı (ör. VORT HRW 30 MONO EVO:
+katalog 38 m³/h · %90, föy 35 m³/h · %89). Aynı anahtara yazmak §11.7'nin yasakladığı semantik
+çakışmadır: ya yasal beyan ya tanıtım değeri sessizce kaybolur. Önek ayrıca vitrinin föyü **ayrı
+blok** olarak gösterebilmesini sağlar.
+
+| Anahtar | Föy alanı | Tip / birim |
+|---|---|---|
+| `erp_sec_class_average` | SEC sınıfı, ortalama iklim | metin: `A+`, `A`, `B`… |
+| `erp_sec_average_kwh_m2a` · `erp_sec_cold_kwh_m2a` · `erp_sec_warm_kwh_m2a` | Özgül enerji tüketimi (SEC), üç iklim | sayı, kWh/(m²·yıl) — negatif olağandır |
+| `erp_ventilation_unit_type` | Tip: konut tek yönlü / çift yönlü | `UVU` · `BVU` |
+| `erp_drive_type` | Sürücü tipi (çok kademeli / değişken hız) | metin, kaynaktaki ifade (`VM`, `VSD`) |
+| `erp_heat_recovery_type` | Isı geri kazanım tipi | metin, kaynaktaki ifade |
+| `erp_thermal_efficiency_pct` | Referans debide ısıl verim | sayı, % |
+| `erp_max_delivery_m3h` | Föyün maksimum debisi | sayı, m³/h |
+| `erp_power_at_max_delivery_w` | Maksimum debide elektrik güç girişi | sayı, W |
+| `erp_noise_lwa_db` | Ses gücü seviyesi LWA (LpA ile karıştırılmaz, §11.7) | sayı, dB(A) |
+| `erp_reference_delivery_m3s` · `erp_reference_pressure_pa` | Referans debi ve referans basınç farkı | sayı |
+| `erp_spi_w_m3h` | Özgül güç girişi | sayı, W/(m³/h) |
+| `erp_control_factor` | Kontrol faktörü | sayı |
+| `erp_leakage_internal_pct` · `erp_leakage_external_pct` | İç / dış kaçak oranı | sayı, % — UVU'da kaynak "NA" diyorsa anahtar YAZILMAZ |
+| `erp_aec_kwh` · `erp_ahs_average_kwh` | Yıllık elektrik tüketimi, yıllık tasarruf edilen ısıtma (ortalama iklim) | sayı, kWh |
+| `erp_eprel_registration` | EPREL kayıt numarası | metin; yalnız üretici verdiyse |
+
+**Kurallar:**
+- ⛔ **Kaynaksız değer yazılmaz, çift bağımsız doğrulama şart.** İki ayrı çıkarım (metin yolu +
+  tablo yolu) aynı değeri vermiyorsa değer yazılmaz, AVenS/Vortice soru paketine gider.
+- ⛔ **Paylaşımlı sütun aktarılmaz.** Kaynak föyü iki koda tek sütun veriyorsa ("12106 / 10911"),
+  üretici ayrı föy ya da açık beyan vermeden ikinci koda değer yazılmaz.
+- Değer **kaynaktaki ondalıkla** yazılır; yuvarlanmaz, "düzeltilmez" (-44,5 kaynaksa -44.5).
+- **Etiket görseli ve föy belgesi veri değildir, dosyadır.** Mesafeli satışta etiketin fiyatın yanında
+  gösterilmesi ve föyün erişilebilir olması gerekir; bu dosyalar üreticiden (EPREL) alınır ve
+  görsel/belge katmanında durur. Bu anahtarlar dosyanın yerini tutmaz.
+
+### `erp_compliant`: yalnız kaynaklı, kapsam dışında hiç (REC-392 ek kapsam, Ops hükmü 2026-09-25)
+
+**Ölçüm (2026-09-25, katalog paketi):** 22 ailede 187 değer (true 159 · false 28), **187'sinin
+kaynak belgesi boş.** NORDIK HVLS'te "Evet"in belgede dayanağı yok; duman tahliye fanlarında
+dayanak motor tüzüğü (2019/1781), fan tüzüğü değil (AB 2024/1834 Md.1(3) duman tahliye ve hava
+sirkülasyon fanlarını kapsam dışı sayar); ATEX ailesinde "Hayır" uyumsuzluk gibi okunuyor.
+
+**Kural:**
+- Değer yalnız üretici belgesinde **hangi tüzüğe** uyduğu yazılıysa girer; alıntı ve sayfa zorunlu.
+- Kaynak bulunamazsa anahtar **silinir** — tahminle `true`/`false` yazılmaz.
+- Tüzüğün kapsamı dışındaki ailede (duman tahliye, HVLS, ATEX, frekans konvertörü…) anahtar **hiç
+  bulunmaz**; `false` "uyumsuz" diye okunur ve yanlıştır.
+
 ## 12. Referanslar
 
 1.  **Medusa.js v2 Pricing & Attribute Architecture:** [medusajs.com/docs/modules/pricing](https://docs.medusajs.com) (Multi-currency PriceSets and Rule Engines).

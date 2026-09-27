@@ -1,0 +1,2 @@
+# Yama dosyalari LF kalir: hedef (node_modules) LF, CRLF'e cevrilen yama git apply'da dusar.
+*.patch -text

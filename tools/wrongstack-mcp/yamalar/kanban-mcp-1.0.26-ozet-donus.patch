@@ -1,0 +1,24 @@
+diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js
+--- a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js
++++ b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/cli.js
+@@ -317,7 +317,7 @@
+       try {
+         const result = await executeKanban(args, context, signal);
+         const failed = !!result && typeof result === "object" && !Array.isArray(result) && result["ok"] === false;
+-        return { content: result, isError: failed };
++        return { content: failed ? result : { ...JSON.parse(kanbanTool.serialize(result, args)), ...(result && result.board && !result.task && args && args.taskId ? { task: result.board.tasks.find((t) => t.id === args.taskId) } : {}) }, isError: failed };
+       } catch (error) {
+         return { content: mcpErrorContent(error), isError: true };
+       }
+diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
+--- a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
++++ b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
+@@ -307,7 +307,7 @@
+       try {
+         const result = await executeKanban(args, context, signal);
+         const failed = !!result && typeof result === "object" && !Array.isArray(result) && result["ok"] === false;
+-        return { content: result, isError: failed };
++        return { content: failed ? result : { ...JSON.parse(kanbanTool.serialize(result, args)), ...(result && result.board && !result.task && args && args.taskId ? { task: result.board.tasks.find((t) => t.id === args.taskId) } : {}) }, isError: failed };
+       } catch (error) {
+         return { content: mcpErrorContent(error), isError: true };
+       }

@@ -32,8 +32,25 @@ başındaki adımları standartlaştırır.
      yeşil → sahibi `pnpm supabase:gen` PR'ı hemen. Ayrıca HER migration sonrası şema tabanı
      (`sema-tabani-uret.yml`) aynı gün yenilenir, yoksa INV-TABAN-TAZE-1 filoda kırmızı
      (migration-safety-standard, tip/taban maddesi).
+   - **Her yeni fonksiyonda açık `REVOKE`:** Supabase varsayılan yetkileri yeni fonksiyona `anon`
+     dahil EXECUTE verir. `revoke all on function … from public, anon;` yazılmazsa ziyaretçi
+     çağırabilir. Yalnız tetik/iç yardımcıysa `authenticated`'dan da kaldır; oturumlu RPC ise
+     `grant execute … to authenticated` AÇIKÇA yaz. Bekçi: INV-AUTH-DEFINER-ANON-1
+     (`anon-definer-yetki.test.ts`) — yeni DEFINER fonksiyonu oraya kol olarak ekle (REC-384).
+   - **CHECK kısıtı ekleme kalıbı (squawk, INV-MIGRATION-3):** `NOT VALID`'siz ekleme KIRMIZI;
+     `NOT VALID` ile `VALIDATE` aynı işlemde de KIRMIZI. Emsal `20260923083021_url_takma_adlari.sql`:
+     ekleme `do $$ … add constraint … not valid; end $$;` bloğunda, `validate constraint` bloğun
+     DIŞINDA. Dürüst yorum yaz: aynı migration işleminde kilit kazancı yoktur; tablonun satır
+     sayısını salt-okuma ile ölç ve yoruma yaz. Squawk yerelde kurulu değil — ilk sinyal CI'dır.
 5. **Yerel doğrulama:** mümkünse `supabase db diff` ile beklenen fark; testler
-   (`pnpm test -- --run`) yeşil.
+   (`pnpm test -- --run`) yeşil. **Davranışı olan migration (tetik, DEFINER, sayaç, kısıt) gölge
+   DB'de kolla koşulur:** `node scripts/db/golge-kur.mjs --ad <ad>` (taban + sonraki migration'lar).
+   Gölgenin eksikleri (2026-09-25 ölçüldü): `net.http_post` sahte (0 döner; değiştirmek için ÖNCE
+   `drop function`, sonra `create` — `create or replace` parametre varsayılanı yüzünden düşer),
+   `vault` şeması YOK, `auth.uid()` NULL. Betiği `-v ON_ERROR_STOP=1` ile koş; yoksa kurulum
+   sessizce düşer, ölçüm hiçbir şey ölçmez. Tetiğin yazdığını okuyan sorgu AYRI ifade olmalı
+   (aynı ifadede eski anlık görüntüyü okur). Başka şeridin `golge_*` DB'sine dokunma;
+   `supabase db reset` YASAK.
 6. **PR ve kapanış uyarısı:** PR açıklamasına şu satır AYNEN girer:
    `⚠ MIGRATION İÇERİR — merge = prod'a otomatik uygulama. Yalnız Recep onayıyla merge.`
    PR'ı ASLA kendi kapınla merge etme; "sadece komutla uygulanacaksa" merge ETME.
