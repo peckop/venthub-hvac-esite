@@ -57,9 +57,9 @@ Her kalem bir mevzuat metnidir. Bir AB tüzüğü ile onun TR karşılığı **i
 | `kimlik` | ✅ | metin | Kararlı anahtar. Biçim: `<YETKİ>-<numara>` → `AB-2024/1834`, `TR-SGM-2026/2`, `STD-IEC-61800-3`. Bir kez verilir, değişmez |
 | `ad` | ✅ | metin | Resmî tam ad, kaynağın dilinde |
 | `ad_tr` | — | metin | AB metni için Türkçe kısa ad (yazılarda kullanılan) |
-| `tur` | ✅ | sabit | `tuzuk` · `direktif` · `uygulama-karari` · `yonetmelik` · `teblig` · `standart` · `rehber` |
+| `tur` | ✅ | sabit | `kanun` · `tuzuk` · `direktif` · `uygulama-karari` · `yonetmelik` · `teblig` · `standart` · `rehber` |
 | `yetki` | ✅ | sabit | `AB` · `TR` · `ULUSLARARASI` |
-| `konu` | ✅ | liste | M0'daki eksenler: `erp` · `enerji-etiketi` · `atex` · `emc` · `alcak-gerilim` · `makine` · `yangin-duman` · `f-gaz` · `yapi-urunleri` · `cerceve` |
+| `konu` | ✅ | liste | M0'daki eksenler: `erp` · `enerji-etiketi` · `atex` · `emc` · `alcak-gerilim` · `makine` · `yangin-duman` · `f-gaz` · `yapi-urunleri` · `ses` · `cerceve` |
 | `kapsam` | ✅ | metin | Kendi cümlemizle, Türkçe, en fazla üç cümle. Standart metninden kopya **yasak** (M4) |
 | `tarihler` | ✅ | nesne | `kabul`, `yayim`, `yururluk` (ISO tarih) + `asamalar: [{tarih, ne}]`. Bilinmeyen alan `null`, tahmin yazılmaz |
 | `yerini_aldigi` | — | liste | Bu metnin kaldırdığı kalemlerin `kimlik`leri |
@@ -176,6 +176,21 @@ tutarlılığını da sınar: her aile slug'ı KATALOG paketinde var mı, her `k
 Bir kalem **durum değiştirdiğinde** (yeni aşama, kaldırılma, TR karşılığının yayımı) üç listenin
 hangisini etkilediği aynı gün yazılır ve ilgili şeride iletilir.
 
+### M6.0 Ürün sayfasında uygunluk satırı ("ErP Uyumlu" vb.) — gösterim kuralı (2026-09-25)
+
+KATALOG'un 187 değerlik `erp_compliant` denetimi için verildi (değerlerin hiçbirinin kaynağı yoktu).
+
+| Durum | Gösterim |
+|---|---|
+| Ürün o ürün grubunun tüzüğünün **kapsamında** ve **modeli adıyla anan** üretici belgesi (föy, uygunluk beyanı, EPREL) uygunluk diyor | "ErP Uyumlu" + hangi tüzük; kaynak sayfası satıra bağlı |
+| Ürünün kendisi kapsam dışı ya da beyan yok, ama üretici **yalnız motor** için 2019/1781 uygunluğu beyan ediyor | Daraltılmış satır: "Motor: AB 2019/1781 ekotasarım tüzüğüne uygun" |
+| Ürün tüzükten **muaf** (ATEX, duman tahliye, hava sirkülasyon fanı, aşındırıcı gaz…) | Satır **hiç gösterilmez**; "Hayır" da yazılmaz ("uymuyor" diye okunur) |
+| Seri/broşür geneli uygunluk cümlesi var, model adı geçmiyor | Yetmez; model belgesi gelene kadar satır gösterilmez |
+
+Dayanak: uygunluk model bazında beyan edilir (1253/2014 ve 1254/2014 bilgi şartları, TR SGM 2021/19 Md.5
+"her bir modeli için"). Muafiyet koşulları kayıttaki kalemin metnindedir; örneğin hava sirkülasyon fanı istisnası
+(2024/1834 Md.1(3)(p)), üretici sıfırdan farklı basınçta performans yayımlıyorsa düşer.
+
 ### M6.1 BLOG ↔ MEVZUAT iş bölümü (kalıcı — OPS/Recep, 2026-09-25)
 
 1. **Yazıdan önce mevzuat paketi.** BLOG konuyu MEVZUAT'a bildirir. MEVZUAT o konunun ürün
@@ -202,3 +217,27 @@ hangisini etkilediği aynı gün yazılır ve ilgili şeride iletilir.
   `docs/mevzuat/kanit/`). Aile slug'larının 47/47'si KATALOG paketiyle eşleşti. Resmî ve doğrulanmış
   alıntısı olmayan tek kalem `STD-EN-12101-3` (CEN kataloğu HTTP 500 verdi). Bu sürümde `tarihler`
   alanları ajanların metin notlarını taşır; ISO tarihe çevrilmesi v0.2 işidir.
+- 2026-09-25 — kayıt v0.2: ses ekseni (G) — `TR-YON-GURULTU-BINA-2017`, `TR-YON-CEVRE-GURULTU-2010`,
+  `AB-BILDIRIM-2016/C416/06`; 45 kalem. `TR-SGM-2021/23` özeti düzeltildi (yalnız erteleme değil;
+  sürücü tarihi Md.5 ile değişir). Üç ölçülmüş ders:
+  (1) **Resmî Gazete ekleri taranmış PDF olabilir** (SGM 2021/16, 2021/18, gürültü yönetmeliği):
+  metin katmanı yok, OCR aracı yok; sayı ve madde **sayfa görüntüsünden** okunur ve kanıtta sayfa
+  numarası yazılır. Alt ajanın görüntü transkripsiyonu kanıt değildir: bu turda iki hata yakalandı
+  (Ek-8 8.2.1 fıkra metni, Tablo 5.1 dipnotunun yanlış tabloya bağlanması).
+  (2) Madde numarası varsayılmaz: "Ek-I madde 2 = sürücü" varsayımı yanlıştı (madde 2 motor ürün
+  bilgisi, madde 3 sürücü); BLOG'a yanlış madde gitti, aynı gün düzeltildi.
+  (4) **Kapsam istisnası kelimesi kelimesine okunur ve üretici beyanıyla çaprazlanır** (v0.3): 1253/2014
+  Md.1(2)(c) "axial or centrifugal fans only equipped with a housing" diyor; MEVZUAT bunu "gövdeli kanal
+  fanı kapsam dışı" diye genelleştirip BLOG'a paket verdi. BLOG, üreticinin 1253/2014 beyanıyla
+  itiraz etti. Karışık akışlı fan istisnada yok, üretici CA kanal fanlarını "RVU-U" beyan edip SEC
+  sınıfı yayımlıyor. Kural: bir ürün ailesini "kapsam dışı" ilan etmeden önce kaynak dizininde o ailenin
+  aynı tüzüğe atfı aranır (`sayfalar.jsonl`'da tüzük numarası); atıf varsa hüküm üretici beyanıyla
+  uzlaştırılmadan verilmez.
+  (5) **Açık bir hükmü kapatan tur, kaydın kendi "okunmadı" notlarını da kapatır** (v0.4): SVGM 2019/15
+  yürürlüğü REC-397 hükmünde Md.10 ile kullanıldığı hâlde kayıtta "okunmadı" yazıyordu. Karar yorumu
+  kayıttan güçlü olmamalı. v0.4'te üç kalem eklendi ya da tamamlandı: SGM 2021/18 Ek-III (AB 2018
+  aşaması değerleri 1/10/2021'den itibaren) ve Md.2(2)(c) açık sorusu, SVGM 2019/15 Md.10 (20.12.2020),
+  yeni `TR-KANUN-7223` (`tur` listesine `kanun` eklendi). 46 kalem.
+  (3) AB konsolide sürüm listesi Yayın Ofisi SPARQL servisinden tek sorguyla alınır
+  (`cdm:resource_legal_id_celex`, `STRSTARTS("0<CELEX>")`); M5.1 takip betiği için en ucuz değişiklik
+  algılayıcısıdır.

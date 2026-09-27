@@ -161,11 +161,15 @@ if (others.length > 0) {
     return `${c.lane}=${String(c.sid).slice(0, 8)} (${globs.length} desen, ${c.yasDk}dk${ek})${bayat}`
   }).join(' · '))
 }
+// KARAR 117 (Recep, 2026-09-25): bu satır eskiden her turda "CronCreate ile 30dk tur kur"
+// diyordu; karar 53 ("zamanlayıcı gerekiyorsa ÖNCE Recep ile konuş") ile çelişiyordu ve her
+// turda tekrarlandığı için kazanan oydu. Recep'in sözü: "ihtiyaca göre önce konu bana gelir,
+// gerekiyorsa da gerçekten ölçüm ile karar verilir." Satır artık kurdurmaz, sordurur.
 if (!seritAldiMi) {
   lines.push(
-    'LOOP: zincirin kurulu değilse docs/standards/session-loop-ritual.md KOMUT-B ile kur ' +
-    '(OPS-AUDIT oturumuysan KOMUT-A) + yedek olarak CronCreate ile 30dk recurring tur kur ' +
-    '(dakika 0/30 dışı). Şerit talep edince bu satır kendiliğinden susar.',
+    'LOOP: bu oturum henüz şerit almadı. Tekrarlanan tur (loop/cron/uyandırma) gerekiyorsa ' +
+    'KURMADAN ÖNCE Recep ile konuş; gereklilik ölçümle gösterilir (karar 117). Nasıl kurulacağı: ' +
+    'docs/standards/session-loop-ritual.md. Şerit talep edince bu satır kendiliğinden susar.',
   )
 }
 // YÖNTEM işareti (T144-VH): yalnız pano konuştuğunda (sessizlik kuralına tabi) tek satır —

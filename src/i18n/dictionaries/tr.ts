@@ -372,6 +372,8 @@ export const tr = {
       aramaYerTutucu: 'Konu ya da terim yazın',
       sonucYok: 'Aramanıza uyan yazı bulunamadı.',
       oku: 'Yazıyı oku',
+      bosBaslik: 'Rehberler hazırlanıyor',
+      bosAciklama: 'Kaynakları belirtilmiş, doğrulanmış rehber yazıları hazırlanıyor. İlk yazılar yayına girene kadar ihtiyacınızı aşağıdaki Ürün Seçici ile hesaplayabilirsiniz.',
       seciciBaslik: 'Ürün Seçici',
       seciciAciklama: 'Kanal, ısı geri kazanım, hava perdesi ve jet fan hesaplarını tek yerden yapın.',
       seciciDugme: 'Ürün Seçici’yi aç',

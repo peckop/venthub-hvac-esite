@@ -13,7 +13,8 @@
  * görünmüyordu; precompact-durum-kapisi son anda yakalıyor. Bu çubuk erken uyarıdır.
  *
  * Ayar (.claude/settings.json): "statusLine": { "type": "command", "command": "node .claude/statusline.cjs" }
- * Deneme: echo '{"model":{"display_name":"Opus"},"context_window":{"used_percentage":63},"workspace":{"current_dir":"/x"}}' | node .claude/statusline.cjs
+ * Deneme: echo '{"model":{"display_name":"Opus"},"context_window":{"used_percentage":18,"context_window_size":1000000},"workspace":{"current_dir":"/x"}}' | node .claude/statusline.cjs
+ *   (250k pencerede → "180k/250k" sarı)
  */
 'use strict'
 const fs = require('fs')
@@ -26,19 +27,52 @@ try {
   d = {}
 }
 const cw = d.context_window || {}
-const pctRaw = typeof cw.used_percentage === 'number' ? cw.used_percentage : null
-const pct = pctRaw === null ? null : Math.max(0, Math.min(100, Math.round(pctRaw)))
-const size = cw.context_window_size ? Math.round(cw.context_window_size / 1000) + 'k' : ''
 const model = (d.model && (d.model.display_name || d.model.id)) || '?'
 const effort = d.effort && d.effort.level ? ' · ' + d.effort.level : ''
 
-// Renk eşikleri: <60 yeşil · 60-79 sarı · ≥80 kırmızı (precompact kapısı ~%90'da devreye girer)
+// Karar 140 (2026-09-27): compact eşiği `autoCompactWindow` ile ~250k'ya indirildi. used_percentage
+// HER ZAMAN modelin tam penceresine (1M) göre ölçülür (code.claude.com/docs/en/env-vars,
+// CLAUDE_CODE_AUTO_COMPACT_WINDOW satırı) — eşik düşünce eski %60/%80 renkleri hiç yanmaz.
+// Bu yüzden çubuk kullanılan TOKEN'ı compact penceresine göre gösterir.
+// Pencere önceliği belgedeki gibi: ortam değişkeni > proje/kullanıcı ayarı > model penceresi.
+function compactPenceresi(modelPenceresi) {
+  const env = parseInt(process.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW || '', 10)
+  if (env > 0) return Math.min(env, modelPenceresi || env)
+  const path = require('path')
+  const yerler = [
+    path.join(process.cwd(), '.claude', 'settings.local.json'),
+    path.join(process.cwd(), '.claude', 'settings.json'),
+    path.join(require('os').homedir(), '.claude', 'settings.json'),
+  ]
+  for (const y of yerler) {
+    try {
+      const v = JSON.parse(fs.readFileSync(y, 'utf8')).autoCompactWindow
+      if (typeof v === 'number' && v > 0) return Math.min(v, modelPenceresi || v)
+    } catch {
+      // dosya yok ya da okunamadı → sıradakine bak
+    }
+  }
+  return modelPenceresi || null
+}
+
+const u = cw.current_usage
+const tokens = u
+  ? (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0)
+  : typeof cw.used_percentage === 'number' && cw.context_window_size
+    ? Math.round((cw.used_percentage / 100) * cw.context_window_size)
+    : null
+const pencere = compactPenceresi(cw.context_window_size || 0)
+
+// Renk eşikleri compact penceresine oranla: <%60 yeşil · %60-79 sarı · ≥%80 kırmızı
+// (250k pencerede: sarı 150k, kırmızı 200k — Recep onayı 2026-09-27)
 const C = { g: '\x1b[32m', y: '\x1b[33m', r: '\x1b[31m', dim: '\x1b[2m', off: '\x1b[0m' }
 let bar = C.dim + '░░░░░░░░░░ bağlam ?' + C.off
-if (pct !== null) {
+if (tokens !== null && pencere) {
+  const pct = Math.max(0, Math.min(100, Math.round((tokens / pencere) * 100)))
   const filled = Math.round(pct / 10)
   const color = pct >= 80 ? C.r : pct >= 60 ? C.y : C.g
-  bar = color + '█'.repeat(filled) + '░'.repeat(10 - filled) + ' ' + pct + '%' + C.off + (size ? C.dim + '/' + size + C.off : '')
+  const k = (n) => Math.round(n / 1000) + 'k'
+  bar = color + '█'.repeat(filled) + '░'.repeat(10 - filled) + ' ' + k(tokens) + C.off + C.dim + '/' + k(pencere) + C.off
 }
 
 let branch = ''

@@ -279,6 +279,8 @@ export const en: typeof tr = {
       aramaYerTutucu: 'Type a topic or term',
       sonucYok: 'No article matches your search.',
       oku: 'Read the article',
+      bosBaslik: 'Guides in preparation',
+      bosAciklama: 'Sourced and verified guides are being prepared. Until the first articles are published, you can size your requirement with the Product Selector below.',
       seciciBaslik: 'Product Selector',
       seciciAciklama: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
       seciciDugme: 'Open the Product Selector',

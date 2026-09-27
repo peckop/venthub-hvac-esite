@@ -170,6 +170,44 @@ describe('REC-280 · hafıza indeksi bekçisi UYARI olarak kalıyor ve AYIRT ED�
     expect(kostur(B).stdout, 'başka oturum uyarıyı hiç görmedi').toMatch(/KAYIP YAZIM SUPHESI/)
   })
 
+  /**
+   * ⭐SATIR DÜZEYİNDE TEKİLLEŞTİRME (2026-09-25, ikinci ölçüm): bütün-metin özeti, araya
+   * değişken bir satır karışınca (git uyarısı, büyüyen liste) aynı ana uyarıyı her çağrıda
+   * yeniden gönderiyordu — Ops oturumunda "KIMLIK YOK" her Bash'te geldi. Doğrudan modülü
+   * koşan küçük bir süreçle ölçülür: yalnız YENİ satırlar gider, madde başlığıyla gider.
+   */
+  it('⭐değişen yan satır ana uyarıyı yeniden göndermez; büyüyen listede yalnız yeni madde gider', () => {
+    const onbellek = fs.mkdtempSync(path.join(os.tmpdir(), 'modele-ilet-satir-'))
+    const modul = path.join(KOK, '.claude/hooks/modele-ilet.cjs')
+    const kostur = (sid: string, metin: string) =>
+      spawnSync(
+        process.execPath,
+        [
+          '-e',
+          `const m=require(${JSON.stringify(modul)}).stderrModeleIlet('PostToolUse');m.oturum(${JSON.stringify(sid)});process.stderr.write(${JSON.stringify(metin)})`,
+        ],
+        { encoding: 'utf8', env: { ...process.env, VENTHUB_MODELE_ILET_DIR: onbellek } },
+      )
+    const A = 'aaaaaaaa-5555-4555-8555-555555555555'
+    const B = 'bbbbbbbb-6666-4666-8666-666666666666'
+    const kimlik = '[k] KIMLIK YOK (sebep) — denetlendi.\n  Onarim: oturum acilisi yap.\n'
+
+    expect(kostur(A, kimlik).stdout).toMatch(/KIMLIK YOK/)
+    const karisik = kostur(A, "warning: unable to access '.git/config'\n" + kimlik)
+    expect(karisik.stdout, 'değişken yan satır yeni sayılmadı').toMatch(/unable to access/)
+    expect(karisik.stdout, 'ana uyarı yan satır yüzünden yeniden gitti').not.toMatch(/KIMLIK YOK|Onarim/)
+    expect(karisik.stderr, 'stderr kopyası kesildi').toMatch(/KIMLIK YOK/)
+
+    kostur(A, '[k] PENCERE DISI 2 kalem\n  · a.md\n  · b.md\n')
+    const buyuyen = JSON.parse(kostur(A, '[k] PENCERE DISI 3 kalem\n  · a.md\n  · b.md\n  · c.md\n').stdout)
+      .hookSpecificOutput.additionalContext as string
+    expect(buyuyen, 'yeni madde başlıksız ya da hiç gitmedi').toMatch(/PENCERE DISI 3 kalem\n {2}· c\.md/)
+    expect(buyuyen, 'eski maddeler yeniden gitti').not.toMatch(/a\.md|b\.md/)
+
+    // Ayırt edici kol: başka oturum hepsini görür (tekilleştirme oturumlar arası sızmaz).
+    expect(kostur(B, "warning: unable to access '.git/config'\n" + kimlik).stdout).toMatch(/KIMLIK YOK/)
+  })
+
   it('NORMALİZE: yalnız boşluk farkı kayıp sayılmaz (yalancı uyarı yasağı — OPS şartı)', () => {
     const { idx, transcript, ham } = fiksturKur()
     const bosluklu = ham

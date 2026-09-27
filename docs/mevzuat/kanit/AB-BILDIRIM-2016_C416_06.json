@@ -1,0 +1,16 @@
+{
+  "kimlik": "AB-BILDIRIM-2016/C416/06",
+  "eksen": "G",
+  "kaynaklar": [
+    {
+      "url": "http://publications.europa.eu/resource/oj/JOC_2016_416_R_0006",
+      "http": 200,
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "erisim_tarihi": "2026-09-25",
+      "alinti": "CEN EN ISO 9614-2 or EN ISO 3744 or EN ISO 3746 or EN ISO 3743-1 or EN ISO 3741 or ISO 13347 or EN ISO 9614-1 or EN ISO 3745 or EN ISO 3743-2",
+      "alinti_dogrulandi": true,
+      "not": "Alt ajan ham metinden grep ile doğruladı."
+    }
+  ]
+}

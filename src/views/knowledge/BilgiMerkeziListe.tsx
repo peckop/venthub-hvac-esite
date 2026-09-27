@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { dildekiYazilar, type YaziDili } from '../../data/bilgiMerkezi/yazilar'
+import { dildekiYazilar, type RehberYazisi, type YaziDili, YAZILAR } from '../../data/bilgiMerkezi/yazilar'
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
@@ -17,9 +17,9 @@ import { tarihYaz } from './RehberYazisiSayfasi'
  * kutusu (K37-a / U2). Görselsiz kart (tasarım ekran 14 ikinci kare). Kategori süzgeci yazı sayısı
  * artınca gelir. Ürün Seçici'ye gerçek bir kapı taşır (eski merkezdeki kapı kaybolmasın, K17).
  */
-export function listeKartlari(dil: YaziDili): ListeKarti[] {
+export function listeKartlari(dil: YaziDili, yazilar: readonly RehberYazisi[] = YAZILAR): ListeKarti[] {
   const dict = dil === 'en' ? en : tr
-  return dildekiYazilar(dil).map((y) => {
+  return dildekiYazilar(dil, yazilar).map((y) => {
     const m = y.diller[dil]
     if (!m) throw new Error(`[bilgi merkezi] ${y.kimlik} ${dil} metni yok`)
     return {
@@ -33,10 +33,10 @@ export function listeKartlari(dil: YaziDili): ListeKarti[] {
   })
 }
 
-export default function BilgiMerkeziListe({ dil }: { dil: YaziDili }) {
+export default function BilgiMerkeziListe({ dil, yazilar = YAZILAR }: { dil: YaziDili; yazilar?: readonly RehberYazisi[] }) {
   const dict = dil === 'en' ? en : tr
   const t = (anahtar: string) => getDictValue(dict, anahtar)
-  const kartlar = listeKartlari(dil)
+  const kartlar = listeKartlari(dil, yazilar)
 
   return (
     <div className="bg-clean-white">
@@ -63,18 +63,29 @@ export default function BilgiMerkeziListe({ dil }: { dil: YaziDili }) {
           <p className="mt-4 text-lg text-industrial-gray">{t('bilgiMerkezi.liste.altBaslik')}</p>
         </header>
 
-        <div className="mt-10">
-          <BilgiMerkeziArama
-            kartlar={kartlar}
-            dil={dil}
-            metin={{
-              aramaEtiketi: t('bilgiMerkezi.liste.aramaEtiketi'),
-              aramaYerTutucu: t('bilgiMerkezi.liste.aramaYerTutucu'),
-              sonucYok: t('bilgiMerkezi.liste.sonucYok'),
-              oku: t('bilgiMerkezi.liste.oku'),
-            }}
-          />
-        </div>
+        {/* BOŞ DURUM (karar 121/c): yazı yokken arama kutusu ve boş ızgara basılmaz; "hazırlanıyor"
+            mesajı ve Ürün Seçici kapısı kalır. Kapı: src/lib/bilgiMerkezi/__tests__/bosDurum.test.tsx. */}
+        {kartlar.length === 0 ? (
+          <section aria-labelledby="rehberler-hazirlaniyor" className="mt-10 max-w-content border-l-4 border-primary-navy bg-light-gray p-8">
+            <h2 id="rehberler-hazirlaniyor" className="text-2xl font-bold tracking-tight text-primary-navy">
+              {t('bilgiMerkezi.liste.bosBaslik')}
+            </h2>
+            <p className="mt-3 text-base text-industrial-gray">{t('bilgiMerkezi.liste.bosAciklama')}</p>
+          </section>
+        ) : (
+          <div className="mt-10">
+            <BilgiMerkeziArama
+              kartlar={kartlar}
+              dil={dil}
+              metin={{
+                aramaEtiketi: t('bilgiMerkezi.liste.aramaEtiketi'),
+                aramaYerTutucu: t('bilgiMerkezi.liste.aramaYerTutucu'),
+                sonucYok: t('bilgiMerkezi.liste.sonucYok'),
+                oku: t('bilgiMerkezi.liste.oku'),
+              }}
+            />
+          </div>
+        )}
 
         <section aria-labelledby="urun-secici-kapisi" className="mt-16 max-w-content rounded-hvac-md border border-light-gray p-8">
           <h2 id="urun-secici-kapisi" className="text-2xl font-bold tracking-tight text-primary-navy">

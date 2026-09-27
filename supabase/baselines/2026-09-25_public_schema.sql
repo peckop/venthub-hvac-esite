@@ -171,6 +171,55 @@ $$;
 ALTER FUNCTION "public"."_normalize_rls_expr"("expr" "text") OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."_quote_published_enqueue"("p_quote_id" "uuid", "p_zorunlu" boolean) RETURNS boolean
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'pg_catalog', 'public', 'pg_temp'
+    AS $$
+declare
+  v_bayrak text;
+  v_url    text;
+  v_sir    text;
+begin
+  select decrypted_secret into v_bayrak from vault.decrypted_secrets
+   where name = 'quote_published_webhook_enabled' limit 1;
+  if v_bayrak is distinct from 'on' then
+    if p_zorunlu then
+      raise exception 'yayim e-postasi kapali (quote_published_webhook_enabled != on) — gonderilmedi'
+        using errcode = 'P0001';
+    end if;
+    raise warning '[_quote_published_enqueue] bayrak kapali — yayim bildirimi ATLANDI, teklif %', p_quote_id;
+    return false;
+  end if;
+
+  select decrypted_secret into v_sir from vault.decrypted_secrets where name = 'quote_webhook_secret' limit 1;
+  select decrypted_secret into v_url from vault.decrypted_secrets where name = 'quote_webhook_url' limit 1;
+  if coalesce(v_sir, '') = '' or coalesce(v_url, '') = '' then
+    if p_zorunlu then
+      raise exception 'Vault kaydi eksik (quote_webhook_secret/url) — gonderilmedi' using errcode = 'P0001';
+    end if;
+    raise warning '[_quote_published_enqueue] Vault kaydi eksik — bildirim ATLANDI, teklif %', p_quote_id;
+    return false;
+  end if;
+
+  -- Gövde YALNIZ olay + kimlik: kişisel veri taşımaz, Edge satırı kendisi okur.
+  perform net.http_post(
+    url := v_url,
+    body := jsonb_build_object('event', 'quote_published', 'quote_id', p_quote_id),
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'x-webhook-secret', v_sir,
+      'x-timestamp', (extract(epoch from now()) * 1000)::bigint::text
+    ),
+    timeout_milliseconds := 5000
+  );
+  return true;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."_quote_published_enqueue"("p_quote_id" "uuid", "p_zorunlu" boolean) OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."adjust_stock"("p_product_id" "uuid", "p_delta" integer, "p_reason" "text") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'pg_catalog, public'
@@ -310,6 +359,9 @@ declare
   v_tenant   uuid := public.jwt_tenant_id();
   v_currency text := upper(trim(coalesce(p_currency, '')));
   v_before   jsonb;
+  v_no       text;
+  v_sent     timestamptz;
+  v_toplam   numeric;
 begin
   if not public.is_admin_user() then
     raise exception 'yetkisiz: teklif yayimlama admin gerektirir'
@@ -321,16 +373,13 @@ begin
       using errcode = 'P0001';
   end if;
 
-  -- Cetvel §6 NOT NULL diyor; "gelecekte olsun" ondan DAHA SIKI bir kuraldır ve bilerek
-  -- eklendi: gecmise tarihli bir yayim, dogdugu anda suresi gecmis bir belge uretir.
-  -- Bu kural cetvele de yazildi (§6), yalniz burada yasamiyor.
+  -- Cetvel §6: "gelecekte olsun" NOT NULL'dan daha sıkı ve bilerek eklendi.
   if p_valid_until is null or p_valid_until <= now() then
     raise exception 'gecersiz gecerlilik tarihi: gelecekte bir zaman olmali'
       using errcode = 'P0001';
   end if;
 
-  -- Tenant süzgeci OKUMADA da uygulanır: DEFINER RLS'i atladığı için bu satır olmasaydı
-  -- fonksiyon başka kiracının belgesini görür ve yazardı.
+  -- Tenant süzgeci OKUMADA da uygulanır (DEFINER RLS'i atlar).
   select to_jsonb(q) into v_before
   from public.venthub_quotes q
   where q.id = p_quote_id and q.tenant_id = v_tenant;
@@ -346,17 +395,20 @@ begin
       using errcode = 'P0001';
   end if;
 
-  -- ÜÇÜ TEK İFADEDE: yayım kapısı satırın SON hâline bakar.
+  -- ÜÇÜ TEK İFADEDE: yayım kapısı satırın SON hâline bakar. Numara/damga/toplam BEFORE tetiğinden
+  -- (trg_stamp_quote_published) gelir; RETURNING tetiğin yazdığı son hâli okur.
   update public.venthub_quotes
      set status      = 'quoted',
          valid_until = p_valid_until,
          currency    = v_currency
-   where id = p_quote_id and tenant_id = v_tenant;
+   where id = p_quote_id and tenant_id = v_tenant
+  returning quote_no, sent_at, total_amount into v_no, v_sent, v_toplam;
 
-  -- DENETİM GÖVDEDE, İSTEMCİDE DEĞİL (CLAUDE.md #11).
-  -- İstemcideki mutateWithAudit'in log çağrısı try/catch içinde yutuluyor ve ayrı bir
-  -- transaction'da koşuyor. RLS'i atlayan bir yolun izi yutulabilir olamaz; burada iz
-  -- yazma ile AYNI transaction'dadır ve düşerse yayım da düşer.
+  if not found then
+    raise exception 'yayim yazilamadi (satir eslesmedi)' using errcode = 'P0001';
+  end if;
+
+  -- DENETİM GÖVDEDE, yazmayla AYNI transaction'da (CLAUDE.md #11).
   insert into public.admin_audit_log
     (actor, table_name, row_pk, action, before, after, comment, tenant_id)
   values (
@@ -365,14 +417,20 @@ begin
     p_quote_id::text,
     'UPDATE',
     jsonb_build_object(
-      'status',      v_before ->> 'status',
-      'valid_until', v_before ->> 'valid_until',
-      'currency',    v_before ->> 'currency'
+      'status',       v_before ->> 'status',
+      'valid_until',  v_before ->> 'valid_until',
+      'currency',     v_before ->> 'currency',
+      'quote_no',     v_before ->> 'quote_no',
+      'sent_at',      v_before ->> 'sent_at',
+      'total_amount', v_before ->> 'total_amount'
     ),
     jsonb_build_object(
-      'status',      'quoted',
-      'valid_until', p_valid_until,
-      'currency',    v_currency
+      'status',       'quoted',
+      'valid_until',  p_valid_until,
+      'currency',     v_currency,
+      'quote_no',     v_no,
+      'sent_at',      v_sent,
+      'total_amount', v_toplam
     ),
     'admin_publish_quote',
     v_tenant
@@ -386,6 +444,61 @@ ALTER FUNCTION "public"."admin_publish_quote"("p_quote_id" "uuid", "p_valid_unti
 
 COMMENT ON FUNCTION "public"."admin_publish_quote"("p_quote_id" "uuid", "p_valid_until" timestamp with time zone, "p_currency" "text") IS 'REC-54/E5 Faz 1: taslak teklifi yayimlar (draft -> quoted). Uc alani TEK ifadede yazar cunku yayim kapisi satirin son haline bakar. Yetki gövdede, denetim ayni transaction''da.';
 
+
+
+CREATE OR REPLACE FUNCTION "public"."admin_resend_quote_published"("p_quote_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public', 'pg_temp'
+    AS $$
+declare
+  v_tenant uuid := public.jwt_tenant_id();
+  v_durum  text;
+  v_gitti  timestamptz;
+begin
+  if not public.is_admin_user() then
+    raise exception 'yetkisiz: yeniden gonderim admin gerektirir' using errcode = '42501';
+  end if;
+
+  -- Satır kilidi: eşzamanlı iki çağrı sıraya girer, tavan kontrolü ikisinde de doğru okur.
+  select status, published_email_sent_at into v_durum, v_gitti
+    from public.venthub_quotes
+   where id = p_quote_id and tenant_id = v_tenant
+     for update;
+
+  if v_durum is null then
+    raise exception 'teklif bulunamadi ya da baska bir kiraciya ait' using errcode = 'P0001';
+  end if;
+  if v_durum <> 'quoted' then
+    raise exception 'yeniden gonderim yalniz yayimlanmis teklife (mevcut durum: %)', v_durum using errcode = 'P0001';
+  end if;
+  if v_gitti is not null then
+    raise exception 'yayim e-postasi zaten gonderildi (%)', v_gitti using errcode = 'P0001';
+  end if;
+  if exists (
+    select 1 from public.admin_audit_log
+     where row_pk = p_quote_id::text
+       and comment = 'admin_resend_quote_published'
+       and at > now() - interval '15 minutes'
+  ) then
+    raise exception 'ayni teklif icin 15 dakika icinde ikinci yeniden gonderim reddedildi' using errcode = 'P0001';
+  end if;
+
+  -- Bayrak kapalıysa HATA (admin "gitti" sanmasın).
+  perform public._quote_published_enqueue(p_quote_id, true);
+
+  insert into public.admin_audit_log
+    (actor, table_name, row_pk, action, before, after, comment, tenant_id)
+  values (
+    auth.uid(), 'venthub_quotes', p_quote_id::text, 'UPDATE',
+    jsonb_build_object('published_email_sent_at', null),
+    jsonb_build_object('yeniden_gonderim', 'kuyruga_alindi'),
+    'admin_resend_quote_published', v_tenant
+  );
+end;
+$$;
+
+
+ALTER FUNCTION "public"."admin_resend_quote_published"("p_quote_id" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."admin_search_products"("p_q" "text", "p_limit" integer DEFAULT 50, "p_offset" integer DEFAULT 0, "p_category_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("id" "uuid", "name" "text", "sku" "text", "model_code" "text", "brand" "text", "status" "text", "category_id" "uuid", "price" numeric, "purchase_price" numeric, "stock_qty" integer, "low_stock_threshold" integer, "is_featured" boolean, "slug" "text", "rank" real, "total_count" bigint)
@@ -949,6 +1062,82 @@ END $$;
 
 
 ALTER FUNCTION "public"."bump_rate_limit"("p_key" "text", "p_limit" integer, "p_window_seconds" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."create_quote_with_items"("p_quote" "jsonb", "p_items" "jsonb") RETURNS "uuid"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO 'pg_catalog', 'public', 'pg_temp'
+    AS $$
+declare
+  v_servis  boolean := (current_user = 'service_role');
+  v_user    uuid;
+  v_tenant  uuid;
+  v_kalem   int;
+  v_quote   uuid;
+begin
+  if p_quote is null or jsonb_typeof(p_quote) <> 'object' then
+    raise exception 'teklif basligi nesne olmali' using errcode = '22023';
+  end if;
+  if p_items is null or jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) < 1 then
+    raise exception 'teklif en az bir kalem icermeli' using errcode = '22023';
+  end if;
+  v_kalem := jsonb_array_length(p_items);
+
+  if v_servis then
+    v_tenant := nullif(p_quote ->> 'tenant_id', '')::uuid;
+    if v_tenant is null then
+      raise exception 'misafir teklifinde tenant_id zorunlu' using errcode = '22023';
+    end if;
+    v_user := null;
+    if v_kalem > 50 then
+      raise exception 'kalem sayisi siniri asildi (%/50)', v_kalem using errcode = '22023';
+    end if;
+    if exists (
+      select 1 from jsonb_array_elements(p_items) e
+       where coalesce(nullif(e ->> 'qty', '')::int, 0) not between 1 and 9999
+    ) then
+      raise exception 'adet 1..9999 araliginda olmali' using errcode = '22023';
+    end if;
+  else
+    v_user := auth.uid();
+    if v_user is null then
+      raise exception 'oturum yok: teklif talebi kimlik gerektirir' using errcode = '42501';
+    end if;
+    v_tenant := public.jwt_tenant_id();
+  end if;
+
+  insert into public.venthub_quotes
+    (tenant_id, user_id, contact_name, contact_email, contact_phone, source, source_project_id)
+  values (
+    v_tenant,
+    v_user,
+    p_quote ->> 'contact_name',
+    p_quote ->> 'contact_email',
+    p_quote ->> 'contact_phone',
+    p_quote ->> 'source',
+    nullif(p_quote ->> 'source_project_id', '')::uuid
+  )
+  returning id into v_quote;
+
+  insert into public.venthub_quote_items (quote_id, tenant_id, product_id, product_name, qty, note)
+  select v_quote,
+         v_tenant,
+         (e ->> 'product_id')::uuid,
+         e ->> 'product_name',
+         (e ->> 'qty')::int,
+         nullif(e ->> 'note', '')
+    from jsonb_array_elements(p_items) e;
+
+  return v_quote;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."create_quote_with_items"("p_quote" "jsonb", "p_items" "jsonb") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."create_quote_with_items"("p_quote" "jsonb", "p_items" "jsonb") IS 'REC-295: teklif basligi + kalemleri tek transaction. SECURITY INVOKER (RLS yururlukte). Dal: current_user=service_role (misafir, tenant zorunlu, 1..50 kalem) / authenticated (user_id=auth.uid()). Kalemsiz cagri reddedilir.';
+
 
 
 CREATE OR REPLACE FUNCTION "public"."custom_access_token_hook"("event" "jsonb") RETURNS "jsonb"
@@ -2379,6 +2568,20 @@ $$;
 ALTER FUNCTION "public"."notify_order_paid"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."notify_quote_published"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'pg_catalog', 'public', 'pg_temp'
+    AS $$
+begin
+  perform public._quote_published_enqueue(new.id, false);
+  return new;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."notify_quote_published"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."notify_quote_request_created"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public', 'extensions', 'vault'
@@ -2836,6 +3039,31 @@ end $$;
 ALTER FUNCTION "public"."product_families_single_level_guard"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."quote_items_durum_kilidi"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'pg_catalog', 'public', 'pg_temp'
+    AS $$
+declare
+  v_durum text;
+begin
+  select status into v_durum from public.venthub_quotes
+   where id = case when tg_op = 'DELETE' then old.quote_id else new.quote_id end;
+  -- Başlık yoksa (cascade silmede başlık zaten gitmiştir) kilit uygulanmaz.
+  if v_durum is not null and v_durum not in ('requested', 'draft') then
+    raise exception 'teklif kalemi degistirilemez: belge % durumunda (yalniz requested/draft)', v_durum
+      using errcode = 'P0001';
+  end if;
+  if tg_op = 'DELETE' then
+    return old;
+  end if;
+  return new;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."quote_items_durum_kilidi"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."reverse_inventory_batch"("p_batch_id" "uuid") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
@@ -2932,15 +3160,15 @@ ALTER FUNCTION "public"."reverse_inventory_batch"("p_batch_id" "uuid", "p_max_mi
 
 
 CREATE OR REPLACE FUNCTION "public"."set_order_number"() RETURNS "trigger"
-    LANGUAGE "plpgsql"
+    LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public', 'pg_temp'
     AS $$
-BEGIN
-    IF NEW.order_number IS NULL OR NEW.order_number = '' THEN
-        NEW.order_number := generate_order_number();
-    END IF;
-    RETURN NEW;
-END;
+begin
+  if new.order_number is null or new.order_number = '' then
+    new.order_number := public.generate_order_number();
+  end if;
+  return new;
+end;
 $$;
 
 
@@ -3096,6 +3324,71 @@ $$;
 
 
 ALTER FUNCTION "public"."stamp_order_paid_at"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."stamp_quote_published"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'pg_catalog', 'public', 'pg_temp'
+    AS $$
+declare
+  v_kalem     int;
+  v_fiyatsiz  int;
+  v_pb_farkli int;
+  v_iskonto   int;
+  v_toplam    numeric;
+  v_gun       date;
+  v_sira      integer;
+begin
+  -- SUNUCU KAPISI (tüm yollar): istemcideki derivePublishHeader'ın DB aynası.
+  select count(*),
+         count(*) filter (where unit_price is null),
+         count(*) filter (where currency is distinct from new.currency),
+         count(*) filter (where coalesce(discount_rate, 0) <> 0),
+         round(sum(qty * unit_price), 2)
+    into v_kalem, v_fiyatsiz, v_pb_farkli, v_iskonto, v_toplam
+    from public.venthub_quote_items
+   where quote_id = new.id;
+
+  if v_kalem = 0 then
+    raise exception 'yayim reddedildi: teklifin kalemi yok' using errcode = 'P0001';
+  end if;
+  if v_fiyatsiz > 0 then
+    raise exception 'yayim reddedildi: % kalemde fiyat yok', v_fiyatsiz using errcode = 'P0001';
+  end if;
+  if v_pb_farkli > 0 then
+    raise exception 'yayim reddedildi: % kalemin para birimi belge para biriminden (%) farkli', v_pb_farkli, new.currency
+      using errcode = 'P0001';
+  end if;
+  -- İskonto alanı ekranda yazılmıyor ve toplam onu hesaba katmıyor: dolu iskontolu belge yanlış toplamla
+  -- müşteriye gitmesin, gürültüyle dursun.
+  if v_iskonto > 0 then
+    raise exception 'yayim reddedildi: iskontolu kalem henuz desteklenmiyor (% kalem)', v_iskonto
+      using errcode = 'P0001';
+  end if;
+
+  new.total_amount := v_toplam;          -- §3.1: kalemlerden türetilir, snapshot'lanır (KDV hariç)
+  new.sent_at      := now();             -- §12: yayım anı
+
+  -- Numara yalnız kök belgeye (H3) ve bir kez. Anahtar new.tenant_id: service_role yolunda JWT yok.
+  if new.amended_from is null and new.quote_no is null then
+    v_gun := (now() at time zone 'Europe/Istanbul')::date;
+    insert into public.quote_number_counters as c (tenant_id, gun, son_no)
+         values (new.tenant_id, v_gun, 1)
+    on conflict (tenant_id, gun) do update set son_no = c.son_no + 1
+      returning c.son_no into v_sira;
+    if v_sira > 9999 then
+      raise exception 'REC-384: gunluk teklif numarasi tasti (% > 9999, gun %). Bicim genisletilmeli.', v_sira, v_gun
+        using errcode = 'check_violation';
+    end if;
+    new.quote_no := 'TK-' || to_char(v_gun, 'YYYYMMDD') || '-' || lpad(v_sira::text, 4, '0');
+  end if;
+
+  return new;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."stamp_quote_published"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."submit_contact_message"("p_name" "text", "p_message" "text", "p_email" "text" DEFAULT NULL::"text", "p_phone" "text" DEFAULT NULL::"text", "p_company" "text" DEFAULT NULL::"text", "p_city" "text" DEFAULT NULL::"text", "p_application_area" "text" DEFAULT NULL::"text", "p_subject" "text" DEFAULT 'web-form'::"text", "p_consent" boolean DEFAULT false) RETURNS "uuid"
@@ -4725,7 +5018,9 @@ CREATE TABLE IF NOT EXISTS "public"."quote_email_events" (
     "status" "text" NOT NULL,
     "error" "text",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    CONSTRAINT "quote_email_events_status_check" CHECK (("status" = ANY (ARRAY['sent'::"text", 'failed'::"text"])))
+    "event" "text" DEFAULT 'request_created'::"text" NOT NULL,
+    CONSTRAINT "quote_email_events_event_check" CHECK (("event" = ANY (ARRAY['request_created'::"text", 'quote_published'::"text"]))),
+    CONSTRAINT "quote_email_events_status_check" CHECK (("status" = ANY (ARRAY['sent'::"text", 'failed'::"text", 'mismatch'::"text"])))
 );
 
 
@@ -4733,6 +5028,21 @@ ALTER TABLE "public"."quote_email_events" OWNER TO "postgres";
 
 
 COMMENT ON TABLE "public"."quote_email_events" IS 'Teklif bildirimi gonderim defteri (T068-VH). status=failed satirlari BILEREK tutulur: net.http_post atesle-unut oldugu icin basarisizlik baska hicbir yerde gorunmez.';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."quote_number_counters" (
+    "tenant_id" "uuid" NOT NULL,
+    "gun" "date" NOT NULL,
+    "son_no" integer DEFAULT 0 NOT NULL,
+    CONSTRAINT "quote_number_counters_son_no_check" CHECK (("son_no" >= 0))
+);
+
+
+ALTER TABLE "public"."quote_number_counters" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."quote_number_counters" IS 'REC-384: teklif numarasinin kiraci+gun sira sayaci. Yalniz stamp_quote_published (tetik, DEFINER) yazar.';
 
 
 
@@ -5174,6 +5484,7 @@ CREATE TABLE IF NOT EXISTS "public"."venthub_quotes" (
     "cancelled_at" timestamp with time zone,
     "cancel_reason" "text",
     "converted_order_id" "uuid",
+    "published_email_sent_at" timestamp with time zone,
     CONSTRAINT "venthub_quotes_accept_channel_check" CHECK ((("accept_channel" IS NULL) OR ("accept_channel" = ANY (ARRAY['site'::"text", 'email'::"text", 'phone'::"text"])))),
     CONSTRAINT "venthub_quotes_currency_check" CHECK ((("currency" IS NULL) OR ("currency" ~ '^[A-Z]{3}$'::"text"))),
     CONSTRAINT "venthub_quotes_source_check" CHECK (("source" = ANY (ARRAY['pdp'::"text", 'cart'::"text", 'project'::"text"]))),
@@ -5189,6 +5500,10 @@ COMMENT ON TABLE "public"."venthub_quotes" IS 'Teklif (RFQ) başlığı — T067
 
 
 COMMENT ON COLUMN "public"."venthub_quotes"."request_email_sent_at" IS 'Teklif talebi alındı e-postasının GÖNDERİLDİĞİ an (T068-VH). NULL = henüz gönderilmedi. Damga yalnız gönderim BAŞARILI olduktan sonra atılır; idempotency kaynağıdır.';
+
+
+
+COMMENT ON COLUMN "public"."venthub_quotes"."published_email_sent_at" IS 'REC-384: yayim e-postasinin GERCEKTEN gonderildigi an (Edge yazar). sent_at = yayim ani (cetvel §12).';
 
 
 
@@ -5631,6 +5946,11 @@ ALTER TABLE ONLY "public"."purchase_orders"
 
 ALTER TABLE ONLY "public"."quote_email_events"
     ADD CONSTRAINT "quote_email_events_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."quote_number_counters"
+    ADD CONSTRAINT "quote_number_counters_pkey" PRIMARY KEY ("tenant_id", "gun");
 
 
 
@@ -6461,6 +6781,10 @@ CREATE OR REPLACE TRIGGER "trg_notify_order_paid" AFTER UPDATE ON "public"."vent
 
 
 
+CREATE OR REPLACE TRIGGER "trg_notify_quote_published" AFTER UPDATE ON "public"."venthub_quotes" FOR EACH ROW WHEN ((("old"."status" = 'draft'::"text") AND ("new"."status" = 'quoted'::"text"))) EXECUTE FUNCTION "public"."notify_quote_published"();
+
+
+
 CREATE OR REPLACE TRIGGER "trg_notify_quote_request_created" AFTER INSERT ON "public"."venthub_quotes" FOR EACH ROW EXECUTE FUNCTION "public"."notify_quote_request_created"();
 
 
@@ -6477,7 +6801,15 @@ CREATE OR REPLACE TRIGGER "trg_product_prices_computed_at" BEFORE INSERT OR UPDA
 
 
 
+CREATE OR REPLACE TRIGGER "trg_quote_items_durum_kilidi" BEFORE INSERT OR DELETE OR UPDATE ON "public"."venthub_quote_items" FOR EACH ROW EXECUTE FUNCTION "public"."quote_items_durum_kilidi"();
+
+
+
 CREATE OR REPLACE TRIGGER "trg_stamp_order_paid_at" BEFORE UPDATE ON "public"."venthub_orders" FOR EACH ROW EXECUTE FUNCTION "public"."stamp_order_paid_at"();
+
+
+
+CREATE OR REPLACE TRIGGER "trg_stamp_quote_published" BEFORE UPDATE ON "public"."venthub_quotes" FOR EACH ROW WHEN ((("old"."status" = 'draft'::"text") AND ("new"."status" = 'quoted'::"text"))) EXECUTE FUNCTION "public"."stamp_quote_published"();
 
 
 
@@ -7796,6 +8128,9 @@ CREATE POLICY "quote_items_update_admin" ON "public"."venthub_quote_items" FOR U
 
 
 
+ALTER TABLE "public"."quote_number_counters" ENABLE ROW LEVEL SECURITY;
+
+
 CREATE POLICY "quotes_insert_admin_draft" ON "public"."venthub_quotes" FOR INSERT TO "authenticated" WITH CHECK ((("tenant_id" = "public"."jwt_tenant_id"()) AND ( SELECT "public"."is_admin_user"() AS "is_admin_user") AND ("status" = 'draft'::"text")));
 
 
@@ -8894,6 +9229,11 @@ GRANT ALL ON FUNCTION "public"."_normalize_rls_expr"("expr" "text") TO "service_
 
 
 
+REVOKE ALL ON FUNCTION "public"."_quote_published_enqueue"("p_quote_id" "uuid", "p_zorunlu" boolean) FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."_quote_published_enqueue"("p_quote_id" "uuid", "p_zorunlu" boolean) TO "service_role";
+
+
+
 REVOKE ALL ON FUNCTION "public"."adjust_stock"("p_product_id" "uuid", "p_delta" integer, "p_reason" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."adjust_stock"("p_product_id" "uuid", "p_delta" integer, "p_reason" "text") TO "service_role";
 GRANT ALL ON FUNCTION "public"."adjust_stock"("p_product_id" "uuid", "p_delta" integer, "p_reason" "text") TO "authenticated";
@@ -8924,9 +9264,14 @@ GRANT ALL ON FUNCTION "public"."admin_list_users"() TO "authenticated";
 
 
 REVOKE ALL ON FUNCTION "public"."admin_publish_quote"("p_quote_id" "uuid", "p_valid_until" timestamp with time zone, "p_currency" "text") FROM PUBLIC;
-GRANT ALL ON FUNCTION "public"."admin_publish_quote"("p_quote_id" "uuid", "p_valid_until" timestamp with time zone, "p_currency" "text") TO "anon";
 GRANT ALL ON FUNCTION "public"."admin_publish_quote"("p_quote_id" "uuid", "p_valid_until" timestamp with time zone, "p_currency" "text") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."admin_publish_quote"("p_quote_id" "uuid", "p_valid_until" timestamp with time zone, "p_currency" "text") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."admin_resend_quote_published"("p_quote_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."admin_resend_quote_published"("p_quote_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."admin_resend_quote_published"("p_quote_id" "uuid") TO "service_role";
 
 
 
@@ -9021,6 +9366,12 @@ GRANT ALL ON FUNCTION "public"."bump_rate_limit"("p_key" "text", "p_limit" integ
 
 
 
+REVOKE ALL ON FUNCTION "public"."create_quote_with_items"("p_quote" "jsonb", "p_items" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."create_quote_with_items"("p_quote" "jsonb", "p_items" "jsonb") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."create_quote_with_items"("p_quote" "jsonb", "p_items" "jsonb") TO "service_role";
+
+
+
 REVOKE ALL ON FUNCTION "public"."custom_access_token_hook"("event" "jsonb") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."custom_access_token_hook"("event" "jsonb") TO "service_role";
 GRANT ALL ON FUNCTION "public"."custom_access_token_hook"("event" "jsonb") TO "supabase_auth_admin";
@@ -9103,8 +9454,7 @@ GRANT ALL ON FUNCTION "public"."fts_search_products"("p_q" "text", "p_limit" int
 
 
 
-GRANT ALL ON FUNCTION "public"."generate_order_number"() TO "anon";
-GRANT ALL ON FUNCTION "public"."generate_order_number"() TO "authenticated";
+REVOKE ALL ON FUNCTION "public"."generate_order_number"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."generate_order_number"() TO "service_role";
 
 
@@ -9229,6 +9579,11 @@ GRANT ALL ON FUNCTION "public"."notify_order_paid"() TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "public"."notify_quote_published"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."notify_quote_published"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."notify_quote_request_created"() TO "anon";
 GRANT ALL ON FUNCTION "public"."notify_quote_request_created"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."notify_quote_request_created"() TO "service_role";
@@ -9260,6 +9615,11 @@ GRANT ALL ON FUNCTION "public"."product_costs_senkron"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."product_families_single_level_guard"() TO "anon";
 GRANT ALL ON FUNCTION "public"."product_families_single_level_guard"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."product_families_single_level_guard"() TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."quote_items_durum_kilidi"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."quote_items_durum_kilidi"() TO "service_role";
 
 
 
@@ -9311,6 +9671,11 @@ GRANT ALL ON FUNCTION "public"."set_user_role"("user_id" "uuid", "new_role" "tex
 GRANT ALL ON FUNCTION "public"."stamp_order_paid_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."stamp_order_paid_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."stamp_order_paid_at"() TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."stamp_quote_published"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."stamp_quote_published"() TO "service_role";
 
 
 
@@ -9678,6 +10043,10 @@ GRANT ALL ON TABLE "public"."purchase_orders" TO "service_role";
 GRANT ALL ON TABLE "public"."quote_email_events" TO "anon";
 GRANT ALL ON TABLE "public"."quote_email_events" TO "authenticated";
 GRANT ALL ON TABLE "public"."quote_email_events" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."quote_number_counters" TO "service_role";
 
 
 
