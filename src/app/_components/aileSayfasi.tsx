@@ -5,18 +5,10 @@ import { SITE_URL } from '@/config/siteUrl'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
-import {
-  getCachedFamilyDetail,
-  getCachedFamilySlugById,
-  getCachedProductBySlug,
-  getCachedSeriesLanding,
-  getCachedTakmaAd,
-  getCachedVariantById,
-  getFamilyDetailForRoute,
-  preloadFamily,
-} from '@/lib/data/preload'
+import { getCachedFamilyDetail, preloadFamily } from '@/lib/data/preload'
 import type { ProductRouteResolution } from '@/lib/data/productRoute'
 import { resolveProductRoute } from '@/lib/data/productRoute'
+import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
 import {
@@ -151,14 +143,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   const resolution: ProductRouteResolution =
     slug === 'generic'
       ? { kind: 'unavailable' }
-      : await resolveProductRoute(slug, lang, {
-          familyDetail: getFamilyDetailForRoute,
-          seriesLanding: getCachedSeriesLanding,
-          variantBySlug: getCachedProductBySlug,
-          familySlugById: getCachedFamilySlugById,
-          takmaAd: getCachedTakmaAd,
-          variantById: getCachedVariantById,
-        })
+      : await resolveProductRoute(slug, lang, urunRotasiBagimliliklari())
 
   // permanentRedirect / notFound birer istisna fırlatır — koşulsuz, en üstte çağrılır.
   if (resolution.kind === 'redirect') permanentRedirect(resolution.to as Route)
