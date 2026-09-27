@@ -23,9 +23,17 @@
  * arka planda konsol programı başlatan her kanca o pencereyi açar. Hem ayrık Node süreci hem
  * PowerShell çağrısı gizli başlatılır.
  *
- * ⭐EŞİKLİDİR (SAGE bloğu gibi): her şey yolundayken satır YOK. Konuştuğu üç hâl:
- *   · tek süreç ≥ 3 GB, · boş bellek < 2 GB, · önbellek 60 dakikadan eski (ölçüm düşüyor).
+ * ⭐EŞİKLİDİR (SAGE bloğu gibi): her şey yolundayken satır YOK. Konuştuğu dört hâl:
+ *   · tek süreç ≥ 3 GB, · boş bellek < 2 GB, · sanal bellek (commit) ≥ %85,
+ *   · önbellek 60 dakikadan eski (ölçüm düşüyor).
  * Windows dışında (CI) hiçbir şey yapmaz.
+ *
+ * ⭐ÖZEL BELLEK, working set DEĞİL (2026-09-27): tsserver 32060 karar 131 tavanıyla
+ * (--max-old-space-size=2048) koşarken working set 4,4 GB, ÖZEL bellek 15,7 GB idi ve dakikada
+ * ~120 MB büyüyordu — sızıntı V8 yığınının dışında, fazlası sıkıştırmaya/diske itilmişti. Satır
+ * working set'e baktığı için 15,7 GB'ı "4,4 GB" diye gösterdi ve makinenin sanal bellek sınırına
+ * (49,3/63,7 GB) yaklaştığını hiç söylemedi. Süreç sıralaması ve eşik artık özel belleğe,
+ * makine riski commit oranına bakar.
  */
 
 const fs = require('fs')
@@ -35,6 +43,7 @@ const { spawn, execFileSync } = require('child_process')
 const MB = 1024 * 1024
 const ESIK_SUREC_MB = Number(process.env.VENTHUB_BELLEK_SUREC_MB || 3072)
 const ESIK_BOS_MB = Number(process.env.VENTHUB_BELLEK_BOS_MB || 2048)
+const ESIK_COMMIT_ORAN = Number(process.env.VENTHUB_BELLEK_COMMIT_ORAN || 0.85)
 const TAZELE_DK = 10
 const BAYAT_DK = 60
 
@@ -79,7 +88,8 @@ function oluVar(ob, yasiyor = pidYasiyor) {
 /**
  * Önbellekten satır üretir; söyleyecek bir şey yoksa null. Büyük süreçlerden biri ölmüşse
  * satır SUSAR (önbellek bayat; kanca hemen yeniden ölçtürür).
- * @param {{ts:number,bosMb:number,surecler:Array<{pid:number,ad:string,mb:number,ipucu:string}>}|null} ob
+ * @param {{ts:number,bosMb:number,commitMb?:number,commitToplamMb?:number,surecler:Array<{pid:number,ad:string,mb:number,ipucu:string}>}|null} ob
+ *   `mb` = süreç ÖZEL belleği (working set değil); `commit*` = sanal bellek kullanımı/sınırı.
  * @param {number} simdi
  * @param {(pid:number)=>boolean} [yasiyor]
  */
@@ -90,12 +100,21 @@ function satir(ob, simdi, yasiyor = pidYasiyor) {
   if (oluVar(ob, yasiyor)) return null
   const buyukler = (ob.surecler || []).filter((s) => s.mb >= ESIK_SUREC_MB)
   const bosAz = typeof ob.bosMb === 'number' && ob.bosMb < ESIK_BOS_MB
-  if (!buyukler.length && !bosAz) return null
+  const commitYuksek =
+    typeof ob.commitMb === 'number' &&
+    typeof ob.commitToplamMb === 'number' &&
+    ob.commitToplamMb > 0 &&
+    ob.commitMb / ob.commitToplamMb >= ESIK_COMMIT_ORAN
+  if (!buyukler.length && !bosAz && !commitYuksek) return null
   const gb = (mb) => (mb / 1024).toFixed(1).replace('.', ',')
   const parca = ['bos ' + gb(ob.bosMb) + ' GB']
+  if (commitYuksek) {
+    const oran = Math.round((100 * ob.commitMb) / ob.commitToplamMb)
+    parca.push('SANAL BELLEK ' + gb(ob.commitMb) + '/' + gb(ob.commitToplamMb) + ' GB (%' + oran + ') — dolarsa pencereler duser')
+  }
   if (buyukler.length) {
     parca.push(
-      gb(ESIK_SUREC_MB) + ' GB ustu: ' + buyukler.map((s) => s.ad + ' ' + s.pid + ' ' + gb(s.mb) + ' GB' + (s.ipucu ? ' (' + s.ipucu + ')' : '')).join(', '),
+      gb(ESIK_SUREC_MB) + ' GB ustu (ozel bellek): ' + buyukler.map((s) => s.ad + ' ' + s.pid + ' ' + gb(s.mb) + ' GB' + (s.ipucu ? ' (' + s.ipucu + ')' : '')).join(', '),
     )
   }
   return '⚠BELLEK: ' + parca.join(' · ') + ' (' + yasDk + ' dk once olculdu)'
@@ -132,13 +151,13 @@ function gerekirseTazele(simdi) {
   }
 }
 
-/** Ölçüm: en büyük 8 süreç + boş bellek. Yalnız `--tazele` ile, arka planda koşar. */
+/** Ölçüm: özel belleği en büyük 8 süreç + boş bellek + sanal bellek (commit). Yalnız `--tazele` ile, arka planda koşar. */
 function tazele() {
   const ps =
     '$ErrorActionPreference="Stop";' +
     '$o=Get-CimInstance Win32_OperatingSystem;' +
-    '$p=Get-CimInstance Win32_Process | Sort-Object WorkingSetSize -Descending | Select-Object -First 8 ProcessId,Name,WorkingSetSize,CommandLine;' +
-    '@{bos=[int64]$o.FreePhysicalMemory*1024;p=@($p)} | ConvertTo-Json -Depth 3 -Compress'
+    '$p=Get-CimInstance Win32_Process | Sort-Object PrivatePageCount -Descending | Select-Object -First 8 ProcessId,Name,PrivatePageCount,CommandLine;' +
+    '@{bos=[int64]$o.FreePhysicalMemory*1024;cTop=[int64]$o.TotalVirtualMemorySize*1024;cBos=[int64]$o.FreeVirtualMemory*1024;p=@($p)} | ConvertTo-Json -Depth 3 -Compress'
   const cikti = execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', ps], {
     encoding: 'utf8',
     windowsHide: true,
@@ -148,10 +167,12 @@ function tazele() {
   const ob = {
     ts: Date.now(),
     bosMb: Math.round(Number(v.bos) / MB),
+    commitMb: Math.round((Number(v.cTop) - Number(v.cBos)) / MB),
+    commitToplamMb: Math.round(Number(v.cTop) / MB),
     surecler: (v.p || []).map((s) => ({
       pid: s.ProcessId,
       ad: String(s.Name || '').replace(/\.exe$/i, ''),
-      mb: Math.round(Number(s.WorkingSetSize) / MB),
+      mb: Math.round(Number(s.PrivatePageCount) / MB),
       ipucu: ipucu(s.CommandLine),
     })),
   }
@@ -172,4 +193,4 @@ if (require.main === module && process.argv.includes('--tazele')) {
   }
 }
 
-module.exports = { satir, ipucu, oku, oluVar, pidYasiyor, gerekirseTazele, ESIK_SUREC_MB, ESIK_BOS_MB }
+module.exports = { satir, ipucu, oku, oluVar, pidYasiyor, gerekirseTazele, tazele, ESIK_SUREC_MB, ESIK_BOS_MB, ESIK_COMMIT_ORAN }
