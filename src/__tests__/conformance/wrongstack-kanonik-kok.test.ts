@@ -53,7 +53,7 @@ describe('INV-WRONGSTACK-KANONIK-KOK-1', () => {
     const argv = sar.argvKur('node', [DIZIN_CLI, '--project-root', KOK, '--stdio'], KOK)
     expect(argv).not.toBeNull()
     expect(argv?.slice(2)).toEqual(['--project-root', kanonikKok(KOK), '--stdio'])
-    // sürücü harfi yalnız Windows'ta var (CI Linux: /home/runner/...)
+    // sürücü harfi yalnız Windows'ta var (CI Linux'ta yol eğik çizgiyle başlar)
     if (process.platform === 'win32') expect(argv?.[3]).toMatch(/^[a-z]:/)
     // ayırt edici çift: büyük harfli kök de AYNI kanoniğe iner
     const buyuk = KOK.replace(/^([a-z]):/, (_, h: string) => h.toUpperCase() + ':')
