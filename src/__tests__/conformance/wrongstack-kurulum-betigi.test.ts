@@ -23,6 +23,7 @@ interface Kurulum {
   siniflandir: (s: Surec[], kendiClaude: number | null, kendiPid?: number) => { kendi: Surec[]; yabanci: Surec[]; daemon: Surec[] }
   kendiClaudeBul: (s: Surec[], baslangic?: number) => number | null
   surumFarki: (deps: Record<string, string>, kurulu: (ad: string) => string | null) => string[]
+  temizle: (metin: string) => string
 }
 
 const BETIK = path.resolve(process.cwd(), 'tools', 'wrongstack-mcp', 'kurulum.cjs')
@@ -60,6 +61,12 @@ describe('INV-WRONGSTACK-KURULUM-1 · kurulum betiği', () => {
     const r = k.siniflandir(surecler, null, 12)
     expect(r.kendi).toEqual([])
     expect(r.yabanci.map((s) => s.pid).sort()).toEqual([13, 14, 21])
+  })
+
+  it('süreç listesindeki ham kontrol karakteri JSON çözümlemeyi düşürmez (09-27 iki kez düştü)', () => {
+    const ham = '[{"ProcessId":5,"ParentProcessId":1,"Name":"x.exe","CommandLine":"a\u0001b\u0007c"}]'
+    expect(() => JSON.parse(ham)).toThrow()
+    expect(JSON.parse(k.temizle(ham))).toEqual([{ ProcessId: 5, ParentProcessId: 1, Name: 'x.exe', CommandLine: 'a b c' }])
   })
 
   it('sürüm farkı: eşit → boş; farklı ya da kurulu değil → adıyla', () => {

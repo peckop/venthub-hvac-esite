@@ -76,6 +76,13 @@ function surumFarki(deps, kuruluSurum) {
   return fark
 }
 
+/** JSON metnindeki ham kontrol karakterlerini (kod < 32) boşluğa çevirir. */
+function temizle(metin) {
+  let s = ''
+  for (const h of metin) s += h.charCodeAt(0) < 32 ? ' ' : h
+  return s
+}
+
 function surecleriOku() {
   // PowerShell 5.1 ConvertTo-Json komut satırındaki kontrol karakterlerini kaçışlamaz; JSON.parse
   // "Bad control character" ile düşüyordu (2026-09-27 ölçüldü) → önce temizlenir.
@@ -88,7 +95,9 @@ function surecleriOku() {
     maxBuffer: 64 * 1024 * 1024,
   }).trim()
   if (!cikti) return []
-  const v = JSON.parse(cikti)
+  // PowerShell tarafındaki temizlik yetmedi (09-27 ikinci ölçüm: yine "Bad control character").
+  // -Compress çıktısında yapısal boşluk yok; ham kontrol karakteri yalnız dize içinde olabilir → boşluğa.
+  const v = JSON.parse(temizle(cikti))
   return (Array.isArray(v) ? v : [v]).map((x) => ({
     pid: x.ProcessId,
     ppid: x.ParentProcessId,
@@ -173,7 +182,7 @@ function kur() {
   }
 }
 
-module.exports = { siniflandir, kendiClaudeBul, surumFarki, surecleriOku }
+module.exports = { siniflandir, kendiClaudeBul, surumFarki, surecleriOku, temizle }
 
 if (require.main === module) {
   try {
