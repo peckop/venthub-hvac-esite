@@ -64,7 +64,7 @@
 | Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (TASLAK, karar 59) |
 | Belgeler **nasıl yazılır** (gövde/tarihçe, sahip), hangi bilgi **hangi katmanda** durur, belge bayatlığı **nasıl görünür**, doğru belge **ne zaman kendiliğinden gelir**? | `standards/belge-yonetimi-standard.md` (TASLAK, REC-400) |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
-| Kapsamlı uçtan uca referans (mimari, DB, akışlar; kuralların 31 maddelik gerekçeli listesi §14) | `../CONTEXT.md` (NLM üretir, elle yeniden yazılmaz) · ⚠2026-08-17'den beri güncellenmedi — tazeliği durum satırında; rolü REC-400 D5'te Recep kararı |
+| Kapsamlı uçtan uca referans (mimari, DB, akışlar; kuralların 31 maddelik gerekçeli listesi §14) | `../CONTEXT.md` (NLM üretir, elle yeniden yazılmaz; kural/niçin sorusunda NotebookLM ikizine alternatif) · ⚠2026-08-17'den beri güncellenmedi — bu yüzden artık "ilk bakılacak yer" DEĞİL (ilk bakılacak yer bu harita); tazeliği durum satırında; rolü REC-400 D5'te Recep kararı |
 | DI ve güvenlik milestone kayıtları, arayüz kontratları | `../PROJECT.md` |
 | Durum ve değişiklik geçmişi | `../RECOMMENDATIONS.md` · `../CHANGELOG.md` |
 

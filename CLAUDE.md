@@ -58,7 +58,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
-   **İş emri de aynı kurala tabidir (2026-08-20):** registry'de açılan her görevin
+   **İş emri de aynı kurala tabidir (2026-08-20):** Linear'da açılan her görevin
    açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
    karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
    Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
@@ -104,7 +104,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 - **"Katalog PDF'inde ne yazıyor"** → **KAYNAK DİZİNİ**, PDF'i AÇMA: `<ingestor>/kaynak-dizini/sayfalar.jsonl`
   (`<ingestor>` = kardeş depo `venthub-pdf-ingestor`). Dizinde yoksa önce dizine eklenir
   (`<ingestor>/scripts/kaynak_dizini/cikar.py`); cetvel `docs/standards/catalog-ingestion-standard.md` §6.3.
-- **Kural / niçin / mimari karar** → NotebookLM dijital ikiz (`chat_ask`, ID `235043eb-970f-4a52-9f39-1d02b2621e9c`).
+- **Kural / niçin / mimari karar / SaaS plan** → NotebookLM dijital ikiz (`chat_ask`, ID `235043eb-970f-4a52-9f39-1d02b2621e9c`).
   NLM auth bozulursa `notebooklm login`'i kendin koş; `auth check` kanıt değil, `notebooklm list` ile ölç.
 - **Çalışma düzeni:** çok oturumda şerit sahipliği + **worktree izolasyonu**, bir-iş-bir-dal
   (`docs/standards/collaboration-protocol.md`); iş emrinde `YÖNTEM:` satırı — yöntemsiz emir eksik emirdir
@@ -126,7 +126,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
   `pnpm install --frozen-lockfile --offline` (kilit dosyası değişmemeli). Ana depoya **junction/symlink ile
   paylaşım YASAK.** Eski bağlantı varsa önce YALNIZ bağlantı kaldırılır (`cmd //c "rmdir <yol>"`, `/s` YOK),
   ana deponun `.bin`'i doğrulanır. Özyinelemeli silmeyi `silme-baglanti-kapisi` kancası durdurur.
-- **Git kancaları:** `pre-commit` **bloklamaz** (uyarı-only, companion var mı bakar); companion üretimi
+- **Git kancaları:** `pre-commit` **bloklamaz** (hızlı, çevrimdışı, uyarı-only; companion var mı bakar, LLM skoruna değil); companion üretimi
   `post-commit`te arka planda (log: `.git/orion-doc.log`).
 
 ## graphify
