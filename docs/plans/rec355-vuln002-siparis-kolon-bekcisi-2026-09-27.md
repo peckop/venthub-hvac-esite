@@ -115,7 +115,11 @@ düşürmek ayrı karar, bekçi zaten reddeder).
 (meşru özellik: `AccountReturnsPage.tsx:131-137` yalnız `order_id, user_id, reason, description` gönderir).
 Ama satırın yönetici alanları da serbest: müşteri `status='approved'`, `refund_amount`, `admin_notes`,
 `approved_at/processed_at/completed_at` yazarak iadeyi "onaylanmış" açabilir. UPDATE politikası zaten
-yalnız admin. Admin iade açma yolu: `orderStatusService.ts:307` (admin claim).
+yalnız admin. Admin iade yolları: `orderStatusService.ts:307/315` (açma), `ReturnsTableBody.tsx:286/397`
+(güncelleme) — ikisi de admin claim; `returns-webhook:108` service key; canlıda iadeye yazan DB fonksiyonu 0.
+**İkinci çürütme (v3) KOŞULLU → K1 (işaret önek eşleşmesi, işaretsiz hata yeniden fırlar), K2 (INV kolon
+evreni = taban `"public".` bloğu ∪ sonraki `add column`'lar), K3 (geri alma üç tablo; INV (d) `on all
+tables in schema public to anon` desenini de yakalar) uygulamada işlendi; yeniden çürütme gerekmiyor.**
 → **Onarım:** ayrı fonksiyon `public.iade_istemci_kayit_bekcisi()` (INVOKER, aynı izin listesi) +
 tetik `iade_istemci_kayit_bekcisi` `before insert or update on public.venthub_returns`:
 - ayrıcalıksız istemci **INSERT**: `status <> 'requested'` ya da `refund_amount`, `admin_notes`,
