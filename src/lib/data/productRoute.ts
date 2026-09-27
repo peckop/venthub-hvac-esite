@@ -25,7 +25,11 @@ import { localizedHref, Routes } from '@/utils/routes'
 export type ProductRouteResolution =
   | { kind: 'family'; detail: FamilyDetail }
   | { kind: 'series'; landing: SeriesLanding }
-  | { kind: 'redirect'; to: string }
+  /**
+   * `to` = bugünkü şemadaki hedef (aile adresi, gerekirse `?sku=`). `hedef` = aynı hedefin KİMLİĞİ;
+   * K3-b eski TR adresi (REC-300 Faz 3b-2) yeni adresi `adresUret`'le buradan kurar — `to`'yu ayrıştırmaz.
+   */
+  | { kind: 'redirect'; to: string; hedef: { aileSlug: string; sku: string | null } }
   | { kind: 'not-found' }
   | { kind: 'unavailable' }
 
@@ -68,7 +72,11 @@ export async function resolveProductRoute(
         // Dil öneki ELLE kurulmaz — SSOT `localizedHref` (INV-2 · localized-route-ssot).
         // Elle birleştirme, tr/en dallarından biri unutulduğunda linki sessizce kıran sınıf.
         const base = localizedHref(Routes.product(familySlug), lang)
-        return { kind: 'redirect', to: `${base}?sku=${encodeURIComponent(variant.sku)}` }
+        return {
+          kind: 'redirect',
+          to: `${base}?sku=${encodeURIComponent(variant.sku)}`,
+          hedef: { aileSlug: familySlug, sku: variant.sku },
+        }
       }
     }
 
@@ -81,7 +89,11 @@ export async function resolveProductRoute(
         const familySlug = await deps.familySlugById(hedef.family_id)
         if (familySlug && familySlug !== slug) {
           const base = localizedHref(Routes.product(familySlug), lang)
-          return { kind: 'redirect', to: `${base}?sku=${encodeURIComponent(hedef.sku)}` }
+          return {
+            kind: 'redirect',
+            to: `${base}?sku=${encodeURIComponent(hedef.sku)}`,
+            hedef: { aileSlug: familySlug, sku: hedef.sku },
+          }
         }
       }
     }
@@ -89,7 +101,11 @@ export async function resolveProductRoute(
     if (aileId) {
       const familySlug = await deps.familySlugById(aileId)
       if (familySlug && familySlug !== slug) {
-        return { kind: 'redirect', to: localizedHref(Routes.product(familySlug), lang) }
+        return {
+          kind: 'redirect',
+          to: localizedHref(Routes.product(familySlug), lang),
+          hedef: { aileSlug: familySlug, sku: null },
+        }
       }
     }
 

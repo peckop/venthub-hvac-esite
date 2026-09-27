@@ -29,7 +29,9 @@ import { describe, expect, it } from 'vitest'
 const KOK = path.join(process.cwd(), 'src')
 const ROTA = path.join(KOK, 'app', '[lang]', 'category', '[categorySlug]', 'page.tsx')
 
-const kaynak = (): string => fs.readFileSync(ROTA, 'utf8')
+// REC-300 Faz 3b-2: gövde ortak çekirdeğe taşındı; kural rota + çekirdek BİRLEŞİMİNDE ölçülür
+const CEKIRDEK = path.join(KOK, 'app', '_components', 'kategoriSayfasi.tsx')
+const kaynak = (): string => fs.readFileSync(ROTA, 'utf8') + '\n' + fs.readFileSync(CEKIRDEK, 'utf8')
 
 /**
  * ⭐AST — VE NİÇİN AST OLDUĞU, İLK KOŞUMDA ÖLÇÜLEREK ÖĞRENİLDİ.

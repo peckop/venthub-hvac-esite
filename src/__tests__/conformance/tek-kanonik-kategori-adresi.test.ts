@@ -132,7 +132,11 @@ describe('INV-TEK-ADRES-1 — kategori adresi tekilliği', () => {
       'iki seviyeli rota yeniden içerik üretiyor (PageComponent) — kanonik ikiye böl��nür',
     ).not.toContain('PageComponent')
     expect(kaynak).not.toContain('generateStaticParams')
-    expect(kaynak).not.toContain('generateMetadata')
+    // REC-300 Faz 3b-2: bayrak AÇIKKEN EN iki seviyeli adres kanonik olur ve metadata üretir;
+    // bayrak KAPALIYKEN metadata boş kalmalı (kanonik ikiye bölünmez).
+    expect(kaynak, 'iki seviyeli rota bayrak kapalıyken metadata üretiyor').toMatch(
+      /if\s*\(\s*!ADRES_SEMASI_K3B\s*\)\s*return\s*\{\s*\}/,
+    )
   })
 
   it('K4 · özel yüzeyler (giriş/hesap/sepet) dizine girmez, ama bağlantıları izlenir', () => {
