@@ -52,8 +52,8 @@ supabase/
 ├── functions/   # Edge Functions (Deno/TS) · migrations/ # PostgreSQL migration'ları
 ```
 
-Karar: Rota mı → `app/` · Sayfa görünümü mü → `views/` · Tekrar kullanılır UI mı →
-`components/` · Veri/servis mi → `lib/services/` (DI) · Hook mu → `hooks/` ·
+Karar: Rota mı → `src/app/` · Sayfa görünümü mü → `src/views/` · Tekrar kullanılır UI mı →
+`src/components/` · Veri/servis mi → `src/lib/services/` (DI) · Hook mu → `src/hooks/` ·
 DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql` — damga **14 hane**;
 8 haneli `YYYYMMDD_` biçimi INV-MIGRATION-2 kapısında KIRMIZI verir, 2026-08-31'de sahada ölçüldü).
 
@@ -62,7 +62,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
-   **İş emri de aynı kurala tabidir (2026-08-20):** registry'de açılan her görevin
+   **İş emri de aynı kurala tabidir (2026-08-20):** Linear'da açılan her görevin
    açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
    karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
    Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
@@ -71,7 +71,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
    "hatırlanan" değil "emre yazılan" şey olmalı.)
    (Niçin: 2026-08-15'te 1044 fiyat satırı prod'a yazıldı ve vitrin değişmedi; sebebi render/önbellek
    cetvelinin hiç yazılmamış olmasıydı — hata tam o boşlukta yaşadı ve hiçbir kapı görmedi.)
-2. **Dependency Injection:** Tüm `lib/services/*` fonksiyonları ilk parametre olarak
+2. **Dependency Injection:** Tüm `src/lib/services/*` fonksiyonları ilk parametre olarak
    `supabase: SupabaseClient<Database>` alır. Modül düzeyinde statik client importu yok.
    (ESLint `no-restricted-imports` + AST testi zorlar.)
 3. **Tip güvenliği:** `any` yasak, strict TypeScript.
@@ -122,7 +122,7 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
 
 ## Doküman Haritası
 
-- `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
+- `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). ⚠2026-08-17'den beri güncellenmedi — **ilk bakılacak yer `docs/README.md`** (tek giriş haritası); tazeliği her mesajdaki `BELGE` satırında.
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
 - `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
 - `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
@@ -134,9 +134,9 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
 - **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)
   + `docs/standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`.
-  Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). **KATALOG PDF'İNDE NE YAZDIĞI
+  Veri deposu: kardeş depo `venthub-pdf-ingestor` (aşağıda `<ingestor>`; CSV'ler). **KATALOG PDF'İNDE NE YAZDIĞI
   sorusu → önce KAYNAK DİZİNİ:** `<ingestor>/kaynak-dizini/sayfalar.jsonl` (+ `manifest.json`);
-  **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`scripts/kaynak_dizini/cikar.py`,
+  **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`<ingestor>/scripts/kaynak_dizini/cikar.py`,
   tazelik kapısı `tazelik.py`). Cetvel: `catalog-ingestion-standard.md` §6.3.
   NLM auth bozulursa → memory `nlm-auth-issue`
   (**2026-08-17 ürün değişti:** paket `notebooklm-py`, CLI `notebooklm`, MCP sunucusu `notebooklm-py`;
@@ -150,7 +150,7 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
   ~1sn taze, kesin). grep'ten önce buna bak.
 - **"Katalog PDF'inde ne yazıyor" sorusu** → **KAYNAK DİZİNİ**, PDF'i AÇMA:
   `<venthub-pdf-ingestor>/kaynak-dizini/sayfalar.jsonl` (sayfa metni + tablo hücreleri, hash'li,
-  deterministik). Dizinde yoksa **önce dizine eklenir** (`scripts/kaynak_dizini/cikar.py`);
+  deterministik). Dizinde yoksa **önce dizine eklenir** (`<ingestor>/scripts/kaynak_dizini/cikar.py`);
   tazelik `tazelik.py` ile ölçülür. Cetvel: `catalog-ingestion-standard.md` §6.3.
   *(Niçin kural: PDF'i doğrudan tarayan her iş, aynı kataloğu üçüncü kez okur — patinajın sebebi buydu.)*
 - **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
