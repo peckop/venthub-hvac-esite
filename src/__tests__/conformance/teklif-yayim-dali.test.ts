@@ -21,13 +21,13 @@ import {
 } from '../../../supabase/functions/quote-notification-webhook/ic_bildirim'
 import {
   belgeNumarasi,
-  kacir as yayimKacir,
-  temizle as yayimTemizle,
   type DefterSatiri,
+  kacir as yayimKacir,
   kararVer409,
   olayCoz,
   portalLinki,
   type ResendYaniti,
+  temizle as yayimTemizle,
   YANIT_METNI,
   yayimAnahtari,
   yayimDaliniIsle,
