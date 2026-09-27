@@ -80,8 +80,9 @@ describe('INV-WRONGSTACK-KANBAN-YAMA-1 · kanban yazma dönüşü özetlenir', (
 
   /** Ayırt edici çift: aynı büyük pano, yazma eyleminde KÜÇÜLÜR, okuma eyleminde AYNI kalır. */
   it.skipIf(!KURULU)('kesici yazmada panoyu özetler (≤ 3 KB), get_board çıktısını değiştirmez', async () => {
-    const modul = pathToFileURL(path.join(ARAC, 'node_modules', '@wrongstack', 'tools', 'dist', 'kanban.js')).href
-    const { kanbanTool } = (await import(modul)) as { kanbanTool: KanbanArac }
+    const { kanbanTool } = (await import(
+      pathToFileURL(path.join(ARAC, 'node_modules', '@wrongstack', 'tools', 'dist', 'kanban.js')).href
+    )) as { kanbanTool: KanbanArac }
     const columns = ['backlog', 'todo', 'in-progress', 'review', 'done'].map((id) => ({ id, title: id }))
     const tasks: Gorev[] = Array.from({ length: 60 }, (_, i) => ({
       id: `t${i}`,

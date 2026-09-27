@@ -186,7 +186,6 @@ madde 1 gereği araç sayılmaz.
 | `scripts/board/mechanism-setup.cjs` | Mekanik otonomi kurulumu/doğrulaması (T115-VH) | ALTYAPI | ⛔ÇAĞIRAN YOK — kanca atıfları REC-328 ile kaldırıldı | 2026-09-14 (son koşum; emeklilik günü) | `INV-MECH-1` (artık TERSİNİ zorlar: kanca bu betiğe yollamaz) | **EMEKLİ** — Recep 2026-09-14 (REC-328) |
 | `scripts/board/registry-autosync.cjs` | Registry oto-senkronu (oturum açılışı, arka plan) | ALTYAPI | `.claude/hooks/session-board.cjs` | 2026-08-15 | yok | KAL |
 | `scripts/board/kartsiz-kayit.cjs` | Linear'da `started` olup panoda AÇIK kartı olmayan kayıtları sayar; tek satır (pilot 09-18 sonrası + eski started ayrı). BLOKLAMAZ, ölçemezse OLCULEMEDI (karar 144) | ARAC | ELLE / gün açılış-kapanış raporu (OPS bağlar); pano SQLite'ı `node:sqlite` salt okuma, Linear tek GraphQL (5 sn) | canlı 2026-09-27: 20/25 pilot, 40/42 eski, 0,66 sn | INV-KARTSIZ-KAYIT-1 | KAL |
-| `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.19-ozet-donus.patch` | kanban-mcp yazma dönüşünü aracın kendi özet kesicisinden geçirir (REC-391 K1): 48.585 → 1.637 bayt, get_board değişmez. `npm ci` sonrası `git apply` ile (README) | ARAC | `.mcp.json` wrongstack-kanban sunucusu (yamalı dosyayı yükler) | yerel 2026-09-27: geri alınca kapı KIRMIZI, uygulanınca yeşil | INV-WRONGSTACK-KANBAN-YAMA-1 | KAL (yukarı akış düzeltince SİL) |
 | `scripts/board/registry-sync.cjs` | Orion registry senkronu — kalıcı iş durumu | ALTYAPI | `.githooks/post-merge`, `docs/standards/multi-session-coordination-standard.md` | 2026-08-15 | yok | KAL |
 | `scripts/ci/apt-hardening.sh` | Koşucuda apt'yi sınırlı sürede başarısız olmaya zorlar | ALTYAPI | `.github/workflows/e2e-smoke.yml` | 2026-08-19 | yok | KAL |
 | `scripts/ci/retry-bounded.sh` | Bir komutu zaman sınırıyla çalıştırır, düşerse tekrar dener | ALTYAPI | `.github/workflows/e2e-smoke.yml` | 2026-08-19 | yok | KAL |
@@ -709,6 +708,12 @@ gerektirmez).
   Sarmalayıcı kökü de **kanonikleştirir** (ana ağaç + küçük sürücü harfi): `C:`/worktree ile açılan
   süreç ayrı bir kutuya (`…-1088d5`) düşüyordu, ölçüldü.
   Açılış sayacı: `scripts/hijyen/posta-kutusu-sayac.cjs` (betik tablosunda satırı var).
+  **Kanban yaması (2026-09-27, karar 144, REC-391 K1) — sahip ARAC, durum KAL (yukarı akış
+  düzeltince SİL):** `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.19-ozet-donus.patch`. Betik
+  değil, kurulum parçası → tabloda değil burada. kanban-mcp yazma dönüşünü aracın kendi özet
+  kesicisinden geçirir: 48.585 → 1.637 bayt, get_board değişmez. `npm ci` sonrası README'deki
+  `git apply` döngüsüyle uygulanır; yamalı dosyayı `.mcp.json` wrongstack-kanban sunucusu yükler.
+  Kapı `INV-WRONGSTACK-KANBAN-YAMA-1` (yerel 2026-09-27: geri alınca KIRMIZI, uygulanınca yeşil).
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
