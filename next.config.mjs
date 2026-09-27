@@ -4,6 +4,7 @@ import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from "@sentry/nextjs";
 
 import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
+import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.mjs';
 
 /**
  * `EN_YAYIN` bayrağının TEK kaynağı `src/config/features.ts`. Bu dosya TypeScript içe aktaramadığı
@@ -11,6 +12,8 @@ import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerke
  * Test aynı okuyucunun `features.ts`'teki gerçek değeri verdiğini ölçer (INV-BILGI-MERKEZI-YONLENDIRME-1).
  */
 const EN_YAYIN = enYayinOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
+/** `ADRES_SEMASI_K3B` — aynı gerekçe; okuyucu `k3bOku` (INV-MARKA-KAYNAK-1 gerçek değeri ölçer). */
+const ADRES_SEMASI_K3B = k3bOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -178,6 +181,12 @@ const nextConfig = {
             // (EN yalnız `EN_YAYIN` açıkken; kapalıyken EN kategori/destek karşılığı). Liste ve
             // gerekçe tek dosyada: src/config/bilgiMerkeziYonlendirmeleri.mjs. Hepsi tek hop.
             ...bilgiMerkeziYonlendirmeleri(EN_YAYIN),
+
+            // ── REC-374 (2026-09-27) — marka listesi DB ile hizalandı; listeden çıkan üç slug
+            // (`frekans-konvertoru` → frekans konvertörleri kategorisi; `flexiva`, `casals` → marka
+            // listesi). K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
+            // src/config/markaYonlendirmeleri.mjs · kapı INV-MARKA-KAYNAK-1. Hepsi tek hop.
+            ...markaYonlendirmeleri(ADRES_SEMASI_K3B),
         ];
     },
     async headers() {

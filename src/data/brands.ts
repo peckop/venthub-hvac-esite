@@ -8,6 +8,20 @@
  * Neden sözlüğe taşınmadı: bunlar arayüz etiketi değil, marka kayıtları — DB'deki
  * çevirilerin `metadata->>lang` ile veri yanında taşınması gibi (CLAUDE.md kural 7),
  * çeviri de kaydın yanında durur. Sözlük yalnız ETİKETİ tutar ("Menşei", "Kuruluş").
+ *
+ * REC-374 (2026-09-27): LİSTE = DB'de AKTİF ÜRÜNÜ OLAN MARKALAR. Ürünsüz marka yayınlanmaz —
+ * sayfası "Bu markanın ürünleri henüz katalogda değil" diyen bir marka vitrinde kusurdur.
+ * Ölçüm (canlı DB, `brands` × `products.status='active'`): vortice 184, avens 106, seat 81,
+ * danfoss 35, nicotra-gebhardt 35. Bu yüzden:
+ *  · `casals` ÇIKTI (DB'de ürünü 0) — Casals ürünleri DB'ye girince (REC-374 1-B) GERİ EKLENİR;
+ *    eski kaydın metni git geçmişinde (bu dosyanın REC-374 öncesi hâli).
+ *  · `flexiva` ÇIKTI (DB'de marka olarak hiç yok).
+ *  · `frekans-konvertoru` ÇIKTI (marka değil, ürün türü — Danfoss'un frekans konvertörleri).
+ *  · `seat` ve `danfoss` EKLENDİ (DB'de ürünü var, listede yoktu).
+ * Eski üç adres 308 ile yönlenir: src/config/markaYonlendirmeleri.mjs.
+ * Kapı: INV-MARKA-KAYNAK-1 (src/data/__tests__/markaKaynagi.test.ts) — listeyi DB fikstürüne bağlar.
+ * Yeni markanın metni üreticinin RESMÎ sitesinden alınır; kaynak URL kaydın üstünde yazılır,
+ * doğrulanamayan alan (founded/headquarters) YAZILMAZ.
  */
 
 /** Dile göre çözülen metin. İki dil de ZORUNLU — eksik dil sessizce Türkçe göstermesin. */
@@ -63,17 +77,39 @@ export const HVAC_BRANDS: HVACBrand[] = [
     specialty: { tr: 'Endüstriyel Klima Santralleri', en: 'Industrial Air Handling Units' }
   },
   {
-    name: 'Casals',
-    slug: 'casals',
+    // KAYNAK (2026-09-27): https://www.seat-ventilation.com/ (merkez adresi Verniolle, "Made in
+    // France", korozif gaz ve hava tahliyesi, uygulama alanları) ·
+    // https://www.seat-ventilation.com/pages/seat-ventilation-history (1968 kuruluş, Montfermeil;
+    // 1988'de PP santrifüj "SEAT Series"). DB'deki marka adı "SEAT"; aile sorgusu `ilike` ile eşler.
+    name: 'SEAT',
+    slug: 'seat',
     description: {
-      tr: '140 yılı aşkın endüstriyel fan üretim tecrübesi. En zorlu koşullarda bile çalışan yüksek performanslı havalandırma fanları ve yangın dayanımlı çözümler.',
-      en: 'Over 140 years of industrial fan manufacturing. High-performance ventilation fans and fire-rated solutions built for the harshest conditions.'
+      tr: '1968\'den bu yana Fransa\'da üretim yapan, korozif gaz ve hava tahliyesinde uzman fan üreticisi. Polipropilen (PP) santrifüj fanlarıyla laboratuvar, kimya ve ilaç sanayi, yüzme havuzu, atık su arıtma ve ATEX ortamlarında operatör ve personel güvenliğini koruyan uzun ömürlü çözümler sunar.',
+      en: 'A French fan manufacturer specialising in the extraction of corrosive gases and air since 1968. Its polypropylene (PP) centrifugal fans provide long-lasting extraction for laboratories, the chemical and pharmaceutical industries, swimming pools, wastewater treatment and ATEX environments, keeping operators and personnel safe.'
     },
-    country: { tr: 'İspanya', en: 'Spain' },
-    founded: 1881,
-    headquarters: { tr: 'Girona', en: 'Girona' },
-    website: 'https://www.casals.com',
-    specialty: { tr: 'Endüstriyel Fan Mühendisliği', en: 'Industrial Fan Engineering' }
+    country: { tr: 'Fransa', en: 'France' },
+    founded: 1968,
+    headquarters: { tr: 'Verniolle', en: 'Verniolle' },
+    website: 'https://www.seat-ventilation.com',
+    specialty: { tr: 'Korozyona Dayanıklı PP Fanlar', en: 'Corrosion-Resistant PP Fans' }
+  },
+  {
+    // KAYNAK (2026-09-27): https://www.danfoss.com/en/about-danfoss/company/history/ (1933, Mads
+    // Clausen, Nordborg; merkez hâlâ Nordborg'da) · https://www.danfoss.com/en/about-danfoss/our-businesses/drives/
+    // ("Pioneers of VFDs since 1968", enerji tüketiminde %80'e varan azaltım) ·
+    // https://www.danfoss.com/en/about-danfoss/ ("family-owned company").
+    // Katalogdaki Danfoss ürünleri frekans konvertörleridir (FC 51 / FC 101 / FC 102).
+    name: 'Danfoss',
+    slug: 'danfoss',
+    description: {
+      tr: '1933\'te Danimarka\'da kurulan bir aile şirketi. Danfoss Drives 1968\'den bu yana frekans konvertörlerinin (değişken frekanslı sürücüler) öncüsüdür; motor hızını ihtiyaca göre ayarlayarak enerji tüketimini %80\'e varan oranda azaltır.',
+      en: 'A family-owned company founded in Denmark in 1933. Danfoss Drives has pioneered variable-frequency drives since 1968, matching motor speed to demand to reduce energy consumption by up to 80%.'
+    },
+    country: { tr: 'Danimarka', en: 'Denmark' },
+    founded: 1933,
+    headquarters: { tr: 'Nordborg', en: 'Nordborg' },
+    website: 'https://www.danfoss.com',
+    specialty: { tr: 'Frekans Konvertörleri', en: 'Variable-Frequency Drives' }
   },
   {
     name: 'Nicotra Gebhardt',
@@ -87,30 +123,5 @@ export const HVAC_BRANDS: HVACBrand[] = [
     headquarters: { tr: 'Waldenburg', en: 'Waldenburg' },
     website: 'https://www.nicotra-gebhardt.com',
     specialty: { tr: 'Yüksek Verimli Santrifüj Fanlar', en: 'High-Efficiency Centrifugal Fans' }
-  },
-  {
-    name: 'Flexiva',
-    slug: 'flexiva',
-    description: {
-      tr: 'Esnek hava kanalı teknolojilerinde Türkiye\'nin global markası. Patentli sızdırmazlık teknolojileri ve kolay montaj avantajıyla havalandırma projelerinin vazgeçilmezi.',
-      en: 'Türkiye\'s global brand in flexible air duct technology. Patented sealing systems and fast installation make it a staple of ventilation projects.'
-    },
-    country: { tr: 'Türkiye', en: 'Türkiye' },
-    founded: 2000,
-    headquarters: { tr: 'İstanbul', en: 'Istanbul' },
-    website: 'https://www.flexiva.com.tr',
-    specialty: { tr: 'Esnek Hava Kanalları', en: 'Flexible Air Ducts' }
-  },
-  {
-    // NOT (REC-98 ölçümü): bu bir MARKA değil, ürün tipi — katalog verisinde kirlilik.
-    // Kapsam dışı bırakıldı, temizliği ayrı iş; burada yalnız iki dilli hale getirildi.
-    name: 'Frekans Konvertörü',
-    slug: 'frekans-konvertoru',
-    description: {
-      tr: 'Yüksek verimli hız kontrolü',
-      en: 'High-efficiency speed control'
-    },
-    country: { tr: 'Danimarka', en: 'Denmark' },
-    specialty: { tr: 'Hız Kontrol Cihazları', en: 'Speed Control Devices' }
   }
 ]
