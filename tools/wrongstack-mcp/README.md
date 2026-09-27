@@ -38,8 +38,15 @@ siler; bu yüzden ikinci satır atlanmaz. Yama uygulandıktan sonra MCP sunucusu
 Arka plan süreçleri (`project-server.js`) pencere kapanınca da ayakta kalır ve paket dosyalarını
 açık tutar. Paketin içinde Windows için derlenmiş modül var; süreçler açıkken `npm ci` dosyaları
 değiştiremeyebilir, değiştirse bile eski kod bellekte koşar (09-27: makinede 30 WrongStack süreci).
-Sıra: bütün Claude pencerelerini kapat → aşağıdaki "Kalıcı servis" maddesindeki komutla
-daemon'ları durdur → yukarıdaki üç satırlık kurulum → pencereleri aç.
+**Tek komut (OPS kararı 09-27):** `node tools/wrongstack-mcp/kurulum.cjs`. Açılış sırası:
+1. Bütün Claude pencereleri kapalı.
+2. YALNIZ ARAÇ penceresi açılır ve betiği koşar. Betik kendi penceresinin WrongStack sunucularını
+   ve daemon'ları durdurur, `npm ci --ignore-scripts` koşar, yamaları uygular, doğrular.
+   Başka pencereye ait sunucu görürse hiçbir şeye dokunmadan `HATA` der.
+3. Son satır `HAZIR` → ARAÇ penceresi `/mcp` ile WrongStack sunucularını yeniden bağlar.
+4. Öteki pencereler açılır.
+`--denetle` yalnız doğrular (sürümler, yamalar, `.mcp.json` giriş dosyaları), hiçbir şey değiştirmez.
+Kapı: `INV-WRONGSTACK-KURULUM-1` (başka pencere varken hiçbir süreç kapatılmaz).
 
 1.0.19 → 1.0.26 ölçümü (2026-09-27): dört sunucu el sıkıştı. kanban 2 araç (1.0.26 istemci eski
 1.0.19 daemon'una bağlanıp okudu), codebase-index 6, sage 15 (sage.db **kopyasında** arama),

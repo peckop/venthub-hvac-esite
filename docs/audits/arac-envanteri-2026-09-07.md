@@ -717,6 +717,10 @@ gerektirmez).
   dosya (`dist/cli.js` + `dist/index.js`): `.mcp.json` cli.js'i çalıştırır; ilk yama (#1437) yalnız
   index.js'e dokunduğu için canlıda etkisizdi. `npm ci` sonrası README'deki `git apply` döngüsüyle
   uygulanır. Kapı `INV-WRONGSTACK-KANBAN-YAMA-1` hedefi `.mcp.json`'dan okur (geri alınca KIRMIZI).
+  **Kurulum betiği (2026-09-27, REC-401 B0b) — sahip ARAC, durum KAL:** `tools/wrongstack-mcp/kurulum.cjs`.
+  Sürüm yükseltmesini tek komutla yapar (kendi penceresinin sunucuları + daemon durdur → npm ci →
+  yama → doğrula, son satır HAZIR/HATA). Başka pencereye ait sunucu varsa hiçbir şeyi kapatmaz.
+  `--denetle` salt okuma. Kapı `INV-WRONGSTACK-KURULUM-1`. Canlı kurulum yalnız toplu açılışta.
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
