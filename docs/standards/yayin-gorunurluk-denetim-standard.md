@@ -21,7 +21,7 @@
 | Search Console tabanı | tık, gösterim, sıra; sayfa×gün | `scripts/rehber/gsc-taban.mjs` | çıktı depoya girmez (pazar-olcum P6) |
 | Adres denetimi | eski adres → aynı ya da **tek** 308 → 200; haritada yönlendirme 0; model sayısı; canonical kendini gösterir; hreflang tr/en/x-default | `scripts/seo/adres-yayin-denetim.mjs` | TAM liste, örneklem değil; yönlendirme izlenmez |
 | Bağlantı taraması | site haritasındaki sayfalardaki site içi bağlantı + ürün görseli: kırık, yönlendirme | `scripts/seo/link-tara.mjs` (linkinator 8.1.0) | `--sitemap-url` + CSV (8.1.0'da JSON raporu site haritası kipinde boş — ölçüldü) |
-| Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | **PageSpeed Insights API v5** (Google sunucusunda Lighthouse, mobil; anahtar `PAGESPEED_API_KEY`, karar 127) — `scripts/seo/sayfa-kalite.mjs` PSI kipi yazılana kadar depo dışı betikle | örnekleme kapalı; ölçüt SEO; performans bilgi (REC-398). Yerel unlighthouse 0.18.1 **yedek**: 2026-09-25'te makinede boş bellek ~1 GB iken üç koşuda "Unable to get browser page" ile düştü (59→24→3 sayfa) |
+| Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | **PageSpeed Insights API v5** (Google sunucusunda Lighthouse, mobil; anahtar `PAGESPEED_API_KEY`, karar 127) — `scripts/seo/sayfa-kalite.mjs` (varsayılan `--kip psi`, `--strateji mobile|desktop`; geçici hata 3 deneme; anahtar hiçbir çıktıya yazılmaz) | örnekleme kapalı; ölçüt SEO; performans bilgi (REC-398). Yerel unlighthouse 0.18.1 **yedek**: 2026-09-25'te makinede boş bellek ~1 GB iken üç koşuda "Unable to get browser page" ile düştü (59→24→3 sayfa) |
 | Bot kalitesi karnesi | 5 bot kimliği × adres: aynı HTML, title, canonical, hreflang, JSON-LD | `scripts/seo/bot-karnesi.mjs --taban` | ön izleme sitesinde de koşar |
 
 Araçlar **kurulmaz**: sürüm sabitli `npx` ile koşar, `package.json`'a dokunulmaz (kalıcı kurulum kararı
@@ -67,7 +67,9 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 
 **Bilinçli istisna (2026-09-25, URUN):** yalnız TR'de yayında olan sayfa (EN karşılığı yok) hreflang basmaz —
 `rehber-yazisi-standard.md` R6 "hreflang yalnız iki dil de yayındaysa". Adres denetiminin `SAYFA/HREFLANG`
-kırmızısı bu sayfalarda ölçüm hatasıdır (GEO-SEO); betik bu istisnayı öğrenene kadar elle ayıklanır.
+kırmızısı bu sayfalarda ölçüm hatasıydı; betik artık ayırır (2026-09-27): sayfada **ve** site haritası satırında hiç
+alternatif yoksa `ozet.sayfa.tekDil` sayılır, kırmızı değil. Biri alternatif bildirip öteki bildirmiyorsa kırmızı kalır
+(ayırt edici çift testte). Tek dilli sayfada canonical denetimi aynen sürer.
 **PSI geçici hatası:** `FAILED_DOCUMENT_REQUEST` ilk koşuda 86 sayfanın 6'sında çıktı, aynı sayfalar yeniden
 denemede ölçüldü (sayfa curl ile 200, <0,6 sn). Tek deneme hatası kusur sayılmaz; en az iki ayrı yeniden deneme.
 

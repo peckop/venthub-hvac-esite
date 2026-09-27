@@ -15,6 +15,7 @@
  *   2. HARİTA: yeni site haritasındaki her adres yönlendirmesiz 200; model adresi (`-p-<sku>`) sayısı
  *      `--model-beklenen` ile karşılaştırılır.
  *   3. SAYFA: site haritasındaki her sayfada canonical = kendi adresi; hreflang tr + en + x-default var
+ *      (istisna: sayfada ve site haritası satırında hiç alternatif olmayan TEK DİLLİ sayfa → ozet.sayfa.tekDil, kırmızı değil)
  *      ve her alternatif site haritasında.
  *
  * Kullanım:
@@ -147,7 +148,7 @@ export async function denetle({ taban, eski, harita, modelBeklenen, esZaman = 6,
   if (modelBeklenen != null && modelSayisi !== modelBeklenen) kirmizi.push({ denetim: 'HARITA', sinif: 'MODEL-SAYISI', ayrinti: `${modelSayisi} (beklenen ${modelBeklenen})` })
 
   // 3. Canonical + hreflang (sunucu HTML'i)
-  const sayfaSay = { denetlenen: 0, canonicalYanlis: 0, hreflangEksik: 0, bilincliEn: 0 }
+  const sayfaSay = { denetlenen: 0, canonicalYanlis: 0, hreflangEksik: 0, bilincliEn: 0, tekDil: 0 }
   if (sayfaDenetimi) {
     for (const h of haritaSonuc) {
       if (!h.html) continue
@@ -156,6 +157,13 @@ export async function denetle({ taban, eski, harita, modelBeklenen, esZaman = 6,
       if (e.canonical.length !== 1 || bosluksuz(tamAdres(e.canonical[0], h.adres)) !== bosluksuz(h.adres)) {
         sayfaSay.canonicalYanlis++
         kirmizi.push({ denetim: 'SAYFA', sinif: 'CANONICAL', adres: h.adres, ayrinti: e.canonical.join(' | ') || '(yok)' })
+      }
+      // TEK DİLLİ SAYFA (bilinçli, rehber-yazisi-standard R6 "hreflang yalnız iki dil de yayındaysa"; ölçüldü 2026-09-25:
+      // TR-yalnız Bilgi Merkezi sayfaları yanlış kırmızı verdi). Ayırt edici: sayfada DA site haritası satırında DA hiç
+      // alternatif yok. Biri alternatif bildirip öteki bildirmiyorsa bu bir kusurdur ve aşağıda kırmızı kalır.
+      if (Object.keys(e.hreflang).length === 0 && Object.keys(hreflang.get(h.adres) ?? {}).length === 0) {
+        sayfaSay.tekDil++
+        continue
       }
       const eksik = ['tr', 'en', 'x-default'].filter((d) => !e.hreflang[d])
       // EN_YAYIN kapalıyken EN ağacı noindex ve haritada yok — bilinçli (bot-karnesi BILINCLI, cetvel R3)
