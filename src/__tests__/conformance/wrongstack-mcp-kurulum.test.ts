@@ -124,7 +124,12 @@ describe('INV-WRONGSTACK-MCP-1 · ucuncu taraf MCP kilitli ve dar', () => {
      * Bu kol, dosyaya herhangi bir `--actor` / `${` geri yazılmasını KIRMIZI yapar.
      */
     const kilit = json<Kilit>(path.join(ARAC, 'package-lock.json'))
-    expect(kilit.packages['node_modules/@wrongstack/mailbox-mcp']?.version, 'mailbox paketi kurulu degil').toBe('1.0.19')
+    // Sürüm elle yazılmaz: package.json'daki sabit sürüm (1.0.19 → 1.0.26 yükseltmesinde bu satır
+    // sessizce "kurulu değil" diyordu, 2026-09-27).
+    expect(deps['@wrongstack/mailbox-mcp'], 'mailbox paketi package.json da yok').toMatch(/^\d+\.\d+\.\d+$/)
+    expect(kilit.packages['node_modules/@wrongstack/mailbox-mcp']?.version, 'mailbox paketi kurulu degil').toBe(
+      deps['@wrongstack/mailbox-mcp'],
+    )
     const mcp = json<Mcp>(path.join(KOK, '.mcp.json'))
     const kutu = (mcp.mcpServers ?? {})['wrongstack-mailbox']
     expect(kutu, 'wrongstack-mailbox kaydi yok (karar 54)').toBeDefined()
