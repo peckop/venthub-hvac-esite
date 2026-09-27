@@ -122,7 +122,7 @@ kadar vekil ölçü kullanılır.
 
 1. **Kırık yol kapısı:** tek giriş haritası ve `CLAUDE.md` içindeki her depo yolu var olmalı. CI'da koşar.
    Şunlar yol sayılmaz, ayrı sayılır ve bloklamaz: yer tutucu (`<ingestor>`, `<tarih>`), glob (`*`, `**`, `{a,b}`),
-   depo dışı mutlak yol (`C:/Users/...`), URL. Bugünkü `CLAUDE.md` bu sınıfların üçünü taşıyor; kapı ilk koşumda
+   depo dışı mutlak yol (sürücü harfiyle başlayan ya da `~/` ile başlayan yol), URL. Bugünkü `CLAUDE.md` bu sınıfların üçünü taşıyor; kapı ilk koşumda
    bunlarda kırmızı verirse kör değil yanlış yazılmıştır.
 2. **Başlık bloğu kapısı:** `docs/standards/` altında **yeni eklenen ya da değişen** cetvelde `Sahibi` ve
    `Son doğrulama` alanları bulunmalı. Eski belgeler sayılır, bloklamaz (companion C4 yaklaşımı).
