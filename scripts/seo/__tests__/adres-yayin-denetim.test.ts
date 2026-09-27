@@ -125,6 +125,29 @@ describe('INV-ADRES-YAYIN-DENETIM-1 · uçtan uca (taklit site)', () => {
     const bayraksiz = await denetle({ taban: T, sayfaDenetimi: true, getir: tabloOlustur().getir })
     expect(bayraksiz.kirmizi.map((k: { sinif: string }) => k.sinif)).toContain('HREFLANG')
   })
+  it('⭐ayırt edici çift: TEK DİLLİ sayfa (sayfada ve haritada alternatif yok) kırmızı değil; harita alternatif bildirip sayfa bildirmezse KIRMIZI (09-25 Bilgi Merkezi vakası)', async () => {
+    const tekDilHarita = `<urlset><url><loc>${A}</loc></url></urlset>`
+    const tek = await denetle({ taban: T, sayfaDenetimi: true, getir: taklit({
+      [`${T}/sitemap.xml`]: { status: 200, body: tekDilHarita },
+      [A]: { status: 200, body: sayfa(A, {}) },
+    }).getir })
+    expect(tek.durum).toBe('TEMIZ')
+    expect(tek.ozet.sayfa.tekDil).toBe(1)
+    expect(tek.ozet.sayfa.hreflangEksik).toBe(0)
+    // Aynı sayfa, ama site haritası TR alternatifi bildiriyor → tutarsızlık, kusur
+    const tutarsiz = await denetle({ taban: T, sayfaDenetimi: true, getir: taklit({
+      [`${T}/sitemap.xml`]: { status: 200, body: harita([A]) },
+      [A]: { status: 200, body: sayfa(A, {}) },
+    }).getir })
+    expect(tutarsiz.kirmizi.map((k: { sinif: string }) => k.sinif)).toContain('HREFLANG')
+    expect(tutarsiz.ozet.sayfa.tekDil).toBe(0)
+    // Tek dilli sayfada canonical yanlışsa canonical kırmızısı yine düşer (istisna yalnız hreflang'i kapsar)
+    const yanlisCanon = await denetle({ taban: T, sayfaDenetimi: true, getir: taklit({
+      [`${T}/sitemap.xml`]: { status: 200, body: tekDilHarita },
+      [A]: { status: 200, body: sayfa(A, {}, `${T}/baska`) },
+    }).getir })
+    expect(yanlisCanon.kirmizi.map((k: { sinif: string }) => k.sinif)).toContain('CANONICAL')
+  })
   it('açılmayan site haritası KIRMIZI (durum kodu ya da ağ hatası)', async () => {
     const { getir } = taklit({ [`${T}/sitemap.xml`]: { status: 500 } })
     expect((await denetle({ taban: T, getir })).durum).toBe('KIRMIZI')
