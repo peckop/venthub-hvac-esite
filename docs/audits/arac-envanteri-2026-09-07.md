@@ -435,6 +435,8 @@ madde 1 gereği araç sayılmaz.
 | `scripts/icerik-hatti/__tests__/katalog-yukle.test.ts` | REC-212 · geri yükleyici yazma kolu (OPS onayı 2026-09-27). Canlıya ÇIKMAZ: hedef, bu dosyanın | URUN-KATALOG | cagiran-yok (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `scripts/icerik-hatti/katalog-yukle.mjs` | TAŞINABİLİR KATALOG — YÜKLEME ÇEKİRDEĞİ (REC-212, yazma kolu). Saf: ağa, DB'ye, diske çıkmaz. | URUN-KATALOG | scripts/icerik-hatti/__tests__/katalog-yukle.test.ts, scripts/icerik-hatti/katalog-geri-yukle.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/katalog-yukle.test.ts | YENI |
 | `scripts/icerik-hatti/paket-gorsel.mjs` | TAŞINABİLİR KATALOG — GÖRSEL DOSYASI KİMLİĞİ (REC-212, OPS GO 2026-09-27). Ağa çıkmaz. | URUN-KATALOG | scripts/icerik-hatti/__tests__/katalog-yukle.test.ts, scripts/icerik-hatti/katalog-geri-yukle.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | scripts/icerik-hatti/__tests__/katalog-yukle.test.ts | YENI |
+| `scripts/seo/__tests__/gsc-url-denetim.test.ts` | INV-GSC-URL-DENETIM-1 · Googlebot gözüyle sayfa denetiminin ağsız parçaları (REC-402) | GEO-SEO | ci test takımı | 2026-09-27 (3/3) | kendisi test | AKTIF |
+| `scripts/seo/gsc-url-denetim.mjs` | GOOGLEBOT GÖZÜYLE SAYFA DENETİMİ — Search Console URL Inspection API: sayfa başına getirme/robots/dizin/son tarama (REC-402) | GEO-SEO | `yayin-gorunurluk-denetim-standard.md` Y1 | 2026-09-27 canlı: 88 sayfa · getirme SUCCESSFUL 83 · robots engeli 0 · hiç taranmamış 5 · son tarama 08-29…09-23 | `__tests__/gsc-url-denetim.test.ts` | AKTIF |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
