@@ -46,7 +46,7 @@
  * Çıkış DAİMA 0 — turu bloklamaz. Ama ölçemezse **"ölçülemedi (sebep)"** yazar; sessiz
  * kalmak bayatlığı "yok" göstermek olur (is-kirmizi-degil-adim-kirmizi).
  *
- * stdin: { session_id?, cwd? } · stdout: tek satır (bağlama eklenir) · çıkış: 0
+ * stdin: { session_id?, cwd?, transcript_path? } · stdout: satırlar (bağlama eklenir) · çıkış: 0
  */
 
 const fs = require('fs')
@@ -314,6 +314,35 @@ try {
   }
 } catch (e) {
   process.stdout.write('⚠BELLEK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── BAĞLAM (karar 148, 2026-09-27) — EŞİKLİ ──
+ * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son
+ * 512 KB'ı okunur (~1 ms). Gerekçe ve ölçüm tanımı: baglam-doluluk.cjs.
+ */
+try {
+  const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
+  const s = bd.satir(bd.sonBaglam(girdi.transcript_path), bd.compactPenceresi(DEPO))
+  if (s) process.stdout.write(s + '\n')
+} catch (e) {
+  process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── BELGE (REC-400 D2, HARİTA tarifi) — EŞİKLİ ──
+ * Yalnız önbellek okunur; ölçüm 6 saatte bir arka planda. Gerekçe: belge-satiri.cjs.
+ */
+try {
+  const bs = require(path.join(__dirname, 'belge-satiri.cjs'))
+  const simdi = Date.now()
+  const s = bs.satir(bs.oku(bs.onbellekYolu(PANO)), simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    bs.gerekirseTazele(PANO, DEPO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠BELGE: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 process.exit(0)
