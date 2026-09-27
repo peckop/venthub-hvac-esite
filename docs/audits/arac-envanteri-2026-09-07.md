@@ -715,11 +715,17 @@ gerektirmez).
   süreç ayrı bir kutuya (`…-1088d5`) düşüyordu, ölçüldü.
   Açılış sayacı: `scripts/hijyen/posta-kutusu-sayac.cjs` (betik tablosunda satırı var).
   **Kanban yaması (2026-09-27, karar 144, REC-391 K1) — sahip ARAC, durum KAL (yukarı akış
-  düzeltince SİL):** `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.19-ozet-donus.patch`. Betik
+  düzeltince SİL):** `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.26-ozet-donus.patch`. Betik
   değil, kurulum parçası → tabloda değil burada. kanban-mcp yazma dönüşünü aracın kendi özet
-  kesicisinden geçirir: 48.585 → 1.637 bayt, get_board değişmez. `npm ci` sonrası README'deki
-  `git apply` döngüsüyle uygulanır; yamalı dosyayı `.mcp.json` wrongstack-kanban sunucusu yükler.
-  Kapı `INV-WRONGSTACK-KANBAN-YAMA-1` (yerel 2026-09-27: geri alınca KIRMIZI, uygulanınca yeşil).
+  kesicisinden geçirir, yalnız pano döndüren eylemlerde etkilenen kartı da korur. Canlı (yamalı
+  cli.js stdio, #1440): add_task 58 KB → 1.278 B, add_note 2.043 B, get_board değişmez. Hedef İKİ
+  dosya (`dist/cli.js` + `dist/index.js`): `.mcp.json` cli.js'i çalıştırır; ilk yama (#1437) yalnız
+  index.js'e dokunduğu için canlıda etkisizdi. `npm ci` sonrası README'deki `git apply` döngüsüyle
+  uygulanır. Kapı `INV-WRONGSTACK-KANBAN-YAMA-1` hedefi `.mcp.json`'dan okur (geri alınca KIRMIZI).
+  **Kurulum betiği (2026-09-27, REC-401 B0b) — sahip ARAC, durum KAL:** `tools/wrongstack-mcp/kurulum.cjs`.
+  Sürüm yükseltmesini tek komutla yapar (kendi penceresinin sunucuları + daemon durdur → npm ci →
+  yama → doğrula, son satır HAZIR/HATA). Başka pencereye ait sunucu varsa hiçbir şeyi kapatmaz.
+  `--denetle` salt okuma. Kapı `INV-WRONGSTACK-KURULUM-1`. Canlı kurulum yalnız toplu açılışta.
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
   altına taşındı (halefi `src/app/sitemap.ts` üretimde çalışıyor). Tehlike notu: betik hem ölü
