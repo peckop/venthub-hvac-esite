@@ -60,6 +60,16 @@ describe('INV-GOVDE-IKAME-1 · gövde içinde kabuk ikamesi', () => {
     expect(govdeIkameBulgulari('python -c "print(\'`id`\')"').map((b) => b.ad)).toEqual(['ters tirnak', 'ters tirnak'])
   })
 
+  it('YANLIŞ POZİTİF (09-27 canlı): tetik yalnız kendi parçasını tarar; sonraki komuttaki meşru $( geçer', () => {
+    const canli =
+      'PORT=$(node -p "require(\'x.json\').PORT"); for u in /a /b; do echo "$u: $(curl -s http://127.0.0.1:$PORT$u)"; done'
+    expect(govdeIkameBulgulari(canli)).toEqual([])
+    // ama aynı zincirde SONRAKİ komut tetikse ve kendi gövdesinde ikame varsa yine yakalanır
+    expect(govdeIkameBulgulari('echo "$(date)"; gh pr comment 1 --body "`x`"').map((b) => b.ad)).toEqual(['ters tirnak', 'ters tirnak'])
+    // tetik parçası && ile biter
+    expect(govdeIkameBulgulari('node -e "1" && echo "$(date)"')).toEqual([])
+  })
+
   it('gövde taşımayan komut kapsam dışı; kapı bu sınıftan reddetmez', () => {
     expect(govdeIkameBulgulari('echo "`date`"')).toEqual([])
     expect(govdeIkameBulgulari('git log --format="%H $(x)"')).toEqual([])
