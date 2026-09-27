@@ -109,7 +109,14 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    47 KB'lık panoda her `add_task`/`add_note`/`transition_task` 48,6 KB dönüyordu.
    `yamalar/kanban-mcp-1.0.19-ozet-donus.patch` başarılı sonucu kesiciden geçirir; kesici girintili
    metin döndürdüğü için sonuç `JSON.parse` ile nesneye çevrilir, sunucu sıkı biçimde yazar.
-   Ölçüm (gerçek pano): yazma 48.585 → **1.637** bayt; `get_board` 48.585 → 48.585 (değişmez).
+   Yalnız panoyu döndüren eylemlerde (`add_note`, `update_task`, `move_task`, `assign_task`…)
+   özet kartı da kaybettirirdi; yama `args.taskId` kartını özetin yanına koyar.
+   ⛔**Yama İKİ dosyaya uygulanır: `dist/cli.js` ve `dist/index.js`.** `.mcp.json`'ın çalıştırdığı
+   `cli.js`, callTool'un kendi kopyasını taşır ve index.js'i yüklemez. İlk yama (#1437) yalnız
+   index.js'e uygulandı, kapı yeşildi, canlıda hiçbir şey değişmedi (09-27 akşam ölçüldü). Kapı artık
+   hedef dosyayı `.mcp.json`'dan okur.
+   Ölçüm (gerçek pano, yamalı cli.js stdio, 23 kart): `add_task` 58 KB → **1.297** bayt,
+   `add_note` → **1.778** bayt (etkilenen kart dahil), `get_board` 58.750 → 58.750 (değişmez).
    Hata sonucu (`ok:false`) kesiciye girmez. Sürüm yükseltilince yama adı ve içeriği yeniden ölçülür;
    kapı sürüm uyuşmazlığında KIRMIZI verir. Yukarı akış kaydı: WrongStack GitHub issue.
 10. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
