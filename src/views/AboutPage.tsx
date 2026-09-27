@@ -6,6 +6,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { localizedHref, Routes } from '@/utils/routes';
+import { adresDili, adresRotalari } from '@/utils/yuzeyAdresleri'
 
 import { BrandIcon } from '../components/HVACIcons'
 import { ScrollReveal } from '../components/ScrollReveal'
@@ -236,7 +237,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
               {t('aboutPage.ctaContact')}
             </Link>
             <Link
-              href={localizedHref(Routes.products(), lang)}
+              href={adresRotalari(adresDili(lang)).products()}
               className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-colors"
             >
               {t('aboutPage.ctaExplore')}

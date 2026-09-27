@@ -62,8 +62,8 @@ export default async function AltKategoriYonlendirme({ params }: { params: Param
     const dil = lang === 'en' ? 'en' : 'tr'
     const istenen =
       dil === 'en' ? adresUret({ tur: 'kategori', kok: categorySlug, dal: subCategorySlug }, 'en') : null
-    const { kategori } = await kategoriRotasiniUygula([categorySlug, subCategorySlug], dil, istenen, kategoriBagimliliklari)
-    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={subCategorySlug} />
+    const { kategori, ust } = await kategoriRotasiniUygula([categorySlug, subCategorySlug], dil, istenen, kategoriBagimliliklari)
+    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={subCategorySlug} ust={ust} />
   }
 
   const kategori = await getCachedCategoryData(subCategorySlug)

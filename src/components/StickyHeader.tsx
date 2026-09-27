@@ -207,7 +207,13 @@ const StickyHeader: React.FC<StickyHeaderProps> = React.memo(function StickyHead
   // kuralıdır. Mobilde üst şerit tasarım gereği yalnız logo + arama taşır, mobil
   // giriş alt sekme çubuğunun işidir (Faz 1b) — orası bu işin kapsamı değil.
   const primaryItems = useMemo(() => {
-    const temel = NAVIGATION_PRIMARY_ITEMS.map((item) => ({ id: item.id, href: item.href ? localizedHref(item.href, lang) : item.href, label: t(item.labelKey) }))
+    // REC-300 Faz 3d: "Ürünler" bir vitrin nesnesi → `Routes.products()` (vekil, K3-b açıkken `adresUret`:
+    // `/tr/urunler`). Kapalıyken `localizedHref('/products', lang)` ile aynı `/tr/products`.
+    const temel = NAVIGATION_PRIMARY_ITEMS.map((item) => ({
+      id: item.id,
+      href: item.id === 'products' ? Routes.products() : item.href ? localizedHref(item.href, lang) : item.href,
+      label: t(item.labelKey),
+    }))
     if (!YENI_KABUK_GEZINMESI) return temel
     // Adres ELLE kurulmaz: `Routes` = `useLocalizedRoutes()` vekili, dil önekini SSOT
     // `localizedHref` üzerinden ekler (kural 7). Etiket de sözlükten gelir — sayfanın

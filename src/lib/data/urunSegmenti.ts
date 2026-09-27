@@ -13,6 +13,8 @@ import {
 } from './preload'
 import { type ProductRouteDeps, resolveProductRoute } from './productRoute'
 
+const UUID_DESENI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export interface UrunRotasiCozumu {
   /** Çizilecek ailenin slug'ı (AileSayfasi girdisi). */
   aileSlug: string
@@ -87,9 +89,11 @@ export async function eskiTrUrunAdresiniYonlendir(slug: string): Promise<never> 
   }
   if (cozum.kind === 'redirect') {
     const { aileSlug, sku } = cozum.hedef
+    // UUID adresinde (REC-300 Faz 3d, madde 6) slug metni aile slug'ıdır — adrese UUID yazılmaz.
+    const metin = UUID_DESENI.test(slug) ? aileSlug : slug
     permanentRedirect(
       sku
-        ? adresUret({ tur: 'model', aileSlug, sku, slug }, 'tr')
+        ? adresUret({ tur: 'model', aileSlug, sku, slug: metin }, 'tr')
         : adresUret({ tur: 'aile', slug: aileSlug }, 'tr'),
     )
   }

@@ -89,7 +89,10 @@ export async function icBaglantiCoz(kimlik: string, dil: AdresDili, kaynak: IcBa
         if (yeni) bulunan = await kaynak.model(yeni.toUpperCase())
       }
       if (!bulunan) throw new IcBaglantiHatasi(kimlik, 'SKU katalogda yok (takma ad da yok)')
-      return adresUret({ tur: 'model', aileSlug: bulunan.aileSlug, sku: bulunan.sku }, dil)
+      // Faz 2 öncesi modelin slug metni yok → metin aile slug'ı (Faz 3b/3d sözleşmesi; rota modeli
+      // SKU'dan çözer). Metin verilmeseydi K3-b açıkken `adresUret` AİLE adresine düşer ve bağlantı
+      // seçili modeli kaybederdi (REC-300 Faz 3d). Kapalıyken metin okunmaz: çıktı bugünkü `?sku=`.
+      return adresUret({ tur: 'model', aileSlug: bulunan.aileSlug, sku: bulunan.sku, slug: bulunan.aileSlug }, dil)
     }
     case 'aile': {
       let bulunan = await kaynak.aile(anahtar)
@@ -122,6 +125,9 @@ export async function icBaglantiCoz(kimlik: string, dil: AdresDili, kaynak: IcBa
     case 'sayfa': {
       const uret = SAYFALAR[anahtar]
       if (!uret) throw new IcBaglantiHatasi(kimlik, `sayfa yok (izinli: ${Object.keys(SAYFALAR).join(', ')})`)
+      // Tüm ürünler bir vitrin NESNESİDİR → adresi `adresUret`'ten (K3-b açıkken `/tr/urunler`;
+      // kapalıyken `localizedHref(Routes.products())` ile aynı `/tr/products`). REC-300 Faz 3d.
+      if (anahtar === 'urunler') return adresUret({ tur: 'urunler' }, dil)
       return localizedHref(uret(), dil)
     }
   }

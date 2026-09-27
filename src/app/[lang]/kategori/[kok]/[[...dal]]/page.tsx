@@ -66,8 +66,8 @@ export default async function Page({ params }: Params) {
   if (!ADRES_SEMASI_K3B || lang !== 'tr') notFound()
   // İkiden fazla segment çözücüde "yok" olur (404) — istenen adres o hâlde hiç karşılaştırılmaz.
   const istenen = adresUret({ tur: 'kategori', kok, dal: dal[0] ?? null }, 'tr')
-  const { kategori } = await kategoriRotasiniUygula([kok, ...dal], 'tr', istenen, kategoriBagimliliklari)
+  const { kategori, ust } = await kategoriRotasiniUygula([kok, ...dal], 'tr', istenen, kategoriBagimliliklari)
   return (
-    <KategoriSayfasi lang={lang} category={kategori} categorySlug={getLocalizedCategorySlug(kategori, 'tr')} />
+    <KategoriSayfasi lang={lang} category={kategori} categorySlug={getLocalizedCategorySlug(kategori, 'tr')} ust={ust} />
   )
 }

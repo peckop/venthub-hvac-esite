@@ -69,8 +69,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   // Eski TR adresi çizilmez (308) → üst veri yazılmaz.
   if (eskiTrUrunRotasi(lang)) return {}
   if (enModelRotasi(lang) && modelAdresiCoz(slug)) {
-    const { aileSlug } = await urunSegmentiniCoz(slug, 'en')
-    return aileSayfasiUstVerisi(lang, aileSlug)
+    const { aileSlug, sunucuSku } = await urunSegmentiniCoz(slug, 'en')
+    return aileSayfasiUstVerisi(lang, aileSlug, sunucuSku)
   }
   return aileSayfasiUstVerisi(lang, slug)
 }

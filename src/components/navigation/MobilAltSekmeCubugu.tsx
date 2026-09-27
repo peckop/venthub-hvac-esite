@@ -29,6 +29,7 @@ import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { bilgiMerkeziListeHref } from '../../utils/bilgiMerkezi'
+import { adresDili, urunlerBolumuOnekleri } from '../../utils/yuzeyAdresleri'
 import LanguageSwitcher from '../LanguageSwitcher'
 import TeklifPaneliIcerigi from './TeklifPaneliIcerigi'
 
@@ -291,7 +292,7 @@ export default function MobilAltSekmeCubugu() {
           type="button"
           aria-expanded={urunlerAcik}
           onClick={() => { setDestekAcik(false); setUrunlerAcik((a) => !a) }}
-          className={sekmeSinifi(aktif(Routes.products()) || urunlerAcik)}
+          className={sekmeSinifi(urunlerBolumuOnekleri(adresDili(lang)).some((yol) => aktif(yol)) || urunlerAcik)}
         >
           <Ikon d={YOLLAR.urunler} />
           {t('altSekme.urunler')}
