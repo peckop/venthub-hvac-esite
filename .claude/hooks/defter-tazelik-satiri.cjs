@@ -317,7 +317,8 @@ try {
 }
 
 /**
- * ── BAĞLAM (karar 148, 2026-09-27) — EŞİKLİ ──
+ * ── BAĞLAM (karar 148, 2026-09-27) — HER MESAJDA ──
+ * Eşik altında düz "BAGLAM: 146k/1M"; compact sınırından sonra cevap yoksa "compact sonrasi".
  * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son
  * 512 KB'ı okunur (~1 ms). Gerekçe ve ölçüm tanımı: baglam-doluluk.cjs.
  */
