@@ -1,0 +1,12 @@
+diff --git a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
+--- a/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
++++ b/tools/wrongstack-mcp/node_modules/@wrongstack/kanban-mcp/dist/index.js
+@@ -280,7 +280,7 @@
+       try {
+         const result = await executeKanban(args, context, new AbortController().signal);
+         const failed = !!result && typeof result === "object" && !Array.isArray(result) && result["ok"] === false;
+-        return { content: result, isError: failed };
++        return { content: failed ? result : JSON.parse(kanbanTool.serialize(result, args)), isError: failed };
+       } catch (error) {
+         return { content: mcpErrorContent(error), isError: true };
+       }
