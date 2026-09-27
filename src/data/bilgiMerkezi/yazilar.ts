@@ -50,7 +50,8 @@ export interface RehberYazisi {
 export const YAZILAR: readonly RehberYazisi[] = [
   {
     // BLOG, doğrulanmış metin sha 138df0114e60, gövde sha 1288fb4e48ff (2026-09-25). MEVZUAT
-    // mevzuat cümlelerini onayladı. Karar 120 (Recep) onayından ÖNCE yalnız yerel ön izleme dalında.
+    // mevzuat cümlelerini onayladı. Yayın: karar 120 ve 135 (Recep, 2026-09-25: "yayına girsin, görsel
+    // sonradan"); kapak karar 134'e göre kapak şablonu PR'ında eklenecek.
     kimlik: 'frekans-konvertoru',
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
