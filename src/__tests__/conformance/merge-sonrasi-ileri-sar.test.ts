@@ -84,12 +84,12 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-1', () => {
     expect(g(ana, 'rev-parse', 'HEAD')).toBe(g(ana, 'rev-parse', 'origin/master'))
   })
 
-  it('kirli ana ağaçta DURUR, dosyaya dokunmaz, sebebi söyler', { timeout: 120_000 }, () => {
+  it('ilgisiz kirli dosya ileri sarmayı ENGELLEMEZ; dosya korunur (#1468 vakası, Ops 09-28)', { timeout: 120_000 }, () => {
     const { ana, wt } = kurulum()
     fs.writeFileSync(path.join(ana, 'b.txt'), 'yarim is\n')
     const once = g(ana, 'rev-parse', 'HEAD')
-    expect(kos(wt, 'gh pr merge 1')).toMatch(/^⚠ANA AGAC 1 COMMIT GERIDE, ileri sarilamadi: .*b\.txt/)
-    expect(g(ana, 'rev-parse', 'HEAD')).toBe(once)
+    expect(kos(wt, 'gh pr merge 1')).toMatch(/^ANA AGAC: merge sonrasi 1 commit ileri sarildi/)
+    expect(g(ana, 'rev-parse', 'HEAD')).not.toBe(once)
     expect(fs.readFileSync(path.join(ana, 'b.txt'), 'utf8')).toBe('yarim is\n')
   })
 
