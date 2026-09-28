@@ -92,6 +92,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gh-api-kapisi.cjs\"",
             "statusMessage": "gh-api-kapisi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/env-yazma-kapisi.cjs\"",
+            "statusMessage": "env-yazma-kapisi"
           }
         ]
       },
