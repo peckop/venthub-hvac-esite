@@ -38,7 +38,6 @@
       "mcp__notebooklm-py__chat_get",
       "mcp__notebooklm-py__server_info",
       "Bash(git ls-remote *)",
-      "Bash(git push --force-with-lease*)",
       "mcp__claude_ai_Vercel__search_vercel_documentation",
       "mcp__claude_ai_Vercel__get_deployment",
       "mcp__plugin_supabase_supabase__get_project_url",
