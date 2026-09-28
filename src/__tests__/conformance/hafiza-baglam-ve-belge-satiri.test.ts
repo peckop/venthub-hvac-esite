@@ -98,6 +98,15 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     expect(bd.sonBaglam(kayit(d, [once, { ...sinir, isSidechain: true }]))).toBe(707_002)
   })
 
+  it('compact sonrası usage=0 kopya satırlar ölçüm değildir, atlanır (hata 09-28: "0k" bastı)', () => {
+    const d = gecici()
+    const sinir = { type: 'system', subtype: 'compact_boundary' }
+    const once = cevap({ cache_read_input_tokens: 505_000 })
+    const kopya = cevap({ input_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 })
+    expect(bd.sonBaglam(kayit(d, [once, sinir, kopya, kopya]))).toBe(bd.COMPACT_SONRASI)
+    expect(bd.sonBaglam(kayit(d, [once, sinir, cevap({ cache_read_input_tokens: 257_000 }), kopya]))).toBe(257_000)
+  })
+
   it('eşik altında da HER mesajda düz satır (Recep 09-27); eşiklerde uyarı', () => {
     expect(bd.satir(146_000, 1_000_000)).toBe('BAGLAM: 146k/1M')
     expect(bd.satir(0, 1_000_000)).toBe('BAGLAM: 0k/1M')
