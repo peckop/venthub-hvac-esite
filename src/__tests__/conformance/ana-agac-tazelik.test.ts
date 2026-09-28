@@ -51,7 +51,8 @@ function kurulum(geride: number): { ana: string; wt: string; kok: string } {
   g(kok, 'clone', '-q', origin, ana)
   g(ana, 'checkout', '-q', '-B', 'master')
   fs.writeFileSync(path.join(ana, 'a.txt'), '0\n')
-  g(ana, 'add', 'a.txt')
+  fs.writeFileSync(path.join(ana, 'z.txt'), 'ilgisiz\n')
+  g(ana, 'add', 'a.txt', 'z.txt')
   g(ana, 'commit', '-q', '-m', 'c0')
   g(ana, 'push', '-q', 'origin', 'master')
   g(ana, 'worktree', 'add', '-q', '-b', 'serit', wt, 'master')
@@ -106,15 +107,25 @@ describe('INV-ANA-AGAC-TAZE-1 ana ağaç tazeliği', { timeout: GIT_SURE }, () =
     expect(fs.existsSync(path.join(ana, 'ekran.png'))).toBe(true)
   })
 
-  it('izlenen dosyada değişiklik varsa DOKUNULMAZ, değişiklik korunur ve sebep yazılır', () => {
+  it('(a) İLGİSİZ kirli izlenen dosya ileri sarmayı ENGELLEMEZ; yerel değişiklik korunur (#1468 vakası)', () => {
+    const { ana } = kurulum(1)
+    fs.writeFileSync(path.join(ana, 'z.txt'), 'baska-seridin-yarim-isi\n')
+    const s = tazelik.ileriSar(ana)
+    expect(s.durum).toBe('ilerlendi')
+    expect(tazelik.olc(ana).geride).toBe(0)
+    expect(fs.readFileSync(path.join(ana, 'z.txt'), 'utf8')).toBe('baska-seridin-yarim-isi\n')
+    expect(fs.readFileSync(path.join(ana, 'a.txt'), 'utf8').trim()).toBe('1')
+  })
+
+  it('(b) ÇAKIŞAN kirli dosya: git REDDEDER, değişiklik korunur, ağaç bozulmaz ve sebep yazılır', () => {
     const { ana } = kurulum(1)
     fs.writeFileSync(path.join(ana, 'a.txt'), 'recep-in-yerel-satiri\n')
     const s = tazelik.ileriSar(ana)
     expect(s.durum).toBe('engelli')
-    expect(s.sebep).toMatch(/izlenen 1 dosyada/)
+    expect(s.sebep).toMatch(/ff-only reddetti \(kirli: .*a\.txt/)
     expect(fs.readFileSync(path.join(ana, 'a.txt'), 'utf8')).toBe('recep-in-yerel-satiri\n')
     expect(tazelik.olc(ana).geride).toBe(1)
-    expect(tazelik.acilisSatiri(ana)).toMatch(/ANA AGAC 1 COMMIT GERIDE[\s\S]*Ileri sarilamaz/)
+    expect(tazelik.acilisSatiri(ana)).toMatch(/ANA AGAC 1 COMMIT GERIDE/)
   })
 
   it('başka dal ya da fazladan yerel commit varsa DOKUNULMAZ', () => {

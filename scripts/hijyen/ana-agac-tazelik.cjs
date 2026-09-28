@@ -74,10 +74,16 @@ function olc(agac, uzak = 'origin/master') {
   return { agac, dal, geride, ileride, kirli }
 }
 
-/** Neden ileri sarılamayacağını söyler; sarılabilirse null. */
+/**
+ * Neden ileri sarılamayacağını söyler; sarılabilirse null.
+ *
+ * Kirli ağaç (izlenen dosyada kaydedilmemiş değişiklik) tek başına ENGEL DEĞİLDİR (Ops 2026-09-28):
+ * `merge --ff-only` gelen commit'in dokunduğu kirli dosyada kendisi reddeder, dokunmadığını korur.
+ * 09-28 #1468'de eski kural (kirli → hiç deneme) başka şeridin ilgisiz bir dosyası yüzünden ana
+ * ağacı geride bıraktı. Stash/reset yine YOK; git reddederse `ileriSar` ENGELLİ + sebep döner.
+ */
 function engel(o, beklenenDal = 'master') {
   if (o.dal !== beklenenDal) return `ana agac '${o.dal}' dalinda (beklenen ${beklenenDal})`
-  if (o.kirli.length) return `izlenen ${o.kirli.length} dosyada degisiklik var: ${o.kirli.slice(0, 3).join(', ')}`
   if (o.ileride > 0) return `ana agacta origin'de olmayan ${o.ileride} commit var`
   return null
 }
@@ -99,7 +105,8 @@ function ileriSar(agac, uzak = 'origin/master') {
   try {
     git(agac, ['merge', '--ff-only', uzak], 60000)
   } catch (e) {
-    return { durum: 'engelli', geride: o.geride, sebep: 'ff-only reddetti: ' + String((e && e.message) || e).slice(0, 160) }
+    const kirliNot = o.kirli.length ? ` (kirli: ${o.kirli.slice(0, 3).join(', ')} — gelen commit bu dosyaya dokunuyor olabilir)` : ''
+    return { durum: 'engelli', geride: o.geride, sebep: 'ff-only reddetti' + kirliNot + ': ' + String((e && e.message) || e).slice(0, 160) }
   }
   return { durum: 'ilerlendi', geride: o.geride }
 }
