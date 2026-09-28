@@ -6,9 +6,10 @@
  * iş sürerken yazılan Recep mesajı `queued_command` eki, compact sonrası kopya satırlar.
  */
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
-import { createRequire } from 'node:module'
+
 import { describe, expect, it } from 'vitest'
 
 const gerek = createRequire(import.meta.url)
