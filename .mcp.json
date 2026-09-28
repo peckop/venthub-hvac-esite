@@ -13,6 +13,7 @@
     "wrongstack-codebase-index": {
       "command": "node",
       "args": [
+        "tools/wrongstack-mcp/kanonik-kok.cjs",
         "tools/wrongstack-mcp/node_modules/@wrongstack/codebase-index-mcp/dist/cli.js",
         "--project-root",
         ".",

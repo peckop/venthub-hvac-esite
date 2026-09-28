@@ -719,6 +719,12 @@ gerektirmez).
   Sarmalayıcı kökü de **kanonikleştirir** (ana ağaç + küçük sürücü harfi): `C:`/worktree ile açılan
   süreç ayrı bir kutuya (`…-1088d5`) düşüyordu, ölçüldü.
   Açılış sayacı: `scripts/hijyen/posta-kutusu-sayac.cjs` (betik tablosunda satırı var).
+  **Kanonik kök sarmalayıcısı (2026-09-27, karar 158) — sahip ARAC, durum KAL:**
+  `tools/wrongstack-mcp/kanonik-kok.cjs`. Kod dizini (`wrongstack-codebase-index`) aynı ikiz kopya
+  arızasını yaşıyordu (`…-7e017f` 50 MB / `…-1088d5` 17 MB); `.mcp.json` artık sunucuyu bu
+  sarmalayıcıdan açar, kök posta kutusuyla AYNI `kanonikKok` ile çözülür. Yalnız
+  `@wrongstack/*/dist/cli.js` çalıştırır, bayrak eklemez (`--writable` yok). Kapı:
+  INV-WRONGSTACK-KANONIK-KOK-1. `…-1088d5/codebase-index` artık yetim — silinmesi ayrı iş (B(0)d).
   **Kanban yaması (2026-09-27, karar 144, REC-391 K1) — sahip ARAC, durum KAL (yukarı akış
   düzeltince SİL):** `tools/wrongstack-mcp/yamalar/kanban-mcp-1.0.26-ozet-donus.patch`. Betik
   değil, kurulum parçası → tabloda değil burada. kanban-mcp yazma dönüşünü aracın kendi özet
