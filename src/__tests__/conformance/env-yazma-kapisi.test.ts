@@ -16,8 +16,8 @@ interface Kapi {
   incele: (komut: string, cwd: string, ana: string | null) => string | null
 }
 const k = gerek(path.join(KOK, '.claude', 'hooks', 'env-yazma-kapisi.cjs')) as Kapi
-const ANA = 'C:/Users/alize/venthub-hvac'
-const WT = 'C:/tmp/vh-arac-2'
+const ANA = 'C:/depo/ana'
+const WT = 'C:/tmp/vh-ornek-wt'
 const sor = (komut: string, cwd = WT, ana: string | null = ANA) => k.incele(komut, cwd, ana) !== null
 
 describe('INV-ENV-YAZMA-1', () => {
