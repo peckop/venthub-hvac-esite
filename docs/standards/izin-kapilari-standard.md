@@ -24,8 +24,8 @@
 | S1 | Canlı veritabanına SQL ile yazma (execute_sql) + apply_migration / deploy_edge_function / dal işlemleri | `.claude/hooks/sql-yazma-kapisi.cjs` | `sql-yazma-kapisi.test.ts` | 09-28 `claude -p`, araç `--allowedTools` ile izinli: `select 1` → sonuç; `begin; create temp table …; rollback;` → kanca durdurdu, çağrı gitmedi | KAPALI |
 | S2 | `gh api` ile beş kapıyı dolanan yazma (merge, dal koruması, contents, git refs, sır, DELETE, depo ayarı, GraphQL mutation) | `.claude/hooks/gh-api-kapisi.cjs` | `gh-api-kapisi.test.ts` | 09-28 `claude -p` (`Bash(gh api *)` allow'da): `PUT pulls/999999/merge` → kanca durdurdu, GitHub'a gitmedi | KAPALI |
 | S3 | `.env` ailesine Bash ile yeni içerik yazma (Edit/Write tarafı `sensitive-path-guard` ile zaten kapalı) | `.claude/hooks/env-yazma-kapisi.cjs` | `env-yazma-kapisi.test.ts` | 09-28 `claude -p` (`--allowedTools Bash`): `echo DENEME=1 >> …/.env.local` → kanca durdurdu, dosya oluşmadı | KAPALI |
-| S4 | settings.local `git push --force-with-lease*` allow ↔ global deny çelişkisi | — | — | — | AÇIK |
-| S5 | `ask` listesindeki eski `mcp__supabase__*` adları | S1 kancası bu araçları adından bağımsız yakalar | S1 testi | — | KISMEN (liste düzeltmesi ayrı) |
+| S4 | `git push --force-with-lease*` allow ↔ global deny çelişkisi | — (izin listesi) | — | Ölçüldü 09-28: allow proje `settings.json`'da (settings.local değil); global deny kazanır → satır ölüydü ve "serbest" izlenimi veriyordu. Satır silindi; davranış değişmedi (deny) | KAPALI |
+| S5 | global `ask` listesindeki eski `mcp__supabase__*` adları (bugünkü `mcp__claude_ai_Supabase__*` / `mcp__plugin_supabase_supabase__*` araçlarını tutmuyor) | S1 kancası bu araçları adından bağımsız yakalar | `sql-yazma-kapisi.test.ts` | Kanca canlı ölçüldü (S1). Global liste düzeltmesi depo dışı (`~/.claude/settings.json`), OPS onayıyla | KISMEN (kanca kapalı, liste düzeltmesi OPS'ta) |
 
 ## S1 ayrıntı
 
