@@ -22,7 +22,7 @@
 | # | Korunan | Kanca | Test | Canlı ölçüm | Durum |
 |---|---|---|---|---|---|
 | S1 | Canlı veritabanına SQL ile yazma (execute_sql) + apply_migration / deploy_edge_function / dal işlemleri | `.claude/hooks/sql-yazma-kapisi.cjs` | `sql-yazma-kapisi.test.ts` | 09-28 `claude -p`, araç `--allowedTools` ile izinli: `select 1` → sonuç; `begin; create temp table …; rollback;` → kanca durdurdu, çağrı gitmedi | KAPALI |
-| S2 | `gh api` ile yazma (yalnız GET serbest) | — | — | — | AÇIK |
+| S2 | `gh api` ile beş kapıyı dolanan yazma (merge, dal koruması, contents, git refs, sır, DELETE, depo ayarı, GraphQL mutation) | `.claude/hooks/gh-api-kapisi.cjs` | `gh-api-kapisi.test.ts` | 09-28 `claude -p` (`Bash(gh api *)` allow'da): `PUT pulls/999999/merge` → kanca durdurdu, GitHub'a gitmedi | KAPALI |
 | S3 | `.env` ailesine Bash ile yazma | — | — | — | AÇIK |
 | S4 | settings.local `git push --force-with-lease*` allow ↔ global deny çelişkisi | — | — | — | AÇIK |
 | S5 | `ask` listesindeki eski `mcp__supabase__*` adları | S1 kancası bu araçları adından bağımsız yakalar | S1 testi | — | KISMEN (liste düzeltmesi ayrı) |
@@ -41,6 +41,22 @@ fonksiyonda yazmayı çalışma anında reddettiği için bu ölçüt beyan değ
 **Ölçülen isabet (2.024 gerçek sorgu):** 1.933 okuma sorusuz geçer; 91 sorulur — hepsi yazma, DDL,
 DO bloğu, geri alınan deneme ya da VOLATILE fonksiyon çağrısı. Okuma sayılıp yazma kelimesi taşıyan: 0.
 
-**Bilinen sınır:** migration dışında (panelden) yaratılmış bir `public` fonksiyon adı şema önekiyle
+**Bilinen sınır (S1):** migration dışında (panelden) yaratılmış bir `public` fonksiyon adı şema önekiyle
 çağrılırsa sorulur; öneksiz çağrılırsa tanınmaz ve geçer. Proje fonksiyonları migration'la yazılır
 (kural 13); panelden fonksiyon yaratmak zaten kural dışıdır.
+
+## S2 ayrıntı
+
+**Ölçülen boşluk (09-28):** `Bash(gh api *)` proje `settings.json`'da **allow**. Kayıtlarda 893 `gh api`
+komutunun 131'i yazma; aralarında `PUT pulls/N/merge` (7 — `gh pr merge` yolunu ve migration onayını
+atlar), dal korumasını kaldır/kur (2), PR'sız `PUT contents/.claude/settings.json` (1), dal silme (4).
+
+**Emirden sapma (OPS'a bildirildi):** emir "yalnız GET" diyordu. Yazmaların ~%80'i zararsız PR aç/düzelt,
+yorum, update-branch; hepsini sormak Recep'i günde onlarca kez yorardı ve 09-28 kararına (ayar işi Recep'e
+sorulmaz, beş kapı onda) aykırıydı. Kapı yazmanın TÜRÜNE bakar; ayrıştırılamayan yazma sorulur.
+
+**Ölçülen isabet (131 gerçek yazma):** 105 zararsız geçer; 26 sorulur (merge 7, git refs 5, contents 4,
+dal koruması 2, depo ayarı 1, ayrıştırılamayan 7).
+
+**Bilinen sınır:** komut değişkenle kurulursa (`gh api $YOL`) uç nokta görünmez; yöntem yazmaysa ve yol
+`repos|orgs|user|graphql` içermiyorsa "ayrıştırılamadı" diye sorulur.

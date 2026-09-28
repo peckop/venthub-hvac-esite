@@ -87,6 +87,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/silme-baglanti-kapisi.cjs\"",
             "statusMessage": "silme-baglanti-kapisi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gh-api-kapisi.cjs\"",
+            "statusMessage": "gh-api-kapisi"
           }
         ]
       },
