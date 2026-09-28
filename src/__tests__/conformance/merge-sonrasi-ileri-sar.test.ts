@@ -93,6 +93,14 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-1', () => {
     expect(fs.readFileSync(path.join(ana, 'b.txt'), 'utf8')).toBe('yarim is\n')
   })
 
+  it('kanca .claude/settings.json PostToolUse Bash bloğunda KAYITLI (kayıtsız kanca hiçbir şey yapmaz)', () => {
+    const ayar = JSON.parse(fs.readFileSync(path.join(KOK, '.claude', 'settings.json'), 'utf8')) as {
+      hooks: { PostToolUse: { matcher: string; hooks: { command: string }[] }[] }
+    }
+    const bash = ayar.hooks.PostToolUse.filter((b) => b.matcher.split('|').includes('Bash'))
+    expect(bash.flatMap((b) => b.hooks.map((h) => h.command)).some((c) => c.includes('merge-sonrasi-ileri-sar.cjs'))).toBe(true)
+  })
+
   it('güncel ağaçta susar; ölçülemeyen hâl söylenir', () => {
     expect(k.satir({ durum: 'guncel', geride: 0 })).toBeNull()
     expect(k.satir({ durum: 'olcemedi', sebep: 'git yok' })).toMatch(/olculemedi \(git yok\)/)
