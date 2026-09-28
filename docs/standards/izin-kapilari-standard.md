@@ -76,3 +76,14 @@ depo sayılır. Şablondan (`.env.example` → `.env`) kopya yeni sır dosyasıd
 
 **Bilinen sınır:** dosyayı kendisi yazan araçlar (`vercel env pull .env.local`) yazma hedefi çıkarıcısında
 tanınmaz; kayıtlarda 1 kez görüldü. Kapsama alınması S3'ün devamıdır.
+
+## Onay sorusu biçimi: komut değil ETKİ (S1; Ops 09-28, Recep SQL okumaz)
+
+`sql-yazma-kapisi` onay sorusunun başına `.claude/hooks/sql-etki.cjs`'in Türkçe özetini koyar:
+`• <tablo> → SİL/GÜNCELLE/EKLE/YAPI … · <N> satır · <not>`. UPDATE/DELETE için aynı WHERE ile
+`select count(*)` KURU KOŞUMU Supabase Management API'nin `read_only: true` kipiyle yapılır (ölçüldü:
+bu kipte `create temp table` Postgres'çe reddedilir). Her sayım 5 sn, en çok 5 sayım. Sayılamayan her şey
+(FROM/USING bağlı yazma, INSERT … SELECT, CTE içi yazma, DO bloğu, fonksiyon çağrısı, API hatası) açıkça
+"ölçülemedi" yazar — sayı uydurulmaz. Koşulsuz UPDATE/DELETE "KOŞULSUZ — tablonun TAMAMI" uyarır.
+Canlı ölçüm 09-28 (`claude -p`): `update products … where brand='Vortice'` → "products → GÜNCELLE · 184
+satır · (değişen alan: updated_at)", veritabanına yazılmadı. Test: `sql-etki.test.ts`.

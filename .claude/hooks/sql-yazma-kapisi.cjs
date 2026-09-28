@@ -141,7 +141,24 @@ function karar(girdi) {
   return s.okuma ? null : { karar: 'ask', sebep: 'Canli veritabanina YAZMA olabilir (' + s.sebep + ')' }
 }
 
-function main() {
+/**
+ * Onay sorusunun metni. Recep SQL okumaz (Ops 09-28): önce ETKİ (tablo · işlem · satır sayısı, bkz.
+ * sql-etki.cjs), sonra kapının teknik sebebi. Etki özeti çıkarılamazsa yalnız sebep gösterilir —
+ * özet hatası soruyu asla engellemez.
+ */
+async function soruMetni(girdi, k) {
+  const teknik = '[sql-yazma-kapisi] ' + k.sebep + ' (REC-410 S1)'
+  if (!/execute_sql$/.test(String(girdi.tool_name || ''))) return 'CANLI SİSTEMDE DEĞİŞİKLİK: ' + k.sebep + '\n' + teknik
+  try {
+    const giris = girdi.tool_input || {}
+    const etki = await require(path.join(__dirname, 'sql-etki.cjs')).ozet(giris.query || '', giris.project_id)
+    return etki ? etki + '\n' + teknik : teknik
+  } catch (e) {
+    return teknik + '\n(etki özeti çıkarılamadı: ' + ((e && e.message) || 'bilinmeyen').slice(0, 80) + ')'
+  }
+}
+
+async function main() {
   let girdi = {}
   try {
     girdi = JSON.parse(require('fs').readFileSync(0, 'utf8') || '{}')
@@ -156,12 +173,12 @@ function main() {
       hookSpecificOutput: {
         hookEventName: 'PreToolUse',
         permissionDecision: k.karar,
-        permissionDecisionReason: '[sql-yazma-kapisi] ' + k.sebep + ' — Recep onayi gerekir (REC-410 S1).',
+        permissionDecisionReason: await soruMetni(girdi, k),
       },
     }),
   )
   process.exit(0)
 }
 
-module.exports = { siniflandir, karar, temizle, projeFonksiyonlari }
+module.exports = { siniflandir, karar, temizle, projeFonksiyonlari, soruMetni }
 if (require.main === module) main()
