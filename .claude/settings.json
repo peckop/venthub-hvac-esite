@@ -251,6 +251,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/precompact-durum-kapisi.cjs\"",
             "statusMessage": "durum kapisi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-konusma-dokumu.cjs\"",
+            "statusMessage": "son konusma dokumu"
           }
         ]
       }

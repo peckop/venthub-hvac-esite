@@ -192,6 +192,18 @@ if (source === 'compact') {
     // Kanca oturumu bloklamaz ama sessiz de gecmez: sebep bilinmeli.
     context += `⚠durum dosyasi enjeksiyonu basarisiz (${(e && (e.code || e.message)) || 'bilinmeyen'}) — ELLE oku.\n`
   }
+  // SON KONUŞMA DÖKÜMÜ (Ops 09-28): Recep'in son mesajları AYNEN — özet onları değiştirmiş olabilir.
+  try {
+    const kapi = require(path.join(__dirname, 'precompact-durum-kapisi.cjs'))
+    const dokum = require(path.join(__dirname, 'son-konusma-dokumu.cjs'))
+    const proje = kapi.projeDiziniBul(sid, input.transcript_path)
+    const metin = proje && dokum.enjeksiyon(path.join(proje, 'memory'), sid)
+    context += metin
+      ? '--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---\n' + metin + '\n--- SON KONUSMA BITTI ---\n'
+      : '⚠son konusma dokumu YOK — PreCompact kancasi kosmamis olabilir; ozetle yetin, Recep sozunu ONA SOR.\n'
+  } catch (e) {
+    context += `⚠son konusma dokumu okunamadi (${(e && (e.code || e.message)) || 'bilinmeyen'}).\n`
+  }
 }
 
 /**
