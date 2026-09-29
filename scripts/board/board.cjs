@@ -22,10 +22,13 @@
  * Pano TTL'li ve süpürülebilir; registry kalıcıdır. İkisini karıştırmak panoyu şişirir.
  */
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const { execFileSync } = require('child_process')
 
 const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || path.join('C:', 'tmp', 'venthub-board')
+/** Claude Code'un pencere başına yazdığı oturum kaydı: `<pid>.json` (sessionId + name). Test için env ile değişir. */
+const OTURUM_KAYIT_DIZINI = process.env.VENTHUB_OTURUM_KAYIT_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
 /** Kira ömrü: bu süre atış almayan talep BAYAT sayılır ve engellemez (ölü oturum kilitlemesin). */
 const DEFAULT_TTL_MS = 4 * 60 * 60 * 1000
 /** Bu yaştan eski dosyalar hiç OKUNMAZ (sınırsız büyümeye karşı; pano anlık kanaldır). */
@@ -413,13 +416,50 @@ function findConflict(filePath, sid, repoRoot) {
  * yazılmış" gibi okunup kafa karıştırıyordu — artık ÇAKIŞMA olarak işaretlenir, çünkü aynı
  * adı taşıyan iki canlı talep birbirini bloklayabilir (kıdemsiz olan yazamaz).
  */
+/**
+ * sid → PENCERE ADI (SendMessage / ListAgents'in kullandığı ad; örn. `venthub-hvac-72`).
+ *
+ * NİÇİN (REC-404, Recep 2026-09-27 "ekibindekileri sürekli karıştırıyorsun"): pano oturum numarasıyla
+ * (sid), SendMessage ise pencere adıyla çalışıyor; aradaki eşleme yoktu ve iki pencere AYNI adı
+ * taşıyabiliyor (`venthub-hvac-8e` ×2, ölçüldü). Eşleme her çağrıda kayıt dosyasından YENİDEN okunur:
+ * ad oturum boyunca değişebilir (`nameSince` alanı), önbellek bayatlatır.
+ *
+ * FAIL-OPEN: dizin yok / dosya bozuk → o kayıt atlanır, pano yine çalışır (ad göstermek panonun ana
+ * işi DEĞİL; adı okuyamamak şerit listesini düşürmemeli). `<pid>.<hash>.key` dosyaları ATLANIR.
+ */
+function pencereAdlari(dizin = OTURUM_KAYIT_DIZINI) {
+  const out = new Map()
+  let dosyalar
+  try { dosyalar = fs.readdirSync(dizin) } catch { return out }
+  for (const f of dosyalar) {
+    if (!/^\d+\.json$/.test(f)) continue
+    try {
+      const j = JSON.parse(fs.readFileSync(path.join(dizin, f), 'utf8'))
+      if (j && typeof j.sessionId === 'string' && typeof j.name === 'string' && j.name) out.set(j.sessionId, j.name)
+    } catch { /* bozuk ya da yarım yazılmış kayıt: atla */ }
+  }
+  return out
+}
+
 function summary(sid) {
   // BAYAT şeritler artık DÜŞMEZ, etiketle gösterilir (T084-VH — bkz. tumTalepler yorumu).
   const hepsi = tumTalepler()
   if (hepsi.length === 0) return 'PANO: talep yok.'
   const laneCount = new Map()
   for (const c of hepsi) if (!c.bayat) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
+  // Pencere adı çakışması: aynı ad iki CANLI sid'de → çıplak adla gönderilen mesaj belirsiz (REC-404).
+  const adlar = pencereAdlari()
+  const adSayac = new Map()
+  for (const c of hepsi) {
+    const ad = adlar.get(c.sid)
+    if (ad && !c.bayat) adSayac.set(ad, (adSayac.get(ad) || 0) + 1)
+  }
   const lines = hepsi.map(c => {
+    const ad = adlar.get(c.sid)
+    const adEtiketi = ad ? ` (${ad})` : ''
+    const adCakisma = ad && !c.bayat && adSayac.get(ad) > 1
+      ? ' ⚠ÇAKIŞMA aynı pencere adı birden çok canlı oturumda — SendMessage için ListAgents\'taki "[ref]" ile gönder'
+      : ''
     const mine = c.sid === sid ? ' (sen)' : ''
     // Çakışma uyarısı yalnız CANLI şeritler için anlamlı: bayat olan bloklamıyor.
     const dup = !c.bayat && laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
@@ -428,7 +468,7 @@ function summary(sid) {
       : ''
     // TAM oturum numarası (karar 54, 2026-09-21): posta kutusu alıcıyı TAM UUID ile eşler; kısa
     // 8 hane SESSİZCE düşer (ölçüldü: OPS'un to="ac03ce11" mesajı alıcının unread'ine girmedi).
-    return `  · ${c.lane}${mine}${dup}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
+    return `  · ${c.lane}${adEtiketi}${mine}${dup}${adCakisma}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
   })
   const bayatSayi = hepsi.filter(c => c.bayat).length
   const bas = bayatSayi > 0
@@ -568,7 +608,7 @@ function markSeen(sid, notes) {
 
 module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
-  append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
+  append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary, pencereAdlari,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
   taramaDurumu, teslimDurumu, teslimKanitSinifi, esikleriOku, ESIK_ADLARI,
   EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
