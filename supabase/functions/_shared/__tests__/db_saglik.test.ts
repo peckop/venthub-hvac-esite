@@ -110,7 +110,13 @@ describe('healthz ucu — DB adımı kör çağrıya geri dönemez (SABOTAJ KOLU
   // Kural: healthz DB'yi dbSaglikOlc ile ölçer; `rpc/now` (pg_catalog fonksiyonu) çağrılmaz.
   function kusurlar(kaynak: string): string[] {
     const bulgu: string[] = []
-    if (/\/rest\/v1\/rpc\/now/.test(kaynak.replace(/\/\/[^\n]*/g, ''))) {
+    // Yorum satırları (`//` ile başlayanlar) kod sayılmaz; satır tabanlı, çünkü kod satırındaki
+    // `https://` şemasını yorum sanan bir sıyırıcı bekçiyi sessizce kör bırakır (INV-SCRUB-1).
+    const kod = kaynak
+      .split('\n')
+      .filter((satir) => !satir.trimStart().startsWith('//'))
+      .join('\n')
+    if (/\/rest\/v1\/rpc\/now/.test(kod)) {
       bulgu.push('rpc/now: PostgREST public dışını sunmaz, hep 404')
     }
     if (!/dbSaglikOlc\s*\(/.test(kaynak)) bulgu.push('dbSaglikOlc çağrısı yok')
