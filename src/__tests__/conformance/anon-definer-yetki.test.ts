@@ -174,6 +174,27 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
     }
   })
 
+  // REC-412 Faz 0.5b (çürütme B3): maliyet özet tetik fonksiyonu da SECURITY DEFINER; RPC'yi anon/PUBLIC çağıramaz.
+  it('⭐denetim_izi_maliyet_ozet: public, anon, authenticated için son hâl KAPALI', () => {
+    expect(sonKip(zincir, 'denetim_izi_maliyet_ozet'), 'denetim_izi_maliyet_ozet tanimi zincirde yok — okuyucu kor').toBe('definer')
+    for (const rol of ['public', 'anon', 'authenticated']) {
+      expect(
+        sonHalKapali(zincir, 'denetim_izi_maliyet_ozet', rol, []),
+        `denetim_izi_maliyet_ozet ${rol} icin acik — istemci denetim tablosuna sahte ozet satiri yazdirabilir`,
+      ).toBe(true)
+    }
+  })
+
+  it('⭐maliyet_yenile: public ve anon KAPALI, authenticated AÇIK (kapı fonksiyon içinde: is_admin_claim)', () => {
+    for (const rol of ['public', 'anon']) {
+      expect(sonHalKapali(zincir, 'maliyet_yenile', rol, ['jsonb']), `maliyet_yenile ${rol} icin acik`).toBe(true)
+    }
+    expect(
+      sonHalKapali(zincir, 'maliyet_yenile', 'authenticated', ['jsonb']),
+      'maliyet_yenile authenticated icin KAPANMIS — yonetici maliyet yenileyemez',
+    ).toBe(false)
+  })
+
   it('⭐admin_resend_quote_published: anon KAPALI, authenticated AÇIK', () => {
     expect(sonHalKapali(zincir, 'admin_resend_quote_published', 'anon', ['uuid']), 'admin_resend_quote_published anon icin acik').toBe(true)
     expect(

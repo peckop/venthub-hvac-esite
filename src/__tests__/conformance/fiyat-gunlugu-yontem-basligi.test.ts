@@ -274,7 +274,10 @@ describe('INV-FIYAT-GUNLUGU-1 · maliyet_yenile RPC sözleşmesi (istemci ↔ DB
   })
 
   it('parti sınırı istemci ile DB’de aynı (kayma → yarım/erken reddedilen yenileme)', () => {
-    const db = /v_tavan constant int := (\d+);/.exec(migration)?.[1]
+    // İlk eşleşme RPC'nin tavanı; özet tetiğinin tavanı (v_tavan) da AYNI olmak zorunda (RPC yolunda kırpma olmasın).
+    const tavanlar = [...migration.matchAll(/v_tavan\s+constant int := (\d+);/g)].map((m) => m[1])
+    const db = tavanlar[0]
+    expect(new Set(tavanlar).size, 'RPC ve özet tetiği parti tavanları ayrışmış').toBe(1)
     const istemci = /const MALIYET_PARTI_TAVANI = (\d+)/.exec(servis)?.[1]
     expect(db, 'migration tavanı bulunamadı').toBeDefined()
     expect(istemci, 'istemci tavanı bulunamadı').toBeDefined()

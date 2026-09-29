@@ -195,11 +195,13 @@ yönetici kapılı RPC + ifade tetiği. Z (iki kolonu satır tetiğine eklemek, 
 
 ### Gölge kanıtı (migration dosyası BİREBİR, PGlite)
 
-`docs/audits/rec412-maliyet-golge/golge.mjs` — gerçek `is_admin_claim()` ve `denetim_izi_yaz()` dosyalardan yüklenir; **33 kontrol yeşil**;
-3 bilinçli bozma kırmızı (`SABOTAJ=tenant` 2, `dedup` 1, `kapi` 4). Kapsam: yönetici/moderatör/`user_metadata`/JWT'siz/service_role, atomiklik
-(5 bozuk girdi), tenant sınırı, 5001 sınırı, fail-closed (günlük FK ihlali → maliyet geri alınır), çift kayıt önlemi, stok regresyonu,
-NULL→değer, iki tenant, yetki matrisi, 5000 satır tek özet (1548 ms PGlite).
-⚠Şema gerçek değil (RLS yok, `auth.uid()` taklit); hacim/süre gerçek DB'yi temsil etmez.
+`docs/audits/rec412-maliyet-golge/golge.mjs` — gerçek `is_admin_claim()` ve `denetim_izi_yaz()` dosyalardan yüklenir; **43 kontrol yeşil**;
+5 bilinçli bozma kırmızı (`SABOTAJ=tenant` 2, `dedup` 1, `kapi` 3, `beklenen` 3, `nan` 3). Kapsam: yönetici/moderatör/`user_metadata`/JWT'siz/service_role,
+atomiklik (5 bozuk girdi), tenant sınırı, 5001 sınırı, fail-closed (günlük FK ihlali → maliyet geri alınır), çift kayıt önlemi, stok regresyonu,
+NULL→değer, iki tenant, yetki matrisi, 5000 satır tek özet; **çürütme sonrası eklenenler:** RLS'li `products` (JWT admin + profil rolü düşük →
+40001, sessiz başarı yok), NaN/Infinity, yinelenen id, alış fiyatı/para birimi değişti, ondalık taşması (2. koşu n=0).
+⚠Şema gerçek değil (RLS modeli basit, `auth.uid()` taklit, 8 sn `statement_timeout` ve satır tetikleri YOK); hacim/süre gerçek DB'yi temsil etmez.
+Bağımsız çürütme: `docs/audits/rec412-maliyet-red-team-2026-09-29.md` (KOŞULLU GEÇER; 4 ORTA + 7 DÜŞÜK; "Karşılık" tablosu her bulguyu yanıtlar).
 
 ### Riskler (adıyla)
 

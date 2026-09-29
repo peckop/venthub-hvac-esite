@@ -501,8 +501,12 @@ describe('refreshCostInBase', () => {
     const rpcCalls = calls.filter(c => c.table === 'maliyet_yenile')
     expect(rpcCalls).toHaveLength(1)
     expect(rpcCalls[0].method).toBe('POST')
+    // Maliyetin HESAPLANDIĞI alış fiyatı da gider: okuma ile yazma arasında fiyat değişirse RPC satırı yazmaz ve
+    // tüm partiyi geri alır (eski fiyattan üretilmiş maliyet canlıya geçmesin).
     expect(rpcCalls[0].body).toEqual({
-      p_satirlar: [{ id: 'p1', cost_in_base: 350, purchase_rate_to_base: 35 }],
+      p_satirlar: [
+        { id: 'p1', cost_in_base: 350, purchase_rate_to_base: 35, purchase_price: 10, purchase_currency: 'EUR' },
+      ],
     })
     // Günlük etiketi: yöntem + koşu kimliği (uuid) istek başlığıyla gider.
     expect(rpcCalls[0].headers['x-degisiklik-yontemi']).toBe('maliyet_yenileme')
@@ -541,6 +545,25 @@ describe('refreshCostInBase', () => {
 
     await expect(refreshCostInBase(supabase, { dryRun: false })).rejects.toMatchObject({ code: '22023' })
     expect(calls.filter(c => c.table === 'products')).toHaveLength(0)
+  })
+
+  it('fazla ondalıklı kur sütun duyarlığına (6) yuvarlanır: aynı kur ikinci koşuda "değişmedi" sayılır', async () => {
+    const calls: CapturedWrite[] = []
+    const supabase = stubClient(
+      {
+        products: [
+          // DB'de numeric(18,6) olarak saklanmış kur: 35.123457. Kaynak kur 35.1234567 (7 ondalık).
+          { id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: 351.2346, purchase_price: 10, purchase_currency: 'EUR', purchase_rate_to_base: 35.123457 },
+        ],
+        currency_rates: [{ rate: 35.1234567, effective_date: '2026-08-13' }],
+      },
+      calls,
+    )
+
+    const summary = await refreshCostInBase(supabase, { dryRun: false })
+
+    expect(summary.updated).toBe(0)
+    expect(calls).toHaveLength(0)
   })
 
   it('parti sınırını (5000) aşarsa BÖLMEDEN durur ve hiçbir yazma isteği atmaz', async () => {

@@ -53,7 +53,10 @@ async function istek({ jwt, baslik, rol = 'authenticated' }, sql) {
   }
 }
 const rpc = (dizi) => `select public.maliyet_yenile('${JSON.stringify(dizi)}'::jsonb) as n`
-const satir = (n, cost, rate = 35) => ({ id: P(n), cost_in_base: cost, purchase_rate_to_base: rate })
+// Payload: maliyetin HESAPLANDIĞI alış fiyatı da gider (varsayılan ürün: 100 EUR) — iyimser eşzamanlılık koruması.
+const satir = (n, cost, rate = 35, fiyat = 100, para = 'EUR') => ({
+  id: P(n), cost_in_base: cost, purchase_rate_to_base: rate, purchase_price: fiyat, purchase_currency: para,
+})
 const maliyet = () => q('select id, cost_in_base::float8 c, purchase_rate_to_base::float8 r from products order by id')
 
 yaz('PostgreSQL:', (await q('select version() v'))[0].v.split(',')[0])
@@ -78,6 +81,17 @@ await db.exec(`
     purchase_rate_to_base numeric(18,6), cost_in_base numeric(14,4), stock int not null default 0, updated_at timestamptz default now());
   grant all on all tables in schema public to authenticated, service_role;
   alter default privileges in schema public grant execute on functions to service_role; -- Supabase varsayılanını taklit
+  -- RLS MODELİ (canlı \`products\` UPDATE politikası: profil rolü admin/super_admin/moderator; tenant süzgeci YOK).
+  -- Çürütme B1: JWT'de admin olup PROFİL rolü düşmüş kullanıcı INVOKER RPC'de sessizce 0 satıra iner.
+  create table user_profiles(id uuid primary key, role text not null);
+  insert into user_profiles values ('${UID}', 'admin');
+  grant select on user_profiles to authenticated;
+  alter table products enable row level security;
+  create policy p_sec on products for select to authenticated using (true);
+  create policy p_upd on products for update to authenticated
+    using (exists (select 1 from user_profiles up where up.id = auth.uid() and up.role in ('admin','super_admin','moderator')))
+    with check (exists (select 1 from user_profiles up where up.id = auth.uid() and up.role in ('admin','super_admin','moderator')));
+  alter role service_role bypassrls;
 `)
 
 // Gerçek fonksiyonlar dosyalardan (taklit değil)
@@ -98,6 +112,8 @@ let mig = fs.readFileSync(`${KOK}/supabase/migrations/20260929143000_maliyet_yen
 if (process.env.SABOTAJ === 'tenant') mig = mig.replaceAll(' and p.tenant_id = public.jwt_tenant_id()', '')
 if (process.env.SABOTAJ === 'dedup') mig = mig.replace(/\s+and o\.purchase_price is not distinct from n\.purchase_price\s+and o\.purchase_currency is not distinct from n\.purchase_currency/, '')
 if (process.env.SABOTAJ === 'kapi') mig = mig.replace('if not public.is_admin_claim() then', 'if false then')
+if (process.env.SABOTAJ === 'beklenen') mig = mig.replace('if v_say <> v_beklenen then', 'if false then')
+if (process.env.SABOTAJ === 'nan') mig = mig.replaceAll(/\s+or s\.(cost_in_base|purchase_rate_to_base) = '(NaN|Infinity)'::numeric/g, '')
 await db.exec(mig)
 yaz('\nmigration uygulandı (son-guard geçti: tetik kuruldu, hata yakalayıcı yok, anon/PUBLIC EXECUTE kapalı)')
 
@@ -195,7 +211,43 @@ await istek({ jwt: SERVIS, rol: 'service_role', baslik: YONTEM }, `update public
 r = await denetim()
 kontrol('iki özet, tenant\'lar {T1,T2}', r.length === 2 && new Set(r.map((x) => x.tenant_id)).size === 2, JSON.stringify(r.map((x) => [x.tenant_id, x.after?.length])))
 await temizle()
-await db.exec(`update products set tenant_id = '${T1}'`)
+await db.exec(`update products set tenant_id = '${T1}'`) // satır tetiği (tenant_id UPDATE OF listesinde) günlük yazar
+await temizle()
+
+yaz('\n(15) çürütme B1: JWT admin ama PROFİL rolü düşmüş → RLS sessizce 0 satır → TÜM parti reddedilir (sessiz başarı YOK)')
+const b1Once = JSON.stringify(await maliyet())
+await db.exec(`update user_profiles set role = 'user' where id = '${UID}'`)
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 601), satir(3, 602)]))
+kontrol('hata 40001, hiçbir satır değişmedi, günlük boş', s.kod === '40001' && JSON.stringify(await maliyet()) === b1Once && (await denetim()).length === 0, JSON.stringify(s).slice(0, 200))
+await db.exec(`update user_profiles set role = 'admin' where id = '${UID}'`)
+
+yaz('\n(16) çürütme B2: NaN / Infinity → TÜM parti reddedilir')
+for (const [ad, bozuk] of [['NaN maliyet', { ...satir(2, 'NaN') }], ['Infinity oran', { ...satir(2, 200, 'Infinity') }], ['NaN oran', { ...satir(2, 200, 'NaN') }]]) {
+  s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 611), bozuk]))
+  kontrol(`${ad} → 22023, yazım YOK`, s.kod === '22023' && JSON.stringify(await maliyet()) === b1Once, JSON.stringify(s).slice(0, 160))
+}
+
+yaz('\n(17) çürütme B6: aynı id iki kez → reddedilir')
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 621), satir(1, 622)]))
+kontrol('yinelenen id → 22023, yazım YOK', s.kod === '22023' && JSON.stringify(await maliyet()) === b1Once, JSON.stringify(s).slice(0, 160))
+
+yaz('\n(18) çürütme B8: okuma ile yazma arasında alış fiyatı değişti → o satır yazılamaz, TÜM parti geri alınır')
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 631), satir(3, 632, 35, 999)])) // ürün 3 gerçekte 100 EUR
+kontrol('eski fiyattan üretilmiş satır → 40001; ürün 1 de YAZILMADI', s.kod === '40001' && JSON.stringify(await maliyet()) === b1Once, JSON.stringify(s).slice(0, 200))
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 631), satir(3, 632, 35, 100, 'USD')]))
+kontrol('para birimi değişmişse de → 40001', s.kod === '40001' && JSON.stringify(await maliyet()) === b1Once, JSON.stringify(s).slice(0, 200))
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([{ id: P(1), cost_in_base: 5, purchase_rate_to_base: 5 }]))
+kontrol('payload\'da alış fiyatı/para birimi yoksa → 22023', s.kod === '22023', JSON.stringify(s).slice(0, 160))
+
+yaz('\n(19) çürütme B5: sütundan fazla ondalık → ilk koşuda yazılır, İKİNCİ koşuda değişmedi sayılır (döngü yok)')
+await temizle()
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 351.23456789, 35.1234567)]))
+r = await denetim()
+kontrol('1. koşu: n=1, özet 1 satır, değerler yuvarlanmış (351.2346 / 35.123457)', s.son?.rows[0].n === 1 && r.length === 1 && r[0].after[0].cost_in_base == 351.2346 && r[0].after[0].purchase_rate_to_base == 35.123457, JSON.stringify(r[0]?.after))
+await temizle()
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc([satir(1, 351.23456789, 35.1234567)]))
+kontrol('2. koşu (aynı girdi): n=0, günlük boş', s.son?.rows[0].n === 0 && (await denetim()).length === 0, JSON.stringify(s))
+await temizle()
 
 yaz('\n(13) yetki matrisi')
 const acl = await q(`select has_function_privilege('anon','public.maliyet_yenile(jsonb)','execute') a, has_function_privilege('authenticated','public.maliyet_yenile(jsonb)','execute') u, has_function_privilege('service_role','public.maliyet_yenile(jsonb)','execute') sv,
@@ -208,7 +260,7 @@ await db.exec(`delete from products; insert into products(id, cost_in_base, purc
 const idler = await q('select id from products order by id')
 await temizle()
 const t0 = Date.now()
-s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc(idler.map((x) => ({ id: x.id, cost_in_base: 101, purchase_rate_to_base: 31 }))))
+s = await istek({ jwt: ADMIN, baslik: YONTEM }, rpc(idler.map((x) => ({ id: x.id, cost_in_base: 101, purchase_rate_to_base: 31, purchase_price: 100, purchase_currency: 'EUR' }))))
 const ms = Date.now() - t0
 r = await denetim()
 kontrol(`5000 satır TEK özet, dizi 5000, kirpildi YOK (${ms} ms)`, s.son?.rows[0].n === 5000 && r.length === 1 && r[0].after.length === 5000 && !/kirpildi/.test(r[0].comment), JSON.stringify(s).slice(0, 160))

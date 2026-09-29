@@ -38,10 +38,11 @@
 --   PostgreSQL kısıtı); değişen satır yoksa hiçbir satır yazılmaz (gölgede ölçüldü: docs/audits/rec412-maliyet-golge).
 --
 -- GERİ ALMA (bu dosyanın tamamı, veri kaybı yok — yalnız günlük kaydı ve RPC gider):
+--   ⭐SIRA: ÖNCE `refreshCostInBase` istemcisi (PR) eski ürün-başına-PATCH koduna döndürülür ve yayınlanır; SONRA
+--   aşağıdakiler. Sıra ters olursa panelden maliyet yenileme "function maliyet_yenile does not exist" ile düşer.
 --   drop trigger if exists denetim_izi_maliyet_ozet on public.products;
 --   drop function if exists public.denetim_izi_maliyet_ozet();
 --   drop function if exists public.maliyet_yenile(jsonb);
---   ve `refreshCostInBase` istemcisi (PR) eski ürün-başına-PATCH koduna döndürülür.
 --
 -- Cetvel: docs/standards/migration-safety-standard.md (salt-ekleyici, biçim a) · docs/standards/denetim-izi-standard.md ·
 -- CLAUDE.md kural 11 (admin işlemleri iz bırakır), 12 (tenant, app_metadata), 13 (merge = prod).
@@ -69,8 +70,13 @@ end $$;
 
 -- ---------------------------------------------------------------------------
 -- maliyet_yenile(jsonb) — TEK UPDATE ifadesi; yönetici kapılı; SECURITY INVOKER (RLS korunur).
--- p_satirlar: [{"id": uuid, "cost_in_base": numeric, "purchase_rate_to_base": numeric}, ...]
+-- p_satirlar: [{"id": uuid, "cost_in_base": numeric, "purchase_rate_to_base": numeric,
+--               "purchase_price": numeric, "purchase_currency": text}, ...]
+--   `purchase_price`/`purchase_currency` = maliyetin HESAPLANDIĞI alış fiyatı (iyimser eşzamanlılık koruması, B8):
+--   okuma ile yazma arasında ürünün fiyatı değiştiyse o satır YAZILAMAZ ve TÜM parti geri alınır.
 -- Döner: gerçekten değişen satır sayısı (aynı değerli satırlar yazılmaz).
+-- Değerler sütun duyarlığına YUVARLANIR (cost 4, rate 6): sütundan fazla ondalık taşıyan girdi her koşuda "değişti"
+-- görünüp satırı boşuna yeniden yazmasın (B5).
 -- ---------------------------------------------------------------------------
 create or replace function public.maliyet_yenile(p_satirlar jsonb)
 returns integer
@@ -79,8 +85,10 @@ security invoker
 set search_path = public, pg_temp
 as $$
 declare
-  v_tavan constant int := 5000;
-  v_say   int;
+  v_tavan     constant int := 5000;
+  v_gelen     int;
+  v_beklenen  int;
+  v_say       int;
 begin
   if not public.is_admin_claim() then
     raise exception 'maliyet_yenile: yalniz yonetici (JWT claim)' using errcode = '42501';
@@ -90,27 +98,40 @@ begin
     raise exception 'maliyet_yenile: p_satirlar bir JSON dizisi olmali' using errcode = '22023';
   end if;
 
-  if jsonb_array_length(p_satirlar) > v_tavan then
-    raise exception 'maliyet_yenile: parti siniri asildi (% > %); yarim yenileme yapilmaz',
-      jsonb_array_length(p_satirlar), v_tavan using errcode = '54000';
+  v_gelen := jsonb_array_length(p_satirlar);
+  if v_gelen > v_tavan then
+    raise exception 'maliyet_yenile: parti siniri asildi (% > %); yarim yenileme yapilmaz', v_gelen, v_tavan
+      using errcode = '54000';
   end if;
 
-  -- Girdi doğrulaması yazımdan ÖNCE: tek bozuk eleman TÜM partiyi reddeder.
+  -- Girdi doğrulaması yazımdan ÖNCE: tek bozuk eleman TÜM partiyi reddeder. NaN/Infinity açıkça elenir
+  -- (`NaN >= 0` PostgreSQL'de DOĞRUDUR; kıyas tek başına yetmez — B2).
   if exists (
     select 1
-      from jsonb_to_recordset(p_satirlar) as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric)
+      from jsonb_to_recordset(p_satirlar)
+             as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric, purchase_price numeric, purchase_currency text)
      where s.id is null
         or s.cost_in_base is null or s.cost_in_base < 0
+        or s.cost_in_base = 'NaN'::numeric or s.cost_in_base = 'Infinity'::numeric
         or s.purchase_rate_to_base is null or s.purchase_rate_to_base <= 0
+        or s.purchase_rate_to_base = 'NaN'::numeric or s.purchase_rate_to_base = 'Infinity'::numeric
+        or s.purchase_price is null or s.purchase_currency is null
   ) then
-    raise exception 'maliyet_yenile: eksik/gecersiz eleman (id, cost_in_base>=0, purchase_rate_to_base>0 zorunlu)'
+    raise exception 'maliyet_yenile: eksik/gecersiz eleman (id, cost_in_base>=0, purchase_rate_to_base>0, purchase_price, purchase_currency zorunlu; NaN/Infinity yasak)'
+      using errcode = '22023';
+  end if;
+
+  -- Aynı id iki kez: hangisinin kazanacağı belirsiz olurdu (B6) → tüm parti reddedilir.
+  if (select count(distinct s.id)
+        from jsonb_to_recordset(p_satirlar) as s(id uuid)) <> v_gelen then
+    raise exception 'maliyet_yenile: ayni urun id birden fazla kez gonderildi (tum parti reddedildi)'
       using errcode = '22023';
   end if;
 
   -- Bu tenant'ta görünmeyen id: tüm parti reddedilir (RLS sessizce atlamasın → yarım yenileme olmaz).
   if exists (
     select 1
-      from jsonb_to_recordset(p_satirlar) as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric)
+      from jsonb_to_recordset(p_satirlar) as s(id uuid)
      where not exists (
        select 1 from public.products p where p.id = s.id and p.tenant_id = public.jwt_tenant_id()
      )
@@ -119,15 +140,34 @@ begin
       using errcode = '22023';
   end if;
 
+  -- Beklenen: şu an gerçekten DEĞİŞECEK satır sayısı (gelen değer sütun duyarlığına yuvarlanmış hâliyle).
+  select count(*) into v_beklenen
+    from jsonb_to_recordset(p_satirlar)
+           as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric, purchase_price numeric, purchase_currency text)
+    join public.products p on p.id = s.id and p.tenant_id = public.jwt_tenant_id()
+   where p.cost_in_base is distinct from round(s.cost_in_base, 4)
+      or p.purchase_rate_to_base is distinct from round(s.purchase_rate_to_base, 6);
+
   update public.products p
-     set cost_in_base = s.cost_in_base,
-         purchase_rate_to_base = s.purchase_rate_to_base
-    from jsonb_to_recordset(p_satirlar) as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric)
+     set cost_in_base = round(s.cost_in_base, 4),
+         purchase_rate_to_base = round(s.purchase_rate_to_base, 6)
+    from jsonb_to_recordset(p_satirlar)
+           as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric, purchase_price numeric, purchase_currency text)
    where p.id = s.id
      and p.tenant_id = public.jwt_tenant_id()
-     and (p.cost_in_base is distinct from s.cost_in_base
-          or p.purchase_rate_to_base is distinct from s.purchase_rate_to_base);
+     and p.purchase_price = s.purchase_price
+     and p.purchase_currency::text = s.purchase_currency
+     and (p.cost_in_base is distinct from round(s.cost_in_base, 4)
+          or p.purchase_rate_to_base is distinct from round(s.purchase_rate_to_base, 6));
   get diagnostics v_say = row_count;
+
+  -- Beklenenden az satır yazıldıysa YARIM yenileme olurdu: (a) INVOKER olduğu için `products` UPDATE politikası
+  -- da uygulanır ve JWT'de admin olup profil rolü düşmüş biri sessizce 0 satıra inerdi (B1), (b) okuma ile yazma
+  -- arasında bir ürünün alış fiyatı değişti (B8). İkisinde de TÜM parti geri alınır; istemci "yeniden deneyin" der.
+  if v_say <> v_beklenen then
+    raise exception 'maliyet_yenile: % satirdan % tanesi yazilabildi (yetki degisti ya da okumadan sonra urun fiyati degisti); tum parti geri alindi',
+      v_beklenen, v_say using errcode = '40001';
+  end if;
 
   return v_say;
 end;

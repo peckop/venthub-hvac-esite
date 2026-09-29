@@ -233,12 +233,15 @@ tetiğinin `UPDATE OF` listesinde **değildir** ve listeye eklenmez: panelden te
 |---|---|
 | **Yazım yolu** | `public.maliyet_yenile(p_satirlar jsonb)` — **TEK `UPDATE` ifadesi**; ya tüm parti yazılır ya hiçbiri (yarım yenileme yok). Ürün başına ayrı PATCH ile yazan istemci yolu **kapıyla KIRMIZI** (INV-FIYAT-GUNLUGU-1, maliyet kolu). |
 | **Yetki** | `is_admin_claim()` — JWT `user_role` / `app_metadata.user_role`; `user_metadata`'ya bakmaz, JWT yoksa FALSE (profil tablosuna DÜŞMEZ; kural 12). `SECURITY INVOKER` (RLS korunur, yetki genişlemez), tenant filtreli, moderatör yazamaz (maliyet yönetici alanı, karar 95). `anon`/`PUBLIC` EXECUTE kapalı. |
-| **Girdi** | Dizi değilse, eleman eksik/geçersizse (`cost_in_base<0`, `purchase_rate_to_base<=0`), `id` bu tenant'ta yoksa **tüm parti reddedilir**. Parti sınırı **5000** (RPC ve istemci aynı; aşılırsa istemci BÖLMEDEN durur — bölmek atomikliği bozar). |
+| **Girdi** | Payload elemanı: `{id, cost_in_base, purchase_rate_to_base, purchase_price, purchase_currency}` (son ikisi maliyetin HESAPLANDIĞI alış fiyatı: okuma ile yazma arasında fiyat değişirse satır yazılamaz). Dizi değilse, eleman eksik/geçersizse (`cost_in_base<0`, `purchase_rate_to_base<=0`, NaN/Infinity), `id` yinelenirse ya da bu tenant'ta yoksa **tüm parti reddedilir** (22023). Değerler sütun duyarlığına yuvarlanır (cost 4, rate 6). Parti sınırı **5000** (54000; RPC ve istemci aynı; aşılırsa istemci BÖLMEDEN durur — bölmek atomikliği bozar). |
+| **Yarım yenileme yok** | Yazılan satır sayısı beklenenden azsa (INVOKER olduğundan `products` UPDATE politikası da uygulanır: JWT'de admin, profil rolü düşmüş → RLS sessizce 0 satır; ya da alış fiyatı değişti) **40001** ile TÜM parti geri alınır; sessiz "0 güncellendi" başarısı yoktur. Arayüz 42501/54000/57014/40001'i ayrı mesajla gösterir. |
 | **Günlük** | `denetim_izi_maliyet_ozet()` — `products` üzerinde ifade düzeyi tetik (geçiş tabloları; sütun listesi konamaz → her UPDATE ifadesinde çalışır, değişen maliyet yoksa satır YAZMAZ). **Tenant başına TEK özet satırı** (`row_pk='OZET'`), `before`/`after` = değişen satırların eski→yeni `{id, cost_in_base, purchase_rate_to_base}` dizisi; yöntem/oturum §8.1 başlıklarından (`maliyet_yenileme`). Fail-closed: günlük yazılamazsa maliyet yazımı geri alınır. |
 | **Çift kayıt önlemi** | `purchase_price`/`purchase_currency` de değişen satır özete GİRMEZ; onu satır tetiği (`denetim_izi_products_upd`) zaten TÜM değişen kolonlarıyla (maliyet dahil) yazar. |
 
-Kanıt: `docs/audits/rec412-maliyet-golge/` (PGlite gölge, 33 kontrol + 3 bilinçli bozma kırmızı: kiracı filtresi, çift kayıt önlemi,
-yönetici kapısı). ⚠Gölge şema gerçek DEĞİL: RLS ve gerçek `auth.uid()` taklittir; hacim ölçüsü gerçek DB'yi temsil etmez.
+Kanıt: `docs/audits/rec412-maliyet-golge/` (PGlite gölge, 43 kontrol + 5 bilinçli bozma kırmızı: kiracı filtresi, çift kayıt önlemi,
+yönetici kapısı, beklenen-sayı kontrolü, NaN kontrolü) ve bağımsız çürütme `docs/audits/rec412-maliyet-red-team-2026-09-29.md`.
+Kapı ayrıca `ZORUNLU_TETIKLER`'i ADIYLA arar (`denetim_izi_maliyet_ozet`, `denetim_izi_ozet_*`): tabloda başka tetik durduğu için
+"tabloda tetik var mı" sorusu bunların sökülmesini görmez. ⚠Gölge şema gerçek DEĞİL: RLS ve gerçek `auth.uid()` taklittir; hacim ölçüsü gerçek DB'yi temsil etmez.
 Bilinen sınır: aynı ifadede maliyet kolonlarıyla birlikte satır tetiğinin izlediği BAŞKA kolon değişirse (bugün hiçbir yolda yok)
 satır iki kez görünebilir. Kapı kapsamı: kolon adı `.update(…)` argümanında DOĞRUDAN geçmeyen (önce değişkene konan) yazımı istemci
 tarayıcısı göremez; DB tetiği yine yazar ama parti özeti sözleşmesi o yolda kaybolur.

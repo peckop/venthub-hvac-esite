@@ -270,6 +270,23 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
         tanim:
           'CREATE TRIGGER denetim_izi_products AFTER INSERT OR DELETE ON public.products FOR EACH ROW EXECUTE FUNCTION denetim_izi_yaz()',
       },
+      // ADIYLA ZORUNLU ifade düzeyi özet tetikleri (hüküm katmanı ZORUNLU_TETIKLER; çürütme B3): product_prices
+      // üç olay + products maliyet özeti. Yeşil fikstürde HEPSİ bulunmak zorunda; biri sökülünce kırmızı testler bakar.
+      ...['ins', 'upd', 'del'].map((olay) => ({
+        tablo: 'product_prices',
+        tetik: `denetim_izi_ozet_${olay}`,
+        fonksiyon: 'denetim_izi_fiyat_ozet',
+        govde: 'begin insert into admin_audit_log ... return null; end;',
+        tanim: `CREATE TRIGGER denetim_izi_ozet_${olay} AFTER ${olay === 'ins' ? 'INSERT' : olay === 'upd' ? 'UPDATE' : 'DELETE'} ON public.product_prices FOR EACH STATEMENT EXECUTE FUNCTION denetim_izi_fiyat_ozet()`,
+      })),
+      {
+        tablo: 'products',
+        tetik: 'denetim_izi_maliyet_ozet',
+        fonksiyon: 'denetim_izi_maliyet_ozet',
+        govde: 'begin insert into admin_audit_log ... return null; end;',
+        tanim:
+          'CREATE TRIGGER denetim_izi_maliyet_ozet AFTER UPDATE ON public.products REFERENCING OLD TABLE AS eski_t NEW TABLE AS yeni_t FOR EACH STATEMENT EXECUTE FUNCTION denetim_izi_maliyet_ozet()',
+      },
     ])
 
   const PRODUCTS_UPD: TetikSatiri = {
@@ -338,7 +355,7 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
       tanim: '',
     }
     const { denetimTetikSayisi } = degerlendir([...TAM, PRODUCTS_UPD, webhook])
-    expect(denetimTetikSayisi).toBe(12)
+    expect(denetimTetikSayisi).toBe(16) // 10 tablo + products INS/DEL + 3 fiyat özeti + maliyet özeti + products UPD
   })
 
   it('⭐KIRMIZI taraf 5 (REC-412 Faz 0.5): product_prices denetim tetigi SOKULMUS -> TETIK-YOK', async () => {
@@ -389,6 +406,15 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
     }
     const { ihlaller } = degerlendir([...TAM, suzgecsiz, MALIYET_OZET])
     expect(ihlaller.some((i) => i.sinif === 'SUZGEC-YOK' || i.sinif === 'SUZGEC-DAR')).toBe(true)
+  })
+
+  it('⭐KIRMIZI taraf 9 (çürütme B3): ifade düzeyi özet tetiği SÖKÜLMÜŞ -> tabloda başka tetik durmasına rağmen TETIK-YOK', async () => {
+    const degerlendir = await degerlendirYukle()
+    for (const ad of ['denetim_izi_maliyet_ozet', 'denetim_izi_ozet_ins', 'denetim_izi_ozet_upd', 'denetim_izi_ozet_del']) {
+      const eksik = [...TAM, PRODUCTS_UPD].filter((r) => r.tetik !== ad)
+      const { ihlaller } = degerlendir(eksik)
+      expect(ihlaller.map((i) => `${i.sinif}:${i.tablo}`), `${ad} sökülünce kapı kör kaldı`).toContain(`TETIK-YOK:${ad}`)
+    }
   })
 
   it('⭐KIRMIZI taraf 8 (REC-412 Faz 0.5b): maliyet ozet fonksiyonuna hata yakalayici girmis -> FAIL-OPEN', async () => {
