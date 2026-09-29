@@ -138,7 +138,17 @@ function sonDogrulama(metin) {
 
 function basliktaSahipVar(metin) {
   const bas = metin.split('\n').slice(0, 40).join('\n')
-  return /Sahib[iı]\**\s*:/i.test(bas)
+  // `Sahibi:` ve kısa yazımlar (`Sahip:`, `Sahib:`) sayılır (OPS 3.4-B: kapı yanlış-pozitif vermesin).
+  return /Sahi[bp][iı]?\**\s*:/i.test(bas)
+}
+
+const SAHIPLIK_YOLU = 'scripts/belge/cetvel-sahipligi.json'
+
+/** Rol kartlarından türetilen cetvel sahiplik haritası: { 'docs/standards/x.md': { sahip, dogrulanacak, dayanak } } */
+function sahiplikHaritasi(kok) {
+  const p = path.join(kok, SAHIPLIK_YOLU)
+  if (!fs.existsSync(p)) return {}
+  return JSON.parse(fs.readFileSync(p, 'utf8')).cetveller || {}
 }
 
 function sonCommitTarihi(kok, dosya) {
@@ -171,13 +181,17 @@ function cekirdekYaslari(kok, simdi = Date.now(), belgeler = CEKIRDEK) {
 
 function cetvelBasliklari(kok) {
   const dizin = path.join(kok, CETVEL_DIZINI)
+  const harita = sahiplikHaritasi(kok)
   return fs
     .readdirSync(dizin)
     .filter((a) => a.endsWith('.md') && a !== 'SOURCES.md')
     .sort()
     .map((a) => {
       const metin = fs.readFileSync(path.join(dizin, a), 'utf8')
-      return { dosya: CETVEL_DIZINI + '/' + a, sahip: basliktaSahipVar(metin), sonDogrulama: sonDogrulama(metin) !== null }
+      const dosya = CETVEL_DIZINI + '/' + a
+      // Sahip iki yoldan biriyle bilinir: başlıkta yazılı VEYA rol kartı haritasında atanmış (REC-433 3.4-B).
+      const sahip = basliktaSahipVar(metin) || Boolean(harita[dosya])
+      return { dosya, sahip, sonDogrulama: sonDogrulama(metin) !== null }
     })
 }
 
@@ -240,6 +254,8 @@ module.exports = {
   kirikYollar,
   sonDogrulama,
   basliktaSahipVar,
+  sahiplikHaritasi,
+  SAHIPLIK_YOLU,
   cekirdekYaslari,
   cetvelBasliklari,
   tabanOku,

@@ -1,0 +1,290 @@
+{
+  "_not": "Üretilmiştir: REC-433 3.4-B, OPS hükmü 2026-09-29. Cetvel başlığına dokunmadan sahiplik haritası. dogrulanacak=true → sahip pencere ilk dokunuşta teyit eder.",
+  "cetveller": {
+    "docs/standards/3d-scene-lighting-research.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/3d-showroom-ux-research.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/admin-capabilities.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/admin-design-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/admin-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/adres-semasi-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/aile-metni-sayisal-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/analytics-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: analytics"
+    },
+    "docs/standards/arac-envanteri-standard.md": {
+      "sahip": "ARAC",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/auth-account-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: auth/hesap altyapısı"
+    },
+    "docs/standards/bagimlilik-guvenlik-yukseltme-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/bagimlilik-kararlari.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/barindirma-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/catalog-ingestion-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/ci-runner-install-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/collaboration-protocol.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/companion-doc-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/crm-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/csv-import-export-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/customer-account-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: müşteri yüzü (müşteri hesabı)"
+    },
+    "docs/standards/db-grant-hygiene-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/dealer-module-blueprint.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": true,
+      "dayanak": "düşük güven: sahip ilk dokunuşta teyit eder"
+    },
+    "docs/standards/dealer-network-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": true,
+      "dayanak": "düşük güven: sahip ilk dokunuşta teyit eder"
+    },
+    "docs/standards/denetim-izi-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/deploy-build-skip-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/document-numbering-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/edge-function-security-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/email-template-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/erp-workspace-design-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/form-submission-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: müşteri yüzü (form gönderimi)"
+    },
+    "docs/standards/i18n-ters-yon-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/is-kayit-duzeni-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/kategori-adlandirma-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/ledger-ve-olu-migration-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/legal-compliance-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: hukuk (Recep kapısı; ayrı HUKUK rolü açılana kadar OPS)"
+    },
+    "docs/standards/marka-token-eslemesi-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/matris-gorunum-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/measurement-discipline-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/migration-safety-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/notification-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: bildirim/e-posta"
+    },
+    "docs/standards/payment-ledger-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: ödeme defteri"
+    },
+    "docs/standards/pricing-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/product-schema-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/proje-takip-defteri-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/purchasing-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": true,
+      "dayanak": "düşük güven: sahip ilk dokunuşta teyit eder"
+    },
+    "docs/standards/quote-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "OPS sahipsiz alan kuralı: müşteri yüzü (teklif akışının müşteri tarafı); ADMIN ikincil (yönetici tarafı)"
+    },
+    "docs/standards/rendering-cache-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/rls-yetki-karari-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/satis-kipi-gecis-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/settled-work-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/spec-axis-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/storefront-design-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/storefront-reflow-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/uretilmis-artefakt-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/urun-yapisal-veri-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/vaat-butunlugu-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/work-tracking-ssot-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    }
+  }
+}
