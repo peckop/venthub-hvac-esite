@@ -12,6 +12,7 @@ import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
+import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
   buildBreadcrumbJsonLd,
@@ -121,11 +122,14 @@ export async function aileSayfasiUstVerisi(
         description,
         alternates: {
           canonical: canonicalUrl,
-          languages: {
-            tr: trUrl,
-            en: enUrl,
-            'x-default': trUrl,
-          },
+          // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+          ...hreflangAlani({
+            languages: {
+              tr: trUrl,
+              en: enUrl,
+              'x-default': trUrl,
+            },
+          }),
         },
         openGraph: {
           title,

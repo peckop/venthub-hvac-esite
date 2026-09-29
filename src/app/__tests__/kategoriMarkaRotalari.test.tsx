@@ -22,6 +22,14 @@ const cagri = vi.hoisted(() => ({
   staticFrom: vi.fn(),
 }))
 
+// REC-300 3e-3: hreflang artık `EN_YAYIN` bayrağına bağlı (kapalıyken yalnız canonical). Bu dosya
+// hreflang ADRES ŞEKLİNİ (tr/en/x-default) ölçer → bayrak AÇIK taklit edilir; KAPALI hâl ve iki
+// yönlü bağ `src/lib/seo/__tests__/enYayinHreflangNoindex.test.ts`'te.
+vi.mock('@/config/features', async (orijinal) => ({
+  ...(await orijinal<typeof import('@/config/features')>()),
+  EN_YAYIN: true,
+}))
+
 vi.mock('next/navigation', () => ({
   notFound: () => {
     throw new Error('NOT_FOUND')
