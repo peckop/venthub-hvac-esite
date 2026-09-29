@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
-import { yeniOturumKimligi, yontemli } from '../pricing/degisiklikYontemi'
+import { type DegisiklikYontemi, yeniOturumKimligi, yontemli } from '../pricing/degisiklikYontemi'
 import { tumSatirlariCek, VARSAYILAN_SAYFA_BOYU } from '../supabase/tumSatirlar'
 import { resolveFxRate } from './fxRate.service'
 import { type PricingRuleRow, resolvePriceWithRules, type RuleEvaluationInputs } from './pricing.service'
@@ -109,7 +109,23 @@ export interface MaterializeOptions {
    * değmez). Üretimde verilmez; varsayılan `VARSAYILAN_SAYFA_BOYU`.
    */
   cacheSayfaBoyu?: number
+  /**
+   * TEK/BİRKAÇ ÜRÜN kapsamı (REC-412 Faz 1): verilirse yalnız bu ürünler taranır VE bayat-satır tasfiyesi
+   * yalnız BU ürünlerin cache satırlarına uygulanır. ⛔Tasfiye kapsamı daraltılmazsa taranmayan 347 ürünün
+   * satırı "bu koşuda üretilmedi" sayılıp pasifleştirilirdi — bu yüzden cache fotoğrafı da aynı süzgeçle okunur.
+   * `undefined` = katalog geneli (mevcut davranış). BOŞ dizi = HİÇBİR ürün (fail-open yasak: "kapsam boş"
+   * asla "hepsi" demek değildir).
+   */
+  productIds?: string[]
+  /**
+   * Fiyat günlüğü yöntem etiketi (INV-FIYAT-GUNLUGU-1). Varsayılan `yeniden_hesap` (katalog yeniden hesabı);
+   * panelden tek ürün yansıtılırken çağıran `panel`/`liste` verir ki günlükte kaynağı doğru okunsun.
+   */
+  yontem?: DegisiklikYontemi
 }
+
+/** `productIds` üst sınırı: id'ler URL'e `in.(...)` olarak gider; sınırsız liste PostgREST adres tavanına çarpar. */
+export const MATERIALIZE_URUN_TAVANI = 200
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -326,9 +342,35 @@ export async function materializePrices(
   const today = options?.today ?? todayIso()
   const sampleSize = options?.sampleSize ?? 10
   const cacheSayfaBoyu = options?.cacheSayfaBoyu ?? VARSAYILAN_SAYFA_BOYU
+  const yontem: DegisiklikYontemi = options?.yontem ?? 'yeniden_hesap'
+  // Kapsam: `undefined` = tüm katalog; dizi = yalnız o ürünler (tekilleştirilir, tavanlanır, BOŞ = hiçbiri).
+  const urunKapsami = options?.productIds === undefined ? null : [...new Set(options.productIds)]
+  if (urunKapsami !== null && urunKapsami.length > MATERIALIZE_URUN_TAVANI) {
+    throw new Error(
+      `materializePrices: productIds ${urunKapsami.length} > ${MATERIALIZE_URUN_TAVANI}. ` +
+        'Sınırsız liste adres tavanına çarpar; katalog geneli için productIds verme.',
+    )
+  }
   // Fiyat günlüğü (INV-FIYAT-GUNLUGU-1): bu koşunun tüm partileri (upsert 500'lük, pasifleştirme 200'lük) aynı
   // oturum kimliğini taşır → günlükte birden çok özet satırı tek koşuya bağlanır.
   const oturum = yeniOturumKimligi()
+  if (urunKapsami !== null && urunKapsami.length === 0) {
+    // Boş kapsam: hiçbir okuma/yazma yapma (kapsam boşken "hepsi"ne düşmek yasak).
+    return {
+      dryRun,
+      productsScanned: 0,
+      pricedProducts: 0,
+      quoteOnlyProducts: 0,
+      rowsUpserted: 0,
+      skippedManual: 0,
+      unbridgedBrand: 0,
+      skippedFxLocked: 0,
+      deactivated: 0,
+      bySegment: [],
+      samples: [],
+      totalNetTry: 0,
+    }
+  }
 
   // 1) Kural havuzu — bir kez.
   const { data: ruleRows, error: rulesErr } = await supabase.from('pricing_rule').select('*')
@@ -390,13 +432,17 @@ export async function materializePrices(
   const derivedActiveIdByKey = new Map<string, string>()
   const existingRows = await tumSatirlariCek<CachedPriceRow>(
     'product_prices (cache fotoğrafı)',
-    (bas, son) =>
-      supabase
+    (bas, son) => {
+      const sorgu = supabase
         .from('product_prices')
         .select('id, product_id, price_list_id, currency, is_derived, is_active', { count: 'exact' })
         .eq('valid_from', DERIVED_VALID_FROM)
+      // Tek/birkaç ürün kapsamında fotoğraf da AYNI süzgeçle okunur: bayat-satır tasfiyesi bu fotoğraftan
+      // beslendiği için, süzülmeyen fotoğraf taranmayan ürünlerin satırlarını pasifleştirirdi.
+      return (urunKapsami === null ? sorgu : sorgu.in('product_id', urunKapsami))
         .order('id', { ascending: true })
-        .range(bas, son),
+        .range(bas, son)
+    },
     cacheSayfaBoyu,
   )
   for (const row of existingRows) {
@@ -433,7 +479,7 @@ export async function materializePrices(
     if (dryRun || rows.length === 0) return
     const { error } = await yontemli(
       supabase.from('product_prices').upsert(rows, { onConflict: CACHE_CONFLICT_TARGET }),
-      'yeniden_hesap',
+      yontem,
       oturum,
     )
     if (error) throw error
@@ -441,11 +487,14 @@ export async function materializePrices(
 
   let offset = 0
   for (;;) {
-    const { data: pageRows, error: productsErr } = await supabase
+    const urunSorgusu = supabase
       .from('products')
       .select(PRODUCT_SCOPE_COLUMNS)
       .is('deleted_at', null)
       .eq('status', 'active')
+    const { data: pageRows, error: productsErr } = await (
+      urunKapsami === null ? urunSorgusu : urunSorgusu.in('id', urunKapsami)
+    )
       .order('id', { ascending: true })
       .range(offset, offset + PRODUCTS_PAGE_SIZE - 1)
     if (productsErr) throw productsErr
@@ -554,7 +603,7 @@ export async function materializePrices(
       const chunk = staleIds.slice(i, i + DEACTIVATE_BATCH_SIZE)
       const { error } = await yontemli(
         supabase.from('product_prices').update({ is_active: false }).in('id', chunk),
-        'yeniden_hesap',
+        yontem,
         oturum,
       )
       if (error) throw error
