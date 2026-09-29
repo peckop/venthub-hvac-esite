@@ -53,24 +53,34 @@ function rpcSlotunuBirak(): void {
   else calisanRpc--
 }
 
+/**
+ * Aile RPC'lerinin (`get_product_families_enriched`, `get_family_detail`) TEK ortak sıra kapısı.
+ * İki RPC AYNI sayacı paylaşır (iki ayrı sayaç değil): derlemede tepe eşzamanlılık toplamda
+ * `FAMILY_RPC_ESZAMANLI` olur. `get_family_detail` ölçümü (2026-09-29): tek çağrı 25 ms / 2.208 tampon;
+ * kırmızı CI koşusunda 57014 `getCachedFamilyDetail`'de düştü — detay RPC'si semaforsuzdu (REC-300).
+ */
+async function aileRpcSirali<T>(cagri: () => PromiseLike<T>): Promise<T> {
+  await rpcSlotuAl()
+  try {
+    return await cagri()
+  } finally {
+    rpcSlotunuBirak() // hata/iptal da slotu bırakır: kuyruk kilitlenmez
+  }
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}
 ): Promise<FamiliesPage> {
-  await rpcSlotuAl()
-  let data: unknown
-  let error: unknown
-  try {
-    ;({ data, error } = await supabase.rpc('get_product_families_enriched', {
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_product_families_enriched', {
       p_category_ids: params.categoryIds,
       p_limit: params.limit ?? 24,
       p_offset: params.offset ?? 0,
       p_search_query: params.searchQuery,
       p_brand: params.brand,
-    }))
-  } finally {
-    rpcSlotunuBirak() // hata/iptal da slotu bırakır: kuyruk kilitlenmez
-  }
+    })
+  )
 
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
@@ -192,10 +202,12 @@ export async function getFamilyDetail(
   slug: string,
   lang: string
 ): Promise<FamilyDetail | null> {
-  const { data, error } = await supabase.rpc('get_family_detail', {
-    p_slug: slug,
-    p_lang: lang,
-  })
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_family_detail', {
+      p_slug: slug,
+      p_lang: lang,
+    })
+  )
 
   if (error) throw error
   const detail = parseFamilyDetail(data)

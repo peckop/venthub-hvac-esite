@@ -192,7 +192,8 @@ konuşan bir kolda tekrar riski zaten düşüktür; gerekirse ölçümle eklenir
 | Nasıl ölçüldüğü, yan yana sayılar | **`docs/audits/`** | ölçüm kaydı uzundur, derse sığmaz |
 
 Kural: bir ders **iki** yere yazılmaz. sage'e yazılan bir ders MEMORY.md'ye satır eklemez;
-gerekirse dizin dosyasına katlanır (indeks 16384 baytta sessizce kırpılır, yumuşak eşik 15800).
+gerekirse dizin dosyasına katlanır (indeks **200 satırda ya da ~25.000 baytta**, hangisi önce dolarsa,
+sessizce kırpılır; yumuşak eşik 160 satır / 20.000 bayt — aşağıdaki bölüm).
 
 ---
 
@@ -327,19 +328,36 @@ arasında **sahada** ölçüldü.
 
 ### Kusur 1 — TAŞMA SESSİZDİR
 
-Dosya **16384 baytı** aşınca alt satırlar **sessizce kırpılır**: uyarı yok, hata yok. O gece
+Dosya kırpma sınırını aşınca alt satırlar **sessizce kırpılır**: uyarı yok, hata yok. O gece
 dosya 16414 → 16510 bayta çıktı ve en alttaki dersler **hiçbir oturuma yüklenmedi**; kimse
-görmedi. Ölçü **bayttır, satır değil** — kırpma bayta bakıyor.
+görmedi.
+
+> **DÜZELTME (2026-09-29, HARİTA ölçtü, REC-433 1.9):** gerçek sınır **200 SATIR YA DA ~25.000
+> BAYT**, hangisi önce dolarsa. Yukarıdaki "16384 bayt / ölçü bayttır, satır değil" eski
+> ölçümdü ve **yanlıştı**: satır sınırı hiç izlenmiyordu. Kırpma modele "Only part of it was
+> loaded" notuyla bildirilir, kullanıcıya görünmez.
 
 **İKİ EŞİK, İKİ AD.** Aynı sayıya iki anlam yüklemek, ikisinden birinin sessizce yanlış
 olması demektir:
 
 | eşik | değer | ne der |
 |---|---|---|
-| **yumuşak** | **15800** | *"satır EKLEME, önce katla"* — taşmaya ~584 bayt var, hâlâ pay var |
-| **sert** | **16384** | *"taşma OLDU"* — bu bir haber değil **otopsidir**, alt satırlar gitmiş olabilir |
+| **yumuşak** | **160 satır / 20.000 bayt** | *"satır EKLEME, önce katla"* — sınıra 40 satır / 5 KB pay var; UYARIR, engellemez |
+| **sert** | **200 satır / 25.000 bayt** | *"taşma OLUR"* — yazımın SONUCU sınırı aşıyorsa yazım **ENGELLENİR** (bekçi, çıkış 2); compact kancası ise haber verir (otopsi) |
 
-Sert eşik tek başına yetmezdi: ancak taşma **olduktan sonra** yanar.
+Sert eşik tek başına yetmezdi (ancak taşma **olduktan sonra** yanar); uyarı tek başına da
+yetmedi (filo aynı gün üç kez kırpmayı görmedi). Bu yüzden bekçi (`hafiza-indeks-bekcisi.cjs`)
+yazımdan **önce**, yazımın **sonucunu** ölçer:
+
+- **KÜÇÜLTEN yazım HER ZAMAN geçer** (katlama adımı): dosya zaten sınırın üstündeyse ve yazım
+  onu küçültüyorsa engellenmez — yoksa şişmiş bir indeksi kimse onaramaz, kapı kilitlenir.
+- **Engellenen yazım kaybolmaz:** sebep ve "önce katla" talimatı modele döner, model daha kısa
+  yazıp yeniden dener. Oturumun asıl kaydı ayrı durum dosyalarındadır; engel yalnız
+  `.../memory/MEMORY.md` indeksine uygulanır.
+- **Ölçülen dosya yazılan dosyanın kendisidir** (oturumun proje dizinindeki değil): başka
+  projenin indeksinde yalancı "satır siliniyor" uyarısı ve worktree oturumlarındaki kör nokta
+  böyle kapandı.
+- Bekçinin **kendi hatası** yazımı engellemez (çıkış 0, ama sessiz değil: "BEKCI CALISAMADI").
 
 ### Kusur 2 — KAYIP YAZIM HİÇ GÖRÜNMÜYORDU
 

@@ -233,6 +233,7 @@ describe('INV-COMPACT-1 — PreCompact durum kapısı', () => {
     const m = require_(KAPI) as { BAYAT_ESIK_DK?: number; MEMORY_ESIK_BAYT?: number }
     expect(typeof m.BAYAT_ESIK_DK, 'eşik export edilmeli — cetvel ile kod aynı sayıyı göstermeli').toBe('number')
     expect(m.BAYAT_ESIK_DK).toBe(60)
-    expect(m.MEMORY_ESIK_BAYT).toBe(16384)
+    // REC-433 1.9: gerçek kırpma sınırı 200 satır YA DA ~25.000 bayt (eski 16384 yanlış ölçümdü).
+    expect(m.MEMORY_ESIK_BAYT).toBe(25000)
   })
 })
