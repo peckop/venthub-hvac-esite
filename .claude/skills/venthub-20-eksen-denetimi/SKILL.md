@@ -1,5 +1,7 @@
 ---
 name: venthub-20-eksen-denetimi
+context: fork
+agent: denetim-opus
 description: VentHub'ı 20 bağımsız kalite/güvenlik ekseninde denetler ve tarihli bir KARNE üretir (ör. 3 PASS / 4 PARTIAL / 12 FAIL). Eksen başına paralel SALT-OKUMA ajanı koşar, sonra bir çürütme pası yanlış-pozitifleri eler, sonra her bulgu için "bunu geri gelmekten alıkoyacak test nedir" sorusunu cevaplar. Şunlarda KULLAN — "20 madde denetimi", "kalite denetimi koş", "güvenlik taraması yap", "nerede zayıfız", "lansman öncesi denetim", "hangi maddede FAIL'dayız", "karneyi güncelle"; ayrıca büyük bir katman değiştiğinde veya lansman öncesi kendiliğinden ÖNER. KOD YAZMAZ, KOD SİLMEZ, DEPLOY ETMEZ. Tek dosyalık bug avı, PR diff incelemesi (→ diff-review), vizyona-sadakat/karmaşıklık denetimi (→ prd-complexity-audit) ya da test koşturmak için KULLANMA.
 ---
 

@@ -1,5 +1,7 @@
 ---
 name: venthub-auditor
+context: fork
+agent: denetim-opus
 description: VentHub'ın mutlak kalite bekçisidir. Mimari bütünlük, pre-commit kontrolleri,
   bütünlük denetimi (bütünlük denetle) ve integrity check gerçekleştirir. Birim testlerini
   çalıştırmak (Vitest), git branch oluşturmak veya veritabanı sıfırlamak için KULLANMAYIN.
