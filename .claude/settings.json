@@ -258,6 +258,12 @@
             "timeout": 90,
             "async": true,
             "statusMessage": "defter bayatlik olcumu"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-konusma-dokumu.cjs\"",
+            "timeout": 60,
+            "async": true
           }
         ]
       }
