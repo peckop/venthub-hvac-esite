@@ -216,6 +216,13 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it('karar 187: her kartta PR = Fixes REC-nn (alt kayıt), istisna yalnız Kayıtsız: <sebep>', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('PR = `Fixes REC-nn`')
+      expect(metin, ad).toContain('`Kayıtsız: <sebep>`')
+    }
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
