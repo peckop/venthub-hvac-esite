@@ -22,6 +22,10 @@ type Uretici = {
   uret: () => Record<string, string>
   sorunlar: (k: Record<string, string>) => string[]
   ROLLER: Record<string, unknown>
+  ILETISIM: string
+  ILETISIM_ISTISNA: Record<string, string>
+  ozet: (ad: string) => string
+  OZET_SINIRI: number
   KART_BAYT_SINIRI: number
   dosyaAdi: (ad: string) => string
 }
@@ -54,6 +58,46 @@ describe('INV-ROL-1 — rol kartı üreticisi ayırt edici', () => {
   })
 })
 
+describe('INV-ROL-1 — --ozet (kanca için tek satır, fail-open)', () => {
+  const betik = path.join(KOK, 'scripts', 'belge', 'rol-karti-uret.cjs')
+  const calistir = (...a: string[]) => spawnSync('node', [betik, ...a], { encoding: 'utf8' })
+
+  it('her rol için tek satır, sınırın altında, yeni satır yok', () => {
+    for (const ad of BEKLENEN_ROLLER) {
+      const r = calistir('--ozet', ad)
+      expect(r.status, ad).toBe(0)
+      expect(r.stdout.length, ad).toBeGreaterThan(0)
+      expect(r.stdout.length, ad).toBeLessThanOrEqual(uretici.OZET_SINIRI)
+      expect(r.stdout, ad).not.toMatch(/[\r\n]/)
+    }
+  })
+
+  it('küçük harfli rol adını da tanır', () => {
+    expect(calistir('--ozet', 'ops').stdout).toBe(calistir('--ozet', 'OPS').stdout)
+  })
+
+  it('bilinmeyen ya da eksik rolde boş çıktı ve çıkış 0 (kanca bozulmaz)', () => {
+    for (const a of [['--ozet', 'YOKBOYLEROL'], ['--ozet']]) {
+      const r = calistir(...a)
+      expect(r.status).toBe(0)
+      expect(r.stdout).toBe('')
+    }
+  })
+
+  it('sınırı aşan görev "…" ile kırpılır (ayırt edicilik: uzun metin kırpılmazsa kapı kördür)', () => {
+    const uzun = { gorev: 'a '.repeat(400) }
+    const roller = uretici.ROLLER as Record<string, unknown>
+    roller.ZZTEST = uzun
+    try {
+      const s = uretici.ozet('ZZTEST')
+      expect(s.length).toBeLessThanOrEqual(uretici.OZET_SINIRI)
+      expect(s.endsWith('…')).toBe(true)
+    } finally {
+      delete roller.ZZTEST
+    }
+  })
+})
+
 describe('INV-ROL-1 — gerçek depoda mandal', () => {
   const uretilen = uretici.uret()
 
@@ -80,6 +124,21 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)
     }
+  })
+
+  it('İletişim bloğu: istisna yalnız OPS için, diğer dokuz kartta bire bir aynı', () => {
+    expect(Object.keys(uretici.ILETISIM_ISTISNA)).toEqual(['OPS'])
+    const blok = (m: string) => m.slice(m.indexOf('## İletişim'), m.indexOf('## Çalışma düzeni')).trimEnd()
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(blok(metin), ad).toBe(uretici.ILETISIM_ISTISNA[ad] ?? uretici.ILETISIM)
+    }
+    expect(blok(uretilen.OPS)).toContain('konsolide tabloyla ben veririm')
+    expect(blok(uretilen.ARAC)).toContain('yalnız iş bitince')
+  })
+
+  it('istisnayı bilmeyen bozuk kopya yakalanır: OPS kartına ortak metin konursa sorun', () => {
+    const bozuk = { ...uretilen, OPS: uretilen.OPS.replace(uretici.ILETISIM_ISTISNA.OPS, uretici.ILETISIM) }
+    expect(uretici.sorunlar(bozuk).some((s) => s.startsWith('OPS: ortak blok'))).toBe(true)
   })
 
   it('beş Recep kapısı her kartta bire bir aynı', () => {

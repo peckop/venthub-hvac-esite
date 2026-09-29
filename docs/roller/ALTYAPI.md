@@ -1,6 +1,6 @@
 # ROL KARTI: ALTYAPI
 
-> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Durum: TASLAK — REC-433 onayı bekliyor.
+> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
 CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi.

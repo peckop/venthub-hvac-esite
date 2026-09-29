@@ -39,6 +39,20 @@ const ILETISIM = [
   '- Recep\'e giden durum cevabı tablodur: No | İş | Durum | Sorumlu | Sırada; onay bekleyenler üstte ayrı karar tablosunda.',
 ].join('\n')
 
+/**
+ * Ortak İLETİŞİM bloğunun rol başına İSTİSNASI (OPS, 2026-09-29): OPS Recep'e giden tek konsolide
+ * yüzdür; "yalnız iş bitince tek satır" kuralı ona uymaz. İstisna AÇIKÇA listelenir; testi de bu
+ * listeyi tanır, listede olmayan rolün ortak bloktan sapması sorun sayılır.
+ */
+const ILETISIM_ISTISNA = {
+  OPS: [
+    '## İletişim',
+    '- Recep\'e filo durumunu konsolide tabloyla ben veririm; karar sorularını numaralı karar tablosuyla sorarım. Bütün pencerelerin Recep\'e giden durumu benden geçer.',
+    '- Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).',
+    '- Recep\'e giden durum cevabı tablodur: No | İş | Durum | Sorumlu | Sırada; onay bekleyenler üstte ayrı karar tablosunda.',
+  ].join('\n'),
+}
+
 const CALISMA = [
   '## Çalışma düzeni',
   '- Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree\'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).',
@@ -51,7 +65,7 @@ const CALISMA = [
 /** Rol verisi. `durum`: kartın kendisini de ilgilendiren canlılık bilgisi. */
 const ROLLER = {
   OPS: {
-    gorev: 'Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez.',
+    gorev: 'Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını REC-425 altına kendi cümlesiyle kaydeder. Linear açık kayıt sayısını 250 altında tutar (yoklama, arşiv, WrongStack kanban\'a taşıma).',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
     yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama.',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',
@@ -136,7 +150,7 @@ function kart(ad, r) {
   return [
     `# ROL KARTI: ${ad}`,
     '',
-    '> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Durum: TASLAK — REC-433 onayı bekliyor.',
+    '> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.',
     '',
     '## Görev',
     r.gorev,
@@ -158,7 +172,7 @@ function kart(ad, r) {
     '',
     RECEP_KAPILARI,
     '',
-    ILETISIM,
+    ILETISIM_ISTISNA[ad] || ILETISIM,
     '',
     CALISMA,
     '',
@@ -185,7 +199,7 @@ function sorunlar(kartlar) {
   for (const [ad, metin] of Object.entries(kartlar)) {
     const bayt = Buffer.byteLength(metin, 'utf8')
     if (bayt > KART_BAYT_SINIRI) s.push(`${ad}: ${bayt} bayt > ${KART_BAYT_SINIRI}`)
-    for (const blok of [RECEP_KAPILARI, ILETISIM, CALISMA]) {
+    for (const blok of [RECEP_KAPILARI, ILETISIM_ISTISNA[ad] || ILETISIM, CALISMA]) {
       if (!metin.includes(blok)) s.push(`${ad}: ortak blok eksik/değişmiş: ${blok.split('\n')[0]}`)
     }
     for (const baslik of ['## Görev', '## Dosyalar', '## Yetki', '## Yasak ve sınır', '## Yetenek ve araç', '## Durum']) {
@@ -195,7 +209,27 @@ function sorunlar(kartlar) {
   return s
 }
 
+const OZET_SINIRI = 300
+
+/**
+ * Kartın "Görev" bölümünden TEK satırlık özet (kanca için: SessionStart çıktısındaki "ROL KARTI:" satırı).
+ * Yeni satır içermez; sınırı aşarsa "…" ile kırpılır. Metin diskteki karttan değil ÜRETİLEN karttan
+ * okunur: kanca fail-open olduğu için dosya okuma hatası riski yok, ama bayat kart da özet vermez.
+ */
+function ozet(ad) {
+  const r = ROLLER[String(ad).toUpperCase()]
+  if (!r) return ''
+  const satir = String(r.gorev).replace(/\s+/g, ' ').trim()
+  return satir.length <= OZET_SINIRI ? satir : satir.slice(0, OZET_SINIRI - 1).trimEnd() + '…'
+}
+
 function main() {
+  const oi = process.argv.indexOf('--ozet')
+  if (oi !== -1) {
+    // Bilinmeyen/eksik rol: boş çıktı + çıkış 0 (kanca çağıranı bozmaz).
+    process.stdout.write(ozet(process.argv[oi + 1] || ''))
+    process.exit(0)
+  }
   const kok = path.resolve(__dirname, '..', '..')
   const dizin = path.join(kok, 'docs', 'roller')
   const kartlar = uret()
@@ -217,6 +251,6 @@ function main() {
   process.exit(fark || s.length ? 1 : 0)
 }
 
-module.exports = { uret, sorunlar, ROLLER, KART_BAYT_SINIRI, dosyaAdi }
+module.exports = { uret, sorunlar, ozet, ROLLER, KART_BAYT_SINIRI, OZET_SINIRI, dosyaAdi, ILETISIM, ILETISIM_ISTISNA }
 
 if (require.main === module) main()

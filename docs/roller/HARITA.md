@@ -1,6 +1,6 @@
 # ROL KARTI: HARITA
 
-> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Durum: TASLAK — REC-433 onayı bekliyor.
+> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
 Belge ve hafıza düzeni: CLAUDE.md, AGENTS.md, docs/README.md haritası, belge yönetimi cetveli, kanca tasarımı.
