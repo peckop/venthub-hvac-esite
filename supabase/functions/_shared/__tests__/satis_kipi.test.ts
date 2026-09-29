@@ -263,6 +263,42 @@ describe('deneme listesi ayrıştırma ve eşleşme', () => {
     expect(denemeIzniHukmu(env, '').var).toBe(false)
   })
 
+  it('sandbox = belgelenmiş TAM konak: "sandbox" içeren benzer konaklar izin VERMEZ ve ortam belirsiz sayılır', () => {
+    const liste = { SATIS_KIPI_DENEME_KULLANICILARI: KULLANICI }
+    const benzerler = [
+      'https://sandbox-proxy.ornek.com',
+      'https://api.iyzipay.com.sandbox.ornek.com',
+      'https://sandbox-api.iyzipay.com.ornek.com',
+      'https://sandbox-api.iyzipay.co',
+    ]
+    for (const url of benzerler) {
+      const h = denemeIzniHukmu({ IYZICO_BASE_URL: url, ...liste }, KULLANICI)
+      expect(h.var, url).toBe(false)
+      expect(h.ortam, url).toBe('bilinmiyor')
+      expect(h.listeDolu, url).toBe(true)
+    }
+    // Yol ve kullanıcı-adı hileleri de sandbox sayılmaz (prod konağı).
+    for (const url of ['https://api.iyzipay.com/sandbox', 'https://sandbox@api.iyzipay.com']) {
+      expect(denemeIzniHukmu({ IYZICO_BASE_URL: url, ...liste }, KULLANICI).var, url).toBe(false)
+    }
+    // Gerçek sandbox konağı (sondaki eğik çizgi ve büyük harf dahil) hâlâ çalışır.
+    expect(denemeIzniHukmu({ IYZICO_BASE_URL: 'https://SANDBOX-API.iyzipay.com/', ...liste }, KULLANICI).var).toBe(true)
+  })
+
+  it('atılan liste girdisi günlüğe SAYI olarak yazılır, kimlik değeri yazılmaz', () => {
+    const uyari: string[] = []
+    const asil = console.warn
+    console.warn = (...a: unknown[]) => void uyari.push(a.join(' '))
+    try {
+      denemeIzniHukmu({ IYZICO_BASE_URL: SANDBOX, SATIS_KIPI_DENEME_KULLANICILARI: `kimlik-degil, ${KULLANICI}` }, KULLANICI)
+    } finally {
+      console.warn = asil
+    }
+    expect(uyari.join('|')).toContain('1 geçersiz girdi')
+    expect(uyari.join('|')).not.toContain('kimlik-degil')
+    expect(uyari.join('|')).not.toContain(KULLANICI)
+  })
+
   it('yalnız geçersiz girdi içeren liste: izin yok AMA liste dolu sayılır (canlıda unutulmuş liste alarmı)', () => {
     const h = denemeIzniHukmu({ IYZICO_BASE_URL: PROD, SATIS_KIPI_DENEME_KULLANICILARI: 'kimlik-degil' }, KULLANICI)
     expect(h.var).toBe(false)

@@ -138,6 +138,9 @@ describe('INV-SATIS-KIPI-EDGE-1 — sabotaj: her bozulma yolu GERÇEKTEN yakalan
   it('sabotaj 1: kapı order-validate bloğundan sonraya taşınırsa yakalanır', () => {
     const bas = kaynak.indexOf('const satisKapisi = await satisKipiKarari({')
     const son = kaynak.indexOf('const satisDenemeIzni')
+    // Dilimleme dayandığı metin değişirse çöp üretmesin: bulunamazsa test KIRMIZI verir.
+    expect(bas).toBeGreaterThan(-1)
+    expect(son).toBeGreaterThan(bas)
     const parca = kaynak.slice(bas, kaynak.indexOf('\n', son) + 1)
     const kalan = kaynak.slice(0, bas) + kaynak.slice(bas + parca.length)
     const hedef = kalan.indexOf('let orderResponse')
@@ -168,6 +171,8 @@ describe('INV-SATIS-KIPI-EDGE-1 — sabotaj: her bozulma yolu GERÇEKTEN yakalan
   it('sabotaj 5: deneme kaydı sipariş yazısından sonraya kayarsa yakalanır', () => {
     const bas = kaynak.indexOf('if (satisDenemeIzni) {')
     const son = kaynak.indexOf('// Try creating order')
+    expect(bas).toBeGreaterThan(-1)
+    expect(son).toBeGreaterThan(bas)
     const parca = kaynak.slice(bas, son)
     const kalan = kaynak.slice(0, bas) + kaynak.slice(son)
     const hedef = kalan.indexOf('const dbOrderId')

@@ -106,12 +106,37 @@ export interface DenemeIzniHukmu {
   listeDolu: boolean
 }
 
+/**
+ * İzin kararı için sandbox = İyzico'nun belgelenmiş sandbox konağı, TAM eşleşme. `resolveIyzicoBase`
+ * konakta "sandbox" alt dizesi arıyor (alarm/denetim için yeterli); ama para akışına dokunan bir
+ * izin, `sandbox-proxy.ornek.com` gibi benzer bir konakla açılmamalı (bağımsız çürütme, bulgu 2).
+ */
+const SANDBOX_KONAGI = 'sandbox-api.iyzipay.com'
+
+function tamSandboxKonagi(base: string): boolean {
+  try {
+    return new URL(base).hostname.toLowerCase() === SANDBOX_KONAGI
+  } catch {
+    return false
+  }
+}
+
 export function denemeIzniHukmu(env: SatisKipiOrtam, userId: string): DenemeIzniHukmu {
   const iyz = resolveIyzicoBase({ IYZICO_BASE_URL: env.IYZICO_BASE_URL })
-  const ortam: DenemeIzniHukmu['ortam'] = iyz ? iyz.ortam : 'bilinmiyor'
+  // "sandbox gibi görünen" ama tam konak olmayan adres BELİRSİZ sayılır: izin açılmaz, alarm çalışır.
+  const ortam: DenemeIzniHukmu['ortam'] = !iyz
+    ? 'bilinmiyor'
+    : iyz.ortam === 'sandbox' && !tamSandboxKonagi(iyz.base)
+      ? 'bilinmiyor'
+      : iyz.ortam
   const ham = (env.SATIS_KIPI_DENEME_KULLANICILARI ?? '').trim()
   const listeDolu = ham.length > 0
-  const listede = denemeListesiniAyristir(ham).includes(String(userId).trim().toLowerCase())
+  const gecerli = denemeListesiniAyristir(ham)
+  // Atılan girdi sessiz kalmasın: operatör "listem neden çalışmıyor" sorusunu günlükten cevaplayabilsin.
+  // Yalnız SAYI yazılır, kimlik değeri yazılmaz.
+  const atilan = ham.split(/[\s,;]+/).filter((s) => s.length > 0).length - gecerli.length
+  if (atilan > 0) console.warn(`[satis-kipi] deneme listesinde ${atilan} geçersiz girdi atıldı (UUID bekleniyor)`)
+  const listede = gecerli.includes(String(userId).trim().toLowerCase())
   return { var: ortam === 'sandbox' && listede, ortam, listeDolu }
 }
 
