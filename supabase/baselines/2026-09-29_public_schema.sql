@@ -1315,6 +1315,73 @@ COMMENT ON FUNCTION "public"."denetim_izi_fiyat_ozet"() IS 'REC-412 Faz 0.5: pro
 
 
 
+CREATE OR REPLACE FUNCTION "public"."denetim_izi_maliyet_ozet"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public', 'pg_temp'
+    AS $_$
+declare
+  v_tavan  constant int := 5000;
+  v_hdr    text;
+  v_yontem text;
+  v_oturum text;
+  v_ek     text;
+begin
+  v_hdr := nullif(current_setting('request.headers', true), '');
+  if v_hdr is not null and pg_input_is_valid(v_hdr, 'jsonb') then
+    v_yontem := (v_hdr::jsonb) ->> 'x-degisiklik-yontemi';
+    v_oturum := (v_hdr::jsonb) ->> 'x-degisiklik-oturumu';
+  end if;
+  if v_yontem is not null
+     and v_yontem not in ('panel', 'liste', 'csv', 'yeniden_hesap', 'maliyet_yenileme', 'sistem') then
+    v_yontem := null;
+  end if;
+  if v_oturum is not null
+     and v_oturum !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' then
+    v_oturum := null;
+  end if;
+  v_ek := ' | yontem=' || coalesce(v_yontem, 'BILINMIYOR')
+       || case when v_oturum is not null then ' | oturum=' || v_oturum else '' end;
+
+  -- Yalnız İKİ maliyet kolonu değişen satırlar. purchase_price/purchase_currency de değişenler satır tetiğinin
+  -- (denetim_izi_products_upd) konusudur, burada ELENİR (çift kayıt olmasın).
+  insert into public.admin_audit_log (actor, table_name, row_pk, action, before, after, comment, tenant_id)
+  select auth.uid(), tg_table_name, 'OZET', 'UPDATE',
+         coalesce(jsonb_agg(d.once  order by d.sira) filter (where d.sira <= v_tavan), '[]'::jsonb),
+         coalesce(jsonb_agg(d.sonra order by d.sira) filter (where d.sira <= v_tavan), '[]'::jsonb),
+         'REC-412 Faz 0.5b maliyet gunlugu OZET (cost_in_base, purchase_rate_to_base). actor NULL ise BILINMIYOR '
+           || 'demektir, sistem DEMEZ. session_user=' || session_user || v_ek
+           || ' | satir=' || count(*)
+           || case when count(*) > v_tavan then ' | kirpildi=evet' else '' end,
+         d.tenant_id
+    from (
+      select n.tenant_id,
+             row_number() over (partition by n.tenant_id order by n.id) as sira,
+             jsonb_build_object('id', o.id, 'cost_in_base', o.cost_in_base,
+                                'purchase_rate_to_base', o.purchase_rate_to_base) as once,
+             jsonb_build_object('id', n.id, 'cost_in_base', n.cost_in_base,
+                                'purchase_rate_to_base', n.purchase_rate_to_base) as sonra
+        from yeni_t n
+        join eski_t o on o.id = n.id
+       where (o.cost_in_base, o.purchase_rate_to_base)
+             is distinct from
+             (n.cost_in_base, n.purchase_rate_to_base)
+         and o.purchase_price is not distinct from n.purchase_price
+         and o.purchase_currency is not distinct from n.purchase_currency
+    ) d
+   group by d.tenant_id;
+
+  return null;
+end;
+$_$;
+
+
+ALTER FUNCTION "public"."denetim_izi_maliyet_ozet"() OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."denetim_izi_maliyet_ozet"() IS 'REC-412 Faz 0.5b: products cost_in_base/purchase_rate_to_base icin ifade duzeyi ozet gunlugu (tenant basina, eski->yeni dizisi, tavan 5000). FAIL-CLOSED. purchase_price/currency degisen satirlar satir tetigindedir.';
+
+
+
 CREATE OR REPLACE FUNCTION "public"."denetim_izi_yaz"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public', 'pg_temp'
@@ -2711,6 +2778,107 @@ $$;
 ALTER FUNCTION "public"."jwt_price_segment"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."maliyet_yenile"("p_satirlar" "jsonb") RETURNS integer
+    LANGUAGE "plpgsql"
+    SET "search_path" TO 'public', 'pg_temp'
+    AS $$
+declare
+  v_tavan     constant int := 5000;
+  v_gelen     int;
+  v_beklenen  int;
+  v_say       int;
+begin
+  if not public.is_admin_claim() then
+    raise exception 'maliyet_yenile: yalniz yonetici (JWT claim)' using errcode = '42501';
+  end if;
+
+  if p_satirlar is null or jsonb_typeof(p_satirlar) <> 'array' then
+    raise exception 'maliyet_yenile: p_satirlar bir JSON dizisi olmali' using errcode = '22023';
+  end if;
+
+  v_gelen := jsonb_array_length(p_satirlar);
+  if v_gelen > v_tavan then
+    raise exception 'maliyet_yenile: parti siniri asildi (% > %); yarim yenileme yapilmaz', v_gelen, v_tavan
+      using errcode = '54000';
+  end if;
+
+  -- Girdi doğrulaması yazımdan ÖNCE: tek bozuk eleman TÜM partiyi reddeder. NaN/Infinity açıkça elenir
+  -- (`NaN >= 0` PostgreSQL'de DOĞRUDUR; kıyas tek başına yetmez — B2).
+  if exists (
+    select 1
+      from jsonb_to_recordset(p_satirlar)
+             as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric, purchase_price numeric, purchase_currency text)
+     where s.id is null
+        or s.cost_in_base is null or s.cost_in_base < 0
+        or s.cost_in_base = 'NaN'::numeric or s.cost_in_base = 'Infinity'::numeric
+        or s.purchase_rate_to_base is null or s.purchase_rate_to_base <= 0
+        or s.purchase_rate_to_base = 'NaN'::numeric or s.purchase_rate_to_base = 'Infinity'::numeric
+        or s.purchase_price is null or s.purchase_currency is null
+  ) then
+    raise exception 'maliyet_yenile: eksik/gecersiz eleman (id, cost_in_base>=0, purchase_rate_to_base>0, purchase_price, purchase_currency zorunlu; NaN/Infinity yasak)'
+      using errcode = '22023';
+  end if;
+
+  -- Aynı id iki kez: hangisinin kazanacağı belirsiz olurdu (B6) → tüm parti reddedilir.
+  if (select count(distinct s.id)
+        from jsonb_to_recordset(p_satirlar) as s(id uuid)) <> v_gelen then
+    raise exception 'maliyet_yenile: ayni urun id birden fazla kez gonderildi (tum parti reddedildi)'
+      using errcode = '22023';
+  end if;
+
+  -- Bu tenant'ta görünmeyen id: tüm parti reddedilir (RLS sessizce atlamasın → yarım yenileme olmaz).
+  if exists (
+    select 1
+      from jsonb_to_recordset(p_satirlar) as s(id uuid)
+     where not exists (
+       select 1 from public.products p where p.id = s.id and p.tenant_id = public.jwt_tenant_id()
+     )
+  ) then
+    raise exception 'maliyet_yenile: tenant disi ya da olmayan urun id (tum parti reddedildi)'
+      using errcode = '22023';
+  end if;
+
+  -- Beklenen: şu an gerçekten DEĞİŞECEK satır sayısı (gelen değer sütun duyarlığına yuvarlanmış hâliyle).
+  select count(*) into v_beklenen
+    from jsonb_to_recordset(p_satirlar)
+           as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric, purchase_price numeric, purchase_currency text)
+    join public.products p on p.id = s.id and p.tenant_id = public.jwt_tenant_id()
+   where p.cost_in_base is distinct from round(s.cost_in_base, 4)
+      or p.purchase_rate_to_base is distinct from round(s.purchase_rate_to_base, 6);
+
+  update public.products p
+     set cost_in_base = round(s.cost_in_base, 4),
+         purchase_rate_to_base = round(s.purchase_rate_to_base, 6)
+    from jsonb_to_recordset(p_satirlar)
+           as s(id uuid, cost_in_base numeric, purchase_rate_to_base numeric, purchase_price numeric, purchase_currency text)
+   where p.id = s.id
+     and p.tenant_id = public.jwt_tenant_id()
+     and p.purchase_price = s.purchase_price
+     and p.purchase_currency::text = s.purchase_currency
+     and (p.cost_in_base is distinct from round(s.cost_in_base, 4)
+          or p.purchase_rate_to_base is distinct from round(s.purchase_rate_to_base, 6));
+  get diagnostics v_say = row_count;
+
+  -- Beklenenden az satır yazıldıysa YARIM yenileme olurdu: (a) INVOKER olduğu için `products` UPDATE politikası
+  -- da uygulanır ve JWT'de admin olup profil rolü düşmüş biri sessizce 0 satıra inerdi (B1), (b) okuma ile yazma
+  -- arasında bir ürünün alış fiyatı değişti (B8). İkisinde de TÜM parti geri alınır; istemci "yeniden deneyin" der.
+  if v_say <> v_beklenen then
+    raise exception 'maliyet_yenile: % satirdan % tanesi yazilabildi (yetki degisti ya da okumadan sonra urun fiyati degisti); tum parti geri alindi',
+      v_beklenen, v_say using errcode = '40001';
+  end if;
+
+  return v_say;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."maliyet_yenile"("p_satirlar" "jsonb") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."maliyet_yenile"("p_satirlar" "jsonb") IS 'REC-412 Faz 0.5b: maliyet yenilemesi (cost_in_base + purchase_rate_to_base) TEK UPDATE ifadesiyle. Yonetici kapili (is_admin_claim, JWT app_metadata), SECURITY INVOKER, tenant filtreli, en fazla 5000 satir; tek bozuk eleman tum partiyi reddeder. Gunluk: denetim_izi_maliyet_ozet (parti basina tek ozet satiri).';
+
+
+
 CREATE OR REPLACE FUNCTION "public"."normalize_product_threshold_overrides"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     SET "search_path" TO 'public', 'pg_temp'
@@ -3367,6 +3535,24 @@ $$;
 
 
 ALTER FUNCTION "public"."reverse_inventory_batch"("p_batch_id" "uuid", "p_max_minutes" integer) OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."satis_kipi_oku"() RETURNS "jsonb"
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  select coalesce(
+    (select jsonb_build_object(
+              'acik',  case when jsonb_typeof(s.value->'acik') = 'boolean' then (s.value->'acik')::boolean else false end,
+              'damga', s.updated_at)
+       from public.site_settings s
+      where s.key = 'satis_kipi'
+      limit 1),
+    jsonb_build_object('acik', false, 'damga', null));
+$$;
+
+
+ALTER FUNCTION "public"."satis_kipi_oku"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."set_order_number"() RETURNS "trigger"
@@ -6887,6 +7073,10 @@ CREATE OR REPLACE TRIGGER "denetim_izi_currency_rates_upd" AFTER DELETE OR UPDAT
 
 
 
+CREATE OR REPLACE TRIGGER "denetim_izi_maliyet_ozet" AFTER UPDATE ON "public"."products" REFERENCING OLD TABLE AS "eski_t" NEW TABLE AS "yeni_t" FOR EACH STATEMENT EXECUTE FUNCTION "public"."denetim_izi_maliyet_ozet"();
+
+
+
 CREATE OR REPLACE TRIGGER "denetim_izi_ozet_del" AFTER DELETE ON "public"."product_prices" REFERENCING OLD TABLE AS "eski_t" FOR EACH STATEMENT EXECUTE FUNCTION "public"."denetim_izi_fiyat_ozet"();
 
 
@@ -6980,6 +7170,18 @@ CREATE OR REPLACE TRIGGER "on_product_prices_upd" AFTER UPDATE ON "public"."prod
 
 
 CREATE OR REPLACE TRIGGER "on_products_change" AFTER INSERT OR DELETE OR UPDATE ON "public"."products" FOR EACH ROW EXECUTE FUNCTION "public"."handle_supabase_webhook"();
+
+
+
+CREATE OR REPLACE TRIGGER "on_site_settings_satis_kipi_del" AFTER DELETE ON "public"."site_settings" FOR EACH ROW WHEN (("old"."key" = 'satis_kipi'::"text")) EXECUTE FUNCTION "public"."handle_supabase_webhook"();
+
+
+
+CREATE OR REPLACE TRIGGER "on_site_settings_satis_kipi_ins" AFTER INSERT ON "public"."site_settings" FOR EACH ROW WHEN (("new"."key" = 'satis_kipi'::"text")) EXECUTE FUNCTION "public"."handle_supabase_webhook"();
+
+
+
+CREATE OR REPLACE TRIGGER "on_site_settings_satis_kipi_upd" AFTER UPDATE ON "public"."site_settings" FOR EACH ROW WHEN ((("new"."key" = 'satis_kipi'::"text") OR ("old"."key" = 'satis_kipi'::"text"))) EXECUTE FUNCTION "public"."handle_supabase_webhook"();
 
 
 
@@ -8550,6 +8752,14 @@ CREATE POLICY "site_settings_admin_update" ON "public"."site_settings" FOR UPDAT
 
 
 
+CREATE POLICY "site_settings_satis_kipi_yalniz_servis_ins" ON "public"."site_settings" AS RESTRICTIVE FOR INSERT TO "authenticated" WITH CHECK (("key" <> 'satis_kipi'::"text"));
+
+
+
+CREATE POLICY "site_settings_satis_kipi_yalniz_servis_upd" ON "public"."site_settings" AS RESTRICTIVE FOR UPDATE TO "authenticated" USING (("key" <> 'satis_kipi'::"text")) WITH CHECK (("key" <> 'satis_kipi'::"text"));
+
+
+
 ALTER TABLE "public"."suppliers" ENABLE ROW LEVEL SECURITY;
 
 
@@ -9649,6 +9859,11 @@ GRANT ALL ON FUNCTION "public"."denetim_izi_fiyat_ozet"() TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "public"."denetim_izi_maliyet_ozet"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."denetim_izi_maliyet_ozet"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."denetim_izi_yaz"() TO "anon";
 GRANT ALL ON FUNCTION "public"."denetim_izi_yaz"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."denetim_izi_yaz"() TO "service_role";
@@ -9847,6 +10062,12 @@ GRANT ALL ON FUNCTION "public"."jwt_price_segment"() TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "public"."maliyet_yenile"("p_satirlar" "jsonb") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."maliyet_yenile"("p_satirlar" "jsonb") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."maliyet_yenile"("p_satirlar" "jsonb") TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."normalize_product_threshold_overrides"() TO "anon";
 GRANT ALL ON FUNCTION "public"."normalize_product_threshold_overrides"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."normalize_product_threshold_overrides"() TO "service_role";
@@ -9910,6 +10131,13 @@ GRANT ALL ON FUNCTION "public"."reverse_inventory_batch"("p_batch_id" "uuid") TO
 
 REVOKE ALL ON FUNCTION "public"."reverse_inventory_batch"("p_batch_id" "uuid", "p_max_minutes" integer) FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."reverse_inventory_batch"("p_batch_id" "uuid", "p_max_minutes" integer) TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."satis_kipi_oku"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."satis_kipi_oku"() TO "service_role";
+GRANT ALL ON FUNCTION "public"."satis_kipi_oku"() TO "anon";
+GRANT ALL ON FUNCTION "public"."satis_kipi_oku"() TO "authenticated";
 
 
 
