@@ -83,7 +83,10 @@ test.describe('admin filtre çipi', () => {
         'aria-pressed',
         'true',
       )
-      await expect(page).toHaveURL(/status=inactive/)
+      await expect(
+        page,
+        'Çip basılı ama adres status=inactive\'e oturmadı — durum/adres kopması (REC-411 sınıfı)',
+      ).toHaveURL(/status=inactive/)
     } finally {
       // Çip açık kaldıysa kapat: oturum filtre durumu sonraki testlere sızmasın.
       if ((await cip.getAttribute('aria-pressed', { timeout: 3_000 }).catch(() => null)) === 'true') {
