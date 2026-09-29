@@ -68,4 +68,9 @@ girerse bekçinin varlık sebebi silinir.
 `KANITSIZ` etiketi **"gözcüsü yok" demek değildir**: şeridin kendi izleyicisi olabilir ama
 ölçülebilir imleç sözleşmesini yazmıyordur. Fail-closed davranış aynı kalır, ama hüküm doğru
 adlandırılır — yanlış hüküm, doğru davranıştan daha uzun yaşar.
+
+## §7 birinci paragraf (2026-09-29, `fleet-mechanism-standard.md` §7'den kelimesi kelimesine taşındı)
+
+**Mekanikleştirilen:** duyma (gözcü), uyanma (cron), yedek kanal (wakeup), yoklama, kurulum
+metninin üretimi ve kurulumun kanıtı.
 
