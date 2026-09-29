@@ -169,7 +169,8 @@ interface Ratchet {
 const RATCHETS: Ratchet[] = [
   {
     ad: 'max-w-7xl (§2.1 konteyner)',
-    tavan: 49,
+    // 2026-09-29 · 49 -> 48: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü silindi.
+    tavan: 48,
     say: () => countMatches(/\bmax-w-7xl\b/g),
     gerekce: 'Tek sayfa genişliği token üzerinden verilmeli.',
   },
@@ -204,7 +205,9 @@ const RATCHETS: Ratchet[] = [
     // birden kapattı. Kazanç yan ürün değil, tam olarak hedefti.
     // 2026-09-24 · 1456 -> 1452: REC-285 — altbilgideki dört sahte sosyal bağlantı
     // (platform ana sayfalarına gidiyordu) kaldırıldı; `text-gray-300` ×4 gitti. Kazanç yan ürün.
-    tavan: 1452,
+    // 2026-09-29 · 1452 -> 1446: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü
+    // (iki kart, DB'de olmayan alt kategorilere bağlıydı ve hiç çizilmiyordu) silindi; 6 ham gri gitti.
+    tavan: 1446,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -213,14 +216,16 @@ const RATCHETS: Ratchet[] = [
     // 2026-08-28 · 391 → 378 (aynı kaldırma).
     // 2026-09-01 · 378 → 377 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 377 -> 375: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 375,
+    // 2026-09-29 · 375 -> 372: REC-434 — aynı ölü bölümün silinmesi.
+    tavan: 372,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
   {
     ad: 'ham vurgu: blue-*/indigo-* (§2.3)',
     // 2026-09-01 · 148 -> 144: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 144,
+    // 2026-09-29 · 144 -> 139: REC-434 — aynı ölü bölümün silinmesi.
+    tavan: 139,
     say: () => countMatches(/\b(?:blue|indigo)-\d{2,3}\b/g),
     gerekce: 'Vurgu rengi marka token üzerinden; ham Tailwind paleti hiyerarşiyi bozar.',
   },
