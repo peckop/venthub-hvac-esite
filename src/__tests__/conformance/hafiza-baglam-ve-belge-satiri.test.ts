@@ -131,14 +131,19 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     const yakin = bd.satir(500_000, 1_000_000) as string
     for (const madde of [
       'COMPACT HAZIRLIK NOTU',
-      '(a) durum dosyam guncel mi',
-      '(b) yarim is var mi',
-      '(c) tek cumle hukum',
+      'UC MADDELIK LISTE',
+      "'- ' ile baslayan",
+      'Birinci madde: durum dosyam guncel mi',
+      'Ikinci madde: yarim is var mi',
+      'Ucuncu madde: hukum',
       'Simdi compact yapabilirsin',
       'her cevapta kisaca tekrarla',
     ]) {
       expect(yakin, madde).toContain(madde)
     }
+    // Recep 09-29 (iki kez): maddeler yan yana tek paragraf ve (a)(b)(c) etiketli YAZILMAZ. Talimat bunu ÖĞRETMEMELİ.
+    expect(yakin, 'talimat etiketli (a)(b)(c) biçimi öğretiyor').not.toMatch(/\(a\)|\(b\)|\(c\)/)
+    expect(yakin, 'talimat yan yana yazmayı yasaklamıyor').toMatch(/yan yana tek paragraf YOK/)
     expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT HAZIRLIK NOTU')
