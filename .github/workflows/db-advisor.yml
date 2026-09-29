@@ -382,6 +382,19 @@ jobs:
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/anon-yazma-nobetcisi.mjs
 
+      # ⭐INV-STORAGE-YAZMA-1 (REC-442) — kardes adim `Anon yazma nobetcisi`nin gerekcesi AYNEN gecerli
+      # (yeni IS ADI acilmadi, advisor'a konmadi: o is continue-on-error tasiyor). Konu: storage.objects
+      # uzerinde kiracisiz/yoneticisiz YAZMA politikasi. Olculdu 2026-09-29: category-images kovasinda
+      # panelden acilmis 3 politika giris yapmis herkese yukleme/silme veriyordu ve HICBIR migration'da
+      # yoktu; bu yuzden olcum CANLI KATALOGDAN yapilir, depo metninden degil.
+      - name: Storage yazma nobetcisi (INV-STORAGE-YAZMA-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/storage-yazma-nobetcisi.mjs
+
       # ⭐INV-RLS-SARMA-1 — NICIN BU ISE ADIM OLARAK EKLENDI (REC-216):
       # Kardes adim `Anon yazma nobetcisi`nin gerekcesi burada da AYNEN gecerli ve o gerekce
       # zaten yukarida yazili: yeni bir IS ADI acmak acik PR'lari "beklenen kontrol gelmedi"de
