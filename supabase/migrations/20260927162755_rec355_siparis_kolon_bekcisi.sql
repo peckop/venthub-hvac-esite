@@ -38,6 +38,7 @@
 begin;
 
 set lock_timeout = '5s';
+set statement_timeout = '30s';
 
 -- ── 1. Genel bekçi: istemci bu tabloya hiç yazamaz ──────────────────────────────
 create or replace function public.istemci_yazma_bekcisi()
