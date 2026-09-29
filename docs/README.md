@@ -1,7 +1,26 @@
-# docs/ — Doküman Sistemi Haritası
+# docs/ — Tek Giriş Haritası
 
-> "Bu iş nasıl yapılır?" dendiğinde **ön kapı**. Hangi soru → hangi dosya, ve klasör düzeni.
+> "Bu iş nasıl yapılır / nereye bakılır?" dendiğinde **ön kapı**: hangi soru → hangi harita, hangi dosya.
+> `CLAUDE.md` bu dosyayı "Tek Giriş Haritası" bölümüyle gösterir; kendi kısa doküman listesi de karar 159 gereği
+> yerinde kalır (`standards/belge-yonetimi-standard.md` B2). Çelişirse bu dosya güncellenir, CLAUDE.md'ye haber verilir.
 > Kural: her konunun **tek otoritesi** vardır; diğer dosyalar onu tekrar etmez, **referans verir**.
+> Haritada olmayan belge ajan için yoktur: yeni cetvel bu dosyaya satırı eklenmeden bitmiş sayılmaz.
+
+## Haritaların haritası — hangi soruda hangi harita
+
+| Soru | Harita / araç | Not |
+|---|---|---|
+| Hangi belge, hangi kural, hangi cetvel? | **bu dosya** (aşağıdaki tablolar) | kırık yol INV-BELGE-1 ile denetlenir |
+| Kod: ne çağırıyor, neyi etkiler, nerede? | **CodeGraph** (MCP `codegraph_explore`) | ~1 sn taze, birebir kaynak döndürür |
+| Kod + **veritabanı** ilişkisi (tablo, FK, sembol toplulukları) | **graphify** + Supabase şema grafı (`graphify query/path/explain`) | `graphify-out/` üretilmiştir; kurulum ve kural `../CLAUDE.md` "graphify" |
+| Kod içinde metin/sembol araması | **WrongStack kod dizini** (MCP `wrongstack-codebase-index`) | dizin elle tazelenir; yaşı ölçülmeden güvenme |
+| Bir dosyaya dokununca geçmiş ders | **sage** (kanca dosyaya dokununca kendiliğinden getirir) | `standards/hafiza-kancalari-standard.md` §6 |
+| "Konuşmuş muyduk / ne karar vermiştik / niçin" | NotebookLM takip defteri `a5f382a4-b4e7-450c-84e0-9b7c082e2502` + Linear "Kararlar" belgesi | `standards/proje-takip-defteri-standard.md` |
+| Kural / niçin / mimari (kod hafızası) | NotebookLM dijital ikiz `235043eb-970f-4a52-9f39-1d02b2621e9c` | snapshot'tır; çelişirse kod kazanır |
+| Bütün belgelerde tarama | NotebookLM "VentHub Belgeler" `f503a886-3e2f-4234-8455-ee57c66f9488` | tek başına güvenilmez; bulgu dosyada doğrulanır |
+| İş ne durumda, kimde? | **Linear** (iş kaydının tek kaynağı) | `standards/is-kayit-duzeni-standard.md` |
+| Ajanın kalıcı dersleri | hafıza dizini `MEMORY.md` (depo dışı, oturum açılışında yüklenir) | `standards/hafiza-kancalari-standard.md` |
+| Belge / harita ne kadar taze? | her mesajdaki durum satırları; elle: `node scripts/belge/belge-tazelik.cjs` | `standards/belge-yonetimi-standard.md` B5 |
 
 ## Klasör düzeni
 
@@ -36,20 +55,29 @@
 | Adres/şablon **yayınından önce, yayın günü ve sonra** arama görünürlüğü nasıl denetlenir (eski adres tek 308, kırık bağlantı, SEO puanı), kusur kimin? | `standards/yayin-gorunurluk-denetim-standard.md` (TASLAK, REC-300) |
 | **Yapay zekâ cevaplarında** (Claude, Gemini) VentHub geçiyor mu, hangi motorla, hangi soru listesiyle, ne ölçülmez? | `standards/geo-olcum-standard.md` (TASLAK, karar 124) |
 | Bir kategorinin **adı hangi kolondan** gelir (menüde, başlıkta, kırıntıda)? | `standards/kategori-adlandirma-standard.md` |
-| Birden çok Claude oturumu **nasıl çakışmadan** çalışır? | `standards/multi-session-coordination-standard.md` |
+| Birden çok Claude oturumu **nasıl çakışmadan** çalışır (şerit sahipliği, worktree izolasyonu, bir-iş-bir-dal)? | `standards/collaboration-protocol.md` · ⚠`standards/multi-session-coordination-standard.md` eski modeli anlatıyor (belge taraması YÜKSEK bulgu 4; düzeltmesi REC-400 D5) |
+| Bir iş **hangi yöntemle** koşar (şerit / alt ajan / Workflow / maestro / skill / elle), emirde `YÖNTEM:` satırı? | `standards/execution-method-standard.md` |
+| Katalogdan ticarete hat — ürün nasıl girer, CSV, fiyat, şema, kategori? | `plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan uca pano) + `standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`; veri deposu kardeş depo `venthub-pdf-ingestor` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
 | Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |
 | Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (TASLAK, karar 59) |
 | Belgeler **nasıl yazılır** (gövde/tarihçe, sahip), hangi bilgi **hangi katmanda** durur, belge bayatlığı **nasıl görünür**, doğru belge **ne zaman kendiliğinden gelir**? | `standards/belge-yonetimi-standard.md` (TASLAK, REC-400) |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
-| Kapsamlı uçtan uca referans | `../CONTEXT.md` (NLM üretir) |
+| Kapsamlı uçtan uca referans (mimari, DB, akışlar; kuralların 31 maddelik gerekçeli listesi §14) | `../CONTEXT.md` (NLM üretir, elle yeniden yazılmaz; kural/niçin sorusunda NotebookLM ikizine alternatif) · ⚠2026-08-17'den beri güncellenmedi — bu yüzden artık "ilk bakılacak yer" DEĞİL (ilk bakılacak yer bu harita); tazeliği durum satırında; rolü REC-400 D5'te Recep kararı |
+| DI ve güvenlik milestone kayıtları, arayüz kontratları | `../PROJECT.md` |
+| Durum ve değişiklik geçmişi | `../RECOMMENDATIONS.md` · `../CHANGELOG.md` |
 
 ## Şu anki geliştirme adımı (takip)
 
-Aktif iş kolu = **Bayi (dealer) modülü** + standart harmonizasyonu. Canlı durum: **`DURUM-TAKIP.md`**.
+İş durumu için tek kaynak **Linear**. `DURUM-TAKIP.md` ("neredeyiz" + şerit panosu) ⚠2026-09-17'den beri
+güncellenmedi; bu bölümdeki eski "aktif iş kolu = bayi modülü" bilgisi de bayat (düzeltmesi REC-400 D5).
 
 ## Üretilen vs küratörlü (karıştırma)
 
 - **Üretilen** (kök master'lar): orion pipeline yazar; elle düzenleme — bir sonraki sync ezer.
 - **Küratörlü** (alt klasörler): elle yazılır; twin'e milestone'da sync edilir (bkz. `.claude/skills/notebooklm-sync`).
+- Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip NotebookLM "VentHub Proje
+  Hafızası" defterine (dijital ikiz) yüklenir.
+- Yetenek ağaçları: `.claude/skills/` = Claude Code, `.agent/skills/` = Antigravity işçisi — **ikisi de aktif ve
+  kasıtlı** (çift ağaç); işçi çekirdek kuralı `../AGENTS.md` köprüsüyle okur.
