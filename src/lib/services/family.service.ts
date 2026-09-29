@@ -23,17 +23,54 @@ export interface FamiliesPage {
   total: number
 }
 
+/**
+ * `get_product_families_enriched` ÇAĞRILARI SÜREÇ İÇİNDE SIRAYA ALINIR (REC-300 onarımı, ALTYAPI ölçümü 2026-09-29).
+ *
+ * NİÇİN: RPC ağır (çağrı başı ~14.185 tampon; tek başına 77 ms). Next build'i statik sayfaları (24 kategori × 2 dil
+ * + ürünler + aile parametreleri + site haritası ≈ 52 çağrı) EŞZAMANLI üretir; anon rolün 3 sn
+ * `statement_timeout`'una eşzamanlı yük altında düşer → `getAllFamilySlugs` hata verir, eskiden `.catch`
+ * bunu yutup ürünsüz site haritası üretiyordu (INV-SITEMAP-HATA-1'den önce). Süreç başına aynı anda TEK
+ * çağrı: sıra bekleyen çağrı DB'ye hiç gitmediği için timeout SAYAÇ İSTEMEZ; çağrı SAYISI değişmez,
+ * yalnız tepe eşzamanlılık düşer (build işçisi sayısı kadar).
+ * Kural 12 (önbellek anahtarında lang+tenant) bilerek dokunulmadı: sayaç düşürmek için anahtar bozulmaz.
+ */
+export const FAMILY_RPC_ESZAMANLI = 1
+let calisanRpc = 0
+const bekleyenRpc: Array<() => void> = []
+
+async function rpcSlotuAl(): Promise<void> {
+  if (calisanRpc < FAMILY_RPC_ESZAMANLI) {
+    calisanRpc++
+    return
+  }
+  // Slot BİRAKAN çağrıdan devredilir (calisanRpc değişmez) — arada başka çağrı araya giremez.
+  await new Promise<void>((devral) => bekleyenRpc.push(devral))
+}
+
+function rpcSlotunuBirak(): void {
+  const siradaki = bekleyenRpc.shift()
+  if (siradaki) siradaki()
+  else calisanRpc--
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}
 ): Promise<FamiliesPage> {
-  const { data, error } = await supabase.rpc('get_product_families_enriched', {
-    p_category_ids: params.categoryIds,
-    p_limit: params.limit ?? 24,
-    p_offset: params.offset ?? 0,
-    p_search_query: params.searchQuery,
-    p_brand: params.brand,
-  })
+  await rpcSlotuAl()
+  let data: unknown
+  let error: unknown
+  try {
+    ;({ data, error } = await supabase.rpc('get_product_families_enriched', {
+      p_category_ids: params.categoryIds,
+      p_limit: params.limit ?? 24,
+      p_offset: params.offset ?? 0,
+      p_search_query: params.searchQuery,
+      p_brand: params.brand,
+    }))
+  } finally {
+    rpcSlotunuBirak() // hata/iptal da slotu bırakır: kuyruk kilitlenmez
+  }
 
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
