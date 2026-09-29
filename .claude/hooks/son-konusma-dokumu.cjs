@@ -8,9 +8,20 @@
  * JEV sıkıştırması %25 azaltma bulamazsa Claude Code'un yerleşik özetleyicisine devrediyor; hangisinin
  * koşacağını Recep önceden bilemiyor. Özet (JEV ya da yerleşik) Recep'in kelimelerini değiştirir ya
  * da atar; durum dosyası ise yalnız ajanın yazmayı hatırladığını taşır. Bu kanca ikisinden bağımsız:
- * PreCompact anında konuşma kaydından Recep'in son 30 mesajını ve son 5 cevabı ÖZETSİZ, modelsiz
+ * konuşma kaydından Recep'in son 30 mesajını ve son 5 cevabı ÖZETSİZ, modelsiz
  * `memory/son-konusma-<sid>.md` dosyasına yazar; SessionStart(compact) (session-board.cjs) onu
  * durum bloğunun yanında ajanın önüne koyar.
+ *
+ * ── NEDEN İKİ OLAY: PreCompact + Stop (Ops 09-29, ölçüldü) ──
+ *
+ * İlk sürüm yalnız PreCompact'teydi ve iki gerçek compact'te (Ops ve ARAÇ, 09-29 07:00Z / 07:02Z)
+ * HİÇ dosya yazmadı. Gerçek compact'ler ~1 sn sürdü (JEV eklentisinin `session.compact` işlevi
+ * sıkıştırmayı kendisi yapıyor); yerleşik yolda (tek kullanımlık oturumda `claude -p /compact`,
+ * 43 sn, compactSummary satırı var) kanca koştu ve dosyayı yazdı. En olası sebep: PreCompact komut
+ * kancaları yerleşik yolun parçası, JEV yolunda koşmuyor (kesin kanıt değil: kancanın kendi
+ * çalışma izi yok). Bu yüzden döküm ARTIK Stop'ta da yenilenir: her cevap bitiminde, kayıttan eskiyse,
+ * sessizce. Stop, compact yoluna bağlı değildir ve en son cevabı da içerir. PreCompact kaydı yerleşik
+ * yol için kalır. Dosyanın `yazildi:` saati compact sınırından ESKİ olmalı — ölçüm bu.
  *
  * ── NE "RECEP MESAJI" SAYILIR (ölçüldü 09-28, bu oturumun kaydı) ──
  *
@@ -40,6 +51,7 @@ const CEVAP_SAYI = 5
 const DOSYA_UST_SINIR = 60_000 // dosyada tutulan
 const ENJEKTE_UST_SINIR = 12_000 // açılışta ajanın önüne konan (Ops: ~12k)
 const OKUMA_BAYT = 16 * 1024 * 1024
+const SUPURME_GUN = 14 // başka oturumların bayat dökümü bu kadar gün sonra silinir
 
 const SISTEM_ONEKLERI = ['<command-name>', '<command-message>', '<local-command-stdout>', '<local-command-caveat>', '<task-notification>']
 
@@ -159,7 +171,7 @@ function turlar(satirlar) {
   return liste
 }
 
-function dokumUret(kayitYolu, simdi = new Date()) {
+function dokumUret(kayitYolu, simdi = new Date(), kaynak = 'PreCompact') {
   const t = turlar(kayitSatirlari(kayitYolu))
   const son = t.slice(-RECEP_SAYI)
   const cevapBaslangic = son.length - CEVAP_SAYI
@@ -172,7 +184,7 @@ function dokumUret(kayitYolu, simdi = new Date()) {
   if (govde.length > DOSYA_UST_SINIR) govde = '…(eski kısım kesildi)\n' + govde.slice(-DOSYA_UST_SINIR)
   return sirSuz(
     `# Son konuşma dökümü (özetsiz)\n` +
-      `yazildi: ${simdi.toISOString()} · Recep mesajı ${son.length} · cevap ${Math.min(CEVAP_SAYI, son.length)}\n\n` +
+      `yazildi: ${simdi.toISOString()} · kaynak ${kaynak} · Recep mesajı ${son.length} · cevap ${Math.min(CEVAP_SAYI, son.length)}\n\n` +
       govde,
   )
 }
@@ -191,6 +203,29 @@ function enjeksiyon(memoryDir, sid, sinir = ENJEKTE_UST_SINIR) {
   return bas + '\n…(eski kısım kesildi — tamamı: ' + path.basename(y) + ')\n' + s.slice(-(sinir - bas.length - 80))
 }
 
+/** Stop turunda dökümü yenilemek gerekir mi: dosya yok ya da kayıttan eski. */
+function dokumGerekli(kayitYolu, hedef) {
+  try {
+    return !fs.existsSync(hedef) || fs.statSync(hedef).mtimeMs < fs.statSync(kayitYolu).mtimeMs
+  } catch {
+    return true
+  }
+}
+
+/** Her oturum kendi dosyasını bırakır; SUPURME_GUN'den eski ve başkasına ait dökümler silinir. */
+function eskiDokumleriSil(memoryDir, sid, simdi = Date.now()) {
+  try {
+    const kendi = path.basename(dosyaYolu(memoryDir, sid))
+    for (const ad of fs.readdirSync(memoryDir)) {
+      if (ad === kendi || !/^son-konusma-.+\.md$/.test(ad)) continue
+      const y = path.join(memoryDir, ad)
+      if (simdi - fs.statSync(y).mtimeMs > SUPURME_GUN * 86_400_000) fs.unlinkSync(y)
+    }
+  } catch {
+    // temizlik dökümü engellemez
+  }
+}
+
 function main() {
   let girdi = {}
   try {
@@ -198,26 +233,37 @@ function main() {
   } catch {
     girdi = {}
   }
+  // Stop her turun sonunda koşar ve sessizdir; PreCompact'te tek satır çıktı verilir.
+  const olay = girdi.hook_event_name === 'Stop' ? 'Stop' : 'PreCompact'
+  const yaz = (m) => {
+    if (olay !== 'Stop') process.stdout.write(m)
+  }
   try {
     const sid = girdi.session_id || ''
     const kayit = girdi.transcript_path || ''
     if (!sid || !kayit || !fs.existsSync(kayit)) {
-      process.stdout.write('[son-konusma] kayit yolu yok — dokum yazilmadi.\n')
+      yaz('[son-konusma] kayit yolu yok — dokum yazilmadi.\n')
       return
     }
     const kapi = require(path.join(__dirname, 'precompact-durum-kapisi.cjs'))
     const proje = kapi.projeDiziniBul(sid, kayit)
     if (!proje) {
-      process.stdout.write('[son-konusma] proje dizini cozulemedi — dokum yazilmadi.\n')
+      yaz('[son-konusma] proje dizini cozulemedi — dokum yazilmadi.\n')
       return
     }
     const memoryDir = path.join(proje, 'memory')
-    fs.writeFileSync(dosyaYolu(memoryDir, sid), dokumUret(kayit))
-    process.stdout.write(`[son-konusma] dokum yazildi: ${path.basename(dosyaYolu(memoryDir, sid))}\n`)
+    const hedef = dosyaYolu(memoryDir, sid)
+    if (olay === 'Stop' && !dokumGerekli(kayit, hedef)) return
+    // Yarım dosya SessionStart'ın okuduğu yerde kalmasın: önce geçici dosya, sonra yeniden adlandır.
+    const gecici = path.join(memoryDir, `son-konusma-${sid}.yaz.md`)
+    fs.writeFileSync(gecici, dokumUret(kayit, new Date(), olay))
+    fs.renameSync(gecici, hedef)
+    eskiDokumleriSil(memoryDir, sid)
+    yaz(`[son-konusma] dokum yazildi: ${path.basename(hedef)}\n`)
   } catch (e) {
-    process.stdout.write(`[son-konusma] dokum BASARISIZ (${(e && (e.code || e.message)) || 'bilinmeyen'}) — compact engellenmedi.\n`)
+    yaz(`[son-konusma] dokum BASARISIZ (${(e && (e.code || e.message)) || 'bilinmeyen'}) — compact engellenmedi.\n`)
   }
 }
 
-module.exports = { sirSuz, turlar, dokumUret, enjeksiyon, dosyaYolu, RECEP_SAYI, CEVAP_SAYI, ENJEKTE_UST_SINIR }
+module.exports = { sirSuz, turlar, dokumUret, enjeksiyon, dosyaYolu, dokumGerekli, eskiDokumleriSil, RECEP_SAYI, CEVAP_SAYI, ENJEKTE_UST_SINIR }
 if (require.main === module) main()
