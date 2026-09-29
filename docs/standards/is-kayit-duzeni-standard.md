@@ -81,6 +81,11 @@ Başlık konvansiyonu: kimlik kodu baştaki köşeli parantezin İÇİNDE (`[ŞE
     birleşmede kapatır (2026-09-29'da REC-433 çatısı yanlışlıkla bu riske girdi, birleşmeden önce yakalandı).
     Çatıya bağ `Part of REC-nn` (Linear'ın kapatmayan bağı) ile kurulur; alt kayıt açılamıyorsa
     (Linear ücretsiz sınırı) PR gövdesine `Part of REC-nn` yazılır.
+  - **Çatı kaydı alt kayıt (parent) almaz, ilişkili kayıt alır.** Çatı = program, plan, kalıcı defter, kapsamı
+    zamanla büyüyen kayıt (REC-425 talimat defteri, REC-345 bağımlılık programı, REC-206 katalog hattı,
+    REC-433 tek plan, REC-400 belge kök çözümü). PR'lar çatıya `Part of REC-nn` ile bağlanır. Alt kayıt
+    (parent) yalnız kapsamı baştan bilinen, parçaları bitince iş gerçekten bitmiş sayılacak kayıtlarda
+    kullanılır; Linear o üstü kendiliğinden kapatır (karar 187, OPS 2026-09-29).
   - İstisna yalnız PR gövdesinde açık bir `Kayıtsız: <sebep>` satırıyla; sebepsiz istisna yoktur.
   - Kapı (Fixes ya da Kayıtsız yoksa uyarı) ARAÇ'ta yazılıyor.
   - Niçin: 2026-09-29 ölçümü, son 60 birleşmenin 0'ı `Fixes` taşıyordu; kayıtlar elle kapanmadığı için
