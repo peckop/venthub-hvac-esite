@@ -317,7 +317,7 @@ process.exit(0)
 // `require` edildiğinde kapı KOŞMAMALI: session-board.cjs bu dosyayı modül olarak çağırıyor ve
 // stdin okuyup process.exit çağıran bir modül, çağıranın oturumunu öldürürdü.
 module.exports = {
-  durumDosyasiBul, sonBlok, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI,
+  durumDosyasiBul, sonBlok, projeDiziniBul, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI,
   // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
   // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
   asciiKatla,

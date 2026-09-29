@@ -200,3 +200,11 @@ describe('geri yükleyici jsonl yolu (ham/)', () => {
     expect(r.stderr).not.toContain('EKSİK')
   })
 })
+
+describe('gorseller.csv — yeni kolon YALNIZ SONA (REC-212, OPS hükmü 2026-09-27)', () => {
+  it('v1 kolonlarının yeri kaymaz; sha256 + bayt en sonda', () => {
+    expect(GORSEL_BASLIK.slice(0, 9)).toEqual(
+      ['sku', 'urun', 'dosya', 'paket_yolu', 'sira', 'alt_metin', 'kaynak_dosya', 'kaynak_sayfa', 'alinti'])
+    expect(GORSEL_BASLIK.slice(-2)).toEqual(['sha256', 'bayt'])
+  })
+})

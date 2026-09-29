@@ -29,6 +29,7 @@ import {
   URUN_BASLIK, TEKNIK_BASLIK, TEKNIK_BASLIK_ADIM3, GORSEL_BASLIK, FIYAT_BASLIK,
   HAM_ESLEME, paketHucresi, csvOku,
 } from './paket-sozlesme.mjs'
+import { paketGorselDogrula } from './paket-gorsel.mjs'
 
 const PAKET = process.argv.find(a => a.startsWith('--paket='))?.slice(8)
 if (!PAKET) { console.error('⛔ --paket=<dizin> gerekli'); process.exit(2) }
@@ -94,7 +95,17 @@ const doluluk = (satirlar, kolonlar) =>
   const c = csv('gorseller.csv')
   basligiDenetle('gorseller.csv', c.basliklar, GORSEL_BASLIK)
   const h = hucreleriDenetle('gorseller.csv', c.satirlar, hamOku('product_images'))
-  rapor.push(['gorseller.csv', c.satirlar.length, h, doluluk(c.satirlar, ['alt_metin'])])
+  // DOSYANIN kendisi (REC-212, 2026-09-27): paketteki her görsel dosyası CSV'deki sha256 ile
+  // tutmalı. Eksik, bozuk ya da sha'sız dosya = FARK (sessiz geçmez).
+  const g = paketGorselDogrula(PAKET, c.satirlar)
+  for (const y of g.eksik.slice(0, 20)) fark.push(`gorseller: DOSYA YOK ${y}`)
+  for (const y of g.bozuk.slice(0, 20)) fark.push(`gorseller: DOSYA sha256 TUTMUYOR ${y}`)
+  if (g.shasiz.length) fark.push(`gorseller: ${g.shasiz.length} satırda sha256 BOŞ — dosya kimliği doğrulanamıyor`)
+  if (g.eksik.length > 20 || g.bozuk.length > 20) fark.push(`gorseller: toplam eksik ${g.eksik.length} · bozuk ${g.bozuk.length}`)
+  const durumYolu = join(PAKET, 'gorsel-durum.json')
+  const durum = existsSync(durumYolu) ? JSON.parse(readFileSync(durumYolu, 'utf8')) : null
+  rapor.push(['gorseller.csv', c.satirlar.length, h,
+    `${doluluk(c.satirlar, ['alt_metin', 'sha256'])} · dosya sha tutan ${g.tamam} · depoyla ${durum?.dogrulandi ? 'DOĞRULANDI' : '⚠DOĞRULANMADI (--gorsel-atla ya da gorsel-durum.json yok)'}`])
 }
 // ── fiyatlar
 {

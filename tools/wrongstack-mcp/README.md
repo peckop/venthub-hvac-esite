@@ -4,9 +4,10 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.19`, `@wrongstack/codebase-index-mcp@1.0.19`, `@wrongstack/kanban-mcp@1.0.19`, `@wrongstack/mailbox-mcp@1.0.19`, lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.26`, `@wrongstack/codebase-index-mcp@1.0.26`, `@wrongstack/kanban-mcp@1.0.26`, `@wrongstack/mailbox-mcp@1.0.26` (09-27 1.0.19'dan yükseltildi), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
+| **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
 | **ALINMAYAN** | WrongStack ajan ürünü (Claude Code'un alternatifi), WebUI/CodeMap, kod dizininin `--writable` yüzeyi. CodeGraph **yerinde kalır**; hangisinin kalacağı OPS kıyasıyla belli olacak (REC-345). |
 
 Karar: Recep, OPS penceresi 2026-09-17 ("bence alalım, beklemeyelim") + ALTYAPI penceresinde teyit ("evet kur"). Kayıt: REC-345 Kova C.
@@ -32,6 +33,26 @@ cd ../.. && for y in tools/wrongstack-mcp/yamalar/*.patch; do git apply "$y"; do
 siler; bu yüzden ikinci satır atlanmaz. Yama uygulandıktan sonra MCP sunucusu yeniden bağlanana kadar
 (`/mcp` → yeniden bağlan ya da pencere kapat-aç) eski kod bellekte koşar. Durum ölçümü (repo kökünden):
 `git apply --reverse --check <yama>` çıkış 0 = uygulanmış. Kapı: `INV-WRONGSTACK-KANBAN-YAMA-1`.
+
+### Sürüm yükseltme (ana depoda) — pencereler açıkken YAPILMAZ
+
+Arka plan süreçleri (`project-server.js`) pencere kapanınca da ayakta kalır ve paket dosyalarını
+açık tutar. Paketin içinde Windows için derlenmiş modül var; süreçler açıkken `npm ci` dosyaları
+değiştiremeyebilir, değiştirse bile eski kod bellekte koşar (09-27: makinede 30 WrongStack süreci).
+**Tek komut (OPS kararı 09-27):** `node tools/wrongstack-mcp/kurulum.cjs`. Açılış sırası:
+1. Bütün Claude pencereleri kapalı.
+2. YALNIZ ARAÇ penceresi açılır ve betiği koşar. Betik kendi penceresinin WrongStack sunucularını
+   ve daemon'ları durdurur, `npm ci --ignore-scripts` koşar, yamaları uygular, doğrular.
+   Başka pencereye ait sunucu görürse hiçbir şeye dokunmadan `HATA` der.
+3. Son satır `HAZIR` → ARAÇ penceresi `/mcp` ile WrongStack sunucularını yeniden bağlar.
+4. Öteki pencereler açılır.
+`--denetle` yalnız doğrular (sürümler, yamalar, `.mcp.json` giriş dosyaları), hiçbir şey değiştirmez.
+Kapı: `INV-WRONGSTACK-KURULUM-1` (başka pencere varken hiçbir süreç kapatılmaz).
+
+1.0.19 → 1.0.26 ölçümü (2026-09-27): dört sunucu el sıkıştı. kanban 2 araç (1.0.26 istemci eski
+1.0.19 daemon'una bağlanıp okudu), codebase-index 6, sage 15 (sage.db **kopyasında** arama),
+mailbox 3. sage.db şeması değişmedi (`user_version` 0, 31 nesne, aynı imza). Yama yeniden üretildi
+(satırlar kaydı, içerik aynı).
 
 `pnpm` **kullanılmaz**: ana lockfile'a ve worktree'lerin `node_modules` bağına dokunmaz.
 Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açılışta onaya sorar.
@@ -107,7 +128,7 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    özet kesicisi (`kanbanTool.serialize` → pano okumayan eylemde panoyu {sütun → kart sayısı}
    özetine indirir) MCP yolunda **hiç çağrılmıyor**. 1.0.26'da da aynı satır (ölçüldü). Bedel:
    47 KB'lık panoda her `add_task`/`add_note`/`transition_task` 48,6 KB dönüyordu.
-   `yamalar/kanban-mcp-1.0.19-ozet-donus.patch` başarılı sonucu kesiciden geçirir; kesici girintili
+   `yamalar/kanban-mcp-1.0.26-ozet-donus.patch` başarılı sonucu kesiciden geçirir; kesici girintili
    metin döndürdüğü için sonuç `JSON.parse` ile nesneye çevrilir, sunucu sıkı biçimde yazar.
    Yalnız panoyu döndüren eylemlerde (`add_note`, `update_task`, `move_task`, `assign_task`…)
    özet kartı da kaybettirirdi; yama `args.taskId` kartını özetin yanına koyar.

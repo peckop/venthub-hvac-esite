@@ -27,7 +27,10 @@ import { describe, expect, it } from 'vitest'
 const KOK = process.cwd()
 const ARAC = path.join(KOK, 'tools', 'wrongstack-mcp')
 const YAMALAR = path.join(ARAC, 'yamalar')
-const KANBAN_YAMASI = path.join(YAMALAR, 'kanban-mcp-1.0.19-ozet-donus.patch')
+const KANBAN_YAMASI = path.join(
+  YAMALAR,
+  fs.readdirSync(YAMALAR).find((d) => /^kanban-mcp-\d+\.\d+\.\d+-ozet-donus\.patch$/.test(d)) ?? 'kanban-mcp-YAMA-YOK.patch',
+)
 const KURULU = fs.existsSync(path.join(ARAC, 'node_modules', '@wrongstack', 'kanban-mcp', 'dist', 'cli.js'))
 const YAMASIZ_SATIR = 'return { content: result, isError: failed };'
 

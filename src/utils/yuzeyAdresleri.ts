@@ -1,0 +1,146 @@
+/**
+ * YÜZEY ADRESLERİ — vitrin yüzeylerinin `adresUret`'e bağlandığı TEK ara katman (REC-300 Faz 3d,
+ * plan §5 Faz 3 madde 2 + 7).
+ *
+ * NİÇİN AYRI MODÜL: `adresUret` nesne → adres üretir; yüzeylerin çoğu ise bugün `Routes.category(…)`,
+ * `Routes.product(…)` gibi DİLSİZ yol üreticilerini çağırıyor (35+ dosya, çoğu `useLocalizedRoutes`
+ * vekili üzerinden). Her çağrı yerini tek tek elle değiştirmek hem kaçak bırakır hem 35 ayrı
+ * "bayrak kapalıyken aynı mı" sorusu doğurur. Bu modül aynı imzayı `adresUret` üzerinden verir:
+ * vekil (`useLocalizedRoutes`) ve sunucu yüzeyleri buradan geçer, soru TEK yerde (tablo testiyle) cevaplanır.
+ *
+ * ⭐BAYRAK KAPALIYKEN (bugün) her fonksiyon BUGÜNKÜ ifadeyi AYNEN döndürür — yeni kod yolu yoktur,
+ * yalnız `bayrak ? yeni : bugünkü` dalı. Kanıt: `src/utils/__tests__/yuzeyAdresleri.test.ts`
+ * (beklenen değerler bu değişiklikten ÖNCEKİ kodun çıktısı) + `yuzeyAdresleriK3b.test.ts` (açık kip).
+ *
+ * `bayrak` parametresi yalnız test içindir; üretim kodu varsayılanı (`ADRES_SEMASI_K3B`) kullanır.
+ */
+import type { Route } from 'next'
+
+import { ADRES_SEMASI_K3B } from '../config/features'
+import { type AdresDili, adresUret } from './adresUret'
+import { localizedHref, Routes } from './routes'
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const adresDili = (lang: string): AdresDili => (lang === 'en' ? 'en' : 'tr')
+
+/** `Routes`'un vitrin nesnesi üreten dört fonksiyonunun dil önekli, şemaya duyarlı karşılığı. */
+export interface AdresRotalari {
+  category: (slug: string, subSlug?: string) => Route
+  product: (slug: string, sku?: string) => Route
+  products: (params?: { brand?: string; limit?: number }) => Route
+  brand: (slug: string) => Route
+}
+
+/**
+ * `Routes.category/product/products/brand` + `localizedHref` bileşiminin `adresUret` karşılığı.
+ *
+ * AÇIK kipte:
+ *  - `category(kök, dal)` → iki seviyeli kanonik (`/tr/kategori/<kök>/<dal>`). Yalnız TEK slug verilen
+ *    çağrı (çağıran üst kategoriyi bilmiyor) tek seviyeli adres üretir; sayfa katmanı dal ise iki
+ *    seviyeliye tek 308 verir (Faz 3b-2, `kategoriSegmenti`). Üstü bilen çağıran İKİSİNİ verir.
+ *  - `product(aile, sku)` → modelin kendi adresi (`/tr/urun/<aile>-p-<sku>`, `?sku=` YOK). Faz 2 öncesi
+ *    modelin slug metni yok → metin olarak aile slug'ı (Faz 3b'deki `handleSelectVariant` ile aynı
+ *    sözleşme; rota modeli SKU'dan çözer).
+ *  - boş aile slug'ı (eski sipariş/favori satırı) → kırık adres üretmek yerine tüm ürünler.
+ *  - UUID (veri kaçağı) → bugünkü eski yol; sayfa katmanı UUID'yi çözer (madde 6, REC-289).
+ */
+export function adresRotalari(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B): AdresRotalari {
+  if (!bayrak) {
+    return {
+      category: (slug, subSlug) => localizedHref(Routes.category(slug, subSlug), dil),
+      product: (slug, sku) => localizedHref(Routes.product(slug, sku), dil),
+      products: (params) => localizedHref(Routes.products(params), dil),
+      brand: (slug) => localizedHref(Routes.brand(slug), dil),
+    }
+  }
+  return {
+    category: (slug, subSlug) => {
+      const dal = subSlug && subSlug !== 'undefined' && subSlug !== slug ? subSlug : null
+      return adresUret({ tur: 'kategori', kok: slug, dal }, dil, true)
+    },
+    product: (slug, sku) => {
+      if (!slug) return adresUret({ tur: 'urunler' }, dil, true)
+      if (UUID.test(slug)) return localizedHref(Routes.product(slug, sku), dil)
+      return sku
+        ? adresUret({ tur: 'model', aileSlug: slug, sku, slug }, dil, true)
+        : adresUret({ tur: 'aile', slug }, dil, true)
+    },
+    products: (params) => {
+      const temel = adresUret({ tur: 'urunler' }, dil, true)
+      // Sorgu parametreleri `Routes.products` ile AYNI kurulur (tek kaynak): yalnız yol değişir.
+      const bugunku = Routes.products(params)
+      const i = bugunku.indexOf('?')
+      return (i < 0 ? temel : `${temel}${bugunku.slice(i)}`) as Route
+    },
+    brand: (slug) => adresUret({ tur: 'marka', slug }, dil, true),
+  }
+}
+
+/** Dile göre bölüm adları — yalnız yol DÖNÜŞTÜRMEK için (üretim `adresUret`'te). */
+const YENI_BOLUM: Record<AdresDili, { urunler: string; kategori: string; urun: string; marka: string }> = {
+  tr: { urunler: 'urunler', kategori: 'kategori', urun: 'urun', marka: 'markalar' },
+  en: { urunler: 'products', kategori: 'category', urun: 'products', marka: 'brands' },
+}
+
+/**
+ * DİL DEĞİŞTİRİCİ yolu (LanguageSwitcher). Bugün yalnız dil segmenti değişir. AÇIK kipte bölüm adı da
+ * çevrilir: `/tr/urun/x` ↔ `/en/products/x`, `/tr/urunler` ↔ `/en/products`, `/tr/kategori/…` ↔
+ * `/en/category/…`, `/tr/markalar/x` ↔ `/en/brands/x` — yoksa dil değişince 404'e düşülürdü
+ * (`/en/urun/x` rotası yok). Slug'lar AYNEN taşınır: kategori slug'ı dile göre farklıysa hedef sayfa
+ * kanoniğine tek 308 verir (Faz 3b-2); aile/model slug'ı bugün iki dilde aynı.
+ */
+export function dilDegistirYolu(pathname: string, yeniDil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B): string {
+  const segments = pathname.split('/').filter(Boolean)
+  const firstSegment = segments[0]
+  if (firstSegment !== 'tr' && firstSegment !== 'en') {
+    return '/' + yeniDil + (pathname === '/' ? '' : pathname)
+  }
+  segments[0] = yeniDil
+  if (bayrak && firstSegment !== yeniDil && segments.length > 1) {
+    const eski = YENI_BOLUM[firstSegment]
+    const yeni = YENI_BOLUM[yeniDil]
+    const bolum = segments[1]
+    if (bolum === eski.kategori) segments[1] = yeni.kategori
+    else if (bolum === eski.marka) segments[1] = yeni.marka
+    else if (firstSegment === 'tr' && bolum === eski.urunler) segments[1] = yeni.urunler
+    else if (firstSegment === 'tr' && bolum === eski.urun) segments[1] = yeni.urun
+    // EN `products` iki TR bölüme ayrılır: alt yol varsa ürün (`urun`), yoksa liste (`urunler`).
+    else if (firstSegment === 'en' && bolum === eski.urun) segments[1] = segments.length > 2 ? yeni.urun : yeni.urunler
+  }
+  return '/' + segments.join('/')
+}
+
+/**
+ * Yol bir ÜRÜN DETAY sayfası mı (ClientLayout gezinme yığını bu sayfaları atlar). Bugün yalnız
+ * `/products/` içeren yollar; AÇIK kipte `/tr/urun/<x>` da.
+ */
+export function urunDetayYoluMu(pathname: string, bayrak: boolean = ADRES_SEMASI_K3B): boolean {
+  if (pathname.includes('/products/')) return true
+  return bayrak && /^\/tr\/urun\/[^/]/.test(pathname)
+}
+
+/**
+ * Alt sekme "Ürünler" hangi yol öneklerinde seçili görünür. Bugün `/<dil>/products` (ürün detayı
+ * dahil, alt yol olarak). AÇIK kipte TR'de liste `/tr/urunler`, detay `/tr/urun/…` ayrı bölümlerdir.
+ */
+export function urunlerBolumuOnekleri(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B): string[] {
+  if (!bayrak) return [localizedHref(Routes.products(), dil)]
+  const liste = adresUret({ tur: 'urunler' }, dil, true)
+  const aileOrnek = adresUret({ tur: 'aile', slug: 'x' }, dil, true)
+  const detayBolumu = aileOrnek.slice(0, aileOrnek.lastIndexOf('/'))
+  return detayBolumu === liste ? [liste] : [liste, detayBolumu]
+}
+
+/**
+ * JSON-LD / kırıntı için DİL ÖNEKLİ yol. Bugün kırıntı adımları dilsiz yol taşır ve önek JSON-LD
+ * üreticisinde eklenir; AÇIK kipte adım zaten `adresUret` çıktısıdır (önekli).
+ */
+export function kategoriKirintiYolu(
+  kok: string,
+  dal: string | null,
+  dil: AdresDili,
+  bayrak: boolean = ADRES_SEMASI_K3B,
+): string {
+  return bayrak ? adresUret({ tur: 'kategori', kok, dal }, dil, true) : Routes.category(kok, dal ?? undefined)
+}

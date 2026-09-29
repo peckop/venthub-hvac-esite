@@ -14,6 +14,7 @@ import { getDictValue } from '../../i18n/getDictValue'
 import { compareText } from '../../i18n/sort'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
 import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { adresDili, adresRotalari } from '../../utils/yuzeyAdresleri'
 import HomePage from '../../views/HomePage'
 
 /**
@@ -234,7 +235,8 @@ export default async function RootPage({ params }: Props) {
       "url": siteUrl,
       "potentialAction": {
         "@type": "SearchAction",
-        "target": `${siteUrl}/${lang}/products?q={search_term_string}`,
+        // REC-300 Faz 3d: tüm ürünler adresi `adresUret`'ten (kapalıyken `/${lang}/products` ile aynı).
+        "target": `${siteUrl}${adresRotalari(adresDili(lang)).products()}?q={search_term_string}`,
         "query-input": "required name=search_term_string"
       }
     },
