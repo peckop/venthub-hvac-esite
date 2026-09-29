@@ -33,7 +33,8 @@ const { execFileSync } = require('child_process')
 const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
 const ONBELLEK = path.join(PANO, '.belge-tazelik-onbellek.json')
 
-const CEKIRDEK = ['CLAUDE.md', 'docs/README.md', 'CONTEXT.md', 'docs/DURUM-TAKIP.md']
+// CONTEXT.md ve docs/DURUM-TAKIP.md 2026-09-29'da emekli edildi (yerinde yönlendirme sayfası): çekirdek değiller.
+const CEKIRDEK = ['CLAUDE.md', 'docs/README.md']
 const HARITALAR = ['CLAUDE.md', 'docs/README.md']
 const CETVEL_DIZINI = 'docs/standards'
 const GRAF = 'graphify-out/graph.json'

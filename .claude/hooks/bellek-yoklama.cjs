@@ -38,7 +38,7 @@
 
 const fs = require('fs')
 const path = require('path')
-const { spawn, execFileSync } = require('child_process')
+const { execFileSync } = require('child_process')
 
 const MB = 1024 * 1024
 const ESIK_SUREC_MB = Number(process.env.VENTHUB_BELLEK_SUREC_MB || 3072)
@@ -145,7 +145,8 @@ function gerekirseTazele(simdi) {
   try {
     fs.mkdirSync(path.dirname(kilit), { recursive: true })
     fs.writeFileSync(kilit, String(simdi))
-    spawn(process.execPath, [__filename, '--tazele'], { detached: true, stdio: 'ignore', windowsHide: true }).unref()
+    // REC-415: kopuk süreç başlatmanın tek yolu (içindeki powershell pencere açmasın)
+    require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs')).kopukBaslat(__filename, ['--tazele'])
   } catch {
     /* başlatılamadı: 60 dk sonra satır OLCULEMEDI der */
   }

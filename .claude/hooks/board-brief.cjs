@@ -150,7 +150,20 @@ function istemYollari(metin) {
 
 if (others.length > 0) {
   const yollar = istemYollari(input.prompt)
+  // PENCERE ADI (REC-404): pano sid ile, SendMessage pencere adıyla çalışır; eşleme satırda görünür ve
+  // aynı ad iki CANLI sid'de ise ⚠ÇAKIŞMA basılır. FAIL-OPEN: eski board.cjs'te `pencereAdlari` yoksa ya da
+  // kayıt okunamazsa ad yazılmaz, satır aynen eskisi gibi basılır (özet satırı ad yüzünden düşmez).
+  let adlar = new Map()
+  try { if (typeof board.pencereAdlari === 'function') adlar = board.pencereAdlari() } catch { adlar = new Map() }
+  const adSayac = new Map()
+  for (const c of hepsi) {
+    const ad = adlar.get(c.sid)
+    if (ad && !c.bayat) adSayac.set(ad, (adSayac.get(ad) || 0) + 1)
+  }
   lines.push('PANO: ' + others.map(c => {
+    const ad = adlar.get(c.sid)
+    const adEt = ad ? `[${ad}]` : ''
+    const adCak = ad && !c.bayat && adSayac.get(ad) > 1 ? ' ⚠ÇAKIŞMA(aynı ad, ListAgents [ref] ile gönder)' : ''
     const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
     const globs = Array.isArray(c.globs) ? c.globs : []
     let degen = []
@@ -158,7 +171,7 @@ if (others.length > 0) {
       degen = globs.filter(g => yollar.some(y => board.globToRegExp(g).test(y)))
     } catch { degen = [] } // eşleyici yoksa özet yine basılır; ayrıntı düşer, satır düşmez
     const ek = degen.length > 0 ? `; istemdeki yola değen: ${degen.join(' ')}` : ''
-    return `${c.lane}=${String(c.sid).slice(0, 8)} (${globs.length} desen, ${c.yasDk}dk${ek})${bayat}`
+    return `${c.lane}${adEt}=${String(c.sid).slice(0, 8)} (${globs.length} desen, ${c.yasDk}dk${ek})${adCak}${bayat}`
   }).join(' · '))
 }
 // KARAR 117 (Recep, 2026-09-25): bu satır eskiden her turda "CronCreate ile 30dk tur kur"

@@ -4,6 +4,7 @@ import { EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
+import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
 import { getCategories } from '../lib/services/category.service'
 import { getAllFamilySlugs } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
@@ -33,9 +34,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * "bunları tara" diye bir talep gitmez. Sayfalar çalışmaya devam eder (bkz. bayrağın
    * kendi gerekçesi, `src/config/features.ts`).
    *
-   * ⚠`alternates.languages` blokları BİLEREK DOKUNULMADI: hreflang beyanı sayfa var
-   * olduğu sürece doğrudur ve onu bozmak TR sayfaların dil eşleşmesini de bozar.
-   * Bayrağın "BİLİNEN SINIR" maddesi tam olarak bunu yazıyor.
+   * `alternates.languages` blokları da AYNI BAYRAĞA BAĞLI (REC-300 Faz 3e-3, OPS hükmü 2026-09-29):
+   * kapalıyken satırda `alternates` alanı hiç çıkmaz (Google'a dizine kapalı `/en` eşi
+   * gösterilmez, sayfaların `<link rel=alternate>`i de aynı kuralla kalkar — `enYayinKurali.ts`);
+   * açılınca bugünkü çıktı BİREBİR geri gelir. Bayrağın eski "BİLİNEN SINIR" maddesi bununla kalktı.
    */
   const locales = EN_YAYIN ? ['tr', 'en'] : ['tr']
 
@@ -86,12 +88,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changefreq: 'daily',
       priority: route === '' ? 1.0 : 0.8,
-      alternates: {
-        languages: {
-          tr: `${baseUrl}/tr${route}`,
-          en: `${baseUrl}/en${route}`,
-        }
-      }
+      ...siteHaritasiAlternates({
+        tr: `${baseUrl}/tr${route}`,
+        en: `${baseUrl}/en${route}`,
+      }),
     }))
   )
 
@@ -102,12 +102,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(cat.updated_at || new Date()),
       changefreq: 'weekly',
       priority: 0.7,
-      alternates: {
-        languages: {
-          tr: `${baseUrl}/tr${Routes.category(getLocalizedCategorySlug(cat, 'tr'))}`,
-          en: `${baseUrl}/en${Routes.category(getLocalizedCategorySlug(cat, 'en'))}`,
-        }
-      }
+      ...siteHaritasiAlternates({
+        tr: `${baseUrl}/tr${Routes.category(getLocalizedCategorySlug(cat, 'tr'))}`,
+        en: `${baseUrl}/en${Routes.category(getLocalizedCategorySlug(cat, 'en'))}`,
+      }),
     }))
   )
 
@@ -132,12 +130,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changefreq: 'weekly',
       priority: 0.6,
-      alternates: {
-        languages: {
-          tr: `${baseUrl}/tr${Routes.brand(brand.slug)}`,
-          en: `${baseUrl}/en${Routes.brand(brand.slug)}`,
-        }
-      }
+      ...siteHaritasiAlternates({
+        tr: `${baseUrl}/tr${Routes.brand(brand.slug)}`,
+        en: `${baseUrl}/en${Routes.brand(brand.slug)}`,
+      }),
     }))
   )
 
@@ -152,12 +148,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(),
         changefreq: 'daily',
         priority: 0.9,
-        alternates: {
-          languages: {
-            tr: `${baseUrl}/tr${Routes.product(f.slug)}`,
-            en: `${baseUrl}/en${Routes.product(f.slug)}`,
-          }
-        }
+        ...siteHaritasiAlternates({
+          tr: `${baseUrl}/tr${Routes.product(f.slug)}`,
+          en: `${baseUrl}/en${Routes.product(f.slug)}`,
+        }),
       }))
   )
 
