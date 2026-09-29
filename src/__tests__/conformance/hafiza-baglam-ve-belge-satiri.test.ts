@@ -127,6 +127,23 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     expect(bd.satir(200_000, 250_000)).toMatch(/COMPACT YAKIN/)
   })
 
+  it("COMPACT YAKIN satırı Recep'e HAZIRLIK NOTU talimatı taşır; doluyor/düz satırda YOK (Recep 09-29)", () => {
+    const yakin = bd.satir(500_000, 1_000_000) as string
+    for (const madde of [
+      'COMPACT HAZIRLIK NOTU',
+      '(a) durum dosyam guncel mi',
+      '(b) yarim is var mi',
+      '(c) tek cumle hukum',
+      'Simdi compact yapabilirsin',
+      'her cevapta kisaca tekrarla',
+    ]) {
+      expect(yakin, madde).toContain(madde)
+    }
+    expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
+    expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
+    expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT HAZIRLIK NOTU')
+  })
+
   it('pencere önceliği durum çubuğuyla aynı: ortam > proje ayarı > kullanıcı ayarı > 1M', () => {
     const kok = gecici()
     const ev = gecici()
