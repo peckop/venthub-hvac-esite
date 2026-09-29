@@ -36,10 +36,11 @@ const path = require('path')
 // ayırt eder. Eşiği düşürmek (ör. 30) AUTH'u yanlış alarmla vururdu — o gün 46 dakikaydı.
 const BAYAT_ESIK_DK = 60
 
-// MEMORY.md boyut bekçisi. ÖLÇÜM TABANI: indeks ~24.4KB'de okunamaz oluyor ve 27.5KB'de
-// sessizce kırpıldığı gözlendi (memory-index-truncates-silently). Filo 16KB'yi çalışma
-// eşiği seçti; uyarı onun üstünde başlar. Ölçü BAYT, satır DEĞİL — kırpma bayta bakıyor.
-const MEMORY_ESIK_BAYT = 16384
+// MEMORY.md boyut bekçisi. ÖLÇÜM TABANI (HARİTA, REC-433 1.9, 2026-09-29): gerçek kırpma sınırı
+// 200 SATIR YA DA ~25.000 BAYT, hangisi önce dolarsa. Eski "16384 bayt" yanlış ölçümdü ve satır
+// sınırını hiç izlemiyordu. Aynı eşikler `hafiza-indeks-bekcisi.cjs`te de var (orada yazım engellenir).
+const MEMORY_ESIK_BAYT = 25000
+const MEMORY_ESIK_SATIR = 200
 
 /**
  * ⭐YUMUŞAK EŞİK (REC-280) — SERT eşiğin uyarısı GEÇ KALIYORDU, ölçüldü.
@@ -47,12 +48,13 @@ const MEMORY_ESIK_BAYT = 16384
  * VAKA (2026-09-07 20:41–20:57Z, üç şerit): dosya 16414 → 16510 bayta çıktı ve alt satırlar
  * SESSİZCE kırpıldı; en alttaki dersler hiçbir oturuma yüklenmedi. Sert eşik ancak taşma
  * OLDUKTAN sonra yanar — yani kırpma zaten gerçekleşmiştir ve uyarı "haber" değil "otopsi"dir.
- * 15800, taşmaya ~584 bayt kala uyarır: bir indeks satırı ortalama 60-120 bayt, yani
- * katlamak için hâlâ birkaç satırlık pay vardır.
+ * 20000 bayt / 160 satır, taşmaya 5 KB / 40 satır kala uyarır: bir indeks satırı ortalama 60-120 bayt,
+ * yani katlamak için bolca pay vardır.
  * İKİ EŞİK, İKİ AD: yumuşak = "satır ekleme, katla" · sert = "taşma OLDU, alt satırlar gitti".
  * Aynı sayıyı iki anlam için kullanmak, ikisinden birinin sessizce yanlış olması demekti.
  */
-const MEMORY_YUMUSAK_ESIK_BAYT = 15800
+const MEMORY_YUMUSAK_ESIK_BAYT = 20000
+const MEMORY_YUMUSAK_ESIK_SATIR = 160
 
 /**
  * ⭐TÜRKÇE HARFLERİ ASCII'YE KATLAR — ölçülmüş kusur (2026-09-01, URUN bildirdi, ALTYAPI ölçtü).
@@ -284,17 +286,22 @@ try {
 try {
   const idx = path.join(memoryDir, 'MEMORY.md')
   const bayt = fs.statSync(idx).size
-  if (bayt > MEMORY_ESIK_BAYT) {
+  // Satır sayısı: sondaki satır sonu fazladan satır sayılmaz (bekçi kancasıyla aynı ölçü).
+  const govde = fs.readFileSync(idx, 'utf8')
+  const satir = govde === '' ? 0 : govde.split(/\r?\n/).length - (/\r?\n$/.test(govde) ? 1 : 0)
+  const ol = bayt + ' bayt / ' + satir + ' satir'
+  if (bayt > MEMORY_ESIK_BAYT || satir > MEMORY_ESIK_SATIR) {
     uyarilar.push(
-      '⛔MEMORY.md ' + bayt + ' bayt — SERT esik ' + MEMORY_ESIK_BAYT + ' ASILDI (asim ' +
-        (bayt - MEMORY_ESIK_BAYT) + '). Bu bir haber degil OTOPSI: alt satirlar SESSIZCE ' +
-        'kirpilmis olabilir ve o dersler hicbir oturuma yuklenmez. HEMEN katla; olcu BAYT.',
+      '⛔MEMORY.md ' + ol + ' — SERT esik ' + MEMORY_ESIK_BAYT + ' bayt / ' + MEMORY_ESIK_SATIR +
+        ' satir ASILDI. Bu bir haber degil OTOPSI: alt satirlar SESSIZCE kirpilmis olabilir ve o ' +
+        'dersler hicbir oturuma yuklenmez. HEMEN katla; olcu bayt YA DA satir, hangisi once dolarsa.',
     )
-  } else if (bayt >= MEMORY_YUMUSAK_ESIK_BAYT) {
-    // ⭐YUMUŞAK eşik: taşmadan ÖNCE söyler. Sert eşiğe ~584 bayt kaldı, yani hâlâ pay var.
+  } else if (bayt >= MEMORY_YUMUSAK_ESIK_BAYT || satir >= MEMORY_YUMUSAK_ESIK_SATIR) {
+    // ⭐YUMUŞAK eşik: taşmadan ÖNCE söyler; sert eşiğe hâlâ pay var (5 KB / 40 satır).
     uyarilar.push(
-      'MEMORY.md ' + bayt + ' bayt — YUMUSAK esik ' + MEMORY_YUMUSAK_ESIK_BAYT + ' asildi, ' +
-        'sert esige ' + (MEMORY_ESIK_BAYT - bayt) + ' bayt kaldi. Yeni satir EKLEMEDEN once ' +
+      'MEMORY.md ' + ol + ' — YUMUSAK esik ' + MEMORY_YUMUSAK_ESIK_BAYT + ' bayt / ' +
+        MEMORY_YUMUSAK_ESIK_SATIR + ' satir asildi, sert esige ' + (MEMORY_ESIK_BAYT - bayt) + ' bayt / ' +
+        (MEMORY_ESIK_SATIR - satir) + ' satir kaldi. Yeni satir EKLEMEDEN once ' +
         'eski ders satirlarini dizin-*.md dosyalarina katla; indekste isaretci birak.',
     )
   }
