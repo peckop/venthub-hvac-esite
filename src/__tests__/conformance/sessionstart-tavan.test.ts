@@ -80,7 +80,9 @@ function calistir(source: string, ekEnv: Record<string, string> = {}): { ek: str
     input: girdi,
     encoding: 'utf8',
     cwd: KOK,
-    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', ...ekEnv },
+    // CC_LANE / üretici / toplam-tavan geçersiz kılmaları her zaman açıkça verilir: geliştiricinin kendi
+    // kabuğundaki değerler testi etkilemesin.
+    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', CC_LANE: '', VH_ROL_KARTI_URETICI: '', ...ekEnv },
     windowsHide: true,
     timeout: 60_000,
   })
@@ -155,6 +157,22 @@ describe('INV-SESSIONSTART-TAVAN-1 · çıktı ≤ 9.000 karakter (şişirilmiş
   )
 
   it(
+    'çok dar bütçede bile Recep sözü ve durum bloğu EN SON düşer: önce daraltılamayan bilgi satırları işaretçiye döner',
+    () => {
+      // 4.600 (ölçüldü): durum+döküm taban değerlerine daralınca hâlâ sığmaz; ancak compact kolu/şerit/tazelik gibi
+      // daraltılamayan satırlar da düşerse sığar → bunlar ÖNCE gitmeli, Recep sözü ve durum bloğu yerinde kalmalı.
+      // (Eski sıra yalnız öncelik numarasına bakıyordu ve bu bütçede Recep sözünü toptan işaretçiye çeviriyordu.)
+      const { ek } = calistir('compact', { VH_SESSIONSTART_TOPLAM_TEST: '4600' })
+      expect(ek.length, `çıktı ${ek.length} karakter`).toBeLessThanOrEqual(4600)
+      expect(ek).not.toContain('COMPACT DONUSU')
+      expect(ek).toContain(SON_MESAJ_BASI)
+      expect(ek).not.toContain('SON KONUSMA dokumu (Recep sozu AYNEN):')
+      expect(ek).toContain('--- SON BLOK ---')
+    },
+    60_000,
+  )
+
+  it(
     'startup/resume/clear: durum bloğu ve döküm bağlama girmez (yalnız compact)',
     () => {
       for (const source of ['startup', 'resume', 'clear']) {
@@ -165,6 +183,79 @@ describe('INV-SESSIONSTART-TAVAN-1 · çıktı ≤ 9.000 karakter (şişirilmiş
     },
     120_000,
   )
+})
+
+/**
+ * ROL KARTI SATIRI (REC-433 Faz 1.2). Satır KİMLİĞİN HEMEN ALTINDA (3. satır) ve her açılış türünde görünür;
+ * üretici (HARİTA, `scripts/belge/rol-karti-uret.cjs --ozet <ROL>`) yok/rol tanımsız/bozuksa oturum yine
+ * açılır ve satır SEBEBİ yazar (fail-open). Testler gerçek üreticiye BAĞLI DEĞİL: kanca `VH_ROL_KARTI_URETICI`
+ * ile geçici bir sahte üreticiyi çağırır (HARİTA'nın PR'ı önce/sonra gelse de aynı sonuç).
+ */
+describe('ROL KARTI satırı · kimliğin hemen altında, fail-open', () => {
+  let sahte = ''
+  let bozuk = ''
+  /** Rol = CC_LANE ortam değişkeni (sahte sid'in pano talebi yok); üretici yolu isteğe bağlı geçersiz kılınır. */
+  const rolCalistir = (source: string, lane: string, uretici = '') =>
+    calistir(source, { CC_LANE: lane, VH_ROL_KARTI_URETICI: uretici })
+  beforeAll(() => {
+    sahte = path.join(gecici, 'sahte-uretici.cjs')
+    // ARAC → özet basar; HATA → çıkış 1; başka rol → boş çıktı (gerçek üreticinin bilinmeyen rol davranışı).
+    fs.writeFileSync(
+      sahte,
+      "const r=(process.argv[process.argv.indexOf('--ozet')+1]||'').toUpperCase();" +
+        "if(r==='ARAC')process.stdout.write('SAHTE-GOREV kanca ve serit araci altyapisi');" +
+        "if(r==='HATA')process.exit(1)\n",
+    )
+    bozuk = path.join(gecici, 'yok-boyle-bir-uretici.cjs')
+  })
+
+  it('her açılış türünde kimlikten HEMEN sonra (3. satır); rol bilinmiyorsa sebebi yazılır', () => {
+    for (const source of ['startup', 'resume', 'clear', 'compact']) {
+      const { ek } = calistir(source)
+      const satirlar = ek.split('\n')
+      expect(satirlar[0], source).toBe(`Oturum kimliğin: ${SID}`)
+      expect(satirlar[2], source).toContain('ROL KARTI:')
+      expect(satirlar[2], source).toContain('bilinmiyor')
+    }
+  }, 240_000)
+
+  it('üretici özet veriyorsa: rol adı, özet ve tam kart yolu tek satırda görünür', () => {
+    const { ek } = rolCalistir('startup', 'ARAC', sahte)
+    expect(ek.split('\n')[2]).toBe('ROL KARTI: ARAC — SAHTE-GOREV kanca ve serit araci altyapisi (tamami: docs/roller/ARAC.md)')
+  }, 60_000)
+
+  it('GERÇEK üretici (HARİTA, docs/roller): her rol için kart özeti + tam kart yolu; kartlar diskte var', () => {
+    for (const rol of ['ARAC', 'OPS', 'HARITA']) {
+      const { ek } = rolCalistir('startup', rol)
+      const satir = ek.split('\n')[2]
+      expect(satir, rol).toMatch(new RegExp(`^ROL KARTI: ${rol} — .{20,} \\(tamami: docs/roller/${rol}\\.md\\)$`))
+      expect(fs.existsSync(path.join(KOK, 'docs/roller', `${rol}.md`)), `docs/roller/${rol}.md`).toBe(true)
+    }
+  }, 120_000)
+
+  it('rol küçük harfle gelse de büyütülür (pano şerit adı ile CC_LANE farkı)', () => {
+    const { ek } = rolCalistir('startup', 'arac', sahte)
+    expect(ek.split('\n')[2]).toContain('ROL KARTI: ARAC — SAHTE-GOREV')
+  }, 60_000)
+
+  it('rol tanımsızsa (üretici boş basar): "kart yok" yazılır, çıktı tavan altında', () => {
+    const { ek, durum } = rolCalistir('compact', 'YOKROL', sahte)
+    expect(durum).toBe(0)
+    expect(ek.split('\n')[2]).toContain('bu rol icin kart yok')
+    expect(ek.length).toBeLessThanOrEqual(TAVAN)
+  }, 60_000)
+
+  it('üretici hata verirse (çıkış 1): oturum açılır, sebep satırda', () => {
+    const { ek, durum } = rolCalistir('startup', 'HATA', sahte)
+    expect(durum).toBe(0)
+    expect(ek.split('\n')[2]).toContain('kart okunamadi')
+  }, 60_000)
+
+  it('üretici dosyası yoksa: oturum açılır, "uretici yok" yazılır', () => {
+    const { ek, durum } = rolCalistir('startup', 'ARAC', bozuk)
+    expect(durum).toBe(0)
+    expect(ek.split('\n')[2]).toContain('kart uretici bu agacta yok')
+  }, 60_000)
 })
 
 describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
