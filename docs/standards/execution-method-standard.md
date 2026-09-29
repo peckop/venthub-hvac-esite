@@ -189,6 +189,11 @@ konuşmaya özet olarak döndürür; denetim çıktısı bir alt-ajan mesajı ol
 açıkça ister (hangi diff, hangi plan). Bulgu kaybı karşılaştırması (aynı girdiye satır içi ↔ fork)
 `diff-review` üzerinde yapıldı; kalan dördü aynı kalıptır ama tek tek karşılaştırılmadı.
 
+**AÇIK BORÇ (Ops 09-29):** `plan-challenger`, `venthub-auditor`, `venthub-enterprise-audit` ve
+`venthub-20-eksen-denetimi` için fork'lu koşumun bulgu eşdeğerliği ölçülmedi. Her birinin ilk GERÇEK
+kullanımında aynı girdiye satır içi ↔ fork bir kez yan yana koşulur, bulgu listesi kıyaslanır ve sonuç
+bu bölüme yazılır; bulgu kaybı çıkan yetenek fork'tan çıkarılır (Sonnet'te satır içi kalır).
+
 ---
 
 ## 6. Bilinen sınırlar (dürüstçe)
