@@ -19,6 +19,9 @@ const store = {
   listeners: new Set<() => void>(),
   replaceCalls: [] as string[],
   delayMs: 0,
+  // Gecikmeli `replace` zamanlayıcıları: temizlenmezse önceki testin bekleyen yazımı SONRAKİ testin
+  // adres deposunu ezer (dış URL değişimini geri alır) — ardışık koşuda kırmızı, tek başına yeşil.
+  timers: new Set<ReturnType<typeof setTimeout>>(),
 }
 
 function setSearch(next: string): void {
@@ -49,7 +52,11 @@ const routerSingleton = {
   replace: (href: string) => {
     store.replaceCalls.push(href)
     const q = href.includes('?') ? href.slice(href.indexOf('?') + 1) : ''
-    setTimeout(() => setSearch(q), store.delayMs)
+    const id = setTimeout(() => {
+      store.timers.delete(id)
+      setSearch(q)
+    }, store.delayMs)
+    store.timers.add(id)
   },
   push: vi.fn(),
 }
@@ -78,6 +85,8 @@ function mount() {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 beforeEach(() => {
+  store.timers.forEach((id) => clearTimeout(id))
+  store.timers.clear()
   store.search = ''
   store.replaceCalls = []
   store.delayMs = 0
@@ -157,14 +166,18 @@ describe('REC-411 · useAdminTable syncUrl URL yazma/okuma döngüsü', () => {
     await waitFor(() => expect(result.current.rows.length).toBe(1))
     await act(async () => {
       result.current.filtering.setFilter('status', ['inactive'])
-      await sleep(60)
+    })
+    // Yankı GELMEDEN dış değişiklik yapılırsa test "geri tuşu"nu değil kendi yarışını sınar:
+    // önce yazımın adrese yerleştiğini bekle (uyku süresi yerine koşul).
+    await waitFor(() => expect(store.search).toContain('status=inactive'))
+    await act(async () => {
+      await sleep(30)
     })
     store.replaceCalls.length = 0
     await act(async () => {
       setSearch('sort=name%3Aasc')
-      await sleep(80)
     })
-    expect(result.current.filtering.filters.status ?? []).toEqual([])
+    await waitFor(() => expect(result.current.filtering.filters.status ?? []).toEqual([]))
     expect(store.replaceCalls.length).toBe(0)
   })
 })
