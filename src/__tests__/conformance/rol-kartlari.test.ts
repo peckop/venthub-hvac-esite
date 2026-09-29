@@ -136,6 +136,11 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(blok(uretilen.ARAC)).toContain('yalnız iş bitince')
   })
 
+  it('OPS kartı karar kaynağı kuralını taşır (fleet §29: karara giden sayı betikten gelir, kaynak Linear kaydında)', () => {
+    expect(uretilen.OPS).toContain('kaynağı (betik + çıktı + tarih)')
+    expect(uretilen.OPS).toContain('karar tablosunda kaynak sütunu yoktur')
+  })
+
   it('istisnayı bilmeyen bozuk kopya yakalanır: OPS kartına ortak metin konursa sorun', () => {
     const bozuk = { ...uretilen, OPS: uretilen.OPS.replace(uretici.ILETISIM_ISTISNA.OPS, uretici.ILETISIM) }
     expect(uretici.sorunlar(bozuk).some((s) => s.startsWith('OPS: ortak blok'))).toBe(true)
