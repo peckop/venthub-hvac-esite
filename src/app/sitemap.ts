@@ -53,7 +53,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // "HATA YOLU"; ilk denemede bu PR o build'i kırdı — koşu 36553735279). Sahte adreste veri hiç gelmez;
   // orada boş liste ile devam edilir ve uyarı basılır. Gerçek adreste (Vercel, e2e-smoke gerçek-env build'i)
   // katı kural geçerlidir.
-  const veritabaniSahte = /dummy\.supabase\.co/.test(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
+  // BİREBİR eşitlik (OPS şartı): boş, tanımsız, yanlış yazılmış ya da `xdummy.supabase.co` gibi kaçak adres
+  // gevşek kola GİRMEZ — yanlış yapılandırılmış canlı ortam sessizce ürünsüz haritaya düşmesin.
+  const veritabaniSahte = process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://dummy.supabase.co'
   const [categories, familySlugs, countRes] = await Promise.all([
     veritabaniSahte ? getCategories(supabaseStaticClient).catch(() => []) : getCategories(supabaseStaticClient),
     veritabaniSahte ? getAllFamilySlugs(supabaseStaticClient).catch(() => []) : getAllFamilySlugs(supabaseStaticClient),

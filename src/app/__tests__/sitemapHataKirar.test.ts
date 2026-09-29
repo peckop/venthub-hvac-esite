@@ -23,9 +23,14 @@ async function sitemapKur(kosul: {
   sayimlar?: () => Promise<{ data: unknown; error: unknown }>
   /** CI'nın sahte veritabanlı build'i (dummy.supabase.co). Varsayılan: GERÇEK adres = katı kural. */
   sahte?: boolean
+  /** Adresi doğrudan ver (boş / yanlış yazılmış / kaçak adres kolları). `sahte`'yi geçersiz kılar. */
+  adres?: string
 }) {
   vi.resetModules()
-  vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', kosul.sahte ? 'https://dummy.supabase.co' : 'https://gercek.supabase.co')
+  vi.stubEnv(
+    'NEXT_PUBLIC_SUPABASE_URL',
+    kosul.adres ?? (kosul.sahte ? 'https://dummy.supabase.co' : 'https://gercek.supabase.co'),
+  )
   vi.doMock('@/lib/supabase/static', () => ({
     supabaseStaticClient: {
       rpc: kosul.sayimlar ?? (async () => ({ data: [{ category_id: 'k1', product_count: 3 }], error: null })),
@@ -94,6 +99,23 @@ describe('INV-SITEMAP-HATA-1 — veri hatası site haritasını üretilmez kıla
       expect(satirlar.some((s) => s.url.endsWith('/tr/brands/vortice'))).toBe(true)
       expect(satirlar.some((s) => s.url.includes('/tr/category/'))).toBe(false)
       expect(satirlar.some((s) => s.url.includes('/tr/products/vortice'))).toBe(false)
+    })
+  })
+
+  // OPS şartı (2026-09-29): gevşek kol YALNIZ birebir bilinen sahte adreste. Boş/yanlış adres = KATI.
+  describe('sahte-olmayan adres ne olursa olsun KATI kural (canlı yanlış yapılandırma ürünsüz haritaya düşmez)', () => {
+    const duserken = {
+      kategoriler: async () => { throw new Error('kategori DB hatası') },
+      aileler: async () => { throw new Error('aile DB hatası') },
+    }
+    it.each([
+      ['boş adres', ''],
+      ['yanlış yazılmış adres', 'https://dumy.supabase.co'],
+      ['kaçak önek (xdummy)', 'https://xdummy.supabase.co'],
+      ['kaçak sonek (dummy.supabase.co.evil)', 'https://dummy.supabase.co.evil.example'],
+    ])('%s → hata fırlatır', async (_ad, adres) => {
+      const sitemap = await sitemapKur({ adres, ...duserken })
+      await expect(sitemap()).rejects.toThrow(/DB hatası/)
     })
   })
 })
