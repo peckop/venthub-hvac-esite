@@ -21,9 +21,15 @@ const cagri = vi.hoisted(() => ({
   aile: vi.fn(),
 }))
 
+// `EN_YAYIN` bir ANAHTAR (REC-300 3e-3): varsayılan AÇIK (hreflang adres şekli ölçülür), kapalı hâl
+// tek testte (`enYayin.acik = false`) — getter, yardımcının her çağrıda güncel değeri okumasını sağlar.
+const enYayin = vi.hoisted(() => ({ acik: true }))
 vi.mock('@/config/features', async (orijinal) => ({
   ...(await orijinal<typeof import('@/config/features')>()),
   ADRES_SEMASI_K3B: true,
+  get EN_YAYIN() {
+    return enYayin.acik
+  },
 }))
 
 vi.mock('next/navigation', () => ({
@@ -205,15 +211,28 @@ describe('/en/category — EN yerinde kalır, dal iki seviyeli (Y4)', () => {
     await expect(sonuc(calis, cagri.kategori)).resolves.toBe(beklenen)
   })
 
-  it('EN üst verisi: hreflang TR eşi yeni adres, EN dizin dışı (EN_YAYIN kapalı)', async () => {
+  it('EN üst verisi (EN_YAYIN AÇIK): hreflang TR eşi yeni adres, EN dizine açık', async () => {
     const m = await altKategoriUst(p({ lang: 'en', categorySlug: 'fans', subCategorySlug: 'duct-fans' }))
     expect(m.alternates).toMatchObject({
       canonical: `${SITE}/en/category/fans/duct-fans`,
       languages: { tr: `${SITE}/tr/kategori/fanlar/kanal-tipi-fanlar` },
     })
-    expect(m.robots).toEqual({ index: false, follow: true })
+    expect(m.robots).toBeUndefined()
     const kok = await kategoriEskiUst(p({ lang: 'en', categorySlug: 'fans' }))
     expect(kok.alternates).toMatchObject({ canonical: `${SITE}/en/category/fans`, languages: { tr: `${SITE}/tr/kategori/fanlar` } })
+  })
+
+  it('EN üst verisi (EN_YAYIN KAPALI): hreflang YOK, yalnız canonical; EN dizin dışı', async () => {
+    enYayin.acik = false
+    try {
+      const m = await altKategoriUst(p({ lang: 'en', categorySlug: 'fans', subCategorySlug: 'duct-fans' }))
+      expect(m.alternates).toEqual({ canonical: `${SITE}/en/category/fans/duct-fans` })
+      expect(m.robots).toEqual({ index: false, follow: true })
+      const kok = await kategoriEskiUst(p({ lang: 'en', categorySlug: 'fans' }))
+      expect(kok.alternates).toEqual({ canonical: `${SITE}/en/category/fans` })
+    } finally {
+      enYayin.acik = true
+    }
   })
 })
 

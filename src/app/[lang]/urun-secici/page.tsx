@@ -25,6 +25,7 @@ import React from 'react'
 import { SITE_URL } from '@/config/siteUrl'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
+import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import { localizedHref, Routes } from '@/utils/routes'
 
 type Params = { lang: string }
@@ -53,7 +54,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         description: dict.urunSecici.aciklama,
         alternates: {
             canonical: lang === 'en' ? enUrl : trUrl,
-            languages: { tr: trUrl, en: enUrl, 'x-default': trUrl },
+            // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+            ...hreflangAlani({ languages: { tr: trUrl, en: enUrl, 'x-default': trUrl } }),
         },
     }
 }

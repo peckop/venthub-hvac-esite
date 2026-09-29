@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 
-import { EN_YAYIN } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
 import { localizedHref } from '@/utils/routes'
+
+import { enKapaliMi, hreflangAlani, NOINDEX_FOLLOW } from './enYayinKurali'
 
 /**
  * SAYFA ÜST VERİSİ — tek yazıcının ortak kalıbı (REC-150 Adım 5, bot karnesi 2026-09-24).
@@ -65,22 +66,25 @@ export function sayfaUstVerisi({
   if (!url) {
     throw new Error(`sayfaUstVerisi: "${lang}" dili için yol verilmedi (dilYollari)`)
   }
-  const enKapali = lang === 'en' && !EN_YAYIN
+  const enKapali = enKapaliMi(lang)
 
   return {
     title: baslik,
     description: aciklama,
-    ...(dizinDisi || enKapali ? { robots: { index: false, follow: true } } : {}),
+    ...(dizinDisi || enKapali ? { robots: NOINDEX_FOLLOW } : {}),
     alternates:
       dizinDisi || !trUrl || !enUrl
         ? { canonical: url }
         : {
             canonical: url,
-            languages: {
-              tr: trUrl,
-              en: enUrl,
-              'x-default': trUrl,
-            },
+            // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+            ...hreflangAlani({
+              languages: {
+                tr: trUrl,
+                en: enUrl,
+                'x-default': trUrl,
+              },
+            }),
           },
     openGraph: {
       title: baslik,

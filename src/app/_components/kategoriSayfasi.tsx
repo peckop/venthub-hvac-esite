@@ -8,6 +8,7 @@ import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
 import type { KategoriUst } from '@/lib/data/preload'
+import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
@@ -127,17 +128,24 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
   const trUrl = `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
   const enUrl = `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
   const canonicalUrl = lang === 'en' ? enUrl : trUrl
+  const pasif = pasifKategoriRobots(category)
 
   return {
     title: `${displayName} | VentHub`,
     description: desc,
+    // O4 (REC-300): pasif (`is_active === false`) kategori sayfası 200 KALIR (bağlantı kırılmasın)
+    // ama dizine girmez; aktif kategoride `robots` alanı YAZILMAZ (bugünkü). Sitemap zaten dışında.
+    ...(pasif ? { robots: pasif } : {}),
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        tr: trUrl,
-        en: enUrl,
-        'x-default': trUrl,
-      },
+      // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+      ...hreflangAlani({
+        languages: {
+          tr: trUrl,
+          en: enUrl,
+          'x-default': trUrl,
+        },
+      }),
     },
     openGraph: {
       title: `${displayName} | VentHub`,
@@ -176,8 +184,11 @@ export function kategoriSayfasiUstVerisiK3b(
     baslik: `${displayName} | VentHub`,
     aciklama: desc,
   })
+  const pasif = pasifKategoriRobots(category)
   return {
     ...m,
+    // Pasif kategori (O4): `noindex, follow` — EN kapalıyken `sayfaUstVerisi` zaten aynısını yazar.
+    ...(pasif ? { robots: pasif } : {}),
     openGraph: {
       ...m.openGraph,
       images: [
