@@ -68,6 +68,7 @@ maliyete dayanır → panel moderatör için maliyet okumak zorunda kalırdı ve
 | Faz | İş | Bitti sayılır |
 |---|---|---|
 | 0 | Bu plan → OPS onayı, aşağıdaki 3 soru cevabı | onay |
+| 0.5 | **Fiyat değişiklik günlüğü** (§5b): migration (tetikler + `degisiklik_yontemi`) + kapı `INV-FIYAT-GUNLUGU-1`; plan-challenger + Recep kapısı | tablolarda tetik var, yazan her yol yöntem veriyor, kapı sabotajla kırmızı→yeşil; günlük satırı canlıda ölçülür |
 | 1 | Servis PR'ı (tek ürün yeniden hesap + tek kural yazımı + geri okuma) | birim testler: fixed net/gross, güncelle-vs-oluştur, yetkisiz yol; `resolvePriceWithRules` tek kopya; CI yeşil |
 | 2 | Panel PR'ı + cetvel §12.1 + kapı | bileşen testleri (yükleniyor/yetkisiz/kısmi başarı/doğrulandı), kapı sabotajla kırmızı→yeşil |
 | 3 | **Canlı kanıt** | Recep onayıyla TEK test ürününde yaz → PDP'de gör → geri al (prod yazma kapısı); vitrin satırı geri okuma çıktısı rapora |
@@ -76,11 +77,32 @@ Geri alma: ürün kuralı silinir + o ürün yeniden hesaplanır (genel kurala d
 
 ## 5. Kararlar (OPS hükmü, 2026-09-29 — plan A KABUL)
 
-1. **Giriş KDV DAHİL.** Panel iki değeri yan yana gösterir: "KDV hariç ₺X · vitrinde ₺Y (ölçüldü)". Saklama cetveldeki gibi HARİÇ net (kural `price_is_vat_inclusive=true` ile girilir, çözücü net'e indirger).
+1. **KDV dahil/hariç girişi SEÇİMLİ (Recep 2026-09-29; OPS'un önceki "KDV dahil" hükmü GERİ ALINDI).** Panelde seçici (varsayılan = kullanıcının son seçimi, tarayıcıda saklanır); ikisi HER ZAMAN yan yana görünür: "KDV hariç ₺X · KDV dahil ₺Y · vitrinde ₺Z (ölçüldü)". Saklama cetveldeki gibi HARİÇ net; "dahil" girilirse kural `price_is_vat_inclusive=true` ile yazılır, çözücü net'e indirger.
+1b. **Satır içi giriş (Recep 2026-09-29):** fiyat ürün LİSTESİNDEN, tablo satırında da girilebilir (mevcut `saveInlineEdit` deseni); yan panelle AYNI servis (`setProductFixedPrice`), aynı KDV seçici ve doğrulama; iki yüzey ayrı yazma yolu DEĞİL.
 2. **Moderatör kural yazar, vitrine yansıtmayı admin yapar** (DB yetkisiyle uyumlu). Moderatör panelinde "yansıtma admin onayında" görünür; yeniden hesap düğmesi kapalı.
 3. **Liste fiyatı (alış) girişi bu işin DIŞINDA**, ayrı kayıt (karar 95 + REC-140 Faz 3 / REC-383 bağımlılığı).
 4. **Kod yazılırken plan-challenger önerisi (zorunlu değil, migration yok):** fiyat yazan kod ilk PR'da çalıştırılır, bulgular bu plana işlenir.
 5. **Canlı kanıt (Faz 3) prod veri yazımıdır = Recep kapısı;** o adıma gelince OPS üzerinden onaya götürülür.
+
+## 5b. Fiyat değişiklik günlüğü — ÖLÇÜM (2026-09-29, canlı salt okuma + kod) ve ZORUNLU parça
+
+Recep sorusu: "sistem fiyat kayıtlarını/loglarını tutuyor mu? Kim, ne zaman, hangi yöntemle güncelledi?"
+
+| Yol | Kim | Ne zaman | Eski→yeni | YÖNTEM | Kanıt |
+|---|---|---|---|---|---|
+| `products` (liste/alış fiyatı, maliyet, eski fiyat alanı; CSV içe aktarma, ürün formu, satır içi düzenleme, maliyet yenileme hepsi buraya yazar) | VAR (`auth.uid()`; servis rolüyle yazılırsa NULL) | VAR | VAR (yalnız değişen kolonlar, jsonb) | **YOK** (yalnız `comment`te `session_user`) | DML tetiği `denetim_izi_products`; 636 UPDATE satırı (2025-12-09 → 2026-09-26) |
+| `pricing_rule` (fiyat/marj kuralı) | — | — | — | — | **Tetik YOK.** İstemci `mutateWithAudit` çağırıyor ama canlıda `pricing_rule` için **0 satır** |
+| `product_prices` (vitrin fiyatı: yeniden hesap + elle ezme) | — | — | — | — | **Tetik YOK.** Tek satır (2026-08-15); 1044 satırlık yeniden hesap günlüğe DÜŞMÜYOR |
+| `price_lists`, `currency_rates`, `pricing_policy` (kur kilidi) | — | — | — | — | Tetik YOK; istemci denetimi var, canlıda 0 satır |
+| Ayrı fiyat geçmişi tablosu | — | — | — | — | **YOK** |
+
+**Sonuç:** "Kim/ne zaman/eski→yeni" yalnız `products` için var; **vitrin fiyatını gerçekten belirleyen iki tablo (`pricing_rule`, `product_prices`) DB düzeyinde hiç izlenmiyor**, istemci denetimi de **yazımdan SONRA, hata olursa yutuluyor** (`mutateWithAudit` catch → `console.error`, "non-fatal") ve canlıda kanıt satırı yok. **"Hangi yöntemle" alanı hiçbir yolda yok** (panel / liste / CSV / yeniden hesap / maliyet yenileme ayırt edilemez).
+
+**ZORUNLU parça (Faz 0.5 — migration → plan-challenger zorunlu + Recep kapısı, kural 13):**
+1. `pricing_rule` ve `product_prices` (+ `price_lists`, `pricing_policy`, `currency_rates`) üzerine mevcut `denetim_izi_yaz()` tetiği (aynı fonksiyon, yeni tablo; no-op eleme ve fail-closed davranışı hazır). `product_prices` yeniden hesabı ~1044 satır: yalnız DEĞİŞEN kolon satırları yazılır (fonksiyon zaten eliyor) ama toplu gürültü için `is_derived=true` yazımları özet satırına indirgenir (karar Faz 0.5'te).
+2. **YÖNTEM alanı:** iki tabloya `degisiklik_yontemi text` (CHECK: `panel | liste | csv | yeniden_hesap | maliyet_yenileme | sistem`); istemci yazım yükünde taşır, tetik `comment`e kopyalar. (PostgREST her istek ayrı işlemdir; oturum değişkeni istekler arası taşınmaz — satır alanı tek güvenilir taşıyıcıdır.)
+3. **Kapı `INV-FIYAT-GUNLUGU-1`:** (a) fiyat yazan her kod yolu (`pricing_rule`, `product_prices`, `products.purchase_price/purchase_currency`) `degisiklik_yontemi` verir, vermeyen KIRMIZI; (b) migration'da bu tabloların her birinde denetim tetiği vardır. Sabotajla kanıtlanır.
+4. Okuma yüzü: ürün panelinde "Fiyat geçmişi" (kim · ne zaman · eski→yeni · yöntem), `admin_audit_log` süzgeci; moderatör maliyet kolonlarını görmez (karar 95).
 
 ## 6. Yan bulgu (kapsam dışı, kayıt önerisi)
 
