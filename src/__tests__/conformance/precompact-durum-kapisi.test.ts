@@ -139,6 +139,30 @@ describe('INV-COMPACT-1 — PreCompact durum kapısı', () => {
     expect(r.stdout).toMatch(/bekleyen kararlar/i)
   })
 
+  it('YAŞ OKUNUR YAZILIR: dakika → saat → gün (Ops 09-29: iki günlük dosya "2880 dakika" görünüyordu)', () => {
+    const m = require_(KAPI) as { yasMetni?: (dk: number) => string }
+    expect(typeof m.yasMetni, 'yasMetni dışa açık olmalı').toBe('function')
+    expect(m.yasMetni?.(90)).toBe('90 dakika')
+    expect(m.yasMetni?.(300)).toBe('5 saat')
+    expect(m.yasMetni?.(3 * 1440)).toBe('3 gun')
+  })
+
+  it('ESKİ DOSYA: durum dosyası VAR ama 3 günlük → gün olarak UYARIR, "compact öncesi güncelle" der, BLOKLAMAZ', () => {
+    const { transcript, kok } = projeKur([['kol-lane-day-2026-08-28.md', TAM_DURUM]])
+    nodeKos(`
+      const fs=require('fs'),path=require('path');
+      const y=path.join(${JSON.stringify(kok)},'memory','kol-lane-day-2026-08-28.md');
+      const t=new Date(Date.now()-3*86400000); fs.utimesSync(y,t,t);
+    `)
+
+    const r = kapiKos(transcript)
+
+    expect(r.status, 'eski dosya compact\'ı BLOKLAMAMALI').toBe(0)
+    expect(r.stdout, 'hangi dosya ve ne kadar eski yazılmalı').toMatch(/BAYAT[^\n]*3 gun[^\n]*kol-lane-day-2026-08-28\.md/)
+    expect(r.stdout).toMatch(/compact ONCESI kol-lane-day-2026-08-28\.md dosyasini guncelle/)
+    expect(r.stdout, 'dakika olarak yazılmamalı').not.toMatch(/4320 dakika/)
+  })
+
   it('⭐TÜRKÇE BAŞLIK: `SON GİRDİ` biçimi de TANINIR (sahadaki yanlış alarmın kökü)', () => {
     // Bu kol OLMADAN kapı yeşildi ve sahada günde iki kez yanlış alarm veriyordu.
     // JavaScript'in /i bayrağı noktalı İ'yi i'ye KATLAMAZ; dahası 'İ'.toLowerCase() düz 'i'
