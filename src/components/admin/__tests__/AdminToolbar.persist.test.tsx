@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import AdminToolbar from '../AdminToolbar'
@@ -23,7 +23,7 @@ vi.mock('@/i18n/I18nProvider', () => ({
 }))
 
 const STORAGE_KEY = 'toolbar:test'
-const RENDER_TAVANI = 60
+const COMMIT_TAVANI = 60
 
 interface Sayaclar {
   render: number
@@ -37,11 +37,14 @@ function Harness({ sayac }: { sayac: Sayaclar }) {
   const [category, setCategory] = useState('')
   const [featured, setFeatured] = useState(false)
 
-  sayac.render += 1
-  // Sonsuz döngüde test işçisini dondurmak yerine hızlıca ve okunur biçimde düş.
-  if (sayac.render > RENDER_TAVANI) throw new Error(`render tavanı aşıldı (${RENDER_TAVANI}) — döngü`)
-
   const sayacRef = useRef(sayac)
+  // Her commit sayılır (render sırasında değil). Döngüde test işçisini dondurmak yerine hızlı ve
+  // okunur biçimde düşer; kararlı durumda commit sayısı küçük kalır.
+  useEffect(() => {
+    sayacRef.current.render += 1
+    if (sayacRef.current.render > COMMIT_TAVANI) throw new Error(`commit tavanı aşıldı (${COMMIT_TAVANI}) — döngü`)
+  })
+
   const chips = useMemo(
     () => [
       {
