@@ -82,6 +82,8 @@ interface CapturedWrite {
   table: string
   url: URL
   body: unknown
+  /** İstek başlıkları (küçük harf) — fiyat günlüğü yöntem başlığı doğrulaması için. */
+  headers: Record<string, string>
 }
 
 function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): SupabaseClient<Database> {
@@ -136,7 +138,11 @@ function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): S
         body = init.body
       }
     }
-    calls.push({ method, table, url, body })
+    const headers: Record<string, string> = {}
+    new Headers(init?.headers).forEach((value, key) => {
+      headers[key.toLowerCase()] = value
+    })
+    calls.push({ method, table, url, body, headers })
     const echo = Array.isArray(body) ? body : body != null ? [body] : []
     return Promise.resolve(
       new Response(JSON.stringify(echo), { status: 201, headers: { 'Content-Type': 'application/json' } }),
@@ -299,6 +305,52 @@ describe('materializePrices', () => {
     // Elle ezilmiş satır ne güncellenir ne pasifleştirilir.
     expect(calls.filter(c => c.table === 'product_prices')).toHaveLength(0)
     expect(summary.deactivated).toBe(0)
+  })
+
+  it('fiyat günlüğü: upsert VE bayat pasifleştirme yeniden_hesap + AYNI uuid oturumunu taşır (INV-FIYAT-GUNLUGU-1)', async () => {
+    const calls: CapturedWrite[] = []
+    const supabase = stubClient(
+      {
+        pricing_rule: [rule({ id: 'global-10', scope: 4, margin_pct: 10 })],
+        price_lists: [INDIVIDUAL_LIST],
+        brands: [],
+        products: [{ id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: 1000 }],
+        // Bu koşuda üretilmeyen türetilmiş satır → pasifleştirilir (ikinci istek türü).
+        product_prices: [
+          { id: 'pp-stale', product_id: 'p-eski', price_list_id: INDIVIDUAL_LIST.id, currency: 'TRY', is_derived: true, is_active: true },
+        ],
+      },
+      calls,
+    )
+
+    await materializePrices(supabase, { dryRun: false })
+
+    const upsert = calls.find(c => c.table === 'product_prices' && c.method === 'POST')
+    const patch = calls.find(c => c.table === 'product_prices' && c.method === 'PATCH')
+    expect(upsert, 'upsert isteği yok').toBeDefined()
+    expect(patch, 'pasifleştirme isteği yok').toBeDefined()
+    for (const c of [upsert, patch]) {
+      expect(c?.headers['x-degisiklik-yontemi']).toBe('yeniden_hesap')
+    }
+    const oturum = upsert?.headers['x-degisiklik-oturumu'] ?? ''
+    // Tetik yalnız uuid biçimini kabul eder (aksi hâlde oturum bilgisi sessizce atılır).
+    expect(oturum).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
+    expect(patch?.headers['x-degisiklik-oturumu']).toBe(oturum)
+  })
+
+  it('fiyat günlüğü: dryRun HİÇBİR yazma isteği atmaz', async () => {
+    const calls: CapturedWrite[] = []
+    const supabase = stubClient(
+      {
+        pricing_rule: [rule({ id: 'global-10', scope: 4, margin_pct: 10 })],
+        price_lists: [INDIVIDUAL_LIST],
+        brands: [],
+        products: [{ id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: 1000 }],
+      },
+      calls,
+    )
+    await materializePrices(supabase, { dryRun: true })
+    expect(calls).toEqual([])
   })
 
   it('bu koşuda üretilmeyen bayat türetilmiş satırı pasifleştirir', async () => {

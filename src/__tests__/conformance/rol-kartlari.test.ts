@@ -126,6 +126,15 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it('Çalışma düzeni bloğu her kartta bire bir aynı ve pano kanıt kuralını taşır (ARAÇ ölçümü: 62 kartın 45\'inde kanıt yok)', () => {
+    const blok = (m: string) => m.slice(m.indexOf('## Çalışma düzeni')).trimEnd()
+    const ilki = blok(Object.values(uretilen)[0])
+    expect(ilki).toContain('Pano kartı açılırken kanıt zorunlu')
+    expect(ilki).toContain('`command`')
+    expect(ilki).toContain('`file_matches`')
+    for (const [ad, metin] of Object.entries(uretilen)) expect(blok(metin), ad).toBe(ilki)
+  })
+
   it('İletişim bloğu: istisna yalnız OPS için, diğer dokuz kartta bire bir aynı', () => {
     expect(Object.keys(uretici.ILETISIM_ISTISNA)).toEqual(['OPS'])
     const blok = (m: string) => m.slice(m.indexOf('## İletişim'), m.indexOf('## Çalışma düzeni')).trimEnd()
@@ -144,6 +153,15 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   it('istisnayı bilmeyen bozuk kopya yakalanır: OPS kartına ortak metin konursa sorun', () => {
     const bozuk = { ...uretilen, OPS: uretilen.OPS.replace(uretici.ILETISIM_ISTISNA.OPS, uretici.ILETISIM) }
     expect(uretici.sorunlar(bozuk).some((s) => s.startsWith('OPS: ortak blok'))).toBe(true)
+  })
+
+  it('karar 181: arka ofis yasağı yalnız URUN/ADMIN/ALTYAPI/KATALOG kartında, olgun-kütüphane satırı her kartta', () => {
+    const yasak = 'Genel arka ofis modülünü'
+    for (const ad of ['URUN', 'ADMIN', 'ALTYAPI', 'KATALOG']) expect(uretilen[ad], ad).toContain(yasak)
+    for (const ad of Object.keys(uretilen).filter((a) => !['URUN', 'ADMIN', 'ALTYAPI', 'KATALOG'].includes(a))) {
+      expect(uretilen[ad], ad).not.toContain(yasak)
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) expect(metin, ad).toContain('olgun kütüphane/sistem aranır (karar 181)')
   })
 
   it('beş Recep kapısı her kartta bire bir aynı', () => {
