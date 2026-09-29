@@ -8,6 +8,9 @@ import { fileURLToPath } from 'node:url'
 
 import { PGlite } from '@electric-sql/pglite'
 
+/** Sonuç satırları standart çıktıya (konsol lint kuralı yalnız warn/error'a izin verir). */
+const yaz = (...parcalar) => process.stdout.write(`${parcalar.join(' ')}\n`)
+
 // Depo kökü: KOK ortam değişkeniyle verilir (ör. KOK=C:/tmp/vh-admin-411); yoksa bu dosyanın üç üstü.
 const KOK = process.env.KOK ?? fileURLToPath(new URL('../../../', import.meta.url))
 const T1 = 'd3b07384-d113-495f-a558-8c38634e0000'
@@ -18,8 +21,8 @@ const db = new PGlite()
 let ok = 0
 let kotu = 0
 function kontrol(ad, kosul, ayrinti = '') {
-  if (kosul) { ok++; console.log(`  ✓ ${ad}`) }
-  else { kotu++; console.log(`  ✗ ${ad} ${ayrinti}`) }
+  if (kosul) { ok++; yaz(`  ✓ ${ad}`) }
+  else { kotu++; yaz(`  ✗ ${ad} ${ayrinti}`) }
 }
 const q = async (s, p) => (await db.query(s, p)).rows
 const temizle = () => db.exec('delete from admin_audit_log')
@@ -35,7 +38,7 @@ async function istek(basliklar, ...sqller) {
 }
 const H = (o) => JSON.stringify(o)
 
-console.log('PostgreSQL:', (await q('select version() v'))[0].v.split(',')[0])
+yaz('PostgreSQL:', (await q('select version() v'))[0].v.split(',')[0])
 
 await db.exec(`
   create schema auth;
@@ -93,18 +96,18 @@ if (process.env.SABOTAJ === 'sale_price') {
     .replace(/\(n\.net_price, n\.gross_price, n\.base_price, n\.sale_price, n\.discount_percentage,\s+n\.valid_from, n\.valid_until, n\.is_active, n\.currency\)/, '(n.net_price, n.gross_price, n.is_active, n.currency)')
 }
 await db.exec(mig)
-console.log('\nmigration uygulandı (son-guard geçti: 11 tetik, hata yakalayıcı yok)')
+yaz('\nmigration uygulandı (son-guard geçti: 11 tetik, hata yakalayıcı yok)')
 
 await db.exec(`insert into price_lists(id, name) values ('bbbbbbbb-0000-0000-0000-000000000001', 'bireysel'), ('bbbbbbbb-0000-0000-0000-000000000002', 'bayi')`)
 
-console.log('\n(vi) mevcut tablo regresyonu: categories yorum metni migration öncesi/sonrası AYNI')
+yaz('\n(vi) mevcut tablo regresyonu: categories yorum metni migration öncesi/sonrası AYNI')
 await db.exec(`update categories set name = 'z', updated_at = now() where id = 'aaaaaaaa-0000-0000-0000-000000000001'`)
 const yeniYorum = (await denetim('categories')).map((r) => r.comment)
 await db.exec(`insert into categories(id, name) values ('aaaaaaaa-0000-0000-0000-000000000002', 'q')`)
 kontrol('UPDATE yorumu birebir aynı', JSON.stringify(eskiYorum.slice(-1)) === JSON.stringify(yeniYorum.slice(-1)), `${eskiYorum} | ${yeniYorum}`)
 await temizle()
 
-console.log('\n(i)(ii)(v)(viii) pricing_rule — başlıklar')
+yaz('\n(i)(ii)(v)(viii) pricing_rule — başlıklar')
 await db.exec(`insert into pricing_rule(id, fixed_price) values ('cccccccc-0000-0000-0000-000000000001', 100)`)
 let r = await denetim('pricing_rule')
 kontrol('başlıksız INSERT → 1 satır, yontem=BILINMIYOR', r.length === 1 && /yontem=BILINMIYOR/.test(r[0].comment), r[0]?.comment)
@@ -126,13 +129,13 @@ r = await denetim('pricing_rule')
 kontrol('(v) DELETE panel → 1 satır, action=DELETE, yontem=panel', r.length === 1 && r[0].action === 'DELETE' && /yontem=panel/.test(r[0].comment))
 await temizle()
 
-console.log('\nFail-closed: günlük yazılamazsa fiyat yazımı GERİ ALINIR')
+yaz('\nFail-closed: günlük yazılamazsa fiyat yazımı GERİ ALINIR')
 let hataKapali = null
 try { await db.exec(`insert into pricing_rule(id, tenant_id, fixed_price) values ('cccccccc-0000-0000-0000-000000000009', '99999999-9999-9999-9999-999999999999', 1)`) } catch (e) { hataKapali = e.message }
 const kural9 = await q(`select count(*)::int n from pricing_rule where id = 'cccccccc-0000-0000-0000-000000000009'`)
 kontrol('tenant FK ihlali → hata VAR, kural satırı YOK', hataKapali !== null && kural9[0].n === 0, hataKapali ?? 'hata yok')
 
-console.log('\nproduct_prices — türetilmiş satırlar tek özet')
+yaz('\nproduct_prices — türetilmiş satırlar tek özet')
 await db.exec(`insert into urun select gen_random_uuid() from generate_series(1, 5)`)
 const ins = `insert into product_prices(product_id, price_list_id, net_price, gross_price, base_price, is_active, is_derived, currency)
              select u.id, 'bbbbbbbb-0000-0000-0000-000000000001', 100, 120, 120, true, true, 'TRY' from urun u`
@@ -156,14 +159,14 @@ kontrol('(iii) 3 satırın fiyatı değişti → TEK UPDATE özeti, before/after
   r[0].before.every((e) => e.net_price == 100) && r[0].after.every((e) => e.net_price == 150) && /satir=3/.test(r[0].comment), JSON.stringify(r.map((x) => [x.action, x.before?.length, x.comment])))
 await temizle()
 
-console.log('\n(ix) karışık parti: 2 mevcut değişen + 2 yeni')
+yaz('\n(ix) karışık parti: 2 mevcut değişen + 2 yeni')
 await db.exec(`insert into urun select gen_random_uuid() from generate_series(1, 2)`)
 await istek(H({ 'x-degisiklik-yontemi': 'yeniden_hesap' }), upsert(200, `where u.id in (select id from urun order by id limit 2) or u.id not in (select product_id from product_prices)`))
 r = await denetim('product_prices')
 kontrol('INSERT özeti + UPDATE özeti (2 satır) — ifade tetikleri bölündü', r.length === 2 && r.map((x) => x.action).sort().join() === 'INSERT,UPDATE', JSON.stringify(r.map((x) => [x.action, x.after?.length])))
 await temizle()
 
-console.log('\n(x) başlık yeniden_hesap + sale_price/discount değişimi susturamaz')
+yaz('\n(x) başlık yeniden_hesap + sale_price/discount değişimi susturamaz')
 await istek(H({ 'x-degisiklik-yontemi': 'yeniden_hesap' }), `update product_prices set sale_price = 1, discount_percentage = 50 where id = (select id from product_prices order by id limit 1)`)
 r = await denetim('product_prices')
 kontrol('türetilmiş satırda sale_price/discount değişimi → özette VAR', r.length === 1 && r[0].after[0].sale_price == 1 && r[0].after[0].discount_percentage == 50, JSON.stringify(r[0]?.after))
@@ -180,7 +183,7 @@ await temizle()
 await db.exec(`update product_prices set is_active = is_active where id = 'dddddddd-0000-0000-0000-000000000001'`)
 kontrol('elle ezilmiş satırda değişmeyen UPDATE → 0 satır', (await denetim('product_prices')).length === 0)
 
-console.log('\n(xi) iki tenant: tek UPDATE → iki özet, doğru tenant')
+yaz('\n(xi) iki tenant: tek UPDATE → iki özet, doğru tenant')
 await db.exec(`update product_prices set tenant_id = '${T2}' where id in (select id from product_prices where is_derived order by id limit 3)`)
 await temizle()
 await istek(H({ 'x-degisiklik-yontemi': 'yeniden_hesap' }), `update product_prices set net_price = net_price + 1 where is_derived`)
@@ -188,7 +191,7 @@ r = await denetim('product_prices')
 kontrol('iki özet satırı, tenant_id\'ler {T1,T2}', r.length === 2 && new Set(r.map((x) => x.tenant_id)).size === 2, JSON.stringify(r.map((x) => [x.tenant_id, x.after?.length])))
 await temizle()
 
-console.log('\n(vii) rol authenticated ile fiyat UPDATE\'i başarılı (tetik EXECUTE tuzağı yok)')
+yaz('\n(vii) rol authenticated ile fiyat UPDATE\'i başarılı (tetik EXECUTE tuzağı yok)')
 let hataRol = null
 try {
   await db.transaction(async (tx) => {
@@ -201,7 +204,7 @@ kontrol('authenticated UPDATE geçti', hataRol === null, hataRol ?? '')
 kontrol('  ve günlük satırları yazıldı', (await q('select count(*)::int n from admin_audit_log'))[0].n >= 1)
 await temizle()
 
-console.log('\n(xii) ürün silme kaskadı')
+yaz('\n(xii) ürün silme kaskadı')
 await db.exec(`delete from urun where id = (select product_id from product_prices where is_derived limit 1)`)
 r = await denetim('product_prices')
 kontrol('kaskad DELETE → türetilmiş satır için DELETE özeti', r.some((x) => x.action === 'DELETE' && x.row_pk === 'OZET'), JSON.stringify(r.map((x) => [x.action, x.row_pk])))
@@ -210,7 +213,7 @@ r = await denetim('product_prices')
 kontrol('kaskad DELETE → elle ezilmiş satır SATIR bazlı', r.some((x) => x.action === 'DELETE' && x.row_pk === 'dddddddd-0000-0000-0000-000000000001'), JSON.stringify(r.map((x) => [x.action, x.row_pk])))
 await temizle()
 
-console.log('\n(xiii) currency_rates')
+yaz('\n(xiii) currency_rates')
 await db.exec(`insert into currency_rates(rate, source) values (32, 'tcmb')`)
 kontrol('tcmb INSERT → 0 satır', (await denetim('currency_rates')).length === 0)
 await db.exec(`insert into currency_rates(id, rate, source) values ('eeeeeeee-0000-0000-0000-000000000001', 33, 'manual')`)
@@ -222,12 +225,12 @@ r = await denetim('currency_rates')
 kontrol('UPDATE + DELETE → toplam 3 satır', r.length === 3, String(r.length))
 await temizle()
 
-console.log('\nprice_lists / pricing_policy')
+yaz('\nprice_lists / pricing_policy')
 await db.exec(`insert into pricing_policy(id) values ('ffffffff-0000-0000-0000-000000000001'); update pricing_policy set fx_lock = true; update price_lists set is_active = true where name = 'bayi'`)
 kontrol('politika INSERT+UPDATE ve liste UPDATE günlüğe girdi', (await denetim('pricing_policy')).length === 2 && (await denetim('price_lists')).length === 1)
 await temizle()
 
-console.log('\nTavan: 2100 türetilmiş satır → 2000 girişli dizi + kirpildi')
+yaz('\nTavan: 2100 türetilmiş satır → 2000 girişli dizi + kirpildi')
 await db.exec(`delete from product_prices; delete from urun; insert into urun select gen_random_uuid() from generate_series(1, 2100)`)
 await temizle()
 await istek(H({ 'x-degisiklik-yontemi': 'yeniden_hesap' }), `insert into product_prices(product_id, price_list_id, net_price, gross_price, base_price, is_active, is_derived, currency)
@@ -236,10 +239,10 @@ r = await denetim('product_prices')
 kontrol('tek özet, dizi 2000, satir=2100, kirpildi=evet', r.length === 1 && r[0].after.length === 2000 && /satir=2100/.test(r[0].comment) && /kirpildi=evet/.test(r[0].comment), JSON.stringify(r.map((x) => [x.after?.length, x.comment])))
 await temizle()
 
-console.log('\nTetik envanteri')
+yaz('\nTetik envanteri')
 const tet = await q(`select c.relname, t.tgname from pg_trigger t join pg_class c on c.oid=t.tgrelid where not t.tgisinternal and t.tgname like 'denetim_izi%' order by 1,2`)
-console.log('  ' + tet.map((x) => `${x.relname}:${x.tgname}`).join('\n  '))
+yaz('  ' + tet.map((x) => `${x.relname}:${x.tgname}`).join('\n  '))
 kontrol('sıralama: denetim_izi_product_prices_upd, on_product_prices_upd\'den ÖNCE ateşlenir (alfabetik)', 'denetim_izi_product_prices_upd' < 'on_product_prices_upd')
 
-console.log(`\nSONUÇ: ${ok} geçti, ${kotu} kaldı`)
+yaz(`\nSONUÇ: ${ok} geçti, ${kotu} kaldı`)
 process.exit(kotu === 0 ? 0 : 1)
