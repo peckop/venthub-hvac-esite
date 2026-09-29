@@ -322,6 +322,42 @@ hâl **o günkü hâldir**. Dört karakterlik fark, §8.2 ile §8.3'ün aynı an
 
 ---
 
+## 9. YOKLUK HÜKMÜ — "yok / bulunamadı / desteklemiyor" ölçüm ister (REC-417, Ops+Recep 2026-09-29)
+
+> **Niçin bu bölüm var (09-29 vakası):** WrongStack "Project Kit" için *"12 pakette hiçbirinde yok"*
+> hükmü verildi. Özellik ürünün GitHub ana dalında duruyordu (yalnız yayımlı 1.0.27 paketinde yoktu).
+> Sebep: **tek yöntem** (yayımlı paket metni grep'i) üç kez tekrarlandı — paket kümesi değişti, yöntem
+> değişmedi; ekrandaki **görünen adlarla** arandı (araç adı `project_kit_run`, klasör `project-kit`,
+> `kit.json` hiç aranmadı); ürünün deposu, `gitmcp` ve web araması elde olduğu hâlde ilk turda
+> kullanılmadı; son turda **desen büyük/küçük harf duyarlı ve alt çizgisizdi** (`project_kit_run`'ı
+> yakalayamazdı). Bir var-olanı yok saymak, var olanı yeniden yazdırır (§6.1'in beşinci vakası aynı
+> hata) ya da doğru aracı elemeye götürür.
+
+**Hüküm.** Olumsuz varlık hükmü ("yok", "bulunamadı", "desteklemiyor", "hiçbirinde") yazılırken **aynı
+cümlede ya da hemen altında** şunlar bulunur; biri eksikse hüküm "**bakılmadı / bilmiyorum**"dur:
+
+| # | Zorunlu alan | Örnek (Project Kit) |
+|---|---|---|
+| a | **Aranan kaynaklar** ve her biri için **bakılmayanlar** | yayımlı paketler: baktım; depo ana dalı: baktım; etiket: baktım; belge: baktım; web: bakmadım |
+| b | **Aranan terimler:** ekran/arayüz adı **+** araç/API adı **+** snake/kebab/camel varyantı **+** dosya/klasör adı | `Project Kit`, `project_kit_run`, `project-kit`, `ProjectKit`, `kit.json`, `temp-file-sweeper` |
+| c | **En az iki FARKLI yöntem** (aynı yöntemin tekrarı bir yöntem sayılır) | yayımlı paket içi grep **+** kaynak deposunda kod araması |
+| d | **Kapsam cümlenin içinde** | *"npm 1.0.27'de yok"* ≠ *"yok"*; *"ana dalda var, etiketli sürümde yok"* |
+| e | Yazılım-varlık sorusunda **önce kaynak deposu/belge, sonra paket** | paket = yayımlanmış kesit; ürün ondan önde olabilir |
+
+**Desen kuralı.** Metin aramasında büyük/küçük harf duyarsız ve ayırıcıya toleranslı desen kullanılır
+(`project[_. -]?kit`). Desen bir **pozitif kontrolle** doğrulanır: bilinen bir varlığı (ör. bilinen bir
+araç adı) aynı desen biçimiyle bulur mu? Bulamıyorsa desen kusurludur, hüküm verilmez.
+
+**"İki ölçüm aynı kör nokta" tuzağı.** İkinci yöntem birincinin **yön/kaynak farkı** taşımalıdır. Aynı
+kaynakta iki farklı desen, iki bağımsız ölçüm değildir.
+
+**Uyaran kontrol (ÖNERİ, uygulanmadı — Ops onayı ister):** rapor/denetim belgelerinde (`docs/audits/*.md`)
+`HİÇBİRİNDE YOK` / `BULUNAMADI` / `DESTEKLEMİYOR` diyen satırın komşu 5 satırında `Aranan kaynak:` ve
+`Aranan terim:` etiketi yoksa **yalnız uyaran** (bloklamayan) bir kontrol. Gürültü ve yalancı-kırmızı
+riski yüzünden bloklayan kapı olarak ÖNERİLMEZ; kararı Ops verir.
+
+---
+
 İlgili: `collaboration-protocol.md` §2.1 · `measurement-discipline-standard.md` ·
 `session-loop-ritual.md` · CLAUDE.md kural 1 (No-Plan-No-Code: plan hangi cetvelle yönetildiğini söyler —
 artık **hangi yöntemle koşacağını da**).
