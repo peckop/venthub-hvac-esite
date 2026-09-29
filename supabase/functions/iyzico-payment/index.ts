@@ -20,6 +20,7 @@ import {
 import { buildAllowedOrigins, isOriginAccepted, pickRedirectOrigin } from '../_shared/origins.ts'
 import { resolveIyzicoBase } from '../_shared/config_audit.ts'
 import { raiseRevenueAlarm } from '../_shared/revenue_alarm.ts'
+import { denemeSiparisiKaydet, satisKipiKarari } from '../_shared/satis_kipi.ts'
 
 
 /**
@@ -285,6 +286,35 @@ Deno.serve(async (req: Request) => {
             });
         }
 
+        // ── SUNUCU TARAFI SATIŞ KİPİ KAPISI (REC-355 alt işi · 2026-09-29) ────────
+        //
+        // Satış kipi bugüne kadar yalnız tarayıcıda kontrol ediliyordu; oturumlu bir kullanıcı bu
+        // uca doğrudan POST atarsa ödeme oturumu açar ve sipariş yazardı. Kapı, kimlik ve sunucu
+        // yapılandırması geçildikten SONRA, `order-validate` çağrısından ve sipariş yazısından
+        // ÖNCE durur. Karar ve gerekçeler: `_shared/satis_kipi.ts` (saf fonksiyon, vitest'te sınanır).
+        // Bu uç sipariş yazan ve ödeme oturumu açan TEK yoldur; uçuştaki ödeme/iade uçları
+        // (callback, webhook, refund) bilerek kapısızdır: kapatmak parası çekilmiş müşteriyi
+        // siparişsiz bırakır.
+        const satisKapisi = await satisKipiKarari({
+            supabaseUrl,
+            serviceRoleKey,
+            tenantId,
+            userId: user_id,
+            env: {
+                IYZICO_BASE_URL: Deno.env.get('IYZICO_BASE_URL') ?? undefined,
+                SATIS_KIPI_DENEME_KULLANICILARI: Deno.env.get('SATIS_KIPI_DENEME_KULLANICILARI') ?? undefined,
+            },
+            fetchImpl: fetch,
+            requestId,
+            corsHeaders,
+        });
+        for (const alarm of satisKapisi.alarmlar) {
+            await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, { fn: 'iyzico-payment', ...alarm });
+        }
+        if (satisKapisi.engel) return satisKapisi.engel;
+        // Deneme izniyle geçildiyse sipariş yazılmadan ÖNCE denetim günlüğüne kaydedilir (aşağıda).
+        const satisDenemeIzni = satisKapisi.neden === 'DENEME_IZNI';
+
         // ── SUNUCU FİYAT OTORİTESİ (T041-VH · 2026-08-15) ─────────────────────────
         //
         // ÖNCEKİ HÂLİ NİÇİN HİÇ ÇALIŞMADI. `order-validate` kimliği token'dan alır
@@ -491,6 +521,32 @@ Deno.serve(async (req: Request) => {
             coupon_discount: 0,
             tenant_id: tenantId
         };
+
+        // Deneme izniyle açılan HER sipariş, sipariş satırından ÖNCE denetim günlüğüne yazılır
+        // (satış kipi kapısı, B′). Yazılamazsa sipariş OLUŞTURULMAZ: izlenemeyen bir deneme siparişinin
+        // yan etkileri (stok, kupon, e-posta, fatura) sonradan temizlenemez.
+        if (satisDenemeIzni) {
+            const denemeKaydi = await denemeSiparisiKaydet({
+                supabaseUrl,
+                serviceRoleKey,
+                tenantId,
+                orderId: dbGeneratedId,
+                userId: user_id,
+                requestId,
+                ortam: iyzicoCfg.ortam,
+                fetchImpl: fetch,
+            });
+            if (!denemeKaydi) {
+                await raiseRevenueAlarm(supabaseUrl, serviceRoleKey, {
+                    fn: 'iyzico-payment',
+                    code: 'SALES_TRIAL_AUDIT_FAILED',
+                    message: 'Deneme izniyle gelen sipariş denetim günlüğüne yazılamadı; sipariş oluşturulmadı (fail-closed).',
+                    extra: { orderId: dbGeneratedId },
+                });
+                return validationFail('SALES_STATE_UNAVAILABLE', 'Satış durumu şu anda doğrulanamıyor; lütfen biraz sonra tekrar deneyin.', {}, 503);
+            }
+            console.warn('[iyzico-payment] deneme izniyle sipariş:', requestId, dbGeneratedId, user_id);
+        }
 
         // Try creating order; if schema drift (shipping_method column missing), retry without it
         let orderResponse = await fetch(`${supabaseUrl}/rest/v1/venthub_orders`, {
