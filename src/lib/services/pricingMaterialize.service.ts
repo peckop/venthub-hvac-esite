@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import { yeniOturumKimligi, yontemli } from '../pricing/degisiklikYontemi'
 import { tumSatirlariCek, VARSAYILAN_SAYFA_BOYU } from '../supabase/tumSatirlar'
 import { resolveFxRate } from './fxRate.service'
 import { type PricingRuleRow, resolvePriceWithRules, type RuleEvaluationInputs } from './pricing.service'
@@ -295,6 +296,9 @@ export async function materializePrices(
   const today = options?.today ?? todayIso()
   const sampleSize = options?.sampleSize ?? 10
   const cacheSayfaBoyu = options?.cacheSayfaBoyu ?? VARSAYILAN_SAYFA_BOYU
+  // Fiyat günlüğü (INV-FIYAT-GUNLUGU-1): bu koşunun tüm partileri (upsert 500'lük, pasifleştirme 200'lük) aynı
+  // oturum kimliğini taşır → günlükte birden çok özet satırı tek koşuya bağlanır.
+  const oturum = yeniOturumKimligi()
 
   // 1) Kural havuzu — bir kez.
   const { data: ruleRows, error: rulesErr } = await supabase.from('pricing_rule').select('*')
@@ -397,9 +401,11 @@ export async function materializePrices(
 
   async function flushUpsertBatch(rows: ProductPriceUpsertRow[]) {
     if (dryRun || rows.length === 0) return
-    const { error } = await supabase
-      .from('product_prices')
-      .upsert(rows, { onConflict: CACHE_CONFLICT_TARGET })
+    const { error } = await yontemli(
+      supabase.from('product_prices').upsert(rows, { onConflict: CACHE_CONFLICT_TARGET }),
+      'yeniden_hesap',
+      oturum,
+    )
     if (error) throw error
   }
 
@@ -516,7 +522,11 @@ export async function materializePrices(
   if (!dryRun) {
     for (let i = 0; i < staleIds.length; i += DEACTIVATE_BATCH_SIZE) {
       const chunk = staleIds.slice(i, i + DEACTIVATE_BATCH_SIZE)
-      const { error } = await supabase.from('product_prices').update({ is_active: false }).in('id', chunk)
+      const { error } = await yontemli(
+        supabase.from('product_prices').update({ is_active: false }).in('id', chunk),
+        'yeniden_hesap',
+        oturum,
+      )
       if (error) throw error
     }
   }

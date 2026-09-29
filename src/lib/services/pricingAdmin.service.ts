@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import { yontemli } from '../pricing/degisiklikYontemi'
 import type { PricingProductInput, PricingRuleRow } from './pricing.service'
 
 /**
@@ -70,7 +71,8 @@ export async function createPricingRule(
   supabase: SupabaseClient<Database>,
   input: PricingRuleCreateInput,
 ): Promise<PricingRuleRow> {
-  const { data, error } = await supabase.from('pricing_rule').insert(input).select('*').single()
+  // Yöntem başlığı (fiyat günlüğü, INV-FIYAT-GUNLUGU-1): kural ekranı = 'panel'.
+  const { data, error } = await yontemli(supabase.from('pricing_rule').insert(input).select('*').single(), 'panel')
   if (error) throw error
   return data
 }
@@ -90,25 +92,23 @@ export async function updatePricingRule(
     updated_at: new Date().toISOString(),
     updated_by: updatedBy,
   }
-  const { data, error } = await supabase
-    .from('pricing_rule')
-    .update(payload)
-    .eq('id', id)
-    .select('*')
-    .single()
+  const { data, error } = await yontemli(
+    supabase.from('pricing_rule').update(payload).eq('id', id).select('*').single(),
+    'panel',
+  )
   if (error) throw error
   return data
 }
 
 export async function deletePricingRule(supabase: SupabaseClient<Database>, id: string): Promise<void> {
-  const { error } = await supabase.from('pricing_rule').delete().eq('id', id)
+  const { error } = await yontemli(supabase.from('pricing_rule').delete().eq('id', id), 'panel')
   if (error) throw error
 }
 
 /** Toplu silme (panelde yalnız onaylı akışta çağrılır). */
 export async function deletePricingRules(supabase: SupabaseClient<Database>, ids: string[]): Promise<void> {
   if (ids.length === 0) return
-  const { error } = await supabase.from('pricing_rule').delete().in('id', ids)
+  const { error } = await yontemli(supabase.from('pricing_rule').delete().in('id', ids), 'panel')
   if (error) throw error
 }
 
