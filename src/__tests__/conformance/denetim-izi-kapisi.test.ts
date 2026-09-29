@@ -224,8 +224,15 @@ describe('INV-DENETIM-IZI-1 · cetvel kurali ve sinirlarini ADIYLA yaziyor', () 
     }
     expect(c).toContain('x-degisiklik-yontemi')
     expect(c).toContain('x-degisiklik-oturumu')
-    // Maliyet yolu (products.cost_in_base) kapsam DISI olarak ADIYLA yazili — kapi fazla iddia etmez.
     expect(c).toMatch(/cost_in_base/)
+  })
+
+  it('REC-412 Faz 0.5b: maliyet yolu cetvelde — tek atomik RPC, JWT yonetici kapisi, parti ozeti, sinirlari ADIYLA', () => {
+    const c = oku(CETVEL)
+    expect(c).toContain('maliyet_yenile')
+    expect(c).toContain('denetim_izi_maliyet_ozet')
+    expect(c).toContain('is_admin_claim')
+    expect(c).toMatch(/last_purchase_cost/) // kapsam DIŞI kalan mal kabul kolonları adıyla yazılı
   })
 })
 
@@ -353,6 +360,45 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
     }
     const { ihlaller } = degerlendir([...TAM, PRODUCTS_UPD, ozet])
     expect(ihlaller.some((i) => i.sinif === 'FAIL-OPEN' && i.tablo === 'denetim_izi_fiyat_ozet')).toBe(true)
+  })
+
+  // REC-412 Faz 0.5b: `products` üzerindeki maliyet özeti ifade-düzeyi tetiği UPDATE OF süzgeci TAŞIYAMAZ (geçiş
+  // tablosu tetiğine sütun listesi konamaz, PostgreSQL kısıtı). Kapı bunu SUZGEC-YOK diye okumamalı: süzgeçli
+  // satır tetiği (PRODUCTS_UPD) yerinde durdukça stok düşümü gürültüsü yok (özet, değişen maliyet yoksa satır yazmaz).
+  const MALIYET_OZET: TetikSatiri = {
+    tablo: 'products',
+    tetik: 'denetim_izi_maliyet_ozet',
+    fonksiyon: 'denetim_izi_maliyet_ozet',
+    govde: 'begin insert into admin_audit_log ... return null; end;',
+    tanim:
+      'CREATE TRIGGER denetim_izi_maliyet_ozet AFTER UPDATE ON public.products REFERENCING OLD TABLE AS eski_t NEW TABLE AS yeni_t FOR EACH STATEMENT EXECUTE FUNCTION denetim_izi_maliyet_ozet()',
+  }
+
+  it('YESIL taraf (REC-412 Faz 0.5b): products maliyet ozet ifade tetigi suzgecsiz ama satir tetigi suzgecli -> ihlal YOK', async () => {
+    const degerlendir = await degerlendirYukle()
+    const { ihlaller } = degerlendir([...TAM, PRODUCTS_UPD, MALIYET_OZET])
+    expect(ihlaller).toEqual([])
+  })
+
+  it('⭐KIRMIZI taraf 7 (REC-412 Faz 0.5b): satir tetiginin suzgeci de kalkarsa ozet tetigi SUZGEC-YOK’u ORTMEZ', async () => {
+    const degerlendir = await degerlendirYukle()
+    const suzgecsiz: TetikSatiri = {
+      ...PRODUCTS_UPD,
+      tanim:
+        'CREATE TRIGGER denetim_izi_products_upd AFTER UPDATE ON public.products FOR EACH ROW EXECUTE FUNCTION denetim_izi_yaz()',
+    }
+    const { ihlaller } = degerlendir([...TAM, suzgecsiz, MALIYET_OZET])
+    expect(ihlaller.some((i) => i.sinif === 'SUZGEC-YOK' || i.sinif === 'SUZGEC-DAR')).toBe(true)
+  })
+
+  it('⭐KIRMIZI taraf 8 (REC-412 Faz 0.5b): maliyet ozet fonksiyonuna hata yakalayici girmis -> FAIL-OPEN', async () => {
+    const degerlendir = await degerlendirYukle()
+    const bozuk: TetikSatiri = {
+      ...MALIYET_OZET,
+      govde: 'begin insert into admin_audit_log ... exception when others then null; end;',
+    }
+    const { ihlaller } = degerlendir([...TAM, PRODUCTS_UPD, bozuk])
+    expect(ihlaller.some((i) => i.sinif === 'FAIL-OPEN' && i.tablo === 'denetim_izi_maliyet_ozet')).toBe(true)
   })
 })
 
