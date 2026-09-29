@@ -107,7 +107,7 @@ Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve pan
 
 ---
 
-## 0.1 Yürürlükteki kural dizini — bölüm başına TEK satır (REC-400 H3, 2026-09-29)
+### 0.4 Yürürlükteki kural dizini — bölüm başına TEK satır (REC-400 H3, 2026-09-29)
 
 > **Bu dizin nedir:** aşağıdaki §1–§34 bölümleri **vaka kaydıdır** (o günün ölçümü, sabotaj tabloları, reddedilen
 > seçenekler); kural cümlesi her bölümde vakanın içine gömülüdür. Bu tablo, her bölümün bugün de geçerli olan tek
