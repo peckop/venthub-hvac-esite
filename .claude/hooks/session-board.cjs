@@ -146,7 +146,7 @@ try {
  * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
  */
 const TOPLAM_TAVAN = 9000
-const DURUM_TAVAN = 3000
+const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
 const bolumler = []
 /** oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır. */
 function bolum(ad, oncelik, tam, ozet = '') {

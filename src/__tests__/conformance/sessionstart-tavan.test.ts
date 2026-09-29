@@ -124,6 +124,19 @@ describe('INV-SESSIONSTART-TAVAN-1 · çıktı ≤ 9.000 karakter (şişirilmiş
   )
 
   it(
+    'compact: ajan KÖR bırakılmaz — uzun talimat SONUNA kadar aynen, durum bloğundan ≥10 satır görünür (Recep 09-29 endişesi)',
+    () => {
+      const { ek } = calistir('compact')
+      // Son mesaj 1.400 karakterlik gövde taşıyor; eski mesajTavan=600 bunu ortadan kırpardı.
+      expect(ek).toContain('y'.repeat(1400))
+      // Eski DURUM_TAVAN=3000 ile ~7 satır görünürdü; 4.500 ile en az 10.
+      const gorunen = (ek.match(/- SATIR-\d+ /g) ?? []).length
+      expect(gorunen, `durum bloğundan ${gorunen} satır göründü`).toBeGreaterThanOrEqual(10)
+    },
+    60_000,
+  )
+
+  it(
     'startup/resume/clear: durum bloğu ve döküm bağlama girmez (yalnız compact)',
     () => {
       for (const source of ['startup', 'resume', 'clear']) {
