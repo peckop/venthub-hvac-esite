@@ -35,8 +35,10 @@ const KAYIT = 'docs/standards/bagimlilik-kararlari.md'
  * 11 → 8 (2026-09-21): bot'un güvenlik PR'ı (#1285) brace-expansion'ı 5.0.12'ye çekip üç kaydı
  * kapattı; kapı aynı PR'da "BAYAT KABUL" dedi ve üç satır silindi. Tavan ilk kez SIKIŞTI.
  * 8 → 6 (2026-09-22): `kucuk-ve-yama` grubu (#1315) browserslist'in iki kaydını kapattı; aynı yol.
+ * 6 → 0 (2026-09-29, REC-424): kalan altısı `fast-uri` idi; kilitte 3.1.2 → 3.1.8 yükseltmesi hepsini
+ * kapattı (Sentry'yi beklemeden, yine bayat-kabul kapısı sayesinde). Liste BOŞ ve boş kalmalı.
  */
-const KABUL_TAVANI = 6
+const KABUL_TAVANI = 0
 
 function kostur(args: string[]): { kod: number; cikti: string } {
   try {
@@ -120,7 +122,10 @@ describe('INV-DEP-DENETIM-1 · karar 52 düzeneği', () => {
 
   it(`§7 kabul listesi: tavan ${KABUL_TAVANI}, her satırın KALDIRMA ŞARTI dolu`, () => {
     const satirlar = kabulSatirlari()
-    expect(satirlar.length, '§7 ayrıştırılamadı ya da boşaldı').toBeGreaterThan(0)
+    // Liste boş olabilir (REC-424); ama §7 bölümü ve tablo başlığı yerinde olmalı, yoksa kapı ölçemez.
+    const bolum = oku(KAYIT).split(/^##\s*7\s*·/m)[1]
+    expect(bolum, '§7 bölümü bulunamadı').toBeDefined()
+    expect(bolum, '§7 tablo başlığı yok').toMatch(/\|\s*GHSA\s*\|/)
     expect(
       satirlar.length,
       `kabul listesi BÜYÜDÜ (${satirlar.length} > ${KABUL_TAVANI}) — yeni kabul ayrı bir karardır`,

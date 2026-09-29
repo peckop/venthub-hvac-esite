@@ -85,8 +85,8 @@ export default async function Page({ params }: Params) {
     // Eski TR adresi → yeni TR adresine (istenen = null: her çözümde 308). EN yerinde kalır.
     const dil = lang === 'en' ? 'en' : 'tr'
     const istenen = dil === 'en' ? adresUret({ tur: 'kategori', kok: categorySlug }, 'en') : null
-    const { kategori } = await kategoriRotasiniUygula([categorySlug], dil, istenen, kategoriBagimliliklari)
-    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={categorySlug} />
+    const { kategori, ust } = await kategoriRotasiniUygula([categorySlug], dil, istenen, kategoriBagimliliklari)
+    return <KategoriSayfasi lang={lang} category={kategori} categorySlug={categorySlug} ust={ust} />
   }
 
   preloadCategory(categorySlug)

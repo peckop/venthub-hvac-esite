@@ -19,6 +19,10 @@
  * yönlendirilir ve doğrulama BAŞARISIZ olur.
  */
 
+import { readFileSync } from 'node:fs'
+
+import { yayinKapisi } from './yayin-kapisi.mjs'
+
 const ENDPOINT = 'https://api.indexnow.org/indexnow'
 const MAX_URL = 10_000
 
@@ -29,6 +33,16 @@ function arg(ad, varsayilan) {
 
 const site = (arg('--site', 'https://venthub.com.tr')).replace(/\/+$/, '')
 const kuru = process.argv.includes('--kuru')
+
+// YAYIN KAPISI (K4 / karar 164 A): adres şeması bayrağı KAPALIYKEN toplu bildirim REDDEDİLİR — canlı
+// sitemap adreslerinin çoğu yayında değişecek. `--kuru` da reddedilir (kuru koşum "hazır" izlenimi verir,
+// yanlış zamanda gerçek koşuma götürür). Ağ ve anahtar kontrolünden ÖNCE çalışır.
+const kapi = yayinKapisi(readFileSync(new URL('../../src/config/features.ts', import.meta.url), 'utf8'))
+if (!kapi.izin) {
+  console.error(`DURDU: ${kapi.sebep}`)
+  process.exit(1)
+}
+
 const key = process.env.INDEXNOW_KEY
 
 if (!key) {

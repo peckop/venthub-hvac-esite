@@ -216,6 +216,17 @@ describe('INV-DENETIM-IZI-1 · cetvel kurali ve sinirlarini ADIYLA yaziyor', () 
     expect(c).toMatch(/site_settings/)
     expect(c).toMatch(/bor[çc]/i)
   })
+
+  it('REC-412 Faz 0.5: fiyat tablolari cetvelin kapsaminda ve yontem basligi sozlesmesi yazili', () => {
+    const c = oku(CETVEL)
+    for (const t of ['pricing_rule', 'pricing_policy', 'price_lists', 'currency_rates', 'product_prices']) {
+      expect(c, `${t} cetvelde anilmiyor`).toContain(t)
+    }
+    expect(c).toContain('x-degisiklik-yontemi')
+    expect(c).toContain('x-degisiklik-oturumu')
+    // Maliyet yolu (products.cost_in_base) kapsam DISI olarak ADIYLA yazili — kapi fazla iddia etmez.
+    expect(c).toMatch(/cost_in_base/)
+  })
 })
 
 describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cift)', () => {
@@ -229,6 +240,12 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
     'product_images',
     'brands',
     'site_settings',
+    // REC-412 Faz 0.5: fiyat tabloları (cetvel §8) — kapsam listesiyle AYNI olmak zorunda.
+    'pricing_rule',
+    'pricing_policy',
+    'price_lists',
+    'currency_rates',
+    'product_prices',
   ]
     .map((tablo) => ({
       tablo,
@@ -257,7 +274,7 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
       'CREATE TRIGGER denetim_izi_products_upd AFTER UPDATE OF name, price, sku, category_id, status, deleted_at ON public.products FOR EACH ROW EXECUTE FUNCTION denetim_izi_yaz()',
   }
 
-  it('YESIL taraf: alti tablo + suzgecli products UPDATE -> ihlal YOK', async () => {
+  it('YESIL taraf: on bir tablo + suzgecli products UPDATE -> ihlal YOK', async () => {
     const degerlendir = await degerlendirYukle()
     const { ihlaller } = degerlendir([...TAM, PRODUCTS_UPD])
     expect(ihlaller).toEqual([])
@@ -314,7 +331,28 @@ describe('INV-DENETIM-IZI-1 · kapi MANTIGI fiksturle sinaniyor (ayirt edici cif
       tanim: '',
     }
     const { denetimTetikSayisi } = degerlendir([...TAM, PRODUCTS_UPD, webhook])
-    expect(denetimTetikSayisi).toBe(7)
+    expect(denetimTetikSayisi).toBe(12)
+  })
+
+  it('⭐KIRMIZI taraf 5 (REC-412 Faz 0.5): product_prices denetim tetigi SOKULMUS -> TETIK-YOK', async () => {
+    const degerlendir = await degerlendirYukle()
+    const eksik = [...TAM.filter((r) => r.tablo !== 'product_prices'), PRODUCTS_UPD]
+    const { ihlaller } = degerlendir(eksik)
+    expect(ihlaller.map((i) => `${i.sinif}:${i.tablo}`)).toContain('TETIK-YOK:product_prices')
+  })
+
+  it('⭐KIRMIZI taraf 6 (REC-412 Faz 0.5): ozet fonksiyonuna hata yakalayici girmis -> FAIL-OPEN', async () => {
+    const degerlendir = await degerlendirYukle()
+    const ozet: TetikSatiri = {
+      tablo: 'product_prices',
+      tetik: 'denetim_izi_ozet_upd',
+      fonksiyon: 'denetim_izi_fiyat_ozet',
+      govde: 'begin insert into admin_audit_log ... exception when others then null; end;',
+      tanim:
+        'CREATE TRIGGER denetim_izi_ozet_upd AFTER UPDATE ON public.product_prices REFERENCING OLD TABLE AS eski_t NEW TABLE AS yeni_t FOR EACH STATEMENT EXECUTE FUNCTION denetim_izi_fiyat_ozet()',
+    }
+    const { ihlaller } = degerlendir([...TAM, PRODUCTS_UPD, ozet])
+    expect(ihlaller.some((i) => i.sinif === 'FAIL-OPEN' && i.tablo === 'denetim_izi_fiyat_ozet')).toBe(true)
   })
 })
 

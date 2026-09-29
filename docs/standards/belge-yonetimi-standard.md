@@ -53,7 +53,10 @@ gider; 0'a ancak her oturumda gerekiyorsa girer.
 1. Tek giriş haritası `docs/README.md`'dir. Diğer haritaların adresini ve **hangi soruda hangisinin**
    kullanılacağını söyler: belge haritası (kendisi), kod haritaları (graphify + şema grafı, CodeGraph,
    WrongStack dizini), hafıza dizini (`MEMORY.md`), NotebookLM defterleri, iş kaydı (Linear + Kararlar belgesi).
-2. `CLAUDE.md` harita **kopyası tutmaz**; tek satırla tek giriş haritasını gösterir.
+2. `CLAUDE.md` tek giriş haritasını açıkça gösterir. **Karar 159 (Recep, 2026-09-27):** `CLAUDE.md`'nin mevcut içeriği
+   (kurallar, gerekçe cümleleri, kendi "Doküman Haritası" bölümü) kısaltılmaz ve taşınmaz; yalnız harita bölümü
+   EKLENİR. Sebep: pencerenin kendiliğinden gördüğü bilgiyi aynı anda azaltan değişikliklerin toplam etkisi
+   ölçülmüyordu. `CLAUDE.md` kısaltması ancak o etki ölçülünce ayrı kararla yeniden açılır.
 3. Haritada olmayan belge **ajan için yoktur**. Yeni cetvel, haritaya satırı eklenmeden bitmiş sayılmaz.
 4. Harita yalnız var olan yolu gösterir (§B7 kapısı).
 

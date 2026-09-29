@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Activity, ArrowRight, CheckCircle2, ChevronDown, ShieldCheck,ThermometerSun, Wind, Zap } from 'lucide-react'
+import { Activity, ArrowRight, CheckCircle2, ChevronDown, ShieldCheck,ThermometerSun } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useState } from 'react'
@@ -33,7 +33,6 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
     // Check if this is special showcase categories
     const isAirCurtain = category.slug === 'air-curtains'
     const isQuietFan = category.slug === 'quiet-duct-fans'
-
     interface CategoryMetadataExtended { showcase_images?: { desktop: string }[] }
     const metadata = category.metadata as CategoryMetadataExtended | null
     const showcaseImages = metadata?.showcase_images
@@ -122,70 +121,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                 parentSlug={category.slug}
             />
 
-            {/* Educational Section (Air Curtains only) */}
-            {isAirCurtain && (
-                <div className="bg-gray-50 py-16 border-b border-gray-100">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl font-bold text-industrial-gray mb-4">{t('category.whichAirCurtain')}</h2>
-                            <p className="text-steel-gray max-w-2xl mx-auto">
-                                {t('category.airCurtainHelper')}
-                            </p>
-                        </div>
-
-                        {/* Comparison Image */}
-                        <div className="flex justify-center mb-12">
-                            <VentImage src="/images/category/electric-vs-ambient.jpg"
-                                alt={t('category.electricVsAmbientAlt')}
-                                className="max-w-full md:max-w-3xl rounded-xl shadow-lg"
-                             />
-                        </div>
-
-                        {/* Quick Selection Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                            {/* Elektrikli Card */}
-                            <Link
-                                href={category.slug === 'elektrikli-isitici' ? Routes.category(categoryUrlSlug) : Routes.category(categoryUrlSlug, 'elektrikli-isitici')}
-                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-orange-300 hover:shadow-md transition-shadow"
-                            >
-                                <div className="flex items-center space-x-4 mb-4">
-                                    <div className="p-3 bg-orange-50 rounded-lg text-orange-500 group-hover:bg-orange-100 transition-colors">
-                                        <Zap size={32} />
-                                    </div>
-                                    <h4 className="text-xl font-bold text-industrial-gray">{t('category.electricHeated')}</h4>
-                                </div>
-                                <p className="text-gray-600 mb-4">
-                                    {t('category.electricPoint1')}
-                                </p>
-                                <div className="flex items-center text-orange-500 font-semibold">
-                                    <span>{t('category.inspectModels')}</span>
-                                    <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </Link>
-
-                            {/* Ortam Havalı Card */}
-                            <Link
-                                href={category.slug === 'ortam-havali' ? Routes.category(categoryUrlSlug) : Routes.category(categoryUrlSlug, 'ortam-havali')}
-                                className="group bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:border-blue-300 hover:shadow-md transition-shadow"
-                            >
-                                <div className="flex items-center space-x-4 mb-4">
-                                    <div className="p-3 bg-blue-50 rounded-lg text-blue-500 group-hover:bg-blue-100 transition-colors">
-                                        <Wind size={32} />
-                                    </div>
-                                    <h4 className="text-xl font-bold text-industrial-gray">{t('category.ambientAir')}</h4>
-                                </div>
-                                <p className="text-gray-600 mb-4">
-                                    {t('category.ambientPoint2')}
-                                </p>
-                                <div className="flex items-center text-blue-500 font-semibold">
-                                    <span>{t('category.inspectModels')}</span>
-                                    <ArrowRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* REC-434: "Hangi hava perdesini seçmelisiniz" kartları kaldırıldı. DB'de olmayan iki alt kategoriye
+                (elektrikli-isitici, ortam-havali) bağlıydılar ve hava perdesinin alt kategorisi olmadığından bu
+                görünümde hiç çizilmiyorlardı (ölçüm 2026-09-29). İki ürün türü ayrı AİLE olarak durur. */}
             {/* Premium Application Areas (Quiet Fans only) */}
             {isQuietFan && (
                 <div className="bg-slate-50 py-24 border-y border-slate-100 overflow-hidden">

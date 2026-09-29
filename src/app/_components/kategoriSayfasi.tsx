@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
 import React, { cache } from 'react'
 
+import { ADRES_SEMASI_K3B } from '@/config/features'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
 import type { KategoriUst } from '@/lib/data/preload'
+import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
@@ -126,17 +128,24 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
   const trUrl = `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
   const enUrl = `${SITE_URL}/en/category/${getLocalizedCategorySlug(category, 'en')}`
   const canonicalUrl = lang === 'en' ? enUrl : trUrl
+  const pasif = pasifKategoriRobots(category)
 
   return {
     title: `${displayName} | VentHub`,
     description: desc,
+    // O4 (REC-300): pasif (`is_active === false`) kategori sayfası 200 KALIR (bağlantı kırılmasın)
+    // ama dizine girmez; aktif kategoride `robots` alanı YAZILMAZ (bugünkü). Sitemap zaten dışında.
+    ...(pasif ? { robots: pasif } : {}),
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        tr: trUrl,
-        en: enUrl,
-        'x-default': trUrl,
-      },
+      // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+      ...hreflangAlani({
+        languages: {
+          tr: trUrl,
+          en: enUrl,
+          'x-default': trUrl,
+        },
+      }),
     },
     openGraph: {
       title: `${displayName} | VentHub`,
@@ -175,8 +184,11 @@ export function kategoriSayfasiUstVerisiK3b(
     baslik: `${displayName} | VentHub`,
     aciklama: desc,
   })
+  const pasif = pasifKategoriRobots(category)
   return {
     ...m,
+    // Pasif kategori (O4): `noindex, follow` — EN kapalıyken `sayfaUstVerisi` zaten aynısını yazar.
+    ...(pasif ? { robots: pasif } : {}),
     openGraph: {
       ...m.openGraph,
       images: [
@@ -195,10 +207,15 @@ export interface KategoriSayfasiProps {
   category: DomainCategory
   /** Adresteki (görünen) slug — JSON-LD ve ad yedeği için; bugünkü rotayla aynı girdi. */
   categorySlug: string
+  /**
+   * K3-b (bayrak AÇIK): çözücünün bulduğu üst kategori — `CollectionPage.url` iki seviyeli kanonik
+   * adresi ancak onunla kurabilir. Bayrak kapalıyken verilmez ve okunmaz.
+   */
+  ust?: KategoriUst | null
 }
 
 /** Kategori sayfası gövdesi — alt kategoriler + aile listesi + JSON-LD + görünüm. */
-export async function KategoriSayfasi({ lang, category, categorySlug }: KategoriSayfasiProps) {
+export async function KategoriSayfasi({ lang, category, categorySlug, ust = null }: KategoriSayfasiProps) {
   const page = SAYFA
 
   const dict = lang === 'en' ? en : tr
@@ -275,12 +292,13 @@ export async function KategoriSayfasi({ lang, category, categorySlug }: Kategori
 
   // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
   // içinde garanti edilir (eski kod dilsiz `${SITE_URL}/products/${slug}` yazıyordu).
-  // ⚠K3-b: JSON-LD adresleri bugünkü şemada kalır — `buildCategoryJsonLd`'nin `adresUret`'e
-  // bağlanması REC-300 Faz 3d'nin (yüzeyler, plan madde 2/7) işidir; bayrak kapalıyken fark yok.
+  // K3-b (REC-300 Faz 3d): bayrak açıkken sayfa adresi `kategoriKanonikAdresi` (adresUret, iki seviyeli
+  // dal), aile adresleri `adresUret`'ten; kapalıyken `buildCategoryJsonLd` bugünkü dizgeyi yazar.
   const jsonLd = buildCategoryJsonLd({
     lang,
     baseUrl: SITE_URL,
     categorySlug,
+    sayfaYolu: ADRES_SEMASI_K3B ? kategoriKanonikAdresi(category, ust, lang === 'en' ? 'en' : 'tr') : undefined,
     name: displayName,
     description: lang === 'en' ? `Products in category ${displayName}` : `${displayName} kategorisindeki ürünler`,
     total,

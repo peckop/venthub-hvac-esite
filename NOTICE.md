@@ -17,6 +17,7 @@
 | rebelytics — "One Skill to Rule Them All" (Task Observer), Eoghan Henn | CC BY 4.0 | Gözlem-günlüğü yöntemi, sinyal kataloğu özü, haftalık inceleme fikri | `.claude/skills/task-observer/SKILL.md`, `docs/skill-gozlemleri/` |
 | henchmarketing-rgb/headroom | MIT | Bağlam-doluluk çubuğu fikri (uygulama bizden) | `.claude/statusline.cjs` |
 | WrongStack (Ersin Koç) | MIT | "Düzenlenen dosyanın testini o anda koş" fikri (`test-runner-gate`); uygulama bizden | `.claude/hooks/verify-on-stop.cjs` |
+| WrongStack (Ersin Koç) — `@wrongstack/core` 1.0.26 skill'leri: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp` | MIT | Skill gövdesi **olduğu gibi**; başa araç eşlemesi + VentHub ek kuralları (bizden), açıklama yeniden yazıldı | `.claude/skills/{verify-before-done,multi-agent,wrongstack-kanban,wrongstack-mailbox-mcp}/SKILL.md` |
 | shadcn/ui | MIT © shadcn | Bileşen temeli (stack'te) | `src/components/ui/` |
 | `fallow` skill'i — Bart Waardenburg, `docs.fallow.tools` | MIT (skill künyesinde yazılı) | Skill dosyası **olduğu gibi** (yöntem değil, metnin kendisi) | `.claude/skills/fallow/`, `.agent/skills/fallow/` |
 | `git-commit` skill'i | MIT (skill künyesinde yazılı) | Skill dosyası olduğu gibi | `.claude/skills/git-commit/`, `.agent/skills/git-commit/` |

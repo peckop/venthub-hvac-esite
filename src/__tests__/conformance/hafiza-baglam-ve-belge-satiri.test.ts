@@ -23,8 +23,9 @@ interface Kullanim {
 interface Baglam {
   compactPenceresi: (kok?: string, ev?: string, env?: Record<string, string | undefined>) => number
   esikler: (p: number) => { doluyor: number; yakin: number }
-  sonBaglam: (yol: string | undefined) => number | null
-  satir: (token: number | null, pencere: number) => string | null
+  sonBaglam: (yol: string | undefined) => number | string | null
+  satir: (token: number | string | null, pencere: number) => string | null
+  COMPACT_SONRASI: string
 }
 type Sonuc = { durum: 'yok' } | { durum: 'bozuk'; hata: string } | { durum: 'tamam'; veri: unknown }
 interface Belge {
@@ -82,8 +83,37 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     expect(bd.sonBaglam(yol)).toBe(42_000)
   })
 
-  it('eşik çiftleri (1M pencere): 299k SUSAR / 300k doluyor · 499k doluyor / 500k COMPACT YAKIN', () => {
-    expect(bd.satir(299_999, 1_000_000)).toBeNull()
+  it('compact sınırından sonra cevap YOK → sınır öncesi 707k okunmaz, "compact sonrasi" denir (hata 09-27)', () => {
+    const d = gecici()
+    const sinir = { type: 'system', subtype: 'compact_boundary', compactMetadata: { preTokens: 707_000, postTokens: 45_451 } }
+    const once = cevap({ input_tokens: 2, cache_read_input_tokens: 707_000 })
+    const yol = kayit(d, [once, sinir, { type: 'user', message: { content: 'özet' } }, { type: 'user', message: { content: 'devam' } }])
+    expect(bd.sonBaglam(yol)).toBe(bd.COMPACT_SONRASI)
+    expect(bd.satir(bd.sonBaglam(yol), 1_000_000)).toBe('BAGLAM: compact sonrasi — olcum ilk cevaptan sonra')
+    // ayırt edici çift: sınırsız aynı kayıt eski değeri okur
+    expect(bd.sonBaglam(kayit(d, [once, { type: 'user', message: { content: 'devam' } }]))).toBe(707_002)
+    // sınırdan SONRA cevap varsa o okunur (sınır yürüyüşü durdurmaz, cevap önce gelir)
+    expect(bd.sonBaglam(kayit(d, [once, sinir, cevap({ cache_read_input_tokens: 126_000 })]))).toBe(126_000)
+    // yan ajanın sınırı ana konuşmayı kesmez
+    expect(bd.sonBaglam(kayit(d, [once, { ...sinir, isSidechain: true }]))).toBe(707_002)
+  })
+
+  it('compact sonrası usage=0 kopya satırlar ölçüm değildir, atlanır (hata 09-28: "0k" bastı)', () => {
+    const d = gecici()
+    const sinir = { type: 'system', subtype: 'compact_boundary' }
+    const once = cevap({ cache_read_input_tokens: 505_000 })
+    const kopya = cevap({ input_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 })
+    expect(bd.sonBaglam(kayit(d, [once, sinir, kopya, kopya]))).toBe(bd.COMPACT_SONRASI)
+    expect(bd.sonBaglam(kayit(d, [once, sinir, cevap({ cache_read_input_tokens: 257_000 }), kopya]))).toBe(257_000)
+  })
+
+  it('eşik altında da HER mesajda düz satır (Recep 09-27); eşiklerde uyarı', () => {
+    expect(bd.satir(146_000, 1_000_000)).toBe('BAGLAM: 146k/1M')
+    expect(bd.satir(0, 1_000_000)).toBe('BAGLAM: 0k/1M')
+  })
+
+  it('eşik çiftleri (1M pencere): 299k düz / 300k doluyor · 499k doluyor / 500k COMPACT YAKIN', () => {
+    expect(bd.satir(299_999, 1_000_000)).toBe('BAGLAM: 300k/1M')
     expect(bd.satir(300_000, 1_000_000)).toMatch(/^⚠BAGLAM: 300k\/1M — doluyor/)
     expect(bd.satir(499_999, 1_000_000)).toMatch(/doluyor/)
     expect(bd.satir(500_000, 1_000_000)).toMatch(/^⛔BAGLAM: 500k\/1M — COMPACT YAKIN/)
@@ -92,9 +122,26 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
 
   it('pencere küçültülmüşse (250k) eşik pencereye oranlanır; mutlak 300k hiç yanmazdı', () => {
     expect(bd.esikler(250_000)).toEqual({ doluyor: 150_000, yakin: 200_000 })
-    expect(bd.satir(149_999, 250_000)).toBeNull()
+    expect(bd.satir(149_999, 250_000)).toBe('BAGLAM: 150k/250k')
     expect(bd.satir(150_000, 250_000)).toMatch(/doluyor/)
     expect(bd.satir(200_000, 250_000)).toMatch(/COMPACT YAKIN/)
+  })
+
+  it("COMPACT YAKIN satırı Recep'e HAZIRLIK NOTU talimatı taşır; doluyor/düz satırda YOK (Recep 09-29)", () => {
+    const yakin = bd.satir(500_000, 1_000_000) as string
+    for (const madde of [
+      'COMPACT HAZIRLIK NOTU',
+      '(a) durum dosyam guncel mi',
+      '(b) yarim is var mi',
+      '(c) tek cumle hukum',
+      'Simdi compact yapabilirsin',
+      'her cevapta kisaca tekrarla',
+    ]) {
+      expect(yakin, madde).toContain(madde)
+    }
+    expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
+    expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
+    expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT HAZIRLIK NOTU')
   })
 
   it('pencere önceliği durum çubuğuyla aynı: ortam > proje ayarı > kullanıcı ayarı > 1M', () => {
@@ -170,7 +217,10 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BELGE bloğu (HARİTA çiftleri)', () => 
   it('kaynak: BELGE bloğu ağ ya da git çağırmaz; tazeleme pencere açmaz (windowsHide)', () => {
     const k = fs.readFileSync(path.join(KANCA, 'belge-satiri.cjs'), 'utf8')
     expect(k).not.toMatch(/fetch\(|execFileSync|execSync|'git'/)
-    expect(k).toMatch(/windowsHide: true/)
+    // REC-415: kopuk başlatma ortak başlatıcıdan geçer; `windowsHide` ve gizli konsol ön yüklemesi orada
+    expect(k).toMatch(/kopukBaslat\(/)
+    const baslatici = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'board', 'kopuk-baslat.cjs'), 'utf8')
+    expect(baslatici).toMatch(/windowsHide: true/)
   })
 })
 

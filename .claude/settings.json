@@ -38,7 +38,6 @@
       "mcp__notebooklm-py__chat_get",
       "mcp__notebooklm-py__server_info",
       "Bash(git ls-remote *)",
-      "Bash(git push --force-with-lease*)",
       "mcp__claude_ai_Vercel__search_vercel_documentation",
       "mcp__claude_ai_Vercel__get_deployment",
       "mcp__plugin_supabase_supabase__get_project_url",
@@ -87,6 +86,26 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/silme-baglanti-kapisi.cjs\"",
             "statusMessage": "silme-baglanti-kapisi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/gh-api-kapisi.cjs\"",
+            "statusMessage": "gh-api-kapisi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/env-yazma-kapisi.cjs\"",
+            "statusMessage": "env-yazma-kapisi"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*[Ss]upabase.*__(execute_sql|apply_migration|deploy_edge_function|merge_branch|reset_branch|delete_branch|pause_project|restore_project)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sql-yazma-kapisi.cjs\"",
+            "statusMessage": "sql-yazma-kapisi"
           }
         ]
       },
@@ -199,6 +218,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/bash-write-audit.cjs\"",
             "statusMessage": "bash-write-audit"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/merge-sonrasi-ileri-sar.cjs\"",
+            "statusMessage": "merge-sonrasi-ileri-sar"
           }
         ]
       },
@@ -234,6 +258,12 @@
             "timeout": 90,
             "async": true,
             "statusMessage": "defter bayatlik olcumu"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-konusma-dokumu.cjs\"",
+            "timeout": 60,
+            "async": true
           }
         ]
       }
@@ -246,6 +276,11 @@
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/precompact-durum-kapisi.cjs\"",
             "statusMessage": "durum kapisi"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-konusma-dokumu.cjs\"",
+            "statusMessage": "son konusma dokumu"
           }
         ]
       }

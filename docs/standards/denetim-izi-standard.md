@@ -150,7 +150,8 @@ ve şimdilik kabul ediyorum" demenin yeridir; burada kabul edilecek bir eksik yo
 ### 7.1 Kapsamda olan tablolar
 
 `categories` · `products` · `product_families` · `product_images` · `brands` ·
-**`site_settings`**.
+**`site_settings`** · *(2026-09-29, REC-412 Faz 0.5)* **`pricing_rule` · `pricing_policy` · `price_lists` ·
+`currency_rates` · `product_prices`** — yani on bir tablo; fiyat tabloları için ayrıntı §8.
 
 `brands` ve `site_settings` emirde yoktu, **ölçümle eklendi.** `site_settings` ticari olarak en
 ağır kalemdir: satış kipi anahtarı (REC-168) orada ve vitrinde fiyatın görünüp görünmeyeceğini
@@ -164,7 +165,8 @@ belirliyor.
 | **`actor` sorusunun çözümü** (özel claim'li jeton / ayrı DB rolü) | Çözülebilir ama ayrı kalem. **Doğa yasası olarak kaydedilmedi.** |
 | **FORCE-RLS politikası** (definer yolunu kapsayan INSERT politikası) | Ayrı kalem. `admin_audit_log`'da üç politika var, hiçbiri `postgres` için değil. |
 | **Otomatik stok/rezervasyon yazımları** | `products` kolon süzgeciyle dışarıda. Sebep: her siparişte yazılıyor ve "kim fiyatı değiştirdi" sorusunu gürültüye boğardı. Ev geleneğinin dersi: **okunmayan alarm alarm değildir.** |
-| **`product_prices` · `price_lists`** | Betiklerle yazılıyor ve ticari hassasiyette `site_settings` sınıfında. Bu turda kapsamda değil; **sessizce dışarıda kalmadı, burada yazılı.** Sonraki turda karara bağlanır. |
+| ~~`product_prices` · `price_lists`~~ | **KAPSAMA ALINDI (2026-09-29, REC-412 Faz 0.5)** — bu satır "sonraki turda karara bağlanır" diyordu; o tur bu. Bkz. §8. |
+| **Maliyet yolu** (`products.cost_in_base`, `purchase_rate_to_base`; `product_costs` aynası) | `cost_in_base`/`purchase_rate_to_base` `products` UPDATE-OF süzgecinde YOK → maliyet yenileme bugün de günlüksüz. `product_costs` yalnız `product_costs_senkron()` aynasıdır, kaynağı (`products`) zaten izlenir → ikinci tetik kopya satır üretirdi. REC-140 Faz 3 yazıcıyı taşıyınca aynaya tetik gerekir. Karar OPS'ta. |
 
 ### 7.3 `site_settings` tenant borcu
 
@@ -172,3 +174,50 @@ belirliyor.
 `admin_audit_log.tenant_id`'nin **sabit varsayılanını** alır — yani o satırların tenant damgası
 gerçek değil, varsayılandır. Faz 2 (multi-tenant) PARK'ta olduğu için bugün zarar üretmiyor;
 **PARK kalkarsa bu bir borçtur ve `site_settings` tenant'lanmadan multi-tenant açılamaz.**
+
+## 8. Fiyat tabloları — değişiklik günlüğü ve yöntem sözleşmesi (REC-412 Faz 0.5, 2026-09-29)
+
+Vitrin fiyatını belirleyen beş tablo denetim izine girer: **`pricing_rule` · `pricing_policy` · `price_lists` ·
+`currency_rates` · `product_prices`**. Aynı `denetim_izi_yaz()` fonksiyonu, fail-closed (bkz. §4). Plan ve çürütme:
+`docs/plans/rec412-tek-urun-fiyat-girisi-2026-09-29.md` §5c · `docs/audits/rec412-faz05-red-team-2026-09-29.md`.
+
+### 8.1 Yöntem: kolon DEĞİL, istek başlığı
+
+İstemci her fiyat yazımında iki başlık gönderir; PostgREST bunları o isteğin işleminde `request.headers` ayarı olarak
+tetiğe görünür kılar ve günlüğün `comment` alanına `| yontem=… | oturum=…` yazılır:
+
+| başlık | değer | anlamı |
+|---|---|---|
+| `x-degisiklik-yontemi` | `panel` · `liste` · `csv` · `yeniden_hesap` · `maliyet_yenileme` · `sistem` | yazımın hangi yoldan geldiği (beyaz liste dışı değer yok sayılır) |
+| `x-degisiklik-oturumu` | uuid | bir koşunun (ör. katalog yeniden hesabı; upsert 500'lük, pasifleştirme 200'lük partilerle gider) parçalarını birleştirir |
+
+* Niçin kolon değil: DELETE isteği yük taşımaz (kural silme yöntemsiz kalırdı) ve iş tablolarına kolon eklemek
+  `database.types.ts`'i kaydırırdı. Başlık okuması tetik gövdesindedir; ayrı fonksiyon yoktur (tip kayması ve `WHEN`
+  içinde EXECUTE yetkisi tuzağı doğmaz).
+* **Başlıksız yazım** (SQL editörü, MCP, psql betiği) zararsızdır: `yontem=BILINMIYOR` yazılır. Boş dize, geçersiz
+  JSON, beyaz liste dışı değer de hata DEĞİL, `BILINMIYOR`'dur (canlıda ölçüldü: transaction-local ayar sonrası
+  `current_setting` `''` dönebilir).
+* ⚠**Yöntem istemci BEYANIDIR, kanıt değil.** "Kim (`actor`) + ne zaman + eski→yeni" DB gerçeğidir; "yöntem" beyandır.
+  Bu yüzden **hiçbir sayım ya da eleme kararı başlığa bağlanmaz**: başlık yalnız etikettir (plan-challenger 2.1).
+* Kanıt sınırı: `request.headers`'ın canlıda uçtan uca okunduğu ilk gerçek panel yazımında ölçülür (audit `comment`'te
+  `yontem=panel` görülmeli). Görünmezse yöntem `BILINMIYOR` kalır (kayıp yok) ve taşıyıcı kolona döndürülür (yeni migration).
+
+### 8.2 Granülarite VERİDEN türetilir
+
+| yazım | günlük |
+|---|---|
+| `pricing_rule`, `pricing_policy`, `price_lists`, `currency_rates` (UPDATE/DELETE; INSERT yalnız `source<>'tcmb'`) | satır başına, tam eski→yeni |
+| `product_prices`, `is_derived=false` (elle ezilmiş) | satır başına, **her yöntemde** (başlık susturamaz); `computed_at` diff'ten elenir |
+| `product_prices`, `is_derived=true` (motor çıktısı) | ifade düzeyinde **tenant başına TEK özet satırı** (`row_pk='OZET'`); `before`/`after` = DEĞİŞEN satırların eski→yeni dizisi (tavan 2000, `kirpildi=evet`); fiyat-otoritesi kolonlarından hiçbiri değişmediyse satır YAZILMAZ |
+
+Fiyat-otoritesi kolonları (ödeme tutarı `net/gross` yoksa diğerlerinden de üretilir): `net_price` · `gross_price` ·
+`base_price` · `sale_price` · `discount_percentage` · `valid_from` · `valid_until` · `is_active` · `currency` (+ `is_derived` satır ölçütünde).
+Bir yeniden hesap koşusu birden çok parti = birden çok özet satırıdır; koşuyu birleştiren anahtar `oturum=`'dur. "Tek özet" değil.
+
+### 8.3 Sınırlar, adıyla
+
+* İfade düzeyi tetikler satır tetiklerinden SONRA ateşlenir (özet için "webhook'tan önce yazılır" iddiası YOKTUR; atomiklik
+  nedeniyle zarar yok: biri düşerse ifade ve günlük birlikte geri alınır).
+* **Maliyet yolu kapsam dışı** (bkz. §7.2): `cost_in_base`/`purchase_rate_to_base` `products` UPDATE-OF süzgecinde yok.
+* Katalog betikleri (`scripts/icerik-hatti/*`) başlık göndermez → `BILINMIYOR`; sahibi katalog hattı (kod kapısı INV-FIYAT-GUNLUGU-1'de ratchet listesi).
+* TRUNCATE yine kapsam dışı (§7.2).

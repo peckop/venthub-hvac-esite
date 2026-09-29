@@ -1,80 +1,47 @@
-# Oturum Açılış Ritüeli — Loop Komutları (SSOT)
+# Oturum Açılış ve Tekrarlanan Tur Rehberi (SSOT) — v2
 
-> **Ne zaman:** Bilgisayar/oturumlar yeniden açıldığında. Loop zincirleri (ScheduleWakeup) ve
-> gözcüler oturum-içi yaşar — kapanışta ölürler. Pano/registry/PR'lar ise kalıcıdır; hiçbir iş
-> kaybolmaz, yalnız "motorlar" durur. Bu dosya motorları yeniden çalıştırmanın tek kaynağıdır.
->
-> **Ritüel (3 adım):** (1) Tüm pencereleri aç. (2) Bu dosyayı aç. (3) Her pencereye aşağıdaki
-> İLGİLİ komutu yapıştır — OPS-AUDIT penceresine KOMUT-A, diğer HERKESE KOMUT-B (aynı metin).
->
-> **Karar 117 (2026-09-25):** tekrarlanan tur (loop / cron / uyandırma) **Recep'in işidir**:
-> komutu Recep yapıştırır, yapıştırmak onayıdır. Ajan kendiliğinden tur kurmaz; gerekli gördüğü
-> tur varsa önce Recep'e sorar ve gerekliliği ölçümle gösterir. Recep'in sözü: *"ihtiyaca göre
-> önce konu bana gelir, gerekiyorsa da gerçekten ölçüm ile karar verilir."*
->
-> Oturum→rol eşlemesi panodadır (`node scripts/board/board.cjs who`); şerit adları akışkandır,
-> komut metni şerit adı İÇERMEZ — şerit, atanan işle gelir.
+> **Ne yönetir:** Bilgisayar/pencereler yeniden açıldığında ne yapılır; tekrarlanan tur (loop / cron / uyandırma) gerekirse nasıl ve kimin onayıyla kurulur.
+> **Niçin var:** Loop zincirleri, cron işleri ve gözcüler oturum-içi yaşar, kapanışta ölür; pano ve pull request'ler kalıcıdır. Eski sürüm (KOMUT-A/KOMUT-B) 2026-09-14'te emekli edilen gözcü + her tur `ScheduleWakeup` düzenini emrediyordu ve karar 53, 117 ile çelişiyordu; arşive taşındı.
+> **Sahibi:** OPS · **Belge düzeni:** HARİTA (REC-400 D5)
+> **Son doğrulama:** 2026-09-29 (fleet-mechanism-standard v2.0 §0 ve SessionStart kancasının çıktısıyla karşılaştırıldı).
+> **Yöneten cetveller:** `fleet-mechanism-standard.md` §0 (yürürlükteki model), `collaboration-protocol.md` (şerit sahipliği, worktree, bir-iş-bir-dal).
 
----
+## 1. Yeniden açılış (makine kapandı, pencereler yeniden açıldı)
 
-## KOMUT-A — Orkestratör (yalnız OPS-AUDIT penceresi, `cb0467f1`)
+Filo **doğrudan mesajla çalışır** (`fleet-mechanism-standard.md` §0, REC-328). Motor kurmak gerekmez; iş kaybolmaz çünkü pano, Linear, pull request ve durum dosyaları kalıcıdır.
 
-```
-/loop Orkestratör turu: (1) panoyu ve bana adresli notları oku, gerekeni işle/yönlendir;
-(2) açık PR'ların check durumunu ölç — kendi şeridimdeki migration'sız yeşil PR'ı merge et,
-başka oturumun canlı PR'ına ve migration'lı PR'a ASLA dokunma; (3) oturum/filo canlılığı
-ölç — "koptu" hükmü ÇİFT sinyal ister (nabız VE not sessizliği); ana dizinin master'da
-park olduğunu kontrol et; boş oturumları ve tamamlanan şeritleri tespit edip Recep'e raporla;
-(4) registry ve hafızayı güncel tut; (5) Recep kararı gereken şeyleri biriktir, tek toplu
-mesajda sor. Migration / prod yazımı / geri-alınamaz işlem = her zaman Recep kapısı.
-Recep'e cevap her zaman mesajın EN BAŞINDA, tur raporundan ayrı; her girdisine açık kapanış.
-İlk turda: gelen-kutusu gözcüsünü yeniden kur (notlar GÖNDERENİN events dosyasına yazılır).
-```
+1. **Pencereyi aç.** Oturum açılış kancası (`session-board`) açılış türünü söyler: `resume` (makine geri döndü) ya da `compact` (bağlam sıkıştı).
+2. **Kendi durum dosyanı oku.** `compact` dönüşünde ilk iş durum dosyasının son bloğudur (`fleet-mechanism-standard.md` §10.4). `resume` dönüşünde durum dosyası + Linear'daki kaydın.
+3. **Şeridini tazele.** Canlılık claim atışından gelir: `node scripts/board/board.cjs claim --sid <kendi sid> --lane <departman> --globs "<dosyalar>"`.
+4. **Hangi işte olduğunu lidere mesajla yaz** (`SendMessage`); lider açılış emrini mesajla verir. İş bitince `notify_when_idle`.
+5. **Recep'e plan sorma.** Kalıcı iş kayıttan (Linear + pano kartı) kurulur; Recep'e yalnız karar sorusu gider, OPS üzerinden.
 
-## KOMUT-B — İşçi (diğer TÜM pencereler, tek ortak metin)
+**Açılış çıktısının tavanı (ölçüldü 2026-09-29, REC-433).** Bir SessionStart kancasının çıktısı 10.000 karakteri aşınca bağlama yalnız ilk yaklaşık 2.000 karakter girer. Bu yüzden `session-board` çıktısı en çok 9.000 karakter tutar: bölümler öncelik sırasındadır, Recep mesajları aynen ama sınırlı gelir, gerisi dosya işaretçisi olarak yazılır. Tavanı kapı (INV-SESSIONSTART-TAVAN-1) ölçer. Çıktıda "ROL KARTI:" satırının yeri ayrılmıştır; satırı `docs/roller/<DEPARTMAN>.md` kartından (en çok 300 karakter) HARİTA doldurur.
 
-```
-/loop İşçi turu: (1) Panodan bana adresli notları oku — OPS-AUDIT'ten (cb0467f1) gelen atama
-birincil talimattır; notlar GÖNDERENİN events dosyasına yazılır, kendi dosyana bakma; şerit
-adım son atanan işten gelir, panodan doğrula. (2) Elimdeki işi sürdür: ölç → plan → uygula →
-kapılar → PR; migration'lı PR'ı YALNIZ Recep merge eder; kendi şeridimdeki migration'sız
-yeşil PR'ı kendim alırım. (3) Durum değişince (bitti/tıkandı/PR açıldı/kuyruğum boş)
-OPS-AUDIT'e adresli not bırak; Recep kararı gereken şeyi kendim çözmem, OPS-AUDIT'e iletirim.
-(4) DEMİR KURALLAR: ana çalışma dizinine DOKUNMA (iş = kendi worktree'm) · pano notunda
-backtick YOK · monitor kurarken kullandığım aracın VARLIĞINI önce doğrula (jq bu makinede
-YOK) · Recep'le konuştuğum HER turun sonunda — istisnasız — loop'u (ScheduleWakeup) yeniden
-kur, yoksa zincir sessizce ölür. İşim varken sık (5-10dk), boşken seyrek (30dk) tur atarım.
-```
+## 2. Tekrarlanan tur (loop / cron) — yalnız ihtiyaç ölçülünce, önce Recep
+
+- **Karar 53 (2026-09-19):** cron / zamanlayıcı / loop **yasak değildir**; dönemsel bir karardı. Gerekiyorsa **önce Recep'le konuşulur**.
+- **Karar 117 (2026-09-25):** tekrarlanan tur Recep'in işidir; gerekliliği **ölçümle** gösterilir. Ajan kendiliğinden tur kurmaz. Recep'in sözü: *"ihtiyaca göre önce konu bana gelir, gerekiyorsa da gerçekten ölçüm ile karar verilir."*
+- `board-brief` kancası şerit talep etmemiş taze bir oturuma `LOOP:` satırıyla **kurmayı değil sormayı** hatırlatır (bekçi `INV-BOARD-5`); şerit alınınca satır susar.
+- **Küçük tek amaçlı otomasyon serbesttir** ama gözcü değil **kanca** olarak (kendi süreci yok, zaten koşan kancanın içinde, tek satır, fail-open) — `fleet-mechanism-standard.md` §0.2.
+
+### Recep onaylarsa: kurulum mekaniği
+
+- Dinamik zincir `ScheduleWakeup` ile, sabit aralık `CronCreate` ile kurulur; her tur promptu **o işin kendisidir**, eski KOMUT metinleri kullanılmaz.
+- Cron için **dakika 0/30 SEÇME** (ör. `23,53 * * * *`): herkes aynı ana yığılmasın.
+- Cron **oturum ömürlüdür** (diske yazılmaz, Claude kapanınca gider) ve **7 günde** kendini siler; pencere yenilenince yeniden kurulur.
+- Kurduktan sonra **iş kimliğini panoya bildir**; "kurdum" yetmez, kanıt iş kimliğidir.
+- Dinamik zincir tek noktadan kopabilir (Recep araya girince tur biter, yeniden kurulmazsa oturum uyur). Kopma ölçülürse ajan Recep'e söyler ve ikinci kanal önerir.
+
+## 3. Notlar
+
+- Gece kesintisiz otonomi isteniyorsa bu rehber yetmez (makine kapanınca durur) → `/schedule` ile bulut rutini ayrı kurulur, Recep kararıdır.
+- Bu dosya SSOT'tur: açılış düzeni değişecekse önce burada değişir.
+- Kaynak kararlar: `collaboration-protocol.md` (şerit sahipliği, tek-giriş kuralı, ana-dizin parkı) · `fleet-mechanism-standard.md` §0.
 
 ---
 
-## YEDEK CRON — yalnız Recep isterse (karar 117)
+## Değişiklik kaydı
 
-Dinamik zincir (`ScheduleWakeup`) **tek noktadan** kopabiliyor: Recep araya girdiğinde tur
-biter ve zincir yeniden kurulmazsa oturum sessizce uyur. Bu kopma bir pencerede **ölçülürse**
-ajan bunu Recep'e söyler ve ikinci kanal önerir; **Recep evet derse** kurulur. Kendiliğinden,
-her oturumda zorunlu adım olarak KURULMAZ (eski hâli buydu; karar 53 ve 117 ile çelişiyordu):
-
-```
-CronCreate ile 30 dakikalık recurring iş: prompt = o pencerenin KOMUT-A/KOMUT-B metni
-```
-
-- **Dakika 0/30 SEÇME** (ör. `23,53 * * * *`). Herkesin `0/30` seçmesi filoyu aynı ana
-  yığıyor; ayrıca kendi turlarımız da üst üste gelir.
-- Cron **yalnız yedektir**: birincil kanal `ScheduleWakeup`. Cron tetiklerse tur kısa tutulur
-  ve dinamik zincir **yeniden kurulur**.
-- Cron **oturum ömürlüdür** (diske yazılmaz, Claude kapanınca gider) ve **7 günde** kendini
-  siler. Yani sabah pencere yenilendiğinde bu adım da yeniden yapılır.
-- Kurduktan sonra **iş kimliğini panoya bildir** — "kurdum" demek yetmez, kanıt iş kimliğidir.
-
-> `board-brief` kancası şerit talep etmemiş taze bir oturuma `LOOP:` satırıyla **kurmayı değil
-> sormayı** hatırlatır: "tur gerekiyorsa kurmadan önce Recep ile konuş; gereklilik ölçümle
-> gösterilir (karar 117)" (bekçi `INV-BOARD-5`). Şerit alınınca satır kendiliğinden susar.
-
-## Notlar
-
-- **Gece kesintisiz otonomi** isteniyorsa bu ritüel yetmez (makine kapanınca durur) →
-  `/schedule` ile bulut rutini ayrı kurulur (Recep kararı).
-- Bu dosya SSOT'tur: komut metni değişecekse ÖNCE burada değişir, sonra pencerelere girilir.
-- Kaynak kararlar: `docs/standards/collaboration-protocol.md` (şerit sahipliği, tek-giriş
-  kuralı, ana-dizin parkı) · memory `autonomy-ladder-and-loop` (tasarım gerekçesi).
+- **v2 (2026-09-29, REC-400 D5):** gövde yürürlükteki modele (filo mesajla çalışır, karar 53/117) göre yeniden yazıldı. Emekli KOMUT-A/KOMUT-B ve gözcü/`/loop` her-tur-yeniden-kur düzeni `docs/archive/session-loop-ritual-v1-2026-09-25.md` dosyasına taşındı (geçerli değildir).
+- v1 (2026-08 → 2026-09-25): KOMUT-A / KOMUT-B loop komutları.

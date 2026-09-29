@@ -161,6 +161,39 @@ verir — kasıtlı: dolaylı seçenek modeli okunamaz kılar. Kapı ayrıca yal
 (`export const meta` içeren) ölçer; belgedeki örnekler evrenin dışındadır, çünkü belge koşmaz ve
 onu saymak kapıyı yalancı kırmızıya boğar.
 
+### 5.4 Pencereler Sonnet, denetim Opus (karar 168, Recep 2026-09-29)
+
+Kullanıcı ayarı `"model": "sonnet"` (pencereler Sonnet 5.5); OPS ve KONTROL rolleri Opus 5.5 kalır.
+Denetim/çürütme işleri Sonnet penceresinde de Opus'ta koşmalıdır. **Ölçüldü (09-29, transkriptte
+`modelUsage`, `claude -p` + gerçek ayarlar):**
+
+| Yol | Sonuç |
+|---|---|
+| Alt-ajan dosyasında `model: opus` (`.claude/agents/security-reviewer.md`) | **Çalışır** — Opus koştu |
+| Yetenek (SKILL.md) başlığında `model: opus` | **Çalışmaz** — üç denemede cevabı Sonnet verdi (belge "çalışır" diyor; bu sürümde etkisiz) |
+| Yetenek `context: fork` + `agent: denetim-opus` (Opus'lu ince kap) | **Çalışır** — Opus koştu; alt-ajan da alt-ajan açabildi |
+
+**Hüküm.** `security-reviewer` alt-ajanı `model: opus`. Beş denetim yeteneği — `plan-challenger`,
+`diff-review`, `venthub-auditor`, `venthub-enterprise-audit`, `venthub-20-eksen-denetimi` — başlıkta
+`context: fork` + `agent: denetim-opus` taşır (kap: `.claude/agents/denetim-opus.md`, `tools` alanı
+YOK = satır içi koşsaydı sahip olacağı araçların hepsi). Yalnız `.claude/` ağacı; `.agent/` ikiz ağacına
+dokunulmaz. Kapı: `src/__tests__/conformance/denetim-model-yonlendirme.test.ts`.
+
+**Bilinçli istisna: `verify-before-done` fork'a GİTMEZ.** Fork konuşma bağlamını görmez; bu yetenek ise
+"az önce ne yaptım, neyi doğruladım" sorusunu konuşmanın kendisinden cevaplar. Satır içi kalır ve
+pencerenin modelinde (Sonnet) koşar. Bunu değiştirmek yeteneği kör eder; kapı bu istisnanın bozulmasını
+da kırmızıya çevirir.
+
+**Bedel (dürüstçe):** fork'lu yetenek konuşmayı görmez, girdisini argümandan/dosyadan alır ve sonucu ana
+konuşmaya özet olarak döndürür; denetim çıktısı bir alt-ajan mesajı olur. Yetenek metni bu yüzden girdisini
+açıkça ister (hangi diff, hangi plan). Bulgu kaybı karşılaştırması (aynı girdiye satır içi ↔ fork)
+`diff-review` üzerinde yapıldı; kalan dördü aynı kalıptır ama tek tek karşılaştırılmadı.
+
+**AÇIK BORÇ (Ops 09-29):** `plan-challenger`, `venthub-auditor`, `venthub-enterprise-audit` ve
+`venthub-20-eksen-denetimi` için fork'lu koşumun bulgu eşdeğerliği ölçülmedi. Her birinin ilk GERÇEK
+kullanımında aynı girdiye satır içi ↔ fork bir kez yan yana koşulur, bulgu listesi kıyaslanır ve sonuç
+bu bölüme yazılır; bulgu kaybı çıkan yetenek fork'tan çıkarılır (Sonnet'te satır içi kalır).
+
 ---
 
 ## 6. Bilinen sınırlar (dürüstçe)
@@ -286,6 +319,42 @@ Kısa biçimde değişken bir gün tanımsız kalırsa yol `/.claude/...` olur v
 tamamı filo çapında sessizce düşer** — ekranda hiçbir şey değişmez. Geri düşmeli biçimde en kötü
 hâl **o günkü hâldir**. Dört karakterlik fark, §8.2 ile §8.3'ün aynı anda karşılığıdır; kabul
 ölçütü de ona göre yazıldı (değişken boşken çıkış 0 **ölçüldü**, varsayılmadı).
+
+---
+
+## 9. YOKLUK HÜKMÜ — "yok / bulunamadı / desteklemiyor" ölçüm ister (REC-417, Ops+Recep 2026-09-29)
+
+> **Niçin bu bölüm var (09-29 vakası):** WrongStack "Project Kit" için *"12 pakette hiçbirinde yok"*
+> hükmü verildi. Özellik ürünün GitHub ana dalında duruyordu (yalnız yayımlı 1.0.27 paketinde yoktu).
+> Sebep: **tek yöntem** (yayımlı paket metni grep'i) üç kez tekrarlandı — paket kümesi değişti, yöntem
+> değişmedi; ekrandaki **görünen adlarla** arandı (araç adı `project_kit_run`, klasör `project-kit`,
+> `kit.json` hiç aranmadı); ürünün deposu, `gitmcp` ve web araması elde olduğu hâlde ilk turda
+> kullanılmadı; son turda **desen büyük/küçük harf duyarlı ve alt çizgisizdi** (`project_kit_run`'ı
+> yakalayamazdı). Bir var-olanı yok saymak, var olanı yeniden yazdırır (§6.1'in beşinci vakası aynı
+> hata) ya da doğru aracı elemeye götürür.
+
+**Hüküm.** Olumsuz varlık hükmü ("yok", "bulunamadı", "desteklemiyor", "hiçbirinde") yazılırken **aynı
+cümlede ya da hemen altında** şunlar bulunur; biri eksikse hüküm "**bakılmadı / bilmiyorum**"dur:
+
+| # | Zorunlu alan | Örnek (Project Kit) |
+|---|---|---|
+| a | **Aranan kaynaklar** ve her biri için **bakılmayanlar** | yayımlı paketler: baktım; depo ana dalı: baktım; etiket: baktım; belge: baktım; web: bakmadım |
+| b | **Aranan terimler:** ekran/arayüz adı **+** araç/API adı **+** snake/kebab/camel varyantı **+** dosya/klasör adı | `Project Kit`, `project_kit_run`, `project-kit`, `ProjectKit`, `kit.json`, `temp-file-sweeper` |
+| c | **En az iki FARKLI yöntem** (aynı yöntemin tekrarı bir yöntem sayılır) | yayımlı paket içi grep **+** kaynak deposunda kod araması |
+| d | **Kapsam cümlenin içinde** | *"npm 1.0.27'de yok"* ≠ *"yok"*; *"ana dalda var, etiketli sürümde yok"* |
+| e | Yazılım-varlık sorusunda **önce kaynak deposu/belge, sonra paket** | paket = yayımlanmış kesit; ürün ondan önde olabilir |
+
+**Desen kuralı.** Metin aramasında büyük/küçük harf duyarsız ve ayırıcıya toleranslı desen kullanılır
+(`project[_. -]?kit`). Desen bir **pozitif kontrolle** doğrulanır: bilinen bir varlığı (ör. bilinen bir
+araç adı) aynı desen biçimiyle bulur mu? Bulamıyorsa desen kusurludur, hüküm verilmez.
+
+**"İki ölçüm aynı kör nokta" tuzağı.** İkinci yöntem birincinin **yön/kaynak farkı** taşımalıdır. Aynı
+kaynakta iki farklı desen, iki bağımsız ölçüm değildir.
+
+**Uyaran kontrol (ÖNERİ, uygulanmadı — Ops onayı ister):** rapor/denetim belgelerinde (`docs/audits/*.md`)
+`HİÇBİRİNDE YOK` / `BULUNAMADI` / `DESTEKLEMİYOR` diyen satırın komşu 5 satırında `Aranan kaynak:` ve
+`Aranan terim:` etiketi yoksa **yalnız uyaran** (bloklamayan) bir kontrol. Gürültü ve yalancı-kırmızı
+riski yüzünden bloklayan kapı olarak ÖNERİLMEZ; kararı Ops verir.
 
 ---
 

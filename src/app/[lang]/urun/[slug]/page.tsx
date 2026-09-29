@@ -32,8 +32,9 @@ type Params = { params: Promise<{ lang: string; slug: string }> }
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, slug } = await params
   if (!ADRES_SEMASI_K3B || lang !== 'tr') return {}
-  const { aileSlug } = await urunSegmentiniCoz(slug, 'tr')
-  return aileSayfasiUstVerisi(lang, aileSlug)
+  const { aileSlug, sunucuSku } = await urunSegmentiniCoz(slug, 'tr')
+  // Model adresinde kanonik o modelin adresi (REC-300 Faz 3d, plan §2).
+  return aileSayfasiUstVerisi(lang, aileSlug, sunucuSku)
 }
 
 export default async function Page({ params }: Params) {

@@ -1,6 +1,7 @@
 import type { Metadata, Route } from 'next'
 import { notFound, permanentRedirect } from 'next/navigation'
 
+import { ADRES_SEMASI_K3B } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
@@ -11,16 +12,19 @@ import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
+import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
   buildBreadcrumbJsonLd,
   buildProductGroupJsonLd,
   buildSeriesLandingJsonLd,
 } from '@/lib/seo/jsonld'
+import { adresUret } from '@/utils/adresUret'
 import { getCategoryDisplayName, getLocalizedCategorySlug, kategoriMetniniIndir } from '@/utils/categoryHelpers'
 import { aileMetniniIndir, dildekiMetin } from '@/utils/dilMetni'
 import { musteriyeGorunurAciklama } from '@/utils/icIngestNotu'
 import { Routes } from '@/utils/routes'
+import { adresDili, kategoriKirintiYolu } from '@/utils/yuzeyAdresleri'
 import SeriesLandingView from '@/views/category/SeriesLandingView'
 
 import { ProductDetailPage as PageComponent } from './ProductDetailPageView'
@@ -46,8 +50,36 @@ import { ProductDetailPage as PageComponent } from './ProductDetailPageView'
 // halkasına düşer, başka dile düşmez.
 const pickLang = dildekiMetin
 
+/**
+ * Aile/model sayfasının MUTLAK adresleri (canonical + hreflang + og:url) — REC-300 Faz 3d.
+ *
+ * KAPALI (bugün): `${SITE_URL}/<dil>${Routes.product(aile)}` — model sayfası yok, `?sku=` kanoniğe girmez.
+ * AÇIK (plan §2): aile → `adresUret(aile)`; model rotası (`sunucuSku` verilmiş) → modelin KENDİ adresi
+ * (her model kendi kanoniğidir; aile adresini kanonik ilan etmek 442 modeli dizinden düşürürdü).
+ * Faz 2 öncesi modelin slug metni aile slug'ıdır (rota modeli SKU'dan çözer).
+ */
+export function aileSayfasiAdresleri(
+  aileSlug: string,
+  sunucuSku: string | null = null,
+  bayrak: boolean = ADRES_SEMASI_K3B,
+): { tr: string; en: string } {
+  if (!bayrak) {
+    return { tr: `${SITE_URL}/tr${Routes.product(aileSlug)}`, en: `${SITE_URL}/en${Routes.product(aileSlug)}` }
+  }
+  const yol = (dil: 'tr' | 'en') =>
+    sunucuSku
+      ? adresUret({ tur: 'model', aileSlug, sku: sunucuSku, slug: aileSlug }, dil, true)
+      : adresUret({ tur: 'aile', slug: aileSlug }, dil, true)
+  return { tr: `${SITE_URL}${yol('tr')}`, en: `${SITE_URL}${yol('en')}` }
+}
+
 /** Aile sayfasının üst verisi (canonical, hreflang, OG). Hata sayfayı patlatmaz — sabit başlık döner. */
-export async function aileSayfasiUstVerisi(lang: string, slug: string): Promise<Metadata> {
+export async function aileSayfasiUstVerisi(
+  lang: string,
+  slug: string,
+  /** Model rotasının seçtiği SKU — K3-b açıkken kanonik o modelin adresi olur. */
+  sunucuSku: string | null = null,
+): Promise<Metadata> {
   preloadFamily(slug, lang)
 
   try {
@@ -68,9 +100,8 @@ export async function aileSayfasiUstVerisi(lang: string, slug: string): Promise<
       //
       // `Routes.product` + dil öneki bileşimi KASITLI: `sitemap.ts` de birebir aynı ifadeyi
       // kullanır, böylece iki yüzey aynı kaynaktan üretilir ve sessizce ayrışamaz.
-      // (REC-300 Faz 3d bu satırları `adresUret`'e bağlayacak — bayrak kapalıyken çıktı aynı.)
-      const trUrl = `${SITE_URL}/tr${Routes.product(family.slug)}`
-      const enUrl = `${SITE_URL}/en${Routes.product(family.slug)}`
+      // REC-300 Faz 3d: adresler `aileSayfasiAdresleri`'nden — bayrak kapalıyken bu ifadenin AYNISI.
+      const { tr: trUrl, en: enUrl } = aileSayfasiAdresleri(family.slug, sunucuSku)
       const canonicalUrl = lang === 'en' ? enUrl : trUrl
       // REC-108: sekme başlığı ve arama sonucu başlığı da dili bilir.
       const title = pickLang(family.meta_title, lang) || `${familyName(family, lang)} | VentHub`
@@ -91,11 +122,14 @@ export async function aileSayfasiUstVerisi(lang: string, slug: string): Promise<
         description,
         alternates: {
           canonical: canonicalUrl,
-          languages: {
-            tr: trUrl,
-            en: enUrl,
-            'x-default': trUrl,
-          },
+          // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+          ...hreflangAlani({
+            languages: {
+              tr: trUrl,
+              en: enUrl,
+              'x-default': trUrl,
+            },
+          }),
         },
         openGraph: {
           title,
@@ -245,9 +279,10 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
           baseUrl: SITE_URL,
           steps: [
             { name: t('category.breadcrumbHome'), path: '/' },
-            ...(mainName && mainSlug ? [{ name: mainName, path: Routes.category(mainSlug) }] : []),
+            // REC-300 Faz 3d: yol `kategoriKirintiYolu`'ndan — kapalıyken bugünkü `Routes.category`.
+            ...(mainName && mainSlug ? [{ name: mainName, path: kategoriKirintiYolu(mainSlug, null, adresDili(lang)) }] : []),
             ...(subName && subSlug && mainSlug && subSlug !== mainSlug
-              ? [{ name: subName, path: Routes.category(mainSlug, subSlug) }]
+              ? [{ name: subName, path: kategoriKirintiYolu(mainSlug, subSlug, adresDili(lang)) }]
               : []),
             // Bulunulan sayfa: path NULL olmak ZORUNDA (helper sözleşmesi).
             { name: gorunenAileAdi, path: null },

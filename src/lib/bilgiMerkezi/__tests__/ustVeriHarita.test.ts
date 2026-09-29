@@ -1,4 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+// hreflang yalnız `EN_YAYIN` açıkken yazılır (REC-300 3e-3): bu dosya hreflang ŞEKLİNİ ölçer → bayrak AÇIK
+// taklit edilir. KAPALI hâl: `src/lib/seo/__tests__/enYayinHreflangNoindex.test.ts`.
+vi.mock('@/config/features', async (orijinal) => ({
+  ...(await orijinal<typeof import('@/config/features')>()),
+  EN_YAYIN: true,
+}))
 
 import { SITE_URL } from '../../../config/siteUrl'
 import { YAZILAR } from '../../../data/bilgiMerkezi/yazilar'

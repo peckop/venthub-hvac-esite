@@ -43,19 +43,23 @@ HVAC sektörüne özel, B2B/B2C karma satış mimarisi üzerine kurulu premium e
 
 ---
 
-## 🦾 PROJE BELGE MERKEZİ (SCADA BİLGİ KÜTÜPHANESİ)
+## 📚 PROJE BELGELERİ
 
-VentHub sistemine ait tüm işletim, mimari ve otonom kurallar **5 Ciltlik Master Kitaplık** altında birleştirilmiştir. Geliştiriciler ve yapay zeka ajanları için tek geçerli referans noktaları bunlardır:
+**Geçerli belgelerin tek giriş haritası: [`docs/README.md`](docs/README.md)** (hangi soru → hangi cetvel/harita) ve ajanlar için kurallar: [`CLAUDE.md`](CLAUDE.md). Belge yazım ve tazelik düzeni: [`docs/standards/belge-yonetimi-standard.md`](docs/standards/belge-yonetimi-standard.md).
 
-1. 🧭 **[CİLT 1: Manifesto & Canlı Görev Durumu (PULSE)](file:///c:/Users/alize/venthub-hvac/.archive/legacy_ciltler/01_manifesto_and_pulse.md)**
+### Arşiv — 5 Ciltlik eski Master Kitaplık (TARİHSEL, geçerli referans DEĞİL)
+
+Aşağıdaki cilt dosyaları eski dönemin birleştirilmiş kayıtlarıdır (`.archive/` altında, dondurulmuş). İçerikleri güncel kurallarla çelişebilir; güncel kural için yukarıdaki haritaya bakın. Yalnız tarihsel bağlam için:
+
+1. 🧭 **[CİLT 1: Manifesto & Canlı Görev Durumu (PULSE)](.archive/legacy_ciltler/01_manifesto_and_pulse.md)**
    * Proje vizyonu, hesaplayıcı mantığı, kullanıcı profilleri ve `PULSE.md` canlı görev yönlendirmesi.
-2. 🏗️ **[CİLT 2: Mimari Tasarım & Premium UI Standartları](file:///c:/Users/alize/venthub-hvac/.archive/legacy_ciltler/02_architecture_and_design.md)**
+2. 🏗️ **[CİLT 2: Mimari Tasarım & Premium UI Standartları](.archive/legacy_ciltler/02_architecture_and_design.md)**
    * Next.js 15 SSR veri akışı, Supabase tiplemeleri, Slot Mimarisi (Anakart-Yuva) ve Typography/Design Scale.
-3. 🦾 **[CİLT 3: AI Otonom Çalışma ve Operasyon Protokolleri](file:///c:/Users/alize/venthub-hvac/.archive/legacy_ciltler/03_ai_operating_protocols.md)**
+3. 🦾 **[CİLT 3: AI Otonom Çalışma ve Operasyon Protokolleri](.archive/legacy_ciltler/03_ai_operating_protocols.md)**
    * AI anayasaları (Gemini/Agents/Claude), No-Plan-No-Code kuralları, Q-Validator V8 Otonom Motor iş akışları ve Model Context Protocol (MCP) aletleri.
-4. 🚀 **[CİLT 4: Altyapı, Dağıtım ve Emniyet Protokolleri](file:///c:/Users/alize/venthub-hvac/.archive/legacy_ciltler/04_operations_and_deployment.md)**
+4. 🚀 **[CİLT 4: Altyapı, Dağıtım ve Emniyet Protokolleri](.archive/legacy_ciltler/04_operations_and_deployment.md)**
    * CI/CD adımları, Vercel yapılandırması, Supabase Advisor emniyet tedbirleri ve Night Shift yönergeleri.
-5. 🌡️ **[CİLT 5: HVAC Domain Bilgisi, Entegrasyonlar ve Yerelleştirme](file:///c:/Users/alize/venthub-hvac/.archive/legacy_ciltler/05_domain_knowledge.md)**
+5. 🌡️ **[CİLT 5: HVAC Domain Bilgisi, Entegrasyonlar ve Yerelleştirme](.archive/legacy_ciltler/05_domain_knowledge.md)**
    * HVAC mühendislik hesaplama standartları (EN/ASHRAE), WhatsApp stok uyarıları, Resend e-posta şablonları ve SEO/i18n sözlüğü.
 
 ---

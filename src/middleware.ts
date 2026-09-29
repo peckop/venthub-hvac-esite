@@ -148,7 +148,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Redirects Column 1: UUID → Slug SEO canonicalization ──
-  if (effectiveSegments.length === 2 && effectiveSegments[0] === 'products') {
+  // REC-300 Faz 3 madde 6 (REC-289): K3-b açıkken bu dal ATLANIR — Edge'de DB sorgusu yasak (kural 12);
+  // UUID'yi sayfa katmanı çözer (`resolveProductRoute` 0. adım → modelin adresine tek 308).
+  // Kapalıyken (bugün) davranış aynen.
+  if (!ADRES_SEMASI_K3B && effectiveSegments.length === 2 && effectiveSegments[0] === 'products') {
     const identifier = effectiveSegments[1]
 
     if (UUID_REGEX.test(identifier)) {

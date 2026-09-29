@@ -33,7 +33,8 @@ const { execFileSync } = require('child_process')
 const PANO = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
 const ONBELLEK = path.join(PANO, '.belge-tazelik-onbellek.json')
 
-const CEKIRDEK = ['CLAUDE.md', 'docs/README.md', 'CONTEXT.md', 'docs/DURUM-TAKIP.md']
+// CONTEXT.md ve docs/DURUM-TAKIP.md 2026-09-29'da emekli edildi (yerinde yönlendirme sayfası): çekirdek değiller.
+const CEKIRDEK = ['CLAUDE.md', 'docs/README.md']
 const HARITALAR = ['CLAUDE.md', 'docs/README.md']
 const CETVEL_DIZINI = 'docs/standards'
 const GRAF = 'graphify-out/graph.json'
@@ -196,8 +197,14 @@ const TABAN_YOLU = 'scripts/belge/belge-tazelik-taban.json'
 
 function tabanOku(kok) {
   const p = path.join(kok, TABAN_YOLU)
-  if (!fs.existsSync(p)) return { kirikYol: {}, cetvelAlanEksik: [] }
-  return JSON.parse(fs.readFileSync(p, 'utf8'))
+  if (!fs.existsSync(p)) return { kirikYol: {}, cetvelAlanEksik: [], cetvelSahipEksik: [], cetvelDogrulamaEksik: [] }
+  const t = JSON.parse(fs.readFileSync(p, 'utf8'))
+  // Eski biçimli taban (yalnız cetvelAlanEksik) okunursa iki yeni liste boş sayılmaz: birleşimden başlar.
+  return {
+    ...t,
+    cetvelSahipEksik: t.cetvelSahipEksik ?? t.cetvelAlanEksik ?? [],
+    cetvelDogrulamaEksik: t.cetvelDogrulamaEksik ?? t.cetvelAlanEksik ?? [],
+  }
 }
 
 function olc(kok = depoKoku(), simdi = Date.now()) {
@@ -216,6 +223,11 @@ function olc(kok = depoKoku(), simdi = Date.now()) {
     kirikYeni,
     cetvel: {
       toplam: basliklar.length,
+      // İKİ AYRI ölçü (REC-433 3.4): sahip eksik ile doğrulama eksik farklı işlerdir. Sahip, rol kartlarından
+      // türetilebilir (mekanik); "Son doğrulama" ise içerik gerçekle karşılaştırılınca yazılır (insan/ajan işi)
+      // ve toplu doldurulamaz. `alanEksik` (ikisinin birleşimi) eski tüketiciler için kalır.
+      sahipEksik: basliklar.filter((b) => !b.sahip).map((b) => b.dosya),
+      dogrulamaEksik: basliklar.filter((b) => !b.sonDogrulama).map((b) => b.dosya),
       alanEksik: basliklar.filter((b) => !b.sahip || !b.sonDogrulama).map((b) => b.dosya),
     },
     grafGun: grafYasi(kok, simdi),
@@ -240,7 +252,12 @@ if (require.main === module) {
   const rapor = olc()
   if (process.argv.includes('--taban-yaz')) {
     const kok = depoKoku()
-    const taban = { kirikYol: {}, cetvelAlanEksik: rapor.cetvel.alanEksik }
+    const taban = {
+      kirikYol: {},
+      cetvelAlanEksik: rapor.cetvel.alanEksik,
+      cetvelSahipEksik: rapor.cetvel.sahipEksik,
+      cetvelDogrulamaEksik: rapor.cetvel.dogrulamaEksik,
+    }
     for (const k of rapor.kirikYol) if (k.kirik.length) taban.kirikYol[k.belge] = k.kirik
     fs.writeFileSync(path.join(kok, TABAN_YOLU), JSON.stringify(taban, null, 2) + '\n')
   }
