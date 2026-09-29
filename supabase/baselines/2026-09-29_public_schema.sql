@@ -2480,6 +2480,39 @@ CREATE OR REPLACE FUNCTION "public"."handle_supabase_webhook"() RETURNS "trigger
 ALTER FUNCTION "public"."handle_supabase_webhook"() OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."iade_istemci_kayit_bekcisi"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO 'public', 'pg_temp'
+    AS $$
+begin
+  if current_user in ('service_role', 'postgres', 'supabase_admin') or public.is_admin_claim() then
+    return new;
+  end if;
+
+  if tg_op = 'UPDATE' then
+    raise exception 'REC355_BEKCI: iade kaydi istemciden guncellenemez' using errcode = '42501';
+  end if;
+
+  if new.status is distinct from 'requested'
+     or new.refund_amount is not null
+     or new.admin_notes is not null
+     or new.approved_at is not null
+     or new.processed_at is not null
+     or new.completed_at is not null then
+    raise exception 'REC355_BEKCI: iade talebinde yonetici alani yazilamaz' using errcode = '42501';
+  end if;
+
+  new.requested_at := now();
+  new.created_at := now();
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."iade_istemci_kayit_bekcisi"() OWNER TO "postgres";
+
+
 CREATE OR REPLACE FUNCTION "public"."increment_coupon_usage"("p_code" "text") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'pg_catalog', 'public'
@@ -2640,6 +2673,24 @@ ALTER FUNCTION "public"."is_user_admin"("user_id" "uuid") OWNER TO "postgres";
 
 COMMENT ON FUNCTION "public"."is_user_admin"("user_id" "uuid") IS 'Kullanıcının admin olup olmadığını kontrol eder';
 
+
+
+CREATE OR REPLACE FUNCTION "public"."istemci_yazma_bekcisi"() RETURNS "trigger"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO 'public', 'pg_temp'
+    AS $$
+begin
+  if current_user not in ('service_role', 'postgres', 'supabase_admin')
+     and not public.is_admin_claim() then
+    raise exception 'REC355_BEKCI: % tablosuna istemciden yazilamaz', tg_table_name
+      using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."istemci_yazma_bekcisi"() OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."jwt_price_segment"() RETURNS "text"
@@ -6892,6 +6943,10 @@ CREATE OR REPLACE TRIGGER "denetim_izi_site_settings" AFTER INSERT OR DELETE OR 
 
 
 
+CREATE OR REPLACE TRIGGER "iade_istemci_kayit_bekcisi" BEFORE INSERT OR UPDATE ON "public"."venthub_returns" FOR EACH ROW EXECUTE FUNCTION "public"."iade_istemci_kayit_bekcisi"();
+
+
+
 CREATE OR REPLACE TRIGGER "on_brands_change" AFTER INSERT OR DELETE OR UPDATE ON "public"."brands" FOR EACH ROW EXECUTE FUNCTION "public"."handle_supabase_webhook"();
 
 
@@ -6925,6 +6980,14 @@ CREATE OR REPLACE TRIGGER "on_product_prices_upd" AFTER UPDATE ON "public"."prod
 
 
 CREATE OR REPLACE TRIGGER "on_products_change" AFTER INSERT OR DELETE OR UPDATE ON "public"."products" FOR EACH ROW EXECUTE FUNCTION "public"."handle_supabase_webhook"();
+
+
+
+CREATE OR REPLACE TRIGGER "order_items_istemci_yazma_bekcisi" BEFORE INSERT OR UPDATE ON "public"."venthub_order_items" FOR EACH ROW EXECUTE FUNCTION "public"."istemci_yazma_bekcisi"();
+
+
+
+CREATE OR REPLACE TRIGGER "orders_istemci_yazma_bekcisi" BEFORE INSERT OR UPDATE ON "public"."venthub_orders" FOR EACH ROW EXECUTE FUNCTION "public"."istemci_yazma_bekcisi"();
 
 
 
@@ -9634,7 +9697,6 @@ GRANT ALL ON FUNCTION "public"."enforce_role_change"() TO "service_role";
 
 
 
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE "public"."venthub_orders" TO "anon";
 GRANT ALL ON TABLE "public"."venthub_orders" TO "authenticated";
 GRANT ALL ON TABLE "public"."venthub_orders" TO "service_role";
 
@@ -9728,6 +9790,11 @@ GRANT ALL ON FUNCTION "public"."handle_supabase_webhook"() TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "public"."iade_istemci_kayit_bekcisi"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."iade_istemci_kayit_bekcisi"() TO "service_role";
+
+
+
 REVOKE ALL ON FUNCTION "public"."increment_coupon_usage"("p_code" "text") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."increment_coupon_usage"("p_code" "text") TO "service_role";
 
@@ -9766,6 +9833,11 @@ GRANT ALL ON FUNCTION "public"."is_staff_user"() TO "authenticated";
 REVOKE ALL ON FUNCTION "public"."is_user_admin"("user_id" "uuid") FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."is_user_admin"("user_id" "uuid") TO "service_role";
 GRANT ALL ON FUNCTION "public"."is_user_admin"("user_id" "uuid") TO "authenticated";
+
+
+
+REVOKE ALL ON FUNCTION "public"."istemci_yazma_bekcisi"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."istemci_yazma_bekcisi"() TO "service_role";
 
 
 
@@ -10125,7 +10197,6 @@ GRANT SELECT ON TABLE "public"."inventory_summary" TO "service_role";
 
 
 
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE "public"."venthub_order_items" TO "anon";
 GRANT ALL ON TABLE "public"."venthub_order_items" TO "authenticated";
 GRANT ALL ON TABLE "public"."venthub_order_items" TO "service_role";
 
@@ -10475,7 +10546,6 @@ GRANT UPDATE("accepted_revision_no") ON TABLE "public"."venthub_quotes" TO "auth
 
 
 
-GRANT INSERT,REFERENCES,DELETE,TRIGGER,TRUNCATE,MAINTAIN,UPDATE ON TABLE "public"."venthub_returns" TO "anon";
 GRANT ALL ON TABLE "public"."venthub_returns" TO "authenticated";
 GRANT ALL ON TABLE "public"."venthub_returns" TO "service_role";
 

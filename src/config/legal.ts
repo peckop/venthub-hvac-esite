@@ -202,6 +202,42 @@ export function hasUnfilledLegalPlaceholders(config: LegalConfig = legalConfig):
 }
 
 /**
+ * SATIŞ AÇIKKEN DOLU OLMASI ZORUNLU SATICI ALANLARI (REC-168 B, OPS 2026-09-29).
+ *
+ * NİÇİN AYRI LİSTE: `unfilledLegalFields` TÜM alanları sayar (retention, IYS, VERBİS…); satış anahtarı
+ * açıldığında ödeme adımını tutması gereken küme daha dardır — müşterinin sipariş anında görmesi/ilişki
+ * kurması zorunlu olan satıcı kimliği, tebligat/iletişim ve iade-kargo alanları (Mesafeli Sözleşmeler
+ * Yönetmeliği ön bilgilendirme). Diğer alanlar (ETBİS, İYS, VERBİS…) hukukçu teyidinin
+ * (`legalReviewCompleted`) konusudur; bu liste onun YERİNE geçmez.
+ *
+ * Yeni bir alan satışı tutacaksa BURAYA eklenir; kapı (`src/lib/kip/odemeKapisi.ts`) ve testi (INV-SATIS-KIPI-6)
+ * listeden okur, kendi içinde alan adı taşımaz.
+ */
+export const SATIS_ICIN_ZORUNLU_SATICI_ALANLARI = [
+  'sellerTitle',
+  'sellerAddress',
+  'sellerEmail',
+  'sellerPhone',
+  'kepAddress',
+  'taxOffice',
+  'taxNumber',
+  'mersis',
+  'returnAddress',
+  'cargoCompanies',
+] as const satisfies readonly (keyof LegalSellerInfo)[]
+
+/**
+ * Satış için zorunlu satıcı alanlarından EKSİK olanların adları. Eksik = yer tutucu (`[X]`), boş ya da
+ * yalnız boşluk. Boş dönerse satıcı bilgisi ödeme adımı için hazırdır.
+ */
+export function satisIcinEksikSaticiAlanlari(config: LegalConfig = legalConfig): string[] {
+  return SATIS_ICIN_ZORUNLU_SATICI_ALANLARI.filter((alan) => {
+    const deger: unknown = config[alan]
+    return typeof deger !== 'string' || deger.trim() === '' || PLACEHOLDER_PATTERN.test(deger.trim())
+  })
+}
+
+/**
  * Hukuki metinler yayına hazır mı?
  * İKİ koşul birden: (1) tüm alanlar doldurulmuş, (2) hukukçu teyidi alınmış.
  * Sayfalardaki taslak uyarı bandı bu değere bağlıdır.
@@ -209,5 +245,31 @@ export function hasUnfilledLegalPlaceholders(config: LegalConfig = legalConfig):
 export function isLegalContentReady(config: LegalConfig = legalConfig): boolean {
   return config.legalReviewCompleted && !hasUnfilledLegalPlaceholders(config)
 }
+
+/**
+ * GÖRÜNÜM METNİ: doldurulmamış alan ziyaretçiye ham `[SATICI_UNVAN]` olarak DEĞİL, bu cümleyle gösterilir
+ * (OPS hükmü 2026-09-29: müşteriye görünen kusur = onarım). Taslak uyarı bandı (`isLegalContentReady`) olduğu gibi
+ * kalır; sayı/süre gibi dolu alanlara DOKUNULMAZ (yalnız tamamı köşeli parantezli metin alanları değişir).
+ */
+const YER_TUTUCU_GORUNUM_METNI = {
+  tr: 'Şirket bilgileri kuruluşla eklenecek',
+  en: 'Company details will be added upon incorporation',
+} as const
+
+function gorunumHaline(config: LegalConfig, dil: keyof typeof YER_TUTUCU_GORUNUM_METNI): LegalConfig {
+  const kopya: Record<string, unknown> = { ...config }
+  for (const [alan, deger] of Object.entries(kopya)) {
+    if (typeof deger === 'string' && PLACEHOLDER_PATTERN.test(deger)) kopya[alan] = YER_TUTUCU_GORUNUM_METNI[dil]
+  }
+  return kopya as unknown as LegalConfig
+}
+
+/**
+ * Hukuki METİN bileşenlerinin okuduğu TEK nesne çifti (TR / EN). Bileşenler `legalConfig` (ham, yer tutuculu) ya da
+ * `legalConfigEn` DEĞİL bunları import eder; ham nesne yalnız kapılar (`unfilledLegalFields`, `satisIcinEksikSaticiAlanlari`)
+ * içindir. Bunu atlayan bileşeni INV-LEGAL-GORUNUM-1 kırmızı yakalar.
+ */
+export const legalGorunumTr: LegalConfig = gorunumHaline(legalConfig, 'tr')
+export const legalGorunumEn: LegalConfig = gorunumHaline(legalConfigEn, 'en')
 
 export default legalConfig

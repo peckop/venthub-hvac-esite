@@ -97,7 +97,7 @@ Taramadaki yanlışların kaynağı buydu; bu yüzden en çok bu kural önemlidi
 |---|---|---|
 | Çekirdek belge (`CLAUDE.md`, `docs/README.md`, `CONTEXT.md`, `docs/DURUM-TAKIP.md`) | son doğrulama yaşı (alan yoksa vekil: son commit tarihi; satırda "vekil" yazılır) | 14 gün |
 | Tek giriş haritası + `CLAUDE.md` | gösterdiği yollardan olmayan | ≥1 |
-| Hafıza indeksi (`MEMORY.md`) | bayt / 16384 | ≥15800 (mevcut yumuşak eşik) |
+| Hafıza indeksi (`MEMORY.md`) | satır / 200 **ya da** bayt / ~25.000 (hangisi önce dolarsa; 2026-09-29 ölçüldü, REC-433 1.9) | ≥160 satır ya da ≥20.000 bayt (yumuşak); ≥200 satır ya da ≥25.000 bayt sert engel (hafiza-indeks-bekcisi) |
 | Kod haritaları (graphify, WrongStack dizini) | son üretimden bu yana gün | 7 gün |
 | Koruma kancaları | son 24 saatte açık kalan (fail-open) çağrı | ≥1 |
 

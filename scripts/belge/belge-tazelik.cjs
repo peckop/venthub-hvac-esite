@@ -18,8 +18,13 @@
  *   3. Cetvel başlık bloğu — docs/standards/*.md içinde `Sahibi` ve `Son doğrulama` alanı (B7.2).
  *   4. Kod haritası yaşı — graphify-out/graph.json değiştirilme zamanı (üretilmiş, .gitignore).
  *
- * ÖLÇÜLMEYENLER (v1, bilerek): MEMORY.md baytı (depo dışı; hafiza-indeks-bekcisi ölçüyor) ve
- * kanca fail-open sayısı. Çıktıda OLCULMEDI olarak görünürler — ölçülemedi, geçti demek değildir.
+ *   5. Hafıza indeksi (`MEMORY.md`) satır ve bayt — depo dışı; yol VENTHUB_MEMORY_INDEX ortam
+ *      değişkeninden, yoksa Claude Code proje klasöründen (~/.claude/projects/<yol-adı>/memory) bulunur.
+ *      Sınırlar 2026-09-29'da ölçüldü (REC-433 1.9): 200 satır YA DA ~25.000 bayt; yumuşak 160 / 20.000.
+ *      Yol bulunamazsa sayı UYDURULMAZ: `olculmedi`de kalır.
+ *
+ * ÖLÇÜLMEYENLER (v1, bilerek): kanca fail-open sayısı. Çıktıda OLCULMEDI olarak görünür — ölçülemedi,
+ * geçti demek değildir.
  *
  * KULLANIM:
  *   node scripts/belge/belge-tazelik.cjs          → JSON rapor stdout'a
@@ -221,7 +226,58 @@ function tabanOku(kok) {
   }
 }
 
+/** REC-433 1.9 ölçümü + ARAÇ hafiza-indeks-bekcisi (#1521) ile aynı eşikler. */
+const HAFIZA_ESIK = { yumusakSatir: 160, yumusakBayt: 20000, sertSatir: 200, sertBayt: 25000 }
+
+/** Satır sayımı: sondaki satır sonu sayılmaz, boş dosya 0 (#1521 ile aynı). */
+function hafizaSay(metin) {
+  if (typeof metin !== 'string' || metin.length === 0) return { satir: 0, bayt: 0 }
+  const govde = metin.endsWith('\n') ? metin.slice(0, -1) : metin
+  return { satir: govde.split('\n').length, bayt: Buffer.byteLength(metin) }
+}
+
+/** 'tamam' | 'yumusak' | 'sert' — satır ya da bayt, hangisi önce dolarsa. */
+function hafizaDurumu({ satir, bayt }, esik = HAFIZA_ESIK) {
+  if (satir >= esik.sertSatir || bayt >= esik.sertBayt) return 'sert'
+  if (satir >= esik.yumusakSatir || bayt >= esik.yumusakBayt) return 'yumusak'
+  return 'tamam'
+}
+
+/**
+ * MEMORY.md yolu: önce VENTHUB_MEMORY_INDEX; yoksa ana çalışma ağacının Claude Code proje klasörü
+ * (yol adındaki `:` `\` `/` → `-`). Bulunamazsa null — sayı uydurulmaz.
+ */
+function hafizaIndeksYolu(kok, ortam = process.env, home = require('os').homedir()) {
+  if (ortam.VENTHUB_MEMORY_INDEX) return fs.existsSync(ortam.VENTHUB_MEMORY_INDEX) ? ortam.VENTHUB_MEMORY_INDEX : null
+  let ana = kok
+  try {
+    const ortak = execFileSync('git', ['-C', kok, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8' }).trim()
+    ana = path.dirname(ortak)
+  } catch {
+    /* git yok: kök kalır */
+  }
+  const ad = path.resolve(ana).replace(/[:\\/]/g, '-')
+  const adaylar = [ad, ad.charAt(0).toLowerCase() + ad.slice(1)]
+  for (const a of adaylar) {
+    const y = path.join(home, '.claude', 'projects', a, 'memory', 'MEMORY.md')
+    if (fs.existsSync(y)) return y
+  }
+  return null
+}
+
+function hafizaIndeksi(kok, ortam = process.env, home) {
+  const yol = hafizaIndeksYolu(kok, ortam, home)
+  if (!yol) return null
+  try {
+    const sayi = hafizaSay(fs.readFileSync(yol, 'utf8'))
+    return { ...sayi, durum: hafizaDurumu(sayi), yol }
+  } catch {
+    return null
+  }
+}
+
 function olc(kok = depoKoku(), simdi = Date.now()) {
+  const hafiza = hafizaIndeksi(kok)
   const basliklar = cetvelBasliklari(kok)
   const kirik = kirikYollar(kok)
   const taban = tabanOku(kok)
@@ -245,7 +301,8 @@ function olc(kok = depoKoku(), simdi = Date.now()) {
       alanEksik: basliklar.filter((b) => !b.sahip || !b.sonDogrulama).map((b) => b.dosya),
     },
     grafGun: grafYasi(kok, simdi),
-    olculmedi: ['MEMORY.md bayt', 'kanca fail-open'],
+    hafizaIndeksi: hafiza,
+    olculmedi: [...(hafiza ? [] : ['MEMORY.md satır/bayt']), 'kanca fail-open'],
   }
 }
 
@@ -259,6 +316,11 @@ module.exports = {
   cekirdekYaslari,
   cetvelBasliklari,
   tabanOku,
+  hafizaSay,
+  hafizaDurumu,
+  hafizaIndeksYolu,
+  hafizaIndeksi,
+  HAFIZA_ESIK,
   olc,
   ONBELLEK,
   TABAN_YOLU,
