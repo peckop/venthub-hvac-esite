@@ -4,7 +4,6 @@ import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-// @ts-expect-error — .mjs betik modülü, tip bildirimi yok
 import { yayinKapisi } from '../../../../scripts/seo/yayin-kapisi.mjs'
 
 /**
@@ -18,6 +17,7 @@ describe('REC-405 · toplu IndexNow yayın kapısı', () => {
   it('bayrak KAPALI → izin yok, sebep K4/164 A yazılı', () => {
     const k = yayinKapisi('export const ADRES_SEMASI_K3B = false\n')
     expect(k.izin).toBe(false)
+    if (k.izin) return // tip daraltma: yukarıdaki beklenti zaten düşürür
     expect(k.sebep).toContain('ADRES_SEMASI_K3B')
     expect(k.sebep).toContain('K4')
   })
