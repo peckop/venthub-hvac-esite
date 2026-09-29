@@ -66,6 +66,7 @@
 | Depoda **hangi araçlar var** (kanca, betik, skill, CI, cetvel), kimin, canlı mı, ölü aday nasıl sayılır? | `standards/arac-envanteri-standard.md` → envanter `audits/arac-envanteri-<tarih>.md` (betik üretir) |
 | Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (TASLAK, karar 59) |
 | Belgeler **nasıl yazılır** (gövde/tarihçe, sahip), hangi bilgi **hangi katmanda** durur, belge bayatlığı **nasıl görünür**, doğru belge **ne zaman kendiliğinden gelir**? | `standards/belge-yonetimi-standard.md` (TASLAK, REC-400) |
+| e-Fatura/e-Arşiv, muhasebe, CRM/ERP, yönetici paneli, PIM ya da "satış olsa çalışır mı" **daha önce ölçüldü mü**? Ölçümü tekrarlamadan önce nereye bakılır? | `olcum/README.md` → konu başına defter (yeniden ölçme yalnız defterdeki tetikleyici oluşunca; sahip OPS) |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
 | Kuralların **31 maddelik gerekçeli tam listesi** (çekirdek 14 kural `CLAUDE.md`'de) | `standards/gelistirme-kurallari-tam-liste.md` (GEÇİCİ; REC-433 rol kartlarına dağıtılacak) |
 | Eski "uçtan uca referans" (mimari, DB, akışlar) | `../CONTEXT.md` **EMEKLİ (2026-09-29)** — yerinde yönlendirme sayfası; eski metin `archive/CONTEXT-2026-08-17.md` (tarihsel). Bugün: bu harita + `CLAUDE.md` |

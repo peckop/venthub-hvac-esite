@@ -162,7 +162,7 @@ function bolum(ad, oncelik, tam, ozet = '', daralt = null) {
  * Bölümleri EKLEME sırasıyla birleştirir. Tavan aşılırsa SIRAYLA:
  *  1) en önemsiz bölümler (öncelik ≥4: yöntem, pano, filo, notlar) işaretçiye çevrilir;
  *  2) hâlâ aşıyorsa `daralt`ı olan bölümler (durum + Recep sözü) taşma payı kadar ORANTILI daraltılır;
- *  3) hâlâ aşıyorsa eski davranış: kalan bölümler öncelik sırasıyla işaretçiye çevrilir.
+ *  3) hâlâ aşıyorsa: önce daraltılamayan bilgi satırları, EN SON durum + Recep sözü işaretçiye çevrilir.
  * (Ölçüldü 09-29 CI: durum 4.500 + döküm 3.600 en kötü durumda 9.000'i aşıyor ve eski sigorta Recep'in
  * sözünü BÜTÜNÜYLE işaretçiye çeviriyordu — 2. adım bunu önler.)
  */
@@ -183,7 +183,13 @@ function birlestir() {
       kullan[i] = bolumler[i].daralt(Math.max(0, kullan[i].length - pay)) || kullan[i]
     }
   }
-  for (const i of sira) {
+  // 3) Hâlâ aşıyorsa: ÖNCE daraltılamayan bilgi satırları (compact kolu, şerit, tazelik, posta…) işaretçiye, durum bloğu
+  //    ve Recep'in sözü (daralt'lı bölümler) EN SON. Eski sıra yalnız öncelik numarasına bakıyordu; ana ağaç bayatken
+  //    tazelik satırı uzayınca Recep'in sözü toptan düşüyordu (ortama bağlı, 09-29'da bir koşumda görüldü).
+  const sonSira = [...sira].sort(
+    (a, b) => (bolumler[a].daralt ? 1 : 0) - (bolumler[b].daralt ? 1 : 0) || bolumler[b].oncelik - bolumler[a].oncelik,
+  )
+  for (const i of sonSira) {
     if (topla() <= TOPLAM_TAVAN) break
     if (bolumler[i].oncelik === 0) continue
     kullan[i] = bolumler[i].ozet
@@ -225,8 +231,39 @@ function kisaPano(ozet) {
     .join('\n')
 }
 
-bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${source}\n` +
-  'ROL KARTI: (henuz yok — REC-433 rol kartlari gelince bu satirda gorunecek)\n')
+bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${source}\n`)
+
+/**
+ * ⭐ROL KARTI SATIRI (REC-433 Faz 1.2, Ops 09-29): pencere açılırken kendi rolünü, yetkisini ve sınırını
+ * bilsin — "hatırlayan pencereye" bağlı kalmasın. Kart HARİTA'nın üreticisinden (`scripts/belge/
+ * rol-karti-uret.cjs --ozet <ROL>`, tek satır ≤300 karakter; tam kart docs/roller/<ROL>.md) gelir.
+ * Rol = pano şeridi (claim), yoksa `CC_LANE` ortam değişkeni. FAIL-OPEN: üretici yok/rol yok/hata →
+ * satır yine basılır ("ROL KARTI:" her zaman görünür), ama bilgi yerine sebep yazılır; oturum bloklanmaz.
+ * Öncelik 0: asla işaretçiye çevrilmez (300 karakterlik tek satır bütçeyi zorlamaz).
+ */
+let rolSeridi = process.env.CC_LANE || ''
+function rolKartiSatiri(lane) {
+  const rol = String(lane || '').trim().toUpperCase()
+  if (!rol) return 'ROL KARTI: (bu oturumun seridi/rolu bilinmiyor — serit talep et ya da docs/roller/ altina bak)\n'
+  try {
+    // VH_ROL_KARTI_URETICI yalnız test içindir (kapı sahte üreticiyle koşar); üretimde ayarlı olmaz.
+    const uretici = process.env.VH_ROL_KARTI_URETICI ||
+      path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
+    if (!fs.existsSync(uretici)) return `ROL KARTI: ${rol} (kart uretici bu agacta yok — docs/roller/${rol}.md varsa oku)\n`
+    const ozet = execFileSync(process.execPath, [uretici, '--ozet', rol], {
+      encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'],
+    }).replace(/\s+/g, ' ').trim()
+    if (!ozet) return `ROL KARTI: ${rol} (bu rol icin kart yok — docs/roller/ altina bak)\n`
+    return `ROL KARTI: ${rol} — ${ozet} (tamami: docs/roller/${rol}.md)\n`
+  } catch (e) {
+    return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
+  }
+}
+/** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
+function rolBolumuEkle() {
+  const satir = rolKartiSatiri(rolSeridi)
+  bolumler.splice(1, 0, { ad: 'rol-karti', oncelik: 0, tam: satir, ozet: satir })
+}
 
 // RESUME UYANDIRMA REFLEKSI (Recep 08-22 onayi: yalniz otomatik uyandirma). Makine kapanip
 // acildiginda oturumlar 'resume' ile geri gelir ama gozcu/cron olabilir; ekip SAGIR acilir.
@@ -361,6 +398,7 @@ try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
+  if (mine && mine.lane) rolSeridi = mine.lane
 
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
@@ -457,13 +495,15 @@ bolum('yontem', 6,
 // POSTA KUTUSU SAYACI (karar 54, 2026-09-21): açılışta kutuya bakılmazsa kapalı pencereye
 // bırakılan mesaj yine kaybolur. 0 → satır yok; ölçülemezse "ölçülemedi" satırı (temiz sayılmaz).
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
-const yaz = () =>
+const yaz = () => {
+  rolBolumuEkle()
   process.stdout.write(JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'SessionStart',
       additionalContext: birlestir(),
     },
   }))
+}
 ;(async () => {
   try {
     const sayac = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'posta-kutusu-sayac.cjs'))
