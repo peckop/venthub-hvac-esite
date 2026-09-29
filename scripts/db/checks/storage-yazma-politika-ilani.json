@@ -1,0 +1,6 @@
+{
+  "olcut": "storage.objects üzerinde INSERT/UPDATE/DELETE/ALL komutlu, public/anon/authenticated rollerine açık ve ifadesi user_profiles / is_admin / jwt_tenant_id içermeyen politika = kapısız (scripts/db/checks/storage-yazma-nobetcisi.sql).",
+  "sinir": "Nöbetçi politikanın VARLIĞINI ve ifadesindeki kapı BELİRTECİNİ ölçer; koşulun gerçekten kısıtlayıcı olduğunu (ör. is_admin_user() çağrısının anon/müşteri için false döndüğünü) SQL ile statik kanıtlayamaz. Ayrıca gerçek Storage API'sinin ek kontrolleri (HTTP kodu, RETURNING kullanımı) ve kova düzeyi MIME/boyut sınırı (file_size_limit, allowed_mime_types) bu nöbetçinin kapsamı DIŞINDADIR. İlan edilen her kalem ELLE doğrulanmıştır; 'ilan edildi' otomatik 'güvenli' DEMEK DEĞİLDİR.",
+  "nicin_ilan_ve_mandal": "'Kapısız politika varsa kırmızı' yerine ilan + mandal: meşru ama belirteç içermeyen bir politika (ör. yalnız sahibine yazdıran) ilk gün sahte kırmızı verirse kapı güvenilmez olur. İlan edilmemiş her yeni kapısız politika kırmızıdır; ilanda olup canlıda artık bulunmayan kalem uyarı üretir (ilan bayatlamasın). Bugünkü ilan BOŞTUR: #1513 sonrası canlıda kapısız yazma politikası 0 (ölçüldü 2026-09-29).",
+  "ilan_edilen_politikalar": []
+}

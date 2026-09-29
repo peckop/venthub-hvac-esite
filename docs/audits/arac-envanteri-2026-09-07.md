@@ -448,6 +448,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/seo/yayin-kapisi.mjs` | Toplu IndexNow yayın kapısı — REC-405 / karar 164 A (OPS hükmü 09-29): `indexnow-bildir.mjs` toplu betiği adres şeması bayrağı kapalıyken reddeder | URUN | scripts/seo/indexnow-bildir.mjs (toplu betik), src/lib/seo/__tests__/indexnowBetikKapisi.test.ts | henüz koşmadı (2026-09-29 yazıldı) | src/lib/seo/__tests__/indexnowBetikKapisi.test.ts | KAL |
 | `scripts/belge/rol-karti-uret.cjs` | ROL KARTI ÜRETİCİ — REC-426 (talimat 09-28.2), tek plan REC-433 Faz 3'ün girdisi. | HARİTA | docs/README.md (rol kartı satırı); `node scripts/belge/rol-karti-uret.cjs --yaz` | 2026-09-29 yazıldı, yeşil | src/__tests__/conformance/rol-kartlari.test.ts (INV-ROL-1) | KAL |
 | `scripts/seo/__tests__/bot-karnesi-en-yayin.test.ts` | INV-BOT-KARNESI-EN-YAYIN-1 · bot karnesi EN_YAYIN bayrağını KAYNAKTAN okur; bayrak kapalıyken hreflang yokluğu bilinçli sayılır, belirsizse sayılmaz (REC-439) | ALTYAPI | vitest (`pnpm test`) | 2026-09-29 (7/7) | kendisi test (eski koda karşı sınandı) | KAL |
+| `scripts/db/checks/storage-yazma-nobetcisi.mjs` | INV-STORAGE-YAZMA-1 nöbetçisi — storage.objects'e KAPISIZ yazma politikası açılmasını yakalar (REC-442; canlı katalogdan okur, kardeşi anon-yazma-nobetcisi) | ALTYAPI | `.github/workflows/db-advisor.yml` (rls-role-coverage işi) | 2026-09-29 (canlıda 0 satır; eski tanımlarda 3 ihlal, 2 sabotaj yakalandı) | INV-STORAGE-YAZMA-1 (`storage-yazma-nobetcisi.test.ts`) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
