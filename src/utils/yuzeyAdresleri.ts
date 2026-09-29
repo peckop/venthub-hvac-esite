@@ -77,6 +77,29 @@ export function adresRotalari(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B
   }
 }
 
+/**
+ * `Routes.category` için ÜST KATEGORİYİ ve DİLE GÖRE slug'ı bilen yüzeyin argümanları (REC-403).
+ *
+ * NİÇİN VAR: `adresRotalari().category(slug)` AÇIK kipte tek slug'ı kök sayar (`/tr/kategori/<slug>`).
+ * Yüzey aslında bir DAL taşıyorsa (üstünü bilmeden) ya da kök slug'ı EN kanonik biçimde veriyorsa
+ * (TR sayfada `fans`), ziyaretçi hedefe doğrudan değil, sayfa katmanının 308'i üzerinden bir fazla
+ * sıçramayla varır (ölçüm 2026-09-29: TR'de çip `fans` → `/tr/kategori/fans` → 308 → `fanlar`).
+ *
+ * Kullanım: `const k = kategoriArgumanlari(…); Routes.category(k.slug, k.subSlug)`.
+ *
+ * ⭐KAPALIYKEN (bugün) `{ slug: bugunkuSlug }` döner: yüzeyin bugünkü tek slug çağrısı BİREBİR (yeni kod
+ * yolu yok; `subSlug` tanımsız = `Routes.category(slug)`). AÇIKKEN üst biliniyorsa `{ slug: üst,
+ * subSlug: dal }`, değilse `{ slug }`: kanonik adres, sıçramasız.
+ */
+export function kategoriArgumanlari(
+  bugunkuSlug: string,
+  tam: { slug: string; ustSlug?: string | null },
+  bayrak: boolean = ADRES_SEMASI_K3B,
+): { slug: string; subSlug?: string } {
+  if (!bayrak) return { slug: bugunkuSlug }
+  return tam.ustSlug && tam.ustSlug !== tam.slug ? { slug: tam.ustSlug, subSlug: tam.slug } : { slug: tam.slug }
+}
+
 /** Dile göre bölüm adları — yalnız yol DÖNÜŞTÜRMEK için (üretim `adresUret`'te). */
 const YENI_BOLUM: Record<AdresDili, { urunler: string; kategori: string; urun: string; marka: string }> = {
   tr: { urunler: 'urunler', kategori: 'kategori', urun: 'urun', marka: 'markalar' },
