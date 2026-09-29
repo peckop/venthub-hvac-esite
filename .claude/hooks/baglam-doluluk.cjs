@@ -126,7 +126,10 @@ const HAZIRLIK_NOTU =
   'Birinci madde: durum dosyam guncel mi (dosya adi + saat). ' +
   'Ikinci madde: yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir). ' +
   "Ucuncu madde: hukum, 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
-  'Compact yapilana kadar her cevapta kisaca tekrarla.'
+  'Compact yapilana kadar her cevapta kisaca tekrarla. ' +
+  "Listenin altina Recep'e su tek cumleyi de yaz: " +
+  '"Not: compact önce JEV ile yalnız araç çıktılarını temizler, konuşma sıkışmaz; uyarı kısa sürede yeniden gelebilir, bu normaldir. ' +
+  'Tam özet JEV kuralıyla sonra gelir." (kaynak hafıza: compact-jev-iki-asamali.md)'
 
 /** Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı. */
 function satir(token, pencere) {

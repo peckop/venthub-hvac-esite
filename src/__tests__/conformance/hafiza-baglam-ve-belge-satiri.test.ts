@@ -144,6 +144,12 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     // Recep 09-29 (iki kez): maddeler yan yana tek paragraf ve (a)(b)(c) etiketli YAZILMAZ. Talimat bunu ÖĞRETMEMELİ.
     expect(yakin, 'talimat etiketli (a)(b)(c) biçimi öğretiyor').not.toMatch(/\(a\)|\(b\)|\(c\)/)
     expect(yakin, 'talimat yan yana yazmayı yasaklamıyor').toMatch(/yan yana tek paragraf YOK/)
+    // Ops 09-29 (Recep: "compact konusunda genel bilgilendirme lazım"): duyuru YOK, bilgi kancanın kendisinde durur.
+    expect(yakin, 'compact bilgilendirme cümlesi (JEV iki aşamalı) satırda yok').toContain(
+      'compact önce JEV ile yalnız araç çıktılarını temizler, konuşma sıkışmaz',
+    )
+    expect(yakin).toContain('uyarı kısa sürede yeniden gelebilir, bu normaldir')
+    expect(bd.satir(499_999, 1_000_000), 'bilgilendirme yalnız COMPACT YAKIN satırında').not.toContain('JEV')
     expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT HAZIRLIK NOTU')
