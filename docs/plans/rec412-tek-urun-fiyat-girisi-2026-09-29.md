@@ -74,11 +74,13 @@ maliyete dayanır → panel moderatör için maliyet okumak zorunda kalırdı ve
 
 Geri alma: ürün kuralı silinir + o ürün yeniden hesaplanır (genel kurala döner); veri kaybı yok.
 
-## 5. Açık sorular (cevap OPS/Recep'te)
+## 5. Kararlar (OPS hükmü, 2026-09-29 — plan A KABUL)
 
-1. **Giriş KDV dahil mi hariç mi?** Önerim: **KDV dahil** (müşterinin PDP'de göreceği sayı; kural `price_is_vat_inclusive=true` saklanır).
-2. **Moderatör bu yolu kullanabilsin mi?** Önerim: kural yazma evet, vitrine yansıtma yönetici (DB yetkisiyle uyumlu). Alternatif: paneli yalnız admin'e açmak (daha basit, moderatör fiyat giremez).
-3. **Liste fiyatı (alış) girişi** bu işin dışında mı kalsın? Önerim: **evet**, katalog hattı (REC-383 / REC-140 Faz 3) ile birlikte ayrı kayıt.
+1. **Giriş KDV DAHİL.** Panel iki değeri yan yana gösterir: "KDV hariç ₺X · vitrinde ₺Y (ölçüldü)". Saklama cetveldeki gibi HARİÇ net (kural `price_is_vat_inclusive=true` ile girilir, çözücü net'e indirger).
+2. **Moderatör kural yazar, vitrine yansıtmayı admin yapar** (DB yetkisiyle uyumlu). Moderatör panelinde "yansıtma admin onayında" görünür; yeniden hesap düğmesi kapalı.
+3. **Liste fiyatı (alış) girişi bu işin DIŞINDA**, ayrı kayıt (karar 95 + REC-140 Faz 3 / REC-383 bağımlılığı).
+4. **Kod yazılırken plan-challenger önerisi (zorunlu değil, migration yok):** fiyat yazan kod ilk PR'da çalıştırılır, bulgular bu plana işlenir.
+5. **Canlı kanıt (Faz 3) prod veri yazımıdır = Recep kapısı;** o adıma gelince OPS üzerinden onaya götürülür.
 
 ## 6. Yan bulgu (kapsam dışı, kayıt önerisi)
 
