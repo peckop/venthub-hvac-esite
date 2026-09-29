@@ -239,14 +239,13 @@ browserslist zincirini tazeledi; denetim `GHSA-c83g-rgw3-j3cx` ve `GHSA-73wf-gq9
 "BAYAT KABUL" dedi (CI: yüksek/kritik 6, kabul 8, yeni 0). İki satır silindi, tavan 8 → 6.
 Kalan altısının hepsi `fast-uri` (webpack şema zinciri).
 
+⭐**2026-09-29 — ÜÇÜNCÜ KAPANIŞ, ALTYAPI eliyle (REC-424, karar 173):** kalan altı `fast-uri` kaydı,
+kilit dosyasında geçişli paket 3.1.2 → 3.1.8 yükseltilerek (4 satır, override yok) kapandı; bu arada
+yedinci bir kayıt (`GHSA-qw65-cvwx-89v3`, `fast-uri` <3.1.7) çıkmıştı, 3.1.8 onu da kapsıyor. Liste
+BOŞ, tavan 6 → 0. Yeni bir yüksek/kritik kayıt çıkarsa yine kabul değil önce kapatma denenir.
+
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
-| `GHSA-v2hh-gcrm-f6hx` | fast-uri | high | 2026-09-21 | webpack yapılandırma şeması ayrıştırır, kullanıcı URL'i değil | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-7p8r-x3mc-p8w7` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-f65p-4m7j-42xc` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-fph4-wmhf-6fwf` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-jqff-g426-hqxp` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
-| `GHSA-4c8g-83qw-93j6` | fast-uri | high | 2026-09-21 | aynı zincir | `@sentry/nextjs` 10.x (karar 17) |
 
 ## 8 · OVERRIDE KALDIRMA ŞARTI — karar 52
 
