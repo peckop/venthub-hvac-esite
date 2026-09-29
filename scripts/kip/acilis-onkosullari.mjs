@@ -221,7 +221,9 @@ async function olcEposta(ctx) {
 
 /**
  * K9: "müşteri e-postası GERÇEKTEN gidiyor" (OPS 09-29, ALTYAPI ölçümü: DNS eksiksiz görünse de Resend'de alanın Verified olduğu
- * ölçülmedi ve üç olay tablosu boş = bugüne dek hiç e-posta denenmemiş). K6 alan doğrulamasını, K9 GÖNDERİM KANITINI ölçer.
+ * ölçülmedi ve üç olay tablosu boş). ⚠OPS düzeltmesi: e-postalar gerçekte gidiyor olabilir (Recep'in Gmail'inde 09-24 teklif ve 09-26 iade
+ * e-postaları var) ama bu tablolar YAZILMIYOR olabilir; ALTYAPI kayıt boşluğunu ölçüyor (REC-368). Ölçüt ALTYAPI hükmüne kadar DEĞİŞMEZ
+ * ve bugün RET verir (doğru davranış: gönderim kanıtı henüz bu kaynaktan alınamıyor). K6 alan doğrulamasını, K9 GÖNDERİM KANITINI ölçer.
  * Ölçüt: son 30 günde en az bir satır; sipariş/teklif: `status='sent'` + `provider_message_id`; kargo tablosunda `status` kolonu YOK
  * (ölçüldü) → yalnız `provider_message_id` dolu satır. Ölçülemezse RET.
  */
@@ -238,7 +240,7 @@ async function olcEpostaGonderimKaniti(ctx) {
   const toplam = s.siparis + s.teklif + s.kargo
   return {
     gecti: toplam >= 1,
-    ayrinti: `son 30 gün gönderim kaydı: sipariş ${s.siparis} · teklif ${s.teklif} · kargo ${s.kargo}${toplam === 0 ? ' (hiç e-posta gitmemiş/denenmemiş)' : ''}`,
+    ayrinti: `son 30 gün gönderim kaydı: sipariş ${s.siparis} · teklif ${s.teklif} · kargo ${s.kargo}${toplam === 0 ? ' (kayıt YOK; e-posta gitmiş olabilir ama bu tablolara yazılmıyor olabilir: REC-368 kayıt boşluğunu ölçüyor)' : ''}`,
   }
 }
 
