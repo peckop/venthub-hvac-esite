@@ -65,7 +65,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       const yol = path.join(KOK, 'docs', 'roller', uretici.dosyaAdi(ad))
       expect(fs.existsSync(yol), `${yol} yok — node scripts/belge/rol-karti-uret.cjs --yaz`).toBe(true)
-      expect(fs.readFileSync(yol, 'utf8'), `${ad} kartı üreticiden sapmış`).toBe(metin)
+      // Windows'ta git satır sonunu CRLF'ye çevirebilir; içerik karşılaştırması satır sonundan bağımsız.
+      expect(fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n'), `${ad} kartı üreticiden sapmış`).toBe(metin)
     }
   })
 
