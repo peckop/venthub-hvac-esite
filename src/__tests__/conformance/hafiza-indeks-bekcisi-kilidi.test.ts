@@ -355,6 +355,7 @@ describe('REC-280 · hafıza indeksi bekçisi UYARI olarak kalıyor ve AYIRT ED�
     expect(s, 'yumuşak satır eşiği yok').toMatch(/MEMORY_YUMUSAK_ESIK_SATIR = 160/)
     expect(s, 'sert eşik metni yumuşak eşikle aynı şeyi söylüyor — okuyan aciliyeti ayırt edemez').toMatch(/OTOPSI/)
     expect(s).toMatch(/YUMUSAK esik/)
-    expect(/16384|15800/.test(s.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '')), 'eski yanlış eşik (16384/15800) kodda kalmış').toBe(false)
+    // Yorum sıyırmadan (şema-güvensiz sıyırıcı yasak, INV-SCRUB-1): eşik ATAMALARI aranır, yorum metni değil.
+    expect(/MEMORY_(YUMUSAK_)?ESIK_BAYT\s*=\s*(16384|15800)/.test(s), 'eski yanlış eşik (16384/15800) sabit olarak kalmış').toBe(false)
   })
 })
