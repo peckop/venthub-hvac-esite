@@ -2,6 +2,10 @@ name: CI
 
 on:
   pull_request:
+    # `edited` ŞART (karar 187): PR gövdesine `Fixes REC-nn` sonradan eklenince kayıt kapısı
+    # yeniden koşmalı; aksi halde yazar boş commit atmak zorunda kalır. Varsayılan tür listesi
+    # (opened, synchronize, reopened) korunur, yalnız `edited` eklenir.
+    types: [opened, synchronize, reopened, edited]
 # ⚠️ `push.branches` KASITEN yalnız master.
 # Eskiden `['**']` yazıyordu ve `pull_request` ile BİRLİKTE ateşliyordu: dal push'landığında
 # AYNI commit iki kez test ediliyordu (kontrol listesinde `ci` ve `admin-smoke`'un ikişer
@@ -115,6 +119,21 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
+
+      # Karar 187 (REC-433): her PR bir Linear kaydına bağlanır. Gövdede `Fixes REC-nn` ya da
+      # `Kayıtsız: <sebep>` yoksa KIRMIZI. Mantığı ve testi: scripts/board/pr-kayit-kapisi.cjs (ARAÇ).
+      # Yalnız pull_request olayında koşar (push/master ve elle koşumda PR gövdesi yoktur).
+      # Kurulumdan ÖNCE durur: bağımlılıksız, saniyeler sürer, boşuna 15 dakikalık kontrol koşturmaz.
+      # PR gövdesi ve yazar ORTAM DEĞİŞKENİ olarak geçer, `run:` satırına gömülmez (enjeksiyon).
+      # Yeni sır yok: LINEAR_API_KEY CI'da tanımlı değildir, çatı kontrolü "ölçülemedi" der, kırmızı yapmaz.
+      # Etiket yazan adım BİLEREK yok: zorunlu `ci` işine `pull-requests: write` vermek, PR'ın kendi
+      # kodunu koşturan işi gereksiz yetkilendirir. İstisnalar gövdedeki `Kayıtsız:` ifadesiyle sayılır.
+      - name: PR kayıt kapısı (karar 187)
+        if: github.event_name == 'pull_request'
+        env:
+          PR_GOVDE: ${{ github.event.pull_request.body }}
+          PR_YAZAR: ${{ github.event.pull_request.user.login }}
+        run: node scripts/board/pr-kayit-kapisi.cjs
 
       - name: Setup Deno
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
