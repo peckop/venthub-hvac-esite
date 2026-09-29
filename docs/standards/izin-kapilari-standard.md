@@ -24,8 +24,8 @@
 | S1 | Canlı veritabanına SQL ile yazma (execute_sql) + apply_migration / deploy_edge_function / dal işlemleri | `.claude/hooks/sql-yazma-kapisi.cjs` | `sql-yazma-kapisi.test.ts` | 09-28 `claude -p`, araç `--allowedTools` ile izinli: `select 1` → sonuç; `begin; create temp table …; rollback;` → kanca durdurdu, çağrı gitmedi | KAPALI |
 | S2 | `gh api` ile beş kapıyı dolanan yazma (merge, dal koruması, contents, git refs, sır, DELETE, depo ayarı, GraphQL mutation) | `.claude/hooks/gh-api-kapisi.cjs` | `gh-api-kapisi.test.ts` | 09-28 `claude -p` (`Bash(gh api *)` allow'da): `PUT pulls/999999/merge` → kanca durdurdu, GitHub'a gitmedi | KAPALI |
 | S3 | `.env` ailesine Bash ile yeni içerik yazma (Edit/Write tarafı `sensitive-path-guard` ile zaten kapalı) | `.claude/hooks/env-yazma-kapisi.cjs` | `env-yazma-kapisi.test.ts` | 09-28 `claude -p` (`--allowedTools Bash`): `echo DENEME=1 >> …/.env.local` → kanca durdurdu, dosya oluşmadı | KAPALI |
-| S4 | `git push --force-with-lease*` allow ↔ global deny çelişkisi | — (izin listesi) | — | Ölçüldü 09-28: allow proje `settings.json`'da (settings.local değil); global deny kazanır → satır ölü, "serbest" izlenimi veriyor. Silme denemesi otomatik güvenlik sınıflandırıcısınca reddedildi (ajanın kendi izin listesini değiştirmesi); Recep'e bırakıldı | AÇIK (Recep) |
-| S5 | global `ask` listesindeki eski `mcp__supabase__*` adları (bugünkü `mcp__claude_ai_Supabase__*` / `mcp__plugin_supabase_supabase__*` araçlarını tutmuyor) | S1 kancası bu araçları adından bağımsız yakalar | `sql-yazma-kapisi.test.ts` | Kanca canlı ölçüldü (S1). Global liste düzeltmesi depo dışı (`~/.claude/settings.json`), OPS onayıyla | KISMEN (kanca kapalı, liste düzeltmesi OPS'ta) |
+| S4 | `git push --force-with-lease*` allow ↔ global deny çelişkisi | — (izin listesi) | — | Ölçüldü 09-28: allow proje `settings.json`'da (settings.local değil); global deny kazanır → satır ölü, "serbest" izlenimi veriyor. ARAÇ'ın silme denemesi sınıflandırıcıca reddedildi (ajanın kendi izin listesi); Recep yetkisiyle OPS sildi: PR #1472 (0d5a3e2bf) | KAPALI |
+| S5 | global `ask` listesindeki eski `mcp__supabase__*` adları (bugünkü `mcp__claude_ai_Supabase__*` / `mcp__plugin_supabase_supabase__*` araçlarını tutmuyor) | S1 kancası bu araçları adından bağımsız yakalar | `sql-yazma-kapisi.test.ts` | Kanca canlı ölçüldü (S1). OPS 09-28 global `ask`'ı güncelledi (yedek `settings.json.s5-oncesi-2026-09-28`); 16:00'dan sonra okundu: altı ad da var (`mcp__claude_ai_Supabase__*` ×3 + `mcp__plugin_supabase_supabase__*` ×3) | KAPALI |
 
 ## S1 ayrıntı
 
@@ -76,3 +76,14 @@ depo sayılır. Şablondan (`.env.example` → `.env`) kopya yeni sır dosyasıd
 
 **Bilinen sınır:** dosyayı kendisi yazan araçlar (`vercel env pull .env.local`) yazma hedefi çıkarıcısında
 tanınmaz; kayıtlarda 1 kez görüldü. Kapsama alınması S3'ün devamıdır.
+
+## Onay sorusu biçimi: komut değil ETKİ (S1; Ops 09-28, Recep SQL okumaz)
+
+`sql-yazma-kapisi` onay sorusunun başına `.claude/hooks/sql-etki.cjs`'in Türkçe özetini koyar:
+`• <tablo> → SİL/GÜNCELLE/EKLE/YAPI … · <N> satır · <not>`. UPDATE/DELETE için aynı WHERE ile
+`select count(*)` KURU KOŞUMU Supabase Management API'nin `read_only: true` kipiyle yapılır (ölçüldü:
+bu kipte `create temp table` Postgres'çe reddedilir). Her sayım 5 sn, en çok 5 sayım. Sayılamayan her şey
+(FROM/USING bağlı yazma, INSERT … SELECT, CTE içi yazma, DO bloğu, fonksiyon çağrısı, API hatası) açıkça
+"ölçülemedi" yazar — sayı uydurulmaz. Koşulsuz UPDATE/DELETE "KOŞULSUZ — tablonun TAMAMI" uyarır.
+Canlı ölçüm 09-28 (`claude -p`): `update products … where brand='Vortice'` → "products → GÜNCELLE · 184
+satır · (değişen alan: updated_at)", veritabanına yazılmadı. Test: `sql-etki.test.ts`.
