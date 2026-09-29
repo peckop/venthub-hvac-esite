@@ -77,6 +77,10 @@ Başlık konvansiyonu: kimlik kodu baştaki köşeli parantezin İÇİNDE (`[ŞE
   - Birden fazla PR'lık iş, her biri tek PR'la biten **alt kayıtlara** bölünür; üst kayıt alt kayıtlar
     bitince Linear ayarıyla kendiliğinden kapanır.
   - Backlog'da 3 ay dokunulmayan kayıt kendiliğinden Canceled olur (geri açılabilir).
+  - **Çatı kaydına (alt kaydı olan kayda) asla `Fixes`/`Closes`/`Resolves` yazılmaz**: bu kelimeler o kaydı
+    birleşmede kapatır (2026-09-29'da REC-433 çatısı yanlışlıkla bu riske girdi, birleşmeden önce yakalandı).
+    Çatıya bağ `Part of REC-nn` (Linear'ın kapatmayan bağı) ile kurulur; alt kayıt açılamıyorsa
+    (Linear ücretsiz sınırı) PR gövdesine `Part of REC-nn` yazılır.
   - İstisna yalnız PR gövdesinde açık bir `Kayıtsız: <sebep>` satırıyla; sebepsiz istisna yoktur.
   - Kapı (Fixes ya da Kayıtsız yoksa uyarı) ARAÇ'ta yazılıyor.
   - Niçin: 2026-09-29 ölçümü, son 60 birleşmenin 0'ı `Fixes` taşıyordu; kayıtlar elle kapanmadığı için
