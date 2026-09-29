@@ -25,14 +25,19 @@ type Olcum = {
   cekirdek: { belge: string; tarih: string | null; kaynak: string; gun: number | null; yok?: boolean }[]
   kirikYol: KirikRapor[]
   kirikYeni: { belge: string; yol: string }[]
-  cetvel: { toplam: number; alanEksik: string[] }
+  cetvel: { toplam: number; alanEksik: string[]; sahipEksik: string[]; dogrulamaEksik: string[] }
 }
 type Modul = {
   yollariAyikla: (m: string) => Siniflar
   kirikYollar: (kok: string, belgeler?: string[]) => KirikRapor[]
   sonDogrulama: (m: string) => string | null
   basliktaSahipVar: (m: string) => boolean
-  tabanOku: (kok: string) => { kirikYol: Record<string, string[]>; cetvelAlanEksik: string[] }
+  tabanOku: (kok: string) => {
+    kirikYol: Record<string, string[]>
+    cetvelAlanEksik: string[]
+    cetvelSahipEksik: string[]
+    cetvelDogrulamaEksik: string[]
+  }
   olc: (kok?: string, simdi?: number) => Olcum
 }
 
@@ -140,6 +145,22 @@ describe('INV-BELGE-1 · gerçek depo mandalı', () => {
   it('taban bayat değil: tabandaki her cetvel hâlâ alan eksik', () => {
     const simdi = new Set(o.cetvel.alanEksik)
     for (const d of taban.cetvelAlanEksik) expect(simdi.has(d), `${d} alanları eklenmiş → tabandan çıkar`).toBe(true)
+  })
+
+  it('3.4: sahip eksik ve doğrulama eksik AYRI mandal — biri düzelince yalnız o tabandan çıkar', () => {
+    const sahipBilinen = new Set(taban.cetvelSahipEksik)
+    expect(o.cetvel.sahipEksik.filter((d) => !sahipBilinen.has(d)), 'yeni cetvel Sahibi alanı taşımıyor').toEqual([])
+    const dogrBilinen = new Set(taban.cetvelDogrulamaEksik)
+    expect(o.cetvel.dogrulamaEksik.filter((d) => !dogrBilinen.has(d)), 'yeni cetvel Son doğrulama taşımıyor').toEqual([])
+    const sahipSimdi = new Set(o.cetvel.sahipEksik)
+    for (const d of taban.cetvelSahipEksik) expect(sahipSimdi.has(d), `${d} Sahibi eklenmiş → cetvelSahipEksik tabanından çıkar`).toBe(true)
+    const dogrSimdi = new Set(o.cetvel.dogrulamaEksik)
+    for (const d of taban.cetvelDogrulamaEksik) expect(dogrSimdi.has(d), `${d} Son doğrulama eklenmiş → cetvelDogrulamaEksik tabanından çıkar`).toBe(true)
+  })
+
+  it('3.4: birleşim tutarlı — alanEksik = sahipEksik ∪ dogrulamaEksik', () => {
+    const birlesim = new Set([...o.cetvel.sahipEksik, ...o.cetvel.dogrulamaEksik])
+    expect(new Set(o.cetvel.alanEksik)).toEqual(birlesim)
   })
 
   it('iki çekirdek belge (CLAUDE.md, docs/README.md) ölçülüyor; emekli CONTEXT.md/DURUM-TAKIP.md ölçülmüyor', () => {
