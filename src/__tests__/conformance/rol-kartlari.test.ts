@@ -207,6 +207,15 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) expect(metin, ad).toContain('olgun kütüphane/sistem aranır (karar 181)')
   })
 
+  it('Recep mesaj biçimi her kartta: tek tablo + madde işaretli liste + 3 maddelik compact notu + Onayında yalnız Recep kararı', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('TEK TABLO ile başlar')
+      expect(metin, ad).toContain('madde işaretli liste olur')
+      expect(metin, ad).toContain('compact hazırlık notu 3 maddelik listedir')
+      expect(metin, ad).toContain('"Onayında" yalnız Recep kararı bekleyen iştir')
+    }
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
