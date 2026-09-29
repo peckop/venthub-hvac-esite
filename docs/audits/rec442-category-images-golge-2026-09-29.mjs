@@ -1,4 +1,5 @@
 // Yeniden koşum: geçici bir klasörde `npm i @electric-sql/pglite`, sonra `node <bu dosya> <migration yolu>`. Depoya bağımlılık EKLENMEZ.
+/* eslint-disable no-console -- CLI kanıt betiği: sonucu terminale yazması amaçtır (depoda çalışma zamanı kodu değildir) */
 // REC-442 alt işi — gölge kanıtı (bellek-içi PGlite). Ölçülen şey RLS KARARIDIR; gerçek Storage API'nin
 // ek kontrolleri (HTTP kodu, RETURNING kullanımı) simüle EDİLMEZ. Politikalar CANLIDAN üretilmiştir
 // (pg_get_expr çıktısı, 2026-09-29), elle yazılmamıştır.
