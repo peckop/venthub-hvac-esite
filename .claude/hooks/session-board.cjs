@@ -145,18 +145,44 @@ try {
  * `enjeksiyonKisa`), yani tipik çıktı tavanın çok altında kalır; koruma yalnız sigortadır.
  * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
  */
-const TOPLAM_TAVAN = 9000
+// VH_SESSIONSTART_TOPLAM_TEST yalnız kapı testindedir (daralma yolunu zorlar); üretimde ayarlı olmaz.
+const TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
 const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
+const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
 const bolumler = []
-/** oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır. */
-function bolum(ad, oncelik, tam, ozet = '') {
-  if (tam) bolumler.push({ ad, oncelik, tam, ozet })
+/**
+ * oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır.
+ * daralt(n): (isteğe bağlı) bölümü ~n karaktere DARALTAN işlev — durum bloğu ve Recep'in sözü için: bütçe
+ * aşılınca bunlar toptan işaretçiye çevrilmez, ORANTILI daralır (ajan kör kalmasın; Recep endişesi 09-29).
+ */
+function bolum(ad, oncelik, tam, ozet = '', daralt = null) {
+  if (tam) bolumler.push({ ad, oncelik, tam, ozet, daralt })
 }
-/** Bölümleri EKLEME sırasıyla birleştirir; tavanı aşarsa en önemsizden başlayarak işaretçiye çevirir. */
+/**
+ * Bölümleri EKLEME sırasıyla birleştirir. Tavan aşılırsa SIRAYLA:
+ *  1) en önemsiz bölümler (öncelik ≥4: yöntem, pano, filo, notlar) işaretçiye çevrilir;
+ *  2) hâlâ aşıyorsa `daralt`ı olan bölümler (durum + Recep sözü) taşma payı kadar ORANTILI daraltılır;
+ *  3) hâlâ aşıyorsa eski davranış: kalan bölümler öncelik sırasıyla işaretçiye çevrilir.
+ * (Ölçüldü 09-29 CI: durum 4.500 + döküm 3.600 en kötü durumda 9.000'i aşıyor ve eski sigorta Recep'in
+ * sözünü BÜTÜNÜYLE işaretçiye çeviriyordu — 2. adım bunu önler.)
+ */
 function birlestir() {
   const kullan = bolumler.map((b) => b.tam)
   const topla = () => kullan.reduce((n, m) => n + m.length, 0)
   const sira = bolumler.map((b, i) => i).sort((a, b) => bolumler[b].oncelik - bolumler[a].oncelik)
+  for (const i of sira) {
+    if (topla() <= TOPLAM_TAVAN) break
+    if (bolumler[i].oncelik >= 4) kullan[i] = bolumler[i].ozet
+  }
+  const asim = topla() - TOPLAM_TAVAN
+  if (asim > 0) {
+    const dar =sira.filter((i) => bolumler[i].daralt && bolumler[i].oncelik > 0 && kullan[i] === bolumler[i].tam)
+    const uzunluk = dar.reduce((n, i) => n + kullan[i].length, 0)
+    for (const i of dar) {
+      const pay = Math.ceil((asim * kullan[i].length) / uzunluk)
+      kullan[i] = bolumler[i].daralt(Math.max(0, kullan[i].length - pay)) || kullan[i]
+    }
+  }
   for (const i of sira) {
     if (topla() <= TOPLAM_TAVAN) break
     if (bolumler[i].oncelik === 0) continue
@@ -244,9 +270,13 @@ if (source === 'compact') {
     if (d) {
       const yasDk = Math.round((Date.now() - d.mt) / 60000)
       const baslik = `DURUM DOSYAN: ${d.ad} (${yasDk} dk once guncellenmis)\n`
-      bolum('durum', 2,
-        baslik + '--- SON BLOK ---\n' + kes(kapi.sonBlok(d.tam), DURUM_TAVAN, d.tam) + '\n--- SON BLOK BITTI ---\n',
-        baslik + `(son blok tavan yuzunden yok — okumadan is baslatma: ${d.tam})\n`)
+      const sonBlok = kapi.sonBlok(d.tam)
+      const durumMetni = (tavan) => baslik + '--- SON BLOK ---\n' + kes(sonBlok, tavan, d.tam) + '\n--- SON BLOK BITTI ---\n'
+      const durumTam = durumMetni(DURUM_TAVAN)
+      bolum('durum', 2, durumTam,
+        baslik + `(son blok tavan yuzunden yok — okumadan is baslatma: ${d.tam})\n`,
+        // Toplam tavan aşılırsa toptan işaretçi değil, taşma payı kadar daral (baş + son parça yine kalır).
+        (n) => durumMetni(Math.max(1200, Math.min(sonBlok.length, DURUM_TAVAN) - (durumTam.length - n))))
     } else {
       bolum('durum', 2,
         '⚠DURUM DOSYAN BULUNAMADI — compact oncesi yazilmamis demektir. Ne kaybettigini ' +
@@ -263,14 +293,18 @@ if (source === 'compact') {
     const dokum = require(path.join(__dirname, 'son-konusma-dokumu.cjs'))
     const proje = kapi.projeDiziniBul(sid, input.transcript_path)
     const memoryDir = proje && path.join(proje, 'memory')
-    const metin = memoryDir && dokum.enjeksiyonKisa(memoryDir, sid)
+    const dokumMetni = (tavan) => {
+      const m = memoryDir && dokum.enjeksiyonKisa(memoryDir, sid, { tavan })
+      return m ? '--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---\n' + m + '\n--- SON KONUSMA BITTI ---\n' : ''
+    }
+    const dokumTam = dokumMetni(DOKUM_TAVAN)
     bolum('son-konusma', 3,
-      metin
-        ? '--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---\n' + metin + '\n--- SON KONUSMA BITTI ---\n'
-        : '⚠son konusma dokumu YOK — PreCompact kancasi kosmamis olabilir; ozetle yetin, Recep sozunu ONA SOR.\n',
-      metin
+      dokumTam || '⚠son konusma dokumu YOK — PreCompact kancasi kosmamis olabilir; ozetle yetin, Recep sozunu ONA SOR.\n',
+      dokumTam
         ? `SON KONUSMA dokumu (Recep sozu AYNEN): ${dokum.dosyaYolu(memoryDir, sid)} — ilk is OKU.\n`
-        : '')
+        : '',
+      // Toplam tavan aşılırsa Recep'in sözü toptan işaretçiye çevrilmez: en eski mesajlar düşer, en yeniler AYNEN kalır.
+      dokumTam ? (n) => dokumMetni(Math.max(1000, DOKUM_TAVAN - (dokumTam.length - n))) : null)
   } catch (e) {
     bolum('son-konusma', 3, `⚠son konusma dokumu okunamadi (${(e && (e.code || e.message)) || 'bilinmeyen'}).\n`)
   }
