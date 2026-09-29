@@ -62,6 +62,22 @@ Sıra gerekçesi: 3e-1 tabloyla bugünkünü kilitler (güvenli taban); 3e-2/3e-
 * Merge YOK: bayrak `false` iken haritada model adresi görünmemeli; dilimler dalda hazır bekler, yayın günü paketine (tazeleme §4) bağlanır.
 * **Bu planın bilmediği:** (a) 8 ailenin EN adı gerçekten doldu mu, (b) GSC'nin hreflang+`noindex` çelişkisine tepkisi, (c) `updated_at` güvenilirliği — ölçüm listesi 4, 5, 6 bunları kapatır.
 
+## 5b. ÖLÇÜM SONUÇLARI (2026-09-29, salt okuma; madde 8 hariç) — planı DÜZELTİR
+
+| # | Ölçüm | Sonuç | Plana etkisi |
+|---|---|---|---|
+| 1 | Canlı sitemap | **87** adres (statik 9, bilgi merkezi 2, kategori 24, marka 5, aile 47); çift 0, `/en` 0, `x-default` 0; kod = canlı küme | Tazeleme belgesindeki "88" yanlıştı → **87** |
+| 1 | `lastmod` | 87'nin 61'i `new Date()` (statik, marka, aile); yalnız kategori ve bilgi merkezi gerçek damga | 3e-2'de model + aile için gerçek damga kaynağı seçilmeli |
+| 2 | Kategori kapsamı | Ürünsüz aktif kategori **0**; pasif 7 kategori canlıda **200 ve `noindex` DEĞİL** (haritada yok, dizine açık) | Ana plan O4 (pasif → 308) hâlâ açık iş; karar OPS'ta |
+| 3 | Model evreni | 442 = **441 aktif + 1 arşiv** (`SEA-61102010`); CSV 442 satır (arşiv dahil) | 3e-2 "442" → **441**; CSV'den arşiv satırı çıkar ya da fikstür 441 |
+| 4 | `updated_at` | Tetik var; toplu yazım kümeleri: 09-25 09:11Z tek dakikada 166 model (%37,6), aileler 09-23 08:17Z 20/47 (%42,6) | Model `lastModified = updated_at` haritaya "hepsi aynı gün" sinyali verir; damga kaynağı 3e-2'nin ilk sorusu |
+| 5 | hreflang | 85/85 karşılıklı; EN adres 85/85 HTTP 200; 2 bilgi merkezi adresinin EN karşılığı yok (istisna); üçlü (tr, en, x-default=TR) sitemap ile birebir | Karşılıklılık tam |
+| 5 | EN robots | 83 `noindex, follow`, **2 `index, follow`: `/en` ve `/en/products`** | 3e-3 kuralı "EN_YAYIN kapalıyken EN yok" bu iki sayfayı ele almalı (karar) |
+| 6 | hreflang riski | TR sayfa "EN karşılığım var" diyor; kategori/aile EN karşılığı `noindex`. GSC erişimi bu oturumda **YOK** | Google'ın tepkisi **ölçülemedi**: GEO-SEO ölçer |
+| 7 | Sözlük | TR/EN parite 2314/2314. EN'de **"Subcategories" ve "Sub-categories"** iki yazım (`CategoryHubOverlay:239`, `CategoryFilters:62`); seri/aile/alt-aile/sub-series katmanları tanımsız; **"dal" sözlükte YOK**; `productSeries`, `seriesCount`, `seriesEyebrow` doğrudan kullanılmıyor (ölü olabilir) | 3e-4 kapsamı somutlaştı |
+| 9 | IndexNow | Toplu betik = canlı sitemap `<loc>` (87, süzgeçsiz); süzgeçle **9 geçer / 78 düşer** (products 48, category 24, brands 6). Webhook yolu ayrı küme | **Toplu betik bayrak KAPALIYKEN koşarsa 78 adres K4'e aykırı** → yalnız bayrak açıldıktan sonra |
+| 8 | Build boyutu/süresi | **HENÜZ ÖLÇÜLMEDİ** (CI'dan ya da en sona) | — |
+
 ## 6. OPS'tan beklenen
 
 Sıra ve ölçüm listesi onayı. Karar isteyen soru yok; 3e-3'ün "hreflang `EN_YAYIN`'a bağlansın mı" sorusu ölçüm 5-6'nın sonucuyla OPS'a tek satırla gelir.
