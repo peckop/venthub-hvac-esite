@@ -27,9 +27,35 @@
  * ifadeyle ayrıştırılır (bağımlılık yok); JSON-LD şema doğrulaması değil yalnız JSON + @type ölçülür.
  * Çıkış kodu: ölçüm tamamlandıysa 0 (sorun bulunsa da), ağ/ayrıştırma hatası varsa 1.
  */
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+
+/**
+ * EN_YAYIN bayrağını KAYNAKTAN okur (src/config/features.ts) — betiğe sabit yazılmaz (REC-439).
+ * NİÇİN: bayrak kapalıyken site tek dillidir; hreflang beyanı BİLİNÇLİ yoktur (#1493). Betik bunu
+ * bilmediğinde canlı 45/45 adresi "HREFLANG-YOK" diye kırmızı saydı (yanlış alarm, 09-29 ölçümü).
+ * Bayrak elle betiğe kopyalansaydı EN_YAYIN açıldığında unutulur ve gerçek hreflang eksiği gizlenirdi.
+ * Okunamazsa `null` döner ve HİÇBİR şey bilinçli sayılmaz (belirsizlik kusuru gizlemez).
+ */
+function varsayilanYol() {
+  // import.meta.url her ortamda `file:` olmayabilir (test çalıştırıcı) → depo kökünden yedek yol.
+  try {
+    return fileURLToPath(new URL('../../src/config/features.ts', import.meta.url))
+  } catch {
+    return join(process.cwd(), 'src', 'config', 'features.ts')
+  }
+}
+export function enYayinOku(yol = varsayilanYol()) {
+  try {
+    const m = readFileSync(yol, 'utf8').match(/export\s+const\s+EN_YAYIN\s*=\s*(true|false)\b/)
+    return m ? m[1] === 'true' : null
+  } catch {
+    return null
+  }
+}
+const EN_YAYIN_ACIK = enYayinOku()
 
 const arg = (ad, varsayilan) => {
   const i = process.argv.indexOf(ad)
@@ -72,11 +98,15 @@ const INDEKSLENMEMELI = new Set(['sepet-hesap'])
  *  - EN_YAYIN=false (src/config/features.ts): /en ağacı `noindex, follow` (src/app/[lang]/layout.tsx).
  *  - Karar K17 (src/app/sitemap.ts): hesaplayıcıların kendi adresleri site haritasında YOK; kapı /urun-secici.
  */
-const BILINCLI = [
+export const bilincliKurallar = (enYayinAcik) => [
   { sinif: 'INDEKSE-KAPALI', kosul: (s) => s.son.startsWith('/en'), gerekce: 'EN_YAYIN kapalı' },
   { sinif: 'HARITADA-YOK', kosul: (s) => s.son.startsWith('/en'), gerekce: 'EN_YAYIN kapalı' },
   { sinif: 'HARITADA-YOK', kosul: (s) => s.tur === 'hesaplayici', gerekce: 'karar K17' },
+  // EN_YAYIN kapalı = tek dilli site: hiçbir sayfada hreflang BEKLENMEZ (#1493). Bayrak KAYNAKTAN okunur;
+  // okunamazsa (null) ya da açıksa kural devreye GİRMEZ ve hreflang eksiği kusur olarak kalır.
+  { sinif: 'HREFLANG-YOK', kosul: () => enYayinAcik === false, gerekce: 'EN_YAYIN kapalı: tek dilli site' },
 ]
+const BILINCLI = bilincliKurallar(EN_YAYIN_ACIK)
 /** Kendi <title>'ını yazmayan sayfanın aldığı layout varsayılanı (TR/EN). */
 const VARSAYILAN_BASLIK = /^VentHub — Premium HVAC (Çözümleri|Solutions)$/
 
