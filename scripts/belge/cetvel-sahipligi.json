@@ -285,6 +285,76 @@
       "sahip": "OPS",
       "dogrulanacak": false,
       "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+    },
+    "docs/standards/execution-method-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/subagent-delegation-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/hukum-kaynak-standard.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/mockup-gelisim-hatti-standardi.md": {
+      "sahip": "OPS",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/hafiza-kancalari-standard.md": {
+      "sahip": "ARAC",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/pano-orion-koprusu-standardi.md": {
+      "sahip": "ARAC",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/tasarim-yetenek-standard.md": {
+      "sahip": "ARAC",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/csp-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/checkout-payment-standard.md": {
+      "sahip": "ALTYAPI",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/canonical-url-standard.md": {
+      "sahip": "GEO-SEO",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir"
+    },
+    "docs/standards/commerce-domain-map-standard.md": {
+      "sahip": "ADMIN",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+    },
+    "docs/standards/category-taxonomy-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir"
+    },
+    "docs/standards/katalog-sayim-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir"
+    },
+    "docs/standards/product-image-standard.md": {
+      "sahip": "KATALOG",
+      "dogrulanacak": false,
+      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir"
     }
   }
 }

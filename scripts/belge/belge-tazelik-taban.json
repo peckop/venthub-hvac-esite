@@ -86,20 +86,7 @@
     "docs/standards/work-tracking-ssot-standard.md",
     "docs/standards/yayin-gorunurluk-denetim-standard.md"
   ],
-  "cetvelSahipEksik": [
-    "docs/standards/canonical-url-standard.md",
-    "docs/standards/category-taxonomy-standard.md",
-    "docs/standards/checkout-payment-standard.md",
-    "docs/standards/commerce-domain-map-standard.md",
-    "docs/standards/csp-standard.md",
-    "docs/standards/execution-method-standard.md",
-    "docs/standards/hafiza-kancalari-standard.md",
-    "docs/standards/hukum-kaynak-standard.md",
-    "docs/standards/katalog-sayim-standard.md",
-    "docs/standards/product-image-standard.md",
-    "docs/standards/subagent-delegation-standard.md",
-    "docs/standards/tasarim-yetenek-standard.md"
-  ],
+  "cetvelSahipEksik": [],
   "cetvelDogrulamaEksik": [
     "docs/standards/3d-scene-lighting-research.md",
     "docs/standards/3d-showroom-ux-research.md",
