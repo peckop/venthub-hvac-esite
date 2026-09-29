@@ -41,13 +41,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    */
   const locales = EN_YAYIN ? ['tr', 'en'] : ['tr']
 
-  // Fetch all categories, product families and per-category product counts
+  // Fetch all categories, product families and per-category product counts.
+  //
+  // HATA YUTULMAZ (REC-300 onarımı, OPS 2026-09-29): önceki `.catch(() => [])` build anındaki TEK geçici DB
+  // hatasını boş listeye çeviriyordu → ürünsüz/kategorisiz harita üretilir, Google'a o gider (CI koşusu
+  // 36548708171: kategori 24, ürün 0 ölçüldü). Artık hata build'i KIRAR; yeniden deneme ile örtülmez —
+  // Vercel önceki başarılı yayını tutar, bozuk harita canlıya çıkmaz. Servisler zaten `throw` eder.
   const [categories, familySlugs, countRes] = await Promise.all([
-    getCategories(supabaseStaticClient).catch(() => []),
-    getAllFamilySlugs(supabaseStaticClient).catch(() => []),
-    // Supabase builder reject etmez; hata {error} alanında döner — data ?? [] yeterli
+    getCategories(supabaseStaticClient),
+    getAllFamilySlugs(supabaseStaticClient),
+    // Supabase builder reject ETMEZ; hata {error} alanında döner — aşağıda AÇIKÇA fırlatılır.
     supabaseStaticClient.rpc('get_category_counts'),
   ])
+  if (countRes.error) throw new Error(`sitemap: get_category_counts başarısız — ${countRes.error.message}`)
+  // Hata olmadan BOŞ dönmek de ürünsüz haritadır (canlıda 24 kategori / 47 aile var; sıfır = veri kaybı).
+  if (categories.length === 0 || familySlugs.length === 0) {
+    throw new Error(
+      `sitemap: boş katalog (kategori ${categories.length}, aile ${familySlugs.length}) — ürünsüz harita üretilmez`,
+    )
+  }
 
   // Nav (CategoryContext) ile tutarlılık: yalnız ÜRÜNÜ OLAN kategoriler sitemap'e yazılır.
   // Boş iskele kategoriler (gelecekteki ürün ailesi için bilinçli oluşturulmuş) DB'de kalır
