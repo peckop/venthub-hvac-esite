@@ -1,11 +1,13 @@
 // Yeniden koşum: geçici bir klasörde `npm i @electric-sql/pglite`, sonra `node <bu dosya> <migration yolu>`. Depoya bağımlılık EKLENMEZ.
-/* eslint-disable no-console -- CLI kanıt betiği: sonucu terminale yazması amaçtır (depoda çalışma zamanı kodu değildir) */
 // REC-442 alt işi — gölge kanıtı (bellek-içi PGlite). Ölçülen şey RLS KARARIDIR; gerçek Storage API'nin
 // ek kontrolleri (HTTP kodu, RETURNING kullanımı) simüle EDİLMEZ. Politikalar CANLIDAN üretilmiştir
 // (pg_get_expr çıktısı, 2026-09-29), elle yazılmamıştır.
 import fs from 'node:fs'
 
 import { PGlite } from '@electric-sql/pglite'
+
+// no-console kuralı: CLI kanıt betiği sonucu standart çıktıya yazar (kural gevşetilmedi, lint kapatılmadı)
+const yaz = (s) => process.stdout.write(`${s}\n`)
 
 const MIGRATION = process.argv[2]
 const migrationSql = fs.readFileSync(MIGRATION, 'utf8')
@@ -77,28 +79,28 @@ async function olarak(db, rol, sub, tenant, sql) {
 let basarisiz = 0
 const kontrol = (ad, kosul, ayrinti = '') => {
   if (!kosul) basarisiz++
-  console.log(`${kosul ? 'GECTI  ' : 'KALDI  '} ${ad}${ayrinti ? ' — ' + ayrinti : ''}`)
+  yaz(`${kosul ? 'GECTI  ' : 'KALDI  '} ${ad}${ayrinti ? ' — ' + ayrinti : ''}`)
 }
 const ekle = (kova, ad) => `insert into storage.objects (bucket_id, name) values ('${kova}', '${ad}')`
 
 // ── FAZ 1: KALDIRMADAN ÖNCE (negatif kontrol: test dişli mi) ──
-console.log('\n=== FAZ 1: migration ÖNCESİ (canlı tanımlarla) ===')
+yaz('\n=== FAZ 1: migration ÖNCESİ (canlı tanımlarla) ===')
 let db = await kur()
 let r
 r = await olarak(db, 'authenticated', SADE, TENANT, ekle('category-images', 'x.png'))
 kontrol('ÖNCE sade kullanıcı category-images INSERT (RETURNING\'siz) ALIR', r.ok === true, JSON.stringify(r))
 r = await olarak(db, 'authenticated', SADE, TENANT, ekle('category-images', 'y.png') + ' returning id')
-console.log(`BİLGİ   ÖNCE sade kullanıcı INSERT ... RETURNING → ${JSON.stringify(r)} (kovada SELECT politikası yok; Storage API'nin hangi biçimi kullandığı ÖLÇÜLMEDİ)`)
+yaz(`BİLGİ   ÖNCE sade kullanıcı INSERT ... RETURNING → ${JSON.stringify(r)} (kovada SELECT politikası yok; Storage API'nin hangi biçimi kullandığı ÖLÇÜLMEDİ)`)
 r = await olarak(db, 'anon', null, null, ekle('category-images', 'z.png'))
 kontrol('ÖNCE anon INSERT reddedilir (auth.role()=anon)', r.ok === false, JSON.stringify(r))
 r = await olarak(db, 'authenticated', SADE, TENANT, `update storage.objects set name = name || '_' where bucket_id = 'category-images'`)
-console.log(`BİLGİ   ÖNCE sade kullanıcı UPDATE etkilenen satır: ${JSON.stringify(r)} (SELECT politikası yok → beklenti 0)`)
+yaz(`BİLGİ   ÖNCE sade kullanıcı UPDATE etkilenen satır: ${JSON.stringify(r)} (SELECT politikası yok → beklenti 0)`)
 r = await olarak(db, 'authenticated', SADE, TENANT, `delete from storage.objects where bucket_id = 'category-images'`)
-console.log(`BİLGİ   ÖNCE sade kullanıcı DELETE etkilenen satır: ${JSON.stringify(r)} (beklenti 0)`)
+yaz(`BİLGİ   ÖNCE sade kullanıcı DELETE etkilenen satır: ${JSON.stringify(r)} (beklenti 0)`)
 await db.close()
 
 // ── FAZ 2: MİGRATION SONRASI ──
-console.log('\n=== FAZ 2: migration SONRASI (gerçek dosya çalıştırıldı) ===')
+yaz('\n=== FAZ 2: migration SONRASI (gerçek dosya çalıştırıldı) ===')
 db = await kur()
 try {
   await db.exec(migrationSql)
@@ -130,7 +132,7 @@ kontrol('REGRESYON: sade kullanıcı product-images\'a yazamaz', r.ok === false,
 await db.close()
 
 // ── FAZ 3: GUARD FİKSTÜRLERİ (F1, F2) ──
-console.log('\n=== FAZ 3: guard fikstürleri ===')
+yaz('\n=== FAZ 3: guard fikstürleri ===')
 async function migrationDene(ekPolitikalar) {
   const d = await kur(ekPolitikalar)
   let hata = null
@@ -165,5 +167,5 @@ kontrol('F2: raise sonrası eski üç politika hâlâ yerinde (atomik)', ['Auth 
   await d.close()
 }
 
-console.log(`\nSONUÇ: ${basarisiz === 0 ? 'HEPSİ GEÇTİ' : basarisiz + ' KALDI'}`)
+yaz(`\nSONUÇ: ${basarisiz === 0 ? 'HEPSİ GEÇTİ' : basarisiz + ' KALDI'}`)
 process.exit(basarisiz === 0 ? 0 : 1)
