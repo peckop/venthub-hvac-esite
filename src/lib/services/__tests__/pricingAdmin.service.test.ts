@@ -7,6 +7,8 @@ import {
   coefficientToMarginPct,
   countProductsInScope,
   createPricingRule,
+  deletePricingRule,
+  deletePricingRules,
   distinctPurchaseCurrenciesInScope,
   marginPctToCoefficient,
   type ProductScopeRow,
@@ -320,6 +322,24 @@ describe('distinctPurchaseCurrenciesInScope', () => {
 })
 
 // ── Yazma payload disiplini ──────────────────────────────────────────────────
+
+describe('fiyat günlüğü yöntem başlığı (INV-FIYAT-GUNLUGU-1)', () => {
+  // DELETE isteği yük taşımaz; yöntem bilgisini YALNIZ başlık taşıyabilir. Bu yüzden dört yazma yolunun hepsi sınanır.
+  it('INSERT / UPDATE / DELETE / toplu DELETE: x-degisiklik-yontemi=panel gider, oturum başlığı yok', async () => {
+    const { supabase, calls } = stubClient({ pricing_rule: [{ id: 'r1' }] })
+    await createPricingRule(supabase, { scope: 4, method: 'cost_plus', margin_pct: 40, priority: 1 })
+    await updatePricingRule(supabase, 'r1', { margin_pct: 45 }, 'user-42')
+    await deletePricingRule(supabase, 'r1')
+    await deletePricingRules(supabase, ['r1', 'r2'])
+
+    const yazmalar = calls.filter((c) => c.method !== 'GET')
+    expect(yazmalar.map((c) => c.method)).toEqual(['POST', 'PATCH', 'DELETE', 'DELETE'])
+    for (const c of yazmalar) {
+      expect(c.headers['x-degisiklik-yontemi'], `${c.method} isteği yöntem başlığı taşımıyor`).toBe('panel')
+      expect(c.headers['x-degisiklik-oturumu']).toBeUndefined()
+    }
+  })
+})
 
 describe('createPricingRule / updatePricingRule payload disiplini', () => {
   it('INSERT: tenant_id GÖNDERİLMEZ (DB default jwt_tenant_id yazar)', async () => {
