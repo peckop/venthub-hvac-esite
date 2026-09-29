@@ -1,5 +1,7 @@
 ---
 name: diff-review
+context: fork
+agent: denetim-opus
 description: Git diff çıktılarını analiz ederek yıkıcı ve tehlikeli kod örüntülerini
   (pattern) tespit eder. Sadece kod değişikliklerini (git diff veya commit öncesi)
   incelemek için kullanın. Yeni git branch'i oluşturma, kod commit'leme veya genel

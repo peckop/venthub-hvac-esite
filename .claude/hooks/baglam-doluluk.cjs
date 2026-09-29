@@ -33,6 +33,12 @@
  * "⛔707k COMPACT YAKIN" bastı. Artık `system/compact_boundary` satırına varılınca yürüyüş durur:
  * sınırdan sonra cevap yoksa "compact sonrasi" denir. `compactMetadata.postTokens` KULLANILMAZ —
  * yalnız özet boyudur (ölçüm: post 45k, ilk cevap 126k); sistem istemi ve araçlar dahil değil.
+ *
+ * ── SIFIR KULLANIMLI KOPYA SATIRLAR (hata 09-28, ölçüldü) ──
+ *
+ * 09-28'den beri compact sınırından SONRA kayıtta eski cevapların kopyaları duruyor (bu oturumun
+ * son üç compact'inde 344 / 266 / 437 satır), hepsinin usage toplamı 0. Kanca bunlardan birini
+ * son cevap sanıp "BAGLAM: 0k" bastı; gerçek ~257k idi. Toplamı 0 olan satır ölçüm değildir.
  */
 const fs = require('fs')
 const os = require('os')
@@ -94,7 +100,9 @@ function sonBaglam(kayitYolu) {
     if (o && o.type === 'system' && o.subtype === 'compact_boundary' && !o.isSidechain) return COMPACT_SONRASI
     const u = o && o.message && o.message.usage
     if (o.type !== 'assistant' || o.isSidechain || !u) continue
-    return (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0)
+    const t = (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0)
+    if (t === 0) continue // compact sonrası kopya satır; ölçüm taşımaz (hata 09-28)
+    return t
   }
   return null
 }
