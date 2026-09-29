@@ -12,7 +12,7 @@ src/views/admin/**, src/components/admin/**, src/app/admin/**, src/hooks/useAdmi
 Admin arayüzü ve servis katmanı değişikliği (DI kuralı geçerli).
 
 ## Yasak ve sınır
-Admin işlemleri admin_audit_log'a yazılır; yetki kararı yalnız app_metadata'dan; canlı veri yazımı Recep kapısıdır.
+Admin işlemleri admin_audit_log'a yazılır; yetki kararı yalnız app_metadata'dan; canlı veri yazımı Recep kapısıdır. Genel arka ofis modülünü (stok, satınalma, CRM, teknik servis) genişletmek = önce OPS'a sor (karar 181).
 
 ## Yetenek ve araç
 i18n-conventions, useAdminTable kiti, vitest + axe.
@@ -36,6 +36,8 @@ CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: t
 ## Çalışma düzeni
 - Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).
 - Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.
-- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano.
+- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.
+- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano. Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.
 - Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.
+- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.
 - CLAUDE.md'deki 14 mutlak kural her role geçerlidir.

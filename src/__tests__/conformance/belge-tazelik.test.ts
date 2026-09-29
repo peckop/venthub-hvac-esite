@@ -158,6 +158,12 @@ describe('INV-BELGE-1 · başlık bloğu ayrıştırma', () => {
     expect(B.basliktaSahipVar(m)).toBe(true)
   })
 
+  it('3.4-B: kısa yazım `Sahip:` da sahip sayılır; alansız metin sayılmaz', () => {
+    expect(B.basliktaSahipVar('# X\n**Sahip:** ALTYAPI\n')).toBe(true)
+    expect(B.basliktaSahipVar('# X\nSahibi: ADMIN\n')).toBe(true)
+    expect(B.basliktaSahipVar('# X\nSahiplik konusu burada geçiyor ama alan değil\n')).toBe(false)
+  })
+
   it('SABOTAJ: 40. satırdan sonraki alan sayılmaz', () => {
     const m = '# X\n' + '\n'.repeat(45) + 'Sahibi: A\nSon doğrulama: 2026-09-27\n'
     expect(B.sonDogrulama(m)).toBeNull()

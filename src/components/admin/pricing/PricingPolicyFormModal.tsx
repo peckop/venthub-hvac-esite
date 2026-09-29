@@ -8,6 +8,7 @@ import { AdminModal } from '@/components/admin/overlay/AdminModal'
 import { useRole } from '@/hooks/useRole'
 import { useI18n } from '@/i18n/I18nProvider'
 import { AdminPermissionError, mutateWithAudit } from '@/lib/admin/mutateWithAudit'
+import { yontemli } from '@/lib/pricing/degisiklikYontemi'
 import { type FxLockFreezeDecision, resolveFxLockFreeze } from '@/lib/services/fxLockAdmin.service'
 import { supabaseBrowserClient } from '@/lib/supabase/client'
 import {
@@ -197,9 +198,10 @@ const PricingPolicyFormModal: React.FC<PricingPolicyFormModalProps> = ({
         after: payload,
         auditedByEdge: false,
         fn: async () => {
+          // Yöntem başlığı (fiyat günlüğü, INV-FIYAT-GUNLUGU-1): kilit formu = 'panel'.
           const { error } = value.id
-            ? await supabaseBrowserClient.from('pricing_policy').update(payload).eq('id', value.id)
-            : await supabaseBrowserClient.from('pricing_policy').insert(payload)
+            ? await yontemli(supabaseBrowserClient.from('pricing_policy').update(payload).eq('id', value.id), 'panel')
+            : await yontemli(supabaseBrowserClient.from('pricing_policy').insert(payload), 'panel')
           if (error) throw error
         },
       })
