@@ -160,6 +160,8 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     title: vm.displayName,
                     image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.webp',
                     categorySlug: vm.slug,
+                    // REC-403: çift tık adresi dile göre slug'la kurulur (`id` EN kanonik).
+                    urlSlug: getLocalizedCategorySlug(vm.raw, lang),
                     modelType: dbModelType || getModelTypeForCategory(vm.slug)
                 }
             })
@@ -173,12 +175,15 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     title: vm.displayName,
                     image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.webp',
                     categorySlug: vm.slug,
+                    // REC-403: dal tek slugla sıçrama yapardı; üstü (`activeMainUrlSlug`) ile tam nesne.
+                    urlSlug: getLocalizedCategorySlug(vm.raw, lang),
+                    parentSlug: activeMainUrlSlug ?? undefined,
                     modelType: dbModelType || getModelTypeForCategory(vm.slug)
                 }
             })
         }
         return []
-    }, [level, mainCategories, subcategories, categories])
+    }, [level, mainCategories, subcategories, categories, lang, activeMainUrlSlug])
 
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
