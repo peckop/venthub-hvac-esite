@@ -126,6 +126,15 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it('Çalışma düzeni bloğu her kartta bire bir aynı ve pano kanıt kuralını taşır (ARAÇ ölçümü: 62 kartın 45\'inde kanıt yok)', () => {
+    const blok = (m: string) => m.slice(m.indexOf('## Çalışma düzeni')).trimEnd()
+    const ilki = blok(Object.values(uretilen)[0])
+    expect(ilki).toContain('Pano kartı açılırken kanıt zorunlu')
+    expect(ilki).toContain('`command`')
+    expect(ilki).toContain('`file_matches`')
+    for (const [ad, metin] of Object.entries(uretilen)) expect(blok(metin), ad).toBe(ilki)
+  })
+
   it('İletişim bloğu: istisna yalnız OPS için, diğer dokuz kartta bire bir aynı', () => {
     expect(Object.keys(uretici.ILETISIM_ISTISNA)).toEqual(['OPS'])
     const blok = (m: string) => m.slice(m.indexOf('## İletişim'), m.indexOf('## Çalışma düzeni')).trimEnd()
