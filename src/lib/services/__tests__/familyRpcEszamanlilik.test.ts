@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
 
 import type { Database } from '../../../types/database.types'
-import { FAMILY_RPC_ESZAMANLI, getFamiliesEnriched } from '../family.service'
+import { FAMILY_RPC_ESZAMANLI, getFamiliesEnriched, getFamilyDetail } from '../family.service'
 
 /**
  * INV-FAMILY-RPC-ESZAMANLI-1 — `get_product_families_enriched` çağrıları süreç içinde SIRAYA alınır.
@@ -64,5 +64,57 @@ describe('INV-FAMILY-RPC-ESZAMANLI-1', () => {
     })
     const sonuc = await Promise.allSettled([1, 2, 3].map(() => getFamiliesEnriched(istemci)))
     expect(sonuc.map((s) => s.status)).toEqual(['rejected', 'fulfilled', 'fulfilled'])
+  })
+})
+
+/**
+ * INV-FAMILY-RPC-ESZAMANLI-2 — `get_family_detail` de AYNI sayacı paylaşır (REC-300, OPS onayı 2026-09-29).
+ * KORUDUĞU KUSUR: kırmızı CI koşusunda 57014 `getCachedFamilyDetail`'de düştü; detay RPC'si semaforsuzdu.
+ * Kapı: liste + detay çağrıları KARIŞIK eşzamanlı verilince TOPLAM tepe eşzamanlılık sınırı aşmaz
+ * (iki ayrı sayaç olsaydı tepe 2 olurdu → kırmızı).
+ */
+function karisikIstemci(detayHatasi = false) {
+  const durum = { sirada: 0, tepe: 0, detayCagri: 0 }
+  const istemci = {
+    rpc: async (ad: string) => {
+      durum.sirada++
+      durum.tepe = Math.max(durum.tepe, durum.sirada)
+      if (ad === 'get_family_detail') durum.detayCagri++
+      try {
+        await new Promise((r) => setTimeout(r, 5))
+        if (ad === 'get_family_detail' && detayHatasi && durum.detayCagri === 1) {
+          return { data: null, error: new Error('statement timeout') }
+        }
+        return { data: ad === 'get_family_detail' ? {} : [], error: null }
+      } finally {
+        durum.sirada--
+      }
+    },
+    from: () => ({ select: () => ({ in: async () => ({ data: [], error: null }) }) }),
+  }
+  return { istemci: istemci as unknown as SupabaseClient<Database>, durum }
+}
+
+describe('INV-FAMILY-RPC-ESZAMANLI-2: detay RPC de aynı sırayı paylaşır', () => {
+  it('liste + detay karışık 12 çağrıda TOPLAM tepe eşzamanlılık sınırı aşmaz', async () => {
+    const { istemci, durum } = karisikIstemci()
+    await Promise.all(
+      Array.from({ length: 12 }, (_, i) =>
+        i % 2 === 0 ? getFamiliesEnriched(istemci, { limit: i + 1 }) : getFamilyDetail(istemci, `slug-${i}`, 'tr'),
+      ),
+    )
+    expect(durum.detayCagri).toBe(6) // çağrı sayısı değişmedi
+    expect(durum.tepe).toBeLessThanOrEqual(FAMILY_RPC_ESZAMANLI)
+  })
+
+  it('detay çağrısı hata verirse slot bırakılır: sonraki liste ve detay çağrıları çalışır', async () => {
+    const { istemci, durum } = karisikIstemci(true)
+    const sonuc = await Promise.allSettled([
+      getFamilyDetail(istemci, 'a', 'tr'),
+      getFamiliesEnriched(istemci),
+      getFamilyDetail(istemci, 'b', 'tr'),
+    ])
+    expect(sonuc.map((s) => s.status)).toEqual(['rejected', 'fulfilled', 'fulfilled'])
+    expect(durum.tepe).toBeLessThanOrEqual(FAMILY_RPC_ESZAMANLI)
   })
 })
