@@ -4611,6 +4611,7 @@ export type Database = {
             Args: { p_batch_id: string; p_max_minutes?: number }
             Returns: number
           }
+      satis_kipi_oku: { Args: never; Returns: Json }
       set_stock:
         | {
             Args: { p_new_qty: number; p_product_id: string; p_reason: string }
