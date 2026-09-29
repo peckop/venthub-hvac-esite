@@ -86,4 +86,11 @@ describe('INV-WRONGSTACK-KURULUM-1 · kurulum betiği', () => {
     expect(kaynak).not.toMatch(/execFileSync\([^)]*\{(?![^}]*windowsHide)[^}]*\}\)/)
     expect(kaynak).toMatch(/'ci', '--ignore-scripts'/)
   })
+
+  it('son satır YANLIŞ talimat vermez: sunucu ilk çağrıda kendiliğinden açılır, "/mcp ile yeniden bağla" YOK (REC-401 W1)', () => {
+    const kaynak = fs.readFileSync(BETIK, 'utf8')
+    expect(kaynak).not.toMatch(/\/mcp ile WrongStack sunucularini yeniden bagla/)
+    expect(kaynak).toMatch(/ilk cagrida kendiliginden acilir/)
+    expect(kaynak).toMatch(/HAZIR/)
+  })
 })
