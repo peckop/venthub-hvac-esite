@@ -68,7 +68,7 @@ afterAll(() => {
   if (gecici) fs.rmSync(gecici, { recursive: true, force: true })
 })
 
-function calistir(source: string): { ek: string; durum: number | null } {
+function calistir(source: string, ekEnv: Record<string, string> = {}): { ek: string; durum: number | null } {
   const girdi = JSON.stringify({
     session_id: SID,
     source,
@@ -80,7 +80,7 @@ function calistir(source: string): { ek: string; durum: number | null } {
     input: girdi,
     encoding: 'utf8',
     cwd: KOK,
-    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK },
+    env: { ...process.env, CLAUDE_PROJECT_DIR: KOK, VH_SESSIONSTART_TOPLAM_TEST: '', ...ekEnv },
     windowsHide: true,
     timeout: 60_000,
   })
@@ -119,6 +119,37 @@ describe('INV-SESSIONSTART-TAVAN-1 · çıktı ≤ 9.000 karakter (şişirilmiş
       expect(ek).toContain('KIRPILDI')
       expect(ek).toContain('arac-serit-durumu-state.md')
       expect(ek).toContain(`son-konusma-${SID}.md`)
+    },
+    60_000,
+  )
+
+  it(
+    'compact: ajan KÖR bırakılmaz — uzun talimat SONUNA kadar aynen, durum bloğundan ≥10 satır görünür (Recep 09-29 endişesi)',
+    () => {
+      const { ek } = calistir('compact')
+      // Son mesaj 1.400 karakterlik gövde taşıyor; eski mesajTavan=600 bunu ortadan kırpardı.
+      expect(ek).toContain('y'.repeat(1400))
+      // Eski DURUM_TAVAN=3000 ile ~7 satır görünürdü; 4.500 ile en az 10.
+      const gorunen = (ek.match(/- SATIR-\d+ /g) ?? []).length
+      expect(gorunen, `durum bloğundan ${gorunen} satır göründü`).toBeGreaterThanOrEqual(9)
+    },
+    60_000,
+  )
+
+  it(
+    'toplam tavan AŞILINCA durum bloğu ve Recep sözü orantılı DARALIR — toptan işaretçiye dönmez (CI 09-29 kırmızısı)',
+    () => {
+      // Daralma yolunu zorlamak için toplam tavan 6.500'e çekilir (CI'da en kötü durum bunu kendiliğinden yapıyordu).
+      const { ek } = calistir('compact', { VH_SESSIONSTART_TOPLAM_TEST: '6500' })
+      expect(ek.length, `çıktı ${ek.length} karakter`).toBeLessThanOrEqual(6500)
+      // Recep'in EN YENİ sözü toptan düşmedi: aynen görünür, işaretçi metni yok.
+      expect(ek).toContain(SON_MESAJ_BASI)
+      expect(ek).toContain('--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---')
+      expect(ek).not.toContain('SON KONUSMA dokumu (Recep sozu AYNEN):')
+      // Durum bloğu da toptan düşmedi: baş + son parça ve yol duruyor.
+      expect(ek).toContain('--- SON BLOK ---')
+      expect(ek).not.toContain('son blok tavan yuzunden yok')
+      expect((ek.match(/- SATIR-\d+ /g) ?? []).length).toBeGreaterThanOrEqual(4)
     },
     60_000,
   )

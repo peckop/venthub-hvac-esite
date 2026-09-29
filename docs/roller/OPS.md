@@ -9,7 +9,7 @@ Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Rece
 Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.
 
 ## Yetki
-Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep'e yalnız bütün çözüm onaya gider), karar numarası atama.
+Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Linear kaydına ve Kararlar belgesine yazılır; Recep'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).
 
 ## Yasak ve sınır
 Kod yazmaz; tekil düzen kararını Recep'e sormaz; Recep kapıları yukarıdaki gibi.

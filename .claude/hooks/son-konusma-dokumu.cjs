@@ -209,7 +209,7 @@ function enjeksiyon(memoryDir, sid, sinir = ENJEKTE_UST_SINIR) {
  * bu sınırı aşıyordu. Burada: yalnız Recep'in SON mesajları (sonN), her biri mesajTavan'a kadar AYNEN,
  * toplam tavan'ı aşmaz; cevaplar ve eski mesajlar dosyada kalır, yolu satırda yazılır.
  */
-function enjeksiyonKisa(memoryDir, sid, { sonN = 6, mesajTavan = 600, tavan = 3600 } = {}) {
+function enjeksiyonKisa(memoryDir, sid, { sonN = 8, mesajTavan = 1500, tavan = 3600 } = {}) {
   const y = dosyaYolu(memoryDir, sid)
   if (!sid || !fs.existsSync(y)) return null
   const s = fs.readFileSync(y, 'utf8')

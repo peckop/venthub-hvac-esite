@@ -38,6 +38,12 @@ export const KAPSAM = [
   'product_images',
   'brands',
   'site_settings',
+  // REC-412 Faz 0.5 (2026-09-29): vitrin fiyatını belirleyen tablolar (cetvel denetim-izi-standard §7.2 → §8).
+  'pricing_rule',
+  'pricing_policy',
+  'price_lists',
+  'currency_rates',
+  'product_prices',
 ]
 
 /** `products` UPDATE süzgecinde BULUNMASI ZORUNLU kolonlar (ticari çekirdek). */
