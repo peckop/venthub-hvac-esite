@@ -106,3 +106,43 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-1', () => {
     expect(k.satir({ durum: 'olcemedi', sebep: 'git yok' })).toMatch(/olculemedi \(git yok\)/)
   })
 })
+
+/**
+ * INV-MERGE-SONRASI-ILERI-SAR-2 · zaman bütçesi + yeniden deneme (REC-441, 09-29).
+ * Ölçülen vaka: #1481 merge'ünde sanal bellek %89'du, git zaman aşımına düştü, ana ağaç bayat kaldı. Ayrıca harness
+ * PostToolUse kancasını ~60 sn'de sessizce öldürür. Kanca artık işi çocuk süreçte, zaman sınırlı ve en fazla 3 kez dener.
+ */
+describe('INV-MERGE-SONRASI-ILERI-SAR-2 · yeniden deneme ve zaman bütçesi', () => {
+  function kosEnv(cwd: string, komut: string, env: Record<string, string>): { cikti: string; ms: number } {
+    const t0 = Date.now()
+    const r = spawnSync(process.execPath, [KANCA], {
+      input: JSON.stringify({ cwd, tool_input: { command: komut } }),
+      encoding: 'utf8',
+      timeout: 90_000,
+      windowsHide: true,
+      env: { ...process.env, ...env },
+    })
+    expect(r.status).toBe(0)
+    const cikti = r.stdout ? (JSON.parse(r.stdout) as { hookSpecificOutput: { additionalContext: string } }).hookSpecificOutput.additionalContext : ''
+    return { cikti, ms: Date.now() - t0 }
+  }
+
+  it('ilk deneme takılırsa ikinci denemede ileri sarar (yeniden deneme ayırt edici kanıt)', { timeout: 120_000 }, () => {
+    const { ana, wt } = kurulum()
+    const uyku = path.join(os.tmpdir(), `ileri-uyku-${process.pid}-${Date.now()}`)
+    GECICI.push(uyku)
+    const once = g(ana, 'rev-parse', 'HEAD')
+    const { cikti } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_UYKU_DOSYA: uyku, VH_ILERI_SAR_DENEME_MS: '4000', VH_ILERI_SAR_BEKLE_MS: '0' })
+    expect(cikti).toMatch(/ileri sarildi/)
+    expect(cikti).toMatch(/deneme 2\/3/)
+    expect(g(ana, 'rev-parse', 'HEAD')).not.toBe(once)
+  })
+
+  it('üç deneme de takılırsa SESSİZ KALMAZ, elle komutu söyler ve bütçeyi aşmaz', { timeout: 120_000 }, () => {
+    const { wt } = kurulum()
+    const { cikti, ms } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_HEP_TAKIL: '1', VH_ILERI_SAR_DENEME_MS: '1500', VH_ILERI_SAR_BEKLE_MS: '0' })
+    expect(cikti).toMatch(/3 denemede tamamlanamadi/)
+    expect(cikti).toContain('ana-agac-tazelik.cjs --ileri-sar')
+    expect(ms).toBeLessThan(30_000)
+  })
+})
