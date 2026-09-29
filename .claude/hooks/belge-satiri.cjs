@@ -20,7 +20,6 @@
  */
 const fs = require('fs')
 const path = require('path')
-const { spawn } = require('child_process')
 
 const BAYAT_GUN = 14
 const GRAF_GUN = 7
@@ -88,7 +87,8 @@ function gerekirseTazele(pano, depo, simdi = Date.now()) {
   try {
     fs.mkdirSync(pano, { recursive: true })
     fs.writeFileSync(kilit, String(simdi))
-    spawn(process.execPath, [betik, '--yaz'], { cwd: depo, detached: true, stdio: 'ignore', windowsHide: true }).unref()
+    // REC-415: kopuk süreç başlatmanın tek yolu (içindeki git/powershell pencere açmasın)
+    require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs')).kopukBaslat(betik, ['--yaz'], { cwd: depo })
     return true
   } catch {
     return false // başlatılamadı: önbellek bayatladıkça satır bunu söyler

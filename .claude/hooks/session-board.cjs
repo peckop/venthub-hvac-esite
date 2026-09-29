@@ -14,7 +14,7 @@
  */
 const fs = require('fs')
 const path = require('path')
-const { spawn, execFileSync } = require('child_process')
+const { execFileSync } = require('child_process')
 
 function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
@@ -122,20 +122,15 @@ const source = input.source || 'startup'
  * Neden koparılmış: `git fetch` ağ işidir; oturum açılışını bekletmemeli. Çıktı
  * `~/.orion/registry-autosync.log`'a düşer.
  *
- * ⚠ `windowsHide: true` ŞART — ölçüldü (2026-08-27). Windows'ta `detached: true` ile başlatılan
- * çocuk süreç, `windowsHide` verilmezse KENDİ konsolunu alır: bir `conhost.exe` penceresi açılıp
- * kapanır. Görünür etkisi "her oturum açılışında bir pencere yanıp söndü" — Recep bunu bildirdi
- * ve teşhis sırasında ölçtük; o gün sayılan 18 pencerenin 1'i buydu (kalan 17 Antigravity MCP
- * config'inden, `npx`/çıplak komut → `.cmd` → `cmd.exe`; ayrı olarak onarıldı).
- * `stdio: 'ignore'` bunu ÖNLEMEZ — çıktıyı yutar, pencereyi değil.
+ * ⚠ PENCERE (ölçüldü 2026-08-27 ve 2026-09-29): `windowsHide: true` yalnız çocuğun KENDİ penceresini
+ * gizler. `detached` çocuk konsolsuzdur; içinden çalışan `git fetch` yeni konsol → Windows Terminal'de
+ * `git.exe` başlıklı pencere açar (her oturum açılışında ve compact bitişinde 3-4 pencere — Recep 09-29).
+ * Bu yüzden başlatma scripts/board/kopuk-baslat.cjs'ten geçer: çocuğun her child_process çağrısına
+ * `windowsHide` eklenir (REC-415). `detached: true` başka yerde YASAK; test zorlar.
  */
 try {
-  const child = spawn(process.execPath, [path.join(__dirname, '..', '..', 'scripts', 'board', 'registry-autosync.cjs')], {
-    detached: true,
-    stdio: 'ignore',
-    windowsHide: true,
-  })
-  child.unref()
+  require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs'))
+    .kopukBaslat(path.join(__dirname, '..', '..', 'scripts', 'board', 'registry-autosync.cjs'))
 } catch { /* senkron başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
 
 let context = `Oturum kimliğin: ${sid}\n`
