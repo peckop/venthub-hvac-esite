@@ -44,7 +44,7 @@ Bugün `--yon ac --uygula --onay "..."` yalnız bir **söze** dayanır; betik on
 
 **K7 cetvel cümlesi (OPS hükmü, olduğu gibi cetvele geçer):** e-arşiv faturası yasal zorunluluktur. Beyan **faturasız satışa izin DEĞİLDİR**; faturanın otomasyon dışı (elle/mali müşavir aracılığıyla) kesileceğinin taahhüdüdür.
 | K8 | Hedef plan tutarlılığı | `planla()` sonrası beklenen durum tutarlı (saf hesap; şimdiki durum DEĞİL: yarım kalmış açılış onarılabilsin) | URUN | GEÇER |
-| K9 | Müşteri e-postası gerçekten gidiyor (OPS 09-29 eki, ALTYAPI ölçümü) | Son 30 günde `order_email_events`/`quote_email_events` `status='sent'` + `provider_message_id` **veya** `shipping_email_events` `provider_message_id` (bu tabloda `status` kolonu YOK, ölçüldü) satırı; üç tablodan toplam ≥ 1. K6 alan doğrulamasını, K9 **gönderim kanıtını** ölçer. DB yoksa ölçülemedi = ret | ALTYAPI (REC-368) | RET (üç tablo bugün 0 satır; ilk deneme e-postası gidene dek) |
+| K9 | Müşteri e-postası gerçekten gidiyor (OPS 09-29 eki, ALTYAPI ölçümü) | Son 30 günde `order_email_events`/`quote_email_events` `status='sent'` + `provider_message_id` **veya** `shipping_email_events` `provider_message_id` (bu tabloda `status` kolonu YOK, ölçüldü) satırı; üç tablodan toplam ≥ 1. K6 alan doğrulamasını, K9 **gönderim kanıtını** ölçer. DB yoksa ölçülemedi = ret | ALTYAPI (REC-368) | RET (üç tablo bugün 0 satır. OPS düzeltmesi: e-postalar gerçekte gidiyor olabilir, Gmail'de 09-24 teklif ve 09-26 iade e-postası var; tablolar yazılmıyor olabilir, REC-368 ölçüyor. Ölçüt ALTYAPI hükmüne kadar DEĞİŞMEZ) |
 
 Kısa devre yok: tablo hepsini basar, Recep tek koşumda **tüm** eksikleri görür.
 
