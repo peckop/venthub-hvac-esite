@@ -162,6 +162,18 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
     }
   })
 
+  // REC-412 Faz 0.5 (2026-09-29): fiyat günlüğünün özet tetik fonksiyonu SECURITY DEFINER'dır ve admin_audit_log'a
+  // yazar. Yalnız tetik çağırır; hiçbir istemci rolü doğrudan çağıramamalı (yeni fonksiyona varsayılan EXECUTE verilir).
+  it('⭐denetim_izi_fiyat_ozet: public, anon, authenticated için son hâl KAPALI', () => {
+    expect(sonKip(zincir, 'denetim_izi_fiyat_ozet'), 'denetim_izi_fiyat_ozet tanimi zincirde yok — okuyucu kor').toBe('definer')
+    for (const rol of ['public', 'anon', 'authenticated']) {
+      expect(
+        sonHalKapali(zincir, 'denetim_izi_fiyat_ozet', rol, []),
+        `denetim_izi_fiyat_ozet ${rol} icin acik — istemci denetim tablosuna sahte ozet satiri yazdirabilir`,
+      ).toBe(true)
+    }
+  })
+
   it('⭐admin_resend_quote_published: anon KAPALI, authenticated AÇIK', () => {
     expect(sonHalKapali(zincir, 'admin_resend_quote_published', 'anon', ['uuid']), 'admin_resend_quote_published anon icin acik').toBe(true)
     expect(

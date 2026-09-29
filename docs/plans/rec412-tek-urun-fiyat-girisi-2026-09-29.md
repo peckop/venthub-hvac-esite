@@ -104,6 +104,47 @@ Recep sorusu: "sistem fiyat kayıtlarını/loglarını tutuyor mu? Kim, ne zaman
 3. **Kapı `INV-FIYAT-GUNLUGU-1`:** (a) fiyat yazan her kod yolu (`pricing_rule`, `product_prices`, `products.purchase_price/purchase_currency`) `degisiklik_yontemi` verir, vermeyen KIRMIZI; (b) migration'da bu tabloların her birinde denetim tetiği vardır. Sabotajla kanıtlanır.
 4. Okuma yüzü: ürün panelinde "Fiyat geçmişi" (kim · ne zaman · eski→yeni · yöntem), `admin_audit_log` süzgeci; moderatör maliyet kolonlarını görmez (karar 95).
 
+## 5c. Faz 0.5 KESİN TASARIM (v2 — plan-challenger çürütmesinden SONRA; migration `20260929110000_fiyat_degisiklik_gunlugu.sql`)
+
+> v1 (yöntem kolonu + "tek özet" + ayrı `istek_yontemi()` fonksiyonu) çürütüldü: `docs/audits/rec412-faz05-red-team-2026-09-29.md`
+> (1 kritik + 5 yüksek). Aşağısı çürütmenin 10 aksiyonunu işlemiş hâlidir. Cetvel: `docs/standards/denetim-izi-standard.md` §8
+> (bu iş yazdı) · `migration-safety-standard.md` · mevcut kapı `scripts/db/checks/denetim-izi-tetik-kapisi.mjs`.
+
+### Ek ölçümler (canlı salt okuma + kod, 2026-09-29)
+
+| Konu | Bulgu |
+|---|---|
+| Tetik durumu | `pricing_rule`, `pricing_policy`, `currency_rates`: **hiç tetik yok**. `price_lists`: yalnız webhook + `updated_at`. `product_prices`: `updated_at` + `computed_at` (BEFORE) + 2 webhook (AFTER). Hiçbirinde `denetim_izi*` yok |
+| Hacim | pricing_rule 1 · product_prices 1044 · price_lists 3 · pricing_policy 0 · currency_rates 64 (TCMB, günde 2, yalnız INSERT) · admin_audit_log 896 satır |
+| Maliyet aynası | `product_costs` (442) yalnız `product_costs_senkron()` ile `products.purchase_*`'tan beslenir; kaynak zaten izleniyor. **Ama** `cost_in_base`/`purchase_rate_to_base` `products` UPDATE-OF listesinde YOK → maliyet yenileme bugün günlüksüz (çürütme Q5) |
+| Yazan kod yolları | `pricingAdmin.service.ts` (kural) · `pricingMaterialize.service.ts` (`product_prices` upsert 500'lük + pasifleştirme 200'lük) · `PricingPolicyFormModal.tsx` · `tcmb-rates-sync` (kur) · `scripts/icerik-hatti/katalog-yukle\|geri-yukle.mjs` |
+| Tarayıcı özel başlığı | canlı API `OPTIONS` ön-kontrolü `x-degisiklik-yontemi`'ne izin veriyor; `postgrest-js@2.116.0` `setHeader()` var |
+| `request.headers` boş dize | transaction-local ayar sonrası `''` döner (canlıda ölçüldü) → `nullif(…,'')` + `pg_input_is_valid` |
+
+### Tasarım (kesin)
+
+1. **Yöntem = istek başlığı** (`x-degisiklik-yontemi`, `x-degisiklik-oturumu`), kolon DEĞİL: DELETE yük taşımaz, iş tablolarına kolon tip kayması yaratır. Okuma **tetik gövdesinde** (ayrı fonksiyon yok → tip kayması ve `WHEN` içinde EXECUTE tuzağı yok). Başlıksız = `yontem=BILINMIYOR`, hata değil. **Yöntem beyandır, kanıt değil; hiçbir sayım/eleme başlığa bağlı değil.**
+2. **Granülarite VERİDEN:** `is_derived=false` satırlar HER yöntemde satır bazlı; `is_derived=true` satırlar ifade düzeyi geçiş-tablosu tetiğiyle **tenant başına özet**, özetin before/after'ı DEĞİŞEN satırların eski→yeni dizisi (tavan 2000, `kirpildi=evet`); ölçüt = tüm fiyat-otoritesi kolonları; hiçbiri değişmediyse satır yazılmaz. **"Tek özet" iddiası düştü:** parti başına 1-2 özet, koşuyu birleştiren `oturum=`.
+3. **`currency_rates`:** INSERT yalnız `source<>'tcmb'` (elle kur girişi kayıtlı), UPDATE/DELETE her zaman.
+4. **Adlandırma/ölçüt:** tetikler `denetim_izi_*` (mevcut kapı süpürür); eleme `TG_ARGV` (`atla:computed_at`, `yontem:iste`); gövde/yorumda hata-yakalayıcı ifadesi yok (kapının regex'i yorumu da tarar).
+5. **Kilitler:** `lock_timeout 5s`, `statement_timeout 60s`, tablolar sabit sırada tek `lock table`.
+6. **Tenant:** özet tenant başına yazılır, varsayılana bırakılmaz.
+7. **Tip/taban:** şema yüzü DEĞİŞMEZ (kolon yok, RPC yok, tetik fonksiyonları REST'te görünmez) → tip dosyası etkilenmez; **şema tabanı aynı gün** (INV-TABAN-TAZE-1).
+8. **Kapılar:** `KAPSAM`'a 5 tablo (canlı DB kapısı); fixture + iki yeni kırmızı kol (tetik sökülmüş, özet fonksiyonu fail-open); `anon-definer-yetki` kolu; cetvel §8 testi.
+
+### Gölge kanıtı (migration dosyası BİREBİR, PGlite — şema gerçek değil, tetik MANTIĞI)
+
+`docs/audits/rec412-faz05-golge/golge.mjs` → **29/29 geçti**; iki bilinçli bozma kırmızı verdi (`computed_at` elemesi kalkarsa 2 kol kırmızı; ölçüt yalnız net/gross'a daralırsa `sale_price/discount` kolu kırmızı). Kollar: (i) başlıksız → BILINMIYOR · (ii) panel+oturum, eski→yeni · (iii) 3 değişen satır → tek UPDATE özeti · (iv) değişmeyen yeniden hesap → 0 satır · (v) DELETE panel · (vi) mevcut tablo yorum metni birebir aynı · (vii) `authenticated` rolüyle UPDATE geçer · (viii) `''`/geçersiz JSON/beyaz liste dışı/bozuk oturum → hata yok · (ix) karışık parti → INSERT+UPDATE özeti · (x) `yeniden_hesap` başlığı elle ezilmiş satırı SUSTURAMAZ · (xi) iki tenant → iki özet · (xii) ürün silme kaskadı · (xiii) `currency_rates` tcmb/manual · tavan 2000 · fail-closed (FK ihlali → fiyat yazımı geri alındı).
+⚠ Sınır: PGlite = PostgreSQL 18.3 (canlı 17.6), `auth.uid()` NULL, PostgREST yok (`request.headers` `set_config` ile taklit), webhook tetiği taklit. **`request.headers`'ın canlıda gerçekten okunduğu** ilk gerçek panel yazımında audit `comment`'te `yontem=panel` görülünce kanıtlanır; görünmezse etiket `BILINMIYOR` kalır (kayıp yok).
+
+### Sıra (kural 13 zinciri)
+
+PR-A (migration + kapı genişlemesi + cetvel + gölge kanıtı, **Recep kapısı**) → merge → `supabase-migrate.yml` yeşil → `sema-tabani-uret.yml` (aynı gün; db-advisor master koşumu migrate ile yarışırsa geçici kırmızı → yeniden koştur) → PR-B (istemci başlıkları + INV-FIYAT-GUNLUGU-1, migration'sız; başlıksız istemci PR-A öncesi de zararsız) → Faz 1.
+
+### OPS'a SAPMA (adıyla)
+
+(a) Yöntem kolon değil başlık (§5b.2'den sapma; gerekçe DELETE + tip kayması). (b) "Toplu yeniden hesap tek özet" → parti başına özet + oturum kimliği + ayrıntılı dizi. (c) **`maliyet_yenileme` bu fazda YOK:** maliyet kolonları `products` UPDATE-OF listesinde olmadığından maliyet yenileme bugün de günlüksüz; ya (1) iki kolon `WHEN`'li listeye girer (348 satırlık yenileme = 348 satır; hacim kararı OPS) ya (2) istemci koşu başına başlangıç/bitiş satırı yazar. Bu faz dışı, karar OPS'ta.
+
 ## 6. Yan bulgu (kapsam dışı, kayıt önerisi)
 
 `pricing_rule` RLS politikaları yetkiyi `user_profiles.role`'den okuyor (CLAUDE.md kural 12: yetki `app_metadata`). Bu iş etkilemez ama REC-140 çizgisiyle birlikte ALTYAPI'ya bildirilmeli.
