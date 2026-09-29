@@ -190,7 +190,7 @@ if (require.main === module) {
     if (!denetim) kur()
     const hatalar = denetle()
     if (hatalar.length) throw new Error(hatalar.join(' · '))
-    process.stdout.write(denetim ? 'HAZIR\n' : 'HAZIR — bu pencerede /mcp ile WrongStack sunucularini yeniden bagla, sonra oteki pencereleri ac\n')
+    process.stdout.write(denetim ? 'HAZIR\n' : 'HAZIR — WrongStack sunuculari her pencerede ilk cagrida kendiliginden acilir; /mcp ile yeniden baglamaya gerek yok\n')
   } catch (e) {
     process.stdout.write('HATA: ' + String(e.message).slice(0, 400) + '\n')
     process.exitCode = 1
