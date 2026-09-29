@@ -71,8 +71,26 @@ Başlık konvansiyonu: kimlik kodu baştaki köşeli parantezin İÇİNDE (`[ŞE
   yine vekil ölçü (tarih!) icat edilir — REC-53 vetosunun kökü buydu.
 - Kapanan iş bir sonraki işi doğuruyorsa (T063 örneği: mekanizma bitti, kanal Recep'te),
   **önce ardıl kayıt açılır, sonra eski kayıt ona işaret ederek kapanır** (ORION §6).
-- PR gövdesinde `Fixes REC-nn` satırı zorunlu — Linear'ın GitHub entegrasyonu durumu
-  otomatik akıtır (08-26 araştırması: free planda dahil; ayrı Action gerekmez).
+- **Kayıtlar iş bitince kendiliğinden kapanır (karar 187, Recep 2026-09-29).** Her PR kendi (alt)
+  kaydını gövdesinde `Fixes REC-nn` satırıyla kapatır; Linear'ın GitHub entegrasyonu durumu otomatik
+  akıtır (08-26 araştırması: free planda dahil; ayrı Action gerekmez).
+  - Birden fazla PR'lık iş, her biri tek PR'la biten **alt kayıtlara** bölünür; üst kayıt alt kayıtlar
+    bitince Linear ayarıyla kendiliğinden kapanır.
+  - Backlog'da 3 ay dokunulmayan kayıt kendiliğinden Canceled olur (geri açılabilir).
+  - **Çatı kaydına (alt kaydı olan kayda) asla `Fixes`/`Closes`/`Resolves` yazılmaz**: bu kelimeler o kaydı
+    birleşmede kapatır (2026-09-29'da REC-433 çatısı yanlışlıkla bu riske girdi, birleşmeden önce yakalandı).
+    Çatıya bağ `Part of REC-nn` (Linear'ın kapatmayan bağı) ile kurulur; alt kayıt açılamıyorsa
+    (Linear ücretsiz sınırı) PR gövdesine `Part of REC-nn` yazılır.
+  - **Çatı kaydı alt kayıt (parent) almaz, ilişkili kayıt alır.** Çatı = program, plan, kalıcı defter, kapsamı
+    zamanla büyüyen kayıt (REC-425 talimat defteri, REC-345 bağımlılık programı, REC-206 katalog hattı,
+    REC-433 tek plan, REC-400 belge kök çözümü). PR'lar çatıya `Part of REC-nn` ile bağlanır. Alt kayıt
+    (parent) yalnız kapsamı baştan bilinen, parçaları bitince iş gerçekten bitmiş sayılacak kayıtlarda
+    kullanılır; Linear o üstü kendiliğinden kapatır (karar 187, OPS 2026-09-29).
+  - İstisna yalnız PR gövdesinde açık bir `Kayıtsız: <sebep>` satırıyla; sebepsiz istisna yoktur.
+  - Kapı (Fixes ya da Kayıtsız yoksa uyarı) ARAÇ'ta yazılıyor.
+  - Niçin: 2026-09-29 ölçümü, son 60 birleşmenin 0'ı `Fixes` taşıyordu; kayıtlar elle kapanmadığı için
+    Linear 275 kayda çıktı ve ücretsiz sınırı doldurdu. (Eski "`Fixes` yalnız işi bitirene, değilse `İlgili:`"
+    kuralı bu maddeyle kalktı: bitiremeyen iş alt kayıtlara bölünür, her alt kayıt tek PR'la biter.)
 
 ## 5. Arşiv ve silme
 
@@ -89,7 +107,8 @@ Duraklatılmış bir şerit yeniden açılırken:
 1. Dal master'a rebase edilir (yaş ≠ bayatlık; çelişki varsa değişimden ölçülür).
 2. İşin Linear kaydı yoksa §2 şablonuyla açılır; varsa durum güncellenir.
 3. Triyaj/audit belgelerinde işin geçmişi kontrol edilir (yapılmış kısmı tekrar yapılmaz).
-4. Şerit, kapanışlarını `Fixes REC-nn` ile Linear'a bağlar.
+4. Şerit, her PR'ında kendi (alt) kaydını `Fixes REC-nn` ile Linear'a bağlar (karar 187, §4); kayıtsız iş
+   yalnız `Kayıtsız: <sebep>` satırıyla.
 
 ## 6.1 PİLOT — iş kartı panosu (karar 46, Recep onayı 2026-09-18)
 
