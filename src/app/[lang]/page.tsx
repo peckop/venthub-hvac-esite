@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import React from 'react'
 
+import { enKuraliRobots, hreflangAlani } from '@/lib/seo/enYayinKurali'
 import { getCategories } from '@/lib/services/category.service'
 import { getProducts } from '@/lib/services/product.service'
 import { supabaseStaticClient } from '@/lib/supabase/static'
@@ -89,11 +90,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // sayfaları yalın, ana sayfa bölge kodlu. Aynı sitede iki biçim tutarsız sinyal üretir.
     alternates: {
       canonical: canonical,
-      languages: {
-        tr: `${siteUrl}/tr`,
-        en: `${siteUrl}/en`,
-        'x-default': `${siteUrl}/tr`,
-      },
+      // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+      ...hreflangAlani({
+        languages: {
+          tr: `${siteUrl}/tr`,
+          en: `${siteUrl}/en`,
+          'x-default': `${siteUrl}/tr`,
+        },
+      }),
     },
     openGraph: {
       title: dict.home.seoTitle,
@@ -118,10 +122,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: dict.home.seoDesc,
       images: [`${siteUrl}/images/og-default.jpg`],
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    // Kendi `robots`unu yazan sayfa dil layout'unun `noindex`ini EZER (canlıda `/en` `index, follow`
+    // döndü, 2026-09-29): EN kapalıyken `noindex, follow`, aksi hâlde bugünkü `index, follow`.
+    robots: enKuraliRobots(lang, { index: true, follow: true }),
   }
 }
 
