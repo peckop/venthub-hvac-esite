@@ -69,6 +69,9 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
 }) => {
   const { t: _t, lang } = useI18n()
   const hydratedRef = useRef(false)
+  const skipSaveRef = useRef(false)
+  const latestRef = useRef({ persist, select, chips, toggles })
+  latestRef.current = { persist, select, chips, toggles }
   const [filtersOpen, setFiltersOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -92,37 +95,44 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [search])
 
-  // Kalıcılık: yükleme
+  // Kalıcılık: yükleme — YALNIZ AÇILIŞTA, BİR KEZ (REC-411).
+  // Üst bileşenler `select`/`chips`/`toggles` nesnelerini her render'da yeniden kurar; yükleme bu
+  // nesnelere bağlı olsaydı her kullanıcı değişikliğinde bir önceki render'ın yazdığı ESKİ kaydı
+  // yeni durumla karşılaştırıp farkı geri çevirirdi, kaydetme de yeni durumu yazardı: sonsuz döngü.
   useEffect(() => {
-    if (!storageKey) return
+    if (!storageKey || hydratedRef.current) return
+    hydratedRef.current = true
     try {
+      const { persist: p, select: sel, chips: cs, toggles: tg } = latestRef.current
       const enable = {
-        search: persist?.search !== false,
-        select: persist?.select !== false,
-        chips: persist?.chips !== false,
-        toggles: persist?.toggles !== false,
+        search: p?.search !== false,
+        select: p?.select !== false,
+        chips: p?.chips !== false,
+        toggles: p?.toggles !== false,
       }
       const raw = localStorage.getItem(storageKey)
-      if (!raw) { hydratedRef.current = true; return }
+      if (!raw) return
       const saved = JSON.parse(raw) as {
         search?: string
         select?: string
         chips?: Record<string, boolean>
         toggles?: Record<string, boolean>
       }
-      if (enable.select && select && typeof saved.select === 'string' && saved.select !== select.value) {
-        select.onChange(saved.select)
+      // Bu commit'teki kaydetme, geri yüklenen değerler render olmadan mevcut kaydı ezmesin.
+      skipSaveRef.current = true
+      if (enable.select && sel && typeof saved.select === 'string' && saved.select !== sel.value) {
+        sel.onChange(saved.select)
       }
-      if (enable.chips && chips && saved.chips) {
-        chips.forEach(ch => {
+      if (enable.chips && cs && saved.chips) {
+        cs.forEach(ch => {
           const want = saved.chips?.[ch.key]
           if (typeof want === 'boolean' && want !== ch.active) {
             ch.onToggle()
           }
         })
       }
-      if (enable.toggles && toggles && saved.toggles) {
-        toggles.forEach(t => {
+      if (enable.toggles && tg && saved.toggles) {
+        tg.forEach(t => {
           const want = saved.toggles?.[t.key]
           if (typeof want === 'boolean' && want !== t.checked) {
             t.onChange(want)
@@ -131,15 +141,16 @@ const AdminToolbar: React.FC<AdminToolbarProps> = ({
       }
     } catch {
       // no-op
-    } finally {
-      hydratedRef.current = true
     }
-  }, [storageKey, persist?.search, persist?.select, persist?.chips, persist?.toggles, select, chips, toggles])
+  }, [storageKey])
 
   // Kalıcılık: kaydetme
-   
   useEffect(() => {
     if (!storageKey || !hydratedRef.current) return
+    if (skipSaveRef.current) {
+      skipSaveRef.current = false
+      return
+    }
     try {
       const enable = {
         search: persist?.search !== false,
