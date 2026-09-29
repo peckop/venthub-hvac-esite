@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
-import type { PricingRuleRow } from './pricing.service'
+import { computePriceFromRule, type PricingRuleRow } from './pricing.service'
 import {
   clearProductFixedPrice,
   type ProductFixedPriceInput,
@@ -93,6 +93,13 @@ export interface ProductPriceChangeResult {
   summary?: MaterializeSummary
   /** Vitrin geri okuması; `recalc !== 'tamam'` ise null (okunacak yeni durum yok). */
   verification: StorefrontVerification | null
+  /**
+   * true → yazılan kural motorun seçtiği kural DEĞİL (başka bir kural vitrini belirliyor). `kazananKuralId` o kuraldır;
+   * panel "vitrinde X kuralı kazanıyor" uyarısını bundan üretir. Kaldırma sonucunda anlamsızdır (false).
+   */
+  golgelendi?: boolean
+  /** Motorun bu ürün için bireysel segmentte seçtiği kuralın id'si (örnek yoksa null). */
+  kazananKuralId?: string | null
 }
 
 export interface ProductPriceChangeOptions {
@@ -117,11 +124,20 @@ function hataMetni(err: unknown): string {
   return String(err)
 }
 
-/** Tek ürünü yeniden hesaplar ve vitrini geri okur. Yeniden hesap hatası ATILMAZ; sonuca `recalc:'hata'` yazılır. */
+/**
+ * Tek ürünü yeniden hesaplar ve vitrini geri okur. Yeniden hesap hatası ATILMAZ; sonuca `recalc:'hata'` yazılır.
+ *
+ * `beklenen`: vitrinde GÖRÜLMESİ GEREKEN fiyat. Sabit fiyat girişinde bu, YAZILAN KURALDAN hesaplanır (yöneticinin
+ * girdiği tutar) — motorun ürettiği örnekten DEĞİL: örnekten türetilen beklenen, başka bir kural (varyant/kitaba özel/
+ * daha öncelikli) kazandığında da vitrinle "eşleşir" ve sessiz başarı üretirdi (security-reviewer YÜKSEK bulgusu).
+ * `undefined` = kural yok (kaldırma): "genel kurala dönüş" motorun kendi cevabıdır, örnekten alınır.
+ */
 async function recalculateAndVerify(
   supabase: SupabaseClient<Database>,
   productId: string,
   yontem: ProductFixedPriceYontem,
+  beklenen?: ExpectedStorefrontPrice | null,
+  yazilanKuralId?: string,
 ): Promise<ProductPriceChangeResult> {
   let summary: MaterializeSummary
   try {
@@ -130,15 +146,20 @@ async function recalculateAndVerify(
     return { recalc: 'hata', recalcError: hataMetni(err), verification: null }
   }
 
-  // Beklenen fiyat: bu ürün için bireysel segmentte üretilen ilk örnek (tek ürün kapsamında en çok 1 örnek olur).
+  // Motorun bu ürün için bireysel segmentte ürettiği örnek (tek ürün kapsamında en çok 1 örnek).
   const sample = summary.samples[0]
-  const expected: ExpectedStorefrontPrice | null = sample ? { net: sample.net, gross: sample.gross } : null
+  const expected: ExpectedStorefrontPrice | null =
+    beklenen !== undefined ? beklenen : sample ? { net: sample.net, gross: sample.gross } : null
+  // "Başka kural kazandı": yazdığımız kural motorun seçtiği kural değil (scope 0 varyant kuralı, kitaba özel kural,
+  // daha yüksek öncelikli kural...). Fiyat yine de tutabilir; kullanıcıya hangi kuralın vitrini belirlediği gösterilir.
+  const golgelendi = yazilanKuralId !== undefined && sample !== undefined && sample.ruleId !== yazilanKuralId
+  const kazananKuralId = sample?.ruleId ?? null
   try {
     const verification = await verifyProductStorefrontPrice(supabase, productId, expected)
-    return { recalc: 'tamam', summary, verification }
+    return { recalc: 'tamam', summary, verification, golgelendi, kazananKuralId }
   } catch (err) {
     // Yazma başarılı, yalnız geri okuma düştü: yansıma DOĞRULANAMADI — sessizce "tamam" demeyiz.
-    return { recalc: 'hata', recalcError: hataMetni(err), summary, verification: null }
+    return { recalc: 'hata', recalcError: hataMetni(err), summary, verification: null, golgelendi, kazananKuralId }
   }
 }
 
@@ -160,7 +181,11 @@ export async function setProductPrice(
 ): Promise<SetProductPriceResult> {
   const rule = await setProductFixedPrice(supabase, productId, input, options.yontem, options.updatedBy)
   if (!options.recalculate) return { rule, recalc: 'yapilmadi', verification: null }
-  return { rule, ...(await recalculateAndVerify(supabase, productId, options.yontem)) }
+  // Beklenen = YÖNETİCİNİN GİRDİĞİ fiyat: yazılan kuraldan, çözücünün AYNI saf işleviyle (maliyet yok → kelepçe yok;
+  // güncelleme yolu kelepçe/ek ücret/yuvarlama/charm alanlarını sıfırladığı için sonuç girilen tutardır).
+  const computed = computePriceFromRule(rule, null, [])
+  const beklenen: ExpectedStorefrontPrice | null = computed ? { net: computed.net, gross: computed.gross } : null
+  return { rule, ...(await recalculateAndVerify(supabase, productId, options.yontem, beklenen, rule.id)) }
 }
 
 export interface ClearProductPriceResult extends ProductPriceChangeResult {

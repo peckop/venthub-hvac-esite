@@ -32,6 +32,11 @@ interface Captured {
 interface StubOptions {
   /** Bu tabloya bu yöntemle yapılan istek 500 döner (yeniden hesap yazımı düşmesi senaryosu). */
   fail?: { table: string; method: string }
+  /**
+   * RLS USING dışında kalan satıra UPDATE: HATA YOK, 0 satır etkilenir ve gövde boş dizi döner (gerçek PostgREST
+   * davranışı). Verilen tabloya PATCH bu şekilde yanıtlanır.
+   */
+  rlsSessizPatch?: string
 }
 
 const IGNORED_PARAMS = new Set(['select', 'order', 'limit', 'offset', 'on_conflict', 'columns'])
@@ -128,6 +133,7 @@ function stub(db: Db, options?: StubOptions): { supabase: SupabaseClient<Databas
     }
 
     if (method === 'PATCH') {
+      if (options?.rlsSessizPatch === table) return json(single ? null : [])
       const touched = rows.filter((r) => matches(r, url.searchParams))
       for (const r of touched) Object.assign(r, body as Row)
       return json(single ? (touched[0] ?? null) : touched)
@@ -302,6 +308,43 @@ describe('setProductFixedPrice', () => {
     })
     expect(calls[0].headers['x-degisiklik-yontemi']).toBe('liste')
     expect(rule.fixed_price).toBe(1500)
+  })
+
+  it('güncellerken eski kuraldan kalan ek ücret/kelepçe/yuvarlama/charm/para birimi SIFIRLANIR, KDV oranı korunur, öncelik diğer kuralların üstüne çıkar', async () => {
+    const { supabase, calls } = stub({
+      pricing_rule: [
+        ruleRow({
+          id: 'sabit-1',
+          scope: 1,
+          product_id: 'p1',
+          method: 'fixed',
+          fixed_price: 1000,
+          priority: 0,
+          surcharge: 50,
+          min_margin_abs: 200,
+          max_margin_abs: 300,
+          round_to: 10,
+          charm_ending: 0.99,
+          currency: 'EUR',
+          vat_rate_pct: 10,
+        }),
+        ruleRow({ id: 'sonradan-marj', scope: 1, product_id: 'p1', priority: 7 }),
+      ],
+    })
+
+    await setProductFixedPrice(supabase, 'p1', { amount: 500, vatIncluded: false }, 'panel', null)
+
+    const govde = calls[0].body as Row
+    expect(govde).toMatchObject({
+      surcharge: 0,
+      min_margin_abs: null,
+      max_margin_abs: null,
+      round_to: null,
+      charm_ending: null,
+      currency: null,
+      priority: 8,
+    })
+    expect(govde).not.toHaveProperty('vat_rate_pct')
   })
 
   it('başka ürünün, kademeli (adet>1) ya da kitaba özel sabit kuralı "ürünün sabit kuralı" SAYILMAZ', async () => {
@@ -543,6 +586,66 @@ describe('setProductPrice', () => {
     expect(sonuc.verification).toMatchObject({ status: 'dogrulandi', net: 2000, gross: 2400 })
   })
 
+  it('⛔SESSİZ BAŞARI YOK: başka bir kural (scope 0 varyant) vitrini belirliyorsa dogrulandi DENMEZ, farkli + golgelendi', async () => {
+    const { supabase } = stub(
+      katalog({
+        pricing_rule: [
+          ruleRow({ id: 'genel-40' }),
+          // scope 0, sabit kuralın (scope 1) ÖNÜNDE sıralanır: vitrin 500 gösterir.
+          ruleRow({ id: 'varyant', scope: 0, product_id: 'p1', method: 'fixed', fixed_price: 500, price_is_vat_inclusive: false }),
+        ],
+      }),
+    )
+
+    const sonuc = await setProductPrice(
+      supabase,
+      'p1',
+      { amount: 2400, vatIncluded: true },
+      { yontem: 'panel', recalculate: true, updatedBy: null },
+    )
+
+    expect(sonuc.recalc).toBe('tamam')
+    expect(sonuc.golgelendi).toBe(true)
+    expect(sonuc.kazananKuralId).toBe('varyant')
+    expect(sonuc.verification).toMatchObject({ status: 'farkli', gross: 600, expected: { net: 2000, gross: 2400 } })
+  })
+
+  it('kural sayfasından sonradan eklenen yüksek öncelikli marj kuralı güncellemede geçilir: vitrin girilen tutarı gösterir', async () => {
+    const { supabase } = stub(
+      katalog({
+        pricing_rule: [
+          ruleRow({ id: 'genel-40' }),
+          ruleRow({ id: 'sabit-p1', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1000, priority: 0, surcharge: 100, min_margin_abs: 5000 }),
+          ruleRow({ id: 'marj-p1', scope: 1, product_id: 'p1', priority: 9 }),
+        ],
+      }),
+    )
+
+    const sonuc = await setProductPrice(
+      supabase,
+      'p1',
+      { amount: 2400, vatIncluded: true },
+      { yontem: 'panel', recalculate: true, updatedBy: null },
+    )
+
+    expect(sonuc.golgelendi).toBe(false)
+    expect(sonuc.verification).toEqual({ status: 'dogrulandi', net: 2000, gross: 2400, isDerived: true })
+  })
+
+  it('RLS bayat satırı SESSİZCE pasifleştirmezse (0 satır etkilendi) yeniden hesap "tamam" DEMEZ: recalc hata', async () => {
+    // p1'in kuralı kalktı → cache satırı bayat; pasifleştirme RLS yüzünden hiçbir satırı etkilemiyor.
+    const { supabase } = stub(
+      katalog({ pricing_rule: [ruleRow({ id: 'yalniz-p2', scope: 1, product_id: 'p2', method: 'fixed', fixed_price: 500 })] }),
+      { rlsSessizPatch: 'product_prices' },
+    )
+
+    const sonuc = await clearProductPrice(supabase, 'p1', { yontem: 'panel', recalculate: true })
+
+    expect(sonuc.recalc).toBe('hata')
+    expect(sonuc.recalcError).toMatch(/pasifleştirilebildi/)
+    expect(sonuc.verification).toBeNull()
+  })
+
   it('moderatör (recalculate:false): kural yazılır, product_prices\'a HİÇ dokunulmaz', async () => {
     const { supabase, calls } = stub(katalog())
 
@@ -583,7 +686,7 @@ describe('setProductPrice', () => {
     expect(calls.some((c) => c.table === 'product_prices')).toBe(false)
   })
 
-  it('elle ezilmiş (is_derived=false) aktif satır motorun konusu değil: fiyat yansımaz, beklenen-yok ve sayaç açık', async () => {
+  it('elle ezilmiş (is_derived=false) aktif satır motorun konusu değil: fiyat yansımaz, vitrin girilenden FARKLI ve sayaç açık', async () => {
     const { supabase } = stub(
       katalog({ product_prices: [cacheRow('elle', 'p1', { is_derived: false, net_price: 900, gross_price: 1080 })] }),
     )
@@ -597,8 +700,13 @@ describe('setProductPrice', () => {
 
     expect(sonuc.recalc).toBe('tamam')
     expect(sonuc.summary?.skippedManual).toBe(1)
-    // Vitrinde hâlâ ESKİ elle fiyat görünür — "yansıdı" DENMEZ.
-    expect(sonuc.verification).toMatchObject({ status: 'beklenen-yok', gross: 1080, isDerived: false })
+    // Vitrinde hâlâ ESKİ elle fiyat görünür — "yansıdı" DENMEZ: girilen 2400 ≠ vitrin 1080.
+    expect(sonuc.verification).toMatchObject({
+      status: 'farkli',
+      gross: 1080,
+      isDerived: false,
+      expected: { net: 2000, gross: 2400 },
+    })
   })
 })
 

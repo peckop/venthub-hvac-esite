@@ -225,3 +225,20 @@ PR-C (migration + istemci + kapı + cetvel + gölge kanıtı + tip, **plan-chall
 * Kural sayfası listesi 500 satır tavanlı (`PRICING_RULE_LIST_LIMIT`); ürün başına kural çoğalırsa tavana yaklaşır → sayaç/uyarı Faz 2'de.
 * Aynı ürüne iki yönetici aynı anda yazarsa: ürün başına tek kural + güncelle semantiği; son yazan kazanır, panel geri okumayla gösterir.
 * "Vitrine yansıdı" ölçümü veritabanı satırını doğrular; sayfa önbelleğinin tazelendiğini ayrıca Faz 3 canlı kanıtı ölçer.
+
+## 8. Faz 1 (servis) — güvenlik incelemesi ve karşılıkları (2026-09-29, security-reviewer, Opus, salt okuma)
+
+Kod: `pricingAdmin.service.ts` (`setProductFixedPrice`/`clearProductFixedPrice`), `pricingMaterialize.service.ts` (`productIds` kapsamı), `pricingProductPrice.service.ts` (`setProductPrice`/`clearProductPrice`/`verifyProductStorefrontPrice`). Migration YOK. İnceleme 7 bulgu verdi (4'ü kodda doğrulanmış); karşılıklar:
+
+| Bulgu | Ciddiyet | Karşılık |
+|---|---|---|
+| Doğrulamanın "beklenen" fiyatı motorun örneğinden geliyordu; başka kural (scope 0 varyant, kitaba özel, daha öncelikli) kazanınca da `dogrulandi` çıkıyordu (sessiz başarı) | YÜKSEK | **Düzeltildi.** Beklenen fiyat YAZILAN KURALDAN (`computePriceFromRule`, çözücünün aynı saf işlevi) hesaplanır; vitrin girilenden farklıysa `farkli`. Ek olarak `golgelendi` + `kazananKuralId` döner (panel "vitrinde X kuralı kazanıyor" uyarısı için). Testli, sabotajla kırmızı. |
+| Güncelleme yolu eski kuraldan ek ücret/marj kelepçesi/yuvarlama/charm/para birimini olduğu gibi bırakıyor; öncelik yükseltilmiyor | YÜKSEK | **Düzeltildi.** Güncellemede hepsi sıfırlanır, `vat_rate_pct` bilinçli KORUNUR, öncelik diğer ürün kurallarının üstüne çıkarılır. Testli. |
+| Bayat satır pasifleştirmesi etkilenen satır sayısını kontrol etmiyor: RLS dışı satıra UPDATE hata vermez, 0 satır etkiler → `tamam` denip eski fiyat kalır | ORTA | **Düzeltildi.** `.select('id')` ile etkilenen sayı `chunk.length` ile karşılaştırılır, eşit değilse hata → `recalc:'hata'`. Testli (RLS sessiz-0 stub'ı). ⚠Bu kolun sabotajla kırmızı görülmesi denenirken güvenlik denetimini kapatan geçici düzenleme sınıflandırıcı tarafından reddedildi; kol yalnız "geçen" testle kanıtlı. |
+| "Ürün başına en fazla 1 sabit kural" yalnız uygulamada; DB'de tekillik kısıtı yok (iki yönetici aynı anda ilk fiyatı girerse iki kural) | ORTA | **AÇIK, ayrı iş:** `(tenant_id, product_id) WHERE scope=1 AND method='fixed' AND price_book_id IS NULL AND min_quantity=1` üzerinde kısmi unique indeks = MIGRATION (plan-challenger + Recep kapısı). Bugün tek yönetici + canlıda 1 kural; sonraki girişte "en fazla 1" hatası fail-closed. Faz 2'den önce karar: OPS'a bildirildi. |
+| Geçerlilik penceresi güncellemede sessizce siliniyor (kampanya `valid_to` kaybolabilir) | DÜŞÜK | **Faz 2 UI şartı:** panel kaydetmeden önce mevcut kuralı okur, pencere doluysa uyarı/onay ister (servis davranışı bilinçli: girilen fiyat HEMEN geçerli). |
+| Yetkisiz silme `removed:0` ("zaten yoktu") dönüyor | DÜŞÜK | **Faz 2 UI şartı:** düğme yalnız yazma yetkisi olana görünür; RLS sınırdır, servis rol bilmez. |
+| Moderatör: `select('*')` marj alanlarını döndürür; `recalculate:true` `cost_in_base` okur (karar 95) | DÜŞÜK | **Faz 2 UI şartı:** moderatör yolu `recalculate:false` ve panel maliyet/marj alanını hiç göstermez; kolon düzeyi erişim REC-140 hattının işi. |
+| `updated_by` çağırandan geliyor | DÜŞÜK | Bilgilendirme kolonu; denetim aktörü DB tetiğinde `auth.uid()` (§5c). Değişiklik yok. |
+
+**Ölçülemeyenler (incelemeden):** canlı `pg_policy`'nin migration'larla birebir aynılığı; yetkinin `user_profiles.role`'den okunması (REC-442, ALTYAPI); `products`/`price_lists` SELECT politikalarının tenant süzgeci; başka tenant'a ait `product_id` ile kural ekleme (FK RLS'i atlar) — Faz 2 park olduğu için bugün tek tenant.

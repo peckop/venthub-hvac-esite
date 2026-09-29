@@ -601,12 +601,20 @@ export async function materializePrices(
   if (!dryRun) {
     for (let i = 0; i < staleIds.length; i += DEACTIVATE_BATCH_SIZE) {
       const chunk = staleIds.slice(i, i + DEACTIVATE_BATCH_SIZE)
-      const { error } = await yontemli(
-        supabase.from('product_prices').update({ is_active: false }).in('id', chunk),
+      const { data: pasiflesen, error } = await yontemli(
+        supabase.from('product_prices').update({ is_active: false }).in('id', chunk).select('id'),
         yontem,
         oturum,
       )
       if (error) throw error
+      // ⛔RLS USING dışında kalan satıra UPDATE HATA VERMEZ, 0 satır etkiler. Sayıyı kontrol etmezsek yetkisiz bir
+      // kullanıcı (ör. moderatör) yeniden hesap çalıştırınca bayat fiyat vitrinde kalır ama sonuç "tamam" görünür.
+      if ((pasiflesen ?? []).length !== chunk.length) {
+        throw new Error(
+          `materializePrices: ${chunk.length} bayat satırdan ${(pasiflesen ?? []).length} tanesi pasifleştirilebildi ` +
+            '(yetki/RLS?). Eski fiyat vitrinde kalmış olabilir.',
+        )
+      }
     }
   }
 

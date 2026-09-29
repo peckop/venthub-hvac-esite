@@ -184,12 +184,26 @@ export async function setProductFixedPrice(
 
   const current = fixedRules[0]
   if (current) {
+    // Kural sayfasından sonradan eklenen, daha yüksek öncelikli ürün-kapsamlı bir kural sabit fiyatı ezmesin.
+    const otherMax = productRules
+      .filter((rule) => rule.id !== current.id)
+      .reduce((max, rule) => Math.max(max, rule.priority), Number.NEGATIVE_INFINITY)
     const { data, error } = await yontemli(
       supabase
         .from('pricing_rule')
         .update({
           fixed_price: input.amount,
           price_is_vat_inclusive: input.vatIncluded,
+          priority: Number.isFinite(otherMax) ? Math.max(current.priority, otherMax + 1) : current.priority,
+          // Panelde girilen tutar VİTRİNDE görülecek tutardır: eski kuraldan kalan ek ücret, marj kelepçesi, yuvarlama,
+          // charm ve para birimi kısıtı fiyatı sessizce değiştirir (ya da TRY adayı olmaktan çıkarır). Hepsi sıfırlanır.
+          // `vat_rate_pct` KORUNUR: ürünün KDV oranı bilinçli bir veridir (fiyat girişi onu değiştirmez).
+          surcharge: 0,
+          min_margin_abs: null,
+          max_margin_abs: null,
+          round_to: null,
+          charm_ending: null,
+          currency: null,
           valid_from: null,
           valid_to: null,
           // Tabloda `updated_at` trigger'ı YOK → damga ELLE basılır (updatePricingRule ile aynı sözleşme).
