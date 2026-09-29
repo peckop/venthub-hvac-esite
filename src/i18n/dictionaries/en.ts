@@ -298,6 +298,9 @@ export const en: typeof tr = {
       teklifDugme: 'Request a quote',
       listeyeDon: 'Back to the Knowledge Hub',
     },
+    // REC-452: guide links under category and family pages + home knowledge block.
+    ilgiliRehberler: 'Guides on this topic',
+    sonRehberler: 'Latest guides',
     konular: {
       konfor: 'Comfort',
       guvenlik: 'Safety',

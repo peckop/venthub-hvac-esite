@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+import { getDictValue } from '../../i18n/getDictValue'
+import { enYeniRehberler } from '../../lib/bilgiMerkezi/tersDizin'
 import { bilgiMerkeziListeHref } from '../../utils/bilgiMerkezi'
 import { bilgiMerkeziRotalari } from '../../utils/bilgiMerkeziRotalari'
 import { localizedHref, Routes } from '../../utils/routes'
@@ -85,6 +89,11 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
   // Numara SSOT = ENV (NEXT_PUBLIC_SHOP_WHATSAPP); eski sabit değer uydurmaydı
   // ve gerçek bir vatandaşa denk gelebilirdi (2026-08-30 temizliği). ENV yoksa buton çıkmaz.
   const whatsAppNumber = getWhatsAppNumber()
+  // REC-452 (rehber-yazisi-standard R3.1): ana sayfa en yeni rehberlere doğrudan bağlanır — önce
+  // yalnız liste sayfasına bağlanıyordu, yeni yazıya ana sayfadan yol yoktu. Sunucuda hesaplanır
+  // (bu bileşen RSC); o dilde Bilgi Merkezi kapalıysa ya da yazı yoksa liste boş, blok basılmaz.
+  const sonRehberler = enYeniRehberler(lang)
+  const sonRehberBaslik = getDictValue(lang === 'en' ? en : tr, 'bilgiMerkezi.sonRehberler')
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 sm:py-32 text-white">
       {/* Background Elements */}
@@ -173,6 +182,27 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
             )
           })}
         </div>
+
+        {sonRehberler.length > 0 && (
+          <section aria-labelledby="son-rehberler" className="mt-16">
+            <h3 id="son-rehberler" className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-400">
+              {sonRehberBaslik}
+            </h3>
+            <ul className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {sonRehberler.map((r) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className="block h-full rounded-hvac-xl border border-white/10 bg-white/2 p-6 transition-colors hover:border-cyan-500/40 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+                  >
+                    <span className="block text-lg font-bold text-white">{r.baslik}</span>
+                    <span className="mt-2 block text-base font-light text-slate-400">{r.ozet}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Integrated Final Action Layer (Unified Conversion) */}
         <div className="mt-24 pt-24 border-t border-white/5 grid gap-12 lg:grid-cols-2 items-center">
