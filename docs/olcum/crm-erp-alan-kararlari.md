@@ -14,7 +14,8 @@ Son ölçüm: 2026-09-29. Önceki ölçümler tarihli, hepsi burada.
 | 09-25 | Vizyon (ERP+teknik servis+IoT+CFD), ilke açık kaynak | NLM 4edeb29e | hafıza venthub-vizyonu-acik-kaynakla |
 | 09-29 | ERP/ön muhasebe/e-fatura | bkz. e-fatura-muhasebe-erp.md | — |
 
-## Alan haritası (karar 181 önerisi, Recep cevabı BEKLENİYOR; şirket kurulmadı bilgisiyle)
+## Alan haritası — KARAR 181: EVET (Recep, 2026-09-29 14:15; şirket kurulmadı bilgisiyle)
+Kural: genel arka ofis modülünü (stok, satınalma, CRM, teknik servis) genişletmek = önce OPS'a sor; genel bir bileşen/modül yazmadan önce olgun kütüphane/sistem aranır. Tetikleyici (şirket + hacim, 2. kullanıcı, gerçek satınalma/depo/servis) oluşunca ERPNext. CRM rafı (wacrm / Atomic CRM / Medusa) yalnız örnek kaynağıdır. Kural rol kartlarına işlendi (URUN, ADMIN, ALTYAPI, KATALOG "Yasak ve sınır"; ortak "Çalışma düzeni").
 | Alan | Öneri |
 |---|---|
 | Seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi | BİZ yazarız (farklılaştıran) |
