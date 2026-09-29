@@ -159,6 +159,63 @@ PR-A (migration + kapı genişlemesi + cetvel + gölge kanıtı, **Recep kapıs�
 
 (a) Yöntem kolon değil başlık (§5b.2'den sapma; gerekçe DELETE + tip kayması). (b) "Toplu yeniden hesap tek özet" → parti başına özet + oturum kimliği + ayrıntılı dizi. (c) **`maliyet_yenileme` bu fazda YOK:** maliyet kolonları `products` UPDATE-OF listesinde olmadığından maliyet yenileme bugün de günlüksüz; ya (1) iki kolon `WHEN`'li listeye girer (348 satırlık yenileme = 348 satır; hacim kararı OPS) ya (2) istemci koşu başına başlangıç/bitiş satırı yazar. Bu faz dışı, karar OPS'ta.
 
+## 5d. Faz 0.5b — MALİYET YENİLEME GÜNLÜĞÜ (karar 186; migration `20260929143000_maliyet_yenileme_gunlugu.sql`)
+
+**Cetvel:** `docs/standards/denetim-izi-standard.md` §8.4 (bu işle yazıldı) · `migration-safety-standard.md` (salt-ekleyici, biçim a) ·
+CLAUDE.md kural 11 / 12 (yetki `app_metadata`) / 13. Bu bölüm §5c (c) maddesinin ("maliyet_yenileme bu fazda YOK") takibidir.
+
+### Ölçüm (canlı salt okuma + kod, 2026-09-29)
+
+| soru | bulgu |
+|---|---|
+| Kim yazıyor? | Yalnız `refreshCostInBase` (`pricingMaterialize.service.ts`); panelden ELLE tetiklenir (`CostRefreshModal`), **cron yok** (`cron.job`'da maliyet işi yok). |
+| Nasıl yazıyor? | 348 ürünü ürün başına **AYRI PostgREST PATCH** (20 paralel). Ortada hata → katalog **yarı yenilenmiş** kalır. |
+| Günlük? | `cost_in_base`/`purchase_rate_to_base` `denetim_izi_products_upd` `UPDATE OF` listesinde **yok** (canlı tanım okundu; `purchase_price`/`purchase_currency` VAR) → yenileme günlüksüz. |
+| Hacim | `products` 442, maliyetli 348. Yenileme başına ≤348 satır. |
+| Yetki | `products` UPDATE politikası admin + super_admin + **moderator** (tenant süzgeci yok). Moderatör fiyatlandırma sayfasını GÖRMEZ ve yazma listesinde değil (`rbac.ts`) → RPC'nin yönetici kapısı arayüzle uyumlu, davranış değişikliği yok. |
+| Kapı işlevi | `is_admin_claim()` = JWT `user_role`/`app_metadata.user_role`, `user_metadata`'ya bakmaz, JWT yoksa FALSE (tabloya düşmez); `is_admin_user()` ise JWT'de rol yoksa profil tablosuna düşer → kural 12 için doğru olan `is_admin_claim()`. |
+
+### Sonuç: parti özeti DB'de tek ifadeyle mümkündür, 348 ayrı istekle DEĞİL
+
+İfade düzeyi tetik yalnız TEK sorgunun satırlarını toplar. **OPS'a bildirildi; X onaylandı (karar 186):** tek `UPDATE` ifadesi yazan
+yönetici kapılı RPC + ifade tetiği. Z (iki kolonu satır tetiğine eklemek, ≤348 satır) reddedildi (parti özeti sözleşmesine aykırı).
+
+### Tasarım (kesin)
+
+1. **`maliyet_yenile(p_satirlar jsonb) returns integer`** — `SECURITY INVOKER` (RLS korunur), `is_admin_claim()` kapısı (42501), tenant filtresi
+   (`jwt_tenant_id()`), girdi doğrulaması yazımdan ÖNCE (dizi mi, eleman tam mı, `cost>=0`, `rate>0`, id bu tenant'ta var mı, ≤5000) — tek bozuk
+   eleman tüm partiyi reddeder. Tek `UPDATE … FROM jsonb_to_recordset(…)`; yalnız değişen satırlar yazılır.
+2. **`denetim_izi_maliyet_ozet()`** — `products` üzerinde ifade tetiği (`REFERENCING OLD/NEW TABLE`), tenant başına TEK özet (`row_pk='OZET'`),
+   `before/after` = değişen satırların eski→yeni dizisi (tavan 5000 = RPC tavanı, RPC yolunda kırpılmaz). Yöntem/oturum §8.1 başlıklarından.
+   `purchase_price`/`purchase_currency` değişen satır özetten ELENİR (satır tetiği zaten tüm kolonlarıyla yazar → çift kayıt yok).
+3. **İstemci:** `refreshCostInBase` RPC'ye geçer (`yontemli(…, 'maliyet_yenileme', yeniOturumKimligi())`); 5000'i aşarsa BÖLMEDEN durur.
+   **Kapı (INV-FIYAT-GUNLUGU-1 maliyet kolu):** `products.update` içinde maliyet kolonu → KIRMIZI; her `.rpc('maliyet_yenile')` başlıklı sarmalda;
+   istemci ve DB parti sınırı AYNI (kayma bekçisi).
+4. **Tip dosyası:** `maliyet_yenile` `database.types.ts` `Functions`'a eklendi (tip-drift kapısı CI'da doğrular).
+
+### Gölge kanıtı (migration dosyası BİREBİR, PGlite)
+
+`docs/audits/rec412-maliyet-golge/golge.mjs` — gerçek `is_admin_claim()` ve `denetim_izi_yaz()` dosyalardan yüklenir; **43 kontrol yeşil**;
+5 bilinçli bozma kırmızı (`SABOTAJ=tenant` 2, `dedup` 1, `kapi` 3, `beklenen` 3, `nan` 3). Kapsam: yönetici/moderatör/`user_metadata`/JWT'siz/service_role,
+atomiklik (5 bozuk girdi), tenant sınırı, 5001 sınırı, fail-closed (günlük FK ihlali → maliyet geri alınır), çift kayıt önlemi, stok regresyonu,
+NULL→değer, iki tenant, yetki matrisi, 5000 satır tek özet; **çürütme sonrası eklenenler:** RLS'li `products` (JWT admin + profil rolü düşük →
+40001, sessiz başarı yok), NaN/Infinity, yinelenen id, alış fiyatı/para birimi değişti, ondalık taşması (2. koşu n=0).
+⚠Şema gerçek değil (RLS modeli basit, `auth.uid()` taklit, 8 sn `statement_timeout` ve satır tetikleri YOK); hacim/süre gerçek DB'yi temsil etmez.
+Bağımsız çürütme: `docs/audits/rec412-maliyet-red-team-2026-09-29.md` (KOŞULLU GEÇER; 4 ORTA + 7 DÜŞÜK; "Karşılık" tablosu her bulguyu yanıtlar).
+
+### Riskler (adıyla)
+
+* **Sıcak tablo:** ifade tetiği `products`'ın HER UPDATE ifadesinde çalışır (stok düşümü dahil; geçiş tablosu tetiğine sütun listesi konamaz).
+  Değişen maliyet yoksa satır yazmaz; PGlite'ta 1000 tek-satır UPDATE'te +~0,25 ms/ifade (tetikli 737 ms, tetiksiz 489 ms) — gerçek DB'de canlı ölçülmeli.
+* **Kilit:** tetik oluşturmak `products` üzerinde SHARE ROW EXCLUSIVE ister; `lock_timeout=5s` ile hızlı düşer (yeniden denenir).
+* **Parti sınırı 5000:** katalog büyürse RPC/istemci sınırı birlikte yükseltilir (migration); istemci BÖLMEZ.
+* **`service_role` TRUE:** betikler yazabilir (kasıtlı; `is_admin_claim()` ile aynı davranış).
+
+### Sıra (kural 13 zinciri)
+
+PR-C (migration + istemci + kapı + cetvel + gölge kanıtı + tip, **plan-challenger ZORUNLU, Recep kapısı**) → merge → `supabase-migrate.yml` yeşil →
+`sema-tabani-uret.yml` (aynı gün; taban bayatlar) → canlı doğrulama: tetik var, `anon` EXECUTE yok, ilk gerçek panel yenilemesinde tek `OZET` satırı.
+
 ## 6. Yan bulgu (kapsam dışı, kayıt önerisi)
 
 `pricing_rule` RLS politikaları yetkiyi `user_profiles.role`'den okuyor (CLAUDE.md kural 12: yetki `app_metadata`). Bu iş etkilemez ama REC-140 çizgisiyle birlikte ALTYAPI'ya bildirilmeli.

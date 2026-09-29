@@ -4587,6 +4587,7 @@ export type Database = {
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
       jwt_price_segment: { Args: never; Returns: string }
       jwt_tenant_id: { Args: never; Returns: string }
+      maliyet_yenile: { Args: { p_satirlar: Json }; Returns: number }
       process_goods_receipt: {
         Args: {
           p_document_no: string
