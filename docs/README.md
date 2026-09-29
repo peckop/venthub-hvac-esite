@@ -73,6 +73,18 @@
 | DI ve güvenlik milestone kayıtları, arayüz kontratları | `../PROJECT.md` |
 | Durum ve değişiklik geçmişi | `../RECOMMENDATIONS.md` · `../CHANGELOG.md` |
 
+## Belge türü haritası — hangi belge nerede, sahibi kim, bayatlığı neyle görünür
+
+| Belge türü | Yeri | Sahibi | Bayatlık / doğrulama |
+|---|---|---|---|
+| Cetvel (kural + kapı) | `standards/*.md` | Başlıkta `Sahibi:` ya da `roller/cetvel-sahipligi.md` tablosu (rol kartlarından türetilmiş) | `belge-tazelik`: sahip eksik ve doğrulama eksik AYRI sayılır (taban yalnız küçülür) |
+| Rol kartı (görev, dosya, yetki, Recep kapıları) | `roller/<DEPARTMAN>.md` | HARİTA üretir, OPS onaylar | Üreticiyle bire bir aynılık testi (INV-ROL-1) |
+| Ölçüm / denetim kaydı | `audits/*.md` | Ölçümü yapan departman | Tarihi dosya adında; eski ölçüm yeni ölçümün yerine geçmez |
+| Plan / yol haritası | `plans/*.md` | İşi yürüten departman | Karar Linear'da, plan yalnız yöntem; bayat plan arşive |
+| Çekirdek belge (CLAUDE.md, bu harita) | kök, `docs/README.md` | HARİTA (CLAUDE.md değişikliği OPS kapısı) | Her mesajdaki `BELGE` satırı; kırık yol kapısı (INV-BELGE-1) |
+| Üretilmiş master | `docs/*_master.md`, `roller/cetvel-sahipligi.md` | Üretici betik | Elle düzenleme yok; üretici çıktısıyla aynılık testi |
+| Arşiv (tarihsel) | `archive/**` | — | Yürürlükte DEĞİL; yönlendirme sayfası asıl belgeyi gösterir |
+
 ## Şu anki geliştirme adımı (takip)
 
 İş durumu için tek kaynak **Linear projeleri**; kim hangi dosyada çalışıyor sorusu için WrongStack panosu

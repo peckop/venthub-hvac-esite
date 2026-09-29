@@ -58,7 +58,7 @@ const CALISMA = [
   '- Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree\'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).',
   '- Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear\'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.',
   '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
-  '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano.',
+  '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano. Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
   '- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.',
   '- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.',
   '- CLAUDE.md\'deki 14 mutlak kural her role geçerlidir.',
@@ -214,6 +214,49 @@ function sorunlar(kartlar) {
   return s
 }
 
+const SAHIPLIK_BELGESI = 'cetvel-sahipligi.md'
+const SAHIPLIK_VERISI = path.join('scripts', 'belge', 'cetvel-sahipligi.json')
+
+/** Sahiplik haritasını okur: { 'docs/standards/x.md': { sahip, dogrulanacak, dayanak } } (dosya yoksa {}). */
+function sahiplikOku(kok) {
+  const p = path.join(kok, SAHIPLIK_VERISI)
+  return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')).cetveller || {} : {}
+}
+
+/**
+ * Sahiplik haritasındaki sorunlar (boş = temiz): bilinmeyen rol, docs/standards dışı yol, var olmayan dosya.
+ * `varMi` test için değiştirilebilir (bozuk kopyayla ayırt edicilik).
+ */
+function sahiplikSorunlari(harita, varMi) {
+  const s = []
+  for (const [dosya, v] of Object.entries(harita)) {
+    if (!ROLLER[v.sahip]) s.push(`${dosya}: bilinmeyen rol ${v.sahip}`)
+    if (!dosya.startsWith('docs/standards/')) s.push(`${dosya}: docs/standards dışında`)
+    else if (!varMi(dosya)) s.push(`${dosya}: dosya yok`)
+  }
+  return s
+}
+
+/** Üretilmiş sahiplik tablosu (docs/roller/cetvel-sahipligi.md). */
+function sahiplikTablosu(harita) {
+  const sirali = Object.entries(harita).sort((a, b) => a[1].sahip.localeCompare(b[1].sahip) || a[0].localeCompare(b[0]))
+  const sayi = {}
+  for (const [, v] of sirali) sayi[v.sahip] = (sayi[v.sahip] || 0) + 1
+  return [
+    '# Cetvel sahipliği (rol kartlarından türetilmiş)',
+    '',
+    '> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.',
+    '> **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.',
+    '',
+    `Rol başına: ${Object.entries(sayi).map(([r, n]) => `${r} ${n}`).join(' · ')}`,
+    '',
+    '| Cetvel | Sahip | Durum | Dayanak |',
+    '|---|---|---|---|',
+    ...sirali.map(([d, v]) => `| ${d.replace('docs/standards/', '')} | ${v.sahip} | ${v.dogrulanacak ? 'Sahip (doğrulanacak)' : 'teyitli'} | ${v.dayanak} |`),
+    '',
+  ].join('\n')
+}
+
 const OZET_SINIRI = 300
 
 /**
@@ -250,12 +293,35 @@ function main() {
       console.error(`FARK: docs/roller/${dosyaAdi(ad)}`)
     }
   }
-  const s = sorunlar(kartlar)
+  const harita = sahiplikOku(kok)
+  const tablo = sahiplikTablosu(harita)
+  const tabloYol = path.join(dizin, SAHIPLIK_BELGESI)
+  if (yaz) {
+    fs.writeFileSync(tabloYol, tablo, 'utf8')
+  } else if (!fs.existsSync(tabloYol) || fs.readFileSync(tabloYol, 'utf8').replace(/\r\n/g, '\n') !== tablo) {
+    fark++
+    console.error(`FARK: docs/roller/${SAHIPLIK_BELGESI}`)
+  }
+  const s = [...sorunlar(kartlar), ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d)))]
   for (const x of s) console.error(`SORUN: ${x}`)
-  if (yaz) console.log(`${Object.keys(kartlar).length} kart yazıldı`)
+  if (yaz) console.log(`${Object.keys(kartlar).length} kart + sahiplik tablosu yazıldı`)
   process.exit(fark || s.length ? 1 : 0)
 }
 
-module.exports = { uret, sorunlar, ozet, ROLLER, KART_BAYT_SINIRI, OZET_SINIRI, dosyaAdi, ILETISIM, ILETISIM_ISTISNA }
+module.exports = {
+  uret,
+  sorunlar,
+  ozet,
+  sahiplikOku,
+  sahiplikSorunlari,
+  sahiplikTablosu,
+  SAHIPLIK_BELGESI,
+  ROLLER,
+  KART_BAYT_SINIRI,
+  OZET_SINIRI,
+  dosyaAdi,
+  ILETISIM,
+  ILETISIM_ISTISNA,
+}
 
 if (require.main === module) main()
