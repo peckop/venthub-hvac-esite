@@ -203,6 +203,39 @@ function enjeksiyon(memoryDir, sid, sinir = ENJEKTE_UST_SINIR) {
   return bas + '\n…(eski kısım kesildi — tamamı: ' + path.basename(y) + ')\n' + s.slice(-(sinir - bas.length - 80))
 }
 
+/**
+ * SessionStart için KISA enjeksiyon (REC-433 alt işi, Ops 09-29). Bir SessionStart kancasının çıktısı
+ * 10.000 karakteri aşınca bağlama yalnız ilk ~2.000 karakter girer; 12.000'lik `enjeksiyon` tek başına
+ * bu sınırı aşıyordu. Burada: yalnız Recep'in SON mesajları (sonN), her biri mesajTavan'a kadar AYNEN,
+ * toplam tavan'ı aşmaz; cevaplar ve eski mesajlar dosyada kalır, yolu satırda yazılır.
+ */
+function enjeksiyonKisa(memoryDir, sid, { sonN = 6, mesajTavan = 600, tavan = 3600 } = {}) {
+  const y = dosyaYolu(memoryDir, sid)
+  if (!sid || !fs.existsSync(y)) return null
+  const s = fs.readFileSync(y, 'utf8')
+  const bas = s.split('\n').slice(0, 2).join('\n')
+  const govde = s.split('\n').slice(2).join('\n')
+  const mesajlar = govde
+    .split(/^### Recep \(/m)
+    .slice(1)
+    .map((p) => {
+      const ust = p.indexOf(')\n')
+      const zaman = ust > -1 ? p.slice(0, ust) : 'saat yok'
+      let metin = ust > -1 ? p.slice(ust + 2) : p
+      const cevap = metin.indexOf('\n#### Cevap')
+      if (cevap > -1) metin = metin.slice(0, cevap)
+      metin = metin.trim()
+      if (metin.length > mesajTavan) metin = metin.slice(0, mesajTavan) + ' […mesaj kırpıldı, tamamı dosyada]'
+      return `### Recep (${zaman})\n${metin}\n`
+    })
+    .slice(-sonN)
+  const not = `(yalnız Recep'in son ${mesajlar.length} mesajı; cevaplar ve eski kısım dosyada — tamamı: ${path.basename(y)})\n`
+  let kabul = mesajlar
+  const topla = (l) => bas.length + not.length + l.reduce((n, m) => n + m.length + 1, 0)
+  while (kabul.length > 1 && topla(kabul) > tavan) kabul = kabul.slice(1)
+  return bas + '\n' + not + kabul.join('\n')
+}
+
 /** Stop turunda dökümü yenilemek gerekir mi: dosya yok ya da kayıttan eski. */
 function dokumGerekli(kayitYolu, hedef) {
   try {
@@ -265,5 +298,5 @@ function main() {
   }
 }
 
-module.exports = { sirSuz, turlar, dokumUret, enjeksiyon, dosyaYolu, dokumGerekli, eskiDokumleriSil, RECEP_SAYI, CEVAP_SAYI, ENJEKTE_UST_SINIR }
+module.exports = { sirSuz, turlar, dokumUret, enjeksiyon, enjeksiyonKisa, dosyaYolu, dokumGerekli, eskiDokumleriSil, RECEP_SAYI, CEVAP_SAYI, ENJEKTE_UST_SINIR }
 if (require.main === module) main()
