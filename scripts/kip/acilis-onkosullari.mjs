@@ -219,7 +219,30 @@ async function olcEposta(ctx) {
   return { gecti: alan?.status === 'verified', ayrinti: `venthub.com.tr ${alan ? `durum=${suz(alan.status)}` : 'Resend hesabında YOK'}` }
 }
 
-const GENEL_YONTEM = /^(ileride|ilerde|sonra|bakilacak|bakılacak|belirlenecek|tbd|\?+|-+|yontem|yöntem)$/i
+/**
+ * K9: "müşteri e-postası GERÇEKTEN gidiyor" (OPS 09-29, ALTYAPI ölçümü: DNS eksiksiz görünse de Resend'de alanın Verified olduğu
+ * ölçülmedi ve üç olay tablosu boş = bugüne dek hiç e-posta denenmemiş). K6 alan doğrulamasını, K9 GÖNDERİM KANITINI ölçer.
+ * Ölçüt: son 30 günde en az bir satır; sipariş/teklif: `status='sent'` + `provider_message_id`; kargo tablosunda `status` kolonu YOK
+ * (ölçüldü) → yalnız `provider_message_id` dolu satır. Ölçülemezse RET.
+ */
+async function olcEpostaGonderimKaniti(ctx) {
+  if (!ctx.dbSorgu) throw new Error('SUPABASE_DB_URL yok')
+  const r = await ctx.dbSorgu(
+    `select
+       (select count(*) from public.order_email_events where status = 'sent' and provider_message_id is not null and created_at > now() - interval '30 days')::int as siparis,
+       (select count(*) from public.quote_email_events where status = 'sent' and provider_message_id is not null and created_at > now() - interval '30 days')::int as teklif,
+       (select count(*) from public.shipping_email_events where provider_message_id is not null and created_at > now() - interval '30 days')::int as kargo`,
+  )
+  const s = r[0]
+  if (!s || [s.siparis, s.teklif, s.kargo].some((n) => typeof n !== 'number')) throw new Error('e-posta olay sayıları okunamadı')
+  const toplam = s.siparis + s.teklif + s.kargo
+  return {
+    gecti: toplam >= 1,
+    ayrinti: `son 30 gün gönderim kaydı: sipariş ${s.siparis} · teklif ${s.teklif} · kargo ${s.kargo}${toplam === 0 ? ' (hiç e-posta gitmemiş/denenmemiş)' : ''}`,
+  }
+}
+
+const GENEL_YONTEM =/^(ileride|ilerde|sonra|bakilacak|bakılacak|belirlenecek|tbd|\?+|-+|yontem|yöntem)$/i
 
 /** K7: Recep beyanı. Kalıp: "e-arşiv faturaları <yöntem> ile kesilecek (mali müşavir teyitli)"; yöntem genel/boş ise RET. */
 export function faturaBeyaniDegerlendir(beyan) {
@@ -253,6 +276,7 @@ export const KALEMLER = [
   { id: 'K6', ad: 'E-posta göndericisi doğrulanmış', sahip: 'Recep + ALTYAPI (REC-368)', kanit: 'Resend GET /domains venthub.com.tr', muaf: true, olc: olcEposta },
   { id: 'K7', ad: 'Fatura yolu: Recep beyanı', sahip: 'Recep', kanit: '--fatura-beyani (damgalı)', muaf: false, olc: olcFatura },
   { id: 'K8', ad: 'Hedef durum tutarlı (anahtar ↔ hide_price)', sahip: 'URUN', kanit: 'planla() sonrası beklenen durum', muaf: false, olc: olcHedefTutarlilik },
+  { id: 'K9', ad: 'Müşteri e-postası gerçekten gidiyor (son 30 günde gönderim kaydı)', sahip: 'ALTYAPI (REC-368)', kanit: '*_email_events: sent + provider_message_id (30 gün)', muaf: false, olc: olcEpostaGonderimKaniti },
 ]
 
 // ---------- ölçüm + değerlendirme ----------

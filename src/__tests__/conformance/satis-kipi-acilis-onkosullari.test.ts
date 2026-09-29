@@ -66,6 +66,7 @@ type Ayar = {
   bekciYanlisTablo?: boolean
   resendDurum?: string
   bekciSorgulari?: { sayac: number; ikinciDefaDus?: boolean }
+  epostaKaydi?: { siparis: number; teklif: number; kargo: number }
 }
 
 function dunya(ayar: Ayar = {}, ctxEk: Partial<Ctx> = {}): Ctx {
@@ -85,6 +86,7 @@ function dunya(ayar: Ayar = {}, ctxEk: Partial<Ctx> = {}): Ctx {
     return yanit(404, '{}')
   }
   const dbSahte: NonNullable<Ctx['dbSorgu']> = async (sql) => {
+    if (sql.includes('order_email_events')) return [ayar.epostaKaydi ?? { siparis: 1, teklif: 0, kargo: 0 }]
     if (sql.includes('satis_kipi_oku')) return [{ n: 1 }]
     if (sql.includes('pg_policy')) {
       const hepsi = [
@@ -130,9 +132,9 @@ function dunya(ayar: Ayar = {}, ctxEk: Partial<Ctx> = {}): Ctx {
 }
 
 describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş alanla kırmızı)', () => {
-  it('sabit kalem sayısı 8 (K1..K8); sessiz kalem silme kırmızı', async () => {
+  it('sabit kalem sayısı 9 (K1..K9); sessiz kalem silme kırmızı', async () => {
     const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
-    expect(m.KALEMLER.map((k) => k.id)).toEqual(['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8'])
+    expect(m.KALEMLER.map((k) => k.id)).toEqual(['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8', 'K9'])
     // K1/K6 dışında hiçbir kalem muaf OLAMAZ (plan bulgu 4)
     expect(m.KALEMLER.filter((k) => k.muaf).map((k) => k.id)).toEqual(['K1', 'K6'])
     // Her kalemin sahibi ve kanıtı tabloda basılır: boş olamaz.
@@ -146,7 +148,7 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
     let hazirlik = 0
     const k = await m.acilisKapisi(dunya(), { hazirlik: async () => void (hazirlik += 1) })
-    expect(k.hukum.satirlar.map((s) => `${s.id}:${s.durum}`)).toEqual(['K1:GECTI', 'K2:GECTI', 'K3:GECTI', 'K4:GECTI', 'K5:GECTI', 'K6:GECTI', 'K7:GECTI', 'K8:GECTI'])
+    expect(k.hukum.satirlar.map((s) => `${s.id}:${s.durum}`)).toEqual(['K1:GECTI', 'K2:GECTI', 'K3:GECTI', 'K4:GECTI', 'K5:GECTI', 'K6:GECTI', 'K7:GECTI', 'K8:GECTI', 'K9:GECTI'])
     expect(k.izin).toBe(true)
     expect(hazirlik).toBe(1)
   })
@@ -162,6 +164,7 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     ['K5', 'bekçi yanlış tabloda', () => ({ ayar: { bekciYanlisTablo: true } })],
     ['K6', 'Resend alan doğrulanmamış', () => ({ ayar: { resendDurum: 'pending' } })],
     ['K7', 'fatura beyanı yok', () => ({ ctx: { faturaBeyani: undefined } })],
+    ['K9', 'son 30 günde hiç e-posta gönderim kaydı yok (üç tablo boş)', () => ({ ayar: { epostaKaydi: { siparis: 0, teklif: 0, kargo: 0 } } })],
     ['K8', 'hedef durum tutarsız (açık + 5 gizli)', () => ({ ctx: { hedef: { acik: true, toplam: 31, hidePriceTrue: 5 }, tutarliMi: (d: unknown) => {
       const x = d as { anahtar: { acik: boolean }; kategori: { hidePriceTrue: number } }
       return { tutarli: !x.anahtar.acik || x.kategori.hidePriceTrue === 0, beklenen: 'açık → 0' }
@@ -179,14 +182,28 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     expect(hazirlik, 'ret sonrası yedek/hazırlık çalıştı (yazma yolu açık kalmış)').toBe(0)
   })
 
-  it('ÖLÇÜLEMEDİ = RET: DB yok, Resend anahtarı yok, probe kimliği yok → K3/K4/K5/K6 ölçülemedi, izin yok', async () => {
+  it('K9: tek bir tabloda bile kayıt yeterli (kargo tablosunda status kolonu yok); üçü de 0 iken RET', async () => {
+    const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
+    const k9 = m.KALEMLER.find((k) => k.id === 'K9')!
+    expect((await m.kalemiOlc(k9, dunya({ epostaKaydi: { siparis: 0, teklif: 0, kargo: 1 } }))).durum).toBe('GECTI')
+    expect((await m.kalemiOlc(k9, dunya({ epostaKaydi: { siparis: 0, teklif: 0, kargo: 0 } }))).durum).toBe('KALDI')
+    // sayı okunamazsa ölçülemedi (ret): boş dizi / sayı olmayan alan yeşil vermez
+    const bozuk = dunya({}, { dbSorgu: async () => [] })
+    expect((await m.kalemiOlc(k9, bozuk)).durum).toBe('OLCULEMEDI')
+    // ölçüt kaynağa bağlı: üç tablo adı ve `sent` + provider_message_id sorgusu betikte durur
+    const kaynak = oku('scripts/kip/acilis-onkosullari.mjs')
+    for (const t of ['order_email_events', 'quote_email_events', 'shipping_email_events']) expect(kaynak, `${t} sorgudan çıkmış`).toContain(t)
+    expect(kaynak).toMatch(/status = 'sent' and provider_message_id is not null/)
+  })
+
+  it('ÖLÇÜLEMEDİ = RET: DB yok, Resend anahtarı yok, probe kimliği yok → K3/K4/K5/K6/K9 ölçülemedi, izin yok', async () => {
     const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
     const ctx = dunya({}, { dbSorgu: null })
     delete ctx.env.RESEND_API_KEY
     delete ctx.env.KIP_PROBE_PAROLA
     const s = await m.onkosulOlc(ctx)
     const durum = Object.fromEntries(s.map((x) => [x.id, x.durum]))
-    expect(durum).toMatchObject({ K3: 'OLCULEMEDI', K4: 'OLCULEMEDI', K5: 'OLCULEMEDI', K6: 'OLCULEMEDI' })
+    expect(durum).toMatchObject({ K3: 'OLCULEMEDI', K4: 'OLCULEMEDI', K5: 'OLCULEMEDI', K6: 'OLCULEMEDI', K9: 'OLCULEMEDI' })
     expect(m.degerlendir(s).acilabilir).toBe(false)
   })
 
@@ -253,7 +270,7 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     const tam = await m.onkosulOlc(dunya())
     expect(m.degerlendir(tam).acilabilir).toBe(true)
     expect(m.degerlendir(tam.slice(1)).acilabilir, 'K1 sessizce silindi ve kapı yine açıldı').toBe(false)
-    expect(m.degerlendir([...tam, { ...tam[0], id: 'K9' }]).acilabilir).toBe(false)
+    expect(m.degerlendir([...tam, { ...tam[0], id: 'K99' }]).acilabilir).toBe(false)
   })
 
   it('TOCTOU: ilk ölçüm geçer, yazımdan hemen önceki YENİDEN ölçümde K5 düşer → izin YOK', async () => {

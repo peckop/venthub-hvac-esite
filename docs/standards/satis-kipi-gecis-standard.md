@@ -223,6 +223,7 @@ Sıra: **önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm →
 | K6 | E-posta göndericisi doğrulanmış | Resend `GET /domains`: `venthub.com.tr` `verified`; anahtar yoksa ölçülemedi · muaf olabilir | Recep + ALTYAPI (REC-368) |
 | K7 | Fatura yolu | Varsayılan **RET**. Tek açık yol: `--fatura-beyani "<Recep sözü · tarih>"`, kalıp **"e-arşiv faturaları `<yöntem>` ile kesilecek (mali müşavir teyitli)"**; yöntem genel/boşsa RET; beyan `site_settings` damgasına yazılır | Recep (açılış günü sorulur) |
 | K8 | Hedef durum tutarlı | `planla()` sonrası beklenen durum (anahtar ↔ `hide_price`); **şimdiki durum DEĞİL** (yarım kalmış açılış onarılabilsin) | URUN |
+| K9 | Müşteri e-postası gerçekten gidiyor | son 30 günde `order_email_events`/`quote_email_events` `status='sent'` + `provider_message_id` ya da `shipping_email_events` `provider_message_id` (bu tabloda `status` kolonu yok); üç tablodan toplam ≥ 1. K6 alanı, K9 gönderimi ölçer; DB yoksa ölçülemedi = ret | ALTYAPI (REC-368) |
 
 **K7 cümlesi (OPS hükmü):** e-arşiv faturası yasal zorunluluktur. Beyan **faturasız satışa izin DEĞİLDİR**; faturanın otomasyon dışı
 (elle/mali müşavir aracılığıyla) kesileceğinin taahhüdüdür.
@@ -242,7 +243,7 @@ yazım bu kapıyı atlar (panelden yazımı #1536'nın kısıtlayıcı politikas
 | **INV-SATIS-KIPI-4** | betik `--uygula`siz: mock istemcide `.update/.insert` çağrı sayısı **0**; `--uygula` onaysız → çıkış 1 | `if (!UYGULA) return` silinir → düşer |
 | **INV-SATIS-KIPI-5** | `tutarliMi()` üç hâl: açık+0 ✓ · kapalı+37 ✓ · açık+5 ✗ | ara hâli kabul eden değişiklik → düşer |
 | **INV-SATIS-KIPI-6** | anahtar açık olsa bile satıcı bilgisi yer tutucuysa ödeme adımı açılmaz (`odemeKarari`); ziyaretçi ham `[YER_TUTUCU]` görmez (INV-LEGAL-GORUNUM-1) | `odemeKarari` çağrısı ya da görünüm nesnesi kaldırılır → düşer |
-| **INV-SATIS-KIPI-7** | açılış önkoşulları (§8.1): 8 kalem, her biri tek tek RET verir; ölçülemedi = ret; boş/eksik sonuç = ret; K1/K6 dışı muaf olamaz; yazımdan hemen önce K2/K4/K5 yeniden ölçülür; kapı yazmadan önce ve ret = çıkış 1 | `if (UYGULA && !onkosulSonuc.izin)` ya da yeniden ölçüm silinir → düşer |
+| **INV-SATIS-KIPI-7** | açılış önkoşulları (§8.1): 9 kalem, her biri tek tek RET verir; ölçülemedi = ret; boş/eksik sonuç = ret; K1/K6 dışı muaf olamaz; yazımdan hemen önce K2/K4/K5 yeniden ölçülür; kapı yazmadan önce ve ret = çıkış 1 | `if (UYGULA && !onkosulSonuc.izin)` ya da yeniden ölçüm silinir → düşer |
 | boş-koşum koruması | her kapı en az bir gerçek girdi görmeden "geçti" demez | — |
 
 ## 10. PR bölümlemesi — kota ve kapı gerekçeli (OPS 2026-09-06 kabul)

@@ -44,12 +44,13 @@ Bugün `--yon ac --uygula --onay "..."` yalnız bir **söze** dayanır; betik on
 
 **K7 cetvel cümlesi (OPS hükmü, olduğu gibi cetvele geçer):** e-arşiv faturası yasal zorunluluktur. Beyan **faturasız satışa izin DEĞİLDİR**; faturanın otomasyon dışı (elle/mali müşavir aracılığıyla) kesileceğinin taahhüdüdür.
 | K8 | Hedef plan tutarlılığı | `planla()` sonrası beklenen durum tutarlı (saf hesap; şimdiki durum DEĞİL: yarım kalmış açılış onarılabilsin) | URUN | GEÇER |
+| K9 | Müşteri e-postası gerçekten gidiyor (OPS 09-29 eki, ALTYAPI ölçümü) | Son 30 günde `order_email_events`/`quote_email_events` `status='sent'` + `provider_message_id` **veya** `shipping_email_events` `provider_message_id` (bu tabloda `status` kolonu YOK, ölçüldü) satırı; üç tablodan toplam ≥ 1. K6 alan doğrulamasını, K9 **gönderim kanıtını** ölçer. DB yoksa ölçülemedi = ret | ALTYAPI (REC-368) | RET (üç tablo bugün 0 satır; ilk deneme e-postası gidene dek) |
 
 Kısa devre yok: tablo hepsini basar, Recep tek koşumda **tüm** eksikleri görür.
 
 ## 4. Yapı
 
-- Yeni modül `scripts/kip/acilis-onkosullari.mjs`: `KALEMLER = [{ id, ad, sahip, kanit, muaf: bool, olc? }]` + saf `degerlendir(sonuclar)`. `olc` yoksa `RET (ölçüt yok)`; `olc` hata fırlatırsa/`undefined` dönerse `OLCULEMEDI` = ret. `sonuclar.length === KALEMLER.length` ve id kümesi eşleşmezse RET; **sabit kalem sayısı (8)**: sessiz silme test kırmızısı.
+- Yeni modül `scripts/kip/acilis-onkosullari.mjs`: `KALEMLER = [{ id, ad, sahip, kanit, muaf: bool, olc? }]` + saf `degerlendir(sonuclar)`. `olc` yoksa `RET (ölçüt yok)`; `olc` hata fırlatırsa/`undefined` dönerse `OLCULEMEDI` = ret. `sonuclar.length === KALEMLER.length` ve id kümesi eşleşmezse RET; **sabit kalem sayısı (9)**: sessiz silme test kırmızısı.
 - `satis-kipine-gec.mjs` yalnız bu modülü import eder. `--uygula` yolunda sıra: önkoşul → taze `olc` → yedek → **K2/K4/K5 yeniden ölç** → yazma. Ret ise DB'ye yazma yok, yedek yazma bile yok.
 - Ölçücüler enjekte edilebilir (mock istemci/`fetch`): kapı canlıya bağlanmadan sınanır (INV-SATIS-KIPI-4 ile aynı desen). Env yalnız izin listesinden okunur (`SUPABASE_DB_URL`, `RESEND_API_KEY`, `KIP_PROBE_EPOSTA`/`KIP_PROBE_PAROLA`, anon anahtar); hata metni süzülür.
 - Cetvel: `satis-kipi-gecis-standard.md` §8'e "otomatik ölçülen kalemler betikte; bu liste belgedir, kapı betiktir" notu + yeni **§8.1 Açılış önkoşulları** + §9'a **INV-SATIS-KIPI-7**. (Numara 6 ödeme kapısında kullanıldı.)
@@ -60,12 +61,12 @@ Kısa devre yok: tablo hepsini basar, Recep tek koşumda **tüm** eksikleri gör
 Dosya: `src/__tests__/conformance/satis-kipi-acilis-onkosullari.test.ts`.
 
 1. Hepsi geçti (ya da muaf) + `--uygula` → yazma çağrısı **yapılır** (pozitif kontrol).
-2. Tek kalem RET → yazma çağrısı **0**, çıkış 1 (her kalem için tek tek: 8 kol; muaf olamayanlar muafiyet istese de RET).
+2. Tek kalem RET → yazma çağrısı **0**, çıkış 1 (her kalem için tek tek: 9 kol; muaf olamayanlar muafiyet istese de RET).
 3. Ölçücü hata fırlatır / `undefined` döner → ret (ölçülemedi geçmez).
 4. Ölçücüsü olmayan kalem → ret; `degerlendir([])` → ret; id kümesi eksik → ret.
 5. Kuru koşum: tablo basılır, yazma 0, çıkış 0; `--onkosul` çıkış 0/2.
 6. `--yon kapat` önkoşulsuz çalışır; hedefi açık `--geri-al` önkoşula tabi.
-7. Kalem sayısı = 8 (sessiz kalem silme kırmızı).
+7. Kalem sayısı = 9 (sessiz kalem silme kırmızı).
 8. K1: ham=0 ama görünüm metni ≥1 sayfada → RET (gizleme yeşil sayılmaz). K2: gerçek gövde fixture'ları (401, 200 sandbox, 200 prod, 503). K5: yanlış tabloda aynı adlı tetik → RET.
 9. TOCTOU: önkoşul geçtikten sonra K5 yazımdan önceki yeniden ölçümde düşerse yazma **0**.
 
