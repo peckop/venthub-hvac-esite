@@ -119,8 +119,8 @@ function round4(value: number): number {
   return Number(value.toFixed(4))
 }
 
-/** Maliyet tazelemesinde eşzamanlı PATCH sayısı (sıralı koşu yüzlerce round-trip demek). */
-const COST_UPDATE_CONCURRENCY = 20
+/** `maliyet_yenile` RPC'sinin parti sınırıyla AYNI (supabase/migrations/20260929143000_maliyet_yenileme_gunlugu.sql). */
+const MALIYET_PARTI_TAVANI = 5000
 
 /**
  * `products.cost_in_base`'i (donmuş TL maliyet) tazeler. Katalog satın-alma fiyatı
@@ -187,7 +187,15 @@ export async function refreshCostInBase(
   let skippedNoRate = 0
   let skippedNoPurchasePrice = 0
   let skippedFxLocked = 0
-  const toWrite: { id: string; costInBase: number; purchaseRateToBase: number }[] = []
+  // `purchasePrice`/`purchaseCurrency`: maliyetin HESAPLANDIĞI alış fiyatı. RPC bunu güncel satırla karşılaştırır:
+  // okuma ile yazma arasında fiyat değiştiyse eski fiyattan üretilmiş maliyet YAZILMAZ, tüm parti geri alınır.
+  const toWrite: {
+    id: string
+    costInBase: number
+    purchaseRateToBase: number
+    purchasePrice: number
+    purchaseCurrency: string
+  }[] = []
 
   // W5 — fiyat kilidi (cetvel §8.2). Kilitli kapsamın `cost_in_base`'i TAZELENMEZ.
   //
@@ -229,31 +237,53 @@ export async function refreshCostInBase(
     }
 
     const newCostInBase = round4(purchasePrice * fx.rate)
-    const newRate = fx.rate
+    // Sütun duyarlığına (numeric(18,6)) yuvarla: fazla ondalıklı kur her koşuda "değişti" görünüp satırı boşuna
+    // yeniden yazmasın (DB de aynı duyarlığa yuvarlar; günlük yazılmaz ama satır ve sayaç şişerdi).
+    const newRate = Math.round(fx.rate * 1e6) / 1e6
     const sameCost = p.cost_in_base != null && Math.abs(Number(p.cost_in_base) - newCostInBase) < 1e-9
     const sameRate = p.purchase_rate_to_base != null && Math.abs(Number(p.purchase_rate_to_base) - newRate) < 1e-9
     if (sameCost && sameRate) continue
 
     updated++
-    toWrite.push({ id: p.id, costInBase: newCostInBase, purchaseRateToBase: newRate })
+    toWrite.push({
+      id: p.id,
+      costInBase: newCostInBase,
+      purchaseRateToBase: newRate,
+      purchasePrice,
+      purchaseCurrency: p.purchase_currency,
+    })
   }
 
-  if (!dryRun) {
-    // Ürün başına ayrı PATCH gerekiyor (Update tipi toplu upsert'e girmiyor: name/sku/brand zorunlu),
-    // ama sıralı koşarsak yüzlerce ardışık round-trip olur → sınırlı eşzamanlılıkla gruplanır.
-    for (let i = 0; i < toWrite.length; i += COST_UPDATE_CONCURRENCY) {
-      const chunk = toWrite.slice(i, i + COST_UPDATE_CONCURRENCY)
-      const results = await Promise.all(
-        chunk.map(row =>
-          supabase
-            .from('products')
-            .update({ cost_in_base: row.costInBase, purchase_rate_to_base: row.purchaseRateToBase })
-            .eq('id', row.id),
+  if (!dryRun && toWrite.length > 0) {
+    // TEK ATOMİK YAZIM (REC-412 Faz 0.5b, karar 186). Eskiden ürün başına ayrı PATCH (20 paralel) yazılıyordu:
+    // ortada hata olursa katalog YARI yenilenmiş kalırdı ve DB günlüğü ayrı istekleri tek özete toplayamazdı.
+    // `maliyet_yenile` tüm partiyi TEK UPDATE ifadesiyle yazar: ya hepsi ya hiçbiri, ve günlükte parti başına
+    // TEK özet satırı (eski→yeni dizisi) düşer. Yönetici kapısı RPC içinde (JWT app_metadata).
+    if (toWrite.length > MALIYET_PARTI_TAVANI) {
+      // Bölmek atomikliği bozar (ilk parça yazılır, ikincisi düşerse yarım yenileme) → BÖLMEDEN dur.
+      // `code`: RPC'nin kendi 54000 hatasıyla AYNI; arayüz iki kaynağı tek mesajla gösterir (CostRefreshModal).
+      throw Object.assign(
+        new Error(
+          `Maliyet yenileme partisi ${toWrite.length} satır; sınır ${MALIYET_PARTI_TAVANI}. ` +
+            `Yarım yenileme yapılmaz — katalog bu sınırı aştıysa parti sınırı (maliyet_yenile migration'ı) yükseltilmelidir.`,
         ),
+        { code: '54000' },
       )
-      const failed = results.find(r => r.error)
-      if (failed?.error) throw failed.error
     }
+    const { error } = await yontemli(
+      supabase.rpc('maliyet_yenile', {
+        p_satirlar: toWrite.map(row => ({
+          id: row.id,
+          cost_in_base: row.costInBase,
+          purchase_rate_to_base: row.purchaseRateToBase,
+          purchase_price: row.purchasePrice,
+          purchase_currency: row.purchaseCurrency,
+        })),
+      }),
+      'maliyet_yenileme',
+      yeniOturumKimligi(),
+    )
+    if (error) throw error
   }
 
   return { scanned: products.length, updated, skippedNoRate, skippedNoPurchasePrice, skippedFxLocked, ratesUsed }

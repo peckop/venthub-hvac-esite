@@ -134,6 +134,19 @@ try {
 } catch { /* senkron başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
 
 /**
+ * Linear arşiv adımı (karar 187, REC-433): kapanmış ve 2 günden eski kayıtlar günde EN ÇOK BİR kez
+ * arşivlenir (Linear ücretsiz planı 250 kayıtta doluyor). Anahtar yoksa ya da bugün koşulduysa hiçbir
+ * şey başlatılmaz. Kopuk ve gizli süreç (REC-415), LLM yok, silme yok. Betik: scripts/board/linear-arsiv.cjs
+ */
+try {
+  const kopuk = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs'))
+  require(path.join(__dirname, '..', '..', 'scripts', 'board', 'linear-arsiv.cjs')).gunlukBaslat({
+    anahtar: process.env.LINEAR_API_KEY || '',
+    baslat: (betik, args) => kopuk.kopukBaslat(betik, args),
+  })
+} catch { /* arşiv başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
+
+/**
  * ⭐ÇIKTI TAVANI (REC-433 alt işi, Ops 09-29; HARİTA 1.2 ölçümü). Bir SessionStart kancasının
  * `additionalContext` çıktısı 10.000 karakteri aşınca bağlama YALNIZ ilk ~2.000 karakter + "Output too
  * large" + dosya yolu girer. Ölçüldü (bu kanca, compact): 11.458 karakter; durum bloğu ve son konuşma

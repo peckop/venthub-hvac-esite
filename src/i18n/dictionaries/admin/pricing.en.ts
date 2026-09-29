@@ -293,6 +293,10 @@ export const pricing = {
       toasts: {
         applied: "{{count}} product costs refreshed",
         applyFailed: "Could not refresh costs",
+        applyFailedNotAdmin: "Refreshing costs requires an admin role. Try signing out and back in; nothing was written.",
+        applyFailedTooLarge: "The product count exceeds the limit for one refresh; nothing was written. Please contact the technical team.",
+        applyFailedTimeout: "The operation timed out; nothing was written. Please try again shortly.",
+        applyFailedChanged: "Product prices or your permissions changed during the refresh; nothing was written. Please try again.",
       },
     },
     impact: {

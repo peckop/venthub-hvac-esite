@@ -114,3 +114,26 @@ DROP TRIGGER IF EXISTS on_price_lists_change ON public.price_lists;
 CREATE TRIGGER on_price_lists_change
 AFTER INSERT OR DELETE OR UPDATE ON public.price_lists
 FOR EACH ROW EXECUTE FUNCTION public.handle_supabase_webhook();
+
+-- site_settings (REC-168): YALNIZ `satis_kipi` anahtarı — satış kipi (ödeme yolu) anahtarı. Üç ayrı tetik: WHEN içinde
+-- OLD/NEW erişimi olaya bağlı (INSERT'te OLD, DELETE'te NEW yok). UPDATE `new.key OR old.key`: anahtar yeniden
+-- adlandırılırsa da düşer. Migration karşılığı: 20260929150000_satis_kipi_anahtari.sql.
+-- Kaynak: docs/plans/rec168-satis-kipi-db-plani-2026-09-29.md.
+DROP TRIGGER IF EXISTS on_site_settings_satis_kipi_ins ON public.site_settings;
+DROP TRIGGER IF EXISTS on_site_settings_satis_kipi_upd ON public.site_settings;
+DROP TRIGGER IF EXISTS on_site_settings_satis_kipi_del ON public.site_settings;
+
+CREATE TRIGGER on_site_settings_satis_kipi_ins
+AFTER INSERT ON public.site_settings
+FOR EACH ROW WHEN (NEW.key = 'satis_kipi')
+EXECUTE FUNCTION public.handle_supabase_webhook();
+
+CREATE TRIGGER on_site_settings_satis_kipi_upd
+AFTER UPDATE ON public.site_settings
+FOR EACH ROW WHEN (NEW.key = 'satis_kipi' OR OLD.key = 'satis_kipi')
+EXECUTE FUNCTION public.handle_supabase_webhook();
+
+CREATE TRIGGER on_site_settings_satis_kipi_del
+AFTER DELETE ON public.site_settings
+FOR EACH ROW WHEN (OLD.key = 'satis_kipi')
+EXECUTE FUNCTION public.handle_supabase_webhook();

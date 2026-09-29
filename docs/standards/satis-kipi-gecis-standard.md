@@ -117,7 +117,7 @@ göre; **bu dosya** değişir, çağıranlar değişmez.
 
 | tablo | tetik | handler dalı (route.ts) | tazelenen |
 |---|---|---|---|
-| `site_settings` (**yalnız** `key='satis_kipi'`, `WHEN` koşulu) | `on_site_settings_satis_kipi` — **migration** | `table==='site_settings' && record.key==='satis_kipi'` → **URUN ekler (REC-169 ilk kalem, ayrı küçük PR)** | `revalidateTag(SATIS_KIPI_TAG)` + `/sitemap.xml` |
+| `site_settings` (**yalnız** `key='satis_kipi'`, `WHEN` koşulu) | üç tetik: `on_site_settings_satis_kipi_ins` / `_upd` (`new.key OR old.key`) / `_del` — **migration `20260929150000_satis_kipi_anahtari.sql`** (REC-168 A; DELETE ve yeniden adlandırma dahil) | `table === 'site_settings'` tek koşullu dal, içeride `key === 'satis_kipi'` (eski adı da sayar) — **eklendi (REC-168 A, aynı PR; INV-RENDER-2 tek koşullu dal arar, bileşik koşul kapıya görünmez)** | `revalidateTag(SATIS_KIPI_TAG)` + `/sitemap.xml`; keşif/ana sayfa etiketlerine DOKUNMAZ |
 | `categories` (hide_price) | `on_categories_change` — **var** | var (`route.ts:337-368`) | kategori yolları + home/discovery tag + sitemap |
 
 ⛔**BULGU (ölçüldü, cetvele giriyor):** `categories` dalı **PDP'leri tazelemiyor**. `hide_price` çevrildiğinde
@@ -127,8 +127,14 @@ yeniden üretilir (REC-169 kabul ölçütü). Betik bu boşluğu **tazeleyemez**
 başlığı altında adıyla yazar (§6).
 
 `WHEN (new.key='satis_kipi')` kasıtlı: `payment`/`general` satırı değişince `to_jsonb(NEW)` (iyzico alanları)
-webhook yüküne **girmez**. `DELETE` tetikte yok (AFTER DELETE'te NEW yok); betik satır silmez, silinirse
-fonksiyon zaten fail-closed (§11).
+webhook yüküne **girmez**. `DELETE` ve ANAHTAR YENİDEN ADLANDIRMA da tetiklenir (REC-168 plan-challenger Ç4):
+üç ayrı tetik, çünkü `WHEN` içinde `OLD`/`NEW` erişimi olaya bağlıdır (INSERT'te `OLD`, DELETE'te `NEW` yok) — eskiden
+DELETE tetikte yoktu ve silinen satır "açık"ı önbellekte tutabilirdi.
+
+**Önbellek süresi (REC-168 Ç1, düzeltme):** `satisKipiOku()` `unstable_cache`'i `revalidate: 300` ile kurulur
+(`SATIS_KIPI_ONBELLEK_SN`); eskiden süresizdi (repodaki diğer hepsi 3600). Okuma HATASI önbelleğe yazılmaz: `dbdenOku`
+fırlatır, `satisKipiOku` yakalayıp o çağrıda KAPALI döner (fail-closed korunur, bayatlık kalıcı olmaz). Webhook düşerse
+"açık" en fazla 5 dk bayat kalır. Kapı: INV-SATIS-KIPI-7 (`src/lib/kip/__tests__/satisKipi.test.ts`).
 
 ## 5. `hide_price` ilişkisi — anahtardan TÜREMEZ, aynı komutla ÇEVRİLİR
 
@@ -223,8 +229,12 @@ Sıra güvenli: B, C'siz çalışır (fail-closed); C, B'siz zararsız (fonksiyo
   çoklu-instance davranışı (Vercel yönetir, dokümanda "caveat").
 - **Atomik değil:** 37 kategori + 1 anahtar ayrı yazımlar; yedek + `--geri-al` telafi eder, önlemez.
 - **Betik onayı doğrulayamaz**, kaydeder. Kapı insan.
-- **`DELETE`** tetikte yok; satır silinirse fonksiyon kapalı döner ama tazeleme atmaz → sayfalar 3600 sn eski.
-  Betik silmez; silen bilerek siler.
+- **`DELETE`** artık tetiklenir (REC-168 A; üç tetik) ve fonksiyon satır yokken kapalı döner. Betik silmez; silen bilerek
+  siler. ~~"sayfalar 3600 sn eski"~~ cümlesi bu dosya için YANLIŞTI: önbellek süresizdi (§4, Ç1); şimdi `revalidate: 300`.
+- **Docker gölgesi gerektiren KALAN (PGlite kapsamaz; satış açılmadan ALTYAPI'nın listesine):** (1) gerçek
+  `handle_supabase_webhook()` ile (Vault sırrı + pg_net) webhook'un route'a ulaşması ve `revalidateTag`'in tetiklenmesi,
+  (2) gerçek JWT/`auth.uid()` çözümlemesiyle panel kilidi, (3) `denetim_izi_site_settings` tetiğinin `satis_kipi` değişiminde
+  `admin_audit_log` satırı yazması. Canlıda `satis-kipi-canli.mjs` (ROLLBACK'li) aynı davranışları migration sonrası ölçer.
 - **PDP tazelemesi** REC-169'a bağlı; o inene kadar `hide_price` değişimi PDP'de **3600 sn** gecikir (§4).
 - **BORÇ:** `.rpc()`'ye dönüş (§3.4) · `sitemap.ts` claim'i (§8-7) · ESLint bu ağaçta junction üzerinden
   yüklenemedi — CI'da koşar (`ci.yml` yol filtresi yok); tsc: `satisKipi.ts`'te **0 hata**, ağaç genelinde
