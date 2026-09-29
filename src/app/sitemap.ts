@@ -47,18 +47,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // hatasını boş listeye çeviriyordu → ürünsüz/kategorisiz harita üretilir, Google'a o gider (CI koşusu
   // 36548708171: kategori 24, ürün 0 ölçüldü). Artık hata build'i KIRAR; yeniden deneme ile örtülmez —
   // Vercel önceki başarılı yayını tutar, bozuk harita canlıya çıkmaz. Servisler zaten `throw` eder.
+  //
+  // TEK İSTİSNA — SAHTE VERİTABANLI CI BUILD'İ: `ci.yml` `Build (blocking)` adımı `dummy.supabase.co` ile
+  // (ağ yok) koşar ve rotaların ağsız ortamda da ÜRETİLEBİLMESİ zorunludur (bkz. `urunlerSayfasi.tsx`
+  // "HATA YOLU"; ilk denemede bu PR o build'i kırdı — koşu 36553735279). Sahte adreste veri hiç gelmez;
+  // orada boş liste ile devam edilir ve uyarı basılır. Gerçek adreste (Vercel, e2e-smoke gerçek-env build'i)
+  // katı kural geçerlidir.
+  const veritabaniSahte = /dummy\.supabase\.co/.test(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '')
   const [categories, familySlugs, countRes] = await Promise.all([
-    getCategories(supabaseStaticClient),
-    getAllFamilySlugs(supabaseStaticClient),
+    veritabaniSahte ? getCategories(supabaseStaticClient).catch(() => []) : getCategories(supabaseStaticClient),
+    veritabaniSahte ? getAllFamilySlugs(supabaseStaticClient).catch(() => []) : getAllFamilySlugs(supabaseStaticClient),
     // Supabase builder reject ETMEZ; hata {error} alanında döner — aşağıda AÇIKÇA fırlatılır.
     supabaseStaticClient.rpc('get_category_counts'),
   ])
-  if (countRes.error) throw new Error(`sitemap: get_category_counts başarısız — ${countRes.error.message}`)
-  // Hata olmadan BOŞ dönmek de ürünsüz haritadır (canlıda 24 kategori / 47 aile var; sıfır = veri kaybı).
-  if (categories.length === 0 || familySlugs.length === 0) {
-    throw new Error(
-      `sitemap: boş katalog (kategori ${categories.length}, aile ${familySlugs.length}) — ürünsüz harita üretilmez`,
-    )
+  if (veritabaniSahte) {
+    console.warn('[sitemap] sahte veritabanı (dummy.supabase.co): kategori/aile satırları OLMADAN üretildi — yalnız CI derlemesi için')
+  } else {
+    if (countRes.error) throw new Error(`sitemap: get_category_counts başarısız — ${countRes.error.message}`)
+    // Hata olmadan BOŞ dönmek de ürünsüz haritadır (canlıda 24 kategori / 47 aile var; sıfır = veri kaybı).
+    if (categories.length === 0 || familySlugs.length === 0) {
+      throw new Error(
+        `sitemap: boş katalog (kategori ${categories.length}, aile ${familySlugs.length}) — ürünsüz harita üretilmez`,
+      )
+    }
   }
 
   // Nav (CategoryContext) ile tutarlılık: yalnız ÜRÜNÜ OLAN kategoriler sitemap'e yazılır.

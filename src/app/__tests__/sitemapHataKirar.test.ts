@@ -21,8 +21,11 @@ async function sitemapKur(kosul: {
   kategoriler?: () => Promise<Kat[]>
   aileler?: () => Promise<{ slug: string }[]>
   sayimlar?: () => Promise<{ data: unknown; error: unknown }>
+  /** CI'nın sahte veritabanlı build'i (dummy.supabase.co). Varsayılan: GERÇEK adres = katı kural. */
+  sahte?: boolean
 }) {
   vi.resetModules()
+  vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', kosul.sahte ? 'https://dummy.supabase.co' : 'https://gercek.supabase.co')
   vi.doMock('@/lib/supabase/static', () => ({
     supabaseStaticClient: {
       rpc: kosul.sayimlar ?? (async () => ({ data: [{ category_id: 'k1', product_count: 3 }], error: null })),
@@ -39,6 +42,7 @@ async function sitemapKur(kosul: {
 
 describe('INV-SITEMAP-HATA-1 — veri hatası site haritasını üretilmez kılar', () => {
   afterEach(() => {
+    vi.unstubAllEnvs()
     vi.doUnmock('@/lib/supabase/static')
     vi.doUnmock('@/lib/services/category.service')
     vi.doUnmock('@/lib/services/family.service')
@@ -75,5 +79,21 @@ describe('INV-SITEMAP-HATA-1 — veri hatası site haritasını üretilmez kıla
   it('hatasız ama BOŞ kategori listesi → ÜRETİLMEZ', async () => {
     const sitemap = await sitemapKur({ kategoriler: async () => [] })
     await expect(sitemap()).rejects.toThrow(/boş katalog/)
+  })
+
+  describe('sahte veritabanlı CI build\'i (dummy.supabase.co) — ağsız ortamda da ÜRETİLEBİLİR', () => {
+    it('tüm veri kaynakları düşse de harita üretilir (statik + marka + bilgi merkezi satırları), kategori/aile satırı yok', async () => {
+      const sitemap = await sitemapKur({
+        sahte: true,
+        kategoriler: async () => { throw new Error('ENOTFOUND dummy.supabase.co') },
+        aileler: async () => { throw new Error('ENOTFOUND dummy.supabase.co') },
+        sayimlar: async () => ({ data: null, error: { message: 'fetch failed' } }),
+      })
+      const satirlar = await sitemap()
+      expect(satirlar.length).toBeGreaterThan(5)
+      expect(satirlar.some((s) => s.url.endsWith('/tr/brands/vortice'))).toBe(true)
+      expect(satirlar.some((s) => s.url.includes('/tr/category/'))).toBe(false)
+      expect(satirlar.some((s) => s.url.includes('/tr/products/vortice'))).toBe(false)
+    })
   })
 })
