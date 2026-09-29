@@ -751,6 +751,11 @@ gerektirmez).
   **Kurulum betiği (2026-09-27, REC-401 B0b) — sahip ARAC, durum KAL:** `tools/wrongstack-mcp/kurulum.cjs`.
   Sürüm yükseltmesini tek komutla yapar (kendi penceresinin sunucuları + daemon durdur → npm ci →
   yama → doğrula, son satır HAZIR/HATA). Başka pencereye ait sunucu varsa hiçbir şeyi kapatmaz.
+  **Ek notlar (2026-09-29, ARAÇ isteği, HARİTA ricasıyla):** (1) Yama **1.0.26'ya özeldir**; npm'de 1.0.27
+  var — sürüm geçişinde yama uygulanıyor mu ve dönüş boyutu korunuyor mu `kurulum.cjs --denetle` ile
+  yeniden ölçülür, varsayılmaz. (2) Panoda kanıt komutsuz kartlar var; kanıt/kapanış düzeni REC-419'da.
+  (3) `add_task` dönüşü artık kart + özet (tüm pano değil); tek kart kapatmanın bayt bedeli REC-419
+  ölçümüne girer.
   `--denetle` salt okuma. Kapı `INV-WRONGSTACK-KURULUM-1`. Canlı kurulum yalnız toplu açılışta.
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
