@@ -3,9 +3,10 @@
 // Docker GEREKMEZ. Depoya bağımlılık EKLENMEDİ: geçici bir klasörde `npm i @electric-sql/pglite`, bu dosyayı oraya
 // kopyala ve `KOK=<depo yolu> node golge.mjs` (sabotaj: SABOTAJ=computed_at | sale_price). Çıkış 0 = tüm kollar geçti.
 // Çıktılar aynı klasörde: cikti-temiz.txt (29/29) ve iki bilinçli bozma (kırmızı olması BEKLENİR).
-import { PGlite } from '@electric-sql/pglite'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
+
+import { PGlite } from '@electric-sql/pglite'
 
 // Depo kökü: KOK ortam değişkeniyle verilir (ör. KOK=C:/tmp/vh-admin-411); yoksa bu dosyanın üç üstü.
 const KOK = process.env.KOK ?? fileURLToPath(new URL('../../../', import.meta.url))
