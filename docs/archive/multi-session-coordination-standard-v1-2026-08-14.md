@@ -1,11 +1,7 @@
-# Çok-Oturumlu Koordinasyon Standardı (Cetvel) — v1.1
+# Çok-Oturumlu Koordinasyon Standardı (Cetvel) — v1.0
 
 > **Bu dosya nedir?** Birden çok Claude Code controller oturumu aynı repoda paralel
-> çalışırken **kimin ne yaptığını bilen, akışı bozmayan** bağlantı modelinin cetveli:
-> **şerit panosu = kira (claim) + yol rezervasyonu + canlılık.** İş durumu Linear'dadır;
-> oturumlar arası iletişim doğrudan mesajladır (`fleet-mechanism-standard.md` §0).
-> **Sahibi:** ALTYAPI (pano) · **Belge düzeni:** HARİTA (REC-400 D5)
-> **Son doğrulama:** 2026-09-29 (`work-tracking-ssot-standard.md`, `fleet-mechanism-standard.md` §0 ve `board.cjs` kullanım satırıyla karşılaştırıldı).
+> çalışırken **kimin ne yaptığını bilen, akışı bozmayan** bağlantı modelinin cetveli.
 >
 > **Neden var?** 2026-08-14'te aynı gün üç ayrı durum kaydı bayatladı: şerit panosu
 > (1 gün), Orion registry (18 iş emri / **0 tamamlanan**, oysa 7 PR + 4 prod migration
@@ -20,7 +16,7 @@
 | İhtiyaç | Depo | Ömür | Neden ayrı |
 |---|---|---|---|
 | **Anlık koordinasyon** — "şu an kim neye dokunuyor?" | `C:/tmp/venthub-board/events.<sid>.jsonl` | TTL'li (4sa), süpürülebilir | Anlık olmalı; git'e yazılan kayıt commit/push/pull'a bağlıdır = **merge zamanlı**, aynı saatteki çakışmayı yapısal olarak göremez |
-| **Kalıcı iş durumu** — "bu iş nerede?" | **Linear** (iş kaydı) + panoda REC-nn başlıklı kart | Kalıcı | Yeni bir oturum açıldığında ne yapacağını buradan öğrenir; pano TTL'li olduğu için bu soruyu cevaplayamaz. Orion registry salt arşivdir (`work-tracking-ssot-standard.md`) |
+| **Kalıcı iş durumu** — "T001-VH nerede?" | Orion registry (`~/.orion/registry.db`) | Kalıcı | Yeni bir oturum açıldığında ne yapacağını buradan öğrenir; pano TTL'li olduğu için bu soruyu cevaplayamaz |
 
 **Karıştırmanın bedeli:** panoyu kalıcı durum deposu yaparsan şişer ve bayatlar; kalıcı
 durumu anlık kanal yaparsan geç kalır. `docs/DURUM-TAKIP.md` üçüncü bir şeydir: **anlatı/tarih**
@@ -68,6 +64,17 @@ hepsinin birleşimidir; böylece eşzamanlı append'in satır karıştırma risk
 | **Her yazmada** | `PreToolUse` kancası **kirayı yeniler** | Atış yalnız kullanıcı turuna bağlıyken, uzun **otonom** çalışmada hiç atış olmaz ve oturum KENDİ şeridini kaybeder. Ölçüldü: 5 saatlik bir koşuda üç oturumun **üçü de** düştü. Yazıyorsan yaşıyorsundur |
 | Oturum kapanışı | `SessionEnd` kancası şeridi **bırakır** | TTL (4sa) yalnız çökme/kapatma için emniyet ağıdır; düzgün kapanışta sıradaki oturum beklemez |
 | Yazmadan önce | `PreToolUse` kancası başka oturumun şeridine yazmayı **reddeder** | Talimat değil **yapı** — protokolü unutmak mümkün değil |
+| PR merge | `post-merge` kancası commit künyelerinden registry'yi günceller | Kanca zaten doc üretimi için koşuyor |
+
+**Künye sözleşmesi** — commit gövdesine tek satır:
+
+```
+Work-Order: T001-VH progress=70
+Work-Order: T011-VH status=completed
+```
+
+`status` ∈ `backlog · open · active · blocked · completed`. Değerler mutlaktır (artırılmaz),
+senkron **idempotent**tir: aynı commit iki kez işlense sonuç aynıdır.
 
 ## 4. Bilinçli tasarım kararları
 
@@ -98,10 +105,6 @@ işaretler** — çünkü aynı adı taşıyan iki canlı talep birbirini blokla
 
 ### 4.1 Not adresleme (INV-BOARD-2)
 
-**Bugünkü kullanım:** oturumlar arası iletişim `SendMessage` ile yapılır; pano notu kanalı **kullanılmaz**
-(`fleet-mechanism-standard.md` §0). `board.cjs note` komutu ve bekçisi `INV-BOARD-2` kodda durur; aşağıdaki
-kurallar o komut kullanılırsa geçerlidir.
-
 **KARAR: `--to <şerit>` gönderim anında o şeridi tutan OTURUMA çözülür, role değil; çözülmüş sid
 kalıcı yazılır.** Bugünkü modelde şerit = oturum olduğu için bu doğrudur; rol-tabanlı teslim
 istenirse değişecek yer bu cümledir, kod değil.
@@ -131,16 +134,21 @@ node scripts/board/board.cjs claim --sid <oturum> --lane PRICING --globs "src/**
 node scripts/board/board.cjs who --sid <oturum>
 node scripts/board/board.cjs note --sid <oturum> --to EDGE "views/ bana lazım, INV-9 alma"
 node scripts/board/board.cjs release --sid <oturum>
+node scripts/board/registry-sync.cjs --dry            # künyeleri raporla, yazma
 ```
 
 ## 6. Bilinen sınırlar (dürüstçe)
 
-- **Tek makine varsayar.** Bir oturum bulutta koşarsa taşıma katmanı değişmeli.
+- **Tek makine varsayar.** Bir oturum bulutta koşarsa taşıma katmanı değişmeli (o durumda
+  registry sqlite doğru yer olur).
 - **Anlamsal çakışmayı görmez.** İki şerit farklı dosyalarda aynı kavramı bozarsa pano susar;
   onu conformance testleri yakalar (INV-*).
 - **Kiralamaya ZORLAYAMAZ.** Kiralamadan çalışan oturum görünmez kalır — ama `SessionStart`
   ona şeridinin talep edilmediğini söyler. Kaçış yolu var, sessiz değil.
 - **Git son hakem.** Pano çakışmayı önler, doğruluğu garanti etmez.
+- **`post-merge` kancası repoda DEĞİL** (`.git/hooks/` versiyonlanmaz). Aynı makinedeki
+  worktree'ler `.git/hooks`'u paylaştığı için üç oturum da kapsanır; ama **yeni bir klonda
+  ya da ikinci bir makinede registry senkronu hiç çalışmaz** — kancayı elle bağlamak gerekir.
 - **Glob granülerliği anlamsal değil.** Aynı glob'a giren ama birbiriyle ilgisiz dosyalar da
   bloklanır; çözüm dar şerit talep etmektir (§K2), kodun akıllanması değil.
 - **Notlar en fazla 5 ve bir kez teslim edilir** (`seen` işareti). Kalıcı iletişim kanalı
@@ -149,10 +157,6 @@ node scripts/board/board.cjs release --sid <oturum>
   Silmek gerekirse `C:/tmp/venthub-board/` elle süpürülebilir.
 
 ---
-
-## Değişiklik kaydı
-
-- **v1.1 (2026-09-29, REC-400 D5):** iş durumu deposu Orion registry → Linear (08-26 göçü), künye sözleşmesi ve `post-merge` registry senkronu, `registry-sync` kullanım satırı ve ilgili sınır kaldırıldı (eski v1.0 metni `docs/archive/multi-session-coordination-standard-v1-2026-08-14.md`); not kanalının bugünkü durumu §4.1'e yazıldı.
 
 > v1.0 · 2026-08-14 · İki controller tasarımının birleşimi. Eş-controller'dan gelen üç fikir
 > aynen alındı: `SessionStart` ile kimlik enjeksiyonu · `PreToolUse` ile **yazmadan önce**
