@@ -142,8 +142,8 @@ describe('INV-BELGE-1 · gerçek depo mandalı', () => {
     for (const d of taban.cetvelAlanEksik) expect(simdi.has(d), `${d} alanları eklenmiş → tabandan çıkar`).toBe(true)
   })
 
-  it('dört çekirdek belge ölçülüyor (tarih çözülüyor)', () => {
-    expect(o.cekirdek).toHaveLength(4)
+  it('iki çekirdek belge (CLAUDE.md, docs/README.md) ölçülüyor; emekli CONTEXT.md/DURUM-TAKIP.md ölçülmüyor', () => {
+    expect(o.cekirdek.map((c: { belge: string }) => c.belge)).toEqual(['CLAUDE.md', 'docs/README.md'])
     for (const c of o.cekirdek) expect(c.tarih, `${c.belge} tarihi okunamadı`).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 })

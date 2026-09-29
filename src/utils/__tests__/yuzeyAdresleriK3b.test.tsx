@@ -11,7 +11,8 @@ import { renderHook } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: true }))
+// `EN_YAYIN: true`: hreflang yalnız EN yayındayken yazılır (REC-300 3e-3); bu dosya hreflang ADRESLERİNİ ölçer.
+vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: true, EN_YAYIN: true }))
 
 const db = vi.hoisted(() => ({ aile: vi.fn() }))
 vi.mock('@/lib/data/preload', () => ({

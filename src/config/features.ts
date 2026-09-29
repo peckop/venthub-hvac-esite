@@ -101,11 +101,11 @@ export const YENI_KABUK_GEZINMESI = false
  * `noindex` düşer. Sonra Search Console'a yeni site haritası bildirilir. Başka hiçbir
  * yeri değiştirmek gerekmez; kapı (INV-EN-YAYIN-1) bunu iki yönlü tutar.
  *
- * BİLİNEN SINIR (gizlemiyoruz): `hreflang` beyanları KALDI. Sayfa var olmaya devam
- * ettiği için dil eşleşmesini bozmak istemedik; ama `noindex` bir sayfaya hreflang
- * göstermek Google için tutarsız sinyaldir ve o beyan büyük ihtimalle yok sayılır.
- * Zararı ölçülmedi, faydası (açılışta tek bayrak yetmesi) ölçüldü. Sorun çıkarsa
- * hreflang de bu bayrağa bağlanır — kapsamı bugün bilerek büyütmedik.
+ * HREFLANG DA BU BAYRAĞA BAĞLI (REC-300 Faz 3e-3, OPS hükmü 2026-09-29): kapalıyken hiçbir
+ * sayfa ve site haritası satırı hreflang beyan etmez (yalnız canonical kalır); `/en` ve
+ * `/en/products` de `noindex, follow` basar (kendi `robots`unu yazan sayfa layout'unkini
+ * ezmesin diye ortak yardımcı: `src/lib/seo/enYayinKurali.ts`). Açılınca hepsi geri gelir.
+ * Kapı: `src/lib/seo/__tests__/enYayinHreflangNoindex.test.ts`.
  */
 export const EN_YAYIN = false
 

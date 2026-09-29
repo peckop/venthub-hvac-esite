@@ -1,7 +1,7 @@
 # CLAUDE.md — VentHub HVAC
 
 > Bu dosya her oturumda otomatik yüklenir. **Kısa ve yüksek sinyalli** tutulur.
-> Kapsamlı referans için → **`CONTEXT.md`** (NotebookLM üretir, elle yeniden yazma).
+> Kapsamlı harita için → **`docs/README.md`** (tek giriş haritası). `CONTEXT.md` emekli (2026-09-29).
 > Milestone/DI detayı → `PROJECT.md` · Üretilmiş master MD'ler → `docs/`
 
 ## Proje Özeti
@@ -110,7 +110,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
     numarası raporda geçer. Bu kural kapsam hakkındadır, yetki hakkında değil — hiçbir kapıyı
     (özellikle kural 13'ü) gevşetmez. Cetvel: `docs/standards/execution-method-standard.md` §8.
 
-> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `CONTEXT.md §14`.
+> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `docs/standards/gelistirme-kurallari-tam-liste.md` (geçici; REC-433 rol kartlarına dağıtılacak).
 
 ## Tek Giriş Haritası — "hangi soru → hangi belge / hangi harita"
 
@@ -122,9 +122,9 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
 
 ## Doküman Haritası
 
-- `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). ⚠2026-08-17'den beri güncellenmedi — **ilk bakılacak yer `docs/README.md`** (tek giriş haritası); tazeliği her mesajdaki `BELGE` satırında.
+- `CONTEXT.md` — **EMEKLİ (2026-09-29)**: yerinde yönlendirme sayfası; eski metin `docs/archive/`. Bilgi için `docs/README.md`.
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
-- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
+- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` **EMEKLİ (2026-09-29)** — canlı durum = Linear projeleri + pano (`board.cjs who`).
 - `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
   skill / elle): karar tablosu + emirde `YÖNTEM:` satırı (öneri; sapma yazılır). Yöntemsiz emir eksik emirdir.
 - `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne
@@ -154,7 +154,7 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
   tazelik `tazelik.py` ile ölçülür. Cetvel: `catalog-ingestion-standard.md` §6.3.
   *(Niçin kural: PDF'i doğrudan tarayan her iş, aynı kataloğu üçüncü kez okur — patinajın sebebi buydu.)*
 - **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
-  ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `CONTEXT.md`.
+  ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `docs/README.md` haritası.
 - **Çelişirse kod kazanır.** NLM ikizi snapshot'tır, drift edebilir (ör. tablo sayısı); kod
   yapısı için daima CodeGraph/gerçek kaynağı doğrula. CLAUDE.md = her oturum yüklü çekirdek katman.
 
@@ -181,7 +181,7 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
   `post-commit`te arka planda (log: `.git/orion-doc.log`). Yedekler: `*.oncesi-2026-08-15`.
   Eskisi rastgele reddediyordu (aynı dosya 80/100 ↔ 100/100) ve 3 dalından 2'si sessizce ölüydü.
 
-- **CONTEXT.md NotebookLM tarafından üretilir** — "iyileştirme" adına yeniden yazma; not/ilave ekleyebilirsin.
+- **CONTEXT.md emekli** — yönlendirme sayfası olarak duruyor; "iyileştirme" adına yeniden doldurma.
 - Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
   NotebookLM "VentHub Proje Hafızası" defterine (dijital ikiz) yüklenir.
 

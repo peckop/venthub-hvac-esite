@@ -107,7 +107,10 @@ describe('INV-BELLEK-YOKLAMA-1: bellek satırı eşikli ve ayırt edici', () => 
 
   it('arka plan ölçümü pencere açmaz (windowsHide) ve kaynakta kullanıcı yolu yok', () => {
     const kaynak = fs.readFileSync(KANCA, 'utf8')
-    expect(kaynak.match(/windowsHide:\s*true/g)?.length ?? 0, 'spawn ve execFileSync ikisi de gizli olmalı').toBeGreaterThanOrEqual(2)
+    // REC-415: kopuk başlatma ortak başlatıcıdan geçer (windowsHide + gizli konsol ön yüklemesi orada);
+    // powershell'i çağıran execFileSync kendi windowsHide'ını da taşır
+    expect(kaynak, 'kopuk başlatma kopukBaslat ile').toMatch(/kopukBaslat\(/)
+    expect(kaynak.match(/windowsHide:\s*true/g)?.length ?? 0, 'execFileSync gizli olmalı').toBeGreaterThanOrEqual(1)
     expect(/[A-Za-z]:[\\/]Users[\\/]/.test(kaynak)).toBe(false)
   })
 

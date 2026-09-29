@@ -26,7 +26,7 @@
 
 | Klasör | İçerik | Elle düzenlenir mi? |
 |---|---|---|
-| `docs/` (kök) | **Üretilen** master'lar (`*_master.md`, `system_tree.md`, `database_schema_master.md`, `design_system_config.md`) + `DURUM-TAKIP.md` | ❌ master'lar orion pipeline'ın çıktısı — elle yazma |
+| `docs/` (kök) | **Üretilen** master'lar (`*_master.md`, `system_tree.md`, `database_schema_master.md`, `design_system_config.md`) + `DURUM-TAKIP.md` (emekli, yönlendirme sayfası) | ❌ master'lar orion pipeline'ın çıktısı — elle yazma |
 | `docs/standards/` | **Cetveller** — "ne iyi demek" (admin/bayi standartları, blueprint) | ✅ küratörlü |
 | `docs/audits/` | **Ölçümler** — doğrulanmış gerçek (ground-truth, panel denetimi, lighthouse) | ✅ kanıt |
 | `docs/plans/` | **Planlar/roadmap** (SaaS roadmap, refactor planı) | ✅ |
@@ -65,14 +65,16 @@
 | Site, veritabanı, DNS, e-posta **nerede barınır**, sağlayıcı değişirse **ne sökülür**? | `standards/barindirma-standard.md` (TASLAK, karar 59) |
 | Belgeler **nasıl yazılır** (gövde/tarihçe, sahip), hangi bilgi **hangi katmanda** durur, belge bayatlığı **nasıl görünür**, doğru belge **ne zaman kendiliğinden gelir**? | `standards/belge-yonetimi-standard.md` (TASLAK, REC-400) |
 | **Niçin** / moat / vizyon? | `../VISION.md` |
-| Kapsamlı uçtan uca referans (mimari, DB, akışlar; kuralların 31 maddelik gerekçeli listesi §14) | `../CONTEXT.md` (NLM üretir, elle yeniden yazılmaz; kural/niçin sorusunda NotebookLM ikizine alternatif) · ⚠2026-08-17'den beri güncellenmedi — bu yüzden artık "ilk bakılacak yer" DEĞİL (ilk bakılacak yer bu harita); tazeliği durum satırında; rolü REC-400 D5'te Recep kararı |
+| Kuralların **31 maddelik gerekçeli tam listesi** (çekirdek 14 kural `CLAUDE.md`'de) | `standards/gelistirme-kurallari-tam-liste.md` (GEÇİCİ; REC-433 rol kartlarına dağıtılacak) |
+| Eski "uçtan uca referans" (mimari, DB, akışlar) | `../CONTEXT.md` **EMEKLİ (2026-09-29)** — yerinde yönlendirme sayfası; eski metin `archive/CONTEXT-2026-08-17.md` (tarihsel). Bugün: bu harita + `CLAUDE.md` |
 | DI ve güvenlik milestone kayıtları, arayüz kontratları | `../PROJECT.md` |
 | Durum ve değişiklik geçmişi | `../RECOMMENDATIONS.md` · `../CHANGELOG.md` |
 
 ## Şu anki geliştirme adımı (takip)
 
-İş durumu için tek kaynak **Linear**. `DURUM-TAKIP.md` ("neredeyiz" + şerit panosu) ⚠2026-09-17'den beri
-güncellenmedi; bu bölümdeki eski "aktif iş kolu = bayi modülü" bilgisi de bayat (düzeltmesi REC-400 D5).
+İş durumu için tek kaynak **Linear projeleri**; kim hangi dosyada çalışıyor sorusu için WrongStack panosu
+(`node scripts/board/board.cjs who`). `DURUM-TAKIP.md` 2026-09-29'da emekli edildi (yönlendirme sayfası; eski metin
+`archive/DURUM-TAKIP-2026-09-17.md`, tarihsel).
 
 ## Üretilen vs küratörlü (karıştırma)
 

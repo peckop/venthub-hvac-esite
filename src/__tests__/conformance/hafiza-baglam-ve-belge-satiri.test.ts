@@ -200,7 +200,10 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BELGE bloğu (HARİTA çiftleri)', () => 
   it('kaynak: BELGE bloğu ağ ya da git çağırmaz; tazeleme pencere açmaz (windowsHide)', () => {
     const k = fs.readFileSync(path.join(KANCA, 'belge-satiri.cjs'), 'utf8')
     expect(k).not.toMatch(/fetch\(|execFileSync|execSync|'git'/)
-    expect(k).toMatch(/windowsHide: true/)
+    // REC-415: kopuk başlatma ortak başlatıcıdan geçer; `windowsHide` ve gizli konsol ön yüklemesi orada
+    expect(k).toMatch(/kopukBaslat\(/)
+    const baslatici = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'board', 'kopuk-baslat.cjs'), 'utf8')
+    expect(baslatici).toMatch(/windowsHide: true/)
   })
 })
 
