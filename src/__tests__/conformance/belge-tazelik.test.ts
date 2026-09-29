@@ -26,6 +26,8 @@ type Olcum = {
   kirikYol: KirikRapor[]
   kirikYeni: { belge: string; yol: string }[]
   cetvel: { toplam: number; alanEksik: string[]; sahipEksik: string[]; dogrulamaEksik: string[] }
+  hafizaIndeksi: { satir: number; bayt: number; durum: string; yol: string } | null
+  olculmedi: string[]
 }
 type Modul = {
   yollariAyikla: (m: string) => Siniflar
@@ -39,11 +41,53 @@ type Modul = {
     cetvelDogrulamaEksik: string[]
   }
   olc: (kok?: string, simdi?: number) => Olcum
+  hafizaSay: (m: string) => { satir: number; bayt: number }
+  hafizaDurumu: (s: { satir: number; bayt: number }) => 'tamam' | 'yumusak' | 'sert'
+  hafizaIndeksYolu: (kok: string, ortam?: Record<string, string>, home?: string) => string | null
+  hafizaIndeksi: (
+    kok: string,
+    ortam?: Record<string, string>,
+    home?: string,
+  ) => { satir: number; bayt: number; durum: string; yol: string } | null
 }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
 const require = createRequire(import.meta.url)
 const B = require(path.join(KOK, 'scripts/belge/belge-tazelik.cjs')) as Modul
+
+describe('INV-BELGE-1 · hafıza indeksi satır/bayt (REC-433 1.9: 200 satır YA DA ~25.000 bayt)', () => {
+  it('satır sayımı: sondaki satır sonu sayılmaz, boş dosya 0, bayt UTF-8', () => {
+    expect(B.hafizaSay('')).toEqual({ satir: 0, bayt: 0 })
+    expect(B.hafizaSay('a\nb\n')).toEqual({ satir: 2, bayt: 4 })
+    expect(B.hafizaSay('a\nb')).toEqual({ satir: 2, bayt: 3 })
+    expect(B.hafizaSay('ş\n').bayt).toBe(3)
+  })
+
+  it('eşik: satır VEYA bayt, hangisi önce dolarsa (ayırt edici: her kol tek başına tetikler)', () => {
+    expect(B.hafizaDurumu({ satir: 126, bayt: 15746 })).toBe('tamam')
+    expect(B.hafizaDurumu({ satir: 160, bayt: 1000 })).toBe('yumusak')
+    expect(B.hafizaDurumu({ satir: 10, bayt: 20000 })).toBe('yumusak')
+    expect(B.hafizaDurumu({ satir: 200, bayt: 1000 })).toBe('sert')
+    expect(B.hafizaDurumu({ satir: 10, bayt: 25000 })).toBe('sert')
+    expect(B.hafizaDurumu({ satir: 10, bayt: 16615 })).toBe('tamam') // eski 16384 inancı artık sert değil
+  })
+
+  it('yol: VENTHUB_MEMORY_INDEX önce; olmayan dosya null (sayı uydurulmaz)', () => {
+    const gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'hafiza-'))
+    const dosya = path.join(gecici, 'MEMORY.md')
+    fs.writeFileSync(dosya, '- a\n- b\n')
+    expect(B.hafizaIndeksYolu(KOK, { VENTHUB_MEMORY_INDEX: dosya })).toBe(dosya)
+    expect(B.hafizaIndeksi(KOK, { VENTHUB_MEMORY_INDEX: dosya })).toMatchObject({ satir: 2, bayt: 8, durum: 'tamam' })
+    expect(B.hafizaIndeksYolu(KOK, { VENTHUB_MEMORY_INDEX: path.join(gecici, 'yok.md') })).toBeNull()
+    expect(B.hafizaIndeksi(KOK, {}, gecici)).toBeNull() // proje klasörü de yok: ölçülemedi, uydurma yok
+  })
+
+  it('olc(): yol bulunamazsa olculmedi listesinde kalır', () => {
+    const o = B.olc()
+    if (o.hafizaIndeksi === null) expect(o.olculmedi).toContain('MEMORY.md satır/bayt')
+    else expect(o.olculmedi).not.toContain('MEMORY.md satır/bayt')
+  })
+})
 
 describe('INV-BELGE-1 · ayıklayıcı sınıfları', () => {
   it('yol, yer tutucu, glob, URL, depo dışı yol ayrı sınıflanır; komut atlanır', () => {
