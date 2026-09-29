@@ -109,6 +109,19 @@ function sonBaglam(kayitYolu) {
 
 const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') + 'M' : Math.round(t / 1000) + 'k')
 
+/**
+ * COMPACT HAZIRLIK NOTU talimatı (Recep 09-29: "diğer pencerelerin compact açıklaması yaptığını görmedim,
+ * bu önemli"). Kanca ve durum dosyası yazımı pencerelerde ÇALIŞIYOR ama Recep'e görünen tek cümle üretmiyordu;
+ * yalnız Ops elle açıklıyordu. Bu satır eşik üstünde HER istemde gelir → not "bir kez" değil, compact
+ * yapılana kadar her cevapta tekrarlanır. Biçim: recep.md "Compact hazırlığı" mesaj türü (üç cümle, tablo değil).
+ */
+const HAZIRLIK_NOTU =
+  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA uc cumle yaz — " +
+  '(a) durum dosyam guncel mi (dosya adi + saat), ' +
+  '(b) yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir), ' +
+  "(c) tek cumle hukum: 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
+  'Compact yapilana kadar her cevapta kisaca tekrarla.'
+
 /** Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı. */
 function satir(token, pencere) {
   if (token === null || token === undefined) return null
@@ -116,7 +129,7 @@ function satir(token, pencere) {
   const e = esikler(pencere)
   const oran = k(token) + '/' + k(pencere)
   if (token >= e.yakin) {
-    return '⛔BAGLAM: ' + oran + ' — COMPACT YAKIN. Durum dosyasini ve acik sozleri SIMDI yaz; buyuk okuma yapma.'
+    return '⛔BAGLAM: ' + oran + ' — COMPACT YAKIN. Durum dosyasini ve acik sozleri SIMDI yaz; buyuk okuma yapma.' + HAZIRLIK_NOTU
   }
   if (token >= e.doluyor) {
     return '⚠BAGLAM: ' + oran + ' — doluyor. Isi toparlamaya basla; compact ' + k(e.yakin) + "'da uyarilir."
@@ -124,4 +137,4 @@ function satir(token, pencere) {
   return 'BAGLAM: ' + oran
 }
 
-module.exports = { compactPenceresi, esikler, sonBaglam, satir, COMPACT_SONRASI, DOLUYOR, YAKIN, OKUMA_BAYT }
+module.exports = { compactPenceresi, esikler, sonBaglam, satir, COMPACT_SONRASI, DOLUYOR, YAKIN, OKUMA_BAYT, HAZIRLIK_NOTU }
