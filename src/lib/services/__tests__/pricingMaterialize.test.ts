@@ -86,7 +86,17 @@ interface CapturedWrite {
   headers: Record<string, string>
 }
 
-function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): SupabaseClient<Database> {
+interface StubSecenekleri {
+  /** `maliyet_yenile` RPC'si sunucu hatası (PostgREST 400 + hata gövdesi) döner — atomik-hata yolu testi. */
+  rpcHatasi?: boolean
+}
+
+function stubClient(
+  tables: StubTables,
+  calls: CapturedWrite[],
+  gets?: URL[],
+  secenek?: StubSecenekleri,
+): SupabaseClient<Database> {
   const lookup: Record<string, unknown[] | undefined> = {
     pricing_rule: tables.pricing_rule,
     categories: tables.categories,
@@ -116,10 +126,16 @@ function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): S
       // Sapmanın bedeli ölçüldü: sayfalı çekim kapısı eklendiğinde bu paket CI'da
       // düştü — kod doğruydu, YALANCI OLAN STUB'DI. Bir stub gerçeği taklit etmiyorsa,
       // üstünde koşan test neyi ölçtüğünü bilmiyor demektir.
+      // ⚠postgrest-js `range()` aralığı `offset`/`limit` SORGU PARAMETRESİYLE yollar (2.116.0'da ölçüldü; `Range`
+      // başlığı yolu yalnız eski sürümlerde). Yalnız başlığa bakan stub, 100+ satırlı bir tabloda sonsuz döngüye
+      // girer: her sayfa TÜM tabloyu döner, "kısa sayfa" hiç gelmez, işçi belleği doldurup düşer.
       const araligi = /(\d+)-(\d+)/.exec(init?.headers ? String(new Headers(init.headers).get('Range') ?? '') : '')
-      const bas = araligi ? Number(araligi[1]) : 0
-      const son = araligi ? Number(araligi[2]) : tumu.length - 1
-      const rows = araligi ? tumu.slice(bas, son + 1) : tumu
+      const offsetParam = url.searchParams.get('offset')
+      const limitParam = url.searchParams.get('limit')
+      const bas = offsetParam !== null ? Number(offsetParam) : araligi ? Number(araligi[1]) : 0
+      const son =
+        limitParam !== null ? bas + Number(limitParam) - 1 : araligi ? Number(araligi[2]) : tumu.length - 1
+      const rows = araligi || offsetParam !== null || limitParam !== null ? tumu.slice(bas, son + 1) : tumu
 
       const basliklar: Record<string, string> = { 'Content-Type': 'application/json' }
       const prefer = init?.headers ? String(new Headers(init.headers).get('Prefer') ?? '') : ''
@@ -143,6 +159,14 @@ function stubClient(tables: StubTables, calls: CapturedWrite[], gets?: URL[]): S
       headers[key.toLowerCase()] = value
     })
     calls.push({ method, table, url, body, headers })
+    if (secenek?.rpcHatasi && table === 'maliyet_yenile') {
+      return Promise.resolve(
+        new Response(JSON.stringify({ code: '22023', message: 'maliyet_yenile: eksik/gecersiz eleman', details: null, hint: null }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+    }
     const echo = Array.isArray(body) ? body : body != null ? [body] : []
     return Promise.resolve(
       new Response(JSON.stringify(echo), { status: 201, headers: { 'Content-Type': 'application/json' } }),
@@ -433,7 +457,7 @@ describe('refreshCostInBase', () => {
     expect(summary.scanned).toBe(1)
     expect(summary.skippedNoRate).toBe(1)
     expect(summary.updated).toBe(0)
-    expect(calls.filter(c => c.table === 'products')).toHaveLength(0)
+    expect(calls).toHaveLength(0) // yazılacak satır yoksa RPC de ÇAĞRILMAZ
   })
 
   it('purchase_price <= 0 olan ürünü atlar (skippedNoPurchasePrice)', async () => {
@@ -472,9 +496,86 @@ describe('refreshCostInBase', () => {
     expect(summary.updated).toBe(1)
     expect(summary.ratesUsed).toEqual([{ currency: 'EUR', rate: 35, effectiveDate: '2026-08-13' }])
 
-    const updates = calls.filter(c => c.table === 'products')
-    expect(updates).toHaveLength(1)
-    expect(updates[0].body).toMatchObject({ cost_in_base: 350, purchase_rate_to_base: 35 })
+    // Yazım TEK atomik RPC'dir (karar 186); ürün başına PATCH YOK.
+    expect(calls.filter(c => c.table === 'products')).toHaveLength(0)
+    const rpcCalls = calls.filter(c => c.table === 'maliyet_yenile')
+    expect(rpcCalls).toHaveLength(1)
+    expect(rpcCalls[0].method).toBe('POST')
+    // Maliyetin HESAPLANDIĞI alış fiyatı da gider: okuma ile yazma arasında fiyat değişirse RPC satırı yazmaz ve
+    // tüm partiyi geri alır (eski fiyattan üretilmiş maliyet canlıya geçmesin).
+    expect(rpcCalls[0].body).toEqual({
+      p_satirlar: [
+        { id: 'p1', cost_in_base: 350, purchase_rate_to_base: 35, purchase_price: 10, purchase_currency: 'EUR' },
+      ],
+    })
+    // Günlük etiketi: yöntem + koşu kimliği (uuid) istek başlığıyla gider.
+    expect(rpcCalls[0].headers['x-degisiklik-yontemi']).toBe('maliyet_yenileme')
+    expect(rpcCalls[0].headers['x-degisiklik-oturumu']).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/)
+  })
+
+  it('348 ürün değişse de TEK istek atar (parti özeti sözleşmesi: ayrı PATCH sağanağı yok)', async () => {
+    const calls: CapturedWrite[] = []
+    const urunler: ProductFixtureRow[] = Array.from({ length: 348 }, (_, i) => ({
+      id: `p${i}`, name: `Fan ${i}`, sku: `SKU-${i}`, brand: 'Vortice', category_id: null,
+      cost_in_base: null, purchase_price: 10 + i, purchase_currency: 'EUR', purchase_rate_to_base: null,
+    }))
+    const supabase = stubClient({ products: urunler, currency_rates: [{ rate: 35, effective_date: '2026-08-13' }] }, calls)
+
+    const summary = await refreshCostInBase(supabase, { dryRun: false })
+
+    expect(summary.updated).toBe(348)
+    expect(calls).toHaveLength(1)
+    expect(calls[0].table).toBe('maliyet_yenile')
+    expect((calls[0].body as { p_satirlar: unknown[] }).p_satirlar).toHaveLength(348)
+  })
+
+  it('RPC hata dönerse fırlatır (yarım yenileme yok: sunucu tüm partiyi geri alır)', async () => {
+    const calls: CapturedWrite[] = []
+    const supabase = stubClient(
+      {
+        products: [
+          { id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: null, purchase_price: 10, purchase_currency: 'EUR', purchase_rate_to_base: null },
+        ],
+        currency_rates: [{ rate: 35, effective_date: '2026-08-13' }],
+      },
+      calls,
+      undefined,
+      { rpcHatasi: true },
+    )
+
+    await expect(refreshCostInBase(supabase, { dryRun: false })).rejects.toMatchObject({ code: '22023' })
+    expect(calls.filter(c => c.table === 'products')).toHaveLength(0)
+  })
+
+  it('fazla ondalıklı kur sütun duyarlığına (6) yuvarlanır: aynı kur ikinci koşuda "değişmedi" sayılır', async () => {
+    const calls: CapturedWrite[] = []
+    const supabase = stubClient(
+      {
+        products: [
+          // DB'de numeric(18,6) olarak saklanmış kur: 35.123457. Kaynak kur 35.1234567 (7 ondalık).
+          { id: 'p1', name: 'Fan A', sku: 'SKU-1', brand: 'Vortice', category_id: null, cost_in_base: 351.2346, purchase_price: 10, purchase_currency: 'EUR', purchase_rate_to_base: 35.123457 },
+        ],
+        currency_rates: [{ rate: 35.1234567, effective_date: '2026-08-13' }],
+      },
+      calls,
+    )
+
+    const summary = await refreshCostInBase(supabase, { dryRun: false })
+
+    expect(summary.updated).toBe(0)
+    expect(calls).toHaveLength(0)
+  })
+
+  it('parti sınırını (5000) aşarsa BÖLMEDEN durur ve hiçbir yazma isteği atmaz', async () => {
+    const calls: CapturedWrite[] = []
+    const urunler: ProductFixtureRow[] = Array.from({ length: 5001 }, (_, i) => ({
+      id: `p${i}`, name: `Fan ${i}`, sku: `SKU-${i}`, brand: 'Vortice', category_id: null,
+      cost_in_base: null, purchase_price: 10, purchase_currency: 'EUR', purchase_rate_to_base: null,
+    }))
+    const supabase = stubClient({ products: urunler, currency_rates: [{ rate: 35, effective_date: '2026-08-13' }] }, calls)
+
+    await expect(refreshCostInBase(supabase, { dryRun: false })).rejects.toThrow(/sınır 5000/)
+    expect(calls).toHaveLength(0)
   })
 
   it('dryRun (varsayılan) hiçbir yazma isteği üretmez ama sayımları döner', async () => {
@@ -492,7 +593,7 @@ describe('refreshCostInBase', () => {
     const summary = await refreshCostInBase(supabase)
 
     expect(summary.updated).toBe(1) // hesap yapılır, sadece YAZILMAZ
-    expect(calls.filter(c => c.table === 'products')).toHaveLength(0)
+    expect(calls).toHaveLength(0)
   })
 
   it('değeri zaten aynı olan satırı "updated" saymaz (gereksiz yazma yok)', async () => {
@@ -510,6 +611,6 @@ describe('refreshCostInBase', () => {
     const summary = await refreshCostInBase(supabase, { dryRun: false })
 
     expect(summary.updated).toBe(0)
-    expect(calls.filter(c => c.table === 'products')).toHaveLength(0)
+    expect(calls).toHaveLength(0)
   })
 })
