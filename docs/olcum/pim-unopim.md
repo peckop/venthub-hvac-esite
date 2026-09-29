@@ -18,3 +18,6 @@ Son ölçüm: 2026-09-29 (OPS, Sonnet). Önceki: REC-357 (In Review), karar 36 E
 Sunucu bedeli, Akeneo destek bitişi, ERP ürün kartı yeteneği.
 ## Yeniden ölçme tetikleyicisi
 Pazaryeri/çok kanal, tedarikçi beslemesi, ikinci kişi ürün girişi, binlerce ürün; 4 hafta sonu.
+
+## KARAR 184 (Recep 2026-09-29 14:17)
+UnoPIM = KATALOG penceresinin işi (dondurma 165 kalkınca KATALOG açılır). Görsel ekleme dahil ürün içeriği UnoPIM tarafında halledilecek (Recep). 4 haftalık koşul KATALOG açıldığı gün başlar: 24 boş ürün + 2 hafta fark 0; canlıya yazma kolu challenger 5 koşulu kapanmadan açılmaz; tek yazıcı ihlali (admin form/CSV/kategori ekranı PIM alanlarına yazıyor) KATALOG açılışının ilk işi. Görsel yönetimi UnoPIM DAM ile mi, site kovası ile mi: KATALOG açılışında ölçülür (ADMIN kategori görsel yükleme kusuru buna göre şekillenir).
