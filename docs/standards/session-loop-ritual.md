@@ -16,6 +16,8 @@ Filo **doğrudan mesajla çalışır** (`fleet-mechanism-standard.md` §0, REC-3
 4. **Hangi işte olduğunu lidere mesajla yaz** (`SendMessage`); lider açılış emrini mesajla verir. İş bitince `notify_when_idle`.
 5. **Recep'e plan sorma.** Kalıcı iş kayıttan (Linear + pano kartı) kurulur; Recep'e yalnız karar sorusu gider, OPS üzerinden.
 
+**Açılış çıktısının tavanı (ölçüldü 2026-09-29, REC-433).** Bir SessionStart kancasının çıktısı 10.000 karakteri aşınca bağlama yalnız ilk yaklaşık 2.000 karakter girer. Bu yüzden `session-board` çıktısı en çok 9.000 karakter tutar: bölümler öncelik sırasındadır, Recep mesajları aynen ama sınırlı gelir, gerisi dosya işaretçisi olarak yazılır. Tavanı kapı (INV-SESSIONSTART-TAVAN-1) ölçer. Çıktıda "ROL KARTI:" satırının yeri ayrılmıştır; satırı `docs/roller/<DEPARTMAN>.md` kartından (en çok 300 karakter) HARİTA doldurur.
+
 ## 2. Tekrarlanan tur (loop / cron) — yalnız ihtiyaç ölçülünce, önce Recep
 
 - **Karar 53 (2026-09-19):** cron / zamanlayıcı / loop **yasak değildir**; dönemsel bir karardı. Gerekiyorsa **önce Recep'le konuşulur**.

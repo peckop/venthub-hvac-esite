@@ -446,6 +446,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/board/gizli-konsol.cjs` | Gizli konsol ön yüklemesi: kopuk sürecin ve node çocuklarının her child_process çağrısına `windowsHide` ekler; ekranda `git.exe` penceresi açılmasın (REC-415, Recep 09-29) | ARAÇ | `NODE_OPTIONS=--require` (`kopuk-baslat.cjs` verir) | 2026-09-29 ölçüm: kopuk çocuk 3/3 pencere açtı, başlatıcıyla 3/3 açmadı | `__tests__/conformance/kopuk-surec-pencere.test.ts` | AKTIF |
 | `scripts/board/kopuk-baslat.cjs` | Kopuk süreç başlatıcı: kancaların arka planda koşturduğu betikleri gizli konsol ön yüklemesiyle başlatır; `detached: true` başka yerde YASAK (REC-415) | ARAÇ | `.claude/hooks/session-board.cjs`, `belge-satiri.cjs`, `bellek-yoklama.cjs` | 2026-09-29 ölçüm: aynı çocuk betik başlatıcıyla pencere açmadan sonuna kadar çalıştı (git + powershell) | `__tests__/conformance/kopuk-surec-pencere.test.ts` | AKTIF |
 | `scripts/seo/yayin-kapisi.mjs` | Toplu IndexNow yayın kapısı — REC-405 / karar 164 A (OPS hükmü 09-29): `indexnow-bildir.mjs` toplu betiği adres şeması bayrağı kapalıyken reddeder | URUN | scripts/seo/indexnow-bildir.mjs (toplu betik), src/lib/seo/__tests__/indexnowBetikKapisi.test.ts | henüz koşmadı (2026-09-29 yazıldı) | src/lib/seo/__tests__/indexnowBetikKapisi.test.ts | KAL |
+| `scripts/belge/rol-karti-uret.cjs` | ROL KARTI ÜRETİCİ — REC-426 (talimat 09-28.2), tek plan REC-433 Faz 3'ün girdisi. | HARİTA | docs/README.md (rol kartı satırı); `node scripts/belge/rol-karti-uret.cjs --yaz` | 2026-09-29 yazıldı, yeşil | src/__tests__/conformance/rol-kartlari.test.ts (INV-ROL-1) | KAL |
 | `scripts/seo/__tests__/bot-karnesi-en-yayin.test.ts` | INV-BOT-KARNESI-EN-YAYIN-1 · bot karnesi EN_YAYIN bayrağını KAYNAKTAN okur; bayrak kapalıyken hreflang yokluğu bilinçli sayılır, belirsizse sayılmaz (REC-439) | ALTYAPI | vitest (`pnpm test`) | 2026-09-29 (7/7) | kendisi test (eski koda karşı sınandı) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
@@ -753,6 +754,11 @@ gerektirmez).
   **Kurulum betiği (2026-09-27, REC-401 B0b) — sahip ARAC, durum KAL:** `tools/wrongstack-mcp/kurulum.cjs`.
   Sürüm yükseltmesini tek komutla yapar (kendi penceresinin sunucuları + daemon durdur → npm ci →
   yama → doğrula, son satır HAZIR/HATA). Başka pencereye ait sunucu varsa hiçbir şeyi kapatmaz.
+  **Ek notlar (2026-09-29, ARAÇ isteği, HARİTA ricasıyla):** (1) Yama **1.0.26'ya özeldir**; npm'de 1.0.27
+  var — sürüm geçişinde yama uygulanıyor mu ve dönüş boyutu korunuyor mu `kurulum.cjs --denetle` ile
+  yeniden ölçülür, varsayılmaz. (2) Panoda kanıt komutsuz kartlar var; kanıt/kapanış düzeni REC-419'da.
+  (3) `add_task` dönüşü artık kart + özet (tüm pano değil); tek kart kapatmanın bayt bedeli REC-419
+  ölçümüne girer.
   `--denetle` salt okuma. Kapı `INV-WRONGSTACK-KURULUM-1`. Canlı kurulum yalnız toplu açılışta.
 
 - **`scripts/generate/generate-sitemap.mjs`** — durum **KARANTİNA**. Bu PR ile `scripts/archive/`
