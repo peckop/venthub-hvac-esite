@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import CookiePreferencesButton from '@/components/consent/CookiePreferencesButton'
-import legalConfig from '@/config/legal'
+import { legalGorunumTr as legalConfig } from '@/config/legal'
 import { localizedHref, Routes } from '@/utils/routes'
 
 export const CookiePolicyContentTr: React.FC<{ lang: string }> = ({ lang }) => {
