@@ -86,8 +86,14 @@ describe('INV-MARKA-KAYNAK-1 (c): site haritası marka kolu listeyi izler', () =
       vi.doMock('../../lib/supabase/static', () => ({
         supabaseStaticClient: { rpc: async () => ({ data: [] }) },
       }))
-      vi.doMock('../../lib/services/category.service', () => ({ getCategories: async () => [] }))
-      vi.doMock('../../lib/services/family.service', () => ({ getAllFamilySlugs: async () => [] }))
+      // Site haritası boş katalogda ÜRETİLMEZ (INV-SITEMAP-HATA-1): sahte veri tek kategori + tek aile taşır;
+      // bu test yalnız MARKA satırlarını ölçer, kategori/aile satırlarını filtre dışı bırakır.
+      vi.doMock('../../lib/services/category.service', () => ({
+        getCategories: async () => [
+          { id: 'k1', slug: 'fans', parent_id: null, metadata: { slug: { tr: 'fanlar', en: 'fans' } }, updated_at: '2026-09-01T00:00:00.000Z' },
+        ],
+      }))
+      vi.doMock('../../lib/services/family.service', () => ({ getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }] }))
       const { default: sitemap } = await import('../../app/sitemap')
       const girisler = await sitemap()
       const markaUrlleri = new Set(girisler.map((g) => g.url).filter((u) => /\/(tr|en)\/brands\//.test(u)))
