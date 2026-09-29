@@ -60,6 +60,26 @@ import PageComponent from '../../views/CategoryPage'
 const PAGE_SIZE = 48
 
 /**
+ * Kategori başına ürün sayıları önbelleği (REC-300, derleme 57014 deneme 2).
+ *
+ * ESKİDEN: bu sayfa `get_category_counts`'u HER kategori sayfası için doğrudan çağırıyordu (≈48 çağrı/derleme,
+ * önbelleksiz; kural 6 ve render cetveline aykırı). Ölçüm 2026-09-29: çağrı başı 42 ms / 35.188 tampon — aile
+ * liste RPC'sinin 2,5 katı; anon `statement_timeout` 3 sn. Ana sayfa, ürünler sayfası ve site haritası aynı
+ * RPC'yi zaten `unstable_cache` içinde çağırıyor; bu sayfa da onlarla aynı desene bağlanır: `lang` × `tenantId`
+ * başına TEK çağrı. Hatada FIRLATILIR (önbelleğe HATA yazılmaz; site haritası da aynısını yapar,
+ * INV-SITEMAP-HATA-1): eskiden hata sessizce "sayı 0" olup tüm alt kategorileri gizliyordu.
+ */
+const getCachedKategoriSayimlari = (lang: string, tenantId: string) => unstable_cache(
+  async () => {
+    const { data, error } = await supabase.rpc('get_category_counts')
+    if (error) throw error
+    return data ?? []
+  },
+  ['category-counts', lang, tenantId],
+  { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
+)()
+
+/**
  * Aile listesi önbelleği. Anahtar SaaS kuralı gereği hem `lang` hem `tenantId`
  * hem de kategori + sayfa içerir (kural 12); etiketler ana sayfa (home-data) değil
  * KEŞİF (discovery) alanıdır — stok hareketi bu listeyi thrash etmez (PS-042).
@@ -249,7 +269,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
     const tenantId = DEFAULT_TENANT_ID
 
     // SSR: Alt kategorilerin tam verisini çek — client-side hydration race'ini ortadan kaldır
-    const [{ data: subsData }, { data: countsData }] = await Promise.all([
+    const [{ data: subsData }, countsData] = await Promise.all([
       supabase
         .from('categories')
         // `marketing_title` KASITEN YOK — emekli alan (REC-297); gerekçe `preload.ts`
@@ -258,7 +278,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
         .eq('parent_id', category.id)
         .eq('is_active', true)
         .order('sort_order', { ascending: true }),
-      supabase.rpc('get_category_counts')
+      getCachedKategoriSayimlari(lang, tenantId)
     ])
 
     // Ürünü OLMAYAN alt kategoriler gizlenir — CategoryContext istemcide aynı count>0
