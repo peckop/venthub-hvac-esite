@@ -45,6 +45,7 @@ function log(msg) {
 function git(args) {
   return execFileSync('git', ['-C', REPO, ...args], {
     encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    windowsHide: true, // kopuk süreç konsolsuz: bu olmadan git.exe yeni konsol penceresi açabilir (REC-415, olası neden — KANITSIZ)
   }).trim()
 }
 
@@ -76,6 +77,7 @@ function main() {
   try {
     out = execFileSync(process.execPath, [path.join(__dirname, 'registry-sync.cjs'), ...range.split('..')], {
       encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true, // aynı gerekçe: kopuk sürecin torunu da pencere açmasın
     })
   } catch (e) {
     log(`senkron başarısız: ${e && e.message}`)
