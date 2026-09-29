@@ -146,6 +146,15 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(uretici.sorunlar(bozuk).some((s) => s.startsWith('OPS: ortak blok'))).toBe(true)
   })
 
+  it('karar 181: arka ofis yasağı yalnız URUN/ADMIN/ALTYAPI/KATALOG kartında, olgun-kütüphane satırı her kartta', () => {
+    const yasak = 'Genel arka ofis modülünü'
+    for (const ad of ['URUN', 'ADMIN', 'ALTYAPI', 'KATALOG']) expect(uretilen[ad], ad).toContain(yasak)
+    for (const ad of Object.keys(uretilen).filter((a) => !['URUN', 'ADMIN', 'ALTYAPI', 'KATALOG'].includes(a))) {
+      expect(uretilen[ad], ad).not.toContain(yasak)
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) expect(metin, ad).toContain('olgun kütüphane/sistem aranır (karar 181)')
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])

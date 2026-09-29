@@ -12,7 +12,7 @@ src/components/products/**, src/views/category/**, src/data/brands.ts, src/confi
 Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").
 
 ## Yasak ve sınır
-Adres şeması değişikliği tek başına Recep'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır.
+Adres şeması değişikliği tek başına Recep'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır. Genel arka ofis modülünü (stok, satınalma, CRM, teknik servis) genişletmek = önce OPS'a sor (karar 181).
 
 ## Yetenek ve araç
 rendering-cache cetveli, i18n-conventions, Playwright ölçümü.
@@ -38,4 +38,5 @@ CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: t
 - Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.
 - Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano.
 - Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.
+- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.
 - CLAUDE.md'deki 14 mutlak kural her role geçerlidir.
