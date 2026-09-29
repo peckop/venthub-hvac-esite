@@ -94,6 +94,17 @@ gerekmez. Linear **proje yorumu pasif**: bir kutuya yazılır ve kimse bakmazsa 
 hangi sınıfta olduğu, ne kadar küçük olduğuna değil, **kendi tetiği olup olmadığına**
 bakılarak söylenir.
 
+### 0.3 Pencereler iş gereği birbirine DOĞRUDAN yazar (Recep, 2026-09-29)
+
+Recep'in sözü: *"ihtiyaç halinde birbirine yazabilmeli, işlerini bırakıp değil, iş gereği; sorumlulukların bilincinde olmalıyız."* OPS aracı değildir; pencereler `SendMessage` ile doğrudan konuşur. Kurallar:
+
+1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Linear numarası yazılı.
+2. **İş bırakılmaz:** alan sahibi elindeki adımı bitirir, sonra kısa cevap verir; gerekirse kendi kuyruğuna kart açar.
+3. **OPS'a da tek satır:** sıra/öncelik değiştiren, başkasının dosyasına dokunan ya da karar isteyen her şey. Pencereler kendi aralarında karar vermez; Recep'e soru dolaştırılmaz.
+4. **Açılışta claim alınır:** claim'siz pencere panoda "kapalı" görünür ve yazışma adresi belirsizleşir.
+
+Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve panoya (`board.cjs who`) bakılır, ad ezberlenmez.
+
 ---
 
 ## 1. Niçin bu cetvel var — ölçülmüş vaka, tahmin değil

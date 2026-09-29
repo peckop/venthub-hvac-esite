@@ -55,7 +55,8 @@
 | Adres/şablon **yayınından önce, yayın günü ve sonra** arama görünürlüğü nasıl denetlenir (eski adres tek 308, kırık bağlantı, SEO puanı), kusur kimin? | `standards/yayin-gorunurluk-denetim-standard.md` (TASLAK, REC-300) |
 | **Yapay zekâ cevaplarında** (Claude, Gemini) VentHub geçiyor mu, hangi motorla, hangi soru listesiyle, ne ölçülmez? | `standards/geo-olcum-standard.md` (TASLAK, karar 124) |
 | Bir kategorinin **adı hangi kolondan** gelir (menüde, başlıkta, kırıntıda)? | `standards/kategori-adlandirma-standard.md` |
-| Birden çok Claude oturumu **nasıl çakışmadan** çalışır (şerit sahipliği, worktree izolasyonu, bir-iş-bir-dal)? | `standards/collaboration-protocol.md` · ⚠`standards/multi-session-coordination-standard.md` eski modeli anlatıyor (belge taraması YÜKSEK bulgu 4; düzeltmesi REC-400 D5) |
+| Birden çok Claude oturumu **nasıl çakışmadan** çalışır (şerit sahipliği, worktree izolasyonu, bir-iş-bir-dal)? | `standards/collaboration-protocol.md` (kurallar) · `standards/multi-session-coordination-standard.md` (şerit panosu: kira, yol rezervasyonu, canlılık) · `standards/fleet-mechanism-standard.md` §0 (filo mesajla çalışır) |
+| Pencereler yeniden açılınca ne yapılır, tekrarlanan tur (loop/cron) ne zaman ve kimin onayıyla kurulur? | `standards/session-loop-ritual.md` |
 | Bir iş **hangi yöntemle** koşar (şerit / alt ajan / Workflow / maestro / skill / elle), emirde `YÖNTEM:` satırı? | `standards/execution-method-standard.md` |
 | Katalogdan ticarete hat — ürün nasıl girer, CSV, fiyat, şema, kategori? | `plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan uca pano) + `standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`; veri deposu kardeş depo `venthub-pdf-ingestor` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
