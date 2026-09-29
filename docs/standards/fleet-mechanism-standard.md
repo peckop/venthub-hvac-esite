@@ -520,7 +520,7 @@ bir yargı olur, oysa alanın varlığı bir ölçümdür. Kapı bu dördünü a
 | eşik | değer | ölçüm tabanı |
 |---|---|---|
 | durum dosyası bayatlık | **60 dakika** | 2026-08-28: aktif beş şeridin dosyaları 1/9/17/27/35/39/46 dk yaşındaydı; bir sonraki değer 356 dk (kapanmış gün). 60, en eski aktif dosyaya pay bırakır ve kapanmış günü ayırt eder. 30 seçilseydi o gün AUTH yanlış alarm alırdı. |
-| `MEMORY.md` boyut | **16384 bayt** | indeks ~24.4KB'de okunamaz oluyor, 27.5KB'de sessizce kırpıldığı gözlendi. Ölçü **bayt**, satır değil — kırpma bayta bakar. |
+| `MEMORY.md` boyut | **200 satır YA DA ~25.000 bayt** (hangisi önce dolarsa); yumuşak 160 satır / 20.000 bayt | 2026-09-29 REC-433 1.9 yeniden ölçümü: 48 KB/250 satır 129. satırda, 7 KB/600 satır 200. satırda kesildi; model bağlamına "Only part of it was loaded" notu düşüyor. Eski "16384" değeri doğrulanmadı. Sınırın ötesi sessizce düşer (kullanıcıya görünmez). |
 
 Eşikler koddan **export edilir** ve conformance testi cetveldeki sayıyla eşleştiğini ölçer;
 sihirli sayı bırakmak, sonraki değiştirenin neyi neden değiştirdiğini bilememesi demektir.
