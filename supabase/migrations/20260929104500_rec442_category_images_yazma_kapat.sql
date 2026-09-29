@@ -26,6 +26,11 @@
 --   create policy "Auth Delete" on storage.objects for delete to public
 --     using ((bucket_id = 'category-images'::text) and (auth.role() = 'authenticated'::text));
 
+-- DROP POLICY, storage.objects üzerinde kısa süreli kilit ister (INV-MIGRATION-3, squawk require-lock/statement-timeout):
+-- kilit alınamazsa 5 sn sonra HIZLI BAŞARISIZ ol (workflow kırmızı, yükleme/okuma trafiği ayakta), sonsuza dek bekleme.
+set lock_timeout = '5s';
+set statement_timeout = '30s';
+
 begin;
 
 -- A) Ön-guard: bu üç AD genel; aynı adlı başka bir politikayı yanlışlıkla silmeyelim. Koşul `using` YA DA
