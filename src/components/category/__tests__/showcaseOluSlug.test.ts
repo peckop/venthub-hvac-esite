@@ -20,7 +20,7 @@ const KAYNAK = fs.readFileSync(
 describe('REC-434 — vitrin ölü alt kategori slug\'ı içermez', () => {
   it.each(['elektrikli-isitici', 'ortam-havali'])('%s slug literali bileşende yok', (slug) => {
     // Yorum satırları hariç: yalnız kod (tırnaklı literal) sayılır.
-    const kod = KAYNAK.replace(/\{\/\*[\s\S]*?\*\/\}/g, '').replace(/\/\/.*$/gm, '')
+    const kod = KAYNAK.replace(/\{\/\*[\s\S]*?\*\/\}/g, '').replace(/(?<!:)\/\/.*$/gm, '')
     expect(kod).not.toMatch(new RegExp(`['"\`]${slug}['"\`]`))
   })
 
