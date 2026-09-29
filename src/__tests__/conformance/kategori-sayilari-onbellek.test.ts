@@ -35,6 +35,25 @@ describe('INV-KATEGORI-SAYILARI-ONBELLEK-1', () => {
     expect(sarmal).toMatch(/if \(error\) throw error/)
   })
 
+  it('TAZELEME: sarmalın etiketleri webhook products/categories dallarında düşer (sayılar vitrinde bayat kalmaz)', () => {
+    const sarmal = kaynak.match(/const getCachedKategoriSayimlari = [\s\S]*?\)\(\)/)![0]
+    expect(sarmal).toMatch(/tags: \[PRODUCTS_DISCOVERY_TAG, discoveryTag\(tenantId\)\]/)
+    const rota = fs.readFileSync(path.join(KOK, 'src/app/api/webhook/supabase/route.ts'), 'utf8')
+    // RPC `products.status/category_id/subcategory_id` ve `categories.parent_id`'i okur (get_category_counts tanımı).
+    const dal = (bas: string, son: string) => {
+      const i = rota.indexOf(bas)
+      const j = rota.indexOf(son, i)
+      expect(i, `${bas} dalı bulunamadı`).toBeGreaterThan(-1)
+      return rota.slice(i, j)
+    }
+    expect(dal("if (table === 'products') {", "else if (table === 'categories')")).toMatch(/revalidateTag\(PRODUCTS_DISCOVERY_TAG\)/)
+    expect(dal("else if (table === 'categories') {", "else if (table === 'inventory_movements')")).toMatch(/revalidateTag\(PRODUCTS_DISCOVERY_TAG\)/)
+    const duyarli = rota.match(/PRODUCT_DISCOVERY_SENSITIVE_FIELDS = \[([\s\S]*?)\] as const/)![1]
+    for (const alan of ['status', 'category_id', 'subcategory_id']) expect(duyarli, `${alan} tazeleme tetikleyicisinde yok`).toContain(`'${alan}'`)
+    // Kiracı etiketi de aynı koşulda (`tenantId && shouldRevalidateDiscovery`) düşer.
+    expect(rota).toMatch(/revalidateTag\(discoveryTag\(tenantId\)\)/)
+  })
+
   it('sayfa sayıları sarmaldan okur', () => {
     expect(kaynak).toMatch(/getCachedKategoriSayimlari\(lang, tenantId\)/)
   })
