@@ -59,8 +59,8 @@ Raporlarda tahmin yoktur; "denenmedi/ölçülmedi" yazan yerler aşağıda aynen
 | BLOG | önizleme → artifact-design; şema → diagram, artifact-diagramming | "önizleme yayınlandı ama artifact-design yüklenmedi"; 11 şema bekliyor |
 | GEO-SEO | render sonrası kural → seo-audit (**Bright Data eklentisi**, deneme 14 gün, ücret ölçülmedi); canlı izleme → canary | search-console: OAuth jetonu ister, biz hizmet hesabıyla giriyoruz; seo-ecommerce: DataForSEO ücretli = para kapısı |
 | HARİTA | D7 ölçümü → agy-orchestrate, multi-agent, llm-council, orion-cli | üçünün içeriğini okumadı |
-| KATALOG | CSV → xlsx; PDF çıkarım → venthub-catalog-importer | importer **yalnız `.agent` ağacında**, Claude penceresinde listelenmez |
-| MEVZUAT | PDF OCR → pdf; araştırma bölme → "multi-agent-research" | o ad `.agent` ağacında (Antigravity); Claude'daki karşılığı `multi-agent`, aynı iş mi ölçülmedi |
+| KATALOG | CSV → xlsx | PDF çıkarım için raporda anılan skill `.agent` tarafında; değerlendirme dışı |
+| MEVZUAT | PDF OCR → pdf | araştırmayı bölmek için raporda anılan "multi-agent-research" `.agent` tarafında; değerlendirme dışı |
 | OPS | kapsam ekseni → plan-ceo-review (gstack DENE #9); karar → llm-council; canlı → sentry-debug-issue, supabase-postgres-best-practices | `review` (gstack) istemiş; envanter §6'da ATLA, kıyas yok |
 | SATIŞ | e2e → webapp-testing, gstack-qa; belge → document-generate (gstack) | gstack-qa "ham sürüm, çalıştırılmaz" (envanter §5), document-generate ATLA (§6): **atama yok** |
 | TASARIM | yazı tipi → typography; kontrast → accessibility, web-design-guidelines; envanter → multi-agent | alt ajan DesignSync'e erişemedi, iki tur kayıp |
@@ -77,10 +77,10 @@ Raporlarda tahmin yoktur; "denenmedi/ölçülmedi" yazan yerler aşağıda aynen
 | D3 | venthub-tasarim-dili | §4 emir kalıbı `design_push.py`, kare indirme `design_dl.py` diyor; TASARIM "401, Design'a yazma yolu artık Linear proje yorumu" diyor | Skill metninde iki betik adı var (satır 76, 84); 401 **ölçülmedi** |
 | D4 | git-commit | Conventional Commits (`type(scope): ...`) dayatıyor; depo biçimi `ŞERİT (REC-nn): ...` ve PR `Fixes REC-nn` | **Doğrulandı** (son 8 commit biçimi ve SKILL.md) |
 | D5 | create-migration | Kartlarda yok; ALTYAPI/ADMIN/SATIŞ/URUN migration yazıyor | HARİTA da aynı boşluğu ölçmüştü |
-| D6 | venthub-catalog-importer | Yalnız `.agent/skills` (36 skill); `.claude/skills` (42 skill) içinde yok | **Doğrulandı** (`ls`) |
+| D6 | — | Kaldırıldı: `.agent` tarafı bu değerlendirmenin dışındadır (Recep 2026-09-30: "biz .claude tarafındayız") | — |
 | D7 | plan-challenger | Adım 1.3'te uyulacak cetvel "CLAUDE.md Mutlak Kurallar (31 madde) + CONTEXT.md §14" diyor; CLAUDE.md artık 14 kural, CONTEXT.md emekli. Adım 1'de `codegraph_impact` aracını anıyor; bu oturumun CodeGraph aracı yalnız `codegraph_explore` | **Doğrulandı** (SKILL.md satır 43 ve 40-41; CLAUDE.md "Doküman Haritası") |
 | D8 | verify-before-done | "Skills in scope" bölümü `testing`, `debugging`, `git-flow` skill'lerine gönderme yapıyor; üçü de depoda yok. "VentHub ek kuralları"nın 12 maddesi posta kutusu/kanban içindir, "bitti" kanıtı işiyle ilgisiz | **Doğrulandı** (SKILL.md satır 127-132 ve 1-40; `.claude/skills` listesi) |
-| D9 | skills-creator | Yeni skill'i `.agent/skills/` altına kuruyor ve `.agent` manifestini derliyor; Claude penceresinin okuduğu `.claude/skills` için doğrudan yol değil | **Doğrulandı** (SKILL.md çıktı alanı ve Adım 1) |
+| D9 | skills-creator | `.claude/skills` altında duran bu skill'in çıktısı `.claude` klasörüne değil başka ağaca yazılıyor; yani `.claude`'a yeni skill kurmak için doğrudan kullanılamaz (skill'in kendi metni; diğer ağacın kendisi bu belgenin konusu değil) | **Doğrulandı** (SKILL.md çıktı alanı ve Adım 1) |
 
 ## 5. Rapor ↔ ölçüm çelişkileri
 
