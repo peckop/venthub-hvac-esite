@@ -5,6 +5,12 @@
 ## Görev
 Kanca, WrongStack, claude-mem ve şerit aracı altyapısı; araç envanteri ve araç-atıl-kalmaz kuralı.
 
+## Yönetim (karar 201)
+- Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
+- Çalışanlar: araştırmacı (salt-okuma ölçüm), uygulayıcı, çürütücü, doğrulayıcı (işi yapmamış ajan, kanıtı yeniden ölçer). Eşzamanlı çalışan sınırı yok.
+- Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır; hangi rolün hangisini kullanacağını YETENEK atar.
+- Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
+
 ## Dosyalar
 .claude/hooks/**, scripts/board/**, tools/**, .github/dependabot.yml, docs/audits/arac-envanteri-*.
 
@@ -18,8 +24,8 @@ Kanca kurulumu ve araç denemeleri (kanca TASARIMI HARİTA'dadır); araç envant
 wrongstack-kanban, wrongstack-mailbox-mcp, ast-grep, CodeGraph.
 
 ## Kurallar
-> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
+> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
 
 ## Durum
 Açık.
