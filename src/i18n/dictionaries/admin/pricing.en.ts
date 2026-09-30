@@ -173,6 +173,8 @@ export const pricing = {
       scopeTarget: "Scope and target do not match: exactly one valid target is required for the selected scope.",
       scopeRange: "Invalid scope value.",
       checkViolation: "The rule failed database validation. Please review the fields.",
+      productFixedExists:
+        "This product already has a fixed-price rule with no end date. Edit the existing rule, or give the new rule a validity period or a currency.",
     },
     validation: {
       minQuantity: "Minimum quantity must be 0 or greater",

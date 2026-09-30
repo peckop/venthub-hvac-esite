@@ -136,11 +136,35 @@ export function isValidFixedPriceAmount(amount: number): boolean {
 }
 
 /**
- * "Ürünün TEK sabit fiyat kuralı": ürün kapsamlı (scope 1), `fixed`, tüm kitaplar (price_book_id NULL), adet 1.
- * Adet>1 kademeli kural bu işin konusu DEĞİL (cetvel §8.1.4 yasağı) — kural sayfasında kalır.
+ * "Ürünün TEK sabit fiyat kuralı": ürün kapsamlı (scope 1), `fixed`, tüm kitaplar (price_book_id NULL), adet 1,
+ * para birimi kısıtsız ve süresiz. Adet>1 kademeli kural bu işin konusu DEĞİL (cetvel §8.1.4 yasağı) — kural sayfasında
+ * kalır; para birimli ya da dönemli (kampanya) sabit kural da "ürünün fiyatı" değildir, çözücü onları priority ile ayırır.
+ * ⚠Bu koşul DB'deki `pricing_rule_urun_tek_sabit_uq` kısmi tekil indeksinin koşuluyla BİREBİR aynı olmalıdır
+ * (migration 20260930061500); biri değişirse öteki de değişir.
  */
 function isProductFixedRule(rule: PricingRuleRow): boolean {
-  return rule.method === 'fixed' && rule.price_book_id === null && rule.min_quantity === 1
+  return (
+    rule.method === 'fixed' &&
+    rule.price_book_id === null &&
+    rule.min_quantity === 1 &&
+    rule.currency === null &&
+    rule.valid_from === null &&
+    rule.valid_to === null
+  )
+}
+
+/** Ürün başına tek sabit kural indeksinin adı (23505 hatasında `message` içinde gelir). */
+export const PRODUCT_FIXED_RULE_UNIQUE_INDEX = 'pricing_rule_urun_tek_sabit_uq'
+
+/**
+ * Saf: hata, "aynı ürüne ikinci sabit kural" indeks ihlali mi? PostgREST hatayı düz nesne döndürür (`instanceof Error`
+ * DEĞİL): ayrım `code` (23505) + `message` içindeki indeks adıyla yapılır. `details` (`Key (tenant_id, product_id)=(…)`)
+ * kullanıcıya gösterilmez.
+ */
+export function isProductFixedRuleConflict(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false
+  const { code, message } = error as { code?: unknown; message?: unknown }
+  return code === '23505' && typeof message === 'string' && message.includes(PRODUCT_FIXED_RULE_UNIQUE_INDEX)
 }
 
 /**
@@ -166,6 +190,25 @@ export async function setProductFixedPrice(
     throw new RangeError(`setProductFixedPrice: geçersiz tutar (${String(input.amount)}); 0 < tutar ≤ ${PRODUCT_FIXED_PRICE_MAX}.`)
   }
 
+  try {
+    return await writeProductFixedPrice(supabase, productId, input, yontem, updatedBy)
+  } catch (error) {
+    // Yarış: iki yönetici aynı ürüne AYNI ANDA ilk fiyatı girdi, biri kazandı (ekleme dalı indeks ihlali aldı).
+    // Kaybeden hata görmesin: yeniden okur, kazananın kuralını GÜNCELLER (son yazan kazanır). TEK yeniden deneme:
+    // ikinci denemede de çakışma çıkarsa hata olduğu gibi yayılır (sonsuz döngü yok).
+    if (!isProductFixedRuleConflict(error)) throw error
+    return await writeProductFixedPrice(supabase, productId, input, yontem, updatedBy)
+  }
+}
+
+/** `setProductFixedPrice`ın tek denemelik gövdesi: oku → varsa güncelle, yoksa ekle. */
+async function writeProductFixedPrice(
+  supabase: SupabaseClient<Database>,
+  productId: string,
+  input: ProductFixedPriceInput,
+  yontem: ProductFixedPriceYontem,
+  updatedBy: string | null,
+): Promise<PricingRuleRow> {
   const { data: existing, error: listErr } = await supabase
     .from('pricing_rule')
     .select('*')
@@ -259,6 +302,9 @@ export async function clearProductFixedPrice(
       .eq('method', 'fixed')
       .is('price_book_id', null)
       .eq('min_quantity', 1)
+      .is('currency', null)
+      .is('valid_from', null)
+      .is('valid_to', null)
       .select('id'),
     yontem,
   )

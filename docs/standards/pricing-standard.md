@@ -621,6 +621,8 @@ ALTER TABLE product_prices ADD COLUMN net_price numeric, ADD COLUMN gross_price 
 ```
 **Sabit kimlikler (blueprint §1):** tenant `d3b07384-…`; price_list individual/dealer/corporate `d9d138d8`/`d97fff9d`/`b3a14f1a`.
 
+**Ürün başına tek sabit kural (REC-412, 2026-09-30):** `(tenant_id, product_id)` üzerinde kısmi tekil indeks `pricing_rule_urun_tek_sabit_uq` — koşul `scope = 1 AND method = 'fixed' AND price_book_id IS NULL AND min_quantity = 1 AND currency IS NULL AND valid_from IS NULL AND valid_to IS NULL`. Yani bir ürünün **süresiz, para birimi kısıtsız, kitapsız, adet-1 sabit kuralı TEKTİR**; para birimli, dönemli (kampanya), kitaba özel ya da kademeli (adet>1) sabit kurallar bu kısıtın DIŞINDADIR ve §11'in aday süzgeci + `priority` ile ayrılmaya devam eder. Uygulama tarafındaki tanım (`isProductFixedRule`, `clearProductFixedPrice` süzgeci) bu koşulla birebir aynı tutulur. İhlal `23505`'tir; tek ürün fiyat girişi servisi ekleme dalında yakalayıp kazananın kuralını günceller. Plan: `docs/plans/rec412-tek-urun-fiyat-girisi-2026-09-29.md` §9.
+
 ---
 
 ## 11. Çözümleme algoritması (deterministik, izlenebilir)

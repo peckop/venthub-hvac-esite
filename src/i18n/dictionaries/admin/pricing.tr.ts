@@ -173,6 +173,8 @@ export const pricing = {
       scopeTarget: "Kapsam ile hedef uyumsuz: seçilen kapsam için tek ve doğru hedef seçilmeli.",
       scopeRange: "Geçersiz kapsam değeri.",
       checkViolation: "Kural veritabanı doğrulamasından geçemedi. Alanları kontrol edin.",
+      productFixedExists:
+        "Bu ürün için zaten süresiz bir sabit fiyat kuralı var. Mevcut kuralı düzenleyin ya da yeni kurala geçerlilik tarihi veya para birimi verin.",
     },
     validation: {
       minQuantity: "Minimum adet 0 veya daha büyük olmalı",

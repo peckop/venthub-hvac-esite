@@ -25,6 +25,7 @@ import {
   coefficientToMarginPct,
   countProductsInScope,
   createPricingRule,
+  isProductFixedRuleConflict,
   listPricingRules,
   marginPctToCoefficient,
   type PricingRuleCreateInput,
@@ -241,6 +242,15 @@ function checkViolationKey(error: unknown): string | null {
   if (detail.includes('min_quantity')) return 'admin.pricing.rules.validation.minQuantity'
   if (detail.includes('scope')) return 'admin.pricing.rules.errors.scopeRange'
   return 'admin.pricing.rules.errors.checkViolation'
+}
+
+/**
+ * Ürün başına tek sabit kural indeksinin ihlalini (23505) i18n mesajına çevirir. Hem ekleme hem güncelleme için geçerli:
+ * mevcut bir kuralı (adet, kapsam, yöntem ya da ürün değiştirerek) indeks koşuluna sokmak da aynı hatayı verir.
+ * `details` (`Key (tenant_id, product_id)=(…)`) kullanıcıya GÖSTERİLMEZ.
+ */
+function uniqueViolationKey(error: unknown): string | null {
+  return isProductFixedRuleConflict(error) ? 'admin.pricing.rules.errors.productFixedExists' : null
 }
 
 interface ImpactSample {
@@ -621,7 +631,7 @@ const PricingRuleFormModal: React.FC<PricingRuleFormModalProps> = ({ open, rule,
         onSaved()
         onClose()
       } catch (e) {
-        const checkKey = checkViolationKey(e)
+        const checkKey = checkViolationKey(e) ?? uniqueViolationKey(e)
         if (e instanceof AdminPermissionError) toast.error(t('admin.pricing.common.noPermission'))
         else if (checkKey) toast.error(t(checkKey))
         else toast.error(t('admin.pricing.rules.toasts.saveFailed'))
