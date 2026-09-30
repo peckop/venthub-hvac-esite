@@ -14,3 +14,4 @@ Recep 2026-09-29: "bu ölçümleri tekrar tekrar yapmamak adına önceki ve şim
 | pim-unopim.md | UnoPIM durumu, alternatifler, PIM gerekli mi |
 | satis-hazirligi.md | "Satış olsa her şey çalışır mı" uçtan uca denetim |
 | erisim-envanteri.md | Hangi hesap, anahtar, bağlayıcıya erişimimiz var; Recep'e sorulmadan önce nasıl ölçülür (değer yazılmaz) |
+| wrongstack-ozellik-envanteri.md | WrongStack'in hangi özelliği var, bizde durumu ne, almak mı yazmak mı (hatırlatma dahil); sahip ARAÇ |
