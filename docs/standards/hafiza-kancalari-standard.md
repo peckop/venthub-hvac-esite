@@ -341,8 +341,13 @@ başlığında **gerekçesiyle** durur, burada yalnız kurallar:
    ajan tarafından belirlenir. Ders başına **700 karakter tavanı** (aşan ders BASILMAZ, kırpılmaz; atlanan
    sayısı "N ders daha var" notuna eklenir — hiçbir ders sığmasa bile not yazılır, kol sessiz kalmaz),
    `<` `>` etkisizleştirilir (‹ ›). Bu zarar azaltmadır, sınır değildir: sage'e yazma yetkisi olan ajan düz
-   metinle "öneri" yazabilir. Bedel: 2026-09-30 ölçümünde ~165 dersin 29'u >700 karakterdi (~%17) — bunlar konu kolunda
-   görünmez, dosya dersi kolu (dosya başına bir kez) etkilenmez.
+   metinle "öneri" yazabilir. Bedel (2026-09-30, sage kopyası, tekSatir sonrası): 166 aktif dersin **32'si**
+   >700 karakter (önem≥0.5 olanlarda 32/158): 20 convention, 2 bug_root_cause, 1 decision, 9 fact —
+   yani kaybedilen şey rastgele uzun not değil, en yüksek değerli kurallar. Bunlar konu kolunda ders
+   olarak GÖRÜNMEZ; yerine notta BAŞLIĞI (ilk 60 karakter, etkisizleştirilmiş) çıkar. Dosya dersi kolu
+   (dosya başına bir kez) etkilenmez. Uzun derslerin kısaltılması (özet + ayrıntı ayrı kayıt) OPS
+   kararıdır (katman-4); bu PR onlara dokunmaz. **Not bir kez:** atlanan ders notu (oturum, nesil)
+   başına bir kez basılır (`.sage-atlanan-*.jsonl`); ders deftere/sayaca GİRMEZ.
 2. **ALAKA SÜZGECİ ZORUNLUDUR (ölçüldü):** `searchSage` durak sözcüksüz `OR` araması yapar; gerçek
    daemon'a sorulan istemlerin hepsi 2-5 ders döndürdü ("merhaba nasilsin" dahil). Süzgeçsiz kanca her
    istemde öter (K3). Ders, istemin içerik terimlerinin yarısını (alt sınır 2, üst sınır 3) taşımalı;

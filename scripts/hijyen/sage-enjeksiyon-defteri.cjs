@@ -142,6 +142,53 @@ function oku(oturum, { pano = panoDizini() } = {}) {
 }
 
 /**
+ * ATLANAN dersler (konu kolunun "N ders daha var" notu): ders BASILMADI, dolayısıyla enjeksiyon
+ * defterine (sayaç kaynağı) GİREMEZ — yoksa Stop sahte enjeksiyon sayardı. Not ise her istemde
+ * birebir tekrar ediyordu (bağımsız inceleme ORTA-3, cetvel K3). Bu yüzden notlanmış (atlanan)
+ * ders kimlikleri AYRI, yalnız-ekleme bir dosyada tutulur: `.sage-atlanan-<oturum24>-<nesil>.jsonl`.
+ * Anahtar (oturum, nesil): compact nesli artırınca not yeniden görünür.
+ * @returns {Set<string>}
+ */
+function atlananlar(oturum, { pano = panoDizini() } = {}) {
+  try {
+    const ham = fs.readFileSync(atlananYolu(oturum, nesil(oturum, pano), pano), 'utf8')
+    const kume = new Set()
+    for (const s of ham.split('\n')) {
+      if (!s.trim()) continue
+      try {
+        const o = JSON.parse(s)
+        if (o && typeof o.id === 'string') kume.add(o.id)
+      } catch {
+        /* yarım satır */
+      }
+    }
+    return kume
+  } catch {
+    return new Set()
+  }
+}
+
+function atlananYolu(oturum, nesilNo, pano) {
+  return path.join(pano, `.sage-atlanan-${oturumKisa(oturum)}-${nesilNo}.jsonl`)
+}
+
+/** Notta anılan (atlanan) ders kimliklerini kaydeder. Yazamazsa `false` (not tekrar edebilir). */
+function atlananiYaz(oturum, idler, { pano = panoDizini() } = {}) {
+  try {
+    if (!idler.length) return true
+    fs.mkdirSync(pano, { recursive: true })
+    fs.appendFileSync(
+      atlananYolu(oturum, nesil(oturum, pano), pano),
+      idler.map((id) => JSON.stringify({ id })).join('\n') + '\n',
+      'utf8',
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
  * Bir ders satırına işaret ekler (`sayildi` | `kullanildi`). Yalnız ekleme — bkz. başlık.
  * @returns {boolean}
  */
@@ -155,4 +202,15 @@ function isaretle(satir, alan) {
   }
 }
 
-module.exports = { METIN_KARAKTER, panoDizini, oturumKisa, nesil, defterYolu, yaz, oku, isaretle }
+module.exports = {
+  METIN_KARAKTER,
+  panoDizini,
+  oturumKisa,
+  nesil,
+  defterYolu,
+  yaz,
+  oku,
+  isaretle,
+  atlananlar,
+  atlananiYaz,
+}
