@@ -11,8 +11,10 @@
 import { describe, it, expect } from 'vitest'
 import {
   kontrolEt, haritaCoz, sayfaAlanlari, jsonldBloklari, robotsDisallow, robotsEslesir,
-  bilinenUygula, cikisKodu, ozetSatirlari, KURAL_NO,
+  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO,
 } from '../canli-kapi.mjs'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 const TABAN = 'https://venthub.com.tr'
 const ACIKLAMA_OK = 'Bu sayfa ürünün teknik özelliklerini, ölçülerini ve kullanım alanlarını ayrıntılı biçimde anlatır.'
@@ -422,5 +424,59 @@ describe('INV-CANLI-KAPI-1 · --bilinen ve çıkış kodu', () => {
     v.ek.enSayfalar[0].html = html({ lang: 'tr' })
     v.ek.yanitlar['/tr/brands/olmayan-marka'] = { durum: 200 }
     expect(new Set(kodlar(v).map((b) => b.kod))).toEqual(new Set(['FAVICON', 'LANG', 'SOFT404']))
+  })
+})
+
+describe('bilinen listesi kalıcı susturucu olamaz (OPS şartı, REC-502)', () => {
+  const k = (kod: string, seviye = 'KIRMIZI'): Bulgu => ({ kod, seviye, adres: '/x', kanit: '' })
+  const son =(kod: string, r: ReturnType<typeof bilinenDogrula>) =>
+    [...(bilinenUygula([k(kod)], r.gecerli) as Bulgu[]), ...(r.bulgular as Bulgu[])]
+
+  it('kaydı Done ya da Canceled olan bilinen satırı KIRMIZI olur ve susturmaz (sabotaj)', () => {
+    for (const d of [{ ad: 'Done', tip: 'completed' }, { ad: 'Canceled', tip: 'canceled' }, { ad: 'Duplicate', tip: 'canceled' }]) {
+      const r = bilinenDogrula({ LANG: 'REC-373' }, { 'REC-373': d })
+      expect(r.gecerli).toEqual({})
+      expect((r.bulgular as Bulgu[]).map((b) => [b.kod, b.seviye])).toEqual([['BILINEN-KAYIT-KAPALI', 'KIRMIZI']])
+      expect(cikisKodu(son('LANG', r))).toBe(1)
+    }
+  })
+  it('açık kayıtlı (Backlog, In Progress, In Review) satır susturur ve çıkışı 1 yapmaz', () => {
+    for (const d of [{ ad: 'Backlog', tip: 'backlog' }, { ad: 'In Progress', tip: 'started' }, { ad: 'In Review', tip: 'started' }]) {
+      const r = bilinenDogrula({ LANG: 'REC-373' }, { 'REC-373': d })
+      expect(r.gecerli).toEqual({ LANG: 'REC-373' })
+      expect(r.bulgular).toEqual([])
+      expect(cikisKodu(son('LANG', r))).toBe(0)
+    }
+  })
+  it('REC kaydına bağlı olmayan satır (boş, serbest metin, küçük harf, sayı) KIRMIZI olur', () => {
+    for (const kayit of ['', 'sonra bakarız', 'REC-', 'rec-12', 42]) {
+      const r = bilinenDogrula({ LANG: kayit })
+      expect(r.gecerli).toEqual({})
+      expect((r.bulgular as Bulgu[])[0].kod).toBe('BILINEN-KAYITSIZ')
+      expect(cikisKodu(son('LANG', r))).toBe(1)
+    }
+  })
+  it('durumu ölçülemeyen kayıt susturmayı bozmaz ama UYARI basar (ağ ya da anahtar yok)', () => {
+    const r = bilinenDogrula({ LANG: 'REC-373' }, {})
+    expect(r.gecerli).toEqual({ LANG: 'REC-373' })
+    expect((r.bulgular as Bulgu[]).map((b) => [b.kod, b.seviye])).toEqual([['BILINEN-KAYIT-OLCULEMEDI', 'UYARI']])
+  })
+  it('kayitDurumlariCek anahtar yoksa ağa çıkmaz, hata verirse boş döner, cevap gelirse durumu okur', async () => {
+    let cagri = 0
+    const bozuk = async () => { cagri++; throw new Error('ağ yok') }
+    expect(await kayitDurumlariCek(['REC-1'], '', bozuk)).toEqual({})
+    expect(cagri).toBe(0)
+    expect(await kayitDurumlariCek(['REC-1'], 'anahtar', bozuk)).toEqual({})
+    const tamam = async () => ({ json: async () => ({ data: { issue: { state: { name: 'Done', type: 'completed' } } } }) })
+    expect(await kayitDurumlariCek(['REC-1'], 'anahtar', tamam)).toEqual({ 'REC-1': { ad: 'Done', tip: 'completed' } })
+  })
+  it('depodaki canli-kapi-bilinen.json: her satır bir REC kaydına bağlı ve kod adı kural tablosunda ya da ailesinde var', () => {
+    const bilinen = JSON.parse(readFileSync(join(__dirname, '..', 'canli-kapi-bilinen.json'), 'utf8')) as Record<string, string>
+    expect(Object.keys(bilinen).length).toBeGreaterThan(0)
+    const kodlar = Object.keys(KURAL_NO)
+    for (const [kod, kayit] of Object.entries(bilinen)) {
+      expect(kayit).toMatch(/^REC-\d+$/)
+      expect(kodlar.some((x) => x === kod || x.startsWith(kod + '-')), `${kod} kural tablosunda yok`).toBe(true)
+    }
   })
 })
