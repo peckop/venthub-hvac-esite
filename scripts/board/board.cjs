@@ -25,6 +25,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { execFileSync } = require('child_process')
+const canlilik = require('./canlilik.cjs')
 
 const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || path.join('C:', 'tmp', 'venthub-board')
 /** Claude Code'un pencere başına yazdığı oturum kaydı: `<pid>.json` (sessionId + name). Test için env ile değişir. */
@@ -441,40 +442,66 @@ function pencereAdlari(dizin = OTURUM_KAYIT_DIZINI) {
   return out
 }
 
+/**
+ * Pano canlılığı (REC-524): `claude agents --json --all` ile claim'leri birleştirir.
+ * Kablo ince: mantık `canlilik.cjs`te. FAIL-OPEN ama sessiz değil — ölçüm yoksa `birlesim` null döner
+ * ve `olculemedi` satırı çağırana verilir (eski çıktı korunur + tek satır).
+ * @returns {{olcum:object, birlesim:object|null}}
+ */
+function canlilikOlc(hepsi) {
+  let olcum
+  try { olcum = canlilik.olc({ onbellekYolu: canlilik.onbellekYolu(BOARD_DIR) }) } catch (e) {
+    olcum = { ok: false, sebep: `ölçüm hatası: ${(e && e.message) || 'bilinmeyen'}` }
+  }
+  return { olcum, birlesim: olcum.ok ? canlilik.birlestir(hepsi, olcum.pencereler) : null }
+}
+
 function summary(sid) {
   // BAYAT şeritler artık DÜŞMEZ, etiketle gösterilir (T084-VH — bkz. tumTalepler yorumu).
   const hepsi = tumTalepler()
-  if (hepsi.length === 0) return 'PANO: talep yok.'
+  const { olcum, birlesim } = canlilikOlc(hepsi)
+  // Ölçüm açıkça kapatıldıysa (VENTHUB_CANLILIK_KAPALI=1) ek satır YOK; başarısızsa TEK satır var.
+  const ekSatirlar = birlesim
+    ? canlilik.ekSatirlar(birlesim, olcum, sid)
+    : (olcum.kapali ? [] : [canlilik.olculemediSatiri(olcum)])
+  if (hepsi.length === 0) return ['PANO: talep yok.', ...ekSatirlar].join('\n')
+  // HAYALET (pencere kapalı) şerit bir adı/şerit adını TUTMAZ: kapalı pencere çakışma sayılmaz.
+  const hayalet = (c) => !!(birlesim && birlesim.serit.get(c.sid) && birlesim.serit.get(c.sid).durum === 'hayalet')
   const laneCount = new Map()
-  for (const c of hepsi) if (!c.bayat) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
+  for (const c of hepsi) if (!c.bayat && !hayalet(c)) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
   // Pencere adı çakışması: aynı ad iki CANLI sid'de → çıplak adla gönderilen mesaj belirsiz (REC-404).
+  // Ad kaynağı: önce `~/.claude/sessions/<pid>.json` (yedek), üstüne `claude agents` (gerçek, güncel ad).
   const adlar = pencereAdlari()
+  if (birlesim) for (const p of olcum.pencereler) if (p.sessionId && p.name) adlar.set(p.sessionId, p.name)
   const adSayac = new Map()
   for (const c of hepsi) {
     const ad = adlar.get(c.sid)
-    if (ad && !c.bayat) adSayac.set(ad, (adSayac.get(ad) || 0) + 1)
+    if (ad && !c.bayat && !hayalet(c)) adSayac.set(ad, (adSayac.get(ad) || 0) + 1)
   }
   const lines = hepsi.map(c => {
     const ad = adlar.get(c.sid)
     const adEtiketi = ad ? ` (${ad})` : ''
-    const adCakisma = ad && !c.bayat && adSayac.get(ad) > 1
+    const canliEtiketi = birlesim ? canlilik.seritEtiketi(birlesim.serit.get(c.sid)) : ''
+    const adCakisma = ad && !c.bayat && !hayalet(c) && adSayac.get(ad) > 1
       ? ' ⚠ÇAKIŞMA aynı pencere adı birden çok canlı oturumda — SendMessage için ListAgents\'taki "[ref]" ile gönder'
       : ''
     const mine = c.sid === sid ? ' (sen)' : ''
-    // Çakışma uyarısı yalnız CANLI şeritler için anlamlı: bayat olan bloklamıyor.
-    const dup = !c.bayat && laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
+    // Çakışma uyarısı yalnız CANLI şeritler için anlamlı: bayat olan bloklamıyor; kapalı pencerenin (hayalet) claim'i de sayılmaz.
+    const dup = !c.bayat && !hayalet(c) && laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
     const bayat = c.bayat
       ? ` ⚠ BAYAT (${c.yasDk}dk atış yok — bırakılmadı, SAHİPSİZ olabilir; bloklamıyor)`
       : ''
     // TAM oturum numarası (karar 54, 2026-09-21): posta kutusu alıcıyı TAM UUID ile eşler; kısa
     // 8 hane SESSİZCE düşer (ölçüldü: OPS'un to="ac03ce11" mesajı alıcının unread'ine girmedi).
-    return `  · ${c.lane}${adEtiketi}${mine}${dup}${adCakisma}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
+    return `  · ${c.lane}${adEtiketi}${mine}${canliEtiketi}${dup}${adCakisma}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
   })
-  const bayatSayi = hepsi.filter(c => c.bayat).length
-  const bas = bayatSayi > 0
-    ? `PANO — şeritler (${hepsi.length - bayatSayi} canlı, ${bayatSayi} BAYAT):`
+  // Sayım ayrık kovalar: hayalet (pencere kapalı) · yalnız-bayat (pencere açık/bilinmiyor, atış yok) · canlı.
+  const hayaletSayi = hepsi.filter(c => hayalet(c)).length
+  const bayatSayi = hepsi.filter(c => c.bayat && !hayalet(c)).length
+  const bas = bayatSayi > 0 || hayaletSayi > 0
+    ? `PANO — şeritler (${hepsi.length - bayatSayi - hayaletSayi} canlı${hayaletSayi > 0 ? `, ${hayaletSayi} KAPALI(hayalet)` : ''}${bayatSayi > 0 ? `, ${bayatSayi} BAYAT` : ''}):`
     : 'PANO — canlı şeritler:'
-  return bas + '\n' + lines.join('\n')
+  return [bas, ...lines, ...ekSatirlar].join('\n')
 }
 
 /** Bu oturumun teslim aldığı son not zamanı (`seen` işareti). */
