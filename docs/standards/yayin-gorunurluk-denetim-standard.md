@@ -21,6 +21,7 @@
 | Search Console tabanı | tık, gösterim, sıra; sayfa×gün | `scripts/rehber/gsc-taban.mjs` | çıktı depoya girmez (pazar-olcum P6) |
 | Adres denetimi | eski adres → aynı ya da **tek** 308 → 200; haritada yönlendirme 0; model sayısı; canonical kendini gösterir; hreflang tr/en/x-default | `scripts/seo/adres-yayin-denetim.mjs` | TAM liste, örneklem değil; yönlendirme izlenmez |
 | Bağlantı taraması | site haritasındaki sayfalardaki site içi bağlantı + ürün görseli: kırık, yönlendirme | `scripts/seo/link-tara.mjs` (linkinator 8.1.0) | `--sitemap-url` + CSV (8.1.0'da JSON raporu site haritası kipinde boş — ölçüldü) |
+| Yetim sayfa taraması | site haritasındaki her sayfaya, haritalı başka bir sayfadan ham HTML `<a href>` ile ulaşılıyor mu (JS çalıştırılmaz; `<button>`, `<link>`, script içi adres sayılmaz); gelen bağlantı dağılımı 0 / 1 / 2-3 / 4-10 / 11+ | `scripts/seo/yetim-tara.mjs` (`--taban`, `--cikti`, `--izin`) | çıkış 1 = yetim var, 2 = sayfa/harita alınamadı. Google: "Every page you care about should have a link from at least one other page on your site"; yalnız `<a href>` taranır. REC-472 (REC-471 kabul ölçütü). Ağsız kapı INV-YETIM-1 |
 | Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | **PageSpeed Insights API v5** (Google sunucusunda Lighthouse, mobil; anahtar `PAGESPEED_API_KEY`, karar 127) — `scripts/seo/sayfa-kalite.mjs` (varsayılan `--kip psi`, `--strateji mobile|desktop`; geçici hata 3 deneme; anahtar hiçbir çıktıya yazılmaz) | örnekleme kapalı; ölçüt SEO; performans bilgi (REC-398). Yerel unlighthouse 0.18.1 **yedek**: 2026-09-25'te makinede boş bellek ~1 GB iken üç koşuda "Unable to get browser page" ile düştü (59→24→3 sayfa) |
 | Googlebot gözüyle sayfa | URL Inspection API: sayfa başına Googlebot getirme sonucu, robots, dizin kararı, son tarama zamanı (Search Console "tarama istatistikleri" API'de yok — ölçüldü 09-27) | `scripts/seo/gsc-url-denetim.mjs` | kırmızı: getirme başarısız, robots engeli; hiç taranmamış ayrı sayılır. Kota günde 2000. REC-402 |
 | Bot kalitesi karnesi | 5 bot kimliği × adres: aynı HTML, title, canonical, hreflang, JSON-LD | `scripts/seo/bot-karnesi.mjs --taban` | ön izleme sitesinde de koşar |
@@ -51,6 +52,8 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
 - Site haritası: her adres doğrudan 200; model adresi sayısı = 442 (plan §1).
 - Canonical: her sayfada tek ve kendini gösterir. hreflang: tr + en + x-default (EN bilinçli istisnası hariç).
 - Bağlantı taraması: kırık 0 · site içi yönlendirme 0 (plan §7 "kırık 0, zincir 0").
+- Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
+  bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
 - Sayfa kalitesi: SEO ortalaması tabandan **düşmez**; aynı yolda SEO'su düşen sayfa 0.
 - Search Console (+7/+28): "bulunamadı" birikimi 0; tık tabana göre kıyaslanır — geçici düşüş beklenir,
   kalıcı düşüş kusurdur (plan §8).
