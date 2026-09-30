@@ -40,6 +40,7 @@ type Modul = {
   YENIDEN_OLCULEN: string[]
   suz: (m: unknown) => string
   faturaBeyaniDegerlendir: (b?: string) => { gecti: boolean; ayrinti: string }
+  urunSayfasiDegerlendir: (bloklar: unknown) => { gecti: boolean; eksik: string[]; offer: number; kimlikli: number }
   degerlendir: (s: Satir[], o?: { kalemler?: Kalem[]; muaf?: Record<string, string> }) => Hukum
   onkosulOlc: (ctx: Ctx, o?: { kalemler?: Kalem[]; sadece?: string[] }) => Promise<Satir[]>
   kalemiOlc: (k: Kalem, ctx: Ctx) => Promise<Satir>
@@ -67,12 +68,48 @@ type Ayar = {
   resendDurum?: string
   bekciSorgulari?: { sayac: number; ikinciDefaDus?: boolean }
   epostaKaydi?: { siparis: number; teklif: number; kargo: number }
+  /** Yasal sayfa başlığı/H1'i "(Taslak)" taşır (legalReviewCompleted=false hâli). */
+  taslakBasligi?: boolean
+  /** Ürün sayfasının JSON-LD nesnesi; verilmezse tam Merchant uyumlu (fiyatlı Offer + iade + gönderim + mpn). */
+  urunJsonld?: unknown
+}
+
+const TAM_URUN_JSONLD = {
+  '@context': 'https://schema.org',
+  '@type': 'ProductGroup',
+  name: 'Ornek Aile',
+  hasVariant: [
+    {
+      '@type': 'Product',
+      name: 'Model A',
+      mpn: 'MPN-A',
+      offers: {
+        '@type': 'Offer',
+        price: '1500.00',
+        priceCurrency: 'TRY',
+        availability: 'https://schema.org/InStock',
+        hasMerchantReturnPolicy: { '@type': 'MerchantReturnPolicy', returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow' },
+        shippingDetails: { '@type': 'OfferShippingDetails', shippingRate: { '@type': 'MonetaryAmount', value: '0', currency: 'TRY' } },
+      },
+    },
+  ],
 }
 
 function dunya(ayar: Ayar = {}, ctxEk: Partial<Ctx> = {}): Ctx {
   const yanit = (status: number, govde: string, tip = 'application/json') => new Response(govde, { status, headers: { 'content-type': tip } })
   const fetchSahte: Ctx['fetch'] = async (url) => {
-    if (url.includes('/legal/')) return yanit(200, `<html><body><main>${ayar.sayfaMetni ?? 'Temiz sözleşme metni'}</main></body></html>`, 'text/html')
+    if (url.endsWith('/sitemap.xml')) {
+      const locs = ['/tr', '/tr/products', '/tr/products/aile-bir', '/tr/products/aile-iki', '/tr/products/aile-uc', '/tr/category/fanlar']
+      return yanit(200, `<urlset>${locs.map((l) => `<url><loc>https://site.test${l}</loc></url>`).join('')}</urlset>`, 'application/xml')
+    }
+    if (/\/tr\/products\/aile-/.test(url)) {
+      const ld = JSON.stringify(ayar.urunJsonld ?? TAM_URUN_JSONLD)
+      return yanit(200, `<html><head><script type="application/ld+json">${ld}</script></head><body><main>urun</main></body></html>`, 'text/html')
+    }
+    if (url.includes('/legal/')) {
+      const ek = ayar.taslakBasligi ? ' (Taslak)' : ''
+      return yanit(200, `<html><head><title>Hukuki Metin${ek} | VentHub</title></head><body><h1>Hukuki Metin${ek}</h1><main>${ayar.sayfaMetni ?? 'Temiz sözleşme metni'}</main></body></html>`, 'text/html')
+    }
     if (url.includes('/functions/v1/healthz')) {
       const h = ayar.healthz ?? { status: 200, govde: { durum: 'saglikli', config: { odeme_ortami: 'prod' } } }
       return yanit(h.status, typeof h.govde === 'string' ? h.govde : JSON.stringify(h.govde))
@@ -132,9 +169,9 @@ function dunya(ayar: Ayar = {}, ctxEk: Partial<Ctx> = {}): Ctx {
 }
 
 describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş alanla kırmızı)', () => {
-  it('sabit kalem sayısı 9 (K1..K9); sessiz kalem silme kırmızı', async () => {
+  it('sabit kalem sayısı 11 (K1..K11); sessiz kalem silme kırmızı', async () => {
     const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
-    expect(m.KALEMLER.map((k) => k.id)).toEqual(['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8', 'K9'])
+    expect(m.KALEMLER.map((k) => k.id)).toEqual(['K1', 'K2', 'K3', 'K4', 'K5', 'K6', 'K7', 'K8', 'K9', 'K10', 'K11'])
     // K1/K6 dışında hiçbir kalem muaf OLAMAZ (plan bulgu 4)
     expect(m.KALEMLER.filter((k) => k.muaf).map((k) => k.id)).toEqual(['K1', 'K6'])
     // Her kalemin sahibi ve kanıtı tabloda basılır: boş olamaz.
@@ -148,7 +185,7 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
     let hazirlik = 0
     const k = await m.acilisKapisi(dunya(), { hazirlik: async () => void (hazirlik += 1) })
-    expect(k.hukum.satirlar.map((s) => `${s.id}:${s.durum}`)).toEqual(['K1:GECTI', 'K2:GECTI', 'K3:GECTI', 'K4:GECTI', 'K5:GECTI', 'K6:GECTI', 'K7:GECTI', 'K8:GECTI', 'K9:GECTI'])
+    expect(k.hukum.satirlar.map((s) => `${s.id}:${s.durum}`)).toEqual(['K1:GECTI', 'K2:GECTI', 'K3:GECTI', 'K4:GECTI', 'K5:GECTI', 'K6:GECTI', 'K7:GECTI', 'K8:GECTI', 'K9:GECTI', 'K10:GECTI', 'K11:GECTI'])
     expect(k.izin).toBe(true)
     expect(hazirlik).toBe(1)
   })
@@ -165,6 +202,8 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     ['K6', 'Resend alan doğrulanmamış', () => ({ ayar: { resendDurum: 'pending' } })],
     ['K7', 'fatura beyanı yok', () => ({ ctx: { faturaBeyani: undefined } })],
     ['K9', 'son 30 günde hiç e-posta gönderim kaydı yok (üç tablo boş)', () => ({ ayar: { epostaKaydi: { siparis: 0, teklif: 0, kargo: 0 } } })],
+    ['K10', 'ürün sayfasında Offer yok (teklif kipi)', () => ({ ayar: { urunJsonld: { '@type': 'Product', name: 'X', mpn: 'M' } } })],
+    ['K11', 'yasal sayfa başlığı/H1 "(Taslak)" (legalReviewCompleted=false)', () => ({ ayar: { taslakBasligi: true } })],
     ['K8', 'hedef durum tutarsız (açık + 5 gizli)', () => ({ ctx: { hedef: { acik: true, toplam: 31, hidePriceTrue: 5 }, tutarliMi: (d: unknown) => {
       const x = d as { anahtar: { acik: boolean }; kategori: { hidePriceTrue: number } }
       return { tutarli: !x.anahtar.acik || x.kategori.hidePriceTrue === 0, beklenen: 'açık → 0' }
@@ -194,6 +233,42 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
     const kaynak = oku('scripts/kip/acilis-onkosullari.mjs')
     for (const t of ['order_email_events', 'quote_email_events', 'shipping_email_events']) expect(kaynak, `${t} sorgudan çıkmış`).toContain(t)
     expect(kaynak).toMatch(/status = 'sent' and provider_message_id is not null/)
+  })
+
+  it('K10: Merchant ölçütü — tam JSON-LD geçer; fiyatsız/iadesiz/gönderimsiz/kimliksiz Offer geçmez; `sku` ARANMAZ (REC-146)', async () => {
+    const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
+    const d = m.urunSayfasiDegerlendir
+    expect(d([TAM_URUN_JSONLD]).gecti).toBe(true)
+    const offer = TAM_URUN_JSONLD.hasVariant[0].offers
+    const varyant = (o: Record<string, unknown>, ek: Record<string, unknown> = {}) => ({ '@type': 'Product', mpn: 'M', ...ek, offers: { ...offer, ...o } })
+    // her eksik ayrı ayrı KALDI
+    expect(d([varyant({ price: '0' })]).gecti, 'fiyat 0 geçti').toBe(false)
+    expect(d([varyant({ priceCurrency: undefined })]).gecti, 'para birimi yok geçti').toBe(false)
+    expect(d([varyant({ hasMerchantReturnPolicy: undefined })]).eksik).toContain('iade politikası yok')
+    expect(d([varyant({ shippingDetails: undefined })]).eksik).toContain('gönderim verisi yok')
+    expect(d([varyant({}, { mpn: undefined })]).eksik).toContain('mpn/gtin yok')
+    expect(d([{ '@type': 'Product', name: 'X', mpn: 'M' }]).eksik[0]).toMatch(/Offer yok/)
+    // gtin mpn'nin yerini tutar; sku YOKLUĞU hata değil (bilinçli yayınlanmıyor)
+    expect(d([varyant({}, { mpn: undefined, gtin13: '8690000000001' })]).gecti).toBe(true)
+    expect(JSON.stringify(TAM_URUN_JSONLD)).not.toContain('"sku"')
+    // boş girdi yeşil vermez
+    expect(d([]).gecti).toBe(false)
+  })
+
+  it('K10/K11 ölçülemedi = ret: site haritası 404, ürün sayfasında JSON-LD yok, yasal sayfada <h1> yok', async () => {
+    const m = await yukle<Modul>('scripts/kip/acilis-onkosullari.mjs')
+    const k10 = m.KALEMLER.find((k) => k.id === 'K10')!
+    const k11 = m.KALEMLER.find((k) => k.id === 'K11')!
+    const yanit = (status: number, govde: string) => new Response(govde, { status })
+    const haritaYok = dunya({}, { fetch: async () => yanit(404, '{}') })
+    expect((await m.kalemiOlc(k10, haritaYok)).durum).toBe('OLCULEMEDI')
+    const ldYok = dunya({}, { fetch: async (u) => (u.endsWith('/sitemap.xml') ? yanit(200, '<loc>https://site.test/tr/products/a</loc>') : yanit(200, '<html></html>')) })
+    expect((await m.kalemiOlc(k10, ldYok)).durum).toBe('OLCULEMEDI')
+    const h1Yok = dunya({}, { fetch: async () => yanit(200, '<html><head><title>x</title></head><body></body></html>') })
+    expect((await m.kalemiOlc(k11, h1Yok)).durum).toBe('OLCULEMEDI')
+    // taslak bandı tek başına da KALDI verir (başlık temiz olsa bile)
+    const bant = dunya({}, { fetch: async () => yanit(200, '<html><head><title>a</title></head><body><h1>a</h1><div>Bu metin taslaktır ve test amaçlıdır.</div></body></html>') })
+    expect((await m.kalemiOlc(k11, bant)).durum).toBe('KALDI')
   })
 
   it('ÖLÇÜLEMEDİ = RET: DB yok, Resend anahtarı yok, probe kimliği yok → K3/K4/K5/K6/K9 ölçülemedi, izin yok', async () => {
