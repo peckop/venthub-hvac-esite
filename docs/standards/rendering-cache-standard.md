@@ -108,6 +108,13 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > bunu yapıyordu (2026-08-15 denetimi yakaladı); dört dal (`products`/`inventory_movements`/
 > `product_prices`/`product_images`) artık tek yardımcıdan (`revalidateFamilyChain`) çözüyor.
 >
+> **YOL LİSTESİ ADRES ŞEMASINDAN GELİR (REC-300 Faz 3g, 2026-09-30).** Webhook aile ve kategori yollarını sabit
+> `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
+> her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
+> olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 4 yol (price_lists fan-out **47 aile → 188 çağrı**).
+> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Kalan (3g-2):** model adresi
+> (`/tr/urun/<slug>-p-<sku>`) ve slug değişiminde eski yol — `slug_i18n` verisi gelince.
+>
 > **`revalidateTag` yalnız o tag'i tüketen bir `unstable_cache` varsa iş görür.** `familyTag`'in
 > tüketicisi yoktu → çağrı sessiz no-op'tu. PDP verisi `React.cache()` ile sarılı olduğundan
 > PDP için etkili olan **`revalidatePath`**'tir.
