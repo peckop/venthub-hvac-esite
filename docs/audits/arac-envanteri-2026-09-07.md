@@ -764,6 +764,15 @@ gerektirmez).
   dosya (`dist/cli.js` + `dist/index.js`): `.mcp.json` cli.js'i çalıştırır; ilk yama (#1437) yalnız
   index.js'e dokunduğu için canlıda etkisizdi. `npm ci` sonrası README'deki `git apply` döngüsüyle
   uygulanır. Kapı `INV-WRONGSTACK-KANBAN-YAMA-1` hedefi `.mcp.json`'dan okur (geri alınca KIRMIZI).
+  **Sage alan-terimi yaması (2026-09-30, REC-519 kapsam 4) — sahip ARAC, durum KAL (yukarı akış
+  düzeltince SİL):** `tools/wrongstack-mcp/yamalar/sage-1.0.26-domain-terms-turkce.patch`. Betik değil,
+  kurulum parçası → tabloda değil burada. `@wrongstack/sage` çıkarıcısı Türkçe harfleri atıyordu
+  (`normalizeTerm("Şerit")` → `erit`, `("ığış")` → boş anahtar); yama Unicode sınıfları + NFC + U+0307 silme
+  kullanır, İngilizce sonuç değişmez. Hedef tek dosya (`dist/index.js`); `sage-mcp` kendi kopyasını taşımaz.
+  Bugün hiçbir VentHub süreci çıkarıcıyı çağırmıyor (ölçüldü) — yama kütüphane kullanımı için hazır. Aynı iş,
+  kurulum betiğine iki düzeltme getirdi: yama sürümü kilit/kurulu paketle uyuşmazsa yüksek sesli `HATA` (kilit
+  kontrolü hiçbir süreç durdurulmadan önce) ve `git apply`nın bütün dosyayı CRLF'e çevirmesini engelleyen
+  `-c core.autocrlf=false -c core.eol=lf`. Kapı `INV-WRONGSTACK-SAGE-YAMA-1`.
   **Kurulum betiği (2026-09-27, REC-401 B0b) — sahip ARAC, durum KAL:** `tools/wrongstack-mcp/kurulum.cjs`.
   Sürüm yükseltmesini tek komutla yapar (kendi penceresinin sunucuları + daemon durdur → npm ci →
   yama → doğrula, son satır HAZIR/HATA). Başka pencereye ait sunucu varsa hiçbir şeyi kapatmaz.

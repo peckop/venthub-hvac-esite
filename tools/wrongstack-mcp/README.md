@@ -26,13 +26,20 @@ Ana depo kökünde (kısa yol şart — derin Temp yolunda npm 5 dk takıldı, O
 ```bash
 cd tools/wrongstack-mcp
 npm ci --ignore-scripts
-cd ../.. && for y in tools/wrongstack-mcp/yamalar/*.patch; do git apply "$y"; done
+cd ../.. && for y in tools/wrongstack-mcp/yamalar/*.patch; do git -c core.autocrlf=false -c core.eol=lf apply "$y"; done
 ```
 
 **Yamalar (`yamalar/`) kurulumun parçasıdır.** `npm ci` her koşuda paketi yeniden yazar ve yamayı
 siler; bu yüzden ikinci satır atlanmaz. Yama uygulandıktan sonra MCP sunucusu yeniden bağlanana kadar
 (`/mcp` → yeniden bağlan ya da pencere kapat-aç) eski kod bellekte koşar. Durum ölçümü (repo kökünden):
-`git apply --reverse --check <yama>` çıkış 0 = uygulanmış. Kapı: `INV-WRONGSTACK-KANBAN-YAMA-1`.
+`git -c core.autocrlf=false -c core.eol=lf apply --reverse --check <yama>` çıkış 0 = uygulanmış (ya da
+`node tools/wrongstack-mcp/kurulum.cjs --denetle`). Kapılar: `INV-WRONGSTACK-KANBAN-YAMA-1`,
+`INV-WRONGSTACK-SAGE-YAMA-1`. Yama adı `<paket>-<sürüm>-<konu>.patch`; sürüm kurulu paketle uyuşmazsa
+kurulum betiği `HATA` verir (önce kilit dosyasına bakar, hiçbir süreci durdurmadan).
+**Bayrakların niçini (2026-09-30 ölçüldü):** düz `git apply` yama uygulanan dosyanın tamamını CRLF'e
+çeviriyordu (depo içinde `.gitattributes` `*.js text` + Windows'ta `core.eol=native`; depo dışında sistem
+`core.autocrlf=true`) ve geri alınca dosya bayt bayt eski hâle dönmüyordu. `core.autocrlf=false` tek başına
+engellemez; `core.eol=lf` engeller. Canlı kanban-mcp `cli.js` bugüne kadar bu yüzden CRLF idi (545 CR).
 
 ### Sürüm yükseltme (ana depoda) — pencereler açıkken YAPILMAZ
 
@@ -140,6 +147,21 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    `add_note` → **1.778** bayt (etkilenen kart dahil), `get_board` 58.750 → 58.750 (değişmez).
    Hata sonucu (`ok:false`) kesiciye girmez. Sürüm yükseltilince yama adı ve içeriği yeniden ölçülür;
    kapı sürüm uyuşmazlığında KIRMIZI verir. Yukarı akış kaydı: WrongStack GitHub issue.
-10. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
+10. **Sage alan-terimi çıkarıcısı Türkçe harfleri atıyordu → yamalı (2026-09-30, REC-519 kapsam 4).**
+   `@wrongstack/sage` `SageDomainTermExtractor` yalnız ASCII varsayar: `normalizeTerm("Şerit")` → `"erit"`,
+   `("çıktı")` → `"kt"`, `("ığış")` → boş anahtar; "İstanbul Şubesi Müdürü" hiç aday olmaz, "ÇıkışKapısı"
+   camelCase sayılmaz, Türkçe harfle biten terimin tanım cümlesi bulunmaz (`\b` ASCII-sözcük tanımlıdır).
+   `yamalar/sage-1.0.26-domain-terms-turkce.patch` yedi satırı Unicode sınıflarına (`\p{L}` `\p{Lu}` `\p{Ll}`),
+   girdiyi ve anahtarı NFC'ye çevirir ve "İ"nin küçük harfinin ürettiği birleşik noktayı (U+0307) siler; İngilizce
+   sonuç değişmez (aynı terimler, aynı güven). Tek dosya: `dist/index.js` — `sage-mcp` kendi kopyasını taşımaz,
+   `@wrongstack/sage`'i içe aktarır (ölçüldü). ⚠Bugün hiçbir VentHub süreci bu çıkarıcıyı ÇAĞIRMIYOR (`sage-mcp`
+   araçlarında yok; yalnız kütüphane dışa aktarımı) — yama, çıkarıcıyı kullanacak iş için hazır tutulur, sunucu
+   davranışını şimdi değiştirmez. **Bilinen sınır:** anahtar yerel-bağımsız küçültülür, yani "Işık" → `işık`,
+   "ışık" → `ışık` (ayrı anahtar); `toLocaleLowerCase('tr')` İngilizce "INDEX"i bozacağı için kullanılmadı.
+   **Ne zaman düşer:** `sage` sürümü 1.0.26'dan kayınca yama uymaz; `kurulum.cjs` sürüm farkını adıyla söyler,
+   yama yeni sürümde yeniden üretilir (kaynak satırlar `extractCandidatesFromMessage`, `hasCamelBoundary`,
+   `normalizeTerm`) ya da yukarı akış düzeltince silinir. Kapı `INV-WRONGSTACK-SAGE-YAMA-1` (yamasız/yamalı kopya
+   karşılaştırması + sunucunun yüklediği dosya).
+11. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
    kümesi `gh` ile sınırlı ve ağ/paket komutları yasak listesinde. Ama bu bir **azaltmadır**,
    sıfırlama değil — kart açıklamasına ve doğrulayıcı komutuna sır yazılmaz.

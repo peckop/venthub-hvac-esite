@@ -21,6 +21,12 @@
  *   node tools/wrongstack-mcp/kurulum.cjs --denetle  → yalnız doğrula (hiçbir şey değiştirmez)
  *
  * Çıktının son satırı daima `HAZIR` ya da `HATA: <neden>`; çıkış kodu 0 / 1.
+ *
+ * ── YAMALAR (`yamalar/<paket>-<sürüm>-<konu>.patch`) ──
+ * Her yama bir paketin TAM bir sürümü için yazılır. Sürüm kayarsa betik yüksek sesle düşer:
+ * kurulumdan önce `package-lock.json`'a (hiçbir süreç durdurulmadan), kurulumdan sonra kurulu
+ * pakete bakılır; `--denetle` de aynı farkı bildirir. `git apply` her zaman `core.autocrlf=false` + `core.eol=lf`
+ * ile koşar (bkz. gitApply).
  */
 const fs = require('node:fs')
 const path = require('node:path')
@@ -106,17 +112,71 @@ function surecleriOku() {
   }))
 }
 
-function yamalar() {
-  return fs.readdirSync(YAMALAR).filter((d) => d.endsWith('.patch'))
+function yamalar(dizin = YAMALAR) {
+  return fs.readdirSync(dizin).filter((d) => d.endsWith('.patch'))
 }
 
-function yamaUygulu(y) {
+/**
+ * Yama adı `<paket>-<sürüm>-<konu>.patch`; hedef paket `@wrongstack/<paket>`. Yamalar bir paketin
+ * TAM bir sürümü için yazılır (satır numaraları + bağlam); sürüm kayınca uymaz.
+ */
+function yamaHedefi(ad) {
+  const m = String(ad).match(/^([a-z0-9-]+?)-(\d+\.\d+\.\d+)-.+\.patch$/)
+  return m ? { paket: '@wrongstack/' + m[1], surum: m[2] } : null
+}
+
+/**
+ * Her yamanın yazıldığı sürüm, hedef paketin KURULU sürümüyle aynı mı? Farkları döndürür.
+ * (Doğrudan bağımlılık olmayan paketler için de çalışır: sage, sage-mcp'nin geçişli bağımlılığı.)
+ * Niçin ayrı kontrol: sürüm kayınca `git apply` yine düşerdi ama "patch does not apply" ile — hangi
+ * yamanın hangi sürüm için yazıldığını söylemezdi.
+ */
+function yamaSurumFarki(adlar, kuruluSurum) {
+  const fark = []
+  for (const ad of adlar) {
+    const h = yamaHedefi(ad)
+    if (!h) {
+      fark.push('yama adi <paket>-<surum>-<konu>.patch bicimine uymuyor: ' + ad)
+      continue
+    }
+    const kurulu = kuruluSurum(h.paket)
+    if (kurulu !== h.surum) {
+      fark.push('yama ' + ad + ' surum ' + h.surum + ' icin yazildi, kurulu ' + h.paket + ' ' + (kurulu || 'YOK') + ' — yama yeni surumde yeniden olculup uretilmeli')
+    }
+  }
+  return fark
+}
+
+function kuruluSurumOku(ad) {
   try {
-    execFileSync('git', ['apply', '--reverse', '--check', path.join('tools', 'wrongstack-mcp', 'yamalar', y)], {
-      cwd: KOK,
-      stdio: 'ignore',
-      windowsHide: true,
-    })
+    return JSON.parse(fs.readFileSync(path.join(ARAC, 'node_modules', ad, 'package.json'), 'utf8')).version
+  } catch {
+    return null
+  }
+}
+
+/**
+ * `git apply` çağrısı. Satır sonu iki ayrı yoldan bozuluyordu (2026-09-30 ölçüldü, sage index.js):
+ *  (1) DEPO İÇİNDE: `.gitattributes` `*.js text` der, `core.eol` Windows'ta `native`=CRLF → yama
+ *      UYGULANAN DOSYANIN TAMAMINI CRLF'e çevirir (0 → 13.378 CR, 496.951 → 510.491 bayt) ve geri alınca
+ *      bayt bayt eski hâle dönmez (510.329). `core.autocrlf=false` bunu ENGELLEMEZ; `core.eol=lf` engeller.
+ *      (Canlı kanban-mcp/cli.js bu yüzden bugün CRLF: 545 CR.)
+ *  (2) DEPO DIŞINDA / yeni klonda: sistem ayarı `core.autocrlf=true` aynı sonucu verir; depo yerelinde
+ *      `false` olduğundan aynı yama `--reverse --check`te "does not apply" verebilir.
+ * İki bayrak birlikte sabitlenince sonuç makine ayarından bağımsız: dosya LF kalır, CRLF'e dönmüş bir
+ * dosyanın `--reverse --check`i de geçer (öncül LF'ye normalize edilir).
+ */
+function gitApply(kok, yamaDosyasi, ek = [], stdio = 'inherit') {
+  execFileSync('git', ['-c', 'core.autocrlf=false', '-c', 'core.eol=lf', 'apply', ...ek, yamaDosyasi], { cwd: kok, stdio, windowsHide: true })
+}
+
+function yamaYolu(y) {
+  return path.join('tools', 'wrongstack-mcp', 'yamalar', y)
+}
+
+function yamaUygulu(y, kok = KOK) {
+  try {
+    gitApply(kok, yamaYolu(y), ['--reverse', '--check'], 'ignore')
     return true
   } catch {
     return false
@@ -136,6 +196,7 @@ function denetle() {
       }
     }),
   )
+  hatalar.push(...yamaSurumFarki(yamalar(), kuruluSurumOku))
   for (const y of yamalar()) if (!yamaUygulu(y)) hatalar.push('yama uygulanmamis: ' + y)
   const mcp = JSON.parse(fs.readFileSync(path.join(KOK, '.mcp.json'), 'utf8')).mcpServers || {}
   for (const [ad, s] of Object.entries(mcp)) {
@@ -150,7 +211,20 @@ function denetle() {
   return hatalar
 }
 
+/** package-lock.json'daki kilitli sürüm (kurulumdan ÖNCE hangi sürümün geleceği); yoksa null. */
+function kilitSurumOku(ad) {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(ARAC, 'package-lock.json'), 'utf8')).packages['node_modules/' + ad].version
+  } catch {
+    return null
+  }
+}
+
 function kur() {
+  // Yama kilitli sürüme uymuyorsa daha HİÇBİR ŞEY durdurulmadan yüksek sesle düş (npm ci sonrası
+  // düşmek pencerelerin sunucusunu kapatıp yamasız paket bırakırdı).
+  const kilitFarki = yamaSurumFarki(yamalar(), kilitSurumOku)
+  if (kilitFarki.length) throw new Error(kilitFarki.join(' · '))
   const surecler = surecleriOku()
   const { kendi, yabanci, daemon } = siniflandir(surecler, kendiClaudeBul(surecler))
   if (yabanci.length) {
@@ -176,13 +250,15 @@ function kur() {
     shell: true,
     windowsHide: true,
   })
+  const kurulumFarki = yamaSurumFarki(yamalar(), kuruluSurumOku)
+  if (kurulumFarki.length) throw new Error(kurulumFarki.join(' · '))
   for (const y of yamalar()) {
-    execFileSync('git', ['apply', path.join('tools', 'wrongstack-mcp', 'yamalar', y)], { cwd: KOK, stdio: 'inherit', windowsHide: true })
+    gitApply(KOK, yamaYolu(y))
     process.stdout.write('yama uygulandi: ' + y + '\n')
   }
 }
 
-module.exports = { siniflandir, kendiClaudeBul, surumFarki, surecleriOku, temizle }
+module.exports = { siniflandir, kendiClaudeBul, surumFarki, surecleriOku, temizle, yamaHedefi, yamaSurumFarki, gitApply, yamaYolu, yamaUygulu }
 
 if (require.main === module) {
   try {
