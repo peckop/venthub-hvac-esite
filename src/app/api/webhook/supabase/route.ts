@@ -1,6 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
+import { aileYollari, kategoriYollari } from '@/lib/adres/tazelemeYollari'
 import {
   discoveryTag,
   familyTag,
@@ -9,7 +10,6 @@ import {
   PRODUCTS_DISCOVERY_TAG,
   variantStockTag,
 } from '@/lib/cache/tags'
-import { aileYollari, kategoriYollari } from '@/lib/adres/tazelemeYollari'
 import { SATIS_KIPI_TAG } from '@/lib/kip/satisKipi'
 import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
