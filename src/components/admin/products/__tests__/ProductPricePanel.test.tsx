@@ -9,8 +9,8 @@ import type {
   SetProductPriceResult,
 } from '@/lib/services/pricingProductPrice.service'
 
-import ProductPricePanel from '../ProductPricePanel'
 import { VAT_PREFERENCE_KEY } from '../productPriceInput'
+import ProductPricePanel from '../ProductPricePanel'
 
 /**
  * ÜRÜN FİYAT YAN PANELİ (REC-412 Faz 2a) — cetvel pricing-standard §12.1.
@@ -113,6 +113,36 @@ describe('ProductPricePanel', () => {
     const haric = screen.getByLabelText('admin.products.pricePanel.vatExcluded')
     expect(haric).toBeChecked()
     expect(screen.getByRole('button', { name: 'admin.products.pricePanel.clear' })).toBeInTheDocument()
+  })
+
+  it('kayıtlı ondalıklı tutar alana TR biçimiyle dolar ve yalnız KDV seçimi değişip kaydedilince AYNI tutar gider (1000 kat kayma yok)', async () => {
+    m.load.mockResolvedValue(durum({ fixedRule: { id: 'r1', fixedPrice: 1234.56, vatIncluded: false, vatRatePct: 20 } }))
+    m.set.mockResolvedValue(setSonuc())
+    renderPanel()
+
+    const input = await amountInput()
+    await waitFor(() => expect(input.value).toBe('1234,56'))
+    fireEvent.click(screen.getByLabelText('admin.products.pricePanel.vatIncluded'))
+    fireEvent.click(screen.getByRole('button', { name: 'admin.products.pricePanel.save' }))
+
+    await waitFor(() => expect(m.set).toHaveBeenCalledTimes(1))
+    expect(m.set).toHaveBeenCalledWith(
+      expect.anything(),
+      'p1',
+      { amount: 1234.56, vatIncluded: true },
+      expect.objectContaining({ yontem: 'panel' }),
+    )
+  })
+
+  it('0,01 TL altı tutar (ör. 0,001) geçersizdir: Kaydet kapalı kalır, fiyatlanamayan kural yazılamaz', async () => {
+    renderPanel()
+    const input = await amountInput()
+
+    fireEvent.change(input, { target: { value: '0,001' } })
+    fireEvent.blur(input)
+
+    expect(screen.getByRole('button', { name: 'admin.products.pricePanel.save' })).toBeDisabled()
+    expect(m.set).not.toHaveBeenCalled()
   })
 
   it('kayıt yoksa KDV seçimi son tercihten gelir (varsayılan KDV dahil)', async () => {

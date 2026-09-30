@@ -10,6 +10,10 @@
  * `₺ 2 400,50`. Belirsiz olan TEK biçim `2.400`: Türkçede binlik ayracı, İngilizcede ondalık — burada binlik sayılır
  * (yalnız noktadan sonra TAM 3 hane varsa). `2.4` ve `2.45` ondalıktır. Sıfır/negatif/sonsuz ayrıca `isValidFixedPriceAmount`
  * ile reddedilir; bu işlev yalnız BİÇİMİ çözer.
+ *
+ * Virgüllü girdi YALNIZ TR biçimidir: `^\d+,\d{1,2}$` ya da binlik noktalı `^\d{1,3}(\.\d{3})+,\d{1,2}$` (kuruş en çok 2 hane).
+ * İngilizce biçim (`1,500.00`) ve virgülden sonra 3+ hane (`1,500`) BELİRSİZDİR (1,5 mi 1500 mü) ve reddedilir: yanlış
+ * okumak fiyatı 1000 kat kaydırırdı (güvenlik incelemesi #1); yönetici net yazmaya yönlendirilir.
  */
 export function parseAmountInput(raw: string): number | null {
   const temiz = raw.replace(/[₺\s]|TL/gi, '')
@@ -17,8 +21,7 @@ export function parseAmountInput(raw: string): number | null {
 
   let normal: string
   if (temiz.includes(',')) {
-    // Virgül ondalıktır; noktalar binliktir. İkinci bir virgül anlaşılmaz girdidir.
-    if (temiz.split(',').length > 2) return null
+    if (!/^(\d+|\d{1,3}(\.\d{3})+),\d{1,2}$/.test(temiz)) return null
     normal = temiz.replace(/\./g, '').replace(',', '.')
   } else if (/^\d{1,3}(\.\d{3})+$/.test(temiz)) {
     normal = temiz.replace(/\./g, '')
@@ -29,6 +32,18 @@ export function parseAmountInput(raw: string): number | null {
   if (!/^\d+(\.\d+)?$/.test(normal)) return null
   const sayi = Number(normal)
   return Number.isFinite(sayi) ? sayi : null
+}
+
+/** Panelin kabul ettiği en küçük tutar (1 kuruş); altı motorda net ≤ 0 → fiyat üretilmez. */
+export const MIN_PANEL_AMOUNT = 0.01
+
+/**
+ * Kayıtlı tutarı alana yazılacak TR biçimine çevirir (ondalık ayracı VİRGÜL, binlik ayracı yok). `String(123.456)` ham
+ * hâliyle geri okununca "123456" olurdu (binlik kalıbı, 1000 kat; güvenlik incelemesi #2). 3+ ondalıklı kayıt virgüllü
+ * yazılınca ayrıştırıcıda reddedilir: sessizce yanlış okunmak yerine yönetici kuruşa yuvarlamaya zorlanır.
+ */
+export function formatAmountForInput(amount: number): string {
+  return String(amount).replace('.', ',')
 }
 
 /** "Girilen tutar KDV dahil mi?" seçiminin tarayıcıda saklandığı anahtar (kullanıcının SON seçimi, plan §5.1). */

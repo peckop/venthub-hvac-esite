@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  formatAmountForInput,
   parseAmountInput,
   readVatIncludedPreference,
   VAT_PREFERENCE_KEY,
@@ -23,6 +24,27 @@ describe('parseAmountInput', () => {
     expect(parseAmountInput('1.234.567')).toBe(1234567)
     expect(parseAmountInput('2.4')).toBe(2.4)
     expect(parseAmountInput('2.45')).toBe(2.45)
+  })
+
+  it('belirsiz virgüllü biçimler REDDEDİLİR: yanlış okumak fiyatı 1000 kat kaydırırdı (İngilizce biçim, 3+ kuruş hanesi)', () => {
+    for (const belirsiz of ['1,500.00', '1,500', '1,234,567.89', '2400,555', '2.400,500', '2400,']) {
+      expect(parseAmountInput(belirsiz), belirsiz).toBeNull()
+    }
+    // TR biçimleri etkilenmez
+    expect(parseAmountInput('1500,5')).toBe(1500.5)
+    expect(parseAmountInput('1.500,00')).toBe(1500)
+  })
+
+  it('formatAmountForInput: kayıtlı tutar virgüllü yazılır ve ayrıştırıcıdan AYNI değerle döner (1000 kat kayma yok)', () => {
+    expect(formatAmountForInput(2400.5)).toBe('2400,5')
+    expect(formatAmountForInput(2400)).toBe('2400')
+    for (const tutar of [2400.5, 2400, 0.99, 123.45, 1234567.89]) {
+      expect(parseAmountInput(formatAmountForInput(tutar)), String(tutar)).toBe(tutar)
+    }
+    // 3 ondalıklı kayıt (nadir) sessizce yanlış okunmaz: reddedilir, yönetici kuruşa yuvarlar
+    expect(formatAmountForInput(123.456)).toBe('123,456')
+    expect(parseAmountInput('123,456')).toBeNull()
+    expect(parseAmountInput('123.456')).toBe(123456) // elle nokta yazımı binlik sayılır (belgelenmiş TR davranışı); alan ARTIK bu biçimle doldurulmaz
   })
 
   it('anlaşılmayan girdide null döner', () => {

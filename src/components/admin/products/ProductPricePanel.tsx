@@ -25,7 +25,13 @@ import { supabaseBrowserClient as supabase } from '../../../lib/supabase/client'
 import { adminButtonPrimaryClass, adminButtonSecondaryClass, adminInputClass } from '../../../utils/adminUi'
 import { AdminSidePanel } from '../overlay/AdminSidePanel'
 import { useConfirm } from '../overlay/ConfirmProvider'
-import { parseAmountInput, readVatIncludedPreference, writeVatIncludedPreference } from './productPriceInput'
+import {
+  formatAmountForInput,
+  MIN_PANEL_AMOUNT,
+  parseAmountInput,
+  readVatIncludedPreference,
+  writeVatIncludedPreference,
+} from './productPriceInput'
 
 /**
  * ÜRÜN FİYAT YAN PANELİ — REC-412 Faz 2a. Cetvel: docs/standards/pricing-standard.md §12.1 (tek ürün fiyat girişi sözleşmesi).
@@ -61,7 +67,8 @@ type LoadState =
   | { status: 'ready'; data: ProductPricePanelState }
 
 type Outcome =
-  | { kind: 'set'; result: SetProductPriceResult }
+  // `rule` (satırın TAMAMI: marj/ek ücret dahil) durumda TUTULMAZ: panelin belleğinde maliyet/marj alanı olmaz (güvenlik #5).
+  | { kind: 'set'; result: Omit<SetProductPriceResult, 'rule'> }
   | { kind: 'clear'; result: ClearProductPriceResult }
   | { kind: 'error'; message: string }
 
@@ -99,7 +106,7 @@ const ProductPricePanel: React.FC<ProductPricePanelProps> = ({ open, product, ca
       const data = await loadProductPricePanelState(supabase, id)
       setLoad({ status: 'ready', data })
       if (prefill) {
-        setAmountText(data.fixedRule ? String(data.fixedRule.fixedPrice) : '')
+        setAmountText(data.fixedRule ? formatAmountForInput(data.fixedRule.fixedPrice) : '')
         setVatIncluded(data.fixedRule ? data.fixedRule.vatIncluded : readVatIncludedPreference())
       }
     } catch (err) {
@@ -118,8 +125,10 @@ const ProductPricePanel: React.FC<ProductPricePanelProps> = ({ open, product, ca
   const ready = load.status === 'ready' ? load.data : null
   const vatRatePct = ready?.fixedRule?.vatRatePct ?? DEFAULT_VAT_RATE_PCT
   const parsed = parseAmountInput(amountText)
-  const amountValid = parsed !== null && isValidFixedPriceAmount(parsed)
-  const preview = amountValid ? previewProductFixedPrice(parsed, vatIncluded, vatRatePct) : null
+  // Alt sınır 1 kuruş: 0,001 gibi tutar aralık denetiminden geçer ama motor net ≤ 0 için fiyat üretmez (güvenlik incelemesi #7).
+  const inRange = parsed !== null && parsed >= MIN_PANEL_AMOUNT && isValidFixedPriceAmount(parsed)
+  const preview = inRange ? previewProductFixedPrice(parsed, vatIncluded, vatRatePct) : null
+  const amountValid = inRange && preview !== null
   const showInvalid = touched && amountText.trim() !== '' && !amountValid
   const busy = saving || clearing
 
@@ -135,7 +144,8 @@ const ProductPricePanel: React.FC<ProductPricePanelProps> = ({ open, product, ca
         { yontem: 'panel', recalculate: canReflect, updatedBy: auth.user?.id ?? null },
       )
       writeVatIncludedPreference(vatIncluded)
-      setOutcome({ kind: 'set', result })
+      const { rule: _yazilanSatir, ...vitrinSonucu } = result
+      setOutcome({ kind: 'set', result: vitrinSonucu })
       onSaved()
       await refresh(productId, false)
     } catch (err) {
