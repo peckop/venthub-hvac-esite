@@ -10,8 +10,11 @@
  * yazım büyük harfli ve ASCII'dir (ARAC, URUN); pencereye çıplak yazılırsa Recep'in kullandığı adla eşleşmez.
  *
  * ELLE VERİLMİŞ AD: kanca SessionStart girdisindeki `session_title` alanını okur (belge: başlık zaten ayarlıysa —
- * --name ya da /rename — dolu gelir); doluysa `sessionTitle` HİÇ gönderilmez, yani elle verilen ad ezilmez. Bu modül
- * yalnız "şerit adından ad" hesabıdır; ezme/çakışma kararları kancadadır (`pencereAdiKarari`).
+ * --name ya da /rename — dolu gelir). Kural: alan BOŞSA ya da tablodaki adla AYNI ise (`ayniMi`: harf ve Türkçe harf
+ * farksız, "Araç" = "arac" = "ARAÇ") kanca `sessionTitle`'ı KANONİK biçimle yazar — restart/resume'da harness
+ * dökümdeki adı geri yüklemiyor ve pid kaydına türetilmiş ad yazıyor; aynı değeri yazmak sonucu değiştirmez, kaydı
+ * düzeltir. FARKLI ve dolu bir ad (Recep'in verdiği başka ad) EZİLMEZ. Bu modül "şerit adından ad" hesabı ve
+ * karşılaştırma katlamasıdır; ezme/çakışma kararları kancadadır (`pencereAdiKarari`).
  * clear/compact'ta alan hiç gönderilmez, ad korunur.
  *
  * Kullanım: `require('./pencere-adlari.cjs').ad('ARAC')` → 'Araç'. Bilinmeyen/bozuk girdi → '' (çağıran alanı EKLEMEZ).
@@ -73,4 +76,32 @@ function ad(serit) {
   }
 }
 
-module.exports = { ad, TABLO, PENCERE_ADLARI, AD_TAVAN }
+/** Birleştirici işaretler bloğu U+0300–U+036F (NFD sonrası aksanlar). Kod noktasından kurulur: kaynak ASCII kalır. */
+const BIRLESTIRICI_ISARETLER = new RegExp('[' + String.fromCharCode(0x300) + '-' + String.fromCharCode(0x36f) + ']', 'g')
+
+/**
+ * Karşılaştırma katlaması: büyük/küçük harf ve Türkçe harf farkı yok sayılır ("Araç" = "arac" = "ARAÇ" = "ARAÇ ").
+ * ı/İ → i; NFD ile aksanlar (ç ö ü ş ğ ...) atılır; küçük harf; baştaki/sondaki boşluk atılır. YALNIZ karşılaştırma içindir,
+ * görünen ad üretmez (görünen ad `ad()` çıktısıdır).
+ */
+function katla(metin) {
+  try {
+    return String(metin)
+      .replace(/ı/g, 'i')
+      .normalize('NFD')
+      .replace(BIRLESTIRICI_ISARETLER, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim()
+  } catch {
+    return ''
+  }
+}
+
+/** İki ad katlanmış hâlde eşit mi (ikisi de boş DEĞİLSE). */
+function ayniMi(a, b) {
+  const x = katla(a)
+  return x !== '' && x === katla(b)
+}
+
+module.exports = { ad, katla, ayniMi, TABLO, PENCERE_ADLARI, AD_TAVAN }
