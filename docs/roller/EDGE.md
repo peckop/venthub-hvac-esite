@@ -1,9 +1,9 @@
-# ROL KARTI: GEO-SEO
+# ROL KARTI: EDGE
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük denetimi ve pazar ölçümü.
+Supabase Edge Function katmanı (`supabase/functions/**`, 29 fonksiyon + `_shared/`): güvenlik duruşu, deploy hattı, repo↔prod sapma denetimi; her fonksiyon çağıran sınıfına (a/b/c/d) yazılı bağlanır.
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -12,23 +12,23 @@ Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük 
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
+`supabase/functions/**`, `supabase/config.toml`, `deploy-functions.yml`, `edge-shared-input-drift.yml`, `scripts/edge/*`, `edge-security.test.ts`, docs/standards/edge-function-security-standard.md (cetvel sahibi EDGE, OPS 09-30).
 
 ## Yetki
-Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.
+Edge fonksiyon kodu, CORS/getUser(jwt)/rol kapısı, HMAC + replay koruması, `_shared/**`; fonksiyon başına çağıran sınıfı yorumu; INV-EDGE-* ve INV-KOKEN-* kapıları.
 
 ## Yasak ve sınır
-Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.
+Argümansız `auth.getUser()`; CORS başlığı olmayan elle cevap; fonksiyon başına ayrı `supabase.toml`; imzasız JWT'yi `atob` ile çözmek; sınıfı yazılmamış yeni fonksiyon; ham hata gövdesi dönmek (REC-355); "PROD İLERİ" raporuna bakmadan toplu deploy. Sınır: ödeme ve bildirim fonksiyonları ALTYAPI kayıtlarıyla (REC-355, REC-368) değişir, e-posta koduna URUN de commit atıyor (son 30 günde 16 commit: 11 ALTYAPI, 4 URUN): değiştirmeden önce o pencereye yaz. EDGE penceresi kapalıyken cetvel değişikliği OPS onayıyla.
 
 ## Yetenek ve araç
-Search Console, PageSpeed ölçümü, seo-audit.
+supabase, supabase-security, plan-challenger (ödeme yolunda zorunlu), diff-review, venthub-20-eksen-denetimi; `scripts/edge/drift-check.mjs`, `deno check --node-modules-dir=none`.
 
-## Kurallar (3)
-- K1 Plan önce; K17 Hreflang; K23 llms.txt (geçiş, katı).
-- Gerekçeli özet: `docs/roller/GEO-SEO-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+## Kurallar (9)
+- K1 Plan önce; K2 Tip güvenliği; K3 RLS-first; K6 HMAC; K8 Replay koruması; K18 Edge dil izolasyonu; K24 Tenant izolasyonu; K25 Middleware Edge; K26 app_metadata.
+- Gerekçeli özet: `docs/roller/EDGE-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamıştı.
+Açık (asli görev). Bilinen bayat kayıt: cetvel §3.9 "E12 resolveTenantId ihlal" diyor, kodda fonksiyon silinmiş (T026-VH) ve E12 kapıları baseline BOŞ; düzeltmeyi cetvel sahibi yapar. Hafıza kaynakları 34-46 gün yaşlı.
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

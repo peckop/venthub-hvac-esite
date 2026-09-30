@@ -28,7 +28,11 @@ import { describe, expect, it } from 'vitest'
  */
 const KOK = process.cwd()
 const NOTICE = path.join(KOK, 'NOTICE.md')
-const AGACLAR = [path.join(KOK, '.claude', 'skills'), path.join(KOK, '.agent', 'skills')]
+const AGACLAR = [
+  path.join(KOK, '.claude', 'skills'),
+  path.join(KOK, '.claude', 'skills-hazir'),
+  path.join(KOK, '.agent', 'skills'),
+]
 
 /**
  * Skill künyesinde AÇIK lisans ibaresi.

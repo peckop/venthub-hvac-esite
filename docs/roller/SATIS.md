@@ -1,9 +1,9 @@
-# ROL KARTI: GEO-SEO
+# ROL KARTI: SATIS
 
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük denetimi ve pazar ölçümü.
+Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, müşteri e-postaları, KVKK ve roller (eski adı AUTH); satış kipi şirket kurulana dek kapalı-hazır.
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -12,23 +12,23 @@ Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük 
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
+Migration'lar `*quote*`, `*anon_definer*`; edge `quote-notification-webhook`, `quote-request-guest`; `quoteService.ts`, `adminQuoteService.ts`, `src/views/admin/quotes/**`; INV-QUOTE-YAYIM-1, INV-AUTH-DEFINER-ANON-1. Sahiplik adayı cetveller (OPS onaylar): ödeme ve satış kipi (checkout-payment, payment-ledger, satis-kipi-gecis; bugün ALTYAPI), teklif ve belge numarası (quote-standard, document-numbering; bugün URUN). Pano dosya kümesi belirlenmedi.
 
 ## Yetki
-Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.
+Migration planı, gölge veritabanı kanıtı, çürütme; teklif servisini bağlama; konformans kapısı ve cetvel yazımı; birleştirme sonrası canlı salt-okuma ölçüm; migrationsız karar 98 sınıfı PR'ı ritüelle kendisi birleştirir.
 
 ## Yasak ve sınır
-Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.
+Kırmızı CI'da birleştirme yok; yeni fonksiyonda anon'a REVOKE; migration/DEFINER PR'ında birleştirmeden önce diff-review + security-reviewer; test teklifi alıcısı Recep (uydurma adres yok); birleştirme saati ALTYAPI'ya yazılır; satış kipi yalnız `scripts/kip/satis-kipine-gec.mjs` ile. Sınır: ödeme yolu ve bildirim cetveli ALTYAPI, e-posta şablonu URUN, KVKK cetveli OPS: değiştirmeden önce sahibine yaz.
 
 ## Yetenek ve araç
-Search Console, PageSpeed ölçümü, seo-audit.
+plan-challenger (iki tur), create-migration, diff-review ve security-reviewer (henüz denenmedi), gölge veritabanı betiği, Supabase MCP salt-okuma, canlı e2e (e2e-canli).
 
-## Kurallar (3)
-- K1 Plan önce; K17 Hreflang; K23 llms.txt (geçiş, katı).
-- Gerekçeli özet: `docs/roller/GEO-SEO-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+## Kurallar (7)
+- K1 Plan önce; K2 Tip güvenliği; K3 RLS-first; K4 Monoton durum; K6 HMAC; K8 Replay koruması; K26 app_metadata.
+- Gerekçeli özet: `docs/roller/SATIS-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamıştı.
+Açık (asli görev). Kuyruk: Edge deploy, istemci yayım çağrısını kaldırma, REC-295, canlı doğrulama.
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
