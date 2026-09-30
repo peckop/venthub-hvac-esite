@@ -466,6 +466,8 @@ madde 1 gereği araç sayılmaz.
 | `scripts/kip/acilis-onkosullari.mjs` | Satış AÇILIŞ ÖNKOŞULLARI — `satis-kipine-gec.mjs --yon ac` bunları ölçmeden canlıya yazmaz (REC-168, INV-SATIS-KIPI-7). | OPS | docs/standards/satis-kipi-gecis-standard.md, scripts/kip/satis-kipine-gec.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/satis-kipi-acilis-onkosullari.test.ts | YENI |
 | `scripts/edge/yeniden-dene.mjs` | scripts/edge/yeniden-dene.mjs | ALTYAPI | scripts/edge/drift-check.mjs (prod kaynak indirmesi, gecici ag hatasinda sinirli yeniden deneme); test: INV-EDGE-DRIFT-RETRY-1 | 2026-09-30 (REC-355 alt isi) | yok | KAL |
 | `scripts/belge/belge-defteri.cjs` | BELGELER DEFTERİ — "VentHub Belgeler" NotebookLM defterini depodaki elle yazılmış belgelerden üretir ve tazeler (REC-473, D8): `uret` grup başına .md, `yukle` aynı adlı kaynağı değiştirir (yeni hazır olmadan eski silinmez), `olc` durum dosyasından yaş, `tara` LLM taraması (zamanlanmaz, HAM damgalı). Grup kuralları `belge-gruplari.json`. Çıkış kodu sözleşmesi betik başlığında; gün kapanışı adımını ARAÇ `scripts/nlm/gun_kapanisi.py`'ye ekler | HARİTA | `scripts/belge/belge-tazelik.cjs` (require, önbellek alanı `belgelerDefteri`) · gün kapanışı bağlantısı bekliyor (ARAÇ, REC-473 5. madde) | canlı 2026-09-30: `yukle` çıkış 0, defter 15 kaynak, mükerrer 0, hepsi hazır | INV-BELGE-DEFTER-1 | KAL |
+| `scripts/board/pencere-adlari.cjs` | Şerit → pencere adı tablosu, tek kaynak: SessionStart kancası `sessionTitle` olarak yazar ("Araç", "Ops"…; REC-525) | ARAÇ | `.claude/hooks/session-board.cjs`, `src/__tests__/conformance/sessionstart-pencere-adi.test.ts` | 2026-09-30 ölçüm: kanca gerçek claim'li girdiyle koşturuldu, `sessionTitle` basıldı; canlı pencerede ad değişimi yeni pencerede doğrulanacak. SINIRLAR: `session_title` doluysa (elle/önceki ad) ezilmez; aynı adı alacak başka canlı oturum varsa ikisi de ad almaz; claim'siz yeni pencere ilk açılışta ad almaz (yalnız talepten SONRAKİ açılışta; bayat claim kendi sid'ine ad verir); fork yeni sid alır, ilk açılışta ad almaz | sessionstart-pencere-adi.test.ts | KAL |
+| `scripts/board/canlilik.cjs` | PANO CANLILIĞI — `claude agents --json` çıktısını pano claim'leriyle birleştirir (REC-524). | OPS | scripts/board/board.cjs (`summary`/`who`, SessionStart pano bloğu) | canlı 2026-09-30: gerçek `claude agents --json` ile `board.cjs who` doğru (bkz. REC-524 PR) | src/__tests__/conformance/pano-canlilik-claude-agents.test.ts | YENI |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -769,6 +771,15 @@ gerektirmez).
   dosya (`dist/cli.js` + `dist/index.js`): `.mcp.json` cli.js'i çalıştırır; ilk yama (#1437) yalnız
   index.js'e dokunduğu için canlıda etkisizdi. `npm ci` sonrası README'deki `git apply` döngüsüyle
   uygulanır. Kapı `INV-WRONGSTACK-KANBAN-YAMA-1` hedefi `.mcp.json`'dan okur (geri alınca KIRMIZI).
+  **Sage alan-terimi yaması (2026-09-30, REC-519 kapsam 4) — sahip ARAC, durum KAL (yukarı akış
+  düzeltince SİL):** `tools/wrongstack-mcp/yamalar/sage-1.0.26-domain-terms-turkce.patch`. Betik değil,
+  kurulum parçası → tabloda değil burada. `@wrongstack/sage` çıkarıcısı Türkçe harfleri atıyordu
+  (`normalizeTerm("Şerit")` → `erit`, `("ığış")` → boş anahtar); yama Unicode sınıfları + NFC + U+0307 silme
+  kullanır, İngilizce sonuç değişmez. Hedef tek dosya (`dist/index.js`); `sage-mcp` kendi kopyasını taşımaz.
+  Bugün hiçbir VentHub süreci çıkarıcıyı çağırmıyor (ölçüldü) — yama kütüphane kullanımı için hazır. Aynı iş,
+  kurulum betiğine iki düzeltme getirdi: yama sürümü kilit/kurulu paketle uyuşmazsa yüksek sesli `HATA` (kilit
+  kontrolü hiçbir süreç durdurulmadan önce) ve `git apply`nın bütün dosyayı CRLF'e çevirmesini engelleyen
+  `-c core.autocrlf=false -c core.eol=lf`. Kapı `INV-WRONGSTACK-SAGE-YAMA-1`.
   **Kurulum betiği (2026-09-27, REC-401 B0b) — sahip ARAC, durum KAL:** `tools/wrongstack-mcp/kurulum.cjs`.
   Sürüm yükseltmesini tek komutla yapar (kendi penceresinin sunucuları + daemon durdur → npm ci →
   yama → doğrula, son satır HAZIR/HATA). Başka pencereye ait sunucu varsa hiçbir şeyi kapatmaz.
