@@ -98,6 +98,10 @@ bir durum değil, bir boşluktur.
 | `soguk-okuyucu-sinavi.cjs` | kanca | iki kayıt yüzeyinde soğuk okuyucu sınavı ister | PostToolUse | ALTYAPI | `…/soguk-okuyucu-sinavi.test.ts` (13 kol) |
 | `sage-dosya-dersi.cjs` | kanca | dokunulan dosyaya **çapalı** sage derslerini bağlama koyar | PreToolUse (`Read\|Edit\|Write\|MultiEdit`) | ALTYAPI | `…/sage-dosya-dersi.test.ts` (6 kol) |
 | `scripts/hijyen/sage-dosya-dersi.cjs` | modül | puanlama, bütçe, "dosya başına bir kez", compact sıfırlaması | kanca + oturum açılışı | ALTYAPI | aynı kapı |
+| `hafiza-enjeksiyonu.cjs` | kanca | istemin konusuna göre en çok 3 sage dersini bağlama koyar; bastığı ID'yi deftere yazar (§8) | UserPromptSubmit | ARAÇ | `…/hafiza-enjeksiyonu.test.ts` (INV-HAFIZA-ENJEKSIYONU-1..12) |
+| `hafiza-kullanim-sayaci.cjs` | kanca | defterdeki enjeksiyonları `recordInjection`, transcript atıflarını `recordUse` ile sage'e yazar | Stop (async) | ARAÇ | aynı kapı |
+| `sage-hijyen-oturum-sonu.cjs` | kanca | taze doğrulanmış yedek varken `port.hygiene` koşar | SessionEnd | ARAÇ | aynı kapı |
+| `scripts/hijyen/hafiza-enjeksiyonu.cjs` · `sage-enjeksiyon-defteri.cjs` | modül | konu/sayaç/hijyen mantığı (port enjekte) · oturum+nesil anahtarlı enjeksiyon defteri | üç kanca + `sage-dosya-dersi` | ARAÇ | aynı kapı |
 
 ⚠**AYARA KAYIT RECEP KAPISI:** dördü de `.claude/settings.json`'a bağlanmadıkça **dosya olarak
 var, tetik olarak ölüdür.** Akran isteğiyle ayar dosyasına dokunulmaz. Kayıt satırları Recep'e
@@ -317,6 +321,41 @@ eksik olan, yedeğin o dersi **uygulaması**ydı.
    parmak izinin ilk yazımı bu yüzden **sage yedeğini tamamen düşürdü** — ve iyi ki düşürdü:
    sessiz kalsaydı yedek alınmadan "alındı" denecekti. Gölge tabloları (`*_fts_data`, `*_fts_idx`,
    `*_fts_docsize`) gerçek tablodur ve sayılır.
+
+---
+
+## §8 KONU ENJEKSİYONU · KULLANIM SAYACI · HİJYEN (REC-519, 2026-09-30)
+
+WrongStack'in üç "kapalı" parçası Claude Code'da çalışmıyordu çünkü hepsi WrongStack'in kendi
+boru hattına bağlıydı. Üçü de kanca olarak yazıldı; mantık `scripts/hijyen/hafiza-enjeksiyonu.cjs`
+başlığında **gerekçesiyle** durur, burada yalnız kurallar:
+
+1. **KONU KOLU (UserPromptSubmit):** en çok **3 ders / 1400 karakter**, ders KIRPILMAZ (§6.2 kural
+   1 ile aynı ilke), asgari önem 0.5, bütçe 2500 ms. Bağlam doluluğuna göre azaltma **yok** —
+   doluluk kancanın girdisinde bilinmiyor ve yukarı akım eşikleri (65/82/95) bizim için ölçülmedi.
+2. **ALAKA SÜZGECİ ZORUNLUDUR (ölçüldü):** `searchSage` durak sözcüksüz `OR` araması yapar; gerçek
+   daemon'a sorulan istemlerin hepsi 2-5 ders döndürdü ("merhaba nasilsin" dahil). Süzgeçsiz kanca her
+   istemde öter (K3). Ders, istemin içerik terimlerinin yarısını (alt sınır 2, üst sınır 3) taşımalı;
+   aynı oturum-nesilde bir ders bir kez basılır. Son 67 gerçek istemde ateşleme %27 (18/67).
+3. **KANCA DAEMON BAŞLATMAZ:** `server.json` yok/pid ölü → sessiz çıkış, sage paketi yüklenmez. Port
+   `initialize()` ile değil spawn etmeyen `connection.status()` ile açılır (`initialize` daemon'u başlatır).
+4. **SAYAÇ STOP'TA, TOPLU:** konu ve dosya dersi kancaları yalnız **deftere** yazar
+   (`.sage-enjekte-<oturum24>-<nesil>.jsonl`, yalnız-ekleme); Stop kancası `recordInjection` →
+   transcript taraması → `recordUse` yapar ve satırı `sayildi/kullanildi` işaretler. **Doğrudan
+   sqlite UPDATE YASAK** (daemon tek-yazar zinciri).
+5. **KULLANIM EŞLEŞTİRMESİ:** yukarı akım `InjectionTracker.consumeMatches` kuralı (ID · ilk 80 karakter ·
+   belirteç ≥3 ve ≥%50) yerel kopyada, iki bilinçli farkla: `İ`→`i` + U+0307 silme, Türkçe harf katlama.
+   Yanlış-pozitif/negatif oranı **ölçülmedi** (etiket yok); yön kararı: yanlış-negatif pahalı (hijyen
+   "hiç kullanılmadı" inceleme adayı üretir), kural sıkılaştırılmadı. Etiketsiz saha ölçümü: 60 gerçek
+   asistan mesajı × 166 ders → oran eşiği 0.5'te 0 eşleşme, 0.4'te 2, 0.3'te 12, 0.25'te 63 (gürültü);
+   yani kural rastgele eşleşme üretmiyor ama uygulanan dersi de zor yakalıyor — eşik etiketli örneklemle
+   yeniden ölçülünce değişir. Transcript yalnız SONU okunur (681 MB).
+6. **HİJYEN YALNIZ TAZE YEDEKLE:** SessionEnd kancaları paralel koşar (sıra garantisi yok); hijyen son
+   doğrulanmış sage yedeğinin <24 saat olduğunu kendisi ölçer, gerekirse 20 sn'ye kadar bekler,
+   yoksa **atlar ve sebebi loga yazar**. `purgeDeletedAfterDays` HİÇBİR çağrıda verilmez.
+   Sonuç özeti PANO dizinindeki `hafiza-kancalari.log` dosyasına yazılır.
+
+Kapı: `src/__tests__/conformance/hafiza-enjeksiyonu.test.ts` — her kolun sabotajı vardır (PR gövdesi).
 
 ---
 
