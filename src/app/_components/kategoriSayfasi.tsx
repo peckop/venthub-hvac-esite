@@ -6,6 +6,7 @@ import { ADRES_SEMASI_K3B } from '@/config/features'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
+import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
 import type { KategoriUst } from '@/lib/data/preload'
 import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
@@ -25,6 +26,7 @@ import { kategoriMetniniIndir } from '../../utils/categoryHelpers'
 import { aileMetniniIndir } from '../../utils/dilMetni'
 import { DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 import PageComponent from '../../views/CategoryPage'
+import IlgiliRehberler from '../../views/knowledge/IlgiliRehberler'
 
 /**
  * KATEGORİ SAYFASI — üst veri + gövde, İKİ rotanın ortak çekirdeği (REC-300 Faz 3b-2).
@@ -346,6 +348,13 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
           initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
         />
       </React.Suspense>
+      {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
+          slug'dır (`vh:kategori/<categories.slug>`); yazı yoksa blok basılmaz. Veri kod sabiti
+          (yazilar.ts) → derlemeyle tazelenir, DB tetiği gerekmez (rendering-cache-standard). */}
+      <IlgiliRehberler
+        rehberler={ilgiliRehberler(`vh:kategori/${category.slug}`, lang)}
+        baslik={t('bilgiMerkezi.ilgiliRehberler')}
+      />
     </>
   )
 }
