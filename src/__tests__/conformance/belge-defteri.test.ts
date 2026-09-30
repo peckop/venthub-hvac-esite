@@ -176,7 +176,9 @@ function dunyaKur(o: { eski?: string[]; hazirOlmaz?: boolean; listeHata?: boolea
   return { oku, durum: process.env.VENTHUB_BELGE_DEFTERI_STATE }
 }
 
-describe('INV-BELGE-DEFTER-1 · yukle (sahte notebooklm, canlı biçimli liste)', () => {
+// Her sınama geçici bir git deposu kurar (Windows'ta yük altında 30-40 sn sürebildi; 20 sn varsayılan zaman aşımı
+// yerel makinede kararsız kırmızı verdi, CI'da hiç düşmedi). Sınır gevşetildi, sınamanın kendisi değişmedi.
+describe('INV-BELGE-DEFTER-1 · yukle (sahte notebooklm, canlı biçimli liste)', { timeout: 90_000 }, () => {
   it('TAM: yeni hazır → aynı adlı eski silinir, mükerrer yok, yetim SİLİNMEZ, durum yazılır, çıkış 0', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {})
     const yetim = 'venthub-belgeler-99-eski-grup.md'

@@ -316,6 +316,119 @@ function kuralSorunlari(kaynak, kartlar, kurallar = KURALLAR) {
   return s
 }
 
+const SKILL_KLASORU = path.join('.claude', 'skills')
+const SKILL_VERISI = path.join('scripts', 'belge', 'skill-atamasi.json')
+const SKILL_BELGESI = 'skill-atamasi.md'
+
+/** Projedeki skill adları (.claude/skills/<ad>/SKILL.md olan klasörler; `_` ile başlayanlar ortak dosya). */
+function skillAdlariOku(kok) {
+  const dizin = path.join(kok, SKILL_KLASORU)
+  if (!fs.existsSync(dizin)) return []
+  return fs
+    .readdirSync(dizin, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && !d.name.startsWith('_') && fs.existsSync(path.join(dizin, d.name, 'SKILL.md')))
+    .map((d) => d.name)
+    .sort()
+}
+
+/** { skiller: {ad: {roller, konu} | {atanmadi}}, projeDisiAdlar: {ad: tür} } (dosya yoksa boş). */
+function skillAtamasiOku(kok) {
+  const p = path.join(kok, SKILL_VERISI)
+  if (!fs.existsSync(p)) return { skiller: {}, projeDisiAdlar: {} }
+  const v = JSON.parse(fs.readFileSync(p, 'utf8'))
+  return { skiller: v.skiller || {}, projeDisiAdlar: v.projeDisiAdlar || {} }
+}
+
+/**
+ * Kartın "Yetenek ve araç" satırındaki ADLAR (küçük harf): virgül / noktalı virgül / " + " ile bölünür; yalnız TEK KELİMELİK
+ * adlar (boşluksuz) alınır. Tire içeren ad ya da proje skill'i olan ad "skill adı adayı"dır; "vitest", "axe" gibi tireli olmayan
+ * ve skill olmayan tek kelimeler yok sayılır (kapı yalnız bilinen desenleri ölçer).
+ */
+function kartSkillAdaylari(metin, projeSkilleri) {
+  const i = metin.indexOf('## Yetenek ve araç')
+  if (i === -1) return []
+  const govde = metin.slice(i + '## Yetenek ve araç'.length).split(/\n## /)[0]
+  const proje = new Set(projeSkilleri)
+  return govde
+    .toLowerCase()
+    .split(/[,;\n]|\s\+\s/)
+    .map((t) => t.trim().replace(/\.$/, ''))
+    .filter((t) => /^[a-z0-9][a-z0-9-]*$/.test(t) && (t.includes('-') || proje.has(t)))
+}
+
+/**
+ * Skill–rol atamasındaki sorunlar (boş = temiz). `veri` = skillAtamasiOku çıktısı, `kartlar` = uret() çıktısı,
+ * `projeSkilleri` = skillAdlariOku çıktısı. İskelet ölçütleri (REC-509): tablo anahtarları .claude/skills ile birebir; her skill
+ * bir rolde ya da "atanmadı: sebep"; roller bilinen roller; kartta adıyla geçen aday ya proje skill'i (tabloda o rolde) ya da
+ * `projeDisiAdlar`'da beyanlı; beyanlı ad ölü olamaz (kartta geçmeli, proje skill'i olmamalı).
+ */
+function skillSorunlari(veri, kartlar, projeSkilleri) {
+  const s = []
+  const proje = new Set(projeSkilleri)
+  const tablo = veri.skiller
+  for (const ad of proje) if (!tablo[ad]) s.push(`skill tabloda yok: ${ad} (karar verilmemiş skill kalamaz)`)
+  for (const ad of Object.keys(tablo)) if (!proje.has(ad)) s.push(`tabloda olup projede olmayan skill: ${ad}`)
+  const kartAdaylari = {}
+  for (const [rol, metin] of Object.entries(kartlar)) kartAdaylari[rol] = new Set(kartSkillAdaylari(metin, projeSkilleri))
+  for (const [ad, v] of Object.entries(tablo)) {
+    const roller = v.roller
+    if (Array.isArray(roller) && roller.length) {
+      if (v.atanmadi) s.push(`${ad}: hem roller hem atanmadı yazılı`)
+      for (const r of roller) {
+        if (!ROLLER[r]) s.push(`${ad}: bilinmeyen rol ${r}`)
+        else if (!kartAdaylari[r] || !kartAdaylari[r].has(ad)) s.push(`${ad}: ${r} kartının Yetenek satırında adı yok`)
+      }
+    } else if (!String(v.atanmadi || '').trim()) {
+      s.push(`${ad}: ne rol ne "atanmadı: sebep" var`)
+    }
+  }
+  const beyanli = veri.projeDisiAdlar
+  const kartlardaGecen = new Set()
+  for (const [rol, adaylar] of Object.entries(kartAdaylari)) {
+    for (const a of adaylar) {
+      kartlardaGecen.add(a)
+      if (proje.has(a)) {
+        const roller = (tablo[a] && tablo[a].roller) || []
+        if (!roller.includes(rol)) s.push(`${rol} kartında adı geçen skill tabloda o role atanmamış: ${a}`)
+      } else if (!beyanli[a]) {
+        s.push(`${rol} kartındaki "${a}" ne projede skill ne de projeDisiAdlar'da beyanlı`)
+      }
+    }
+  }
+  for (const [a, tur] of Object.entries(beyanli)) {
+    if (!String(tur).trim()) s.push(`projeDisiAdlar: ${a} türsüz`)
+    if (proje.has(a)) s.push(`projeDisiAdlar'da olup projede skill olan ad: ${a}`)
+    if (!kartlardaGecen.has(a)) s.push(`projeDisiAdlar'da olup hiçbir kartta geçmeyen ölü ad: ${a}`)
+  }
+  return s
+}
+
+/** Üretilmiş skill tablosu (docs/roller/skill-atamasi.md). */
+function skillTablosu(veri) {
+  const sirali = Object.entries(veri.skiller).sort((a, b) => a[0].localeCompare(b[0]))
+  const atanan = sirali.filter(([, v]) => Array.isArray(v.roller) && v.roller.length).length
+  return [
+    '# Skill–rol ataması (rol kartlarından türetilmiş)',
+    '',
+    '> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/skill-atamasi.json`); elle düzenleme. İçeriği (hangi skill hangi role, hangisi kapatılacak) YETENEK penceresi doldurur; iskelet REC-509.',
+    '> Ölçüt (INV-ROL-1): tablo anahtarları `.claude/skills` ile birebir; her skill bir rolde ya da "atanmadı: sebep"; rol kartlarındaki "Yetenek ve araç" satırıyla çift yönlü uyum. `.agent/skills` çift ağacı bu tablonun dışındadır.',
+    '',
+    `Toplam ${sirali.length} skill: ${atanan} atanmış, ${sirali.length - atanan} atanmadı.`,
+    '',
+    '| Skill | Roller | Konu | Durum |',
+    '|---|---|---|---|',
+    ...sirali.map(([ad, v]) => {
+      const atandi = Array.isArray(v.roller) && v.roller.length
+      return `| ${ad} | ${atandi ? v.roller.join(', ') : '—'} | ${v.konu || '—'} | ${atandi ? 'atanmış' : `atanmadı: ${v.atanmadi}`} |`
+    }),
+    '',
+    '## Kartta geçen ama proje skill\'i olmayan adlar',
+    '',
+    ...Object.entries(veri.projeDisiAdlar).map(([a, t]) => `- \`${a}\`: ${t}`),
+    '',
+  ].join('\n')
+}
+
 const SAHIPLIK_BELGESI = 'cetvel-sahipligi.md'
 const SAHIPLIK_VERISI = path.join('scripts', 'belge', 'cetvel-sahipligi.json')
 
@@ -404,10 +517,20 @@ function main() {
     fark++
     console.error(`FARK: docs/roller/${SAHIPLIK_BELGESI}`)
   }
+  const skillVeri = skillAtamasiOku(kok)
+  const skillTab = skillTablosu(skillVeri)
+  const skillYol = path.join(dizin, SKILL_BELGESI)
+  if (yaz) {
+    fs.writeFileSync(skillYol, skillTab, 'utf8')
+  } else if (!fs.existsSync(skillYol) || fs.readFileSync(skillYol, 'utf8').replace(/\r\n/g, '\n') !== skillTab) {
+    fark++
+    console.error(`FARK: docs/roller/${SKILL_BELGESI}`)
+  }
   const s = [
     ...sorunlar(kartlar),
     ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d))),
     ...kuralSorunlari(kuralKaynagiOku(kok), kartlar),
+    ...skillSorunlari(skillVeri, kartlar, skillAdlariOku(kok)),
   ]
   for (const x of s) console.error(`SORUN: ${x}`)
   if (yaz) console.log(`${Object.keys(kartlar).length} kart + sahiplik tablosu yazıldı`)
@@ -421,6 +544,12 @@ module.exports = {
   sahiplikOku,
   sahiplikSorunlari,
   sahiplikTablosu,
+  skillAdlariOku,
+  skillAtamasiOku,
+  skillSorunlari,
+  skillTablosu,
+  kartSkillAdaylari,
+  SKILL_BELGESI,
   kuralKaynagiOku,
   kuralSorunlari,
   rolKurallari,

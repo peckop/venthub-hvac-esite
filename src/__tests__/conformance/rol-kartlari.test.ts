@@ -36,6 +36,17 @@ type Uretici = {
   kuralSorunlari: (kaynak: { no: number; baslik: string }[], kartlar: Record<string, string>, kurallar?: unknown[]) => string[]
   rolKurallari: (ad: string) => unknown[][]
   KURALLAR: [number, string, string, string, string[] | 'HEPSI'][]
+  skillAdlariOku: (kok: string) => string[]
+  skillAtamasiOku: (kok: string) => SkillVeri
+  skillSorunlari: (veri: SkillVeri, kartlar: Record<string, string>, proje: string[]) => string[]
+  skillTablosu: (veri: SkillVeri) => string
+  kartSkillAdaylari: (metin: string, proje: string[]) => string[]
+  SKILL_BELGESI: string
+}
+
+type SkillVeri = {
+  skiller: Record<string, { roller?: string[]; konu?: string | null; atanmadi?: string }>
+  projeDisiAdlar: Record<string, string>
 }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
@@ -121,6 +132,71 @@ describe('INV-ROL-1 — 31 geliştirme kuralı rol kartlarına dağıtıldı, hi
     expect(uretici.sorunlar(silinmis).some((s) => s.startsWith('URUN: kural satırı eksik') && s.includes('K14'))).toBe(true)
     const degismis = { ...kartlar, ADMIN: kartlar.ADMIN.replaceAll('admin_audit_log', 'baska_tablo') }
     expect(uretici.sorunlar(degismis).some((s) => s.startsWith('ADMIN: kural satırı') && s.includes('K5'))).toBe(true)
+  })
+})
+
+describe('INV-ROL-1 — skill–rol atama tablosu iskeleti (REC-509)', () => {
+  const proje = uretici.skillAdlariOku(KOK)
+  const veri = uretici.skillAtamasiOku(KOK)
+  const kartlar = uretici.uret()
+  const kopya = (): SkillVeri => JSON.parse(JSON.stringify(veri)) as SkillVeri
+
+  it('projede skill var ve tablo anahtarları .claude/skills ile birebir aynı', () => {
+    expect(proje.length).toBeGreaterThan(0)
+    expect(Object.keys(veri.skiller).sort()).toEqual([...proje].sort())
+  })
+
+  it('gerçek tablo temiz: her skill bir rolde ya da "atanmadı: sebep"; kartlarla çift yönlü uyum', () => {
+    expect(uretici.skillSorunlari(veri, kartlar, proje)).toEqual([])
+  })
+
+  it('YETENEK içeriği doldururken rol eklerse kart satırı da güncellenmek zorunda: kartta adı olmayan atama yakalanır', () => {
+    const b = kopya()
+    b.skiller['create-migration'] = { roller: ['ALTYAPI'], konu: null }
+    expect(uretici.skillSorunlari(b, kartlar, proje).some((s) => s.startsWith('create-migration: ALTYAPI kartının Yetenek satırında adı yok'))).toBe(true)
+  })
+
+  it('AYIRT EDİCİLİK: kararsız yeni skill, silinmiş skill, sebepsiz atanmadı, bilinmeyen rol yakalanır', () => {
+    expect(uretici.skillSorunlari(veri, kartlar, [...proje, 'yeni-skill']).some((s) => s.startsWith('skill tabloda yok: yeni-skill'))).toBe(true)
+    expect(uretici.skillSorunlari(veri, kartlar, proje.filter((a) => a !== 'qa')).some((s) => s.startsWith('tabloda olup projede olmayan skill: qa'))).toBe(true)
+
+    const sebepsiz = kopya()
+    sebepsiz.skiller.fallow = { atanmadi: '  ' }
+    expect(uretici.skillSorunlari(sebepsiz, kartlar, proje).some((s) => s.startsWith('fallow: ne rol ne'))).toBe(true)
+
+    const yabanci = kopya()
+    yabanci.skiller.fallow = { roller: ['YOKROL'], konu: null }
+    expect(uretici.skillSorunlari(yabanci, kartlar, proje).some((s) => s.includes('bilinmeyen rol YOKROL'))).toBe(true)
+  })
+
+  it('AYIRT EDİCİLİK: kartta adı geçen skill tabloda o role atanmamışsa, beyansız araç adı ve ölü beyan yakalanır', () => {
+    const atamasiz = kopya()
+    atamasiz.skiller.codegraph = { atanmadi: 'test' }
+    expect(uretici.skillSorunlari(atamasiz, kartlar, proje).some((s) => s.startsWith('ARAC kartında adı geçen skill tabloda o role atanmamış: codegraph'))).toBe(true)
+
+    const beyansiz = kopya()
+    delete beyansiz.projeDisiAdlar['ast-grep']
+    expect(uretici.skillSorunlari(beyansiz, kartlar, proje).some((s) => s.includes('"ast-grep" ne projede skill ne de projeDisiAdlar'))).toBe(true)
+
+    const olu = kopya()
+    olu.projeDisiAdlar['hic-yok-arac'] = 'araç'
+    expect(uretici.skillSorunlari(olu, kartlar, proje).some((s) => s.includes('ölü ad: hic-yok-arac'))).toBe(true)
+
+    const cakisma = kopya()
+    cakisma.projeDisiAdlar['plan-challenger'] = 'araç'
+    expect(uretici.skillSorunlari(cakisma, kartlar, proje).some((s) => s.includes("projede skill olan ad: plan-challenger"))).toBe(true)
+  })
+
+  it('kart adayı çıkarımı: tireli ad ve proje skill\'i alınır, boşluklu ifade ve tireli olmayan yabancı kelime alınmaz', () => {
+    const metin = '## Yetenek ve araç\nSupabase, Linear, vitest + axe, rendering-cache cetveli, ast-grep, plan-challenger.\n\n## Durum\nx'
+    expect(uretici.kartSkillAdaylari(metin, ['supabase', 'plan-challenger'])).toEqual(['supabase', 'ast-grep', 'plan-challenger'])
+  })
+
+  it('docs/roller/skill-atamasi.md üreticiyle bire bir aynı ve sayıları doğru söyler', () => {
+    const disk = fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.SKILL_BELGESI), 'utf8').replace(/\r\n/g, '\n')
+    expect(disk).toBe(uretici.skillTablosu(veri))
+    const atanan = Object.values(veri.skiller).filter((v) => v.roller?.length).length
+    expect(disk).toContain(`Toplam ${proje.length} skill: ${atanan} atanmış, ${proje.length - atanan} atanmadı.`)
   })
 })
 
@@ -221,7 +297,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
 
   it('docs/roller/ içinde üreticinin bilmediği kart yok', () => {
     const disk = fs.readdirSync(path.join(KOK, 'docs', 'roller')).filter((f) => f.endsWith('.md'))
-    const beklenen = [...Object.keys(uretilen).map((ad) => uretici.dosyaAdi(ad)), uretici.SAHIPLIK_BELGESI]
+    const beklenen = [...Object.keys(uretilen).map((ad) => uretici.dosyaAdi(ad)), uretici.SAHIPLIK_BELGESI, uretici.SKILL_BELGESI]
     expect(disk.sort()).toEqual(beklenen.sort())
   })
 
