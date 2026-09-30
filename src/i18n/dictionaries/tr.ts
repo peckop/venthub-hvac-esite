@@ -391,6 +391,9 @@ export const tr = {
       teklifDugme: 'Teklif iste',
       listeyeDon: 'Bilgi Merkezi’ne dön',
     },
+    // REC-452: kategori ve aile sayfasının altındaki rehber bağlantıları + ana sayfa bilgi bloğu.
+    ilgiliRehberler: 'Bu konudaki rehber yazıları',
+    sonRehberler: 'Son rehber yazıları',
     konular: {
       konfor: 'Konfor',
       guvenlik: 'Güvenlik',

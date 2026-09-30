@@ -93,7 +93,10 @@ describe('INV-MARKA-KAYNAK-1 (c): site haritası marka kolu listeyi izler', () =
           { id: 'k1', slug: 'fans', parent_id: null, metadata: { slug: { tr: 'fanlar', en: 'fans' } }, updated_at: '2026-09-01T00:00:00.000Z' },
         ],
       }))
-      vi.doMock('../../lib/services/family.service', () => ({ getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }] }))
+      vi.doMock('../../lib/services/family.service', () => ({
+        getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }],
+        getFamilyLastModified: async () => new Map<string, string>(),
+      }))
       const { default: sitemap } = await import('../../app/sitemap')
       const girisler = await sitemap()
       const markaUrlleri = new Set(girisler.map((g) => g.url).filter((u) => /\/(tr|en)\/brands\//.test(u)))

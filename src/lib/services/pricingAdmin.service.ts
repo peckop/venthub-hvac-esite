@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import { type DegisiklikYontemi, yontemli } from '../pricing/degisiklikYontemi'
 import type { PricingProductInput, PricingRuleRow } from './pricing.service'
 
 /**
@@ -70,7 +71,8 @@ export async function createPricingRule(
   supabase: SupabaseClient<Database>,
   input: PricingRuleCreateInput,
 ): Promise<PricingRuleRow> {
-  const { data, error } = await supabase.from('pricing_rule').insert(input).select('*').single()
+  // Yöntem başlığı (fiyat günlüğü, INV-FIYAT-GUNLUGU-1): kural ekranı = 'panel'.
+  const { data, error } = await yontemli(supabase.from('pricing_rule').insert(input).select('*').single(), 'panel')
   if (error) throw error
   return data
 }
@@ -90,26 +92,178 @@ export async function updatePricingRule(
     updated_at: new Date().toISOString(),
     updated_by: updatedBy,
   }
-  const { data, error } = await supabase
-    .from('pricing_rule')
-    .update(payload)
-    .eq('id', id)
-    .select('*')
-    .single()
+  const { data, error } = await yontemli(
+    supabase.from('pricing_rule').update(payload).eq('id', id).select('*').single(),
+    'panel',
+  )
   if (error) throw error
   return data
 }
 
 export async function deletePricingRule(supabase: SupabaseClient<Database>, id: string): Promise<void> {
-  const { error } = await supabase.from('pricing_rule').delete().eq('id', id)
+  const { error } = await yontemli(supabase.from('pricing_rule').delete().eq('id', id), 'panel')
   if (error) throw error
 }
 
 /** Toplu silme (panelde yalnız onaylı akışta çağrılır). */
 export async function deletePricingRules(supabase: SupabaseClient<Database>, ids: string[]): Promise<void> {
   if (ids.length === 0) return
-  const { error } = await supabase.from('pricing_rule').delete().in('id', ids)
+  const { error } = await yontemli(supabase.from('pricing_rule').delete().in('id', ids), 'panel')
   if (error) throw error
+}
+
+/* ──────────────────── tek ürün sabit fiyat (REC-412 Faz 1) ──────────────────── */
+
+/** Tek ürün fiyat girişinin geldiği yüzey (günlük yöntem etiketi): yan panel = `panel`, tablo satırı = `liste`. */
+export type ProductFixedPriceYontem = Extract<DegisiklikYontemi, 'panel' | 'liste'>
+
+export interface ProductFixedPriceInput {
+  /** Girilen TRY tutarı; anlamı `vatIncluded` ile belirlenir. */
+  amount: number
+  /**
+   * true → tutar KDV DAHİL girildi: kural `price_is_vat_inclusive=true` ile yazılır, çözücü NET'e indirger
+   * (NET kanonik saklanır, cetvel §11). false → tutar KDV HARİÇ (net) girildi.
+   */
+  vatIncluded: boolean
+}
+
+/** Makul üst sınır: yapıştırma/ölçek hatasını (fazladan sıfır) kaydetmeden önce yakalar. */
+export const PRODUCT_FIXED_PRICE_MAX = 1_000_000_000
+
+/** Saf: girilen tutar kaydedilebilir mi? Panel aynı işlevi anlık doğrulamada kullanır (tek kural). */
+export function isValidFixedPriceAmount(amount: number): boolean {
+  return Number.isFinite(amount) && amount > 0 && amount <= PRODUCT_FIXED_PRICE_MAX
+}
+
+/**
+ * "Ürünün TEK sabit fiyat kuralı": ürün kapsamlı (scope 1), `fixed`, tüm kitaplar (price_book_id NULL), adet 1.
+ * Adet>1 kademeli kural bu işin konusu DEĞİL (cetvel §8.1.4 yasağı) — kural sayfasında kalır.
+ */
+function isProductFixedRule(rule: PricingRuleRow): boolean {
+  return rule.method === 'fixed' && rule.price_book_id === null && rule.min_quantity === 1
+}
+
+/**
+ * Bir ürüne sabit satış fiyatı yazar: ürünün sabit kuralı VARSA günceller, YOKSA oluşturur (ürün başına tek kural).
+ *
+ *  · Yeni kural, ürünün diğer ürün-kapsamlı kurallarının (ör. kural sayfasındaki marj override'ı) ÜSTÜNDE
+ *    kazansın diye `priority = mevcut en yüksek + 1` alır: paneldeki açık fiyat girişi sessizce ezilmemeli.
+ *  · Güncellerken geçerlilik penceresi TEMİZLENİR: süresi dolmuş bir kural güncellenip yine devreye girmezse
+ *    "kaydettim ama vitrin değişmedi" sessiz başarısı doğardı.
+ *  · Aynı üründe birden çok sabit kural VERİ ANOMALİSİDİR: hangisini güncelleyeceğimizi tahmin etmek yerine HATA.
+ *  · `tenant_id` gönderilmez (DB default'u yazar, CLAUDE.md §12).
+ *
+ * Yalnız KURALI yazar; vitrin (`product_prices`) yeniden hesabı `pricingProductPrice.service.ts` içindedir.
+ */
+export async function setProductFixedPrice(
+  supabase: SupabaseClient<Database>,
+  productId: string,
+  input: ProductFixedPriceInput,
+  yontem: ProductFixedPriceYontem,
+  updatedBy: string | null,
+): Promise<PricingRuleRow> {
+  if (!isValidFixedPriceAmount(input.amount)) {
+    throw new RangeError(`setProductFixedPrice: geçersiz tutar (${String(input.amount)}); 0 < tutar ≤ ${PRODUCT_FIXED_PRICE_MAX}.`)
+  }
+
+  const { data: existing, error: listErr } = await supabase
+    .from('pricing_rule')
+    .select('*')
+    .eq('scope', 1)
+    .eq('product_id', productId)
+  if (listErr) throw listErr
+  const productRules = existing ?? []
+
+  const fixedRules = productRules.filter(isProductFixedRule)
+  if (fixedRules.length > 1) {
+    throw new Error(
+      `setProductFixedPrice: ürün ${productId} için ${fixedRules.length} sabit kural var (en fazla 1 olmalı). ` +
+        'Hangisinin güncelleneceği belirsiz; kural sayfasından fazlalıkları temizleyin.',
+    )
+  }
+
+  const current = fixedRules[0]
+  if (current) {
+    // Kural sayfasından sonradan eklenen, daha yüksek öncelikli ürün-kapsamlı bir kural sabit fiyatı ezmesin.
+    const otherMax = productRules
+      .filter((rule) => rule.id !== current.id)
+      .reduce((max, rule) => Math.max(max, rule.priority), Number.NEGATIVE_INFINITY)
+    const { data, error } = await yontemli(
+      supabase
+        .from('pricing_rule')
+        .update({
+          fixed_price: input.amount,
+          price_is_vat_inclusive: input.vatIncluded,
+          priority: Number.isFinite(otherMax) ? Math.max(current.priority, otherMax + 1) : current.priority,
+          // Panelde girilen tutar VİTRİNDE görülecek tutardır: eski kuraldan kalan ek ücret, marj kelepçesi, yuvarlama,
+          // charm ve para birimi kısıtı fiyatı sessizce değiştirir (ya da TRY adayı olmaktan çıkarır). Hepsi sıfırlanır.
+          // `vat_rate_pct` KORUNUR: ürünün KDV oranı bilinçli bir veridir (fiyat girişi onu değiştirmez).
+          surcharge: 0,
+          min_margin_abs: null,
+          max_margin_abs: null,
+          round_to: null,
+          charm_ending: null,
+          currency: null,
+          valid_from: null,
+          valid_to: null,
+          // Tabloda `updated_at` trigger'ı YOK → damga ELLE basılır (updatePricingRule ile aynı sözleşme).
+          updated_at: new Date().toISOString(),
+          updated_by: updatedBy,
+        })
+        .eq('id', current.id)
+        .select('*')
+        .single(),
+      yontem,
+    )
+    if (error) throw error
+    return data
+  }
+
+  const highestPriority = productRules.reduce((max, rule) => Math.max(max, rule.priority), Number.NEGATIVE_INFINITY)
+  const { data, error } = await yontemli(
+    supabase
+      .from('pricing_rule')
+      .insert({
+        scope: 1,
+        product_id: productId,
+        method: 'fixed',
+        fixed_price: input.amount,
+        price_is_vat_inclusive: input.vatIncluded,
+        min_quantity: 1,
+        priority: Number.isFinite(highestPriority) ? highestPriority + 1 : 0,
+        updated_by: updatedBy,
+      })
+      .select('*')
+      .single(),
+    yontem,
+  )
+  if (error) throw error
+  return data
+}
+
+/**
+ * Ürünün sabit fiyat kuralını kaldırır (ürün genel kurala döner). Kaldırılan kural sayısını döndürür
+ * (0 = zaten yoktu, hata değil). Vitrin yeniden hesabı çağıranın (pricingProductPrice.service) işidir.
+ */
+export async function clearProductFixedPrice(
+  supabase: SupabaseClient<Database>,
+  productId: string,
+  yontem: ProductFixedPriceYontem,
+): Promise<number> {
+  const { data, error } = await yontemli(
+    supabase
+      .from('pricing_rule')
+      .delete()
+      .eq('scope', 1)
+      .eq('product_id', productId)
+      .eq('method', 'fixed')
+      .is('price_book_id', null)
+      .eq('min_quantity', 1)
+      .select('id'),
+    yontem,
+  )
+  if (error) throw error
+  return (data ?? []).length
 }
 
 /* ──────────────────── marka köprüsü (KRİTİK) ──────────────────── */

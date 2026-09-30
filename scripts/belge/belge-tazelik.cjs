@@ -18,8 +18,13 @@
  *   3. Cetvel başlık bloğu — docs/standards/*.md içinde `Sahibi` ve `Son doğrulama` alanı (B7.2).
  *   4. Kod haritası yaşı — graphify-out/graph.json değiştirilme zamanı (üretilmiş, .gitignore).
  *
- * ÖLÇÜLMEYENLER (v1, bilerek): MEMORY.md baytı (depo dışı; hafiza-indeks-bekcisi ölçüyor) ve
- * kanca fail-open sayısı. Çıktıda OLCULMEDI olarak görünürler — ölçülemedi, geçti demek değildir.
+ *   5. Hafıza indeksi (`MEMORY.md`) satır ve bayt — depo dışı; yol VENTHUB_MEMORY_INDEX ortam
+ *      değişkeninden, yoksa Claude Code proje klasöründen (~/.claude/projects/<yol-adı>/memory) bulunur.
+ *      Sınırlar 2026-09-29'da ölçüldü (REC-433 1.9): 200 satır YA DA ~25.000 bayt; yumuşak 160 / 20.000.
+ *      Yol bulunamazsa sayı UYDURULMAZ: `olculmedi`de kalır.
+ *
+ * ÖLÇÜLMEYENLER (v1, bilerek): kanca fail-open sayısı. Çıktıda OLCULMEDI olarak görünür — ölçülemedi,
+ * geçti demek değildir.
  *
  * KULLANIM:
  *   node scripts/belge/belge-tazelik.cjs          → JSON rapor stdout'a
@@ -138,7 +143,17 @@ function sonDogrulama(metin) {
 
 function basliktaSahipVar(metin) {
   const bas = metin.split('\n').slice(0, 40).join('\n')
-  return /Sahib[iı]\**\s*:/i.test(bas)
+  // `Sahibi:` ve kısa yazımlar (`Sahip:`, `Sahib:`) sayılır (OPS 3.4-B: kapı yanlış-pozitif vermesin).
+  return /Sahi[bp][iı]?\**\s*:/i.test(bas)
+}
+
+const SAHIPLIK_YOLU = 'scripts/belge/cetvel-sahipligi.json'
+
+/** Rol kartlarından türetilen cetvel sahiplik haritası: { 'docs/standards/x.md': { sahip, dogrulanacak, dayanak } } */
+function sahiplikHaritasi(kok) {
+  const p = path.join(kok, SAHIPLIK_YOLU)
+  if (!fs.existsSync(p)) return {}
+  return JSON.parse(fs.readFileSync(p, 'utf8')).cetveller || {}
 }
 
 function sonCommitTarihi(kok, dosya) {
@@ -171,13 +186,17 @@ function cekirdekYaslari(kok, simdi = Date.now(), belgeler = CEKIRDEK) {
 
 function cetvelBasliklari(kok) {
   const dizin = path.join(kok, CETVEL_DIZINI)
+  const harita = sahiplikHaritasi(kok)
   return fs
     .readdirSync(dizin)
     .filter((a) => a.endsWith('.md') && a !== 'SOURCES.md')
     .sort()
     .map((a) => {
       const metin = fs.readFileSync(path.join(dizin, a), 'utf8')
-      return { dosya: CETVEL_DIZINI + '/' + a, sahip: basliktaSahipVar(metin), sonDogrulama: sonDogrulama(metin) !== null }
+      const dosya = CETVEL_DIZINI + '/' + a
+      // Sahip iki yoldan biriyle bilinir: başlıkta yazılı VEYA rol kartı haritasında atanmış (REC-433 3.4-B).
+      const sahip = basliktaSahipVar(metin) || Boolean(harita[dosya])
+      return { dosya, sahip, sonDogrulama: sonDogrulama(metin) !== null }
     })
 }
 
@@ -197,11 +216,68 @@ const TABAN_YOLU = 'scripts/belge/belge-tazelik-taban.json'
 
 function tabanOku(kok) {
   const p = path.join(kok, TABAN_YOLU)
-  if (!fs.existsSync(p)) return { kirikYol: {}, cetvelAlanEksik: [] }
-  return JSON.parse(fs.readFileSync(p, 'utf8'))
+  if (!fs.existsSync(p)) return { kirikYol: {}, cetvelAlanEksik: [], cetvelSahipEksik: [], cetvelDogrulamaEksik: [] }
+  const t = JSON.parse(fs.readFileSync(p, 'utf8'))
+  // Eski biçimli taban (yalnız cetvelAlanEksik) okunursa iki yeni liste boş sayılmaz: birleşimden başlar.
+  return {
+    ...t,
+    cetvelSahipEksik: t.cetvelSahipEksik ?? t.cetvelAlanEksik ?? [],
+    cetvelDogrulamaEksik: t.cetvelDogrulamaEksik ?? t.cetvelAlanEksik ?? [],
+  }
+}
+
+/** REC-433 1.9 ölçümü + ARAÇ hafiza-indeks-bekcisi (#1521) ile aynı eşikler. */
+const HAFIZA_ESIK = { yumusakSatir: 160, yumusakBayt: 20000, sertSatir: 200, sertBayt: 25000 }
+
+/** Satır sayımı: sondaki satır sonu sayılmaz, boş dosya 0 (#1521 ile aynı). */
+function hafizaSay(metin) {
+  if (typeof metin !== 'string' || metin.length === 0) return { satir: 0, bayt: 0 }
+  const govde = metin.endsWith('\n') ? metin.slice(0, -1) : metin
+  return { satir: govde.split('\n').length, bayt: Buffer.byteLength(metin) }
+}
+
+/** 'tamam' | 'yumusak' | 'sert' — satır ya da bayt, hangisi önce dolarsa. */
+function hafizaDurumu({ satir, bayt }, esik = HAFIZA_ESIK) {
+  if (satir >= esik.sertSatir || bayt >= esik.sertBayt) return 'sert'
+  if (satir >= esik.yumusakSatir || bayt >= esik.yumusakBayt) return 'yumusak'
+  return 'tamam'
+}
+
+/**
+ * MEMORY.md yolu: önce VENTHUB_MEMORY_INDEX; yoksa ana çalışma ağacının Claude Code proje klasörü
+ * (yol adındaki `:` `\` `/` → `-`). Bulunamazsa null — sayı uydurulmaz.
+ */
+function hafizaIndeksYolu(kok, ortam = process.env, home = require('os').homedir()) {
+  if (ortam.VENTHUB_MEMORY_INDEX) return fs.existsSync(ortam.VENTHUB_MEMORY_INDEX) ? ortam.VENTHUB_MEMORY_INDEX : null
+  let ana = kok
+  try {
+    const ortak = execFileSync('git', ['-C', kok, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8' }).trim()
+    ana = path.dirname(ortak)
+  } catch {
+    /* git yok: kök kalır */
+  }
+  const ad = path.resolve(ana).replace(/[:\\/]/g, '-')
+  const adaylar = [ad, ad.charAt(0).toLowerCase() + ad.slice(1)]
+  for (const a of adaylar) {
+    const y = path.join(home, '.claude', 'projects', a, 'memory', 'MEMORY.md')
+    if (fs.existsSync(y)) return y
+  }
+  return null
+}
+
+function hafizaIndeksi(kok, ortam = process.env, home) {
+  const yol = hafizaIndeksYolu(kok, ortam, home)
+  if (!yol) return null
+  try {
+    const sayi = hafizaSay(fs.readFileSync(yol, 'utf8'))
+    return { ...sayi, durum: hafizaDurumu(sayi), yol }
+  } catch {
+    return null
+  }
 }
 
 function olc(kok = depoKoku(), simdi = Date.now()) {
+  const hafiza = hafizaIndeksi(kok)
   const basliklar = cetvelBasliklari(kok)
   const kirik = kirikYollar(kok)
   const taban = tabanOku(kok)
@@ -217,10 +293,16 @@ function olc(kok = depoKoku(), simdi = Date.now()) {
     kirikYeni,
     cetvel: {
       toplam: basliklar.length,
+      // İKİ AYRI ölçü (REC-433 3.4): sahip eksik ile doğrulama eksik farklı işlerdir. Sahip, rol kartlarından
+      // türetilebilir (mekanik); "Son doğrulama" ise içerik gerçekle karşılaştırılınca yazılır (insan/ajan işi)
+      // ve toplu doldurulamaz. `alanEksik` (ikisinin birleşimi) eski tüketiciler için kalır.
+      sahipEksik: basliklar.filter((b) => !b.sahip).map((b) => b.dosya),
+      dogrulamaEksik: basliklar.filter((b) => !b.sonDogrulama).map((b) => b.dosya),
       alanEksik: basliklar.filter((b) => !b.sahip || !b.sonDogrulama).map((b) => b.dosya),
     },
     grafGun: grafYasi(kok, simdi),
-    olculmedi: ['MEMORY.md bayt', 'kanca fail-open'],
+    hafizaIndeksi: hafiza,
+    olculmedi: [...(hafiza ? [] : ['MEMORY.md satır/bayt']), 'kanca fail-open'],
   }
 }
 
@@ -229,9 +311,16 @@ module.exports = {
   kirikYollar,
   sonDogrulama,
   basliktaSahipVar,
+  sahiplikHaritasi,
+  SAHIPLIK_YOLU,
   cekirdekYaslari,
   cetvelBasliklari,
   tabanOku,
+  hafizaSay,
+  hafizaDurumu,
+  hafizaIndeksYolu,
+  hafizaIndeksi,
+  HAFIZA_ESIK,
   olc,
   ONBELLEK,
   TABAN_YOLU,
@@ -241,7 +330,12 @@ if (require.main === module) {
   const rapor = olc()
   if (process.argv.includes('--taban-yaz')) {
     const kok = depoKoku()
-    const taban = { kirikYol: {}, cetvelAlanEksik: rapor.cetvel.alanEksik }
+    const taban = {
+      kirikYol: {},
+      cetvelAlanEksik: rapor.cetvel.alanEksik,
+      cetvelSahipEksik: rapor.cetvel.sahipEksik,
+      cetvelDogrulamaEksik: rapor.cetvel.dogrulamaEksik,
+    }
     for (const k of rapor.kirikYol) if (k.kirik.length) taban.kirikYol[k.belge] = k.kirik
     fs.writeFileSync(path.join(kok, TABAN_YOLU), JSON.stringify(taban, null, 2) + '\n')
   }

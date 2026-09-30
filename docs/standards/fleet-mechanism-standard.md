@@ -121,10 +121,10 @@ Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve pan
 | § | Kısa başlık | Yürürlükteki kural (tek cümle) | Zorlayan kapı/test | Durum |
 |---|---|---|---|---|
 | 1 | Niçin bu cetvel var (ölçülmüş vaka) | Talimat davranış üretmez, mekanizma üretir; yazılı bir ders açılış adımına bağlanmadıkça bilgi verir, davranış vermez (sağırlık sessizdir, 2026-08-20 vakası). | yok | GEÇERLİ (L129-132) |
-| 2 | Üç katman (gözcü, cron, ScheduleWakeup) ve üçünün birlikte ölmesi | Gözcü (persistent Monitor), cron (CronCreate) ve tur-sonu uyanışı (ScheduleWakeup) aynı oturumda yaşar, uygulama kapanınca üçü birden ölür; tek kanal yedeklilik değildir, üçü birlikte istenir; SessionStart kancası hatırlatır, UserPromptSubmit her turda kırmızı satır basar. | yok (SessionStart / UserPromptSubmit kancaları adıyla geçiyor, INV kimliği yok) | TARİHSEL (L138-148) |
-| 3 | Kural (kurulum, prob kanıtı, OFSETLER, sonTarama) | Her şerit oturumu ilk turunda üç katmanı kurar ve mechanism-setup.cjs prob çıktısıyla kanıtlar; cron ofseti OFSETLER tablosundan okunur, gözcü kalıcı imleç tutup her taramada sonTarama damgası basar, olay akışı kodda UTF-8'e zorlanır. | mechanism-setup.cjs (prob) | TARİHSEL (L152-158) |
-| 4 | Ayırt edici test, öz-test değil (4.1 testin sınırı) | prob panoya farklı bir sid ile dış olay yazar ve gözcü imlecinin olayın ötesine geçmesini bekler ("kendine test notu at" öz-testi yanlış negatif üretir); prob okumayı kanıtlar, bildirimin ajana ulaştığını dogrula --jeton ayrıca kanıtlar. | mechanism-setup.cjs prob, dogrula --jeton | TARİHSEL (L164-179) |
-| 5 | Ölçülen ile beyan edileni ayırmak (fail-closed) | dogrula çıktısı ÖLÇÜLDÜ, BEYAN ve ÖLÇÜLEMEZ (ScheduleWakeup) sınıflarını karıştırmaz ve kanıtlanmayan katman çökmüş sayılır; KANITSIZ "gözcüsü yok" demek değildir. | dogrula (mechanism-setup.cjs); INV yok | TARİHSEL (L187-196) |
+| 2 | Üç katman (gözcü, cron, ScheduleWakeup) ve üçünün birlikte ölmesi | Gözcü (persistent Monitor), cron (CronCreate) ve tur-sonu uyanışı (ScheduleWakeup) aynı oturumda yaşar, uygulama kapanınca üçü birden ölür; tek kanal yedeklilik değildir, üçü birlikte istenir; SessionStart kancası hatırlatır, UserPromptSubmit her turda kırmızı satır basar. | yok (SessionStart / UserPromptSubmit kancaları adıyla geçiyor, INV kimliği yok) | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 3 | Kural (kurulum, prob kanıtı, OFSETLER, sonTarama) | Her şerit oturumu ilk turunda üç katmanı kurar ve mechanism-setup.cjs prob çıktısıyla kanıtlar; cron ofseti OFSETLER tablosundan okunur, gözcü kalıcı imleç tutup her taramada sonTarama damgası basar, olay akışı kodda UTF-8'e zorlanır. | mechanism-setup.cjs (prob) | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 4 | Ayırt edici test, öz-test değil (4.1 testin sınırı) | prob panoya farklı bir sid ile dış olay yazar ve gözcü imlecinin olayın ötesine geçmesini bekler ("kendine test notu at" öz-testi yanlış negatif üretir); prob okumayı kanıtlar, bildirimin ajana ulaştığını dogrula --jeton ayrıca kanıtlar. | mechanism-setup.cjs prob, dogrula --jeton | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 5 | Ölçülen ile beyan edileni ayırmak (fail-closed) | dogrula çıktısı ÖLÇÜLDÜ, BEYAN ve ÖLÇÜLEMEZ (ScheduleWakeup) sınıflarını karıştırmaz ve kanıtlanmayan katman çökmüş sayılır; KANITSIZ "gözcüsü yok" demek değildir. | dogrula (mechanism-setup.cjs); INV yok | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
 | 6 | Yoklama, üç eksenli canlılık | board.cjs yoklama (rollcall) filoyu ATIS (heartbeat), GOZCU (imlecin son tarama yaşı) ve SES (son not yaşı) eksenlerinde ölçer, okuyan fiil olduğu için --sid istemez. | board.cjs yoklama (INV kimliği yok) | BELİRSİZ (L200-214; GOZCU ekseni gözcü modeline bağlı, yoklama komutunun bugün kullanıldığı metinden anlaşılmıyor) |
 | 7 | Kapsam sınırı, adıyla | Duyma, uyanma, yedek kanal, yoklama ve kurulum kanıtı mekanikleştirilir; slot verme, kuyruk sırası ve çakışma hakemliği hüküm katmanıdır ve orkestratörde kalır; INV-MECH-1 yalnız yapıyı ölçer, çalıştığını ölçmez. | INV-MECH-1 | BELİRSİZ (L218-227; hüküm-katmanı ayrımı genel görünüyor ama mekanikleştirilen liste v1 gözcü/cron modeline bağlı, INV-MECH-1'in bugün yürürlükte olduğu metinden anlaşılmıyor) |
 | 8 | Kapı eklendiğinde kanıt zorunluluğu | Bu cetveli zorlayan her kol bilerek bozularak (sabotajla) kanıtlanır; kanıtlanmamış bir kapı kapı değildir. | sabotaj tablosu (dogrula/prob/kanca brifingi); sonraki bölümlerde INV-BASH-WRITE-2, INV-HOOKS-2 vb. aynı yöntemle | GEÇERLİ (L241; ilke L503-506 ve L634-652'de sonraki bölümlere uygulanıyor, ancak L231-239 sabotaj tablosunun kendisi gözcü/prob'a ait tarihsel örnektir) |
@@ -181,69 +181,11 @@ Buradan çıkan hüküm:
 > **Talimat davranış üretmez; mekanizma üretir.** Yazılı bir ders, açılış adımına
 > bağlanmadıkça bilgi verir, davranış vermez.
 
-## 2. Üç katman — ve üçünün de aynı anda ölmesi
+## 2–5. v1.0 gözcü/cron modeli — TAŞINDI (tarihsel, yürürlükte değil)
 
-| katman | ne yapar | ömrü |
-|---|---|---|
-| **gözcü** (persistent Monitor) | panoyu tarar, yeni notu bildirime çevirir | oturumla ölür |
-| **cron** (CronCreate, ofsetli) | şeridi düzenli uyandırır | oturumla ölür |
-| **tur-sonu uyanışı** (ScheduleWakeup) | gözcü ölürse ikinci kanal | tur sonunda **yeniden kurulur** |
-
-**Üçü de aynı oturumun içinde yaşar ve uygulama kapanınca üçü birden ölür.** Yeni oturum
-bunları devralmaz. Bu yüzden yeni oturumun **ilk işi** kurulumdur — ve bunu hatırlatmak
-insana bırakılmaz (bırakıldı, dört kez başarısız oldu): `SessionStart` kancası hatırlatır,
-`UserPromptSubmit` kancası her turda kırmızı satır basar.
-
-**Tek kanal yedeklilik değildir.** Gözcü tek başına ölürse şerit sağır kalır; cron tek başına
-kalırsa notlar 20 dakika bekler. Üçü birlikte istenir.
-
-## 3. Kural
-
-1. Her şerit oturumu, ilk turunda üç katmanı kurar ve **kanıtlar**.
-2. Kurulum **beyanla** kapanmaz. Geçerli kanıt, `mechanism-setup.cjs prob` çıktısıdır.
-3. Cron ofseti **tablodan** okunur (`mechanism-setup.cjs` içindeki `OFSETLER`), hatırdan
-   yazılmaz. İki şerit aynı dakikayı paylaşamaz.
-4. Gözcü **kalıcı imleç** tutar ve her taramada `sonTarama` damgası basar. Damga basmayan
-   gözcü, canlılığı dışarıdan ölçülemediği için **kanıtsız** sayılır.
-5. Gözcünün olay akışı **kodda** UTF-8'e zorlanır; konsol kodlamasına güvenilmez.
-6. Mekanizma kırmızısı, brifingin **sessizlik kuralına tabi değildir**.
-
-## 4. Ayırt edici test — öz-test değil
-
-`prob` fiili panoya **dış** bir olay yazar ve gözcünün kalıcı imlecinin o olayın **ötesine**
-geçmesini bekler. Ayırt ediciliği şuradan gelir:
-
-> Gözcü çalışmıyorsa imleç **asla** ilerlemez. Yani gözlem, mekanizma çalışmasaydı **farklı**
-> olurdu.
-
-Olayı yazan süreç gözcüden ayrıdır ve **farklı bir sid** kullanır. Bu bir detay değil,
-tasarımın kilit noktasıdır: gözcü kendi notlarını eler, dolayısıyla **"kendine test notu at"**
-biçimindeki öz-test, tanım gereği **yanlış negatif** üretir. Her gözcü sahibinin sorması
-gereken soru budur: *filtrem, görmem gereken hangi sınıfı tanım gereği dışarıda bırakıyor?*
-
-### 4.1 Testin sınırı — adıyla
-
-`prob` gözcünün panoyu **okuduğunu** kanıtlar; bildirimin **ajana ulaştığını** kanıtlamaz.
-Teslimat ayrı bir kanıttır: probun ürettiği jeton bildirimde görülür ve
-`dogrula --jeton <jeton>` ile geri yazılır. İkisini tek kanıt saymak, okuma ile duyma
-arasındaki farkı siler.
-
-## 5. Ölçülen ile beyan edileni ayırmak (fail-closed)
-
-`dogrula` çıktısı üç sınıf kullanır ve bunları **karıştırmaz**:
-
-| sınıf | anlamı | örnek |
-|---|---|---|
-| **ÖLÇÜLDÜ** | araç baktı ve gördü | gözcü imlecinin yaşı |
-| **BEYAN** | ajan söyledi, disk doğrulayamaz | cron id (tek geçerli ölçüm: `CronList`) |
-| **ÖLÇÜLEMEZ** | diskte izi yok | `ScheduleWakeup` |
-
-Kanıtlanmayan katman **çökmüş sayılır** (fail-closed). "Ölçemedim" ile "geçti" aynı kovaya
-girerse bekçinin varlık sebebi silinir.
-
-`KANITSIZ` etiketi **"gözcüsü yok" demek değildir**: şeridin kendi izleyicisi olabilir ama
-ölçülebilir imleç sözleşmesini yazmıyordur. Fail-closed davranış aynı kalır, ama hüküm doğru
-adlandırılır — yanlış hüküm, doğru davranıştan daha uzun yaşar.
+Üç katman (gözcü + cron + tur-sonu uyanışı), kurulum kuralı, ayırt edici prob testi ve ölçülen/beyan edilen ayrımı
+v1.0 modeline aittir; model 2026-09-14'te emekli edildi (§0). Kod yorumlarındaki §2–§5 atıfları için tam metin:
+`docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md` (kelimesi kelimesine, silinmedi).
 
 ## 6. Yoklama — üç eksenli canlılık
 
@@ -520,7 +462,7 @@ bir yargı olur, oysa alanın varlığı bir ölçümdür. Kapı bu dördünü a
 | eşik | değer | ölçüm tabanı |
 |---|---|---|
 | durum dosyası bayatlık | **60 dakika** | 2026-08-28: aktif beş şeridin dosyaları 1/9/17/27/35/39/46 dk yaşındaydı; bir sonraki değer 356 dk (kapanmış gün). 60, en eski aktif dosyaya pay bırakır ve kapanmış günü ayırt eder. 30 seçilseydi o gün AUTH yanlış alarm alırdı. |
-| `MEMORY.md` boyut | **16384 bayt** | indeks ~24.4KB'de okunamaz oluyor, 27.5KB'de sessizce kırpıldığı gözlendi. Ölçü **bayt**, satır değil — kırpma bayta bakar. |
+| `MEMORY.md` boyut | **200 satır YA DA ~25.000 bayt** (hangisi önce dolarsa); yumuşak 160 satır / 20.000 bayt | 2026-09-29 REC-433 1.9 yeniden ölçümü: 48 KB/250 satır 129. satırda, 7 KB/600 satır 200. satırda kesildi; model bağlamına "Only part of it was loaded" notu düşüyor. Eski "16384" değeri doğrulanmadı. Sınırın ötesi sessizce düşer (kullanıcıya görünmez). |
 
 Eşikler koddan **export edilir** ve conformance testi cetveldeki sayıyla eşleştiğini ölçer;
 sihirli sayı bırakmak, sonraki değiştirenin neyi neden değiştirdiğini bilememesi demektir.

@@ -134,6 +134,19 @@ try {
 } catch { /* senkron başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
 
 /**
+ * Linear arşiv adımı (karar 187, REC-433): kapanmış ve 2 günden eski kayıtlar günde EN ÇOK BİR kez
+ * arşivlenir (Linear ücretsiz planı 250 kayıtta doluyor). Anahtar yoksa ya da bugün koşulduysa hiçbir
+ * şey başlatılmaz. Kopuk ve gizli süreç (REC-415), LLM yok, silme yok. Betik: scripts/board/linear-arsiv.cjs
+ */
+try {
+  const kopuk = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs'))
+  require(path.join(__dirname, '..', '..', 'scripts', 'board', 'linear-arsiv.cjs')).gunlukBaslat({
+    anahtar: process.env.LINEAR_API_KEY || '',
+    baslat: (betik, args) => kopuk.kopukBaslat(betik, args),
+  })
+} catch { /* arşiv başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
+
+/**
  * ⭐ÇIKTI TAVANI (REC-433 alt işi, Ops 09-29; HARİTA 1.2 ölçümü). Bir SessionStart kancasının
  * `additionalContext` çıktısı 10.000 karakteri aşınca bağlama YALNIZ ilk ~2.000 karakter + "Output too
  * large" + dosya yolu girer. Ölçüldü (bu kanca, compact): 11.458 karakter; durum bloğu ve son konuşma
@@ -145,19 +158,51 @@ try {
  * `enjeksiyonKisa`), yani tipik çıktı tavanın çok altında kalır; koruma yalnız sigortadır.
  * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
  */
-const TOPLAM_TAVAN = 9000
-const DURUM_TAVAN = 3000
+// VH_SESSIONSTART_TOPLAM_TEST yalnız kapı testindedir (daralma yolunu zorlar); üretimde ayarlı olmaz.
+const TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
+const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
+const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
 const bolumler = []
-/** oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır. */
-function bolum(ad, oncelik, tam, ozet = '') {
-  if (tam) bolumler.push({ ad, oncelik, tam, ozet })
+/**
+ * oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır.
+ * daralt(n): (isteğe bağlı) bölümü ~n karaktere DARALTAN işlev — durum bloğu ve Recep'in sözü için: bütçe
+ * aşılınca bunlar toptan işaretçiye çevrilmez, ORANTILI daralır (ajan kör kalmasın; Recep endişesi 09-29).
+ */
+function bolum(ad, oncelik, tam, ozet = '', daralt = null) {
+  if (tam) bolumler.push({ ad, oncelik, tam, ozet, daralt })
 }
-/** Bölümleri EKLEME sırasıyla birleştirir; tavanı aşarsa en önemsizden başlayarak işaretçiye çevirir. */
+/**
+ * Bölümleri EKLEME sırasıyla birleştirir. Tavan aşılırsa SIRAYLA:
+ *  1) en önemsiz bölümler (öncelik ≥4: yöntem, pano, filo, notlar) işaretçiye çevrilir;
+ *  2) hâlâ aşıyorsa `daralt`ı olan bölümler (durum + Recep sözü) taşma payı kadar ORANTILI daraltılır;
+ *  3) hâlâ aşıyorsa: önce daraltılamayan bilgi satırları, EN SON durum + Recep sözü işaretçiye çevrilir.
+ * (Ölçüldü 09-29 CI: durum 4.500 + döküm 3.600 en kötü durumda 9.000'i aşıyor ve eski sigorta Recep'in
+ * sözünü BÜTÜNÜYLE işaretçiye çeviriyordu — 2. adım bunu önler.)
+ */
 function birlestir() {
   const kullan = bolumler.map((b) => b.tam)
   const topla = () => kullan.reduce((n, m) => n + m.length, 0)
   const sira = bolumler.map((b, i) => i).sort((a, b) => bolumler[b].oncelik - bolumler[a].oncelik)
   for (const i of sira) {
+    if (topla() <= TOPLAM_TAVAN) break
+    if (bolumler[i].oncelik >= 4) kullan[i] = bolumler[i].ozet
+  }
+  const asim = topla() - TOPLAM_TAVAN
+  if (asim > 0) {
+    const dar =sira.filter((i) => bolumler[i].daralt && bolumler[i].oncelik > 0 && kullan[i] === bolumler[i].tam)
+    const uzunluk = dar.reduce((n, i) => n + kullan[i].length, 0)
+    for (const i of dar) {
+      const pay = Math.ceil((asim * kullan[i].length) / uzunluk)
+      kullan[i] = bolumler[i].daralt(Math.max(0, kullan[i].length - pay)) || kullan[i]
+    }
+  }
+  // 3) Hâlâ aşıyorsa: ÖNCE daraltılamayan bilgi satırları (compact kolu, şerit, tazelik, posta…) işaretçiye, durum bloğu
+  //    ve Recep'in sözü (daralt'lı bölümler) EN SON. Eski sıra yalnız öncelik numarasına bakıyordu; ana ağaç bayatken
+  //    tazelik satırı uzayınca Recep'in sözü toptan düşüyordu (ortama bağlı, 09-29'da bir koşumda görüldü).
+  const sonSira = [...sira].sort(
+    (a, b) => (bolumler[a].daralt ? 1 : 0) - (bolumler[b].daralt ? 1 : 0) || bolumler[b].oncelik - bolumler[a].oncelik,
+  )
+  for (const i of sonSira) {
     if (topla() <= TOPLAM_TAVAN) break
     if (bolumler[i].oncelik === 0) continue
     kullan[i] = bolumler[i].ozet
@@ -199,8 +244,39 @@ function kisaPano(ozet) {
     .join('\n')
 }
 
-bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${source}\n` +
-  'ROL KARTI: (henuz yok — REC-433 rol kartlari gelince bu satirda gorunecek)\n')
+bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${source}\n`)
+
+/**
+ * ⭐ROL KARTI SATIRI (REC-433 Faz 1.2, Ops 09-29): pencere açılırken kendi rolünü, yetkisini ve sınırını
+ * bilsin — "hatırlayan pencereye" bağlı kalmasın. Kart HARİTA'nın üreticisinden (`scripts/belge/
+ * rol-karti-uret.cjs --ozet <ROL>`, tek satır ≤300 karakter; tam kart docs/roller/<ROL>.md) gelir.
+ * Rol = pano şeridi (claim), yoksa `CC_LANE` ortam değişkeni. FAIL-OPEN: üretici yok/rol yok/hata →
+ * satır yine basılır ("ROL KARTI:" her zaman görünür), ama bilgi yerine sebep yazılır; oturum bloklanmaz.
+ * Öncelik 0: asla işaretçiye çevrilmez (300 karakterlik tek satır bütçeyi zorlamaz).
+ */
+let rolSeridi = process.env.CC_LANE || ''
+function rolKartiSatiri(lane) {
+  const rol = String(lane || '').trim().toUpperCase()
+  if (!rol) return 'ROL KARTI: (bu oturumun seridi/rolu bilinmiyor — serit talep et ya da docs/roller/ altina bak)\n'
+  try {
+    // VH_ROL_KARTI_URETICI yalnız test içindir (kapı sahte üreticiyle koşar); üretimde ayarlı olmaz.
+    const uretici = process.env.VH_ROL_KARTI_URETICI ||
+      path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
+    if (!fs.existsSync(uretici)) return `ROL KARTI: ${rol} (kart uretici bu agacta yok — docs/roller/${rol}.md varsa oku)\n`
+    const ozet = execFileSync(process.execPath, [uretici, '--ozet', rol], {
+      encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'],
+    }).replace(/\s+/g, ' ').trim()
+    if (!ozet) return `ROL KARTI: ${rol} (bu rol icin kart yok — docs/roller/ altina bak)\n`
+    return `ROL KARTI: ${rol} — ${ozet} (tamami: docs/roller/${rol}.md)\n`
+  } catch (e) {
+    return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
+  }
+}
+/** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
+function rolBolumuEkle() {
+  const satir = rolKartiSatiri(rolSeridi)
+  bolumler.splice(1, 0, { ad: 'rol-karti', oncelik: 0, tam: satir, ozet: satir })
+}
 
 // RESUME UYANDIRMA REFLEKSI (Recep 08-22 onayi: yalniz otomatik uyandirma). Makine kapanip
 // acildiginda oturumlar 'resume' ile geri gelir ama gozcu/cron olabilir; ekip SAGIR acilir.
@@ -244,9 +320,13 @@ if (source === 'compact') {
     if (d) {
       const yasDk = Math.round((Date.now() - d.mt) / 60000)
       const baslik = `DURUM DOSYAN: ${d.ad} (${yasDk} dk once guncellenmis)\n`
-      bolum('durum', 2,
-        baslik + '--- SON BLOK ---\n' + kes(kapi.sonBlok(d.tam), DURUM_TAVAN, d.tam) + '\n--- SON BLOK BITTI ---\n',
-        baslik + `(son blok tavan yuzunden yok — okumadan is baslatma: ${d.tam})\n`)
+      const sonBlok = kapi.sonBlok(d.tam)
+      const durumMetni = (tavan) => baslik + '--- SON BLOK ---\n' + kes(sonBlok, tavan, d.tam) + '\n--- SON BLOK BITTI ---\n'
+      const durumTam = durumMetni(DURUM_TAVAN)
+      bolum('durum', 2, durumTam,
+        baslik + `(son blok tavan yuzunden yok — okumadan is baslatma: ${d.tam})\n`,
+        // Toplam tavan aşılırsa toptan işaretçi değil, taşma payı kadar daral (baş + son parça yine kalır).
+        (n) => durumMetni(Math.max(1200, Math.min(sonBlok.length, DURUM_TAVAN) - (durumTam.length - n))))
     } else {
       bolum('durum', 2,
         '⚠DURUM DOSYAN BULUNAMADI — compact oncesi yazilmamis demektir. Ne kaybettigini ' +
@@ -263,14 +343,18 @@ if (source === 'compact') {
     const dokum = require(path.join(__dirname, 'son-konusma-dokumu.cjs'))
     const proje = kapi.projeDiziniBul(sid, input.transcript_path)
     const memoryDir = proje && path.join(proje, 'memory')
-    const metin = memoryDir && dokum.enjeksiyonKisa(memoryDir, sid)
+    const dokumMetni = (tavan) => {
+      const m = memoryDir && dokum.enjeksiyonKisa(memoryDir, sid, { tavan })
+      return m ? '--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---\n' + m + '\n--- SON KONUSMA BITTI ---\n' : ''
+    }
+    const dokumTam = dokumMetni(DOKUM_TAVAN)
     bolum('son-konusma', 3,
-      metin
-        ? '--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---\n' + metin + '\n--- SON KONUSMA BITTI ---\n'
-        : '⚠son konusma dokumu YOK — PreCompact kancasi kosmamis olabilir; ozetle yetin, Recep sozunu ONA SOR.\n',
-      metin
+      dokumTam || '⚠son konusma dokumu YOK — PreCompact kancasi kosmamis olabilir; ozetle yetin, Recep sozunu ONA SOR.\n',
+      dokumTam
         ? `SON KONUSMA dokumu (Recep sozu AYNEN): ${dokum.dosyaYolu(memoryDir, sid)} — ilk is OKU.\n`
-        : '')
+        : '',
+      // Toplam tavan aşılırsa Recep'in sözü toptan işaretçiye çevrilmez: en eski mesajlar düşer, en yeniler AYNEN kalır.
+      dokumTam ? (n) => dokumMetni(Math.max(1000, DOKUM_TAVAN - (dokumTam.length - n))) : null)
   } catch (e) {
     bolum('son-konusma', 3, `⚠son konusma dokumu okunamadi (${(e && (e.code || e.message)) || 'bilinmeyen'}).\n`)
   }
@@ -327,6 +411,7 @@ try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
+  if (mine && mine.lane) rolSeridi = mine.lane
 
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
@@ -423,13 +508,15 @@ bolum('yontem', 6,
 // POSTA KUTUSU SAYACI (karar 54, 2026-09-21): açılışta kutuya bakılmazsa kapalı pencereye
 // bırakılan mesaj yine kaybolur. 0 → satır yok; ölçülemezse "ölçülemedi" satırı (temiz sayılmaz).
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
-const yaz = () =>
+const yaz = () => {
+  rolBolumuEkle()
   process.stdout.write(JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'SessionStart',
       additionalContext: birlestir(),
     },
   }))
+}
 ;(async () => {
   try {
     const sayac = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'posta-kutusu-sayac.cjs'))

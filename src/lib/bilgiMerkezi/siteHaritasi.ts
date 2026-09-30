@@ -27,7 +27,8 @@ export function bilgiMerkeziSiteHaritasi(
   for (const dil of acikDiller) {
     satirlar.push({
       url: tam(bilgiMerkeziRotalari.liste(dil), dil),
-      lastModified: enYeni ? new Date(`${enYeni}T00:00:00Z`) : new Date(),
+      // Yazı yoksa tarih YOK (REC-454): `new Date()` her üretimde "bugün değişti" derdi.
+      ...(enYeni ? { lastModified: new Date(`${enYeni}T00:00:00Z`) } : {}),
       changeFrequency: 'weekly',
       priority: 0.7,
       ...(acikDiller.length === 2

@@ -57,17 +57,25 @@ const CALISMA = [
   '## Çalışma düzeni',
   '- Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree\'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).',
   '- Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear\'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.',
-  '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano.',
+  '- PR = `Fixes REC-nn` (alt kaydının); birden fazla PR\'lık iş her biri tek PR\'la biten alt kayıtlara bölünür; kayıtsız iş yalnız PR gövdesinde `Kayıtsız: <sebep>` satırıyla (karar 187).',
+  '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz, frontmatter `metadata.originSessionId` = TAM oturum kimliği (8 hane değil); compact öncesi güncelle; dört alan: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa compact kapısı durdurur).',
+  '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
+  '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano. Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
   '- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.',
+  '- Recep\'e her durum mesajı TEK TABLO ile başlar (`| No: REC bağlantısı · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).',
+  '- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.',
   '- CLAUDE.md\'deki 14 mutlak kural her role geçerlidir.',
 ].join('\n')
+
+/** Karar 181: yalnız URUN, ADMIN, ALTYAPI, KATALOG kartlarının Yasak bölümüne eklenir. */
+const ARKA_OFIS_YASAGI = ' Genel arka ofis modülünü (stok, satınalma, CRM, teknik servis) genişletmek = önce OPS\'a sor (karar 181).'
 
 /** Rol verisi. `durum`: kartın kendisini de ilgilendiren canlılık bilgisi. */
 const ROLLER = {
   OPS: {
     gorev: 'Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını REC-425 altına kendi cümlesiyle kaydeder. Linear açık kayıt sayısını 250 altında tutar (yoklama, arşiv, WrongStack kanban\'a taşıma).',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
-    yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama.',
+    yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Linear kaydına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',
     yetenek: 'Pano (board.cjs), Linear, SendMessage, workflow orkestrasyonu, plan-challenger.',
     durum: 'Açık.',
@@ -84,7 +92,7 @@ const ROLLER = {
     gorev: 'CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi.',
     dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, docs/standards/fleet-mechanism-standard.md.',
     yetki: 'CI ve bağımlılık değişikliği, dependabot PR\'ları, güvenlik taraması; kendi cetveli için gözden geçirme.',
-    yasak: 'Sürüm sabitleme istisnadır (gerekçesiz pin yok); sır yazmaz; migration merge\'ü Recep kapısıdır.',
+    yasak: 'Sürüm sabitleme istisnadır (gerekçesiz pin yok); sır yazmaz; migration merge\'ü Recep kapısıdır.' + ARKA_OFIS_YASAGI,
     yetenek: 'supabase-security, security-check, plan-challenger, diff-review.',
     durum: 'Açık.',
   },
@@ -100,7 +108,7 @@ const ROLLER = {
     gorev: 'Vitrin: ürün, kategori ve marka sayfaları, adres yönlendirmeleri, REC-300 adres paketi.',
     dosyalar: 'src/components/products/**, src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*.',
     yetki: 'Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").',
-    yasak: 'Adres şeması değişikliği tek başına Recep\'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır.',
+    yasak: 'Adres şeması değişikliği tek başına Recep\'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır.' + ARKA_OFIS_YASAGI,
     yetenek: 'rendering-cache cetveli, i18n-conventions, Playwright ölçümü.',
     durum: 'Açık.',
   },
@@ -108,7 +116,7 @@ const ROLLER = {
     gorev: 'Yönetici paneli: tablo, form ve iş akışı ekranları.',
     dosyalar: 'src/views/admin/**, src/components/admin/**, src/app/admin/**, src/hooks/useAdminTable*, src/lib/services/admin*/**.',
     yetki: 'Admin arayüzü ve servis katmanı değişikliği (DI kuralı geçerli).',
-    yasak: 'Admin işlemleri admin_audit_log\'a yazılır; yetki kararı yalnız app_metadata\'dan; canlı veri yazımı Recep kapısıdır.',
+    yasak: 'Admin işlemleri admin_audit_log\'a yazılır; yetki kararı yalnız app_metadata\'dan; canlı veri yazımı Recep kapısıdır.' + ARKA_OFIS_YASAGI,
     yetenek: 'i18n-conventions, useAdminTable kiti, vitest + axe.',
     durum: 'Açık; işler OPS\'tan gelir.',
   },
@@ -116,7 +124,7 @@ const ROLLER = {
     gorev: 'Ürün verisi hattı: katalog PDF\'inden ürün satırına, CSV içe/dışa aktarım, fiyat ve şema cetvelleri.',
     dosyalar: 'scripts/icerik-hatti/**, scripts/db/product-data/**, catalog-ingestion / csv-import-export / pricing / product-schema standartları; kardeş depo venthub-pdf-ingestor.',
     yetki: 'Kaynak dizininden okuma ve veri hazırlama; PDF\'i doğrudan taramaz (KAYNAK DİZİNİ önce).',
-    yasak: 'Canlı ürün/fiyat yazımı Recep kapısıdır; uydurma kimlik üretmez; ErP kararı çıkana kadar dondurulmuş liste değişmez.',
+    yasak: 'Canlı ürün/fiyat yazımı Recep kapısıdır; uydurma kimlik üretmez; ErP kararı çıkana kadar dondurulmuş liste değişmez.' + ARKA_OFIS_YASAGI,
     yetenek: 'supabase, kaynak dizini betikleri, csv-import-export cetveli.',
     durum: 'Kapalı (iş dondurma, karar 165); açılınca ilk iş REC-423.',
   },
@@ -209,6 +217,49 @@ function sorunlar(kartlar) {
   return s
 }
 
+const SAHIPLIK_BELGESI = 'cetvel-sahipligi.md'
+const SAHIPLIK_VERISI = path.join('scripts', 'belge', 'cetvel-sahipligi.json')
+
+/** Sahiplik haritasını okur: { 'docs/standards/x.md': { sahip, dogrulanacak, dayanak } } (dosya yoksa {}). */
+function sahiplikOku(kok) {
+  const p = path.join(kok, SAHIPLIK_VERISI)
+  return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')).cetveller || {} : {}
+}
+
+/**
+ * Sahiplik haritasındaki sorunlar (boş = temiz): bilinmeyen rol, docs/standards dışı yol, var olmayan dosya.
+ * `varMi` test için değiştirilebilir (bozuk kopyayla ayırt edicilik).
+ */
+function sahiplikSorunlari(harita, varMi) {
+  const s = []
+  for (const [dosya, v] of Object.entries(harita)) {
+    if (!ROLLER[v.sahip]) s.push(`${dosya}: bilinmeyen rol ${v.sahip}`)
+    if (!dosya.startsWith('docs/standards/')) s.push(`${dosya}: docs/standards dışında`)
+    else if (!varMi(dosya)) s.push(`${dosya}: dosya yok`)
+  }
+  return s
+}
+
+/** Üretilmiş sahiplik tablosu (docs/roller/cetvel-sahipligi.md). */
+function sahiplikTablosu(harita) {
+  const sirali = Object.entries(harita).sort((a, b) => a[1].sahip.localeCompare(b[1].sahip) || a[0].localeCompare(b[0]))
+  const sayi = {}
+  for (const [, v] of sirali) sayi[v.sahip] = (sayi[v.sahip] || 0) + 1
+  return [
+    '# Cetvel sahipliği (rol kartlarından türetilmiş)',
+    '',
+    '> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.',
+    '> **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.',
+    '',
+    `Rol başına: ${Object.entries(sayi).map(([r, n]) => `${r} ${n}`).join(' · ')}`,
+    '',
+    '| Cetvel | Sahip | Durum | Dayanak |',
+    '|---|---|---|---|',
+    ...sirali.map(([d, v]) => `| ${d.replace('docs/standards/', '')} | ${v.sahip} | ${v.dogrulanacak ? 'Sahip (doğrulanacak)' : 'teyitli'} | ${v.dayanak} |`),
+    '',
+  ].join('\n')
+}
+
 const OZET_SINIRI = 300
 
 /**
@@ -245,12 +296,35 @@ function main() {
       console.error(`FARK: docs/roller/${dosyaAdi(ad)}`)
     }
   }
-  const s = sorunlar(kartlar)
+  const harita = sahiplikOku(kok)
+  const tablo = sahiplikTablosu(harita)
+  const tabloYol = path.join(dizin, SAHIPLIK_BELGESI)
+  if (yaz) {
+    fs.writeFileSync(tabloYol, tablo, 'utf8')
+  } else if (!fs.existsSync(tabloYol) || fs.readFileSync(tabloYol, 'utf8').replace(/\r\n/g, '\n') !== tablo) {
+    fark++
+    console.error(`FARK: docs/roller/${SAHIPLIK_BELGESI}`)
+  }
+  const s = [...sorunlar(kartlar), ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d)))]
   for (const x of s) console.error(`SORUN: ${x}`)
-  if (yaz) console.log(`${Object.keys(kartlar).length} kart yazıldı`)
+  if (yaz) console.log(`${Object.keys(kartlar).length} kart + sahiplik tablosu yazıldı`)
   process.exit(fark || s.length ? 1 : 0)
 }
 
-module.exports = { uret, sorunlar, ozet, ROLLER, KART_BAYT_SINIRI, OZET_SINIRI, dosyaAdi, ILETISIM, ILETISIM_ISTISNA }
+module.exports = {
+  uret,
+  sorunlar,
+  ozet,
+  sahiplikOku,
+  sahiplikSorunlari,
+  sahiplikTablosu,
+  SAHIPLIK_BELGESI,
+  ROLLER,
+  KART_BAYT_SINIRI,
+  OZET_SINIRI,
+  dosyaAdi,
+  ILETISIM,
+  ILETISIM_ISTISNA,
+}
 
 if (require.main === module) main()

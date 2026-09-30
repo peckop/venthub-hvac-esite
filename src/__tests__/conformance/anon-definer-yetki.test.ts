@@ -162,12 +162,69 @@ describe('INV-AUTH-DEFINER-ANON-1 · sipariş sayacı ve teklif yayımı istemci
     }
   })
 
+  // REC-412 Faz 0.5 (2026-09-29): fiyat günlüğünün özet tetik fonksiyonu SECURITY DEFINER'dır ve admin_audit_log'a
+  // yazar. Yalnız tetik çağırır; hiçbir istemci rolü doğrudan çağıramamalı (yeni fonksiyona varsayılan EXECUTE verilir).
+  it('⭐denetim_izi_fiyat_ozet: public, anon, authenticated için son hâl KAPALI', () => {
+    expect(sonKip(zincir, 'denetim_izi_fiyat_ozet'), 'denetim_izi_fiyat_ozet tanimi zincirde yok — okuyucu kor').toBe('definer')
+    for (const rol of ['public', 'anon', 'authenticated']) {
+      expect(
+        sonHalKapali(zincir, 'denetim_izi_fiyat_ozet', rol, []),
+        `denetim_izi_fiyat_ozet ${rol} icin acik — istemci denetim tablosuna sahte ozet satiri yazdirabilir`,
+      ).toBe(true)
+    }
+  })
+
+  // REC-412 Faz 0.5b (çürütme B3): maliyet özet tetik fonksiyonu da SECURITY DEFINER; RPC'yi anon/PUBLIC çağıramaz.
+  it('⭐denetim_izi_maliyet_ozet: public, anon, authenticated için son hâl KAPALI', () => {
+    expect(sonKip(zincir, 'denetim_izi_maliyet_ozet'), 'denetim_izi_maliyet_ozet tanimi zincirde yok — okuyucu kor').toBe('definer')
+    for (const rol of ['public', 'anon', 'authenticated']) {
+      expect(
+        sonHalKapali(zincir, 'denetim_izi_maliyet_ozet', rol, []),
+        `denetim_izi_maliyet_ozet ${rol} icin acik — istemci denetim tablosuna sahte ozet satiri yazdirabilir`,
+      ).toBe(true)
+    }
+  })
+
+  it('⭐maliyet_yenile: public ve anon KAPALI, authenticated AÇIK (kapı fonksiyon içinde: is_admin_claim)', () => {
+    for (const rol of ['public', 'anon']) {
+      expect(sonHalKapali(zincir, 'maliyet_yenile', rol, ['jsonb']), `maliyet_yenile ${rol} icin acik`).toBe(true)
+    }
+    expect(
+      sonHalKapali(zincir, 'maliyet_yenile', 'authenticated', ['jsonb']),
+      'maliyet_yenile authenticated icin KAPANMIS — yonetici maliyet yenileyemez',
+    ).toBe(false)
+  })
+
   it('⭐admin_resend_quote_published: anon KAPALI, authenticated AÇIK', () => {
     expect(sonHalKapali(zincir, 'admin_resend_quote_published', 'anon', ['uuid']), 'admin_resend_quote_published anon icin acik').toBe(true)
     expect(
       sonHalKapali(zincir, 'admin_resend_quote_published', 'authenticated', ['uuid']),
       'admin_resend_quote_published authenticated icin KAPANMIS — yonetici yeniden gonderemez',
     ).toBe(false)
+  })
+
+  // REC-168 (Ç6, plan-challenger 2026-09-29): bu kapı yalnız "kapalı OLMALI" olanları sınıyordu. Ters yön de bir
+  // sözleşmedir: anon'a KASITLI açık kalanlar, ileride "anon EXECUTE'u kapat" turunda yanlışlıkla kapatılırsa
+  // mağaza SESSİZCE hiç açılamaz (satis_kipi_oku: fail-closed → daima KAPALI) ya da eski adresler 404'e düşer.
+  // Üçü de anon EXECUTE'a SAHİP olmalı; her biri salt okuma ya da tek amaçlı yazma (`submit_contact_message`).
+  describe('ANON AÇIK KALMALI — kasıtlı anon-DEFINER kabul kolu', () => {
+    it('⭐satis_kipi_oku: SECURITY DEFINER ve anon + authenticated AÇIK (vitrin bu yoldan okur)', () => {
+      expect(sonKip(zincir, 'satis_kipi_oku'), 'satis_kipi_oku tanimi zincirde yok — okuyucu kor').toBe('definer')
+      for (const rol of ['anon', 'authenticated']) {
+        expect(
+          sonHalKapali(zincir, 'satis_kipi_oku', rol, []),
+          `satis_kipi_oku ${rol} icin KAPANMIS — vitrin satis kipini okuyamaz, magaza sessizce hic acilamaz`,
+        ).toBe(false)
+      }
+      expect(sonHalKapali(zincir, 'satis_kipi_oku', 'public', []), 'satis_kipi_oku PUBLIC icin acik — hedefli grant yerine herkese acilmis').toBe(true)
+    })
+
+    it('⭐url_takma_ad_coz: anon AÇIK (eski adresler 301 alır)', () => {
+      expect(
+        sonHalKapali(zincir, 'url_takma_ad_coz', 'anon', ['text', 'text', 'text']),
+        'url_takma_ad_coz anon icin KAPANMIS — eski adresler yonlendirilemez',
+      ).toBe(false)
+    })
   })
 
   describe('AYIRT EDİCİLİK — değerlendirici her geri kaçışı reddediyor', () => {

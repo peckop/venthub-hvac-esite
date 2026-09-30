@@ -53,24 +53,34 @@ function rpcSlotunuBirak(): void {
   else calisanRpc--
 }
 
+/**
+ * Aile RPC'lerinin (`get_product_families_enriched`, `get_family_detail`) TEK ortak sıra kapısı.
+ * İki RPC AYNI sayacı paylaşır (iki ayrı sayaç değil): derlemede tepe eşzamanlılık toplamda
+ * `FAMILY_RPC_ESZAMANLI` olur. `get_family_detail` ölçümü (2026-09-29): tek çağrı 25 ms / 2.208 tampon;
+ * kırmızı CI koşusunda 57014 `getCachedFamilyDetail`'de düştü — detay RPC'si semaforsuzdu (REC-300).
+ */
+async function aileRpcSirali<T>(cagri: () => PromiseLike<T>): Promise<T> {
+  await rpcSlotuAl()
+  try {
+    return await cagri()
+  } finally {
+    rpcSlotunuBirak() // hata/iptal da slotu bırakır: kuyruk kilitlenmez
+  }
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}
 ): Promise<FamiliesPage> {
-  await rpcSlotuAl()
-  let data: unknown
-  let error: unknown
-  try {
-    ;({ data, error } = await supabase.rpc('get_product_families_enriched', {
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_product_families_enriched', {
       p_category_ids: params.categoryIds,
       p_limit: params.limit ?? 24,
       p_offset: params.offset ?? 0,
       p_search_query: params.searchQuery,
       p_brand: params.brand,
-    }))
-  } finally {
-    rpcSlotunuBirak() // hata/iptal da slotu bırakır: kuyruk kilitlenmez
-  }
+    })
+  )
 
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
@@ -192,10 +202,12 @@ export async function getFamilyDetail(
   slug: string,
   lang: string
 ): Promise<FamilyDetail | null> {
-  const { data, error } = await supabase.rpc('get_family_detail', {
-    p_slug: slug,
-    p_lang: lang,
-  })
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_family_detail', {
+      p_slug: slug,
+      p_lang: lang,
+    })
+  )
 
   if (error) throw error
   const detail = parseFamilyDetail(data)
@@ -546,4 +558,38 @@ export async function getAllFamilySlugs(
     }
   }
   return slugs
+}
+
+/**
+ * Site haritası `lastmod` kaynağı (REC-454): aile slug'ı → ailenin ve AKTİF varyantlarının en son
+ * `updated_at`'i. Sayfada görünen veri (aile metni, model satırları) bu iki tablodan gelir.
+ *
+ * NİÇİN: harita her üretimde `new Date()` yazıyordu → 87 adresin 61'i her gün "bugün değişti".
+ * Google lastmod'u yalnız tutarlı biçimde doğruysa kullanır; her gün her şeyi değişmiş ilan eden
+ * haritada tarihi yok sayar (yeni rehber yazısının gerçek tarihi de kaybolur). 2026-09-30 ölçümü:
+ * bu iki sütun gerçek değişikliği gösteriyor (47 aile, tarihler 08-27…09-26 arasına yayılmış,
+ * toplu günlük yazımla oynamıyor).
+ *
+ * Aktif varyantı olmayan aile haritada zaten yok; seri slug'larının kendi varyantı olmadığı için
+ * burada YOKTUR → çağıran lastmod YAZMAZ (uydurma tarih yok). Hata FIRLATILIR (yutulmaz).
+ */
+export async function getFamilyLastModified(
+  supabase: SupabaseClient<Database>
+): Promise<Map<string, string>> {
+  const { data, error } = await supabase
+    .from('product_families')
+    .select('slug, updated_at, products(updated_at, status, deleted_at)')
+    .is('deleted_at', null)
+    .range(0, 4999)
+  if (error) throw error
+  const sonuc = new Map<string, string>()
+  for (const aile of data ?? []) {
+    const aktif = (aile.products ?? []).filter((p) => p.status === 'active' && p.deleted_at === null)
+    if (!aile.slug || aktif.length === 0) continue
+    const enSon = [aile.updated_at, ...aktif.map((p) => p.updated_at)]
+      .filter((t): t is string => typeof t === 'string')
+      .reduce((a, b) => (Date.parse(b) > Date.parse(a) ? b : a), '1970-01-01T00:00:00Z')
+    sonuc.set(aile.slug, enSon)
+  }
+  return sonuc
 }

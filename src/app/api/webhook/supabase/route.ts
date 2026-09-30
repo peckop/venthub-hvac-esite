@@ -9,6 +9,7 @@ import {
   PRODUCTS_DISCOVERY_TAG,
   variantStockTag,
 } from '@/lib/cache/tags'
+import { SATIS_KIPI_TAG } from '@/lib/kip/satisKipi'
 import { indexNowBildir } from '@/lib/seo/indexnow'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
 // Yalnız `type` import eden saf yardımcı (React/i18n/client bağımlılığı YOK — ölçüldü),
@@ -275,7 +276,9 @@ export async function POST(request: NextRequest) {
     // tenant-scoped keşif tag'lerine AYNI şekilde uygulanır — stok-only UPDATE
     // tenant tag'i üzerinden de cache thrash edemez.
     let shouldRevalidateDiscovery = true
-    if (table === 'inventory_movements' || table === 'product_prices') {
+    if (table === 'inventory_movements' || table === 'product_prices' || table === 'site_settings') {
+      // REC-168: site_settings (satış kipi anahtarı) katalog/keşif verisi DEĞİLDİR — ana sayfa ve keşif
+      // önbelleklerini ASLA thrash etmez; yalnız kendi etiketi tazelenir (aşağıdaki `site_settings` dalı).
       // PS-042: fiyat (product_prices) da stok hareketi gibi keşif önbelleğini
       // asla thrash ETMEZ — Recep kararı: fiyat yalnız PDP'de gösterilir,
       // kartlarda gösterilmez. Bkz. table === 'product_prices' bloğu altındaki not.
@@ -550,6 +553,31 @@ export async function POST(request: NextRequest) {
         revalidatePath(`/tr/products/${f.slug}`)
         revalidatePath(`/en/products/${f.slug}`)
         revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+      }
+    }
+
+    /**
+     * 9. Table: site_settings (REC-168) — YALNIZ `satis_kipi` anahtarı tazeler.
+     *
+     * Tetik zaten `WHEN (key = 'satis_kipi')` ile kurulu (üç tetik: INSERT/UPDATE/DELETE); buradaki `key`
+     * kontrolü ikinci emniyet: gelecekte biri tetiği genişletirse `general`/`payment` değişimi mağaza
+     * kipini sessizce tazelemez. UPDATE'te ANAHTAR YENİDEN ADLANDIRILMIŞSA eski ad da sayılır
+     * (`old_record.key`): "satis_kipi" başka bir adla saklanırsa okuma satırı kaybeder → KAPALI'ya düşmeli.
+     * DELETE'te `record` yoktur, `activeRecord = old_record`.
+     *
+     * NE TAZELER: `SATIS_KIPI_TAG` — `satisKipiOku()` sarmalını okuyan HER sayfa (checkout, ...) bir sonraki
+     * istekte yeniden üretilir. Sitemap fiyat/kip bilgisine bağlı olabileceği için `/sitemap.xml` de tazelenir.
+     * Keşif/ana sayfa etiketlerine DOKUNMAZ (yukarıdaki `shouldRevalidateDiscovery = false`).
+     * Cetvel: rendering-cache-standard.md §3 (`site_settings` satırı).
+     */
+    else if (table === 'site_settings') {
+      const anahtar = activeRecord.key as string | undefined
+      const eskiAnahtar = old_record?.key as string | undefined
+      if (anahtar === 'satis_kipi' || eskiAnahtar === 'satis_kipi') {
+        revalidateTag(SATIS_KIPI_TAG)
+        revalidatedTags.push(SATIS_KIPI_TAG)
+        revalidatePath('/sitemap.xml')
+        revalidatedPaths.push('/sitemap.xml')
       }
     }
 

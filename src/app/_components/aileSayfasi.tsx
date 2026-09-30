@@ -6,6 +6,7 @@ import { SITE_URL } from '@/config/siteUrl'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
+import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { getCachedFamilyDetail, preloadFamily } from '@/lib/data/preload'
 import type { ProductRouteResolution } from '@/lib/data/productRoute'
 import { resolveProductRoute } from '@/lib/data/productRoute'
@@ -26,6 +27,7 @@ import { musteriyeGorunurAciklama } from '@/utils/icIngestNotu'
 import { Routes } from '@/utils/routes'
 import { adresDili, kategoriKirintiYolu } from '@/utils/yuzeyAdresleri'
 import SeriesLandingView from '@/views/category/SeriesLandingView'
+import IlgiliRehberler from '@/views/knowledge/IlgiliRehberler'
 
 import { ProductDetailPage as PageComponent } from './ProductDetailPageView'
 
@@ -318,6 +320,14 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
         priceTaxIncluded={detail?.price_tax_included ?? null}
         sunucuSku={sunucuSku}
       />
+      {/* REC-452 (rehber-yazisi-standard R3.1): aile → o aileye bağlanan rehber. Aile bulunamadıysa
+          (unavailable) blok yok; yazı yoksa `IlgiliRehberler` hiçbir şey basmaz. */}
+      {family && (
+        <IlgiliRehberler
+          rehberler={ilgiliRehberler(`vh:aile/${family.slug}`, lang)}
+          baslik={t('bilgiMerkezi.ilgiliRehberler')}
+        />
+      )}
     </>
   )
 }

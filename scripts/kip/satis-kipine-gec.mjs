@@ -7,6 +7,13 @@
 //   node scripts/kip/satis-kipine-gec.mjs --yon ac --uygula --onay "Recep 2026-09-xx"   # canlıya yazar (Recep kapısı)
 //   node scripts/kip/satis-kipine-gec.mjs --geri-al <yedek.json> [--uygula --onay "..."] # yedekteki hâle döndürür
 //   node scripts/kip/satis-kipine-gec.mjs --dogrula                   # yalnız ölçer ve tutarlılık hükmü verir (çıkış 0/2)
+//   node scripts/kip/satis-kipine-gec.mjs --onkosul                   # yalnız AÇILIŞ ÖNKOŞULLARI tablosu (salt okuma; çıkış 0 = hepsi geçti, 2 = geçmeyen var)
+//   ... --yon ac --uygula --onay "..." [--fatura-beyani "<Recep sözü · tarih>"] [--muaf K1 --muaf-gerekce "<≥20 karakter>"]
+//
+// AÇILIŞ ÖNKOŞULLARI (INV-SATIS-KIPI-7, acilis-onkosullari.mjs): yönü AÇ olan her koşum (kuru koşum dahil) önkoşul
+// tablosunu ölçer ve basar; `--uygula` bir kalem GEÇTİ değilse (ölçülemedi dahil) canlıya HİÇBİR ŞEY yazmadan çıkış 1 verir.
+// Kapatmak (`--yon kapat`, hedefi kapalı `--geri-al`) önkoşula tabi DEĞİLDİR. Genel atlama bayrağı YOK; yalnız K1/K6 için
+// gerekçeli damgalı muafiyet. Sıra: önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm → yazma.
 //
 // NİÇİN VARSAYILAN KURU KOŞUM: bu betik canlı vitrinin fiyat görünürlüğünü ve ödeme yolunu çevirir.
 // Yanlış yönde bir koşum müşteriye fiyat/ödeme gösterir ya da satışı keser. `--uygula` olmadan
@@ -36,6 +43,8 @@ import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { acilisKapisi, degerlendir, izinliEnvAl, MUAFIYET_GEREKCE_ASGARI, onkosulOlc, suz, tabloYaz } from './acilis-onkosullari.mjs'
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 const REPO = resolve(HERE, '../..')
 
@@ -46,12 +55,17 @@ const arg = (ad) => {
   return i >= 0 ? argv[i + 1] : undefined
 }
 const bayrak = (ad) => argv.includes(ad)
+const hepsi = (ad) => argv.flatMap((a, i) => (a === ad && argv[i + 1] !== undefined ? [argv[i + 1]] : []))
 
 const UYGULA = bayrak('--uygula')
 const DOGRULA = bayrak('--dogrula')
+const ONKOSUL = bayrak('--onkosul')
 const GERI_AL = arg('--geri-al')
 const YON = arg('--yon')
 const ONAY = arg('--onay')
+const MUAF = hepsi('--muaf')
+const MUAF_GEREKCE = arg('--muaf-gerekce')
+const FATURA_BEYANI = arg('--fatura-beyani')
 
 const ANAHTAR_KEY = 'satis_kipi'
 const HIDE_PRICE = 'hide_price'
@@ -65,8 +79,11 @@ function hata(mesaj) {
 // bu modülü import edip olc/hepsiniCek'i sahte istemciyle çağırır; import anında process.exit olsaydı
 // hiçbir test yazılamazdı (ilk sürümde öyleydi — ölçüldü, düzeltildi).
 function argumanlariDogrula() {
-  if (!DOGRULA && !GERI_AL && YON !== 'ac' && YON !== 'kapat') {
-    hata("--yon ac | --yon kapat zorunlu (ya da --dogrula / --geri-al <dosya>). Yön verilmeden hiçbir şey planlanmaz.")
+  if (!DOGRULA && !ONKOSUL && !GERI_AL && YON !== 'ac' && YON !== 'kapat') {
+    hata("--yon ac | --yon kapat zorunlu (ya da --dogrula / --onkosul / --geri-al <dosya>). Yön verilmeden hiçbir şey planlanmaz.")
+  }
+  if (MUAF.length > 0 && (typeof MUAF_GEREKCE !== 'string' || MUAF_GEREKCE.trim().length < MUAFIYET_GEREKCE_ASGARI)) {
+    hata(`--muaf için --muaf-gerekce "<asgari ${MUAFIYET_GEREKCE_ASGARI} karakter>" zorunlu; gerekçe rapora ve DB satırına damgalanır.`)
   }
   if (UYGULA && !ONAY) {
     hata('--uygula için --onay "<kim, tarih>" zorunlu. Canlı yazım Recep kapısıdır; onay metni rapora ve DB satırına damgalanır.')
@@ -91,13 +108,79 @@ function envYukle() {
   const url = env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL
   const key = env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !key) hata('.env içinde SUPABASE_URL/NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY gerekli (değerler basılmaz)')
-  return { url, key }
+  // Önkoşul ölçücülerine YALNIZ izin listesindeki adlar geçer (service-role anahtarı onlara verilmez).
+  return { url, key, izinli: izinliEnvAl({ ...env, ...process.env }) }
 }
 
 // Kapı (INV-SATIS-KIPI-4) istemciyi enjekte edebilsin diye tek fabrika.
 export function istemciKur() {
   const { url, key } = envYukle()
   return createClient(url, key, { auth: { persistSession: false } })
+}
+
+/**
+ * DB sorgusu (K4/K5 için `pg_*` kataloğu; PostgREST'ten okunamaz). `SUPABASE_DB_URL` yoksa `null`; bağlanılamazsa
+ * sorgu çağrıldığında FIRLATIR → ilgili kalem ÖLÇÜLEMEDİ = RET (bağlantı hatası metni süzülür, dize basılmaz).
+ */
+async function dbKur(dbUrl) {
+  if (!dbUrl) return { sorgu: null, kapat: async () => {} }
+  try {
+    const { default: pg } = await import('pg')
+    const { resolveTls } = await import('../katalog/katalog-sayim.mjs')
+    const temiz = dbUrl.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '')
+    const client = new pg.Client({ connectionString: temiz, ssl: resolveTls() })
+    await client.connect()
+    return { sorgu: async (sql, p) => (await client.query(sql, p)).rows, kapat: () => client.end().catch(() => {}) }
+  } catch (e) {
+    const neden = suz(e?.message ?? e)
+    return {
+      sorgu: async () => {
+        throw new Error('DB bağlantısı kurulamadı: ' + neden)
+      },
+      kapat: async () => {},
+    }
+  }
+}
+
+/** K8 için: koşumun HEDEF durumu (şimdiki durum DEĞİL — yarım kalmış açılış onarılabilsin). */
+function hedefDurum(d, yon, yedek) {
+  if (yedek) {
+    const toplam = yedek.kategoriler.length
+    return { acik: Boolean(yedek.anahtar?.acik), toplam, hidePriceTrue: yedek.kategoriler.filter((c) => Boolean(c.metadata?.[HIDE_PRICE])).length }
+  }
+  return { acik: yon === 'ac', toplam: d.kategori.toplam, hidePriceTrue: yon === 'ac' ? 0 : d.kategori.toplam }
+}
+
+/**
+ * Açılış önkoşul kapısı (INV-SATIS-KIPI-7). Tabloyu basar. `uygula` doğruysa `acilisKapisi` (ilk ölçüm → hazırlık →
+ * K2/K4/K5 yeniden ölçüm) ile hüküm verir ve `izin` döner; değilse yalnız ölçer (`izin: null`).
+ */
+async function onkosulKapisi({ ortam, once, hedef, uygula, hazirlik }) {
+  const db = await dbKur(ortam.izinli.SUPABASE_DB_URL)
+  const ctx = {
+    env: ortam.izinli,
+    fetch: globalThis.fetch,
+    dbSorgu: db.sorgu,
+    anahtarAcik: once.anahtar.acik,
+    faturaBeyani: FATURA_BEYANI,
+    hedef,
+    tutarliMi,
+  }
+  const muaf = Object.fromEntries(MUAF.map((id) => [id, MUAF_GEREKCE]))
+  try {
+    yaz('')
+    yaz('## açılış önkoşulları (INV-SATIS-KIPI-7)')
+    if (uygula) {
+      const kapi = await acilisKapisi(ctx, { muaf, hazirlik })
+      yaz(tabloYaz(kapi.hukum))
+      return { izin: kapi.izin, asama: kapi.asama, hukum: kapi.hukum, muaf }
+    }
+    const hukum = degerlendir(await onkosulOlc(ctx), { muaf })
+    yaz(tabloYaz(hukum))
+    return { izin: null, asama: 'olcum', hukum, muaf }
+  } finally {
+    await db.kapat()
+  }
 }
 
 // ---------- yedek dizini (repo DIŞI) ----------
@@ -255,8 +338,9 @@ async function kategorileriYaz(sb, kategoriler, hedefHide) {
   return yazilan
 }
 
-async function anahtariYaz(sb, d, acik, onay, kaynak) {
-  const value = { acik, degistiren: 'scripts/kip/satis-kipine-gec.mjs', onay, damga: new Date().toISOString(), kaynak }
+async function anahtariYaz(sb, d, acik, onay, kaynak, ek = {}) {
+  // `ek`: açılışta önkoşul damgası (muafiyet + fatura beyanı). RPC yalnız {acik, damga} okur; ek alanlar sızmaz.
+  const value = { acik, degistiren: 'scripts/kip/satis-kipine-gec.mjs', onay, damga: new Date().toISOString(), kaynak, ...ek }
   if (d.anahtar.var) {
     const { error } = await sb.from('site_settings').update({ value, updated_at: new Date().toISOString() }).eq('id', d.anahtar.id)
     if (error) throw new Error('site_settings güncellenemedi: ' + error.message)
@@ -271,8 +355,9 @@ function yaz(s) { process.stdout.write(s + '\n') }
 
 async function main() {
   argumanlariDogrula()
-  const sb = istemciKur()
-  const once = await olc(sb)
+  const ortam = envYukle()
+  const sb = createClient(ortam.url, ortam.key, { auth: { persistSession: false } })
+  let once = await olc(sb)
   const kip = UYGULA ? 'UYGULA' : 'KURU KOŞUM'
 
   yaz(`# satış kipi geçişi — ${kip} — ${once.damga}`)
@@ -287,10 +372,26 @@ async function main() {
     process.exit(t0.tutarli ? 0 : 2)
   }
 
+  // Yalnız önkoşul tablosu (salt okuma): `satis-hazirligi.md` yeniden ölçme tetikleyicisi bunu çağırır.
+  if (ONKOSUL) {
+    const k = await onkosulKapisi({ ortam, once, hedef: hedefDurum(once, 'ac'), uygula: false })
+    process.exit(k.hukum.acilabilir ? 0 : 2)
+  }
+
   // Geri alma: yedekteki hâle döndür (yön yedeğin kendisinden okunur)
   if (GERI_AL) {
     const yedek = JSON.parse(readFileSync(GERI_AL, 'utf8'))
     const hedefAcik = Boolean(yedek.anahtar?.acik)
+    // Hedefi AÇIK olan geri alma bir AÇMADIR (anahtar şu an kapalıysa): önkoşula tabi. Kapatmak serbest.
+    let onkosulEk = {}
+    if (hedefAcik && !once.anahtar.acik) {
+      const k = await onkosulKapisi({ ortam, once, hedef: hedefDurum(once, 'ac', yedek), uygula: UYGULA, hazirlik: async () => {} })
+      if (UYGULA && !k.izin) {
+        yaz(`⛔ önkoşul (${k.asama}): canlıya HİÇBİR ŞEY yazılmadı, çıkış 1. Düzeltip yeniden koş; muafiyet yalnız K1/K6 için gerekçeli.`)
+        process.exit(1)
+      }
+      onkosulEk = { onkosul: { muaf: k.muaf, faturaBeyani: FATURA_BEYANI ?? null } }
+    }
     const yol = yedekYaz(once, 'geri-al-oncesi')
     yaz(`geri alma hedefi: anahtar ${hedefAcik ? 'AÇIK' : 'KAPALI'} · ${yedek.kategoriler.length} kategori metadata'sı yedekten · şimdiki hâlin yedeği: ${yol}`)
     if (!UYGULA) { yaz('KURU KOŞUM — canlıya yazılmadı. Uygulamak için --uygula --onay "..."'); return }
@@ -302,15 +403,36 @@ async function main() {
       if (error) throw new Error(`geri alma ${c.slug} (${n} yazıldı, YARIM): ` + error.message)
       n += 1
     }
-    if (hedefAcik) await anahtariYaz(sb, once, true, ONAY, 'geri-al:' + GERI_AL)
+    if (hedefAcik) await anahtariYaz(sb, once, true, ONAY, 'geri-al:' + GERI_AL, onkosulEk)
     const sonra = await olc(sb)
     const t1 = tutarliMi(sonra)
     yaz(`geri alındı: ${n} kategori · tutarlılık (sonra): ${t1.tutarli ? 'TUTARLI' : 'TUTARSIZ'}`)
     process.exit(t1.tutarli ? 0 : 2)
   }
 
+  // AÇMA: önkoşul kapısı. Sıra: önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm → yazma (yazmayı bu fonksiyon değil, aşağısı yapar).
+  // KAPATMA önkoşula tabi DEĞİL. Kuru koşumda tablo basılır ama hiçbir şey engellenmez; `--uygula` ret alırsa YEDEK dahi yazılmaz.
+  let yedekYolu
+  let onkosulSonuc = null
+  if (YON === 'ac') {
+    onkosulSonuc = await onkosulKapisi({
+      ortam,
+      once,
+      hedef: hedefDurum(once, 'ac'),
+      uygula: UYGULA,
+      hazirlik: async () => {
+        once = await olc(sb) // taze ölçüm: önkoşul ölçümü ile yazma arasındaki bayat veri (TOCTOU) kalmasın
+        yedekYolu = yedekYaz(once, `${YON}-oncesi`)
+      },
+    })
+    if (UYGULA && !onkosulSonuc.izin) {
+      yaz('')
+      yaz(`⛔ önkoşul (${onkosulSonuc.asama}): canlıya HİÇBİR ŞEY yazılmadı, çıkış 1. Düzeltip yeniden koş; muafiyet yalnız K1/K6 için gerekçeli.`)
+      process.exit(1)
+    }
+  }
   const plan = planla(once, YON)
-  const yedekYolu = yedekYaz(once, `${YON}-oncesi`)
+  yedekYolu ??= yedekYaz(once, `${YON}-oncesi`)
   yaz('')
   yaz(`## plan (--yon ${YON})`)
   yaz(`kategori: ${plan.kategori.degisecek} satır hide_price=${plan.kategori.hedefHidePrice} olacak, ${plan.kategori.degismeyecek} zaten öyle`)
@@ -324,6 +446,8 @@ async function main() {
   if (!UYGULA) {
     yaz('')
     yaz('KURU KOŞUM — canlıya HİÇBİR ŞEY yazılmadı. Uygulamak için: --uygula --onay "<kim, tarih>"')
+    if (onkosulSonuc && !onkosulSonuc.hukum.acilabilir) yaz(`⚠ bugün --uygula ÇALIŞMAZ: ${onkosulSonuc.hukum.neden}`)
+    if (onkosulSonuc) rapor.onkosul = { acilabilir: onkosulSonuc.hukum.acilabilir, gecmeyen: onkosulSonuc.hukum.gecmeyen }
     writeFileSync(join(yedekDizini(), `rapor-${DAMGA}-kuru.json`), JSON.stringify(rapor, null, 2))
     return
   }
@@ -332,7 +456,9 @@ async function main() {
   const hedefKategoriler = once._kategoriler.filter((c) => Boolean(c.metadata?.[HIDE_PRICE]) !== plan.kategori.hedefHidePrice)
   if (YON === 'kapat' && plan.anahtar.degisiyor) await anahtariYaz(sb, once, false, ONAY, 'yon:kapat')
   const n = await kategorileriYaz(sb, hedefKategoriler, plan.kategori.hedefHidePrice)
-  if (YON === 'ac' && plan.anahtar.degisiyor) await anahtariYaz(sb, once, true, ONAY, 'yon:ac')
+  if (YON === 'ac' && plan.anahtar.degisiyor) {
+    await anahtariYaz(sb, once, true, ONAY, 'yon:ac', { onkosul: { muaf: onkosulSonuc?.muaf ?? {}, faturaBeyani: FATURA_BEYANI ?? null } })
+  }
 
   const sonra = await olc(sb)
   const t1 = tutarliMi(sonra)

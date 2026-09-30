@@ -293,6 +293,10 @@ export const pricing = {
       toasts: {
         applied: "{{count}} ürünün maliyeti tazelendi",
         applyFailed: "Maliyetler tazelenemedi",
+        applyFailedNotAdmin: "Maliyet tazeleme yalnız yönetici yetkisiyle yapılır. Oturumu kapatıp yeniden açmayı deneyin; hiçbir şey yazılmadı.",
+        applyFailedTooLarge: "Ürün sayısı tek seferde tazelenebilecek sınırı aştı; hiçbir şey yazılmadı. Teknik ekibe bildirin.",
+        applyFailedTimeout: "İşlem zaman aşımına uğradı; hiçbir şey yazılmadı. Biraz sonra yeniden deneyin.",
+        applyFailedChanged: "Tazeleme sırasında ürün fiyatları ya da yetkiniz değişti; hiçbir şey yazılmadı. Yeniden deneyin.",
       },
     },
     impact: {

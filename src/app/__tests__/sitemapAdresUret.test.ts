@@ -35,6 +35,8 @@ vi.mock('@/lib/services/category.service', () => ({
 }))
 vi.mock('@/lib/services/family.service', () => ({
   getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }, { slug: 'vortice-hava-perdesi' }, { slug: '' }],
+  // REC-454 (master): aile lastmod'u ayrı sorgudan gelir; bu test yalnız ADRESİ ölçer, tarih sitemapLastmod.test.ts'te.
+  getFamilyLastModified: async () => new Map<string, string>(),
 }))
 
 type Satir = { url: string; changefreq: unknown; priority: unknown; alternates: unknown }

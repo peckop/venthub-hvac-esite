@@ -113,14 +113,23 @@ const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') 
  * COMPACT HAZIRLIK NOTU talimatı (Recep 09-29: "diğer pencerelerin compact açıklaması yaptığını görmedim,
  * bu önemli"). Kanca ve durum dosyası yazımı pencerelerde ÇALIŞIYOR ama Recep'e görünen tek cümle üretmiyordu;
  * yalnız Ops elle açıklıyordu. Bu satır eşik üstünde HER istemde gelir → not "bir kez" değil, compact
- * yapılana kadar her cevapta tekrarlanır. Biçim: recep.md "Compact hazırlığı" mesaj türü (üç cümle, tablo değil).
+ * yapılana kadar her cevapta tekrarlanır. Biçim: recep.md §2b "Compact hazırlığı" (üç AYRI satır, tablo değil).
+ *
+ * ⚠BİÇİM (Recep 09-29, iki kez tekrarladı: "şıkları yanyana dizmişsin, alt alta olsun düz cümle gibi"):
+ * üç madde TEK PARAGRAFTA yan yana ve `(a) (b) (c)` etiketiyle yazılınca okunmuyordu. Talimat artık
+ * her maddenin AYRI SATIRDA, etiketsiz düz cümle olmasını söyler; eski etiketli sürüm geri gelmesin diye
+ * kapı (hafiza-baglam-ve-belge-satiri.test.ts) etiketleri yasaklar.
  */
 const HAZIRLIK_NOTU =
-  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA uc cumle yaz — " +
-  '(a) durum dosyam guncel mi (dosya adi + saat), ' +
-  '(b) yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir), ' +
-  "(c) tek cumle hukum: 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
-  'Compact yapilana kadar her cevapta kisaca tekrarla.'
+  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA UC MADDELIK LISTE yaz; her madde '- ' ile baslayan " +
+  'ayri bir satir ve tam cumle, yan yana tek paragraf YOK, harfli ya da numarali etiket YOK. ' +
+  'Birinci madde: durum dosyam guncel mi (dosya adi + saat). ' +
+  'Ikinci madde: yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir). ' +
+  "Ucuncu madde: hukum, 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
+  'Compact yapilana kadar her cevapta kisaca tekrarla. ' +
+  "Listenin altina Recep'e su tek cumleyi de yaz: " +
+  '"Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. ' +
+  'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz."'
 
 /** Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı. */
 function satir(token, pencere) {

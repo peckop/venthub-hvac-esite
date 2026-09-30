@@ -131,14 +131,28 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
     const yakin = bd.satir(500_000, 1_000_000) as string
     for (const madde of [
       'COMPACT HAZIRLIK NOTU',
-      '(a) durum dosyam guncel mi',
-      '(b) yarim is var mi',
-      '(c) tek cumle hukum',
+      'UC MADDELIK LISTE',
+      "'- ' ile baslayan",
+      'Birinci madde: durum dosyam guncel mi',
+      'Ikinci madde: yarim is var mi',
+      'Ucuncu madde: hukum',
       'Simdi compact yapabilirsin',
       'her cevapta kisaca tekrarla',
     ]) {
       expect(yakin, madde).toContain(madde)
     }
+    // Recep 09-29 (iki kez): maddeler yan yana tek paragraf ve (a)(b)(c) etiketli YAZILMAZ. Talimat bunu ÖĞRETMEMELİ.
+    expect(yakin, 'talimat etiketli (a)(b)(c) biçimi öğretiyor').not.toMatch(/\(a\)|\(b\)|\(c\)/)
+    expect(yakin, 'talimat yan yana yazmayı yasaklamıyor').toMatch(/yan yana tek paragraf YOK/)
+    // Ops 09-29 (Recep: "compact konusunda genel bilgilendirme lazım"): duyuru YOK, bilgi kancanın kendisinde durur.
+    expect(yakin, 'compact bilgilendirme cümlesi (iki aşamalı) satırda yok').toContain(
+      'Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir.',
+    )
+    expect(yakin).toContain('Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz.')
+    // Ops 09-29: "JEV" iç kelimedir, Recep'e giden hiçbir kanca metninde geçmez (kaynak dosya hafızası da anılmaz).
+    expect(yakin, 'Recep e giden metinde iç kelime JEV').not.toMatch(/JEV/i)
+    expect(yakin, 'kaynak hafıza dosyası adı metne sızmış').not.toContain('compact-jev')
+    expect(bd.satir(499_999, 1_000_000), 'bilgilendirme yalnız COMPACT YAKIN satırında').not.toContain('iki aşamalıdır')
     expect(bd.satir(499_999, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(146_000, 1_000_000)).not.toContain('HAZIRLIK')
     expect(bd.satir(200_000, 250_000), 'küçültülmüş pencerede de').toContain('COMPACT HAZIRLIK NOTU')

@@ -97,7 +97,7 @@ Taramadaki yanlışların kaynağı buydu; bu yüzden en çok bu kural önemlidi
 |---|---|---|
 | Çekirdek belge (`CLAUDE.md`, `docs/README.md`, `CONTEXT.md`, `docs/DURUM-TAKIP.md`) | son doğrulama yaşı (alan yoksa vekil: son commit tarihi; satırda "vekil" yazılır) | 14 gün |
 | Tek giriş haritası + `CLAUDE.md` | gösterdiği yollardan olmayan | ≥1 |
-| Hafıza indeksi (`MEMORY.md`) | bayt / 16384 | ≥15800 (mevcut yumuşak eşik) |
+| Hafıza indeksi (`MEMORY.md`) | satır / 200 **ya da** bayt / ~25.000 (hangisi önce dolarsa; 2026-09-29 ölçüldü, REC-433 1.9) | ≥160 satır ya da ≥20.000 bayt (yumuşak); ≥200 satır ya da ≥25.000 bayt sert engel (hafiza-indeks-bekcisi) |
 | Kod haritaları (graphify, WrongStack dizini) | son üretimden bu yana gün | 7 gün |
 | Koruma kancaları | son 24 saatte açık kalan (fail-open) çağrı | ≥1 |
 
@@ -108,7 +108,8 @@ kadar vekil ölçü kullanılır.
 ## B6 — Yönlendirici
 
 1. **Cevap üretmez, adres verir.** Belgeyi okumak ve uygulamak ajanın işidir; yönlendirici yanlış cevap
-   üretme riski taşımaz ve ağ çağrısı yapmaz.
+   üretme riski taşımaz. **Eşleştirme modülü ağ çağrısı yapmaz** (madde 7); yerel hafıza servisine çağrı (madde 4)
+   yalnız kancada yapılır: yalnız `127.0.0.1`, kısa süre sınırı, hata olursa sessiz geç (fail-open).
 2. **Konu tablosu tek dosyadır**: konu → tetik kalıpları → adresler (cetvel dosyası, hafıza dersi, kod
    haritası aracı). Kalıplar çok kelimelidir; tek kelimelik ipucu kullanılmaz (her istemde öter).
 3. **Doz:** istem başına en fazla 3 adres; aynı oturumda aynı adres ikinci kez basılmaz. Oturum başı
@@ -120,6 +121,24 @@ kadar vekil ölçü kullanılır.
    (b) son 7 günün istemleri üzerinde kuru koşumda yönlendirici istemlerin en fazla %30'unda öter.
    Ölçüt karşılanmadan kanca açılmaz.
 6. Mevcut `hafiza-sorusu-yonlendirme.cjs` bu tablonun bir satırıdır; ayrı kalmaz.
+7. **Modül sözleşmesi (REC-400 D4, HARİTA + ARAÇ tek tasarım, 2026-09-29):** eşleştirme saf bir modüldür:
+   `scripts/belge/konu-yonlendirici.cjs`, kapısı INV-BELGE-2 (`belge-yonlendirici.test.ts`). Dosya, ağ, saat,
+   ortam değişkeni okumaz.
+   - `satirlariCikar(readmeMetni) → [{ soru, yol }]`: `docs/README.md` içindeki `| Soru | … |` tablolarını
+     ayrıştırır (yol = satırdaki ilk ters tırnaklı `.md`/`.json`/`.cjs` yolu ya da klasör).
+   - `konuYonlendir({ istem, satirlar, maks = 2, esik = 2 }) → [{ yol, puan, ortak }]`: istemdeki anlamlı
+     sözcükler (≥4 harf, Türkçe harf katlamalı, 5 harfli kök) ile satırın SORU hücresi kesişir; kesişim ≥ `esik`
+     olan satırlar puanla sıralanır, en çok `maks` (2) tekrarsız yol döner. Eşik altı istem için **boş dizi**:
+     yönlendirici belirsizlikte sessizdir.
+8. **İş bölümü:** eşleştirme kuralı (içerik) HARİTA'nındır. Kanca kablolaması ARAÇ'ındır
+   (`.claude/hooks/hafiza-sorusu-yonlendirme.cjs`, UserPromptSubmit): oturum başına aynı cetvel 1 kez
+   (`os.tmpdir()/vh-yonlendirme-<sid>.json`), claude-mem çağrısı ve kuralcı süzgeç (özgül terimle kesişmeyen
+   kayıt düşer, en çok 2 kayıt / 2.000 karakter), çıktı bütçesi ≤1.000 karakter, mevcut ÖLÇÜM DEFTERİ satırıyla
+   birleşik tek satır. `source_contains` geçerlilik koşulu (kaynak-metin denetimi) ayrı, sonraki parçadır ve
+   süzgeçten SONRA gelir.
+9. **Sınırlar (bilerek):** yalnız belge haritasındaki SORU hücresine bakar; REC numarası, karar numarası,
+   dosya adı ile eşleştirme ve konu tablosunun ayrı tetik kalıpları (madde 2) sonraki sürümdür. Ölçüt (madde 5)
+   karşılanmadan kanca açılmaz; kanca ARAÇ'ta kurulur, açma kararı OPS'tadır.
 
 ## B7 — Kilit (kapılar)
 
