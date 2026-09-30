@@ -3,7 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 import { describe, expect, it } from 'vitest'
 
 import type { Database } from '../../../types/database.types'
-import { clearProductFixedPrice, isValidFixedPriceAmount, PRODUCT_FIXED_PRICE_MAX, setProductFixedPrice } from '../pricingAdmin.service'
+import {
+  clearProductFixedPrice,
+  isProductFixedRuleConflict,
+  isValidFixedPriceAmount,
+  PRODUCT_FIXED_PRICE_MAX,
+  setProductFixedPrice,
+} from '../pricingAdmin.service'
 import { DERIVED_VALID_FROM, MATERIALIZE_URUN_TAVANI, materializePrices } from '../pricingMaterialize.service'
 import {
   clearProductPrice,
@@ -37,6 +43,12 @@ interface StubOptions {
    * davranışı). Verilen tabloya PATCH bu şekilde yanıtlanır.
    */
   rlsSessizPatch?: string
+  /**
+   * `pricing_rule`a EKLEME, ürün başına tek sabit kural indeksine çarpar (gerçek PostgREST biçimi: 409 + 23505, indeks adı
+   * `message` içinde, `details` anahtar değerini taşır). `rakip` verilirse çarpışan satır tabloya YAZILIR (yarışı kazanan
+   * yöneticinin kuralı); yeniden okuma onu görür. `hep` verilirse her ekleme çarpar (yeniden deneme de çarpışırsa hata yayılır).
+   */
+  carpisma?: { rakip?: Row; hep?: boolean; indeks?: string }
 }
 
 const IGNORED_PARAMS = new Set(['select', 'order', 'limit', 'offset', 'on_conflict', 'columns'])
@@ -60,6 +72,7 @@ function matches(row: Row, params: URLSearchParams): boolean {
 function stub(db: Db, options?: StubOptions): { supabase: SupabaseClient<Database>; calls: Captured[]; db: Db } {
   const calls: Captured[] = []
   let idCounter = 0
+  let carpismaKullanildi = false
   const fakeFetch: typeof fetch = (input, init) => {
     const href = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
     const url = new URL(href)
@@ -104,6 +117,19 @@ function stub(db: Db, options?: StubOptions): { supabase: SupabaseClient<Databas
     }
 
     if (method === 'POST') {
+      if (table === 'pricing_rule' && options?.carpisma && (options.carpisma.hep === true || !carpismaKullanildi)) {
+        carpismaKullanildi = true
+        if (options.carpisma.rakip) rows.push(options.carpisma.rakip)
+        return json(
+          {
+            code: '23505',
+            message: `duplicate key value violates unique constraint "${options.carpisma.indeks ?? 'pricing_rule_urun_tek_sabit_uq'}"`,
+            details: 'Key (tenant_id, product_id)=(tenant-1, p1) already exists.',
+            hint: null,
+          },
+          409,
+        )
+      }
       const incoming = (Array.isArray(body) ? body : [body]) as Row[]
       const written: Row[] = []
       for (const item of incoming) {
@@ -280,7 +306,7 @@ describe('setProductFixedPrice', () => {
     expect(calls[0].body).toMatchObject({ priority: 6, price_is_vat_inclusive: false, updated_by: null })
   })
 
-  it('sabit kural VARSA günceller (yeni satır açmaz), geçerlilik penceresini temizler, yöntem başlığı liste', async () => {
+  it('sabit kural VARSA günceller (yeni satır açmaz), yöntem başlığı liste', async () => {
     const { supabase, calls } = stub({
       pricing_rule: [
         ruleRow({
@@ -289,7 +315,6 @@ describe('setProductFixedPrice', () => {
           product_id: 'p1',
           method: 'fixed',
           fixed_price: 1000,
-          valid_to: '2026-01-01',
         }),
       ],
     })
@@ -310,7 +335,7 @@ describe('setProductFixedPrice', () => {
     expect(rule.fixed_price).toBe(1500)
   })
 
-  it('güncellerken eski kuraldan kalan ek ücret/kelepçe/yuvarlama/charm/para birimi SIFIRLANIR, KDV oranı korunur, öncelik diğer kuralların üstüne çıkar', async () => {
+  it('güncellerken eski kuraldan kalan ek ücret/kelepçe/yuvarlama/charm SIFIRLANIR, KDV oranı korunur, öncelik diğer kuralların üstüne çıkar', async () => {
     const { supabase, calls } = stub({
       pricing_rule: [
         ruleRow({
@@ -325,7 +350,6 @@ describe('setProductFixedPrice', () => {
           max_margin_abs: 300,
           round_to: 10,
           charm_ending: 0.99,
-          currency: 'EUR',
           vat_rate_pct: 10,
         }),
         ruleRow({ id: 'sonradan-marj', scope: 1, product_id: 'p1', priority: 7 }),
@@ -363,6 +387,22 @@ describe('setProductFixedPrice', () => {
     expect(calls[0].body).toMatchObject({ priority: 1 })
   })
 
+  it('para birimli ya da dönemli (kampanya) sabit kural "ürünün sabit kuralı" SAYILMAZ: süresiz kural yeni açılır, kampanya kuralı DOKUNULMAZ', async () => {
+    const { supabase, calls, db } = stub({
+      pricing_rule: [
+        ruleRow({ id: 'usd', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, currency: 'USD', priority: 3 }),
+        ruleRow({ id: 'kampanya', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 2, valid_from: '2027-01-01', valid_to: '2027-02-01', priority: 4 }),
+      ],
+    })
+
+    await setProductFixedPrice(supabase, 'p1', { amount: 50, vatIncluded: true }, 'panel', null)
+
+    expect(calls.map((c) => c.method)).toEqual(['POST'])
+    expect(calls[0].body).toMatchObject({ priority: 5 })
+    expect(calls[0].body).not.toHaveProperty('currency')
+    expect(db['pricing_rule'].filter((r) => r['id'] === 'usd' || r['id'] === 'kampanya')).toHaveLength(2)
+  })
+
   it('aynı üründe birden çok sabit kural veri anomalisidir: HATA, hiçbir şey yazılmaz', async () => {
     const { supabase, calls } = stub({
       pricing_rule: [
@@ -393,6 +433,53 @@ describe('setProductFixedPrice', () => {
       message: 'sahte sunucu hatası',
     })
   })
+
+  describe('yarış: iki yönetici aynı ürüne aynı anda İLK fiyatı girer (tekillik indeksi)', () => {
+    it('ekleme indeks ihlali alırsa kazananın kuralını yeniden okur ve GÜNCELLER: hata yok, tek sabit kural kalır', async () => {
+      const rakip = ruleRow({ id: 'rakip-1', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 999 })
+      const { supabase, calls, db } = stub({ pricing_rule: [] }, { carpisma: { rakip } })
+
+      const rule = await setProductFixedPrice(supabase, 'p1', { amount: 2400, vatIncluded: true }, 'panel', 'user-1')
+
+      expect(calls.map((c) => c.method)).toEqual(['POST', 'PATCH'])
+      expect(calls[1].url.searchParams.get('id')).toBe('eq.rakip-1')
+      expect(calls[1].headers['x-degisiklik-yontemi']).toBe('panel')
+      expect(rule.id).toBe('rakip-1')
+      expect(rule.fixed_price).toBe(2400)
+      const sabitler = db['pricing_rule'].filter((r) => r['product_id'] === 'p1' && r['method'] === 'fixed')
+      expect(sabitler).toHaveLength(1)
+    })
+
+    it('yeniden denemede de çakışma çıkarsa TEK deneme sonunda hata yayılır (döngü yok)', async () => {
+      const { supabase, calls } = stub({ pricing_rule: [] }, { carpisma: { hep: true } })
+
+      await expect(setProductFixedPrice(supabase, 'p1', { amount: 10, vatIncluded: true }, 'panel', null)).rejects.toMatchObject({
+        code: '23505',
+      })
+      expect(calls.filter((c) => c.method === 'POST')).toHaveLength(2)
+    })
+
+    it('başka bir indeksin 23505 hatası bu yarış DEĞİLDİR: yeniden denenmez, atar', async () => {
+      const { supabase, calls } = stub({ pricing_rule: [] }, { carpisma: { hep: true, indeks: 'baska_indeks_uq' } })
+
+      await expect(setProductFixedPrice(supabase, 'p1', { amount: 10, vatIncluded: true }, 'panel', null)).rejects.toMatchObject({
+        code: '23505',
+      })
+      expect(calls.filter((c) => c.method === 'POST')).toHaveLength(1)
+    })
+  })
+})
+
+describe('isProductFixedRuleConflict', () => {
+  it('yalnız 23505 + tekillik indeksi adını taşıyan düz hata nesnesini tanır', () => {
+    const iyi = { code: '23505', message: 'duplicate key value violates unique constraint "pricing_rule_urun_tek_sabit_uq"' }
+    expect(isProductFixedRuleConflict(iyi)).toBe(true)
+    expect(isProductFixedRuleConflict({ ...iyi, code: '23514' })).toBe(false)
+    expect(isProductFixedRuleConflict({ ...iyi, message: 'duplicate key value violates unique constraint "baska_uq"' })).toBe(false)
+    expect(isProductFixedRuleConflict(new Error('pricing_rule_urun_tek_sabit_uq'))).toBe(false)
+    expect(isProductFixedRuleConflict(null)).toBe(false)
+    expect(isProductFixedRuleConflict('23505')).toBe(false)
+  })
 })
 
 // ── clearProductFixedPrice ───────────────────────────────────────────────────
@@ -404,6 +491,8 @@ describe('clearProductFixedPrice', () => {
         ruleRow({ id: 'sabit-1', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1 }),
         ruleRow({ id: 'marj-1', scope: 1, product_id: 'p1' }), // marj override'ı DOKUNULMAZ
         ruleRow({ id: 'sabit-p2', scope: 1, product_id: 'p2', method: 'fixed', fixed_price: 1 }),
+        ruleRow({ id: 'usd-1', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, currency: 'USD' }), // kampanya/para birimli: DOKUNULMAZ
+        ruleRow({ id: 'kampanya-1', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, valid_to: '2027-02-01' }),
       ],
     })
 
@@ -417,8 +506,11 @@ describe('clearProductFixedPrice', () => {
     expect(sorgu.get('method')).toBe('eq.fixed')
     expect(sorgu.get('price_book_id')).toBe('is.null')
     expect(sorgu.get('min_quantity')).toBe('eq.1')
+    expect(sorgu.get('currency')).toBe('is.null')
+    expect(sorgu.get('valid_from')).toBe('is.null')
+    expect(sorgu.get('valid_to')).toBe('is.null')
     expect(calls[0].headers['x-degisiklik-yontemi']).toBe('panel')
-    expect(db['pricing_rule'].map((r) => r['id'])).toEqual(['marj-1', 'sabit-p2'])
+    expect(db['pricing_rule'].map((r) => r['id'])).toEqual(['marj-1', 'sabit-p2', 'usd-1', 'kampanya-1'])
   })
 
   it('silinecek kural yoksa 0 döner (hata değil)', async () => {

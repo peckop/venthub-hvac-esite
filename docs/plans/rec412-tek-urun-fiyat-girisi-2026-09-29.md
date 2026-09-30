@@ -242,3 +242,45 @@ Kod: `pricingAdmin.service.ts` (`setProductFixedPrice`/`clearProductFixedPrice`)
 | `updated_by` çağırandan geliyor | DÜŞÜK | Bilgilendirme kolonu; denetim aktörü DB tetiğinde `auth.uid()` (§5c). Değişiklik yok. |
 
 **Ölçülemeyenler (incelemeden):** canlı `pg_policy`'nin migration'larla birebir aynılığı; yetkinin `user_profiles.role`'den okunması (REC-442, ALTYAPI); `products`/`price_lists` SELECT politikalarının tenant süzgeci; başka tenant'a ait `product_id` ile kural ekleme (FK RLS'i atlar) — Faz 2 park olduğu için bugün tek tenant.
+
+## 9. Tekillik kısıtı — ürün başına TEK sabit fiyat kuralı (v2, 2026-09-30; migration `20260930061500_pricing_rule_urun_tek_sabit_uq.sql`; karar 193)
+
+**Cetvel:** `docs/standards/migration-safety-standard.md` (atomiklik INV-MIGRATION-1, tip/taban maddesi) · `docs/standards/pricing-standard.md` §10-§11. **Yöntem:** şerit ADMIN; plan-challenger (bağımsız çürütme, Opus, salt okuma) + gölge kanıt (bellek-içi PGlite) + elle.
+
+### 9.1 Sorun (ölçüldü)
+`setProductFixedPrice` "önce oku, yoksa ekle" yapar. İki yönetici aynı ürüne AYNI ANDA ilk fiyatı girerse ikisi de "yok" görür, ikisi de ekler → ürüne iki sabit kural; servis bundan sonra "N sabit kural var" hatası verir ve ürün panelden fiyat girişine KİLİTLENİR. Tekillik yalnız uygulamadadır (canlı indeksler: pkey, tenant_scope, product, brand, category).
+
+### 9.2 Canlı ölçüm (salt okuma, 2026-09-29 ~17:45 TR)
+`pricing_rule` toplam **1 satır**; koşula uyup tekrar eden grup **0**; ürünsüz sabit kural **0**; çakışan indeks **yok**. Kısıt mevcut satırlara uygulanır: 0 ihlal olduğu için temiz eklenir.
+
+### 9.3 Tasarım (v2 — çürütmeden sonra)
+Kısmi tekil indeks `pricing_rule_urun_tek_sabit_uq` `(tenant_id, product_id)`, koşul: `scope = 1 AND method = 'fixed' AND price_book_id IS NULL AND min_quantity = 1 AND currency IS NULL AND valid_from IS NULL AND valid_to IS NULL`. Koşul servisin `isProductFixedRule` tanımıyla ve `clearProductFixedPrice` süzgeciyle BİREBİR aynıdır (biri değişirse hepsi değişir).
+- **Para birimli ve dönemli (kampanya) sabit kural koşulun DIŞINDA:** çözücü para birimini ve geçerlilik penceresini aday süzgecinde kullanır (`pricing.service.ts` ~435-439; cetvel §11) ve aynı kapsamdaki kuralları `priority` ile ayırır. "Kalıcı fiyat + dönemli kampanya fiyatı" bir ürüne birlikte durabilmeli. Servis bu kuralları "ürünün fiyatı" saymaz, dokunmaz; güncellerken bu alanları sıfırlaması yalnız savunmadır (eşleşen kuralda zaten null).
+- **Üç adımlı migration (INV-MIGRATION-3):** düz `CREATE UNIQUE INDEX` squawk'ta `require-concurrent-index-creation` KIRMIZI verir (çürütmede ölçüldü: squawk 2.65.0 + `.squawk.toml`). A) işlem: zaman aşımları + ön doğrulama (ihlal varsa `raise exception`); B) işlem DIŞI: geçersiz kalmış eski indeks varsa düşür, `create unique index concurrently if not exists`; C) işlem: son doğrulama `indisvalid and indisunique and indpred is not null`. Emsal `20260916132052_arama_pgroonga_tek_govde.sql`. Tablo 1 satır: kurulum milisaniye.
+- **Geri alma (tek satır, veri kaybı yok):** `drop index if exists public.pricing_rule_urun_tek_sabit_uq;`
+- Tip dosyası ETKİLENMEZ (indeks `database.types.ts`'e girmez). Şema tabanı aynı gün yenilenir (INV-TABAN-TAZE-1).
+
+### 9.4 Kodda karşılığı (aynı PR)
+- `setProductFixedPrice` ekleme dalı `23505` + `pricing_rule_urun_tek_sabit_uq` alırsa yeniden okur ve kazananın kuralını GÜNCELLER (**son yazan kazanır**), TEK yeniden deneme; ikinci çakışma olduğu gibi yayılır. Ayrım `code === '23505' && message.includes(indeks adı)` ile yapılır: PostgREST hatayı düz nesne döndürür (`instanceof Error` DEĞİL), indeks adı `message` içinde gelir (gölgede ölçüldü); `details` kullanıcıya gösterilmez.
+- Kural formu (`PricingRuleFormModal`) ekleme VE güncelleme için aynı 23505'i anlaşılır Türkçe/İngilizce mesaja çevirir (`errors.productFixedExists`): mevcut bir kuralı adet/kapsam/yöntem/ürün değiştirerek koşula sokmak da aynı hatayı verir.
+- Yarışı kazanan tarafın vitrin doğrulaması, kaybedenin tutarı A'nın tutarını ezdiği için "farklı" dönebilir: sessiz değil, doğru sonuç (panel metni Faz 2'de).
+- `min_quantity = 0` koşulun dışında BİLİNÇLİ bırakıldı: çözücüde `min_quantity DESC` sıralaması yüzünden adet 1 kuralının gölgesinde kalır, belirsizlik doğurmaz.
+
+### 9.5 Çürütme bulguları ve karşılıkları (2026-09-30, bağımsız Opus, salt okuma)
+| Bulgu | Ciddiyet | Karşılık |
+|---|---|---|
+| Düz `CREATE UNIQUE INDEX` squawk'ta kırmızı | YÜKSEK | **Düzeltildi:** üç adımlı CONCURRENTLY (§9.3); gölgede geçersiz-indeks yeniden koşumu ölçüldü. |
+| UPDATE yolu (form) 23505 alır, formun hata eşlemesi yalnız 23514'ü tanıyor | ORTA | **Düzeltildi:** modal eşlemesi + i18n + test (§9.4). |
+| İndeks para birimli/dönemli meşru ikiliyi engelliyordu | ORTA | **Düzeltildi:** koşula `currency/valid_from/valid_to IS NULL` (çürütmenin önerisi b); servis süzgeçleri hizalandı. Cetvel modeli korunur. |
+| "Aynı PR" sıralaması: `setProductFixedPrice` master'da yoktu | ORTA | **Kapandı:** #1551 birleşti (790f28db1), bu dal onun üstünde. |
+| 23505 hata biçimi | DÜŞÜK | Servis `isProductFixedRuleConflict` (düz nesne, `code` + `message`); gölge + birim test. |
+| Test taklidi yarışı sınayamıyordu | DÜŞÜK | **Düzeltildi:** taklide `carpisma` seçeneği (409 + gerçek hata metni, rakip satırı yazar); güncelleme dalı, ikinci çakışma ve başka-indeks senaryoları. |
+| Yarışı kazanan tarafın doğrulaması "farklı" görebilir | DÜŞÜK | Belgelendi (§9.4). |
+| `min_quantity = 0` koşul dışı | DÜŞÜK | Belgelendi (§9.4). |
+
+§8'deki "geçerlilik penceresi güncellemede sessizce siliniyor" satırı bu iş sonrası yapısal olarak kapanır: dönemli kural artık "ürünün sabit kuralı" sayılmadığı için hiç güncellenmez/silinmez.
+
+### 9.6 Kabul ölçütleri ve kanıt
+- Gölge (bellek-içi PGlite, `docs/audits/rec412-tekillik-golge-2026-09-30.mjs`): **24/24** — temiz veride uygulanır, ikinci koşum idempotent, ikinci sabit kural INSERT ve koşula sokan UPDATE 23505, koşul dışı satırlar (başka ürün/tenant, kitaplı, adet>1, scope 0, cost_plus, para birimli, dönemli) engellenmez, ihlalli veride ön-guard düşer ve indeks OLUŞMAZ, geçersiz indeks yeniden koşumda düzelir.
+- Ölçülemeyen (PGlite kapsamaz): PostgREST'in gerçek hata gövdesi (canlıda ilk fırsatta ölçülür), `denetim_izi_pricing_rule` tetiğinin yeniden denemedeki günlük satırı (çürütme: AFTER ROW, başarısız INSERT satır bırakmaz).
+- Canlıda migration sonrası: `pg_indexes`'te indeks var ve `indisvalid`; `pricing_rule` satır sayısı değişmemiş (1).
