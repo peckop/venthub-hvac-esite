@@ -21,6 +21,7 @@ import { useConfirm } from '../../components/admin/overlay/ConfirmProvider'
 import ProductCsvImport from '../../components/admin/products/ProductCsvImport'
 import ProductFormModal from '../../components/admin/products/ProductFormModal'
 import ProductHealthBadge from '../../components/admin/products/ProductHealthBadge'
+import ProductPricePanel, { type ProductPricePanelProduct } from '../../components/admin/products/ProductPricePanel'
 import { type FetchParams, type FetchResult, useAdminTable } from '../../hooks/useAdminTable'
 import { useRole } from '../../hooks/useRole'
 import { SYSTEM_CURRENCY } from '../../i18n/currency'
@@ -34,6 +35,7 @@ import {
   adminButtonPrimaryClass,
   adminTableActionClass,
   adminTableActionDangerClass,
+  adminTableActionPrimaryClass,
 } from '../../utils/adminUi'
 
 /* ---- model ---- */
@@ -360,8 +362,12 @@ const InlineNumberCell: React.FC<InlineNumberCellProps> = ({ value, display, wid
 const ProductsTableBody: React.FC = () => {
   const { t, lang } = useI18n()
   const confirm = useConfirm()
-  const { canWrite } = useRole()
+  const { canWrite, role } = useRole()
   const hasWriteAccess = canWrite('products')
+  // "Fiyat" eylemi (REC-412 Faz 2a): UI ⊆ DB — yalnız fiyat tablolarına yazabilen rol görür (moderatör ölçüldü: yazamaz,
+  // REC-468 notu). Vitrine yansıtma (`product_prices` yazma) yalnız admin/super_admin.
+  const canWritePricing = canWrite('pricing')
+  const canReflectPrice = role === 'admin' || role === 'super_admin'
 
   const table = useAdminTable<ProductRow>({
     resource: 'products',
@@ -413,6 +419,12 @@ const ProductsTableBody: React.FC = () => {
   const openEdit = useCallback((id: string) => {
     setEditingId(id)
     setIsModalOpen(true)
+  }, [])
+
+  /* ---- fiyat yan paneli (REC-412 Faz 2a; non-modal, arka plan etkileşimli kalır) ---- */
+  const [pricePanelProduct, setPricePanelProduct] = useState<ProductPricePanelProduct | null>(null)
+  const openPricePanel = useCallback((r: ProductRow) => {
+    setPricePanelProduct({ id: r.id, name: r.name, sku: r.sku })
   }, [])
 
   /* ---- (a) tekil silme — DELETE, mutateWithAudit kapısından ---- */
@@ -811,6 +823,11 @@ const ProductsTableBody: React.FC = () => {
         cell: (r) =>
           hasWriteAccess ? (
             <div className="flex items-center justify-center gap-2">
+              {canWritePricing ? (
+                <button type="button" onClick={() => openPricePanel(r)} className={adminTableActionPrimaryClass}>
+                  {t('admin.products.pricePanel.action')}
+                </button>
+              ) : null}
               <button type="button" onClick={() => openEdit(r.id)} className={adminTableActionClass}>
                 {t('admin.ui.edit')}
               </button>
@@ -821,7 +838,7 @@ const ProductsTableBody: React.FC = () => {
           ) : null,
       },
     ],
-    [t, lang, hasWriteAccess, catsMap, statusBadge, openEdit, removeSingle, saveInlineEdit],
+    [t, lang, hasWriteAccess, canWritePricing, catsMap, statusBadge, openEdit, openPricePanel, removeSingle, saveInlineEdit],
   )
 
   /* ---- status chip'leri (kit filters.status Record üzerinden) ---- */
@@ -984,6 +1001,16 @@ const ProductsTableBody: React.FC = () => {
         _productId={editingId}
         onSuccess={() => void table.reload()}
       />
+
+      {canWritePricing ? (
+        <ProductPricePanel
+          open={pricePanelProduct !== null}
+          product={pricePanelProduct}
+          canReflect={canReflectPrice}
+          onClose={() => setPricePanelProduct(null)}
+          onSaved={() => void table.reload()}
+        />
+      ) : null}
     </div>
   )
 }
