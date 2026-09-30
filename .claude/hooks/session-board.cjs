@@ -10,7 +10,8 @@
  * böylece kullanıcı mesaj taşıyıcısı olmaktan kurtulur.
  *
  * stdin: { session_id, cwd, ... }
- * stdout: { hookSpecificOutput: { hookEventName, additionalContext } }
+ * stdout: { hookSpecificOutput: { hookEventName, additionalContext, sessionTitle? } }
+ *   sessionTitle = şeridin pencere adı ("Araç", "Ops"…; yalnız claim varsa ve source startup/resume/fork; REC-525, aşağıda).
  */
 const fs = require('fs')
 const path = require('path')
@@ -272,6 +273,36 @@ function rolKartiSatiri(lane) {
     return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
   }
 }
+/**
+ * ⭐PENCERE ADI = ŞERİT ADI (REC-525, 2026-09-30). `hookSpecificOutput.sessionTitle` `/rename` ile AYNI etkidir
+ * (belge: code.claude.com/docs/en/hooks). Pencereleri IDE eklentisi açıyor, `--name` bayrağı yok ve her açılış
+ * `--resume=<sid>`; ad verilmezse pencereler `venthub-hvac-72` gibi anlamsız adlarla açılır ve şerit ↔ pencere
+ * eşlemesi (SendMessage) karışır (REC-404). Ad oturumla KALICIdır: bir kez verilince sonraki resume'lar da taşır.
+ *
+ * KURALLAR:
+ *  · yalnız pano talebi (CANLI claim) varsa; talep yoksa alan HİÇ eklenmez (mevcut ad bozulmaz, `CC_LANE` yedeği
+ *    de kullanılmaz: ortam değişkeni bir ad taahhüdü değil, rol ipucudur);
+ *  · yalnız startup/resume/fork — belge clear ve compact'ta alanı yok sayar, gereksiz çıktı basılmaz;
+ *  · ad ÇIPLAK pano yazımı (ARAC) değil, Recep'in pencereleri elle verdiği İNSAN adıdır ("Araç", "Ops", "Yetenek",
+ *    "Harita" — Recep 09-30). Eşleme TEK KAYNAKTA: scripts/board/pencere-adlari.cjs (`ad(serit)` + `TABLO`); başka
+ *    üreticiler de oradan alır, burada kopya YOK. Tabloda olmayan şerit → ilk harf büyük, kalanı küçük (Türkçe
+ *    karakter ÜRETİLMEZ, tahmin yok); string değil/boş/`lane` yer tutucusu → '' (alan eklenmez);
+ *  · FAIL-OPEN: modül/hesap hatası → '' (alan yok, mevcut çıktı aynen); kanca `claude agents` ÇAĞIRMAZ (yavaşlatır).
+ *
+ * BİLİNEN SINIR: kanca pencerenin o an ELLE verilmiş adını göremez. Elle verilen ad tablodaki değerle aynıysa sonuç
+ * aynıdır; farklıysa (örn. "Araç-2") sonraki açılışta (startup/resume/fork) kanca tablodaki adı yazar.
+ * NOT (çakışma): aynı adlı başka canlı oturum varsa Claude Code adın sonuna kendisi varyant ekler; burada ek iş yok.
+ */
+const PENCERE_ADI_KAYNAKLARI = new Set(['startup', 'resume', 'fork'])
+let pencereAdi = ''
+function seritAdindanPencereAdi(lane) {
+  try {
+    return require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs')).ad(lane) || ''
+  } catch {
+    return '' // modül yok/bozuk: alan eklenmez, mevcut çıktı aynen (fail-open)
+  }
+}
+
 /** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
 function rolBolumuEkle() {
   const satir = rolKartiSatiri(rolSeridi)
@@ -412,6 +443,7 @@ try {
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
+  pencereAdi = seritAdindanPencereAdi(mine && mine.lane)
 
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
@@ -510,12 +542,12 @@ bolum('yontem', 6,
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
 const yaz = () => {
   rolBolumuEkle()
-  process.stdout.write(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: birlestir(),
-    },
-  }))
+  const cikti = {
+    hookEventName: 'SessionStart',
+    additionalContext: birlestir(),
+  }
+  if (pencereAdi && PENCERE_ADI_KAYNAKLARI.has(source)) cikti.sessionTitle = pencereAdi
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: cikti }))
 }
 ;(async () => {
   try {
