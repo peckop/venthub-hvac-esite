@@ -118,11 +118,20 @@ const CostRefreshModal: React.FC<CostRefreshModalProps> = ({ open, onClose, onSu
       onSuccess()
       onClose()
     } catch (e) {
-      toast.error(
-        e instanceof AdminPermissionError
-          ? t('admin.pricing.common.noPermission')
-          : t('admin.pricing.rules.costRefresh.toasts.applyFailed'),
-      )
+      // `maliyet_yenile` RPC hata kodları (migration 20260929143000): hepsinde TÜM parti geri alınmıştır.
+      const code: unknown = typeof e === 'object' && e !== null ? Reflect.get(e, 'code') : undefined
+      // Anahtarlar DÜZ METİN (ölü-anahtar kapısı şablon dizgisindeki kullanımı göremez).
+      const failureMessage =
+        code === '42501'
+          ? t('admin.pricing.rules.costRefresh.toasts.applyFailedNotAdmin')
+          : code === '54000'
+            ? t('admin.pricing.rules.costRefresh.toasts.applyFailedTooLarge')
+            : code === '57014'
+              ? t('admin.pricing.rules.costRefresh.toasts.applyFailedTimeout')
+              : code === '40001'
+                ? t('admin.pricing.rules.costRefresh.toasts.applyFailedChanged')
+                : t('admin.pricing.rules.costRefresh.toasts.applyFailed')
+      toast.error(e instanceof AdminPermissionError ? t('admin.pricing.common.noPermission') : failureMessage)
     } finally {
       setApplying(false)
     }
