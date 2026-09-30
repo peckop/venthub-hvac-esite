@@ -29,9 +29,33 @@
 // sınıfı onardım (aynı kimlik iki kuralı gösteriyordu, #703). Bu uç orkestrasyon yapar:
 // kimlik doğrular, idempotansı korur, gönderimi mevcut uca devreder, sonucu deftere yazar.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.4'
+import { sentryCaptureMessage } from '../_shared/sentry.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (kardeş webhook'larla aynı pencere)
 const KIND = 'order_paid'
+// order_email_events.subject NOT NULL ve varsayılansız (REC-368 M0). Gerçek konu satırını
+// order-confirmation hesaplıyor; 'attempt' anında henüz bilinmiyor, bu yüzden sabit etiket
+// yazılır ve gönderim başarılıysa cevaptaki gerçek konuyla değiştirilir.
+const KONU_ETIKETI = 'Siparis onayi'
+
+/**
+ * Defter yazımının sonucunu denetler. supabase-js hata FIRLATMAZ, `{ error }` döner; `try/catch`
+ * tek başına hiçbir şey yakalamaz (REC-368: NOT NULL kolonlar boş bırakılınca her yazım ~ay boyu
+ * sessizce düşmüştü). Defter GÖZLEM içindir, kapı değil: hata gönderimin sonucunu DEĞİŞTİRMEZ
+ * (5xx dönmek pg_net'i tekrara sokar ve müşteriye ikinci e-posta gönderir), yalnız görünür kılınır.
+ */
+async function defterHatasiniBildir(
+  adim: string,
+  orderId: string,
+  error: { message: string } | null,
+): Promise<void> {
+  if (!error) return
+  const mesaj = `[order-paid-webhook] defter yazimi basarisiz (${adim}) siparis=${orderId}: ${error.message}`
+  console.error(mesaj)
+  try {
+    await sentryCaptureMessage(mesaj, 'error', { fn: 'order-paid-webhook', adim, order_id: orderId })
+  } catch { /* bildirim de düşerse asıl akış etkilenmez */ }
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -114,7 +138,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: order, error: orderErr } = await supabase
       .from('venthub_orders')
-      .select('id, tenant_id, payment_status, paid_at, paid_email_sent_at')
+      .select('id, tenant_id, payment_status, paid_at, paid_email_sent_at, customer_email')
       .eq('id', orderId)
       .maybeSingle()
     // Okuma düştüyse 503: "bakamadım" ile "yok" AYNI cevaba düşmemeli (pg_net tekrar dener).
@@ -142,18 +166,41 @@ Deno.serve(async (req: Request) => {
     // eksik onay, mükerrer onaydan pahalıdır.
     // Bu satır mükerrerliği ENGELLEMEZ; gönderim ile damga arasında ölen bir çağrının TEK
     // izi olur. Terminal duruma hiç geçmeyen bir attempt = "e-posta gitmiş olabilir".
+    //
+    // Alıcı: sipariş satırındaki `customer_email` (order-confirmation aynı kolonu okuyor).
+    // `email_to` NOT NULL olduğundan alıcısı bilinmeyen sipariş için '' YAZILMAZ (sahte satır
+    // olurdu): satır atlanır, durum Sentry'ye gider; gönderimin kendisi yine devredilir çünkü
+    // alıcıya son sözü order-confirmation söyler.
+    const aliciEposta = typeof order.customer_email === 'string' ? order.customer_email.trim() : ''
+    if (!aliciEposta) {
+      await defterHatasiniBildir('alici_yok', order.id, { message: 'venthub_orders.customer_email bos' })
+    }
     let denemeId: string | null = null
-    try {
-      const { data: deneme } = await supabase
-        .from('order_email_events')
-        .insert({ order_id: order.id, kind: KIND, provider: 'resend', status: 'attempt' })
-        .select('id')
-        .maybeSingle()
-      denemeId = deneme?.id ?? null
-    } catch { /* defter düşerse gönderimi ENGELLEME — kayıt gözlem içindir, kapı değil */ }
+    if (aliciEposta) {
+      try {
+        const { data: deneme, error: denemeErr } = await supabase
+          .from('order_email_events')
+          .insert({
+            order_id: order.id,
+            kind: KIND,
+            provider: 'resend',
+            status: 'attempt',
+            email_to: aliciEposta,
+            subject: KONU_ETIKETI,
+          })
+          .select('id')
+          .maybeSingle()
+        await defterHatasiniBildir('attempt', order.id, denemeErr)
+        denemeId = deneme?.id ?? null
+      } catch (e) {
+        // Defter düşerse gönderimi ENGELLEME — kayıt gözlem içindir, kapı değil.
+        await defterHatasiniBildir('attempt', order.id, { message: e instanceof Error ? e.message : String(e) })
+      }
+    }
 
     // ── Gönderim: mevcut uca devredilir (tek şablon, tek gönderim mantığı) ─────────
     let gonderimHatasi: string | null = null
+    let gercekKonu: string | null = null
     try {
       const resp = await fetch(`${supabaseUrl}/functions/v1/order-confirmation`, {
         method: 'POST',
@@ -166,6 +213,10 @@ Deno.serve(async (req: Request) => {
       })
       if (!resp.ok) {
         gonderimHatasi = `order-confirmation ${resp.status}: ${(await resp.text().catch(() => '')).slice(0, 500)}`
+      } else {
+        // Cevap { success, subject, result }: gerçek konu deftere işlenir. Okunamazsa etiket kalır.
+        const govde: { subject?: unknown } | null = await resp.json().catch(() => null)
+        if (typeof govde?.subject === 'string' && govde.subject.trim()) gercekKonu = govde.subject.trim()
       }
     } catch (e) {
       gonderimHatasi = e instanceof Error ? e.message : String(e)
@@ -177,19 +228,26 @@ Deno.serve(async (req: Request) => {
       // Bu yazma best-effort'tur: defter düşerse asıl hatayı YUTMAMALI.
       try {
         if (denemeId) {
-          await supabase.from('order_email_events')
+          const { error: yazimHatasi } = await supabase.from('order_email_events')
             .update({ status: 'failed', error: gonderimHatasi.slice(0, 1000) })
             .eq('id', denemeId)
-        } else {
-          await supabase.from('order_email_events').insert({
+          await defterHatasiniBildir('failed_guncelle', order.id, yazimHatasi)
+        } else if (aliciEposta) {
+          const { error: yazimHatasi } = await supabase.from('order_email_events').insert({
             order_id: order.id,
             kind: KIND,
             provider: 'resend',
             status: 'failed',
+            email_to: aliciEposta,
+            subject: KONU_ETIKETI,
             error: gonderimHatasi.slice(0, 1000),
           })
+          await defterHatasiniBildir('failed_ekle', order.id, yazimHatasi)
         }
-      } catch { /* defter düşse bile asıl hata aşağıda bildirilecek */ }
+      } catch (e) {
+        // Defter düşse bile asıl hata aşağıda bildirilecek.
+        await defterHatasiniBildir('failed', order.id, { message: e instanceof Error ? e.message : String(e) })
+      }
       // 500: pg_net tekrar dener. Damga ATILMADIĞI için tekrar denemesi GÜVENLİ.
       return json({ error: 'send_failed', detail: gonderimHatasi.slice(0, 500) }, 500)
     }
@@ -214,16 +272,28 @@ Deno.serve(async (req: Request) => {
 
     try {
       if (denemeId) {
-        await supabase.from('order_email_events').update({ status: 'sent' }).eq('id', denemeId)
-      } else {
-        await supabase.from('order_email_events').insert({
+        const { error: yazimHatasi } = await supabase.from('order_email_events')
+          .update({ status: 'sent', subject: gercekKonu ?? KONU_ETIKETI })
+          .eq('id', denemeId)
+        await defterHatasiniBildir('sent_guncelle', order.id, yazimHatasi)
+      } else if (aliciEposta) {
+        const { error: yazimHatasi } = await supabase.from('order_email_events').insert({
           order_id: order.id,
           kind: KIND,
           provider: 'resend',
           status: 'sent',
+          email_to: aliciEposta,
+          subject: gercekKonu ?? KONU_ETIKETI,
         })
+        // İkinci `sent` satırını uq_order_email_events_sent_once reddeder — beklenen davranış
+        // (23505); bunu hata olarak bildirmek yanlış alarm olur, yalnız başka hatalar bildirilir.
+        if (yazimHatasi && yazimHatasi.code !== '23505') {
+          await defterHatasiniBildir('sent_ekle', order.id, yazimHatasi)
+        }
       }
-    } catch { /* kısıt ikinci `sent` satırını reddeder — beklenen davranış */ }
+    } catch (e) {
+      await defterHatasiniBildir('sent', order.id, { message: e instanceof Error ? e.message : String(e) })
+    }
 
     return json({
       ok: true,
