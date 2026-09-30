@@ -110,6 +110,7 @@ describe('DI Signature compliance static analysis', () => {
           'toPricingProductInput',  // (row, brandMap) → motor girdisi; DB'ye dokunmaz
           'marginPctToCoefficient', // saf aritmetik
           'coefficientToMarginPct', // saf aritmetik
+          'isValidFixedPriceAmount', // (amount) → boolean; sabit fiyat tutar aralığı doğrulaması, DB'ye dokunmaz
         ],
         'displayPrice.service.ts': [
           'attachDisplayPrices',    // (items, priceMap) → items; DB'ye dokunmaz
