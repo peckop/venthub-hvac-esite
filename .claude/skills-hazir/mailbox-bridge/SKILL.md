@@ -1,0 +1,324 @@
+---
+name: mailbox-bridge
+description: "Posta kutusunu MCP konuşmayan istemcilere (kanca, betik, CI) loopback HTTP ile açar: okuma, gönderme, onaylama. Tetik: mailbox köprüsü, HTTP posta, MCP'siz posta. Kutunun kendisi için wrongstack-mailbox-mcp kullanılır. HAZIR klasörde: köprü sunucusu kurulana kadar etkin değil. WrongStack 1.0.26 uyarlaması."
+category: coordination
+metadata:
+  kaynak: "WrongStack @wrongstack/core 1.0.26 skills/mailbox-bridge/SKILL.md (MIT lisansı, telif ECOSTACK TECHNOLOGY OÜ)"
+  uyarlama: "YETENEK 2026-09-30 (REC-519) - başa durum, araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  durum: "HAZIR - .claude/skills'e KONMAZ; köprü sunucusu (wstack CLI) çalışınca taşınır"
+---
+
+> **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/mailbox-bridge/SKILL.md`, MIT lisansı. Aşağıdaki
+> "Durum", "Araç eşlemesi" ve "VentHub ek kuralları" bölümleri bize aittir; ondan sonraki gövde **değiştirilmeden** kopyalandı.
+
+## Durum: HAZIR, ETKİN DEĞİL (2026-09-30 ölçüm)
+
+Köprü sunucusu bizde kurulu değil: `wstack` komutu makinede yok (yalnız `wstack-*-mcp` ikilileri var) ve `healthz` / `/mailbox/send` / `.mailbox.token` dizgileri kurulu `@wrongstack` paketlerinin kod dosyalarında geçmiyor, yalnız skill belgelerinde. Bu yüzden bu skill `.claude/skills/` altına KONMAZ (çalışmayan komut anlatır, oturum açıklama yükü ekler). Sunucu çalışınca (ARAÇ: wstack CLI kurulumu) bu klasör `.claude/skills/mailbox-bridge/` altına taşınır ve `wrongstack-mailbox-mcp` ek kural 9 ("mailbox-bridge kullanılmaz") aynı PR'da güncellenir.
+
+## Araç eşlemesi (kaynak metindeki adlar bizde neye karşılık gelir)
+
+| Kaynak metin | Bizde |
+|---|---|
+| `wstack mailbox serve` / `/mailbox-serve` | Sunucu kurulunca aynen geçerli; şimdi YOK |
+| `features.mailboxBridge` | WrongStack proje ayarı; bizde yok |
+| `wstack mcp serve` | Bizde `wstack-mailbox-mcp` (`tools/wrongstack-mcp`, `mcp__wrongstack-mailbox__*`) |
+| `MailboxHealthWatchdog`, `mbWithBootstrap` | WrongStack ana programının parçası; bizde yok |
+| "Skills in scope" (prompt-engineering, node-modern, output-standards, security-scanner) | Henüz alınmadı; atıflar boşta, alınınca bağlanır |
+| `<nextsteps>` | Kullanılmaz (Recep'e rapor akan cümle; OPS'a NE · DURUM · KANIT · KİMDE) |
+
+## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
+
+1. **Bind adresi `127.0.0.1` ZORUNLU.** `--host 0.0.0.0` bizde YASAK. Tehdit modelimiz tek makinedir: köprüye erişmek için makinede kabuk erişimi gerekir (bizim ajanlarımız ve Recep); LAN'a açmak bu modeli değiştirir, Recep kararı gerekir.
+2. **Kime:** yalnız MCP konuşmayan istemciler (kanca, betik, CI). Claude Code pencereleri `wrongstack-mailbox-mcp` kullanır; aynı iş için iki köprü işletme borcudur (kaynak "Out of scope").
+3. **Jeton sırdır:** komut satırına, commit'e, kutuya, belgeye YAZILMAZ; `.mailbox.token` dosyasından ya da ortamdan okunur, 401'de yeniden okunur.
+4. **Kök yol:** köprü de posta kutusunun kanonik köküyle (`c:\Users\…\venthub-hvac`, küçük harf) çalışır; yoksa mesaj pencerenin görmediği ikinci kutuya düşer (`tools/wrongstack-mcp/README.md`, iki kutu tuzağı).
+5. **Kimlik:** köprüde çağıran `from`'u kendisi verir (kaynak "Security notes"). Pencere kimliği daima TAM oturum kimliğidir (36 karakter). Taklit riski tek makine modelinde kabul edilir; köprü başka makineye açılırsa yeniden karar verilir.
+6. Kutuya sır ve Recep onayı yazılmaz; `control` mesajı gönderilmez.
+7. İş emrinin tek kaynağı **Linear**'dır; posta ve köprü emir kaynağı değildir.
+8. Bu skill'i ETKİNLEŞTİRMEK (klasörü taşımak) ARAÇ'ın işidir ve sunucunun gerçekten çalıştığı ölçüldükten sonra yapılır.
+
+---
+
+
+# Mailbox Bridge — Expose the Shared Mailbox to External Agents
+
+> **Bundled skill.** This file is shipped with `@wrongstack/core` and
+> auto-discovered via `bundledSkillsDir`. To pin it to a specific project,
+> run `wstack skill install <path-to-this-file>` once — the project-level
+> manifest at `~/.wrongstack/projects/<slug>/installed-skills.json` will
+> record that override.
+
+## Overview
+
+WrongStack-internal agents (CLI, TUI, WebUI, ACP) already share one
+project-level mailbox, a SQLite store at
+`~/.wrongstack/projects/<slug>/_mailbox.sqlite`.
+This skill starts a thin loopback HTTP server that wraps that exact same
+`GlobalMailbox` so external coding agents — Claude Code, Aider, Continue,
+a user's own scripts — can read and send messages on the same channel
+without touching the store directly.
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                    WrongStack project dir                          │
+│                                                                    │
+│   ~/.wrongstack/projects/<slug>/                                  │
+│   ├── _mailbox.sqlite           ← shared message store              │
+│   ├── _mailbox.registry.json    ← agent heartbeats                  │
+│   └── _mailbox.clients.json     ← REPL/TUI/WebUI/external clients   │
+│                                                                    │
+│              ▲             ▲             ▲             ▲            │
+│              │             │             │             │            │
+│       ┌──────┴───┐  ┌──────┴───┐  ┌──────┴───┐  ┌──────┴───┐       │
+│       │ Leader A │  │ BugHunter│  │ WebUI    │  │ External │        │
+│       │ (CLI)    │  │ (CLI)    │  │ (browser)│  │ agent    │        │
+│       └──────────┘  └──────────┘  └──────────┘  └─────▲────┘       │
+│                                                       │            │
+│                                            HTTP POST │ /mailbox/* │
+│                                                       │            │
+└───────────────────────────────────────────────────────┼────────────┘
+                                                        │
+                                          ┌─────────────┴───────────┐
+                                          │  wstack mailbox serve   │
+                                          │  (this skill)           │
+                                          │  wraps GlobalMailbox    │
+                                          └─────────────────────────┘
+```
+
+The bridge does NOT introduce a parallel store. External calls go through
+`GlobalMailbox`, so agent heartbeats,
+read receipts, and HQ telemetry happen exactly as they do for
+WrongStack-internal callers. An external agent and a WrongStack-internal
+agent posting to the same `agentId` are indistinguishable to the rest of
+the system — the WebUI's "online agents" panel will show them side by
+side, with `source = 'http'` distinguishing the HTTP path.
+
+## When to use this skill
+
+- The user asks to "let Claude Code send/receive on the mailbox".
+- The user wants to run a script (build bot, CI hook, alerting agent)
+  alongside WrongStack that should participate in the project's inter-agent
+  coordination.
+- The user wants to debug or inspect mailbox traffic from another tool
+  without granting it access to the JSONL file.
+
+## When NOT to use this skill
+
+- The external agent speaks MCP natively — use `wstack mcp serve` instead
+  (it exposes WrongStack's tool registry, including the mailbox tool).
+- The user wants SMTP/IMAP-style email integration — WrongStack's mailbox
+  is internal-only and is not an email server. Reject that direction.
+- The user wants the external agent to act on the wider file system or
+  other WrongStack tools — the bridge exposes ONLY mailbox operations.
+
+## Setup
+
+Run from any terminal where `wstack` is on PATH and the project is the
+working directory:
+
+```
+wstack mailbox serve
+```
+
+Or, if the user is already in a WrongStack REPL/TUI:
+
+```
+/mailbox-serve
+```
+
+To have every WrongStack surface start or join the bridge on boot, set
+`features.mailboxBridge: "auto"` in the project config. The default is
+`"off"`, because nothing inside WrongStack needs the bridge — only external
+agents do.
+
+The server prints its bind URL and writes the bearer token to
+`~/.wrongstack/projects/<slug>/.mailbox.token` (mode `0600`). The token
+is rotated on every server start, so external agents must read it
+freshly each time they connect — never hardcode.
+
+To pass it to the external agent, set two environment variables:
+
+```
+WRONGSTACK_MAILBOX_URL=http://127.0.0.1:7788
+WRONGSTACK_MAILBOX_TOKEN=$(cat ~/.wrongstack/projects/<slug>/.mailbox.token)
+```
+
+### Flags
+
+| Flag | Default | Notes |
+|------|---------|-------|
+| `--host <ip>` | `127.0.0.1` | Loopback by default. Pass `0.0.0.0` to expose on LAN — NOT recommended without a reverse proxy that re-authenticates and rate-limits. |
+| `--port <n>` | `7788` | Requested port used when `--strict-port` is set. In non-strict mode the server deliberately passes port `0` so the OS assigns a free port, even when a port value was supplied. |
+| `--strict-port` | off | Bind the requested/default port exactly and fail on `EADDRINUSE`; without it, bind an OS-assigned free port. |
+
+## Routes
+
+All routes take JSON bodies on POST (or no body on GET). All requests
+require `Authorization: Bearer <token>`. All responses are JSON.
+
+| Method | Path | Wraps |
+|--------|------|-------|
+| POST | `/mailbox/send` | `GlobalMailbox.send` |
+| POST | `/mailbox/query` | `GlobalMailbox.query` |
+| POST | `/mailbox/check` | convenience inbox check: direct/base/broadcast query plus optional read/completion batch ack |
+| POST | `/mailbox/ack` | `GlobalMailbox.ack` |
+| POST | `/mailbox/ack-many` | `GlobalMailbox.ackMany` (batch under one lock + rewrite) |
+| POST | `/mailbox/unread-count` | `GlobalMailbox.unreadCount` |
+| POST | `/mailbox/agents/register` | `GlobalMailbox.registerAgent` (`source = 'http'`) |
+| POST | `/mailbox/agents/heartbeat` | `GlobalMailbox.heartbeat` |
+| POST | `/mailbox/register-client` | `GlobalMailbox.registerClient` (`source = 'http'`) |
+| POST | `/mailbox/heartbeat` | `GlobalMailbox.clientHeartbeat` |
+| POST | `/mailbox/purge-clients` | `GlobalMailbox.purgeClients` |
+| GET | `/mailbox/agents` | `GlobalMailbox.getAgentStatuses` |
+| GET | `/mailbox/agents/online` | `GlobalMailbox.getOnlineAgents` |
+| GET | `/mailbox/events` | authenticated SSE stream for mailbox events |
+| GET | `/healthz` | liveness probe (no auth or rate limit) |
+
+### Error shape
+
+Every error response follows the WrongStack API convention:
+
+```json
+{ "error": { "code": "VALIDATION_ERROR", "message": "field \"from\" is required (string)" } }
+```
+
+| Code | HTTP | When |
+|------|------|------|
+| `VALIDATION_ERROR` | 400 | Missing/wrong-type field in request body, body too large, or invalid JSON. |
+| `UNAUTHORIZED` | 401 | Missing or wrong bearer token. |
+| `NOT_FOUND` | 404 | No route for the request method + URL. |
+| `RATE_LIMITED` | 429 | More than 120 authenticated requests in the rolling 60-second window. |
+| `INTERNAL_ERROR` | 500 | `GlobalMailbox` threw (e.g. store unavailable, disk full). |
+
+### Limits
+
+- Body cap: **256 KB**. The mailbox message format is small; this leaves
+  headroom for long bodies and base64 attachments while rejecting
+  pathological payloads before they reach `JSON.parse`.
+- Authenticated routes share a per-bearer sliding-window limit of **120
+  requests per 60 seconds**. `/healthz` bypasses authentication and the limit.
+  This bounds accidental flooding; it is not an identity or authorization
+  boundary because every caller uses the same project token.
+
+## The HQ dashboard writes to the same mailbox
+
+The HQ command center (`wstack --hq`) shares this exact `GlobalMailbox`.
+When an operator sends a prompt from the HQ screen, it lands in the same
+`_mailbox.sqlite` store an external agent reads through `/mailbox/query` — so an
+external agent participating via this bridge sees HQ prompts too.
+
+HQ delivers a prompt one of two ways:
+
+- **`POST /api/command`** on the HQ server — routes to a *connected*
+  client, which then calls `GlobalMailbox.send`.
+- **`POST /api/mailbox-send`** on the HQ server — writes to the project
+  mailbox **directly**, so the prompt is delivered even when no agent is
+  connected. The HQ server resolves the target `projectRoot` from its
+  `SessionRegistry` (never a browser-supplied path).
+
+Either way, the resulting mailbox message carries one of the HQ **send
+types**, which map onto the mailbox `type` field an external agent will
+observe:
+
+| HQ send type | Mailbox `type` | Intent for the receiver |
+|--------------|----------------|-------------------------|
+| `steer`      | `steer`        | Change course now.       |
+| `btw`        | `btw`          | FYI / context — no course change demanded. |
+| `queue`      | `note`         | A queued prompt; handle before the next step. |
+| `broadcast`  | `broadcast`    | Sent to all agents on the project (`to: all`). |
+
+An external agent does not need to distinguish HQ-originated messages —
+they arrive with `from` set to `hq@<tag>` and are read, acked, and
+completed through the same `/mailbox/query` + `/mailbox/ack` routes as
+any other message. Filter on `from` if you want to treat HQ prompts
+specially.
+
+## Pairing with the external-facing skill
+
+This internal skill describes how to run the server. The
+`wrongstack-mailbox` skill (also bundled with `@wrongstack/core`) describes
+how the external agent uses the routes. When configuring an external agent,
+install both:
+
+- In the WrongStack project: `bundledSkillsDir/mailbox-bridge/` (this file)
+- In the external agent's project: copy
+  `bundledSkillsDir/wrongstack-mailbox/SKILL.md` to the agent's skills
+  directory (e.g. `.claude/skills/wrongstack-mailbox/SKILL.md`).
+  The repo ships `scripts/install-mailbox-bridge-skills.sh` for this.
+
+## Examples
+
+Before using this workflow, read [the complete instructions](references/examples.md).
+Load with `skill({ name: "mailbox-bridge", resource: "references/examples.md" })`, or resolve the reference relative to this skill directory in another client.
+
+## How it ends
+
+`Ctrl+C` (SIGINT) or `SIGTERM` triggers a graceful shutdown: stop accepting
+new connections, let in-flight requests finish, flush the mailbox cache,
+unlink the token file. The `mailbox_serve_started` and
+`mailbox_serve_stopping` JSON log lines on stdout are the deterministic
+hooks for any log-shipper watching the process.
+
+## Health watchdog
+
+`packages/core/src/coordination/mailbox-health.ts` provides a
+`MailboxHealthWatchdog` that probes `/healthz` and sends a
+`mailbox-bridge-down` message to the project mailbox when the bridge stops
+responding (and a recovery message when it returns). Nothing starts it
+automatically and no slash command exists for it: host code constructs
+`new MailboxHealthWatchdog({ mailbox, url })` and calls `start()`. Defaults:
+probe every 15 s, 3 s timeout, alert after 2 consecutive failures.
+
+## Security notes
+
+- The token is the only credential. Anyone who can read
+  `~/.wrongstack/projects/<slug>/.mailbox.token` AND reach the bind host
+  can act on the project's mailbox. Loopback binding makes "reach"
+  require shell access on the host machine.
+- The shared bearer is **not bound to an agent identity or capability set**.
+  An authenticated caller supplies message `from`/type, registration ids, and
+  acknowledgement `readerId`; the bridge does not separately authorize
+  `steer`/control messages or prevent impersonation. Add an identity-aware
+  trusted proxy before exposing it beyond mutually trusted local clients.
+- Token comparison uses `timingSafeEqual`.
+- The bridge does NOT log message bodies. The structured
+  `mailbox_serve_started` event includes the bind URL, port, project dir,
+  and token path — never the token itself.
+- The HTTP server has no request logging at the access-log level. If
+  audit trails of which external agent called which route are needed,
+  the agent itself should log them client-side.
+
+## Out of scope
+
+- **Don't expose the bridge on `0.0.0.0` without a trusted reverse proxy.** Loopback binding makes "reach" require shell access on the host. LAN exposure without re-authentication and rate-limiting at the proxy is a trust leak.
+- **Don't log the bearer token.** The structured `mailbox_serve_started` event includes bind URL, port, project dir, and token path — never the token itself. Logging it once is a permanent compromise.
+- **Don't treat the bearer as identity-bound.** Every caller uses the same project token. The bridge does not separately authorize `steer`/control messages or prevent impersonation; the caller can claim any `from`, `type`, or `readerId`. Add an identity-aware trusted proxy before exposing beyond mutually trusted local clients.
+- **Don't expose the filesystem, shell, or non-mailbox tools through the bridge.** It is the mailbox surface only. If a caller needs more, they need a different bridge.
+- **Don't start the bridge for an external agent that already speaks MCP natively.** Use `wstack mcp serve` to expose WrongStack's full tool registry including the mailbox tool. Two bridges for the same purpose is operational debt.
+- **Don't start a second bridge for the same project.** The per-project lock makes later starts join the running bridge; an extra instance on another port only splits external agents between two endpoints.
+- **Don't hardcode a token into prompts or committed code.** Read it from `.mailbox.token` or accept it from the environment; re-read after a 401.
+- **Don't send `control` messages through the bridge.** Control is a runtime-only surface; the bridge doesn't expose it, and the only legitimate override is `steer` via the `mailbox_manage` route, not through the bridge.
+
+## Before returning
+
+- [ ] `wstack mailbox serve` (or `mbWithBootstrap`) used; no parallel implementation
+- [ ] Bind address is `127.0.0.1` unless behind a reverse proxy that re-authenticates
+- [ ] Bearer token read from `.mailbox.token` or env, not hardcoded
+- [ ] Token not present in any log line, event, or error message
+- [ ] Body cap of 256 KB enforced; rate limit of 120/min/token enforced
+- [ ] `/healthz` reachable; no auth or rate limit on the health probe
+- [ ] Pair with `wrongstack-mailbox` skill for external-agent usage
+- [ ] Graceful shutdown handles SIGINT/SIGTERM, flushes the cache, unlinks the token
+- [ ] Mailbox health watchdog wired if running unattended
+- [ ] No `control` messages; `steer` only via the canonical `mailbox_manage` route
+
+## Skills in scope
+
+- `prompt-engineering` — for the external-facing `wrongstack-mailbox`
+  skill that pairs with this one.
+- `node-modern` — for `AbortSignal.timeout` patterns the external agent
+  should use when calling these routes.
+- `output-standards` — for the `<nextsteps>` shape in the paired
+  external skill.
+- `security-scanner` — for confirming the bridge's bearer-token handling
+  matches project security conventions.
