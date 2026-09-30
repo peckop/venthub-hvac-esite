@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.
 > **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.
 
-Rol başına: ADMIN 9 · ALTYAPI 21 · ARAC 4 · GEO-SEO 1 · KATALOG 7 · OPS 10 · URUN 19
+Rol başına: ADMIN 9 · ALTYAPI 20 · ARAC 4 · EDGE 1 · GEO-SEO 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 10 · URUN 20
 
 | Cetvel | Sahip | Durum | Dayanak |
 |---|---|---|---|
@@ -29,7 +29,6 @@ Rol başına: ADMIN 9 · ALTYAPI 21 · ARAC 4 · GEO-SEO 1 · KATALOG 7 · OPS 1
 | db-grant-hygiene-standard.md | ALTYAPI | teyitli | alt ajan sınıflandırması (orta güven), OPS onaylı |
 | denetim-izi-standard.md | ALTYAPI | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | deploy-build-skip-standard.md | ALTYAPI | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
-| edge-function-security-standard.md | ALTYAPI | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | ledger-ve-olu-migration-standard.md | ALTYAPI | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | migration-safety-standard.md | ALTYAPI | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | notification-standard.md | ALTYAPI | teyitli | OPS sahipsiz alan kuralı: bildirim/e-posta |
@@ -41,7 +40,9 @@ Rol başına: ADMIN 9 · ALTYAPI 21 · ARAC 4 · GEO-SEO 1 · KATALOG 7 · OPS 1
 | hafiza-kancalari-standard.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | pano-orion-koprusu-standardi.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | tasarim-yetenek-standard.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
+| edge-function-security-standard.md | EDGE | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; önceki sahip ALTYAPI; ALTYAPI ve URUN dokunuşu kartta sınır satırı) |
 | canonical-url-standard.md | GEO-SEO | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
+| i18n-localization-standard.md | I18N | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; URUN uygulayıcı, kartta sınır satırı; başlıktaki "Sahibi: Recep" bu tabloyla değiştirildi) |
 | catalog-ingestion-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | category-taxonomy-standard.md | KATALOG | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
 | csv-import-export-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
@@ -49,6 +50,7 @@ Rol başına: ADMIN 9 · ALTYAPI 21 · ARAC 4 · GEO-SEO 1 · KATALOG 7 · OPS 1
 | pricing-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | product-image-standard.md | KATALOG | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
 | product-schema-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
+| mevzuat-kaydi-standard.md | MEVZUAT | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); cetvel v0.1 taslak, Recep onay kaydı bulunamadı |
 | execution-method-standard.md | OPS | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | hukum-kaynak-standard.md | OPS | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | is-kayit-duzeni-standard.md | OPS | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
@@ -61,6 +63,7 @@ Rol başına: ADMIN 9 · ALTYAPI 21 · ARAC 4 · GEO-SEO 1 · KATALOG 7 · OPS 1
 | work-tracking-ssot-standard.md | OPS | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | 3d-scene-lighting-research.md | URUN | teyitli | alt ajan sınıflandırması (orta güven), OPS onaylı |
 | 3d-showroom-ux-research.md | URUN | teyitli | alt ajan sınıflandırması (orta güven), OPS onaylı |
+| 3d-webgl-standard.md | URUN | teyitli | OPS kararı 2026-09-30 (sahipsiz cetvel atandı) |
 | adres-semasi-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | aile-metni-sayisal-standard.md | URUN | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | customer-account-standard.md | URUN | teyitli | OPS sahipsiz alan kuralı: müşteri yüzü (müşteri hesabı) |
