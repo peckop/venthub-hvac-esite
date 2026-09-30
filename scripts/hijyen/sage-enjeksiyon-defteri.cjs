@@ -155,4 +155,4 @@ function isaretle(satir, alan) {
   }
 }
 
-module.exports = { METIN_KARAKTER, panoDizini, nesil, defterYolu, yaz, oku, isaretle }
+module.exports = { METIN_KARAKTER, panoDizini, oturumKisa, nesil, defterYolu, yaz, oku, isaretle }

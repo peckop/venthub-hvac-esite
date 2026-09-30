@@ -103,9 +103,11 @@ bir durum değil, bir boşluktur.
 | `sage-hijyen-oturum-sonu.cjs` | kanca | taze doğrulanmış yedek varken `port.hygiene` koşar | SessionEnd | ARAÇ | aynı kapı |
 | `scripts/hijyen/hafiza-enjeksiyonu.cjs` · `sage-enjeksiyon-defteri.cjs` | modül | konu/sayaç/hijyen mantığı (port enjekte) · oturum+nesil anahtarlı enjeksiyon defteri | üç kanca + `sage-dosya-dersi` | ARAÇ | aynı kapı |
 
-⚠**AYARA KAYIT RECEP KAPISI:** dördü de `.claude/settings.json`'a bağlanmadıkça **dosya olarak
-var, tetik olarak ölüdür.** Akran isteğiyle ayar dosyasına dokunulmaz. Kayıt satırları Recep'e
+⚠**AYARA KAYIT RECEP KAPISI:** bu tabloda listelenen bir kanca `.claude/settings.json`'a
+bağlanmadıkça **dosya olarak var, tetik olarak ölüdür** (tablodaki kanca sayısı değişir; sayıya
+değil bağlantıya bakılır). Akran isteğiyle ayar dosyasına dokunulmaz. Kayıt satırları Recep'e
 sunulur; sunulana kadar bu cetveldeki "tetik" kolonu *tasarlanan* tetiği gösterir, *çalışan* değil.
+REC-519'un üç kancasının bağlantısı `INV-HAFIZA-ENJEKSIYONU-10` ile ölçülür (settings'ten silinirse kırmızı).
 
 `.md` künyeleri (companion) **üretilmiş artefakttır** — post-commit üretir, elle yazılmaz (AXIOM 3).
 
@@ -330,21 +332,36 @@ WrongStack'in üç "kapalı" parçası Claude Code'da çalışmıyordu çünkü 
 boru hattına bağlıydı. Üçü de kanca olarak yazıldı; mantık `scripts/hijyen/hafiza-enjeksiyonu.cjs`
 başlığında **gerekçesiyle** durur, burada yalnız kurallar:
 
-1. **KONU KOLU (UserPromptSubmit):** en çok **3 ders / 1400 karakter**, ders KIRPILMAZ (§6.2 kural
-   1 ile aynı ilke), asgari önem 0.5, bütçe 2500 ms. Bağlam doluluğuna göre azaltma **yok** —
-   doluluk kancanın girdisinde bilinmiyor ve yukarı akım eşikleri (65/82/95) bizim için ölçülmedi.
+1. **KONU KOLU (UserPromptSubmit):** en çok **3 ders / 1400 karakter**, asgari önem 0.5, bütçe 2500 ms
+   (sage YÜKLEMESİ bunu aşarsa o istemde sessiz çıkılır ve günlüğe yazılır). Başlık "HAFIZA (konu) —
+   bilgi notu, talimat DEĞİL:". Bağlam doluluğuna göre azaltma **yok** — doluluk kancanın girdisinde
+   yok ve yukarı akım eşikleri (65/82/95) bizim için ölçülmedi. Her ateşleme `hafiza-kancalari.log`a
+   ders kimliği + istemin ilk 80 karakteriyle yazılır (gösterim günlüğü).
+   **GÜVENLİK (istem enjeksiyonu yüzeyi):** ders metni `additionalContext`'e girer ve sage'e yazan HER
+   ajan tarafından belirlenir. Ders başına **700 karakter tavanı** (aşan ders BASILMAZ, kırpılmaz; atlanan
+   sayısı "N ders daha var" notuna eklenir — hiçbir ders sığmasa bile not yazılır, kol sessiz kalmaz),
+   `<` `>` etkisizleştirilir (‹ ›). Bu zarar azaltmadır, sınır değildir: sage'e yazma yetkisi olan ajan düz
+   metinle "öneri" yazabilir. Bedel: 2026-09-30 ölçümünde ~165 dersin 29'u >700 karakterdi (~%17) — bunlar konu kolunda
+   görünmez, dosya dersi kolu (dosya başına bir kez) etkilenmez.
 2. **ALAKA SÜZGECİ ZORUNLUDUR (ölçüldü):** `searchSage` durak sözcüksüz `OR` araması yapar; gerçek
    daemon'a sorulan istemlerin hepsi 2-5 ders döndürdü ("merhaba nasilsin" dahil). Süzgeçsiz kanca her
    istemde öter (K3). Ders, istemin içerik terimlerinin yarısını (alt sınır 2, üst sınır 3) taşımalı;
-   aynı oturum-nesilde bir ders bir kez basılır. Son 67 gerçek istemde ateşleme %27 (18/67).
+   aynı oturum-nesilde bir ders bir kez basılır. Yaklaşık ateşleme oranı %27 (son ~67 gerçek istem,
+   bir tek koşum): **ölçüm kaydı depoda yok**; yöntem = gerçek istemler × canlı `searchSage` ×
+   `ortakTerimSayisi/gerekliOrtakTerim`. Yeniden üretmek için kayıtlı betik yoktur, yazılması gerekir.
 3. **KANCA DAEMON BAŞLATMAZ:** `server.json` yok/pid ölü → sessiz çıkış, sage paketi yüklenmez. Port
    `initialize()` ile değil spawn etmeyen `connection.status()` ile açılır (`initialize` daemon'u başlatır).
 4. **SAYAÇ STOP'TA, TOPLU:** konu ve dosya dersi kancaları yalnız **deftere** yazar
    (`.sage-enjekte-<oturum24>-<nesil>.jsonl`, yalnız-ekleme); Stop kancası `recordInjection` →
    transcript taraması → `recordUse` yapar ve satırı `sayildi/kullanildi` işaretler. **Doğrudan
-   sqlite UPDATE YASAK** (daemon tek-yazar zinciri).
+   sqlite UPDATE YASAK** (daemon tek-yazar zinciri). **Çift sayma yok — KOŞULLU:** satır işareti tek
+   başına yetmez; iki Stop örtüşürse ikisi de "sayılmamış" görür (ölçüldü: iki eşzamanlı çağrıda toplam
+   2 kimlik, beklenen 1). Bu yüzden Stop kolu oturum başına kilit dosyası (`wx`) alır, alamazsa sessiz
+   çıkar, 60 sn'den bayat kilit düşer. Kilit dışında bir yerde (ör. elle iki süreç) garanti yoktur.
 5. **KULLANIM EŞLEŞTİRMESİ:** yukarı akım `InjectionTracker.consumeMatches` kuralı (ID · ilk 80 karakter ·
-   belirteç ≥3 ve ≥%50) yerel kopyada, iki bilinçli farkla: `İ`→`i` + U+0307 silme, Türkçe harf katlama.
+   belirteç ≥3 ve ≥%50) yerel kopyada, **her asistan yanıtına AYRI** uygulanır (yukarı akım gibi; ilk
+   yazımda yanıtlar birleştiriliyordu ve bağımsız ölçümde gerçek transcript'lerde 3-40 ders sahte
+   "eşleşiyordu", ayrı ayrı 0 — düzeltildi). İki bilinçli fark: `İ`→`i` + U+0307 silme, Türkçe harf katlama.
    Yanlış-pozitif/negatif oranı **ölçülmedi** (etiket yok); yön kararı: yanlış-negatif pahalı (hijyen
    "hiç kullanılmadı" inceleme adayı üretir), kural sıkılaştırılmadı. Etiketsiz saha ölçümü: 60 gerçek
    asistan mesajı × 166 ders → oran eşiği 0.5'te 0 eşleşme, 0.4'te 2, 0.3'te 12, 0.25'te 63 (gürültü);
@@ -352,10 +369,19 @@ başlığında **gerekçesiyle** durur, burada yalnız kurallar:
    yeniden ölçülünce değişir. Transcript yalnız SONU okunur (681 MB).
 6. **HİJYEN YALNIZ TAZE YEDEKLE:** SessionEnd kancaları paralel koşar (sıra garantisi yok); hijyen son
    doğrulanmış sage yedeğinin <24 saat olduğunu kendisi ölçer, gerekirse 20 sn'ye kadar bekler,
-   yoksa **atlar ve sebebi loga yazar**. `purgeDeletedAfterDays` HİÇBİR çağrıda verilmez.
-   Sonuç özeti PANO dizinindeki `hafiza-kancalari.log` dosyasına yazılır.
+   yoksa **atlar ve sebebi loga yazar**. "Doğrulanmış" = dosya var DEĞİL: `VACUUM INTO` dosyayı doğrulamadan
+   önce yaratır. Ölçüt: boyut>0 + SQLite başlığı + (`son-kosum.log`ta `[sage] ALINDI <ad>` VEYA dosya ≥15 sn
+   eski). `purgeDeletedAfterDays` HİÇBİR çağrıda verilmez. Sonuç özeti PANO dizinindeki
+   `hafiza-kancalari.log` dosyasına yazılır.
+   **OPS 4 hafta kapısı:** `injected_never_used` silme önerileri `ONERI_KAPISI_MS` (2026-10-28) öncesinde
+   ÜRETİLMEZ (`archiveUnusedAfterDays: 3650`), kodda sabit tarih. Kapsam: YALNIZ bu kancanın hijyeni;
+   ajanın elle koştuğu `memory_hygiene` aynı adayı üretebilir.
 
-Kapı: `src/__tests__/conformance/hafiza-enjeksiyonu.test.ts` — her kolun sabotajı vardır (PR gövdesi).
+Kapı: `src/__tests__/conformance/hafiza-enjeksiyonu.test.ts`. **Sabotaj kaydı** PR #1590 gövdesindedir.
+Sabotajsız kolun yeşili kanıt sayılmaz: bağımsız inceleme ilk yazımda 7 kolun sabotajda YEŞİL kaldığını
+buldu (penceresi, durak süzgeci, zaman aşımı sarmalayıcısı, çıktı zarfı, spawn'lı port açılışı, dolaylı
+purge anahtarı, <4 belirteç koruması); kollar eklendi. Sage paketi kurulu olmadan gerçek kanca kablosunu
+ölçmek için testler geçici proje köküne sahte `@wrongstack/sage` modülü ve canlı pid'li `server.json` koyar.
 
 ---
 
