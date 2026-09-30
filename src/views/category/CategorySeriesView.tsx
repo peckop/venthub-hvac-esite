@@ -94,14 +94,14 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                 listesini hiç çizmiyordu; üst kategorisi `series` modunda olan alt sayfa Google'a yetim kalıyordu
                 (GEO-SEO taraması 2026-09-30: yedek-parca-ve-sensorler). Adres `Routes.category` (adresUret). */}
             {subCategories.length > 0 && (
-                <nav aria-label={t('category.showcase.subGroups')} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
-                    <h2 className="text-sm font-black text-secondary-blue uppercase tracking-hvac-relaxed mb-6">{t('category.showcase.subGroups')}</h2>
+                <nav aria-label={t('category.showcase.subGroups')} className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+                    <h2 className="text-sm font-bold text-secondary-blue uppercase tracking-hvac-relaxed mb-6">{t('category.showcase.subGroups')}</h2>
                     <ul className="flex flex-wrap gap-3">
                         {subCategories.map((sub) => (
                             <li key={sub.id}>
                                 <Link
                                     href={Routes.category(getLocalizedCategorySlug(category, lang), getLocalizedCategorySlug(sub, lang))}
-                                    className="inline-block px-5 py-3 rounded-full border border-slate-200 text-slate-700 font-medium hover:border-cyan-500 hover:text-cyan-600 focus-visible:ring-2 focus-visible:ring-cyan-500 transition-colors"
+                                    className="inline-block px-5 py-3 rounded-full border border-industrial-gray text-industrial-gray font-medium hover:border-secondary-blue hover:text-secondary-blue focus-visible:ring-2 focus-visible:ring-secondary-blue transition-colors"
                                 >
                                     {wrapCategory(sub)?.displayName || getCategoryDisplayName(sub, t)}
                                 </Link>
