@@ -57,6 +57,19 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
 
 Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri alma kararı planın §11'indedir.
 
+### Y3.1 Site haritası `lastmod` — gerçek değişiklik ya da hiç (REC-454, 2026-09-30)
+
+- `lastmod` yalnız sayfada görünen verinin **gerçek** değişiklik tarihinden gelir: kategori `categories.updated_at`,
+  ürün ailesi = ailenin ve aktif varyantlarının en son `updated_at`'i (`getFamilyLastModified`), rehber yazısı
+  `guncellemeTarihi`. Güvenilir kaynağı olmayan satırda (sabit sayfalar, markalar, seri adresi) alan **yazılmaz**.
+- Üretim anı (`new Date()`) lastmod olarak YAZILMAZ. Kapı: INV-SITEMAP-LASTMOD-1 (`src/app/__tests__/sitemapLastmod.test.ts`).
+- **Niçin (ölçüm, 2026-09-29):** canlı haritada 87 adresin 61'i her gün "bugün" taşıyordu. Google lastmod'u yalnız
+  tutarlı biçimde doğruysa kullanır; her şeyi her gün değişmiş ilan eden haritanın tarihlerini yok sayar ve yeni
+  sayfanın gerçek tarihi de kaybolur. Aynı gün GSC: 83 dizinli sayfanın 81'ine son uğrama 8–30 gün önce.
+  Aile/varyant `updated_at` sütunlarının gerçek değişikliği gösterdiği ölçüldü (2026-09-30: 47 aile, tarihler
+  08-27…09-26 arasına yayılmış; toplu günlük yazım bu sütunları oynatmıyor). Toplu bir yazım bu sütunu her gün
+  oynatmaya başlarsa kural yine çiğnenmiş olur — o gün kaynak alan yeniden seçilir.
+
 ## Y4 — Kusurun sahibi
 
 | Kusur | Sahip |

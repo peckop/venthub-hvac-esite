@@ -559,3 +559,37 @@ export async function getAllFamilySlugs(
   }
   return slugs
 }
+
+/**
+ * Site haritası `lastmod` kaynağı (REC-454): aile slug'ı → ailenin ve AKTİF varyantlarının en son
+ * `updated_at`'i. Sayfada görünen veri (aile metni, model satırları) bu iki tablodan gelir.
+ *
+ * NİÇİN: harita her üretimde `new Date()` yazıyordu → 87 adresin 61'i her gün "bugün değişti".
+ * Google lastmod'u yalnız tutarlı biçimde doğruysa kullanır; her gün her şeyi değişmiş ilan eden
+ * haritada tarihi yok sayar (yeni rehber yazısının gerçek tarihi de kaybolur). 2026-09-30 ölçümü:
+ * bu iki sütun gerçek değişikliği gösteriyor (47 aile, tarihler 08-27…09-26 arasına yayılmış,
+ * toplu günlük yazımla oynamıyor).
+ *
+ * Aktif varyantı olmayan aile haritada zaten yok; seri slug'larının kendi varyantı olmadığı için
+ * burada YOKTUR → çağıran lastmod YAZMAZ (uydurma tarih yok). Hata FIRLATILIR (yutulmaz).
+ */
+export async function getFamilyLastModified(
+  supabase: SupabaseClient<Database>
+): Promise<Map<string, string>> {
+  const { data, error } = await supabase
+    .from('product_families')
+    .select('slug, updated_at, products(updated_at, status, deleted_at)')
+    .is('deleted_at', null)
+    .range(0, 4999)
+  if (error) throw error
+  const sonuc = new Map<string, string>()
+  for (const aile of data ?? []) {
+    const aktif = (aile.products ?? []).filter((p) => p.status === 'active' && p.deleted_at === null)
+    if (!aile.slug || aktif.length === 0) continue
+    const enSon = [aile.updated_at, ...aktif.map((p) => p.updated_at)]
+      .filter((t): t is string => typeof t === 'string')
+      .reduce((a, b) => (Date.parse(b) > Date.parse(a) ? b : a), '1970-01-01T00:00:00Z')
+    sonuc.set(aile.slug, enSon)
+  }
+  return sonuc
+}
