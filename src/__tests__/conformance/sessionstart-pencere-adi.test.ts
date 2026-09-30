@@ -358,10 +358,11 @@ describe('INV-SESSIONSTART-AD-5 · mevcut additionalContext KORUNUR (regresyon)'
   })
 })
 
-describe('INV-SESSIONSTART-AD-8 · session_title DOLUYSA (elle/önceden verilmiş ad) sessionTitle EZMEZ (ORTA-1)', () => {
-  // Belge (SessionStart girdisi): `session_title` = başlık zaten ayarlıysa (--name, /rename) dolu gelir.
+describe('INV-SESSIONSTART-AD-8 · session_title: FARKLI dolu ad EZİLMEZ; boş ya da tablodaki adla AYNI ise kanonik ad YAZILIR', () => {
+  // Belge (SessionStart girdisi): `session_title` = başlık zaten ayarlıysa (--name, /rename) dolu gelir. Ölçüm (Ops): restart/
+  // resume'da harness dökümdeki /rename adını geri yüklemiyor, pid kaydına türetilmiş ad yazıyor → aynı değeri yazmak zararsız.
   for (const source of ['startup', 'resume', 'fork']) {
-    it(`${source}: session_title dolu → alan yok, talep olsa bile`, () => {
+    it(`${source}: session_title FARKLI ve dolu → alan yok, talep olsa bile`, () => {
       const pano = yeniPano()
       talepYaz(pano, 'ARAC')
       const s = calistir(source, pano, {}, { session_title: 'Recep-in-verdigi-ad' })
@@ -371,10 +372,60 @@ describe('INV-SESSIONSTART-AD-8 · session_title DOLUYSA (elle/önceden verilmi�
     })
   }
 
-  it('session_title tablodaki adın aynısıysa da alan yok (kancanın kendi eski adı tekrar yazılmaz; sonuç aynı)', () => {
+  it('farklı ad ezilmez: "Araç-2", tablodaki BAŞKA şeridin adı ("Ops") ve önek/sonek benzerleri', () => {
+    for (const farkli of ['Araç-2', 'Ops', 'Arac Yeni', 'Araçlar', 'A', 'venthub-hvac-72']) {
+      const pano = yeniPano()
+      talepYaz(pano, 'ARAC')
+      expect(alanVar(calistir('resume', pano, {}, { session_title: farkli })), farkli).toBe(false)
+    }
+  })
+
+  it('AYNI ad (harf/Türkçe harf farksız) → kanonik biçim YAZILIR: Araç = arac = ARAÇ = ARAC = araç = " Araç "', () => {
+    for (const ayni of ['Araç', 'arac', 'ARAÇ', 'ARAC', 'araç', 'Arac', ' Araç ', 'ARAC\t']) {
+      const pano = yeniPano()
+      talepYaz(pano, 'ARAC')
+      const s = calistir('resume', pano, {}, { session_title: ayni })
+      expect(s.durum).toBe(0)
+      expect(s.baslik, JSON.stringify(ayni)).toBe('Araç') // kanonik: tablodaki yazım, gelen yazım DEĞİL
+    }
+  })
+
+  it('Türkçe harf katlaması tabloda: Ü/Ö/Ç/Ş/Ğ/İ/ı — ÜRÜN=urun, ALTYAPI=altyapı, GEO-SEO=geo-seo', () => {
+    for (const [serit, ayni, kanonik] of [
+      ['URUN', 'ÜRÜN', 'Ürün'],
+      ['URUN', 'urun', 'Ürün'],
+      ['URUN', 'ürün', 'Ürün'],
+      ['ALTYAPI', 'altyapı', 'Altyapı'],
+      ['ALTYAPI', 'ALTYAPI', 'Altyapı'],
+      ['ALTYAPI', 'Altyapi', 'Altyapı'],
+      ['GEO-SEO', 'geo-seo', 'Geo-SEO'],
+      ['GEO-SEO', 'GEO-SEO', 'Geo-SEO'],
+      ['OPS', 'OPS', 'Ops'],
+    ] as const) {
+      const pano = yeniPano()
+      talepYaz(pano, serit)
+      expect(calistir('startup', pano, {}, { session_title: ayni }).baslik, `${serit} / ${ayni}`).toBe(kanonik)
+    }
+  })
+
+  it('tabloda olmayan şerit: İ/ı/Ş katlaması da geçerli (IZMIR → "Izmir"; session_title "İZMİR" aynı sayılır)', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'IZMIR')
+    expect(calistir('resume', pano, {}, { session_title: 'İZMİR' }).baslik).toBe('Izmir')
+    const kalan = yeniPano()
+    talepYaz(kalan, 'ISIK')
+    expect(calistir('resume', kalan, {}, { session_title: 'ışık' }).baslik).toBe('Isik')
+  })
+
+  it('aynı ad ama başka CANLI oturum aynı adı alıyor: çakışma kuralı önce gelir, alan yok', () => {
     const pano = yeniPano()
     talepYaz(pano, 'ARAC')
+    talepYaz(pano, 'ARAC', new Date().toISOString(), BASKA_SID)
     expect(alanVar(calistir('resume', pano, {}, { session_title: 'Araç' }))).toBe(false)
+  })
+
+  it('aynı ad ama talep YOK: yazılmaz (talep yokken alan hiç eklenmez, mevcut ad zaten korunur)', () => {
+    expect(alanVar(calistir('resume', yeniPano(), {}, { session_title: 'Araç' }))).toBe(false)
   })
 
   it('session_title boş/yalnız boşluk/yok/string değil → alan VAR ve tablodaki ad yazılır', () => {
@@ -422,6 +473,19 @@ describe('INV-SESSIONSTART-AD-9 · aynı adı alacak başka CANLI oturum varsa a
     talepYaz(birakilmis, 'ARAC', new Date().toISOString(), BASKA_SID)
     olayYaz(birakilmis, { type: 'release' }, BASKA_SID)
     expect(calistir('resume', birakilmis).baslik).toBe('Araç')
+  })
+
+  it('başka canlı oturumun kayıtlı adı harf/Türkçe harf farkıyla aynıysa ("arac") da çakışma sayılır', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    talepYaz(pano, 'OPS', new Date().toISOString(), BASKA_SID)
+    const kayit = path.join(kayitDizini, '434343.json')
+    fs.writeFileSync(kayit, JSON.stringify({ sessionId: BASKA_SID, name: 'ARAÇ' }), 'utf8')
+    try {
+      expect(alanVar(calistir('resume', pano))).toBe(false)
+    } finally {
+      fs.rmSync(kayit, { force: true })
+    }
   })
 
   it('başka canlı oturumun PENCERE ADI zaten aynıysa (talebi başka şeritte olsa da) alan yok', () => {
@@ -482,6 +546,8 @@ describe('INV-SESSIONSTART-AD-10 · BAYAT (TTL dolmuş) talep KENDİ sid için a
 describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynaktır: tablo dışa aktarılır, ad() ölçülür', () => {
   const modul = createRequire(path.join(KOK, 'package.json'))('./scripts/board/pencere-adlari.cjs') as {
     ad: (serit: unknown) => string
+    katla: (metin: unknown) => string
+    ayniMi: (a: unknown, b: unknown) => boolean
     TABLO: ReadonlyArray<readonly [string, string]>
     PENCERE_ADLARI: Map<string, string>
   }
@@ -520,6 +586,28 @@ describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynakt�
     expect(modul.ad('ıslak')).toBe('Islak')
     expect(modul.ad('ÜRUNX')).toBe('Ürunx') // ayrık Ü → tek karakter Ü, sonra küçültme
     expect(modul.ad('ÜRUNX')).toBe('Ürunx'.normalize('NFC'))
+  })
+
+  it('ayniMi(): harf ve Türkçe harf farksız eşitlik; boş ve farklı adlar eşit DEĞİL', () => {
+    const esit: ReadonlyArray<readonly [string, string]> = [
+      ['Araç', 'arac'], ['ARAÇ', 'Araç'], ['ÜRÜN', 'Ürün'], ['urun', 'ÜRÜN'], ['altyapı', 'ALTYAPI'],
+      ['İZMİR', 'izmir'], ['ışık', 'ISIK'], ['ÖĞRENCİ', 'ogrenci'], ['ŞEHİR', 'sehir'], [' Araç ', 'araç'],
+      ['ÜRUN', 'Ürün'], // ayrık ve tek karakterli Ü aynı
+    ]
+    for (const [a, b] of esit) expect(modul.ayniMi(a, b), `${a} = ${b}`).toBe(true)
+    const farkli: ReadonlyArray<readonly [string, string]> = [
+      ['Araç', 'Araç-2'], ['Ops', 'Araç'], ['Araç', 'Araçlar'], ['', ''], ['   ', ''], ['', 'Araç'], ['Araç', ''],
+    ]
+    for (const [a, b] of farkli) expect(modul.ayniMi(a, b), `${JSON.stringify(a)} ≠ ${JSON.stringify(b)}`).toBe(false)
+  })
+
+  it('katla(): bozuk girdide istisna atmaz', () => {
+    expect(modul.katla(undefined)).toBe('undefined')
+    expect(modul.katla(null)).toBe('null')
+    const patlayan = { toString: (): string => { throw new Error('toString patladı') } }
+    expect(() => modul.katla(patlayan)).not.toThrow()
+    expect(modul.katla(patlayan)).toBe('')
+    expect(modul.ayniMi(patlayan, patlayan)).toBe(false) // iki taraf da '' → eşit SAYILMAZ
   })
 
   it('ad(): ayrık yazım 60 sınırından ÖNCE NFC olur — birleştirici işaret tabandan ayrı kesilmez', () => {

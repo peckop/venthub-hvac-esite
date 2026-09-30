@@ -280,9 +280,11 @@ function rolKartiSatiri(lane) {
  * eşlemesi (SendMessage) karışır (REC-404). Ad oturumla KALICIdır: bir kez verilince sonraki resume'lar da taşır.
  *
  * KURALLAR:
- *  · ELLE/ÖNCEDEN VERİLMİŞ AD EZİLMEZ (ORTA-1): belge (SessionStart girdisi) `session_title` alanını verir — "oturum
- *    başlığı zaten ayarlıysa (--name, /rename)"; doluysa alan HİÇ eklenmez. Kanca Recep'in elle verdiği adı görebilir
- *    ve ezmez; kendi verdiği ad da bir sonraki açılışta `session_title` dolu geldiği için tekrar yazılmaz (sonuç aynı);
+ *  · ELLE VERİLMİŞ FARKLI AD EZİLMEZ (ORTA-1): belge (SessionStart girdisi) `session_title` alanını verir — "oturum
+ *    başlığı zaten ayarlıysa (--name, /rename)". Dolu VE tablodaki adla farklıysa alan HİÇ eklenmez. Boşsa ya da
+ *    tablodaki adla AYNIYSA (harf ve Türkçe harf farksız: "Araç" = "arac" = "ARAÇ") kanonik ad YAZILIR (REC-525 takip:
+ *    restart/resume'da harness dökümdeki /rename adını geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri
+ *    yazmak sonucu değiştirmez, kaydı düzeltir);
  *  · yalnız pano talebi varsa; talep yoksa alan HİÇ eklenmez (`CC_LANE` yedeği de kullanılmaz: ortam değişkeni bir
  *    ad taahhüdü değil, rol ipucudur). Talep BAYAT (TTL 4 saat, makine kapanıp sabah resume) olsa da KENDİ sid'inin
  *    talebiyse ad verilir (ORTA-3, `board.tumTalepler`; başka pencerenin talebi karışmaz); BIRAKILMIŞ talep ad vermez;
@@ -306,21 +308,24 @@ function rolKartiSatiri(lane) {
 const PENCERE_ADI_KAYNAKLARI = new Set(['startup', 'resume', 'fork'])
 let pencereAdi = ''
 /**
- * Bu pencerenin adı ('' = alan eklenmez). Sırayla: ad zaten verilmiş mi (ORTA-1) → kendi sid'inin talebi (bayat dahil,
- * bırakılmış hariç; ORTA-3) → tablodan ad → başka canlı oturum aynı adı alıyor/taşıyor mu (ORTA-2). Her hata → ''.
+ * Bu pencerenin adı ('' = alan eklenmez). Sırayla: kendi sid'inin talebi (bayat dahil, bırakılmış hariç; ORTA-3) →
+ * tablodan ad → mevcut `session_title` dolu VE tablodaki adla FARKLIYSA ezme (Recep'in verdiği başka ad, ORTA-1);
+ * boş ya da aynıysa (harf/Türkçe harf farksız, `ayniMi`) kanonik adı YAZ (REC-525 takip: restart/resume'da harness
+ * dökümdeki adı geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri yazmak sonucu değiştirmez) →
+ * başka canlı oturum aynı adı alıyor/taşıyor mu (ORTA-2). Her hata → ''.
  */
 function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
   try {
-    if (typeof mevcutAd === 'string' && mevcutAd.trim()) return ''
     const benim = board.tumTalepler().find((c) => c.sid === kendiSid)
     if (!benim) return ''
     const modul = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
     const ad = modul.ad(benim.lane)
     if (!ad) return ''
+    if (typeof mevcutAd === 'string' && mevcutAd.trim() && !modul.ayniMi(mevcutAd, ad)) return ''
     const digerleri = live.filter((c) => c.sid !== kendiSid)
     if (digerleri.some((c) => modul.ad(c.lane) === ad)) return ''
     const adlar = board.pencereAdlari()
-    if (digerleri.some((c) => adlar.get(c.sid) === ad)) return ''
+    if (digerleri.some((c) => modul.ayniMi(adlar.get(c.sid), ad))) return ''
     return ad
   } catch {
     return '' // modül/pano hatası: alan eklenmez, mevcut çıktı aynen (fail-open)
