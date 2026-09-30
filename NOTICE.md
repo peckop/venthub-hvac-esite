@@ -18,6 +18,7 @@
 | henchmarketing-rgb/headroom | MIT | Bağlam-doluluk çubuğu fikri (uygulama bizden) | `.claude/statusline.cjs` |
 | WrongStack (Ersin Koç) | MIT | "Düzenlenen dosyanın testini o anda koş" fikri (`test-runner-gate`); uygulama bizden | `.claude/hooks/verify-on-stop.cjs` |
 | WrongStack (Ersin Koç) — `@wrongstack/core` 1.0.26 skill'leri: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp` | MIT | Skill gövdesi **olduğu gibi**; başa araç eşlemesi + VentHub ek kuralları (bizden), açıklama yeniden yazıldı | `.claude/skills/{verify-before-done,multi-agent,wrongstack-kanban,wrongstack-mailbox-mcp}/SKILL.md` |
+| WrongStack (Ersin Koç; telif ECOSTACK TECHNOLOGY OÜ) — `@wrongstack/core` 1.0.26 skill'leri: `mailbox-bridge`, `wrongstack-mailbox` | MIT | Skill gövdesi **olduğu gibi**; başa durum, araç eşlemesi + VentHub ek kuralları (bizden). HAZIR klasöründe, köprü sunucusu kurulana kadar etkin değil | `.claude/skills-hazir/{mailbox-bridge,wrongstack-mailbox}/SKILL.md` |
 | shadcn/ui | MIT © shadcn | Bileşen temeli (stack'te) | `src/components/ui/` |
 | `fallow` skill'i — Bart Waardenburg, `docs.fallow.tools` | MIT (skill künyesinde yazılı) | Skill dosyası **olduğu gibi** (yöntem değil, metnin kendisi) | `.claude/skills/fallow/`, `.agent/skills/fallow/` |
 | `git-commit` skill'i | MIT (skill künyesinde yazılı) | Skill dosyası olduğu gibi | `.claude/skills/git-commit/`, `.agent/skills/git-commit/` |
