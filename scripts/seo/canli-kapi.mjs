@@ -22,7 +22,9 @@
  *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse).
  *
  * Kullanım: node scripts/seo/canli-kapi.mjs [--taban https://venthub.com.tr] [--cikti <depo dışı klasör>]
- *           [--bilinen <json>] [--bugun YYYY-MM-DD]
+ *           [--bilinen <json>] [--kayit-durum <json>] [--bugun YYYY-MM-DD]
+ *   --kayit-durum: `{ "REC-nn": {"ad":"Todo","tip":"unstarted"} }`; verilmezse durum Linear'dan LINEAR_API_KEY ile çekilir.
+ *   Kaydı Done/Canceled olan ya da REC'e bağlı olmayan bilinen satırı KIRMIZI sayılır (susturma kalıcı olamaz).
  *   --bilinen: `{ "KOD": "REC-nn" }`; bilinen KIRMIZI "BİLİNEN(REC-nn)" basılır ve çıkışı 1 YAPMAZ (kod adı tam eşleşir
  *   ya da `KOD-` ailesidir: "JSONLD" → JSONLD-ISPARTOF); listede olmayan yeni KIRMIZI çıkışı 1 yapar. Varsayılan:
  *   bilinen yok, her KIRMIZI çıkış 1 verir. UYARI çıkışı hiçbir zaman etkilemez.
@@ -460,6 +462,63 @@ export function bilinenUygula(bulgular, bilinen = {}) {
   })
 }
 
+const KAPALI_DURUM_TIPLERI = new Set(['completed', 'canceled'])
+const KAPALI_DURUM_ADLARI = new Set(['done', 'canceled', 'cancelled', 'duplicate'])
+
+/**
+ * Bilinen listesi kalıcı susturucuya dönmesin: her satır açık bir REC kaydına bağlı olmalı ve kaydı Done/Canceled
+ * olan satır KIRMIZI sayılır. `durumlar`: {'REC-nn': {ad, tip}} (Linear durumu; ölçülemeyen kayıt anahtarı yoktur).
+ * Döner: {gecerli: {KOD: 'REC-nn'}, bulgular: [...]}. Ölçülemeyen kayıt susturmayı bozmaz ama UYARI basar.
+ */
+export function bilinenDogrula(bilinen = {}, durumlar = {}) {
+  const gecerli = {}
+  const bulgular = []
+  for (const [kod, kayit] of Object.entries(bilinen)) {
+    if (typeof kayit !== 'string' || !/^REC-\d+$/.test(kayit)) {
+      bulgular.push(bulgu('BILINEN-KAYITSIZ', 'KIRMIZI', kod, `bilinen satırı açık bir REC kaydına bağlı değil (${JSON.stringify(kayit)})`))
+      continue
+    }
+    const d = durumlar[kayit]
+    if (!d) {
+      gecerli[kod] = kayit
+      bulgular.push(bulgu('BILINEN-KAYIT-OLCULEMEDI', 'UYARI', kod, `${kayit} durumu ölçülemedi; susturma geçerli sayıldı`))
+      continue
+    }
+    if (KAPALI_DURUM_TIPLERI.has(String(d.tip || '').toLowerCase()) || KAPALI_DURUM_ADLARI.has(String(d.ad || '').toLowerCase())) {
+      bulgular.push(bulgu('BILINEN-KAYIT-KAPALI', 'KIRMIZI', kod, `${kayit} ${d.ad || d.tip} durumunda ama kusur hâlâ canlıda; susturma geçersiz`))
+      continue
+    }
+    gecerli[kod] = kayit
+  }
+  return { gecerli, bulgular }
+}
+
+/**
+ * Linear'dan REC kayıtlarının durumunu çeker (LINEAR_API_KEY ortam değişkeni; anahtar yoksa ya da hata varsa boş döner).
+ * @param {string[]} kayitlar
+ * @param {string} [anahtar]
+ * @param {(url: string, init: object) => Promise<{ json: () => Promise<{ data?: { issue?: { state?: { name: string, type: string } } } }> }>} [istekFn]
+ * @returns {Promise<Record<string, { ad: string, tip: string }>>}
+ */
+export async function kayitDurumlariCek(kayitlar, anahtar = process.env.LINEAR_API_KEY, istekFn = fetch) {
+  const durumlar = {}
+  if (!anahtar) return durumlar
+  for (const kayit of kayitlar) {
+    try {
+      const r = await istekFn('https://api.linear.app/graphql', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: anahtar },
+        body: JSON.stringify({ query: 'query($id:String!){issue(id:$id){identifier state{name type}}}', variables: { id: kayit } }),
+        signal: AbortSignal.timeout(ISTEK_ZAMAN_ASIMI_MS),
+      })
+      const j = await r.json()
+      const s = j?.data?.issue?.state
+      if (s) durumlar[kayit] = { ad: s.name, tip: s.type }
+    } catch { /* ölçülemedi: bilinenDogrula UYARI basar */ }
+  }
+  return durumlar
+}
+
 /** Çıkış kodu: araç hatası 2 · bilinmeyen KIRMIZI 1 · aksi 0 (UYARI ve bilinen KIRMIZI çıkışı etkilemez). */
 export function cikisKodu(bulgular, aracHatalari = []) {
   if (aracHatalari.length > 0) return 2
@@ -618,7 +677,16 @@ async function calistir() {
   try { veri = await topla(taban, bugun) } catch (e) {
     console.error(`HATA: ölçüm başlatılamadı (${e.message})`); process.exit(2)
   }
-  const bulgular = bilinenUygula(kontrolEt(veri), bilinen)
+  let durumlar = {}
+  if (deger('--kayit-durum')) {
+    try { durumlar = JSON.parse(readFileSync(deger('--kayit-durum'), 'utf8')) } catch (e) {
+      console.error(`HATA: --kayit-durum okunamadı (${e.message})`); process.exit(2)
+    }
+  } else {
+    durumlar = await kayitDurumlariCek(Object.values(bilinen).filter((k) => typeof k === 'string'))
+  }
+  const dogrulama = bilinenDogrula(bilinen, durumlar)
+  const bulgular = [...bilinenUygula(kontrolEt(veri), dogrulama.gecerli), ...dogrulama.bulgular]
   const ozet = ozetSatirlari(bulgular)
   const kirmizi = bulgular.filter((b) => b.seviye === 'KIRMIZI')
   const yeni = kirmizi.filter((b) => !b.bilinen)
