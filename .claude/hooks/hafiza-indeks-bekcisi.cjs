@@ -47,6 +47,20 @@
  * Bu, worktree oturumlarındaki eski kör noktayı da kapatır (kendi proje dizininde `memory/`
  * yoktu ve kol sessizce hiç koşmuyordu).
  *
+ * ⭐DEPARTMAN GENİŞLEMESİ (2026-09-30, HARİTA kararı 4, şartname hafiza-yazma-duzeni §7): kapsam
+ * `.../memory/departman/<ROL>/MEMORY.md` dosyalarını da tanır. Departman indeksi Claude'un yerleşik
+ * yoluyla YÜKLENMEZ; açılışta SessionStart kancası onu rol kartıyla enjekte eder ve enjeksiyonun
+ * ÜST SINIRI 60 satır / 8 KB'tır (aşan kısım sessizce kesilir). Bekçi aynı sayıyı YUMUŞAK eşik
+ * olarak kullanır: yoksa bekçiden geçen bir indeks enjeksiyonda görünmeden kırpılırdı.
+ *   - Departman YUMUŞAK eşiği: 60 satır / 8 KB — AŞILINCA (>) UYARIR, ENGEL DEĞİL (60 satırın
+ *     kendisi enjeksiyona sığar; kesilen ilk satır 61. satırdır).
+ *   - SERT eşik ana indeksle AYNI (200 satır / 25 KB) ve engel dalı TEKTİR (KOL C).
+ *   - KOL B'nin "katlanmış mı" araması departmanın KENDİ dizininde yapılır (konu dosyaları
+ *     `departman/<ROL>/<konu>.md`); ana hafıza dizininde aranmaz.
+ *   - ANA `memory/MEMORY.md` davranışı DEĞİŞMEZ (regresyon testi).
+ * Tanıma yalnız yola bakar (`memory/departman/<ROL>/MEMORY.md`, harf duyarsız: NTFS); `docs/departman/...`
+ * ya da `memory/departman/<ROL>/alt/MEMORY.md` gibi başka yerler susar.
+ *
  * ⛔MUTLAK YOL YAZILMAZ (cetvel §24 — depo 2026-08-15'ten beri PUBLIC, kullanıcı adı taşıyan
  * yol kimlik sızdırır): dizin, yazılan dosyanın kendi yolundan türetilir, gövdeye gömülmez.
  *
@@ -79,6 +93,14 @@ const YUMUSAK_SATIR = 160
 const SERT_BAYT = 25000
 const SERT_SATIR = 200
 
+/**
+ * DEPARTMAN indeksi yumuşak eşiği = SessionStart enjeksiyonunun üst sınırı (şartname §7).
+ * Ana indeksin `>=` ölçütünden FARKLI olarak AŞILINCA (>) uyarır: 60 satır enjeksiyona sığar.
+ * Sert eşik (SERT_*) ana indeksle ortaktır.
+ */
+const DEPARTMAN_YUMUSAK_BAYT = 8000
+const DEPARTMAN_YUMUSAK_SATIR = 60
+
 /** Kayıp satır raporunda gösterilecek en fazla satır; kalanı sayıyla söylenir. */
 const EN_FAZLA_GOSTER = 5
 
@@ -99,12 +121,30 @@ function stdinOku() {
 }
 
 /**
- * Hedef, bir hafıza indeksi mi? `.../memory/MEMORY.md` — yalnız ad değil, klasör de doğrulanır.
- * Ad ölçütü tek başına depodaki ya da bir test klasöründeki başka bir `MEMORY.md`'yi de yakalardı.
+ * Hedef hangi tür hafıza indeksi? `'ana'` (`.../memory/MEMORY.md`), `'departman'`
+ * (`.../memory/departman/<ROL>/MEMORY.md`) ya da `null` (indeks değil → kanca susar).
+ * Yalnız ad değil klasör de doğrulanır: ad ölçütü tek başına depodaki ya da bir test klasöründeki
+ * başka bir `MEMORY.md`'yi de yakalardı.
+ *
+ * ANA tür eski ölçütle AYNEN tanınır (kesin harf, ham yol): davranış değişmez.
+ * DEPARTMAN türü `..` giderilmiş yolda ve harf duyarsız aranır (NTFS: `Departman\urun\memory.md`
+ * aynı dosyadır); `memory` klasörü ŞARTTIR, çünkü hafıza dizini dışındaki `departman/` başka şeydir.
  */
-function indeksMi(filePath) {
+function indeksTuru(filePath) {
   const p = String(filePath).replace(/\\/g, '/')
-  return path.posix.basename(p) === 'MEMORY.md' && path.posix.basename(path.posix.dirname(p)) === 'memory'
+  if (path.posix.basename(p) === 'MEMORY.md' && path.posix.basename(path.posix.dirname(p)) === 'memory') return 'ana'
+  const s = path.posix.normalize(p).split('/')
+  const n = s.length
+  if (
+    n >= 4 &&
+    s[n - 1].toLowerCase() === 'memory.md' &&
+    s[n - 2] !== '' &&
+    s[n - 3].toLowerCase() === 'departman' &&
+    s[n - 4].toLowerCase() === 'memory'
+  ) {
+    return 'departman'
+  }
+  return null
 }
 
 /** Satır sayısı: sondaki satır sonu fazladan boş satır sayılmaz; boş dosya 0 satırdır. */
@@ -193,11 +233,18 @@ function main() {
   modeleIlet.oturum(girdi.session_id) // aynı uyarı bu oturumda modele bir kez gider
   const ti = girdi.tool_input || {}
   const filePath = ti.file_path || ''
-  if (!indeksMi(filePath)) process.exit(0)
+  const tur = indeksTuru(filePath)
+  if (!tur) process.exit(0)
+  const departman = tur === 'departman'
 
   // ⭐Ölçülen dosya YAZILAN dosyanın kendisi (oturumun proje dizinindeki değil).
   const hedef = path.resolve(String(filePath))
-  const memoryDir = path.dirname(hedef)
+  const memoryDir = path.dirname(hedef) // departmanda: departman/<ROL>/ (katlanmış satırın yaşadığı yer)
+  const indeksAdi = path.basename(hedef)
+  const ad = departman ? 'Departman MEMORY.md (' + path.basename(memoryDir) + ')' : 'MEMORY.md'
+  const katlaYeri = departman
+    ? 'konu dosyalarina (departman/<ROL>/<konu>.md) bolum olarak tasi, indekste yalniz isaretci birak'
+    : 'dizin-*.md dosyalarina bolum olarak tasi, indekste yalniz isaretci birak'
 
   let mevcut = ''
   try {
@@ -220,14 +267,14 @@ function main() {
     const satirAsti = satir > SERT_SATIR && satir >= mevcutSatir
     if (baytAsti || satirAsti) {
       yaz(
-        '[hafiza-indeks] ⛔YAZIM ENGELLENDI: MEMORY.md bu yazimdan sonra ' + satir + ' satir / ' + bayt +
+        '[hafiza-indeks] ⛔YAZIM ENGELLENDI: ' + ad + ' bu yazimdan sonra ' + satir + ' satir / ' + bayt +
           ' bayt olur; SERT esik ' + SERT_SATIR + ' satir / ' + SERT_BAYT + ' bayt. Bu sinirin ustu ' +
           'SESSIZCE kirpilir: alt satirlar hicbir oturuma yuklenmez ve kullanici bunu GORMEZ.',
       )
       yaz(
-        '[hafiza-indeks] YAPILACAK: once KATLA — eski ders satirlarini dizin-*.md dosyalarina bolum ' +
-          'olarak tasi, indekste yalniz isaretci birak; dosyayi KUCULTEN yazim her zaman gecer. ' +
-          'Sonra yeni satirini ekleyip yeniden yaz. Yazim KAYBOLMADI, yalniz ertelendi.',
+        '[hafiza-indeks] YAPILACAK: once KATLA — eski ders satirlarini ' + katlaYeri + '; dosyayi ' +
+          'KUCULTEN yazim her zaman gecer. Sonra yeni satirini ekleyip yeniden yaz. Yazim KAYBOLMADI, ' +
+          'yalniz ertelendi.',
       )
       process.exit(2)
     }
@@ -236,7 +283,18 @@ function main() {
   const uyarilar = []
 
   // ---- KOL A: yumuşak eşik (yazımdan ÖNCE, yazımın SONUCU ölçülür)
-  if (bayt >= YUMUSAK_BAYT || satir >= YUMUSAK_SATIR) {
+  if (departman) {
+    // Departman: eşik SessionStart enjeksiyonunun üst sınırı; aşılınca (>) kesilir.
+    if (bayt > DEPARTMAN_YUMUSAK_BAYT || satir > DEPARTMAN_YUMUSAK_SATIR) {
+      uyarilar.push(
+        ad + ' yazimdan sonra ' + satir + ' satir / ' + bayt + ' bayt: YUMUSAK ESIK ' +
+          DEPARTMAN_YUMUSAK_SATIR + ' satir / ' + DEPARTMAN_YUMUSAK_BAYT + ' bayt asildi (SessionStart ' +
+          'enjeksiyonunun ust siniri: asan kisim acilista SESSIZCE kesilir). ⛔SATIR EKLEME — once ' +
+          'KATLA: eski satirlari ' + katlaYeri + '. SERT esik ' + SERT_SATIR + ' satir / ' + SERT_BAYT +
+          ' bayt ve orada yazim ENGELLENIR.',
+      )
+    }
+  } else if (bayt >= YUMUSAK_BAYT || satir >= YUMUSAK_SATIR) {
     uyarilar.push(
       'MEMORY.md yazimdan sonra ' + satir + ' satir / ' + bayt + ' bayt: YUMUSAK ESIK ' +
         YUMUSAK_SATIR + ' satir / ' + YUMUSAK_BAYT + ' bayt asildi. ⛔SATIR EKLEME — once KATLA: ' +
@@ -253,7 +311,7 @@ function main() {
     const kaybolan = eski.filter((s) => !yeniKume.has(s))
     if (kaybolan.length) {
       // ⭐KATLANMIŞ olanları AYIKLA: taşınmış satır kayıp değildir (ayırt edici nokta).
-      const gercektenSilinen = kaybolan.filter((s) => !katlanmisMi(s, memoryDir, 'MEMORY.md'))
+      const gercektenSilinen = kaybolan.filter((s) => !katlanmisMi(s, memoryDir, indeksAdi))
       if (gercektenSilinen.length) {
         uyarilar.push(
           'KAYIP YAZIM SUPHESI: bu yazim ' + gercektenSilinen.length +
