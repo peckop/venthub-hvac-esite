@@ -7,7 +7,7 @@ import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
- * INV-SESSIONSTART-AD-1..6 · SessionStart kancası pencere adını ŞERİT adına sabitler (REC-525).
+ * INV-SESSIONSTART-AD-1..10 · SessionStart kancası pencere adını ŞERİT adına sabitler (REC-525).
  *
  * NİÇİN: `hookSpecificOutput.sessionTitle` Claude Code'da `/rename` ile aynı etkidir (belge:
  * code.claude.com/docs/en/hooks). Pencereleri IDE eklentisi `--resume=<sid>` ile açıyor, `--name` bayrağı yok;
@@ -76,16 +76,31 @@ function olayYaz(pano: string, olay: Record<string, unknown>, sid = SID): void {
   )
 }
 
-function talepYaz(pano: string, lane: unknown, ts = new Date().toISOString()): void {
+function talepYaz(pano: string, lane: unknown, ts = new Date().toISOString(), sid = SID): void {
   fs.appendFileSync(
-    path.join(pano, `events.${SID}.jsonl`),
-    JSON.stringify({ ts, sid: SID, type: 'claim', lane, globs: ['ornek/**'] }) + '\n',
+    path.join(pano, `events.${sid}.jsonl`),
+    JSON.stringify({ ts, sid, type: 'claim', lane, globs: ['ornek/**'] }) + '\n',
     'utf8',
   )
 }
 
-function calistir(source: string, pano: string, ekEnv: Record<string, string> = {}): Sonuc {
-  const girdi = JSON.stringify({ session_id: SID, source, cwd: calismaDizini, hook_event_name: 'SessionStart' })
+const BASKA_SID = '11111111-2222-4333-8444-555555555555'
+const besSaatOnce = (): string => new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+
+/** `girdiEk`: SessionStart stdin'ine eklenen alanlar (örn. `session_title`, ya da `session_id` ile başka oturum). */
+function calistir(
+  source: string,
+  pano: string,
+  ekEnv: Record<string, string> = {},
+  girdiEk: Record<string, unknown> = {},
+): Sonuc {
+  const girdi = JSON.stringify({
+    session_id: SID,
+    source,
+    cwd: calismaDizini,
+    hook_event_name: 'SessionStart',
+    ...girdiEk,
+  })
   const r = spawnSync(process.execPath, [KANCA], {
     input: girdi,
     encoding: 'utf8',
@@ -140,6 +155,8 @@ const TABLO: ReadonlyArray<readonly [string, string]> = [
 ]
 
 describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adını şeridin insan adına sabitler', () => {
+  // ⚠SINIR (fork): gerçek fork'ta yeni oturum YENİ sid alır ve panoda talebi olmaz; aşağıdaki döngü aynı sid ile yalnız
+  // `source` dalını ölçer (fork'ta alan üretilebiliyor). Gerçek fork'un claim'siz ilk açılışı ayrı testte: ad ALMAZ.
   for (const source of ['startup', 'resume', 'fork']) {
     it(`${source}: sessionTitle = tablodaki ad (ARAC → "Araç")`, () => {
       const pano = yeniPano()
@@ -149,6 +166,18 @@ describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adın
       expect(s.baslik).toBe('Araç')
     })
   }
+
+  it("gerçek fork: YENİ sid'in talebi yok → alan yok (kaynak oturumun talebi çocuğa ad vermez)", () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC') // kaynak oturum (SID) talepli
+    const s = calistir('fork', pano, {}, { session_id: BASKA_SID }) // çocuk oturum: yeni sid, talep yok
+    expect(s.durum).toBe(0)
+    expect(alanVar(s)).toBe(false)
+    // Kaynak oturumun talebi BAYATSA da (canlı çakışma kuralı devreye girmeden) çocuk ad almaz: eşleşme yalnız sid'dir.
+    const bayat = yeniPano()
+    talepYaz(bayat, 'ARAC', besSaatOnce())
+    expect(alanVar(calistir('fork', bayat, {}, { session_id: BASKA_SID }))).toBe(false)
+  })
 
   it('TABLONUN HER SATIRI ölçülür: şerit adı → pencere adı', () => {
     for (const [serit, ad] of TABLO) {
@@ -213,9 +242,9 @@ describe('INV-SESSIONSTART-AD-2 · talep YOKSA sessionTitle alanı hiç eklenmez
     expect(alanVar(calistir('resume', pano))).toBe(false)
   })
 
-  it('SÜRESİ DOLMUŞ (5 saat atışsız) talep ad vermez: ölü talep canlı kimlik değildir', () => {
+  it("BAŞKA oturumun SÜRESİ DOLMUŞ talebi bu pencereye ad vermez (bayat talep yalnız kendi sid'ine ad verir; AD-10)", () => {
     const pano = yeniPano()
-    talepYaz(pano, 'ARAC', new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString())
+    talepYaz(pano, 'ARAC', besSaatOnce(), BASKA_SID)
     expect(alanVar(calistir('resume', pano))).toBe(false)
   })
 
@@ -329,6 +358,127 @@ describe('INV-SESSIONSTART-AD-5 · mevcut additionalContext KORUNUR (regresyon)'
   })
 })
 
+describe('INV-SESSIONSTART-AD-8 · session_title DOLUYSA (elle/önceden verilmiş ad) sessionTitle EZMEZ (ORTA-1)', () => {
+  // Belge (SessionStart girdisi): `session_title` = başlık zaten ayarlıysa (--name, /rename) dolu gelir.
+  for (const source of ['startup', 'resume', 'fork']) {
+    it(`${source}: session_title dolu → alan yok, talep olsa bile`, () => {
+      const pano = yeniPano()
+      talepYaz(pano, 'ARAC')
+      const s = calistir(source, pano, {}, { session_title: 'Recep-in-verdigi-ad' })
+      expect(s.durum).toBe(0)
+      expect(alanVar(s)).toBe(false)
+      expect(s.ek).toContain('Şeridin: ARAC') // bağlam yine tam
+    })
+  }
+
+  it('session_title tablodaki adın aynısıysa da alan yok (kancanın kendi eski adı tekrar yazılmaz; sonuç aynı)', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    expect(alanVar(calistir('resume', pano, {}, { session_title: 'Araç' }))).toBe(false)
+  })
+
+  it('session_title boş/yalnız boşluk/yok/string değil → alan VAR ve tablodaki ad yazılır', () => {
+    for (const bos of ['', '   ', undefined, null, 5, {}]) {
+      const pano = yeniPano()
+      talepYaz(pano, 'ARAC')
+      const s = calistir('resume', pano, {}, bos === undefined ? {} : { session_title: bos })
+      expect(s.baslik, JSON.stringify(bos) ?? 'undefined').toBe('Araç')
+    }
+  })
+})
+
+describe('INV-SESSIONSTART-AD-9 · aynı adı alacak başka CANLI oturum varsa alan yok (ORTA-2: belirsiz ad, adsızlıktan kötü)', () => {
+  it('aynı şeritte iki canlı oturum: İKİSİ DE ad almaz', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    talepYaz(pano, 'ARAC', new Date().toISOString(), BASKA_SID)
+    expect(alanVar(calistir('resume', pano))).toBe(false)
+    expect(alanVar(calistir('resume', pano, {}, { session_id: BASKA_SID }))).toBe(false)
+  })
+
+  it("aynı adı veren farklı yazım ('arac' ile 'ARAC') çakışma sayılır", () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    talepYaz(pano, 'arac', new Date().toISOString(), BASKA_SID)
+    expect(alanVar(calistir('startup', pano))).toBe(false)
+  })
+
+  it('farklı şeritler çakışmaz: ARAC ve OPS ayrı adı alır', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    talepYaz(pano, 'OPS', new Date().toISOString(), BASKA_SID)
+    expect(calistir('startup', pano).baslik).toBe('Araç')
+    expect(calistir('startup', pano, {}, { session_id: BASKA_SID }).baslik).toBe('Ops')
+  })
+
+  it('aynı şeritteki diğer oturum BAYAT (ölü) ya da BIRAKILMIŞSA çakışma sayılmaz', () => {
+    const bayat = yeniPano()
+    talepYaz(bayat, 'ARAC')
+    talepYaz(bayat, 'ARAC', besSaatOnce(), BASKA_SID)
+    expect(calistir('resume', bayat).baslik).toBe('Araç')
+
+    const birakilmis = yeniPano()
+    talepYaz(birakilmis, 'ARAC')
+    talepYaz(birakilmis, 'ARAC', new Date().toISOString(), BASKA_SID)
+    olayYaz(birakilmis, { type: 'release' }, BASKA_SID)
+    expect(calistir('resume', birakilmis).baslik).toBe('Araç')
+  })
+
+  it('başka canlı oturumun PENCERE ADI zaten aynıysa (talebi başka şeritte olsa da) alan yok', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC')
+    talepYaz(pano, 'OPS', new Date().toISOString(), BASKA_SID)
+    const kayit = path.join(kayitDizini, '424242.json')
+    fs.writeFileSync(kayit, JSON.stringify({ sessionId: BASKA_SID, name: 'Araç' }), 'utf8')
+    try {
+      expect(alanVar(calistir('resume', pano))).toBe(false)
+    } finally {
+      fs.rmSync(kayit, { force: true })
+    }
+    expect(calistir('resume', pano).baslik).toBe('Araç') // kayıt kalkınca ad verilir: karar gerçekten kayda bağlıydı
+  })
+})
+
+describe('INV-SESSIONSTART-AD-10 · BAYAT (TTL dolmuş) talep KENDİ sid için ad verir; makine kapanıp sabah resume (ORTA-3)', () => {
+  it('5 saat atışsız kendi talebi + resume/startup: ad var', () => {
+    for (const source of ['resume', 'startup']) {
+      const pano = yeniPano()
+      talepYaz(pano, 'ARAC', besSaatOnce())
+      const s = calistir(source, pano)
+      expect(s.durum).toBe(0)
+      expect(s.baslik, source).toBe('Araç')
+    }
+  })
+
+  it('bayat talep: pano bağlamı BAYAT şeridi "TALEP EDİLMEMİŞ" diye gösterse de ad verilir (ad talebi bağlamdan bağımsız)', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'HARITA', besSaatOnce())
+    expect(calistir('resume', pano).baslik).toBe('Harita')
+  })
+
+  it("başka sid'in bayat talebi bu pencereye ad vermez; kendi talebi bayat + başkası canlı aynı şerit: ad yok", () => {
+    const baskasi = yeniPano()
+    talepYaz(baskasi, 'ARAC', besSaatOnce(), BASKA_SID)
+    expect(alanVar(calistir('resume', baskasi))).toBe(false)
+
+    const cakisma = yeniPano()
+    talepYaz(cakisma, 'ARAC', besSaatOnce())
+    talepYaz(cakisma, 'ARAC', new Date().toISOString(), BASKA_SID)
+    expect(alanVar(calistir('resume', cakisma))).toBe(false)
+  })
+
+  it('bayat sonra BIRAKILMIŞ talep ad vermez', () => {
+    const pano = yeniPano()
+    talepYaz(pano, 'ARAC', besSaatOnce())
+    olayYaz(pano, { type: 'release' })
+    expect(alanVar(calistir('resume', pano))).toBe(false)
+  })
+
+  it('SINIR: hiç talep etmemiş yeni pencere ilk açılışta ad ALMAZ (yalnız talepten sonraki açılışlarda)', () => {
+    expect(alanVar(calistir('startup', yeniPano()))).toBe(false)
+  })
+})
+
 describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynaktır: tablo dışa aktarılır, ad() ölçülür', () => {
   const modul = createRequire(path.join(KOK, 'package.json'))('./scripts/board/pencere-adlari.cjs') as {
     ad: (serit: unknown) => string
@@ -363,10 +513,43 @@ describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynakt�
     expect(modul.ad('toString')).toBe('Tostring')
   })
 
-  it('kanca tabloyu KENDİ İÇİNDE tutmaz: modülü çağırır (kopya = ayrışma)', () => {
+  it('ad(): Türkçe harfli bilinmeyen şerit — İ bozulmaz (i + U+0307 olmaz), ASCII I → i kalır, ayrık yazım NFC olur', () => {
+    expect(modul.ad('İZMİR')).toBe('İzmir') // varsayılan toLowerCase 'İ' → 'i̇' (2 kod noktası) üretirdi
+    expect(modul.ad('İZMİR')).not.toContain('̇')
+    expect(modul.ad('ADMIN-CUSTOMER')).toBe('Admin-customer') // tr kuralı 'Admın' YAPMAZ
+    expect(modul.ad('ıslak')).toBe('Islak')
+    expect(modul.ad('ÜRUNX')).toBe('Ürunx') // ayrık Ü → tek karakter Ü, sonra küçültme
+    expect(modul.ad('ÜRUNX')).toBe('Ürunx'.normalize('NFC'))
+  })
+
+  it('ad(): ayrık yazım 60 sınırından ÖNCE NFC olur — birleştirici işaret tabandan ayrı kesilmez', () => {
+    // 59 'a' + ayrık 'Ü' (U + U+0308) + 'x': NFC sonrası 61 kod noktası → 60'a kesilince Ü kalır (küçültülünce 'ü').
+    const ad = modul.ad('a'.repeat(59) + 'Üx')
+    expect(Array.from(ad).length).toBe(60)
+    expect(Array.from(ad).at(-1)).toBe('ü')
+  })
+
+  it('ad(): 60 sınırı KOD NOKTASINA göre keser — yetim vekil (surrogate) kalmaz', () => {
+    const uzun = 'a'.repeat(59) + '😀' + 'bcd' // 63 kod noktası; 60. kod noktası emoji, 61-63 atılmalı
+    const ad = modul.ad(uzun)
+    expect(Array.from(ad).length).toBe(60)
+    expect(Array.from(ad).at(-1)).toBe('😀')
+    expect(() => encodeURIComponent(ad), 'yetim vekil encodeURIComponent atar').not.toThrow()
+    // UTF-16 sınırı tam emojinin ortasına denk gelen durum: 59 tek birimlik + emoji (2 birim) → 61 birim
+    const orta = modul.ad('b'.repeat(59) + '😀😀')
+    expect(() => encodeURIComponent(orta)).not.toThrow()
+    expect(Array.from(orta).length).toBe(60)
+  })
+
+  it('kanca tabloyu KENDİ İÇİNDE tutmaz: modülü çağırır; tablodaki HİÇBİR ad kancada tırnaklı sabit olarak geçmez', () => {
     const kaynak = fs.readFileSync(KANCA, 'utf8')
     expect(kaynak).toContain('pencere-adlari.cjs')
-    expect(kaynak).not.toMatch(/\['URUN',\s*'Ürün'\]/)
+    // Yorumlar atılır (açıklamalarda adlar geçebilir); geriye kalan KODDA hiçbir tablo değeri tırnaklı sabit olmamalı:
+    // dizi, Map, nesne ya da başka biçim — hangi kopya biçimi olursa olsun yakalanır.
+    const kod = kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+    for (const [, ad] of TABLO) {
+      expect(kod, `kancada tablo değeri kopyası: ${ad}`).not.toMatch(new RegExp(`['"\`]${ad}['"\`]`))
+    }
   })
 })
 

@@ -9,9 +9,10 @@
  * NEDEN İNSAN ADI: Recep pencereleri elle "Ops", "Yetenek", "Harita", "Araç" diye adlandırdı (2026-09-30). Panodaki
  * yazım büyük harfli ve ASCII'dir (ARAC, URUN); pencereye çıplak yazılırsa Recep'in kullandığı adla eşleşmez.
  *
- * BİLİNEN SINIR: kanca pencerenin o an ELLE verilmiş adını göremez (adı okumak `claude agents` çağrısı ister, kanca
- * yavaşlar). Elle verilen ad tablodaki değerle aynıysa sonuç aynıdır; farklıysa (örn. "Araç-2") sonraki açılışta
- * (startup/resume/fork) kanca tablodaki adı yazar. clear/compact'ta alan hiç gönderilmez, ad korunur.
+ * ELLE VERİLMİŞ AD: kanca SessionStart girdisindeki `session_title` alanını okur (belge: başlık zaten ayarlıysa —
+ * --name ya da /rename — dolu gelir); doluysa `sessionTitle` HİÇ gönderilmez, yani elle verilen ad ezilmez. Bu modül
+ * yalnız "şerit adından ad" hesabıdır; ezme/çakışma kararları kancadadır (`pencereAdiKarari`).
+ * clear/compact'ta alan hiç gönderilmez, ad korunur.
  *
  * Kullanım: `require('./pencere-adlari.cjs').ad('ARAC')` → 'Araç'. Bilinmeyen/bozuk girdi → '' (çağıran alanı EKLEMEZ).
  */
@@ -56,11 +57,17 @@ function kontrolTemizle(metin) {
 function ad(serit) {
   try {
     if (typeof serit !== 'string') return ''
-    const ham = kontrolTemizle(serit).replace(/\s+/g, ' ').trim().slice(0, AD_TAVAN).trim()
+    // NFC: ayrık (birleştirici işaretli) yazım tek karaktere iner. Kesme KOD NOKTASINA göredir: UTF-16 ortasından
+    // kesmek yetim vekil (surrogate) bırakırdı.
+    const ham = Array.from(kontrolTemizle(serit.normalize('NFC')).replace(/\s+/g, ' ').trim())
+      .slice(0, AD_TAVAN).join('').trim()
     if (!ham || ham === YER_TUTUCU) return ''
     const tablo = PENCERE_ADLARI.get(ham.toUpperCase())
     if (tablo) return tablo
-    return ham.charAt(0).toUpperCase() + ham.slice(1).toLowerCase()
+    const [ilk, ...kalan] = Array.from(ham)
+    // Kalan küçültülürken 'İ' önce 'i' yapılır: varsayılan toLowerCase 'İ' → 'i' + U+0307 (bozuk) üretir. ASCII 'I' → 'i'
+    // kalır (tr kuralı 'ı' UYGULANMAZ: şerit adları ASCII'dir, ADMIN-CUSTOMER → Admin-customer; 'Admın' olmasın).
+    return (ilk.toUpperCase() + kalan.join('').replace(/İ/g, 'i').toLowerCase()).normalize('NFC')
   } catch {
     return ''
   }
