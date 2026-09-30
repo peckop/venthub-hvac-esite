@@ -24,6 +24,7 @@
 // değeri, uzunluğu ya da öneki yazılmaz. Uç kimliksizdir — bu kısıt tasarımın parçasıdır,
 // nezaket değil.
 import { auditConfig } from '../_shared/config_audit.ts'
+import { dbSaglikOlc } from '../_shared/db_saglik.ts'
 
 type Durum = 'saglikli' | 'bozuk' | 'olculemedi'
 
@@ -81,17 +82,12 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    const resp = await fetch(`${supabaseUrl}/rest/v1/rpc/now`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${serviceKey}`,
-        apikey: serviceKey,
-        'Content-Type': 'application/json',
-      },
-      body: '{}',
-    })
-    if (!resp.ok) {
-      return cevap('bozuk', { sebep: 'db_unhealthy', db_status: resp.status, config })
+    // Eskiden `rpc/now` çağrılıyordu: `now()` yalnız pg_catalog'da, PostgREST public dışını
+    // sunmaz → DB sağlamken bile HER ZAMAN 404 = uç canlıda hep "bozuk", izleme kör.
+    // Şimdi bilinen bir public tabloya HEAD (bkz. _shared/db_saglik.ts).
+    const db = await dbSaglikOlc({ supabaseUrl, serviceKey })
+    if (!db.ok) {
+      return cevap('bozuk', { sebep: 'db_unhealthy', db_status: db.status, db_neden: db.neden, config })
     }
 
     if (!rapor.saglikli) {
