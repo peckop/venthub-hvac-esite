@@ -74,7 +74,7 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-1', () => {
     for (const s of ['gh pr view 1457', 'git merge --ff-only origin/master', 'gh pr checks 1', undefined]) expect(k.mergeMi(s)).toBe(false)
   })
 
-  it('merge sonrası geride ana ağaç ileri sarılır; merge değilse dokunulmaz (ayırt edici çift)', { timeout: 120_000 }, () => {
+  it('merge sonrası geride ana ağaç ileri sarılır; merge değilse dokunulmaz (ayırt edici çift)', { timeout: 420_000 }, () => {
     const { ana, wt } = kurulum()
     expect(kos(wt, 'gh pr view 1')).toBe('')
     expect(g(ana, 'rev-list', '--count', 'HEAD..origin/master').length).toBeGreaterThan(0)
@@ -84,7 +84,7 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-1', () => {
     expect(g(ana, 'rev-parse', 'HEAD')).toBe(g(ana, 'rev-parse', 'origin/master'))
   })
 
-  it('ilgisiz kirli dosya ileri sarmayı ENGELLEMEZ; dosya korunur (#1468 vakası, Ops 09-28)', { timeout: 120_000 }, () => {
+  it('ilgisiz kirli dosya ileri sarmayı ENGELLEMEZ; dosya korunur (#1468 vakası, Ops 09-28)', { timeout: 420_000 }, () => {
     const { ana, wt } = kurulum()
     fs.writeFileSync(path.join(ana, 'b.txt'), 'yarim is\n')
     const once = g(ana, 'rev-parse', 'HEAD')
@@ -108,11 +108,14 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-1', () => {
 })
 
 /**
- * INV-MERGE-SONRASI-ILERI-SAR-2 · zaman bütçesi + yeniden deneme (REC-441, 09-29).
+ * INV-MERGE-SONRASI-ILERI-SAR-2 · ilerleme izleme + yeniden deneme (REC-441, 09-29; REC-459, 09-30).
  * Ölçülen vaka: #1481 merge'ünde sanal bellek %89'du, git zaman aşımına düştü, ana ağaç bayat kaldı. Ayrıca harness
- * PostToolUse kancasını ~60 sn'de sessizce öldürür. Kanca artık işi çocuk süreçte, zaman sınırlı ve en fazla 3 kez dener.
+ * PostToolUse kancasını ~60 sn'de sessizce öldürür. REC-459 kök sebebi: önceki sürüm çocuğa SABİT süre verip yarı yolda
+ * öldürüyordu; çekirdeğin 2 katı CPU yükünde 3 koşumun 3'ünde düştü (yavaş ama ilerleyen iş öldürülüp baştan başlıyordu).
+ * Şimdi çocuk her adımda işaret yazar; ebeveyn YALNIZ işaret gelmeyince (takılma) ya da toplam pay (TAVAN_MS) dolunca öldürür.
+ * Testler GERÇEK git hızına bağlı değildir: takılma ve yavaşlık kancanın test kancalarıyla ÜRETİLİR.
  */
-describe('INV-MERGE-SONRASI-ILERI-SAR-2 · yeniden deneme ve zaman bütçesi', () => {
+describe('INV-MERGE-SONRASI-ILERI-SAR-2 · ilerleme izleme ve yeniden deneme', () => {
   function kosEnv(cwd: string, komut: string, env: Record<string, string>): { cikti: string; ms: number } {
     const t0 = Date.now()
     const r = spawnSync(process.execPath, [KANCA], {
@@ -127,22 +130,72 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-2 · yeniden deneme ve zaman bütçesi', (
     return { cikti, ms: Date.now() - t0 }
   }
 
-  it('ilk deneme takılırsa ikinci denemede ileri sarar (yeniden deneme ayırt edici kanıt)', { timeout: 120_000 }, () => {
+  it('ilk deneme takılırsa ikinci denemede ileri sarar (yeniden deneme ayırt edici kanıt)', { timeout: 420_000 }, () => {
     const { ana, wt } = kurulum()
     const uyku = path.join(os.tmpdir(), `ileri-uyku-${process.pid}-${Date.now()}`)
     GECICI.push(uyku)
     const once = g(ana, 'rev-parse', 'HEAD')
-    const { cikti } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_UYKU_DOSYA: uyku, VH_ILERI_SAR_DENEME_MS: '4000', VH_ILERI_SAR_BEKLE_MS: '0' })
+    // Takılan çocuk 'basla' işaretinden sonra uyur → 15 sn işaret gelmeyince öldürülür; 2. deneme süreye değil işaret akışına bağlı.
+    // (Pencere yük altında TEK git çağrısının süresinden geniş tutulur: her git çağrısından önce işaret yazılır.)
+    const { cikti } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_UYKU_DOSYA: uyku, VH_ILERI_SAR_BOSTA_MS: '15000', VH_ILERI_SAR_BEKLE_MS: '0' })
     expect(cikti).toMatch(/ileri sarildi/)
     expect(cikti).toMatch(/deneme 2\/3/)
     expect(g(ana, 'rev-parse', 'HEAD')).not.toBe(once)
   })
 
-  it('üç deneme de takılırsa SESSİZ KALMAZ, elle komutu söyler ve bütçeyi aşmaz', { timeout: 120_000 }, () => {
+  it('üç deneme de takılırsa SESSİZ KALMAZ, elle komutu söyler ve bütçeyi aşmaz', { timeout: 420_000 }, () => {
     const { wt } = kurulum()
-    const { cikti, ms } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_HEP_TAKIL: '1', VH_ILERI_SAR_DENEME_MS: '1500', VH_ILERI_SAR_BEKLE_MS: '0' })
+    const { cikti, ms } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_HEP_TAKIL: '1', VH_ILERI_SAR_BOSTA_MS: '1500', VH_ILERI_SAR_BEKLE_MS: '0' })
     expect(cikti).toMatch(/3 denemede tamamlanamadi/)
     expect(cikti).toContain('ana-agac-tazelik.cjs --ileri-sar')
+    expect(cikti).toContain('ilerleme isareti gelmedi')
     expect(ms).toBeLessThan(30_000)
+  })
+
+  it('REC-459 KÖK SEBEP: YAVAŞ AMA İLERLEYEN çocuk ÖLDÜRÜLMEZ, ilk denemede tamamlanır (sabit süre bütçesi bunu öldürürdü)', { timeout: 420_000 }, () => {
+    const { ana, wt } = kurulum()
+    const once = g(ana, 'rev-parse', 'HEAD')
+    // Çocuk ≈18 sn sürer ama her 500 ms'de işaret yazar; bekleme penceresi 8 sn: toplam süre pencereyi 2 kattan fazla aşar.
+    const { cikti } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_YAVAS_MS: '18000', VH_ILERI_SAR_BOSTA_MS: '8000', VH_ILERI_SAR_BEKLE_MS: '0' })
+    expect(cikti).toMatch(/ileri sarildi/)
+    expect(cikti).not.toMatch(/deneme \d\/3/)
+    expect(g(ana, 'rev-parse', 'HEAD')).not.toBe(once)
+  })
+
+  it('TOPLAM PAY (harness sınırı) dolunca İLERLEYEN çocuk da öldürülür ve durum SÖYLENİR', { timeout: 420_000 }, () => {
+    const { wt } = kurulum()
+    const { cikti, ms } = kosEnv(wt, 'gh pr merge 1', { VH_ILERI_SAR_TEST_YAVAS_MS: '60000', VH_ILERI_SAR_BOSTA_MS: '20000', VH_ILERI_SAR_TAVAN_MS: '3000', VH_ILERI_SAR_BEKLE_MS: '0' })
+    expect(cikti).toMatch(/1 denemede tamamlanamadi/)
+    expect(cikti).toContain('toplam 3000 ms doldu')
+    expect(cikti).toContain('ana-agac-tazelik.cjs --ileri-sar')
+    expect(ms).toBeLessThan(20_000)
+  })
+
+  it('yama sırası: ana-agac-tazelik içindeki git çağrıları da ilerleme işareti yazar (davranış)', { timeout: 420_000 }, () => {
+    // Kanca DOĞRUDAN çocuk kipinde (--is) koşar; işaretler çocuğun stderr'ine yazılır. `require(tazelik)` yamadan ÖNCEYE
+    // alınırsa tazelik modülü orijinal execFileSync'i destructure eder → anaAgacYolu/ileriSar içindeki git çağrıları işaretsiz kalır.
+    const { wt } = kurulum()
+    const r = spawnSync(process.execPath, [KANCA, '--is'], {
+      input: JSON.stringify({ cwd: wt, tool_input: { command: 'gh pr merge 1' } }),
+      encoding: 'utf8',
+      windowsHide: true,
+      timeout: 300_000,
+    })
+    const isaretler = (r.stderr ?? '').split(/\r?\n/).map((s) => s.trim())
+    const gitSayisi = isaretler.filter((s) => s === 'ADIM git').length
+    expect(gitSayisi, `ADIM git satırı sayısı (stderr: ${JSON.stringify(r.stderr)})`).toBeGreaterThanOrEqual(3)
+    for (const ad of ['basla', 'fetch', 'ileri-sar']) expect(isaretler, `ADIM ${ad} yok`).toContain(`ADIM ${ad}`)
+  })
+
+  it('kaynak: sabit süre bütçesi (spawnSync + timeout) GERİ GELMEZ; ilerleme işareti ve takılma penceresi var', () => {
+    const kaynak = fs.readFileSync(KANCA, 'utf8')
+    const kod = kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1')
+    expect(kod).not.toMatch(/spawnSync/)
+    expect(kod).not.toMatch(/DENEME_MS/)
+    expect(kod).toMatch(/BOSTA_MS/)
+    expect(kod).toMatch(/TAVAN_MS/)
+    expect(kod).toContain("ilerle('fetch')")
+    expect(kod).toContain("ilerle('ileri-sar')")
+    expect(kod).toContain("ilerle('git')") // her git çağrısından önce işaret (yük altı ölçümü: seyrek işaret takılma sanılıyordu)
   })
 })
