@@ -438,15 +438,16 @@ Claude Code sürümüyle değişebilir: bir sayıya dayanan iş, sayıyı önce 
 | Sınır | Varsayılan | Ayar (ortam değişkeni) |
 |---|---|---|
 | Alt ajanın içinde alt ajan (katman) | 3 (1 = kapalı) | `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` |
-| Eşzamanlı alt ajan | 20 | `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` |
+| Eşzamanlı alt ajan (iç içe olanlar ve liderler dahil, oturum genelinde sayılır; reddedilen kuyruğa girmez) | 20 | `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` |
 | Workflow eşzamanlı ajan | 16 (CPU azsa daha az; ayar aralığı 1-256) | `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS` |
 | Workflow çağrı başına öğe / çalışma başına ajan | 4096 / 1000 | — |
 | Workflow boyut önerisi | `workflowSizeGuideline`, varsayılan medium (<10 ajan; öğüt, kilit değil) | ayar |
 
-- **Ultracode ve 20 sınırı:** ultracode açıkken 20'lik eşzamanlı alt ajan sınırı `Agent` aracıyla açılan alt ajanlara uygulanmaz. `ultracode` kelimesi yalnız o istem için ve yalnız insanın yazdığı istemde etkilidir (webhook, PR yorumu, `-p` ile gelende tetiklemez); `/effort ultracode` oturum boyunca, `ultracode` ayarı her oturumda açar.
+- **20 sınırı ÖLÇÜLDÜ (ARAÇ, 2026-09-30, haiku, salt okuma, ekip bayrağı kapalı):** 5 ekip lideri × 5 çalışan = 25 çalışandan 14'ü koştu, 11'i "Concurrent subagent limit reached … Do not retry" ile reddedildi; **reddedilen çağrı kuyruğa girmez.** Sınır iç içe açılanlara da uygulanır ve **oturum genelinde** sayılır (lider ve başka koşan ajanlar da hakkı yer: 13 çalışan + 5 lider + 2 başka ajan = 20). Sonuç: varsayılanda "5 konu × 5 çalışan" 25 eşzamanlı **koşmaz**; iş dalga dalga verilir ya da `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` yükseltilir (bizim kuralımız aşağıda).
+- **Ultracode ve 20 sınırı (belgede yazıyor, SINANMADI):** belgeye göre ultracode açıkken 20'lik sınır `Agent` aracıyla açılan alt ajanlara uygulanmaz; bu cümle ölçülmedi, ölçülene kadar ona güvenilmez. `ultracode` kelimesi yalnız o istem için ve yalnız insanın yazdığı istemde etkilidir (webhook, PR yorumu, `-p` ile gelende tetiklemez); `/effort ultracode` oturum boyunca, `ultracode` ayarı her oturumda açar.
 - **Workflow izni izin moduna göre değişir:** Auto modda yalnız İLK çalıştırmada sorar ve verilen herhangi bir "Yes" kullanıcı ayarına kalıcı yazılır (sonra sorulmaz); Manual ve accept-edits modunda her çalıştırmada sorar (kayıtlı workflow için "bir daha sorma" vardır); Bypass modunda ve `claude -p`/SDK'da sorulmaz (`Workflow` allow kuralı işler). Ultracode açıkken auto modda ilk onay da sorulmaz.
 - **Agent teams (ekip) AYRI KOŞUL:** deneysel ve varsayılan kapalı, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` gerekir; yalnız interaktif oturumda; oturumda tek ekip; **iç içe ekip yok** (üye ekip açamaz); üye sayısına sert sınır yok, öneri 3-5; üyeler liderin izin modunu miras alır (`dontAsk` hariç). Bu, alt ajan zincirinden (müdür → ekip lideri → çalışan) farklı bir mekanizmadır.
-- ⚠**SINANMADI, varsayılmaz:** 5 konu × 5 alt ajan = 25 alt ajanın "eşzamanlı 20" sınırına takılıp takılmadığı (ekip üyesinin ayrı oturum sayılıp sayılmadığı belgede yok). İlk büyük ekip işinde sayı gözlenir ve buraya yazılır.
+- ⚠**SINANMADI:** agent teams (ekip) üyelerinin "eşzamanlı 20" sınırına ayrı oturum olarak sayılıp sayılmadığı (yukarıdaki ölçüm ekip bayrağı kapalıyken yapıldı, belgede de yok).
 - **Bizim kuralımız (Recep: "sınır koymayız"):** bu sınırlara ilk takılışta ilgili ortam değişkeni artırılır; kota ya da varsayılan bahane edilip iş küçültülmez (§8: kapsamı kota daraltır, tamlık ölçütünü daraltmaz). Ayar değişikliği `.claude/settings.json` üzerinden yapılıyorsa OPS kapısıdır.
 
 ### 10.6 Ölçüm (henüz yapılmadı)
