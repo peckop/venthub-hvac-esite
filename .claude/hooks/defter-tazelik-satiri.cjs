@@ -317,6 +317,23 @@ try {
 }
 
 /**
+ * ── HAFIZA KUYRUĞU (REC-422, Ops emri 2026-09-30) — EŞİKLİ ──
+ * claude-mem'in bekleyen olay kuyruğu 300'ü aşarsa konuşur. Kuyruk yalnız bellektedir: makine
+ * kapanınca kaybolur (09-29: 5.469 olay). Ölçüm arka planda ve önbellekten. Gerekçe: hafiza-kuyrugu.cjs.
+ */
+try {
+  const hk = require(path.join(__dirname, 'hafiza-kuyrugu.cjs'))
+  const simdi = Date.now()
+  const s = hk.satir(hk.oku(), simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    hk.gerekirseTazele(simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠HAFIZA KUYRUK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
  * ── BAĞLAM (karar 148, 2026-09-27) — HER MESAJDA ──
  * Eşik altında düz "BAGLAM: 146k/1M"; compact sınırından sonra cevap yoksa "compact sonrasi".
  * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son
