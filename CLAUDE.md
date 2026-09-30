@@ -110,7 +110,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
     numarası raporda geçer. Bu kural kapsam hakkındadır, yetki hakkında değil — hiçbir kapıyı
     (özellikle kural 13'ü) gevşetmez. Cetvel: `docs/standards/execution-method-standard.md` §8.
 
-> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `docs/standards/gelistirme-kurallari-tam-liste.md` (geçici; REC-433 rol kartlarına dağıtılacak).
+> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `docs/standards/gelistirme-kurallari-tam-liste.md`. Her kural ilgili rolün kartında (`docs/roller/<ROL>.md`, `## Kurallar`) özetlenir; sayım testi `INV-ROL-1` hiçbir kuralın düşmediğini ölçer (REC-503).
 
 ## Tek Giriş Haritası — "hangi soru → hangi belge / hangi harita"
 

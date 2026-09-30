@@ -17,6 +17,10 @@ Kod yazmaz; tekil düzen kararını Recep'e sormaz; Recep kapıları yukarıdaki
 ## Yetenek ve araç
 Pano (board.cjs), Linear, SendMessage, workflow orkestrasyonu, plan-challenger.
 
+## Kurallar
+> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
+
 ## Durum
 Açık.
 

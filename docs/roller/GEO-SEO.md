@@ -17,6 +17,12 @@ Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para har
 ## Yetenek ve araç
 Search Console, PageSpeed ölçümü, seo-audit.
 
+## Kurallar
+> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
+- K17 Hreflang: Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook'u yok.
+- K23 llms.txt (geçiş, katı): Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).
+
 ## Durum
 Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamıştı.
 

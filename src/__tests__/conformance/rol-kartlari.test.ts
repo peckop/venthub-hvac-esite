@@ -32,6 +32,10 @@ type Uretici = {
   OZET_SINIRI: number
   KART_BAYT_SINIRI: number
   dosyaAdi: (ad: string) => string
+  kuralKaynagiOku: (kok: string) => { no: number; baslik: string }[]
+  kuralSorunlari: (kaynak: { no: number; baslik: string }[], kartlar: Record<string, string>, kurallar?: unknown[]) => string[]
+  rolKurallari: (ad: string) => unknown[][]
+  KURALLAR: [number, string, string, string, string[] | 'HEPSI'][]
 }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
@@ -59,6 +63,64 @@ describe('INV-ROL-1 — rol kartı üreticisi ayırt edici', () => {
   it('başlığı eksik kartı yakalar', () => {
     const bozuk = { ...temiz, ADMIN: temiz.ADMIN.replace('## Yetki', '## Baska') }
     expect(uretici.sorunlar(bozuk).some((s) => s.includes('başlık eksik'))).toBe(true)
+  })
+})
+
+describe('INV-ROL-1 — 31 geliştirme kuralı rol kartlarına dağıtıldı, hiçbiri düşmedi (REC-503)', () => {
+  const kaynak = uretici.kuralKaynagiOku(KOK)
+  const kartlar = uretici.uret()
+  const kurallar = uretici.KURALLAR
+
+  it('kaynakta 31 kural var, dağıtımda 31, kartlarda 31 farklı kural numarası', () => {
+    expect(kaynak).toHaveLength(31)
+    expect(kaynak.map((k) => k.no)).toEqual(Array.from({ length: 31 }, (_, i) => i + 1))
+    expect(kurallar).toHaveLength(31)
+    const kartlarda = new Set<number>()
+    for (const metin of Object.values(kartlar)) for (const m of metin.matchAll(/^- K(\d+) /gm)) kartlarda.add(Number(m[1]))
+    expect(kartlarda.size).toBe(31)
+  })
+
+  it('gerçek dağıtım temiz: başlıklar kaynakla birebir, roller bilinen roller, hiçbir kural düşmemiş', () => {
+    expect(uretici.kuralSorunlari(kaynak, kartlar)).toEqual([])
+  })
+
+  it('her kuralın atandığı kartta satırı var; atanmadığı kartta yok', () => {
+    for (const ad of BEKLENEN_ROLLER) {
+      const atanan = new Set(uretici.rolKurallari(ad).map((k) => k[0] as number))
+      for (const [no] of kurallar) {
+        const var_ = new RegExp(`^- K${no} `, 'm').test(kartlar[ad])
+        expect(var_, `${ad} K${no}`).toBe(atanan.has(no))
+      }
+    }
+  })
+
+  it('kural 1 (plan önce) bütün on kartta; her kural en az bir rolde', () => {
+    for (const ad of BEKLENEN_ROLLER) expect(kartlar[ad], ad).toMatch(/^- K1 Plan önce:/m)
+    for (const [no, , , , roller] of kurallar) expect(roller === 'HEPSI' || roller.length > 0, `K${no}`).toBe(true)
+  })
+
+  it('AYIRT EDİCİLİK: düşen kural, sapan başlık, bilinmeyen rol ve kartlardan silinen kural yakalanır', () => {
+    const dusmus = kurallar.filter((k) => k[0] !== 20)
+    expect(uretici.kuralSorunlari(kaynak, kartlar, dusmus).some((s) => s.includes('K20') && s.includes('düşmüş'))).toBe(true)
+
+    const sapmis = kurallar.map((k) => (k[0] === 5 ? [k[0], 'Audit Izi', k[2], k[3], k[4]] : k))
+    expect(uretici.kuralSorunlari(kaynak, kartlar, sapmis).some((s) => s.startsWith('K5: başlık'))).toBe(true)
+
+    const yabanci = kurallar.map((k) => (k[0] === 6 ? [k[0], k[1], k[2], k[3], ['YOKROL']] : k))
+    expect(uretici.kuralSorunlari(kaynak, kartlar, yabanci).some((s) => s.includes('bilinmeyen rol YOKROL'))).toBe(true)
+
+    const eksikKaynak = kaynak.slice(0, 30)
+    expect(uretici.kuralSorunlari(eksikKaynak, kartlar).some((s) => s.includes('kaynakta 30 kural'))).toBe(true)
+
+    const kartsiz = Object.fromEntries(Object.entries(kartlar).map(([a, m]) => [a, m.replace(/^- K19 .*$/gm, '')]))
+    expect(uretici.kuralSorunlari(kaynak, kartsiz).some((s) => s.includes('K19: hiçbir kartta yok'))).toBe(true)
+  })
+
+  it('AYIRT EDİCİLİK: kartta kural satırı silinirse ya da değişirse sorunlar() yakalar', () => {
+    const silinmis = { ...kartlar, URUN: kartlar.URUN.replace(/^- K14 .*$/m, '') }
+    expect(uretici.sorunlar(silinmis).some((s) => s.startsWith('URUN: kural satırı eksik') && s.includes('K14'))).toBe(true)
+    const degismis = { ...kartlar, ADMIN: kartlar.ADMIN.replaceAll('admin_audit_log', 'baska_tablo') }
+    expect(uretici.sorunlar(degismis).some((s) => s.startsWith('ADMIN: kural satırı') && s.includes('K5'))).toBe(true)
   })
 })
 
