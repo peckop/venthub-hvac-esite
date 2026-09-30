@@ -68,7 +68,7 @@ Raporlarda tahmin yoktur; "denenmedi/ölçülmedi" yazan yerler aşağıda aynen
 | YETENEK | doğrulama → plan-challenger, verify-before-done; skill yazımı → skills-creator, find-skills | kartım yok |
 | EDGE | (35 gün öncesi iş) supabase, create-migration, plan-challenger | **öneri: emekli**, edge işleri ALTYAPI'da |
 
-## 4. Skill'lerin kendi kusurları (raporlarda geçen, kaynağında doğrulanan)
+## 4. Skill'lerin kendi kusurları (D1-D6 raporlarda geçen, D7-D9 YETENEK'in SKILL.md okurken bulduğu; hepsi kaynağında doğrulandı)
 
 | No | Skill | Bulgu | Doğrulama |
 |---|---|---|---|
@@ -78,6 +78,9 @@ Raporlarda tahmin yoktur; "denenmedi/ölçülmedi" yazan yerler aşağıda aynen
 | D4 | git-commit | Conventional Commits (`type(scope): ...`) dayatıyor; depo biçimi `ŞERİT (REC-nn): ...` ve PR `Fixes REC-nn` | **Doğrulandı** (son 8 commit biçimi ve SKILL.md) |
 | D5 | create-migration | Kartlarda yok; ALTYAPI/ADMIN/SATIŞ/URUN migration yazıyor | HARİTA da aynı boşluğu ölçmüştü |
 | D6 | venthub-catalog-importer | Yalnız `.agent/skills` (36 skill); `.claude/skills` (42 skill) içinde yok | **Doğrulandı** (`ls`) |
+| D7 | plan-challenger | Adım 1.3'te uyulacak cetvel "CLAUDE.md Mutlak Kurallar (31 madde) + CONTEXT.md §14" diyor; CLAUDE.md artık 14 kural, CONTEXT.md emekli. Adım 1'de `codegraph_impact` aracını anıyor; bu oturumun CodeGraph aracı yalnız `codegraph_explore` | **Doğrulandı** (SKILL.md satır 43 ve 40-41; CLAUDE.md "Doküman Haritası") |
+| D8 | verify-before-done | "Skills in scope" bölümü `testing`, `debugging`, `git-flow` skill'lerine gönderme yapıyor; üçü de depoda yok. "VentHub ek kuralları"nın 12 maddesi posta kutusu/kanban içindir, "bitti" kanıtı işiyle ilgisiz | **Doğrulandı** (SKILL.md satır 127-132 ve 1-40; `.claude/skills` listesi) |
+| D9 | skills-creator | Yeni skill'i `.agent/skills/` altına kuruyor ve `.agent` manifestini derliyor; Claude penceresinin okuduğu `.claude/skills` için doğrudan yol değil | **Doğrulandı** (SKILL.md çıktı alanı ve Adım 1) |
 
 ## 5. Rapor ↔ ölçüm çelişkileri
 
