@@ -13,6 +13,8 @@ import {
 import { DERIVED_VALID_FROM, MATERIALIZE_URUN_TAVANI, materializePrices } from '../pricingMaterialize.service'
 import {
   clearProductPrice,
+  loadProductPricePanelState,
+  previewProductFixedPrice,
   setProductPrice,
   verifyProductStorefrontPrice,
 } from '../pricingProductPrice.service'
@@ -69,8 +71,12 @@ function matches(row: Row, params: URLSearchParams): boolean {
   return true
 }
 
-function stub(db: Db, options?: StubOptions): { supabase: SupabaseClient<Database>; calls: Captured[]; db: Db } {
+function stub(
+  db: Db,
+  options?: StubOptions,
+): { supabase: SupabaseClient<Database>; calls: Captured[]; reads: Captured[]; db: Db } {
   const calls: Captured[] = []
+  const reads: Captured[] = []
   let idCounter = 0
   let carpismaKullanildi = false
   const fakeFetch: typeof fetch = (input, init) => {
@@ -89,6 +95,7 @@ function stub(db: Db, options?: StubOptions): { supabase: SupabaseClient<Databas
     let body: unknown = null
     if (typeof init?.body === 'string') body = JSON.parse(init.body)
     if (method !== 'GET') calls.push({ method, table, url, body, headers })
+    else reads.push({ method, table, url, body, headers })
 
     if (options?.fail && options.fail.table === table && options.fail.method === method) {
       return json({ code: 'XX000', message: 'sahte sunucu hatası', details: null, hint: null }, 500)
@@ -177,7 +184,7 @@ function stub(db: Db, options?: StubOptions): { supabase: SupabaseClient<Databas
     global: { fetch: fakeFetch },
     auth: { persistSession: false, autoRefreshToken: false },
   })
-  return { supabase, calls, db }
+  return { supabase, calls, reads, db }
 }
 
 // ── Fixture yardımcıları ─────────────────────────────────────────────────────
@@ -829,5 +836,125 @@ describe('clearProductPrice', () => {
     const sonuc = await clearProductPrice(supabase, 'p1', { yontem: 'liste', recalculate: false })
     expect(sonuc).toMatchObject({ removed: 1, recalc: 'yapilmadi', verification: null })
     expect(calls.some((c) => c.table === 'product_prices')).toBe(false)
+  })
+})
+
+// ── loadProductPricePanelState (yan panelin okuduğu durum) ──────────────────
+
+describe('loadProductPricePanelState', () => {
+  it('sabit kural YOKSA: kural null, vitrin fiyatı okunur (kıyas yapılmaz), diğer kural 0', async () => {
+    const { supabase } = stub(katalog())
+
+    const durum = await loadProductPricePanelState(supabase, 'p1')
+
+    expect(durum.fixedRule).toBeNull()
+    expect(durum.otherFixedRules).toBe(0)
+    expect(durum.storefront).toMatchObject({ status: 'beklenen-yok', net: 1400, gross: 1680 })
+  })
+
+  it('ürünün TEK sabit kuralını panele uygun alanlarla döner; para birimli/dönemli/kitaplı/kademeli sabit kurallar "diğer" sayılır', async () => {
+    const { supabase } = stub(
+      katalog({
+        pricing_rule: [
+          ruleRow({ id: 'genel-40' }),
+          ruleRow({ id: 'sabit', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 2400, price_is_vat_inclusive: true, vat_rate_pct: 10 }),
+          ruleRow({ id: 'usd', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, currency: 'USD' }),
+          ruleRow({ id: 'kampanya', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, valid_to: '2027-02-01' }),
+          ruleRow({ id: 'kitap', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, price_book_id: 'pl-dealer' }),
+          ruleRow({ id: 'kademeli', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1, min_quantity: 10 }),
+          ruleRow({ id: 'baska-urun', scope: 1, product_id: 'p2', method: 'fixed', fixed_price: 1 }),
+        ],
+      }),
+    )
+
+    const durum = await loadProductPricePanelState(supabase, 'p1')
+
+    expect(durum.fixedRule).toEqual({ id: 'sabit', fixedPrice: 2400, vatIncluded: true, vatRatePct: 10 })
+    expect(durum.otherFixedRules).toBe(4)
+  })
+
+  it('kural sorgusu YALNIZ panelin gösterdiği dar alanları seçer: marj/maliyet/ek ücret alanı istenmez (karar 95)', async () => {
+    const { supabase, reads } = stub(katalog())
+
+    await loadProductPricePanelState(supabase, 'p1')
+
+    const kuralOkuma = reads.find((r) => r.table === 'pricing_rule')
+    const secilen = (kuralOkuma?.url.searchParams.get('select') ?? '').split(',').map((s) => s.trim())
+    expect(secilen.length).toBeGreaterThan(0)
+    for (const yasak of ['*', 'margin_pct', 'surcharge', 'min_margin_abs', 'max_margin_abs', 'base']) {
+      expect(secilen).not.toContain(yasak)
+    }
+    expect(reads.some((r) => r.table === 'products')).toBe(false)
+  })
+
+  it('aynı üründe birden çok TEK-sabit-kural veri anomalisidir: yanlış birini göstermez, HATA atar', async () => {
+    const { supabase } = stub(
+      katalog({
+        pricing_rule: [
+          ruleRow({ id: 'a', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 1 }),
+          ruleRow({ id: 'b', scope: 1, product_id: 'p1', method: 'fixed', fixed_price: 2 }),
+        ],
+      }),
+    )
+
+    await expect(loadProductPricePanelState(supabase, 'p1')).rejects.toThrow(/2 sabit kural/)
+  })
+
+  it('vitrinde satış satırı yoksa storefront "yok" der (panel "Teklif Alın" gösterir)', async () => {
+    const { supabase } = stub(katalog({ product_prices: [] }))
+
+    const durum = await loadProductPricePanelState(supabase, 'p1')
+
+    expect(durum.storefront).toEqual({ status: 'yok' })
+  })
+
+  it('kural okuması düşerse hata yayılır (panel yükleme hatası gösterir)', async () => {
+    const { supabase } = stub(katalog(), { fail: { table: 'pricing_rule', method: 'GET' } })
+
+    await expect(loadProductPricePanelState(supabase, 'p1')).rejects.toMatchObject({ message: 'sahte sunucu hatası' })
+  })
+})
+
+// ── previewProductFixedPrice (panel önizlemesi = vitrinde görülecek sayı) ───
+
+describe('previewProductFixedPrice', () => {
+  it('KDV DAHİL tutar: net indirgenir, brüt geri hesaplanır', () => {
+    expect(previewProductFixedPrice(1200, true, 20)).toEqual({ net: 1000, gross: 1200 })
+    expect(previewProductFixedPrice(110, true, 10)).toEqual({ net: 100, gross: 110 })
+  })
+
+  it('KDV HARİÇ tutar: net aynen, brüt KDV eklenerek', () => {
+    expect(previewProductFixedPrice(1000, false, 20)).toEqual({ net: 1000, gross: 1200 })
+  })
+
+  it('KDV oranı verilmezse tablo varsayılanı %20 kullanılır', () => {
+    expect(previewProductFixedPrice(1000, false)).toEqual({ net: 1000, gross: 1200 })
+  })
+
+  it('KDV dahil girilen tutar kuruş düzeyinde KAYABİLİR (net kuruşa yuvarlanır): önizleme bunu GÖSTERİR, vitrinle ayrışmaz', () => {
+    const onizleme = previewProductFixedPrice(999.99, true, 20)
+    expect(onizleme).not.toBeNull()
+    // Girilen 999,99 ≠ gösterilecek brüt: panel bu farkı kullanıcıya söyler.
+    expect(onizleme?.gross).not.toBe(999.99)
+    expect(Math.abs((onizleme?.gross ?? 0) - 999.99)).toBeLessThan(0.02)
+  })
+
+  it('kaydın "beklenen" fiyatıyla AYNI çözücü işlevinden gelir (sapma yok)', async () => {
+    const { supabase, db } = stub(katalog({ pricing_rule: [ruleRow({ id: 'genel-40' })] }))
+    const onizleme = previewProductFixedPrice(1200, true, 20)
+
+    const sonuc = await setProductPrice(supabase, 'p1', { amount: 1200, vatIncluded: true }, { yontem: 'panel', recalculate: true, updatedBy: null })
+
+    // Vitrin satırı motorun yazdığı değer; önizleme onunla birebir aynı olmalı.
+    const satir = db['product_prices'].find((r) => r['product_id'] === 'p1' && r['is_active'] === true)
+    expect(satir?.['net_price']).toBe(onizleme?.net)
+    expect(satir?.['gross_price']).toBe(onizleme?.gross)
+    expect(sonuc.verification).toMatchObject({ status: 'dogrulandi' })
+  })
+
+  it('geçersiz tutarda null döner', () => {
+    for (const kotu of [0, -5, Number.NaN, Number.POSITIVE_INFINITY, PRODUCT_FIXED_PRICE_MAX + 1]) {
+      expect(previewProductFixedPrice(kotu, true, 20)).toBeNull()
+    }
   })
 })

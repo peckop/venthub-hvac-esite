@@ -112,6 +112,10 @@ describe('DI Signature compliance static analysis', () => {
           'coefficientToMarginPct', // saf aritmetik
           'isValidFixedPriceAmount', // (amount) → boolean; sabit fiyat tutar aralığı doğrulaması, DB'ye dokunmaz
           'isProductFixedRuleConflict', // (error) → boolean; PostgREST hata nesnesinde tekillik indeksi ihlali ayrımı
+          'isProductFixedRule', // (rule) → boolean; kuralın "ürünün TEK sabit kuralı" olup olmadığı (indeks koşuluyla aynı tanım)
+        ],
+        'pricingProductPrice.service.ts': [
+          'previewProductFixedPrice', // (amount, vatIncluded, vatRatePct) → {net, gross}; saf önizleme, DB'ye dokunmaz
         ],
         'displayPrice.service.ts': [
           'attachDisplayPrices',    // (items, priceMap) → items; DB'ye dokunmaz

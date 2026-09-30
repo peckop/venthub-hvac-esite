@@ -142,7 +142,9 @@ export function isValidFixedPriceAmount(amount: number): boolean {
  * ⚠Bu koşul DB'deki `pricing_rule_urun_tek_sabit_uq` kısmi tekil indeksinin koşuluyla BİREBİR aynı olmalıdır
  * (migration 20260930061500); biri değişirse öteki de değişir.
  */
-function isProductFixedRule(rule: PricingRuleRow): boolean {
+export function isProductFixedRule(
+  rule: Pick<PricingRuleRow, 'method' | 'price_book_id' | 'min_quantity' | 'currency' | 'valid_from' | 'valid_to'>,
+): boolean {
   return (
     rule.method === 'fixed' &&
     rule.price_book_id === null &&

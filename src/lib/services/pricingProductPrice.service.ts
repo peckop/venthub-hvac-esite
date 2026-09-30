@@ -4,6 +4,8 @@ import type { Database } from '../../types/database.types'
 import { computePriceFromRule, type PricingRuleRow } from './pricing.service'
 import {
   clearProductFixedPrice,
+  isProductFixedRule,
+  isValidFixedPriceAmount,
   type ProductFixedPriceInput,
   type ProductFixedPriceYontem,
   setProductFixedPrice,
@@ -202,4 +204,112 @@ export async function clearProductPrice(
   const removed = await clearProductFixedPrice(supabase, productId, options.yontem)
   if (!options.recalculate) return { removed, recalc: 'yapilmadi', verification: null }
   return { removed, ...(await recalculateAndVerify(supabase, productId, options.yontem)) }
+}
+
+/* ──────────────────── yan panelin okuduğu durum (REC-412 Faz 2a) ──────────────────── */
+
+/** Yeni sabit kuralın KDV oranı: `pricing_rule.vat_rate_pct` sütun varsayılanıyla AYNI (tabloda %20). */
+export const DEFAULT_VAT_RATE_PCT = 20
+
+/** Ürünün mevcut "TEK sabit kuralı"nın panele gereken alanları (marj/maliyet alanı YOK, karar 95). */
+export interface ProductFixedRuleView {
+  id: string
+  /** Kuralda saklanan tutar: `vatIncluded` true ise KDV DAHİL girilen, false ise KDV HARİÇ (net) girilen. */
+  fixedPrice: number
+  vatIncluded: boolean
+  vatRatePct: number
+}
+
+export interface ProductPricePanelState {
+  /** Vitrinde şu an görünen (bireysel liste, TRY, aktif satır); `beklenen-yok` = okundu, kıyas yapılmadı. */
+  storefront: StorefrontVerification
+  /** Ürünün TEK sabit kuralı; yoksa null (genel kural uygulanıyor). */
+  fixedRule: ProductFixedRuleView | null
+  /** Ürünün bu panelin yönetmediği sabit kuralları (para birimli, dönemli/kampanya, kitaba özel, kademeli): kural sayfasında yönetilir. */
+  otherFixedRules: number
+}
+
+/**
+ * Yan panel açılırken okunur. YALNIZ okur; kural satırından yalnız panelin gösterdiği dar alanlar seçilir
+ * (`select('*')` marj alanlarını da döndürürdü — moderatör maliyet/marj görmez, karar 95).
+ * Kural sorgusu ürünün TÜM sabit kurallarını çeker; "tek kural" ayrımı `isProductFixedRule` ile yapılır (indeks koşuluyla
+ * aynı tanım). Birden çok eşleşen kural veri anomalisidir: panel yanlış birini göstermesin diye HATA atılır (servis de aynını yapar).
+ */
+export async function loadProductPricePanelState(
+  supabase: SupabaseClient<Database>,
+  productId: string,
+): Promise<ProductPricePanelState> {
+  const [storefront, rules] = await Promise.all([
+    verifyProductStorefrontPrice(supabase, productId, null),
+    supabase
+      .from('pricing_rule')
+      .select('id, method, price_book_id, min_quantity, currency, valid_from, valid_to, fixed_price, price_is_vat_inclusive, vat_rate_pct')
+      .eq('scope', 1)
+      .eq('product_id', productId)
+      .eq('method', 'fixed'),
+  ])
+  if (rules.error) throw rules.error
+
+  const all = rules.data ?? []
+  const own = all.filter(isProductFixedRule)
+  if (own.length > 1) {
+    throw new Error(
+      `loadProductPricePanelState: ürün ${productId} için ${own.length} sabit kural var (en fazla 1 olmalı); kural sayfasından fazlalıkları temizleyin.`,
+    )
+  }
+  const current = own[0]
+  const fixedRule: ProductFixedRuleView | null =
+    current && current.fixed_price !== null
+      ? {
+          id: current.id,
+          fixedPrice: current.fixed_price,
+          vatIncluded: current.price_is_vat_inclusive,
+          vatRatePct: current.vat_rate_pct,
+        }
+      : null
+  return { storefront, fixedRule, otherFixedRules: all.length - own.length }
+}
+
+/**
+ * Saf: girilen tutarın VİTRİNDE görüneceği net/brüt. Panel önizlemesi ile kaydın "beklenen" fiyatı AYNI çözücü işlevinden
+ * (`computePriceFromRule`) gelir: gösterilen sayı ile vitrinde görülecek sayı ayrışamaz. KDV DAHİL girişte net yuvarlanıp
+ * brüt yeniden hesaplandığı için girilen brüt kuruş düzeyinde değişebilir (ör. 999,99 → 1.000,00); çağıran bunu gösterir.
+ * Geçersiz tutarda null (kayıt zaten reddeder).
+ */
+export function previewProductFixedPrice(
+  amount: number,
+  vatIncluded: boolean,
+  vatRatePct: number = DEFAULT_VAT_RATE_PCT,
+): { net: number; gross: number } | null {
+  if (!isValidFixedPriceAmount(amount)) return null
+  const rule: PricingRuleRow = {
+    id: 'onizleme',
+    tenant_id: 'onizleme',
+    price_book_id: null,
+    scope: 1,
+    product_id: 'onizleme',
+    brand_id: null,
+    category_id: null,
+    method: 'fixed',
+    base: 'cost',
+    margin_pct: null,
+    surcharge: 0,
+    fixed_price: amount,
+    vat_rate_pct: vatRatePct,
+    price_is_vat_inclusive: vatIncluded,
+    min_margin_abs: null,
+    max_margin_abs: null,
+    round_to: null,
+    charm_ending: null,
+    min_quantity: 1,
+    priority: 0,
+    is_exclusive: true,
+    currency: null,
+    valid_from: null,
+    valid_to: null,
+    created_at: '',
+    updated_at: '',
+    updated_by: null,
+  }
+  return computePriceFromRule(rule, null, [])
 }
