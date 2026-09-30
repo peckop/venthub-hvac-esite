@@ -225,6 +225,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(disk.sort()).toEqual(beklenen.sort())
   })
 
+  // Gerekçe (OPS şartı, REC-503): sınır 4096 → 6656; en yüklü kart URUN 6151 bayt, pay %8. Aşılırsa kural
+  // özetleri kısaltılır; sınır bir daha gevşetilmez.
   it('her kart bayt sınırının altında', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)

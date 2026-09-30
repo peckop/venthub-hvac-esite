@@ -21,7 +21,8 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 // 4096 idi; 31 kuralın rol kartlarına dağıtımı (REC-503) ile 6656'ya çıktı: en yüklü kart (URUN, ölçüm: 6151 bayt)
-// kendi 17 kuralını taşır, ~500 bayt pay bırakıldı. Pencereye giren satır kart özeti (`--ozet`), tamamı istenince okunur.
+// kendi 17 kuralını taşır, pay %8. Aşılırsa kural özetleri kısaltılır; sınır BİR DAHA GEVŞETİLMEZ (OPS şartı).
+// Pencereye giren satır kart özeti (`--ozet`), tamamı istenince okunur.
 const KART_BAYT_SINIRI = 6656
 
 const KURAL_KAYNAGI = path.join('docs', 'standards', 'gelistirme-kurallari-tam-liste.md')
