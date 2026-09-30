@@ -9,6 +9,7 @@ import {
   denemeListesiniAyristir,
   denemeSiparisiKaydet,
   denemeSiparisleriniAyir,
+  satisDurumuOku,
   satisKipiKarari,
   type FetchLike,
   type SatisKipiGirdi,
@@ -137,6 +138,32 @@ describe('satisKipiKarari — RPC okuması: yalnız gerçek boolean true açar',
     const s = await satisKipiKarari(girdi(fetchImpl))
     expect(s.engel?.status).toBe(503)
     expect(s.neden).toBe('HATA')
+  })
+})
+
+describe('satisDurumuOku — izleme için: açık / kapalı / okunamadı (bilgisizlik "kapalı" değildir)', () => {
+  const oku = (davranis: (n: number) => Promise<Response>, zamanAsimiMs?: number) => {
+    const { fetchImpl } = sahte(davranis)
+    return satisDurumuOku({ supabaseUrl: SUPABASE, serviceRoleKey: ANAHTAR, fetchImpl, zamanAsimiMs })
+  }
+
+  it('gerçek boolean true → acik, false → kapali', async () => {
+    expect(await oku(() => json({ acik: true }))).toBe('acik')
+    expect(await oku(() => json({ acik: false }))).toBe('kapali')
+  })
+
+  it('geri kalan HER biçim okunamadi (kapali sayılmaz; healthz istisnası açılmaz)', async () => {
+    expect(await oku(() => json({ acik: 'true' }))).toBe('okunamadi')
+    expect(await oku(() => json({ acik: 1 }))).toBe('okunamadi')
+    expect(await oku(() => json('json degil'))).toBe('okunamadi')
+    expect(await oku(() => json({}, 404))).toBe('okunamadi')
+    expect(await oku(() => json({}, 401))).toBe('okunamadi')
+    expect(await oku(() => json({}, 500))).toBe('okunamadi')
+    expect(await oku(() => Promise.reject(new Error('ag yok')))).toBe('okunamadi')
+  })
+
+  it('zaman aşımı okunamadi (asılı fetch beklemeyi bitirir)', async () => {
+    expect(await oku(() => asili(), 20)).toBe('okunamadi')
   })
 })
 
