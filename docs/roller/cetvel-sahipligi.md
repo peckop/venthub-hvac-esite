@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/cetvel-sahipligi.json`); elle düzenleme. Sahibi cetvel başlığında yazılı olanlar burada değildir.
 > **Sahip (doğrulanacak)** = düşük güvenli atama: sahip pencere ilk dokunuşta teyit eder.
 
-Rol başına: ADMIN 9 · ALTYAPI 20 · ARAC 4 · EDGE 1 · GEO-SEO 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 10 · URUN 20
+Rol başına: ADMIN 9 · ALTYAPI 20 · ARAC 4 · EDGE 1 · GEO-SEO 1 · HARITA 1 · I18N 1 · KATALOG 7 · MEVZUAT 1 · OPS 10 · URUN 20
 
 | Cetvel | Sahip | Durum | Dayanak |
 |---|---|---|---|
@@ -42,6 +42,7 @@ Rol başına: ADMIN 9 · ALTYAPI 20 · ARAC 4 · EDGE 1 · GEO-SEO 1 · I18N 1 �
 | tasarim-yetenek-standard.md | ARAC | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel) |
 | edge-function-security-standard.md | EDGE | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; önceki sahip ALTYAPI; ALTYAPI ve URUN dokunuşu kartta sınır satırı) |
 | canonical-url-standard.md | GEO-SEO | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
+| hafiza-yazma-duzeni-standard.md | HARITA | teyitli | Recep modeli 2026-09-30 (OPS iletti), REC-530: düzeni HARİTA kurar, kancayı ARAÇ kurar |
 | i18n-localization-standard.md | I18N | teyitli | OPS kararı 2026-09-30 (departmanın asli görevi; URUN uygulayıcı, kartta sınır satırı; başlıktaki "Sahibi: Recep" bu tabloyla değiştirildi) |
 | catalog-ingestion-standard.md | KATALOG | teyitli | alt ajan sınıflandırması (yüksek güven), OPS onaylı |
 | category-taxonomy-standard.md | KATALOG | teyitli | OPS onayı 2026-09-29 (iki role bölünen cetvel); kapalı pencere: sahiplik kayıtta durur, pencere açılınca üstlenir |
