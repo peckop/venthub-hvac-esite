@@ -62,6 +62,11 @@
  * BİR DAHA görünmezse hafıza yine okunmamış olur. Bu yüzden işaretler oturum + NESİL ile
  * anahtarlanır; nesil compact dönüşünde artar (`isaretleriTemizle`, oturum açılışından çağrılır).
  *
+ * ── ENJEKSİYON DEFTERİ (REC-519) ──
+ * Gerçekten BASILAN dersin ID'si `sage-enjeksiyon-defteri.cjs` defterine eklenir (yalnız dosya
+ * yazımı; ders basılmayan sıcak yolda ek maliyet yok). Stop kancası sage sayacını oradan yazar.
+ * Basılan çıktı DEĞİŞMEDİ: `bicimlendir` = `bicimlendirAyrintili(...).metin`.
+ *
  * Yöneten cetvel: docs/standards/hafiza-kancalari-standard.md
  */
 const fs = require('fs')
@@ -199,10 +204,20 @@ function dersleriBul(kok, dosya, simdi = Date.now(), dbKok = kok) {
  * SESSİZ kalır ve bu kancanın onardığı kusurun aynısı olur. Bedeli bilinir, sessizlik değil.
  */
 function bicimlendir(goreli, dersler) {
-  if (!dersler.length) return ''
+  return bicimlendirAyrintili(goreli, dersler).metin
+}
+
+/**
+ * `bicimlendir`in çıktısı + GERÇEKTEN BASILAN derslerin listesi (REC-519: enjeksiyon defteri
+ * bütçeye sığmayıp atlanan dersi "basıldı" saymamalı). Metin `bicimlendir` ile birebir aynıdır.
+ * @returns {{metin: string, basilan: {id:string, kind:string, metin:string}[]}}
+ */
+function bicimlendirAyrintili(goreli, dersler) {
+  if (!dersler.length) return { metin: '', basilan: [] }
   const bas = `SAGE DERSI (${goreli}):\n`
   let cikti = bas
   let atlanan = 0
+  const basilan = []
   for (const d of dersler) {
     const satir = `  · [${d.kind}] ${d.metin}\n`
     if (cikti !== bas && (cikti + satir).length > TOPLAM_KARAKTER) {
@@ -210,11 +225,12 @@ function bicimlendir(goreli, dersler) {
       continue
     }
     cikti += satir
+    basilan.push(d)
   }
   if (atlanan > 0) {
     cikti += `  (${atlanan} ders daha var, butceye sigmadi — tamami: memory_for_file "${goreli}")\n`
   }
-  return cikti === bas ? '' : cikti
+  return { metin: cikti === bas ? '' : cikti, basilan }
 }
 
 /** İşaret dosyası: oturum + NESİL ile anahtarlanır (compact nesli artırır). */
@@ -296,7 +312,26 @@ function satir({ kok, dosya, oturum, dbKok = kok }) {
   }
   // Ders bulunmasa da işaretle: aynı dosya için her turda DB açmanın bedeli boşa gider.
   isaretle(oturum, goreli)
-  return bicimlendir(goreli, dersler)
+  const { metin, basilan } = bicimlendirAyrintili(goreli, dersler)
+  if (basilan.length) enjeksiyonDefterineYaz(oturum, basilan)
+  return metin
+}
+
+/**
+ * REC-519: gerçekten basılan ders ID'lerini oturum defterine ekler (Stop kancası sage
+ * sayacını oradan yazar). Yalnız dosya yazımı; sıcak yola ağır bir şey EKLENMEZ — defter
+ * modülü yalnız ders basılan (nadir) yolda, tembel yüklenir. Yazamazsa ders yine basılır.
+ */
+function enjeksiyonDefterineYaz(oturum, basilan) {
+  try {
+    require('./sage-enjeksiyon-defteri.cjs').yaz(
+      oturum,
+      basilan.map((d) => ({ id: d.id, metin: d.metin, kaynak: 'dosya' })),
+      { pano: PANO },
+    )
+  } catch {
+    /* ölçüm yüzeyi ders göstermeyi engellemez */
+  }
 }
 
 module.exports = {
@@ -312,6 +347,7 @@ module.exports = {
   tekSatir,
   dersleriBul,
   bicimlendir,
+  bicimlendirAyrintili,
   isaretleriTemizle,
   gorulduMu,
   isaretle,

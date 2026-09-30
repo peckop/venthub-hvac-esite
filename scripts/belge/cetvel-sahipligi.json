@@ -326,6 +326,11 @@
       "dogrulanacak": false,
       "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
     },
+    "docs/standards/hafiza-yazma-duzeni-standard.md": {
+      "sahip": "HARITA",
+      "dogrulanacak": false,
+      "dayanak": "Recep modeli 2026-09-30 (OPS iletti), REC-530: düzeni HARİTA kurar, kancayı ARAÇ kurar"
+    },
     "docs/standards/pano-orion-koprusu-standardi.md": {
       "sahip": "ARAC",
       "dogrulanacak": false,
