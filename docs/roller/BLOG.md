@@ -5,6 +5,12 @@
 ## Görev
 Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi.
 
+## Yönetim (karar 201)
+- Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
+- Çalışanlar: araştırmacı (salt-okuma ölçüm), uygulayıcı, çürütücü, doğrulayıcı (işi yapmamış ajan, kanıtı yeniden ölçer). Eşzamanlı çalışan sınırı yok.
+- Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır; hangi rolün hangisini kullanacağını YETENEK atar.
+- Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
+
 ## Dosyalar
 docs/standards/rehber-yazisi-standard.md ve rehber yazı taslakları (REC-369).
 
@@ -18,8 +24,8 @@ Recep görmeden içerik onayı istenmez (karar 98); yayın Recep onayıyla; mevz
 rehber-yazisi cetveli, kaynak dizini, görsel ihtiyaç listesi.
 
 ## Kurallar
-> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
+> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
 - K7 i18n: Kullanıcıya görünen her metin sözlük dosyalarından gelir.
 - K13 Typography prose: Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.
 

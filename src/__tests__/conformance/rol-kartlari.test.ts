@@ -24,6 +24,8 @@ type Uretici = {
   ROLLER: Record<string, unknown>
   ILETISIM: string
   ILETISIM_ISTISNA: Record<string, string>
+  YONETIM: string
+  YONETIM_ISTISNA: Record<string, string>
   ozet: (ad: string) => string
   sahiplikOku: (kok: string) => Record<string, { sahip: string; dogrulanacak: boolean; dayanak: string }>
   sahiplikSorunlari: (h: Record<string, { sahip: string }>, varMi: (d: string) => boolean) => string[]
@@ -250,6 +252,38 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
     expect(blok(uretilen.OPS)).toContain('konsolide tabloyla ben veririm')
     expect(blok(uretilen.ARAC)).toContain('yalnız iş bitince')
+  })
+
+  it('Yönetim bloğu (karar 201, REC-518): istisna yalnız OPS için, diğer dokuz kartta bire bir aynı ve Görev\'in hemen altında', () => {
+    expect(Object.keys(uretici.YONETIM_ISTISNA)).toEqual(['OPS'])
+    const blok = (m: string) => m.slice(m.indexOf('## Yönetim (karar 201)'), m.indexOf('## Dosyalar')).trimEnd()
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin.indexOf('## Görev'), ad).toBeLessThan(metin.indexOf('## Yönetim (karar 201)'))
+      expect(blok(metin), ad).toBe(uretici.YONETIM_ISTISNA[ad] ?? uretici.YONETIM)
+    }
+    // Model içeriği: pencere müdür, çalışan türleri, bağımsız doğrulama, eşzamanlı sınır yok, cetvel atfı.
+    expect(uretici.YONETIM).toContain('müdürüsün')
+    for (const tur of ['araştırmacı', 'uygulayıcı', 'çürütücü', 'doğrulayıcı']) expect(uretici.YONETIM).toContain(tur)
+    expect(uretici.YONETIM).toContain('Eşzamanlı çalışan sınırı yok')
+    // OPS istisnası: şirket yönetimi + kendi işlerinde de müdür (OPS onayı 2026-09-30).
+    expect(uretilen.OPS).toContain('Kendi işlerimde (ölçüm, denetim, kayıt temizliği) ben de müdürüm')
+    expect(uretilen.OPS).not.toContain('Sen bu işin müdürüsün')
+  })
+
+  it('Yönetim bloğunun cetvel atfı gerçek: execution-method-standard.md "10. MÜDÜR MODELİ" bölümünü taşır', () => {
+    const cetvel = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'execution-method-standard.md'), 'utf8')
+    expect(uretici.YONETIM).toContain('docs/standards/execution-method-standard.md')
+    expect(cetvel).toContain('## 10. MÜDÜR MODELİ (§Müdür)')
+    for (const alt of ['### 10.1 Roller', '### 10.2 Müdürün altı adımı', '### 10.3 Çalışan türleri', '### 10.4 Sınırlar']) expect(cetvel).toContain(alt)
+  })
+
+  it('AYIRT EDİCİLİK: Yönetim bloğu silinen ya da değişen kart, OPS\'a konan ortak blok yakalanır', () => {
+    const silinmis = { ...uretilen, URUN: uretilen.URUN.replace(uretici.YONETIM, '') }
+    expect(uretici.sorunlar(silinmis).some((s) => s.startsWith('URUN: ortak blok') || s.startsWith('URUN: başlık eksik'))).toBe(true)
+    const degismis = { ...uretilen, ADMIN: uretilen.ADMIN.replace('Elle yalnız küçük tek dosya', 'Elle yapabilirsin') }
+    expect(uretici.sorunlar(degismis).some((s) => s.startsWith('ADMIN: ortak blok'))).toBe(true)
+    const opsOrtak = { ...uretilen, OPS: uretilen.OPS.replace(uretici.YONETIM_ISTISNA.OPS, uretici.YONETIM) }
+    expect(uretici.sorunlar(opsOrtak).some((s) => s.startsWith('OPS: ortak blok'))).toBe(true)
   })
 
   it('OPS kartı karar kaynağı kuralını taşır (fleet §29: karara giden sayı betikten gelir, kaynak Linear kaydında)', () => {

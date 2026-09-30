@@ -5,6 +5,12 @@
 ## Görev
 Marka kimliği: logo, palet, yazı tipi ve belge sistemi (Design-MARKA projesi).
 
+## Yönetim (karar 201)
+- Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
+- Çalışanlar: araştırmacı (salt-okuma ölçüm), uygulayıcı, çürütücü, doğrulayıcı (işi yapmamış ajan, kanıtı yeniden ölçer). Eşzamanlı çalışan sınırı yok.
+- Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır; hangi rolün hangisini kullanacağını YETENEK atar.
+- Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
+
 ## Dosyalar
 Design-MARKA proje çıktıları ve yorumları; markanın belge sistemi.
 
@@ -18,9 +24,9 @@ Tasarım = hedef, canlı = eski: canlıya uygulama URUN işidir; para harcatan t
 venthub-tasarim-dili, design-dna, tipografi ve erişilebilirlik skill'leri.
 
 ## Kurallar
-> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
-- K10 Design token: Arbitrary Tailwind değeri yasak; değerler `tokens.js`'ten, renk HEX değil CSS custom property (HSL).
+> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
+- K10 Design token: Arbitrary Tailwind değeri yasak; `tokens.js` kullanılır, renk HEX değil CSS custom property (HSL).
 - K12 focus-visible: Etkileşimli elemanlarda `focus:` değil `focus-visible:`.
 - K13 Typography prose: Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.
 
