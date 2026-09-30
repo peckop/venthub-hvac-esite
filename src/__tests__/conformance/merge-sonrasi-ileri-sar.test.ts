@@ -171,6 +171,22 @@ describe('INV-MERGE-SONRASI-ILERI-SAR-2 · ilerleme izleme ve yeniden deneme', (
     expect(ms).toBeLessThan(20_000)
   })
 
+  it('yama sırası: ana-agac-tazelik içindeki git çağrıları da ilerleme işareti yazar (davranış)', { timeout: 420_000 }, () => {
+    // Kanca DOĞRUDAN çocuk kipinde (--is) koşar; işaretler çocuğun stderr'ine yazılır. `require(tazelik)` yamadan ÖNCEYE
+    // alınırsa tazelik modülü orijinal execFileSync'i destructure eder → anaAgacYolu/ileriSar içindeki git çağrıları işaretsiz kalır.
+    const { wt } = kurulum()
+    const r = spawnSync(process.execPath, [KANCA, '--is'], {
+      input: JSON.stringify({ cwd: wt, tool_input: { command: 'gh pr merge 1' } }),
+      encoding: 'utf8',
+      windowsHide: true,
+      timeout: 300_000,
+    })
+    const isaretler = (r.stderr ?? '').split(/\r?\n/).map((s) => s.trim())
+    const gitSayisi = isaretler.filter((s) => s === 'ADIM git').length
+    expect(gitSayisi, `ADIM git satırı sayısı (stderr: ${JSON.stringify(r.stderr)})`).toBeGreaterThanOrEqual(3)
+    for (const ad of ['basla', 'fetch', 'ileri-sar']) expect(isaretler, `ADIM ${ad} yok`).toContain(`ADIM ${ad}`)
+  })
+
   it('kaynak: sabit süre bütçesi (spawnSync + timeout) GERİ GELMEZ; ilerleme işareti ve takılma penceresi var', () => {
     const kaynak = fs.readFileSync(KANCA, 'utf8')
     const kod = kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1')
