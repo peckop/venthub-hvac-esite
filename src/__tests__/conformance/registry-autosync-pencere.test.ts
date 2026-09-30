@@ -39,7 +39,7 @@ function cagriGovdeleri(kod: string): string[] {
 }
 
 describe('INV-AUTOSYNC-PENCERE-1 · alt süreçler pencere açmaz', () => {
-  const cagrilar = cagriGovdeleri(KAYNAK.replace(/\/\/.*$/gm, ''))
+  const cagrilar = cagriGovdeleri(KAYNAK.replace(/(?<!:)\/\/.*$/gm, ''))
 
   it('betikte en az iki alt süreç çağrısı bulunur (kaynak değişirse test sessizce boşa geçmesin)', () => {
     expect(cagrilar.length).toBeGreaterThanOrEqual(2)
@@ -50,7 +50,7 @@ describe('INV-AUTOSYNC-PENCERE-1 · alt süreçler pencere açmaz', () => {
   })
 
   it('kaynakta kabuk açan çağrı (exec/execSync/spawn shell) yoktur', () => {
-    const temiz = KAYNAK.replace(/\/\/.*$/gm, '')
+    const temiz = KAYNAK.replace(/(?<!:)\/\/.*$/gm, '')
     expect(temiz).not.toMatch(/\bexecSync\(/)
     expect(temiz).not.toMatch(/shell:\s*true/)
   })
