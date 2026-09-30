@@ -10,7 +10,8 @@
  * böylece kullanıcı mesaj taşıyıcısı olmaktan kurtulur.
  *
  * stdin: { session_id, cwd, ... }
- * stdout: { hookSpecificOutput: { hookEventName, additionalContext } }
+ * stdout: { hookSpecificOutput: { hookEventName, additionalContext, sessionTitle? } }
+ *   sessionTitle = şeridin pencere adı ("Araç", "Ops"…; yalnız claim varsa ve source startup/resume/fork; REC-525, aşağıda).
  */
 const fs = require('fs')
 const path = require('path')
@@ -272,6 +273,60 @@ function rolKartiSatiri(lane) {
     return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
   }
 }
+/**
+ * ⭐PENCERE ADI = ŞERİT ADI (REC-525, 2026-09-30). `hookSpecificOutput.sessionTitle` `/rename` ile AYNI etkidir
+ * (belge: code.claude.com/docs/en/hooks). Pencereleri IDE eklentisi açıyor, `--name` bayrağı yok ve her açılış
+ * `--resume=<sid>`; ad verilmezse pencereler `venthub-hvac-72` gibi anlamsız adlarla açılır ve şerit ↔ pencere
+ * eşlemesi (SendMessage) karışır (REC-404). Ad oturumla KALICIdır: bir kez verilince sonraki resume'lar da taşır.
+ *
+ * KURALLAR:
+ *  · ELLE/ÖNCEDEN VERİLMİŞ AD EZİLMEZ (ORTA-1): belge (SessionStart girdisi) `session_title` alanını verir — "oturum
+ *    başlığı zaten ayarlıysa (--name, /rename)"; doluysa alan HİÇ eklenmez. Kanca Recep'in elle verdiği adı görebilir
+ *    ve ezmez; kendi verdiği ad da bir sonraki açılışta `session_title` dolu geldiği için tekrar yazılmaz (sonuç aynı);
+ *  · yalnız pano talebi varsa; talep yoksa alan HİÇ eklenmez (`CC_LANE` yedeği de kullanılmaz: ortam değişkeni bir
+ *    ad taahhüdü değil, rol ipucudur). Talep BAYAT (TTL 4 saat, makine kapanıp sabah resume) olsa da KENDİ sid'inin
+ *    talebiyse ad verilir (ORTA-3, `board.tumTalepler`; başka pencerenin talebi karışmaz); BIRAKILMIŞ talep ad vermez;
+ *  · ÇAKIŞMA (ORTA-2): aynı adı verecek başka CANLI oturum varsa (aynı şerit ya da aynı ad) alan eklenmez —
+ *    iki pencere aynı adı taşırsa SendMessage to:"Araç" belirsizleşir;
+ *  · yalnız startup/resume/fork — belge clear ve compact'ta alanı yok sayar, gereksiz çıktı basılmaz;
+ *  · ad ÇIPLAK pano yazımı (ARAC) değil, Recep'in pencereleri elle verdiği İNSAN adıdır ("Araç", "Ops", "Yetenek",
+ *    "Harita" — Recep 09-30). Eşleme TEK KAYNAKTA: scripts/board/pencere-adlari.cjs (`ad(serit)` + `TABLO`); başka
+ *    üreticiler de oradan alır, burada kopya YOK. Tabloda olmayan şerit → ilk harf büyük, kalanı küçük (Türkçe
+ *    karakter ÜRETİLMEZ, tahmin yok); string değil/boş/`lane` yer tutucusu → '' (alan eklenmez);
+ *  · FAIL-OPEN: modül/hesap hatası → '' (alan yok, mevcut çıktı aynen); kanca `claude agents` ÇAĞIRMAZ (yavaşlatır).
+ *
+ * BİLİNEN SINIRLAR (dürüst liste):
+ *  · claim'siz YENİ pencere ilk açılışta ad ALMAZ: o an pano talebi yoktur. Şerit talep edilince pencere ad alır
+ *    yalnız SONRAKİ açılışta (resume/startup/fork); pencere içinde anlık yeniden adlandırma bu kancanın işi değil;
+ *  · fork'ta yeni oturum YENİ sid alır ve claim'i yoktur → fork ilk açılışta ad almaz (belge fork'ta alanı uygular,
+ *    ama pano kimlik bağı olmadan şerit bilinemez);
+ *  · claim ile pencere adı bağı yalnız sid'dir; iki pencere aynı şeridi talep ederse ikisi de ad ALMAZ (ORTA-2 seçimi:
+ *    belirsiz ad, adsızlıktan kötü).
+ */
+const PENCERE_ADI_KAYNAKLARI = new Set(['startup', 'resume', 'fork'])
+let pencereAdi = ''
+/**
+ * Bu pencerenin adı ('' = alan eklenmez). Sırayla: ad zaten verilmiş mi (ORTA-1) → kendi sid'inin talebi (bayat dahil,
+ * bırakılmış hariç; ORTA-3) → tablodan ad → başka canlı oturum aynı adı alıyor/taşıyor mu (ORTA-2). Her hata → ''.
+ */
+function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
+  try {
+    if (typeof mevcutAd === 'string' && mevcutAd.trim()) return ''
+    const benim = board.tumTalepler().find((c) => c.sid === kendiSid)
+    if (!benim) return ''
+    const modul = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const ad = modul.ad(benim.lane)
+    if (!ad) return ''
+    const digerleri = live.filter((c) => c.sid !== kendiSid)
+    if (digerleri.some((c) => modul.ad(c.lane) === ad)) return ''
+    const adlar = board.pencereAdlari()
+    if (digerleri.some((c) => adlar.get(c.sid) === ad)) return ''
+    return ad
+  } catch {
+    return '' // modül/pano hatası: alan eklenmez, mevcut çıktı aynen (fail-open)
+  }
+}
+
 /** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
 function rolBolumuEkle() {
   const satir = rolKartiSatiri(rolSeridi)
@@ -412,6 +467,7 @@ try {
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
+  pencereAdi = pencereAdiKarari(board, live, sid, input.session_title)
 
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
@@ -510,12 +566,12 @@ bolum('yontem', 6,
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
 const yaz = () => {
   rolBolumuEkle()
-  process.stdout.write(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: birlestir(),
-    },
-  }))
+  const cikti = {
+    hookEventName: 'SessionStart',
+    additionalContext: birlestir(),
+  }
+  if (pencereAdi && PENCERE_ADI_KAYNAKLARI.has(source)) cikti.sessionTitle = pencereAdi
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: cikti }))
 }
 ;(async () => {
   try {
