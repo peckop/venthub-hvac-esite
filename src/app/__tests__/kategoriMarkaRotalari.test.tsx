@@ -253,12 +253,16 @@ describe('eski marka rotası — bugünküyle aynı', () => {
   it.each([
     ['tr', 'avens'],
     ['en', 'avens'],
-    // bilinmeyen marka bugün de gövdeye gider (görünüm kendi boş hâlini çizer) — DEĞİŞMEZ
-    ['tr', 'boyle-marka-yok'],
   ])('/%s/brands/%s çizilir', async (lang, slug) => {
     await expect(sonuc(() => MarkaEski(p({ lang, slug })), cagri.marka)).resolves.toBe(
       `CIZ:${JSON.stringify({ lang, slug })}`,
     )
+  })
+
+  // REC-490: bilinmeyen marka artık GERÇEK 404 (eskiden 200 + "Marka Bulunamadı" = Google soft 404; bu satır
+  // kusuru kilitliyordu). Gövdeye HİÇ gidilmez.
+  it.each(['tr', 'en'])('/%s/brands/boyle-marka-yok → 404 (soft 404 değil)', async (lang) => {
+    await expect(sonuc(() => MarkaEski(p({ lang, slug: 'boyle-marka-yok' })), cagri.marka)).resolves.toBe('NOT_FOUND')
   })
 
   it('iki dil × her marka önceden üretilir (sıra: marka başına tr, en)', async () => {
