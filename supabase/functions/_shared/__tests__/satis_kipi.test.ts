@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  DENEME_ISARETI,
+  denemeIsaretleriniOku,
+  denemeIsaretleriSorgusu,
   denemeIzniHukmu,
+  denemeKaydiGovdesi,
   denemeListesiniAyristir,
   denemeSiparisiKaydet,
+  denemeSiparisleriniAyir,
   satisKipiKarari,
   type FetchLike,
   type SatisKipiGirdi,
@@ -38,7 +43,7 @@ interface Cagri {
 function sahte(davranis: (n: number) => Promise<Response>): { fetchImpl: FetchLike; cagrilar: Cagri[] } {
   const cagrilar: Cagri[] = []
   const fetchImpl: FetchLike = (url, init) => {
-    cagrilar.push({ url, method: init.method, headers: init.headers, body: init.body })
+    cagrilar.push({ url, method: init.method, headers: init.headers, body: init.body ?? '' })
     return davranis(cagrilar.length)
   }
   return { fetchImpl, cagrilar }
@@ -335,5 +340,63 @@ describe('denemeSiparisiKaydet — izinli sipariş siparişten ÖNCE denetim gü
     expect(await denemeSiparisiKaydet(g(hata.fetchImpl))).toBe(false)
     const ag = sahte(() => Promise.reject(new TypeError('network')))
     expect(await denemeSiparisiKaydet(g(ag.fetchImpl))).toBe(false)
+  })
+})
+
+describe('deneme işareti — yazan ve okuyanlar TEK sabitten (OPS şartı, row_pk birleşimi)', () => {
+  const ORDER_A = 'aaaa1111-0000-0000-0000-000000000001'
+  const ORDER_B = 'bbbb2222-0000-0000-0000-000000000002'
+  const ORDER_C = 'cccc3333-0000-0000-0000-000000000003'
+
+  it('yazılan satır ile okuma sorgusu AYNI işaret sabitini kullanır (yazma/okuma kayması yakalanır)', () => {
+    const govde = denemeKaydiGovdesi({ orderId: ORDER_A, userId: KULLANICI, ortam: 'sandbox', requestId: 'r', tenantId: 't1' })
+    expect(govde.table_name).toBe(DENEME_ISARETI.table_name)
+    expect(govde.action).toBe(DENEME_ISARETI.action)
+    const sorgu = new URL(denemeIsaretleriSorgusu(SUPABASE, 't1'))
+    expect(sorgu.pathname).toBe('/rest/v1/admin_audit_log')
+    expect(sorgu.searchParams.get('table_name')).toBe(`eq.${govde.table_name}`)
+    expect(sorgu.searchParams.get('action')).toBe(`eq.${govde.action}`)
+    expect(sorgu.searchParams.get('select')).toBe('row_pk')
+    expect(sorgu.searchParams.get('tenant_id')).toBe('eq.t1')
+    expect(new URL(denemeIsaretleriSorgusu(`${SUPABASE}/`)).searchParams.has('tenant_id')).toBe(false)
+  })
+
+  it('ayırma: işaretli sipariş deneme, işaretsiz gerçek; büyük/küçük harf ve boşluk farkı eşleşmeyi bozmaz', () => {
+    const siparisler = [{ id: ORDER_A }, { id: ORDER_B }, { id: ORDER_C }]
+    const r = denemeSiparisleriniAyir(siparisler, [{ row_pk: ORDER_A.toUpperCase() }, { row_pk: ` ${ORDER_C} ` }, { row_pk: null }])
+    expect(r.deneme.map((s) => s.id)).toEqual([ORDER_A, ORDER_C])
+    expect(r.gercek.map((s) => s.id)).toEqual([ORDER_B])
+    expect(r.belirsiz).toEqual([])
+  })
+
+  it('işaret listesi OKUNAMADIYSA (null) hiçbir sipariş "gerçek" sayılmaz: hepsi belirsiz', () => {
+    const r = denemeSiparisleriniAyir([{ id: ORDER_A }, { id: ORDER_B }], null)
+    expect(r.gercek).toEqual([])
+    expect(r.deneme).toEqual([])
+    expect(r.belirsiz).toHaveLength(2)
+  })
+
+  it('boş işaret listesi: hepsi gerçek (işaret yok = deneme yok)', () => {
+    const r = denemeSiparisleriniAyir([{ id: ORDER_A }], [])
+    expect(r.gercek).toHaveLength(1)
+    expect(r.belirsiz).toEqual([])
+  })
+
+  it('denemeIsaretleriniOku: doğru URL ve servis anahtarıyla GET; satırları döner', async () => {
+    const { fetchImpl, cagrilar } = sahte(() =>
+      Promise.resolve(new Response(JSON.stringify([{ row_pk: ORDER_A }, { row_pk: 5 }, {}]), { status: 200 })),
+    )
+    const sonuc = await denemeIsaretleriniOku({ supabaseUrl: SUPABASE, serviceRoleKey: ANAHTAR, tenantId: 't1', fetchImpl })
+    expect(sonuc).toEqual([{ row_pk: ORDER_A }, { row_pk: null }, { row_pk: null }])
+    expect(cagrilar[0].url).toBe(denemeIsaretleriSorgusu(SUPABASE, 't1'))
+    expect(cagrilar[0].method).toBe('GET')
+  })
+
+  it('denemeIsaretleriniOku: HTTP hatası, dizi olmayan gövde, ağ hatası ve bozuk JSON\'da null (fail-closed)', async () => {
+    const oku = (fetchImpl: FetchLike) => denemeIsaretleriniOku({ supabaseUrl: SUPABASE, serviceRoleKey: ANAHTAR, fetchImpl })
+    expect(await oku(sahte(() => Promise.resolve(new Response('x', { status: 500 }))).fetchImpl)).toBeNull()
+    expect(await oku(sahte(() => Promise.resolve(new Response('{"hata":1}', { status: 200 }))).fetchImpl)).toBeNull()
+    expect(await oku(sahte(() => Promise.reject(new TypeError('network'))).fetchImpl)).toBeNull()
+    expect(await oku(sahte(() => Promise.resolve(new Response('{', { status: 200 }))).fetchImpl)).toBeNull()
   })
 })

@@ -185,3 +185,61 @@ describe('INV-SATIS-KIPI-EDGE-1 — sabotaj: her bozulma yolu GERÇEKTEN yakalan
     expect(kapiBaglantisiniDenetle(bozuk).join('|')).toContain('çağrısı yok')
   })
 })
+
+/**
+ * denemeIsaretiTekKaynak — deneme bayrağı `admin_audit_log`'da durduğu için (sipariş satırında değil)
+ * deneme siparişini ayıran her okuma `row_pk` birleşimi yapar. Bu birleşimin işareti (`table_name` +
+ * `action`) YALNIZ `_shared/satis_kipi.ts` içinde tanımlıdır; okuyanlar `denemeIsaretleriniOku` /
+ * `denemeSiparisleriniAyir`i içe aktarır. Başka bir uç, betik ya da görünüm eylem adını kendi
+ * cümlesiyle yazarsa yazan/okuyan işaret kayabilir ve deneme siparişi gerçek ciroya karışır.
+ */
+describe('INV-SATIS-KIPI-EDGE-1 — denemeIsaretiTekKaynak: eylem adı tek dosyada', () => {
+  const EYLEM = 'satis_kipi_deneme_izni'
+  const TARANACAK = ['supabase/functions', 'supabase/migrations', 'scripts', 'src'] as const
+  const ATLANAN_KLASOR = new Set(['node_modules', '.next', '__tests__', 'archive'])
+
+  function dosyalar(klasor: string): string[] {
+    const cikti: string[] = []
+    if (!existsSync(klasor)) return cikti
+    for (const ad of readdirSync(klasor, { withFileTypes: true })) {
+      if (ad.isDirectory()) {
+        if (!ATLANAN_KLASOR.has(ad.name)) cikti.push(...dosyalar(path.join(klasor, ad.name)))
+      } else if (/\.(ts|tsx|js|mjs|cjs|sql)$/.test(ad.name) && !/\.test\.(ts|tsx)$/.test(ad.name)) {
+        cikti.push(path.join(klasor, ad.name))
+      }
+    }
+    return cikti
+  }
+
+  function eylemiYazanlar(): string[] {
+    const bulunan: string[] = []
+    for (const k of TARANACAK) {
+      for (const dosya of dosyalar(path.join(KOK, k))) {
+        const goreli = path.relative(KOK, dosya).split(path.sep).join('/')
+        if (readFileSync(dosya, 'utf8').includes(EYLEM)) bulunan.push(goreli)
+      }
+    }
+    return bulunan.sort()
+  }
+
+  /** Tek kaynak dışında eylem adını yazan dosyalar (saf: sabotaj aynı fonksiyonu sınar). */
+  function tekKaynakDisindakiler(yazanlar: readonly string[]): string[] {
+    return yazanlar.filter((d) => d !== YARDIMCI)
+  }
+
+  it('eylem adını üretim kodunda YALNIZ _shared/satis_kipi.ts yazar', () => {
+    const yazanlar = eylemiYazanlar()
+    const ihlal = tekKaynakDisindakiler(yazanlar)
+    expect(ihlal, `eylem adı tek kaynak dışında geçiyor: ${ihlal.join(', ')}`).toEqual([])
+  })
+
+  it('tarama kırılırsa sessiz geçmez: yardımcı dosya taramada bulunuyor ve eylem adını içeriyor', () => {
+    expect(eylemiYazanlar()).toContain(YARDIMCI)
+    expect(readFileSync(path.join(KOK, YARDIMCI), 'utf8')).toContain(EYLEM)
+  })
+
+  it('sabotaj: başka bir dosya eylem adını kendisi yazarsa denetim onu yakalar', () => {
+    expect(tekKaynakDisindakiler([YARDIMCI])).toEqual([])
+    expect(tekKaynakDisindakiler([YARDIMCI, 'scripts/db/checks/baska-karne.mjs'])).toEqual(['scripts/db/checks/baska-karne.mjs'])
+  })
+})

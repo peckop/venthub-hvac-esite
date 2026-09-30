@@ -64,7 +64,7 @@ export interface SatisKipiOrtam {
 /** Vitest'te sahte, Deno'da gerçek `fetch`. `signal` istekle birlikte geçer. */
 export type FetchLike = (
   url: string,
-  init: { method: string; headers: Record<string, string>; body: string; signal: AbortSignal },
+  init: { method: string; headers: Record<string, string>; body?: string; signal: AbortSignal },
 ) => Promise<Response>
 
 export interface SatisKipiGirdi {
@@ -277,6 +277,81 @@ export interface DenemeKaydiGirdi {
 }
 
 /**
+ * DENEME İŞARETİ — TEK KAYNAK (OPS hükmü 2026-09-30, şart 3'ün sapması).
+ * Deneme bayrağı sipariş satırında değil `admin_audit_log`'da durur (`iyzico-callback` `payment_debug`'ı
+ * baştan yazdığı için orada kaybolurdu). Bunun bedeli: deneme siparişini ayıran HER okuma (karne,
+ * satış önkoşulu, rapor) `admin_audit_log.row_pk = venthub_orders.id` birleşimini yapmak zorundadır.
+ * Birleşimin üç parçası (işaret, sorgu, ayırma) YALNIZ burada tanımlıdır; başka dosya `satis_kipi_deneme_izni`
+ * yazamaz (konformans kolu `denemeIsaretiTekKaynak`). Yazan (`denemeSiparisiKaydet`) ve okuyanlar aynı sabiti kullanır.
+ */
+export const DENEME_ISARETI = { table_name: 'venthub_orders', action: 'satis_kipi_deneme_izni' } as const
+
+/** Yazma gövdesi: yazan kodun ürettiği satır ile okuyanların aradığı işaret AYNI sabitten gelir. */
+export function denemeKaydiGovdesi(g: Pick<DenemeKaydiGirdi, 'orderId' | 'userId' | 'ortam' | 'requestId' | 'tenantId'>) {
+  return {
+    table_name: DENEME_ISARETI.table_name,
+    row_pk: g.orderId,
+    action: DENEME_ISARETI.action,
+    after: { neden: 'DENEME_IZNI', user_id: g.userId, ortam: g.ortam, request_id: g.requestId },
+    tenant_id: g.tenantId,
+  }
+}
+
+/** Okuma sorgusu (PostgREST, salt okuma): deneme izniyle açılmış siparişlerin `row_pk` listesi. */
+export function denemeIsaretleriSorgusu(supabaseUrl: string, tenantId?: string): string {
+  const q = new URLSearchParams({
+    table_name: `eq.${DENEME_ISARETI.table_name}`,
+    action: `eq.${DENEME_ISARETI.action}`,
+    select: 'row_pk',
+  })
+  if (tenantId) q.set('tenant_id', `eq.${tenantId}`)
+  return `${supabaseUrl.replace(/\/+$/, '')}/rest/v1/admin_audit_log?${q.toString()}`
+}
+
+/**
+ * Saf birleşim: sipariş listesini deneme / gerçek diye ayırır. `row_pk` metin, `id` uuid olduğundan
+ * karşılaştırma küçük harfe çevrilerek yapılır. İşaret listesi `null` (okunamadı) ise HİÇBİR sipariş
+ * "gerçek" sayılmaz: okunamayan işaret, deneme siparişini gerçek ciroya karıştırmasın diye `belirsiz` döner.
+ */
+export function denemeSiparisleriniAyir<T extends { id: string }>(
+  siparisler: readonly T[],
+  isaretler: ReadonlyArray<{ row_pk: string | null }> | null,
+): { deneme: T[]; gercek: T[]; belirsiz: T[] } {
+  if (isaretler === null) return { deneme: [], gercek: [], belirsiz: [...siparisler] }
+  const kume = new Set(isaretler.map((i) => String(i.row_pk ?? '').trim().toLowerCase()).filter((s) => s.length > 0))
+  const deneme: T[] = []
+  const gercek: T[] = []
+  for (const s of siparisler) (kume.has(String(s.id).trim().toLowerCase()) ? deneme : gercek).push(s)
+  return { deneme, gercek, belirsiz: [] }
+}
+
+/** İşaretleri servis anahtarıyla okur; herhangi bir hata/zaman aşımı/bozuk yanıtta `null` (fail-closed: ayırma `belirsiz` döner). */
+export async function denemeIsaretleriniOku(g: {
+  supabaseUrl: string
+  serviceRoleKey: string
+  tenantId?: string
+  fetchImpl: FetchLike
+}): Promise<Array<{ row_pk: string | null }> | null> {
+  const ctrl = new AbortController()
+  const zamanlayici = setTimeout(() => ctrl.abort(), VARSAYILAN_ZAMAN_ASIMI_MS)
+  try {
+    const r = await g.fetchImpl(denemeIsaretleriSorgusu(g.supabaseUrl, g.tenantId), {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${g.serviceRoleKey}`, apikey: g.serviceRoleKey },
+      signal: ctrl.signal,
+    })
+    if (!r.ok) return null
+    const govde: unknown = await r.json()
+    if (!Array.isArray(govde)) return null
+    return govde.map((x) => ({ row_pk: typeof (x as { row_pk?: unknown })?.row_pk === 'string' ? (x as { row_pk: string }).row_pk : null }))
+  } catch {
+    return null
+  } finally {
+    clearTimeout(zamanlayici)
+  }
+}
+
+/**
  * Şart 3: deneme izniyle açılan HER sipariş, siparişten ÖNCE denetim günlüğüne yazılır.
  * Yazılamazsa `false` döner ve çağıran sipariş OLUŞTURMAZ (izlenemeyen deneme siparişi yan etkileri
  * — stok, kupon, e-posta, fatura — temizlenemez). `admin_audit_log` eklemeli bir tablodur;
@@ -294,13 +369,7 @@ export async function denemeSiparisiKaydet(g: DenemeKaydiGirdi): Promise<boolean
         'Content-Type': 'application/json',
         Prefer: 'return=minimal',
       },
-      body: JSON.stringify({
-        table_name: 'venthub_orders',
-        row_pk: g.orderId,
-        action: 'satis_kipi_deneme_izni',
-        after: { neden: 'DENEME_IZNI', user_id: g.userId, ortam: g.ortam, request_id: g.requestId },
-        tenant_id: g.tenantId,
-      }),
+      body: JSON.stringify(denemeKaydiGovdesi(g)),
       signal: ctrl.signal,
     })
     return r.ok
