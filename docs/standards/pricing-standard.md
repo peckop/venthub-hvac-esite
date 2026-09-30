@@ -654,6 +654,21 @@ resolvePrice(supabase, product, qty, currency, userCtx):
 - **K1–K5 zorunlu:** jenerik table-kit (K1), URL-state (K2), RBAC 3-katman + sunucu RLS (K3),
   `logAdminAction` gerçek-yazma (K4), 5 durum (K5). §8 skoru ≥20/24.
 
+### 12.1 Tek ürün fiyat girişi sözleşmesi (REC-412 Faz 2a · 2026-09-30 · kapı INV-ADMIN-FIYAT-GIRISI-1)
+
+Ürün satırındaki "Fiyat" paneli (`ProductPricePanel`) bir ürünün **tek sabit satış kuralını** yönetir. Panel kural motoruna bir kapıdır, ikinci bir fiyat motoru değildir; aşağıdaki sözleşme bozulursa vitrin fiyatı ile yönetici ekranı ayrışır.
+
+- **Tek yazma yolu servis:** panel fiyatı yalnız `setProductPrice` / `clearProductPrice` (`pricingProductPrice.service.ts`) ile yazar. Bu iki işlev kuralı yazar, ürünün vitrin satırını yeniden hesaplar ve **geri okuyarak** vitrinde görünen fiyatı ölçer. Panelin `products.price`, `product_prices` ya da `pricing_rule` tablosuna doğrudan yazması YASAK (kapı süpürür).
+- **Girilen tutar KDV dahil ya da hariç seçilir** (varsayılan = yöneticinin son seçimi, tarayıcıda saklanır). Kural motoru net saklar (§5); panel iki tutarı yan yana gösterir ve kuruş yuvarlaması dahil girilen ile vitrinde görünen farklıysa bunu söyler.
+- **"Kaydedildi" ile "vitrinde görünüyor" ayrı iddialardır.** Kayıttan sonra panel vitrinin gerçekte ne gösterdiğini yazar: `dogrulandi`, `farkli`, `yok`, `belirsiz`; başka bir kural kazanıyorsa `golgelendi` uyarısı ve kural sayfası bağlantısı. Sessiz başarı yasak.
+- **Yalnız ürünün süresiz, adet-1, kitapsız, para birimsiz sabit kuralı** yönetilir (`isProductFixedRule`; tekillik indeksi `pricing_rule_urun_tek_sabit_uq` ile aynı koşul). Para birimli, dönemli, kitaba özel ve kademeli kurallar panelde yalnız SAYI olarak görünür ("N ek sabit kural"), değiştirilmez.
+- **Yetki:** "Fiyat" eylemi yalnız fiyat yazma yetkisi olana görünür (`canWrite('pricing')`); sunucu RLS asıl sınırdır. Vitrine yansıtma (`recalculate`) yalnız `admin`/`super_admin` içindir; yetkisiz rol kuralı kaydeder, vitrin yansıması yöneticiye kalır ve panel bunu söyler.
+- **Maliyet ve marj panelde YOKTUR.** Panel `select('*')` kullanmaz; `margin_pct`, `surcharge`, `cost_in_base`, `purchase_price` alanlarını okumaz ve göstermez (moderatör sızıntısı, karar 95).
+- **Hata yolları:** okuma başarısızsa hata + "Tekrar dene"; yazma başarısızsa hata metni ve giriş korunur; kısmi başarı (kural yazıldı, vitrin yansıması başarısız) kullanıcıya açıkça söylenir. Kaldırma onay ister.
+- **Bilinen sapma (OPS kabulü 2026-09-30):** moderatör rolü "Fiyat" eylemini şimdilik görmez, çünkü canlı politikaya göre fiyat tablolarına yazamaz (`rbac.ts`). Yetki veritabanından okunur hâle gelince (REC-442) açılır.
+
+**Enforcement:** `src/__tests__/conformance/admin-fiyat-girisi.test.ts` (INV-ADMIN-FIYAT-GIRISI-1). Plan: `docs/plans/rec412-tek-urun-fiyat-girisi-2026-09-29.md` §10.
+
 ---
 
 ## 13. Zorunlu kurallar (CLAUDE.md + standartlar)

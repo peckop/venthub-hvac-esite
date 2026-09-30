@@ -192,7 +192,8 @@ export const products = {
     image: 'Görsel',
     name: 'Ad',
     price: 'Satış fiyatı (KDV dahil)',
-    priceHint: 'Standart listenin satış fiyatı; fiyat kuralından hesaplanır, buradan değiştirilmez.',
+    priceHint:
+      'Standart listenin satış fiyatı; fiyat kuralından hesaplanır. Sabit fiyat girmek için satırdaki "Fiyat" düğmesini kullanın (fiyat yetkisi gerekir).',
     priceQuote: 'Teklif',
     priceUnreadable: 'Okunamadı',
     sku: 'SKU',

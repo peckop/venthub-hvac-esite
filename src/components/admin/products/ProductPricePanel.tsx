@@ -72,7 +72,7 @@ function errorMessage(err: unknown): string {
   return String(err)
 }
 
-const PANEL_LEAD_CLASS = 'text-xs font-semibold uppercase tracking-wide text-admin-fg-muted'
+const PANEL_LEAD_CLASS = 'text-xs font-semibold text-admin-fg-muted'
 
 const ProductPricePanel: React.FC<ProductPricePanelProps> = ({ open, product, canReflect, onClose, onSaved }) => {
   const { t, lang } = useI18n()

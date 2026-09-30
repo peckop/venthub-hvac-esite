@@ -89,7 +89,8 @@ export const products = {
     status: 'Status',
     health: 'Performance',
     price: 'Sales price (incl. VAT)',
-    priceHint: 'Standard list sales price; computed from the pricing rule, not editable here.',
+    priceHint:
+      'Standard list sales price; computed from the pricing rule. To set a fixed price use the "Price" button on the row (pricing permission required).',
     priceQuote: 'Quote',
     priceUnreadable: 'Unavailable',
     stock: 'Stock',

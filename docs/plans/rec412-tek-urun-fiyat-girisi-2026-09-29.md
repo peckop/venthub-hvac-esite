@@ -283,4 +283,29 @@ Kısmi tekil indeks `pricing_rule_urun_tek_sabit_uq` `(tenant_id, product_id)`, 
 ### 9.6 Kabul ölçütleri ve kanıt
 - Gölge (bellek-içi PGlite, `docs/audits/rec412-tekillik-golge-2026-09-30.mjs`): **24/24** — temiz veride uygulanır, ikinci koşum idempotent, ikinci sabit kural INSERT ve koşula sokan UPDATE 23505, koşul dışı satırlar (başka ürün/tenant, kitaplı, adet>1, scope 0, cost_plus, para birimli, dönemli) engellenmez, ihlalli veride ön-guard düşer ve indeks OLUŞMAZ, geçersiz indeks yeniden koşumda düzelir.
 - Ölçülemeyen (PGlite kapsamaz): PostgREST'in gerçek hata gövdesi (canlıda ilk fırsatta ölçülür), `denetim_izi_pricing_rule` tetiğinin yeniden denemedeki günlük satırı (çürütme: AFTER ROW, başarısız INSERT satır bırakmaz).
-- Canlıda migration sonrası: `pg_indexes`'te indeks var ve `indisvalid`; `pricing_rule` satır sayısı değişmemiş (1).
+- Canlıda migration sonrası: `pg_indexes`'te indeks var ve `indisvalid`; `pricing_rule` satır sayısı değişmemiş (1). **Ölçüldü (2026-09-30, #1556 sonrası, `supabase-migrate` başarılı):** indeks var ve geçerli, satır sayısı 1.
+
+## 10. Faz 2a — ürün satırından "Fiyat" paneli (REC-468; migration YOK; 2026-09-30)
+
+**Cetvel:** `docs/standards/pricing-standard.md` §12.1 (bu işle yazıldı) · `admin-standard.md` K1–K5. **Yöntem:** şerit ADMIN, elle; güvenlik incelemesi (security-reviewer) + diff-review PR'dan önce. Faz 2b (aynı servis ve seçiciyle satır içi giriş) ayrı iştir.
+
+### 10.1 Ne yapıldı
+- `ProductPricePanel` (yan panel): mevcut sabit kural + vitrinde görünen fiyat (KDV hariç/dahil), tutar girişi, KDV dahil/hariç seçici (son seçim tarayıcıda saklanır), kayıttan önce "vitrinde görünecek" önizlemesi, "Kaydet ve vitrini doğrula", "Sabit fiyatı kaldır" (onaylı).
+- Servis: `loadProductPricePanelState` (yalnız gereken kolonlar; kural + vitrin satırı + ek kural sayısı) ve `previewProductFixedPrice` (saf hesap; motorun kendi işlevi). Yazma Faz 1'in `setProductPrice`/`clearProductPrice` işlevleridir; panel başka yola yazmaz.
+- Girdi ayrıştırıcı `productPriceInput.ts` (TR `2.400,50` ve `2400.50`; sıfır, negatif, taşma reddedilir).
+- Ürün tablosunda "Fiyat" düğmesi (yalnız `canWrite('pricing')`).
+- Faz 1 incelemesinin "Faz 2 UI şartları" (§8): geçerlilik penceresi uyarısı tekillik işiyle yapısal kapandı (§9; dönemli kural artık dokunulmaz, panel yalnız sayar); yazma yetkisizine düğme gizli; moderatör yolunda maliyet/marj alanı yok.
+
+### 10.2 Tasarım kararları
+| Karar | Gerekçe |
+|---|---|
+| Panel `select('*')` kullanmaz, marj/maliyet kolonlarını okumaz | Moderatör sızıntısı (karar 95); kapı süpürür |
+| Kayıttan sonra sonuç 4 durumlu (`dogrulandi/farkli/yok/belirsiz`) + `golgelendi` | "Kaydedildi" ≠ "vitrinde görünüyor"; sessiz başarı yasağı |
+| Ek kurallar (para birimli, dönemli, kitaplı, kademeli) yalnız sayı olarak gösterilir | Tekillik indeksi yalnız süresiz sabit kuralı kapsar; diğerleri kural sayfasının işi |
+| Moderatör "Fiyat" eylemini görmez | `rbac.ts` canlı politikadan ölçülmüş: moderatör fiyat tablolarına yazamaz. **SAPMA, OPS kabul etti;** yetki veritabanından okununca (REC-442) açılır |
+| Vitrine yansıtma yalnız `admin`/`super_admin` | `recalculate` `cost_in_base` okur (karar 95); yetkisiz rol kuralı kaydeder, panel "yönetici yeniden hesaplamalı" der |
+
+### 10.3 Kabul ölçütleri ve kanıt
+- Servis testleri 72/72, panel bileşen testleri 19/19 (bir düzeltme geri alınınca beklenen test kırıldı: sabotajla kanıtlı), girdi ayrıştırıcı 7/7; `tsc` ve `eslint` temiz.
+- Kapı INV-ADMIN-FIYAT-GIRISI-1 (`admin-fiyat-girisi.test.ts`): panel/girdi dosyaları ürün/kural/fiyat tablolarına doğrudan yazmaz; yazma yolu geri okumalı servis işlevleridir; panel maliyet/marj kolonu ve `select('*')` içermez. Sabotajla kırmızı→yeşil.
+- Canlı kanıt (Faz 3, Recep kapısı): TEK test ürününde yaz → vitrinde gör → geri al. Bu PR'da yapılmaz.
