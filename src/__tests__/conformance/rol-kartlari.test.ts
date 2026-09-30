@@ -224,6 +224,14 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it('her kartta erişim sorusundan önce erişim envanteri okunur ve envanter dosyası gerçekten var', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('docs/olcum/erisim-envanteri.md')
+      expect(metin, ad).toContain('"Kanıt" yolunu koş')
+    }
+    expect(fs.existsSync(path.join(KOK, 'docs/olcum/erisim-envanteri.md'))).toBe(true)
+  })
+
   it('karar 187: her kartta PR = Fixes REC-nn (alt kayıt), istisna yalnız Kayıtsız: <sebep>', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('PR = `Fixes REC-nn`')
