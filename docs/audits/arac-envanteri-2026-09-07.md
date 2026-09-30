@@ -556,6 +556,7 @@ madde 1 gereği araç sayılmaz.
 | 76 | verify-before-done | .claude | bitti demeden once projenin kontrolleriyle kanit; WrongStack core 1.0.26 kopyasi + ek kurallar (karar 165 W3) | ARAC | `skill:verify-before-done` | 2026-09-28 · manifest yok | yok (NOTICE.md satiri) | ENVANTER-DISI |
 | 77 | wrongstack-kanban | .claude | WrongStack pano karti yasam dongusu ve dogrulama; Linear yaninda pilot; WrongStack core 1.0.26 kopyasi + ek kurallar (karar 165 W3) | ARAC | `skill:wrongstack-kanban` | 2026-09-28 · manifest yok | yok (NOTICE.md satiri) | ENVANTER-DISI |
 | 78 | wrongstack-mailbox-mcp | .claude | kapali pencereye posta kutusu; WrongStack core 1.0.26 kopyasi + ek kurallar (karar 165 W3) | ARAC | `skill:wrongstack-mailbox-mcp` | 2026-09-28 · manifest yok | yok (NOTICE.md satiri) | ENVANTER-DISI |
+| 79 | mutasyon-testi | .claude | kodu gecici bozup testlerin bozulmayi yakalayip yakalamadigini olcer (durum makinesi, fiyat/hesap katmani); ayri kopyada calisir, ana agaca dokunmaz | YETENEK | `skill:mutasyon-testi` | 2026-09-30 · manifest yok (.claude kapsam disi) | INV-MUTASYON-KOSUCU-1 (koşucu kapı testi, 5 sabotaj kırmızı) | KAL |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —
