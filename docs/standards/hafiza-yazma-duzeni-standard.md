@@ -81,9 +81,9 @@ istisna kütüphaneye girer.
 (canlı = TTL içinde, release edilmemiş; `seritAdi()` dışa açık değildir ve TTL'yi yok sayar, kullanılmaz).
 
 **Şerit adı → rol:** pano şerit adı serbest metindir (`URUN-KATALOG`, `ADMIN-UX`, `OPS-AUDIT`, `ALTYAPI-NLM`; adsız claim
-literal `lane` yazar). Çözüm tek yerde yapılır: `scripts/board/pencere-adlari.cjs` içindeki `seritRolu(lane)` (ARAÇ'ın #1592'den sonra
-açacağı ayrı küçük PR; **dosya bugün depoda yok**; ayrı ikinci bir tablo yazılmaz; pencerenin görünen adı tablosu ile rol çözücüsü ayrı
-kavramlardır). Sözleşme: büyük harfe çevir ve Türkçe karakterleri ASCII'ye indir; önce tam eşleşme (`GEO-SEO`), yoksa `-` ile
+literal `lane` yazar). Çözüm tek yerde yapılır: `scripts/board/pencere-adlari.cjs` içindeki `seritRolu(lane)` (dosya #1592 ile depoda ve
+bugün yalnız pencerenin **görünen ad** tablosunu içerir; `seritRolu` ARAÇ'ın ayrı küçük PR'ıdır ve **henüz yoktur**; ayrı ikinci bir tablo
+yazılmaz; görünen ad tablosu ile rol çözücüsü ayrı kavramlardır). Sözleşme: büyük harfe çevir ve Türkçe karakterleri ASCII'ye indir; önce tam eşleşme (`GEO-SEO`), yoksa `-` ile
 ayrılmış en uzun bilinen önek (soldan); dönüş `{ rol, tam }`; bilinmeyen ya da `lane` → `null`. Rol listesi `ROLLER` anahtarlarından okunur.
 **OPS için yalnız tam eşleşme** `tam: true` döner (`OPS-AUDIT` → `tam: false`). **Tek rol çözücü:** `session-board.cjs` bugün rolü `CC_LANE`
 ortam değişkeninden ya da ham `lane.toUpperCase()` ile alır; enjeksiyon ve hafıza kancası **aynı** `seritRolu`'yu kullanır, yoksa aynı pencere
