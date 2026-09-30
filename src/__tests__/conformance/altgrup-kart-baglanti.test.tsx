@@ -71,3 +71,59 @@ describe('INV-ALTGRUP-BAGLANTI-1 — alt grup kartı gerçek bağlantı', () => 
     )
   })
 })
+
+/**
+ * REC-471 ikinci parça — `series` görünümü: üst kategorisi bu modda olan alt sayfa (yedek-parca-ve-sensorler) yetim
+ * kalıyordu, çünkü `CategorySeriesView` alt kategori listesini HİÇ çizmiyordu (GEO-SEO taraması, 17 → 1).
+ */
+const SERI = path.join(process.cwd(), 'src', 'views', 'category', 'CategorySeriesView.tsx')
+const MASTER = path.join(process.cwd(), 'src', 'views', 'CategoryMasterView.tsx')
+
+/** `subCategories.map(cb)` gövdesindeki TÜM JSX etiket adları ve her birinin öznitelikleri. */
+function haritaEtiketleri(src: string): Array<{ ad: string; oznitelikler: string[] }> {
+  const sonuc: Array<{ ad: string; oznitelikler: string[] }> = []
+  const jsxTopla = (n: ts.Node): void => {
+    if (ts.isJsxOpeningElement(n) || ts.isJsxSelfClosingElement(n)) {
+      sonuc.push({
+        ad: n.tagName.getText(),
+        oznitelikler: n.attributes.properties.filter(ts.isJsxAttribute).map((a) => a.name.getText()),
+      })
+    }
+    ts.forEachChild(n, jsxTopla)
+  }
+  const gez = (n: ts.Node): void => {
+    if (
+      ts.isCallExpression(n) &&
+      ts.isPropertyAccessExpression(n.expression) &&
+      n.expression.name.text === 'map' &&
+      n.expression.expression.getText() === 'subCategories'
+    ) {
+      jsxTopla(n.arguments[0])
+      return
+    }
+    ts.forEachChild(n, gez)
+  }
+  gez(agac(src))
+  return sonuc
+}
+
+describe('INV-ALTGRUP-BAGLANTI-1 (seri görünümü) — alt kategoriler sunucuda gerçek bağlantı', () => {
+  it('K4 (ön-koşul) — seri görünümü alt kategorileri `subCategories.map` ile çiziyor', () => {
+    expect(haritaEtiketleri(fs.readFileSync(SERI, 'utf8')).length, 'seri görünümü alt kategori listesi çizmiyor').toBeGreaterThan(0)
+  })
+
+  it('K5 (kural) — listede `Link`/`a` + `href` var; `button` yok', () => {
+    const etiketler = haritaEtiketleri(fs.readFileSync(SERI, 'utf8'))
+    const baglanti = etiketler.find((e) => ['Link', 'a'].includes(e.ad))
+    expect(baglanti, 'alt kategori listesinde gerçek bağlantı (Link/a) yok').toBeDefined()
+    expect(baglanti!.oznitelikler, 'bağlantı `href` taşımıyor').toContain('href')
+    expect(etiketler.map((e) => e.ad), 'liste `button` ile çiziliyor: HTML\'de <a href> çıkmaz').not.toContain('button')
+  })
+
+  it('K6 (kural) — `CategoryMasterView` seri kolunda alt kategorileri görünüme AKTARIYOR', () => {
+    const kaynakMaster = fs.readFileSync(MASTER, 'utf8')
+    const seriKolu = kaynakMaster.match(/case 'series':[\s\S]*?<CategorySeriesView([\s\S]*?)\/>/)
+    expect(seriKolu, "master görünümünde `case 'series'` kolu bulunamadı — kapının evreni kaymış").not.toBeNull()
+    expect(seriKolu![1], "`series` kolu `subCategories` aktarmıyor: alt sayfalar yine yetim kalır").toMatch(/subCategories=\{/)
+  })
+})

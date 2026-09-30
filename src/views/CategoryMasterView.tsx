@@ -198,6 +198,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
           <CategorySeriesView
             category={category.raw}
             parentCategory={parentCategory?.raw}
+            subCategories={rawSubCategories}
             families={visibleFamilies}
           />
         )
