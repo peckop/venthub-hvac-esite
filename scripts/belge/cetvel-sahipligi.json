@@ -6,6 +6,11 @@
       "dogrulanacak": false,
       "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
     },
+    "docs/standards/3d-webgl-standard.md": {
+      "sahip": "URUN",
+      "dogrulanacak": false,
+      "dayanak": "OPS kararı 2026-09-30 (sahipsiz cetvel atandı)"
+    },
     "docs/standards/3d-showroom-ux-research.md": {
       "sahip": "URUN",
       "dogrulanacak": false,
@@ -132,9 +137,9 @@
       "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
     },
     "docs/standards/edge-function-security-standard.md": {
-      "sahip": "ALTYAPI",
+      "sahip": "EDGE",
       "dogrulanacak": false,
-      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+      "dayanak": "OPS kararı 2026-09-30 (departmanın asli görevi; önceki sahip ALTYAPI; ALTYAPI ve URUN dokunuşu kartta sınır satırı)"
     },
     "docs/standards/email-template-standard.md": {
       "sahip": "URUN",
@@ -150,6 +155,11 @@
       "sahip": "URUN",
       "dogrulanacak": false,
       "dayanak": "OPS sahipsiz alan kuralı: müşteri yüzü (form gönderimi)"
+    },
+    "docs/standards/i18n-localization-standard.md": {
+      "sahip": "I18N",
+      "dogrulanacak": false,
+      "dayanak": "OPS kararı 2026-09-30 (departmanın asli görevi; URUN uygulayıcı, kartta sınır satırı; başlıktaki \"Sahibi: Recep\" bu tabloyla değiştirildi)"
     },
     "docs/standards/i18n-ters-yon-standard.md": {
       "sahip": "URUN",
@@ -190,6 +200,11 @@
       "sahip": "OPS",
       "dogrulanacak": false,
       "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+    },
+    "docs/standards/mevzuat-kaydi-standard.md": {
+      "sahip": "MEVZUAT",
+      "dogrulanacak": false,
+      "dayanak": "OPS kararı 2026-09-30 (departmanın asli görevi; KATALOG ataması geri alındı); cetvel v0.1 taslak, Recep onay kaydı bulunamadı"
     },
     "docs/standards/migration-safety-standard.md": {
       "sahip": "ALTYAPI",
