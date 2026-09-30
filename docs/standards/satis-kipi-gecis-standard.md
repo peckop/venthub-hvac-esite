@@ -201,6 +201,38 @@ Doğrulama satırı (uygula sonrası): `fiyat görünür ürün (veri): 348 / 37
 | 9 | **Bu betik**: kuru koşum → Recep onayı → `--uygula` → K3 doğrulama | ALTYAPI | §6–§7 |
 | 10 | Hosting kullanım şartı — **Recep kararı 2026-08-16 kayıtlı** (user-side-open-items madde 5); bu cetvel yeniden **açmaz** | — | — |
 
+**Bu liste BELGEDİR, kapı BETİKTİR (2026-09-29, OPS emri, karar 190 sonrası):** yukarıdaki kalemlerden otomatik ölçülebilenler
+§8.1'deki önkoşul tablosunda `satis-kipine-gec.mjs` içinde koşar; listeyi hatırlamak kimseye kalmaz. Otomatik ölçülemeyen
+kalemler (hukukçu teyidi, KDV alanı, iade şeması…) burada ve `docs/olcum/satis-hazirligi.md`'de durur.
+
+### 8.1 Açılış önkoşulları (INV-SATIS-KIPI-7 — `scripts/kip/acilis-onkosullari.mjs`)
+
+**Kural:** yönü AÇ olan her koşum (kuru koşum dahil) tabloyu ölçer ve basar; `--uygula` bir kalem **GEÇTİ değilse** canlıya
+hiçbir şey yazmadan çıkış 1 verir. **ÖLÇÜLEMEDİ = RET.** Boş/eksik sonuç = RET. Kapatmak (`--yon kapat`, hedefi kapalı
+`--geri-al`) önkoşula tabi değildir; hedefi açık `--geri-al` açma sayılır. Yalnız tablo: `--onkosul` (çıkış 0 = hepsi geçti, 2 = geçmeyen var).
+Sıra: **önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm → yazma.** Genel atlama bayrağı YOKTUR; yalnız **K1 ve K6** için
+`--muaf K1 --muaf-gerekce "<≥20 karakter>"` (rapora ve `site_settings` satırına damgalanır).
+
+| # | kalem | ölçüm | sahibi |
+|---|---|---|---|
+| K1 | Yasal sayfalarda yer tutucu yok | canlı 12 yasal sayfa gövdesi: ham `[X_Y]` = 0 **ve** görünüm metni ("Şirket bilgileri kuruluşla eklenecek"/EN) = 0 (görünüm metni ham yer tutucuyu GİZLER; yalnız ham=0 yeşil verirdi) · muaf olabilir | Recep + URUN |
+| K2 | Ödeme ortamı canlı | `healthz` **anon JWT ile**: `durum=saglikli` ve `odeme_ortami='prod'`. **Sınır:** yalnız konak adı ölçütü; İyzico anahtar çiftinin geçerliliğini KANITLAMAZ | Recep + ALTYAPI |
+| K3 | Edge satış kapısı canlıda | `iyzico-payment` boş sepet probu: `403 SALES_CLOSED` (`409 VALIDATION_EMPTY_CART` = kapı yok). Anahtar zaten açıksa onarımdır, probe uygulanmaz. Kimlik yoksa ölçülemedi | ALTYAPI (REC-355) |
+| K4 | `site_settings` kilidi + RPC + webhook tetikleri | `pg_policy` (2 RESTRICTIVE), `satis_kipi_oku()` var, 3 tetik `tgenabled='O'`; `SUPABASE_DB_URL` yoksa ölçülemedi | URUN |
+| K5 | Sipariş bekçisi tetikleri (#1454) | `pg_trigger`: doğru tablo + BEFORE INSERT/UPDATE + INVOKER + etkin | ALTYAPI |
+| K6 | E-posta göndericisi doğrulanmış | Resend `GET /domains`: `venthub.com.tr` `verified`; anahtar yoksa ölçülemedi · muaf olabilir | Recep + ALTYAPI (REC-368) |
+| K7 | Fatura yolu | Varsayılan **RET**. Tek açık yol: `--fatura-beyani "<Recep sözü · tarih>"`, kalıp **"e-arşiv faturaları `<yöntem>` ile kesilecek (mali müşavir teyitli)"**; yöntem genel/boşsa RET; beyan `site_settings` damgasına yazılır | Recep (açılış günü sorulur) |
+| K8 | Hedef durum tutarlı | `planla()` sonrası beklenen durum (anahtar ↔ `hide_price`); **şimdiki durum DEĞİL** (yarım kalmış açılış onarılabilsin) | URUN |
+| K9 | Müşteri e-postası gerçekten gidiyor | son 30 günde `order_email_events`/`quote_email_events` `status='sent'` + `provider_message_id` ya da `shipping_email_events` `provider_message_id` (bu tabloda `status` kolonu yok); üç tablodan toplam ≥ 1. K6 alanı, K9 gönderimi ölçer; DB yoksa ölçülemedi = ret | ALTYAPI (REC-368) |
+
+**K7 cümlesi (OPS hükmü):** e-arşiv faturası yasal zorunluluktur. Beyan **faturasız satışa izin DEĞİLDİR**; faturanın otomasyon dışı
+(elle/mali müşavir aracılığıyla) kesileceğinin taahhüdüdür.
+
+**Sınır (dürüstlük):** "hepsi geçti" **satışa hazır** demek değildir; yalnız otomatik ölçülebilen açılış koşulları sağlandı demektir.
+Bu tabloda OLMAYANLAR adıyla: hukukçu teyidi (`legalReviewCompleted`), KDV `tax_rate` ölçümü (§8 madde 4), iade şeması (REC-159/57),
+İyzico webhook sırrı, durum monotonluğu tetiği, e-posta içerik testi. Betiği kullanmadan `site_settings`'e service-role ile elle
+yazım bu kapıyı atlar (panelden yazımı #1536'nın kısıtlayıcı politikası kapatır; service-role için ayrı kayıt).
+
 ## 9. Kapılar (ikinci PR'da yazılır — adıyla, sabotaj kollarıyla)
 
 | kapı | ne ölçer | sabotaj |
@@ -210,6 +242,8 @@ Doğrulama satırı (uygula sonrası): `fiyat görünür ürün (veri): 348 / 37
 | **INV-SATIS-KIPI-3** | `VERCEL_ENV=production` + `SATIS_KIPI_ONIZLEME=1` → **kapalı**; `preview` → açık | koşul kaldırılır → düşer |
 | **INV-SATIS-KIPI-4** | betik `--uygula`siz: mock istemcide `.update/.insert` çağrı sayısı **0**; `--uygula` onaysız → çıkış 1 | `if (!UYGULA) return` silinir → düşer |
 | **INV-SATIS-KIPI-5** | `tutarliMi()` üç hâl: açık+0 ✓ · kapalı+37 ✓ · açık+5 ✗ | ara hâli kabul eden değişiklik → düşer |
+| **INV-SATIS-KIPI-6** | anahtar açık olsa bile satıcı bilgisi yer tutucuysa ödeme adımı açılmaz (`odemeKarari`); ziyaretçi ham `[YER_TUTUCU]` görmez (INV-LEGAL-GORUNUM-1) | `odemeKarari` çağrısı ya da görünüm nesnesi kaldırılır → düşer |
+| **INV-SATIS-KIPI-7** | açılış önkoşulları (§8.1): 9 kalem, her biri tek tek RET verir; ölçülemedi = ret; boş/eksik sonuç = ret; K1/K6 dışı muaf olamaz; yazımdan hemen önce K2/K4/K5 yeniden ölçülür; kapı yazmadan önce ve ret = çıkış 1 | `if (UYGULA && !onkosulSonuc.izin)` ya da yeniden ölçüm silinir → düşer |
 | boş-koşum koruması | her kapı en az bir gerçek girdi görmeden "geçti" demez | — |
 
 ## 10. PR bölümlemesi — kota ve kapı gerekçeli (OPS 2026-09-06 kabul)
