@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process'
+import { spawnSync, type SpawnSyncReturns } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
@@ -191,7 +191,7 @@ const ac = (rol: string, d: Duzenek, ek: string[] = [], env: Record<string, stri
 const kapat = (rol: string, d: Duzenek, ek: string[] = [], env: Record<string, string> = {}): Kosum => calistir(KAPAT, [rol, ...ek, '--kuru'], d, env)
 
 /** Gerçek kabuk zinciri (cmd.exe → ps1 → node). Yalnız Windows'ta koşar. */
-function cmdKos(cmdYol: string, argv: string[], d: Duzenek): ReturnType<typeof spawnSync<string>> {
+function cmdKos(cmdYol: string, argv: string[], d: Duzenek): SpawnSyncReturns<string> {
   return spawnSync('cmd.exe', ['/c', cmdYol, ...argv], { encoding: 'utf8', windowsHide: true, timeout: 60_000, env: duzenekEnv(d) })
 }
 
@@ -204,7 +204,7 @@ function asciiMi(metin: string): boolean {
   return true
 }
 
-/** Yorumları atar (başlık yorumları yasak kalıpları ANLATIR; ölçülen şey KOD). ps1: `#` satırları; cjs: `/* */` ve `//`. */
+/** Yorumları atar (başlık yorumları yasak kalıpları ANLATIR; ölçülen şey KOD). ps1: diyez satırları; cjs: blok yorumu ve çift eğik çizgi. */
 const ps1Kod = (m: string): string => m.split('\n').filter((s) => !s.trim().startsWith('#')).join('\n')
 const cjsKod = (m: string): string =>
   m
