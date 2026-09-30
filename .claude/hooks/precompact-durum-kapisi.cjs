@@ -224,6 +224,16 @@ function sonBlok(yol, enFazlaSatir = 60) {
   return dilim.slice(0, enFazlaSatir).join('\n')
 }
 
+/**
+ * Yaşı okunur yazar (Ops 09-29: iki günlük dosya "2880 dakika" diye görünüyordu): 2 saate kadar dakika,
+ * 2 güne kadar saat, sonrası gün. Uyarının işi bayatlığın BÜYÜKLÜĞÜNÜ tek bakışta göstermek.
+ */
+function yasMetni(dk) {
+  if (dk < 120) return dk + ' dakika'
+  if (dk < 48 * 60) return Math.round(dk / 60) + ' saat'
+  return Math.round(dk / 1440) + ' gun'
+}
+
 function main() {
 const girdi = girdiOku()
 const sid = girdi.session_id || girdi.sessionId || process.env.CLAUDE_SESSION_ID || ''
@@ -266,7 +276,7 @@ const enTaze = dosyalar[0]
 const yasDk = Math.round((Date.now() - enTaze.mt) / 60000)
 if (yasDk > BAYAT_ESIK_DK) {
   uyarilar.push(
-    'BAYAT: en taze durum dosyan ' + yasDk + ' dakika onceki (esik ' + BAYAT_ESIK_DK +
+    'BAYAT: en taze durum dosyan ' + yasMetni(yasDk) + ' onceki (esik ' + BAYAT_ESIK_DK +
       ' dk) — ' + enTaze.ad + '. Bu turda konusulanlar ORADA YOK.',
   )
 }
@@ -324,7 +334,7 @@ process.exit(0)
 // `require` edildiğinde kapı KOŞMAMALI: session-board.cjs bu dosyayı modül olarak çağırıyor ve
 // stdin okuyup process.exit çağıran bir modül, çağıranın oturumunu öldürürdü.
 module.exports = {
-  durumDosyasiBul, sonBlok, projeDiziniBul, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI,
+  durumDosyasiBul, sonBlok, projeDiziniBul, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI, yasMetni,
   // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
   // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
   asciiKatla,

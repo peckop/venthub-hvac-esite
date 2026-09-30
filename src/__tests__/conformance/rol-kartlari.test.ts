@@ -216,6 +216,14 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it('her kartta açılış işi: durum dosyası + TAM oturum kimliği + dört alan', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('lane-day-<tarih>.md')
+      expect(metin, ad).toContain('TAM oturum kimliği')
+      expect(metin, ad).toContain('son girdi / açık kuyruk / verilen sözler / bekleyen kararlar')
+    }
+  })
+
   it('karar 187: her kartta PR = Fixes REC-nn (alt kayıt), istisna yalnız Kayıtsız: <sebep>', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('PR = `Fixes REC-nn`')
