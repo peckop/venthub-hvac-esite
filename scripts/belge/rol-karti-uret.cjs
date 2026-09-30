@@ -20,7 +20,67 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const KART_BAYT_SINIRI = 4096
+// 4096 idi; 31 kuralın rol kartlarına dağıtımı (REC-503) ile 6656'ya çıktı: en yüklü kart (URUN, ölçüm: 6151 bayt)
+// kendi 17 kuralını taşır, pay %8. Aşılırsa kural özetleri kısaltılır; sınır BİR DAHA GEVŞETİLMEZ (OPS şartı).
+// Pencereye giren satır kart özeti (`--ozet`), tamamı istenince okunur.
+const KART_BAYT_SINIRI = 6656
+
+const KURAL_KAYNAGI = path.join('docs', 'standards', 'gelistirme-kurallari-tam-liste.md')
+
+/**
+ * 31 GELİŞTİRME KURALININ DAĞITIMI (REC-503; kaynak: docs/standards/gelistirme-kurallari-tam-liste.md).
+ * [no, baslik (kaynaktaki kalın başlıkla BİREBİR; test ölçer), kısa ad, özet, roller | 'HEPSI'].
+ * Kural metnine dokunulmaz: özet kaynağın bir cümlelik okunuşudur, gerekçeli tam metin kaynakta durur.
+ * ROL ATAMASI HARİTA'nın önerisidir (kuralın hangi işin içinde çiğnenebileceğine bakılarak); sahibi itiraz ederse
+ * yalnız bu tablo değişir, sayım testi kuralın hiç düşmediğini ölçmeye devam eder.
+ */
+const FAZ2 = ' (Faz 2 park: tasarım kuralı, kodda ölçülmedi)'
+const KURALLAR = [
+  [1, 'No-Plan-No-Code', 'Plan önce', 'Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").', 'HEPSI'],
+  [2, 'Tip Güvenliği', 'Tip güvenliği', '`any` yasak, strict TypeScript.', ['URUN', 'ADMIN', 'ALTYAPI']],
+  [3, 'RLS-First', 'RLS-first', 'Her tablo RLS politikasıyla korunur.', ['ALTYAPI', 'ADMIN', 'KATALOG']],
+  [4, 'Monoton Durum', 'Monoton durum', 'Sipariş ve iade durumları yalnız ileri gider, geri dönüş engellenir.', ['ADMIN', 'ALTYAPI']],
+  [5, 'Audit Trail', 'Audit izi', 'Admin işlemleri `admin_audit_log` tablosuna yazılır.', ['ADMIN']],
+  [6, 'HMAC Doğrulama', 'HMAC', 'Webhook uçları HMAC-SHA256 ile korunur.', ['ALTYAPI']],
+  [7, 'i18n-Ready', 'i18n', 'Kullanıcıya görünen her metin sözlük dosyalarından gelir.', ['URUN', 'ADMIN', 'BLOG']],
+  [8, 'Webhook Replay Guard', 'Replay koruması', 'Webhook\'ta HMAC\'e ek olarak zaman damgası (`x-timestamp`) ya da idempotency.', ['ALTYAPI']],
+  [9, 'MVVM & Gateway Prensibi', 'MVVM/Gateway', 'UI bileşeni ham veri çekmez (fetch/supabase); veri Gateway kancalarından gelir.', ['URUN', 'ADMIN']],
+  [10, 'Design Token ve Strict Linter Standardı', 'Design token', 'Arbitrary Tailwind değeri yasak; değerler `tokens.js`\'ten, renk HEX değil CSS custom property (HSL).', ['URUN', 'ADMIN', 'MARKA']],
+  [11, 'content-auto Render Performans Standardı', 'content-auto', 'Sayfa altı ağır bileşenlerde `.content-auto` zorunlu.', ['URUN', 'ADMIN']],
+  [12, 'focus-visible Klavye Erişilebilirlik Standardı', 'focus-visible', 'Etkileşimli elemanlarda `focus:` değil `focus-visible:`.', ['URUN', 'ADMIN', 'MARKA']],
+  [13, 'Typography prose Standartları', 'Typography prose', 'Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.', ['URUN', 'BLOG', 'MARKA']],
+  [14, 'Suspense Sınırı', 'Suspense sınırı', '`useSearchParams` kullanan her bileşen `<Suspense fallback={<Skeleton />}>` ile sarılır (sınır yalnız o uç bileşeni sarar).', ['URUN', 'ADMIN']],
+  [15, 'unstable_cache İzole Edilmesi (Cache Collision Guard)', 'Önbellek anahtarı: dil', '`unstable_cache` anahtar dizisine aktif dil kodu (`lang`) eklenir.', ['URUN', 'ALTYAPI']],
+  [16, 'On-Demand ISR ve Webhook Senkronizasyonu', 'ISR + webhook', 'Statik vitrinde görünen her tablonun DB tetiği VE webhook handler dalı olur; HMAC geçince `revalidatePath`/`revalidateTag`; secret yoksa fail-closed (cetvel: `rendering-cache-standard.md` §3).', ['URUN', 'ALTYAPI', 'KATALOG']],
+  [17, 'SEO ve Sitemap Hreflang Standartları', 'Hreflang', 'Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook\'u yok.', ['URUN', 'GEO-SEO']],
+  [18, 'Edge Functions & Mikroservis Standartları (Contextual Locale İzolasyonu)', 'Edge dil izolasyonu', 'Sipariş anında kullanıcı dili (`user_locale`) kaydedilir; e-posta şablonu ürün adını o dile göre süzer.', ['ALTYAPI']],
+  [19, '3D Canvas Render ve Gölge Standartları', '3D gölge', 'R3F gölge haritası türü `\'percentage\'` olur; başka (yumuşak) gölge haritası türü yasak.', ['URUN']],
+  [20, 'CSP (İçerik Güvenlik Politikası) ve 3D CDN İzinleri', 'CSP 3D CDN', '`connect-src` beyaz listesinde `raw.githubusercontent.com` ve `raw.githack.com` kalıcıdır; kaldırmak yasak.', ['ALTYAPI', 'URUN']],
+  [21, 'React 19 Compiler ve useMemo/useCallback Sınırlandırması [GEÇİŞ AŞAMASINDA - WARNING]', 'React Compiler (geçiş, uyarı)', 'Basit bileşende manuel `useMemo`/`useCallback` kısıtlı; Gateway viewmodel ve Provider\'lar muaf.', ['URUN', 'ADMIN']],
+  [22, 'Supabase ORM Tekilleştirme (React cache) [GEÇİŞ AŞAMASINDA - STRICT]', 'React.cache (geçiş, katı)', 'RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.', ['URUN', 'ADMIN']],
+  [23, 'AI Botları ve Ajanlar için llms.txt Standardı [GEÇİŞ AŞAMASINDA - STRICT]', 'llms.txt (geçiş, katı)', 'Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).', ['GEO-SEO', 'HARITA']],
+  [24, 'Tenant Data İzolasyonu (SaaS)', 'Tenant izolasyonu', 'Okuma/yazma, Edge API ve Realtime kanalları tenant-scoped olur; data bleeding kabul edilmez.', ['ALTYAPI', 'ADMIN']],
+  [25, 'Middleware Strict Edge Kısıtı (SaaS)', 'Middleware Edge', '`middleware.ts` Edge\'de DB sorgusu atmaz; tenant çözümü header/Edge Config ile, URL rewrite yok.', ['ALTYAPI']],
+  [26, 'JWT app_metadata Zorunluluğu (SaaS)', 'app_metadata', 'Yetki kararı `app_metadata` üzerinden verilir; kullanıcının kendi düzenleyebildiği meta veriden asla.', ['ALTYAPI', 'ADMIN']],
+  [27, 'Feature Flags ve RSC Hibrit Mimarisi (SaaS)', 'Feature flag / RSC', 'Server Component\'ta `getTenantConfig()`, Client Component\'ta `useTenant()`; RSC\'de client hook yok.', ['URUN', 'ADMIN']],
+  [28, 'Cache Key Tenant İzolasyonu (SaaS)', 'Önbellek anahtarı: tenant', '`unstable_cache`/`revalidateTag` anahtarına `tenantId` de girer (`[\'key\', lang, tenantId]`).', ['ALTYAPI', 'URUN']],
+  [29, 'Tenant-Aware İletişim (SaaS)', 'Tenant-aware iletişim', 'E-posta logo ve unvanı global `.env`\'den değil `tenants.config`\'ten gelir.' + FAZ2, ['ALTYAPI']],
+  [30, 'Storage Bucket İzolasyon Politikaları (SaaS)', 'Storage RLS', 'Tenant bucket\'larında `tenant_id = jwt_tenant_id()` RLS kontrolü.' + FAZ2, ['ALTYAPI', 'KATALOG']],
+  [31, 'Çapraz Kiracı super_admin Yetkilendirmesi (SaaS)', 'super_admin pivotu', 'Çapraz kiracı `super_admin` için 1-N FK yerine `tenant_users` pivot tablosu.' + FAZ2, ['ALTYAPI', 'ADMIN']],
+]
+
+/** Bir rolün kartına yazılacak kurallar (kaynak sırasıyla). */
+function rolKurallari(ad) {
+  return KURALLAR.filter(([, , , , roller]) => roller === 'HEPSI' || roller.includes(ad))
+}
+
+function kuralBolumu(ad) {
+  return [
+    '## Kurallar',
+    '> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).',
+    ...rolKurallari(ad).map(([no, , kisa, ozet]) => `- K${no} ${kisa}: ${ozet}`),
+  ].join('\n')
+}
 
 const RECEP_KAPILARI = [
   '## Recep kapıları (önce onay)',
@@ -174,6 +234,8 @@ function kart(ad, r) {
     '## Yetenek ve araç',
     r.yetenek,
     '',
+    kuralBolumu(ad),
+    '',
     '## Durum',
     r.durum,
     '',
@@ -209,10 +271,48 @@ function sorunlar(kartlar) {
     for (const blok of [RECEP_KAPILARI, ILETISIM_ISTISNA[ad] || ILETISIM, CALISMA]) {
       if (!metin.includes(blok)) s.push(`${ad}: ortak blok eksik/değişmiş: ${blok.split('\n')[0]}`)
     }
-    for (const baslik of ['## Görev', '## Dosyalar', '## Yetki', '## Yasak ve sınır', '## Yetenek ve araç', '## Durum']) {
+    for (const baslik of ['## Görev', '## Dosyalar', '## Yetki', '## Yasak ve sınır', '## Yetenek ve araç', '## Kurallar', '## Durum']) {
       if (!metin.includes(baslik)) s.push(`${ad}: başlık eksik: ${baslik}`)
     }
+    for (const [no, , kisa, ozet] of rolKurallari(ad)) {
+      if (!metin.includes(`- K${no} ${kisa}: ${ozet}`)) s.push(`${ad}: kural satırı eksik/değişmiş: K${no}`)
+    }
   }
+  return s
+}
+
+/** Kaynak listedeki numaralı kurallar: [{ no, baslik }] (kalın başlık, sondaki iki nokta hariç). */
+function kuralKaynagiOku(kok) {
+  const metin = fs.readFileSync(path.join(kok, KURAL_KAYNAGI), 'utf8').replace(/\r\n/g, '\n')
+  const kurallar = []
+  for (const satir of metin.split('\n')) {
+    const m = /^(\d+)\. \*\*(.+?):?\*\*/.exec(satir)
+    if (m) kurallar.push({ no: Number(m[1]), baslik: m[2] })
+  }
+  return kurallar
+}
+
+/**
+ * Kural dağıtımındaki sorunlar (boş = temiz): kaynakla sayı/numara/başlık uyuşmazlığı, bilinmeyen rol,
+ * hiçbir kartta bulunmayan (DÜŞMÜŞ) kural. `kaynak` = kuralKaynagiOku çıktısı, `kartlar` = uret() çıktısı.
+ * Ayırt edicilik testi bu fonksiyonu bilerek bozulmuş girdilerle çağırır.
+ */
+function kuralSorunlari(kaynak, kartlar, kurallar = KURALLAR) {
+  const s = []
+  if (kaynak.length !== kurallar.length) s.push(`kaynakta ${kaynak.length} kural, dağıtımda ${kurallar.length}`)
+  const kaynakNo = new Map(kaynak.map((k) => [k.no, k.baslik]))
+  for (const [no, baslik, , , roller] of kurallar) {
+    if (!kaynakNo.has(no)) s.push(`K${no}: kaynakta yok`)
+    else if (kaynakNo.get(no) !== baslik) s.push(`K${no}: başlık kaynaktan sapmış (${kaynakNo.get(no)})`)
+    if (roller !== 'HEPSI') {
+      if (!roller.length) s.push(`K${no}: hiçbir role atanmamış`)
+      for (const r of roller) if (!ROLLER[r]) s.push(`K${no}: bilinmeyen rol ${r}`)
+    }
+  }
+  for (const { no } of kaynak) if (!kurallar.some((k) => k[0] === no)) s.push(`K${no}: dağıtımda yok (kural düşmüş)`)
+  const kartlarda = new Set()
+  for (const metin of Object.values(kartlar)) for (const m of metin.matchAll(/^- K(\d+) /gm)) kartlarda.add(Number(m[1]))
+  for (const { no } of kaynak) if (!kartlarda.has(no)) s.push(`K${no}: hiçbir kartta yok`)
   return s
 }
 
@@ -304,7 +404,11 @@ function main() {
     fark++
     console.error(`FARK: docs/roller/${SAHIPLIK_BELGESI}`)
   }
-  const s = [...sorunlar(kartlar), ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d)))]
+  const s = [
+    ...sorunlar(kartlar),
+    ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d))),
+    ...kuralSorunlari(kuralKaynagiOku(kok), kartlar),
+  ]
   for (const x of s) console.error(`SORUN: ${x}`)
   if (yaz) console.log(`${Object.keys(kartlar).length} kart + sahiplik tablosu yazıldı`)
   process.exit(fark || s.length ? 1 : 0)
@@ -317,6 +421,10 @@ module.exports = {
   sahiplikOku,
   sahiplikSorunlari,
   sahiplikTablosu,
+  kuralKaynagiOku,
+  kuralSorunlari,
+  rolKurallari,
+  KURALLAR,
   SAHIPLIK_BELGESI,
   ROLLER,
   KART_BAYT_SINIRI,

@@ -1,14 +1,16 @@
 # Geliştirme Kuralları — 31 Madde (tam liste) — v1.0
 
-> ⚠ **GEÇİCİ DOSYA — REC-433 rol kartlarına dağıtılacak.** Bu liste, `CONTEXT.md` §14'ten (2026-06-12 tarihli,
-> NotebookLM üretimi) aynen alındı; `CONTEXT.md` emekli edildiği (Recep/OPS hükmü, 2026-09-29) için kuralların
-> gerekçeli tam metni burada duruyor. REC-433 TEK PLAN'da rol kartları (REC-426) gelince her kural ilgili role
-> dağıtılacak ve bu dosya kapanacak. Kural metinleri **elle değiştirilmedi**; bayat olabilecek yerler aşağıdaki
-> tabloda işaretli.
+> **DAĞITILDI (REC-503, 2026-09-30):** 31 kuralın her biri ilgili rolün kartına (`docs/roller/<ROL>.md`, `## Kurallar`)
+> yazıldı; hangi kuralın hangi karta gittiği `scripts/belge/rol-karti-uret.cjs` içindeki `KURALLAR` tablosundadır ve
+> `INV-ROL-1` sayım testi (kaynakta 31 = kartlarda 31, başlıklar bu dosyayla birebir) hiçbir kuralın düşmediğini ölçer.
+> Bu dosya artık geçici değildir: kuralların **gerekçeli tam metni ve kaynağı** olarak kalır (kartlar bir cümlelik özet
+> taşır). Bu listeye kural eklenir ya da başlığı değişirse üretici tablosu da güncellenmeden test kırmızı verir.
+> Liste `CONTEXT.md` §14'ten (2026-06-12 tarihli, NotebookLM üretimi) aynen alındı; kural metinleri **elle
+> değiştirilmedi**; bayat olabilecek yerler aşağıdaki tabloda işaretli.
 >
 > **Ne yönetir:** Geliştirme kurallarının gerekçeli tam listesi. Çekirdek 14 kural `CLAUDE.md`'dedir (her oturumda
 > yüklenir); bu liste ondan geniştir.
-> **Sahibi:** HARİTA oturumu (REC-400); dağıtım REC-433.
+> **Sahibi:** HARİTA oturumu (REC-400); dağıtım REC-503 (REC-426 altı).
 > **Son doğrulama:** 2026-09-29 — yalnız şu ölçüldü: (a) her kuralın `CLAUDE.md`'de karşılığı olup olmadığı, (b) 9 ve
 > 23 numaralı kuralların dayandığı yapıların varlığı (`useCategoryGateway`, `useAdminTable` kancaları; `public/llms.txt`).
 > Diğer kuralların koda uyumu **ölçülmedi**; kural metni "bugün de böyle" iddiası değildir.

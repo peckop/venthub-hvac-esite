@@ -17,6 +17,11 @@ CLAUDE.md değişikliği OPS kapısıdır; içeriğini doğrulamadığı belgeye
 ## Yetenek ve araç
 plan-challenger, diff-review, alt ajan çürütme, docs/README.md haritası.
 
+## Kurallar
+> Geliştirme kuralları, rolüne düşenler (K = tam listedeki madde no; gerekçeli tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan kendisini hangi cetvelin yönettiğini söyler (dosya adı ya da açıkça "cetvel yok").
+- K23 llms.txt (geçiş, katı): Mimari ve kuralları özetleyen `/llms.txt` kökte sunulur (`public/llms.txt` var).
+
 ## Durum
 Açık (REC-400, REC-426).
 
