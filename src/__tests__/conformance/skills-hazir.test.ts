@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { describe, it, expect } from 'vitest'
+
+import { describe, expect,it } from 'vitest'
 
 /**
  * INV-SKILLS-HAZIR-1 — `.claude/skills-hazir/` (uyarlanmış ama ETKİN OLMAYAN skill'ler) kuralı.
