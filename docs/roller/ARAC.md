@@ -23,9 +23,9 @@ Kanca kurulumu ve araç denemeleri (kanca TASARIMI HARİTA'dadır); araç envant
 ## Yetenek ve araç
 wrongstack-kanban, wrongstack-mailbox-mcp, ast-grep, CodeGraph.
 
-## Kurallar
-> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
+## Kurallar (1)
+- K1 Plan önce.
+- Gerekçeli özet: `docs/roller/ARAC-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
 Açık.

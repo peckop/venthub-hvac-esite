@@ -23,26 +23,9 @@ Adres şeması değişikliği tek başına Recep'e sorulur (paketlenmez); canlı
 ## Yetenek ve araç
 rendering-cache cetveli, i18n-conventions, Playwright ölçümü.
 
-## Kurallar
-> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
-- K2 Tip güvenliği: `any` yasak, strict TypeScript.
-- K7 i18n: Kullanıcıya görünen her metin sözlük dosyalarından gelir.
-- K9 MVVM/Gateway: UI bileşeni ham veri çekmez (fetch/supabase); veri Gateway kancalarından gelir.
-- K10 Design token: Arbitrary Tailwind değeri yasak; `tokens.js` kullanılır, renk HEX değil CSS custom property (HSL).
-- K11 content-auto: Sayfa altı ağır bileşende `.content-auto` zorunlu.
-- K12 focus-visible: Etkileşimli elemanlarda `focus:` değil `focus-visible:`.
-- K13 Typography prose: Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.
-- K14 Suspense sınırı: `useSearchParams` kullanan bileşen `<Suspense fallback={<Skeleton />}>` ile sarılır; sınır yalnız o bileşeni sarar.
-- K15 Önbellek anahtarı: dil: `unstable_cache` anahtar dizisine aktif dil kodu (`lang`) eklenir.
-- K16 ISR + webhook: Statik vitrinde görünen her tablonun DB tetiği VE webhook dalı olur; HMAC sonrası revalidate, secret yoksa fail-closed (`rendering-cache-standard.md` §3).
-- K17 Hreflang: Sitemap ve dinamik rotalarda TR/EN `alternates.languages` saf TypeScript ile üretilir; istemci hook'u yok.
-- K19 3D gölge: R3F gölge haritası türü `'percentage'` olur; başka (yumuşak) tür yasak.
-- K20 CSP 3D CDN: `connect-src` beyaz listesinde `raw.githubusercontent.com` ve `raw.githack.com` kalıcı; kaldırmak yasak.
-- K21 React Compiler (geçiş, uyarı): Basit bileşende manuel `useMemo`/`useCallback` kısıtlı; Gateway viewmodel ve Provider muaf.
-- K22 React.cache (geçiş, katı): RSC ağacında tekrarlanabilen Supabase sorguları `React.cache()` ile tekilleştirilir.
-- K27 Feature flag / RSC: Server Component'ta `getTenantConfig()`, Client Component'ta `useTenant()`; RSC'de client hook yok.
-- K28 Önbellek anahtarı: tenant: `unstable_cache`/`revalidateTag` anahtarına `tenantId` de girer.
+## Kurallar (18)
+- K1 Plan önce; K2 Tip güvenliği; K7 i18n; K9 MVVM/Gateway; K10 Design token; K11 content-auto; K12 focus-visible; K13 Typography prose; K14 Suspense sınırı; K15 Önbellek anahtarı: dil; K16 ISR + webhook; K17 Hreflang; K19 3D gölge; K20 CSP 3D CDN; K21 React Compiler (geçiş, uyarı); K22 React.cache (geçiş, katı); K27 Feature flag / RSC; K28 Önbellek anahtarı: tenant.
+- Gerekçeli özet: `docs/roller/URUN-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
 Açık.

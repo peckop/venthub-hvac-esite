@@ -79,7 +79,7 @@
 | Belge türü | Yeri | Sahibi | Bayatlık / doğrulama |
 |---|---|---|---|
 | Cetvel (kural + kapı) | `standards/*.md` | Başlıkta `Sahibi:` ya da `roller/cetvel-sahipligi.md` tablosu (rol kartlarından türetilmiş) | `belge-tazelik`: sahip eksik ve doğrulama eksik AYRI sayılır (taban yalnız küçülür) |
-| Rol kartı (görev, dosya, yetki, Recep kapıları) | `roller/<DEPARTMAN>.md` | HARİTA üretir, OPS onaylar | Üreticiyle bire bir aynılık testi (INV-ROL-1) |
+| Rol kartı (görev, dosya, yetki, Recep kapıları) ve rolün kural özetleri | `roller/<DEPARTMAN>.md`, `roller/<DEPARTMAN>-kurallar.md` | HARİTA üretir, OPS onaylar | Üreticiyle bire bir aynılık ve 31 kuralın sayım testi (INV-ROL-1) |
 | Ölçüm / denetim kaydı | `audits/*.md` | Ölçümü yapan departman | Tarihi dosya adında; eski ölçüm yeni ölçümün yerine geçmez |
 | Plan / yol haritası | `plans/*.md` | İşi yürüten departman | Karar Linear'da, plan yalnız yöntem; bayat plan arşive |
 | Çekirdek belge (CLAUDE.md, bu harita) | kök, `docs/README.md` | HARİTA (CLAUDE.md değişikliği OPS kapısı) | Her mesajdaki `BELGE` satırı; kırık yol kapısı (INV-BELGE-1) |

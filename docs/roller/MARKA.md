@@ -23,12 +23,9 @@ Tasarım = hedef, canlı = eski: canlıya uygulama URUN işidir; para harcatan t
 ## Yetenek ve araç
 venthub-tasarim-dili, design-dna, tipografi ve erişilebilirlik skill'leri.
 
-## Kurallar
-> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
-- K10 Design token: Arbitrary Tailwind değeri yasak; `tokens.js` kullanılır, renk HEX değil CSS custom property (HSL).
-- K12 focus-visible: Etkileşimli elemanlarda `focus:` değil `focus-visible:`.
-- K13 Typography prose: Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.
+## Kurallar (4)
+- K1 Plan önce; K10 Design token; K12 focus-visible; K13 Typography prose.
+- Gerekçeli özet: `docs/roller/MARKA-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
 Kapalı (iş dondurma).

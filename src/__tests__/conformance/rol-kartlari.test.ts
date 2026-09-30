@@ -20,6 +20,9 @@ import { describe, expect, it } from 'vitest'
 
 type Uretici = {
   uret: () => Record<string, string>
+  uretKurallar: () => Record<string, string>
+  kuralDosyaAdi: (ad: string) => string
+  kuralDosyaSorunlari: (k: Record<string, string>) => string[]
   sorunlar: (k: Record<string, string>) => string[]
   ROLLER: Record<string, unknown>
   ILETISIM: string
@@ -68,61 +71,81 @@ describe('INV-ROL-1 — rol kartı üreticisi ayırt edici', () => {
   })
 })
 
-describe('INV-ROL-1 — 31 geliştirme kuralı rol kartlarına dağıtıldı, hiçbiri düşmedi (REC-503)', () => {
+describe('INV-ROL-1 — 31 geliştirme kuralı rol kurallar dosyalarına dağıtıldı, hiçbiri düşmedi (REC-503, REC-521)', () => {
   const kaynak = uretici.kuralKaynagiOku(KOK)
   const kartlar = uretici.uret()
+  // REC-521: kural özetleri kartta değil docs/roller/<ROL>-kurallar.md dosyalarında; kartta kısa ad listesi + atıf.
+  const kuralDosyalari = uretici.uretKurallar()
   const kurallar = uretici.KURALLAR
 
-  it('kaynakta 31 kural var, dağıtımda 31, kartlarda 31 farklı kural numarası', () => {
+  it('kaynakta 31 kural var, dağıtımda 31, kurallar dosyalarında 31 farklı kural numarası', () => {
     expect(kaynak).toHaveLength(31)
     expect(kaynak.map((k) => k.no)).toEqual(Array.from({ length: 31 }, (_, i) => i + 1))
     expect(kurallar).toHaveLength(31)
-    const kartlarda = new Set<number>()
-    for (const metin of Object.values(kartlar)) for (const m of metin.matchAll(/^- K(\d+) /gm)) kartlarda.add(Number(m[1]))
-    expect(kartlarda.size).toBe(31)
+    const dosyalarda = new Set<number>()
+    for (const metin of Object.values(kuralDosyalari)) for (const m of metin.matchAll(/^- K(\d+) /gm)) dosyalarda.add(Number(m[1]))
+    expect(dosyalarda.size).toBe(31)
   })
 
   it('gerçek dağıtım temiz: başlıklar kaynakla birebir, roller bilinen roller, hiçbir kural düşmemiş', () => {
-    expect(uretici.kuralSorunlari(kaynak, kartlar)).toEqual([])
+    expect(uretici.kuralSorunlari(kaynak, kuralDosyalari)).toEqual([])
+    expect(uretici.kuralDosyaSorunlari(kuralDosyalari)).toEqual([])
   })
 
-  it('her kuralın atandığı kartta satırı var; atanmadığı kartta yok', () => {
+  it('her kuralın atandığı rolün kurallar dosyasında satırı ve kartında kısa adı var; atanmadığı yerde yok', () => {
     for (const ad of BEKLENEN_ROLLER) {
       const atanan = new Set(uretici.rolKurallari(ad).map((k) => k[0] as number))
       for (const [no] of kurallar) {
-        const var_ = new RegExp(`^- K${no} `, 'm').test(kartlar[ad])
-        expect(var_, `${ad} K${no}`).toBe(atanan.has(no))
+        const dosyada = new RegExp(`^- K${no} `, 'm').test(kuralDosyalari[ad])
+        expect(dosyada, `${ad}-kurallar.md K${no}`).toBe(atanan.has(no))
+        const kartta = new RegExp(`[-;] K${no} `).test(kartlar[ad].slice(kartlar[ad].indexOf('## Kurallar'), kartlar[ad].indexOf('## Durum')))
+        expect(kartta, `${ad} kartı K${no} kısa adı`).toBe(atanan.has(no))
       }
     }
   })
 
-  it('kural 1 (plan önce) bütün on kartta; her kural en az bir rolde', () => {
-    for (const ad of BEKLENEN_ROLLER) expect(kartlar[ad], ad).toMatch(/^- K1 Plan önce:/m)
+  it('her kartta kurallar dosyasına atıf var ve atıf gerçek bir dosyayı gösterir', () => {
+    for (const ad of BEKLENEN_ROLLER) {
+      expect(kartlar[ad], ad).toContain(`docs/roller/${uretici.kuralDosyaAdi(ad)}`)
+      expect(kuralDosyalari[ad], ad).toMatch(/^# KURALLAR: /)
+    }
+  })
+
+  it('kural 1 (plan önce) bütün kartlarda ve dosyalarda; her kural en az bir rolde', () => {
+    for (const ad of BEKLENEN_ROLLER) {
+      expect(kuralDosyalari[ad], ad).toMatch(/^- K1 Plan önce:/m)
+      expect(kartlar[ad], ad).toContain('K1 Plan önce')
+    }
     for (const [no, , , , roller] of kurallar) expect(roller === 'HEPSI' || roller.length > 0, `K${no}`).toBe(true)
   })
 
   it('AYIRT EDİCİLİK: düşen kural, sapan başlık, bilinmeyen rol ve kartlardan silinen kural yakalanır', () => {
     const dusmus = kurallar.filter((k) => k[0] !== 20)
-    expect(uretici.kuralSorunlari(kaynak, kartlar, dusmus).some((s) => s.includes('K20') && s.includes('düşmüş'))).toBe(true)
+    expect(uretici.kuralSorunlari(kaynak, kuralDosyalari, dusmus).some((s) => s.includes('K20') && s.includes('düşmüş'))).toBe(true)
 
     const sapmis = kurallar.map((k) => (k[0] === 5 ? [k[0], 'Audit Izi', k[2], k[3], k[4]] : k))
-    expect(uretici.kuralSorunlari(kaynak, kartlar, sapmis).some((s) => s.startsWith('K5: başlık'))).toBe(true)
+    expect(uretici.kuralSorunlari(kaynak, kuralDosyalari, sapmis).some((s) => s.startsWith('K5: başlık'))).toBe(true)
 
     const yabanci = kurallar.map((k) => (k[0] === 6 ? [k[0], k[1], k[2], k[3], ['YOKROL']] : k))
-    expect(uretici.kuralSorunlari(kaynak, kartlar, yabanci).some((s) => s.includes('bilinmeyen rol YOKROL'))).toBe(true)
+    expect(uretici.kuralSorunlari(kaynak, kuralDosyalari, yabanci).some((s) => s.includes('bilinmeyen rol YOKROL'))).toBe(true)
 
     const eksikKaynak = kaynak.slice(0, 30)
-    expect(uretici.kuralSorunlari(eksikKaynak, kartlar).some((s) => s.includes('kaynakta 30 kural'))).toBe(true)
+    expect(uretici.kuralSorunlari(eksikKaynak, kuralDosyalari).some((s) => s.includes('kaynakta 30 kural'))).toBe(true)
 
-    const kartsiz = Object.fromEntries(Object.entries(kartlar).map(([a, m]) => [a, m.replace(/^- K19 .*$/gm, '')]))
-    expect(uretici.kuralSorunlari(kaynak, kartsiz).some((s) => s.includes('K19: hiçbir kartta yok'))).toBe(true)
+    const dosyasiz = Object.fromEntries(Object.entries(kuralDosyalari).map(([a, m]) => [a, m.replace(/^- K19 .*$/gm, '')]))
+    expect(uretici.kuralSorunlari(kaynak, dosyasiz).some((s) => s.includes('K19: hiçbir kartta yok'))).toBe(true)
   })
 
-  it('AYIRT EDİCİLİK: kartta kural satırı silinirse ya da değişirse sorunlar() yakalar', () => {
-    const silinmis = { ...kartlar, URUN: kartlar.URUN.replace(/^- K14 .*$/m, '') }
-    expect(uretici.sorunlar(silinmis).some((s) => s.startsWith('URUN: kural satırı eksik') && s.includes('K14'))).toBe(true)
-    const degismis = { ...kartlar, ADMIN: kartlar.ADMIN.replaceAll('admin_audit_log', 'baska_tablo') }
-    expect(uretici.sorunlar(degismis).some((s) => s.startsWith('ADMIN: kural satırı') && s.includes('K5'))).toBe(true)
+  it('AYIRT EDİCİLİK: kurallar dosyasında kural satırı silinirse ya da değişirse, kartta kısa ad listesi bozulursa yakalanır', () => {
+    const silinmis = { ...kuralDosyalari, URUN: kuralDosyalari.URUN.replace(/^- K14 .*$/m, '') }
+    expect(uretici.kuralDosyaSorunlari(silinmis).some((s) => s.startsWith('URUN: kural satırı eksik') && s.includes('K14'))).toBe(true)
+    const degismis = { ...kuralDosyalari, ADMIN: kuralDosyalari.ADMIN.replaceAll('admin_audit_log', 'baska_tablo') }
+    expect(uretici.kuralDosyaSorunlari(degismis).some((s) => s.startsWith('ADMIN: kural satırı') && s.includes('K5'))).toBe(true)
+    const dosyaYok = { ...kuralDosyalari }
+    delete dosyaYok.MARKA
+    expect(uretici.kuralDosyaSorunlari(dosyaYok).some((s) => s.startsWith('MARKA: kurallar dosyası yok'))).toBe(true)
+    const kartBozuk = { ...kartlar, URUN: kartlar.URUN.replace('K14 Suspense sınırı; ', '') }
+    expect(uretici.sorunlar(kartBozuk).some((s) => s.startsWith('URUN: kural bölümü eksik'))).toBe(true)
   })
 })
 
@@ -221,18 +244,33 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
-  it('docs/roller/ içinde üreticinin bilmediği kart yok', () => {
+  it('docs/roller/<ROL>-kurallar.md üreticinin çıktısıyla bire bir aynı (REC-521)', () => {
+    for (const [ad, metin] of Object.entries(uretici.uretKurallar())) {
+      const yol = path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad))
+      expect(fs.existsSync(yol), `${yol} yok — node scripts/belge/rol-karti-uret.cjs --yaz`).toBe(true)
+      expect(fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n'), `${ad} kurallar dosyası üreticiden sapmış`).toBe(metin)
+    }
+  })
+
+  it('docs/roller/ içinde üreticinin bilmediği kart ya da kurallar dosyası yok', () => {
     const disk = fs.readdirSync(path.join(KOK, 'docs', 'roller')).filter((f) => f.endsWith('.md'))
-    const beklenen = [...Object.keys(uretilen).map((ad) => uretici.dosyaAdi(ad)), uretici.SAHIPLIK_BELGESI]
+    const beklenen = [
+      ...Object.keys(uretilen).map((ad) => uretici.dosyaAdi(ad)),
+      ...Object.keys(uretilen).map((ad) => uretici.kuralDosyaAdi(ad)),
+      uretici.SAHIPLIK_BELGESI,
+    ]
     expect(disk.sort()).toEqual(beklenen.sort())
   })
 
-  // Gerekçe (OPS şartı, REC-503): sınır 4096 → 6656; en yüklü kart URUN 6151 bayt, pay %8. Aşılırsa kural
-  // özetleri kısaltılır; sınır bir daha gevşetilmez.
-  it('her kart bayt sınırının altında', () => {
+  // Gerekçe (OPS şartı, REC-503; kök çözüm REC-521): sınır 4096 → 6656 ve bir daha gevşetilmez. Kural özetleri
+  // kurallar dosyalarına taşındı, en büyük kart ~4,9 KB. Karta yeni bölüm eklerken aşılırsa ayrıntı dosyaya taşınır.
+  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %80\'inde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)
+      expect(metin, `${ad} kartında kural özet satırı olmamalı (kurallar dosyasında)`).not.toMatch(/^- K\d+ [^;\n]+: /m)
     }
+    const enBuyuk = Math.max(...Object.values(uretilen).map((m) => Buffer.byteLength(m, 'utf8')))
+    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.8)
   })
 
   it('Çalışma düzeni bloğu her kartta bire bir aynı ve pano kanıt kuralını taşır (ARAÇ ölçümü: 62 kartın 45\'inde kanıt yok)', () => {
