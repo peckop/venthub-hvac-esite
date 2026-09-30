@@ -23,11 +23,9 @@ Recep görmeden içerik onayı istenmez (karar 98); yayın Recep onayıyla; mevz
 ## Yetenek ve araç
 rehber-yazisi cetveli, kaynak dizini, görsel ihtiyaç listesi.
 
-## Kurallar
-> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
-- K7 i18n: Kullanıcıya görünen her metin sözlük dosyalarından gelir.
-- K13 Typography prose: Yasal ve bilgi merkezi metin sayfalarında `prose dark:prose-invert max-w-prose` sarmalayıcısı.
+## Kurallar (3)
+- K1 Plan önce; K7 i18n; K13 Typography prose.
+- Gerekçeli özet: `docs/roller/BLOG-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
 Kapalı (iş dondurma).

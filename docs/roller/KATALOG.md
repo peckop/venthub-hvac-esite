@@ -23,12 +23,9 @@ Canlı ürün/fiyat yazımı Recep kapısıdır; uydurma kimlik üretmez; ErP ka
 ## Yetenek ve araç
 supabase, kaynak dizini betikleri, csv-import-export cetveli.
 
-## Kurallar
-> Rolüne düşen geliştirme kuralları (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
-- K1 Plan önce: Değişiklikten önce plan çıkar, onay al; plan, kendisini yöneten cetveli söyler (dosya adı ya da "cetvel yok").
-- K3 RLS-first: Her tablo RLS politikasıyla korunur.
-- K16 ISR + webhook: Statik vitrinde görünen her tablonun DB tetiği VE webhook dalı olur; HMAC sonrası revalidate, secret yoksa fail-closed (`rendering-cache-standard.md` §3).
-- K30 Storage RLS: Tenant bucket'larında `tenant_id = jwt_tenant_id()` RLS kontrolü. (Faz 2 park: tasarım kuralı, kodda ölçülmedi)
+## Kurallar (4)
+- K1 Plan önce; K3 RLS-first; K16 ISR + webhook; K30 Storage RLS.
+- Gerekçeli özet: `docs/roller/KATALOG-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
 Kapalı (iş dondurma, karar 165); açılınca ilk iş REC-423.

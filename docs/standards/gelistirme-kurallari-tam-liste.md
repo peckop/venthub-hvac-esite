@@ -1,10 +1,12 @@
 # Geliştirme Kuralları — 31 Madde (tam liste) — v1.0
 
-> **DAĞITILDI (REC-503, 2026-09-30):** 31 kuralın her biri ilgili rolün kartına (`docs/roller/<ROL>.md`, `## Kurallar`)
-> yazıldı; hangi kuralın hangi karta gittiği `scripts/belge/rol-karti-uret.cjs` içindeki `KURALLAR` tablosundadır ve
-> `INV-ROL-1` sayım testi (kaynakta 31 = kartlarda 31, başlıklar bu dosyayla birebir) hiçbir kuralın düşmediğini ölçer.
-> Bu dosya artık geçici değildir: kuralların **gerekçeli tam metni ve kaynağı** olarak kalır (kartlar bir cümlelik özet
-> taşır). Bu listeye kural eklenir ya da başlığı değişirse üretici tablosu da güncellenmeden test kırmızı verir.
+> **DAĞITILDI (REC-503, 2026-09-30; REC-521'de kurallar ayrı dosyaya alındı):** 31 kuralın her biri ilgili rolün
+> kurallar dosyasına (`docs/roller/<ROL>-kurallar.md`) bir cümlelik özetle yazıldı; rol kartında (`docs/roller/<ROL>.md`,
+> `## Kurallar`) yalnız kısa ad listesi ve bu dosyaya atıf durur. Hangi kuralın hangi role gittiği
+> `scripts/belge/rol-karti-uret.cjs` içindeki `KURALLAR` tablosundadır ve `INV-ROL-1` sayım testi (kaynakta 31 = kurallar
+> dosyalarında 31, başlıklar bu dosyayla birebir) hiçbir kuralın düşmediğini ölçer.
+> Bu dosya artık geçici değildir: kuralların **gerekçeli tam metni ve kaynağı** olarak kalır (kurallar dosyaları bir
+> cümlelik özet taşır). Bu listeye kural eklenir ya da başlığı değişirse üretici tablosu da güncellenmeden test kırmızı verir.
 > Liste `CONTEXT.md` §14'ten (2026-06-12 tarihli, NotebookLM üretimi) aynen alındı; kural metinleri **elle
 > değiştirilmedi**; bayat olabilecek yerler aşağıdaki tabloda işaretli.
 >

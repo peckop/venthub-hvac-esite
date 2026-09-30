@@ -377,7 +377,11 @@ varsayılan hep "elle" oldu (bu cetvelin kuruluş nedeni, başlık notu) ve yaza
 |---|---|---|
 | **Şirket yönetimi** | OPS | Sırayı ve iş bölümünü kurar, kararları Recep'e sorar. Kendi işlerinde (ölçüm, denetim, kayıt temizliği) **o da müdürdür:** alt ajanlara böler, bağımsız doğrulatır. |
 | **Müdür** | Her departman penceresi (HARİTA, ARAÇ, ALTYAPI, URUN, ADMIN, GEO-SEO, YETENEK…) | Emri alır, planlar, böler, çalışanı yönetir, çıktıyı denetler, bağımsız doğrulatır, raporlar. Kararı ve kapı eylemini **kendisi** verir. |
-| **Çalışan** | Müdürün açtığı alt ajan (`Agent`) | Tek, sınırlı parça iş yapar ve sonucu müdüre döner; yargı vermez, hafızası yoktur (§4). |
+| **Ekip lideri** | Müdürün konu başına açtığı `general-purpose` alt ajan | Bir konunun işini böler, kendi çalışanlarını açıp denetler, bağımsız doğrulayıcıyı çalıştırır ve müdüre **tek özet** döner. Kapı eylemi yine müdürdedir (§10.4). |
+| **Çalışan** | Müdürün ya da ekip liderinin açtığı alt ajan (`Agent`) | Tek, sınırlı parça iş yapar ve sonucu açana döner; yargı vermez, hafızası yoktur (§4). |
+
+Zincir: müdür → konu başına ekip lideri → onun çalışanları (ör. 5 konu × 5 çalışan = 25 ajan). Ekip lideri kullanılmadan
+müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan katman açılmaz.
 | **Uzmanlık** | Skill | Çalışanın ya da müdürün çağırdığı hazır prosedür. Hangi rolün hangi skill'i kullanacağını **YETENEK** atar (`SKILL_ATAMASI` tablosu); bu cetvel atamaz. |
 
 ### 10.2 Müdürün altı adımı
@@ -399,7 +403,11 @@ varsayılan hep "elle" oldu (bu cetvelin kuruluş nedeni, başlık notu) ve yaza
 | **Çürütücü** | Planı ya da bulguyu çürütmeye çalışır (plan-challenger, kötü niyetli okuma) | Hayır | Kendi çürütmesini |
 | **Doğrulayıcı** | İşi yapmamıştır; atıfları ve sayıları yeniden ölçer, her iddiayı DOĞRULANDI / ÇELİŞİYOR / DESTEKSİZ / ÖLÇÜLEMEDİ diye işaretler | Hayır | — (son halka) |
 
-**Sıra:** çalışan → müdür denetimi → bağımsız doğrulayıcı → müdür hükmü. **Bağımsızlık şartı:** doğrulayıcı
+**Ajan tipi:** araştırmacı ve doğrulayıcı için salt-okuma `Explore` tipi yeterlidir. Kendi alt ajanını açması gereken
+ekip lideri `general-purpose` olmalıdır (araçları "*"); `Explore` ve `Plan` tipleri alt ajan açamaz.
+
+**Sıra:** çalışan → müdür denetimi → bağımsız doğrulayıcı → müdür hükmü. Ekip liderli işte: çalışan → ekip liderinin
+denetimi → liderin çalıştırdığı bağımsız doğrulayıcı → lider özeti → müdür denetimi (özeti örnekler, kaynağa iner). **Bağımsızlık şartı:** doğrulayıcı
 üretenle aynı ajan değildir. Ölçüm yapılan işte soruları seçen ölçümü yapmaz, puanlayan cevap üretmez
 (kör puanlama). Mekanik okuma Sonnet'e, yargı ve sentez müdüre (§4, §5).
 
@@ -414,7 +422,7 @@ doğrulama adımı olmasaydı kartlara girecekti.
 - **Eşzamanlı alt ajan sayısına sınır konmaz** (Recep, karar 201). Tek ölçüt: her parça denetlenip doğrulanabilir
   olmalı. Denetlenemeyecek kadar çok parçaya bölmek bu modelin ihlalidir.
 - **Elle yalnız küçük tek dosya** ve kapsam kararı gerektirmeyen iş. Şüphede model uygulanır.
-- **Kapı eylemi çalışana devredilmez:** birleştirme (`merge-ritueli.cjs`), canlıya yazma, migration, ayar ve
+- **Kapı eylemi çalışana ve ekip liderine devredilmez:** birleştirme (`merge-ritueli.cjs`), canlıya yazma, migration, ayar ve
   hesap değişikliği müdürün işidir ve gereken onayla yapılır. Çalışan bir eylemde izin reddi alırsa müdür
   eylemi başka yoldan yaptırmaz; Recep'e ya da OPS'a bildirir.
 - **Çalışan Recep'e yazmaz,** başka pencereye emir vermez; raporu yalnız müdüre gider.
