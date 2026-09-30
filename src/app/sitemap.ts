@@ -6,7 +6,7 @@ import { HVAC_BRANDS } from '../data/brands'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
 import { getCategories } from '../lib/services/category.service'
-import { getAllFamilySlugs } from '../lib/services/family.service'
+import { getAllFamilySlugs, getFamilyLastModified } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { Routes } from '../utils/routes'
@@ -56,9 +56,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // BİREBİR eşitlik (OPS şartı): boş, tanımsız, yanlış yazılmış ya da `xdummy.supabase.co` gibi kaçak adres
   // gevşek kola GİRMEZ — yanlış yapılandırılmış canlı ortam sessizce ürünsüz haritaya düşmesin.
   const veritabaniSahte = process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://dummy.supabase.co'
-  const [categories, familySlugs, countRes] = await Promise.all([
+  const [categories, familySlugs, aileTarihleri, countRes] = await Promise.all([
     veritabaniSahte ? getCategories(supabaseStaticClient).catch(() => []) : getCategories(supabaseStaticClient),
     veritabaniSahte ? getAllFamilySlugs(supabaseStaticClient).catch(() => []) : getAllFamilySlugs(supabaseStaticClient),
+    // REC-454: aile lastmod'u = ailenin + aktif varyantlarının en son `updated_at`'i. Hata yutulmaz
+    // (aynı katı kural); sahte veritabanında boş harita → lastmod hiç yazılmaz.
+    veritabaniSahte
+      ? getFamilyLastModified(supabaseStaticClient).catch(() => new Map<string, string>())
+      : getFamilyLastModified(supabaseStaticClient),
     // Supabase builder reject ETMEZ; hata {error} alanında döner — aşağıda AÇIKÇA fırlatılır.
     supabaseStaticClient.rpc('get_category_counts'),
   ])
@@ -110,7 +115,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({
       url: `${baseUrl}/${lang}${route}`,
-      lastModified: new Date(),
+      // lastmod YOK (REC-454): bu sayfaların güvenilir değişiklik tarihi yok. Eskiden `new Date()`
+      // yazılıyordu = her üretimde "bugün değişti" → Google haritanın tarihlerine güvenmeyi bırakır.
+      // Uydurma tarih yerine alan hiç yazılmaz (Google: lastmod isteğe bağlıdır).
       changefreq: 'daily',
       priority: route === '' ? 1.0 : 0.8,
       ...siteHaritasiAlternates({
@@ -124,7 +131,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categoryRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     categoriesWithProducts.map((cat) => ({
       url: `${baseUrl}/${lang}${Routes.category(getLocalizedCategorySlug(cat, lang))}`,
-      lastModified: new Date(cat.updated_at || new Date()),
+      // Tarihsiz satırda `new Date()` yedeği KALDIRILDI (REC-454) — tarih yoksa alan yazılmaz.
+      ...(cat.updated_at ? { lastModified: new Date(cat.updated_at) } : {}),
       changefreq: 'weekly',
       priority: 0.7,
       ...siteHaritasiAlternates({
@@ -152,7 +160,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     HVAC_BRANDS.map((brand) => ({
       url: `${baseUrl}/${lang}${Routes.brand(brand.slug)}`,
-      lastModified: new Date(),
+      // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
       changefreq: 'weekly',
       priority: 0.6,
       ...siteHaritasiAlternates({
@@ -170,7 +178,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((f) => !!f.slug)
       .map((f) => ({
         url: `${baseUrl}/${lang}${Routes.product(f.slug)}`,
-        lastModified: new Date(),
+        // REC-454: gerçek değişiklik tarihi (aile + aktif varyantlar). Seri slug'ı haritada yok → alan yazılmaz.
+        ...(aileTarihleri.has(f.slug) ? { lastModified: new Date(aileTarihleri.get(f.slug) as string) } : {}),
         changefreq: 'daily',
         priority: 0.9,
         ...siteHaritasiAlternates({
