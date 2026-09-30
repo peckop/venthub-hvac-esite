@@ -64,15 +64,22 @@ describe('INV-GUN-KAPANISI-BELGE-1 · kaynak (Python gerekmez)', () => {
     expect(g).toContain('HICBIR SEY yazilmadi')
   })
 
-  it('--kuru bayrağı betiğe iletilir; adım 5 auth KIRMIZI ise ATLANDI (ağa çıkılmaz)', () => {
+  it('--kuru bayrağı betiğe iletilir; adım 5 auth KIRMIZI ise ATLANDI (kuru DAHİL, ağa çıkılmaz)', () => {
     const g = adim13Govde()
     expect(g).toContain('"--kuru"')
-    expect(g).toMatch(/auth_ok"\) is False/)
+    expect(g).toMatch(/auth_ok"\) is False:/)
+    expect(g).not.toMatch(/auth_ok"\) is False and not c\["kuru"\]/)
     expect(g).toContain('ATLANDI')
   })
 
-  it('zaman aşımı betiğin kendi bekleme süresinden (900 sn) UZUN', () => {
-    const m = /BELGE_ZAMAN = (\d+)/.exec(kaynak)
+  it('betik ya da node yoksa KIRMIZI (ATLANDI sessiz yeşil bırakırdı)', () => {
+    const g = adim13Govde()
+    expect(g).toMatch(/not node:\s*\n\s*return kirmizi\(/)
+    expect(g).toMatch(/not os\.path\.exists\(betik_yolu\):[^\n]*\n\s*return kirmizi\(/)
+  })
+
+  it('varsayılan zaman aşımı betiğin kendi bekleme süresinden (900 sn) UZUN', () => {
+    const m = /BELGE_ZAMAN = int\(os\.environ\.get\("VENTHUB_BELGE_ZAMAN"\) or (\d+)\)/.exec(kaynak)
     expect(m).not.toBeNull()
     expect(Number(m?.[1])).toBeGreaterThan(900)
   })
@@ -90,10 +97,13 @@ describe.skipIf(!PY)('INV-GUN-KAPANISI-BELGE-1 · davranış (sahte belge-defter
   beforeEach(() => {
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gun-kapanisi-belge-'))
     sahte = path.join(dir, 'sahte-belge-defteri.cjs')
-    // argv[2] = yukle | olc; çıkış kodu ortamdan: FAKE_YUKLE_RC / FAKE_OLC_RC. Ağa ÇIKMAZ.
+    // argv[2] = yukle | olc. Çıkış kodu: olc → FAKE_OLC_RC; yukle --kuru → FAKE_KURU_RC (vars. 3, GERÇEK betik gibi
+    // YALNIZ --kuru gelirse); yukle → FAKE_YUKLE_RC. FAKE_UYKU_SN>0 önce uyur (zaman aşımı dalı). Ağa ÇIKMAZ.
     fs.writeFileSync(
       sahte,
-      "const k=process.argv[2];const rc=Number(process.env[k==='yukle'?'FAKE_YUKLE_RC':'FAKE_OLC_RC']??0);" +
+      "const k=process.argv[2];const kuru=process.argv.includes('--kuru');" +
+        "const u=Number(process.env.FAKE_UYKU_SN||0);if(u>0)Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,u*1000);" +
+        "const rc=k==='olc'?Number(process.env.FAKE_OLC_RC??0):(kuru?Number(process.env.FAKE_KURU_RC??3):Number(process.env.FAKE_YUKLE_RC??0));" +
         "console.log(k==='olc'?'BELGELER DEFTERI: son esitleme 2026-09-30 (0 gun) · 15 kaynak':'sahte '+k+' '+process.argv.slice(3).join(' '));process.exit(rc)",
     )
   })
@@ -143,12 +153,33 @@ describe.skipIf(!PY)('INV-GUN-KAPANISI-BELGE-1 · davranış (sahte belge-defter
     expect(r.cikti).toContain('beklenmeyen cikis 7')
   })
 
-  it('--kuru: betiğe --kuru gider, 3 dönerse YEŞİL; 3 dönmezse KIRMIZI', () => {
-    const iyi = kos({ FAKE_YUKLE_RC: '3' }, '--kuru')
+  it('--kuru: kod bayrağı İLETİRSE sahte betik 3 döner → YEŞİL (iletmezse canlı 0 döner → KIRMIZI: regresyonu yakalar)', () => {
+    const iyi = kos({}, '--kuru')
     expect(iyi.kod).toBe(0)
     expect(iyi.cikti).toContain('YUKLENMEDI')
-    const kotu = kos({ FAKE_YUKLE_RC: '0' }, '--kuru')
+  })
+
+  it('--kuru ama betik 3 dönmezse KIRMIZI', () => {
+    const kotu = kos({ FAKE_KURU_RC: '0' }, '--kuru')
     expect(kotu.kod).toBe(3)
     expect(kotu.cikti).toContain('beklenen cikis 3')
+  })
+
+  it('olc çıkış 2 (ölçülemedi) yukle 0 olsa da KIRMIZI', () => {
+    const r = kos({ FAKE_YUKLE_RC: '0', FAKE_OLC_RC: '2' })
+    expect(r.kod).toBe(3)
+    expect(r.cikti).toContain('olc cikis 2')
+  })
+
+  it('zaman aşımı (124) KIRMIZI: betik uyur, sınır 1 sn', () => {
+    const r = kos({ FAKE_UYKU_SN: '5', VENTHUB_BELGE_ZAMAN: '1' })
+    expect(r.kod).toBe(3)
+    expect(r.cikti).toContain('zaman asimi')
+  })
+
+  it('betik dosyası yoksa KIRMIZI (sessiz yeşil değil), çıkış 3', () => {
+    const r = kos({ VENTHUB_BELGE_DEFTERI_BETIK: path.join(dir, 'yok.cjs') })
+    expect(r.kod).toBe(3)
+    expect(r.cikti).toContain('belge-defteri.cjs yok')
   })
 })

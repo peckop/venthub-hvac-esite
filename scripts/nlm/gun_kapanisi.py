@@ -38,7 +38,8 @@ state (10) en son):
   12 proje_takip_sync.py esitle        (2. tur) — demet 11 (7/8/9 ciktilari) AYNI kapanista deftere gider (cetvel §10.3)
   13 belge-defteri.cjs yukle           — BELGELER defteri (15 kaynak; scripts/belge/belge-defteri.cjs, REC-473): cikis 0 tam → `olc` ile
                                          taze olculur · 1 oturum/ag olculemedi (hicbir sey yazilmadi, KIRMIZI) · 2 kismi (eski kaynaklar
-                                         korunur, KIRMIZI) · 3 --kuru; adim 5 auth KIRMIZI ise ATLANDI; `tara` (LLM) BAGLANMAZ
+                                         korunur, KIRMIZI) · 3 --kuru; adim 5 auth KIRMIZI ise ATLANDI (kuru dahil, ag'a cikilmaz);
+                                         betik/node yok = KIRMIZI; `tara` (LLM) BAGLANMAZ
   10 state.json "gun_kapanisi"         — {damga, adimlar, seviye, sureler}; --kuru'da "gun_kapanisi_kuru" yazilir, kapiya damga
                                          BIRAKILMAZ (kuru kosum defteri esitlemez; eski kuru kaydi 'gun_kapanisi'den dusurulur)
 
@@ -75,7 +76,7 @@ PY = sys.executable
 NLM_ZAMAN = 180          # notebooklm list/delete + sinav oncesi 'ready' beklemesi
 ALT_ZAMAN = 900          # python alt betikler (sinav haric)
 ESITLE_ZAMAN = 1800      # proje_takip_sync esitle (kaynak yukleme)
-BELGE_ZAMAN = 1800       # belge-defteri.cjs yukle: 15 yukleme + 'hazir' bekleme (betigin kendi NLM_ZAMAN'i 900 sn; ustunde kal)
+BELGE_ZAMAN = int(os.environ.get("VENTHUB_BELGE_ZAMAN") or 1800)  # belge-defteri.cjs yukle: 15 yukleme + 'hazir' bekleme (betigin kendi NLM_ZAMAN'i 900 sn; ustunde kal). Ortam degiskeni yalniz TEST icin
 BAYAT_GUN = 7            # Linear acik is bayatlik esigi (linear_disa_aktar §4 ile ayni)
 GUNLUK_PENCERE = 14      # cetvel §10.6
 AUTH_HATA = re.compile(r"Authentication expired|AUTH_REQUIRED|Not logged in|notebooklm login|login required", re.I)
@@ -635,11 +636,10 @@ def adim13(c, a):
     node = shutil.which("node")
     betik_yolu = os.environ.get("VENTHUB_BELGE_DEFTERI_BETIK") or os.path.join(REPO, "scripts", "belge", "belge-defteri.cjs")  # ortam degiskeni yalniz test icin (sahte betik)
     if not node:
-        return kirmizi(a, "node yok: belge-defteri.cjs kosulamaz")
-    if not os.path.exists(betik_yolu):
-        a["durum"], a["olcum"] = "ATLANDI", "ATLANDI: scripts/belge/belge-defteri.cjs yok"
-        return
-    if c.get("auth_ok") is False and not c["kuru"]:
+        return kirmizi(a, "node yok: belge-defteri.cjs kosulamaz", rc=127)
+    if not os.path.exists(betik_yolu):  # betik yok = KIRMIZI (ATLANDI sessiz yesil birakirdi; ekranda iz kalmazdi)
+        return kirmizi(a, f"belge-defteri.cjs yok ({rel(betik_yolu)}) → BELGELER DEFTERI TAZELENEMEZ", rc=127)
+    if c.get("auth_ok") is False:  # kuru dahil: ag'a hic cikilmaz (adim 5 zaten KIRMIZI, kapanis yesil gorunmez)
         a["durum"], a["olcum"] = "ATLANDI", "ATLANDI: defter on-kapi KIRMIZI (adim 5, notebooklm oturumu) → BELGELER DEFTERI BAYAT"
         return
     rc, out, _ = kos([node, betik_yolu, "yukle"] + (["--kuru"] if c["kuru"] else []), timeout=BELGE_ZAMAN)
@@ -651,8 +651,8 @@ def adim13(c, a):
         return
     if rc == 124:
         return kirmizi(a, "belge-defteri yukle zaman asimi → BELGELER DEFTERI BAYAT olabilir")
-    if rc == 1:
-        return kirmizi(a, "belge-defteri yukle: oturum/ag olculemedi, HICBIR SEY yazilmadi → BELGELER DEFTERI BAYAT")
+    if rc == 1:  # sozlesme: oturum/ag olculemedi, hicbir sey yazilmadi; betikteki beklenmeyen istisna da 1 verir → son satirlara bak
+        return kirmizi(a, "belge-defteri yukle: oturum/ag olculemedi, HICBIR SEY yazilmadi (sozlesme; beklenmeyen istisna da 1 verir, son satirlara bak) → BELGELER DEFTERI BAYAT")
     if rc == 2:
         return kirmizi(a, "belge-defteri yukle: KISMI (bazi gruplar yuklenemedi/silinemedi); eski kaynaklar korundu, durum yazilmadi → BELGELER DEFTERI BAYAT")
     if rc != 0:
