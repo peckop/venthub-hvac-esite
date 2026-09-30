@@ -39,6 +39,10 @@ bakmadığı şeyi kanıtlamaz" dersinin aynadaki hâli: **kırmızı da bakmad�
   notuydu ve pano notu pasif bir kutudur. `SendMessage` **itici** bir kanaldır — mesaj
   konuşmaya düşer, okunmak için bir bekçi gerekmez. Yani doğru ders şu olmalıydı:
   **pasif kanal mekanizma ister; itici kanal istemez.**
+- **Ayırt edici test** (§4'ten, 2026-09-29): gözlem, mekanizma çalışmasaydı FARKLI olmalı; öz-test
+  ("kendine test notu at") tanım gereği yanlış negatif verir.
+- **Ölçemedim ≠ geçti** (§5'ten, 2026-09-29): kanıtlanmayan katman çökmüş sayılır (fail-closed);
+  KANITSIZ "yok" demek değildir.
 - **2026-09-01'in 62 dakikalık kaybı** hâlâ geçerli: o gün kanıtlanamayan bir katmana
   güvenildi. Çözüm o katmanı daha iyi ölçmek değil, **ona ihtiyaç duymamak** oldu.
 
@@ -114,8 +118,8 @@ Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve pan
 > cümlelik kuralını ve onu zorlayan kapıyı bir arada gösterir; bölümler **taşınmadı ve değiştirilmedi** (53 dosya ve
 > `fleet-mechanism-integrity.test.ts` bölüm adlarına ve içeriğine atıf yapıyor). Çelişirse bölümün kendi metni ve
 > ölçülen kapı kazanır; bu dizin özettir.
-> **Durum sütunu ÖNERİLEN sınıflamadır** (3 alt-ajan çıkardı, HARİTA örnekleme yapmadı): **ALTYAPI gözden geçirir**
-> (bu cetvelin ölçüm sahibi ALTYAPI). GEÇERLİ = bugün de uygulanan kural · TARİHSEL = v1.0 gözcü/cron modeli, §0'da
+> **Durum sütunu** 3 alt-ajanın çıkardığı sınıflamadır (HARİTA örnekleme yapmadı). **ALTYAPI (cetvelin ölçüm sahibi)
+> §2–§7 ve §16 için hükmünü verdi (2026-09-29); bu satırlarda kesin, kalan satırlar ÖNERİLEN'dir ve ALTYAPI gözden geçirir.** GEÇERLİ = bugün de uygulanan kural · TARİHSEL = v1.0 gözcü/cron modeli, §0'da
 > emekli · BELİRSİZ = metinden anlaşılmıyor, sahibi karar verir.
 
 | § | Kısa başlık | Yürürlükteki kural (tek cümle) | Zorlayan kapı/test | Durum |
@@ -125,8 +129,8 @@ Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve pan
 | 3 | Kural (kurulum, prob kanıtı, OFSETLER, sonTarama) | Her şerit oturumu ilk turunda üç katmanı kurar ve mechanism-setup.cjs prob çıktısıyla kanıtlar; cron ofseti OFSETLER tablosundan okunur, gözcü kalıcı imleç tutup her taramada sonTarama damgası basar, olay akışı kodda UTF-8'e zorlanır. | mechanism-setup.cjs (prob) | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
 | 4 | Ayırt edici test, öz-test değil (4.1 testin sınırı) | prob panoya farklı bir sid ile dış olay yazar ve gözcü imlecinin olayın ötesine geçmesini bekler ("kendine test notu at" öz-testi yanlış negatif üretir); prob okumayı kanıtlar, bildirimin ajana ulaştığını dogrula --jeton ayrıca kanıtlar. | mechanism-setup.cjs prob, dogrula --jeton | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
 | 5 | Ölçülen ile beyan edileni ayırmak (fail-closed) | dogrula çıktısı ÖLÇÜLDÜ, BEYAN ve ÖLÇÜLEMEZ (ScheduleWakeup) sınıflarını karıştırmaz ve kanıtlanmayan katman çökmüş sayılır; KANITSIZ "gözcüsü yok" demek değildir. | dogrula (mechanism-setup.cjs); INV yok | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
-| 6 | Yoklama, üç eksenli canlılık | board.cjs yoklama (rollcall) filoyu ATIS (heartbeat), GOZCU (imlecin son tarama yaşı) ve SES (son not yaşı) eksenlerinde ölçer, okuyan fiil olduğu için --sid istemez. | board.cjs yoklama (INV kimliği yok) | BELİRSİZ (L200-214; GOZCU ekseni gözcü modeline bağlı, yoklama komutunun bugün kullanıldığı metinden anlaşılmıyor) |
-| 7 | Kapsam sınırı, adıyla | Duyma, uyanma, yedek kanal, yoklama ve kurulum kanıtı mekanikleştirilir; slot verme, kuyruk sırası ve çakışma hakemliği hüküm katmanıdır ve orkestratörde kalır; INV-MECH-1 yalnız yapıyı ölçer, çalıştığını ölçmez. | INV-MECH-1 | BELİRSİZ (L218-227; hüküm-katmanı ayrımı genel görünüyor ama mekanikleştirilen liste v1 gözcü/cron modeline bağlı, INV-MECH-1'in bugün yürürlükte olduğu metinden anlaşılmıyor) |
+| 6 | Yoklama, üç eksenli canlılık | board.cjs yoklama (rollcall) filoyu ATIS (heartbeat), GOZCU (imlecin son tarama yaşı) ve SES (son not yaşı) eksenlerinde ölçer, okuyan fiil olduğu için --sid istemez. | board.cjs yoklama (INV kimliği yok) | GEÇERLİ (ALTYAPI hükmü 09-29: `yoklama` bugün canlı, ATIS ve SES eksenleri geçerli; GOZCU ekseni tarihsel, komut onu TARAMA/TESLİM diye yeniden adlandırdı) |
+| 7 | Kapsam sınırı, adıyla | Duyma, uyanma, yedek kanal, yoklama ve kurulum kanıtı mekanikleştirilir; slot verme, kuyruk sırası ve çakışma hakemliği hüküm katmanıdır ve orkestratörde kalır; INV-MECH-1 yalnız yapıyı ölçer, çalıştığını ölçmez. | INV-MECH-1 | GEÇERLİ, birinci paragraf TARİHSEL — TAŞINDI (ALTYAPI hükmü 09-29: hüküm-katmanı ayrımı ve INV-MECH-1 paragrafı geçerli; "mekanikleştirilen" listesi arşive gitti) |
 | 8 | Kapı eklendiğinde kanıt zorunluluğu | Bu cetveli zorlayan her kol bilerek bozularak (sabotajla) kanıtlanır; kanıtlanmamış bir kapı kapı değildir. | sabotaj tablosu (dogrula/prob/kanca brifingi); sonraki bölümlerde INV-BASH-WRITE-2, INV-HOOKS-2 vb. aynı yöntemle | GEÇERLİ (L241; ilke L503-506 ve L634-652'de sonraki bölümlere uygulanıyor, ancak L231-239 sabotaj tablosunun kendisi gözcü/prob'a ait tarihsel örnektir) |
 | 9 | Kanca yazım kuralları: kök, kimlik, koparılmış süreç (9.1-9.7) | Kanca çalışma ağacını cwd'den çözmez (yol verilmişse hedefin kendi git deposundan, verilmemişse sid'den ağaç kimliğiyle), sid'i tekil varsaymaz ve belirsizliği görünür uyarıyla bildirir, git status ölçen kanca -uall kullanır, detached spawn windowsHide:true ile başlar, kanıt kapının kendi akışına bağlanır ve bozuk/boş stdin fail-open ama stderr'e "stdin okunamadi, karisilmadi" yazar. | INV-BASH-WRITE-2 (src/__tests__/conformance/bash-write-audit-tree.test.ts), INV-HOOKS-2 (src/__tests__/conformance/githooks-doc-scope.test.ts) | GEÇERLİ (L253, L286-294, L302-311, L363-377, L412-437) |
 | 10 | Compact dayanıklılığı: 4 sabit alan + PreCompact kapısı (10.1-10.6) | Her oturumun durum dosyası SON GİRDİ, AÇIK KUYRUK, VERİLEN SÖZLER, BEKLEYEN KARARLAR alanlarını taşır; PreCompact kapısı durum dosyası hiç yoksa bloklar (exit 2), bayat (60 dk), eksik alan veya MEMORY.md 16384 baytı aşarsa yalnız uyarır, SessionStart(compact) durum dosyasının son bloğunu bağlama enjekte eder. | src/__tests__/conformance/precompact-durum-kapisi.test.ts (8 kol, 6 sabotaj); kaçış valfi VENTHUB_PRECOMPACT_KAPALI=1 | GEÇERLİ (L452-467, L478-484, L486-491; PreCompact'ta exit 2'nin compact'i iptal ettiği ölçülmemiş, L493-501) |
@@ -135,7 +139,7 @@ Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve pan
 | 13 | Ağır-sınıf test eşiği | Ağır conformance testinin zaman aşımı test dosyası başına `vi.setConfig({ testTimeout: 60_000 })` ile yazılır, global `vitest.config.ts` değeri 20 sn kalır ve eşiğin yanına ölçülmüş boş-gövde değeri ile 27× notu yazılır. | `vi.setConfig` (test dosyası başına), `vitest.config.ts`; INV kimliği yok (etkilenen: `build-skip-positive-logic`, `eol-normalization` vb.) | GEÇERLİ (L880-886) |
 | 14 | `board.cjs` bayrak semantiği | `--globs` tekrarlanırsa birikir (birleşim, stderr'e yol sayısı yazılır), `--sid/--lane/--to/--text` tekrarlanırsa iki değer birden yazılarak HATA (exit 1) verilir; sessizce ezme yoktur. | `src/__tests__/conformance/board-globs-tekrarlanan-bayrak.test.ts` (5 kol; INV kimliği yok) | GEÇERLİ (L925-929) |
 | 15 | Üretilmiş artefakt ihlali ≠ dikiş yeri ihlali | Üretilmiş artefakt (manifest kaydı, manifestin kendisi, kardeş kaynağı olan companion `.md`) ihlali `bash-write-audit`'te yapısal olarak sınıflanır: DÜŞÜK ŞİDDET görünür kalır ama bloklamaz ve panoya not göndermez, sınıf ölçülemezse fail-closed gerçek sayılır. | `src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` (6 kol; INV kimliği yok) | GEÇERLİ (L1008-1015) |
-| 16 | Mekanizma PR'ı inince ana dizin tazelenir | `scripts/board/**`, `.claude/hooks/**`, `.githooks/**` değiştiren PR master'a inince OPS'a bildirilir, OPS aynı turda ana dizini ff-pull eder (companion olmayan kirli dosya varsa yapılmaz), tek satır içerik kanıtı basılır ve otomatik tazeleme bilerek reddedilmiştir; ancak §20.2 (L1543-1547) merge ritüelinde koşullu otomatik ff-only sarma getirdiği için iki metnin birbirine göre kapsamı belgeden anlaşılmıyor. | yok (§16'da kapı yok; ilgili: `ana-agac-tazelik.test.ts` INV-ANA-AGAC-TAZE-1 yalnız §20.2'de geçiyor) | BELİRSİZ (L1078 ↔ L1543) |
+| 16 | Mekanizma PR'ı inince ana dizin tazelenir | `scripts/board/**`, `.claude/hooks/**`, `.githooks/**` değiştiren PR master'a inince OPS'a bildirilir, OPS aynı turda ana dizini ff-pull eder (companion olmayan kirli dosya varsa yapılmaz), tek satır içerik kanıtı basılır ve otomatik tazeleme bilerek reddedilmiştir; ancak §20.2 (L1543-1547) merge ritüelinde koşullu otomatik ff-only sarma getirdiği için iki metnin birbirine göre kapsamı belgeden anlaşılmıyor. | yok (§16'da kapı yok; ilgili: `ana-agac-tazelik.test.ts` INV-ANA-AGAC-TAZE-1 yalnız §20.2'de geçiyor) | GEÇERLİ (ALTYAPI hükmü 09-29: kancalar ve pano aracı hâlâ ana dizinden yüklenir, tazeleme kuralı olduğu gibi durur; §20.2 ile çelişki yok) |
 | 17 | Adres keşfedilebilirliği | Makine dönüşü sonrası ilk `SendMessage`'tan önce `ListAgents` zorunludur, ad↔şerit eşleşmesi işbaşı notundan teyit edilir ve adres yanlışsa geri alınamaz sınıfta içerik aktarılmaz; pano-sid uzayı ile mesaj-adres uzayı ayrı ayrı doğrulanır. | `board-hedef-serit-adi.test.ts` (INV-BOARD-9; `note` çıktısı alıcı şerit adını basar) | GEÇERLİ (L1115-1122, L1143) |
 | 18 | İzin-reddi olay günlüğü | Normalde serbest bir iş reddedilirse bir kez AYNEN yeniden denenir, ret kılık değiştirilerek dolanılmaz, `deny` kuralı kip değiştirerek/ayar gevşetilerek açılmaz (iş insan eline geçer), ikinci ret ve eksik kalan mekanizma katmanı panoya bildirilir. | `scripts/board/izin-reddi-gunlugu.cjs` + `izin-reddi-gunlugu.test.ts` (INV-BOARD-10, 8 kol) | GEÇERLİ (L1198-1222) |
 | 19 | Kimlik "açılış" kaydıdır, "sahiplik" değil | Ortak/ana ağaca (`absolute-git-dir === git-common-dir`) kimlik yazılmaz ve oradaki eski kayıt silinir, denetlenen küme kimlik ağaçları ∪ cwd ağacı ∪ ortak ana ağaçtır, ortak ana ağaç koşulsuz denetlenir ve baskındır, oradaki kir şerit ihlali gibi raporlanmaz/bloklamaz ama sessiz de kalmaz. | `e1-kimlik-kontrolu.test.ts` (10 kol) + `bash-write-audit-tree.test.ts` (13 kol); INV kimliği yok | GEÇERLİ (L1280-1304) |
@@ -189,6 +193,9 @@ v1.0 modeline aittir; model 2026-09-14'te emekli edildi (§0). Kod yorumlarında
 
 ## 6. Yoklama — üç eksenli canlılık
 
+> **Güncel (2026-09-29, ALTYAPI hükmü):** aşağıdaki GOZCU ekseni tarihseldir; komut onu artık TARAMA/TESLİM olarak
+> yeniden adlandırılmış basar ve "gözcü EMEKLİ, bu sütun arıza değil" der. Canlı ölçüm ATIS ve SES eksenleridir.
+
 `board.cjs yoklama` (eşanlamlı: `rollcall`) filoyu **üç ayrı eksende** ölçer:
 
 | eksen | soru | kaynak |
@@ -207,8 +214,8 @@ olurdu. Yazan fiiller kimliksiz koşmaz; okuyan fiiller koşar.
 
 ## 7. Kapsam sınırı — ADIYLA
 
-**Mekanikleştirilen:** duyma (gözcü), uyanma (cron), yedek kanal (wakeup), yoklama, kurulum
-metninin üretimi ve kurulumun kanıtı.
+**Mekanikleştirilen (v1.0 modeli, TARİHSEL):** liste `docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md`
+dosyasının "§7 birinci paragraf" bölümüne taşındı (2026-09-29, ALTYAPI hükmü). Canlı olan yalnız yoklama (§6).
 
 **Bilinçli olarak mekanikleştirilMEYEN:** slot verme, kuyruk sırası, çakışma hakemliği.
 Bunlar **hüküm katmanıdır** ve orkestratörde kalır. Gerekçe: bu kararlar tempo, risk ve
