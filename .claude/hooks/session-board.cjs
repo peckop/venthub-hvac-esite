@@ -464,6 +464,20 @@ try {
 
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
+  /**
+   * ⭐CLAIM YENİLEME (Ops 09-30): startup/resume'da bu oturumun KENDİ süresi dolmuş talebi varsa aynı şerit + aynı
+   * desenlerle yeniden alınır; canlı başka oturum aynı şeridi/çakışan deseni tutuyorsa ALINMAZ, tek satır UYARI basılır.
+   * `liveClaims()` çağrısından ÖNCE koşar: yenilenen talep aşağıda `mine` olarak görünür (şerit satırı, rol kartı, ad).
+   * clear/compact'ta dokunulmaz. FAIL-OPEN: yenile() asla fırlatmaz; hata → alan yok, oturum açılışı aynen (hata stderr'e).
+   * Mantık ve kurallar: scripts/board/claim-yenile.cjs (kapı: claim-yenile.test.ts).
+   */
+  try {
+    const y = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'claim-yenile.cjs')).yenile(board, sid, { source })
+    if (y.satir) bolum('claim-yenile', 1, y.satir, y.islem === 'yenile' ? 'CLAIM YENILENDI (pano: board.cjs who)\n' : '⚠CLAIM YENILENMEDI (canli cakisma; board.cjs who)\n')
+    if (y.islem === 'hata') process.stderr.write(`[session-board] claim yenileme atlandi (${y.sebep}) — oturum acilisi etkilenmedi.\n`)
+  } catch (e) {
+    process.stderr.write(`[session-board] claim yenileme modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — oturum acilisi etkilenmedi.\n`)
+  }
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
