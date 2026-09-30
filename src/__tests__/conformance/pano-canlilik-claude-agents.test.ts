@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 
 import { describe, expect, it, vi } from 'vitest'
@@ -7,12 +7,13 @@ import { describe, expect, it, vi } from 'vitest'
 vi.setConfig({ testTimeout: 60_000 })
 
 /**
- * INV-PANO-CANLILIK-1..12 · Pano canlılığı `claude agents --json --all` ile beslenir (REC-524).
+ * INV-PANO-CANLILIK-1..17 · Pano canlılığı `claude agents --json` ile beslenir (REC-524).
  *
  * ÖLÇÜLMÜŞ SORUN (F8, 2026-09-30): pano canlılığı CLAIM ATIŞINDAN türetiliyordu. İki kör nokta:
  *   (a) pencere kapandı, claim kirası (4 saat) dolmadı → şerit "canlı" görünür = HAYALET;
  *   (b) pencere açık ama hiç claim almadı → pano onu HİÇ göstermez = "kayıp pencere".
- * Gerçek kaynak Claude Code'un kendisidir; `claude agents --json --all` açık tüm interaktif pencereleri verir.
+ * Gerçek kaynak Claude Code'un kendisidir; `claude agents --json` aktif oturumları verir. `--all` KULLANILMAZ:
+ * `claude agents --help` ona "tamamlanmış arka plan oturumlarını da kat" der (canlılık kaynağı değil).
  *
  * TEST TASARIMI: `claude` çıktısı ENJEKTE edilir (`calistir` parametresi ya da CLI için ham çıktı dosyası,
  * `VENTHUB_CANLILIK_HAM`) — gerçek `claude`a bağlı değildir; zaman aşımı / ENOENT / bozuk JSON yolları
@@ -42,19 +43,24 @@ type Olcum =
 type Birlesim = {
   serit: Map<string, { durum: string; ad: string; calisma: string }>
   seritsiz: Pencere[]
+  yeniSurec: Pencere[]
   altSurec: Pencere[]
 }
 type Canlilik = {
   ZAMAN_ASIMI_MS: number
   ONBELLEK_MS: number
+  YENI_SUREC_MS: number
+  gercekKaynakKapaliMi: () => boolean
   ayristir: (ham: string) => { ok: true; pencereler: Pencere[] } | { ok: false; sebep: string }
   olc: (o?: {
     calistir?: () => unknown
     simdi?: number
     onbellekYolu?: string
     ttlMs?: number
+    benSid?: string
   }) => Olcum
-  birlestir: (claimler: Array<{ sid: string }>, pencereler: Pencere[]) => Birlesim
+  olculemediSatiri: (o: Olcum) => string
+  birlestir: (claimler: Array<{ sid: string }>, pencereler: Pencere[], simdi?: number) => Birlesim
   altSurecMi: (p: Pencere) => boolean
 }
 const canlilik: Canlilik = require('../../../scripts/board/canlilik.cjs')
@@ -70,7 +76,7 @@ function p(o: Partial<Pencere> & { sessionId: string }): Pencere {
     pid: 1000,
     cwd: ANA,
     kind: 'interactive',
-    startedAt: 1790757610029,
+    startedAt: 1_700_000_000_000, // ESKI (2023): "yeni surec" kurali testleri acikca kendi startedAt'ini verir
     name: 'venthub-hvac-0a',
     status: 'idle',
     ...o,
@@ -126,7 +132,7 @@ function claimAl(pano: string, sid: string, lane: string, globs = 'src/**'): voi
   expect(r.kod, r.err).toBe(0)
 }
 
-describe('INV-PANO-CANLILIK · pano canlilik `claude agents --json --all` ile beslenir', () => {
+describe('INV-PANO-CANLILIK · pano canlilik `claude agents --json` ile beslenir', () => {
   it('ON KOSUL: gercek cikti bicimi ayristirilir, board.cjs canlilik modulunu yukler (olculemedi != gecti)', () => {
     const ornek =
       '[{"pid":31284,"cwd":"c:\\\\Users\\\\alize\\\\venthub-hvac","kind":"interactive","startedAt":1790757610029,' +
@@ -249,7 +255,9 @@ describe('INV-PANO-CANLILIK · pano canlilik `claude agents --json --all` ile be
     // Sinir kodda sabit: gercek 8 sn'lik bekleme testte kosulmaz, ama parametreler ölçülür.
     expect(canlilik.ZAMAN_ASIMI_MS).toBe(8000)
     const kaynak = readFileSync(CANLILIK_YOLU, 'utf8')
-    expect(kaynak).toMatch(/spawnSync\('claude', \['agents', '--json', '--all'\]/)
+    // ORTA-2: `--all` "bitmis arka plan oturumlarini da kat" demek (claude agents --help); canlilik kaynagina GIRMEZ.
+    expect(kaynak).toMatch(/spawnSync\('claude', \['agents', '--json'\]/)
+    expect(kaynak, '`--all` bayragi geri geldi: bitmis oturumlar canli sayilabilir').not.toMatch(/\['agents', '--json', '--all'\]/)
     expect(kaynak).toMatch(/timeout: ZAMAN_ASIMI_MS/)
     expect(kaynak).toMatch(/windowsHide: true/)
   })
@@ -342,9 +350,34 @@ describe('INV-PANO-CANLILIK · pano canlilik `claude agents --json --all` ile be
     expect(w.kod, w.err).toBe(0)
     expect(w.out).toMatch(/PANO — canlı şeritler:/)
     expect(w.out).not.toMatch(/canlılık|●canlı|○KAPALI|ŞERİTSİZ/)
-    // Acikca acilirsa (=0) gercek kaynak calisir: kural iki yonde olculur.
-    const acik = kos(pano, ['who', '--sid', A], { ek: ACIK })
-    expect(acik.out).toMatch(/canlılık|●canlı|○KAPALI/)
+    // Kural matrisi HERMETIK olculur (gercek `claude` cagrilmaz): env degiskenleri gecici kurulup geri konur.
+    const kural = (env: Record<string, string | undefined>): boolean => {
+      const anahtarlar = ['VENTHUB_BOARD_DIR', 'VENTHUB_CANLILIK_KAPALI', 'VENTHUB_CANLILIK_HAM']
+      const eski = Object.fromEntries(anahtarlar.map((k) => [k, process.env[k]]))
+      try {
+        for (const k of anahtarlar) {
+          const v = env[k]
+          if (v === undefined) delete process.env[k]
+          else process.env[k] = v
+        }
+        return canlilik.gercekKaynakKapaliMi()
+      } finally {
+        for (const k of anahtarlar) {
+          if (eski[k] === undefined) delete process.env[k]
+          else process.env[k] = eski[k]
+        }
+      }
+    }
+    expect(kural({ VENTHUB_BOARD_DIR: 'x' }), 'izole pano varsayilan KAPALI').toBe(true)
+    expect(kural({ VENTHUB_BOARD_DIR: 'x', VENTHUB_CANLILIK_KAPALI: '0' }), '=0 izole panoyu ACAR').toBe(false)
+    expect(kural({ VENTHUB_BOARD_DIR: 'x', VENTHUB_CANLILIK_KAPALI: '1' })).toBe(true)
+    expect(kural({ VENTHUB_CANLILIK_KAPALI: '1' }), 'gercek pano da =1 ile kapanir').toBe(true)
+    expect(kural({}), 'gercek pano (VENTHUB_BOARD_DIR yok) varsayilan ACIK').toBe(false)
+    expect(kural({ VENTHUB_BOARD_DIR: 'x', VENTHUB_CANLILIK_KAPALI: '1', VENTHUB_CANLILIK_HAM: 'f' }), 'HAM her zaman acar').toBe(false)
+    // CLI yarisi da hermetik: HAM verilince izole panoda bile olcum ACILIR (gercek claude yok).
+    const acik = kos(pano, ['who', '--sid', A], { hamCikti: ham(p({ sessionId: A, name: 'Yetenek' })) })
+    expect(acik.out).toMatch(/●canlı/)
+    expect(acik.out).toMatch(/canlılık: claude agents/)
   })
 
   it('INV-PANO-CANLILIK-11 · hayalet (kapali) pencere ad/serit CAKISMASI sayilmaz; canli olani tek basina kalir', () => {
@@ -374,5 +407,145 @@ describe('INV-PANO-CANLILIK · pano canlilik `claude agents --json --all` ile be
     expect(w.out.split('\n')[0]).toBe('PANO: talep yok.')
     expect(w.out).toContain('ŞERİTSİZ AÇIK PENCERE')
     expect(w.out).toContain('Ops')
+  })
+
+  it('INV-PANO-CANLILIK-13 · onbellekte CAGIRAN (benSid) yoksa onbellek yok sayilir, yeniden olculur (yeni acilan pencere hayalet gorunmez)', () => {
+    const yol = benzersiz('onbellek-ben') + '/canlilik-onbellek.json'
+    let liste: Pencere[] = [p({ sessionId: C, name: 'Ops' })]
+    let cagri = 0
+    const calistir = () => {
+      cagri += 1
+      return { status: 0, stdout: ham(...liste) }
+    }
+    const t0 = 1_800_000_000_000
+    canlilik.olc({ calistir, simdi: t0, onbellekYolu: yol }) // onbellekte A YOK
+    liste = [p({ sessionId: C, name: 'Ops' }), p({ sessionId: A, name: 'Yeni' })]
+    const ben = canlilik.olc({ calistir, simdi: t0 + 5_000, onbellekYolu: yol, benSid: A })
+    expect(cagri, 'onbellekte ben yokken yeniden olculmedi').toBe(2)
+    expect(ben.ok && ben.kaynak).toBe('canli')
+    expect(ben.ok && ben.pencereler.some((x) => x.sessionId === A)).toBe(true)
+    // Ben listedeyse onbellek KULLANILIR (gereksiz surec yok); benSid verilmezse de eskisi gibi.
+    canlilik.olc({ calistir, simdi: t0 + 6_000, onbellekYolu: yol, benSid: A })
+    canlilik.olc({ calistir, simdi: t0 + 7_000, onbellekYolu: yol })
+    expect(cagri).toBe(2)
+
+    // CLI: onbellek ben'siz bir listeyle taze yazilmis; who --sid A yeniden olcer ve A'yi ●canli gorur.
+    const pano = benzersiz('pano-canlilik-13')
+    claimAl(pano, A, 'YETENEK')
+    writeFileSync(
+      `${pano}/canlilik-onbellek.json`,
+      JSON.stringify({ ts: Date.now(), ok: true, pencereler: [p({ sessionId: C, name: 'Ops' })] }),
+    )
+    const w = kos(pano, ['who', '--sid', A], { hamCikti: ham(p({ sessionId: A, name: 'Yeni' })), ek: ACIK })
+    const yetenek = w.out.split('\n').find((s) => s.includes('YETENEK'))
+    expect(yetenek, w.out).toContain('●canlı')
+    expect(yetenek).not.toContain('hayalet')
+  })
+
+  it('INV-PANO-CANLILIK-14 · `status: completed` kayit canli SAYILMAZ (claim → hayalet); `--all` bayragi kullanilmaz', () => {
+    const r = canlilik.ayristir(
+      ham(p({ sessionId: A, name: 'Acik', status: 'busy' }), p({ sessionId: B, name: 'Bitmis', status: 'completed' })),
+    )
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.pencereler.map((x) => x.sessionId)).toEqual([A])
+    const pano = benzersiz('pano-canlilik-14')
+    claimAl(pano, A, 'YETENEK')
+    claimAl(pano, B, 'URUN')
+    const w = kos(pano, ['who', '--sid', A], {
+      hamCikti: ham(p({ sessionId: A, name: 'Acik' }), p({ sessionId: B, name: 'Bitmis', status: 'completed' })),
+      ek: ACIK,
+    })
+    expect(w.out.split('\n').find((s) => s.includes('URUN'))).toContain('KAPALI(hayalet')
+    expect(w.out, 'bitmis oturum sayildi').toMatch(/1 açık pencere/)
+  })
+
+  it('INV-PANO-CANLILIK-15 · yalniz basarili olcum + ZAMAN ASIMI onbelleklenir; ENOENT/bozuk JSON onbelleklenmez; onbellek satiri etiketli; tmp cop birakmaz', () => {
+    const t0 = 1_800_000_000_000
+    for (const [ad, sonuc] of [
+      ['ENOENT', { status: null, error: { code: 'ENOENT' } }],
+      ['bozuk JSON', { status: 0, stdout: '{ yarim' }],
+    ] as const) {
+      const yol = benzersiz('onbellek-hizli-hata') + '/canlilik-onbellek.json'
+      let cagri = 0
+      const calistir = () => {
+        cagri += 1
+        return sonuc
+      }
+      canlilik.olc({ calistir, simdi: t0, onbellekYolu: yol })
+      canlilik.olc({ calistir, simdi: t0 + 1_000, onbellekYolu: yol })
+      expect(cagri, `${ad} onbelleklendi (claude kurulunca 30 sn yalan surer)`).toBe(2)
+    }
+
+    // "(onbellek)" etiketi: hata satiri ve basarili olcum satiri, kaynak onbellek ise etiket tasir.
+    const yol2 = benzersiz('onbellek-etiket') + '/canlilik-onbellek.json'
+    const zaman = () => ({ status: null, signal: 'SIGTERM', error: { code: 'ETIMEDOUT' } })
+    const ilk = canlilik.olc({ calistir: zaman, simdi: t0, onbellekYolu: yol2 })
+    const ikinci = canlilik.olc({ calistir: zaman, simdi: t0 + 1_000, onbellekYolu: yol2 })
+    expect(ilk.ok).toBe(false)
+    expect(ikinci.ok).toBe(false)
+    const satir = (o: Olcum) => canlilik.olculemediSatiri(o)
+    expect(satir(ikinci)).toMatch(/önbellek ≤30sn/)
+    expect(satir(ilk)).not.toMatch(/önbellek/)
+    const pano = benzersiz('pano-canlilik-15')
+    claimAl(pano, A, 'YETENEK')
+    const hamA = ham(p({ sessionId: A, name: 'Yetenek' }))
+    const w1 = kos(pano, ['who', '--sid', A], { hamCikti: hamA, ek: ACIK })
+    const w2 = kos(pano, ['who', '--sid', A], { hamCikti: hamA, ek: ACIK })
+    expect(w1.out).toMatch(/\(ölçüldü \d+ms\)/)
+    expect(w2.out, 'onbellekten gelen satir etiketsiz').toMatch(/\(önbellek ≤30sn\)/)
+
+    // D2: renameSync basarisiz olursa (hedef bir DIZIN) gecici dosya SILINIR.
+    const dizin = benzersiz('onbellek-rename')
+    const hedef = `${dizin}/canlilik-onbellek.json`
+    mkdirSync(hedef, { recursive: true })
+    const sonuc = canlilik.olc({ calistir: calistirSabit('[]'), simdi: t0, onbellekYolu: hedef })
+    expect(sonuc.ok).toBe(true)
+    expect(readdirSync(dizin).filter((f) => f.endsWith('.tmp')), 'gecici dosya cop kaldi').toEqual([])
+  })
+
+  it('INV-PANO-CANLILIK-16 · claude sifirdan farkli cikis kodu: sebep "cikis kodu N", onbelleklenmez, eski cikti korunur', () => {
+    const r = canlilik.olc({ calistir: () => ({ status: 2, stdout: '' }) })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.sebep).toBe('claude çıkış kodu 2')
+    // Cikis kodu 0 + bos cikti ile AYIRT EDILIR (farkli sebep): kol yalnizca kod dalini olcer.
+    const bos = canlilik.olc({ calistir: () => ({ status: 0, stdout: '' }) })
+    expect(bos.ok).toBe(false)
+    if (!bos.ok) expect(bos.sebep).not.toMatch(/çıkış kodu/)
+  })
+
+  it('INV-PANO-CANLILIK-17 · claim-siz surec < 5 dk → ◦YENI SUREC (henuz claim almadi); 5 dk sonra ⚠SERITSIZ; alt surec yeni sayilmaz', () => {
+    const simdi = 1_800_000_000_000
+    const b = canlilik.birlestir(
+      [{ sid: A }],
+      [
+        p({ sessionId: A, name: 'Yetenek' }),
+        p({ sessionId: 'yeni-1', name: 'Taze', startedAt: simdi - 4 * 60_000 }),
+        p({ sessionId: 'eski-1', name: 'Eski', startedAt: simdi - 6 * 60_000 }),
+        p({ sessionId: 'null-1', name: 'Belirsiz', startedAt: null }),
+        p({ sessionId: 'alt-1', name: 'vh-arac-9-xx', startedAt: simdi - 60_000 }),
+      ],
+      simdi,
+    )
+    expect(b.yeniSurec.map((x) => x.sessionId)).toEqual(['yeni-1'])
+    expect(b.seritsiz.map((x) => x.sessionId).sort()).toEqual(['eski-1', 'null-1'])
+    expect(b.altSurec.map((x) => x.sessionId)).toEqual(['alt-1'])
+    expect(canlilik.YENI_SUREC_MS).toBe(5 * 60_000)
+
+    const pano = benzersiz('pano-canlilik-17')
+    claimAl(pano, A, 'YETENEK')
+    const su = Date.now()
+    const w = kos(pano, ['who', '--sid', A], {
+      hamCikti: ham(
+        p({ sessionId: A, name: 'Yetenek' }),
+        p({ sessionId: C, name: 'Taze', startedAt: su - 60_000 }),
+        p({ sessionId: D, name: 'Eski', startedAt: su - 10 * 60_000 }),
+      ),
+      ek: ACIK,
+    })
+    const yeni = w.out.split('\n').find((s) => s.includes('YENİ SÜREÇ'))
+    expect(yeni, w.out).toContain('henüz claim almadı')
+    expect(yeni).toContain('Taze')
+    expect(w.out.split('\n').find((s) => s.includes('ŞERİTSİZ AÇIK PENCERE'))).toContain('Eski')
+    expect(w.out.split('\n').filter((s) => s.includes('Taze') && s.includes('ŞERİTSİZ'))).toHaveLength(0)
   })
 })

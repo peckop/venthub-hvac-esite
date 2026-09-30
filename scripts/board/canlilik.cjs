@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 /**
- * PANO CANLILIĞI — `claude agents --json --all` çıktısını pano claim'leriyle birleştirir (REC-524).
+ * PANO CANLILIĞI — `claude agents --json` çıktısını pano claim'leriyle birleştirir (REC-524).
  *
  * NİÇİN VAR: pano canlılığı şimdiye kadar CLAIM ATIŞINDAN türetiliyordu (kalp atışı + 4 saatlik kira).
  * Atış oturumun YAŞADIĞINI değil, en son ne zaman atış YAZDIĞINI söyler. İki kör nokta ölçüldü:
  *   (a) pencere kapandı, claim kirası dolmadı → pano şeridi 4 saat "canlı" gösterir (HAYALET);
  *   (b) pencere açık ama hiç claim almadı → pano onu HİÇ göstermez (F8'in "kayıp pencere"si).
- * Gerçek kaynak Claude Code'un kendisi: `claude agents --json --all` açık TÜM interaktif pencereleri
+ * Gerçek kaynak Claude Code'un kendisi: `claude agents --json` AKTİF oturumları (interaktif + arka plan)
  * verir (pid, cwd, kind, startedAt, sessionId, name, status busy/idle). Daemon gerekmez; ölçüldü
  * 2026-09-30, bu makine, ~0,65 sn. Cetvel: docs/standards/fleet-mechanism-standard.md (pano = claim +
  * canlılık).
+ *
+ * ⚠`--all` KULLANILMAZ: `claude agents --help` ona "with --json: also include COMPLETED background
+ * sessions" der — yani "açık pencere" değil, bitmiş arka plan oturumlarını da katar. Canlılık kaynağına
+ * bitmiş oturum sokmak hayaleti canlı gösterir. Ek emniyet: `status: completed` kayıtlar ayrıştırmada
+ * ATILIR (bu makinede `--json` ile `--json --all` çıktısı aynıydı; fark ileride çıkarsa da canlı sayılmaz).
  *
  * TASARIM — ince kablo: bu dosya SAF mantık + tek küçük süreç çağrısıdır. `board.cjs` yalnız çağırır.
  * `claude` çıktısı ENJEKTE edilebilir (`calistir` parametresi) → test gerçek `claude`a bağlı değildir
@@ -20,7 +25,11 @@
  * gibi okunmaz ve asla "hepsi kapalı" gibi de okunmaz — durum `bilinmiyor` kalır.
  *
  * ⚠ÇAĞRI MALİYETİ: her `who`/SessionStart çağrısı süreç açmasın diye 30 sn önbellek (pano dizininde
- * küçük json). Önbellek BAŞARISIZLIĞI da tutulur (8 sn'lik zaman aşımı her çağrıda tekrarlanmasın).
+ * küçük json). Önbelleğe YALNIZ başarılı ölçüm ve ZAMAN AŞIMI girer (8 sn'lik bekleme her çağrıda
+ * tekrarlanmasın). Hızlı hatalar (ENOENT, bozuk JSON, çıkış kodu, ham-dosya hatası) önbelleklenmez: yeniden
+ * ölçmek ucuzdur ve `claude` kurulunca / hata geçince 30 sn boyunca eski "ölçülemedi" yalanı sürmemeli.
+ * ⚠Önbellek isabetinde ÇAĞIRANIN kendi oturumu (`benSid`) listede yoksa önbellek yok sayılır: 30 sn içinde
+ * açılan yeni pencere kendi claim'ini "hayalet" görmesin.
  */
 const fs = require('fs')
 const path = require('path')
@@ -33,10 +42,12 @@ const ONBELLEK_MS = 30 * 1000
 const ONBELLEK_ADI = 'canlilik-onbellek.json'
 /** Alt ajan / gözlemci süreçlerin adı (`vh-arac-12`, `vh-…-xx`). Ana pencereler `venthub-hvac-xx` / serbest ad taşır. */
 const ALT_SUREC_AD = /^vh-/i
+/** Claim'siz süreç bu yaştan gençse "YENİ SÜREÇ" (henüz claim almadı) sayılır; sonra ŞERİTSİZ AÇIK PENCERE uyarısı. */
+const YENI_SUREC_MS = 5 * 60 * 1000
 
 /**
- * Ham metni pencere listesine çevirir. SAF.
- * @param {string} ham `claude agents --json --all` stdout'u
+ * Ham metni pencere listesine çevirir. SAF. `status: completed` kayıtlar ATILIR (bitmiş oturum canlı değildir).
+ * @param {string} ham `claude agents --json` stdout'u
  * @returns {{ok:true, pencereler:Array<object>}|{ok:false, sebep:string}}
  */
 function ayristir(ham) {
@@ -48,6 +59,7 @@ function ayristir(ham) {
   const pencereler = []
   for (const p of j) {
     if (!p || typeof p !== 'object') continue
+    if (p.status === 'completed') continue
     pencereler.push({
       pid: typeof p.pid === 'number' ? p.pid : null,
       cwd: typeof p.cwd === 'string' ? p.cwd : '',
@@ -70,16 +82,16 @@ function sonucuYorumla(r) {
   const e = r.error
   if (e) {
     if (e.code === 'ENOENT') return { ok: false, sebep: 'claude bulunamadı (ENOENT)' }
-    if (e.code === 'ETIMEDOUT') return { ok: false, sebep: `${ZAMAN_ASIMI_MS / 1000} sn'de dönmedi (zaman aşımı)` }
+    if (e.code === 'ETIMEDOUT') return { ok: false, zamanAsimi: true, sebep: `${ZAMAN_ASIMI_MS / 1000} sn'de dönmedi (zaman aşımı)` }
     return { ok: false, sebep: `süreç hatası: ${e.code || e.message || 'bilinmeyen'}`.slice(0, 120) }
   }
-  if (r.signal) return { ok: false, sebep: `${ZAMAN_ASIMI_MS / 1000} sn'de dönmedi (${r.signal})` }
+  if (r.signal) return { ok: false, zamanAsimi: true, sebep: `${ZAMAN_ASIMI_MS / 1000} sn'de dönmedi (${r.signal})` }
   if (typeof r.status === 'number' && r.status !== 0) return { ok: false, sebep: `claude çıkış kodu ${r.status}` }
   return { ok: true, ham: r.stdout == null ? '' : String(r.stdout) }
 }
 
 /**
- * Varsayılan çalıştırıcı: gerçek `claude agents --json --all`.
+ * Varsayılan çalıştırıcı: gerçek `claude agents --json` (`--all` YOK, bkz. dosya başlığı).
  * Test kancaları (yalnız ortam değişkeni; kural `gercekKaynakKapaliMi`de): `VENTHUB_CANLILIK_HAM=<dosya>` ham
  * çıktıyı dosyadan okur (CLI düzeyi uçtan uca test için); `VENTHUB_CANLILIK_KAPALI=1` ölçümü kapatır.
  */
@@ -88,7 +100,7 @@ function gercekCalistir() {
   if (ham) {
     try { return { status: 0, stdout: fs.readFileSync(ham, 'utf8') } } catch (error) { return { status: null, error } }
   }
-  return spawnSync('claude', ['agents', '--json', '--all'], {
+  return spawnSync('claude', ['agents', '--json'], {
     encoding: 'utf8',
     timeout: ZAMAN_ASIMI_MS,
     windowsHide: true,
@@ -124,8 +136,14 @@ function onbellekYaz(yol, kayit) {
   try {
     fs.mkdirSync(path.dirname(yol), { recursive: true })
     const gecici = `${yol}.${process.pid}.tmp`
-    fs.writeFileSync(gecici, JSON.stringify(kayit), 'utf8')
-    fs.renameSync(gecici, yol)
+    try {
+      fs.writeFileSync(gecici, JSON.stringify(kayit), 'utf8')
+      fs.renameSync(gecici, yol)
+    } catch (e) {
+      // Yarım kalan geçici dosya pano dizininde çöp bırakmasın (D2).
+      try { fs.unlinkSync(gecici) } catch { /* zaten yok */ }
+      throw e
+    }
   } catch { /* önbellek yazılamadı: ölçüm yine döner, yalnız bir sonraki çağrı yeniden ölçer */ }
 }
 
@@ -136,6 +154,7 @@ function onbellekYaz(yol, kayit) {
  * @param {number} [o.simdi] ms
  * @param {string} [o.onbellekYolu] verilmezse önbellek KULLANILMAZ (saf çağrı)
  * @param {number} [o.ttlMs]
+ * @param {string} [o.benSid] çağıranın oturumu: önbellek listesinde YOKSA önbellek yok sayılır (yeni açılan pencere)
  * @returns {{ok:true, pencereler:Array<object>, kaynak:'canli'|'onbellek', sureMs:number}|{ok:false, sebep:string, kaynak:'canli'|'onbellek'}}
  */
 function olc(o = {}) {
@@ -144,7 +163,9 @@ function olc(o = {}) {
   if (!o.calistir && gercekKaynakKapaliMi()) return { ok: false, sebep: 'kapalı (izole pano ya da VENTHUB_CANLILIK_KAPALI=1)', kaynak: 'canli', kapali: true }
   if (o.onbellekYolu) {
     const c = onbellekOku(o.onbellekYolu, simdi, ttlMs)
-    if (c) return c.ok ? { ok: true, pencereler: c.pencereler, kaynak: 'onbellek', sureMs: 0 } : { ok: false, sebep: c.sebep, kaynak: 'onbellek' }
+    // ORTA-1: çağıran kendi oturumunu önbellekte göremiyorsa liste ondan ESKİDİR (30 sn içinde açıldı) → yeniden ölç.
+    const benYok = c && c.ok && o.benSid && !c.pencereler.some((p) => p.sessionId === o.benSid)
+    if (c && !benYok) return c.ok ? { ok: true, pencereler: c.pencereler, kaynak: 'onbellek', sureMs: 0 } : { ok: false, sebep: c.sebep, kaynak: 'onbellek' }
   }
   const t0 = Date.now()
   let sonuc
@@ -155,7 +176,8 @@ function olc(o = {}) {
     sonuc = { ok: false, sebep: `ölçüm hatası: ${(e && e.message) || 'bilinmeyen'}`.slice(0, 120) }
   }
   const sureMs = Date.now() - t0
-  if (o.onbellekYolu) {
+  // D1: yalnız başarılı ölçüm ve ZAMAN AŞIMI önbelleklenir; hızlı hatalar (ENOENT, bozuk JSON, çıkış kodu…) girmez.
+  if (o.onbellekYolu && (sonuc.ok || sonuc.zamanAsimi)) {
     onbellekYaz(o.onbellekYolu, sonuc.ok ? { ts: simdi, ok: true, pencereler: sonuc.pencereler } : { ts: simdi, ok: false, sebep: sonuc.sebep })
   }
   return sonuc.ok
@@ -176,13 +198,14 @@ function altSurecMi(p) {
  * Claim'leri pencere listesiyle birleştirir. SAF.
  *  - claim var + listede var  → `canli` (ad + meşgul/boşta)
  *  - claim var + listede yok  → `hayalet` (pencere kapalı, claim duruyor)
- *  - listede var + claim yok  → `seritsiz` (şeritsiz açık pencere) ya da `altSurec`
+ *  - listede var + claim yok  → `altSurec`, `yeniSurec` (`startedAt` < 5 dk: henüz claim almadı) ya da `seritsiz`
  *  - claim'i olan pencere ASLA alt süreç sayılmaz (ana pencere; adı/dizini `vh-` olsa bile)
  * @param {Array<{sid:string}>} claimler
  * @param {Array<object>} pencereler `ayristir().pencereler`
- * @returns {{serit:Map<string,{durum:'canli'|'hayalet', ad:string, calisma:string}>, seritsiz:Array<object>, altSurec:Array<object>}}
+ * @param {number} [simdi] ms (yeni süreç yaşı için; verilmezse Date.now())
+ * @returns {{serit:Map<string,{durum:'canli'|'hayalet', ad:string, calisma:string}>, seritsiz:Array<object>, yeniSurec:Array<object>, altSurec:Array<object>}}
  */
-function birlestir(claimler, pencereler) {
+function birlestir(claimler, pencereler, simdi = Date.now()) {
   const sidleri = new Set((claimler || []).map((c) => c.sid))
   const pencereSid = new Map()
   for (const p of pencereler || []) if (p.sessionId) pencereSid.set(p.sessionId, p)
@@ -194,12 +217,15 @@ function birlestir(claimler, pencereler) {
       : { durum: 'hayalet', ad: '', calisma: '' })
   }
   const seritsiz = []
+  const yeniSurec = []
   const altSurec = []
   for (const p of pencereler || []) {
     if (p.sessionId && sidleri.has(p.sessionId)) continue
-    ;(altSurecMi(p) ? altSurec : seritsiz).push(p)
+    if (altSurecMi(p)) altSurec.push(p)
+    else if (typeof p.startedAt === 'number' && simdi - p.startedAt < YENI_SUREC_MS) yeniSurec.push(p)
+    else seritsiz.push(p)
   }
-  return { serit, seritsiz, altSurec }
+  return { serit, seritsiz, yeniSurec, altSurec }
 }
 
 /** Meşgul/boşta sözcüğü; bilinmeyen değer olduğu gibi (uydurma çeviri yok). */
@@ -223,8 +249,13 @@ function dizinSonu(cwd) { return String(cwd || '').replace(/\\/g, '/').replace(/
  * Şerit satırlarının ALTINA eklenecek satırlar (şeritsiz pencere · alt süreç · ölçüm başlığı). SAF.
  * @param {string} [benSid] çağıranın oturumu — şeritsizse "(sen)" işaretlenir
  */
-function ekSatirlar(birlesim, olcum, benSid) {
+function ekSatirlar(birlesim, olcum, benSid, simdi = Date.now()) {
   const out = []
+  for (const p of birlesim.yeniSurec) {
+    const sen = benSid && p.sessionId === benSid ? ' (sen)' : ''
+    const dk = Math.max(0, Math.floor((simdi - p.startedAt) / 60000))
+    out.push(`  ◦YENİ SÜREÇ${sen} (henüz claim almadı, ${dk}dk önce açıldı): ${p.name || '(adsız)'} [${p.sessionId || 'sid yok'}] ${calismaSozu(p.status)}, ${dizinSonu(p.cwd)}`)
+  }
   for (const p of birlesim.seritsiz) {
     const sen = benSid && p.sessionId === benSid ? ' (sen)' : ''
     out.push(`  ⚠ŞERİTSİZ AÇIK PENCERE${sen}: ${p.name || '(adsız)'} [${p.sessionId || 'sid yok'}] ${calismaSozu(p.status)}, ${dizinSonu(p.cwd)} — panoda claim yok`)
@@ -235,15 +266,16 @@ function ekSatirlar(birlesim, olcum, benSid) {
   }
   if (olcum && olcum.ok) {
     const anaPencere = olcum.pencereler.length - birlesim.altSurec.length
-    const kaynak = olcum.kaynak === 'onbellek' ? 'önbellek ≤30sn' : `ölçüldü ${olcum.sureMs}ms`
-    out.push(`  canlılık: claude agents — ${anaPencere} açık pencere + ${birlesim.altSurec.length} alt süreç (${kaynak})`)
+    const kaynak = olcum.kaynak === 'onbellek' ? '(önbellek ≤30sn)' : `(ölçüldü ${olcum.sureMs}ms)`
+    out.push(`  canlılık: claude agents — ${anaPencere} açık pencere + ${birlesim.altSurec.length} alt süreç ${kaynak}`)
   }
   return out
 }
 
-/** Ölçüm başarısızsa eklenecek TEK satır (sessiz değil). */
+/** Ölçüm başarısızsa eklenecek TEK satır (sessiz değil). Önbellekten gelen hata "(önbellek)" etiketi taşır. */
 function olculemediSatiri(olcum) {
-  return `  canlılık ölçülemedi (${olcum.sebep}) — yukarıdaki durum yalnız claim atışına dayanıyor`
+  const et = olcum.kaynak === 'onbellek' ? '; önbellek ≤30sn' : ''
+  return `  canlılık ölçülemedi (${olcum.sebep}${et}) — yukarıdaki durum yalnız claim atışına dayanıyor`
 }
 
 /**
@@ -253,7 +285,7 @@ function olculemediSatiri(olcum) {
 function onbellekYolu(panoDizini) { return path.join(panoDizini, ONBELLEK_ADI) }
 
 module.exports = {
-  ZAMAN_ASIMI_MS, ONBELLEK_MS, ONBELLEK_ADI,
-  ayristir, sonucuYorumla, olc, birlestir, altSurecMi,
+  ZAMAN_ASIMI_MS, ONBELLEK_MS, ONBELLEK_ADI, YENI_SUREC_MS,
+  gercekKaynakKapaliMi, ayristir, sonucuYorumla, olc, birlestir, altSurecMi,
   seritEtiketi, ekSatirlar, olculemediSatiri, calismaSozu, onbellekYolu,
 }

@@ -443,14 +443,15 @@ function pencereAdlari(dizin = OTURUM_KAYIT_DIZINI) {
 }
 
 /**
- * Pano canlılığı (REC-524): `claude agents --json --all` ile claim'leri birleştirir.
+ * Pano canlılığı (REC-524): `claude agents --json` ile claim'leri birleştirir.
  * Kablo ince: mantık `canlilik.cjs`te. FAIL-OPEN ama sessiz değil — ölçüm yoksa `birlesim` null döner
  * ve `olculemedi` satırı çağırana verilir (eski çıktı korunur + tek satır).
  * @returns {{olcum:object, birlesim:object|null}}
  */
-function canlilikOlc(hepsi) {
+function canlilikOlc(hepsi, benSid) {
   let olcum
-  try { olcum = canlilik.olc({ onbellekYolu: canlilik.onbellekYolu(BOARD_DIR) }) } catch (e) {
+  // benSid: çağıranın oturumu önbellekte yoksa önbellek yok sayılır (30 sn içinde açılan yeni pencere, ORTA-1).
+  try { olcum = canlilik.olc({ onbellekYolu: canlilik.onbellekYolu(BOARD_DIR), benSid }) } catch (e) {
     olcum = { ok: false, sebep: `ölçüm hatası: ${(e && e.message) || 'bilinmeyen'}` }
   }
   return { olcum, birlesim: olcum.ok ? canlilik.birlestir(hepsi, olcum.pencereler) : null }
@@ -459,7 +460,7 @@ function canlilikOlc(hepsi) {
 function summary(sid) {
   // BAYAT şeritler artık DÜŞMEZ, etiketle gösterilir (T084-VH — bkz. tumTalepler yorumu).
   const hepsi = tumTalepler()
-  const { olcum, birlesim } = canlilikOlc(hepsi)
+  const { olcum, birlesim } = canlilikOlc(hepsi, sid)
   // Ölçüm açıkça kapatıldıysa (VENTHUB_CANLILIK_KAPALI=1) ek satır YOK; başarısızsa TEK satır var.
   const ekSatirlar = birlesim
     ? canlilik.ekSatirlar(birlesim, olcum, sid)
