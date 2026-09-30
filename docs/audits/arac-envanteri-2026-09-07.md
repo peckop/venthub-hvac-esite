@@ -454,6 +454,7 @@ madde 1 gereği araç sayılmaz.
 | `scripts/belge/konu-yonlendirici.cjs` | KONU YÖNLENDİRİCİ — `docs/standards/belge-yonetimi-standard.md` §B6 (yönlendirici), REC-400 D4. | HARİTA | docs/standards/belge-yonetimi-standard.md §B6 madde 7-9; ARAÇ kancası (`hafiza-sorusu-yonlendirme.cjs`, F3) çağıracak — kanca bağlanana dek çağıran yok, kurulum ARAÇ'ta | 2026-09-29 yazıldı, yeşil (8/8) | src/__tests__/conformance/belge-yonlendirici.test.ts (INV-BELGE-2; eşik sabotajı ayırt edici) | KAL |
 | `scripts/db/checks/satis-kipi-canli.mjs` | INV-SATIS-KIPI-2a/2b/2c/2d/2e — satış kipi anahtarının CANLI davranışı (REC-168, plan adım 4). | OPS | docs/standards/satis-kipi-gecis-standard.md, src/__tests__/conformance/satis-kipi-webhook-dali.test.ts (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/satis-kipi-webhook-dali.test.ts | YENI |
 | `scripts/kip/acilis-onkosullari.mjs` | Satış AÇILIŞ ÖNKOŞULLARI — `satis-kipine-gec.mjs --yon ac` bunları ölçmeden canlıya yazmaz (REC-168, INV-SATIS-KIPI-7). | OPS | docs/standards/satis-kipi-gecis-standard.md, scripts/kip/satis-kipine-gec.mjs (betik taramasi) | olculemedi (repo disi izler taranmadi) | src/__tests__/conformance/satis-kipi-acilis-onkosullari.test.ts | YENI |
+| `scripts/edge/yeniden-dene.mjs` | scripts/edge/yeniden-dene.mjs | ALTYAPI | scripts/edge/drift-check.mjs (prod kaynak indirmesi, gecici ag hatasinda sinirli yeniden deneme); test: INV-EDGE-DRIFT-RETRY-1 | 2026-09-30 (REC-355 alt isi) | yok | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
