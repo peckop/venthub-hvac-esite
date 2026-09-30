@@ -50,7 +50,7 @@ interface Cikarici {
   normalizeTerm: (t: string) => string
 }
 interface Kurulum {
-  yamaSurumFarki: (adlar: string[], kurulu: (ad: string) => string | null) => string[]
+  yamaSurumFarki: (adlar: string[], surumOku: (ad: string) => string | null, kaynak?: 'kurulu' | 'kilitli') => string[]
   gitApply: (kok: string, yama: string, ek?: string[], stdio?: string) => void
 }
 const kurulum = createRequire(import.meta.url)(KURULUM_BETIGI) as Kurulum
@@ -134,7 +134,7 @@ describe('INV-WRONGSTACK-SAGE-YAMA-1 · sage alan-terimi çıkarıcısı Türkç
     expect(dosyalar).toEqual([`+++ b/${HEDEF}`])
   })
 
-  it('yama yedi düzeltmenin hepsini taşır (Unicode sınıfları, NFC, U+0307)', () => {
+  it('yama altı düzeltmenin hepsini taşır (Unicode sınıfları, NFC, U+0307, uzunluk üst sınırları)', () => {
     const arti = fs
       .readFileSync(YAMA, 'utf8')
       .split('\n')
@@ -142,14 +142,71 @@ describe('INV-WRONGSTACK-SAGE-YAMA-1 · sage alan-terimi çıkarıcısı Türkç
       .join('\n')
     const beklenen: [string, string][] = [
       ['backtick terimi', '`(\\p{L}[\\p{L}\\p{N}_-]{2,80})`/gu'],
-      ['büyük harfle başlayan sözcük', '(?<![\\p{L}\\p{N}_])(\\p{Lu}[\\p{L}\\p{N}]{3,})(?![\\p{L}\\p{N}_])/gu'],
-      ['çok kelimeli başlık', '(?:\\p{Lu}\\p{Ll}{2,})(?:\\s+\\p{Lu}[\\p{Ll}\\p{N}]{2,}){0,3}'],
-      ['tanım cümlesi sınırı', '(?![\\\\p{L}\\\\p{N}_])\\\\s+(?:is|are|means|refers to)'],
-      ['camelCase sınırı', '/\\p{Ll}\\p{Lu}/u'],
+      ['büyük harfle başlayan sözcük (üst sınırlı)', '(?<![\\p{L}\\p{N}_])(\\p{Lu}[\\p{L}\\p{N}]{3,200})(?![\\p{L}\\p{N}_])/gu'],
+      ['çok kelimeli başlık (üst sınırlı)', '(?:\\p{Lu}\\p{Ll}{2,80})(?:\\s+\\p{Lu}[\\p{Ll}\\p{N}]{2,80}){0,3})(?![\\p{L}\\p{N}_])/gu'],
+      ['tanım cümlesi: `\\b` yok', '${escapeRegex(cand.term)}\\\\s+(?:is|are|means|refers to)'],
+      ['camelCase kural 1', '/\\p{Ll}\\p{Lu}/u.test(identifier)'],
+      ['camelCase kural 2 (7+ harf)', '/\\p{Lu}\\p{Ll}/u.test(identifier) && identifier.length >= 7'],
       ['girdi NFC', 'text.normalize("NFC")'],
       ['anahtar: NFC + U+0307 silme + Unicode harf', 'term.normalize("NFC").toLowerCase().replace(/\\u0307/g, "").replace(/[^\\p{L}\\p{N}\\s\\-_]+/gu'],
     ]
     for (const [ad, parca] of beklenen) expect(arti, `yamada ${ad} düzeltmesi yok`).toContain(parca)
+    // Sadeleştirmeler: kural 3 (`^\p{Lu}\p{Ll}+\p{Lu}`) kural 1'in alt kümesidir (Ll+ Lu ⊂ Ll Lu); tanım
+    // cümlesindeki `(?![\p{L}\p{N}_])` ardından gelen `\s+` yüzünden gereksizdi. İkisi de yamada YOK.
+    expect(arti, 'kural 3 geri gelmiş: kural 1\'in alt kümesi, gereksiz').not.toContain('^\\p{Lu}\\p{Ll}+\\p{Lu}')
+    expect(arti, 'tanım cümlesine gereksiz sözcük-sınırı geri gelmiş').not.toContain('escapeRegex(cand.term)}(?!')
+    expect(arti, 'tanım cümlesine `\\b` geri gelmiş (Türkçe harfle biten terimde kırılır)').not.toContain('escapeRegex(cand.term)}\\\\b')
+  })
+
+  /**
+   * D1 (CI'da da koşar — kurulu paket GEREKMEZ): yamanın hunk başlıklarını ayrıştırır, her hunk'ın öncül
+   * satırlarını başlıktaki satır numarasına yerleştirerek en küçük sahte hedef dosyayı kurar ve `git apply`
+   * ile uygular. Sayılar tutarsızsa ("corrupt patch"), bağlam kayıksa ya da uygulanmıyorsa düşer; ardından
+   * ardıl görüntü, yamadaki `+` satırlarını sırasıyla içermeli.
+   */
+  it('yama BİÇİMCE uygulanabilir: hunk başlıkları tutarlı, sahte en küçük ağaçta git apply temiz', () => {
+    const satirlar = fs.readFileSync(YAMA, 'utf8').split('\n')
+    interface Hunk { eskiBas: number; eskiSay: number; yeniSay: number; on: string[]; son: string[] }
+    const hunklar: Hunk[] = []
+    let h: Hunk | null = null
+    for (const s of satirlar) {
+      const m = s.match(/^@@ -(\d+),(\d+) \+(\d+),(\d+) @@/)
+      if (m) {
+        h = { eskiBas: Number(m[1]), eskiSay: Number(m[2]), yeniSay: Number(m[4]), on: [], son: [] }
+        hunklar.push(h)
+      } else if (h && (s.startsWith(' ') || s.startsWith('-') || s.startsWith('+')) && !s.startsWith('---') && !s.startsWith('+++')) {
+        if (s[0] !== '+') h.on.push(s.slice(1))
+        if (s[0] !== '-') h.son.push(s.slice(1))
+      }
+    }
+    expect(hunklar.length, 'yamada hunk yok').toBeGreaterThan(0)
+    for (const x of hunklar) {
+      expect(x.on.length, `hunk -${x.eskiBas}: eski satır sayısı başlıkla uyuşmuyor`).toBe(x.eskiSay)
+      expect(x.son.length, `hunk -${x.eskiBas}: yeni satır sayısı başlıkla uyuşmuyor`).toBe(x.yeniSay)
+    }
+    const dosya: string[] = []
+    let sonSatir = 0
+    for (const x of hunklar) {
+      expect(x.eskiBas, 'hunk\'lar sıralı ve çakışmasız olmalı').toBeGreaterThan(sonSatir)
+      while (dosya.length < x.eskiBas - 1) dosya.push(`dolgu ${dosya.length + 1}`)
+      dosya.push(...x.on)
+      sonSatir = x.eskiBas + x.eskiSay - 1
+    }
+    for (let i = 0; i < 5; i++) dosya.push(`kuyruk ${i}`)
+    const kok = geciciDizin()
+    const hedef = path.join(kok, HEDEF)
+    fs.mkdirSync(path.dirname(hedef), { recursive: true })
+    fs.writeFileSync(hedef, `${dosya.join('\n')}\n`)
+    const r = git(kok, ['apply', YAMA])
+    expect(r.status, `yama sahte ağaca uygulanamadı: ${r.stderr}`).toBe(0)
+    const sonuc = fs.readFileSync(hedef, 'utf8')
+    let konum = 0
+    for (const x of hunklar) {
+      const blok = x.son.join('\n')
+      const i = sonuc.indexOf(blok, konum)
+      expect(i, `hunk -${x.eskiBas}: ardıl görüntü uygulanmış dosyada yok`).toBeGreaterThan(-1)
+      konum = i + blok.length
+    }
   })
 
   it.skipIf(!KURULU)('kopyada git apply --check temiz, uygulanır, geri alınır; satır sonu makine ayarından bağımsız (LF kalır)', () => {
@@ -210,6 +267,56 @@ describe('INV-WRONGSTACK-SAGE-YAMA-1 · sage alan-terimi çıkarıcısı Türkç
     expect(cikar(await yukle(kopya(false).index), nfd).map((t) => t.term)).not.toContain('çıktıDosyası')
   })
 
+  it.skipIf(!KURULU)('camelCase kural 2: 7+ harfli baş harfi büyük sözcük ("İstanbul") yamalıda aday, 5 harfli ("Şerit") değil', async () => {
+    const yamasiz = cikar(await yukle(kopya(false).index), 'Bu İstanbul için Şerit ayrıdır.').map((t) => t.term)
+    const yamali = cikar(await yukle(kopya(true).index), 'Bu İstanbul için Şerit ayrıdır.').map((t) => t.term)
+    expect(yamasiz).not.toContain('İstanbul')
+    expect(yamali).toContain('İstanbul')
+    expect(yamali, 'kural 2 uzunluk eşiği (7) aşağı çekilmiş: 5 harfli sözcük aday olmamalı').not.toContain('Şerit')
+  })
+
+  it.skipIf(!KURULU)('çok kelimeli başlık daha uzun bir sözcüğün ÖNEKİ olamaz ("Şube MüdürA" → "Şube Müdür" değil)', async () => {
+    const yamali = await yukle(kopya(true).index)
+    expect(cikar(yamali, 'Şube Müdür raporu verdi.').map((t) => t.term), 'kontrol: sınır yokken de çıkan gerçek başlık').toContain('Şube Müdür')
+    expect(cikar(yamali, 'Şube MüdürA raporu verdi.').map((t) => t.term)).not.toContain('Şube Müdür')
+    expect(cikar(yamali, 'Şube Müdür2_x raporu verdi.').map((t) => t.term)).not.toContain('Şube Müdür2')
+  })
+
+  it.skipIf(!KURULU)('tanım cümlesi: harf büyüklüğüne duyarsız (`i` bayrağı) ve terim daha uzun sözcüğün önekiyse eşleşmez', async () => {
+    const yamali = await yukle(kopya(true).index)
+    const tanim = (metin: string, terim: string) => cikar(yamali, metin).find((t) => t.term === terim)?.definition
+    expect(tanim('**Şerit Kilidi** vardır. şerit kilidi is a lock.', 'Şerit Kilidi')).toBe('a lock')
+    // `\s+` sınırı zaten öneki eler: "Çıkış Kapısıcı is …" cümlesi "Çıkış Kapısı" terimine tanım vermez
+    expect(tanim('**Çıkış Kapısı** var. Çıkış Kapısıcı is the door.', 'Çıkış Kapısı')).toBe('')
+  })
+
+  /**
+   * O1 (bağımsız inceleme): boşluksuz, baş harfi büyük çok uzun sözcük `new RegExp(escapeRegex(terim))`
+   * kurulumunda "Invalid regular expression: Stack overflow" atıyordu (yamalı 8k, yamasız ~33-50k karakterde).
+   * Yama, aday uzunluklarına üst sınır koyar; hiçbir uzunlukta istisna atmamalı, süre doğrusal kalmalı.
+   */
+  it.skipIf(!KURULU)('çok uzun tek sözcük (10k / 50k / 200k) istisna atmaz, hızlı biter, terim uzunluğu sınırlı kalır', async () => {
+    const yamali = await yukle(kopya(true).index)
+    // Son kalıp: iki uzun küçük-harf sözcük ("Aaa…a Bbb…b") — çok kelimeli başlık regex'inin üst sınırını ölçer
+    const ikiSozcuk = (n: number) => `A${'a'.repeat(n / 2)} B${'b'.repeat(n / 2)}`
+    for (const birim of ['ÇıkışKapısı', 'WorkTree', 'Aaaa', 'çıktıDosyası', 'İKİ']) {
+      for (const n of [10_000, 50_000, 200_000]) {
+        const uzun = birim === 'İKİ' ? ikiSozcuk(n) : birim.repeat(Math.ceil(n / birim.length))
+        const t0 = Date.now()
+        let sonuc: Terim[] = []
+        expect(() => {
+          sonuc = cikar(yamali, uzun)
+        }, `${birim} × ${n}: istisna attı`).not.toThrow()
+        expect(Date.now() - t0, `${birim} × ${n}: süre doğrusal değil`).toBeLessThan(3_000)
+        for (const t of sonuc) expect(t.term.length, `${birim} × ${n}: sınırsız uzun terim`).toBeLessThanOrEqual(400)
+        // uzun sözcük normal terimleri gölgelemez
+        const karisik = cikar(yamali, `\`çıktıDosyası\` ve ${uzun} sonra **Çıkış Kapısı** önemli.`).map((x) => x.term)
+        expect(karisik).toContain('çıktıDosyası')
+        expect(karisik).toContain('Çıkış Kapısı')
+      }
+    }
+  })
+
   /** ⭐Ayırt edici kol: sunucunun YÜKLEDİĞİ dosya. sage-mcp kendi kopyasını taşımaz, `@wrongstack/sage`'i içe aktarır. */
   it.skipIf(!KURULU)('sunucunun yüklediği paket yamalı: sage-mcp tek kopyayı kullanır ve o kopya Türkçe anahtar üretir', async () => {
     const mcpCli = path.join(ARAC, 'node_modules', '@wrongstack', 'sage-mcp', 'dist', 'cli.js')
@@ -233,7 +340,14 @@ describe('INV-WRONGSTACK-SAGE-YAMA-1 · sage alan-terimi çıkarıcısı Türkç
     expect(fark[0]).toContain(ad)
     expect(fark[0]).toContain('1.0.27')
     expect(fark[0]).toMatch(/yeniden olculup uretilmeli/)
-    expect(kurulum.yamaSurumFarki([ad], () => null)[0]).toContain('YOK')
+    // NEDEN doğru söylenir: paket yok ≠ kilit dosyası okunamadı (kilit yok/bozuk "kurulu YOK" DENMEZ)
+    const yok = kurulum.yamaSurumFarki([ad], () => null)[0]
+    expect(yok).toMatch(/kurulu degil/)
+    expect(yok).not.toMatch(/package-lock/)
+    const kilitYok = kurulum.yamaSurumFarki([ad], () => null, 'kilitli')[0]
+    expect(kilitYok).toMatch(/package-lock\.json okunamadi ya da @wrongstack\/sage kaydi yok/)
+    expect(kilitYok).not.toMatch(/kurulu degil/)
+    expect(kurulum.yamaSurumFarki([ad], () => '1.0.27', 'kilitli')[0]).toMatch(/kilitli @wrongstack\/sage 1\.0\.27/)
     expect(kurulum.yamaSurumFarki(['bicimsiz.patch'], () => '1.0.26')[0]).toMatch(/bicimine uymuyor/)
   })
 

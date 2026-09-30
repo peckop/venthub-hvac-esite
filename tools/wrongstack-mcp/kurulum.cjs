@@ -131,7 +131,7 @@ function yamaHedefi(ad) {
  * Niçin ayrı kontrol: sürüm kayınca `git apply` yine düşerdi ama "patch does not apply" ile — hangi
  * yamanın hangi sürüm için yazıldığını söylemezdi.
  */
-function yamaSurumFarki(adlar, kuruluSurum) {
+function yamaSurumFarki(adlar, surumOku, kaynak = 'kurulu') {
   const fark = []
   for (const ad of adlar) {
     const h = yamaHedefi(ad)
@@ -139,10 +139,16 @@ function yamaSurumFarki(adlar, kuruluSurum) {
       fark.push('yama adi <paket>-<surum>-<konu>.patch bicimine uymuyor: ' + ad)
       continue
     }
-    const kurulu = kuruluSurum(h.paket)
-    if (kurulu !== h.surum) {
-      fark.push('yama ' + ad + ' surum ' + h.surum + ' icin yazildi, kurulu ' + h.paket + ' ' + (kurulu || 'YOK') + ' — yama yeni surumde yeniden olculup uretilmeli')
-    }
+    const okunan = surumOku(h.paket)
+    if (okunan === h.surum) continue
+    // Okunamayan sürümün NEDENİ doğru söylenir: kilit dosyası yok/bozuksa "kurulu YOK" demek yanıltır.
+    const durum =
+      okunan !== null && okunan !== undefined
+        ? (kaynak === 'kilitli' ? 'kilitli ' : 'kurulu ') + h.paket + ' ' + okunan
+        : kaynak === 'kilitli'
+          ? 'package-lock.json okunamadi ya da ' + h.paket + ' kaydi yok'
+          : h.paket + ' kurulu degil (node_modules/ okunamadi)'
+    fark.push('yama ' + ad + ' surum ' + h.surum + ' icin yazildi, ' + durum + ' — yama yeni surumde yeniden olculup uretilmeli')
   }
   return fark
 }
@@ -223,7 +229,7 @@ function kilitSurumOku(ad) {
 function kur() {
   // Yama kilitli sürüme uymuyorsa daha HİÇBİR ŞEY durdurulmadan yüksek sesle düş (npm ci sonrası
   // düşmek pencerelerin sunucusunu kapatıp yamasız paket bırakırdı).
-  const kilitFarki = yamaSurumFarki(yamalar(), kilitSurumOku)
+  const kilitFarki = yamaSurumFarki(yamalar(), kilitSurumOku, 'kilitli')
   if (kilitFarki.length) throw new Error(kilitFarki.join(' · '))
   const surecler = surecleriOku()
   const { kendi, yabanci, daemon } = siniflandir(surecler, kendiClaudeBul(surecler))
