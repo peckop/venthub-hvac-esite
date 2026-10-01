@@ -382,6 +382,20 @@ describe('updateOrderStatus — monotonluk kapısı SERVİSTE (T058-VH)', () => 
     expect(update).not.toHaveBeenCalled()
   })
 
+  it('"hazırlanıyor" atlanarak kargoya verilemez ve veritabanına hiç dokunulmaz (karar 221)', async () => {
+    // Makine testi kuralı sabitliyor; bu test kuralın SERVİSTE uygulandığını sabitliyor.
+    // Kapı arayüzde kalsaydı pano/form değişince sessizce düşerdi.
+    for (const oldStatus of ['pending', 'paid', 'confirmed']) {
+      const update = vi.fn()
+      ;(supabase.from as import('vitest').Mock).mockImplementation(() => ({ update }))
+      const result = await updateOrderStatus({
+        orderId: 'order-1', newStatus: 'shipped', oldStatus, skipReturnsSync: true,
+      })
+      expect(result.ok, `${oldStatus} → shipped`).toBe(false)
+      expect(update, `${oldStatus} → shipped`).not.toHaveBeenCalled()
+    }
+  })
+
   it('`oldStatus` yoksa kapı uygulanmaz (senkronizasyon yolu)', async () => {
     const eq = vi.fn().mockResolvedValue({ error: null })
     const update = vi.fn().mockReturnValue({ eq })
