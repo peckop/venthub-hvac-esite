@@ -213,7 +213,7 @@ const cjsKod = (m: string): string =>
   m
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .split('\n')
-    .map((s) => s.replace(/(^|\s)\/\/.*$/, ''))
+    .map((s) => s.replace(/(^|[^:])\/\/.*$/, ''))
     .join('\n')
 
 describe('INV-DEPARTMAN-AC-1 · rol adı → görünen ad TEK KAYNAKTAN (pencere-adlari.cjs), Türkçe katlamalı', () => {
