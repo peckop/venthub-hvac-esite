@@ -18,7 +18,7 @@
  *     AÇMAZ: "zaten açık: <ad> (sid8)", çıkış 0 (`departman-ortak.rolPencereleri`).
  *  4. TAVAN: açık ana pencere sayısı (alt süreçler ve OPS HARİÇ) 5'e ulaştıysa AÇMAZ, uyarır, çıkış 1.
  *     OPS tavandan MUAFTIR: Ops tavan doluyken de açılır (sayıma girmediği gibi kapıya da takılmaz).
- *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --strict-mcp-config --mcp-config
+ *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --mcp-config
  *     <ana-kök>\.mcp.json` (sid yoksa `--resume` YOK = yeni oturum), çalışma dizini = ANA DEPO KÖKÜ
  *     (scripts/hijyen/ana-kok.cjs; sabit yol yazılmaz).
  *  · İZİN MODU (Recep kararı bekliyor): açılan pencere `--permission-mode auto` kipte BAŞLAR; Recep kararı gelene kadar
@@ -100,14 +100,16 @@ function planla(rolArg, o = {}) {
   if (!exe) return { karar: 'hata', sebep: 'claude.exe bulunamadi (PATH icinde claude.exe yok; VENTHUB_CLAUDE_EXE ile de verilmedi)', ad: rol.ad, uyarilar }
   const kok = process.env.VENTHUB_ANA_KOK || anaKok()
   const mcp = path.join(kok, '.mcp.json')
-  if (!fs.existsSync(mcp)) return { karar: 'hata', sebep: `.mcp.json yok: ${mcp} (--strict-mcp-config bayrak yolu kirik olurdu)`, ad: rol.ad, uyarilar }
+  if (!fs.existsSync(mcp)) return { karar: 'hata', sebep: `.mcp.json yok: ${mcp} (--mcp-config bayrak yolu kirik olurdu)`, ad: rol.ad, uyarilar }
 
   const resume = son && !o.taze ? son.sid : null
   const args = [
     ...(resume ? ['--resume', resume] : []),
     '--name', rol.ad,
     '--permission-mode', 'auto',
-    '--strict-mcp-config',
+    // --strict-mcp-config YOK (Ops 10-01): strict, kullanici/eklenti/hesap duzeyindeki sunculari (github, codegraph, supabase,
+    // linear, playwright, sentry...) kapatiyor ve terminal penceresinde yalniz proje .mcp.json (4 wrongstack) kaliyordu. Varsayilan =
+    // Masaustu penceresiyle AYNI sunucu kumesi. .mcp.json acikca verilir (proje sunuculari onaylidir, onay istemi cikmaz).
     '--mcp-config', mcp,
   ]
   let istem = null
