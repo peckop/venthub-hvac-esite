@@ -29,7 +29,7 @@ const kapi = require_(KAPI_YOLU) as Kapi
 
 const SID = '11111111-2222-3333-4444-555555555555'
 const BASKA_SID = '99999999-8888-7777-6666-555555555555'
-const ENV = ['VENTHUB_ANA_PROJE_DIZINI'] as const
+const ENV = ['VENTHUB_ANA_PROJE_DIZINI', 'VENTHUB_SESSIONS_DIZINI'] as const
 
 const durumGovde = (sid: string) =>
   `---\nname: x-lane-day\nmetadata:\n  originSessionId: ${sid}\n---\n\n## Durum\n**SON GIRDI:** a\n**ACIK KUYRUK:** b\n**VERILEN SOZLER:** c\n**BEKLEYEN KARARLAR:** d\n`
@@ -144,5 +144,60 @@ describe('INV-COMPACT-2 · ARC-17: gunluk/* alt klasörleri taranır', () => {
   it('gunluk altındaki BAŞKA oturumun dosyası eşleşmez', () => {
     yaz(path.join(wt, 'memory', 'gunluk', '2026-10-01', 'x-lane-day.md'), durumGovde(BASKA_SID))
     expect(kapi.oturumunDosyalari(kapi.hafizaDizinleri(wt), SID)).toEqual([])
+  })
+})
+
+describe('INV-COMPACT-3 · ARC-6 2. katman: kimlik eski ise AYNI ŞERİT adlı durum dosyası kabul edilir (uyarıyla)', () => {
+  let oturumlar = ''
+  const oturumKaydi = (ad: string, sid: string = SID) =>
+    yaz(path.join(oturumlar, '4242.json'), JSON.stringify({ pid: 4242, sessionId: sid, name: ad, kind: 'interactive' }))
+  const cikti = (r: { stdout: string; stderr: string }) => r.stdout + r.stderr
+
+  beforeEach(() => {
+    oturumlar = path.join(t, 'sessions')
+    fs.mkdirSync(oturumlar, { recursive: true })
+    process.env.VENTHUB_SESSIONS_DIZINI = oturumlar
+  })
+
+  it('⭐kimlik ESKİ ama dosya adı pencere adıyla başlıyor (Araç → arac-…): kapı GEÇER ve "KIMLIK ESKI" uyarır', () => {
+    yaz(path.join(ana, 'memory', 'arac-serit-durumu.md'), durumGovde(BASKA_SID).replace('x-lane-day', 'arac-durum'))
+    oturumKaydi('Araç')
+    const r = kapiKos()
+    expect(r.status, cikti(r)).toBe(0)
+    expect(cikti(r)).toContain('KIMLIK ESKI')
+    expect(cikti(r)).toContain('"arac"')
+  })
+
+  it('sessions kaydı YOK (şerit bilinmiyor): eski davranış, kapı DURDURUR', () => {
+    yaz(path.join(ana, 'memory', 'arac-serit-durumu.md'), durumGovde(BASKA_SID))
+    expect(kapiKos().status).toBe(2)
+  })
+
+  it('BAŞKA şeridin dosyası kabul edilmez (Araç penceresi, ops-lane-day): DURDURUR', () => {
+    yaz(path.join(ana, 'memory', 'ops-lane-day-2026-10-01.md'), durumGovde(BASKA_SID))
+    oturumKaydi('Araç')
+    expect(kapiKos().status).toBe(2)
+  })
+
+  it('önek kısmi değil: "arac" şeridi "aracsiz-lane-day.md" (tire yok) ya da durum kalıbı olmayan "arac-ders.md" dosyasını kabul ETMEZ', () => {
+    yaz(path.join(ana, 'memory', 'aracsiz-lane-day.md'), durumGovde(BASKA_SID))
+    yaz(path.join(ana, 'memory', 'arac-ders.md'), durumGovde(BASKA_SID))
+    oturumKaydi('Araç')
+    expect(kapiKos().status).toBe(2)
+  })
+
+  it('kimlik EŞLEŞİYORSA şerit yedeği devreye girmez: uyarı yok, dönüş biçimi değişmez', () => {
+    yaz(path.join(ana, 'memory', 'arac-serit-durumu.md'), durumGovde(SID))
+    oturumKaydi('Araç')
+    const r = kapiKos()
+    expect(r.status).toBe(0)
+    expect(cikti(r)).not.toContain('KIMLIK ESKI')
+    expect(Object.keys(kapi.oturumunDosyalari(kapi.hafizaDizinleri(wt), SID)[0]).sort()).toEqual(['ad', 'mt', 'tam'])
+  })
+
+  it('bozuk sessions kaydı kapıyı düşürmez (JSON değil): eski davranış', () => {
+    yaz(path.join(oturumlar, '1.json'), '{bozuk')
+    yaz(path.join(ana, 'memory', 'arac-serit-durumu.md'), durumGovde(BASKA_SID))
+    expect(kapiKos().status).toBe(2)
   })
 })

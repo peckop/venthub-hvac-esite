@@ -199,7 +199,53 @@ function anaProjeDizini() {
   }
 }
 
+/**
+ * ⭐ŞERİT ADI YEDEĞİ — ARC-6 2. katman (2026-10-01, ÖLÇÜLDÜ): kapı kimliği dosyanın İLK 600 karakterinde arıyor; her yeni
+ * oturumun kimliği değiştiği için başlığı güncellenmemiş durum dosyası "dosya 0" diye compact'ı DURDURUYORDU (ARAÇ'ın kendi
+ * dosyasında önceki oturumun kimliği vardı; kimliği yenileyince kapı geçti). Kalıcı çözüm: kimlikle eşleşen dosya YOKSA,
+ * oturumun şerit adıyla (sessions kaydındaki `name`; Türkçe katlamalı) başlayan durum dosyası KABUL edilir ve
+ * "kimlik eski, güncelle" diye UYARILIR. Bloklamaz; başka şeridin dosyasını kabul etmez (ad ÖNEK eşleşmesi + durum kalıbı).
+ */
+function oturumSeridi(sid) {
+  if (!sid) return ''
+  try {
+    const dizin = process.env.VENTHUB_SESSIONS_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
+    for (const f of fs.readdirSync(dizin)) {
+      if (!f.endsWith('.json')) continue
+      try {
+        const j = JSON.parse(fs.readFileSync(path.join(dizin, f), 'utf8'))
+        if (j && j.sessionId === sid && typeof j.name === 'string') return asciiKatla(j.name).trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
+      } catch { /* bozuk kayıt atlanır */ }
+    }
+  } catch { /* sessions dizini yok */ }
+  return ''
+}
+
 function oturumunDosyalari(memoryDizinleri, sid) {
+  const sidli = sidIleDosyalar(memoryDizinleri, sid)
+  if (sidli.length) return sidli
+  const serit = oturumSeridi(sid)
+  if (!serit) return sidli
+  const yedek = []
+  for (const k of [].concat(memoryDizinleri)) {
+    const dizinler = [k]
+    try {
+      const g = path.join(k, 'gunluk')
+      for (const e of fs.readdirSync(g, { withFileTypes: true })) if (e.isDirectory()) dizinler.push(path.join(g, e.name))
+    } catch { /* gunluk yok */ }
+    for (const d of dizinler) {
+      let adlar = []
+      try { adlar = fs.readdirSync(d).filter(a => a.endsWith('.md')) } catch { continue }
+      for (const ad of adlar) {
+        if (!asciiKatla(ad).toLowerCase().startsWith(serit + '-') || !AD_KALIBI.test(ad)) continue
+        try { yedek.push({ ad, tam: path.join(d, ad), mt: fs.statSync(path.join(d, ad)).mtimeMs, seritEslesmesi: serit }) } catch { /* atla */ }
+      }
+    }
+  }
+  return yedek.sort((a, b) => b.mt - a.mt)
+}
+
+function sidIleDosyalar(memoryDizinleri, sid) {
   // Eski çağrı biçimi (tek dizin dizgisi) çalışmaya devam eder; günlük alt klasörleri de tarar.
   const kokler = [].concat(memoryDizinleri)
   const dizinler = []
@@ -329,6 +375,12 @@ if (dosyalar.length === 0) {
 
 // KOL 2 — en taze dosya bayat mı? (uyarır, bloklamaz)
 const enTaze = dosyalar[0]
+if (enTaze.seritEslesmesi) {
+  uyarilar.push(
+    'KIMLIK ESKI: ' + enTaze.ad + ' dosyasinin originSessionId alani bu oturumu (' + sid + ') gostermiyor; "' +
+      enTaze.seritEslesmesi + '" serit adiyla eslesti ve KABUL edildi. Kimligi guncelle (sonraki acilis ayni yere takilmasin).',
+  )
+}
 const yasDk = Math.round((Date.now() - enTaze.mt) / 60000)
 if (yasDk > BAYAT_ESIK_DK) {
   uyarilar.push(
