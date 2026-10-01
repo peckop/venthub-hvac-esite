@@ -142,7 +142,7 @@ if (recepDefteri) {
 
 // SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok + defterde yeni soz yok ise
 // brifing hic akmaz.
-if (others.length === 0 && notes.length === 0 && seritAldiMi && !linear && recepSatirlari.length === 0) process.exit(0)
+if (others.length === 0 && notes.length === 0 && seritAldiMi && recepSatirlari.length === 0 && !linear) process.exit(0)
 
 const lines = []
 if (linear) lines.push(linear)
