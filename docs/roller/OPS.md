@@ -44,13 +44,14 @@ CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: t
 - Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).
 
 ## Çalışma düzeni
-- Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).
-- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear donuktur (karar 219): yeni iş kaydı açılmaz.
-- PR gövdesi `Kanban: <numara>` taşır (2026-10-08'e kadar `Fixes REC-nn` de kabul); çok PR'lık iş her biri tek PR'la biten alt kartlara bölünür; kartsız iş yalnız `Kayıtsız: <sebep>` satırıyla (karar 187, 219).
-- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz, frontmatter `metadata.originSessionId` = TAM oturum kimliği (8 hane değil); compact öncesi güncelle; dört alan: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa compact kapısı durdurur).
+- Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).
+- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM + KAYNAK/CETVEL. Linear donuk (karar 219): yeni kayıt açılmaz.
+- PR gövdesi `Kanban: <numara>` taşır (2026-10-08'e kadar `Fixes REC-nn` de kabul); çok PR'lık iş her biri tek PR'la biten alt kartlara bölünür; kartsız iş yalnız `Kayıtsız: <sebep>` (karar 187).
+- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa kapı durdurur).
 - Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.
 - Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.
 - Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.
-- Recep'e her durum mesajı TEK TABLO ile başlar (`| No: Kanban numarası (taşınan REC-nn korunur) · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).
-- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.
+- Recep'e her durum mesajı TEK TABLO ile başlar (`| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`) ve (OPS hariç) yalnız KENDİ Kanban kartlarını içerir (çok departmanlı resmi OPS verir; çok elzemse tablo dışında tek cümle hatırlat); 2+ kalem madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir; tur sonunda "devam edeyim mi" sorma, sırası belli işe geç (`~/.claude/output-styles/recep.md`).
+- DURUM (2026-10-01, OPS günceller): şirket kurulmadı, gerçek satış yok. Veri bozulması, sır/gizlilik sızıntısı, ödeme riski BUGÜN zarar sayılır; zarar vermeyen bulgu = kart + "ilk satıştan önce" etiketi, Recep'e karar gitmez; kapılar değişmez.
+- Genel bileşen/modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdeği (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, teklif deneyimi) biz yazarız.
 - CLAUDE.md'deki 14 mutlak kural her role geçerlidir.
