@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * DEPARTMAN KAPATICI — karar/plan tarafı. Süreci sonlandıran kabuk `departman-kapat.ps1`dir (`departman-kapat.cmd <Rol>`).
+ * DEPARTMAN KAPATICI — KARAR-ONLY: "kapatılabilir / kapatılamaz" hükmü + sebep verir; hiçbir süreci SONLANDIRMAZ (kabuk: `departman-kapat.cmd <Rol>`).
  *
  * NİÇİN VAR (Ops 09-30, "en çok 5 departman penceresi" düzeni): pencere sayısı tavana dayanınca bir departmanı
  * KAYIPSIZ kapatmak gerekir. Kayıp = pencerenin belleğindeki iş durumu; onun tek kalıcı kopyası DURUM DOSYASIdır. Bu betik
@@ -16,16 +16,16 @@
  *  4. KAPI: durum dosyası son 10 dk içinde güncellenmişse (DURUM_TAZE_DK) VE pencere MEŞGUL değilse → `kapat`. Değilse
  *     `kapatma`: "günlük bayat, kapatılmadı" / "pencere meşgul" / "durum dosyası bulunamadı". Bayatsa `--bekle-sn` kadar
  *     (varsayılan 90 sn) taze olmasını BEKLER; bekleme yalnız istek atıldıysa anlamlıdır.
- *  5. ZORLA KAPATMA YOK: `-Force`, `taskkill /F`, süreç ağacı öldürme, `Get-Process claude | Stop-Process` (toplu) YOKTUR.
- *     Yalnız TEK pid (sessions kaydından, sid ile eşleşen) ve ps1 onun adının `claude*` olduğunu doğrular. ⚠Windows'ta
- *     konsol sürecini "nazikçe" kapatmanın güvenilir yolu yoktur (`Stop-Process` fiilen TerminateProcess'tir); bu yüzden
- *     güvence SÜRECİN KENDİSİ değil KAPIDIR: taze durum dosyası + boşta + doğru pid. Gerçek kapatma YALNIZ --kuru dışında koşar
- *     ve testlerde ASLA koşmaz (yalnız kuru kipi ölçülür).
+ *  5. KARAR-ONLY (Ops kararı 2026-09-30): ne bu dosya ne `departman-kapat.ps1` süreç sonlandırır — tek pid de, toplu da,
+ *     zorla da YOK. Sebep: izin denetimi başka oturumun sürecini öldürmeyi reddediyor (tasarım sınırı) ve Windows'ta konsol
+ *     sürecini "nazikçe" kapatmanın güvenilir yolu yok. Kapatma İNSAN EYLEMİDİR: karar `kapat` ise plan `talimat` alanında
+ *     Recep'e söylenecek cümleyi taşır ("<Ad> penceresini elle kapat"). Süreç sonlandıran bir komut bu dosyalara girerse
+ *     INV-DEPARTMAN-KAPAT-4 kırmızı verir.
  *
- * ÇIKIŞ: 0 = kapat (plan) / zaten kapalı · 1 = kapatma (kapı kapalı) / hata.
+ * ÇIKIŞ: 0 = kapatılabilir (karar `kapat`) / zaten kapalı · 1 = kapatılamaz (karar `kapatma`) / hata.
  *
  * Kullanım:  node departman-kapat.cjs <Rol> [--kuru] [--json] [--istek-atla] [--bekle-sn N]
- *   --kuru : posta GÖNDERMEZ, BEKLEMEZ, süreç sonlandırmaz; kapı bugünkü durumla değerlendirilir ("kapatılırdı/kapatılmazdı").
+ *   --kuru : posta GÖNDERMEZ, BEKLEMEZ; kapı bugünkü durumla değerlendirilir ("kapatılırdı/kapatılmazdı").
  */
 const fs = require('fs')
 const path = require('path')
@@ -105,6 +105,11 @@ function postaGonder(sid, kok, zamanAsimiMs = POSTA_ZAMAN_ASIMI_MS) {
   })
 }
 
+/** İnsana verilecek talimat (karar `kapat` iken). ASCII: ps1 Windows PowerShell 5.1'de aynen basar. Saf. */
+function talimatYaz(ad, sid) {
+  return `SIMDI: "${ad}" penceresini/sekmesini ELLE kapat (sid ${String(sid).slice(0, 8)}). Bu betik hicbir sureci sonlandirmaz; kapatma insan eylemidir.`
+}
+
 /** Kapı: durum dosyası taze mi (≤ DURUM_TAZE_DK) ve pencere boşta mı? Saf. */
 function kapiDegerlendir(durum, hedef) {
   if (!durum) return { acik: false, sebep: 'durum-yok', mesaj: 'durum dosyasi BULUNAMADI — kapatilmadi' }
@@ -118,7 +123,7 @@ function kapiDegerlendir(durum, hedef) {
 }
 
 /**
- * PLAN. `o`: {kuru, istekAtla, bekleSn, postaGonder (test enjekte eder), uyu}. Süreç SONLANDIRMAZ.
+ * PLAN. `o`: {kuru, istekAtla, bekleSn, postaGonder (test enjekte eder), uyu}. Süreç SONLANDIRMAZ; `kapat` kararında `talimat` döner.
  * @returns {Promise<object>} `{karar:'kapat'|'kapatma'|'zaten-kapali'|'hata', ...}`
  */
 async function planla(rolArg, o = {}) {
@@ -150,6 +155,7 @@ async function planla(rolArg, o = {}) {
     const k = kapiDegerlendir(durum, hedef)
     return {
       ...taban, karar: k.acik ? 'kapat' : 'kapatma', sebep: k.sebep, durum, posta: { durum: 'kuru-gonderilmedi' },
+      ...(k.acik ? { talimat: talimatYaz(rol.ad, son.sid) } : {}),
       mesaj: `KURU: ${k.acik ? 'KAPATILIRDI' : 'KAPATILMAZDI'} — ${k.mesaj}`,
     }
   }
@@ -175,7 +181,10 @@ async function planla(rolArg, o = {}) {
   if (!hedef) return { ...taban, karar: 'zaten-kapali', uyarilar, mesaj: `zaten kapali: ${rol.ad} (${son.sid.slice(0, 8)})` }
   if (hedef.pid !== taban.pid) return { ...taban, karar: 'hata', sebep: `pid degisti (${taban.pid} → ${hedef.pid}) — kapatilmadi`, uyarilar }
   kapi = kapiDegerlendir(durum, hedef)
-  return { ...taban, karar: kapi.acik ? 'kapat' : 'kapatma', sebep: kapi.sebep, durum, posta, mesaj: kapi.mesaj }
+  return {
+    ...taban, karar: kapi.acik ? 'kapat' : 'kapatma', sebep: kapi.sebep, durum, posta, mesaj: kapi.mesaj,
+    ...(kapi.acik ? { talimat: talimatYaz(rol.ad, son.sid) } : {}),
+  }
 }
 
 async function main(argv) {
@@ -193,12 +202,12 @@ async function main(argv) {
   } else {
     for (const u of plan.uyarilar || []) process.stdout.write(`uyari: ${u}\n`)
     process.stdout.write((plan.mesaj || plan.karar) + '\n')
-    if (plan.karar === 'kapat') process.stdout.write(`hedef: ${plan.ad} sid=${plan.sid} pid=${plan.pid} (bu betik surec SONLANDIRMAZ; departman-kapat.cmd kullan)\n`)
+    if (plan.karar === 'kapat') process.stdout.write(`hedef: ${plan.ad} sid=${plan.sid} pid=${plan.pid} (KAPATILABILIR)\n${plan.talimat}\n`)
   }
   return plan.karar === 'hata' || plan.karar === 'kapatma' ? 1 : 0
 }
 
-module.exports = { planla, postaGonder, kapiDegerlendir, POSTA_KONU, POSTA_GOVDE }
+module.exports = { planla, postaGonder, kapiDegerlendir, talimatYaz, POSTA_KONU, POSTA_GOVDE }
 
 if (require.main === module) {
   main(process.argv.slice(2)).then((k) => process.exit(k), (e) => {

@@ -926,42 +926,70 @@ describe('INV-DEPARTMAN-KAPAT-3 · GERÇEK yol (posta + bekleme) enjekte edilmi�
   })
 })
 
-describe('INV-DEPARTMAN-KAPAT-4 · ZORLA KAPATMA YOK: sonlandırma yalnız ps1 de, tek pid, claude* doğrulamalı', () => {
-  const ps1 = ps1Kod(fs.readFileSync(KAPAT_PS1, 'utf8'))
-  const cjs = cjsKod(fs.readFileSync(KAPAT, 'utf8'))
-  const ortak = cjsKod(fs.readFileSync(path.join(KOK, 'scripts/board/departman-ortak.cjs'), 'utf8'))
+describe('INV-DEPARTMAN-KAPAT-4 · KARAR-ONLY: kapatıcı HİÇBİR süreci sonlandırmaz; kapatma insan eylemidir (Ops kararı 2026-09-30)', () => {
+  const ps1Ham = fs.readFileSync(KAPAT_PS1, 'utf8')
+  const ps1 = ps1Kod(ps1Ham)
+  const cjsHam = fs.readFileSync(KAPAT, 'utf8')
+  const cjs = cjsKod(cjsHam)
+  const ortakHam = fs.readFileSync(path.join(KOK, 'scripts/board/departman-ortak.cjs'), 'utf8')
+  const ortak = cjsKod(ortakHam)
   const cmd = fs.readFileSync(KAPAT_CMD, 'utf8')
+  // Süreç sonlandıran her yol. Yorum satırları DAHİL taranır: komut adı belgede bile kalmaz (kopyala-yapıştır geri getirmesin).
+  const SONLANDIRAN = /Stop-Process|taskkill|\bspps\b|\.CloseMainWindow\(|Terminate\(|Stop-Computer|wmic[^\n]*delete|tskill/i
+  // .NET `.Kill()` büyük harfe DUYARLI aranır: kapat.cjs'teki `p.kill()` betiğin KENDİ açtığı posta alt sürecini kapatır (hedef pencere değil).
+  const NET_KILL = /\.Kill\(/
 
-  it('.ps1 tek pid e Stop-Process -Id uygular; -Force / taskkill / toplu Get-Process|Stop-Process / süreç ağacı YOK', () => {
-    expect(ps1).toMatch(/Stop-Process -Id \$plan\.pid -ErrorAction Stop/)
-    const kod = ps1.split('\n').filter((s) => !s.trim().startsWith('#')).join('\n')
-    expect(kod).not.toMatch(/-Force/i)
-    expect(kod).not.toMatch(/taskkill/i)
-    expect(kod).not.toMatch(/Get-Process[^\n]*\|\s*Stop-Process/i)
-    expect(kod).not.toMatch(/Get-CimInstance|Win32_Process|\/T\b/i)
+  it('.ps1 / .cmd / kapat.cjs / ortak.cjs HAM metninde (yorum dahil) süreç sonlandıran komut YOK', () => {
+    for (const [ad, m] of [['ps1', ps1Ham], ['cmd', cmd], ['kapat.cjs', cjsHam], ['ortak.cjs', ortakHam]] as const) {
+      expect(SONLANDIRAN.test(m), ad).toBe(false)
+      expect(NET_KILL.test(m), ad).toBe(false)
+    }
   })
 
-  it('.ps1 hedef pid nin claude* olduğunu DOĞRULAR ve Stop-Process tan ÖNCE', () => {
-    const dogrula = ps1.indexOf("-notlike 'claude*'")
-    expect(dogrula).toBeGreaterThan(0)
-    expect(dogrula).toBeLessThan(ps1.indexOf('Stop-Process -Id'))
+  it('kapat.cjs: `.kill()` yalnız betiğin kendi açtığı posta alt sürecinde (`p.kill()`); başka alıcıda YOK', () => {
+    const cagrilar = [...cjs.matchAll(/(\w+)\.kill\(/g)].map((m) => m[1])
+    expect(cagrilar.filter((a) => a !== 'p' && a !== 'process')).toEqual([])
   })
 
-  it('.ps1: yalnız karar "kapat" iken sonlandırır; --kuru dalı ve kapatma/zaten-kapali/hata dalları ÖNCE çıkar', () => {
-    const son = ps1.indexOf('Stop-Process -Id')
-    for (const dal of ["-eq 'hata'", "-eq 'zaten-kapali'", "-eq 'kapatma'", "-ne 'kapat'", 'if ($kuru)']) {
+  it('.ps1 kodu süreç NESNESİ bile almaz: Get-Process / Get-CimInstance / Win32_Process / WaitForExit / -Force yok', () => {
+    expect(ps1).not.toMatch(/Get-Process|Get-CimInstance|Win32_Process|WaitForExit|-Force\b/i)
+  })
+
+  it('.ps1: karar "kapat" → KAPATILABILIR + talimat, çıkış 0; "kapatma" → KAPATILAMAZ, çıkış 1; dallar hükümden ÖNCE çıkar', () => {
+    const son = ps1.indexOf("'KAPATILABILIR: '")
+    expect(son).toBeGreaterThan(0)
+    for (const dal of ["-eq 'hata'", "-eq 'zaten-kapali'", "-eq 'kapatma'", "-ne 'kapat'"]) {
       const i = ps1.indexOf(dal)
       expect(i, dal).toBeGreaterThan(0)
       expect(i, dal).toBeLessThan(son)
     }
+    expect(ps1).toContain("'KAPATILAMAZ: '")
+    expect(ps1.slice(son)).toMatch(/Write-Host \$plan\.talimat\s+exit 0\s*$/)
   })
 
-  it('karar betikleri (kapat.cjs / ortak.cjs) süreç SONLANDIRMAZ: process.kill(…, sinyal)/taskkill/Stop-Process yok', () => {
+  it('karar betikleri (kapat.cjs / ortak.cjs): process.kill yalnız sinyal 0 (canlılık yoklaması); gerçek sinyal YOK', () => {
     for (const k of [cjs, ortak]) {
-      expect(k).not.toMatch(/taskkill|Stop-Process/)
-      // process.kill(pid, 0) yalnız CANLILIK yoklamasıdır (sinyal 0); gerçek sinyal YOK
       for (const m of k.matchAll(/process\.kill\(([^)]*)\)/g)) expect(m[1].trim(), m[0]).toMatch(/,\s*0$/)
     }
+  })
+
+  it('planla(): "kapat" kararı insana TALİMAT taşır (ad + kısa sid + "ELLE kapat"); "kapatma" kararında talimat YOK', () => {
+    const t = (require(KAPAT) as { talimatYaz: (ad: string, sid: string) => string }).talimatYaz('Araç', S_ARAC)
+    expect(t).toContain('"Araç" penceresini/sekmesini ELLE kapat')
+    expect(t).toContain(S_ARAC.slice(0, 8))
+    expect(t).toContain('hicbir sureci sonlandirmaz')
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    oturumKaydi(d, S_ARAC, { name: 'Araç' })
+    const yol = durumDosyasi(d, S_ARAC, 1)
+    const ok = JSON.parse(calistir(KAPAT, ['Araç', '--kuru', '--json'], d, {}, false).out) as { karar: string; talimat?: string }
+    expect(ok.karar).toBe('kapat')
+    expect(ok.talimat).toContain('ELLE kapat')
+    const eski = new Date(Date.now() - 30 * 60 * 1000)
+    fs.utimesSync(yol, eski, eski)
+    const b = JSON.parse(calistir(KAPAT, ['Araç', '--kuru', '--json'], d, {}, false).out) as { karar: string; talimat?: string }
+    expect(b.karar).toBe('kapatma')
+    expect(b.talimat).toBeUndefined()
   })
 
   it('.cmd ince sarmalayıcı: aynı klasör ps1, %*, ERRORLEVEL', () => {
@@ -984,11 +1012,26 @@ describe('INV-DEPARTMAN-KAPAT-4 · ZORLA KAPATMA YOK: sonlandırma yalnız ps1 d
     fs.utimesSync(yol, eski, eski)
     const b = cmdKos(KAPAT_CMD, ['Araç', '--kuru'], d)
     expect(b.status).toBe(1)
-    expect(b.stdout).toContain('KAPATILMADI')
+    expect(b.stdout).toContain('KAPATILAMAZ')
     expect(b.stdout).toContain('gunluk bayat')
     const h = cmdKos(KAPAT_CMD, ['yok', '--kuru'], d)
     expect(h.status).toBe(1)
     expect(h.stdout).toContain('HATA: rol taninmiyor')
+  }, 120_000)
+
+  // Karar-only olduğu için GERÇEK (kuru olmayan) yol da güvenle koşulabilir: hedef pid BU TEST SÜRECİDİR ve hayatta kalmalıdır.
+  it.skipIf(!win)('GERÇEK kabuk zinciri KURU DEĞİL (--istek-atla --bekle-sn 0): KAPATILABILIR + talimat, çıkış 0, hedef süreç CANLI kalır', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    oturumKaydi(d, S_ARAC, { name: 'Araç' })
+    durumDosyasi(d, S_ARAC, 1)
+    const t = cmdKos(KAPAT_CMD, ['Araç', '--istek-atla', '--bekle-sn', '0'], d)
+    expect(t.status).toBe(0)
+    expect(t.stdout).toContain('KAPATILABILIR')
+    expect(t.stdout).toContain(`pid=${process.pid}`)
+    expect(t.stdout).toContain('ELLE kapat')
+    expect(t.stdout).not.toContain('KURU')
+    expect(() => process.kill(process.pid, 0)).not.toThrow()
   }, 120_000)
 })
 

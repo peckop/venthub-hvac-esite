@@ -1,17 +1,20 @@
-# departman-kapat.ps1 - bir departman penceresini KAYIPSIZ kapatir: durum dosyasi TAZE degilse KAPATMAZ.
+# departman-kapat.ps1 - bir departman penceresi KAYIPSIZ kapatilabilir mi diye KARAR verir; pencereyi KENDISI KAPATMAZ.
 #
 # Kullanim:   departman-kapat.cmd <Rol> [--kuru] [--istek-atla] [--bekle-sn N]      (bu dosyayi cmd sarmalar)
-#   --kuru        : HICBIR surec sonlandirmaz, posta gondermez, beklemez; kapinin bugunku hukmunu yazar.
+#   --kuru        : posta gondermez, beklemez; kapinin bugunku hukmunu yazar.
 #   --istek-atla  : "durum dosyani yaz" istegi zaten SendMessage ile atildi; yalniz olc ve karara bak.
 #   --bekle-sn N  : istek atildiktan sonra durum dosyasinin taze olmasini en cok N sn bekle (varsayilan 90).
 #
 # KARAR (rol -> son sid -> acik mi -> istek -> durum dosyasi taze mi -> bosta mi) scripts/board/departman-kapat.cjs'tedir
-# ve --json ile buraya gelir; burasi yalniz SONLANDIRIR ve yalniz karar 'kapat' iken.
+# ve --json ile buraya gelir; burasi yalniz hukmu ve INSANA verilecek talimati YAZAR.
 #
-# ZORLA KAPATMA YOK: -Force, taskkill /F, surec agaci oldurme ve toplu (Get-Process claude | Stop-Process) YOKTUR.
-# Yalniz TEK pid (sessions kaydindan, sid ile eslesen) ve o pidin adi 'claude*' degilse HICBIR SEY yapilmaz.
-# Uyari: Windows'ta konsol surecini "nazikce" kapatmanin guvenilir yolu yoktur (Stop-Process fiilen TerminateProcess'tir);
-# guvence surecin kendisinde degil KAPIDADIR: taze durum dosyasi + bosta + dogru pid.
+# KARAR-ONLY (Ops karari 2026-09-30): bu betik HICBIR sureci sonlandirmaz - ne tek pid, ne toplu, ne zorla.
+# Sebep: izin denetimi baska bir oturumun surecini oldurmeyi reddediyor (tasarim siniri) ve Windows'ta konsol
+# surecini "nazikce" kapatmanin guvenilir yolu yok. Kapatma INSAN EYLEMIDIR: cikti "KAPATILABILIR" derse
+# pencereyi/sekmeyi Recep elle kapatir. Surec sonlandiran herhangi bir komut bu dosyaya girerse kapi testi
+# (INV-DEPARTMAN-KAPAT-4) kirmizi verir.
+#
+# CIKIS: 0 = kapatilabilir / zaten kapali - 1 = kapatilamaz / hata.
 #
 # Bu dosya ASCII tutulur (Windows PowerShell 5.1 BOM'suz UTF-8'i ANSI okur).
 
@@ -58,7 +61,7 @@ if ($plan.karar -eq 'zaten-kapali') {
   exit 0
 }
 if ($plan.karar -eq 'kapatma') {
-  Write-Host ('KAPATILMADI: ' + $plan.mesaj)
+  Write-Host ('KAPATILAMAZ: ' + $plan.mesaj)
   exit 1
 }
 if ($plan.karar -ne 'kapat') {
@@ -66,32 +69,7 @@ if ($plan.karar -ne 'kapat') {
   exit 1
 }
 
-if ($kuru) {
-  Write-Host $plan.mesaj
-  Write-Host ('KURU: kapatilacak hedef: ' + $plan.ad + ' sid=' + $plan.sid + ' pid=' + $plan.pid + ' (tek pid, zorla kapatma YOK)')
-  exit 0
-}
-
-# Hedef pid'i son kez dogrula: canli mi ve gercekten claude mu? Degilse HICBIR SEY yapma.
-$hedef = Get-Process -Id $plan.pid -ErrorAction SilentlyContinue
-if (-not $hedef) {
-  Write-Host ('zaten kapali: ' + $plan.ad + ' pid=' + $plan.pid)
-  exit 0
-}
-if ($hedef.ProcessName -notlike 'claude*') {
-  Write-Host ('HATA: pid ' + $plan.pid + ' bir claude sureci degil (' + $hedef.ProcessName + ') - KAPATILMADI')
-  exit 1
-}
-
-try {
-  Stop-Process -Id $plan.pid -ErrorAction Stop
-} catch {
-  Write-Host ('HATA: kapatilamadi: ' + $_.Exception.Message)
-  exit 1
-}
-if ($hedef.WaitForExit(10000)) {
-  Write-Host ('kapatildi: ' + $plan.ad + ' sid=' + $plan.sid + ' pid=' + $plan.pid + ' (' + $plan.mesaj + ')')
-  exit 0
-}
-Write-Host ('UYARI: ' + $plan.ad + ' pid=' + $plan.pid + ' 10 sn icinde kapanmadi - ZORLANMADI')
-exit 1
+if ($kuru) { Write-Host $plan.mesaj }
+Write-Host ('KAPATILABILIR: ' + $plan.ad + ' sid=' + $plan.sid + ' pid=' + $plan.pid + ' (' + $plan.mesaj + ')')
+Write-Host $plan.talimat
+exit 0
