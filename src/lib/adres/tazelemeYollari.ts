@@ -1,5 +1,4 @@
 import { type AdresDili, adresUret } from '@/utils/adresUret'
-import { localizedHref } from '@/utils/routes'
 
 /**
  * TAZELEME YOLLARI — webhook'un `revalidatePath` listesi (REC-300 Faz 3g, ana plan m.9).
@@ -45,16 +44,13 @@ export function kategoriYollari(
     const ustSlug = ust?.(dil)
     for (const yeni of SEMALAR) {
       yollar.add(String(adresUret({ tur: 'kategori', kok: own }, dil, yeni)))
-      // Dal adresi ÜST'ü kök alır: yeni şemada `/kategori/<üst>/<alt>`; bugünkü şemada `adresUret` `Routes.category`
-      // çağırır ve TEK segment (`/category/<alt>`) üretir — bugünkü iki segmentli yol aşağıdaki açık satırdan gelir.
+      // Dal adresi ÜST'ü kök alır: yeni şemada `/kategori/<üst>/<alt>` (EN: `/category/<üst>/<alt>`); bugünkü şemada
+      // `adresUret` `Routes.category` çağırır ve TEK segment (`/category/<alt>`) üretir.
       if (ustSlug) yollar.add(String(adresUret({ tur: 'kategori', kok: ustSlug, dal: own }, dil, yeni)))
     }
-    // Bugünkü şemanın iki segmentli alt kategori yolu artık YALNIZ yönlendirme yapar (REC-205: kanonik tek
-    // segment) ama önbellekli 308'i bayatlayabilir; eski webhook bunu tazeliyordu (W2) — davranış KORUNUR.
-    // `Routes.category` REC-205'ten beri hep tek seviyeli (alt slug'ı verir), iki seviyeli yolu üretmez; bu yüzden
-    // yol gövdesi burada, dil öneki ise `localizedHref`'ten gelir (kural 7: dil öneki elle birleştirilmez;
-    // kapı: INV-TAZELEME-YOL-2, bu dosyanın testi).
-    if (ustSlug) yollar.add(String(localizedHref(`/category/${ustSlug}/${own}`, dil)))
+    // Bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu BİLİNÇLİ üretilmez: bayrak kapalıyken yalnız
+    // 308 yönlendirmesidir, önbelleği yoktur (URN-7 ölçümü 2026-10-01), tazelemek boş iştir. Bayrak açılınca iki
+    // segmentli sayfa yolu yukarıdaki yeni-şema dalından gelir (kapı: INV-TAZELEME-YOL-2 elle dil önekini yasaklar).
   }
   return [...yollar]
 }

@@ -166,7 +166,9 @@ type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; paren
  *
  *  W2 — 14 `revalidatePath` çağrısının tamamı TEK segmentliydi; `/category/[c]/[s]`
  *       (alt-kategori) hiç tazelenmiyordu. Artık `parent_id` varsa iki segmentli yol da
- *       üretilir.
+ *       üretilir — yeni şemanın `/kategori/<üst>/<alt>` (EN: `/category/<üst>/<alt>`) yolu. Bugünkü şemanın
+ *       `/<dil>/category/<üst>/<alt>` yolu üretilmez: bayrak kapalıyken yalnız 308'dir, önbelleği yok
+ *       (URN-7 ölçümü 2026-10-01); bkz. `kategoriYollari`.
  *
  * Yollar tekilleştirilir: iki dilin slug'ı aynı olabilir (çeviri yoksa kanoniğe düşer).
  */

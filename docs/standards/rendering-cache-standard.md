@@ -112,6 +112,8 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
 > her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
 > olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
+> Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
+> bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
 > Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Kalan (3g-2):** model adresi
 > (`/tr/urun/<slug>-p-<sku>`) ve slug değişiminde eski yol — `slug_i18n` verisi gelince.
 >

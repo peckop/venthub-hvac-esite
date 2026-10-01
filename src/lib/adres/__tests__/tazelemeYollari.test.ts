@@ -30,7 +30,7 @@ describe('INV-TAZELEME-YOL-1 — tazeleme yolları iki şemada ve iki dilde', ()
     )
   })
 
-  it('kategori dalı: üst/alt yolu her iki şemada; tek segmentli alt yol da durur (REC-205)', () => {
+  it('kategori dalı: yeni-şema üst/alt yolu üretilir; bugünkü TR iki segmentli 308 yolu üretilmez; tek segmentli alt yol durur (REC-205, URN-7)', () => {
     const yollar = kategoriYollari(
       (d) => (d === 'tr' ? 'sessiz-kanal-fanlari' : 'quiet-duct-fans'),
       (d) => (d === 'tr' ? 'fanlar' : 'fans'),
@@ -38,11 +38,14 @@ describe('INV-TAZELEME-YOL-1 — tazeleme yolları iki şemada ve iki dilde', ()
     expect(yollar).toEqual(
       expect.arrayContaining([
         '/tr/kategori/fanlar/sessiz-kanal-fanlari',
-        '/tr/category/fanlar/sessiz-kanal-fanlari',
         '/en/category/fans/quiet-duct-fans',
         '/tr/category/sessiz-kanal-fanlari',
       ]),
     )
+    // URN-7 (ölçüm 2026-10-01): bugünkü şemanın TR iki segmentli yolu bayrak kapalıyken yalnız 308'dir, önbelleği
+    // yok; tazelenmez. EN iki segmentli yol ise yeni-şema dalından gelir (bayrak açılınca gerçek sayfa).
+    expect(yollar).not.toContain('/tr/category/fanlar/sessiz-kanal-fanlari')
+    expect(yollar).toContain('/en/category/fans/quiet-duct-fans')
   })
 
   it('INV-TAZELEME-YOL-2 — tazelemeYollari.ts dil önekini elle birleştirmez (kural 7: önek rota yardımcısından)', () => {
