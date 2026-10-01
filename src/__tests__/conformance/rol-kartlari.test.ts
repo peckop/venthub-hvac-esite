@@ -270,9 +270,10 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // kurallar dosyalarına taşındı, en büyük kart ~4,9 KB. Karta yeni bölüm eklerken aşılırsa ayrıntı dosyaya taşınır.
   // Yumuşak kanarya: REC-521'de %80'di (en büyük kart 4,96 KB). REC-522'de altı yeni kart geldi; rol içeriği eski
   // kartlardan uzun (1,2-1,9 KB, eskiler 0,7-1,2 KB) ve doğrulanmış olgu taşıyor, en büyük kart 5,7 KB oldu → %90.
-  // 2026-10-01 (HRT-5): yumuşak kanarya %90 → %92. Sebep: Kanban geçişi (#1609) ve karar 224 onay satırı ortak bloğa
-  // girdi; en büyük kart (SATIS) iki değişiklikle ~6,03 KB oldu (master 5,83 KB). Satır en kısa hâle indirildi, ayrıntı
-  // fleet-mechanism §Kural 4'te. SERT sınır (6656) aynı kaldı; yeni bölüm gerekirse ayrıntı dosyaya taşınır.
+  // 2026-10-01 (HRT-5): yumuşak kanarya %90 → %92. Sebep (ölçüldü): karar 224 onay satırı ortak bloğa girdi;
+  // en büyük kart (SATIS) 5834 → ~6,1 KB (satır kapı eşlemesini de söylüyor). #1609 (Kanban geçişi) birleşince ek pay
+  // gerekebilir, o zaman ayrı ölçülür. Ayrıntı fleet-mechanism §17 Kural 4'te. SERT sınır (6656) aynı kaldı;
+  // yeni bölüm gerekirse ayrıntı dosyaya taşınır.
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
   it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %92\'sinde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
@@ -387,8 +388,10 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
 
   it('karar 224: her kart canlı dışı onay yolunu (OPS) ve aktarım yetkisinin yalnız OPS\'ta olduğunu taşır; OPS kartı genel müdür', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
-      expect(metin, ad).toContain('Canlı dışı işte onay OPS\'tan alınır')
+      expect(metin, ad).toContain('Yukarıdaki 1-5. kapılar Recep\'te kalır')
+      expect(metin, ad).toContain('onay OPS\'tan alınır')
       expect(metin, ad).toContain('aktarım yalnız OPS')
+      expect(metin, ad).toContain('§17 Kural 4')
       expect(metin, ad).toContain('Recep teyidi bekliyor')
     }
     expect(uretilen.OPS).toContain('genel müdürü')

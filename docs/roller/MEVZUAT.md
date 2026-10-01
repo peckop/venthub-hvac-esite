@@ -36,7 +36,8 @@ Açık, beklemede: tohum işi bitti, BLOG ya da KATALOG ihtiyacı doğunca yenid
 3. Geçmişi silen ya da zorlayan git komutu.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
-Canlı dışı işte onay OPS'tan alınır; aktarım yalnız OPS'tan (karar 224, ayrıntı fleet-mechanism §Kural 4; ayar/izin dosyası sınırı: Recep teyidi bekliyor).
+
+Yukarıdaki 1-5. kapılar Recep'te kalır. Bunların dışındaki onay OPS'tan alınır; aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4; ayar/izin dosyası sınırı: Recep teyidi bekliyor).
 CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
 
 ## İletişim
