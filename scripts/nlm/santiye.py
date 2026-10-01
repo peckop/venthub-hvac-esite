@@ -28,7 +28,7 @@ SERITLER = ["URUN", "URUN-KATALOG", "ALTYAPI", "OPS", "DESIGN"]   # eski Linear 
 HAVUZ = "HAVUZ"   # Kanban "Linear Bekleyenler" panosu: ortak bekleme havuzu, sahipsiz sayilmaz, KIRMIZI uretmez
 DIS_PROJELER = set()   # Recep 2026-09-07: "hicbir is VentHub disinda degil" — proje disi tutma YOK (Q-Validator eski mimari, kayitlari baglandi/kapandi)
 KATALOG_PROJE = "Katalog ve Ürün Verisi"
-LIMIT_IP, LIMIT_TODO = 1, 3
+import santiye_sinirlar as SIN   # renk esikleri TEK dosyada (OPS karari 2026-10-01); kip main()'de secilir
 CURUME_GUN = 14   # Backlog'da bu kadar gun kimsenin bakmadigi kayit "BAKILMADI" isareti. Recep 09-07: "is varsa istir" — iptal YOK, yalniz sahibine "bir bak" isareti.
 # Olcut updatedAt DEGIL "sonAnlamli" (son yorum / PR eki / baslama / bitis / acilis): etiket, toplu bakim, betik dokunusu yasi TAZELEMEZ.
 # Sinav: bir kayda yalniz etiket ekle -> yas degismemeli (updatedAt degisir, sonAnlamli degismez). Katalog uyarisi 09-07.
@@ -119,7 +119,11 @@ def main():
     L.append(f"<!-- uretilmis: scripts/nlm/santiye.py · damga {damga} · {kaynak_adi} disa aktarimi {kaynak_damga} · elle duzenlenmez -->")
     L.append(f"# ŞANTİYE — kimde ne iş var ({damga})")
     L.append("")
-    L.append(f"Kaynak: {kaynak_adi} ({kaynak_damga}). Kural: şerit başına yapılıyor ≤{LIMIT_IP}, sırada ≤{LIMIT_TODO}. Pano notu/sohbet kaynak değildir; HAVUZ = Linear'dan taşınan ortak bekleme havuzu (limit dışı).")
+    if kaynak_adi == "Kanban":
+        kural = f"yapılıyor ≤{SIN.KANBAN['yesil_en_fazla']} YEŞİL, ≤{SIN.KANBAN['sari_en_fazla']} SARI, üstü KIRMIZI; sırada sınırsız"
+    else:
+        kural = f"yapılıyor ≤{SIN.LINEAR['yesil_en_fazla']}, sırada ≤{SIN.LINEAR['sirada_siniri']}"
+    L.append(f"Kaynak: {kaynak_adi} ({kaynak_damga}). Kural (santiye_sinirlar.py): şerit başına {kural}. Pano notu/sohbet kaynak değildir; HAVUZ = Linear'dan taşınan ortak bekleme havuzu (limit dışı).")
     L.append("")
     L.append("## §0 Özet")
     L.append("")
@@ -133,10 +137,12 @@ def main():
         uyum = "YEŞİL"
         if s == HAVUZ:
             uyum = "HAVUZ (limit dışı)"
-        elif ip > LIMIT_IP:
-            uyum = f"KIRMIZI (yapılıyor {ip} > {LIMIT_IP})"; kirmizi.append((s, ip))
-        elif td > LIMIT_TODO:
-            uyum = f"SARI (sırada {td} > {LIMIT_TODO})"
+        else:
+            renk, neden = SIN.uyum(SIN.KANBAN if kaynak_adi == "Kanban" else SIN.LINEAR, ip, td)
+            if renk == "KIRMIZI":
+                uyum = f"KIRMIZI ({neden})"; kirmizi.append((s, ip))
+            elif renk == "SARI":
+                uyum = f"SARI ({neden})"
         if s == "SAHIPSIZ" and (ip or td or len(b["Backlog"])):
             uyum = "KIRMIZI (sahipsiz kayıt)"; kirmizi.append((s, ip + td + len(b["Backlog"])))
         L.append(f"| {s} | {ip_all} | {rv} | {td} | {len(b['Backlog'])} | {len(b['CURUDU'])} | {len(b['BLOKLU'])} | {len(b['RECEP'])} | {uyum} |")
@@ -181,11 +187,12 @@ def main():
     else:
         L.append("YEŞİL — her şerit sınırın içinde.")
     metin = "\n".join(L) + "\n"
-    hedef = a.hedef or os.path.join(REPO, "docs", "proje-takip", "is-dagilimi.md")
-    os.makedirs(os.path.dirname(hedef), exist_ok=True)
+    # Karar (OPS 2026-10-01): cikti DEPO DISINDA uretilir (repo PUBLIC; kart basliklari depoya girmesin).
+    hedef = a.hedef or os.environ.get("VENTHUB_SANTIYE_HEDEF") or os.path.join(os.path.expanduser("~"), ".venthub", "santiye", "is-dagilimi.md")
+    os.makedirs(os.path.dirname(os.path.abspath(hedef)), exist_ok=True)
     open(hedef, "w", encoding="utf-8", newline="\n").write(metin)
     print(metin)
-    print(f"→ {os.path.relpath(hedef, REPO)}")
+    print(f"→ {hedef}")
     sys.exit(1 if kirmizi else 0)
 
 

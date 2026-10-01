@@ -56,12 +56,18 @@ const PANOLAR: Pano[] = [
     tasks: [
       kart('ARC-1 · birinci iş', 'in-progress'),
       kart('ARC-2 · ikinci iş', 'in-progress'),
+      kart('ARC-7 · yedinci iş', 'in-progress'),
+      kart('ARC-8 · sekizinci iş', 'in-progress'),
+      kart('ARC-9 · dokuzuncu iş', 'in-progress'),
+      kart('ARC-10 · onuncu iş', 'in-progress'),
       kart('REC-538 · taşınan iş', 'todo', { notes: [{ createdAt: '2026-09-20T00:00:00.000Z' }] }),
       kart('numarasız başlık', 'backlog'),
       kart('ARC-3 · biten iş', 'done', { completedAt: '2026-09-30T00:00:00.000Z' }),
     ],
   },
   { title: 'VentHub HARİTA', tasks: [kart('HRT-6 · teslim', 'review')] },
+  { title: 'VentHub URUN', tasks: ['URN-1', 'URN-2', 'URN-3', 'URN-4'].map((n) => kart(`${n} · iş`, 'in-progress')) },
+  { title: 'VentHub OPS', tasks: ['OPS-1', 'OPS-2', 'OPS-3'].map((n) => kart(`${n} · iş`, 'in-progress')) },
   { title: 'Linear Bekleyenler (taşınan, karar 215)', tasks: [kart('REC-1 · havuz', 'backlog'), kart('REC-2 · havuz', 'in-progress')] },
   { title: 'DENEME-yonetilen (YTN-4, sil)', tasks: [kart('YTN-4 · deney', 'todo')] },
 ]
@@ -107,7 +113,7 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
     expect(r.cikis, r.stderr).toBe(0)
     const d = JSON.parse(fs.readFileSync(hedef, 'utf-8')) as { kaynak: string; kayitlar: Record<string, unknown>[] }
     expect(d.kaynak).toBe('Kanban')
-    expect(d.kayitlar).toHaveLength(8) // 5 ARAC + 1 HARITA + 2 HAVUZ; DENEME'nin 1 kartı yok
+    expect(d.kayitlar).toHaveLength(19) // 9 ARAC + 1 HARITA + 4 URUN + 3 OPS + 2 HAVUZ; DENEME'nin 1 kartı yok
     const ara = (id: string) => d.kayitlar.find((k) => k.identifier === id)
     expect(ara('ARC-1')).toMatchObject({ status: 'In Progress', serit: 'ARAC' })
     expect(ara('REC-538')).toMatchObject({ status: 'Todo', serit: 'ARAC', sonAnlamli: '2026-09-20T00:00:00.000Z' })
@@ -122,16 +128,29 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
     expect(ara('ARC-1')?.sonAnlamli).toBe('2026-09-01T00:00:00.000Z')
   })
 
-  it('tablo şerit başına sayar: yapılıyor 2 > 1 KIRMIZI (çıkış 1), havuz limit dışı, teslim ayrı sütun', () => {
+  it('tablo şerit başına sayar: yapılıyor ≤3 YEŞİL, 4-5 SARI, >5 KIRMIZI (çıkış 1), sırada sınırsız, havuz limit dışı', () => {
     const hedef = path.join(dizin, 'santiye.md')
     const r = py(SANTIYE, ['--db', db, '--hedef', hedef, '--simdi', '2026-10-01T12:00:00Z'])
     expect(r.cikis, r.stderr).toBe(1)
     const md = fs.readFileSync(hedef, 'utf-8')
     expect(md).toContain('Kaynak: Kanban')
-    expect(md).toMatch(/\| ARAC \| 2 \| 0 \| 1 \| 1 \| \d+ \| 0 \| 0 \| KIRMIZI \(yapılıyor 2 > 1\) \|/)
+    expect(md).toMatch(/\| ARAC \| 6 \| 0 \| 1 \| 1 \| \d+ \| 0 \| 0 \| KIRMIZI \(yapılıyor 6 > 5\) \|/)
+    expect(md).toMatch(/\| URUN \| 4 \| 0 \| 0 \| 0 \| \d+ \| 0 \| 0 \| SARI \(yapılıyor 4 > 3\) \|/)
+    expect(md).toMatch(/\| OPS \| 3 \| 0 \| 0 \| 0 \| \d+ \| 0 \| 0 \| YEŞİL \|/)
     expect(md).toMatch(/\| HARITA \| 0 \| 1 \| 0 \| 0 \|/)
     expect(md).toMatch(/\| HAVUZ \| 1 \| 0 \| 0 \| 1 \|.*HAVUZ \(limit dışı\)/)
     expect(md).not.toContain('YTN-4')
+  })
+
+  it('çıktı varsayılan olarak depoya yazılmaz: hedef VENTHUB_SANTIYE_HEDEF ile depo dışına gider', () => {
+    const dis = path.join(dizin, 'dis', 'is-dagilimi.md')
+    const r = spawnSync(PY as string, [SANTIYE, '--db', db], {
+      encoding: 'utf-8',
+      env: { ...process.env, PYTHONIOENCODING: 'utf-8', VENTHUB_SANTIYE_HEDEF: dis },
+    })
+    expect(r.status, r.stderr).toBe(1)
+    expect(fs.existsSync(dis)).toBe(true)
+    expect(fs.readFileSync(path.join(KOK, 'docs/proje-takip/is-dagilimi.md'), 'utf-8')).toContain('EMEKLİ')
   })
 
   it('pano dosyası yoksa çıkış 2 (sessiz yeşil yok)', () => {
