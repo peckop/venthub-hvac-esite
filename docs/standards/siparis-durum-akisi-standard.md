@@ -1,6 +1,8 @@
 # Sipariş Durum Akışı Cetveli
 
-> **Durum:** v1.0 · 2026-10-01 · Sahip: ALTYAPI (admin yüzeyi için ADMIN, müşteri yüzeyi için URUN, Edge için EDGE ikincil)
+> **Durum:** v1.0 · 2026-10-01
+> **Sahibi:** ALTYAPI (admin yüzeyi için ADMIN, müşteri yüzeyi için URUN, Edge için EDGE ikincil)
+> **Son doğrulama:** 2026-10-01 (canlı sipariş sayımı salt okuma; §4 yüzey tablosu kaynak dosyalardan, işi yapmamış bir doğrulayıcıyla teyit edildi; mutasyon 8/8 öldü)
 > **Niçin var:** Sipariş durumunun hangi sırayla ilerlediği yalnız `orderStatusMachine.ts` içindeki
 > bir yorumda yazılıydı. 2026-10-01 ölçümünde aynı kuralın **beş ayrı yerde beş ayrı kopyası**
 > bulundu ve hiçbiri diğeriyle aynı değildi (§4). Recep'in 221 numaralı kararı ("ödeme alınır,
@@ -57,7 +59,7 @@ Geçiş kuralının TEK kaynağı `src/lib/admin/orderStatusMachine.ts` içindek
 - Asıl kapı serviste durur (`orderStatusService.updateOrderStatus`). Arayüzdeki kontrol kullanıcıya
   sebebini söyleyen nezaket katmanıdır; tek koruma orada olursa bileşen değişince sessizce düşer.
 - Edge fonksiyonu (Deno) `src/` altını içe aktaramaz. Edge'de kural kopyası gerekiyorsa kopya TEK
-  sabit olarak durur ve bir **parite testi** onu makineyle karşılaştırır (emsal: `yayim.ts` paritesi).
+  sabit olarak durur ve bir **parite testi** onu makineyle karşılaştırır (emsal: iade tarafında `supabase/functions/_shared/return_transitions.ts` ↔ `returnStatusMachine.ts`, kapısı `returns-webhook-transitions.test.ts`).
 - Müşteriye gösterilen adım çubuğu ve durum etiketi tek bir eşleme yardımcısından üretilir;
   bilinmeyen durum ham olarak basılmaz.
 
