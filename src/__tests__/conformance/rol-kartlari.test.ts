@@ -376,8 +376,11 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       expect(metin, ad).toContain('| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |')
       expect(metin, ad).toContain('2+ kalem madde işaretli liste olur')
-      expect(metin, ad).toContain('compact hazırlık notu 3 maddelik listedir')
+      expect(metin, ad).toContain('cevabın sonuna 3 maddelik liste')
+      expect(metin, ad).toContain('kopyalanabilir `/compact')
+      expect(metin, ad).toContain('Kırmızı · Onayında · Sürüyor · Sırada · Başlamadı · Beklemede · Bitti')
       expect(metin, ad).toContain('"Onayında" yalnız Recep kararı bekleyen iştir')
+      expect(metin, ad).toContain('Kaydı olmayan iş satıra yazılmaz, önce Kanban kartı açılır')
     }
   })
 
@@ -449,7 +452,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
       expect(metin, ad).toContain('çok elzemse tablo dışında tek cümle hatırlat')
-      expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma, sırası belli işe geç')
+      expect(metin, ad).toContain('Tur sonunda "devam edeyim mi" sorma, sırası belli işe geç; tıkanırsan OPS\'a yaz')
     }
   })
 
@@ -459,10 +462,10 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('değişen yoksa tablo yok')
     }
     for (const [ad, metin] of Object.entries(kuralMetinleri)) {
-      expect(metin, ad).toContain('Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
+      expect(metin, ad).toContain('(OPS hariç) Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
+      expect(metin, ad).toContain('(OPS hariç) Değişen yoksa tablo yok: Recep "devam et" dediğinde')
       expect(metin, ad).toContain("Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok)")
       expect(metin, ad).toContain('"başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok); Sorumlu = "ben" (OPS hariç)')
-      expect(metin, ad).toContain('Değişen yoksa tablo yok: Recep "devam et" dediğinde')
       expect(metin, ad).toContain("İşi kalmayan departman bunu Recep'e değil OPS'a yazar")
     }
   })
