@@ -13,6 +13,10 @@ import { type AdresDili, adresUret } from '@/utils/adresUret'
  * önbellekli 308 de bayatlayabilir: ana plan v4 O2), ve geri alma (bayrak `false`) da aynı listeyle güvenlidir.
  * Var olmayan bir yolu geçersiz kılmanın maliyeti yok; eksik bırakmanın maliyeti bayat vitrin.
  *
+ * İSTİSNA (URN-7, ölçüm 2026-10-01): bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu bayrak
+ * kapalıyken önbelleği olmayan 308'dir; üretilmez. Faz 3-C o rotaya sayfa sınıfı (force-static/revalidate) ilan
+ * ederse bu yol geri eklenir (kapı: INV-TAZELEME-YOL-3).
+ *
  * Saf yardımcı: `next/cache` ya da DB'ye dokunmaz; çağıran `revalidatePath` yapar (route handler tek koşullu
  * `if (table === 'x')` dallarını korur — INV-RENDER-2).
  */

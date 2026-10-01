@@ -163,6 +163,9 @@ type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; paren
  *       `getLocalizedCategorySlug` ile çözülür (CLAUDE.md kural 7 — kanonik EN, görünen
  *       URL dile göre). Kanonik yol da tazelenmeye DEVAM eder: 308 kaynağı olsa bile
  *       prerender edilmiş olabilir, kaldırmak yeni bir delik açardı.
+ *       İSTİSNA (URN-7, ölçüm 2026-10-01): bugünkü şemanın iki segmentli `/<dil>/category/<üst>/<alt>` yolu
+ *       bayrak kapalıyken önbelleği olmayan 308'dir; üretilmez. Faz 3-C o rotaya sayfa sınıfı
+ *       (force-static/revalidate) ilan ederse bu yol geri eklenir (kapı: INV-TAZELEME-YOL-3).
  *
  *  W2 — 14 `revalidatePath` çağrısının tamamı TEK segmentliydi; `/category/[c]/[s]`
  *       (alt-kategori) hiç tazelenmiyordu. Artık `parent_id` varsa iki segmentli yol da
