@@ -281,8 +281,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // Eşik %97 = 6456 B (pay 3 B); sert sınır 6656 (pay 203 B). Bundan sonra yeni ortak satır eklenemez: ya ayrıntı
   // kurallar dosyasına/cetvele taşınır ya da ortak bloktan eşit bayt çıkarılır (kanarya artık yalnız son uyarıdır).
   // 2026-10-01 (HRT-10): %97 → %99. Sebep (ölçüldü): Recep'in iki yeni kuralı (başka pencereden gelen turda cevap o pencereye;
-  // bekleme ifadesi adsız) ortak bloğa girdi; ortak bloktan ~100 B kısaltılmasına rağmen net +90 B: SATIS 6453 → 6543 B (%98,3).
-  // Eşik %99 = 6589 B (pay 46 B); sert sınır 6656 aynı. Kalıcı çözüm HRT-11: ortak blok ayrıntıları kurallar dosyasına taşınır.
+  // bekleme ifadesi adsız) ortak bloğa girdi; ortak bloktan ~100 B kısaltılmasına rağmen net +126 B: SATIS 6453 → 6579 B (%98,8; bağımsız okuyucu bulguları sonrası "sırası belli işe geç" ve "Recep'e giden" geri geldi).
+  // Eşik %99 = 6589 B (pay 10 B); sert sınır 6656 aynı. Kalıcı çözüm HRT-11: ortak blok ayrıntıları kurallar dosyasına taşınır.
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
   it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %99\'unda)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
@@ -446,7 +446,8 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('Başka pencereden gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
       expect(metin, ad).toContain("Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok)")
-      expect(metin, ad).toContain('"başka bir departmanın işini bekliyor" (adı/işi yok), Sorumlu = "ben"')
+      expect(metin, ad).toContain('"başka bir departmanın işini bekliyor" (adı/işi/sırası yok), Sorumlu = "ben" (OPS hariç)')
+      expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma, sırası belli işe geç')
     }
   })
 

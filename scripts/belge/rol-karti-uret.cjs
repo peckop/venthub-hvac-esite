@@ -125,7 +125,7 @@ const ILETISIM = [
   '## İletişim',
   '- Recep\'e yalnız iş bitince ya da sorun çıkınca tek satır yaz; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS\'a gider.',
   '- Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).',
-  '- Durum cevabı TEK tablodur (sütunlar Çalışma düzeni\'nde); onay bekleyenler en üst satırlardır, ayrı tablo yok.',
+  '- Recep\'e giden durum cevabı TEK tablodur (sütunlar Çalışma düzeni\'nde); onay bekleyenler en üst satırlardır, ayrı tablo yok.',
 ].join('\n')
 
 /**
@@ -173,7 +173,7 @@ const CALISMA = [
   '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
   '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
   '- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.',
-  '- Recep\'e durum mesajı TEK TABLO (`| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`), (OPS hariç) yalnız KENDİ kartların; genel resmi OPS verir, çok elzemse tablo dışında tek cümle. Başka pencereden gelen mesajla açılan turda cevap o pencereye SendMessage ile gider; Recep\'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). İşin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" (adı/işi yok), Sorumlu = "ben". 2+ kalem madde işaretli; compact notu 3 madde; "Onayında" yalnız Recep kararı; tur sonunda "devam edeyim mi" sorma (`~/.claude/output-styles/recep.md`).',
+  '- Recep\'e durum mesajı TEK TABLO (`| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`), (OPS hariç) yalnız KENDİ kartların; genel resmi OPS verir, çok elzemse tablo dışında tek cümle. Başka pencereden gelen mesajla açılan turda cevap o pencereye SendMessage ile gider; Recep\'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). İşin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" (adı/işi/sırası yok), Sorumlu = "ben" (OPS hariç). 2+ kalem madde işaretli; compact notu 3 madde; "Onayında" yalnız Recep kararı; tur sonunda "devam edeyim mi" sorma, sırası belli işe geç (recep.md).',
   '- DURUM (2026-10-01, OPS günceller): şirket kurulmadı, gerçek satış yok. Veri bozulması, sır/gizlilik sızıntısı, ödeme riski BUGÜN zarar sayılır; zarar vermeyen bulgu = kart + "ilk satıştan önce" etiketi, Recep\'e karar gitmez; kapılar değişmez.',
   '- Genel bileşen/modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdeği (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, teklif deneyimi) biz yazarız.',
   '- CLAUDE.md\'deki 14 mutlak kural her role geçerlidir.',
