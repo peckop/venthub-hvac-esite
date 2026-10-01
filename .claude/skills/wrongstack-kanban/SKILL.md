@@ -59,14 +59,16 @@ metadata:
 6. **Bitir** (YTN-2 kartında 10-01 ölçüldü, iki adım):
    1. `verify_completion` kanıt komutunu gerçekten koşturur; `verdict: passed`, `exitCode`, süre kartın `verificationReport` alanına yazılır (ilk koşuda 886 ms, 12.227 karakter döndü).
    2. `move_task` ile `targetColumnId: done`. **`transition_task` bu panolarda `REFUSED` verir** ("Strict Kanban Agent transitions require a managed board"); denemeye gerek yok.
-   - `move_task` kendi başına kanıt İSTEMEZ; kanıtı `verify_completion` üretir. Bu yüzden sıra bağlayıcıdır: **önce doğrula, rapor `passed` değilse Done'a taşıma.** "bitti, tamam, çalışıyor" gibi tek kelimelik özet kanıt değildir. Kapanışta PR numarası ve birleşme kanıtı kartın notunda kalır.
+   - ⛔**`move_task` ile Done'da KAPI YOKTUR (DENEME kartı, 10-01 ölçüldü):** (a) kartta hiç kanıt komutu yokken `move_task` Done'a taşıdı, `status: completed`; (b) kartta koşmamış (`pending`) bir kanıt komutu varken de kart Done'da kaldı; (c) `verify_completion` `PASSED` verdikten sonra bile `transition_task` aynı hatayı verdi (`[REFUSED] Strict Kanban Agent transitions require a managed board`, `managed-policy-invalid`, alan `lifecycle.mode`): sebep karttaki kanıt değil, panonun yönetilen olmamasıdır. Yani bu panolarda kanıt kuralı **araç değil disiplin** işidir.
+   - **Sıra bağlayıcıdır: önce `verify_completion`, rapor `passed` değilse `move_task` ile Done'a TAŞIMA.** Kanıtsız ya da `needs_human` kartı Done'a çeken kişi kuralı çiğnemiş olur, araç engellemez. "bitti, tamam, çalışıyor" gibi tek kelimelik özet kanıt değildir. Kapanışta PR numarası ve birleşme kanıtı kartın notunda kalır.
+   - Gerçek kapı için araçta `adopt_managed_lifecycle` eylemi var; bir panoyu yönetilene çevirmenin sonucu **ölçülmedi** (OPS/ARAÇ kararı, YTN deneme önerisi). Ölçülene kadar Done kapısı disiplindir.
 7. **Hata dalları** (kural 14): panoya yazma başarısız olursa söyle ve işe devam et (pano işi izler, iş panoyu beklemez); kanıt komutu kırmızıysa kart Done'a GİTMEZ, `record_activity` ile `blocker` yazılır; doğrulayıcı komutu `needs_human` verirse komutun bu kuralları ihlal edip etmediğine bak (aşağıda C).
 
 ### C. Ölçülmüş tuzaklar (kaynak: `docs/standards/is-kayit-duzeni-standard.md` §6.1; her satır sahada ölçüldü)
 
 | Tuzak | Ölçüm | Karşılık |
 |---|---|---|
-| İçe aktarılan pano **yönetilen değildir** | Done kanıtsız geçer | Kart panoda **doğrudan** açılır, dışarıdan aktarılmaz |
+| Pano **yönetilen değildir** (içe aktarılan de, doğrudan açılan da; 10-01 ölçüldü) | `move_task` Done'a kanıtsız ve koşmamış kanıt komutuyla da geçirir; `transition_task` her durumda `REFUSED` | Kapı disiplindir: önce `verify_completion` `passed`, sonra `move_task`. Kart panoda doğrudan açılır, dışarıdan aktarılmaz |
 | Doğrulayıcı izin listesi **çok dar** | varsayılan `["pwd","true","false","test"]` | `.mcp.json` env: `WRONGSTACK_KANBAN_VERIFIER_COMMANDS=+gh` (yalnız `gh`; yasak listesi her hâlde üstün). `curl/wget/npm/node` yasak |
 | **Tek komut, boru yok** | `\|` `&&` `\|\|` `;` `>` `<` `` ` `` `$()` içeren komut **hiç koşmaz**, hüküm `needs_human`a düşer, kart kapanmaz | Komut çıkış koduyla konuşur; çıktı metnine bakan `grep` gerekiyorsa komut yanlış seçilmiştir. Yazmadan önce bir olumlu bir olumsuz örnekte ayırt ediciliği ölç |
 | **Sürücü harfi** duyarlı proje kimliği | `c:\…` ≠ `C:\…` iki ayrı kimlik verir | Pano küçük harfli kökle açılır; kimlik ölçülür |
