@@ -117,8 +117,7 @@ try {
 
   const damga = new Date(t0).toISOString().replace(/\.\d+Z$/, 'Z')
   /** Yedeği eşiğinden ESKİ (ya da hiç olmayan) depolar; yalnız bunlar alınır. */
-  const bayat = yedek.DEPOLAR.filter((d) => {
-    const ds = durum.depolar.find((x) => x.depo === d.ad)
+  const bayat = yedek.DEPOLAR.filter((d) => {    const ds = durum.depolar.find((x) => x.depo === d.ad)
     return !(ds && ds.sonYedek && t0 - Date.parse(ds.sonYedek) < d.tazeSaat * 3_600_000)
   })
   const dd = defterYedek.durum(dizin, t0)

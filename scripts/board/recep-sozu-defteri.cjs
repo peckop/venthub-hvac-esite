@@ -363,8 +363,8 @@ function dondur(secenek = {}) {
   try {
     const ilk = fs.statSync(yol).size
     if (ilk <= esik) return { durum: 'gerek-yok' }
-    const tam = tamSatirlar(fs.readFileSync(yol))
-    const satirlar = tam.toString('utf8').split('\n').filter((s) => s !== '')
+    // Satır sonu olmayan son satır da KALIR (kesik satırı atmak kayıp olurdu); eşzamanlı yazım aşağıdaki boy kontrolleriyle yakalanır.
+    const satirlar = fs.readFileSync(yol, 'utf8').split('\n').filter((s) => s !== '')
     let toplam = 0
     let bolum = satirlar.length
     while (bolum > 0 && toplam + Buffer.byteLength(satirlar[bolum - 1]) + 1 <= tut) {

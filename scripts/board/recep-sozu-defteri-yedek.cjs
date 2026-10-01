@@ -82,7 +82,8 @@ function yedekAl(simdi = new Date(), secenek = {}) {
     const ad = `${ONEK}${sageYedek.damga(simdi)}${UZANTI}`
     const yol = path.join(hedefDizin, ad)
     const gecici = `${yol}.yaziliyor-${process.pid}`
-    fs.writeFileSync(gecici, tam)
+    // `yaz` yalnız testte bozuk yazımı taklit etmek içindir (doğrulama kolunu sabote edilebilir kılar).
+    ;(secenek.yaz || fs.writeFileSync)(gecici, tam)
     const okunan = fs.readFileSync(gecici)
     if (!okunan.equals(tam)) {
       const kotu = `${yol}.DOGRULANMADI`
