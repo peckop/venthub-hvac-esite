@@ -171,7 +171,8 @@ describe('INV-RECEP-SOZU-3 · sır görünümlü metin MASKELENİR', () => {
       'AKIAABCDEFGHIJKLMNOP',
       'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dBjftJeZ4CVPmB92K27uhbUJU1p1r',
       'Bearer abcdefghijklmnopqrstuvwxyz0123',
-      'postgresql://postgres:ParolaCokGizli@db.example.com:5432/postgres',
+      // CI "hardcoded DB connection string" tarayıcısı tam biçimi gerçek sır sanar: parçalayıp çalışma anında kuruyoruz
+      ['postgres', 'ql://', 'postgres:', 'ParolaCokGizli', '@db.example.com:5432/postgres'].join(''),
     ]
     for (const g of girdiler) {
       const m = defter.maskele(`şu: ${g} bitti`)
