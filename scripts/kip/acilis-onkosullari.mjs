@@ -244,6 +244,115 @@ async function olcEpostaGonderimKaniti(ctx) {
   }
 }
 
+// ---------- K10: Google ürün sonucu / Merchant uygunluğu (OPS 09-30, GEO-SEO REC-461) ----------
+export const URUN_ORNEK_SAYISI = 3
+
+/** JSON-LD ağacında `@type` (dizi olabilir) verilen türlerden birine eşit tüm düğümleri toplar. */
+function jsonldDugumleri(kok, turler, cikti = []) {
+  if (Array.isArray(kok)) {
+    for (const x of kok) jsonldDugumleri(x, turler, cikti)
+  } else if (kok && typeof kok === 'object') {
+    const t = kok['@type']
+    if ([].concat(t ?? []).some((x) => turler.includes(x))) cikti.push(kok)
+    for (const v of Object.values(kok)) jsonldDugumleri(v, turler, cikti)
+  }
+  return cikti
+}
+
+/**
+ * Bir ürün sayfasının JSON-LD bloklarını Merchant/ürün sonucu ölçütüne göre değerlendirir (SAF; testte doğrudan sınanır).
+ * Ölçüt: (1) en az bir Offer, hepsinde sayısal fiyat > 0 + para birimi; (2) her Offer'da iade (`hasMerchantReturnPolicy`) ve
+ * gönderim (`shippingDetails`); (3) ürün kimliği: `mpn` ya da `gtin*` olan en az bir Product. ⚠`sku` ARANMAZ: REC-146 kararıyla
+ * iç kimlik olarak BİLEREK yayınlanmıyor (ürün kimliği `mpn`). Bugün (teklif kipi) Offer yok → sayfa GEÇMEZ: beklenen durum.
+ */
+export function urunSayfasiDegerlendir(bloklar) {
+  const offerlar = jsonldDugumleri(bloklar, ['Offer', 'AggregateOffer'])
+  const urunler = jsonldDugumleri(bloklar, ['Product'])
+  const fiyat = (o) => Number(o.price ?? o.lowPrice)
+  const fiyatli = offerlar.filter((o) => Number.isFinite(fiyat(o)) && fiyat(o) > 0 && typeof o.priceCurrency === 'string' && o.priceCurrency.length === 3)
+  const iadeli = offerlar.filter((o) => o.hasMerchantReturnPolicy)
+  const gonderimli = offerlar.filter((o) => o.shippingDetails)
+  const kimlikli = urunler.filter((u) => u.mpn || Object.keys(u).some((k) => k.startsWith('gtin') && u[k]))
+  const eksik = []
+  if (offerlar.length === 0 || fiyatli.length !== offerlar.length) eksik.push(offerlar.length === 0 ? 'Offer yok (teklif kipi)' : `fiyatsız Offer ${offerlar.length - fiyatli.length}`)
+  if (offerlar.length > 0 && iadeli.length !== offerlar.length) eksik.push('iade politikası yok')
+  if (offerlar.length > 0 && gonderimli.length !== offerlar.length) eksik.push('gönderim verisi yok')
+  if (kimlikli.length === 0) eksik.push('mpn/gtin yok')
+  return { gecti: eksik.length === 0, eksik, offer: offerlar.length, kimlikli: kimlikli.length }
+}
+
+function jsonldBloklari(html) {
+  const bloklar = []
+  for (const m of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      bloklar.push(JSON.parse(m[1]))
+    } catch {
+      throw new Error('JSON-LD ayrıştırılamadı')
+    }
+  }
+  return bloklar
+}
+
+async function olcGoogleUrunUygunlugu(ctx) {
+  const taban = siteUrl(ctx.env)
+  const r = await ctx.fetch(`${taban}/sitemap.xml`, { signal: zamanAsimi() })
+  if (r.status !== 200) throw new Error(`sitemap HTTP ${r.status}`)
+  const adresler = [...(await r.text()).matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map((m) => m[1].trim())
+    .filter((u) => /\/tr\/(?:products|urun)\/[^/?#]+$/.test(u))
+  if (adresler.length === 0) throw new Error('site haritasında ürün adresi yok')
+  // Deterministik örnek: ilk, orta, son (tekrarsız).
+  const ornek = [...new Set([adresler[0], adresler[Math.floor(adresler.length / 2)], adresler[adresler.length - 1]])].slice(0, URUN_ORNEK_SAYISI)
+  const sonuc = []
+  for (const adres of ornek) {
+    const s = await ctx.fetch(adres, { signal: zamanAsimi() })
+    if (s.status !== 200) throw new Error(`${adres.replace(taban, '')} HTTP ${s.status}`)
+    const bloklar = jsonldBloklari(await s.text())
+    if (bloklar.length === 0) throw new Error(`${adres.replace(taban, '')}: JSON-LD yok`)
+    sonuc.push({ adres: adres.replace(taban, ''), ...urunSayfasiDegerlendir(bloklar) })
+  }
+  const gecmeyen = sonuc.filter((x) => !x.gecti)
+  return {
+    gecti: gecmeyen.length === 0,
+    ayrinti:
+      gecmeyen.length === 0
+        ? `${sonuc.length} örnek ürün sayfası: fiyatlı Offer + iade + gönderim + mpn/gtin tamam`
+        : `${gecmeyen.length}/${sonuc.length} örnek sayfa eksik: ${[...new Set(gecmeyen.flatMap((x) => x.eksik))].join(', ')} (teklif kipinde beklenen; satış açılınca Offer/iade/gönderim gelmeli)`,
+  }
+}
+
+// ---------- K11: yasal metinlerde taslak işareti yok = hukukçu teyidi bayrağı (OPS 09-30, REC-492) ----------
+const TASLAK_BASLIK = /\((?:Taslak|Draft)\)/
+const TASLAK_BANT = ['taslaktır ve test amaçlıdır', 'is a draft and for testing purposes']
+const YASAL_BASLIK_SAYFALARI = ['kvkk', 'gizlilik-politikasi', 'cerez-politikasi', 'mesafeli-satis-sozlesmesi', 'on-bilgilendirme-formu', 'kullanim-kosullari']
+
+/**
+ * ⚠ÖLÇTÜĞÜ: `legalReviewCompleted` bayrağının canlı sonucu (bayrak false iken sayfa başlığı/H1'i "(Taslak)" taşır ve taslak bandı basılır;
+ * true olunca ikisi KENDİLİĞİNDEN kalkar — REC-492). ÖLÇMEDİĞİ: hukukçunun gerçekten teyit etip etmediği (bayrağı değiştiren PR'ın
+ * gövdesindeki teyit kaydı bunun kanıtıdır). Muaf OLAMAZ: onaylanmamış hukuki metni onaylı göstermek yanlış beyandır.
+ */
+async function olcHukukcuTeyidi(ctx) {
+  const taban = siteUrl(ctx.env)
+  const taslakli = []
+  let olculen = 0
+  for (const d of DILLER) {
+    for (const s of YASAL_BASLIK_SAYFALARI) {
+      const r = await ctx.fetch(`${taban}/${d}/legal/${s}`, { signal: zamanAsimi() })
+      if (r.status !== 200) throw new Error(`/${d}/legal/${s} HTTP ${r.status}`)
+      const html = await r.text()
+      const baslik = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]
+      const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]
+      if (baslik === undefined || h1 === undefined) throw new Error(`/${d}/legal/${s}: <title> ya da <h1> bulunamadı`)
+      olculen += 1
+      if (TASLAK_BASLIK.test(baslik) || TASLAK_BASLIK.test(h1) || TASLAK_BANT.some((b) => html.includes(b))) taslakli.push(`/${d}/legal/${s}`)
+    }
+  }
+  return {
+    gecti: taslakli.length === 0,
+    ayrinti: `${olculen} yasal sayfa · taslak işaretli ${taslakli.length}` + (taslakli.length ? ` (${taslakli.slice(0, 2).join(', ')}…): hukukçu teyidi bayrağı (legalReviewCompleted) hâlâ false` : ''),
+  }
+}
+
 const GENEL_YONTEM =/^(ileride|ilerde|sonra|bakilacak|bakılacak|belirlenecek|tbd|\?+|-+|yontem|yöntem)$/i
 
 /** K7: Recep beyanı. Kalıp: "e-arşiv faturaları <yöntem> ile kesilecek (mali müşavir teyitli)"; yöntem genel/boş ise RET. */
@@ -279,6 +388,8 @@ export const KALEMLER = [
   { id: 'K7', ad: 'Fatura yolu: Recep beyanı', sahip: 'Recep', kanit: '--fatura-beyani (damgalı)', muaf: false, olc: olcFatura },
   { id: 'K8', ad: 'Hedef durum tutarlı (anahtar ↔ hide_price)', sahip: 'URUN', kanit: 'planla() sonrası beklenen durum', muaf: false, olc: olcHedefTutarlilik },
   { id: 'K9', ad: 'Müşteri e-postası gerçekten gidiyor (son 30 günde gönderim kaydı)', sahip: 'ALTYAPI (REC-368)', kanit: '*_email_events: sent + provider_message_id (30 gün)', muaf: false, olc: olcEpostaGonderimKaniti },
+  { id: 'K10', ad: 'Google ürün sonucu / Merchant uygunluğu (fiyatlı Offer + iade + gönderim + mpn/gtin)', sahip: 'URUN (REC-146/REC-461) + Recep (iade/gönderim politikası)', kanit: 'canlı 3 örnek ürün sayfası JSON-LD', muaf: false, olc: olcGoogleUrunUygunlugu },
+  { id: 'K11', ad: 'Yasal metinlerde taslak işareti yok (hukukçu teyidi bayrağı)', sahip: 'Recep (hukukçu teyidi) + URUN (REC-492)', kanit: 'canlı 12 yasal sayfa <title>/<h1>/taslak bandı', muaf: false, olc: olcHukukcuTeyidi },
 ]
 
 // ---------- ölçüm + değerlendirme ----------
