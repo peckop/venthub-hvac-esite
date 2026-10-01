@@ -275,14 +275,18 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // 2026-10-01 (HRT-2, #1609): %92 → %94. Sebep (ölçüldü): Kanban geçişi ortak bloğa 94 B ekledi (SATIS 6074 → 6168 B,
   // eşik %92 = 6123); yeni eşik 6257 B (pay 89 B). SERT sınır (6656) aynı kaldı; yeni bölüm gerekirse ayrıntı dosyaya
   // taşınır, cümleler önce kısaltılır.
+  // 2026-10-01 (HRT-6/HRT-9): %94 → %97. Sebep (ölçüldü): Recep tablo kuralı (yalnız kendi kartların, elzem hatırlatma,
+  // tur sonu) ve tarihli DURUM satırı ortak bloğa girdi; ortak bloktan ~250 B kısaltıldıktan sonra SATIS 6168 → 6414 B
+  // (eşik %97 = 6456, pay 42 B; sert sınır 6656'ya 242 B). Bundan sonra yeni ortak satır eklenemez: ya ayrıntı
+  // kurallar dosyasına/cetvele taşınır ya da ortak bloktan eşit bayt çıkarılır (kanarya artık yalnız son uyarıdır).
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
-  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %94\'ünde)', () => {
+  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %97\'sinde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)
       expect(metin, `${ad} kartında kural özet satırı olmamalı (kurallar dosyasında)`).not.toMatch(/^- K\d+ [^;\n]+: /m)
     }
     const enBuyuk = Math.max(...Object.values(uretilen).map((m) => Buffer.byteLength(m, 'utf8')))
-    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.94)
+    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.97)
   })
 
   it('Çalışma düzeni bloğu her kartta bire bir aynı ve pano kanıt kuralını taşır (ARAÇ ölçümü: 62 kartın 45\'inde kanıt yok)', () => {
@@ -418,6 +422,16 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
     expect(uretilen.OPS).toContain('genel müdürü')
     expect(uretilen.URUN).not.toContain('genel müdürü')
+  })
+
+  it('HRT-6/HRT-9: her kart Recep tablosunu yalnız kendi Kanban kartlarıyla sınırlar, tur sonunu soru bırakmaz ve tarihli DURUM bağlamını taşır', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('yalnız KENDİ Kanban kartlarını içerir')
+      expect(metin, ad).toContain('çok elzemse tablo dışında tek cümle hatırlat')
+      expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma')
+      expect(metin, ad).toMatch(/DURUM \(2026-10-01, OPS günceller\): şirket kurulmadı, gerçek satış yok/)
+      expect(metin, ad).toContain('"ilk satıştan önce" etiketi')
+    }
   })
 
   it('beş Recep kapısı her kartta bire bir aynı', () => {

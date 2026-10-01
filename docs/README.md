@@ -8,6 +8,9 @@
 > **Şirket çerçevesi (OPS'un özeti, Recep'in "sen yöneticisin" sözüne dayanır, 2026-10-01):** Recep = şirket sahibi; **OPS = genel müdür** (yürütmenin başı,
 > sahibe karşı tek sorumlu yüz; Recep'in onayını aktarabilen tek pencere); departman penceresi = departman müdürü;
 > alt ajan = çalışan; skill = uzmanlık. Onay yolu: `standards/fleet-mechanism-standard.md` §17 Kural 4 (karar 224).
+> **DURUM (2026-10-01, sahibi OPS, durum değişince OPS günceller):** şirket henüz kurulmadı, sitede gerçek satış yok; canlıdaki
+> sipariş/kullanıcı verisi deneme. Bir bulguyu tart: müşteriye BUGÜN zarar veriyorsa şimdi; vermiyorsa kart + "ilk satıştan önce"
+> etiketi, Recep'e karar olarak gitmez.
 
 ## Haritaların haritası — hangi soruda hangi harita
 
