@@ -95,6 +95,16 @@ describe('INV-AJAN-TANIM-1 — tanımın içeriği', () => {
     expect(uretici.tanim(ornek('uygulayici'))).not.toMatch(/disallowedTools/)
   })
 
+  it('HRT-13 (YTN-8 ölçümü): hiçbir türün disallowedTools alanında ToolSearch YOK (Haiku çalışan ~329 bin jetonla hiç açılmıyor)', () => {
+    for (const tur of ['arastirmaci', 'uygulayici', 'curutucu', 'dogrulayici']) {
+      expect(uretici.tanim(ornek(tur)), tur).not.toMatch(/^disallowedTools:.*ToolSearch/m)
+    }
+  })
+
+  it('HRT-13: KULLANICI_DUZEYI bayat eklenti skill adı taşımaz (supabase eklentisi bu makinede etkin değil)', () => {
+    expect([...uretici.KULLANICI_DUZEYI]).not.toContain('supabase-postgres-best-practices')
+  })
+
   it('skills: alanına YALNIZ onYukle girer; adiylaCagir ve bekleyen girmez', () => {
     const s = ornek('uygulayici')
     expect(s.adiylaCagir.length).toBeGreaterThan(0)
