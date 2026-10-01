@@ -64,5 +64,8 @@ export default async function Page({ params }: Params) {
     if (dil === 'tr' || marka.slug !== slug) permanentRedirect(kanonik)
     return <MarkaSayfasi lang={lang} slug={marka.slug} />
   }
+  // REC-490 (Google soft 404 kuralı): bilinmeyen marka 200 ile "Marka Bulunamadı" sayfası basıyordu; Google bunu
+  // "soft 404" sayar (geçerli sayfa gibi dizine alınmaya çalışılır). Gerçek 404 dönülür — bayrak açık koldaki gibi.
+  if (!markaBul(slug)) notFound()
   return <MarkaSayfasi lang={lang} slug={slug} />
 }

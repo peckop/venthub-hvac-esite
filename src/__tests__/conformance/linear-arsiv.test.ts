@@ -24,12 +24,19 @@ interface Aday {
 }
 interface Sonuc {
   arsivlenen: Aday[]
+  atlanan: Aday[]
   aday: number
   hata?: string
+}
+interface Zincir {
+  id: string
+  parent?: Zincir | null
 }
 interface Arsiv {
   sinirTarihi: (now: string, gun?: number) => string
   listeSorgusu: (sinir: string) => { query: string; variables: { sinir: string; n: number } }
+  acikAltSorgusu: () => { query: string; variables: { n: number } }
+  korunanUstler: (veri: unknown) => Set<string>
   arsivMutasyonu: (idler: string[]) => { query: string }
   parcala: <T>(liste: T[], n: number) => T[][]
   calistir: (a: { anahtar: string; now: string; kuru?: boolean; fetchFn: FetchFn }) => Promise<Sonuc>
@@ -49,13 +56,19 @@ const NOW = '2026-09-29T12:00:00.000Z'
 const uuid = (i: number) => `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`
 const adaylar = (n: number): Aday[] => Array.from({ length: n }, (_, i) => ({ id: uuid(i + 1), identifier: `REC-${i + 1}` }))
 
-/** Sahte Linear: liste sorgusuna sıradaki aday kümesini verir, mutasyonda `basarisiz` kimlikleri false döner. */
-function sahteLinear(kumeler: Aday[][], basarisiz: Set<string> = new Set()) {
+/**
+ * Sahte Linear: liste sorgusuna sıradaki aday kümesini verir, mutasyonda `basarisiz` kimlikleri false döner.
+ * `acikAlt` = açık alt kayıtların üst zinciri (koruma sorgusunun cevabı); `acikSayfa` = daha sayfa var mı.
+ */
+function sahteLinear(kumeler: Aday[][], basarisiz: Set<string> = new Set(), acikAlt: Zincir[] = [], acikSayfa = false) {
   const cagrilar: string[] = []
   let sira = 0
   const fetchFn: FetchFn = async (_u, init) => {
     const govde = JSON.parse(init.body) as { query: string }
     cagrilar.push(govde.query)
+    if (govde.query.includes('parent { id')) {
+      return { ok: true, json: async () => ({ data: { issues: { pageInfo: { hasNextPage: acikSayfa }, nodes: acikAlt } } }) }
+    }
     if (govde.query.startsWith('mutation')) {
       const data: Record<string, { success: boolean }> = {}
       const idler = [...govde.query.matchAll(/issueArchive\(id: "([^"]+)"\)/g)].map((m) => m[1])
@@ -153,13 +166,97 @@ describe('INV-LINEAR-ARSIV-1 · koşum', () => {
     const fetchFn: FetchFn = async (_u, init) => {
       const q = (JSON.parse(init.body) as { query: string }).query
       n += 1
-      if (q.startsWith('mutation') && n > 2) return { ok: false, status: 500, json: async () => ({}) }
+      if (q.startsWith('mutation') && n > 3) return { ok: false, status: 500, json: async () => ({}) }
       if (q.startsWith('mutation')) return { ok: true, json: async () => ({ data: Object.fromEntries(Array.from({ length: 20 }, (_, i) => ['a' + i, { success: true }])) }) }
       return { ok: true, json: async () => ({ data: { issues: { nodes: adaylar(45) } } }) }
     }
     const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, fetchFn })
     expect(s.hata).toContain('HTTP 500')
     expect(s.arsivlenen).toHaveLength(20)
+  })
+})
+
+/**
+ * SABOTAJ (2026-09-30): Linear üst kaydı arşivleyince açık alt/torun kayıtları da arşivler; REC-473 ve REC-468
+ * böyle düştü. Bu blok korumayı kaldıran ya da zayıflatan her değişikliği kırmızıya çevirir.
+ */
+describe('INV-LINEAR-ARSIV-1 · açık altı olan üst kayıt arşivlenmez', () => {
+  const arsivlenenIdler = (cagrilar: string[]) =>
+    cagrilar.filter((q) => q.startsWith('mutation')).flatMap((q) => [...q.matchAll(/issueArchive\(id: "([^"]+)"\)/g)].map((m) => m[1]))
+
+  it('koruma sorgusu bütün açık alt kayıtları ve en az 8 seviye üst zinciri ister', () => {
+    const s = arsiv.acikAltSorgusu().query
+    expect(s).toContain('parent: { null: false }')
+    expect(s).toContain('"completed","canceled"')
+    expect(s).toContain('nin')
+    expect((s.match(/parent \{/g) ?? []).length).toBeGreaterThanOrEqual(8)
+    expect(s).toContain('hasNextPage')
+  })
+
+  it('kapalı üst kaydın AÇIK alt kaydı varsa üst ARŞİVLENMEZ, atlanan olarak raporlanır', async () => {
+    const hepsi = adaylar(4)
+    const { fetchFn, cagrilar } = sahteLinear([hepsi], new Set(), [{ id: uuid(99), parent: { id: uuid(2) } }])
+    const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, fetchFn })
+    expect(arsivlenenIdler(cagrilar)).not.toContain(uuid(2))
+    expect(s.arsivlenen.map((a) => a.identifier)).toEqual(['REC-1', 'REC-3', 'REC-4'])
+    expect(s.atlanan.map((a) => a.identifier)).toEqual(['REC-2'])
+  })
+
+  it('TORUN açıksa büyükanne kayıt da korunur (zincirin her halkası)', async () => {
+    const { fetchFn, cagrilar } = sahteLinear([adaylar(3)], new Set(), [{ id: uuid(99), parent: { id: uuid(10), parent: { id: uuid(1) } } }])
+    const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, fetchFn })
+    expect(arsivlenenIdler(cagrilar)).not.toContain(uuid(1))
+    expect(s.atlanan.map((a) => a.identifier)).toEqual(['REC-1'])
+  })
+
+  it('KURU koşum da açık altı olan üstü aday saymaz', async () => {
+    const { fetchFn } = sahteLinear([adaylar(3)], new Set(), [{ id: uuid(99), parent: { id: uuid(3) } }])
+    const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, kuru: true, fetchFn })
+    expect(s.arsivlenen.map((a) => a.identifier)).toEqual(['REC-1', 'REC-2'])
+    expect(s.atlanan.map((a) => a.identifier)).toEqual(['REC-3'])
+  })
+
+  it('tüm adaylar korunanlardan ibaretse mutasyon yok ve döngü takılmaz', async () => {
+    const yuz = adaylar(100)
+    const acik = yuz.map((a, i) => ({ id: uuid(1000 + i), parent: { id: a.id } }))
+    const { fetchFn, cagrilar } = sahteLinear([yuz, yuz, yuz], new Set(), acik)
+    const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, fetchFn })
+    expect(cagrilar.some((q) => q.startsWith('mutation'))).toBe(false)
+    expect(s.arsivlenen).toHaveLength(0)
+    expect(s.atlanan).toHaveLength(100)
+    expect(cagrilar.filter((q) => q.startsWith('query($sinir')).length).toBe(1)
+  })
+
+  it('FAIL-CLOSED: koruma listesi çok sayfaysa HİÇBİR şey arşivlenmez', async () => {
+    const { fetchFn, cagrilar } = sahteLinear([adaylar(5)], new Set(), [], true)
+    const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, fetchFn })
+    expect(s.hata).toContain('tamamlanamadi')
+    expect(s.arsivlenen).toHaveLength(0)
+    expect(cagrilar.some((q) => q.startsWith('mutation'))).toBe(false)
+  })
+
+  it('FAIL-CLOSED: koruma sorgusu hata verirse HİÇBİR şey arşivlenmez', async () => {
+    const cagrilar: string[] = []
+    const fetchFn: FetchFn = async (_u, init) => {
+      const q = (JSON.parse(init.body) as { query: string }).query
+      cagrilar.push(q)
+      if (q.includes('parent { id')) return { ok: false, status: 500, json: async () => ({}) }
+      return { ok: true, json: async () => ({ data: { issues: { nodes: adaylar(3) } } }) }
+    }
+    const s = await arsiv.calistir({ anahtar: 'k'.repeat(20), now: NOW, fetchFn })
+    expect(s.hata).toContain('HTTP 500')
+    expect(cagrilar.some((q) => q.startsWith('mutation'))).toBe(false)
+  })
+
+  it('korunanUstler bozuk cevapta atar (sessizce boş küme dönmez)', () => {
+    expect(() => arsiv.korunanUstler({})).toThrow()
+    expect(() => arsiv.korunanUstler(null)).toThrow()
+  })
+
+  it('günlük atlananları da yazar (izlenebilirlik)', () => {
+    arsiv.gunlugeYaz(NOW, { arsivlenen: adaylar(1), atlanan: [{ id: uuid(7), identifier: 'REC-7' }], aday: 2 }, dir)
+    const satir = JSON.parse(fs.readFileSync(path.join(dir, 'gunluk.jsonl'), 'utf8').trim()) as { atlanan: Aday[] }
+    expect(satir.atlanan.map((a) => a.identifier)).toEqual(['REC-7'])
   })
 })
 
@@ -193,7 +290,7 @@ describe('INV-LINEAR-ARSIV-1 · günde bir kez', () => {
   })
 
   it('günlük her arşivlenen kimliği yazar (geri alınabilirlik)', () => {
-    arsiv.gunlugeYaz(NOW, { arsivlenen: adaylar(2), aday: 2 }, dir)
+    arsiv.gunlugeYaz(NOW, { arsivlenen: adaylar(2), atlanan: [], aday: 2 }, dir)
     const satir = JSON.parse(fs.readFileSync(path.join(dir, 'gunluk.jsonl'), 'utf8').trim()) as { arsivlenen: Aday[] }
     expect(satir.arsivlenen.map((a) => a.id)).toEqual([uuid(1), uuid(2)])
   })

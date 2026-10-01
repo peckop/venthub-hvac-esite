@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { auditConfig, resolveIyzicoBase } from '../config_audit'
+import { auditConfig, resolveIyzicoBase, yalnizSandboxTutarsizligi } from '../config_audit'
 
 /**
  * `_shared/config_audit.ts` SÖZLEŞMESİNİN KİLİDİ (T100-VH · 2026-08-19).
@@ -18,6 +18,34 @@ import { auditConfig, resolveIyzicoBase } from '../config_audit'
 const PROD_SITE = 'https://venthub.com.tr'
 const PROD_IYZ = 'https://api.iyzipay.com'
 const SANDBOX_IYZ = 'https://sandbox-api.iyzipay.com'
+
+describe('yalnizSandboxTutarsizligi — healthz istisnası yalnız TEK kusur bu ise açılır', () => {
+  const tam = {
+    IYZICO_BASE_URL: SANDBOX_IYZ,
+    IYZICO_API_KEY: 'a',
+    IYZICO_SECRET_KEY: 'b',
+    PUBLIC_SITE_URL: PROD_SITE,
+    ALLOWED_ORIGINS: PROD_SITE,
+  }
+
+  it('prod site + sandbox uç + başka kusur yok → true', () => {
+    expect(yalnizSandboxTutarsizligi(auditConfig(tam))).toBe(true)
+  })
+
+  it('canlı ödeme ucu → false (zaten sağlıklı, istisnaya gerek yok)', () => {
+    expect(yalnizSandboxTutarsizligi(auditConfig({ ...tam, IYZICO_BASE_URL: PROD_IYZ }))).toBe(false)
+  })
+
+  it('sandbox + BAŞKA kusur (anahtar eksik) → false: istisna başka kusuru SAKLAYAMAZ', () => {
+    expect(yalnizSandboxTutarsizligi(auditConfig({ ...tam, IYZICO_API_KEY: '' }))).toBe(false)
+    expect(yalnizSandboxTutarsizligi(auditConfig({ ...tam, PUBLIC_SITE_URL: '', ALLOWED_ORIGINS: '' }))).toBe(false)
+  })
+
+  it('ucu çözülemeyen ya da yerel site → false', () => {
+    expect(yalnizSandboxTutarsizligi(auditConfig({ ...tam, IYZICO_BASE_URL: '' }))).toBe(false)
+    expect(yalnizSandboxTutarsizligi(auditConfig({ ...tam, PUBLIC_SITE_URL: 'http://localhost:5173', ALLOWED_ORIGINS: 'http://localhost:5173' }))).toBe(false)
+  })
+})
 
 describe('resolveIyzicoBase — varsayilan YOK', () => {
   it('deger yoksa null doner (sandbox varsayilanina DUSMEZ)', () => {

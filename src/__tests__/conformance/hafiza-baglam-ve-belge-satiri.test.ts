@@ -191,6 +191,13 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BELGE bloğu (HARİTA çiftleri)', () => 
     expect(s).toBe('⚠BELGE: CONTEXT.md 41 gun (vekil) · DURUM-TAKIP.md 14 gun')
   })
 
+  it('belgeler defteri (REC-473): bayat gün sayısı VAR / taze YOK / null "OLCULMEDI" / eski önbellek (alan yok) sessiz', () => {
+    expect(bs.satir(tamam({ belgelerDefteri: { gun: 3, kaynak: 15, bayat: true } }), SIMDI)).toBe('⚠BELGE: belgeler defteri 3 gun')
+    expect(bs.satir(tamam({ belgelerDefteri: { gun: 1, kaynak: 15, bayat: false } }), SIMDI)).toBeNull()
+    expect(bs.satir(tamam({ belgelerDefteri: null }), SIMDI)).toBe('⚠BELGE: belgeler defteri OLCULMEDI')
+    expect(bs.satir(tamam({}), SIMDI)).toBeNull()
+  })
+
   it('kirikYeni [] parça yok / 1 kayıt "kirik yol 1 (belge: yol)"', () => {
     expect(bs.satir(tamam({ kirikYeni: [] }), SIMDI)).toBeNull()
     expect(bs.satir(tamam({ kirikYeni: [{ belge: 'docs/README.md', yol: 'docs/yok.md' }] }), SIMDI)).toBe(

@@ -140,13 +140,16 @@ export function denemeIzniHukmu(env: SatisKipiOrtam, userId: string): DenemeIzni
   return { var: ortam === 'sandbox' && listede, ortam, listeDolu }
 }
 
+/** Okuma yolunun ihtiyacı: kim olduğun (kullanıcı/tenant) değil, yalnız ağ ve süre. */
+export type OkumaGirdi = Pick<SatisKipiGirdi, 'supabaseUrl' | 'serviceRoleKey' | 'fetchImpl' | 'zamanAsimiMs'>
+
 type Okuma =
   | { tur: 'acik' }
   | { tur: 'kapali' }
   | { tur: 'rpc_yok' | 'yetki' | 'hata' | 'zaman_asimi' | 'bozuk'; ayrinti?: string }
 
 /** Tek deneme: fetch + gövde okuması AYNI süre bütçesinde; sahte fetch sinyali yok sayarsa da asılmaz. */
-async function birDeneme(g: SatisKipiGirdi, sureMs: number): Promise<Okuma> {
+async function birDeneme(g: OkumaGirdi, sureMs: number): Promise<Okuma> {
   const ctrl = new AbortController()
   let zamanlayici: ReturnType<typeof setTimeout> | undefined
   const zamanAsimi = new Promise<'zaman_asimi'>((coz) => {
@@ -199,12 +202,23 @@ async function birDeneme(g: SatisKipiGirdi, sureMs: number): Promise<Okuma> {
   }
 }
 
-async function satisKipiniOku(g: SatisKipiGirdi): Promise<Okuma> {
+async function satisKipiniOku(g: OkumaGirdi): Promise<Okuma> {
   const sure = g.zamanAsimiMs ?? VARSAYILAN_ZAMAN_ASIMI_MS
   const ilk = await birDeneme(g, sure)
   // Yeniden deneme YALNIZ zaman aşımında (okuma idempotent); hata/bozuk cevap tekrarla düzelmez.
   if (ilk.tur !== 'zaman_asimi') return ilk
   return birDeneme(g, sure)
+}
+
+/**
+ * İzleme için (healthz): satış kipi yalnız bu üç durumdan biri. Ödeme kapısıyla AYNI okuma yolu ve
+ * aynı katı boolean kuralı kullanılır; okunamayan her şey `okunamadi` (bilgisizlik "kapalı" değildir).
+ */
+export type SatisDurumu = 'acik' | 'kapali' | 'okunamadi'
+
+export async function satisDurumuOku(g: OkumaGirdi): Promise<SatisDurumu> {
+  const o = await satisKipiniOku(g)
+  return o.tur === 'acik' ? 'acik' : o.tur === 'kapali' ? 'kapali' : 'okunamadi'
 }
 
 function yanit(g: SatisKipiGirdi, status: number, code: string, message: string, ekBaslik: Record<string, string> = {}): Response {

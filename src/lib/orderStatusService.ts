@@ -240,11 +240,17 @@ export async function syncOrderFromReturn(orderId: string, returnStatus: string)
       kalmaz — yalan tek başına, sessizce yaşar.
 
       Statü davranışı (received → cancelled) BİLEREK değiştirilmedi: o ayrı bir karar.
+
+      ALT-4 (2026-10-01) — `approved` dalı KALDIRILDI. İade onayı siparişi, kaynak
+      durumuna bakmadan `processing`e çekiyordu: teslim edilmiş sipariş "hazırlanıyor"a
+      GERİ gidiyordu (kural 11) ve müşteri sipariş ekranında bunu görecekti. Canlıda
+      ölçülen tek örnek: ödemesi `failed` bir sipariş 09-26'daki iade onayıyla
+      `processing` oldu. İade kendi tablosunda yaşar; onaylanması siparişin kargo
+      durumu hakkında hiçbir şey söylemez. Cetvel: siparis-durum-akisi-standard.md.
     */
     const orderStatusMap: Record<string, { status: string; payment_status?: string }> = {
         refunded: { status: 'cancelled', payment_status: 'refunded' },
         cancelled: { status: 'cancelled' },
-        approved: { status: 'processing' },
         rejected: { status: 'delivered' },
         received: { status: 'cancelled' },
     }
