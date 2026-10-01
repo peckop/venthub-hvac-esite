@@ -132,9 +132,9 @@
       "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
     },
     "docs/standards/document-numbering-standard.md": {
-      "sahip": "URUN",
+      "sahip": "SATIS",
       "dogrulanacak": false,
-      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+      "dayanak": "OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip URUN)"
     },
     "docs/standards/edge-function-security-standard.md": {
       "sahip": "EDGE",
@@ -187,9 +187,9 @@
       "dayanak": "OPS sahipsiz alan kuralı: hukuk (Recep kapısı; ayrı HUKUK rolü açılana kadar OPS)"
     },
     "docs/standards/marka-token-eslemesi-standard.md": {
-      "sahip": "URUN",
+      "sahip": "TASARIM",
       "dogrulanacak": false,
-      "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
+      "dayanak": "OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip URUN)"
     },
     "docs/standards/matris-gorunum-standard.md": {
       "sahip": "URUN",
@@ -217,9 +217,9 @@
       "dayanak": "OPS sahipsiz alan kuralı: bildirim/e-posta"
     },
     "docs/standards/payment-ledger-standard.md": {
-      "sahip": "ALTYAPI",
+      "sahip": "SATIS",
       "dogrulanacak": false,
-      "dayanak": "OPS sahipsiz alan kuralı: ödeme defteri"
+      "dayanak": "OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip ALTYAPI)"
     },
     "docs/standards/pricing-standard.md": {
       "sahip": "KATALOG",
@@ -242,9 +242,9 @@
       "dayanak": "düşük güven: sahip ilk dokunuşta teyit eder"
     },
     "docs/standards/quote-standard.md": {
-      "sahip": "URUN",
+      "sahip": "SATIS",
       "dogrulanacak": false,
-      "dayanak": "OPS sahipsiz alan kuralı: müşteri yüzü (teklif akışının müşteri tarafı); ADMIN ikincil (yönetici tarafı)"
+      "dayanak": "OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip URUN)"
     },
     "docs/standards/rendering-cache-standard.md": {
       "sahip": "URUN",
@@ -257,9 +257,9 @@
       "dayanak": "alt ajan sınıflandırması (yüksek güven), OPS onaylı"
     },
     "docs/standards/satis-kipi-gecis-standard.md": {
-      "sahip": "ALTYAPI",
+      "sahip": "SATIS",
       "dogrulanacak": false,
-      "dayanak": "alt ajan sınıflandırması (orta güven), OPS onaylı"
+      "dayanak": "OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip ALTYAPI)"
     },
     "docs/standards/settled-work-standard.md": {
       "sahip": "OPS",
@@ -347,9 +347,9 @@
       "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
     },
     "docs/standards/checkout-payment-standard.md": {
-      "sahip": "ALTYAPI",
+      "sahip": "SATIS",
       "dogrulanacak": false,
-      "dayanak": "OPS onayı 2026-09-29 (iki role bölünen cetvel)"
+      "dayanak": "OPS onaylı sahiplik devri 2026-09-30 (rol kuruldu; önceki sahip ALTYAPI)"
     },
     "docs/standards/canonical-url-standard.md": {
       "sahip": "GEO-SEO",

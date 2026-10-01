@@ -215,3 +215,39 @@ describe('INV-AJAN-TANIM-1 — ayırt edicilik (sorunlar bilerek bozulmuş girdi
     expect(tur.some((x) => /bilinmeyen tür/.test(x))).toBe(true)
   })
 })
+
+/**
+ * BAĞLAM MALİYETİ — her tanım Agent aracının açıklamasına girer, yani HER oturumun ve HER alt ajanın ilk çağrısında bir kez
+ * ödenir (önbellekten sonra ucuzlar). ÖLÇÜM 2026-10-01 (claude -p, tek tur, kancalar kapalı, iki tekrar): 50 tanım Sonnet 5.5
+ * ilk çağrı girişini +4.794, Haiku 4.5'i +4.087 jeton büyüttü (tanım başına ~96); Haiku'da skill listesi kırpması DEĞİŞMEDİ.
+ * OPS tavanı 6.000 jeton; yeni çalışan türü eklemek bu sayıyı büyütür, tavanı aşan ekleme OPS'a gider. Kapı jetonu doğrudan
+ * ölçemez: ölçüm anındaki ad+açıklama karakter toplamı (7.282) ile jeton farkı (4.794) orantılanır, tavan karaktere çevrilir.
+ */
+const OLCUM_KARAKTER = 7282
+const OLCUM_JETON = 4794
+const TAVAN_JETON = 6000
+const TAVAN_KARAKTER = Math.round((OLCUM_KARAKTER * TAVAN_JETON) / OLCUM_JETON)
+
+const maliyetKarakter = (cikti: Record<string, string>): number =>
+  Object.values(cikti).reduce((t, metin) => {
+    const fm = metin.replace(/\r/g, '').split('---')[1] ?? ''
+    const ad = /^name:\s*(.*)$/m.exec(fm)?.[1] ?? ''
+    const aciklama = /^description:\s*(.*)$/m.exec(fm)?.[1] ?? ''
+    return t + ad.length + aciklama.length
+  }, 0)
+
+describe('INV-AJAN-TANIM-1 — bağlam maliyeti tavanı', () => {
+  it('üretilen tanımların ad+açıklama toplamı OPS tavanının (6k jeton) karakter karşılığını aşmaz', () => {
+    expect(maliyetKarakter(uretici.uret(setler))).toBeLessThanOrEqual(TAVAN_KARAKTER)
+  })
+
+  it('ayırt edici: tek bir tanımın açıklaması şişirilirse tavan aşılır ve kapı kırmızı verir', () => {
+    const k = kopya()
+    const satir = k.setler.find((x) => x.uret)
+    if (!satir) throw new Error('üretilen satır yok')
+    const cikti = uretici.uret(k)
+    const [ilkDosya] = Object.keys(cikti)
+    cikti[ilkDosya] = cikti[ilkDosya].replace(/^description:\s*(.*)$/m, (_m, d: string) => `description: ${d}${' x'.repeat(2000)}`)
+    expect(maliyetKarakter(cikti)).toBeGreaterThan(TAVAN_KARAKTER)
+  })
+})

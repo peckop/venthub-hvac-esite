@@ -22,7 +22,7 @@ metadata:
 
 1. **Kimlik** yalnız `tools/wrongstack-mcp/posta-kutusu.cjs` sarmalayıcısından gelir. `.mcp.json`'a `--actor` ya da `${...}` yer tutucusu yazılmaz (genişlemiyor, bütün pencereler aynı kimliğe düşüyor).
 2. **Posta alıcısı** daima TAM oturum kimliğidir (36 karakter). 8 haneli kısa kimliğe giden mesaj hata vermeden kaybolur.
-3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz.
+3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz. **Gövdedeki örnek yapılandırma bloğu `--admin` içerir: aynen KOPYALANMAZ**; `.mcp.json` yalnız `posta-kutusu.cjs` sarmalayıcısını çağırır (kural 1).
 4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir.
 5. `*_watch` çağrısı kanıt değildir; durum `mailbox_read` / `kanban_read` ile okunarak doğrulanır.
 6. Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır; karttaki bilgi Linear'ı geçersiz kılmaz.

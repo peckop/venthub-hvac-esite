@@ -12,7 +12,7 @@ Claude Design ile site arasındaki köprü: Design kararlarını kayda geçirir,
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-`src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yalnız yazı tipi), `docs/plans/tasarim-kod-plani-v2-*` (dosya kümesi plan önerisidir, karar değil). Sahiplik adayı cetveller (OPS onaylar): tasarım dili ve marka token eşlemesi (bugün URUN).
+`src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yalnız yazı tipi), `docs/plans/tasarim-kod-plani-v2-*` (dosya kümesi plan önerisidir, karar değil). Sahibi olduğu cetvel (OPS onaylı devir, 2026-09-30): marka token eşlemesi (önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN'da kalır.
 
 ## Yetki
 Faz 2a (görünmez token köprüsü), Faz 2b (görünüm dönüşü, Recep "olur"undan sonra) ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.

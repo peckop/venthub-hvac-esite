@@ -99,6 +99,7 @@ function uret(setler) {
 /**
  * Üretim kuralı ihlalleri (yazım hatası ve sessiz sapma kapısı):
  *   - her `uret: true` satırının en az bir `onYukle` skill'i vardır (boş onYukle'li satır uret:false olmalıdır);
+ *   - BAĞLAM MALİYETİ (ölçüm 2026-10-01): tanım başına ~96 jeton, 50 tanım ≈ 4,8k; her oturumun ve her alt ajanın ilk çağrısında bir kez; tavan 6k jeton (INV-AJAN-TANIM-1 karakter karşılığıyla ölçer), aşan yeni tür OPS'a gider;
  *   - bir sette en çok `enFazlaOnYukle` skill ve `onYuklemeButceKB` KB (YETENEK ölçütü);
  *   - ön yüklenen skill adı etkin ağaçta (`.claude/skills/<ad>/SKILL.md`) ya da `kullaniciDuzeyi` listesinde vardır.
  * @param {object} setler
