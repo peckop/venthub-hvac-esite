@@ -18,7 +18,15 @@ export function normalizeOrderStatus(status: string | null | undefined): string 
   return s === 'confirmed' ? 'paid' : s
 }
 
-const LABEL_KEYS: Record<string, string> = {
+/**
+ * Düz nesne araması `constructor` / `__proto__` / `toString` gibi durumlarda prototip üyesini
+ * döndürür (`??` yakalamaz, `t()`'ye fonksiyon gider). Yalnız nesnenin KENDİ anahtarları geçerlidir.
+ */
+function ownLookup(table: Readonly<Record<string, string>>, key: string): string | undefined {
+  return Object.hasOwn(table, key) ? table[key] : undefined
+}
+
+const LABEL_KEYS: Readonly<Record<string, string>> = {
   pending: 'orders.pending',
   paid: 'orders.paid',
   processing: 'orders.processing',
@@ -31,10 +39,10 @@ const LABEL_KEYS: Record<string, string> = {
 
 /** Bilinmeyen durum ham basılmaz: nötr etiket anahtarı döner. */
 export function orderStatusLabelKey(status: string | null | undefined): string {
-  return LABEL_KEYS[normalizeOrderStatus(status)] ?? 'orders.statusUnknown'
+  return ownLookup(LABEL_KEYS, normalizeOrderStatus(status)) ?? 'orders.statusUnknown'
 }
 
-const BADGE_CLASSES: Record<string, string> = {
+const BADGE_CLASSES: Readonly<Record<string, string>> = {
   pending: 'bg-yellow-100 text-yellow-800',
   paid: 'bg-blue-100 text-blue-800',
   processing: 'bg-amber-100 text-amber-800',
@@ -45,7 +53,7 @@ const BADGE_CLASSES: Record<string, string> = {
 }
 
 export function orderStatusBadgeClass(status: string | null | undefined): string {
-  return BADGE_CLASSES[normalizeOrderStatus(status)] ?? 'bg-gray-100 text-gray-800'
+  return ownLookup(BADGE_CLASSES, normalizeOrderStatus(status)) ?? 'bg-gray-100 text-gray-800'
 }
 
 /**
@@ -57,8 +65,12 @@ export function orderStepIndex(status: string | null | undefined): number {
   return Math.max(index, 0)
 }
 
-/** Kargo ekranlarında bir siparişin gösterilen evresi. */
-export type ShipPhase = 'awaitingPayment' | 'preparing' | 'shipped' | 'delivered'
+/**
+ * Kargo ekranlarında bir siparişin gösterilen evresi.
+ * - `closed`: iptal / başarısız / iade; etiket siparişin KENDİ durumundan gelir (orders.cancelled vb.).
+ * - `unknown`: tanımadığımız durum; nötr etiket (orders.statusUnknown), ham metin basılmaz.
+ */
+export type ShipPhase = 'awaitingPayment' | 'preparing' | 'shipped' | 'delivered' | 'closed' | 'unknown'
 
 export interface ShipPhaseInput {
   status?: string | null
@@ -67,21 +79,25 @@ export interface ShipPhaseInput {
   delivered_at?: string | null
 }
 
+const CLOSED_STATUSES: readonly string[] = ['cancelled', 'failed', 'refunded']
+
 /**
- * Kargo evresi. Kargo işareti (teslim/kargo tarihi, takip no, sipariş durumu) her zaman önceliklidir;
- * kargo işareti yoksa yalnız ödemesi alınmış siparişler "hazırlanıyor" sayılır. Ödenmemiş ya da
- * iptal/başarısız sipariş "Hazırlanıyor" gösterilmez.
+ * Kargo evresi. Sırayla: kapanmış sipariş (iptal/başarısız/iade) her şeyden önce gelir; sonra kargo
+ * işareti (teslim/kargo tarihi, takip no, durum); sonra ödemesi alınmış sipariş "hazırlanıyor";
+ * yalnız `pending` "ödeme bekleniyor". Tanınmayan durum "unknown" olur, "Hazırlanıyor" gösterilmez.
  */
 export function shipPhase(row: ShipPhaseInput | undefined | null): ShipPhase {
   if (!row) return 'awaitingPayment'
   const status = normalizeOrderStatus(row.status)
+  if (CLOSED_STATUSES.includes(status)) return 'closed'
   if (row.delivered_at || status === 'delivered') return 'delivered'
   if (row.shipped_at || row.tracking_number || status === 'shipped') return 'shipped'
   if (status === 'paid' || status === 'processing') return 'preparing'
-  return 'awaitingPayment'
+  if (status === 'pending') return 'awaitingPayment'
+  return 'unknown'
 }
 
-/** Kargo adım çubuğu: ödeme bekleyen siparişte hiçbir adım aktif değildir. */
+/** Kargo adım çubuğu: ödeme bekleyen, kapanmış ve tanınmayan siparişte hiçbir adım aktif değildir. */
 export function shipPhaseStepIndex(phase: ShipPhase): number {
   switch (phase) {
     case 'delivered':

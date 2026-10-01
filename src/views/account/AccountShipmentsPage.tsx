@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, Copy, ExternalLink, MapPin,Package, Truck } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, Copy, ExternalLink, MapPin,Package, Truck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -11,7 +11,7 @@ import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
-import { type ShipPhase, shipPhase, shipPhaseStepIndex } from '../../utils/orderStatusDisplay'
+import { orderStatusLabelKey, type ShipPhase, shipPhase, shipPhaseStepIndex } from '../../utils/orderStatusDisplay'
 import { siparisNoGoster } from '../../utils/siparisNo'
 
 interface ShipmentRow {
@@ -116,7 +116,7 @@ export default function AccountShipmentsPage() {
   // Kargo evresi ortak yardımcıdan gelir (URN-1): ödenmemiş sipariş "Hazırlanıyor" görünmez.
   const getShipStatus = (row: ShipmentRow): ShipPhase => shipPhase(row)
 
-  const getShipStatusBadge = (status: ShipPhase) => {
+  const getShipStatusBadge = (status: ShipPhase, orderStatus?: string | null) => {
     switch (status) {
       case 'delivered':
         return (
@@ -134,6 +134,19 @@ export default function AccountShipmentsPage() {
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
             <Clock className="w-3.5 h-3.5" /> {t('account.shipments.statusPreparing')}
+          </span>
+        )
+      case 'closed':
+        // İptal / başarısız / iade: etiket siparişin kendi durumundan gelir.
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-red-50 text-red-700 border border-red-200 shadow-sm">
+            <AlertTriangle className="w-3.5 h-3.5" /> {t(orderStatusLabelKey(orderStatus))}
+          </span>
+        )
+      case 'unknown':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-clean-white text-steel-gray border border-light-gray shadow-sm">
+            <Clock className="w-3.5 h-3.5" /> {t('orders.statusUnknown')}
           </span>
         )
       default:
@@ -254,7 +267,7 @@ export default function AccountShipmentsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {getShipStatusBadge(shipStatus)}
+                      {getShipStatusBadge(shipStatus, o.status)}
                       <button
                         onClick={() => router.push(Routes.account.orderDetail(o.id))}
                         className="h-8 px-3 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 hover:border-primary-navy hover:text-primary-navy rounded-lg transition-shadow shadow-sm"
