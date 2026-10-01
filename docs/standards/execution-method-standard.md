@@ -52,7 +52,7 @@
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
 | "Neyi silebiliriz, vizyona sadık mı" | **prd-complexity-audit** | Bug avı | `docs/audits/` |
 | RLS / politika / migration yazımı | **supabase-security** + plan-challenger | — | migration + INV |
-| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Linear kayıt gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Linear kaydı + `docs/plans/` |
+| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Kanban kartı gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Linear kaydı + `docs/plans/` |
 | Küçük **tek dosya**, tek PR, net iş | **Elle** (müdür modelinin tek istisnası, §10) | Tek dosyayı aşınca müdür modeli: böl, çalışana ver, denetle · **kapsam kararı gerekiyorsa PLAN MODU** (bu sınıf 2026-09-07'ye kadar yanlışlıkla "elle" sayılıyordu) | PR |
 
 **Seçim ilkesi:** önce *şekli* tanı (kaç dosya? salt-okuma mı yazım mı? yargı mı tarama mı? kaç gün?),

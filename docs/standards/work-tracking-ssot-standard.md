@@ -1,4 +1,4 @@
-> ⛔ **YÜRÜRLÜK (2026-08-26): SSOT = Linear.** Aşağıdaki **Model A / Orion Registry / Model B / KIBridge**
+> ⛔ **YÜRÜRLÜK (2026-10-01, karar 219): SSOT = Kanban** (2026-08-26'dan 10-01'e kadar Linear; Linear artık donuk arşiv). Aşağıdaki **Model A / Orion Registry / Model B / KIBridge**
 > hükümleri **TARİHÇEDİR, uygulanmaz** → yürürlükteki cetvel: `docs/standards/is-kayit-duzeni-standard.md` (§1 katman
 > haritası). Orion registry = donmuş **salt arşiv** (REC-42/REC-53). Bu dosyada hiçbir hüküm canlı iş takibini
 > yönetmez; çelişkide is-kayit-duzeni kazanır. (Not tarihi: OPS 2026-09-04; başa taşıma + netleştirme OPS 2026-09-06.)
@@ -71,10 +71,15 @@ standart/plan docs · `CHANGELOG`/git · agent-memory. **İki+ yüzey aynı bilg
 
 Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kimde, nerede" sorusuna cevap alamıyordu; sabah Linear'da 53 kayıt "yapılıyor" görünürken gerçek sayı 3'tü) + Katalog şeridinin yığın ölçümü (203 kayıt: 58 bitti · 4 iptal · 31 aktif · 110 backlog) + Recep düzeltmesi (Mart kayıtları arşivlenmez, bağlanır). Uygulayan betik: `scripts/nlm/santiye.py` → `docs/proje-takip/santiye.md` (ad "iş dağılımı"na dönecek). Kaynak yalnız Linear; pano notu, sohbet, durum dosyası kaynak DEĞİLDİR.
 
+> **2026-10-01 (karar 219) okuma notu:** bu bölümde "Linear / kayıt / etiket" yerine **Kanban / kart / kart sahibi** okunur;
+> In Progress · Todo · In Review · Done = Kanban sütunları (`in-progress`, `todo`, `review`, `done`). Yukarıdaki
+> `santiye.py` hâlâ Linear'dan okur (veri/tarihçe sınıfı); Kanban kaynağına geçişi **HRT-3** kartıdır, o bitene kadar
+> iş dağılımı tablosu Kanban'ı yansıtmaz ve elle ölçülür. Kural metni yürürlüktedir, betik geride kalmıştır.
+
 1. **Sahiplik = etiket.** Şerit etiketleri: URUN · URUN-KATALOG · ALTYAPI · OPS · DESIGN. Etiketsiz kayıt SAHİPSİZ'dir ve tabloyu KIRMIZI yapar; proje sessizce sahip yapmaz (09-07 ölçümü: proje ölçütü Katalog'a 8 iş sayıyordu, gerçek 1).
-2. **Şerit başına "yapılıyor" (In Progress) ≤ 1, "sırada" (Todo) ≤ 3.** Aşım KIRMIZI; şerit Linear'ı gerçek duruma çekmeden yeni iş almaz. "Recep kapısı" etiketli kayıt "yapılıyor" limitinden muaftır (bekleyen Recep'tir, şerit değil).
+2. **Şerit başına "yapılıyor" (In Progress) ≤ 1, "sırada" (Todo) ≤ 3.** Aşım KIRMIZI; şerit Kanban'ı gerçek duruma çekmeden yeni iş almaz. "Recep kapısı" etiketli kayıt "yapılıyor" limitinden muaftır (bekleyen Recep'tir, şerit değil).
 3. **"Teslim" = In Review:** iş bitti, PR açık, yalnız merge bekler. Merge olmadan Done denmez (iş master'da yoktur). Merge olunca Done.
-4. **Durum değişikliği panoya yazılmaz, Linear'da YAPILIR.** Pano notu REC numarası taşır; taşımayan not iş sayılmaz.
+4. **Durum değişikliği claim panosuna yazılmaz, Kanban kartında YAPILIR.** Pano notu kart numarasını (`<KISA AD>-<sayı>`, tablo `is-kayit-duzeni-standard.md` §1; ya da taşınan `REC-nn`) taşır; taşımayan not iş sayılmaz. Done yalnız tek komutluk kanıtla (`is-kayit-duzeni-standard.md` §6.1).
 5. **Recep'ten bir şey bekleyen kayıt "Recep kapısı" etiketi taşır;** taşımayan görünmez ve Recep'e sunulmaz.
 6. **Kayıt açmanın bedeli:** yeni kayıt yalnız (a) canlıda ÖLÇÜLMÜŞ kusur, (b) Recep kararı, (c) aktif işin alt adımı ise açılır. "İyi olurdu" fikri yol haritası satırıdır, kayıt değil.
 7. **Bakılmadı işareti (Recep düzeltmesi 09-07: "iş varsa iştir"):** 14 gündür kimsenin bakmadığı Backlog kaydı "bakılmadı" listesine düşer (§8 tablo). Bu bir İPTAL mekanizması DEĞİLDİR; sahibine "bir bak" işaretidir. Gerekçe yazma zorunluluğu yok; yorum/gövde spreyi yapılmaz. Ölçüt son yorum / PR eki / açılış tarihi (updatedAt, startedAt, completedAt DEĞİL: etiket, bakım ve durum gezdirme saati sıfırlamaz). İptal yalnız Recep sözüyle.

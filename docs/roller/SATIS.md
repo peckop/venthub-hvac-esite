@@ -45,12 +45,12 @@ CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: t
 
 ## Çalışma düzeni
 - Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).
-- Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.
-- PR = `Fixes REC-nn` (alt kaydının); birden fazla PR'lık iş her biri tek PR'la biten alt kayıtlara bölünür; kayıtsız iş yalnız PR gövdesinde `Kayıtsız: <sebep>` satırıyla (karar 187).
+- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear donuktur (karar 219): yeni iş kaydı açılmaz.
+- PR gövdesi `Kanban: <numara>` taşır (2026-10-08'e kadar `Fixes REC-nn` de kabul); çok PR'lık iş her biri tek PR'la biten alt kartlara bölünür; kartsız iş yalnız `Kayıtsız: <sebep>` satırıyla (karar 187, 219).
 - Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz, frontmatter `metadata.originSessionId` = TAM oturum kimliği (8 hane değil); compact öncesi güncelle; dört alan: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa compact kapısı durdurur).
 - Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.
-- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano; hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.
+- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.
 - Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.
-- Recep'e her durum mesajı TEK TABLO ile başlar (`| No: REC bağlantısı · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).
+- Recep'e her durum mesajı TEK TABLO ile başlar (`| No: Kanban numarası (taşınan REC-nn korunur) · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).
 - Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.
 - CLAUDE.md'deki 14 mutlak kural her role geçerlidir.

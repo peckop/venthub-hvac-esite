@@ -15,10 +15,10 @@
 | Kod + **veritabanı** ilişkisi (tablo, FK, sembol toplulukları) | **graphify** + Supabase şema grafı (`graphify query/path/explain`) | `graphify-out/` üretilmiştir; kurulum ve kural `../CLAUDE.md` "graphify" |
 | Kod içinde metin/sembol araması | **WrongStack kod dizini** (MCP `wrongstack-codebase-index`) | dizin elle tazelenir; yaşı ölçülmeden güvenme |
 | Bir dosyaya dokununca geçmiş ders | **sage** (kanca dosyaya dokununca kendiliğinden getirir) | `standards/hafiza-kancalari-standard.md` §6 |
-| "Konuşmuş muyduk / ne karar vermiştik / niçin" | NotebookLM takip defteri `a5f382a4-b4e7-450c-84e0-9b7c082e2502` + Linear "Kararlar" belgesi | `standards/proje-takip-defteri-standard.md` |
+| "Konuşmuş muyduk / ne karar vermiştik / niçin" | NotebookLM takip defteri `a5f382a4-b4e7-450c-84e0-9b7c082e2502` + Linear "Kararlar" belgesi (REC-554'e kadar; sonra dosya) | `standards/proje-takip-defteri-standard.md` |
 | Kural / niçin / mimari (kod hafızası) | NotebookLM dijital ikiz `235043eb-970f-4a52-9f39-1d02b2621e9c` | snapshot'tır; çelişirse kod kazanır |
 | Bütün belgelerde tarama | NotebookLM "VentHub Belgeler" `f503a886-3e2f-4234-8455-ee57c66f9488` | tek başına güvenilmez; bulgu dosyada doğrulanır |
-| İş ne durumda, kimde? | **Linear** (iş kaydının tek kaynağı) | `standards/is-kayit-duzeni-standard.md` |
+| İş ne durumda, kimde? | **Kanban** (WrongStack panoları; iş kaydının tek kaynağı, karar 219; Linear donuk arşiv) | `standards/is-kayit-duzeni-standard.md` |
 | Ajanın kalıcı dersleri | hafıza dizini `MEMORY.md` (depo dışı, oturum açılışında yüklenir) | `standards/hafiza-kancalari-standard.md` |
 | Hafızaya ya da talimat dosyasına (`CLAUDE.md`, rol kartı) kim, nereye yazabilir? Günlük dosyası nerede durur? | katmanlı model: ortak çekirdek (OPS onaylı) + departman klasörü + ayrı günlük klasörü | `standards/hafiza-yazma-duzeni-standard.md` |
 | Belge / harita ne kadar taze? | her mesajdaki durum satırları; elle: `node scripts/belge/belge-tazelik.cjs` | `standards/belge-yonetimi-standard.md` B5 |
@@ -82,14 +82,14 @@
 | Cetvel (kural + kapı) | `standards/*.md` | Başlıkta `Sahibi:` ya da `roller/cetvel-sahipligi.md` tablosu (rol kartlarından türetilmiş) | `belge-tazelik`: sahip eksik ve doğrulama eksik AYRI sayılır (taban yalnız küçülür) |
 | Rol kartı (görev, dosya, yetki, Recep kapıları) ve rolün kural özetleri | `roller/<DEPARTMAN>.md`, `roller/<DEPARTMAN>-kurallar.md` | HARİTA üretir, OPS onaylar | Üreticiyle bire bir aynılık ve 31 kuralın sayım testi (INV-ROL-1) |
 | Ölçüm / denetim kaydı | `audits/*.md` | Ölçümü yapan departman | Tarihi dosya adında; eski ölçüm yeni ölçümün yerine geçmez |
-| Plan / yol haritası | `plans/*.md` | İşi yürüten departman | Karar Linear'da, plan yalnız yöntem; bayat plan arşive |
+| Plan / yol haritası | `plans/*.md` | İşi yürüten departman | Karar "Kararlar" belgesinde (Linear, REC-554'e kadar), plan yalnız yöntem; bayat plan arşive |
 | Çekirdek belge (CLAUDE.md, bu harita) | kök, `docs/README.md` | HARİTA (CLAUDE.md değişikliği OPS kapısı) | Her mesajdaki `BELGE` satırı; kırık yol kapısı (INV-BELGE-1) |
 | Üretilmiş master | `docs/*_master.md`, `roller/cetvel-sahipligi.md` | Üretici betik | Elle düzenleme yok; üretici çıktısıyla aynılık testi |
 | Arşiv (tarihsel) | `archive/**` | — | Yürürlükte DEĞİL; yönlendirme sayfası asıl belgeyi gösterir |
 
 ## Şu anki geliştirme adımı (takip)
 
-İş durumu için tek kaynak **Linear projeleri**; kim hangi dosyada çalışıyor sorusu için WrongStack panosu
+İş durumu için tek kaynak **Kanban panoları** (karar 219; Linear 2026-10-01'den beri donuk arşiv); kim hangi dosyada çalışıyor sorusu için WrongStack claim panosu
 (`node scripts/board/board.cjs who`). `DURUM-TAKIP.md` 2026-09-29'da emekli edildi (yönlendirme sayfası; eski metin
 `archive/DURUM-TAKIP-2026-09-17.md`, tarihsel).
 

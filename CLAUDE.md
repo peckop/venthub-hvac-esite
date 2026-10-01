@@ -62,8 +62,8 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
-   **İş emri de aynı kurala tabidir (2026-08-20):** Linear'da açılan her görevin
-   açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
+   **İş emri de aynı kurala tabidir (2026-08-20):** Kanban'da açılan her kartın (iş emri;
+   Linear 2026-10-01'den beri donuktur, karar 219) açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
    karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
    Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
    cetvel var mı" diye SORAR. (Niçin: 2026-08-20'de ERP yetenek çerçeveleri zaten yazılıyken
@@ -116,7 +116,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 
 **Nereye bakılacağını bilmiyorsan önce `docs/README.md`'yi aç.** Orada iki tablo var: "haritaların haritası"
 (kod → CodeGraph, kod + veritabanı → graphify + şema grafı, metin arama → WrongStack dizini, dosya dersi → sage,
-geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Linear, tazelik → durum satırları) ve
+geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar), iş durumu → Kanban, tazelik → durum satırları) ve
 "hangi soru → hangi cetvel". Yeni cetvel oraya satırı eklenmeden bitmiş sayılmaz. Belge bayatlığı her mesajdaki
 `BELGE` satırında görünür (`docs/standards/belge-yonetimi-standard.md`).
 
@@ -124,7 +124,7 @@ geçmiş karar → NotebookLM takip defteri + Linear Kararlar, iş durumu → Li
 
 - `CONTEXT.md` — **EMEKLİ (2026-09-29)**: yerinde yönlendirme sayfası; eski metin `docs/archive/`. Bilgi için `docs/README.md`.
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
-- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` **EMEKLİ (2026-09-29)** — canlı durum = Linear projeleri + pano (`board.cjs who`).
+- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` **EMEKLİ (2026-09-29)** — canlı durum = Kanban panoları + claim panosu (`board.cjs who`); Linear donuk arşiv.
 - `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
   skill / elle): karar tablosu + emirde `YÖNTEM:` satırı (öneri; sapma yazılır). Yöntemsiz emir eksik emirdir.
 - `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne

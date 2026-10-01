@@ -9,7 +9,7 @@
 | Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
 |---|---|---|
 | Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
-| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Emir | pano notu / sıralı emir | **Kanban kartı** (karar 219) — Recep sözü **önce karta** (tırnak + pencere + saat), sonra şeride emir |
 | Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
 | Uyanma | cron + tur-sonu `ScheduleWakeup` | eski üçlü **EMEKLİ** · uyandırma = mesaj. ⚠**Karar 53 (2026-09-19):** cron / zamanlayıcı / loop genel olarak yasak **değil** — dönemsel bir karardı; gerekiyorsa **önce Recep'le konuşulur** |
 | Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
@@ -102,7 +102,7 @@ bakılarak söylenir.
 
 Recep'in sözü: *"ihtiyaç halinde birbirine yazabilmeli, işlerini bırakıp değil, iş gereği; sorumlulukların bilincinde olmalıyız."* OPS aracı değildir; pencereler `SendMessage` ile doğrudan konuşur. Kurallar:
 
-1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Linear numarası yazılı.
+1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Kanban numarası yazılı.
 2. **İş bırakılmaz:** alan sahibi elindeki adımı bitirir, sonra kısa cevap verir; gerekirse kendi kuyruğuna kart açar.
 3. **OPS'a da tek satır:** sıra/öncelik değiştiren, başkasının dosyasına dokunan ya da karar isteyen her şey. Pencereler kendi aralarında karar vermez; Recep'e soru dolaştırılmaz.
 4. **Açılışta claim alınır:** claim'siz pencere panoda "kapalı" görünür ve yazışma adresi belirsizleşir.

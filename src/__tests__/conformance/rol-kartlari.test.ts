@@ -331,7 +331,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(uretici.sorunlar(opsOrtak).some((s) => s.startsWith('OPS: ortak blok'))).toBe(true)
   })
 
-  it('OPS kartı karar kaynağı kuralını taşır (fleet §29: karara giden sayı betikten gelir, kaynak Linear kaydında)', () => {
+  it('OPS kartı karar kaynağı kuralını taşır (fleet §29: karara giden sayı betikten gelir, kaynak Kanban kartında)', () => {
     expect(uretilen.OPS).toContain('kaynağı (betik + çıktı + tarih)')
     expect(uretilen.OPS).toContain('karar tablosunda kaynak sütunu yoktur')
   })
@@ -375,10 +375,19 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(fs.existsSync(path.join(KOK, 'docs/olcum/erisim-envanteri.md'))).toBe(true)
   })
 
-  it('karar 187: her kartta PR = Fixes REC-nn (alt kayıt), istisna yalnız Kayıtsız: <sebep>', () => {
+  it('karar 219: her kartta PR gövdesi `Kanban: <numara>` taşır, geçiş penceresinde Fixes de kabul, istisna yalnız Kayıtsız: <sebep>', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
-      expect(metin, ad).toContain('PR = `Fixes REC-nn`')
+      expect(metin, ad).toContain('PR gövdesi `Kanban: <numara>`')
+      expect(metin, ad).toContain('`Fixes REC-nn` de kabul')
       expect(metin, ad).toContain('`Kayıtsız: <sebep>`')
+    }
+  })
+
+  it('karar 219/220: hiçbir kart Linear\'ı iş kaydı olarak şart koşmaz; numara biçimi <KISA AD>-<sayı>', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('`<KISA AD>-<sayı>`')
+      expect(metin, ad).not.toContain('Linear kaydı (REC-nn)')
+      expect(metin, ad).not.toContain('iş durumu için Linear')
     }
   })
 
