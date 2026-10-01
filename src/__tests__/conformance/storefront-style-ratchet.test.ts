@@ -246,7 +246,7 @@ const RATCHETS: Ratchet[] = [
   },
   {
     ad: 'keyfi w/h/text/gap-[...] (kural 8)',
-    tavan: 6,
+    tavan: 5,
     say: () =>
       countMatches(/\b(?:w|h|max-w|min-h|min-w|max-h|text|gap|top|left|right|bottom)-\[[^\]]+\]/g),
     gerekce: 'Arbitrary Tailwind değeri yasak; tokens.js kullan.',

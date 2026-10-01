@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { yasalBaslik } from '@/config/legal'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return sayfaUstVerisi({
     lang,
     yol: Routes.legal.kvkk(),
-    baslik: `${dict.legal.kvkkTitle} | VentHub`,
+    baslik: `${yasalBaslik(dict.legal.kvkkTitle)} | VentHub`,
     aciklama: dict.legal.seo.kvkk,
   })
 }

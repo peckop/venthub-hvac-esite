@@ -12,6 +12,7 @@ import legalConfig, {
   legalGorunumTr,
   SATIS_ICIN_ZORUNLU_SATICI_ALANLARI,
   satisIcinEksikSaticiAlanlari,
+  yasalBaslik,
 } from '../../config/legal'
 import { odemeKarari } from '../../lib/kip/odemeKapisi'
 import { CookiePolicyContentEn } from '../../views/legal/components/en/CookiePolicyContent'
@@ -81,6 +82,43 @@ describe('INV-SATIS-KIPI-6: ödeme adımı satıcı bilgisi olmadan açılmaz', 
     const sayfa = oku('src/app/[lang]/checkout/page.tsx')
     expect(sayfa, 'checkout odemeKarari() çağırmıyor').toMatch(/odemeKarari\(/)
     expect(sayfa, 'ödeme adımı hâlâ yalnız anahtara bağlı: satıcı bilgisi kapısı atlanır').not.toMatch(/kip\.acik\s*\?/)
+  })
+})
+
+/**
+ * INV-LEGAL-BASLIK-1 (REC-492, OPS hükmü 2026-09-30): yasal sayfa başlığındaki "(Taslak)"/"(Draft)" eki metin HAZIR olana
+ * kadar KALIR, hazır olunca `<title>` ve H1'den kendiliğinden kalkar (taslak uyarı bandıyla AYNI koşul). KORUDUĞU KUSUR:
+ * ibarenin elle kaldırılması onaylanmamış hukuki metni onaylı gösterirdi; ya da teyit gelince ibare unutulur, sayfa
+ * sonsuza dek "taslak" görünürdü. Ölçmediği: hukukçunun gerçekten teyit ettiği (bayrağı çeviren PR'ın gövdesi).
+ */
+describe('INV-LEGAL-BASLIK-1: taslak ibaresi yasal hazır koşuluna bağlı', () => {
+  it('bugün (hazır DEĞİL) ibare KALIR; hazır olunca iki dilde kalkar', () => {
+    expect(yasalBaslik('KVKK Aydınlatma Metni (Taslak)')).toBe('KVKK Aydınlatma Metni (Taslak)')
+    // "Hazır" = teyit VAR ve hiçbir alan yer tutucu değil (tüm köşeli yer tutucular doldurulur).
+    const doldurulmus = Object.fromEntries(
+      Object.entries(legalConfig).map(([a, d]) => [a, typeof d === 'string' && /^\[[A-Z0-9_]+\]$/.test(d) ? `Dolu ${a}` : d]),
+    )
+    const hazir = { ...doldurulmus, legalReviewCompleted: true } as unknown as typeof legalConfig
+    expect(yasalBaslik('KVKK Aydınlatma Metni (Taslak)', hazir)).toBe('KVKK Aydınlatma Metni')
+    expect(yasalBaslik('KVKK Clarification Text (Draft)', hazir)).toBe('KVKK Clarification Text')
+  })
+
+  it('hukukçu teyidi tek başına yetmez: yer tutucu doluysa (satıcı bilgisi eksik) ibare KALIR', () => {
+    const teyitliAmaEksik = { ...legalConfig, legalReviewCompleted: true } as typeof legalConfig
+    expect(yasalBaslik('Çerez Politikası (Taslak)', teyitliAmaEksik)).toBe('Çerez Politikası (Taslak)')
+  })
+
+  it('altı yasal rota üst verisi ve altı görünüm H1\'i başlığı `yasalBaslik` üzerinden alır (ham sözlük başlığı kalmadı)', () => {
+    const rotalar = ['cerez-politikasi', 'gizlilik-politikasi', 'kullanim-kosullari', 'kvkk', 'mesafeli-satis-sozlesmesi', 'on-bilgilendirme-formu']
+    for (const r of rotalar) {
+      const kaynak = oku(`src/app/[lang]/legal/${r}/page.tsx`)
+      expect(kaynak, `${r}: generateMetadata başlığı yasalBaslik'ten geçmiyor`).toMatch(/baslik:\s*`\$\{yasalBaslik\(dict\.legal\.\w+Title\)\}/)
+    }
+    const gorunumler = ['CookiePolicyPage', 'DistanceSalesAgreementPage', 'KVKKPage', 'PreInformationPage', 'PrivacyPolicyPage', 'TermsOfUsePage']
+    for (const g of gorunumler) {
+      const kaynak = oku(`src/views/legal/${g}.tsx`)
+      expect(kaynak, `${g}: H1 yasalBaslik'ten geçmiyor`).toMatch(/yasalBaslik\(t\('legal\.\w+Title'\)\)/)
+    }
   })
 })
 

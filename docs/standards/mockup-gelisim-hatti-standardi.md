@@ -12,7 +12,7 @@ Her mockup yayını bir sürüm defteri satırı taşır: **özellik envanteri**
 `ÖZELLİK → YENİ / VAR / DEĞİŞTİ(gerekçe) / DÜŞTÜ(gerekçe + onay)`.
 
 - Defter iki yerde yaşar: (a) mockup sayfasının altında görünür blok (Recep süreci sayfadan
-  izler), (b) ilgili Linear kaydında (kalıcı iz).
+  izler), (b) ilgili Kanban kartında (kalıcı iz).
 - **Hiçbir özellik sessizce düşmez.** Düşürme ancak gerekçe + Recep onayı ile olur; "yalın
   konsept kanıtı" gibi amaç daraltmaları bile defterde "DÜŞTÜ (bilinçli, geri gelecek)" satırı ister.
 - Yeni sürüm çizilirken önceki sürümün envanteri **ölçülerek** (dosyadan grep/inceleme,

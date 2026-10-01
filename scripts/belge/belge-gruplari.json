@@ -1,0 +1,87 @@
+{
+  "_aciklama": "belge-defteri.cjs grup kuralları (REC-473). 'VentHub Belgeler' NotebookLM defterinin kaynak dosyaları bu kurallarla üretilir. Sıra önemli: ilk eşleşen kural kazanır. Yeni belge hiçbir kurala uymazsa 'atanmamis' grubuna düşer ve uyarı basılır.",
+  "defter": "f503a886-3e2f-4234-8455-ee57c66f9488",
+  "dosya_oneki": "venthub-belgeler-",
+  "klasor_tur": {
+    "docs/standards": "kural",
+    "docs/plans": "plan",
+    "docs/audits": "olcum",
+    "docs/reference": "basvuru",
+    "docs/research": "arastirma",
+    "docs/legal": "kural",
+    "docs/products": "basvuru",
+    "docs/olcum": "olcum",
+    "docs/roller": "kural"
+  },
+  "kok_dosyalar": [
+    "CLAUDE.md",
+    "CONTEXT.md",
+    "PROJECT.md",
+    "README.md",
+    "docs/README.md",
+    "docs/DURUM-TAKIP.md",
+    "docs/recep-komut-rehberi.md",
+    "RECOMMENDATIONS.md"
+  ],
+  "cekirdek_grup": "01 Çekirdek ve harita",
+  "yol_oneki_grup": {
+    "docs/reference/supabase/": "05 Veritabanı, migration, RLS, güvenlik",
+    "docs/olcum/": "03 Ölçüm, kanıt, kapı disiplini",
+    "docs/roller/": "02 Çalışma yöntemi, filo, iş kaydı"
+  },
+  "ad_oneki_grup": {
+    "rec340": "09"
+  },
+  "elle": {
+    "docs/audits/canliya-alma-hazirlik-2026-08-15.md": "12 SaaS, yol haritası, stratejik plan",
+    "docs/audits/rec340-karar59-olcum/README.md": "09",
+    "docs/audits/rec347-dort-soru-2026-09-16.md": "03 Ölçüm, kanıt, kapı disiplini",
+    "docs/legal/en-yasal-ceviri-inceleme-2026-06-16.md": "11 Mevzuat, yasal, AVenS",
+    "docs/plans/README.md": "01 Çekirdek ve harita",
+    "docs/standards/SOURCES.md": "01 Çekirdek ve harita",
+    "docs/standards/belge-yonetimi-standard.md": "01 Çekirdek ve harita",
+    "docs/products/AIR_DOOR_AD_900_MASTER.md": "06",
+    "docs/reference/vortice_catalogs.md": "06"
+  },
+  "kural": [
+    ["02 Çalışma yöntemi, filo, iş kaydı", "collaboration|execution-method|fleet|multi-session|session-loop|subagent|work-tracking|is-kayit|settled-work|proje-takip|pano-orion|hafiza-kancalari|operasyon-dongusu|oturum-devir|registry-triyaj|kacirma-listesi|karar-kayit|t139-gun-sonu|gelistirme-kurallari"],
+    ["03 Ölçüm, kanıt, kapı disiplini", "measurement|hukum-kaynak|vaat|uretilmis-artefakt|t104-vaat|investigate|evren-muhafizi|rec162|rec336|rec352|vibe-coding|teknik-bosluk|model-kiyas|ocr-kiyas|rec363"],
+    ["04 Araçlar, skill, CI, bağımlılık", "arac-envanteri|skill|gstack|graphify|kod-grafigi|mcp-bellek|claude-mem|ci-runner|deploy-build|build-skip|bagimlilik|dependency|runtime-version|rec313|rec314|rec315|rec319|rec326|rec327|rec333|rec176|rec348|companion|document-numbering|izin-kapilari"],
+    ["05 Veritabanı, migration, RLS, güvenlik", "migration|ledger-ve-olu|db-grant|rls|yetki|edge-function-security|csp|secret|sir-ekrana|tenant|t101|t134|rec321|rec335|rec296|rec52|sema-graf|denetim-izi|rec292|kasa-ve-siralama|locale-kasa|vuln"],
+    ["06 Katalog ve içerik hattı: kurallar", "catalog-ingestion|catalog-depth|katalog-sayim|product-schema|spec-axis|category-taxonomy|kategori-adlandirma|csv-import|aile-metni|product-image|urun-yapisal|matris|catalog-commerce|f5b-family|urun-kimlik|kategori-esleme|kategori-gorsel|rec146|rec172|rec108|rec357|rec124|rec140|rec158|dealer-data|matris-sutun|fiyatsiz|aile-adi|t099|t119|t138|t140|t143|t146|t162|t077|urun-veri-fark|katalog-karnesi|t139-urun|rec442|category-images"],
+    ["07 İçerik hattı: ölçümler ve taslaklar", "icerik-hatti"],
+    ["08 Fiyat, ödeme, sipariş, teklif", "pricing|fiyat|checkout|payment|odeme|quote|teklif|rec117|rec355|t080|t114|t116|t132|purchasing|t128|t129|satis-kipi|rec168|satis-acilis"],
+    ["09 Vitrin: tasarım, render, adres, SEO, dil", "storefront|rendering|render|canonical|adres|slug|seo|geo-olcum|yayin-gorunurluk|arama|vitrin|i18n|localization|tasarim|marka|mockup|3d|rec300|rec59|rec369|rehber-yazisi|pazar-olcum|analytics|t021|lighthouse|t093|t150|olu-sozluk|design|rec-300"],
+    ["10 Yönetim paneli, ERP, CRM, bayi", "admin|erp|crm|dealer|j\\d+-|faz2-admin|commerce-domain|notification|email|form-submission|auth-account|customer-account|t047"],
+    ["11 Mevzuat, yasal, AVenS", "legal|mevzuat|avens|kvkk"],
+    ["12 SaaS, yol haritası, stratejik plan", "saas|roadmap|faz0|faz1|kademe2|unified-refactor|lansman|barindirma|rec129|rec340|red-team"]
+  ],
+  "bol": {
+    "06": ["06a Katalog ve ürün verisi: kurallar", "06b Katalog ve ürün verisi: plan, ölçüm, başvuru"],
+    "09": ["09a Vitrin: kurallar", "09b Vitrin: plan, ölçüm, başvuru"]
+  },
+  "tarihce": {
+    "grup": "13 Tarihçe: bitmiş/eski planlar",
+    "tur": "plan",
+    "oncesi": "2026-08-01"
+  },
+  "atanmamis": "14 Atanmamış (kural eşleşmedi)",
+  "tur_ad": {
+    "kural": "KURAL (geçerli cetvel)",
+    "plan": "PLAN",
+    "olcum": "ÖLÇÜM / DENETİM",
+    "basvuru": "BAŞVURU",
+    "arastirma": "ARAŞTIRMA",
+    "cekirdek": "ÇEKİRDEK (her oturum / harita)",
+    "diger": "DİĞER"
+  },
+  "tara_sorulari": {
+    "bicim": "Cevabı YALNIZ şu biçimde ver, her bulgu bir satır: `TÜR | BELGE A (tam yol) | BELGE B (tam yol veya -) | NE ÇELİŞİYOR/TEKRARLANIYOR/ESKİMİŞ (tek cümle, iki tarafın sözü) | HANGİSİ YENİ (tarih)`. TÜR = ÇELİŞKİ, TEKRAR, ESKİMİŞ, KIRIK ATIF. Yolu her belgenin 'BELGE:' satırından AYNEN al; tahmin etme. Emin olmadığını yazma. En fazla 25 bulgu, önem sırasıyla.",
+    "grup": "Yalnız 'VentHub Belgeler — {grup}' kaynağındaki belgeleri incele. Aynı konuda birbirine AYKIRI hüküm veren belgeleri (sayı, kural, dosya adı, süreç), aynı kuralı iki yerde tekrarlayan belgeleri ve sonradan gelen bir belgenin geçersiz kıldığı halde düzeltilmemiş eski ifadeleri bul.",
+    "capraz": [
+      ["Çapraz: çekirdek vs kurallar", "'01 Çekirdek ve harita' kaynağındaki CLAUDE.md, CONTEXT.md, README.md ve docs/README.md'nin söylediklerini diğer TÜM kaynaklardaki KURAL türü belgelerle karşılaştır: çekirdek dosyaların eskimiş, yanlış ya da cetvellerle çelişen ifadeleri neler? Var olmayan dosyaya verilen atıflar?"],
+      ["Çapraz: tarihçe hâlâ kullanılıyor mu", "'13 Tarihçe' kaynağındaki planlara diğer kaynaklardaki KURAL türü belgeler hâlâ dayanıyor mu? Hangi güncel kural eski bir plana atıf yapıyor ve o plan artık geçersiz görünüyor?"],
+      ["Çapraz: aynı konu iki grupta", "Aynı kuralın ya da sürecin FARKLI kaynaklarda (gruplarda) iki ayrı cetvelde tanımlandığı ve birbirinden farklılaştığı yerleri bul (ör. iş kaydı, migration, ölçüm disiplini, adres/slug, fiyat)."]
+    ]
+  }
+}

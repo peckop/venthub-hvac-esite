@@ -71,9 +71,17 @@ const TRANSITIONS: Record<OrderBoardStatus, readonly OrderBoardStatus[]> = {
   partial_refunded: ['refunded'],
 }
 
-/** Verilen statüden izin verilen sonraki statüler. Bilinmeyen statü → kilitli. */
+/**
+ * Verilen statüden izin verilen sonraki statüler. Bilinmeyen statü → kilitli.
+ *
+ * Kendi-anahtar denetimi KASITLI (REC-551): `TRANSITIONS[current] ?? []` yalnız
+ * null/undefined'a bakar; `'constructor'`, `'toString'`, `'__proto__'` gibi değerler
+ * nesnenin KALITSAL üyesine denk gelir, "tanımlı" sayılır ve yayma işlemi TypeError
+ * fırlatırdı. Söz "bilinmeyen statü kilitli"dir, "bilinmeyen statü çöker" değil.
+ */
 export function allowedNextOrderStatuses(current: string): OrderBoardStatus[] {
-  return [...(TRANSITIONS[current as OrderBoardStatus] ?? [])]
+  if (!Object.prototype.hasOwnProperty.call(TRANSITIONS, current)) return []
+  return [...TRANSITIONS[current as OrderBoardStatus]]
 }
 
 /** Geçiş izinli mi? Panonun sürükle-bırak kapısı ve mutasyon koruması bunu kullanır. */

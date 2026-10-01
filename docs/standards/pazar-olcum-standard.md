@@ -41,7 +41,7 @@ yapılabiliyorsa neden ücret ödeyelim").
 
 - **Değişiklik öncesi taban:** adres ağacı, şablon ya da site haritası gibi arama görünürlüğünü etkileyen
   bir yayından önce, **yayın günü** `scripts/rehber/gsc-taban.mjs` koşulur (90 gün, son 3 gün hariç;
-  sayfa×gün kırılımı dahil). Çıktı depoya değil Linear kaydına eklenir (P6). İlk taban 2026-09-24
+  sayfa×gün kırılımı dahil). Çıktı depoya değil Kanban kartına eklenir (P6; kartlar depoda izlenmez). İlk taban 2026-09-24
   (REC-369 eki); REC-300 adres yayını günü yenilenir.
 - **Veri gecikmesi:** Google'a göre veri normalde 2–3 günde gelir, son 2 günün verisi ön veridir
   (support.google.com/webmasters/answer/10083653). Haftalık koşu bu yüzden son 3 günü dışarıda bırakan
@@ -97,15 +97,15 @@ platform ve ücretli veri kaynağı alınmadı.
 | 4. Geçmiş | Haftalık anlık görüntü, zaman serisi olarak saklanır | "Şu an" değil "zaman içinde ne değişti" birinci sınıf veri |
 
 - **Salt okur, salt önerir.** Rapor siteyi değiştirmez; öneri ilgili şeride iş olarak gider.
-- **Dil:** sade Türkçe; Recep'e OPS üzerinden kısa özet, ayrıntı Linear'da.
+- **Dil:** sade Türkçe; Recep'e OPS üzerinden kısa özet, ayrıntı Kanban kartında.
 - **İzlenen 10 sayfa:** yayındaki rehber yazıları önce, sonra F1 kümelerinin karşılığı olan kategori ve ürün
-  sayfaları. Liste Linear'da tutulur; değişiklik gerekçesiyle yazılır.
+  sayfaları. Liste Kanban kartında tutulur; değişiklik gerekçesiyle yazılır.
 - **Saklama:** sorgu ve sayfa verisi PUBLIC depoya girmez (P6). Kalıcı saklama yeri (özel tablo ya da
-  Linear eki) ilk koşuda ölçülüp bu satıra yazılır.
+  özel depolama) ilk koşuda ölçülüp bu satıra yazılır.
 
 ## P6 — Depoya girmeyen veri
 
-Depo PUBLIC'tir. Şunlar depoya **girmez**, yalnız Linear kaydına ve özel depolamaya girer: arama sorgusu
+Depo PUBLIC'tir. Şunlar depoya **girmez**, yalnız Kanban kartına ve özel depolamaya girer: arama sorgusu
 listeleri, izlenen anahtar kelimeler, rakip adları ve adresleri, hacim verileri, yazı taslakları. Depoya
 yalnız özet sayılar ve yöntem girer.
 
