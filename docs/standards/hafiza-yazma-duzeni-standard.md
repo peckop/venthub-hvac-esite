@@ -11,7 +11,7 @@
 > **Kayıt:** REC-530 (çatı), REC-531 (bu cetvel). Model Recep'in onayıyla 2026-09-30 (OPS iletti); teknik kararlar OPS.
 > **Son doğrulama:** 2026-09-30 (Claude Code belge sayfaları iki araştırmacı ve işi yapmamış bir doğrulayıcıyla okundu;
 > `lane-guard.cjs`, `bash-write-guard.cjs`, `bash-write-audit.cjs`, `precompact-durum-kapisi.cjs`, `board.cjs`
-> kodu iki ayrı bağımsız okuyucuyla ve kaynaktan karşılaştırıldı; v0.3; ARAÇ'ın uygulayıcı okuması 17 kritik madde buldu, v0.4 onları işler).
+> kodu iki ayrı bağımsız okuyucuyla ve kaynaktan karşılaştırıldı; ARAÇ'ın uygulayıcı okuması 17 kritik madde buldu, v0.4 onları işledi; v0.4'ü okuyan dördüncü bağımsız okuyucu 7 engelleyici buldu, v0.5 onları işler).
 > **Kanca KURULU DEĞİL** (§10); bu cetvel şartnamedir.
 
 ---
@@ -40,12 +40,16 @@ katmanlarını yönetir.
 
 **Değerlendirme sırası ve öncelik:** kural en özel yoldan genele doğru bakılır: önce K0 (kapı dışı), sonra R9 (repo talimat dosyaları,
 hafıza yolu değildir), R6 (durum dosyası kalıbı), R5, R4, R3, R2, R1, R7, en son R8. **R10 karar verici değil, EK İZİNDİR** (v0.4, ARAÇ
-kararı 1): R10'un koşulu (geçiş süresi içinde, yazar OPS ya da HARİTA-muafiyet) sağlanıyorsa işlem, aşağıdaki normal kuraldan bağımsız **izinlidir**;
+kararı 1): R10'un koşulu (`gecis_son` tarihi içinde ve yazar tam OPS ya da şeridi HARİTA olan oturum; **tek bayrak `gecis_son`**, `harita_muafiyet_son` yalnız R9 içindir) sağlanıyorsa işlem, aşağıdaki normal kuraldan bağımsız **izinlidir**;
 sağlanmıyorsa R10 yok sayılır ve yol normal kuralına (R4, R5, R3…) düşer. Böylece geçiş boyunca URUN kendi `gunluk/URUN/`'unu ve
 şeritsiz pencere `gunluk/_sahipsiz/<sid>.md`'yi yazabilir. Normal kurallarda ilk eşleşen kural karar verir; başka kurala düşülmez.
-**Dizin ya da `*` hedefi** (örn. `rm -rf gunluk/URUN`, `mv gunluk arsiv/`, `departman/*/x`): statik önek genişletmesiyle bakılır (dosya sistemi
-taranmaz); altındaki yolların **en kısıtlısının** kuralı uygulanır. `gunluk/URUN` dizin hedefi R4'e düşer ve R4 OPS dahil kimseye izin vermez;
-temizlik istisnası (aşağıda) yalnız **tek dosya** hedefinde geçerlidir, dizin hedefinde geçmez.
+**Dizin ya da `*` hedefi** (örn. `rm -rf gunluk/URUN`, `mv gunluk arsiv/`, `departman/*/x`): **statik önek genişletmesi** (v0.5 algoritma; dosya sistemi
+taranmaz): (1) hedefin ilk `*` segmentinden önceki kısım statik önektir; `*` içermeyen dizin hedefi için hedefin kendisi önektir. (2) `*` bir **ROL segmentine** denk geliyorsa
+(`departman/*/…`, `gunluk/*/…`, `oneri/*`) `ROLLER` anahtarlarıyla (ve `gunluk` için `_sahipsiz` ile) genişletilir ve **her genişleme için ayrı karar** verilir; `*` başka yerdeyse
+(kökte `*.md` gibi) hedefin bulunduğu dizinin kuralı uygulanır (kökte R1). (3) Dizin hedefi (`gunluk/URUN`, `gunluk`) altındaki **en kısıtlı kuralı** alır: `gunluk/<ROL>` R4,
+`gunluk` kökü her ROL için R4. (4) Toplam karar genişlemelerin **en kötüsüdür** (biri engelse komut engelli). Sonuç: `gunluk/URUN` dizin hedefi R4'e düşer ve R4 OPS dahil kimseye izin vermez;
+`departman/*/x.md` silmeyi OPS (tam) için R3 her ROL'de izin verdiğinden **izin** çıkar (başkası için her genişlemede R3 engel); temizlik istisnası (aşağıda) yalnız **tek dosya**
+hedefinde geçerlidir, dizin ve `*` hedefinde geçmez. **`$DEĞİŞKEN`, `$(…)` ve ters tırnak** içeren hedef ise genişletilemez: `genisletmeli: true` işaretlenir, **izin + alarm** (§6).
 
 "Şerit" ve "rol" §3'teki çözümden gelir. **"tam"** bir rolün şerit adıyla birebir eşleştiği anlamına gelir (önekle eşleşme
 "tam" değildir); OPS yetkisi gerektiren her satır **tam** eşleşme ister.
@@ -55,14 +59,14 @@ temizlik istisnası (aşağıda) yalnız **tek dosya** hedefinde geçerlidir, di
 | K0 | Araç olmayan yazmalar: kancaların ve betiklerin kendi yazdığı dosyalar (`son-konusma-*.md` Stop kancası, `MEMORY.md.oncesi-*` yedekleri, `.gitignore`, `.git/**`, hafıza yedek commit'i) | kural uygulanmaz | Kanca yazımı araç çağrısı olmadığından kancaya gelmez; bu satır "izinli" sayıldığını yazılı kılar. **Test yok, yalnız belge** (kancaya gelmeyen yazma sınanamaz). Pencerenin kendi `Edit`/`Write` çağrısıyla bu dosyalara yazması R8'e düşer (modelin `cp MEMORY.md MEMORY.md.oncesi-…` yedeği de: yalnız OPS). |
 | R6 | **Geçiş süresince** kökteki durum dosyaları: ad `(lane-day\|state\|durum)` içerir ve küçük harfli adın başı, bir ROL adının küçük harfli, `-` çıkarılmış hâli ile **ve ardından `-`** ile başlar (`geoseo-…`, `urun-katalog-lane-day-…` → URUN, `ops-cycle-audit-state.md` → OPS; `aracin-…` ARAC'a düşmez); birden çok ROL uyarsa en uzun önek | o ROL'ün oturumu | Geçiş bitince (§9) bu satır kalkar. Kalıba uymayan sahipli dosyalar (eski rol adları `auth-`, `pricing-`, `legal-`, `orion-`, `lane-day-states-index` gibi; `blog-seridi-berati`, `mevzuat-seridi-park`, `urun-lane-charter`, `admin-serit-sahibi` gibi anahtar sözcüksüz rol dosyaları) **R1'de kalır** (yalnız OPS); bunların hangi ROL'e taşınacağı §9 geçiş listesinde yazılır. |
 | R5 | `gunluk/_sahipsiz/<session_id>.md` | yalnız o `session_id`'nin oturumu | Dosya adı tam `session_id` (harf duyarsız) ve `.md`; alt klasör ve başka ek yok. Şeridi olmayan pencerenin tek günlük yeri. |
-| R4 | `gunluk/<ROL>/**` | o ROL'ün oturumu (alt ajan dahil) | OPS dahil başkası yazmaz, okur. Geçiş taşıması için R10. |
+| R4 | `gunluk/<ROL>/**` | o ROL'ün oturumu (alt ajan dahil) | OPS dahil başkası yazmaz, okur. Geçiş taşıması için R10, süresi dolmuş tek dosya temizliği için temizlik istisnası. Bu, `gunluk/_sahipsiz/<sid>.md` için de geçerlidir (R5 "yalnız o `sid`": OPS başka `sid`'in dosyasına **yazamaz**; yalnız temizlik istisnası ve R10 yolu açıktır). |
 | R3 | `departman/<ROL>/**` | o ROL'ün oturumu (önekle eşleşme yeter); şeridi OPS olan oturum (tam) | Başka departman yazamaz. |
 | R2 | `oneri/**` | dosya adı `<ROL>-` ile başlıyorsa o ROL'ün oturumu; `_sahipsiz-<session_id>-` ile başlıyorsa o oturum | Başkasının öneri dosyasının üzerine yazılmaz. Şeridi olmayan pencere yalnız `_sahipsiz-` adıyla yazar. |
 | R1 | `MEMORY.md`, kökteki `*.md` ortak ders dosyaları, `olcum/**` | şeridi OPS olan oturum (**tam**) | Departman yazamaz, R2'ye öneri bırakır. |
 | R7 | `arsiv/**` | şeridi OPS olan oturum (**tam**) | Geçiş süresince HARİTA da (R10). |
-| R8 | tablo dışı her hafıza yolu (kökteki `.py`, `.json`, `belge-yonetimi-devir/**` dahil) | şeridi OPS olan oturum (**tam**) | Sınıflandırılmamış yeni yol açılmaz. `belge-yonetimi-devir/**` HARİTA'nın çalışma klasörüdür; geçiş süresince R10 kapsar, sonra arşive taşınır. |
-| R9 | Repoda talimat dosyaları (yalnız aşağıdaki kalıplar; kök yolları git köküne göredir, `AGENTS.md` yalnız depo kökündekidir): `CLAUDE.md`, `.claude/CLAUDE.md`, `AGENTS.md`, `docs/roller/**`, `docs/proje-takip/design/*/CLAUDE.md`. **Kaynak dosyalar da bu kapsamdadır (açık liste, v0.4):** `scripts/belge/rol-karti-uret.cjs`, `docs/roller/cetvel-sahipligi.*`, ayar dosyası `.claude/hafiza-yazma-ayar.json`, `.claude/hooks/**/hafiza-yazma-*` (kanca ve `lib/hafiza-yazma-kurali.cjs` kütüphanesi), `INV-HAFIZA-YAZMA-1` test dosyası, `scripts/board/pencere-adlari.cjs`, `scripts/board/board.cjs`, `.claude/settings.json`, `.claude/settings.local.json` | şeridi OPS olan oturum (**tam**); HARİTA, `harita_muafiyet_son` tarihine kadar | Çıktıyı (kartlar) korumak, kaynağı (üretici, sahiplik kaydı, ayar) korumamak bir delik olurdu: HARİTA kapandıktan sonra da üreticiyi düzenleyip kartları değiştirebilirdi. **Ön süzgeç (maliyet):** hedefin dosya adı `CLAUDE.md`, `AGENTS.md`, `settings.json`, `settings.local.json` ya da yolu `roller/` ya da `hooks/` ya da `scripts/belge/` ya da `scripts/board/` segmenti içeriyorsa git kökü bakılır; içermiyorsa R9 hiç işletilmez (her `Edit`/`Write` çağrısında git çağırmamak için). "Repo" bu deponun ana ağacıdır (git ortak dizininin ebeveyni); ek çalışma dizinlerindeki başka depolar ve `~/.claude/CLAUDE.md` bu kuralın konusu değildir. `.claude/skills/**` ve `.agent/skills/**` bu cetvelin kapsamı dışı (YETENEK). `docs/roller/**` yazımı elle değil kart üreticisi üzerindendir (kart testi elle düzenlemeyi kırmızı yapar). |
-| R10 | **EK İZİN** (öncelik: §2 başı): geçiş taşıması: `gunluk/**`, `departman/**`, `arsiv/**`, `belge-yonetimi-devir/**` altına yazma ve silme; kökteki durum dosyalarının ve R1 dosyalarının **silinmesi/taşınması** | şeridi OPS ya da HARİTA olan oturum (**tam** ya da HARİTA), `gecis_son` tarihine kadar | Ayrı bir taşıma listesi yoktur; kapsam yol kalıbıdır, sınır tarihtir. Koşul sağlanmıyorsa R10 yok sayılır, yol normal kuralına düşer. Bash `mv` ve `cp` komutlarının **kaynağı** bugün hedef sayılmıyor (`bash-write-targets.cjs`); kaynak silme kancaya gelmiyorsa açık delik (§6), bu kalemi ARAÇ iş listesi çözer. |
+| R8 | tablo dışı her hafıza yolu (kökteki `.py`, `.json`, `belge-yonetimi-devir/**` dahil; **ROL listesinde olmayan segment**: `gunluk/foo/x.md`, `departman/foo/x.md`, kökte `gunluk/x.md` dahil, D31) | şeridi OPS olan oturum (**tam**) | Sınıflandırılmamış yeni yol açılmaz. `belge-yonetimi-devir/**` HARİTA'nın çalışma klasörüdür; geçiş süresince R10 kapsar, sonra arşive taşınır. |
+| R9 | Repoda talimat dosyaları (yalnız aşağıdaki kalıplar; kök yolları git köküne göredir, `AGENTS.md` yalnız depo kökündekidir): `CLAUDE.md`, `.claude/CLAUDE.md`, `AGENTS.md`, `docs/roller/**`, `docs/proje-takip/design/*/CLAUDE.md`. **Kaynak dosyalar da bu kapsamdadır (açık liste, v0.4):** `scripts/belge/rol-karti-uret.cjs`, `docs/roller/cetvel-sahipligi.*`, ayar dosyası `.claude/hafiza-yazma-ayar.json`, `.claude/hooks/**/hafiza-yazma-*` (kanca ve `lib/hafiza-yazma-kurali.cjs` kütüphanesi), `INV-HAFIZA-YAZMA-1` test dosyası (`src/__tests__/conformance/*hafiza-yazma*`), `scripts/board/pencere-adlari.cjs`, `scripts/board/board.cjs`, `.claude/settings.json`, `.claude/settings.local.json` | şeridi OPS olan oturum (**tam**); HARİTA, `harita_muafiyet_son` tarihine kadar | Çıktıyı (kartlar) korumak, kaynağı (üretici, sahiplik kaydı, ayar) korumamak bir delik olurdu: HARİTA kapandıktan sonra da üreticiyi düzenleyip kartları değiştirebilirdi. **Sahiplik kaydının gerçek yeri `scripts/belge/cetvel-sahipligi.json`'dur** (`docs/roller/` altında yalnız üretilmiş `cetvel-sahipligi.md` var; v0.4'teki `docs/roller/cetvel-sahipligi.*` yanlıştı). **Bilinçli dışarıda:** `bash-write-guard.cjs`, `bash-write-targets.cjs`, `canlilik.cjs` gibi ARAÇ'ın genel kanca kodu R9'a girmez (ARAÇ kendi şeridinde düzenler; kanca kodunu OPS-only yapmak ARAÇ'ı kilitlerdi) ve bu kalite ağının bilinen sınırıdır (§6). **Ön süzgeç (maliyet) AYRI BİR LİSTE DEĞİLDİR (v0.5):** R9 kalıpları tek bir sabit listedir; ön süzgeç aynı listenin **dize karşılaştırmasıdır** (hedefin dosya adı ya da yol sonu/segmenti kalıbın sabit kısmıyla eşleşiyor mu; git çağrısı yok). Eşleşirse git ortak dizinine bakılır, eşleşmezse R9 işletilmez. Liste ile süzgeç iki ayrı yerde yazılırsa biri eskir (v0.4'te `.claude/hafiza-yazma-ayar.json` ve test dosyası süzgeçten düşmüştü): kütüphane tek sabiti dışa açar, test her kalıbın süzgeçten geçtiğini sınar. **"Repo" tanımı (v0.5):** hedef yolun bulunduğu çalışma ağacının `git rev-parse --git-common-dir` değeri bu deponunkiyle aynıysa hedef R9 kapsamındadır; yani ana ağaç **ve her worktree** (pencereler worktree'de çalışır; worktree'deki `CLAUDE.md` serbest olsaydı R9 anlamsızlaşırdı). Ayar dosyası bunun istisnasıdır: bayrak **ana ağaçtan** okunur (aşağıda). Ek çalışma dizinlerindeki başka depolar ve `~/.claude/CLAUDE.md` bu kuralın konusu değildir. `.claude/skills/**` ve `.agent/skills/**` bu cetvelin kapsamı dışı (YETENEK). `docs/roller/**` yazımı elle değil kart üreticisi üzerindendir (kart testi elle düzenlemeyi kırmızı yapar). |
+| R10 | **EK İZİN** (öncelik: §2 başı): geçiş taşıması: `gunluk/**`, `departman/**`, `arsiv/**`, `belge-yonetimi-devir/**` altına yazma ve silme; kökteki durum dosyalarının ve R1 dosyalarının **silinmesi/taşınması** | şeridi tam OPS olan ya da şeridi HARİTA olan oturum, `gecis_son` tarihine kadar (R9'un `harita_muafiyet_son`'u buraya girmez) | **Ayar dosyası yoksa ya da `gecis_son` yoksa R10 kapalıdır** (§2 bayraklar); D8, D22 ve D27 satırları bu kapalı durumu sınar, açık durumu D19 sınar. Ayrı bir taşıma listesi yoktur; kapsam yol kalıbıdır, sınır tarihtir. Koşul sağlanmıyorsa R10 yok sayılır, yol normal kuralına düşer. Bash `mv` ve `cp` komutlarının **kaynağı** bugün hedef sayılmıyor (`bash-write-targets.cjs`); kaynak silme kancaya gelmiyorsa açık delik (§6), bu kalemi ARAÇ iş listesi çözer. |
 
 **Tarihli bayraklar** (`harita_muafiyet_son`, `gecis_son`) ayar dosyasında durur: **sabit yol `.claude/hafiza-yazma-ayar.json`, ANA AĞAÇTA**
 (git ortak dizininin ebeveyni; worktree kopyasından okunmaz. HARİTA'nın pencereleri `venthub-harita-*` worktree'lerinde açılır ve dosya dalda
@@ -74,8 +78,10 @@ tam damga ya da tarih) enjekte edilir.
 **Temizlik istisnası (v0.4, ARAÇ kararı 2):** yalnız **tek dosya** hedefinde ve yalnız **silme ya da `arsiv/`'e taşıma** işleminde geçerlidir; içerik
 yazma değildir (R4 "OPS dahil başkası yazmaz" içerik yazma içindir). Kapsam ve koşul:
 - `oneri/**` tek dosya: şeridi OPS (**tam**) olan oturum, **koşulsuz** siler ya da taşır (kabul/red işareti aranmaz; işareti üretmek kancanın işi değildir).
-- `gunluk/**` tek dosya (`gunluk/_sahipsiz/**` dahil): yalnız kaynak dosyanın son değişiklik zamanı **14 günden eskiyse** ve yazan tam OPS ya da geçerli HARİTA
-  muafiyeti ise. Süresi dolmamış günlük hiçbir pencerece silinip taşınamaz (R4).
+- `gunluk/**` tek dosya (`gunluk/_sahipsiz/**` dahil): yalnız kaynak dosyanın son değişiklik zamanı **14 günden eskiyse** ve yazan tam OPS ya da şeridi HARİTA olan oturum
+  `gecis_son` içindeyse (R10 ile aynı bayrak). Süresi dolmamış günlük hiçbir pencerece silinip taşınamaz (R4). Dosyanın yaşı (`mtime`) **kancada** ölçülür ve kütüphaneye
+  hedef başına `mtimeGun` olarak verilir (kütüphane saf kalır; hedef yoksa `null`, `null` = süre dolmadı).
+- **Çift OPS vetosu temizlik istisnasının OPS kolunu da kapsar** (§3).
 - Dizin hedefi ve `*` hedefi bu istisnadan yararlanmaz (§2 başı).
 
 **Şeridi olmayan pencere** hiçbir hafıza yoluna yazamaz; yalnız R2 (`_sahipsiz-` adıyla) ve R5.
@@ -103,8 +109,9 @@ bir yerde URUN, öbüründe şeritsiz sayılır (ARAÇ iş listesi, §10). Panod
 **`lane` ezmesi (ölçüldü, açık kusur):** `claim --globs ...` adsız çağrılırsa `board.cjs` literal `lane` yazar ve `e.lane || prev.lane`
 'lane'i doluymuş sayıp **önceki gerçek şerit adını ezer** (`URUN-KATALOG → lane → URUN-KATALOG` panoda görüldü). Kalıcı çözüm `board.cjs`'te
 (adsız claim önceki adı korusun; ARAÇ iş listesi). Kusur **üç yerdedir**: `board.cjs` olay birleştirmesi (`e.lane || prev.lane`, ~L183), aynı mantığın ikinci
-kullanımı (~L232) ve `claim` komut satırı varsayılanı (`flags.lane || 'lane'`, ~L1221-1223). Düzelince `lane` panoya hiç girmez; bu yüzden **D10c kanca
-düzeyinde kurulamaz** ve kütüphane testine iner (girdi `{ lane: 'lane', sonBilinenAd }`; `sonBilinenAd` `tumTalepler` ve ham olaydan okunur, süresi
+kullanımı (~L232) ve `claim` komut satırı varsayılanı (`flags.lane || 'lane'`, ~L1221-1223). Düzeltmenin **iki parçası vardır:** adsız claim önceki adı korur **ve**
+`lane` değerini boş sayar (`e.lane === 'lane'` ≡ adsız). Sonrasında bile adsız **ilk** claim'in `lane: 'lane'` kaydı ve son 24 saatin olay dosyalarındaki eski `lane` literal'leri panoda
+durur; bu yüzden **D10c kanca düzeyinde güvenilir kurulamaz** ve kütüphane testine iner (girdi `{ lane: 'lane', sonBilinenAd }`; `sonBilinenAd` `tumTalepler` ve ham olaydan okunur, süresi
 dolan claim'i `liveClaims` zaten düşürür). O zamana kadar çözücü `lane`'i şeritsiz sayar ve engel mesajı pencerenin son bilinen
 şerit adını gösterir ("şeridin `OPS-AUDIT`, tam `OPS` değildir").
 
@@ -128,12 +135,17 @@ aynı ROL olduğu için yazamayacaksa) mesaj "ebeveyn de yazamaz; içeriği `one
 `agent_id`'yi kendisi okur; bugünkü `bash-write-guard.cjs` okumaz ve **değiştirilmez**, yeni kancanın kendi mesajı yeter.
 
 **Çift OPS kuralı (OPS kararı 2026-09-30):** aynı anda birden fazla canlı claim `tam: true` OPS ise ortak çekirdeğe yazma
-(R1, R3-OPS, R7, R8, R9-OPS) **her ikisine de** engellenir ve durum satırında alarm çıkar. OPS kimliği bir şerit beyanıdır
+(R1, R3-OPS, R7, R8, R9-OPS, R10'un OPS kolu ve temizlik istisnasının OPS kolu) **her ikisine de** engellenir ve durum satırında alarm çıkar. OPS kimliği bir şerit beyanıdır
 (`claim --lane OPS` herkes alabilir, `board.cjs` doğrulamaz); bu, güvenlik değil **kalite ağıdır** (§6). **Çöken pencere düzeltmesi:**
 çöken ya da yeniden açılan OPS penceresinin eski claim'i TTL (4 saat) boyunca canlı kalır ve tek meşru yazıcıyı kilitlerdi; bu yüzden
 "canlı OPS" sayımı 30 dakikalık sezgiyle değil, **canlılık ölçümüyle** yapılır (REC-524'te birleşen `scripts/board/canlilik.cjs`, `claude agents --json`
 ile açık pencereler; hayalet/kapalı pencerenin claim'i sayılmaz; fork ya da `/clear` ile yeni `sid` alan OPS'un eski claim'i kendini kilitlemez).
-Bilgi eksikse (canlılık ölçülemedi) sezgi yedek olarak 30 dakikadır (yalnız son atışı 30 dakikadan yeni olanlar sayılır). Uzun otonom turda `heartbeat` yalnız
+Bilgi eksikse (canlılık ölçülemedi) sezgi yedek olarak 30 dakikadır (yalnız son atışı 30 dakikadan yeni olanlar sayılır).
+**Çağrı koşulu ve maliyet (v0.5):** canlılık ölçümü bir süreç açar (`claude agents --json`, zaman aşımı 8 sn, 30 sn önbellek: `canlilik.cjs`); kanca bunu **her çağrıda** koşmaz.
+Yalnız şu üç koşul birlikte sağlanınca çağrılır: hedef OPS yetkisi isteyen bir yol (R1, R3-OPS, R7, R8, R9-OPS, R10-OPS, temizlik-OPS), yazar `tam: true` OPS ve
+`liveClaims`'te **en az bir başka** `tam: true` OPS claim'i var. Ölçüm zaman aşımına uğrar ya da hata verirse sezgiye (30 dk) düşülür ve durum satırına
+`kural ölçülemedi: canlılık` düşer. Karar kütüphanesine girdi: `canlilik: { olculdu, acikSidler: [...] }` (ölçüm yapıldıysa açık pencerelerin `sid`'leri); kütüphane yalnız bunu okur,
+süreç açmaz. Testte `VENTHUB_BOARD_DIR` verilince gerçek `claude` çağrılmaz (`canlilik.cjs` izole pano kuralı); D26'nın canlılık dalını kurmak için `VENTHUB_CANLILIK_HAM=<dosya>` (ham `claude agents` çıktısı) enjekte edilir (§4). Uzun otonom turda `heartbeat` yalnız
 `touch` ile ilerlediği için sezgiyle canlı OPS sayım dışı kalabilirdi; bu, canlılık ölçümünün gerekçesidir. Alarm yalnız `UserPromptSubmit` satırında görünür
 (otonom turda görünmez; kabul). Engel mesajı iki claim'in `sid`'lerini ve `node scripts/board/board.cjs release --sid <eski>` komutunu gösterir. Herhangi bir pencerenin `claim --lane OPS` ile OPS'u kilitlemesi
 (kilitleme saldırısı) aynı beyan sorununun sonucudur ve kabul edilir (§6).
@@ -208,7 +220,9 @@ değişkenleri (mevcut emsaller: `VENTHUB_BOARD_DIR`, `VENTHUB_CLAUDE_KOK`, `VEN
 yeni `VENTHUB_MEMORY_DIRS` bir **dizin listesidir**, karıştırılmaz): `VENTHUB_BOARD_DIR` (pano), `VENTHUB_MEMORY_DIRS` (aday listesi, `;` ile),
 `VENTHUB_AYAR_KOK` (ayar dosyalarının aranacağı kök: **worktree'de ana ağacın kökü**, çünkü kancalar ana ağaçtan yüklenir ve bayrak dosyası ana ağaçtadır;
 worktree'de Claude kendi worktree ayarını okur, kanca ana ağaç ayarını okur, gitignored `settings.local.json` yalnız ana ağaçtadır; bu fark bilinen sınırdır),
-`VENTHUB_GIT_ORTAK_DIZIN`, `VENTHUB_SIMDI` (saat, ISO; D18 ve D19 tarihli bayrakları sınar). `BOARD_DIR` `board.cjs` yüklenirken sabitlenir; süreç içi test ortamı
+`VENTHUB_GIT_ORTAK_DIZIN` (git ortak dizini; `VENTHUB_AYAR_KOK` ile **aynı değildir**: biri ayar/bayrak dosyasının aranacağı ana ağaç kökü, öbürü "bu depo mu" karşılaştırması için ortak dizin; test ikisini de verir),
+`VENTHUB_CANLILIK_HAM` (D26 canlılık dalı; ham `claude agents --json` çıktısı dosyası, `canlilik.cjs` mevcut değişkeni), `VENTHUB_SIMDI` (saat, ISO; D18 ve D19 tarihli bayrakları sınar). Kullanıcı ayar dizini için mevcut
+emsal `VENTHUB_CLAUDE_KOK` kullanılır (kullanıcı ayarında `autoMemoryDirectory` testi). `BOARD_DIR` `board.cjs` yüklenirken sabitlenir; süreç içi test ortamı
 değiştiremez, kanca testi süreç başlatarak (spawn) yapılır.
 
 **`autoMemoryDirectory` ayar kaynağı:** Claude Code memory sayfası (2026-09-30 iki araştırmacıyla okundu): "It is read from any settings scope: user, project,
@@ -228,17 +242,27 @@ doğrulanmadı; ölçülecek.
   anlamsız bir göreli yol üretir. `bash-write-guard.cjs` ayrıca depo dışı hedefleri **bilerek** görmezden gelir (pano ve scratchpad
   yazımı bu kapının konusu değil). Bu yüzden hafıza kuralı ayrı bir kanca dosyasıdır (öneri ad `hafiza-yazma-bekcisi.cjs`) ve karar mantığı
   saf bir kütüphanede durur (`.claude/hooks/lib/hafiza-yazma-kurali.cjs`; test bu kütüphaneyi doğrudan çağırır). **Girdi (v0.4, ARAÇ okuması):**
-  `{ arac, hedefler: [{ yol, islem }], cozulemedi, genisletmeli, panoDurumu, stdinBozuk, yolTuretilemedi, sid, agent_id, claimler: [{ sid, lane, ts, heartbeat }],
-  adaylar, bayraklar, simdi }`; `islem` ∈ `yaz | sil | tasi` (R10, temizlik istisnası ve D27 işleme göre ayrılır); `hedefler` çoktur (Bash çok hedeflidir);
-  `panoDurumu` `board.durumOku()` sonucudur (D11); `cozulemedi` ve `genisletmeli` Bash çıkarıcısının işaretleridir. **Çıktı:** her hedefin `izin | engel | olculemedi` kararı,
+  `{ arac, hedefler: [{ yol, islem, mtimeGun, repoGoreli, genisletmeli }], cozulemedi, panoDurumu, stdinBozuk, yolTuretilemedi, sid, agent_id, sonBilinenAd,
+  claimler: [{ sid, lane, ts, heartbeat }], canlilik: { olculdu, acikSidler }, adaylar, bayraklar, simdi }`; `islem` ∈ `yaz | sil | tasi` (R10, temizlik istisnası ve D27 işleme göre ayrılır);
+  `hedefler` çoktur (Bash çok hedeflidir). **Kancada hesaplanıp kütüphaneye verilen alanlar (kütüphane saf, dosya sistemi ve git bilmez):** `mtimeGun` (hedef dosyanın yaşı, gün; yoksa `null`),
+  `repoGoreli` (R9 kalıbı için depo-göreli yol; hedef bu deponun hiçbir çalışma ağacında değilse `null`), `sonBilinenAd` (bu `sid`'in panoda son görülen şerit adı; D10c), `canlilik` (§3).
+  `panoDurumu` `board.durumOku()` sonucudur (D11); `cozulemedi` Bash çıkarıcısının işaretidir, `genisletmeli` hedef başınadır (`$DEĞİŞKEN`/`$(…)`/ters tırnak, §2).
+  **`islem` kaynağı:** dosya araçlarında `Edit`/`Write`/`MultiEdit`/`NotebookEdit` her zaman `yaz`'dır (bu araçlarla silme ya da taşıma yoktur; **temizlik istisnası yalnız Bash yolundadır**).
+  Bash'te `islem` komutun **fiilinden** türetilir: `rm`/`unlink`/`rmdir` → `sil`, `mv` → kaynak `sil` + hedef `yaz` (`tasi` her iki hedefe birden bakan karardır), `cp` → hedef `yaz`, diğer yazma fiilleri
+  `yaz`. Bugünkü `bash-write-targets.cjs` **hedef başına fiil döndürmez** (hedef ve sebep listeleri hizalı değildir; `mv`/`cp` için yalnız son argüman gelir; ölçüldü, v0.5 okuması): bu yüzden
+  "hedef başına `islem` + `mv`/`cp` kaynağı" **ARAÇ iş listesinin kabul koşuludur** (§10 kalem 7); o gelene kadar Bash'te bilinmeyen `islem` `yaz` sayılır (en kısıtlı), yani temizlik istisnası
+  Bash yolunda **kapalıdır** ve D27 Bash ayağı yalnız kütüphane düzeyinde sınanır. `cozulemedi` bayrağı olan komutta toplam karar: kanca sıfır hedefle kütüphaneyi çağırmaz;
+  mevcut `bash-write-guard.cjs` çözülemeyen hedefi zaten engeller, yeni kanca bu kolu tekrarlamaz (D15a) ve yalnız çıkarılabilen hedeflerin kararını verir. **Çıktı:** her hedefin `izin | engel | olculemedi` kararı,
   sebebi ve kuralı; toplam karar hedeflerin **en kötüsüdür** (bir hedef engelse komut engelli).
 - **Bash yolu:** hedef çıkarımı mevcut `bash-write-targets.cjs` kütüphanesini kullanır (yeni ayrıştırıcı yazılmaz). Kural
   `depoIcindeMi` süzgecinden **önce**, **ham** hedefler üzerinde çalışır; pano ve scratchpad muafiyeti korunur. Bu kütüphanenin sınırları
   §6'da açık delik olarak yazılıdır (`cd` izlemez, `;`/`&&` ile bölünen komutlarda yorumlayıcı gövdesini kaçırır, PowerShell fiillerini ve
   `git -C` alt komutlarını tanımaz); ayrıştırıcıyı genişletmek ARAÇ iş listesindedir (§10) ve bu şartnamenin kabul koşulu değildir.
-- **Çalışma sırası (maliyet):** kanca her `Edit`/`Write`/`Bash` çağrısında koşar; pano 200'den fazla olay dosyası okuyabilir. Sıra:
-  hedef yol çıkar → hafıza yolu mu (yalnız ucuz karşılaştırma) → **hayırsa hemen çık**; ancak evetse pano, `git rev-parse` ve olay kaydı.
-  Gözlem satırı yalnız hafıza-yolu çağrılarında yazılır.
+- **Çalışma sırası (maliyet, v0.5 düzeltmesi):** kanca her `Edit`/`Write`/`Bash` çağrısında koşar; pano 200'den fazla olay dosyası okuyabilir. Sıra:
+  hedef yol çıkar → **iki ucuz ön koşul** (hiçbiri git ya da pano çağırmaz): (i) hedef R9 kalıp sabitinin dize karşılaştırmasına uyuyor mu (§2 R9), (ii) hedef **önceden hesaplanmış aday kümesinin** altında mı
+  (aday kümesi kanca sürecinde bir kez türetilir ve önbelleklenir; ilk türetim git ortak dizinini çözer, sonrası dize karşılaştırmasıdır) → ikisi de **hayırsa hemen çık**; ancak biri evetse pano,
+  `git rev-parse` ve olay kaydı. Gözlem satırı yalnız hafıza-yolu çağrılarında yazılır. (v0.4'te "yalnız ucuz karşılaştırma" denmişti; aday türetimi ilk seferde git ister, bu yüzden "ilk türetim
+  bir kez, sonrası ucuz" diye düzeltildi.)
 - **Araçlar ve alan adı:** `Edit`, `Write`, `MultiEdit`, `NotebookEdit`, `Bash` ve `PowerShell`. Yol alanı `file_path`'tir, `NotebookEdit`'te `notebook_path`,
   `MultiEdit` yükünde `edits[].file_path` da olabilir (belge özeti düşük güvenilirlikli; kanca yükteki **tüm yol alanlarını** tarar: `file_path`, `notebook_path`,
   `edits[].file_path`; bugün yalnız `file_path` okunuyor). Eşleştirici tam adla eşleşir: `Edit|Write` diğerlerini
@@ -268,9 +292,9 @@ Bu düzen **kalite ağıdır, güvenlik sınırı değildir.** Bilinen delikler:
 |---|---|---|
 | **OPS kimliği beyandır** | `board.cjs claim --lane X` doğrulamasızdır (`lane: flags.lane \|\| 'lane'`); herkes `OPS` adını alabilir. | Çift OPS alarmı (§3); blok mesajlarında OPS örneği yok; sid listesi gibi güçlü doğrulama şimdilik yok (OPS kararı). |
 | **Bash ile dolaylı yazma** | `Edit\|Write` eşleştiricisi Bash'i yakalamaz; Claude Code belgesi Bash'te yalnız tanınan dosya komutlarını (`cat`, `sed`, `tee` gibi, liste kapalı değil) ve yönlendirme hedeflerini denetlediğini, betiklerin ve dolaylı yazmaların yakalanmadığını, tam kilit için işletim sistemi sandbox'ının gerektiğini söyler. | Yeni kanca Bash komut metnindeki hedefi yakalar. **Yalnız tek segmentli** `python -c "...open(p,'w')..."` / `node -e "...writeFileSync..."` gibi yorumlayıcı gövdelerinde mevcut `bash-write-targets.cjs` yazma imzasını görürse hedefi çözemeyip **engeller** (her yola, OPS dahil, fail-closed). **Geçer (açık delik):** `;`, `&&`, `\|` ya da satır sonu içeren komut (çıkarıcı tırnak içinde de böler, gövde parçalanır ve imza kaçar); imza listesinde olmayan yazma biçimleri (`Path.write_text`, `Set-Content`, `perl -pi`); `mv` ve `cp` **kaynağı**; `git -C <hafıza> checkout/reset/clean/rm/stash` (hafıza dizini kendi git deposudur). **Ek geçen biçimler (ARAÇ'ın çalıştırarak ölçtüğü, v0.4):** bitişik yönlendirme `echo x>MEMORY.md`; tırnak içinde `;`/`\|`/`&&` sonrası yönlendirme `echo "a; b" > MEMORY.md`; `&>`, `>\|`; `sed -Ei`, `sed --in-place=.bak`; `<<` içeren komutta yalnız ilk sözcük fiil sayılır (`cat <<EOF \| tee MEMORY.md`); `touch`, `mkdir`, `ln`, `install`, `curl -o`, `wget -O`, `rsync`, `patch`, `git apply`; `cp -t DİZİN`. Ters yönde yanlış pozitif: `echo ">MEMORY.md"` hedef sayılır. Bu biçimlerin çoğu **çıkarıcının genişletilmesiyle** kapanır (ARAÇ sonraki işi); ikinci katman olarak komut metninde aday dizin yolu (harf/bölü normalize) geçiyor ve fiil okuma listesinde değilse **izin + alarm** önerilir. **Mevcut kapı D15a'yı zaten engelliyor:** `bash-write-guard.cjs` çözülemeyen hedefi (yorumlayıcı gövdesinde yazma imzası) `depoIcindeMi` süzgecinden önce her yola engeller; yeni kanca bu kolu **tekrarlamaz** (yalnız çift mesaj üretirdi). |
-| **Sonradan yakalama YOK** | `bash-write-audit.cjs` yalnız çalışma ağaçlarının `git status`'ünü tarar; hafıza dizini bir ağaç değildir ve çalışma dizini kullanıcı ayar dizini altındaysa hiç çalışmaz. **Hiçbir mevcut kanca hafızaya betikle yazılanı görmez.** | Açık delik. İstenirse ayrı bir hafıza dizini taraması (dosya değişiklik zamanı ile `hafiza-yazma-olay.jsonl` karşılaştırması) sonraki iştir. |
-| Bash kaza yolları | `cd <hafıza> && echo x > MEMORY.md`: çıkarıcı **`cd`/`pushd` izlemez**, `&&` ile segmentler bağımsızdır, göreli hedef kancanın cwd'sine göre çözülür → **yakalanmaz (açık delik)**. `$DEĞİŞKEN`, ev dizini kısayolu ve `*` içeren hedefler: çıkarıcı bunları işaretlemez, göreli yol gibi çözer. | Ev dizini kısayolu ve MSYS `/c/...` yolları kanca tarafında §4 normalizasyonuyla çözülür (**engel**). `$DEĞİŞKEN` ve `*` içeren hedef için çıkarıcıya `genisletmeli: true` işareti eklenir (ARAÇ iş listesi); işaretli hedef **izin + alarm**. `cd` izleme yoktur: açık delik, sonraki iştir. |
-| PowerShell | Ana ortamın kabuğu PowerShell (bu oturumun ortam satırı böyle diyor); `settings.json`'da hiçbir kayıt PowerShell içermiyor ve `Set-Content`, `Out-File`, `Add-Content`, `Copy-Item`, `Move-Item` için hedef çıkaran kod yok (`eylem-defteri.cjs` fiilleri kaydediyor ama hedefe bakmıyor). | Eşleştirici `PowerShell` aracını da kapsar (§5); hedef çıkarımı ARAÇ'ın sonraki işidir; o zamana kadar açık delik. |
+| **Sonradan yakalama YOK** | `bash-write-audit.cjs` yalnız çalışma ağaçlarının `git status`'ünü tarar; hafıza dizini bir ağaç değildir ve çalışma dizini kullanıcı ayar dizini altındaysa hiç çalışmaz. **Hiçbir mevcut kanca hafızaya betikle yazılanı görmez.** | Açık delik. İstenirse ayrı bir hafıza dizini taraması (dosya değişiklik zamanı ile `hafiza-yazma-olay.<sid>.<gün>.jsonl` dosyalarının karşılaştırması) sonraki iştir. |
+| Bash kaza yolları | `cd <hafıza> && echo x > MEMORY.md`: çıkarıcı **`cd`/`pushd` izlemez**, `&&` ile segmentler bağımsızdır, göreli hedef kancanın cwd'sine göre çözülür → **yakalanmaz (açık delik)**. `$DEĞİŞKEN`, ev dizini kısayolu ve `*` içeren hedefler: çıkarıcı bunları işaretlemez, göreli yol gibi çözer. | Ev dizini kısayolu ve MSYS `/c/...` yolları kanca tarafında §4 normalizasyonuyla çözülür (**engel**). `*` içeren hedef kanca tarafında §2 "statik önek genişletmesi" ile karara bağlanır (izin ya da engel; alarm değil). `$DEĞİŞKEN`, `$(…)` ve ters tırnak içeren hedef için çıkarıcıya `genisletmeli: true` işareti eklenir (ARAÇ iş listesi); işaretli hedef **izin + alarm**. Çıkarıcı bu işareti eklenene kadar bu hedefler ham yol gibi çözülür (kanca düzeyinde alarm üretilemez; **kütüphane testi** `genisletmeli: true` girdisiyle kurulur, D13d). `cd` izleme yoktur: açık delik, sonraki iştir. |
+| PowerShell | Ana ortamın kabuğu PowerShell (bu oturumun ortam satırı böyle diyor); `settings.json`'da hiçbir kayıt PowerShell içermiyor ve `Set-Content`, `Out-File`, `Add-Content`, `Copy-Item`, `Move-Item` için hedef çıkaran kod yok (`eylem-defteri.cjs` fiilleri kaydediyor ama hedefe bakmıyor). | Eşleştirici `PowerShell` aracını da kapsar (§5); hedef çıkarımı ARAÇ'ın sonraki işidir; o zamana kadar PowerShell yükünde hedef çıkarılamaz ve kanca **izin verir** (açık delik). Komut metninde aday dizin yolu geçiyorsa **izin + alarm** (`kural ölçülemedi: powershell hedefi`; hedef çıkaramadığı için `cozulemedi` değil, ölçülemedi sınıfı). |
 | Kancayı kapatma | `disableAllHooks` ve `allowManagedHooksOnly` anahtarları var; kullanıcı ayarındaki kanca başka ayar dosyasından kapatılabilir. | Yönetilen katmana (yönetici hakkıyla) koymak ayrı karardır, bu modelin dışında. |
 | Claude'un kendi otomatik hafıza yazımı | Standart `Edit`/`Write` araçlarıyla yapılır; iç yolun kural denetimini atlayıp atlamadığı belgede yazmıyor. | **Denenecek** (D14). Kancadan geçerse şeritli pencerenin "bunu hatırla" isteği R1'e takılır ve mesaj `oneri/` yolunu gösterir; geçmezse `autoMemoryEnabled: false` kararını OPS ve Recep verir. |
 | Ölçülemedi | §3 | Durum satırı alarmı |
@@ -289,8 +313,8 @@ sınırı** vardır (öneri 60 satır / 8 KB; aşarsa kesilir ve kesildiği yaz�
 `MEMORY.md`'yi tanıdığından kapsamı `departman/*/MEMORY.md`'ye genişletilir ve departman indeksi için eşik enjeksiyon üst sınırıyla **aynıdır**
 (60 satır / 8 KB; yoksa bekçiden geçen bir indeks enjeksiyonda sessizce kırpılırdı). **Bu eşik YUMUŞAKTIR** (bekçi uyarır, engellemez; enjeksiyon kırpar);
 sert eşik ana indeksin mevcut 200 satır / 25 KB sınırıdır. `src/__tests__/conformance/hafiza-indeks-bekcisi-kilidi.test.ts` bugün bekçi kaynağında
-`projeDiziniBul` ve `os.homedir()` kullanımını yasaklıyor ve `exit(2)`'nin tam bir yerde olmasını istiyor; ortak aday işlevi ve `departman/*/MEMORY.md` genişletmesi
-bunu kırar. Bu test **bilinçli güncellenir** (yeni ortak işlev serbest; mutlak **kullanıcı yolu** yasağı kalır; testte gerekçe satırı yazılır). Bekçi hedefi bugün
+`projeDiziniBul` ve `os.homedir()` kullanımını yasaklıyor (`:99`; kırılacak tek onay budur) ve `exit(2)`'nin tam bir yerde olmasını istiyor (`:84`; bekçiye yeni `exit(2)` eklenmediği, eşik de yumuşak kaldığı
+sürece **kırılmaz**; eşik sert olsaydı kırılırdı); ortak aday işlevi `:99`'u kırar. Bu test **bilinçli güncellenir** (yeni ortak işlev serbest; mutlak **kullanıcı yolu** yasağı kalır; testte gerekçe satırı yazılır). Bekçi hedefi bugün
 `dirname === 'memory'` ile tanır; departman için `.../departman/<ROL>/MEMORY.md` biçimi ve "katlanmış mı" araması **departman dizininde** yapılır (kökte değil).
 Yeni açılan pencerenin claim'i açılışta henüz yoktur:
 enjeksiyon `seritRolu` (§3) ile çözülen role göre basar; rol çözülemiyorsa departman hafızasını basmaz ve "şerit al, sonra departman hafızan gelir" der.
@@ -301,8 +325,8 @@ okununca yüklendiği için departman talimatı için güvenilir bir yol değild
 
 ## §8 Deneme senaryoları (her "izin" satırının "engel" eşi vardır)
 
-Kanca kurulunca işi yapmamış bağımsız bir ajan bu tabloyu koşar; sonuç REC-530'a yazılır. D1-D13, D16-D19 ve D20-D30 otomatik testtir
-(§10), D14-D15 elle denemedir. "Şeritli URUN" = canlı claim'i `URUN` olan oturum. Her R kuralının (R1-R10) en az bir izin ve bir engel satırı
+Kanca kurulunca işi yapmamış bağımsız bir ajan bu tabloyu koşar; sonuç REC-530'a yazılır. D1-D13, D16-D19 ve D20-D31 otomatik testtir
+(§10), D14-D15 elle denemedir. **Her satır ayar durumunu ve `simdi`'yi açıkça söyler** ("R10 kapalı", "`gecis_son` içinde"); söylemeyen satır "R10 kapalı"dır. "Şeritli URUN" = canlı claim'i `URUN` olan oturum. Her R kuralının (R1-R10) en az bir izin ve bir engel satırı
 vardır; K0 sınanamaz (§2). **Sabotaj listesi:** her kural için "o kuralı `izin`e çeviren mutasyon" testte kırmızı verir (R6, R7, R8 dahil); kural
 kaldırılınca hiçbir satırın düşmemesi bir kusurdur.
 
@@ -318,7 +342,7 @@ kaldırılınca hiçbir satırın düşmemesi bir kusurdur.
 | D7b | Şeritsiz pencere `gunluk/_sahipsiz/<KENDİ-SID-BÜYÜK-HARF>.md` yazar | izin (harf duyarsız) |
 | D7c | Şeritsiz pencere `gunluk/_sahipsiz/../URUN/x.md` yazar | **engel** (çözülünce R4) |
 | D7d | Şeritsiz pencere `gunluk/_sahipsiz/<kendi-sid>.md.bak` / `<kendi-sid>.md.` yazar | **engel** (R5 tam ad; `.bak`, sondaki nokta eşleşmez) |
-| D8 | Şeritli URUN `gunluk/URUN/`'a / `gunluk/ALTYAPI/`'ya yazar; şeridi OPS olan oturum `gunluk/URUN/`'a yazar | izin / **engel** / **engel** (R4) |
+| D8 | **(R10 kapalı: ayar dosyası yok ya da `gecis_son` geçmiş)** Şeritli URUN `gunluk/URUN/`'a / `gunluk/ALTYAPI/`'ya yazar; şeridi OPS olan oturum `gunluk/URUN/`'a yazar | izin / **engel** / **engel** (R4) |
 | D9 | Alt ajan (`agent_id` var, ebeveyn URUN) `departman/URUN/`'a / `departman/ALTYAPI/`'ya / `gunluk/URUN/`'a yazar | izin / **engel** / izin; kural engeli (R3) mesajı "ebeveyn de yazamaz; içeriği `oneri/` altına bırak" der, "raporunda döndür, ebeveyn yazsın" yalnız claim çakışmasında söylenir (§3; dosya araçlarında ve Bash'te aynı metin) |
 | D10a | **Kütüphane düzeyinde** (claim listesi parametre; kanca düzeyinde sınanmaz, §3 `touch` kararı): süresi dolmuş claim'li pencere `gunluk/URUN/`'a yazar | **engel** (şeritsiz) |
 | D10b | Aynı oturum `ALTYAPI` sonra `ALTYAPI-NLM` adıyla claim almış; `departman/ALTYAPI/x.md` / `departman/URUN/x.md` yazar | izin (aynı ROL) / **engel** (farklı ROL) |
@@ -330,8 +354,8 @@ kaldırılınca hiçbir satırın düşmemesi bir kusurdur.
 | D13a | `MultiEdit` ile D2'yi tekrarla (aynı `file_path` yükü) | **engel** (R1) |
 | D13b | `NotebookEdit` ile hafıza kökünde `x.ipynb` (`notebook_path` yüküyle) yazar | **engel** (R8: `.ipynb` R1 ortak ders dosyası değil, tablo dışı yol) |
 | D13c | Bash yönlendirme `> MEMORY.md` (mutlak yol ile), `tee MEMORY.md`, ev dizini kısayolu ve MSYS `/c/...` biçimi | **engel** (R1; dört yol da aynı kural) |
-| D13d | Bash `$HOME/…/MEMORY.md` ya da `*.md` (genişletmeli hedef) | izin + alarm (`genisletmeli`; çıkarıcı işareti eklenene kadar: geçer, açık delik §6) |
-| D14 | Claude'un kendi otomatik hafıza yazımı: şeritli URUN pencerede "bunu hatırla" isteği | denenecek; iki dal: kancadan geçer (`hafiza-yazma-olay.jsonl`'da kayıt var) → R1 engeli ve `oneri/` yönlendirmesi; geçmez (kayıt yok) → `autoMemoryEnabled: false` kararı OPS ve Recep'te |
+| D13d | **Kütüphane testi** (`genisletmeli: true` girdisiyle; kanca düzeyinde çıkarıcı işaretlemediği için alarm üretilemez, §6): Bash `$HOME/…/MEMORY.md` hedefi / hafıza kökünde `*.md` hedefi, yazar şeritli URUN | izin + alarm (`genisletmeli`) / **engel** (`*` statik önek genişletmesiyle R1'e düşer; §2) |
+| D14 | Claude'un kendi otomatik hafıza yazımı: şeritli URUN pencerede "bunu hatırla" isteği | denenecek; iki dal: kancadan geçer (`hafiza-yazma-olay.<sid>.<gün>.jsonl`'de kayıt var) → R1 engeli ve `oneri/` yönlendirmesi; geçmez (kayıt yok) → `autoMemoryEnabled: false` kararı OPS ve Recep'te |
 | D15a | Bash tek segmentli: `python -c "open('MEMORY.md','w').write('x')"` ile hafızaya yazma | **engel, mevcut `bash-write-guard.cjs` kapısından** (yorumlayıcı imzası, çözülemeyen hedef; her yola, OPS dahil); yeni kancanın bu kolu tekrarlamadığı ayrıca doğrulanır (çift mesaj yok) |
 | D15b | Bash: `python -c "import os; open('MEMORY.md','w').write('x')"` (imza **ikinci** segmentte kalıyor: `;` ile bölünür), `python -c "open(p,'w').write('x');print(1)"` (imza ilk segmentte: bunun **engel** olduğu ölçüldü, D15a ile aynı), `Path(p).write_text('x')`, `cd <hafıza> && echo x > MEMORY.md`, `git -C <hafıza> checkout .` | ilk komut ve `write_text`, `cd`, `git -C` biçimleri **geçer** (açık delik, §6; hiçbir kanca görmez); ikinci komut **engel** |
 | D16a | Worktree'de açılmış şeritli URUN `departman/URUN/`'a yazar | izin (ana depo dizini adayı) |
@@ -341,16 +365,20 @@ kaldırılınca hiçbir satırın düşmemesi bir kusurdur.
 | D19a | R10 (**ek izin**): geçiş süresince HARİTA `gunluk/URUN/x.md` yazımı ve `arsiv/x.md` yazımı / `gecis_son` sonrası aynıları | izin (R10 koşulu) / **engel** (R10 yok sayılır; `gunluk/URUN/` R4'e, `arsiv/` R7'ye düşer) |
 | D19b | Geçiş süresince şeritli URUN kendi `gunluk/URUN/x.md`'sine / `gunluk/ALTYAPI/x.md`'ye / `arsiv/x.md`'ye yazar | izin (R4, R10 gerekmez) / **engel** (R4) / **engel** (R7) |
 | D19c | Geçiş süresince şeritsiz pencere `gunluk/_sahipsiz/<kendi-sid>.md` yazar | izin (R5; R10 karar verici olsaydı bu düşerdi) |
+| D19d | **R10 açık** (`gecis_son` içinde): şeridi tam OPS olan oturum `gunluk/URUN/x.md`'ye yazar; **R10 kapalı** (ayar yok): aynı yazım | izin (R10) / **engel** (R4; D8 ile aynı) |
 | D20 | R6: şeritli URUN kendi kökteki `urun-lane-day-x.md`'sine / `aracin-x-state.md`'ye (önek `-`'sız) / `altyapi-lane-state-x.md`'ye yazar | izin / **engel** (R1'e düşer) / **engel** (R6 başka ROL) |
 | D21 | R6: `urun-katalog-lane-day-x.md` dosyasına şeridi `URUN-KATALOG` olan oturum / şeridi `URUN` olan / şeridi `KATALOG` olan yazar | izin / izin (aynı ROL URUN) / **engel** (en uzun önek URUN, KATALOG değil) |
-| D22 | R7: şeridi OPS (tam) `arsiv/x.md`'ye yazar / şeridi `OPS-AUDIT` olan / şeritli URUN (geçiş bayrağı kapalıyken) | izin / **engel** / **engel** |
+| D22 | R7 (**R10 kapalı**): şeridi OPS (tam) `arsiv/x.md`'ye yazar / şeridi `OPS-AUDIT` olan / şeritli URUN | izin / **engel** / **engel** |
 | D23 | R8: şeridi OPS (tam) hafıza kökünde `x.py`'ye yazar / şeritli URUN aynı yola | izin / **engel** |
-| D24 | R9 kaynak dosyaları: şeritli URUN `scripts/belge/rol-karti-uret.cjs`'e / `docs/roller/cetvel-sahipligi.json`'a yazar; OPS (tam) aynılarına; HARİTA `harita_muafiyet_son` içinde / sonra | **engel** / **engel** / izin / izin / **engel** |
+| D24a | R9 kaynak dosyaları: şeritli URUN `scripts/belge/rol-karti-uret.cjs`'e / `scripts/belge/cetvel-sahipligi.json`'a / `.claude/hafiza-yazma-ayar.json`'a / bir `*hafiza-yazma*` test dosyasına yazar | **engel** (dört yol; ön süzgeç dördünü de yakalar) |
+| D24b | Aynı dört yola OPS (tam) / HARİTA `harita_muafiyet_son` içinde / HARİTA sonra | izin / izin / **engel** |
+| D24c | **Worktree:** `…/.claude/worktrees/x/CLAUDE.md`'ye şeritli URUN yazar / OPS (tam) yazar; başka depodaki `CLAUDE.md`'ye OPS yazar | **engel** (aynı git ortak dizini) / izin / izin (R9 kapsamı dışı) |
 | D25 | Bayrak dosyası yok, bozuk ya da alanı eksik iken HARİTA `CLAUDE.md`'ye yazar | **engel** (muafiyet yok, §2) |
-| D26 | Çift OPS: biri **canlılık ölçümünde açık pencere olmayan** (çöken/hayalet; ölçüm yoksa son atışı 30 dakikadan eski) claim'i, öteki canlı | çift OPS **değil**, canlı olan `MEMORY.md`'ye yazar: izin; çift OPS alarmı çıkmaz |
-| D27a | Temizlik (`islem: sil` ya da `tasi`, **tek dosya**): OPS (tam) `oneri/x.md`'yi `arsiv/`'e taşır ya da siler / şeritli URUN aynı işlemi yapar | izin (koşulsuz) / **engel** |
-| D27b | Temizlik: OPS (tam) mtime 20 gün eski `gunluk/URUN/x.md`'yi siler / mtime 3 gün eski olanı siler / şeritli URUN 20 gün eskiyi siler | izin / **engel** (14 gün dolmadı) / **engel** (yazan OPS ya da HARİTA-muafiyet değil) |
-| D27c | Temizlik: OPS (tam) `rm -rf gunluk/URUN` / `mv gunluk arsiv/` (dizin hedefi) / `departman/*/x.md` silme | **engel** (en kısıtlı kural R4; dizin ve `*` hedefinde temizlik istisnası geçmez) |
+| D26 | Çift OPS (kütüphane girdisi `canlilik: { olculdu, acikSidler }`): (a) `olculdu: true`, biri `acikSidler`'de **yok** (çöken/hayalet), öteki var; (b) `olculdu: false` (zaman aşımı) ve biri son atışı 30 dakikadan eski; (c) `olculdu: true`, ikisi de `acikSidler`'de | (a) çift OPS **değil**, açık olan `MEMORY.md`'ye yazar: izin, alarm yok / (b) aynı: izin + durum satırında `kural ölçülemedi: canlılık` / (c) **engel** (ikisine de) + çift OPS alarmı (D17 ile aynı) |
+| D27a | **(R10 kapalı; kütüphane düzeyi, Bash ayağı §10 kalem 7 gelince kancada)** Temizlik (`islem: sil` ya da `tasi`, **tek dosya**): OPS (tam) `oneri/x.md`'yi `arsiv/`'e taşır ya da siler / şeritli URUN aynı işlemi yapar | izin (koşulsuz) / **engel** |
+| D27b | **(R10 kapalı; `mtimeGun` girdisiyle)** Temizlik: OPS (tam) `mtimeGun: 20` `gunluk/URUN/x.md`'yi siler / `mtimeGun: 3` olanı siler / `mtimeGun: null` (dosya yok) / şeritli URUN `mtimeGun: 20` olanı siler | izin / **engel** (14 gün dolmadı) / **engel** (süre dolmadı sayılır) / **engel** (yazan tam OPS ya da şeridi HARİTA değil) |
+| D27c | **(R10 kapalı)** Dizin ve `*` hedefi: OPS (tam) `rm -rf gunluk/URUN` / `mv gunluk arsiv/` (hedefler: `gunluk` dizini `sil`, `arsiv/` `yaz`; kaynak §10 kalem 7 gelince görünür) / OPS (tam) `departman/*/x.md` silme / şeritli URUN `departman/*/x.md` silme | **engel** (R4; dizin hedefinde temizlik istisnası geçmez) / **engel** (`gunluk` kökü her ROL için R4, toplam en kötüsü) / **izin** (v0.5: R3 OPS için her ROL genişlemesinde izin; v0.4'teki "R4" gerekçesi yanlıştı) / **engel** (R3, başka ROL genişlemeleri) |
+| D31 | ROL listesinde olmayan segment: şeritli URUN `gunluk/foo/x.md`'ye / `departman/foo/x.md`'ye yazar; tam OPS aynılarına | **engel** (tablo dışı, R8) / izin (R8) |
 | D28 | R2: şeritli URUN `oneri/URUN-x.md`'nin üzerine başka ROL'ün oturumu yazar | **engel** (R2 önek) |
 | D29 | Alt ajan Bash yolunda `departman/ALTYAPI/`'na yazar (ebeveyn URUN) | **engel** (R3); mesaj "ebeveyn de yazamaz, `oneri/` altına bırak" der (dosya araçlarıyla aynı metin) |
 | D30 | Karışık büyük/küçük harfli ROL segmenti: şeritli URUN `departman/urun/x.md` ve `Departman\URUN\x.md` yazar | izin / izin (harf duyarsız; NTFS) |
@@ -366,20 +394,22 @@ Günlük/durum dosyaları bugün hafıza dizininin kökünde durur (`<rol>-lane-
 `(lane-day|state|durum)` ad kalıbıyla arar ve özyinelemeli tarama yapmaz. Taşımak kapıyı kırar; bu yüzden **kapı değişikliği ve kanca
 aynı PR'da** girer (ARAÇ).
 
-**Kapının üç tüketicisi vardır, yalnız birini değiştirmek compact dönüşünü bozar** (ölçüldü): (1) `precompact-durum-kapisi.cjs` (compact'ı
-durduran kapı); (2) `session-board.cjs` compact dönüşünde `durumDosyasiBul`'u kullanır (dönüşte "durum dosyan şu" enjeksiyonu); (3)
-`son-konusma-dokumu.cjs` `projeDiziniBul` ile `memory/` dizinini çözer. Üçü **aynı ortak işlevi** kullanır: `oturumunDosyalari` bugün düz
+**Kapının tüketicileri beş çağrı noktasıdır, birini unutmak compact dönüşünü bozar** (ölçüldü, v0.5 sayımı): (1) `precompact-durum-kapisi.cjs` (compact'ı
+durduran kapı); (2) `session-board.cjs` compact dönüşünde `durumDosyasiBul`'u kullanır (dönüşte "durum dosyan şu" enjeksiyonu, ~L374-379); (3)
+`son-konusma-dokumu.cjs` `projeDiziniBul` ile `memory/` dizinini çözer ve döküm yazar (~L281-291); (4) `session-board.cjs` compact kolunda **dökümü okur** (~L399-400; (3)'ün yazdığı dosyayı aynı dizinden
+okur: yalnız yazma hedefi değişirse "döküm yok" der); (5) `hafiza-sorusu-yonlendirme.cjs` **kendi `projeDiziniBul` kopyasıyla** `memory/olcum/` okur (~L65, L91-96). Hepsi **aynı ortak işlevi** kullanır: `oturumunDosyalari` bugün düz
 `readdirSync` yapar, `sid`'i dosyanın ilk 600 karakterinde arar ve `AD_KALIBI` şart koşar; yeni işlev `gunluk/*/` ve `gunluk/_sahipsiz/`
-altını `sid`'e göre tarar (kapıda pano yok, ROL bilmeye gerek kalmaz) ve §4'ün aday kümesini kullanır. **`_sahipsiz/<sid>.md` eşleşmesi dosya adıyladır**
+altını `sid`'e göre tarar: **tek ve kesin kural (v0.5): kapı panoya bakmaz ve ROL bilmez; `gunluk/*/` altındaki bütün alt klasörlerde ve `gunluk/_sahipsiz/` altında dosya adı ya da (ROL
+klasörlerinde) `sid` içeriği ile tarar, geçiş süresince ek olarak kökü tarar** (v0.4'ün "önce `gunluk/<ROL>/`'a bakar" cümlesi geri alındı; ROL bilmek pano gerektirirdi). §4'ün aday kümesi kullanılır. **`_sahipsiz/<sid>.md` eşleşmesi dosya adıyladır**
 (`<sid>.md`, harf duyarsız; içerikte frontmatter aranmaz: bugünkü ilk 600 karakter kuralı frontmatter'sız dosyayı yok sayardı). **Dönüş sözleşmesi (v0.4):**
-`{ okumaAdaylari: [dizin…], yazmaHedefi: dizin }` (okuma tüm adaylardan; **yazma hedefi ana deponun hafıza dizinidir**, worktree'de `memory/` olmadığı için
-bugün `son-konusma-dokumu.cjs` `writeFileSync` ENOENT'ini sessizce yutuyor ve worktree pencerelerinde döküm hiç yazılmıyor); durum dosyası bulma `{ dosya, sahipsiz }`
-döner. `session-board.cjs` compact kolu `sahipsiz: true` dosyayı "DURUM DOSYAN" diye basar ama "şerit al" uyarısıyla birlikte; `oturumunDosyalari` bugün
+`{ okumaAdaylari: [dizin…], yazmaHedefi: dizin }` (okuma tüm adaylardan; **yazma hedefi ana deponun hafıza dizinidir**; worktree proje dizinlerinin çoğunda `memory/` yoktur (iki dizinde vardır: ölçüldü; aday kümesine girmesi
+zararsızdır) ve bu durumda bugün `son-konusma-dokumu.cjs` `writeFileSync` ENOENT'ini Stop'ta sessizce yutuyor, PreCompact'te "döküm BAŞARISIZ" basıyor); durum dosyası bulma bugünkü
+dönüşü `{ ad, tam, mt }` **korur ve `sahipsiz` ekler** (`{ ad, tam, mt, sahipsiz }`; `dosya` diye yeni alan yoktur; `session-board.cjs` `d.ad/d.mt/d.tam` okumaya devam eder). `session-board.cjs` compact kolu `sahipsiz: true` dosyayı "DURUM DOSYAN" diye basar ama "şerit al" uyarısıyla birlikte; `oturumunDosyalari` bugün
 dışa açık değildir (`module.exports`) ve `durumDosyasiBul` adı kapı testinde kilitlidir (`precompact-durum-kapisi.test.ts`): yeni işlev bu adı korur, test bilinçli
 güncellenir. Alt ajanın transcript'i `<proje>/<sid>/subagents/agent-*.jsonl` altında durur; kancaya verilen `transcript_path` bu dosyaysa `path.dirname` yanlış
 dizini verir, ortak işlev bunu tanır (proje dizinini `subagents/` üstünden çözer). Worktree'den açılan oturumda `projeDiziniBul` bugün de transcript dizinini verir ve orada `memory/` yoktur (harita-h4, urun-acilis,
 harita-bicim'de ölçüldü): kapı **bugün** bu oturumlarda "hiç durum dosyası yok" der; aday kümesi kapıya da uygulanır.
-Kapı önce `gunluk/<ROL>/`'a, bulamazsa geçiş süresince köke bakar (R6 ile aynı kalıp). `gunluk/_sahipsiz/<session_id>.md` kapıda
+Geçiş süresince kök ve `gunluk/*/` birlikte taranır (yukarıdaki kural; R6 ile aynı kalıp). `gunluk/_sahipsiz/<session_id>.md` kapıda
 **"durum var" sayılır**, ama yalnız **uyarı düzeyinde**: şeritsiz pencerenin tek yazma yeri orasıdır ve sayılmasaydı compact'ı hiç geçemezdi
 (`VENTHUB_PRECOMPACT_KAPALI=1` dışında); süresi dolan claim'li pencere de aynı yere düşer.
 
@@ -395,13 +425,13 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
 |---|---|
 | Karar kütüphanesi | `.claude/hooks/lib/hafiza-yazma-kurali.cjs` (saf işlev; §2 R1-R10, §3 sınıflar; girdi/çıktı sözleşmesi §5 "Yeni kanca yazılır" maddesinde: `hedefler:[{yol,islem}]`, `cozulemedi`, `genisletmeli`, `panoDurumu`, `claimler`, `adaylar`, `bayraklar`, `simdi`; çıktı hedeflerin en kötüsü; dosya sistemi, `realpath` ve pano kancada) |
 | Kanca | `hafiza-yazma-bekcisi.cjs` (PreToolUse); dosya araçları ve Bash tek dosyada; alt ajan mesajı her iki yolda; alarm ve olay kaydı oturum başına (§3, §5); çalışma sırası §5 |
-| Ayar | `.claude/settings.json` eşleştirici `Edit\|Write\|MultiEdit\|NotebookEdit\|Bash`; ana ağaca ileri sarma. Değişikliği ARAÇ yapar, **OPS onaylar** (ARAÇ kartı: "settings değişikliği OPS kapısıdır"); dosya yolu okuma `file_path \|\| notebook_path` |
+| Ayar | `.claude/settings.json` eşleştirici `Edit\|Write\|MultiEdit\|NotebookEdit\|Bash\|PowerShell` (§5 ile aynı; v0.4 §10'da `PowerShell` eksikti); ana ağaca ileri sarma. Değişikliği ARAÇ yapar, **OPS onaylar** (ARAÇ kartı: "settings değişikliği OPS kapısıdır"); dosya yolu okuma `file_path`, `notebook_path` ve `edits[].file_path` (§5 "tüm yol alanlarını tara") |
 | Yardımcılar | `seritRolu` (`pencere-adlari.cjs`, ARAÇ #1592 sonrası ayrı küçük PR; `session-board.cjs` aynı işlevi kullanır); ana depo dizini türetimi `belge-tazelik.cjs`'ten ortak işleve (dizin adayı döndürür, slug `[^A-Za-z0-9]`→`-`) |
-| **ARAÇ iş listesi (kabul koşulu)** | (1) `board.durumOku()`: dizin var mı, olay dosyası sayısı, bu `sid`'in dosyası var mı, bozuk satır ve hangi dosyada; dizini **yaratmaz** (§3). (2) `board.cjs` adsız `claim`'in önceki şerit adını ezmesi (`lane`) düzeltilir (§3). (3) `session-board.cjs`, `precompact-durum-kapisi.cjs`, `son-konusma-dokumu.cjs`: ortak durum dosyası bulma işlevi (§9), AYNI PR. (4) `hafiza-indeks-bekcisi.cjs` kapsamı `departman/*/MEMORY.md`, eşik 60 satır / 8 KB **yumuşak**, `hafiza-indeks-bekcisi-kilidi.test.ts` bilinçli güncelleme (§7). (5) `lane` ezmesi **üç yerde** (§3). (6) Ayar dosyası `.claude/hafiza-yazma-ayar.json` ana ağaçtan okunur (§2). **Ekip üyesi** claim'siz = şeritsiz (§3). |
-| **ARAÇ iş listesi (sonraki iş, kabul koşulu DEĞİL)** | `bash-write-targets.cjs`: `cd`/`pushd` izleme; tırnak farkındalıklı segment bölme; `mv`/`cp` kaynağı; `git -C` alt komutları; `genisletmeli: true` işareti; PowerShell fiilleri (§6). Bunlar yapılınca §8 D13d/D15b beklentileri "engel"e çevrilir. |
-| Test | `src/__tests__/conformance/` altında yeni kapı (öneri `INV-HAFIZA-YAZMA-1`): §8 D1-D13, D16-D30, her satır izin/engel çiftiyle; test enjeksiyonu §4 (`VENTHUB_SIMDI` dahil); sabotaj: her kural için "izin'e çevir" mutasyonu → kırmızı |
+| **ARAÇ iş listesi (kabul koşulu)** | (1) `board.durumOku()`: dizin var mı, olay dosyası sayısı, bu `sid`'in dosyası var mı, bozuk satır ve hangi dosyada; dizini **yaratmaz** (§3). (2) `board.cjs` adsız `claim`'in önceki şerit adını ezmesi (`lane`) düzeltilir (§3). (3) `session-board.cjs`, `precompact-durum-kapisi.cjs`, `son-konusma-dokumu.cjs`: ortak durum dosyası bulma işlevi (§9), AYNI PR. (4) `hafiza-indeks-bekcisi.cjs` kapsamı `departman/*/MEMORY.md`, eşik 60 satır / 8 KB **yumuşak**, `hafiza-indeks-bekcisi-kilidi.test.ts` bilinçli güncelleme (§7). (5) `seritRolu` (`pencere-adlari.cjs`, §3) ve `session-board.cjs`'in aynı işlevi kullanması (rol çözümü tek yerde). (6) Ayar dosyası `.claude/hafiza-yazma-ayar.json` ana ağaçtan okunur (§2). (7) `bash-write-targets.cjs`: **hedef başına fiil** (`islem`: `sil`/`yaz`/`tasi`) ve `mv`/`cp` **kaynağı** döndürülür (§5; olmadan temizlik istisnası Bash'te sınanamaz). **Ekip üyesi** claim'siz = şeritsiz (§3). (2)'nin kapsamı: `lane` ezmesi **üç yerde** ve `e.lane === 'lane'` boş sayılır (§3; v0.4'te (2) ve (5) aynı kalemdi, birleştirildi). **Kapı kalemi (3)** beş çağrı noktasını kapsar (§9): `precompact-durum-kapisi.cjs`, `session-board.cjs` (iki yerde), `son-konusma-dokumu.cjs`, `hafiza-sorusu-yonlendirme.cjs`. **Durum satırı:** `board-brief.cjs` hafıza alarmı varken sessizlik kuralını (`exit(0)`) aşar ve alarm satırını basar; alarm yoksa mevcut davranış korunur. |
+| **ARAÇ iş listesi (sonraki iş, kabul koşulu DEĞİL)** | `bash-write-targets.cjs`: `cd`/`pushd` izleme; tırnak farkındalıklı segment bölme; `git -C` alt komutları (`mv`/`cp` kaynağı ve hedef başına fiil kabul koşuluna taşındı, kalem 7); `genisletmeli: true` işareti; PowerShell fiilleri (§6). Bunlar yapılınca §8 D13d/D15b beklentileri "engel"e çevrilir. |
+| Test | `src/__tests__/conformance/` altında yeni kapı (öneri `INV-HAFIZA-YAZMA-1`): §8 D1-D13, D16-D31 (D19a-d, D24a-c), her satır izin/engel çiftiyle; test enjeksiyonu §4 (`VENTHUB_SIMDI` dahil); sabotaj: her kural için "izin'e çevir" mutasyonu → kırmızı |
 | Durum satırı | `board-brief.cjs` alarm dosyalarını okur (§3); alarm kaydı ve olay dosyası oturum başına |
-| Kapı | §9'daki üç tüketici, AYNI PR |
+| Kapı | §9'daki **beş** çağrı noktası, AYNI PR |
 | Envanter | `docs/audits/arac-envanteri-*` satırı (kanca envantere girmeden bitmiş sayılmaz) |
 | Deneme | D14 ve D15'i HARİTA'nın bağımsız ajanı koşar; sonucu REC-530'a yazar |
 
@@ -426,6 +456,18 @@ tek yerde (`pencere-adlari.cjs`).
 
 ## Değişiklik kaydı
 
+- 2026-10-01 v0.5: v0.4'ü okuyan dördüncü bağımsız okuyucu (işi yapmamış, kodu canlı çalıştırdı) 7 engelleyici ve 6 yanlış olgu buldu; hepsi işlendi. **R9:** ön süzgeç artık ayrı liste değil, R9 kalıp sabitinin dize
+  karşılaştırması (ayar dosyası ve test dosyası süzgeçten düşüyordu); sahiplik kaydı yolu düzeltildi (`scripts/belge/cetvel-sahipligi.json`, `docs/roller/…json` yoktu); "repo" = aynı git ortak dizinine bağlı **her çalışma ağacı**
+  (worktree dahil); ARAÇ'ın genel kanca kodu bilinçli olarak R9 dışında. **Kütüphane girdisi:** hedef başına `mtimeGun`, `repoGoreli`, `genisletmeli`; `sonBilinenAd`; `canlilik`; `islem` türetme kuralı yazıldı ve
+  ölçüldü: çıkarıcı hedef başına fiil ve `mv`/`cp` kaynağı döndürmüyor → **ARAÇ kabul koşulu 7**; temizlik istisnası yalnız Bash yolundadır. **`*` hedefi:** statik önek genişletme algoritması yazıldı (ROL segmenti `ROLLER` ile
+  genişler, toplam en kötüsü); `$DEĞİŞKEN`/`$(…)` ayrı sınıf (izin + alarm); D27c üçüncü durum "R4" idi, R3 ile **izin** çıkar (düzeltildi). **R10/D8/D27:** tek bayrak `gecis_son` (R10 ve temizlik), `harita_muafiyet_son` yalnız R9;
+  her D satırı "R10 kapalı/açık" durumunu söyler; D19d eklendi; çift OPS vetosu R10-OPS ve temizlik-OPS kolunu da kapsar; R5 notu (OPS başka `sid`'in dosyasına yazamaz). **Çift OPS canlılık:** çağrı koşulu (üç koşul),
+  zaman aşımı/sezgi yedeği, kütüphane girdisi `canlilik`, test enjeksiyonu `VENTHUB_CANLILIK_HAM`; D26 üç dala bölündü. **§9:** "önce `gunluk/<ROL>/`" cümlesi geri alındı (pano gerektirirdi; kapı `gunluk/*/` ve `_sahipsiz`'i sid'e göre tarar),
+  dönüş sözleşmesi bugünkü `{ad, tam, mt}`'yi korur ve `sahipsiz` ekler, kapı tüketicileri **beş çağrı noktası** (iki ek: `session-board.cjs` döküm okuma, `hafiza-sorusu-yonlendirme.cjs` kendi kopyası). **Olgusal düzeltmeler:**
+  kilit testinin yalnız `:99` onayı kırılır (`:84` `exit(2)` kırılmaz), `lane` ezmesi düzeltmesinin iki parçası (`e.lane === 'lane'`), ENOENT PreCompact'te yutulmuyor, worktree proje dizinlerinin bazısında `memory/` var, `exit 0 bilgi` olay
+  dosyası adı tutarsızlığı. **§10:** matcher'a `PowerShell`, `edits[].file_path`; yinelenen kalem (2)/(5) birleşti; `seritRolu` ve hedef-başına-fiil kalemleri kabul koşuluna girdi; durum satırı sessizlik istisnası; D31 (ROL listesi dışı segment → R8).
+  Kodlama sırasında kalan **düşük** maddeler (okuyucu raporu): R2 sil/yaz ayrımı, `exit 0 bilgi` hangi bilgi, `CLAUDE_PROJECT_DIR` ile ana depo çözümünün başlangıç dizini, D13c göreli cwd, slug uzun yol kırpması, alarm dosyası `<gün>` saat dilimi (UTC) ve `sid` sanitizasyonu
+  (`board.cjs sessionFile` emsali), `PRUNE_MS` ile olay dosyası sayısı, `cozulemedi` + hafıza hedefi birlikteyse sıra (engel > ölçülemedi > izin), R2'de en uzun önek (`GEO-SEO-…`).
 - 2026-09-30 v0.4: ARAÇ'ın uygulayıcı (üçüncü) okuması 17 kritik, 12 düşük madde buldu; ARAÇ'ın 4 sorusuna HARİTA kararları işlendi. **R10 ek izin** (karar verici değil; §2 başı, D19a-c);
   **temizlik istisnası** tanımlandı (`oneri/` koşulsuz OPS, `gunluk/` 14 gün ve yazan OPS/HARİTA-muafiyet, dizin/`*` hedefinde geçmez; D27a-c); **bayrak/ayar ana ağaçtan**, sabit yol
   `.claude/hafiza-yazma-ayar.json`; departman eşiği **yumuşak**, kilit testi bilinçli güncellenir; kütüphane girdisi `hedefler:[{yol,islem}]`, `panoDurumu`, `claimler`; R9 kaynak listesi açık
