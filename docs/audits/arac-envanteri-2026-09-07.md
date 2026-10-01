@@ -557,6 +557,8 @@ madde 1 gereği araç sayılmaz.
 | 77 | wrongstack-kanban | .claude | WrongStack pano karti yasam dongusu ve dogrulama; Linear yaninda pilot; WrongStack core 1.0.26 kopyasi + ek kurallar (karar 165 W3) | ARAC | `skill:wrongstack-kanban` | 2026-09-28 · manifest yok | yok (NOTICE.md satiri) | ENVANTER-DISI |
 | 78 | wrongstack-mailbox-mcp | .claude | kapali pencereye posta kutusu; WrongStack core 1.0.26 kopyasi + ek kurallar (karar 165 W3) | ARAC | `skill:wrongstack-mailbox-mcp` | 2026-09-28 · manifest yok | yok (NOTICE.md satiri) | ENVANTER-DISI |
 | 79 | mutasyon-testi | .claude | kodu gecici bozup testlerin bozulmayi yakalayip yakalamadigini olcer (durum makinesi, fiyat/hesap katmani); ayri kopyada calisir, ana agaca dokunmaz | YETENEK | `skill:mutasyon-testi` | 2026-09-30 · manifest yok (.claude kapsam disi) | INV-MUTASYON-KOSUCU-1 (koşucu kapı testi, 5 sabotaj kırmızı) | KAL |
+| 80 | chimera | .claude | degisen dosyalari SALT-OKUMA incelenip siddet siralı hata raporu uretir, duzeltme yazmaz (WrongStack 1.0.26 uyarlamasi, talep uzerine) | YETENEK | `skill:chimera` | 2026-10-01 · manifest yok (.claude kapsam disi) | INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
+| 81 | mnemosyne | .claude | sage hafizasini bakima alir: hygiene + cıpa dogrulama + celiski/tekrar incelemesi, silme/arsiv yalniz oneri (WrongStack 1.0.26 uyarlamasi) | YETENEK | `skill:mnemosyne` | 2026-10-01 · manifest yok (.claude kapsam disi) | INV-SKILL-BITIS-1, INV-SKILL-FRONTMATTER-1 (varlik/ayrisma; etki olculmedi) | KAL |
 
 **Not:** ENVANTER-DIŞI = `.claude` ağacındaki satır ne `venthub-core` manifest'inde (yalnız `.agent`
 yollarını kapsar) ne 09-05 dış envanterinin §3 istisnasında geçiyor. Bu "yanlış" anlamına gelmez —

@@ -33,6 +33,12 @@ metadata:
 10. Ops'a rapor dört alanlı etiketle gider (NE · DURUM · KANIT · KİMDE). Kaynak metindeki `<nextsteps>` biçimi bunun ekidir, yerine geçmez.
 11. **İzin bilgisi** (kim neye yetki verdi) pencere mesajından hafızaya ya da durum dosyasına KOPYALANMAZ. Tek kaynak `~/.claude/settings.json`; en fazla "bkz. settings.json autoMode, <tarih>" yazılır.
 12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Linear) + hüküm + istek taşır; ayrıntı dosyada ya da Linear'dadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+13. **⚠Kaynak gövde ile `execution-method-standard.md` §10 (müdür modeli, karar 201) çakışan yerler — §10 kazanır:**
+    - Gövdedeki **"≥5 tool calls per subtask" bölme kapısı** (karar sorusu 3 ve "Single atomic task under 5 tool calls") bizde geçerli değildir: §10.4 **"şüphede model uygulanır"** der; elle yalnız küçük tek dosya.
+    - Gövdedeki **"~10 işçi (200K) / ~25 (1M)" pratik tavanı** sert sınır değildir: §10.4 **eşzamanlı alt ajan sayısına sınır koymaz** (Recep, karar 201); tek ölçüt her parçanın denetlenip doğrulanabilmesidir. Tavandan alınacak ders yalnız şu: sentez kalitesi bağlamdan önce düşer, parça sayısı denetlenebilirliği aşınca dalgaya böl. Host sınırları (eşzamanlı 20 vb.) ayrıdır: §10.5.
+    - Gövdedeki **"bağlama sığıyorsa bölme"** ipucu bizde gerekçe değildir: bölmenin gerekçesi **bağımsız doğrulamadır** (yazan göz hatasını göremez, §10.3).
+    - `delegate` / `batch_tool_use` / `collab_debug` / fleet adları bizde yok (yukarıdaki tablo). `references/collab-debug.md` kopyada yok; gövdedeki bağlantı boşta.
+    - **Çalışan Recep'e yazmaz, başka pencereye emir vermez; raporu yalnız müdüre gider** (§10.4); gövdedeki çalışan→lider posta örnekleri bu kuralla okunur.
 
 ---
 
