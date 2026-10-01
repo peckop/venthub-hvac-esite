@@ -528,7 +528,7 @@ export async function POST(request: NextRequest) {
      * 8. Table: price_lists (W4) — TÜM ailelerin PDP yolları; keşife DOKUNMAZ.
      *
      * ⚠️ FAN-OUT SINIRI: bu dal aile sayısı kadar yol tazeler (ölçüm 2026-08-17: **32 aile**
-     * → 64 çağrı; REC-300 Faz 3g'den sonra aile başına 4 yol = 128). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
+     * → 64 çağrı; REC-300 Faz 3g'den sonra aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir) = 96). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
      * çözüme geçilmelidir. Sınır cetvele sayıyla yazıldı; sessizce yavaşlamasın.
      *
      * Keşife dokunmama kararı `product_prices` ile aynı gerekçeye dayanır: fiyat yalnız
