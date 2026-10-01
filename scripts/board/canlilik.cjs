@@ -40,8 +40,9 @@ const ZAMAN_ASIMI_MS = 8000
 /** Önbellek ömrü. */
 const ONBELLEK_MS = 30 * 1000
 const ONBELLEK_ADI = 'canlilik-onbellek.json'
-/** Alt ajan / gözlemci süreçlerin adı (`vh-arac-12`, `vh-…-xx`). Ana pencereler `venthub-hvac-xx` / serbest ad taşır. */
-const ALT_SUREC_AD = /^vh-/i
+/** Alt ajan / gözlemci süreçlerin adı (`vh-arac-12`, `vh-…-xx`) ve Desktop'ın arka planda açtığı `scratchpad-xx` süreçleri
+ *  (adı ya da çalışma dizininin son parçası `scratchpad`). Ana pencereler `venthub-hvac-xx` / serbest ad taşır. */
+const ALT_SUREC_AD = /^(vh-|scratchpad)/i
 /** Claim'siz süreç bu yaştan gençse "YENİ SÜREÇ" (henüz claim almadı) sayılır; sonra ŞERİTSİZ AÇIK PENCERE uyarısı. */
 const YENI_SUREC_MS = 5 * 60 * 1000
 

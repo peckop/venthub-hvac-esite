@@ -21,6 +21,9 @@
  *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --strict-mcp-config --mcp-config
  *     <ana-kök>\.mcp.json` (sid yoksa `--resume` YOK = yeni oturum), çalışma dizini = ANA DEPO KÖKÜ
  *     (scripts/hijyen/ana-kok.cjs; sabit yol yazılmaz).
+ *  · İZİN MODU (Recep kararı bekliyor): açılan pencere `--permission-mode auto` kipte BAŞLAR; Recep kararı gelene kadar
+ *     varsayılan budur. Bu bir güvenlik tercihidir, teknik zorunluluk değil; değişecekse YALNIZ bu satırdaki değer
+ *     (ve bu not) değişir. Canlı deneme onayı istenirken bu satır ayrıca söylenir.
  *  · `--taze`: `--resume` YOK; yeni oturum `--name <Ad>` + ilk mesaj "durum dosyanı oku, devam et" (durum dosyasının
  *     yolu rolün son sid'inden mevcut kancanın çözümlemesiyle bulunur; bulunamazsa genel cümle + uyarı).
  *

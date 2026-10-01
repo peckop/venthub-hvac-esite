@@ -12,13 +12,13 @@ Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, m
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-Migration'lar `*quote*`, `*anon_definer*`; edge `quote-notification-webhook`, `quote-request-guest`; `quoteService.ts`, `adminQuoteService.ts`, `src/views/admin/quotes/**`; INV-QUOTE-YAYIM-1, INV-AUTH-DEFINER-ANON-1. Sahiplik adayı cetveller (OPS onaylar): ödeme ve satış kipi (checkout-payment, payment-ledger, satis-kipi-gecis; bugün ALTYAPI), teklif ve belge numarası (quote-standard, document-numbering; bugün URUN). Pano dosya kümesi belirlenmedi.
+Migration'lar `*quote*`, `*anon_definer*`; edge `quote-notification-webhook`, `quote-request-guest`; `quoteService.ts`, `adminQuoteService.ts`, `src/views/admin/quotes/**`; INV-QUOTE-YAYIM-1, INV-AUTH-DEFINER-ANON-1. Sahibi olduğu cetveller (OPS onaylı devir, 2026-09-30): ödeme ve satış kipi (checkout-payment, payment-ledger, satis-kipi-gecis; önceki sahip ALTYAPI), teklif ve belge numarası (quote-standard, document-numbering; önceki sahip URUN; quote-standard yönetici tarafında ADMIN ikincil). Pano dosya kümesi belirlenmedi.
 
 ## Yetki
 Migration planı, gölge veritabanı kanıtı, çürütme; teklif servisini bağlama; konformans kapısı ve cetvel yazımı; birleştirme sonrası canlı salt-okuma ölçüm; migrationsız karar 98 sınıfı PR'ı ritüelle kendisi birleştirir.
 
 ## Yasak ve sınır
-Kırmızı CI'da birleştirme yok; yeni fonksiyonda anon'a REVOKE; migration/DEFINER PR'ında birleştirmeden önce diff-review + security-reviewer; test teklifi alıcısı Recep (uydurma adres yok); birleştirme saati ALTYAPI'ya yazılır; satış kipi yalnız `scripts/kip/satis-kipine-gec.mjs` ile. Sınır: ödeme yolu ve bildirim cetveli ALTYAPI, e-posta şablonu URUN, KVKK cetveli OPS: değiştirmeden önce sahibine yaz.
+Kırmızı CI'da birleştirme yok; yeni fonksiyonda anon'a REVOKE; migration/DEFINER PR'ında birleştirmeden önce diff-review + security-reviewer; test teklifi alıcısı Recep (uydurma adres yok); birleştirme saati ALTYAPI'ya yazılır; satış kipi yalnız `scripts/kip/satis-kipine-gec.mjs` ile. Sınır: ödeme yolunun cetvelleri SATIS'ındır (devir 2026-09-30); bildirim cetveli (notification-standard) ALTYAPI, e-posta şablonu URUN, KVKK cetveli OPS: sahibi başkasıysa değiştirmeden önce ona yaz.
 
 ## Yetenek ve araç
 plan-challenger (iki tur), create-migration, diff-review ve security-reviewer (henüz denenmedi), gölge veritabanı betiği, Supabase MCP salt-okuma, canlı e2e (e2e-canli).

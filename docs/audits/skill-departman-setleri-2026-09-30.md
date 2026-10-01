@@ -24,10 +24,13 @@ Müdür modelinde (execution-method-standard §10) bir departman penceresi işi 
 | Listede açıklamasız skill, 1M pencere (`claude-sonnet-5-5[1m]`, bütçe ayarı 0,02) | 0 / 138 |
 | Aynı ölçüm, Haiku 4.5 (200K) | 103 / 138 açıklamasız (proje skill'lerinin 30 / 42'si) |
 | Aynı ölçüm, Sonnet 5.5 200K | 113 / 138 açıklamasız (proje skill'lerinin 37 / 42'si) |
+| ⭐KESİN sayım, 10-01 (oturum dökümündeki `skill_listing` eki satır satır; `scripts/hijyen/skill-listesi-say.cjs`; yukarıdaki üç satır modelin kendi sayımıydı) | Haiku 4.5 (200K): 159 skill, 128 açıklamasız, **proje 32 / 45 açıklamasız (%71)**. Sonnet 5.5 düz ve [1m]: 159 skill, 3 açıklamasız, **proje 0 / 45 açıklamasız** |
 | Listede açıklaması görünmeyen skill'i adıyla çağırma (`Skill(skill="verify-before-done")`), Haiku 200K ve Sonnet 200K, yeni süreç | İkisinde de başarılı: araç çağrısı yapıldı, "Launching skill" döndü |
 | Ad çakışması | `supabase` (proje 19K, eklenti 13K) ve `scrape` (kullanıcı 26K, Bright Data 5K); `skills:` alanının hangisini çözdüğü ölçülmedi |
 
 Sonuç: çalışan bir skill'i adıyla çağırabiliyor, ama ne zaman çağıracağını bilmesi gerekiyor. Bu yüzden iki katman var: **ön yükle** (kısa ve kritik, çalışan hiç karar vermeden bilir) ve **adıyla çağır** (ağır ya da nadir, çalışanın görevinde adı geçmeli). Ön yüklemenin çalışanın davranışını gerçekten değiştirip değiştirmediği ölçülmedi, §8'deki ölçüm bunun için.
+
+**Kural (OPS hükmü, 10-01): Haiku (200K) çalışana skill'e bağlı iş verilmez; verilecekse skill adı müdürün görev metninde AÇIKÇA yazılır ya da `skills:` ile ön yüklenir.** Sonnet çalışanlarda proje skill'leri tam görünür.
 
 ## 4. Setler
 
@@ -299,7 +302,7 @@ Bu bölümdeki skill'lerde dikkat:
 |---|---|---|
 | diff-review | Yalnız çalışma ağacındaki `git diff HEAD`'e bakıyor; işlenmiş dalda boş dönüyor. `.md`, `.json`, `.yml` dosyalarını hiç taramıyor. Edge fonksiyonlarındaki meşru `SUPABASE_SERVICE_ROLE_KEY` kullanımını engelleyici hata sayıyor. SKILL.md'deki `useSearchParams` kuralı betikte yok. | REC-514 (D1, D10, D11), sabotaj testiyle kanıtlı düzeltme |
 | plan-challenger | Cetvel olarak emekli CONTEXT.md ve "31 madde" diyor; olmayan `codegraph_impact` aracını anıyor. 45 günde 33 kez kullanıldı ve işledi. | D7, REC-514 kuyruğu, ayrı PR |
-| verify-before-done | Kapsam listesi depoda olmayan üç skill'e (testing, debugging, git-flow) gönderiyor. WrongStack'ten alınınca kapanır. | D8, REC-519 alma adımı |
+| verify-before-done | Kapsam listesi depoda olmayan üç skill'e (testing, debugging, git-flow) gönderiyor. **KAPANDI (WrongStack alımı 2. paket: testing, debugging, git-flow depoya geldi).** | D8, REC-519 alma adımı |
 | skills-creator | Yeni skill'i `.agent/skills` altına yazıyor. | D9, REC-514 kuyruğu |
 | Denetim dörtlüsü (venthub-enterprise-audit, venthub-auditor, venthub-20-eksen-denetimi, venthub-global-rontgen) | Aynı işe talip; "aynı iş" yan yana koşumla kanıtlanmadan biri seçilmez. global-rontgen'de ayrıca bayat yol ve araç adları var. | Yan yana koşum (ayrı iş, ALTYAPI ile) |
 | careful, freeze, guard | Üçlü aynı kanca alanında; kıyas bekliyor. | ARAÇ ile yan yana koşum |

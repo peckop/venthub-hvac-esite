@@ -669,6 +669,26 @@ describe('INV-DEPARTMAN-AC-7 · kabuk sarmalayıcıları: .cmd ince, .ps1 doğru
     expect(baslat).toBeGreaterThan(temizle)
   })
 
+  it('.ps1: temizlikten SONRA, Start-Process tan ÖNCE kullanıcı/sistem düzeyindeki KALICI CLAUDE* değişkenleri kayıttan geri verilir (CLAUDE_CONFIG_DIR gibi)', () => {
+    const temizle = ps1.indexOf("Get-ChildItem Env: | Where-Object Name -like 'CLAUDE*' | Remove-Item")
+    const geri = ps1.indexOf('GetEnvironmentVariables')
+    const baslat = ps1.indexOf('Start-Process')
+    expect(geri).toBeGreaterThan(temizle)
+    expect(baslat).toBeGreaterThan(geri)
+    const blok = ps1.slice(temizle, baslat)
+    expect(blok).toMatch(/'Machine'\s*,\s*'User'/) // iki kapsam da; User en son yazar (kullanıcı değeri sistem değerini ezer)
+    expect(blok).toMatch(/-like 'CLAUDE\*'/)
+    expect(blok).toMatch(/Set-Item\s+-Path\s+\('Env:'\s*\+\s*\$anahtar\)/) // yalnız bu sürecin ortamına yazar, kalıcı kayda dokunmaz
+    expect(blok).not.toMatch(/SetEnvironmentVariable/)
+  })
+
+  it('departman-ac.cjs başlığı: pencere --permission-mode auto kipte BAŞLAR, Recep kararı gelene kadar varsayılan budur (kod ile not aynı yerde)', () => {
+    const kaynak = fs.readFileSync(AC, 'utf8')
+    expect(kaynak).toMatch(/İZİN MODU \(Recep kararı bekliyor\)/)
+    expect(kaynak).toMatch(/permission-mode` kipte BAŞLAR|`--permission-mode auto` kipte BAŞLAR/)
+    expect(kaynak).toMatch(/'--permission-mode', 'auto'/)
+  })
+
   it('.ps1: Start-Process -FilePath/-WorkingDirectory/-ArgumentList/-WindowStyle Normal/-PassThru; --kuru dalı başlatmadan ÖNCE çıkar', () => {
     const satir = ps1.split('\n').find((s) => s.includes('Start-Process -FilePath')) ?? ''
     for (const p of ['-FilePath $plan.exe', '-WorkingDirectory $plan.cwd', '-ArgumentList $plan.argumentList', '-WindowStyle Normal', '-PassThru']) expect(satir).toContain(p)

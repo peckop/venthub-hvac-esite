@@ -86,6 +86,9 @@ Başlık konvansiyonu: kimlik kodu baştaki köşeli parantezin İÇİNDE (`[ŞE
     REC-433 tek plan, REC-400 belge kök çözümü). PR'lar çatıya `Part of REC-nn` ile bağlanır. Alt kayıt
     (parent) yalnız kapsamı baştan bilinen, parçaları bitince iş gerçekten bitmiş sayılacak kayıtlarda
     kullanılır; Linear o üstü kendiliğinden kapatır (karar 187, OPS 2026-09-29).
+  - **Çok aşamalı işte bütün alt kayıtlar İŞ BAŞINDA açılır;** çatının tek alt kaydı kapanırsa Linear çatıyı da
+    kapatır. Çatı erken kapanırsa sahibi In Progress'e alır ve eksik alt kayıtları açar. (Vaka 2026-09-30:
+    REC-531 kapanınca üstü REC-530 ve onun üstü REC-516 kalan iş varken kendiliğinden Done oldu.)
   - İstisna yalnız PR gövdesinde açık bir `Kayıtsız: <sebep>` satırıyla; sebepsiz istisna yoktur.
   - Kapı (Fixes ya da Kayıtsız yoksa uyarı) ARAÇ'ta yazılıyor.
   - Niçin: 2026-09-29 ölçümü, son 60 birleşmenin 0'ı `Fixes` taşıyordu; kayıtlar elle kapanmadığı için
@@ -98,6 +101,20 @@ Başlık konvansiyonu: kimlik kodu baştaki köşeli parantezin İÇİNDE (`[ŞE
   (Recep 08-26: "arşiv olmazsa geçmişimizi kaybediyoruz").
 - Registry'ye yazma yalnız CLI/engine yolundan (elle SQL yasak).
 - Linear free tavanı (250 arşivlenmemiş kayıt) için periyodik arşivleme rutini OPS'ta.
+- **Tavanı biten işler değil AÇIK kayıtlar doldurur; bekleyen eski iş panoya taşınır (karar 215, Recep
+  2026-10-01).** Ölçüm 2026-10-01: arşivsiz 264 kaydın 210'u backlog/todo, yalnız 13'ü bitmişti; bitmişleri
+  arşivlemek tavanı açmadı.
+  - Ölçüt: durumu Backlog ya da Todo, 14 gündür dokunulmamış, süren bir üst ya da alt kaydı yok.
+  - Yol: önce tam içerik yedeği (açıklama + yorumlar), sonra WrongStack kanban panosunda
+    ("Linear Bekleyenler (taşınan, karar 215)") REC numarasıyla başlayan kart, en son Linear'da arşiv.
+    Kart sayısı ölçülmeden arşive geçilmez.
+  - Taşınmaz, Linear'da kalır: Design'ın sürekli açık soru kayıtları, lansman engelleri, sır rotasyonu
+    gibi güvenlik kalemleri, Recep'in kararını ya da kapısını bekleyen kayıtlar.
+  - Geri alma: Linear'da arşivden çıkarılır (kayıt silinmez), panodaki kart kapatılır. İşin sırası gelince
+    bunu OPS yapar; şerit numarayı yazması yeter.
+  - Bu, aşağıdaki zaman-vekilli ölçü yasağına **açık istisnadır**: kayıt kapatılmaz ya da iptal edilmez,
+    yalnız görünür olduğu yer değişir.
+  - İlk koşum 2026-10-01: 100 kayıt taşındı, 9 kayıt bilerek bırakıldı, arşivsiz toplam 264 → 164.
 - Toplu kapanış koşumları: önce yedek + kuru koşum + log; "tarihsizlik = ölülük" gibi
   **zaman-vekilli ölçüler YASAK** — bayatlık değişimle ölçülür.
 

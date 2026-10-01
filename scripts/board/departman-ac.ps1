@@ -70,8 +70,16 @@ if ($kuru) {
   exit 0
 }
 
-# CLAUDE* ortam degiskenlerinin HEPSINI bu surecten temizle (bkz. dosya basi), sonra baslat.
+# CLAUDE* ortam degiskenlerinin HEPSINI bu surecten temizle (bkz. dosya basi), sonra kullanicinin/sistemin KALICI
+# tanimladiklarini kayittan geri ver (ornegin CLAUDE_CONFIG_DIR): yeni pencere onlari kayittan degil bu surecin ortam
+# blogundan miras alir, silinirse kaybolurlardi. Oturuma ozgu olanlar kayitta yoktur, geri gelmez.
 Get-ChildItem Env: | Where-Object Name -like 'CLAUDE*' | Remove-Item
+foreach ($kapsam in 'Machine', 'User') {
+  $kalici = [Environment]::GetEnvironmentVariables($kapsam)
+  foreach ($anahtar in $kalici.Keys) {
+    if ($anahtar -like 'CLAUDE*') { Set-Item -Path ('Env:' + $anahtar) -Value $kalici[$anahtar] }
+  }
+}
 
 try {
   $surec = Start-Process -FilePath $plan.exe -WorkingDirectory $plan.cwd -ArgumentList $plan.argumentList -WindowStyle Normal -PassThru -ErrorAction Stop
