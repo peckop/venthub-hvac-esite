@@ -63,11 +63,33 @@ YÖNTEM: şerit; plan → plan-challenger (canlı veri) ZORUNLU → uygulayıcı
 - **Elle tek seferlik yedek (karar 231 evet gelirse):** aynı komutlar yerelde; dosya yalnız şifreli hâliyle kalır; yolu ve boyutu karta yazılır; ardından geri yükleme denemesi aynı gün.
 
 ## 5. plan-challenger sonucu
-(koşunca buraya işlenecek)
+**Hüküm: KOŞULLU** (2026-10-01, bağımsız çürütücü, salt okuma; Supabase/PostgreSQL davranışları "belgeye göre" işaretlidir, canlıda ölçülmedi). Bugün zarar yok (kod yok, gerçek müşteri verisi yok). Aşağıdaki değişiklikler işlenmeden uygulama BAŞLAMAZ; bu bölüm §2 ve §2-ek'teki çelişen cümlelerin ÜSTÜNDEDİR.
+
+| No | Şiddet | Bulgu | Plana işlenen değişiklik |
+|---|---|---|---|
+| 1 | KRİTİK | Saklama yeri "yazan belirteç silebilir mi" sorusunu sormuyor; git deposu saklama süresini ve silme talebini uygulanamaz kılar. | Ölçüt: **yazan belirteç silemez.** Seçenekler: saklama kilitli kova + yalnız yazma yetkisi; ya da çekme modeli (yedeği Recep'in makinesi çeker, depoya yazma sırrı girmez). Git deposu seçeneği DÜŞTÜ. Saklama süresi temizlik adımı + belirteç bitiş uyarısı. |
+| 2 | YÜKSEK | Runner'da `pg_dump` 16, sunucu 17.6: eski istemci yeni sunucuyu reddeder; apt kurulumu bu depoda 24 dk asılmıştı. | `docker run postgres:17` ile döküm (ya da sabit ikili); her adıma `timeout-minutes`. Şifreleme aracı sabit sürüm + sha256 doğrulamalı. |
+| 3 | YÜKSEK | Geri yükleme hedefi `golge-kur.mjs` OLAMAZ (sahte `auth.users`, girişsiz roller, pg_cron yok; konteyner paylaşımlı). | Hedef: `supabase/postgres:17.x` imajı ya da boş yeni Supabase projesi; ayrı, damgalı ad; yalnız kendi adını düşürür. Önce küçük deneme dökümüyle "bu hedefe yüklenir" ölçülür. |
+| 4 | YÜKSEK | "public + auth + storage" izin listesi sessizce eksik bırakır: `archive_pre_kademe2`, uzantılar, roller, yayın (publication), veritabanı ayarları; 252 MB'ın 239 MB'ı nerede bilinmiyor. | İzin listesi yerine DIŞLAMA listesi (tüm veritabanı, yönetilen şemalar hariç). Kapı: canlı şema listesi ile dökümdeki şema listesi karşılaştırılır, açıklanmamış şema kırmızı. Roller ve yayın ayrı adım. |
+| 5 | YÜKSEK | `pipefail` yoksa yarıda ölen döküm "başarılı" şifreli parça üretir; açık dosya diskte kalabilir. | `pg_dump \| şifrele` borusu + `set -euo pipefail`; ad = UTC damga + koşu kimliği; `concurrency`; `if: always()` temizlik; tek yeniden deneme. |
+| 6 | YÜKSEK | Depodaki açık anahtar değiştirilirse iş yeşil kalır, yedek okunamaz olur; tek anahtar kaybı = tüm yedekler. | Alıcı dosyası CODEOWNERS; iş akışı alıcı sha256'sını ortam değişkeniyle karşılaştırır; iki bağımsız alıcı; değişim prosedürü cetvelde. |
+| 7 | YÜKSEK | Sır yüzeyi: bağlantı sırrı iş düzeyinde tüm adımlara açık. (Düzeltme: zamanlanmış ve canlıya bağlanan iş emsali ZATEN var: `katalog-sayim.yml`.) | GitHub Environment `yedek` + zorunlu onaylayıcı + yalnız master; sır yalnız döküm adımında; `pull_request*` tetik, artifact ve `set -x` yok; bunların conformance testi. |
+| 8 | YÜKSEK | Tazelik yeşilken yedek boş ya da bozuk olabilir (liste girdisi satır sayısı vermez; taban ilk yedeğe bağlı). | Şifrelemeden ÖNCE runner'da boş hedefe geri yükle, kritik tablo sayıları aynı anlık görüntüden alınan manifestle karşılaştırılır; yükleme sonrası uzak nesnenin boyut/sha256'sı; "ölçülemedi" ayrı kırmızı. |
+| 9 | YÜKSEK | Deneme "yalnız Recep'in makinesinde" ise düzenli deneme fiilen yapılmaz. | İki kademe: günlük otomatik yapısal deneme (yalnız şema, kişisel veri yok) + üç ayda bir veri denemesi; ikisi de tazelik satırında. |
+| 10 | ORTA | `auth`/`storage` tam geri yüklemesi hedefte çakışır; oturum ve belirteç tabloları gereksiz ve hassas. | Bu şemalarda yalnız veri; oturum/belirteç tabloları dışlanır; iki geri yükleme yolu (yeni proje / düz Postgres) ayrı yazılır ve denenir. |
+| 11 | ORTA | Vault sırları geri gelmezse bildirimler SESSİZCE durur (fonksiyonlar yalnız uyarı verir). | Cetvelde yeniden girilecek sır adları + deneme sonunda varlık kontrolü; zamanlanmış veritabanı işlerini yeniden kuran betik. |
+| 12 | ORTA | KVKK: şifreli yurt dışı saklama aktarım mı; silinen kişinin yedekte kalma süresi. | MEVZUAT'a iki somut soru; geri yükleme sonrası silme listesinin yeniden uygulanması cetvelde. İlk satıştan önce şart. |
+| 13 | ORTA | Satır sayısı eşitliği içerik, indeks, yetki ve sayaçları kanıtlamaz; "canlı aynı saatte" kıyası hareketli veride anlamsız. | Ölçüt listesi: geri yükleme hata sayısı, manifest sayıları, kritik tablolarda özet, politika/fonksiyon/tetik/indeks sayıları, bir arama sorgusu, sayaçlar, vault adları. |
+| 14 | ORTA | Bağlantı türü (havuz / doğrudan), zaman aşımı ve kilit davranışı belirsiz; `--jobs` bu biçimde anlamsız. | §4'e bağlantı türü + TLS kök sertifikası ölçümü; `--jobs` kaldırıldı; zaman aşımı ve yeniden deneme politikası yazılır. |
+| 15 | DÜŞÜK | "PIM düzenini izler" cümlesi eksik: manifest + sha256, anahtarsız başlamama, çözme hedefi depo dışı, deneme ortamı yalnız kendini siler. | §0 emsal cümlesi bu dört korumayı açıkça taşır. |
+
+**Uygulama açılmadan önce ölçülecek üç şey:** bağlantı sırrı havuz mu doğrudan mı · `supabase/postgres:17` imajına küçük deneme dökümü yükleniyor mu · `archive_pre_kademe2` canlıda duruyor mu ve 239 MB'ın dağılımı.
+
+**Kural 14 notu:** kapı ve hata yolları iş akışıyla AYNI işte yazılır; §6'daki sıra buna göre okunur (4. adım iş akışı + kapı + hata yolları + conformance testleri tek iştir).
 
 ## 6. Uygulama sırası
-1. Kararlar 229/230/231 + zamanlanmış koşum izni.
-2. Açık ölçümler (§4).
+1. Kararlar (o gün yeniden sorulacak): saklama yeri (§5 bulgu 1 ölçütüyle), gizli anahtar, zamanlanmış koşum izni.
+2. Açık ölçümler (§4 + §5'teki üç ölçüm).
 3. Cetvel `docs/standards/yedek-geri-yukleme-standard.md` + `docs/README.md` satırı (HARİTA) + araç envanteri satırı.
 4. İş akışı + boş yedek kapısı + tazelik satırı + `INV-YEDEK-TAZE-1`.
 5. İlk koşu → geri yükleme denemesi → 7 gün izleme → kabul (kapı 1/4 devri OPS'ta, ayar değişikliği Recep onayıyla).
