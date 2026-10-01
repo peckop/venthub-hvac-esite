@@ -25,13 +25,13 @@ metadata:
 3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz. **Gövdedeki örnek yapılandırma bloğu `--admin` içerir: aynen KOPYALANMAZ**; `.mcp.json` yalnız `posta-kutusu.cjs` sarmalayıcısını çağırır (kural 1).
 4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir. Tek ayrı yol (karar 224): canlı DIŞI işte OPS, Recep'in OPS'ta verdiği evetin sözünü ve saatini OPS panosundaki onay kartına yazar; onayı orada doğrularsın. Canlı iş (migration'lı PR, sır/anahtar/parola, geçmişi silen git, canlı veritabanı yazımı, para harcatan her şey) bunun dışındadır: onay yine yalnız Recep'ten gelir.
 5. `*_watch` çağrısı kanıt değildir; durum `mailbox_read` / `kanban_read` ile okunarak doğrulanır.
-6. Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır; karttaki bilgi Linear'ı geçersiz kılmaz.
+6. İş takibinin tek kaynağı **Kanban**'dır (karar 219, 2026-10-01); Linear donuktur: yeni kayıt açılmaz, mevcut kayıtlar silinmez. İş emri = Kanban kartı (KAYNAK/CETVEL + YÖNTEM + kanıt komutu); Done kanıt komutuyla (`wrongstack-kanban` skill'i).
 7. "Bitti" doğrulayıcı komutu `gh` ile sınırlıdır ve sır içermez.
 8. Kanban yaması `cli.js` + `index.js` dosyalarında (`tools/wrongstack-mcp/yamalar/`). Sürüm yükselince yamanın hâlâ tuttuğu yeniden ölçülür.
 9. `mailbox-bridge` kullanılmaz (HTTP köprüsü; bizde kapalı).
 10. Ops'a rapor dört alanlı etiketle gider (NE · DURUM · KANIT · KİMDE). Kaynak metindeki `<nextsteps>` biçimi bunun ekidir, yerine geçmez.
 11. **İzin bilgisi** (kim neye yetki verdi) pencere mesajından hafızaya ya da durum dosyasına KOPYALANMAZ. Tek kaynak `~/.claude/settings.json`; en fazla "bkz. settings.json autoMode, <tarih>" yazılır.
-12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Linear) + hüküm + istek taşır; ayrıntı dosyada ya da Linear'dadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Kanban kartı) + hüküm + istek taşır; ayrıntı dosyada ya da Kanban kartındadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
 
 ---
 

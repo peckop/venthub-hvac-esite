@@ -21,7 +21,7 @@ metadata:
 | `codebase-targeted-test`, `codebase-skeleton` | Yok. Kapsayan testi değişen dosyanın yanında / `src/__tests__/` altında elle bul; iskelet için aralıklı `Read` |
 | `<nextsteps>` etiketi | **Hiç üretilmez.** Bizde ayrıştırıcı yok; Recep'e rapor akan cümledir |
 | Commit mesajı örneği (satır ~56-63: tür önekli, `Refs #123`) | `ŞERİT (REC-nn): ne oldu — niçin (#PR)`; Türkçe, tür öneki (`fix:`) yok. Satır ~65 "en çok 72 karakter, emir kipi" **kaldırılır** (depo konuları 110-140 karakter, Türkçe) |
-| PR gövdesi (satır ~101-102) | Gövdede `Fixes REC-nn` (karar 187); Linear sınırı doluyken `Kayıtsız: Linear sınırı dolu, Part of REC-nn` |
+| PR gövdesi (satır ~101-102) | Gövdede `Kanban: <ÖN EK>-<sayı>` (ör. `Kanban: YTN-4`; Linear'dan taşınan kayıt `Kanban: REC-nn`); yoksa kayıt kapısı kırmızı. Eski `Fixes REC-nn` / `Kayıtsız:` yolları 10-01 gün sonunda kapanır (karar 219/220) |
 | **Ana dala geçip `merge --ff-only` yapmak (satır ~104-105)** | **BİZDE YASAK YOL.** Yerine: `node scripts/hijyen/merge-ritueli.cjs <PR> <dal> --agac=<yol> --merge` (kapı eylemi müdürün işi; migration'lı PR yalnız Recep onayıyla) |
 | `git stash push` (satır ~85) | **Kullanma.** Stash tüm worktree'ler arasında ORTAKTIR; çok pencereli filoda başka pencerenin stash'i görünür. Yerine **önce WIP commit** |
 
