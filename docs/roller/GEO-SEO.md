@@ -37,7 +37,7 @@ Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamı�
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
 
-Yukarıdaki 1-5. kapılar Recep'te kalır. Bunların dışındaki onay OPS'tan alınır; aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4; ayar/izin dosyası sınırı: Recep teyidi bekliyor).
+Yukarıdaki 1-5. kapılar Recep'te kalır. Bunların dışındaki onayı Recep yalnız OPS penceresinde verir; aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekiyorsa metni hazırla, OPS uygular.
 CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
 
 ## İletişim

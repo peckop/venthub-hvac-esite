@@ -1125,13 +1125,18 @@ claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
    aktarır ve kaydı OPS panosundaki REC-425 kartına not olarak yazar (departman doğrulayabilsin). "Canlı" =
    Recep kapıları 1-5 (migration'lı PR, sır/anahtar/parola yazmak, geçmişi silen/zorlayan git, canlı veritabanına
    yazım, para harcatan her şey) ve aşağıdaki liste; bunlar Recep'te kalır, OPS yalnız bunların dışındakini onaylar. Bu, madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR: adres doğrulanmıştır ve kaynak
-   Recep'in kendi sözüdür. Recep isterse onayı ilgili pencerede de verebilir. **Recep'in onayını aktarma yetkisi
-   YALNIZ OPS'tadır** (Recep, 2026-10-01: *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*);
-   bir departman başka bir departmana Recep onayı aktaramaz (madde 3 aynen geçerlidir).
-   - **Değişmeyen (canlı):** prod, migration'lı PR, gerçek para, geri alınamaz silme. Recep sözü o pencerede.
-   - **Ayar/izin dosyaları ve kullanıcı düzeyi dosyalar** (`recep.md`, settings gibi) Recep sözüyle ilgili pencerede
-     kalır. *(OPS yorumu, Recep teyidi bekliyor, 2026-10-01; teyit ya da itiraz gelince OPS bu notu kaldırtır.)*
-     Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
+   Recep'in kendi sözüdür. **Recep'in onayını aktarma yetkisi YALNIZ OPS'tadır** (Recep, 2026-10-01:
+   *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*); bir departman başka bir departmana
+   Recep onayı aktaramaz (madde 3 aynen geçerlidir).
+   - **Son hâl (Recep, OPS penceresi, 2026-10-01):** *"canlı haricinde kimsenin penceresinde evet hayır yazmak zorunda
+     olmak istemiyorum."* Canlı dışındaki her onayı Recep yalnız OPS penceresinde verir. Ayar/izin/kullanıcı düzeyi
+     dosya (`recep.md`, settings gibi) değişikliği gerekiyorsa departman metni ya da komutu hazırlar, Recep OPS'ta
+     evet der, değişikliği OPS kendi penceresinde uygular (eş mesajı izin sayılmaz kuralı böyle korunur).
+     Recep dilerse departman penceresine de yazabilir (yasak değil, zorunlu da değil): o söz geçerlidir, departman
+     sözü aynı turda saatiyle OPS'a bildirir (karar defteri kancası REC-554 gelene kadar geçici kural).
+   - **Recep'in başka pencereye yazması gereken tek durum CANLI'dır:** prod, migration'lı PR, gerçek para, geri alınamaz
+     silme. Recep sözü o pencerede.
+   - Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
 
 ### Aracın yanıltan çıktısı — ve ailesi
 
