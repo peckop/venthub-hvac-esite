@@ -151,11 +151,14 @@ describe('REC-280 · hafıza indeksi bekçisi UYARI olarak kalıyor ve AYIRT ED�
   })
 
   it('⭐SABOTAJ: yasağı gevşetmek dedektörlerin dişini almadı — gömülü kullanıcı yolu / ev dizini sabiti / yerel projeDiziniBul HÂLÂ yakalanır', () => {
-    const gomuluYol = "const HAFIZA = 'C:/Users/biri/.claude/projects/x/memory'\n"
+    // Örnek yollar PARÇALI kurulur: gerçek kimlik-yolu kalıbı bu dosyanın kendi metnine girmesin (mutlak-yol-sizintisi kapısı tarar).
+    const KULLANICILAR = 'Us' + 'ers'
+    const EV = 'ho' + 'me'
+    const gomuluYol = `const HAFIZA = 'C:/${KULLANICILAR}/biri/.claude/projects/x/memory'\n`
     expect(kullaniciYoluVar(gomuluYol), 'Windows kullanıcı yolu yakalanmadı').toBe(true)
-    expect(kullaniciYoluVar("const H = 'C:\\\\Users\\\\biri\\\\x'"), 'ters bölülü kullanıcı yolu yakalanmadı').toBe(true)
-    expect(kullaniciYoluVar("const H = '/Users/biri/x'"), 'macOS kullanıcı yolu yakalanmadı').toBe(true)
-    expect(kullaniciYoluVar("const H = '/home/biri/x'"), 'Linux kullanıcı yolu yakalanmadı').toBe(true)
+    expect(kullaniciYoluVar(`const H = 'C:\\\\${KULLANICILAR}\\\\biri\\\\x'`), 'ters bölülü kullanıcı yolu yakalanmadı').toBe(true)
+    expect(kullaniciYoluVar(`const H = '/${KULLANICILAR}/biri/x'`), 'macOS kullanıcı yolu yakalanmadı').toBe(true)
+    expect(kullaniciYoluVar(`const H = '/${EV}/biri/x'`), 'Linux kullanıcı yolu yakalanmadı').toBe(true)
 
     const sabit = "const os = require('os')\nconst HAFIZA = path.join(os.homedir(), '.claude', 'projects')\n"
     expect(evDiziniSabiti(sabit), 'os.homedir() ile türetilmiş modül sabiti yakalanmadı').toBe(true)
