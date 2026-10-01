@@ -1,7 +1,7 @@
 # Katalog Sayımı Standardı — sayısal iddia nereden gelir
 
 **Kapsam:** kataloğa dair **sayısal** her iddia (ürün, aile, kategori, marka, doluluk,
-boşluk). Panoya, Linear'a, PR gövdesine, Recep'e giden rapora yazılan sayılar.
+boşluk). Panoya, Kanban kartına, PR gövdesine, Recep'e giden rapora yazılan sayılar.
 **Kapsam dışı:** yargı gerektiren sorular ("bu ürün doğru dalda mı") — onlar karardır,
 sayı değil.
 

@@ -2,7 +2,7 @@
 
 > **Bu dosya nedir?** Birden çok Claude Code controller oturumu aynı repoda paralel
 > çalışırken **kimin ne yaptığını bilen, akışı bozmayan** bağlantı modelinin cetveli:
-> **şerit panosu = kira (claim) + yol rezervasyonu + canlılık.** İş durumu Linear'dadır;
+> **şerit panosu = kira (claim) + yol rezervasyonu + canlılık.** İş durumu Kanban'dadır (karar 219);
 > oturumlar arası iletişim doğrudan mesajladır (`fleet-mechanism-standard.md` §0).
 > **Sahibi:** ALTYAPI (pano) · **Belge düzeni:** HARİTA (REC-400 D5)
 > **Son doğrulama:** 2026-09-29 (`work-tracking-ssot-standard.md`, `fleet-mechanism-standard.md` §0 ve `board.cjs` kullanım satırıyla karşılaştırıldı).
@@ -20,7 +20,7 @@
 | İhtiyaç | Depo | Ömür | Neden ayrı |
 |---|---|---|---|
 | **Anlık koordinasyon** — "şu an kim neye dokunuyor?" | `C:/tmp/venthub-board/events.<sid>.jsonl` | TTL'li (4sa), süpürülebilir | Anlık olmalı; git'e yazılan kayıt commit/push/pull'a bağlıdır = **merge zamanlı**, aynı saatteki çakışmayı yapısal olarak göremez |
-| **Kalıcı iş durumu** — "bu iş nerede?" | **Linear** (iş kaydı) + panoda REC-nn başlıklı kart | Kalıcı | Yeni bir oturum açıldığında ne yapacağını buradan öğrenir; pano TTL'li olduğu için bu soruyu cevaplayamaz. Orion registry salt arşivdir (`work-tracking-ssot-standard.md`) |
+| **Kalıcı iş durumu** — "bu iş nerede?" | **Kanban** (iş kartı, `<KISA AD>-<sayı>` ya da taşınan `REC-nn`; Linear donuk arşiv) | Kalıcı | Yeni bir oturum açıldığında ne yapacağını buradan öğrenir; pano TTL'li olduğu için bu soruyu cevaplayamaz. Orion registry salt arşivdir (`work-tracking-ssot-standard.md`) |
 
 **Karıştırmanın bedeli:** panoyu kalıcı durum deposu yaparsan şişer ve bayatlar; kalıcı
 durumu anlık kanal yaparsan geç kalır. `docs/DURUM-TAKIP.md` üçüncü bir şeydir: **anlatı/tarih**

@@ -247,6 +247,16 @@ export function isLegalContentReady(config: LegalConfig = legalConfig): boolean 
 }
 
 /**
+ * YASAL SAYFA BAŞLIĞI (REC-492, OPS hükmü 2026-09-30): sözlükteki "(Taslak)" / "(Draft)" eki, metin hukukçu teyidi ve
+ * satıcı bilgileriyle HAZIR olana kadar KALIR (onaylanmamış hukuki metni onaylı göstermek yanlış beyandır); hazır olunca
+ * `<title>` ve H1'den KENDİLİĞİNDEN kalkar — kimsenin hatırlaması gerekmez. Taslak uyarı bandıyla aynı koşul
+ * (`isLegalContentReady`): başlık ile bant hiçbir zaman ayrışmaz. Kapı: satış açılış önkoşulu K11.
+ */
+export function yasalBaslik(baslik: string, config: LegalConfig = legalConfig): string {
+  return isLegalContentReady(config) ? baslik.replace(/\s*\((?:Taslak|Draft)\)/, '') : baslik
+}
+
+/**
  * GÖRÜNÜM METNİ: doldurulmamış alan ziyaretçiye ham `[SATICI_UNVAN]` olarak DEĞİL, bu cümleyle gösterilir
  * (OPS hükmü 2026-09-29: müşteriye görünen kusur = onarım). Taslak uyarı bandı (`isLegalContentReady`) olduğu gibi
  * kalır; sayı/süre gibi dolu alanlara DOKUNULMAZ (yalnız tamamı köşeli parantezli metin alanları değişir).

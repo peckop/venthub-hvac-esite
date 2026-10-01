@@ -13,6 +13,11 @@
  *    yazmaz, ertesi oturumda yeniden denenir. Aynı anda iki oturum koşmasın diye 15 dk kilidi var.
  *  - GERİ ALINABİLİR, SİLME YOK: arşiv Linear'da geri alınır (`issueUnarchive`); arşivlenen her kaydın
  *    kimliği `~/.claude/linear-arsiv/gunluk.jsonl`'a yazılır.
+ *  - ⭐AÇIK ALTI OLAN ÜST KAYIT ARŞİVLENMEZ (2026-09-30, REC-473/REC-468 olayı): Linear bir kaydı
+ *    arşivleyince ALT ve TORUN kayıtlarını da arşivler, alt kayıt açık olsa bile. Yalnız kaydın kendi
+ *    durumuna bakan süzgeç bu yüzden açık işi sessizce arşive gönderir. Koşum başında bütün AÇIK alt
+ *    kayıtların üst zinciri çekilir; zincirde geçen her kayıt aday olsa da atlanır. Zincir listesi
+ *    alınamazsa (hata ya da çok sayfa) HİÇBİR ŞEY arşivlenmez (fail-closed).
  *
  * NEDEN AYRI BETİK (seçim, Ops'a bildirildi): mevcut Linear çağıran kancalar (`board-brief.cjs`,
  * `linear-yeni-yorum.cjs`) UserPromptSubmit'te koşar ve 3 sn zaman aşımlı SESSİZ okuyuculardır; yazma
@@ -53,6 +58,32 @@ function listeSorgusu(sinir) {
   }
 }
 
+const ZINCIR_DERINLIK = 8
+
+/** Açık (completed/canceled olmayan) her alt kaydın üst zinciri; Linear alt kayıt derinliği en çok 8. */
+function acikAltSorgusu() {
+  let zincir = 'parent { id identifier }'
+  for (let i = 1; i < ZINCIR_DERINLIK; i += 1) zincir = 'parent { id identifier ' + zincir + ' }'
+  return {
+    query:
+      'query($n: Int!){ issues(first: $n, filter: { parent: { null: false }, state: { type: { nin: ["completed","canceled"] } } }) ' +
+      '{ pageInfo { hasNextPage } nodes { id identifier ' + zincir + ' } } }',
+    variables: { n: 250 },
+  }
+}
+
+/** Açık alt kayıtların zincirinde geçen her kayıt kimliği: bunlar arşivlenirse açık iş de arşive gider. */
+function korunanUstler(veri) {
+  const issues = veri && veri.issues
+  if (!issues || !Array.isArray(issues.nodes)) throw new Error('acik alt kayit listesi okunamadi')
+  if (issues.pageInfo && issues.pageInfo.hasNextPage) throw new Error('acik alt kayit listesi tamamlanamadi (cok sayfa)')
+  const korunan = new Set()
+  for (const dugum of issues.nodes) {
+    for (let p = dugum && dugum.parent; p; p = p.parent) korunan.add(p.id)
+  }
+  return korunan
+}
+
 function arsivMutasyonu(idler) {
   const gecersiz = idler.filter((i) => !UUID.test(i))
   if (gecersiz.length) throw new Error('kayit kimligi UUID degil')
@@ -82,19 +113,31 @@ async function graphql(anahtar, govde, fetchFn) {
 }
 
 /**
- * @returns {Promise<{ arsivlenen: {id:string, identifier:string}[], aday: number, hata?: string }>}
- * `kuru` doğruysa yazma çağrısı YAPILMAZ.
+ * @returns {Promise<{ arsivlenen: {id:string, identifier:string}[], atlanan: {id:string, identifier:string}[], aday: number, hata?: string }>}
+ * `kuru` doğruysa yazma çağrısı YAPILMAZ. `atlanan` = aday olup açık alt kaydı olduğu için bırakılanlar.
  */
 async function calistir({ anahtar, now, kuru, fetchFn }) {
-  if (!anahtar) return { arsivlenen: [], aday: 0, hata: 'LINEAR_API_KEY yok' }
+  if (!anahtar) return { arsivlenen: [], atlanan: [], aday: 0, hata: 'LINEAR_API_KEY yok' }
   const sinir = sinirTarihi(now)
   const arsivlenen = []
+  const atlanan = []
+  const gorulen = new Set()
   let toplamAday = 0
   try {
+    // Koruma listesi HER yazmadan önce alınır; alınamazsa aşağıdaki hiçbir çağrıya geçilmez (fail-closed).
+    const korunan = korunanUstler(await graphql(anahtar, acikAltSorgusu(), fetchFn))
     for (let tur = 0; tur < 3 && arsivlenen.length < TAVAN; tur += 1) {
       const veri = await graphql(anahtar, listeSorgusu(sinir), fetchFn)
-      const adaylar = (veri.issues && veri.issues.nodes) || []
-      if (tur === 0) toplamAday = adaylar.length
+      const tumu = (veri.issues && veri.issues.nodes) || []
+      if (tur === 0) toplamAday = tumu.length
+      const adaylar = []
+      for (const k of tumu) {
+        if (korunan.has(k.id)) {
+          if (!gorulen.has(k.id)) atlanan.push({ id: k.id, identifier: k.identifier })
+          gorulen.add(k.id)
+        } else adaylar.push(k)
+      }
+      // Tüm sayfa korunanlardan ibaretse ilerleme yok: aynı sayfa yeniden gelir, döngüyü kır.
       if (adaylar.length === 0) break
       if (kuru) {
         arsivlenen.push(...adaylar)
@@ -107,11 +150,11 @@ async function calistir({ anahtar, now, kuru, fetchFn }) {
         })
       }
       // Arşivlenenler bir sonraki sorguda çıkmaz; hiçbiri arşivlenemediyse döngüyü kır (sonsuz döngü koruması).
-      if (adaylar.length < SAYFA) break
+      if (tumu.length < SAYFA) break
     }
-    return { arsivlenen, aday: toplamAday }
+    return { arsivlenen, atlanan, aday: toplamAday }
   } catch (e) {
-    return { arsivlenen, aday: toplamAday, hata: e && e.message ? e.message : 'bilinmeyen hata' }
+    return { arsivlenen, atlanan, aday: toplamAday, hata: e && e.message ? e.message : 'bilinmeyen hata' }
   }
 }
 
@@ -144,7 +187,7 @@ function kilitYaz(now, dir = dizin()) {
 
 function gunlugeYaz(now, sonuc, dir = dizin()) {
   fs.mkdirSync(dir, { recursive: true })
-  const satir = JSON.stringify({ t: new Date(now).toISOString(), aday: sonuc.aday, arsivlenen: sonuc.arsivlenen, hata: sonuc.hata || null })
+  const satir = JSON.stringify({ t: new Date(now).toISOString(), aday: sonuc.aday, arsivlenen: sonuc.arsivlenen, atlanan: sonuc.atlanan || [], hata: sonuc.hata || null })
   fs.appendFileSync(path.join(dir, 'gunluk.jsonl'), satir + '\n')
 }
 
@@ -164,6 +207,8 @@ module.exports = {
   GUN_ESIGI,
   sinirTarihi,
   listeSorgusu,
+  acikAltSorgusu,
+  korunanUstler,
   arsivMutasyonu,
   parcala,
   calistir,
@@ -183,12 +228,13 @@ if (require.main === module) {
       console.log('LINEAR ARSIV: OLCULEMEDI (' + s.hata + ')')
       return
     }
+    const atlananNot = s.atlanan.length ? ' · ' + s.atlanan.length + ' üst kayıt açık altı olduğu için atlandı: ' + s.atlanan.slice(0, 10).map((a) => a.identifier).join(', ') : ''
     if (kuru) {
-      console.log('LINEAR ARSIV (kuru koşum): ' + s.arsivlenen.length + ' aday' + (s.arsivlenen.length ? ' — ' + s.arsivlenen.slice(0, 10).map((a) => a.identifier).join(', ') : ''))
+      console.log('LINEAR ARSIV (kuru koşum): ' + s.arsivlenen.length + ' aday' + (s.arsivlenen.length ? ' — ' + s.arsivlenen.slice(0, 10).map((a) => a.identifier).join(', ') : '') + atlananNot)
       return
     }
     gunlugeYaz(now, s)
     if (!s.hata) damgaYaz(now)
-    console.log('LINEAR ARSIV: ' + s.arsivlenen.length + '/' + s.aday + ' kayit arsivlendi' + (s.hata ? ' (kismi, hata: ' + s.hata + ')' : ''))
+    console.log('LINEAR ARSIV: ' + s.arsivlenen.length + '/' + s.aday + ' kayit arsivlendi' + (s.hata ? ' (kismi, hata: ' + s.hata + ')' : '') + atlananNot)
   })().catch(() => process.exit(0))
 }

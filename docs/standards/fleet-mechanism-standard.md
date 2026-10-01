@@ -9,7 +9,7 @@
 | Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
 |---|---|---|
 | Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
-| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Emir | pano notu / sıralı emir | **Kanban kartı** (karar 219) — Recep sözü **önce karta** (tırnak + pencere + saat), sonra şeride emir |
 | Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
 | Uyanma | cron + tur-sonu `ScheduleWakeup` | eski üçlü **EMEKLİ** · uyandırma = mesaj. ⚠**Karar 53 (2026-09-19):** cron / zamanlayıcı / loop genel olarak yasak **değil** — dönemsel bir karardı; gerekiyorsa **önce Recep'le konuşulur** |
 | Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
@@ -21,7 +21,7 @@
 2. Lider oturumun `TARAMA` katmanı **asılmış**, `TESLIM` kanıtı **6955 dk (~4,8 gün)** bayattı —
    ve filo o süre boyunca **kayıpsız** çalıştı. Bütün emirler `SendMessage` ile gitti.
 3. ALTYAPI gözcüsü **kapatıldıktan sonra** pano `who` canlılığı **0 dk** kaldı: canlılık
-   **claim atışından** gelir, gözcüden değil. Üçlünün koruduğu sanılan şey zaten başka
+   **claim atışından** gelir, gözcüden değil (⚠2026-09-30'dan beri canlılığın **gerçek kaynağı** `claude agents --json`'dır; bkz. §35). Üçlünün koruduğu sanılan şey zaten başka
    yerden geliyordu.
 
 Buna karşılık maliyeti **her turda bir uyarı satırı** ve **her açılışta bir kurulum ritüeliydi**.
@@ -102,7 +102,7 @@ bakılarak söylenir.
 
 Recep'in sözü: *"ihtiyaç halinde birbirine yazabilmeli, işlerini bırakıp değil, iş gereği; sorumlulukların bilincinde olmalıyız."* OPS aracı değildir; pencereler `SendMessage` ile doğrudan konuşur. Kurallar:
 
-1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Linear numarası yazılı.
+1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Kanban numarası yazılı.
 2. **İş bırakılmaz:** alan sahibi elindeki adımı bitirir, sonra kısa cevap verir; gerekirse kendi kuyruğuna kart açar.
 3. **OPS'a da tek satır:** sıra/öncelik değiştiren, başkasının dosyasına dokunan ya da karar isteyen her şey. Pencereler kendi aralarında karar vermez; Recep'e soru dolaştırılmaz.
 4. **Açılışta claim alınır:** claim'siz pencere panoda "kapalı" görünür ve yazışma adresi belirsizleşir.
@@ -1119,6 +1119,24 @@ claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
    akran aktarımı onay yerine **geçmez**; yanlış adrese düşen bir GO, düştüğü şerit
    tarafından **taşınmaz** — yalnız *"teslimat kayboldu, kendi kanalından al"* denir.
    (Vaka 3 böyle kapatıldı.)
+4. **Onay yolu (karar 224, Recep 2026-10-01, OPS penceresi).** Recep'in sözü: *"canlı haricinde sen işi
+   bitirebilmelisin ama ben ister sana ister de o pencerede gidip yine onay verebilirim"*. Yani **canlı DIŞINDAKİ
+   işlerde** departman onayı doğrudan OPS'tan alınır; Recep'in OPS'ta verdiği evet için OPS sözünü ve saatini
+   aktarır ve kaydı OPS panosundaki REC-425 kartına not olarak yazar (departman doğrulayabilsin). "Canlı" =
+   Recep kapıları 1-5 (migration'lı PR, sır/anahtar/parola yazmak, geçmişi silen/zorlayan git, canlı veritabanına
+   yazım, para harcatan her şey) ve aşağıdaki liste; bunlar Recep'te kalır, OPS yalnız bunların dışındakini onaylar. Bu, madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR: adres doğrulanmıştır ve kaynak
+   Recep'in kendi sözüdür. **Recep'in onayını aktarma yetkisi YALNIZ OPS'tadır** (Recep, 2026-10-01:
+   *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*); bir departman başka bir departmana
+   Recep onayı aktaramaz (madde 3 aynen geçerlidir).
+   - **Son hâl (Recep, OPS penceresi, 2026-10-01):** *"canlı haricinde kimsenin penceresinde evet hayır yazmak zorunda
+     olmak istemiyorum."* Canlı dışındaki her onayı Recep yalnız OPS penceresinde verir. Ayar/izin/kullanıcı düzeyi
+     dosya (`recep.md`, settings gibi) değişikliği gerekiyorsa departman metni ya da komutu hazırlar, Recep OPS'ta
+     evet der, değişikliği OPS kendi penceresinde uygular (eş mesajı izin sayılmaz kuralı böyle korunur).
+     Recep dilerse departman penceresine de yazabilir (yasak değil, zorunlu da değil): o söz geçerlidir, departman
+     sözü aynı turda saatiyle OPS'a bildirir (karar defteri kancası REC-554 gelene kadar geçici kural).
+   - **Recep'in başka pencereye yazması gereken tek durum CANLI'dır:** prod, migration'lı PR, gerçek para, geri alınamaz
+     silme. Recep sözü o pencerede.
+   - Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
 
 ### Aracın yanıltan çıktısı — ve ailesi
 
@@ -2788,3 +2806,64 @@ yardım metninden *"atanin ekranina basilir"* **kalktı** · `gozcu.cjs` basım 
 **yok** (gerekçenin dayanağı; süzgeç eklenirse kol kırmızı verip gerekçenin yeniden ölçülmesini
 ister) · açılış satırı *"KANITLI"* demez ve sınıfı **damgadan** okur · yoklama sınırı koşulsuz
 basar · cetvel bu hükmü taşır.
+
+---
+
+## 35. PANO CANLILIĞININ GERÇEK KAYNAĞI `claude agents --json` — hayalet ve kayıp pencere (REC-524)
+
+**Ölçülmüş sorun (F8, 2026-09-30):** pano canlılığı **claim atışından** türetiliyordu (§0 madde 3). Atış,
+oturumun *yaşadığını* değil en son ne zaman atış *yazdığını* söyler. İki kör nokta: pencere kapandı ama
+4 saatlik kira dolmadı → şerit "canlı" görünür (**hayalet**); pencere açık ama hiç claim almadı → pano onu hiç
+göstermez (**kayıp pencere**).
+
+**Kaynak:** `claude agents --json` aktif oturumları verir (`pid`, `cwd`, `kind`, `startedAt`, `sessionId`, `name`,
+`status` busy/idle); daemon gerekmez; ölçüldü 2026-09-30, ~0,65 sn. Birleştirme anahtarı `sessionId` = pano `sid`.
+Mantık `scripts/board/canlilik.cjs`, kablo `board.cjs` `summary`.
+⚠`--all` KULLANILMAZ: `claude agents --help` ona "with --json: also include completed background sessions" der
+(bitmiş oturumlar canlılık kaynağı değildir); ayrıca `status: completed` kayıtlar ayrıştırmada atılır.
+
+| Durum | Koşul | Pano gösterimi |
+|---|---|---|
+| canlı | claim var + listede var | `●canlı/meşgul` ya da `●canlı/boşta`, ad `claude agents`'tan |
+| hayalet | claim var + listede yok | `○KAPALI(hayalet …)`; başlıkta sayılır; ad/şerit **çakışması** saymaz |
+| yeni süreç | claim'siz, `startedAt` < 5 dk | `◦YENİ SÜREÇ (henüz claim almadı, Ndk önce açıldı)` |
+| şeritsiz açık pencere | claim'siz, ≥ 5 dk (ya da `startedAt` yok) | `⚠ŞERİTSİZ AÇIK PENCERE` satırı |
+| alt süreç | claim'siz + (`kind` interaktif değil · ad `vh-…` · `cwd` son parçası `vh-…` worktree) | `◦ALT SÜREÇ N (ana pencere sayılmaz)`; **claim'i olan pencere asla alt süreç sayılmaz**; alt süreç "yeni" de sayılmaz |
+| ölçülemedi | `claude` yok · 8 sn'de dönmedi · JSON bozuk · çıkış kodu ≠ 0 | eski çıktı **aynen** + TEK satır `canlılık ölçülemedi (sebep)`; durum etiketi **basılmaz** |
+
+**Kurallar:** (1) fail-open ama **sessiz değil** — "ölçemedim" ne "hepsi canlı" ne "hepsi kapalı" diye okunur;
+(2) `spawnSync` `timeout: 8000` + `windowsHide: true`; (3) 30 sn önbellek (`<pano dizini>/canlilik-onbellek.json`):
+**yalnız başarılı ölçüm ve zaman aşımı** önbelleklenir (ENOENT/bozuk JSON/çıkış kodu değil: hızlı hata 30 sn yalan
+sürmesin); önbellekten gelen satır `önbellek ≤30sn` etiketi taşır; önbellekte **çağıranın kendi oturumu yoksa**
+önbellek yok sayılır (30 sn içinde açılan pencere kendi claim'ini "hayalet" görmesin); (4) **izole pano**
+(`VENTHUB_BOARD_DIR` verilmiş — test/deneme) gerçek `claude`ı çağırmaz, çünkü sahte sid'ler gerçek listeyle
+birleşince hepsi "hayalet" görünürdü; `VENTHUB_CANLILIK_KAPALI=0` açar, `=1` kapatır, `VENTHUB_CANLILIK_HAM=<dosya>`
+(test) her zaman açar; (5) kullanıcı ayar dizinindeki `sessions/<pid>.json` ad kaynağı **yedek** olarak durur, `claude agents` adı
+üstüne yazar; (6) `board-brief` (her tur) **değişmedi** — tur başına süreç açmaz; canlılık `who` ve SessionStart
+pano bloğunda.
+
+**Kapı:** `INV-PANO-CANLILIK-1..17` (`src/__tests__/conformance/pano-canlilik-claude-agents.test.ts`): hayalet ·
+şeritsiz pencere · alt süreç (+ claim'li pencere alt süreç değil) · meşgul/boşta · zaman aşımı (+ `--all` yok) ·
+bozuk JSON (tek satır, eski çıktı korunur) · boş dizi · `claude` yok (ENOENT, PATH boşken **gerçek** süreç yolu) ·
+önbellek · izole pano kural matrisi (hermetik) · hayalet çakışma saymaz · claim'siz + açık pencereler · önbellekte
+çağıran yoksa yeniden ölç · `completed` sayılmaz · hızlı hata önbelleklenmez + etiket + tmp çöp bırakmaz ·
+çıkış kodu · yeni süreç (< 5 dk). Her kolun sabotajı ölçülmüştür (REC-524 PR gövdesi).
+
+---
+
+## 36. ÖLÇÜM İÇİN AÇILAN `claude -p` ALT SÜRECİ — kabuk mirası giriş etiketi (OPS emri 2026-09-30; sekme etkisi ÖLÇÜLMEDİ)
+
+**Kural:** ölçüm ya da deneme için açılan **her** `claude -p` alt süreci `CLAUDE_CODE_ENTRYPOINT=sdk-cli` ile,
+`--no-session-persistence` bayrağıyla ve **oturum klasörünün değil scratchpad klasörünün** içinden koşar.
+
+**Niçin (OPS emri; gerekçenin ölçülen kısmı dar):** alt süreç kabuktan `CLAUDE_CODE_ENTRYPOINT=claude-vscode` değerini miras alırsa oturum kaydına **eklenti etiketiyle**
+yazılır; ARAÇ ölçümü: kabuk mirasıyla açılan terminal denemeleri `claude-vscode` taşıdı, temiz ortamla (`CLAUDE*` değişkenleri silinip `Start-Process`) `entrypoint=cli` döndü
+(ARAÇ ekip deneyi 2, 2026-09-30). OPS emrinin dayanağı "YETENEK vakası: dört sekmenin dördünde `entrypoint=claude-vscode`" idi; **bu kayıt kanıt dosyalarında bulunamadı**
+ve editörün oturum yöneticisi terminal oturumlarını da listeliyor (ARAÇ notu, OPS ölçtü): yani etiketin sekmeyi tek başına doğurduğu **kanıtlanmış değildir.**
+
+**Ölçüm (ARAÇ, 2026-10-01; temiz ortam, scratchpad cwd, `--no-session-persistence`):** her iki kolda da koşarken kullanıcı
+ayar dizinindeki `sessions/` altına **1 kayıt yazılır, bitince silinir** (`kind=interactive`). Fark yalnız `entrypoint` alanı:
+`sdk-cli` kolunda `sdk-cli`, kontrol kolunda `claude-vscode`. Yani "`claude -p` oturum kaydı hiç yazmaz" **yanlıştır**.
+⚠**ÖLÇÜLMEDİ:** editörün oturum listesinde/sekmesinde görünüp görünmediği (kayıt birkaç sn yaşar, ölçen tarafta editör yok);
+bu Recep gözüyle ölçülecek. Kural bu yüzden "OPS emri + kayıtta `entrypoint=sdk-cli` yazılır" olarak uygulanır,
+"sekmeyi kapatır" diye anılmaz.

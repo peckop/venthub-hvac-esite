@@ -10,7 +10,8 @@
  * böylece kullanıcı mesaj taşıyıcısı olmaktan kurtulur.
  *
  * stdin: { session_id, cwd, ... }
- * stdout: { hookSpecificOutput: { hookEventName, additionalContext } }
+ * stdout: { hookSpecificOutput: { hookEventName, additionalContext, sessionTitle? } }
+ *   sessionTitle = şeridin pencere adı ("Araç", "Ops"…; yalnız claim varsa ve source startup/resume/fork; REC-525, aşağıda).
  */
 const fs = require('fs')
 const path = require('path')
@@ -272,6 +273,65 @@ function rolKartiSatiri(lane) {
     return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
   }
 }
+/**
+ * ⭐PENCERE ADI = ŞERİT ADI (REC-525, 2026-09-30). `hookSpecificOutput.sessionTitle` `/rename` ile AYNI etkidir
+ * (belge: code.claude.com/docs/en/hooks). Pencereleri IDE eklentisi açıyor, `--name` bayrağı yok ve her açılış
+ * `--resume=<sid>`; ad verilmezse pencereler `venthub-hvac-72` gibi anlamsız adlarla açılır ve şerit ↔ pencere
+ * eşlemesi (SendMessage) karışır (REC-404). Ad oturumla KALICIdır: bir kez verilince sonraki resume'lar da taşır.
+ *
+ * KURALLAR:
+ *  · ELLE VERİLMİŞ FARKLI AD EZİLMEZ (ORTA-1): belge (SessionStart girdisi) `session_title` alanını verir — "oturum
+ *    başlığı zaten ayarlıysa (--name, /rename)". Dolu VE tablodaki adla farklıysa alan HİÇ eklenmez. Boşsa ya da
+ *    tablodaki adla AYNIYSA (harf ve Türkçe harf farksız: "Araç" = "arac" = "ARAÇ") kanonik ad YAZILIR (REC-525 takip:
+ *    restart/resume'da harness dökümdeki /rename adını geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri
+ *    yazmak sonucu değiştirmez, kaydı düzeltir);
+ *  · yalnız pano talebi varsa; talep yoksa alan HİÇ eklenmez (`CC_LANE` yedeği de kullanılmaz: ortam değişkeni bir
+ *    ad taahhüdü değil, rol ipucudur). Talep BAYAT (TTL 4 saat, makine kapanıp sabah resume) olsa da KENDİ sid'inin
+ *    talebiyse ad verilir (ORTA-3, `board.tumTalepler`; başka pencerenin talebi karışmaz); BIRAKILMIŞ talep ad vermez;
+ *  · ÇAKIŞMA (ORTA-2): aynı adı verecek başka CANLI oturum varsa (aynı şerit ya da aynı ad) alan eklenmez —
+ *    iki pencere aynı adı taşırsa SendMessage to:"Araç" belirsizleşir;
+ *  · yalnız startup/resume/fork — belge clear ve compact'ta alanı yok sayar, gereksiz çıktı basılmaz;
+ *  · ad ÇIPLAK pano yazımı (ARAC) değil, Recep'in pencereleri elle verdiği İNSAN adıdır ("Araç", "Ops", "Yetenek",
+ *    "Harita" — Recep 09-30). Eşleme TEK KAYNAKTA: scripts/board/pencere-adlari.cjs (`ad(serit)` + `TABLO`); başka
+ *    üreticiler de oradan alır, burada kopya YOK. Tabloda olmayan şerit → ilk harf büyük, kalanı küçük (Türkçe
+ *    karakter ÜRETİLMEZ, tahmin yok); string değil/boş/`lane` yer tutucusu → '' (alan eklenmez);
+ *  · FAIL-OPEN: modül/hesap hatası → '' (alan yok, mevcut çıktı aynen); kanca `claude agents` ÇAĞIRMAZ (yavaşlatır).
+ *
+ * BİLİNEN SINIRLAR (dürüst liste):
+ *  · claim'siz YENİ pencere ilk açılışta ad ALMAZ: o an pano talebi yoktur. Şerit talep edilince pencere ad alır
+ *    yalnız SONRAKİ açılışta (resume/startup/fork); pencere içinde anlık yeniden adlandırma bu kancanın işi değil;
+ *  · fork'ta yeni oturum YENİ sid alır ve claim'i yoktur → fork ilk açılışta ad almaz (belge fork'ta alanı uygular,
+ *    ama pano kimlik bağı olmadan şerit bilinemez);
+ *  · claim ile pencere adı bağı yalnız sid'dir; iki pencere aynı şeridi talep ederse ikisi de ad ALMAZ (ORTA-2 seçimi:
+ *    belirsiz ad, adsızlıktan kötü).
+ */
+const PENCERE_ADI_KAYNAKLARI = new Set(['startup', 'resume', 'fork'])
+let pencereAdi = ''
+/**
+ * Bu pencerenin adı ('' = alan eklenmez). Sırayla: kendi sid'inin talebi (bayat dahil, bırakılmış hariç; ORTA-3) →
+ * tablodan ad → mevcut `session_title` dolu VE tablodaki adla FARKLIYSA ezme (Recep'in verdiği başka ad, ORTA-1);
+ * boş ya da aynıysa (harf/Türkçe harf farksız, `ayniMi`) kanonik adı YAZ (REC-525 takip: restart/resume'da harness
+ * dökümdeki adı geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri yazmak sonucu değiştirmez) →
+ * başka canlı oturum aynı adı alıyor/taşıyor mu (ORTA-2). Her hata → ''.
+ */
+function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
+  try {
+    const benim = board.tumTalepler().find((c) => c.sid === kendiSid)
+    if (!benim) return ''
+    const modul = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const ad = modul.ad(benim.lane)
+    if (!ad) return ''
+    if (typeof mevcutAd === 'string' && mevcutAd.trim() && !modul.ayniMi(mevcutAd, ad)) return ''
+    const digerleri = live.filter((c) => c.sid !== kendiSid)
+    if (digerleri.some((c) => modul.ad(c.lane) === ad)) return ''
+    const adlar = board.pencereAdlari()
+    if (digerleri.some((c) => modul.ayniMi(adlar.get(c.sid), ad))) return ''
+    return ad
+  } catch {
+    return '' // modül/pano hatası: alan eklenmez, mevcut çıktı aynen (fail-open)
+  }
+}
+
 /** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
 function rolBolumuEkle() {
   const satir = rolKartiSatiri(rolSeridi)
@@ -296,7 +356,8 @@ if (source === 'resume') {
       ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele ve ' +
         'uyuyan her birine SendMessage at: "makine dondu, hangi isteydin, serit talebini tazele". ' +
         'Bekleme yapma; mesaj tek kanaldir.\n'
-      : 'Serit talebini TAZELE (canlilik atistan gelir) ve liderin uyandirma mesajini bekleme — ' +
+      : 'Serit talebin acilista (startup/resume) OTOMATIK yenilenir (claim-yenile); yenilenmediyse pano blogu ' +
+        '"TALEP EDILMEMIS" ya da UYARI basar — o zaman elle claim al. Liderin uyandirma mesajini bekleme — ' +
         'hangi iste oldugunu SendMessage ile lidere yaz.\n'))
 }
 
@@ -409,9 +470,24 @@ try {
 
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
+  /**
+   * ⭐CLAIM YENİLEME (Ops 09-30): startup/resume'da bu oturumun KENDİ süresi dolmuş talebi varsa aynı şerit + aynı
+   * desenlerle yeniden alınır; canlı başka oturum aynı şeridi/çakışan deseni tutuyorsa ALINMAZ, tek satır UYARI basılır.
+   * `liveClaims()` çağrısından ÖNCE koşar: yenilenen talep aşağıda `mine` olarak görünür (şerit satırı, rol kartı, ad).
+   * clear/compact'ta dokunulmaz. FAIL-OPEN: yenile() asla fırlatmaz; hata → alan yok, oturum açılışı aynen (hata stderr'e).
+   * Mantık ve kurallar: scripts/board/claim-yenile.cjs (kapı: claim-yenile.test.ts).
+   */
+  try {
+    const y = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'claim-yenile.cjs')).yenile(board, sid, { source })
+    if (y.satir) bolum('claim-yenile', 1, y.satir, y.islem === 'yenile' ? 'CLAIM YENILENDI (pano: board.cjs who)\n' : '⚠CLAIM YENILENMEDI (canli cakisma; board.cjs who)\n')
+    if (y.islem === 'hata') process.stderr.write(`[session-board] claim yenileme atlandi (${y.sebep}) — oturum acilisi etkilenmedi.\n`)
+  } catch (e) {
+    process.stderr.write(`[session-board] claim yenileme modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — oturum acilisi etkilenmedi.\n`)
+  }
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
+  pencereAdi = pencereAdiKarari(board, live, sid, input.session_title)
 
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
@@ -510,12 +586,12 @@ bolum('yontem', 6,
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
 const yaz = () => {
   rolBolumuEkle()
-  process.stdout.write(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: birlestir(),
-    },
-  }))
+  const cikti = {
+    hookEventName: 'SessionStart',
+    additionalContext: birlestir(),
+  }
+  if (pencereAdi && PENCERE_ADI_KAYNAKLARI.has(source)) cikti.sessionTitle = pencereAdi
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: cikti }))
 }
 ;(async () => {
   try {

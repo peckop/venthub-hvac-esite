@@ -21,6 +21,8 @@
 | Search Console tabanı | tık, gösterim, sıra; sayfa×gün | `scripts/rehber/gsc-taban.mjs` | çıktı depoya girmez (pazar-olcum P6) |
 | Adres denetimi | eski adres → aynı ya da **tek** 308 → 200; haritada yönlendirme 0; model sayısı; canonical kendini gösterir; hreflang tr/en/x-default | `scripts/seo/adres-yayin-denetim.mjs` | TAM liste, örneklem değil; yönlendirme izlenmez |
 | Bağlantı taraması | site haritasındaki sayfalardaki site içi bağlantı + ürün görseli: kırık, yönlendirme | `scripts/seo/link-tara.mjs` (linkinator 8.1.0) | `--sitemap-url` + CSV (8.1.0'da JSON raporu site haritası kipinde boş — ölçüldü) |
+| Yetim sayfa taraması | site haritasındaki her sayfaya, haritalı başka bir sayfadan ham HTML `<a href>` ile ulaşılıyor mu (JS çalıştırılmaz; `<button>`, `<link>`, script içi adres sayılmaz); gelen bağlantı dağılımı 0 / 1 / 2-3 / 4-10 / 11+ | `scripts/seo/yetim-tara.mjs` (`--taban`, `--cikti`, `--izin`) | çıkış 1 = yetim var, 2 = sayfa/harita alınamadı. Google: "Every page you care about should have a link from at least one other page on your site"; yalnız `<a href>` taranır. REC-472 (REC-471 kabul ölçütü). Ağsız kapı INV-YETIM-1 |
+| Canlı tarama kapısı | yayındaki siteyi TEK geçişte ölçer (sitemap + her adresin ham HTML'i + az sayıda ek istek): yetim, title (yok/tekrar/uzun/taslak), meta açıklama (yok/tekrar/kesik/şablon/kısa), `<html lang>` (EN dahil), favicon ve ikon dosyaları, lastmod (bugün/toplu), robots.txt kalıpları + gizli yüzeyler, olmayan adres 404 mü, site içi bağlantı yönlendirmesi, yönlendirme zinciri, JSON-LD geçerliliği/şema uyarıları, changefreq | `scripts/seo/canli-kapi.mjs` (`--taban`, `--cikti`, `--bilinen <json>`, `--bugun`) | çıkış 0 temiz · 1 yeni KIRMIZI · 2 araç/ağ hatası. `--bilinen {"KOD":"REC-nn"}`: bilinen kırmızı çıkışı 1 yapmaz, yeni kırmızı yapar. Google kural denetimi REC-461 TEK-TABLO kural numaraları kod başına konsol özetinde. REC-502. Ağsız kapı INV-CANLI-KAPI-1 |
 | Sayfa kalitesi | Lighthouse SEO / erişilebilirlik / iyi uygulama / performans | **PageSpeed Insights API v5** (Google sunucusunda Lighthouse, mobil; anahtar `PAGESPEED_API_KEY`, karar 127) — `scripts/seo/sayfa-kalite.mjs` (varsayılan `--kip psi`, `--strateji mobile|desktop`; geçici hata 3 deneme; anahtar hiçbir çıktıya yazılmaz) | örnekleme kapalı; ölçüt SEO; performans bilgi (REC-398). Yerel unlighthouse 0.18.1 **yedek**: 2026-09-25'te makinede boş bellek ~1 GB iken üç koşuda "Unable to get browser page" ile düştü (59→24→3 sayfa) |
 | Googlebot gözüyle sayfa | URL Inspection API: sayfa başına Googlebot getirme sonucu, robots, dizin kararı, son tarama zamanı (Search Console "tarama istatistikleri" API'de yok — ölçüldü 09-27) | `scripts/seo/gsc-url-denetim.mjs` | kırmızı: getirme başarısız, robots engeli; hiç taranmamış ayrı sayılır. Kota günde 2000. REC-402 |
 | Bot kalitesi karnesi | 5 bot kimliği × adres: aynı HTML, title, canonical, hreflang, JSON-LD | `scripts/seo/bot-karnesi.mjs --taban` | ön izleme sitesinde de koşar |
@@ -29,17 +31,18 @@ Araçlar **kurulmaz**: sürüm sabitli `npx` ile koşar, `package.json`'a dokunu
 ALTYAPI'da, `bagimlilik-kararlari.md`). Her betik `--taban` alır: canlı, yerel ön izleme ya da dal önizlemesi.
 
 **Ölçüm verisinin yeri:** çalışma kopyası depo dışında sabit klasör `~/venthub-olcum/<an>-<tarih>/`
-(oturum geçici klasörü kalıcı yer değildir); kalıcı kopya ilgili Linear kaydına ek (REC-300 / REC-369). PUBLIC
+(oturum geçici klasörü kalıcı yer değildir); kopyanın yolu ilgili Kanban kartına not olarak yazılır (karar 219; dosya depo dışı ve tek makinededir, yedek yeri ayrı karardır; REC-300 / REC-369 eski Linear kayıtlarıdır). PUBLIC
 depoya yalnız özet sayı girer.
 
 ## Y2 — Ne zaman ne koşulur
 
 | An | Koşu | Evren | Çıktı |
 |---|---|---|---|
-| **Taban** (yayından önce, canlı) | gsc-taban · adres-yayin-denetim (`--eski` verilmez → bugünkü site haritası `eski-adresler.json` olarak kaydedilir) · link-tara · sayfa-kalite · bot-karnesi | canlı site haritası | Linear kaydına ek |
+| **Taban** (yayından önce, canlı) | gsc-taban · adres-yayin-denetim (`--eski` verilmez → bugünkü site haritası `eski-adresler.json` olarak kaydedilir) · link-tara · sayfa-kalite · bot-karnesi | canlı site haritası | Kanban kartına not + depo dışı dosya yolu |
 | **Ön izleme** (Faz 4, yerel üretim paketi) | adres-yayin-denetim `--taban <önizleme> --eski <taban listesi + plan §6 tam envanteri> --harita <eski-adres-haritasi.json> --model-beklenen 442 --sayfa-denetimi` · link-tara · bot-karnesi | ön izleme | kusur listesi → sahibine |
-| **Yayın günü** (Faz 3-C deploy sonrası) | gsc-taban (son taban) · adres-yayin-denetim (ön izlemeyle aynı bayraklar, canlıya) · link-tara · sayfa-kalite + `--kiyas` | canlı | aynı gün Linear + OPS |
-| **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Linear |
+| **Yayın günü** (Faz 3-C deploy sonrası) | gsc-taban (son taban) · adres-yayin-denetim (ön izlemeyle aynı bayraklar, canlıya) · link-tara · sayfa-kalite + `--kiyas` | canlı | aynı gün Kanban kartı + OPS |
+| **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Kanban kartı |
+| **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar kart numarasıyla; eski kayıtlarda REC-nn) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili Kanban kartı |
 
 EN_YAYIN kapalıyken `--en-harita-disi-bilincli` verilir: EN alternatifinin haritada olmaması kırmızı değil,
 ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalkar.
@@ -51,6 +54,10 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
 - Site haritası: her adres doğrudan 200; model adresi sayısı = 442 (plan §1).
 - Canonical: her sayfada tek ve kendini gösterir. hreflang: tr + en + x-default (EN bilinçli istisnası hariç).
 - Bağlantı taraması: kırık 0 · site içi yönlendirme 0 (plan §7 "kırık 0, zincir 0").
+- Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
+  bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
+- Canlı kapı: **KIRMIZI 0** (`canli-kapi.mjs`); onarımı henüz gelmemiş kırmızılar yalnız `--bilinen` ile REC numarasıyla
+  bilinçli taşınır, her onarım bilinen listesinden çıkarılır.
 - Sayfa kalitesi: SEO ortalaması tabandan **düşmez**; aynı yolda SEO'su düşen sayfa 0.
 - Search Console (+7/+28): "bulunamadı" birikimi 0; tık tabana göre kıyaslanır — geçici düşüş beklenir,
   kalıcı düşüş kusurdur (plan §8).

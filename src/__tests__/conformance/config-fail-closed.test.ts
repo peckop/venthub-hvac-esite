@@ -126,6 +126,18 @@ describe('INV-CONFIG-1 · yapilandirma bosugu sessizce davranis degistiremez', (
     ).toBe(true)
   })
 
+  it('healthz sandbox istisnasi YALNIZ satis KESIN kapaliyken saglikli doner', () => {
+    const temiz = yorumlariSiyir(readFileSync(HEALTHZ, 'utf8').replace(/\r\n/g, '\n'))
+    const kapaliKosulu = temiz.indexOf("satis === 'kapali'")
+    const uyariCevabi = temiz.indexOf("'sandbox_odeme_ucu_satis_kapali'")
+    expect(kapaliKosulu, "istisna 'satis === kapali' kosuluna bagli degil").toBeGreaterThan(-1)
+    expect(uyariCevabi, 'istisna uyari cevabi yok ya da kosuldan ONCE').toBeGreaterThan(kapaliKosulu)
+    expect(temiz.includes('yalnizSandboxTutarsizligi'), 'istisna TEK-kusur kosulunu kullanmiyor').toBe(true)
+    // Yesil cevap yalniz iki yerde olabilir: ana yol ve bu istisna. Ucuncusu sessiz bir yesil kapisidir.
+    const yesiller = temiz.split("cevap('saglikli'").length - 1
+    expect(yesiller, 'healthz icinde beklenmeyen ek yesil cevap').toBe(2)
+  })
+
   it('healthz config.toml icinde BEYAN EDILMIS', () => {
     const toml = readFileSync(CONFIG_TOML, 'utf8')
     expect(
