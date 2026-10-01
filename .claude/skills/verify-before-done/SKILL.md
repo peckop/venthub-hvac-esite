@@ -17,6 +17,11 @@ metadata:
 | "project's own checks" | `pnpm type-check`, `pnpm lint`, `pnpm test -- --run`, ilgili `src/__tests__/conformance/*`; PR'da `gh pr checks` |
 | verification.run / execution.shell | Bash aracı |
 | Kanban "verified" | `kanban_manage` doğrulayıcısı (kural 7) |
+| `codebase-targeted-test`, `codebase-impact-analysis` araçları | Yok. Etkilenen test: değişen dosyanın yanındaki / `src/__tests__/conformance/` altındaki ilgili test; çağıranlar: `graphify affected "sembol()"` (parantez şart) ya da `codegraph_explore` |
+| "migration applied and rolled back locally" (Public API, schema satırı) | Bizde yerel Supabase yığını (Docker) **yok**, adım uygulanamaz. Yerine: `create-migration` zinciri + `plan-challenger`, prod'a karşı **yalnız okuma** sorgusuyla kanıt; "uygulandı" ancak merge sonrası ve ölçülerek yazılır (kural 13: merge prod'a otomatik yazar) |
+| "Clean install from the lockfile" | `pnpm install --frozen-lockfile --offline` (karar 88) |
+| UI kanıtı ("rendered at the relevant widths…") | `qa` skill'i (gerçek tarayıcıda gezip kanıt üretir) |
+| Gövdedeki "Skills in scope" atıfları (`testing`, `debugging`, `git-flow`) | Bu üçü WrongStack alımının 2. PR'ıyla depoya gelir; gelene kadar atıf boşta, yok sayılır |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
