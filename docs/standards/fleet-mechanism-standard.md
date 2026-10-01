@@ -21,7 +21,7 @@
 2. Lider oturumun `TARAMA` katmanı **asılmış**, `TESLIM` kanıtı **6955 dk (~4,8 gün)** bayattı —
    ve filo o süre boyunca **kayıpsız** çalıştı. Bütün emirler `SendMessage` ile gitti.
 3. ALTYAPI gözcüsü **kapatıldıktan sonra** pano `who` canlılığı **0 dk** kaldı: canlılık
-   **claim atışından** gelir, gözcüden değil. Üçlünün koruduğu sanılan şey zaten başka
+   **claim atışından** gelir, gözcüden değil (⚠2026-09-30'dan beri canlılığın **gerçek kaynağı** `claude agents --json`'dır; bkz. §35). Üçlünün koruduğu sanılan şey zaten başka
    yerden geliyordu.
 
 Buna karşılık maliyeti **her turda bir uyarı satırı** ve **her açılışta bir kurulum ritüeliydi**.
@@ -2833,15 +2833,15 @@ bozuk JSON (tek satır, eski çıktı korunur) · boş dizi · `claude` yok (ENO
 
 ---
 
-## 36. ÖLÇÜM İÇİN AÇILAN `claude -p` ALT SÜRECİ — kabuk mirası sekme açar (OPS emri 2026-09-30)
+## 36. ÖLÇÜM İÇİN AÇILAN `claude -p` ALT SÜRECİ — kabuk mirası giriş etiketi (OPS emri 2026-09-30; sekme etkisi ÖLÇÜLMEDİ)
 
 **Kural:** ölçüm ya da deneme için açılan **her** `claude -p` alt süreci `CLAUDE_CODE_ENTRYPOINT=sdk-cli` ile,
 `--no-session-persistence` bayrağıyla ve **oturum klasörünün değil scratchpad klasörünün** içinden koşar.
 
-**Niçin:** alt süreç kabuktan `CLAUDE_CODE_ENTRYPOINT=claude-vscode` değerini miras alırsa Recep'in editöründe
-**sekme olarak açılır** (YETENEK vakası 2026-09-30: dört kaydın dördünde `entrypoint=claude-vscode`). ARAÇ'ın dolaylı
-izi aynı yönde: kabuk mirasıyla açılan terminal denemeleri `claude-vscode` taşıdı, temiz ortamla (`CLAUDE*` değişkenleri
-silinip `Start-Process`) `entrypoint=cli` döndü (ARAÇ ekip deneyi 2, 2026-09-30).
+**Niçin (OPS emri; gerekçenin ölçülen kısmı dar):** alt süreç kabuktan `CLAUDE_CODE_ENTRYPOINT=claude-vscode` değerini miras alırsa oturum kaydına **eklenti etiketiyle**
+yazılır; ARAÇ ölçümü: kabuk mirasıyla açılan terminal denemeleri `claude-vscode` taşıdı, temiz ortamla (`CLAUDE*` değişkenleri silinip `Start-Process`) `entrypoint=cli` döndü
+(ARAÇ ekip deneyi 2, 2026-09-30). OPS emrinin dayanağı "YETENEK vakası: dört sekmenin dördünde `entrypoint=claude-vscode`" idi; **bu kayıt kanıt dosyalarında bulunamadı**
+ve editörün oturum yöneticisi terminal oturumlarını da listeliyor (ARAÇ notu, OPS ölçtü): yani etiketin sekmeyi tek başına doğurduğu **kanıtlanmış değildir.**
 
 **Ölçüm (ARAÇ, 2026-10-01; temiz ortam, scratchpad cwd, `--no-session-persistence`):** her iki kolda da koşarken kullanıcı
 ayar dizinindeki `sessions/` altına **1 kayıt yazılır, bitince silinir** (`kind=interactive`). Fark yalnız `entrypoint` alanı:
