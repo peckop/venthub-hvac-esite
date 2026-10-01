@@ -131,7 +131,7 @@ function sorunlar(setler, etkinMi, kullaniciDuzeyi) {
  * Etkin ağaçta bulunmayan ama YETENEK setinde ön yüklenen skill'ler: kullanıcı/eklenti düzeyinde var (bu oturumun
  * skill listesinde görülür). Mekanik doğrulama (alan geçerli mi, gövde bağlama giriyor mu) ARAÇ'ın işidir.
  */
-const KULLANICI_DUZEYI = new Set(['webapp-testing', 'accessibility', 'search-console', 'pdf', 'supabase-postgres-best-practices'])
+const KULLANICI_DUZEYI = new Set(['webapp-testing', 'accessibility', 'search-console', 'pdf'])
 
 function main() {
   const kok = path.resolve(__dirname, '..', '..')
