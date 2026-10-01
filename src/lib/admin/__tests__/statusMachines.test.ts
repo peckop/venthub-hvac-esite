@@ -86,6 +86,27 @@ describe('orderStatusMachine — kanban monotonluk kapısı (T058-VH)', () => {
 })
 
 /**
+ * REC-551 — mutasyon testi kaos yoklaması K2'nin bulduğu üretim hatası.
+ *
+ * `TRANSITIONS[current] ?? []` kalıtsal üyeleri "tanımlı" saydığı için bu dört değer
+ * `[]` yerine TypeError fırlatıyordu. Statü dış girdiden (webhook gövdesi, admin isteği)
+ * gelirse sonuç 500'dü. Kilit bozulmuyordu ama söz "kilitli"ydi, "çöker" değil.
+ */
+describe('durum makineleri — nesnenin kalıtsal anahtarları statü DEĞİLDİR (REC-551)', () => {
+  const KALITSAL = ['__proto__', 'constructor', 'toString', 'hasOwnProperty']
+
+  it.each(KALITSAL)('sipariş makinesi `%s` için kilitli döner, istisna fırlatmaz', (anahtar) => {
+    expect(allowedNextOrderStatuses(anahtar)).toEqual([])
+    expect(canTransitionOrder(anahtar, 'shipped')).toBe(false)
+    expect(canTransitionOrder('pending', anahtar)).toBe(false)
+  })
+
+  it.each(KALITSAL)('iade makinesi `%s` için kilitli döner, istisna fırlatmaz', (anahtar) => {
+    expect(allowedNextStatuses(anahtar)).toEqual([])
+  })
+})
+
+/**
  * REC-535 — mutasyon testi ilk koşusu (sipariş + iade durum makineleri).
  *
  * Yukarıdaki testler yasak geçişleri (teslimden geri dönüş, terminal çıkış) ve birkaç izinli
