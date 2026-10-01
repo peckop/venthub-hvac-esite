@@ -270,14 +270,17 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // kurallar dosyalarına taşındı, en büyük kart ~4,9 KB. Karta yeni bölüm eklerken aşılırsa ayrıntı dosyaya taşınır.
   // Yumuşak kanarya: REC-521'de %80'di (en büyük kart 4,96 KB). REC-522'de altı yeni kart geldi; rol içeriği eski
   // kartlardan uzun (1,2-1,9 KB, eskiler 0,7-1,2 KB) ve doğrulanmış olgu taşıyor, en büyük kart 5,7 KB oldu → %90.
+  // 2026-10-01 (HRT-5): yumuşak kanarya %90 → %92. Sebep: Kanban geçişi (#1609) ve karar 224 onay satırı ortak bloğa
+  // girdi; en büyük kart (SATIS) iki değişiklikle ~6,03 KB oldu (master 5,83 KB). Satır en kısa hâle indirildi, ayrıntı
+  // fleet-mechanism §Kural 4'te. SERT sınır (6656) aynı kaldı; yeni bölüm gerekirse ayrıntı dosyaya taşınır.
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
-  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %90\'ında)', () => {
+  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %92\'sinde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)
       expect(metin, `${ad} kartında kural özet satırı olmamalı (kurallar dosyasında)`).not.toMatch(/^- K\d+ [^;\n]+: /m)
     }
     const enBuyuk = Math.max(...Object.values(uretilen).map((m) => Buffer.byteLength(m, 'utf8')))
-    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.9)
+    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.92)
   })
 
   it('Çalışma düzeni bloğu her kartta bire bir aynı ve pano kanıt kuralını taşır (ARAÇ ölçümü: 62 kartın 45\'inde kanıt yok)', () => {
@@ -380,6 +383,16 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('PR = `Fixes REC-nn`')
       expect(metin, ad).toContain('`Kayıtsız: <sebep>`')
     }
+  })
+
+  it('karar 224: her kart canlı dışı onay yolunu (OPS) ve aktarım yetkisinin yalnız OPS\'ta olduğunu taşır; OPS kartı genel müdür', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, ad).toContain('Canlı dışı işte onay OPS\'tan alınır')
+      expect(metin, ad).toContain('aktarım yalnız OPS')
+      expect(metin, ad).toContain('Recep teyidi bekliyor')
+    }
+    expect(uretilen.OPS).toContain('genel müdürü')
+    expect(uretilen.URUN).not.toContain('genel müdürü')
   })
 
   it('beş Recep kapısı her kartta bire bir aynı', () => {

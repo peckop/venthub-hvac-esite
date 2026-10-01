@@ -14,7 +14,7 @@
 > kodu iki ayrı bağımsız okuyucuyla ve kaynaktan karşılaştırıldı; ARAÇ'ın uygulayıcı okuması 17 kritik madde buldu, v0.4 onları işledi; v0.4'ü okuyan dördüncü bağımsız okuyucu 7 engelleyici buldu, v0.5 onları işledi; v0.5'i doğrulayan beşinci okuyucu 2 engelleyici + 4 orta buldu, v0.6 onları işledi; v0.6'yı doğrulayan 2 engelleyici + 5 orta buldu, v0.7 işledi; v0.7'yi doğrulayan SON okuma (OPS kuralı) 1 engelleyici + 4 orta buldu, v0.8 hepsini işler).
 > **Kanca KURULU DEĞİL** (§10); bu cetvel şartnamedir. **Statü: v0.7, uygulamayla doğrulanacak** (OPS kararı 2026-10-01: v0.4, v0.5, v0.6 her turda en az 2 engelleyici (7, 2, 2; v0.7'de 1)
 > çıktı; belge kodla sınanmadan sıfıra inmez; kalan sorular §11 "Açık sorular (uygulamada ölçülecek)" başlığında ARAÇ'ın kabul testlerine bağlıdır).
-> **Davranış kuralı (Recep, ayakta duran, kancadan bağımsız):** "Ayar dosyasına yazım yalnız ilgili pencerede Recep sözüyle; onay pencereler arası taşınmaz." Kanca izin verse bile söz şartı kalkmaz.
+> **Davranış kuralı (Recep, ayakta duran, kancadan bağımsız):** "Ayar dosyasına yazım yalnız ilgili pencerede Recep sözüyle; onay pencereler arası taşınmaz." Kanca izin verse bile söz şartı kalkmaz. *(Karar 224 sınırı: canlı dışı işte onay OPS'tan alınır; ayar/izin/kullanıcı düzeyi dosyalar bu yüzden Recep sözüyle kalır, OPS yorumu, Recep teyidi bekliyor, 2026-10-01; `fleet-mechanism-standard.md` §Kural 4.)*
 
 ---
 

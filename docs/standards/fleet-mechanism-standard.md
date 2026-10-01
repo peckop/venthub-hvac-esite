@@ -1119,6 +1119,17 @@ claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
    akran aktarımı onay yerine **geçmez**; yanlış adrese düşen bir GO, düştüğü şerit
    tarafından **taşınmaz** — yalnız *"teslimat kayboldu, kendi kanalından al"* denir.
    (Vaka 3 böyle kapatıldı.)
+4. **Onay yolu (karar 224, Recep 2026-10-01, OPS penceresi).** Recep'in sözü: *"canlı haricinde sen işi
+   bitirebilmelisin ama ben ister sana ister de o pencerede gidip yine onay verebilirim"*. Yani **canlı DIŞINDAKİ
+   işlerde** departman onayı doğrudan OPS'tan alınır; Recep'in OPS'ta verdiği evet için OPS sözünü ve saatini
+   aktarır. Bu, madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR: adres doğrulanmıştır ve kaynak
+   Recep'in kendi sözüdür. Recep isterse onayı ilgili pencerede de verebilir. **Recep'in onayını aktarma yetkisi
+   YALNIZ OPS'tadır** (Recep, 2026-10-01: *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*);
+   bir departman başka bir departmana Recep onayı aktaramaz (madde 3 aynen geçerlidir).
+   - **Değişmeyen (canlı):** prod, migration'lı PR, gerçek para, geri alınamaz silme. Recep sözü o pencerede.
+   - **Ayar/izin dosyaları ve kullanıcı düzeyi dosyalar** (`recep.md`, settings gibi) Recep sözüyle ilgili pencerede
+     kalır. *(OPS yorumu, Recep teyidi bekliyor, 2026-10-01; teyit ya da itiraz gelince OPS bu notu kaldırtır.)*
+     Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
 
 ### Aracın yanıltan çıktısı — ve ailesi
 

@@ -36,6 +36,7 @@ Açık; işler OPS'tan gelir.
 3. Geçmişi silen ya da zorlayan git komutu.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
+Canlı dışı işte onay OPS'tan alınır; aktarım yalnız OPS'tan (karar 224, ayrıntı fleet-mechanism §Kural 4; ayar/izin dosyası sınırı: Recep teyidi bekliyor).
 CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
 
 ## İletişim

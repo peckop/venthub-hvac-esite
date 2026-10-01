@@ -5,6 +5,9 @@
 > yerinde kalır (`standards/belge-yonetimi-standard.md` B2). Çelişirse bu dosya güncellenir, CLAUDE.md'ye haber verilir.
 > Kural: her konunun **tek otoritesi** vardır; diğer dosyalar onu tekrar etmez, **referans verir**.
 > Haritada olmayan belge ajan için yoktur: yeni cetvel bu dosyaya satırı eklenmeden bitmiş sayılmaz.
+> **Şirket çerçevesi (Recep, 2026-10-01, OPS penceresi):** Recep = şirket sahibi; **OPS = genel müdür** (yürütmenin başı,
+> sahibe karşı tek sorumlu yüz; Recep'in onayını aktarabilen tek pencere); departman penceresi = departman müdürü;
+> alt ajan = çalışan; skill = uzmanlık. Onay yolu: `standards/fleet-mechanism-standard.md` §Kural 4 (karar 224).
 
 ## Haritaların haritası — hangi soruda hangi harita
 
