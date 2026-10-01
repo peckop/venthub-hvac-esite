@@ -846,16 +846,16 @@
      "ad": "codegraph",
      "kb": 5.4,
      "kaynak": "yetenek"
-    },
-    {
-     "ad": "supabase-postgres-best-practices",
-     "kb": 3.2,
-     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 8.6,
+   "toplamKB": 5.4,
    "adiylaCagir": [],
-   "bekleyen": []
+   "bekleyen": [
+    {
+     "ad": "supabase-postgres-best-practices",
+     "neden": "supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8 ölçümü 2026-10-01: Haiku ve Sonnet alt ajanı \"YOK\" dedi; olmayan ad hata vermeden atlanır). Projeye alınırsa (MIT, 3,2 KB; yük bütçesine sığma ayrıca bakılır) ya da eklenti açılırsa eklenir"
+    }
+   ]
   },
   {
    "dept": "SATIS",
@@ -866,14 +866,9 @@
      "ad": "create-migration",
      "kb": 6.3,
      "kaynak": "departman"
-    },
-    {
-     "ad": "supabase-postgres-best-practices",
-     "kb": 3.2,
-     "kaynak": "yetenek"
     }
    ],
-   "toplamKB": 9.5,
+   "toplamKB": 6.3,
    "adiylaCagir": [
     {
      "ad": "supabase",
@@ -881,7 +876,12 @@
      "uyari": "ad çakışması: proje supabase (19K) ile eklenti supabase:supabase (13K); alanın hangisini çözdüğü ölçülmedi"
     }
    ],
-   "bekleyen": []
+   "bekleyen": [
+    {
+     "ad": "supabase-postgres-best-practices",
+     "neden": "supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8 ölçümü 2026-10-01: Haiku ve Sonnet alt ajanı \"YOK\" dedi; olmayan ad hata vermeden atlanır). Projeye alınırsa (MIT, 3,2 KB; yük bütçesine sığma ayrıca bakılır) ya da eklenti açılırsa eklenir"
+    }
+   ]
   },
   {
    "dept": "SATIS",
