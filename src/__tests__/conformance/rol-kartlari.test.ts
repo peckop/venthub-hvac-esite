@@ -388,7 +388,18 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('`<KISA AD>-<sayı>`')
       expect(metin, ad).not.toContain('Linear kaydı (REC-nn)')
       expect(metin, ad).not.toContain('iş durumu için Linear')
+      // Okuyucu bulgusu (10-01): iki literal dizge yetmez; "Linear'da kayıt/bağlantı" biçimindeki her cümle yasak.
+      // Meşru cümleler (Linear donuktur, Linear'a yeni iş kaydı açılmaz, MARKA Design istisnası) bu desene girmez.
+      expect(metin, ad).not.toMatch(/Linear'?(da|a|ı|'dan|dan)?\s*(kayd|kayıt|bağlant)/i)
+      expect(metin, ad).not.toContain('<DEPARTMAN>-')
     }
+  })
+
+  it('numara biçimi kolu ayırt edici: eski kalıplar bozuk kopyada yakalanır', () => {
+    const bozukOrnekler = ["Her iş Linear'da kayıt açılır (REC-nn).", 'No: REC Linear bağlantısı', 'kart (`<DEPARTMAN>-<sayı>`)']
+    const yakalar = (m: string) => /Linear'?(da|a|ı|'dan|dan)?\s*(kayd|kayıt|bağlant)/i.test(m) || m.includes('<DEPARTMAN>-')
+    for (const o of bozukOrnekler) expect(yakalar(o), o).toBe(true)
+    for (const ad of Object.keys(uretilen)) expect(yakalar(uretilen[ad]), ad).toBe(false)
   })
 
   it('beş Recep kapısı her kartta bire bir aynı', () => {

@@ -44,7 +44,7 @@ Kapı testlerinin hepsi kodla birlikte değişir; "cetvel + kapı birlikte" kura
 | `rol-karti-uret.cjs:168` | "Her iş: Linear kaydı (REC-nn) + panoda kart + … Linear'da yeni kayıt açılamıyorsa üst kayda 'ALT İŞ' yorumu yaz." | "Her iş: Kanban kartı (<KISA AD>-<sayı>; Linear'dan taşınan REC-nn korunur) + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu." |
 | `rol-karti-uret.cjs:172` | "iş durumu için Linear + pano" | "iş durumu için Kanban; kim hangi dosyada için claim panosu" |
 | `session-board.cjs:520` | "Emir = Linear kaydi" | "Emir = Kanban karti" |
-| `ci.yml:123` / `pr-kayit-kapisi.cjs` | "her PR bir Linear kaydına bağlanır: `Fixes REC-nn` ya da `Kayıtsız: <sebep>`" | "her PR bir Kanban kartına bağlanır: `Kanban: <DEPARTMAN>-<sayı>` ya da `Kanban: REC-nn`; geçiş penceresinde `Fixes REC-nn` de kabul" |
+| `ci.yml:123` / `pr-kayit-kapisi.cjs` | "her PR bir Linear kaydına bağlanır: `Fixes REC-nn` ya da `Kayıtsız: <sebep>`" | "her PR bir Kanban kartına bağlanır: `Kanban: <KISA AD>-<sayı>` ya da `Kanban: REC-nn`; geçiş penceresinde `Fixes REC-nn` de kabul" |
 | 4 WrongStack skill, madde 6 | "Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır" | "Kanban iş emrinin tek kaynağıdır (karar 219); Linear donuk" |
 | 4 WrongStack skill, madde 12 | "mesaj yalnız ADRES (dosya/Linear)" | "mesaj yalnız ADRES (dosya/Kanban numarası)" |
 | `recep.md:68` | "No: … Linear kaydına tıklanabilir bağlantı" | "No: işin Kanban numarası (<KISA AD>-<sayı> ya da taşınan REC-nn)" |
@@ -75,9 +75,9 @@ Kapı testlerinin hepsi kodla birlikte değişir; "cetvel + kapı birlikte" kura
 5. **PR şablonu:** `.github/pull_request_template.md` Linear'dan hiç söz etmiyor (ROADMAP satırları eski). Şablona `Kanban: <numara>` satırı eklenmesi PR 1'e girsin mi? **Önerim:** evet. **OPS kararı: evet (PR 1'e girdi).**
 6. **PR 1'de ölçüm sırasında çıkan, planda olmayan sorular (OPS'a):**
    - `multi-session-coordination-standard.md` (iş durumu Linear'da yazıyordu) planın sınıf B listesinde yoktu; ikinci geçişte (`rg "REC-\d+"`) bulundu ve PR 1'e eklendi. Benzer bir kaçak bırakmamak için PR sonrası `rg -i linear docs/standards` sayımı tekrar edilir.
-   - Üç cetvel Linear'ı veri/ek yeri olarak anıyor: `geo-olcum-standard.md` (ham cevap ve aylık özet "Linear kaydına ek"), `rehber-yazisi-standard.md` (REC-369 eki), `yayin-gorunurluk-denetim-standard.md` (kalıcı kopya "Linear kaydına ek"). Bunlar iş durumu değil ölçüm saklama yeridir; Linear donukken yeni ek eklenir mi, Kanban kartına mı gider? **Sahipleri GEO-SEO, BLOG, ALTYAPI; karar OPS'ta, PR 1'e DAHİL DEĞİL.**
-   - Kısa ad tablosunda BLOG, EDGE, GEO-SEO, I18N, MARKA, MEVZUAT, SATIS, TASARIM satırı yok; OPS ataması bekleniyor (is-kayit-duzeni §1).
-   - OPS kartının görev cümlesindeki "Recep'in her talimatını REC-425 altına kaydeder" (talimat defteri Linear'da) donuk Linear ile çelişiyor; PR 1'de DOKUNULMADI. Talimat defteri nereye taşınacak: OPS.
+   - Üç cetvel Linear'ı veri/ek yeri olarak anıyor: `geo-olcum-standard.md` (ham cevap ve aylık özet "Linear kaydına ek"), `rehber-yazisi-standard.md` (REC-369 eki), `yayin-gorunurluk-denetim-standard.md` (kalıcı kopya "Linear kaydına ek"). Bunlar iş durumu değil ölçüm saklama yeridir; Linear donukken yeni ek eklenir mi, Kanban kartına mı gider? **Sahipleri GEO-SEO, BLOG, ALTYAPI; PR 1'e DAHİL DEĞİL.** **KARAR (OPS):** ek = ilgili Kanban kartına bağlantı/not, dosya depoda ya da `docs/olcum/` altında; cümlelerin düzeltilmesi HRT-4 kartında.
+   - Kısa ad tablosunda BLOG, EDGE, GEO-SEO, I18N, MARKA, MEVZUAT, SATIS, TASARIM satırı yok; OPS ataması bekleniyor (is-kayit-duzeni §1). **ÇÖZÜLDÜ (OPS, a1e643c91):** BLG, EDG, SEO, DIL, MRK, MVZ, STS, TSR.
+   - OPS kartının görev cümlesindeki "Recep'in her talimatını REC-425 altına kaydeder" (talimat defteri Linear'da) donuk Linear ile çelişiyor; PR 1'de DOKUNULMADI. Talimat defteri nereye taşınacak: OPS. **ÇÖZÜLDÜ (OPS):** Recep talimatı OPS panosundaki REC-425 kartına not olarak yazılır; üretici ve OPS kartı düzeltildi.
    - `scripts/nlm/santiye.py` ve `work-tracking-ssot-standard.md` §8'in Linear'dan okuyan iş dağılımı üreticisi: HRT-3 kartında.
 
 ## 5. Bu belge neyi ölçmedi (adıyla)

@@ -30,7 +30,7 @@
 | **maestro** (skill) | Çok dosyaya **aynı** yapısal değişikliği paralel dalgalarla uygulama + yargıç + merkezi kapı | Tek koşum, çok PR | YÜKSEK ama elle yapmaktan ucuz |
 | **agy-orchestrate** (skill) | Antigravity/Gemini filosuyla ucuz geniş tarama; Claude CodeGraph ile doğrular | Tek koşum | DÜŞÜK (Claude kotası yerine Gemini) |
 | **Tekil skill** (office-hours, plan-challenger, diff-review, code-review, qa, llm-council, task-observer, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum (task-observer: oturum boyu arka planda) | DÜŞÜK-ORTA |
-| **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Linear kaydına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
+| **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Kanban kartına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
 | **Elle** (oturumun kendisi) | Doğrudan okuma/düzenleme | — | En ucuz, en dar |
 
 ---
@@ -52,7 +52,7 @@
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
 | "Neyi silebiliriz, vizyona sadık mı" | **prd-complexity-audit** | Bug avı | `docs/audits/` |
 | RLS / politika / migration yazımı | **supabase-security** + plan-challenger | — | migration + INV |
-| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Kanban kartı gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Linear kaydı + `docs/plans/` |
+| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Kanban kartı gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Kanban kartı + `docs/plans/` |
 | Küçük **tek dosya**, tek PR, net iş | **Elle** (müdür modelinin tek istisnası, §10) | Tek dosyayı aşınca müdür modeli: böl, çalışana ver, denetle · **kapsam kararı gerekiyorsa PLAN MODU** (bu sınıf 2026-09-07'ye kadar yanlışlıkla "elle" sayılıyordu) | PR |
 
 **Seçim ilkesi:** önce *şekli* tanı (kaç dosya? salt-okuma mı yazım mı? yargı mı tarama mı? kaç gün?),
