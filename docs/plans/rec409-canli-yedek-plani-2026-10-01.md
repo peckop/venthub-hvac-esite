@@ -1,7 +1,9 @@
 # REC-409 — Canlı veritabanının tam, düzenli, şifreli yedeği + denenmiş geri yükleme (plan v1)
 
-> **Durum:** v1 · 2026-10-01 · Sahip: ALTYAPI · OPS onayı: "plan v1 + plan-challenger" (10-01). Kod yok.
-> **Recep kararları bekliyor:** 229 (saklama yeri) · 230 (gizli anahtar kimde, kaç kopya) · 231 (bugün tek seferlik elle yedek) · zamanlanmış koşum izni (§3 madde 5; numarası OPS'tan).
+> **Durum:** v1 · 2026-10-01 · Sahip: ALTYAPI · **PARK: "ilk satıştan önce"** (Recep 10-01, karar 231 = hayır: "bugün tek seferlik yedeğe gerek yok, zaten sitede satış yok, şirket açılmadı henüz"). Kod yok.
+> **Bağlam:** şirket henüz kurulmadı, sitede gerçek satış yok; canlıdaki sipariş ve kullanıcı verisi denemedir. Bu iş acil değildir; satış hazırlığı listesinde sırası gelince açılır.
+> **Kararlar o zaman sorulacak (229, 230, 232 geri çekildi):** saklama yeri · gizli anahtar kimde, kaç kopya · zamanlanmış koşum izni.
+> **Emsal (sıfırdan tasarlanmaz):** `scripts/pim/unopim-yedek.cjs` (REC-357, 2026-09-23): `al` / `dene` / `coz` komutları, makine dışına yalnız şifreli tek dosya, hedef dizin depo içinde olamaz kapısı, ayrı ortamda geri kurma denemesi ve sayım karşılaştırması. Canlı veritabanı yedeği aynı düzeni izler.
 > §5 plan-challenger sonucu için ayrılmıştır; koşmadan uygulama başlamaz.
 
 YÖNTEM: şerit; plan → plan-challenger (canlı veri) ZORUNLU → uygulayıcı (sonnet) → geri yükleme denemesi bağımsız doğrulayıcıyla.
@@ -23,7 +25,7 @@ YÖNTEM: şerit; plan → plan-challenger (canlı veri) ZORUNLU → uygulayıcı
 | Depoda yedek aracı | Tüm veriyi alan düzenli yedek YOK. Var olanlar: şema tabanı (veri yok), katalog paketi, UnoPim yedeği, 08-11 tek seferlik döküm (bayat) |
 | Bağlantı | `SUPABASE_DB_URL` sırrı depoda kayıtlı (şema tabanı iş akışı kullanıyor) |
 
-**Hüküm:** bugün canlı veritabanı silinir ya da bozulursa müşteri, sipariş, teklif ve kullanıcı verisini geri getirecek HİÇBİR kopya yok. Veri küçük (sıkıştırılmış döküm tahminen 10 MB altı; ölçülmedi), yani iş ucuz ve hızlı.
+**Hüküm:** canlı veritabanının güncel ve düzenli yedeği yok; son tam kopya 2026-08-11 tarihli tek seferlik dökümdür. Katalog verisi katalog paketinden, PIM verisi PIM yedeğinden geri kurulabilir. Bugün canlıda gerçek müşteri ve sipariş verisi olmadığı için kayıp riski düşüktür; düzenli yedek ilk gerçek satıştan ÖNCE kurulmuş olmalıdır. Veri küçük (sıkıştırılmış döküm tahminen 10 MB altı; ölçülmedi), yani iş ucuz ve hızlı.
 
 ## 2. Tasarım taslağı
 
