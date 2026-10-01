@@ -94,7 +94,7 @@ Onarım iki adımdır, ikisi de seçenek değildir:
 gösterim verdi. Bu "talep yok" demek değil; aynı konular için Google arama önerisi 16 tohumda toplam
 93 bilgi niyetli öneri döndürdü (ör. "hava perdesi" tek başına 16). Search Console, yazı yayımlanana
 kadar bilgi talebini ölçemez; konu seçimi en az bir **dış** kaynağa dayanır. Sorgu dökümü ve tohum
-listesi REC-369 BLOG F1 yorumunda (PUBLIC depoya girmez).
+listesi eski Linear REC-369 BLOG F1 yorumunda; güncel yer Kanban kartı/depo dışı dosya (PUBLIC depoya girmez).
 
 ### R1.2 Ölçütler (konu başına tablo, Recep'e özetle gider)
 
@@ -444,7 +444,7 @@ Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü)
   ürün kartı) temsilîdir ve sayfada bu yazılır.
 - Onaylanan sha256, tablo geldiğinde yazının ilk revizyonu olarak yazılır; farklıysa akış baştan.
 - Bağımlı işler (sırasıyla, URUN): karar 92 rotası + rehber tablosu migration'ı (kural 13) → önizleme
-  rotası. Hepsi REC-369 (Linear, donuk arşiv) altında izlenmişti; yeni izleme Kanban kartında (karar 219).
+  rotası. Hepsi REC-369 (Linear, donuk arşiv) altında izlenmişti; yeni izleme BLOG'un Kanban kartında (karar 219; kart numarası BLOG kartı açınca buraya yazılır).
 
 ## R6 — Yer ve teknik gereklilikler (uygulayan URUN)
 
