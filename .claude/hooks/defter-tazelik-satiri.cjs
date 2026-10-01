@@ -290,7 +290,21 @@ try {
   const parca = []
   if (d.dogrulanmadi.length > 0) parca.push('⛔DOGRULANMAMIS ' + d.dogrulanmadi.length + ' dosya (bir kosum DUSTU)')
   if (d.gun === null) parca.push('HIC YEDEK YOK')
-  else if (d.gun > 2) parca.push('son yedek ' + d.gun + ' gun once')
+  // Eşik DEPO BAŞINA (kanban 24 saat, sage 72 saat): ayrı depoların gecikmesi ayrı söylenir (ARC-9).
+  else for (const g of d.geciken || []) parca.push(g.depo + ' yedegi ' + g.saat + ' saat once')
+  // Recep sözü defteri (ARC-15): karar kaydı; yedeği hiç yoksa ya da 24 saati aştıysa konuşur. Defter yoksa susar.
+  try {
+    const dy = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri-yedek.cjs'))
+    const dd = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri.cjs'))
+    if (require('fs').existsSync(dd.defterYolu())) {
+      const y = dy.durum()
+      if (y.dogrulanmadi.length > 0) parca.push('⛔defter yedegi DOGRULANMAMIS ' + y.dogrulanmadi.length + ' dosya')
+      if (y.sonYedek === null) parca.push('defter HIC YEDEK YOK')
+      else if (y.gecikti) parca.push('defter yedegi ' + y.saat + ' saat once')
+    }
+  } catch (e) {
+    parca.push('defter yedegi OLCULEMEDI (' + String(e.message).slice(0, 50) + ')')
+  }
   if (parca.length > 0) {
     process.stdout.write('⚠SAGE: ' + parca.join(' · ') + '\n')
     process.stdout.write('  ONARIM: node scripts/hijyen/sage-yedek.cjs (salt-okuma, ~1 sn, git disina yazar)\n')
