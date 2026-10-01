@@ -412,8 +412,8 @@ müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan
 ekip lideri `general-purpose` olmalıdır (araçları "*"); `Explore` ve `Plan` tipleri alt ajan açamaz.
 
 **Çalışan tanımı kuralları (YTN-8 ölçümü, 2026-10-01; rapor `docs/audits/skill-calisan-yukleme-olcumu-2026-10-01.md`):**
-- **`ToolSearch`, tanımın `disallowedTools` alanına YAZILMAZ.** Ölçüldü: yazılınca Haiku çalışan hiç açılmadı (istek ~329 bin jeton, limit 200 bin, "Prompt is too long"; ertelenmiş araç listesi satır içine dökülüyor); aynı tanımla Sonnet açıldı ama ~330 bin jetonlu istekle. Mevcut tanımların hiçbirinde yok; üretici çıktısı `INV-AJAN-TANIM-1` ile kilitli.
-- **`skills:` ön yüklemesi yalnız `Agent` aracıyla açılan alt ajanda ölçüldü.** `claude --agent <ad>` ile açılan ANA oturumda ön yükleme çalışmadı (tek koşu; üretim yolu değil): ana oturumu bir çalışan tanımıyla açıp skill ön yüklemesine güvenme.
+- **`ToolSearch`, tanımın `disallowedTools` alanına YAZILMAZ.** Ölçüldü: yazılınca Haiku çalışan hiç açılmadı (istek ~329 bin jeton, limit 200 bin, "Prompt is too long"; ertelenmiş araç listesi satır içine dökülüyor); aynı tanımla Sonnet açıldı ama ~330 bin jetonlu istekle. Mevcut tanımların hiçbirinde yok; üretici çıktısı `INV-AJAN-TANIM-1` mandalıyla (disk = üretici) ve yazmayan üç türde ToolSearch'ü arayan testle korunur (uygulayıcıya `disallowedTools` hiç yazılmadığı için orada test boş geçer).
+- **`skills:` ön yüklemesi yalnız `Agent` aracıyla açılan alt ajanda ölçüldü.** `claude --agent <ad>` ile açılan ANA oturumda ön yükleme çalışmadı (Haiku, tek koşu; Sonnet ölçülmedi; üretim yolu değil): ana oturumu bir çalışan tanımıyla açıp skill ön yüklemesine güvenme.
 
 **Model açıkça yazılır.** Kullanıcı ayarında `CLAUDE_CODE_SUBAGENT_MODEL` `sonnet` olarak tanımlıdır (kullanıcı ayar
 dosyası, 2026-10-01 okundu); `model` parametresi verilmeyen alt ajan **sessizce Sonnet'e** düşer. **Ölçüldü** (ARAÇ kontrol
