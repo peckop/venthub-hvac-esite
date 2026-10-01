@@ -9,7 +9,7 @@ import { getCategories } from '../lib/services/category.service'
 import { getAllFamilySlugs, getFamilyLastModified } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
-import { Routes } from '../utils/routes'
+import { adresDili, adresRotalari, kategoriArgumanlari } from '../utils/yuzeyAdresleri'
 
 /**
  * W3 (render-dalga1) — YEDEK TAZELEME YOLU.
@@ -112,32 +112,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/legal/cerez-politikasi',
   ]
 
+  // REC-300 Faz 3e-1: TÜM ürün/kategori/marka/aile adresleri `adresUret` katmanından (`yuzeyAdresleri`) gelir;
+  // bayrak (`ADRES_SEMASI_K3B`) kapalıyken çıktı eski kodla bayt bayt aynıdır (INV-SITEMAP-ADRES-1, altın veri).
+  // Adres her dil için ayrı üretilir: hem satırın `url`i hem hreflang eşi aynı üreticiden çıkar.
+  const dilYolu = (lang: string) => adresRotalari(adresDili(lang))
+
+  // Ürün listesi şemaya duyarlıdır (`/products` ↔ `/urunler`); diğer statik sayfalar şemadan bağımsız.
+  const statikYol = (lang: string, route: string): string =>
+    route === '/products' ? dilYolu(lang).products() : `/${lang}${route}`
+
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({
-      url: `${baseUrl}/${lang}${route}`,
+      url: `${baseUrl}${statikYol(lang, route)}`,
       // lastmod YOK (REC-454): bu sayfaların güvenilir değişiklik tarihi yok. Eskiden `new Date()`
       // yazılıyordu = her üretimde "bugün değişti" → Google haritanın tarihlerine güvenmeyi bırakır.
       // Uydurma tarih yerine alan hiç yazılmaz (Google: lastmod isteğe bağlıdır).
       changefreq: 'daily',
       priority: route === '' ? 1.0 : 0.8,
       ...siteHaritasiAlternates({
-        tr: `${baseUrl}/tr${route}`,
-        en: `${baseUrl}/en${route}`,
+        tr: `${baseUrl}${statikYol('tr', route)}`,
+        en: `${baseUrl}${statikYol('en', route)}`,
       }),
     }))
   )
 
   // 2. Category Routes (URL'ler dile göre yerelleştirilmiş slug ile üretilir; boş kategoriler hariç)
+  // Kategori adresi ÜST'ü bilerek üretilir (dal → iki seviyeli kanonik, kök → tek); kapalıyken tek slug.
+  const kategoriById = new Map(categories.map((c) => [c.id, c]))
+  const kategoriYolu = (cat: (typeof categories)[number], lang: string): string => {
+    const ust = cat.parent_id ? kategoriById.get(cat.parent_id) : undefined
+    const slug = getLocalizedCategorySlug(cat, lang)
+    const k = kategoriArgumanlari(slug, {
+      slug,
+      ustSlug: ust ? getLocalizedCategorySlug(ust, lang) : null,
+    })
+    return dilYolu(lang).category(k.slug, k.subSlug)
+  }
   const categoryRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     categoriesWithProducts.map((cat) => ({
-      url: `${baseUrl}/${lang}${Routes.category(getLocalizedCategorySlug(cat, lang))}`,
+      url: `${baseUrl}${kategoriYolu(cat, lang)}`,
       // Tarihsiz satırda `new Date()` yedeği KALDIRILDI (REC-454) — tarih yoksa alan yazılmaz.
       ...(cat.updated_at ? { lastModified: new Date(cat.updated_at) } : {}),
       changefreq: 'weekly',
       priority: 0.7,
       ...siteHaritasiAlternates({
-        tr: `${baseUrl}/tr${Routes.category(getLocalizedCategorySlug(cat, 'tr'))}`,
-        en: `${baseUrl}/en${Routes.category(getLocalizedCategorySlug(cat, 'en'))}`,
+        tr: `${baseUrl}${kategoriYolu(cat, 'tr')}`,
+        en: `${baseUrl}${kategoriYolu(cat, 'en')}`,
       }),
     }))
   )
@@ -159,13 +179,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 3. Brand Routes
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     HVAC_BRANDS.map((brand) => ({
-      url: `${baseUrl}/${lang}${Routes.brand(brand.slug)}`,
+      url: `${baseUrl}${dilYolu(lang).brand(brand.slug)}`,
       // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
       changefreq: 'weekly',
       priority: 0.6,
       ...siteHaritasiAlternates({
-        tr: `${baseUrl}/tr${Routes.brand(brand.slug)}`,
-        en: `${baseUrl}/en${Routes.brand(brand.slug)}`,
+        tr: `${baseUrl}${dilYolu('tr').brand(brand.slug)}`,
+        en: `${baseUrl}${dilYolu('en').brand(brand.slug)}`,
       }),
     }))
   )
@@ -177,14 +197,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     familySlugs
       .filter((f) => !!f.slug)
       .map((f) => ({
-        url: `${baseUrl}/${lang}${Routes.product(f.slug)}`,
+        url: `${baseUrl}${dilYolu(lang).product(f.slug)}`,
         // REC-454: gerçek değişiklik tarihi (aile + aktif varyantlar). Seri slug'ı haritada yok → alan yazılmaz.
         ...(aileTarihleri.has(f.slug) ? { lastModified: new Date(aileTarihleri.get(f.slug) as string) } : {}),
         changefreq: 'daily',
         priority: 0.9,
         ...siteHaritasiAlternates({
-          tr: `${baseUrl}/tr${Routes.product(f.slug)}`,
-          en: `${baseUrl}/en${Routes.product(f.slug)}`,
+          tr: `${baseUrl}${dilYolu('tr').product(f.slug)}`,
+          en: `${baseUrl}${dilYolu('en').product(f.slug)}`,
         }),
       }))
   )

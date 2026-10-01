@@ -73,6 +73,8 @@ async function bayrakla(acik: boolean) {
   vi.resetModules()
   vi.doMock('../../config/features', () => ({
     EN_YAYIN: acik,
+    // Site haritası adresleri `yuzeyAdresleri` üzerinden üretilir (REC-300 3e-1); o modül bu bayrağı okur.
+    ADRES_SEMASI_K3B: false,
     UC_BOYUT_MUSTERI_YUZEYINDE: false,
     YENI_KABUK_GEZINMESI: false,
   }))
