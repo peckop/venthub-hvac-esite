@@ -112,7 +112,7 @@ export default function AccountOverviewPage() {
 
   // İstatistik Hesaplamaları
   const totalVolume = orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0)
-  const activeOrders = orders.filter(o => !['delivered', 'cancelled', 'refunded', 'rejected'].includes(o.status.toLowerCase()))
+  const activeOrders = orders.filter(o => !['delivered', 'cancelled', 'refunded', 'rejected', 'failed'].includes(o.status.toLowerCase()))
   const completedOrdersCount = orders.filter(o => o.status.toLowerCase() === 'delivered').length
 
   // Aktif Sipariş için Kargo Durumu Bulma (En son verilen, bitmemiş sipariş)
