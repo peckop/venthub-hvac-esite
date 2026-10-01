@@ -18,6 +18,7 @@ import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { VARIANT_DETAIL_COLUMNS } from '../../lib/services/product.columns'
+import { ORDER_STEPS, orderStatusBadgeClass, orderStatusLabelKey, orderStepIndex } from '../../utils/orderStatusDisplay'
 import { siparisNoGoster } from '../../utils/siparisNo'
 
 interface ShippingAddress {
@@ -250,35 +251,9 @@ export default function OrderDetailPage() {
   }
 
   // Status helpers
-  const getStatusColor = (status: string) => {
-    switch ((status || '').toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'paid':
-      case 'confirmed': return 'bg-blue-100 text-blue-800'
-      case 'shipped': return 'bg-purple-100 text-purple-800'
-      case 'delivered': return 'bg-green-100 text-green-800'
-      case 'failed':
-      case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-  const getStatusText = (status: string) => {
-    switch ((status || '').toLowerCase()) {
-      case 'pending': return t('orders.pending')
-      case 'paid':
-      case 'confirmed': return t('orders.paid')
-      case 'shipped': return t('orders.shipped')
-      case 'delivered': return t('orders.delivered')
-      case 'failed': return t('orders.failed')
-      case 'cancelled': return t('orders.cancelled')
-      case 'refunded': return t('orders.refunded')
-      default: return status
-    }
-  }
-  const steps = ['pending', 'paid', 'shipped', 'delivered'] as const
-  // Normalize 'confirmed' status to 'paid' for progress bar
-  const normalizedStatus = (order.status || 'pending').toLowerCase() === 'confirmed' ? 'paid' : (order.status || 'pending').toLowerCase()
-  const activeIdx = Math.max(steps.indexOf(normalizedStatus as typeof steps[number]), 0)
+  // Durum eşlemesi ortak yardımcıdan gelir (URN-1): sipariş listesiyle aynı kuralı kullanır.
+  const getStatusText = (status: string) => t(orderStatusLabelKey(status))
+  const activeIdx = orderStepIndex(order.status || 'pending')
 
   return (
     <div className="min-h-screen bg-clean-white py-8">
@@ -306,7 +281,7 @@ export default function OrderDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</span>
+              <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${orderStatusBadgeClass(order.status)}`}>{getStatusText(order.status)}</span>
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
@@ -317,13 +292,13 @@ export default function OrderDetailPage() {
           {/* Detailed Stepper */}
           <div className="mt-2 py-2">
             <div className="flex items-center gap-2 max-w-2xl mx-auto">
-              {steps.map((s, idx) => (
+              {ORDER_STEPS.map((s, idx) => (
                 <React.Fragment key={s}>
                   <div className="flex flex-col items-center min-w-80px">
                     <div className={`w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${idx <= activeIdx ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
                     <span className={`mt-2 text-xs uppercase font-bold tracking-wider ${idx <= activeIdx ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
                   </div>
-                  {idx < steps.length - 1 && (
+                  {idx < ORDER_STEPS.length - 1 && (
                     <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
                   )}
                 </React.Fragment>

@@ -1573,6 +1573,8 @@ export const en: typeof tr = {
     all: 'All',
     pending: 'Pending',
     paid: 'Paid',
+    processing: 'Preparing',
+    statusUnknown: 'Status Updating',
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
@@ -2247,7 +2249,8 @@ export const en: typeof tr = {
       shipStatus: {
         delivered: 'Delivered',
         shipped: 'Shipped',
-        preparing: 'Preparing'
+        preparing: 'Preparing',
+        awaitingPayment: 'Awaiting Payment'
       },
       shipSteps: {
         preparing: 'Prepared',
@@ -2421,6 +2424,7 @@ export const en: typeof tr = {
       statusDelivered: 'Delivered',
       statusShipped: 'In Transit',
       statusPreparing: 'Preparing',
+      statusAwaitingPayment: 'Awaiting Payment',
       stepShipped: 'Shipped',
       stepDelivered: 'Delivered',
       subtitle: 'Track the shipping status and tracking details of your orders here.',
