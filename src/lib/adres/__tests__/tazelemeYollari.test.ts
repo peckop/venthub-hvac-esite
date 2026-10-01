@@ -45,6 +45,15 @@ describe('INV-TAZELEME-YOL-1 — tazeleme yolları iki şemada ve iki dilde', ()
     )
   })
 
+  it('bugünkü şemanın iki segmentli alt yolu bire bir `/<dil>/category/<üst>/<alt>` (dil öneki rota yardımcısından)', () => {
+    const yollar = kategoriYollari(
+      (d) => (d === 'tr' ? 'alt-tr' : 'alt-en'),
+      (d) => (d === 'tr' ? 'ust-tr' : 'ust-en'),
+    )
+    expect(yollar).toContain('/tr/category/ust-tr/alt-tr')
+    expect(yollar).toContain('/en/category/ust-en/alt-en')
+  })
+
   it('boş slug yol üretmez; yollar tekil', () => {
     expect(kategoriYollari(() => '')).toEqual([])
     const yollar = aileYollari('x')

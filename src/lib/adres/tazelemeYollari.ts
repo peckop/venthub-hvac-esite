@@ -1,4 +1,5 @@
 import { type AdresDili, adresUret } from '@/utils/adresUret'
+import { localizedHref } from '@/utils/routes'
 
 /**
  * TAZELEME YOLLARI — webhook'un `revalidatePath` listesi (REC-300 Faz 3g, ana plan m.9).
@@ -49,7 +50,9 @@ export function kategoriYollari(
     }
     // Bugünkü şemanın iki segmentli alt kategori yolu artık YALNIZ yönlendirme yapar (REC-205: kanonik tek
     // segment) ama önbellekli 308'i bayatlayabilir; eski webhook bunu tazeliyordu (W2) — davranış KORUNUR.
-    if (ustSlug) yollar.add(`/${dil}/category/${ustSlug}/${own}`)
+    // `Routes.category` REC-205'ten beri hep tek seviyeli (alt slug'ı verir), iki seviyeli yolu üretmez; bu yüzden
+    // yol gövdesi burada, dil öneki ise `localizedHref`'ten gelir (kural 7: elle `/${dil}/` birleştirme yok).
+    if (ustSlug) yollar.add(String(localizedHref(`/category/${ustSlug}/${own}`, dil)))
   }
   return [...yollar]
 }
