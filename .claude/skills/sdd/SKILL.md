@@ -20,7 +20,7 @@ metadata:
 | `codebase-impact-analysis` | `graphify affected "sembol()"` (**parantez şart**: parantezsiz "No unique node match" verir) |
 | `codebase-targeted-test`, `codebase-skeleton` | Yok. Kapsayan testi değişen dosyanın yanında / `src/__tests__/` altında elle bul; iskelet için aralıklı `Read` |
 | `<nextsteps>` etiketi | **Hiç üretilmez.** Bizde ayrıştırıcı yok; Recep'e rapor akan cümledir |
-| `/sdd …` komutları (satır ~37-58) ve görev yaşam döngüsü komutları | WrongStack ana programının; Claude Code'da **yok**. Spec elle `docs/plans/<ad>-<tarih>.md` olarak yazılır; görev durumları (satır ~91-98) `/sdd` deposunda değil **Linear alt kaydında** tutulur |
+| `/sdd …` komutları (satır ~37-58) ve görev yaşam döngüsü komutları | WrongStack ana programının; Claude Code'da **yok**. Spec elle `docs/plans/<ad>-<tarih>.md` olarak yazılır; görev durumları (satır ~91-98) `/sdd` deposunda değil **Kanban alt kartında** tutulur |
 | **"Goal & Eternal Mode" bölümü (satır 108-123: `/goal`, `/autonomy eternal`)** | **UYGULANMAZ, çıkarılmış say.** Sebep: bu komutlar Claude Code'da yok (bölüm zaten çalışmaz) ve sonsuz `decide→execute→reflect→sleep` döngüsü karar 53 (zamanlayıcı/döngü önce Recep'le) ile "kuyruk bitince dur" sözüyle çelişir. Yalnız Recep AÇIKÇA isterse konuşulur |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
