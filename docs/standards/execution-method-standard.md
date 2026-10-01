@@ -470,15 +470,18 @@ Claude Code sürümüyle değişebilir: bir sayıya dayanan iş, sayıyı önce 
 - **Ultracode ve 20 sınırı (belgede yazıyor, SINANMADI):** belgeye göre ultracode açıkken 20'lik sınır `Agent` aracıyla açılan alt ajanlara uygulanmaz; bu cümle ölçülmedi, ölçülene kadar ona güvenilmez. `ultracode` kelimesi yalnız o istem için ve yalnız insanın yazdığı istemde etkilidir (webhook, PR yorumu, `-p` ile gelende tetiklemez); `/effort ultracode` oturum boyunca, `ultracode` ayarı her oturumda açar.
 - **Workflow izni izin moduna göre değişir:** Auto modda yalnız İLK çalıştırmada sorar ve verilen herhangi bir "Yes" kullanıcı ayarına kalıcı yazılır (sonra sorulmaz); Manual ve accept-edits modunda her çalıştırmada sorar (kayıtlı workflow için "bir daha sorma" vardır); Bypass modunda ve `claude -p`/SDK'da sorulmaz (`Workflow` allow kuralı işler). Ultracode açıkken auto modda ilk onay da sorulmaz.
 - **Agent teams (ekip) AYRI KOŞUL:** deneysel ve varsayılan kapalı, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` gerekir; yalnız interaktif oturumda; oturumda tek ekip; **iç içe ekip yok** (üye ekip açamaz); üye sayısına sert sınır yok, öneri 3-5; üyeler liderin izin modunu miras alır (`dontAsk` hariç). Bu, alt ajan zincirinden (müdür → ekip lideri → çalışan) farklı bir mekanizmadır.
-- **Ekip lideri hangi yüzeyde olabilir (ölçüm, her biri TEK oturum; ARAÇ ekip deneyleri 2026-09-30 / 10-01):**
-  - **Etkileşimli terminal (`entrypoint=cli`): ekip KURULDU** — kullanıcı ayar dizinindeki `teams/` altında oturum klasörü ve `config.json`,
-    `Agent` + `name` ile açılan üye `in-process teammate` olarak kayıtlı (ekip deneyi 2).
-  - **Claude Desktop (Code sekmesi, `entrypoint=claude-desktop`): ekip KURULMADI** — iki denemede `Agent` + `name` ile
-    açılan üye düz alt ajan oldu, `config.json` oluşmadı, üyenin sistem isteminde `team-lead`/`teammate` yoktu; hata metni
+- **Ekip lideri hangi yüzeyde güvenilir (ölçüm, her biri TEK oturum; ARAÇ ekip deneyleri 2026-09-30 / 10-01):**
+  - **Etkileşimli terminal (`entrypoint=cli`): ekip kuruldu VE çalıştı** — kullanıcı ayar dizinindeki `teams/` altında oturum
+    klasörü ve `config.json`; `Agent` + `name` ile açılan üye `in-process teammate` olarak kayıtlı (ekip deneyi 2).
+  - **Claude Desktop (Code sekmesi, `entrypoint=claude-desktop`): ekip dizini HİÇ oluşmadı** — iki denemede `Agent` + `name`
+    ile açılan üye düz alt ajan oldu, `config.json` yok, üyenin sistem isteminde `team-lead`/`teammate` yok; hata metni
     yok, **sessizce** açılmadı. Dar okuma: Teammates paneli görülmedi, Recep teyit etmedi.
-  - **VS Code eklentisi (`stream-json`):** ölçüm yok; yalnız belgede (`agent-teams.md`) "`-p` ve SDK kipinde üye açılmaz".
-  - Sonuç: ekip özelliğinin lideri olacak oturum **etkileşimli terminalde** açılır; departman pencereleri (Desktop, eklenti)
-    bu iş için varsayılan olarak lider **sayılmaz**. Alt ajan zinciri (müdür → ekip lideri → çalışan) bu sınırdan etkilenmez.
+  - **`entrypoint=claude-vscode` (eklenti): ekip yapısı kuruldu ama teslim güvenilmez** — deney 205 C kolunda (oturum
+    68e95ce3) lider `config.json` ve işçi posta kutuları oluştu, ama 25/25 işçi "SubagentHandback ile rapor teslim etmeden
+    bitti" (sebep bilinmiyor). Soru "kuruldu mu" değil **"işçi sonucu müdüre teslim edildi mi"**dir. Belgede ayrıca
+    "`-p` ve SDK kipinde üye açılmaz" yazar. Ekip deneyi 1'in (8b465648) yüzeyi bilinmiyor: **ölçülmedi**.
+  - Sonuç: sağlam sonuç için ekip lideri **etkileşimli terminalde** açılır; departman pencerelerinde (Desktop, eklenti) ekip
+    varsayılan olarak denenmez. Alt ajan zinciri (müdür → ekip lideri → çalışan) bu sınırdan etkilenmez.
 - ⚠**SINANMADI:** agent teams (ekip) üyelerinin "eşzamanlı 20" sınırına ayrı oturum olarak sayılıp sayılmadığı (yukarıdaki ölçüm ekip bayrağı kapalıyken yapıldı, belgede de yok).
 - **Bizim kuralımız (Recep: "sınır koymayız"):** bu sınırlara ilk takılışta ilgili ortam değişkeni artırılır; kota ya da varsayılan bahane edilip iş küçültülmez (§8: kapsamı kota daraltır, tamlık ölçütünü daraltmaz). Ayar değişikliği `.claude/settings.json` üzerinden yapılıyorsa OPS kapısıdır.
 

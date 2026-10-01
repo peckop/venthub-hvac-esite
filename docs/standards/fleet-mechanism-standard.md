@@ -2843,6 +2843,9 @@ bozuk JSON (tek satır, eski çıktı korunur) · boş dizi · `claude` yok (ENO
 izi aynı yönde: kabuk mirasıyla açılan terminal denemeleri `claude-vscode` taşıdı, temiz ortamla (`CLAUDE*` değişkenleri
 silinip `Start-Process`) `entrypoint=cli` döndü (ARAÇ ekip deneyi 2, 2026-09-30).
 
-⚠**ÖLÇÜLMEDİ:** bu üç ayarın birlikte sekmeyi **gerçekten kapattığı** henüz ölçülmedi; kural OPS emridir. ARAÇ ölçümü
-yapacak (tek `claude -p`, önce/sonra oturum kayıtları, kabuk mirasıyla kontrol kolu); sonuç gelince bu paragraf güncellenir.
-Ölçülene kadar kural "güvenli taraf" olarak uygulanır, "kanıtlandı" diye anılmaz.
+**Ölçüm (ARAÇ, 2026-10-01; temiz ortam, scratchpad cwd, `--no-session-persistence`):** her iki kolda da koşarken kullanıcı
+ayar dizinindeki `sessions/` altına **1 kayıt yazılır, bitince silinir** (`kind=interactive`). Fark yalnız `entrypoint` alanı:
+`sdk-cli` kolunda `sdk-cli`, kontrol kolunda `claude-vscode`. Yani "`claude -p` oturum kaydı hiç yazmaz" **yanlıştır**.
+⚠**ÖLÇÜLMEDİ:** editörün oturum listesinde/sekmesinde görünüp görünmediği (kayıt birkaç sn yaşar, ölçen tarafta editör yok);
+bu Recep gözüyle ölçülecek. Kural bu yüzden "OPS emri + kayıtta `entrypoint=sdk-cli` yazılır" olarak uygulanır,
+"sekmeyi kapatır" diye anılmaz.
