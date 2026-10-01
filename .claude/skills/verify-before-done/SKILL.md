@@ -28,7 +28,7 @@ metadata:
 1. **Kimlik** yalnız `tools/wrongstack-mcp/posta-kutusu.cjs` sarmalayıcısından gelir. `.mcp.json`'a `--actor` ya da `${...}` yer tutucusu yazılmaz (genişlemiyor, bütün pencereler aynı kimliğe düşüyor).
 2. **Posta alıcısı** daima TAM oturum kimliğidir (36 karakter). 8 haneli kısa kimliğe giden mesaj hata vermeden kaybolur.
 3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz.
-4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir.
+4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir. Tek ayrı yol (karar 224): canlı DIŞI işte OPS, Recep'in OPS'ta verdiği evetin sözünü ve saatini OPS panosundaki onay kartına yazar; onayı orada doğrularsın. Canlı iş (migration'lı PR, sır/anahtar/parola, geçmişi silen git, canlı veritabanı yazımı, para harcatan her şey) bunun dışındadır: onay yine yalnız Recep'ten gelir.
 5. `*_watch` çağrısı kanıt değildir; durum `mailbox_read` / `kanban_read` ile okunarak doğrulanır.
 6. Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır; karttaki bilgi Linear'ı geçersiz kılmaz.
 7. "Bitti" doğrulayıcı komutu `gh` ile sınırlıdır ve sır içermez.
