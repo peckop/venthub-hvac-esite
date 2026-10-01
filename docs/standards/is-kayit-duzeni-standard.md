@@ -172,7 +172,8 @@ Duraklatılmış bir şerit yeniden açılırken:
 
 **Recep talimat defteri (REC-425) ve ölçüm ekleri:** Recep'in talimatı OPS panosundaki REC-425 kartına not olarak yazılır
 (Linear'a yazılmaz). Bir ölçümün "kayda ek" olarak anıldığı yerde ek, ilgili Kanban kartına bağlantı/not olarak girer;
-dosyanın kendisi depoda ya da `docs/olcum/` altında durur.
+dosyanın kendisi depoda ya da `docs/olcum/` altında durur; public depoya girmemesi gereken veri (sorgu listesi, rakip adı,
+ham cevap) depo DIŞINDA kalır ve karta yalnız dosya yolu yazılır.
 
 **Taşınan kartların sütunu (2026-10-01):** Linear'da "sürüyor" görünen kayıtlar `linear-suruyor` etiketiyle To Do'ya
 kondu; departman gerçekten üzerinde çalıştığını In Progress'e kendisi alır (sütunun iş sınırı 5).
