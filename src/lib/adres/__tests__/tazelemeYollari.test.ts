@@ -45,13 +45,16 @@ describe('INV-TAZELEME-YOL-1 — tazeleme yolları iki şemada ve iki dilde', ()
     )
   })
 
-  it('bugünkü şemanın iki segmentli alt yolu bire bir `/<dil>/category/<üst>/<alt>` (dil öneki rota yardımcısından)', () => {
-    const yollar = kategoriYollari(
-      (d) => (d === 'tr' ? 'alt-tr' : 'alt-en'),
-      (d) => (d === 'tr' ? 'ust-tr' : 'ust-en'),
-    )
-    expect(yollar).toContain('/tr/category/ust-tr/alt-tr')
-    expect(yollar).toContain('/en/category/ust-en/alt-en')
+  it('INV-TAZELEME-YOL-2 — tazelemeYollari.ts dil önekini elle birleştirmez (kural 7: önek rota yardımcısından)', () => {
+    // KORUDUĞU KUSUR: `/${dil}/category/...` gibi elle önekli şablon; çıktı aynı kalsa da önek kuralı (localizedHref)
+    // atlanır. Test kaynağı tarar; çıktıyı DEĞİL, yazım biçimini sınar.
+    const ELLE_ONEK = /\/\$\{\s*dil\s*\}\//
+    const kaynak = fs.readFileSync(path.resolve(__dirname, '../tazelemeYollari.ts'), 'utf8')
+    expect(kaynak, 'elle `/${dil}/` öneki geri gelmiş: `localizedHref` kullan').not.toMatch(ELLE_ONEK)
+
+    // Sabotaj kanıtı: desen, eski satırı içeren bir dizgede GERÇEKTEN eşleşir (kapı boş geçmiyor).
+    const eskiSatir = 'if (ustSlug) yollar.add(`/${dil}/category/${ustSlug}/${own}`)'
+    expect(eskiSatir).toMatch(ELLE_ONEK)
   })
 
   it('boş slug yol üretmez; yollar tekil', () => {

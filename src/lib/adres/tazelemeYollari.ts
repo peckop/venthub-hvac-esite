@@ -45,13 +45,15 @@ export function kategoriYollari(
     const ustSlug = ust?.(dil)
     for (const yeni of SEMALAR) {
       yollar.add(String(adresUret({ tur: 'kategori', kok: own }, dil, yeni)))
-      // Dal adresi ÜST'ü kök alır: yeni şemada `/kategori/<üst>/<alt>`, bugünkü şemada `/category/<üst>/<alt>`.
+      // Dal adresi ÜST'ü kök alır: yeni şemada `/kategori/<üst>/<alt>`; bugünkü şemada `adresUret` `Routes.category`
+      // çağırır ve TEK segment (`/category/<alt>`) üretir — bugünkü iki segmentli yol aşağıdaki açık satırdan gelir.
       if (ustSlug) yollar.add(String(adresUret({ tur: 'kategori', kok: ustSlug, dal: own }, dil, yeni)))
     }
     // Bugünkü şemanın iki segmentli alt kategori yolu artık YALNIZ yönlendirme yapar (REC-205: kanonik tek
     // segment) ama önbellekli 308'i bayatlayabilir; eski webhook bunu tazeliyordu (W2) — davranış KORUNUR.
     // `Routes.category` REC-205'ten beri hep tek seviyeli (alt slug'ı verir), iki seviyeli yolu üretmez; bu yüzden
-    // yol gövdesi burada, dil öneki ise `localizedHref`'ten gelir (kural 7: elle `/${dil}/` birleştirme yok).
+    // yol gövdesi burada, dil öneki ise `localizedHref`'ten gelir (kural 7: dil öneki elle birleştirilmez;
+    // kapı: INV-TAZELEME-YOL-2, bu dosyanın testi).
     if (ustSlug) yollar.add(String(localizedHref(`/category/${ustSlug}/${own}`, dil)))
   }
   return [...yollar]
