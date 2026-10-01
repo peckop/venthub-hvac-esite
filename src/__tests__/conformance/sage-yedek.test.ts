@@ -370,3 +370,262 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
     expect(metin, 'DUSMUS kosum taze yedek yaninda GIZLENDI — en agir sinyal susturuldu').toContain('DOGRULANMAMIS')
   })
 })
+
+/**
+ * INV-KANBAN-YEDEK-1 (ARC-9, 2026-10-01) — karar 219 ile Kanban iş kartlarının TEK kaynağı oldu.
+ *
+ * ⭐NİÇİN AYRI BLOK: yukarıdaki pano kolu yalnız "dosya yedekleniyor mu"yu ölçer. Bu blok dört ayrı
+ * arızayı ölçer: (1) satır sayısı tutar ama KART sayısı tutmaz, (2) saatlik yedekte düz "son N"
+ * kuralı dünkü panoyu siler, (3) geri yükleme çalışan servisin altından dosya değiştirir ya da
+ * eski hâli siler, (4) tazelik eşiği depo başına değildir. Ölçüm 10-01: sabah yedeği 10 pano /
+ * 387 kart, öğlen canlı 12 pano / 414 kart; 24 saat kuralı aradaki 27 kartı yedeksiz bırakıyordu.
+ */
+type KanbanSayim = {
+  pano: number
+  kart: number
+  olay: number | null
+  bozukPayload: number
+  butunluk: string
+}
+type KanbanDepo = {
+  ad: string
+  onek: string
+  tazeSaat: number
+  uyariSaat: number
+  saklama: { son: number; gunluk: number } | null
+}
+type GeriSonuc = {
+  durum: string
+  sebep?: string
+  yedek?: string
+  hedef?: string
+  tasinacak?: string[]
+  oncesi?: string[]
+  icerik?: KanbanSayim | null
+}
+const kanbanModul = require_(MODUL_YOLU) as {
+  DEPOLAR: KanbanDepo[]
+  kanbanSayim: (yol: string) => KanbanSayim | null
+  kademeliSilinecek: (dosyalar: string[], depo: KanbanDepo) => string[]
+  surecCanli: (pid: number) => boolean
+  geriYukle: (depo: string, dosya?: string | null, s?: { evet?: boolean; simdi?: Date }) => GeriSonuc
+  yedekAl: (
+    simdi?: Date,
+    depo?: string,
+  ) => {
+    durum: string
+    yol?: string
+    sebep?: string
+    kanban?: KanbanSayim | null
+  }
+  sonDurum: (d?: string, simdi?: number) => { geciken: { depo: string; saat: number }[] }
+}
+
+/** Gerçek biçimde (kanban_boards.payload JSON) WAL kipli bir pano veritabanı kurar; bağlantı AÇIK döner. */
+function kanbanKur(panolar: (number | 'BOZUK')[]): {
+  kok: string
+  yol: string
+  db: SqliteDb
+} {
+  const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-arc9-'))
+  fs.mkdirSync(path.join(kok, '.wrongstack', 'kanbans'), { recursive: true })
+  const yol = path.join(kok, '.wrongstack', 'kanbans', '_kanban.sqlite')
+  const { DatabaseSync } = sqlite()
+  const db = new DatabaseSync(yol)
+  db.exec('pragma journal_mode = WAL')
+  db.exec(
+    'create table kanban_boards (id TEXT PRIMARY KEY, payload TEXT NOT NULL, revision INTEGER NOT NULL, updated_at TEXT NOT NULL)',
+  )
+  db.exec(
+    'create table kanban_events (seq INTEGER PRIMARY KEY AUTOINCREMENT, board_id TEXT NOT NULL, payload TEXT NOT NULL)',
+  )
+  panolar.forEach((n, i) => {
+    const payload =
+      n === 'BOZUK'
+        ? '{"tasks": [ yarim'
+        : JSON.stringify({
+            id: `b${i}`,
+            title: `Pano ${i}`,
+            tasks: Array.from({ length: n }, (_, k) => ({ id: `t${i}-${k}` })),
+          })
+    db.prepare('insert into kanban_boards (id,payload,revision,updated_at) values (?,?,1,?)').run(
+      `b${i}`,
+      payload,
+      '2026-10-01',
+    )
+    db.prepare('insert into kanban_events (board_id,payload) values (?,?)').run(`b${i}`, '{}')
+  })
+  return { kok, yol, db }
+}
+
+describe('INV-KANBAN-YEDEK-1 · Kanban yedegi kart sayisiyla dogrulanir, kademeli saklanir, geri yuklenir', () => {
+  it('⭐KART SAYIMI: yedek pano ve kart sayisini payload ICINDEN olcer ve kaynakla esitler', () => {
+    const { kok, yol, db } = kanbanKur([3, 4, 0])
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-hedef-'))
+    expect(fs.existsSync(yol + '-wal'), 'WAL yok — tuzak uretilemedi, kol KOR').toBe(true)
+
+    const s = kanbanModul.yedekAl(new Date(), 'kanban')
+    expect(s.durum, `yedek alinamadi: ${s.sebep}`).toBe('alindi')
+    expect(s.kanban, 'kart sayimi sonuca yazilmadi').toMatchObject({
+      pano: 3,
+      kart: 7,
+      bozukPayload: 0,
+      butunluk: 'ok',
+    })
+    expect(kanbanModul.kanbanSayim(String(s.yol))?.kart, 'yedek dosyasinda kart eksik').toBe(7)
+    db.close()
+  })
+
+  it('⛔SABOTAJ: payload bozuksa satir sayisi tutsa da yedek DOGRULANMAZ', () => {
+    const { kok, db } = kanbanKur([2, 'BOZUK'])
+    const hedef = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-bozuk-'))
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = hedef
+
+    const s = kanbanModul.yedekAl(new Date(), 'kanban')
+    expect(s.durum, 'bozuk payload "alindi" sayildi — satir sayisi korlugu').toBe('dogrulanmadi')
+    expect(s.sebep).toMatch(/payload/)
+    expect(
+      fs.readdirSync(hedef).some((f) => f.endsWith('.DOGRULANMADI')),
+      'kanit dosyasi birakilmadi',
+    ).toBe(true)
+    db.close()
+  })
+
+  it('kanban_boards tablosu olmayan veritabaninda kart sayimi null doner (uydurma sayi yok)', () => {
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-bicimsiz-'))
+    const yol = path.join(kok, 'x.sqlite')
+    const { DatabaseSync } = sqlite()
+    const db = new DatabaseSync(yol)
+    db.exec('create table baska (id TEXT)')
+    db.close()
+    expect(kanbanModul.kanbanSayim(yol)).toBeNull()
+  })
+
+  it('⭐KADEMELI SAKLAMA: son 24 kopya + gun basina en yeni kopya (30 gun); dunku pano SILINMEZ', () => {
+    const depo = kanbanModul.DEPOLAR.find((d) => d.ad === 'kanban')
+    if (!depo) throw new Error('kanban deposu DEPOLAR listesinde yok')
+    expect(depo.saklama, 'kanban icin kademeli saklama tanimli degil').toEqual({
+      son: 24,
+      gunluk: 30,
+    })
+    expect(depo.tazeSaat, 'kanban tazelik esigi 1 saat degil').toBe(1)
+    expect(kanbanModul.DEPOLAR.find((d) => d.ad === 'sage')?.tazeSaat, 'sage esigi degisti').toBe(24)
+
+    // 40 gün × günde 3 kopya (06, 12, 18) + 41. günde saat başı 24 kopya.
+    const gunAdi = (g: number): string => new Date(Date.UTC(2026, 7, g)).toISOString().slice(0, 10)
+    const adlar: string[] = []
+    for (let g = 1; g <= 40; g++) {
+      for (const s of ['0600', '1200', '1800']) adlar.push(`kanban-${gunAdi(g)}T${s}Z.sqlite`)
+    }
+    for (let h = 0; h < 24; h++) adlar.push(`kanban-${gunAdi(41)}T${String(h).padStart(2, '0')}00Z.sqlite`)
+    adlar.sort()
+
+    const silinecek = new Set(kanbanModul.kademeliSilinecek(adlar, depo))
+    const kalan = adlar.filter((a) => !silinecek.has(a))
+    // Son 24 kopyanın hepsi durur.
+    for (const a of adlar.slice(-24)) expect(kalan, `son 24 icindeki ${a} silindi`).toContain(a)
+    // Son 30 günün (12..41) her birinden EN YENİ kopya durur; aynı günün eski kopyası gider.
+    for (let g = 12; g <= 40; g++) {
+      expect(kalan, `${gunAdi(g)} gununun son kopyasi silindi`).toContain(`kanban-${gunAdi(g)}T1800Z.sqlite`)
+      expect(kalan, `${gunAdi(g)} gununun eski kopyasi tutuldu`).not.toContain(`kanban-${gunAdi(g)}T0600Z.sqlite`)
+    }
+    // 30 günden eski günler tamamen gider.
+    expect(
+      kalan.some((a) => a.includes(`${gunAdi(11)}T`)),
+      '30 gunden eski kopya tutuldu',
+    ).toBe(false)
+    expect(kalan.length, 'kalan kopya sayisi beklenenden farkli').toBe(24 + 29)
+    // Adı çözülemeyen dosyaya DOKUNULMAZ.
+    expect(kanbanModul.kademeliSilinecek(['kanban-elle-aldim.sqlite', ...adlar], depo)).not.toContain(
+      'kanban-elle-aldim.sqlite',
+    )
+  })
+
+  it('⭐GERI YUKLEME: --evet olmadan yalniz PLAN; servis canliyken RET; uygulaninca eski hal .oncesi ile KALIR', () => {
+    const { kok, yol, db } = kanbanKur([5, 2])
+    const hedef = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-geri-'))
+    process.env.CLAUDE_PROJECT_DIR = kok
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = hedef
+    expect(kanbanModul.yedekAl(new Date(), 'kanban').durum).toBe('alindi')
+
+    // Yedekten SONRA canlıya 3 kart daha eklenir: geri yükleme 7 karta DÖNMELİ.
+    db.prepare('insert into kanban_boards (id,payload,revision,updated_at) values (?,?,1,?)').run(
+      'b9',
+      JSON.stringify({
+        id: 'b9',
+        tasks: [{ id: 'x1' }, { id: 'x2' }, { id: 'x3' }],
+      }),
+      '2026-10-01',
+    )
+    db.close()
+    expect(kanbanModul.kanbanSayim(yol)?.kart).toBe(10)
+
+    // 1) PLAN: hiçbir şey değişmez.
+    const plan = kanbanModul.geriYukle('kanban')
+    expect(plan.durum, `plan uretilemedi: ${plan.sebep}`).toBe('kuru')
+    expect(plan.icerik?.kart, 'plan yedegin kart sayisini yazmiyor').toBe(7)
+    expect(kanbanModul.kanbanSayim(yol)?.kart, 'plan asamasinda canli dosya DEGISTI').toBe(10)
+
+    // 2) SERVİS CANLI: bu test sürecinin pid'i "çalışan servis" olarak yazılır → RET.
+    const servis = path.join(kok, '.wrongstack', 'kanban-server.json')
+    fs.writeFileSync(servis, JSON.stringify({ pid: process.pid }), 'utf8')
+    const ret = kanbanModul.geriYukle('kanban', null, { evet: true })
+    expect(ret.durum, 'calisan servisin altindan dosya degistirildi').toBe('servis-canli')
+    expect(kanbanModul.kanbanSayim(yol)?.kart, 'ret edilen geri yukleme canliyi DEGISTIRDI').toBe(10)
+
+    // 3) SERVİS KAPALI: geri yüklenir, eski dosya silinmez.
+    fs.unlinkSync(servis)
+    const r = kanbanModul.geriYukle('kanban', null, { evet: true })
+    expect(r.durum, `geri yukleme basarisiz: ${r.sebep}`).toBe('geri-yuklendi')
+    expect(kanbanModul.kanbanSayim(yol), 'geri yuklenen pano yedekle ayni degil').toMatchObject({
+      pano: 2,
+      kart: 7,
+      butunluk: 'ok',
+    })
+    expect(r.oncesi?.length, 'eski hal yana alinmadi').toBeGreaterThan(0)
+    for (const f of r.oncesi ?? []) expect(fs.existsSync(f), `eski hal SILINMIS: ${f}`).toBe(true)
+    const eski = (r.oncesi ?? []).find((f) => /_kanban\.sqlite\.oncesi-[^-]+$/.test(f))
+    expect(eski, 'ana dosyanin eski hali listede yok').toBeDefined()
+    expect(kanbanModul.kanbanSayim(String(eski))?.kart, 'yana alinan eski dosya 10 karti tasimiyor').toBe(10)
+  })
+
+  it('GERI YUKLEME hata yollari: bilinmeyen depo, servis denetimi olmayan depo, olmayan yedek, bos yedek dizini', () => {
+    process.env.CLAUDE_PROJECT_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-geri-hata-'))
+    process.env.VENTHUB_SAGE_YEDEK_DIZINI = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-geri-bos-'))
+    expect(kanbanModul.geriYukle('yok').durum).toBe('hata')
+    expect(kanbanModul.geriYukle('sage').sebep, 'servis denetimi olmayan depo geri yuklenebiliyor').toMatch(
+      /tanimli degil/,
+    )
+    expect(kanbanModul.geriYukle('kanban').sebep).toMatch(/yedegi yok/)
+    expect(kanbanModul.geriYukle('kanban', 'kanban-2000-01-01T0000Z.sqlite').sebep).toMatch(/bulunamadi/)
+    expect(kanbanModul.surecCanli(process.pid)).toBe(true)
+    expect(kanbanModul.surecCanli(-1)).toBe(false)
+  })
+
+  it('⭐TAZELIK ESIGI DEPO BASINA: 25 saatlik kanban yedegi GECIKMIS, 25 saatlik sage yedegi DEGIL', () => {
+    const kok = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-esik-kok-'))
+    fs.mkdirSync(path.join(kok, '.wrongstack', 'kanbans'), { recursive: true })
+    fs.mkdirSync(path.join(kok, '.wrongstack', 'memories'), {
+      recursive: true,
+    })
+    fs.writeFileSync(path.join(kok, '.wrongstack', 'kanbans', '_kanban.sqlite'), 'x')
+    fs.writeFileSync(path.join(kok, '.wrongstack', 'memories', 'sage.db'), 'x')
+    process.env.CLAUDE_PROJECT_DIR = kok
+
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-kanban-esik-'))
+    const simdi = Date.now()
+    const eski = new Date(simdi - 25 * 3_600_000 - 60_000)
+    for (const ad of ['kanban-2026-09-30T0000Z.sqlite', 'sage-2026-09-30T0000Z.db']) {
+      fs.writeFileSync(path.join(dizin, ad), 'x')
+      fs.utimesSync(path.join(dizin, ad), eski, eski)
+    }
+    const d = kanbanModul.sonDurum(dizin, simdi)
+    expect(
+      d.geciken.map((g) => g.depo),
+      'esik depo basina degil',
+    ).toEqual(['kanban'])
+    expect(d.geciken[0]?.saat).toBe(25)
+  })
+})
