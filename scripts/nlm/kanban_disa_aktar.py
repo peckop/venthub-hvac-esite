@@ -3,7 +3,8 @@
 KANBAN DIŞA AKTARIM — WrongStack Kanban panolarını santiye.py'nin okuduğu "kayitlar" şemasına çevirir
 (karar 219: iş takibinin tek kaynağı Kanban; Linear donuk. Eski kaynak: linear_disa_aktar.py).
 
-Kaynak: ana deponun `.wrongstack/kanbans/_kanban.sqlite` dosyası, SALT OKUNUR (`mode=ro`; WAL açık olsa da yazmaz).
+Kaynak: ana deponun `.wrongstack/kanbans/_kanban.sqlite` dosyası, `mode=ro` ile açılır: VERİ dosyasını (db ve -wal içeriği)
+değiştirmez (bağımsız okuyucu ölçümü); WAL kipinde okuyucu olarak -shm dizinini günceller, -shm yoksa oluşturabilir.
 MCP yolu kullanılmaz (her çağrı panonun tamamını döndürür). Dosya git DIŞIDIR (depo PUBLIC): bu betik yalnız
 çıktıyı (kart başlığı, sütun, tarih) JSON'a yazar, yol ve içerik başka yere sızmaz.
 
@@ -25,7 +26,7 @@ import argparse, datetime, json, os, re, sqlite3, subprocess, sys
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SUTUN = {"backlog": "Backlog", "todo": "Todo", "in-progress": "In Progress", "review": "In Review", "done": "Done"}
 ONCELIK = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-NUMARA = re.compile(r"^\s*([A-Z]{2,4}-\d+)\b")
+NUMARA = re.compile(r"\b([A-Z]{2,5}-\d+)\b")   # başlığın ilk 60 karakterinde ("URUN REC-411: …", "ADMIN VULN-006 (…)" de numaralı sayılır)
 ASCII = str.maketrans("ÇĞİÖŞÜçğıöşü", "CGIOSUcgiosu")
 
 
@@ -79,7 +80,7 @@ def kayitlar(yol):
             continue
         for k in pano.get("tasks") or []:
             baslik = k.get("title") or ""
-            m = NUMARA.match(baslik)
+            m = NUMARA.search(baslik[:60])
             etiketler = list(k.get("labels") or [])
             cikti.append({
                 "identifier": m.group(1) if m else (k.get("id") or "?")[:8],

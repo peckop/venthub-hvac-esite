@@ -53,6 +53,12 @@ def recep_kapisi(k):
     return "Recep kapısı" in (k.get("labels") or [])
 
 
+def adsiz(k):
+    """Başlık numarayla başlıyorsa (Kanban kartları) numarayı atar: çıktıda 'REC-182 · REC-182 · …' çiftlenmesin."""
+    t, i = k.get("title") or "", k.get("identifier") or ""
+    return t[len(i):].lstrip(" ·—-:") if i and t.startswith(i) else t
+
+
 def kisa(t, n=78):
     t = (t or "").replace("|", "/").strip()
     return t if len(t) <= n else t[: n - 1] + "…"
@@ -151,7 +157,7 @@ def main():
     L.append(f"## §1 Recep'ten bekleyen ({len(recep)})")
     L.append("")
     for k in sorted(recep, key=lambda x: x["identifier"]):
-        L.append(f"- {k['identifier']} · {kisa(k['title'], 110)} · {serit_of(k)} · {k['status']}")
+        L.append(f"- {k['identifier']} · {kisa(adsiz(k), 110)} · {serit_of(k)} · {k['status']}")
     L.append("")
     for s in sirali:
         b = by[s]
@@ -167,18 +173,18 @@ def main():
             for k in sorted(items, key=lambda x: (-(x.get('priority') or 0), x['identifier'])):
                 blk = f" · bloklu: {', '.join(x if isinstance(x, str) else x.get('identifier', '?') for x in k.get('blockedBy') or [])}" if k.get("blockedBy") else ""
                 rk = " · [Recep kapısı]" if recep_kapisi(k) else ""
-                L.append(f"- {k['identifier']} · {kisa(k['title'])}{rk}{blk}")
+                L.append(f"- {k['identifier']} · {kisa(adsiz(k))}{rk}{blk}")
             L.append("")
         if s == "SAHIPSIZ" and b["Backlog"]:
             L.append(f"**BACKLOG ({len(b['Backlog'])}) — etiket borcu (proje yalnız not)**")
             for k in sorted(b["Backlog"], key=lambda x: x["identifier"]):
-                L.append(f"- {k['identifier']} · {kisa(k['title'])} · proje: {k.get('project') or '-'}")
+                L.append(f"- {k['identifier']} · {kisa(adsiz(k))} · proje: {k.get('project') or '-'}")
             L.append("")
     curu = [k for s in by for k in by[s]["CURUDU"]]
     L.append(f"## §8 Bakılmadı ({len(curu)}) — Backlog'da ≥{CURUME_GUN} gündür kimse bakmamış; iş varsa iştir, iptal yok, sahibi bir bakar")
     L.append("")
     for k in sorted(curu, key=lambda x: (serit_of(x), x["identifier"])):
-        L.append(f"- {k['identifier']} · {kisa(k['title'], 100)} · {serit_of(k)} · son anlamlı dokunuş {(k.get('sonAnlamli') or '?')[:10]}")
+        L.append(f"- {k['identifier']} · {kisa(adsiz(k), 100)} · {serit_of(k)} · son anlamlı dokunuş {(k.get('sonAnlamli') or '?')[:10]}")
     L.append("")
     L.append("## §9 Hüküm")
     L.append("")

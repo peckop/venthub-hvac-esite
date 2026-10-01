@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -33,6 +34,7 @@ function pythonBul(): string | null {
 const PY = pythonBul()
 
 interface Kart {
+  id?: string
   title: string
   columnId: string
   status: string
@@ -61,10 +63,12 @@ const PANOLAR: Pano[] = [
       kart('ARC-9 · dokuzuncu iş', 'in-progress'),
       kart('ARC-10 · onuncu iş', 'in-progress'),
       kart('REC-538 · taşınan iş', 'todo', { notes: [{ createdAt: '2026-09-20T00:00:00.000Z' }] }),
-      kart('numarasız başlık', 'backlog'),
+      kart('numarasız başlık', 'backlog', { id: 'abcdef0123456789' }),
       kart('ARC-3 · biten iş', 'done', { completedAt: '2026-09-30T00:00:00.000Z' }),
     ],
   },
+  // başlığın ortasında numara (gerçek panoda 13 kart böyle) ve 4 harfli önek; küçük harfli pano adı şerit adını büyütür
+  { title: 'VentHub seo', tasks: [kart('URUN REC-411: ortada numara', 'todo'), kart('ADMIN VULN-006 (REC-355) dört harf', 'todo')] },
   { title: 'VentHub HARİTA', tasks: [kart('HRT-6 · teslim', 'review')] },
   { title: 'VentHub URUN', tasks: ['URN-1', 'URN-2', 'URN-3', 'URN-4'].map((n) => kart(`${n} · iş`, 'in-progress')) },
   { title: 'VentHub OPS', tasks: ['OPS-1', 'OPS-2', 'OPS-3'].map((n) => kart(`${n} · iş`, 'in-progress')) },
@@ -87,12 +91,17 @@ beforeAll(() => {
   db = path.join(dizin, 'pano.sqlite')
   bosDb = path.join(dizin, 'yok.sqlite')
   const betik = [
-    'import json, sqlite3, sys',
+    // WAL kipi + temiz kapanış YOK (os._exit): -wal içinde işlenmemiş çerçeveler kalır, böylece yazma kipinde açan bir
+    // okuyucu kapanışta checkpoint yapıp ana dosyayı DEĞİŞTİRİR; `mode=ro` mutasyonu bu testte kırmızı verir.
+    'import json, os, sqlite3, sys',
     'c = sqlite3.connect(sys.argv[1])',
+    'c.execute("pragma journal_mode=wal")',
+    'c.execute("pragma wal_autocheckpoint=0")',
     'c.execute("create table kanban_boards (id text, payload text, revision integer, updated_at text)")',
     'for i, p in enumerate(json.load(open(sys.argv[2], encoding="utf-8"))):',
     '    c.execute("insert into kanban_boards values (?,?,?,?)", (str(i), json.dumps(p, ensure_ascii=False), 1, ""))',
     'c.commit()',
+    'os._exit(0)',
   ].join('\n')
   const girdi = path.join(dizin, 'panolar.json')
   fs.writeFileSync(girdi, JSON.stringify(PANOLAR), 'utf-8')
@@ -113,7 +122,7 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
     expect(r.cikis, r.stderr).toBe(0)
     const d = JSON.parse(fs.readFileSync(hedef, 'utf-8')) as { kaynak: string; kayitlar: Record<string, unknown>[] }
     expect(d.kaynak).toBe('Kanban')
-    expect(d.kayitlar).toHaveLength(19) // 9 ARAC + 1 HARITA + 4 URUN + 3 OPS + 2 HAVUZ; DENEME'nin 1 kartı yok
+    expect(d.kayitlar).toHaveLength(21) // 9 ARAC + 1 HARITA + 4 URUN + 3 OPS + 2 SEO + 2 HAVUZ; DENEME'nin 1 kartı yok
     const ara = (id: string) => d.kayitlar.find((k) => k.identifier === id)
     expect(ara('ARC-1')).toMatchObject({ status: 'In Progress', serit: 'ARAC' })
     expect(ara('REC-538')).toMatchObject({ status: 'Todo', serit: 'ARAC', sonAnlamli: '2026-09-20T00:00:00.000Z' })
@@ -121,11 +130,20 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
     expect(ara('HRT-6')).toMatchObject({ status: 'In Review', serit: 'HARITA' })
     expect(ara('REC-1')).toMatchObject({ serit: 'HAVUZ', status: 'Backlog' })
     expect(d.kayitlar.some((k) => String(k.title).includes('YTN-4'))).toBe(false)
-    // numarasız başlık kısa kart kimliğine düşer (bozuk kopyada başlığın tamamı ya da boş olurdu)
-    const numarasiz = d.kayitlar.find((k) => k.title === 'numarasız başlık')
-    expect(String(numarasiz?.identifier)).not.toMatch(/^[A-Z]{2,4}-\d+$/)
+    // numarasız başlık kartın kısa kimliğine (ilk 8 karakter) düşer; başlığın ortasındaki numara da bulunur
+    expect(d.kayitlar.find((k) => k.title === 'numarasız başlık')?.identifier).toBe('abcdef01')
+    expect(ara('REC-411')).toMatchObject({ serit: 'SEO', status: 'Todo' })
+    expect(ara('VULN-006')).toMatchObject({ serit: 'SEO', status: 'Todo' })
     // updatedAt kullanılmaz: ARC-1'in sonAnlamli'si açılış tarihi (09-01), güncelleme tarihi (10-01) değil
     expect(ara('ARC-1')?.sonAnlamli).toBe('2026-09-01T00:00:00.000Z')
+  })
+
+  it('pano dosyasının VERİ içeriğini değiştirmez (mode=ro): koşu öncesi/sonrası ana dosya özeti aynı', () => {
+    const ozet = () => crypto.createHash('sha256').update(fs.readFileSync(db)).digest('hex')
+    const once = ozet()
+    expect(py(DISA, ['--db', db, '--hedef', path.join(dizin, 'ro.json')]).cikis).toBe(0)
+    expect(py(SANTIYE, ['--db', db, '--hedef', path.join(dizin, 'ro.md')]).cikis).toBe(1)
+    expect(ozet()).toBe(once)
   })
 
   it('tablo şerit başına sayar: yapılıyor ≤3 YEŞİL, 4-5 SARI, >5 KIRMIZI (çıkış 1), sırada sınırsız, havuz limit dışı', () => {
