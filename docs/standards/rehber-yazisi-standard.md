@@ -94,7 +94,7 @@ Onarım iki adımdır, ikisi de seçenek değildir:
 gösterim verdi. Bu "talep yok" demek değil; aynı konular için Google arama önerisi 16 tohumda toplam
 93 bilgi niyetli öneri döndürdü (ör. "hava perdesi" tek başına 16). Search Console, yazı yayımlanana
 kadar bilgi talebini ölçemez; konu seçimi en az bir **dış** kaynağa dayanır. Sorgu dökümü ve tohum
-listesi REC-369 BLOG F1 yorumunda (PUBLIC depoya girmez).
+listesi eski Linear REC-369 BLOG F1 yorumunda; güncel yer Kanban kartı/depo dışı dosya (PUBLIC depoya girmez).
 
 ### R1.2 Ölçütler (konu başına tablo, Recep'e özetle gider)
 
@@ -346,7 +346,7 @@ v0.4'ten beri "URUN'un sayfa işi" diye yazılıydı ama emre bağlanmamıştı 
 6. **Mevzuat hükmü** ("zorunludur", "yasaktır") yalnız resmî metne atıfla ve yürürlük tarihiyle yazılır.
 7. **Kişi ve proje adı yok** (müşteri, şantiye, teklif).
 8. **Yayından önce metin herkese açık başka bir adreste durmaz.** Depo PUBLIC; taslak, iddia tablosu ve
-   doğrulama kaydı yayından önce depoya girmez (veritabanının iç tablosu ya da Linear kaydı).
+   doğrulama kaydı yayından önce depoya girmez (veritabanının iç tablosu ya da Kanban kartı/depo dışı dosya).
 9. **Google Indexing API kullanılmaz.** Google: *"The Indexing API can only be used to crawl pages with
    either JobPosting or BroadcastEvent embedded in a VideoObject."*
    (developers.google.com/search/apis/indexing-api/v3/quickstart, ham HTML, "Last updated 2026-07-16",
@@ -430,7 +430,7 @@ sha256'sının ilk 12 hanesini gösterir; Recep'in onayladığı metin doğrulan
 ### R5.7 Ara düzen — tablo ve rota gelene kadar (F4)
 
 Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü). İlk yazı beklemez; yayın bekler:
-- Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Linear REC-369 ekinde** tutulur
+- Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Kanban kartında (not + depo dışı dosya yolu; eski kayıt Linear REC-369)** tutulur
   (özel; PUBLIC depo değil — R4.8).
 - ⛔**Rota ve sayfa gelmeden Recep'e yayın onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
   bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi). Yayına giremeyecek
@@ -444,7 +444,7 @@ Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü)
   ürün kartı) temsilîdir ve sayfada bu yazılır.
 - Onaylanan sha256, tablo geldiğinde yazının ilk revizyonu olarak yazılır; farklıysa akış baştan.
 - Bağımlı işler (sırasıyla, URUN): karar 92 rotası + rehber tablosu migration'ı (kural 13) → önizleme
-  rotası. Hepsi REC-369 altında izlenir (Linear aktif kayıt sınırı dolu, yeni kayıt açılmıyor).
+  rotası. Hepsi REC-369 (Linear, donuk arşiv) altında izlenmişti; yeni izleme BLOG'un Kanban kartında (karar 219; kart numarası BLOG kartı açınca buraya yazılır).
 
 ## R6 — Yer ve teknik gereklilikler (uygulayan URUN)
 
@@ -481,7 +481,7 @@ girer. Bugünkü 10 adres (R0.1) kalıcı yönlendirmeyle taşınır; hedefsiz a
 - **Taban:** F1 küme rakamları (Ölçüm geçmişi, A sınıfı). Kıyas aynı sorgu ve aynı gün sayısıyla yapılır.
 - Sayısal hedef yazılmadı: 25 günlük, 448 gösterimlik tabanla hedef koymak tahmin olurdu. İlk dört
   yazının ölçümü tabanı oluşturur.
-- Sorgu listeleri PUBLIC depoya girmez; depoya yalnız özet sayılar, sorgular Linear kaydına.
+- Sorgu listeleri PUBLIC depoya girmez; depoya yalnız özet sayılar, sorgular Kanban kartına (depo dışı dosya yolu).
 
 ## R8 — Kapılar
 
@@ -493,7 +493,7 @@ Kapılar "ilk yazıdan önce bir gün" kurulmaz: her kapı, koruduğu şeyi geti
 (`scripts/rehber/__tests__/`, vitest `ci` işinde; betiklerin **kendi** doğruluğunu sınar).
 ⚠**Betik testleri yazıyı denetlemez.** Yazının kendisi ancak yayın geçişi betik çıktısına bağlanınca
 (R5.5, tablo kısıtı) kapı altına girer; o güne kadar ara düzende (R5.7) betikler elle koşar ve çıktıları
-Linear ekine girer.
+Kanban kartına not + depo dışı dosya yolu olarak girer.
 ⚠**Kapının koştuğu ortam:** DB kapıları (ziyaretçi rolü, durum ↔ sha256) prod'a değil **Supabase dalına**
 karşı koşar — tablo ancak merge'ten sonra prod'da olur. SSR kapısı yayında yazı yokken **fikstür yazıyla**
 koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil verir.
@@ -506,7 +506,7 @@ koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil veri
 | İç bağlantı — canlı (R3) | yayındaki her rehber yazısının gövdesindeki site içi bağlantı **doğrudan 200**; 3xx ve 404 KIRMIZI (yönlendirme izlenmez); yayında yazı yoksa `EVREN-BOS` (çıkış 3), temiz değil. **Betik var** (`scripts/rehber/ic-baglanti-denetle.mjs`, ağlı); ölçüldü 2026-09-24: site haritasında yazı 0 → EVREN-BOS; önizlemenin 5 bağlantısı 200; sabotaj: kök adres 308 → KIRMIZI. **Zamanlı koşu ve adres yayınından (REC-300) sonra koşturma ALTYAPI'da** | BLOG kalıp kapısı PR'ı (betik) · ALTYAPI (bağlama) | BLOG + ALTYAPI |
 | Alıntı betiği (R5.1 3c) | alıntı ham kaynakta; son adres/durum/sha256 kaydı | BLOG doğrulama betikleri PR'ı | BLOG |
 | Not deseni (R4.4) | K2 sınıfı not 0 (R8.2) | BLOG doğrulama betikleri PR'ı ya da tablo kısıtı (migration PR'ı) | BLOG + URUN |
-| Vaat / rakip / fiyat deseni (R4.2, R4.3, R3) | "en iyi", "%100", "garanti"; rakip ad listesi (Linear'dan, depoya girmez); `₺ TL € EUR USD` + rakam = 0 | BLOG doğrulama betikleri PR'ı | BLOG |
+| Vaat / rakip / fiyat deseni (R4.2, R4.3, R3) | "en iyi", "%100", "garanti"; rakip ad listesi (Kanban kartı/depo dışı dosyadan, depoya girmez); `₺ TL € EUR USD` + rakam = 0 | BLOG doğrulama betikleri PR'ı | BLOG |
 | Olumsuz iddia (R4.5) | olumsuz fiilli her cümle iddia tablosunda `tur = olumsuz` + açık alıntı | BLOG doğrulama betikleri PR'ı | BLOG |
 | Mevzuat (R4.6) | "zorunlu/yasaktır/yönetmelik" cümlesi → resmî kaynak + yürürlük tarihi | BLOG doğrulama betikleri PR'ı | BLOG |
 | Toplu üretim (R4.1) | 7 günde yayına geçen **yeni** yazı sayısı > eşik → KIRMIZI (revizyon sayılmaz; eşik Recep'in ritim tercihidir, öneri 2); her yayında doğrulama + onay kaydı | migration PR'ı (onay kaydı) | URUN + BLOG |
