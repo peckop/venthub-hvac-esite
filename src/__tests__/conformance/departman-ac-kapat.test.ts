@@ -266,7 +266,7 @@ describe('INV-DEPARTMAN-AC-2 · rolün SON sid i panodan: en yeni claim; 24 saat
     const k = ac('Araç', d)
     expect(k.kod).toBe(0)
     expect(k.plan.sid).toBe(S_ARAC)
-    expect(k.plan.args).toEqual(['--resume', S_ARAC, '--name', 'Araç', '--permission-mode', 'auto', '--strict-mcp-config', '--mcp-config', path.join(d.kok, '.mcp.json')])
+    expect(k.plan.args).toEqual(['--resume', S_ARAC, '--name', 'Araç', '--permission-mode', 'auto', '--mcp-config', path.join(d.kok, '.mcp.json')])
   })
 
   it('24 saatten ESKİ olay dosyası (pano bunu okumaz) da bulunur', () => {
@@ -294,7 +294,7 @@ describe('INV-DEPARTMAN-AC-2 · rolün SON sid i panodan: en yeni claim; 24 saat
     const k = ac('Harita', d)
     expect(k.plan.sid).toBeNull()
     expect(k.plan.args).not.toContain('--resume')
-    expect(k.plan.args).toEqual(['--name', 'Harita', '--permission-mode', 'auto', '--strict-mcp-config', '--mcp-config', path.join(d.kok, '.mcp.json')])
+    expect(k.plan.args).toEqual(['--name', 'Harita', '--permission-mode', 'auto', '--mcp-config', path.join(d.kok, '.mcp.json')])
     expect((k.plan.uyarilar ?? []).join('\n')).toContain('gecmis oturum yok')
   })
 
@@ -483,7 +483,7 @@ describe('INV-DEPARTMAN-AC-4 · pencere TAVANI: en çok 5 açık departman pence
     expect(o.kod).toBe(0)
     expect(o.plan.karar).toBe('ac')
     expect(o.plan.ad).toBe('Ops')
-    expect(o.plan.args).toEqual(['--resume', S_OPS, '--name', 'Ops', '--permission-mode', 'auto', '--strict-mcp-config', '--mcp-config', path.join(d.kok, '.mcp.json')])
+    expect(o.plan.args).toEqual(['--resume', S_OPS, '--name', 'Ops', '--permission-mode', 'auto', '--mcp-config', path.join(d.kok, '.mcp.json')])
     const a = ac('Araç', d)
     expect(a.kod).toBe(1)
     expect(a.plan.karar).toBe('tavan')
@@ -716,7 +716,8 @@ describe('INV-DEPARTMAN-AC-7 · kabuk sarmalayıcıları: .cmd ince, .ps1 doğru
     expect(r.status).toBe(0)
     expect(r.stdout).toContain('KURU: ')
     expect(r.stdout).toContain(`--resume ${S_ARAC} --name Araç`)
-    expect(r.stdout).toContain('--strict-mcp-config')
+    expect(r.stdout).toContain('--mcp-config')
+    expect(r.stdout).not.toContain('--strict-mcp-config')
     expect(fs.existsSync(d.marker)).toBe(false)
   }, 60_000)
 
