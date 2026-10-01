@@ -167,13 +167,13 @@ const YONETIM_ISTISNA = {
 const CALISMA = [
   '## Çalışma düzeni',
   '- Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree\'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).',
-  '- Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear\'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.',
-  '- PR = `Fixes REC-nn` (alt kaydının); birden fazla PR\'lık iş her biri tek PR\'la biten alt kayıtlara bölünür; kayıtsız iş yalnız PR gövdesinde `Kayıtsız: <sebep>` satırıyla (karar 187).',
+  '- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear donuktur (karar 219): yeni iş kaydı açılmaz.',
+  '- PR gövdesi `Kanban: <numara>` taşır (2026-10-08\'e kadar `Fixes REC-nn` de kabul); çok PR\'lık iş her biri tek PR\'la biten alt kartlara bölünür; kartsız iş yalnız `Kayıtsız: <sebep>` satırıyla (karar 187, 219).',
   '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz, frontmatter `metadata.originSessionId` = TAM oturum kimliği (8 hane değil); compact öncesi güncelle; dört alan: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa compact kapısı durdurur).',
   '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
-  '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano; hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
+  '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
   '- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.',
-  '- Recep\'e her durum mesajı TEK TABLO ile başlar (`| No: REC bağlantısı · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).',
+  '- Recep\'e her durum mesajı TEK TABLO ile başlar (`| No: Kanban numarası (taşınan REC-nn korunur) · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).',
   '- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.',
   '- CLAUDE.md\'deki 14 mutlak kural her role geçerlidir.',
 ].join('\n')
@@ -184,11 +184,11 @@ const ARKA_OFIS_YASAGI = ' Genel arka ofis modülünü (stok, satınalma, CRM, t
 /** Rol verisi. `durum`: kartın kendisini de ilgilendiren canlılık bilgisi. */
 const ROLLER = {
   OPS: {
-    gorev: 'Filonun orkestratörü ve genel müdürü (yürütmenin başı, sahibe karşı tek sorumlu yüz): sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını REC-425 altına kendi cümlesiyle kaydeder. Linear açık kayıt sayısını 250 altında tutar (yoklama, arşiv, WrongStack kanban\'a taşıma).',
+    gorev: 'Filonun orkestratörü ve genel müdürü (yürütmenin başı, sahibe karşı tek sorumlu yüz): sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını kendi cümlesiyle OPS panosundaki REC-425 kartına not olarak kaydeder (Linear\'a yazılmaz). Kanban panolarını (ortak "Bekleyenler" + departman başına) ve Linear\'ın donukluğunu (karar 219) gözler; Linear\'a yeni iş kaydı açılmaz.',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
-    yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Linear kaydına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
+    yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',
-    yetenek: 'Pano (board.cjs), Linear, SendMessage, workflow orkestrasyonu, plan-challenger.',
+    yetenek: 'Pano (board.cjs), Kanban (WrongStack), SendMessage, workflow orkestrasyonu, plan-challenger.',
     durum: 'Açık.',
   },
   ARAC: {
@@ -258,7 +258,7 @@ const ROLLER = {
   MARKA: {
     gorev: 'Marka kimliği: logo, palet, yazı tipi ve belge sistemi (Design-MARKA projesi).',
     dosyalar: 'Design-MARKA proje çıktıları ve yorumları; markanın belge sistemi.',
-    yetki: 'Tasarım kararı önerisi ve marka kılavuzu; Linear proje yorumları tasarım yüzeyidir.',
+    yetki: 'Tasarım kararı önerisi ve marka kılavuzu; Linear proje yorumları tasarım yüzeyidir (karar 219 Design istisnası, deneme boyunca 2026-10-08\'e kadar).',
     yasak: 'Tasarım = hedef, canlı = eski: canlıya uygulama URUN işidir; para harcatan tasarım aracı Recep kapısıdır.',
     yetenek: 'venthub-tasarim-dili, design-dna, tipografi ve erişilebilirlik skill\'leri.',
     durum: 'Kapalı (iş dondurma).',

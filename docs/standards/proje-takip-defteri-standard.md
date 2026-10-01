@@ -14,11 +14,11 @@ bu cetvelin doğuş sebebidir.
 ## 1. Tek kaynak ayrımı (değişmez)
 | Soru | SSOT | Defterin rolü |
 |---|---|---|
-| Ne karar verildi / iş durumu ne | **Linear** (Kararlar belgeleri + iş kayıtları) | kopya (dışa aktarım), aranabilir hafıza |
+| Ne karar verildi / iş durumu ne | **Linear** (Kararlar belgeleri, REC-554'e kadar) · **Kanban** (iş durumu, karar 219) | kopya (dışa aktarım), aranabilir hafıza |
 | Kural / cetvel / plan / ölçüm | **depo `docs/`** | kopya |
 | Orkestratör dersleri | **hafıza notları** | kopya |
 | "Bunu konuşmuş muyduk, neden böyle" | **NotebookLM "Venthub Proje Takip"** | ilk sorulan yer; cevap Linear/docs ile DOĞRULANIR |
-Çelişkide sıra: kod > Linear > docs > defter. Defter karar üretmez, hatırlatır.
+Çelişkide sıra: kod > Kanban/Linear > docs > defter. Defter karar üretmez, hatırlatır.
 
 ## 2. Kapsam — manifest tek listedir
 `docs/proje-takip/manifest.json` hangi dosyaların "proje yürütme kaynağı" olduğunu söyler. Listede olmayan şey deftere
@@ -44,7 +44,7 @@ bulgu dosyaları `docs/proje-takip/design-15a/` altında yaşar (önceden yalnı
 ## 4. Defterin doğru kullanımı
 - Sorular SERİ sorulur (aynı konuşma, tek tek); paralel soru bağlamı bozar (Recep, 09-04).
 - Defter çıktısı her zaman "aday bulgu"dur: tarih ve belge adıyla gelir, ama çözülmüş eski bulguları da getirir.
-  İş açmadan önce kod/Linear ile doğrulanır; doğrulanmamış bulgu Linear'a girmez.
+  İş açmadan önce kod/Kanban ile doğrulanır; doğrulanmamış bulgu Kanban'a girmez.
 - Çelişki/mükerrerlik taraması alan alan yapılır (ticari model · katalog · vitrin · iş yönetimi · güvenlik · yol
   haritası); çıktı `docs/proje-takip/celiski-mukerrerlik-analizi-<tarih>.md` olarak depoya girer ve deftere yüklenir.
 
