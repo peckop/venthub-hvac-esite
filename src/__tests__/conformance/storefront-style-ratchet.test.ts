@@ -207,7 +207,8 @@ const RATCHETS: Ratchet[] = [
     // (platform ana sayfalarına gidiyordu) kaldırıldı; `text-gray-300` ×4 gitti. Kazanç yan ürün.
     // 2026-09-29 · 1452 -> 1446: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü
     // (iki kart, DB'de olmayan alt kategorilere bağlıydı ve hiç çizilmiyordu) silindi; 6 ham gri gitti.
-    tavan: 1446,
+    // 2026-10-01 · 1446 -> 1444: URN-1 — sipariş durum eşlemesi ortak yardımcıya taşındı, kopya kalktı.
+    tavan: 1444,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -225,7 +226,8 @@ const RATCHETS: Ratchet[] = [
     ad: 'ham vurgu: blue-*/indigo-* (§2.3)',
     // 2026-09-01 · 148 -> 144: REC-115 olu bilesen CategoryHero silindi.
     // 2026-09-29 · 144 -> 139: REC-434 — aynı ölü bölümün silinmesi.
-    tavan: 139,
+    // 2026-10-01 · 139 -> 137: URN-1 — aynı kopya eşlemenin kalkması.
+    tavan: 137,
     say: () => countMatches(/\b(?:blue|indigo)-\d{2,3}\b/g),
     gerekce: 'Vurgu rengi marka token üzerinden; ham Tailwind paleti hiyerarşiyi bozar.',
   },
