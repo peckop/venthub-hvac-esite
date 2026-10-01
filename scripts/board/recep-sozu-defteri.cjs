@@ -237,7 +237,25 @@ function kaydet(girdi, secenek = {}) {
 
 // ───────────────────────── oku ─────────────────────────
 
-/** Defterin son OKUMA_BAYT baytından kayıtları okur; bozuk satır atlanır. */
+/** Test koşularının deftere sızdırdığı bilinen sahte kimlikler (Ops ilk canlı ölçüm, 2026-10-01): 5555… UUID biçimindedir. */
+const BILINEN_TEST_SIDLERI = new Set(['55555555-aaaa-4aaa-8aaa-555555555555'])
+/** Uydurma rol adları (testler "BEN" yazdı); gerçek roller pano şerit adlarıdır. */
+const SAHTE_ROLLER = new Set(['BEN'])
+
+/**
+ * OKUMA süzgeci: dosyaya ek-yazılmış ESKİ sahte satırlar silinmeden görünmez/sayılmaz (silme izni yok; okumada süzmek de
+ * söz kaybettirmez). Gerçek Recep sözü bu üç eleme dışında hiçbir şeyi kaybetmez: UUID olmayan sid · bilinen sahte
+ * kimlik/rol · sözü harness çerçevesinden ibaret kayıt (idle notice gibi).
+ */
+function gecerliKayit(k) {
+  if (typeof k.sid !== 'string' || !UUID.test(k.sid)) return false
+  if (BILINEN_TEST_SIDLERI.has(k.sid.toLowerCase())) return false
+  if (SAHTE_ROLLER.has(String(k.rol || '').toUpperCase())) return false
+  if (!siniflandir(k.soz).recep) return false
+  return true
+}
+
+/** Defterin son OKUMA_BAYT baytından kayıtları okur; bozuk ve geçersiz (sahte) satır atlanır. */
 function kayitlariOku() {
   const yol = defterYolu()
   let fd
@@ -254,7 +272,7 @@ function kayitlariOku() {
       if (!satir.trim()) continue
       try {
         const o = JSON.parse(satir)
-        if (o && typeof o.ts === 'string' && typeof o.soz === 'string') out.push(o)
+        if (o && typeof o.ts === 'string' && typeof o.soz === 'string' && gecerliKayit(o)) out.push(o)
       } catch { /* bozuk satır */ }
     }
     return out

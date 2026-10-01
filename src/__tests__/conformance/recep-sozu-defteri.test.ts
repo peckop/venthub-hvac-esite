@@ -463,6 +463,22 @@ describe('INV-RECEP-SOZU-6 · gerçek deftere sahte söz YAZILMAZ (Ops 10-01 ilk
     expect(defter.kayitlariOku()).toHaveLength(4)
   })
 
+  it('OKUMA süzgeci: eski sahte satırlar (UUID olmayan sid, bilinen test sid i, rol BEN, idle notice) SİLİNMEDEN görünmez; gerçek söz görünür, dosya aynen kalır', () => {
+    const t = new Date(dk(2)).toISOString()
+    const ham = (o: Record<string, unknown>) => fs.appendFileSync(defter.defterYolu(), JSON.stringify({ ts: t, pencere: '', no: null, cevap: null, ...o }) + '\n')
+    ham({ sid: 'benim1', rol: 'ALTYAPI', soz: 'merhaba' })
+    ham({ sid: '55555555-aaaa-4aaa-8aaa-555555555555', rol: 'BEN', soz: 'merhaba, durum nedir?' })
+    ham({ sid: '66666666-bbbb-4bbb-8bbb-666666666666', rol: 'BEN', soz: 'başka bir sahte' })
+    ham({ sid: OPS, rol: 'OPS', soz: '[Cross-session idle notice] "Altyapı" is idle now.' })
+    ham({ sid: HARITA, rol: 'HARITA', pencere: 'Harita', soz: 'compact yapalım hazırlık' })
+    const onceSatir = fs.readFileSync(defter.defterYolu(), 'utf8').trim().split('\n').length
+    expect(defter.kayitlariOku().map((k) => k.soz)).toEqual(['compact yapalım hazırlık'])
+    const s = defter.gorunur({ sid: ARAC, rol: 'OPS' })
+    expect(s).toHaveLength(1)
+    expect(s[0]).toContain('compact yapalım hazırlık')
+    expect(fs.readFileSync(defter.defterYolu(), 'utf8').trim().split('\n')).toHaveLength(onceSatir) // dosya silinmedi
+  })
+
   it('vitest kurulumu defteri geçici dizine yönlendirir: gerçek ev dizinindeki defter DEĞİL', () => {
     // beforeEach kendi tmp yolunu verir; kurulumun yönlendirmesi kök sürecin başlangıç değeridir
     const baslangic = eskiEnv.VENTHUB_RECEP_DEFTER
