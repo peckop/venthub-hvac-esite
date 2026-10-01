@@ -652,7 +652,7 @@ GitHub tarafında bayat/hayalet bir kayıt; repo tarafı hiç izlemedi. Durum: *
 tarafı hayalet)** — OPS'un GitHub Actions ayarlarından elle temizlemesi gerekir (repo commit'i
 gerektirmez).
 
-### 3.6 · cetvel — `docs/standards/*.md` (68 araç)
+### 3.6 · cetvel — `docs/standards/*.md` (69 araç)
 
 > Kapı sütunu cetveller.md'deki kapı aynen taşındı. Durum: KAPILI→**KAL**, HARİTADA-KAPISIZ ve
 > YETİM→**KAL-KAPISIZ** (AXIOM 3 madde 3: kapısı yok ama var — kapı borcu). Sahip: sahipsiz
@@ -751,6 +751,7 @@ gerektirmez).
 | belge-yonetimi-standard | Belge Yönetimi Standardı (Cetvel) — v0.1 TASLAK (REC-400 D1): bilgi katmanları 0-5 (B1), tek giriş haritası `docs/README.md` (B2), yazım kuralı gövde = geçerli kural + başlık bloğu (B3), sahiplik (B4), tazelik göstergesi eşikleri (B5), konu yönlendiricisi sınırları (B6), belge kapıları (B7), oturum sürekliliği (B8) | HARİTA | `docs/README.md` (soru→dosya haritası), Linear REC-400 | 2026-09-27 yazıldı; plan-challenger çürütmesi DÜZELTMEYLE GEÇER, 4 düzeltme uygulandı | yok — B7 kapıları D2'de doğar (kırık yol, başlık bloğu); B9 uygulama durumu tablosu | KAL-KAPISIZ |
 | gelistirme-kurallari-tam-liste | Geliştirme Kuralları — 31 Madde (tam liste) — v1.0; CONTEXT.md §14 emekli olunca kuralların yeni evi, GEÇİCİ (REC-433 rol kartlarına dağıtılacak) | HARİTA | `CLAUDE.md` (Mutlak Kurallar altı), `docs/README.md`, CONTEXT.md yönlendirme sayfası; Linear REC-400 | 2026-09-29 yazıldı (kurallar CONTEXT.md §14'ten aynen; yalnız CLAUDE.md karşılığı ölçüldü) | yok — dosya REC-433 ile kapanacak | KAL-KAPISIZ |
 | hafiza-yazma-duzeni-standard | Hafıza ve Talimat Yazma Düzeni Standardı — v0.3 TASLAK (REC-530, Recep modeli 2026-09-30): kural tablosu R1-R10, şerit→rol çözümü, ölçülemedi ≠ şeritsiz, çift OPS, hafıza dizini adayları, Bash açık delikleri, deneme tablosu D1-D19, ARAÇ iş listesi | HARİTA | `docs/README.md`, `docs/roller/cetvel-sahipligi.md`; kanca kodu henüz yok (ARAÇ, şartname onayından sonra) | 2026-09-30 yazıldı; iki bağımsız okuyucu (28 + 35 bulgu) işlendi, kod tarafı iddiaları kaynak dosyadan doğrulandı | yok — kanca yazılınca INV kapıları eklenecek | KAL-KAPISIZ |
+| siparis-durum-akisi-standard | Sipariş Durum Akışı Cetveli — v1.0 (ALT-1, karar 221): tek akış, altı değişmez ("kargoya yalnız processing'ten girilir"), tek kaynak `orderStatusMachine.ts`, kuralın yüzey yüzey kopyaları ve borç tablosu, birleşme sırası | ALTYAPI | `src/lib/admin/orderStatusMachine.ts` yorumu; `docs/README.md` satırı HARİTA'da (cetvel birleşince) | 2026-10-01 yazıldı; canlı ölçüm aynı gün (`confirmed` 0 sipariş), yüzey tablosu kaynak dosyalardan okundu | `src/lib/admin/__tests__/statusMachines.test.ts` ("hazırlanıyor adımı ATLANAMAZ") + `src/lib/__tests__/orderStatusService.test.ts` | KAL |
 
 ---
 
