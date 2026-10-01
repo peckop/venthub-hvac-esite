@@ -562,7 +562,6 @@ const DONMUS_BORC: ReadonlySet<string> = new Set([
   'common.backToSite',
   'common.discover',
   'common.exploreProducts',
-  'common.getQuote',
   'common.more',
   'common.saving',
   'common.searchPlaceholder',

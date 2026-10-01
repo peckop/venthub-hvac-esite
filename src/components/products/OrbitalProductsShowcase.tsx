@@ -510,12 +510,11 @@ const OrbitalCard: React.FC<{
                     style={{ pointerEvents: 'none', transition: 'opacity 0.5s', opacity: 1 }}
                 >
                     <div
-                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
+                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg text-white"
                         style={{
                             background: 'rgba(0,0,0,0.85)',
                             backdropFilter: 'blur(8px)',
                             border: `1px solid ${hovered ? CONFIG.glowColor : 'rgba(34,211,238,0.3)'}`,
-                            color: '#fff',
                             textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                         }}
                     >
