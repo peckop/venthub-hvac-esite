@@ -120,8 +120,9 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
-      # Karar 187 (REC-433): her PR bir Linear kaydına bağlanır. Gövdede `Fixes REC-nn` ya da
-      # `Kayıtsız: <sebep>` yoksa KIRMIZI. Mantığı ve testi: scripts/board/pr-kayit-kapisi.cjs (ARAÇ).
+      # Karar 187 (REC-433) + karar 219/220 (ARC-2): her PR bir iş kaydına bağlanır. Gövdede `Kanban: <ÖN EK>-<sayı>`
+      # (ör. `Kanban: ARC-3`, taşınan kayıt `Kanban: REC-nn`) yoksa KIRMIZI; eski yol `Fixes REC-nn` / `Kayıtsız: <sebep>`
+      # 2026-10-08 dahil kabul. Mantığı ve testi: scripts/board/pr-kayit-kapisi.cjs (ARAÇ).
       # Yalnız pull_request olayında koşar (push/master ve elle koşumda PR gövdesi yoktur).
       # Kurulumdan ÖNCE durur: bağımlılıksız, saniyeler sürer, boşuna 15 dakikalık kontrol koşturmaz.
       # PR gövdesi ve yazar ORTAM DEĞİŞKENİ olarak geçer, `run:` satırına gömülmez (enjeksiyon).
