@@ -15,7 +15,7 @@
  *     tek küçük görev): gövdedeki skill talimatı 3/3 uygulandı; boş gövde araç kullanımını ve rapor biçimini
  *     bozmadı ama skill çağrısı da üretmedi. Gövde, ÇALIŞAN tanımında ajanın sistem istemidir; PENCERE tanımı gövdesi
  *     boş kalır (bu betik pencere tanımı üretmez).
- *   - `model` AÇIKÇA yazılır (execution-method-standard §10.3): kullanıcı ayarındaki CLAUDE_CODE_SUBAGENT_MODEL=sonnet
+ *   - `model` AÇIKÇA yazılır (execution-method-standard §5.1 ve §10.3 "Model açıkça yazılır"): kullanıcı ayarındaki CLAUDE_CODE_SUBAGENT_MODEL=sonnet
  *     modelsiz tanımı sessizce Sonnet'e düşürür; burada aynı değer görünür kılınır, değiştirmek tek sabittir.
  *   - Araştırmacı, çürütücü, doğrulayıcı yazmaz: `disallowedTools: Edit, Write, NotebookEdit` (ölçüldü 2026-10-01:
  *     alan çalışıyor, çalışanın araç listesinde Write yok). Bash yolu açık kalır; bu bir kalite ağıdır, kilit değil.
@@ -39,11 +39,14 @@ const TUR_MODEL = { arastirmaci: 'sonnet', uygulayici: 'sonnet', curutucu: 'sonn
 
 /** Çalışan türü → Türkçe ad ve görev cümlesi (execution-method §10.3 tablosundan). */
 const TURLER = {
-  arastirmaci: { ad: 'araştırmacı', gorev: 'Salt-okuma çalışırsın: kaynağı bulur, ölçer, taslak çıkarırsın; sonucu scratchpad\'e yazar ve açana dönersin.' },
+  arastirmaci: { ad: 'araştırmacı', gorev: 'Salt-okuma çalışırsın: kaynağı bulur, ölçer, taslak çıkarırsın; sonucu RAPORUNDA açana döndürürsün (dosya yazmazsın, Bash ile de yazma).' },
   uygulayici: { ad: 'uygulayıcı', gorev: 'Müdürün verdiği dar ve adlı dosya kümesini yazar, ilgili kapıları koşar ve sonucu açana dönersin.' },
-  curutucu: { ad: 'çürütücü', gorev: 'Planı ya da bulguyu çürütmeye çalışırsın; kanıtsız bulgu yazmaz, emin olmadığını işaretlersin. Dosya yazmazsın.' },
+  curutucu: { ad: 'çürütücü', gorev: 'Planı ya da bulguyu çürütmeye çalışırsın; kanıtsız bulgu yazmaz, emin olmadığını işaretlersin. Raporu yanıt olarak dönersin; dosya yazmazsın (bir skill "rapor dosyası yaz" dese bile içeriği yanıtında döndür, Bash ile de yazma).' },
   dogrulayici: { ad: 'doğrulayıcı', gorev: 'İşi yapmamış bağımsız okuyucusun: atıfları ve sayıları yeniden ölçer, her iddiayı DOĞRULANDI / ÇELİŞİYOR / DESTEKSİZ / ÖLÇÜLEMEDİ diye işaretlersin. Dosya yazmazsın.' },
 }
+
+/** Ön yüklenemeyen çakışan skill adları (YETENEK belgesi: hangisini çözdüğü ölçülmedi). */
+const AD_CAKISMASI = new Set(['supabase', 'scrape'])
 
 /** Yazmayan türler. */
 const YAZMAYAN = new Set(['arastirmaci', 'curutucu', 'dogrulayici'])
@@ -116,6 +119,8 @@ function sorunlar(setler, etkinMi, kullaniciDuzeyi) {
     if (x.uret && sinir.enFazlaOnYukle && x.onYukle.length > sinir.enFazlaOnYukle) s.push(`${ad}: ${x.onYukle.length} skill > ${sinir.enFazlaOnYukle}`)
     const kb = (x.onYukle || []).reduce((t, o) => t + (o.kb || 0), 0)
     if (x.uret && sinir.onYuklemeButceKB && kb > sinir.onYuklemeButceKB + 0.05) s.push(`${ad}: ${kb.toFixed(1)} KB > ${sinir.onYuklemeButceKB}`)
+    // Ad çakışması: `supabase` ve `scrape` hangi kaynağa çözüldüğü ölçülmedi (YETENEK belgesi); ön yüklenemez.
+    for (const o of x.onYukle || []) if (AD_CAKISMASI.has(o.ad)) s.push(`${ad}: "${o.ad}" ad çakışması var, ön yüklenemez`)
     for (const o of x.onYukle || []) if (!etkinMi(o.ad) && !kullaniciDuzeyi.has(o.ad)) s.push(`${ad}: ön yüklenen "${o.ad}" etkin ağaçta ve bilinen kullanıcı düzeyi listesinde yok`)
   }
   return s
@@ -164,6 +169,6 @@ function main() {
   process.exit(fark || s.length ? 1 : 0)
 }
 
-module.exports = { uret, tanim, sorunlar, dosyaAdi, TURLER, TUR_MODEL, YAZMAYAN, KULLANICI_DUZEYI, SETLER_YOLU, AJAN_DIZINI }
+module.exports = { uret, tanim, sorunlar, dosyaAdi, TURLER, TUR_MODEL, YAZMAYAN, KULLANICI_DUZEYI, AD_CAKISMASI, SETLER_YOLU, AJAN_DIZINI }
 
 if (require.main === module) main()

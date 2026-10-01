@@ -31,6 +31,7 @@ type Uretici = {
   dosyaAdi: (d: string, t: string) => string
   TUR_MODEL: Record<string, string>
   KULLANICI_DUZEYI: Set<string>
+  AD_CAKISMASI: Set<string>
   SETLER_YOLU: string
 }
 
@@ -105,6 +106,34 @@ describe('INV-AJAN-TANIM-1 — tanımın içeriği', () => {
     for (const a of s.adiylaCagir) expect(t.split('---')[2]).toContain(a.ad)
   })
 
+  it('bekleyen skill adı frontmatter\'a da gövdeye de girmez (ayırt edici: bekleyeni dolu satır)', () => {
+    const s = ornek('uygulayici')
+    s.bekleyen = [{ ad: 'bekleyen-skill-x', neden: 'REC-514 kapanınca' }]
+    expect(uretici.tanim(s)).not.toContain('bekleyen-skill-x')
+  })
+
+  it('model değeri sabit ve beklenen (totoloji değil): her tür sonnet', () => {
+    for (const tur of ['arastirmaci', 'uygulayici', 'curutucu', 'dogrulayici']) {
+      expect(uretici.TUR_MODEL[tur]).toBe('sonnet')
+      expect(uretici.tanim(ornek(tur))).toMatch(/^model: sonnet$/m)
+    }
+  })
+
+  it('name dosya adıyla aynıdır ve description boş değildir (50 üretilmiş dosya)', () => {
+    for (const [dosya, metin] of Object.entries(uretici.uret(setler))) {
+      expect(metin).toMatch(new RegExp(`^name: ${dosya.replace(/\.md$/, '')}$`, 'm'))
+      expect(metin).toMatch(/^description: \S.{20,}$/m)
+    }
+  })
+
+  it('yazmayan türlerin gövdesi rapor yazma/dosya yazma çelişkisi taşımaz: "dosya yazmazsın" der, scratchpad\'e yazdırmaz', () => {
+    for (const tur of ['arastirmaci', 'curutucu', 'dogrulayici']) {
+      const t = uretici.tanim(ornek(tur))
+      expect(t).toMatch(/[Dd]osya yazmazsın/)
+      expect(t).not.toMatch(/scratchpad/)
+    }
+  })
+
   it('ad çakışması uyarısı olan adıyla-çağır skill\'i gövdeye de girmez', () => {
     const s = ornek('uygulayici')
     s.adiylaCagir.push({ ad: 'cakisan-skill', uyari: 'ad çakışması' })
@@ -163,6 +192,16 @@ describe('INV-AJAN-TANIM-1 — ayırt edicilik (sorunlar bilerek bozulmuş girdi
       if (x) x.onYukle = [{ ad: 'codegrph-yazim-hatasi', kb: 1 }]
     })
     expect(s.some((x) => /etkin ağaçta/.test(x))).toBe(true)
+  })
+
+  it('ad çakışması olan skill (supabase, scrape) ön yüklenirse yakalar', () => {
+    for (const ad of ['supabase', 'scrape']) {
+      const s = bozuk((k) => {
+        const x = k.setler.find((r) => r.uret)
+        if (x) x.onYukle = [{ ad, kb: 1 }]
+      })
+      expect(s.some((x) => /ad çakışması/.test(x))).toBe(true)
+    }
   })
 
   it('yinelenen ajan adını ve bilinmeyen türü yakalar', () => {
