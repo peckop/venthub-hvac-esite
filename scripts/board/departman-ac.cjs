@@ -35,6 +35,8 @@
  *  ajana düşer ve ekip modu KAYBOLUR (ölçüldü 2026-10-01, Ürün). Ekip modu isteyen pencere terminalde KALIR.
  *  Aynı sid iki yerde birden açılamaz: Masaüstü'nde açık bir oturumu terminale almak için önce Masaüstü tarafı kapanmalı
  *  (bu betik "zaten açık" der ve açmaz). Her açılış Recep'in ekranında ve onayındadır; kapatmak insan eylemidir.
+ *  MCP KÜMESİNİ DARALTMAK (ör. `--strict-mcp-config`, rol başına sunucu listesi) RECEP KARARIDIR (Ops 10-01): varsayılan
+ *  Masaüstü penceresiyle AYNI sunucu kümesidir; daraltma gerekçeli ve ölçümlü bir kararla girer, betiğin kendi tercihiyle girmez.
  *
  * HATA YOLLARI (hepsi açık mesaj; sessiz geçmez): rol tanınmıyor · claude.exe bulunamadı · .mcp.json yok (bayrak yolu kırık
  * olurdu) · pencere tavanı dolu → çıkış 1. Pano dizini yok / olay dosyası bozuk / sessions dizini yok / sid yok →
