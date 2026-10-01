@@ -1,10 +1,10 @@
 ---
 name: wrongstack-kanban
-description: "WrongStack panosunda kart açma, yaşam döngüsü (Backlog→Todo→Running→Review→Done), sahiplik ve \"doğrulandı\" kanıtı. Tetik: pano kartı, kanban, iş kartı ilerletme. Linear yanında pilot; iş emri Linear'dadır. WrongStack 1.0.26 uyarlaması."
+description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu. WrongStack 1.0.26 uyarlaması."
 category: coordination
 metadata:
   kaynak: "WrongStack @wrongstack/core 1.0.26 skills/wrongstack-kanban/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) - araç eşlemesi ve VentHub ek kuralları eklendi, kaynak gövde değiştirilmedi"
+  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı. Kaynak gövde değiştirilmedi"
 ---
 
 > **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/wrongstack-kanban/SKILL.md`, MIT lisansı. Aşağıdaki
@@ -15,8 +15,9 @@ metadata:
 | Kaynak metin | Bizde |
 |---|---|
 | `kanban` aracı | MCP `mcp__wrongstack-kanban__kanban_read` / `kanban_manage` / `kanban_watch` |
-| Managed board / lease-fenced dispatch | Pilot; bizim panolar yönetilmeyen (unmanaged) — `transition_task` reddedilir, `move_task` kullanılır |
-| Dönüş boyutu | Yazma eylemleri yamalı (~1,5 KB); `verify_completion` hâlâ ~65 KB döner |
+| Managed board / lease-fenced dispatch | Bizim panolar yönetilmeyen (unmanaged): `start_task` cevabı "This board is not in managed lifecycle mode" der (10-01 ölçüldü). Kaynak gövdedeki "managed" zorunlulukları (tek aşama kuralı, lease koruması) burada bağlanmaz; ARAÇ'ın 09-28 ölçümü: `transition_task` reddedilir, `move_task` kullanılır |
+| Dönüş boyutu | Her yazma panonun tamamını döndürür; bu bir **pano boyutu** işidir (aşağıda "Maliyet kuralı"). Yama diskte uygulanmıştır ama etkisi 3 kartlık panoda görünmedi (10-01) |
+| Linear | **Donuk** (karar 219): yeni kayıt açılmaz, mevcut kayıt silinmez ya da arşivlenmez. Kaynak gövdede ve eski kurallarda "Linear" geçen yerler artık "Kanban" okunur |
 
 ## VentHub ek kuralları (kaynak metinden ÖNCE okunur; çelişirse bunlar kazanır)
 
@@ -25,13 +26,71 @@ metadata:
 3. `--admin` ve `--destructive` bayrakları KAPALI kalır; kaynak metindeki örnek yapılandırmalar bizde uygulanmaz.
 4. Kutuya ve karta **sır** (anahtar, parola, token) ve **Recep onayı** yazılmaz. Onay yalnız Recep'in kendi penceresinde verilir.
 5. `*_watch` çağrısı kanıt değildir; durum `mailbox_read` / `kanban_read` ile okunarak doğrulanır.
-6. Pano (kanban) Linear'ın YANINDA pilottur. İş emrinin tek kaynağı **Linear**'dır; karttaki bilgi Linear'ı geçersiz kılmaz.
+6. **Kanban iş emrinin ve iş durumunun tek kaynağıdır** (karar 219, Recep 2026-10-01); Linear donuktur. Deneme 1 hafta (10-08); beğenilirse Linear devre dışı kalır, beğenilmezse bu madde geri alınır. Çelişkide Kanban kazanır.
 7. "Bitti" doğrulayıcı komutu `gh` ile sınırlıdır ve sır içermez.
 8. Kanban yaması `cli.js` + `index.js` dosyalarında (`tools/wrongstack-mcp/yamalar/`). Sürüm yükselince yamanın hâlâ tuttuğu yeniden ölçülür.
 9. `mailbox-bridge` kullanılmaz (HTTP köprüsü; bizde kapalı).
 10. Ops'a rapor dört alanlı etiketle gider (NE · DURUM · KANIT · KİMDE). Kaynak metindeki `<nextsteps>` biçimi bunun ekidir, yerine geçmez.
 11. **İzin bilgisi** (kim neye yetki verdi) pencere mesajından hafızaya ya da durum dosyasına KOPYALANMAZ. Tek kaynak `~/.claude/settings.json`; en fazla "bkz. settings.json autoMode, <tarih>" yazılır.
-12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Linear) + hüküm + istek taşır; ayrıntı dosyada ya da Linear'dadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+12. **Pencereler arası mesaj ≤800 karakter.** Mesaj yalnız ADRES (dosya/Kanban numarası) + hüküm + istek taşır; ayrıntı dosyada ya da Kanban kartındadır. Recep'e giden metin bu sınırın DIŞINDADIR (tam cümle kuralı).
+
+---
+
+## Tam kullanım kipi (karar 219 ve 220; bu bölüm kaynak gövdeden ÖNCE okunur, çelişirse kazanır)
+
+### A. Numara ve panolar
+
+- **Numara:** `<ÖNEK>-<sayı>`; önekler OPS, SEO, ARC, HRT, YTN, URN, ALT, ADM, KTL (sessiz harf, Recep kararı 220 ve sonrası). Sayaç pano başına, numara kartın doğduğu departmanda kalır, devredilince DEĞİŞMEZ. Linear'dan taşınan kart `REC-nn` numarasını korur. **Yeni numarayı betik gelene kadar OPS verir; uydurulmaz.**
+- **Başlık** numarayla başlar: `YTN-3 · ...`. Numarasız kart açılmaz.
+- **Panolar:** ortak havuz `Linear Bekleyenler (taşınan, karar 215)` (sahibi OPS) ve departman başına `VentHub <DEPARTMAN>`. Pano kimliğini sabit yazma; `kanban_read list_boards` ile oku.
+- **PR gövdesi** `Kanban: <numara>` satırı taşır. PR kayıt kapısı çift yollu olana kadar (ARAC-2) `Kayıtsız: <sebep>, Part of REC-nn` satırı da yazılır; kapı yalnız `Kanban:` satırına bakmaz.
+
+### B. Günlük akış
+
+1. **Önce ara.** Aynı iş için kart var mı: `kanban_read search_tasks` (sorgu iş adıyla ve numarayla). Aramanın EYLEMİ değil SONUCU yazılır: "x kart buldum, mükerrer yok / var".
+2. **Havuzdan iş alma** (10-01 ölçüldü, REC-309 kartında). Sırası gelen kart `Linear Bekleyenler` havuzundadır; karar OPS'tadır.
+   - ⛔**`move_task` + `targetBoardId` panolar arası TAŞIMAZ:** `targetBoardId` yok sayıldı, kart yalnız havuzun kendi sütununda yer değiştirdi (`ok: true` döndü, yanıltıcı). `transfer` eylemi `--destructive` kapısının arkasında kapalıdır.
+   - **Doğru yol `copy_task`:** `boardId` = havuz, `taskId` = kart, `targetBoardId` = kendi panon, `targetColumnId: todo`, `preserveOriginTaskIds: true`, `inheritLabels: true`. Yeni kart yeni kimlik alır, `origin` (REC-nn, Linear kimliği) korunur.
+   - **Sonra havuzdaki aslını arşivle** (`update_task`, `status: archived`, `note` = yeni kartın kimliği); yoksa aynı iş iki panoda yaşar. Havuz OPS'undur: çekiş ve arşiv notu OPS'a bildirilir.
+   - Havuz 159 kartlık olduğundan yazma cevabı tam pano yerine **özet** döner (aşağıda D).
+3. **Kartı aç** (`add_task`). Zorunlu alanlar:
+   - `title`: numarayla başlar.
+   - `description`: **KAYNAK/CETVEL bloğu** (yöneten cetvel dosya adı ya da açıkça "cetvel yok, yazımı bu işin kapsamında") + **`YÖNTEM:` satırı** (şerit / alt ajan / Workflow / elle) + iş ne, neden şimdi.
+   - `assignee`: işi yapan departman adı.
+   - **Kanıt komutu** (`add_check`, `checkType: command`, `checkNotes` = komut). Kanıtsız kart açılmaz; kanıt komutu açma anında yazılır.
+4. **Başla** (`start_task`): `boardId`, `taskId`, `author`, `transitionComment` dördü de zorunlu (10-01 ölçüldü: biri eksikse `INVALID_INPUT`). Cevap bir kiralama (lease) kimliği ve 15 dakikalık bitiş saati (`leaseExpiresAt`) döndürür; bu yönetilmeyen panoda yönetişime bağlı değildir. **Süre dolunca KART DEĞİŞMEZ** (10-01 ölçüldü: YTN-1 bitişten 6 dakika sonra hâlâ `running`, `attempt 1`, kimse almadı, otomatik kurtarma yok). Bu yüzden kiralama süresi "iş sahipliği" kanıtı sayılmaz; sahiplik kartın `assignee` alanı ve notlarıdır. `heartbeat_assignment` çağrısının bu panoda bir etkisi olduğu iddia edilmez.
+5. **İlerlerken kanıt biriktir:** `add_note` (düz not), `record_activity` (`activityKind`: decision / attempt / result / blocker / observation), `add_link` (`linkType: pr`, PR adresi). "Bir şey yaptım" sohbette kalmaz, karta yazılır.
+6. **Bitir** (YTN-2 kartında 10-01 ölçüldü, iki adım):
+   1. `verify_completion` kanıt komutunu gerçekten koşturur; `verdict: passed`, `exitCode`, süre kartın `verificationReport` alanına yazılır (ilk koşuda 886 ms, 12.227 karakter döndü).
+   2. `move_task` ile `targetColumnId: done`. **`transition_task` bu panolarda `REFUSED` verir** ("Strict Kanban Agent transitions require a managed board"); denemeye gerek yok.
+   - ⛔**`move_task` ile Done'da KAPI YOKTUR (DENEME kartı, 10-01 ölçüldü):** (a) kartta hiç kanıt komutu yokken `move_task` Done'a taşıdı, `status: completed`; (b) kartta koşmamış (`pending`) bir kanıt komutu varken de kart Done'da kaldı; (c) `verify_completion` `PASSED` verdikten sonra bile `transition_task` aynı hatayı verdi (`[REFUSED] Strict Kanban Agent transitions require a managed board`, `managed-policy-invalid`, alan `lifecycle.mode`): sebep karttaki kanıt değil, panonun yönetilen olmamasıdır. Yani bu panolarda kanıt kuralı **araç değil disiplin** işidir.
+   - **Sıra bağlayıcıdır: önce `verify_completion`, rapor `passed` değilse `move_task` ile Done'a TAŞIMA.** Kanıtsız ya da `needs_human` kartı Done'a çeken kişi kuralı çiğnemiş olur, araç engellemez. "bitti, tamam, çalışıyor" gibi tek kelimelik özet kanıt değildir. Kapanışta PR numarası ve birleşme kanıtı kartın notunda kalır.
+   - Gerçek kapı için araçta `adopt_managed_lifecycle` eylemi var; bir panoyu yönetilene çevirmenin sonucu **ölçülmedi** (OPS/ARAÇ kararı, YTN deneme önerisi). Ölçülene kadar Done kapısı disiplindir.
+7. **Hata dalları** (kural 14): panoya yazma başarısız olursa söyle ve işe devam et (pano işi izler, iş panoyu beklemez); kanıt komutu kırmızıysa kart Done'a GİTMEZ, `record_activity` ile `blocker` yazılır; doğrulayıcı komutu `needs_human` verirse komutun bu kuralları ihlal edip etmediğine bak (aşağıda C).
+
+### C. Ölçülmüş tuzaklar (kaynak: `docs/standards/is-kayit-duzeni-standard.md` §6.1; her satır sahada ölçüldü)
+
+| Tuzak | Ölçüm | Karşılık |
+|---|---|---|
+| Pano **yönetilen değildir** (içe aktarılan de, doğrudan açılan da; 10-01 ölçüldü) | `move_task` Done'a kanıtsız ve koşmamış kanıt komutuyla da geçirir; `transition_task` her durumda `REFUSED` | Kapı disiplindir: önce `verify_completion` `passed`, sonra `move_task`. Kart panoda doğrudan açılır, dışarıdan aktarılmaz |
+| Doğrulayıcı izin listesi **çok dar** | varsayılan `["pwd","true","false","test"]` | `.mcp.json` env: `WRONGSTACK_KANBAN_VERIFIER_COMMANDS=+gh` (yalnız `gh`; yasak listesi her hâlde üstün). `curl/wget/npm/node` yasak |
+| **Tek komut, boru yok** | `\|` `&&` `\|\|` `;` `>` `<` `` ` `` `$()` içeren komut **hiç koşmaz**, hüküm `needs_human`a düşer, kart kapanmaz | Komut çıkış koduyla konuşur; çıktı metnine bakan `grep` gerekiyorsa komut yanlış seçilmiştir. Yazmadan önce bir olumlu bir olumsuz örnekte ayırt ediciliği ölç |
+| **Sürücü harfi** duyarlı proje kimliği | `c:\…` ≠ `C:\…` iki ayrı kimlik verir | Pano küçük harfli kökle açılır; kimlik ölçülür |
+| Silme yüzeyi | `--destructive` silme/birleştirme/devretme açar | Kapalı kalır; kayıt yalnız gerekçeyle küçülür |
+| Alt süreç `process.env` kalıtır | sırlar çocuk sürece geçer | Kart açıklamasına ve kanıt komutuna sır yazılmaz |
+
+**"PR birleşti mi" kanıt kalıbı:** `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` (GitHub 204 → çıkış 0; 404 → çıkış 1). Birleşmiş PR'da 0, açık PR'da 1 ölçüldü.
+
+### D. Maliyet kuralı
+
+- **Her yazma çağrısı panonun tamamını geri döndürür.** 09-21 ölçümü: bir yazma 13-19 KB, bir kartı kapatmak ~64 KB bağlam. 10-01'de 3-4 kartlık `YETENEK` panosunda `add_check` ve `start_task` ~7 KB, `verify_completion` 12 KB, kartı Done'a `move_task` ile taşımak ~9 KB döndürdü (kart başına `successCriteria` ve `verificationReport` büyüdükçe artar). Küçük panoda maliyet kart sayısı ve kart başına kanıt/rapor büyüdükçe artar. **Büyük panoda (159 kartlık havuz, 183 KB) yazma cevabı tam pano yerine sütun sayıları ve kartın kendisini döndürür** ("Full board … omitted"; 10-01 ölçüldü); asıl pahalı olan küçük panolardır ve `verify_completion` (12-15 KB).
+- **Okuma:** tek kart için `get_task` ucuzdur (~1-4 KB). **`search_tasks` ucuz DEĞİLDİR:** havuzda "skill" aramasında 7 sonuç 20 KB döndürdü (her sonuç `board` + `task` taşır). Aramayı dar sorguyla yap, sonuç sayısını `limit` ile sınırla; tam pano için `get_board` kullanma.
+- **Toplu giriş tek çağrıyla:** çok kart açılacaksa `sync_task_graph` (ya da `create_from_graph`) bir kez çağrılır; kart başına `add_task` döngüsü kurulmaz.
+- **Toplu yazım alt ajana verilmez:** alt ajan da her yazmada panoyu geri alır ve bağlamı kendi penceresinde yakar. Yazmayı çağıran pencere yapar.
+
+### E. Haiku işçi
+
+Haiku 200K bağlamında proje skill'lerinin çoğu açıklamasız (yalnız adıyla) listelenir; yönlendirme onu seçemez. Bu yüzden Haiku işçiye kartla ilgili bir iş verirken **skill adı görev metninde açıkça yazılır:** "wrongstack-kanban skill'ini kullan; kartı `<numara>`, kanıt komutu `<komut>`". İşçi kartı yalnız OKUR (`get_task`); açma, başlatma, Done yazımı işçiye verilmez, müdür yapar (§10.4 ve D maddesi). Skill `SKILL_ATAMASI` cetvelinde **her departman müdürünün çekirdeğindedir**, çalışan setlerinde değil (gerekçe: setler belgesi §6 "Müdür çekirdeği").
 
 ---
 
