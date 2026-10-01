@@ -48,13 +48,17 @@ metadata:
 ### B. Günlük akış
 
 1. **Önce ara.** Aynı iş için kart var mı: `kanban_read search_tasks` (sorgu iş adıyla ve numarayla). Aramanın EYLEMİ değil SONUCU yazılır: "x kart buldum, mükerrer yok / var".
-2. **Havuzdan iş alma.** Sırası gelen kart `Linear Bekleyenler` havuzundadır. Karar OPS'tadır; onayla gelen kart `kanban_manage move_task` ile kendi departman panona taşınır (`taskId` + `targetBoardId`; `targetColumnId` ver). *Bu eylem benim tarafımdan henüz gerçek kartta ölçülmedi; ilk çekmede çıktıyı bu satıra yaz.*
+2. **Havuzdan iş alma** (10-01 ölçüldü, REC-309 kartında). Sırası gelen kart `Linear Bekleyenler` havuzundadır; karar OPS'tadır.
+   - ⛔**`move_task` + `targetBoardId` panolar arası TAŞIMAZ:** `targetBoardId` yok sayıldı, kart yalnız havuzun kendi sütununda yer değiştirdi (`ok: true` döndü, yanıltıcı). `transfer` eylemi `--destructive` kapısının arkasında kapalıdır.
+   - **Doğru yol `copy_task`:** `boardId` = havuz, `taskId` = kart, `targetBoardId` = kendi panon, `targetColumnId: todo`, `preserveOriginTaskIds: true`, `inheritLabels: true`. Yeni kart yeni kimlik alır, `origin` (REC-nn, Linear kimliği) korunur.
+   - **Sonra havuzdaki aslını arşivle** (`update_task`, `status: archived`, `note` = yeni kartın kimliği); yoksa aynı iş iki panoda yaşar. Havuz OPS'undur: çekiş ve arşiv notu OPS'a bildirilir.
+   - Havuz 159 kartlık olduğundan yazma cevabı tam pano yerine **özet** döner (aşağıda D).
 3. **Kartı aç** (`add_task`). Zorunlu alanlar:
    - `title`: numarayla başlar.
    - `description`: **KAYNAK/CETVEL bloğu** (yöneten cetvel dosya adı ya da açıkça "cetvel yok, yazımı bu işin kapsamında") + **`YÖNTEM:` satırı** (şerit / alt ajan / Workflow / elle) + iş ne, neden şimdi.
    - `assignee`: işi yapan departman adı.
    - **Kanıt komutu** (`add_check`, `checkType: command`, `checkNotes` = komut). Kanıtsız kart açılmaz; kanıt komutu açma anında yazılır.
-4. **Başla** (`start_task`): `boardId`, `taskId`, `author`, `transitionComment` dördü de zorunlu (10-01 ölçüldü: biri eksikse `INVALID_INPUT`). Cevap bir kiralama (lease) kimliği ve 15 dakikalık bitiş saati döndürür; bu yönetilmeyen panoda yönetişime bağlı değildir. *Süre dolunca ne olduğu ölçülmedi; uzun işte `heartbeat_assignment` çağır, çağrının bir etkisi olduğunu iddia etme.*
+4. **Başla** (`start_task`): `boardId`, `taskId`, `author`, `transitionComment` dördü de zorunlu (10-01 ölçüldü: biri eksikse `INVALID_INPUT`). Cevap bir kiralama (lease) kimliği ve 15 dakikalık bitiş saati (`leaseExpiresAt`) döndürür; bu yönetilmeyen panoda yönetişime bağlı değildir. **Süre dolunca KART DEĞİŞMEZ** (10-01 ölçüldü: YTN-1 bitişten 6 dakika sonra hâlâ `running`, `attempt 1`, kimse almadı, otomatik kurtarma yok). Bu yüzden kiralama süresi "iş sahipliği" kanıtı sayılmaz; sahiplik kartın `assignee` alanı ve notlarıdır. `heartbeat_assignment` çağrısının bu panoda bir etkisi olduğu iddia edilmez.
 5. **İlerlerken kanıt biriktir:** `add_note` (düz not), `record_activity` (`activityKind`: decision / attempt / result / blocker / observation), `add_link` (`linkType: pr`, PR adresi). "Bir şey yaptım" sohbette kalmaz, karta yazılır.
 6. **Bitir** (YTN-2 kartında 10-01 ölçüldü, iki adım):
    1. `verify_completion` kanıt komutunu gerçekten koşturur; `verdict: passed`, `exitCode`, süre kartın `verificationReport` alanına yazılır (ilk koşuda 886 ms, 12.227 karakter döndü).
@@ -79,8 +83,8 @@ metadata:
 
 ### D. Maliyet kuralı
 
-- **Her yazma çağrısı panonun tamamını geri döndürür.** 09-21 ölçümü: bir yazma 13-19 KB, bir kartı kapatmak ~64 KB bağlam. 10-01'de 3-4 kartlık `YETENEK` panosunda `add_check` ve `start_task` ~7 KB, `verify_completion` 12 KB, kartı Done'a `move_task` ile taşımak ~9 KB döndürdü (kart başına `successCriteria` ve `verificationReport` büyüdükçe artar). Maliyet pano büyüdükçe artar; 159 kartlık havuza yazma çağrısı yapmadan önce gerekçe ara.
-- **Okuma ucuzdur, yazma pahalı:** tek kart için `get_task` (~4 KB); `get_board` yerine `search_tasks`/`get_task`.
+- **Her yazma çağrısı panonun tamamını geri döndürür.** 09-21 ölçümü: bir yazma 13-19 KB, bir kartı kapatmak ~64 KB bağlam. 10-01'de 3-4 kartlık `YETENEK` panosunda `add_check` ve `start_task` ~7 KB, `verify_completion` 12 KB, kartı Done'a `move_task` ile taşımak ~9 KB döndürdü (kart başına `successCriteria` ve `verificationReport` büyüdükçe artar). Küçük panoda maliyet kart sayısı ve kart başına kanıt/rapor büyüdükçe artar. **Büyük panoda (159 kartlık havuz, 183 KB) yazma cevabı tam pano yerine sütun sayıları ve kartın kendisini döndürür** ("Full board … omitted"; 10-01 ölçüldü); asıl pahalı olan küçük panolardır ve `verify_completion` (12-15 KB).
+- **Okuma:** tek kart için `get_task` ucuzdur (~1-4 KB). **`search_tasks` ucuz DEĞİLDİR:** havuzda "skill" aramasında 7 sonuç 20 KB döndürdü (her sonuç `board` + `task` taşır). Aramayı dar sorguyla yap, sonuç sayısını `limit` ile sınırla; tam pano için `get_board` kullanma.
 - **Toplu giriş tek çağrıyla:** çok kart açılacaksa `sync_task_graph` (ya da `create_from_graph`) bir kez çağrılır; kart başına `add_task` döngüsü kurulmaz.
 - **Toplu yazım alt ajana verilmez:** alt ajan da her yazmada panoyu geri alır ve bağlamı kendi penceresinde yakar. Yazmayı çağıran pencere yapar.
 
