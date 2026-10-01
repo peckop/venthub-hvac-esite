@@ -84,3 +84,100 @@ describe('orderStatusMachine — kanban monotonluk kapısı (T058-VH)', () => {
     expect(canTransitionOrder('bilinmeyen', 'shipped')).toBe(false)
   })
 })
+
+/**
+ * REC-535 — mutasyon testi ilk koşusu (sipariş + iade durum makineleri).
+ *
+ * Yukarıdaki testler yasak geçişleri (teslimden geri dönüş, terminal çıkış) ve birkaç izinli
+ * geçişi sabitliyor; ama izinli akışın çoğu ve geri-gitme yasağının çoğu KİLİTSİZDİ:
+ * `confirmed → processing`, `partial_refunded → refunded`, `pending → partial_refunded`,
+ * `shipped → pending` gibi tek satırlık bozulmalar bütün paketi yeşil bırakıyordu.
+ * Aşağıdaki her test, o bozulmalardan en az birini öldürdüğü koşuyla ölçülerek eklendi.
+ */
+describe('orderStatusMachine — izinli akış ve geri gidememe (REC-535)', () => {
+  it('ileri akışın her halkası açık: pending → confirmed → processing → shipped → delivered', () => {
+    expect(canTransitionOrder('pending', 'confirmed')).toBe(true)
+    expect(canTransitionOrder('paid', 'confirmed')).toBe(true)
+    expect(canTransitionOrder('confirmed', 'processing')).toBe(true)
+    expect(canTransitionOrder('processing', 'shipped')).toBe(true)
+    expect(canTransitionOrder('shipped', 'delivered')).toBe(true)
+  })
+
+  it('hiçbir aşamadan geriye gidilemez (monotonluk, kural 11)', () => {
+    // `pending` ve `paid` panoda aynı "Yeni" sütunu; iade/iptal zincir dışı çıkış durumlarıdır.
+    const sira: Record<string, number> = {
+      pending: 0,
+      paid: 0,
+      confirmed: 1,
+      processing: 2,
+      shipped: 3,
+      delivered: 4,
+    }
+    const geriye: string[] = []
+    for (const kaynak of Object.keys(sira)) {
+      for (const hedef of allowedNextOrderStatuses(kaynak)) {
+        if (hedef in sira && sira[hedef] < sira[kaynak]) geriye.push(`${kaynak} → ${hedef}`)
+      }
+    }
+    expect(geriye, `geri geçiş izinli: ${geriye.join(', ')}`).toEqual([])
+  })
+
+  it('kısmi iade HER aşamadan mümkün — tam iade gibi teslimden önce de olur', () => {
+    for (const s of ['pending', 'paid', 'confirmed', 'processing', 'shipped', 'delivered']) {
+      expect(canTransitionOrder(s, 'partial_refunded')).toBe(true)
+    }
+  })
+
+  it('kısmi iade sonradan tam iadeye tamamlanabilir, başka yere gidemez', () => {
+    expect(allowedNextOrderStatuses('partial_refunded')).toEqual(['refunded'])
+  })
+
+  it('dönen liste değiştirilse makinenin kendisi bozulmaz (kopya döner)', () => {
+    const liste = allowedNextOrderStatuses('pending')
+    liste.length = 0
+    liste.push('delivered')
+    expect(allowedNextOrderStatuses('pending')).toEqual([
+      'confirmed',
+      'cancelled',
+      'refunded',
+      'partial_refunded',
+    ])
+    expect(canTransitionOrder('pending', 'delivered')).toBe(false)
+  })
+})
+
+describe('returnStatusMachine — iade zinciri ve giriş kuralları (REC-535)', () => {
+  it('iade baştan sona tamamlanabilir: requested → approved → in_transit → received → refunded', () => {
+    expect(allowedNextStatuses('requested')).toContain('approved')
+    expect(allowedNextStatuses('approved')).toContain('in_transit')
+    expect(allowedNextStatuses('in_transit')).toContain('received')
+    expect(allowedNextStatuses('received')).toContain('refunded')
+  })
+
+  it('her statüye yalnız kendi öncülünden girilir — aşama atlanamaz, geri dönülemez', () => {
+    // Yukarıdaki `toContain` testleri makine GENİŞLERSE (fazladan geçiş eklenirse) fark etmezdi.
+    // Bu test ters yönden bakar: kim hangi statüye girebiliyor.
+    const hepsi = ['requested', 'approved', 'rejected', 'in_transit', 'received', 'refunded', 'cancelled']
+    const girenler = (hedef: string): string[] =>
+      hepsi.filter((kaynak) => allowedNextStatuses(kaynak).includes(hedef))
+
+    expect(girenler('requested')).toEqual([]) // talep başlangıçtır, hiçbir yerden dönülmez
+    expect(girenler('approved')).toEqual(['requested'])
+    expect(girenler('rejected')).toEqual(['requested'])
+    expect(girenler('in_transit')).toEqual(['approved'])
+    expect(girenler('received')).toEqual(['in_transit'])
+    expect(girenler('refunded')).toEqual(['received'])
+  })
+
+  it('bilinmeyen statü KİLİTLİ (fail-closed) — sessizce ileri geçiş vermez', () => {
+    expect(allowedNextStatuses('bilinmeyen')).toEqual([])
+    expect(allowedNextStatuses('')).toEqual([])
+  })
+
+  it('dönen liste değiştirilse makinenin kendisi bozulmaz (kopya döner)', () => {
+    const liste = allowedNextStatuses('requested')
+    liste.length = 0
+    liste.push('refunded')
+    expect(allowedNextStatuses('requested')).toEqual(['approved', 'rejected', 'cancelled'])
+  })
+})
