@@ -360,6 +360,8 @@ function dondur(secenek = {}) {
   const esik = secenek.esikBayt || DONDUR_ESIK_BAYT
   const tut = secenek.tutBayt || DONDUR_TUT_BAYT
   const yol = defterYolu()
+  // Test koşusu gerçek makine defterini döndüremez (kaydet() ile aynı koruma).
+  if (testOrtamiMi() && !baskaYolMu()) return { durum: 'hata', sebep: 'test-ortami-gercek-defter-yasak' }
   try {
     const ilk = fs.statSync(yol).size
     if (ilk <= esik) return { durum: 'gerek-yok' }
