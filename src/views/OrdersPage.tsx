@@ -15,6 +15,7 @@ import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { isRecord } from '../lib/type-converters'
+import { ORDER_STEPS, orderStatusBadgeClass, orderStatusLabelKey, orderStepIndex } from '../utils/orderStatusDisplay'
 import { siparisNoGoster } from '../utils/siparisNo'
 
 
@@ -161,54 +162,8 @@ const OrdersPage: React.FC = () => {
     return formatCurrency(price, lang, { currency: SYSTEM_CURRENCY, maximumFractionDigits: 0 })
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'paid':
-      case 'confirmed':
-        return 'bg-blue-100 text-blue-800'
-      case 'shipped':
-        return 'bg-purple-100 text-purple-800'
-      case 'delivered':
-        return 'bg-green-100 text-green-800'
-      case 'failed':
-      case 'cancelled':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getStatusText = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return t('orders.pending')
-      case 'paid':
-      case 'confirmed':
-        return t('orders.paid')
-      case 'shipped':
-        return t('orders.shipped')
-      case 'delivered':
-        return t('orders.delivered')
-      case 'failed':
-        return t('orders.failed')
-      case 'cancelled':
-        return t('orders.cancelled')
-      case 'refunded':
-        return t('orders.refunded')
-      default:
-        return status
-    }
-  }
-
-  const steps = ['pending', 'paid', 'shipped', 'delivered'] as const
-  const stepLabel: Record<string, string> = {
-    pending: t('orders.pending'),
-    pa_id: t('orders.paid'),
-    shipped: t('orders.shipped'),
-    delivered: t('orders.delivered')
-  }
+  // Durum eşlemesi ortak yardımcıdan gelir (URN-1): iki müşteri ekranı aynı kuralı kullanır.
+  const getStatusText = (status: string) => t(orderStatusLabelKey(status))
 
 
   // Derived filtered list
@@ -322,18 +277,16 @@ const OrdersPage: React.FC = () => {
                   {/* Status Stepper */}
                   <div className="mb-6">
                     <div className="flex items-center gap-2">
-                      {steps.map((s, idx) => {
-                        // Normalize 'confirmed' status to 'paid' for progress bar
-                        const normalizedStatus = order.status.toLowerCase() === 'confirmed' ? 'paid' : order.status.toLowerCase()
-                        const activeIdx = Math.max(steps.indexOf(normalizedStatus as 'paid' | 'pending' | 'shipped' | 'delivered'), 0)
+                      {ORDER_STEPS.map((s, idx) => {
+                        const activeIdx = orderStepIndex(order.status)
                         const active = idx <= activeIdx
                         return (
                           <React.Fragment key={s}>
                             <div className="flex flex-col items-center min-w-80px">
                               <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${active ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
-                              <span className={`mt-2 text-xs font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>{stepLabel[s]}</span>
+                              <span className={`mt-2 text-xs font-bold uppercase tracking-wider ${active ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
                             </div>
-                            {idx < steps.length - 1 && (
+                            {idx < ORDER_STEPS.length - 1 && (
                               <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
                             )}
                           </React.Fragment>
@@ -367,7 +320,7 @@ const OrdersPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${getStatusColor(order.status)}`}>
+                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${orderStatusBadgeClass(order.status)}`}>
                         {getStatusText(order.status)}
                       </span>
                       {order.payment_status?.toLowerCase() === 'partial_refunded' && (

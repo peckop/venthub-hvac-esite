@@ -11,6 +11,7 @@ import { SYSTEM_CURRENCY } from '../../i18n/currency'
 import { formatDate as formatOnlyDate } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
+import { type ShipPhase, shipPhase, shipPhaseStepIndex } from '../../utils/orderStatusDisplay'
 import { siparisNoGoster } from '../../utils/siparisNo'
 
 interface ShipmentRow {
@@ -112,13 +113,10 @@ export default function AccountShipmentsPage() {
     }
   }
 
-  const getShipStatus = (row: ShipmentRow): 'delivered' | 'shipped' | 'preparing' => {
-    if (row.delivered_at) return 'delivered'
-    if (row.shipped_at || row.tracking_number) return 'shipped'
-    return 'preparing'
-  }
+  // Kargo evresi ortak yardımcıdan gelir (URN-1): ödenmemiş sipariş "Hazırlanıyor" görünmez.
+  const getShipStatus = (row: ShipmentRow): ShipPhase => shipPhase(row)
 
-  const getShipStatusBadge = (status: 'delivered' | 'shipped' | 'preparing') => {
+  const getShipStatusBadge = (status: ShipPhase) => {
     switch (status) {
       case 'delivered':
         return (
@@ -132,10 +130,16 @@ export default function AccountShipmentsPage() {
             <Truck className="w-3.5 h-3.5" /> {t('account.shipments.statusShipped')}
           </span>
         )
-      default:
+      case 'preparing':
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 shadow-sm">
             <Clock className="w-3.5 h-3.5" /> {t('account.shipments.statusPreparing')}
+          </span>
+        )
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider bg-yellow-50 text-yellow-800 border border-yellow-200 shadow-sm">
+            <Clock className="w-3.5 h-3.5" /> {t('account.shipments.statusAwaitingPayment')}
           </span>
         )
     }
@@ -147,11 +151,7 @@ export default function AccountShipmentsPage() {
     { key: 'delivered', label: t('account.shipments.stepDelivered'), icon: MapPin },
   ]
 
-  const getStepIndex = (status: 'delivered' | 'shipped' | 'preparing') => {
-    if (status === 'delivered') return 2
-    if (status === 'shipped') return 1
-    return 0
-  }
+  const getStepIndex = shipPhaseStepIndex
 
   // Filtered
   const displayed = rows.filter(r => {

@@ -2185,7 +2185,8 @@ export const tr = {
       shipStatus: {
         delivered: 'Teslim Edildi',
         shipped: 'Kargoda',
-        preparing: 'Hazırlanıyor'
+        preparing: 'Hazırlanıyor',
+        awaitingPayment: 'Ödeme Bekleniyor'
       },
       shipSteps: {
         preparing: 'Hazırlandı',
@@ -2197,6 +2198,7 @@ export const tr = {
       statusDelivered: 'Teslim Edildi',
       statusShipped: 'Kargoda',
       statusPreparing: 'Hazırlanıyor',
+      statusAwaitingPayment: 'Ödeme Bekleniyor',
       stepShipped: 'Kargoya Verildi',
       stepDelivered: 'Teslim Edildi',
       subtitle: 'Siparişlerinizin kargo durumunu ve takip bilgilerini buradan izleyebilirsiniz.',
@@ -2443,6 +2445,8 @@ export const tr = {
     paid: 'Ödendi',
     partialRefunded: 'Kısmi İade Edildi',
     pending: 'Beklemede',
+    processing: 'Hazırlanıyor',
+    statusUnknown: 'Durum Güncelleniyor',
     refunded: 'İade Edildi',
     shipped: 'Sevk Edildi',
     startDate: 'Başlangıç Tarihi',
