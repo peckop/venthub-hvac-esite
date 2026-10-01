@@ -224,8 +224,8 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), supabase-postgres-best-practices (3,2K, y) | 8,6K | — | — |
-| Uygulayıcı | create-migration (6,3K), supabase-postgres-best-practices (3,2K, y) | 9,5K | supabase (18,8K) | — |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | — | supabase-postgres-best-practices: supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8, 10-01); projeye alınırsa ya da eklenti açılırsa eklenir |
+| Uygulayıcı | create-migration (6,3K) | 6,3K | supabase (18,8K) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
 | Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | — | — |
 | Doğrulayıcı | verify-before-done (8,9K, y), webapp-testing (3,9K) | 12,8K | — | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
 
@@ -347,6 +347,8 @@ Makine okuyan kaynak: `docs/audits/skill-departman-setleri-2026-09-30.json`. HAR
 
 ## 8. Ölçüm planı: ön yükleme çalışanı gerçekten değiştiriyor mu
 
+> **Mekanik kısım ÖLÇÜLDÜ (YTN-8, 2026-10-01): `docs/audits/skill-calisan-yukleme-olcumu-2026-10-01.md`.** Aşağıdaki plan "davranışı değiştiriyor mu" kısmı içindir; o hâlâ koşulmadı.
+
 Model kararını (toplama Haiku, yargı Sonnet 5.5) besleyecek sayı budur. Yöntem, işi yapmamış bir ölçücüyle:
 
 1. Aynı dört görev metni (biri her tür için), ön yüklemeli ve ön yüklemesiz iki tanımla, Haiku ve Sonnet 5.5 200K'da beşer kez koşulur.
@@ -357,7 +359,7 @@ Model kararını (toplama Haiku, yargı Sonnet 5.5) besleyecek sayı budur. Yön
 ## 9. Açık sorular
 
 1. **Adıyla çağır katmanı nerede yaşayacak?** Önerim: ajan tanımının gövdesinde tek satır ("Gerektiğinde şu skill'leri Skill aracıyla çağır: …"). OPS "gövde boş" demişti; gövde boş kalırsa müdür her görev metnine adı yazmak zorunda. Karar HARİTA ve OPS'ta.
-2. **Ad çakışması.** `supabase` ve `scrape` için `skills:` alanının hangisini çözdüğü ölçülmedi. Çözülene kadar ikisi de ön yüklenmiyor.
+2. **Ad çakışması.** ÖLÇÜLDÜ (YTN-8, 10-01): aynı ad kullanıcı ve proje düzeyinde varsa `skills:` **kullanıcı düzeyinin** gövdesini yükler (kanarya `scrape`: gelen metin kullanıcı düzeyindeki gstack skill'iydi). `supabase` için proje/eklenti çakışması eklenti etkin olmadığından ölçülemedi. Çözülene kadar ikisi de ön yüklenmiyor; bugün projenin hiçbir skill adı kullanıcı düzeyiyle çakışmıyor.
 3. **Mutasyon testi skill'i (yeni, OPS talebi).** Hazır olunca tüm kod departmanlarının Doğrulayıcı setine girecek; ADMIN ve URUN doğrulayıcı setleri zaten dolu, orada takas gerekecek.
 4. **Çalışan modeli.** Bu tasarım 200K çalışan için kurulu. Model Recep'le konuşuluyor; Haiku'da ön yüklemenin işe yaradığı §8 ölçümüyle görülecek.
 5. **Departman doğrulaması.** Her departman kendi bölümünü okuyup "işime yarar mı, yarıyorsa neden anmadım" diye cevaplayacak (SORU-neden-onermedin.md). Cevaplar setleri ve skill açıklamalarını düzeltir.
