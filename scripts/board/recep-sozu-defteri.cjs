@@ -42,8 +42,26 @@ const TUR_TAVAN = 5
 /** Satırda gösterilen söz uzunluğu. */
 const GORUNUR_UZUNLUK = 200
 
+/** Gerçek oturum kimliği: UUID. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+/** Aynı sid + aynı söz bu süre içinde ikinci kez yazılmaz. */
+const TEKRAR_MS = 10 * 1000
+
+function varsayilanYol() {
+  return path.join(os.homedir(), '.claude', DEFTER_ADI)
+}
 function defterYolu() {
-  return process.env.VENTHUB_RECEP_DEFTER || path.join(os.homedir(), '.claude', DEFTER_ADI)
+  return process.env.VENTHUB_RECEP_DEFTER || varsayilanYol()
+}
+/** Test koşusu mu? (vitest, NODE_ENV=test, jest). Kancayı spawn eden testler `process.env`'i miras ettirir. */
+function testOrtamiMi() {
+  return Boolean(process.env.VITEST || process.env.JEST_WORKER_ID || process.env.NODE_ENV === 'test')
+}
+/** Defter yolu GERÇEK varsayılan yoldan başka bir yere mi işaret ediyor? (Test ortamında yalnız o yazılabilir.) */
+function baskaYolMu() {
+  const secili = process.env.VENTHUB_RECEP_DEFTER
+  if (!secili) return false
+  return path.resolve(secili).toLowerCase() !== path.resolve(varsayilanYol()).toLowerCase()
 }
 function imlecDizini() {
   return path.join(path.dirname(defterYolu()), 'recep-sozu-imlec')
@@ -78,6 +96,10 @@ const CERCEVE_CUMLELERI = [
   // Blok sonrası açıklama paragrafları ("This came from another Claude session — not typed by your user...",
   // "That "other Claude session" is an agent working inside this same session..."): boş satıra kadar PARAGRAFIN tamamı.
   /^[ \t]*(?:This came from another Claude session|That ["“]?other Claude session["”]? is an agent)[^\n]*(?:\n(?![ \t]*\n)[^\n]*)*/gim,
+  // Harness bildirimleri köşeli başlıkla gelir ("[Cross-session idle notice] ...", "[Cross-session delivery notice] ...",
+  // "[SYSTEM NOTIFICATION ...]", "[Artifact comment sent to Claude]"): Ops'un ilk canlı ölçümünde idle notice Recep sözü
+  // sanılıp deftere yazıldı. Başlıktan boş satıra kadar PARAGRAFIN tamamı çerçevedir.
+  /^[ \t]*\[(?:Cross-session[^\]\n]*|SYSTEM NOTIFICATION[^\]\n]*|[^\]\n]*\bnotice\b[^\]\n]*|Artifact comment[^\]\n]*|Subagent[^\]\n]*)\][^\n]*(?:\n(?![ \t]*\n)[^\n]*)*/gim,
 ]
 
 /**
@@ -175,9 +197,14 @@ function rolBul(sid, board) {
  */
 function kaydet(girdi, secenek = {}) {
   try {
+    // KORUMA 1 (Ops 10-01, ilk canlı ölçüm): eski kanca testleri yalıtımsız koşunca GERÇEK deftere sahte "Recep sözü"
+    // ("merhaba", sid benim1) yazdı. Test ortamında gerçek defter yoluna yazmak YASAK; test geçici yol vermelidir.
+    if (testOrtamiMi() && !baskaYolMu()) return { kaydedildi: false, sebep: 'test-ortami-gercek-defter-yasak' }
     const s = siniflandir(girdi && girdi.prompt)
     if (!s.recep) return { kaydedildi: false, sebep: s.sebep }
     const sid = girdi && typeof girdi.session_id === 'string' ? girdi.session_id : ''
+    // KORUMA 2: gerçek oturum kimliği UUID'dir; "benim1" gibi uydurma sid kayda girmez.
+    if (!UUID.test(sid)) return { kaydedildi: false, sebep: 'sid-uuid-degil' }
     const { rol, pencere } = rolBul(sid, secenek.board)
     let soz = maskele(s.soz)
     let kirpildi = false
@@ -194,6 +221,10 @@ function kaydet(girdi, secenek = {}) {
       soz,
       ...(kirpildi ? { kirpildi: true } : {}),
     }
+    // KORUMA 3: aynı sid + aynı söz TEKRAR_MS içinde ikinci kez yazılmaz (aynı mesajı altı kez kaydeden test artığı).
+    const simdi = secenek.simdi || Date.now()
+    const tekrar = kayitlariOku().some((k) => k.sid === sid && k.soz === soz && Math.abs(simdi - Date.parse(k.ts)) < TEKRAR_MS)
+    if (tekrar) return { kaydedildi: false, sebep: 'tekrar' }
     const yol = defterYolu()
     fs.mkdirSync(path.dirname(yol), { recursive: true })
     fs.appendFileSync(yol, JSON.stringify(kayit) + '\n')
@@ -206,7 +237,25 @@ function kaydet(girdi, secenek = {}) {
 
 // ───────────────────────── oku ─────────────────────────
 
-/** Defterin son OKUMA_BAYT baytından kayıtları okur; bozuk satır atlanır. */
+/** Test koşularının deftere sızdırdığı bilinen sahte kimlikler (Ops ilk canlı ölçüm, 2026-10-01): 5555… UUID biçimindedir. */
+const BILINEN_TEST_SIDLERI = new Set(['55555555-aaaa-4aaa-8aaa-555555555555'])
+/** Uydurma rol adları (testler "BEN" yazdı); gerçek roller pano şerit adlarıdır. */
+const SAHTE_ROLLER = new Set(['BEN'])
+
+/**
+ * OKUMA süzgeci: dosyaya ek-yazılmış ESKİ sahte satırlar silinmeden görünmez/sayılmaz (silme izni yok; okumada süzmek de
+ * söz kaybettirmez). Gerçek Recep sözü bu üç eleme dışında hiçbir şeyi kaybetmez: UUID olmayan sid · bilinen sahte
+ * kimlik/rol · sözü harness çerçevesinden ibaret kayıt (idle notice gibi).
+ */
+function gecerliKayit(k) {
+  if (typeof k.sid !== 'string' || !UUID.test(k.sid)) return false
+  if (BILINEN_TEST_SIDLERI.has(k.sid.toLowerCase())) return false
+  if (SAHTE_ROLLER.has(String(k.rol || '').toUpperCase())) return false
+  if (!siniflandir(k.soz).recep) return false
+  return true
+}
+
+/** Defterin son OKUMA_BAYT baytından kayıtları okur; bozuk ve geçersiz (sahte) satır atlanır. */
 function kayitlariOku() {
   const yol = defterYolu()
   let fd
@@ -223,7 +272,7 @@ function kayitlariOku() {
       if (!satir.trim()) continue
       try {
         const o = JSON.parse(satir)
-        if (o && typeof o.ts === 'string' && typeof o.soz === 'string') out.push(o)
+        if (o && typeof o.ts === 'string' && typeof o.soz === 'string' && gecerliKayit(o)) out.push(o)
       } catch { /* bozuk satır */ }
     }
     return out
@@ -324,5 +373,5 @@ function gorunur(g) {
 
 module.exports = {
   siniflandir, kararlar, maskele, rolBul, kaydet, gorunur, anilanSeritler, kayitlariOku, seritAdi,
-  defterYolu, imlecDizini, SOZ_TAVAN, TUR_TAVAN, ILK_PENCERE_MS, MASKE,
+  defterYolu, imlecDizini, testOrtamiMi, SOZ_TAVAN, TUR_TAVAN, ILK_PENCERE_MS, TEKRAR_MS, MASKE,
 }

@@ -43,6 +43,8 @@ interface Defter {
   anilanSeritler: (s: string) => Set<string>
   kayitlariOku: () => Kayit[]
   defterYolu: () => string
+  testOrtamiMi: () => boolean
+  TEKRAR_MS: number
   SOZ_TAVAN: number
   TUR_TAVAN: number
   ILK_PENCERE_MS: number
@@ -119,6 +121,21 @@ describe('INV-RECEP-SOZU-1 · yalnız Recep in KENDİ mesajı yakalanır', () =>
   it('Recep in yazısı + peer bloğu karışık gelirse yazı kalır, peer ATILIR', () => {
     const s = defter.siniflandir('227 evet\n\nAnother Claude session sent a message while you were working:\n<cross-session-message>224 hayır</cross-session-message>')
     expect(s).toMatchObject({ recep: true, soz: '227 evet' })
+  })
+
+  it('harness bildirimleri ("[Cross-session idle notice] ...", delivery notice, SYSTEM NOTIFICATION) YAKALANMAZ (Ops ilk canlı ölçüm)', () => {
+    const idle = '[Cross-session idle notice] "Altyapı", which you asked to be notified about, is idle now — it finished a turn at 13:27.'
+    expect(defter.siniflandir(idle).recep).toBe(false)
+    expect(defter.siniflandir('[Cross-session delivery notice] The message to "Urun" was held for approval.').recep).toBe(false)
+    expect(defter.siniflandir('[SYSTEM NOTIFICATION - NOT USER INPUT]\nautomated event\n223 evet').recep).toBe(false)
+    expect(defter.siniflandir('[Artifact comment sent to Claude] 227 evet').recep).toBe(false)
+    // Recep ın kendi yazısı bildirimden önce ya da sonra gelirse KALIR
+    expect(defter.siniflandir('227 evet\n\n[Cross-session idle notice] "Altyapı" is idle.').soz).toBe('227 evet')
+  })
+
+  it('köşeli ayraçla başlayan ama bildirim OLMAYAN Recep yazısı kalır', () => {
+    expect(defter.siniflandir('[ARC-3] için devam et').recep).toBe(true)
+    expect(defter.siniflandir('[not] bu bir deneme').recep).toBe(true)
   })
 
   it('kapanışı gelmemiş (kesik) dış blok: içeriği Recep sözü sayılmaz', () => {
@@ -374,5 +391,98 @@ describe('INV-RECEP-SOZU-5 · board-brief kancası gerçek süreçte', () => {
     process.env.VENTHUB_RECEP_DEFTER = tmp
     const r = kos({ session_id: ARAC, prompt: '227 evet' })
     expect(r.status).toBe(0)
+  })
+})
+
+describe('INV-RECEP-SOZU-6 · gerçek deftere sahte söz YAZILMAZ (Ops 10-01 ilk canlı ölçüm: 8 test artığı)', () => {
+  /** Kancayı verilen ortamla koşturur; HOME'u geçici dizine çevirir ki "gerçek varsayılan yol" tmp altında olsun. */
+  const kosOrtam = (girdi: unknown, ortam: Record<string, string | undefined>) => {
+    const env: Record<string, string | undefined> = {
+      ...process.env,
+      USERPROFILE: path.join(tmp, 'home'),
+      HOME: path.join(tmp, 'home'),
+      ...ortam,
+    }
+    for (const k of Object.keys(env)) if (env[k] === undefined) delete env[k]
+    return spawnSync(process.execPath, [KANCA], { input: JSON.stringify(girdi), encoding: 'utf8', env: env as NodeJS.ProcessEnv, timeout: 60_000 })
+  }
+  const gercekYol = () => path.join(tmp, 'home', '.claude', 'recep-sozu-defteri.jsonl')
+
+  it('test ortamında (VITEST) yol verilmemişse kayıt REDDEDİLİR, gerçek yola dosya açılmaz', () => {
+    const r = kosOrtam({ session_id: ARAC, prompt: 'merhaba' }, { VENTHUB_RECEP_DEFTER: undefined, VITEST: 'true' })
+    expect(r.status).toBe(0)
+    expect(fs.existsSync(gercekYol())).toBe(false)
+  })
+
+  it('test ortamında yol AÇIKÇA gerçek varsayılan yola verilse bile REDDEDİLİR (aynı yola eşitlik kontrolü)', () => {
+    const r = kosOrtam({ session_id: ARAC, prompt: 'merhaba' }, { VENTHUB_RECEP_DEFTER: gercekYol(), VITEST: 'true' })
+    expect(r.status).toBe(0)
+    expect(fs.existsSync(gercekYol())).toBe(false)
+  })
+
+  it('NODE_ENV=test de test ortamı sayılır; modül kararı doğrudan verir', () => {
+    const onceVitest = process.env.VITEST
+    const onceYol = process.env.VENTHUB_RECEP_DEFTER
+    try {
+      delete process.env.VENTHUB_RECEP_DEFTER
+      expect(defter.testOrtamiMi()).toBe(true) // vitest içindeyiz
+      const r = defter.kaydet({ prompt: 'merhaba', session_id: ARAC })
+      expect(r).toMatchObject({ kaydedildi: false, sebep: 'test-ortami-gercek-defter-yasak' })
+    } finally {
+      if (onceVitest === undefined) delete process.env.VITEST
+      else process.env.VITEST = onceVitest
+      if (onceYol !== undefined) process.env.VENTHUB_RECEP_DEFTER = onceYol
+    }
+  })
+
+  it('AYIRT EDİCİ ÇİFT: test ortamı DEĞİLSE aynı girdi gerçek varsayılan yola yazılır (üretimde kanca ölü değil)', () => {
+    const r = kosOrtam(
+      { session_id: ARAC, prompt: 'merhaba' },
+      { VENTHUB_RECEP_DEFTER: undefined, VITEST: undefined, NODE_ENV: undefined, JEST_WORKER_ID: undefined },
+    )
+    expect(r.status).toBe(0)
+    expect(fs.existsSync(gercekYol())).toBe(true)
+    expect(fs.readFileSync(gercekYol(), 'utf8')).toContain('merhaba')
+  })
+
+  it('UUID olmayan sid kayda girmez (benim1, boş, kısa kimlik)', () => {
+    for (const sid of ['benim1', '', 'cb0467f1', 'cb0467f1-f1a3-437d-bc15', '../../x']) {
+      const r = defter.kaydet({ prompt: 'merhaba', session_id: sid })
+      expect(r, sid).toMatchObject({ kaydedildi: false, sebep: 'sid-uuid-degil' })
+    }
+    expect(fs.existsSync(defter.defterYolu())).toBe(false)
+  })
+
+  it('tekrar koruması: aynı sid + aynı söz 10 sn içinde ikinci kez YAZILMAZ; sonra, farklı söz ya da farklı sid yazılır', () => {
+    const t0 = Date.now()
+    expect(defter.kaydet({ prompt: '227 evet', session_id: ARAC }, { simdi: t0 })).toMatchObject({ kaydedildi: true })
+    expect(defter.kaydet({ prompt: '227 evet', session_id: ARAC }, { simdi: t0 + 3000 })).toMatchObject({ kaydedildi: false, sebep: 'tekrar' })
+    expect(defter.kaydet({ prompt: '227 evet', session_id: ARAC }, { simdi: t0 + defter.TEKRAR_MS + 1000 })).toMatchObject({ kaydedildi: true })
+    expect(defter.kaydet({ prompt: 'başka söz', session_id: ARAC }, { simdi: t0 + 3500 })).toMatchObject({ kaydedildi: true })
+    expect(defter.kaydet({ prompt: '227 evet', session_id: HARITA }, { simdi: t0 + 4000 })).toMatchObject({ kaydedildi: true })
+    expect(defter.kayitlariOku()).toHaveLength(4)
+  })
+
+  it('OKUMA süzgeci: eski sahte satırlar (UUID olmayan sid, bilinen test sid i, rol BEN, idle notice) SİLİNMEDEN görünmez; gerçek söz görünür, dosya aynen kalır', () => {
+    const t = new Date(dk(2)).toISOString()
+    const ham = (o: Record<string, unknown>) => fs.appendFileSync(defter.defterYolu(), JSON.stringify({ ts: t, pencere: '', no: null, cevap: null, ...o }) + '\n')
+    ham({ sid: 'benim1', rol: 'ALTYAPI', soz: 'merhaba' })
+    ham({ sid: '55555555-aaaa-4aaa-8aaa-555555555555', rol: 'BEN', soz: 'merhaba, durum nedir?' })
+    ham({ sid: '66666666-bbbb-4bbb-8bbb-666666666666', rol: 'BEN', soz: 'başka bir sahte' })
+    ham({ sid: OPS, rol: 'OPS', soz: '[Cross-session idle notice] "Altyapı" is idle now.' })
+    ham({ sid: HARITA, rol: 'HARITA', pencere: 'Harita', soz: 'compact yapalım hazırlık' })
+    const onceSatir = fs.readFileSync(defter.defterYolu(), 'utf8').trim().split('\n').length
+    expect(defter.kayitlariOku().map((k) => k.soz)).toEqual(['compact yapalım hazırlık'])
+    const s = defter.gorunur({ sid: ARAC, rol: 'OPS' })
+    expect(s).toHaveLength(1)
+    expect(s[0]).toContain('compact yapalım hazırlık')
+    expect(fs.readFileSync(defter.defterYolu(), 'utf8').trim().split('\n')).toHaveLength(onceSatir) // dosya silinmedi
+  })
+
+  it('vitest kurulumu defteri geçici dizine yönlendirir: gerçek ev dizinindeki defter DEĞİL', () => {
+    // beforeEach kendi tmp yolunu verir; kurulumun yönlendirmesi kök sürecin başlangıç değeridir
+    const baslangic = eskiEnv.VENTHUB_RECEP_DEFTER
+    expect(baslangic).toBeTruthy()
+    expect(path.resolve(String(baslangic)).toLowerCase()).not.toBe(path.resolve(os.homedir(), '.claude', 'recep-sozu-defteri.jsonl').toLowerCase())
   })
 })
