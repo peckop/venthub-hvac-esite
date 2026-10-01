@@ -81,9 +81,9 @@ if [ -z "$PYTHON" ] && [ -n "$GRAPHIFY_BIN" ]; then
         *) "$_SHEBANG" -c "import graphify" 2>/dev/null && PYTHON="$_SHEBANG" ;;
     esac
 fi
-# 3. Fall back to python3 (Windows: python3 is often a Store stub, so probe it and fall back to python)
+# 3. Fall back to python, then python3 (Windows: python3 is often a Store stub whose mere call opens the Store, so never probe it first)
 if [ -z "$PYTHON" ]; then
-    if python3 -c "import sys" 2>/dev/null; then PYTHON="python3"; else PYTHON="python"; fi
+    if python -c "import sys" 2>/dev/null; then PYTHON="python"; elif python3 -c "import sys" 2>/dev/null; then PYTHON="python3"; else PYTHON="python"; fi
 fi
 if ! "$PYTHON" -c "import graphify" 2>/dev/null; then
     if command -v uv >/dev/null 2>&1; then
@@ -669,9 +669,9 @@ if [ ! -f graphify-out/.graphify_python ]; then
         PYTHON=$(head -1 "$GRAPHIFY_BIN" | tr -d '#!')
         case "$PYTHON" in *[!a-zA-Z0-9/_.@-]*) PYTHON="" ;; esac
     fi
-    # Windows: python3 is often a Store stub, so probe it and fall back to python
+    # Windows: python3 is often a Store stub whose mere call opens the Store, so probe python first
     if [ -z "$PYTHON" ]; then
-        if python3 -c "import sys" 2>/dev/null; then PYTHON="python3"; else PYTHON="python"; fi
+        if python -c "import sys" 2>/dev/null; then PYTHON="python"; elif python3 -c "import sys" 2>/dev/null; then PYTHON="python3"; else PYTHON="python"; fi
     fi
     mkdir -p graphify-out
     "$PYTHON" -c "import sys; open('graphify-out/.graphify_python', 'w', encoding='utf-8').write(sys.executable)"
