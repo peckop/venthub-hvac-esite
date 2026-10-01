@@ -96,6 +96,10 @@ export const YENI_KABUK_GEZINMESI = false
  *  1. `/en/…` görünür metninde Türkçe kelime **0** (REC-210 ile bugün karşılandı).
  *  2. 8 ailenin gerçek İngilizce adı yazılmış (REC-109).
  *  3. 23 aktif kategorinin İngilizce açıklaması dolu (REC-161 alanı açıyor).
+ *  ⚠2. maddenin ÖLÇÜLEBİLİR hâli (KATALOG ölçümü 2026-09-27, REC-300 Faz 3e-5): "EN adı TR adının aynısı" tek
+ *  başına hata DEĞİLDİR — 8 ailede EN=TR olan ad özel addır (marka/model adı). Hata olan: TR'de Türkçe harf ya da
+ *  kelime geçen adın EN'de AYNEN durması. Şart bu kuralla ölçülür; kategori tarafı 24/24 kategoride EN açıklama
+ *  dolu olarak ölçüldü (madde 3 karşılanmış görünüyor — açmadan önce yeniden ölçülür, bayat sayı sayılmaz).
  *
  * GERİ AÇMA: bu değeri `true` yap — site haritası EN adresleri yeniden ilan eder,
  * `noindex` düşer. Sonra Search Console'a yeni site haritası bildirilir. Başka hiçbir
