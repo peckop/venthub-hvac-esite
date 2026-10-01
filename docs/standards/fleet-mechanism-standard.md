@@ -2788,3 +2788,61 @@ yardım metninden *"atanin ekranina basilir"* **kalktı** · `gozcu.cjs` basım 
 **yok** (gerekçenin dayanağı; süzgeç eklenirse kol kırmızı verip gerekçenin yeniden ölçülmesini
 ister) · açılış satırı *"KANITLI"* demez ve sınıfı **damgadan** okur · yoklama sınırı koşulsuz
 basar · cetvel bu hükmü taşır.
+
+---
+
+## 35. PANO CANLILIĞININ GERÇEK KAYNAĞI `claude agents --json` — hayalet ve kayıp pencere (REC-524)
+
+**Ölçülmüş sorun (F8, 2026-09-30):** pano canlılığı **claim atışından** türetiliyordu (§0 madde 3). Atış,
+oturumun *yaşadığını* değil en son ne zaman atış *yazdığını* söyler. İki kör nokta: pencere kapandı ama
+4 saatlik kira dolmadı → şerit "canlı" görünür (**hayalet**); pencere açık ama hiç claim almadı → pano onu hiç
+göstermez (**kayıp pencere**).
+
+**Kaynak:** `claude agents --json` aktif oturumları verir (`pid`, `cwd`, `kind`, `startedAt`, `sessionId`, `name`,
+`status` busy/idle); daemon gerekmez; ölçüldü 2026-09-30, ~0,65 sn. Birleştirme anahtarı `sessionId` = pano `sid`.
+Mantık `scripts/board/canlilik.cjs`, kablo `board.cjs` `summary`.
+⚠`--all` KULLANILMAZ: `claude agents --help` ona "with --json: also include completed background sessions" der
+(bitmiş oturumlar canlılık kaynağı değildir); ayrıca `status: completed` kayıtlar ayrıştırmada atılır.
+
+| Durum | Koşul | Pano gösterimi |
+|---|---|---|
+| canlı | claim var + listede var | `●canlı/meşgul` ya da `●canlı/boşta`, ad `claude agents`'tan |
+| hayalet | claim var + listede yok | `○KAPALI(hayalet …)`; başlıkta sayılır; ad/şerit **çakışması** saymaz |
+| yeni süreç | claim'siz, `startedAt` < 5 dk | `◦YENİ SÜREÇ (henüz claim almadı, Ndk önce açıldı)` |
+| şeritsiz açık pencere | claim'siz, ≥ 5 dk (ya da `startedAt` yok) | `⚠ŞERİTSİZ AÇIK PENCERE` satırı |
+| alt süreç | claim'siz + (`kind` interaktif değil · ad `vh-…` · `cwd` son parçası `vh-…` worktree) | `◦ALT SÜREÇ N (ana pencere sayılmaz)`; **claim'i olan pencere asla alt süreç sayılmaz**; alt süreç "yeni" de sayılmaz |
+| ölçülemedi | `claude` yok · 8 sn'de dönmedi · JSON bozuk · çıkış kodu ≠ 0 | eski çıktı **aynen** + TEK satır `canlılık ölçülemedi (sebep)`; durum etiketi **basılmaz** |
+
+**Kurallar:** (1) fail-open ama **sessiz değil** — "ölçemedim" ne "hepsi canlı" ne "hepsi kapalı" diye okunur;
+(2) `spawnSync` `timeout: 8000` + `windowsHide: true`; (3) 30 sn önbellek (`<pano dizini>/canlilik-onbellek.json`):
+**yalnız başarılı ölçüm ve zaman aşımı** önbelleklenir (ENOENT/bozuk JSON/çıkış kodu değil: hızlı hata 30 sn yalan
+sürmesin); önbellekten gelen satır `önbellek ≤30sn` etiketi taşır; önbellekte **çağıranın kendi oturumu yoksa**
+önbellek yok sayılır (30 sn içinde açılan pencere kendi claim'ini "hayalet" görmesin); (4) **izole pano**
+(`VENTHUB_BOARD_DIR` verilmiş — test/deneme) gerçek `claude`ı çağırmaz, çünkü sahte sid'ler gerçek listeyle
+birleşince hepsi "hayalet" görünürdü; `VENTHUB_CANLILIK_KAPALI=0` açar, `=1` kapatır, `VENTHUB_CANLILIK_HAM=<dosya>`
+(test) her zaman açar; (5) kullanıcı ayar dizinindeki `sessions/<pid>.json` ad kaynağı **yedek** olarak durur, `claude agents` adı
+üstüne yazar; (6) `board-brief` (her tur) **değişmedi** — tur başına süreç açmaz; canlılık `who` ve SessionStart
+pano bloğunda.
+
+**Kapı:** `INV-PANO-CANLILIK-1..17` (`src/__tests__/conformance/pano-canlilik-claude-agents.test.ts`): hayalet ·
+şeritsiz pencere · alt süreç (+ claim'li pencere alt süreç değil) · meşgul/boşta · zaman aşımı (+ `--all` yok) ·
+bozuk JSON (tek satır, eski çıktı korunur) · boş dizi · `claude` yok (ENOENT, PATH boşken **gerçek** süreç yolu) ·
+önbellek · izole pano kural matrisi (hermetik) · hayalet çakışma saymaz · claim'siz + açık pencereler · önbellekte
+çağıran yoksa yeniden ölç · `completed` sayılmaz · hızlı hata önbelleklenmez + etiket + tmp çöp bırakmaz ·
+çıkış kodu · yeni süreç (< 5 dk). Her kolun sabotajı ölçülmüştür (REC-524 PR gövdesi).
+
+---
+
+## 36. ÖLÇÜM İÇİN AÇILAN `claude -p` ALT SÜRECİ — kabuk mirası sekme açar (OPS emri 2026-09-30)
+
+**Kural:** ölçüm ya da deneme için açılan **her** `claude -p` alt süreci `CLAUDE_CODE_ENTRYPOINT=sdk-cli` ile,
+`--no-session-persistence` bayrağıyla ve **oturum klasörünün değil scratchpad klasörünün** içinden koşar.
+
+**Niçin:** alt süreç kabuktan `CLAUDE_CODE_ENTRYPOINT=claude-vscode` değerini miras alırsa Recep'in editöründe
+**sekme olarak açılır** (YETENEK vakası 2026-09-30: dört kaydın dördünde `entrypoint=claude-vscode`). ARAÇ'ın dolaylı
+izi aynı yönde: kabuk mirasıyla açılan terminal denemeleri `claude-vscode` taşıdı, temiz ortamla (`CLAUDE*` değişkenleri
+silinip `Start-Process`) `entrypoint=cli` döndü (ARAÇ ekip deneyi 2, 2026-09-30).
+
+⚠**ÖLÇÜLMEDİ:** bu üç ayarın birlikte sekmeyi **gerçekten kapattığı** henüz ölçülmedi; kural OPS emridir. ARAÇ ölçümü
+yapacak (tek `claude -p`, önce/sonra oturum kayıtları, kabuk mirasıyla kontrol kolu); sonuç gelince bu paragraf güncellenir.
+Ölçülene kadar kural "güvenli taraf" olarak uygulanır, "kanıtlandı" diye anılmaz.

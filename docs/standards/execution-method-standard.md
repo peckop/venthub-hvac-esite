@@ -390,6 +390,11 @@ müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan
 2. **Planla:** işin şeklini ölç (kaç dosya, salt-okuma mı yazım mı) ve §2'den yöntemi seç; işe uyan skill'i
    `Skill` aracıyla çağır (hangi rol için hangisi: `SKILL_ATAMASI`); sapmayı yaz (§3).
 3. **Böl:** birbirinden bağımsız parçalara ayır; her parçaya **tek** çalışan türü ata (§10.3 tablo).
+   - Görev metnine kural, **proje kural metninden aynen kopyalanır; müdür yorum ya da genelleme eklemez.**
+     Vaka (ARAÇ deneyi 205, 2026-09-30): kör doğrulayıcı 41 hükümden 21'ini doğru, 9'unu yanlış, 11'ini sınırda
+     buldu; 9 yanlışın 8'i tek kuraldandı: görev metninde bağımlılık enjeksiyonu kuralı "bileşen ve servis
+     dosyasında" diye genişletilmişti, liderler harfiyen uyguladı. Kural yalnız `src/lib/services/**/*.ts` içindir
+     (`eslint.config.cjs`, `no-restricted-imports` bloğu; 2026-09-30 okundu). Hata modelde değil **aktarımdaydı**.
 4. **Denetle:** çalışan çıktısını kaynağına karşı örnekle: atıf gerçek mi, sayı komutla yeniden üretiliyor mu.
 5. **Bağımsız doğrulat:** işi yapmamış ayrı bir çalışana ver (§10.3); doğrulanmamış çıktı rapora girmez.
 6. **Raporla:** OPS'a ayrıntılı, Recep'e özet; ölçülmeyeni "ölçülmedi" yaz.
@@ -406,10 +411,28 @@ müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan
 **Ajan tipi:** araştırmacı ve doğrulayıcı için salt-okuma `Explore` tipi yeterlidir. Kendi alt ajanını açması gereken
 ekip lideri `general-purpose` olmalıdır (araçları "*"); `Explore` ve `Plan` tipleri alt ajan açamaz.
 
+**Model açıkça yazılır.** Kullanıcı ayarında `CLAUDE_CODE_SUBAGENT_MODEL` `sonnet` olarak tanımlıdır (kullanıcı ayar
+dosyası, 2026-10-01 okundu); `model` parametresi verilmeyen alt ajan **sessizce Sonnet'e** düşer. **Ölçüldü** (ARAÇ kontrol
+deneyi, HARİTA dökümü yeniden okudu, 2026-09-30): model parametresiz açılan yazıcı ajanın (a3ed24ff) döküm dosyasında
+`model` alanı yalnız `claude-sonnet-5-5`; `model: "haiku"` ile açılan çalışanların dökümlerinde yalnız
+`claude-haiku-4-5-20251001` (ilk 10 dosya okundu). Ajanın modelsiz açıldığı ARAÇ'ın beyanıdır; döküm bunu tek başına
+göstermez. Haiku (ya da Opus) istenen her `Agent` çağrısında `model` açıkça yazılır.
+
 **Sıra:** çalışan → müdür denetimi → bağımsız doğrulayıcı → müdür hükmü. Ekip liderli işte: çalışan → ekip liderinin
 denetimi → liderin çalıştırdığı bağımsız doğrulayıcı → lider özeti → müdür denetimi (özeti örnekler, kaynağa iner). **Bağımsızlık şartı:** doğrulayıcı
 üretenle aynı ajan değildir. Ölçüm yapılan işte soruları seçen ölçümü yapmaz, puanlayan cevap üretmez
 (kör puanlama). Mekanik okuma Sonnet'e, yargı ve sentez müdüre (§4, §5).
+
+**Ekip lideri çalışanlarını `run_in_background: false` ile TEK mesajda paralel açar.** Arka planda açılan çalışanların
+raporları müdürün bağlamına tekrar tekrar düşer (ARAÇ deneyi 205'te gözlendi). **Jeton maliyeti ÖLÇÜLMEDİ:** "yaklaşık
+30 bin" ARAÇ'ın kestirimidir, ölçüm olarak yazılmaz; ölçülen tek değer bir ürün liderinin 132 bin jetonudur (3/3 kusur
+bulundu, ret 0).
+
+**İstisna: mutasyon doğrulayıcısı.** Doğrulayıcı "yazmaz" kuralının tek istisnasıdır ve yalnız şu şartlarla: (1) **atılabilir
+worktree'de** üretim dosyasını geçici olarak değiştirir (testin gerçekten kırılıp kırılmadığını ölçmek için); (2) her
+mutasyondan sonra dosyanın **sha256** özetiyle geri alındığını doğrular; (3) **asla commit etmez**; (4) ana ağaçta,
+`migrations/` altında, `.sql` dosyalarında ve test dosyalarında **yasaktır**. YETENEK'in koşucusu (`mutasyon-testi` skill'i)
+bu şartları mekanik zorlar.
 
 **Vaka (2026-09-30, HARİTA):** beş araştırmacı beş yeni rol kartı taslağı yazdı. İşi yapmamış doğrulayıcı
 yaklaşık 55 iddiayı yeniden ölçtü ve **sekiz düzeltme kalemi** buldu: "30 fonksiyon" aslında 29 + `_shared`;
@@ -447,6 +470,15 @@ Claude Code sürümüyle değişebilir: bir sayıya dayanan iş, sayıyı önce 
 - **Ultracode ve 20 sınırı (belgede yazıyor, SINANMADI):** belgeye göre ultracode açıkken 20'lik sınır `Agent` aracıyla açılan alt ajanlara uygulanmaz; bu cümle ölçülmedi, ölçülene kadar ona güvenilmez. `ultracode` kelimesi yalnız o istem için ve yalnız insanın yazdığı istemde etkilidir (webhook, PR yorumu, `-p` ile gelende tetiklemez); `/effort ultracode` oturum boyunca, `ultracode` ayarı her oturumda açar.
 - **Workflow izni izin moduna göre değişir:** Auto modda yalnız İLK çalıştırmada sorar ve verilen herhangi bir "Yes" kullanıcı ayarına kalıcı yazılır (sonra sorulmaz); Manual ve accept-edits modunda her çalıştırmada sorar (kayıtlı workflow için "bir daha sorma" vardır); Bypass modunda ve `claude -p`/SDK'da sorulmaz (`Workflow` allow kuralı işler). Ultracode açıkken auto modda ilk onay da sorulmaz.
 - **Agent teams (ekip) AYRI KOŞUL:** deneysel ve varsayılan kapalı, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` gerekir; yalnız interaktif oturumda; oturumda tek ekip; **iç içe ekip yok** (üye ekip açamaz); üye sayısına sert sınır yok, öneri 3-5; üyeler liderin izin modunu miras alır (`dontAsk` hariç). Bu, alt ajan zincirinden (müdür → ekip lideri → çalışan) farklı bir mekanizmadır.
+- **Ekip lideri hangi yüzeyde olabilir (ölçüm, her biri TEK oturum; ARAÇ ekip deneyleri 2026-09-30 / 10-01):**
+  - **Etkileşimli terminal (`entrypoint=cli`): ekip KURULDU** — kullanıcı ayar dizinindeki `teams/` altında oturum klasörü ve `config.json`,
+    `Agent` + `name` ile açılan üye `in-process teammate` olarak kayıtlı (ekip deneyi 2).
+  - **Claude Desktop (Code sekmesi, `entrypoint=claude-desktop`): ekip KURULMADI** — iki denemede `Agent` + `name` ile
+    açılan üye düz alt ajan oldu, `config.json` oluşmadı, üyenin sistem isteminde `team-lead`/`teammate` yoktu; hata metni
+    yok, **sessizce** açılmadı. Dar okuma: Teammates paneli görülmedi, Recep teyit etmedi.
+  - **VS Code eklentisi (`stream-json`):** ölçüm yok; yalnız belgede (`agent-teams.md`) "`-p` ve SDK kipinde üye açılmaz".
+  - Sonuç: ekip özelliğinin lideri olacak oturum **etkileşimli terminalde** açılır; departman pencereleri (Desktop, eklenti)
+    bu iş için varsayılan olarak lider **sayılmaz**. Alt ajan zinciri (müdür → ekip lideri → çalışan) bu sınırdan etkilenmez.
 - ⚠**SINANMADI:** agent teams (ekip) üyelerinin "eşzamanlı 20" sınırına ayrı oturum olarak sayılıp sayılmadığı (yukarıdaki ölçüm ekip bayrağı kapalıyken yapıldı, belgede de yok).
 - **Bizim kuralımız (Recep: "sınır koymayız"):** bu sınırlara ilk takılışta ilgili ortam değişkeni artırılır; kota ya da varsayılan bahane edilip iş küçültülmez (§8: kapsamı kota daraltır, tamlık ölçütünü daraltmaz). Ayar değişikliği `.claude/settings.json` üzerinden yapılıyorsa OPS kapısıdır.
 
