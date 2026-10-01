@@ -73,8 +73,10 @@ Kaynak: Recep'in 2026-09-07 sabah hükmü (bir haftadır "iş açıldı mı, kim
 
 > **2026-10-01 (karar 219) okuma notu:** bu bölümde "Linear / kayıt / etiket" yerine **Kanban / kart / kart sahibi** okunur;
 > In Progress · Todo · In Review · Done = Kanban sütunları (`in-progress`, `todo`, `review`, `done`). Yukarıdaki
-> `santiye.py` hâlâ Linear'dan okur (veri/tarihçe sınıfı); Kanban kaynağına geçişi **HRT-3** kartıdır, o bitene kadar
-> iş dağılımı tablosu Kanban'ı yansıtmaz ve elle ölçülür. Kural metni yürürlüktedir, betik geride kalmıştır.
+> `santiye.py` artık VARSAYILAN olarak canlı Kanban'dan okur (**HRT-3**, `scripts/nlm/kanban_disa_aktar.py`: pano SQLite'ı
+> salt okunur; şerit = pano, durum = sütun; "Linear Bekleyenler" panosu HAVUZ şeridi, limit dışı). Eski Linear kaynağı yalnız
+> `--json/--tarih` ile. Sınırlar (≤1 yapılıyor, ≤3 sırada) olduğu gibi duruyor ve bugünkü panoda ALTYAPI ve OPS'ta KIRMIZI verir:
+> sınırların Kanban'da da geçerli olup olmadığı OPS kararıdır. "Recep kapısı" etiketi Kanban kartlarında henüz kullanılmıyor.
 
 1. **Sahiplik = etiket.** Şerit etiketleri: URUN · URUN-KATALOG · ALTYAPI · OPS · DESIGN. Etiketsiz kayıt SAHİPSİZ'dir ve tabloyu KIRMIZI yapar; proje sessizce sahip yapmaz (09-07 ölçümü: proje ölçütü Katalog'a 8 iş sayıyordu, gerçek 1).
 2. **Şerit başına "yapılıyor" (In Progress) ≤ 1, "sırada" (Todo) ≤ 3.** Aşım KIRMIZI; şerit Kanban'ı gerçek duruma çekmeden yeni iş almaz. "Recep kapısı" etiketli kayıt "yapılıyor" limitinden muaftır (bekleyen Recep'tir, şerit değil).
