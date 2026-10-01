@@ -8,13 +8,25 @@
  * "series" cetvelde AİLE demektir; alt kategori sayfasına giden düğme "Explore Series"
  * olamaz, düğme "Explore" olur.
  *
- * Kapı yalnız sözlük DEĞER dizgelerini tarar (yorum satırları taranmaz); yasak yazımlar:
- *   "Sub Product Groups", "Sub-categories", "Sub Categories" (büyük/küçük harf fark etmez).
- * Doğru yazım: "Subcategories". TR sözlüğüne dokunulmaz ("Alt Ürün Grupları" kalır).
+ * KAPI NASIL TARAR (ilk sürüm satır-regex'iydi ve KÖRDÜ — çürütme 2026-10-01, gerçek mutasyonla):
+ * dizi elemanı (`['Sub Product Groups']`), değeri sonraki satırda olan alan ve eşanlamlılar
+ * ('Sub Families', 'Sub Groups') kaçıyordu. Şimdi TypeScript derleyici API'siyle kaynak AST'ye
+ * çevrilir ve TÜM metin düğümleri (StringLiteral, NoSubstitutionTemplateLiteral,
+ * TemplateHead/Middle/Tail) toplanır. Yorumlar AST'de metin düğümü değildir, kendiliğinden dışarıda.
+ * Mantık `yasakliAdlariBul(kaynakMetni)` yardımcısındadır; gerçek dosyalar da sabotaj dizgeleri
+ * de AYNI fonksiyondan geçer.
+ *
+ * Yasak yazımlar (büyük/küçük harf; boşluk, çift boşluk, NBSP, tire varyantları fark etmez):
+ *   "Sub Product Groups", "Sub-categories", "Sub Categories" (ve tekil sub-category),
+ *   "Sub Families", "Sub Groups". Doğru yazım: "Subcategory" / "Subcategories".
+ * KAPIYA GİRMEYENLER (bilerek): "sub-series", "sub-family" — ölü anahtarlarda (en.ts home.hero.metrics,
+ * home.guidedDiscovery) duruyor, müşteriye görünen ad kararı bekliyor (BELİRSİZ).
+ * TR sözlüğüne dokunulmaz ("Alt Ürün Grupları" kalır).
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 const SOZLUK_DIZINI = join(process.cwd(), 'src', 'i18n', 'dictionaries')
@@ -28,50 +40,102 @@ const enDosyalar = (): string[] => {
   return [join(SOZLUK_DIZINI, 'en.ts'), ...admin]
 }
 
-/** `anahtar: 'değer'` / `"değer"` / `` `değer` `` biçimindeki DEĞER dizgeleri; yorum satırları atlanır. */
-const DEGER = /:\s*(['"`])((?:\\.|(?!\1)[^\\])*)\1/g
-
-const degerler = (kaynak: string): string[] => {
+/** Kaynaktaki bütün metin düğümlerinin çözülmüş (kaçışsız) metinleri. Yorumlar dahil DEĞİL. */
+const metinleriTopla = (kaynakMetni: string): string[] => {
+  const kaynak = ts.createSourceFile('sozluk.ts', kaynakMetni, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
   const cikti: string[] = []
-  for (const satir of kaynak.split('\n')) {
-    if (/^\s*(\/\/|\*|\/\*)/.test(satir)) continue
-    for (const m of satir.matchAll(DEGER)) cikti.push(m[2] ?? '')
+  const gez = (dugum: ts.Node): void => {
+    if (
+      ts.isStringLiteral(dugum) ||
+      ts.isNoSubstitutionTemplateLiteral(dugum) ||
+      ts.isTemplateHead(dugum) ||
+      ts.isTemplateMiddle(dugum) ||
+      ts.isTemplateTail(dugum)
+    ) {
+      cikti.push(dugum.text)
+    }
+    ts.forEachChild(dugum, gez)
   }
+  gez(kaynak)
   return cikti
 }
 
-const YASAK_YAZIMLAR = [
-  { ad: 'Sub Product Groups', desen: /sub\s+product\s+groups?/i },
-  { ad: 'Sub-categories / Sub Categories', desen: /sub[\s-]+categor/i },
+/** Ayraç: boşluk (NBSP dahil, \s), çift boşluk, tire/kısa çizgi/eksi varyantları. */
+const AYRAC = '[\\s\\u00a0\\u2010-\\u2015\\u2212-]+'
+
+const YASAK_YAZIMLAR: ReadonlyArray<{ ad: string; desen: RegExp }> = [
+  { ad: 'Sub Product Groups', desen: new RegExp(`sub${AYRAC}product${AYRAC}groups?`, 'i') },
+  { ad: 'Sub-categories / Sub Categories', desen: new RegExp(`sub${AYRAC}categor(?:y|ies)`, 'i') },
+  { ad: 'Sub Families', desen: new RegExp(`sub${AYRAC}families`, 'i') },
+  { ad: 'Sub Groups', desen: new RegExp(`sub${AYRAC}groups`, 'i') },
 ]
 
+/** Kaynak metnindeki her metin düğümünü yasak yazımlara karşı tarar; ihlal satırları döner. */
+const yasakliAdlariBul = (kaynakMetni: string): string[] => {
+  const ihlaller: string[] = []
+  for (const metin of metinleriTopla(kaynakMetni)) {
+    for (const { ad, desen } of YASAK_YAZIMLAR) {
+      if (desen.test(metin)) ihlaller.push(`"${metin}" (${ad})`)
+    }
+  }
+  return ihlaller
+}
+
 describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazımı', () => {
-  it('sabotaj kanıtı: desenler yasak yazımı gerçekten yakalar, doğru yazımı yakalamaz', () => {
-    const kotu = "      subGroups: 'Sub Product Groups',"
-    expect(degerler(kotu)).toEqual(['Sub Product Groups'])
-    expect(YASAK_YAZIMLAR[0]?.desen.test(degerler(kotu)[0] ?? '')).toBe(true)
-    expect(YASAK_YAZIMLAR[1]?.desen.test('Sub-categories')).toBe(true)
-    expect(YASAK_YAZIMLAR[1]?.desen.test('Sub Categories')).toBe(true)
-    expect(YASAK_YAZIMLAR[1]?.desen.test('Subcategories')).toBe(false)
-    // Yorum satırı değer sayılmaz.
-    expect(degerler("// subGroups: 'Sub Product Groups'")).toEqual([])
+  it('sabotaj kanıtı: yasakliAdlariBul her yazım biçimini yakalar', () => {
+    const kotuKaynaklar: ReadonlyArray<readonly [string, string]> = [
+      ['alan değeri', "const a = { subGroups: 'Sub Product Groups' }"],
+      ['çift tırnak', 'const a = { subGroups: "Sub Product Groups" }'],
+      ['dizi elemanı', "const a = { pitfalls: ['Sub Product Groups'] }"],
+      ['dizi ilk elemanı', "const a = { steps: ['Sub-categories', 'Explore'] }"],
+      ['dizi son elemanı', "const a = { steps: ['Explore', 'Sub Categories'] }"],
+      ['değer sonraki satırda', "const a = {\n  subGroups:\n    'Sub Product Groups',\n}"],
+      ['eşanlamlı Sub Families', "const a = { x: 'Sub Families' }"],
+      ['eşanlamlı Sub Groups', "const a = { x: 'Sub Groups' }"],
+      ['şablon dizgesi (ikamesiz)', 'const a = { x: `Sub Categories` }'],
+      ['şablon başı', 'const a = { x: `Sub Categories of ${ad}` }'],
+      ['şablon ortası', 'const a = { x: `${ad} Sub Groups ${sayi}` }'],
+      ['şablon sonu', 'const a = { x: `${ad} Sub Families` }'],
+      ['NBSP', "const a = { x: 'Sub Product Groups' }"],
+      ['çift boşluk', "const a = { x: 'Sub  Categories' }"],
+      ['tire', "const a = { x: 'Sub-Categories' }"],
+      ['tekil', "const a = { x: 'Sub-category' }"],
+      ['küçük harf', "const a = { x: 'sub product groups' }"],
+      ['kaçışlı dizgede', "const a = { x: 'Sub\\u0020Categories' }"],
+    ]
+    for (const [ad, kaynak] of kotuKaynaklar) {
+      expect(yasakliAdlariBul(kaynak), ad).not.toEqual([])
+    }
   })
 
-  it('tarama gerçekten değer okuyor (boş taramayla yeşil olamaz)', () => {
-    const en = readFileSync(join(SOZLUK_DIZINI, 'en.ts'), 'utf8')
-    const tum = degerler(en)
+  it('sabotaj kanıtı: meşru yazımlar ve yorumlar yanlış pozitif vermez', () => {
+    const temizKaynaklar: ReadonlyArray<readonly [string, string]> = [
+      ['Subcategories', "const a = { x: 'Subcategories' }"],
+      ['Subcategory', "const a = { x: 'Subcategory' }"],
+      ['sayılı şablon', 'const a = { x: `${n} Subcategories` }'],
+      ['sub-series kapı dışı', "const a = { x: 'sub-series structure' }"],
+      ['sub-family kapı dışı', "const a = { x: '{{count}} series and sub-family routes' }"],
+      ['satır yorumu', "// subGroups: 'Sub Product Groups'\nconst a = 1"],
+      ['blok yorumu', "/* 'Sub Categories' */ const a = 1"],
+      ['yorumdaki sub-categories', '// REC-103: the six missing sub-categories.\nconst a = 1'],
+      ['tek sözcük Subgroups', "const a = { x: 'Subgroups' }"],
+    ]
+    for (const [ad, kaynak] of temizKaynaklar) {
+      expect(yasakliAdlariBul(kaynak), ad).toEqual([])
+    }
+  })
+
+  it('tarama gerçekten metin okuyor (boş taramayla yeşil olamaz)', () => {
+    const tum = metinleriTopla(readFileSync(join(SOZLUK_DIZINI, 'en.ts'), 'utf8'))
     expect(tum.length).toBeGreaterThan(1000)
     expect(tum).toContain('Subcategories')
+    expect(enDosyalar().length).toBeGreaterThan(10)
   })
 
-  it('en.ts ve admin *.en.ts değerlerinde yasak yazım yok', () => {
+  it('en.ts ve admin *.en.ts içinde yasak yazım yok (gerçek dosyalar, 0 ihlal)', () => {
     const ihlaller: string[] = []
     for (const dosya of enDosyalar()) {
-      for (const deger of degerler(readFileSync(dosya, 'utf8'))) {
-        for (const { ad, desen } of YASAK_YAZIMLAR) {
-          if (desen.test(deger)) ihlaller.push(`${dosya} → "${deger}" (${ad})`)
-        }
-      }
+      for (const ihlal of yasakliAdlariBul(readFileSync(dosya, 'utf8'))) ihlaller.push(`${dosya} → ${ihlal}`)
     }
     expect(ihlaller).toEqual([])
   })
@@ -83,15 +147,18 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
   })
 
   /**
-   * ALT KATEGORİ DÜZEYİNİ adlandıran anahtarlar (tüketici dosyası açılıp düzey kodla doğrulandı):
+   * ALT KATEGORİ DÜZEYİNİ adlandıran anahtarlar (tüketici dosyaları açılıp düzey kodla doğrulandı):
    *  - category.showcase.subGroups       → CategoryShowcaseView (alt kategori ızgarası başlığı), CategorySeriesView (alt kategori bağlantı şeridi)
    *  - category.showcase.exploreSeries   → CategoryShowcaseView (kart, alt kategori sayfasına gider)
-   *  - category.allSeries/chooseSeriesDesc/inspectSeries → components/category/CategoryShowcase.tsx (alt kategori kartları)
+   *  - category.allSeries/chooseSeriesDesc/inspectSeries → components/category/CategoryShowcase.tsx.
+   *    ⚠ÖLÜ BİLEŞEN: hiçbir dosya import etmiyor (useCategoryViewModel.ts:79; catalog-integrity-baseline.json
+   *    ÖLÜ DOSYA kaydı), müşteriye görünmez. İleride canlanırsa terim tutarlı olsun diye çevrildi.
    *  - category.subcategories            → CategoryFilters (alt kategori listesi)
    *  - products.orbital.subcategoriesTitle, products.radialMenu.subcategoriesCount/noSubcategories → alt kategori düzeyi
    *  - megamenu.categoryHub.subCategoryCount → alt kategori sayısı
    * "series" cetvelde AİLE demektir; bu düzeyi adlandıran değerde "series" geçemez ve
    * değer "Subcategor..." ya da düğme ise "Explore" olmalıdır.
+   * KAPSAM DIŞI: category.series.seriesDetail/technicalFamily/heroDefaultDesc (karar bekliyor).
    */
   it('alt kategori düzeyi anahtarlarında "series" geçmez; terim "Subcategories" ya da düğme "Explore"', async () => {
     const { en } = await import('../../i18n/dictionaries/en')
@@ -122,12 +189,11 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
     expect(ihlal).toEqual([])
   })
 
-  it('sabotaj kanıtı: "series" yasağı ve düğme koşulu eski değerleri yakalar', () => {
+  it('sabotaj kanıtı: "series" yasağı eski değerleri yakalar', () => {
     expect(/\bseries\b/i.test('All Series')).toBe(true)
     expect(/\bseries\b/i.test('Choose the series that suits your needs')).toBe(true)
     expect(/\bseries\b/i.test('Explore Series')).toBe(true)
     expect(/\bseries\b/i.test('All Subcategories')).toBe(false)
-    expect(/subcategor/i.test('Sub Product Groups')).toBe(false)
     const eskiDugme: string = 'Inspect Series'
     expect(eskiDugme !== 'Explore').toBe(true)
   })
