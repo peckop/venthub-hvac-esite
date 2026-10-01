@@ -116,6 +116,8 @@ const RECEP_KAPILARI = [
   '3. Geçmişi silen ya da zorlayan git komutu.',
   '4. Canlı veritabanına yazım.',
   '5. Para harcatan her şey (ücretli plan, servis, satın alma).',
+  '',
+  'Yukarıdaki 1-5. kapılar Recep\'te kalır. Bunların dışındaki onayı Recep yalnız OPS penceresinde verir; aktarım yalnız OPS\'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekiyorsa metni hazırla, OPS uygular.',
   'CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS\'a gider, Recep\'e OPS götürür.',
 ].join('\n')
 
@@ -182,7 +184,7 @@ const ARKA_OFIS_YASAGI = ' Genel arka ofis modülünü (stok, satınalma, CRM, t
 /** Rol verisi. `durum`: kartın kendisini de ilgilendiren canlılık bilgisi. */
 const ROLLER = {
   OPS: {
-    gorev: 'Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını kendi cümlesiyle OPS panosundaki REC-425 kartına not olarak kaydeder (Linear\'a yazılmaz). Kanban panolarını (ortak "Bekleyenler" + departman başına) ve Linear\'ın donukluğunu (karar 219) gözler; Linear\'a yeni iş kaydı açılmaz.',
+    gorev: 'Filonun orkestratörü ve genel müdürü (yürütmenin başı, sahibe karşı tek sorumlu yüz): sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını kendi cümlesiyle OPS panosundaki REC-425 kartına not olarak kaydeder (Linear\'a yazılmaz). Kanban panolarını (ortak "Bekleyenler" + departman başına) ve Linear\'ın donukluğunu (karar 219) gözler; Linear\'a yeni iş kaydı açılmaz.',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
     yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',

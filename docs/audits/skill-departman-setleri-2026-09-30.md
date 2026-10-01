@@ -332,7 +332,9 @@ Bu bölümdeki skill'lerde dikkat:
 | design-system, design-critique, design-craft (15,8K) | Uygulayıcı, Doğrulayıcı | TASARIM URUN ADMIN | UYARLA-AL (`design` aracı yok; OKLCH ve HEX örnekleri kural 8'e çevrilir) |
 | web-platform-baseline (6,2K) | Araştırmacı | TASARIM URUN ADMIN GEO-SEO I18N | UYARLA-AL |
 
-Müdür ve ekip lideri düzeyinde kalanlar (çalışan setine girmez): multi-agent, refactor-planner, sdd, mnemosyne, wrongstack-kanban, wrongstack-mailbox-mcp. Hiçbir departmana bağlanmayanlar: docker-deploy, plugin-author, audit-log. Alınamayan: auto-review (çalıştıracak ana program yok).
+Müdür ve ekip lideri düzeyinde kalanlar (çalışan setine girmez): multi-agent, refactor-planner, sdd, mnemosyne, wrongstack-kanban, wrongstack-mailbox-mcp.
+
+**Müdür çekirdeği (karar 219, 2026-10-01; YETENEK, YTN-1):** `wrongstack-kanban` **her departman penceresinin (müdürün) çekirdek skill'idir**: kart açma, havuzdan iş alma, kanıt komutuyla Done müdürün işidir. Bu satır çalışan setlerini DEĞİŞTİRMEZ ve bilerek öyle: kartı çalışan açıp kapatırsa §10.4 ("çalışan başka pencereye yazmaz") ve skill'in maliyet kuralı ("toplu yazım alt ajana verilmez", her yazma pano boyunca 7-12 KB döndürür) bozulur. Çalışan, kart okuması gerekirse (`get_task`, ~4 KB) görev metninde adı verilmiş olarak yalnız OKUR. Müdür pencerelerinde `skills:` ön yüklemesi yoktur; müdür skill'i `Skill` aracıyla adıyla çağırır, 63 proje skill'inin tamamı Sonnet 1M listesinde açıklamalıdır (10-01 kesin sayım). Hiçbir departmana bağlanmayanlar: docker-deploy, plugin-author, audit-log. Alınamayan: auto-review (çalıştıracak ana program yok).
 
 ## 7. Üretici girdisi
 

@@ -255,6 +255,86 @@ function tumTalepler(now = Date.now()) {
   return out
 }
 
+/**
+ * BİR OTURUMUN KENDİ talep geçmişi — süresi dolmuş / düşmüş talep DAHİL (claim yenileme için).
+ *
+ * NİÇİN AYRI: `liveClaims`/`tumTalepler` (a) PRUNE_MS'ten eski dosyaları HİÇ açmaz ve (b) tüm oturumları birleştirir.
+ * Makine gece kapanıp sabah `resume` olunca oturumun dosyası 24 saatten eskidir → o talep panodan tamamen "yokmuş"
+ * gibi düşer; yenileme kararı için tam da o geçmişe bakmak gerekir. Bu fonksiyon YALNIZ verilen sid'in kendi dosyasını
+ * okur (tek sahiplik: başka oturumun geçmişine dokunulmaz) ve `liveClaims` ile AYNI birleştirme kuralını uygular
+ * (globlar birleşir, `exact` ezer, kıdem = ilk claim, heartbeat kirayı uzatır, release kapatır).
+ *
+ * DÖNÜŞ: `{durum:'yok'}` (dosya/claim yok) · `{durum:'birakildi'}` (son hareket release: BİLİNÇLİ kapanış) ·
+ * `{durum:'talep', canli, lane, globs, ts, heartbeat, ttlMs, yasDk}`. Okuma hatası (ENOENT dışı) FIRLATIR — çağıran
+ * fail-open karar verir; sessizce "yok" demek, okunamayan geçmişi "geçmiş yok" saymak olurdu.
+ * Bozuk satır atlanır ve `bozukSatir` sayısı döner (tek bozuk satır sessizce geçilmez).
+ */
+function gecmisTalep(sid, now = Date.now()) {
+  let raw
+  try { raw = fs.readFileSync(sessionFile(sid), 'utf8') } catch (e) {
+    if (e && e.code === 'ENOENT') return { durum: 'yok', bozukSatir: 0 }
+    throw e
+  }
+  let c = null
+  let birakildi = false
+  let bozukSatir = 0
+  for (const line of raw.split('\n')) {
+    if (!line.trim()) continue
+    let e
+    try { e = JSON.parse(line) } catch { bozukSatir++; continue }
+    if (!e || typeof e !== 'object' || (e.sid && e.sid !== sid)) continue
+    if (e.type === 'claim') {
+      const globs = Array.isArray(e.globs) ? e.globs : []
+      c = {
+        lane: e.lane || (c && c.lane) || 'lane',
+        globs: c && !e.exact ? [...new Set([...c.globs, ...globs])] : globs,
+        ts: c ? c.ts : e.ts,
+        heartbeat: e.ts,
+        ttlMs: typeof e.ttlMs === 'number' ? e.ttlMs : DEFAULT_TTL_MS,
+      }
+      birakildi = false
+    } else if (e.type === 'heartbeat') {
+      if (c) c.heartbeat = e.ts
+    } else if (e.type === 'release') {
+      c = null
+      birakildi = true
+    }
+  }
+  if (!c) return { durum: birakildi ? 'birakildi' : 'yok', bozukSatir }
+  const yasMs = now - Date.parse(c.heartbeat)
+  return {
+    durum: 'talep',
+    canli: Number.isFinite(yasMs) && yasMs <= c.ttlMs,
+    ...c,
+    yasDk: Number.isFinite(yasMs) ? Math.max(0, Math.round(yasMs / 60000)) : null,
+    bozukSatir,
+  }
+}
+
+/** Glob'un joker öncesi sabit öneki (`src/app/**` → `src/app/`). */
+function globOneki(glob) {
+  const norm = String(glob).replace(/\\/g, '/').toLowerCase()
+  const i = norm.search(/[*?[{]/)
+  return i < 0 ? norm : norm.slice(0, i)
+}
+
+/**
+ * İki glob ÇAKIŞIYOR mu? (talep-talep; `findConflict` yol-talep karşılaştırır.) MUHAFAZAKÂR: kesin bilemediği
+ * durumda "çakışır" der — yenileme için yanlış-pozitif yalnız UYARIDIR (claim alınmaz), yanlış-negatif ise iki
+ * oturumun aynı yolu tutmasıdır. Kurallar: biri ötekinin örneği (`a/**` ↔ `a/b/**`, literal yol ↔ glob) ya da sabit
+ * önekleri iç içe (`src/**\/x.ts` ↔ `src/a/**`). Boş/geçersiz girdi çakışmaz.
+ */
+function globCakisir(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || !a.trim() || !b.trim()) return false
+  const na = a.replace(/\\/g, '/')
+  const nb = b.replace(/\\/g, '/')
+  if (na.toLowerCase() === nb.toLowerCase()) return true
+  if (globToRegExp(na).test(nb) || globToRegExp(nb).test(na)) return true
+  const pa = globOneki(na)
+  const pb = globOneki(nb)
+  return pa.startsWith(pb) || pb.startsWith(pa)
+}
+
 /** Glob → RegExp. `**` her şeyi, `*` tek segmenti karşılar. */
 function globToRegExp(glob) {
   const norm = String(glob).replace(/\\/g, '/')
@@ -641,6 +721,7 @@ module.exports = {
   taramaDurumu, teslimDurumu, teslimKanitSinifi, esikleriOku, ESIK_ADLARI,
   EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
   globToRegExp, toRepoRelative, repoRootFor, agacKonumu, ayrismaSay,
+  gecmisTalep, globCakisir, OTURUM_KAYIT_DIZINI,
 }
 
 /**

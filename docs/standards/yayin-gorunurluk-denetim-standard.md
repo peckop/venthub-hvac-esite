@@ -31,18 +31,18 @@ Araçlar **kurulmaz**: sürüm sabitli `npx` ile koşar, `package.json`'a dokunu
 ALTYAPI'da, `bagimlilik-kararlari.md`). Her betik `--taban` alır: canlı, yerel ön izleme ya da dal önizlemesi.
 
 **Ölçüm verisinin yeri:** çalışma kopyası depo dışında sabit klasör `~/venthub-olcum/<an>-<tarih>/`
-(oturum geçici klasörü kalıcı yer değildir); kalıcı kopya ilgili Linear kaydına ek (REC-300 / REC-369). PUBLIC
+(oturum geçici klasörü kalıcı yer değildir); kopyanın yolu ilgili Kanban kartına not olarak yazılır (karar 219; dosya depo dışı ve tek makinededir, yedek yeri ayrı karardır; REC-300 / REC-369 eski Linear kayıtlarıdır). PUBLIC
 depoya yalnız özet sayı girer.
 
 ## Y2 — Ne zaman ne koşulur
 
 | An | Koşu | Evren | Çıktı |
 |---|---|---|---|
-| **Taban** (yayından önce, canlı) | gsc-taban · adres-yayin-denetim (`--eski` verilmez → bugünkü site haritası `eski-adresler.json` olarak kaydedilir) · link-tara · sayfa-kalite · bot-karnesi | canlı site haritası | Linear kaydına ek |
+| **Taban** (yayından önce, canlı) | gsc-taban · adres-yayin-denetim (`--eski` verilmez → bugünkü site haritası `eski-adresler.json` olarak kaydedilir) · link-tara · sayfa-kalite · bot-karnesi | canlı site haritası | Kanban kartına not + depo dışı dosya yolu |
 | **Ön izleme** (Faz 4, yerel üretim paketi) | adres-yayin-denetim `--taban <önizleme> --eski <taban listesi + plan §6 tam envanteri> --harita <eski-adres-haritasi.json> --model-beklenen 442 --sayfa-denetimi` · link-tara · bot-karnesi | ön izleme | kusur listesi → sahibine |
-| **Yayın günü** (Faz 3-C deploy sonrası) | gsc-taban (son taban) · adres-yayin-denetim (ön izlemeyle aynı bayraklar, canlıya) · link-tara · sayfa-kalite + `--kiyas` | canlı | aynı gün Linear + OPS |
-| **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Linear |
-| **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar REC numarasıyla) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili REC kaydı |
+| **Yayın günü** (Faz 3-C deploy sonrası) | gsc-taban (son taban) · adres-yayin-denetim (ön izlemeyle aynı bayraklar, canlıya) · link-tara · sayfa-kalite + `--kiyas` | canlı | aynı gün Kanban kartı + OPS |
+| **+1, +7, +28 gün** | adres-yayin-denetim · link-tara · gsc-taban (+7 ve +28'de tabanla kıyas) · sayfa-kalite (+7) | canlı | Kanban kartı |
+| **Her production dağıtımı sonrası + günlük** | canli-kapi (`--bilinen` ile bilinen kırmızılar kart numarasıyla; eski kayıtlarda REC-nn) — workflow ALTYAPI tarafından eklenecek (`workflow_run` + `schedule`, REC-502) | canlı | kırmızı çıkış → ilgili Kanban kartı |
 
 EN_YAYIN kapalıyken `--en-harita-disi-bilincli` verilir: EN alternatifinin haritada olmaması kırmızı değil,
 ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalkar.

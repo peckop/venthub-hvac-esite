@@ -203,6 +203,9 @@ describe('INV-PANO-CANLILIK · pano canlilik `claude agents --json` ile beslenir
     expect(canlilik.altSurecMi(p({ sessionId: 'x2', name: 'gozlemci', cwd: 'C:\\tmp\\vh-arac-12' }))).toBe(true)
     expect(canlilik.altSurecMi(p({ sessionId: 'x3', name: 'bg', kind: 'background' }))).toBe(true)
     expect(canlilik.altSurecMi(p({ sessionId: 'x4', name: 'Yetenek' }))).toBe(false)
+    // Desktop'in arka planda actigi scratchpad surecleri (ad ya da cwd'nin son parcasi) tavani sahte doldurmasin
+    expect(canlilik.altSurecMi(p({ sessionId: 'x5', name: 'scratchpad-3f2a' }))).toBe(true)
+    expect(canlilik.altSurecMi(p({ sessionId: 'x6', name: '', cwd: 'C:\\Users\\a\\AppData\\Local\\Temp\\claude\\c--x\\abc\\scratchpad' }))).toBe(true)
 
     const b = canlilik.birlestir(
       [{ sid: D }],

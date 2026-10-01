@@ -5,6 +5,9 @@
 > yerinde kalır (`standards/belge-yonetimi-standard.md` B2). Çelişirse bu dosya güncellenir, CLAUDE.md'ye haber verilir.
 > Kural: her konunun **tek otoritesi** vardır; diğer dosyalar onu tekrar etmez, **referans verir**.
 > Haritada olmayan belge ajan için yoktur: yeni cetvel bu dosyaya satırı eklenmeden bitmiş sayılmaz.
+> **Şirket çerçevesi (OPS'un özeti, Recep'in "sen yöneticisin" sözüne dayanır, 2026-10-01):** Recep = şirket sahibi; **OPS = genel müdür** (yürütmenin başı,
+> sahibe karşı tek sorumlu yüz; Recep'in onayını aktarabilen tek pencere); departman penceresi = departman müdürü;
+> alt ajan = çalışan; skill = uzmanlık. Onay yolu: `standards/fleet-mechanism-standard.md` §17 Kural 4 (karar 224).
 
 ## Haritaların haritası — hangi soruda hangi harita
 
@@ -61,6 +64,7 @@
 | Bir iş **hangi yöntemle** koşar (şerit / alt ajan / Workflow / maestro / skill / elle), emirde `YÖNTEM:` satırı? Alt ajanın modeli, ekip lideri, ekip (agent teams) hangi yüzeyde kurulur? | `standards/execution-method-standard.md` (§10.3 model ve mutasyon istisnası, §10.5 ekip yüzeyi) |
 | Bir şeye "**yok / bulunamadı / desteklemiyor**" demeden önce neyi, nerede, hangi yöntemle aramalıyım? | `standards/execution-method-standard.md` §9 (yokluk hükmü) |
 | Bir departmanın (OPS, ARAC, ALTYAPI, HARITA, URUN, ADMIN, KATALOG, GEO-SEO, BLOG, MARKA) görevi, dosyaları, yetkisi ve Recep kapıları ne? | `roller/<DEPARTMAN>.md` (rol kartı; üretici `scripts/belge/rol-karti-uret.cjs`, REC-426) |
+| Bir departmanın **çalışan** (alt ajan) tanımı hangi skill'lerle ve hangi araç sınırıyla gelir? | `.claude/agents/<departman>-<tur>.md` (üretilmiş, elle düzenleme yok; üretici `scripts/belge/ajan-tanimi-uret.cjs`, girdi `docs/audits/skill-departman-setleri-2026-09-30.json`, kapı INV-AJAN-TANIM-1). Bağlam maliyeti (ölçüm 2026-10-01): tanım başına ~96 jeton, 50 tanım ≈ 4,8k; her oturumun ve her alt ajanın ilk çağrısında bir kez; tavan 6k jeton (kapıda karakter karşılığı), aşan yeni tür OPS'a gider. |
 | Katalogdan ticarete hat — ürün nasıl girer, CSV, fiyat, şema, kategori? | `plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan uca pano) + `standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`; veri deposu kardeş depo `venthub-pdf-ingestor` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
