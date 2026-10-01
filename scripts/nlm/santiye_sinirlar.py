@@ -8,7 +8,7 @@ anda taşıdığı iş sayısıdır; çalışan (alt ajan) sayısı sınırsız 
 OPS panosu da aynı kurala tabidir (muafiyet yok). HAVUZ şeridi ("Linear Bekleyenler") limit dışıdır.
 
 Eski Linear kipi (--json/--tarih; yalnız tarihçe) 2026-09-07 sınırlarını korur: yapılıyor ≤1 (aşım KIRMIZI), sırada ≤3 (aşım SARI).
-Sınır değişirse yalnız bu dosya değişir; santiye.py ve test buradan okur.
+Sınır değişirse yalnız bu dosya değişir; santiye.py buradan okur (test eşikleri sınır değerleriyle kendi içinde sabit tutar: bir sınır değişince test bilerek kırılır).
 """
 
 KANBAN = {"yesil_en_fazla": 3, "sari_en_fazla": 5, "sirada_siniri": None}

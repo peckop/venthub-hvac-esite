@@ -171,6 +171,20 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
     expect(fs.readFileSync(path.join(KOK, 'docs/proje-takip/is-dagilimi.md'), 'utf-8')).toContain('EMEKLİ')
   })
 
+  it('hedef verilmezse VARSAYILAN çıktı depoya değil kullanıcı dizinine gider (repo PUBLIC: kart başlığı depoya sızmaz)', () => {
+    const ev = path.join(dizin, 'ev')
+    fs.mkdirSync(ev, { recursive: true })
+    const izlenen = path.join(KOK, 'docs/proje-takip/is-dagilimi.md')
+    const once = fs.readFileSync(izlenen, 'utf-8')
+    const env = { ...process.env, PYTHONIOENCODING: 'utf-8', HOME: ev, USERPROFILE: ev } as NodeJS.ProcessEnv
+    delete env.VENTHUB_SANTIYE_HEDEF
+    const r = spawnSync(PY as string, [SANTIYE, '--db', db], { encoding: 'utf-8', env })
+    expect(r.status, r.stderr).toBe(1)
+    const beklenen = path.join(ev, '.venthub', 'santiye', 'is-dagilimi.md')
+    expect(fs.existsSync(beklenen), `varsayılan hedef ${beklenen} oluşmadı`).toBe(true)
+    expect(fs.readFileSync(izlenen, 'utf-8'), 'depoda izlenen dosya DEĞİŞMEMELİ').toBe(once)
+  })
+
   it('pano dosyası yoksa çıkış 2 (sessiz yeşil yok)', () => {
     const d = py(DISA, ['--db', bosDb])
     expect(d.cikis).toBe(2)
