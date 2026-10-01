@@ -78,6 +78,12 @@ metadata:
 | **Sürücü harfi** duyarlı proje kimliği | `c:\…` ≠ `C:\…` iki ayrı kimlik verir | Pano küçük harfli kökle açılır; kimlik ölçülür |
 | Silme yüzeyi | `--destructive` silme/birleştirme/devretme açar | Kapalı kalır; kayıt yalnız gerekçeyle küçülür |
 | Alt süreç `process.env` kalıtır | sırlar çocuk sürece geçer | Kart açıklamasına ve kanıt komutuna sır yazılmaz |
+| **Yönetilen pano** (`adopt_managed_lifecycle`; atılabilir panoda ölçüldü, rapor `docs/audits/skill-yonetilen-pano-deneyi-2026-10-01.md`) | Kapıyı **araç** zorlar: kanıtsız `move_task` `REFUSED`; `mark_assignment(completed)` kanıtı kendisi koşturur, geçerse Done'a OTOMATİK alır, kırmızıysa kart Review'da bekler ve elle Done da reddedilir | Kart: açıklama + `add_check` + `start_task` (kiralama) + `mark_assignment`. Kırmızı kanıtı "geçti"ye çevirmek ya da kanıtı silmek **yasak** (araç da bunu yazar). Gerçek panoya geçiş kararı OPS'undur |
+| **`release_managed_lifecycle` kapıyı tamamen kaldırır** | Geri dönüşten sonra kırmızı kanıtlı kart `move_task` ile Done'a geçti | Gerçek panoda **çağrılmaz** |
+| **Kiralama kendiliğinden temizlenmez** (yönetilmeyen pano; yönetilen panoda otomatik kurtarma **ölçülmedi**, pilotta ölçülür) | Süre dolunca kart "running" kalır (2 dk sonra hâlâ); `recover_stale` elle çağrılınca To Do'ya döner, deneme sayısı 1→2 (üst sınır 3) | Çöken çalışanın kartını oturum açılışında `recover_stale` ile kurtar; kendiliğinden toparlanacağını varsayma |
+| **Yanlış aşamadaki kart panonun yeniden adopt'unu kilitler** | `update_task status=archived` kartı `done` sütununa taşır; aşaması `todo` kalan kart `adopt_managed_lifecycle`'ı `stage-mismatch` ile REFUSED yaptırdı (10-01) | Deneme panosu tek kullanımlıktır; adopt'tan önce kartların aşaması ile sütunu eşleşmeli |
+| **`file_exists` kanıtı proje dışı yolu görmedi** | `C:/tmp/…` ve `C:\tmp\…` ikisinde de "dosya yok" (dosya vardı) | Kanıtı repo içi yola ya da `gh api` kalıbına bağla; sebep ölçülmedi |
+| **`verify_completion` zaman aşımı** | 10-01'de iki kez `domainCall timed out`; ikinci denemede koştu | Tekrar güvenli (okuma/çalıştırma); önce `get_task` ile kartın durumuna bak |
 
 **"PR birleşti mi" kanıt kalıbı:** `gh api repos/peckop/venthub-hvac-esite/pulls/<N>/merge` (GitHub 204 → çıkış 0; 404 → çıkış 1). Birleşmiş PR'da 0, açık PR'da 1 ölçüldü.
 
