@@ -61,6 +61,7 @@
 | Bir iş **hangi yöntemle** koşar (şerit / alt ajan / Workflow / maestro / skill / elle), emirde `YÖNTEM:` satırı? | `standards/execution-method-standard.md` |
 | Bir şeye "**yok / bulunamadı / desteklemiyor**" demeden önce neyi, nerede, hangi yöntemle aramalıyım? | `standards/execution-method-standard.md` §9 (yokluk hükmü) |
 | Bir departmanın (OPS, ARAC, ALTYAPI, HARITA, URUN, ADMIN, KATALOG, GEO-SEO, BLOG, MARKA) görevi, dosyaları, yetkisi ve Recep kapıları ne? | `roller/<DEPARTMAN>.md` (rol kartı; üretici `scripts/belge/rol-karti-uret.cjs`, REC-426) |
+| Bir departmanın **çalışan** (alt ajan) tanımı hangi skill'lerle ve hangi araç sınırıyla gelir? | `.claude/agents/<departman>-<tur>.md` (üretilmiş, elle düzenleme yok; üretici `scripts/belge/ajan-tanimi-uret.cjs`, girdi `docs/audits/skill-departman-setleri-2026-09-30.json`, kapı INV-AJAN-TANIM-1) |
 | Katalogdan ticarete hat — ürün nasıl girer, CSV, fiyat, şema, kategori? | `plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan uca pano) + `standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`; veri deposu kardeş depo `venthub-pdf-ingestor` |
 | Bir işi **alt-ajana** ne zaman devrederim, neyi yasaklarım, sonucu neye göre kabul ederim? | `standards/subagent-delegation-standard.md` |
 | Hangi tasarım **yeteneği (skill)** kalır/erir/kaldırılır, yenisi nasıl kurulur? | `standards/tasarim-yetenek-standard.md` |
