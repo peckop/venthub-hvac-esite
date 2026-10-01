@@ -1206,7 +1206,7 @@ export const en: typeof tr = {
     why3Title: 'Long Life',
     why3Desc: 'Corrosion-resistant body and heavy-duty components.',
     filters: 'Filters',
-    subcategories: 'Sub-categories',
+    subcategories: 'Subcategories',
     brands: 'Brands',
     airflow: 'Airflow (m³/h)',
     showcase: {
