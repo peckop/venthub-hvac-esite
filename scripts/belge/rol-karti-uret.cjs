@@ -97,6 +97,21 @@ function kuralBolumu(ad) {
   ].join('\n')
 }
 
+/**
+ * RECEP'E MESAJ KURALLARI (HRT-11, 2026-10-01): kartın bayt payını yemesin diye ayrıntı kurallar dosyasında durur,
+ * kartta (CALISMA) tek satırlık işaretçi kalır. Yöneten metin: `~/.claude/output-styles/recep.md` (OPS yazar).
+ * Her rolün kurallar dosyasına AYNEN girer (OPS istisnaları metnin içinde yazılı).
+ */
+const RECEP_MESAJ_KURALLARI = [
+  '## Recep\'e mesaj kuralları (ayrıntı; yöneten metin `~/.claude/output-styles/recep.md`)',
+  '- Durum mesajı TEK TABLO: `| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`; onay bekleyenler en üst satırlardır, ayrı tablo yok. Recep\'e giden durum cevabı tek tablodur.',
+  '- (OPS hariç) tabloya yalnız KENDİ kartların girer; çok departmanlı genel resmi OPS verir; çok elzemse tablo dışında tek cümle hatırlat.',
+  '- Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider, Recep\'e ANLATILMAZ; Recep\'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok).',
+  '- Değişen yoksa tablo yok: Recep "devam et" dediğinde ya da durum sorduğunda son rapordan beri kartında değişen yoksa cevap TEK cümledir; bekleyen kartlar her cevapta yeniden dökülmez, tabloya yalnız durumu değişen ya da Recep\'in adıyla sorduğu kart girer. İşi kalmayan departman bunu Recep\'e değil OPS\'a yazar.',
+  '- İşin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok); Sorumlu = "ben" (OPS hariç).',
+  '- 2+ kalem madde işaretli liste olur (tablo dışında, cümle içinde (a) (b) şık dizilmez); compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir; tur sonunda "devam edeyim mi" sorma, sırası belli işe geç.',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -105,6 +120,8 @@ function kuralDosyasi(ad) {
     `> Üretilmiştir (\`scripts/belge/rol-karti-uret.cjs\`); elle düzenleme. Rol kartı: \`docs/roller/${dosyaAdi(ad)}\`. K = tam listedeki madde no; gerekçeli tam metin: \`docs/standards/gelistirme-kurallari-tam-liste.md\`.`,
     '',
     ...rolKurallari(ad).map(([no, , kisa, ozet]) => `- K${no} ${kisa}: ${ozet}`),
+    '',
+    RECEP_MESAJ_KURALLARI,
     '',
   ].join('\n')
 }
@@ -117,7 +134,7 @@ const RECEP_KAPILARI = [
   '4. Canlı veritabanına yazım.',
   '5. Para harcatan her şey (ücretli plan, servis, satın alma).',
   '',
-  'Kapılar 1-5 Recep\'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS\'tan (karar 224, fleet §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.',
+  'Kapılar 1-5 Recep\'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS\'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.',
   'CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS\'a gider, Recep\'e OPS götürür.',
 ].join('\n')
 
@@ -173,7 +190,7 @@ const CALISMA = [
   '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
   '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
   '- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.',
-  '- Recep\'e durum mesajı TEK TABLO (`| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`), (OPS hariç) yalnız KENDİ kartların; genel resmi OPS verir, çok elzemse tablo dışında tek cümle. Başka pencereden gelen mesajla açılan turda cevap o pencereye SendMessage ile gider; Recep\'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok). İşin başkasını bekliyorsa yalnız "başka bir departmanın işini bekliyor" (adı/işi/sırası yok), Sorumlu = "ben" (OPS hariç). 2+ kalem madde işaretli; compact notu 3 madde; "Onayında" yalnız Recep kararı; tur sonunda "devam edeyim mi" sorma, sırası belli işe geç (recep.md).',
+  '- Recep\'e durum mesajı TEK TABLO, (OPS hariç) yalnız KENDİ kartların; başka pencereden gelen turda cevap o pencereye SendMessage ile gider, Recep\'e tek cümle; değişen yoksa tablo yok. Sütunlar ve ayrıntı: `docs/roller/<ROL>-kurallar.md` "Recep\'e mesaj kuralları".',
   '- DURUM (2026-10-01, OPS günceller): şirket kurulmadı, gerçek satış yok. Veri bozulması, sır/gizlilik sızıntısı, ödeme riski BUGÜN zarar sayılır; zarar vermeyen bulgu = kart + "ilk satıştan önce" etiketi, Recep\'e karar gitmez; kapılar değişmez.',
   '- Genel bileşen/modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdeği (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, teklif deneyimi) biz yazarız.',
   '- CLAUDE.md\'deki 14 mutlak kural her role geçerlidir.',

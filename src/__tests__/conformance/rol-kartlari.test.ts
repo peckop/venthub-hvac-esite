@@ -234,6 +234,7 @@ describe('INV-ROL-1 — --ozet (kanca için tek satır, fail-open)', () => {
 
 describe('INV-ROL-1 — gerçek depoda mandal', () => {
   const uretilen = uretici.uret()
+  const kuralMetinleri = uretici.uretKurallar()
 
   it('beklenen 16 rolün hepsi var, fazlası yok', () => {
     expect(Object.keys(uretilen).sort()).toEqual([...BEKLENEN_ROLLER].sort())
@@ -283,14 +284,17 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // 2026-10-01 (HRT-10): %97 → %99. Sebep (ölçüldü): Recep'in iki yeni kuralı (başka pencereden gelen turda cevap o pencereye;
   // bekleme ifadesi adsız) ortak bloğa girdi; ortak bloktan ~100 B kısaltılmasına rağmen net +126 B: SATIS 6453 → 6579 B (%98,8; bağımsız okuyucu bulguları sonrası "sırası belli işe geç" ve "Recep'e giden" geri geldi).
   // Eşik %99 = 6589 B (pay 10 B); sert sınır 6656 aynı. Kalıcı çözüm HRT-11: ortak blok ayrıntıları kurallar dosyasına taşınır.
+  // 2026-10-01 (HRT-11): %99 → %94 (HRT-6/9 öncesi eşik geri geldi). Recep mesaj kurallarının ayrıntısı her rolün
+  // `<ROL>-kurallar.md` dosyasına taşındı (RECEP_MESAJ_KURALLARI), kartta tek satırlık işaretçi kaldı: SATIS 6579 → 6171 B
+  // (%92,7; eşik %94 = 6257 B, pay 86 B). Yeni Recep kuralı artık kurallar dosyasına eklenir, karta değil.
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
-  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %99\'unda)', () => {
+  it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %94\'ünde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)
       expect(metin, `${ad} kartında kural özet satırı olmamalı (kurallar dosyasında)`).not.toMatch(/^- K\d+ [^;\n]+: /m)
     }
     const enBuyuk = Math.max(...Object.values(uretilen).map((m) => Buffer.byteLength(m, 'utf8')))
-    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.99)
+    expect(enBuyuk).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI * 0.94)
   })
 
   it('Çalışma düzeni bloğu her kartta bire bir aynı ve pano kanıt kuralını taşır (ARAÇ ölçümü: 62 kartın 45\'inde kanıt yok)', () => {
@@ -366,9 +370,14 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   it('Recep mesaj biçimi her kartta: tek tablo + madde işaretli liste + 3 maddelik compact notu + Onayında yalnız Recep kararı', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('durum mesajı TEK TABLO')
-      expect(metin, ad).toContain('2+ kalem madde işaretli')
-      expect(metin, ad).toContain('compact notu 3 madde')
-      expect(metin, ad).toContain('"Onayında" yalnız Recep kararı')
+      expect(metin, ad).toContain('"Recep\'e mesaj kuralları"')
+    }
+    // Ayrıntı HRT-11'den beri kurallar dosyasındadır (kartın bayt payı için).
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      expect(metin, ad).toContain('| No: Kanban numarası · karar no | İş | Durum | Önerim | Sorumlu | Sırada |')
+      expect(metin, ad).toContain('2+ kalem madde işaretli liste olur')
+      expect(metin, ad).toContain('compact hazırlık notu 3 maddelik listedir')
+      expect(metin, ad).toContain('"Onayında" yalnız Recep kararı bekleyen iştir')
     }
   })
 
@@ -431,8 +440,6 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   it('HRT-6/HRT-9: her kart Recep tablosunu yalnız kendi Kanban kartlarıyla sınırlar, tur sonunu soru bırakmaz ve tarihli DURUM bağlamını taşır', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('yalnız KENDİ kartların')
-      expect(metin, ad).toContain('çok elzemse tablo dışında tek cümle')
-      expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma')
       expect(metin, ad).toMatch(/DURUM \(2026-10-01, OPS günceller\): şirket kurulmadı, gerçek satış yok/)
       expect(metin, ad).toContain('"ilk satıştan önce" etiketi')
       expect(metin, ad).toContain('BUGÜN zarar sayılır')
@@ -440,14 +447,23 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('Recep\'e karar gitmez; kapılar değişmez')
       expect(metin, ad).toContain('(OPS hariç) yalnız KENDİ kartların')
     }
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      expect(metin, ad).toContain('çok elzemse tablo dışında tek cümle hatırlat')
+      expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma, sırası belli işe geç')
+    }
   })
 
-  it('HRT-10: her kart başka pencereden gelen turda cevabı o pencereye yollatır ve bekleme ifadesini adsız tutar', () => {
+  it('HRT-10/HRT-11: kartta başka pencereden gelen tur kuralı kısa durur; ayrıntı (bekleme ifadesi adsız, değişen yoksa tablo yok) her kurallar dosyasında', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
-      expect(metin, ad).toContain('Başka pencereden gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
+      expect(metin, ad).toContain('başka pencereden gelen turda cevap o pencereye SendMessage ile gider')
+      expect(metin, ad).toContain('değişen yoksa tablo yok')
+    }
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      expect(metin, ad).toContain('Başka pencereden (OPS dahil) gelen mesajla açılan turda cevap o pencereye SendMessage ile gider')
       expect(metin, ad).toContain("Recep'e görünen metin tek cümle, yalnız kendi kartın (değişen yoksa tablo yok)")
-      expect(metin, ad).toContain('"başka bir departmanın işini bekliyor" (adı/işi/sırası yok), Sorumlu = "ben" (OPS hariç)')
-      expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma, sırası belli işe geç')
+      expect(metin, ad).toContain('"başka bir departmanın işini bekliyor" yaz (adı/işi/sırası yok); Sorumlu = "ben" (OPS hariç)')
+      expect(metin, ad).toContain('Değişen yoksa tablo yok: Recep "devam et" dediğinde')
+      expect(metin, ad).toContain("İşi kalmayan departman bunu Recep'e değil OPS'a yazar")
     }
   })
 
