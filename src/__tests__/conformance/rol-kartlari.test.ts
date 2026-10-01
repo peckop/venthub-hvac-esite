@@ -276,8 +276,9 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // eşik %92 = 6123); yeni eşik 6257 B (pay 89 B). SERT sınır (6656) aynı kaldı; yeni bölüm gerekirse ayrıntı dosyaya
   // taşınır, cümleler önce kısaltılır.
   // 2026-10-01 (HRT-6/HRT-9): %94 → %97. Sebep (ölçüldü): Recep tablo kuralı (yalnız kendi kartların, elzem hatırlatma,
-  // tur sonu) ve tarihli DURUM satırı ortak bloğa girdi; ortak bloktan ~250 B kısaltıldıktan sonra SATIS 6168 → 6414 B
-  // (eşik %97 = 6456, pay 42 B; sert sınır 6656'ya 242 B). Bundan sonra yeni ortak satır eklenemez: ya ayrıntı
+  // tur sonu) ve tarihli DURUM satırı (zarar tanımı + kapılar değişmez) ortak bloğa girdi; SATIS 6168 → ~6,4 KB
+  // (bağımsız okuyucu ölçümü: ortak bloktan ~66 B kısaltıldı, ~312 B eklendi; sonra ~40 B daha kısaltıldı: SATIS 6453 B).
+  // Eşik %97 = 6456 B (pay 3 B); sert sınır 6656 (pay 203 B). Bundan sonra yeni ortak satır eklenemez: ya ayrıntı
   // kurallar dosyasına/cetvele taşınır ya da ortak bloktan eşit bayt çıkarılır (kanarya artık yalnız son uyarıdır).
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
   it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %97\'sinde)', () => {
@@ -431,6 +432,10 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       expect(metin, ad).toContain('tur sonunda "devam edeyim mi" sorma')
       expect(metin, ad).toMatch(/DURUM \(2026-10-01, OPS günceller\): şirket kurulmadı, gerçek satış yok/)
       expect(metin, ad).toContain('"ilk satıştan önce" etiketi')
+      expect(metin, ad).toContain('BUGÜN zarar sayılır')
+      expect(metin, ad).toContain('sır/gizlilik sızıntısı, ödeme riski')
+      expect(metin, ad).toContain('Recep\'e karar gitmez; kapılar değişmez')
+      expect(metin, ad).toContain('(OPS hariç) yalnız KENDİ Kanban kartlarını içerir')
     }
   })
 
