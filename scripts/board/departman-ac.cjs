@@ -14,13 +14,21 @@
  *     Tanınmayan rol → HATA.
  *  2. Rolün SON sid'i: panonun olay dosyalarındaki en yeni `claim` (PRUNE_MS uygulanmaz; departman gün sonra da açılır).
  *  3. Canlı mı: `claude agents --json` (ölçülebilirse YETKİLİ) yoksa `~/.claude/sessions/<pid>.json` + pid canlılığı.
- *     Canlıysa AÇMAZ: "zaten açık: <ad> (sid8)", çıkış 0.
+ *     Rolün BİLİNEN TÜM sid'lerinden biri ya da adı rol adıyla eşleşen (Türkçe katlamalı) bir ana pencere AÇIKSA
+ *     AÇMAZ: "zaten açık: <ad> (sid8)", çıkış 0 (`departman-ortak.rolPencereleri`).
  *  4. TAVAN: açık ana pencere sayısı (alt süreçler ve OPS HARİÇ) 5'e ulaştıysa AÇMAZ, uyarır, çıkış 1.
+ *     OPS tavandan MUAFTIR: Ops tavan doluyken de açılır (sayıma girmediği gibi kapıya da takılmaz).
  *  5. Komut: `claude.exe --resume <sid> --name <Ad> --permission-mode auto --strict-mcp-config --mcp-config
  *     <ana-kök>\.mcp.json` (sid yoksa `--resume` YOK = yeni oturum), çalışma dizini = ANA DEPO KÖKÜ
  *     (scripts/hijyen/ana-kok.cjs; sabit yol yazılmaz).
  *  · `--taze`: `--resume` YOK; yeni oturum `--name <Ad>` + ilk mesaj "durum dosyanı oku, devam et" (durum dosyasının
  *     yolu rolün son sid'inden mevcut kancanın çözümlemesiyle bulunur; bulunamazsa genel cümle + uyarı).
+ *
+ * EKİP KİPİ: Ekip gereken iş için departman kendi TERMINAL penceresini açar: Desktop penceresinde ekip kurulmaz (ölçüldü
+ *  2026-10-01), cli girişli terminal penceresinde kurulur ve çalışır (EkipTest3 ölçümü). Terminal penceresi Desktop kenar
+ *  çubuğunda GÖRÜNMEZ ama pencere listesinde (claude agents / ListAgents) adıyla durur ve SendMessage ile iki yönde
+ *  ulaşılır. Her açılış Recep'in ekranında ve onayındadır; pencereyi kapatmak insan eylemidir. Eski oturumu --resume ile
+ *  terminalde açınca ekip kurulup kurulmadığı ÖLÇÜLMEDİ; --taze yeni oturumda kurulur.
  *
  * HATA YOLLARI (hepsi açık mesaj; sessiz geçmez): rol tanınmıyor · claude.exe bulunamadı · .mcp.json yok (bayrak yolu kırık
  * olurdu) · pencere tavanı dolu → çıkış 1. Pano dizini yok / olay dosyası bozuk / sessions dizini yok / sid yok →
@@ -60,16 +68,25 @@ function planla(rolArg, o = {}) {
   const acik = ortak.acikPencereler()
   uyarilar.push(...acik.uyarilar)
 
-  if (son && acik.liste.some((p) => p.sid === son.sid)) {
+  // "Zaten açık" kararı rolün BİLİNEN TÜM sid'leri + pencere adı üzerinden verilir (yalnız en yeni claim'in sid'i DEĞİL):
+  // eski sid canlı + yeni sid kapalıysa ya da `--taze` ile claim'siz açılmış "Araç" penceresi varsa ikincisi AÇILMAZ.
+  const canli = ortak.rolPencereleri(acik.liste, tara.claims, rol)
+  if (canli.length > 0) {
+    const p = canli[0]
+    if (canli.length > 1) uyarilar.push(`${rol.ad} icin ${canli.length} ACIK pencere var (${canli.map((x) => `pid ${x.pid}`).join(', ')}) — biri fazla`)
+    const kimlik = p.sid ? p.sid.slice(0, 8) : `pid ${p.pid}`
     return {
-      karar: 'zaten-acik', ad: rol.ad, serit: rol.serit, sid: son.sid, kanit: acik.kaynak, uyarilar,
-      mesaj: `zaten acik: ${rol.ad} (${son.sid.slice(0, 8)})`,
+      karar: 'zaten-acik', ad: rol.ad, serit: rol.serit, sid: p.sid || null, pid: p.pid, eslesme: p.eslesme, kanit: acik.kaynak, uyarilar,
+      mesaj: `zaten acik: ${rol.ad} (${kimlik})`,
     }
   }
   if (!son) uyarilar.push(`${rol.ad} icin panoda gecmis oturum yok — YENI oturum acilacak (--resume yok)`)
 
   const tavan = ortak.tavanDurumu(acik.liste, ortak.opsSidleri(tara.claims))
-  if (tavan.doldu) {
+  // OPS tavandan MUAF: sayıma girmez (tavanDurumu) ve açılışta da kapıya takılmaz. Ops, tavan doluyken başka bir
+  // departmanı kapatmayı koordine eden penceredir; en çok o zaman gerekir.
+  const opsMuaf = ortak.ayniMi(rol.serit, ortak.OPS_SERIT)
+  if (tavan.doldu && !opsMuaf) {
     return {
       karar: 'tavan', ad: rol.ad, serit: rol.serit, sayi: tavan.sayi, tavan: tavan.tavan, uyarilar,
       mesaj: `pencere tavani DOLU: ${tavan.sayi}/${tavan.tavan} acik departman penceresi (OPS ve alt surecler haric) — ${rol.ad} ACILMADI; once birini kapat (departman-kapat.cmd <Rol>)`,

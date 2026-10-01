@@ -448,3 +448,17 @@ describe('INV-CLAIM-YENILE-10 · kablo: kanca yenilemeyi liveClaims() ÇAĞRISIN
     expect(modul).toMatch(/new Set\(\['startup', 'resume'\]\)/)
   })
 })
+
+describe('INV-CLAIM-YENILE-11 · resume açılış metni YENİLEMENİN gerçeğini söyler (PR #1598 denetimi DÜŞÜK-3)', () => {
+  // Eski metin "Şerit talebini TAZELE" diyordu: yenileme artık kancada OTOMATİK; ajanı elle tazelemeye yönlendirmek yanlıştı.
+  it('resume (lider olmayan): "OTOMATIK yenilenir" der, "TAZELE" emri vermez; kancada eski ifade de yok', () => {
+    const pano = yeniPano()
+    claim(pano, SID, 'ARAC', ['scripts/board/**'], saatOnce(5))
+    const s = kanca('resume', pano)
+    expect(s.durum).toBe(0)
+    expect(s.ek).toContain('RESUME ACILISI')
+    expect(s.ek).toContain('OTOMATIK yenilenir')
+    expect(s.ek).not.toMatch(/talebini TAZELE/)
+    expect(fs.readFileSync(KANCA, 'utf8')).not.toMatch(/talebini TAZELE/)
+  }, HK)
+})

@@ -7,8 +7,11 @@
  * bu yüzden bir pencereyi yalnız durum dosyası TAZEYSE kapatmaya izin verir.
  *
  * AKIŞ (her adım kapı testinde ölçülür — src/__tests__/conformance/departman-kapat.test.ts):
- *  1. Rol → şerit → rolün SON sid'i (departman-ortak.cjs; departman-ac ile AYNI çözümleme). Tanınmayan rol → HATA.
- *  2. Pencere açık mı? Değilse "zaten kapalı", çıkış 0. Hedef YALNIZ bu rolün sid'idir (başka sid'e/role dokunulmaz).
+ *  1. Rol → şerit → rolün AÇIK penceresi (departman-ortak.rolPencereleri; departman-ac ile AYNI çözümleme: rolün bilinen
+ *     TÜM sid'leri + pencere adı). Tanınmayan rol → HATA.
+ *  2. Pencere açık mı? Değilse "zaten kapalı", çıkış 0. Hedef YALNIZ bu rolün penceresidir (başka role dokunulmaz).
+ *     Aynı rolün/adın BİRDEN ÇOK açık penceresi varsa hedef BELİRSİZDİR → HATA ("belirsiz hedef"), kapatma kararı verilmez.
+ *     Talimat sid8 ile BİRLİKTE pid'i de yazar ("sid 11111111, pid 4242").
  *  3. İSTEK: pencerenin posta kutusuna "durum dosyanı yaz" mesajı (mailbox-mcp `mailbox_manage send`, alıcı = TAM sid).
  *     `--istek-atla`: istek zaten SendMessage ile atıldıysa (SendMessage ajan aracıdır, betikten çağrılamaz) yalnız ölçer.
  *     ⚠SINIR (dürüst): posta kutusu BOŞTA bir pencereyi UYANDIRMAZ; pencere mesajı ancak bir sonraki turunda görür. Bu yüzden
@@ -105,9 +108,19 @@ function postaGonder(sid, kok, zamanAsimiMs = POSTA_ZAMAN_ASIMI_MS) {
   })
 }
 
-/** İnsana verilecek talimat (karar `kapat` iken). ASCII: ps1 Windows PowerShell 5.1'de aynen basar. Saf. */
-function talimatYaz(ad, sid) {
-  return `SIMDI: "${ad}" penceresini/sekmesini ELLE kapat (sid ${String(sid).slice(0, 8)}). Bu betik hicbir sureci sonlandirmaz; kapatma insan eylemidir.`
+/**
+ * İnsana verilecek talimat (karar `kapat` iken). ASCII: ps1 Windows PowerShell 5.1'de aynen basar. Saf.
+ * `pid` verilirse talimata girer ("sid 11111111, pid 4242"): aynı adlı başka sekme varsa insan doğru pencereyi ayırt eder.
+ */
+function talimatYaz(ad, sid, pid) {
+  const kimlik = Number.isInteger(pid) && pid > 0 ? `sid ${String(sid).slice(0, 8)}, pid ${pid}` : `sid ${String(sid).slice(0, 8)}`
+  return `SIMDI: "${ad}" penceresini/sekmesini ELLE kapat (${kimlik}). Bu betik hicbir sureci sonlandirmaz; kapatma insan eylemidir.`
+}
+
+/** Aynı rolün birden çok açık penceresi varsa hedef BELİRSİZDİR: kapatma kararı verilmez (hangisi?). Saf. */
+function belirsizHedef(canli, ad) {
+  const ayrinti = canli.map((p) => `pid ${p.pid} sid ${p.sid ? p.sid.slice(0, 8) : '?'} (${p.eslesme})`).join('; ')
+  return `belirsiz hedef: ${ad} icin ${canli.length} ACIK pencere var (${ayrinti}) — hangisinin kapatilacagi bilinmiyor, kapatilmadi; once fazla pencereyi elle kapat`
 }
 
 /** Kapı: durum dosyası taze mi (≤ DURUM_TAZE_DK) ve pencere boşta mı? Saf. */
@@ -134,35 +147,40 @@ async function planla(rolArg, o = {}) {
   const tara = ortak.panoTara()
   const uyarilar = [...tara.uyarilar]
   const son = ortak.sonSid(tara.claims, rol.serit)
-  if (!son) return { karar: 'hata', sebep: `${rol.ad} icin panoda gecmis oturum yok — kapatilacak pencere BILINMIYOR`, ad: rol.ad, uyarilar }
 
   let acik = ortak.acikPencereler()
   uyarilar.push(...acik.uyarilar)
-  let hedef = acik.liste.find((p) => p.sid === son.sid)
-  if (!hedef) {
+  // Hedef = rolün AÇIK penceresi: bilinen TÜM sid'ler + pencere adı (departman-ac ile AYNI çözümleme). "En yeni claim'in
+  // sid'i" canlılığa bakmaz; eski sid canlı + yeni sid kapalıyken yanlış pencereyi "kapalı" sanardı.
+  let canli = ortak.rolPencereleri(acik.liste, tara.claims, rol)
+  if (canli.length === 0) {
+    if (!son) return { karar: 'hata', sebep: `${rol.ad} icin panoda gecmis oturum yok — kapatilacak pencere BILINMIYOR`, ad: rol.ad, uyarilar }
     return { karar: 'zaten-kapali', ad: rol.ad, serit: rol.serit, sid: son.sid, uyarilar, mesaj: `zaten kapali: ${rol.ad} (${son.sid.slice(0, 8)})` }
   }
-  // Hedef doğrulama: tek pid, ana pencere. Alt süreç/gözlemci ya da pid'siz kayıt ASLA hedef olmaz.
-  if (hedef.altSurec || !Number.isInteger(hedef.pid) || hedef.pid <= 0) {
-    return { karar: 'hata', sebep: `hedef pencere kapatilamaz: ana pencere degil ya da pid yok (${hedef.name || '?'}, pid=${hedef.pid})`, ad: rol.ad, sid: son.sid, uyarilar }
+  // Aynı adlı/aynı rolün birden çok canlı penceresi: hangisinin kapatılacağı BELLİ DEĞİL → karar yok, sebep yazılır.
+  if (canli.length > 1) return { karar: 'hata', sebep: belirsizHedef(canli, rol.ad), ad: rol.ad, serit: rol.serit, uyarilar }
+  let hedef = canli[0]
+  // Hedef doğrulama: tek pid, ana pencere, sid var. Alt süreç/gözlemci ya da pid'siz/sid'siz kayıt ASLA hedef olmaz.
+  if (hedef.altSurec || !Number.isInteger(hedef.pid) || hedef.pid <= 0 || !hedef.sid) {
+    return { karar: 'hata', sebep: `hedef pencere kapatilamaz: ana pencere degil ya da pid/sid yok (${hedef.name || '?'}, pid=${hedef.pid})`, ad: rol.ad, sid: hedef.sid || null, uyarilar }
   }
 
   const kok = process.env.VENTHUB_ANA_KOK || anaKok()
-  const taban = { ad: rol.ad, serit: rol.serit, sid: son.sid, pid: hedef.pid, kuru: !!o.kuru, uyarilar }
-  let durum = ortak.durumBul(son.sid, Date.now(), o.projeDizini)
+  const taban = { ad: rol.ad, serit: rol.serit, sid: hedef.sid, pid: hedef.pid, kuru: !!o.kuru, uyarilar }
+  let durum = ortak.durumBul(hedef.sid, Date.now(), o.projeDizini)
 
   if (o.kuru) {
     const k = kapiDegerlendir(durum, hedef)
     return {
       ...taban, karar: k.acik ? 'kapat' : 'kapatma', sebep: k.sebep, durum, posta: { durum: 'kuru-gonderilmedi' },
-      ...(k.acik ? { talimat: talimatYaz(rol.ad, son.sid) } : {}),
+      ...(k.acik ? { talimat: talimatYaz(rol.ad, hedef.sid, hedef.pid) } : {}),
       mesaj: `KURU: ${k.acik ? 'KAPATILIRDI' : 'KAPATILMAZDI'} — ${k.mesaj}`,
     }
   }
 
   let posta = { durum: 'atlandi' }
   if (!o.istekAtla) {
-    posta = await (o.postaGonder || postaGonder)(son.sid, kok)
+    posta = await (o.postaGonder || postaGonder)(taban.sid, kok)
     if (posta.durum !== 'gonderildi') uyarilar.push(`durum dosyasi istegi GONDERILEMEDI (${posta.sebep}) — yalniz mevcut durum dosyasina bakilacak`)
   }
 
@@ -172,18 +190,21 @@ async function planla(rolArg, o = {}) {
   let kapi = kapiDegerlendir(durum, hedef)
   while (!kapi.acik && kapi.sebep !== 'meshgul' && Date.now() < bitis) {
     await (o.uyu || uyu)(YOKLAMA_ARALIK_MS)
-    durum = ortak.durumBul(son.sid, Date.now(), o.projeDizini)
+    durum = ortak.durumBul(taban.sid, Date.now(), o.projeDizini)
     kapi = kapiDegerlendir(durum, hedef)
   }
-  // Son karardan hemen önce pencerenin durumu YENİDEN ölçülür (bekleme sırasında meşgul olmuş olabilir; pid de değişmiş olabilir).
+  // Son karardan hemen önce pencerenin durumu YENİDEN ölçülür (bekleme sırasında meşgul olmuş olabilir; pid de değişmiş olabilir;
+  // yeni bir aynı adlı pencere açılmış olabilir → hedef yine TEK olmalı).
   acik = ortak.acikPencereler()
-  hedef = acik.liste.find((p) => p.sid === son.sid)
-  if (!hedef) return { ...taban, karar: 'zaten-kapali', uyarilar, mesaj: `zaten kapali: ${rol.ad} (${son.sid.slice(0, 8)})` }
-  if (hedef.pid !== taban.pid) return { ...taban, karar: 'hata', sebep: `pid degisti (${taban.pid} → ${hedef.pid}) — kapatilmadi`, uyarilar }
+  canli = ortak.rolPencereleri(acik.liste, tara.claims, rol)
+  if (canli.length === 0) return { ...taban, karar: 'zaten-kapali', uyarilar, mesaj: `zaten kapali: ${rol.ad} (${taban.sid.slice(0, 8)})` }
+  if (canli.length > 1) return { ...taban, karar: 'hata', sebep: belirsizHedef(canli, rol.ad), uyarilar }
+  hedef = canli[0]
+  if (hedef.pid !== taban.pid || hedef.sid !== taban.sid) return { ...taban, karar: 'hata', sebep: `pid degisti (${taban.pid} → ${hedef.pid}) — kapatilmadi`, uyarilar }
   kapi = kapiDegerlendir(durum, hedef)
   return {
     ...taban, karar: kapi.acik ? 'kapat' : 'kapatma', sebep: kapi.sebep, durum, posta, mesaj: kapi.mesaj,
-    ...(kapi.acik ? { talimat: talimatYaz(rol.ad, son.sid) } : {}),
+    ...(kapi.acik ? { talimat: talimatYaz(rol.ad, taban.sid, taban.pid) } : {}),
   }
 }
 
@@ -202,7 +223,11 @@ async function main(argv) {
   } else {
     for (const u of plan.uyarilar || []) process.stdout.write(`uyari: ${u}\n`)
     process.stdout.write((plan.mesaj || plan.karar) + '\n')
-    if (plan.karar === 'kapat') process.stdout.write(`hedef: ${plan.ad} sid=${plan.sid} pid=${plan.pid} (KAPATILABILIR)\n${plan.talimat}\n`)
+    if (plan.karar === 'kapat') {
+      // Kuru kip insana EMİR vermez ("SIMDI … ELLE kapat" yanıltıcı olur): talimat yalnız gerçek koşumda basılır.
+      // JSON'daki `talimat` alanı kuru kipte de durur (makine okur).
+      process.stdout.write(`hedef: ${plan.ad} sid=${plan.sid} pid=${plan.pid} (KAPATILABILIR)\n${plan.kuru ? '(kuru: talimat verilmedi)' : plan.talimat}\n`)
+    }
   }
   return plan.karar === 'hata' || plan.karar === 'kapatma' ? 1 : 0
 }

@@ -356,7 +356,8 @@ if (source === 'resume') {
       ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele ve ' +
         'uyuyan her birine SendMessage at: "makine dondu, hangi isteydin, serit talebini tazele". ' +
         'Bekleme yapma; mesaj tek kanaldir.\n'
-      : 'Serit talebini TAZELE (canlilik atistan gelir) ve liderin uyandirma mesajini bekleme — ' +
+      : 'Serit talebin acilista (startup/resume) OTOMATIK yenilenir (claim-yenile); yenilenmediyse pano blogu ' +
+        '"TALEP EDILMEMIS" ya da UYARI basar — o zaman elle claim al. Liderin uyandirma mesajini bekleme — ' +
         'hangi iste oldugunu SendMessage ile lidere yaz.\n'))
 }
 

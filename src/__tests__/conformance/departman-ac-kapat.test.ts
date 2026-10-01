@@ -35,6 +35,7 @@ const win = process.platform === 'win32'
 
 const S_ARAC = '11111111-2222-4333-8444-555555555555'
 const S_ARAC_ESKI = 'aaaaaaaa-2222-4333-8444-555555555555'
+const S_ARAC_YENI = 'dddddddd-2222-4333-8444-555555555555'
 const S_HARITA = '99999999-2222-4333-8444-555555555555'
 const S_OPS = 'bbbbbbbb-2222-4333-8444-555555555555'
 
@@ -143,6 +144,8 @@ interface Plan {
   uyarilar?: string[]
   istem?: string | null
   taze?: boolean
+  eslesme?: string
+  talimat?: string
   durum?: { ad: string; yasDk: number; tam: string } | null
   posta?: { durum: string }
   sayi?: number
@@ -356,6 +359,69 @@ describe('INV-DEPARTMAN-AC-3 · pencere ZATEN AÇIKSA açılmaz ("zaten açık: 
     for (let i = 0; i < 5; i++) oturumKaydi(d, `0000000${i}-2222-4333-8444-555555555555`)
     expect(ac('Araç', d).plan.karar).toBe('zaten-acik')
   })
+
+  // ORTA-2 (PR #1598 denetimi): "zaten açık" yalnız EN YENİ claim'in sid'ine değil, rolün BİLİNEN TÜM sid'lerine ve
+  // pencere ADINA bakar. Her kol ayrı bir yoldur; ayırt edici çiftleri aşağıdadır.
+  it('ESKİ sid canlı + YENİ sid kapalı: ikinci pencere AÇILMAZ (hedef canlı olan eski sid)', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC_ESKI, 'ARAC', saatOnce(30))
+    claim(d, S_ARAC_YENI, 'ARAC', saatOnce(2)) // en yeni claim bu, ama bu pencere KAPALI
+    const pid = oturumKaydi(d, S_ARAC_ESKI, { name: 'venthub-hvac-xx' }) // adı tanıtıcı DEĞİL: yalnız sid bilgisi eşleştirir
+    const k = ac('Araç', d)
+    expect(k.kod).toBe(0)
+    expect(k.plan.karar).toBe('zaten-acik')
+    expect(k.plan.sid).toBe(S_ARAC_ESKI)
+    expect(k.plan.pid).toBe(pid)
+    expect(k.plan.eslesme).toBe('sid')
+    expect(k.plan.komut).toBeUndefined()
+  })
+
+  it('ters yön ve ayırt edici çift: yeni sid canlı + eski kapalı → zaten açık; İKİSİ de kapalı → AÇILIR (--resume en yeni claim)', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC_ESKI, 'ARAC', saatOnce(30))
+    claim(d, S_ARAC_YENI, 'ARAC', saatOnce(2))
+    const k0 = ac('Araç', d)
+    expect(k0.plan.karar).toBe('ac')
+    expect(k0.plan.sid).toBe(S_ARAC_YENI)
+    oturumKaydi(d, S_ARAC_YENI, { name: 'venthub-hvac-xx' })
+    expect(ac('Araç', d).plan.karar).toBe('zaten-acik')
+  })
+
+  it('başka şeridin canlı sid i yanıltmaz: HARİTA açık, ARAÇ kapalı → ARAÇ açılır', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC', saatOnce(5))
+    claim(d, S_HARITA, 'HARITA', saatOnce(1))
+    oturumKaydi(d, S_HARITA, { name: 'venthub-hvac-xx' })
+    expect(ac('Araç', d).plan.karar).toBe('ac')
+  })
+
+  it('CLAIM İÇİN SID YOK ama pencere ADI rolle eşleşiyor (--taze ile claim siz açılmış "Araç"): zaten açık, ikincisi açılmaz', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC_ESKI, 'ARAC', saatOnce(30)) // eski sid kapalı
+    const pid = oturumKaydi(d, 'eeeeeeee-2222-4333-8444-555555555555', { name: 'Araç' }) // claim i YOK
+    const k = ac('Araç', d, ['--taze'])
+    expect(k.kod).toBe(0)
+    expect(k.plan.karar).toBe('zaten-acik')
+    expect(k.plan.eslesme).toBe('ad')
+    expect(k.plan.pid).toBe(pid)
+    expect(k.plan.mesaj).toBe('zaten acik: Araç (eeeeeeee)')
+  })
+
+  it('ad eşleşmesi Türkçe katlamalı ("ARAC" adlı pencere "Araç" rolünü kapsar); tanıtıcı olmayan ya da başka rolün adı KAPSAMAZ', () => {
+    const d = yeniDuzenek()
+    oturumKaydi(d, 'eeeeeeee-2222-4333-8444-555555555555', { name: 'ARAC' })
+    expect(ac('Araç', d).plan.karar).toBe('zaten-acik')
+    const d2 = yeniDuzenek()
+    oturumKaydi(d2, 'eeeeeeee-2222-4333-8444-555555555555', { name: 'venthub-hvac-xx' })
+    oturumKaydi(d2, 'ffffffff-2222-4333-8444-555555555555', { name: 'Harita' })
+    expect(ac('Araç', d2).plan.karar).toBe('ac')
+  })
+
+  it('alt süreç (kind ≠ interactive) "Araç" adını taşısa da rolü açık SAYDIRMAZ', () => {
+    const d = yeniDuzenek()
+    oturumKaydi(d, 'eeeeeeee-2222-4333-8444-555555555555', { name: 'Araç', kind: 'background' })
+    expect(ac('Araç', d).plan.karar).toBe('ac')
+  })
 })
 
 describe('INV-DEPARTMAN-AC-4 · pencere TAVANI: en çok 5 açık departman penceresi; OPS ve alt süreçler SAYILMAZ', () => {
@@ -405,6 +471,30 @@ describe('INV-DEPARTMAN-AC-4 · pencere TAVANI: en çok 5 açık departman pence
     const k = ac('Araç', d)
     expect(k.plan.karar).toBe('tavan')
     expect(k.plan.sayi).toBe(5)
+  })
+
+  // ORTA-1 (PR #1598 denetimi): OPS sayıma girmediği gibi açılış kapısına da takılmaz. Ops, tavan doluyken başka bir
+  // departmanı kapatmayı koordine eden penceredir. Ayırt edici çift: aynı düzenekte Araç REDDEDİLİR, Ops AÇILIR.
+  it('OPS tavandan MUAF: 5 ana pencere açıkken Ops AÇILIR (Araç aynı düzenekte reddedilir)', () => {
+    const d = yeniDuzenek()
+    doldur(d, 5)
+    claim(d, S_OPS, 'OPS', saatOnce(3)) // Ops kapalı; geçmişi var
+    const o = ac('Ops', d)
+    expect(o.kod).toBe(0)
+    expect(o.plan.karar).toBe('ac')
+    expect(o.plan.ad).toBe('Ops')
+    expect(o.plan.args).toEqual(['--resume', S_OPS, '--name', 'Ops', '--permission-mode', 'auto', '--strict-mcp-config', '--mcp-config', path.join(d.kok, '.mcp.json')])
+    const a = ac('Araç', d)
+    expect(a.kod).toBe(1)
+    expect(a.plan.karar).toBe('tavan')
+    expect(ac('OPS', d).plan.karar).toBe('ac') // şerit adıyla da
+  })
+
+  it('OPS muafiyeti zaten-açık kararını bozmaz: Ops açıkken tekrar Ops → "zaten açık"', () => {
+    const d = yeniDuzenek()
+    doldur(d, 5)
+    oturumKaydi(d, S_OPS, { name: 'Ops' })
+    expect(ac('Ops', d).plan.karar).toBe('zaten-acik')
   })
 
   it('alt süreç / gözlemci pencereleri (vh-… adı, kind ≠ interactive) SAYILMAZ', () => {
@@ -680,9 +770,63 @@ describe('INV-DEPARTMAN-KAPAT-1 · rol çözümü ve hedef seçimi: yalnız BU r
     expect(k.plan.karar).toBe('hata')
     expect(k.plan.sebep).toContain('ana pencere degil')
   })
+
+  // ORTA-2 (PR #1598 denetimi): hedef "en yeni claim'in sid'i" değil, rolün gerçekten AÇIK penceresidir; aynı çözümleme
+  // departman-ac ile ortaktır (departman-ortak.rolPencereleri).
+  it('ESKİ sid canlı + YENİ sid kapalı: "zaten kapalı" DEĞİL — hedef canlı olan eski sid in penceresi (pid i talimatta)', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC_ESKI, 'ARAC', saatOnce(30))
+    claim(d, S_ARAC_YENI, 'ARAC', saatOnce(2)) // en yeni claim, pencere kapalı
+    const pid = oturumKaydi(d, S_ARAC_ESKI, { name: 'Araç' })
+    durumDosyasi(d, S_ARAC_ESKI, 1)
+    const k = kapat('Araç', d)
+    expect(k.plan.karar).toBe('kapat')
+    expect(k.plan.sid).toBe(S_ARAC_ESKI)
+    expect(k.plan.pid).toBe(pid)
+  })
+
+  it('claim siz ama ADI "Araç" olan tek pencere hedeftir (ad eşleşmesi); hiç pencere yoksa claim geçmişi olsa da "zaten kapalı"', () => {
+    const d = yeniDuzenek()
+    const yeni = 'eeeeeeee-2222-4333-8444-555555555555'
+    oturumKaydi(d, yeni, { name: 'Araç' })
+    durumDosyasi(d, yeni, 1)
+    const k = kapat('Araç', d)
+    expect(k.plan.karar).toBe('kapat')
+    expect(k.plan.sid).toBe(yeni)
+    const d2 = yeniDuzenek()
+    claim(d2, S_ARAC, 'ARAC')
+    expect(kapat('Araç', d2).plan.karar).toBe('zaten-kapali')
+  })
+
+  it('AYNI ADLI İKİ canlı pencere: hedef BELİRSİZ → kapatıcı REDDEDER (hata, sebep yazılı, talimat YOK) — tek pencerede kapat', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    oturumKaydi(d, S_ARAC, { pid: process.pid, name: 'Araç' })
+    durumDosyasi(d, S_ARAC, 1)
+    expect(kapat('Araç', d).plan.karar).toBe('kapat') // ayırt edici çift: tek pencere kapatılabilir
+    const ikinci = 'cccccccc-2222-4333-8444-555555555555'
+    oturumKaydi(d, ikinci, { pid: process.ppid, name: 'Araç' })
+    const k = kapat('Araç', d)
+    expect(k.kod).toBe(1)
+    expect(k.plan.karar).toBe('hata')
+    expect(k.plan.sebep).toContain('belirsiz hedef')
+    expect(k.plan.sebep).toContain(`pid ${process.pid}`)
+    expect(k.plan.sebep).toContain(`pid ${process.ppid}`)
+    expect(k.plan.talimat).toBeUndefined()
+  })
+
+  // (talimatYaz() doğrudan çağrısı KAPAT-4 te: bu modül KAPAT-3 ün izole ortamından ÖNCE yüklenmemeli — dizinleri yüklenirken okur.)
+  it('talimat sid8 İLE BİRLİKTE pid i yazar ("sid XXXXXXXX, pid N")', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    oturumKaydi(d, S_ARAC, { name: 'Araç' })
+    durumDosyasi(d, S_ARAC, 1)
+    const k = kapat('Araç', d)
+    expect(k.plan.talimat).toContain(`sid ${S_ARAC.slice(0, 8)}, pid ${process.pid}`)
+  })
 })
 
-describe('INV-DEPARTMAN-KAPAT-2 · KAPI: yalnız durum dosyası TAZE (≤10 dk) ve pencere BOŞTA ise kapat', () => {
+describe('INV-DEPARTMAN-KAPAT-2· KAPI: yalnız durum dosyası TAZE (≤10 dk) ve pencere BOŞTA ise kapat', () => {
   const hazirla = (yasDk: number | null, o: { status?: string } = {}): Duzenek => {
     const d = yeniDuzenek()
     claim(d, S_ARAC, 'ARAC')
@@ -895,6 +1039,21 @@ describe('INV-DEPARTMAN-KAPAT-3 · GERÇEK yol (posta + bekleme) enjekte edilmi�
     expect(p.sebep).toContain('pid degisti')
   })
 
+  it('bekleme sırasında AYNI ADLI İKİNCİ pencere açılırsa: hedef belirsizleşir → HATA, kapat kararı YOK', async () => {
+    kur(60)
+    const p = await kapatMod.planla('Araç', { projeDizini: proje,
+      postaGonder: async () => ({ durum: 'gonderildi' }),
+      uyu: async () => {
+        fs.writeFileSync(path.join(kayit, '90002.json'), JSON.stringify({ pid: process.ppid, sessionId: 'cccccccc-2222-4333-8444-555555555555', kind: 'interactive', name: 'Araç', status: 'idle', cwd: 'C:\\p' }))
+        simdiYaz()
+      },
+      bekleSn: 30,
+    })
+    expect(p.karar).toBe('hata')
+    expect(p.sebep).toContain('belirsiz hedef')
+    expect(p.talimat).toBeUndefined()
+  })
+
   it('bekleme sırasında pencere MEŞGUL olursa (durum taze): KAPATMA (son ölçüm meşgul der)', async () => {
     kur(60)
     const p = await kapatMod.planla('Araç', { projeDizini: proje,
@@ -951,6 +1110,34 @@ describe('INV-DEPARTMAN-KAPAT-4 · KARAR-ONLY: kapatıcı HİÇBİR süreci sonl
     expect(cagrilar.filter((a) => a !== 'p' && a !== 'process')).toEqual([])
   })
 
+  // DÜŞÜK-5 (PR #1598 denetimi): yukarıdaki regex `kill` komutunu, `os.kill`, `process['kill']`, `const k = process.kill`
+  // biçimlerini kaçırırdı. Burada `kill` KELİMESİ tersten ölçülür: izinli iki biçim silinir, geriye `kill` kalırsa KIRMIZI.
+  const KILL_IZINLI = [/\bp\.kill\(\)/g, /\bprocess\.kill\(\s*\w+\s*,\s*0\s*\)/g]
+  const killKalan = (kod: string): string => KILL_IZINLI.reduce((m, r) => m.replace(r, ''), kod)
+
+  it('cjs KODUNDA `kill` yalnız iki izinli biçimde geçer (p.kill() posta alt süreci · process.kill(pid, 0) yoklama); os.kill / process[\'kill\'] / takma ad / kill komutu KIRMIZI', () => {
+    const kodlar: Array<[string, string]> = [
+      ['kapat.cjs', cjs],
+      ['ortak.cjs', ortak],
+      ['ac.cjs', cjsKod(fs.readFileSync(path.join(KOK, 'scripts/board/departman-ac.cjs'), 'utf8'))],
+    ]
+    for (const [ad, k] of kodlar) expect(killKalan(k), ad).not.toMatch(/kill/i)
+    expect([...cjs.matchAll(/\bp\.kill\(\)/g)].length, 'p.kill() yalnız posta alt sürecinde, tam 1 kez').toBe(1)
+    expect([...ortak.matchAll(/\bp\.kill\(/g)].length).toBe(0)
+  })
+
+  it('ps1 / cmd (ac ve kapat) HAM metninde `kill` kelimesi hiç geçmez (kill, pskill, Stop-Process takma adları, yorum dahil)', () => {
+    for (const f of [KAPAT_PS1, KAPAT_CMD, AC_PS1, AC_CMD]) expect(fs.readFileSync(f, 'utf8'), f).not.toMatch(/kill/i)
+  })
+
+  it('kapat.cjs: child_process yalnız `spawn` içe alınır; `spawn(` çağrısı TEK ve yalnız posta yardımcısı için (process.execPath); exec/fork YOK', () => {
+    expect([...cjs.matchAll(/require\((['"])(?:node:)?child_process\1\)/g)].length).toBe(1)
+    expect(cjs).toMatch(/const\s*\{\s*spawn\s*\}\s*=\s*require\((['"])(?:node:)?child_process\1\)/)
+    expect([...cjs.matchAll(/\bspawn\w*\s*\(/g)].length, 'spawn çağrı sayısı').toBe(1)
+    expect(cjs).toMatch(/\bspawn\(process\.execPath,\s*\[cli,/)
+    expect(cjs).not.toMatch(/\b(exec|execSync|execFile|execFileSync|fork)\s*\(/)
+  })
+
   it('.ps1 kodu süreç NESNESİ bile almaz: Get-Process / Get-CimInstance / Win32_Process / WaitForExit / -Force yok', () => {
     expect(ps1).not.toMatch(/Get-Process|Get-CimInstance|Win32_Process|WaitForExit|-Force\b/i)
   })
@@ -974,9 +1161,12 @@ describe('INV-DEPARTMAN-KAPAT-4 · KARAR-ONLY: kapatıcı HİÇBİR süreci sonl
   })
 
   it('planla(): "kapat" kararı insana TALİMAT taşır (ad + kısa sid + "ELLE kapat"); "kapatma" kararında talimat YOK', () => {
-    const t = (require(KAPAT) as { talimatYaz: (ad: string, sid: string) => string }).talimatYaz('Araç', S_ARAC)
+    const talimatYaz = (require(KAPAT) as { talimatYaz: (ad: string, sid: string, pid?: number) => string }).talimatYaz
+    const t = talimatYaz('Araç', S_ARAC)
     expect(t).toContain('"Araç" penceresini/sekmesini ELLE kapat')
     expect(t).toContain(S_ARAC.slice(0, 8))
+    expect(t).not.toContain('pid') // pid verilmediyse uydurulmaz
+    expect(talimatYaz('Araç', S_ARAC, 4242)).toContain(`sid ${S_ARAC.slice(0, 8)}, pid 4242`)
     expect(t).toContain('hicbir sureci sonlandirmaz')
     const d = yeniDuzenek()
     claim(d, S_ARAC, 'ARAC')
@@ -1007,6 +1197,10 @@ describe('INV-DEPARTMAN-KAPAT-4 · KARAR-ONLY: kapatıcı HİÇBİR süreci sonl
     expect(t.stdout).toContain('KAPATILIRDI')
     expect(t.stdout).toContain(`sid=${S_ARAC}`)
     expect(t.stdout).toContain(`pid=${process.pid}`)
+    // DÜŞÜK-4: kuru kip mesajı TEK kez basar ve insana "ELLE kapat" emri vermez
+    expect(t.stdout.match(/KAPATILIRDI/g)?.length).toBe(1)
+    expect(t.stdout).not.toContain('SIMDI')
+    expect(t.stdout).toContain('(kuru: talimat verilmedi)')
     expect(() => process.kill(process.pid, 0)).not.toThrow()
     const eski = new Date(Date.now() - 30 * 60 * 1000)
     fs.utimesSync(yol, eski, eski)
@@ -1045,6 +1239,29 @@ describe('INV-DEPARTMAN-KAPAT-5 · CLI: bayrak ayrıştırma ve hata çıkışla
     }
   })
 
+  // DÜŞÜK-4 (PR #1598 denetimi): kuru kip insana EMİR vermez ve aynı mesajı iki kez basmaz; gerçek kip talimatı basar.
+  it('--kuru insan çıktısı: mesaj TEK kez, "SIMDI ... ELLE kapat" emri YOK; JSON talimat alanı yine dolu; gerçek kipte talimat basılır', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    oturumKaydi(d, S_ARAC, { name: 'Araç' })
+    durumDosyasi(d, S_ARAC, 1)
+    const kuru = calistir(KAPAT, ['Araç', '--kuru'], d, {}, false)
+    expect(kuru.kod).toBe(0)
+    expect(kuru.out.match(/KAPATILIRDI/g)?.length).toBe(1)
+    expect(kuru.out).not.toContain('SIMDI')
+    expect(kuru.out).not.toContain('ELLE kapat')
+    expect(kuru.out).toContain('(kuru: talimat verilmedi)')
+    expect(kuru.out).toContain(`hedef: Araç sid=${S_ARAC} pid=${process.pid}`)
+    const json = calistir(KAPAT, ['Araç', '--kuru'], d, {}, true)
+    expect(json.plan.karar).toBe('kapat')
+    expect(json.plan.talimat).toContain('ELLE kapat')
+    const gercek = calistir(KAPAT, ['Araç', '--istek-atla', '--bekle-sn', '0'], d, {}, false)
+    expect(gercek.kod).toBe(0)
+    expect(gercek.out).toContain('SIMDI: "Araç" penceresini/sekmesini ELLE kapat')
+    expect(gercek.out).toContain(`pid ${process.pid}`)
+    expect(gercek.out).not.toContain('kuru')
+  })
+
   it('JSON dışı çıktı: kapat → "hedef:" satırı sid+pid ile; kapatma → çıkış 1 ve mesaj', () => {
     const d = yeniDuzenek()
     claim(d, S_ARAC, 'ARAC')
@@ -1069,5 +1286,39 @@ describe('INV-DEPARTMAN-KAPAT-6 · posta isteğinin içeriği: yalnız durum dos
     expect(m.POSTA_GOVDE).toContain('10 dk')
     expect(m.POSTA_GOVDE).toContain('KAPATMAYACAGIZ')
     expect(m.POSTA_GOVDE).not.toMatch(/onay|sifre|token|anahtar|key/i)
+  })
+})
+
+describe('INV-DEPARTMAN-ENVANTER-1 · araç envanteri bu PR in altı satırını DOĞRU anlatır (belge-kod çelişkisi: "süreci sonlandıran kabuk")', () => {
+  // INV-ARAC yalnız varlığı ve sahibi ölçer; satırın AÇIKLAMA metnini ölçmez. PR in en önemli iddiası "süreç sonlandırmaz":
+  // envanter bunun tersini söylerse (WIP başlığından taşınmış metin) kapı yeşil kalır. Bu test o boşluğu kapatır.
+  const envanter = fs.readFileSync(path.join(KOK, 'docs/audits/arac-envanteri-2026-09-07.md'), 'utf8')
+  const satir = (yol: string): string => envanter.split('\n').find((s) => s.startsWith(`| \`${yol}\``)) ?? ''
+
+  it('departman-kapat.cjs / .ps1 satırları KARAR-ONLY der; "sonlandıran kabuk" / "kapatir" YOK', () => {
+    for (const f of ['scripts/board/departman-kapat.cjs', 'scripts/board/departman-kapat.ps1']) {
+      const s = satir(f)
+      expect(s, f).not.toBe('')
+      expect(s, f).not.toMatch(/sonlandıran kabuk|sonlandiran kabuk|kapatir:/i)
+      expect(s, f).toMatch(/KARAR/)
+      expect(s, f).toMatch(/KAPATMAZ|SONLANDIRMAZ/)
+    }
+  })
+
+  it('altı satırın hiçbirinde test sütunu "yok" değil: ilgili conformance testine bağlı', () => {
+    const beklenen: Array<[string, string]> = [
+      ['scripts/board/claim-yenile.cjs', 'claim-yenile.test.ts'],
+      ['scripts/board/departman-ac.cjs', 'departman-ac-kapat.test.ts'],
+      ['scripts/board/departman-ac.ps1', 'departman-ac-kapat.test.ts'],
+      ['scripts/board/departman-kapat.cjs', 'departman-ac-kapat.test.ts'],
+      ['scripts/board/departman-kapat.ps1', 'departman-ac-kapat.test.ts'],
+      ['scripts/board/departman-ortak.cjs', 'departman-ac-kapat.test.ts'],
+    ]
+    for (const [f, test] of beklenen) {
+      const s = satir(f)
+      expect(s, f).not.toBe('')
+      expect(s, f).toContain(test)
+      expect(s, `${f} tüketici sütunu`).not.toMatch(/\| cagiran-yok \(betik taramasi\) \|/)
+    }
   })
 })

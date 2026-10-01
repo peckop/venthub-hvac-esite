@@ -99,6 +99,41 @@ function opsSidleri(claims) {
   return s
 }
 
+/**
+ * Rolün BİLİNEN tüm sid'leri: her sid'in SON claim'inin şeridi bu rolün şeridi olan oturumlar. Yaş sınırı YOK (bilinçli):
+ * canlılık açık pencere listesinden ölçülür; 4 günlük claim'li ama hâlâ açık bir pencere de görülmeli.
+ * @returns {Set<string>}
+ */
+function rolSidleri(claims, serit) {
+  const sonSerit = new Map()
+  for (const c of claims) {
+    const o = sonSerit.get(c.sid)
+    if (!o || c.ts > o.ts) sonSerit.set(c.sid, c)
+  }
+  const s = new Set()
+  for (const [sid, c] of sonSerit) if (ayniMi(c.lane, serit)) s.add(sid)
+  return s
+}
+
+/**
+ * Rolün şu an AÇIK pencereleri. İKİ kanıt, herhangi biri yeter:
+ *  (a) `sid`: pencerenin sid'i rolün BİLİNEN sid'lerinden biri (eski sid canlı + yeni sid kapalı durumu yakalanır);
+ *  (b) `ad`: ana pencerenin adı rol adıyla Türkçe katlamalı eşit ("Araç") — `--taze` ile claim'siz açılmış pencere
+ *      panoda görünmez, yalnız adıyla yakalanır. Alt süreç/gözlemci pencereleri ad eşleşmesine girmez.
+ * "En yeni claim'in sid'i" seçimi canlılığa bakmaz; bu yüzden "zaten açık" ve "kapat" kararı BURADAN verilir.
+ * @returns {Array<object>} pencere kayıtları (`acikPencereler().liste` biçimi) + `eslesme: 'sid'|'ad'`; sid eşleşmeleri önde.
+ */
+function rolPencereleri(liste, claims, rol) {
+  const sidler = rolSidleri(claims, rol.serit)
+  const sonuc = []
+  for (const p of liste) if (p.sid && sidler.has(p.sid)) sonuc.push({ ...p, eslesme: 'sid' })
+  for (const p of liste) {
+    if (p.altSurec || (p.sid && sidler.has(p.sid))) continue
+    if (ayniMi(p.name, rol.ad)) sonuc.push({ ...p, eslesme: 'ad' })
+  }
+  return sonuc
+}
+
 /** Bu açık pencere OPS'un mu? Pano claim'inin şerit adı YA DA pencere adı (tablo eşlemesi: OPS → "Ops"). */
 function opsMi(p, opsSids) {
   return opsSids.has(p.sid) || ayniMi(p.name, pencereAdlari.ad(OPS_SERIT))
@@ -208,6 +243,6 @@ function argvAyristir(argv, degerBayraklari = []) {
 
 module.exports = {
   SID_UUID, PENCERE_TAVANI, OPS_SERIT, DURUM_TAZE_DK,
-  ayniMi, rolCoz, gecerliRoller, panoTara, sonSid, opsSidleri, opsMi, pidCanliMi,
+  ayniMi, rolCoz, gecerliRoller, panoTara, sonSid, rolSidleri, rolPencereleri, opsSidleri, opsMi, pidCanliMi,
   acikPencereler, tavanDurumu, durumBul, claudeExeBul, tirnakla, asciiJson, argvAyristir,
 }

@@ -5,7 +5,7 @@
 #   --istek-atla  : "durum dosyani yaz" istegi zaten SendMessage ile atildi; yalniz olc ve karara bak.
 #   --bekle-sn N  : istek atildiktan sonra durum dosyasinin taze olmasini en cok N sn bekle (varsayilan 90).
 #
-# KARAR (rol -> son sid -> acik mi -> istek -> durum dosyasi taze mi -> bosta mi) scripts/board/departman-kapat.cjs'tedir
+# KARAR (rol -> acik pencere -> istek -> durum dosyasi taze mi -> bosta mi) scripts/board/departman-kapat.cjs'tedir
 # ve --json ile buraya gelir; burasi yalniz hukmu ve INSANA verilecek talimati YAZAR.
 #
 # KARAR-ONLY (Ops karari 2026-09-30): bu betik HICBIR sureci sonlandirmaz - ne tek pid, ne toplu, ne zorla.
@@ -69,7 +69,14 @@ if ($plan.karar -ne 'kapat') {
   exit 1
 }
 
-if ($kuru) { Write-Host $plan.mesaj }
+# Kuru kip insana EMIR vermez ("SIMDI ... ELLE kapat" yaniltici olur) ve ayni mesaji iki kez basmaz.
+# JSON'daki talimat alani kuru kipte de durur; burada yalniz basilmaz.
+if ($kuru) {
+  Write-Host $plan.mesaj
+  Write-Host ('hedef: ' + $plan.ad + ' sid=' + $plan.sid + ' pid=' + $plan.pid)
+  Write-Host '(kuru: talimat verilmedi)'
+  exit 0
+}
 Write-Host ('KAPATILABILIR: ' + $plan.ad + ' sid=' + $plan.sid + ' pid=' + $plan.pid + ' (' + $plan.mesaj + ')')
 Write-Host $plan.talimat
 exit 0
