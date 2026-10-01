@@ -89,11 +89,8 @@ const INFRA_ALLOWLIST = new Set<string>([
   // 308 hedefini elle `/${lang}/...` kurmayı bıraktı; rota kararı `lib/data/productRoute.ts`e
   // taşındı ve orada dil öneki SSOT'tan (`localizedHref`) geliyor. Muafiyet artık gereksiz —
   // ve gereksiz muafiyet, o dosyaya yarın yazılacak gerçek bir kaçağı görünmez kılardı.
-  // `revalidatePath` literal yol ister (Next sözleşmesi).
-  // ⚠️ NOT: bu dosyanın TR yollarını KANONİK slug'la kurması AYRI bir kusurdur
-  // (render denetimi K2, Dalga-1'de düzeltilecek). Buradaki muafiyet onu AKLAMAZ,
-  // yalnız "bu kapının konusu değil" der — muafiyet, kusuru görünmez yapmamalı.
-  'app/api/webhook/supabase/route.ts',
+  // `app/api/webhook/supabase/route.ts` 2026-09-30'da LİSTEDEN ÇIKTI (REC-300 Faz 3g-1): tazeleme yolları artık
+  // elle `/${lang}/…` kurulmuyor, `src/lib/adres/tazelemeYollari.ts`'ten (adresUret, iki şema) geliyor.
 ])
 
 // 1) Elle `/${lang}` / `/${locale}` dil-öneki birleştirme.

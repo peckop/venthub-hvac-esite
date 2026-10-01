@@ -1,6 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
+import { aileYollari, kategoriYollari } from '@/lib/adres/tazelemeYollari'
 import {
   discoveryTag,
   familyTag,
@@ -117,6 +118,17 @@ async function walkFamilyChain(
 }
 
 /**
+ * Bir ailenin (ya da serisinin) sayfa yollarını tazeler ve üretilenleri döndürür. Yollar İKİ şemada ve iki dilde
+ * gelir (`aileYollari`, REC-300 Faz 3g): adres şeması bayrağı açılınca sabit `/tr/products/<slug>` yolu yanlış
+ * sayfayı vururdu.
+ */
+function aileYolunuTazele(slug: string): string[] {
+  const yollar = aileYollari(slug)
+  for (const p of yollar) revalidatePath(p)
+  return yollar
+}
+
+/**
  * Bir aile id'si için kendi + (varsa) seri sayfasını tazeler (path + familyTag).
  * `products` / `inventory_movements` / `product_prices` / `product_images` dallarının
  * hepsi buradan geçer — böylece "model değişti, serisi bayatladı" boşluğu TEK yerde kapanır.
@@ -129,11 +141,7 @@ async function revalidateFamilyChain(
   const tags: string[] = []
 
   for (const slug of slugs) {
-    for (const lang of ['tr', 'en'] as const) {
-      const p = `/${lang}/products/${slug}`
-      revalidatePath(p)
-      paths.push(p)
-    }
+    paths.push(...aileYolunuTazele(slug))
     revalidateTag(familyTag(slug))
     tags.push(familyTag(slug))
   }
@@ -163,25 +171,15 @@ type CategoryRow = { id?: string; slug: string | null; metadata?: unknown; paren
  * Yollar tekilleştirilir: iki dilin slug'ı aynı olabilir (çeviri yoksa kanoniğe düşer).
  */
 function categoryPathsFor(category: CategoryRow, parent: CategoryRow | null): string[] {
-  const paths = new Set<string>()
   const canonical = category.slug ?? ''
+  const yerel = (c: CategoryRow) => (dil: 'tr' | 'en') => getLocalizedCategorySlug(c, dil) || c.slug || ''
 
-  for (const lang of ['tr', 'en'] as const) {
-    const own = getLocalizedCategorySlug(category, lang) || canonical
-    if (!own) continue
-
-    paths.add(`/${lang}/category/${own}`)
-
-    if (parent) {
-      const parentSlug = getLocalizedCategorySlug(parent, lang) || parent.slug || ''
-      if (parentSlug) paths.add(`/${lang}/category/${parentSlug}/${own}`)
-    }
-  }
+  // İki dil × iki adres şeması (REC-300 Faz 3g): yeni şemanın `/kategori/<kök>/<dal>` yolu da tazelenir.
+  const paths = new Set<string>(kategoriYollari(yerel(category), parent ? yerel(parent) : null))
 
   // Kanonik EN yolu her hâlükârda kalsın (yukarıdaki gerekçe).
   if (canonical) {
-    paths.add(`/tr/category/${canonical}`)
-    paths.add(`/en/category/${canonical}`)
+    for (const p of kategoriYollari(() => canonical)) paths.add(p)
   }
 
   return [...paths]
@@ -422,9 +420,7 @@ export async function POST(request: NextRequest) {
          * değişince PDP en fazla ISR yedeğiyle (1 saat) güncelleniyordu. PDP verisi
          * `React.cache()` ile sarılı olduğu için etkili olan şey `revalidatePath`'tir.
          */
-        revalidatePath(`/tr/products/${familySlug}`)
-        revalidatePath(`/en/products/${familySlug}`)
-        revalidatedPaths.push(`/tr/products/${familySlug}`, `/en/products/${familySlug}`)
+        revalidatedPaths.push(...aileYolunuTazele(familySlug))
 
         revalidateTag(familyTag(familySlug))
         revalidatedTags.push(familyTag(familySlug))
@@ -440,9 +436,7 @@ export async function POST(request: NextRequest) {
         const { slugs: seriesSlugs, truncated: seriesFanoutTruncated } =
           await walkFamilyChain(parentFamilyId)
         for (const slug of seriesSlugs) {
-          revalidatePath(`/tr/products/${slug}`)
-          revalidatePath(`/en/products/${slug}`)
-          revalidatedPaths.push(`/tr/products/${slug}`, `/en/products/${slug}`)
+          revalidatedPaths.push(...aileYolunuTazele(slug))
           revalidateTag(familyTag(slug))
           revalidatedTags.push(familyTag(slug))
         }
@@ -521,9 +515,7 @@ export async function POST(request: NextRequest) {
 
         for (const f of families ?? []) {
           if (!f.slug) continue
-          revalidatePath(`/tr/products/${f.slug}`)
-          revalidatePath(`/en/products/${f.slug}`)
-          revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+          revalidatedPaths.push(...aileYolunuTazele(f.slug))
         }
       }
 
@@ -536,7 +528,7 @@ export async function POST(request: NextRequest) {
      * 8. Table: price_lists (W4) — TÜM ailelerin PDP yolları; keşife DOKUNMAZ.
      *
      * ⚠️ FAN-OUT SINIRI: bu dal aile sayısı kadar yol tazeler (ölçüm 2026-08-17: **32 aile**
-     * → 64 çağrı). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
+     * → 64 çağrı; REC-300 Faz 3g'den sonra aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir) = 96). Katalog birkaç yüz aileye çıkarsa bu dal pahalılaşır ve **tag tabanlı**
      * çözüme geçilmelidir. Sınır cetvele sayıyla yazıldı; sessizce yavaşlamasın.
      *
      * Keşife dokunmama kararı `product_prices` ile aynı gerekçeye dayanır: fiyat yalnız
@@ -550,9 +542,7 @@ export async function POST(request: NextRequest) {
 
       for (const f of families ?? []) {
         if (!f.slug) continue
-        revalidatePath(`/tr/products/${f.slug}`)
-        revalidatePath(`/en/products/${f.slug}`)
-        revalidatedPaths.push(`/tr/products/${f.slug}`, `/en/products/${f.slug}`)
+        revalidatedPaths.push(...aileYolunuTazele(f.slug))
       }
     }
 
