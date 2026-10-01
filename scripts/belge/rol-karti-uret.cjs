@@ -182,7 +182,7 @@ const ARKA_OFIS_YASAGI = ' Genel arka ofis modülünü (stok, satınalma, CRM, t
 /** Rol verisi. `durum`: kartın kendisini de ilgilendiren canlılık bilgisi. */
 const ROLLER = {
   OPS: {
-    gorev: 'Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını REC-425 altına kendi cümlesiyle kaydeder. Kanban panolarını (ortak "Bekleyenler" + departman başına) ve Linear\'ın donukluğunu (karar 219) gözler; Linear\'a yeni iş kaydı açılmaz.',
+    gorev: 'Filonun orkestratörü: sırayı, önceliği ve karar numaralarını verir; Recep\'e giden TEK konsolide yüzdür. Kod işi üstlenmez. Recep\'in her talimatını kendi cümlesiyle OPS panosundaki REC-425 kartına not olarak kaydeder (Linear\'a yazılmaz). Kanban panolarını (ortak "Bekleyenler" + departman başına) ve Linear\'ın donukluğunu (karar 219) gözler; Linear\'a yeni iş kaydı açılmaz.',
     dosyalar: 'Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.',
     yetki: 'Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep\'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep\'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).',
     yasak: 'Kod yazmaz; tekil düzen kararını Recep\'e sormaz; Recep kapıları yukarıdaki gibi.',
