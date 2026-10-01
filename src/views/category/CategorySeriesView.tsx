@@ -1,6 +1,7 @@
 'use client';
 import { motion } from 'framer-motion'
 import { Activity, Wind, Zap } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
 
 import Breadcrumb from '@/components/navigation/Breadcrumb'
@@ -16,6 +17,8 @@ import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/cat
 interface CategorySeriesViewProps {
     category: DomainCategory
     parentCategory?: DomainCategory | null
+    /** REC-471: bu kategorinin alt kategorileri; doluysa ürün listesinin üstünde GERÇEK bağlantı olarak basılır. */
+    subCategories?: DomainCategory[]
     /** F5-B W2.1: seri grupları kalktı — liste doğrudan AİLE satırlarıdır. */
     families: FamilyListItem[]
 }
@@ -28,6 +31,7 @@ interface CategorySeriesViewProps {
 const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
     category,
     parentCategory,
+    subCategories = [],
     families
 }) => {
     const { lang, t } = useI18n()
@@ -85,6 +89,27 @@ const CategorySeriesView: React.FC<CategorySeriesViewProps> = ({
                     </motion.p>
                 </div>
             </section>
+
+            {/* REC-471: alt kategori bağlantıları — `<a href>` olarak SUNUCUDA basılır. Bu görünüm alt kategori
+                listesini hiç çizmiyordu; üst kategorisi `series` modunda olan alt sayfa Google'a yetim kalıyordu
+                (GEO-SEO taraması 2026-09-30: yedek-parca-ve-sensorler). Adres `Routes.category` (adresUret). */}
+            {subCategories.length > 0 && (
+                <nav aria-label={t('category.showcase.subGroups')} className="max-w-page mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+                    <h2 className="text-sm font-bold text-secondary-blue uppercase tracking-hvac-relaxed mb-6">{t('category.showcase.subGroups')}</h2>
+                    <ul className="flex flex-wrap gap-3">
+                        {subCategories.map((sub) => (
+                            <li key={sub.id}>
+                                <Link
+                                    href={Routes.category(getLocalizedCategorySlug(category, lang), getLocalizedCategorySlug(sub, lang))}
+                                    className="inline-block px-5 py-3 rounded-full border border-industrial-gray text-industrial-gray font-medium hover:border-secondary-blue hover:text-secondary-blue focus-visible:ring-2 focus-visible:ring-secondary-blue transition-colors"
+                                >
+                                    {wrapCategory(sub)?.displayName || getCategoryDisplayName(sub, t)}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            )}
 
             {/* AİLE LİSTESİ — her kart bir ürün ailesi (varyantlar PDP'de) */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">

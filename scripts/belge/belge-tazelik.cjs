@@ -302,7 +302,22 @@ function olc(kok = depoKoku(), simdi = Date.now()) {
     },
     grafGun: grafYasi(kok, simdi),
     hafizaIndeksi: hafiza,
+    belgelerDefteri: belgelerDefteri(simdi),
     olculmedi: [...(hafiza ? [] : ['MEMORY.md satır/bayt']), 'kanca fail-open'],
+  }
+}
+
+/**
+ * "VentHub Belgeler" NotebookLM defterinin yaşı (REC-473, D8): durum dosyasını `belge-defteri.cjs yukle` yazar.
+ * Dosya yok/bozuksa NULL (sayı uydurulmaz); tüketici bunu "OLCULMEDI" diye gösterir.
+ */
+function belgelerDefteri(simdi) {
+  try {
+    const bd = require('./belge-defteri.cjs')
+    const d = bd.durumOku(simdi)
+    return d ? { gun: d.gun, kaynak: d.kaynak, bayat: d.gun > bd.DEFTER_BAYAT_GUN } : null
+  } catch (e) {
+    return null
   }
 }
 

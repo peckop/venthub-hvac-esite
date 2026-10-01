@@ -35,6 +35,19 @@ try {
   board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
 } catch { process.exit(0) } // pano yoksa sessizce geç (koordinasyon katmanı fail-open)
 
+// ⭐RECEP SÖZÜ DEFTERİ (REC-554, karar 218/224): Recep'in KENDİ mesajı ortak deftere yazılır, OPS görür (iki yön).
+// Pano okuması (aşağıdaki try) hata verip çıkış yapsa bile kayıt kaybolmasın diye ONDAN ÖNCE. Fail-open: modül yok/bozuksa
+// kanca eskisi gibi çalışır. Bilmek yetki taşımaz; ayrıntı ve sınırlar: scripts/board/recep-sozu-defteri.cjs.
+let recepDefteri = null
+try { recepDefteri = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri.cjs')) } catch { recepDefteri = null }
+let recepRol = ''
+if (recepDefteri) {
+  try {
+    recepDefteri.kaydet(input, { board })
+    recepRol = recepDefteri.rolBul(sid, board).rol
+  } catch { /* kayıt kancayı asla düşürmez */ }
+}
+
 /** Loop hatırlatması bu yaştan sonra susar — sürekli nag etmesin (T085-VH). */
 const LOOP_HATIRLATMA_PENCERESI_MS = 2 * 60 * 60 * 1000
 
@@ -121,12 +134,19 @@ async function linearCizgisi() {
 void (async () => {
 const linear = await linearCizgisi()
 
-// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok ise
+// Recep sözü defteri satırları (REC-554): yeni söz varsa konuşur, yoksa susar. Okuma imleci ilerler.
+let recepSatirlari = []
+if (recepDefteri) {
+  try { recepSatirlari = recepDefteri.gorunur({ sid, rol: recepRol }) } catch { recepSatirlari = [] }
+}
+
+// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok + defterde yeni soz yok ise
 // brifing hic akmaz.
-if (others.length === 0 && notes.length === 0 && seritAldiMi && !linear) process.exit(0)
+if (others.length === 0 && notes.length === 0 && seritAldiMi && recepSatirlari.length === 0 && !linear) process.exit(0)
 
 const lines = []
 if (linear) lines.push(linear)
+for (const s of recepSatirlari) lines.push(s)
 /**
  * ⭐ÖZET SATIR (REC-345 Kova C, 2026-09-17) — tam desen listesi HER TURDA basılmaz.
  *

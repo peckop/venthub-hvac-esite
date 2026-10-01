@@ -23,8 +23,9 @@
 // SIR SIZDIRMAZ: yapılandırma bölümü yalnız HÜKÜM ve konak adı taşır; hiçbir anahtarın
 // değeri, uzunluğu ya da öneki yazılmaz. Uç kimliksizdir — bu kısıt tasarımın parçasıdır,
 // nezaket değil.
-import { auditConfig } from '../_shared/config_audit.ts'
+import { auditConfig, yalnizSandboxTutarsizligi } from '../_shared/config_audit.ts'
 import { dbSaglikOlc } from '../_shared/db_saglik.ts'
+import { satisDurumuOku, type SatisDurumu } from '../_shared/satis_kipi.ts'
 
 type Durum = 'saglikli' | 'bozuk' | 'olculemedi'
 
@@ -91,9 +92,20 @@ Deno.serve(async (req: Request) => {
     }
 
     if (!rapor.saglikli) {
+      // İSTİSNA (OPS hükmü 09-30, B′ tasarımı): TEK kusur "üretim sitesi + sandbox ödeme ucu" ise ve
+      // satış KAPALIYSA bu beklenen durumdur (sandbox provası) → 200 + uyarı. Satış AÇIK ya da
+      // OKUNAMIYORSA kırmızı kalır: para gerçek olmalıyken sahte uca gitmek ya da bilmemek sağlık değildir.
+      // Satış kipi yalnız bu dalda okunur; sağlıklı/başka-kusurlu yollarda ek RPC yok.
+      let satis: SatisDurumu | null = null
+      if (yalnizSandboxTutarsizligi(rapor)) {
+        satis = await satisDurumuOku({ supabaseUrl, serviceRoleKey: serviceKey, fetchImpl: fetch })
+        if (satis === 'kapali') {
+          return cevap('saglikli', { db: 'ok', uyari: 'sandbox_odeme_ucu_satis_kapali', satis_kipi: satis, config })
+        }
+      }
       // DB iyi ama yapılandırma değil. Bu AYRI bir kırmızıdır ve gizlenmemelidir:
       // sistemin ayakta olması, doğru yere bağlı olduğu anlamına gelmez.
-      return cevap('bozuk', { sebep: 'yapilandirma_kusurlu', db: 'ok', config })
+      return cevap('bozuk', { sebep: 'yapilandirma_kusurlu', db: 'ok', ...(satis ? { satis_kipi: satis } : {}), config })
     }
 
     return cevap('saglikli', { db: 'ok', config })

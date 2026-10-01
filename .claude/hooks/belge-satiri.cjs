@@ -67,6 +67,10 @@ function satir(sonuc, simdi = Date.now()) {
     parca.push('kirik yol ' + v.kirikYeni.length + ' (' + path.basename(String(ilk.belge)) + ': ' + ilk.yol + ')')
   }
   if (typeof v.grafGun === 'number' && v.grafGun >= GRAF_GUN) parca.push('graphify ' + v.grafGun + ' gun')
+  // Belgeler defteri (REC-473): null = durum dosyası yok/bozuk (OLCULMEDI görünür); undefined = eski önbellek (konuşma yok).
+  const bdf = v.belgelerDefteri
+  if (bdf === null) parca.push('belgeler defteri OLCULMEDI')
+  else if (bdf && bdf.bayat === true && typeof bdf.gun === 'number') parca.push('belgeler defteri ' + bdf.gun + ' gun')
   const saat = Math.floor((simdi - Date.parse(v.olculdu)) / 3600000)
   if (Number.isFinite(saat) && saat >= ONBELLEK_BAYAT_SAAT) parca.push('onbellek ' + saat + ' saat bayat')
   return parca.length ? '⚠BELGE: ' + parca.join(' · ') : null

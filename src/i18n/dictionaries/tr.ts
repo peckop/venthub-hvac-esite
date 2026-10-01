@@ -216,6 +216,20 @@ export const tr = {
     },
     orbital: {
       dragHint: 'Tut Çevir',
+      tapProductHint: 'Ürüne Tıkla',
+      swipeHint: 'Sol-Sağ Çevir',
+      pickCategoryHint: 'Kategoriyi Seç',
+      discoverTitle: 'Ürün Yelpazemizi Keşfedin',
+      subcategoriesTitle: '{{name}} Alt Kategorileri',
+      openMainDesktop: 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git',
+      openMainTouch: 'Dokun: Aç • Çift Dokun: Git',
+      openSubDesktop: 'Tıklayarak Ürün Sayfasına Gidin',
+      openSubTouch: 'Dokunarak Sayfaya Gidin',
+    },
+    radialMenu: {
+      subcategoriesCount: 'Alt Kategoriler ({{count}})',
+      noSubcategories: 'Alt Kategori Yok',
+      viewProducts: 'Ürünleri Gör',
     },
     category3DIcon: {
       dragHint: 'Tut Çevir',
@@ -2185,7 +2199,8 @@ export const tr = {
       shipStatus: {
         delivered: 'Teslim Edildi',
         shipped: 'Kargoda',
-        preparing: 'Hazırlanıyor'
+        preparing: 'Hazırlanıyor',
+        awaitingPayment: 'Ödeme Bekleniyor'
       },
       shipSteps: {
         preparing: 'Hazırlandı',
@@ -2197,6 +2212,7 @@ export const tr = {
       statusDelivered: 'Teslim Edildi',
       statusShipped: 'Kargoda',
       statusPreparing: 'Hazırlanıyor',
+      statusAwaitingPayment: 'Ödeme Bekleniyor',
       stepShipped: 'Kargoya Verildi',
       stepDelivered: 'Teslim Edildi',
       subtitle: 'Siparişlerinizin kargo durumunu ve takip bilgilerini buradan izleyebilirsiniz.',
@@ -2443,6 +2459,8 @@ export const tr = {
     paid: 'Ödendi',
     partialRefunded: 'Kısmi İade Edildi',
     pending: 'Beklemede',
+    processing: 'Hazırlanıyor',
+    statusUnknown: 'Durum Güncelleniyor',
     refunded: 'İade Edildi',
     shipped: 'Sevk Edildi',
     startDate: 'Başlangıç Tarihi',
@@ -3142,7 +3160,10 @@ export const tr = {
     },
     coldStorage: 'Soğuk Hava Deposu',
     coldStorageDesc: 'Soğuk zincir koruması',
+    coldStorageTip: 'Soğuk zinciri KORUR, ürün bozulmasını engeller',
     industrial: 'Endüstriyel Tesis',
+    industrialDesc: 'Fabrika, lojistik tesisi',
+    industrialTip: 'Toz, duman ve zararlı madde izolasyonu sağlar',
     retail: 'Market / Süpermarket',
     retailDesc: 'Soğutucu reyonlar',
     retailTip: 'Soğutucu reyonlardan sıcak havayı uzak tutar',

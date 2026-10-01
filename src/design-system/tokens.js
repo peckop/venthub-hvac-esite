@@ -60,6 +60,7 @@ export const borderRadius = {
 
 export const fontSize = {
   'display': ['var(--font-size-display)', { lineHeight: '1.1' }],
+  '6px': '6px',
   '7px': '7px',
   '5.5rem': '5.5rem',
 };

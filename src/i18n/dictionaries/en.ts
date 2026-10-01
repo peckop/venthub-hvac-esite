@@ -740,6 +740,20 @@ export const en: typeof tr = {
     },
     orbital: {
       dragHint: 'Drag to Spin',
+      tapProductHint: 'Tap a Product',
+      swipeHint: 'Swipe Left-Right',
+      pickCategoryHint: 'Pick a Category',
+      discoverTitle: 'Discover Our Product Range',
+      subcategoriesTitle: '{{name}} Subcategories',
+      openMainDesktop: 'Click: Open Category • Double-click: Go to Page',
+      openMainTouch: 'Tap: Open • Double Tap: Go',
+      openSubDesktop: 'Click to Open the Product Page',
+      openSubTouch: 'Tap to Open the Page',
+    },
+    radialMenu: {
+      subcategoriesCount: 'Subcategories ({{count}})',
+      noSubcategories: 'No Subcategories',
+      viewProducts: 'View Products',
     },
     category3DIcon: {
       dragHint: 'Hold to Rotate',
@@ -1559,6 +1573,8 @@ export const en: typeof tr = {
     all: 'All',
     pending: 'Pending',
     paid: 'Paid',
+    processing: 'Preparing',
+    statusUnknown: 'Status Updating',
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
@@ -2233,7 +2249,8 @@ export const en: typeof tr = {
       shipStatus: {
         delivered: 'Delivered',
         shipped: 'Shipped',
-        preparing: 'Preparing'
+        preparing: 'Preparing',
+        awaitingPayment: 'Awaiting Payment'
       },
       shipSteps: {
         preparing: 'Prepared',
@@ -2407,6 +2424,7 @@ export const en: typeof tr = {
       statusDelivered: 'Delivered',
       statusShipped: 'In Transit',
       statusPreparing: 'Preparing',
+      statusAwaitingPayment: 'Awaiting Payment',
       stepShipped: 'Shipped',
       stepDelivered: 'Delivered',
       subtitle: 'Track the shipping status and tracking details of your orders here.',
@@ -3131,6 +3149,7 @@ export const en: typeof tr = {
     close: 'Close',
     coldStorage: 'Cold Storage',
     coldStorageDesc: 'Cold chain protection',
+    coldStorageTip: 'Protects the cold chain and prevents product spoilage',
     consultUs: 'Consult us',
     customOffer: 'Request Custom Offer',
     doorHeight: 'What is Your Door Height?',
@@ -3145,6 +3164,8 @@ export const en: typeof tr = {
     heatingYesDesc: 'For winter comfort',
     heightMeter: 'Height (Meter)',
     industrial: 'Industrial Facility',
+    industrialDesc: 'Factory, logistics facility',
+    industrialTip: 'Isolates dust, smoke and harmful substances',
     insulation: 'For insulation and savings',
     matchScore: '{{score}}% Match',
     meter: 'Meter',

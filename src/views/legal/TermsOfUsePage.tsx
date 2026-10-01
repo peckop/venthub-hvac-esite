@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { isLegalContentReady } from '@/config/legal'
+import { isLegalContentReady, yasalBaslik } from '@/config/legal'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
@@ -15,7 +15,7 @@ const TermsOfUsePage: React.FC<{ lang: string }> = ({ lang }) => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold text-industrial-gray mb-6">
-        {t('legal.termsTitle')}
+        {yasalBaslik(t('legal.termsTitle'))}
       </h1>
 
       {!isLegalContentReady() && (
