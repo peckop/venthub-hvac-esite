@@ -19,7 +19,8 @@
  *   YETIM 9 (7, 11) · TITLE-YOK/TEKRAR 76 · TITLE-UZUN 77 · TITLE-TASLAK 3 · ACIKLAMA-YOK/TEKRAR 79 ·
  *   ACIKLAMA-KESIK/SABLON/KISA 5 · LANG 6 · FAVICON 2 · LASTMOD-BUGUN 42 · LASTMOD-TOPLU 29 · ROBOTS-KALIP 15 (44) ·
  *   SOFT404 1 (54) · IC-BAGLANTI-YONLENDIRME 12 · YONLENDIRME-ZINCIRI 14 · JSONLD-* 66/18/17/58/59/20/62 ·
- *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse).
+ *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse) ·
+ *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse).
  *
  * Kullanım: node scripts/seo/canli-kapi.mjs [--taban https://venthub.com.tr] [--cikti <depo dışı klasör>]
  *           [--bilinen <json>] [--kayit-durum <json>] [--bugun YYYY-MM-DD]
@@ -70,6 +71,8 @@ export const KURAL_NO = {
   'JSONLD-BREADCRUMB': '20,62',
   'ROBOTS-HARITA-ALAN': '16',
   'HARITA-ADRES-DURUM': '73',
+  'LLMS-SAYFA': '-',
+  'LLMS-DIL': '-',
 }
 const KOD_SIRASI = Object.keys(KURAL_NO)
 
@@ -170,7 +173,10 @@ function tumDugumler(v, cikti = []) {
 // ---------------------------------------------------------------------------------------------------------------
 // Site haritası ve robots.txt (saf)
 
-/** Site haritası XML'i → [{loc, lastmod, changefreq, priority}] (alt harita dizini burada çözülmez; ağ katmanı gezer). */
+/**
+ * Site haritası XML'i → { satirlar: [{loc, lastmod, changefreq, priority}], hreflangSayisi } (alt harita dizini burada
+ * çözülmez; ağ katmanı gezer). `hreflangSayisi`: `<xhtml:link … hreflang=…>` sayısı (llms.txt dil beyanı sınaması için).
+ */
 export function haritaCoz(xml) {
   const satirlar = []
   for (const m of String(xml).matchAll(/<url>([\s\S]*?)<\/url>/g)) {
@@ -178,7 +184,8 @@ export function haritaCoz(xml) {
     const loc = al('loc')
     if (loc) satirlar.push({ loc, lastmod: al('lastmod'), changefreq: al('changefreq'), priority: al('priority') })
   }
-  return { satirlar }
+  const hreflangSayisi = [...String(xml).matchAll(/<xhtml:link\b[^>]*\bhreflang\s*=/gi)].length
+  return { satirlar, hreflangSayisi }
 }
 
 /** robots.txt → `User-agent: *` grubundaki boş olmayan Disallow kalıpları. */
@@ -393,6 +400,40 @@ function jsonldKontrolleri(sayfalar, cikti) {
   }
 }
 
+/** Sayıyı yazıdan okur ("1.234", "1,234" binlik ayırıcılı olabilir). */
+const sayiOku = (s) => Number(String(s).replace(/[.,]/g, ''))
+
+/**
+ * llms.txt'in sayfa/dil beyanı site haritası gerçeğiyle çelişirse KIRMIZI (SEO-6, 2026-10-02: dosya "~190 sayfa, TR/EN
+ * hreflang, ~37 kategori" diyordu, gerçek 87 adres, yalnız TR, 24 kategori, hreflang yok; 08-29'dan beri bayattı).
+ * Beyan biçimi (makine okur): "N pages|URLs" (yalnız yazılmışsa sınanır), "N categories" (yalnız yazılmışsa sınanır) ve
+ * ZORUNLU `Languages (ISO 639-1): tr[, en]` satırı. Dil kümesi haritanın `/tr|/en` yol önekleri; `<xhtml:link hreflang>`
+ * varsa karşı dil de var sayılır (iki dil). Dil satırı yoksa da KIRMIZI: dil beyanı zorunlu, sessiz geçmez.
+ */
+export function llmsKontrolu(harita, llms, cikti, adres = '/llms.txt') {
+  const metin = String(llms)
+  const yollar = harita.satirlar.map((s) => { try { return new URL(s.loc).pathname } catch { return s.loc } })
+  const gercekSayfa = harita.satirlar.length
+  const gercekKategori = yollar.filter((y) => /\/category\//.test(y)).length
+  for (const m of metin.matchAll(/(\d[\d.,]*)\s+(?:indexable\s+)?(?:pages|urls)\b/gi)) {
+    if (sayiOku(m[1]) !== gercekSayfa) cikti.push(bulgu('LLMS-SAYFA', 'KIRMIZI', adres, `llms.txt "${m[0]}" diyor, site haritasında ${gercekSayfa} adres var`))
+  }
+  for (const m of metin.matchAll(/(\d[\d.,]*)\s+categories\b/gi)) {
+    if (sayiOku(m[1]) !== gercekKategori) cikti.push(bulgu('LLMS-SAYFA', 'KIRMIZI', adres, `llms.txt "${m[0]}" diyor, site haritasında ${gercekKategori} kategori adresi var`))
+  }
+  const satir = /^[\s>*_-]*languages\b[^:\n]*:\s*(.+)$/im.exec(metin)
+  if (!satir) {
+    cikti.push(bulgu('LLMS-DIL', 'KIRMIZI', adres, 'llms.txt\'te "Languages (ISO 639-1): tr" biçiminde dil beyanı satırı yok (zorunlu)'))
+    return
+  }
+  const beyan = new Set(satir[1].toLowerCase().match(/\b(?:tr|en)\b/g) || [])
+  const gercek = new Set()
+  for (const y of yollar) { const d = dilOnEki(y); if (d) gercek.add(d) }
+  if ((harita.hreflangSayisi || 0) > 0) { gercek.add('tr'); gercek.add('en') }
+  const yaz = (k) => [...k].sort().join(',') || 'yok'
+  if (yaz(beyan) !== yaz(gercek)) cikti.push(bulgu('LLMS-DIL', 'KIRMIZI', adres, `llms.txt diller: ${yaz(beyan)}; site haritası diller: ${yaz(gercek)} (hreflang ${harita.hreflangSayisi || 0})`))
+}
+
 function yonlendirmeKontrolleri(sayfalar, ek, taban, cikti) {
   const YON = new Set([301, 302, 307, 308])
   if (ek.yonlendirmeler) {
@@ -437,6 +478,7 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   faviconKontrolu(sayfalar, ek.varliklar, cikti)
   lastmodKontrolu(harita, bugun, cikti)
   if (ek.robots != null) robotsKontrolu(harita, ek.robots, ek.gizli, taban, cikti)
+  if (ek.llms != null) llmsKontrolu(harita, ek.llms, cikti, taban + '/llms.txt')
   for (const [yol, v] of Object.entries(ek.yanitlar || {})) {
     if (v.durum !== 404 && v.durum !== 410) cikti.push(bulgu('SOFT404', 'KIRMIZI', yol, `olmayan adres HTTP ${v.durum} döndü (404 beklenir)${v.konum ? ' → ' + v.konum : ''}`))
   }
@@ -588,12 +630,15 @@ async function haritaGetir(taban) {
   if (r.durum !== 200) throw new Error(`sitemap.xml HTTP ${r.durum}`)
   if (!/<sitemapindex/i.test(r.html)) return haritaCoz(r.html)
   const satirlar = []
+  let hreflangSayisi = 0
   for (const m of r.html.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)) {
     const alt = await istek(varlikCoz(m[1]), { govde: 'metin' })
     if (alt.durum !== 200) throw new Error(`alt harita HTTP ${alt.durum}`)
-    satirlar.push(...haritaCoz(alt.html).satirlar)
+    const cozulen = haritaCoz(alt.html)
+    satirlar.push(...cozulen.satirlar)
+    hreflangSayisi += cozulen.hreflangSayisi
   }
-  return { satirlar }
+  return { satirlar, hreflangSayisi }
 }
 
 /** Yönlendirme zincirini elle izler; sıçrama = 3xx yanıt sayısı. */
@@ -634,6 +679,7 @@ async function topla(taban, bugun) {
   const ek = { taban, bugun, enSayfalar: [], varliklar: {}, gizli: {}, yanitlar: {}, yonlendirmeler: {}, zincirler: {} }
   const isler = []
   isler.push(async () => { const r = await dene('/robots.txt', () => istek(`${taban}/robots.txt`, { govde: 'metin' })); if (r) { if (r.durum === 200) ek.robots = r.html; else hatalar.push(`/robots.txt (HTTP ${r.durum})`) } })
+  isler.push(async () => { const r = await dene('/llms.txt', () => istek(`${taban}/llms.txt`, { govde: 'metin' })); if (r) { if (r.durum === 200) ek.llms = r.html; else if (r.durum !== 404) hatalar.push(`/llms.txt (HTTP ${r.durum})`) } })
   for (const yol of EN_SAYFALAR) isler.push(async () => { const r = await dene(yol, () => istek(taban + yol, { govde: 'metin' })); if (r) ek.enSayfalar.push({ yol, durum: r.durum, html: r.durum === 200 ? r.html : null }) })
   for (const [yol, tur] of IKON_DOSYALARI) isler.push(async () => { const r = await dene(yol, () => istek(taban + yol, { govde: 'bayt' })); if (r) ek.varliklar[yol] = { durum: r.durum, ilk: r.ilk, tur } })
   for (const yol of GIZLI_YUZEYLER) isler.push(async () => { const r = await dene(yol, () => istek(taban + yol, { govde: 'metin' })); if (r) ek.gizli[yol] = { durum: r.durum, basliklar: r.basliklar, html: r.durum === 200 ? r.html : null } })
