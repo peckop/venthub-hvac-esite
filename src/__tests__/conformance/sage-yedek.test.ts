@@ -231,7 +231,8 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
       const r = spawnSync(process.execPath, [KANCA_OTURUM_SONU], {
         input: '{"session_id":"t","reason":"clear"}',
         encoding: 'utf8',
-        env: { ...process.env, CLAUDE_PROJECT_DIR: kok, VENTHUB_SAGE_YEDEK_DIZINI: dizin },
+        // VENTHUB_RECEP_DEFTER: gerçek makine defterini yedeklemesin/döndürmesin (ARC-15).
+        env: { ...process.env, CLAUDE_PROJECT_DIR: kok, VENTHUB_SAGE_YEDEK_DIZINI: dizin, VENTHUB_RECEP_DEFTER: path.join(dizin, 'yok', 'defter.jsonl') },
         timeout: 60_000,
       })
       const l = path.join(dizin, 'son-kosum.log')
@@ -347,7 +348,8 @@ describe('INV-SAGE-YEDEK-1 · sage yedegi tutarli ve dogrulanmis', () => {
       const r = spawnSync(process.execPath, [KANCA_ISTEM], {
         input: '{"session_id":"t"}',
         encoding: 'utf8',
-        env: { ...process.env, VENTHUB_SAGE_YEDEK_DIZINI: dizin },
+        // VENTHUB_RECEP_DEFTER: bu makinenin GERÇEK defterine bakmasın (ARC-15: istem satırı defter yedeğini de ölçer).
+        env: { ...process.env, VENTHUB_SAGE_YEDEK_DIZINI: dizin, VENTHUB_RECEP_DEFTER: path.join(dizin, 'yok', 'defter.jsonl') },
         timeout: 60_000,
       })
       return `${r.stdout ?? ''}${r.stderr ?? ''}`

@@ -619,6 +619,31 @@ describe('INV-DEPARTMAN-AC-6 · --taze: resume YOK, yeni oturum --name ile, ilk 
     expect(k.plan.argumentList).toContain(`"${istem}"`) // boşluklu istem tek argüman olarak TIRNAKLI
   })
 
+  it('ilk mesaj `--` ayırıcısından SONRA gelir (--mcp-config değişken uzunluklu: ayırıcı yoksa istem .mcp.json un değeri sanılıp yutulur)', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    const k = ac('Araç', d, ['--taze'])
+    const a = k.plan.args ?? []
+    expect(a.at(-2)).toBe('--')
+    expect(a.indexOf('--')).toBeGreaterThan(a.indexOf('--mcp-config'))
+    expect(a.filter((x) => x === '--')).toHaveLength(1)
+    expect(k.plan.argumentList).toMatch(/ -- "Durum dosyan/)
+  })
+
+  it('--taze OLMADAN `--` ayırıcısı YOK (istem yoksa ayırıcı da anlamsız)', () => {
+    const d = yeniDuzenek()
+    claim(d, S_ARAC, 'ARAC')
+    expect(ac('Araç', d).plan.args).not.toContain('--')
+  })
+
+  it('başlık notu: ekip modu terminalde VAR (resume dahil), `/desktop` onu düşürür; eski "ölçülmedi/kurulmaz" cümlesi YOK', () => {
+    const baslik = fs.readFileSync(AC, 'utf8').split('\n').slice(0, 60).join('\n')
+    expect(baslik).toContain('/desktop')
+    expect(baslik).toContain('TERMİNAL')
+    expect(baslik).not.toContain('ÖLÇÜLMEDİ')
+    expect(baslik).not.toContain('Desktop penceresinde ekip kurulmaz')
+  })
+
   it('durum dosyası BULUNAMADI: genel cümle + uyarı (yol uydurulmaz)', () => {
     const d = yeniDuzenek()
     claim(d, S_ARAC, 'ARAC')
