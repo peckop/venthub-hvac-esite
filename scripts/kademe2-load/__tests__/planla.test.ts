@@ -150,13 +150,28 @@ describe('load.mjs — yazma yolu sözleşmesi (metin denetimi, sabotaj yönlü)
     expect(kapi).toBeLessThan(kaynak.indexOf('// ---------- APPLY ----------'))
   })
 
-  it('mevcut ürün GÜNCELLENMEZ: products üzerinde tek update image_url, upsert hiç yok', () => {
+  it('mevcut ürün GÜNCELLENMEZ: products üzerinde tek update image_url, products upsert hiç yok', () => {
     expect(apply).toContain('// ---------- APPLY ----------')
-    expect(apply).not.toMatch(/\.upsert\s*\(/)
+    expect(apply).not.toMatch(/from\('products'\)\.upsert\s*\(/)
     const guncellemeler = [...apply.matchAll(/from\('products'\)\.update\(\{([^}]*)\}\)/g)].map((m) => m[1].trim())
     expect(guncellemeler).toEqual(['image_url: pub.publicUrl'])
     // mevcut ürün dalı yalnız kimliği alır, yazmaz
     expect(apply).toMatch(/if \(existing\) \{ pid = existing\.id \}/)
+  })
+
+  it('REC-383: maliyet products\'a YAZILMAZ; yalnız yeni üründe product_costs\'a UPSERT (on conflict product_id)', () => {
+    // products'a giden satırdan maliyet alanları ayıklanır
+    expect(apply).toMatch(/const \{ imageFile, famSlug, purchase_price, purchase_currency, \.\.\.cols \} = p/)
+    // tek maliyet yazımı: product_costs upsert, çakışma anahtarı product_id, yeni ürün dalında
+    const maliyetYazimi = [...apply.matchAll(/from\('product_costs'\)\.(\w+)\(/g)].map((m) => m[1])
+    expect(maliyetYazimi).toEqual(['upsert'])
+    expect(apply).toMatch(/onConflict: 'product_id'/)
+    const yeniDal = apply.slice(apply.indexOf('else {', apply.indexOf('if (existing)')), apply.indexOf('if (imageFile)'))
+    expect(yeniDal).toContain("from('product_costs').upsert(")
+    // 8 maliyet kolonundan hiçbiri products yazımında adıyla geçmez
+    for (const k of ['purchase_rate_to_base', 'cost_in_base', 'last_purchase_cost', 'last_purchase_currency', 'last_purchased_at', 'supplier_name']) {
+      expect(apply).not.toContain(k)
+    }
   })
 
   it('planlama kuralları load.mjs içinde kopya tutulmaz (tek kaynak planla.mjs)', () => {

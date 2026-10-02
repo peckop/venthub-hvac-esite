@@ -151,7 +151,10 @@ for (const fam of families.values()) {
 // ürünler + görseller
 let inserted = 0
 for (const p of products) {
-  const { imageFile, famSlug, ...cols } = p
+  // REC-383 (REC-140 Faz 3): liste/maliyet alanları products'ta YOK, admin-yalnız product_costs'ta.
+  // products'a yalnız ürün kolonları gider; maliyet satırını products INSERT tetiği yaratır, biz
+  // değerini UPSERT ederiz (insert değil — satır zaten var). Mevcut ürün yine GÜNCELLENMEZ.
+  const { imageFile, famSlug, purchase_price, purchase_currency, ...cols } = p
   const row = { ...cols, tenant_id: TENANT_ID, family_id: famIds.get(famSlug) }
   const existing = await must(sb.from('products').select('id').eq('sku', p.sku).maybeSingle(), 'product select')
   let pid
@@ -159,6 +162,9 @@ for (const p of products) {
   else {
     const ins = await must(sb.from('products').insert(row).select('id').single(), `product insert ${p.sku}`)
     pid = ins.id; inserted++
+    await must(sb.from('product_costs').upsert(
+      { product_id: pid, tenant_id: TENANT_ID, purchase_price, purchase_currency },
+      { onConflict: 'product_id' }), `product_costs upsert ${p.sku}`)
   }
   if (imageFile) {
     const ext = imageFile.split('.').pop().toLowerCase()
