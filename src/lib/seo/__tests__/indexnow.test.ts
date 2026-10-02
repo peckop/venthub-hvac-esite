@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { INDEXNOW_ANAHTARI } from '@/config/indexnow'
 import { SITE_URL } from '@/config/siteUrl'
+import { aileYollari, kategoriYollari } from '@/lib/adres/tazelemeYollari'
+import type { AdresDili } from '@/utils/adresUret'
 
 import { indexNowBildir, K3B_BOLUMLERI, K3B_DISI_BOLUMLER, k3bdenEtkilenirMi } from '../indexnow'
 
@@ -129,6 +131,61 @@ describe('INV-INDEXNOW-1 · k3bdenEtkilenirMi süzgeci', () => {
     expect(k3bdenEtkilenirMi('/tr')).toBe(false)
     expect(k3bdenEtkilenirMi(`${SITE_URL}/tr/bilgi-merkezi`), 'tam URL').toBe(false)
     expect(k3bdenEtkilenirMi(`${SITE_URL}/tr/products/x`), 'tam URL').toBe(true)
+  })
+
+  it('⭐yol normalize edilir: ".." ile etkilenen bölüme kaçan yol etkilenir; düz etkilenmeyen yol geçer', () => {
+    expect(k3bdenEtkilenirMi('/tr/destek/../urun/x'), 'destek/../urun').toBe(true)
+    expect(k3bdenEtkilenirMi('/tr/urun-secici/../urun/x'), 'urun-secici/../urun').toBe(true)
+    expect(k3bdenEtkilenirMi('/tr/destek/%2e%2e/urun/x'), 'kodlanmış ..').toBe(true)
+    expect(k3bdenEtkilenirMi(`${SITE_URL}/tr/destek/../urun/x`), 'tam URL ile ..').toBe(true)
+    expect(k3bdenEtkilenirMi('/tr/destek'), 'düz etkilenmeyen').toBe(false)
+    expect(k3bdenEtkilenirMi('/tr'), 'dil kökü').toBe(false)
+    expect(k3bdenEtkilenirMi('/tr/destek?x=1#a'), 'sorgu ve parça').toBe(false)
+  })
+
+  it('çözülemeyen girdi güvenli tarafta: etkilenir (düşer)', () => {
+    expect(k3bdenEtkilenirMi('http://'), 'geçersiz URL').toBe(true)
+    expect(k3bdenEtkilenirMi('//baska-kok/tr/destek'), 'tabanı değiştiren biçim').toBe(true)
+  })
+})
+
+describe('INV-INDEXNOW-1 · süzgeç ↔ tazelemeYollari bağı', () => {
+  // Webhook'un `revalidatePath` listesi bu fonksiyonlardan gelir ve sonra IndexNow'a gider. Süzgeç bu listeyi
+  // yakalamazsa bayrak kapalıyken değişecek adres Bing'e sızar (K4). Yeni şema/bölüm eklenirse bu bağ kırılır.
+  const kok = (dil: AdresDili) => (dil === 'tr' ? 'fanlar' : 'fans')
+  const ust = (dil: AdresDili) => (dil === 'tr' ? 'havalandirma' : 'ventilation')
+
+  const TAZELEME_YOLLARI = [
+    ...aileYollari('x'),
+    ...kategoriYollari(kok),
+    ...kategoriYollari(kok, ust),
+  ]
+
+  afterEach(() => {
+    bayrak.acik = false
+    vi.restoreAllMocks()
+  })
+
+  it('tazeleme yolları boş değil (bağ kendiliğinden boşalmasın)', () => {
+    expect(aileYollari('x').length).toBeGreaterThan(0)
+    expect(kategoriYollari(kok).length).toBeGreaterThan(0)
+    expect(kategoriYollari(kok, ust).length).toBeGreaterThan(kategoriYollari(kok).length)
+  })
+
+  it.each(TAZELEME_YOLLARI)('⭐%s → k3bdenEtkilenirMi true', (yol) => {
+    expect(k3bdenEtkilenirMi(yol), `süzgeç tazeleme yolunu kaçırdı: ${yol}`).toBe(true)
+  })
+
+  it('⭐bayrak KAPALI — tazeleme yollarının HEPSİ bildirilirse ağ isteği atılmaz, sonuç yayin-oncesi', async () => {
+    bayrak.acik = false
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 200 }))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const sonuc = await indexNowBildir(TAZELEME_YOLLARI)
+
+    expect(fetchSpy, 'tazeleme yoluyla istek atıldı (K4)').not.toHaveBeenCalled()
+    expect(sonuc.durum).toBe('atlandi')
+    expect(sonuc).toMatchObject({ durum: 'atlandi', sebep: 'yayin-oncesi' })
   })
 })
 

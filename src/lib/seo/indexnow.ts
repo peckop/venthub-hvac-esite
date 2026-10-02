@@ -34,6 +34,9 @@ const MAX_URL = 10_000
 
 const DILLER: readonly AdresDili[] = ['tr', 'en']
 
+/** Göreli yolları çözmek için sahte kök (`URL` göreli girdiyi tabansız çözmez; yalnız pathname okunur). */
+const NORMALIZE_TABANI = 'http://x'
+
 /**
  * K3-b'nin DOKUNDUĞU bölüm adları — elle yazılmaz, TEK ADRES ÜRETİCİSİNDEN türetilir.
  * `adresUret` her nesne türü için iki dilde, bayrak KAPALI (bugünkü şema) ve AÇIK (yeni şema)
@@ -75,17 +78,23 @@ export const K3B_DISI_BOLUMLER: ReadonlySet<string> = new Set([
  * Yol, K3-b adres şeması açıldığında DEĞİŞECEK (ya da bunu bilemediğimiz) bir adres mi?
  * Girdi göreli yol (`/tr/products/x`) veya tam URL olabilir. Dil kökü (`/tr`, `/en`) etkilenmez;
  * dilsiz yollar (`/sitemap.xml`, `/products/x`) vitrin sayfası değil ya da yönlendirilir → etkilenir.
+ *
+ * Girdi ÖNCE `URL` ile normalize edilir: `/tr/destek/../urun/x` gerçekte `/tr/urun/x`'tir; bölüm kontrolü ham
+ * metne bakarsa `destek` görür ve değişecek adresi bildirirdi (K4 ihlali). Çözülemeyen girdi (geçersiz URL,
+ * başka kök adres) güvenli taraftadır: etkilenir → düşer.
  */
 export function k3bdenEtkilenirMi(yol: string): boolean {
-  let yolAdi = yol
-  if (yol.startsWith('http://') || yol.startsWith('https://')) {
-    try {
-      yolAdi = new URL(yol).pathname
-    } catch {
-      return true
-    }
+  let yolAdi: string
+  try {
+    const cozulen = new URL(yol, NORMALIZE_TABANI)
+    const tamUrlMi = yol.startsWith('http://') || yol.startsWith('https://')
+    // Göreli girdi kendi kökünde kalmalı; `//baska-kok/tr` gibi biçimler tabanı değiştirir → çözülemedi say.
+    if (!tamUrlMi && cozulen.origin !== NORMALIZE_TABANI) return true
+    yolAdi = cozulen.pathname
+  } catch {
+    return true
   }
-  const parcalar = yolAdi.split(/[?#]/)[0].split('/').filter(Boolean)
+  const parcalar = yolAdi.split('/').filter(Boolean)
   if (!DILLER.some((d) => d === parcalar[0])) return true
   const bolum = parcalar[1]
   if (bolum === undefined) return false
