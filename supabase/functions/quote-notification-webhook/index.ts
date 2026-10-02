@@ -26,6 +26,7 @@ import { checkRateLimit } from '../_shared/rate_limit.ts'
 import { DEFAULT_TENANT_ID } from '../_shared/tenant.ts'
 import { getTenantBranding, VARSAYILAN_GONDERICI } from '../_shared/tenant_config.ts'
 import { icBildirimOlustur, kacir, musteriOnayAnahtari } from './ic_bildirim.ts'
+import { olayCoz, YAYIM_OLAYI, yayimDaliniIsle, type YayimKalemi, type YayimTeklif } from './yayim.ts'
 
 const SKEW_MS = 5 * 60 * 1000 // 5 dk tolerans (returns-webhook ile aynı pencere)
 const KULLANICI_SAATLIK = 5 // REC-380: oturumlu kullanıcı başına saatlik teklif e-postası (misafir e-posta sınırıyla aynı)
@@ -66,6 +67,8 @@ async function hmacValid(secret: string, raw: string, signature: string): Promis
 }
 
 interface QuotePayload {
+  /** REC-384: yoksa talep dalı (mevcut INSERT tetiği göndermez); 'quote_published' → yayım dalı. */
+  event?: unknown
   quote_id?: string
   record?: { id?: string }
 }
@@ -104,10 +107,95 @@ Deno.serve(async (req: Request) => {
     } catch {
       return json({ error: 'invalid_json' }, 400)
     }
+    // ── OLAY AYRIMI (REC-384): kimlik + replay guard + gövde geçtikten SONRA, DB'den ÖNCE ──────
+    // `event` yok → bugünkü talep dalı (geriye uyum). 'quote_published' → yayım dalı (yayim.ts).
+    // Başka her değer 400: tanımadığı olayı "talep" sayan uç yanlış e-posta + sahte iç bildirim üretirdi.
+    const olay = olayCoz(payload)
+    if (olay === 'bilinmeyen') return json({ error: 'unknown_event' }, 400)
+
     const quoteId = payload.quote_id || payload.record?.id
     if (!quoteId) return json({ error: 'quote_id_required' }, 400)
 
     const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } })
+
+    if (olay === 'yayim') {
+      // Yayım dalı talep dalının hiçbir kapısını (request_email_sent_at, kullanıcı hız sınırı,
+      // iç bildirim) KULLANMAZ; kendi damgası published_email_sent_at. Portlar burada kurulur,
+      // dal mantığı saf modülde (vitest sahte portlarla koşar).
+      const resendKey = Deno.env.get('RESEND_API_KEY') || ''
+      if (!resendKey) return json({ error: 'CONFIG_MISSING' }, 500)
+      const sonuc = await yayimDaliniIsle(
+        quoteId,
+        {
+          teklifOku: async (id) => {
+            // published_email_sent_at yalnız BU dalda seçilir: kolon REC-384 migration'ıyla gelir,
+            // talep dalının SELECT'ine girseydi migration'dan önce inen deploy talep e-postasını kırardı.
+            const { data, error } = await supabase
+              .from('venthub_quotes')
+              .select('id, tenant_id, user_id, status, quote_no, total_amount, currency, valid_until, contact_email, published_email_sent_at')
+              .eq('id', id)
+              .maybeSingle()
+            return { data: (data as YayimTeklif | null) ?? null, error: error?.message ?? null }
+          },
+          kalemleriOku: async (id) => {
+            // Yayımdan sonra kalemler kilitli (trg_quote_items_durum_kilidi) → talep dalındaki yarış yok.
+            const { data, error } = await supabase
+              .from('venthub_quote_items')
+              .select('product_name, qty, unit_price, line_no')
+              .eq('quote_id', id)
+              .order('line_no', { ascending: true, nullsFirst: false })
+            return { data: (data as YayimKalemi[] | null) ?? null, error: error?.message ?? null }
+          },
+          authEpostasi: async (userId) => {
+            const { data } = await supabase.auth.admin.getUserById(userId)
+            return data?.user?.email ?? null
+          },
+          kiraciDestekAdresi: async (tenantId) => {
+            const { data, error } = await supabase.from('tenants').select('config').eq('id', tenantId).maybeSingle()
+            if (error) return { adres: null, error: error.message }
+            const cfg = (data?.config ?? {}) as Record<string, string>
+            return { adres: cfg.support_email || cfg.supportEmail || null, error: null }
+          },
+          marka: (tenantId) => getTenantBranding(tenantId),
+          deftereYaz: async (id, satir) => {
+            const { error } = await supabase
+              .from('quote_email_events')
+              .insert({ quote_id: id, event: YAYIM_OLAYI, ...satir })
+            return error?.message ?? null
+          },
+          gonderimSatiriVarMi: async (id) => {
+            const { data, error } = await supabase
+              .from('quote_email_events')
+              .select('id')
+              .eq('quote_id', id)
+              .eq('event', YAYIM_OLAYI)
+              .eq('status', 'sent')
+              .limit(1)
+            return { var: (data ?? []).length > 0, error: error?.message ?? null }
+          },
+          damgala: async (id) => {
+            const { error } = await supabase
+              .from('venthub_quotes')
+              .update({ published_email_sent_at: new Date().toISOString() })
+              .eq('id', id)
+              .is('published_email_sent_at', null)
+            return error?.message ?? null
+          },
+          resendGonder: (govde, anahtar) =>
+            fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${resendKey}`,
+                'Content-Type': 'application/json',
+                'Idempotency-Key': anahtar,
+              },
+              body: JSON.stringify(govde),
+            }),
+        },
+        { varsayilanKiraciId: DEFAULT_TENANT_ID, siteUrl: Deno.env.get('SITE_URL') ?? null },
+      )
+      return json(sonuc.govde, sonuc.durum)
+    }
 
     const { data: quote, error: quoteErr } = await supabase
       .from('venthub_quotes')
