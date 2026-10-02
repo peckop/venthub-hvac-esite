@@ -22,6 +22,11 @@ import { type AdresDili, type AdresNesnesi, adresUret } from '@/utils/adresUret'
  * Hepsi düşerse ağ isteği atılmaz ve sonuç `atlandi/yayin-oncesi` olarak GÖRÜNÜR (sessiz olmak
  * görünmez olmak değildir). Bayrak açıldığı yayında süzgeç kendiliğinden devreden çıkar.
  *
+ * KAPATMA (REC-405): bildirim sorun çıkarırsa (yanlış adres öğretme şüphesi, arama motoru şikâyeti) kod
+ * değişmeden kapatılır: Vercel'de `INDEXNOW_KAPALI=1` (ya da `true`) tanımlanıp yeniden dağıtılır. Bu durumda yol
+ * süzgecine ve ağa hiç girilmez, sonuç `atlandi/kapatildi` olarak webhook yanıtında GÖRÜNÜR. Değişken yok, boş ya da
+ * başka değerdeyse bildirim AÇIKTIR (varsayılan).
+ *
  * Bildirim BEST-EFFORT bir yan etkidir: başarısız olması webhook'u ASLA düşürmemeli, çünkü
  * webhook'un asıl işi önbellek tazelemektir. Bu yüzden burada hiçbir hata yukarı fırlatılmaz;
  * yutulan hata GÜNLÜĞE yazılır (sessiz yutma on gün gizlenir — ölçüldü).
@@ -108,10 +113,17 @@ export function k3bdenEtkilenirMi(yol: string): boolean {
 }
 
 export type BildirimSonucu =
+  | { durum: 'atlandi'; sebep: 'kapatildi' }
   | { durum: 'atlandi'; sebep: 'yol-yok' }
   | { durum: 'atlandi'; sebep: 'yayin-oncesi'; dusurulen: number }
   | { durum: 'gonderildi'; gonderilen: number; dusurulen: number; http: number }
   | { durum: 'hata'; mesaj: string; dusurulen: number }
+
+/** `INDEXNOW_KAPALI` değeri (boşluk kırpılır, büyük/küçük harf fark etmez) `1` ya da `true` ise bildirim kapalıdır. */
+function bildirimKapaliMi(): boolean {
+  const deger = process.env.INDEXNOW_KAPALI?.trim().toLowerCase()
+  return deger === '1' || deger === 'true'
+}
 
 /** Göreli yolu tam URL'ye çevirir; zaten tam URL ise dokunmaz. */
 function tamUrl(yol: string): string {
@@ -126,6 +138,9 @@ function tamUrl(yol: string): string {
  *               Yinelenenler tekilleştirilir; boş liste no-op'tur.
  */
 export async function indexNowBildir(yollar: readonly string[]): Promise<BildirimSonucu> {
+  // Kapatma anahtarı: yol süzgecinden ve ağdan ÖNCE (dosya başındaki "KAPATMA" notu).
+  if (bildirimKapaliMi()) return { durum: 'atlandi', sebep: 'kapatildi' }
+
   const key = process.env.INDEXNOW_KEY?.trim() || INDEXNOW_ANAHTARI
 
   // Tekilleştir: webhook aynı yolu birden çok dalda biriktirebiliyor (zincir yürüyüşü).

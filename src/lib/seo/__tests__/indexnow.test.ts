@@ -36,6 +36,7 @@ vi.mock('@/config/features', async (orijinal) => {
 })
 
 const ORIJINAL_KEY = process.env.INDEXNOW_KEY
+const ORIJINAL_KAPALI = process.env.INDEXNOW_KAPALI
 const KOK = process.cwd()
 
 interface Govde {
@@ -203,12 +204,15 @@ describe('INV-INDEXNOW-1 · bildirim sözleşmesi', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     delete process.env.INDEXNOW_KEY
+    delete process.env.INDEXNOW_KAPALI
     bayrak.acik = false
   })
 
   afterEach(() => {
     if (ORIJINAL_KEY === undefined) delete process.env.INDEXNOW_KEY
     else process.env.INDEXNOW_KEY = ORIJINAL_KEY
+    if (ORIJINAL_KAPALI === undefined) delete process.env.INDEXNOW_KAPALI
+    else process.env.INDEXNOW_KAPALI = ORIJINAL_KAPALI
     bayrak.acik = false
     vi.restoreAllMocks()
   })
@@ -263,6 +267,38 @@ describe('INV-INDEXNOW-1 · bildirim sözleşmesi', () => {
       http: 202,
     })
   })
+
+  it.each(['1', 'true', 'TRUE', ' True '])(
+    '⭐INDEXNOW_KAPALI=%j — bayrak AÇIK olsa bile fetch ÇAĞRILMAZ, sonuç atlandi/kapatildi',
+    async (deger) => {
+      process.env.INDEXNOW_KAPALI = deger
+      bayrak.acik = true
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 200 }))
+
+      const sonuc = await indexNowBildir([...ETKILENEN_YOLLAR, ...ETKILENMEYEN_YOLLAR])
+
+      expect(fetchSpy, 'kapatma anahtarına rağmen istek atıldı').not.toHaveBeenCalled()
+      expect(sonuc).toEqual({ durum: 'atlandi', sebep: 'kapatildi' })
+    },
+  )
+
+  it('INDEXNOW_KAPALI=1 iken boş yol listesi de kapatildi döner (anahtar yol kontrolünden önce)', async () => {
+    process.env.INDEXNOW_KAPALI = '1'
+    expect(await indexNowBildir([])).toEqual({ durum: 'atlandi', sebep: 'kapatildi' })
+  })
+
+  it.each([undefined, '', '  ', '0', 'false', 'evet'])(
+    'INDEXNOW_KAPALI=%j — bildirim AÇIK, mevcut davranış değişmez',
+    async (deger) => {
+      if (deger !== undefined) process.env.INDEXNOW_KAPALI = deger
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 200 }))
+
+      const sonuc = await indexNowBildir(ETKILENMEYEN_YOLLAR)
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+      expect(sonuc).toEqual({ durum: 'gonderildi', gonderilen: ETKILENMEYEN_YOLLAR.length, dusurulen: 0, http: 200 })
+    },
+  )
 
   it('gönderilecek yol YOK — ağ isteği denenmez', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch')
