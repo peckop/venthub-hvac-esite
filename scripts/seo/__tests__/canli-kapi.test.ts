@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   kontrolEt, haritaCoz, sayfaAlanlari, jsonldBloklari, robotsDisallow, robotsEslesir,
-  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO,
+  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu,
 } from '../canli-kapi.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -29,9 +29,10 @@ type Ek = {
   taban: string; bugun: string; robots: string
   enSayfalar: Kayit[]; varliklar: Record<string, Kayit>; gizli: Record<string, GizliKayit>
   yanitlar: Record<string, Kayit>; yonlendirmeler: Record<string, Kayit>; zincirler: Record<string, Kayit>
+  llms?: string
 }
 type Satir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
-type Veri = { harita: { satirlar: Satir[] }; sayfalar: Sayfa[]; ek: Ek }
+type Veri = { harita: { satirlar: Satir[]; hreflangSayisi?: number }; sayfalar: Sayfa[]; ek: Ek }
 type Bulgu = { kod: string; seviye: string; adres: string; kanit: string; bilinen?: string }
 type HtmlSecenek = { title?: string | null; desc?: string | null; h1?: string; lang?: string | null; icon?: boolean; ld?: unknown[]; links?: string[] }
 
@@ -383,6 +384,11 @@ describe('INV-CANLI-KAPI-1 · ROBOTS-HARITA-ALAN ve ayrıştırıcılar (kural 1
       { loc: 'https://a/y', lastmod: null, changefreq: null, priority: null },
     ])
   })
+  it('haritaCoz hreflangSayisi: <xhtml:link hreflang> sayar; yoksa 0', () => {
+    const var1 = '<urlset><url><loc>https://a/tr</loc><xhtml:link rel="alternate" hreflang="en" href="https://a/en"/><xhtml:link rel="alternate" hreflang="tr" href="https://a/tr"/></url></urlset>'
+    expect(haritaCoz(var1).hreflangSayisi).toBe(2)
+    expect(haritaCoz('<urlset><url><loc>https://a/tr</loc></url></urlset>').hreflangSayisi).toBe(0)
+  })
   it('sayfaAlanlari: gövde içi <svg><title> sayılmaz, ilk <h1> alınır, lang okunur, script içi dizgi etiket sayılmaz', () => {
     const a = sayfaAlanlari('<html lang="en"><head><title> Gerçek &amp; Başlık </title><script>var s = "<title>sahte</title>"</script></head><body><svg><title>ikon</title></svg><h1>Bir <b>ad</b></h1><h1>ikinci</h1></body></html>')
     expect(a).toMatchObject({ title: 'Gerçek & Başlık', h1: 'Bir ad', lang: 'en' })
@@ -478,5 +484,92 @@ describe('bilinen listesi kalıcı susturucu olamaz (OPS şartı, REC-502)', () 
       expect(kayit).toMatch(/^REC-\d+$/)
       expect(kodlar.some((x) => x === kod || x.startsWith(kod + '-')), `${kod} kural tablosunda yok`).toBe(true)
     }
+  })
+})
+
+/**
+ * INV-LLMS-GERCEK-1 · llms.txt'in sayfa/dil beyanı site haritasıyla çelişirse KIRMIZI (SEO-6, 2026-10-02).
+ * Dosya "~190 sayfa, TR/EN hreflang, ~37 kategori" diyordu; gerçek 87 adres, yalnız TR, 24 kategori. Kural: beyan ya
+ * gerçeği söyler ya kapı kırmızıdır (kontrolü olmayan kural yoktur).
+ */
+type HaritaSatir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
+const haritaSatir = (yol: string): HaritaSatir => ({ loc: TABAN + yol, lastmod: null, changefreq: null, priority: null })
+function haritaKur(toplam: number, kategori: number, enSayfa = 0): { satirlar: HaritaSatir[]; hreflangSayisi: number } {
+  const satirlar: HaritaSatir[] = []
+  for (let i = 0; i < kategori; i++) satirlar.push(haritaSatir(`/tr/category/k${i}`))
+  for (let i = 0; i < enSayfa; i++) satirlar.push(haritaSatir(`/en/products/p${i}`))
+  while (satirlar.length < toplam) satirlar.push(haritaSatir(`/tr/products/p${satirlar.length}`))
+  return { satirlar, hreflangSayisi: 0 }
+}
+const llmsMetni = (ek = ''): string => [
+  '# VentHub', 'Languages (ISO 639-1): tr', '- [Sitemap](https://venthub.com.tr/sitemap.xml): 87 indexable URLs, Turkish only',
+  '- Catalog across 24 categories.', ek,
+].join('\n')
+const llmsBulgu = (harita: { satirlar: HaritaSatir[]; hreflangSayisi?: number }, metin: string): Bulgu[] => {
+  const cikti: Bulgu[] = []
+  llmsKontrolu(harita, metin, cikti)
+  return cikti
+}
+
+describe('INV-LLMS-GERCEK-1 · llms.txt beyanı haritayla tutarlı', () => {
+  it('taban çizgisi: doğru sayfa/kategori/dil beyanı hiç bulgu vermez', () => {
+    expect(llmsBulgu(haritaKur(87, 24), llmsMetni())).toEqual([])
+  })
+  it('sabotaj: eski bayat metin ("~190 pages", "~37 categories", dil satırı yok) hem LLMS-SAYFA hem LLMS-DIL KIRMIZI', () => {
+    const eski = '# VentHub\nSitemap: all ~190 pages with TR/EN hreflang alternates\ncatalog across ~37 categories; English mirrors exist under /en/...'
+    const b = llmsBulgu(haritaKur(87, 24), eski)
+    expect(b.filter((x) => x.kod === 'LLMS-SAYFA')).toHaveLength(2)
+    expect(b.filter((x) => x.kod === 'LLMS-DIL')).toHaveLength(1)
+    expect(b.every((x) => x.seviye === 'KIRMIZI')).toBe(true)
+  })
+  it('sabotaj: sayfa sayısı haritadan farklıysa KIRMIZI (87 yazılı, haritada 86)', () => {
+    const b = llmsBulgu(haritaKur(86, 24), llmsMetni())
+    expect(b.map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+    expect(b[0].kanit).toMatch(/87/)
+    expect(b[0].kanit).toMatch(/86/)
+  })
+  it('sabotaj: kategori sayısı haritadan farklıysa KIRMIZI (24 yazılı, haritada 23)', () => {
+    expect(llmsBulgu(haritaKur(87, 23), llmsMetni()).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+  })
+  it('sabotaj: harita /en adresleri taşıyorken llms.txt yalnız "tr" diyorsa KIRMIZI (EN yayınlanınca dosya güncellenmeli)', () => {
+    const b = llmsBulgu(haritaKur(87, 24, 10), llmsMetni())
+    expect(b.map((x) => x.kod)).toEqual(['LLMS-DIL'])
+    expect(b[0].kanit).toMatch(/tr/)
+    expect(b[0].kanit).toMatch(/en,tr/)
+  })
+  it('sabotaj: haritada hreflang varken "Languages: tr" KIRMIZI; "tr, en" olunca temiz', () => {
+    const h = { ...haritaKur(87, 24), hreflangSayisi: 4 }
+    expect(llmsBulgu(h, llmsMetni()).map((x) => x.kod)).toEqual(['LLMS-DIL'])
+    expect(llmsBulgu(h, llmsMetni().replace('Languages (ISO 639-1): tr', 'Languages (ISO 639-1): tr, en'))).toEqual([])
+  })
+  it('sabotaj: llms.txt EN beyan ediyor ama harita yalnız TR ise KIRMIZI (tersi de çelişki)', () => {
+    const b = llmsBulgu(haritaKur(87, 24), llmsMetni().replace('Languages (ISO 639-1): tr', 'Languages (ISO 639-1): tr, en'))
+    expect(b.map((x) => x.kod)).toEqual(['LLMS-DIL'])
+  })
+  it('kontrolEt: ek.llms verilirse çalışır, verilmezse ölçülmemiş sayılır (bulgu yok)', () => {
+    const v = temiz()
+    expect(kodlar(v).filter((x) => x.kod.startsWith('LLMS'))).toEqual([])
+    v.ek.llms = '# VentHub\nSitemap: ~190 pages'
+    expect(kodlar(v).filter((x) => x.kod.startsWith('LLMS')).map((x) => x.kod).sort()).toEqual(['LLMS-DIL', 'LLMS-SAYFA'])
+  })
+  it('depodaki public/llms.txt: dil satırı VAR ve src/config/features.ts EN_YAYIN bayrağıyla uyumlu (kapalıysa yalnız tr)', () => {
+    const kok = join(__dirname, '..', '..', '..')
+    const llms = readFileSync(join(kok, 'public', 'llms.txt'), 'utf8')
+    const ozellikler = readFileSync(join(kok, 'src', 'config', 'features.ts'), 'utf8')
+    const enAcik = /export const EN_YAYIN\s*=\s*true\b/.test(ozellikler)
+    const satir = /^[\s>*_-]*languages\b[^:\n]*:\s*(.+)$/im.exec(llms)
+    expect(satir, 'public/llms.txt "Languages (ISO 639-1): …" satırı taşımalı').not.toBeNull()
+    const beyan = new Set(satir![1].toLowerCase().match(/\b(?:tr|en)\b/g) || [])
+    expect([...beyan].sort().join(','), 'llms.txt dil beyanı EN_YAYIN bayrağıyla uyumsuz').toBe(enAcik ? 'en,tr' : 'tr')
+    expect(llms, 'bayat sayfa beyanı geri gelmesin').not.toMatch(/~\s*\d+\s+(?:pages|categories)/i)
+  })
+  it('depodaki public/llms.txt gerçek haritaya (87 adres, 24 kategori, yalnız TR) KARŞI temiz; harita 86 olunca KIRMIZI', () => {
+    const llms = readFileSync(join(__dirname, '..', '..', '..', 'public', 'llms.txt'), 'utf8')
+    const yazilanSayfa = Number(/(\d+)\s+indexable URLs/i.exec(llms)?.[1])
+    const yazilanKategori = Number(/(\d+)\s+categories/i.exec(llms)?.[1])
+    expect(yazilanSayfa).toBeGreaterThan(0)
+    expect(yazilanKategori).toBeGreaterThan(0)
+    expect(llmsBulgu(haritaKur(yazilanSayfa, yazilanKategori), llms)).toEqual([])
+    expect(llmsBulgu(haritaKur(yazilanSayfa - 1, yazilanKategori), llms).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
   })
 })

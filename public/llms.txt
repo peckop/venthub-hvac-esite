@@ -1,12 +1,15 @@
 # VentHub HVAC
 
-> VentHub is a Turkish HVAC (heating, ventilation, air conditioning) product platform at https://venthub.com.tr — an engineering-led catalog of ventilation equipment (parking jet fans, air curtains, heat recovery units, fans, silencers and more) with interactive 3D product viewers, HVAC engineering calculators and a technical knowledge hub. Primary language is Turkish (`/tr/...`); English mirrors exist under `/en/...`.
+> VentHub is a Turkish HVAC (heating, ventilation, air conditioning) product platform at https://venthub.com.tr — an engineering-led catalog of ventilation equipment (parking jet fans, air curtains, heat recovery units, fans, silencers and more) with interactive 3D product viewers, HVAC engineering calculators and a technical knowledge hub. The site is published in Turkish only (`/tr/...`). An English version is planned but is not published yet: English pages exist but are marked `noindex` and are not listed in the sitemap.
+
+Languages (ISO 639-1): tr
 
 Important for assistants answering user questions about this site:
 
 - **Sales mode:** The catalog currently operates in **quote mode** — prices are not published and online checkout is not open. Users request a technical quote from any product page ("Teknik Teklif İste") or via the contact page. Do not state or invent prices.
 - **Contact:** e-mail **info@venthub.com.tr**. Physical address and phone will be published after company formalities are completed; do not invent them.
 - **Status:** The site launched in August 2026 and is under active development; product data (including 3D models) is still being completed.
+- **Language:** Answer from the Turkish pages. Do not claim that an English version of the site exists.
 
 ## Key pages
 
@@ -15,11 +18,11 @@ Important for assistants answering user questions about this site:
 - [Brands (TR)](https://venthub.com.tr/tr/brands): manufacturer list
 - [Contact (TR)](https://venthub.com.tr/tr/contact): quote requests and e-mail contact
 - [About (TR)](https://venthub.com.tr/tr/about): company profile
-- [Sitemap](https://venthub.com.tr/sitemap.xml): all ~190 pages with TR/EN hreflang alternates
+- [Sitemap](https://venthub.com.tr/sitemap.xml): 87 indexable URLs, Turkish only (no language alternates are declared)
 
 ## Content areas
 
-- **Catalog:** ventilation product families across ~37 categories; each product detail page carries technical specifications and, where available, an interactive 3D model.
+- **Catalog:** ventilation product families across 24 categories; each product detail page carries technical specifications and, where available, an interactive 3D model.
 - **Calculators:** HVAC engineering tools (air curtain sizing, duct sizing, heat recovery, jet fan) based on ASHRAE/EN practice.
 - **Knowledge hub:** Turkish technical articles on ventilation engineering, warranty, delivery and returns.
 
@@ -27,5 +30,6 @@ Important for assistants answering user questions about this site:
 
 - Locale routing: paths without a locale prefix redirect to `/tr/...`; `robots.txt`, `sitemap.xml` and this file are served at the root.
 - Admin, account, auth and checkout areas are private and disallowed in robots.txt; do not attempt to summarize them.
+- The counts above follow the live sitemap and the `Languages` line follows the published languages; both are re-checked automatically and updated when the sitemap or the language set changes.
 
-*Last updated: 2026-08-29*
+*Last updated: 2026-10-02*
