@@ -27,11 +27,16 @@
  *  · `--taze`: `--resume` YOK; yeni oturum `--name <Ad>` + ilk mesaj "durum dosyanı oku, devam et" (durum dosyasının
  *     yolu rolün son sid'inden mevcut kancanın çözümlemesiyle bulunur; bulunamazsa genel cümle + uyarı).
  *
- * EKİP KİPİ: Ekip gereken iş için departman kendi TERMINAL penceresini açar: Desktop penceresinde ekip kurulmaz (ölçüldü
- *  2026-10-01), cli girişli terminal penceresinde kurulur ve çalışır (EkipTest3 ölçümü). Terminal penceresi Desktop kenar
- *  çubuğunda GÖRÜNMEZ ama pencere listesinde (claude agents / ListAgents) adıyla durur ve SendMessage ile iki yönde
- *  ulaşılır. Her açılış Recep'in ekranında ve onayındadır; pencereyi kapatmak insan eylemidir. Eski oturumu --resume ile
- *  terminalde açınca ekip kurulup kurulmadığı ÖLÇÜLMEDİ; --taze yeni oturumda kurulur.
+ * EKİP KİPİ (Ops ölçümü, 2026-10-01; kayıt memory/ekip-modu-olculmus-gercek.md — TEKRAR ÖLÇME): ekip modu (agent teams)
+ *  TERMİNAL oturumunda VAR (taze de `--resume` de), Masaüstü uygulamasında YOK. Ayrı "TeamCreate" aracı yoktur; ekip üyesi
+ *  Agent'ı `name` ile çağırmakla açılır. Bu yüzden ekip isteyen departman bu betikle TERMİNAL sekmesinde açılır ve
+ *  `--resume` ekibi KAYBETTİRMEZ (yalnız önceki üyeler geri gelmez, lider yenilerini açar).
+ *  ⚠`/desktop` YAZMA: terminalde açık bir oturuma `/desktop` yazılırsa oturum Masaüstü'ne geçer, `Agent name` düz alt
+ *  ajana düşer ve ekip modu KAYBOLUR (ölçüldü 2026-10-01, Ürün). Ekip modu isteyen pencere terminalde KALIR.
+ *  Aynı sid iki yerde birden açılamaz: Masaüstü'nde açık bir oturumu terminale almak için önce Masaüstü tarafı kapanmalı
+ *  (bu betik "zaten açık" der ve açmaz). Her açılış Recep'in ekranında ve onayındadır; kapatmak insan eylemidir.
+ *  MCP KÜMESİNİ DARALTMAK (ör. `--strict-mcp-config`, rol başına sunucu listesi) RECEP KARARIDIR (Ops 10-01): varsayılan
+ *  Masaüstü penceresiyle AYNI sunucu kümesidir; daraltma gerekçeli ve ölçümlü bir kararla girer, betiğin kendi tercihiyle girmez.
  *
  * HATA YOLLARI (hepsi açık mesaj; sessiz geçmez): rol tanınmıyor · claude.exe bulunamadı · .mcp.json yok (bayrak yolu kırık
  * olurdu) · pencere tavanı dolu → çıkış 1. Pano dizini yok / olay dosyası bozuk / sessions dizini yok / sid yok →
@@ -117,7 +122,9 @@ function planla(rolArg, o = {}) {
     const durum = son ? ortak.durumBul(son.sid) : null
     if (!durum) uyarilar.push('durum dosyasi bulunamadi — ilk mesaj genel cumle (dosya yolu yok)')
     istem = tazeIstem(durum)
-    args.push(istem) // konum argumani = ilk mesaj (claude [options] [prompt])
+    // Konum argumani = ilk mesaj (claude [options] [prompt]). `--mcp-config <configs...>` DEGISKEN-uzunluklu oldugundan
+    // `--` olmadan istem .mcp.json'un ikinci degeri sanilip yutulur (ARC-10); `--` secenek ayrimini kapatir.
+    args.push('--', istem)
   }
   const argumentList = args.map(ortak.tirnakla).join(' ')
   return {
