@@ -110,6 +110,9 @@ describe('INV-SITEMAP-MODEL-1 — aktif modeller site haritasında, yalnız bayr
       expect(yollar.join('\n')).not.toContain(ARSIV_SKU.toLowerCase())
       expect(yollar.join('\n')).not.toContain('tst-silinmis')
       expect(new Set(yollar).size).toBe(AKTIF_MODEL)
+      // EN_YAYIN kapalıyken `/en` eşi ilan edilmez (REC-204/3e-3): model satırında alternates alanı HİÇ yok, EN satırı yok.
+      expect(modeller.some((s) => 'alternates' in s)).toBe(false)
+      expect(modeller.some((s) => s.url.startsWith(`${base}/en/`))).toBe(false)
     })
 
     it('EN_YAYIN açık: 882 model satırı (441 × 2 dil); EN adresi /en/products/<aile>-p-<sku>; hreflang eşi satırın kendi adresini içerir', async () => {
@@ -155,16 +158,21 @@ describe('INV-SITEMAP-MODEL-1 — aktif modeller site haritasında, yalnız bayr
     for (const enYayin of [false, true]) {
       it(`EN_YAYIN ${enYayin ? 'açık' : 'kapalı'}: 441 modelli fikstür ile modelsiz fikstür AYNI çıktıyı verir; hiçbir adreste -p- ya da ?sku= yok`, async () => {
         const modelli = await harita({ aileler: fikstur(), enYayin, k3b: false })
+        // Modelsiz fikstür: her ailede yalnız EN SON güncellenen aktif model kalır → aile lastmod'u (aile + aktif
+        // varyantların en son tarihi) modelli fikstürle AYNI kalır; fark yalnız model sayısıdır.
         const modelsiz = await harita({
-          aileler: fikstur().map((a) => ({ ...a, products: a.products.slice(0, 1) })),
+          aileler: fikstur().map((a) => {
+            const aktif = a.products.filter((p) => p.status === 'active' && p.deleted_at === null)
+            const enSon = aktif.reduce((x, y) => (Date.parse(y.updated_at ?? '') > Date.parse(x.updated_at ?? '') ? y : x))
+            return { ...a, products: [enSon] }
+          }),
           enYayin,
           k3b: false,
         })
         expect(modelSatirlari(modelli.satirlar)).toEqual([])
         expect(modelli.satirlar.some((s) => s.url.includes('?sku='))).toBe(false)
-        // Aile lastmod'u modellerden etkilenebilir; model SATIRI eklenip eklenmediği satır sayısı + adres listesiyle ölçülür.
-        expect(modelli.satirlar.map((s) => s.url)).toEqual(modelsiz.satirlar.map((s) => s.url))
-        expect(modelli.satirlar).toHaveLength(modelsiz.satirlar.length)
+        // TÜM satır (url, lastModified, alternates, changefreq, priority) birebir: bayrak kapalıyken model verisi çıktıya sızmaz.
+        expect(modelli.satirlar).toEqual(modelsiz.satirlar)
       })
     }
   })
