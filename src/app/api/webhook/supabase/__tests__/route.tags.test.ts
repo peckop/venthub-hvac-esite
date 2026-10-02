@@ -19,7 +19,9 @@ vi.mock('next/cache', () => ({
 // yüzden mock `.eq('id', val)` argümanını izleyip `familyRowsById`/`productRowsById` map'lerinden
 // okuyan bir builder'a yükseltildi. `vi.hoisted` kullanılır çünkü `vi.mock` fabrikası hoist edilir
 // ve dışarıdaki değişkenlere normal kapanışla erişemez.
-const { familyRowsById, productRowsById, categoryRowsById, categoryChildrenByParentId } = vi.hoisted(() => ({
+const { familyRowsById, productRowsById, categoryRowsById, categoryChildrenByParentId, categorySingleQueryIds } = vi.hoisted(() => ({
+  // URN-12: `categories` tablosuna `.eq('id', x).single()` ile giden sorguların kimlikleri (istek-içi önbellek ölçümü).
+  categorySingleQueryIds: [] as string[],
   familyRowsById: new Map<
     string,
     { id: string; slug: string | null; parent_family_id: string | null }
@@ -70,6 +72,7 @@ vi.mock('@/lib/supabase/static', () => ({
             return { data: row ?? null, error: null }
           }
           if (table === 'categories') {
+            if (queriedId) categorySingleQueryIds.push(queriedId)
             const row = queriedId ? categoryRowsById.get(queriedId) : undefined
             return { data: row ?? null, error: null }
           }
@@ -104,6 +107,7 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
     productRowsById.clear()
     categoryRowsById.clear()
     categoryChildrenByParentId.clear()
+    categorySingleQueryIds.length = 0
   })
 
   afterEach(() => {
@@ -604,6 +608,29 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       ]))
     })
 
+    it('(U12-t) ortak üstü paylaşan eski+yeni category_id/subcategory_id: categories tablosuna kimlik başına TEK sorgu (istek-içi önbellek)', async () => {
+      // Yeni alt ve eski alt AYNI üstü (kok-yeni) paylaşır; üst, hem category_id olarak hem iki alt kategorinin
+      // ebeveyni olarak istenir. Önbelleksiz kok-yeni 3 kez çekilirdi.
+      categoryRowsById.set('alt-eski-2', { id: 'alt-eski-2', slug: 'alt-eski-2-slug', metadata: null, parent_id: 'kok-yeni' })
+      const { POST } = await import('../route')
+
+      await POST(buildRequest({
+        type: 'UPDATE', table: 'products', schema: 'public',
+        record: urun({ category_id: 'kok-yeni', subcategory_id: 'alt-yeni' }),
+        old_record: urun({ category_id: 'kok-eski', subcategory_id: 'alt-eski-2' }),
+      }))
+
+      const sayim = new Map<string, number>()
+      for (const id of categorySingleQueryIds) sayim.set(id, (sayim.get(id) ?? 0) + 1)
+      expect([...sayim.entries()].filter(([, n]) => n > 1)).toEqual([])
+      expect([...sayim.keys()].sort()).toEqual(['alt-eski-2', 'alt-yeni', 'kok-eski', 'kok-yeni'])
+      // Önbellek yolları değiştirmez: dört kimliğin hepsi tazelendi.
+      expect(yollarOf()).toEqual(expect.arrayContaining([
+        '/tr/category/kok-yeni-slug', '/tr/category/kok-eski-slug',
+        '/tr/kategori/kok-yeni-slug/alt-yeni-slug', '/tr/kategori/kok-yeni-slug/alt-eski-2-slug',
+      ]))
+    })
+
     it('(U12-m) ürün başka aileye taşındı: ESKİ ailenin ve serisinin PDP yolu da tazelenir', async () => {
       familyRowsById.set('aile-yeni', { id: 'aile-yeni', slug: 'aile-yeni-slug', parent_family_id: 'seri-1' })
       familyRowsById.set('aile-eski', { id: 'aile-eski', slug: 'aile-eski-slug', parent_family_id: 'seri-1' })
@@ -704,6 +731,22 @@ describe('POST /api/webhook/supabase — PS-042 cache tag izolasyonu', () => {
       expect(yollarOf()).toEqual(expect.arrayContaining([
         '/tr/kategori/ust-yeni/alt', '/tr/kategori/ust-eski/alt',
       ]))
+    })
+
+    it('(U12-u) yolla ilgisiz metadata alanı değişti: eski yol çalışması açılmaz, üst satırı tek kez sorgulanır, yol tekrarı yok', async () => {
+      categoryRowsById.set('ust-1', { id: 'ust-1', slug: 'ust-slug', metadata: null, parent_id: null })
+      const { POST } = await import('../route')
+
+      await POST(buildRequest({
+        type: 'UPDATE', table: 'categories', schema: 'public',
+        record: kat({ slug: 'alt', parent_id: 'ust-1', metadata: { slug: { tr: 'alt-tr', en: 'alt-en' }, description: 'Yeni' } }),
+        old_record: kat({ slug: 'alt', parent_id: 'ust-1', metadata: { slug: { tr: 'alt-tr', en: 'alt-en' }, description: 'Eski' } }),
+      }))
+
+      expect(categorySingleQueryIds.filter((id) => id === 'ust-1')).toHaveLength(1)
+      const yollar = yollarOf()
+      expect(new Set(yollar).size).toBe(yollar.length)
+      expect(yollar).toEqual(expect.arrayContaining(['/tr/category/alt-tr', '/tr/kategori/ust-slug/alt-tr']))
     })
 
     it('(U12-s) değişmeyen satır: ek (eski) yol üretilmez; old_record YOK iken yalnız yeni yollar', async () => {

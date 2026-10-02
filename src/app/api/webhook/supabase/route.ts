@@ -226,16 +226,36 @@ async function categoryRowById(id: string | undefined): Promise<CategoryRow | nu
   return data ?? null
 }
 
+type KategoriCozucu = (id: string | undefined) => Promise<CategoryRow | null>
+
+/**
+ * İSTEK ÖMRÜNDE önbellekli `categoryRowById` (URN-12). Eski+yeni kategori/alt kategori ağaçları aynı üstü paylaşır;
+ * önbelleksiz her biri üstü ayrıca çekerdi (442'lik toplu güncellemede ~900 ek sorgu). Önbellek her POST için
+ * YENİDEN kurulur ve istekle ölür: modül düzeyinde paylaşılan önbellek bayatlar ve kiracılar arası sızabilir (kural 12).
+ * Bulunamayan satır (`null`) da önbelleğe girer; aynı kimlik ikinci kez DB'ye gitmez.
+ */
+function istekKategoriCozucu(): KategoriCozucu {
+  const onbellek = new Map<string, CategoryRow | null>()
+  return async (id) => {
+    if (!id) return null
+    if (onbellek.has(id)) return onbellek.get(id) ?? null
+    const satir = await categoryRowById(id)
+    onbellek.set(id, satir)
+    return satir
+  }
+}
+
 /**
  * Bir kategori için tüm yolları (kendi + ebeveyn zinciri) tazeler; tazelenenleri döndürür.
  * `zatenTazelenen` verilirse o listedeki yollar atlanır (URN-12: eski+yeni kategori ağaçları ortak yol
- * üretebilir; aynı yol iki kez tazelenmez ve yanıtta iki kez görünmez).
+ * üretebilir; aynı yol iki kez tazelenmez ve yanıtta iki kez görünmez). Üst satır `kategoriSatiri` ile çözülür.
  */
 async function revalidateCategoryTree(
   category: CategoryRow,
+  kategoriSatiri: KategoriCozucu,
   zatenTazelenen?: readonly string[]
 ): Promise<string[]> {
-  const parent = await categoryRowById(category.parent_id ?? undefined)
+  const parent = await kategoriSatiri(category.parent_id ?? undefined)
   const paths = categoryPathsFor(category, parent).filter((p) => !zatenTazelenen?.includes(p))
   for (const p of paths) revalidatePath(p)
   return paths
@@ -297,6 +317,7 @@ export async function POST(request: NextRequest) {
 
     const revalidatedPaths: string[] = []
     const revalidatedTags: string[] = []
+    const kategoriSatiri = istekKategoriCozucu()
     // PS-042: products UPDATE'inde alan-bazlı karşılaştırma yapılıp yapılamadığını
     // (old_record var mı) yanıtta raporlamak için.
     let discoveryComparisonSkipped = false
@@ -386,9 +407,9 @@ export async function POST(request: NextRequest) {
         ),
       ]
       for (const kategoriId of kategoriKimlikleri) {
-        const category = await categoryRowById(kategoriId)
+        const category = await kategoriSatiri(kategoriId)
         if (category) {
-          revalidatedPaths.push(...(await revalidateCategoryTree(category, revalidatedPaths)))
+          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths)))
         }
       }
     }
@@ -403,7 +424,7 @@ export async function POST(request: NextRequest) {
         parent_id: (activeRecord.parent_id as string | null) ?? null,
       }
       if (self.slug) {
-        revalidatedPaths.push(...(await revalidateCategoryTree(self)))
+        revalidatedPaths.push(...(await revalidateCategoryTree(self, kategoriSatiri)))
       }
 
       /**
@@ -416,10 +437,16 @@ export async function POST(request: NextRequest) {
       let eskiSelf: CategoryRow | null = null
       if (record && old_record) {
         const eskiSlug = metin(old_record.slug)
+        // Yalnız YOL ÜRETEN alanlar karşılaştırılır: kanonik slug, iki dildeki çözülmüş slug
+        // (`metadata.slug.tr|en`) ve ebeveyn. Yolla ilgisiz metadata alanı (açıklama, görsel…) değişince eski
+        // yol/üst sorgusu açılmaz.
+        const yerelSlug = (r: Record<string, unknown>, dil: 'tr' | 'en') =>
+          getLocalizedCategorySlug({ slug: metin(r.slug) ?? null, metadata: r.metadata }, dil)
         const degisti =
           eskiSlug !== metin(record.slug) ||
           metin(old_record.parent_id) !== metin(record.parent_id) ||
-          JSON.stringify(old_record.metadata ?? null) !== JSON.stringify(record.metadata ?? null)
+          yerelSlug(old_record, 'tr') !== yerelSlug(record, 'tr') ||
+          yerelSlug(old_record, 'en') !== yerelSlug(record, 'en')
         if (degisti && eskiSlug) {
           eskiSelf = {
             id: self.id,
@@ -427,7 +454,7 @@ export async function POST(request: NextRequest) {
             metadata: old_record.metadata,
             parent_id: metin(old_record.parent_id) ?? null,
           }
-          revalidatedPaths.push(...(await revalidateCategoryTree(eskiSelf, revalidatedPaths)))
+          revalidatedPaths.push(...(await revalidateCategoryTree(eskiSelf, kategoriSatiri, revalidatedPaths)))
         }
       }
 
@@ -483,9 +510,9 @@ export async function POST(request: NextRequest) {
 
           // If product is linked to a category, revalidate category path too
           if (product.category_id) {
-            const category = await categoryRowById(product.category_id)
+            const category = await kategoriSatiri(product.category_id)
             if (category) {
-              revalidatedPaths.push(...(await revalidateCategoryTree(category)))
+              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri)))
             }
           }
         }
