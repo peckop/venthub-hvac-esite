@@ -34,7 +34,7 @@ vi.mock('@/lib/services/category.service', () => ({
 }))
 vi.mock('@/lib/services/family.service', () => ({
   getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }],
-  getFamilyLastModified: async () => new Map<string, string>(),
+  getFamilySitemapData: async () => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
   getFamiliesEnriched: async () => [],
 }))
 

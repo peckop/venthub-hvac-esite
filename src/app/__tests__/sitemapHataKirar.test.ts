@@ -41,7 +41,10 @@ async function sitemapKur(kosul: {
   }))
   vi.doMock('@/lib/services/family.service', () => ({
     getAllFamilySlugs: kosul.aileler ?? (async () => [{ slug: 'vortice-lineo-quiet' }]),
-    getFamilyLastModified: async () => new Map([['vortice-lineo-quiet', '2026-09-20T10:00:00.000Z']]),
+    getFamilySitemapData: async () => ({
+      aileTarihleri: new Map([['vortice-lineo-quiet', '2026-09-20T10:00:00.000Z']]),
+      modeller: [],
+    }),
   }))
   return (await import('../sitemap')).default
 }

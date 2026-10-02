@@ -95,7 +95,7 @@ describe('INV-MARKA-KAYNAK-1 (c): site haritası marka kolu listeyi izler', () =
       }))
       vi.doMock('../../lib/services/family.service', () => ({
         getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }],
-        getFamilyLastModified: async () => new Map<string, string>(),
+        getFamilySitemapData: async () => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
       }))
       const { default: sitemap } = await import('../../app/sitemap')
       const girisler = await sitemap()

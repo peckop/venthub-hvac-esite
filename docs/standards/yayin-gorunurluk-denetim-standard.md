@@ -67,7 +67,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 ### Y3.1 Site haritası `lastmod` — gerçek değişiklik ya da hiç (REC-454, 2026-09-30)
 
 - `lastmod` yalnız sayfada görünen verinin **gerçek** değişiklik tarihinden gelir: kategori `categories.updated_at`,
-  ürün ailesi = ailenin ve aktif varyantlarının en son `updated_at`'i (`getFamilyLastModified`), rehber yazısı
+  ürün ailesi = ailenin ve aktif varyantlarının en son `updated_at`'i (`getFamilySitemapData`), rehber yazısı
   `guncellemeTarihi`. Güvenilir kaynağı olmayan satırda (sabit sayfalar, markalar, seri adresi) alan **yazılmaz**.
 - Üretim anı (`new Date()`) lastmod olarak YAZILMAZ. Kapı: INV-SITEMAP-LASTMOD-1 (`src/app/__tests__/sitemapLastmod.test.ts`).
 - **Niçin (ölçüm, 2026-09-29):** canlı haritada 87 adresin 61'i her gün "bugün" taşıyordu. Google lastmod'u yalnız

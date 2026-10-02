@@ -26,7 +26,7 @@ async function sitemapKur(aileTarihleri: () => Promise<Map<string, string>>) {
   }))
   vi.doMock('@/lib/services/family.service', () => ({
     getAllFamilySlugs: async () => [{ slug: 'tarihli-aile' }, { slug: 'seri-slug' }],
-    getFamilyLastModified: aileTarihleri,
+    getFamilySitemapData: async () => ({ aileTarihleri: await aileTarihleri(), modeller: [] }),
   }))
   return (await import('../sitemap')).default
 }

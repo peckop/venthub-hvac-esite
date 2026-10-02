@@ -1,12 +1,12 @@
 import { MetadataRoute } from 'next'
 
-import { EN_YAYIN } from '../config/features'
+import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
 import { getCategories } from '../lib/services/category.service'
-import { getAllFamilySlugs, getFamilyLastModified } from '../lib/services/family.service'
+import { type FamilySitemapData,getAllFamilySlugs, getFamilySitemapData } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { adresDili, adresRotalari, kategoriArgumanlari } from '../utils/yuzeyAdresleri'
@@ -56,14 +56,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // BİREBİR eşitlik (OPS şartı): boş, tanımsız, yanlış yazılmış ya da `xdummy.supabase.co` gibi kaçak adres
   // gevşek kola GİRMEZ — yanlış yapılandırılmış canlı ortam sessizce ürünsüz haritaya düşmesin.
   const veritabaniSahte = process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://dummy.supabase.co'
-  const [categories, familySlugs, aileTarihleri, countRes] = await Promise.all([
+  const [categories, familySlugs, { aileTarihleri, modeller }, countRes] = await Promise.all([
     veritabaniSahte ? getCategories(supabaseStaticClient).catch(() => []) : getCategories(supabaseStaticClient),
     veritabaniSahte ? getAllFamilySlugs(supabaseStaticClient).catch(() => []) : getAllFamilySlugs(supabaseStaticClient),
     // REC-454: aile lastmod'u = ailenin + aktif varyantlarının en son `updated_at`'i. Hata yutulmaz
     // (aynı katı kural); sahte veritabanında boş harita → lastmod hiç yazılmaz.
+    // REC-300 3e-2: aynı sorgu aktif model listesini de döner (ikinci sorgu YOK); bayrak kapalıyken kullanılmaz.
     veritabaniSahte
-      ? getFamilyLastModified(supabaseStaticClient).catch(() => new Map<string, string>())
-      : getFamilyLastModified(supabaseStaticClient),
+      ? getFamilySitemapData(supabaseStaticClient).catch(
+          (): FamilySitemapData => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
+        )
+      : getFamilySitemapData(supabaseStaticClient),
     // Supabase builder reject ETMEZ; hata {error} alanında döner — aşağıda AÇIKÇA fırlatılır.
     supabaseStaticClient.rpc('get_category_counts'),
   ])
@@ -209,7 +212,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }))
   )
 
+  // 4b. Model Routes — REC-300 Faz 3e-2: her aktif model kendi adresine sahip (`/tr/urun/<aile>-p-<sku>`,
+  // `/en/products/<aile>-p-<sku>`). YALNIZ `ADRES_SEMASI_K3B` AÇIKKEN: kapalıyken model adresi `?sku=`
+  // sorgusudur (aile sayfasının kopyası) ve haritaya girmez; kapalı çıktı bayt bayt aynıdır (INV-SITEMAP-MODEL-1).
+  // `lastModified` = modelin kendi `updated_at`'i; yoksa alan yazılmaz (uydurma tarih yok, REC-454).
+  const modelRoutes: MetadataRoute.Sitemap = ADRES_SEMASI_K3B
+    ? locales.flatMap((lang) =>
+        modeller.map((m) => ({
+          url: `${baseUrl}${dilYolu(lang).product(m.aileSlug, m.sku)}`,
+          ...(m.updatedAt ? { lastModified: new Date(m.updatedAt) } : {}),
+          changefreq: 'weekly',
+          priority: 0.8,
+          ...siteHaritasiAlternates({
+            tr: `${baseUrl}${dilYolu('tr').product(m.aileSlug, m.sku)}`,
+            en: `${baseUrl}${dilYolu('en').product(m.aileSlug, m.sku)}`,
+          }),
+        })),
+      )
+    : []
+
   // `subCategoryRoutes` KALDIRILDI (REC-205) — alt kategoriler `categoryRoutes` içinde
   // zaten tek seviyeli kanonik adresleriyle var; ikinci kez eklemek çift yayın demekti.
-  return [...staticRoutes, ...bilgiMerkeziSiteHaritasi(baseUrl), ...categoryRoutes, ...brandRoutes, ...productRoutes]
+  return [
+    ...staticRoutes,
+    ...bilgiMerkeziSiteHaritasi(baseUrl),
+    ...categoryRoutes,
+    ...brandRoutes,
+    ...productRoutes,
+    ...modelRoutes,
+  ]
 }
