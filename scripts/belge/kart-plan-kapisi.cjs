@@ -41,6 +41,23 @@ const RECEP_OZETI = 'Recep özeti'
 const MIN_ADIM = 2
 const ETKI_DEGERLERI = ['yok', 'müşteriye-görünen', 'veritabanı', 'site-yapısı']
 const MIN_ISTISNA_SEBEBI = 8
+/** "PLAN: gerekmez" sebebi bu köklerden birini içeriyorsa istisna kullanılamaz (karar 243); ASCII katlamalı, sözcük başı eşleşmesi. */
+const ISTISNA_YASAK_KOKLER = ['veritabani', 'sema', 'migration', 'musteri', 'vitrin', 'site yapisi', 'rota', 'url', 'menu', 'fiyat', 'odeme']
+
+/** Türkçe harfleri ASCII'ye katlar (İ/I/ı → i, ç → c ...), küçük harfe çevirir, boşlukları teke indirir. */
+function asciiKatla(metin) {
+  return String(metin)
+    .replace(/İ/g, 'i')
+    .toLocaleLowerCase('tr')
+    .replace(/[çğıöşü]/g, (c) => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u' })[c])
+    .replace(/\s+/g, ' ')
+}
+
+/** Sebepte yasak kök geçiyorsa o kökü döndürür (sözcük başı: "protokol" içindeki "rota" sayılmaz, "rotası" sayılır). */
+function yasakKok(sebep) {
+  const k = asciiKatla(sebep)
+  return ISTISNA_YASAK_KOKLER.find((kok) => new RegExp(`(^|[^a-z0-9])${kok}`).test(k)) || null
+}
 
 /** Kod çitleri ve HTML yorumlarındaki satırlar sayılmaz (şablon örneği kapıyı geçirmesin; scripts/board/pr-kayit-kapisi.cjs ile aynı mantık). */
 function govdeyiTemizle(metin) {
@@ -84,12 +101,10 @@ function degerlendir(aciklama) {
     const istisna = susluSatirlar.map((s) => s.match(/^PLAN[ \t]*:[ \t]*gerekmez[ \t]*[—–-]+[ \t]*(.*)$/i)).find(Boolean)
     if (istisna) {
       const sebep = istisna[1].trim()
-      if (bosluksuz(sebep) >= MIN_ISTISNA_SEBEBI) return { gecti: true, tur: 'plan-gerekmez', eksikler: [] }
-      return {
-        gecti: false,
-        tur: 'plan-gerekmez',
-        eksikler: [`"PLAN: gerekmez" sebebi çok kısa (${bosluksuz(sebep)}/${MIN_ISTISNA_SEBEBI} karakter)`],
-      }
+      const eksikIstisna = []
+      if (bosluksuz(sebep) < MIN_ISTISNA_SEBEBI) eksikIstisna.push(`"PLAN: gerekmez" sebebi çok kısa (${bosluksuz(sebep)}/${MIN_ISTISNA_SEBEBI} karakter)`)
+      if (yasakKok(sebep)) eksikIstisna.push('istisna kullanılamaz: sebep müşteriye görünen/veritabanı/site yapısı etkisi anıyor (karar 243: Recep özeti gerekir)')
+      return { gecti: eksikIstisna.length === 0, tur: 'plan-gerekmez', eksikler: eksikIstisna }
     }
     return {
       gecti: false,
@@ -130,10 +145,17 @@ function degerlendir(aciklama) {
   }
 
   if (bolumler.has('Etki alanı')) {
-    const deger = degerOku('Etki alanı').replace(/\s+/g, ' ').trim()
-    if (!ETKI_DEGERLERI.includes(deger.toLowerCase())) {
-      eksikler.push(`Etki alanı: değer "${deger}" geçersiz; yalnız ${ETKI_DEGERLERI.join(' | ')}`)
-    } else if (deger.toLowerCase() !== 'yok') {
+    // Değer YALNIZ etiketin kendi satırıdır (sonraki satırlar katılmaz). Noktalı ("yok.") ve virgüllü ("veritabanı, site-yapısı") yazım kabul;
+    // karşılaştırma Türkçe küçük harfle (VERİTABANI, İ/ı doğru çözülür). "yok" başka değerle birleşmez.
+    const deger = bolumler.get('Etki alanı')[0].sus.replace(/\s+/g, ' ').trim()
+    const parcalar = deger
+      .replace(/\.$/, '')
+      .split(',')
+      .map((p) => p.trim().replace(/\.$/, '').toLocaleLowerCase('tr'))
+    const gecerli = parcalar.every((p) => ETKI_DEGERLERI.includes(p)) && (parcalar.length === 1 || !parcalar.includes('yok'))
+    if (!gecerli) {
+      eksikler.push(`Etki alanı: değer "${deger}" geçersiz; yalnız ${ETKI_DEGERLERI.join(' | ')} (çoklu etki virgülle, "yok" tek başına)`)
+    } else if (!(parcalar.length === 1 && parcalar[0] === 'yok')) {
       if (!bolumler.has(RECEP_OZETI) || bosluksuz(degerOku(RECEP_OZETI)) === 0) {
         eksikler.push(`Recep özeti: Etki alanı "${deger}" iken dolu "Recep özeti:" satırı gerekir (karar 243)`)
       } else if (!/\d/.test(degerOku(RECEP_OZETI))) {
@@ -167,15 +189,30 @@ function panoDosyasi(ortam = process.env) {
 }
 
 /**
+ * `node:sqlite`'ı yükler. Deneysel-uyarı (SQLite) zararsız ama CLI çıktısını kirletiyor (stderr): yalnız yükleme süresince ve
+ * yalnız bu uyarı süzülür; `process.emitWarning` hemen geri konur, başka uyarılar ve süreç dinleyicileri etkilenmez.
+ */
+function sqliteYukle() {
+  const orijinal = process.emitWarning
+  process.emitWarning = function (uyari, ...argumanlar) {
+    if (/SQLite/.test(String(uyari)) && argumanlar[0] === 'ExperimentalWarning') return undefined
+    return orijinal.call(process, uyari, ...argumanlar)
+  }
+  try {
+    return require('node:sqlite')
+  } finally {
+    process.emitWarning = orijinal
+  }
+}
+
+/**
  * Kartı numarasıyla bulur. Aşama 1: başlığın BAŞI (`HRT-14 · …`); bulunamazsa aşama 2: başlığın ilk 60 karakterinde
  * `\bNO\b` ("URUN REC-411: …"). Her aşamada tek eşleşme gerekir; birden fazlası "belirsiz" (istisna).
  * Okunamazsa, bulunamazsa ya da belirsizse istisna fırlatır (mesaj aşamayı söyler).
  */
-function kartiOku(no, yol) {
+function kartBul(no, yol) {
   if (!fs.existsSync(yol)) throw new Error(`Kanban veri dosyası yok: ${yol}`)
-  // node:sqlite'ın deneysel uyarısı zararsız ama CLI çıktısını kirletiyor (stderr).
-  process.removeAllListeners('warning')
-  const { DatabaseSync } = require('node:sqlite')
+  const { DatabaseSync } = sqliteYukle()
   const db = new DatabaseSync(yol, { readOnly: true })
   let satirlar
   try {
@@ -186,7 +223,7 @@ function kartiOku(no, yol) {
   const kartlar = []
   for (const { payload } of satirlar) {
     const pano = JSON.parse(payload)
-    for (const kart of pano.tasks || []) kartlar.push({ pano: pano.title, baslik: String(kart.title || ''), aciklama: kart.description || '' })
+    for (const kart of pano.tasks || []) kartlar.push({ pano: pano.title, baslik: String(kart.title || ''), aciklama: kart.description || '', etiketler: Array.isArray(kart.labels) ? kart.labels : [] })
   }
   const asamalar = [
     { ad: 'aşama 1: başlığın başı', kalip: new RegExp(`^${kacis(no)}(?![A-Za-z0-9-])`), kart: (k) => k.baslik },
@@ -194,10 +231,26 @@ function kartiOku(no, yol) {
   ]
   for (const asama of asamalar) {
     const bulunan = kartlar.filter((k) => asama.kalip.test(asama.kart(k)))
-    if (bulunan.length === 1) return bulunan[0].aciklama
+    if (bulunan.length === 1) return bulunan[0]
     if (bulunan.length > 1) throw new Error(`kart numarası belirsiz: ${no} ${bulunan.length} kartta geçiyor (${asama.ad}; ${bulunan.map((b) => b.pano).join('; ')})`)
   }
   throw new Error(`kart bulunamadı: ${no} (başlığın başında ya da ilk 60 karakterinde aranmıştı)`)
+}
+
+/** Kartın açıklaması (bulunamazsa/belirsizse/okunamazsa istisna; ayrıntı için `kartBul`). */
+function kartiOku(no, yol) {
+  return kartBul(no, yol).aciklama
+}
+
+/** Kartın Kanban `labels` alanındaki sınıf etiketleri (küçük harf); karar 244 adım 2: kart açılırken tek sınıf yazılır. */
+const SINIF_ETIKETLERI = ['bu-ay', 'ilk-satistan-once', 'rafta']
+
+function sinifUyarisi(etiketler) {
+  const sinif = (etiketler || []).map((e) => String(e).toLocaleLowerCase('tr')).filter((e) => SINIF_ETIKETLERI.includes(e))
+  const tekil = [...new Set(sinif)]
+  if (tekil.length === 1 && sinif.length === 1) return null
+  if (tekil.length === 0) return `UYARI: kartta sınıf etiketi yok (${SINIF_ETIKETLERI.join('/')}); tek biri yazılmalı`
+  return `UYARI: kartta birden fazla sınıf etiketi var (${tekil.join(', ')}; ${SINIF_ETIKETLERI.join('/')}); tek biri yazılmalı`
 }
 
 function argumanlar(argv) {
@@ -226,7 +279,7 @@ function main(argv) {
     return 2
   }
 
-  const isler = [] // {ad, aciklama}
+  const isler = [] // {ad, aciklama, etiketler?} (etiketler yalnız --kart ile okunan kartta)
   let kod = 0
   const kartNolari = [...kart]
   try {
@@ -235,7 +288,15 @@ function main(argv) {
       const govde = fs.readFileSync(d, 'utf8')
       const numaralar = prGovdesindenNumaralar(govde)
       // Yalnız uyarı (çıkış kodu değişmez): `Fixes REC-nn` karar 187 ile geçiş döneminde kasıtlı olarak meşru olabilir.
-      const linear = [...new Set(govdeyiTemizle(govde).match(/\bREC-\d+\b/g) || [])]
+      // "Kanban: REC-411" satırı geçerli bir kart numarasıdır (taşınan Linear kaydı); yalnız diğer satırlardaki REC-nn uyarır.
+      const linear = [
+        ...new Set(
+          govdeyiTemizle(govde)
+            .split('\n')
+            .filter((satir) => !/^[ \t>*_-]*kanban[ \t]*:/i.test(satir))
+            .flatMap((satir) => satir.match(/\bREC-\d+\b/g) || []),
+        ),
+      ]
       if (linear.length > 0) {
         console.error(`UYARI: PR gövdesinde Linear numarası ${linear.join(', ')} var; kapanmaması gerekiyorsa sil, yalnız Kanban: <no> yaz`)
       }
@@ -247,14 +308,22 @@ function main(argv) {
     }
     if (kartNolari.length > 0) {
       const yol = panoDosyasi()
-      for (const no of [...new Set(kartNolari)]) isler.push({ ad: no, aciklama: kartiOku(no, yol) })
+      for (const no of [...new Set(kartNolari)]) {
+        const k = kartBul(no, yol)
+        isler.push({ ad: no, aciklama: k.aciklama, etiketler: kart.includes(no) ? k.etiketler : undefined })
+      }
     }
   } catch (e) {
     console.error(`HATA: ${e.message}`)
     return 2
   }
 
-  for (const { ad, aciklama } of isler) {
+  for (const { ad, aciklama, etiketler } of isler) {
+    // Yalnız uyarı (çıkış kodu değişmez): yeni açılan kart sınıfsız doğar, kapı kırmızı vermesin.
+    if (etiketler !== undefined) {
+      const uyari = sinifUyarisi(etiketler)
+      if (uyari) console.error(`${uyari} (${ad})`)
+    }
     const s = degerlendir(aciklama)
     if (s.gecti) {
       console.log(`GEÇTİ ${ad}: ${s.tur}`)
@@ -267,7 +336,7 @@ function main(argv) {
   return kod
 }
 
-module.exports = { degerlendir, govdeyiTemizle, prGovdesindenNumaralar, panoDosyasi, kartiOku, ETIKETLER, ETKI_DEGERLERI }
+module.exports = { degerlendir, govdeyiTemizle, prGovdesindenNumaralar, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
 
 if (require.main === module) {
   process.exitCode = main(process.argv.slice(2))

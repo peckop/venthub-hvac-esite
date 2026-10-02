@@ -140,6 +140,35 @@ describe('INV-KART-PLAN-1 · degerlendir (saf işlev)', () => {
     expect(s.eksikler.some((e) => e.startsWith('Dosyalar:'))).toBe(true)
   })
 
+  it('"PLAN: gerekmez" sebebi müşteri/veritabanı/site yapısı etkisi anıyorsa reddedilir (karar 243); zararsız sebep geçer', () => {
+    const reddedilen = K.degerlendir('PLAN: gerekmez — veritabanı şemasını değiştirir ama kısa')
+    expect(reddedilen).toMatchObject({ gecti: false, tur: 'plan-gerekmez' })
+    expect(reddedilen.eksikler.join('\n')).toMatch(/istisna kullanılamaz: sebep müşteriye görünen\/veritabanı\/site yapısı etkisi anıyor/)
+    for (const sebep of ['MÜŞTERİ sayfası metni', 'vitrin başlığı düzeltmesi', 'yeni rotası eklenir', 'site yapısı notu', 'fiyat satırı yorumu', 'Ödeme sayfası']) {
+      expect(K.degerlendir(`PLAN: gerekmez — ${sebep}`).gecti, sebep).toBe(false)
+    }
+    expect(K.degerlendir('PLAN: gerekmez — yalnız yorum satırı düzeltmesi')).toEqual({ gecti: true, tur: 'plan-gerekmez', eksikler: [] })
+    expect(K.degerlendir('PLAN: gerekmez — protokol notu eklenir').gecti).toBe(true) // "protokol" içindeki "rota" sözcük başı değil
+  })
+
+  it('Etki alanı değeri yalnız etiketin kendi satırıdır: sonraki satır değere katılmaz', () => {
+    expect(K.degerlendir(`${TAM_PLAN}\nbu satır değere katılmaz`).gecti).toBe(true)
+    expect(K.degerlendir(TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı:\nyok')).gecti).toBe(false) // değer boş satırda değil, bulunamaz
+  })
+
+  it('Etki alanı: noktalı "yok." ve büyük harfli VERİTABANI kabul; çoklu değer virgülle; "yok" başkasıyla birleşmez', () => {
+    expect(K.degerlendir(TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı: yok.')).gecti).toBe(true)
+    expect(K.degerlendir(TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı: YOK')).gecti).toBe(true)
+    const buyuk = TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı: VERİTABANI')
+    expect(K.degerlendir(buyuk).gecti).toBe(false) // Recep özeti yok
+    expect(K.degerlendir(`${buyuk}\nRecep özeti: karar 243`).gecti).toBe(true)
+    const coklu = TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı: veritabanı, site-yapısı')
+    expect(K.degerlendir(coklu).eksikler.join('\n')).toMatch(/Recep özeti/)
+    expect(K.degerlendir(`${coklu}\nRecep özeti: 2026-10-02`).gecti).toBe(true)
+    expect(K.degerlendir(TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı: yok, veritabanı')).gecti).toBe(false)
+    expect(K.degerlendir(TAM_PLAN.replace('Etki alanı: yok', 'Etki alanı: veritabanı, bilmem\nRecep özeti: 243')).gecti).toBe(false)
+  })
+
   it('"PLAN: gerekmez" sebebi kısaysa reddedilir, 8+ karakterliyse geçer', () => {
     expect(K.degerlendir('PLAN: gerekmez — kısa')).toMatchObject({ gecti: false, tur: 'plan-gerekmez' })
     expect(K.degerlendir('PLAN: gerekmez — tek satırlık yazım düzeltmesi')).toEqual({ gecti: true, tur: 'plan-gerekmez', eksikler: [] })
@@ -200,11 +229,15 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
   }
 
   /** `kanban_boards(id, payload, revision, updated_at)` tablosuyla geçici veri dosyası; her pano {title, tasks[]}. */
-  function sahteDosya(ad: string, panolar: { title: string; tasks: { title: string; description: string }[] }[]): string {
+  function sahteDosya(ad: string, panolar: { title: string; tasks: { title: string; description: string; labels?: string[] }[] }[]): string {
     const yol = path.join(gecici, ad)
     const db = new DatabaseSync(yol)
     db.exec('CREATE TABLE kanban_boards (id TEXT PRIMARY KEY, payload TEXT, revision INTEGER, updated_at TEXT)')
-    panolar.forEach((p, i) => db.prepare('INSERT INTO kanban_boards VALUES (?, ?, ?, ?)').run(`b${i}`, JSON.stringify(p), 1, '2026-10-02'))
+    // Gerçek veriyle aynı şekil: her kartta `labels` alanı vardır (belirtilmezse tek sınıf etiketi `bu-ay`).
+    panolar.forEach((p, i) => {
+      const tam = { ...p, tasks: p.tasks.map((t) => ({ ...t, labels: t.labels ?? ['bu-ay'] })) }
+      db.prepare('INSERT INTO kanban_boards VALUES (?, ?, ?, ?)').run(`b${i}`, JSON.stringify(tam), 1, '2026-10-02')
+    })
     db.close()
     return yol
   }
@@ -275,5 +308,62 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
     const r = spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
     expect(r.status).toBe(0)
     expect(r.stderr).not.toMatch(/UYARI/)
+  })
+
+  it('--pr-govde-dosyasi: "Kanban: REC-411" satırı tek başına uyarı vermez; ayrıca "Fixes REC-5" satırı varsa yalnız onu uyarır', () => {
+    const yol = sahteDosya('a10.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'REC-411 · taşınan kart', description: TAM_PLAN }] }])
+    const calistir = (govdeMetni: string, ad: string) => {
+      const govde = path.join(gecici, ad)
+      fs.writeFileSync(govde, govdeMetni)
+      return spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
+    }
+    const tek = calistir('Özet.\nKanban: REC-411\n', 'govde-kanban-rec.md')
+    expect(tek.status).toBe(0)
+    expect(tek.stderr).not.toMatch(/UYARI/)
+    const fixesli = calistir('Özet.\nKanban: REC-411\nFixes REC-5\n', 'govde-kanban-fixes.md')
+    expect(fixesli.status).toBe(0)
+    expect(fixesli.stderr).toMatch(/UYARI: PR gövdesinde Linear numarası REC-5 var/)
+    expect(fixesli.stderr).not.toMatch(/REC-411/)
+  })
+
+  it('--kart: sınıf etiketi yoksa ya da birden fazlaysa stderr UYARI; tek etiket (büyük/küçük harf fark etmez) uyarmaz; çıkış kodu hiçbirinde değişmez', () => {
+    const yol = sahteDosya('a11.sqlite', [
+      {
+        title: 'VentHub TEST',
+        tasks: [
+          { title: 'HRT-21 · etiketsiz', description: TAM_PLAN, labels: ['HARITA', 'recep-karari'] },
+          { title: 'HRT-22 · tek', description: TAM_PLAN, labels: ['HARITA', 'bu-ay'] },
+          { title: 'HRT-23 · iki', description: TAM_PLAN, labels: ['bu-ay', 'rafta'] },
+          { title: 'HRT-24 · büyük harf', description: TAM_PLAN, labels: ['RAFTA'] },
+          { title: 'HRT-25 · eksik plan, etiketsiz', description: 'PLAN yok', labels: [] },
+        ],
+      },
+    ])
+    const calistir = (no: string) =>
+      spawnSync(process.execPath, [KAPI_YOLU, '--kart', no], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
+    const etiketsiz = calistir('HRT-21')
+    expect(etiketsiz.status).toBe(0)
+    expect(etiketsiz.stderr).toMatch(/UYARI: kartta sınıf etiketi yok \(bu-ay\/ilk-satistan-once\/rafta\); tek biri yazılmalı/)
+    const tek = calistir('HRT-22')
+    expect(tek.status).toBe(0)
+    expect(tek.stderr).not.toMatch(/UYARI/)
+    const iki = calistir('HRT-23')
+    expect(iki.status).toBe(0)
+    expect(iki.stderr).toMatch(/UYARI: kartta birden fazla sınıf etiketi var/)
+    const buyuk = calistir('HRT-24')
+    expect(buyuk.status).toBe(0)
+    expect(buyuk.stderr).not.toMatch(/UYARI/)
+    const eksik = calistir('HRT-25')
+    expect(eksik.status).toBe(1) // uyarı çıkış kodunu değiştirmez: eksik plan yine 1
+    expect(eksik.stderr).toMatch(/UYARI: kartta sınıf etiketi yok/)
+  })
+
+  it('--pr-govde-dosyasi ile okunan kart sınıf uyarısı vermez (yalnız --kart)', () => {
+    const yol = sahteDosya('a12.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-26 · etiketsiz', description: TAM_PLAN, labels: [] }] }])
+    const govde = path.join(gecici, 'govde-sinif.md')
+    fs.writeFileSync(govde, 'Özet.\nKanban: HRT-26\n')
+    const r = spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
+    expect(r.status).toBe(0)
+    expect(r.stderr).not.toMatch(/sınıf etiketi/)
   })
 })

@@ -39,7 +39,12 @@ Bitti ölçütü: ölçülebilir; hangi komut hangi çıktıyı verince iş bite
 Sor-noktaları: üyenin durup müdüre yazacağı durumlar (en az 3 karakter; yoksa "yok").
 Etki alanı: yok | müşteriye-görünen | veritabanı | site-yapısı
 Recep özeti: yalnız Etki alanı "yok" değilse; OPS'un sunduğu tek sayfa özetin karar numarası ya da tarihi.
+Sınıf: bu-ay | ilk-satistan-once | rafta   (açıklamaya değil, kart açılırken Kanban `labels` alanına tek etiket olarak yazılır)
 ```
+
+"Sınıf" kapının zorunlu etiketi DEĞİLDİR (karar 244 adım 2): kartın `labels` alanında bu üç değerden TAM BİRİ
+bulunmalıdır. Kapı `--kart` ile okunan kartta sınıf etiketi yoksa ya da birden fazlaysa stderr'e UYARI basar
+(küçük/büyük harf fark etmez); bu kol YALNIZ uyarıdır, çıkış kodunu değiştirmez (yeni açılan kart sınıfsız doğar).
 
 Her etiketin anlamı:
 
@@ -71,7 +76,9 @@ Betik: `scripts/belge/kart-plan-kapisi.cjs`. Kimliği INV-KART-PLAN-1, testi
 - Asgari uzunluk (boşluksuz karakter): Amaç 20, Adımlar 40 ve en az iki numaralı adım ("1." "2." ile
   başlayan satır), Dosyalar 10, Bitti ölçütü 20, Ölçülmeyenler 3, Sor-noktaları 3.
 - Etki alanı dört izinli kelimeden biri olmalı; `yok` değilse "Recep özeti:" dolu olmalı ve en az bir
-  rakam içermeli (karar numarası ya da tarih; "gönderildi" gibi rakamsız metin geçmez).
+  rakam içermeli (karar numarası ya da tarih; "gönderildi" gibi rakamsız metin geçmez). Değer YALNIZ
+  etiketin kendi satırıdır; "yok." noktalı ve büyük harfli (VERİTABANI) yazım kabul, çoklu etki virgülle
+  yazılır ("veritabanı, site-yapısı"); `yok` başka değerle birleşmez.
 - Markdown süsü tolere edilir: `## PLAN`, `**PLAN**`, `**Amaç:** metin`, `- Amaç: metin` kabul edilir.
   Numaralı adım sayımı ham satırlarda yapılır (satır `1.` ile başlamalı).
 - PLAN başlığı ile "PLAN: gerekmez — ..." satırı birlikte varsa PLAN değerlendirilir, istisna yok sayılır.
@@ -81,7 +88,9 @@ Betik: `scripts/belge/kart-plan-kapisi.cjs`. Kimliği INV-KART-PLAN-1, testi
 - Linear numarası: PR başlığında ve gövdesinde kapanmaması gereken Linear numarası (REC-nn) geçmez, yalnız
   `Kanban: <no>` satırı yazılır (Linear'a bağlı PR birleşince kayıt kendiliğinden Done olur, REC-508 böyle
   kapandı). `--pr-govde-dosyasi` gövdede REC-nn görürse stderr'e UYARI basar; bu kol YALNIZ uyarıdır, çıkış
-  kodunu değiştirmez (karar 187 ile geçiş döneminde kasıtlı `Fixes REC-nn` meşrudur).
+  kodunu değiştirmez (karar 187 ile geçiş döneminde kasıtlı `Fixes REC-nn` meşrudur). `Kanban: REC-411`
+  satırının kendisindeki REC-nn geçerli bir kart numarasıdır (taşınan Linear kaydı) ve uyarı vermez; yalnız
+  diğer satırlardaki REC-nn uyarır.
 - Çıkış kodu: 0 geçti ya da plan-gerekmez; 1 eksik var (her eksik ayrı satırda); 2 Kanban veri dosyası
   okunamadı ya da kart bulunamadı/belirsiz (sessizlik geçti sayılmaz). Betik hiçbir şey yazmaz.
 
@@ -102,6 +111,9 @@ PLAN: gerekmez — <sebep, en az 8 karakter>
 
 Bu satır kapıdan geçer ama "plan-gerekmez" olarak ayrıca sayılır; sebep kısa ya da boşsa kapı reddeder.
 İstisna, planın zahmetinden kaçmak için değil, plan yazmanın iş kadar uzun olacağı küçük işler içindir.
+Etki alanı "yok" değilse ya da sebep bu etkileri anıyorsa gerekmez istisnası kullanılmaz: sebepte veritabanı,
+şema, migration, müşteri, vitrin, site yapısı, rota, url, menü, fiyat ya da ödeme kökü geçerse (ASCII katlamalı,
+sözcük başı eşleşmesi) kapı reddeder; bu işler Recep özetli tam PLAN ister (karar 243).
 
 ## Ölçülmeyenler
 
