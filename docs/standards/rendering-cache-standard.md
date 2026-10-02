@@ -117,7 +117,14 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
 > bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
 > Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Kalan (3g-2):** model adresi
-> (`/tr/urun/<slug>-p-<sku>`) ve slug değişiminde eski yol — `slug_i18n` verisi gelince.
+> (`/tr/urun/<slug>-p-<sku>`) — `slug_i18n` verisi gelince.
+>
+> **ESKİ DEĞER TAZELEMESİ (URN-12, REC-300 3g-2a, 2026-10-02).** Webhook yalnız yeni değeri değil, UPDATE'te `old_record`'daki
+> ESKİ değeri de tazeler: aile/kategori slug'ı (kategoride `metadata.slug` ve `parent_id` dahil; üst değişince çocukların eski
+> iki segmentli yolu), ürünün eski `family_id` (+ serisi), eski ve yeni `category_id` + `subcategory_id`. Yollar/etiketler tekilleştirilir.
+> `old_record` INSERT'te NULL, DELETE'te `record` NULL (DELETE zaten eski satırı tazeler); UPDATE'te `old_record` eksikse yalnız yeni
+> değer tazelenir (güvenli düşüş). Gerekçe: A→B→A dönüşünde önbellekli 308 döngü yapabilir (ana plan m.9, O2; önbellek doluluğu ÖLÇÜLMEDİ).
+> Kapı: `route.tags.test.ts` `U12-a..s` (sabotajla kanıtlandı).
 >
 > **`revalidateTag` yalnız o tag'i tüketen bir `unstable_cache` varsa iş görür.** `familyTag`'in
 > tüketicisi yoktu → çağrı sessiz no-op'tu. PDP verisi `React.cache()` ile sarılı olduğundan
