@@ -9,6 +9,7 @@ import { eskiAdresEsle } from './lib/adres/eslestirici'
 import { ESKI_ADRES_HARITASI } from './lib/adres/haritaKaynagi'
 import { resolveTenant } from './lib/tenantResolver'
 import { type DesteklenenDil, tercihEdilenDil } from './utils/dilTespiti'
+import { kokDosyaKarari } from './utils/kokDosya'
 import { Routes } from './utils/routes'
 
 export const config = {
@@ -108,13 +109,20 @@ export async function middleware(request: NextRequest) {
   } else {
     // Inject language prefix for user-facing routes missing a locale segments
     const isAuthApi = firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')
-    // ⚠ `.txt` MUAFİYETİ TEK KURALA İNDİRİLDİ (REC-127). Eskiden robots.txt ve llms.txt
-    // tek tek sayılıyordu; IndexNow doğrulama dosyası (`public/<anahtar>.txt`) da aynı
-    // muafiyete ihtiyaç duyuyor ve ADI ANAHTARIN KENDİSİ olduğu için önceden yazılamaz.
-    // Kök seviyedeki her `.txt` muaf: hepsi bot/araç dosyası, hiçbiri dile göre değişmiyor.
-    const isRootTextFile = segments.length === 1 && pathname.endsWith('.txt')
+    // ⚠ KÖK `.txt`/`.xml` MUAFİYETİ YALNIZ BİLİNEN DOSYALARA (REC-127 → URN-15). REC-127 kök
+    // seviyedeki HER `.txt`yi muaf tutuyordu (IndexNow anahtar dosyası için); dosyası olmayan ad
+    // (`/ai.txt`) `[lang]` rotasına dil değeri olarak düşüp 500 veriyordu (2026-10-02 ölçüldü).
+    // Bilinen ad → muaf; kök seviyede bilinmeyen `.txt`/`.xml` → doğrudan 404. Yalnız ad listesi
+    // (DB yok, kural 12). Liste ve niçin: src/utils/kokDosya.ts.
+    const kokDosya = kokDosyaKarari(pathname, segments)
+    if (kokDosya === 'bilinmeyen') {
+      return new NextResponse('Not Found', {
+        status: 404,
+        headers: { 'content-type': 'text/plain; charset=utf-8' },
+      })
+    }
     const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi ||
-                           pathname.endsWith('sitemap.xml') || isRootTextFile
+                           kokDosya === 'bilinen'
 
     if (!isSpecialRoute) {
       const url = request.nextUrl.clone()

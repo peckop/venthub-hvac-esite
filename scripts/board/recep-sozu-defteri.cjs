@@ -283,6 +283,139 @@ function kayitlariOku() {
   }
 }
 
+// ───────────────────────── arşiv / döndürme (ARC-15) ─────────────────────────
+
+/**
+ * ⭐DEFTER ARTIK KARAR KAYDIDIR (Recep 10-01: "tarih ve saat var ise neleri yazdığım nelere onay verdiğim de kayıt altında
+ * olmuş olur"). Büyüyen tek dosya iki şeyi bozar: kanca her turda son OKUMA_BAYT'ı okur (eski kararlar görünmez olur) ve
+ * dosya sonsuza dek şişer. Çare KIRPMA DEĞİL TAŞIMA: aktif defter DONDUR_ESIK_BAYT'ı aşınca eski kayıtlar aylık arşive
+ * (`recep-sozu-defteri.arsiv-YYYY-MM.jsonl`) EKLENİR, aktifte son DONDUR_TUT_BAYT kalır. Hiçbir kayıt silinmez.
+ * Aktif defter eşiği OKUMA_BAYT'ın ALTINDA tutulur: kanca okuması aktif defteri her zaman TAMAMEN görür.
+ */
+const DONDUR_ESIK_BAYT = 96 * 1024
+const DONDUR_TUT_BAYT = 32 * 1024
+const ARSIV_ONEK = 'recep-sozu-defteri.arsiv-'
+
+/** Arşiv dosyaları, eskiden yeniye. */
+function arsivYollari() {
+  const dizin = path.dirname(defterYolu())
+  try {
+    return fs
+      .readdirSync(dizin)
+      .filter((f) => f.startsWith(ARSIV_ONEK) && f.endsWith('.jsonl'))
+      .sort()
+      .map((f) => path.join(dizin, f))
+  } catch {
+    return []
+  }
+}
+
+/** Buffer'ı son TAM satıra kadar keser (yazım ortasındaki kesik satırı almaz). */
+function tamSatirlar(tampon) {
+  const son = tampon.lastIndexOf(0x0a)
+  return son === -1 ? Buffer.alloc(0) : tampon.subarray(0, son + 1)
+}
+
+/**
+ * Arşiv + aktif defterin TÜM geçerli kayıtları (tekilleştirilmiş: aynı ts+sid+söz bir kez). Kanca kullanmaz (yavaş);
+ * karar listesi, pano sayfası ve geri yükleme doğrulaması kullanır.
+ */
+function tumKayitlar() {
+  const gorulen = new Set()
+  const out = []
+  for (const yol of [...arsivYollari(), defterYolu()]) {
+    let metin
+    try { metin = fs.readFileSync(yol, 'utf8') } catch { continue }
+    for (const satir of metin.split('\n')) {
+      if (!satir.trim()) continue
+      try {
+        const o = JSON.parse(satir)
+        if (!o || typeof o.ts !== 'string' || typeof o.soz !== 'string' || !gecerliKayit(o)) continue
+        const anahtar = `${o.ts}|${o.sid}|${o.soz}`
+        if (gorulen.has(anahtar)) continue
+        gorulen.add(anahtar)
+        out.push(o)
+      } catch { /* bozuk satır */ }
+    }
+  }
+  return out
+}
+
+/** Numaralı kararlar (arşiv dahil), eskiden yeniye: `{ts, no, cevap, soz, rol, pencere}`. Pano "Son kararlar" bölümü bunu okur. */
+function kararKayitlari() {
+  return tumKayitlar().filter((k) => k.no).map((k) => ({ ts: k.ts, no: k.no, cevap: k.cevap, soz: k.soz, rol: k.rol, pencere: k.pencere }))
+}
+
+/**
+ * Aktif defter eşiği aştıysa eski kayıtları aylık arşive TAŞIR. Hiçbir kayıt kaybolmaz:
+ *   1. aktif defter okunur, boyutu not edilir;
+ *   2. tutulacak kuyruk ve taşınacak baş belirlenir (satır sınırında);
+ *   3. baş, kayıtların KENDİ ayının arşivine eklenir; arşiv boyu beklenen kadar büyümediyse işlem DURUR;
+ *   4. aktif defter boyu hâlâ aynıysa (araya yazım girmediyse) geçici dosya + rename ile yerine konur.
+ * Araya yazım girerse ya da dosya başka süreçte açıksa (Windows EBUSY/EPERM) VAZGEÇİLİR: aktif defter dokunulmadan kalır,
+ * arşive gitmiş satırlar sonraki koşumda `tumKayitlar` tekilleştirmesiyle çift sayılmaz.
+ * @returns {{durum: 'gerek-yok'|'dondu'|'yaris'|'mesgul'|'hata', tasinan?: number, tutulan?: number, sebep?: string}}
+ */
+function dondur(secenek = {}) {
+  const esik = secenek.esikBayt || DONDUR_ESIK_BAYT
+  const tut = secenek.tutBayt || DONDUR_TUT_BAYT
+  const yol = defterYolu()
+  // Test koşusu gerçek makine defterini döndüremez (kaydet() ile aynı koruma).
+  if (testOrtamiMi() && !baskaYolMu()) return { durum: 'hata', sebep: 'test-ortami-gercek-defter-yasak' }
+  try {
+    const ilk = fs.statSync(yol).size
+    if (ilk <= esik) return { durum: 'gerek-yok' }
+    // Satır sonu olmayan son satır da KALIR (kesik satırı atmak kayıp olurdu); eşzamanlı yazım aşağıdaki boy kontrolleriyle yakalanır.
+    const satirlar = fs.readFileSync(yol, 'utf8').split('\n').filter((s) => s !== '')
+    let toplam = 0
+    let bolum = satirlar.length
+    while (bolum > 0 && toplam + Buffer.byteLength(satirlar[bolum - 1]) + 1 <= tut) {
+      toplam += Buffer.byteLength(satirlar[bolum - 1]) + 1
+      bolum--
+    }
+    const tasinacak = satirlar.slice(0, bolum)
+    const tutulacak = satirlar.slice(bolum)
+    if (tasinacak.length === 0) return { durum: 'gerek-yok' }
+
+    // Ay → satırlar. Ayı çözülemeyen (bozuk) satır "diger" arşivine gider: KAYIP YOK.
+    const aylar = new Map()
+    for (const s of tasinacak) {
+      let ay = 'diger'
+      try {
+        const o = JSON.parse(s)
+        if (o && typeof o.ts === 'string' && /^\d{4}-\d{2}/.test(o.ts)) ay = o.ts.slice(0, 7)
+      } catch { /* bozuk satır: diger */ }
+      if (!aylar.has(ay)) aylar.set(ay, [])
+      aylar.get(ay).push(s)
+    }
+    if (fs.statSync(yol).size !== ilk) return { durum: 'yaris', sebep: 'okuma sirasinda deftere yazildi' }
+
+    const dizin = path.dirname(yol)
+    for (const [ay, sat] of aylar) {
+      const hedef = path.join(dizin, `${ARSIV_ONEK}${ay}.jsonl`)
+      const veri = sat.join('\n') + '\n'
+      const once = fs.existsSync(hedef) ? fs.statSync(hedef).size : 0
+      fs.appendFileSync(hedef, veri)
+      if (fs.statSync(hedef).size !== once + Buffer.byteLength(veri)) {
+        return { durum: 'hata', sebep: `arsiv boyu beklenenle uyusmuyor: ${path.basename(hedef)} (aktif defter DOKUNULMADI)` }
+      }
+    }
+    if (fs.statSync(yol).size !== ilk) return { durum: 'yaris', sebep: 'arsivlerken deftere yazildi (aktif DOKUNULMADI; satirlar arsivde, tekilleştirilir)' }
+
+    const gecici = `${yol}.donduruluyor-${process.pid}`
+    fs.writeFileSync(gecici, tutulacak.join('\n') + '\n')
+    try {
+      fs.renameSync(gecici, yol)
+    } catch (e) {
+      try { fs.unlinkSync(gecici) } catch { /* temizlenemedi */ }
+      return { durum: 'mesgul', sebep: String((e && e.code) || (e && e.message) || e) }
+    }
+    return { durum: 'dondu', tasinan: tasinacak.length, tutulan: tutulacak.length }
+  } catch (e) {
+    return { durum: 'hata', sebep: String((e && e.message) || e).slice(0, 160) }
+  }
+}
+
 function imlecOku(sid) {
   try {
     const o = JSON.parse(fs.readFileSync(path.join(imlecDizini(), `${sid}.json`), 'utf8'))
@@ -374,4 +507,5 @@ function gorunur(g) {
 module.exports = {
   siniflandir, kararlar, maskele, rolBul, kaydet, gorunur, anilanSeritler, kayitlariOku, seritAdi,
   defterYolu, imlecDizini, testOrtamiMi, SOZ_TAVAN, TUR_TAVAN, ILK_PENCERE_MS, TEKRAR_MS, MASKE,
+  OKUMA_BAYT, DONDUR_ESIK_BAYT, DONDUR_TUT_BAYT, ARSIV_ONEK, arsivYollari, tamSatirlar, tumKayitlar, kararKayitlari, dondur,
 }
