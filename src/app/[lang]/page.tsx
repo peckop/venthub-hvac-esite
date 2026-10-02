@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { dilGecerliMi } from '@/i18n/yoldanDil'
 import { enKuraliRobots, hreflangAlani } from '@/lib/seo/enYayinKurali'
 import { getCategories } from '@/lib/services/category.service'
 import { getProducts } from '@/lib/services/product.service'
@@ -74,6 +76,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params
+  if (!dilGecerliMi(lang)) notFound()
   const dict = lang === 'en' ? en : tr
 
   const siteUrl = SITE_URL
@@ -163,6 +166,9 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
 
 export default async function RootPage({ params }: Props) {
   const { lang } = await params
+  // Derin savunma (URN-15): layout ile paralel render edilir; geçersiz dil `compareText`teki
+  // `Intl.Collator`a ulaşıp 500 vermesin.
+  if (!dilGecerliMi(lang)) notFound()
   const dict = lang === 'en' ? en : tr
 
   // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59 Adım B/1 — Recep kararı 2026-09-04:
