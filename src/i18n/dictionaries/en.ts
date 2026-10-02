@@ -1139,9 +1139,9 @@ export const en: typeof tr = {
       venthubSolution: 'VentHub Solution',
     },
     series: {
-      technicalFamily: 'Technical Product Family',
-      heroDefaultDesc: 'Browse professional ventilation solutions by their technical series.',
-      seriesDetail: 'Series Detail',
+      technicalFamily: 'Subcategory',
+      heroDefaultDesc: 'Browse professional ventilation solutions by their technical product families.',
+      seriesDetail: 'Subcategory Detail',
       requestQuote: 'Request a Quote',
       colModel: 'Model',
       colPrice: 'Price',

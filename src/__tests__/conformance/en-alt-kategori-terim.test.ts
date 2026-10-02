@@ -18,7 +18,8 @@
  *
  * Yasak yazımlar (büyük/küçük harf; boşluk, çift boşluk, NBSP, tire varyantları fark etmez):
  *   "Sub Product Groups", "Sub-categories", "Sub Categories" (ve tekil sub-category),
- *   "Sub Families", "Sub Groups". Doğru yazım: "Subcategory" / "Subcategories".
+ *   "Sub Families", "Sub Groups", "Technical Product Family" (tekil), "Series Detail" (karar 238 / URN-9).
+ *   Doğru yazım: "Subcategory" / "Subcategories" / "Subcategory Detail".
  * KAPIYA GİRMEYENLER (bilerek): "sub-series", "sub-family" — ölü anahtarlarda (en.ts home.hero.metrics,
  * home.guidedDiscovery) duruyor, müşteriye görünen ad kararı bekliyor (BELİRSİZ).
  * TR sözlüğüne dokunulmaz ("Alt Ürün Grupları" kalır).
@@ -68,6 +69,10 @@ const YASAK_YAZIMLAR: ReadonlyArray<{ ad: string; desen: RegExp }> = [
   { ad: 'Sub-categories / Sub Categories', desen: new RegExp(`sub${AYRAC}categor(?:y|ies)`, 'i') },
   { ad: 'Sub Families', desen: new RegExp(`sub${AYRAC}families`, 'i') },
   { ad: 'Sub Groups', desen: new RegExp(`sub${AYRAC}groups`, 'i') },
+  // Karar 238 / URN-9: alt kategori sayfasında bu iki ad aile düzeyini adlandırıyordu. "families" çoğulu
+  // (heroDefaultDesc'in yeni değeri "...technical product families.") `family\b` ile eşleşmez: temiz kalır.
+  { ad: 'Technical Product Family', desen: new RegExp(`technical${AYRAC}product${AYRAC}family\\b`, 'i') },
+  { ad: 'Series Detail', desen: new RegExp(`series${AYRAC}detail`, 'i') },
 ]
 
 /** Kaynak metnindeki her metin düğümünü yasak yazımlara karşı tarar; ihlal satırları döner. */
@@ -102,6 +107,10 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
       ['tekil', "const a = { x: 'Sub-category' }"],
       ['küçük harf', "const a = { x: 'sub product groups' }"],
       ['kaçışlı dizgede', "const a = { x: 'Sub\\u0020Categories' }"],
+      ['Technical Product Family (URN-9)', "const a = { technicalFamily: 'Technical Product Family' }"],
+      ['Technical Product Family küçük harf, çift boşluk', "const a = { x: 'technical  product family' }"],
+      ['Series Detail (URN-9)', "const a = { seriesDetail: 'Series Detail' }"],
+      ['Series Detail tireli', "const a = { x: 'Series-Detail' }"],
     ]
     for (const [ad, kaynak] of kotuKaynaklar) {
       expect(yasakliAdlariBul(kaynak), ad).not.toEqual([])
@@ -119,6 +128,10 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
       ['blok yorumu', "/* 'Sub Categories' */ const a = 1"],
       ['yorumdaki sub-categories', '// REC-103: the six missing sub-categories.\nconst a = 1'],
       ['tek sözcük Subgroups', "const a = { x: 'Subgroups' }"],
+      ['Subcategory Detail (URN-9)', "const a = { seriesDetail: 'Subcategory Detail' }"],
+      ['technical product families çoğul (URN-9)', "const a = { x: 'by their technical product families.' }"],
+      ['Technical Product Families çoğul, şablon', 'const a = { x: `${n} Technical Product Families` }'],
+      ['product family tek başına', "const a = { x: 'Product Family' }"],
     ]
     for (const [ad, kaynak] of temizKaynaklar) {
       expect(yasakliAdlariBul(kaynak), ad).toEqual([])
@@ -158,7 +171,9 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
    *  - megamenu.categoryHub.subCategoryCount → alt kategori sayısı
    * "series" cetvelde AİLE demektir; bu düzeyi adlandıran değerde "series" geçemez ve
    * değer "Subcategor..." ya da düğme ise "Explore" olmalıdır.
-   * KAPSAM DIŞI: category.series.seriesDetail/technicalFamily/heroDefaultDesc (karar bekliyor).
+   * Karar 238 / URN-9: category.series.{technicalFamily,seriesDetail,heroDefaultDesc} de bu düzeydedir
+   * (CategorySeriesView:71/120/88, alt kategori sayfası); tam eşitlikle aşağıdaki ayrı testte kilitlidir
+   * (heroDefaultDesc "Subcategor..." taşımaz, çünkü cümle ailelerden söz eder; bu yüzden bu listeye girmez).
    */
   it('alt kategori düzeyi anahtarlarında "series" geçmez; terim "Subcategories" ya da düğme "Explore"', async () => {
     const { en } = await import('../../i18n/dictionaries/en')
@@ -187,6 +202,15 @@ describe('INV-EN-ALT-KATEGORI-TERIM-1: İngilizce sözlükte alt kategori yazım
       if (/\bseries\b/i.test(deger)) ihlal.push(`${yol} → "${deger}" ("series" aile demektir)`)
     }
     expect(ihlal).toEqual([])
+  })
+
+  it('karar 238 (URN-9): alt kategori sayfası etiketleri tam eşitlikle Subcategory dilinde', async () => {
+    const { en } = await import('../../i18n/dictionaries/en')
+    expect(en.category.series.technicalFamily).toBe('Subcategory')
+    expect(en.category.series.seriesDetail).toBe('Subcategory Detail')
+    expect(en.category.series.heroDefaultDesc).toBe(
+      'Browse professional ventilation solutions by their technical product families.',
+    )
   })
 
   it('sabotaj kanıtı: "series" yasağı eski değerleri yakalar', () => {
