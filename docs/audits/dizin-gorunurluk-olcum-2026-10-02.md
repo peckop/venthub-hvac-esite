@@ -42,6 +42,27 @@ dizinde değil (aşağıda 5).
 | 14 | Var olmayan kök adresler | `/llms-full.txt`, `/ai.txt`, `/humans.txt`, `/ads.txt`, `/security.txt`, `/news-sitemap.xml`, uydurma `/xyz.txt`: **500** (404 olmalı). Günlük: `RangeError: Incorrect locale information provided at new Collator ([lang]/page.js)`. Sebep (kod okuma): `src/middleware.ts:111-114` kök seviyedeki her `.txt`'yi dil yönlendirmesinden muaf tutuyor (REC-127, IndexNow anahtarı için), olmayan ad `[lang]` rotasına dil değeri olarak düşüyor; son halka çıkarım. Kasıt değil. Dizin kaybına yol açtığına dair ölçüm yok | ölçtüm (500, günlük); mekanizma kod okuma + çıkarım. Onarım: URN-15 |
 | 15 | Hız (SEO-2) | 87 sayfa kırık 0; PSI mobil performans ort. 0,746 (51 sayfa 75 altı), LCP ortanca 6029 ms | ölçtüm (`rec-300-taban-2026-10-02.md`). Ayrı kart SEO-7, başlamadı |
 
+## Search Console ve Bing Webmaster, yan yana (Supermetrics denemesi, REC-470; salt okuma)
+
+Dönem 2026-09-03 ile 09-30 (28 gün). Google tarafı hizmet hesabı betiğiyle ve Supermetrics GW ile, Bing tarafı yalnız Supermetrics BW ile alındı.
+
+| Ölçü | Google (Search Console) | Bing (Webmaster) | Dayanak |
+|---|---|---|---|
+| Tıklama | **24** (iki yol da aynı sayıyı verdi) | **0** | ölçtüm |
+| Gösterim | 447 (hizmet hesabı) · 550 tüm arama türleri, 455 yalnız web (Supermetrics) | **6** (günlük toplam; sorgu tablosundan 4, sayfa tablosundan 4: üç Bing tablosu birbirini tutmuyor, nedeni ölçülmedi) | ölçtüm |
+| Dizindeki sayfa | 87 adresin 83'ü | **21** (09-10'a kadar 0; 09-14'te 5, 09-22'de 11, 09-25'te 17, 09-30'da 21: düzenli artıyor). Sayfa **listesi** alınamadı, yalnız sayım | ölçtüm |
+| Tarama | son tarama 08-29 ile 10-01 arası, getirme 84/84 başarılı | 28 günde 687 tarama; hata, 4xx, 5xx, 301, 302, robots engeli, zararlı yazılım **hepsi 0** | ölçtüm |
+| Site haritası | 87 gönderilmiş; haritanın kendi "dizine eklenen 0" alanı URL denetimiyle çelişiyor, kullanılmaz | `sitemap.xml` durum **Success**, gönderim 08-29, son tarama 09-25, 86 URL (dosyadaki 87 ile 1 fark, ölçülmedi) | ölçtüm |
+| "venthub" sorgusu | 3 tık, 23 gösterim, sıra 6,7 (başka "venthub" içeren sorgu yok) | 0 tık, 2 gösterim | ölçtüm |
+| 5 konu sorgusu | adlı sorgularda 0 tık; "hava perdesi" 10 gösterim (sıra 61), "aksiyel fan" 8 (sıra 90) | satır yok = gösterim yok | ölçtüm |
+| Gizlenmiş sorgu | **21 tık ve 241 gösterim** hangi sorguya ait olduğu Google tarafından verilmiyor (nadir sorgular) | — | ölçtüm |
+| Cihaz ve ülke | masaüstü 21 tık, mobil 3; Türkiye 24 tık; 49 ülkede gösterim var, tıklama yok | — | ölçtüm |
+
+- **Google ile Supermetrics gösterim farkı** (447 / 455 / 527 / 550) iki kaynaktan geliyor: varsayılan sorgu web ile görsel aramasını toplar (görseli çıkarınca 550 → 455) ve kesinleşmemiş son gün (09-30, 23 gösterim). Kalan 8-13 gösterimlik fark ölçülemedi. Taban olarak hizmet hesabının 447'si kullanılır, tıklama her yerde 24.
+- **Bing sorgu konumları** (0,2 ve 0,5) imkânsız değerler, doğrulanamadı, **kullanılmaz**.
+- **Hüküm:** Bing'de teknik bir engel yok (hata 0, robots engeli 0, harita Success); sayfa sayısı hızla artıyor. Bing'den görünür trafik henüz ölçülebilir değil (28 günde 6 gösterim). Google'daki 24 tıkın tamamı Türkiye'den, 21'i sorgusu bilinmeyen.
+- **Denemenin kalıcı katkısı yalnız Bing verisi:** depoda Bing okuyan betik yok (yalnız IndexNow gönderimi). Google tarafında Supermetrics yeni bilgi eklemedi, hizmet hesabı betiği aynı sayıları verdi.
+
 ## Çürütme turu (bağımsız üye, ölçümleri çürütmeye çalıştı)
 
 | Bulgu | Sonuç |
