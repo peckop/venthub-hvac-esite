@@ -80,16 +80,21 @@ export const K3B_DISI_BOLUMLER: ReadonlySet<string> = new Set([
  * dilsiz yollar (`/sitemap.xml`, `/products/x`) vitrin sayfası değil ya da yönlendirilir → etkilenir.
  *
  * Girdi ÖNCE `URL` ile normalize edilir: `/tr/destek/../urun/x` gerçekte `/tr/urun/x`'tir; bölüm kontrolü ham
- * metne bakarsa `destek` görür ve değişecek adresi bildirirdi (K4 ihlali). Çözülemeyen girdi (geçersiz URL,
- * başka kök adres) güvenli taraftadır: etkilenir → düşer.
+ * metne bakarsa `destek` görür ve değişecek adresi bildirirdi (K4 ihlali). Çözülemeyen girdi (geçersiz URL)
+ * ve başka sunucuya giden girdi (tam URL'de sunucu adı `SITE_URL` ile aynı değil; göreli girdide
+ * `//baska-kok/tr` gibi tabanı değiştiren biçim) güvenli taraftadır: etkilenir → düşer.
  */
 export function k3bdenEtkilenirMi(yol: string): boolean {
   let yolAdi: string
   try {
     const cozulen = new URL(yol, NORMALIZE_TABANI)
     const tamUrlMi = yol.startsWith('http://') || yol.startsWith('https://')
-    // Göreli girdi kendi kökünde kalmalı; `//baska-kok/tr` gibi biçimler tabanı değiştirir → çözülemedi say.
-    if (!tamUrlMi && cozulen.origin !== NORMALIZE_TABANI) return true
+    if (tamUrlMi) {
+      // Başka sunucunun adresi bu sitenin bildirimi değildir; yol kısmı masum görünse de düşer.
+      if (cozulen.host !== new URL(SITE_URL).host) return true
+    } else if (cozulen.origin !== NORMALIZE_TABANI) {
+      return true
+    }
     yolAdi = cozulen.pathname
   } catch {
     return true

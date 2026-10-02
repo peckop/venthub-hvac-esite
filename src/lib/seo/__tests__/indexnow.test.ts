@@ -147,6 +147,16 @@ describe('INV-INDEXNOW-1 · k3bdenEtkilenirMi süzgeci', () => {
     expect(k3bdenEtkilenirMi('http://'), 'geçersiz URL').toBe(true)
     expect(k3bdenEtkilenirMi('//baska-kok/tr/destek'), 'tabanı değiştiren biçim').toBe(true)
   })
+
+  it('⭐tam URL\'de sunucu adı kontrol edilir: başka sunucu düşer, kendi sunucu adı mevcut davranışı korur', () => {
+    const kendi = new URL(SITE_URL).host
+    expect(k3bdenEtkilenirMi('https://baska.com/tr/destek'), 'başka sunucu, masum yol').toBe(true)
+    expect(k3bdenEtkilenirMi('https://baska.com/tr'), 'başka sunucu, dil kökü').toBe(true)
+    expect(k3bdenEtkilenirMi(`https://${kendi}.baska.com/tr/destek`), 'sunucu adını önek yapan başka sunucu').toBe(true)
+    expect(k3bdenEtkilenirMi(`${SITE_URL}/tr/destek`), 'kendi sunucu, etkilenmeyen').toBe(false)
+    expect(k3bdenEtkilenirMi(`${SITE_URL}/tr`), 'kendi sunucu, dil kökü').toBe(false)
+    expect(k3bdenEtkilenirMi(`${SITE_URL}/tr/products/x`), 'kendi sunucu, etkilenen').toBe(true)
+  })
 })
 
 describe('INV-INDEXNOW-1 · süzgeç ↔ tazelemeYollari bağı', () => {
