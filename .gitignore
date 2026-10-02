@@ -35,6 +35,8 @@ Thumbs.db
 *.txt
 !requirements.txt
 !public/llms.txt
+# IndexNow doğrulama dosyası (REC-405) — adı anahtarın kendisi; yayında olmazsa IndexNow 403 döner.
+!public/e4468e39c3131f38c51ffc73fab38c99.txt
 !memory-engine/**/requirements.txt
 *.log
 /tmp/
