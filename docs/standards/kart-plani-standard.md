@@ -114,6 +114,8 @@ Bu satır kapıdan geçer ama "plan-gerekmez" olarak ayrıca sayılır; sebep k�
 Etki alanı "yok" değilse ya da sebep bu etkileri anıyorsa gerekmez istisnası kullanılmaz: sebepte veritabanı,
 şema, migration, müşteri, vitrin, site yapısı, rota, url, menü, fiyat ya da ödeme kökü geçerse (ASCII katlamalı,
 sözcük başı eşleşmesi) kapı reddeder; bu işler Recep özetli tam PLAN ister (karar 243).
+Olumsuzlama da reddedilir ("fiyata dokunmaz" gibi bir sebep de kök içerdiği için ret alır): kapı cümlenin anlamını
+değil kökün varlığını ölçer, bilerek güvenli taraftadır; ilk takılan tam PLAN yazar.
 
 ## Ölçülmeyenler
 
