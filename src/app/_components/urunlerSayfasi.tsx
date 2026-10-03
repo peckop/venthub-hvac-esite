@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import React from 'react'
 
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
@@ -183,19 +182,22 @@ export async function UrunlerSayfasi({ lang }: { lang: string }) {
     console.warn('Kategori kapisi verisi alinamadi (/products):', error)
   }
 
+  // ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Kök sınır, içerik askıya alınınca
+  // (`next/dynamic` görünümleri) tüm gövdeyi ham HTML'de gizli akış bloğuna (`<div hidden
+  // id="S:0">`) itiyordu: h1 ve liste JS'siz görünmüyordu (tr: 99 görünür / 1015 gizli kelime).
+  // `useSearchParams` okuyan tek uç (Pagination) CategoryMasterView içinde kendi sınırıyla
+  // sarılıdır. Kapı: INV-SSR-GOVDE-2 (storefront-ssr-govde.test.ts).
+  // initialCategory null olduğu için MasterView bunu Discovery olarak işleyecektir.
   return (
-    <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
-      {/* initialCategory null olduğu için MasterView bunu Discovery olarak işleyecektir */}
-      <TenantProvider value={tenantConfig}>
-        <CategoryMasterView
-          initialCategory={null}
-          kategoriler={kategoriler}
-          families={families}
-          total={total}
-          page={page}
-          pageSize={PAGE_SIZE}
-        />
-      </TenantProvider>
-    </React.Suspense>
+    <TenantProvider value={tenantConfig}>
+      <CategoryMasterView
+        initialCategory={null}
+        kategoriler={kategoriler}
+        families={families}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+      />
+    </TenantProvider>
   )
 }

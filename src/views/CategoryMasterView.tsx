@@ -17,6 +17,13 @@ import type { FamilyListItem } from '../types/ui-models'
 // kategori//products sayfaları Haziran'dan beri bota/LCP'ye boş <main> sunuyordu.
 // dynamic() code-splitting için kalır; ağır 3D (CategoryOrbitCarousel) kendi
 // izole Suspense'inde ssr:false olarak ProductsDiscoveryView içinde durur.
+//
+// ⭐BU GÖRÜNÜMLERİ SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, 2026-10-03). `dynamic()` sunucuda
+// `React.lazy` gibi askıya alır; askıya alınan içerik, onu saran bir Suspense sınırının
+// DIŞINA, akış bloğuna (`<div hidden id="S:0">`) yazılır: ham HTML'de sayfa gövdesi (h1 dahil)
+// gizli blokta, görünür yerde yalnız spinner iskeleti kalıyordu (kategori ve /products).
+// Sınır olmayınca sunucu kabuğu görünümler çözülene kadar bekler ve gövde HTML'e düz yazılır.
+// Suspense yalnız `useSearchParams` okuyan yaprağı (Pagination) sarar (kural 5).
 const CategoryGridView = dynamic(() => import('./category/CategoryGridView'))
 const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'))
 const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView'))
@@ -160,10 +167,10 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
 
   if (!category && !loading) {
     return (
-      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
+      <>
         <ProductsDiscoveryView kategoriler={kategoriler} families={visibleFamilies} total={total} isLoading={loading} />
         {pagination}
-      </React.Suspense>
+      </>
     )
   }
 
@@ -242,10 +249,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
 
   return (
     <div className="min-h-screen">
-      <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-white"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-navy" /></div>}>
-        {renderView()}
-        {etkinMod !== 'showcase' && pagination}
-      </React.Suspense>
+      {renderView()}
+      {etkinMod !== 'showcase' && pagination}
     </div>
   )
 }

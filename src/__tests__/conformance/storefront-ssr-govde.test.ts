@@ -149,3 +149,101 @@ describe('INV-SSR-GOVDE-1 · hesaplayıcı sayfaları sunucuda render edilir', (
     expect(govde(oku(...OKUYUCU)).length, 'Okuyucu bos okundu.').toBeGreaterThan(100)
   })
 })
+
+/**
+ * INV-SSR-GOVDE-2 — kategori ve /products gövdesi ham HTML'de GÖRÜNÜR yerde kalır (URN-25).
+ *
+ * NİÇİN VAR (ölçülmüş, 2026-10-03, `next build` çıktısı `.next/server/app/tr/...html`):
+ *
+ *   | sayfa              | görünür kelime | gizli blokta | h1 yeri        |
+ *   |--------------------|----------------|--------------|----------------|
+ *   | tr/category/fanlar | 94             | 719          | `S:0` İÇİNDE   |
+ *   | tr/products        | 99             | 1015         | `S:0` İÇİNDE   |
+ *   | en/products        | 93             | 1165         | `S:0` İÇİNDE   |
+ *
+ * SEBEP, adıyla: `CategoryMasterView` görünümleri `next/dynamic` ile yükler; o sunucuda
+ * `React.lazy` gibi ASKIYA ALIR. Askıya alınan içeriği saran Suspense sınırı akışta önce
+ * yalnız fallback (spinner) yazar, içerik sonradan `<div hidden id="S:0">` bloğuna gelir.
+ * JS çalıştırmayan okuyucu gövdeyi görmez. Sınır İKİ yerdeydi: rota çekirdeğinde (kök) ve
+ * `CategoryMasterView` içinde; ÖLÇÜLDÜ: yalnız kökü kaldırmak YETMEDİ (iç sınır aynı bloğu
+ * üretti), ikisi birden kalkınca blok 0 oldu. Görünüm importunu statiğe çevirmek de bloğu
+ * sıfırladı ama ilk yük JS'ini 324 → 410 kB çıkardı; o yüzden `dynamic()` KALDI, sınırlar gitti.
+ *
+ * ⚠KURAL 5 LAFZEN SAĞLANIYORDU ("Suspense var"); yanlış YERDEYDİ (bkz. INV-SSR-GOVDE-1).
+ *
+ * ⭐BU KAPININ SINIRI: kaynak okur, derleme çıktısını DEĞİL. "Gövde hidden dışında" iddiasının
+ * kendisi yalnız `next build` sonrası ham HTML'de ölçülür (S bloğu sayısı 0, h1 hidden dışı).
+ * Burada ölçülen, bloğu üreten YAPININ geri gelmemesidir.
+ */
+describe('INV-SSR-GOVDE-2 · kategori ve /products Suspense sınırı içeriği sarmaz', () => {
+  const CEKIRDEKLER = [
+    ['src', 'app', '_components', 'kategoriSayfasi.tsx'],
+    ['src', 'app', '_components', 'urunlerSayfasi.tsx'],
+  ] as const
+  const MASTER = ['src', 'views', 'CategoryMasterView.tsx'] as const
+
+  /** `<Suspense …>…</Suspense>` bloklarının GÖVDELERİ (iç içe sınır yok varsayımı, K4 ölçer). */
+  const suspenseBloklari = (g: string): string[] =>
+    g.match(/<(?:React\.)?Suspense\b[\s\S]*?<\/(?:React\.)?Suspense>/g) ?? []
+
+  /** İhlal listesi: Pagination dışında bir şeyi saran Suspense ya da çekirdekte herhangi bir Suspense. */
+  const masterIhlalleri = (g: string): string[] =>
+    suspenseBloklari(g).filter((b) => !/<Pagination\b/.test(b) || /renderView|ProductsDiscoveryView|<Category\w+View/.test(b))
+
+  it('⭐ASIL İDDİA — rota çekirdekleri (kategoriSayfasi, urunlerSayfasi) Suspense İÇERMEZ', () => {
+    for (const yol of CEKIRDEKLER) {
+      const g = govde(oku(...yol))
+      expect(
+        /<(?:React\.)?Suspense\b/.test(g),
+        `${yol.join('/')}: sayfa cekirdegine Suspense eklenmis. Icerik askiya alinirsa (dynamic ` +
+          'gorunumler) tum govde ham HTML de <div hidden id="S:0"> blogunda kalir; JS siz ' +
+          'okuyucu h1 i ve listeyi gormez (olculdu: gorunur 94 kelime, gizli 719). Sinir ' +
+          'yalniz useSearchParams okuyan uc bilesende olmali.',
+      ).toBe(false)
+    }
+  })
+
+  it('⭐CategoryMasterView — Suspense YALNIZ Pagination yaprağını sarar', () => {
+    const g = govde(oku(...MASTER))
+    expect(
+      masterIhlalleri(g),
+      'CategoryMasterView icinde Pagination disinda bir seyi saran Suspense var (gorunum ya ' +
+        'da ProductsDiscoveryView). dynamic() gorunumleri askiya alir; saran sinir icerigi ham ' +
+        'HTML de gizli akis blogu na iter (URN-25 olcumu).',
+    ).toEqual([])
+    expect(
+      suspenseBloklari(g).length,
+      'Pagination (useSearchParams) Suspense siz kalmis — Next build hatasi / CSR bailout.',
+    ).toBeGreaterThanOrEqual(1)
+  })
+
+  it('AYIRT EDİCİ — çözücü kusurlu kalıbı GERÇEKTEN yakalıyor (sabote örnekler)', () => {
+    const kokSinir = '<React.Suspense fallback={<Y/>}><PageComponent a={1}/></React.Suspense>'
+    expect(/<(?:React\.)?Suspense\b/.test(govde(kokSinir))).toBe(true)
+
+    const icSinir =
+      '<React.Suspense fallback={null}>{renderView()}{etkinMod !== "showcase" && pagination}</React.Suspense>'
+    expect(masterIhlalleri(icSinir).length).toBe(1)
+
+    const discoverySinir =
+      '<Suspense fallback={null}><ProductsDiscoveryView a={1}/>{pagination}</Suspense>'
+    expect(masterIhlalleri(discoverySinir).length).toBe(1)
+
+    const saglam = '<React.Suspense fallback={<div/>}><Pagination page={page} total={total}/></React.Suspense>'
+    expect(masterIhlalleri(saglam)).toEqual([])
+
+    // Yorum içindeki Suspense kapıyı tetiklemez (govde yorumu atar).
+    expect(/<(?:React\.)?Suspense\b/.test(govde('{/* <React.Suspense> bilincli yok */}'))).toBe(false)
+  })
+
+  it('BOŞLUK MUHAFIZI — dosyalar gerçekten okunuyor (INV-SSR-GOVDE-2)', () => {
+    for (const yol of CEKIRDEKLER) {
+      expect(govde(oku(...yol)).length, `${yol.join('/')} bos okundu.`).toBeGreaterThan(2000)
+    }
+    expect(govde(oku(...MASTER)).length, 'CategoryMasterView bos okundu.').toBeGreaterThan(2000)
+    expect(
+      govde(oku(...MASTER)).includes('<Pagination'),
+      'Pagination CategoryMasterView den dusmus — Suspense kolunun anlami kalmadi.',
+    ).toBe(true)
+  })
+})

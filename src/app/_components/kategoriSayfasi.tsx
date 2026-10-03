@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
-import React, { cache } from 'react'
+import { cache } from 'react'
 
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import { en } from '@/i18n/dictionaries/en'
@@ -337,17 +337,20 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <React.Suspense fallback={<div className="container mx-auto py-12 px-4 text-center text-slate-500">{dict.common.loading}</div>}>
-        {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
-        <PageComponent
-          initialCategory={kategoriMetniniIndir(category, lang)}
-          families={families}
-          total={total}
-          page={page}
-          pageSize={PAGE_SIZE}
-          initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
-        />
-      </React.Suspense>
+      {/* ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Buradaki kök sınır, içerik
+          askıya alınınca (`next/dynamic` görünümleri) TÜM gövdeyi ham HTML'de gizli akış
+          bloğuna (`<div hidden id="S:0">`) itiyordu: h1 ve liste JS'siz görünmüyordu.
+          `useSearchParams` okuyan tek uç (Pagination) CategoryMasterView içinde kendi
+          sınırıyla sarılıdır. Kapı: INV-SSR-GOVDE-2 (storefront-ssr-govde.test.ts). */}
+      {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
+      <PageComponent
+        initialCategory={kategoriMetniniIndir(category, lang)}
+        families={families}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
+      />
       {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
           slug'dır (`vh:kategori/<categories.slug>`); yazı yoksa blok basılmaz. Veri kod sabiti
           (yazilar.ts) → derlemeyle tazelenir, DB tetiği gerekmez (rendering-cache-standard). */}
