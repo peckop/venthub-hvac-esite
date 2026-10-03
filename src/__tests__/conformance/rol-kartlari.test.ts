@@ -470,6 +470,21 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     }
   })
 
+  it('HRT-14 (karar 241/243): kart planı kuralı her kurallar dosyasında (üretilen ve diskteki) bulunur, kartta değil', () => {
+    const kural =
+      "Plan karta yazılır (docs/standards/kart-plani-standard.md): konuyu bilmeyenin uygulayabileceği açıklıkta; işi planı yazan değil yeni açılan ekip üyesi yapar; müşteriye görünen, veritabanı ya da site yapısı planı Recep'e tek sayfa özetle OPS'tan gider; planın iskeletinin eksiksizliğini `node scripts/belge/kart-plan-kapisi.cjs --kart <NO>` ölçer."
+    const linearKurali =
+      "PR başlığında ve gövdesinde kapanmaması gereken Linear numarası (REC-nn) geçmez; yalnız `Kanban: <no>` satırı yazılır (Linear'a bağlı PR birleşince kayıt kendiliğinden Done olur, REC-508 böyle kapandı)."
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      expect(metin, `${ad} (üretilen)`).toContain(kural)
+      expect(metin, `${ad} (üretilen, Linear numarası kuralı)`).toContain(linearKurali)
+      const disk = fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+      expect(disk, `${ad}-kurallar.md (disk)`).toContain(kural)
+      expect(disk, `${ad}-kurallar.md (disk, Linear numarası kuralı)`).toContain(linearKurali)
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('kart-plani-standard.md')
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
