@@ -73,6 +73,17 @@ mailbox 3. sage.db şeması değişmedi (`user_version` 0, 31 nesne, aynı imza)
 `pnpm` **kullanılmaz**: ana lockfile'a ve worktree'lerin `node_modules` bağına dokunmaz.
 Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açılışta onaya sorar.
 
+## Yeni etiket bildirimi (ARC-24, karar 257) — kırmızı yanınca ne yapılır
+
+Dependabot npm'e bakar, GitHub'daki sürümü görmez; WrongStack GitHub'da npm'den önce çıkar. Günlük iş
+`.github/workflows/wrongstack-etiket-kontrol.yml` (betik `scripts/board/wrongstack-etiket-bak.cjs`) en son etiketi
+`etiket-taban.json` içindeki `sonGorulen` ile karşılaştırır; yeni etiket ya da kalıcı ölçüm bozulması işi KIRMIZI bitirir.
+Taban güncellenene kadar her gün kırmızı kalır (bilinçli: unutulan etiket görünür kalsın).
+
+1. **Ölç** (iş özeti zaten yazar, doğrula): `gh api repos/WrongStack/WrongStack/releases/latest --jq .tag_name` ve `npm view @wrongstack/sage-mcp@<sürüm> version` (E404 = npm'de henüz yok; yükseltme npm'de çıkmadan yapılamaz).
+2. **Kart aç:** ARAÇ için Kanban kartı (KAYNAK/CETVEL bloğu: bu bölüm + ARC-24, karar 257). Yükseltip yükseltmemek Recep'in ya da ARAÇ'ın ölçüme dayalı kararıdır; yükseltme "Sürüm yükseltme" bölümündeki sırayla yapılır.
+3. **Tabanı güncelle:** ARAÇ dalında (`arac/wrongstack-<sürüm>`) `etiket-taban.json` → `sonGorulen` yeni etiket; yükseltilmese de güncellenir (karar kartta yazılı olsun), PR'ın başlığında `ARAÇ (<kart>)` ve `Kanban: <kart>`.
+
 ## Bilinen sınırlar (adıyla)
 
 1. **Kalıcı servis.** MCP süreci bir IPC istemcisidir; SQLite'ın sahibi proje başına **ayrık bir

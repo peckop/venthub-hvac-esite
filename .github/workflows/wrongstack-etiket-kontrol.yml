@@ -1,0 +1,53 @@
+name: WrongStack etiket kontrolu
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ARC-24 (karar 257) — GitHub'daki yeni WrongStack etiketi gunluk gozlenir.
+#
+# NICIN: Dependabot npm'e bakar, GitHub'daki surumu gormez. WrongStack GitHub'da npm'den ONCE
+# cikiyor (v1.0.30 GitHub'da 2026-10-01, npm'deki son surum 1.0.29). Yeni etiket cikinca haberimiz
+# olmali.
+#
+# SINYAL: yeni etiket varsa is KIRMIZI biter ve ozet sayfasi etiketi, yayin notunu, karsilastirma
+# baglantisini ve npm durumunu yazar. Yeni yoksa YESIL ve sessiz. GECICI ag hatasi (zaman asimi,
+# 5xx, 429) KIRMIZI degil: uyari satiri yazar (gecici hata her gun alarm uretirse alarm bakilmayan
+# alarma doner). KALICI bozulma (404, 401, 403, gecerli etiket yok) KIRMIZI: kontrol sessizce kor kalmaz.
+#
+# YALNIZ OKUR: yazma izni, secret, self-hosted runner, pull_request_target YOK; issue/PR/yorum
+# acmaz, dosya commit etmez. Karsilastirma mantigi workflow'da DEGIL, test edilen betikte:
+# scripts/board/wrongstack-etiket-bak.cjs. Taban: tools/wrongstack-mcp/etiket-taban.json.
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    # Gunde bir, 05:17 UTC (Istanbul 08:17). Dakika tam saat degil: GitHub tam saatlerde
+    # zamanlanmis isleri geciktiriyor.
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+# Depo PUBLIC: `permissions:` yazilinca varsayilanlar duser, `contents: read` ZORUNLU
+# (CLAUDE.md Notlar — yoksa checkout "Repository not found" verir).
+permissions:
+  contents: read
+
+jobs:
+  etiket:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # GITHUB_TOKEN .git/config'te birakilmaz: sonraki adimlar/betik onu okuyamaz (kontrol yalniz okur).
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Son WrongStack etiketi tabandan yeni mi
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/board/wrongstack-etiket-bak.cjs --ozet "$GITHUB_STEP_SUMMARY"
