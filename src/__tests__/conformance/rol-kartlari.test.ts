@@ -582,12 +582,14 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     }
   })
 
-  it('cetvel gerçek dosya, README haritasında satırı var, kart ve görev dosyası ona atıf yapar', () => {
+  // Kart bayt payı dar (SATIS sert sınırın %93'ünde, OPS 10-03): kart cetvele atıf yapmaz, yalnız görev dosyasının
+  // yolunu verir; cetvele atıf görev dosyasında ve README haritasında durur.
+  it('cetvel gerçek dosya, README haritasında satırı var, görev dosyası ona atıf yapar, kart görev dosyasını gösterir', () => {
     const cetvel = 'docs/standards/duzenli-gorevler-standard.md'
     expect(varMi(cetvel)).toBe(true)
     expect(oku('docs/README.md')).toContain('standards/duzenli-gorevler-standard.md')
     expect(uretici.uretGorevler()['GEO-SEO']).toContain(cetvel)
-    expect(uretici.uret()['GEO-SEO']).toContain('duzenli-gorevler-standard.md')
+    expect(uretici.uret()['GEO-SEO']).toContain('docs/roller/GEO-SEO-gorevler.md')
   })
 
   it('AYIRT EDİCİLİK: kanıtsız "bağlı: evet" yakalanır (iş akışı var ama komutu çağırmıyor)', () => {
@@ -620,6 +622,9 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(s((v) => (v['GEO-SEO'].gorevler[1].gorev = v['GEO-SEO'].gorevler[0].gorev))).toMatch(/aynı görev iki kez/)
     expect(s((v) => (v['GEO-SEO'].gorevler = []))).toMatch(/düzenli görev yok/)
     expect(s((v) => (v['GEO-SEO'].amac = ''))).toMatch(/amaç yok/)
+    // OPS kararı 10-03: Amaç TEK cümle (kart bayt payı); ikinci cümle kapıda KIRMIZI
+    expect(s((v) => (v['GEO-SEO'].amac = 'Birinci cümle. İkinci cümle.'))).toMatch(/amaç tek cümle olmalı/)
+    expect(s((v) => (v['GEO-SEO'].amac = 'Tek cümle; noktalı virgülle uzar ve sonda nokta var.'))).not.toMatch(/amaç/)
   })
 
   it('AYIRT EDİCİLİK: kartlardan Amaç ya da Düzenli görevler bölümü silinirse kart denetimi yakalar', () => {

@@ -15,7 +15,7 @@ Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük 
 Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.
 
 ## Düzenli görevler
-- 4 görev, tetiğe bağlı 0: `docs/roller/GEO-SEO-gorevler.md` (cetvel: `duzenli-gorevler-standard.md`).
+- 4 görev, tetiğe bağlı 0: `docs/roller/GEO-SEO-gorevler.md`.
 
 ## Dosyalar
 scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum}-standard.md, docs/audits/geo-*, docs/audits/seo-*.

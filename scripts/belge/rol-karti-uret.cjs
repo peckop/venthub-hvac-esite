@@ -373,7 +373,7 @@ const GOREV_CETVELI = 'docs/standards/duzenli-gorevler-standard.md'
 const SIKLIKLAR = { 'her-dagitim': 'her dağıtım', haftalik: 'haftalık', aylik: 'aylık', olay: 'olay' }
 const TETIKLER = { actions: 'Actions', 'istem-tazelik': 'istem satırı tazelik', 'kart-kapisi': 'kart kapısı' }
 const BAGLILAR = ['evet', 'hayir']
-const AMAC_SINIRI = 400
+const AMAC_SINIRI = 260
 
 /** Veri dosyasını okur: { ROL: { amac, gorevler: [...] } } (dosya yoksa {}). */
 function gorevVerisiOku(kok = path.resolve(__dirname, '..', '..')) {
@@ -404,7 +404,7 @@ function gorevBolumu(ad, veri = GOREVLER) {
   const { toplam, bagli } = gorevSayilari(g)
   return [
     '## Düzenli görevler',
-    `- ${toplam} görev, tetiğe bağlı ${bagli}: \`docs/roller/${gorevDosyaAdi(ad)}\` (cetvel: \`duzenli-gorevler-standard.md\`).`,
+    `- ${toplam} görev, tetiğe bağlı ${bagli}: \`docs/roller/${gorevDosyaAdi(ad)}\`.`,
   ].join('\n')
 }
 
@@ -467,6 +467,7 @@ function gorevSorunlari(veri, roller, varMi, oku, isAkislari = []) {
     }
     if (typeof g.amac !== 'string' || !g.amac.trim()) s.push(`${ad}: amaç yok`)
     else if (g.amac.length > AMAC_SINIRI || g.amac.includes('\n')) s.push(`${ad}: amaç ${AMAC_SINIRI} karakteri ya da tek paragrafı aşıyor`)
+    else if (/[.!?…]\s+\S/.test(g.amac)) s.push(`${ad}: amaç tek cümle olmalı (kart bayt payı)`)
     if (!Array.isArray(g.gorevler) || !g.gorevler.length) {
       s.push(`${ad}: düzenli görev yok`)
       continue

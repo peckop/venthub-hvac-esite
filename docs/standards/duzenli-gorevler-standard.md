@@ -17,7 +17,7 @@
 
 ## Kural
 
-1. **Amaç** 1-2 cümledir, etki diliyle yazılır (bu iş ne işe yarar, bozulursa kime ne olur); en çok 400 karakter,
+1. **Amaç** TEK cümledir (OPS kararı 10-03: kart bayt payı dar), etki diliyle yazılır (bu iş ne işe yarar, bozulursa kime ne olur); en çok 260 karakter,
    tek paragraf. Kartta "Yönetim" bölümünün altında durur.
 2. **Düzenli görev**, tekrarlanan iştir. Tek seferlik iş Kanban kartıdır, bu tabloya girmez.
 3. Her görev aşağıdaki altı alanı taşır; hiçbiri boş bırakılmaz.
