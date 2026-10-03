@@ -2867,3 +2867,12 @@ ayar dizinindeki `sessions/` altına **1 kayıt yazılır, bitince silinir** (`k
 ⚠**ÖLÇÜLMEDİ:** editörün oturum listesinde/sekmesinde görünüp görünmediği (kayıt birkaç sn yaşar, ölçen tarafta editör yok);
 bu Recep gözüyle ölçülecek. Kural bu yüzden "OPS emri + kayıtta `entrypoint=sdk-cli` yazılır" olarak uygulanır,
 "sekmeyi kapatır" diye anılmaz.
+
+---
+
+## 37. İŞ BAŞI "ÖNCEKİ ÇALIŞMA" TARAMASI — tek komut, sonuç ilk satırda (ARC-30 / OPS-30)
+
+**Komut:** `node scripts/arac/onceki-calisma.cjs "<emir metni>" [--haric ARC-30] [--derin] [--json] [--kanca]`. Yeni arama motoru değildir; beş mevcut aramayı paralel koşar: dosya adı (`git ls-files`) · git konu satırı (`git log --all`) · Kanban başlık/etiket (`kanban_disa_aktar.py`) · sage (yalnız ipucu) · Linear (`LINEAR_API_KEY` varsa, ipucu).
+**İlk satır** üç sonuçtan biri ve karışmaz: `ÖNCEKİ ÇALIŞMA: BULUNDU n — …` · `YOK (k/5 yer arandı, ifade: …)` (yalnız dosya+git+Kanban tamam ölçüldüyse) · `ÖLÇÜLEMEDİ (kaynak: sebep)`. Kimlik `REC-300 = rec300 = rec 300`. Bütçe CLI 6 sn, `--kanca` 2,5 sn.
+**Sayaç:** `~/.claude/ara-onceki-calisma.jsonl` (depo DIŞI, yalnız-ekleme; depo içi yola yazmayı betik reddeder); `--sayac` oturumda bulunan yollarla yazılan dosya adlarının kesişimini `tekrar-uretim` satırı yazar.
+**Kapı:** `INV-ONCEKI-CALISMA-1..13`. **Ölçülmedi:** istem kancasına bağlama (UserPromptSubmit + SendMessage tetiklenmesi) ve Kanban description/notes araması.
