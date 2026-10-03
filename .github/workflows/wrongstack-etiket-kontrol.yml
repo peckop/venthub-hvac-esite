@@ -37,6 +37,9 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # GITHUB_TOKEN .git/config'te birakilmaz: sonraki adimlar/betik onu okuyamaz (kontrol yalniz okur).
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -45,5 +48,4 @@ jobs:
 
       - name: Son WrongStack etiketi tabandan yeni mi
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: node scripts/board/wrongstack-etiket-bak.cjs --ozet "$GITHUB_STEP_SUMMARY"
+          GH_TOKEN: ${{ github.token }}        run: node scripts/board/wrongstack-etiket-bak.cjs --ozet "$GITHUB_STEP_SUMMARY"

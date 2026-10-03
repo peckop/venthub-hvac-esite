@@ -9,18 +9,24 @@
  * (v1.0.30 GitHub'da 2026-10-01'de, npm'deki son sürüm 1.0.29). Yeni etiket çıkınca haberimiz olmalı; bu betik
  * günlük workflow'dan (`.github/workflows/wrongstack-etiket-kontrol.yml`) koşar.
  *
- * ⭐YALNIZ OKUR: GitHub'dan okur, dışarıya hiçbir şey yazmaz (issue/PR/yorum/commit YOK). Tek yazdığı yer
- * `--ozet` ile verilen iş özeti dosyasıdır (GITHUB_STEP_SUMMARY).
+ * ⭐YALNIZ OKUR: GitHub'dan okur (`gh api` yalnız GET), dışarıya hiçbir şey yazmaz (issue/PR/yorum/commit YOK).
+ * Tek yazdığı yer `--ozet` ile verilen iş özeti dosyasıdır (GITHUB_STEP_SUMMARY).
+ *
+ * ⭐İKİ KAYNAK BİRLEŞİR: `releases/latest` (yayın notu ve tarih burada) VE `/tags` ikisi de okunur, semver olarak
+ * BÜYÜK olan alınır. Yalnız latest'e bakmak, yayını (release) hazırlanmamış ama etiketlenmiş bir sürümü kaçırır.
  *
  * ÇIKIŞ KODU:
- *   0  yeni etiket YOK (sessiz) ya da ÖLÇÜLEMEDİ (ağ hatası: belirsiz + uyarı satırı; KIRMIZI DEĞİL — geçici
- *      GitHub/ağ hatası her gün alarm üretirse alarm bakılmayan alarma döner)
- *   1  YENİ etiket var (iş KIRMIZI biter ki sinyal görünsün)
- *   2  taban dosyası okunamadı/bozuk (depo kusuru, geçici değil: kontrol kör kalır, sessiz geçilmez)
+ *   0  yeni etiket YOK (sessiz) ya da GEÇİCİ ölçülemedi (zaman aşımı/5xx/ağ: belirsiz + ::warning::)
+ *   1  YENİ etiket var YA DA ölçüm KALICI bozuk (404/yetki/depo adı değişti/geçerli etiket yok): iş KIRMIZI biter.
+ *      ⭐Kalıcı bozulma sessiz geçilirse kontrol sonsuza dek "yeşil" ve kör kalır; ayrım `hataSinifi` ile yapılır.
+ *   2  taban dosyası okunamadı/bozuk (depo kusuru: kontrol kör kalır, sessiz geçilmez)
+ *
+ * ⭐DIŞ KAYNAKLI METİN: yayın notu GitHub'dan gelir ve stdout'a basılır; satır başındaki `::komut::` ve `##[komut]`
+ * önekleri etkisizleştirilir (iş akışı komutu enjeksiyonu: sahte hata, `::add-mask::`, `::stop-commands::`).
  *
  * Kullanım:  node scripts/board/wrongstack-etiket-bak.cjs [--taban yol] [--ozet dosya] [--json]
  *
- * Saf fonksiyonlar dışa verilir (test edilebilirlik); ağ erişimi (`ag`, `npm`) ENJEKTE edilir.
+ * Saf fonksiyonlar dışa verilir (test edilebilirlik); ağ erişimi (`ag`, `npm`) ve çıktı (`yaz`) ENJEKTE edilir.
  */
 
 const fs = require('node:fs')
@@ -31,6 +37,8 @@ const DEPO = 'WrongStack/WrongStack'
 const NPM_PAKETI = '@wrongstack/sage-mcp'
 const VARSAYILAN_TABAN = path.join(__dirname, '..', '..', 'tools', 'wrongstack-mcp', 'etiket-taban.json')
 const NOT_SATIRI = 40
+const SATIR_TAVANI = 500
+const SIFIR_GENISLIK = '​'
 
 /** `v1.0.30` / `1.0.30` → [1,0,30]. Ön-sürüm (`-rc.1`) ve bozuk biçim → null (taban kararına GİRMEZ). */
 function surumCoz(etiket) {
@@ -47,6 +55,20 @@ function surumKarsilastir(a, b) {
     if (x[i] !== y[i]) return x[i] < y[i] ? -1 : 1
   }
   return 0
+}
+
+/**
+ * Hata iletisini 'gecici' | 'kalici' diye sınıflar. ⭐Geçici YALNIZ olumlu tanınanlardır (zaman aşımı, 5xx, 408/429,
+ * DNS/bağlantı kopması); tanınmayan her şey KALICI sayılır: bilinmeyen hata bir gün kırmızı görünür, yanlışlıkla
+ * "geçici" sayılan kalıcı bozulma ise sonsuza dek sessiz kalır.
+ */
+function hataSinifi(mesaj) {
+  const s = String(mesaj ?? '')
+  const gecici =
+    /HTTP\s*(5\d\d|408|429)\b/i.test(s) ||
+    /\b(timed?\s*out|timeout|ETIMEDOUT|ECONNRESET|ECONNREFUSED|ENOTFOUND|EAI_AGAIN|EHOSTUNREACH|ENETUNREACH)\b/i.test(s) ||
+    /could not resolve host|dial tcp|connection (reset|refused)|network is unreachable|TLS handshake/i.test(s)
+  return gecici ? 'gecici' : 'kalici'
 }
 
 /** Taban dosyasını okur: `{"sonGorulen":"v1.0.30"}`. Okunamazsa/bozuksa hata atar (sessiz varsayılan YOK). */
@@ -70,44 +92,67 @@ function tabanOku(yol, okuyucu = fs) {
 }
 
 /**
- * En son etiketi bulur: önce `releases/latest`, o başarısızsa `/tags` (sürüm sırasına göre en büyük).
- * `ag.getir(yol)` → Promise<nesne>; ağ hatasında reddeder. Dönüş: {etiket, tarih, notMetni, kaynak}.
+ * En son etiketi bulur: `releases/latest` VE `/tags` İKİSİ de okunur, semver olarak EN BÜYÜK alınır (eşitlikte
+ * yayın kaydı olan latest kazanır: tarih ve not onda). `ag.getir(yol)` → Promise<nesne>; ağ hatasında reddeder.
+ * Dönüş: {etiket, tarih, notMetni, kaynak, uyarilar}. Hiç etiket alınamazsa `.sinif` ('gecici'|'kalici') taşıyan hata atar.
  */
 async function sonEtiketiOku(ag) {
+  const adaylar = []
   const hatalar = []
+  const hataYaz = (kaynak, e) => hatalar.push({ mesaj: `${kaynak}: ${e.message}`, sinif: e.sinif ?? hataSinifi(e.message) })
   try {
     const r = await ag.getir(`repos/${DEPO}/releases/latest`)
     if (r && surumCoz(r.tag_name)) {
-      return { etiket: r.tag_name, tarih: r.published_at ?? null, notMetni: r.body ?? '', kaynak: 'releases/latest' }
+      adaylar.push({ etiket: r.tag_name, tarih: r.published_at ?? null, notMetni: r.body ?? '', kaynak: 'releases/latest' })
+    } else {
+      hatalar.push({ mesaj: 'releases/latest gecerli etiket dondurmedi', sinif: 'kalici' })
     }
-    hatalar.push('releases/latest gecerli etiket dondurmedi')
   } catch (e) {
-    hatalar.push(`releases/latest: ${e.message}`)
+    hataYaz('releases/latest', e)
   }
   try {
     const liste = await ag.getir(`repos/${DEPO}/tags?per_page=100`)
-    const adaylar = (Array.isArray(liste) ? liste : []).map((t) => t && t.name).filter((n) => surumCoz(n))
-    if (adaylar.length > 0) {
-      const en = adaylar.reduce((a, b) => (surumKarsilastir(b, a) > 0 ? b : a))
-      return { etiket: en, tarih: null, notMetni: '', kaynak: 'tags' }
-    }
-    hatalar.push('tags gecerli etiket dondurmedi')
+    const adlar = (Array.isArray(liste) ? liste : []).map((t) => t && t.name).filter((n) => surumCoz(n))
+    for (const ad of adlar) adaylar.push({ etiket: ad, tarih: null, notMetni: '', kaynak: 'tags' })
+    if (adlar.length === 0) hatalar.push({ mesaj: 'tags gecerli etiket dondurmedi', sinif: 'kalici' })
   } catch (e) {
-    hatalar.push(`tags: ${e.message}`)
+    hataYaz('tags', e)
   }
-  const hata = new Error(`en son etiket okunamadi — ${hatalar.join(' | ')}`)
-  hata.olculemedi = true
-  throw hata
+  if (adaylar.length === 0) {
+    const hata = new Error(`en son etiket okunamadi — ${hatalar.map((h) => h.mesaj).join(' | ')}`)
+    // KALICI = her başarısızlık kalıcı. Biri bile geçiciyse durum kendiliğinden düzelebilir (ör. latest 404 + tags 503).
+    hata.sinif = hatalar.every((h) => h.sinif === 'kalici') ? 'kalici' : 'gecici'
+    throw hata
+  }
+  const en = adaylar.reduce((a, b) => (surumKarsilastir(b.etiket, a.etiket) > 0 ? b : a))
+  return { ...en, uyarilar: hatalar.map((h) => h.mesaj) }
+}
+
+/** Dış kaynaklı sürüm notunu süzer: ilk NOT_SATIRI satır, kontrol karakteri yok, satır başı iş akışı komutu etkisiz. */
+function notuSuz(metin) {
+  return String(metin ?? '')
+    .split(/\r?\n/)
+    .slice(0, NOT_SATIRI)
+    .map((s) => {
+      const temiz = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').slice(0, SATIR_TAVANI)
+      return /^\s*(::|##\[)/.test(temiz) ? SIFIR_GENISLIK + temiz : temiz
+    })
 }
 
 /**
  * Karar: taban ile son etiket → sonuç nesnesi. Hiç ağ erişimi yapmaz (saf).
- * durum: 'yeni' (son > taban) | 'yok' (son <= taban) | 'belirsiz' (son etiket okunamadı).
+ * durum: 'yeni' (son > taban) | 'yok' (son <= taban) | 'belirsiz' (GEÇİCİ okunamadı) | 'bozuk' (KALICI okunamadı).
+ * `hata` = {mesaj, sinif}.
  */
 function karar(taban, son, hata) {
   if (!son) {
-    return { durum: 'belirsiz', taban, uyari: `WrongStack etiketi olculemedi: ${hata}`, cikis: 0 }
+    const mesaj = hata && hata.mesaj ? hata.mesaj : 'bilinmeyen hata'
+    if (hata && hata.sinif === 'gecici') {
+      return { durum: 'belirsiz', taban, uyari: `WrongStack etiketi olculemedi (gecici): ${mesaj}`, cikis: 0 }
+    }
+    return { durum: 'bozuk', taban, uyari: `WrongStack etiket olcumu KALICI bozuk: ${mesaj}`, cikis: 1 }
   }
+  const uyarilar = son.uyarilar ?? []
   const fark = surumKarsilastir(son.etiket, taban)
   if (fark > 0) {
     return {
@@ -117,22 +162,23 @@ function karar(taban, son, hata) {
       tarih: son.tarih,
       kaynak: son.kaynak,
       compare: `https://github.com/${DEPO}/compare/${taban}...${son.etiket}`,
-      notSatirlari: String(son.notMetni).split(/\r?\n/).slice(0, NOT_SATIRI),
+      notSatirlari: notuSuz(son.notMetni),
+      uyarilar,
       cikis: 1,
     }
   }
-  return { durum: 'yok', taban, son: son.etiket, cikis: 0 }
+  return { durum: 'yok', taban, son: son.etiket, uyarilar, cikis: 0 }
 }
 
 /** Tüm akış: taban oku → etiket oku → karar → (yeniyse) npm'de var mı. Taban bozuksa hata ATAR (çıkış 2'yi çağıran verir). */
 async function kontrolEt({ tabanYolu, ag, npm, okuyucu }) {
   const taban = tabanOku(tabanYolu, okuyucu)
   let son = null
-  let hata = ''
+  let hata = null
   try {
     son = await sonEtiketiOku(ag)
   } catch (e) {
-    hata = e.message
+    hata = { mesaj: e.message, sinif: e.sinif ?? 'kalici' }
   }
   const sonuc = karar(taban, son, hata)
   if (sonuc.durum === 'yeni') {
@@ -141,9 +187,16 @@ async function kontrolEt({ tabanYolu, ag, npm, okuyucu }) {
   return sonuc
 }
 
+/** Notun içindeki en uzun ters tırnak dizisinden UZUN bir çit seçer: not, kod bloğunu kapatıp özeti bozamaz. */
+function citSec(satirlar) {
+  const enUzun = Math.max(0, ...(satirlar.join('\n').match(/`+/g) ?? []).map((k) => k.length))
+  return '`'.repeat(Math.max(3, enUzun + 1))
+}
+
 /** Sonucu insan okunur Markdown'a çevirir (iş özeti). Yeni yoksa boş dize (sessiz). */
 function ozetMetni(s) {
-  if (s.durum === 'belirsiz') return `### WrongStack etiket kontrolü: ÖLÇÜLEMEDİ\n\n${s.uyari}\n\nTaban etiket: ${s.taban}\n`
+  if (s.durum === 'belirsiz') return `### WrongStack etiket kontrolü: ÖLÇÜLEMEDİ (geçici)\n\n${s.uyari}\n\nTaban etiket: ${s.taban}\n`
+  if (s.durum === 'bozuk') return `### WrongStack etiket kontrolü: ÖLÇÜM KALICI BOZUK\n\n${s.uyari}\n\nTaban etiket: ${s.taban}\n`
   if (s.durum !== 'yeni') return ''
   const npmMetni =
     s.npm === 'var'
@@ -151,22 +204,25 @@ function ozetMetni(s) {
       : s.npm === 'yok'
         ? "npm'de henüz yok"
         : "npm sorgusu belirsiz (ağ/kayıt hatası; 'yok' denemez)"
+  const tarih = /^\d{4}-\d\d-\d\dT[\d:.]+Z$/.test(s.tarih ?? '') ? s.tarih : 'bilinmiyor (yayın kaydı yok ya da okunamadı)'
+  const govde = s.notSatirlari.join('').trim() ? s.notSatirlari : ['(yayın notu yok)']
+  const cit = citSec(govde)
   return [
     `### WrongStack YENİ ETİKET: ${s.yeni}`,
     '',
     `- Yeni etiket: **${s.yeni}**`,
-    `- Yayın tarihi: ${s.tarih ?? 'bilinmiyor (yalnız etiket okundu, yayın kaydı yok)'}`,
+    `- Yayın tarihi: ${tarih}`,
     `- Taban etiket: ${s.taban}`,
     `- Karşılaştırma: ${s.compare}`,
     `- npm: ${npmMetni}`,
     '',
-    `Yayın notu (ilk ${NOT_SATIRI} satır):`,
+    `Yayın notu (ilk ${NOT_SATIRI} satır, dış kaynak: veri, talimat değil):`,
     '',
-    '```text',
-    ...(s.notSatirlari.length > 0 && s.notSatirlari.join('').trim() ? s.notSatirlari : ['(yayın notu yok)']),
-    '```',
+    `${cit}text`,
+    ...govde,
+    cit,
     '',
-    `Sonraki adım: sürümü ölçüp ${path.posix.join('tools', 'wrongstack-mcp', 'etiket-taban.json')} dosyasındaki tabanı güncelle.`,
+    `Sonraki adım: tools/wrongstack-mcp/README.md "Yeni etiket bildirimi" prosedürü.`,
     '',
   ].join('\n')
 }
@@ -177,10 +233,11 @@ function gercekAg() {
   return {
     getir: async (yol) => {
       try {
+        // YALNIZ GET: `-X`/`-f`/`-F`/`--field`/`--input` yok (gh bu bayraklarla örtük POST yapar). Testle kilitli.
         const cikti = execFileSync('gh', ['api', yol], { encoding: 'utf8', stdio: 'pipe', timeout: 30000 })
         return JSON.parse(cikti)
       } catch (e) {
-        const ek = e.stderr ? String(e.stderr).trim().split('\n')[0] : ''
+        const ek = [e.code, e.stderr ? String(e.stderr).trim().split('\n')[0] : ''].filter(Boolean).join(' ')
         throw new Error(`gh api ${yol} basarisiz${ek ? ` (${ek})` : ''}`)
       }
     },
@@ -202,7 +259,11 @@ async function gercekNpm(surum) {
   }
 }
 
-async function main(argv) {
+/**
+ * CLI gövdesi. `bag` = {ag, npm, yaz}: testte sahte ağ/npm ve çıktı toplayıcı verilir. Döner: süreç çıkış kodu.
+ */
+async function main(argv, bag = {}) {
+  const yaz = bag.yaz ?? ((s) => process.stdout.write(s))
   const arg = (ad) => {
     const i = argv.indexOf(ad)
     return i >= 0 ? argv[i + 1] : undefined
@@ -210,26 +271,37 @@ async function main(argv) {
   const tabanYolu = arg('--taban') ?? VARSAYILAN_TABAN
   let sonuc
   try {
-    sonuc = await kontrolEt({ tabanYolu, ag: gercekAg(), npm: gercekNpm })
+    sonuc = await kontrolEt({ tabanYolu, ag: bag.ag ?? gercekAg(), npm: bag.npm ?? gercekNpm })
   } catch (e) {
-    process.stdout.write(`::error::WrongStack etiket kontrolu kor: ${e.message}\n`)
+    yaz(`::error::WrongStack etiket kontrolu kor: ${e.message}\n`)
     return 2
   }
-  if (argv.includes('--json')) process.stdout.write(`${JSON.stringify(sonuc, null, 2)}\n`)
+  const json = argv.includes('--json')
+  if (json) yaz(`${JSON.stringify(sonuc, null, 2)}\n`)
+  for (const u of sonuc.uyarilar ?? []) yaz(`::warning::WrongStack etiket kaynagi kismen okunamadi: ${u}\n`)
   const metin = ozetMetni(sonuc)
-  if (sonuc.durum === 'belirsiz') process.stdout.write(`::warning::${sonuc.uyari}\n`)
-  if (sonuc.durum === 'yeni') {
-    process.stdout.write(`::error::WrongStack yeni etiket: ${sonuc.yeni} (taban ${sonuc.taban})\n`)
-  }
-  if (metin && !argv.includes('--json')) process.stdout.write(`${metin}\n`)
-  if (metin && arg('--ozet')) fs.appendFileSync(arg('--ozet'), `${metin}\n`)
-  if (sonuc.durum === 'yok' && !argv.includes('--json')) {
-    process.stdout.write(`WrongStack: yeni etiket yok (son ${sonuc.son}, taban ${sonuc.taban}).\n`)
-  }
+  if (sonuc.durum === 'belirsiz') yaz(`::warning::${sonuc.uyari}\n`)
+  if (sonuc.durum === 'bozuk') yaz(`::error::${sonuc.uyari}\n`)
+  if (sonuc.durum === 'yeni') yaz(`::error::WrongStack yeni etiket: ${sonuc.yeni} (taban ${sonuc.taban})\n`)
+  if (metin && !json) yaz(`${metin}\n`)
+  const ozet = arg('--ozet')
+  if (metin && ozet) fs.appendFileSync(ozet, `${metin}\n`)
+  if (sonuc.durum === 'yok' && !json) yaz(`WrongStack: yeni etiket yok (son ${sonuc.son}, taban ${sonuc.taban}).\n`)
   return sonuc.cikis
 }
 
-module.exports = { surumCoz, surumKarsilastir, tabanOku, sonEtiketiOku, karar, kontrolEt, ozetMetni }
+module.exports = {
+  surumCoz,
+  surumKarsilastir,
+  hataSinifi,
+  tabanOku,
+  sonEtiketiOku,
+  notuSuz,
+  karar,
+  kontrolEt,
+  ozetMetni,
+  main,
+}
 
 if (require.main === module) {
   main(process.argv.slice(2)).then(
