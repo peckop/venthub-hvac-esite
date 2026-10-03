@@ -1,10 +1,10 @@
 ---
 name: wrongstack-kanban
-description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu. WrongStack 1.0.26 uyarlaması."
+description: "Kanban'da kart açma, havuzdan iş alma, kanıt komutuyla Done ve pano maliyet kuralları; iş takibinin tek kaynağı Kanban, Linear donuk (karar 219). Tetik: kart aç, kanban, Done, iş durumu, bu iş daha önce yapıldı mı, önceki çalışma. WrongStack 1.0.26 uyarlaması."
 category: coordination
 metadata:
   kaynak: "WrongStack @wrongstack/core 1.0.26 skills/wrongstack-kanban/SKILL.md (MIT lisansı, telif WrongStack)"
-  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı. Kaynak gövde değiştirilmedi"
+  uyarlama: "ARAÇ 2026-09-28 (karar 165 W3) araç eşlemesi + ek kurallar; YETENEK 2026-10-01 (YTN-1, karar 219 ve 220) tam kullanım kipi: günlük akış, ölçülmüş tuzaklar, maliyet kuralı, Haiku kuralı; YETENEK 2026-10-03 (YTN-12) önce-ara iki arama + kullanılmayan okuma yetenekleri. Kaynak gövde değiştirilmedi"
 ---
 
 > **Kaynak:** WrongStack `@wrongstack/core` 1.0.26, `skills/wrongstack-kanban/SKILL.md`, MIT lisansı. Aşağıdaki
@@ -15,7 +15,7 @@ metadata:
 | Kaynak metin | Bizde |
 |---|---|
 | `kanban` aracı | MCP `mcp__wrongstack-kanban__kanban_read` / `kanban_manage` / `kanban_watch` |
-| Managed board / lease-fenced dispatch | Bizim panolar yönetilmeyen (unmanaged): `start_task` cevabı "This board is not in managed lifecycle mode" der (10-01 ölçüldü). Kaynak gövdedeki "managed" zorunlulukları (tek aşama kuralı, lease koruması) burada bağlanmaz; ARAÇ'ın 09-28 ölçümü: `transition_task` reddedilir, `move_task` kullanılır |
+| Managed board / lease-fenced dispatch | **YETENEK panosu 10-01 09:39'dan beri yönetilen** (YTN-6 pilotu: kapanış `mark_assignment` ile, kapı araçta; ölçüm `docs/audits/skill-kanban-tam-kapasite-2026-10-03.md`). Diğer panolar yönetilmeyen (unmanaged); aşağıdaki "yönetilmeyen" anlatımı onlar içindir: `start_task` cevabı "This board is not in managed lifecycle mode" der (10-01 ölçüldü). Kaynak gövdedeki "managed" zorunlulukları (tek aşama kuralı, lease koruması) burada bağlanmaz; ARAÇ'ın 09-28 ölçümü: `transition_task` reddedilir, `move_task` kullanılır |
 | Dönüş boyutu | Her yazma panonun tamamını döndürür; bu bir **pano boyutu** işidir (aşağıda "Maliyet kuralı"). Yama diskte uygulanmıştır ama etkisi 3 kartlık panoda görünmedi (10-01) |
 | Linear | **Donuk** (karar 219): yeni kayıt açılmaz, mevcut kayıt silinmez ya da arşivlenmez. Kaynak gövdede ve eski kurallarda "Linear" geçen yerler artık "Kanban" okunur |
 
@@ -47,7 +47,11 @@ metadata:
 
 ### B. Günlük akış
 
-1. **Önce ara.** Aynı iş için kart var mı: `kanban_read search_tasks` (sorgu iş adıyla ve numarayla). Aramanın EYLEMİ değil SONUCU yazılır: "x kart buldum, mükerrer yok / var".
+1. **Önce ara: iki ayrı arama, ikisinin de SONUCU yazılır.** Aramanın EYLEMİ değil SONUCU yazılır: "x kart / y dosya buldum, mükerrer yok / var".
+   - **(a) Kart var mı:** `kanban_read search_tasks` + `includeCompletedTasks: true` + `includeArchived: true` (biten kartlar da aranır; "REC-300" 40 kart döndürdü, Done dahil, 10-03 ölçüldü). Sorgu iş adı ve numarayla, `limit` küçük (maliyet kuralı D).
+   - **(b) İş daha önce YAPILDI mı:** Kanban 10-01'de başladı, öncesi ve kart dışı üretim kart aramasında çıkmaz. Ayrıca koş: `git log --all --grep=<anahtar>`, `docs/plans` ve `docs/audits` altında ad ve içerik taraması, sage hafıza araması, Linear (donuk; 10-01 öncesi işler için yalnız okunur). Vaka (10-03, OPS-30): 441 model adres listesi 09-23'te `docs/plans/rec300-model-adres-listesi-2026-09-23.csv` + `uret.py` olarak depoda vardı; OPS ve URUN aynı gün sıfırdan üretmeye başladı. Kusur araçta değil, aramanın çağrılmamasındaydı.
+   - **Yazılacak biçim:** kartın planında ya da ilk notunda `ÖNCEKİ ÇALIŞMA:` satırı = aranan yerler + bulunan dosya/commit/kart ya da "yok" + kullanılan arama ifadesi. Aranan yerler ve ifade olmayan "yok" geçersizdir. Etiketi HARİTA kart planı şablonuna HRT-26'da yazıyor; aynı ifade kullanılır.
+   - **Otomatik komut:** ARAÇ OPS-30'da iş başı tek komutu kuruyor (git log + docs + Kanban Done + sage); kurulunca adı buraya yazılır ve elle adımların yerini alır. O zamana kadar (a) ve (b) elle koşulur.
 2. **Havuzdan iş alma** (10-01 ölçüldü, REC-309 kartında). Sırası gelen kart `Linear Bekleyenler` havuzundadır; karar OPS'tadır.
    - ⛔**`move_task` + `targetBoardId` panolar arası TAŞIMAZ:** `targetBoardId` yok sayıldı, kart yalnız havuzun kendi sütununda yer değiştirdi (`ok: true` döndü, yanıltıcı). `transfer` eylemi `--destructive` kapısının arkasında kapalıdır.
    - **Doğru yol `copy_task`:** `boardId` = havuz, `taskId` = kart, `targetBoardId` = kendi panon, `targetColumnId: todo`, `preserveOriginTaskIds: true`, `inheritLabels: true`. Yeni kart yeni kimlik alır, `origin` (REC-nn, Linear kimliği) korunur.
@@ -65,7 +69,7 @@ metadata:
    2. `move_task` ile `targetColumnId: done`. **`transition_task` bu panolarda `REFUSED` verir** ("Strict Kanban Agent transitions require a managed board"); denemeye gerek yok.
    - ⛔**`move_task` ile Done'da KAPI YOKTUR (DENEME kartı, 10-01 ölçüldü):** (a) kartta hiç kanıt komutu yokken `move_task` Done'a taşıdı, `status: completed`; (b) kartta koşmamış (`pending`) bir kanıt komutu varken de kart Done'da kaldı; (c) `verify_completion` `PASSED` verdikten sonra bile `transition_task` aynı hatayı verdi (`[REFUSED] Strict Kanban Agent transitions require a managed board`, `managed-policy-invalid`, alan `lifecycle.mode`): sebep karttaki kanıt değil, panonun yönetilen olmamasıdır. Yani bu panolarda kanıt kuralı **araç değil disiplin** işidir.
    - **Sıra bağlayıcıdır: önce `verify_completion`, rapor `passed` değilse `move_task` ile Done'a TAŞIMA.** Kanıtsız ya da `needs_human` kartı Done'a çeken kişi kuralı çiğnemiş olur, araç engellemez. "bitti, tamam, çalışıyor" gibi tek kelimelik özet kanıt değildir. Kapanışta PR numarası ve birleşme kanıtı kartın notunda kalır.
-   - Gerçek kapı için araçta `adopt_managed_lifecycle` eylemi var; bir panoyu yönetilene çevirmenin sonucu **ölçülmedi** (OPS/ARAÇ kararı, YTN deneme önerisi). Ölçülene kadar Done kapısı disiplindir.
+   - Gerçek kapı için araçta `adopt_managed_lifecycle` eylemi var; sonucu YTN-4 (atılabilir pano) ve YTN-6/YTN-12 (YETENEK panosu, canlı pilot) ölçtü; geçiş kararı OPS'undur. Yönetilmeyen panoda Done kapısı disiplindir.
 7. **Hata dalları** (kural 14): panoya yazma başarısız olursa söyle ve işe devam et (pano işi izler, iş panoyu beklemez); kanıt komutu kırmızıysa kart Done'a GİTMEZ, `record_activity` ile `blocker` yazılır; doğrulayıcı komutu `needs_human` verirse komutun bu kuralları ihlal edip etmediğine bak (aşağıda C).
 
 ### C. Ölçülmüş tuzaklar (kaynak: `docs/standards/is-kayit-duzeni-standard.md` §6.1; her satır sahada ölçüldü)
@@ -89,10 +93,17 @@ metadata:
 
 ### D. Maliyet kuralı
 
-- **Her yazma çağrısı panonun tamamını geri döndürür.** 09-21 ölçümü: bir yazma 13-19 KB, bir kartı kapatmak ~64 KB bağlam. 10-01'de 3-4 kartlık `YETENEK` panosunda `add_check` ve `start_task` ~7 KB, `verify_completion` 12 KB, kartı Done'a `move_task` ile taşımak ~9 KB döndürdü (kart başına `successCriteria` ve `verificationReport` büyüdükçe artar). Küçük panoda maliyet kart sayısı ve kart başına kanıt/rapor büyüdükçe artar. **Büyük panoda (159 kartlık havuz, 183 KB) yazma cevabı tam pano yerine sütun sayıları ve kartın kendisini döndürür** ("Full board … omitted"; 10-01 ölçüldü); asıl pahalı olan küçük panolardır ve `verify_completion` (12-15 KB).
+- **Her yazma çağrısı panonun tamamını geri döndürür.** 09-21 ölçümü: bir yazma 13-19 KB, bir kartı kapatmak ~64 KB bağlam. 10-01'de 3-4 kartlık `YETENEK` panosunda `add_check` ve `start_task` ~7 KB, `verify_completion` 12 KB, kartı Done'a `move_task` ile taşımak ~9 KB döndürdü (kart başına `successCriteria` ve `verificationReport` büyüdükçe artar). Küçük panoda maliyet kart sayısı ve kart başına kanıt/rapor büyüdükçe artar. **Büyük panoda (159 kartlık havuz, 183 KB) yazma cevabı tam pano yerine sütun sayıları ve kartın kendisini döndürür** ("Full board … omitted"; 10-01 ölçüldü); asıl pahalı olan küçük panolardır ve `verify_completion` (12-15 KB). **10-03 güncellemesi:** YETENEK panosu 59 KB'a çıkınca yazma cevabı da panoyu atladı (`add_check`, `assign_task`, `transition_task` ≈ 3 KB, kartın kendisi); yani eşik pano boyutuyla kayıyor, pahalı kalan okumalardır (D2).
 - **Okuma:** tek kart için `get_task` ucuzdur (~1-4 KB). **`search_tasks` ucuz DEĞİLDİR:** havuzda "skill" aramasında 7 sonuç 20 KB döndürdü (her sonuç `board` + `task` taşır). Aramayı dar sorguyla yap, sonuç sayısını `limit` ile sınırla; tam pano için `get_board` kullanma.
 - **Toplu giriş tek çağrıyla:** çok kart açılacaksa `sync_task_graph` (ya da `create_from_graph`) bir kez çağrılır; kart başına `add_task` döngüsü kurulmaz.
 - **Toplu yazım alt ajana verilmez:** alt ajan da her yazmada panoyu geri alır ve bağlamı kendi penceresinde yakar. Yazmayı çağıran pencere yapar.
+
+### D2. Kullanılmayan okuma yetenekleri (ölçüldü, YTN-12; tam tablo `docs/audits/skill-kanban-tam-kapasite-2026-10-03.md`)
+
+- **`queue_health`** (≈ 2 KB): oturum açılışında bir kez; bayat kiralama ve eksik alanı (assignee yok, aşama uyuşmuyor) gösterir. `recover_stale`i körlemesine çağırmak yerine önce bunu oku.
+- **`workbench`** (≈ 9 KB, `limit: 3`): 12 panonun şimdi/sıradaki/bloklu/**review** + uyarı resmi; genel resim OPS'un işidir, departman penceresi çağırmaz. Review sütunu "bitti ama kapanmadı" kartların listesidir.
+- **Kullanma:** `snapshot` (81 KB, `limit` kapalı kartları kırpmıyor), `events` (73 olay 48 KB; `limit` ≤ 10), `get_chain` (zincir kurmuyoruz). `ready_tasks` pahalı ve backlog kartlarını "hazır" sayıyor; `limit: 1` ve sonucu `queue_health`le doğrula.
+- **`dependsOn`:** kartın başka işe sırası düz yazıda ("X birleşince") bırakılmaz, `add_dependency` ile yazılır; **denenmedi**, ilk vakada ölçülür.
 
 ### E. Haiku işçi
 

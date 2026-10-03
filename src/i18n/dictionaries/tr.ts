@@ -1060,7 +1060,11 @@ export const tr = {
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin mühendislik harikası çözümlerini projelerinizle buluşturuyoruz.',
     eyebrow: 'Mükemmelliğin Global İmzaları',
     exploreBrand: 'Markayı Keşfedin',
-    seoDesc: 'VentHub çatısı altındaki endüstriyel havalandırma markaları',
+    seoDesc: 'VentHub kataloğundaki endüstriyel havalandırma ve HVAC markaları. Her markanın ürün ailelerini, modellerini ve teknik özelliklerini inceleyin.',
+    // REC-497: marka kaydındaki üretici övgüsü ("dünya lideri" vb.) arama açıklamasından atılınca kalan metin
+    // kısa kalırsa ya da hiç kalmazsa kullanılır. Yalnız kayıttaki doğrulanabilir alan (uzmanlık) konuşur.
+    seoYedekUzmanlik: 'VentHub kataloğunda {{uzmanlik}} alanındaki ürünleri inceleyin.',
+    seoYedek: '{{ad}} markasının ürün ailelerini, modellerini ve teknik özelliklerini VentHub kataloğunda inceleyin.',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
@@ -1135,7 +1139,9 @@ export const tr = {
       submitFailed: 'Mesajınız gönderilemedi. Lütfen tekrar deneyin; sorun sürerse bize doğrudan ulaşın.',
     },
     title: 'İletişim',
-    subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
+    // REC-497: bu metnin TEK tüketicisi sayfanın üst verisi (arama sonucu açıklaması); eski metin
+    // 51 karakterdi ("Size her konuda yardımcı olmaktan mutluluk duyarız.") ve sayfayı anlatmıyordu.
+    subtitle: 'VentHub ile iletişime geçin: ürün seçimi, teknik sorular ve teklif talepleriniz için formu doldurun ya da e-posta ile yazın.',
   },
   aboutPage: {
     title: 'Hakkımızda',
@@ -1427,6 +1433,9 @@ export const tr = {
     unexpected: 'Beklenmedik bir hata oluştu'
   },
   category: {
+    // REC-497: kategorinin KENDİ açıklaması (metadata.description_i18n) yoksa arama sonucu açıklaması.
+    // "en kaliteli/ekonomik" gibi sitede doğrulanamayan iddia YOK; satış modu teklif usulü, fiyat vaadi YOK.
+    seoYedekAciklama: '{{ad}} kategorisindeki ürün ailelerini, modelleri ve teknik özellikleri VentHub kataloğunda inceleyin.',
     family: {
       variantCount: '{{count}} model',
       count: '{{count}} ürün ailesi',
@@ -2676,6 +2685,8 @@ export const tr = {
     // böyle bir aktarım YOK — hesaplayıcılar sonucu teklif akışına taşımıyor. Vaat kutularını
     // temizleyen PR'ın kendisi yeni bir vaat getiriyordu; aynı K1 hatası, bu kez benden.
     aciklama: 'Hacim, debi ve basınç girdilerinizle ön değerlendirme yapın.',
+    // REC-497: arama sonucu açıklaması (60 karakterlik sayfa metni çok kısaydı; sayfa metni değişmez).
+    seoDescription: 'Hacim, debi ve basınç değerlerinizle kanal fanı, ısı geri kazanım, hava perdesi ve jet fan için ön değerlendirme yapın.',
     araclar: {
       kanal: {
         ad: 'Kanal fanı hesabı',

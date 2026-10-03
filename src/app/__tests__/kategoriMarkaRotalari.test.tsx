@@ -188,7 +188,8 @@ describe('eski kategori rotası — kararlar bugünküyle aynı', () => {
 
   it('üst veri BİREBİR bugünkü (TR)', async () => {
     const m = await kategoriEskiUst(p({ lang: 'tr', categorySlug: 'fanlar' }))
-    const aciklama = 'Fanlar kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.'
+    // REC-497: şablon kalktı; fikstürde kategorinin kendi açıklaması yok → sözlükteki yedek cümle.
+    const aciklama = 'Fanlar kategorisindeki ürün ailelerini, modelleri ve teknik özellikleri VentHub kataloğunda inceleyin.'
     expect(m).toEqual({
       title: 'Fanlar | VentHub',
       description: aciklama,
@@ -276,8 +277,8 @@ describe('eski marka rotası — bugünküyle aynı', () => {
 
   it('üst veri BİREBİR bugünkü', async () => {
     const m = await markaEskiUst(p({ lang: 'tr', slug: 'avens' }))
-    const aciklama =
-      "Avens markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da."
+    // REC-497: şablon kalktı; açıklama markanın kendi kaydından, marka adı başta, ilk cümlede biter.
+    const aciklama = 'Avens: Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleri.'
     expect(m).toEqual({
       title: 'Avens Ürünleri ve Çözümleri | VentHub',
       description: aciklama,

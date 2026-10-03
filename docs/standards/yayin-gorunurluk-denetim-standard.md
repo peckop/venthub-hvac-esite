@@ -70,6 +70,11 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
   bilinçli taşınır, her onarım bilinen listesinden çıkarılır.
 - `llms.txt`: sayfa/kategori sayısı ve `Languages:` beyanı site haritasıyla **aynı** (`LLMS-SAYFA`, `LLMS-DIL`, INV-LLMS-GERCEK-1;
   EN_YAYIN açılınca dil satırı ve sayılar aynı PR'da güncellenir). Olmayan kök adres (`/ai.txt`, `/llms-full.txt` …) **404** verir, 500 değil (URN-15).
+- Meta açıklama: **ACIKLAMA-KESIK 0 · ACIKLAMA-SABLON 0 · ACIKLAMA-TEKRAR 0**; açıklama kaydın KENDİ metninden türer (aile: aile
+  açıklaması, kategori: `metadata.description_i18n`, marka: marka kaydı), tek kırpıcıdan geçer (`aciklamaKirp`, ≤155 karakter,
+  cümle ya da sözcük sınırında; INV-ACIKLAMA-KIRP-1) ve doğrulanamayan övgü ("en kaliteli", "ekonomik", "avantajlı fiyat") içermez
+  (INV-ACIKLAMA-URETEC-1; satış modu teklif usulü, fiyat vaadi yok). `ACIKLAMA-KISA` (<70 karakter) uyarıdır; kaynağı DB metniyse
+  (ör. `seat-serisi` aile açıklaması 68 karakter) düzeltme KATALOG verisidir, kodla şişirilmez.
 - Sayfa kalitesi: SEO ortalaması tabandan **düşmez**; aynı yolda SEO'su düşen sayfa 0.
 - Search Console (+7/+28): "bulunamadı" birikimi 0; tık tabana göre kıyaslanır — geçici düşüş beklenir,
   kalıcı düşüş kusurdur (plan §8).
@@ -99,6 +104,7 @@ Kırmızı yayını geri almaz; kusur sahibine aynı gün yazılır (Y4). Geri a
 | gerçek bot erişimi (Vercel Bot Protection / güvenlik duvarı kuralı, bot günlüğü) | ALTYAPI (salt okuma ölçüm, ALT-9) |
 | olmayan adresin 500 vermesi (middleware kök `.txt` muafiyeti) | URUN (URN-15; ölçümü GEO-SEO, SEO-5) |
 | `llms.txt` beyanı haritayla çelişiyor | GEO-SEO (SEO-6) |
+| meta açıklama üreticisi (aile/kategori/marka kırpma ve şablon) | GEO-SEO (REC-497); kaynak metnin kendisi (DB açıklaması çok kısa/yok) KATALOG |
 | ölçümün kendisi (betik hatası, yanlış kırmızı) | GEO-SEO |
 
 **Bilinçli istisna (2026-09-25, URUN):** yalnız TR'de yayında olan sayfa (EN karşılığı yok) hreflang basmaz —
