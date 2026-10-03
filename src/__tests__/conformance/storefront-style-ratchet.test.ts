@@ -208,7 +208,9 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-29 · 1452 -> 1446: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü
     // (iki kart, DB'de olmayan alt kategorilere bağlıydı ve hiç çizilmiyordu) silindi; 6 ham gri gitti.
     // 2026-10-01 · 1446 -> 1444: URN-1 — sipariş durum eşlemesi ortak yardımcıya taşındı, kopya kalktı.
-    tavan: 1444,
+    // 2026-10-03 · 1444 -> 1442: URN-25 — kategori ve /products kök Suspense yedek görünümleri kalktı;
+    // iki `text-slate-500` gitti. Kazanç yan ürün.
+    tavan: 1442,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
