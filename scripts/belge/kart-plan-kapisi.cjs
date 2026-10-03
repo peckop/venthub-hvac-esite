@@ -6,7 +6,7 @@
  *
  * NİÇİN VAR: plan karta, konuyu hiç bilmeyen birinin uygulayabileceği açıklıkta yazılmalı (karar 241); "yazıldı"
  * demek ölçü değildir, bu betik planın iskeletinin eksiksiz olduğunu ölçer (karar 244: kontrolü yazılamayan kural girmez).
- * Ölçtüğü şey İSKELETtir (yedi etiket, asgari uzunluk, numaralı adım, etki alanı); planın DOĞRU olduğunu ölçmez.
+ * Ölçtüğü şey İSKELETtir (yedi etiket + ÖNCEKİ ÇALIŞMA satırı, asgari uzunluk, numaralı adım, etki alanı); planın DOĞRU olduğunu ölçmez.
  *
  * KULLANIM (yerelde; CI'da KOŞMAZ: Kanban verisi git dışıdır, depo public):
  *   node scripts/belge/kart-plan-kapisi.cjs --kart HRT-14
@@ -38,6 +38,23 @@ const ETIKETLER = [
   { ad: 'Etki alanı', min: 1 },
 ]
 const RECEP_OZETI = 'Recep özeti'
+/**
+ * ÖNCEKİ ÇALIŞMA (HRT-26, OPS-30): işe başlamadan önce "bu iş daha önce yapıldı mı" aramasının yazılı kanıtı. Cetvel §Önceki çalışma;
+ * aranan beş yer wrongstack-kanban skill §B.1 ve ARC-30 ile AYNI (YETENEK ile 10-03 eşitlendi). Ölçülen şey satırın İSKELETİdir
+ * (beş yer adı + arama ifadesi + sonuç); aramanın gerçekten yapıldığını değil, yazıldığını ölçer.
+ */
+const ONCEKI_CALISMA = 'ÖNCEKİ ÇALIŞMA'
+/** Aranan beş yer: [gösterim adı, ASCII katlanmış metinde aranan kalıp]. "docs/plans + docs/audits" tek yer sayılır ama iki yol da adı geçmeli. */
+const ARANAN_YERLER = [
+  ['Kanban search_tasks', /search_tasks/],
+  ['git log', /git log/],
+  ['docs/plans', /docs\/plans/],
+  ['docs/audits', /docs\/audits/],
+  ['sage', /(^|[^a-z0-9])sage([^a-z0-9]|$)/],
+  ['Linear', /linear/],
+]
+/** Yürürlük: bu tarihten (UTC) ÖNCE açılan kartlarda eksik satır yalnız UYARI verir (OPS 10-03: yalnız YENİ kartlar). createdAt'i olmayan girdi (--dosya) yeni sayılır. */
+const ONCEKI_CALISMA_YURURLUK = '2026-10-04T00:00:00.000Z'
 const MIN_ADIM = 2
 const ETKI_DEGERLERI = ['yok', 'müşteriye-görünen', 'veritabanı', 'site-yapısı']
 const MIN_ISTISNA_SEBEBI = 8
@@ -88,9 +105,12 @@ function sus(satir) {
 
 /**
  * Açıklamayı değerlendirir.
- * @returns {{gecti: boolean, tur: 'plan'|'plan-yok'|'plan-gerekmez', eksikler: string[]}}
+ * @param {string} aciklama
+ * @param {{onceki?: 'zorunlu'|'uyari'}} [secenek] ÖNCEKİ ÇALIŞMA satırı eksikse: 'zorunlu' (varsayılan, yeni kart) eksiklere yazar;
+ *   'uyari' (yürürlükten önce açılmış kart) `uyarilar` alanına yazar, geçti değişmez. `uyarilar` yalnız doluysa sonuçta bulunur.
+ * @returns {{gecti: boolean, tur: 'plan'|'plan-yok'|'plan-gerekmez', eksikler: string[], uyarilar?: string[]}}
  */
-function degerlendir(aciklama) {
+function degerlendir(aciklama, secenek = {}) {
   const temiz = govdeyiTemizle(aciklama)
   const ham = temiz.split('\n')
   const susluSatirlar = ham.map(sus)
@@ -116,6 +136,8 @@ function degerlendir(aciklama) {
   // Başlıktan sonraki satırlar etiket bölümlerine ayrılır; bir bölüm sonraki etikete (Recep özeti dahil) kadar sürer.
   // Bölümde her satırın hem süssüz hali (değer/uzunluk için) hem ham hali (numaralı adım sayımı için) tutulur.
   const kalipler = [...ETIKETLER.map((e) => e.ad), RECEP_OZETI].map((ad) => ({ ad, kalip: etiketKalibi(ad) }))
+  // JS /i bayrağı Türkçe İ/ı çiftini katlamaz ("Önceki çalışma:" eşleşmezdi); bu etiket için büyük/küçük ve noktalı/noktasız yazım açıkça sayılır.
+  kalipler.push({ ad: ONCEKI_CALISMA, kalip: /^[Öö][Nn][Cc][Ee][Kk][iİıI][ \t]+[Çç][Aa][Ll][iİıI][Şş][Mm][Aa][ \t]*:/ })
   const bolumler = new Map()
   let akis = null
   for (let i = baslikIdx + 1; i < ham.length; i++) {
@@ -164,7 +186,32 @@ function degerlendir(aciklama) {
     }
   }
 
-  return { gecti: eksikler.length === 0, tur: 'plan', eksikler }
+  const oncekiSorunlar = oncekiCalismaSorunlari(bolumler.has(ONCEKI_CALISMA) ? degerOku(ONCEKI_CALISMA) : null)
+  const uyarilar = []
+  if (secenek.onceki === 'uyari') uyarilar.push(...oncekiSorunlar)
+  else eksikler.push(...oncekiSorunlar)
+
+  return { gecti: eksikler.length === 0, tur: 'plan', eksikler, ...(uyarilar.length > 0 ? { uyarilar } : {}) }
+}
+
+/**
+ * ÖNCEKİ ÇALIŞMA satırının sorunları ([] = tamam). `deger` null ise etiket hiç yok.
+ * Kural: beş aranan yerin HEPSİ adıyla geçer, "ifade:" ile arama ifadesi yazılıdır (en az 3 karakter) ve sonuç ya "yok"tur ya da
+ * en az bir bulgu (kart numarası, commit özeti ya da dosya yolu) yazılıdır. İfadesiz ya da yersiz "yok" geçersizdir.
+ */
+function oncekiCalismaSorunlari(deger) {
+  if (deger === null) return [`${ONCEKI_CALISMA}: etiketi yok (aranan beş yer + arama ifadesi + sonuç yazılır; cetvel §Önceki çalışma)`]
+  const katli = asciiKatla(deger)
+  const sorunlar = []
+  if (bosluksuz(deger) < 20) sorunlar.push(`${ONCEKI_CALISMA}: çok kısa (${bosluksuz(deger)}/20 karakter)`)
+  const eksikYerler = ARANAN_YERLER.filter(([, kalip]) => !kalip.test(katli)).map(([ad]) => ad)
+  if (eksikYerler.length > 0) sorunlar.push(`${ONCEKI_CALISMA}: aranan yer(ler) yazılmamış: ${eksikYerler.join(', ')} (beşi de aranmadan "yok" geçmez)`)
+  const ifade = deger.match(/ifade(?:si)?[ \t]*:[ \t]*(\S[^\n]*)/i)
+  if (!ifade || bosluksuz(ifade[1]) < 3) sorunlar.push(`${ONCEKI_CALISMA}: arama ifadesi yok ("ifade: <aranan sözcükler>" yazılır; ifadesiz sonuç geçersiz)`)
+  const bulgu = /\b[A-Z]{2,5}-\d+\b|\b(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b|\b(docs|scripts|src|supabase)\/[\w./-]+/.test(deger.replace(/docs\/(plans|audits)\b(?![\w./-]*\.)/g, ''))
+  const yok = /(^|[^\p{L}])yok([^\p{L}]|$)/iu.test(deger)
+  if (!bulgu && !yok) sorunlar.push(`${ONCEKI_CALISMA}: sonuç yok (bulunan kart/commit/dosya ya da "yok" yazılır)`)
+  return sorunlar
 }
 
 /** PR gövdesindeki `Kanban: HRT-14` / `Kanban: ARC-3, HRT-12` satırlarından numaralar (kod çiti/yorum içindekiler sayılmaz). */
@@ -223,7 +270,7 @@ function kartBul(no, yol) {
   const kartlar = []
   for (const { payload } of satirlar) {
     const pano = JSON.parse(payload)
-    for (const kart of pano.tasks || []) kartlar.push({ pano: pano.title, baslik: String(kart.title || ''), aciklama: kart.description || '', etiketler: Array.isArray(kart.labels) ? kart.labels : [] })
+    for (const kart of pano.tasks || []) kartlar.push({ pano: pano.title, baslik: String(kart.title || ''), aciklama: kart.description || '', etiketler: Array.isArray(kart.labels) ? kart.labels : [], olusturuldu: typeof kart.createdAt === 'string' ? kart.createdAt : undefined })
   }
   const asamalar = [
     { ad: 'aşama 1: başlığın başı', kalip: new RegExp(`^${kacis(no)}(?![A-Za-z0-9-])`), kart: (k) => k.baslik },
@@ -251,6 +298,11 @@ function sinifUyarisi(etiketler) {
   if (tekil.length === 1 && sinif.length === 1) return null
   if (tekil.length === 0) return `UYARI: kartta sınıf etiketi yok (${SINIF_ETIKETLERI.join('/')}); tek biri yazılmalı`
   return `UYARI: kartta birden fazla sınıf etiketi var (${tekil.join(', ')}; ${SINIF_ETIKETLERI.join('/')}); tek biri yazılmalı`
+}
+
+/** Kart yürürlük tarihinden önce açıldıysa 'uyari', yeni kart ya da tarihsiz girdi (--dosya) ise 'zorunlu'. Karşılaştırma ISO dizgesiyle (UTC). */
+function oncekiKipi(olusturuldu) {
+  return typeof olusturuldu === 'string' && olusturuldu < ONCEKI_CALISMA_YURURLUK ? 'uyari' : 'zorunlu'
 }
 
 function argumanlar(argv) {
@@ -310,7 +362,7 @@ function main(argv) {
       const yol = panoDosyasi()
       for (const no of [...new Set(kartNolari)]) {
         const k = kartBul(no, yol)
-        isler.push({ ad: no, aciklama: k.aciklama, etiketler: kart.includes(no) ? k.etiketler : undefined })
+        isler.push({ ad: no, aciklama: k.aciklama, etiketler: kart.includes(no) ? k.etiketler : undefined, olusturuldu: k.olusturuldu })
       }
     }
   } catch (e) {
@@ -318,13 +370,14 @@ function main(argv) {
     return 2
   }
 
-  for (const { ad, aciklama, etiketler } of isler) {
+  for (const { ad, aciklama, etiketler, olusturuldu } of isler) {
     // Yalnız uyarı (çıkış kodu değişmez): yeni açılan kart sınıfsız doğar, kapı kırmızı vermesin.
     if (etiketler !== undefined) {
       const uyari = sinifUyarisi(etiketler)
       if (uyari) console.error(`${uyari} (${ad})`)
     }
-    const s = degerlendir(aciklama)
+    const s = degerlendir(aciklama, { onceki: oncekiKipi(olusturuldu) })
+    for (const u of s.uyarilar || []) console.error(`UYARI: ${u} (${ad}; yürürlükten önce açılmış kart, yalnız uyarı)`)
     if (s.gecti) {
       console.log(`GEÇTİ ${ad}: ${s.tur}`)
     } else {
@@ -336,7 +389,7 @@ function main(argv) {
   return kod
 }
 
-module.exports = { degerlendir, govdeyiTemizle, prGovdesindenNumaralar, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
+module.exports = { degerlendir, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
 
 if (require.main === module) {
   process.exitCode = main(process.argv.slice(2))

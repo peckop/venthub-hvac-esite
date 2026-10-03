@@ -1,4 +1,4 @@
-# Kart Planı Standardı (v1.0 — 2026-10-02)
+# Kart Planı Standardı (v1.1 — 2026-10-03)
 
 > **Ne yönetir:** Kanban kartının içindeki PLAN bölümünün nasıl yazıldığı, kimin uyguladığı ve eksiksiz
 > olduğunun nasıl ölçüldüğü. İş emri kartının KAYNAK/CETVEL bloğu (CLAUDE.md kural 1) ayrı kalır; bu cetvel
@@ -8,8 +8,8 @@
 > müşteriye görünen, veritabanı ya da site yapısı planları Recep'e tek sayfa özetle gider. Karar 244:
 > kontrolü yazılamayan kural girmez; bu yüzden kural bir betikle ölçülür.
 > **Sahibi:** HARİTA. Kartı Kanban'a taşıma düzeni (`is-kayit-duzeni-standard.md`) OPS'undur, buna dokunulmaz.
-> **Son doğrulama:** 2026-10-02.
-> **Kayıt:** HRT-14 (OPS-13). **İlgili:** `execution-method-standard.md` §10 (çalışan tanımları).
+> **Son doğrulama:** 2026-10-03.
+> **Kayıt:** HRT-14 (OPS-13); v1.1 HRT-26 (OPS-30, ÖNCEKİ ÇALIŞMA satırı). **İlgili:** `execution-method-standard.md` §10 (çalışan tanımları).
 
 ## Kural
 
@@ -30,6 +30,7 @@ kartta çit KULLANILMAZ, çünkü kapı çit içindekini saymaz). ŞABLON bu cet
 ```
 PLAN
 Amaç: bir iki cümle; işin bitince neyi değiştirdiği, kime ne işe yaradığı (en az 20 karakter).
+ÖNCEKİ ÇALIŞMA: bulunan kart/commit/dosya ya da yok. Aranan: Kanban search_tasks (Done + arşiv), git log --all --grep, docs/plans, docs/audits, sage, Linear (arşiv). ifade: aranan sözcükler.
 Adımlar: sıra numaralı liste; her adım tek eylem, yol/komut/beklenen çıktı ile (en az 2 adım, 40 karakter).
 1. İlk adım.
 2. İkinci adım.
@@ -56,6 +57,29 @@ Her etiketin anlamı:
 - **Sor-noktaları:** durup müdüre yazılacak durumlar; üye bu noktalarda tahmin yürütmez.
 - **Etki alanı:** işin dışarıya etkisi; dört değerden biri (aşağıda).
 
+## Önceki çalışma (HRT-26, OPS-30)
+
+Niçin var: 2026-10-03'te depoda ve Kanban'da zaten duran 441 adreslik liste (09-23'te üretilmişti) iş başında aranmadığı için
+sıfırdan üretilmeye başlandı. Kart araması kart dışı dosyaları (listeler, ölçüm defterleri) göremez; bu yüzden aranacak yerler
+yalnız Kanban değil, depo ve hafıza da. Plan "önce bu iş daha önce yapıldı mı" sorusunun yazılı cevabıyla başlar.
+
+Kural: PLAN'da `ÖNCEKİ ÇALIŞMA:` etiketi bulunur ve şunları yazar:
+
+- **Aranan yerler (beşi de):** Kanban `search_tasks` (`includeCompletedTasks` + `includeArchived`, tüm panolar), `git log --all --grep`,
+  `docs/plans` ve `docs/audits`, sage, Linear (donuk arşiv; yalnız 10-01 öncesi kayıtlar için okunur). Aynı beş yer
+  `wrongstack-kanban` skill'inin §B.1'inde ve ARC-30 iş başı tarama komutunda (ARAÇ) geçer; üç yerde ifade aynıdır.
+- **Arama ifadesi:** `ifade: <aranan sözcükler>` (en az 3 karakter). İfadesiz sonuç geçersizdir.
+- **Sonuç:** bulunan kart numarası, commit özeti ya da dosya yolu; hiçbiri yoksa `yok`. "yok" yalnız beş yer ve ifade yazılıysa geçer.
+  Bulunan şey varsa plan onu nasıl kullandığını (devam, yenileme, çürütme) Amaç ya da Adımlar'da söyler.
+
+Örnek (yok): `ÖNCEKİ ÇALIŞMA: yok. Aranan: Kanban search_tasks (Done + arşiv, tüm panolar), git log --all --grep, docs/plans, docs/audits, sage, Linear; ifade: adres listesi 441.`
+Örnek (bulundu; kart numarası ve dosya adı uydurmadır, yalnız biçimi gösterir): `ÖNCEKİ ÇALIŞMA: HRT-99 kartı ve docs/audits/ornek-liste.md bulundu. Aranan: Kanban search_tasks, git log --all --grep, docs/plans, docs/audits, sage, Linear; ifade: adres listesi.`
+
+Yürürlük: 2026-10-04 (UTC). Kapı, kartın `createdAt` alanı bu tarihten ÖNCE ise eksik satırı yalnız UYARI olarak basar ve çıkış
+kodunu değiştirmez; yeni kartta ve `--dosya` ile verilen metinde (tarihsiz) satır zorunludur (çıkış 1). Mevcut açık kartlar
+toplu düzeltilmez (OPS 10-03). Kapı satırın İSKELETİNİ ölçer: aramanın gerçekten yapıldığını değil, yazıldığını. ARC-30 komutu
+çıktısını bu satıra yazmayı kolaylaştırır; komut yoksa arama elle (`kanban_read search_tasks`, `git log`, `grep`, sage) yapılır.
+
 ## Etki alanı ve Recep özeti (karar 243)
 
 "Etki alanı:" değeri yalnız şunlardan biridir: `yok`, `müşteriye-görünen`, `veritabanı`, `site-yapısı`.
@@ -72,7 +96,8 @@ Betik: `scripts/belge/kart-plan-kapisi.cjs`. Kimliği INV-KART-PLAN-1, testi
 - Kartın açıklamasında satır başında "PLAN" başlığı aranır; kod çitleri ve HTML yorumları içindeki satırlar
   sayılmaz (şablon örneği kapıyı geçirmesin; `scripts/board/pr-kayit-kapisi.cjs` ile aynı mantık).
 - Başlıktan sonra yedi etiket bulunmalıdır: Amaç, Adımlar, Dosyalar, Bitti ölçütü, Ölçülmeyenler,
-  Sor-noktaları, Etki alanı.
+  Sor-noktaları, Etki alanı; sekizincisi `ÖNCEKİ ÇALIŞMA` yeni kartlarda zorunludur (§Önceki çalışma; büyük/küçük ve
+  noktalı/noktasız yazım tolere edilir, eksiği ya da geçersizi çıkış 1 verir, yürürlükten önceki kartta yalnız uyarı).
 - Asgari uzunluk (boşluksuz karakter): Amaç 20, Adımlar 40 ve en az iki numaralı adım ("1." "2." ile
   başlayan satır), Dosyalar 10, Bitti ölçütü 20, Ölçülmeyenler 3, Sor-noktaları 3.
 - Etki alanı dört izinli kelimeden biri olmalı; `yok` değilse "Recep özeti:" dolu olmalı ve en az bir
