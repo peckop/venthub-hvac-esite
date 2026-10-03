@@ -237,6 +237,13 @@ describe('INV-KART-PLAN-1 · ÖNCEKİ ÇALIŞMA satırı (HRT-26, OPS-30)', () =
     expect(sorun('yok').join('\n')).toMatch(/çok kısa/)
   })
 
+  it('aranan yer adları büyük/küçük harf fark etmez ("Git Log", "LINEAR", "SAGE", "Docs/Plans", "SEARCH_TASKS")', () => {
+    const buyuk = 'yok. Aranan: KANBAN SEARCH_TASKS (Done + arşiv), Git Log --all --grep, Docs/Plans, DOCS/AUDITS, SAGE, LINEAR; İFADE: kart plani.'
+    expect(sorun(buyuk)).toEqual([])
+    // büyük harf toleransı eksik yeri gizlemez: LINEAR çıkarılınca yine kırmızı
+    expect(sorun(buyuk.replace(', LINEAR', '')).join('\n')).toMatch(/aranan yer\(ler\) yazılmamış: Linear/)
+  })
+
   it('yazım toleransı: "Önceki çalışma:" ve "önceki çalışma :" da aynı etiket sayılır (Türkçe İ/ı)', () => {
     for (const yazim of ['Önceki çalışma:', 'önceki çalışma :', 'ÖNCEKI CALISMA:'.replace('CALISMA', 'ÇALIŞMA')]) {
       const plan = TAM_PLAN.replace(/^ÖNCEKİ ÇALIŞMA:/m, yazim)

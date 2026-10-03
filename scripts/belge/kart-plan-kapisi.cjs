@@ -206,7 +206,8 @@ function oncekiCalismaSorunlari(deger) {
   if (bosluksuz(deger) < 20) sorunlar.push(`${ONCEKI_CALISMA}: çok kısa (${bosluksuz(deger)}/20 karakter)`)
   const eksikYerler = ARANAN_YERLER.filter(([, kalip]) => !kalip.test(katli)).map(([ad]) => ad)
   if (eksikYerler.length > 0) sorunlar.push(`${ONCEKI_CALISMA}: aranan yer(ler) yazılmamış: ${eksikYerler.join(', ')} (beşi de aranmadan "yok" geçmez)`)
-  const ifade = deger.match(/ifade(?:si)?[ \t]*:[ \t]*(\S[^\n]*)/i)
+  // ASCII-katlı metinde aranır: JS /i bayrağı "İFADE:" (noktalı büyük İ) yazımını "ifade" ile eşleştirmez.
+  const ifade = katli.match(/ifade(?:si)?[ \t]*:[ \t]*(\S.*)/)
   if (!ifade || bosluksuz(ifade[1]) < 3) sorunlar.push(`${ONCEKI_CALISMA}: arama ifadesi yok ("ifade: <aranan sözcükler>" yazılır; ifadesiz sonuç geçersiz)`)
   const bulgu = /\b[A-Z]{2,5}-\d+\b|\b(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b|\b(docs|scripts|src|supabase)\/[\w./-]+/.test(deger.replace(/docs\/(plans|audits)\b(?![\w./-]*\.)/g, ''))
   const yok = /(^|[^\p{L}])yok([^\p{L}]|$)/iu.test(deger)
