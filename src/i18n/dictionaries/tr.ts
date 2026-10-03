@@ -1585,6 +1585,7 @@ export const tr = {
     notFound: 'Kategori bulunamadı',
     backHome: 'Ana Sayfaya Dön',
     breadcrumbHome: 'Ana Sayfa',
+    breadcrumbAria: 'Sayfa yolu',
     premiumCollection: 'Premium Koleksiyon',
     findModel: 'Bana Uygun Modeli Bul',
     productCount: 'Ürün Sayısı',
