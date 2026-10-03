@@ -24,6 +24,7 @@ import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../services/family.service'
+import { dilOnekliMi } from './kirinti'
 
 /**
  * Aile description/meta alanları için dil çözümü — YALNIZ sayfanın dili (INV-DIL-DUSUSU-1).
@@ -344,8 +345,6 @@ export interface BuildBreadcrumbJsonLdParams {
  * ATAR. Bunlar kullanıcı verisinden değil ÇAĞIRAN KODDAN gelir; sessizce düzeltmek, bozuk
  * yapılandırılmış veriyi fark edilmeden yayına almak olurdu.
  */
-const dilOnekliMi = (yol: string) => /^\/(tr|en)(\/|$)/.test(yol)
-
 export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Record<string, unknown> {
   const { lang, baseUrl, steps } = params
 

@@ -125,3 +125,20 @@ export const HVAC_BRANDS: HVACBrand[] = [
     specialty: { tr: 'Yüksek Verimli Santrifüj Fanlar', en: 'High-Efficiency Centrifugal Fans' }
   }
 ]
+
+/** Ad karşılaştırması için: harf duyarsız, ayraçsız (`AVenS` = `avens`, `Nicotra Gebhardt` = `nicotra-gebhardt`). */
+const markaAnahtari = (deger: string): string => deger.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+/**
+ * DB'deki marka ADINDAN (`product_families.brands.name`) vitrindeki marka kaydını bulur.
+ *
+ * NİÇİN: aile satırı marka SLUG'ını taşımaz, yalnız adını (`brand_name`) — oysa marka sayfasının
+ * adresi slug ister. Eşleşme yoksa `null` döner ve çağıran bağlantıyı HİÇ çizmez: var olmayan bir
+ * marka sayfasına giden bağlantı, bağlantı olmamasından kötüdür (404'e açılan iç bağlantı).
+ */
+export function markaBulAdla(ad: string | null | undefined): HVACBrand | null {
+  if (!ad) return null
+  const anahtar = markaAnahtari(ad)
+  if (!anahtar) return null
+  return HVAC_BRANDS.find((b) => markaAnahtari(b.name) === anahtar || markaAnahtari(b.slug) === anahtar) ?? null
+}

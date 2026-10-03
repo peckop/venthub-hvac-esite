@@ -1158,6 +1158,7 @@ export const en: typeof tr = {
     notFound: 'Category Not Found',
     backHome: 'Back to home',
     breadcrumbHome: 'Home',
+    breadcrumbAria: 'Breadcrumb',
     premiumCollection: 'Premium Collection',
     findModel: 'Find Suitable Model',
     productCount: 'Product Count',
