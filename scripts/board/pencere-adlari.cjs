@@ -30,6 +30,7 @@ const TABLO = Object.freeze([
   Object.freeze(['ALTYAPI', 'Altyapı']),
   Object.freeze(['ADMIN', 'Admin']),
   Object.freeze(['GEO-SEO', 'Geo-SEO']),
+  Object.freeze(['BLOG', 'Blog']),
 ])
 
 /** Aramalar Map üzerinden yapılır (nesne prototipi adlarına karşı ek güvence; anahtarlar zaten büyük harf). */

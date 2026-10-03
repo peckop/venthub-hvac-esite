@@ -152,6 +152,7 @@ const TABLO: ReadonlyArray<readonly [string, string]> = [
   ['ALTYAPI', 'Altyapı'],
   ['ADMIN', 'Admin'],
   ['GEO-SEO', 'Geo-SEO'],
+  ['BLOG', 'Blog'],
 ]
 
 describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adını şeridin insan adına sabitler', () => {
@@ -552,7 +553,7 @@ describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynakt�
     PENCERE_ADLARI: Map<string, string>
   }
 
-  it('dışa aktarılan TABLO beklenen sekiz satırın aynısıdır (sıra dahil)', () => {
+  it('dışa aktarılan TABLO beklenen dokuz satırın aynısıdır (sıra dahil)', () => {
     expect(modul.TABLO.map(([k, v]) => [k, v])).toEqual(TABLO.map(([k, v]) => [k, v]))
     expect(modul.PENCERE_ADLARI.size).toBe(TABLO.length)
   })

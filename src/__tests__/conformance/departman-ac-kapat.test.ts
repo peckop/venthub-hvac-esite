@@ -235,6 +235,19 @@ describe('INV-DEPARTMAN-AC-1 · rol adı → görünen ad TEK KAYNAKTAN (pencere
     }
   }, 60_000)
 
+  it('Blog (OPS-29): "blog" = "BLOG" = "Blog" tabloda; pano geçmişi varsa ESKİ Blog oturumu --resume edilir, taze açılmaz', () => {
+    const S_BLOG = 'e07358f7-9bfc-4f10-8f21-9f91d7f4509b' // 09-24..09-30 BLOG şeridini tutan gerçek oturum
+    const d = yeniDuzenek()
+    claim(d, S_BLOG, 'BLOG', saatOnce(30))
+    for (const v of ['blog', 'BLOG', 'Blog']) {
+      const k = ac(v, d)
+      expect(k.kod, v).toBe(0)
+      expect(k.plan.ad, v).toBe('Blog')
+      expect(k.plan.sid, v).toBe(S_BLOG)
+      expect(k.plan.args, v).toEqual(['--resume', S_BLOG, '--name', 'Blog', '--permission-mode', 'auto', '--mcp-config', path.join(d.kok, '.mcp.json')])
+    }
+  }, 60_000)
+
   it('tanınmayan / boş / kısmi rol → HATA, çıkış 1, geçerli roller TABLODAN listelenir, hiçbir şey başlamaz', () => {
     for (const rol of ['bilinmez', 'Ara', 'Araç Ops', '', '  ', '../ops']) {
       const d = yeniDuzenek()
