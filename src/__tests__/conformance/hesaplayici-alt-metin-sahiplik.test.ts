@@ -51,6 +51,14 @@ const SABIT_BIRIM_SIMGELERI: ReadonlySet<string> = new Set([
   'm', 'mm', 'm²', 'm³/h', 'm/s', 'W', 'Pa', 'Pa/m', 'N', 'h', 'ACH', '₺/kWh',
 ])
 
+/**
+ * Nesne özelliği adları. Rüzgar hızı aralıkları (`'< 5 m/s'`) tek harfli simgelerden oluştuğu için
+ * `HARF_DIZISI` (art arda iki harf) onları zaten yakalamaz; ayrıca istisna gerekmez.
+ */
+const OZELLIK_ADLARI = [
+  'label', 'description', 'title', 'text', 'hint', 'placeholder', 'subtitle', 'tooltip', 'desc', 'unit', 'info',
+]
+
 const GORUNUR_NITELIKLER = [
   'title', 'aria-label', 'placeholder', 'label', 'description', 'unit', 'alt', 'subtitle',
   'tooltip', 'hint', 'helperText', 'text',
@@ -59,6 +67,9 @@ const GORUNUR_NITELIKLER = [
 function kaynak(dosya: string): string {
   return readFileSync(join(process.cwd(), 'src', 'views', 'calculators', dosya), 'utf8')
 }
+
+/** Birleşim tiplerinin (`AirCurtainApplication`, `efficiency`) yazıldığı hesap kodu. */
+const HESAP_KODU = readFileSync(join(process.cwd(), 'src', 'lib', 'hvacCalculations.ts'), 'utf8')
 
 interface CevirmeCagrisi {
   /** Tırnak içindeki ham metin; şablon dizesinde `${…}` dahil. */
@@ -107,6 +118,45 @@ function sabitMetinDugumleri(src: string): string[] {
     .filter((m) => HARF_DIZISI.test(m) && !/[=;()&|]/.test(m))
 }
 
+/** Nesne özelliği olarak yazılmış sabit görünen metin: `{ label: 'Retail/Mall', description: "…" }`. */
+function sabitNesneMetinleri(src: string): string[] {
+  const ozellik = OZELLIK_ADLARI.join('|')
+  const re = new RegExp(`(?<![\\w-])(?:${ozellik})\\s*:\\s*(['"\`])((?:(?!\\1)[^\\\\$])*)\\1`, 'g')
+  return [...yorumsuz(src).matchAll(re)]
+    .map((m) => m[2].trim())
+    .filter((m) => HARF_DIZISI.test(m) && !SABIT_BIRIM_SIMGELERI.has(m))
+}
+
+/**
+ * Şablon dizesiyle kurulan anahtarların (`t(\`…${x}…\`)`) beklenen TAM kümesi. Küme sözlükten
+ * değil KOD sözleşmesinden (`lib/hvacCalculations.ts` birleşim tipleri) türer: tipe yeni bir
+ * değer eklenip sözlüğe anahtarı eklenmezse ya da bir anahtar silinirse test kırmızı olur.
+ */
+function birlesimDegerleri(kod: string, oncesi: RegExp): string[] {
+  const m = kod.match(new RegExp(`${oncesi.source}\\s*((?:'[A-Za-z]+'\\s*\\|\\s*)*'[A-Za-z]+')`))
+  return m ? [...m[1].matchAll(/'([A-Za-z]+)'/g)].map((x) => x[1]) : []
+}
+
+const BASHARF_BUYUK = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+const DINAMIK_KAYITLAR: { desen: RegExp; uret: (hesapKodu: string) => string[] }[] = [
+  {
+    desen: /^calculators\.airCurtain\.applications\.\$\{[^}]+\}\.info$/,
+    uret: (k) =>
+      birlesimDegerleri(k, /type AirCurtainApplication =/).map((v) => `calculators.airCurtain.applications.${v}.info`),
+  },
+  {
+    desen: /^calculators\.airCurtain\.results\.efficiency\$\{[^}]+\}$/,
+    uret: (k) =>
+      birlesimDegerleri(k, /efficiency:/).map((v) => `calculators.airCurtain.results.efficiency${BASHARF_BUYUK(v)}`),
+  },
+  {
+    desen: /^calculators\.airCurtain\.results\.efficiency\$\{[^}]+\}Desc$/,
+    uret: (k) =>
+      birlesimDegerleri(k, /efficiency:/).map((v) => `calculators.airCurtain.results.efficiency${BASHARF_BUYUK(v)}Desc`),
+  },
+]
+
 function altDal(kok: unknown, ...yol: string[]): unknown {
   return yol.reduce<unknown>(
     (dal, k) => (dal && typeof dal === 'object' ? Reflect.get(dal, k) : undefined),
@@ -136,6 +186,24 @@ describe('INV-HESAPLAYICI-ALT-METIN-1 · tarayıcılar kör değil', () => {
     expect(sabitNitelikMetinleri(kod)).toEqual(['Annual Energy Saving', 'years'])
   })
 
+  it('sabit nesne özelliği: harfli metin yakalanır; sözlük bağı, sayı aralığı ve kod yakalanmaz', () => {
+    const kod = [
+      `{ value: 'a', label: t('x.y'), description: 'Retail/Mall' }`,
+      `{ label: "Low Friction", hint: \`Flexible\`, unit: 'mm' }`,
+      `{ description: '< 5 m/s' }, { description: '5-10 m/s' }`,
+      `{ description: t('x.y'), title: someVar, text: \`\${a}\` }`,
+      `// description: 'Yorum içindeki metin'`,
+    ].join('\n')
+    expect(sabitNesneMetinleri(kod)).toEqual(['Retail/Mall', 'Low Friction', 'Flexible'])
+  })
+
+  it('birleşim tipi okuyucu: kod sözleşmesinden değerleri çıkarır', () => {
+    expect(birlesimDegerleri("efficiency: 'optimal' | 'acceptable' | 'marginal'\n x", /efficiency:/)).toEqual([
+      'optimal', 'acceptable', 'marginal',
+    ])
+    expect(birlesimDegerleri('hiçbir şey yok', /efficiency:/)).toEqual([])
+  })
+
   it('sabit metin düğümü: harfli düz metin yakalanır, ifade ve karşılaştırma yakalanmaz', () => {
     const kod = `<h3>Annual Savings</h3><p>{t('a.b')}</p>\n const f = (a) => a\n if (ach >= 6 && ach <= 10) return 1`
     expect(sabitMetinDugumleri(kod)).toEqual(['Annual Savings'])
@@ -159,13 +227,14 @@ describe('INV-HESAPLAYICI-ALT-METIN-1 · kaynak taraması', () => {
       for (const c of cevirmeCagrilari(src)) {
         for (const [dil, sozluk] of SOZLUKLER) {
           if (c.dinamik) {
-            // Şablon dizesinde ön ek bir sözlük dalına inmeli: `…applications.` → o dal,
-            // `…results.efficiency` → `results` dalında `efficiency` ile başlayan en az bir anahtar.
-            const son = c.onEk.lastIndexOf('.')
-            const dal = altDal(sozluk, ...c.onEk.slice(0, son).split('.'))
-            const kalan = c.onEk.slice(son + 1)
-            const anahtarlar = dal && typeof dal === 'object' ? Object.keys(dal) : []
-            expect(anahtarlar.some((k) => k.startsWith(kalan)), `${dil}:${c.anahtar}`).toBe(true)
+            // Şablon dizesi KAYITLI olmalı ve kaydın ürettiği TAM küme iki dilde çözülmeli.
+            const kayit = DINAMIK_KAYITLAR.find((k) => k.desen.test(c.anahtar))
+            expect(kayit, `kayıtsız dinamik anahtar: ${c.anahtar} (DINAMIK_KAYITLAR'a ekle)`).toBeDefined()
+            const beklenen = kayit?.uret(HESAP_KODU) ?? []
+            expect(beklenen.length, `boş küme: ${c.anahtar}`).toBeGreaterThan(0)
+            for (const tam of beklenen) {
+              expect(getDictValue(sozluk, tam), `${dil}:${tam}`).not.toBe(tam)
+            }
           } else {
             // getDictValue çözülemeyen anahtarda anahtarın kendisini döndürür.
             const deger = getDictValue(sozluk, c.anahtar)
@@ -182,9 +251,10 @@ describe('INV-HESAPLAYICI-ALT-METIN-1 · kaynak taraması', () => {
       expect(alt.filter((a, i) => alt.indexOf(a) !== i)).toEqual([])
     })
 
-    it(`${s.ad}: nitelik ve JSX metin düğümlerinde sözlüğe bağlı olmayan harfli metin yok`, () => {
+    it(`${s.ad}: nitelik, nesne özelliği ve JSX metin düğümlerinde sözlüğe bağlı olmayan harfli metin yok`, () => {
       expect(sabitNitelikMetinleri(src)).toEqual([])
       expect(sabitMetinDugumleri(src)).toEqual([])
+      expect(sabitNesneMetinleri(src)).toEqual([])
     })
   }
 

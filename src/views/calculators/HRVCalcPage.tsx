@@ -43,15 +43,15 @@ const HRVCalcPage: React.FC = () => {
   ], [t])
 
   const buildingOptions = useMemo(() => [
-    { value: 'residential', label: t('common.homeLabel'), description: 'Domestic' },
-    { value: 'office', label: t('calculators.hrv.form.office'), description: 'Workplace' },
-    { value: 'commercial', label: t('calculators.hrv.form.commercial'), description: 'Retail/Mall' }
+    { value: 'residential', label: t('calculators.hrv.form.residential'), description: t('calculators.hrv.form.residentialDesc') },
+    { value: 'office', label: t('calculators.hrv.form.office'), description: t('calculators.hrv.form.officeDesc') },
+    { value: 'commercial', label: t('calculators.hrv.form.commercial'), description: t('calculators.hrv.form.commercialDesc') }
   ], [t])
 
   const climateOptions = useMemo(() => [
-    { value: 'cold', label: t('calculators.hrv.form.cold'), description: 'North/Mountain' },
-    { value: 'temperate', label: t('calculators.hrv.form.temperate'), description: 'Central' },
-    { value: 'hot', label: t('calculators.hrv.form.hot'), description: 'South/Coast' }
+    { value: 'cold', label: t('calculators.hrv.form.cold'), description: t('calculators.hrv.form.coldDesc') },
+    { value: 'temperate', label: t('calculators.hrv.form.temperate'), description: t('calculators.hrv.form.temperateDesc') },
+    { value: 'hot', label: t('calculators.hrv.form.hot'), description: t('calculators.hrv.form.hotDesc') }
   ], [t])
 
   /**

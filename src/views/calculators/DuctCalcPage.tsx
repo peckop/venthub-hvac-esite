@@ -48,9 +48,9 @@ const DuctCalcPage: React.FC = () => {
   ], [t])
 
   const materialOptions = useMemo(() => [
-    { value: 'galvanized', label: t('calculators.duct.form.steel'), description: 'Standart' },
-    { value: 'pvc', label: t('calculators.duct.form.pvc'), description: 'Low Friction' },
-    { value: 'flex', label: t('calculators.duct.form.flex'), description: 'Flexible' }
+    { value: 'galvanized', label: t('calculators.duct.form.steel'), description: t('calculators.duct.form.steelDesc') },
+    { value: 'pvc', label: t('calculators.duct.form.pvc'), description: t('calculators.duct.form.pvcDesc') },
+    { value: 'flex', label: t('calculators.duct.form.flex'), description: t('calculators.duct.form.flexDesc') }
   ], [t])
 
   // Form state
