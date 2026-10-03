@@ -45,6 +45,28 @@ interface SupabaseWebhookPayload {
   old_record: Record<string, unknown> | null
 }
 
+/** Payload alanını boş olmayan metne indirger; null/undefined/boş/başka tip → undefined. */
+function metin(deger: unknown): string | undefined {
+  return typeof deger === 'string' && deger.length > 0 ? deger : undefined
+}
+
+/**
+ * ESKİ DEĞER KAPISI (REC-300 3g-2a, URN-12). Eski adres/kategori yalnız UPDATE'te ve yalnız İKİ görüntü de
+ * (record + old_record) varken karşılaştırılabilir. `scripts/webhook_setup.sql` ölçümü: INSERT'te `old_record`
+ * NULL, DELETE'te `record` NULL (DELETE'te `activeRecord = old_record` zaten eski değeri tazeler); PS-042 notu:
+ * UPDATE'te de `old_record` eksik gelebilir. Eksikse dönüş `undefined` → çağıran YALNIZ yeni değeri tazelemeye
+ * devam eder (mevcut davranış, güvenli geri düşüş).
+ */
+function eskiDeger(
+  record: Record<string, unknown> | null,
+  oldRecord: Record<string, unknown> | null,
+  alan: string
+): string | undefined {
+  if (!record || !oldRecord) return undefined
+  const eski = metin(oldRecord[alan])
+  return eski !== undefined && eski !== metin(record[alan]) ? eski : undefined
+}
+
 /**
  * T138-VH K6 — SERİ↔MODEL zinciri.
  *
@@ -134,13 +156,16 @@ function aileYolunuTazele(slug: string): string[] {
  * hepsi buradan geçer — böylece "model değişti, serisi bayatladı" boşluğu TEK yerde kapanır.
  */
 async function revalidateFamilyChain(
-  familyId: string | undefined
+  familyId: string | undefined,
+  zatenTazelenen?: readonly string[]
 ): Promise<{ paths: string[]; tags: string[]; truncated: boolean }> {
   const { slugs, truncated } = await walkFamilyChain(familyId)
   const paths: string[] = []
   const tags: string[] = []
 
   for (const slug of slugs) {
+    // Eski+yeni zincir aynı seriyi paylaşabilir (URN-12): aynı yol/etiket iki kez tazelenmez.
+    if (zatenTazelenen?.includes(familyTag(slug))) continue
     paths.push(...aileYolunuTazele(slug))
     revalidateTag(familyTag(slug))
     tags.push(familyTag(slug))
@@ -201,10 +226,37 @@ async function categoryRowById(id: string | undefined): Promise<CategoryRow | nu
   return data ?? null
 }
 
-/** Bir kategori için tüm yolları (kendi + ebeveyn zinciri) tazeler; üretilenleri döndürür. */
-async function revalidateCategoryTree(category: CategoryRow): Promise<string[]> {
-  const parent = await categoryRowById(category.parent_id ?? undefined)
-  const paths = categoryPathsFor(category, parent)
+type KategoriCozucu = (id: string | undefined) => Promise<CategoryRow | null>
+
+/**
+ * İSTEK ÖMRÜNDE önbellekli `categoryRowById` (URN-12). Eski+yeni kategori/alt kategori ağaçları aynı üstü paylaşır;
+ * önbelleksiz her biri üstü ayrıca çekerdi (442'lik toplu güncellemede ~900 ek sorgu). Önbellek her POST için
+ * YENİDEN kurulur ve istekle ölür: modül düzeyinde paylaşılan önbellek bayatlar ve kiracılar arası sızabilir (kural 12).
+ * Bulunamayan satır (`null`) da önbelleğe girer; aynı kimlik ikinci kez DB'ye gitmez.
+ */
+function istekKategoriCozucu(): KategoriCozucu {
+  const onbellek = new Map<string, CategoryRow | null>()
+  return async (id) => {
+    if (!id) return null
+    if (onbellek.has(id)) return onbellek.get(id) ?? null
+    const satir = await categoryRowById(id)
+    onbellek.set(id, satir)
+    return satir
+  }
+}
+
+/**
+ * Bir kategori için tüm yolları (kendi + ebeveyn zinciri) tazeler; tazelenenleri döndürür.
+ * `zatenTazelenen` verilirse o listedeki yollar atlanır (URN-12: eski+yeni kategori ağaçları ortak yol
+ * üretebilir; aynı yol iki kez tazelenmez ve yanıtta iki kez görünmez). Üst satır `kategoriSatiri` ile çözülür.
+ */
+async function revalidateCategoryTree(
+  category: CategoryRow,
+  kategoriSatiri: KategoriCozucu,
+  zatenTazelenen?: readonly string[]
+): Promise<string[]> {
+  const parent = await kategoriSatiri(category.parent_id ?? undefined)
+  const paths = categoryPathsFor(category, parent).filter((p) => !zatenTazelenen?.includes(p))
   for (const p of paths) revalidatePath(p)
   return paths
 }
@@ -265,6 +317,7 @@ export async function POST(request: NextRequest) {
 
     const revalidatedPaths: string[] = []
     const revalidatedTags: string[] = []
+    const kategoriSatiri = istekKategoriCozucu()
     // PS-042: products UPDATE'inde alan-bazlı karşılaştırma yapılıp yapılamadığını
     // (old_record var mı) yanıtta raporlamak için.
     let discoveryComparisonSkipped = false
@@ -318,18 +371,45 @@ export async function POST(request: NextRequest) {
       revalidatedTags.push(...familyChainTags)
       if (productFanoutTruncated) fanoutTruncated = true
 
+      /**
+       * URN-12: ürün başka aileye taşındıysa ESKİ ailenin (ve varsa serisinin) sayfası da bayatlar — kartı hâlâ
+       * basıyordur. `eskiDeger` yalnız UPDATE + iki görüntü varken ve değer değiştiyse döner; yoksa davranış aynı.
+       */
+      const eskiAileId = eskiDeger(record, old_record, 'family_id')
+      if (eskiAileId) {
+        const { paths: eskiPaths, tags: eskiTags, truncated: eskiTruncated } =
+          await revalidateFamilyChain(eskiAileId, familyChainTags)
+        revalidatedPaths.push(...eskiPaths)
+        revalidatedTags.push(...eskiTags)
+        if (eskiTruncated) fanoutTruncated = true
+      }
+
       if (shouldRevalidateDiscovery) {
         revalidateTag(PRODUCTS_DISCOVERY_TAG)
         revalidateTag(HOME_DATA_TAG)
         revalidatedTags.push(PRODUCTS_DISCOVERY_TAG, HOME_DATA_TAG)
       }
 
-      // If category has changed or is associated, we also revalidate the category path
-      const categoryId = activeRecord.category_id as string | undefined
-      if (categoryId) {
-        const category = await categoryRowById(categoryId)
+      /**
+       * Kategori + alt kategori: YENİ ve ESKİ `category_id` / `subcategory_id` (URN-12). Eskiden yalnız yeni
+       * `category_id` tazeleniyordu: ürün kategoriden çıkınca eski kategori/alt kategori listesi bayat kalıyor,
+       * `subcategory_id` hiç tazelenmiyordu. Her kimlik bir kez çözülür; ortak yollar (ör. aynı üst kategori)
+       * tekilleştirilir. Alt kategorinin yolları üstüyle birlikte iki segmentli adresi de içerir (`revalidateCategoryTree`).
+       */
+      const kategoriKimlikleri = [
+        ...new Set(
+          [
+            metin(activeRecord.category_id),
+            metin(activeRecord.subcategory_id),
+            eskiDeger(record, old_record, 'category_id'),
+            eskiDeger(record, old_record, 'subcategory_id'),
+          ].filter((id): id is string => id !== undefined)
+        ),
+      ]
+      for (const kategoriId of kategoriKimlikleri) {
+        const category = await kategoriSatiri(kategoriId)
         if (category) {
-          revalidatedPaths.push(...(await revalidateCategoryTree(category)))
+          revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri, revalidatedPaths)))
         }
       }
     }
@@ -344,7 +424,38 @@ export async function POST(request: NextRequest) {
         parent_id: (activeRecord.parent_id as string | null) ?? null,
       }
       if (self.slug) {
-        revalidatedPaths.push(...(await revalidateCategoryTree(self)))
+        revalidatedPaths.push(...(await revalidateCategoryTree(self, kategoriSatiri)))
+      }
+
+      /**
+       * URN-12 — ESKİ YOLLAR. Slug (kanonik ya da `metadata.slug.{tr,en}`) ya da ebeveyn değişince eski adres
+       * önbellekte durur: A→B→A dönüşünde önbellekli 308 döngü yapabilir (ana plan m.9, O2). Eski satır payload'daki
+       * `old_record`'dan kurulur (`to_jsonb(OLD)`: slug + metadata + parent_id içerir, ek sorgu gerekmez). Yalnız
+       * UPDATE'te ve iki görüntü varken çalışır; `old_record` eksikse yalnız yeni yollar tazelenir (güvenli düşüş).
+       * Yeni yollarla ortak olanlar tekrar tazelenmez.
+       */
+      let eskiSelf: CategoryRow | null = null
+      if (record && old_record) {
+        const eskiSlug = metin(old_record.slug)
+        // Yalnız YOL ÜRETEN alanlar karşılaştırılır: kanonik slug, iki dildeki çözülmüş slug
+        // (`metadata.slug.tr|en`) ve ebeveyn. Yolla ilgisiz metadata alanı (açıklama, görsel…) değişince eski
+        // yol/üst sorgusu açılmaz.
+        const yerelSlug = (r: Record<string, unknown>, dil: 'tr' | 'en') =>
+          getLocalizedCategorySlug({ slug: metin(r.slug) ?? null, metadata: r.metadata }, dil)
+        const degisti =
+          eskiSlug !== metin(record.slug) ||
+          metin(old_record.parent_id) !== metin(record.parent_id) ||
+          yerelSlug(old_record, 'tr') !== yerelSlug(record, 'tr') ||
+          yerelSlug(old_record, 'en') !== yerelSlug(record, 'en')
+        if (degisti && eskiSlug) {
+          eskiSelf = {
+            id: self.id,
+            slug: eskiSlug,
+            metadata: old_record.metadata,
+            parent_id: metin(old_record.parent_id) ?? null,
+          }
+          revalidatedPaths.push(...(await revalidateCategoryTree(eskiSelf, kategoriSatiri, revalidatedPaths)))
+        }
       }
 
       /**
@@ -362,6 +473,12 @@ export async function POST(request: NextRequest) {
           const childPaths = categoryPathsFor(child, self)
           for (const p of childPaths) revalidatePath(p)
           revalidatedPaths.push(...childPaths)
+          // Üstün ESKİ slug'ıyla kurulmuş iki segmentli çocuk yolları da bayatlar (URN-12).
+          if (eskiSelf) {
+            const eskiChildPaths = categoryPathsFor(child, eskiSelf).filter((p) => !revalidatedPaths.includes(p))
+            for (const p of eskiChildPaths) revalidatePath(p)
+            revalidatedPaths.push(...eskiChildPaths)
+          }
         }
       }
 
@@ -393,9 +510,9 @@ export async function POST(request: NextRequest) {
 
           // If product is linked to a category, revalidate category path too
           if (product.category_id) {
-            const category = await categoryRowById(product.category_id)
+            const category = await kategoriSatiri(product.category_id)
             if (category) {
-              revalidatedPaths.push(...(await revalidateCategoryTree(category)))
+              revalidatedPaths.push(...(await revalidateCategoryTree(category, kategoriSatiri)))
             }
           }
         }
@@ -446,6 +563,31 @@ export async function POST(request: NextRequest) {
           revalidatedTags.push(familyTag(slug))
         }
         if (seriesFanoutTruncated) fanoutTruncated = true
+      }
+
+      /**
+       * URN-12 — ESKİ ADRES. Aile slug'ı değişince eski slug'ın sayfası (ve etiketi) önbellekte kalırdı; A→B→A
+       * dönüşünde A'daki önbellekli 308 döngü yapabilir (ana plan m.9, O2). `eskiDeger` yalnız UPDATE'te ve iki
+       * görüntü de varken (değişmişse) döner; `old_record` eksikse yalnız yeni slug tazelenir (güvenli düşüş).
+       * Model başka seriye taşındıysa ESKİ serinin landing'i de bayatlar (model kartı oradan kalkar).
+       */
+      const eskiFamilySlug = eskiDeger(record, old_record, 'slug')
+      if (eskiFamilySlug) {
+        revalidatedPaths.push(...aileYolunuTazele(eskiFamilySlug))
+        revalidateTag(familyTag(eskiFamilySlug))
+        revalidatedTags.push(familyTag(eskiFamilySlug))
+      }
+      const eskiParentFamilyId = eskiDeger(record, old_record, 'parent_family_id')
+      if (eskiParentFamilyId) {
+        const { slugs: eskiSeriesSlugs, truncated: eskiSeriesTruncated } =
+          await walkFamilyChain(eskiParentFamilyId)
+        for (const slug of eskiSeriesSlugs) {
+          if (revalidatedTags.includes(familyTag(slug))) continue
+          revalidatedPaths.push(...aileYolunuTazele(slug))
+          revalidateTag(familyTag(slug))
+          revalidatedTags.push(familyTag(slug))
+        }
+        if (eskiSeriesTruncated) fanoutTruncated = true
       }
     }
 
