@@ -22,6 +22,8 @@ import { describe, expect, it } from 'vitest'
 import {
   ANASAYFA_BILINCLI_ADALAR,
   ANASAYFA_MAX_BAILOUT,
+  gizliAkisBloklari,
+  gorunurH1Sayisi,
   ihlaller,
   kurallar,
   PDP_BILINCLI_ADALAR,
@@ -609,5 +611,78 @@ describe('INV-DUMAN-7: temsilci ADRESTEN değil İÇERİKTEN seçilir', () => {
       d2.altgrupluKategori
     )
     expect(d1.altgrupluKategori, 'alfabetik ilk UYGUN aday seçilmeli').toBe('/tr/category/m')
+  })
+})
+
+describe('INV-DUMAN-8: gövde gizli akış bloğuna itilmez (URN-25 çalışma-zamanı kolu)', () => {
+  /**
+   * NİÇİN: orijinal arıza (kategori ve /products gövdesi `<div hidden id="S:0">` içinde) bailout
+   * sayımında GÖRÜNMEZ — gövde HTML'de vardır, yalnız gizli blokta durur (ölçüldü: bailout 0,
+   * gizli kelime 719). Bu kol o işareti sayar. Sunucu gerekmez: gerçek `next build` çıktısının
+   * ŞEKLİ (spinner iskeleti + sonradan gelen hidden blok) burada sabit örnekle taklit edilir.
+   *
+   * ⚠SINIR: bu kol `ihlaller` MANTIĞINI ölçer; canlı/derlenmiş HTML'i ölçmez. O, PR kapısında
+   * (`e2e/ssr-html.e2e.ts`, admin-smoke) ve prod alarmında (`tests/smoke/ssr-html.spec.ts`) koşar.
+   */
+  const fake = {
+    altgrupluKategori: '/tr/category/a',
+    yaprakKategori: '/tr/category/b',
+    pdp: '/tr/products/x',
+    marka: '/tr/brands/x',
+    sayimlar: { kategori: 2, ikiSegmentli: 0, pdp: 1, marka: 1 },
+    secim: { icerikten: true, denenenAday: 1, adayTavani: 8 },
+    atlananlar: [],
+  }
+  const kuralOf = (sinif: string) => {
+    const k = kurallar(fake).find((x) => x.sinif === sinif)
+    if (!k) throw new Error(`${sinif} kuralı yok`)
+    return k
+  }
+
+  // Orijinal arızanın biçimi: kabukta spinner, gövde (h1 dahil) sonradan hidden blokta.
+  const ARIZALI =
+    '<main><div class="min-h-screen"><!--$?--><template id="B:0"></template>' +
+    '<div class="spin"></div><!--/$--></div></main>' +
+    '<div hidden id="S:0"><div class="a"><div class="b"><h1>Fanlar</h1></div>' +
+    '<div data-ssr="family-card">k</div></div></div><script>$RC("B:0","S:0")</script>'
+  // Düzeltilmiş biçim: gövde doğrudan yerinde.
+  const SAGLAM =
+    '<main><div class="min-h-screen"><h1>Fanlar</h1>' +
+    '<div data-ssr="family-card">k</div></div></main>'
+
+  it('⭐ARIZALI biçim KIRMIZI: S bloğu + görünür h1 yok (4 sınıfta da)', () => {
+    for (const sinif of ['liste', 'liste-en', 'yaprak-kategori', 'altgruplu-kategori']) {
+      const k = kuralOf(sinif)
+      const html = ARIZALI + (sinif === 'altgruplu-kategori' ? '>Alt Ürün Grupları<' : '')
+      const sorun = ihlaller(k, html).join(' | ')
+      expect(sorun, `${sinif}: gizli akış bloğu yakalanmadı`).toMatch(/gizli akış bloğunda/)
+      expect(sorun, `${sinif}: gizli bloktaki h1 görünür sayıldı`).toMatch(/görünür yerde <h1> yok/)
+    }
+  })
+
+  it('SAĞLAM biçim YEŞİL (sahte kırmızı yok)', () => {
+    for (const sinif of ['liste', 'liste-en', 'yaprak-kategori']) {
+      expect(ihlaller(kuralOf(sinif), SAGLAM), `${sinif} sağlam biçimde kırmızı`).toEqual([])
+    }
+  })
+
+  it('KAPSAM: ölçüt yalnız işaretli sınıflarda koşar (marka, PDP ve anasayfa hâlâ S bloğu taşıyabilir)', () => {
+    for (const sinif of ['marka', 'marka-listesi', 'pdp', 'anasayfa']) {
+      expect(kuralOf(sinif).govdeGorunur, `${sinif} yanlışlıkla işaretlenmiş — kapsam dışı sayfalar kırmızı olur`)
+        .toBeFalsy()
+    }
+    for (const sinif of ['liste', 'liste-en', 'yaprak-kategori', 'altgruplu-kategori']) {
+      expect(kuralOf(sinif).govdeGorunur, `${sinif} işaretsiz — ölçüt koşmaz`).toBe(true)
+    }
+  })
+
+  it('AYRIŞTIRICI: iç içe div blok sonunu şaşırmaz; blok DIŞINDAKİ h1 görünür sayılır', () => {
+    const html =
+      '<div hidden id="S:0"><div><div>a</div><h1>gizli</h1></div></div><h1>gorunur</h1>'
+    expect(gizliAkisBloklari(html).length).toBe(1)
+    expect(gorunurH1Sayisi(html), 'gizli h1 sayıldı ya da görünür h1 kayboldu').toBe(1)
+    // Kapanmayan blok HTML sonuna kadar sayılır: sonrasındaki h1 de gizli kabul edilir (güvenli taraf).
+    expect(gorunurH1Sayisi('<div hidden id="S:1"><div><h1>x</h1>')).toBe(0)
+    expect(gizliAkisBloklari('<main><h1>x</h1></main>')).toEqual([])
   })
 })

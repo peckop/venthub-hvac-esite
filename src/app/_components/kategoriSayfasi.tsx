@@ -337,11 +337,12 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      {/* ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Buradaki kök sınır, içerik
-          askıya alınınca (`next/dynamic` görünümleri) TÜM gövdeyi ham HTML'de gizli akış
-          bloğuna (`<div hidden id="S:0">`) itiyordu: h1 ve liste JS'siz görünmüyordu.
-          `useSearchParams` okuyan tek uç (Pagination) CategoryMasterView içinde kendi
-          sınırıyla sarılıdır. Kapı: INV-SSR-GOVDE-2 (storefront-ssr-govde.test.ts). */}
+      {/* ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Buradaki kök sınır TÜM gövdeyi
+          ham HTML'de gizli akış bloğuna (`<div hidden id="S:0">`) itiyordu: h1 ve liste JS'siz
+          görünmüyordu. Sebep iki kollu: sardığı içerik askıya alınırsa (`next/dynamic` görünümleri)
+          YA DA büyükse (Fizz, ~12800 bayt üstünü tamamlanmış olsa bile dışarı yazar) — yani BÜYÜK
+          GÖVDEYİ SARAN HER Suspense aynı sonucu verir. `useSearchParams` okuyan tek uç (Pagination)
+          CategoryMasterView içinde kendi sınırıyla sarılıdır. Kapı: INV-SSR-GOVDE-2. */}
       {/* INV-DIL-DUSUSU-1 gömülü katman: istemciye yalnız sayfanın dilindeki metin gider. */}
       <PageComponent
         initialCategory={kategoriMetniniIndir(category, lang)}

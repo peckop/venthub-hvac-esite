@@ -182,9 +182,11 @@ export async function UrunlerSayfasi({ lang }: { lang: string }) {
     console.warn('Kategori kapisi verisi alinamadi (/products):', error)
   }
 
-  // ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Kök sınır, içerik askıya alınınca
-  // (`next/dynamic` görünümleri) tüm gövdeyi ham HTML'de gizli akış bloğuna (`<div hidden
-  // id="S:0">`) itiyordu: h1 ve liste JS'siz görünmüyordu (tr: 99 görünür / 1015 gizli kelime).
+  // ⭐SAYFAYI SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, kural 5). Kök sınır tüm gövdeyi ham HTML'de
+  // gizli akış bloğuna (`<div hidden id="S:0">`) itiyordu: h1 ve liste JS'siz görünmüyordu
+  // (yerel derleme: tr 99 görünür / 1015 gizli kelime). Sebep iki kollu: sardığı içerik askıya
+  // alınırsa (`next/dynamic` görünümleri) YA DA büyükse (Fizz, ~12800 bayt üstünü tamamlanmış
+  // olsa bile dışarı yazar) — BÜYÜK GÖVDEYİ SARAN HER Suspense aynı sonucu verir.
   // `useSearchParams` okuyan tek uç (Pagination) CategoryMasterView içinde kendi sınırıyla
   // sarılıdır. Kapı: INV-SSR-GOVDE-2 (storefront-ssr-govde.test.ts).
   // initialCategory null olduğu için MasterView bunu Discovery olarak işleyecektir.

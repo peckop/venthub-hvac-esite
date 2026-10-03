@@ -18,12 +18,15 @@ import type { FamilyListItem } from '../types/ui-models'
 // dynamic() code-splitting için kalır; ağır 3D (CategoryOrbitCarousel) kendi
 // izole Suspense'inde ssr:false olarak ProductsDiscoveryView içinde durur.
 //
-// ⭐BU GÖRÜNÜMLERİ SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, 2026-10-03). `dynamic()` sunucuda
-// `React.lazy` gibi askıya alır; askıya alınan içerik, onu saran bir Suspense sınırının
-// DIŞINA, akış bloğuna (`<div hidden id="S:0">`) yazılır: ham HTML'de sayfa gövdesi (h1 dahil)
-// gizli blokta, görünür yerde yalnız spinner iskeleti kalıyordu (kategori ve /products).
-// Sınır olmayınca sunucu kabuğu görünümler çözülene kadar bekler ve gövde HTML'e düz yazılır.
-// Suspense yalnız `useSearchParams` okuyan yaprağı (Pagination) sarar (kural 5).
+// ⭐BU GÖRÜNÜMLERİ SARAN SUSPENSE YOK — BİLİNÇLİ (URN-25, 2026-10-03). Mekanizma İKİ KOLLU:
+// bir Suspense sınırının sardığı içerik, (a) askıya alınırsa (`dynamic()` sunucuda `React.lazy`
+// gibi askıya alır) ya da (b) büyükse (Fizz, içerik `progressiveChunkSize` ≈ 12800 bayt üstündeyse
+// TAMAMLANMIŞ olsa bile) sınırın DIŞINA, akış bloğuna (`<div hidden id="S:0">`) yazılır; görünür
+// yerde yalnız fallback (spinner) iskeleti kalır. Ham HTML'de sayfa gövdesi (h1 dahil) gizli
+// blokta kalıyordu (kategori ve /products). İkinci kol bu işte izole ölçülmedi; kaynağı
+// çürütücü ölçümüdür (dynamic'siz `brands/page.tsx` da S:0 üretiyor). Sonuç değişmez: BÜYÜK GÖVDEYİ
+// SARAN HER Suspense aynı arızayı verir, bu yüzden Suspense yalnız `useSearchParams` okuyan
+// küçük yaprağı (Pagination) sarar (kural 5). Sınır olmayınca gövde HTML'e düz yazılır.
 const CategoryGridView = dynamic(() => import('./category/CategoryGridView'))
 const CategoryLandingView = dynamic(() => import('./category/CategoryLandingView'))
 const CategorySeriesView = dynamic(() => import('./category/CategorySeriesView'))
@@ -155,8 +158,11 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
    *
    * Koşulu ÇAĞIRANA taşımak hook'u hiç çağırmaz. Kategori rotasında `total > pageSize` artık
    * asla doğru olmaz (sayfa boyu 48, en kalabalık kategori 34) — yani orada sayfalama tümüyle
-   * devre dışı. `/products` rotası aynı bileşeni kullanıyor ve orada sayfalama HÂLÂ GEÇERLİ;
-   * o rota `searchParams` aldığı için zaten dinamik, dolayısıyla bailout'un bedeli yok.
+   * devre dışı. `/products` rotası aynı bileşeni kullanıyor ve o da `force-static` (`searchParams`
+   * ALMAZ; sayfa boyu 72, ölçülen aile sayısı 47 — `urunlerSayfasi.tsx` K7 kolu), yani orada da
+   * koşul bugün yanlış ve Pagination çizilmez. Aile sayısı 72'yi aştığı gün Pagination çizilir ve
+   * `useSearchParams` bailout'u kendi sınırında kalır; o sınırı bu dosyada TEK Suspense yapan şey
+   * INV-SSR-GOVDE-2'dir (içeriği değil yalnız Pagination'ı sarmalı).
    */
   const cokSayfaVar = total > pageSize
   const pagination = cokSayfaVar ? (
