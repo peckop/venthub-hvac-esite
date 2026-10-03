@@ -76,12 +76,12 @@ describe('middleware — kök dışındaki .txt/.xml ve uzantısız adresler esk
   })
 })
 
-describe('INV-KOK-DOSYA-1 — public/ kökündeki her .txt muaf kalır', () => {
-  // Biri `public/`a yeni bir kök `.txt` koyup `src/utils/kokDosya.ts` listesine eklemeyi unutursa
-  // dosya canlıda sessizce 404 olurdu; bu test o unutmayı kırmızıya çevirir.
-  const dosyalar = readdirSync(join(process.cwd(), 'public')).filter((a) => a.endsWith('.txt'))
+describe('INV-KOK-DOSYA-1 — public/ kökündeki her .txt ve .xml muaf kalır', () => {
+  // Biri `public/`a yeni bir kök `.txt` ya da `.xml` koyup `src/utils/kokDosya.ts` listesine eklemeyi
+  // unutursa dosya canlıda sessizce 404 olurdu; bu test o unutmayı kırmızıya çevirir.
+  const dosyalar = readdirSync(join(process.cwd(), 'public')).filter((a) => /\.(txt|xml)$/.test(a))
 
-  it('public/ kökünde en az bir .txt var (test kör değil)', () => {
+  it('public/ kökünde en az bir .txt ya da .xml var (test kör değil)', () => {
     expect(dosyalar.length).toBeGreaterThan(0)
   })
 

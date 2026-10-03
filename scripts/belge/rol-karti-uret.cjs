@@ -115,6 +115,27 @@ const RECEP_MESAJ_KURALLARI = [
   '- Compact hazırlığı ("COMPACT YAKIN" uyarısında, compact yapılana kadar her cevapta): cevabın sonuna 3 maddelik liste (durum dosyam güncel mi + dosya adı/saat, yarım iş var mı, hüküm "Şimdi compact yapabilirsin" ya da "X bitince söyleyeceğim"); altına tek kod bloğunda kopyalanabilir `/compact Recep\'in son sözlerini aynen koru. Şunları koru: <numara (durum)>, ..., yarım işler (<kısa adlar>). Ayrıntı durum dosyamda. Araç çıktılarını ve eski ölçüm ayrıntılarını at.` satırı.',
 ].join('\n')
 
+/**
+ * KART PLANI KURALI (HRT-14, karar 241/243, 2026-10-02): kartın bayt payını yemesin diye kurallar dosyasında durur.
+ * Yöneten cetvel: `docs/standards/kart-plani-standard.md`; kapı: `scripts/belge/kart-plan-kapisi.cjs` (INV-KART-PLAN-1).
+ * Her rolün kurallar dosyasına AYNEN girer.
+ */
+const KART_PLAN_KURALI = [
+  '## Kart planı (karar 241/243)',
+  '- Plan karta yazılır (docs/standards/kart-plani-standard.md): konuyu bilmeyenin uygulayabileceği açıklıkta; işi planı yazan değil yeni açılan ekip üyesi yapar; müşteriye görünen, veritabanı ya da site yapısı planı Recep\'e tek sayfa özetle OPS\'tan gider; planın iskeletinin eksiksizliğini `node scripts/belge/kart-plan-kapisi.cjs --kart <NO>` ölçer.',
+  '- PR başlığında ve gövdesinde kapanmaması gereken Linear numarası (REC-nn) geçmez; yalnız `Kanban: <no>` satırı yazılır (Linear\'a bağlı PR birleşince kayıt kendiliğinden Done olur, REC-508 böyle kapandı).',
+].join('\n')
+
+/**
+ * ÇALIŞAN AÇMA KURALI (HRT-21, karar 251, 2026-10-03): kartın bayt payını yemesin diye kurallar dosyasında durur.
+ * Yöneten cetvel: `docs/standards/execution-method-standard.md` §10.3 (ARAÇ ölçümü: ekip üyesine verilen yazma yasağı işlemiyor, ARC-20).
+ * Her rolün kurallar dosyasına AYNEN girer.
+ */
+const CALISAN_ACMA_KURALI = [
+  '## Çalışan açma (karar 251)',
+  '- Salt-okuma çalışan (araştırmacı, çürütücü, doğrulayıcı) `Agent` aracıyla `name` VERİLMEDEN açılır: sonuç doğrudan açana döner ve yazma yasağı ancak böyle işler; yazan uygulayıcı ekip üyesi olarak `name` ile açılır (docs/standards/execution-method-standard.md §10.3).',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -125,6 +146,10 @@ function kuralDosyasi(ad) {
     ...rolKurallari(ad).map(([no, , kisa, ozet]) => `- K${no} ${kisa}: ${ozet}`),
     '',
     RECEP_MESAJ_KURALLARI,
+    '',
+    KART_PLAN_KURALI,
+    '',
+    CALISAN_ACMA_KURALI,
     '',
   ].join('\n')
 }

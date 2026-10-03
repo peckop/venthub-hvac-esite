@@ -151,12 +151,29 @@ describe('Bilgi merkezi konu → kategori (TopicPage) ve ana sayfa çözüm kart
     expect(getCategoryUrlFromTopic(konu, dil, true)).toBe(yeni)
   })
 
-  it('cozumKartiAdresi: bugün EN slug iki dilde; K3-b TR görünen slug', () => {
+  it('cozumKartiAdresi: görünen slug her iki kipte dile göre (URN-19); bayrak yalnız şemayı değiştirir', () => {
     const kart = { categorySlug: 'air-curtains', trSlug: 'hava-perdeleri' }
-    expect(cozumKartiAdresi(kart, 'tr')).toBe('/tr/category/air-curtains')
+    // Yedek yol (kategori listesi gelmedi): TR → trSlug, EN → kanonik slug.
+    expect(cozumKartiAdresi(kart, 'tr')).toBe('/tr/category/hava-perdeleri')
+    expect(cozumKartiAdresi(kart, 'tr', false)).toBe('/tr/category/hava-perdeleri')
     expect(cozumKartiAdresi(kart, 'en', false)).toBe('/en/category/air-curtains')
     expect(cozumKartiAdresi(kart, 'tr', true)).toBe('/tr/kategori/hava-perdeleri')
     expect(cozumKartiAdresi(kart, 'en', true)).toBe('/en/category/air-curtains')
+  })
+
+  it('cozumKartiAdresi: slug listedeki kategoriden çözülür (DB değişirse kart kendiliğinden izler)', () => {
+    const kart = { categorySlug: 'air-curtains', trSlug: 'hava-perdeleri' }
+    const liste = [
+      { slug: 'fans', metadata: { slug: { tr: 'fanlar', en: 'fans' } } },
+      { slug: 'air-curtains', metadata: { slug: { tr: 'hava-perdesi-yeni', en: 'air-curtains-new' } } },
+    ]
+    expect(cozumKartiAdresi(kart, 'tr', false, liste)).toBe('/tr/category/hava-perdesi-yeni')
+    expect(cozumKartiAdresi(kart, 'en', false, liste)).toBe('/en/category/air-curtains-new')
+    expect(cozumKartiAdresi(kart, 'tr', true, liste)).toBe('/tr/kategori/hava-perdesi-yeni')
+    // Listede kategori yoksa yedek.
+    expect(cozumKartiAdresi({ categorySlug: 'heat-recovery-vmc', trSlug: 'isi-geri-kazanim' }, 'tr', false, liste)).toBe(
+      '/tr/category/isi-geri-kazanim',
+    )
   })
 })
 

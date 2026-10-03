@@ -25,6 +25,7 @@ import { BrandIcon } from '../../components/HVACIcons'
 import ImageGallery from '../../components/ImageGallery'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
 import { AddToProjectModal } from '../../components/products'
+import { AileKirintisi } from '../../components/products/AileKirintisi'
 import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
@@ -41,6 +42,7 @@ import { selectVariant } from '../../lib/data/selectVariant'
 import { familyName } from '../../lib/i18n/familyName'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
+import type { KirintiAdimi } from '../../lib/seo/kirinti'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
 import { getFamiliesEnriched } from '../../lib/services/family.service'
 import { getProductById } from '../../lib/services/product.service'
@@ -60,7 +62,7 @@ import {
   translateSpecKey} from '../../utils/productHelpers'
 import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
-import { adresDili, adresRotalari } from '../../utils/yuzeyAdresleri'
+import { adresDili, adresRotalari, modelBaglantiAdresi } from '../../utils/yuzeyAdresleri'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -96,6 +98,12 @@ export interface ProductDetailPageProps {
    * modelin KENDİ adresine gider. Aile rotası vermez → bugünkü `?sku=` davranışı aynen.
    */
   sunucuSku?: string | null
+  /**
+   * URN-21 — görünür kırıntı adımları. SUNUCUDA bir kez kurulur (`aileKirintiAdimlari`) ve JSON-LD
+   * BreadcrumbList'e aynı nesneyle verilir. Eskiden bu bileşen kırıntıyı `useCategories()` bağlamından
+   * kuruyordu; bağlam ilk render'da boş olduğundan ham HTML'de kategori/marka bağlantısı yoktu.
+   */
+  kirinti: KirintiAdimi[]
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -136,6 +144,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   selectedSku: skuParam,
   priceTaxIncluded = null,
   sunucuSku = null,
+  kirinti,
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
@@ -319,6 +328,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
     router.replace(`${pathname}?${next.toString()}` as Route, { scroll: false })
   }, [pathname, router, sunucuSku, family, lang])
 
+  // URN-21: Modeller satırlarının gerçek `<a href>` hedefi — adres üreticisinden (bayrak kapalıyken
+  // `?sku=` kipi, K3-b açılınca modelin kendi adresi). Tıklama yine `handleSelectVariant`'tan geçer.
+  const modelAdresi = (sku: string): string => modelBaglantiAdresi(adresDili(lang), family?.slug ?? '', sku)
+
   // Galeri: seçili varyantın görselleri → yoksa ailedeki ilk görselli varyant.
   const galleryImages = useMemo(() => {
     const own = selectedVariant?.images ?? []
@@ -498,31 +511,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
       {/* Seamless Integrated Breadcrumb */}
       <div className="relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-          <nav className="flex items-center space-x-2 text-xs sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
-            <Link href={localizedHref('/', lang)} className="hover:text-primary-navy transition-colors">
-              {t('category.breadcrumbHome')}
-            </Link>
-            <ChevronRight size={10} className="flex-shrink-0" />
-            {mainCategory && (
-              <>
-                <Link href={yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang))} className="hover:text-primary-navy transition-colors">
-                  {getCategoryDisplayName(mainCategory, t)}
-                </Link>
-                {subCategory && subCategory.slug !== mainCategory.slug && (
-                  <>
-                    <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang))} className="hover:text-primary-navy transition-colors">
-                      {getCategoryDisplayName(subCategory, t)}
-                    </Link>
-                  </>
-                )}
-                <ChevronRight size={10} className="flex-shrink-0" />
-              </>
-            )}
-            <span className="text-industrial-gray truncate max-w-150px sm:max-w-none">
-              {gorunenAileAdi}
-            </span>
-          </nav>
+          <AileKirintisi adimlar={kirinti} lang={lang} etiket={t('category.breadcrumbAria')} />
         </div>
       </div>
 
@@ -651,6 +640,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                   variants={variants}
                   selectedSku={selectedVariant.sku}
                   onSelect={handleSelectVariant}
+                  modelAdresi={modelAdresi}
                   quoteMode={quoteMode}
                   priceTaxIncluded={priceTaxIncluded}
                 />
@@ -1002,6 +992,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                           variants={variants}
                           selectedSku={selectedVariant.sku}
                           onSelect={handleSelectVariant}
+                          modelAdresi={modelAdresi}
                           quoteMode={quoteMode}
                           priceTaxIncluded={priceTaxIncluded}
                         />

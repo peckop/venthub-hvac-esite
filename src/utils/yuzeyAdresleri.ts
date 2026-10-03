@@ -78,6 +78,20 @@ export function adresRotalari(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B
 }
 
 /**
+ * Modeller satırının `<a href>` adresi (URN-21) — aile sayfasındaki seçici ve testler AYNI işlevi çağırır.
+ * KAPALIYKEN `?sku=` biçimi (`/tr/products/<aile>?sku=<sku>`), AÇIKKEN modelin kendi kısa adresi
+ * (`/tr/urun/<aile>-p-<sku>`); ikisi de `adresRotalari().product`'tan, elle birleştirme yok.
+ */
+export function modelBaglantiAdresi(
+  dil: AdresDili,
+  aileSlug: string,
+  sku: string,
+  bayrak: boolean = ADRES_SEMASI_K3B,
+): string {
+  return adresRotalari(dil, bayrak).product(aileSlug, sku)
+}
+
+/**
  * `Routes.category` için ÜST KATEGORİYİ ve DİLE GÖRE slug'ı bilen yüzeyin argümanları (REC-403).
  *
  * NİÇİN VAR: `adresRotalari().category(slug)` AÇIK kipte tek slug'ı kök sayar (`/tr/kategori/<slug>`).

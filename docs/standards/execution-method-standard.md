@@ -411,6 +411,21 @@ müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan
 **Ajan tipi:** araştırmacı ve doğrulayıcı için salt-okuma `Explore` tipi yeterlidir. Kendi alt ajanını açması gereken
 ekip lideri `general-purpose` olmalıdır (araçları "*"); `Explore` ve `Plan` tipleri alt ajan açamaz.
 
+**Salt-okuma çalışan AD VERİLMEDEN açılır (karar 251 = EVET, 2026-10-03; ölçüm ARAÇ'ın, OPS aktardı, HARİTA yeniden koşmadı):**
+- Araştırmacı, çürütücü ve doğrulayıcı `Agent` aracıyla **`name` parametresi olmadan** açılır (örnek: `subagent_type: harita-curutucu`, ad yok). Sonuç doğrudan açana döner ve tanımdaki yazma yasağı gerçekten işler.
+- Yazan **uygulayıcı** ekip üyesi olarak (`name` ile) kalır; yazma yasağı ona zaten uygulanmaz.
+- Niçin: ekip üyesine (adlı çalışana) verilen yazma yasağı Claude'da işlemiyor (ARC-20).
+- **Ölçüm (ARAÇ ölçtü 10-03, OPS aktardı; HARİTA özet dosyasını okudu, deneyi yeniden koşmadı):** müdür → 5 adsız denetçi (paralel) → 1 adsız doğrulayıcı + 1 adlı uygulayıcı ekip üyesi; girdi 15 kusurlu dosya.
+
+  | Ölçüt | Sonuç |
+  |---|---|
+  | Kusur yakalama | 15/15 (toplam 47 bulgu; doğrulayıcı: 41 doğru, 6 sınırda, 0 yanlış) |
+  | Rapor kaybı | 0 (denetçi→müdür 5/5 rapor; müdür→üye→dosya 47→47) |
+  | Denetçi yazabildi mi | Hayır, 5/5. **Sınır:** üçünde `Write` aracı listede yoktu; ikisi `Bash` ile yazmayı talimat gereği denemedi (yasak araç düzeyinde 3/5 kanıtlı); dosya özeti (md5) önce/sonra aynı |
+  | Süre | ~4 dk (dünkü saf ekip 73 sn; dünkü ekip üyesi→Haiku işçi düzeni 238 sn ve 25/25 işçi raporu kayıp) |
+
+- **Bedel:** saf ekipten ~3 kat yavaş; karşılığında yazma kısıtı gerçekten işliyor ve rapor kaybolmuyor. Tek koşumdur, eğilim değil; yeniden ölçülürse bu satır güncellenir.
+
 **Çalışan tanımı kuralları (YTN-8 ölçümü, 2026-10-01; rapor `docs/audits/skill-calisan-yukleme-olcumu-2026-10-01.md`):**
 - **`ToolSearch`, tanımın `disallowedTools` alanına YAZILMAZ.** Ölçüldü: yazılınca Haiku çalışan hiç açılmadı (istek ~329 bin jeton, limit 200 bin, "Prompt is too long"; ertelenmiş araç listesi satır içine dökülüyor); aynı tanımla Sonnet açıldı ama ~330 bin jetonlu istekle. Mevcut tanımların hiçbirinde yok; üretici çıktısı `INV-AJAN-TANIM-1` mandalıyla (disk = üretici) ve yazmayan üç türde ToolSearch'ü arayan testle korunur (uygulayıcıya `disallowedTools` hiç yazılmadığı için orada test boş geçer).
 - **`skills:` ön yüklemesi yalnız `Agent` aracıyla açılan alt ajanda ölçüldü.** `claude --agent <ad>` ile açılan ANA oturumda ön yükleme çalışmadı (Haiku, tek koşu; Sonnet ölçülmedi; üretim yolu değil): ana oturumu bir çalışan tanımıyla açıp skill ön yüklemesine güvenme.

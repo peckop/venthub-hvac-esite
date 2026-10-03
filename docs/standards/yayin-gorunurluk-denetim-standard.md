@@ -57,6 +57,15 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
 - Bağlantı taraması: kırık 0 · site içi yönlendirme 0 (plan §7 "kırık 0, zincir 0").
 - Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
   bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
+- **Gövdede iç bağlantı (URN-21, 2026-10-03):** "yetim yok" yetmez; sayfaya giden bağlantının **gövdeden** (header/nav/footer
+  hariç, ham HTML) gelmesi gerekir. Aile ve model sayfasında: (a) görünür kırıntıda kategori + marka (+ alt kategori; model
+  sayfasında aile) gerçek `<a href>`, aile sayfasında **≥2**, son basamak bağlantısız ve `aria-current="page"`; (b) "Modeller"
+  bölümünde her model satırı **tam 1** `<a href>` (model adresi; bayrak kapalıyken `?sku=` biçimi, K3-b açılınca modelin kendi
+  adresi), `<button>` değil; (c) kırıntı JSON-LD BreadcrumbList ile **aynı diziden** gelir (`src/lib/seo/kirinti.ts`
+  `aileKirintiAdimlari`; ikinci bir kurucu yazılmaz); (d) mobilde bu bağlantılar en az 44px (`min-h-11`). Ağsız kapılar:
+  `src/lib/seo/__tests__/kirinti.test.ts`, `src/components/products/__tests__/{AileKirintisi,VariantSelector}.test.tsx`.
+  Canlı ölçüm: ham HTML'de aile sayfasının `<main>` içindeki `<a>` sayısı (öncesi 2026-10-03: aile sayfasında 1, yalnız "Ana Sayfa";
+  Modeller satırında 0).
 - Canlı kapı: **KIRMIZI 0** (`canli-kapi.mjs`); onarımı henüz gelmemiş kırmızılar yalnız `--bilinen` ile REC numarasıyla
   bilinçli taşınır, her onarım bilinen listesinden çıkarılır.
 - `llms.txt`: sayfa/kategori sayısı ve `Languages:` beyanı site haritasıyla **aynı** (`LLMS-SAYFA`, `LLMS-DIL`, INV-LLMS-GERCEK-1;
