@@ -41,7 +41,34 @@ type Uretici = {
   kuralSorunlari: (kaynak: { no: number; baslik: string }[], kartlar: Record<string, string>, kurallar?: unknown[]) => string[]
   rolKurallari: (ad: string) => unknown[][]
   KURALLAR: [number, string, string, string, string[] | 'HEPSI'][]
+  GOREVLER: Record<string, RolGorevi>
+  uretGorevler: () => Record<string, string>
+  gorevDosyaAdi: (ad: string) => string
+  gorevSorunlari: (
+    veri: Record<string, RolGorevi>,
+    roller: string[],
+    varMi: (d: string) => boolean,
+    oku: (d: string) => string,
+    isAkislari?: string[],
+  ) => string[]
+  gorevEksikRoller: () => string[]
+  isAkisiMetinleri: (kok: string) => string[]
+  AMAC_SINIRI: number
 }
+
+type Gorev = {
+  gorev: string
+  komut?: string
+  siklik: string
+  tetik: string
+  tetikAyrinti: string
+  bagli: string
+  baglayacak?: string
+  cikti: string
+  esik: string
+  taslak?: boolean
+}
+type RolGorevi = { amac: string; gorevler: Gorev[] }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
 const require = createRequire(import.meta.url)
@@ -262,6 +289,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     const beklenen = [
       ...Object.keys(uretilen).map((ad) => uretici.dosyaAdi(ad)),
       ...Object.keys(uretilen).map((ad) => uretici.kuralDosyaAdi(ad)),
+      ...Object.keys(uretici.uretGorevler()).map((ad) => uretici.gorevDosyaAdi(ad)),
       uretici.SAHIPLIK_BELGESI,
     ]
     expect(disk.sort()).toEqual(beklenen.sort())
@@ -288,6 +316,9 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // `<ROL>-kurallar.md` dosyasına taşındı (RECEP_MESAJ_KURALLARI), kartta tek satırlık işaretçi kaldı: SATIS 6579 → 6171 B
   // (%92,7; eşik %94 = 6257 B, pay 86 B). Yeni Recep kuralı artık kurallar dosyasına eklenir, karta değil.
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
+  // 2026-10-03 (HRT-24, OPS kararı: çıta oynatılmaz): Amaç + Düzenli görevler işaretçisi kart başına ~325 B tutar
+  // (GEO-SEO ölçümü; SATIS 6171 → ~6496 olurdu). SATIS kendi satırlarından 241 B kısaldı (6171 → 5930); eşik %94 KALDI.
+  // 16 rolün Amaç'ı dolunca eşik yine kırılırsa ayrıntı dosyaya taşınır, eşik değil metin kısalır.
   it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %94\'ünde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)
@@ -318,7 +349,9 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
 
   it('Yönetim bloğu (karar 201, REC-518): istisna yalnız OPS için, diğer kartlarda bire bir aynı ve Görev\'in hemen altında', () => {
     expect(Object.keys(uretici.YONETIM_ISTISNA)).toEqual(['OPS'])
-    const blok = (m: string) => m.slice(m.indexOf('## Yönetim (karar 201)'), m.indexOf('## Dosyalar')).trimEnd()
+    // Verisi olan rolde (OPS-27) Yönetim bloğunu "## Amaç" izler; blok o başlıkta ya da yoksa "## Dosyalar"da biter.
+    const son = (m: string) => (m.includes('## Amaç') ? m.indexOf('## Amaç') : m.indexOf('## Dosyalar'))
+    const blok = (m: string) => m.slice(m.indexOf('## Yönetim (karar 201)'), son(m)).trimEnd()
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin.indexOf('## Görev'), ad).toBeLessThan(metin.indexOf('## Yönetim (karar 201)'))
       expect(blok(metin), ad).toBe(uretici.YONETIM_ISTISNA[ad] ?? uretici.YONETIM)
@@ -501,5 +534,120 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     const ilki = blok(Object.values(uretilen)[0])
     expect(ilki.split('\n').filter((s) => /^[1-5]\. /.test(s))).toHaveLength(5)
     for (const [ad, metin] of Object.entries(uretilen)) expect(blok(metin), ad).toBe(ilki)
+  })
+})
+
+describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
+  const roller = Object.keys(uretici.ROLLER)
+  const varMi = (d: string) => fs.existsSync(path.join(KOK, d))
+  const oku = (d: string) => fs.readFileSync(path.join(KOK, d), 'utf8')
+  const isAkislari = uretici.isAkisiMetinleri(KOK)
+  const gercek = uretici.GOREVLER
+  const kopya = (): Record<string, RolGorevi> => JSON.parse(JSON.stringify(gercek))
+
+  it('gerçek veri temiz: şema geçerli, komut dosyaları var, "bağlı" kaydı depodaki gerçeğe uyuyor', () => {
+    expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, isAkislari)).toEqual([])
+  })
+
+  it('GEO-SEO ilk örnek: dört düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste)', () => {
+    const g = gercek['GEO-SEO']
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay'])
+    expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
+    expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
+  })
+
+  // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin
+  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı', () => {
+    const g = gercek['GEO-SEO'].gorevler
+    const ara = (s: string) => g.find((x) => x.siklik === s)
+    expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'hayir' })
+    expect(ara('her-dagitim-gunluk')?.tetikAyrinti).toMatch(/günlük schedule/)
+    expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', baglayacak: 'ARAC' })
+    expect(ara('haftalik')?.tetikAyrinti).toMatch(/ARC-28/)
+    expect(ara('aylik')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC' })
+    expect(ara('aylik')?.tetikAyrinti).toMatch(/ARC-27/)
+    expect(JSON.stringify(g)).not.toMatch(/REC-502/)
+  })
+
+  it('GEO-SEO kartı Amaç ve Düzenli görevler bölümünü Yönetim\'den sonra, Dosyalar\'dan önce taşır; Durum artık "Kapalı" demez', () => {
+    const kart = uretici.uret()['GEO-SEO']
+    const i = (b: string) => kart.indexOf(b)
+    expect(i('## Yönetim (karar 201)')).toBeGreaterThan(-1)
+    expect(i('## Amaç')).toBeGreaterThan(i('## Yönetim (karar 201)'))
+    expect(i('## Düzenli görevler')).toBeGreaterThan(i('## Amaç'))
+    expect(i('## Dosyalar')).toBeGreaterThan(i('## Düzenli görevler'))
+    expect(kart).toContain('docs/roller/GEO-SEO-gorevler.md')
+    expect(kart.slice(kart.indexOf('## Durum'), kart.indexOf('## Recep kapıları'))).not.toMatch(/Kapalı/)
+  })
+
+  it('verisi olmayan rolün kartında bölüm yok; eksik roller sayılır ve GEO-SEO onlar arasında değil', () => {
+    const eksik = uretici.gorevEksikRoller()
+    expect(eksik).not.toContain('GEO-SEO')
+    expect(eksik.length).toBe(roller.length - Object.keys(gercek).length)
+    for (const ad of eksik) {
+      const kart = uretici.uret()[ad]
+      expect(kart, `${ad} kartında veri yokken bölüm olmamalı`).not.toContain('## Düzenli görevler')
+    }
+  })
+
+  it('docs/roller/<ROL>-gorevler.md üreticiyle bire bir aynı (elle düzenleme yok)', () => {
+    for (const [ad, metin] of Object.entries(uretici.uretGorevler())) {
+      const yol = path.join(KOK, 'docs', 'roller', uretici.gorevDosyaAdi(ad))
+      expect(fs.existsSync(yol), `${yol} yok — node scripts/belge/rol-karti-uret.cjs --yaz`).toBe(true)
+      expect(fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n'), `${ad} görev dosyası üreticiden sapmış`).toBe(metin)
+    }
+  })
+
+  // Kart bayt payı dar (SATIS sert sınırın %93'ünde, OPS 10-03): kart cetvele atıf yapmaz, yalnız görev dosyasının
+  // yolunu verir; cetvele atıf görev dosyasında ve README haritasında durur.
+  it('cetvel gerçek dosya, README haritasında satırı var, görev dosyası ona atıf yapar, kart görev dosyasını gösterir', () => {
+    const cetvel = 'docs/standards/duzenli-gorevler-standard.md'
+    expect(varMi(cetvel)).toBe(true)
+    expect(oku('docs/README.md')).toContain('standards/duzenli-gorevler-standard.md')
+    expect(uretici.uretGorevler()['GEO-SEO']).toContain(cetvel)
+    expect(uretici.uret()['GEO-SEO']).toContain('docs/roller/GEO-SEO-gorevler.md')
+  })
+
+  it('AYIRT EDİCİLİK: kanıtsız "bağlı: evet" yakalanır (iş akışı var ama komutu çağırmıyor)', () => {
+    const v = kopya()
+    Object.assign(v['GEO-SEO'].gorevler[0], { bagli: 'evet', tetikAyrinti: '.github/workflows/e2e-smoke.yml' })
+    expect(uretici.gorevSorunlari(v, roller, varMi, oku, isAkislari).join('\n')).toMatch(/bağlı: evet ama .*çağrılmıyor/)
+    Object.assign(v['GEO-SEO'].gorevler[0], { tetikAyrinti: '.github/workflows/olmayan-dosya.yml' })
+    expect(uretici.gorevSorunlari(v, roller, varMi, oku, isAkislari).join('\n')).toMatch(/tetik dosyası yok/)
+  })
+
+  it('AYIRT EDİCİLİK: iş akışı komutu çağırmaya başlayınca "bağlı: hayır" kaydı bayat sayılır', () => {
+    const sahte = [`jobs:\n  canli:\n    steps:\n      - run: node scripts/seo/canli-kapi.mjs --taban https://venthub.com.tr`]
+    expect(uretici.gorevSorunlari(gercek, roller, varMi, oku, sahte).join('\n')).toMatch(/bağlı: evet yazılmalı \(kayıt bayat\)/)
+  })
+
+  it('AYIRT EDİCİLİK: geçersiz alan, bilinmeyen rol, eksik kuracak rol, uzun amaç, taslak eşik, yok komut ve çift görev yakalanır', () => {
+    const s = (f: (v: Record<string, RolGorevi>) => void) => {
+      const v = kopya()
+      f(v)
+      return uretici.gorevSorunlari(v, roller, varMi, oku, isAkislari).join('\n')
+    }
+    expect(s((v) => (v['GEO-SEO'].gorevler[0].siklik = 'yarin'))).toMatch(/sıklık geçersiz/)
+    expect(s((v) => (v['GEO-SEO'].gorevler[0].tetik = 'elle'))).toMatch(/tetik geçersiz/)
+    expect(s((v) => (v['GEO-SEO'].gorevler[0].bagli = 'belki'))).toMatch(/bağlı alanı geçersiz/)
+    expect(s((v) => (v.OLMAYANROL = v['GEO-SEO']))).toMatch(/OLMAYANROL: bilinmeyen rol/)
+    expect(s((v) => delete v['GEO-SEO'].gorevler[0].baglayacak)).toMatch(/kuracak rol/)
+    expect(s((v) => (v['GEO-SEO'].amac = 'a'.repeat(uretici.AMAC_SINIRI + 1)))).toMatch(/amaç .* aşıyor/)
+    expect(s((v) => (v['GEO-SEO'].gorevler[1].esik = 'Eşik belli'))).toMatch(/TASLAK ile başlamalı/)
+    expect(s((v) => (v['GEO-SEO'].gorevler[0].komut = 'scripts/seo/yok.mjs'))).toMatch(/komut dosyası yok/)
+    expect(s((v) => (v['GEO-SEO'].gorevler[1].gorev = v['GEO-SEO'].gorevler[0].gorev))).toMatch(/aynı görev iki kez/)
+    expect(s((v) => (v['GEO-SEO'].gorevler = []))).toMatch(/düzenli görev yok/)
+    expect(s((v) => (v['GEO-SEO'].amac = ''))).toMatch(/amaç yok/)
+    // OPS kararı 10-03: Amaç TEK cümle (kart bayt payı); ikinci cümle kapıda KIRMIZI
+    expect(s((v) => (v['GEO-SEO'].amac = 'Birinci cümle. İkinci cümle.'))).toMatch(/amaç tek cümle olmalı/)
+    expect(s((v) => (v['GEO-SEO'].amac = 'Tek cümle; noktalı virgülle uzar ve sonda nokta var.'))).not.toMatch(/amaç/)
+  })
+
+  it('AYIRT EDİCİLİK: kartlardan Amaç ya da Düzenli görevler bölümü silinirse kart denetimi yakalar', () => {
+    const kartlar = uretici.uret()
+    const bozuk = { ...kartlar, 'GEO-SEO': kartlar['GEO-SEO'].replace(/## Amaç\n[^\n]*\n\n/, '') }
+    expect(uretici.sorunlar(bozuk).join('\n')).toMatch(/GEO-SEO: ## Amaç bölümü eksik/)
+    const bozuk2 = { ...kartlar, 'GEO-SEO': kartlar['GEO-SEO'].replace(/## Düzenli görevler\n[^\n]*\n\n/, '') }
+    expect(uretici.sorunlar(bozuk2).join('\n')).toMatch(/GEO-SEO: ## Düzenli görevler bölümü eksik/)
   })
 })
