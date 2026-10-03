@@ -13,6 +13,7 @@ expect.extend(matchers)
 // sahte "Recep sözü" yazmasın. Her testin kancası bu ortamı miras alır; defter geçici dizine yönlenir.
 // Yönlendirmeyi ve temizliği koşum başına `vitest.global-setup.ts` yapar (ARC-21). Aşağıdaki satır yalnız
 // o çalışmadıysa (tek dosya, farklı koşucu) güvenlik ağıdır: BENZERSİZ ad, sabit ad değil.
+// Bu yolda oluşan dosya TEMİZLENMEZ (silecek ana süreç kapanışı yok); yalnız istisnai yolda kalır, işletim sistemi geçici dizini siler.
 process.env.VENTHUB_RECEP_DEFTER ??= join(tmpdir(), `vitest-recep-defter-${process.pid}-${randomUUID()}.jsonl`)
 
 // Log unhandled rejections to help diagnose silent exits
