@@ -40,10 +40,10 @@ Sütunlar: **Ön yükle** = çalışan tanımının `skills:` alanına girer (to
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), venthub-architecture (6,5K, y) | 11,9K | — | — |
-| Uygulayıcı | i18n-conventions (14,2K), venthub-architecture (6,5K, y), vercel-composition-patterns (4,8K, y) | 25,5K | create-migration (6,3K), vercel-react-best-practices (9,1K, y), ui-ux-pro-max (13,6K) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K, y), web-design-guidelines (4K, y), webapp-testing (3,9K, y), accessibility (14,5K, y) | 31,3K | — | diff-review: REC-514 kapanınca eklenir (ADMIN doğrulayıcı "evet") |
+| Araştırmacı | codegraph (5,4K, y), venthub-architecture (6,5K, y) | 11,9K | codebase-navigation (8,2K, y), web-platform-baseline (9,8K, y) | — |
+| Uygulayıcı | i18n-conventions (14,2K), venthub-architecture (6,5K, y), vercel-composition-patterns (4,8K, y) | 25,5K | create-migration (6,3K), vercel-react-best-practices (9,1K, y), ui-ux-pro-max (13,6K), testing (9,5K, y), debugging (9,8K, y), react-modern (9,8K, y), typescript-strict (8,5K, y), observability (7,9K, y), api-design (8,7K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K, y), web-design-guidelines (4K, y), webapp-testing (3,9K, y), accessibility (14,5K, y) | 32,7K | code-review (9K, y) | diff-review: REC-514 kapanınca eklenir (ADMIN doğrulayıcı "evet") |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -61,10 +61,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), investigate (6K, y) | 11,4K | fallow (16,4K) | — |
-| Uygulayıcı | create-migration (6,3K) | 6,3K | — | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | venthub-enterprise-audit: dört denetim skill'i aynı işe talip; yan yana koşum yapılmadan biri seçilmez; venthub-auditor: aynı kıyas; venthub-20-eksen-denetimi: aynı kıyas; venthub-global-rontgen: aynı kıyas; ayrıca bayat yol/araç adları; diff-review: REC-514 kapanınca eklenir |
+| Araştırmacı | codegraph (5,4K), investigate (6K, y) | 11,4K | fallow (16,4K), research-web (18,2K, y), codebase-navigation (8,2K, y) | — |
+| Uygulayıcı | create-migration (6,3K), testing (9,5K, y) | 15,8K | debugging (9,8K, y), node-modern (8,5K, y), observability (7,9K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | venthub-enterprise-audit: dört denetim skill'i aynı işe talip; yan yana koşum yapılmadan biri seçilmez; venthub-auditor: aynı kıyas; venthub-20-eksen-denetimi: aynı kıyas; venthub-global-rontgen: aynı kıyas; ayrıca bayat yol/araç adları; diff-review: REC-514 kapanınca eklenir |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -78,10 +78,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), investigate (6K) | 11,4K | — | — |
+| Araştırmacı | codegraph (5,4K, y), investigate (6K) | 11,4K | research-web (18,2K, y), codebase-navigation (8,2K, y) | — |
 | Uygulayıcı | — | — | mcp-builder (9,1K, y) | wrongstack-kanban: müdür düzeyi: çalışan başka pencereye yazmaz, kartı müdür yönetir (§10.4, belge §6); wrongstack-mailbox-mcp: müdür düzeyi: pencereler arası posta çalışanın işi değil; örnek yapılandırmada --admin ve mcp_use var (§10.4); guard: careful, freeze, guard üçlüsü kıyas bekliyor; careful: aynı kıyas; freeze: aynı kıyas |
-| Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Çürütücü | plan-challenger (14,6K), chimera (16,9K, y) | 31,5K | bug-hunter (18K, y), security-scanner (12,7K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -93,10 +93,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | — | — | — | — |
+| Araştırmacı | research-web (18,2K, y) | 18,2K | — | — |
 | Uygulayıcı | — | — | diagram (16K) | — |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -108,10 +108,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y), investigate (6K, y) | 11,4K | — | — |
-| Uygulayıcı | create-migration (6,3K) | 6,3K | supabase (18,8K) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K, y) | 29,0K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | venthub-global-rontgen: bayat yol ve araç adları (src/app/products/[slug] yok, npm run build), edge fonksiyonlarına dair tek madde var; bağımsız doğrulayıcı UYMAZ dedi; diff-review: REC-514 kapanınca eklenir (edge için D11 yanlış alarmı düzelmeli) |
+| Araştırmacı | codegraph (5,4K, y), investigate (6K, y) | 11,4K | codebase-navigation (8,2K, y) | — |
+| Uygulayıcı | create-migration (6,3K), testing (9,5K, y) | 15,8K | supabase (18,8K), debugging (9,8K, y), typescript-strict (8,5K, y), node-modern (8,5K, y), observability (7,9K, y), api-design (8,7K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K, y) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | venthub-global-rontgen: bayat yol ve araç adları (src/app/products/[slug] yok, npm run build), edge fonksiyonlarına dair tek madde var; bağımsız doğrulayıcı UYMAZ dedi; diff-review: REC-514 kapanınca eklenir (edge için D11 yanlış alarmı düzelmeli) |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -125,10 +125,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 17,9K | — | — |
+| Araştırmacı | codegraph (5,4K), search-console (12,5K) | 17,9K | research-web (18,2K, y), web-platform-baseline (9,8K, y) | — |
 | Uygulayıcı | — | — | — | — |
-| Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | accessibility (14,5K, y) | — |
+| Çürütücü | plan-challenger (14,6K), chimera (16,9K, y) | 31,5K | bug-hunter (18K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | accessibility (14,5K, y) | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -142,10 +142,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K) | 5,4K | graphify (42,6K) | — |
+| Araştırmacı | codegraph (5,4K) | 5,4K | graphify (43,1K), codebase-navigation (8,2K, y) | — |
 | Uygulayıcı | — | — | — | document-generate: commit ve push adımı var, sabit Co-Authored-By yazıyor, docs/ harita cetvelini atlıyor; uyarlanmadan verilmez; document-release: commit ve push yapıyor, VERSION ve TODOS.md varsayıyor, CLAUDE.md düzenliyor; uyarlanmadan verilmez |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -161,10 +161,10 @@ I18N'in rapor dosyası yok; set yalnız SKILL.md okumasına dayanıyor. Departma
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y) | 5,4K | — | — |
-| Uygulayıcı | i18n-conventions (14,2K, y) | 14,2K | — | — |
-| Çürütücü | plan-challenger (14,6K, y) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K, y), i18n-conventions (14,2K, y) | 23,1K | — | — |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | codebase-navigation (8,2K, y), web-platform-baseline (9,8K, y) | — |
+| Uygulayıcı | i18n-conventions (14,2K, y), testing (9,5K, y) | 23,7K | debugging (9,8K, y) | — |
+| Çürütücü | plan-challenger (14,6K, y), chimera (16,9K, y) | 31,5K | bug-hunter (18K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K, y), i18n-conventions (14,2K, y), code-review (9K, y) | 33,5K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -176,10 +176,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K) | 5,4K | — | pdf: K15: PDF doğrudan açılmaz, önce KAYNAK DİZİNİ; verilirse çalışan kural 15'i çiğneyebilir |
+| Araştırmacı | codegraph (5,4K) | 5,4K | research-web (18,2K, y), codebase-navigation (8,2K, y) | pdf: K15: PDF doğrudan açılmaz, önce KAYNAK DİZİNİ; verilirse çalışan kural 15'i çiğneyebilir |
 | Uygulayıcı | — | — | xlsx (8,5K), supabase (18,8K) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K), code-review (9K, y) | 19,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -194,10 +194,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | pdf (8,2K) | 8,2K | — | notebook-navigator: ücret sınıfı belirsiz (NotebookLM Google hesabı); ücretli ve belirsiz olanlar sonraya bırakılıyor |
+| Araştırmacı | pdf (8,2K), research-web (18,2K, y) | 26,4K | — | notebook-navigator: ücret sınıfı belirsiz (NotebookLM Google hesabı); ücretli ve belirsiz olanlar sonraya bırakılıyor |
 | Uygulayıcı | — | — | — | — |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -209,10 +209,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y) | 5,4K | — | — |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | codebase-navigation (8,2K, y) | — |
 | Uygulayıcı | — | — | — | to-issues: D2: yerel task.md yazıyor, Linear kaydı açmıyor |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | llm-council: orkestrasyon skill'i; müdür ve ekip lideri kullanır, çalışana verilmez (kural 5); prd-complexity-audit: NotebookLM ikizi ve çok-ajanlı Workflow bağımlılığı; müdür düzeyi |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -224,10 +224,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K, y) | 5,4K | — | supabase-postgres-best-practices: supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8, 10-01); projeye alınırsa ya da eklenti açılırsa eklenir |
-| Uygulayıcı | create-migration (6,3K) | 6,3K | supabase (18,8K) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K, y), webapp-testing (3,9K) | 12,8K | — | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
+| Araştırmacı | codegraph (5,4K, y) | 5,4K | research-web (18,2K, y), codebase-navigation (8,2K, y) | supabase-postgres-best-practices: supabase eklentisi bu makinede etkin değil, skill çözülmüyor (YTN-8, 10-01); projeye alınırsa ya da eklenti açılırsa eklenir |
+| Uygulayıcı | create-migration (6,3K), testing (9,5K, y) | 15,8K | supabase (18,8K), debugging (9,8K, y), typescript-strict (8,5K, y), api-design (8,7K, y) | supabase-postgres-best-practices: aynı neden (YTN-8, 10-01) |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y), security-scanner (12,7K, y), data-governance (10K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K, y), webapp-testing (3,9K), code-review (9K, y) | 23,2K | — | diff-review: REC-514 kapanınca eklenir (SATIS doğrulayıcı listesinde) |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -242,10 +242,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | venthub-tasarim-dili (11,4K) | 11,4K | browse (29,9K, y) | — |
-| Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K) | 18,7K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
+| Araştırmacı | venthub-tasarim-dili (11,4K) | 11,4K | browse (29,9K, y), web-platform-baseline (9,8K, y) | — |
+| Uygulayıcı | typography (7,3K), venthub-tasarim-dili (11,4K), react-modern (9,8K, y) | 28,5K | ui-ux-pro-max (13,6K, y), design-dna (8,3K, y) | — |
 | Çürütücü | plan-challenger (14,6K), web-design-guidelines (4K) | 18,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K), accessibility (14,5K), webapp-testing (3,9K, y) | 27,3K | — | — |
+| Doğrulayıcı | verify-before-done (10,3K), accessibility (14,5K), webapp-testing (3,9K, y) | 28,7K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -262,10 +262,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | codegraph (5,4K), investigate (6K, y), venthub-architecture (6,5K, y) | 17,9K | — | — |
-| Uygulayıcı | i18n-conventions (14,2K), venthub-tasarim-dili (11,4K), venthub-architecture (6,5K, y) | 32,1K | vercel-composition-patterns (4,8K, y), vercel-react-best-practices (9,1K, y), threejs-webgl-performance (22,4K, y) | — |
-| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K), accessibility (14,5K), web-design-guidelines (4K, y), webapp-testing (3,9K) | 31,3K | canary (52K, y), benchmark (28,6K, y) | diff-review: REC-514 kapanınca eklenir (URUN doğrulayıcı "evet") |
+| Araştırmacı | codegraph (5,4K), investigate (6K, y), venthub-architecture (6,5K, y) | 17,9K | codebase-navigation (8,2K, y), web-platform-baseline (9,8K, y) | — |
+| Uygulayıcı | i18n-conventions (14,2K), venthub-tasarim-dili (11,4K), venthub-architecture (6,5K, y) | 32,1K | vercel-composition-patterns (4,8K, y), vercel-react-best-practices (9,1K, y), threejs-webgl-performance (22,4K, y), testing (9,5K, y), debugging (9,8K, y), react-modern (9,8K, y), typescript-strict (8,5K, y), observability (7,9K, y) | — |
+| Çürütücü | plan-challenger (14,6K), supabase-security (14,4K) | 29,0K | chimera (16,9K, y), bug-hunter (18K, y) | — |
+| Doğrulayıcı | verify-before-done (10,3K), accessibility (14,5K), web-design-guidelines (4K, y), webapp-testing (3,9K) | 32,7K | canary (52K, y), benchmark (28,6K, y), code-review (9K, y) | diff-review: REC-514 kapanınca eklenir (URUN doğrulayıcı "evet") |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -284,10 +284,10 @@ Bu bölümdeki skill'lerde dikkat:
 
 | Tür | Ön yükle | Toplam | Adıyla çağır | Bekleyen (neden) |
 |---|---|---|---|---|
-| Araştırmacı | — | — | find-skills (7,4K), task-observer (7,4K, y) | — |
+| Araştırmacı | — | — | find-skills (7,4K), task-observer (7,4K, y), research-web (18,2K, y) | — |
 | Uygulayıcı | — | — | skill-creator (32,4K) | skills-creator: D9 kapanınca eklenir (.agent ağacına yazıyor) |
 | Çürütücü | plan-challenger (14,6K) | 14,6K | — | — |
-| Doğrulayıcı | verify-before-done (8,9K) | 8,9K | — | — |
+| Doğrulayıcı | verify-before-done (10,3K) | 10,3K | — | — |
 
 Bu bölümdeki skill'lerde dikkat:
 
@@ -308,39 +308,66 @@ Bu bölümdeki skill'lerde dikkat:
 | careful, freeze, guard | Üçlü aynı kanca alanında; kıyas bekliyor. | ARAÇ ile yan yana koşum |
 | document-generate, document-release | Commit ve push yapıyor, CLAUDE.md düzenliyor. HARİTA yazma alanı. | Uyarlama, HARİTA ile |
 
-## 6. WrongStack skill'leri alınınca eklenecekler (henüz sette YOK)
+## 6. WrongStack skill'lerinin bağlanması (YTN-11, 2026-10-03)
 
-36 skill'in incelemesi bitti (`C:/tmp/venthub-skill-ihtiyac/wrongstack-skill-inceleme.md`), etkin ağaca alma adımı sürüyor. Aşağıdaki yerleşim **öneridir**; skill etkin ağaçta olmadan `skills:` alanına yazılamaz. Ön yükleme bütçesi dolu olan setlere (ADMIN ve URUN doğrulayıcı 31,3K, URUN uygulayıcı 32,1K) eklemek takas ister: ya bir skill "adıyla çağır"a iner ya da yeni skill oraya konur.
+Ölçüm (OPS, 10-03): 10-01'de alınan 15 WrongStack skill'inden 14'ü hiçbir çalışan tanımında yoktu (yalnız verify-before-done 15 tanımda); son 10 günde oturum dökümlerinde Skill çağrısı verify-before-done 3, code-review 1, kalan 13 skill 0. Kök: bu belgenin setleri skill'ler gelmeden ÖNCE yazılmıştı, eski §6 yalnız öneri tablosuydu ve hiçbir mekanik onu sete çevirmedi. PR 3'ün dokuz skill'i (security-scanner, typescript-strict, codebase-navigation, react-modern, data-governance, api-design, observability, node-modern, web-platform-baseline) aynı sebeple bağsızdı; onlar da burada. Boyutlar diskteki SKILL.md'dir (eski tablodaki tahminler küçüktü; uyarlama ekleriyle code-review 9,0K, bug-hunter 18,0K oldu).
 
-| Skill | Önerilen tür | Departmanlar | Karar (incelemeden) |
-|---|---|---|---|
-| code-review (5,2K) | Doğrulayıcı | ADMIN URUN EDGE ALTYAPI ARAC SATIS I18N KATALOG GEO-SEO | AL |
-| bug-hunter (14,0K) | Araştırmacı, Doğrulayıcı | kod departmanları ve YETENEK | UYARLA-AL (araç adı eşlemesi, `any` şiddeti, cascade modu uygulanmaz) |
-| chimera (12,5K) | Doğrulayıcı, Çürütücü (ağır) | ADMIN URUN EDGE ALTYAPI SATIS I18N KATALOG ARAC GEO-SEO | UYARLA-AL |
-| testing (5,8K) | Uygulayıcı | kod departmanları | AL |
-| debugging (6,2K) | Uygulayıcı | kod departmanları | AL |
-| codebase-navigation (4,9K) | Araştırmacı | kod okuyan herkes | UYARLA-AL (tireli araç adlarının altçizgiliye eşlenmesi) |
-| research-web (14,3K) | Araştırmacı | MEVZUAT BLOG GEO-SEO ALTYAPI KATALOG ARAC YETENEK SATIS | UYARLA-AL (bilgi kaynağı sırası: kaynak dizini web'den önce) |
-| typescript-strict (5,3K) | Uygulayıcı | ADMIN EDGE URUN SATIS KATALOG ARAC | AL |
-| node-modern (5,2K) | Uygulayıcı | ARAC ALTYAPI KATALOG GEO-SEO HARITA EDGE | AL |
-| react-modern (6,5K) | Uygulayıcı | URUN ADMIN TASARIM | AL |
-| security-scanner (8,2K) | Doğrulayıcı, Çürütücü | ALTYAPI EDGE ADMIN SATIS ARAC | UYARLA-AL (PEM başlığı örneği commit'ten ÖNCE maskelenir; npm audit → pnpm audit) |
-| data-governance (6,4K) | Çürütücü | SATIS ALTYAPI EDGE ADMIN | UYARLA-AL (tek sahip servis ilkesi kural 12'ye çevrilir, KVKK silme/saklama dili eklenir) |
-| prompt-engineering (5,6K) | Uygulayıcı (görev metni yazarken) | YETENEK ARAC HARITA OPS | AL |
-| observability (4,8K) | Uygulayıcı | EDGE ALTYAPI ADMIN URUN | AL |
-| api-design (5,1K) | Uygulayıcı | EDGE SATIS ADMIN | UYARLA-AL (para alanı pricing-standard'a bağlanır; tenant ve HMAC satırları eklenir) |
-| design-system, design-critique, design-craft (15,8K) | Uygulayıcı, Doğrulayıcı | TASARIM URUN ADMIN | UYARLA-AL (`design` aracı yok; OKLCH ve HEX örnekleri kural 8'e çevrilir) |
-| web-platform-baseline (6,2K) | Araştırmacı | TASARIM URUN ADMIN GEO-SEO I18N | UYARLA-AL |
+**Karar kuralı:** ön yükleme her açılışta çalışanın bağlamına girer, bu yüzden yalnız o türün hemen her işinde lazım olan ve setin 35 KB bütçesine sığan skill ön yüklenir; koşullu ya da sığmayan skill çalışan tanımının gövdesindeki "adıyla çağır" satırına girer. Müdür düzeyi skill çalışana verilmez (set kuralları 4 ve 5, §10.4). Hangisinin gerçekten kullanıldığı 8 Ekim denemesinde ölçülür (§8.1); kullanılmayan çıkarılır.
 
-Müdür ve ekip lideri düzeyinde kalanlar (çalışan setine girmez): multi-agent, refactor-planner, sdd, mnemosyne, wrongstack-kanban, wrongstack-mailbox-mcp.
+### 6.1 Çalışan setlerine girenler (15 skill)
 
-**Müdür çekirdeği (karar 219, 2026-10-01; YETENEK, YTN-1):** `wrongstack-kanban` **her departman penceresinin (müdürün) çekirdek skill'idir**: kart açma, havuzdan iş alma, kanıt komutuyla Done müdürün işidir. Bu satır çalışan setlerini DEĞİŞTİRMEZ ve bilerek öyle: kartı çalışan açıp kapatırsa §10.4 ("çalışan başka pencereye yazmaz") ve skill'in maliyet kuralı ("toplu yazım alt ajana verilmez", her yazma pano boyunca 7-12 KB döndürür) bozulur. Çalışan, kart okuması gerekirse (`get_task`, ~4 KB) görev metninde adı verilmiş olarak yalnız OKUR. Müdür pencerelerinde `skills:` ön yüklemesi yoktur; müdür skill'i `Skill` aracıyla adıyla çağırır, 63 proje skill'inin tamamı Sonnet 1M listesinde açıklamalıdır (10-01 kesin sayım). Hiçbir departmana bağlanmayanlar: docker-deploy, plugin-author, audit-log. Alınamayan: auto-review (çalıştıracak ana program yok).
+| Skill | Tür | Ön yükle (departman) | Adıyla çağır (departman) | Neden |
+|---|---|---|---|---|
+| code-review (9,0K) | Doğrulayıcı | ALTYAPI, ARAC, EDGE, GEO-SEO, I18N, KATALOG, SATIS | ADMIN, URUN | Bağımsız ikinci okuma (diff, doğruluk, güvenlik); verify-before-done iddiaları ölçer, code-review kodu okur. ADMIN ve URUN setleri 31 KB dolu, orada adıyla çağır. |
+| chimera (16,9K) | Çürütücü | ARAC, GEO-SEO, I18N | ADMIN, ALTYAPI, EDGE, KATALOG, SATIS, URUN | Değişikliği şiddet sıralı hata raporuna çevirir (plan-challenger planı, chimera diff'i çürütür). Çürütücü setleri supabase-security ile dolu olan altı departmanda adıyla çağır. |
+| bug-hunter (18,0K) | Çürütücü | — | ADMIN, ALTYAPI, ARAC, EDGE, GEO-SEO, I18N, KATALOG, SATIS, URUN | 18,0K: plan-challenger ile birlikte 35 KB bütçeye ancak sığıyor ve her çürütme kusur avı değil; hepsinde adıyla çağır. |
+| security-scanner (12,7K) | Çürütücü | — | ADMIN, ALTYAPI, ARAC, EDGE, SATIS | Sır, enjeksiyon, bağımlılık açığı taraması; koşullu iş, çürütücü setleri dolu: adıyla çağır. |
+| data-governance (10,0K) | Çürütücü | — | ADMIN, ALTYAPI, EDGE, SATIS | KVKK, saklama, RLS sahipliği; yalnız veri dokunan işte: adıyla çağır. |
+| testing (9,5K) | Uygulayıcı | ALTYAPI, EDGE, I18N, SATIS | ADMIN, URUN | Her kod değişikliğinde (önce kırmızı, eşik düşürme ve skip yasak): odası olan dört departmanda ön yükle, ADMIN ve URUN dolu: adıyla çağır. |
+| debugging (9,8K) | Uygulayıcı | — | ADMIN, ALTYAPI, EDGE, I18N, SATIS, URUN | Yalnız "nedeni bilinmeyen bozukluk" işinde, her görevde değil: adıyla çağır. |
+| react-modern (9,8K) | Uygulayıcı | TASARIM | ADMIN, URUN | TASARIM uygulayıcı React yazar ve odası var: ön yükle; URUN ve ADMIN dolu: adıyla çağır. |
+| typescript-strict (8,5K) | Uygulayıcı | — | ADMIN, EDGE, SATIS, URUN | Depo zaten `any` yasağı ve tip kapısıyla korunuyor; tip hatası işinde adıyla çağır. |
+| node-modern (8,5K) | Uygulayıcı | — | ALTYAPI, EDGE | Betik/CJS işinde; bizde CommonJS korunur: adıyla çağır. |
+| observability (7,9K) | Uygulayıcı | — | ADMIN, ALTYAPI, EDGE, URUN | Log, Sentry, izleme işi koşullu: adıyla çağır. |
+| api-design (8,7K) | Uygulayıcı | — | ADMIN, EDGE, SATIS | Yeni endpoint ve hata sözleşmesi işi koşullu: adıyla çağır. |
+| research-web (18,2K) | Araştırmacı | BLOG, MEVZUAT | ALTYAPI, ARAC, GEO-SEO, KATALOG, SATIS, YETENEK | 18,2K (20K sınırına yakın). MEVZUAT ve BLOG'da işin kendisi web araştırması: ön yükle (BLOG araştırmacısı bu yüzden yeni dosya). Diğerlerinde adıyla çağır. |
+| codebase-navigation (8,2K) | Araştırmacı | — | ADMIN, ALTYAPI, ARAC, EDGE, HARITA, I18N, KATALOG, OPS, SATIS, URUN | codegraph skill'i zaten ön yüklü ve aynı işe talip; yan yana koşum olmadan ön yüklenmez (set kuralı 7): adıyla çağır. |
+| web-platform-baseline (9,8K) | Araştırmacı | — | ADMIN, GEO-SEO, I18N, TASARIM, URUN | Tarayıcı desteği ve modern CSS sorusu koşullu: adıyla çağır. |
+
+`verify-before-done` değişmedi: 15 doğrulayıcı tanımında ön yüklü; "depoda olmayan üç skill'e gönderiyor" kusuru kapandı (testing, debugging, git-flow depoda).
+
+### 6.2 Müdür çekirdeği (çalışan tanımına girmez)
+
+Bunlar departman penceresinin (müdürün) kendi aracıdır; `Skill` aracıyla adıyla çağrılır, `.claude/agents` tanımlarına yazılmaz. Liste makine okur: JSON `mudurCekirdegi` alanı. **`skill-bagli.test.ts` her `.claude/skills` klasörünün ya bir sette ya bu listede olmasını ister**; yeni skill gelince bağsız kalamaz.
+
+| Skill | Departman müdürleri | Ne için |
+|---|---|---|
+| wrongstack-kanban (24,9K) | HEPSİ (15 departman) | Kart açma, havuzdan iş alma, kanıt komutuyla Done müdürün işi (karar 219); çalışan başka pencereye yazmaz (§10.4). |
+| wrongstack-mailbox-mcp (10,5K) | HEPSİ (15 departman) | Kapalı pencereye mesaj müdürün işi; açık pencereye SendMessage. Örnek yapılandırmada --admin ve mcp_use var (§10.4). |
+| multi-agent (19,9K) | HEPSİ (15 departman) | İşi çalışanlara bölme, görev metni, sonuç birleştirme: çalışanı yöneten müdürün aracı (set kuralı 5). |
+| prompt-engineering (9,4K) | YETENEK, ARAC, HARITA, OPS | Görev metni, ajan tanımı ve skill açıklaması yazarken; çalışan metin yazmaz, müdür yazar. |
+| git-flow (9,7K) | HEPSİ (15 departman) | Commit, PR, rebase, geri alma: kapı eylemi müdürün (set kuralı 4); çalışan commit atmaz. |
+| refactor-planner (17,1K) | ADMIN, ALTYAPI, ARAC, EDGE, HARITA, I18N, KATALOG, SATIS, URUN | Çok dosyalı yeniden düzenleme planı (plan yazar, uygulamaz): müdür planlar, uygulayıcı dar dosya kümesini yazar. |
+| sdd (10,8K) | ADMIN, ALTYAPI, ARAC, EDGE, HARITA, I18N, KATALOG, SATIS, URUN, OPS | Spec ve görev grafiği: planlama müdür düzeyinde; çalışana hazır kabul ölçütüyle bölünmüş iş gider. |
+| mnemosyne (13,7K) | ARAC | Sage hafıza bakımı (ARC-23): silme/arşiv yalnız öneri olarak dosyalanır; bakımı ARAÇ müdürü başlatır, sonucu OPS onaylar. |
+| maestro (12,8K) | ADMIN, ALTYAPI, ARAC, EDGE, HARITA, I18N, KATALOG, SATIS, URUN | Bölünebilir büyük değişiklik dalgaları: orkestrasyon, ekip lideri düzeyi (set kuralı 5). |
+| agy-orchestrate (12,9K) | ALTYAPI, ARAC, HARITA | Geniş tarama için agy filosu: orkestrasyon, ekip lideri düzeyi (set kuralı 5). |
+| git-commit (5,0K) | HEPSİ (15 departman) | Commit atar: kapı eylemi (set kuralı 4). |
+| qa (12,6K) | URUN, ADMIN, TASARIM, GEO-SEO | Gerçek tarayıcıda gezip hata düzeltir ve commit atar: kapı eylemi (set kuralı 4). |
+| mutasyon-testi (11,8K) | ADMIN, ALTYAPI, ARAC, EDGE, I18N, KATALOG, SATIS, URUN | Mutasyon doğrulayıcısı yazma istisnasıdır (§10.3) ve doğrulayıcı tanımında Write kapalı; ayrı çalışan türü kararına kadar müdür adıyla çağırır (§9 soru 3). |
+| notebooklm-sync (11,5K) | HARITA, OPS | Milestone/manuel senkron; NotebookLM kimlik doğrulama gerektirir. |
+| orion-cli (9,7K) | HARITA | Doküman hattı komutları (tree, şema üretimi). |
+| office-hours (11,4K) | OPS | Fikir/özellik önerisi plandan önce: karar öncesi tartışma, çalışan işi değil. |
+| to-prd (3,0K) | OPS | Konuşmayı PRD’ye çevirir: müdür/OPS düzeyi. |
+| video-kaynak (4,8K) | OPS | Video bulup NotebookLM’e kaynak ekler: seçimi Recep yapar, çalışan işi değil. |
+
+Hiçbir departmana bağlanmayanlar (eski not): docker-deploy, plugin-author, audit-log (bu depoda skill klasörü yok); alınamayan: auto-review (çalıştıracak ana program yok).
 
 ## 7. Üretici girdisi
 
 Makine okuyan kaynak: `docs/audits/skill-departman-setleri-2026-09-30.json`. HARİTA'nın kart üreticisi her `uret: true` satırı için `.claude/agents/<dept>-<tur>.md` dosyasını üretir; `skills:` alanına `onYukle[].ad` girer. Bu belge ile JSON aynı betikten çıktı, elle düzenlenmez; değişiklik betikte yapılır.
 
-- Satır sayısı: 60 (15 departman × 4 tür). Üretilecek ajan dosyası: 50. Ön yüklenecek skill olmayan 10 satırda `uret: false`, dosya üretilmez.
+- Satır sayısı: 60 (15 departman × 4 tür). Üretilecek ajan dosyası: 51 (YTN-11 ile 50 → 51: BLOG araştırmacısı research-web ile eklendi). Ön yüklenecek skill olmayan satırlarda `uret: false`, dosya üretilmez. JSON ayrıca `mudurCekirdegi` listesini taşır (§6.2); üretici onu okumaz, `skill-bagli.test.ts` okur.
 - `adiylaCagir` ve `bekleyen` alanları `skills:` alanına GİRMEZ. `adiylaCagir` çalışanın görev metnine ya da ajan tanımının gövdesine yazılacak (§9 soru 1).
 - `kaynak: "yetenek"` = departman raporunda anılmayan, YETENEK'in eklediği skill. Departman bölümünü okurken bunlara özellikle bakacak.
 - `adiylaCagir[].uyari` dolu ise ad çakışması var; o ad `skills:` alanına yazılmaz.
@@ -360,7 +387,7 @@ Model kararını (toplama Haiku, yargı Sonnet 5.5) besleyecek sayı budur. Yön
 
 1. **Adıyla çağır katmanı nerede yaşayacak?** Önerim: ajan tanımının gövdesinde tek satır ("Gerektiğinde şu skill'leri Skill aracıyla çağır: …"). OPS "gövde boş" demişti; gövde boş kalırsa müdür her görev metnine adı yazmak zorunda. Karar HARİTA ve OPS'ta.
 2. **Ad çakışması.** ÖLÇÜLDÜ (YTN-8, 10-01): aynı ad kullanıcı ve proje düzeyinde varsa `skills:` **kullanıcı düzeyinin** gövdesini yükler (kanarya `scrape`: gelen metin kullanıcı düzeyindeki gstack skill'iydi). `supabase` için proje/eklenti çakışması eklenti etkin olmadığından ölçülemedi. Çözülene kadar ikisi de ön yüklenmiyor; bugün projenin hiçbir skill adı kullanıcı düzeyiyle çakışmıyor.
-3. **Mutasyon testi skill'i (yeni, OPS talebi).** Hazır olunca tüm kod departmanlarının Doğrulayıcı setine girecek; ADMIN ve URUN doğrulayıcı setleri zaten dolu, orada takas gerekecek.
+3. **Mutasyon testi skill'i (REC-535, depoda).** Doğrulayıcının yazma istisnasıdır (§10.3) ama doğrulayıcı tanımlarında `disallowedTools: Edit, Write` var; ayrı bir "mutasyon doğrulayıcısı" türü ya da istisna kararı verilene kadar `mudurCekirdegi` listesinde, müdür adıyla çağırır (YTN-11).
 4. **Çalışan modeli.** Bu tasarım 200K çalışan için kurulu. Model Recep'le konuşuluyor; Haiku'da ön yüklemenin işe yaradığı §8 ölçümüyle görülecek.
 5. **Departman doğrulaması.** Her departman kendi bölümünü okuyup "işime yarar mı, yarıyorsa neden anmadım" diye cevaplayacak (SORU-neden-onermedin.md). Cevaplar setleri ve skill açıklamalarını düzeltir.
 
