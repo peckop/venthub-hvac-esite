@@ -559,6 +559,20 @@ describe('INV-WS-ETIKET-1 · workflow sözleşmesi (public depo, yalnız okur)',
     ).toMatch(/actions\/checkout@[0-9a-f]{40}[^\n]*\n\s+with:\s*\n(?:\s+\S[^\n]*\n)*?\s+persist-credentials:\s*false\b/)
   })
 
+  it('⭐YAPI: betiği çalıştıran `run:` kendi satırında ve `env:` altı yalnız GH_TOKEN (birleşmiş satır yok)', () => {
+    // Bu kol BİR KAZADAN doğdu: bir sabotaj geri alınırken `GH_TOKEN: ...` ile `run: ...` tek satıra yapıştı,
+    // iş akışı geçersiz YAML oldu ve bütün dize-içerir kolları yeşil kaldı. Dize aramak yapıyı ölçmez.
+    expect(w, '`run:` anahtarı kendi satırında değil (önceki satıra yapışmış)').toMatch(
+      /^\s+run:\s+node scripts\/board\/wrongstack-etiket-bak\.cjs\b/m
+    )
+    const env = /^\s+env:\s*\n((?:\s+[A-Z_]+:[^\n]*\n)+)/m.exec(w)?.[1] ?? ''
+    const anahtarlar = env.split('\n').filter(Boolean).map((s) => s.trim().split(':')[0])
+    expect(anahtarlar, 'env bloğu yalnız GH_TOKEN taşımalı').toEqual(['GH_TOKEN'])
+    // Hiçbir satırda iki anahtar-değer yan yana olamaz (`X: ${{ ... }}        run: ...`).
+    const yapisik = w.split('\n').filter((s) => /\}\}\s{2,}\w+:/.test(s))
+    expect(yapisik, `yapışık satır: ${yapisik.join(' | ')}`).toEqual([])
+  })
+
   it('betiği çağırır, GH_TOKEN yalnız github.token, dışarı yazan adım YOK', () => {
     expect(w, 'workflow kararı betiğe devretmiyor').toContain('node scripts/board/wrongstack-etiket-bak.cjs')
     expect(w).toMatch(/GH_TOKEN:\s*\$\{\{\s*github\.token\s*\}\}/)
