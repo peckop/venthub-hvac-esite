@@ -6,9 +6,9 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import {
-  KALAN_AZAMI,
   degisecekMi,
   degismeyenleriAyir,
+  KALAN_AZAMI,
   kanonikAdres,
   suzgecliKapi,
 } from '../../../../scripts/seo/yayin-kapisi.mjs'
