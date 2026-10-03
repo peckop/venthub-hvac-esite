@@ -13,6 +13,7 @@ import { resolveProductRoute } from '@/lib/data/productRoute'
 import { urunRotasiBagimliliklari } from '@/lib/data/urunSegmenti'
 import { familyName } from '@/lib/i18n/familyName'
 import { storagePathToUrl } from '@/lib/images/productImage'
+import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import {
   assertNoUuid,
@@ -114,7 +115,7 @@ export async function aileSayfasiUstVerisi(
       // ile aynıdır, uydurma metin ÜRETİLMEZ.
       const description =
         pickLang(family.meta_description, lang) ||
-        musteriyeGorunurAciklama(pickLang(family.description, lang))?.substring(0, 160) ||
+        aciklamaKirp(musteriyeGorunurAciklama(pickLang(family.description, lang))) ||
         // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
         (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
       const coverPath = variants.find((v) => v.images.length > 0)?.images[0]?.path

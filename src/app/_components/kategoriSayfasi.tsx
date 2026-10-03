@@ -9,12 +9,13 @@ import { getDictValue } from '@/i18n/getDictValue'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { kategoriKanonikAdresi } from '@/lib/data/kategoriSegmenti'
 import type { KategoriUst } from '@/lib/data/preload'
+import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani, pasifKategoriRobots } from '@/lib/seo/enYayinKurali'
 import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import { getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
+import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
 
 import { SITE_URL } from '../../config/siteUrl'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
@@ -126,9 +127,13 @@ function kategoriMetinleri(lang: string, category: DomainCategory) {
   const t = (key: string) => getDictValue(dict, key)
   const displayName = getCategoryDisplayName(category, t)
 
-  const desc = lang === 'en'
-    ? `Explore the highest quality and most economical ventilation products in the ${displayName} category.`
-    : `${displayName} kategorisindeki en kaliteli ve ekonomik havalandırma ürünlerini keşfedin.`
+  // REC-497: şablon ("en kaliteli ve ekonomik…") KALKTI. Canlı kapı 2026-10-02: 24 kategori sayfası
+  // aynı kalıpla bitiyordu ve "en kaliteli/ekonomik" sitede doğrulanamayan bir iddiaydı. Açıklama
+  // kategorinin KENDİ metninden (metadata.description_i18n, dile göre) türer; metin yoksa (pasif
+  // kategori) sözlükteki yedek cümle. Aynı metin sayfa gövdesinde de basılır, yani arama sonucu
+  // ile sayfa birbirini çürütemez.
+  const kendiMetni = aciklamaKirp(getCategoryDescription(category, lang))
+  const desc = kendiMetni || t('category.seoYedekAciklama').replace('{{ad}}', displayName)
   return { displayName, desc }
 }
 

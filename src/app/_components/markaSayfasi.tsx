@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { SITE_URL } from '@/config/siteUrl'
 import { brandText, HVAC_BRANDS } from '@/data/brands'
+import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { adresUret } from '@/utils/adresUret'
@@ -34,9 +35,17 @@ function markaMetinleri(lang: string, brand: Marka) {
   const metaTitle = isEn
     ? `${brand.name} Products and Solutions | VentHub`
     : `${brand.name} Ürünleri ve Çözümleri | VentHub`
-  const metaDescription = isEn
-    ? `${brand.name} ventilation products, technical specifications and competitive pricing at VentHub.`
-    : `${brand.name} markasının en kaliteli havalandırma ürünleri, teknik özellikleri ve avantajlı fiyatları VentHub'da.`
+  // REC-497: şablon ("en kaliteli… avantajlı fiyatları") KALKTI — canlı kapı 2026-10-02: 5 marka
+  // sayfası aynı kalıpla bitiyordu; "avantajlı fiyat" ise satış modu teklif usulü olan ve fiyat
+  // göstermeyen sitede doğrulanamayan vaatti. Açıklama markanın KENDİ kaydından (üretici sitesinden
+  // alınmış `description`, iki dilli) türer; marka adı başa eklenir ki arama sonucu kimin sayfası
+  // olduğunu söylesin. Kayıt metni marka adıyla başlıyorsa tekrar eklenmez.
+  const kayit = brandText(brand.description, lang)
+  const yerel = isEn ? 'en' : 'tr'
+  const adli = kayit.toLocaleLowerCase(yerel).startsWith(brand.name.toLocaleLowerCase(yerel))
+    ? kayit
+    : `${brand.name}: ${kayit}`
+  const metaDescription = aciklamaKirp(adli)
   return { metaTitle, metaDescription }
 }
 

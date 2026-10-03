@@ -1007,6 +1007,9 @@ export const en: typeof tr = {
     vision: 'Our Vision'
   },
   category: {
+    // REC-497: used when the category has no description of its own (metadata.description_i18n).
+    // No unverifiable "highest quality / most economical" claim; sales mode is quote-based, no price promise.
+    seoYedekAciklama: 'Browse the product families, models and technical specifications in the {{ad}} category in the VentHub catalog.',
     family: {
       variantCount: '{{count}} models',
       count: '{{count}} product families',
@@ -1986,7 +1989,7 @@ export const en: typeof tr = {
     pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
     eyebrow: 'Global Signatures of Excellence',
     exploreBrand: 'Explore Brand',
-    seoDesc: 'Industrial ventilation brands under the VentHub umbrella',
+    seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
@@ -2642,6 +2645,8 @@ export const en: typeof tr = {
     // ⛔"Results carry over into your quote request" REMOVED (2026-09-05, code review):
     // no such hand-off exists. The PR that removes promise boxes was introducing a new promise.
     aciklama: 'Run a pre-assessment from volume, airflow and pressure inputs.',
+    // REC-497: search-result description (page copy is unchanged).
+    seoDescription: 'Run a pre-assessment for duct fans, heat recovery, air curtains and jet fans from your volume, airflow and pressure inputs.',
     araclar: {
       kanal: {
         ad: 'Duct fan sizing',
