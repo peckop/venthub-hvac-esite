@@ -282,7 +282,7 @@ const HRVCalcPage: React.FC = () => {
                   label={t('calculators.hrv.form.occupancy')}
                   value={occupancy}
                   onChange={setOccupancy}
-                  unit="people"
+                  unit={t('calculators.hrv.form.unitPeople')}
                   min={0}
                   max={1000}
                   step={1}
@@ -355,20 +355,20 @@ const HRVCalcPage: React.FC = () => {
               <div className="mb-6 p-4 bg-success-green/10 rounded-xl border border-success-green/20">
                 <div className="flex items-center gap-3 mb-4">
                   <DollarSign className="text-success-green" size={24} />
-                  <h3 className="font-semibold text-industrial-gray">{t('cart.itemTotal')}</h3>
+                  <h3 className="font-semibold text-industrial-gray">{t('calculators.hrv.results.savingsTitle')}</h3>
                 </div>
                 <ResultGrid>
                   <ResultCard
-                    title="Annual Energy Saving"
+                    title={t('calculators.hrv.results.annualEnergySaving')}
                     value={result.annualEnergySaving}
-                    unit="kWh/y"
+                    unit={t('calculators.hrv.results.unitKwhPerYear')}
                     status="optimal"
                     large
                   />
                   <ResultCard
-                    title="Annual Cost Saving"
+                    title={t('calculators.hrv.results.annualCostSaving')}
                     value={result.annualCostSaving}
-                    unit="₺/y"
+                    unit={t('calculators.hrv.results.unitCostPerYear')}
                     status="optimal"
                     large
                   />
@@ -380,14 +380,14 @@ const HRVCalcPage: React.FC = () => {
                   <ResultCard
                     title={t('calculators.hrv.results.co2Reduction')}
                     value={result.co2Reduction}
-                    unit="kg/y"
+                    unit={t('calculators.hrv.results.unitKgPerYear')}
                     status="optimal"
                     description={t('calculators.hrv.results.co2Desc')}
                   />
                   <ResultCard
                     title={t('calculators.hrv.results.payback')}
                     value={result.paybackPeriod}
-                    unit="years"
+                    unit={t('calculators.hrv.results.unitYears')}
                     status={result.paybackPeriod <= 3 ? 'optimal' : 'acceptable'}
                     description={t('calculators.hrv.results.paybackDesc')}
                   />
