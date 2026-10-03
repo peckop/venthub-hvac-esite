@@ -485,6 +485,17 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('kart-plani-standard.md')
   })
 
+  it('HRT-21 (karar 251): çalışan açma kuralı her kurallar dosyasında (üretilen ve diskteki) bulunur, kartta değil', () => {
+    const kural =
+      'Salt-okuma çalışan (araştırmacı, çürütücü, doğrulayıcı) `Agent` aracıyla `name` VERİLMEDEN açılır: sonuç doğrudan açana döner ve yazma yasağı ancak böyle işler; yazan uygulayıcı ekip üyesi olarak `name` ile açılır (docs/standards/execution-method-standard.md §10.3).'
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      expect(metin, `${ad} (üretilen)`).toContain(kural)
+      const disk = fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+      expect(disk, `${ad}-kurallar.md (disk)`).toContain(kural)
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('Çalışan açma (karar 251)')
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])

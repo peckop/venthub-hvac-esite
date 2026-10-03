@@ -126,6 +126,16 @@ const KART_PLAN_KURALI = [
   '- PR başlığında ve gövdesinde kapanmaması gereken Linear numarası (REC-nn) geçmez; yalnız `Kanban: <no>` satırı yazılır (Linear\'a bağlı PR birleşince kayıt kendiliğinden Done olur, REC-508 böyle kapandı).',
 ].join('\n')
 
+/**
+ * ÇALIŞAN AÇMA KURALI (HRT-21, karar 251, 2026-10-03): kartın bayt payını yemesin diye kurallar dosyasında durur.
+ * Yöneten cetvel: `docs/standards/execution-method-standard.md` §10.3 (ARAÇ ölçümü: ekip üyesine verilen yazma yasağı işlemiyor, ARC-20).
+ * Her rolün kurallar dosyasına AYNEN girer.
+ */
+const CALISAN_ACMA_KURALI = [
+  '## Çalışan açma (karar 251)',
+  '- Salt-okuma çalışan (araştırmacı, çürütücü, doğrulayıcı) `Agent` aracıyla `name` VERİLMEDEN açılır: sonuç doğrudan açana döner ve yazma yasağı ancak böyle işler; yazan uygulayıcı ekip üyesi olarak `name` ile açılır (docs/standards/execution-method-standard.md §10.3).',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -138,6 +148,8 @@ function kuralDosyasi(ad) {
     RECEP_MESAJ_KURALLARI,
     '',
     KART_PLAN_KURALI,
+    '',
+    CALISAN_ACMA_KURALI,
     '',
   ].join('\n')
 }
