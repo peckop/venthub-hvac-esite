@@ -130,7 +130,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // lastmod YOK (REC-454): bu sayfaların güvenilir değişiklik tarihi yok. Eskiden `new Date()`
       // yazılıyordu = her üretimde "bugün değişti" → Google haritanın tarihlerine güvenmeyi bırakır.
       // Uydurma tarih yerine alan hiç yazılmaz (Google: lastmod isteğe bağlıdır).
-      changefreq: 'daily',
       priority: route === '' ? 1.0 : 0.8,
       ...siteHaritasiAlternates({
         tr: `${baseUrl}${statikYol('tr', route)}`,
@@ -156,7 +155,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}${kategoriYolu(cat, lang)}`,
       // Tarihsiz satırda `new Date()` yedeği KALDIRILDI (REC-454) — tarih yoksa alan yazılmaz.
       ...(cat.updated_at ? { lastModified: new Date(cat.updated_at) } : {}),
-      changefreq: 'weekly',
       priority: 0.7,
       ...siteHaritasiAlternates({
         tr: `${baseUrl}${kategoriYolu(cat, 'tr')}`,
@@ -184,7 +182,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     HVAC_BRANDS.map((brand) => ({
       url: `${baseUrl}${dilYolu(lang).brand(brand.slug)}`,
       // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
-      changefreq: 'weekly',
       priority: 0.6,
       ...siteHaritasiAlternates({
         tr: `${baseUrl}${dilYolu('tr').brand(brand.slug)}`,
@@ -203,7 +200,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${baseUrl}${dilYolu(lang).product(f.slug)}`,
         // REC-454: gerçek değişiklik tarihi (aile + aktif varyantlar). Seri slug'ı haritada yok → alan yazılmaz.
         ...(aileTarihleri.has(f.slug) ? { lastModified: new Date(aileTarihleri.get(f.slug) as string) } : {}),
-        changefreq: 'daily',
         priority: 0.9,
         ...siteHaritasiAlternates({
           tr: `${baseUrl}${dilYolu('tr').product(f.slug)}`,
@@ -221,7 +217,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         modeller.map((m) => ({
           url: `${baseUrl}${dilYolu(lang).product(m.aileSlug, m.sku)}`,
           ...(m.updatedAt ? { lastModified: new Date(m.updatedAt) } : {}),
-          changefreq: 'weekly',
           priority: 0.8,
           ...siteHaritasiAlternates({
             tr: `${baseUrl}${dilYolu('tr').product(m.aileSlug, m.sku)}`,
