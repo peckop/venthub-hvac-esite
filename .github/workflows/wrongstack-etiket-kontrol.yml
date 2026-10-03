@@ -48,4 +48,5 @@ jobs:
 
       - name: Son WrongStack etiketi tabandan yeni mi
         env:
-          GH_TOKEN: ${{ github.token }}        run: node scripts/board/wrongstack-etiket-bak.cjs --ozet "$GITHUB_STEP_SUMMARY"
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/board/wrongstack-etiket-bak.cjs --ozet "$GITHUB_STEP_SUMMARY"
