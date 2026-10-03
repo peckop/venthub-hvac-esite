@@ -204,7 +204,7 @@ const HRVCalcPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.form.type')}</h2>
-                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
+                <p className="text-sm text-steel-gray">{t('calculators.hrv.form.typeDesc')}</p>
               </div>
             </div>
 
@@ -247,7 +247,7 @@ const HRVCalcPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.form.usage')}</h2>
-                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.steps.dimensionsDesc')}</p>
+                <p className="text-sm text-steel-gray">{t('calculators.hrv.form.usageDesc')}</p>
               </div>
             </div>
 
@@ -328,8 +328,8 @@ const HRVCalcPage: React.FC = () => {
               <TrendingUp className="text-success-green" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.results.title')}</h2>
-              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.results.subtitle')}</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.results.title')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.hrv.results.subtitle')}</p>
             </div>
           </div>
 

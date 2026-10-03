@@ -2805,6 +2805,8 @@ export const tr = {
       description: 'Hava kanalı hız hesaplaması ve basınç düşümü tahmini',
       infoText: 'Debi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplar.',
       form: {
+        inputTitle: 'Kanal Bilgileri',
+        inputDesc: 'Debi ve kanal ölçülerini girin',
         shape: 'Kanal Tipi',
         round: 'Yuvarlak',
         roundDesc: 'Spiral veya kaynaklı boru',
@@ -2824,6 +2826,8 @@ export const tr = {
         lengthTooltip: 'Toplam kanal boyu'
       },
       results: {
+        title: 'Hesaplama Sonuçları',
+        subtitle: 'Hava hızı ve basınç kaybı değerleri',
         velocity: 'Hava Hızı',
         specificLoss: 'Basınç Kaybı (Spesifik)',
         totalLoss: 'Toplam Basınç Kaybı',
@@ -2837,6 +2841,7 @@ export const tr = {
       infoText: 'Isı geri kazanım cihazlarının (IGK) veya entalpi geri kazanım cihazlarının (ERV) yıllık enerji tasarruf potansiyelini hesaplar.',
       form: {
         type: 'Cihaz Tipi',
+        typeDesc: 'Isı geri kazanım sistemini seçin',
         hrv: 'HRV (Isı Geri Kazanım)',
         hrvDesc: 'Sadece duyulur ısı',
         erv: 'ERV (Enerji Geri Kazanım)',
@@ -2846,6 +2851,7 @@ export const tr = {
         temperate: 'Ilıman',
         hot: 'Sıcak',
         usage: 'Mahal Tipi',
+        usageDesc: 'Bina, iklim ve kullanım bilgileri',
         office: 'Ofis',
         commercial: 'Ticari',
         occupancy: 'Kişi Sayısı',
@@ -2856,6 +2862,8 @@ export const tr = {
         area: 'Alan (m²)'
       },
       results: {
+        title: 'Hesaplama Sonuçları',
+        subtitle: 'Tahmini yıllık enerji tasarrufu',
         heatingGain: 'Isıtma Kazancı',
         coolingGain: 'Soğutma Kazancı',
         co2Reduction: 'CO₂ Azaltımı',

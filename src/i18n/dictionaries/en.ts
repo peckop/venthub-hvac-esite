@@ -2772,6 +2772,8 @@ export const en: typeof tr = {
       description: 'Air duct velocity calculation and pressure drop estimation',
       infoText: 'Calculates air velocity and estimated pressure loss based on flow rate and duct dimensions.',
       form: {
+        inputTitle: 'Duct Details',
+        inputDesc: 'Enter airflow and duct dimensions',
         shape: 'Duct Type',
         round: 'Circular',
         roundDesc: 'Spiral or welded pipe',
@@ -2791,6 +2793,8 @@ export const en: typeof tr = {
         lengthTooltip: 'Total duct length'
       },
       results: {
+        title: 'Calculation Results',
+        subtitle: 'Air velocity and pressure loss values',
         velocity: 'Air Velocity',
         specificLoss: 'Pressure Loss (Specific)',
         totalLoss: 'Total Pressure Loss',
@@ -2804,6 +2808,7 @@ export const en: typeof tr = {
       infoText: 'Calculates annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units (ERV).',
       form: {
         type: 'Device Type',
+        typeDesc: 'Select the heat recovery system',
         hrv: 'HRV (Heat Recovery)',
         hrvDesc: 'Heat recovery only',
         erv: 'ERV (Energy Recovery)',
@@ -2813,6 +2818,7 @@ export const en: typeof tr = {
         temperate: 'Temperate',
         hot: 'Hot',
         usage: 'Space Type',
+        usageDesc: 'Building, climate and usage details',
         office: 'Office',
         commercial: 'Commercial',
         occupancy: 'Number of People',
@@ -2823,6 +2829,8 @@ export const en: typeof tr = {
         area: 'Area (m²)'
       },
       results: {
+        title: 'Calculation Results',
+        subtitle: 'Estimated annual energy savings',
         heatingGain: 'Heating Gain',
         coolingGain: 'Cooling Gain',
         co2Reduction: 'CO₂ Reduction',
