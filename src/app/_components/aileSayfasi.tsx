@@ -114,7 +114,7 @@ export async function aileSayfasiUstVerisi(
       // Süzgeç null döndürünce zincir bir sonraki halkaya düşer — davranış "açıklama yok"
       // ile aynıdır, uydurma metin ÜRETİLMEZ.
       const description =
-        pickLang(family.meta_description, lang) ||
+        aciklamaKirp(pickLang(family.meta_description, lang)) ||
         aciklamaKirp(musteriyeGorunurAciklama(pickLang(family.description, lang))) ||
         // Son çare SEO açıklaması — sözlük yok (RSC metadata), dil koşuluyla çözülür.
         (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')

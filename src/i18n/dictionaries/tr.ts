@@ -1061,6 +1061,10 @@ export const tr = {
     eyebrow: 'Mükemmelliğin Global İmzaları',
     exploreBrand: 'Markayı Keşfedin',
     seoDesc: 'VentHub kataloğundaki endüstriyel havalandırma ve HVAC markaları. Her markanın ürün ailelerini, modellerini ve teknik özelliklerini inceleyin.',
+    // REC-497: marka kaydındaki üretici övgüsü ("dünya lideri" vb.) arama açıklamasından atılınca kalan metin
+    // kısa kalırsa ya da hiç kalmazsa kullanılır. Yalnız kayıttaki doğrulanabilir alan (uzmanlık) konuşur.
+    seoYedekUzmanlik: 'VentHub kataloğunda {{uzmanlik}} alanındaki ürünleri inceleyin.',
+    seoYedek: '{{ad}} markasının ürün ailelerini, modellerini ve teknik özelliklerini VentHub kataloğunda inceleyin.',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',

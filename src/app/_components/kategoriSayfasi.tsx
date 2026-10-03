@@ -133,7 +133,7 @@ function kategoriMetinleri(lang: string, category: DomainCategory) {
   // kategori) sözlükteki yedek cümle. Aynı metin sayfa gövdesinde de basılır, yani arama sonucu
   // ile sayfa birbirini çürütemez.
   const kendiMetni = aciklamaKirp(getCategoryDescription(category, lang))
-  const desc = kendiMetni || t('category.seoYedekAciklama').replace('{{ad}}', displayName)
+  const desc = kendiMetni || aciklamaKirp(t('category.seoYedekAciklama').replace('{{ad}}', displayName))
   return { displayName, desc }
 }
 

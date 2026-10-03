@@ -2,8 +2,12 @@ import type { Metadata } from 'next'
 
 import { SITE_URL } from '@/config/siteUrl'
 import { brandText, HVAC_BRANDS } from '@/data/brands'
-import { aciklamaKirp } from '@/lib/seo/aciklamaKirp'
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
+import { getDictValue } from '@/i18n/getDictValue'
+import { ACIKLAMA_ASGARI, aciklamaKirp } from '@/lib/seo/aciklamaKirp'
 import { hreflangAlani } from '@/lib/seo/enYayinKurali'
+import { ovguCumleleriniAt, ovguVarMi } from '@/lib/seo/ovguAyikla'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { adresUret } from '@/utils/adresUret'
 import { Routes } from '@/utils/routes'
@@ -40,11 +44,22 @@ function markaMetinleri(lang: string, brand: Marka) {
   // göstermeyen sitede doğrulanamayan vaatti. Açıklama markanın KENDİ kaydından (üretici sitesinden
   // alınmış `description`, iki dilli) türer; marka adı başa eklenir ki arama sonucu kimin sayfası
   // olduğunu söylesin. Kayıt metni marka adıyla başlıyorsa tekrar eklenmez.
-  const kayit = brandText(brand.description, lang)
+  // Üreticinin kanıtsız üstünlük cümleleri ("dünya lideri", "en geniş ürün gamı") atılır (çürütücü bulgusu 10);
+  // kalan metin kısa kalırsa ya da hiç kalmazsa kayıttaki doğrulanabilir alan (uzmanlık) cümlesi eklenir.
+  const dict = isEn ? en : tr
+  const t = (key: string) => getDictValue(dict, key)
+  const kayit = ovguCumleleriniAt(brandText(brand.description, lang))
   const yerel = isEn ? 'en' : 'tr'
-  const adli = kayit.toLocaleLowerCase(yerel).startsWith(brand.name.toLocaleLowerCase(yerel))
-    ? kayit
-    : `${brand.name}: ${kayit}`
+  // Uzmanlık etiketi de kayıttan gelir: iddia taşıyorsa kullanılmaz; küçük harfe çevrilir (cümle içinde Başlık Biçimi durmaz).
+  const uzmanlikHam = brandText(brand.specialty, lang)
+  const uzmanlik = uzmanlikHam && !ovguVarMi(uzmanlikHam) ? uzmanlikHam.toLocaleLowerCase(yerel) : ''
+  const yedek = uzmanlik
+    ? t('brands.seoYedekUzmanlik').replace('{{uzmanlik}}', uzmanlik)
+    : t('brands.seoYedek').replace('{{ad}}', brand.name)
+  const govde = kayit.length >= ACIKLAMA_ASGARI ? kayit : [kayit, yedek].filter(Boolean).join(' ')
+  const adli = govde.toLocaleLowerCase(yerel).startsWith(brand.name.toLocaleLowerCase(yerel))
+    ? govde
+    : `${brand.name}: ${govde}`
   const metaDescription = aciklamaKirp(adli)
   return { metaTitle, metaDescription }
 }

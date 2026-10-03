@@ -4,6 +4,7 @@ import { HVAC_BRANDS } from '@/data/brands'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { ACIKLAMA_ASGARI, ACIKLAMA_AZAMI, aciklamaKirp } from '@/lib/seo/aciklamaKirp'
+import { ovguVarMi } from '@/lib/seo/ovguAyikla'
 import type { DomainCategory } from '@/lib/type-converters'
 
 import { kategoriSayfasiUstVerisi } from '../_components/kategoriSayfasi'
@@ -75,10 +76,33 @@ describe('marka açıklaması', () => {
         expect(d.length, `${ad}: ${d}`).toBeLessThanOrEqual(ACIKLAMA_AZAMI)
         expect(d.toLowerCase(), `${ad} adı geçmeli`).toContain(ad.toLowerCase())
         expect(d, `${ad} övgü kalıbı`).not.toMatch(YASAK_OVGU)
+        expect(ovguVarMi(d), `${ad} üstünlük iddiası (üretici sitesinden gelen "lider/en geniş/öncü"): ${d}`).toBe(false)
+        expect(d, `${ad}: sözlük anahtarı çözülmeden açıklamaya sızmış`).not.toMatch(/brands\./)
       }
       expect(new Set(aciklamalar.map((a) => a.d)).size, 'iki marka aynı açıklamayı veremez').toBe(HVAC_BRANDS.length)
     })
   }
+
+  it('tr: üstünlük cümlesi atılınca kalan iddiasız cümle korunur (Danfoss), kalmazsa uzmanlık yedeği gelir (Vortice)', () => {
+    const danfoss = String(markaUstVerisi('tr', 'danfoss').description)
+    expect(danfoss).toContain('1933')
+    expect(danfoss).toContain('VentHub kataloğunda')
+    expect(ovguVarMi(danfoss)).toBe(false)
+    const vortice = String(markaUstVerisi('tr', 'vortice').description)
+    expect(vortice.startsWith('Vortice: ')).toBe(true)
+    expect(vortice).toContain('VentHub kataloğunda')
+    expect(ovguVarMi(vortice)).toBe(false)
+  })
+
+  it('en: iddia atılınca yedek cümle gelir, ham sözlük anahtarı sızmaz (Vortice, Danfoss)', () => {
+    const vortice = String(markaUstVerisi('en', 'vortice').description)
+    expect(vortice.startsWith('Vortice: ')).toBe(true)
+    expect(vortice).toContain('VentHub catalog')
+    expect(ovguVarMi(vortice)).toBe(false)
+    const danfoss = String(markaUstVerisi('en', 'danfoss').description)
+    expect(danfoss).toContain('1933')
+    expect(danfoss).toContain('VentHub catalog')
+  })
 
   it('marka adı kayıt metninde yoksa başa eklenir, varsa tekrarlanmaz', () => {
     const avens = String(markaUstVerisi('tr', 'avens').description)

@@ -1990,6 +1990,8 @@ export const en: typeof tr = {
     eyebrow: 'Global Signatures of Excellence',
     exploreBrand: 'Explore Brand',
     seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
+    seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
+    seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
