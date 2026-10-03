@@ -551,9 +551,22 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
 
   it('GEO-SEO ilk örnek: dört düzenli görev (canlı kapı, haftalık veri, aylık resmi belge, yayın öncesi liste)', () => {
     const g = gercek['GEO-SEO']
-    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim', 'olay'])
+    expect(g.gorevler.map((x) => x.siklik).sort()).toEqual(['aylik', 'haftalik', 'her-dagitim-gunluk', 'olay'])
     expect(g.amac.length).toBeLessThanOrEqual(uretici.AMAC_SINIRI)
-    expect(g.gorevler.find((x) => x.siklik === 'her-dagitim')?.komut).toBe('scripts/seo/canli-kapi.mjs')
+    expect(g.gorevler.find((x) => x.siklik === 'her-dagitim-gunluk')?.komut).toBe('scripts/seo/canli-kapi.mjs')
+  })
+
+  // OPS 10-03 (karar 260/261, SEO-15..17, ARC-26..28): tetiği kuracak rol ARAÇ; veri bu gerçeği taşır, eski ALTYAPI/REC-502 atfı dönmesin
+  it('GEO-SEO görevlerinin tetiğini ARAÇ kuruyor: canlı kapı ve aylık belge Actions, haftalık istem satırı', () => {
+    const g = gercek['GEO-SEO'].gorevler
+    const ara = (s: string) => g.find((x) => x.siklik === s)
+    expect(ara('her-dagitim-gunluk')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC', bagli: 'hayir' })
+    expect(ara('her-dagitim-gunluk')?.tetikAyrinti).toMatch(/günlük schedule/)
+    expect(ara('haftalik')).toMatchObject({ tetik: 'istem-tazelik', baglayacak: 'ARAC' })
+    expect(ara('haftalik')?.tetikAyrinti).toMatch(/ARC-28/)
+    expect(ara('aylik')).toMatchObject({ tetik: 'actions', baglayacak: 'ARAC' })
+    expect(ara('aylik')?.tetikAyrinti).toMatch(/ARC-27/)
+    expect(JSON.stringify(g)).not.toMatch(/REC-502/)
   })
 
   it('GEO-SEO kartı Amaç ve Düzenli görevler bölümünü Yönetim\'den sonra, Dosyalar\'dan önce taşır; Durum artık "Kapalı" demez', () => {

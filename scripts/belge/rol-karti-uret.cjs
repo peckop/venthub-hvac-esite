@@ -370,7 +370,7 @@ const ROLLER = {
  */
 const GOREV_VERISI = 'scripts/belge/rol-gorevleri.json'
 const GOREV_CETVELI = 'docs/standards/duzenli-gorevler-standard.md'
-const SIKLIKLAR = { 'her-dagitim': 'her dağıtım', haftalik: 'haftalık', aylik: 'aylık', olay: 'olay' }
+const SIKLIKLAR = { 'her-dagitim': 'her dağıtım', 'her-dagitim-gunluk': 'her dağıtım + günde bir', haftalik: 'haftalık', aylik: 'aylık', olay: 'olay' }
 const TETIKLER = { actions: 'Actions', 'istem-tazelik': 'istem satırı tazelik', 'kart-kapisi': 'kart kapısı' }
 const BAGLILAR = ['evet', 'hayir']
 const AMAC_SINIRI = 260

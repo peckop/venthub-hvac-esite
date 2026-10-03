@@ -6,7 +6,7 @@
 > bölümü 16 kartın 15'inde yoktu (OPS ölçümü) ve departmanlar asli görevini kendiliğinden koşmuyordu. İlk
 > örnek GEO-SEO: dört düzenli görevin dördünün de tetiği kurulu değil (HARİTA ölçümü, 2026-10-03: `.github/workflows`
 > altında `scripts/seo` betiği çağıran dosya yok; cetvel `yayin-gorunurluk-denetim-standard.md` Y2 "workflow ALTYAPI
-> tarafından eklenecek" diyordu, eklenmemişti).
+> tarafından eklenecek" diyordu, eklenmemişti; karar 260/261'den sonra iş akışlarını ARAÇ kuruyor, ARC-26..28).
 > **Sahibi:** HARİTA (şema, üretici, test). Görev satırlarının içeriği rolün kendisinindir; tetiği kurmak tabloda
 > "kuracak" diye yazılı roldür.
 > **Durum:** v0.1 TASLAK. OPS örneği (GEO-SEO) onaylayana kadar yalnız GEO-SEO verisi var; diğer 15 rolün taslağını
@@ -37,7 +37,7 @@
 | Alan | Değerler | Anlamı |
 |---|---|---|
 | Görev | tek cümle | Ne yapılır; komut varsa parantezde betik yolu |
-| Sıklık | her dağıtım · haftalık · aylık · olay | Ne zaman koşar; "olay" = belli bir iş türü başlayınca |
+| Sıklık | her dağıtım · her dağıtım + günde bir · haftalık · aylık · olay | Ne zaman koşar; "olay" = belli bir iş türü başlayınca |
 | Tetik | Actions · istem satırı tazelik · kart kapısı | Kendiliğinden kim başlatır (aşağıdaki tablo) |
 | Bağlı mı | evet · hayır (kuracak: ROL) | Tetik bugün kurulu mu |
 | Çıktı | metin | Ne üretir ve nereye gider (Kanban kartı, kusur sahibi, cetvel PR'ı) |
@@ -47,7 +47,7 @@
 
 | Tür | Ne demek | "Bağlı: evet" kanıtı | Kuran |
 |---|---|---|---|
-| Actions | `.github/workflows` altında `workflow_run`, `schedule` ya da `push` ile koşan iş akışı | İş akışı dosyası var ve komutu çağırıyor | ALTYAPI |
+| Actions | `.github/workflows` altında `workflow_run`, `schedule` ya da `push` ile koşan iş akışı | İş akışı dosyası var ve komutu çağırıyor | ALTYAPI ya da ARAÇ (iş akışı sahibi kartta yazılı) |
 | İstem satırı tazelik | Her mesajda görünen uyarı satırı (`⚠BELGE` gibi): son koşu kaydı süreyi aşınca görevi hatırlatır | Tazelik betiği var ve görevin komutunu ya da kaydını anıyor | HARİTA (satır tasarımı); kanca altyapısı gerekirse ARAÇ |
 | Kart kapısı | Kart açılırken ya da Review'a geçerken koşan kapı | Kapı betiği var ve görevin komutunu anıyor | HARİTA |
 
@@ -62,4 +62,4 @@ belge incelemesi, yayın öncesi liste), tetiğe bağlı 0. Aylık ve haftalık 
 2. OPS her departmana kendi amaç ve görev taslağını yazdırır (rol başına ayrı kart); satırlar `rol-gorevleri.json`'a girer.
 3. 16 rol doluyken kart bayt payı yeniden ölçülür (en büyük kartta ~400 bayt pay kalıyor).
 4. Eksik veri kırmızı sayılır (şimdilik `gorevEksikRoller()` yalnız sayar).
-5. "Kuracak" rollerin kartları açılır: önce ALTYAPI'nın canlı kapı iş akışı (REC-502), sonra tazelik satırları ve kart kapısı.
+5. "Kuracak" rollerin kartları açılır; GEO-SEO için bunlar açık: ARAÇ'ta ARC-26 (canlı kapı, her dağıtım + günde bir), ARC-27 (aylık resmi belge), ARC-28 ("SEO haftalık: N gün" istem satırı); yayın öncesi liste için HARİTA'nın kart kapısı.
