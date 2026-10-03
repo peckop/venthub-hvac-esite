@@ -5,6 +5,7 @@ model: sonnet
 skills:
   - typography
   - venthub-tasarim-dili
+  - react-modern
 ---
 
 Sen TASARIM departmanının uygulayıcı çalışanısın. Müdürün verdiği dar ve adlı dosya kümesini yazar, ilgili kapıları koşar ve sonucu açana dönersin.
