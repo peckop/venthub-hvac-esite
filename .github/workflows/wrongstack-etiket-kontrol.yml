@@ -8,8 +8,9 @@ name: WrongStack etiket kontrolu
 # olmali.
 #
 # SINYAL: yeni etiket varsa is KIRMIZI biter ve ozet sayfasi etiketi, yayin notunu, karsilastirma
-# baglantisini ve npm durumunu yazar. Yeni yoksa YESIL ve sessiz. Ag hatasi KIRMIZI degil: uyari
-# satiri yazar (gecici hata her gun alarm uretirse alarm bakilmayan alarma doner).
+# baglantisini ve npm durumunu yazar. Yeni yoksa YESIL ve sessiz. GECICI ag hatasi (zaman asimi,
+# 5xx, 429) KIRMIZI degil: uyari satiri yazar (gecici hata her gun alarm uretirse alarm bakilmayan
+# alarma doner). KALICI bozulma (404, 401, 403, gecerli etiket yok) KIRMIZI: kontrol sessizce kor kalmaz.
 #
 # YALNIZ OKUR: yazma izni, secret, self-hosted runner, pull_request_target YOK; issue/PR/yorum
 # acmaz, dosya commit etmez. Karsilastirma mantigi workflow'da DEGIL, test edilen betikte:
