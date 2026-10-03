@@ -1,0 +1,55 @@
+{
+  "_aciklama": "Rol kartlarının Amaç ve Düzenli görevler verisi (OPS-27, HRT-24). Yöneten cetvel: docs/standards/duzenli-gorevler-standard.md. Üretici (scripts/belge/rol-karti-uret.cjs) kartın Amaç bölümünü ve docs/roller/<ROL>-gorevler.md tablosunu BURADAN yazar; o dosyalar elle düzenlenmez. Bağlı: evet yalnız tetik gerçekten kuruluysa yazılır (test iş akışı/betik dosyasını okuyup doğrular).",
+  "roller": {
+    "GEO-SEO": {
+      "amac": "Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.",
+      "gorevler": [
+        {
+          "gorev": "Dağıtım sonrası canlı kapı: yayındaki siteyi tek geçişte ölç (adres, başlık, açıklama, hreflang, yetim sayfa, llms.txt)",
+          "komut": "scripts/seo/canli-kapi.mjs",
+          "siklik": "her-dagitim",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows altında workflow_run + schedule (cetvel yayin-gorunurluk Y2 son satır: ALTYAPI ekleyecek, REC-502)",
+          "bagli": "hayir",
+          "baglayacak": "ALTYAPI",
+          "cikti": "Her yeni KIRMIZI için ilgili Kanban kartı (bilinen kırmızılar --bilinen ile kart numarasıyla taşınır)",
+          "esik": "Yeni KIRMIZI 0 (cetvel Y3)"
+        },
+        {
+          "gorev": "Haftalık veri incelemesi: Search Console taraması ve Googlebot gözüyle örnek sayfalar (son tarama, dizin durumu, site haritası hataları)",
+          "komut": "scripts/seo/gsc-url-denetim.mjs",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "son inceleme kaydı 8 günü aşınca uyarır (henüz yazılmadı)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Kanban kartına tek tablo notu; tabana (REC-300 taban tablosu) kıyas",
+          "esik": "TASLAK: GEO-SEO belirler. Cetvelde haftalık eşik yok; Y3 yalnız +7 ve +28 gün kıyasını ister.",
+          "taslak": true
+        },
+        {
+          "gorev": "Aylık resmi belge incelemesi: Google Search Central ve Bing Webmaster belgelerinde değişen hüküm var mı, cetvellerimiz hâlâ uyuyor mu",
+          "siklik": "aylik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "son inceleme kaydı 35 günü aşınca uyarır (henüz yazılmadı)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Değişen hüküm başına Kanban kartı ve cetvel güncellemesi (cetvel sahibi GEO-SEO)",
+          "esik": "TASLAK: hangi belgelerin kapsandığını GEO-SEO teyit eder.",
+          "taslak": true
+        },
+        {
+          "gorev": "Yayın öncesi liste: adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2 taban ve ön izleme satırları)",
+          "komut": "scripts/seo/adres-yayin-denetim.mjs",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs: arama görünürlüğüne dokunan kartta Y2 koşu notunu istemek (henüz yok)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Kusur listesi sahibine (cetvel Y4); taban dosyasının yolu Kanban kartına",
+          "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
+        }
+      ]
+    }
+  }
+}

@@ -11,6 +11,12 @@ Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük 
 - Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır; hangi rolün hangisini kullanacağını YETENEK atar.
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
+## Amaç
+Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.
+
+## Düzenli görevler
+- 4 görev, tetiğe bağlı 0: `docs/roller/GEO-SEO-gorevler.md` (cetvel: `duzenli-gorevler-standard.md`).
+
 ## Dosyalar
 scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
 
@@ -28,7 +34,7 @@ Search Console, PageSpeed ölçümü, seo-audit.
 - Gerekçeli özet: `docs/roller/GEO-SEO-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
 
 ## Durum
-Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamıştı.
+Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).

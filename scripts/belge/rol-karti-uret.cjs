@@ -291,7 +291,7 @@ const ROLLER = {
     yetki: 'Salt-okuma ölçüm ve rapor; ölçüm betikleri; durum dosyası geoseo-lane-state.md.',
     yasak: 'Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para harcatan servis Recep kapısıdır.',
     yetenek: 'Search Console, PageSpeed ölçümü, seo-audit.',
-    durum: 'Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamıştı.',
+    durum: 'Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.',
   },
   BLOG: {
     gorev: 'Rehber yazıları: taslak, kaynak ve mevzuat girdisi, yayın kalıbı denetimi.',
@@ -361,6 +361,146 @@ const ROLLER = {
   },
 }
 
+/**
+ * AMAÇ VE DÜZENLİ GÖREVLER (OPS-27, HRT-24, 2026-10-03): "Görev" tek cümledir; departman asli işini kendiliğinden
+ * koşmuyordu (örnek: SEO boşluğu). Veri `scripts/belge/rol-gorevleri.json` (rol başına amaç + görev satırları);
+ * kartta yalnız kısa "Amaç" ve tablo atfı durur, tablo `docs/roller/<ROL>-gorevler.md` dosyasındadır (kurallar
+ * dosyası gibi: kartın bayt payını yemesin). Yöneten cetvel: `docs/standards/duzenli-gorevler-standard.md`.
+ * Verisi olmayan rolün kartında bölüm yoktur; eksik roller `gorevEksikRoller()` ile sayılır (zorunluluk OPS onayından sonra).
+ */
+const GOREV_VERISI = 'scripts/belge/rol-gorevleri.json'
+const GOREV_CETVELI = 'docs/standards/duzenli-gorevler-standard.md'
+const SIKLIKLAR = { 'her-dagitim': 'her dağıtım', haftalik: 'haftalık', aylik: 'aylık', olay: 'olay' }
+const TETIKLER = { actions: 'Actions', 'istem-tazelik': 'istem satırı tazelik', 'kart-kapisi': 'kart kapısı' }
+const BAGLILAR = ['evet', 'hayir']
+const AMAC_SINIRI = 400
+
+/** Veri dosyasını okur: { ROL: { amac, gorevler: [...] } } (dosya yoksa {}). */
+function gorevVerisiOku(kok = path.resolve(__dirname, '..', '..')) {
+  const p = path.join(kok, ...GOREV_VERISI.split('/'))
+  return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')).roller || {} : {}
+}
+
+const GOREVLER = gorevVerisiOku()
+
+function gorevDosyaAdi(ad) {
+  return `${ad}-gorevler.md`
+}
+
+function gorevSayilari(g) {
+  return { toplam: g.gorevler.length, bagli: g.gorevler.filter((x) => x.bagli === 'evet').length }
+}
+
+/** Kartta kısa "Amaç" bölümü (verisi olmayan rolde boş dize). */
+function amacBolumu(ad, veri = GOREVLER) {
+  const g = veri[ad]
+  return g ? ['## Amaç', g.amac].join('\n') : ''
+}
+
+/** Kartta "Düzenli görevler" işaretçisi: sayılar + tablo dosyası atfı (verisi olmayan rolde boş dize). */
+function gorevBolumu(ad, veri = GOREVLER) {
+  const g = veri[ad]
+  if (!g) return ''
+  const { toplam, bagli } = gorevSayilari(g)
+  return [
+    '## Düzenli görevler',
+    `- ${toplam} görev, tetiğe bağlı ${bagli}: \`docs/roller/${gorevDosyaAdi(ad)}\` (cetvel: \`duzenli-gorevler-standard.md\`).`,
+  ].join('\n')
+}
+
+function hucre(s) {
+  return String(s).replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim()
+}
+
+/** Bir rolün görev tablosu dosyası (yalnız verisi olan roller için çağrılır). */
+function gorevDosyasi(ad, veri = GOREVLER) {
+  const g = veri[ad]
+  const { toplam, bagli } = gorevSayilari(g)
+  const bekleyen = {}
+  for (const x of g.gorevler) if (x.bagli !== 'evet') bekleyen[x.baglayacak] = (bekleyen[x.baglayacak] || 0) + 1
+  const bekleyenMetin = Object.entries(bekleyen).map(([r, n]) => `${r} ${n}`).join(' · ')
+  return [
+    `# DÜZENLİ GÖREVLER: ${ad}`,
+    '',
+    `> Üretilmiştir (\`scripts/belge/rol-karti-uret.cjs\`, veri: \`${GOREV_VERISI}\`); elle düzenleme. Yöneten cetvel: \`${GOREV_CETVELI}\`. Rol kartı: \`docs/roller/${dosyaAdi(ad)}\`.`,
+    '',
+    '## Amaç',
+    g.amac,
+    '',
+    '## Görevler',
+    '| Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |',
+    '|---|---|---|---|---|---|',
+    ...g.gorevler.map(
+      (x) =>
+        `| ${hucre(x.gorev)}${x.komut ? ` (\`${x.komut}\`)` : ''} | ${SIKLIKLAR[x.siklik]} | ${TETIKLER[x.tetik]}: ${hucre(x.tetikAyrinti)} | ${x.bagli === 'evet' ? 'evet' : `hayır (kuracak: ${x.baglayacak})`} | ${hucre(x.cikti)} | ${hucre(x.esik)} |`,
+    ),
+    '',
+    `${toplam} görev, tetiğe bağlı ${bagli}.${bekleyenMetin ? ` Tetiğin kurulmasını bekleyen: ${bekleyenMetin}.` : ''}`,
+    '',
+  ].join('\n')
+}
+
+/** Tüm görev dosyaları (yalnız verisi olan roller): { 'GEO-SEO': '...metin...' } */
+function uretGorevler(veri = GOREVLER) {
+  const cikti = {}
+  for (const ad of Object.keys(ROLLER)) if (veri[ad]) cikti[ad] = gorevDosyasi(ad, veri)
+  return cikti
+}
+
+/** Verisi olmayan roller (OPS-27 ölçümü: 15 kartta 0). Zorunluluk OPS onayından sonra açılır. */
+function gorevEksikRoller(veri = GOREVLER) {
+  return Object.keys(ROLLER).filter((ad) => !veri[ad])
+}
+
+/**
+ * Görev verisindeki sorunlar (boş = temiz). `varMi(yol)`: depoda dosya var mı; `oku(yol)`: dosya metni;
+ * `isAkislari`: .github/workflows altındaki dosyaların metinleri. "Bağlı: evet" kanıtsız yazılamaz (tetik
+ * dosyası var ve komutu çağırıyor), "bağlı: hayır" bayat kalamaz (iş akışı komutu çağırıyorsa evet yazılmalı).
+ * Ayırt edicilik testi bu işlevi bilerek bozulmuş veriyle çağırır.
+ */
+function gorevSorunlari(veri, roller, varMi, oku, isAkislari = []) {
+  const s = []
+  for (const [ad, g] of Object.entries(veri)) {
+    if (!roller.includes(ad)) {
+      s.push(`${ad}: bilinmeyen rol`)
+      continue
+    }
+    if (typeof g.amac !== 'string' || !g.amac.trim()) s.push(`${ad}: amaç yok`)
+    else if (g.amac.length > AMAC_SINIRI || g.amac.includes('\n')) s.push(`${ad}: amaç ${AMAC_SINIRI} karakteri ya da tek paragrafı aşıyor`)
+    if (!Array.isArray(g.gorevler) || !g.gorevler.length) {
+      s.push(`${ad}: düzenli görev yok`)
+      continue
+    }
+    const gorulen = new Set()
+    g.gorevler.forEach((x, i) => {
+      const n = `${ad} görev ${i + 1}`
+      for (const alan of ['gorev', 'tetikAyrinti', 'cikti', 'esik']) {
+        if (typeof x[alan] !== 'string' || !x[alan].trim()) s.push(`${n}: ${alan} yok`)
+      }
+      if (gorulen.has(x.gorev)) s.push(`${n}: aynı görev iki kez`)
+      gorulen.add(x.gorev)
+      if (!SIKLIKLAR[x.siklik]) s.push(`${n}: sıklık geçersiz (${x.siklik})`)
+      if (!TETIKLER[x.tetik]) s.push(`${n}: tetik geçersiz (${x.tetik})`)
+      if (!BAGLILAR.includes(x.bagli)) s.push(`${n}: bağlı alanı geçersiz (${x.bagli})`)
+      if (x.komut !== undefined && !varMi(x.komut)) s.push(`${n}: komut dosyası yok: ${x.komut}`)
+      if (x.taslak && !String(x.esik).startsWith('TASLAK')) s.push(`${n}: taslak görevin eşiği TASLAK ile başlamalı`)
+      const adim = x.komut ? path.posix.basename(x.komut) : ''
+      if (x.bagli === 'hayir') {
+        if (!roller.includes(x.baglayacak)) s.push(`${n}: bağlı değil ama tetiği kuracak rol (baglayacak) yok ya da bilinmiyor`)
+        if (x.tetik === 'actions' && adim && isAkislari.some((m) => m.includes(adim))) {
+          s.push(`${n}: bir iş akışı ${adim} komutunu çağırıyor; bağlı: evet yazılmalı (kayıt bayat)`)
+        }
+      }
+      if (x.bagli === 'evet') {
+        const yol = String(x.tetikAyrinti || '').split(/\s/)[0]
+        if (!varMi(yol)) s.push(`${n}: bağlı: evet ama tetik dosyası yok: ${yol}`)
+        else if (adim && !oku(yol).includes(adim)) s.push(`${n}: bağlı: evet ama ${yol} içinde ${adim} çağrılmıyor`)
+      }
+    })
+  }
+  return s
+}
+
 function kart(ad, r) {
   return [
     `# ROL KARTI: ${ad}`,
@@ -372,6 +512,7 @@ function kart(ad, r) {
     '',
     YONETIM_ISTISNA[ad] || YONETIM,
     '',
+    ...(GOREVLER[ad] ? [amacBolumu(ad), '', gorevBolumu(ad), ''] : []),
     '## Dosyalar',
     r.dosyalar,
     '',
@@ -426,6 +567,12 @@ function sorunlar(kartlar) {
     }
     // Kartta kural özeti değil kısa adı ve dosya atfı bulunur (REC-521).
     if (!metin.includes(kuralBolumu(ad))) s.push(`${ad}: kural bölümü eksik/değişmiş (kısa ad listesi ve atıf)`)
+    // Verisi olan rolün kartında Amaç ve Düzenli görevler bölümü bire bir bulunur (OPS-27, HRT-24).
+    if (GOREVLER[ad]) {
+      for (const blok of [amacBolumu(ad), gorevBolumu(ad)]) {
+        if (!metin.includes(blok)) s.push(`${ad}: ${blok.split('\n')[0]} bölümü eksik/değişmiş`)
+      }
+    }
   }
   return s
 }
@@ -546,6 +693,16 @@ function ozet(ad) {
   return satir.length <= OZET_SINIRI ? satir : satir.slice(0, OZET_SINIRI - 1).trimEnd() + '…'
 }
 
+/** .github/workflows altındaki iş akışı dosyalarının metinleri (bağlı: hayir kaydının bayatlığını ölçmek için). */
+function isAkisiMetinleri(kok) {
+  const dizin = path.join(kok, '.github', 'workflows')
+  if (!fs.existsSync(dizin)) return []
+  return fs
+    .readdirSync(dizin)
+    .filter((f) => /\.ya?ml$/.test(f))
+    .map((f) => fs.readFileSync(path.join(dizin, f), 'utf8'))
+}
+
 function main() {
   const oi = process.argv.indexOf('--ozet')
   if (oi !== -1) {
@@ -578,6 +735,16 @@ function main() {
       console.error(`FARK: docs/roller/${kuralDosyaAdi(ad)}`)
     }
   }
+  const gorevDosyalari = uretGorevler()
+  for (const [ad, metin] of Object.entries(gorevDosyalari)) {
+    const yol = path.join(dizin, gorevDosyaAdi(ad))
+    if (yaz) {
+      fs.writeFileSync(yol, metin, 'utf8')
+    } else if (!fs.existsSync(yol) || fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n') !== metin) {
+      fark++
+      console.error(`FARK: docs/roller/${gorevDosyaAdi(ad)}`)
+    }
+  }
   const harita = sahiplikOku(kok)
   const tablo = sahiplikTablosu(harita)
   const tabloYol = path.join(dizin, SAHIPLIK_BELGESI)
@@ -592,14 +759,37 @@ function main() {
     ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d))),
     ...kuralDosyaSorunlari(kurallarDosyalari),
     ...kuralSorunlari(kuralKaynagiOku(kok), kurallarDosyalari),
+    ...gorevSorunlari(
+      GOREVLER,
+      Object.keys(ROLLER),
+      (d) => fs.existsSync(path.join(kok, d)),
+      (d) => fs.readFileSync(path.join(kok, d), 'utf8'),
+      isAkisiMetinleri(kok),
+    ),
   ]
   for (const x of s) console.error(`SORUN: ${x}`)
-  if (yaz) console.log(`${Object.keys(kartlar).length} kart + ${Object.keys(kurallarDosyalari).length} kurallar dosyası + sahiplik tablosu yazıldı`)
+  if (yaz) {
+    console.log(`${Object.keys(kartlar).length} kart + ${Object.keys(kurallarDosyalari).length} kurallar dosyası + ${Object.keys(gorevDosyalari).length} görev dosyası + sahiplik tablosu yazıldı`)
+    console.log(`düzenli görev verisi eksik rol: ${gorevEksikRoller().length}/${Object.keys(ROLLER).length}`)
+  }
   process.exit(fark || s.length ? 1 : 0)
 }
 
 module.exports = {
   uret,
+  uretGorevler,
+  gorevDosyaAdi,
+  gorevDosyasi,
+  gorevSorunlari,
+  gorevEksikRoller,
+  gorevVerisiOku,
+  isAkisiMetinleri,
+  amacBolumu,
+  gorevBolumu,
+  GOREVLER,
+  GOREV_VERISI,
+  GOREV_CETVELI,
+  AMAC_SINIRI,
   uretKurallar,
   kuralDosyaAdi,
   kuralDosyasi,
