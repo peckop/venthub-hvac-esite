@@ -10,6 +10,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { DB_MARKALARI } from '@/data/__tests__/markaDbFiksturu'
 import { markaBulAdla } from '@/data/brands'
 
 import { buildBreadcrumbJsonLd } from '../jsonld'
@@ -124,6 +125,17 @@ describe('markaBulAdla', () => {
     expect(markaBulAdla('Bilinmeyen')).toBeNull()
     expect(markaBulAdla(null)).toBeNull()
     expect(markaBulAdla('  ')).toBeNull()
+  })
+
+  it('GERÇEK DB marka adlarının TAMAMI (fikstür, 2026-10-03 ölçümü: 5 marka / 47 aile) kendi slug\'ına eşleşir, düşen ya da yanlış eşleşen yok', () => {
+    const sonuc = Object.entries(DB_MARKALARI).map(([slug, m]) => [slug, markaBulAdla(m.ad)?.slug ?? null])
+    expect(sonuc.filter(([slug, bulunan]) => bulunan !== slug)).toEqual([])
+    expect(sonuc).toHaveLength(5)
+  })
+
+  it('farklı iki marka adı aynı kayda düşmez (yanlış eşleşme yok)', () => {
+    const bulunan = Object.values(DB_MARKALARI).map((m) => markaBulAdla(m.ad)?.slug)
+    expect(new Set(bulunan).size).toBe(bulunan.length)
   })
 })
 

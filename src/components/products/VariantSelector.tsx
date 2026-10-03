@@ -137,6 +137,14 @@ const ModelBaglantisi: React.FC<ModelBaglantisiProps> = ({ sku, href, active, on
       e.preventDefault()
       onSelect(sku)
     }}
+    // Eski <button> Space ile de seçiyordu; <a> yalnız Enter'la tıklanır. Space'e aynı davranış verilir
+    // (preventDefault: sayfa kaymasın). Enter'a dokunulmaz — tarayıcı onu click'e çevirir. Değiştirici tuşlu
+    // Space'e dokunulmaz.
+    onKeyDown={(e) => {
+      if (e.key !== ' ' || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      e.preventDefault()
+      onSelect(sku)
+    }}
   >
     {children}
   </Link>

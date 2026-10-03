@@ -78,6 +78,64 @@ describe('VariantSelector: Modeller satırları gerçek bağlantı', () => {
     expect(tiklamaDevam).toBe(false) // preventDefault çağrıldı
   })
 
+  it('Enter (tarayıcı click üretir, button=0) seçer; keydown Enter ayrıca seçmez (çift çağrı yok)', () => {
+    const onSelect = vi.fn()
+    const { container } = render(
+      <VariantSelector variants={liste(5)} selectedSku={null} onSelect={onSelect} modelAdresi={adres} quoteMode={false} />,
+    )
+    const a = container.querySelectorAll('a[href]')[2]
+    expect(fireEvent.keyDown(a, { key: 'Enter' })).toBe(true)
+    expect(onSelect).not.toHaveBeenCalled()
+    fireEvent.click(a, { button: 0, detail: 0 })
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    expect(onSelect).toHaveBeenCalledWith('sku-3')
+  })
+
+  it('Space seçer ve sayfa kaymasın diye varsayılanı iptal eder (eski <button> davranışı)', () => {
+    const onSelect = vi.fn()
+    const { container } = render(
+      <VariantSelector variants={liste(5)} selectedSku={null} onSelect={onSelect} modelAdresi={adres} quoteMode={false} />,
+    )
+    const a = container.querySelectorAll('a[href]')[3]
+    expect(fireEvent.keyDown(a, { key: ' ' })).toBe(false)
+    expect(onSelect).toHaveBeenCalledTimes(1)
+    expect(onSelect).toHaveBeenCalledWith('sku-4')
+  })
+
+  it('değiştirici tuşlu Space ve diğer tuşlar seçmez', () => {
+    const onSelect = vi.fn()
+    const { container } = render(
+      <VariantSelector variants={liste(5)} selectedSku={null} onSelect={onSelect} modelAdresi={adres} quoteMode={false} />,
+    )
+    const a = container.querySelectorAll('a[href]')[0]
+    for (const ek of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true }]) {
+      expect(fireEvent.keyDown(a, { key: ' ', ...ek })).toBe(true)
+    }
+    fireEvent.keyDown(a, { key: 'a' })
+    fireEvent.keyDown(a, { key: 'Tab' })
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it('orta tık (button=1), sağ tık ve Alt tık seçmez, tarayıcıya kalır', () => {
+    const onSelect = vi.fn()
+    const { container } = render(
+      <VariantSelector variants={liste(5)} selectedSku={null} onSelect={onSelect} modelAdresi={adres} quoteMode={false} />,
+    )
+    const ilk = container.querySelectorAll('a[href]')[0]
+    expect(fireEvent.click(ilk, { button: 1 })).toBe(true)
+    expect(fireEvent.click(ilk, { button: 2 })).toBe(true)
+    expect(fireEvent.click(ilk, { altKey: true })).toBe(true)
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it('href tamamen modelAdresi prop\'undan gelir: model kısa adresi (bayrak AÇIK kipi) olduğu gibi yazılır', () => {
+    const kisa = (sku: string) => `/tr/urun/aile-p-${sku}`
+    const h = renderToStaticMarkup(
+      <VariantSelector variants={liste(3)} selectedSku={null} onSelect={() => {}} modelAdresi={kisa} quoteMode={false} />,
+    )
+    expect(baglantilar(h)).toEqual(['/tr/urun/aile-p-sku-1', '/tr/urun/aile-p-sku-2', '/tr/urun/aile-p-sku-3'])
+  })
+
   it('Ctrl/Cmd/Shift tık tarayıcıya bırakılır: onSelect çağrılmaz, gezinme iptal edilmez', () => {
     const onSelect = vi.fn()
     const { container } = render(

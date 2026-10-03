@@ -62,7 +62,7 @@ import {
   translateSpecKey} from '../../utils/productHelpers'
 import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
-import { adresDili, adresRotalari } from '../../utils/yuzeyAdresleri'
+import { adresDili, adresRotalari, modelBaglantiAdresi } from '../../utils/yuzeyAdresleri'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -330,7 +330,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   // URN-21: Modeller satırlarının gerçek `<a href>` hedefi — adres üreticisinden (bayrak kapalıyken
   // `?sku=` kipi, K3-b açılınca modelin kendi adresi). Tıklama yine `handleSelectVariant`'tan geçer.
-  const modelAdresi = (sku: string): string => yuzeyAdresi.product(family?.slug ?? '', sku)
+  const modelAdresi = (sku: string): string => modelBaglantiAdresi(adresDili(lang), family?.slug ?? '', sku)
 
   // Galeri: seçili varyantın görselleri → yoksa ailedeki ilk görselli varyant.
   const galleryImages = useMemo(() => {
