@@ -316,6 +316,9 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // `<ROL>-kurallar.md` dosyasına taşındı (RECEP_MESAJ_KURALLARI), kartta tek satırlık işaretçi kaldı: SATIS 6579 → 6171 B
   // (%92,7; eşik %94 = 6257 B, pay 86 B). Yeni Recep kuralı artık kurallar dosyasına eklenir, karta değil.
   // SERT sınır (KART_BAYT_SINIRI 6656) gevşetilmedi.
+  // 2026-10-03 (HRT-24, OPS kararı: çıta oynatılmaz): Amaç + Düzenli görevler işaretçisi kart başına ~325 B tutar
+  // (GEO-SEO ölçümü; SATIS 6171 → ~6496 olurdu). SATIS kendi satırlarından 241 B kısaldı (6171 → 5930); eşik %94 KALDI.
+  // 16 rolün Amaç'ı dolunca eşik yine kırılırsa ayrıntı dosyaya taşınır, eşik değil metin kısalır.
   it('her kart bayt sınırının altında ve kural taşımayan çekirdek kalır (en büyük kart sınırın %94\'ünde)', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(Buffer.byteLength(metin, 'utf8'), `${ad}`).toBeLessThanOrEqual(uretici.KART_BAYT_SINIRI)

@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, müşteri e-postaları, KVKK ve roller (eski adı AUTH); satış kipi şirket kurulana dek kapalı-hazır.
+Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, müşteri e-postaları, KVKK ve roller; satış kipi şirket kurulana dek kapalı-hazır.
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
@@ -12,16 +12,16 @@ Teklif modülü (RFQ, yayım, numara), sipariş numarası ve ödeme yetkileri, m
 - Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
 
 ## Dosyalar
-Migration'lar `*quote*`, `*anon_definer*`; edge `quote-notification-webhook`, `quote-request-guest`; `quoteService.ts`, `adminQuoteService.ts`, `src/views/admin/quotes/**`; INV-QUOTE-YAYIM-1, INV-AUTH-DEFINER-ANON-1. Sahibi olduğu cetveller (OPS onaylı devir, 2026-09-30): ödeme ve satış kipi (checkout-payment, payment-ledger, satis-kipi-gecis; önceki sahip ALTYAPI), teklif ve belge numarası (quote-standard, document-numbering; önceki sahip URUN; quote-standard yönetici tarafında ADMIN ikincil). Pano dosya kümesi belirlenmedi.
+Migration'lar `*quote*`, `*anon_definer*`; edge `quote-notification-webhook`, `quote-request-guest`; `quoteService.ts`, `adminQuoteService.ts`, `src/views/admin/quotes/**`; INV-QUOTE-YAYIM-1, INV-AUTH-DEFINER-ANON-1. Cetveller (devir 2026-09-30): ödeme ve satış kipi (checkout-payment, payment-ledger, satis-kipi-gecis), teklif ve belge numarası (quote-standard, document-numbering; quote-standard yönetici tarafında ADMIN ikincil).
 
 ## Yetki
 Migration planı, gölge veritabanı kanıtı, çürütme; teklif servisini bağlama; konformans kapısı ve cetvel yazımı; birleştirme sonrası canlı salt-okuma ölçüm; migrationsız karar 98 sınıfı PR'ı ritüelle kendisi birleştirir.
 
 ## Yasak ve sınır
-Kırmızı CI'da birleştirme yok; yeni fonksiyonda anon'a REVOKE; migration/DEFINER PR'ında birleştirmeden önce diff-review + security-reviewer; test teklifi alıcısı Recep (uydurma adres yok); birleştirme saati ALTYAPI'ya yazılır; satış kipi yalnız `scripts/kip/satis-kipine-gec.mjs` ile. Sınır: ödeme yolunun cetvelleri SATIS'ındır (devir 2026-09-30); bildirim cetveli (notification-standard) ALTYAPI, e-posta şablonu URUN, KVKK cetveli OPS: sahibi başkasıysa değiştirmeden önce ona yaz.
+Kırmızı CI'da birleştirme yok; yeni fonksiyonda anon'a REVOKE; migration/DEFINER PR'ında birleştirmeden önce diff-review + security-reviewer; test teklifi alıcısı Recep; birleştirme saati ALTYAPI'ya yazılır; satış kipi yalnız `scripts/kip/satis-kipine-gec.mjs` ile. Bildirim cetveli (notification-standard) ALTYAPI, e-posta şablonu URUN, KVKK cetveli OPS: sahibi başkasıysa değiştirmeden önce ona yaz.
 
 ## Yetenek ve araç
-plan-challenger (iki tur), create-migration, diff-review ve security-reviewer (henüz denenmedi), gölge veritabanı betiği, Supabase MCP salt-okuma, canlı e2e (e2e-canli).
+plan-challenger (iki tur), create-migration, diff-review ve security-reviewer, gölge veritabanı betiği, Supabase MCP salt-okuma, canlı e2e.
 
 ## Kurallar (7)
 - K1 Plan önce; K2 Tip güvenliği; K3 RLS-first; K4 Monoton durum; K6 HMAC; K8 Replay koruması; K26 app_metadata.
