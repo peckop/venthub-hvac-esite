@@ -71,6 +71,13 @@ demesi, o ürünün **kendi** dizininde yokluğu, ya da o cevap için **hiç ara
   değildir; 202 doğrulama bekliyor, 403 geçersiz anahtar, 429 sınır.
 - Bizde: `scripts/seo/indexnow-bildir.mjs` toplu bildirim betiği (anahtarı ortam değişkeninden okuyor; sabite alınması SEO-3);
   #1459 süzgeci bayrak kapalıyken webhook'tan yeni adres göndermez. Toplu bildirimi **yalnız GEO-SEO tetikler** (yayın günü).
+- **Bayrak kapalıyken tek geçerli toplu kip (karar 249 daraltması, 2026-10-03):** `--yalniz-degismeyen`. Betik yalnız bilinen
+  değişmeyen TÜRLERİ geçirir (izin listesi, fail-closed: ana sayfa, hakkında, iletişim, ürün seçici, yasal sayfalar, bilgi merkezi;
+  yalnız `/tr`); ürün, kategori, marka ağaçları, yeni şema bölümleri ve tanınmayan her adres ATILIR. Kalanın her adresi GET ile
+  sınanır (yönlendirme takip edilmez, 200 ve kanonik = kendisi, değilse durur) ve yalnız onlar bildirilir; süzgeçsiz kip kapıdan
+  geçemez (K4, karar 164 A). Boş küme ya da kalan > 15 = DUR. Kilit: `indexnowSuzgec.test.ts` (INV-INDEXNOW-SUZGEC-1).
+  Ölçüm 2026-10-03 (canlıya karşı kuru koşu): sitemap 87 adres, 78 atıldı, 9 kaldı, 9'u 200 ve kanonik. Değişecek 78 adres yayın günü
+  adres yayınıyla aynı yayında gider.
 - Kaynak: indexnow.org/documentation, /faq; blogs.bing.com/webmaster/May-2025/… (2025-05-19).
 
 ## D5 — llms.txt hükmü
