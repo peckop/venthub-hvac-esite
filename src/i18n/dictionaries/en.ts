@@ -2021,9 +2021,10 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
-      // OPS-51 (decision 265): ONLY for the brand marked `yakinda: true` in brands.ts (Flexiva). Placeholder for
-      // Design's "products soon" state; the final copy replaces THIS key. See the TR note on INV-VAAT-SIZINTI-2.
-      productsSoon: 'This brand\'s products will be listed soon.',
+      // OPS-51 (decision 265 + OPS ruling): ONLY for the brand marked `yakinda: true` in brands.ts (Flexiva).
+      // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
+      productsOnRequest: 'Request a quote from us for {{ad}} products.',
+      productsOnRequestCta: 'Go to the contact form',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak

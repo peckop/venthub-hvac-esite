@@ -341,9 +341,20 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
               <Package className="mx-auto text-slate-200 mb-4" size={48} />
               {/* `yakinda` işareti YALNIZ brands.ts'te ve INV-MARKA-KAYNAK-1'deki kapalı listedeki marka için
                   (karar 265, Flexiva). İşaretsiz ürünsüz marka kapıda kırmızıdır; bu dal ona ulaşmaz. */}
+              {/* Teklif yolu = iletişim formu (`Routes.contact()`): özel teklif akışının depodaki sayfası
+                  (EnhancedNeedsWizard "customOffer" ve contactPage.heroDesc "özel teklifler" aynı rotaya gider);
+                  sepet tabanlı QuoteRequestButton ürünsüz markada boş listeyle çalışmaz. */}
               <p className="text-slate-400 font-light italic">
-                {brand.yakinda ? t('brands.detail.productsSoon') : t('brands.detail.noProducts')}
+                {brand.yakinda ? t('brands.detail.productsOnRequest', { ad: brand.name }) : t('brands.detail.noProducts')}
               </p>
+              {brand.yakinda && (
+                <Link
+                  href={Routes.contact()}
+                  className="mt-4 inline-block text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8 focus-visible:outline-2"
+                >
+                  {t('brands.detail.productsOnRequestCta')}
+                </Link>
+              )}
             </div>
           )}
         </div>

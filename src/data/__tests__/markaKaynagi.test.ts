@@ -116,6 +116,37 @@ describe('INV-MARKA-KAYNAK-1: marka listesi = DB\'de ürünü olan markalar', ()
   })
 })
 
+describe('INV-MARKA-KAYNAK-1 (e) vitrin cümlesi: zaman vaadi taşımaz, teklif yoluna bağlanır (OPS-51)', () => {
+  const tr = readFileSync(join(KOK, 'src', 'i18n', 'dictionaries', 'tr.ts'), 'utf8')
+  const en = readFileSync(join(KOK, 'src', 'i18n', 'dictionaries', 'en.ts'), 'utf8')
+  const sayfa = readFileSync(join(KOK, 'src', 'views', 'BrandDetailPage.tsx'), 'utf8')
+  const ZAMAN = /yakında|çok yakında|soon|coming|will be (added|listed)|opening/i
+
+  it('eski productsSoon anahtarı sözlüklerde ve sayfada YOK; productsOnRequest(+Cta) iki dilde var', () => {
+    for (const kaynak of [tr, en, sayfa]) expect(kaynak).not.toContain('productsSoon')
+    for (const kaynak of [tr, en]) {
+      expect(kaynak).toContain('productsOnRequest:')
+      expect(kaynak).toContain('productsOnRequestCta:')
+    }
+  })
+
+  it('cümleler ve bağlantı metni zaman öbeği içermez (VAAT-SIZINTI-2 terimlerinin üst kümesi)', () => {
+    for (const kaynak of [tr, en]) {
+      for (const anahtar of ['productsOnRequest', 'productsOnRequestCta']) {
+        const satir = kaynak.split('\n').find((s) => s.trim().startsWith(`${anahtar}:`))
+        expect(satir, `${anahtar} satırı yok`).toBeDefined()
+        expect(satir!, `${anahtar} zaman taşıyor`).not.toMatch(ZAMAN)
+      }
+    }
+  })
+
+  it('sayfa yakinda markada cümle + Routes.contact() bağlantısı çizer (manuel /tr/ yok)', () => {
+    expect(sayfa).toContain("t('brands.detail.productsOnRequest', { ad: brand.name })")
+    expect(sayfa).toMatch(/href=\{Routes\.contact\(\)\}[\s\S]{0,400}productsOnRequestCta/)
+    expect(sayfa).not.toMatch(/href=["'`{]\s*["'`]?\/(tr|en)\//)
+  })
+})
+
 describe('INV-MARKA-KAYNAK-1 (e) sabotaj: yüklem gevşemeden ayırt eder', () => {
   const db = { flexiva: { aktifUrun: 0 }, avens: { aktifUrun: 53 }, yenimarka: { aktifUrun: 0 } }
   const ist = ['flexiva']
