@@ -151,7 +151,7 @@ describe('/tr/kategori (yeni) — rota × durum × sonuç', () => {
     expect(m.robots).toBeUndefined()
   })
 
-  it('önceden üretim: 6 kök + 18 dal, TR slug\'larıyla', async () => {
+  it('önceden üretim: 7 kök + 17 dal (Sığınak 7. kök), TR slug\'larıyla', async () => {
     const satirlar = (await import('../../lib/data/__tests__/fixtures/kategoriAgaci')).KATEGORI_AGACI.filter(
       (c) => c.is_active,
     )
@@ -162,6 +162,9 @@ describe('/tr/kategori (yeni) — rota × durum × sonuç', () => {
     expect(r).toHaveLength(24)
     expect(r).toContainEqual({ lang: 'tr', kok: 'fanlar', dal: [] })
     expect(r).toContainEqual({ lang: 'tr', kok: 'fanlar', dal: ['kanal-tipi-fanlar'] })
+    // OPS-51: Sığınak kökte üretilir; fans altında İKİ SEVİYELİ biçimi ARTIK üretilmez
+    expect(r).toContainEqual({ lang: 'tr', kok: 'siginak-havalandirma', dal: [] })
+    expect(r).not.toContainEqual({ lang: 'tr', kok: 'fanlar', dal: ['siginak-havalandirma'] })
     expect(r.every((x) => x.lang === 'tr')).toBe(true)
   })
 })

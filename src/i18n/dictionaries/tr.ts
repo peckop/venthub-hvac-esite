@@ -1094,6 +1094,11 @@ export const tr = {
       // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
       // olmayan bir VAAT. Artık olgu: marka katalogda var, ürünleri henüz yok.
       noProducts: 'Bu markanın ürünleri henüz katalogda değil.',
+      // OPS-51 (karar 265): YALNIZ `brands.ts`'te `yakinda: true` işaretli marka (Flexiva) için. Metin Design'ın
+      // "ürünler yakında" durumunun yer tutucusudur; Design son metni verince BU anahtar değişir.
+      // ⚠ INV-VAAT-SIZINTI-2 / REC-148 zaman vaadini yasaklar ("yakında eklenecek" öbekleri); bu cümle terim
+      // listesinden geçer ama doktrinle (K1: vitrin var olanı gösterir) gerilim taşır — OPS/Recep onayı PR gövdesinde.
+      productsSoon: 'Bu markanın ürünleri yakında listelenecek.',
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş',
       // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak

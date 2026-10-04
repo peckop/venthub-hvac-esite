@@ -44,10 +44,11 @@ const uygula = (seg: string[], dil: 'tr' | 'en', istenen: string | null, b = bag
   kategoriRotasiniUygula(seg, dil, istenen as Parameters<typeof kategoriRotasiniUygula>[2], b)
 
 describe('fikstür evreni (ölçümün kendisi)', () => {
-  it('31 satır: 6 aktif kök, 18 aktif dal, 7 pasif', () => {
+  it('31 satır: 7 aktif kök (Sığınak 7. kök, OPS-51), 17 aktif dal, 7 pasif', () => {
     expect(KATEGORI_AGACI).toHaveLength(31)
-    expect(KATEGORI_AGACI.filter((c) => c.is_active && !c.parent_id)).toHaveLength(6)
-    expect(KATEGORI_AGACI.filter((c) => c.is_active && c.parent_id)).toHaveLength(18)
+    expect(KATEGORI_AGACI.filter((c) => c.is_active && !c.parent_id)).toHaveLength(7)
+    expect(KATEGORI_AGACI.filter((c) => c.is_active && c.parent_id)).toHaveLength(17)
+    expect(KATEGORI_AGACI.find((c) => c.slug === 'shelter-ventilation')?.parent_id).toBeNull()
     expect(KATEGORI_AGACI.filter((c) => !c.is_active)).toHaveLength(7)
   })
 })

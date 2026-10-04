@@ -81,6 +81,11 @@
    "priority": 0.6
   },
   {
+   "url": "{BASE}/tr/brands/casals",
+   "changefreq": "weekly",
+   "priority": 0.6
+  },
+  {
    "url": "{BASE}/tr/brands/seat",
    "changefreq": "weekly",
    "priority": 0.6
@@ -92,6 +97,11 @@
   },
   {
    "url": "{BASE}/tr/brands/nicotra-gebhardt",
+   "changefreq": "weekly",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/flexiva",
    "changefreq": "weekly",
    "priority": 0.6
   },
@@ -404,6 +414,17 @@
    }
   },
   {
+   "url": "{BASE}/tr/brands/casals",
+   "changefreq": "weekly",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
+    }
+   }
+  },
+  {
    "url": "{BASE}/tr/brands/seat",
    "changefreq": "weekly",
    "priority": 0.6,
@@ -437,6 +458,17 @@
    }
   },
   {
+   "url": "{BASE}/tr/brands/flexiva",
+   "changefreq": "weekly",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/flexiva",
+     "en": "{BASE}/en/brands/flexiva"
+    }
+   }
+  },
+  {
    "url": "{BASE}/en/brands/vortice",
    "changefreq": "weekly",
    "priority": 0.6,
@@ -455,6 +487,17 @@
     "languages": {
      "tr": "{BASE}/tr/brands/avens",
      "en": "{BASE}/en/brands/avens"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/casals",
+   "changefreq": "weekly",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
     }
    }
   },
@@ -488,6 +531,17 @@
     "languages": {
      "tr": "{BASE}/tr/brands/nicotra-gebhardt",
      "en": "{BASE}/en/brands/nicotra-gebhardt"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/flexiva",
+   "changefreq": "weekly",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/flexiva",
+     "en": "{BASE}/en/brands/flexiva"
     }
    }
   },
