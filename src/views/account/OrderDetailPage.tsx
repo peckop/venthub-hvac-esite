@@ -35,8 +35,6 @@ interface OrderItem {
   id: string
   product_id?: string
   product_name: string
-  /** Sipariş anındaki SKU (snapshot). Katalogtaki güncel SKU değil. */
-  product_sku?: string
   quantity: number
   unit_price: number
   total_price: number
@@ -106,7 +104,7 @@ export default function OrderDetailPage() {
             invoice_info, legal_consents,
             venthub_order_items (
               id, product_id, quantity, product_image_url,
-              product_name_snapshot, unit_price_snapshot, product_sku_snapshot
+              product_name_snapshot, unit_price_snapshot
             )
           `)
           .eq('id', id)
@@ -129,7 +127,6 @@ export default function OrderDetailPage() {
             id: String(it.id),
             product_id: it.product_id ? String(it.product_id) : undefined,
             product_name: String(it.product_name_snapshot),
-            product_sku: it.product_sku_snapshot ? String(it.product_sku_snapshot) : undefined,
             quantity: qty,
             unit_price: unit,
             total_price: unit * qty,
@@ -401,12 +398,11 @@ export default function OrderDetailPage() {
                           ) : (
                             item.product_name
                           )}
-                          {/* Sipariş anındaki SKU — katalogtaki güncel SKU değil (W2b-2 snapshot). */}
-                          {item.product_sku ? (
-                            <div className="mt-0.5 text-xs font-normal text-slate-500">
-                              {t('orders.skuLabel', { sku: item.product_sku })}
-                            </div>
-                          ) : null}
+                          {/* URN-32: sipariş-anı `product_sku_snapshot` satırı KALDIRILDI. Sipariş detayı
+                              müşteriye gösterilir ve kural (INV-SKU-GORUNMEZ-1) "HİÇBİR müşteri yüzeyinde"
+                              der; snapshot/fatura görünümü için muafiyet yok. Satır sorgudan da çıktı —
+                              ekranda basılmayan iç kod müşteri tarayıcısına da inmesin. `model_code`
+                              snapshot'ı şemada yok (ayrı kayıt); ad + adet + tutar eşleştirmeye yeter. */}
                         </td>
                         <td className="p-4">
                           {item.product_image_url ? (

@@ -154,9 +154,10 @@ export async function generateProductDatasheet(
         const title = lang === 'tr' ? 'TEKNİK ÜRÜN FÖYÜ' : 'TECHNICAL DATASHEET';
         doc.text(title, pageWidth - margin, 20, { align: 'right' });
 
-        doc.setFont(fontName, 'normal');
-        doc.setFontSize(9);
-        doc.text(`Ref: ${product.sku || product.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 26, { align: 'right' });
+        // URN-33: buradaki `Ref: <iç SKU>` satırı KALDIRILDI. Müşteri belgesine iç kod basıyordu
+        // (yedeği de `product.id` parçasıydı, o da iç kimlik). Model kodu zaten gövdede,
+        // markanın yanında `getProductModelLabel` ile basılıyor ("Model Kodu: …"); üst bilgiye
+        // ikinci bir kopya koymak hem gereksiz hem sızıntı yolu. Bekçi: INV-SKU-GORUNMEZ-1 (K7).
     };
 
     // ----- FOOTER (ALT BİLGİ) -----

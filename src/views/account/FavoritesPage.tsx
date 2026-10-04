@@ -13,9 +13,13 @@ import { supabaseBrowserClient } from '@/lib/supabase/client'
 import { mapDatabaseProductToDomain } from '@/lib/type-converters'
 import type { DbProduct } from '@/types/db-rows'
 import type { Product } from '@/types/ui-models'
+import { getProductModelLabel } from '@/utils/productHelpers'
 
 import { useFavorites } from '../../hooks/useFavorites'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
+
+/** Yalnız `model_code` okunur: `name_i18n` (Json) çözücünün ad tipine uymaz, `as` gerekmez. */
+const modelKodu = (p: Product): string | null => getProductModelLabel({ model_code: p.model_code })
 
 /**
  * Favoriler v1 — kimlikler localStorage'da (useFavorites), ürün detayları DB'den
@@ -112,7 +116,11 @@ export default function FavoritesPage() {
                   <div className="text-sm font-bold text-slate-900 truncate group-hover:text-primary-navy transition-colors">{p.name}</div>
                 </Link>
                 {p.brand && <div className="text-xs text-slate-500 mt-0.5 truncate">{p.brand}</div>}
-                {p.sku && <div className="text-xs text-slate-400 mt-0.5 truncate">{p.sku}</div>}
+                {/* URN-32: eskiden ham `p.sku` basılıyordu (iç kod). Görünen kod YALNIZ `model_code`;
+                    yoksa satır hiç çizilmez (INV-SKU-GORUNMEZ-1). */}
+                {modelKodu(p) && (
+                  <div className="text-xs text-slate-400 mt-0.5 truncate">{modelKodu(p)}</div>
+                )}
               </div>
               <button
                 onClick={() => removeFavorite(p.id)}
