@@ -518,6 +518,7 @@ function kart(ad, r) {
     '## Dosyalar',
     r.dosyalar,
     '',
+    ...(ad === 'OPS' ? [HARITA_ISARETCISI, ''] : []),
     '## Yetki',
     r.yetki,
     '',
@@ -569,6 +570,8 @@ function sorunlar(kartlar) {
     }
     // Kartta kural özeti değil kısa adı ve dosya atfı bulunur (REC-521).
     if (!metin.includes(kuralBolumu(ad))) s.push(`${ad}: kural bölümü eksik/değişmiş (kısa ad listesi ve atıf)`)
+    // OPS kartı Departman haritası işaretçisini taşır (HRT-29): harita ayrı dosyada, kartta yalnız yol bulunur.
+    if (ad === 'OPS' && !metin.includes(HARITA_ISARETCISI)) s.push('OPS: Departman haritası işaretçisi eksik/değişmiş')
     // Verisi olan rolün kartında Amaç ve Düzenli görevler bölümü bire bir bulunur (OPS-27, HRT-24).
     if (GOREVLER[ad]) {
       for (const blok of [amacBolumu(ad), gorevBolumu(ad)]) {
@@ -695,6 +698,95 @@ function ozet(ad) {
   return satir.length <= OZET_SINIRI ? satir : satir.slice(0, OZET_SINIRI - 1).trimEnd() + '…'
 }
 
+/**
+ * DEPARTMAN HARİTASI (HRT-29, OPS-27 eki): OPS işi dağıtırken 16 departmanın görevini, dosya alanını ve AÇILIŞ YOLUNU tek
+ * yerde görsün. Tam harita `docs/roller/DEPARTMAN-HARITASI.md` (üretilmiş, Görev ve Dosyalar bölümleri rol kartlarından
+ * aynen); açılışa (session-board, rol OPS) `--harita-ozet` ile ≤ HARITA_OZET_SINIRI baytlık kısa özet girer. Kısa satırlar
+ * aşağıda TEK yerde (rol tablosunun komşusu) durur ve bayat kalamaz: dosya üretilmiş metinle bayt bayt karşılaştırılır.
+ * Açılış yolu ELLE yazılmaz: `scripts/board/pencere-adlari.cjs` tablosundaki rol `departman-ac` ile terminalden açılabilir
+ * (T), değilse yalnız masaüstü (ölçüm 2026-10-05: tabloda olmayan rolde departman-ac "rol taninmiyor" verir).
+ */
+const HARITA_DOSYASI = 'DEPARTMAN-HARITASI.md'
+const HARITA_OZET_SINIRI = 2048
+/** OPS kartına giren işaretçi (tam harita ayrı dosyada kalır: kart bayt payı korunur). */
+const HARITA_ISARETCISI = [
+  '## Departman haritası',
+  'Tam harita: `docs/roller/DEPARTMAN-HARITASI.md` (üretilmiş; her departman için görev, dosya alanı ve açılış yolu). Kart açmadan önce işin hangi departmana düştüğüne oradan bak; pencere açılışında kısa özeti gelir.',
+].join('\n')
+const HARITA_KISA = {
+  OPS: ['Orkestratör: sıra, öncelik, karar no; Recep\'e tek yüz', 'kod sahibi değil'],
+  ARAC: ['Kanca, WrongStack, araç envanteri', 'hooks, scripts/board, tools'],
+  ALTYAPI: ['CI, bağımlılık, güvenlik denetimi', 'package.json, .github/workflows'],
+  HARITA: ['Belge ve hafıza düzeni, rol kartları', 'CLAUDE.md, docs/README, scripts/belge, docs/roller'],
+  URUN: ['Vitrin: ürün, kategori, marka sayfaları, adresler', 'components/products, views/category, next.config'],
+  ADMIN: ['Yönetici paneli ekranları', 'views/admin, components/admin, app/admin'],
+  KATALOG: ['Ürün verisi hattı: PDF\'den ürün satırına, CSV, fiyat', 'scripts/icerik-hatti, scripts/db/product-data'],
+  'GEO-SEO': ['Arama motoru ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-* ve seo-*'],
+  BLOG: ['Rehber yazıları', 'rehber-yazisi-standard, taslaklar'],
+  MARKA: ['Marka kimliği: logo, palet, yazı tipi', 'Design-MARKA çıktıları'],
+  MEVZUAT: ['Mevzuat ve standart kaydı (kanıtlı)', 'docs/mevzuat/**, mevzuat-kaydi-standard'],
+  SATIS: ['Teklif (RFQ), ödeme yetkisi, KVKK, e-postalar', '*quote* migration ve edge, quoteService'],
+  TASARIM: ['Design ↔ site köprüsü: token, yazı tipi, bileşen', 'src/design-system, tailwind.config'],
+  EDGE: ['Supabase Edge Function katmanı ve deploy', 'supabase/functions, scripts/edge'],
+  I18N: ['TR/EN sözlükler ve i18n kapıları', 'src/i18n, i18n-*.test.ts'],
+  YETENEK: ['Skill\'leri departmana bağlama ve ölçme', 'docs/audits/skill-*, .claude/skills'],
+}
+
+/** Rol `departman-ac` ile terminalden açılabilir mi: pencere adı tablosunda (şerit adıyla) var mı. */
+function terminaldenAcilir(ad, tablo = require(path.join(__dirname, '..', 'board', 'pencere-adlari.cjs')).TABLO) {
+  return tablo.some((satir) => satir[0] === ad)
+}
+
+/** Kısa özet: bir departman = bir satır; açılış harfi M (masaüstü) ya da M/T (T = ekip modu için terminal). */
+function haritaOzet(roller = ROLLER, kisa = HARITA_KISA, tablo) {
+  const satirlar = Object.keys(roller).map((ad) => {
+    const [gorev, alan] = kisa[ad] || ['(kısa satır yok)', '']
+    return `${ad} · ${gorev} · ${alan} · ${terminaldenAcilir(ad, tablo) ? 'M/T' : 'M'}`
+  })
+  return [
+    'DEPARTMAN HARİTASI (departman · görev · dosya alanı · açılış; tam harita: docs/roller/DEPARTMAN-HARITASI.md)',
+    'Açılış: M = masaüstü; T = ekip modu gerekirse terminal (scripts\\board\\departman-ac.cmd <AD>). T yazmayan departman terminalden AÇILAMAZ (pencere adı tablosunda yok).',
+    ...satirlar,
+    '',
+  ].join('\n')
+}
+
+/** Tam harita dosyası: Görev ve Dosyalar bölümleri rol tablosundan aynen; açılış sütunu tablodan türetilir. */
+function haritaDosyasi(roller = ROLLER, tablo) {
+  const satirlar = Object.entries(roller).map(([ad, r]) => {
+    const acilis = terminaldenAcilir(ad, tablo)
+      ? 'masaüstü, ya da ekip modu gerekiyorsa terminal: `scripts\\board\\departman-ac.cmd ' + ad + '`'
+      : 'yalnız masaüstü (terminal: YOK, pencere adı tablosunda yok)'
+    return `| ${ad} | ${hucre(r.gorev)} | ${hucre(r.dosyalar)} | ${acilis} |`
+  })
+  return [
+    '# DEPARTMAN HARİTASI',
+    '',
+    '> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Kaynak: rol kartlarının Görev ve Dosyalar bölümleri ve `scripts/board/pencere-adlari.cjs` tablosu. HRT-29, OPS 2026-10-04.',
+    '',
+    'Açılış yolu kuralı: ekip modu gerekiyorsa departman terminalden `departman-ac` ile açılır, gerekmiyorsa masaüstünden; iki yolda içerik aynıdır (tek kaynak rol kartları). Terminalde açılmış pencereye `/desktop` yazılırsa ekip modu kaybolur.',
+    '',
+    '| Departman | Görev | Dosya alanı | Açılış yolu |',
+    '|---|---|---|---|',
+    ...satirlar,
+    '',
+  ].join('\n')
+}
+
+/** Harita sorunları (boş = temiz): her rolün kısa satırı var ve sınırlı, özet bütçede ve her rolü ile açılış harfini taşıyor. */
+function haritaSorunlari(roller = ROLLER, kisa = HARITA_KISA, tablo) {
+  const s = []
+  for (const ad of Object.keys(roller)) {
+    const k = kisa[ad]
+    if (!k || !k[0] || !k[1]) s.push(`harita: ${ad} için kısa görev/alan satırı yok`)
+  }
+  for (const ad of Object.keys(kisa)) if (!roller[ad]) s.push(`harita: ${ad} rol tablosunda yok`)
+  const ozetMetin = haritaOzet(roller, kisa, tablo)
+  const bayt = Buffer.byteLength(ozetMetin, 'utf8')
+  if (bayt > HARITA_OZET_SINIRI) s.push(`harita: kısa özet ${bayt} bayt > ${HARITA_OZET_SINIRI}`)
+  return s
+}
+
 /** .github/workflows altındaki iş akışı dosyalarının metinleri (bağlı: hayir kaydının bayatlığını ölçmek için). */
 function isAkisiMetinleri(kok) {
   const dizin = path.join(kok, '.github', 'workflows')
@@ -710,6 +802,11 @@ function main() {
   if (oi !== -1) {
     // Bilinmeyen/eksik rol: boş çıktı + çıkış 0 (kanca çağıranı bozmaz).
     process.stdout.write(ozet(process.argv[oi + 1] || ''))
+    process.exit(0)
+  }
+  if (process.argv.includes('--harita-ozet')) {
+    // Kanca (session-board, rol OPS) için kısa harita özeti; hata olursa kanca fail-open olduğundan çıkış yine 0'dır.
+    process.stdout.write(haritaOzet())
     process.exit(0)
   }
   const kok = path.resolve(__dirname, '..', '..')
@@ -747,6 +844,14 @@ function main() {
       console.error(`FARK: docs/roller/${gorevDosyaAdi(ad)}`)
     }
   }
+  const haritaMetin = haritaDosyasi()
+  const haritaYol = path.join(dizin, HARITA_DOSYASI)
+  if (yaz) {
+    fs.writeFileSync(haritaYol, haritaMetin, 'utf8')
+  } else if (!fs.existsSync(haritaYol) || fs.readFileSync(haritaYol, 'utf8').replace(/\r\n/g, '\n') !== haritaMetin) {
+    fark++
+    console.error(`FARK: docs/roller/${HARITA_DOSYASI}`)
+  }
   const harita = sahiplikOku(kok)
   const tablo = sahiplikTablosu(harita)
   const tabloYol = path.join(dizin, SAHIPLIK_BELGESI)
@@ -758,6 +863,7 @@ function main() {
   }
   const s = [
     ...sorunlar(kartlar),
+    ...haritaSorunlari(),
     ...sahiplikSorunlari(harita, (d) => fs.existsSync(path.join(kok, d))),
     ...kuralDosyaSorunlari(kurallarDosyalari),
     ...kuralSorunlari(kuralKaynagiOku(kok), kurallarDosyalari),
@@ -778,6 +884,14 @@ function main() {
 }
 
 module.exports = {
+  haritaOzet,
+  haritaDosyasi,
+  haritaSorunlari,
+  terminaldenAcilir,
+  HARITA_DOSYASI,
+  HARITA_KISA,
+  HARITA_OZET_SINIRI,
+  HARITA_ISARETCISI,
   uret,
   uretGorevler,
   gorevDosyaAdi,

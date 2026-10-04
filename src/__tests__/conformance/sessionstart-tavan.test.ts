@@ -68,13 +68,14 @@ afterAll(() => {
   if (gecici) fs.rmSync(gecici, { recursive: true, force: true })
 })
 
-function calistir(source: string, ekEnv: Record<string, string> = {}): { ek: string; durum: number | null } {
+function calistir(source: string, ekEnv: Record<string, string> = {}, ekGirdi: Record<string, string> = {}): { ek: string; durum: number | null } {
   const girdi = JSON.stringify({
     session_id: SID,
     source,
     transcript_path: kayitYolu,
     cwd: KOK,
     hook_event_name: 'SessionStart',
+    ...ekGirdi,
   })
   const r = spawnSync(process.execPath, [KANCA], {
     input: girdi,
@@ -279,4 +280,40 @@ describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
     const m = dokum.enjeksiyonKisa(memoryDir, SID, { sonN: 1, mesajTavan: 200, tavan: 3600 }) ?? ''
     expect(m).toContain('mesaj kırpıldı')
   })
+})
+
+describe('HRT-29 · rol OPS ise açılışta departman haritası kısa özeti gelir', () => {
+  const HARITA_TAVANI = 2048
+  const ROLLER = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA', 'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK']
+
+  it('CC_LANE=OPS: 16 departman satırı ve açılış harfleri görünür, çıktı tavanı yalnız özet kadar genişler', () => {
+    const { ek, durum } = calistir('startup', { CC_LANE: 'OPS' })
+    expect(durum).toBe(0)
+    expect(ek).toContain('DEPARTMAN HARİTASI')
+    for (const ad of ROLLER) expect(ek, `${ad} satırı yok`).toContain(`${ad} · `)
+    expect(ek).toMatch(/ · M\/T\n/)
+    expect(ek.length).toBeLessThanOrEqual(TAVAN + HARITA_TAVANI)
+    expect(ek.startsWith(`Oturum kimliğin: ${SID}`)).toBe(true)
+  }, 60_000)
+
+  it('claim YOK ve CC_LANE yok: pencere başlığı "Ops" ise rol OPS tanınır, harita ve rol kartı gelir', () => {
+    const { ek } = calistir('startup', {}, { session_title: 'Ops' })
+    expect(ek).toContain('ROL KARTI: OPS')
+    expect(ek).toContain('DEPARTMAN HARİTASI')
+  }, 60_000)
+
+  it('AYIRT EDİCİLİK: OPS olmayan rolde ve başlıksız/tanımsız başlıkta harita GELMEZ, rol kartı bilinmiyor der', () => {
+    expect(calistir('startup', { CC_LANE: 'ARAC' }).ek).not.toContain('DEPARTMAN HARİTASI')
+    const bos = calistir('startup', {}, { session_title: '' }).ek
+    expect(bos).not.toContain('DEPARTMAN HARİTASI')
+    expect(bos).toContain('ROL KARTI: (bu oturumun seridi/rolu bilinmiyor')
+    expect(calistir('startup', {}, { session_title: 'Baska Bir Ad' }).ek).not.toContain('DEPARTMAN HARİTASI')
+  }, 120_000)
+
+  it('FAIL-OPEN: üretici yoksa oturum açılır, harita yerine işaretçi satırı yazılır', () => {
+    const { ek, durum } = calistir('startup', { CC_LANE: 'OPS', VH_ROL_KARTI_URETICI: path.join(gecici, 'yok-boyle-bir-uretici.cjs') })
+    expect(durum).toBe(0)
+    expect(ek).toContain('DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md')
+    expect(ek).not.toContain('GEO-SEO · ')
+  }, 60_000)
 })

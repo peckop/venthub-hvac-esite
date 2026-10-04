@@ -54,6 +54,14 @@ type Uretici = {
   gorevEksikRoller: () => string[]
   isAkisiMetinleri: (kok: string) => string[]
   AMAC_SINIRI: number
+  haritaOzet: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][]) => string
+  haritaDosyasi: (roller?: Record<string, unknown>, tablo?: string[][]) => string
+  haritaSorunlari: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][]) => string[]
+  terminaldenAcilir: (ad: string, tablo?: string[][]) => boolean
+  HARITA_DOSYASI: string
+  HARITA_KISA: Record<string, string[]>
+  HARITA_OZET_SINIRI: number
+  HARITA_ISARETCISI: string
 }
 
 type Gorev = {
@@ -291,6 +299,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
       ...Object.keys(uretilen).map((ad) => uretici.kuralDosyaAdi(ad)),
       ...Object.keys(uretici.uretGorevler()).map((ad) => uretici.gorevDosyaAdi(ad)),
       uretici.SAHIPLIK_BELGESI,
+      uretici.HARITA_DOSYASI,
     ]
     expect(disk.sort()).toEqual(beklenen.sort())
   })
@@ -649,5 +658,91 @@ describe('INV-ROL-1 — Amaç ve Düzenli görevler (OPS-27, HRT-24)', () => {
     expect(uretici.sorunlar(bozuk).join('\n')).toMatch(/GEO-SEO: ## Amaç bölümü eksik/)
     const bozuk2 = { ...kartlar, 'GEO-SEO': kartlar['GEO-SEO'].replace(/## Düzenli görevler\n[^\n]*\n\n/, '') }
     expect(uretici.sorunlar(bozuk2).join('\n')).toMatch(/GEO-SEO: ## Düzenli görevler bölümü eksik/)
+  })
+})
+
+describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
+  const roller = Object.keys(uretici.ROLLER)
+  const ozet = uretici.haritaOzet()
+
+  it('BAYATLIK KAPISI: docs/roller/DEPARTMAN-HARITASI.md üreticiyle bire bir aynı (rol kartı ya da pencere-adlari tablosu değişip harita yeniden üretilmezse kırmızı)', () => {
+    const yol = path.join(KOK, 'docs', 'roller', uretici.HARITA_DOSYASI)
+    expect(fs.existsSync(yol), `${yol} yok — node scripts/belge/rol-karti-uret.cjs --yaz`).toBe(true)
+    expect(fs.readFileSync(yol, 'utf8').replace(/\r\n/g, '\n'), 'harita üreticiden sapmış: node scripts/belge/rol-karti-uret.cjs --yaz').toBe(uretici.haritaDosyasi())
+  })
+
+  it('tam harita her departmanın görev ve dosya metnini rol tablosundan AYNEN taşır (tek kaynak)', () => {
+    const tam = uretici.haritaDosyasi()
+    const kartlar = uretici.uret()
+    for (const ad of roller) {
+      const r = uretici.ROLLER[ad] as { gorev: string; dosyalar: string }
+      expect(tam, `${ad} satırı yok`).toContain(`| ${ad} |`)
+      // Kartın Görev ve Dosyalar bölümleri de aynı metni taşır: harita ile kart ayrışamaz.
+      expect(kartlar[ad]).toContain(`## Görev\n${r.gorev}`)
+      expect(kartlar[ad]).toContain(`## Dosyalar\n${r.dosyalar}`)
+    }
+  })
+
+  it('kısa özet ≤ 2 KB, 16 departmanı ve her satırda açılış harfini (M ya da M/T) taşır', () => {
+    expect(Buffer.byteLength(ozet, 'utf8')).toBeLessThanOrEqual(uretici.HARITA_OZET_SINIRI)
+    for (const ad of roller) {
+      const satir = ozet.split('\n').find((l) => l.startsWith(`${ad} · `))
+      expect(satir, `${ad} satırı özette yok`).toBeTruthy()
+      expect(satir as string).toMatch(/ · (M\/T|M)$/)
+    }
+    expect(ozet).toContain('departman-ac.cmd')
+  })
+
+  it('AÇILIŞ YOLU GERÇEĞE UYAR: T işareti olan rolü departman-ac gerçekten tanır, olmayanı "rol taninmiyor" ile reddeder', () => {
+    for (const ad of roller) {
+      const r = spawnSync(process.execPath, [path.join(KOK, 'scripts', 'board', 'departman-ac.cjs'), ad, '--kuru'], {
+        encoding: 'utf8',
+        windowsHide: true,
+      })
+      const tanindi = !/rol taninmiyor/.test(`${r.stdout}${r.stderr}`)
+      expect(uretici.terminaldenAcilir(ad), `${ad}: harita T=${uretici.terminaldenAcilir(ad)} ama departman-ac tanıma=${tanindi}`).toBe(tanindi)
+    }
+  }, 60_000)
+
+  it('OPS kartı yalnız işaretçiyi taşır (tam harita kartta değil), diğer kartlarda işaretçi yok', () => {
+    const kartlar = uretici.uret()
+    expect(kartlar.OPS).toContain(uretici.HARITA_ISARETCISI)
+    expect(kartlar.OPS).not.toContain('| ARAC |')
+    for (const ad of roller.filter((a) => a !== 'OPS')) expect(kartlar[ad]).not.toContain('## Departman haritası')
+  })
+
+  it('AYIRT EDİCİLİK: bir rolün görevi değişince tam harita değişir (bayatlık kapısı kör değil)', () => {
+    const ropy = JSON.parse(JSON.stringify(uretici.ROLLER)) as Record<string, { gorev: string }>
+    ropy.ARAC.gorev = ropy.ARAC.gorev + ' EK-DEGISIKLIK'
+    expect(uretici.haritaDosyasi(ropy)).not.toBe(uretici.haritaDosyasi())
+  })
+
+  it('AYIRT EDİCİLİK: pencere-adlari tablosundan bir rol çıkarsa açılış harfi M/T → M olur, tam harita da değişir', () => {
+    const tablo = [['ARAC', 'Araç']]
+    expect(uretici.haritaOzet(undefined, undefined, tablo)).toMatch(/\nARAC · .* · M\/T\n/)
+    expect(uretici.haritaOzet(undefined, undefined, tablo)).toMatch(/\nHARITA · .* · M\n/)
+    expect(uretici.haritaDosyasi(undefined, tablo)).not.toBe(uretici.haritaDosyasi())
+  })
+
+  it('AYIRT EDİCİLİK: kısa satırı eksik rol, tabloda olmayan rol ve bütçeyi aşan özet yakalanır', () => {
+    expect(uretici.haritaSorunlari()).toEqual([])
+    const eksik = { ...uretici.HARITA_KISA }
+    delete eksik.SATIS
+    expect(uretici.haritaSorunlari(undefined, eksik).join('\n')).toMatch(/SATIS için kısa görev\/alan satırı yok/)
+    expect(uretici.haritaSorunlari(undefined, { ...uretici.HARITA_KISA, YOKROL: ['a', 'b'] }).join('\n')).toMatch(/YOKROL rol tablosunda yok/)
+    const sisik = { ...uretici.HARITA_KISA, OPS: ['x'.repeat(1500), 'y'.repeat(600)] }
+    expect(uretici.haritaSorunlari(undefined, sisik).join('\n')).toMatch(/kısa özet \d+ bayt > 2048/)
+  })
+
+  it('AYIRT EDİCİLİK: OPS kartından işaretçi silinirse kart denetimi yakalar', () => {
+    const kartlar = uretici.uret()
+    const bozuk = { ...kartlar, OPS: kartlar.OPS.replace(uretici.HARITA_ISARETCISI, '') }
+    expect(uretici.sorunlar(bozuk).join('\n')).toMatch(/OPS: Departman haritası işaretçisi eksik/)
+  })
+
+  it('--harita-ozet kanca çıktısı üretilen özetle aynı ve çıkış 0', () => {
+    const r = spawnSync(process.execPath, [path.join(KOK, 'scripts', 'belge', 'rol-karti-uret.cjs'), '--harita-ozet'], { encoding: 'utf8', windowsHide: true })
+    expect(r.status).toBe(0)
+    expect(r.stdout).toBe(ozet)
   })
 })

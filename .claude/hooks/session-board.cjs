@@ -160,7 +160,8 @@ try {
  * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
  */
 // VH_SESSIONSTART_TOPLAM_TEST yalnız kapı testindedir (daralma yolunu zorlar); üretimde ayarlı olmaz.
-const TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
+// let: yalnız OPS rolünde departman haritası kısa özetinin uzunluğu kadar genişler (HRT-29; bölüm küçülmez, bkz. haritaBolumuEkle).
+let TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
 const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
 const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
 const bolumler = []
@@ -332,6 +333,46 @@ function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
   }
 }
 
+/**
+ * ⭐DEPARTMAN HARİTASI (HRT-29, OPS-27 eki): rol OPS ise açılışta 16 departmanın görev + dosya alanı + açılış yolu kısa özeti
+ * gelir (OPS işi neye göre dağıttığını bilsin; YTN-13 olayı). Özet `rol-karti-uret.cjs --harita-ozet`ten (≤2 KB, üretilmiş
+ * tam harita docs/roller/DEPARTMAN-HARITASI.md). Bölüm KÜÇÜLMEZ (öncelik 0) ve tavan onun uzunluğu kadar genişler: yoksa OPS'un
+ * büyük durum bloğu haritayı hep işaretçiye iterdi. FAIL-OPEN: üretici yok/hata → yalnız işaretçi satırı; oturum bloklanmaz.
+ */
+function haritaBolumuEkle() {
+  if (String(rolSeridi || '').trim().toUpperCase() !== 'OPS') return
+  const isaretci = 'DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md (16 departman: gorev, dosya alani, acilis yolu) — kisa ozet uretilemedi, dosyayi oku.\n'
+  let tam = isaretci
+  try {
+    const uretici = process.env.VH_ROL_KARTI_URETICI ||
+      path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
+    if (fs.existsSync(uretici)) {
+      const ozet = execFileSync(process.execPath, [uretici, '--harita-ozet'], {
+        encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'],
+      })
+      if (ozet && ozet.trim()) tam = ozet.endsWith('\n') ? ozet : ozet + '\n'
+    }
+  } catch {
+    tam = isaretci
+  }
+  TOPLAM_TAVAN += tam.length
+  bolumler.splice(2, 0, { ad: 'departman-haritasi', oncelik: 0, tam, ozet: isaretci })
+}
+
+/**
+ * Pano talebi yokken rol ipucu: pencere başlığı tablodaki görünen adla (Türkçe katlamalı) eşleşirse o şerit ("Ops" → OPS).
+ * Claim yoksa OPS açılışta "ROL KARTI: bilinmiyor" görüyordu (HRT-29 kök sebep 1). Eşleşme yoksa/hata → '' (rol değişmez).
+ */
+function rolBasliktan(baslik) {
+  try {
+    const m = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const satir = m.TABLO.find((s) => m.ayniMi(baslik, s[1]))
+    return satir ? satir[0] : ''
+  } catch {
+    return ''
+  }
+}
+
 /** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
 function rolBolumuEkle() {
   const satir = rolKartiSatiri(rolSeridi)
@@ -487,6 +528,7 @@ try {
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
+  if (!rolSeridi) rolSeridi = rolBasliktan(input.session_title)
   pencereAdi = pencereAdiKarari(board, live, sid, input.session_title)
 
   bolum('serit', 2, mine
@@ -586,6 +628,7 @@ bolum('yontem', 6,
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
 const yaz = () => {
   rolBolumuEkle()
+  haritaBolumuEkle()
   const cikti = {
     hookEventName: 'SessionStart',
     additionalContext: birlestir(),
