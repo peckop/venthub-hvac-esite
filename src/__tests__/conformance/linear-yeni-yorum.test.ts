@@ -33,9 +33,25 @@ interface Durum {
   eskiKanallar?: { ad: string; yanitsizSayi: number; enEskiYanitsizYasMs: number }[]
 }
 
+interface SeritTani {
+  serit: string | null
+  kaynak: 'imza' | 'baslik' | 'imza+baslik' | 'celiski' | 'yok'
+  celiski: boolean
+}
+
+interface CekSonuc {
+  hata?: string
+  kalemler?: { proje: string; createdAt: string; serit: string | null; kaynak: string }[]
+  belirsiz?: number
+}
+
 interface Modul {
   durum: (simdiMs?: number) => Promise<Durum>
-  durumHesapla: (dugumler: readonly unknown[], simdiMs: number) => Durum
+  durumHesapla: (dugumler: readonly unknown[], simdiMs: number, okumaMs?: number | null) => Durum & { belirsizSayi?: number }
+  seritTani: (govde: string) => SeritTani
+  baslikSerit: (govde: string) => string | null
+  ozetle: (kalemler: readonly { proje: string; createdAt: string }[], belirsiz?: number) => string | null
+  cek: () => Promise<CekSonuc>
   satir: () => Promise<string | null>
   seritTuru: (govde: string) => 'design' | 'ops' | null
   yasYaz: (ms: number) => string
@@ -247,6 +263,160 @@ describe('INV-LINEAR-YORUM-8: varsayılan çıktı geriye uyumlu', () => {
     const r = spawnSync(process.execPath, [BETIK], { env: { ...process.env, LINEAR_API_KEY: '' }, encoding: 'utf8', timeout: 20000 })
     expect(r.status).toBe(0)
     expect(r.stdout.trim()).toBe('')
+  })
+})
+
+// ---- ARC-51 (2026-10-04): imzasız OPS yorumları "yeni" sayılıyordu; şerit tanıma imza + başlık ----
+
+/** OPS'un kendi emri: başlıklı, imza satırı YOK (son satır madde). Vitrin 15A'daki gerçek biçim. */
+function opsEmri(saat: number, no: number, proje = MENU): Dugum {
+  return {
+    createdAt: onceki(saat),
+    body: `**OPS → Design #${no} · İŞ: örnek**\n\nAyrıntı satırı.\n\n- Hesap, sepet, ödeme ve giriş adreslerinin hangi dilde olacağı`,
+    project: proje,
+  }
+}
+/** Sahte imza üreten son satır ("- SSS'deki …" → imzaSerit `SSS` verir). Başlık OPS. */
+function sahteImzaliOpsEmri(saat: number, no: number): Dugum {
+  return { createdAt: onceki(saat), body: `**OPS → Design #${no} · DÜZELTME**\n\n- SSS'deki "VentHub kimdir?" sorusu da kişisiz cevaplanacak`, project: MENU }
+}
+/** Design'ın gerçek yorumu: başlık da imza da DESIGN-MENU. */
+function designYorumu(saat: number): Dugum {
+  return { createdAt: onceki(saat), body: '**DESIGN-MENU → OPS · 2026-10-03 · TESLİM**\n\nTeslim edildi.\n\n— DESIGN-MENU 2026-10-03', project: MENU }
+}
+/** İmza ile başlık çelişiyor: başlık OPS diyor, son satır DESIGN-MENU diyor. */
+function celisenYorum(saat: number): Dugum {
+  return { createdAt: onceki(saat), body: '**OPS → Design #99 · çelişkili**\n\nmetin\n\n— DESIGN-MENU', project: MENU }
+}
+
+describe('INV-LINEAR-YORUM-10: şerit tanıma imza + başlık (ARC-51)', () => {
+  it('başlık gönderen adını verir: OPS → Design, DESIGN-MENU → OPS, HARİTA → OPS; yalnız İLK satır', () => {
+    expect(m.baslikSerit('**OPS → Design #22 · x**\n\ny')).toBe('OPS')
+    expect(m.baslikSerit('**DESIGN-MENU → OPS · 2026-10-03**')).toBe('DESIGN-MENU')
+    expect(m.baslikSerit('**HARİTA → OPS: 84 cetvel**')).toBe('HARİTA')
+    expect(m.baslikSerit('OPS -> Design')).toBe('OPS')
+    // Metin ORTASINDAKİ ok sayılmaz.
+    expect(m.baslikSerit('Giriş cümlesi\n**OPS → Design #1**')).toBeNull()
+    expect(m.baslikSerit('Küçük harfli ad → hedef')).toBeNull()
+    expect(m.baslikSerit('')).toBeNull()
+  })
+
+  it('imzasız OPS emri başlıktan OPS tanınır', () => {
+    const t = m.seritTani(opsEmri(1, 13).body)
+    expect(t).toMatchObject({ serit: 'OPS', kaynak: 'baslik', celiski: false })
+    expect(m.seritTuru(opsEmri(1, 13).body)).toBe('ops')
+  })
+
+  it('imzalı Design yorumu Design kalır (başlık ve imza aynı aile)', () => {
+    expect(m.seritTani(designYorumu(1).body)).toMatchObject({ serit: 'DESIGN-MENU', kaynak: 'imza+baslik', celiski: false })
+    expect(m.seritTuru(designYorumu(1).body)).toBe('design')
+  })
+
+  it('DESIGN-KATALOG imzası ile DESIGN-MENU başlığı çelişki DEĞİL (aynı aile)', () => {
+    expect(m.seritTani('**DESIGN-MENU → OPS**\n\n— DESIGN-KATALOG (Opus)').celiski).toBe(false)
+  })
+
+  it('sahte imza (SSS) başlıkla çelişki sayılmaz: başlık kazanır', () => {
+    expect(m.seritTani(sahteImzaliOpsEmri(1, 16).body)).toMatchObject({ serit: 'OPS', kaynak: 'baslik', celiski: false })
+  })
+
+  it('bilinen iki şerit farklıysa ÇELİŞKİ: serit null, ne OPS ne Design', () => {
+    const t = m.seritTani(celisenYorum(1).body)
+    expect(t).toMatchObject({ serit: null, kaynak: 'celiski', celiski: true })
+    expect(m.seritTuru(celisenYorum(1).body)).toBeNull()
+  })
+
+  it('yalnız imza ya da hiçbiri: eski davranış aynen (geriye uyum)', () => {
+    expect(m.seritTani('x\n\n— OPS (Opus)')).toMatchObject({ serit: 'OPS', kaynak: 'imza' })
+    expect(m.seritTani('imzasız ve başlıksız yorum')).toMatchObject({ serit: null, kaynak: 'yok', celiski: false })
+    expect(m.seritTani('')).toMatchObject({ serit: null, celiski: false })
+  })
+})
+
+describe('INV-LINEAR-YORUM-11: cek() olay verisiyle — imzasız OPS emirleri "yeni" sayılmaz (ARC-51 bitiş ölçüsü)', () => {
+  const eskiAnahtar = process.env.LINEAR_API_KEY
+  beforeEach(() => {
+    process.env.LINEAR_API_KEY = 'x'.repeat(30)
+  })
+  afterEach(() => {
+    if (eskiAnahtar === undefined) delete process.env.LINEAR_API_KEY
+    else process.env.LINEAR_API_KEY = eskiAnahtar
+    vi.unstubAllGlobals()
+  })
+
+  function sahteCevap(nodes: Dugum[]) {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: { comments: { nodes } } }) }))
+  }
+
+  it('12 yorumun 8\'i imzasız OPS emri (olay): 0 yeni, belirsiz 0', async () => {
+    const emirler = Array.from({ length: 8 }, (_, i) => (i % 2 === 0 ? opsEmri(30 - i, 13 + i) : sahteImzaliOpsEmri(30 - i, 13 + i)))
+    const imzaliOps: Dugum[] = [ops(2), ops(3), ops(4), ops(5)]
+    sahteCevap([...emirler, ...imzaliOps])
+    const s = await m.cek()
+    expect(s.hata).toBeUndefined()
+    expect(s.kalemler).toHaveLength(0)
+    expect(s.belirsiz).toBe(0)
+    expect(m.ozetle(s.kalemler ?? [], s.belirsiz)).toBeNull()
+  })
+
+  it('aynı verinin arasına gerçek bir Design yorumu eklenince tam 1 yeni olur', async () => {
+    const emirler = Array.from({ length: 8 }, (_, i) => opsEmri(30 - i, 13 + i))
+    sahteCevap([...emirler, designYorumu(1)])
+    const s = await m.cek()
+    expect(s.kalemler).toHaveLength(1)
+    expect(s.kalemler?.[0]?.serit).toBe('DESIGN-MENU')
+    expect(m.ozetle(s.kalemler ?? [], s.belirsiz)).toContain('LINEAR: 1 yeni yorum')
+  })
+
+  it('çelişen yorum yeni sayılmaz ama "belirsiz" diye ayrı sayılır; tek başına satır BASILMAZ (zil alarm vermesin)', async () => {
+    sahteCevap([celisenYorum(2)])
+    const s = await m.cek()
+    expect(s.kalemler).toHaveLength(0)
+    expect(s.belirsiz).toBe(1)
+    expect(m.ozetle(s.kalemler ?? [], s.belirsiz)).toBeNull()
+  })
+
+  it('yeni yorumla birlikte gelen belirsiz sayısı satırda görünür', async () => {
+    sahteCevap([designYorumu(1), celisenYorum(2)])
+    const s = await m.cek()
+    expect(m.ozetle(s.kalemler ?? [], s.belirsiz)).toContain('belirsiz 1 (imza ile başlık çelişiyor)')
+  })
+
+  it('imzasız ve başlıksız yorum eskisi gibi yeni sayılır (kimden geldiği bilinmiyor, kaçırılmaz)', async () => {
+    sahteCevap([{ createdAt: onceki(1), body: 'başlıksız, imzasız not', project: MENU }])
+    expect((await m.cek()).kalemler).toHaveLength(1)
+  })
+})
+
+describe('INV-LINEAR-YORUM-12: --durum başlık tanımayı kullanır, belirsizi ayrı yazar (ARC-51)', () => {
+  it('imzasız OPS emirleri yanıtsız OPS yorumu olarak sayılır (zil ile sayaç aynı şeyi söyler)', () => {
+    const d = m.durumHesapla([designYorumu(30), opsEmri(8, 21), opsEmri(7, 22)], SIMDI)
+    expect(d.yanitsizSayi).toBe(2)
+    expect(d.seviye).toBe('amber')
+    expect(d.ozet).toContain('OPS 2 yorum yanıtsız')
+  })
+
+  it('çelişen yorum ne Design ne OPS sayılır; son okumadan sonrakiler "belirsiz N" olarak ozet\'e yazılır', () => {
+    const okuma = SIMDI - 10 * SAAT
+    const d = m.durumHesapla([design(30), celisenYorum(2), celisenYorum(20)], SIMDI, okuma)
+    expect(d.sonDesignYasMs).toBe(30 * SAAT)
+    expect(d.yanitsizSayi).toBe(0)
+    // 20 saat önceki çelişkili yorum son okumadan ESKİ: sayılmaz; 2 saat önceki sayılır.
+    expect(d.belirsizSayi).toBe(1)
+    expect(d.ozet).toContain('belirsiz 1 yorum (imza ile başlık çelişiyor)')
+  })
+
+  it('okuma damgası verilmezse bütün çelişkili yorumlar sayılır; çelişki yoksa ozet\'te belirsiz geçmez', () => {
+    expect(m.durumHesapla([design(30), celisenYorum(2), celisenYorum(20)], SIMDI).belirsizSayi).toBe(2)
+    const temiz = m.durumHesapla([design(30), opsEmri(2, 1)], SIMDI)
+    expect(temiz.belirsizSayi).toBe(0)
+    expect(temiz.ozet).not.toContain('belirsiz')
+  })
+
+  it('Design yorumu hiç yokken de çelişki sayısı yazılır (kanal belirsiz)', () => {
+    const d = m.durumHesapla([celisenYorum(2)], SIMDI)
+    expect(d.durum).toBe('belirsiz')
+    expect(d.ozet).toContain('belirsiz 1 yorum')
   })
 })
 
