@@ -1,0 +1,298 @@
+{
+  "redirects": [
+    {
+      "source": "/:lang(tr|en)/products/vortice-lineo-100-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-lineo-125-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-lineo-150-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-lineo-200-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-lineo-250-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-lineo-315-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/destek/hesaplayicilar",
+      "destination": "/:lang/urun-secici",
+      "permanent": true
+    },
+    {
+      "source": "/category/fanlar/:path*",
+      "destination": "/category/fans/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/hava-perdeleri/:path*",
+      "destination": "/category/air-curtains/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/isi-geri-kazanim-cihazlari/:path*",
+      "destination": "/category/heat-recovery-units/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/hava-temizleyiciler-anti-viral-urunler/:path*",
+      "destination": "/category/air-purifiers/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/hiz-kontrolu-cihazlari/:path*",
+      "destination": "/category/speed-controllers/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/aksesuarlar/:path*",
+      "destination": "/category/accessories/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/flexible-hava-kanallari/:path*",
+      "destination": "/category/flexible-air-ducts/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/nem-alma-cihazlari/:path*",
+      "destination": "/category/dehumidifiers/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/endustriyel-havalandirma/:path*",
+      "destination": "/category/industrial-ventilation/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/ticari-havalandirma/:path*",
+      "destination": "/category/commercial-ventilation/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/konut-tipi-havalandirma/:path*",
+      "destination": "/category/residential-ventilation/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/duman-egzoz-fanlari/:path*",
+      "destination": "/category/smoke-exhaust-fans/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/category/otopark-jet-fanlari/:path*",
+      "destination": "/category/jet-fans/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921",
+      "destination": "/:lang/products/nicotra-gebhardt-dd?sku=NIC-11921",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-ca-il-4020-es-rect-16076",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-ca-il-5035-es-rect-16077",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-ca-il-6040-es-rect-16078",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-ca-il-7050-es-rect-16079",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT",
+      "permanent": true
+    },
+    {
+      "source": "/:lang(tr|en)/products/vortice-ca-il-8060-es-rect-16080",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT",
+      "permanent": true
+    },
+    {
+      "source": "/tr/destek/merkez",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": true
+    },
+    {
+      "source": "/tr/destek/konular/hava-perdesi",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/tr/destek/konular/air-curtain",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/tr/destek/konular/jet-fan",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/tr/destek/konular/hrv",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/tr/destek/konular",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": true
+    },
+    {
+      "source": "/tr/destek/konular/:eski*",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": true
+    },
+    {
+      "source": "/tr/bilgi-merkezi/hava-perdesi",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/tr/bilgi-merkezi/otopark-jet-fan",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/tr/bilgi-merkezi/isi-geri-kazanim",
+      "destination": "/tr/bilgi-merkezi",
+      "permanent": false
+    },
+    {
+      "source": "/en/destek/merkez",
+      "destination": "/en/urun-secici",
+      "permanent": true
+    },
+    {
+      "source": "/en/destek/konular/hava-perdesi",
+      "destination": "/en/category/air-curtains",
+      "permanent": true
+    },
+    {
+      "source": "/en/destek/konular/air-curtain",
+      "destination": "/en/category/air-curtains",
+      "permanent": true
+    },
+    {
+      "source": "/en/destek/konular/jet-fan",
+      "destination": "/en/destek/hesaplayicilar/jet-fan",
+      "permanent": true
+    },
+    {
+      "source": "/en/destek/konular/hrv",
+      "destination": "/en/category/heat-recovery-vmc",
+      "permanent": true
+    },
+    {
+      "source": "/en/destek/konular",
+      "destination": "/en/urun-secici",
+      "permanent": true
+    },
+    {
+      "source": "/en/destek/konular/:eski*",
+      "destination": "/en/urun-secici",
+      "permanent": true
+    },
+    {
+      "source": "/tr/brands/frekans-konvertoru",
+      "destination": "/tr/category/frekans-konvertorleri",
+      "permanent": true
+    },
+    {
+      "source": "/en/brands/frekans-konvertoru",
+      "destination": "/en/category/frequency-converters",
+      "permanent": true
+    },
+    {
+      "source": "/tr/brands/flexiva",
+      "destination": "/tr/brands",
+      "permanent": true
+    },
+    {
+      "source": "/en/brands/flexiva",
+      "destination": "/en/brands",
+      "permanent": true
+    },
+    {
+      "source": "/tr/brands/casals",
+      "destination": "/tr/brands",
+      "permanent": true
+    },
+    {
+      "source": "/en/brands/casals",
+      "destination": "/en/brands",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy-Report-Only",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.iyzipay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https: data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel-insights.com https://raw.githubusercontent.com https://raw.githack.com https://*.google-analytics.com https://api.pwnedpasswords.com https://*.iyzipay.com; frame-src 'self' https://www.youtube.com https://*.cloudflarestream.com https://*.iyzipay.com; frame-ancestors 'none'; form-action 'self' https://*.iyzipay.com; base-uri 'self'; object-src 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/:lang(tr|en)/:yuzey(auth|account|cart|checkout|payment-success)/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
+    },
+    {
+      "source": "/:lang(tr|en)/:yuzey(auth|account|cart|checkout|payment-success)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
+    }
+  ]
+}

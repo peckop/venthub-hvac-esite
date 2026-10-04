@@ -71,7 +71,10 @@ Değişken yok / bozuk = **kapalı** (güvenli yön).
 | Derleme sabiti (`features.ts`) | repo geleneği, sessizce yanlış değere düşmez | önizlemeyi canlıdan ayırmak için ayrı dal/dağıtım; açmak PR + dağıtım |
 | Edge Config | dağıtımsız anlık | Vercel'e özgü (A6, karar 59); `next.config` onu okuyamaz → çifte mekanizma |
 
-**OPS'tan karar: ortam değişkeni mi, derleme sabiti mi?** Önerim ortam değişkeni; sabit seçilirse §3 aynen geçerli.
+**KARAR (OPS, 10-04 akşam): ortam değişkeni, öneri aynen.** `NEXT_PUBLIC_ADRES_DILI`: Preview=1, Production=0, yok/bozuk=kapalı
+(yalnız tam `1` açar).
+**GERİ ALMA:** değişkeni Production'da `0` yap + yeniden dağıt; **kod değişikliği gerekmez.** (Alternatif: Vercel'de önceki yayına anında dönüş.)
+Geri alma sonrası kanıt: Kapı 3 canlı matrisi, kapalı matrisle farkı boş.
 
 ### 2.4 K3B ile ilişki
 
@@ -128,9 +131,14 @@ giden `href` 0 (kırık adres 0); Aşama 2 önekleri hâlâ eski adreste 200.
 **düz alt ajan, name'siz** (karar 251); kritik kod (kural üretici, zincir/döngü, dilsiz kol) için `mutasyon-testi` bağımsız doğrulama.
 Migration içeren PR birleştirilmez; çıkarsa PR açılır, durulur, OPS'a yazılır (Salı onayı, OPS-54).
 
-## 6. OPS'a açık sorular
+## 6. Kapanan sorular (OPS, 10-04 akşam)
 
-1. **Anahtar türü:** ortam değişkeni (öneri) mi, derleme sabiti mi? (§2.3)
-2. **`EN_YAYIN`:** 11 Ekim'de açılıyor mu? Kapalıysa EN adresler çalışır ama sitemap/hreflang'da yoktur; testler iki kipte yazılır.
-3. **Tek yayın listesi:** `ADRES_SEMASI_K3B` ve `NEXT_PUBLIC_ADRES_DILI` yayın günü birlikte mi açılır? (önerim evet, K3B'nin eski kararı: Recep önizlemede "gördüm, tamam", karar 68)
-4. Design'ın adres listesi (OPS-48) Salı'ya kadar gelmezse D PR'ı Çarşamba'ya kayar; A–C bağımsız ilerler.
+1. **Anahtar türü:** ortam değişkeni `NEXT_PUBLIC_ADRES_DILI` (§2.3).
+2. **`EN_YAYIN`:** 11 Ekim'de **KAPALI kalır** (EN makale metni yok); EN adresler çalışır ama sitemap/hreflang'da yoktur. Testler **iki kipte**
+   yazılır. Recep aksini derse değişir.
+3. **Yayın listesi:** `ADRES_SEMASI_K3B` ve `NEXT_PUBLIC_ADRES_DILI` yayın günü **aynı listede** açılır ama **AYRI anahtar** kalır (biri tek
+   başına geri alınabilsin; görünüm ve adres ayrı anahtarlar). Kodda ikisi birbirine bağlanmaz.
+4. Design'ın adres listesi (OPS-48) **teslim edildi**: `adres-listesi-2026-10-04.csv`, 548 satır (27 sayfa, 7 kök, 18 dal, 47 aile, 7 marka,
+   442 ürün) + `sayfa-link-haritasi.md`; OPS `C:/tmp/vh-design-devir-2026-10-04/` altına koyacak. Bu liste yalnız **27 sayfa** satırı için
+   `rotaDili`'ye girer; kök/dal/aile/marka/ürün K3B hattının (ürün şeridi) işidir. D PR'ı öne gelebilir. Design'ın EN soruları OPS'ta.
+5. **Spike** (rewrites sonrası `usePathname`/dil değiştirici) A PR'ının içinde, erken. Klasör yeniden adlandırma gerekirse OPS'a yazılır.
