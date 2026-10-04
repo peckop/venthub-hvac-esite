@@ -146,4 +146,58 @@ function satir(token, pencere) {
   return 'BAGLAM: ' + oran
 }
 
-module.exports = { compactPenceresi, esikler, sonBaglam, satir, COMPACT_SONRASI, DOLUYOR, YAKIN, OKUMA_BAYT, HAZIRLIK_NOTU }
+/**
+ * ── PENCERE BAŞINA DURUM DOSYASI (ARC-33 madde 2, 10-04) ──
+ *
+ * Modlar (ops-kokpit) bağlamı `$.session.usage()` ile okuyunca değer donuyordu (kokpit 19, gerçek 27).
+ * Gerçek değeri bu kanca zaten her istemde ölçüyor; aynı ölçümü `~/.claude/mod-durum/pencereler/<sid>.json`
+ * dosyasına da bırakır, mod oradan okur (kanca denetlenebilir, mod yalnız gösterir). Aynı dosya pencere
+ * başına compact için temel olur. Alanlar: baglamToken (sayı; compact sonrası ilk mesajda null), durum
+ * ('olculdu' | 'compact-sonrasi'), pencere, saat (ISO), rol (CC_LANE; bilinmiyorsa null), sid.
+ *
+ * FAIL-OPEN: yazım hatası kancayı bozmaz, null döner. Yazım atomiktir (geçici dosya + rename), okuyan mod
+ * yarım dosya görmez. sid yalnız UUID ise yazılır (yol enjeksiyonu yok).
+ */
+const SID_BICIMI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date()) {
+  try {
+    if (!SID_BICIMI.test(String(sid || ''))) return null
+    if (token === null || token === undefined) return null
+    const compactSonrasi = token === COMPACT_SONRASI
+    const kayit = {
+      sid: String(sid).toLowerCase(),
+      baglamToken: compactSonrasi ? null : token,
+      durum: compactSonrasi ? 'compact-sonrasi' : 'olculdu',
+      pencere,
+      saat: simdi.toISOString(),
+      rol: rol ? String(rol).toUpperCase() : null,
+    }
+    fs.mkdirSync(klasor, { recursive: true })
+    const hedef = path.join(klasor, kayit.sid + '.json')
+    const gecici = hedef + '.' + process.pid + '.tmp'
+    fs.writeFileSync(gecici, JSON.stringify(kayit) + '\n')
+    fs.renameSync(gecici, hedef)
+    return hedef
+  } catch {
+    return null
+  }
+}
+
+/** Varsayılan klasör; VH_PENCERE_KLASORU yalnız testler içindir (gerçek kullanıcı klasörünü kirletmesin). */
+const PENCERE_KLASORU =
+  process.env.VH_PENCERE_KLASORU || path.join(os.homedir(), '.claude', 'mod-durum', 'pencereler')
+
+module.exports = {
+  compactPenceresi,
+  esikler,
+  sonBaglam,
+  satir,
+  pencereDosyasiYaz,
+  PENCERE_KLASORU,
+  COMPACT_SONRASI,
+  DOLUYOR,
+  YAKIN,
+  OKUMA_BAYT,
+  HAZIRLIK_NOTU,
+}

@@ -338,8 +338,12 @@ try {
  */
 try {
   const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
-  const s = bd.satir(bd.sonBaglam(girdi.transcript_path), bd.compactPenceresi(DEPO))
+  const token = bd.sonBaglam(girdi.transcript_path)
+  const pencere = bd.compactPenceresi(DEPO)
+  const s = bd.satir(token, pencere)
   if (s) process.stdout.write(s + '\n')
+  // Modlar bu ölçümü pencere başına dosyadan okur (ARC-33 madde 2); yazım hatası satırı bozmaz.
+  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE)
 } catch (e) {
   process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
