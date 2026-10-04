@@ -56,6 +56,7 @@
 | Fiyat/kur/marj **nasıl hesaplanır**? | `standards/pricing-standard.md` |
 | **Katalog PDF'inde ne yazıyor?** (PDF'i AÇMA — dizini oku) | `standards/catalog-ingestion-standard.md` §6.3 → `<ingestor>/kaynak-dizini/sayfalar.jsonl` |
 | Hangi sayfa **nasıl üretilir**, veri değişince **ne tazelenir**, fiyat **hangi yüzeyde** görünür? | `standards/rendering-cache-standard.md` |
+| Statik sayfaların (hakkımızda, iletişim, destek…) **adres dili**: TR'de Türkçe, EN'de İngilizce yol; eski adresler nereye gider; anahtar nasıl açılır/geri alınır? | `standards/rota-dili-standard.md` (v0.1, OPS-52; kategori/marka adresleri değil, onlar `adres-semasi-standard.md`) |
 | Müşterinin gördüğü ürün metnine **ne girer, ne girmez** (iç editör notu, doğrulanmamış değer)? | `standards/vitrin-metni-standard.md` |
 | Rehber (bilgi) yazısının **konusu nasıl seçilir, kaynağı ne, nasıl doğrulanır**, yayından sonra ne ölçülür? | `standards/rehber-yazisi-standard.md` (TASLAK, karar 62) |
 | Aramada ve pazarda **nasıl göründüğümüz hangi kaynaktan ölçülür**, haftalık takip nasıl, hangi veri depoya girmez? | `standards/pazar-olcum-standard.md` (TASLAK, karar 93 → 124) |
