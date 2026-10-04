@@ -3,6 +3,7 @@ import { MetadataRoute } from 'next'
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
+import { rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
 import { getCategories } from '../lib/services/category.service'
@@ -121,8 +122,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const dilYolu = (lang: string) => adresRotalari(adresDili(lang))
 
   // Ürün listesi şemaya duyarlıdır (`/products` ↔ `/urunler`); diğer statik sayfalar şemadan bağımsız.
+  // Statik sayfalar dilde GÖRÜNEN adresle ilan edilir (rota dili, OPS-52): kanonik = sitemap adresi
+  // (canonical-url-standard); ikisi de aynı `rotaDiliYoluOku` tablosundan çıkar. Anahtar kapalıyken
+  // `rotaDiliYoluOku` rotayı AYNEN döndürür → bugünkü `/${lang}${route}`.
   const statikYol = (lang: string, route: string): string =>
-    route === '/products' ? dilYolu(lang).products() : `/${lang}${route}`
+    route === '/products' ? dilYolu(lang).products() : `/${lang}${rotaDiliYoluOku(route, lang)}`
 
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({
