@@ -180,8 +180,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // yönlendirme yapar). Site haritası kanonik olmayan adresi İLAN ETMEZ.
 
   // 3. Brand Routes
+  // OPS-51: ürünsüz marka (`urunsuz: true`, şu an flexiva) sitemap DIŞI — sayfası noindex,follow basar (markaSayfasi.tsx);
+  // dizine kapalı bir adresi haritada ilan etmek çelişkidir. Marka listesinde ve ana sayfa bandında logoyla kalır.
+  // Ürün gelip işaret kalkınca marka satırı kendiliğinden haritaya girer.
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
-    HVAC_BRANDS.map((brand) => ({
+    HVAC_BRANDS.filter((brand) => !brand.urunsuz).map((brand) => ({
       url: `${baseUrl}${dilYolu(lang).brand(brand.slug)}`,
       // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
       changefreq: 'weekly',

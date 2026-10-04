@@ -1065,6 +1065,8 @@ export const tr = {
     // kısa kalırsa ya da hiç kalmazsa kullanılır. Yalnız kayıttaki doğrulanabilir alan (uzmanlık) konuşur.
     seoYedekUzmanlik: 'VentHub kataloğunda {{uzmanlik}} alanındaki ürünleri inceleyin.',
     seoYedek: '{{ad}} markasının ürün ailelerini, modellerini ve teknik özelliklerini VentHub kataloğunda inceleyin.',
+    // OPS-51: ürünsüz marka sayfasının meta açıklaması (sayfa gövdesiyle aynı olgu; ürün/zaman vaadi yok).
+    seoUrunsuz: '{{ad}} ürünleri henüz VentHub kataloğunda yer almıyor; ürün bilgisi ve teklif için bizimle iletişime geçin.',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
@@ -1094,7 +1096,7 @@ export const tr = {
       // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
       // olmayan bir VAAT. Artık olgu: marka katalogda var, ürünleri henüz yok.
       noProducts: 'Bu markanın ürünleri henüz katalogda değil.',
-      // OPS-51 (karar 265 + OPS hükmü): YALNIZ `brands.ts`'te `yakinda: true` işaretli marka (Flexiva) için.
+      // OPS-51 (karar 265 + OPS hükmü): YALNIZ `brands.ts`'te `urunsuz: true` işaretli marka (Flexiva) için.
       // ZAMAN VAADİ YOK (INV-VAAT-SIZINTI-2 / REC-148): olgu + eylem — ürün katalogda yok, teklif istenir.
       productsOnRequest: '{{ad}} ürünleri için bizden teklif isteyin.',
       productsOnRequestCta: 'İletişim formuna git',

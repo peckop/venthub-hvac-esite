@@ -46,10 +46,10 @@ describe('INV-MARKA-I18N-1: marka verisi iki dilli', () => {
     expect(eksik).toEqual([])
   })
 
-  it('zorunlu alanlar (description, country) hiçbir markada eksik değil — `yakinda` marka country\'siz olabilir (OPS-51)', () => {
+  it('zorunlu alanlar (description, country) hiçbir markada eksik değil — `urunsuz` marka country\'siz olabilir (OPS-51)', () => {
     const eksik = HVAC_BRANDS
-      // country YALNIZ `yakinda` işaretli (kaynağı doğrulanamayan, ürünsüz) markada atlanabilir; description HER markada zorunlu.
-      .filter(b => !ikiDilli(b.description) || (!ikiDilli(b.country) && !b.yakinda))
+      // country YALNIZ `urunsuz` işaretli (kaynağı doğrulanamayan, ürünsüz) markada atlanabilir; description HER markada zorunlu.
+      .filter(b => !ikiDilli(b.description) || (!ikiDilli(b.country) && !b.urunsuz))
       .map(b => b.slug)
     expect(eksik).toEqual([])
   })

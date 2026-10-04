@@ -28,7 +28,7 @@
  *    (migration 20261004120000). Metin YALNIZ doğrulanabilir bilgiden (Casals katalog baskısındaki
  *    firma adresi ve Vortice Group şirketleri listesi; AVenS distribütörlüğü = karar 264). Eski metindeki
  *    "140 yıl / en köklü / tercih edilen" ve 1881 kuruluş yılı KAYNAKSIZ olduğu için YAZILMADI.
- *  · `flexiva` ürünü OLMAYAN marka: `yakinda: true` ile AÇIKÇA işaretli tek istisna (INV-MARKA-KAYNAK-1
+ *  · `flexiva` ürünü OLMAYAN marka: `urunsuz: true` ile AÇIKÇA işaretli tek istisna (INV-MARKA-KAYNAK-1
  *    (e) yalnız bu işaretli ve DB'de gerçekten ürünsüz marka için "ürünsüz marka listede olmaz" kuralını esnetir).
  *    Kaynak dizininde Flexiva için 0 sayfa var (ölçüldü 2026-10-04) → ülke/kuruluş/merkez/uzmanlık YAZILMADI
  *    ve eski kaydın "patentli / global marka" iddiaları atıldı; metni Design yazacak, kaynağı gelince eklenir.
@@ -42,7 +42,7 @@ export interface HVACBrand {
   slug: string
   description: BrandText
   /**
-   * Menşei. İsteğe bağlı YALNIZ `yakinda` markalarda (kaynağı doğrulanamayan ülke YAZILMAZ);
+   * Menşei. İsteğe bağlı YALNIZ `urunsuz` markalarda (kaynağı doğrulanamayan ülke YAZILMAZ);
    * ürünü olan her markada zorunludur (INV-MARKA-I18N-1 ölçer).
    */
   country?: BrandText
@@ -51,7 +51,7 @@ export interface HVACBrand {
    * ve YALNIZ INV-MARKA-KAYNAK-1'deki kapalı listedeki marka için geçerlidir (şu an: flexiva, karar 265).
    * İşaretsiz ürünsüz marka kapıda KIRMIZI verir; işaretli marka DB'de ürün kazanırsa işaret KALKMALI (kapı ölçer).
    */
-  yakinda?: true
+  urunsuz?: true
   founded?: number
   headquarters?: BrandText
   website?: string
@@ -164,14 +164,14 @@ export const HVAC_BRANDS: HVACBrand[] = [
     // KAYNAK YOK (2026-10-04): kaynak dizininde Flexiva için 0 sayfa, DB'de ürün 0. Bu yüzden ülke / kuruluş / merkez /
     // uzmanlık / web sitesi YAZILMADI; eski kaydın "Türkiye'nin global markası / patentli sızdırmazlık" cümleleri
     // doğrulanamadığı için atıldı. `description` yalnız durumu söyler (olgu: marka kaydı var, ürün yok). Marka sayfasının
-    // asıl metnini Design yazacak; kaynak gelince bu kayıt tamamlanır ve `yakinda` işareti ürünle birlikte KALKAR.
+    // asıl metnini Design yazacak; kaynak gelince bu kayıt tamamlanır ve `urunsuz` işareti ürünle birlikte KALKAR.
     name: 'Flexiva',
     slug: 'flexiva',
     description: {
       tr: 'Flexiva marka kaydı katalogda açıldı; ürünleri henüz katalogda değil.',
       en: 'The Flexiva brand record is open in the catalogue; its products are not in the catalogue yet.'
     },
-    yakinda: true
+    urunsuz: true
   }
 ]
 

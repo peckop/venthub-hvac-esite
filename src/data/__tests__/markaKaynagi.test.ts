@@ -14,8 +14,8 @@
  *  (c) site haritası marka URL kümesi = liste × yayındaki diller
  *  (d) yönlendirme tablosu: kalan eski slug × 2 dil var, hedefler listede/kategoride çözülür, tek hop
  *      (OPS-51: casals ve flexiva listeye döndü → 308'leri KALKTI; yalnız frekans-konvertoru kaldı)
- *  (e) ürünsüz marka listede olmaz — TEK, KAPALI, AÇIKÇA İŞARETLİ istisna: `yakinda: true` taşıyan ve
- *      `YAKINDA_ISTISNALARI` listesindeki marka (şu an yalnız flexiva, karar 265). Genel gevşeme YOK:
+ *  (e) ürünsüz marka listede olmaz — TEK, KAPALI, AÇIKÇA İŞARETLİ istisna: `urunsuz: true` taşıyan ve
+ *      `URUNSUZ_ISTISNALARI` listesindeki marka (şu an yalnız flexiva, karar 265). Genel gevşeme YOK:
  *      işaretsiz ürünsüz marka, istisna listesinde olmayan işaretli marka, ürünü olduğu hâlde hâlâ işaretli
  *      marka ve işareti silinmiş flexiva KIRMIZI verir (aşağıdaki "sabotaj" bloğu yüklemi sentetik girdiyle ölçer).
  */
@@ -42,21 +42,21 @@ const listeSluglari = () => HVAC_BRANDS.map((b) => b.slug)
 
 /**
  * KAPALI İSTİSNA LİSTESİ (karar 265): ürünü olmadan listede durabilen markalar. Yeni marka eklemek bu listeyi
- * DEĞİŞTİRMEKTİR — yani kapının kendisinde görünür bir diff ve bilinçli karar ister; `brands.ts`'e `yakinda`
+ * DEĞİŞTİRMEKTİR — yani kapının kendisinde görünür bir diff ve bilinçli karar ister; `brands.ts`'e `urunsuz`
  * yazmak TEK BAŞINA yetmez.
  */
-const YAKINDA_ISTISNALARI: readonly string[] = ['flexiva']
+const URUNSUZ_ISTISNALARI: readonly string[] = ['flexiva']
 
 interface MarkaKaydiOzeti {
   slug: string
-  yakinda?: true
+  urunsuz?: true
 }
 
 /**
  * (e) yüklemi: `liste` markalarını DB ölçümüne (`db`) karşı süzer, ihlalleri açıklamalı döner.
- *  1. ürünsüz (aktif ürün ≤ 0, fikstürde de yok sayılır) marka `yakinda` işaretli DEĞİLSE ihlal;
- *  2. `yakinda` işaretli marka istisna listesinde DEĞİLSE ihlal;
- *  3. `yakinda` işaretli marka DB'de aktif ürün kazandıysa ihlal (işaret ürünle birlikte kalkmalı).
+ *  1. ürünsüz (aktif ürün ≤ 0, fikstürde de yok sayılır) marka `urunsuz` işaretli DEĞİLSE ihlal;
+ *  2. `urunsuz` işaretli marka istisna listesinde DEĞİLSE ihlal;
+ *  3. `urunsuz` işaretli marka DB'de aktif ürün kazandıysa ihlal (işaret ürünle birlikte kalkmalı).
  */
 export function urunsuzMarkaIhlalleri(
   liste: readonly MarkaKaydiOzeti[],
@@ -66,9 +66,9 @@ export function urunsuzMarkaIhlalleri(
   const ihlal: string[] = []
   for (const m of liste) {
     const aktif = db[m.slug]?.aktifUrun ?? 0
-    if (aktif <= 0 && !m.yakinda) ihlal.push(`${m.slug}: ürünsüz marka işaretsiz listede ("henüz katalogda değil" sayfası)`)
-    if (m.yakinda && !istisnalar.includes(m.slug)) ihlal.push(`${m.slug}: yakinda işareti istisna listesinde yok`)
-    if (m.yakinda && aktif > 0) ihlal.push(`${m.slug}: DB'de ${aktif} aktif ürünü var ama hâlâ yakinda işaretli`)
+    if (aktif <= 0 && !m.urunsuz) ihlal.push(`${m.slug}: ürünsüz marka işaretsiz listede ("henüz katalogda değil" sayfası)`)
+    if (m.urunsuz && !istisnalar.includes(m.slug)) ihlal.push(`${m.slug}: urunsuz işareti istisna listesinde yok`)
+    if (m.urunsuz && aktif > 0) ihlal.push(`${m.slug}: DB'de ${aktif} aktif ürünü var ama hâlâ urunsuz işaretli`)
   }
   return ihlal
 }
@@ -95,14 +95,14 @@ describe('INV-MARKA-KAYNAK-1: marka listesi = DB\'de ürünü olan markalar', ()
   })
 
   it('(e) ürünsüz marka listede olamaz — yalnız açıkça işaretli, kapalı listedeki marka (flexiva) istisnadır', () => {
-    expect(urunsuzMarkaIhlalleri(HVAC_BRANDS, DB_MARKALARI, YAKINDA_ISTISNALARI)).toEqual([])
+    expect(urunsuzMarkaIhlalleri(HVAC_BRANDS, DB_MARKALARI, URUNSUZ_ISTISNALARI)).toEqual([])
   })
 
-  it('(e) `yakinda` işaretli markalar kümesi istisna listesiyle BİREBİR aynı (flexiva işareti silinirse/yenisi eklenirse kırmızı)', () => {
-    const isaretliler = HVAC_BRANDS.filter((b) => b.yakinda).map((b) => b.slug).sort()
-    expect(isaretliler).toEqual([...YAKINDA_ISTISNALARI].sort())
+  it('(e) `urunsuz` işaretli markalar kümesi istisna listesiyle BİREBİR aynı (flexiva işareti silinirse/yenisi eklenirse kırmızı)', () => {
+    const isaretliler = HVAC_BRANDS.filter((b) => b.urunsuz).map((b) => b.slug).sort()
+    expect(isaretliler).toEqual([...URUNSUZ_ISTISNALARI].sort())
     // Ölçüt körelmesin: istisna gerçekten DB'de ürünsüz bir marka için var.
-    for (const s of YAKINDA_ISTISNALARI) expect(DB_MARKALARI[s]?.aktifUrun, `${s} DB fikstüründe ürünsüz olmalı`).toBe(0)
+    for (const s of URUNSUZ_ISTISNALARI) expect(DB_MARKALARI[s]?.aktifUrun, `${s} DB fikstüründe ürünsüz olmalı`).toBe(0)
   })
 
   it('casals ve flexiva listede, eski 308 tablosunda DEĞİL (OPS-51)', () => {
@@ -140,7 +140,7 @@ describe('INV-MARKA-KAYNAK-1 (e) vitrin cümlesi: zaman vaadi taşımaz, teklif 
     }
   })
 
-  it('sayfa yakinda markada cümle + Routes.contact() bağlantısı çizer (manuel /tr/ yok)', () => {
+  it('sayfa urunsuz markada cümle + Routes.contact() bağlantısı çizer (manuel /tr/ yok)', () => {
     expect(sayfa).toContain("t('brands.detail.productsOnRequest', { ad: brand.name })")
     expect(sayfa).toMatch(/href=\{Routes\.contact\(\)\}[\s\S]{0,400}productsOnRequestCta/)
     expect(sayfa).not.toMatch(/href=["'`{]\s*["'`]?\/(tr|en)\//)
@@ -152,31 +152,31 @@ describe('INV-MARKA-KAYNAK-1 (e) sabotaj: yüklem gevşemeden ayırt eder', () =
   const ist = ['flexiva']
 
   it('temiz durum: flexiva işaretli + ürünsüz, diğerleri ürünlü → ihlal yok', () => {
-    expect(urunsuzMarkaIhlalleri([{ slug: 'flexiva', yakinda: true }, { slug: 'avens' }], db, ist)).toEqual([])
+    expect(urunsuzMarkaIhlalleri([{ slug: 'flexiva', urunsuz: true }, { slug: 'avens' }], db, ist)).toEqual([])
   })
 
   it('istisnasız ürünsüz marka eklenince KIRMIZI', () => {
-    const ihlal = urunsuzMarkaIhlalleri([{ slug: 'flexiva', yakinda: true }, { slug: 'yenimarka' }], db, ist)
+    const ihlal = urunsuzMarkaIhlalleri([{ slug: 'flexiva', urunsuz: true }, { slug: 'yenimarka' }], db, ist)
     expect(ihlal).toHaveLength(1)
     expect(ihlal[0]).toMatch(/^yenimarka: ürünsüz marka işaretsiz/)
   })
 
-  it('flexiva istisnası (yakinda işareti) silinince KIRMIZI', () => {
+  it('flexiva istisnası (urunsuz işareti) silinince KIRMIZI', () => {
     const ihlal = urunsuzMarkaIhlalleri([{ slug: 'flexiva' }], db, ist)
     expect(ihlal).toHaveLength(1)
     expect(ihlal[0]).toMatch(/^flexiva: ürünsüz marka işaretsiz/)
   })
 
-  it('işaretli ama istisna listesinde olmayan marka KIRMIZI (yalnız `yakinda` yazmak yetmez)', () => {
-    const ihlal = urunsuzMarkaIhlalleri([{ slug: 'yenimarka', yakinda: true }], db, ist)
+  it('işaretli ama istisna listesinde olmayan marka KIRMIZI (yalnız `urunsuz` yazmak yetmez)', () => {
+    const ihlal = urunsuzMarkaIhlalleri([{ slug: 'yenimarka', urunsuz: true }], db, ist)
     expect(ihlal).toHaveLength(1)
     expect(ihlal[0]).toMatch(/istisna listesinde yok/)
   })
 
   it('flexiva DB\'de ürün kazanıp hâlâ işaretliyse KIRMIZI (işaret ürünle birlikte kalkmalı)', () => {
-    const ihlal = urunsuzMarkaIhlalleri([{ slug: 'flexiva', yakinda: true }], { flexiva: { aktifUrun: 4 } }, ist)
+    const ihlal = urunsuzMarkaIhlalleri([{ slug: 'flexiva', urunsuz: true }], { flexiva: { aktifUrun: 4 } }, ist)
     expect(ihlal).toHaveLength(1)
-    expect(ihlal[0]).toMatch(/hâlâ yakinda işaretli/)
+    expect(ihlal[0]).toMatch(/hâlâ urunsuz işaretli/)
   })
 
   it('fikstürde HİÇ olmayan marka ürünsüz sayılır (DB\'de yok = ürün yok)', () => {
@@ -224,10 +224,55 @@ describe('INV-MARKA-KAYNAK-1 (c): site haritası marka kolu listeyi izler', () =
       const girisler = await sitemap()
       const markaUrlleri = new Set(girisler.map((g) => g.url).filter((u) => /\/(tr|en)\/brands\//.test(u)))
       const diller = enYayin ? DILLER : (['tr'] as const)
-      const beklenen = new Set(diller.flatMap((d) => listeSluglari().map((s) => `${SITE_URL}/${d}${Routes.brand(s)}`)))
+      // OPS-51: haritaya YALNIZ DB fikstüründe aktif ürünü olan markalar girer (ürünsüz marka sitemap DIŞI). Beklenen küme
+      // `urunsuz` bayrağından DEĞİL DB ölçümünden türer: ürünlü bir markaya yanlışlıkla `urunsuz` yazılırsa haritadan
+      // düşer ve bu test KIRMIZI olur; ürünsüz bir marka haritaya girerse de KIRMIZI olur (istisna yalnız ürünsüz için).
+      const haritadaOlmali = listeSluglari().filter((s) => (DB_MARKALARI[s]?.aktifUrun ?? 0) > 0)
+      const beklenen = new Set(diller.flatMap((d) => haritadaOlmali.map((s) => `${SITE_URL}/${d}${Routes.brand(s)}`)))
       expect([...markaUrlleri].sort()).toEqual([...beklenen].sort())
+      expect(markaUrlleri.has(`${SITE_URL}/tr${Routes.brand('flexiva')}`), 'ürünsüz flexiva haritada').toBe(false)
+      expect(markaUrlleri.has(`${SITE_URL}/tr${Routes.brand('casals')}`), 'ürünlü casals haritada olmalı').toBe(true)
     })
   }
+})
+
+describe('INV-MARKA-KAYNAK-1 (f): ürünsüz marka sayfası noindex,follow ve ürün vaat etmeyen açıklama basar (OPS-51)', () => {
+  afterEach(() => {
+    vi.doUnmock('../../config/features')
+    vi.resetModules()
+  })
+
+  for (const k3b of [false, true]) {
+    it(`ADRES_SEMASI_K3B=${k3b}: flexiva noindex,follow; ürünlü markada robots alanı YOK (bugünkü)`, async () => {
+      vi.resetModules()
+      vi.doMock('../../config/features', async (asil) => ({ ...(await asil<object>()), ADRES_SEMASI_K3B: k3b, EN_YAYIN: true }))
+      const m = await import('../../app/_components/markaSayfasi')
+      const ust = (slug: string, lang: string) => (k3b ? m.markaUstVerisiK3b(lang, slug) : m.markaUstVerisi(lang, slug))
+      for (const lang of ['tr', 'en']) {
+        expect(ust('flexiva', lang).robots, `flexiva ${lang} noindex değil`).toEqual({ index: false, follow: true })
+        for (const urunlu of ['casals', 'avens', 'seat', 'vortice']) {
+          expect(ust(urunlu, lang).robots, `${urunlu} ${lang} robots yazıyor`).toBeUndefined()
+        }
+      }
+    })
+  }
+
+  it('flexiva meta açıklaması ürün vaat etmez, ≥70 karakter (seoYedek devreye girmez) ve sayfanın söylediğiyle aynı olgu (iki dil)', async () => {
+    vi.resetModules()
+    const m = await import('../../app/_components/markaSayfasi')
+    const { tr } = await import('../../i18n/dictionaries/tr')
+    const { en } = await import('../../i18n/dictionaries/en')
+    for (const [lang, sozluk] of [['tr', tr], ['en', en]] as const) {
+      const a = String(m.markaUstVerisi(lang, 'flexiva').description)
+      expect(a.length).toBeGreaterThanOrEqual(70)
+      expect(a).toContain('Flexiva')
+      expect(a, `seoYedek ürün vaadi: ${a}`).not.toBe(sozluk.brands.seoYedek.replace('{{ad}}', 'Flexiva'))
+      expect(a).not.toMatch(/ürün ailelerini|modellerini|product families|models and technical/i)
+      expect(a).not.toMatch(/yakında|soon|coming/i)
+    }
+    // Ürünlü marka (casals) açıklaması DEĞİŞMEDİ: ürünsüz dalına düşmez.
+    expect(String(m.markaUstVerisi('tr', 'casals').description)).not.toContain('henüz VentHub kataloğunda yer almıyor')
+  })
 })
 
 describe('INV-MARKA-KAYNAK-1 (d): listeden çıkan slug\'ların 308 yönlendirmesi', () => {

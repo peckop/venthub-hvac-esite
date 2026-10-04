@@ -101,11 +101,6 @@
    "priority": 0.6
   },
   {
-   "url": "{BASE}/tr/brands/flexiva",
-   "changefreq": "weekly",
-   "priority": 0.6
-  },
-  {
    "url": "{BASE}/tr/products/vortice-lineo-quiet",
    "changefreq": "daily",
    "priority": 0.9
@@ -458,17 +453,6 @@
    }
   },
   {
-   "url": "{BASE}/tr/brands/flexiva",
-   "changefreq": "weekly",
-   "priority": 0.6,
-   "alternates": {
-    "languages": {
-     "tr": "{BASE}/tr/brands/flexiva",
-     "en": "{BASE}/en/brands/flexiva"
-    }
-   }
-  },
-  {
    "url": "{BASE}/en/brands/vortice",
    "changefreq": "weekly",
    "priority": 0.6,
@@ -531,17 +515,6 @@
     "languages": {
      "tr": "{BASE}/tr/brands/nicotra-gebhardt",
      "en": "{BASE}/en/brands/nicotra-gebhardt"
-    }
-   }
-  },
-  {
-   "url": "{BASE}/en/brands/flexiva",
-   "changefreq": "weekly",
-   "priority": 0.6,
-   "alternates": {
-    "languages": {
-     "tr": "{BASE}/tr/brands/flexiva",
-     "en": "{BASE}/en/brands/flexiva"
     }
    }
   },

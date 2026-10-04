@@ -1993,6 +1993,8 @@ export const en: typeof tr = {
     seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
     seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
     seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
+    // OPS-51: meta description of the brand page without products (same fact as the page body; no product/time promise).
+    seoUrunsuz: '{{ad}} products are not yet in the VentHub catalog; contact us for product information and a quote.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
@@ -2021,7 +2023,7 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
-      // OPS-51 (decision 265 + OPS ruling): ONLY for the brand marked `yakinda: true` in brands.ts (Flexiva).
+      // OPS-51 (decision 265 + OPS ruling): ONLY for the brand marked `urunsuz: true` in brands.ts (Flexiva).
       // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
       productsOnRequest: 'Request a quote from us for {{ad}} products.',
       productsOnRequestCta: 'Go to the contact form',

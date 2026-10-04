@@ -6,7 +6,7 @@ import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
 import { ACIKLAMA_ASGARI, aciklamaKirp } from '@/lib/seo/aciklamaKirp'
-import { hreflangAlani } from '@/lib/seo/enYayinKurali'
+import { hreflangAlani, NOINDEX_FOLLOW } from '@/lib/seo/enYayinKurali'
 import { ovguCumleleriniAt, ovguVarMi } from '@/lib/seo/ovguAyikla'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { adresUret } from '@/utils/adresUret'
@@ -48,6 +48,15 @@ function markaMetinleri(lang: string, brand: Marka) {
   // kalan metin kısa kalırsa ya da hiç kalmazsa kayıttaki doğrulanabilir alan (uzmanlık) cümlesi eklenir.
   const dict = isEn ? en : tr
   const t = (key: string) => getDictValue(dict, key)
+  // OPS-51: ürünsüz marka (Flexiva) sayfası ürün vaat edemez — kayıt/uzmanlık/seoYedek yolları ("ürün ailelerini,
+  // modellerini inceleyin") yanlış olurdu. Açıklama sayfanın GÖSTERDİĞİYLE aynı olguyu söyler (ürün yok, teklif iste);
+  // sözlük cümlesi ≥ ACIKLAMA_ASGARI olduğu için yedek devreye girmez (testle kilitli).
+  if (brand.urunsuz) {
+    return {
+      metaTitle,
+      metaDescription: aciklamaKirp(t('brands.seoUrunsuz').replace('{{ad}}', brand.name)),
+    }
+  }
   const kayit = ovguCumleleriniAt(brandText(brand.description, lang))
   const yerel = isEn ? 'en' : 'tr'
   // Uzmanlık etiketi de kayıttan gelir: iddia taşıyorsa kullanılmaz; küçük harfe çevrilir (cümle içinde Başlık Biçimi durmaz).
@@ -94,6 +103,9 @@ export function markaUstVerisi(lang: string, slug: string): Metadata {
   return {
     title: metaTitle,
     description: metaDescription,
+    // OPS-51: ürünsüz marka sayfası 200 KALIR (marka listesinde logoyla durur) ama dizine girmez; ürünlü markada
+    // `robots` alanı YAZILMAZ (bugünkü). Site haritası da bu markayı ilan etmez (sitemap.ts). Emsal: pasifKategoriRobots.
+    ...(brand.urunsuz ? { robots: NOINDEX_FOLLOW } : {}),
     alternates: {
       canonical: canonicalUrl,
       // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
@@ -134,7 +146,12 @@ export function markaUstVerisiK3b(lang: string, slug: string): Metadata {
     baslik: metaTitle,
     aciklama: metaDescription,
   })
-  return { ...m, openGraph: { ...m.openGraph, images: OG_GORSELI } }
+  return {
+    ...m,
+    // OPS-51: ürünsüz marka → noindex, follow (K3-b yolunda da; ürünlü markada `m.robots` olduğu gibi kalır).
+    ...(brand.urunsuz ? { robots: NOINDEX_FOLLOW } : {}),
+    openGraph: { ...m.openGraph, images: OG_GORSELI },
+  }
 }
 
 /** Marka sayfası gövdesi — JSON-LD + görünüm. */
