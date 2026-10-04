@@ -21,6 +21,12 @@ export const DILLER = /** @type {const} */ (['tr', 'en'])
 export const ASAMA_2_ONEKLERI = /** @type {const} */ (['account', 'cart', 'checkout', 'auth', 'payment-success'])
 
 /**
+ * Middleware'in dil önekini hiç eklemediği/dokunmadığı ağaçlar (`middleware.ts` özel yollar). Dilsiz kol bunlara
+ * yönlendirme kurmasın diye tabloya girmeleri doğrulayıcıda hatadır (PR-C2).
+ */
+export const DOKUNULMAZ_ONEKLER = /** @type {const} */ (['admin', 'api', '_next'])
+
+/**
  * @typedef {{ id: string, klasor: string, tr: string, en: string, altYollar?: boolean }} RotaDiliSatiri
  * `klasor`: bugünkü dilden bağımsız klasör/yol (`/` içerebilir). `tr`/`en`: o dildeki yeni genel yol;
  * klasörle aynıysa o dilde değişiklik yoktur. `altYollar`: true ise `/:path*` kuyruğu da eşlenir.
@@ -93,6 +99,9 @@ export function rotaDiliTablosuDogrula(tablo) {
       }
       if (/** @type {readonly string[]} */ (DILLER).includes(ilkParca)) {
         throw hata(`${ad}: "${alan}" dil koduyla başlıyor ("${ilkParca}"); dil öneki ile karışır`)
+      }
+      if (/** @type {readonly string[]} */ (DOKUNULMAZ_ONEKLER).includes(ilkParca)) {
+        throw hata(`${ad}: "${alan}" middleware'in dokunmadığı bir önekle başlıyor ("${ilkParca}")`)
       }
     }
     if (satir.altYollar !== undefined && typeof satir.altYollar !== 'boolean') {
