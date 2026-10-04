@@ -218,7 +218,7 @@ export function rotaDiliYenidenYazimlari(acik, tablo) {
 export function rotaDiliEsle(yol, tablo, acik = false) {
   if (!acik) return null
   if (typeof yol !== 'string' || !yol.startsWith('/')) return null
-  const temiz = yol.length > 1 ? yol.replace(/\/+$/, '') : yol
+  const temiz = yol.length > 1 ? sondakiEgikCizgileriKirp(yol) : yol
   const bulunan = satirBul(temiz, tablo, 'klasor')
   if (bulunan === null) return null
   const { satir, kalan } = bulunan
@@ -256,9 +256,22 @@ function urlBol(url) {
   const konum = url.search(/[?#]/)
   const yolKismi = konum === -1 ? url : url.slice(0, konum)
   const ek = konum === -1 ? '' : url.slice(konum)
-  const temiz = yolKismi.length > 1 ? yolKismi.replace(/\/+$/, '') : yolKismi
+  const temiz = yolKismi.length > 1 ? sondakiEgikCizgileriKirp(yolKismi) : yolKismi
   const son = yolKismi.length > 1 && yolKismi.endsWith('/') ? '/' : ''
   return { yol: temiz, son, ek }
+}
+
+/**
+ * Sondaki tüm `/` karakterlerini kırpar. `replace(/\/+$/, '')` YERİNE doğrusal döngü: o desen, çok sayıda
+ * ardışık `/` ve ardından başka karakter gelen istek yollarında ikinci dereceden yavaşlar (16.000 `/` ≈ 150 ms,
+ * 32.000 ≈ 600 ms CPU; middleware her istekte çağırır). Girdi kullanıcıdan gelir, bu yüzden desen kullanılmaz.
+ * @param {string} metin
+ * @returns {string}
+ */
+function sondakiEgikCizgileriKirp(metin) {
+  let son = metin.length
+  while (son > 0 && metin.charCodeAt(son - 1) === 47) son--
+  return metin.slice(0, son)
 }
 
 /**
