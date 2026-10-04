@@ -43,6 +43,28 @@ function surumAyir(s) {
   return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null
 }
 
+/**
+ * ⛔ENJEKSİYON SINIRI: satır her mesajın bağlamına yazılır; GitHub etiketi, npm sürümü ve hata
+ * metni DIŞ VERİDİR. `surumAyir` yalnız metnin BAŞINI doğruluyor ("1.0.31 şunu yap…" geçer),
+ * bu yüzden bağlama giden her değer önce buradan geçer: sürüm yalnız rakamlardan yeniden kurulur,
+ * tarih yalnız YYYY-AA-GG, serbest metin (hata) harf/rakam/ayraçla sınırlanır.
+ */
+function surumTemiz(s) {
+  const a = surumAyir(s)
+  return a ? a.join('.') : null
+}
+function tarihTemiz(s) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? String(s) : ''
+}
+function metinTemiz(s) {
+  // Hata metni SABİT SÖZLÜKTEN seçilir: serbest metin (harfler dahil) bağlama girmez. Mesaj
+  // gövdesi bilerek atılır; sebep türü yeter.
+  const m = /^(ag|zaman asimi|GitHub \d{3}|etiket cozulemedi|fetch yok|JSON bozuk|package\.json okunamadi|@wrongstack bagimliligi yok)/.exec(
+    String(s == null ? '' : s),
+  )
+  return m ? m[1] : 'sebep tanimsiz'
+}
+
 /** a<b → -1, a=b → 0, a>b → 1; çözülemeyen → null. */
 function karsilastir(a, b) {
   const x = surumAyir(a)
@@ -60,8 +82,8 @@ function kurulu(depo) {
   let paket
   try {
     paket = JSON.parse(fs.readFileSync(path.join(depo, PAKET_YOLU), 'utf8'))
-  } catch (e) {
-    return { hata: 'package.json okunamadi (' + String(e.message).slice(0, 40) + ')' }
+  } catch {
+    return { hata: 'package.json okunamadi' }
   }
   const bagimlilik = (paket && paket.dependencies) || {}
   const surumler = Object.entries(bagimlilik)
@@ -88,7 +110,7 @@ async function sonSurumuOlc(secenek = {}) {
     if (!yanit.ok) return { hata: 'GitHub ' + yanit.status }
     const v = await yanit.json()
     if (!surumAyir(v && v.tag_name)) return { hata: 'etiket cozulemedi' }
-    const sonuc = { son: String(v.tag_name).replace(/^v/, ''), tarih: String(v.published_at || '').slice(0, 10) }
+    const sonuc = { son: surumTemiz(v.tag_name), tarih: tarihTemiz(String(v.published_at || '').slice(0, 10)) }
     // KURULABİLİR sürüm: GitHub etiketi npm'e günler sonra iniyor (10-04: GitHub 1.0.31, npm 1.0.29).
     // npm okunamazsa satırdan düşer; GitHub ölçümünü bozmaz.
     try {
@@ -98,7 +120,7 @@ async function sonSurumuOlc(secenek = {}) {
       })
       if (n.ok) {
         const nv = await n.json()
-        if (nv && surumAyir(nv.version)) sonuc.npm = String(nv.version)
+        if (nv && surumAyir(nv.version)) sonuc.npm = surumTemiz(nv.version)
       }
     } catch {
       /* npm ölçülemedi: npm alanı yok */
@@ -123,7 +145,7 @@ function oku(yol) {
     if (!v || typeof v.olculdu !== 'string') return { durum: 'bozuk', hata: 'olculdu alani yok' }
     return { durum: 'tamam', veri: v }
   } catch (e) {
-    return { durum: 'bozuk', hata: String(e.message) }
+    return { durum: 'bozuk', hata: 'JSON bozuk' }
   }
 }
 
@@ -134,14 +156,21 @@ function oku(yol) {
 function satir(sonuc, depo, simdi = Date.now()) {
   const k = kurulu(depo)
   const bizde = k.hata ? null : k.surum
-  const onEk = k.hata ? 'bizde OLCULEMEDI (' + k.hata + ')' : 'bizde ' + bizde + (k.karisik ? ' (paketler karisik)' : '')
+  const onEk = k.hata ? 'bizde OLCULEMEDI (' + metinTemiz(k.hata) + ')' : 'bizde ' + bizde + (k.karisik ? ' (paketler karisik)' : '')
   if (sonuc.durum === 'yok') return '⚠WRONGSTACK: ' + onEk + ', son OLCULMEDI (onbellek yok)'
-  if (sonuc.durum === 'bozuk') return '⚠WRONGSTACK: ' + onEk + ', son OLCULEMEDI (' + sonuc.hata.slice(0, 50) + ')'
-  const v = sonuc.veri
+  if (sonuc.durum === 'bozuk') return '⚠WRONGSTACK: ' + onEk + ', son OLCULEMEDI (' + metinTemiz(sonuc.hata) + ')'
+  // Önbellek dosyası da dış girdi sayılır: bağlama giden her alan çıkışta yeniden temizlenir.
+  const v = {
+    ...sonuc.veri,
+    son: surumTemiz(sonuc.veri.son) || undefined,
+    npm: surumTemiz(sonuc.veri.npm) || undefined,
+    tarih: tarihTemiz(sonuc.veri.tarih),
+    hata: sonuc.veri.hata ? metinTemiz(sonuc.veri.hata) : undefined,
+  }
   const bayatSaat = Math.floor((simdi - Date.parse(v.olculdu)) / 3600000)
   const bayatEk = Number.isFinite(bayatSaat) && bayatSaat >= BAYAT_SAAT ? ' · onbellek ' + bayatSaat + ' saat bayat' : ''
-  if (!v.son) return '⚠WRONGSTACK: ' + onEk + ', son OLCULEMEDI (' + String(v.hata || 'sebep yok').slice(0, 50) + ')' + bayatEk
-  const hataEk = v.hata ? ' · son kontrol OLCULEMEDI (' + String(v.hata).slice(0, 40) + ')' : ''
+  if (!v.son) return '⚠WRONGSTACK: ' + onEk + ', son OLCULEMEDI (' + (v.hata || 'sebep yok') + ')' + bayatEk
+  const hataEk = v.hata ? ' · son kontrol OLCULEMEDI (' + v.hata + ')' : ''
   const tarihEk = v.tarih ? ' (' + v.tarih + ')' : ''
   const npmEk = v.npm && v.npm !== v.son ? ", npm'de " + v.npm : ''
   const fark = bizde ? karsilastir(bizde, v.son) : null
