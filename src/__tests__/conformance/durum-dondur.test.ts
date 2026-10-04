@@ -191,6 +191,17 @@ describe('INV-DURUM-DONDUR-1: durum dosyası günlük döndürme', () => {
       expect(fs.existsSync(k.gecmis)).toBe(false)
     })
 
+    it('stderr borulandığında Türkçe karakter bozulmaz (ortam değişkeni YOK: betik kendisi UTF-8 yapar)', () => {
+      const k = kur('\n', { devir: 'yok', dortAlanGunde: true })
+      const temiz: Record<string, string | undefined> = { ...ENV }
+      delete temiz.PYTHONIOENCODING
+      delete temiz.PYTHONUTF8
+      const r = spawnSync(PY as string, [BETIK, ...ortak(k, ['--oncesi-tek', '--yaz'])], { env: temiz as NodeJS.ProcessEnv })
+      expect(r.status).toBe(3)
+      expect(r.stderr.toString('utf-8')).toContain('REDDEDİLDİ')
+      expect(r.stderr.toString('utf-8')).not.toContain('�')
+    })
+
     it('DEVİR var ama dört alandan biri DEVİR içinde yok (başka bir günde geçse de): çıkış 3', () => {
       const k = kur('\n', { devir: 'eksik', dortAlanGunde: true })
       const r = py(ortak(k, ['--oncesi-tek', '--yaz']))

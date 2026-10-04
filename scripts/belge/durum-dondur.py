@@ -20,6 +20,7 @@ Kurallar (hepsi kodda sınanır):
   · Yazma güvenliği: okumadan sonra dosya değişirse durur; `os.replace`'ten hemen önce içerik BAYT BAYT yeniden okunup karşılaştırılır; yazma hata verirse (Windows'ta
     PermissionError dahil) yazılmış geçmiş dosyaları ve .tmp temizlenir, böylece sonraki koşu "ezilmez" ile takılmaz. Geçmiş dosyası ASLA ezilmez. Canlı dosya atomik yazılır.
     KALAN SINIR: son karşılaştırma ile `os.replace` arasındaki milisaniyelik pencerede başka pencerenin eklediği satır ezilir; bu yüzden döndürme, başka pencere o dosyaya yazmıyorken çalıştırılır.
+    AYNI SINIR geri yazma yolunda da geçerlidir: diskten doğrulama tutmayıp özgün dosya geri yazılırken (çıkış 1) o aralıkta eklenen satır kaybolur.
   · Satır sonu: dosyadaki BASKIN satır sonu (CRLF ya da LF) işaret ve başlık satırlarında kullanılır; mevcut satırlar bayt bayt korunur.
   · Geçmiş dosyalarının başlığında `sid:` ve dört alan bulunmaz (kapı onları canlı dosya sanmasın, §9b madde 4).
 Çıkış: 0 tamam (ya da yapılacak iş yok) · 1 kullanım/yazma güvenliği/doğrulama · 2 yapı hatası · 3 DEVİR şartı sağlanmıyor (--yaz reddedildi).
@@ -141,10 +142,11 @@ def diskten_dogrula(dosya, gd, hedefler, canli_idx, ust_bit, satirlar, veri, isa
 
 
 def main():
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
+    for akis in (sys.stdout, sys.stderr):
+        try:
+            akis.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
     ap = argparse.ArgumentParser()
     ap.add_argument("--dosya", required=True)
     ap.add_argument("--gecmis-dizin", required=True)
