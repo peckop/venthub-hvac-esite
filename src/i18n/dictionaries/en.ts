@@ -1623,6 +1623,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
+    /** The item's CURRENT catalog model code (not an order-time snapshot); never the raw SKU. */
+    modelCodeLabel: 'Model Code: {{code}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',

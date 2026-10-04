@@ -2448,6 +2448,8 @@ export const tr = {
     reorderedToast: '{{count}} ürün sepete eklendi',
     reorderNotFound: 'Ürünler stokta bulunamadı',
     reorderError: 'Tekrar sipariş sırasında hata',
+    /** Kalemin GÜNCEL katalog model kodu (sipariş-anı snapshot'ı değil); ham SKU değildir. */
+    modelCodeLabel: 'Model Kodu: {{code}}',
     shippingInfo: 'Kargo / Takip',
     carrier: 'Kargo Firması',
     trackingNumber: 'Takip Numarası',

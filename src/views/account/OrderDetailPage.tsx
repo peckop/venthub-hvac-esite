@@ -19,7 +19,20 @@ import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { VARIANT_DETAIL_COLUMNS } from '../../lib/services/product.columns'
 import { ORDER_STEPS, orderStatusBadgeClass, orderStatusLabelKey, orderStepIndex } from '../../utils/orderStatusDisplay'
+import { getProductModelLabel } from '../../utils/productHelpers'
 import { siparisNoGoster } from '../../utils/siparisNo'
+
+/**
+ * Kalemin gömülü ürününden (`products ( model_code )`) GÖRÜNEN model kodu. PostgREST many-to-one
+ * gömmeyi nesne döndürür; dizi gelirse ilk eleman. Ürün okunamadıysa (RLS/boş) ya da kod boşsa
+ * `null` — `getProductModelLabel` hiçbir zaman ham `sku`ya düşmez, bu yüzden hata yolu da "satır yok".
+ */
+function kalemModelKodu(urun: unknown): string | null {
+  const satir: unknown = Array.isArray(urun) ? urun[0] : urun
+  if (!satir || typeof satir !== 'object') return null
+  const kod = (satir as { model_code?: unknown }).model_code
+  return getProductModelLabel({ model_code: typeof kod === 'string' ? kod : null })
+}
 
 interface ShippingAddress {
   fullAddress?: string
@@ -35,6 +48,11 @@ interface OrderItem {
   id: string
   product_id?: string
   product_name: string
+  /**
+   * GÜNCEL katalog model kodu (`products.model_code`), sipariş-anı snapshot'ı DEĞİL — şemada
+   * `model_code` snapshot'ı yok. Kod boşsa/ürün okunamadıysa `null`; ham SKU'ya ASLA düşülmez.
+   */
+  model_code?: string | null
   quantity: number
   unit_price: number
   total_price: number
@@ -104,7 +122,8 @@ export default function OrderDetailPage() {
             invoice_info, legal_consents,
             venthub_order_items (
               id, product_id, quantity, product_image_url,
-              product_name_snapshot, unit_price_snapshot
+              product_name_snapshot, unit_price_snapshot,
+              products ( model_code )
             )
           `)
           .eq('id', id)
@@ -127,6 +146,7 @@ export default function OrderDetailPage() {
             id: String(it.id),
             product_id: it.product_id ? String(it.product_id) : undefined,
             product_name: String(it.product_name_snapshot),
+            model_code: kalemModelKodu(it.products),
             quantity: qty,
             unit_price: unit,
             total_price: unit * qty,
@@ -401,8 +421,14 @@ export default function OrderDetailPage() {
                           {/* URN-32: sipariş-anı `product_sku_snapshot` satırı KALDIRILDI. Sipariş detayı
                               müşteriye gösterilir ve kural (INV-SKU-GORUNMEZ-1) "HİÇBİR müşteri yüzeyinde"
                               der; snapshot/fatura görünümü için muafiyet yok. Satır sorgudan da çıktı —
-                              ekranda basılmayan iç kod müşteri tarayıcısına da inmesin. `model_code`
-                              snapshot'ı şemada yok (ayrı kayıt); ad + adet + tutar eşleştirmeye yeter. */}
+                              ekranda basılmayan iç kod müşteri tarayıcısına da inmesin.
+                              Yerine ürün sayfasının müşteriye zaten gösterdiği GÜNCEL katalog `model_code`'u
+                              (snapshot değil; şemada model_code snapshot'ı yok). Kod yoksa satır HİÇ çizilmez. */}
+                          {item.model_code ? (
+                            <div className="mt-0.5 text-xs font-normal text-steel-gray">
+                              {t('orders.modelCodeLabel', { code: item.model_code })}
+                            </div>
+                          ) : null}
                         </td>
                         <td className="p-4">
                           {item.product_image_url ? (
