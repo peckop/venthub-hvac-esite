@@ -19,6 +19,9 @@ import { rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri, zincirVarMi } from '
  * FİKSTÜRÜ YENİLEMEK: yalnız başka bir kapı bilerek adres değiştirdiğinde (örn. karar 92 listesi büyüdü).
  * Üretim: next.config.mjs'i anahtarsız içe aktar, `{ redirects: await redirects(), headers: await headers() }`
  * JSON'unu yaz. Rota dili satırı eklemek fikstürü DEĞİŞTİRMEZ (kapalı kipte hiçbir etkisi yok).
+ *
+ * YENİLEME KAYDI: OPS-51 (karar 264 + 265, 2026-10-05) casals ve flexiva marka 308'lerini bilerek kaldırdı
+ * (tr/en × 2 = 4 satır); fikstürden yalnız bu dört kayıt çıktı (49 → 45), başka fark yok.
  */
 
 const ANAHTAR = 'NEXT_PUBLIC_ADRES_DILI'
@@ -53,7 +56,7 @@ async function yukle(anahtar: string | undefined) {
 
 describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres farkı', () => {
   it('ÖN KOŞUL — fikstür dolu evren (boş evrende yeşil kapı ölçüm değildir)', () => {
-    expect(FIKSTUR.redirects).toHaveLength(49)
+    expect(FIKSTUR.redirects).toHaveLength(45)
     expect(FIKSTUR.headers).toHaveLength(3)
   })
 
@@ -77,7 +80,7 @@ describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres 
   it('⛔DUYARLILIK: anahtar tam "1" iken çıktı fikstürden FARKLI (karşılaştırma gerçekten ayırt ediyor)', async () => {
     const cikti = await yukle('1')
     expect(cikti.redirects).not.toEqual(FIKSTUR.redirects)
-    // Fark yalnız SONA eklenen rota dili kuralları: önceki 49 satır bozulmaz.
+    // Fark yalnız SONA eklenen rota dili kuralları: önceki 45 satır bozulmaz.
     expect(cikti.redirects.slice(0, FIKSTUR.redirects.length)).toEqual(FIKSTUR.redirects)
     const fazla = cikti.redirects.slice(FIKSTUR.redirects.length)
     expect(fazla.length).toBeGreaterThan(0)
@@ -88,7 +91,7 @@ describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres 
     expect(cikti.headers).toEqual(FIKSTUR.headers)
   }, 60_000)
 
-  it('açık kipte TÜM next.config yönlendirmeleri (49 mevcut + rota dili) tek hop: zincir/döngü yok', async () => {
+  it('açık kipte TÜM next.config yönlendirmeleri (45 mevcut + rota dili) tek hop: zincir/döngü yok', async () => {
     const cikti = await yukle('1')
     const bulgu = zincirVarMi(cikti.redirects)
     expect(bulgu, bulgu ? `${bulgu.kaynak.source} -> ${bulgu.kaynak.destination} sonra ${bulgu.hedef.source}` : '').toBeNull()
