@@ -5,6 +5,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
 import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.mjs';
+import { adresDiliOku, rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri } from './src/config/rotaDili.mjs';
 
 /**
  * `EN_YAYIN` bayrağının TEK kaynağı `src/config/features.ts`. Bu dosya TypeScript içe aktaramadığı
@@ -14,6 +15,11 @@ import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.
 const EN_YAYIN = enYayinOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
 /** `ADRES_SEMASI_K3B` — aynı gerekçe; okuyucu `k3bOku` (INV-MARKA-KAYNAK-1 gerçek değeri ölçer). */
 const ADRES_SEMASI_K3B = k3bOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
+/**
+ * Rota dili anahtarı (OPS-52): `NEXT_PUBLIC_ADRES_DILI`, derleme anında okunur; YALNIZ tam `1` açar,
+ * yok/bozuk = kapalı. K3B'den AYRI anahtar (biri tek başına geri alınır). Cetvel: src/config/rotaDili.mjs.
+ */
+const ADRES_DILI = adresDiliOku(process.env.NEXT_PUBLIC_ADRES_DILI);
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -187,7 +193,16 @@ const nextConfig = {
             // listesi). K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
             // src/config/markaYonlendirmeleri.mjs · kapı INV-MARKA-KAYNAK-1. Hepsi tek hop.
             ...markaYonlendirmeleri(ADRES_SEMASI_K3B),
+
+            // ── OPS-52 (kararlar 267/269/270) — sayfa adresleri dile göre yazılır
+            // (`/tr/about` → `/tr/hakkimizda`). Anahtar kapalıyken liste BOŞ. Gerekçe, tablo ve
+            // yeniden yazım karşılığı: src/config/rotaDili.mjs. Hepsi tek hop.
+            ...rotaDiliYonlendirmeleri(ADRES_DILI),
         ];
+    },
+    async rewrites() {
+        // Yeni adres → mevcut klasör (sayfa dosyası aranmadan önce). Anahtar kapalıyken boş.
+        return { beforeFiles: rotaDiliYenidenYazimlari(ADRES_DILI) };
     },
     async headers() {
         return [
