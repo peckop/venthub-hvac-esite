@@ -1457,7 +1457,8 @@ export const en: typeof tr = {
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
-      sku: 'SKU',
+      /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
+      modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
     },
     actions: {

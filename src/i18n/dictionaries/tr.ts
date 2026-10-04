@@ -1896,7 +1896,8 @@ export const tr = {
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Mühendislik Analizi',
-      sku: 'SKU',
+      /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
+      modelCode: 'Model Kodu',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
     },
     actions: {

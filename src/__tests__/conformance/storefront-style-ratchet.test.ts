@@ -210,8 +210,11 @@ const RATCHETS: Ratchet[] = [
     // 2026-10-01 · 1446 -> 1444: URN-1 — sipariş durum eşlemesi ortak yardımcıya taşındı, kopya kalktı.
     // 2026-10-03 · 1444 -> 1442: URN-25 — kategori ve /products kök Suspense yedek görünümleri kalktı;
     // iki `text-slate-500` gitti. Kazanç yan ürün.
-    // 2026-10-05 · 1442 -> 1440: URN-32 — sipariş detayındaki ham SKU satırı (`text-slate-500`) ve
-    // arama sonucundaki SKU/ayraç satırı (`text-slate-600` kardeşi) kalktı. Kazanç yan ürün.
+    // 2026-10-05 · 1442 -> 1440: URN-32 — iki ham gri kalktı: arama sonucundaki marka/SKU ayracı
+    // (`text-gray-300`, SearchOverlay) ve sipariş detayındaki ham SKU satırı (`text-slate-500`,
+    // OrderDetailPage). Marka `text-slate-600` ve favori satırı `text-slate-400` yerinde kaldı
+    // (net etkisi 0); sipariş detayına eklenen model kodu satırı token (`text-steel-gray`) kullanır.
+    // Kazanç yan ürün.
     tavan: 1440,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',

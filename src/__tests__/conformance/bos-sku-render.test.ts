@@ -27,17 +27,22 @@ import { describe, expect, it } from 'vitest'
  * satırı (`VariantSelector`, ≥20 modelli 5 aile) ve ürün föyü PDF'i (`Ref: product.sku`) ham
  * iç SKU basıyordu ve kapı yeşildi. Şimdi:
  *   · K5 — müşteri bileşenleri ADLA listelenir (boş evren korumalı) ve her biri ölçülür;
- *   · K6 — `src/{components,views,app}` altındaki ADMİN OLMAYAN her dosya taranır: bu yüzeylerde
- *          yeni bir `.sku` basımı, listeye eklenmesi unutulsa bile kırmızı verir;
- *   · K7 — ürün föyü PDF'i (`pdfGenerator.ts`) `sku` alanını HİÇ OKUMAZ;
+ *   · K6 — `src/**\/*.tsx` altındaki ADMİN OLMAYAN (`admin` dizini ve testler hariç) her dosya
+ *          taranır: yeni bir `.sku` basımı, listeye eklenmesi unutulsa bile kırmızı verir;
+ *   · K7 — JSX DIŞINDA belge basan iki dosya (föy PDF'i `pdfGenerator.ts`, sipariş detayındaki
+ *          proforma PDF'inin bulunduğu `OrderDetailPage.tsx`) `sku` alanını HİÇ OKUMAZ — jsPDF
+ *          `doc.text` ve `autoTable` gövdesi JSX olmadığı için K5/K6 dedektörü onları göremez
+ *          (sabotajla ölçüldü: proforma gövdesine SKU eklenince yalnız K7 kırmızı verir);
  *   · K8 — dedektörün KENDİ ayırt ediciliği (sahte pozitif / sahte negatif örnekleriyle).
  *
  * ⭐SİPARİŞ DETAYI İSTİSNA DEĞİLDİR: `OrderDetailPage` müşteriye gösterilir ve sipariş-anı
  * `product_sku_snapshot`'ını basıyordu. Kuralın metninde "snapshot" ya da "fatura görünümü" diye
  * bir muafiyet YOK; snapshot alanı *sipariş kaydı* için SKU'yu saklar, *müşteri ekranı* için
- * değil. `model_code` snapshot'ı şemada olmadığından (migration bu işin kapsamı dışı) satır
- * kaldırıldı; müşteri eşleştirmeyi ürün adı + adet + tutar ile yapar. Model kodu snapshot'ı
- * istenirse ayrı bir kayıttır (bkz. URN-32 raporu).
+ * değil. Satır kaldırıldı ve sorgudan da çıktı. Yerine kalemde `products.model_code` gösterilir
+ * (embed `products ( model_code )`): bu GÜNCEL katalog kodudur, sipariş-anı snapshot'ı DEĞİL —
+ * şemada `model_code` snapshot'ı yok (migration bu işin kapsamı dışı). Ad tekilliğine
+ * dayanılmaz: `products.name` üzerinde UNIQUE yok (bugün 442 üründe çakışma 0, bkz.
+ * product-schema-standard §11.4 ölçüm notu); ayırt edicilik ad + model kodu ile sağlanır.
  *
  * NİÇİN AST: `ts.Node.getText()` yorumları da taşır ve bu dosyanın kendi açıklamasında
  * yasaklı kalıplar geçiyor. Aynı tuzağa depoda bir kez düşüldü. AST yorumu, string
@@ -49,16 +54,36 @@ import { describe, expect, it } from 'vitest'
  * olarak ekrana** (JSX çocuğu ya da `title`/`alt`/`aria-label`/`placeholder` özniteliği) mi
  * gidiyor, yoksa kimlik olarak mı taşınıyor. Kapı birinciyi ölçer.
  *
- * ⚠KABUL EDİLEN SINIR, ADIYLA: değer bir FONKSİYONDAN geçip ekrana başka bir dosyada basılırsa
- * (`return v.sku` → başka bileşende `{etiket()}`) dedektör zinciri izlemez. Aynı dosyadaki
- * değişken takma adı (`const s = v.sku` → `{s}`) ve yapı bozma (`const { sku } = v`) İZLENİR.
- * Sunucu tarafı yüzeyleri (e-posta şablonu, Edge fonksiyonu) bu kapının DIŞINDADIR.
+ * ⚠KABUL EDİLEN SINIRLAR, ADIYLA (kapı "yok" demez, "bu yazılışlar yok" der):
+ *   1. İZLENENLER (aynı dosya içinde): değişken takma adı (`const s = v.sku` → `{s}`), yapı
+ *      bozma (`const { sku } = v`), ok/ifade/adlı fonksiyon dönüşü (`return x.sku` → `{f(v)}`;
+ *      adlı fonksiyon yalnız ÇAĞRILINCA değer sayılır, `modelAdresi={f}` işlev başvurusudur),
+ *      dizi eşleme sonucu (`v.map((x) => x.sku).join()`), görünür öznitelikler (düz HTML: title,
+ *      alt, aria-label, placeholder, value, label, content, text, description) ve ÖZEL BİLEŞEN
+ *      proplarının tümü (`<Row kod={v.sku}/>`) — teknik adlar (key, href, id, on*, data-*, *Sku,
+ *      className…) muaftır.
+ *   2. İZLENMEYENLER: değerin FONKSİYONDAN geçip başka DOSYADA basılması; özel bileşenin kendi
+ *      içinde `sku=` propunu metne çevirmesi (prop adı teknik görünür; bileşenin içi K6'da kendi
+ *      dosyası olarak ölçülür); `dangerouslySetInnerHTML`, `document.title =` gibi JSX dışı yollar.
+ *   3. KAPSAM KÖR NOKTALARI: K6 yalnız `.tsx` tarar. `.ts` dosyaları (`utils/`, `hooks/`,
+ *      `contexts/`, `lib/`) JSX içermez ama metin üretebilir (ör. `utils/whatsapp.ts`
+ *      `stockInquiryWithSku` mesajı: bugün ölü kod, çağıranı yok) — bunları bu kapı ölçmez.
+ *      Sunucu tarafı yüzeyler (e-posta şablonu, Edge fonksiyonu, `supabase/`) kapı DIŞIDIR.
+ *      `admin` dizinleri bilerek kapsam dışıdır (SKU orada kimliktir).
  */
 
 const KOK = join(__dirname, '..', '..', '..')
 const PDP = join(KOK, 'src', 'app', '_components', 'ProductDetailPageView.tsx')
 const JSONLD = join(KOK, 'src', 'lib', 'seo', 'jsonld.ts')
-const PDF_FOY = join(KOK, 'src', 'lib', 'pdfGenerator.ts')
+/**
+ * JSX DIŞINDA belge basan müşteri dosyaları: ürün föyü PDF'i ve sipariş detayındaki proforma PDF'i
+ * (`OrderDetailPage.handleInvoicePdf`, jsPDF `doc.text` + `autoTable` gövdesi). Basım varış yeri JSX
+ * olmadığı için `basilanSkular` bunları göremez; burada `sku` okumanın kendisi yasak.
+ */
+const SKU_OKUMAYAN_DOSYALAR = [
+  join(KOK, 'src', 'lib', 'pdfGenerator.ts'),
+  join(KOK, 'src', 'views', 'account', 'OrderDetailPage.tsx'),
+]
 
 /**
  * Müşteriye görünen bileşenler — ADLA. Her birinin canlı rotadan erişilebilirliği URN-32'de
@@ -78,12 +103,12 @@ const MUSTERI_BILESENLERI = [
 ].map((parcalar) => join(KOK, ...parcalar))
 
 /** Taranan müşteri ağacı kökleri (admin ve test hariç). */
-const TARAMA_KOKLERI = ['components', 'views', 'app'].map((a) => join(KOK, 'src', a))
+const TARAMA_KOKLERI = [join(KOK, 'src')]
 
 /** `sku`yu taşıyan alan adları (UI modeli, RPC satırı, sipariş snapshot'ı). */
 const SKU_ALANLARI: ReadonlySet<string> = new Set(['sku', 'product_sku', 'product_sku_snapshot'])
 
-/** Değeri ekranda GÖRÜNEN öznitelikler — kimlik değil, metin taşırlar. */
+/** Düz HTML öğesinde değeri ekranda GÖRÜNEN öznitelikler — kimlik değil, metin taşırlar. */
 const GORUNUR_OZNITELIKLER: ReadonlySet<string> = new Set([
   'title',
   'alt',
@@ -91,7 +116,21 @@ const GORUNUR_OZNITELIKLER: ReadonlySet<string> = new Set([
   'aria-description',
   'aria-valuetext',
   'placeholder',
+  'value',
+  'defaultValue',
+  'label',
+  'content',
+  'text',
+  'description',
 ])
+
+/**
+ * ÖZEL BİLEŞENDE (`<Row …/>`, büyük harfle başlayan etiket) prop adı bu desene uymuyorsa değeri
+ * ekrana gidebilir sayılır: bileşenin içinde metne dönüşüp dönüşmediği bu dosyadan görülmez, bu yüzden
+ * varsayılan "basılır"dır. Kimlik/adres/olay/stil taşıyan adlar açıkça muaftır (`sku`, `selectedSku`,
+ * `href`, `key`, `onSelect`, `className`, `data-*` …).
+ */
+const TEKNIK_PROP = /^(key|ref|href|to|id|as|name|type|src|srcSet|role|tabIndex|htmlFor|className|style)$|^on[A-Z]|^data-|^aria-(?!label$|description$|valuetext$)|[sS]ku$/
 
 /** Sonucu `boolean` üreten ikili operatörler: değer ekrana gitmez, karşılaştırılır. */
 const KARSILASTIRMA: ReadonlySet<ts.SyntaxKind> = new Set([
@@ -186,7 +225,37 @@ function degerBasvurusuMu(n: ts.Identifier): boolean {
   return true
 }
 
-type Yolculuk = 'basilir' | 'basilmaz' | { takmaAd: string }
+type Yolculuk = 'basilir' | 'basilmaz' | { takmaAd: string; fonksiyon: boolean }
+
+/** Bir JSX özniteliğinin ifade değeri ekrana metin olarak gidebilir mi? */
+function oznitelikBasilirMi(oznitelik: ts.JsxAttribute): boolean {
+  const ad = oznitelik.name.getText()
+  const oge: ts.Node | undefined = oznitelik.parent?.parent
+  const etiket = oge && (ts.isJsxOpeningElement(oge) || ts.isJsxSelfClosingElement(oge)) ? oge.tagName.getText() : ''
+  // Büyük harfle başlayan ya da noktalı etiket özel bileşendir; küçük harf düz HTML öğesidir.
+  const ozelBilesen = /^[A-Z]/.test(etiket) || etiket.includes('.')
+  return ozelBilesen ? !TEKNIK_PROP.test(ad) : GORUNUR_OZNITELIKLER.has(ad)
+}
+
+/**
+ * Bir fonksiyonun DÖNÜŞ değeri nereye akıyor? Süzgeç/sıralama geri çağrısının dönüşü bir koşuldur;
+ * adlı fonksiyon bildirimi çağrıldığı yerde değeri taşır (adı takma ad olarak izlenir).
+ */
+function donusAkisi(fn: ts.Node): 'devam' | 'basilmaz' | { takmaAd: string; fonksiyon: boolean } {
+  if (ts.isFunctionDeclaration(fn)) return fn.name ? { takmaAd: fn.name.text, fonksiyon: true } : 'basilmaz'
+  if (!ts.isArrowFunction(fn) && !ts.isFunctionExpression(fn)) return 'basilmaz'
+  const cagri: ts.Node | undefined = fn.parent
+  if (
+    cagri &&
+    ts.isCallExpression(cagri) &&
+    cagri.arguments.some((a) => a === fn) &&
+    ts.isPropertyAccessExpression(cagri.expression) &&
+    KOSUL_GERI_CAGRILARI.has(cagri.expression.name.text)
+  ) {
+    return 'basilmaz'
+  }
+  return 'devam'
+}
 
 /**
  * Bir `sku` düğümünün değeri nereye akıyor?
@@ -195,15 +264,15 @@ type Yolculuk = 'basilir' | 'basilmaz' | { takmaAd: string }
  *  · `takmaAd`  — `const x = <değer>`: aynı dosyada `x` ayrıca izlenir.
  */
 function yolculuk(dugum: ts.Node): Yolculuk {
+  // Değer bir fonksiyon sınırından geçtiyse bağlanan ad bir DEĞER değil, ÇAĞRILINCA değer veren işlevdir.
+  let fonksiyonGecti = false
   let cocuk: ts.Node = dugum
   let ust: ts.Node | undefined = dugum.parent
   while (ust) {
     if (ts.isJsxExpression(ust)) {
       const anne = ust.parent
       if (anne && (ts.isJsxElement(anne) || ts.isJsxFragment(anne))) return 'basilir'
-      if (anne && ts.isJsxAttribute(anne)) {
-        return GORUNUR_OZNITELIKLER.has(anne.name.getText()) ? 'basilir' : 'basilmaz'
-      }
+      if (anne && ts.isJsxAttribute(anne)) return oznitelikBasilirMi(anne) ? 'basilir' : 'basilmaz'
       return 'basilmaz'
     }
     if (ts.isJsxAttribute(ust)) {
@@ -222,6 +291,8 @@ function yolculuk(dugum: ts.Node): Yolculuk {
       return 'basilmaz'
     }
     if (ts.isTypeOfExpression(ust)) return 'basilmaz'
+    // Çağrı, fonksiyonu tüketir (`v.map(fn)`, `useMemo(fn)`, `fn()`): bağlanan ad artık değerdir.
+    if (ts.isCallExpression(ust)) fonksiyonGecti = false
     // Değerden ÖLÇÜ/DOĞRULUK üreten çağrılar (`[v.sku, …].some(...)`, `v.sku.length`): sonuç
     // `sku` değildir, ekrana basılan şey de o değildir.
     if (ts.isPropertyAccessExpression(ust) && ust.expression === cocuk && DEGER_URETMEYEN.has(ust.name.text)) {
@@ -230,28 +301,30 @@ function yolculuk(dugum: ts.Node): Yolculuk {
     // Değerin akışı: ifade gövdeli ok fonksiyonu değeri DIŞARI döndürür — ama süzgeç/sıralama
     // geri çağrısının dönüşü bir KOŞULDUR, değer değil.
     if (ts.isArrowFunction(ust)) {
-      const cagri: ts.Node | undefined = ust.parent
-      if (
-        cagri &&
-        ts.isCallExpression(cagri) &&
-        cagri.arguments.includes(ust) &&
-        ts.isPropertyAccessExpression(cagri.expression) &&
-        KOSUL_GERI_CAGRILARI.has(cagri.expression.name.text)
-      ) {
-        return 'basilmaz'
-      }
       if (ust.body !== cocuk) return 'basilmaz'
+      const akis = donusAkisi(ust)
+      if (akis !== 'devam') return akis
+      fonksiyonGecti = true
       cocuk = ust
       ust = ust.parent
       continue
     }
     if (ts.isVariableDeclaration(ust)) {
-      if (ust.initializer === cocuk && ts.isIdentifier(ust.name)) return { takmaAd: ust.name.text }
+      if (ust.initializer === cocuk && ts.isIdentifier(ust.name)) {
+        return { takmaAd: ust.name.text, fonksiyon: fonksiyonGecti }
+      }
       return 'basilmaz'
     }
     if (ts.isReturnStatement(ust)) {
-      cocuk = ust
-      ust = ust.parent
+      // Blok gövdeli geri çağrı / fonksiyon: `return x.sku` değeri fonksiyonun ÇAĞRILDIĞI yere taşır.
+      let fn: ts.Node | undefined = ust.parent
+      while (fn && !ts.isFunctionLike(fn)) fn = fn.parent
+      if (!fn) return 'basilmaz'
+      const akis = donusAkisi(fn)
+      if (akis !== 'devam') return akis
+      fonksiyonGecti = true
+      cocuk = fn
+      ust = fn.parent
       continue
     }
     // Başka her deyim (ifade deyimi, if, blok, fonksiyon bildirimi…) JSX çocuğu değildir.
@@ -269,33 +342,43 @@ interface Ihlal {
 
 /** Dosyada müşteriye METİN olarak basılan her `sku` okuyuşu. */
 function basilanSkular(kaynak: ts.SourceFile): Ihlal[] {
-  const takmaAdlar = new Set<string>()
+  // ad → 'deger' (`const s = v.sku`: `s` sku taşır) | 'fonksiyon' (`const f = (x) => x.sku`: `f` yalnız
+  // ÇAĞRILINCA sku taşır; `modelAdresi={f}` gibi çıplak başvuru bir değer değil, bir işlev başvurusudur).
+  const takmaAdlar = new Map<string, 'deger' | 'fonksiyon'>()
+  const kaydet = (y: Yolculuk): void => {
+    if (typeof y !== 'object') return
+    if (takmaAdlar.get(y.takmaAd) !== 'deger') takmaAdlar.set(y.takmaAd, y.fonksiyon ? 'fonksiyon' : 'deger')
+  }
+  const kimlikKaynakMi = (n: ts.Node): boolean => {
+    if (!ts.isIdentifier(n) || !degerBasvurusuMu(n)) return false
+    if (SKU_ALANLARI.has(n.text)) return true
+    const tur = takmaAdlar.get(n.text)
+    if (tur === 'deger') return true
+    const p = n.parent
+    return tur === 'fonksiyon' && !!p && ts.isCallExpression(p) && p.expression === n
+  }
   // Takma ad kümesi sabitlenene dek tara (alias'ın alias'ı).
   for (let tur = 0; tur < 4; tur += 1) {
-    const onceki = takmaAdlar.size
+    const onceki = takmaAdlar.size + [...takmaAdlar.values()].filter((v) => v === 'deger').length
     const gez = (n: ts.Node): void => {
       if (skuErisimiMi(n)) {
-        const y = yolculuk(n)
-        if (typeof y === 'object') takmaAdlar.add(y.takmaAd)
+        kaydet(yolculuk(n))
       } else if (ts.isBindingElement(n) && ts.isIdentifier(n.name)) {
         // `const { sku } = v` ya da `const { sku: s } = v`
         const kaynakAd = n.propertyName && ts.isIdentifier(n.propertyName) ? n.propertyName.text : n.name.text
-        if (SKU_ALANLARI.has(kaynakAd)) takmaAdlar.add(n.name.text)
-      } else if (ts.isIdentifier(n) && degerBasvurusuMu(n) && (SKU_ALANLARI.has(n.text) || takmaAdlar.has(n.text))) {
-        const y = yolculuk(n)
-        if (typeof y === 'object') takmaAdlar.add(y.takmaAd)
+        if (SKU_ALANLARI.has(kaynakAd)) takmaAdlar.set(n.name.text, 'deger')
+      } else if (kimlikKaynakMi(n)) {
+        kaydet(yolculuk(n))
       }
       ts.forEachChild(n, gez)
     }
     gez(kaynak)
-    if (takmaAdlar.size === onceki) break
+    if (takmaAdlar.size + [...takmaAdlar.values()].filter((v) => v === 'deger').length === onceki) break
   }
 
   const ihlaller: Ihlal[] = []
   const gez = (n: ts.Node): void => {
-    const hedef =
-      skuErisimiMi(n) ||
-      (ts.isIdentifier(n) && degerBasvurusuMu(n) && (SKU_ALANLARI.has(n.text) || takmaAdlar.has(n.text)))
+    const hedef = skuErisimiMi(n) || kimlikKaynakMi(n)
     if (hedef && yolculuk(n) === 'basilir') {
       ihlaller.push({
         satir: kaynak.getLineAndCharacterOfPosition(n.getStart()).line + 1,
@@ -427,7 +510,7 @@ describe('INV-SKU-GORUNMEZ-1 — sku müşteri yüzeyinde basılmaz', () => {
     ).toEqual([])
   })
 
-  it('K6: `src/{components,views,app}` altındaki ADMİN OLMAYAN hiçbir dosya `sku` basmıyor', () => {
+  it('K6: `src/**/*.tsx` altındaki ADMİN OLMAYAN hiçbir dosya `sku` basmıyor', () => {
     const dosyalar = TARAMA_KOKLERI.flatMap(musteriDosyalari)
     // Boş evren: tarama gerçekten büyük bir ağacı gördü ve listelenen bileşenler içinde.
     expect(dosyalar.length, 'taranan müşteri ağacı beklenenden küçük — yol değişmiş olabilir').toBeGreaterThan(150)
@@ -450,15 +533,19 @@ describe('INV-SKU-GORUNMEZ-1 — sku müşteri yüzeyinde basılmaz', () => {
     ).toEqual([])
   })
 
-  it('K7: ürün föyü PDF — `sku` alanı HİÇ okunmuyor (müşteri belgesi, kimlik kullanımı yok)', () => {
-    const okumalar = skuOkumalari(ayristirDosya(PDF_FOY))
-    expect(
-      okumalar,
-      'Föy PDF`i `sku` okuyor — müşteri belgesine iç kod basılır (URN-33: `Ref: product.sku`). ' +
-        'Model kodu zaten `getProductModelLabel` ile gövdede basılıyor; üst bilgiye ikinci kopya koyma.\n' +
-        satirlar(okumalar),
-    ).toEqual([])
-  })
+  it.each(SKU_OKUMAYAN_DOSYALAR.map((yol) => [goreli(yol), yol] as const))(
+    'K7: müşteri BELGESİ üreten %s — `sku` alanı HİÇ okunmuyor (kimlik kullanımı da yok)',
+    (_ad, yol) => {
+      const okumalar = skuOkumalari(ayristirDosya(yol))
+      expect(
+        okumalar,
+        'Müşteri belgesi (PDF) üreten dosya `sku` okuyor — belgeye iç kod basılır (URN-33: föyde `Ref: product.sku`). ' +
+          'JSX olmayan basımı (jsPDF `doc.text`, `autoTable` gövdesi) JSX dedektörü GÖRMEZ; bu yüzden ' +
+          'bu dosyalarda `sku` okuması yasak, teknik kullanım dahil. Model kodu `getProductModelLabel` ile gelir.\n' +
+          satirlar(okumalar),
+      ).toEqual([])
+    },
+  )
 
   describe('K8: dedektörün ayırt ediciliği (sahte pozitif / sahte negatif)', () => {
     const olc = (kod: string) => basilanSkular(ayristir('ornek.tsx', kod)).length
@@ -482,6 +569,18 @@ describe('INV-SKU-GORUNMEZ-1 — sku müşteri yüzeyinde basılmaz', () => {
       ['alt özniteliği', 'const A = () => <img alt={v.sku} />'],
       ['aria-label özniteliği', 'const A = () => <b aria-label={`${v.sku}`} />'],
       ['kısa yazım parametre', "const A = ({ sku }) => <b>{t('k', { sku })}</b>"],
+      // URN-32 çürütücü turu: dosya İÇİNDEN atlatma yolları.
+      [
+        'blok gövdeli geri çağrı',
+        "const A = () => { const l = v.map((x) => { return x.sku }); return <b>{l.join(', ')}</b> }",
+      ],
+      ['adlı fonksiyon dönüşü', 'function kod(x) { return x.sku }\nconst A = () => <b>{kod(v)}</b>'],
+      ['fonksiyon ifadesi dönüşü', 'const kod = function (x) { return x.sku }\nconst A = () => <b>{kod(v)}</b>'],
+      ['özel bileşen prop (kod=)', 'const A = () => <Row kod={v.sku} />'],
+      ['özel bileşen prop (şablon)', 'const A = () => <Row etiket={`${v.sku}`} />'],
+      ['noktalı özel bileşen', 'const A = () => <Tablo.Satir kod={v.sku} />'],
+      ['value özniteliği', 'const A = () => <input value={v.sku} readOnly />'],
+      ['label özniteliği', 'const A = () => <optgroup label={v.sku} />'],
     ])('basılır → yakalanır: %s', (_ad, kod) => {
       expect(olc(kod)).toBeGreaterThan(0)
     })
@@ -499,7 +598,7 @@ describe('INV-SKU-GORUNMEZ-1 — sku müşteri yüzeyinde basılmaz', () => {
       ['yorum', 'const A = () => <b>{/* v.sku */}{/* {v.sku} */}</b>\n// {v.sku}'],
       ['dize değişmezi', "const A = () => <b className=\"{v.sku}\">{'v.sku'}</b>"],
       ['className metni', 'const A = () => <b className="sku product_sku" />'],
-      ['sözlük anahtarı etiketi', "const A = () => <b>{t('pdp.labels.sku')}</b>"],
+      ['sözlük anahtarı etiketi', "const A = () => <b>{t('pdp.labels.modelCode')}</b>"],
       ['ifade deyimi', 'function f(v) { izle(v.sku) }'],
       [
         'arama süzgeci (VariantSelector deseni)',
@@ -509,6 +608,17 @@ describe('INV-SKU-GORUNMEZ-1 — sku müşteri yüzeyinde basılmaz', () => {
       ['kullanılmayan takma ad','const A = () => { const s = v.sku; return <b>{v.ad}</b> }'],
       ['başka alan', 'const A = () => <b>{v.model_code}</b>'],
       ['alan adı bildirimi', 'const A = ({ x }: { x: { sku: string } }) => <b>{x.ad}</b>'],
+      [
+        'özel bileşen teknik proplar',
+        'const A = () => <Satir sku={v.sku} selectedSku={v.sku} href={adres(v.sku)} onSelect={() => sec(v.sku)} key={v.sku} data-kod={v.sku} />',
+      ],
+      ['blok gövdeli süzgeç geri çağrısı', 'const A = () => <b>{l.filter((x) => { return x.sku === q }).length}</b>'],
+      [
+        'blok gövdeli geri çağrı, yalnız sayı basılır',
+        'const A = () => { const l = v.map((x) => { return x.sku }); return <b>{l.length}</b> }',
+      ],
+      ['fonksiyon dönüşü key olarak', 'function kod(x) { return x.sku }\nconst A = () => <li key={kod(v)} />'],
+      ['düz HTML öğesinde teknik öznitelik', 'const A = () => <input data-kod={v.sku} id={v.sku} name={v.sku} />'],
     ])('basılmaz → yakalanmaz: %s', (_ad, kod) => {
       expect(olc(kod)).toBe(0)
     })

@@ -204,6 +204,18 @@ Kural: `model_code` yoksa **etiket hiç gösterilmez**. `sku`'ya düşmek yasakt
 "hangi modeli aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin
 parçasıdır.
 
+> **2026-10-05 ÖLÇÜM NOTU (URN-32/33, canlı SELECT, 442 ürün):** yukarıdaki "74" bugün
+> **YENİDEN ÜRETİLEMİYOR.** Aile içinde `lower(btrim(name))` çakışması **0 grup / 0 satır**; tüm
+> katalogda çakışan ad **0**; aile içinde çakışan `model_code` **0**. `products.name` üzerinde
+> UNIQUE kısıt ya da UNIQUE indeks de **YOK** (`pg_constraint`/`pg_indexes`: 0) — yani ad
+> tekilliği şemada zorunlu değil, yalnız bugünkü veride tutuyor. Çelişkinin kaynağı ya 74'ün
+> başka bir tanımla (ör. aile adıyla ya da ek/sonek ayıklanmış adla) ölçülmüş olması ya da
+> sonradan katalogda adların ayrıştırılmasıdır; **hangisi olduğunu ölçemedim** (ilk ölçümün
+> sorgusu cetvelde yazılı değil). Sonuç: §11.4'ün "ad tek başına yetmez" hükmü bu cetvelde
+> **veriyle desteklenmiyor**; hüküm, ad tekilliğinin zorunlu olmamasından (gelecekte çakışma
+> girebilir) ve §11.4.2'den (kodsuz ürün) türer. Bir yüzey "ürün adları DB'de tekildir" diye
+> gerekçelendirilemez; model kodu gösterimi (`getProductModelLabel`) bu yüzden sürer.
+
 ### 11.4.1 Veri tarafı borcu (açık)
 
 Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
