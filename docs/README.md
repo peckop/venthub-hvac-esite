@@ -27,7 +27,7 @@
 | Bütün belgelerde tarama | NotebookLM "VentHub Belgeler" `f503a886-3e2f-4234-8455-ee57c66f9488` | tek başına güvenilmez; bulgu dosyada doğrulanır |
 | İş ne durumda, kimde? | **Kanban** (WrongStack panoları; iş kaydının tek kaynağı, karar 219; Linear donuk arşiv) | `standards/is-kayit-duzeni-standard.md` |
 | Ajanın kalıcı dersleri | hafıza dizini `MEMORY.md` (depo dışı, oturum açılışında yüklenir) | `standards/hafiza-kancalari-standard.md` |
-| Hafızaya ya da talimat dosyasına (`CLAUDE.md`, rol kartı) kim, nereye yazabilir? Günlük dosyası nerede durur? | katmanlı model: ortak çekirdek (OPS onaylı) + departman klasörü + ayrı günlük klasörü | `standards/hafiza-yazma-duzeni-standard.md` |
+| Hafızaya ya da talimat dosyasına (`CLAUDE.md`, rol kartı) kim, nereye yazabilir? Günlük dosyası nerede durur ve nasıl döndürülür? Hafızadaki bilgiye tarih ve kaynak nasıl yazılır? | katmanlı model: ortak çekirdek (OPS onaylı) + departman klasörü + ayrı günlük klasörü; §9b günlük döndürme (DEVİR bloğu + `gecmis/`), §12 künye (yazıldı + kaynak) | `standards/hafiza-yazma-duzeni-standard.md` |
 | Belge / harita ne kadar taze? | her mesajdaki durum satırları; elle: `node scripts/belge/belge-tazelik.cjs` | `standards/belge-yonetimi-standard.md` B5 |
 
 ## Klasör düzeni
