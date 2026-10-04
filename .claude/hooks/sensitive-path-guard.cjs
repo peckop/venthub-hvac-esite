@@ -106,8 +106,9 @@ process.stdin.on('end', () => {
     }
     const m = masterdaMi(path.resolve(p));
     if (m.durum === 'var') karar('ask', UYGULANMIS_MIGRATION_METNI);                       // (c)
-    if (m.durum === 'olculemedi') {
-      karar('ask', YENI_MIGRATION_METNI + ' (Master\'da olup olmadığı ölçülemedi: ' + String(m.sebep).slice(0, 120) + ' — güvenli tarafta soruluyor.)'); // (d)
+    // (d) Yalnız açıkça 'yok' geçer; 'olculemedi' ya da tanınmayan her değer güvenli tarafta sorulur.
+    if (m.durum !== 'yok') {
+      karar('ask', YENI_MIGRATION_METNI + ' (Master\'da olup olmadığı ölçülemedi: ' + String(m.sebep).slice(0, 120) + ' — güvenli tarafta soruluyor.)');
     }
     // (b) Diskte var, master'da yok: soru yok, yalnız ajana hatırlatma. Karar alanı yazılmaz.
     console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', additionalContext: DALDA_YENI_BAGLAM } }));
