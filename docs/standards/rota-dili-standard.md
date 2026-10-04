@@ -1,5 +1,7 @@
 # Rota Dili Standardı (statik sayfa adresleri: TR Türkçe, EN İngilizce)
 
+> **Sahibi:** ALTYAPI
+> **Son doğrulama:** 2026-10-04 (PR-A: kapılar yeşil, bağımsız doğrulayıcı geçti)
 > **Durum:** v0.1 · 2026-10-04 · Şerit: ALTYAPI · Kart: OPS-52 · **Uygulama öncesi cetvel**: bugün canlıda olan kısımlar "CANLI",
 > yayını bekleyenler "HEDEF" diye işaretlidir. Anahtar kapalıyken canlıda hiçbir adres değişmez.
 > **Kararlar:** 267 (hakkımızda), 269 (iletişim), 270 (iki aşama: 11 Ekim vitrin, hesap/sepet/ödeme sonra); Recep ilkesi 10-03:
