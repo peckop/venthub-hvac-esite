@@ -171,6 +171,7 @@ hatasını tekrarlar.
 | `.claude/hooks/hafiza-enjeksiyonu.cjs` | hook | KANCA — konu farkında sage hafızası: istemin konusuna çapalı/ilgili dersleri bağlama koyar. | ARAÇ | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `.claude/hooks/hafiza-kullanim-sayaci.cjs` | hook | KANCA — sage kullanım sayacı: basılan derslerin enjeksiyonunu ve (transcript'te atıf | ARAÇ | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
 | `.claude/hooks/sage-hijyen-oturum-sonu.cjs` | hook | KANCA — oturum kapanırken sage hijyenini (`port.hygiene`) koşar — ama YALNIZ taze | ARAÇ | .claude/settings.json, docs/standards/hafiza-kancalari-standard.md (betik taramasi) | olculemedi (repo disi izler taranmadi) | yok | YENI |
+| `.claude/hooks/kartsiz-beklenti-kapisi.cjs` | hook | Stop kapısı: Recep'ten istenen şeyin Kanban kartı yoksa turu bloklar, pencere kartı açıp yeniden yazar (atlatma "Kartsız: sebep") | ARAÇ | `hook:Stop *` (settings'e ekleme Recep sözüyle OPS'ta bekliyor) | henüz bağlı değil | kanca-kartsiz-beklenti-kapisi.test.ts | KAL |
 
 **Not (kaldırıldı 2026-09-30 — `hafiza-kuyrugu.cjs`):** claude-mem bekçisi silindi (Recep: "kullanmayacağız",
 Ops onayladı). Dosya, konformans testi (`INV-HAFIZA-KUYRUGU-1`) ve `defter-tazelik-satiri.cjs` içindeki çağrı bloğu
