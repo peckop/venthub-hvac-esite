@@ -27,7 +27,7 @@
 | Bütün belgelerde tarama | NotebookLM "VentHub Belgeler" `f503a886-3e2f-4234-8455-ee57c66f9488` | tek başına güvenilmez; bulgu dosyada doğrulanır |
 | İş ne durumda, kimde? | **Kanban** (WrongStack panoları; iş kaydının tek kaynağı, karar 219; Linear donuk arşiv) | `standards/is-kayit-duzeni-standard.md` |
 | Ajanın kalıcı dersleri | hafıza dizini `MEMORY.md` (depo dışı, oturum açılışında yüklenir) | `standards/hafiza-kancalari-standard.md` |
-| Hafızaya ya da talimat dosyasına (`CLAUDE.md`, rol kartı) kim, nereye yazabilir? Günlük dosyası nerede durur? | katmanlı model: ortak çekirdek (OPS onaylı) + departman klasörü + ayrı günlük klasörü | `standards/hafiza-yazma-duzeni-standard.md` |
+| Hafızaya ya da talimat dosyasına (`CLAUDE.md`, rol kartı) kim, nereye yazabilir? Günlük dosyası nerede durur ve nasıl döndürülür? Hafızadaki bilgiye tarih ve kaynak nasıl yazılır? | katmanlı model: ortak çekirdek (OPS onaylı) + departman klasörü + ayrı günlük klasörü; §9b günlük döndürme (DEVİR bloğu + `gecmis/`), §12 künye (yazıldı + kaynak) | `standards/hafiza-yazma-duzeni-standard.md` |
 | Belge / harita ne kadar taze? | her mesajdaki durum satırları; elle: `node scripts/belge/belge-tazelik.cjs` | `standards/belge-yonetimi-standard.md` B5 |
 
 ## Klasör düzeni
@@ -56,6 +56,7 @@
 | Fiyat/kur/marj **nasıl hesaplanır**? | `standards/pricing-standard.md` |
 | **Katalog PDF'inde ne yazıyor?** (PDF'i AÇMA — dizini oku) | `standards/catalog-ingestion-standard.md` §6.3 → `<ingestor>/kaynak-dizini/sayfalar.jsonl` |
 | Hangi sayfa **nasıl üretilir**, veri değişince **ne tazelenir**, fiyat **hangi yüzeyde** görünür? | `standards/rendering-cache-standard.md` |
+| Statik sayfaların (hakkımızda, iletişim, destek…) **adres dili**: TR'de Türkçe, EN'de İngilizce yol; eski adresler nereye gider; anahtar nasıl açılır/geri alınır? | `standards/rota-dili-standard.md` (v0.1, OPS-52; kategori/marka adresleri değil, onlar `adres-semasi-standard.md`) |
 | Müşterinin gördüğü ürün metnine **ne girer, ne girmez** (iç editör notu, doğrulanmamış değer)? | `standards/vitrin-metni-standard.md` |
 | Rehber (bilgi) yazısının **konusu nasıl seçilir, kaynağı ne, nasıl doğrulanır**, yayından sonra ne ölçülür? | `standards/rehber-yazisi-standard.md` (TASLAK, karar 62) |
 | Aramada ve pazarda **nasıl göründüğümüz hangi kaynaktan ölçülür**, haftalık takip nasıl, hangi veri depoya girmez? | `standards/pazar-olcum-standard.md` (TASLAK, karar 93 → 124) |

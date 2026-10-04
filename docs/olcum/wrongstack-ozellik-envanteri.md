@@ -316,8 +316,37 @@ Kaynak: alt-ajan taraması, 1.0.29, salt okuma; hiçbir özellik çalıştırıl
 3. "`memory_hygiene` aday üretir, silmez": oturum kapsamlı hafızaları 7 gün sonra yumuşak siler, tekilleştirmede `superseded` yapar; proje hafızaları için silme yalnız aday.
 4. "1.0.29'da kanban-mcp/mailbox-mcp/codebase-index-mcp yok" (alt-ajan bulgusu): üçü de npm'de 1.0.29 olarak var, karşılaştırıldı.
 
+## 1.0.27 – 1.0.31 değişiklik özeti (2026-10-04, ARC-24, karar 257) — KURULUM YAPILMADI
+
+**Ne ölçüldü:** GitHub `WrongStack/WrongStack` sürüm notları (1.0.27–1.0.30 notları yalnız "Full Changelog" bağlantısı, 1.0.31'in notu dolu), `v1.0.26...v1.0.31` arası 111 commit başlığı ve ilgili commit'lerin hangi paketlere dokunduğu (GitHub API). **Kod satırı satırı okunmadı**; commit gövdeleri boş, yalnız `fix(kanban)` commit'inin dosya listesine ve değişen işlev adlarına bakıldı. Kanıt dili yukarıdaki gibi: yazılmayan "ölçülmedi"dir.
+
+| Sürüm | GitHub'da | npm'de | Not |
+|---|---|---|---|
+| 1.0.27 | 09-27 | var | notu yalnız karşılaştırma bağlantısı |
+| 1.0.28 | 09-29 | var | aynı |
+| 1.0.29 | 09-29 | **var (npm'in son sürümü)** | sage HQ eşitleme, harici ajan bağlantısı, birleşik sıralı arama (commit başlığı) |
+| 1.0.30 | 10-01 | **yok** | MCP OAuth boş/null isteğe bağlı alan düzeltmesi (changelog satırı) |
+| 1.0.31 | 10-03 | **yok** | ToolFlow, Session Story, kalıcı Docker otomasyonu, hesap girişleri (sürüm notu) |
+
+| Bizim sunucu | Değişiklik (commit başlığından) | Bize etkisi |
+|---|---|---|
+| kanban-mcp | `fix(kanban): enforce assignment, completion and session-mirror integrity`: 27 kaynak dosya, yeni `completion-gate`, `definition-of-done`, `task-checks`, atama kurtarma (`assignment-recovery`) | **Kart kapatma (kanıt komutuyla Done) ve atama davranışı değişebilir.** Yükseltmeden önce ayrı çalışma kopyasında bir deneme kartı kapatılmalı. Ölçülmedi: bizim kapanış akışımızı bozup bozmadığı. |
+| kanban-mcp | `fix(kanban): drop the unreachable completed-branch that fails declaration emit` | Derleme düzeltmesi, davranış değişmez. |
+| sage-mcp | `graphFor` bozuk satırda fırlatmak yerine atlar; aynı terim iki kanaldan eşleşse bir kez sayılır; `close()` kimlik yeniden denemesinde bekleyen çağrıyı uyandırır; bellek geçerliliği yönetimi | Hata düzeltmeleri. **ARC-23 (aday kuyruğu) ile ilgili bir başlık görünmüyor**; ölçülmedi. |
+| mailbox-mcp | Başlıklarda mailbox-mcp'ye özel düzeltme yok; yalnız 1.0.29 toplu sürüm commit'i dokunuyor | Etki görünmüyor. WebUI'de yazma/yanıtlama eklenmiş (bizde WebUI kullanılmıyor). |
+| codebase-index-mcp | yaml/ruby/css satır eşleşmesi kendi satırında kalır; Rust `cr"…"` C-string sabitleri ham sayılır | İndekste küçük doğruluk düzeltmeleri. |
+| ortak (core, tools, runtime) | `fix(security)` sıfır ömürlü önbellek yanıtı bayat kullanılamaz (core); `harden command execution` (tools); `harden persistence, prompts, plugin guards` (core, runtime, plugins, sage…) | Dört sunucumuzun bunlara bağımlılığı **ölçülmedi**; sertleştirme niteliğinde, bir açık kapatma ilanı yok. |
+
+**Güvenlik düzeltmesi var mı:** GitHub'ın güvenlik duyuruları listesi **boş**, sürüm notlarında CVE/duyuru ifadesi yok. "security" etiketli tek commit `fix(security)` (core'da yanıt önbelleği); sertleştirme commit'leri ayrıca var. Bizim dört MCP sunucusunu doğrudan etkileyen bir açık ilan edilmemiş. Bu "etkilemez" demek değildir: ortak paketlerin sunuculara yansıması ölçülmedi.
+
+**Kurulabilirlik:** dört paketin npm'deki son sürümü **1.0.29**; 1.0.30 ve 1.0.31 yalnız GitHub etiketi. Kurulacaksa hedef 1.0.29'dur, 1.0.31 değil.
+
+**Öneri:** güvenlik duyurusu olmadığı için yükseltme **12 Ekim sonrası**; önce ayrı çalışma kopyasında kanban kart kapatma denemesi. Bu dört madde bu bölümde karara bağlanmadı: ARC-24'ün 4. kalemi (Context Dashboard ve Session Story'nin bizim bağlam kancamızla karşılaştırılması) **henüz yapılmadı**.
+
+**Satırın kendisi:** her mesajın kanca satırında "WRONGSTACK: bizde X, son Y" görünür (`.claude/hooks/wrongstack-satiri.cjs`); GitHub'dan günde en çok bir kez okunur.
+
 ## Yeniden ölçme tetikleyicisi
 
-- WrongStack yeni sürüm yayımlanınca (bugün en yeni 1.0.29): yalnız `diff` ile değişen paketler okunur, bu deftere tarihli satır eklenir.
+- WrongStack yeni sürüm yayımlanınca (kanca satırı "WRONGSTACK: bizde X, son Y" uyarı verir; 2026-10-04'te en yeni GitHub 1.0.31, npm 1.0.29): yalnız `diff` ile değişen paketler okunur, bu deftere tarihli satır eklenir.
 - REC-391 kalemlerinden biri kapanınca ilgili satırın "Bizde durum" hücresi güncellenir.
 - "Yeni kayıt gerekir" yazan satırlar için Ops onayından sonra Linear kaydı açılır; kayıt numarası satıra yazılır (kaydı olmayan iş takip tablosuna girmez).
