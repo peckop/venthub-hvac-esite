@@ -20,8 +20,11 @@
 ## 1. Kurallar
 
 **R1 — Tek tablo.** Adres dilinin tek kaynağı `src/config/rotaDili.veri.json`. Satır: `{ id, klasor, tr, en, altYollar? }`. `klasor` bugünkü
-(iki dilde ortak) klasör yoludur; `tr`/`en` o dilde görünecek yeni yoldur. Tablo **veridir**; mekanizma (`src/config/rotaDili.mjs`) veriden bağımsızdır.
-Aynı tablodan üç çıktı: eski → yeni 308, yeni → klasör yeniden yazım (rewrite), adres üretimi (iç bağlantı, kanonik, hreflang, sitemap).
+(iki dilde ortak) klasör yoludur; `tr`/`en` o dilde görünecek yeni yoldur. Tablo **veridir**; mekanizma veriden bağımsızdır ve üç dosyadır:
+`src/config/rotaDiliCekirdek.mjs` (saf çekirdek: tüm kurallar burada; `node:fs`, `process`, `require`, `import` YOK, tablo her fonksiyonda parametre, çünkü
+Edge middleware'i ve istemci paketi de yükler), `src/config/rotaDili.mjs` (tabloyu diskten okuyan ince kabuk; yalnız `next.config` içindir) ve
+`src/lib/adres/rotaDiliTablo.ts` (TS erişimcisi: JSON'u içe aktarır, anahtarı `process.env.NEXT_PUBLIC_ADRES_DILI` literaliyle okur; `localizedHref`,
+site haritası ve `dilDegistirYolu` bundan geçer). Aynı tablodan üç çıktı: eski → yeni 308, yeni → klasör yeniden yazım (rewrite), adres üretimi (iç bağlantı, kanonik, hreflang, sitemap).
 Klasör adı değiştirilmez, sayfa kopyalanmaz.
 
 **R2 — Anahtar.** `NEXT_PUBLIC_ADRES_DILI`, derleme anında okunur. **Yalnız tam `1` açar**; yok, boş, `true`, `0` ya da bozuk değer **kapalıdır**
@@ -30,12 +33,21 @@ kod değişikliği gerekmez** (ya da Vercel'in önceki yayına anında dönüş�
 bağlanmaz (biri tek başına geri alınabilmeli). Yayın günü aynı listede açılırlar.
 
 **R3 — Anahtar kapalı = sıfır fark.** Kapalıyken `rotaDili` çıktıları boş listedir; `next.config` yönlendirme ve başlık listesi ile site haritası
-adresleri master 9ea04a55d fikstürüyle **derin eşit** kalır. Bu bir iddia değil ölçümdür (R9).
+adresleri master 9ea04a55d fikstürüyle **derin eşit** kalır. Bu bir iddia değil ölçümdür: yönlendirme + başlık listesi §2 Kapı 1 (INV-ROTA-DILI-KAPALI-1,
+`next.config` fikstürü), iç bağlantılar + `dilDegistirYolu` + site haritası (EN_YAYIN kapalı ve açık iki kip) §2 INV-ROTA-DILI-KAPALI-2
+(`rota-dili-adres-uretimi.test.ts`, kod değişmeden ÖNCE üretilmiş fikstür). Kapalıyken `rewrites()` `{ beforeFiles: [] }` döndürür (master'da bu anahtar
+yoktu); bu fark `next build` routes-manifest'iyle karşılaştırılmadı, CI build yeşil ve davranış farkı beklenmiyor (bilinen, ölçülmedi).
 
 **R4 — Tek sıçrama.** Eski adres tek 308 ile yeni adrese gider; hedef hiçbir kuralla yeniden eşleşmez (zincir, döngü yok). Mevcut kuralların
 hedefleri (ör. karar 92, `/destek/hesaplayicilar`) yeni adrese tabloyla yeniden yazılır. Dilsiz eski adres (`/about`) için A9 bütçesi 1:
 config tek başına 307 + 308 = 2 sıçrama üretir; bu yüzden middleware'de, `ADRES_SEMASI_K3B` kolunun yanında saf tablo aramasıyla çalışan
-dilsiz kol kullanılır (DB yok, kural 12). Karar PR-C'de hop sayımıyla kesinleşir.
+dilsiz kol kullanılır (DB yok, kural 12). **Karar (PR-C2, OPS onaylı, A9 ana hükmü):** dil `detectLocale` ile seçilir ve **307** verilir;
+deterministik TR 308 yalnız içeriği YALNIZ Türkçe olan adresler içindir (kategori slug'ı `fanlar` gibi). Statik sayfaların iki dilde içeriği vardır ve
+`/about` dilden bağımsız bir addır: 308, İngilizce ziyaretçiyi tarayıcıda kalıcı olarak Türkçeye çiviler.
+
+**Açık yönlendirme güvenliği.** `rotaDiliYolu` / `rotaDiliCevir`, `//evil.com` gibi tablo dışı girdiyi aynen döndürür (açık yönlendirme üretmez); çıktıları
+doğrudan bir `Location` başlığına yazılmaz, middleware `nextUrl.clone()` ile origin'i korur. **İstek yolu işlemede düzenli ifade ile "sondaki `/`" kırpılmaz**
+(kare büyüyen desen; doğrusal döngü kullanılır, INV-ROTA-DILI-CEKIRDEK-1 zorlar).
 
 **R5 — Aşama 2 tabloya giremez.** `account`, `cart`, `checkout`, `auth`, `payment-success` önekleri doğrulayıcıda hata verir; sessiz yutulmaz.
 
@@ -52,8 +64,11 @@ middleware haritasındadır.
 |---|---|---|
 | INV-ROTA-DILI-KAPALI-1 (`src/__tests__/conformance/rota-dili-kapali-sifir-fark.test.ts`) | env yok / `0` / `true` iken `next.config` redirects + headers master fikstürüyle derin eşit, rewrites boş; env `1` iken fark var (duyarlılık kanıtı) | PR-A (HEDEF) |
 | `src/lib/adres/__tests__/rotaDili.test.ts` | kapalı=boş, açık kip tam değerler, `altYollar`, zincir/döngü, Aşama 2 reddi, tablo doğrulayıcı | PR-A (HEDEF) |
-| Kapı 2 — HTTP matrisi (`scripts/adres/matris.cjs`, yerel derleme, anahtar=0, master'la fark ∅) | 54 şablon × {tr,en} + sabit örnekler + bilinen eski adresler: durum + Location + cache-control | PR-B (HEDEF) |
-| Kapı 3 — CANLI salt-okuma matrisi (birleşmeden önce/sonra; yayın günü açık matris) | canlıda tek adres değişmedi / yayın günü beklenen değişim | PR-B/yayın (HEDEF) |
+| INV-ROTA-DILI-CEKIRDEK-1 (`src/lib/adres/__tests__/rotaDiliCekirdek.test.ts`) | çekirdek Edge/istemcide yüklenir: yorum dışı kodda `node:`/`process`/`require`/`import` yok (kabuk aynı taramadan KIRMIZI çıkar, ayırt eder); kabuk ↔ çekirdek aynı çıktı; istek yolu işlemede ikinci dereceden yavaşlama yok (64.000 `/` < 250 ms, kaynakta kırpma regex'i yok) | PR-C0/C2 (HEDEF) |
+| INV-ROTA-DILI-KAPALI-2 (`src/__tests__/conformance/rota-dili-adres-uretimi.test.ts` + `fikstur/rota-dili-kapali-2-oncesi.json`) | kapalıyken `localizedHref` × tüm `Routes` × 2 dil, `dilDegistirYolu` ve site haritası (EN_YAYIN kapalı/açık) değişiklikten ÖNCEKİ çıktıyla derin eşit; env `1` iken fark var (duyarlılık) | PR-C1 (HEDEF) |
+| Dil değiştirici + middleware dilsiz kol (`rota-dili-dil-degistirici.test.tsx`, `src/lib/adres/__tests__/middleware-rota-dili-{kapali,acik,zincir}.test.ts`) | TR↔EN çeviri, sorgu/parça taşınır, Bilgi Merkezi 404 yok (ALT-14); dilsiz adres TEK sıçrama (307, gerçek `middleware` + gerçek `next.config`), kapalıyken middleware aynı, Aşama 2 / admin / api dokunulmaz, kol K3B'den SONRA ve yalnız anahtar açıkken | PR-C1/C2 (HEDEF) |
+| Kapı 2 — HTTP matrisi (`scripts/adres/matris.cjs`, yerel derleme, anahtar=0, master'la fark ∅) | 54 şablon × {tr,en} + sabit örnekler + bilinen eski adresler: durum + Location + cache-control | PR-B (master'da, c454d2e61; tam koşum yayın öncesi) |
+| Kapı 3 — CANLI salt-okuma matrisi (birleşmeden önce/sonra; yayın günü açık matris) | canlıda tek adres değişmedi / yayın günü beklenen değişim | PR-B/yayın (taban `docs/audits/adres-matrisi-canli-2026-10-04-oncesi.json`) |
 | Açık kip kapıları (önizleme) | tek hop, hedef 200, hreflang karşılıklı, kanonik = sitemap, eski adrese `href` 0, Aşama 2 önekleri eski adreste 200 | PR-D (HEDEF) |
 
 ## 3. Yayın günü kontrol listesi
