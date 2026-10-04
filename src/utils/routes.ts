@@ -29,6 +29,8 @@ function assertProductSlug(slug: string): string {
 
 import type { Route } from 'next';
 
+import { rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo';
+
 export const Routes = {
   home: () => '/' as Route,
   
@@ -194,11 +196,16 @@ export const Routes = {
  *
  * Idempotent ve güvenli: zaten `/tr`/`/en` ile başlayan URL'lere mükerrer önek eklemez,
  * `/admin` ve `/api` rotalarına hiç dokunmaz. (Aynı kural `useLocalizedRoutes`'taki proxy'de.)
+ *
+ * ROTA DİLİ (OPS-52, `NEXT_PUBLIC_ADRES_DILI`): dil önekinden ÖNCE dilsiz klasör yolu, dilde GÖRÜNEN yola çevrilir
+ * (`/about` → TR `/hakkimizda`). Kanonik, hreflang, sitemap satırı ve iç bağlantılar hep buradan geçtiği için tek
+ * noktadır. Anahtar kapalıyken `rotaDiliYoluOku` girdiyi AYNEN döndürür (çıktı öncekiyle birebir).
  */
 export function localizedHref(url: string, lang: string): Route {
   if (url.startsWith('/admin') || url.startsWith('/api')) return url as Route;
   // Zaten locale-önekli mi? Yalnız TAM segment ('/tr', '/en', '/tr/...', '/en/...').
   // startsWith('/tr') KULLANMA — '/trends' gibi yolları yanlışlıkla localize-dışı bırakır.
   if (url === '/tr' || url === '/en' || url.startsWith('/tr/') || url.startsWith('/en/')) return url as Route;
-  return `/${lang}${url === '/' ? '' : url}` as Route;
+  const gorunen = rotaDiliYoluOku(url, lang);
+  return `/${lang}${gorunen === '/' ? '' : gorunen}` as Route;
 }

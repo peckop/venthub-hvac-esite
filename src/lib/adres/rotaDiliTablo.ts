@@ -17,10 +17,16 @@ import {
  * ANAHTAR: `process.env.NEXT_PUBLIC_ADRES_DILI` LİTERAL yazılır; Next derlemede bu ifadeyi değerle değiştirir
  * (dinamik `process.env[ad]` erişimi istemci paketinde boş kalırdı). Yalnız tam `1` açar; yok/bozuk = kapalı.
  *
- * ⛔BU PR'DA HİÇBİR ÜRETİM DOSYASINA BAĞLI DEĞİL (routes.ts / middleware.ts sonraki PR'larda). Canlıya etkisi sıfır.
+ * TÜKETİCİLER (PR-C1): `utils/routes.ts` `localizedHref` (iç bağlantı, kanonik, hreflang, sitemap satırı),
+ * `utils/yuzeyAdresleri.ts` `dilDegistirYolu` (dil değiştirici). Anahtar kapalıyken her iki sarmalayıcı da
+ * girdiyi AYNEN döndürür (çekirdeğin ilk satırı), yani canlıda sıfır fark (INV-ROTA-DILI-KAPALI-2).
+ * `middleware.ts` PR-C2'de bağlanır.
  */
 
 type Dil = 'tr' | 'en'
+
+/** Çağıranlar `lang: string` taşır; bilinmeyen dil değeri çevrilmeden aynen geçer. */
+const dilMi = (dil: string): dil is Dil => dil === 'tr' || dil === 'en'
 
 /** Yüklemede doğrulanmış tablo; bozuksa modül yüklenirken ATAR (sessiz yutma yok). */
 export const ROTA_DILI_TABLO = rotaDiliTablosuDogrula(veri)
@@ -32,14 +38,14 @@ export const ADRES_DILI_ACIK: boolean = adresDiliOku(process.env.NEXT_PUBLIC_ADR
  * Dilsiz klasör yolunu `dil`'deki görünen yola çevirir; sorgu/parça korunur. Anahtar kapalıysa ya da
  * eşleşme yoksa girdiyi aynen döndürür.
  */
-export function rotaDiliYoluOku(url: string, dil: Dil): string {
-  return rotaDiliYolu(url, dil, ROTA_DILI_TABLO, ADRES_DILI_ACIK)
+export function rotaDiliYoluOku(url: string, dil: string): string {
+  return dilMi(dil) ? rotaDiliYolu(url, dil, ROTA_DILI_TABLO, ADRES_DILI_ACIK) : url
 }
 
 /**
  * Dil değiştirirken: `eskiDil`'de görünen dilsiz yolu `yeniDil`'deki görünen yola çevirir. Anahtar kapalıysa
  * ya da eşleşme yoksa girdiyi aynen döndürür.
  */
-export function rotaDiliCevirOku(yol: string, eskiDil: Dil, yeniDil: Dil): string {
-  return rotaDiliCevir(yol, eskiDil, yeniDil, ROTA_DILI_TABLO, ADRES_DILI_ACIK)
+export function rotaDiliCevirOku(yol: string, eskiDil: string, yeniDil: string): string {
+  return dilMi(eskiDil) && dilMi(yeniDil) ? rotaDiliCevir(yol, eskiDil, yeniDil, ROTA_DILI_TABLO, ADRES_DILI_ACIK) : yol
 }
