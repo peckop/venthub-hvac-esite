@@ -2,35 +2,47 @@
 """
 DURUM DOSYASI GÜNLÜK DÖNDÜRME (docs/standards/hafiza-yazma-duzeni-standard.md §9b; ilk uygulama OPS durum dosyası, 2026-10-04).
 
-Canlı dosyada başlık/not + DEVİR bloğu + `--tutulan-ilk-gun` ve sonrası kalır; daha eski gün blokları AYNEN `--gecmis-dizin` altına taşınır.
+Canlı dosyada başlık/not + DEVİR bloğu (dosyanın SONUNDA) + `--tutulan-ilk-gun` ve sonrası kalır; daha eski gün blokları AYNEN `--gecmis-dizin` altına taşınır.
 VARSAYILAN = KURU KOŞU (hiçbir şey yazmaz, satır/bayt raporu verir). Gerçek yazma yalnız `--yaz` ile.
 
 Kullanım:
   python scripts/belge/durum-dondur.py --dosya <durum.md> --gecmis-dizin <gunluk/ROL/gecmis> [--tutulan-ilk-gun YYYY-AA-GG] [--oncesi-tek] [--yaz]
 
 Kurallar (hepsi kodda sınanır):
-  · Blok = `## ` ile başlayan satırdan sonraki `## `'a kadar. Tarih başlıktan okunur: `2026-10-03` ya da `(10-03 ~12:00)`; başlıkta tarih yoksa ÖNCEKİ bloğun tarihi
-    geçerlidir (EK blokları). DEVİR bloğu (başlıkta DEVİR) tarihe bakılmaz, hep canlıda kalır. İlk gün bloğunda tarih yoksa durur (tahmin yok).
-  · KAYIPSIZ: eski + canlı (eklenen işaret satırı hariç) = özgün dosya, bayt bayt; satır sonu (CRLF/LF) korunur; aksi hâlde durur.
-  · Kapının dört alanı (precompact-durum-kapisi.cjs DORT_ALAN) canlıda, döndürmeden ÖNCE var olan her alan için SONRA da bulunmalı; bulunmazsa `--yaz` REDDEDİLİR
-    (çıkış 3): önce DEVİR bloğu yazılmalı. Bilerek geçmek için `--devir-eksik-olsun`.
-  · Yazma güvenliği: okumadan sonra dosyanın boyutu/mtime'ı değiştiyse durur (başka pencere yazıyor olabilir); geçmiş dosyası ASLA ezilmez (varsa durur);
-    canlı dosya geçici dosya + `os.replace` ile atomik yazılır.
+  · Blok = `## ` ile başlayan satırdan sonraki `## `'a kadar. DEVİR bloğu: başlığın BAŞI `DEVİR` kelimesidir (`## DEVİR (…)`); başlığın başka yerinde geçen "devir" DEVİR sayılmaz.
+  · DEVİR ŞARTI (§9b madde 1): DEVİR bloğu yoksa ya da kapının dört alanı (SON GİRDİ, AÇIK KUYRUK, VERİLEN SÖZLER, BEKLEYEN KARARLAR) DEVİR bloğunun İÇİNDE bulunmuyorsa
+    `--yaz` REDDEDİLİR (çıkış 3); kuru koşu aynı eksiği raporlar. Alan, dosyanın başka yerinde geçse de sayılmaz.
+  · Tarih (tahmin yok): başlığın BAŞINDAKİ tam tarih (`2026-10-03 …`) ya da `(` hemen sonrasındaki tarih (`(10-03 ~12:00)`, `(2026-10-03 …)`); başlığın ortasında geçen tarih sayılmaz.
+    Kısa tarihin yılı önceki bloğun yılından türetilir (yıl sınırında bir sonraki yıla geçer). Tarihsiz başlık DEVİR'den ÖNCE ise önceki bloğun tarihini devralır (EK blokları);
+    DEVİR'den SONRA ise ya da ilk blokta ise durur (çıkış 2).
+  · KAYIPSIZ: yazdıktan sonra geçmiş dosyaları ve canlı dosya DİSKTEN geri okunur; geçmiş gövdesi + canlı (işaret satırı hariç) özgün dosyayla bayt bayt karşılaştırılır; tutmazsa
+    özgün geri yazılır ve geçmiş dosyaları silinir (çıkış 1). "Doğrulandı" yalnız bu karşılaştırma geçince söylenir.
+  · Yazma güvenliği: okumadan sonra dosya değişirse durur; `os.replace`'ten hemen önce içerik BAYT BAYT yeniden okunup karşılaştırılır; yazma hata verirse (Windows'ta
+    PermissionError dahil) yazılmış geçmiş dosyaları ve .tmp temizlenir, böylece sonraki koşu "ezilmez" ile takılmaz. Geçmiş dosyası ASLA ezilmez. Canlı dosya atomik yazılır.
+    KALAN SINIR: son karşılaştırma ile `os.replace` arasındaki milisaniyelik pencerede başka pencerenin eklediği satır ezilir; bu yüzden döndürme, başka pencere o dosyaya yazmıyorken çalıştırılır.
+  · Satır sonu: dosyadaki BASKIN satır sonu (CRLF ya da LF) işaret ve başlık satırlarında kullanılır; mevcut satırlar bayt bayt korunur.
   · Geçmiş dosyalarının başlığında `sid:` ve dört alan bulunmaz (kapı onları canlı dosya sanmasın, §9b madde 4).
-Çıkış: 0 tamam (ya da yapılacak iş yok) · 1 kullanım/yazma güvenliği · 2 yapı hatası · 3 dört alan eksilir (--yaz reddedildi).
+Çıkış: 0 tamam (ya da yapılacak iş yok) · 1 kullanım/yazma güvenliği/doğrulama · 2 yapı hatası · 3 DEVİR şartı sağlanmıyor (--yaz reddedildi).
 """
 import argparse, datetime, os, re, sys, tempfile, unicodedata
 
-DORT_ALAN = [
-    ("son girdi", re.compile(r"son\s+girdi|bana ulasan son")),
-    ("acik kuyruk", re.compile(r"acik\s+kuyruk|sonraki\s+is|kuyruk")),
-    ("verilen sozler", re.compile(r"verilen\s+soz|taahhut")),
-    ("bekleyen kararlar", re.compile(r"bekleyen\s+karar|recep(te|'te)\s+bekleyen")),
-]
 H2 = re.compile(rb"^## ")
 EOL_AD = {b"\r\n": "CRLF", b"\n": "LF"}
-TAM_TARIH = re.compile(r"(20\d\d)-(\d\d)-(\d\d)")
-KISA_TARIH = re.compile(r"(?<![\d-])(\d\d)-(\d\d)(?![\d-])")
+DEVIR_BASLIK = re.compile(r"^devir\b")
+# DEVİR bloğu İÇİNDE aranan dört alan (kapının DORT_ALAN'ının gevşek `kuyruk`/`taahhut` kolları BİLEREK yok: bir günün metnindeki kelime sayılmasın)
+DEVIR_ALAN = [
+    ("son girdi", re.compile(r"son\s+girdi")),
+    ("acik kuyruk", re.compile(r"acik\s+kuyruk")),
+    ("verilen sozler", re.compile(r"verilen\s+soz")),
+    ("bekleyen kararlar", re.compile(r"bekleyen\s+karar")),
+]
+BASTA_TAM = re.compile(r"^(\d{4})-(\d\d)-(\d\d)(?!\d)")
+PAREN_TARIH = re.compile(r"\(\s*(?:(\d{4})-)?(\d\d)-(\d\d)(?!\d)")
+YARIM_YIL = datetime.timedelta(days=183)
+
+
+class Degisti(Exception):
+    pass
 
 
 def katla(s):
@@ -40,57 +52,92 @@ def katla(s):
     return s.replace("ı", "i").replace("İ", "i").lower()
 
 
-def alanlar(metin):
+def devir_eksik(metin):
     k = katla(metin)
-    return {ad for ad, d in DORT_ALAN if d.search(k)}
+    return [ad for ad, d in DEVIR_ALAN if not d.search(k)]
 
 
-def bloklar(satirlar, yil):
-    """[(baslangic_idx, bitis_idx, baslik, tur, tarih)] ; ilk H2'den önceki kısım 'ust'tur."""
-    ilk = next((i for i, s in enumerate(satirlar) if H2.match(s)), None)
-    if ilk is None:
-        raise ValueError("dosyada '## ' gün bloğu başlığı yok")
+def baslik_tarihi(govde, onceki, tutulan):
+    """Başlık gövdesinden (## sonrası) tarih; yoksa None. Geçersiz tarih ValueError."""
+    m = BASTA_TAM.match(govde)
+    if m:
+        return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    p = PAREN_TARIH.search(govde)
+    if not p:
+        return None
+    ay, gun = int(p.group(2)), int(p.group(3))
+    if p.group(1):
+        return datetime.date(int(p.group(1)), ay, gun)
+    yil = onceki.year if onceki else tutulan.year
+    aday = datetime.date(yil, ay, gun)
+    if onceki and aday < onceki - YARIM_YIL:
+        aday = datetime.date(yil + 1, ay, gun)
+    elif not onceki and aday > tutulan + YARIM_YIL:
+        aday = datetime.date(yil - 1, ay, gun)
+    return aday
+
+
+def bloklar(satirlar, tutulan):
+    """(ust_bitis, [(baslangic, bitis, baslik, tur, tarih)]) ; ilk H2'den önceki kısım 'ust'tur."""
     basl = [i for i, s in enumerate(satirlar) if H2.match(s)]
-    cikti, onceki = [], None
+    if not basl:
+        raise ValueError("dosyada '## ' gün bloğu başlığı yok")
+    cikti, onceki, devir_goruldu = [], None, False
     for n, b in enumerate(basl):
         bit = basl[n + 1] if n + 1 < len(basl) else len(satirlar)
         baslik = satirlar[b].decode("utf-8").strip()
-        if "devir" in katla(baslik):
+        govde = baslik[3:].strip()
+        if DEVIR_BASLIK.match(katla(govde)):
             cikti.append((b, bit, baslik, "devir", None))
+            devir_goruldu = True
             continue
-        m = TAM_TARIH.search(baslik)
-        if m:
-            t = datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
-        else:
-            k = KISA_TARIH.search(baslik)
-            if k:
-                t = datetime.date(yil, int(k.group(1)), int(k.group(2)))
-            elif onceki is not None:
-                t = onceki
-            else:
+        try:
+            t = baslik_tarihi(govde, onceki, tutulan)
+        except ValueError as e:
+            raise ValueError(f"başlıkta geçersiz tarih ({e}): {baslik[:80]}")
+        if t is None:
+            if devir_goruldu:
+                raise ValueError(f"DEVİR bloğundan sonra tarihsiz başlık (tahmin edilmez): {baslik[:80]}")
+            if onceki is None:
                 raise ValueError(f"ilk gün bloğunda tarih yok (tahmin edilmez): {baslik[:80]}")
+            t = onceki
         onceki = t
         cikti.append((b, bit, baslik, "gun", t))
-    return ilk, cikti
-
-
-def planla(veri, tutulan, oncesi_tek):
-    satirlar = veri.splitlines(keepends=True)
-    ust_bit, bl = bloklar(satirlar, tutulan.year)
-    eski_idx, canli_idx = [], list(range(0, ust_bit))
-    eski_gun = {}
-    for b, bit, baslik, tur, t in bl:
-        aralik = list(range(b, bit))
-        if tur == "gun" and t < tutulan:
-            eski_idx += aralik
-            eski_gun.setdefault(t, []).extend(aralik)
-        else:
-            canli_idx += aralik
-    return satirlar, ust_bit, bl, eski_idx, canli_idx, eski_gun
+    return basl[0], cikti
 
 
 def bayt(satirlar, idx):
     return sum(len(satirlar[i]) for i in idx)
+
+
+def baskin_eol(veri):
+    crlf = veri.count(b"\r\n")
+    lf = veri.count(b"\n") - crlf
+    return b"\r\n" if crlf > lf else b"\n"
+
+
+def diskten_dogrula(dosya, gd, hedefler, canli_idx, ust_bit, satirlar, veri, isaret):
+    """Yazılan dosyaları DİSKTEN geri okuyup özgünü bayt bayt yeniden kurar. Hata nedenini ya da None döndürür."""
+    canli = open(dosya, "rb").read().splitlines(keepends=True)
+    if canli[ust_bit : ust_bit + 2] != isaret.splitlines(keepends=True):
+        return "canlı dosyada işaret satırı beklenen yerde/biçimde değil"
+    govde = canli[:ust_bit] + canli[ust_bit + 2 :]
+    if len(govde) != len(canli_idx):
+        return f"canlı satır sayısı tutmuyor ({len(govde)} ≠ {len(canli_idx)})"
+    rec = [None] * len(satirlar)
+    for k, i in enumerate(canli_idx):
+        rec[i] = govde[k]
+    for ad, idx in hedefler.items():
+        g = open(os.path.join(gd, ad), "rb").read().splitlines(keepends=True)[2:]
+        if len(g) != len(idx):
+            return f"geçmiş dosyası satır sayısı tutmuyor: {ad} ({len(g)} ≠ {len(idx)})"
+        for k, i in enumerate(idx):
+            rec[i] = g[k]
+    if any(r is None for r in rec):
+        return "bazı özgün satırlar ne canlıda ne geçmişte"
+    if b"".join(rec) != veri:
+        return "geçmiş + canlı özgünle bayt bayt eşit değil"
+    return None
 
 
 def main():
@@ -104,13 +151,11 @@ def main():
     ap.add_argument("--tutulan-ilk-gun", default=(datetime.date.today() - datetime.timedelta(days=1)).isoformat())
     ap.add_argument("--oncesi-tek", action="store_true", help="eski blokları gün başına değil tek `oncesi-<gün>.md` dosyasına yaz (ilk döndürme)")
     ap.add_argument("--yaz", action="store_true")
-    ap.add_argument("--devir-eksik-olsun", action="store_true")
-    a = ap.parse_args()
-    return uygula(a)
+    return uygula(ap.parse_args())
 
 
-def uygula(a, once_yaz=None):
-    """`once_yaz`: test dikişi; son boyut/mtime kontrolünden hemen önce çağrılır."""
+def uygula(a, once_yaz=None, replace_oncesi=None):
+    """Test dikişleri: `once_yaz` ilk boyut/mtime kontrolünden önce, `replace_oncesi` os.replace'ten hemen önce çağrılır."""
     try:
         tutulan = datetime.date.fromisoformat(a.tutulan_ilk_gun)
     except ValueError:
@@ -123,19 +168,28 @@ def uygula(a, once_yaz=None):
     veri = open(a.dosya, "rb").read()
     try:
         veri.decode("utf-8")
-        satirlar, ust_bit, bl, eski_idx, canli_idx, eski_gun = planla(veri, tutulan, a.oncesi_tek)
+        satirlar = veri.splitlines(keepends=True)
+        ust_bit, bl = bloklar(satirlar, tutulan)
     except (ValueError, UnicodeDecodeError) as e:
         print(f"HATA (yapı): {e}", file=sys.stderr)
         return 2
-    eol = b"\r\n" if b"\r\n" in veri else b"\n"
+    eski_idx, canli_idx, eski_gun, devir_idx = [], list(range(0, ust_bit)), {}, []
+    for b, bit, baslik, tur, t in bl:
+        aralik = list(range(b, bit))
+        if tur == "gun" and t < tutulan:
+            eski_idx += aralik
+            eski_gun.setdefault(t, []).extend(aralik)
+        else:
+            canli_idx += aralik
+            if tur == "devir":
+                devir_idx += aralik
+    eol = baskin_eol(veri)
     if not eski_idx:
         print(f"Yapılacak iş yok: {tutulan.isoformat()} öncesine ait blok kalmadı ({len(satirlar)} satır, {len(veri)} bayt).")
         return 0
-    # kayıpsızlık: her satır tam bir yerde
     if sorted(eski_idx + canli_idx) != list(range(len(satirlar))) or bayt(satirlar, eski_idx) + bayt(satirlar, canli_idx) != len(veri):
         print("HATA (yapı): bölme kayıpsız değil, durdu.", file=sys.stderr)
         return 2
-    # hedef dosyalar
     gd = a.gecmis_dizin
     hedefler = {}
     if a.oncesi_tek:
@@ -143,14 +197,13 @@ def uygula(a, once_yaz=None):
     else:
         for t, idx in sorted(eski_gun.items()):
             hedefler[f"{t.isoformat()}.md"] = idx
-    yeni_canli_baslik = f"> Eski günler (§9b döndürme {datetime.date.today().isoformat()}): {os.path.relpath(gd, os.path.dirname(os.path.abspath(a.dosya))).replace(os.sep, '/')}/ altında ({', '.join(hedefler)}).".encode("utf-8") + eol + eol
-    canli = b"".join(satirlar[i] for i in canli_idx[:ust_bit]) + yeni_canli_baslik + b"".join(satirlar[i] for i in canli_idx[ust_bit:])
-    onceki_alan = alanlar(veri.decode("utf-8"))
-    sonraki_alan = alanlar(canli.decode("utf-8"))
-    kaybolan = sorted(onceki_alan - sonraki_alan)
-    # rapor
+    rel = os.path.relpath(gd, os.path.dirname(os.path.abspath(a.dosya))).replace(os.sep, "/")
+    isaret = f"> Eski günler (§9b döndürme {datetime.date.today().isoformat()}): {rel}/ altında ({', '.join(hedefler)}).".encode("utf-8") + eol + eol
+    canli = b"".join(satirlar[i] for i in canli_idx[:ust_bit]) + isaret + b"".join(satirlar[i] for i in canli_idx[ust_bit:])
+    devir_var = bool(devir_idx)
+    eksik = devir_eksik(b"".join(satirlar[i] for i in devir_idx).decode("utf-8")) if devir_var else [ad for ad, _ in DEVIR_ALAN]
     print(f"DOSYA: {a.dosya}")
-    print(f"ÖNCE : {len(satirlar)} satır, {len(veri)} bayt | tutulan ilk gün: {tutulan.isoformat()} | satır sonu: {EOL_AD[eol]}")
+    print(f"ÖNCE : {len(satirlar)} satır, {len(veri)} bayt | tutulan ilk gün: {tutulan.isoformat()} | baskın satır sonu: {EOL_AD[eol]}")
     print("BLOKLAR (başlangıç satırı · tarih · satır · bayt · hedef · başlık):")
     for b, bit, baslik, tur, t in bl:
         hedef = "CANLI (DEVİR)" if tur == "devir" else ("GEÇMİŞ" if t < tutulan else "CANLI")
@@ -159,12 +212,18 @@ def uygula(a, once_yaz=None):
     for ad, idx in hedefler.items():
         print(f"GEÇMİŞ: {os.path.join(gd, ad)} ← {len(idx)} satır, {bayt(satirlar, idx)} bayt")
     print(f"AZALMA: {len(veri)} → {len(canli)} bayt ({100 - round(100 * len(canli) / len(veri))}% küçülür)")
-    print(f"KAPI DÖRT ALAN: önce {sorted(onceki_alan)} | sonra {sorted(sonraki_alan)}" + (f" | EKSİLEN: {kaybolan}" if kaybolan else " | eksilen yok"))
+    if not devir_var:
+        print("DEVİR ŞARTI: SAĞLANMIYOR, DEVİR bloğu yok (başlığın başı `DEVİR` olan '## ' bloğu gerekir).")
+    elif eksik:
+        print(f"DEVİR ŞARTI: SAĞLANMIYOR, DEVİR bloğunda dört alandan eksik olan: {eksik}")
+    else:
+        print("DEVİR ŞARTI: sağlanıyor (dört alan DEVİR bloğunun içinde).")
+    sart_yok = (not devir_var) or bool(eksik)
     if not a.yaz:
         print("KURU KOŞU: hiçbir şey yazılmadı. Yazmak için aynı komuta --yaz ekle (OPS onayından sonra).")
-        return 3 if kaybolan else 0
-    if kaybolan and not a.devir_eksik_olsun:
-        print(f"REDDEDİLDİ: canlı dosyada kapının {kaybolan} alanı kalmıyor. Önce DEVİR bloğunu yaz ya da --devir-eksik-olsun ile bilerek geç.", file=sys.stderr)
+        return 3 if sart_yok else 0
+    if sart_yok:
+        print("REDDEDİLDİ: DEVİR şartı sağlanmıyor (§9b madde 1); önce DEVİR bloğunu yaz.", file=sys.stderr)
         return 3
     for ad in hedefler:
         if os.path.exists(os.path.join(gd, ad)):
@@ -176,25 +235,61 @@ def uygula(a, once_yaz=None):
     if (st1.st_size, st1.st_mtime_ns) != (st0.st_size, st0.st_mtime_ns):
         print("DURDU: dosya okumadan sonra değişti (başka pencere yazıyor olabilir); yeniden dene. Hiçbir şey yazılmadı.", file=sys.stderr)
         return 1
+    gd_vardi = os.path.isdir(gd)
     os.makedirs(gd, exist_ok=True)
-    yazilan = []
+    yazilan, tmp = [], None
+
+    def temizle():
+        for f in yazilan:
+            try:
+                os.remove(f)
+            except OSError:
+                pass
+        if tmp and os.path.exists(tmp):
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
+        if not gd_vardi:
+            try:
+                os.rmdir(gd)
+            except OSError:
+                pass
+
     try:
-        for ad, idx in hedefler.items():
-            baslik = f"# Geçmiş günler — {os.path.basename(a.dosya)} (döndürme {datetime.date.today().isoformat()})".encode("utf-8") + eol + eol
-            with open(os.path.join(gd, ad), "xb") as f:
-                f.write(baslik + b"".join(satirlar[i] for i in idx))
-            yazilan.append(os.path.join(gd, ad))
         fd, tmp = tempfile.mkstemp(dir=os.path.dirname(os.path.abspath(a.dosya)), prefix=".dondur-", suffix=".tmp")
         with os.fdopen(fd, "wb") as f:
             f.write(canli)
+        for ad, idx in hedefler.items():
+            baslik = f"# Geçmiş günler — {os.path.basename(a.dosya)} (döndürme {datetime.date.today().isoformat()})".encode("utf-8") + eol + eol
+            with open(os.path.join(gd, ad), "xb") as f:
+                yazilan.append(os.path.join(gd, ad))
+                f.write(baslik + b"".join(satirlar[i] for i in idx))
+        if replace_oncesi:
+            replace_oncesi()
+        if open(a.dosya, "rb").read() != veri:
+            raise Degisti()
         os.replace(tmp, a.dosya)
+    except Degisti:
+        temizle()
+        print("DURDU: dosya yazmadan hemen önce değişti (başka pencere yazıyor); geçmiş dosyaları ve geçici dosya silindi, canlı dosyaya dokunulmadı. Yeniden dene.", file=sys.stderr)
+        return 1
     except Exception as e:
-        print(f"HATA (yazma): {e}. Geçmiş dosyaları yazıldıysa canlı dosya DEĞİŞMEDİ (kayıp yok): {yazilan}", file=sys.stderr)
+        temizle()
+        print(f"HATA (yazma): {e}. Geçmiş dosyaları ve geçici dosya temizlendi; canlı dosya DEĞİŞMEDİ.", file=sys.stderr)
         return 1
-    if open(a.dosya, "rb").read() != canli:
-        print("HATA: yazma sonrası doğrulama tutmadı.", file=sys.stderr)
+    hata = diskten_dogrula(a.dosya, gd, hedefler, canli_idx, ust_bit, satirlar, veri, isaret)
+    if hata:
+        geri = a.dosya + ".dondur-geri.tmp"
+        try:
+            open(geri, "wb").write(veri)
+            os.replace(geri, a.dosya)
+            temizle()
+            print(f"HATA: diskten doğrulama tutmadı ({hata}); ÖZGÜN DOSYA GERİ YAZILDI, geçmiş dosyaları silindi.", file=sys.stderr)
+        except Exception as e:
+            print(f"HATA: diskten doğrulama tutmadı ({hata}) VE geri yazma başarısız ({e}); özgün dosya bellekte, geçmiş dosyaları diskte duruyor, ELLE İNCELE.", file=sys.stderr)
         return 1
-    print(f"YAZILDI: canlı {len(canli)} bayt; geçmiş {len(yazilan)} dosya. Kayıpsızlık doğrulandı (eski + canlı = özgün, işaret satırı hariç).")
+    print(f"YAZILDI: canlı {len(canli)} bayt; geçmiş {len(yazilan)} dosya. Diskten geri okundu: geçmiş + canlı (işaret satırı hariç) özgünle bayt bayt eşit.")
     return 0
 
 

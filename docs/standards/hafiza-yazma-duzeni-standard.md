@@ -449,7 +449,7 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
 1. **Canlı dosya iki parçadır.** **DEVİR bloğu dosyanın SONUNDA durur** (OPS kararı 2026-10-04: compact kapısı ve `SessionStart` dosyanın son bloğunu okur, bu yüzden sonda olması işe yarar; döndürme yerini DEĞİŞTİRMEZ): açık ve yarım işler, bekleyen kararlar, sıradaki adımlar; kapının dört alanını (`SON GİRDİ`,
    `AÇIK KUYRUK`, `VERİLEN SÖZLER`, `BEKLEYEN KARARLAR`, bkz. `precompact-durum-kapisi.cjs` `DORT_ALAN`) taşır, en çok 40 satırdır (öneri, ölçülecek),
    her compact öncesi tazelenir, birikmez. Öncesinde **gün blokları**: her biri `## YYYY-AA-GG` başlığıyla, canlı dosyada yalnız **bugün ve dün**.
-   DEVİR bloğu olmadan döndürme yapılmaz: açık iş yalnız eski bir günde kalırsa kaybolurdu.
+   DEVİR bloğu olmadan döndürme yapılmaz: açık iş yalnız eski bir günde kalırsa kaybolurdu. Betik bunu zorlar: başlığın BAŞI `## DEVİR` olan blok yoksa ya da dört alan o bloğun İÇİNDE bulunmuyorsa `--yaz` reddedilir (çıkış 3); başlığın başka yerinde geçen "devir" DEVİR sayılmaz.
 2. **Döndürme iki adımdır ve kayıpsızdır.** Pencere yeni günün ilk yazımında iki günden eski blokları önce `gunluk/<ROL>/gecmis/<YYYY-AA-GG>.md`
    dosyalarına (gün başına bir dosya, metin AYNEN) yazar, sonra canlı dosyadan çıkarır. İlk adım başarısızsa ikinci adım yapılmaz. Bu **dosya silme
    ya da taşıma değildir**, iki yazma işlemidir; R4'ün "silmez ve taşımaz" cümlesiyle çelişmez.
