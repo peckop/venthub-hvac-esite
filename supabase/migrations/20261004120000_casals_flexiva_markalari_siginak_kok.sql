@@ -9,8 +9,12 @@
 --     Karar 264 (Recep: "marka casals, avens distribütör"). NIMUS dahil: Casals katalog kaynağında nimus/nimax aynı
 --     casals.com flipbook sayfalarında; plug/enkelfan Casals plug-fans PDF'inde. AVenS'te 53 ürün kalır (106 − 53).
 --     ⚠ AİLE SLUG'LARINA DOKUNULMAZ (`avens-…` kalır): slug yeniden adlandırması KATALOG işi (Faz 1-B), bu PR'ın dışı.
+--     AİLE ADLARI (OPS hükmü): yayından önce `product_families.name` ve `name_i18n` (tr + en) baştaki 'AVenS' → 'Casals' olur,
+--     kalan metin AYNEN (dönüşüm tablosu aşağıda). Ürün adlarına DOKUNULMAZ: ölçüm — 4 ailenin 53 ürünü ve Sığınak'ın 3 ürünü
+--     için products.name, name_i18n, description_i18n, model_code, sku ve product_images.alt alanlarında 'AVenS' geçmiyor (0).
 --  B) `brands`'a 'Flexiva' (slug flexiva) eklenir. ÜRÜN YOK (DB'de ürünü yok, kaynak dizininde 0 sayfa). Vitrinde
---     "ürünler yakında" durumu kodda (BrandDetailPage + INV-MARKA-KAYNAK-1 açık 'yakında' istisnası).
+--     "ürünsüz marka" durumu kodda: sayfa "teklif isteyin" cümlesiyle yayında, ürün gelene kadar noindex,follow ve
+--     site haritası dışı (brands.ts `urunsuz` işareti + INV-MARKA-KAYNAK-1 kapalı istisnası).
 --  C) `categories` 'shelter-ventilation' (Sığınak Havalandırma Fanları) fans'ın altından alınıp 7. KÖK olur
 --     (parent_id NULL; `categories_set_level` BEFORE tetiği level'i 0 yapar). Kategori kökte BOŞ AÇILMASIN diye
 --     `avens-siginak-havalandirma-uniteleri` ailesinin 3 modeli ve ailenin kendisi kök kategoriye bağlanır:
@@ -28,6 +32,17 @@
 --  Marka kapsamlı fiyat kuralı: pricing_rule 1 satır (brand_id NULL), pricing_policy 0 satır → marka değişimi fiyat
 --  çözümünü ETKİLEMEZ. category_mapping_rules.brand_filter 'avens' içeren 0 satır. venthub_order_items.product_brand
 --  'AVenS' olan 0 satır (geçmiş sipariş kopyası bu yüzden de değişmez).
+--  AİLE ADI DÖNÜŞÜMÜ (canlı SELECT, name = name_i18n.tr; 4 ailenin açıklama/meta alanlarında 'AVenS' geçmiyor):
+--    avens-plug-fanlar       | AVenS Plug Fanlar                       → Casals Plug Fanlar
+--                            | EN: AVenS Plug Fans                     → Casals Plug Fans
+--    avens-enkelfan-ec-plug  | AVenS ENKELFAN EC Motorlu Plug Fanlar   → Casals ENKELFAN EC Motorlu Plug Fanlar
+--                            | EN: AVenS ENKELFAN EC Plug Fans         → Casals ENKELFAN EC Plug Fans
+--    avens-nimus             | AVenS NIMUS Santrifüj Fanlar            → Casals NIMUS Santrifüj Fanlar
+--                            | EN: AVenS NIMUS Centrifugal Fans        → Casals NIMUS Centrifugal Fans
+--    avens-nimax             | AVenS NIMAX Santrifüj Fanlar            → Casals NIMAX Santrifüj Fanlar
+--                            | EN: AVenS NIMAX Backward Centrifugal Fans → Casals NIMAX Backward Centrifugal Fans
+--    DOKUNULMAYAN: avens-siginak-havalandirma-uniteleri ('AVenS BVU Sığınak …', ürün/marka AVenS kalır), avens-bvu-ls ve
+--    diğer 8 AVenS ailesi.
 --  Kategori sayacı (`get_category_counts()`, YALNIZ aktif ürün): fans 360, shelter-ventilation 3 → sonra fans 357,
 --  shelter-ventilation 3. (Sayım ayrımı: fans'a category_id ile bağlı silinmemiş ürün 361 = 360 aktif + 1 arşivlenmiş (status='archived');
 --  3 sığınak ürünü aktif → taşıma sonrası 358 / 357 aynı farkın iki yüzü. Sayaç yalnız aktifi sayar.)
@@ -43,11 +58,16 @@
 --    (webhook `brands` dalı: markanın ailelerinin PDP yolları + PRODUCTS_DISCOVERY/HOME_DATA etiketi; yeni markada aile yok).
 --    ⚠ `arama_marka_kelimeleri()` (arama yazım düzeltmesi sözlüğü) `brands.name` kelimelerinden kurulur: 'casals' ve 'flexiva'
 --    düzeltme sözlüğüne girer. 'flexiva' için ürün yok → o kelimeyle arama boş döner (beklenen); ürünler yazılınca düzelir.
---  product_families UPDATE brand_id/category_id/subcategory_id (4 + 1 satır):
+--  product_families UPDATE brand_id/name/name_i18n (4 satır, TEK UPDATE) + category_id/subcategory_id (1 satır):
 --    product_families_set_updated_at · denetim_izi_product_families · on_product_families_change (webhook: HOME_DATA +
 --    PRODUCTS_DISCOVERY etiketi + aile PDP yolları + seri landing zinciri).
 --    url_takma_ad_aile YALNIZ `slug` değişince ateşler (WHEN old.slug IS DISTINCT FROM new.slug): slug'a dokunulmuyor →
---    ESKİ ADRES KAYDI YAZILMAZ ve gerekmez (aile adresleri değişmez). arama_aile_kuyrukla yalnız name/name_i18n → ATEŞLEMEZ.
+--    ESKİ ADRES KAYDI YAZILMAZ ve gerekmez (aile adresleri değişmez).
+--    arama_aile_kuyrukla `name`/`name_i18n` değişince ATEŞLER (4 satır): search_reindex_queue'ya ('aile', id) yazar
+--    (ON CONFLICT DO NOTHING); kuyruğu pg_cron işi `arama-kuyrugu-bosalt` her 5 dakikada boşaltır → aile adı arama
+--    gövdesine en geç ~5 dk sonra tam yansır. SIRA ÖNEMLİ: aile adı + marka UPDATE'i, ürün brand UPDATE'inden ÖNCE
+--    gelir; `arama_urun_tazele` (senkron) `arama_indeksi_tazele`'yi çağırır ve o aile adını (`f.name`) okur — sıra
+--    ters olsaydı 53 ürün eski aile adıyla indekslenir, düzeltme kuyruğa kalırdı.
 --  products UPDATE brand (53 satır) + category_id/subcategory_id (3 satır):
 --    products_set_updated_at · denetim_izi_products_upd (brand, category_id, subcategory_id izlenen kolonlar → audit satırı) ·
 --    arama_urun_tazele (brand/category_id/subcategory_id izlenen kolonlar → `arama_indeksi_tazele` ürün başına, arama gövdesi
@@ -61,8 +81,12 @@
 --    kategori adresleri slug'a dayanır, slug aynı kalıyor (ADRES_SEMASI_K3B = false iken tek seviyeli /category/<slug> kanonik;
 --    eski iki seviyeli /category/fans/<slug> adresi kod tarafında parent'a bakmadan slug'dan kanoniğe 308 verir).
 --    arama_kategori_kuyrukla yalnız name değişince → ATEŞLEMEZ.
---  Toplam yan etki: ≈ 64 webhook isteği (pg_net, işlem commit olunca kuyruktan gider), ≈ 66 admin_audit_log satırı
---  (actor NULL = BİLİNMİYOR; session_user yorumda), 56 ürün için arama indeksi yeniden hesabı.
+--  Toplam yan etki: ≈ 64 webhook isteği (pg_net, işlem commit olunca kuyruktan gider; aile UPDATE'i 4+1 satır, ad ve
+--  marka AYNI UPDATE'te olduğu için aile başına tek webhook), ≈ 66 admin_audit_log satırı (actor NULL = BİLİNMİYOR;
+--  session_user yorumda; ad değişimi aynı aile UPDATE satırının diff'ine girer), 56 ürün için arama indeksi yeniden
+--  hesabı + 4 arama kuyruğu satırı.
+--  ARAMA SONUCU (beklenen): 'avens' araması yalnız AVenS'in kendi 53 ürününü, 'casals' 53 ürünü (marka + aile adı
+--  gövdede) bulur. Eski 'AVenS NIMUS' gibi sorgular Casals ürünlerini aile adı kelimesi tutmadığı için artık getirmez.
 --
 -- BU MIGRATION PROD'A OTOMATİK UYGULANIR (kural 13). Yalnız Recep onayıyla birleşir.
 --
@@ -72,6 +96,11 @@
 -- GERİ ALMA (elle, tek işlemde; uygulandıktan sonra gerekirse):
 --   update public.product_families set brand_id = (select id from public.brands where slug='avens')
 --    where slug in ('avens-plug-fanlar','avens-enkelfan-ec-plug','avens-nimus','avens-nimax');
+--   update public.product_families set
+--          name = regexp_replace(name, '^Casals ', 'AVenS '),
+--          name_i18n = name_i18n || jsonb_build_object('tr', regexp_replace(name_i18n->>'tr', '^Casals ', 'AVenS '),
+--                                                      'en', regexp_replace(name_i18n->>'en', '^Casals ', 'AVenS '))
+--    where slug in ('avens-plug-fanlar','avens-enkelfan-ec-plug','avens-nimus','avens-nimax');   -- ad geri dönüşümü
 --   update public.products p set brand = 'AVenS' from public.product_families f
 --    where p.family_id = f.id and f.slug in ('avens-plug-fanlar','avens-enkelfan-ec-plug','avens-nimus','avens-nimax');
 --   update public.categories set parent_id = (select id from public.categories where slug='fans') where slug='shelter-ventilation';
@@ -125,6 +154,14 @@ begin
   if v_n <> 1 then
     raise exception 'OPS-51 guard: siginak ailesi bulunamadi';
   end if;
+  -- AD ÖN GUARD'I: 4 ailenin üç adı (name, name_i18n.tr, name_i18n.en) ya 'AVenS ' ile (ilk koşu) ya 'Casals ' ile
+  -- (tekrar koşu) başlamalı; başka biçim = canlı veri ölçümden sapmış, regexp sessizce boşa düşmesin.
+  select count(*) into v_n from public.product_families
+   where tenant_id = v_tenant and slug = any (c_aile_slug)
+     and (name !~ '^(AVenS|Casals) ' or (name_i18n->>'tr') !~ '^(AVenS|Casals) ' or (name_i18n->>'en') !~ '^(AVenS|Casals) ');
+  if v_n <> 0 then
+    raise exception 'OPS-51 guard: % ailenin adi AVenS/Casals ile baslamiyor (ad donusumu belirsiz)', v_n;
+  end if;
 
   select id into v_fans    from public.categories where tenant_id = v_tenant and slug = 'fans';
   select id into v_shelter from public.categories where tenant_id = v_tenant and slug = 'shelter-ventilation';
@@ -160,9 +197,18 @@ begin
   end if;
 
   -- ── A) aile → marka, ürün metni → 'Casals' (YALNIZ bu 4 aile) ────────────────────────────────────────────
+  -- Aile UPDATE'i ürün UPDATE'inden ÖNCE (arama gövdesi aile adını okur — tetikleyici notuna bak). Ad + marka TEK
+  -- UPDATE: aile başına tek webhook/audit satırı. Yalnız baştaki 'AVenS ' → 'Casals '; `name_i18n`'in başka anahtarları
+  -- (varsa) korunur (jsonb birleştirme).
   update public.product_families
-     set brand_id = v_casals
-   where tenant_id = v_tenant and slug = any (c_aile_slug) and brand_id is distinct from v_casals;
+     set brand_id  = v_casals,
+         name      = regexp_replace(name, '^AVenS ', 'Casals '),
+         name_i18n = name_i18n || jsonb_build_object(
+                       'tr', regexp_replace(name_i18n->>'tr', '^AVenS ', 'Casals '),
+                       'en', regexp_replace(name_i18n->>'en', '^AVenS ', 'Casals '))
+   where tenant_id = v_tenant and slug = any (c_aile_slug)
+     and (brand_id is distinct from v_casals
+          or name ~ '^AVenS ' or (name_i18n->>'tr') ~ '^AVenS ' or (name_i18n->>'en') ~ '^AVenS ');
 
   update public.products p
      set brand = 'Casals'
@@ -192,6 +238,20 @@ begin
    where f.tenant_id = v_tenant and f.slug = any (c_aile_slug) and (p.brand is distinct from 'Casals' or f.brand_id is distinct from v_casals);
   if v_n <> 0 then
     raise exception 'OPS-51 son guard: 4 Casals ailesinde % urun/aile hala Casals degil', v_n;
+  end if;
+
+  select count(*) into v_n from public.product_families
+   where tenant_id = v_tenant and slug = any (c_aile_slug)
+     and (name !~ '^Casals ' or (name_i18n->>'tr') !~ '^Casals ' or (name_i18n->>'en') !~ '^Casals '
+          or name ~* 'avens' or name_i18n::text ~* 'avens');
+  if v_n <> 0 then
+    raise exception 'OPS-51 son guard: % Casals ailesinin adi hala AVenS iceriyor ya da Casals ile baslamiyor', v_n;
+  end if;
+
+  select count(*) into v_n from public.product_families
+   where tenant_id = v_tenant and slug = c_siginak_aile and name !~ '^AVenS ';
+  if v_n <> 0 then
+    raise exception 'OPS-51 son guard: siginak ailesinin adi degismis olmamaliydi';
   end if;
 
   select count(*) into v_n from public.products where tenant_id = v_tenant and brand = 'Casals'
