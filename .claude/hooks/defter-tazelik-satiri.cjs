@@ -364,4 +364,20 @@ try {
   process.stdout.write('⚠BELGE: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+/**
+ * ── WRONGSTACK (ARC-24, karar 257) — HER MESAJDA, EŞİKSİZ ──
+ * "bizde X, son Y": sabitli sürüm taze okunur, son sürüm GitHub'dan günde en çok bir kez
+ * arka planda ölçülüp önbelleğe yazılır. Ağ yoksa "OLCULEMEDI". Gerekçe: wrongstack-satiri.cjs.
+ */
+try {
+  const ws = require(path.join(__dirname, 'wrongstack-satiri.cjs'))
+  const simdi = Date.now()
+  process.stdout.write(ws.satir(ws.oku(ws.onbellekYolu(PANO)), DEPO, simdi) + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ws.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠WRONGSTACK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)
