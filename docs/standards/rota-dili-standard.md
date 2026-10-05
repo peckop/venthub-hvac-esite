@@ -94,7 +94,8 @@ başka bir `src/app/[lang]/` üst klasörüyle çakışamaz.
 
 Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Listedeki 27 sayfa dört gruba ayrılır:
 
-**Tabloya girenler (8): bugün sayfası olan klasörler.**
+**Tabloya girenler (13): bugün sayfası olan klasörler.** Son beş satır Design'ın 10-05 07:41Z ekidir (OPS-48 listesi); EN adlar GEO-SEO'nun
+Çarşamba gözden geçirmesine açık **öneridir**, değişirse yalnız `rotaDili.veri.json` satırı (ve `rota-dili-acik-kip.test.ts` literali) değişir.
 
 | id | klasör (bugünkü, iki dilde ortak) | TR | EN | Design durumu |
 |---|---|---|---|---|
@@ -106,6 +107,13 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 | yasal-gizlilik | `legal/gizlilik-politikasi` | `yasal/gizlilik-politikasi` | `legal/privacy-policy` | kabul OPS #24 |
 | yasal-cerez | `legal/cerez-politikasi` | `yasal/cerez-politikasi` | `legal/cookie-policy` | kabul OPS #24 |
 | yasal-mesafeli | `legal/mesafeli-satis-sozlesmesi` | `yasal/mesafeli-satis-sozlesmesi` | `legal/distance-sales-contract` | kabul OPS #24 · satış kipi |
+| yasal-kullanim | `legal/kullanim-kosullari` | `yasal/kullanim-kosullari` | `legal/terms-of-use` | Design eki 10-05 · EN öneri |
+| yasal-on-bilgilendirme | `legal/on-bilgilendirme-formu` | `yasal/on-bilgilendirme-formu` | `legal/pre-contract-information` | Design eki 10-05 · EN öneri |
+| destek-garanti | `destek/garanti-servis` | `destek/garanti-servis` | `support/warranty-service` | Design eki 10-05 · EN öneri |
+| destek-iade | `destek/iade-degisim` | `destek/iade-degisim` | `support/returns-exchanges` | Design eki 10-05 · EN öneri |
+| destek-teslimat | `destek/teslimat-kargo` | `destek/teslimat-kargo` | `support/delivery-shipping` | Design eki 10-05 · EN öneri |
+
+Destek satırlarında TR adresi klasörle aynıdır: yalnız EN için kural üretilir (eski `/en/destek/garanti-servis` → `/en/support/warranty-service`, 308).
 
 **Girmeyenler, nedeniyle (R8, R7):**
 
@@ -116,7 +124,7 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 | bilgi merkezi çatısı | kendi mekanizması (`bilgiMerkeziYonlendirmeleri.mjs`, karar 92, `EN_YAYIN`) | — |
 | giriş, hesap, ödeme, sipariş | Aşama 2 (karar 270, R5) | sonraki aşama |
 
-**Bilinen (Design listesinde adı olmayan mevcut sayfalar):** `destek/garanti-servis`, `destek/iade-degisim`, `destek/teslimat-kargo`, `legal/kullanim-kosullari`,
-`legal/on-bilgilendirme-formu` 11 Ekim'de bugünkü adreslerinde kalır (OPS hükmü 10-04). `legal/*` iki sayfa TR tarafında İngilizce `legal` segmentini taşır,
-bu karar 270 ilkesiyle (TR'de Türkçe adres) **çelişir**; Design'dan hedef ad istendi (OPS-48 kalan iş), ad gelince ayrı satır olarak eklenir ve 11 Ekim'i bloklamaz.
-Aynı nedenle `/en/destek/...` hâlâ Türkçe alt adlar taşıyor (`garanti-servis` vb.); EN'de İngilizce karşılığı yoktur.
+**Kapanan eski not (OPS hükmü 10-04, 10-05'te değişti):** `destek/garanti-servis`, `destek/iade-degisim`, `destek/teslimat-kargo`, `legal/kullanim-kosullari` ve
+`legal/on-bilgilendirme-formu` önce "Design listesinde adı yok, bugünkü adreste kalır" diye dışarıdaydı. Design 10-05 07:41Z'de bu beşine ad verdi (yukarıdaki tablonun son
+beş satırı); OPS "eski adreste kalır" hükmünü geri aldı. Hâlâ dışarıda kalan tek mevcut sayfa `destek/hesaplayicilar/*`: Design listesinde adı yok, mevcut kural
+hedefi (`/destek/hesaplayicilar` → `urun-secici`) yenileme (R4) ile yeni adrese gider.

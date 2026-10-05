@@ -418,7 +418,7 @@ describe('6. DİLSİZ (gerçek middleware) — tek sıçrama, görünen yola', (
   }, 60_000)
 })
 
-describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 yeni satırı literal (tablo bunlardan sapamaz)', () => {
+describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 11 yeni satırı literal (tablo bunlardan sapamaz)', () => {
   const BEKLENEN = [
     { id: 'secici', klasor: 'urun-secici', tr: 'secici', en: 'selector' },
     { id: 'sss', klasor: 'destek/sss', tr: 'sss', en: 'faq' },
@@ -426,9 +426,16 @@ describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 yeni satırı literal (tablo b
     { id: 'yasal-gizlilik', klasor: 'legal/gizlilik-politikasi', tr: 'yasal/gizlilik-politikasi', en: 'legal/privacy-policy' },
     { id: 'yasal-cerez', klasor: 'legal/cerez-politikasi', tr: 'yasal/cerez-politikasi', en: 'legal/cookie-policy' },
     { id: 'yasal-mesafeli', klasor: 'legal/mesafeli-satis-sozlesmesi', tr: 'yasal/mesafeli-satis-sozlesmesi', en: 'legal/distance-sales-contract' },
+    // Design'ın 10-05 07:41Z eki (OPS-48 listesi): sayfası olan beş klasör. EN adlar GEO-SEO Çarşamba onayına açık öneridir;
+    // değişirse yalnız rotaDili.veri.json'daki satır ve bu literal değişir.
+    { id: 'yasal-kullanim', klasor: 'legal/kullanim-kosullari', tr: 'yasal/kullanim-kosullari', en: 'legal/terms-of-use' },
+    { id: 'yasal-on-bilgilendirme', klasor: 'legal/on-bilgilendirme-formu', tr: 'yasal/on-bilgilendirme-formu', en: 'legal/pre-contract-information' },
+    { id: 'destek-garanti', klasor: 'destek/garanti-servis', tr: 'destek/garanti-servis', en: 'support/warranty-service' },
+    { id: 'destek-iade', klasor: 'destek/iade-degisim', tr: 'destek/iade-degisim', en: 'support/returns-exchanges' },
+    { id: 'destek-teslimat', klasor: 'destek/teslimat-kargo', tr: 'destek/teslimat-kargo', en: 'support/delivery-shipping' },
   ]
 
-  it('tablo karar 267/269 satırları + 6 yeni satır literal değerlerle birebir', () => {
+  it('tablo karar 267/269 satırları + 11 yeni satır literal değerlerle birebir', () => {
     expect(TABLO.map((s) => s.id)).toEqual(['hakkimizda', 'iletisim', ...BEKLENEN.map((b) => b.id)])
     for (const b of BEKLENEN) expect(TABLO.find((s) => s.id === b.id)).toEqual(b)
   })
@@ -449,25 +456,26 @@ describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 yeni satırı literal (tablo b
       ['/en/legal/cerez-politikasi', '/en/legal/cookie-policy'],
       ['/tr/legal/mesafeli-satis-sozlesmesi', '/tr/yasal/mesafeli-satis-sozlesmesi'],
       ['/en/legal/mesafeli-satis-sozlesmesi', '/en/legal/distance-sales-contract'],
+      ['/tr/legal/kullanim-kosullari', '/tr/yasal/kullanim-kosullari'],
+      ['/en/legal/kullanim-kosullari', '/en/legal/terms-of-use'],
+      ['/tr/legal/on-bilgilendirme-formu', '/tr/yasal/on-bilgilendirme-formu'],
+      ['/en/legal/on-bilgilendirme-formu', '/en/legal/pre-contract-information'],
+      // destek satırlarında TR adresi klasörle aynıdır: yalnız EN kuralı üretilir.
+      ['/en/destek/garanti-servis', '/en/support/warranty-service'],
+      ['/en/destek/iade-degisim', '/en/support/returns-exchanges'],
+      ['/en/destek/teslimat-kargo', '/en/support/delivery-shipping'],
     ]
     for (const [eski, yeni] of hedefler) {
       expect(r, eski).toContainEqual({ source: eski, destination: yeni, permanent: true })
       expect(w, yeni).toContainEqual({ source: yeni, destination: eski })
     }
-    expect(r).toHaveLength(14) // 12 + hakkımızda/iletişim TR
-    expect(w).toHaveLength(14)
+    expect(r).toHaveLength(21) // 14 (önceki altı satır) + 7 (yeni beş satır: iki yasal × TR+EN, üç destek × yalnız EN)
+    expect(w).toHaveLength(21)
   })
 
-  it('Aşama 1 dışında kalanlar tabloda YOK: garanti-servis, iade-degisim, teslimat-kargo, hesaplayicilar, kullanim-kosullari, on-bilgilendirme-formu', () => {
+  it('tabloda YOK: destek/hesaplayicilar (adres adı Design listesinde yok; mevcut kural hedefi yenilenir)', () => {
     const klasorler = new Set(TABLO.map((s) => s.klasor))
-    for (const disarida of [
-      'destek/garanti-servis',
-      'destek/iade-degisim',
-      'destek/teslimat-kargo',
-      'destek/hesaplayicilar',
-      'legal/kullanim-kosullari',
-      'legal/on-bilgilendirme-formu',
-    ]) {
+    for (const disarida of ['destek/hesaplayicilar']) {
       expect(klasorler.has(disarida), disarida).toBe(false)
     }
   })

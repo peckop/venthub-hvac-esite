@@ -180,8 +180,8 @@ describe('açık kip — iç bağlantılar (header / footer / navigationConfig) 
     expect(m.localizedHref('/en/about', 'en')).toBe('/en/about')
     expect(m.localizedHref('/admin/about', 'tr')).toBe('/admin/about')
     expect(m.localizedHref('/api/contact', 'tr')).toBe('/api/contact')
-    expect(m.localizedHref('/destek/iade-degisim', 'tr')).toBe('/tr/destek/iade-degisim') // tabloda yok: bugünkü adres
-    expect(m.localizedHref('/legal/kullanim-kosullari', 'en')).toBe('/en/legal/kullanim-kosullari')
+    expect(m.localizedHref('/destek/iade-degisim', 'tr')).toBe('/tr/destek/iade-degisim') // tabloda, TR adresi klasörle aynı: bugünkü adres
+    expect(m.localizedHref('/destek/hesaplayicilar', 'en')).toBe('/en/destek/hesaplayicilar') // tabloda yok: bugünkü adres
     expect(m.localizedHref('/about/ekip', 'tr')).toBe('/tr/about/ekip') // altYollar kapalı: alt yol bu satırın işi değil
     expect(m.localizedHref('/aboutx', 'tr')).toBe('/tr/aboutx')
     expect(m.localizedHref('/about', 'de')).toBe('/de/about')
