@@ -331,7 +331,7 @@ function hedefKalaniniCevir(kalan, dil, tablo) {
   const kuyrukBelirteci = kuyrukKonumu === -1 ? '' : kalan.slice(kuyrukKonumu)
   const bulunan = satirBul(taban, tablo, 'klasor')
   if (bulunan === null) return kalan
-  if (kuyrukBelirteci !== '' && !(bulunan.satir.altYollar && bulunan.kalan === '')) return kalan
+  if (kuyrukBelirteci !== '' && !bulunan.satir.altYollar) return kalan
   return `/${bulunan.satir[dil]}${bulunan.kalan}${kuyrukBelirteci}`
 }
 

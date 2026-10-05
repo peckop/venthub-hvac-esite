@@ -119,4 +119,5 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 **Bilinen (Design listesinde adı olmayan mevcut sayfalar):** `destek/garanti-servis`, `destek/iade-degisim`, `destek/teslimat-kargo`, `legal/kullanim-kosullari`,
 `legal/on-bilgilendirme-formu` 11 Ekim'de bugünkü adreslerinde kalır (OPS hükmü 10-04). `legal/*` iki sayfa TR tarafında İngilizce `legal` segmentini taşır,
 bu karar 270 ilkesiyle (TR'de Türkçe adres) **çelişir**; Design'dan hedef ad istendi (OPS-48 kalan iş), ad gelince ayrı satır olarak eklenir ve 11 Ekim'i bloklamaz.
+Design 10-05'te bu beş sayfa için ad önerdi, ama prototipte tasarlanıp tasarlanmadığı ve `destek/iade-degisim` ile `yasal/iptal-ve-iade`'nin aynı konu olup olmadığı (çift sayfa riski) ölçülmedi; OPS Design'a sordu (Linear emir #30). Cevaba göre ya satır eklenir ya eski adres 308 ile yönlendirilir; o güne kadar beş sayfa tabloda DEĞİLDİR.
 Aynı nedenle `/en/destek/...` hâlâ Türkçe alt adlar taşıyor (`garanti-servis` vb.); EN'de İngilizce karşılığı yoktur.

@@ -348,6 +348,15 @@ describe('rotaDiliHedefleriniYenile — mevcut kuralların hedefleri tabloyla ye
     expect(yenile([kuyruklu])[0]).toBe(kuyruklu)
   })
 
+  it('altYollar: kuyruk klasörün doğrudan sonunda değil, daha derinde olsa da hedef çevrilir (zincir doğmaz)', () => {
+    expect(yenile([k('/en/a', '/en/destek/ekip/:path*')])).toEqual([k('/en/a', '/en/support/ekip/:path*')])
+    expect(yenile([k('/en/a', '/en/destek/k/:a/:path*')])).toEqual([k('/en/a', '/en/support/k/:a/:path*')])
+    expect(yenile([k('/:lang(tr|en)/a', '/:lang/destek/ekip/:path*')])).toEqual([
+      k('/tr/a', '/tr/destek/ekip/:path*'),
+      k('/en/a', '/en/support/ekip/:path*'),
+    ])
+  })
+
   it('⭐EN UZUN EŞLEŞME: /destek/sss genel destek satırını ezer', () => {
     expect(yenile([k('/en/a', '/en/destek/sss')])).toEqual([k('/en/a', '/en/support/faq')])
     expect(yenile([k('/en/a', '/en/destek/iade')])).toEqual([k('/en/a', '/en/support/iade')])
