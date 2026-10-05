@@ -464,6 +464,16 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
 6. **Geçiş.** Bugünkü büyük dosyalarda gün başlığı yok; ilk döndürmede eski kısım `gecmis/oncesi-<ilk-gün>.md` olarak tek parça taşınır, son blok ve DEVİR
    canlıda kalır. Toplu taşıma yayın haftasında yapılmaz (OPS kararı 2026-10-04); her pencere kendi dosyasını, OPS kendi dosyasını kendisi döndürür.
    Kanca henüz yoktur: kural pencerenin kendi disiplinidir (§10: ARAÇ'ın bekçisi canlı dosya boyutu için uyarı verebilir; eşik ölçülecek, §11).
+7. **Standart "Yarım iş" satırı (v0.9 eki, HRT-31, OPS isteği 2026-10-05).** Her rolün durum dosyası güncellemesinde, DEVİR bloğunun içinde ve dosyanın en sonunda tam olarak şu iki biçimden biri durur:
+   - `Yarım iş: yok — <kısa>` (örnek: `Yarım iş: yok — HRT-29 ve REC-516 bitti, sırada iş yok`),
+   - `Yarım iş: var — <ne>, <ne zaman güvenli>` (örnek: `Yarım iş: var — HRT-28 PR #1699 OPS hükmü bekliyor, hüküm gelene dek güvenli`).
+
+   Sebep: ARAÇ'ın kancası (`baglam-doluluk.cjs`, `yarimIsOku`, ARC-31 madde 2) pencerenin durum dosyasının son 24 KB'ında bu ifadeyi sabit bir kalıpla arar ve kokpitte pencere başına compact hazırlığı satırını kurar; ifade yoksa kokpit `ölçülemedi` gösterir. Kalıp büyük/küçük harf ve Türkçe harf farksızdır (`yarım iş`, `YARIM İŞ`, `yarim is`); ayraç `:`, `=` ya da boşluktur; ardından `yok` ya da `var` gelir, ondan sonra Türkçe harf gelmez (`yoksa` okunmaz). **Ölçüldü 2026-10-05 (gerçek `yarimIsOku` ile):** `Yarım iş: yok`, `Yarım iş: var`, `Yarım iş yok`, `YARIM İŞ: YOK` okunur; `Yarım: HRT-28`, `Yarım işler: var`, `Yarım iş: yoksa` okunmaz (`bilinmiyor`).
+   Kurallar:
+   - **Son eşleşme geçerlidir.** Kanca dosyanın son 24 KB'ındaki SON `yarım iş yok|var` ifadesini okur; bu yüzden satır **en sondadır** ve her durum güncellemesinde (compact öncesi dahil) DEVİR bloğuyla birlikte tazelenir (blok birikmez, §9b madde 1); satır güncel değilse kokpit yanlış hazırlık gösterir. Satırın altına `yarım iş yok|var` geçen başka bir cümle yazılmaz (kanca onu okurdu).
+   - **`yok` derken yarım iş listelenmez; belirsizse `var` yazılır** ("güvenli yön": belirsizlik `yok` dedirmez). `var` derken ne olduğu ve **ne zaman güvenli noktaya geleceği** aynı satırdadır; compact yapılıp yapılmayacağı buna bakılarak kararlaştırılır.
+   - Satır ayrıntı yeri değildir: tek satır, en çok iki cümle; ayrıntı DEVİR bloğunun `AÇIK KUYRUK` alanındadır.
+   - Bu madde **pencerenin kendi disiplinidir**: kancayı zorlayan bir yazma kapısı henüz yoktur; ARAÇ'ın bekçisi satır eksikse `ölçülemedi` gösterir (kokpit zaten gösteriyor). Rol kartları bunu tek cümleyle hatırlatır (`docs/roller/<ROL>.md`, Çalışma düzeni; ayrıntı `docs/roller/<ROL>-kurallar.md`).
 
 ---
 
@@ -546,6 +556,7 @@ otomatik yazılan son dokunma zamanıdır, bilginin yazıldığı ya da olduğu 
   şöyle yazıyor (tarih)" kalıbı ve bayatlık kuralı; **§9b** durum dosyasının günlük döndürülmesi (DEVİR bloğu dosyanın sonunda + bugün/dün, `gecmis/` kayıpsız iki adım, kapı `gecmis/`'i taramaz; ilk uygulama OPS durum dosyası 2026-10-04: 336.438 → 106.480 bayt, betik `scripts/belge/durum-dondur.py`).
   §1 satır 3, §8 (D33, D34), §10 (v0.9 eki), §11 (iki açık soru) buna göre güncellendi. Başlıktaki "v0.7" bayattı (değişiklik kaydı v0.8'e gelmişti): v0.9 yapıldı.
   Kanca değişmedi; v0.9 bağımsız okuyucudan geçmedi, uygulamayla doğrulanacak.
+- 2026-10-05 v0.9 eki (HRT-31, OPS isteği): §9b madde 7, durum dosyasının sonunda standart `Yarım iş: yok|var — ...` satırı (ARAÇ'ın #1702 kancası okuyor; biçim gerçek `yarimIsOku` ile ölçüldü). Rol kartlarına tek cümle, kurallar dosyalarına blok eklendi (`rol-karti-uret.cjs`). Kanca ve yazma kapıları değişmedi.
 
 - 2026-10-01 v0.8 (v0.7 son okuma turu; statü: uygulamayla doğrulanacak): 1 engelleyici + 4 orta + 3 düşük işlendi. §6 "Bash kaza yolları" `genisletmeli`'yi §5/D13d ile hizaladı (kanca işaretler); kalem 7 öncesi `unlink`/`rmdir`/`mv` kaynağı açık delik olarak §6'ya yazıldı;
   R9b öncelik sırasına ve ön süzgeç/D24d kapsamına girdi; §6 R9-dışı satırı R9b'ye atıfla yeniden yazıldı ve atıf `docs/roller/ARAC.md` oldu; §10 Ayar satırı Recep davranış kuralına bağlandı (söz ARAÇ'ın kendi penceresinde, OPS onayı yerine geçmez; "ayar dosyası" = `settings*.json` + `hafiza-yazma-ayar.json`);
