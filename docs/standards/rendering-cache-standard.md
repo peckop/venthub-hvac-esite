@@ -116,8 +116,11 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 > olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
 > Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
 > bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
-> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Kalan (3g-2):** model adresi
-> (`/tr/urun/<slug>-p-<sku>`) — `slug_i18n` verisi gelince.
+> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
+> products dalı, ürün SKU'su (UPDATE'te eski SKU da) `yayindaModeller` listesindeyse modelin TR + EN sayfa yolunu
+> (`/tr/urun/<slug>-p-<sku>`) `skuModelYollari` (adres tek noktası `adresUret`) ile tazeler; liste dışı SKU ve boş listede
+> ek yol yoktur, çağrı başına en çok 4 ek yol. Kapı: `INV-WEBHOOK-MODEL-YOLU-1`
+> (`src/app/api/webhook/supabase/__tests__/route.model-yolu{,.acik}.test.ts`, bayrak kapalı ve açık kip).
 >
 > **ESKİ DEĞER TAZELEMESİ (URN-12, REC-300 3g-2a, 2026-10-02).** Webhook yalnız yeni değeri değil, UPDATE'te `old_record`'daki
 > ESKİ değeri de tazeler: aile/kategori slug'ı (kategoride `metadata.slug` ve `parent_id` dahil; üst değişince çocukların eski
