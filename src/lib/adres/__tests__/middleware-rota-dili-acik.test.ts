@@ -109,7 +109,9 @@ describe('middleware dilsiz kol — anahtar AÇIK (gerçek veri dosyası: hakkı
   })
 
   it('tabloda olmayan dilsiz yol ve dil çözülemeyen başlık: bugünkü akış', async () => {
-    expect(await istek('/destek/iade-degisim', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/destek/iade-degisim' })
+    // karar 293: garanti-servis tabloda DEĞİL (destek altında kalır) → bugünkü akış; iade-degisim tabloda (ALT-33) → tek 307, yeni adres.
+    expect(await istek('/destek/garanti-servis', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/destek/garanti-servis' })
+    expect(await istek('/destek/iade-degisim', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/yasal/iptal-ve-iade' })
     expect(await istek('/', {})).toMatchObject({ durum: 308, konum: '/tr' })
   })
 
