@@ -446,10 +446,10 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
 
 **Kural:**
 
-1. **Canlı dosya iki parçadır.** Üstte **DEVİR bloğu**: açık ve yarım işler, bekleyen kararlar, sıradaki adımlar; kapının dört alanını (`SON GİRDİ`,
+1. **Canlı dosya iki parçadır.** **DEVİR bloğu dosyanın SONUNDA durur** (OPS kararı 2026-10-04: compact kapısı ve `SessionStart` dosyanın son bloğunu okur, bu yüzden sonda olması işe yarar; döndürme yerini DEĞİŞTİRMEZ): açık ve yarım işler, bekleyen kararlar, sıradaki adımlar; kapının dört alanını (`SON GİRDİ`,
    `AÇIK KUYRUK`, `VERİLEN SÖZLER`, `BEKLEYEN KARARLAR`, bkz. `precompact-durum-kapisi.cjs` `DORT_ALAN`) taşır, en çok 40 satırdır (öneri, ölçülecek),
-   her gün yeniden yazılır, birikmez. Altında **gün blokları**: her biri `## YYYY-AA-GG` başlığıyla, canlı dosyada yalnız **bugün ve dün**.
-   DEVİR bloğu olmadan döndürme yapılmaz: açık iş yalnız eski bir günde kalırsa kaybolurdu.
+   her compact öncesi tazelenir, birikmez. Öncesinde **gün blokları**: her biri `## YYYY-AA-GG` başlığıyla, canlı dosyada yalnız **bugün ve dün**.
+   DEVİR bloğu olmadan döndürme yapılmaz: açık iş yalnız eski bir günde kalırsa kaybolurdu. Betik bunu zorlar: başlığın BAŞI `## DEVİR` olan blok yoksa ya da dört alan o bloğun İÇİNDE bulunmuyorsa `--yaz` reddedilir (çıkış 3); başlığın başka yerinde geçen "devir" DEVİR sayılmaz.
 2. **Döndürme iki adımdır ve kayıpsızdır.** Pencere yeni günün ilk yazımında iki günden eski blokları önce `gunluk/<ROL>/gecmis/<YYYY-AA-GG>.md`
    dosyalarına (gün başına bir dosya, metin AYNEN) yazar, sonra canlı dosyadan çıkarır. İlk adım başarısızsa ikinci adım yapılmaz. Bu **dosya silme
    ya da taşıma değildir**, iki yazma işlemidir; R4'ün "silmez ve taşımaz" cümlesiyle çelişmez.
@@ -543,7 +543,7 @@ otomatik yazılan son dokunma zamanıdır, bilginin yazıldığı ya da olduğu 
 ## Değişiklik kaydı
 
 - 2026-10-04 v0.9 (REC-516/REC-530, OPS isteği; statü: uygulamayla doğrulanacak): iki boşluk kapandı. **§12** hafızadaki bilgiye tarih ve kaynak etiketi (künye), "hafızada
-  şöyle yazıyor (tarih)" kalıbı ve bayatlık kuralı; **§9b** durum dosyasının günlük döndürülmesi (DEVİR bloğu + bugün/dün, `gecmis/` kayıpsız iki adım, kapı `gecmis/`'i taramaz).
+  şöyle yazıyor (tarih)" kalıbı ve bayatlık kuralı; **§9b** durum dosyasının günlük döndürülmesi (DEVİR bloğu dosyanın sonunda + bugün/dün, `gecmis/` kayıpsız iki adım, kapı `gecmis/`'i taramaz; ilk uygulama OPS durum dosyası 2026-10-04: 336.438 → 106.480 bayt, betik `scripts/belge/durum-dondur.py`).
   §1 satır 3, §8 (D33, D34), §10 (v0.9 eki), §11 (iki açık soru) buna göre güncellendi. Başlıktaki "v0.7" bayattı (değişiklik kaydı v0.8'e gelmişti): v0.9 yapıldı.
   Kanca değişmedi; v0.9 bağımsız okuyucudan geçmedi, uygulamayla doğrulanacak.
 

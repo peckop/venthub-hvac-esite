@@ -31,6 +31,16 @@ const TABLO = Object.freeze([
   Object.freeze(['ADMIN', 'Admin']),
   Object.freeze(['GEO-SEO', 'Geo-SEO']),
   Object.freeze(['BLOG', 'Blog']),
+  // ARC-61 (HRT-29 ölçümü, 2026-10-05): rol kartı olup tabloda olmayan yedi departman `departman-ac` ile açılamıyordu ("rol taninmiyor").
+  // Anahtar = docs/roller/<ROL>.md dosya adı (ASCII, büyük harf); görünen ad = Recep'in kullandığı insan adı. Tablo ile rol kartları
+  // arasındaki farkı `src/__tests__/conformance/departman-ac-kapat.test.ts` (INV-DEPARTMAN-AC-9) kırmızıyla gösterir.
+  Object.freeze(['TASARIM', 'Tasarım']),
+  Object.freeze(['SATIS', 'Satış']),
+  Object.freeze(['MARKA', 'Marka']),
+  Object.freeze(['KATALOG', 'Katalog']),
+  Object.freeze(['EDGE', 'Edge']),
+  Object.freeze(['I18N', 'I18N']),
+  Object.freeze(['MEVZUAT', 'Mevzuat']),
 ])
 
 /** Aramalar Map üzerinden yapılır (nesne prototipi adlarına karşı ek güvence; anahtarlar zaten büyük harf). */
