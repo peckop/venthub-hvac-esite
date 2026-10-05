@@ -202,6 +202,31 @@ takma ad biçimi, çözülmüş renk ≤2 kanal farkı, tek tanım, çakışan k
 değişmediği ve `tailwind.config.js`'te `theme` altında yalnız `extend` olduğu. INV-TOKEN-PARITE-1
 (kopya↔türev) ALTYAPI'nın işidir ve DS kopyası gelince yazılır.
 
+### 2.3 Çakışan küme: görünür dönüşüm anahtarın ARKASINDA (TSR-9, Faz 2b, 2026-10-05)
+
+Çakışan küme (§2.2 "DOKUNULMAZ") `:root`ta **eski değerinde kalır**; DS değeri `:root[data-gorunum='yeni']`
+kapsamında, `var(--marka-*)` **takma adıyla** yazılır (literal değil → yeni renk kaynağı açılmaz, INV-PALET-1
+hedefi korur). `data-gorunum` özniteliğini kök `layout.tsx` yalnız `YENI_GORUNUM` (`src/config/features.ts`)
+açıkken basar; kapalıyken blok hiçbir öğeyle eşleşmez. Plan: v2.2 §1.2.
+
+| Ad | `:root` (kapalı, DEĞİŞMEDİ) | `:root[data-gorunum='yeni']` | Not |
+|---|---|---|---|
+| `--primary-navy` | `226 71% 40%` | `var(--marka-lacivert)` | DS `219 48% 20%` ≈ marka lacivert; değer tek kaynakta |
+| `--brand-cyan` | `189 78% 53%` | `var(--marka-turkuaz)` | koyu zeminde kontrast **ölçülmedi** (M3, gerçek tarayıcı) |
+| `--radius` | `0.5rem` | `0` | DS değeri; `var(--radius)` kullanımı bugün 0 |
+| `--font-sans` | Inter (`next/font`, body sınıfı) | `var(--font-archivo), system-ui, …` | `variable` + `className` BİRLİKTE değişir |
+| `--font-serif` / `--font-mono` | tanımsız | `var(--font-source-serif), Georgia, serif` / `var(--font-plex-mono), ui-monospace, monospace` | Tailwind `font-mono`/`font-serif` `var(--ad, <varsayılan yığın>)` biçiminde: kapalıyken eski yığın |
+| `--action-terracotta-deep` | `24.4 91% 39.2%` | **ATLANDI** | site değeri kazanır (K25-b); DS'e düzeltme isteği OPS emriyle Design'a |
+
+**Admin dondurma (plan §1.4):** `[data-admin-theme]` `--primary-navy`/`--brand-cyan`'ı eski değerlere sabitler;
+`--font-sans` CSS'ten sabitlenemez (Inter'in üretilmiş adı yalnız `next/font` sınıfında yaşar) → admin yerleşimi
+(`src/app/admin/layout.tsx`) kendi Inter nesnesini `variable` + `className` ile taşır.
+**Açık kalem (ölçülmedi/çözülmedi):** `document.body`ye portal edilen admin diyalog/toast'ları admin sarmalayıcısının
+dışındadır ve `<body>` fontunu alır; bayrak açıkken Archivo olur. Karar ADMIN şeridinde (plan §1.4 "Bilinmeyen").
+
+Kapı: `src/__tests__/conformance/gorunum-anahtari-faz-2b.test.tsx` (kapalı=bugünkü sınıf, açık=yeni, üç aile
+`preload: false`, `:root` değerleri değişmedi, takma ad, admin pinleri, Tailwind yığını).
+
 ---
 
 ## 3) Kapı — ve ölçemediği şey (gizlenmiyor)

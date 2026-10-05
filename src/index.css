@@ -472,6 +472,34 @@ textarea:focus-visible {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* ── YENİ GÖRÜNÜM KAPSAMI (TSR-9, Faz 2b) ─────────────────────────────
+     Plan: docs/plans/tasarim-kod-plani-v2.2-2026-10-05.md §1.2. `src/app/layout.tsx`
+     `data-gorunum="yeni"` özniteliğini YALNIZ `YENI_GORUNUM` (src/config/features.ts) açıkken
+     basar; bayrak kapalıyken bu blok HİÇBİR öğeyle eşleşmez → canlıda fark 0. Yukarıdaki `:root`
+     değerleri DEĞİŞMEDİ (çakışan kümenin eski değerleri orada durur; silinmeleri açılıştan
+     SONRAki temizlik PR'ının işidir).
+
+     RENK: değerler `var(--marka-*)` TAKMA ADIDIR, literal DEĞİL → yeni renk kaynağı açılmaz
+     (cetvel marka-token-eslemesi §2; INV-PALET-1 hedefi korur). Eşleme (v2.1 §2.2):
+       --primary-navy → --marka-lacivert · --brand-cyan → --marka-turkuaz.
+     ATLANAN: `--action-terracotta-deep` (site değeri kazanır, v2.1 §2.2: DS'e düzeltme isteği
+     OPS emriyle Design'a gider). `--brand-cyan-ink` eşit, küme dışı.
+     ⚠--brand-cyan koyu zeminde (site 53% açıklık → DS 35%) kontrast gerçek tarayıcıda ÖLÇÜLÜR
+     (plan §4 M3); bu blok bayrak kapalıyken zaten etkisizdir.
+
+     YAZI AİLESİ: DS dizeleri; `--font-archivo/-source-serif/-plex-mono` `next/font` `variable`
+     adlarıdır ve `<html>` sınıfından gelir (aynı öğe, bayrak açıkken). Eşitlik "DS dizesiyle"
+     aranmaz: üretilmiş ad hiçbir zaman eşit olmaz (v2.1 §2.2).
+     `--radius`: DS değeri 0 (site 0.5rem; `var(--radius)` kullanımı bugün 0). */
+  :root[data-gorunum='yeni'] {
+    --primary-navy: var(--marka-lacivert);
+    --brand-cyan: var(--marka-turkuaz);
+    --radius: 0;
+    --font-sans: var(--font-archivo), system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+    --font-serif: var(--font-source-serif), Georgia, serif;
+    --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  }
+
   .light {
     --surface-deep: 210 40% 96%;
     --surface-darker: 215 28% 93%;
@@ -549,6 +577,19 @@ textarea:focus-visible {
     --admin-success-fg: 0 0% 100%;
     --admin-success-weak: 152 60% 96%;
     --admin-ring: 226 71% 45%;
+    /* ADMIN DONDURMA (TSR-9, Faz 2b; plan v2.2 §1.4): yeni görünüm açılsa da admin ESKİ
+       değerlerde kalır. Değerler `:root`takinin AYNISI (bayrak kapalıyken kalıtımla zaten bu
+       değerler → fark 0). `--font-sans` BURADA SABİTLENEMEZ: Inter'in üretilmiş adı yalnız
+       `next/font` sınıfında yaşar; admin yerleşimi kendi Inter nesnesini taşır
+       (`src/app/admin/layout.tsx`, `variable: '--font-sans'` + `className`).
+       `--font-mono`/`--font-serif` (admin `font-mono` ~63 kullanım) Tailwind'in VARSAYILAN yığınına
+       sabitlenir: bayrak açıkken `:root[data-gorunum='yeni']` bunları Plex Mono/Source Serif'e çevirir,
+       admin'e sızmasın (ölçüldü 2026-10-05: sabitleme olmadan admin `font-mono` Plex Mono çıktı).
+       Yığınlar `tailwindcss/defaultTheme` ile birebir (font adı, renk değil). */
+    --primary-navy: 226 71% 40%;
+    --brand-cyan: 189 78% 53%;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
     color-scheme: light;
   }
 
