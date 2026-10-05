@@ -20,8 +20,8 @@ tablosu, §4 şerit sınırları, satır 486/491 eşzamanlı alt ajan sınırı,
 ## 0 · v2.2 değişiklik özeti
 
 1. **Üç anahtar** (§1): adres (`ADRES_SEMASI_K3B`, mevcut, **geri dönüşsüz**), kabuk (`YENI_KABUK_GEZINMESI`, mevcut), görünüm (`YENI_GORUNUM`, YENİ) + paket alt bayrağı.
-2. **Takvim 5–11 Ekim gün gün** (§2): 6 Salı plan onayı + kapı + token/font; 7-8 paketler; 9 yerel önizleme kabulü; 10 düzeltme; 11 Pazar yayın (adres önce, görünüm sonra).
-3. **Ekran işi paketlere bölündü** (§3): 52 kare + G(9) + H(6) → 17 satırlık paket tablosu (§3.2; ARAMA·KARSILASTIRMA·SENARYO tek satır); çakışmasızlık depoya karşı **ölçüldü** (0 çakışma). **10 kare yeni adres gerektirdiği için baştan "KOD YOK"** (§3.1, §5.3).
+2. **Takvim 5–11 Ekim gün gün** (§2): 5 Pzt plan onayı geldi, **S1 font spike + Faz 2a bugün başlar**; 6 Sal kapı + token/font tamamlanır; 7-8 paketler; 9 yerel önizleme kabulü; 10 düzeltme; 11 Pazar yayın (adres önce, görünüm sonra).
+3. **Ekran işi paketlere bölündü** (§3): 52 kare + G(9) + H(6) → 17 satırlık paket tablosu (§3.2; ARAMA·KARSILASTIRMA·SENARYO tek satır); çakışmasızlık depoya karşı **ölçüldü** (0 çakışma). **6 kare, v3 şemasında da adresi olmadığı için baştan "KOD YOK"** (ARAMA D3–D5, F4, B10/B11; §3.1, §5.3); senaryo/teklif-listesi/karşılaştırma adresleri v3'te **VAR** (§5.3).
 4. **9 Ekim kabul ölçütü** (§4): görünüm için 14 madde, **adres için ayrı M-A1..M-A8**; M2/M3/M7 çekirdek değil **tüm 54 vitrin sayfası** için.
 5. **Yetişmezse düşen dilim** (§5): düşme sırası, Ops'un 9 Ekim akşamı karar kuralı, **Pazar günü adres kırmızı çıkarsa** tablosu.
 6. **Gerçekçilik** (§6): güven yargısı açık yazıldı (11 Ekim tam kapsam: DÜŞÜK; adres tek başına: ORTA).
@@ -40,7 +40,7 @@ tablosu, §4 şerit sınırları, satır 486/491 eşzamanlı alt ajan sınırı,
 | Uzun metin ölçüsü | Design cevabı bekleniyordu | Kapandı (v2.1 §1.2, commit `228ace497`) | — |
 | Faz 4(2) "adres yayınından sonra" | Ayrı yayın | **Aynı gün, ayrı anahtar, ayrı deploy, adres önce** (§5.3) | 271 + karar 118 |
 | "Geri alma = bayrak `false` PR'ı" | Hem adres hem görünüm için | **Yalnız görünüm için.** Adres açılışı geri dönüşsüz (§5.4) | `features.ts:127-128`; adres planı §11 |
-| Yeni sayfa rotaları (arama, karşılaştırma, senaryo, F4, teklif-listesi alt adresleri) | "Adres şemasında yazılı mı: ölçülmedi" | **Ölçüldü: yazılı DEĞİL** → baştan KOD YOK (§5.3) | `adres-semasi-standard.md` grep'i |
+| Yeni sayfa rotaları (arama, karşılaştırma, senaryo, F4, teklif-listesi alt adresleri) | "Adres şemasında yazılı mı: ölçülmedi" | **Standartta yok, Recep'in 09-11 v3 şemasında VAR** (senaryo `:58`, teklif-listesi `:61`, karşılaştır `:62`): paketler **kapasiteye göre**. **v3'te de adresi olmayanlar KOD YOK:** arama (yalnız rezerve kelime `:97`), F4, `teklif-listesi/gonder` + `/alindi` (§5.3). **Recep'e adres sorusu YOK** (Ops: TSR-6 kapandı) | `rec300-design-adres-semasi-v3-2026-09-11.md` satır 50–62, 97; Ops düzeltmesi 10-05 |
 
 ---
 
@@ -104,21 +104,21 @@ Gerekçe: Design prototipi vitrindir (Vitrin 15A / Menü v18); admin 11 Ekim hed
 
 **Süre etiketi:** depoda ölçülmüş ajan verimi/PR hızı **yok**; süreler **tahmin**dir, Ops'un verdiği tarih çerçevesinden geriye dağıtılmıştır, taahhüt değildir.
 Dal öneki departmandır (`tasarim/*`, `urun/*`, `satis/*`, `i18n/*`, `altyapi/*`); K-1 komutu yalnız `tasarim/*` için (v2.1 §3).
-**Design girdisi KESİMİ:** Design'a bağlı kareler (§3.1: A4+F3, A6, A8, A9) için son cevap günü **Çar 12:00** (öneri; Ops teyit). Sonra gelen cevap **kodlanmaz** (11 Ekim sonrasına); cevap gelmeyen kare eski bileşen + yeni tokenla kalır.
+**Design girdisi KESİMİ:** Design'a bağlı kareler (§3.1: A4+F3, A6, A8, A9) için son cevap günü **Çar 12:00** (Ops teyit etti 10-05: EVET). Sonra gelen cevap **kodlanmaz** (11 Ekim sonrasına); cevap gelmeyen kare eski bileşen + yeni tokenla kalır.
 
 | Gün | Ne biter | Kim | Ölçü (kanıt) | Süre |
 |---|---|---|---|---|
-| **5 Pzt** (bugün) | (1) v2.2 → doğrulayıcı → Ops. (2) **Design'a soru dosyası** (§6.3) TASARIM hazırlar, OPS gönderir; **kesim Çar 12:00**. (3) ALTYAPI kapı emri (INV-PALET-1 4. kol, v2.1 §2.1) Ops açar. (4) Paket kartları + `YÖNTEM:` satırı + claim'ler (§3.2 globları) Ops açar. (5) ADMIN'e dondurma sorusu (Ops). (6) **Recep'e adres sorusu** (§5.3: arama/karşılaştırma/senaryo/F4/teklif-listesi alt adresleri) Ops taşır; kesim Çar 12:00 | TASARIM, Ops | Doğrulayıcı hükmü; açılan kart sayısı = §3.2 tablosundaki satır sayısı (17); claim tablosu `board.cjs who` ile | akşam |
-| **6 Sal** — **sıra önemli** | **09:00 S1 spike (font manifest/`preload`, §1.2) ÖNCE koşar — sonucu font tanımını geçersiz kılabilir; S3 (ölü dal) yanında.** Paralel: **ALTYAPI** INV-PALET-1 4. kol PR'ı (sabotaj (a)–(d)) → öğleye merge; **ALTYAPI** `package.json`: Lighthouse bağımlılığı kararı (§4 M8); **OLCUM** yalnız **fark-0 koşucusu + enstrümanı** (§1.3; "bayrak kapalı ilk koşu" bunu ister); **VARLIK** `public/brand` SVG; **I18N** sözlük iskeleti. **Öğleden sonra TOK:** Faz 2a PR'ı (v2.1 §2.5 Faz 2a adım 2–8; DS 66 adı) + `src/config/gorunum/index.ts` + `features.ts` tek satır (`YENI_GORUNUM`) + S2 spike. **DS:** PR-1 başlar (3 çalışan). Paketler dal açar. **ADRES (URUN, ayrılmış kapasite):** adres önizleme paketi hazırlığı + Faz 1-B/3-C durum ölçümü (09-29'dan sonraki ilerleme **ölçülmedi**) | TASARIM, ALTYAPI, I18N, URUN | INV-PALET-1 sabotaj 4/4; K-1 komutu 0; fark-0 aracı kendi enstrümanıyla çalışır + **ilk koşu**; S1/S2/S3 sonuçları; `type-check` · `lint` · `test -- --run` yeşil. **INV-TOKEN-PARITE-1 (ALTYAPI) Salı akşam ya da Çar sabah — kayma riski var (tahmin)**; font tanımı PR'ı S1 sonrası, **Çar sabah** | yük yüksek; **tahmin: Salı'ya sığmayanlar Çar sabahına kayar** |
-| **7 Çar** | **Sabah:** font tanımı + Faz 2b anahtarlı çevirme (§1.2) merge; PARITE kapısı (kaydıysa). **12:00 Design/adres-kararı KESİMİ.** DS PR-2 (TeknikTablo, KarsilastirmaTablosu, AdetKontrolu, KatliCagriSatiri) ve PR-3 (PQEgrisi). **KABUK, ANA, LISTE, URUNSAYFA, TEKLIF(B9/B9b)** kodlama; **ölçüm araçları** (§4 tablosu: reflow genişletme, kontrast, axe kablolama). **SOZLUK dalgası #1 (öğle).** **Master dalgası 17:00** (yalnız kapalı-bayraklı, kapıları yeşil; günde en çok 2) | TASARIM, URUN, SATIS, I18N | DS: bileşen başına Vitest render + axe 0; her paket PR'ında §1.3 statik ölçü; dalga sonrası fark 0 yeniden koşulur | tahmin |
+| **5 Pzt** (bugün) — **plan onayı geldi (Ops 10-05); S1 + Faz 2a başlar** | (1) **Ops plan onayı verildi.** (2) **Design'a soru dosyası** (§6.3) TASARIM hazırlar, OPS gönderir; **kesim Çar 12:00**. (3) ALTYAPI'ya **INV-PALET-1 kapı emri verildi (vade Salı)**; standarda v3 adres satırlarının taşınması da ALTYAPI'ya (§5.3). (4) Paket kartları + `YÖNTEM:` satırı + claim'ler (§3.2 globları) Ops açar. (5) ADMIN dondurma: varsayılan **EVET** (Ops). (6) **TASARIM bugün başlar:** **S1 font spike** (§1.2; sonuç akşam) + **Faz 2a** (v2.1 §2.5 Faz 2a adım 2–5: `kenar.css`/`yuzey.css` okuması, `ds-kaynak` kopya, `index.css` eklemeleri, `tailwind.config.js` `extend`) — PR Salı sabah | TASARIM, Ops, ALTYAPI | S1 sonucu (preload farkı ölçüsü); 2a dalı açık, diff yalnız ekleme; açılan kart sayısı = §3.2 tablosundaki satır sayısı (17); claim tablosu `board.cjs who` ile | akşam (tahmin) |
+| **6 Sal** (Pzt'te başlayan 2a/S1 sayesinde hafifledi) | **Sabah:** Faz 2a PR'ı (Pzt'te başladı; DS 66 adı, `src/config/gorunum/index.ts`, `features.ts` tek satır `YENI_GORUNUM`) merge'e hazır; **ALTYAPI** INV-PALET-1 4. kol PR'ı (vade Salı; sabotaj (a)–(d)) → öğleye merge; **font tanımı** (S1 sonucuna göre; Çar'a kaymaz); S2 + S3 spike. **Paralel:** **ALTYAPI** Lighthouse/axe kararı ve `package.json` (§4 M8/M7; Ops: Salı); **OLCUM** yalnız **fark-0 koşucusu + enstrümanı**; **VARLIK** `public/brand` SVG; **I18N** sözlük iskeleti; **DS** PR-1 (3 çalışan); paketler dal açar; **ROTA** (URUN, `urun/*` dalı): senaryo, teklif-listesi, karşılaştır rota klasörleri **v3 adresiyle** (§5.3; kapasiteye göre; bayrak kapalıyken `notFound()`, indekslenmez); **ADRES (URUN, ayrılmış kapasite):** adres önizleme paketi + Faz 1-B/3-C durum ölçümü (09-29 sonrası **ölçülmedi**). **Akşam:** INV-TOKEN-PARITE-1 (ALTYAPI) | TASARIM, ALTYAPI, I18N, URUN | INV-PALET-1 sabotaj 4/4; K-1 komutu 0; fark-0 aracı kendi enstrümanıyla çalışır + **ilk koşu**; S1/S2/S3 sonuçları; `type-check` · `lint` · `test -- --run` yeşil; PARITE yeşil | tahmin; PARITE kayarsa Çar sabahı |
+| **7 Çar** | **Sabah:** Faz 2b anahtarlı çevirme (§1.2) merge; PARITE kapısı (kaydıysa). **12:00 Design girdisi KESİMİ** (A4+F3, A6, A8, A9). DS PR-2 (TeknikTablo, KarsilastirmaTablosu, AdetKontrolu, KatliCagriSatiri) ve PR-3 (PQEgrisi). **KABUK, ANA, LISTE, URUNSAYFA, TEKLIF(B9/B9b)** kodlama; **ölçüm araçları** (§4 tablosu: reflow genişletme, kontrast, axe kablolama). **SOZLUK dalgası #1 (öğle).** **Master dalgası 17:00** (yalnız kapalı-bayraklı, kapıları yeşil; günde en çok 2) | TASARIM, URUN, SATIS, I18N | DS: bileşen başına Vitest render + axe 0; her paket PR'ında §1.3 statik ölçü; dalga sonrası fark 0 yeniden koşulur | tahmin |
 | **8 Per** | **Kod-tamam hedefi.** İkincil paketler (BILGI, SECICI) bugün biter ya da düşme adayıdır. **SOZLUK dalgası #2 (sabah), #3 (18:00 son).** **TOK dondurma 18:00** (§3.4). **Yerel önizleme dalı:** master + tüm bayraklar `true` tek commit, **push EDİLMEZ**. **İlk tam ölçüm turu** (OLCUM, akşam) | tümü | Ölçüm raporu v0 (§4'ün ilk koşusu); kırmızı listesi paket sahiplerine | tahmin; en sıkışık gün |
 | **9 Cum** | **09:00 SOZLUK dalgası #4 (son; düzeltme anahtarları)**. **12:00 kod dondurma** (yalnız kırmızı düzeltme). 12:00–15:00 **bağımsız doğrulayıcı ölçümü** (§10.3) → rapor v1. **15:00–18:00 Recep yerel önizlemeleri — iki AYRI blok** (öneri, Ops'a bırakılır): **(1) ADRES önizlemesi** (karar 68/161: adres planı Faz 4 gezinme listesi; "gördüm, tamam" ayrı kaydedilir), **(2) GÖRÜNÜM önizlemesi** (M14; ara durum "yalnız token+font" da gösterilir, §5.2). Gerekçe: iki karar iki ayrı anahtardır, onayları da ayrı olmalı; aynı oturumda ama ayrı hüküm. **Akşam: Ops kararı** (§5.2) | TASARIM + doğrulayıcı, URUN/ALTYAPI (adres), Recep, Ops | §4 (M1–M14) + adres ölçütleri (M-A1..M-A8) | tahmin |
 | **10 Cmt** | **Yalnız kırmızı düzeltme + ilgili M ölçümünün yeniden koşulması** (kabul sonrası başka değişiklik yok). Yayın hazırlığı: açılış PR'ları **draft**; **açılış kombinasyonu** (Cuma'da onaylanan alt küme) ayrıca `pnpm build` + M2/M3/M6/M7/M9 yeniden — Cuma önizlemesi "hepsi `true`" dalıydı, açılış kombinasyonu ondan **farklı olabilir** (düşen paket `false`); Recep'in görmediği kombinasyon yayınlanmaz → Ops, farkı Recep'e yazar (yeniden onay gerekir mi kararı Ops'ta); **görünüm geri alma provası** (bayrak `false` PR'ı yerelde build); **adres açılış kontrol listesi** (§4 M-A) URUN/ALTYAPI'dan; canlı ölçüm komut seti; Vercel merge kapasitesi kontrolü (ALTYAPI) | TASARIM, URUN, ALTYAPI, Ops | Yayın kontrol listesi yeşil; açılış kombinasyonu build + M ölçümleri yeşil | tahmin |
 | **11 Paz** | **ADRES ÖNCE (adres planı "YAYIN GÜNÜ listesi", `rec-300-plan-tazeleme` §4):** Faz 1-B merge (Recep "şimdi yap"; **migration → prod DB, kural 13**) → canlı ölçüm (40 eski aile adresi tek 308) → Faz 3-C merge → deploy → yayın ölçümü → IndexNow + GSC. **Yeşilse GÖRÜNÜM:** açılış PR'ı → deploy → canlı ölçüm (6 referans sayfa, CSS hash `curl` 3 ISR adresi, Lighthouse). Gözlem; **Pazar adres kırmızıysa tablo §5.2**. Adres adımlarının toplam süresi **ölçülmedi** (adres planında yalnız "pencere dakikalarla sınırlı" yazılı) | URUN/ALTYAPI/GEO-SEO (adres), TASARIM (görünüm), Ops, **Recep (Faz 1-B onayı)** | Adres: ana plan §7 ölçümü; görünüm: canlı ölçüm raporu | tahmin; **tek günde ikisi sığmayabilir** |
-| **11 Ekim sonrası** | OPS-71 (karar 285, **kod 11 Ekim'den sonra, ÜRÜN ile**); eski değerleri silen temizlik PR'ı; Faz 5 borç eritme (INV-BORC-MANDAL-1; "aynı değişiklik çok hedef" → **maestro** uygun, §3.5); admin'in DS'e geçişi (ADMIN kararı); "KOD YOK" paketler adres kararıyla (§5.3); Design cevabı kesimden sonra gelen kareler | URUN, TASARIM, ADMIN | — | — |
+| **11 Ekim sonrası** | OPS-71 (karar 285, **kod 11 Ekim'den sonra, ÜRÜN ile**); eski değerleri silen temizlik PR'ı; Faz 5 borç eritme (INV-BORC-MANDAL-1; "aynı değişiklik çok hedef" → **maestro** uygun, §3.5); admin'in DS'e geçişi (ADMIN kararı); v3'te de adresi olmayan "KOD YOK" kareler (ARAMA D3–D5, F4, B10/B11) ALTYAPI/URUN adres cevabıyla (§5.3); kapasiteye yetişmeyen paketler; Design cevabı kesimden sonra gelen kareler | URUN, TASARIM, ADMIN | — | — |
 
 **v2.1 faz tablosu ile eşleme:** ön koşul (kapı) → Sal sabah · Faz 2a → Sal · Faz 3 (DS) → Sal–Çar · Faz 2b → Çar (ölçüm Per) · Faz 1 (kabuk) → Çar–Per, anahtar `YENI_KABUK_GEZINMESI` ·
-Faz 4 (sayfalar) → paketler Çar–Per, anahtar paket bayrağı · Faz 5 → 11 Ekim sonrası. **Sapma gerekçesi:** 2b anahtarlı olduğundan merge'ü Çarşamba'ya (ölçümü Perşembe'ye) koydum; font tanımı S1'e bağlı olduğu için Salı değil Çar sabah.
+Faz 4 (sayfalar) → paketler Çar–Per, anahtar paket bayrağı · Faz 5 → 11 Ekim sonrası. **Sapma gerekçesi:** 2b anahtarlı olduğundan merge'ü Çarşamba'ya (ölçümü Perşembe'ye) koydum; S1 ve Faz 2a Ops onayıyla **bugün** başladığı için font tanımı Salı'dadır (ilk sürümdeki "Çar sabah" geri çekildi).
 
 ---
 
@@ -133,19 +133,20 @@ Faz 4 (sayfalar) → paketler Çar–Per, anahtar paket bayrağı · Faz 5 → 1
 | **ANA** | B1 | 1 / 0 | — |
 | **LISTE** | B3 B3b B3c B4 B5 B5b C3 / B1b + G: M2 | 7 / 1 | OPS-71 ile B3b/B3c ilişkisi **ölçülmedi** (§5.3) |
 | **URUNSAYFA** | B6 B7 B7b B7c B7d B7e / B7v B7f + G: M7 | 6 / 2 | B7v: tasarım "aynı adreste seçilir" ↔ kod 308 `?sku=` (adres kararı URUN'un) |
-| **TEKLIF** (SATIS) | **kod yazılacak:** B9 / B9b (mevcut `/cart` adresinde yeniden çizim) + G: M6. **KOD YOK:** B10 B11 (yeni adres). H: S1–S6 (K1 kapalı bekler) | 1 / 3 | B10/B11 **adres kararı gelene dek KOD YOK** |
-| **ARAMA** | D3 D4 / D5 | 2 / 1 | **KOD YOK — yeni adres kararı yok** (§5.3). D1/D2 (header overlay) KABUK'ta |
-| **KARSILASTIRMA** | B8 B8b | 2 / 0 | **KOD YOK — yeni adres kararı yok**; B8 ayrıca "bayat" (alan kümesi) |
+| **TEKLIF** (SATIS) | **kod yazılacak:** B9 / B9b (görünüm rota-bağımsız; mevcut `/cart` ve v3'teki `/tr/teklif-listesi` aynı görünümü kullanır) + G: M6. **KOD YOK:** B10 B11 (`/gonder`, `/alindi` alt adresleri v3'te de yok). H: S1–S6 (K1 kapalı bekler) | 1 / 3 | **teklif-listesi adresi v3 `:61`'de VAR** → B9/B9b kapasiteye göre; B10/B11 **KOD YOK** (alt adres şemada yok; ALTYAPI/URUN'a sorulur) |
+| **ARAMA** | D3 D4 / D5 | 2 / 1 | **KOD YOK:** v3 yalnız "arama" kelimesini **rezerve** ediyor (`:97`); rota şablonları tablosunda (`:50–63`) arama sayfası adresi **YOK**; tam adres şablonu **ölçülmedi → ALTYAPI/URUN'a sorulur**. D1/D2 (header overlay) KABUK'ta |
+| **KARSILASTIRMA** | B8 B8b | 2 / 0 | **Adres v3 `:62`'de VAR** (`/tr/karsilastir?m=…`, EN `/en/compare?m=…`) → **kapasiteye göre**; B8 ayrıca "bayat" (alan kümesi, KATALOG) |
 | **SECICI** | E2 / E3 | 1 / 1 | Mevcut `urun-secici` adresi |
-| **BILGI** | **kod yazılacak:** F1 F2. **KOD YOK:** F4 | 2 / 1 | F4 sayfası sitede yok; **yeni adres kararı yok** |
-| **SENARYO** | C1 C2 | 2 / 0 | **KOD YOK — yeni adres kararı yok**; ayrıca etiket verisi 0 |
+| **BILGI** | **kod yazılacak:** F1 F2. **KOD YOK:** F4 | 2 / 1 | F4 sayfası sitede yok; `/tr/destek/nasil-teklif-alinir` adresi v3'te **yok** (`nasil-teklif`/`destek` arandı, eşleşme 0) → ALTYAPI/URUN'a sorulur |
+| **SENARYO** | C1 C2 | 2 / 0 | **Adres v3 `:58`'de VAR** (`/tr/senaryo/<slug>`, EN `/en/solutions/<slug>`) → **kapasiteye göre**; etiket verisi 0 (ilk düşen) |
 | **KAPSAM DIŞI** | — / B12 F5 | 0 / 2 | **B12** (K62 ERTELENDİ) · **F5** (giriş/kayıt; Google OAuth ölçülmedi) |
 | **Toplam** | | **33 / 19 = 52** | |
 
 Sayım `docs/audits/tasarim-envanteri-2026-09-25-menu.md` tablosundan betikle yeniden üretildi (HAZIR 33, YARIM 19 [18 satır + F3'ün `**YARIM — açık karar**` biçimi]). Envanter ayrıca **27 kareyi "yapısal çelişki"** (çoğu adres) ve **19 karede site karşılığını "ölçülmedi"** işaretliyor
 (A0 A1 A2 A2b A3 A5b B2 B5 B5b B7 B7c B7d B7e B7f B9b C1 C2 E1 F2). G (9) ve H (6) başlık düzeyinde okundu, kare kare eşleşme **ölçülmedi**.
 
-**Kod kapsamı sayıları:** 52 kareden **10 kare baştan KOD YOK** (adres kararı: D3 D4 D5 · B8 B8b · C1 C2 · F4 · B10 B11) ve **2 kapsam dışı** (B12, F5) → **40 kare koda girebilir**; bunlardan **5'i Design girdisine bağlı** (A4, F3, A6, A8, A9) → **35 kare hemen girilebilir**; 35'in içinde 9 "rozetli" YARIM kare var (A0 A2b A5b A7 B1b B7v B7f B9b E3; rozetin anlamı **ölçülmedi**).
+**Kod kapsamı sayıları (v3 düzeltmesiyle yeniden hesaplandı):** 52 kareden **6 kare baştan KOD YOK** (v3'te de adresi olmayanlar: **D3 D4 D5** arama · **F4** · **B10 B11**) ve **2 kapsam dışı** (B12, F5) → **44 kare koda girebilir**; bunlardan **4'ünün adresi v3'te var ama standarda taşınmadı** (B8 B8b karşılaştırma, C1 C2 senaryo; **kapasiteye göre**, düşme sırasında önde); **5'i Design girdisine bağlı** (A4, F3, A6, A8, A9) → **39 kare hemen girilebilir**;
+39'un içinde 9 "rozetli" YARIM kare var (A0 A2b A5b A7 B1b B7v B7f B9b E3; rozetin anlamı **ölçülmedi**). (İlk sürümdeki 10/40/35, adres standardına tek başına bakıldığı için yanlıştı.)
 
 **ÇEKİRDEK — TEK TANIM (başka yerde yeniden tanımlanmaz):** çekirdek paketler = **TOK/font · DS · KABUK · ANA · LISTE · URUNSAYFA**. Çekirdek **ölçüt kümesi** = **17 kare** (A1–A5, B1, B2, B3, B3b, B3c, B4, B5, B6, B7, B7b, B7d, B7e) + G'nin **8 alt karesi** (M1–M5, M7–M9).
 Çekirdek-dışı kareler (A0, A2b, A5b, A6, A7, D1, D2, E1, F3, B1b, B5b, C3, B7c, B7v, B7f) çekirdek paketi düşürmez: kare bazında "eski kalır". **Çekirdeğin 3 karesi dış koşula bağlıdır:** A4 (Design cevabı, kesim Çar 12:00) ve B3b/B3c (OPS-71 ile ilişkisi ölçülmedi);
@@ -158,7 +159,7 @@ Paralellik **ikiz şerit açarak değil** (§4 şerit sınırları), müdür iç
 
 | Paket | Departman (müdür) | Ajan önerisi (tahmin) | Dosya alanı (glob; her tek-dosya globu **eşlik `.md` ve colocated test**ini de kapsar, §3.3) | Alt bayrak | Sıra / bağımlılık |
 |---|---|---|---|---|---|
-| **TOK** | TASARIM | 1 çalışan + müdür | `src/design-system/**` · `src/index.css` · `tailwind.config.js` · `src/app/layout.tsx` · `src/config/gorunum/index.ts` | `YENI_GORUNUM` | Sal; 18:00 Per dondurulur |
+| **TOK** | TASARIM | 1 çalışan + müdür | `src/design-system/**` · `src/index.css` · `tailwind.config.js` · `src/app/layout.tsx` · `src/config/gorunum/index.ts` | `YENI_GORUNUM` | **Pzt başlar**, Sal biter; 18:00 Per dondurulur |
 | **DS** | TASARIM | 3 çalışan (DS-A: AnaEylemDugmesi CerceveliDugme Cip Kart HukumKutusu · DS-B: TeknikTablo KarsilastirmaTablosu AdetKontrolu KatliCagriSatiri · DS-C: PQEgrisi) | `src/components/ds/**` | — | TOK'tan sonra; PR-1 (DS-A) Sal, PR-2 (DS-B) Çar, **PR-3 (DS-C: PQEgrisi) Çar** |
 | **VARLIK** | TASARIM (claim Ops'tan) | 1 çalışan | `public/brand/**` | — | Sal; KABUK'tan önce |
 | **KABUK** | URUN | lider A + 2 çalışan | `src/components/{StickyHeader,Footer,MegaMenu,SearchOverlay,LanguageSwitcher}.tsx` · `src/components/layout/**` · `src/components/navigation/**` · `src/app/not-found.tsx` · `src/views/NotFoundView.tsx` · `src/config/gorunum/kabuk.ts` | `YENI_KABUK_GEZINMESI` **ve** alt bayrak | VARLIK + DS-PR1 |
@@ -167,8 +168,9 @@ Paralellik **ikiz şerit açarak değil** (§4 şerit sınırları), müdür iç
 | **URUNSAYFA** | URUN | lider B + 2 çalışan | `src/app/_components/{ProductDetailPageView,aileSayfasi}.tsx` · `src/components/products/{VariantSelector,AileKirintisi,AddToProjectModal,RichTextRenderer}.tsx` · `src/components/{QuickViewModal,ImageGallery}.tsx` · `src/config/gorunum/urun.ts` | `URUN_GORUNUM` | **DS-PR2 (TeknikTablo, KatliCagriSatiri) ve DS-PR3 (PQEgrisi)** |
 | **SECICI** | URUN | lider B + 1 çalışan | `src/components/category/{EnhancedNeedsWizard,NeedsAnalysisWizard,SilentFanWizard}.tsx` · `src/config/gorunum/secici.ts` | `SECICI_GORUNUM` | `urun-secici/page.tsx` içeriğini `views/`e taşıma ROTA'dan (§3.4) |
 | **TEKLIF** | **SATIS** (teklif modülü sahibi; Ops teyit) | lider (SATIS müdürü) + 2 çalışan | `src/views/{CartPage,CheckoutPage,PaymentSuccessPage}.tsx` · `src/views/checkout/**` · `src/components/AddToCartToast{,Content}.tsx` · `src/config/gorunum/teklif.ts` | `TEKLIF_GORUNUM` | DS-PR2 (AdetKontrolu); yalnız B9/B9b/M6; B10/B11 KOD YOK |
-| **BILGI** | URUN | lider C + 1 çalışan | `src/views/knowledge/**` · `src/views/support/**` · `src/config/gorunum/bilgi.ts` | `BILGI_GORUNUM` | F1/F2; F4 KOD YOK |
-| **ARAMA · KARSILASTIRMA · SENARYO** | URUN | **atanmış lider/çalışan YOK** — adres kararı gelirse lider C açar | `src/views/arama/**` · `src/views/karsilastirma/**` · `src/views/senaryo/**` · ilgili `src/config/gorunum/*.ts` | alt bayraklar | **"karar gelirse" koşulu:** Çar 12:00 kesimine kadar adres kararı + route açılışı (ROTA) yoksa 11 Ekim sonrası |
+| **BILGI** | URUN | lider C + 1 çalışan (**sıralı**, aşağıda) | `src/views/knowledge/**` · `src/views/support/**` · `src/config/gorunum/bilgi.ts` | `BILGI_GORUNUM` | F1/F2; F4 KOD YOK |
+| **KARSILASTIRMA · SENARYO** | URUN | **lider C'nin aynı çalışanı, BILGI'den sonra sıralı (paralel değil)** — kapasiteye göre | `src/views/karsilastirma/**` · `src/views/senaryo/**` · ilgili `src/config/gorunum/*.ts` | alt bayraklar | Adres v3'te var; rota klasörü ROTA'dan (§5.3). Yetişmezse **ilk düşenler** (§5.1) |
+| **ARAMA** | URUN | **atanmış lider/çalışan YOK** | `src/views/arama/**` · `src/config/gorunum/arama.ts` | `ARAMA_GORUNUM` | **KOD YOK:** tam adres şablonu v3'te yok; ALTYAPI/URUN cevabı gelirse ve kapasite varsa (kesim Çar 12:00) aksi hâlde 11 Ekim sonrası |
 | **ROTA/ADRES** (tek sahip) | URUN (adres işinin sahibi) | müdür + ayrılmış adres kapasitesi (§3.5) | `src/app/[lang]/**` · `src/app/_components/markaSayfasi.tsx` · `src/app/{sitemap,robots}.ts` · `src/config/features.ts` · `src/utils/{routes,adresUret,yuzeyAdresleri,applicationLinks}.ts` · `src/hooks/useLocalizedRoutes.ts` · `src/lib/adres/**` · `src/lib/seo/**` · `src/lib/data/productRoute.ts` · `src/middleware.ts` · `next.config.mjs` | — | Paketler bu alana **dokunmaz** |
 | **SOZLUK** (tek sahip) | I18N | müdür | `src/i18n/dictionaries/{tr,en}.ts` (tek satır) · `src/i18n/dictionaries/gorunum/index.ts` | — | §3.4 |
 | **SOZLUK-PARCA** | paket sahibi | — | `src/i18n/dictionaries/gorunum/<paket>.{tr,en}.ts` | — | Kendi paketinin parçası |
@@ -176,7 +178,7 @@ Paralellik **ikiz şerit açarak değil** (§4 şerit sınırları), müdür iç
 | **OLCUM** | TASARIM | 1 çalışan + bağımsız doğrulayıcı | `e2e/gorunum/**` · `docs/audits/yeni-gorunum-*` · `docs/plans/tasarim-kod-plani-v2*` | — | Sal'dan itibaren |
 | **ADMIN** (dondurma) | ADMIN | müdür | `src/app/admin/**` (yalnız dondurma, §1.4) | — | ADMIN kararı Sal 12:00 |
 
-Ekip liderleri `general-purpose` alt ajandır (§10.1): lider A = KABUK+ANA; lider B = LISTE+URUNSAYFA+SECICI; lider C = BILGI (+ karar gelirse ARAMA/KARSILASTIRMA/SENARYO).
+Ekip liderleri `general-purpose` alt ajandır (§10.1): lider A = KABUK+ANA; lider B = LISTE+URUNSAYFA+SECICI; lider C = BILGI, sonra KARSILASTIRMA, sonra SENARYO (tek çalışan, sıralı); ARAMA için atama yok.
 Her lider kendi çalışanlarını açar, denetler, bağımsız doğrulayıcı çalıştırır, müdüre **tek özet** döner; merge müdürdedir.
 
 ### 3.3 Çakışmasızlık kanıtı (depoya karşı ölçüldü)
@@ -214,7 +216,7 @@ Her lider kendi çalışanlarını açar, denetler, bağımsız doğrulayıcı �
 | `src/components/StickyHeader.tsx` vb. (KABUK) | **KABUK** | `HeaderTeklifPaneli` sepet sayısını `CartContext`'ten **yalnız okur** |
 | `public/brand/**` | **VARLIK** | Salı biter; KABUK logoyu oradan okur (K23) |
 
-**Sıra özeti:** KAPI(Sal) → TOK(Sal; font Çar sabah) → {DS-PR1, VARLIK, SOZLUK iskelet}(Sal) → {DS-PR2/3, LISTE `ProductCard`}(Çar) → {KABUK, ANA, URUNSAYFA, TEKLIF, SECICI, BILGI}(Çar–Per) → OLCUM(Per akşam).
+**Sıra özeti:** TOK(Pzt başlar, Sal biter; font tanımı Sal) · KAPI(Sal) → {DS-PR1, VARLIK, SOZLUK iskelet, ROTA rota klasörleri (v3 adresiyle)}(Sal) → {DS-PR2/3, LISTE `ProductCard`}(Çar) → {KABUK, ANA, URUNSAYFA, TEKLIF, SECICI, BILGI}(Çar–Per) → OLCUM(Per akşam).
 
 ### 3.5 Yöntem (execution-method-standard §2/§3), sapma ve kapasite
 
@@ -294,14 +296,18 @@ Kaynak: `adres-semasi-standard.md` §8 (satır 103–107) + `rec-adres-agac-tek-
 
 **Asla düşmeyenler (taban):** (T1) **adres dilimi tek başına çıkabilir** (anahtar matrisi, §5.2); (T2) Faz 2a **görünmezliği** + INV-PALET-1 güncellemesi + K-1 komutu 0; (T3) "tüm bayraklar kapalı = fark 0" (M6a) — hiçbir paket bunu ihlal ederek master'a girmez; (T4) kapılar gevşetilmez (kural 14): paket DÜŞER, kapı gevşemez.
 
-**Baştan düşmüş (adres kararı yok, §5.3):** ARAMA (D3–D5), KARSILASTIRMA (B8, B8b), SENARYO (C1, C2), F4, B10/B11 — "KOD YOK". Etkisi: **fark yok** (bu sayfalar zaten sitede yok).
+**Baştan düşmüş ("KOD YOK": v3 şemasında da adresi olmayanlar, §5.3):** ARAMA D3–D5 (v3 yalnız "arama" kelimesini rezerve ediyor), F4, B10/B11 (`/gonder`, `/alindi`). Etkisi: **fark yok** (bu sayfalar zaten sitede yok). Cevap gelirse ve kapasite varsa girer; aksi hâlde 11 Ekim sonrası.
+
+**Adresi v3'te VAR olan paketler (senaryo, karşılaştırma, teklif-listesi) "kapasiteye göre"dir; düşme sırası değişmedi** (ilk sürümdeki sıra korunur; yalnız ARAMA/F4/B10-B11 sıradan "baştan düşmüş"e ayrıldı):
 
 | Sıra | Düşen dilim (kod yazılacaklar) | "Düştü" etkisi (ziyaretçi için) | Not |
 |---|---|---|---|
-| 1 | **H satış kipi** (S1–S6) | Fark yok (K1: kapalı bekler) | Kod hazır kalır |
-| 2 | **BILGI** (F1, F2) | Bilgi Merkezi: `YENI_GORUNUM` açıkken **yeni token/font, eski yerleşim** | |
-| 3 | **SECICI** (E2, E3) | Ürün Seçici: yeni token/font, eski yerleşim | |
-| 4 | **TEKLIF** (B9, B9b, M6) | Sepet/teklif: yeni token/font, eski yerleşim; header "Teklif (n)" paneli (A3) mevcut `/cart` adresine bağlanır | Ticari akış: düşerse **Recep'e açıkça yazılır** |
+| 1 | **SENARYO** (C1, C2) | Fark yok (sayfa zaten sitede yok) | Etiket verisi 0 |
+| 2 | **H satış kipi** (S1–S6) | Fark yok (K1: kapalı bekler) | Kod hazır kalır |
+| 3 | **KARSILASTIRMA** (B8, B8b) | Fark yok (sayfa yok); `KarsilastirmaTablosu` DS'te hazır kalır | B8 "bayat" |
+| 4 | **BILGI** (F1, F2) | Bilgi Merkezi: `YENI_GORUNUM` açıkken **yeni token/font, eski yerleşim** | |
+| 5 | **SECICI** (E2, E3) | Ürün Seçici: yeni token/font, eski yerleşim | |
+| 6 | **TEKLIF** (B9, B9b, M6) | Sepet/teklif: yeni token/font, eski yerleşim; header "Teklif (n)" paneli (A3) mevcut `/cart` adresine bağlanır | Ticari akış: düşerse **Recep'e açıkça yazılır** |
 | — | **ÇEKİRDEK** (TOK/font · DS · KABUK(A+G birlikte) · ANA · LISTE · URUNSAYFA) | **Biri düşerse görünüm anahtarı TOPLUCA kapalı kalır** (yarım çekirdek tutarsız site) | `features.ts:47-48` "yarısı açık kabuk kötüdür" |
 
 **Önemli düzeltme:** düşen paketin alt bayrağı `false` kaldığında "canlıda iz yok" **değildir**: `YENI_GORUNUM` açıkken o paketin sayfasında **yeni token/font görünür** (yalnız yerleşim eski kalır). Bu "iz" ayrıca ölçülür (§4.2 M6 durum (b)/(c)); "anahtar kapalı = fark 0" yalnız **tüm bayraklar kapalıyken** geçerlidir.
@@ -332,15 +338,20 @@ Kaynak: `adres-semasi-standard.md` §8 (satır 103–107) + `rec-adres-agac-tek-
 **Adres dilimi tek başına — hangi anahtar, hangi test:** anahtar `ADRES_SEMASI_K3B = true`, `YENI_GORUNUM = false`. Testler: mevcut `rota-dili-*`, `kategori-rotasi-statik`, `urunler-rotasi-statik`, `tek-kanonik-kategori-adresi`, `anasayfa-rotasi-statik`, sitemap/robots testleri (URUN/ALTYAPI'nın) + **yeni anahtar matrisi kapısı** (öneri, ALTYAPI; ad belirsiz):
 {ADRES false/true} × {GORUNUM false/true} = 4 kombinasyonda altı sayfa render (`vi.mock`) + **iki gerçek `pnpm build`** (T,F ve T,T). Canlı: M-A ölçütleri. **Ölçülmedi:** `vi.mock` ile derleme sabiti kombinasyonlarının güvenilirliği ve `next build` süresi (ALTYAPI Salı).
 
-### 5.3 K-1 / karar 118, Faz 4(2) ve **yeni rotalar (ÖLÇÜLDÜ: adres kararı yok)**
+### 5.3 K-1 / karar 118, Faz 4(2) ve **yeni rotalar (v3 şemasına göre DÜZELTİLDİ)**
 
 - **K-1 SÜRER:** `tasarim/*` dalında `src/app` altına rota klasörü ekleme/silme/taşıma **0** (v2.1 §3 komutu, `:(glob)` biçimi). Adres işi URUN/ALTYAPI'nındır; bu belge adres şemasını değiştirmez.
-- **ÖLÇÜLDÜ (doğrulayıcı grep'i; bu oturumda yeniden doğrulandı):** `docs/standards/adres-semasi-standard.md` içinde **arama, karşılaştırma, senaryo, teklif-listesi adresleri YOK** (standart §1 şeması yalnız urunler/kategori/dal/aile/model/marka). Bu adresler yalnız
-  **Design v3 planında** geçer: `docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md` — senaryo `:58`, teklif listesi `:61` (`/tr/teklif-listesi`, EN `/en/quote-list`), karşılaştırma `:62` (`/tr/karsilastir?m=…`), `arama` ise yalnız rezerve kelime listesinde `:97`. Design v3 **standart değildir**; yazılı adres kararı yok.
-- **Sonuç:** **ARAMA, KARSILASTIRMA, SENARYO, F4 ve B9–B11'in yeni `teklif-listesi` alt adresleri (`/gonder`, `/alindi`) paketleri "adres kararı gelene dek KOD YOK / düşer" olarak BAŞTAN işaretlidir** (§3.1). **Recep'e adres sorusu** (URUN rol kuralı: adres şeması değişikliği tek başına sorulur, paketlenmez) — Ops taşır, kesim **Çar 12:00**.
-  **"Karar gelirse" koşulu:** karar + URUN'un rota klasörlerini `urun/*` dalında açması Çar 12:00'ye kadar gelmezse paket 11 Ekim sonrasına kalır. Salı'daki "ROTA: yeni rota taslakları" görevi **kaldırıldı**.
-  **B9/B9b** (teklif listesi) mevcut `/cart` adresinde yeniden çizilir (adres değişmez) → kod yazılır.
-- **Yeni rota klasörü şartı (karar gelirse):** rota klasörü **bayrak kapalıyken `notFound()` döner ve indekslenmez** (sitemap'te yok, `noindex`); §4.2 M6'ya bu rotaların "bayrak kapalı → 404 + sitemap'te yok" ölçümü eklenir.
+- **İlk sürümdeki hata:** yalnız `docs/standards/adres-semasi-standard.md`'ye bakılmıştı (orada arama, karşılaştırma, senaryo, teklif-listesi yok; standart §1 yalnız urunler/kategori/dal/aile/model/marka). **Recep'in 09-11 v3 şemasında** (`docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md`, satır 50–63 ve 97 dosyadan okundu) şu adresler **VAR**:
+  senaryo **`:58`** (`/tr/senaryo/<slug>`, EN `/en/solutions/<slug>`) · teklif listesi **`:61`** (`/tr/teklif-listesi`, EN `/en/quote-list`) · karşılaştırma **`:62`** (`/tr/karsilastir?m=…`, EN `/en/compare?m=…`) · Ürün Seçici `:60` (`/tr/secici`) · hesap `:63`; **`:97`** rezerve ilk segmentler (`senaryo`, `teklif-listesi`, `karsilastir`, `arama`, `giris`, `kayit`, `hesap` … ve EN karşılıkları).
+  **Standarda taşınması ALTYAPI'nın işidir** (Ops 10-05: v3 satırlarını ALTYAPI taşır); taşınana kadar kaynak v3'tür.
+- **Sonuç (kare bazında):**
+  - **Adres v3'te VAR → paket "kapasiteye göre", düşme sırası aynı:** SENARYO (C1, C2), KARSILASTIRMA (B8, B8b), TEKLIF'in ana adresi `/tr/teklif-listesi` (B9, B9b). Rota klasörlerini **ROTA paketi `urun/*` dalında v3 adresiyle açar** (Salı); TASARIM açmaz (K-1).
+  - **ARAMA (D3–D5): dürüst durum:** v3 yalnız "arama" **kelimesini rezerve ediyor** (`:97`); rota şablonları tablosunda (`:50–63`) arama sayfası adresi **YOK**. Tam adres şablonu (`/tr/arama?q=…` mi, başka mı) **ölçülmedi → ALTYAPI/URUN'a sorulur**; cevap gelene dek **KOD YOK**.
+  - **F4** (`/tr/destek/nasil-teklif-alinir`) ve **B10/B11** (`/tr/teklif-listesi/gonder`, `/alindi`): `nasil-teklif`, `destek`, `gonder`, `alindi` v3'te **aranıp bulunamadı** (eşleşme 0) → **KOD YOK**; ALTYAPI/URUN'a sorulur.
+  - **Recep'e adres sorusu YOK** (Ops: TSR-6 kapandı); sorular ALTYAPI/URUN'a gider. **Cevap kesimi Çar 12:00** (ARAMA/F4/B10-B11 için; sonrası 11 Ekim sonrası).
+  - **Sayılar:** 6 kare KOD YOK (D3 D4 D5 · F4 · B10 B11); adresi v3'te var ama kapasiteye göre 4 kare (B8 B8b C1 C2) + B9/B9b; ayrıntı §3.1.
+- **Yeni rota klasörü şartı (v3 adresiyle açılan rotalar):** rota klasörü **bayrak kapalıyken `notFound()` döner ve indekslenmez** (sitemap'te yok, `noindex`); §4.2 M6'ya bu rotaların "bayrak kapalı → 404 + sitemap'te yok" ölçümü eklenir. Rota klasörünü `urun/*` dalında ROTA paketi açar; `tasarim/*` dalında `src/app` altına rota ekleme **0** kalır.
+- **B9/B9b** görünümü **rota-bağımsızdır**: mevcut `/cart` ve (rota açılırsa) `/tr/teklif-listesi` aynı görünümü kullanır; `/cart` → `/teklif-listesi` yönlendirmesi adres işinin kararıdır (**ölçülmedi**).
 - **Faz 4(2) yeniden:** v2.1 "adres yayınından SONRA, ayrı yayın" diyordu. 271 ile **aynı gün** ama **ayrı anahtar, ayrı deploy**: önce adres açılışı + canlı ölçüm, **yeşilse** görünüm. Görünüm bileşenleri **rota-bağımsızdır** (`src/views/**`; seçim içlerinde, §3.4) → görünüm anahtarı adres anahtarına KOD bağımlılığı taşımaz.
   Link üretimi rota tablosundan (`useLocalizedRoutes`, kural 7). Mevcut `kategori/[kok]/[[...dal]]`, `urun/[slug]`, `urunler`, `bilgi-merkezi` rota klasörleri depoda var (bayrak `false`).
 - **Karar 285 (OPS-71) 11 Ekim SONRASIDIR.** B3b/B3c ile ilişkisi **ölçülmedi**; ilişki varsa o kareler çekirdekten çıkar (§3.1, M1: yalnız B3b/B3c çıkarsa 15; A4 de çıkarsa 14).
@@ -377,24 +388,26 @@ Kaynak: `adres-semasi-standard.md` §8 (satır 103–107) + `rec-adres-agac-tek-
 ## 7 · Karar ve onay kaydı
 
 - **Karar 271 ile kararlı (Recep'e gitmez):** hangi fazın 11 Ekim'e girdiği (TAM KAPSAM); K36 "kabuk anahtar arkasında yazılır"; galeri çıkarma; `token-turet` çıkarma; `ds/` yolu. (v2.1 §4 soru 1 ve 2 bu belgeyle **kapandı**.)
-- **Recep'e kalan:** (1) 9 Ekim **iki ayrı önizleme hükmü** — adres (karar 68/161) ve görünüm (M14), Ops penceresinde; (2) **adres sorusu** (arama/karşılaştırma/senaryo/F4/teklif-listesi alt adresleri; tek başına; kesim Çar 12:00); (3) Pazar sabahı **Faz 1-B migration onayı** (kural 13; adres planına göre); (4) "token+font tek başına" ara durum seçeneği (§5.2).
+- **Recep'e kalan:** (1) 9 Ekim **iki ayrı önizleme hükmü** — adres (karar 68/161) ve görünüm (M14), Ops penceresinde; (2) Pazar sabahı **Faz 1-B migration onayı** (kural 13; adres planına göre); (3) "token+font tek başına" ara durum seçeneği (§5.2). **Recep'e adres sorusu YOK** (Ops 10-05: TSR-6 kapandı; senaryo/teklif-listesi/karşılaştırma adresleri v3'te var, arama/F4/B10-B11 için sorular ALTYAPI/URUN'a gider).
+- **Ops'un 10-05 teyitleri (kayıt):** plan v2.2 **ONAYLANDI** · Design girdisi kesimi **Çar 12:00 EVET** · URUN penceresinde **en çok 16 ajan EVET** · SATIS'ın **TEKLIF paketi EVET** · I18N **sözlük dalgası Cuma 09:00 sapması KABUL** · admin **DONDUR varsayılan EVET** · **Lighthouse/axe kararı ALTYAPI'da, Salı** · **INV-PALET-1 kapı emri ALTYAPI'ya verildi (vade Salı)** · **rol kartı sapması HARİTA'ya verildi** · **standarda v3 adres satırlarını ALTYAPI taşır** · **Faz 2a + S1 font spike BUGÜN başlıyor** (§2).
 - **ROL KARTI SAPMASI (Ops teyidi ve rol kartı güncellemesi gerekir):** `docs/roller/TASARIM.md` "Yasak ve sınır": *"K36 kabuk kararı ve Faz 2b Recep onayı olmadan başlamaz"*; "Durum": *"K36 yazılmamış"*; `layout.tsx` için *"yalnız yazı tipi"*. **Planın yaptığı:** Faz 2b'yi anahtar arkasında **Çarşamba merge** eder; K36'yı **karar 271 ile kararlı** sayar; `layout.tsx`'e `data-gorunum` özniteliği + `body` sınıf seçimi ekler (yalnız yazı tipinin ötesi).
   **Dayanak:** Ops 10-05 mesajı: *"K36 271 kapsamında, Recep'e gitmez"*; **karar 271 metni DOĞRUDAN okunmadı (Ops aktarımı)**. **Rol kartının güncellenmesi** (Yasak/Durum/Dosyalar satırları) Ops/HARİTA'ya aittir; bu belge rol kartını yazmaz.
-- **Ops'a:** (1) plan v2.2 onayı (Sal sabah); (2) ALTYAPI kapı emri; (3) paket kartları, `YÖNTEM:` satırı ve **claim'ler** (§3.2 globları; `features.ts` için URUN claim izni; `public/brand/**` için TASARIM claim'i); (4) Design soru dosyasının gönderimi (kesim Çar 12:00); (5) ADMIN'e dondurma sorusu; (6) I18N'e sapma talebi; (7) SATIS'ın TEKLIF paketini üstlenmesi (öneri); (8) M8 eşiği (%10) teyidi; (9) Vercel merge kapasitesi; (10) Recep'e iki önizleme bloğunun ayrı yapılması önerisi (§2 Cum).
+- **Ops'ta kalan açık işler:** (1) paket kartları, `YÖNTEM:` satırı ve **claim'ler** (§3.2 globları; `features.ts` için URUN claim izni; `public/brand/**` için TASARIM claim'i); (2) Design soru dosyasının gönderimi (kesim Çar 12:00); (3) M8 eşiğinin (%10) teyidi; (4) Vercel merge kapasitesi; (5) iki önizleme bloğunun ayrı yapılması önerisinin (§2 Cum) kararı; (6) ALTYAPI/URUN'a adres soruları: **arama** tam adres şablonu (v3 yalnız rezerve), **F4**, **B10/B11** alt adresleri (kesim Çar 12:00).
 
 ## 8 · Ölçülmeyenler ve açık kalemler (v2.1 §8'e ek; hepsi "ölçülmedi", uydurma değer yok)
 
 | Kalem | Durum | Kim / ne zaman |
 |---|---|---|
 | Karar 271 metni | doğrudan okunmadı (OPS aktarımı) | Ops |
-| Font manifest girdisinin HTML'de `<link rel=preload>` olarak basıldığı (render tarafı); `font-mono` computed eşitliği (S1) | manifest tarafı **kaynaktan okundu**; render tarafı ve ölçüm yok | TASARIM, Sal 09:00 |
+| Font manifest girdisinin HTML'de `<link rel=preload>` olarak basıldığı (render tarafı); `font-mono` computed eşitliği (S1) | manifest tarafı **kaynaktan okundu**; render tarafı ve ölçüm yok | TASARIM, **Pzt (bugün) başlar**, Sal sabah biter |
 | Admin dondurma: portal diyalog/toast fontu (S2) | ölçülmedi | TASARIM/ADMIN, Sal |
 | Sabit bayrak okumanın yeni kodu kapalıyken paketten çıkarması (S3) | ölçülmedi | TASARIM, Sal |
 | Ajan verimi, PR hızı, URUN müdürü denetim kapasitesi; eşzamanlı build/test CPU-bellek sınırı | ölçülmedi | Ops (Çar–Per gözlem) |
 | 19 karenin iç yerleşimi, G/H kare kare eşleşme | ölçülmedi (envanter) | paket liderleri |
 | 9 rozetli YARIM karenin anlamı; Design yanıt süresi (tek veri ~8–10 gün) | ölçülmedi | Design/Ops |
 | "Design kendiliğinden tetiklenmez" kuralının bugünkü geçerliliği | ölçülmedi | Ops |
-| **Yeni adresler (arama, karşılaştırma, senaryo, F4, teklif-listesi alt adresleri) adres standardında** | **ÖLÇÜLDÜ: yazılı değil** (§5.3) | Ops → Recep |
+| Yeni adresler: senaryo, teklif-listesi, karşılaştır **v3'te VAR** (`:58,61,62`); standarda taşıma | **ÖLÇÜLDÜ** (v3 dosyadan okundu); taşıma ALTYAPI'nın, süresi **ölçülmedi** | ALTYAPI |
+| **Arama sayfası tam adres şablonu** (v3 yalnız "arama" kelimesini rezerve ediyor, `:97`); **F4** ve **B10/B11** alt adresleri (`nasil-teklif`, `gonder`, `alindi` v3'te eşleşme 0) | **ölçülmedi** (v3'te şablon yok) | ALTYAPI/URUN, kesim Çar 12:00 (Recep'e sorulmaz) |
 | Adres açılışı M-A1..M-A8'in 10-05 durumu; Faz 1-B (#1352) durumu; 09-29'dan sonraki adres ilerlemesi | ölçülmedi | URUN/ALTYAPI |
 | Adres gerçek geri alma tarifi: revert build+deploy süresi, GSC/IndexNow etkisi, Faz 1-B migration geri alma | ölçülmedi — **URUN/ALTYAPI tarifi gerekir** | URUN/ALTYAPI |
 | Adres işinin 4 görünüm dosyasına hâlâ dokunup dokunmayacağı | ölçülmedi | URUN |
@@ -412,12 +425,12 @@ Kaynak: `adres-semasi-standard.md` §8 (satır 103–107) + `rec-adres-agac-tek-
 
 ## 9 · Doğrulayıcı + çürütücü kaydı (2026-10-05)
 
-**DOĞRULAYICI + ÇÜRÜTÜCÜ GEÇTİ 10-05** — hüküm: doğrulayıcı **DÜZELTME GEREKLİ**, çürütücü **engelleyici bulgu** (kabul kapsamı) içerdi; bu sürüm tüm bulguları işler. **Düzeltmelerin yeniden doğrulaması bekliyor** (bu sürümü yazan ajan kendi düzeltmesini doğrulamış sayılmaz).
+**DOĞRULAYICI + ÇÜRÜTÜCÜ GEÇTİ 10-05; Ops ONAYLADI 10-05 (v3 adres düzeltmesiyle, son satır)** — hüküm: doğrulayıcı **DÜZELTME GEREKLİ**, çürütücü **engelleyici bulgu** (kabul kapsamı) içerdi; bu sürüm tüm bulguları işler. **Düzeltmelerin yeniden doğrulaması bekliyor** (bu sürümü yazan ajan kendi düzeltmesini doğrulamış sayılmaz).
 
 | Harf | Bulgu | Karşılık | Bölüm |
 |---|---|---|---|
 | A | Adres açılışı geri dönüşsüz; standart §8 ön koşulları; "geri alma = bayrak" yanlış | Geri alma cümlesi silindi; adres için gerçek tarif (adres planı §11) ve "ölçülmedi, URUN/ALTYAPI tarifi"; M-A1..M-A8; karar 68 onayı Cuma ayrı blok; Pazar kırmızı tablosu; adres ölçütleri adres planından, TASARIM yalnız takvime yerleştirir | §1.1, §2, §4.3, §5.2, §5.4 |
-| B | Yeni rotalar adres standardında yok (ölçüldü) | ARAMA/KARSILASTIRMA/SENARYO/F4/B10-B11 baştan KOD YOK; ROTA taslak görevi ve atanmış lider/çalışan kaldırıldı; Recep'e adres sorusu; `notFound()`+indekssiz şartı ve M6 | §3.1, §3.2, §5.3, §2 |
+| B | Yeni rotalar adres standardında yok (ölçüldü) — **sonradan v3 ile düzeltildi (aşağıdaki Ops satırı)** | Başlangıçta 5 paket "KOD YOK" yazılmıştı; `notFound()`+indekssiz şartı ve M6 korundu | §3.1, §3.2, §5.3, §2 |
 | C | Kabul kapsamı çekirdekle sınırlı; pakete atanmayan 284 vitrin dosyası (178'i admin dışı), token/font global | M2/M3/M7 54 sayfa için; sayfa envanteri tablosu; M6 dört durum (ara durumlar dahil); §5.1 "iz yok" cümlesi düzeltildi | §4.1, §4.2, §5.1 |
 | D | Font preload: kapalıyken de önyüklenir | Next 15.5.25 kaynağı okundu (manifest tarafı teyit; render tarafı ölçülmedi); üç aile `preload:false`; M6 tanımı; S1 spike güncel | §1.2, §1.3, §4.2 M6, §8 |
 | E | Design kesimi; çekirdek tek tanım; A4; güven; ara satır | Kesim Çar 12:00; çekirdek yalnız §3.1; ANA düşme listesinden çıktı; A4 Design'a bağlı; B3b/B3c riski M1'de; "TOK+DS+token" ara durumu; güven DÜŞÜK/ORTA açıkça | §2, §3.1, §4.2, §5.1–§5.2, §6.8 |
@@ -428,10 +441,11 @@ Kaynak: `adres-semasi-standard.md` §8 (satır 103–107) + `rec-adres-agac-tek-
 | J | Rol kartı sapması | Sapma satırı: madde, planın yaptığı, Ops teyidi, kartı güncelleyen Ops/HARİTA | §7 |
 | K | Kota bayat | `vercel.json` dal önizlemelerini kapatıyor; yük master merge'leri | §6.5 |
 | L | Güven, INV-REFLOW-1, kayıt | 320 bilgisi doğru (korundu); güven §6.8; bu tablo | §4.2, §6.8, §9 |
+| **Ops** | **Ops ONAYI 10-05 + v3 düzeltmesi:** plan v2.2 onaylandı; dört adres Recep'in 09-11 v3 şemasında zaten var (`:58` senaryo, `:61` teklif-listesi, `:62` karşılaştır, `:97` rezerve) — yalnız standarda bakılmıştı | KOD YOK yalnız v3'te de adresi olmayanlara kaldı (arama D3–D5 [v3 yalnız kelimeyi rezerve ediyor], F4, B10/B11 = **6 kare**); senaryo/teklif-listesi/karşılaştırma **kapasiteye göre**, düşme sırası aynı; sayılar 44 koda girebilir / 39 hemen girilebilir; Salı ROTA görevi v3 adresiyle geri geldi (`notFound()` + M6 kaldı); **"Recep'e adres sorusu" kaldırıldı** (TSR-6 kapandı); Ops teyitleri §7'de; **S1 + Faz 2a bugün başlıyor** → §2 güncellendi, Salı hafifledi | §2, §3.1, §3.2, §5.1, §5.3, §7, §8 |
 
 ---
 
 **ÖLÇÜM:** 2026-10-05 · master `fe2a7fa95`; ana depo bugünkü HEAD `74e50d280` (Ops/koordinatör bildirimi); çalışma ağacı tabanı `35224a3c5` (`fe2a7fa95`'in torunu). Bu belgenin sayıları çalışma ağacında üretildi: `git ls-files` 5029 + 14 sentetik yol, **picomatch 4.0.4** ile paket-glob kesişim betiği (0 çakışma; 861 atanan mevcut dosya; vitrin alanı 482 / atanmayan 284, bunun 106'sı küçük harfle `admin` yollu, 178'i admin dışı); envanter tablosu betikle yeniden sayıldı (HAZIR 33 · YARIM 19 · "ölçülmedi" 19 · "VAR" 27);
-54 `src/app/[lang]/**/page.tsx`; `src/config/features.ts` (`ADRES_SEMASI_K3B:130 = false`, yorum `:127-128`; `YENI_KABUK_GEZINMESI:58 = false`); `docs/standards/adres-semasi-standard.md` §1, §8; `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` Faz 3-C/4/5, §11; `docs/plans/rec-300-plan-tazeleme-2026-09-29.md` §2, §4; `docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md:58,61,62,97`;
+54 `src/app/[lang]/**/page.tsx`; `src/config/features.ts` (`ADRES_SEMASI_K3B:130 = false`, yorum `:127-128`; `YENI_KABUK_GEZINMESI:58 = false`); `docs/standards/adres-semasi-standard.md` §1, §8; `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` Faz 3-C/4/5, §11; `docs/plans/rec-300-plan-tazeleme-2026-09-29.md` §2, §4; `docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md:50–63,97` (dosyadan okundu; `nasil-teklif|gonder|alindi|destek|bilgi-merkezi` araması eşleşme 0);
 `node_modules/next/dist/build/webpack/plugins/next-font-manifest-plugin.js` (Next 15.5.25, satır 22–30, 58–80); `vercel.json`; `package.json` (axe-core, vitest-axe var; `@axe-core/playwright`, lighthouse, linkinator, unlighthouse yok); `e2e/reflow.e2e.ts` (`ROUTES` 5, genişlikler 320/768/1024/1280); `docs/standards/execution-method-standard.md:486,491`; `docs/roller/I18N.md:15,18`, `docs/roller/TASARIM.md`; `DEPARTMAN-HARITASI.md`; v2.1; girdi ölçüm notu H bölümü (**karar 271 ve Vitrin 15A özeti OPS aktarımıdır, doğrudan okunmadı**).
 Fark kontrolü: ilgili dosyalarda `fe2a7fa95`→HEAD diff boş (doğrulayıcı ölçtü; v2.1 ÖLÇÜM satırı).
