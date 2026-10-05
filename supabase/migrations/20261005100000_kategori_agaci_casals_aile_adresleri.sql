@@ -66,15 +66,17 @@
 -- (A→B→A: canlı slug önceliklidir). Yeni 4 dal ürünler geri taşındıktan sonra silinir (FK RESTRICT sırayı
 -- zorlar). Casals markası, marka/ad/ürün marka metni #1692'nindir: geri alma onun dosyasındaki tarife bağlıdır.
 -- Korozyon dalı: name 'Asit Dayanımlı Fanlar', menu_label NULL, translation_key 'sub.acid-fans', TR slug
--- 'asit-dayanikli-fanlar' (eski sözlük anahtarı 'acid-fans' bu yüzden sözlükte DURUR). Radyal dalı: name ve menu_label
+-- 'asit-dayanikli-fanlar', EN (kanonik) slug 'acid-resistant-fans' (eski sözlük anahtarı 'acid-fans' bu yüzden sözlükte
+-- DURUR). Radyal dalı: name ve menu_label
 -- 'Santrifüj / Radyal Fanlar'. Yedek parça translation_key NULL. Plug ailesi 5b: name/name_i18n 'Casals Plug Fanlar' /
--- 'Casals Plug Fans', series_code NULL.
+-- 'Casals Plug Fans', series_code NULL. Çalıştırılabilir ters yön: scripts/db/geri-alma/20261005100000_…geri-al.sql.
 --
 -- YAN ETKİ (bilerek): `products`/`product_families`/`categories` üzerindeki `on_*_change` webhook
 -- tetikleri her satır için bir tazeleme isteği atar (~100 satır). Emsal: karar 45 migration'ı 17
 -- aile satırıyla aynı yoldan geçti, sorun ölçülmedi. Ek: `arama_aile_kuyrukla` (plug ailesinin adı) ve
 -- `arama_kategori_kuyrukla` (korozyon ve radyal adı) arama yeniden-indeks kuyruğuna satır yazar (pg_cron her 5 dk
--- boşaltır); `url_takma_ad_kategori` korozyon TR slug'ı değişince eski adresi yazar (radyal slug'ı değişmez: takma ad yok).
+-- boşaltır); `url_takma_ad_kategori` korozyon TR VE EN slug'ı değişince iki eski adresi de yazar (radyal slug'ı
+-- değişmez: takma ad yok).
 --
 -- Cetvel: docs/standards/migration-safety-standard.md · category-taxonomy-standard.md §8 (her
 -- taşımada İKİ tablo: products VE product_families) · CLAUDE.md kural 12 (tek kiracı kapısı), 13.
@@ -143,7 +145,9 @@ BEGIN
   -- Yeni dal adresleri boş mu (EN slug tekil kısıtlı; TR slug metadata'da, kısıt YOK → elle ölçülür).
   SELECT count(*) INTO n FROM public.categories
    WHERE id NOT IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli, k_korozyon)  -- kendileri: ikinci koşum
-     AND (slug IN ('plug-fans','cabinet-fans','unheated-air-curtains','electric-heated-air-curtains')
+     AND (slug IN ('plug-fans','cabinet-fans','unheated-air-curtains','electric-heated-air-curtains',
+                   'corrosion-and-acid-resistant-fans')
+          OR metadata->'slug'->>'en' = 'corrosion-and-acid-resistant-fans'
           OR metadata->'slug'->>'tr' IN ('plug-fanlar','hucreli-aspiratorler','isiticisiz-hava-perdeleri',
                                          'elektrikli-isiticili-hava-perdeleri','korozyona-ve-aside-dayanimli-fanlar'));
   IF n > 0 THEN RAISE EXCEPTION 'KAPI 1: % kategori yeni dal adreslerinden birini zaten kullanıyor', n; END IF;
@@ -182,31 +186,42 @@ BEGIN
   -- ── 3) KOROZYON DALI — AD + TR SLUG + SÖZLÜK ANAHTARI, TEK BLOK (karar 287, Recep; OPS-74) ──
   -- TR ad 'Korozyona ve Aside Dayanımlı Fanlar' (name + menu_label), TR slug 'korozyona-ve-aside-dayanimli-fanlar',
   -- yeni anahtar `sub.corrosion-fans` (sözlük TR/EN değerleri aynı PR'da: EN 'Corrosion- and Acid-Resistant Fans').
-  -- Kanonik EN slug (`acid-resistant-fans`) SABİT. Görünen ad önce sözlükten çözülür (`sub.corrosion-fans`);
-  -- name/menu_label sözlüğün bulunmadığı yolların (yönetim, arama, yedek zincir) aynı adı göstermesi içindir.
-  -- Ad ile adres AYNI UPDATE'te döner (tek tetik turu): iki ayrı UPDATE ad ile adresi bir an ayrı bırakırdı.
-  -- Eski TR adres `asit-dayanikli-fanlar`: Faz 1-A tetiği `url_takma_adlari`'na yazar (aşağıda ölçülür);
-  -- eşleyici tek adımda 308 ile yeni adrese gider (kanıt: src/lib/adres/__tests__/korozyon-tek-sicrama.test.ts).
+  -- EN slug da DEĞİŞİR (Recep, OPS aktardı 2026-10-05: "ingilizcesi de korozyon eklenmesi lazım, neden değişmesin ki
+  -- madem türkçe değişiyor?"): `acid-resistant-fans` → `corrosion-and-acid-resistant-fans`, TR adresin birebir karşılığı.
+  -- Kanonik EN slug `categories.slug`tur; `metadata.slug.en` ile birlikte aynı UPDATE'te döner. Görünen ad önce sözlükten çözülür
+  -- (`sub.corrosion-fans`); name/menu_label sözlüğün bulunmadığı yolların (yönetim, arama, yedek zincir) aynı adı göstermesi içindir.
+  -- Ad ile iki adres AYNI UPDATE'te döner (tek tetik turu): ayrı UPDATE'ler ad ile adresi bir an ayrı bırakırdı.
+  -- Eski adresler `asit-dayanikli-fanlar` (TR) ve `acid-resistant-fans` (EN): Faz 1-A tetiği ikisini de `url_takma_adlari`'na
+  -- yazar (aşağıda ikisi ayrı ölçülür); eşleyici her biri için tek adımda 308 ile yeni adrese gider
+  -- (kanıt: src/lib/adres/__tests__/korozyon-tek-sicrama.test.ts, EN kolu dahil).
   UPDATE public.categories
      SET name = 'Korozyona ve Aside Dayanımlı Fanlar',
          menu_label = 'Korozyona ve Aside Dayanımlı Fanlar',
          translation_key = 'sub.corrosion-fans',
-         metadata = jsonb_set(metadata, '{slug,tr}', '"korozyona-ve-aside-dayanimli-fanlar"'),
+         slug = 'corrosion-and-acid-resistant-fans',
+         metadata = jsonb_set(jsonb_set(metadata, '{slug,tr}', '"korozyona-ve-aside-dayanimli-fanlar"'),
+                              '{slug,en}', '"corrosion-and-acid-resistant-fans"'),
          updated_at = now()
    WHERE id = k_korozyon AND tenant_id = v_t
-     AND translation_key = 'sub.acid-fans' AND metadata->'slug'->>'tr' = 'asit-dayanikli-fanlar';
+     AND translation_key = 'sub.acid-fans' AND metadata->'slug'->>'tr' = 'asit-dayanikli-fanlar'
+     AND slug = 'acid-resistant-fans' AND metadata->'slug'->>'en' = 'acid-resistant-fans';
   -- İlk koşum de ikinci koşum de AYNI son durumu ölçer; yarım/elle değişmiş satır adıyla durdurur.
   SELECT count(*) INTO n FROM public.categories
    WHERE id = k_korozyon AND tenant_id = v_t
      AND name = 'Korozyona ve Aside Dayanımlı Fanlar' AND menu_label = 'Korozyona ve Aside Dayanımlı Fanlar'
      AND translation_key = 'sub.corrosion-fans'
      AND metadata->'slug'->>'tr' = 'korozyona-ve-aside-dayanimli-fanlar'
-     AND slug = 'acid-resistant-fans' AND metadata->'slug'->>'en' = 'acid-resistant-fans';
-  IF n <> 1 THEN RAISE EXCEPTION '3: korozyon dalı ne eski ne yeni durumda (ad/anahtar/slug) — elle değişmiş, incele'; END IF;
+     AND slug = 'corrosion-and-acid-resistant-fans' AND metadata->'slug'->>'en' = 'corrosion-and-acid-resistant-fans';
+  IF n <> 1 THEN RAISE EXCEPTION '3: korozyon dalı ne eski ne yeni durumda (ad/anahtar/TR+EN slug) — elle değişmiş, incele'; END IF;
   IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
                   WHERE tur = 'kategori' AND dil = 'tr' AND eski_slug = 'asit-dayanikli-fanlar'
                     AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
     RAISE EXCEPTION '3: korozyon dalının eski TR adresi takma ada yazılmadı — eski adres 404 olurdu';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
+                  WHERE tur = 'kategori' AND dil = 'en' AND eski_slug = 'acid-resistant-fans'
+                    AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
+    RAISE EXCEPTION '3: korozyon dalının eski EN adresi takma ada yazılmadı — eski adres 404 olurdu';
   END IF;
 
   -- ── 4) YEDEK PARÇA — boş translation_key (ham ad render ediliyordu) ──────────────────────

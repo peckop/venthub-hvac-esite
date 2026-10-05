@@ -21,7 +21,7 @@
 --   4b) Radyal dalı: name ve menu_label 'Santrifüj / Radyal Fanlar'.
 --   4)  Yedek parça dalı: translation_key NULL.
 --   3)  Korozyon dalı: name 'Asit Dayanımlı Fanlar', menu_label NULL, translation_key 'sub.acid-fans',
---       TR slug 'asit-dayanikli-fanlar'.
+--       TR slug 'asit-dayanikli-fanlar', EN (kanonik) slug 'acid-resistant-fans'.
 --   2)  4 yeni dal SİLİNİR — yalnız ürün ve aileler geri taşındıktan SONRA (FK RESTRICT sırayı zorlar).
 --
 -- NE YAPMAZ (bilerek):
@@ -31,7 +31,8 @@
 --     için #1352'nin kod değişikliği (PR) ayrıca geri alınır. Eski sözlük anahtarı `sub.acid-fans` sözlükte DURUR
 --     (silinmesi URN-49), yani veritabanı geri alınınca korozyon dalı yeniden çözülür.
 --   · Arama yeniden-indeks kuyruğu ve webhook tazelemeleri: tetikler kendiliğinden yeniden yazar (pg_cron ~5 dk).
---   · `url_takma_adlari` yeni-slug satırları KALIR: yeni adrese gelen trafik 308 ile eski adrese gider (istenen davranış).
+--   · `url_takma_adlari` yeni-slug satırları KALIR (40 aile + korozyon TR + korozyon EN): yeni adrese gelen trafik 308 ile
+--     eski adrese gider (istenen davranış).
 --
 -- DEĞİŞMEZ KURAL: her adım "eski durumda" YA DA "yeni durumda" olduğunu ölçer; üçüncü bir durum (elle değişmiş satır)
 -- adıyla durdurur ve HİÇBİR ŞEY yazmaz (tek işlem). Betik TEKRAR koşulabilir: ikinci koşum no-op'tur ve aynı son durumu ölçer.
@@ -250,23 +251,36 @@ BEGIN
      SET name = 'Asit Dayanımlı Fanlar',
          menu_label = NULL,
          translation_key = 'sub.acid-fans',
-         metadata = jsonb_set(metadata, '{slug,tr}', '"asit-dayanikli-fanlar"'),
+         slug = 'acid-resistant-fans',
+         metadata = jsonb_set(jsonb_set(metadata, '{slug,tr}', '"asit-dayanikli-fanlar"'),
+                              '{slug,en}', '"acid-resistant-fans"'),
          updated_at = now()
    WHERE id = k_korozyon AND tenant_id = v_t
-     AND translation_key = 'sub.corrosion-fans' AND metadata->'slug'->>'tr' = 'korozyona-ve-aside-dayanimli-fanlar';
+     AND translation_key = 'sub.corrosion-fans' AND metadata->'slug'->>'tr' = 'korozyona-ve-aside-dayanimli-fanlar'
+     AND slug = 'corrosion-and-acid-resistant-fans' AND metadata->'slug'->>'en' = 'corrosion-and-acid-resistant-fans';
   SELECT count(*) INTO n FROM public.categories
    WHERE id = k_korozyon AND tenant_id = v_t
      AND name = 'Asit Dayanımlı Fanlar' AND menu_label IS NULL
      AND translation_key = 'sub.acid-fans'
      AND metadata->'slug'->>'tr' = 'asit-dayanikli-fanlar'
      AND slug = 'acid-resistant-fans' AND metadata->'slug'->>'en' = 'acid-resistant-fans';
-  IF n <> 1 THEN RAISE EXCEPTION 'GERİ ALMA 3: korozyon dalı ne eski ne yeni durumda (ad/anahtar/slug) — elle değişmiş, incele'; END IF;
+  IF n <> 1 THEN RAISE EXCEPTION 'GERİ ALMA 3: korozyon dalı ne eski ne yeni durumda (ad/anahtar/TR+EN slug) — elle değişmiş, incele'; END IF;
   -- Yeni TR adres için takma ad (308 ile eski adrese) tetikle yazılmış olmalı.
   IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
                   WHERE tur = 'kategori' AND dil = 'tr' AND eski_slug = 'korozyona-ve-aside-dayanimli-fanlar'
                     AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
     RAISE EXCEPTION 'GERİ ALMA 3: korozyon dalının yeni TR adresi takma ada yazılmadı — o adres 404 olurdu';
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
+                  WHERE tur = 'kategori' AND dil = 'en' AND eski_slug = 'corrosion-and-acid-resistant-fans'
+                    AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
+    RAISE EXCEPTION 'GERİ ALMA 3: korozyon dalının yeni EN adresi takma ada yazılmadı — o adres 404 olurdu';
+  END IF;
+  -- Eski adresler yeniden CANLI: kendilerini gösteren takma ad kalmamalı (canlı slug önceliği, iki dilde).
+  SELECT count(*) INTO n FROM public.url_takma_adlari
+   WHERE tur = 'kategori' AND tenant_id = v_t
+     AND ((dil = 'tr' AND eski_slug = 'asit-dayanikli-fanlar') OR (dil = 'en' AND eski_slug = 'acid-resistant-fans'));
+  IF n <> 0 THEN RAISE EXCEPTION 'GERİ ALMA 3: korozyonun % eski adresi hâlâ takma ad olarak duruyor (canlı slug öncelikli olmalı)', n; END IF;
 
   -- ── 2) DÖRT YENİ DAL SİLİNİR — yalnız hiçbir ürün/aile/alt dal bağlı değilse ───────────────
   SELECT count(*) INTO n FROM public.categories WHERE parent_id IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli);
