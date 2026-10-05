@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
+import { sitemapModelMi } from '../config/yayindaModeller'
 import { HVAC_BRANDS } from '../data/brands'
 import { rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
@@ -222,7 +223,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // `lastModified` = modelin kendi `updated_at`'i; yoksa alan yazılmaz (uydurma tarih yok, REC-454).
   const modelRoutes: MetadataRoute.Sitemap = ADRES_SEMASI_K3B
     ? locales.flatMap((lang) =>
-        modeller.map((m) => ({
+        // URN-31: yalnız yayındaki listedeki TEMEL modeller (sürüm kanoniği temele gider; liste dışı modelin sayfası
+        // yok). Boş liste = sıfır satır. DB'deki aktiflik süzgeci serviste, liste süzgeci burada.
+        modeller.filter((m) => sitemapModelMi(m.sku)).map((m) => ({
           url: `${baseUrl}${dilYolu(lang).product(m.aileSlug, m.sku)}`,
           ...(m.updatedAt ? { lastModified: new Date(m.updatedAt) } : {}),
           changefreq: 'weekly',

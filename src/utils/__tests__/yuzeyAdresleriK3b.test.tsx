@@ -9,7 +9,21 @@
  */
 import { renderHook } from '@testing-library/react'
 import React from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { modellerdenVeri, yayindaVeriAyarla } from '../../config/__tests__/yayindaTestKiti'
+
+// URN-31: model adresi yalnız yayındaki listedeki SKU için üretilir; adres metni listeden (burada aile slug'ı,
+// eski beklentilerle aynı).
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() =>
+  yayindaVeriAyarla(
+    modellerdenVeri([
+      ...['SEA-61143003', 'SEA-1'].map((sku) => ({ aile: 'storm-serisi', sku, tr: 'storm-serisi', en: 'storm-serisi' })),
+      { aile: 'vortice-hava-perdesi', sku: 'VRT-65195', tr: 'vortice-hava-perdesi', en: 'vortice-hava-perdesi' },
+    ]),
+  ),
+)
 
 // `EN_YAYIN: true`: hreflang yalnız EN yayındayken yazılır (REC-300 3e-3); bu dosya hreflang ADRESLERİNİ ölçer.
 vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: true, EN_YAYIN: true }))

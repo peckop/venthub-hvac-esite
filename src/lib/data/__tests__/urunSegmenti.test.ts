@@ -4,6 +4,8 @@
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { modellerdenVeri, yayindaVeriAyarla } from '@/config/__tests__/yayindaTestKiti'
+
 const db = vi.hoisted(() => ({
   modelBySku: vi.fn(),
   familySlugById: vi.fn(),
@@ -25,9 +27,20 @@ vi.mock('next/navigation', () => ({
 
 import { urunSegmentiniCoz } from '../urunSegmenti'
 
+// URN-31: model sayfası yalnız yayındaki listedeki SKU için vardır; adres metni listeden. Liste kapısı ve slug
+// metni (O1) kapıları: urunSegmentiYayinda.test.ts. Bu dosya BİÇİME BAĞLI (`-p-`) örnekleri korur.
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+
 beforeEach(() => {
   db.modelBySku.mockReset()
   db.familySlugById.mockReset()
+  yayindaVeriAyarla(
+    modellerdenVeri([
+      { aile: 'storm-serisi', sku: 'SEA-61143003', tr: 'storm-10-kanal-fani', en: 'storm-10-duct-fan' },
+      { aile: 'storm-serisi', sku: 'SEA-1', tr: 'storm-10', en: 'storm-10' },
+      { aile: 'x-serisi', sku: 'A-1', tr: 'x', en: 'x' },
+    ]),
+  )
 })
 
 describe('urunSegmentiniCoz', () => {
@@ -47,14 +60,28 @@ describe('urunSegmentiniCoz', () => {
   })
 
   it('adreste büyük harfli SKU → küçük harfli kanonik adrese 308 (DB\'ye gitmeden)', async () => {
-    await expect(urunSegmentiniCoz('storm-10-p-SEA-61143003', 'tr')).rejects.toThrow(
-      'REDIRECT:/tr/urun/storm-10-p-sea-61143003',
+    await expect(urunSegmentiniCoz('storm-10-kanal-fani-p-SEA-61143003', 'tr')).rejects.toThrow(
+      'REDIRECT:/tr/urun/storm-10-kanal-fani-p-sea-61143003',
     )
     expect(db.modelBySku).not.toHaveBeenCalled()
   })
 
+  it('büyük harfli SKU ama yayında DEĞİL → 404 (308 ölü adrese taşımaz), DB\'ye gitmeden', async () => {
+    await expect(urunSegmentiniCoz('x-p-YOK-1', 'tr')).rejects.toThrow('NOT_FOUND')
+    expect(db.modelBySku).not.toHaveBeenCalled()
+  })
+
+  it('metin yanlış VE SKU büyük harf → TEK 308 (iki düzeltme tek sıçrama)', async () => {
+    await expect(urunSegmentiniCoz('yanlis-p-SEA-61143003', 'tr')).rejects.toThrow(
+      'REDIRECT:/tr/urun/storm-10-kanal-fani-p-sea-61143003',
+    )
+  })
+
   it('EN model adresi EN önekiyle 308\'lenir', async () => {
     await expect(urunSegmentiniCoz('storm-10-p-SEA-1', 'en')).rejects.toThrow('REDIRECT:/en/products/storm-10-p-sea-1')
+    await expect(urunSegmentiniCoz('storm-10-duct-fan-p-SEA-61143003', 'en')).rejects.toThrow(
+      'REDIRECT:/en/products/storm-10-duct-fan-p-sea-61143003',
+    )
   })
 
   it('bilinmeyen SKU → 404', async () => {

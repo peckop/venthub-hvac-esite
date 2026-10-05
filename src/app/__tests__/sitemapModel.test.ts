@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { yayindaModuluSahtele } from '@/config/__tests__/yayindaTestKiti'
+
 /**
  * INV-SITEMAP-MODEL-1 — aktif MODELLER site haritasına girer, YALNIZ adres şeması bayrağı AÇIKKEN
  * (REC-300 Faz 3e-2, OPS hükmü 2026-10-02: model `lastModified` = `products.updated_at`, migration yok).
@@ -56,6 +58,17 @@ async function harita(kosul: Kosul) {
     EN_YAYIN: kosul.enYayin,
     ADRES_SEMASI_K3B: kosul.k3b,
   }))
+  // URN-31: haritaya yalnız yayındaki listedeki modeller girer. Bu dosya "tüm aktif modeller" davranışını ölçer →
+  // fikstürdeki HER SKU listeye alınır (adres metni = aile slug'ı); liste süzgeci: sitemapYayindaModel.test.ts.
+  const liste = {
+    modeller: Object.fromEntries(
+      kosul.aileler.map((a) => [a.slug, Object.fromEntries(a.products.map((p) => [p.sku, { tr: a.slug, en: a.slug }]))]),
+    ),
+    surumler: {},
+  }
+  vi.doMock('@/config/yayindaModeller', async (orijinal) =>
+    yayindaModuluSahtele(await orijinal<typeof import('@/config/yayindaModeller')>(), () => liste),
+  )
   vi.doMock('@/lib/supabase/static', () => {
     const zincir = {
       select: () => zincir,
@@ -94,6 +107,7 @@ describe('INV-SITEMAP-MODEL-1 — aktif modeller site haritasında, yalnız bayr
   afterEach(() => {
     vi.unstubAllEnvs()
     vi.doUnmock('@/config/features')
+    vi.doUnmock('@/config/yayindaModeller')
     vi.doUnmock('@/lib/supabase/static')
     vi.doUnmock('@/lib/services/category.service')
     vi.doUnmock('@/lib/services/family.service')
