@@ -251,6 +251,85 @@ describe('INV-KANCA-HASSAS-YOL-2 · migration kolu üç dal', () => {
     expect(kos(yol(UYGULANMIS + '.bak')).karar).toBeNull()
   })
 
+  it('⭐HARF FARKI gevşeme açığı değil: master\'da "…uygulanmis.sql" varken diskte/istekte "…UYGULANMIS.sql" (NTFS aynı dosya) → yine ask, SERT metin', () => {
+    const { yol } = depoKur()
+    const buyuk = '20260101000000_UYGULANMIS.sql'
+    fs.writeFileSync(yol(buyuk), 'select 5;\n') // NTFS'te asıl dosyayı yazar; harf duyarlı diskte ayrı dosya olur — ikisinde de ask beklenir
+    const r = kos(yol(buyuk))
+    expect(r.karar).toBe('ask')
+    expect(r.sebep).toContain('UYGULANMIŞ MIGRATION')
+  })
+
+  it('⭐BİR REF ÇÖKERSE öteki çözülse bile "yok" ÇIKMAZ: bozuk origin/master + yerel master listeliyor, dosya master\'da yok → ask, "ölçülemedi"', () => {
+    const { kok, yol } = depoKur()
+    git(kok, 'update-ref', '-d', 'refs/remotes/origin/master')
+    // Olmayan bir nesneyi gösteren ref: `show-ref --verify` çıkış 128 verir (ref "yok" değil, BOZUK).
+    fs.mkdirSync(path.join(kok, '.git', 'refs', 'remotes', 'origin'), { recursive: true })
+    fs.writeFileSync(path.join(kok, '.git', 'refs', 'remotes', 'origin', 'master'), '1111111111111111111111111111111111111111\n')
+    fs.writeFileSync(yol('20260105000000_dalda_yeni.sql'), 'select 6;\n')
+    const r = kos(yol('20260105000000_dalda_yeni.sql'))
+    expect(r.karar, 'bozuk ref sessizce "dalda yeni" sayıldı').toBe('ask')
+    expect(r.sebep).toContain('ölçülemedi')
+  })
+
+  it('⭐ref VAR ama listelenemiyor (ağaç değil dosya nesnesine işaret ediyor) → `ls-tree` çöker → ask, "ölçülemedi"; boş çıktı "master\'da yok" sayılmaz', () => {
+    const { kok, yol } = depoKur()
+    const h = spawnSync('git', ['hash-object', '-w', '--stdin'], { cwd: kok, input: 'agac-degil\n', encoding: 'utf8' })
+    git(kok, 'update-ref', 'refs/remotes/origin/master', h.stdout.trim())
+    fs.writeFileSync(yol('20260105000000_dalda_yeni.sql'), 'select 8;\n')
+    const r = kos(yol('20260105000000_dalda_yeni.sql'))
+    expect(r.karar, 'ls-tree hatası sessizce "master\'da yok" sayıldı').toBe('ask')
+    expect(r.sebep).toContain('ölçülemedi')
+  })
+
+  it('git HİÇ çalışmıyorsa (PATH boş) → ask, "ölçülemedi"; "dalda yeni" sayılmaz', () => {
+    const { yol } = depoKur()
+    fs.writeFileSync(yol('20260105000000_dalda_yeni.sql'), 'select 9;\n')
+    const env = { ...process.env }
+    for (const k of Object.keys(env)) if (k.toLowerCase() === 'path') delete env[k] // Windows'ta anahtar "Path"
+    // PATH'i silmek yetmez (Node üst sürecin PATH'ine döner); içinde git olmayan boş bir klasöre çevrilir.
+    const bos = fs.mkdtempSync(path.join(os.tmpdir(), 'spg-bos-'))
+    geciciler.push(bos)
+    env.PATH = bos
+    const r = spawnSync(process.execPath, [KANCA], {
+      input: JSON.stringify({ tool_name: 'Write', tool_input: { file_path: yol('20260105000000_dalda_yeni.sql') } }),
+      encoding: 'utf8',
+      env,
+    })
+    const c = JSON.parse(r.stdout.trim()) as { hookSpecificOutput: { permissionDecision: string; permissionDecisionReason: string } }
+    expect(c.hookSpecificOutput.permissionDecision).toBe('ask')
+    expect(c.hookSpecificOutput.permissionDecisionReason).toContain('ölçülemedi')
+  })
+
+  it('ref GERÇEKTEN yoksa (origin tanımsız) atlanır: yerel master çözülür, dalda yeni dosya sorusuz geçer', () => {
+    const { kok, yol } = depoKur()
+    git(kok, 'update-ref', '-d', 'refs/remotes/origin/master')
+    fs.writeFileSync(yol('20260105000000_dalda_yeni.sql'), 'select 7;\n')
+    expect(kos(yol('20260105000000_dalda_yeni.sql')).karar).toBeNull()
+  })
+
+  it('⭐KLASÖR ADI harf farkı kancayı atlatmaz: `Supabase/Migrations/…` da migration yoludur (eski kancada da açıktı)', () => {
+    const { kok } = depoKur()
+    const r = kos(path.join(kok, 'Supabase', 'Migrations', '20260105000000_yeni.sql').replace(/\\/g, '/'))
+    expect(r.karar).toBe('ask')
+    expect(r.sebep).toContain('MIGRATION DOSYASI')
+  })
+
+  it('⭐`..` ile dolanan yol kancayı atlatmaz: `supabase/foo/../migrations/…` migration yoludur', () => {
+    const { kok } = depoKur()
+    const r = kos(`${kok.replace(/\\/g, '/')}/supabase/foo/../migrations/20260105000000_yeni.sql`)
+    expect(r.karar).toBe('ask')
+    expect(r.sebep).toContain('MIGRATION DOSYASI')
+  })
+
+  it('⭐`.env` harf farkıyla atlatılamaz: `.ENV` ve `.Env.local` DENY (NTFS aynı dosya); şablon muafiyeti `.env.example` için sürer', () => {
+    const { kok } = depoKur()
+    const k = kok.replace(/\\/g, '/')
+    expect(kos(`${k}/.ENV`).karar).toBe('deny')
+    expect(kos(`${k}/.Env.local`).karar).toBe('deny')
+    expect(kos(`${k}/.env.example`).karar).toBeNull()
+  })
+
   it('Edit ve MultiEdit araçlarında, ters bölülü Windows yolunda da aynı karar', () => {
     const { yol } = depoKur()
     for (const arac of ['Edit', 'MultiEdit', 'Write']) {
