@@ -1,4 +1,5 @@
 import typography from '@tailwindcss/typography';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 import {
   blur,
@@ -117,6 +118,14 @@ const tailwindConfig = {
       },
       fontFamily: {
         'sans': ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        /* ── serif/mono (TSR-9, Faz 2b; plan v2.2 §1.2 "Tuzak") ─────────────────────
+           `var(--font-mono)` TANIMSIZSA (bayrak kapalı: `--font-mono` yalnız
+           `:root[data-gorunum='yeni']` kapsamında doğar) `font-family: var(--font-mono), …`
+           geçersiz sayılır ve özellik SIFIRLANIR. Bu yüzden `var(--ad, <Tailwind varsayılan
+           yığını>)` biçimi: kapalıyken `font-mono`/`font-serif` computed `font-family`
+           AYNEN eski yığın (kaynak: tailwindcss/defaultTheme, sürümle birlikte gider). */
+        'mono': [`var(--font-mono, ${defaultTheme.fontFamily.mono.join(', ')})`],
+        'serif': [`var(--font-serif, ${defaultTheme.fontFamily.serif.join(', ')})`],
       },
       letterSpacing: {
         'hvac-tight': '0.1em',

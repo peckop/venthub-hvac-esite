@@ -80,7 +80,8 @@ Bunun yeni bileşen kodunu kapalıyken paketten gerçekten çıkardığı **ÖL�
 
 **Tanım:** ziyaretçinin gördüğü fark 0. Dosya baytı özdeş olmak **zorunda değil**: yeni bileşen CSS/JS'i ve `@font-face` CSS'i pakete girebilir (bütçelenir, §4 M8); **font `preload` bağlantısı ve font dosyası isteği 0** olmalıdır.
 **İki ölçüm, ikisi de gerekli:**
-1. **Statik:** paketin `git diff --numstat origin/master...HEAD` çıktısında, **zaten var olan** dosyalarda **silinen satır = 0**; mevcut dosyaya yalnız seçim satırı + import eklenir
+1. **Statik:** paketin `git diff --numstat origin/master...HEAD` çıktısında, **zaten var olan** dosyalarda **silinen satır = 0**
+   (**tek dar istisna, Ops 10-05:** kök layout'ta bayrağı basan `<html>`/`<body>` satırları ve font import satırı hariç; bunlar PR gövdesinde tek tek listelenir, bayrak kapalıyken aynı çıktı testle bağlanır; genel bir istisna DEĞİLDİR, başka dosya/satır için geçerli olmaz; Faz 2b PR'ı #1719: 3 satır, `src/app/layout.tsx`); mevcut dosyaya yalnız seçim satırı + import eklenir
    (`if (YENI_GORUNUM && X_GORUNUM) return <Yeni/>`), eski gövde dokunulmaz; yeni kod yeni dosyadadır. Komut PR raporuna sayı olarak yazılır. Kalıcı kapı önerisi `INV-GORUNUM-KAPALI-1`
    (ALTYAPI belirler).
 2. **Dinamik:** tüm bayraklar `false` iken altı referans sayfada (ana, kategori, liste, ürün, Bilgi Merkezi, sepet) × {390, 1280} normalize sunucu HTML'i (build kimlikleri ve hash'li adresler
