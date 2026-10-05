@@ -154,6 +154,43 @@ doğrudan hâlâ geçiyor (~satır 607/641). Değişkeni silmek literali kaldır
 ⚠**`public/**` ESLint ignore'da** — favicon'daki renk hiçbir kapının görüş alanında
 değil. Bu, kuralın bilinen kör noktasıdır ve gizlenmiyor.
 
+### 2.2 DS adları: takma ad ve literal (OPS-53 Faz 2a, 2026-10-05)
+
+Design System (DS) renk adları koda **iki kapıyla** iner. **Faz 2a yalnız görünmez olanı ekler**
+(tüketicisi yok; üretilen CSS'te yalnız yeni custom property satırları farklı). Plan:
+`docs/plans/tasarim-kod-plani-v2.2-2026-10-05.md` §2 ve v2.1 §2.1/§2.2. İlke, §2'nin "yeni renk
+kaynağı açılamaz" kuralının devamıdır: **değer tek kaynakta kalır**, DS adı o değere işaret eder.
+
+| DS adı | Sınıf | `src/index.css` `:root` | Not |
+|---|---|---|---|
+| `--action-terracotta` | K1 takma ad | `var(--marka-kiremit)` | değer ≈ eşit |
+| `--warn-amber` | K1 takma ad | `var(--marka-amber)` | değer eşit |
+| `--text-strong` | K1 takma ad | `var(--marka-lacivert)` | DS `219 48% 20%` (#1B2C4B), hedef #1A2B4A: kanal farkı ≤2 |
+| `--text-on-dark` | K1 takma ad | `var(--clean-white)` | değer eşit |
+| `--text-muted` | K1 takma ad | `var(--steel-gray)` | DS `220 9% 46%` = site değeri; kapı ALT-30 ile serbest |
+| `--accent-air-green` | K2 tek literal | `100 61% 30%` | sitede bu değer yok (`--vortice-green` farklı) |
+| `--text-body` | K2 tek literal | `218 17% 35%` | sitede en yakını `--industrial-gray 215 19% 27%` (farklı) |
+| `--text-on-dark-muted` | K2 tek literal | `215 26% 65%` | sitede karşılığı yok |
+
+**DOKUNULMAZ (çakışan küme, K3):** `--primary-navy` (site `226 71% 40%`, DS `219 48% 20%`),
+`--brand-cyan` (site `189 78% 53%`, DS `194 100% 35%`), `--action-terracotta-deep` (site kazanır),
+`--font-sans` (Inter ↔ Archivo). Görünür dönüşüm Faz 2b'dir ve `:root` değerlerini **değiştirmez**:
+çevirme `:root[data-gorunum='yeni']` kapsamında `var(--marka-*)` takma adıyla yapılır.
+
+**`--text-muted`:** §2.1'in silinenler listesindeki bir adla çakışıyordu; INV-PALET-1 4. kol ALT-30
+(#1707) ile takma adı serbest bıraktı (ham değer, tanımsız hedef, döngü kırmızı). Bu yüzden K1 olarak
+`var(--steel-gray)` eklendi. ⚠`--steel-gray` `prefers-contrast: more` içinde değişir, takma ad onu izler;
+kontrast etkisi **ölçülmedi** (tüketici yok, gerçek tarayıcıda ölçülecek).
+
+**Ölçülmedi (ad ad tablo eksik):** DS'in kalan adları (tipografi ölçeği, yüzey/kenar adları,
+`--radius-panel`, boşluk rolleri, `--size-editorial`/`--lh-editorial`) bu tabloda **yok**: değerleri
+DesignSync okumasıyla alınacak (`ds-kaynak` kopyası) ve uydurma değer yazılmayacak.
+
+**Kapı (TASARIM'ın kendi, geçici):** `src/design-system/__tests__/ds-takma-adlari-faz-2a.test.ts` —
+takma ad biçimi, çözülmüş renk ≤2 kanal farkı, tek tanım, çakışan kümenin `:root` değerinin
+değişmediği ve `tailwind.config.js`'te `theme` altında yalnız `extend` olduğu. INV-TOKEN-PARITE-1
+(kopya↔türev) ALTYAPI'nın işidir ve DS kopyası gelince yazılır.
+
 ---
 
 ## 3) Kapı — ve ölçemediği şey (gizlenmiyor)
