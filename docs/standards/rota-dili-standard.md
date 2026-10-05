@@ -107,7 +107,7 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 | yasal-cerez | `legal/cerez-politikasi` | `yasal/cerez-politikasi` | `legal/cookie-policy` | kabul OPS #24 |
 | yasal-mesafeli | `legal/mesafeli-satis-sozlesmesi` | `yasal/mesafeli-satis-sozlesmesi` | `legal/distance-sales-contract` | kabul OPS #24 · satış kipi |
 | yasal-kullanim-kosullari | `legal/kullanim-kosullari` | `yasal/kullanim-kosullari` | `legal/terms-of-use` | **karar 293 A** (ALT-33, 10-05) · EN ad kıyas önerisi, Design teyidi bekliyor |
-| yasal-on-bilgilendirme | `legal/on-bilgilendirme-formu` | `yasal/on-bilgilendirme-formu` | `legal/pre-information-form` | **karar 293 A** · EN ad aynı |
+| yasal-on-bilgilendirme | `legal/on-bilgilendirme-formu` | `yasal/on-bilgilendirme-formu` | `legal/pre-contract-information` | **karar 293 A** · EN ad aynı |
 | yasal-iptal-iade | `destek/iade-degisim` | `yasal/iptal-ve-iade` | `legal/cancellation-and-returns` | **karar 293 A** · sayfa klasörü AYNI kalır (yeniden yazım), metin ve "satış kapalı" notu aynı; Footer iç bağlantısı `localizedHref` ile kendiliğinden döner |
 
 **Girmeyenler, nedeniyle (R8, R7):**
@@ -121,5 +121,5 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 
 **Karar 293 = A (Recep, 2026-10-05, ALT-33):** `legal/kullanim-kosullari`, `legal/on-bilgilendirme-formu` ve `destek/iade-degisim` tabloya GİRDİ (yukarıdaki üç satır): açık kipte eski adres tek 308,
 yeni adres 200 (yeniden yazım, klasör aynı). İade metni ve "satış kapalı" notu değişmez; hukuk onayı ön koşulu kaldırıldı. `destek/garanti-servis` ve `destek/teslimat-kargo` destek altında KALIR (308 yok, Design 9a324708).
-EN adlar (`terms-of-use`, `pre-information-form`, `cancellation-and-returns`) mevcut satırlara kıyasla önerildi, Design EN çeviri tablosunda teyit bekliyor; teyitte ad değişirse tek satır + literal test değeri güncellenir.
+EN adlar Design CSV hedefiyle teyit edildi (2026-10-05): `terms-of-use` ve `cancellation-and-returns` aynı, ön bilgilendirme `pre-contract-information` (kıyas önerisi `pre-information-form` idi, değişti). Ad yeniden değişirse tek satır + literal test değeri güncellenir.
 Kalan sınır: `/en/destek/garanti-servis`, `/en/destek/teslimat-kargo` hâlâ Türkçe alt ad taşıyor (EN'de İngilizce karşılığı yoktur).

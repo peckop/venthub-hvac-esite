@@ -440,7 +440,7 @@ describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 satırı + ALT-33 (karar 293 A
     { id: 'yasal-mesafeli', klasor: 'legal/mesafeli-satis-sozlesmesi', tr: 'yasal/mesafeli-satis-sozlesmesi', en: 'legal/distance-sales-contract' },
     // ALT-33 · karar 293 = A (Recep, 10-05): üç satır daha. İade metni aynı sayfada kalır (klasör destek/iade-degisim), adresi yasaldır.
     { id: 'yasal-kullanim-kosullari', klasor: 'legal/kullanim-kosullari', tr: 'yasal/kullanim-kosullari', en: 'legal/terms-of-use' },
-    { id: 'yasal-on-bilgilendirme', klasor: 'legal/on-bilgilendirme-formu', tr: 'yasal/on-bilgilendirme-formu', en: 'legal/pre-information-form' },
+    { id: 'yasal-on-bilgilendirme', klasor: 'legal/on-bilgilendirme-formu', tr: 'yasal/on-bilgilendirme-formu', en: 'legal/pre-contract-information' },
     { id: 'yasal-iptal-iade', klasor: 'destek/iade-degisim', tr: 'yasal/iptal-ve-iade', en: 'legal/cancellation-and-returns' },
   ]
 
@@ -468,7 +468,7 @@ describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 satırı + ALT-33 (karar 293 A
       ['/tr/legal/kullanim-kosullari', '/tr/yasal/kullanim-kosullari'],
       ['/en/legal/kullanim-kosullari', '/en/legal/terms-of-use'],
       ['/tr/legal/on-bilgilendirme-formu', '/tr/yasal/on-bilgilendirme-formu'],
-      ['/en/legal/on-bilgilendirme-formu', '/en/legal/pre-information-form'],
+      ['/en/legal/on-bilgilendirme-formu', '/en/legal/pre-contract-information'],
       ['/tr/destek/iade-degisim', '/tr/yasal/iptal-ve-iade'],
       ['/en/destek/iade-degisim', '/en/legal/cancellation-and-returns'],
     ]
