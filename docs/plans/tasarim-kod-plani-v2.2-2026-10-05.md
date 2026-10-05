@@ -120,6 +120,19 @@ Dal öneki departmandır (`tasarim/*`, `urun/*`, `satis/*`, `i18n/*`, `altyapi/*
 **v2.1 faz tablosu ile eşleme:** ön koşul (kapı) → Sal sabah · Faz 2a → Sal · Faz 3 (DS) → Sal–Çar · Faz 2b → Çar (ölçüm Per) · Faz 1 (kabuk) → Çar–Per, anahtar `YENI_KABUK_GEZINMESI` ·
 Faz 4 (sayfalar) → paketler Çar–Per, anahtar paket bayrağı · Faz 5 → 11 Ekim sonrası. **Sapma gerekçesi:** 2b anahtarlı olduğundan merge'ü Çarşamba'ya (ölçümü Perşembe'ye) koydum; S1 ve Faz 2a Ops onayıyla **bugün** başladığı için font tanımı Salı'dadır (ilk sürümdeki "Çar sabah" geri çekildi).
 
+### 2.1 Açılış PR'ı kontrol listesi (Ops 10-05; kart **TSR-10**, TASARIM panosu, `hafta-41`)
+
+Açılış PR'ını **Ops** açar; aşağıdaki dört madde merge'ten ÖNCE işaretli olmalıdır. Liste hafızada değil **kartta** tutulur (Ops kararı 10-05); bu bölüm kartın belgedeki aynasıdır, çelişirse kart kazanır.
+
+| # | Madde | Neden / kanıt | Sahip |
+|---|---|---|---|
+| 1 | **Inter tanımı `src/app/layout.tsx`'ten KALDIRILIR**; `<body>` sınıfı bayrak açıkken yeni ailenin `variable`/`className`'ini taşır; Inter **yalnız** `src/app/admin/layout.tsx`'te kalır (Faz 2b'de eklendi, ADMIN kartı ADM-9) | S1 v5 ölçümü: root'ta tanımlı Inter kullanılmasa da preload edilir; açılışta Archivo ile **iki** font önyüklenir, M6 kötüleşir. Faz 2b'de Inter root'ta KALIR (bayrak kapalıyken vitrin Inter'de kalmak zorunda, §1.3 "fark 0") | Ops (açılış PR'ı) |
+| 2 | **Archivo `preload: false` → `true`**; Source Serif 4 ve IBM Plex Mono `false` kalır | §1.2: açılış PR'ı yalnız Archivo'yu `true` yapar. `latin` + `latin-ext` ise Archivo **2** preload bağlantısı üretir (S1: her `preload:true` aile, subsets sayısı kadar bağlantı); M6'nın beklenen sayısı buna göre yazılır. Preload sayımı **Linux/CI'da** ölçülür: yerel Windows `next build` `next-font-manifest.json`'u `"app":{}` üretir (yol ayracı), orada sayım yanıltıcı 0 verir | Ops (açılış PR'ı) + ALTYAPI (M6 ölçümü) |
+| 3 | **Açılıştan önce ölçülecek:** portal'lı admin diyalog ve toast'ların yazı tipi (bayrak AÇIKKEN; `body`'ye basılan elemanlar yeni aileyi alıyor mu) | §1.4 "Bilinmeyen (ÖLÇÜLMEDİ)". Admin yerleşiminin kendi Inter sınıfı yalnız yerleşimin içindeki elemanları kapsar; kök `body`'ye portal'la basılanlar kapsam dışı olabilir | **ADMIN** (ADM-9) |
+| 4 | Bayrak açıkken admin `getComputedStyle().fontFamily` bayrak kapalıyla aynı (giriş sonrası ekranlar dahil) | Faz 2b PR'ı kapalı/açık karşılaştırmasını yazar; girişli ekran test kimliği olmadığından **ölçülmedi** olabilir (kimlik uydurulmaz) | TASARIM (ölçüm) + ADMIN (onay) |
+
+**Sonuç yoksa:** madde "ölçülmedi" yazılır, açılış kararı Ops'ta kalır; sessizce geçilmez.
+
 ---
 
 ## 3 · (b) Ekran işinin paralel bölümü
