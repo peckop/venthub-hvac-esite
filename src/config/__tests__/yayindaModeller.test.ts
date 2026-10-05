@@ -17,7 +17,7 @@ import { sentetikSlug, sentetikVeri } from './yayindaTestKiti'
 /**
  * INV-YAYINDA-MODEL-1 — "yayındaki modeller" listesinin BİÇİMİ, TEKİLLİĞİ, SIRASI, model slug'ı ve sürüm
  * hedefi (URN-31). Liste anahtarı SKU'dur; her listedeki SKU'nun `slug_tr` / `slug_en` adres metni VARDIR
- * (kaynak: Faz 2 CSV'si, bkz. yayindaModellerCsv.test.ts). Metin yoksa SKU liste içi sayılamaz: aile slug'ına
+ * (kaynak: Faz 2 CSV'si, bkz. scripts/seo/__tests__/yayinda-model-veri-uret.test.ts). Metin yoksa SKU liste içi sayılamaz: aile slug'ına
  * düşülmez, kayıt GEÇERSİZdir (fail-closed).
  * Mekanizma PR'ında liste BOŞTUR; gerçek liste bu kapıdan geçer, sentetik KÖTÜ listeler geçmez (duyarlılık).
  */

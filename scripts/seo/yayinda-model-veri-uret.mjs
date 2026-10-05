@@ -3,7 +3,7 @@
  *
  * NİÇİN: `src/config/yayindaModeller.veri.json` (yayındaki modeller listesi) elle yazılmaz. Her SKU'nun model adres
  * metni (`slug_tr` / `slug_en`) Faz 2 CSV'sinden (`docs/plans/rec300-model-adres-listesi-2026-09-23.csv`) BİREBİR
- * gelir; sıfırdan üretilmez. CSV değişirse liste tek komutla yenilenir; `yayindaModellerCsv.test.ts` her satırı
+ * gelir; sıfırdan üretilmez. CSV değişirse liste tek komutla yenilenir; `scripts/seo/__tests__/yayinda-model-veri-uret.test.ts` her satırı
  * CSV ile karşılaştırır (CSV ile liste ayrışırsa kapı KIRMIZI).
  *
  * Kullanım:
