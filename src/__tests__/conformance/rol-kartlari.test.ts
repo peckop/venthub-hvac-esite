@@ -793,6 +793,9 @@ describe('INV-ROL-1 — durum dosyası standart "Yarım iş" satırı (HRT-31, O
     }
     expect(uretici.DURUM_SATIRI_KURALI).toContain('`Yarım iş: yok — <kısa>`')
     expect(uretici.DURUM_SATIRI_KURALI).toContain('`Yarım iş: var — <ne>, <ne zaman güvenli>`')
+    // OPS 2026-10-05: compact hazırlığı notu Recep'e KENDİ penceresinde yazılır, OPS'a tek satır.
+    expect(uretici.DURUM_SATIRI_KURALI).toContain("KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider")
+    for (const ad of BEKLENEN_ROLLER) expect(kurallar[ad], ad).toContain('iki aşamalı compact cümlesi KENDİ penceresinde')
     // Blokta geçen iki örnek biçim, <...> yer tutucuları doldurulunca kancada okunur.
     expect(yarimIsOku('Yarım iş: yok — kısa')).toBe('yok')
     expect(yarimIsOku('Yarım iş: var — ne, ne zaman güvenli')).toBe('var')

@@ -474,6 +474,7 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
    - **`yok` derken yarım iş listelenmez; belirsizse `var` yazılır** ("güvenli yön": belirsizlik `yok` dedirmez). `var` derken ne olduğu ve **ne zaman güvenli noktaya geleceği** aynı satırdadır; compact yapılıp yapılmayacağı buna bakılarak kararlaştırılır.
    - Satır ayrıntı yeri değildir: tek satır, en çok iki cümle; ayrıntı DEVİR bloğunun `AÇIK KUYRUK` alanındadır.
    - Bu madde **pencerenin kendi disiplinidir**: kancayı zorlayan bir yazma kapısı henüz yoktur; ARAÇ'ın bekçisi satır eksikse `ölçülemedi` gösterir (kokpit zaten gösteriyor). Rol kartları bunu tek cümleyle hatırlatır (`docs/roller/<ROL>.md`, Çalışma düzeni; ayrıntı `docs/roller/<ROL>-kurallar.md`).
+   - **Compact hazırlığı Recep'e yazılır (OPS isteği 2026-10-05).** Recep compact hazırlığı istediğinde (ya da "COMPACT YAKIN" uyarısında) üç maddelik not (durum dosyası güncel mi + saat / yarım iş var mı / hüküm: "Şimdi compact yapabilirsin" ya da "X bitince söyleyeceğim") ve iki aşamalı compact cümlesi pencerenin KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu OPS'a yazıp Recep'e yazmamak kuralı çiğner (2026-10-05'te iki departman bunu yaptı, kural rol kartında yoktu). Aynı cümle her rolün kurallar dosyasındadır.
 
 ---
 
