@@ -6,10 +6,5 @@
   { "id": "yasal-kvkk", "klasor": "legal/kvkk", "tr": "yasal/kvkk-aydinlatma-metni", "en": "legal/privacy-notice-kvkk" },
   { "id": "yasal-gizlilik", "klasor": "legal/gizlilik-politikasi", "tr": "yasal/gizlilik-politikasi", "en": "legal/privacy-policy" },
   { "id": "yasal-cerez", "klasor": "legal/cerez-politikasi", "tr": "yasal/cerez-politikasi", "en": "legal/cookie-policy" },
-  { "id": "yasal-mesafeli", "klasor": "legal/mesafeli-satis-sozlesmesi", "tr": "yasal/mesafeli-satis-sozlesmesi", "en": "legal/distance-sales-contract" },
-  { "id": "yasal-kullanim", "klasor": "legal/kullanim-kosullari", "tr": "yasal/kullanim-kosullari", "en": "legal/terms-of-use" },
-  { "id": "yasal-on-bilgilendirme", "klasor": "legal/on-bilgilendirme-formu", "tr": "yasal/on-bilgilendirme-formu", "en": "legal/pre-contract-information" },
-  { "id": "destek-garanti", "klasor": "destek/garanti-servis", "tr": "destek/garanti-servis", "en": "support/warranty-service" },
-  { "id": "destek-iade", "klasor": "destek/iade-degisim", "tr": "destek/iade-degisim", "en": "support/returns-exchanges" },
-  { "id": "destek-teslimat", "klasor": "destek/teslimat-kargo", "tr": "destek/teslimat-kargo", "en": "support/delivery-shipping" }
+  { "id": "yasal-mesafeli", "klasor": "legal/mesafeli-satis-sozlesmesi", "tr": "yasal/mesafeli-satis-sozlesmesi", "en": "legal/distance-sales-contract" }
 ]
