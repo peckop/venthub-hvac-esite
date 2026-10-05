@@ -216,8 +216,68 @@ describe('OPS-53 Faz 2a — DS takma adları görünmez ve tek kaynakta', () => 
     for (const ad of YENI_ADLAR) {
       expect(renkler, `${ad} theme.extend.colors altında yok`).toContain(ad.replace(/^--/, ''))
     }
-    // Plan v2.2 §2.6: boşluk rolleri `space-*` önekiyle eklenecek (Faz 2a'nın DS ölçek kısmı
-    // DS kopyasını bekliyor); varsayılan spacing ölçeğine DOKUNULMADIĞI burada sabitlenir.
-    expect(extend.spacing, 'spacing ölçeği ezilmiş: yeni adlar space-* önekiyle ayrı anahtar olmalı').toBeUndefined()
+    // Plan v2.2 §2.6: boşluk rolleri YALNIZ `space-*` önekli anahtarlar (extend.spacing); sayısal
+    // varsayılan ölçeğe (1, 2, 4 …) dokunan anahtar yok.
+    const spacing = Object.keys((extend.spacing ?? {}) as Record<string, unknown>)
+    expect(spacing.filter((k) => !k.startsWith('space-')), 'extend.spacing space-* dışı anahtar taşıyor').toEqual([])
+  })
+})
+
+/** İkinci dilim: DS tipografi/ölçü/kenar/yüzey adları (DesignSync kopyası 2026-10-05, birebir). */
+const IKINCI: ReadonlyArray<readonly [string, string]> = [
+  ['--wordmark-weight', '700'], ['--wordmark-tracking', '-0.03em'],
+  ['--weight-govde', '400'], ['--weight-mono', '500'], ['--weight-baslik', '600'], ['--weight-h1', '700'],
+  ['--size-display', '46px'], ['--lh-display', '1.16'], ['--track-display', '-0.03em'],
+  ['--size-h1', '34px'], ['--size-h1-mobil', '25px'], ['--lh-h1', '1.15'], ['--track-h1', '-0.025em'],
+  ['--size-h2', '29px'], ['--lh-h2', '1.2'], ['--track-h2', '-0.03em'],
+  ['--size-h3', '21px'], ['--lh-h3', '1.3'], ['--track-h3', '-0.02em'],
+  ['--size-body', '15px'], ['--lh-body', '1.5'],
+  ['--size-body-small', '13.5px'], ['--lh-body-small', '1.55'],
+  ['--size-caption', '12.5px'], ['--lh-caption', '1.45'],
+  ['--size-overline', '11px'], ['--lh-overline', '1.4'], ['--track-overline', '0.14em'],
+  ['--size-editorial', '16px'], ['--lh-editorial', '1.6'],
+  ['--space-tight', '5px'], ['--space-inline', '7px'], ['--space-grid', '10px'], ['--space-stack', '14px'],
+  ['--space-card', '16px'], ['--space-card-loose', '20px'], ['--space-page-mobile', '18px'],
+  ['--space-block', '30px'], ['--space-page', '40px'],
+  ['--border-control', '60 5% 84%'], ['--border-hairline', '60 6% 88%'], ['--border-row', '60 13% 94%'],
+  ['--radius-panel', '8px'], ['--shadow-none', 'none'],
+  ['--surface-page', '60 8% 95%'], ['--surface-card', '0 0% 100%'], ['--surface-subtle', '60 20% 98%'],
+  ['--surface-inset', '60 11% 93%'], ['--surface-dark', '216 40% 10%'], ['--surface-dark-inset', '218 44% 25%'],
+]
+const RENK_IKINCI = IKINCI.filter(([ad]) => /^--(border-(control|hairline|row)|surface-(page|card|subtle|inset|dark|dark-inset))$/.test(ad))
+
+describe('OPS-53 Faz 2a ikinci dilim — tipografi/ölçü/kenar/yüzey', () => {
+  it('50 ad', () => {
+    expect(IKINCI.length).toBe(50)
+  })
+
+  it.each(IKINCI)('%s :root\'ta DS değeriyle birebir ve tek tanımlı', (ad, deger) => {
+    expect(kokDegeri(ad)).toBe(deger)
+    expect(tanimSayisi(ad)).toBe(1)
+  })
+
+  it.each(RENK_IKINCI)('%s HSL üçlüsü ve Tailwind\'e bağlı', (ad) => {
+    expect(HSL_UCLUSU.test(kokDegeri(ad) ?? '')).toBe(true)
+    expect(tailwindBaglamaSayisi(ad)).toBe(1)
+  })
+
+  it('boşluk rolleri extend.spacing altında space-* önekiyle, değişkene bağlı', () => {
+    const extend = (tailwindConfig as { theme?: { extend?: Record<string, Record<string, unknown>> } }).theme?.extend ?? {}
+    for (const [ad] of IKINCI.filter(([a]) => a.startsWith('--space-'))) {
+      expect(extend.spacing?.[ad.replace(/^--/, '')]).toBe(`var(${ad})`)
+    }
+  })
+
+  it('yazı ölçeği ds-* anahtarlarıyla, mevcut display anahtarı DEĞİŞMEDİ', () => {
+    const fs = ((tailwindConfig as { theme?: { extend?: Record<string, Record<string, unknown>> } }).theme?.extend ?? {}).fontSize ?? {}
+    expect(Object.keys(fs).filter((k) => k.startsWith('ds-')).length).toBe(10)
+    expect(JSON.stringify(fs.display)).toBe(JSON.stringify(['var(--font-size-display)', { lineHeight: '1.1' }]))
+  })
+
+  it('çakışan küme DS\'e çevrilmemiş: --radius ve yazı ailesi adı :root\'ta yok/aynı', () => {
+    expect(kokDegeri('--radius')).toBe('0.5rem')
+    for (const ad of ['--font-serif', '--font-mono', '--font-size-display']) {
+      expect(ad === '--font-size-display' ? kokDegeri(ad) !== null : kokDegeri(ad) === null, ad).toBe(true)
+    }
   })
 })
