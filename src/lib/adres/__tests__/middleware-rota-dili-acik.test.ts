@@ -109,7 +109,7 @@ describe('middleware dilsiz kol — anahtar AÇIK (gerçek veri dosyası: hakkı
   })
 
   it('tabloda olmayan dilsiz yol ve dil çözülemeyen başlık: bugünkü akış', async () => {
-    expect(await istek('/destek/sss', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/destek/sss' })
+    expect(await istek('/destek/iade-degisim', { 'accept-language': TR_CHROME })).toMatchObject({ durum: 307, konum: '/tr/destek/iade-degisim' })
     expect(await istek('/', {})).toMatchObject({ durum: 308, konum: '/tr' })
   })
 

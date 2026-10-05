@@ -4,7 +4,13 @@ import { join } from 'node:path'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri, zincirVarMi } from '../../config/rotaDili.mjs'
+import {
+  ROTA_DILI,
+  rotaDiliHedefleriniYenile,
+  rotaDiliYenidenYazimlari,
+  rotaDiliYonlendirmeleri,
+  zincirVarMi,
+} from '../../config/rotaDili.mjs'
 
 /**
  * INV-ROTA-DILI-KAPALI-1 — Kapı 1: anahtar KAPALIYKEN canlıda sıfır adres farkı (OPS-52 plan §3.1).
@@ -77,11 +83,21 @@ describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres 
   it('⛔DUYARLILIK: anahtar tam "1" iken çıktı fikstürden FARKLI (karşılaştırma gerçekten ayırt ediyor)', async () => {
     const cikti = await yukle('1')
     expect(cikti.redirects).not.toEqual(FIKSTUR.redirects)
-    // Fark yalnız SONA eklenen rota dili kuralları: önceki 49 satır bozulmaz.
-    expect(cikti.redirects.slice(0, FIKSTUR.redirects.length)).toEqual(FIKSTUR.redirects)
-    const fazla = cikti.redirects.slice(FIKSTUR.redirects.length)
+    // Fark iki parçadır: (1) mevcut 49 kuralın HEDEFLERİ tabloyla yenilenir (R4), (2) SONA rota dili kuralları eklenir.
+    const yenilenmis = rotaDiliHedefleriniYenile(FIKSTUR.redirects, true, ROTA_DILI)
+    expect(cikti.redirects.slice(0, yenilenmis.length)).toEqual(yenilenmis)
+    const fazla = cikti.redirects.slice(yenilenmis.length)
     expect(fazla.length).toBeGreaterThan(0)
     expect(fazla).toEqual(rotaDiliYonlendirmeleri(true))
+    // Yenileme yalnız hedefi tablodaki bir klasöre (urun-secici) giden kurallara dokunur; kaynaklar ve gerisi aynen.
+    const degisenKaynaklar = new Set(
+      FIKSTUR.redirects.filter((k) => !yenilenmis.some((y) => y.source === k.source && y.destination === k.destination)).map((k) => k.source),
+    )
+    for (const k of FIKSTUR.redirects) {
+      const dokunuldu = degisenKaynaklar.has(k.source)
+      expect(dokunuldu, k.source).toBe(/urun-secici/.test(k.destination))
+    }
+    expect(degisenKaynaklar.size).toBeGreaterThan(0)
     expect(cikti.beforeFiles).toEqual(rotaDiliYenidenYazimlari(true))
     expect(cikti.beforeFiles.length).toBeGreaterThan(0)
     // Başlıklar anahtardan etkilenmez (noindex Aşama 2 başlığı bu işte değişmez).

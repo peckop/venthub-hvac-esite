@@ -19,7 +19,7 @@ import type { Route } from 'next'
 import { BILGI_MERKEZI_BOLUMU, EN_KAPALI_LISTE_HEDEFI } from '../config/bilgiMerkeziYonlendirmeleri.mjs'
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { modelAdresiVarMi } from '../config/yayindaModeller'
-import { rotaDiliCevirOku } from '../lib/adres/rotaDiliTablo'
+import { rotaDiliCevirOku, rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
 import { type AdresDili, adresUret } from './adresUret'
 import { localizedHref, Routes } from './routes'
 
@@ -176,7 +176,11 @@ export function dilDegistirYolu(
     // yok). AÇIKKEN liste ↔ liste; yazı slug'ı dile göre farklı olduğu için yazıdan liste sayfasına inilir
     // (yazı eşi bu dosyaya yüklenmez: yazı metinleri istemci paketine girmesin).
     if (firstSegment === 'tr' && segments[1] === BILGI_MERKEZI_BOLUMU.tr && yeniDil === 'en') {
-      return enYayin ? bilgiMerkeziListe(yeniDil) : EN_KAPALI_LISTE_HEDEFI
+      // Hedef `/en/urun-secici` (eski klasör adresi): rota dili açıkken görünen yol (`/en/selector`) — next.config'in
+      // `rotaDiliHedefleriniYenile` ile yenilenen EN-kapalı kuralları aynı yere gider, zincir kurulmaz. Kapalıyken AYNEN.
+      return enYayin
+        ? bilgiMerkeziListe(yeniDil)
+        : `/${yeniDil}${rotaDiliYoluOku(EN_KAPALI_LISTE_HEDEFI.slice(1 + yeniDil.length), yeniDil)}`
     }
     if (firstSegment === 'en' && segments[1] === BILGI_MERKEZI_BOLUMU.en && yeniDil === 'tr') {
       return bilgiMerkeziListe(yeniDil)

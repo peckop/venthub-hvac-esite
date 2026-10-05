@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { bilgiMerkeziYonlendirmeleri, EN_KAPALI_LISTE_HEDEFI } from '../../config/bilgiMerkeziYonlendirmeleri.mjs'
-import { rotaDiliYonlendirmeleri, zincirVarMi } from '../../config/rotaDili.mjs'
+import { ROTA_DILI, rotaDiliHedefleriniYenile, rotaDiliYonlendirmeleri, zincirVarMi } from '../../config/rotaDili.mjs'
 
 /**
  * INV-ROTA-DILI-KAPALI-2 + açık kip kabul ölçütleri — ADRES ÜRETİMİ (OPS-52 PR-C1).
@@ -145,9 +145,21 @@ describe('INV-ROTA-DILI-KAPALI-2 — anahtar kapalı → adres üretimi işe ba�
     const tr = localizedCiktilar(m.localizedHref, m.Routes, 'tr')
     const degisen = Object.keys(tr).filter((k) => tr[k] !== FIKSTUR.localizedHref.tr[k])
     expect(degisen.sort()).toEqual(
-      expect.arrayContaining(['about()', 'contact()', 'contact(ornek-slug,ornek-alt)']),
+      expect.arrayContaining(['about()', 'contact()', 'contact(ornek-slug,ornek-alt)', 'urunSecici()', 'destek.sss()', 'legal.kvkk()']),
     )
-    for (const k of degisen) expect(k, k).toMatch(/^(about|contact)\(/)
+    // Her değişiklik TABLODAN açıklanır: eski değer `/tr/<klasor>`, yeni değer `/tr/<satır.tr>` (sorgu hariç).
+    const yolu = (u: string) => u.split('?')[0]
+    for (const k of degisen) {
+      const eski = yolu(FIKSTUR.localizedHref.tr[k])
+      const satir = ROTA_DILI.find((r) => eski === `/tr/${r.klasor}`)
+      expect(satir, `${k}: ${eski} tabloda yok`).toBeDefined()
+      expect(yolu(tr[k]), k).toBe(`/tr/${satir?.tr}`)
+    }
+    // Tablodaki HER klasörün Routes karşılığı fikstürde var (gerçek Routes'a bağlı satır sessizce atlanmaz).
+    for (const satir of ROTA_DILI) {
+      const fikstur = Object.values(FIKSTUR.localizedHref.tr).filter((u) => yolu(u) === `/tr/${satir.klasor}`)
+      expect(fikstur.length, `Routes'ta ${satir.klasor} yok`).toBeGreaterThan(0)
+    }
   })
 })
 
@@ -168,7 +180,8 @@ describe('açık kip — iç bağlantılar (header / footer / navigationConfig) 
     expect(m.localizedHref('/en/about', 'en')).toBe('/en/about')
     expect(m.localizedHref('/admin/about', 'tr')).toBe('/admin/about')
     expect(m.localizedHref('/api/contact', 'tr')).toBe('/api/contact')
-    expect(m.localizedHref('/destek/sss', 'tr')).toBe('/tr/destek/sss')
+    expect(m.localizedHref('/destek/iade-degisim', 'tr')).toBe('/tr/destek/iade-degisim') // tabloda yok: bugünkü adres
+    expect(m.localizedHref('/legal/kullanim-kosullari', 'en')).toBe('/en/legal/kullanim-kosullari')
     expect(m.localizedHref('/about/ekip', 'tr')).toBe('/tr/about/ekip') // altYollar kapalı: alt yol bu satırın işi değil
     expect(m.localizedHref('/aboutx', 'tr')).toBe('/tr/aboutx')
     expect(m.localizedHref('/about', 'de')).toBe('/de/about')
@@ -349,15 +362,25 @@ describe('ALT-14 (a) — Bilgi Merkezi dil değiştirici: anahtardan BAĞIMSIZ, 
   it.each([undefined, '1'])('anahtar %s, EN kapalı: /tr/bilgi-merkezi* → EN_KAPALI_LISTE_HEDEFI (yönlendirme hedefiyle AYNI)', async (anahtar) => {
     const m = await yukle(anahtar, false)
     expect(EN_KAPALI_LISTE_HEDEFI).toBe('/en/urun-secici')
+    // Kapalıyken bugünkü hedef; AÇIKKEN Ürün Seçici'nin görünen adresi (next.config hedefleri tabloyla yenilenir).
+    const beklenen = anahtar === '1' ? '/en/selector' : '/en/urun-secici'
     for (const yol of ['/tr/bilgi-merkezi', '/tr/bilgi-merkezi/frekans-konvertoru-nedir', '/tr/bilgi-merkezi/hava-perdesi']) {
-      expect(m.dilDegistirYolu(yol, 'en', false, false), yol).toBe('/en/urun-secici')
+      expect(m.dilDegistirYolu(yol, 'en', false, false), yol).toBe(beklenen)
     }
-    expect(tekHop('/en/urun-secici', false)).toBeNull()
+    expect(tekHop(beklenen, false)).toBeNull()
   })
 
   it('EN kapalıyken ürettiği hedef, next.config\'in /en/destek/merkez hedefiyle aynı (iki yol aynı yere varır)', () => {
     const merkez = bilgiMerkeziYonlendirmeleri(false).find((k) => k.source === '/en/destek/merkez')
     expect(merkez?.destination).toBe(EN_KAPALI_LISTE_HEDEFI)
+  })
+
+  it('⭐AÇIKKEN de aynı: dil değiştirici hedefi = next.config\'in YENİLENMİŞ /en/destek/merkez hedefi (/en/selector)', async () => {
+    const yenilenmis = rotaDiliHedefleriniYenile(bilgiMerkeziYonlendirmeleri(false), true, ROTA_DILI)
+    const merkez = yenilenmis.find((k) => k.source === '/en/destek/merkez')
+    expect(merkez?.destination).toBe('/en/selector')
+    const m = await yukle('1', false)
+    expect(m.dilDegistirYolu('/tr/bilgi-merkezi', 'en', false, false)).toBe(merkez?.destination)
   })
 
   it('EN açıkken liste ↔ liste (BILGI_MERKEZI_BOLUMU eşlemesi); yazıdan liste sayfasına inilir', async () => {
