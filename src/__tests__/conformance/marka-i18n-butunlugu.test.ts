@@ -16,6 +16,7 @@ import { join } from 'node:path'
 
 import { describe, expect,it } from 'vitest'
 
+import { DB_MARKALARI } from '../../data/__tests__/markaDbFiksturu'
 import { type BrandText,HVAC_BRANDS } from '../../data/brands'
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
@@ -46,10 +47,11 @@ describe('INV-MARKA-I18N-1: marka verisi iki dilli', () => {
     expect(eksik).toEqual([])
   })
 
-  it('zorunlu alanlar (description, country) hiçbir markada eksik değil — `urunsuz` marka country\'siz olabilir (OPS-51)', () => {
+  it('zorunlu alanlar (description, country) hiçbir markada eksik değil — DB fikstüründe ürünsüz marka country\'siz olabilir (OPS-51)', () => {
     const eksik = HVAC_BRANDS
-      // country YALNIZ `urunsuz` işaretli (kaynağı doğrulanamayan, ürünsüz) markada atlanabilir; description HER markada zorunlu.
-      .filter(b => !ikiDilli(b.description) || (!ikiDilli(b.country) && !b.urunsuz))
+      // country YALNIZ fikstürde aktif ürünü 0 olan (kaynağı doğrulanamayan) markada atlanabilir; ürün gelince (fikstür
+      // yeniden ölçülünce) country de zorunlu olur. description HER markada zorunlu. Statik `urunsuz` bayrağı YOK.
+      .filter(b => !ikiDilli(b.description) || (!ikiDilli(b.country) && (DB_MARKALARI[b.slug]?.aktifUrun ?? 0) > 0))
       .map(b => b.slug)
     expect(eksik).toEqual([])
   })

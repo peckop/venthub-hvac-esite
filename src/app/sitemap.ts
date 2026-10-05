@@ -5,8 +5,9 @@ import { SITE_URL } from '../config/siteUrl'
 import { HVAC_BRANDS } from '../data/brands'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
+import { urunsuzMarkaSluglari } from '../lib/seo/markaUrunDurumu'
 import { getCategories } from '../lib/services/category.service'
-import { type FamilySitemapData,getAllFamilySlugs, getFamilySitemapData } from '../lib/services/family.service'
+import { type FamilySitemapData, getAllFamilySlugs, getBrandFamilyCount, getFamilySitemapData } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import { adresDili, adresRotalari, kategoriArgumanlari } from '../utils/yuzeyAdresleri'
@@ -180,11 +181,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // yönlendirme yapar). Site haritası kanonik olmayan adresi İLAN ETMEZ.
 
   // 3. Brand Routes
-  // OPS-51: ürünsüz marka (`urunsuz: true`, şu an flexiva) sitemap DIŞI — sayfası noindex,follow basar (markaSayfasi.tsx);
+  // OPS-51: ürünsüz marka (DB'de aktif ürünü 0; şu an flexiva) sitemap DIŞI — sayfası noindex,follow basar (markaSayfasi.tsx);
   // dizine kapalı bir adresi haritada ilan etmek çelişkidir. Marka listesinde ve ana sayfa bandında logoyla kalır.
-  // Ürün gelip işaret kalkınca marka satırı kendiliğinden haritaya girer.
+  // Karar sayfayla AYNI yardımcıdan (`markaUrunDurumu.ts`) ve harita üretildiği ANDA DB'den türer: ürün girince marka
+  // satırı kendiliğinden haritaya girer (statik bayrak YOK). DB okunamazsa karar FIRLATIR (harita üretilmez; hata yutulmaz,
+  // sahte-veritabanlı CI derlemesi hariç — yardımcının HATA YOLU).
+  const urunsuzMarkalar = await urunsuzMarkaSluglari(HVAC_BRANDS, (ad) => getBrandFamilyCount(supabaseStaticClient, ad))
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
-    HVAC_BRANDS.filter((brand) => !brand.urunsuz).map((brand) => ({
+    HVAC_BRANDS.filter((brand) => !urunsuzMarkalar.has(brand.slug)).map((brand) => ({
       url: `${baseUrl}${dilYolu(lang).brand(brand.slug)}`,
       // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
       changefreq: 'weekly',

@@ -82,9 +82,15 @@ const BRAND_DETAILS: Record<string, {
 
 export interface BrandDetailPageProps {
   initialBrandSlug?: string
+  /**
+   * OPS-51: markanın DB'de aktif ürünü yok (sunucu kararı; `markaUrunDurumu.ts`). Üst veri (noindex) ve site haritasıyla
+   * AYNI kaynaktan gelir — ürün sayısı sıfırken "teklif isteyin" cümlesi ve bağlantısı çizilir, ürün girince kalkar.
+   * Verilmezse `false` (bugünkü "ürünleri henüz katalogda değil" cümlesi).
+   */
+  urunsuz?: boolean
 }
 
-const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false }) => {
   const { t, lang } = useI18n()
   // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
   const Routes = useLocalizedRoutes()
@@ -339,15 +345,15 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           ) : (
             <div className="text-center py-20 bg-white rounded-hvac-3xl border border-dashed border-slate-200">
               <Package className="mx-auto text-slate-200 mb-4" size={48} />
-              {/* `urunsuz` işareti YALNIZ brands.ts'te ve INV-MARKA-KAYNAK-1'deki kapalı listedeki marka için
-                  (karar 265, Flexiva). İşaretsiz ürünsüz marka kapıda kırmızıdır; bu dal ona ulaşmaz. */}
+              {/* `urunsuz` = sunucunun DB'deki aktif ürün sayısından türettiği karar (`markaSayfasi.tsx` →
+                  `markaUrunDurumu.ts`); üst veri/site haritasıyla AYNI kaynak (statik bayrak YOK, OPS-51). */}
               {/* Teklif yolu = iletişim formu (`Routes.contact()`): özel teklif akışının depodaki sayfası
                   (EnhancedNeedsWizard "customOffer" ve contactPage.heroDesc "özel teklifler" aynı rotaya gider);
                   sepet tabanlı QuoteRequestButton ürünsüz markada boş listeyle çalışmaz. */}
               <p className="text-slate-400 font-light italic">
-                {brand.urunsuz ? t('brands.detail.productsOnRequest', { ad: brand.name }) : t('brands.detail.noProducts')}
+                {urunsuz ? t('brands.detail.productsOnRequest', { ad: brand.name }) : t('brands.detail.noProducts')}
               </p>
-              {brand.urunsuz && (
+              {urunsuz && (
                 <Link
                   href={Routes.contact()}
                   className="mt-4 inline-block text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8 focus-visible:outline-2"

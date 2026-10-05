@@ -2023,7 +2023,8 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
-      // OPS-51 (decision 265 + OPS ruling): ONLY for the brand marked `urunsuz: true` in brands.ts (Flexiva).
+      // OPS-51 (decision 265 + OPS ruling): ONLY for a brand with zero active products in the DB (currently Flexiva); the
+      // decision is derived on the server from the active product count (`markaUrunDurumu.ts`), no static flag.
       // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
       productsOnRequest: 'Request a quote from us for {{ad}} products.',
       productsOnRequestCta: 'Go to the contact form',

@@ -37,6 +37,8 @@ vi.mock('@/lib/services/family.service', () => ({
   getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }, { slug: 'vortice-hava-perdesi' }, { slug: '' }],
   // REC-454 (master): aile lastmod'u ayrı sorgudan gelir; bu test yalnız ADRESİ ölçer, tarih sitemapLastmod.test.ts'te.
   getFamilySitemapData: async () => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
+  // OPS-51: marka ürün sayısı ENJEKTE (DB yerine). Flexiva ürünsüz → haritada yok (altın veriyle tutarlı); diğerleri ürünlü.
+  getBrandFamilyCount: async (_supabase: unknown, ad: string) => (ad === 'Flexiva' ? 0 : 5),
 }))
 
 type Satir = { url: string; changefreq: unknown; priority: unknown; alternates: unknown }

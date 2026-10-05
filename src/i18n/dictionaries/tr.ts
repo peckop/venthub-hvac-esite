@@ -1096,7 +1096,8 @@ export const tr = {
       // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
       // olmayan bir VAAT. Artık olgu: marka katalogda var, ürünleri henüz yok.
       noProducts: 'Bu markanın ürünleri henüz katalogda değil.',
-      // OPS-51 (karar 265 + OPS hükmü): YALNIZ `brands.ts`'te `urunsuz: true` işaretli marka (Flexiva) için.
+      // OPS-51 (karar 265 + OPS hükmü): YALNIZ DB'de aktif ürünü 0 olan marka (şu an Flexiva) için; karar sunucuda
+      // aktif ürün sayısından türer (`markaUrunDurumu.ts`), statik bayrak yok.
       // ZAMAN VAADİ YOK (INV-VAAT-SIZINTI-2 / REC-148): olgu + eylem — ürün katalogda yok, teklif istenir.
       productsOnRequest: '{{ad}} ürünleri için bizden teklif isteyin.',
       productsOnRequestCta: 'İletişim formuna git',

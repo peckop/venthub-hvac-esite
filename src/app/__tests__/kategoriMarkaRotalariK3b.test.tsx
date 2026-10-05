@@ -50,6 +50,14 @@ vi.mock('@/lib/data/preload', () => ({
 
 vi.mock('@/lib/supabase/static', () => ({ supabaseStaticClient: { from: cagri.staticFrom } }))
 
+// OPS-51: marka üst verisi artık DB'deki aktif ürün sayısına bakar; sayı ENJEKTE (ürünlü marka → bugünkü çıktı BİREBİR).
+// `unstable_cache` Next çalışma zamanı dışında kurulamaz → geçiş.
+vi.mock('next/cache', () => ({ unstable_cache: <T,>(fn: T) => fn }))
+vi.mock('@/lib/services/family.service', async (orijinal) => ({
+  ...(await orijinal<typeof import('@/lib/services/family.service')>()),
+  getBrandFamilyCount: async () => 5,
+}))
+
 vi.mock('@/lib/data/urunSegmenti', () => ({
   eskiTrUrunAdresiniYonlendir: cagri.eskiUrun,
   urunSegmentiniCoz: vi.fn(),

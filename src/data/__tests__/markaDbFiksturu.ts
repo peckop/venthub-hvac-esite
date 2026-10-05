@@ -24,6 +24,13 @@
  */
 export const MARKA_OLCUM_TARIHI = '2026-10-04'
 
+/*
+ * OPS-51 düzeltmesi: bu fikstür artık marka SAYFASI / SİTE HARİTASI kararının dayanağı DEĞİL. "Ürünsüz marka" kararı
+ * render ve harita anında DB'deki aktif ürün sayısından türer (`src/lib/seo/markaUrunDurumu.ts`); o kararın kapıları
+ * sayıyı yardımcıya ENJEKTE eder (`markaKaynagi.test.ts` (c)/(f)). Fikstür yalnız liste-bütünlüğü ölçütüdür:
+ * (a) listedeki her slug DB'de var, (b) ürünlü her marka listede, (e) ürünsüz marka istisnasız listeye sızmaz.
+ */
+
 /** DB'deki markalar: slug → aktif ürün sayısı. */
 export const DB_MARKALARI: Readonly<Record<string, { ad: string; aktifUrun: number }>> = {
   vortice: { ad: 'Vortice', aktifUrun: 184 },

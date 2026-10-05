@@ -45,6 +45,8 @@ async function sitemapKur(kosul: {
       aileTarihleri: new Map([['vortice-lineo-quiet', '2026-09-20T10:00:00.000Z']]),
       modeller: [],
     }),
+    // OPS-51: marka ürün sayısı ENJEKTE (DB yerine); bu dosya katalog/kategori/aile HATA kollarını ölçer.
+    getBrandFamilyCount: async () => 5,
   }))
   return (await import('../sitemap')).default
 }
