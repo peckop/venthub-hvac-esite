@@ -27,6 +27,13 @@ import { expect, type Page, test } from '@playwright/test'
  */
 const TABAN: Readonly<Record<string, number>> = {}
 
+/**
+ * `color-contrast` incomplete düğüm sayısı tavanı (OPS şartı, 2026-10-05). Yalnız AZALABİLİR.
+ * Ölçüm: canlıda ilk koşu 23, sonraki beş koşu kararlı 17 (yayın arası fark); tavan 23 CI/canlı farkına pay
+ * bırakır. İlk CI okumasından sonra gerçek değere sıkılır. Sabotaj: 10 görsel arka planlı metin → 27, kırmızı.
+ */
+const BELIRSIZ_KONTRAST_TABAN = 23
+
 const ETIKETLER = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const
 
 async function ac(page: Page): Promise<void> {
@@ -54,6 +61,22 @@ test.describe('INV-AXE-1 — ana sayfa TR 390px axe taraması', () => {
       .map(([id, n]) => `${id}: ${n} > taban ${TABAN[id]}`)
     expect(yeni, `TABANDA olmayan yeni axe kuralı ihlali: ${yeni.join(', ')}`).toEqual([])
     expect(artan, `taban aşıldı: ${artan.join(' | ')}`).toEqual([])
+
+    // "Karar verilemedi" (incomplete) color-contrast düğümleri: geçti DEĞİL, görülmeyen alan. Sayı artarsa
+    // (yeni gradyan/görsel arka plan üstü metin) kırmızı; azalırsa tabanı düşürme notu çıkar (OPS şartı, 10-05).
+    const belirsiz = sonuc.incomplete.find((v) => v.id === 'color-contrast')?.nodes.length ?? 0
+    testInfo.annotations.push({ type: 'color-contrast-incomplete', description: String(belirsiz) })
+    if (belirsiz < BELIRSIZ_KONTRAST_TABAN) {
+      console.warn(
+        `NOT: color-contrast incomplete ${belirsiz} < taban ${BELIRSIZ_KONTRAST_TABAN}; ` +
+          'BELIRSIZ_KONTRAST_TABAN sabitini düşür (tavan sıkılır).',
+      )
+    }
+    expect(
+      belirsiz,
+      `color-contrast "karar verilemedi" düğümü ${belirsiz} > taban ${BELIRSIZ_KONTRAST_TABAN}: ` +
+        'yeni gradyan/görsel arka plan üstü metin eklenmiş, kontrastı kimse ölçmüyor.',
+    ).toBeLessThanOrEqual(BELIRSIZ_KONTRAST_TABAN)
   })
 
   test('enstrüman kanıtı: alt metni olmayan görsel axe tarafından görülüyor', async ({ page }) => {
