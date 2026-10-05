@@ -38,24 +38,24 @@ const slidesData: SlideData[] = [
   {
     image: '/images/hero_hvac_industrial_premium_1.webp',
     products: [
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.0.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.0.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' },
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.0.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.0.products.1.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' }
     ],
     key: 0
   },
   {
     image: '/images/vortice_lineo_futuristic.webp',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.1.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.0.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.1.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.1.products.1.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' }
     ],
     key: 1
   },
   {
     image: '/images/hvac_installation_close_up_premium_3.webp',
     products: [
-      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', familySlug: 'vortice-lineo-quiet' },
-      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', familySlug: 'vortice-lineo-quiet' }
+      { url: '/images/products/vortice_lineo_360.png', labelKey: 'home.hero.sinevizyon.slides.2.products.0.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.0.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' },
+      { url: '/images/vortice_lineo_futuristic.webp', labelKey: 'home.hero.sinevizyon.slides.2.products.1.label', subLabelKey: 'home.hero.sinevizyon.slides.2.products.1.subLabel', familySlug: 'vortice-lineo-quiet-sessiz-kanal-fanlari' }
     ],
     key: 2
   }

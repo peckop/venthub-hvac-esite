@@ -2,32 +2,32 @@
   "redirects": [
     {
       "source": "/:lang(tr|en)/products/vortice-lineo-100-quiet",
-      "destination": "/:lang/products/vortice-lineo-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-lineo-125-quiet",
-      "destination": "/:lang/products/vortice-lineo-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-lineo-150-quiet",
-      "destination": "/:lang/products/vortice-lineo-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-lineo-200-quiet",
-      "destination": "/:lang/products/vortice-lineo-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-lineo-250-quiet",
-      "destination": "/:lang/products/vortice-lineo-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-lineo-315-quiet",
-      "destination": "/:lang/products/vortice-lineo-quiet",
+      "destination": "/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari",
       "permanent": true
     },
     {
@@ -102,32 +102,32 @@
     },
     {
       "source": "/:lang(tr|en)/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921",
-      "destination": "/:lang/products/nicotra-gebhardt-dd?sku=NIC-11921",
+      "destination": "/:lang/products/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar?sku=NIC-11921",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-ca-il-4020-es-rect-16076",
-      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-4020-ES-RECT",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-ca-il-5035-es-rect-16077",
-      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-5035-ES-RECT",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-ca-il-6040-es-rect-16078",
-      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-6040-ES-RECT",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-ca-il-7050-es-rect-16079",
-      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-7050-ES-RECT",
       "permanent": true
     },
     {
       "source": "/:lang(tr|en)/products/vortice-ca-il-8060-es-rect-16080",
-      "destination": "/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT",
+      "destination": "/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-8060-ES-RECT",
       "permanent": true
     },
     {
