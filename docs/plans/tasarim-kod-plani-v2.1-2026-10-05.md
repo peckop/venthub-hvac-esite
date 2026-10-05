@@ -33,8 +33,9 @@ OPS emir dosyasıyla Design'a gider (K26: değer emri kaynağa gider), koddan ya
 4. **Çakışan küme 2-3 değil 4 ad + 1 yazı tipi kolu:** `--primary-navy`, `--brand-cyan`, `--action-terracotta-deep`,
    `--font-sans`. Ayrıştırma: görünmez adlar 2a'da, görünür çevirme 2b'de ve takma adla (§2.2).
 5. **Admin kararı Faz 2b'nin ÖN KOŞULU:** "admin değişmemeli" ölçütü kalktı; admin etkilenir (§2.3).
-6. **K-1 kapısı ölçülebilir tanıma bağlandı:** "Faz PR'ı" = `tasarim/*` dalı; v2'nin `ds-galeri` rotası **çıkarıldı** çünkü bu planın
-   hiçbir fazı `src/app` altına rota klasörü eklemez (§3).
+6. **K-1 kapısı ölçülebilir tanıma bağlandı:** "Faz PR'ı" = `tasarim/*` dalı; v2'nin `ds-galeri` rotası **çıkarıldı**
+   (v2'den sapma). Red-team çıkarmayı değil noindex + bayrak kilidini istemişti; biz çıkarmayı seçtik çünkü karar 118 kapısı (rota klasörü ekleme 0) istisna açmadan
+   sade kalıyor. Riski: izole görsel kapı kaybolur → yerine Vitest render + axe, görsel doğrulama Faz 4'te; CLAUDE.md kural 14 ile gerilim açıkça yazıldı (§2.5 Faz 3, §3, §4).
 7. **Faz 4 sırası:** ürün sayfası + kategori/liste görünüm göçü adres yayınından SONRA, ayrı yayında (§2.5).
 8. **`ds-kaynak` kopyası kaldı, `token-turet.mjs` üreteci çıkarıldı** (lint dışı, sahipsiz, sahte tazelik; §2.5).
 9. **Faz tablosu** (canlıda görünür mü, ölçü, kim onaylar, geri alma) ve **11 Ekim önerisi** eklendi (§2.4, §4).
@@ -48,7 +49,7 @@ OPS emir dosyasıyla Design'a gider (K26: değer emri kaynağa gider), koddan ya
 | 1 | §2.2 **KRİTİK** | Faz 2a `--text-muted` eklemek INV-PALET-1'in "geri gelmez" kolunu kırar; DS'in `--text-muted`/`--warn-amber`/`--action-terracotta` adları mevcut `--steel-gray`/`--marka-amber`/`--marka-kiremit` değerlerinin ikinci kopyası olur | Takma ad yolu (değer tek kaynakta). Kapı dosyadan okundu: takma ad bile 4. kolu kırar → kapı güncellemesi ALTYAPI PR'ı olarak 2a'nın ön koşulu; yedek yol yazıldı | 2.1 |
 | 2 | §2.1 **YÜKSEK** | Çakışan küme 4 ad (+`--action-terracotta-deep`, `--font-sans`); `.light` ikinci tanım; `kenar.css`/`yuzey.css` okunmadı | Küme 4 ad + font kolu olarak yazıldı, ad ad listelenir; `.light` parite kapısının dışında (silme ayrı kayıt); `kenar`/`yuzey` ad listesi **ölçülmedi**, 2a'nın ilk adımı (DesignSync okuması) | 2.2 |
 | 3 | §2.3 **YÜKSEK** | "Admin DEĞİŞMEMELİ" yanlış: admin `primary-navy` 19 kullanım/4 dosya, kök `body` fontu, 63 `font-mono`; admin tema bu adları ezmiyor | Ölçüt kalktı. Admin kararı (dahil ya da dondur) Faz 2b'nin ön koşulu; öneri: dahil; ADMIN şeridi onaylar | 2.3 |
-| 4 | §2.7 **YÜKSEK** | K-1 kapısında "Faz PR'ı" tanımsız (URUN'un adres/Bilgi Merkezi PR'larını kırar ya da TASARIM'ı durdurmaz); galeri noindex/robots; Faz 4(2) "adres işiyle aynı yayında" karar 118 ile çelişir | "Faz PR'ı" = `tasarim/*` dalı; ölçülebilir komut; galeri rotası çıkarıldı (noindex/robots riski de kalktı); Faz 4(2) adres yayınından sonra, ayrı yayın | 3 (K-1), 2.5 |
+| 4 | §2.7 **YÜKSEK** | K-1 kapısında "Faz PR'ı" tanımsız (URUN'un adres/Bilgi Merkezi PR'larını kırar ya da TASARIM'ı durdurmaz); galeri noindex/robots; Faz 4(2) "adres işiyle aynı yayında" karar 118 ile çelişir | "Faz PR'ı" = `tasarim/*` dalı; ölçülebilir komut; galeri rotası çıkarıldı (red-team noindex + bayrak kilidi istemişti; çıkarma bizim seçimimiz, gerekçe/risk §2.5 Faz 3); Faz 4(2) adres yayınından sonra, ayrı yayın | 3 (K-1), 2.5 |
 | 5 | §2.4 ORTA | "Inter 0" iki kapsam dışı dosyaya (`InventoryQrLabel`, `Product3DViewer`) dokunur; `\bInter\b` kalıbı; Roboto (PDF) dördüncü aile | Ölçüt `\bInter\b` ile ikiye ayrıldı: vitrin kökü Inter 0 (kapı) + adıyla listelenmiş 3 istisna (QR etiketi, 3D gizmo, PDF Roboto); yeni istisna eklenemez | 2.5 Faz 2b |
 | 6 | §2.5 ORTA | Font: CSP uygun, `latin-ext` doğru; 16 woff2 önyüklemesi; `className`+`variable` birlikte; `--font-sans` pariteye giremez; bugünkü ğ/ş kusuru | Değişken eksen (Archivo, Source Serif 4), Plex Mono statik, serif/mono `preload: false`; `className` ve `variable` birlikte değişir; font adı ayrı kol (layout'ta hangi aile); "önce" ölçümüne ğ/ş eklenir | 2.5 Faz 2b |
 | 7 | §2.6 ORTA | Tailwind: `theme.extend` açık yazılmalı; `spacing.page` ile `maxWidth.page` aynı ad; `fontSize.display` çakışması; INV-TOKEN-SINIF-1 adlı sınıfları görmez | `extend` zorunlu; boşluk anahtarı `space-*` önekli; DS yazı ölçeği `display` anahtarına yazılmaz (ayrı ad); INV-TOKEN-SINIF-1'e adlı `p/m/gap/text` kolu (ALTYAPI) | 2.5 Faz 2a |
@@ -73,7 +74,7 @@ OPS emir dosyasıyla Design'a gider (K26: değer emri kaynağa gider), koddan ya
 | `ds-kaynak` + `token-turet` | DARALT | Üreteç çıktı, kopya + kapı kaldı | 2.5 |
 
 Red-team §3 aksiyon maddeleri: 1 → bulgu 2 · 2 → bulgu 1 · 3 → bulgu 1 ve Faz 2b · 4 → bulgu 3 · 5 → bulgu 5 · 6 → bulgu 6 ·
-7 → bulgu 7 · 8 → bulgu 4 · 9 → galeri rotasının çıkarılması (§3) · 10 → bulgu 10 · 11 → bulgu 8 · 12 → bulgu 9.
+7 → bulgu 7 · 8 → bulgu 4 · 9 → galeri: noindex + bayrak kilidi yerine rota çıkarıldı, yerine Vitest render + axe (§2.5 Faz 3) · 10 → bulgu 10 · 11 → bulgu 8 · 12 → bulgu 9.
 
 ---
 
@@ -88,7 +89,7 @@ Red-team §3 aksiyon maddeleri: 1 → bulgu 2 · 2 → bulgu 1 · 3 → bulgu 1 
 | 3 | Adres yayını bekliyor (karar 118) | `ADRES_SEMASI_K3B = false` (`src/config/features.ts:130`); `YENI_KABUK_GEZINMESI = false` (`:58`) | Faz 4(2) için ön koşul: adres yayını canlıda |
 | 4 | — | **Karar 285 EVET:** tek aileli alt kategori sayfası (OPS-71). Design prototipte yapıyor | Faz tablosunda "11 Ekim sonrası" satırı |
 | 5 | — | **Karar 271:** 11 Ekim kapsamı = dilim 1 | §4 öneri |
-| 6 | Uzun metin 16 px/1.6/66ch ↔ 17 px/720 px çelişkisi | Design'a soruldu, **cevap bekleniyor** (§1.2) | Bloklanan/bloklamayan fazlar §1.2'de |
+| 6 | Uzun metin 16 px/1.6/66ch ↔ 17 px/720 px çelişkisi | **KAPANDI** (Ops aktarımı 10-05, Design cevabı): DS değeri geçerli (16 px · satır 1.6 · 66ch); Menü v18 3 Ekim'de buna döndü (§1.2) | Hiçbir faz bloklanmıyor |
 | 7 | `layout.tsx:12` Inter | Dosyada `layout.tsx:5` import, `:12` tanım (girdi notunda `:9` yazıyordu; kod kazanır) | Faz 2b |
 
 ### 1.2 · DS ölçümü 2026-10-05
@@ -104,15 +105,13 @@ DesignSync ile yalnız okuma. Proje "VentHub Design System" (`31b0824c-8d7e-4a4c
   h2 29, h3 21, body 15, body-small 13.5, caption 12.5, overline 11, editorial 16/1.6 (ölçü 66ch). Yarıçap 0 (panel 8 px), gölge yok.
 - **ÖLÇÜLMEDİ:** DS dosyalarının **içerik sürüm farkı**. Yalnız proje `updatedAt` ve token/bileşen/kart sayıları kıyaslandı; aynı
   sayıda ama değeri değişmiş bir token bu ölçümle yakalanmaz. Faz 2a'nın ilk adımı kopyayı okurken bunu kapatır.
-- **AÇIK ÇELİŞKİ (uzun metin ölçüsü):** DS tip-serif kartı "16 px / 1.6, 66ch"; başka kaynak (Menü v18 F1) 17 px / 1.65 / 720 px.
-  Ops Design'a sordu, **cevap yok → AÇIK**. v2.1 bu değeri **uydurmaz**; DS kopyası DS'in kendi değeriyle alınır (K26: değer DS'ten
-  gelir). Bloklama etkisi:
-  - **Bloklamaz:** Faz 0, 1, 2a (kopya DS'in değeriyle girer, cevap gelirse kopya yenilenir), 2b (yazı tipi ailesi/ağırlığı
-    yüklenir, uzun metin ölçüsü tokenı tüketilmez), 3 (bileşenler bu ölçüyü Faz 4'e kadar kullanmaz — **ölçülmedi, Faz 3
-    PR'ında doğrulanır**), 5.
-  - **Bloklar:** yalnız Bilgi Merkezi'nin uzun metin ölçüsünün DS'e bağlanması (Faz 4 madde 1'in o kalemi).
-  - v2'de "Faz 2b bu cevabı bekler" yazıyordu; v2.1'de gevşetildi çünkü 2b uzun metin ölçüsünü tüketen kod getirmiyor. Bu yorum
-    TASARIM'ındır, Ops teyit etsin.
+- **KAPANAN ÇELİŞKİ (uzun metin ölçüsü):** v2'de DS tip-serif kartı "16 px / 1.6, 66ch" ile Menü v18 F1 17 px / 1.65 / 720 px
+  çelişiyordu ve Design'a soruluydu. **Cevap geldi (Ops 10-05 aktarımı; kaynak: Linear yorum `8a37e60b` — bu oturumda yorum DOĞRUDAN
+  okunmadı, Ops aktarımına dayanır):** DS değeri geçerlidir — **16 px · satır yüksekliği 1.6 · 66ch**. Menü v18 3 Ekim'de buna
+  döndürüldü; 720 px yalnız iki sütun kabıdır (uzun metin ölçüsü değil). Kodda sabit değer yazılmaz, DS tokenı kullanılır:
+  `--size-editorial`, `--lh-editorial` (66ch ölçüsünün token adı **ölçülmedi**). Etki: **hiçbir faz bloklanmıyor**; v2'deki "Faz 2b bu cevabı bekler" kaydı da
+  kalktı. DS kopyası (Faz 2a) bu değerleri DS'in kendi değeriyle alır (K26). Doğrudan doğrulama (Menü v18'in 3 Ekim sürümünün
+  DesignSync ile okunması) **ölçülmedi**; Faz 2a kopyayı okurken `--size-editorial`/`--lh-editorial` değerlerini 16 px/1.6 olarak teyit eder.
 
 ### 1.3 · Sitede bugün (2026-10-05, master `fe2a7fa95`)
 
@@ -121,17 +120,18 @@ DesignSync ile yalnız okuma. Proje "VentHub Design System" (`31b0824c-8d7e-4a4c
 `prefers-contrast` 2. İkinci `:root` yok. `:root` marka: `--marka-lacivert 218.8 48% 19.6%`, `--marka-turkuaz 193.6 100% 34.5%`,
 `--marka-kiremit 23.3 87.9% 45.3%`, `--marka-amber 38 92% 50%`; AA tonları `--brand-cyan-ink 193 100% 28%`,
 `--action-terracotta-deep 24.4 91% 39.2%`.
-`tailwind.config.js`: 47 renk (43 `hsl(var(--x)/<alpha-value>)`, 4 sabit HEX: success-green, warning-orange, gold-accent,
-silver-accent); `fontFamily` yalnız `sans`; serif/mono tanımı yok; spacing/screens varsayılan. `tokens.js`: 14 export; **renk,
+`tailwind.config.js`: **45 renk anahtarı** (41 `hsl(var(--x)/<alpha-value>)`, 4 sabit HEX: success-green, warning-orange, gold-accent,
+silver-accent; dosyada anahtar anahtar sayıldı. Düz `grep hsl(var(--` 42 satır gösterir çünkü 50. satırdaki yorum cümlesi de
+`hsl(var(--…))` içerir — o satır anahtar değil; girdi notundaki "47 / 43" sayısı bu yüzden yanlıştı, kod kazanır); `fontFamily` yalnız `sans`; serif/mono tanımı yok; spacing/screens varsayılan. `tokens.js`: 14 export; **renk,
 spacing ölçeği ve tipografi ölçeği YOK**.
 **Yazı tipi:** `layout.tsx` Inter (`--font-sans`); Archivo / Source Serif 4 / IBM Plex Mono kaynakta hiç geçmiyor. `font-mono`
-68 kullanım / 37 dosya (Tailwind varsayılan mono). **Ölçülmedi:** `font-serif` kullanım sayısı.
+68 kullanım / 37 dosya (Tailwind varsayılan mono; sabit sayım yöntemi §2.3'te). **Ölçülmedi:** `font-serif` kullanım sayısı.
 
 **DS adı ↔ site eşleşmesi (15 ad ölçüldü; DS'in kalan ~51 adı için ad ad tablo ÖLÇÜLMEDİ — Faz 2a'nın ilk adımı).**
 
 | DS adı | Sitede | Sonuç | v2.1 sınıfı |
 |---|---|---|---|
-| `--primary-navy` | VAR, FARKLI RENK: site `226 71% 40%` (#1E3FAE canlı mavi), DS `219 48% 20%` (#1B2C4B lacivert) | ÇAKIŞIYOR; ~796 sınıf kullanımı | K3 (2b'de çevrilir) |
+| `--primary-navy` | VAR, FARKLI RENK: site `226 71% 40%` (#1E3FAE canlı mavi), DS `219 48% 20%` (#1B2C4B lacivert) | ÇAKIŞIYOR; 798 eşleşme / 139 dosya (sabit yöntem §2.3) | K3 (2b'de çevrilir) |
 | `--brand-cyan` | VAR, FARKLI: site koyu `189 78% 53%`, `.light` `189 78% 40%`; DS `194 100% 35%` | ÇAKIŞIYOR; site `--marka-turkuaz` ≈ DS değeri | K3 (2b'de çevrilir) |
 | `--brand-cyan-ink` | var, `193 100% 28%` | EŞİT | K4 (işlem yok) |
 | `--action-terracotta` | yok (karşılığı `--marka-kiremit 23.3 87.9% 45.3%`) | ad yok, değer ≈ eşit | K1 takma ad |
@@ -140,7 +140,7 @@ spacing ölçeği ve tipografi ölçeği YOK**.
 | `--accent-air-green` | yok (en yakın `--vortice-green 149 100% 29%`; DS `100 61% 30%`) | değer FARKLI | K2 literal |
 | `--text-strong` | yok (DS = primary-navy; `--marka-lacivert` ≈) | ad yok | K1 takma ad |
 | `--text-body` | yok (DS `218 17% 35%`; en yakın `--industrial-gray 215 19% 27%`) | en yakını farklı | K2 literal |
-| `--text-muted` | yok (DS `220 9% 46%` = site `--steel-gray`) | değer eşit, ad farklı (~339 sınıf `steel-gray`) | K1 takma ad |
+| `--text-muted` | yok (DS `220 9% 46%` = site `--steel-gray`) | değer eşit, ad farklı (`steel-gray` 339 eşleşme / 80 dosya, sabit yöntem §2.3) | K1 takma ad |
 | `--text-on-dark` | yok (= `--clean-white`) | değer eşit | K1 takma ad |
 | `--text-on-dark-muted` | yok (DS `215 26% 65%`) | karşılığı yok | K2 literal |
 | `--font-sans` | var (Inter) | DS Archivo → farklı font | K3 (font kolu, 2b) |
@@ -148,7 +148,7 @@ spacing ölçeği ve tipografi ölçeği YOK**.
 
 **KRİTİK OLGU:** DS değerleri sitede zaten `--marka-*` adlarıyla var, ama Tailwind `--marka-*`'yı renk olarak yayınlamıyor
 (**0 sınıf kullanımı**). Canlıda kullanılan `primary-navy` ve `brand-cyan` DS'ten AYRI renktir. DS'i bu adlarla koda eşlemek
-~800 sınıf kullanımının rengini değiştirir (görünür); marka adlarına takma adla eşlemek canlıda görsel değişiklik yaratmaz.
+798 eşleşmenin (139 dosya) rengini değiştirir (görünür); marka adlarına takma adla eşlemek canlıda görsel değişiklik yaratmaz.
 
 **Kural 8 ihlalleri** (`git ls-files src/**/*.ts(x)`, test/fixture hariç, 722 dosya) — Faz 5 mandalının ve K-2'nin tabanı:
 - **Arbitrary değer:** vitrin 4 (NavSearchTrigger, NavShell, ContactPage, CategoryShowcaseView: 3 `shadow-[…]`, 1 `aspect-[4/3]`);
@@ -243,7 +243,7 @@ ama cetvel §2.1 "AdminThemeToggle referans veriyor" diyor; **kesinleştirilmedi
 
 | Ad | Site | DS | 2a'da | 2b'de |
 |---|---|---|---|---|
-| `--primary-navy` | `226 71% 40%` | `219 48% 20%` | Dokunulmaz. Aynı DS rengi **yeni adla** (`--text-strong` → `var(--marka-lacivert)`) görünmez eklenir | `--primary-navy: var(--marka-lacivert)` (tek satır, ~796 sınıf rengi değişir) |
+| `--primary-navy` | `226 71% 40%` | `219 48% 20%` | Dokunulmaz. Aynı DS rengi **yeni adla** (`--text-strong` → `var(--marka-lacivert)`) görünmez eklenir | `--primary-navy: var(--marka-lacivert)` (tek satır, 798 eşleşme / 139 dosyanın rengi değişir) |
 | `--brand-cyan` | `189 78% 53%` (koyu zemin tonu) | `194 100% 35%` | Dokunulmaz | `--brand-cyan: var(--marka-turkuaz)`. **Dikkat:** site değeri `53%` açıklıkta, koyu zeminde okunsun diye; DS değeri `35%`. Koyu zeminde kontrast gerçek tarayıcıda ölçülür (**ÖLÇÜLMEDİ**) |
 | `--action-terracotta-deep` | `24.4 91% 39.2%` (#BF5309, K25-b kapalı karar) | `24 91% 39%` | Dokunulmaz | **Dokunulmaz — site değeri kazanır.** Fark kanal ≤2 (INV-TOKEN-AA-RENK-1 payının sınırında); DS'e düzeltme isteği OPS emriyle Design'a gider |
 | `--font-sans` | Inter (`next/font` üretilmiş ad) | Archivo | Dokunulmaz | Font kolu (§2.5); DS dizesiyle eşitlik **aranmaz** (üretilmiş ad hiçbir zaman eşit olmaz) |
@@ -256,12 +256,23 @@ lacivert yaşar, DS "temiz" bir ürün olarak yarım uygulanır. Bu seçim Recep
 ### 2.3 · Admin etkisi (YÜKSEK bulgu)
 
 **Ölçü.** `[data-admin-theme]` bloğu yalnız `--admin-*` adlarını tanımlar; `--primary-navy`, `--brand-cyan`, `--font-sans` adlarını
-**ezmez**. Admin kök `layout.tsx`'in `body`'si altında render edilir. Sayılar: red-team (09-25, HEAD `080e33815`): admin `primary-navy`
-**19 kullanım / 4 dosya**, `text-brand-cyan` 1, açık `font-sans` 2, `font-mono` **63 / 33 dosya**. 10-05'te kaba yeniden sayımla
-(`src/app/admin` + `src/components/admin` + `src/views/admin`, test hariç, ön ek ve varyant dahil) `primary-navy` **30 eşleşme / 8 dosya**,
-`font-mono` **82 / 52 dosya** buldum; envanter çalışanının tüm-site sayısı `font-mono` 68 / 37 dosya. Üç sayım üç farklı sonuç veriyor →
-**sayım yöntemi sabitlenmemiş**; fark "admin etkilenir" sonucunu değiştirmiyor. Faz 2b'nin ön koşulu: tek komutla (`git ls-files`,
-test hariç) sabitlenmiş sayım.
+**ezmez**. Admin kök `layout.tsx`'in `body`'si altında render edilir.
+
+**Sayım yöntemi SABİTLENDİ (ölçüldü 2026-10-05).** Dosya kümesi: `git ls-files 'src/*.ts' 'src/*.tsx'` çıktısından test dosyaları
+(`__tests__`, `.test.`, `.spec.`) atılır → **717 dosya**; "admin" = yolunda `admin` geçen dosyalar → **210 dosya**. Sayı = dosya içeriğinde
+kalıbın **toplam eşleşme sayısı** (`grep -o` mantığı, kalıp `\bprimary-navy\b`, `\bfont-mono\b`, `steel-gray`) / eşleşen dosya sayısı.
+Aynı yöntem Faz 2b ön/sonra ölçümünde tekrarlanır. Kapsam `.ts`/`.tsx` ile sınırlıdır (`src` altındaki `.md`/`.json`/`.css` dosyaları sayıma girmez); girdi notundaki ve
+red-team'deki sayılar bu yöntemle yeniden üretildi.
+
+| Ölçüm (10-05, sabit yöntem) | Admin (210 dosya) | Tüm site (717 dosya) |
+|---|---|---|
+| `primary-navy` | **19 eşleşme / 4 dosya** (red-team 09-25 ile birebir) | 798 / 139 |
+| `font-mono` | **63 / 33 dosya** (red-team ile birebir) | 68 / 37 |
+| `brand-cyan` (`-ink` hariç) | 1 / 1 | 1 / 1 |
+| `font-sans` | 3 / 3 (red-team "açık sınıf 2" saymıştı; kalıp değişken adını da yakalıyor, ayrıştırılmadı) | 4 / 4 |
+| `steel-gray` | 0 / 0 | 339 / 80 |
+
+Admin'de `font-mono` payı tüm sitenin 63/68'i: `fontFamily.mono` DS'e bağlandığında değişimin neredeyse tamamı admin'dedir.
 
 **Faz bazında etki:**
 
@@ -273,7 +284,7 @@ test hariç) sabitlenmiş sayım.
 **Karar (Faz 2b'den ÖNCE, ayrı):** (A) admin dahil edilir — admin DS fontuna ve DS lacivertine geçer; (B) admin dondurulur —
 `[data-admin-theme]` altında eski `--primary-navy`/`--brand-cyan` sabitlenir ve admin için Inter ayrıca yüklenmeye devam eder.
 **Öneri: A.** Gerekçe: B, "Inter 0" ölçütünü bozar (admin için Inter baytı yüklenir), iki lacivert üretir ve her biri için `admin-design-standard`'a
-yazılı istisna ister; A'nın görünür maliyeti küçük sayılardır (yukarıdaki dört sayı). Risk: admin'de `font-mono` etiketlerinin (63–82 kullanım)
+yazılı istisna ister; A'nın görünür maliyeti küçük sayılardır (yukarıdaki dört sayı). Risk: admin'de `font-mono` etiketlerinin (63 kullanım / 33 dosya)
 Plex Mono'ya dönmesi tablo hizasını değiştirebilir — önce/sonra ölçümü bunu gösterir.
 **Kim onaylar:** ADMIN şeridi (`admin-design-standard.md` sahibi) karar verir, Ops kayda alır; Recep Faz 2b önizlemesinde admin
 önce/sonrasını ayrı satır olarak görür. ADMIN kararı olmadan Faz 2b PR'ı açılmaz.
@@ -287,7 +298,7 @@ Plex Mono'ya dönmesi tablo hizasını değiştirebilir — önce/sonra ölçüm
 | 1 | Kabuk (bayrak `YENI_KABUK_GEZINMESI`) | **HAYIR** (bayrak kapalı birleşir); açılış ayrı PR'da **EVET** | INV-KABUK-V18-1 (v18 A1–A5); önizleme dalında bayrak `true` | Recep (K36 + önizleme) | Bayrak `false` | K36 |
 | 2a | Token köprüsü, görünmez kısım | **HAYIR** | Diff yalnız ekleme (`:root` ve `tailwind.extend`); 6 sayfada önce/sonra fark 0; INV-TOKEN-PARITE-1; INV-PALET-1 güncel | Ops | PR revert (tüketici 0) | Ön koşul; K36'yı BEKLEMEZ |
 | 2b | Görünüm dönüşü (renk + yazı tipi) | **EVET (tüm site + admin)** | Önce/sonra ekran; Lighthouse LCP/CLS; font bayt; gerçek tarayıcı kontrast; `\bInter\b`; ISR CSS hash `curl` | **Recep "olur"** + ADMIN şeridi | Tek PR revert; veri/adres etkisi yok | 2a; ADMIN kararı; Recep olur |
-| 3 | `components/ds/` 10 bileşen | **HAYIR** (tüketici yok; galeri rotası yok) | INV-DS-PROP-1; `pnpm knip` sonucu (§2.5) | Ops | PR revert | 2a (K36'yı BEKLEMEZ) |
+| 3 | `components/ds/` 10 bileşen | **HAYIR** (tüketici yok; galeri rotası yok) | INV-DS-PROP-1; bileşen başına Vitest render + axe (INV-DS-GORSEL-1'in yeni tanımı, kontrast hariç); `pnpm knip` sonucu (§2.5) | Ops | PR revert | 2a (K36'yı BEKLEMEZ) |
 | 4 | Sayfa göçleri | **EVET** (sayfa sayfa) | Kareyle yan yana ölçüm (elle, gerçek tarayıcı) | Recep (sıra), URUN (sayfa) | Sayfa PR'ı revert | 2b (renk/font), 3 (bileşen); (2): adres yayını |
 | 5 | Borç eritme | EVET (küçük, kademeli) | INV-BORC-MANDAL-1 (yalnız küçülür) | Ops | PR revert | — |
 | 11 Ekim sonrası | Tek aileli alt kategori sayfası (OPS-71, karar 285 EVET) | EVET (yayınlandığında) | Design prototipiyle yan yana ölçüm | Recep (ürün kararı verildi), URUN yürütür | URUN belirler (**ölçülmedi**) | Kod: 11 Ekim'den SONRA, ÜRÜN ile |
@@ -317,7 +328,7 @@ ayrıca yazılmaz: `StickyHeader`'a bağlanır (tek kabuk).
 5. **`tailwind.config.js`:** `theme.extend` açıkça (red-team §2.6: `theme.spacing`'e yazılırsa varsayılan ölçek silinir). **Yalnız YENİ
    anahtarlar:** renk anahtarları DS adıyla (`marka-*` YOK, §2.1 madde 2); boşluk rolleri `space-*` önekiyle (`w-page` 40 px ile `max-w-page`
    1600 px çakışmasın); yazı ölçeği `fontSize` DS'e özgü adla — **`display` anahtarına yazılmaz** (mevcut akışkan `clamp` anahtarı var,
-   `tokens.js`). Her yeni anahtarın mevcut 47 renk anahtarı ve `tokens.js` anahtarlarıyla çakışması PR'da 0 olarak ölçülür.
+   `tokens.js`). Her yeni anahtarın mevcut 45 renk anahtarı ve `tokens.js` anahtarlarıyla çakışması PR'da 0 olarak ölçülür.
    **`fontFamily.serif`/`mono` BAĞLANMAZ** (Faz 2b).
 6. **Kapı INV-TOKEN-PARITE-1** (ALTYAPI dizininde; lint ve knip görür): her kopya adı için `index.css` `:root`'ta (a) aynı adla ve **çözülmüş
    RGB farkı ≤2** ile (takma ad zinciri çözülür) ya da (b) çakışan küme listesinde. Çakışan küme ad ad listelenir (4 ad; liste kapının içinde, 2b'de
@@ -352,16 +363,26 @@ ayrıca yazılmaz: `StickyHeader`'a bağlanır (tek kabuk).
 (AnaEylemDugmesi, CerceveliDugme, KatliCagriSatiri, AdetKontrolu, KarsilastirmaTablosu, PQEgrisi, TeknikTablo, Cip, HukumKutusu, Kart);
 **`KabukBandi` Faz 1'e bağlıdır** (`StickyHeader`'a bağlanır, ayrı yazılmaz; red-team §2.9). `Kart` ↔ `ProductCard`/`FamilyCard` yakın işlevli:
 `Kart` yazılırken bu iki bileşenle ilişki (mevcut kullanım sayısı) PR'da ölçülür (**ölçülmedi**). Kaynak: DS canlı `.jsx`/`.d.ts`/`.prompt.md`
-(TASARIM kopyalar; alt ajanlar Design'a erişemez, depo içi kopya verilir). **Galeri rotası `/[lang]/ds-galeri` ÇIKARILDI:** K-1 (§3) gereği bu planın hiçbir
-fazı `src/app` altına rota klasörü eklemez; bu aynı zamanda red-team §2.7'nin noindex/robots/bayrak-kilidi riskini ortadan kaldırır. **Sonuç:**
-INV-DS-GORSEL-1 galeri sayfasında koşamaz; görsel doğrulama Faz 4'te gerçek sayfalarda kareyle yan yana ölçümle yapılır (elle, gerçek tarayıcı).
+(TASARIM kopyalar; alt ajanlar Design'a erişemez, depo içi kopya verilir). **Galeri rotası `/[lang]/ds-galeri` ÇIKARILDI (v2'den sapma).**
+*Gerekçe (red-team ne istedi, biz ne seçtik):* red-team §2.7 galerinin **çıkarılmasını istemedi**; galeri kalacaksa `generateMetadata`'da `robots: { index: false }`,
+bayrak kilidi ve kilit testi istedi. Biz çıkarmayı seçtik, çünkü karar 118'in kapısı ("rota klasörü ekleme 0", §3 K-1) **istisna açılmadan sade** kalıyor: galeri
+"hariç" denirse kapı bir adı çakılı istisna taşır, galeri için ayrıca noindex + robots + bayrak kilidi ve bayrak kapalıyken görsel kapının neyi ölçtüğü sorusu doğar.
+*Riski:* bileşenlerin görsel eşitliğini izole bir sayfada (gerçek sayfa bağlamı olmadan) ölçen kapı kaybolur.
+**Yerine (Faz 3 ölçüsü, INV-DS-GORSEL-1'in yeni tanımı):** her `components/ds/` bileşeni için **Vitest render + axe testi** — bileşen yanında (`components/ds/**`
+TASARIM'ın claim'inde), varsayılan hâl + her kip/varyant (Teklif ↔ Satış, K38/K39) render edilir, axe ihlali **0**, `.d.ts` sözleşmesiyle prop uyumu
+INV-DS-PROP-1'de. **Bu testin ÖLÇEMEDİĞİ:** kontrast (axe `color-contrast` kuralı jsdom'da koşmaz, cetvel §3) ve karedeki görünüme eşitlik. Görsel doğrulama Faz 4'te gerçek
+sayfalarda kareyle yan yana ölçüm olarak (elle, gerçek tarayıcı) kalır.
+**CLAUDE.md kural 14 ile gerilim (açıkça adlandırıldı):** kural 14 "testi/kapıyı sonraki işe bırakma" der; görsel eşitlik kapısı Faz 3'ten Faz 4'e kaymış oluyor. Bu bir
+kapsam tavizidir, TASARIM'ın savunması: o ölçüm gerçek sayfa bağlamı olmadan anlam taşımaz ve jsdom'da koşamaz; Faz 3'te yapısal + a11y kapı bugün kurulur. Kapatma koşulu:
+her bileşenin ilk tüketicisi olan Faz 4 PR'ında kareyle yan yana ölçüm rapora sayıyla yazılır. İstenirse alternatif: K-1'e galeri istisnası + noindex + bayrak kilidi (red-team
+yolu) — Ops karar verir (§4, "Ops'a bildirilecekler").
 INV-DS-PROP-1 (prop sözleşmesi, `.d.ts`) kalır. **Risk (ÖLÇÜLMEDİ):** tüketicisi olmayan `components/ds/` dosyaları `pnpm knip`'te "kullanılmayan"
 çıkabilir; Faz 3 PR'ında `pnpm knip` koşulur, çıkarsa muafiyet/ignore ya da bileşenleri ilk tüketiciyle (Faz 4) birlikte getirme kararı Ops'a gider.
 Yol notu: Ops emri `src/components/ui/**` dedi; **`ds/` önerisi sürer** (`ui/`'de DS ile ilgisiz 4 primitif: Pagination, ScrollObserver, Skeleton, VentImage;
 ayrı klasör kapının kapsamını tek glob'la sınırlar). Bu sapma Ops'a **bildirilir**.
 
 **Faz 4 · Sayfalar** (sıra envanter §3 + karar 118 + karar 285). Sayfa dosyaları URUN'un; TASARIM bileşeni verir, kareyle yan yana ölçer.
-1. **Bilgi Merkezi** (URUN kuruyor; DS bileşenleri gelince göçer). Uzun metin ölçüsü kalemi Design cevabını bekler (§1.2).
+1. **Bilgi Merkezi** (URUN kuruyor; DS bileşenleri gelince göçer). Uzun metin ölçüsü DS tokenıyla (`--size-editorial`, `--lh-editorial`; 16 px · 1.6 · 66ch) bağlanır — **bloklanmıyor** (§1.2, Design cevabı geldi).
 2. **Ürün sayfası + kategori/liste görünüm göçü — adres yayınından SONRA, ayrı yayında.** Ön koşul: adres yayını (URUN, REC-300/442 ürün adresi;
    `ADRES_SEMASI_K3B`) canlıda açık ve ölçülmüş. Bugün (10-05) bayrak `false`. v2'nin "adres işiyle aynı yayında" cümlesi **kaldırıldı**:
    görünüm ve adres aynı sürümde değişirse geri alma iki şeyi birden geri alır ve karar 118'in "adres önce" sırasıyla çelişir.
@@ -377,13 +398,19 @@ Taban: §1.3 kural 8 sayıları (arbitrary değer vitrin 4 · admin 2 · diğer 
 
 - **K-1 · Karar 118: tasarım geçişi hiçbir vitrin adresini değiştirmez.** Design karelerindeki adres etiketleri (`/tr/secici`, `/tr/urunler`,
   `/tr/teklif-listesi`, `/tr/hesap/*`) hedef değil çizim notudur; adres kararı yalnız `adres-semasi-standard.md` / REC-300 (URUN) yolundan.
-  **Bu planın hiçbir fazı `src/app` altına yeni rota klasörü eklemez** (galeri rotası bu yüzden çıkarıldı; "galeri hariç" istisnası kalktı).
+  **Bu planın hiçbir fazı `src/app` altına yeni rota klasörü eklemez** (v2'nin galeri rotası çıkarıldı; "galeri hariç" istisnası yok; gerekçe ve riski §2.5 Faz 3'te).
   **Kapının ölçülebilir tanımı:**
   - *Kapsam:* "Faz PR'ı" = dal adı `tasarim/` ile başlayan her PR. URUN'un `urun/*` dalları (adres şeması, Bilgi Merkezi, OPS-71) kapıya tabi DEĞİL.
-  - *Komut (çıktı BOŞ olmalı):* `git diff --name-status --diff-filter=ADR <taban>...HEAD -- 'src/app/**/page.tsx' 'src/app/**/route.ts'
-    'src/app/**/layout.tsx' 'src/app/**/loading.tsx' 'src/app/**/error.tsx' 'src/app/**/not-found.tsx' 'src/app/**/template.tsx' 'src/app/**/default.tsx'`.
+  - *Komut (çıktı BOŞ olmalı):* `git diff --name-status --diff-filter=ADR <taban>...HEAD -- ':(glob)src/app/**/page.tsx' ':(glob)src/app/**/route.ts'
+    ':(glob)src/app/**/layout.tsx' ':(glob)src/app/**/loading.tsx' ':(glob)src/app/**/error.tsx' ':(glob)src/app/**/not-found.tsx' ':(glob)src/app/**/template.tsx'
+    ':(glob)src/app/**/default.tsx'`.
     `A` (ekleme), `D` (silme) ve `R` (taşıma) 0; `M` (değişiklik) serbest — Faz 2b'nin `layout.tsx` font değişikliği `M`'dir.
-  - *İkinci kol:* aynı aralıkta `next.config.mjs` ve `src/middleware.ts` (yönlendirme/yeniden yazma tablosu) için diff **boş**; `src/app/robots*` ve `src/app/sitemap*` için diff **boş**.
+    **Pathspec notu (ölçüldü 10-05):** düz `'src/app/**/layout.tsx'` biçimi kökteki `src/app/layout.tsx` ve `src/app/not-found.tsx` dosyalarını **yakalamaz**
+    (`git ls-files` ile denendi: düz biçim bu ikisini listelemiyor, `:(glob)` biçimi listeliyor; düz `**` en az bir alt dizin ister). Bu yüzden komut `:(glob)` biçimindedir.
+    Komut `35224a3c5...HEAD` aralığında çalıştırıldı: çıktı **boş** (0 ihlal); aynı aralıkta `:(glob)docs/plans/**/*.md` pathspec'i eklenen belgeyi `A` olarak gösterdi
+    (komut biçimi çalışıyor).
+  - *İkinci kol:* aynı aralıkta `next.config.mjs`, `src/middleware.ts`, `':(glob)src/app/robots*'` ve `':(glob)src/app/sitemap*'` için diff **boş** (bu dört yol aynı komuta
+    pathspec olarak eklenir; 10-05'te çıktı boş).
   - *Durum:* bugün kalıcı test **yok** (⚠SINANMIYOR). Şimdilik her `tasarim/*` PR raporuna komut çıktısı sayı olarak yazılır (0). Kalıcı kapı (CI'da dal adı ölçen
     test) ALTYAPI'dan Ops üzerinden istenir; ad önerisi `INV-ADRES-TASARIM-1`, adı Ops/ALTYAPI verir.
   - Zorunlu bir rota ihtiyacı çıkarsa: yalnız kalıcı yönlendirmeyle ve Recep onayıyla; bu plan değişir (v2.2).
@@ -410,9 +437,31 @@ cümlesine ve fazların bağımlılıklarına dayanır. **Karar Recep'indir; TAS
 
 **Sorular:**
 1. **K36 kabuk kararı** — v18 A kanalı kabuğu canlı sitenin kabuğu olsun mu? (Faz 1'in kilidi; yapısal karar, tek başına.)
+   Karar Recep'indir; TASARIM tek öneri yazar, planın kendi metninden ve özellik bayrağından türetilmiştir:
+
+   > **ÖNERİ (K36): "EVET" de, ama kaydı "kabuğun yazımına izin" olarak oku — canlı kabuğu açmaz; açılış ayrı, Recep onaylı PR'dır.**
+   > **Gerekçe (ziyaretçiye etkisi):** `YENI_KABUK_GEZINMESI` kapalı doğuyor ve kodun kendi notu "yarısı açık bir kabuk, kapalı bir kabuktan KÖTÜDÜR" diyor
+   > (`src/config/features.ts:47-48`); bayrak mobil alt sekme çubuğunu ve header "Teklif" panelini tek anahtarla yönetiyor ve açmadan önce gözle doğrulama istiyor
+   > (`:54-56`). Yani K36'ya "evet" demek tek başına ziyaretçinin gördüğünü değiştirmez: bayrak `false` kalır, kilit testleri `= false` bekler, açılış anı Faz 1
+   > önizlemesinden sonra ayrı onaydır (§2.5 Faz 1). K36'nın bağladığı yer yalnız Faz 1 (KabukBandi, bayrak) ve kabuğa bağlı sayfa göçleridir; **Faz 2a ve Faz 3
+   > K36'yı beklemez**, karar gecikse de onlar akar. "Hayır/bekle" denirse Faz 1 durur ve kabuk yazımı belirsiz kalır; envanter kabuk kodunun yazılı ama kapalı olduğunu
+   > söylüyor (`StickyHeader`, `Footer`, `HeaderTeklifPaneli`, `MobilAltSekmeCubugu`), yani beklemenin getirisi "yazılmış kodu kullanmamak"tır.
+   > **Risk:** (1) EVET, v18 A1–A5'in (HAZIR) çekirdeğini taahhüt eder; A0, A2b, A5b, A6, A7 YARIM ve A8/A9 "öneri" (envanter §1 birim 2) — bu karelerin K36 kapsamına
+   > girip girmediği **ölçülmedi**; öneri K36'nın yalnız A1–A5'i kapsaması, yarımların ayrı karar olması. (2) Bayrak açılınca mobil alt çubuk ile header aynı işi iki kez
+   > sunabilir (kodun kendi uyarısı; kapı semantik çakışmayı göremez) → açılış PR'ında gözle ölçüm şart. (3) Kabuk dosyalarının sahibi URUN; URUN'un Faz 1 takvimi
+   > **ölçülmedi**. (4) Recep 09-25'te "önümüzdeki hafta site dizaynıyla yoğunlaşacağız" demişti (niyet var, karar kaydı yok); karar kaydı çıkmadıkça bu niyet plana
+   > bağlanamaz.
 2. **Hangi faz 11 Ekim'e girsin** — öneri yukarıda (Faz 2a). Karar Recep'in.
 3. **Faz 2b görünüm dönüşü** — önizlemede görüp "olur" demesi (soru değil onay; PR hazır olunca; ADMIN kararından sonra).
 - *ADMIN kararı* (dahil/dondur) Recep sorusu değil, ADMIN şerit kararıdır (Ops ADMIN'e taşır, kayda alır); Recep önizlemede admin farkını ayrı satırda görür.
+
+**Ops'a bildirilecekler (v2'den sapmalar ve talepler; Recep sorusu değildir):**
+1. **Galeri rotası çıkarıldı (v2'den sapma).** Gerekçe, riski ve kural 14 gerilimi §2.5 Faz 3'te; yerine bileşen başına Vitest render + axe, görsel doğrulama Faz 4'te elle.
+   Ops isterse alternatif: K-1'e adı çakılı galeri istisnası + `robots: { index: false }` + bayrak kilidi (red-team yolu).
+2. `token-turet.mjs` üreteci çıkarıldı; `ds-kaynak` kopyası + kapı kaldı (§2.5 Faz 2a).
+3. `components/ds/` yolu (Ops emri `components/ui/**` demişti) sürüyor; `KabukBandi` Faz 1'e bağlandı, Faz 3 = 10 bileşen.
+4. INV-PALET-1 4. kol güncellemesi için ALTYAPI emri (Faz 2a'dan önce); kalıcı K-1 kapısı (`INV-ADRES-TASARIM-1` önerisi) talebi.
+5. Uzun metin ölçüsü çelişkisi kapandı (Design cevabı; Linear yorumu doğrudan okunmadı, Ops aktarımı) — hiçbir faz bloklanmıyor.
 
 ## 5 · Sahiplik
 
@@ -446,20 +495,22 @@ bileşen ayaklarıyla ve takma ad kuralıyla güncel · `storefront-design-stand
 | Kalem | Durum | Kim / ne zaman |
 |---|---|---|
 | DS dosya içerik sürüm farkı | ölçülmedi (yalnız `updatedAt` + sayılar) | TASARIM, Faz 2a adım 2 |
-| Uzun metin ölçüsü (16/1.6/66ch ↔ 17/1.65/720 px) | **AÇIK**, Design cevabı bekleniyor | Design; yalnız Faz 4(1) uzun metin kalemini bloklar |
+| Uzun metin ölçüsü: DS değeri 16 px/1.6/66ch geçerli (Design cevabı, Menü v18 3 Ekim) | **KAPANDI** (Ops aktarımı; Linear yorumu `8a37e60b` bu oturumda DOĞRUDAN okunmadı; Menü v18 3 Ekim sürümü DesignSync ile okunmadı) | Faz 2a kopyayı okurken `--size-editorial`/`--lh-editorial` değerini teyit eder; hiçbir faz bloklanmıyor |
 | `kenar.css` / `yuzey.css` ad listesi, `--radius` çakışması | ölçülmedi | TASARIM, Faz 2a adım 2 |
 | DS'in kalan ~51 adı için ad ad eşleşme ve `SILINENLER` kesişimi | ölçülmedi | TASARIM, Faz 2a adım 2 |
 | `font-serif` kullanım sayısı | ölçülmedi | TASARIM, Faz 2b ön ölçüm |
 | Hangi ham HEX'in DS karşılığı olduğu | ölçülmedi | Faz 5 mandalı kurulurken |
 | `tailwindcss/no-arbitrary-value` muafiyeti, `pnpm lint` | koşulmadı | Faz 5 |
-| Admin kullanım sayıları (19/4 ↔ 30/8; 63/33 ↔ 82/52 ↔ 68/37) | sayım yöntemi farklı, çözülmedi | TASARIM, Faz 2b ön koşulu |
+| Admin kullanım sayıları | **ölçüldü 10-05, yöntem sabitlendi** (§2.3): primary-navy 19/4, font-mono 63/33; admin `font-sans` 3/3'ün ayrıştırması (sınıf mı değişken adı mı) ölçülmedi | TASARIM, Faz 2b ön/sonra (aynı yöntemle) |
 | `.light` sınıfı gerçekten ölü mü | kaba grep'te uygulayan kod yok; cetvel "AdminThemeToggle referans veriyor" diyor; kesinleşmedi | ADMIN/ALTYAPI, silmeden önce |
 | `--text-muted` takma adının `prefers-contrast` davranışı | ölçülmedi | TASARIM, Faz 2a (gerçek tarayıcı) |
 | `--brand-cyan` yeni değerinin koyu zeminde kontrastı | ölçülmedi | TASARIM, Faz 2b |
 | Faz 2a "görünmez" ölçüsü (6 sayfada fark 0) | ölçülmedi | TASARIM, Faz 2a PR'ı |
 | ISR sayfalarında CSS hash yayılımı | ölçülmedi | TASARIM, Faz 2b dağıtımı sonrası |
 | `components/ds/` tüketicisiz → `pnpm knip` | ölçülmedi | TASARIM, Faz 3 PR'ı |
-| Faz 3 bileşenlerinin uzun metin ölçüsünü Faz 4'e kadar kullanmadığı | ölçülmedi | TASARIM, Faz 3 PR'ı |
+| Menü v18 3 Ekim sürümünün DS değerine döndüğünün DesignSync ile doğrudan teyidi | ölçülmedi (Ops aktarımına dayanır) | TASARIM, Faz 2a kopya okuması |
+| Galeri yerine Vitest render + axe kapısının yeterliliği (kural 14 gerilimi) | ölçülmedi; kontrast ve kareye eşitlik jsdom'da ölçülemez | Faz 4 ilk tüketici PR'ı; Ops alternatifi seçerse K-1 istisnası |
+| K36 kapsamında A0, A2b, A5b, A6, A7 (YARIM) karelerinin olup olmadığı; URUN'un Faz 1 takvimi | ölçülmedi | Recep/Ops (K36), URUN |
 | Karar 271 "dilim 1" içeriği | bu belgenin girdisinde yok | Ops |
 | OPS-71 geri alma yöntemi | ürün tarafı belirler | URUN |
 | `board.cjs who` claim durumu (10-05) | koşulmadı | Ops |
@@ -467,8 +518,10 @@ bileşen ayaklarıyla ve takma ad kuralıyla güncel · `storefront-design-stand
 
 ---
 
-**ÖLÇÜM:** 2026-10-05 · master `fe2a7fa95` (çalışma ağacı tabanı `35224a3c5`, `fe2a7fa95`'in torunu; `src/index.css`, `tailwind.config.js`,
-`src/design-system`, `src/app/layout.tsx` ve `marka-palet-tokenlari.test.ts` dosyalarında `fe2a7fa95`→`35224a3c5` farkı **0**, `git diff --stat` boş) · kaynak dosyalar:
+**ÖLÇÜM:** 2026-10-05 · master `fe2a7fa95`; ana depo bugünkü HEAD `74e50d280`; ilgili dosyalarda (`src/index.css`, `tailwind.config.js`, `src/design-system`, `src/app/layout.tsx`,
+`marka-palet-tokenlari.test.ts`) `fe2a7fa95`→HEAD diff boş (doğrulayıcı ölçtü). Bu belgenin sayımları ve K-1 komutu çalışma ağacında (taban `35224a3c5`, `fe2a7fa95`'in torunu) koşuldu;
+aynı dosyalarda `fe2a7fa95`→`35224a3c5` farkı da **0** (`git diff --stat` boş, yazarın ölçümü). Uzun metin ölçüsü kapanışı (Design cevabı) Ops aktarımıdır: Linear yorumu `8a37e60b` bu oturumda
+DOĞRUDAN okunmadı · kaynak dosyalar:
 `docs/plans/tasarim-kod-plani-v2-2026-09-25.md`, `docs/plans/red-team-tasarim-kod-plani-v2-2026-09-25.md`,
 `docs/standards/marka-token-eslemesi-standard.md`, `src/__tests__/conformance/marka-palet-tokenlari.test.ts` (dosyadan okundu; takma ad regex'i yerel betikle örnek
 dizeler üzerinde denendi, test koşulmadı), `docs/audits/tasarim-envanteri-2026-09-25.md`, v2.1 girdi ölçüm notu 2026-10-05 (DS `updatedAt`/token/bileşen/kart sayıları, site token
