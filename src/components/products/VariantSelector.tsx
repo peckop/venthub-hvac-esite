@@ -351,7 +351,10 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                       <span className="text-xs font-black text-industrial-gray uppercase tracking-widest truncate">
                         {variantLabel(v, lang)}
                       </span>
-                      <span className="text-xs font-medium text-steel-gray truncate">{v.sku}</span>
+                      {/* URN-32: eskiden ham `v.sku` basılıyordu (müşteriye İÇ KOD). Liste kipiyle AYNI çözücü:
+                          görünen ad (`getProductDisplayName`) — aynı model kodunu paylaşan üyeleri
+                          (T / TP / PIR / HCS) ayırt eden de bu ad. Bekçi: INV-SKU-GORUNMEZ-1 (K5). */}
+                      <span className="text-xs font-medium text-steel-gray truncate">{getProductDisplayName(v, null, lang)}</span>
                     </span>
                     {specKeys.map((key) => (
                       <span key={key} className="text-xs font-bold text-industrial-gray truncate">

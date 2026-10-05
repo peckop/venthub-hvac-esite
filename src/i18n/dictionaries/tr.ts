@@ -1896,7 +1896,8 @@ export const tr = {
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Mühendislik Analizi',
-      sku: 'SKU',
+      /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
+      modelCode: 'Model Kodu',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
     },
     actions: {
@@ -2448,8 +2449,8 @@ export const tr = {
     reorderedToast: '{{count}} ürün sepete eklendi',
     reorderNotFound: 'Ürünler stokta bulunamadı',
     reorderError: 'Tekrar sipariş sırasında hata',
-    /** Sipariş anındaki SKU (snapshot) — katalogtaki güncel SKU değil. */
-    skuLabel: 'SKU: {{sku}}',
+    /** Kalemin GÜNCEL katalog model kodu (sipariş-anı snapshot'ı değil); ham SKU değildir. */
+    modelCodeLabel: 'Model Kodu: {{code}}',
     shippingInfo: 'Kargo / Takip',
     carrier: 'Kargo Firması',
     trackingNumber: 'Takip Numarası',

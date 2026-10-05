@@ -148,3 +148,78 @@ describe('VariantSelector: Modeller satırları gerçek bağlantı', () => {
     expect(onSelect).not.toHaveBeenCalled()
   })
 })
+
+/**
+ * URN-32 — matris görünümünde müşteriye HAM İÇ SKU basılmaz (INV-SKU-GORUNMEZ-1).
+ *
+ * Eskiden matris satırının ikinci satırı `{v.sku}` idi (≥20 modelli beş ailede: seat-serisi 40,
+ * vort-quadro-evo 23, jet-serisi 21, vort-qbk-sal-kc-evo 21, storm-serisi 20). Doğru olan liste
+ * kipindeki gibi görünen ad: aynı model kodunu paylaşan T / TP / PIR / HCS üyelerini ayırt eden de o.
+ * Bu test GERÇEK bileşeni renderlar ve ekrandaki METNİ ölçer (öznitelikler — `href` içindeki
+ * `?sku=` — metin değildir ve bilerek serbesttir).
+ */
+describe('VariantSelector: matris satırı iç SKU basmaz (URN-32)', () => {
+  const EKLER = ['T', 'TP', 'PIR', 'HCS'] as const
+  // Gerçek aileye benzer: aynı model_code, ayırt edici yalnız ad; SKU iç kod biçiminde.
+  const ailevi = (n: number): FamilyVariant[] =>
+    Array.from({ length: n }, (_, i) => ({
+      id: `id-${i}`,
+      sku: `VRT-${17100 + i}`,
+      name: `Vortice QE 60 LL ${EKLER[i % EKLER.length]}`,
+      slug: null,
+      model_code: `QE 60 LL-${i}`,
+      price: null,
+      stock_qty: 1,
+      technical_specs: { debi: i, guc: i * 2 },
+      description: null,
+      images: [],
+    }))
+
+  it('20+ model, matris kipi: hiçbir satırın METNİNDE sku yok; ayırt edici ad (T/TP/PIR/HCS) ve model kodu var', () => {
+    const v = ailevi(24)
+    const { container, getByText } = render(
+      <VariantSelector variants={v} selectedSku={null} onSelect={() => {}} modelAdresi={adres} quoteMode />,
+    )
+    fireEvent.click(getByText('pdp.variant.viewMatrix'))
+
+    const satirlar = [...container.querySelectorAll('a[href]')]
+    expect(satirlar).toHaveLength(24)
+    satirlar.forEach((satir, i) => {
+      const metin = satir.textContent ?? ''
+      expect(metin, `satır ${i}: ham SKU müşteri metninde`).not.toContain(v[i].sku)
+      expect(metin).not.toMatch(/VRT-\d+/)
+      expect(metin, `satır ${i}: ayırt edici ad görünmüyor`).toContain(v[i].name)
+      expect(metin).toContain(v[i].model_code as string)
+    })
+    // Tüm bileşenin görünür metni de temiz (başlık, kolon, arama kutusu dahil).
+    expect(container.textContent).not.toMatch(/VRT-\d+/)
+    // Satırın ikinci satırı görünen ad: dört ayırt edici ek (T/TP/PIR/HCS) dört AYRI metin olarak çıkıyor.
+    const adSatirlari = satirlar.map((s) => s.querySelector('span.flex-col > span:last-child')?.textContent)
+    expect(new Set(adSatirlari)).toEqual(new Set(EKLER.map((ek) => `Vortice QE 60 LL ${ek}`)))
+  })
+
+  it('model kodu OLMAYAN üyede de sku çıkmaz: etiket görünen ada düşer', () => {
+    const v = ailevi(21).map((x) => ({ ...x, model_code: null }))
+    const { container, getByText } = render(
+      <VariantSelector variants={v} selectedSku={null} onSelect={() => {}} modelAdresi={adres} quoteMode />,
+    )
+    fireEvent.click(getByText('pdp.variant.viewMatrix'))
+    const satirlar = [...container.querySelectorAll('a[href]')]
+    expect(satirlar).toHaveLength(21)
+    satirlar.forEach((satir, i) => {
+      expect(satir.textContent).toContain(v[i].name)
+      expect(satir.textContent).not.toMatch(/VRT-\d+/)
+    })
+  })
+
+  it('seçim hâlâ SKU kimliğiyle çalışır (kimlik kullanımı serbest, yalnız basım yasak)', () => {
+    const v = ailevi(22)
+    const onSelect = vi.fn()
+    const { container, getByText } = render(
+      <VariantSelector variants={v} selectedSku={null} onSelect={onSelect} modelAdresi={adres} quoteMode />,
+    )
+    fireEvent.click(getByText('pdp.variant.viewMatrix'))
+    fireEvent.click(container.querySelectorAll('a[href]')[3])
+    expect(onSelect).toHaveBeenCalledWith(v[3].sku)
+  })
+})
