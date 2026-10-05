@@ -159,8 +159,76 @@ function satir(token, pencere) {
  * yarım dosya görmez. sid yalnız UUID ise yazılır (yol enjeksiyonu yok).
  */
 const SID_BICIMI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const BOS_DURUM = Object.freeze({ durumDosyasi: null, durumBulundu: null, yarimIs: 'bilinmiyor' })
 
-function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date()) {
+/**
+ * ── COMPACT HAZIRLIK VERİSİ (ARC-31 madde 2, 10-05) ──
+ * Kokpitin "Açık pencereler" satırı ≥%50'de pencerenin durum dosyası güncel mi / yarım iş var mı / hüküm ne satırını gösterir.
+ * Durum dosyasını BULMA mantığı tek yerde kalır (precompact-durum-kapisi.cjs: kimlik, şerit adı, gün klasörleri); mod onu kopyalamaz.
+ * Bulma ~300 ms sürer (ölçüldü 10-05), her istemde koşamaz: bulunan yol pencere dosyasında saklanır, bağlam %40'ı geçince
+ * ve en çok 10 dakikada bir yeniden aranır. "Yarım iş" ifadesi dosyanın SON 24 KB'ından okunur (<1 ms).
+ * Dosya içeriği ekrana ya da bağlama GİRMEZ: yalnız sabit sözlükten bir değer çıkar ('yok' | 'var' | 'bilinmiyor').
+ */
+const HAZIRLIK_ESIGI = 0.4
+const DURUM_ARAMA_ARALIGI_MS = 10 * 60 * 1000
+const DURUM_OKUMA_BAYT = 24 * 1024
+
+/** Dosyadaki SON "yarım iş yok/var" ifadesi. Yoksa 'bilinmiyor'. Güvenli yön: belirsizlik "yok" demez. */
+function yarimIsOku(metin) {
+  const kucuk = String(metin).toLocaleLowerCase('tr')
+  let son = null
+  for (const m of kucuk.matchAll(/yar[ıi]m i[şs](?:im|lerim)?\s*[:=]?\s*(yok|var)(?![a-zçğıöşü])/g)) son = m[1]
+  return son === 'yok' || son === 'var' ? son : 'bilinmiyor'
+}
+
+function sonBaytlar(yol, bayt) {
+  const fd = fs.openSync(yol, 'r')
+  try {
+    const boy = fs.fstatSync(fd).size
+    const baslangic = Math.max(0, boy - bayt)
+    const tampon = Buffer.alloc(boy - baslangic)
+    fs.readSync(fd, tampon, 0, tampon.length, baslangic)
+    return tampon.toString('utf8')
+  } finally {
+    fs.closeSync(fd)
+  }
+}
+
+/**
+ * Pencere dosyasına yazılacak durum alanları. FAIL-OPEN: her hata BOS_DURUM'a (bilinmiyor) düşer, kancayı bozmaz.
+ * `bul(sid, transcriptPath)` → { tam } | null; testte yerine konur.
+ */
+function pencereDurumOzeti(klasor, sid, transcriptPath, token, pencere, simdi = Date.now(), bul = null) {
+  try {
+    if (!SID_BICIMI.test(String(sid || ''))) return BOS_DURUM
+    let onceki = {}
+    try {
+      onceki = JSON.parse(fs.readFileSync(path.join(klasor, String(sid).toLowerCase() + '.json'), 'utf8'))
+    } catch {
+      onceki = {}
+    }
+    let yol = typeof onceki.durumDosyasi === 'string' ? onceki.durumDosyasi : null
+    let bulundu = typeof onceki.durumBulundu === 'number' ? onceki.durumBulundu : null
+    if (yol !== null && !fs.existsSync(yol)) {
+      yol = null
+      bulundu = null
+    }
+    const oran = typeof token === 'number' && pencere > 0 ? token / pencere : 0
+    const eskidi = bulundu === null || simdi - bulundu > DURUM_ARAMA_ARALIGI_MS
+    if (oran >= HAZIRLIK_ESIGI && (yol === null || eskidi)) {
+      const bulucu = bul || require(path.join(__dirname, 'precompact-durum-kapisi.cjs')).durumDosyasiBul
+      const r = bulucu(String(sid).toLowerCase(), transcriptPath)
+      yol = r && typeof r.tam === 'string' ? r.tam : null
+      bulundu = simdi
+    }
+    if (yol === null) return { durumDosyasi: null, durumBulundu: bulundu, yarimIs: 'bilinmiyor' }
+    return { durumDosyasi: yol, durumBulundu: bulundu, yarimIs: yarimIsOku(sonBaytlar(yol, DURUM_OKUMA_BAYT)) }
+  } catch {
+    return BOS_DURUM
+  }
+}
+
+function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date(), durum = BOS_DURUM) {
   try {
     if (!SID_BICIMI.test(String(sid || ''))) return null
     if (token === null || token === undefined) return null
@@ -172,6 +240,10 @@ function pencereDosyasiYaz(klasor, sid, token, pencere, rol, simdi = new Date())
       pencere,
       saat: simdi.toISOString(),
       rol: rol ? String(rol).toUpperCase() : null,
+      // Compact hazırlığı (ARC-31 madde 2): kokpit ≥%50'de bu üç alandan "durum dosyası güncel mi / yarım iş / hüküm" satırını kurar.
+      durumDosyasi: typeof durum.durumDosyasi === 'string' ? durum.durumDosyasi : null,
+      durumBulundu: typeof durum.durumBulundu === 'number' ? durum.durumBulundu : null,
+      yarimIs: durum.yarimIs === 'yok' || durum.yarimIs === 'var' ? durum.yarimIs : 'bilinmiyor',
     }
     fs.mkdirSync(klasor, { recursive: true })
     const hedef = path.join(klasor, kayit.sid + '.json')
@@ -194,6 +266,10 @@ module.exports = {
   sonBaglam,
   satir,
   pencereDosyasiYaz,
+  pencereDurumOzeti,
+  yarimIsOku,
+  HAZIRLIK_ESIGI,
+  DURUM_ARAMA_ARALIGI_MS,
   PENCERE_KLASORU,
   COMPACT_SONRASI,
   DOLUYOR,

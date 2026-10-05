@@ -1,4 +1,10 @@
 [
   { "id": "hakkimizda", "klasor": "about", "tr": "hakkimizda", "en": "about" },
-  { "id": "iletisim", "klasor": "contact", "tr": "iletisim", "en": "contact" }
+  { "id": "iletisim", "klasor": "contact", "tr": "iletisim", "en": "contact" },
+  { "id": "secici", "klasor": "urun-secici", "tr": "secici", "en": "selector" },
+  { "id": "sss", "klasor": "destek/sss", "tr": "sss", "en": "faq" },
+  { "id": "yasal-kvkk", "klasor": "legal/kvkk", "tr": "yasal/kvkk-aydinlatma-metni", "en": "legal/privacy-notice-kvkk" },
+  { "id": "yasal-gizlilik", "klasor": "legal/gizlilik-politikasi", "tr": "yasal/gizlilik-politikasi", "en": "legal/privacy-policy" },
+  { "id": "yasal-cerez", "klasor": "legal/cerez-politikasi", "tr": "yasal/cerez-politikasi", "en": "legal/cookie-policy" },
+  { "id": "yasal-mesafeli", "klasor": "legal/mesafeli-satis-sozlesmesi", "tr": "yasal/mesafeli-satis-sozlesmesi", "en": "legal/distance-sales-contract" }
 ]
