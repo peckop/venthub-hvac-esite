@@ -95,6 +95,12 @@ describe('INV-HARITA-URET-1 · iş akışı yapısı', () => {
     expect(GOVDE).toMatch(/if-no-files-found:\s*error/)
   })
 
+  it('iş YALNIZ master dalında koşar ve checkout belirteci diskte bırakmaz (güvenlik incelemesi)', () => {
+    expect(GOVDE).toMatch(/^\s{4}if:\s*github\.ref == 'refs\/heads\/master'\s*$/m)
+    const checkout = GOVDE.split(/^ {6}- name:/m).find((a) => /actions\/checkout@/.test(a)) ?? ''
+    expect(checkout).toMatch(/persist-credentials:\s*false/)
+  })
+
   it('kurulum adımı betik çalıştırmaz (--ignore-scripts) ve sırrı görmez', () => {
     expect(GOVDE).toMatch(/pnpm install --frozen-lockfile --ignore-scripts/)
   })
@@ -106,7 +112,7 @@ describe('INV-HARITA-URET-1 · yazma çağrısı 0', () => {
     'scripts/adres/harita-uret-yardimci.ts',
     'src/lib/adres/haritaUret.ts',
   ]
-  it.each(DOSYALAR)('%s: yazma çağrısı yok', (dosya) => {
+  it.each(DOSYALAR)('%s: yazma çağrısı yok', (dosya: string) => {
     // Yorum satırları çıkarılır: "insert/update yok" gibi açıklamalar çağrı sayılmasın.
     const kod = oku(dosya)
       .split('\n')
