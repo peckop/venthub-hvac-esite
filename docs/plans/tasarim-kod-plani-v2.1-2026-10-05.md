@@ -1,5 +1,7 @@
 # Tasarım → Kod Planı v2.1 (2026-10-05, TASARIM) — TASLAK
 
+> **YERİNE v2.2 GEÇER:** `docs/plans/tasarim-kod-plani-v2.2-2026-10-05.md` (karar 271: 11 Ekim tam kapsam). Bu dosya tarihçedir; gövdesi değişmedi.
+
 > **DURUM: TASLAK — ONAYSIZ, UYGULANMAZ.** Bu belge `tasarim-kod-plani-v2-2026-09-25.md` planının yerine geçer; v2 dosyası
 > tarihçe olarak durur. v2'nin bağımsız denetimi (`red-team-tasarim-kod-plani-v2-2026-09-25.md`: 1 Kritik, 3 Yüksek, DARALT
 > hükümleri) bu belgede **tek tek işlendi** (aşağıdaki iki tablo). Uygulama için Ops'un iki kararı gerekir: K36 (kabuk) ve hangi
