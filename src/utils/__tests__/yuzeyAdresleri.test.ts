@@ -9,9 +9,10 @@
  * Varsayılan bayrakla (gerçek `features.ts`) koşar; bayrağın kendisi `adresUret.test.ts`'te sabit.
  * Açık kipin varsayılanla (vekil, middleware, bilgi merkezi) davranışı: `yuzeyAdresleriK3b.test.tsx`.
  */
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { cozumKartiAdresi } from '../../components/home/ApplicationSolutions'
+import { modellerdenVeri, yayindaVeriAyarla } from '../../config/__tests__/yayindaTestKiti'
 import { type ProductRouteDeps,resolveProductRoute } from '../../lib/data/productRoute'
 import {
   buildBreadcrumbJsonLd,
@@ -29,6 +30,17 @@ import {
   urunDetayYoluMu,
   urunlerBolumuOnekleri,
 } from '../yuzeyAdresleri'
+
+// URN-31: model adresi yalnız yayındaki listedeki SKU için üretilir; adres metni listeden. Varsayılan liste: üç SKU,
+// adres metni aile slug'ı (eski beklentilerle aynı). Bayrak KAPALI kolları listeden bağımsızdır (INV-YAYINDA-MODEL-7).
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() =>
+  yayindaVeriAyarla(
+    modellerdenVeri(
+      ['SEA-61143003', 'SEA-1', 'SEA-2'].map((sku) => ({ aile: 'storm-serisi', sku, tr: 'storm-serisi', en: 'storm-serisi' })),
+    ),
+  ),
+)
 
 describe('adresRotalari — vekilin (useLocalizedRoutes) ve sunucu yüzeylerinin ortak üreticisi', () => {
   // [çağrı, dil, BUGÜNKÜ çıktı, K3-b çıktısı]
@@ -273,6 +285,8 @@ function deps(o: Partial<ProductRouteDeps> = {}): ProductRouteDeps {
 
 describe('resolveProductRoute — yönlendirme hedefi', () => {
   it('varyant slug: KAPALI bugünkü ?sku=, AÇIK modelin adresi', async () => {
+    // Adres metni yayındaki listeden gelir: bu testte modelin listedeki metni `storm-10`.
+    yayindaVeriAyarla(modellerdenVeri([{ aile: 'storm-serisi', sku: 'SEA-1', tr: 'storm-10', en: 'storm-10' }]))
     const d = () => deps({ variantBySlug: vi.fn().mockResolvedValue({ sku: 'SEA-1', family_id: 'f' }) })
     expect(await resolveProductRoute('storm-10', 'tr', d())).toMatchObject({ kind: 'redirect', to: '/tr/products/storm-serisi?sku=SEA-1' })
     expect(await resolveProductRoute('storm-10', 'en', d(), false)).toMatchObject({ to: '/en/products/storm-serisi?sku=SEA-1' })

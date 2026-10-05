@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { modellerdenVeri, yayindaVeriAyarla } from '@/config/__tests__/yayindaTestKiti'
 import { type AdresDili, adresUret } from '@/utils/adresUret'
 
 import { eskiAdresEsle } from '../eslestirici'
@@ -13,6 +14,13 @@ import { fiksturHaritasi, modelSlugluHarita } from './fikstur'
  * REC-300 Faz 3 m.4 — ESKİ ADRES EŞLEYİCİSİ (plan §4.1, §6). Her kuralın en az bir testi; kural
  * numaraları `eslestirici.ts` başlığındakilerle aynı.
  */
+// URN-31: model hedefi yalnız yayındaki listedeki SKU için üretilir (adres metni listeden; fikstürdeki Faz 2 metinleri).
+// Liste dışı SKU davranışı: eslestiriciYayinda.test.ts.
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+const SEA = { aile: 'storm-serisi', sku: 'SEA-61143003', tr: 'storm-14-atex-cati-fani', en: 'storm-14-atex-roof-fan' }
+const VRT = { aile: 'vortice-vort-commercial-in-line-rectangular', sku: 'VRT-CA-IL-4020-ES-RECT', tr: 'vortice-ca-il-4020-kanal-fani', en: 'vortice-ca-il-4020-duct-fan' }
+beforeEach(() => yayindaVeriAyarla(modellerdenVeri([SEA])))
+
 const h = fiksturHaritasi()
 
 function esle(yol: string, sku: string | null = null, dil: AdresDili = 'tr', harita: KiraciHaritasi = h) {
@@ -134,6 +142,7 @@ describe('kural 4 — ?sku= ayrıştırılır, hedefte query YOK', () => {
   })
 
   it('eski ürün slug\'ı → model kanoniği', () => {
+    yayindaVeriAyarla(modellerdenVeri([SEA, VRT]))
     expect(esle('/en/products/vortice-ca-il-4020-es-rect-16076', null, 'tr', m).sonuc?.hedef).toBe(
       '/en/products/vortice-ca-il-4020-duct-fan-p-vrt-ca-il-4020-es-rect'
     )
@@ -144,7 +153,8 @@ describe('kural 4 — ?sku= ayrıştırılır, hedefte query YOK', () => {
     expect(esle('/en/products/storm-serisi', 'YOK-1').sonuc).toBeNull()
   })
 
-  it('model adres metni yokken (Faz 2 öncesi) EN kanonik aile + ?sku= kendine yönlenmez (model seçimi düşmesin)', () => {
+  it('SKU yayında değilken (liste dışı / boş liste) EN kanonik aile + ?sku= kendine yönlenmez (model seçimi düşmesin)', () => {
+    yayindaVeriAyarla({ modeller: {}, surumler: {} })
     expect(esle('/en/products/storm-serisi', 'SEA-61143003').sonuc).toBeNull()
   })
 
@@ -169,7 +179,7 @@ describe('kural 5 — hedefler yeni şemadan (adresUret(…, dil, true))', () =>
     )
     expect(esle('/tr/products/storm-serisi').sonuc?.hedef).toBe(adresUret({ tur: 'aile', slug: 'storm-serisi' }, 'tr', true))
     expect(esle('/tr/products/storm-serisi', 'SEA-61143003', 'tr', m).sonuc?.hedef).toBe(
-      adresUret({ tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003', slug: 'storm-14-atex-cati-fani' }, 'tr', true)
+      adresUret({ tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003' }, 'tr', true)
     )
   })
 })

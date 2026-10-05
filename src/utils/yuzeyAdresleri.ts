@@ -18,6 +18,7 @@ import type { Route } from 'next'
 
 import { BILGI_MERKEZI_BOLUMU, EN_KAPALI_LISTE_HEDEFI } from '../config/bilgiMerkeziYonlendirmeleri.mjs'
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
+import { modelAdresiVarMi } from '../config/yayindaModeller'
 import { rotaDiliCevirOku, rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
 import { type AdresDili, adresUret } from './adresUret'
 import { localizedHref, Routes } from './routes'
@@ -65,7 +66,7 @@ export function adresRotalari(dil: AdresDili, bayrak: boolean = ADRES_SEMASI_K3B
       if (!slug) return adresUret({ tur: 'urunler' }, dil, true)
       if (UUID.test(slug)) return localizedHref(Routes.product(slug, sku), dil)
       return sku
-        ? adresUret({ tur: 'model', aileSlug: slug, sku, slug }, dil, true)
+        ? adresUret({ tur: 'model', aileSlug: slug, sku }, dil, true)
         : adresUret({ tur: 'aile', slug }, dil, true)
     },
     products: (params) => {
@@ -91,6 +92,31 @@ export function modelBaglantiAdresi(
   bayrak: boolean = ADRES_SEMASI_K3B,
 ): string {
   return adresRotalari(dil, bayrak).product(aileSlug, sku)
+}
+
+/** Model seçiminin (PDP `handleSelectVariant`) hedefi: adrese GİT (`router.push`) ya da `?sku=` yaz (`router.replace`). */
+export type ModelSecimiHedefi = { tur: 'git'; adres: string } | { tur: 'sorgu' }
+
+/**
+ * Seçicide bir modele tıklanınca ne olur? (URN-31, INV-YAYINDA-MODEL-4 — en kritik istemci kusuru: yayında
+ * olmayan modelin adresine push = 404.)
+ *
+ *  - KAPALI kip ve model sayfasında DEĞİLİZ → bugünkü `?sku=` yazıcısı (`sorgu`).
+ *  - Hedef SKU yayında DEĞİL ve aile sayfasındayız → yine `?sku=` yazıcısı (model sayfası yok; geçmiş şişmez).
+ *  - Aksi hâlde `adresUret` adresine git: liste içi → modelin sayfası; model sayfasındayken liste dışı kardeşe →
+ *    aile sayfası + `?sku=` (model sayfasında `?sku=` yazmak seçimi değiştirmezdi: sunucu seçili modeli verir).
+ * `modelSayfasinda` = rota sunucuda bir SKU seçtiyse (`sunucuSku`). `bayrak` yalnız test içindir.
+ */
+export function modelSecimiHedefi(
+  dil: AdresDili,
+  aileSlug: string,
+  sku: string,
+  modelSayfasinda: boolean,
+  bayrak: boolean = ADRES_SEMASI_K3B,
+): ModelSecimiHedefi {
+  if (!modelSayfasinda && !bayrak) return { tur: 'sorgu' }
+  if (!modelSayfasinda && !modelAdresiVarMi(sku)) return { tur: 'sorgu' }
+  return { tur: 'git', adres: adresUret({ tur: 'model', aileSlug, sku }, dil, bayrak) }
 }
 
 /**
