@@ -3,7 +3,7 @@
 > Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`); elle düzenleme. Yürürlükte — REC-433 Recep onayı 2026-09-29.
 
 ## Görev
-CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi.
+CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi; rota dili satırı ve yönlendirme (arama sonuç sayfasının kendisi URUN'dur).
 
 ## Yönetim (karar 201)
 - Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
