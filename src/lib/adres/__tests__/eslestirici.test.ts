@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import { type AdresDili, adresUret } from '@/utils/adresUret'
@@ -198,5 +201,34 @@ describe('kural 6 — kanonik adres ve tanınmayan yol → null', () => {
 
   it('kiracının haritası yoksa null (tahmin yürütülmez)', () => {
     expect(eskiAdresEsle(undefined, { yol: '/tr/category/fans', sku: null, dilTespit: () => 'tr' })).toBeNull()
+  })
+})
+
+describe('istek yolu işleme — ikinci dereceden yavaşlama (ReDoS) yok (ALT-15)', () => {
+  // normalizeEt middleware'de İSTEK yolunda çalışır. Eski `replace(/\/+$/, '')` 64.000 ardışık `/` + harfte
+  // ≈ 3 sn CPU yiyordu (kare büyüme); doğrusal döngü ≈ 0.
+  it('kaynakta sondaki-eğik-çizgi kırpan düzenli ifade YOK (yorumlar hariç)', () => {
+    const kaynak = readFileSync(join(process.cwd(), 'src', 'lib', 'adres', 'eslestirici.ts'), 'utf8')
+    const kod = kaynak
+      .split('\n')
+      .filter((satir) => !/^\s*(\/\/|\/\*|\*)/.test(satir))
+      .join('\n')
+    expect(kod.includes('replace(/\\/+$/')).toBe(false)
+  })
+
+  it('64.000 ardışık `/` + harf: eskiAdresEsle 250 ms altında', () => {
+    const kotu = `${'/'.repeat(64_000)}x`
+    const t0 = performance.now()
+    expect(esle(kotu).sonuc).toBeNull()
+    expect(performance.now() - t0).toBeLessThan(250)
+  })
+
+  it('kırpma davranışı eskisiyle aynı: sondaki bir ya da çok `/` aynı sonucu verir, yalnız `/` eşleşmez', () => {
+    const referans = esle('/tr/category/fans').sonuc
+    expect(referans).not.toBeNull()
+    for (const yol of ['/tr/category/fans/', '/tr/category/fans///']) {
+      expect(esle(yol).sonuc).toEqual(referans)
+    }
+    for (const yol of ['/', '//', '///']) expect(esle(yol).sonuc).toBeNull()
   })
 })
