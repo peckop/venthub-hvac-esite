@@ -1,0 +1,82 @@
+name: Eski Adres Haritasi Uret (salt-okuma)
+
+# ════════════════════════════════════════════════════════════════════════════
+# NİÇİN VAR (ALT-37a, OPS onayı 2026-10-05; plan rec-adres-agac-tek-yayin §4.1, ALT-13 parçası)
+#
+# Eski adres haritası (src/data/generated/eski-adres-haritasi.json) commit EDİLMEZ ve üreteci
+# (src/lib/adres/haritaUret.ts) service-role anahtarı ister: `url_takma_adlari` tablosu anonim erişime
+# kapalı. Bu iş akışı üreteci canlı veritabanına karşı BİR KEZ koşturur, haritayı ARTEFAKT olarak indirir.
+# Cuma önizlemesi (karar 68) için harita yerel kopyaya konur; anahtar ne bir kişiye ne bir makineye verilir.
+#
+# ⛔YALNIZ OKUMA. Veritabanına tek çağrı türü SELECT'tir. Yazma çağrısı (insert/update/upsert/delete/rpc)
+#    ne bu dosyada ne çalıştırıcıda ne üreteçte vardır; src/__tests__/conformance/harita-uret-is-akisi.test.ts
+#    bunu grep ile 0 olarak ölçer.
+# ⛔YALNIZ ELLE TETİK (workflow_dispatch). pull_request, pull_request_target, push ve schedule YOK:
+#    repo PUBLIC, fork PR'ı sırrı görmemeli ve prod'a ne zaman bağlanıldığı insanın kararı olmalı.
+# ⛔SIR YALNIZ ÜRETİM ADIMINDA. Anahtar iş düzeyinde ya da kurulum adımında DEĞİL, yalnız o tek adımın
+#    `env:` bloğunda; hiçbir adım değeri basmaz (GitHub günlükte ayrıca maskeler).
+# ⛔DOĞRUDAN COMMIT YOK. Çıktı 1 gün saklanan artefakttır; depoya girmez.
+# ════════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_dispatch:
+    inputs:
+      not:
+        description: "Nicin kosuyorsun (kayda gecer)"
+        required: false
+        default: "ALT-37 Cuma onizlemesi haritasi"
+
+# Repo PUBLIC: `permissions:` yazıldığı anda varsayılanlar DÜŞER ve `contents: read`
+# olmadan checkout "Repository not found" verir (CLAUDE.md notu, sahada ölçüldü).
+permissions:
+  contents: read
+
+concurrency:
+  group: harita-uret
+  cancel-in-progress: false
+
+jobs:
+  uret:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      # Betik çalıştırmayı kapatır: kurulum adımında sır YOK ve üçüncü taraf kurulum betiği çalışmaz.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Harita ureticiyi calistir (yalniz SELECT)
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          JITI_ALIAS: '{"@/":"${{ github.workspace }}/src/"}'
+        run: |
+          mkdir -p harita-cikti
+          pnpm exec jiti scripts/adres/harita-uret.ts --cikti harita-cikti/eski-adres-haritasi.json
+
+      # SIRSIZ ikinci adım: dosyanın boş/yarım olmadığını ve anahtar, JWT, e-posta biçimi taşımadığını
+      # üretimden bağımsız olarak yeniden doğrular.
+      - name: Ciktiyi dogrula (sirsiz)
+        run: pnpm exec jiti scripts/adres/harita-uret.ts --dogrula harita-cikti/eski-adres-haritasi.json
+
+      - name: Artefakt yukle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: eski-adres-haritasi
+          path: harita-cikti/eski-adres-haritasi.json
+          retention-days: 1
+          if-no-files-found: error
