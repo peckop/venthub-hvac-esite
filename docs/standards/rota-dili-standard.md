@@ -1,9 +1,9 @@
 # Rota Dili Standardı (statik sayfa adresleri: TR Türkçe, EN İngilizce)
 
 > **Sahibi:** ALTYAPI
-> **Son doğrulama:** 2026-10-04 (PR-A: kapılar yeşil, bağımsız doğrulayıcı geçti)
-> **Durum:** v0.1 · 2026-10-04 · Şerit: ALTYAPI · Kart: OPS-52 · **Uygulama öncesi cetvel**: bugün canlıda olan kısımlar "CANLI",
-> yayını bekleyenler "HEDEF" diye işaretlidir. Anahtar kapalıyken canlıda hiçbir adres değişmez.
+> **Son doğrulama:** 2026-10-04 (PR-A…C2 kapıları yeşil, her PR bağımsız doğrulayıcıdan geçti; PR-D: tablo verisi + açık kip kapıları)
+> **Durum:** v0.2 · 2026-10-04 · Şerit: ALTYAPI · Kart: OPS-52 · **Anahtar kapalı (CANLI)**: bugün canlıda hiçbir adres değişmez; tablo ve
+> açık kip yayın günü (11 Ekim) açılır, önizlemede (Preview=1) denenir. Hepsi "HEDEF" diye işaretlidir.
 > **Kararlar:** 267 (hakkımızda), 269 (iletişim), 270 (iki aşama: 11 Ekim vitrin, hesap/sepet/ödeme sonra); Recep ilkesi 10-03:
 > *TR'de Türkçe, EN'de İngilizce adres* (OPS-36).
 > **Bağlı cetveller:** `adres-semasi-standard.md` (A5 tek kanonik, A6 sağlayıcıya özgü özellik yok, A9 sıçrama bütçesi, A11 308 önbelleği) ·
@@ -14,8 +14,9 @@
 
 | Yönetir (Aşama 1) | Yönetmez |
 |---|---|
-| Veriden bağımsız **statik sayfalar**: hakkımızda, iletişim, destek/*, legal/*, ürün seçici, teklif, bilgi merkezi çatısı (Design listesinden 27 sayfa) | Kategori / dal / aile / marka / model adresleri: **K3B hattı** (`adres-semasi-standard.md`, `adresUret`) |
+| Veriden bağımsız **statik sayfalar**, yalnız **bugün sayfası (`page.tsx`) olan klasörler** (§4: Design listesinden 27 sayfanın 8'i; kalanı neden girmediğiyle §4'te) | Kategori / dal / aile / marka / model adresleri: **K3B hattı** (`adres-semasi-standard.md`, `adresUret`) |
 | | **Aşama 2** yüzeyleri: `account/*`, `cart`, `checkout`, `auth/*`, `payment-success` (karar 270; Supabase auth dönüş adresleri, İyzico callback ve e-posta bağlantıları birlikte taşınır, ayrı iş) |
+| | **Bilgi merkezi** (`bilgi-merkezi` ↔ `knowledge-hub`): kendi mekanizması (`bilgiMerkeziYonlendirmeleri.mjs`, karar 92, `EN_YAYIN`) |
 
 ## 1. Kurallar
 
@@ -39,7 +40,7 @@ adresleri master 9ea04a55d fikstürüyle **derin eşit** kalır. Bu bir iddia de
 yoktu); bu fark `next build` routes-manifest'iyle karşılaştırılmadı, CI build yeşil ve davranış farkı beklenmiyor (bilinen, ölçülmedi).
 
 **R4 — Tek sıçrama.** Eski adres tek 308 ile yeni adrese gider; hedef hiçbir kuralla yeniden eşleşmez (zincir, döngü yok). Mevcut kuralların
-hedefleri (ör. karar 92, `/destek/hesaplayicilar`) yeni adrese tabloyla yeniden yazılır. Dilsiz eski adres (`/about`) için A9 bütçesi 1:
+hedefleri (ör. karar 92, `/destek/hesaplayicilar` → `urun-secici`) yeni adrese tabloyla yeniden yazılır (`rotaDiliHedefleriniYenile`; kapalıyken dizi aynen döner). Dilsiz eski adres (`/about`) için A9 bütçesi 1:
 config tek başına 307 + 308 = 2 sıçrama üretir; bu yüzden middleware'de, `ADRES_SEMASI_K3B` kolunun yanında saf tablo aramasıyla çalışan
 dilsiz kol kullanılır (DB yok, kural 12). **Karar (PR-C2, OPS onaylı, A9 ana hükmü):** dil `detectLocale` ile seçilir ve **307** verilir;
 deterministik TR 308 yalnız içeriği YALNIZ Türkçe olan adresler içindir (kategori slug'ı `fanlar` gibi). Statik sayfaların iki dilde içeriği vardır ve
@@ -58,6 +59,14 @@ site haritasında ve hreflang'da yoktur; `EN_YAYIN` ayrı eksendir ve 11 Ekim'de
 **R7 — Veriye bağlı eski adres config'e girmez** (A §3). `rotaDili` yalnız statik sayfaları kapsar; kategori/ürün/marka eski adresleri K3B'nin
 middleware haritasındadır.
 
+**R8 — Satır, sayfası olan klasöre yazılır.** Her satırın `klasor`ü `src/app/[lang]/<klasor>/page.tsx` olarak diskte bulunur; sayfası olmayan klasöre
+satır yazılırsa eski adres ölü bir hedefe 308 verir ve yeni adres 404 olur. Design yeni bir sayfa adı verse bile satır, sayfa yazılınca eklenir
+(§4 "girmeyenler"). Kapı: INV-ROTA-DILI-ACIK-1 tablo ↔ disk denetimi. Yeni görünen yolun ilk segmenti, kendi satırının klasörü dışında,
+başka bir `src/app/[lang]/` üst klasörüyle çakışamaz.
+
+**R9 — Cetvel dışı adres eklenmez.** Tabloya Design'ın teslim ettiği listenin (OPS-48) dışında ad yazılmaz; ad değişikliği Design'dan gelir, ALTYAPI uydurmaz.
+İşaretli öneri (GEO-SEO onayı beklenen) adlar veriye işaretli girer; şu an tabloda öneri-işaretli statik sayfa yoktur (öneriler yalnız K3B dal adlarıdır).
+
 ## 2. Kapılar
 
 | Kapı | Ne ölçer | Durum |
@@ -70,6 +79,7 @@ middleware haritasındadır.
 | Kapı 2 — HTTP matrisi (`scripts/adres/matris.cjs`, yerel derleme, anahtar=0, master'la fark ∅) | 54 şablon × {tr,en} + sabit örnekler + bilinen eski adresler: durum + Location + cache-control | PR-B (master'da, c454d2e61; tam koşum yayın öncesi) |
 | Kapı 3 — CANLI salt-okuma matrisi (birleşmeden önce/sonra; yayın günü açık matris) | canlıda tek adres değişmedi / yayın günü beklenen değişim | PR-B/yayın (taban `docs/audits/adres-matrisi-canli-2026-10-04-oncesi.json`) |
 | Açık kip kapıları (önizleme) | tek hop, hedef 200, hreflang karşılıklı, kanonik = sitemap, eski adrese `href` 0, Aşama 2 önekleri eski adreste 200 | PR-D (HEDEF) |
+| INV-ROTA-DILI-ACIK-1 (`src/__tests__/conformance/rota-dili-acik-kip.test.ts`) | tablo ↔ disk (R8); gerçek `next.config` ile zincir 0, eski dilli adres TEK 308, yeni adres rewrite; mevcut kural hedefleri yenilenir; adres üretimi/site haritası/kanonik/hreflang yeni adreste, eski adrese `href` 0; Aşama 2 dokunulmaz; dilsiz adres tek sıçrama | PR-D (HEDEF) |
 
 ## 3. Yayın günü kontrol listesi
 
@@ -77,3 +87,36 @@ middleware haritasındadır.
 2. Kapı 3 canlı matrisi **açık** beklenen matrisle eşleşir (açmayı unutma / yanlış açma kapanır).
 3. Search Console'a yeni site haritası bildirilir; birkaç örnek adres için indeksleme istenir (`canonical-url-standard.md`).
 4. Geri alma hazır: değişkeni `0` yap + yeniden dağıt; sonra Kapı 3 kapalı matrisle fark ∅.
+5. `public/llms.txt` statik adresleri (`/tr/contact`, `/tr/about`) yayın günü yeni adreslere elle güncellenir (ÜRÜN / GEO-SEO kalemi; eski adres 308 verir, kırık değildir).
+6. Yayın günü ayrıca: `EN_YAYIN` kapalı kalır (hreflang ve site haritasında EN yok); `ADRES_SEMASI_K3B` kendi kararıyla ayrı açılır. Üçü birbirine bağlı DEĞİLDİR.
+
+## 4. Tablo: Design listesi (OPS-48, 2026-10-04) ↔ bugünkü klasör
+
+Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Listedeki 27 sayfa dört gruba ayrılır:
+
+**Tabloya girenler (8): bugün sayfası olan klasörler.**
+
+| id | klasör (bugünkü, iki dilde ortak) | TR | EN | Design durumu |
+|---|---|---|---|---|
+| hakkimizda | `about` | `hakkimizda` | `about` | karar 267 |
+| iletisim | `contact` | `iletisim` | `contact` | karar 269 |
+| secici | `urun-secici` | `secici` | `selector` | v3 |
+| sss | `destek/sss` | `sss` | `faq` | kabul OPS #24 |
+| yasal-kvkk | `legal/kvkk` | `yasal/kvkk-aydinlatma-metni` | `legal/privacy-notice-kvkk` | kabul OPS #24 |
+| yasal-gizlilik | `legal/gizlilik-politikasi` | `yasal/gizlilik-politikasi` | `legal/privacy-policy` | kabul OPS #24 |
+| yasal-cerez | `legal/cerez-politikasi` | `yasal/cerez-politikasi` | `legal/cookie-policy` | kabul OPS #24 |
+| yasal-mesafeli | `legal/mesafeli-satis-sozlesmesi` | `yasal/mesafeli-satis-sozlesmesi` | `legal/distance-sales-contract` | kabul OPS #24 · satış kipi |
+
+**Girmeyenler, nedeniyle (R8, R7):**
+
+| Design satırı | Neden tabloda yok | Ne zaman |
+|---|---|---|
+| teklif-listesi, teklif-iste (+ teşekkürler), onay-dosyası, nasıl-teklif-alınır, mühendislik, belgeler, belge/doğrula, site-haritası, yasal/iptal-ve-iade, destek (kök) | bugün sayfası (`page.tsx`) yok; satır eklenirse eski adres ölü hedefe gider | sayfa yazılınca satır eklenir (R8 kapısı zorlar) |
+| ana, ürünler, markalar (+ kategori / dal / aile / model, asit dalı dahil) | K3B hattı (`adresUret`, `ADRES_SEMASI_K3B`); veriye bağlı (R7) | K3B kendi açılışıyla |
+| bilgi merkezi çatısı | kendi mekanizması (`bilgiMerkeziYonlendirmeleri.mjs`, karar 92, `EN_YAYIN`) | — |
+| giriş, hesap, ödeme, sipariş | Aşama 2 (karar 270, R5) | sonraki aşama |
+
+**Bilinen (Design listesinde adı olmayan mevcut sayfalar):** `destek/garanti-servis`, `destek/iade-degisim`, `destek/teslimat-kargo`, `legal/kullanim-kosullari`,
+`legal/on-bilgilendirme-formu` 11 Ekim'de bugünkü adreslerinde kalır (OPS hükmü 10-04). `legal/*` iki sayfa TR tarafında İngilizce `legal` segmentini taşır,
+bu karar 270 ilkesiyle (TR'de Türkçe adres) **çelişir**; Design'dan hedef ad istendi (OPS-48 kalan iş), ad gelince ayrı satır olarak eklenir ve 11 Ekim'i bloklamaz.
+Aynı nedenle `/en/destek/...` hâlâ Türkçe alt adlar taşıyor (`garanti-servis` vb.); EN'de İngilizce karşılığı yoktur.

@@ -37,6 +37,7 @@ import { readFileSync } from 'node:fs'
 import {
   rotaDiliCevir as cekirdekCevir,
   rotaDiliEsle as cekirdekEsle,
+  rotaDiliHedefleriniYenile as cekirdekHedefleriniYenile,
   rotaDiliTablosuDogrula,
   rotaDiliYenidenYazimlari as cekirdekYenidenYazimlari,
   rotaDiliYolu as cekirdekYolu,
@@ -103,4 +104,17 @@ export function rotaDiliYolu(url, dil, tablo = ROTA_DILI, acik = false) {
  */
 export function rotaDiliCevir(yol, eskiDil, yeniDil, tablo = ROTA_DILI, acik = false) {
   return cekirdekCevir(yol, eskiDil, yeniDil, tablo, acik)
+}
+
+/**
+ * Mevcut yönlendirme kurallarının hedeflerini tabloyla yeniler (açıklama: çekirdekteki aynı adlı fonksiyon).
+ * Anahtar kapalıyken girdi dizisi AYNEN (aynı referans) döner.
+ * @template {{ source: string, destination: string }} K
+ * @param {K[]} kurallar
+ * @param {boolean} acik anahtar
+ * @param {RotaDiliSatiri[]} [tablo]
+ * @returns {K[]}
+ */
+export function rotaDiliHedefleriniYenile(kurallar, acik, tablo = ROTA_DILI) {
+  return cekirdekHedefleriniYenile(kurallar, acik, tablo)
 }

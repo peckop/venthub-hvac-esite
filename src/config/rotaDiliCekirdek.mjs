@@ -316,6 +316,82 @@ export function rotaDiliCevir(yol, eskiDil, yeniDil, tablo, acik) {
 }
 
 /**
+ * Yönlendirme hedefinin dilsiz kalan kısmını (`/urun-secici`, `/destek/:path*`) `dil`'de GÖRÜNEN yola çevirir.
+ * `:ad*` kuyruğu yalnız `altYollar` satırında anlamlıdır (kuyruk bu satırın alt yollarını da kapsar); değilse
+ * hedef satırın TAMAMINI kapsamadığı için çevrilmez (aynen döner). Eşleşme yoksa aynen döner.
+ * @param {string} kalan dil önekinden sonraki kısım (`''` ya da `/…`), sorgu/parça yok, sondaki `/` yok
+ * @param {'tr' | 'en'} dil
+ * @param {RotaDiliSatiri[]} tablo
+ * @returns {string}
+ */
+function hedefKalaniniCevir(kalan, dil, tablo) {
+  if (kalan === '' || kalan === '/') return kalan
+  const kuyrukKonumu = kalan.search(/\/:[A-Za-z]+\*$/)
+  const taban = kuyrukKonumu === -1 ? kalan : kalan.slice(0, kuyrukKonumu)
+  const kuyrukBelirteci = kuyrukKonumu === -1 ? '' : kalan.slice(kuyrukKonumu)
+  const bulunan = satirBul(taban, tablo, 'klasor')
+  if (bulunan === null) return kalan
+  if (kuyrukBelirteci !== '' && !(bulunan.satir.altYollar && bulunan.kalan === '')) return kalan
+  return `/${bulunan.satir[dil]}${bulunan.kalan}${kuyrukBelirteci}`
+}
+
+/**
+ * MEVCUT yönlendirme kurallarının HEDEFLERİNİ rota dili tablosuyla yeniler (R4: "mevcut kuralların hedefleri
+ * tabloyla yeniden yazılır"). Neden: `/destek/hesaplayicilar → /:lang/urun-secici` gibi eski kurallar hedef olarak
+ * ESKİ klasör adresini gösterir; tablo `urun-secici`yi `secici`ye çevirince adres iki sıçramayla çözülürdü.
+ *
+ *  · `acik` false → girdi dizisi AYNEN (aynı referans) döner: anahtar kapalıyken sıfır fark.
+ *  · hedef `/:lang/…` ise iki dilin görünen yolu ayrı hesaplanır: aynıysa tek kural (`/:lang/…` korunur),
+ *    farklıysa kaynak `/:lang(tr|en)` öneki `/tr` ve `/en` olarak İKİ kurala bölünür (tr önce). Bölünemeyen kaynak
+ *    (`/:lang(tr|en)` ile başlamayan) ATAR: sessizce yanlış hedefte bırakılmaz.
+ *  · hedef `/tr/…` ya da `/en/…` ise yalnız o dilin görünen yolu uygulanır.
+ *  · dilsiz hedef (`/category/fans/:path*`), tablodaki klasörle eşleşmeyen hedef: kural nesnesi DEĞİŞMEZ
+ *    (aynı referans). Sorgu dizesi ve parça hedefte AYNEN kalır; sondaki `/` korunur.
+ *  · girdiyi değiştirmez, sıra deterministiktir, idempotenttir (yenilenmiş çıktı yeniden yenilenince aynı kalır).
+ * @template {{ source: string, destination: string }} K
+ * @param {K[]} kurallar
+ * @param {boolean} acik anahtar
+ * @param {RotaDiliSatiri[]} tablo
+ * @returns {K[]}
+ */
+export function rotaDiliHedefleriniYenile(kurallar, acik, tablo) {
+  if (!acik) return kurallar
+  const dilKalibi = '/:lang(tr|en)'
+  /** @type {K[]} */
+  const sonuc = []
+  for (const kural of kurallar) {
+    const { yol, son, ek } = urlBol(kural.destination)
+    const dilBelirteci = yol.split('/')[1]
+    if (dilBelirteci !== ':lang' && dilBelirteci !== 'tr' && dilBelirteci !== 'en') {
+      sonuc.push(kural)
+      continue
+    }
+    const kalan = yol.slice(dilBelirteci.length + 1)
+    const yaz = (/** @type {string} */ dil, /** @type {string} */ yeniKalan) => `/${dil}${yeniKalan}${son}${ek}`
+    if (dilBelirteci === 'tr' || dilBelirteci === 'en') {
+      const yeni = hedefKalaniniCevir(kalan, dilBelirteci, tablo)
+      sonuc.push(yeni === kalan ? kural : { ...kural, destination: yaz(dilBelirteci, yeni) })
+      continue
+    }
+    const trKalan = hedefKalaniniCevir(kalan, 'tr', tablo)
+    const enKalan = hedefKalaniniCevir(kalan, 'en', tablo)
+    if (trKalan === kalan && enKalan === kalan) {
+      sonuc.push(kural)
+    } else if (trKalan === enKalan) {
+      sonuc.push({ ...kural, destination: yaz(':lang', trKalan) })
+    } else {
+      if (!kural.source.startsWith(dilKalibi)) {
+        throw hata(`hedef yenileme: "${kural.source}" kuralının hedefi dile göre ayrışıyor ama kaynak "${dilKalibi}" ile başlamıyor, bölünemez`)
+      }
+      for (const [dil, dilKalani] of /** @type {const} */ ([['tr', trKalan], ['en', enKalan]])) {
+        sonuc.push({ ...kural, source: `/${dil}${kural.source.slice(dilKalibi.length)}`, destination: yaz(dil, dilKalani) })
+      }
+    }
+  }
+  return sonuc
+}
+
+/**
  * Next desen kuralını (`/:lang(tr|en)/…`) iki dile açar. Dilsiz ve dilli açık kurallar olduğu gibi kalır.
  * @param {Yonlendirme | YenidenYazim} kural
  * @returns {{ source: string, destination: string, orijinal: Yonlendirme | YenidenYazim }[]}
