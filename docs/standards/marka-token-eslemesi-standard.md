@@ -182,6 +182,17 @@ kaynağı açılamaz" kuralının devamıdır: **değer tek kaynakta kalır**, D
 `var(--steel-gray)` eklendi. ⚠`--steel-gray` `prefers-contrast: more` içinde değişir, takma ad onu izler;
 kontrast etkisi **ölçülmedi** (tüketici yok, gerçek tarayıcıda ölçülecek).
 
+**İkinci dilim (2026-10-05, DesignSync salt-okuma kopyası, birebir değer; hepsi `:root`ta tek tanım, tüketici 0):**
+50 ad. Tipografi 30 (`--wordmark-weight/-tracking`, `--weight-govde/mono/baslik/h1`, `--size-*`, `--lh-*`, `--track-*`
+display/h1/h2/h3/body/body-small/caption/overline/editorial; `--size-h1-mobil`), boşluk 9 (`--space-tight/inline/grid/stack/card/card-loose/page-mobile/block/page`),
+kenar 5 (`--border-control/hairline/row`, `--radius-panel`, `--shadow-none`), yüzey 6 (`--surface-page/card/subtle/inset/dark/dark-inset`).
+Renk olanlar HSL üçlüsü, boyutlar px/em. Tailwind `theme.extend`: renk adları DS adıyla, boşluk `space-*` önekiyle (`extend.spacing`),
+yazı ölçeği `ds-*` önekiyle (`ds-display` … `ds-editorial`; mevcut akışkan `display` anahtarı dokunulmadı).
+**DS ad sayımı (ad ad):** renk 12 + tipografi 33 (yazı ailesi 3 + 30 yukarıdaki) + ölçü 9 + kenar 6 + yüzey 6 = 66. Kopya dosya başlığındaki
+"renk 15, tipografi 28/31 → 64" sayıları yanlıştı; ad ad sayım 66. Sitede dört renk adı zaten vardı (primary-navy, brand-cyan, brand-cyan-ink,
+action-terracotta-deep) + 8 renk eklendi = 12; kalan 54 = 50 bu dilim + 3 yazı ailesi + `--radius` (3'ü ve `--radius` 2b'nin).
+**Çakışan ad: yok** (yeni 50 adın hiçbiri `index.css`te önceden tanımlı değildi; `--size-display` ≠ `--font-size-display`).
+
 **Ölçülmedi (ad ad tablo eksik):** DS'in kalan adları (tipografi ölçeği, yüzey/kenar adları,
 `--radius-panel`, boşluk rolleri, `--size-editorial`/`--lh-editorial`) bu tabloda **yok**: değerleri
 DesignSync okumasıyla alınacak (`ds-kaynak` kopyası) ve uydurma değer yazılmayacak.
