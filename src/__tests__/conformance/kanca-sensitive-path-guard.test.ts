@@ -328,6 +328,8 @@ describe('INV-KANCA-HASSAS-YOL-2 · migration kolu üç dal', () => {
     expect(kos(`${k}/.ENV`).karar).toBe('deny')
     expect(kos(`${k}/.Env.local`).karar).toBe('deny')
     expect(kos(`${k}/.env.example`).karar).toBeNull()
+    // Şablon muafiyeti harf DUYARLI: `.env.EXAMPLE` şablon değil, gerçek bir sır dosyası olabilir → deny (güvenli yön).
+    expect(kos(`${k}/.env.EXAMPLE`).karar).toBe('deny')
   })
 
   it('Edit ve MultiEdit araçlarında, ters bölülü Windows yolunda da aynı karar', () => {
