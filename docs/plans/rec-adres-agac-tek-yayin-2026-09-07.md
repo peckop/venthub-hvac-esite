@@ -15,7 +15,9 @@
   ERTELENDİ; sıra 1 Cloudflare Workers + OpenNext, 2 DigitalOcean, 3 Vercel Pro; tetik: ödeme/fiyat
   canlıya açılmadan önce ya da kota dağıtımı durdurursa) · karar **60** (dağıtım depolaması temizliği) ·
   **68** (tek yayın, REC-212 sonrası, ön izleme) · **78b** (iki perde dalı pazar kelimesi) · **84**
-  (korozyon dalı model adresi `korozyon-dayanimli-asit-fani`) · **86** (2026-09-23: 39 aile adres
+  (korozyon dalı model adresi `korozyon-dayanimli-asit-fani`; **yerine geçti: karar 287/288 (10-05)**: dal adı
+  "Korozyona ve Aside Dayanımlı Fanlar", adres `korozyona-ve-aside-dayanimli-fanlar`; radyal dalı "Radyal (Santrifüj)
+  Fanlar", `radyal-fanlar` değişmedi) · **86** (2026-09-23: 39 aile adres
   metni Design `seo_slug`'ına geçer; istisna Casals 4 aile K17 + 2 perde ailesi 78b; yayından önce
   GSC taban ölçümü).
 - **Recep hükümleri (09-22):** aile adresi `/tr/urun/`'e geçer (R2 kapandı) · ağaç = bugünkü 18 dal +
@@ -208,7 +210,7 @@ inmiş olarak kalır; görünür bir şey değiştirmez.
 ### Faz 2 — model slug'ları (veri migration'ı)
 Kaynak: URUN listesi (bu dal; REC-212 paketi `slug_tr/en` taşırsa paket kazanır, doğrulayıcı
 karşılaştırır). Doğrulayıcı: ≤ 70 · `-p-` yok · rezerve kelime yok · `(tenant, dil, slug)` tekil ·
-teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81) · 7 eski slug takma adda.
+teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81; korozyon dalı adresi sonradan karar 287/288 ile değişti, bkz. başlık) · 7 eski slug takma adda.
 Ön koşul: 7 ailenin EN adı. Bugün: 442/442 tekil, en uzun 70/69.
 
 ### Faz 3 — kod (bayrak = derleme sabiti `ADRES_SEMASI_K3B`, canlıda görünmez)
