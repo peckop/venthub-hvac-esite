@@ -12,11 +12,13 @@
 -- #1692 önce geri alınırsa bu betiğin KAPI 0'ı Casals markasını bulamaz ve DURUR.
 --
 -- ═════════════════════════════════════════════════════════════════════════════
--- NE YAPAR (migration'ın tersi; sıra: 7 → 6 → 5b → 4b → 4 → 3 → 2)
+-- NE YAPAR (migration'ın tersi; sıra: 7 → 6 → 5c → 5b → 4b → 4 → 3 → 2)
 -- ═════════════════════════════════════════════════════════════════════════════
 --   7)  40 aile slug'ı yeni → eski (Faz 1-A tetiği: eski adres yeniden canlı slug olur → eski takma adı SİLİNİR;
 --       yeni adres için yeni → aile takma adı YAZILIR, yani yeni adrese gelen bağlantılar 308 ile geri döner).
 --   6)  6 aile + 44 ürünün alt kategorisi eski dala (radyal ya da boş) döner (İKİ TABLO BİRLİKTE).
+--   5c) Perde aileleri (a_ad, a_had): name/name_i18n canlıdaki 2026-10-05 ölçümüne ('Ortam Havalı' / 'Isıtmalı', a_ad tr
+--       'Vortice AIR DOOR Hava Perdeleri', en 'Vortice AIR DOOR Air Curtains').
 --   5b) KENTALFAN: name/name_i18n 'Casals Plug Fanlar' / 'Casals Plug Fans', series_code NULL (#1692'nin bıraktığı hâl).
 --   4b) Radyal dalı: name ve menu_label 'Santrifüj / Radyal Fanlar'.
 --   4)  Yedek parça dalı: translation_key NULL.
@@ -208,6 +210,37 @@ BEGIN
   SELECT count(*) INTO n FROM public.product_families
    WHERE subcategory_id IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli);
   IF n <> 0 THEN RAISE EXCEPTION 'GERİ ALMA 6: yeni dallarda hâlâ % aile var — dallar silinemez', n; END IF;
+
+  -- ── 5c) PERDE AİLELERİ — ad canlıdaki 2026-10-05 ölçümüne (migration öncesi) döner ──────────
+  -- a_ad: name 'Vortice AD Ortam Havalı…', name_i18n tr 'Vortice AIR DOOR Hava Perdeleri' (name'den farklıydı), en
+  -- 'Vortice AIR DOOR Air Curtains'. a_had: name/tr '…Elektrikli Isıtmalı…', en değişmedi.
+  UPDATE public.product_families
+     SET name = 'Vortice AD Ortam Havalı Hava Perdeleri',
+         name_i18n = coalesce(name_i18n, '{}'::jsonb) || jsonb_build_object('tr', 'Vortice AIR DOOR Hava Perdeleri',
+                                                                           'en', 'Vortice AIR DOOR Air Curtains'),
+         updated_at = now()
+   WHERE id = a_ad AND tenant_id = v_t
+     AND (name IS DISTINCT FROM 'Vortice AD Ortam Havalı Hava Perdeleri'
+          OR (name_i18n->>'tr') IS DISTINCT FROM 'Vortice AIR DOOR Hava Perdeleri'
+          OR (name_i18n->>'en') IS DISTINCT FROM 'Vortice AIR DOOR Air Curtains');
+  UPDATE public.product_families
+     SET name = 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri',
+         name_i18n = coalesce(name_i18n, '{}'::jsonb) || jsonb_build_object('tr', 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri',
+                                                                           'en', 'Vortice AIR DOOR H AD Electrically Heated Air Curtains'),
+         updated_at = now()
+   WHERE id = a_had AND tenant_id = v_t
+     AND (name IS DISTINCT FROM 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri'
+          OR (name_i18n->>'tr') IS DISTINCT FROM 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri'
+          OR (name_i18n->>'en') IS DISTINCT FROM 'Vortice AIR DOOR H AD Electrically Heated Air Curtains');
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE tenant_id = v_t AND deleted_at IS NULL
+     AND ((id = a_ad  AND name = 'Vortice AD Ortam Havalı Hava Perdeleri'
+                      AND (name_i18n->>'tr') = 'Vortice AIR DOOR Hava Perdeleri'
+                      AND (name_i18n->>'en') = 'Vortice AIR DOOR Air Curtains')
+       OR (id = a_had AND name = 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri'
+                      AND (name_i18n->>'tr') = 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri'
+                      AND (name_i18n->>'en') = 'Vortice AIR DOOR H AD Electrically Heated Air Curtains'));
+  IF n <> 2 THEN RAISE EXCEPTION 'GERİ ALMA 5c: perde ailelerinin adı beklenen eski değerde değil (% eşleşti)', n; END IF;
 
   -- ── 5b) KENTALFAN — ad + seri kodu #1692'nin bıraktığı hâle ──────────────────────────────
   UPDATE public.product_families

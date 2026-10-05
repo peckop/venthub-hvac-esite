@@ -285,6 +285,51 @@ BEGIN
      AND (name_i18n->>'tr') = 'Casals KENTALFAN Plug Fanlar' AND (name_i18n->>'en') = 'Casals KENTALFAN Plug Fans';
   IF n <> 1 THEN RAISE EXCEPTION '5b: KENTALFAN ailesi beklenen ad/seri kodunda değil'; END IF;
 
+  -- ── 5c) İKİ HAVA PERDESİ AİLESİNİN ADI — adresle aynı kelime (OPS hükmü 10-05, Design 47/47 kontrolü) ──
+  -- Adres 7'de 'isiticisiz' / 'elektrikli-isiticili' oluyor; ad hâlâ 'Ortam Havalı' / 'Isıtmalı' kalsaydı ad ile
+  -- adres farklı kelime söylerdi. Canlı ölçüm 2026-10-05 (SELECT): a_ad name 'Vortice AD Ortam Havalı Hava Perdeleri',
+  -- name_i18n tr 'Vortice AIR DOOR Hava Perdeleri' (name'den FARKLI), en 'Vortice AIR DOOR Air Curtains';
+  -- a_had name ve tr 'Vortice H AD Elektrikli Isıtmalı Hava Perdeleri', en 'Vortice AIR DOOR H AD Electrically Heated
+  -- Air Curtains'. EN adlar sözlüğün 'Unheated Air Curtains' / 'Electrically Heated Air Curtains' kalıbıyla paralel
+  -- (Design'da aile adı çeviri tablosu yok). Tek blok: istenmezse bütünüyle çıkarılabilir (adres adımları buna dayanmaz).
+  -- Sapma kapısı: ad bugünkü değerde de yeni değerde de değilse elle değişmiş demektir → dur (ikinci koşum yeni değerde geçer).
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE tenant_id = v_t AND deleted_at IS NULL
+     AND ((id = a_ad  AND name IN ('Vortice AD Ortam Havalı Hava Perdeleri', 'Vortice AD Isıtıcısız Hava Perdeleri'))
+       OR (id = a_had AND name IN ('Vortice H AD Elektrikli Isıtmalı Hava Perdeleri',
+                                   'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri')));
+  IF n <> 2 THEN RAISE EXCEPTION '5c: perde ailelerinin adı ne bugünkü ne yeni değerde (% eşleşti) — elle değişmiş, incele', n; END IF;
+
+  UPDATE public.product_families
+     SET name = 'Vortice AD Isıtıcısız Hava Perdeleri',
+         name_i18n = coalesce(name_i18n, '{}'::jsonb) || jsonb_build_object('tr', 'Vortice AD Isıtıcısız Hava Perdeleri',
+                                                                           'en', 'Vortice AIR DOOR AD Unheated Air Curtains'),
+         updated_at = now()
+   WHERE id = a_ad AND tenant_id = v_t
+     AND (name IS DISTINCT FROM 'Vortice AD Isıtıcısız Hava Perdeleri'
+          OR (name_i18n->>'tr') IS DISTINCT FROM 'Vortice AD Isıtıcısız Hava Perdeleri'
+          OR (name_i18n->>'en') IS DISTINCT FROM 'Vortice AIR DOOR AD Unheated Air Curtains');
+  UPDATE public.product_families
+     SET name = 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri',
+         name_i18n = coalesce(name_i18n, '{}'::jsonb) || jsonb_build_object('tr', 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri',
+                                                                           'en', 'Vortice AIR DOOR H AD Electrically Heated Air Curtains'),
+         updated_at = now()
+   WHERE id = a_had AND tenant_id = v_t
+     AND (name IS DISTINCT FROM 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri'
+          OR (name_i18n->>'tr') IS DISTINCT FROM 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri'
+          OR (name_i18n->>'en') IS DISTINCT FROM 'Vortice AIR DOOR H AD Electrically Heated Air Curtains');
+
+  -- Son-durum kapısı: üç alan da beklenen değerde, iki ailede de.
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE tenant_id = v_t AND deleted_at IS NULL
+     AND ((id = a_ad  AND name = 'Vortice AD Isıtıcısız Hava Perdeleri'
+                      AND (name_i18n->>'tr') = 'Vortice AD Isıtıcısız Hava Perdeleri'
+                      AND (name_i18n->>'en') = 'Vortice AIR DOOR AD Unheated Air Curtains')
+       OR (id = a_had AND name = 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri'
+                      AND (name_i18n->>'tr') = 'Vortice H AD Elektrikli Isıtıcılı Hava Perdeleri'
+                      AND (name_i18n->>'en') = 'Vortice AIR DOOR H AD Electrically Heated Air Curtains'));
+  IF n <> 2 THEN RAISE EXCEPTION '5c: perde ailelerinin adı beklenen değerde değil (% eşleşti)', n; END IF;
+
   -- ── 6) TAŞIMA — İKİ TABLO BİRLİKTE (taksonomi cetveli §8) ──────────────────────────────
   FOR r IN SELECT * FROM (VALUES
       (a_kentalfan, k_fanlar, k_radyal, k_plug),
