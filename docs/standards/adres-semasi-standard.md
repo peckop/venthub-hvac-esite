@@ -36,7 +36,10 @@ tarayıcının İngilizce sayfaya gönderilmesi. CLAUDE.md 1. kural: cetvel yoks
 **A3 — Slug metni:** ≤ 70 karakter · teknik değer yalnız `technical_specs`'ten (uydurma sayı yok) · EN slug'da
 Türkçe harf yok · kategori slug'ı zenginleşmez (Design slug kuralı §6). Model slug'ları üreticiyle kurulur:
 `docs/plans/rec300-model-adres-uret.py`; tip kelimeleri rakip taramasıyla seçilir (karar 78) ve dal başına
-kararlarla sabitlenir (karar 84: korozyon dalı `korozyon-dayanimli-asit-fani`).
+kararlarla sabitlenir (karar 84: korozyon dalı `korozyon-dayanimli-asit-fani`;
+**yerine geçti: karar 287 = B (2026-10-05):** korozyon dalı adı "Korozyona ve Aside Dayanımlı Fanlar", TR adresi
+`korozyona-ve-aside-dayanimli-fanlar` · **karar 288 = B (2026-10-05):** radyal dalı adı "Radyal (Santrifüj) Fanlar",
+adres `radyal-fanlar` değişmedi).
 
 **A4 — Rezerve kelimeler:** Design v3 §4 listesi + `api`, `admin`, `_next`. Hiçbir kategori/aile/marka slug'ı
 bunlarla kesişmez (HEDEF kapı INV-ADRES-CAKISMA-1).

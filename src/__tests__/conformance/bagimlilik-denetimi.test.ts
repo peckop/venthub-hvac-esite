@@ -37,8 +37,10 @@ const KAYIT = 'docs/standards/bagimlilik-kararlari.md'
  * 8 → 6 (2026-09-22): `kucuk-ve-yama` grubu (#1315) browserslist'in iki kaydını kapattı; aynı yol.
  * 6 → 0 (2026-09-29, REC-424): kalan altısı `fast-uri` idi; kilitte 3.1.2 → 3.1.8 yükseltmesi hepsini
  * kapattı (Sentry'yi beklemeden, yine bayat-kabul kapısı sayesinde). Liste BOŞ ve boş kalmalı.
+ * 0 → 1 (2026-10-05, ALT-32, OPS hükmü): `braces` ≤3.0.3 (GHSA-vfj7-8cjw-p6xm) için düzeltme sürümü
+ * YOK; yükseltilemiyor, tek kabul. Yamalı sürüm çıkınca bayat-kabul kapısı satırı sildirir, tavan 0'a iner.
  */
-const KABUL_TAVANI = 0
+const KABUL_TAVANI = 1
 
 function kostur(args: string[]): { kod: number; cikti: string } {
   try {

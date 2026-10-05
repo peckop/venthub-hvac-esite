@@ -835,3 +835,20 @@ describe('INV-ROL-1 — durum dosyası standart "Yarım iş" satırı (HRT-31, O
     }
   })
 })
+
+describe('INV-ROL-1 — arama sonuç sayfası sahipliği (HRT-32, OPS isteği 2026-10-05)', () => {
+  const kartlar = uretici.uret()
+  const harita = fs.readFileSync(path.join(KOK, 'docs', 'roller', 'DEPARTMAN-HARITASI.md'), 'utf8').replace(/\r\n/g, '\n')
+  const satir = (ad: string) => harita.split('\n').find((s) => s.startsWith(`| ${ad} |`)) ?? ''
+
+  it('URUN kartında ve haritadaki URUN satırında arama sonuç sayfası (v3 ARAMA adresi) yazılı', () => {
+    expect(kartlar.URUN).toContain('arama sonuç sayfası (v3 ARAMA adresi)')
+    expect(satir('URUN')).toContain('arama sonuç sayfası (v3 ARAMA adresi)')
+  })
+
+  it('rota dili satırı ve yönlendirme ALTYAPI\'da kalır: ALTYAPI kartında ve haritadaki iki satırda yazılı', () => {
+    expect(kartlar.ALTYAPI).toContain('rota dili satırı ve yönlendirme')
+    expect(satir('ALTYAPI')).toContain('rota dili satırı ve yönlendirme')
+    expect(satir('URUN')).toContain('rota dili satırı ve yönlendirmesi ALTYAPI')
+  })
+})

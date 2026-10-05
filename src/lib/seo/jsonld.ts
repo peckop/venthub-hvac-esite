@@ -15,6 +15,7 @@
  */
 
 import { ADRES_SEMASI_K3B } from '../../config/features'
+import { sitemapModelMi } from '../../config/yayindaModeller'
 import type { FamilyListItem } from '../../types/ui-models'
 import { adresUret } from '../../utils/adresUret'
 import { dildekiMetin } from '../../utils/dilMetni'
@@ -102,7 +103,9 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     // kanoniğe girmez). Faz 2 öncesi slug metni aile slug'ıdır (rota modeli SKU'dan çözer).
     // ⚠Adres SKU'yu (küçük harf) taşır — plan §2 şemasının kendisi (`…-p-<sku>`); `sku` ALANI yine
     // yazılmaz (INV-SKU-GORUNMEZ-1 K2). Adres `adresRotalari` üzerinden (`adresUret` model nesnesi).
-    if (bayrak) {
+    // URN-31: yalnız DİZİNE AÇIK model adresi yazılır (`sitemapModelMi`: yayındaki listedeki temel model). Liste dışı
+    // varyantın model sayfası yok (404); sürüm sayfasının kanoniği temele gider — ikisinde de url YOK.
+    if (bayrak && sitemapModelMi(variant.sku)) {
       productNode.url = `${baseUrl}${adresRotalari(dilOf(lang), true).product(family.slug, variant.sku)}`
     }
 

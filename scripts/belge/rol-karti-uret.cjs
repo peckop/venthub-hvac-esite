@@ -261,7 +261,7 @@ const ROLLER = {
     durum: 'Açık.',
   },
   ALTYAPI: {
-    gorev: 'CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi.',
+    gorev: 'CI kapıları, bağımlılık ve güvenlik denetimi, fleet-mechanism cetvelinin sahibi; rota dili satırı ve yönlendirme (arama sonuç sayfasının kendisi URUN\'dur).',
     dosyalar: 'package.json, pnpm-lock.yaml, .github/workflows/**, scripts/board/board.cjs, conformance board-* ve bagimlilik-*, docs/standards/fleet-mechanism-standard.md.',
     yetki: 'CI ve bağımlılık değişikliği, dependabot PR\'ları, güvenlik taraması; kendi cetveli için gözden geçirme.',
     yasak: 'Sürüm sabitleme istisnadır (gerekçesiz pin yok); sır yazmaz; migration merge\'ü Recep kapısıdır.' + ARKA_OFIS_YASAGI,
@@ -277,7 +277,7 @@ const ROLLER = {
     durum: 'Açık (REC-400, REC-426).',
   },
   URUN: {
-    gorev: 'Vitrin: ürün, kategori ve marka sayfaları, adres yönlendirmeleri, REC-300 adres paketi.',
+    gorev: 'Vitrin: ürün, kategori ve marka sayfaları, arama sonuç sayfası (v3 ARAMA adresi), adres yönlendirmeleri, REC-300 adres paketi. Arama sayfasının rota dili satırı ve yönlendirmesi ALTYAPI\'da kalır.',
     dosyalar: 'src/components/products/**, src/views/category/**, src/data/brands.ts, src/config/markaYonlendirmeleri.mjs, next.config.mjs, docs/plans/rec-300*.',
     yetki: 'Vitrin kodu ve yönlendirme; yayın sonrası canlı ölçüm (merge sonrası "indi != canlıda").',
     yasak: 'Adres şeması değişikliği tek başına Recep\'e sorulur (paketlenmez); canlı veri yazımı Recep kapısıdır.' + ARKA_OFIS_YASAGI,
@@ -737,7 +737,7 @@ const HARITA_KISA = {
   ARAC: ['Kanca, WrongStack, araç envanteri', 'hooks, scripts/board, tools'],
   ALTYAPI: ['CI, bağımlılık, güvenlik denetimi', 'package.json, .github/workflows'],
   HARITA: ['Belge ve hafıza düzeni, rol kartları', 'CLAUDE.md, docs/README, scripts/belge, docs/roller'],
-  URUN: ['Vitrin: ürün, kategori, marka sayfaları, adresler', 'components/products, views/category, next.config'],
+  URUN: ['Vitrin: ürün, kategori, marka, arama sonuç sayfaları, adresler','components/products, views/category, next.config'],
   ADMIN: ['Yönetici paneli ekranları', 'views/admin, components/admin, app/admin'],
   KATALOG: ['Ürün verisi hattı: PDF\'den ürün satırına, CSV, fiyat', 'scripts/icerik-hatti, scripts/db/product-data'],
   'GEO-SEO': ['Arama motoru ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-*, docs/audits/seo-*'],

@@ -331,6 +331,98 @@ textarea:focus-visible {
     --brand-cyan-ink: 193 100% 28%;        /* #00708F */
     --action-terracotta-deep: 24.4 91% 39.2%;  /* #BF5309 */
 
+    /* ── DS TAKMA ADLARI (OPS-53 Faz 2a, 2026-10-05) — GÖRÜNMEZ, TÜKETİCİSİ YOK ──
+       Plan: docs/plans/tasarim-kod-plani-v2.2-2026-10-05.md §2 + v2.1 §2.1/§2.2
+       (PR #1700). Design System'in (DS) renk adları bu bloğa YALNIZ EKLENİR; bu
+       dosyada hiçbir mevcut satır değişmedi. Tailwind'de karşılıkları aşağıdaki
+       "DS adları" renk anahtarlarıdır; hiçbir kod henüz kullanmıyor — bu yüzden
+       üretilen CSS'te yalnız bu satırlar farklıdır ve ekranda hiçbir şey değişmez.
+
+       ⭐DEĞER TEK KAYNAKTA KALIR (cetvel marka-token-eslemesi-standard.md §2 "yeni
+       renk kaynağı açılamaz"): DS değeri sitede ZATEN bir tokenla aynıysa o tokene
+       TAKMA AD olur (var(...) ile); hedef değişirse takma ad onu izler ve INV-PALET-1
+       hedefi korur. Takma ad, kalıtım yoluyla hedefin :root değerini alır — `.light`
+       gibi alt kapsam hedefi yeniden tanımlasa bile takma ad :root'ta çözülür
+       (bugün DS adının tüketicisi olmadığı için ölçülen etki yok).
+
+       K1 (değer sitede aynı, DS adı yok → takma ad):
+         action-terracotta → marka-kiremit · warn-amber → marka-amber ·
+         text-strong → marka-lacivert · text-on-dark → clean-white
+       K2 (değer sitede YOK, DS adı yok → tek literal; DS 2026-09-14 sürümünden,
+           okuma 2026-10-05; başka dosyada ikinci tanımı yok): aşağıdaki üç satır.
+
+       ⚠ÇAKIŞAN KÜME BU BLOKTA YOK: primary-navy, brand-cyan, action-terracotta-deep
+       ve font-sans sitede FARKLI değerle zaten var ve 2a'da DOKUNULMAZ (görünür
+       dönüşüm Faz 2b'dir; `:root` değerleri hiç değişmeyecek, çevirme
+       `:root[data-gorunum='yeni']` kapsamında yapılacak — v2.2 §1.2).
+       text-muted, silinen ölü değişken listesindeki bir adla çakışır; INV-PALET-1
+       4. kol takma adı serbest bıraktıktan sonra (ALT-30, #1707) K1 olarak EKLENDİ:
+       steel-gray'e takma ad (steel-gray prefers-contrast'ta değişir, takma ad onu
+       izler; kontrast etkisi gerçek tarayıcıda ölçülecek, bugün tüketici yok). */
+    --text-muted: var(--steel-gray);
+    --action-terracotta: var(--marka-kiremit);
+    --warn-amber: var(--marka-amber);
+    --text-strong: var(--marka-lacivert);
+    --text-on-dark: var(--clean-white);
+    --accent-air-green: 100 61% 30%;
+    --text-body: 218 17% 35%;
+    --text-on-dark-muted: 215 26% 65%;
+
+    /* ── DS TİPOGRAFİ / ÖLÇÜ / KENAR / YÜZEY (OPS-53 Faz 2a ikinci dilim, 2026-10-05) ──
+       Kaynak: Design System 2026-09-14 sürümü, DesignSync salt-okuma kopyası (birebir değerler).
+       GÖRÜNMEZ: tüketici 0. Yazı AİLESİ adları (sans/serif/mono), --radius ve renk
+       çakışan kümesi BU BLOKTA YOK — 2b'nin işi (:root değerleri hiç değişmez). */
+    --wordmark-weight: 700;
+    --wordmark-tracking: -0.03em;
+    --weight-govde: 400;
+    --weight-mono: 500;
+    --weight-baslik: 600;
+    --weight-h1: 700;
+    --size-display: 46px;
+    --lh-display: 1.16;
+    --track-display: -0.03em;
+    --size-h1: 34px;
+    --size-h1-mobil: 25px;
+    --lh-h1: 1.15;
+    --track-h1: -0.025em;
+    --size-h2: 29px;
+    --lh-h2: 1.2;
+    --track-h2: -0.03em;
+    --size-h3: 21px;
+    --lh-h3: 1.3;
+    --track-h3: -0.02em;
+    --size-body: 15px;
+    --lh-body: 1.5;
+    --size-body-small: 13.5px;
+    --lh-body-small: 1.55;
+    --size-caption: 12.5px;
+    --lh-caption: 1.45;
+    --size-overline: 11px;
+    --lh-overline: 1.4;
+    --track-overline: 0.14em;
+    --size-editorial: 16px;
+    --lh-editorial: 1.6;
+    --space-tight: 5px;
+    --space-inline: 7px;
+    --space-grid: 10px;
+    --space-stack: 14px;
+    --space-card: 16px;
+    --space-card-loose: 20px;
+    --space-page-mobile: 18px;
+    --space-block: 30px;
+    --space-page: 40px;
+    --border-control: 60 5% 84%;
+    --border-hairline: 60 6% 88%;
+    --border-row: 60 13% 94%;
+    --radius-panel: 8px;
+    --shadow-none: none;
+    --surface-page: 60 8% 95%;
+    --surface-card: 0 0% 100%;
+    --surface-subtle: 60 20% 98%;
+    --surface-inset: 60 11% 93%;
+    --surface-dark: 216 40% 10%;
+    --surface-dark-inset: 218 44% 25%;
+
     /* ── Design System Tokens ──────────────────────────── */
     --surface-deep: 224 52% 8%;
     --surface-darker: 224 71% 4%;
