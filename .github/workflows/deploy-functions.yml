@@ -152,7 +152,7 @@ jobs:
       # dedektor SESSIZCE yanlis sonuc verebilir. 2.101.0 = `--use-api` davranisinin
       # yerelde birebir olculdugu surum (repo == prod, 26/26 fonksiyon).
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
+        uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.101.0
 
@@ -235,7 +235,7 @@ jobs:
       # dedektor SESSIZCE yanlis sonuc verebilir. 2.101.0 = `--use-api` davranisinin
       # yerelde birebir olculdugu surum (repo == prod, 26/26 fonksiyon).
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
+        uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.101.0
 
