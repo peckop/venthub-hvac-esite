@@ -62,6 +62,8 @@ type Uretici = {
   HARITA_KISA: Record<string, string[]>
   HARITA_OZET_SINIRI: number
   HARITA_ISARETCISI: string
+  DURUM_SATIRI_KURALI: string
+  CALISMA: string
 }
 
 type Gorev = {
@@ -756,5 +758,80 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     const r = spawnSync(process.execPath, [path.join(KOK, 'scripts', 'belge', 'rol-karti-uret.cjs'), '--harita-ozet'], { encoding: 'utf8', windowsHide: true })
     expect(r.status).toBe(0)
     expect(r.stdout).toBe(ozet)
+  })
+})
+
+describe('INV-ROL-1 — durum dosyası standart "Yarım iş" satırı (HRT-31, OPS isteği 2026-10-05)', () => {
+  // Okuyucu ARAÇ'ın kancasıdır (`baglam-doluluk.cjs`, ARC-31 madde 2); biçim onunla ölçülür, kopya regex yazılmaz.
+  const { yarimIsOku } = require(path.join(KOK, '.claude', 'hooks', 'baglam-doluluk.cjs')) as { yarimIsOku: (m: string) => string }
+  const kartlar = uretici.uret()
+  const kurallar = uretici.uretKurallar()
+
+  it('standart iki biçim kancanın okuyucusuyla okunur: yok → yok, var → var; sonuncu satır kazanır', () => {
+    expect(yarimIsOku('Yarım iş: yok — HRT-29 ve REC-516 bitti, sırada iş yok')).toBe('yok')
+    expect(yarimIsOku('Yarım iş: var — HRT-28 PR OPS hükmü bekliyor, hüküm gelene dek güvenli')).toBe('var')
+    expect(yarimIsOku('Yarım iş: var — eski\nYarım iş: yok — yeni')).toBe('yok')
+    expect(yarimIsOku('Yarım iş: yok — eski\nYarım iş: var — yeni')).toBe('var')
+  })
+
+  it('AYIRT EDİCİLİK: biçim bozulursa kanca okuyamaz ("bilinmiyor"): "Yarım:", "Yarım işler: var", "yoksa"', () => {
+    expect(yarimIsOku('Yarım: HRT-28')).toBe('bilinmiyor')
+    expect(yarimIsOku('Yarım işler: var — a')).toBe('bilinmiyor')
+    expect(yarimIsOku('Yarım iş: yoksa sor')).toBe('bilinmiyor')
+  })
+
+  it('16 kartın Çalışma düzeni durum dosyası maddesi standart satırı tek cümleyle söyler', () => {
+    for (const ad of BEKLENEN_ROLLER) {
+      expect(kartlar[ad], ad).toContain('`Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b)')
+      expect(kartlar[ad], ad).toContain(uretici.CALISMA)
+    }
+  })
+
+  it('16 kurallar dosyası aynı bloğu AYNEN taşır ve iki biçimi kancanın okuyabildiği hâliyle yazar', () => {
+    for (const ad of BEKLENEN_ROLLER) {
+      expect(kurallar[ad], ad).toContain(uretici.DURUM_SATIRI_KURALI)
+    }
+    expect(uretici.DURUM_SATIRI_KURALI).toContain('`Yarım iş: yok — <kısa>`')
+    expect(uretici.DURUM_SATIRI_KURALI).toContain('`Yarım iş: var — <ne>, <ne zaman güvenli>`')
+    // OPS 2026-10-05: compact hazırlığı notu Recep'e KENDİ penceresinde yazılır, OPS'a tek satır.
+    expect(uretici.DURUM_SATIRI_KURALI).toContain("KENDİ penceresinde Recep'e yazılır; OPS'a yalnız tek satır gider")
+    for (const ad of BEKLENEN_ROLLER) expect(kurallar[ad], ad).toContain('iki aşamalı compact cümlesi KENDİ penceresinde')
+    // Blokta geçen iki örnek biçim, <...> yer tutucuları doldurulunca kancada okunur.
+    expect(yarimIsOku('Yarım iş: yok — kısa')).toBe('yok')
+    expect(yarimIsOku('Yarım iş: var — ne, ne zaman güvenli')).toBe('var')
+  })
+
+  it('kart baytı sert sınırın ve kanaryanın altında kalır (ekleme sonrası en büyük kart)', () => {
+    const en = Math.max(...BEKLENEN_ROLLER.map((ad) => Buffer.byteLength(kartlar[ad], 'utf8')))
+    expect(en).toBeLessThan(Math.floor(uretici.KART_BAYT_SINIRI * 0.94))
+  })
+
+  it('AYIRT EDİCİLİK: kartta cümle ya da kurallar dosyasında blok düşerse denetim yakalar', () => {
+    const cumle = '; dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b)'
+    const bozukKart = { ...kartlar, ARAC: kartlar.ARAC.replace(cumle, '') }
+    expect(uretici.sorunlar(bozukKart).join('\n')).toMatch(/ARAC: ortak blok eksik\/değişmiş: ## Çalışma düzeni/)
+    const bozukKural = { ...kurallar, URUN: kurallar.URUN.replace(uretici.DURUM_SATIRI_KURALI, '') }
+    expect(uretici.kuralDosyaSorunlari(bozukKural).join('\n')).toMatch(/URUN: kurallar dosyasında "Yarım iş" satırı bloğu eksik/)
+    expect(uretici.kuralDosyaSorunlari(kurallar)).toEqual([])
+  })
+
+  // OPS emri 2026-10-05: TASARIM kartı karar 271 (10-03, 11 Ekim tam kapsam) ve plan v2.2 §7 ile hizalandı; eski ifade geri gelmesin.
+  it('TASARIM kartı: Faz 2b/K36 karar 271 kapsamında bayrak arkasında; eski "Recep onayı olmadan başlamaz" ve "yalnız yazı tipi" kalktı', () => {
+    const t = kartlar.TASARIM
+    expect(t).toContain('Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma)')
+    expect(t).toContain('`data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7')
+    expect(t).toContain('K36 karar 271 ile kararlı')
+    for (const eski of ['Faz 2b Recep onayı olmadan başlamaz', 'layout.tsx` (yalnız yazı tipi)', 'K36 kabuk kararı yazılmamış', 'Recep "olur"undan sonra']) {
+      expect(t, eski).not.toContain(eski)
+    }
+  })
+
+  it('şartname §9b madde 7 standart satırı ve okuyucuyu (yarimIsOku, son 24 KB, son eşleşme) yazar', () => {
+    const sartname = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'hafiza-yazma-duzeni-standard.md'), 'utf8')
+    const madde = sartname.slice(sartname.indexOf('7. **Standart "Yarım iş" satırı'), sartname.indexOf('## §10 ARAÇ'))
+    expect(madde.length).toBeGreaterThan(500)
+    for (const parca of ['`Yarım iş: yok — <kısa>`', '`Yarım iş: var — <ne>, <ne zaman güvenli>`', 'yarimIsOku', '24 KB', 'Son eşleşme geçerlidir']) {
+      expect(madde, parca).toContain(parca)
+    }
   })
 })
