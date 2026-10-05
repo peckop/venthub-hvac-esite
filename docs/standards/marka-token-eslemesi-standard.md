@@ -130,6 +130,7 @@ Bugün en az altı kaynak var (ölçüldü, 2026-09-04):
 
 **Kural:** yeni bir renk kaynağı **açılamaz**. Mevcutlardan hangisinin kalacağı ve
 hangisinin token'a çekileceği Faz 1'de **isim isim** listelenir; liste bu cetvele girer.
+**İstisna (ALT-30, INV-PALET-1 4. kol):** tasarım sisteminin takma adı `--ad: var(--hedef)` yeni kaynak sayılmaz ve silinmiş legacy adlarda da serbesttir; hedef `index.css`'te tanımlı olmalı ve zincirde döngü olmamalı, ham HSL/HEX/rgb değer yazılırsa kapı kırmızı kalır.
 
 ### 2.1 İsim isim liste (Faz 1, 2026-09-04'te ölçüldü ve uygulandı)
 
