@@ -1,5 +1,7 @@
 # Tasarım → Kod Planı v2 (2026-09-25, TASARIM) — TASLAK
 
+> **YERİNE v2.1 GEÇER:** `docs/plans/tasarim-kod-plani-v2.1-2026-10-05.md` (denetim bulguları işlendi). Bu dosya tarihçedir.
+
 > **DURUM: TASLAK — ONAYSIZ, UYGULANMAZ.** plan-challenger (bağımsız red-team) koşuldu, hüküm **KOŞULLU**:
 > `red-team-tasarim-kod-plani-v2-2026-09-25.md` (1 Kritik, 3 Yüksek; ÇIKAR yok, 7 adım DARALT). **Bulgular bu metne
 > İŞLENMEDİ** (pencere park edildi). Tasarım haftasının (2026-09-28) ilk adımı: bulguları işlemek → v2.1 → Ops/Recep.
