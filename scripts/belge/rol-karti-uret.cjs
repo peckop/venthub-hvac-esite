@@ -137,6 +137,18 @@ const CALISAN_ACMA_KURALI = [
   '- Salt-okuma çalışan (araştırmacı, çürütücü, doğrulayıcı) `Agent` aracıyla `name` VERİLMEDEN açılır: sonuç doğrudan açana döner ve yazma yasağı ancak böyle işler; yazan uygulayıcı ekip üyesi olarak `name` ile açılır (docs/standards/execution-method-standard.md §10.3).',
 ].join('\n')
 
+/**
+ * DURUM DOSYASI "YARIM İŞ" SATIRI (HRT-31, OPS isteği 2026-10-05): kartın bayt payını yemesin diye ayrıntı kurallar dosyasında durur,
+ * kartta (CALISMA) tek cümle kalır. Yöneten cetvel: `docs/standards/hafiza-yazma-duzeni-standard.md` §9b madde 7; okuyucu: ARAÇ'ın
+ * `.claude/hooks/baglam-doluluk.cjs` `yarimIsOku` (kokpit compact hazırlığı). Her rolün kurallar dosyasına AYNEN girer.
+ */
+const DURUM_SATIRI_KURALI = [
+  '## Durum dosyası: standart "Yarım iş" satırı (HRT-31)',
+  '- Durum dosyasının SONUNA (DEVİR bloğunun içine) her güncellemede ve compact öncesinde tam bu iki biçimden biri yazılır: `Yarım iş: yok — <kısa>` ya da `Yarım iş: var — <ne>, <ne zaman güvenli>`. Kokpit compact hazırlığı bunu okur; ifade yoksa "ölçülemedi" görünür.',
+  '- Kanca dosyanın son 24 KB\'ındaki SON `yarım iş yok|var` ifadesini okur: satır en sonda durur, altına aynı ifadeyi taşıyan başka cümle yazılmaz. `yok` derken yarım iş listelenmez; belirsizse `var` yazılır. Ayrıntı AÇIK KUYRUK alanındadır (hafiza-yazma-duzeni-standard §9b madde 7).',
+  '- Recep compact hazırlığı istediğinde (ya da "COMPACT YAKIN" uyarısında) üç maddelik not (durum dosyası güncel mi + saat / yarım iş / hüküm) ve iki aşamalı compact cümlesi KENDİ penceresinde Recep\'e yazılır; OPS\'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu OPS\'a yazıp Recep\'e yazmamak kuralı çiğner (OPS 2026-10-05: iki departman bunu yaptı).',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -151,6 +163,8 @@ function kuralDosyasi(ad) {
     KART_PLAN_KURALI,
     '',
     CALISAN_ACMA_KURALI,
+    '',
+    DURUM_SATIRI_KURALI,
     '',
   ].join('\n')
 }
@@ -215,7 +229,7 @@ const CALISMA = [
   '- Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree\'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).',
   '- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM + KAYNAK/CETVEL. Linear donuk (karar 219): yeni kayıt açılmaz.',
   '- PR gövdesi `Kanban: <numara>` taşır (2026-10-08\'e kadar `Fixes REC-nn` de kabul); çok PR\'lık iş her biri tek PR\'la biten alt kartlara bölünür; kartsız iş yalnız `Kayıtsız: <sebep>` (karar 187).',
-  '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa kapı durdurur).',
+  '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa kapı durdurur); dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).',
   '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
   '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
   '- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.',
@@ -330,11 +344,11 @@ const ROLLER = {
   },
   TASARIM: {
     gorev: 'Claude Design ile site arasındaki köprü: Design kararlarını kayda geçirir, tasarım sistemini (token, yazı tipi, temel bileşen) koda taşır, yapılan ekranı Design karesiyle yan yana ölçer. Sayfa yolu, verisi ve SEO URUN\'undur.',
-    dosyalar: '`src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yalnız yazı tipi), `docs/plans/tasarim-kod-plani-v2-*` (dosya kümesi plan önerisidir, karar değil). Sahibi olduğu cetvel (OPS onaylı devir, 2026-09-30): marka token eşlemesi (önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN\'da kalır.',
-    yetki: 'Faz 2a (görünmez token köprüsü), Faz 2b (görünüm dönüşü, Recep "olur"undan sonra) ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.',
-    yasak: 'Sayfa, rota, adres, veri, SEO ve kabuk dosyaları URUN\'undur (dokunma, ölç); adres şemasını değiştirmez (karar 118); K36 kabuk kararı ve Faz 2b Recep onayı olmadan başlamaz; yeni renk kaynağı açmaz; para harcatan tasarım aracı Recep kapısıdır. Sınır: MARKA = web\'deki Design-MARKA projesi (kimlik), TASARIM = yerel köprü, canlıya uygulama URUN.',
+    dosyalar: '`src/design-system/**`, `src/components/ds/**` (henüz yok), `src/index.css` (yalnız :root türev bloğu), `tailwind.config.js`, `src/app/layout.tsx` (yazı tipi + `data-gorunum` özniteliği ve `body` sınıf seçimi; plan v2.2 §7), `docs/plans/tasarim-kod-plani-v2*` (dosya kümesi plan önerisidir, karar değil). Sahibi olduğu cetvel (OPS onaylı devir, 2026-09-30): marka token eşlemesi (önceki sahip URUN); tasarım dili cetveli (storefront-design) URUN\'da kalır.',
+    yetki: 'Faz 2a (görünmez token köprüsü), Faz 2b (görünüm dönüşü, bayrak arkasında) ve Faz 3 (DS bileşenleri) kodu; Faz 1 ve 4 için yalnız ölçüm. Design önerisini "öneri" diye kaydeder, karar saymaz.',
+    yasak: 'Sayfa, rota, adres, veri, SEO ve kabuk dosyaları URUN\'undur (dokunma, ölç); adres şemasını değiştirmez (karar 118); Faz 2b ve K36 karar 271 kapsamında, bayrak arkasında merge edilir; canlı AÇILIŞ Recep önizleme kabulüyle (Cuma); yeni renk kaynağı açmaz; para harcatan tasarım aracı Recep kapısıdır. Sınır: MARKA = web\'deki Design-MARKA projesi (kimlik), TASARIM = yerel köprü, canlıya uygulama URUN.',
     yetenek: 'venthub-tasarim-dili (kare kabul ölçümü), design-dna (yalnız Faz 1-2), Playwright, plan-challenger, typography, accessibility; DesignSync yalnız ana oturumda.',
-    durum: 'Açık (asli görev). 09-25\'te park edildi, "tasarım haftası 09-28\'de yeniden açılır" denmişti; 09-28 sonrası yeniden açılış kaydı yok. K36 kabuk kararı yazılmamış.',
+    durum: 'Açık (asli görev). 09-25\'te park edildi, "tasarım haftası 09-28\'de yeniden açılır" denmişti; 09-28 sonrası yeniden açılış kaydı yok. K36 karar 271 ile kararlı (10-03).',
   },
   EDGE: {
     gorev: 'Supabase Edge Function katmanı (`supabase/functions/**`, 29 fonksiyon + `_shared/`): güvenlik duruşu, deploy hattı, repo↔prod sapma denetimi; her fonksiyon çağıran sınıfına (a/b/c/d) yazılı bağlanır.',
@@ -601,6 +615,8 @@ function kuralDosyaSorunlari(kurallarDosyalari) {
     for (const [no, , kisa, ozet] of rolKurallari(ad)) {
       if (!metin.includes(`- K${no} ${kisa}: ${ozet}`)) s.push(`${ad}: kural satırı eksik/değişmiş: K${no}`)
     }
+    // Durum dosyası "Yarım iş" satırı bloğu (HRT-31): kokpit compact hazırlığı bu biçime bağlı, blok düşerse biçim unutulur.
+    if (!metin.includes(DURUM_SATIRI_KURALI)) s.push(`${ad}: kurallar dosyasında "Yarım iş" satırı bloğu eksik/değişmiş (HRT-31)`)
   }
   return s
 }
@@ -899,6 +915,8 @@ function main() {
 }
 
 module.exports = {
+  DURUM_SATIRI_KURALI,
+  CALISMA,
   haritaOzet,
   haritaDosyasi,
   haritaSorunlari,
