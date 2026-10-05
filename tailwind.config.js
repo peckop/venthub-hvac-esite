@@ -53,6 +53,23 @@ const tailwindConfig = {
         'brand-cyan-ink':        'hsl(var(--brand-cyan-ink) / <alpha-value>)',
         'action-terracotta-deep': 'hsl(var(--action-terracotta-deep) / <alpha-value>)',
 
+        /* ── DS adları (OPS-53 Faz 2a, 2026-10-05) — GÖRÜNMEZ, TÜKETİCİSİ YOK ──
+           Design System'in renk adları, ADIYLA. Değişkenler `src/index.css` `:root`ta
+           (takma ad ya da tek literal) — SSOT orasıdır, burada SABİT HEX YOK ve
+           palet adı YAZILMAZ (INV-PALET-1 3. kol: ikinci kaynak olmaz).
+           Hiçbir sınıf bu anahtarları henüz kullanmıyor; Tailwind kullanılmayan
+           anahtar için CSS üretmez, yani bu satırlar çıktıyı değiştirmez.
+           Çakışan küme (primary-navy, brand-cyan, action-terracotta-deep, font-sans)
+           2a'da DOKUNULMAZ — görünür dönüşüm Faz 2b. */
+        'action-terracotta':      'hsl(var(--action-terracotta) / <alpha-value>)',
+        'warn-amber':             'hsl(var(--warn-amber) / <alpha-value>)',
+        'accent-air-green':       'hsl(var(--accent-air-green) / <alpha-value>)',
+        'text-strong':            'hsl(var(--text-strong) / <alpha-value>)',
+        'text-body':              'hsl(var(--text-body) / <alpha-value>)',
+        'text-muted':             'hsl(var(--text-muted) / <alpha-value>)',
+        'text-on-dark':           'hsl(var(--text-on-dark) / <alpha-value>)',
+        'text-on-dark-muted':     'hsl(var(--text-on-dark-muted) / <alpha-value>)',
+
         /* ── Admin semantik renkleri ──────────────────────────────────
            Değişkenler `src/index.css`te `[data-admin-theme]` kapsamında
            tanımlı (varsayılan açık, `='dark'` ile koyu). Admin yüzeylerinde

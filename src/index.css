@@ -331,6 +331,43 @@ textarea:focus-visible {
     --brand-cyan-ink: 193 100% 28%;        /* #00708F */
     --action-terracotta-deep: 24.4 91% 39.2%;  /* #BF5309 */
 
+    /* ── DS TAKMA ADLARI (OPS-53 Faz 2a, 2026-10-05) — GÖRÜNMEZ, TÜKETİCİSİ YOK ──
+       Plan: docs/plans/tasarim-kod-plani-v2.2-2026-10-05.md §2 + v2.1 §2.1/§2.2
+       (PR #1700). Design System'in (DS) renk adları bu bloğa YALNIZ EKLENİR; bu
+       dosyada hiçbir mevcut satır değişmedi. Tailwind'de karşılıkları aşağıdaki
+       "DS adları" renk anahtarlarıdır; hiçbir kod henüz kullanmıyor — bu yüzden
+       üretilen CSS'te yalnız bu satırlar farklıdır ve ekranda hiçbir şey değişmez.
+
+       ⭐DEĞER TEK KAYNAKTA KALIR (cetvel marka-token-eslemesi-standard.md §2 "yeni
+       renk kaynağı açılamaz"): DS değeri sitede ZATEN bir tokenla aynıysa o tokene
+       TAKMA AD olur (var(...) ile); hedef değişirse takma ad onu izler ve INV-PALET-1
+       hedefi korur. Takma ad, kalıtım yoluyla hedefin :root değerini alır — `.light`
+       gibi alt kapsam hedefi yeniden tanımlasa bile takma ad :root'ta çözülür
+       (bugün DS adının tüketicisi olmadığı için ölçülen etki yok).
+
+       K1 (değer sitede aynı, DS adı yok → takma ad):
+         action-terracotta → marka-kiremit · warn-amber → marka-amber ·
+         text-strong → marka-lacivert · text-on-dark → clean-white
+       K2 (değer sitede YOK, DS adı yok → tek literal; DS 2026-09-14 sürümünden,
+           okuma 2026-10-05; başka dosyada ikinci tanımı yok): aşağıdaki üç satır.
+
+       ⚠ÇAKIŞAN KÜME BU BLOKTA YOK: primary-navy, brand-cyan, action-terracotta-deep
+       ve font-sans sitede FARKLI değerle zaten var ve 2a'da DOKUNULMAZ (görünür
+       dönüşüm Faz 2b'dir; `:root` değerleri hiç değişmeyecek, çevirme
+       `:root[data-gorunum='yeni']` kapsamında yapılacak — v2.2 §1.2).
+       text-muted, silinen ölü değişken listesindeki bir adla çakışır; INV-PALET-1
+       4. kol takma adı serbest bıraktıktan sonra (ALT-30, #1707) K1 olarak EKLENDİ:
+       steel-gray'e takma ad (steel-gray prefers-contrast'ta değişir, takma ad onu
+       izler; kontrast etkisi gerçek tarayıcıda ölçülecek, bugün tüketici yok). */
+    --text-muted: var(--steel-gray);
+    --action-terracotta: var(--marka-kiremit);
+    --warn-amber: var(--marka-amber);
+    --text-strong: var(--marka-lacivert);
+    --text-on-dark: var(--clean-white);
+    --accent-air-green: 100 61% 30%;
+    --text-body: 218 17% 35%;
+    --text-on-dark-muted: 215 26% 65%;
+
     /* ── Design System Tokens ──────────────────────────── */
     --surface-deep: 224 52% 8%;
     --surface-darker: 224 71% 4%;
