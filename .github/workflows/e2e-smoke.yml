@@ -181,6 +181,11 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.E2E_SUPABASE_ANON_KEY }}
 
+      # ALT-34 · M6: bayrak kapalıyken (bugün) HTML'e yalnız Inter font önyüklemesi basılır; fazlası KIRMIZI, boş
+      # manifest ÖLÇÜLEMEDİ = kırmızı. Yalnız Linux'ta anlamlı (Windows'ta manifest boş). Cetvel: plan v2.2 §4 M6.
+      - name: Font preload olcumu (kapali kip, yalniz Inter)
+        run: node scripts/ci/font-preload-olc.cjs --beklenen Inter
+
       - name: Run smoke suite (admin + checkout)
         run: pnpm exec playwright test
         env:

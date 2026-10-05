@@ -237,6 +237,14 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   // `unavailable` = veri yok DEĞİL, veriye ULAŞILAMADI (ağ/RPC/env). 404 basılmaz —
   // önbelleğe alınabilen kalıcı bir yokluk beyanı olurdu; mevcut "bulunamadı" görünümü çizilir.
   const detail = resolution.kind === 'family' ? resolution.detail : null
+
+  // URN-38: MODEL rotasında (canonical'ı kendi adresi) veri yoksa içi boş 200 çizilmez — o sayfa
+  // önbelleğe girer ve indekslenebilirdi. Hata fırlatılır: sayfa önbelleğe alınmaz, ISR son iyi
+  // sayfayı korur. Aile rotası (`sunucuSku` yok) bugünkü "bulunamadı" görünümünü çizmeye devam eder.
+  if (sunucuSku && !detail) {
+    throw new Error(`model sayfası verisi alınamadı (${slug}, ${sunucuSku}): veriye ulaşılamadı`)
+  }
+
   const family = detail?.family ?? null
   const variants = detail?.variants ?? []
 
