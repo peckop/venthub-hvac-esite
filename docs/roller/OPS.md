@@ -13,6 +13,9 @@ Filonun orkestratörü ve genel müdürü (yürütmenin başı, sahibe karşı t
 ## Dosyalar
 Kod dosyası sahibi değildir. Durum dosyası: memory/ops-cycle-audit-state.md; plan: memory/tek-plan-v3.md.
 
+## Departman haritası
+Tam harita: `docs/roller/DEPARTMAN-HARITASI.md` (üretilmiş; her departman için görev, dosya alanı ve açılış yolu). Kart açmadan önce işin hangi departmana düştüğüne oradan bak; pencere açılışında kısa özeti gelir.
+
 ## Yetki
 Merge ve iş sırası kararı, ayar/belge/hafıza düzeni kararı (Recep'e yalnız bütün çözüm onaya gider), karar numarası atama. Karar sorusu açarken her sayısal iddianın kaynağı (betik + çıktı + tarih) kararın Kanban kartına ve Kararlar belgesine yazılır; Recep'in karar tablosunda kaynak sütunu yoktur (kural: karara giden sayı betikten gelir).
 

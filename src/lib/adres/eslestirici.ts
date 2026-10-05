@@ -43,10 +43,15 @@ const KATEGORI_ONEKLERI = new Set(['category', 'kategori'])
 const URUN_ONEKLERI = new Set(['products', 'urun'])
 const TUM_URUNLER_ONEKLERI = new Set(['products', 'urunler'])
 
-/** Sondaki eğik çizgileri atar (kök `/` hariç). */
+/**
+ * Sondaki eğik çizgileri atar (kök `/` hariç). `replace(/\/+$/, '')` YERİNE doğrusal döngü: o desen çok sayıda
+ * ardışık `/` + başka karakter içeren yollarda ikinci dereceden yavaşlar (64.000 `/` ≈ 3 sn CPU) ve bu fonksiyon
+ * middleware'de İSTEK yolunda çalışır (ALT-15; aynı kusur OPS-52 PR-C2'de ölçülüp düzeltildi).
+ */
 function normalizeEt(yol: string): string {
-  const kirpilmis = yol.replace(/\/+$/, '')
-  return kirpilmis === '' ? '/' : kirpilmis
+  let son = yol.length
+  while (son > 0 && yol.charCodeAt(son - 1) === 47) son--
+  return son === 0 ? '/' : yol.slice(0, son)
 }
 
 /** Segmentleri çözer; bozuk yüzde kodlamada null (eşleşme yok — bugünkü akış karar versin). */

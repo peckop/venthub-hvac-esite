@@ -2,6 +2,7 @@ import veri from '@/config/rotaDili.veri.json'
 import {
   adresDiliOku,
   rotaDiliCevir,
+  rotaDiliEsle,
   rotaDiliTablosuDogrula,
   rotaDiliYolu,
 } from '@/config/rotaDiliCekirdek.mjs'
@@ -48,4 +49,14 @@ export function rotaDiliYoluOku(url: string, dil: string): string {
  */
 export function rotaDiliCevirOku(yol: string, eskiDil: string, yeniDil: string): string {
   return dilMi(eskiDil) && dilMi(yeniDil) ? rotaDiliCevir(yol, eskiDil, yeniDil, ROTA_DILI_TABLO, ADRES_DILI_ACIK) : yol
+}
+
+/**
+ * MIDDLEWARE DİLSİZ KOL (PR-C2): dil öneksiz eski adresi (`/about`) tablodan eşler → iki dildeki hedef
+ * (`{ tr: '/tr/hakkimizda', en: '/en/about' }`), eşleşme yoksa ya da anahtar kapalıysa `null`. Saf tablo
+ * araması; DB, çerez, istek yok (CLAUDE.md kural 12). Dil kararı middleware'indir (`detectLocale`).
+ */
+export function rotaDiliDilsizOku(yol: string): { tr: string; en: string } | null {
+  const esleme = rotaDiliEsle(yol, ROTA_DILI_TABLO, ADRES_DILI_ACIK)
+  return esleme === null ? null : { tr: esleme.tr, en: esleme.en }
 }
