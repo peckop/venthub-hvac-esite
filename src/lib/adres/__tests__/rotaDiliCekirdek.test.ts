@@ -262,3 +262,29 @@ describe('kabuk (rotaDili.mjs) ↔ çekirdek sözleşmesi', () => {
     expect(cekirdek.rotaDiliEsle('/about', [HAKKIMIZDA, ILETISIM], true)).toEqual({ satirId: 'hakkimizda', tr: '/tr/hakkimizda', en: '/en/about' })
   })
 })
+
+describe('istek yolu işleme — ikinci dereceden yavaşlama (ReDoS) yok', () => {
+  // Middleware dilsiz kolu yol bu fonksiyondan geçer; yol İSTEK'ten gelir (kullanıcı kontrolünde).
+  // `replace(/\/+$/, '')` 32.000 ardışık `/` + bir harfte ≈ 600 ms CPU yiyordu (kare büyüme); doğrusal döngü ≈ 0.
+  it('kaynakta sondaki-eğik-çizgi kırpan düzenli ifade YOK (yorumlar hariç)', () => {
+    const kod = yorumsuz(readFileSync(CEKIRDEK_YOLU, 'utf8'))
+    expect(kod).not.toMatch(/\.replace\(\s*\/\\\/\+\$\//)
+  })
+
+  it('64.000 ardışık `/` + harf: rotaDiliEsle ve rotaDiliYolu 250 ms altında (eski desen ≈ 2,5 sn)', () => {
+    const kotu = `${'/'.repeat(64_000)}x`
+    const t0 = performance.now()
+    expect(cekirdek.rotaDiliEsle(kotu, TABLO, true)).toBeNull()
+    expect(cekirdek.rotaDiliYolu(kotu, 'tr', TABLO, true)).toBe(kotu)
+    expect(performance.now() - t0).toBeLessThan(250)
+  })
+
+  it('kırpma davranışı eskisiyle aynı: sondaki bir ya da çok `/` aynı satıra eşler, ortadakiler eşlemez', () => {
+    for (const yol of ['/about', '/about/', '/about///']) {
+      expect(cekirdek.rotaDiliEsle(yol, TABLO, true)?.satirId).toBe('hakkimizda')
+    }
+    expect(cekirdek.rotaDiliEsle('/about//x', TABLO, true)).toBeNull()
+    expect(cekirdek.rotaDiliEsle('//', TABLO, true)).toBeNull()
+    expect(cekirdek.rotaDiliYolu('/about///', 'tr', TABLO, true)).toBe('/hakkimizda/')
+  })
+})
