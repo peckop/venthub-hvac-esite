@@ -227,11 +227,24 @@ describe('INV-DEPARTMAN-AC-1 · rol adı → görünen ad TEK KAYNAKTAN (pencere
         expect(k.plan.args, v).toContain(ad)
       }
     }
-  }, 120_000)
+  }, 300_000)
 
   it('Türkçe katlama: "Ürün" = "urun" = "URUN"; "Altyapı" = "altyapi"; "Araç" = "ARAC"', () => {
     for (const [a, beklenen] of [['Ürün', 'Ürün'], ['urun', 'Ürün'], ['ÜRÜN', 'Ürün'], ['altyapi', 'Altyapı'], ['ARAÇ', 'Araç'], ['geo-seo', 'Geo-SEO']] as const) {
       expect(ac(a, yeniDuzenek()).plan.ad, a).toBe(beklenen)
+    }
+  }, 60_000)
+
+  it('Blog (OPS-29): "blog" = "BLOG" = "Blog" tabloda; pano geçmişi varsa ESKİ Blog oturumu --resume edilir, taze açılmaz', () => {
+    const S_BLOG = 'e07358f7-9bfc-4f10-8f21-9f91d7f4509b' // 09-24..09-30 BLOG şeridini tutan gerçek oturum
+    const d = yeniDuzenek()
+    claim(d, S_BLOG, 'BLOG', saatOnce(30))
+    for (const v of ['blog', 'BLOG', 'Blog']) {
+      const k = ac(v, d)
+      expect(k.kod, v).toBe(0)
+      expect(k.plan.ad, v).toBe('Blog')
+      expect(k.plan.sid, v).toBe(S_BLOG)
+      expect(k.plan.args, v).toEqual(['--resume', S_BLOG, '--name', 'Blog', '--permission-mode', 'auto', '--mcp-config', path.join(d.kok, '.mcp.json')])
     }
   }, 60_000)
 
@@ -254,6 +267,72 @@ describe('INV-DEPARTMAN-AC-1 · rol adı → görünen ad TEK KAYNAKTAN (pencere
     for (const [serit] of TABLO.filter(([s]) => s !== 'OPS')) expect(kaynak, serit).not.toContain(`'${serit}'`)
     // OPS yalnız tavan istisnası için ADLA anılır (görünen adı tablodan alınır: pencereAdlari.ad(OPS_SERIT))
     expect(kaynak).toContain("OPS_SERIT = 'OPS'")
+  })
+})
+
+/**
+ * Rol kartı olan her departman: `docs/roller/<ROL>.md` (büyük harf, ASCII). `-kurallar`, `-gorevler`, `cetvel-sahipligi` ve harita
+ * belgeleri rol kartı DEĞİLDİR; ad deseni onları ayıklar (küçük harf içerenler dışarıda).
+ */
+function rolKartlari(): string[] {
+  return fs
+    .readdirSync(path.join(KOK, 'docs/roller'))
+    .map((f) => (/^([A-Z0-9]+(?:-[A-Z0-9]+)*)\.md$/.exec(f) ?? [])[1])
+    .filter((r): r is string => r !== undefined && r !== 'DEPARTMAN-HARITASI')
+    .sort()
+}
+
+/** Tablo anahtarları ile rol kartları arasındaki fark (iki yön). Saf işlev: sabotajlı tabloya da uygulanır. */
+function tabloFarki(roller: readonly string[], tablo: ReadonlyArray<readonly [string, string]>): { eksik: string[]; fazla: string[] } {
+  const anahtar = new Set(tablo.map(([s]) => s))
+  return { eksik: roller.filter((r) => !anahtar.has(r)), fazla: [...anahtar].filter((s) => !roller.includes(s)).sort() }
+}
+
+describe('INV-DEPARTMAN-AC-9 · tablo (pencere-adlari.cjs) ↔ rol kartları (docs/roller): 16 departmanın hepsi açılabilir (ARC-61)', () => {
+  it('rol kartı listesi okunabiliyor ve boş değil (kapı sessizce geçmesin)', () => {
+    expect(rolKartlari().length).toBeGreaterThanOrEqual(16)
+  })
+
+  it('TABLO anahtarları = rol kartları: eksik de fazla da KIRMIZI, mesaj eksik/fazla rolü adıyla söyler', () => {
+    const f = tabloFarki(rolKartlari(), TABLO)
+    expect(f.eksik, `rol kartı var, tabloda satır YOK (departman-ac "rol taninmiyor" der): ${f.eksik.join(', ')}`).toEqual([])
+    expect(f.fazla, `tabloda satır var, rol kartı YOK: ${f.fazla.join(', ')}`).toEqual([])
+  })
+
+  it('ÖLÇÜ KENDİSİ ÇALIŞIYOR: tablodan bir satır silinirse ya da uydurma satır eklenirse fark görünür (bilinçli satır silme kırmızı verir)', () => {
+    const roller = rolKartlari()
+    for (const [silinen] of TABLO) {
+      const eksikli = TABLO.filter(([s]) => s !== silinen)
+      expect(tabloFarki(roller, eksikli).eksik, `${silinen} silindi ama fark görünmedi`).toEqual([silinen])
+    }
+    expect(tabloFarki(roller, [...TABLO, ['UYDURMA', 'Uydurma']]).fazla).toEqual(['UYDURMA'])
+  })
+
+  it('YEDİ EKSİK ROL (ARC-61) görünen adlarıyla tabloda: Tasarım, Satış, Marka, Katalog, Edge, I18N, Mevzuat', () => {
+    const harita = new Map(TABLO)
+    for (const [serit, ad] of [['TASARIM', 'Tasarım'], ['SATIS', 'Satış'], ['MARKA', 'Marka'], ['KATALOG', 'Katalog'], ['EDGE', 'Edge'], ['I18N', 'I18N'], ['MEVZUAT', 'Mevzuat']] as const) {
+      expect(harita.get(serit), serit).toBe(ad)
+    }
+  })
+
+  it('HER ROL KARTI İÇİN gerçek kuru koşu: "rol taninmiyor" YOK, plan "ac", ad tablodaki ad (şerit adıyla ve görünen adla)', () => {
+    const harita = new Map(TABLO)
+    for (const rol of rolKartlari()) {
+      for (const v of [rol, rol.toLowerCase(), harita.get(rol) ?? '?']) {
+        const d = yeniDuzenek()
+        const k = ac(v, d)
+        expect(k.err + k.out, `${v}: "rol taninmiyor"`).not.toContain('rol taninmiyor')
+        expect(k.kod, `${v} → çıkış`).toBe(0)
+        expect(k.plan.karar, v).toBe('ac')
+        expect(k.plan.ad, v).toBe(harita.get(rol))
+        expect(fs.existsSync(d.marker), `${v}: kuru kip pencere BAŞLATTI`).toBe(false)
+      }
+    }
+  }, 240_000)
+
+  it('geçersiz hata mesajı artık 16 görünen adın hepsini listeler', () => {
+    const k = ac('bilinmez', yeniDuzenek())
+    for (const ad of ['Tasarım', 'Satış', 'Marka', 'Katalog', 'Edge', 'I18N', 'Mevzuat']) expect(k.plan.sebep).toContain(ad)
   })
 })
 

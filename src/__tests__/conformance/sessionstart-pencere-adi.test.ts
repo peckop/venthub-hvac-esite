@@ -152,6 +152,15 @@ const TABLO: ReadonlyArray<readonly [string, string]> = [
   ['ALTYAPI', 'Altyapı'],
   ['ADMIN', 'Admin'],
   ['GEO-SEO', 'Geo-SEO'],
+  ['BLOG', 'Blog'],
+  // ARC-61 (10-05): rol kartı olup tabloda olmayan yedi departman. Tablo ↔ rol kartı eşitliği ayrıca departman-ac-kapat.test.ts INV-DEPARTMAN-AC-9.
+  ['TASARIM', 'Tasarım'],
+  ['SATIS', 'Satış'],
+  ['MARKA', 'Marka'],
+  ['KATALOG', 'Katalog'],
+  ['EDGE', 'Edge'],
+  ['I18N', 'I18N'],
+  ['MEVZUAT', 'Mevzuat'],
 ]
 
 describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adını şeridin insan adına sabitler', () => {
@@ -185,7 +194,7 @@ describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adın
       talepYaz(pano, serit)
       expect(calistir('resume', pano).baslik, serit).toBe(ad)
     }
-  })
+  }, 120_000) // her satır gerçek kancayı ayrı süreçte koşturur; tablo 16 satıra çıkınca varsayılan 20 sn yetmedi (ARC-61)
 
   it('tablo anahtarı büyük/küçük harfe duyarsız: panoda küçük yazılmış "ops" da "Ops" olur', () => {
     const pano = yeniPano()
@@ -195,7 +204,7 @@ describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adın
 
   it('tabloda OLMAYAN şerit: ilk harf büyük, kalanı küçük; Türkçe karakter üretilmez, ham ad çıplak basılmaz', () => {
     for (const [serit, ad] of [
-      ['KATALOG', 'Katalog'],
+      ['DENEME-SERIT', 'Deneme-serit'], // tabloda olmayan örnek (KATALOG 10-05'te tabloya girdi, ARC-61)
       ['ADMIN-CUSTOMER', 'Admin-customer'],
       ['MEKANIZMA-PROBU', 'Mekanizma-probu'],
       ['GORSEL', 'Gorsel'], // "Görsel" TAHMİN EDİLMEZ — tabloya satır eklenene kadar ASCII kalır
@@ -552,7 +561,7 @@ describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynakt�
     PENCERE_ADLARI: Map<string, string>
   }
 
-  it('dışa aktarılan TABLO beklenen sekiz satırın aynısıdır (sıra dahil)', () => {
+  it('dışa aktarılan TABLO beklenen on altı satırın aynısıdır (sıra dahil)', () => {
     expect(modul.TABLO.map(([k, v]) => [k, v])).toEqual(TABLO.map(([k, v]) => [k, v]))
     expect(modul.PENCERE_ADLARI.size).toBe(TABLO.length)
   })

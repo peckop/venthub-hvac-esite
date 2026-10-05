@@ -264,6 +264,10 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-beklenti-kapisi.cjs\""
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/verify-on-stop.cjs\"",
             "timeout": 120,
             "statusMessage": "verify (eslint --fix + tsc)",

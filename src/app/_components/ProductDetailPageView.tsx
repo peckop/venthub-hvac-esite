@@ -704,7 +704,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                         Kardeş yüzeyler bu çözücüye çoktan geçmişti (VariantSelector:78,
                         JSON-LD `mpn`); geride kalan tek yer burasıydı. */}
                     {variantLabel && (
-                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {variantLabel}</span>
+                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.modelCode')}: {variantLabel}</span>
                     )}
                   </div>
                 </div>

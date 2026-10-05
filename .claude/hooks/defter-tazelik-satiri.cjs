@@ -338,8 +338,12 @@ try {
  */
 try {
   const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
-  const s = bd.satir(bd.sonBaglam(girdi.transcript_path), bd.compactPenceresi(DEPO))
+  const token = bd.sonBaglam(girdi.transcript_path)
+  const pencere = bd.compactPenceresi(DEPO)
+  const s = bd.satir(token, pencere)
   if (s) process.stdout.write(s + '\n')
+  // Modlar bu ölçümü pencere başına dosyadan okur (ARC-33 madde 2); yazım hatası satırı bozmaz.
+  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE)
 } catch (e) {
   process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
@@ -358,6 +362,22 @@ try {
   }
 } catch (e) {
   process.stdout.write('⚠BELGE: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── WRONGSTACK (ARC-24, karar 257) — HER MESAJDA, EŞİKSİZ ──
+ * "bizde X, son Y": sabitli sürüm taze okunur, son sürüm GitHub'dan günde en çok bir kez
+ * arka planda ölçülüp önbelleğe yazılır. Ağ yoksa "OLCULEMEDI". Gerekçe: wrongstack-satiri.cjs.
+ */
+try {
+  const ws = require(path.join(__dirname, 'wrongstack-satiri.cjs'))
+  const simdi = Date.now()
+  process.stdout.write(ws.satir(ws.oku(ws.onbellekYolu(PANO)), DEPO, simdi) + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ws.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠WRONGSTACK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 process.exit(0)

@@ -7,6 +7,7 @@ import { createRedirectResponse,resolveUserClaims } from '@/utils/router'
 import { ADRES_SEMASI_K3B } from './config/features'
 import { eskiAdresEsle } from './lib/adres/eslestirici'
 import { ESKI_ADRES_HARITASI } from './lib/adres/haritaKaynagi'
+import { ADRES_DILI_ACIK, rotaDiliDilsizOku } from './lib/adres/rotaDiliTablo'
 import { resolveTenant } from './lib/tenantResolver'
 import { type DesteklenenDil, tercihEdilenDil } from './utils/dilTespiti'
 import { kokDosyaKarari } from './utils/kokDosya'
@@ -77,6 +78,28 @@ export async function middleware(request: NextRequest) {
       const yanit = redirectResponse(url, eslesme.durum)
       // Tarayıcı 308'i kalıcı önbelleğe almasın (plan §5 m.9, v4 D4): bayat harita düzeltilince
       // ziyaretçi eski hedefe kilitli kalmasın.
+      yanit.headers.set('Cache-Control', 'max-age=0, must-revalidate')
+      return yanit
+    }
+  }
+
+  // ── ROTA DİLİ DİLSİZ KOLU (OPS-52 PR-C2; yalnız `NEXT_PUBLIC_ADRES_DILI=1` iken) ──
+  // Dilsiz eski adres (`/about`) bugün 307 `/tr/about`, sonra config 308 `/tr/hakkimizda` = İKİ sıçrama
+  // (A9 bütçesi 1). Burada tablodan TEK adımda hedef dilin YENİ adresine gidilir. Yalnız tablo araması:
+  // DB yok (kural 12). K3B kolundan SONRA (K3B kendi eski adreslerini önce çözer), dil öneki kolundan ÖNCE.
+  // Dilli eski adres (`/tr/about`) bu kola GİRMEZ: tek 308'i config verir. Aşama 2 önekleri tabloda yoktur.
+  //
+  // ⚠DİL SEÇİMİ = `detectLocale` + 307, deterministik TR 308 DEĞİL. A9'un "Türkçe slug'lı dilsiz eski adres →
+  // TR 308" hükmü içeriğin YALNIZ Türkçe olduğu adresler içindir (kategori slug'ı `fanlar`). Statik sayfaların iki
+  // dilde de içeriği var ve `/about` dilden bağımsız bir ad: 308 İngilizce ziyaretçiyi tarayıcıda kalıcı olarak
+  // Türkçeye çiviler ve geri alınamaz (next.config'teki "dilsiz kural yok" gerekçesi, REC-127). Sorgu dizesi AYNEN
+  // taşınır (`/contact?dept=satis`); kalıcı önbelleğe karşı başlık K3B koluyla aynı.
+  if (ADRES_DILI_ACIK) {
+    const dilsiz = rotaDiliDilsizOku(pathname)
+    if (dilsiz) {
+      const url = request.nextUrl.clone()
+      url.pathname = dilsiz[detectLocale(request)]
+      const yanit = redirectResponse(url, 307)
       yanit.headers.set('Cache-Control', 'max-age=0, must-revalidate')
       return yanit
     }

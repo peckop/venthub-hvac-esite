@@ -111,10 +111,76 @@ function opsMu(serit) {
 }
 
 /**
+ * ⭐İKİNCİ KAYNAK: GÖVDENİN İLK SATIRINDAKİ BAŞLIK (kart ARC-51, olay 2026-10-04).
+ *
+ * OLAY: tek Linear hesabı olduğu için şerit ayrımı yalnız imza satırına dayanıyordu. Vitrin 15A (MENU)
+ * projesindeki son 12 yorumun 8'i OPS'un kendi emriydi (başlık "**OPS → Design #13 …**") ama son satırları
+ * içerik ya da madde ("- Hesap, sepet, ödeme …", "Çıktıyı bu dizide …") olduğundan imza çıkmadı: sayaç
+ * OPS'un kendi emirlerini Design'dan gelmiş sayıp "LINEAR: 8 yeni yorum" yazdı. Aynı anda zil ve --durum
+ * "Design son yorumu 23 saat önce" diyordu: iki ölçüm birbirini yalanlıyordu.
+ *
+ * Başlık kuralımızın parçası: "**<GÖNDEREN> → <ALICI> …**" (OPS → Design #22, DESIGN-MENU → OPS, HARİTA → OPS).
+ * Gönderen = oktan ÖNCEKİ büyük harfli ad. Yalnız İLK satıra bakılır (metin ortasındaki oklar sayılmaz).
+ */
+const BASLIK_DESENI = /^[\s*_#>]*([A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜ0-9-]{1,20})\s*(?:→|->|—>|=>)/
+
+function baslikSerit(govde) {
+  if (typeof govde !== 'string') return null
+  const ilk = govde
+    .split('\n')
+    .map((s) => s.trim())
+    .find(Boolean)
+  if (!ilk) return null
+  const m = BASLIK_DESENI.exec(ilk)
+  return m ? m[1] : null
+}
+
+/**
+ * Bilinen şerit adları. İmza çıkarımı gürültülüdür ("- SSS'deki …" satırından `SSS`, "PNG", "INSERT", "AMA"
+ * sahte imzalar çıkıyor): çelişki yalnız İKİ KAYNAK DA bilinen bir şeritse sayılır; bilinmeyen imza başlıkla
+ * çelişmez, başlık kazanır.
+ */
+const BILINEN_SERITLER = new Set([
+  'OPS', 'ALTYAPI', 'HARİTA', 'HARITA', 'ARAÇ', 'ARAC', 'URUN', 'ÜRÜN', 'ADMIN', 'KATALOG', 'EDGE', 'I18N',
+  'SATIS', 'SATIŞ', 'MEVZUAT', 'TASARIM', 'BLOG', 'GEO-SEO', 'YETENEK', 'SEO',
+])
+
+function bilinenSerit(ad) {
+  return typeof ad === 'string' && (BILINEN_SERITLER.has(ad) || ad.startsWith('DESIGN'))
+}
+
+/** Aynı şerit mi? DESIGN-MENU ile DESIGN-KATALOG aynı aileden (Design) sayılır. */
+function ayniSerit(a, b) {
+  return a === b || (a.startsWith('DESIGN') && b.startsWith('DESIGN'))
+}
+
+/**
+ * ⭐ŞERİT TANIMA: imza + başlık birlikte. Dönüş: `{ serit, kaynak, celiski }`.
+ * - ikisi de var, bilinen ve aynı aile → imza · ikisi de var, bilinen, FARKLI → `celiski` (serit null)
+ * - imza bilinmeyen/sahte + başlık var → başlık · yalnız biri var → o · hiçbiri → serit null
+ * Çelişen yorum "belirsiz"dir: ne OPS'un ne Design'ın sayılır, yeni de sayılmaz; ayrıca gösterilir.
+ */
+function seritTani(govde) {
+  const imza = imzaSerit(govde)
+  const baslik = baslikSerit(govde)
+  if (imza && baslik) {
+    if (bilinenSerit(imza) && bilinenSerit(baslik)) {
+      return ayniSerit(imza, baslik) ? { serit: imza, kaynak: 'imza+baslik', celiski: false } : { serit: null, kaynak: 'celiski', celiski: true, imza, baslik }
+    }
+    return bilinenSerit(imza) ? { serit: imza, kaynak: 'imza', celiski: false } : { serit: baslik, kaynak: 'baslik', celiski: false }
+  }
+  if (imza) return { serit: imza, kaynak: 'imza', celiski: false }
+  if (baslik) return { serit: baslik, kaynak: 'baslik', celiski: false }
+  return { serit: null, kaynak: 'yok', celiski: false }
+}
+
+/**
  * Sayımı tek satıra çevirir. Hiç yeni yorum yoksa `null` döner (satır BASILMAZ).
  * Biçim: `LINEAR: 3 yeni yorum (KATALOG 2 · MENU 1), en eski 18:23Z`
  */
-function ozetle(kalemler) {
+function ozetle(kalemler, belirsiz = 0) {
+  // ⭐Yalnız belirsiz yorum varsa satır BASILMAZ: yüklü zil boş olmayan her çıktıyı "Design yeni yorum yazdı" sayar.
+  // Belirsiz sayısı yalnız yeni yorum da varsa satıra eklenir; tek başına `--durum` çıktısında görünür.
   if (!Array.isArray(kalemler) || kalemler.length === 0) return null
   const sayac = new Map()
   let enEski = null
@@ -128,7 +194,8 @@ function ozetle(kalemler) {
     .map(([ad, n]) => `${ad} ${n}`)
     .join(' · ')
   const saat = enEski ? `${enEski.slice(11, 16)}Z` : '?'
-  return `LINEAR: ${kalemler.length} yeni yorum (${dagilim}), en eski ${saat} — okudum: node scripts/board/linear-okundu.cjs`
+  const belirsizYazi = belirsiz > 0 ? ` · belirsiz ${belirsiz} (imza ile başlık çelişiyor)` : ''
+  return `LINEAR: ${kalemler.length} yeni yorum (${dagilim})${belirsizYazi}, en eski ${saat} — okudum: node scripts/board/linear-okundu.cjs`
 }
 
 /**
@@ -178,17 +245,213 @@ async function cek() {
 
     const harita = new Map(PROJELER.map((p) => [p.id, p.kisa]))
     const kalemler = []
+    let belirsiz = 0
     for (const d of dugumler) {
       if (!d || typeof d.createdAt !== 'string') continue
-      const serit = imzaSerit(d.body)
-      if (opsMu(serit)) continue
-      kalemler.push({ proje: harita.get(d.project?.id) || '?', createdAt: d.createdAt, serit })
+      const tani = seritTani(d.body)
+      // İmza ile başlık çelişiyorsa yeni SAYILMAZ (yanlış alarm gerçek Design cevabını örter), ama ayrıca sayılır.
+      if (tani.celiski) {
+        belirsiz++
+        continue
+      }
+      if (opsMu(tani.serit)) continue
+      kalemler.push({ proje: harita.get(d.project?.id) || '?', createdAt: d.createdAt, serit: tani.serit, kaynak: tani.kaynak })
     }
-    return { kalemler, esik, hamSayi: dugumler.length }
+    return { kalemler, belirsiz, esik, hamSayi: dugumler.length }
   } catch (e) {
     return { hata: e && e.name === 'AbortError' ? `zaman asimi (${ZAMAN_ASIMI_MS}ms)` : 'ag/cozumleme' , esik }
   } finally {
     clearTimeout(saat)
+  }
+}
+
+/**
+ * ⭐`--durum` KİPİ (ARC kartı 6edd47ed, olay 2026-10-04) — "ölçülemedi" ile "haber yok"u AYIRIR.
+ *
+ * OLAY: Design'dan Linear'a 21 saat hiçbir şey gelmedi (son yorum 10-03 12:55Z, arkasından OPS yorumları
+ * cevapsız), zil "Okunmamış yorum yok" gösterdi. Sebep iki katmandı: (1) `satir()` anahtar yok / ağ hatası /
+ * HTTP hatası / istisna durumlarında `null` döner ve çağıran bunu "yeni yorum yok"tan AYIRAMAZ; (2) sayaç
+ * yalnız "okunmamış yeni yorum" sayar, "Design uzun süredir sessiz" bilgisi hiçbir yerde üretilmez.
+ *
+ * ⭐GERİYE UYUM: varsayılan çıktı (`satir()` / boş çıktı = yok) DEĞİŞMEZ; yüklü zil boş olmayan her
+ * çıktıyı "yeni yorum" sayar, yani yeni bir metin o çıktıya EKLENSEYDİ yanlış alarm verirdi. Bu yüzden yeni
+ * bilgi AYRI bayrakla (`--durum`) ve TEK satır JSON olarak verilir.
+ *
+ * ⭐PROJEDEN BAĞIMSIZ: sorgu proje listesine (PROJELER) bakmaz; çalışma alanının son yorumlarını çeker ve
+ * Design/OPS ayrımını İMZADAN yapar. Yeni bir Design projesi açılsa bile kör kalmaz.
+ *
+ * ⭐DESIGN İMZASI = `DESIGN` ile başlayan şerit (DESIGN-MENU, DESIGN-KATALOG…). Ölçüm (2026-10-04): imza
+ * çıkarımı gürültülüdür (SSS, PNG, INSERT, AMA gibi sahte "imza"lar çıkıyor), bu yüzden yalnız `DESIGN*` ve
+ * `OPS` tanınır, geri kalanı yok sayılır.
+ *
+ * ⭐PROJE BAŞINA DEĞERLENDİRME: bir projede en az bir Design yorumu varsa o proje "Design kanalı"dır; onun
+ * son Design yorumundan SONRA yazılmış OPS yorumları "yanıtsız"dır. Design yorumu olmayan proje (ör. OPS'un
+ * emir yazdığı ALTYAPI projesi) kanal sayılmaz, yoksa her OPS yorumu sahte "yanıtsız" olurdu.
+ *
+ * ⚠SINIR, ADIYLA: pencere son 100 yorumdur. Bir projede pencere içinde hiç Design yorumu yoksa o proje
+ * kanal sayılmaz. Hiçbir projede Design yorumu yoksa sonuç "belirsiz"dir, "sessiz" DEĞİL.
+ */
+const DURUM_SORGU = `query {
+  comments(first: 100, orderBy: createdAt) {
+    nodes { createdAt body project { id name } }
+  }
+}`
+
+/** Yanıtsız OPS yorumu için eşikler: 6 saatten sonra amber, 24 saatten sonra kırmızı. */
+const ESIK_AMBER_MS = 6 * 60 * 60 * 1000
+const ESIK_KIRMIZI_MS = 24 * 60 * 60 * 1000
+
+function seritTuru(govde) {
+  const s = seritTani(govde).serit
+  if (!s) return null
+  if (s === 'OPS') return 'ops'
+  if (s.startsWith('DESIGN')) return 'design'
+  return null
+}
+
+/** "5 dk", "21 saat", "3 gün" — okunur yaş. */
+function yasYaz(ms) {
+  if (!Number.isFinite(ms) || ms < 0) return '?'
+  const dk = Math.floor(ms / 60000)
+  if (dk < 60) return `${dk} dk`
+  const saat = Math.floor(dk / 60)
+  if (saat < 48) return `${saat} saat`
+  return `${Math.floor(saat / 24)} gün`
+}
+
+/**
+ * Saf hesap: yorum düğümlerinden durumu çıkarır. Ağ yok, saat DIŞARIDAN verilir (test edilebilir).
+ * Dönüş: `{ durum: 'olculdu', seviye, ozet, ... }` ya da `{ durum: 'belirsiz', seviye: 'belirsiz', ... }`.
+ */
+function durumHesapla(dugumler, simdiMs, okumaMs = null) {
+  const projeler = new Map()
+  // ⭐İmza ile başlığı çelişen yorumlar ne OPS'un ne Design'ın sayılır; son okumadan SONRA yazılanlar "belirsiz N" diye ayrı gösterilir.
+  let belirsizSayi = 0
+  for (const d of Array.isArray(dugumler) ? dugumler : []) {
+    if (!d || typeof d.createdAt !== 'string' || !d.project || !d.project.id) continue
+    const zaman = Date.parse(d.createdAt)
+    if (!Number.isFinite(zaman)) continue
+    const tani = seritTani(d.body)
+    if (tani.celiski) {
+      if (okumaMs === null || zaman > okumaMs) belirsizSayi++
+      continue
+    }
+    const tur = seritTuru(d.body)
+    if (!tur) continue
+    let p = projeler.get(d.project.id)
+    if (!p) {
+      p = { ad: d.project.name || '?', design: [], ops: [] }
+      projeler.set(d.project.id, p)
+    }
+    p[tur].push(zaman)
+  }
+
+  const kanallar = []
+  for (const [id, p] of projeler) {
+    if (p.design.length === 0) continue
+    const sonDesign = Math.max(...p.design)
+    const yanitsiz = p.ops.filter((z) => z > sonDesign).sort((a, b) => a - b)
+    kanallar.push({
+      id,
+      ad: p.ad,
+      sonDesignMs: sonDesign,
+      sonDesignYas: simdiMs - sonDesign,
+      yanitsizSayi: yanitsiz.length,
+      enEskiYanitsizYas: yanitsiz.length > 0 ? simdiMs - yanitsiz[0] : null,
+    })
+  }
+
+  const belirsizYazi = belirsizSayi > 0 ? ` · belirsiz ${belirsizSayi} yorum (imza ile başlık çelişiyor)` : ''
+
+  if (kanallar.length === 0) {
+    return {
+      durum: 'belirsiz',
+      seviye: 'belirsiz',
+      ozet: 'Design yorumu son 100 yorumda yok: sessizlik ölçülemedi' + belirsizYazi,
+      belirsizSayi,
+    }
+  }
+
+  // ⭐SEVİYE YALNIZ ETKİN KANALA BAĞLIDIR (en son Design yorumu olan proje). Ölçüm (2026-10-04): MARKA
+  // kanalında OPS en son yazmış ve 5 gündür cevap yok; o eski konuşma seviyeyi kalıcı kırmızı yapıp zili
+  // gürültüye çevirirdi. Diğer kanallar BİLGİ olarak ozet'e yazılır, seviyeyi etkilemez.
+  const enSon = kanallar.reduce((a, b) => (b.sonDesignMs > a.sonDesignMs ? b : a))
+  const digerleri = kanallar.filter((k) => k !== enSon && k.yanitsizSayi > 0)
+
+  let seviye = 'iyi'
+  if (enSon.enEskiYanitsizYas !== null && enSon.enEskiYanitsizYas >= ESIK_KIRMIZI_MS) seviye = 'kirmizi'
+  else if (enSon.enEskiYanitsizYas !== null && enSon.enEskiYanitsizYas >= ESIK_AMBER_MS) seviye = 'amber'
+
+  let ozet = `Design son yorum: ${yasYaz(enSon.sonDesignYas)} önce (${kisaAd(enSon.ad)})`
+  if (enSon.yanitsizSayi > 0) {
+    ozet += ` · OPS ${enSon.yanitsizSayi} yorum yanıtsız (en eski ${yasYaz(enSon.enEskiYanitsizYas)})`
+  }
+  if (digerleri.length > 0) {
+    ozet += ` · eski kanal: ${digerleri.map((k) => `${kisaAd(k.ad)} ${k.yanitsizSayi} yanıtsız (${yasYaz(k.enEskiYanitsizYas)})`).join(', ')}`
+  }
+
+  ozet += belirsizYazi
+
+  return {
+    durum: 'olculdu',
+    seviye,
+    ozet,
+    belirsizSayi,
+    sonDesignYasMs: enSon.sonDesignYas,
+    sonDesignProje: enSon.ad,
+    yanitsizSayi: enSon.yanitsizSayi,
+    enEskiYanitsizYasMs: enSon.enEskiYanitsizYas,
+    eskiKanallar: digerleri.map((k) => ({ ad: k.ad, yanitsizSayi: k.yanitsizSayi, enEskiYanitsizYasMs: k.enEskiYanitsizYas })),
+  }
+}
+
+/** "Vitrin 15A Yeniden Tasarım (DESIGN-MENU)" → "DESIGN-MENU"; parantez yoksa adın ilk 24 harfi. */
+function kisaAd(ad) {
+  const m = /\(([^)]+)\)\s*$/.exec(String(ad))
+  return m ? m[1] : String(ad).slice(0, 24)
+}
+
+/** Ham sorgu, `cek()` ile AYNI hata sözlüğü. `{ hata }` ya da `{ dugumler }`. */
+async function cekDurum() {
+  const anahtar = process.env.LINEAR_API_KEY
+  if (!anahtar || anahtar.length < 10) return { hata: 'anahtar yok' }
+
+  const kontrol = new AbortController()
+  const saat = setTimeout(() => kontrol.abort(), ZAMAN_ASIMI_MS)
+  try {
+    const cevap = await fetch('https://api.linear.app/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: anahtar },
+      body: JSON.stringify({ query: DURUM_SORGU }),
+      signal: kontrol.signal,
+    })
+    if (!cevap.ok) return { hata: `HTTP ${cevap.status}` }
+    const veri = await cevap.json()
+    if (veri && veri.errors) return { hata: 'GraphQL hatasi' }
+    const dugumler = veri?.data?.comments?.nodes
+    if (!Array.isArray(dugumler)) return { hata: 'beklenen alan yok (comments.nodes)' }
+    return { dugumler }
+  } catch (e) {
+    return { hata: e && e.name === 'AbortError' ? `zaman asimi (${ZAMAN_ASIMI_MS}ms)` : 'ag/cozumleme' }
+  } finally {
+    clearTimeout(saat)
+  }
+}
+
+/**
+ * `--durum` çıktısı: HER durumda bir sonuç döner, asla boş değil.
+ * `olculemedi` (anahtar/ağ/HTTP/şema hatası) ile `belirsiz` ile `olculdu` birbirinden AYRIDIR.
+ */
+async function durum(simdiMs = Date.now()) {
+  try {
+    const c = await cekDurum()
+    if (c.hata) {
+      return { durum: 'olculemedi', seviye: 'olculemedi', sebep: c.hata, ozet: `ölçülemedi: ${c.hata}` }
+    }
+    // "Belirsiz" sayısı son okumadan sonrakilerle sınırlı: eski çelişkili yorumlar sonsuza dek alarm vermesin.
+    return durumHesapla(c.dugumler, simdiMs, Date.parse(sonOkuma()))
+  } catch {
+    return { durum: 'olculemedi', seviye: 'olculemedi', sebep: 'istisna', ozet: 'ölçülemedi: istisna' }
   }
 }
 
@@ -252,7 +515,7 @@ async function satir() {
       // kalmayı seçmek, sessiz fail-open'ı gereksizce uzatmak olurdu.
       return null
     }
-    const cikti = ozetle(s.kalemler)
+    const cikti = ozetle(s.kalemler, s.belirsiz)
     onbellegeYaz(cikti)
     return cikti
   } catch {
@@ -260,11 +523,32 @@ async function satir() {
   }
 }
 
-module.exports = { imzaSerit, ozetle, opsMu, satir, cek, damgaYolu, PROJELER, ZAMAN_ASIMI_MS, SORGU }
+module.exports = {
+  imzaSerit,
+  baslikSerit,
+  seritTani,
+  ozetle,
+  opsMu,
+  satir,
+  cek,
+  damgaYolu,
+  PROJELER,
+  ZAMAN_ASIMI_MS,
+  SORGU,
+  durum,
+  durumHesapla,
+  seritTuru,
+  yasYaz,
+  ESIK_AMBER_MS,
+  ESIK_KIRMIZI_MS,
+}
 
 if (require.main === module) {
   const tani = process.argv.includes('--tani')
-  if (!tani) {
+  if (process.argv.includes('--durum')) {
+    // Tek satır JSON; çıkış kodu HER ZAMAN 0 (ölçülemedi de bir sonuçtur, çağıran kendi hatasıyla karıştırmasın).
+    durum().then((d) => console.log(JSON.stringify(d)))
+  } else if (!tani) {
     satir().then((s) => {
       if (s) console.log(s)
     })
@@ -280,9 +564,9 @@ if (require.main === module) {
         return
       }
       console.log(`[tani] sunucudan  : ${s.hamSayi} yorum (proje + tarih suzgeci SUNUCUDA)`)
-      console.log(`[tani] OPS disi   : ${s.kalemler.length}`)
-      for (const k of s.kalemler) console.log(`         ${k.proje.padEnd(8)} ${k.createdAt} imza=${k.serit}`)
-      console.log(`[tani] SATIR      : ${ozetle(s.kalemler) || '(yok — N=0, satir BASILMAZ)'}`)
+      console.log(`[tani] OPS disi   : ${s.kalemler.length} (belirsiz, imza/baslik celisen: ${s.belirsiz})`)
+      for (const k of s.kalemler) console.log(`         ${k.proje.padEnd(8)} ${k.createdAt} serit=${k.serit} kaynak=${k.kaynak}`)
+      console.log(`[tani] SATIR      : ${ozetle(s.kalemler, s.belirsiz) || '(yok — N=0, satir BASILMAZ)'}`)
     })
   }
 }

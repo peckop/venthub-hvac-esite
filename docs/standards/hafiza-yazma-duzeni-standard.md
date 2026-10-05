@@ -12,7 +12,7 @@
 > **Son doğrulama:** 2026-09-30 (Claude Code belge sayfaları iki araştırmacı ve işi yapmamış bir doğrulayıcıyla okundu;
 > `lane-guard.cjs`, `bash-write-guard.cjs`, `bash-write-audit.cjs`, `precompact-durum-kapisi.cjs`, `board.cjs`
 > kodu iki ayrı bağımsız okuyucuyla ve kaynaktan karşılaştırıldı; ARAÇ'ın uygulayıcı okuması 17 kritik madde buldu, v0.4 onları işledi; v0.4'ü okuyan dördüncü bağımsız okuyucu 7 engelleyici buldu, v0.5 onları işledi; v0.5'i doğrulayan beşinci okuyucu 2 engelleyici + 4 orta buldu, v0.6 onları işledi; v0.6'yı doğrulayan 2 engelleyici + 5 orta buldu, v0.7 işledi; v0.7'yi doğrulayan SON okuma (OPS kuralı) 1 engelleyici + 4 orta buldu, v0.8 hepsini işler).
-> **Kanca KURULU DEĞİL** (§10); bu cetvel şartnamedir. **Statü: v0.7, uygulamayla doğrulanacak** (OPS kararı 2026-10-01: v0.4, v0.5, v0.6 her turda en az 2 engelleyici (7, 2, 2; v0.7'de 1)
+> **Kanca KURULU DEĞİL** (§10); bu cetvel şartnamedir. **Statü: v0.9, uygulamayla doğrulanacak** (OPS kararı 2026-10-01: v0.4, v0.5, v0.6 her turda en az 2 engelleyici (7, 2, 2; v0.7'de 1)
 > çıktı; belge kodla sınanmadan sıfıra inmez; kalan sorular §11 "Açık sorular (uygulamada ölçülecek)" başlığında ARAÇ'ın kabul testlerine bağlıdır).
 > **Davranış kuralı (Recep, ayakta duran, kancadan bağımsız):** "Ayar dosyasına yazım yalnız ilgili pencerede Recep sözüyle; onay pencereler arası taşınmaz." Kanca izin verse bile söz şartı kalkmaz. *(Karar 224 son hâli, Recep 2026-10-01: canlı dışındaki her onayı Recep yalnız OPS penceresinde verir; ayar/izin/kullanıcı düzeyi dosyada "Recep sözü OPS penceresinde, değişikliği uygulayan OPS"; R9b "kullanıcı settings yalnız OPS ve ARAÇ yazar" hükmü kalır; `fleet-mechanism-standard.md` §17 Kural 4.)*
 
@@ -25,7 +25,7 @@
 | **1 Ortak çekirdek** | Şirket geneli sözleşme, Recep'in genel tercihleri, ortak dersler, indeks | `MEMORY.md`, kökteki ortak ders dosyaları, `olcum/**`; repoda talimat dosyaları (§2, R9) | yalnız OPS | herkes, oturum açılışında |
 | **1b Öneri kutusu** | "Bunu ortak hafızaya ya da kurala ekleyin" talebi: ne, neden, hangi departman, kanıt | `oneri/<ROL>-<tarih>-<konu>.md` | o ROL'ün penceresi (şeritsiz pencere: `oneri/_sahipsiz-<sid>-<konu>.md`) | OPS kabul ya da reddeder, kabul edileni çekirdeğe kendisi yazar |
 | **2 Departman hafızası** | O departmanın kalıcı dersleri, karar gerekçeleri, ölçüm sonuçları | `departman/<ROL>/` (kendi `MEMORY.md`'si ve konu dosyaları) | o ROL'ün penceresi ve OPS | yalnız o departman: `SessionStart` kancası kendi `MEMORY.md`'sini rol kartıyla birlikte enjekte eder (üst sınır §7) |
-| **3 Günlük / durum** | Compact sonrası kaldığı yer: dört sabit alan | `gunluk/<ROL>/` (ana indeksten ayrı, indekse girmez) | yalnız o ROL'ün penceresi | aynı pencere, compact kapısı |
+| **3 Günlük / durum** | Compact sonrası kaldığı yer: dört sabit alan | `gunluk/<ROL>/` (ana indeksten ayrı, indekse girmez); geçmiş günler `gunluk/<ROL>/gecmis/` (§9b) | yalnız o ROL'ün penceresi | aynı pencere, compact kapısı |
 | **4 Konu tetiklemeli dersler** | Bir konu açılınca gelen kısa dersler | sage ve konu yönlendirici (REC-448, ARAÇ #1590) | mekanizma | konu algılanınca |
 | **5 Arşiv** | Ölü, birleştirilmiş, eski kayıt | `arsiv/` | OPS | hiçbir pencere otomatik okumaz |
 
@@ -338,7 +338,7 @@ okununca yüklendiği için departman talimatı için güvenilir bir yol değild
 
 ## §8 Deneme senaryoları (her "izin" satırının "engel" eşi vardır)
 
-Kanca kurulunca işi yapmamış bağımsız bir ajan bu tabloyu koşar; sonuç REC-530'a yazılır. D1-D13, D16-D19 ve D20-D31 otomatik testtir
+Kanca kurulunca işi yapmamış bağımsız bir ajan bu tabloyu koşar; sonuç REC-530'a yazılır. D1-D13, D16-D19 ve D20-D34 otomatik testtir
 (§10), D14-D15 elle denemedir. **Her satır ayar durumunu ve `simdi`'yi açıkça söyler** ("R10 kapalı", "`gecis_son` içinde"); söylemeyen satır "R10 kapalı"dır. "Şeritli URUN" = canlı claim'i `URUN` olan oturum. Her R kuralının (R1-R10) en az bir izin ve bir engel satırı
 vardır; K0 sınanamaz (§2). **Sabotaj listesi:** her kural için "o kuralı `izin`e çeviren mutasyon" testte kırmızı verir (R6, R7, R8 dahil); kural
 kaldırılınca hiçbir satırın düşmemesi bir kusurdur.
@@ -386,6 +386,8 @@ kaldırılınca hiçbir satırın düşmemesi bir kusurdur.
 | D24a | R9 kaynak dosyaları: şeritli URUN `scripts/belge/rol-karti-uret.cjs`'e / `scripts/belge/cetvel-sahipligi.json`'a / `.claude/hafiza-yazma-ayar.json`'a yazar; `.claude/settings.json`'a ve `.claude/hooks/x.cjs`'e yazar (R9 dışı, §6 kabul edilmiş sınır) | **engel** (ilk üç yol; ön süzgeç üçünü de yakalar) / izin (son ikisi, hafıza kuralının konusu değil) |
 | D24b | D24a'nın üç R9 yoluna: OPS (tam) yazar; HARİTA `harita_muafiyet_son` içinde `rol-karti-uret.cjs`'e ve `cetvel-sahipligi.json`'a yazar; HARİTA muafiyet içinde `.claude/hafiza-yazma-ayar.json`'a yazar; HARİTA muafiyet bittikten sonra `rol-karti-uret.cjs`'e yazar | izin / izin / **engel** (ayar dosyası HARİTA muafiyetinden hariç) / **engel** |
 | D24d | **Ön süzgeç sınaması (kütüphane testi):** R9 kalıp sabitindeki HER kalıp için örnek bir yol kütüphanenin ön süzgecinden geçer; süzgeçte olmayan bir kalıp varsa test kırmızı | geçer / kırmızı (liste ile süzgeç aynı sabit olduğu için kırılma sabotaj kolunda ölçülür) |
+| D33 | §9b: şeritli URUN `gunluk/URUN/gecmis/2026-10-03.md`'ye yazar; ALTYAPI oturumu `gunluk/URUN/gecmis/2026-10-03.md`'ye yazar; tam OPS aynı dosyaya yazar (R10 kapalı) | izin / **engel** (R4) / **engel** (R4; OPS başkasının günlüğüne yazamaz) |
+| D34 | §12 (kütüphane düzeyi, §10 "Künye uyarısı" gelince): yazma bekçisi ortak çekirdeğe künyesiz (tarihsiz ya da kaynaksız) yeni satır yazılırken; künyeli satır yazılırken | izin + **uyarı** (engel değil; mesaj "yazıldı + kaynak ekle") / izin, uyarı yok |
 | D32 | Ölçülemedi sınıfı: stdin bozuk / boş (yük okunamadı); hafıza yolu türetilemedi (aday kümesi boş) | izin + alarm (`kural ölçülemedi: <sebep>`; §3 tablosunun iki satırının D karşılığı) |
 | D24c | **Worktree** (kanca düzeyi, **gerçek git fixture** gerekir: `git worktree add` ile geçici ağaç; kütüphane testi `repoGoreli` verir ama kapsam kararını kanca verir): `…/.claude/worktrees/x/CLAUDE.md`'ye şeritli URUN yazar / OPS (tam) yazar; başka depodaki `CLAUDE.md`'ye OPS yazar | **engel** (aynı git ortak dizini) / izin / izin (R9 kapsamı dışı) |
 | D24e | R9b: git dışı ayar dosyası `.claude/settings.local.json`'a ve kullanıcı düzeyi `settings.json`'a yazar: tam OPS / şeridi ARAC / şeridi HARİTA (muafiyet içinde) / şeritli URUN | izin / izin / **engel** / **engel** |
@@ -436,6 +438,35 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
 
 ---
 
+## §9b Durum dosyasının günlük döndürülmesi (v0.9, OPS isteği 2026-10-04)
+
+**Sorun (ölçüldü 2026-10-04):** durum dosyası tek parça büyüyor ve hiç kesilmiyor. Hafıza dizininin kökündeki pencere durum dosyalarının en büyük beşi:
+`ops-cycle-audit-state.md` 326 KB, `arac-serit-durumu.md` 324 KB, `altyapi-lane-day-2026-09-09.md` 301 KB, `urun-katalog-lane-day-2026-09-06.md` 282 KB,
+`harita-lane-day-2026-09-29.md` 128 KB. Dosya adı ilk günün tarihini taşır, sonraki günler aynı dosyaya eklenir; OPS açılışta dosyanın kırpıldığını bildirdi.
+
+**Kural:**
+
+1. **Canlı dosya iki parçadır.** **DEVİR bloğu dosyanın SONUNDA durur** (OPS kararı 2026-10-04: compact kapısı ve `SessionStart` dosyanın son bloğunu okur, bu yüzden sonda olması işe yarar; döndürme yerini DEĞİŞTİRMEZ): açık ve yarım işler, bekleyen kararlar, sıradaki adımlar; kapının dört alanını (`SON GİRDİ`,
+   `AÇIK KUYRUK`, `VERİLEN SÖZLER`, `BEKLEYEN KARARLAR`, bkz. `precompact-durum-kapisi.cjs` `DORT_ALAN`) taşır, en çok 40 satırdır (öneri, ölçülecek),
+   her compact öncesi tazelenir, birikmez. Öncesinde **gün blokları**: her biri `## YYYY-AA-GG` başlığıyla, canlı dosyada yalnız **bugün ve dün**.
+   DEVİR bloğu olmadan döndürme yapılmaz: açık iş yalnız eski bir günde kalırsa kaybolurdu. Betik bunu zorlar: başlığın BAŞI `## DEVİR` olan blok yoksa ya da dört alan o bloğun İÇİNDE bulunmuyorsa `--yaz` reddedilir (çıkış 3); başlığın başka yerinde geçen "devir" DEVİR sayılmaz.
+2. **Döndürme iki adımdır ve kayıpsızdır.** Pencere yeni günün ilk yazımında iki günden eski blokları önce `gunluk/<ROL>/gecmis/<YYYY-AA-GG>.md`
+   dosyalarına (gün başına bir dosya, metin AYNEN) yazar, sonra canlı dosyadan çıkarır. İlk adım başarısızsa ikinci adım yapılmaz. Bu **dosya silme
+   ya da taşıma değildir**, iki yazma işlemidir; R4'ün "silmez ve taşımaz" cümlesiyle çelişmez.
+3. **Okuma.** Açılış ve compact dönüşü yalnız canlı dosyayı okur (DEVİR + bugün + dün). `gecmis/` yalnız "dün ya da geçen hafta ne oldu" sorusunda,
+   aranarak okunur; hiçbir kanca onu kendiliğinden yüklemez.
+4. **Kapı (ARAÇ'a, §10).** `precompact-durum-kapisi.cjs` ve `session-board.cjs` durum dosyasını `gunluk/<ROL>/*.md` (tek seviye) ve
+   `gunluk/_sahipsiz/<sid>.md` içinde arar; `gunluk/<ROL>/gecmis/` **taranmaz**. Sebep (kodda ölçüldü): kapı adayları `mtime`'a göre azalan sıralayıp en
+   yenisini seçer; `gecmis/` dosyaları döndürme anında yeni yazıldığından en yeni olur ve kapı onları canlı dosya sanırdı. `gecmis/` dosyalarının başında
+   `sid:` ve dört alan da bulunmaz (içerikle eşleşmeyi ikinci kez önler).
+5. **Yetki.** `gecmis/`, `gunluk/<ROL>/**` altındadır (R4): yalnız o ROL'ün oturumu yazar; OPS başkasının `gecmis/` dizinine yazamaz (D33). 14 günü geçen
+   `gecmis/` dosyasını OPS mevcut temizlik istisnasıyla (tek dosya) `arsiv/`'e taşır.
+6. **Geçiş.** Bugünkü büyük dosyalarda gün başlığı yok; ilk döndürmede eski kısım `gecmis/oncesi-<ilk-gün>.md` olarak tek parça taşınır, son blok ve DEVİR
+   canlıda kalır. Toplu taşıma yayın haftasında yapılmaz (OPS kararı 2026-10-04); her pencere kendi dosyasını, OPS kendi dosyasını kendisi döndürür.
+   Kanca henüz yoktur: kural pencerenin kendi disiplinidir (§10: ARAÇ'ın bekçisi canlı dosya boyutu için uyarı verebilir; eşik ölçülecek, §11).
+
+---
+
 ## §10 ARAÇ'a devir sözleşmesi
 
 | Kalem | Beklenen |
@@ -445,6 +476,7 @@ sonrası taşınır). Taşımayı yapan HARİTA (R10, `gecis_son` içinde).
 | Ayar | `.claude/settings.json` eşleştirici `Edit\|Write\|MultiEdit\|NotebookEdit\|Bash\|PowerShell` (§5 ile aynı; v0.4 §10'da `PowerShell` eksikti); ana ağaca ileri sarma. Değişikliği ARAÇ yapar, **OPS onaylar** (ARAÇ kartı: "settings değişikliği OPS kapısıdır"); **ayar dosyasına yazım Recep sözüyle ARAÇ'ın KENDİ penceresinde alınır, OPS onayı o sözün yerine geçmez** (başlık notundaki davranış kuralı; "ayar dosyası" = `settings*.json` ve `hafiza-yazma-ayar.json`); dosya yolu okuma `file_path`, `notebook_path` ve `edits[].file_path` (§5 "tüm yol alanlarını tara") |
 | Yardımcılar | `seritRolu` (`pencere-adlari.cjs`, ARAÇ #1592 sonrası ayrı küçük PR; `session-board.cjs` aynı işlevi kullanır); ana depo dizini türetimi `belge-tazelik.cjs`'ten ortak işleve (dizin adayı döndürür, slug `[^A-Za-z0-9]`→`-`) |
 | **ARAÇ iş listesi (kabul koşulu)** | (1) `board.durumOku()`: dizin var mı, olay dosyası sayısı, bu `sid`'in dosyası var mı, bozuk satır ve hangi dosyada; dizini **yaratmaz** (§3). (2) `board.cjs` adsız `claim`'in önceki şerit adını ezmesi (`lane`) düzeltilir (§3). (3) `session-board.cjs`, `precompact-durum-kapisi.cjs`, `son-konusma-dokumu.cjs`: ortak durum dosyası bulma işlevi (§9), AYNI PR. (4) `hafiza-indeks-bekcisi.cjs` kapsamı `departman/*/MEMORY.md`, eşik 60 satır / 8 KB **yumuşak**, `hafiza-indeks-bekcisi-kilidi.test.ts` bilinçli güncelleme (§7). (5) `seritRolu` (`pencere-adlari.cjs`, §3) ve `session-board.cjs`'in aynı işlevi kullanması (rol çözümü tek yerde). (6) Ayar dosyası `.claude/hafiza-yazma-ayar.json` ana ağaçtan okunur (§2). (7) `bash-write-targets.cjs`: **hedef başına fiil** (`islem`: `sil`/`yaz`; `tasi` yoktur, `mv` = kaynak `sil` + varış `yaz`), `mv`/`cp` **kaynağı** ve **`unlink`/`rmdir` hedefleri** döndürülür (§5; bugün çıkarıcı `rm` dışındaki silme fiillerinin hedefini üretmiyor, ölçüldü; olmadan temizlik istisnası Bash'te sınanamaz). `genisletmeli` işaretini çıkarıcı değil **kanca** hesaplar (§5). **Ekip üyesi** claim'siz = şeritsiz (§3). (2)'nin kapsamı: `lane` ezmesi **üç yerde** ve `e.lane === 'lane'` boş sayılır (§3; v0.4'te (2) ve (5) aynı kalemdi, birleştirildi). **Kapı kalemi (3)** beş çağrı noktasını kapsar (§9): `precompact-durum-kapisi.cjs`, `session-board.cjs` (iki yerde), `son-konusma-dokumu.cjs`, `hafiza-sorusu-yonlendirme.cjs`. **Durum satırı:** `board-brief.cjs` bugün **beş erken çıkış** noktası taşır (~L28 `!sid`, L31, L36, L61 ve L126 sessizlik kuralı, ölçüldü); hafıza alarmı kontrolü **hepsinden ÖNCE** koşar (yalnız sonuncuyu aşmak yetmez: `!sid` ya da `board.cjs` `require` hatası alarmı gizlerdi); alarm yoksa mevcut davranış aynen korunur. |
+| **ARAÇ iş listesi (v0.9 eki, kabul koşulu DEĞİL)** | **Geçmiş taraması:** `precompact-durum-kapisi.cjs` ve `session-board.cjs` durum dosyasını yalnız `gunluk/<ROL>/*.md` (tek seviye) ve `gunluk/_sahipsiz/<sid>.md` içinde arar, `gunluk/<ROL>/gecmis/` taranmaz (§9b madde 4; D33'ün kütüphane karşılığı). **Künye uyarısı:** yazma bekçisi (REC-536) ortak çekirdeğe satır ya da yeni konu dosyası yazılırken künye (yazıldı + kaynak) eksikse UYARIR, engellemez (§12; D34). **Boyut uyarısı (isteğe bağlı):** canlı durum dosyası eşiği aşarsa uyarı; eşik ölçülmeden sayı yazılmaz (§11). |
 | **ARAÇ iş listesi (sonraki iş, kabul koşulu DEĞİL)** | `bash-write-targets.cjs`: `cd`/`pushd` izleme; tırnak farkındalıklı segment bölme; `git -C` alt komutları (`mv`/`cp` kaynağı ve hedef başına fiil kabul koşuluna taşındı, kalem 7); (`genisletmeli` işareti artık çıkarıcıda değil kancada, §5); PowerShell fiilleri (§6). Bunlar yapılınca §8 D13d/D15b beklentileri "engel"e çevrilir. |
 | Test | `src/__tests__/conformance/` altında yeni kapı (öneri `INV-HAFIZA-YAZMA-1`): §8 D1-D13, D16-D32 (D19a-d, D24a-d, D27a-d), her satır izin/engel çiftiyle; **R9 sabit listesi ile ön süzgecin aynı olduğunu sınayan kol (D24d)**; test enjeksiyonu §4 (`VENTHUB_SIMDI` dahil); sabotaj: her kural için "izin'e çevir" mutasyonu → kırmızı |
 | Durum satırı | `board-brief.cjs` alarm dosyalarını okur (§3); alarm kaydı ve olay dosyası oturum başına |
@@ -473,10 +505,47 @@ tek yerde (`pencere-adlari.cjs`).
   doğrulanmadı; ilk kanca denemesinde ölçülür (§4).
 - **Sandbox / yönetilen katman:** §6'daki kanca kapatma ve Bash delikleri için işletim sistemi düzeyi koruma ayrı karar.
 - **Bash sonrası tarama:** hafıza dizini için ayrı sonradan tarama (§6) yapılıp yapılmayacağı.
+- **Künye bayatlık eşiği (§12):** `ölçüm` kaynaklı bir kaydın kaç gün sonra "yeniden ölçülmeden güncel olgu gibi sunulamaz" sayılacağı; sayı ölçülmeden yazılmadı.
+- **Canlı durum dosyası boyut eşiği (§9b):** DEVİR + iki gün için makul üst sınır (öneri 40 KB); iki haftalık gerçek kullanımdan sonra ölçülür.
+
+---
+
+## §12 Hafızadaki bilginin tarihi ve kaynağı (künye) (v0.9, OPS isteği 2026-10-04)
+
+**Niçin (ölçüldü 2026-10-04):** OPS hafızadaki eski bir tarihi bugünün konuşmasına yapıştırdı ve yazılı bir kural aynı gün çiğnendi. Kök sebep, hafıza
+kaydının yazıldığı günü ve nereden geldiğini taşımaması: okuyan, "hafızada böyle yazıyor" ile "bugün böyle oldu"yu ayıramıyor. `MEMORY.md`'nin
+125 tekil satırından 77'sinde yılsız `09-12` gibi bir tarih var, 48'inde hiç tarih yok, yapısal bir kaynak etiketi hiçbirinde yok (2026-10-04 sayımı); REC-516 ölçümü (2026-09-30) künyeli konu dosyası sayısını 0/582 buldu. Frontmatter'daki `modified:`
+otomatik yazılan son dokunma zamanıdır, bilginin yazıldığı ya da olduğu günü göstermez.
+
+**Kural:**
+
+1. **Yazarken.** Her yeni hafıza kaydı (ortak çekirdek satırı, departman dersi, konu dosyası) iki etiket taşır.
+   - **yazıldı:** tam tarih (`2026-10-04`); yılsız `10-04` yeni kayıtta yazılmaz.
+   - **kaynak:** `söz` (Recep'in o gün söylediği; özet yazılır, tırnakla alıntı yazılmaz: repo PUBLIC), `ölçüm` (komut, dosya ya da PR ile doğrulandı; kanıt yolu aynı yerde),
+     `karar` (karar numarası) ya da `çıkarım` (yazanın yorumu, doğrulanmadı).
+   - "Bugün", "dün", "bu hafta", "yarın" gibi göreli zaman hafızaya yazılmaz; yazıldığı günün tarihine çevrilir.
+2. **Biçim.** Ortak çekirdek satırında: `- [Başlık](dosya.md) — (2026-10-04, söz) kısa kural`. Konu dosyasında frontmatter `metadata:` altına `yazildi: 2026-10-04` ve
+   `kaynak: söz`. Günlük/durum blokta tarih `## YYYY-AA-GG` başlığından gelir; kaynak etiketi (`[söz]`, `[karar]`) yalnız Recep sözü ve karar maddelerinde zorunludur,
+   çünkü karışma riski bunlarda var.
+3. **Okurken ve anarken.** Hafızadan okunan bilgi konuşmaya "hafızada şöyle yazıyor (<tarih>, <kaynak>): …" kalıbıyla girer. Bugünün sözü ile hafızadaki söz aynı
+   cümlede karıştırılmaz. Hafızadaki tarih bugünün ya da son olayın tarihi gibi kullanılmaz. "Şu an" ile ilgili olgu (sayı, durum, kim canlı) hafızadan değil ölçümden
+   verilir (sözleşme madde 3, beyan öncesi ölçüm).
+4. **Bayatlık.** `ölçüm` kaynaklı kayıt yeniden ölçülmeden güncel olgu gibi sunulmaz; sunulurken yaşı yazılır ("2026-09-25 ölçümü"). Kaç gün sonra bayat sayılacağı
+   için sayı yazılmadı (§11 açık soru).
+5. **Geriye dönük.** Mevcut dosyalar toplu etiketlenmez; REC-538 geçişinde her dosya taşınırken künye eklenir. Tarih dosyada yoksa `yazildi: bilinmiyor` yazılır;
+   `modified:` değeri ya da tahmin tarih olarak yazılmaz. Ayrı bir toplu iş açılmaz.
+6. **Zorlama ve sınır.** Bugün kanca yok; §10 "Künye uyarısı" yazma bekçisinin eksik künyede uyarmasını ister (engel değil, D34). Etiketin DOĞRULUĞU denetlenmez
+   (yazan "ölçüm" yazıp ölçmemiş olabilir); kural yalnız ayrımı görünür kılar. Sahte `ölçüm` etiketi disiplin sorunudur ve 3. maddedeki "şu an olgusu ölçümden verilir"
+   kuralıyla sınırlanır.
 
 ---
 
 ## Değişiklik kaydı
+
+- 2026-10-04 v0.9 (REC-516/REC-530, OPS isteği; statü: uygulamayla doğrulanacak): iki boşluk kapandı. **§12** hafızadaki bilgiye tarih ve kaynak etiketi (künye), "hafızada
+  şöyle yazıyor (tarih)" kalıbı ve bayatlık kuralı; **§9b** durum dosyasının günlük döndürülmesi (DEVİR bloğu dosyanın sonunda + bugün/dün, `gecmis/` kayıpsız iki adım, kapı `gecmis/`'i taramaz; ilk uygulama OPS durum dosyası 2026-10-04: 336.438 → 106.480 bayt, betik `scripts/belge/durum-dondur.py`).
+  §1 satır 3, §8 (D33, D34), §10 (v0.9 eki), §11 (iki açık soru) buna göre güncellendi. Başlıktaki "v0.7" bayattı (değişiklik kaydı v0.8'e gelmişti): v0.9 yapıldı.
+  Kanca değişmedi; v0.9 bağımsız okuyucudan geçmedi, uygulamayla doğrulanacak.
 
 - 2026-10-01 v0.8 (v0.7 son okuma turu; statü: uygulamayla doğrulanacak): 1 engelleyici + 4 orta + 3 düşük işlendi. §6 "Bash kaza yolları" `genisletmeli`'yi §5/D13d ile hizaladı (kanca işaretler); kalem 7 öncesi `unlink`/`rmdir`/`mv` kaynağı açık delik olarak §6'ya yazıldı;
   R9b öncelik sırasına ve ön süzgeç/D24d kapsamına girdi; §6 R9-dışı satırı R9b'ye atıfla yeniden yazıldı ve atıf `docs/roller/ARAC.md` oldu; §10 Ayar satırı Recep davranış kuralına bağlandı (söz ARAÇ'ın kendi penceresinde, OPS onayı yerine geçmez; "ayar dosyası" = `settings*.json` + `hafiza-yazma-ayar.json`);

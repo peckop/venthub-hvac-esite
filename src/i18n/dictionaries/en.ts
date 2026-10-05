@@ -1457,7 +1457,8 @@ export const en: typeof tr = {
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
-      sku: 'SKU',
+      /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
+      modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
     },
     actions: {
@@ -1623,8 +1624,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
-    /** SKU as of the order date (snapshot) — not the current catalog SKU. */
-    skuLabel: 'SKU: {{sku}}',
+    /** The item's CURRENT catalog model code (not an order-time snapshot); never the raw SKU. */
+    modelCodeLabel: 'Model Code: {{code}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',
