@@ -1,0 +1,18 @@
+{
+  "kimlik": "STD-IEC-61800-3",
+  "eksen": "D",
+  "kaynaklar": [
+    {
+      "url": "https://webstore.iec.ch/en/publication/65056",
+      "son_url": "https://webstore.iec.ch/en/publication/65056",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "webstore.iec.ch",
+      "resmi": true,
+      "durum_satiri": "Publication date 2022-11-30, Edition 4.0, Stability date 2027, 'Under development' etiketi yok (standart aktif).",
+      "alinti": "IEC 61800-3:2022 specifies electromagnetic compatibility (EMC) requirements for adjustable speed power drive systems (PDSs) and machine tools (MTs). [...] This fourth edition cancels and replaces the third edition published in 2017.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

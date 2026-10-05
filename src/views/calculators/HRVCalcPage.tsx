@@ -1,3 +1,6 @@
+'use client'
+
+// İstemci sınırı BURADA ilan edilir: rota metadata yazdığı için Server Component (REC-150 Adım 5).
 import { DollarSign,Leaf, RotateCcw, Snowflake, ThermometerSun, TrendingUp, Users } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect,useMemo, useState } from 'react'
@@ -40,15 +43,15 @@ const HRVCalcPage: React.FC = () => {
   ], [t])
 
   const buildingOptions = useMemo(() => [
-    { value: 'residential', label: t('common.homeLabel'), description: 'Domestic' },
-    { value: 'office', label: t('calculators.hrv.form.office'), description: 'Workplace' },
-    { value: 'commercial', label: t('calculators.hrv.form.commercial'), description: 'Retail/Mall' }
+    { value: 'residential', label: t('calculators.hrv.form.residential'), description: t('calculators.hrv.form.residentialDesc') },
+    { value: 'office', label: t('calculators.hrv.form.office'), description: t('calculators.hrv.form.officeDesc') },
+    { value: 'commercial', label: t('calculators.hrv.form.commercial'), description: t('calculators.hrv.form.commercialDesc') }
   ], [t])
 
   const climateOptions = useMemo(() => [
-    { value: 'cold', label: t('calculators.hrv.form.cold'), description: 'North/Mountain' },
-    { value: 'temperate', label: t('calculators.hrv.form.temperate'), description: 'Central' },
-    { value: 'hot', label: t('calculators.hrv.form.hot'), description: 'South/Coast' }
+    { value: 'cold', label: t('calculators.hrv.form.cold'), description: t('calculators.hrv.form.coldDesc') },
+    { value: 'temperate', label: t('calculators.hrv.form.temperate'), description: t('calculators.hrv.form.temperateDesc') },
+    { value: 'hot', label: t('calculators.hrv.form.hot'), description: t('calculators.hrv.form.hotDesc') }
   ], [t])
 
   /**
@@ -201,7 +204,7 @@ const HRVCalcPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.form.type')}</h2>
-                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
+                <p className="text-sm text-steel-gray">{t('calculators.hrv.form.typeDesc')}</p>
               </div>
             </div>
 
@@ -244,7 +247,7 @@ const HRVCalcPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.form.usage')}</h2>
-                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.steps.dimensionsDesc')}</p>
+                <p className="text-sm text-steel-gray">{t('calculators.hrv.form.usageDesc')}</p>
               </div>
             </div>
 
@@ -279,7 +282,7 @@ const HRVCalcPage: React.FC = () => {
                   label={t('calculators.hrv.form.occupancy')}
                   value={occupancy}
                   onChange={setOccupancy}
-                  unit="people"
+                  unit={t('calculators.hrv.form.unitPeople')}
                   min={0}
                   max={1000}
                   step={1}
@@ -325,8 +328,8 @@ const HRVCalcPage: React.FC = () => {
               <TrendingUp className="text-success-green" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.results.title')}</h2>
-              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.results.subtitle')}</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.hrv.results.title')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.hrv.results.subtitle')}</p>
             </div>
           </div>
 
@@ -352,20 +355,20 @@ const HRVCalcPage: React.FC = () => {
               <div className="mb-6 p-4 bg-success-green/10 rounded-xl border border-success-green/20">
                 <div className="flex items-center gap-3 mb-4">
                   <DollarSign className="text-success-green" size={24} />
-                  <h3 className="font-semibold text-industrial-gray">{t('cart.itemTotal')}</h3>
+                  <h3 className="font-semibold text-industrial-gray">{t('calculators.hrv.results.savingsTitle')}</h3>
                 </div>
                 <ResultGrid>
                   <ResultCard
-                    title="Annual Energy Saving"
+                    title={t('calculators.hrv.results.annualEnergySaving')}
                     value={result.annualEnergySaving}
-                    unit="kWh/y"
+                    unit={t('calculators.hrv.results.unitKwhPerYear')}
                     status="optimal"
                     large
                   />
                   <ResultCard
-                    title="Annual Cost Saving"
+                    title={t('calculators.hrv.results.annualCostSaving')}
                     value={result.annualCostSaving}
-                    unit="₺/y"
+                    unit={t('calculators.hrv.results.unitCostPerYear')}
                     status="optimal"
                     large
                   />
@@ -377,14 +380,14 @@ const HRVCalcPage: React.FC = () => {
                   <ResultCard
                     title={t('calculators.hrv.results.co2Reduction')}
                     value={result.co2Reduction}
-                    unit="kg/y"
+                    unit={t('calculators.hrv.results.unitKgPerYear')}
                     status="optimal"
                     description={t('calculators.hrv.results.co2Desc')}
                   />
                   <ResultCard
                     title={t('calculators.hrv.results.payback')}
                     value={result.paybackPeriod}
-                    unit="years"
+                    unit={t('calculators.hrv.results.unitYears')}
                     status={result.paybackPeriod <= 3 ? 'optimal' : 'acceptable'}
                     description={t('calculators.hrv.results.paybackDesc')}
                   />

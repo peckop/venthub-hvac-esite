@@ -52,11 +52,18 @@ describe('INV-KIMLIK-TEK-KURAL-1 · CI bağı', () => {
   })
 
   it('tek kural: iki çağıran da kimliği kural modülünden alıyor, yükleyici kodsuz satırı atmıyor', () => {
+    // 2026-09-24 (REC-209): yükleyici ikiye bölündü — load.mjs (G/Ç) planla.mjs'i (saf kurallar) içe aktarır,
+    // kimlik kuralı planla.mjs'den gelir. Zincir iki halkada ayrı ayrı doğrulanır; kodsuz satır yasağı
+    // ikisinin birleşiminde aranır (kural hangisine taşınırsa taşınsın kaçmasın).
     const load = fs.readFileSync(path.join(KOK, 'scripts', 'kademe2-load', 'load.mjs'), 'utf8')
+    const planla = fs.readFileSync(path.join(KOK, 'scripts', 'kademe2-load', 'planla.mjs'), 'utf8')
     const uydurma = fs.readFileSync(path.join(DIZIN, 'uydurma-kimlik-tek-kural.mjs'), 'utf8')
-    expect(load).toMatch(/import\s*\{[^}]*kimlikTuret[^}]*\}\s*from\s*'\.\.\/icerik-hatti\/kimlik-kurali\.mjs'/)
+    expect(load, 'yükleyici planlama katmanını kullanmıyor').toMatch(/import\s*\{[^}]*\bplanla\b[^}]*\}\s*from\s*'\.\/planla\.mjs'/)
+    expect(planla).toMatch(/import\s*\{[^}]*kimlikTuret[^}]*\}\s*from\s*'\.\.\/icerik-hatti\/kimlik-kurali\.mjs'/)
+    // Yalnız GERÇEK içe aktarım satırı (yorumda dosya adının geçmesi serbest — load.mjs:22 zinciri anlatıyor).
+    expect(load, 'yükleyici kimlik kuralını planlama katmanını atlayarak ikinci kez içe aktarıyor').not.toMatch(/^\s*import\b[^\n]*kimlik-kurali\.mjs/m)
     expect(uydurma).toMatch(/import\s*\{[^}]*kimlikTuret[^}]*\}\s*from\s*'\.\/kimlik-kurali\.mjs'/)
-    expect(load, 'yükleyici kodsuz satırı yine hata sayıp atıyor (REC-275)').not.toMatch(/model_code boş satır/)
+    expect(load + '\n' + planla, 'yükleyici kodsuz satırı yine hata sayıp atıyor (REC-275)').not.toMatch(/model_code boş satır/)
     expect(load, 'yükleyici SKU\'yu yine kendisi kuruyor — iki kural').not.toMatch(/prefix\s*\+\s*'-'\s*\+\s*model_code/)
   })
 })

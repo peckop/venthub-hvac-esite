@@ -1,20 +1,32 @@
-'use client'
+import type { Metadata } from 'next'
+
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
+import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
+import { Routes } from '@/utils/routes'
+
+import PageComponent from '../../../../../views/calculators/HRVCalcPage'
 
 /**
- * SAYFA-BOYU SUSPENSE KALDIRILDI (REC-150 PR-0, 2026-09-05).
- *
- * ESKİDEN: `<Suspense><PageComponent/></Suspense>` — sınır sayfanın TAMAMINI sarıyordu.
- * Görünüm `useSearchParams()` çağırdığı için o sınırın kapsadığı ağaç sunucuda HİÇ render
- * edilmiyordu (CSR bailout) ve sonuç canlıda ölçüldü: bu sayfa arama motoruna **0 kelime**
- * gövde ve sitenin **jenerik** açıklamasıyla görünüyordu (karşılaştırma: `kanal` 422 kelime
- * ve kendi açıklaması).
- *
- * ŞİMDİ: sınır görünümün içinde, yalnız parametreyi okuyan uç bileşeni sarıyor
- * (`UrlParametreOkuyucu`). Sayfa `kanal`/`jet-fan` ile aynı kalıba döndü.
- *
- * CLAUDE.md kural 5 lafzen sağlanıyordu ama sarılan şey SAYFAYDI; kural bileşeni söylüyor.
+ * METADATA TEK YAZICIDA (REC-150 Adım 5, 2026-09-24) — kanal pilotunun kalıbı, ortak
+ * yardımcıyla. Rota artık Server Component: istemci sınırını görünüm (`HRVCalcPage`) kendisi
+ * ilan eder. Başlık biçimi canlıdakiyle AYNI ("… | Ürün Seçici | VentHub") — göç SEO
+ * değişikliği değil, mükerrerlik temizliğidir.
  */
-import PageComponent from '../../../../../views/calculators/HRVCalcPage'
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>
+}): Promise<Metadata> {
+  const { lang } = await params
+  const dict = lang === 'en' ? en : tr
+  return sayfaUstVerisi({
+    lang,
+    yol: Routes.destek.hesaplayicilar('hrv'),
+    baslik: `${dict.calculators.hrv.title} | ${dict.urunSecici.ustBaslik} | VentHub`,
+    aciklama: dict.calculators.hrv.description,
+  })
+}
 
 export default function Page() {
   return <PageComponent />

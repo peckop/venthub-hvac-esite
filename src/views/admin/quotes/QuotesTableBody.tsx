@@ -20,6 +20,7 @@ import { formatDate, formatTime } from '../../../i18n/datetime'
 import { formatCurrency } from '../../../i18n/format'
 import { useI18n } from '../../../i18n/I18nProvider'
 import { ensureSessionFresh } from '../../../lib/ensureSessionFresh'
+import { derivePublishHeader, publishQuote } from '../../../lib/services/adminQuoteService'
 import { type QuoteItemRow, type QuoteRow, type QuoteSource } from '../../../lib/services/quoteService'
 import type { Database } from '../../../types/database.types'
 import { adminTableActionPrimaryClass } from '../../../utils/adminUi'
@@ -316,9 +317,12 @@ const QuotesTableBody: React.FC = () => {
       const allowed = allowedAdminQuoteActions(row.status)
       if (!allowed.includes(newStatus as (typeof allowed)[number])) return
 
-      // 'quoted' göndermeden önce TÜM kalemler fiyatlı olmalı — fiyatsız teklif
-      // müşteriye "boş teklif" olarak düşer (Q6'daki e-postanın da anlamı kalmaz).
-      if (newStatus === 'quoted' && row.items.some((i) => typeof i.unit_price !== 'number')) {
+      // 'quoted' YAYIMDIR: başlıkta süre + para birimi ister ve bunları yalnız
+      // admin_publish_quote RPC'si yazabilir (düz status UPDATE'i tetiğin yayım kapısında
+      // HER ZAMAN düşüyordu — 2026-09-24 ölçümü). Başlık kalemlerden türetilir; fiyatsız,
+      // karışık para birimli ya da süresi geçmiş belge müşteriye gitmez.
+      const yayim = newStatus === 'quoted' ? derivePublishHeader(row.items) : null
+      if (yayim && !yayim.ok) {
         toast.error(t('quotes.admin.toasts.priceRequired'))
         return
       }
@@ -333,13 +337,19 @@ const QuotesTableBody: React.FC = () => {
           rowPk: row.id,
           before: { status: oldStatus },
           after: { status: newStatus },
-          auditedByEdge: false,
+          // Yayımda iz RPC gövdesinde, yazmayla AYNI transaction'da yazılır; istemci
+          // logu ikinci (ve yutulabilir) bir kayıt olurdu.
+          auditedByEdge: yayim?.ok === true,
           fn: async () => {
-                  const { error } = await supabaseBrowserClient
-              .from('venthub_quotes')
-              .update({ status: newStatus })
-              .eq('id', row.id)
-            if (error) throw error
+            if (yayim?.ok) {
+              await publishQuote(supabaseBrowserClient, row.id, yayim)
+            } else {
+              const { error } = await supabaseBrowserClient
+                .from('venthub_quotes')
+                .update({ status: newStatus })
+                .eq('id', row.id)
+              if (error) throw error
+            }
 
             // Müşteri bildirimi — best-effort (cetvel Q6: e-posta hatası statüyü geri
             // almaz). E-posta bilinmiyorsa (GRANT #566 henüz yoksa) sessizce atlanır —
@@ -384,7 +394,10 @@ const QuotesTableBody: React.FC = () => {
   /* ---- genişleyen satır: kalemler + fiyat girişi ---- */
   const renderExpanded = useCallback(
     (row: QuoteAdminRow) => {
-      const editable = hasWriteAccess && row.status === 'requested'
+      // Fiyat taslakta da girilir: durum makinesi requested → draft → quoted; yalnız
+      // 'requested'ta açık olsaydı taslağa alınan teklif fiyatsız kilitlenirdi (09-24'te
+      // canlıdaki tek teklif tam böyle kaldı). DB politikası durumdan bağımsız, admin şartlı.
+      const editable = hasWriteAccess && (row.status === 'requested' || row.status === 'draft')
       return (
         <div className="max-w-4xl mx-auto space-y-4 py-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center gap-3 mb-2">

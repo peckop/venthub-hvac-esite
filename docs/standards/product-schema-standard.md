@@ -204,6 +204,18 @@ Kural: `model_code` yoksa **etiket hiç gösterilmez**. `sku`'ya düşmek yasakt
 "hangi modeli aldım" sorusunu cevaplamıyor; `model_code` etiketi süs değil, kimliğin
 parçasıdır.
 
+> **2026-10-05 ÖLÇÜM NOTU (URN-32/33, canlı SELECT, 442 ürün):** yukarıdaki "74" bugün
+> **YENİDEN ÜRETİLEMİYOR.** Aile içinde `lower(btrim(name))` çakışması **0 grup / 0 satır**; tüm
+> katalogda çakışan ad **0**; aile içinde çakışan `model_code` **0**. `products.name` üzerinde
+> UNIQUE kısıt ya da UNIQUE indeks de **YOK** (`pg_constraint`/`pg_indexes`: 0) — yani ad
+> tekilliği şemada zorunlu değil, yalnız bugünkü veride tutuyor. Çelişkinin kaynağı ya 74'ün
+> başka bir tanımla (ör. aile adıyla ya da ek/sonek ayıklanmış adla) ölçülmüş olması ya da
+> sonradan katalogda adların ayrıştırılmasıdır; **hangisi olduğunu ölçemedim** (ilk ölçümün
+> sorgusu cetvelde yazılı değil). Sonuç: §11.4'ün "ad tek başına yetmez" hükmü bu cetvelde
+> **veriyle desteklenmiyor**; hüküm, ad tekilliğinin zorunlu olmamasından (gelecekte çakışma
+> girebilir) ve §11.4.2'den (kodsuz ürün) türer. Bir yüzey "ürün adları DB'de tekildir" diye
+> gerekçelendirilemez; model kodu gösterimi (`getProductModelLabel`) bu yüzden sürer.
+
 ### 11.4.1 Veri tarafı borcu (açık)
 
 Bu cetvel yüzeyi bağlar; **veriyi bağlamaz.** `products.model_code` bugün 374/374 dolu
@@ -414,6 +426,34 @@ anma devrini aşar (4 kutup: senkron 1500 > anma 1400-1475). Yani anma devri üs
 - `nominal_rpm` göçünün adayıdır; **başka alana emsal olmaz**.
 - Fan ve motor devri kaynakta farklı verilmişse (ör. kayış tahrik ya da çelişik föy) **yazılmaz**.
 
+### Frekans, yalıtım sınıfı, sıcaklık (REC-172 tur 2, 2026-09-23)
+
+Bu satırlar yazılana kadar dört alanın anlamı cetvelde **yoktu**; canlıda 193 / 231 / 20 / 3 üründe dolu
+olmalarına rağmen. Tur 2 çıkarımı (`<ingestor>/venthub/icerik-hatti/rec172/tur2/OZET.md`) kaynak ifadelerini
+aşağıdaki gibi eşledi; kural o eşlemeyi bağlar.
+
+| Alan | Anlamı | Kaynak tipik ifadesi | Yazılmaz |
+|---|---|---|---|
+| `frequency_hz` | Şebeke frekansı, **tek sayı** | "230V 50Hz", "1~ 50" | "50/60 Hz" çift frekans (tek sayıya sıkışmaz; kural gelene kadar boş) · kaynak basmıyorsa "Avrupa'da 50 Hz" çıkarımı |
+| `insulation_class` | Motor sargısının **ısıl** yalıtım sınıfı (IEC 60085), biçim `Class F` | "insulation class F", "thermal class F" | motorsuz gövdede (motoru anlatan cümle ürünü anlatmaz) |
+| `max_ambient_temp_c` | Motorun/ünitenin bulunduğu **ortamın** üst sıcaklığı | "ambient 60ºC", "ortam sıcaklığı" | taşınan havanın sıcaklığı ("transported air", "(°C)/air") |
+| `min_` / `max_operating_temperature_c` | Kaynağın **çalışma sıcaklığı aralığı** — hava mı ortam mı olduğunu söylemeyen | "working temperature −20…60ºC", "Operating Temperature Range" | aralığın tek ucu, öbür uç kaynakta varken (§11.7 çift kuralı) |
+| `electrical_protection_class` | **Elektrik koruma sınıfı** (IEC 61140: topraklama gerekir mi), küme `Class I` · `Class II` · `Class III` | "Electrical insulation class: II (earthing not required)", "Class II insulation" | ısıl sınıf harfi (B, F, H) — o `insulation_class` |
+| `motor_efficiency_class` | Motor **verim sınıfı** (IEC 60034-30-1), küme `IE1` … `IE5` | "IE3 motor", "IE4 motors for 75 kW or higher" | kaynağın güç eşiği ürünün motor gücünü kapsamıyorsa |
+
+- Kaynağın "insulation class" kelimesi iki ayrı büyüklük için kullanılıyor: harf (F, B) = ısıl sınıf,
+  Roma rakamı (I, II) = koruma sınıfı. Alan **değerin biçimine göre** seçilir, kelimeye göre değil.
+- Küme dışı değer (ör. `IE6`, `Class IV`) yazılmaz; yazım betiği girdiyi kümeye karşı denetler
+  (`<ingestor>/venthub/icerik-hatti/rec172/tur2/duzeltme-uret.py`).
+- ⚠**Açık iki anlam çakışması (ölçüldü, bu satırın getirdiği değil):**
+  - `insulation_class` Vortice'te **82 üründe** `Class I` / `Class II` taşıyor — koruma sınıfı, ısıl sınıf
+    değil. Onarım: değer `electrical_protection_class`'a taşınır (OPS hükmü 2026-09-23: müşteriye görünen yanlış
+    bilgi = onarım; canlı yazım Recep'in toplu onayıyla, URUN'un vitrin etiketinden sonra).
+  - `max_ambient_temp_c`'de HEATMASTER **10 üründe** değer "(°C)/air", yani taşınan hava; SLIMROOF **9 üründe**
+    değer bir aralığın üst ucu, alt uç yazılmamış.
+- Taşınan hava sıcaklığı için alan **yok**; kaynaklar 171 üründe veriyor (tur 2 `belirsiz.csv`). Alan açılana
+  kadar hiçbir alana yazılmaz.
+
 ### Basınç: "toplam" ile "statik" ayrı alanlardır
 
 **Nereden çıktı (ölçüm, 2026-09-07):** Nicotra katalogları fan eğrisini **toplam basınç**
@@ -484,6 +524,64 @@ Buna karşın **38 hücre** sayısal anahtarda birimi değerin içinde taşıyor
 
 **Kural:** sayısal son ekli (`_w`, `_pa`, `_m3h`, `_kg`, `_mm`, `_v`, `_a`, `_hz`) her alan
 sayı tutar. Metin değer yazan betik **kırmızı verir**. Mevcut 38 hücre ayrı onarım kalemidir.
+
+### Enerji etiketi ve ürün bilgi föyü: yasal alanlar (REC-392, 2026-09-25)
+
+**Nereden çıktı:** MEVZUAT şeridi (REC-392) konut tipi ısı geri kazanım cihazlarının fiyatla
+satıldığını, ama AB 1254/2014'ün (TR karşılığı SGM-2021/19) istediği enerji sınıfı ve ürün bilgi
+föyünün sitede olmadığını buldu. Yükümlülük satıcıdadır. Bu alanlar **yasal beyan**dır; teknik
+özellik gibi "yaklaşık doğru" olamaz. Bu yüzden kural diğer satırlardan serttir.
+
+**Yer:** `technical_specs` (JSONB). Yeni tablo kolonu **yok**, migration gerekmez. Anahtarlar
+1254/2014 Ek IV föy alanlarının birebir karşılığıdır ve **hepsi `erp_` önekini taşır.**
+
+**Önek neden zorunlu (ölçüm, 2026-09-25):** föyün "maksimum debi" ve "ısıl verim"i, yönetmeliğin
+tanımladığı **referans koşulda** ölçülür; katalogdaki `max_delivery_m3h` / `thermal_efficiency_pct`
+ise üreticinin genel tanıtım değeridir. 11 üründe 20 hücre farklı çıktı (ör. VORT HRW 30 MONO EVO:
+katalog 38 m³/h · %90, föy 35 m³/h · %89). Aynı anahtara yazmak §11.7'nin yasakladığı semantik
+çakışmadır: ya yasal beyan ya tanıtım değeri sessizce kaybolur. Önek ayrıca vitrinin föyü **ayrı
+blok** olarak gösterebilmesini sağlar.
+
+| Anahtar | Föy alanı | Tip / birim |
+|---|---|---|
+| `erp_sec_class_average` | SEC sınıfı, ortalama iklim | metin: `A+`, `A`, `B`… |
+| `erp_sec_average_kwh_m2a` · `erp_sec_cold_kwh_m2a` · `erp_sec_warm_kwh_m2a` | Özgül enerji tüketimi (SEC), üç iklim | sayı, kWh/(m²·yıl) — negatif olağandır |
+| `erp_ventilation_unit_type` | Tip: konut tek yönlü / çift yönlü | `UVU` · `BVU` |
+| `erp_drive_type` | Sürücü tipi (çok kademeli / değişken hız) | metin, kaynaktaki ifade (`VM`, `VSD`) |
+| `erp_heat_recovery_type` | Isı geri kazanım tipi | metin, kaynaktaki ifade |
+| `erp_thermal_efficiency_pct` | Referans debide ısıl verim | sayı, % |
+| `erp_max_delivery_m3h` | Föyün maksimum debisi | sayı, m³/h |
+| `erp_power_at_max_delivery_w` | Maksimum debide elektrik güç girişi | sayı, W |
+| `erp_noise_lwa_db` | Ses gücü seviyesi LWA (LpA ile karıştırılmaz, §11.7) | sayı, dB(A) |
+| `erp_reference_delivery_m3s` · `erp_reference_pressure_pa` | Referans debi ve referans basınç farkı | sayı |
+| `erp_spi_w_m3h` | Özgül güç girişi | sayı, W/(m³/h) |
+| `erp_control_factor` | Kontrol faktörü | sayı |
+| `erp_leakage_internal_pct` · `erp_leakage_external_pct` | İç / dış kaçak oranı | sayı, % — UVU'da kaynak "NA" diyorsa anahtar YAZILMAZ |
+| `erp_aec_kwh` · `erp_ahs_average_kwh` | Yıllık elektrik tüketimi, yıllık tasarruf edilen ısıtma (ortalama iklim) | sayı, kWh |
+| `erp_eprel_registration` | EPREL kayıt numarası | metin; yalnız üretici verdiyse |
+
+**Kurallar:**
+- ⛔ **Kaynaksız değer yazılmaz, çift bağımsız doğrulama şart.** İki ayrı çıkarım (metin yolu +
+  tablo yolu) aynı değeri vermiyorsa değer yazılmaz, AVenS/Vortice soru paketine gider.
+- ⛔ **Paylaşımlı sütun aktarılmaz.** Kaynak föyü iki koda tek sütun veriyorsa ("12106 / 10911"),
+  üretici ayrı föy ya da açık beyan vermeden ikinci koda değer yazılmaz.
+- Değer **kaynaktaki ondalıkla** yazılır; yuvarlanmaz, "düzeltilmez" (-44,5 kaynaksa -44.5).
+- **Etiket görseli ve föy belgesi veri değildir, dosyadır.** Mesafeli satışta etiketin fiyatın yanında
+  gösterilmesi ve föyün erişilebilir olması gerekir; bu dosyalar üreticiden (EPREL) alınır ve
+  görsel/belge katmanında durur. Bu anahtarlar dosyanın yerini tutmaz.
+
+### `erp_compliant`: yalnız kaynaklı, kapsam dışında hiç (REC-392 ek kapsam, Ops hükmü 2026-09-25)
+
+**Ölçüm (2026-09-25, katalog paketi):** 22 ailede 187 değer (true 159 · false 28), **187'sinin
+kaynak belgesi boş.** NORDIK HVLS'te "Evet"in belgede dayanağı yok; duman tahliye fanlarında
+dayanak motor tüzüğü (2019/1781), fan tüzüğü değil (AB 2024/1834 Md.1(3) duman tahliye ve hava
+sirkülasyon fanlarını kapsam dışı sayar); ATEX ailesinde "Hayır" uyumsuzluk gibi okunuyor.
+
+**Kural:**
+- Değer yalnız üretici belgesinde **hangi tüzüğe** uyduğu yazılıysa girer; alıntı ve sayfa zorunlu.
+- Kaynak bulunamazsa anahtar **silinir** — tahminle `true`/`false` yazılmaz.
+- Tüzüğün kapsamı dışındaki ailede (duman tahliye, HVLS, ATEX, frekans konvertörü…) anahtar **hiç
+  bulunmaz**; `false` "uyumsuz" diye okunur ve yanlıştır.
 
 ## 12. Referanslar
 

@@ -10,6 +10,7 @@ import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
+import { getProductModelLabel } from '../utils/productHelpers'
 
 const CartPage: React.FC = () => {
   const { items, updateQuantity, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart()
@@ -31,9 +32,11 @@ const CartPage: React.FC = () => {
             <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-sm">
               <ShoppingBag size={48} className="text-steel-gray" />
             </div>
-            <h2 className="text-2xl font-bold text-industrial-gray mb-4">
+            {/* H1 (PR-1, 2026-09-24 ölçümü): boş sepette sayfanın TEK başlığı buydu ve h2'ydi —
+                çizilmiş DOM'da H1 sayısı 0. Dolu sepet kolunun H1'i aşağıda (`cart.title`). */}
+            <h1 className="text-2xl font-bold text-industrial-gray mb-4">
               {t('cart.emptyTitle')}
-            </h2>
+            </h1>
             <p className="text-steel-gray mb-8">
               {t('cart.emptyDesc')}
             </p>
@@ -80,6 +83,7 @@ const CartPage: React.FC = () => {
               const unitPrice = typeof item.unitPrice === 'number' && Number.isFinite(item.unitPrice)
                 ? item.unitPrice
                 : null
+              const modelKodu = getProductModelLabel({ model_code: item.product.model_code })
               return (
               <div key={item.id} className="bg-white rounded-xl shadow-sm border border-light-gray p-6">
                 <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
@@ -99,8 +103,11 @@ const CartPage: React.FC = () => {
                         {item.product.name}
                       </h3>
                     </Link>
+                    {/* URN-32: eskiden `marka • sku` basılıyordu (iç kod). Görünen kod YALNIZ
+                        `model_code`; yoksa hiç çizilmez (INV-SKU-GORUNMEZ-1). */}
                     <p className="text-sm text-steel-gray mb-2">
-                      {item.product.brand} • {item.product.sku}
+                      {item.product.brand}
+                      {modelKodu && <> • {modelKodu}</>}
                     </p>
                     <div className="flex items-center space-x-4">
                       {unitPrice === null ? (

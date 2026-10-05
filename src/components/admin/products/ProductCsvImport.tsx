@@ -27,6 +27,8 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
      * `role="status"`/`aria-live` ile ekran okuyucuya da duyurulur.
      */
     const [notice, setNotice] = React.useState<{ tone: 'error' | 'info'; text: string } | null>(null)
+    /** Son hazırlamada yok sayılan fiyat hücresi sayısı; yazım iki yoldan (doğrudan / bilinmeyen SKU onayı) biter. */
+    const yoksayilanFiyatRef = React.useRef(0)
     /**
      * BİLİNMEYEN SKU KORUMASI (T148-VH çürütme turunda bulundu).
      * `upsert(..., { onConflict: 'sku' })` eşleşme bulamazsa satırı SESSİZCE **INSERT** eder.
@@ -69,13 +71,15 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
         const hasRequired = required.every(k => h.includes(k))
         const okCount = (importPreview?.rows || []).filter(r => r['name'] && r['sku']).length
         const statusKey = hasRequired ? 'admin.products.import.statusComplete' : 'admin.products.import.statusMissing'
+        const ozet = t('admin.products.import.dryRunResult', {
+            status: t(statusKey),
+            ok: okCount,
+            total: importPreview?.total || 0
+        })
+        // Fiyat sütunu YAZILMAZ (csvProductMapping: yoksayilanFiyat) — kullanıcı yazımdan ÖNCE bilsin.
         setNotice({
             tone: 'info',
-            text: t('admin.products.import.dryRunResult', {
-                status: t(statusKey),
-                ok: okCount,
-                total: importPreview?.total || 0
-            })
+            text: h.includes('price') ? `${ozet} ${t('admin.products.import.priceIgnored')}` : ozet,
         })
     }
 
@@ -99,7 +103,8 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
          * SÖZLEŞME: kategori değeri var ama canlı DB'de karşılığı yoksa satır payloads'a
          * GİRMEZ, reddedilen'e düşer (ERR_SLUG_NOT_IN_DB — sessiz null YOK).
          */
-        const { payloads, reddedilen } = hazirlaUrunSatirlari(importRows, categories)
+        const { payloads, reddedilen, yoksayilanFiyat } = hazirlaUrunSatirlari(importRows, categories)
+        yoksayilanFiyatRef.current = yoksayilanFiyat
 
         /* Kategorisi çözülemeyen satır varsa YAZIM YAPILMAZ. Kısmi yazım burada en kötü
          * seçenek olurdu: dosyanın bir kısmı içeri girer, geri kalanı girmez ve kullanıcı
@@ -171,12 +176,13 @@ export default function ProductCsvImport({ categories, onSuccess }: ProductCsvIm
                     ok += chunk.length
                 }
             }
-            setNotice({
-                tone: 'info',
-                text: skipped > 0
-                    ? t('admin.products.import.updateExistingDone', { ok, skipped })
-                    : t('admin.products.import.done', { ok, fail }),
-            })
+            const sonuc = skipped > 0
+                ? t('admin.products.import.updateExistingDone', { ok, skipped })
+                : t('admin.products.import.done', { ok, fail })
+            const fiyatNotu = yoksayilanFiyatRef.current > 0
+                ? ` ${t('admin.products.import.priceIgnoredCount', { count: yoksayilanFiyatRef.current })}`
+                : ''
+            setNotice({ tone: 'info', text: sonuc + fiyatNotu })
             setPendingWrite(null)
             setImportPreview(null)
             setImportRows(null)

@@ -44,6 +44,16 @@ LLM çıkarır → flat CSV  →  [ İNSAN DENETİMİ ]  →  loader flat→JSON
 * **Metin Kaçışları (Escaping):** İçerisinde noktalı virgül veya çift tırnak barındıran metin alanları çift tırnak (`"`) içine alınmalıdır. Metin içindeki çift tırnaklar iki adet çift tırnakla (`""`) kaçırılmalıdır.
 * **Satır = ürün:** Tek satır = tek ürün (renk/varyant ayrı satır). Başlık satırı zorunlu.
 
+### 1.1 Formül enjeksiyonu nötrleme (VULN-006, 2026-09-29) — YÖNETİCİ DIŞA AKTARIMLARI
+
+Tablolama yazılımı (Excel, Sheets, LibreOffice) `= + - @ TAB CR` ile başlayan hücreyi **formül** sayar. Müşterinin kayıtta yazdığı ad, istemciden gelen hata mesajı, dış sistemin olay tipi gibi **saldırganın kontrol edebildiği** her alan, yönetici CSV'yi açtığında çalışabilir (veri sızdırma, yönlendirme). Bu bölüm dışa aktarımın kuralıdır; içe alım (§2+) değişmez.
+
+* **Tek kapı:** yönetici CSV üreten HER yer hücreyi `src/utils/csvHucre.ts` (`csvHucre` / `csvSatir`) ile yazar. Yerel `escape()` ya da satır içi `.replace(/"/g, '""')` yasaktır (kapı: `INV-ADMIN-CSV-1`).
+* **Nötrleme:** hücre metninin NFKC normalize edilmiş **ilk karakteri** `= + - @ TAB CR` ise metnin başına tek tırnak (`'`) konur. Tam genişlikli `＝ ＋ － ＠` da yakalanır. Normalize edilmiş hâl çıktıya YAZILMAZ; yalnız karar içindir.
+* **Sayı/tarih DEĞİŞMEZ:** `number` tipi olduğu gibi yazılır; yalnız işaret+rakam+ayraçtan oluşan metin (`-12,50`, `+905551112233`) formül olamayacağı için önek almaz. Bedel (kabul edilen): sayı gibi görünmeyen metin ilk karakter formül karakteriyse Excel'de görünür `'` önekiyle açılır.
+* **Çıkışta yapılır, girişte bozulmaz:** veritabanındaki ham değer değiştirilmez; nötrleme yalnız CSV çıktısındadır.
+* **Her hücre çift tırnaklıdır** (mevcut dışa aktarımlarla bayt uyumu); ayraç (`,` / `;`) çağıranın seçimidir.
+
 ---
 
 ## 2. CSV Kolon Yapısı (Düzleştirilmiş Mimari)

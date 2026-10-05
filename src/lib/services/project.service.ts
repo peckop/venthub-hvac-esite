@@ -5,6 +5,7 @@ import type { TablesInsert } from '../../types/database.types'
 import type { DbProduct,DbProjectItem, DbUserProject } from '../../types/db-rows'
 import type { ProjectItem } from '../../types/ui-models'
 import { mapDatabaseProductToDomain } from '../type-converters'
+import { VARIANT_DETAIL_COLUMNS } from './product.columns'
 
 /**
  * Retrieves all projects associated with the currently authenticated user.
@@ -120,21 +121,23 @@ export async function removeProductFromProject(
  * @throws {Error} If the database query fails.
  */
 export async function listProjectItems(supabase: SupabaseClient<Database>, projectId: string): Promise<ProjectItem[]> {
-  // NOT (W4b): gömülü `products(*)` ham `price` kolonunu da getiriyor. Kolon SSOT'unu
-  // şablon dizgeyle geçirmek PostgREST tip-ayrıştırıcısını kırıyor (dinamik gömülü alan
-  // listesi desteklenmiyor), o yüzden yıldız korundu. Tip katmanı zaten koruyor:
-  // `DomainProduct` artık `price` taşımıyor, dolayısıyla okunamaz.
+  // REC-140 (2026-09-24): eskiden gömülü `products(*)` idi — tip katmanı `price`'ı
+  // gizliyordu ama AĞ YANITI tüm satırı (alış fiyatı, maliyet, tedarikçi) tarayıcıya
+  // taşıyordu. Tip gizlemek veri gizlemek değildir; gömülü alan listesi vitrin kümesidir.
+  // `as const` şablonu literal tipte tutar, PostgREST tip-ayrıştırıcısı onu okur.
   const { data, error } = await supabase.from('project_items')
-    .select('*, product:products(*)')
+    .select(`*, product:products(${VARIANT_DETAIL_COLUMNS})` as const)
     .eq('project_id', projectId)
 
   if (error) throw (error as Error)
 
-  const items = (data as (DbProjectItem & { product: DbProduct | null })[]) || []
   // `exactOptionalPropertyTypes`: opsiyonel alana açıkça `undefined` atanamaz —
-  // ürün yoksa anahtar hiç eklenmez.
-  return items.map(item => {
+  // ürün yoksa anahtar hiç eklenmez. Gömülü ürün vitrin kümesidir (DbProduct'ın alt
+  // kümesi); eşleyici kaldırılan maliyet kolonlarını okumaz — cart.service'teki
+  // `as DbProduct[]` daraltmasının aynısı, satır başına.
+  return (data || []).map(item => {
     const { product, ...rest } = item
-    return product ? { ...rest, product: mapDatabaseProductToDomain(product) } : rest
+    const satir = rest as Omit<DbProjectItem, 'product'>
+    return product ? { ...satir, product: mapDatabaseProductToDomain(product as DbProduct) } : satir
   })
 }

@@ -15,8 +15,6 @@ export const products = {
     featureFailed: 'Vitrin güncelleme hatası',
     deleteConfirm: 'Seçili {{count}} ürünü SİLMEK istediğinize emin misiniz? Bu işlem geri alınamaz!',
     deleteFailed: 'Toplu silme hatası',
-    priceConfirm: 'Seçili {{count}} ürüne fiyat güncellemesi uygulanacak. Onaylıyor musunuz?',
-    priceFailed: 'Fiyat güncelleme hatası',
   },
   form: {
     name: 'Ürün Adı',
@@ -110,6 +108,9 @@ export const products = {
     closeSymbol: '✕',
     moreRows: '... ve {{count}} satır daha.',
     processing: 'İşleniyor...',
+    // Fiyat sütunu artık yazılmıyor: satış fiyatını fiyat motoru hesaplıyor (csv-import-export-standard).
+    priceIgnored: 'Dosyadaki "price" sütunu içe aktarılmaz; satış fiyatı fiyat kurallarından hesaplanır.',
+    priceIgnoredCount: '{{count}} satırdaki fiyat değeri içe aktarılmadı; satış fiyatı fiyat kurallarından hesaplanır.',
     // Bilinmeyen SKU koruması: eski bir dışa aktarım dosyası yeniden yüklenirse
     // `upsert(onConflict:'sku')` sessizce KOPYA ÜRÜN yaratıyordu. Metinler teşhis değil
     // YOL TARİFİ verir; sayı interpolasyonla gelir, sabit metne gömülmez.
@@ -137,7 +138,10 @@ export const products = {
     health: 'Performans',
     image: 'Görsel',
     name: 'Ad',
-    price: 'Fiyat',
+    price: 'Satış fiyatı (KDV dahil)',
+    priceHint: 'Standart listenin satış fiyatı; fiyat kuralından hesaplanır, buradan değiştirilmez.',
+    priceQuote: 'Teklif',
+    priceUnreadable: 'Okunamadı',
     sku: 'SKU',
     status: 'Durum',
     stock: 'Stok',

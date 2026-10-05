@@ -6,10 +6,10 @@ import Link from 'next/link'
 import React from 'react'
 
 import { localizedHref, Routes } from '@/utils/routes';
+import { adresDili, adresRotalari } from '@/utils/yuzeyAdresleri'
 
 import { BrandIcon } from '../components/HVACIcons'
 import { ScrollReveal } from '../components/ScrollReveal'
-import Seo from '../components/Seo'
 import { HVAC_BRANDS } from '../data/brands'
 import { en } from '../i18n/dictionaries/en'
 import { tr } from '../i18n/dictionaries/tr'
@@ -66,10 +66,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Seo
-        /* site adi Seo bileseninde eklenir — REC-148 */ title={t('aboutPage.title')}
-        description={t('aboutPage.seoDescription')}
-      />
+      {/* Üst veri rotada (`about/page.tsx` generateMetadata) — istemci Seo ikinci <title> basıyordu. */}
 
       {/* Cinematic Hero */}
       <section className="relative h-70vh flex items-center justify-center overflow-hidden bg-slate-950 text-white">
@@ -240,7 +237,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
               {t('aboutPage.ctaContact')}
             </Link>
             <Link
-              href={localizedHref(Routes.products(), lang)}
+              href={adresRotalari(adresDili(lang)).products()}
               className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-colors"
             >
               {t('aboutPage.ctaExplore')}

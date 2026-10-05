@@ -51,6 +51,7 @@
  */
 
 import { execFile, spawnSync } from 'node:child_process'
+import { yenidenDene } from './yeniden-dene.mjs'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -286,23 +287,38 @@ async function downloadSlug(ref, tempRoot, slug) {
   // CLI'nin "burası bir Supabase projesi" demesi için gereken TEK şey.
   fs.writeFileSync(path.join(work, 'supabase', 'config.toml'), `project_id = "${ref}"\n`, 'utf8')
 
-  try {
-    // `--use-api` ZORUNLU, kolaylık değil. Bayrak yokken CLI eszip'i **Docker ile**
-    // yerelde açıyor; GitHub runner'da bu 26 fonksiyonun 19'unda SESSİZCE başarısız
-    // oldu — CLI exit 0 döndürdü ama hiç dosya çıkarmadı (ölçüldü: CI run 31870449493;
-    // çalışan 7 tanesi, tesadüfen, bundle'ı CI'da üretilmiş olanlardı).
-    // `--use-api` unbundle'ı sunucu tarafında yaptırır: Docker bağımlılığı yok,
-    // sonuç ortamdan bağımsız. Yerelde iki yolun da aynı dosyaları verdiği doğrulandı.
-    await execFileAsync(CLI_BIN, ['functions', 'download', slug, '--project-ref', ref, '--use-api'], {
-      cwd: work,
-      shell: USE_SHELL,
-      windowsHide: true,
-      maxBuffer: 64 * 1024 * 1024,
-    })
-  } catch (e) {
-    const detail = String(e?.stderr || e?.stdout || e?.message || e).trim().slice(0, 600)
-    return { slug, error: `'${CLI_BIN} functions download ${slug}' BAŞARISIZ (exit ${e?.code ?? '?'}): ${detail}` }
-  }
+  // YALNIZ CLI çağrısı yeniden denenir (çıkış kodu ≠ 0 = ağ/geçici hata; bir koşumda 3/29, sonrakinde
+  // 2/29, sonra 1/29 fonksiyon bu yüzden düştü). "Hata vermedi ama dosya çıkarmadı" AŞAĞIDA ayrı ve
+  // yeniden DENENMEZ: o, geçici değil yapısal bozulmadır. Deneme sayısı sınırlı; tükenirse hata
+  // deneme sayısıyla birlikte raporlanır (ört-bas yok, kısmi sonuç hâlâ exit 2).
+  const indirme = await yenidenDene(
+    async () => {
+      try {
+        // `--use-api` ZORUNLU, kolaylık değil. Bayrak yokken CLI eszip'i **Docker ile**
+        // yerelde açıyor; GitHub runner'da bu 26 fonksiyonun 19'unda SESSİZCE başarısız
+        // oldu — CLI exit 0 döndürdü ama hiç dosya çıkarmadı (ölçüldü: CI run 31870449493;
+        // çalışan 7 tanesi, tesadüfen, bundle'ı CI'da üretilmiş olanlardı).
+        // `--use-api` unbundle'ı sunucu tarafında yaptırır: Docker bağımlılığı yok,
+        // sonuç ortamdan bağımsız. Yerelde iki yolun da aynı dosyaları verdiği doğrulandı.
+        await execFileAsync(CLI_BIN, ['functions', 'download', slug, '--project-ref', ref, '--use-api'], {
+          cwd: work,
+          shell: USE_SHELL,
+          windowsHide: true,
+          maxBuffer: 64 * 1024 * 1024,
+        })
+        return {}
+      } catch (e) {
+        const detail = String(e?.stderr || e?.stdout || e?.message || e).trim().slice(0, 600)
+        return { error: `'${CLI_BIN} functions download ${slug}' BAŞARISIZ (exit ${e?.code ?? '?'}): ${detail}` }
+      }
+    },
+    {
+      haber: (n, hata) =>
+        console.error(`[drift] '${slug}' indirilemedi (deneme ${n}), yeniden deneniyor: ${hata.slice(0, 120).replace(/\s+/g, ' ')}`),
+    }
+  )
+  if (indirme.error) return { slug, error: `${indirme.error} [${indirme.denemeSayisi} deneme]` }
+  if (indirme.denemeSayisi > 1) console.error(`[drift] '${slug}' ${indirme.denemeSayisi}. denemede indi`)
 
   let files
   try {

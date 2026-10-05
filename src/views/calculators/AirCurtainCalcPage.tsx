@@ -1,3 +1,6 @@
+'use client'
+
+// İstemci sınırı BURADA ilan edilir: rota metadata yazdığı için Server Component (REC-150 Adım 5).
 import { ArrowLeft, ArrowRight, DoorOpen, RotateCcw,Thermometer, Wind, Zap } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { Suspense, useCallback, useEffect, useMemo,useState } from 'react'
@@ -215,7 +218,7 @@ const AirCurtainCalcPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.steps.dimensions')}</h2>
-                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
+                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.steps.dimensionsDesc')}</p>
               </div>
             </div>
 

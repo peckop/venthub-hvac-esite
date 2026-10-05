@@ -58,7 +58,7 @@ src/
 | Hook | camelCase.ts, `use` prefix | `useCart.ts` |
 | Utility | camelCase.ts | `formatCurrency.ts` |
 | Config | camelCase.ts | `categoryRegistry.ts` |
-| Migration | `YYYYMMDD_description.sql` | `20260120_fix_rls.sql` |
+| Migration | `YYYYMMDDHHMMSS_description.sql` (14 hane) | `20260120143000_fix_rls.sql` |
 
 ## Performans ve Render Standartları (90+ Puan Hedefi)
 

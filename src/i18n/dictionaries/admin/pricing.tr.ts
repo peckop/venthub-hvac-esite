@@ -173,6 +173,8 @@ export const pricing = {
       scopeTarget: "Kapsam ile hedef uyumsuz: seçilen kapsam için tek ve doğru hedef seçilmeli.",
       scopeRange: "Geçersiz kapsam değeri.",
       checkViolation: "Kural veritabanı doğrulamasından geçemedi. Alanları kontrol edin.",
+      productFixedExists:
+        "Bu ürün için zaten süresiz bir sabit fiyat kuralı var. Mevcut kuralı düzenleyin ya da yeni kurala geçerlilik tarihi veya para birimi verin.",
     },
     validation: {
       minQuantity: "Minimum adet 0 veya daha büyük olmalı",
@@ -293,6 +295,10 @@ export const pricing = {
       toasts: {
         applied: "{{count}} ürünün maliyeti tazelendi",
         applyFailed: "Maliyetler tazelenemedi",
+        applyFailedNotAdmin: "Maliyet tazeleme yalnız yönetici yetkisiyle yapılır. Oturumu kapatıp yeniden açmayı deneyin; hiçbir şey yazılmadı.",
+        applyFailedTooLarge: "Ürün sayısı tek seferde tazelenebilecek sınırı aştı; hiçbir şey yazılmadı. Teknik ekibe bildirin.",
+        applyFailedTimeout: "İşlem zaman aşımına uğradı; hiçbir şey yazılmadı. Biraz sonra yeniden deneyin.",
+        applyFailedChanged: "Tazeleme sırasında ürün fiyatları ya da yetkiniz değişti; hiçbir şey yazılmadı. Yeniden deneyin.",
       },
     },
     impact: {

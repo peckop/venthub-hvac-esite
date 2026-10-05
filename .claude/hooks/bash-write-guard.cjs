@@ -82,6 +82,31 @@ try {
   process.stderr.write('[bash-write-guard] sir-kalip modulu yuklenemedi (fail-open): ' + (e && e.message) + '\n')
 }
 
+/**
+ * ⭐ÜÇÜNCÜ SINIF: GÖVDE İÇİNDE KABUK İKAMESİ (2026-09-27, ARAÇ olayı). Gerekçe ve kural:
+ * govde-ikame-kalip.cjs. Çift tırnaklı gövdedeki kaçışsız ters tırnak / `$(` komut olarak koşar.
+ */
+try {
+  const { govdeIkameBulgulari } = require(path.join(__dirname, 'govde-ikame-kalip.cjs'))
+  const bulgular = govdeIkameBulgulari(komut)
+  if (bulgular.length > 0) {
+    const satirlar = bulgular
+      .slice(0, 3)
+      .map((b) => `  • ${b.ad}: ${JSON.stringify(b.parca)}`)
+      .join('\n')
+    process.stderr.write(
+      '[bash-write-guard] CIFT TIRNAKLI GOVDEDE KABUK IKAMESI — reddedildi:\n' +
+        satirlar +
+        '\n  NICIN: 2026-09-27\'de PR govdesindeki ters tirnaklar bash icin komuttu; reddedilmis bir\n' +
+        '  kurulum betigi istemeden kostu. YAPILACAK: govdeyi Write ile dosyaya yaz, --body-file /\n' +
+        '  -F body=@dosya kullan; kod ise betigi dosyaya yaz. Tek tirnak ya da \\` kacisi da guvenlidir.\n'
+    )
+    process.exit(2)
+  }
+} catch (e) {
+  process.stderr.write('[bash-write-guard] govde-ikame modulu yuklenemedi (fail-open): ' + (e && e.message) + '\n')
+}
+
 let cikarici
 try {
   cikarici = require(path.join(__dirname, 'bash-write-targets.cjs'))

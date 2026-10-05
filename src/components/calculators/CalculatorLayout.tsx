@@ -4,7 +4,6 @@ import React from 'react'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes';
 import { useI18n } from '../../i18n/I18nProvider'
-import Seo from '../Seo'
 
 
 interface CalculatorLayoutProps {
@@ -15,26 +14,17 @@ interface CalculatorLayoutProps {
     backLabel?: string
     infoText?: string
     warningText?: string
-    /**
-     * ⏳GEÇİCİ — metadata'yı ROTA üretiyorsa bu layout `<Seo>` basmaz (REC-150 PR-1, 2026-09-05).
-     *
-     * NİÇİN GEREKLİ: `CalculatorLayout` TEK bileşen ama **dört rotayı birden** çeviriyor.
-     * `<Seo>`'yu buradan kaldırmak dört rotayı aynı anda göç ettirmek demekti; oysa plan
-     * adım adım ilerlemeyi ve her adımı ölçmeyi söylüyor. Bu bayrak, pilotun yarıçapını
-     * TEK rotaya (`kanal`) daraltır: o rota `generateMetadata` yazar ve bayrağı açar,
-     * diğer üçü bugünkü davranışını aynen sürdürür.
-     *
-     * ⚠BU BAYRAK KALICI DEĞİL: dört rota da göç ettiğinde `<Seo>` bu dosyadan tümden
-     * kalkar ve bayrak SİLİNİR (REC-150 Adım 5). Geçici dikişi burada adıyla yazıyorum ki
-     * yarın "bu ne işe yarıyordu" diye durmasın — geçici olduğu unutulan dikiş kalıcı olur.
-     */
-    metadataRotadanMi?: boolean
     children: React.ReactNode
 }
 
 /**
- * Ortak hesap makinesi layout wrapper
- * Premium görünüm, SEO, breadcrumb içerir
+ * Ortak hesap makinesi layout wrapper — görünüm + breadcrumb.
+ *
+ * METADATA BURADA YAZILMAZ (REC-150 Adım 5, 2026-09-24): dört hesaplayıcı rotası da kendi
+ * `generateMetadata`'sını `sayfaUstVerisi` ile yazıyor. Eskiden bu layout istemci `<Seo>`
+ * basıyordu ve rota da metadata yazınca sayfa iki `<title>` taşıyordu; geçici
+ * `metadataRotadanMi` bayrağı pilotta tek rotayı susturuyordu. Dördü göç etti, bayrak silindi.
+ * Kapı: INV-METADATA-TEK-YAZICI-1.
  */
 const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     title,
@@ -44,7 +34,6 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     backLabel,
     infoText,
     warningText,
-    metadataRotadanMi = false,
     children
 }) => {
     const { t } = useI18n()
@@ -66,33 +55,6 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
     const geriYol = backLink ?? Routes.urunSecici()
     return (
         <div className="min-h-screen bg-gradient-to-b from-light-gray to-white">
-            {/* Rota kendi metadata'sını üretiyorsa İKİNCİ YAZICI olmayız (REC-150 PR-1).
-                İki yazıcı aynı anda çalışınca sayfa iki <title> ve iki <meta description>
-                basıyordu ve hangisinin kazandığı ORTAMA göre değişiyordu. */}
-            {metadataRotadanMi ? null : (
-            <Seo
-                /**
-                 * SEKME/ARAMA BAŞLIĞI TEK ADA BAĞLANDI (REC-148 B1, 2026-09-05).
-                 *
-                 * Buraya "VentHub Mühendislik Araçları" SABİT KODLANMIŞTI ve iki ayrı
-                 * kusur taşıyordu:
-                 *  1. Yeteneğin ONUNCU adıydı — K17 tek ad diyor, oysa bu ad sözlükte
-                 *     hiç geçmiyordu; kimse "burada da bir ad var" diye bakmamıştı çünkü
-                 *     sayfanın gövdesinde görünmüyor, yalnız sekmede ve arama sonucunda.
-                 *  2. TÜRKÇE SABİTTİ — İngilizce ziyaretçi, sayfanın geri kalanı İngilizce
-                 *     iken sekmesinde Türkçe bir ad görüyordu (CLAUDE.md kural 7 ihlali:
-                 *     kullanıcıya görünen metin sözlükten gelir).
-                 *
-                 * ⚠SİTE ADI BURAYA YAZILMAZ: `Seo` bileşeni başlığın sonuna zaten
-                 * "| VentHub" ekliyor. İlk yazışımda "· VentHub" koymuştum; önizlemede
-                 * ölçtüğümde "… | Ürün Seçici · VentHub | VentHub" çıktı — kendi eklediğim
-                 * fazlalık. Ölçmeseydim, mükerrerliği temizleyen PR mükerrerlik getirecekti.
-                 */
-                title={`${title} | ${t('urunSecici.ustBaslik')}`}
-                description={description}
-            />
-            )}
-
             {/* Header */}
             <div className="bg-primary-navy text-white">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

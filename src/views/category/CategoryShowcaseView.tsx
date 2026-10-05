@@ -1,6 +1,6 @@
 'use client';
 import { Activity, ArrowRight, ChevronDown, Layers,ShieldCheck, ThermometerSun, Zap } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
@@ -27,7 +27,6 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     subCategories,
     onSubcategorySelect
 }) => {
-    const router = useRouter()
     const { t, dict, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
@@ -41,14 +40,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     const [heroTextRef, heroTextVisible] = useScrollAnimation<HTMLParagraphElement>({ threshold: 0.2 })
     const [airCurtainBtnRef, airCurtainBtnVisible] = useScrollAnimation<HTMLButtonElement>({ threshold: 0.2 })
 
-    // Handle selection either via prop or direct routing
-    const handleSubSelect = (subSlug: string) => {
-        if (onSubcategorySelect) {
-            onSubcategorySelect(subSlug)
-        } else {
-            router.push(Routes.category(getLocalizedCategorySlug(category, lang), subSlug))
-        }
-    }
+    // Alt kategori adresi (üst + alt); kart bağlantısı ve seçici modu aynı adresi kullanır.
+    const subHref = (subSlug: string) => Routes.category(getLocalizedCategorySlug(category, lang), subSlug)
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
@@ -136,10 +129,18 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     {subCategories.map((sub) => {
                         const subVm = wrapCategory(sub)
                         return (
-                            <button
+                            // REC-471: kart GERÇEK bağlantı (`<a href>`, sunucuda basılır). Eskiden `<button onClick>` +
+                            // `router.push` idi: Google alt kategori sayfalarına ulaşamıyordu (17 yetim sayfa, GEO-SEO
+                            // REC-461). Adres `Routes.category` (adresUret) üzerinden — şema değişince kendiliğinden doğru.
+                            <Link
                                 key={sub.id}
+                                href={subHref(getLocalizedCategorySlug(sub, lang))}
                                 className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-hvac-card-hover transition-shadow duration-700 cursor-pointer overflow-hidden max-w-modal text-left block w-full"
-                                onClick={() => handleSubSelect(getLocalizedCategorySlug(sub, lang))}
+                                onClick={onSubcategorySelect ? (e) => {
+                                    // Üst bileşen seçimi kendi yönetiyorsa (seçici modu) gezinme onda; bağlantı yine de basılı kalır.
+                                    e.preventDefault()
+                                    onSubcategorySelect(getLocalizedCategorySlug(sub, lang))
+                                } : undefined}
                             >
                                 <div className="relative z-10">
                                     {/* ⭐GÖRSEL (REC-291, Recep isteği: "görselli olması lazım bence").
@@ -194,7 +195,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
                                     </div>
                                 </div>
-                            </button>
+                            </Link>
                         )
                     })}
                 </div>

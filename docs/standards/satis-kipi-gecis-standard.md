@@ -117,7 +117,7 @@ göre; **bu dosya** değişir, çağıranlar değişmez.
 
 | tablo | tetik | handler dalı (route.ts) | tazelenen |
 |---|---|---|---|
-| `site_settings` (**yalnız** `key='satis_kipi'`, `WHEN` koşulu) | `on_site_settings_satis_kipi` — **migration** | `table==='site_settings' && record.key==='satis_kipi'` → **URUN ekler (REC-169 ilk kalem, ayrı küçük PR)** | `revalidateTag(SATIS_KIPI_TAG)` + `/sitemap.xml` |
+| `site_settings` (**yalnız** `key='satis_kipi'`, `WHEN` koşulu) | üç tetik: `on_site_settings_satis_kipi_ins` / `_upd` (`new.key OR old.key`) / `_del` — **migration `20260929150000_satis_kipi_anahtari.sql`** (REC-168 A; DELETE ve yeniden adlandırma dahil) | `table === 'site_settings'` tek koşullu dal, içeride `key === 'satis_kipi'` (eski adı da sayar) — **eklendi (REC-168 A, aynı PR; INV-RENDER-2 tek koşullu dal arar, bileşik koşul kapıya görünmez)** | `revalidateTag(SATIS_KIPI_TAG)` + `/sitemap.xml`; keşif/ana sayfa etiketlerine DOKUNMAZ |
 | `categories` (hide_price) | `on_categories_change` — **var** | var (`route.ts:337-368`) | kategori yolları + home/discovery tag + sitemap |
 
 ⛔**BULGU (ölçüldü, cetvele giriyor):** `categories` dalı **PDP'leri tazelemiyor**. `hide_price` çevrildiğinde
@@ -127,8 +127,14 @@ yeniden üretilir (REC-169 kabul ölçütü). Betik bu boşluğu **tazeleyemez**
 başlığı altında adıyla yazar (§6).
 
 `WHEN (new.key='satis_kipi')` kasıtlı: `payment`/`general` satırı değişince `to_jsonb(NEW)` (iyzico alanları)
-webhook yüküne **girmez**. `DELETE` tetikte yok (AFTER DELETE'te NEW yok); betik satır silmez, silinirse
-fonksiyon zaten fail-closed (§11).
+webhook yüküne **girmez**. `DELETE` ve ANAHTAR YENİDEN ADLANDIRMA da tetiklenir (REC-168 plan-challenger Ç4):
+üç ayrı tetik, çünkü `WHEN` içinde `OLD`/`NEW` erişimi olaya bağlıdır (INSERT'te `OLD`, DELETE'te `NEW` yok) — eskiden
+DELETE tetikte yoktu ve silinen satır "açık"ı önbellekte tutabilirdi.
+
+**Önbellek süresi (REC-168 Ç1, düzeltme):** `satisKipiOku()` `unstable_cache`'i `revalidate: 300` ile kurulur
+(`SATIS_KIPI_ONBELLEK_SN`); eskiden süresizdi (repodaki diğer hepsi 3600). Okuma HATASI önbelleğe yazılmaz: `dbdenOku`
+fırlatır, `satisKipiOku` yakalayıp o çağrıda KAPALI döner (fail-closed korunur, bayatlık kalıcı olmaz). Webhook düşerse
+"açık" en fazla 5 dk bayat kalır. Kapı: INV-SATIS-KIPI-7 (`src/lib/kip/__tests__/satisKipi.test.ts`).
 
 ## 5. `hide_price` ilişkisi — anahtardan TÜREMEZ, aynı komutla ÇEVRİLİR
 
@@ -195,6 +201,40 @@ Doğrulama satırı (uygula sonrası): `fiyat görünür ürün (veri): 348 / 37
 | 9 | **Bu betik**: kuru koşum → Recep onayı → `--uygula` → K3 doğrulama | ALTYAPI | §6–§7 |
 | 10 | Hosting kullanım şartı — **Recep kararı 2026-08-16 kayıtlı** (user-side-open-items madde 5); bu cetvel yeniden **açmaz** | — | — |
 
+**Bu liste BELGEDİR, kapı BETİKTİR (2026-09-29, OPS emri, karar 190 sonrası):** yukarıdaki kalemlerden otomatik ölçülebilenler
+§8.1'deki önkoşul tablosunda `satis-kipine-gec.mjs` içinde koşar; listeyi hatırlamak kimseye kalmaz. Otomatik ölçülemeyen
+kalemler (hukukçu teyidi, KDV alanı, iade şeması…) burada ve `docs/olcum/satis-hazirligi.md`'de durur.
+
+### 8.1 Açılış önkoşulları (INV-SATIS-KIPI-7 — `scripts/kip/acilis-onkosullari.mjs`)
+
+**Kural:** yönü AÇ olan her koşum (kuru koşum dahil) tabloyu ölçer ve basar; `--uygula` bir kalem **GEÇTİ değilse** canlıya
+hiçbir şey yazmadan çıkış 1 verir. **ÖLÇÜLEMEDİ = RET.** Boş/eksik sonuç = RET. Kapatmak (`--yon kapat`, hedefi kapalı
+`--geri-al`) önkoşula tabi değildir; hedefi açık `--geri-al` açma sayılır. Yalnız tablo: `--onkosul` (çıkış 0 = hepsi geçti, 2 = geçmeyen var).
+Sıra: **önkoşul → taze ölçüm → yedek → K2/K4/K5 yeniden ölçüm → yazma.** Genel atlama bayrağı YOKTUR; yalnız **K1 ve K6** için
+`--muaf K1 --muaf-gerekce "<≥20 karakter>"` (rapora ve `site_settings` satırına damgalanır).
+
+| # | kalem | ölçüm | sahibi |
+|---|---|---|---|
+| K1 | Yasal sayfalarda yer tutucu yok | canlı 12 yasal sayfa gövdesi: ham `[X_Y]` = 0 **ve** görünüm metni ("Şirket bilgileri kuruluşla eklenecek"/EN) = 0 (görünüm metni ham yer tutucuyu GİZLER; yalnız ham=0 yeşil verirdi) · muaf olabilir | Recep + URUN |
+| K2 | Ödeme ortamı canlı | `healthz` **anon JWT ile**: `durum=saglikli` ve `odeme_ortami='prod'`. **Sınır:** yalnız konak adı ölçütü; İyzico anahtar çiftinin geçerliliğini KANITLAMAZ | Recep + ALTYAPI |
+| K3 | Edge satış kapısı canlıda | `iyzico-payment` boş sepet probu: `403 SALES_CLOSED` (`409 VALIDATION_EMPTY_CART` = kapı yok). Anahtar zaten açıksa onarımdır, probe uygulanmaz. Kimlik yoksa ölçülemedi | ALTYAPI (REC-355) |
+| K4 | `site_settings` kilidi + RPC + webhook tetikleri | `pg_policy` (2 RESTRICTIVE), `satis_kipi_oku()` var, 3 tetik `tgenabled='O'`; `SUPABASE_DB_URL` yoksa ölçülemedi | URUN |
+| K5 | Sipariş bekçisi tetikleri (#1454) | `pg_trigger`: doğru tablo + BEFORE INSERT/UPDATE + INVOKER + etkin | ALTYAPI |
+| K6 | E-posta göndericisi doğrulanmış | Resend `GET /domains`: `venthub.com.tr` `verified`; anahtar yoksa ölçülemedi · muaf olabilir | Recep + ALTYAPI (REC-368) |
+| K7 | Fatura yolu | Varsayılan **RET**. Tek açık yol: `--fatura-beyani "<Recep sözü · tarih>"`, kalıp **"e-arşiv faturaları `<yöntem>` ile kesilecek (mali müşavir teyitli)"**; yöntem genel/boşsa RET; beyan `site_settings` damgasına yazılır | Recep (açılış günü sorulur) |
+| K8 | Hedef durum tutarlı | `planla()` sonrası beklenen durum (anahtar ↔ `hide_price`); **şimdiki durum DEĞİL** (yarım kalmış açılış onarılabilsin) | URUN |
+| K9 | Müşteri e-postası gerçekten gidiyor | son 30 günde `order_email_events`/`quote_email_events` `status='sent'` + `provider_message_id` ya da `shipping_email_events` `provider_message_id` (bu tabloda `status` kolonu yok); üç tablodan toplam ≥ 1. K6 alanı, K9 gönderimi ölçer; DB yoksa ölçülemedi = ret | ALTYAPI (REC-368) |
+| K10 | Google ürün sonucu / Merchant uygunluğu (OPS 09-30, GEO-SEO REC-461) | canlı site haritasından 3 örnek ürün sayfası (ilk, orta, son); JSON-LD'de: her Offer'da sayısal fiyat > 0 + para birimi, her Offer'da `hasMerchantReturnPolicy` ve `shippingDetails`, en az bir Product'ta `mpn` ya da `gtin*`. ⚠`sku` ARANMAZ: REC-146 kararıyla iç kimlik olarak bilerek yayınlanmıyor. Bugün (teklif kipi) Offer yok → RET: beklenen durum | URUN (REC-146) + Recep (iade/gönderim politikası) |
+| K11 | Yasal metinlerde taslak işareti yok = hukukçu teyidi bayrağı (OPS 09-30, REC-492) | canlı 12 yasal sayfa: `<title>`/`<h1>`'de `(Taslak)`/`(Draft)` ve taslak uyarı bandı yok. `legalReviewCompleted` true olunca üçü kendiliğinden kalkar. Muaf OLAMAZ (onaylanmamış metni onaylı göstermek yanlış beyan). ⚠Ölçmediği: hukukçunun gerçekten teyit ettiği (bayrağı çeviren PR'ın gövdesindeki teyit kaydı) | Recep (hukukçu) + URUN |
+
+**K7 cümlesi (OPS hükmü):** e-arşiv faturası yasal zorunluluktur. Beyan **faturasız satışa izin DEĞİLDİR**; faturanın otomasyon dışı
+(elle/mali müşavir aracılığıyla) kesileceğinin taahhüdüdür.
+
+**Sınır (dürüstlük):** "hepsi geçti" **satışa hazır** demek değildir; yalnız otomatik ölçülebilen açılış koşulları sağlandı demektir.
+Bu tabloda OLMAYANLAR adıyla: hukukçu teyidi (`legalReviewCompleted`), KDV `tax_rate` ölçümü (§8 madde 4), iade şeması (REC-159/57),
+İyzico webhook sırrı, durum monotonluğu tetiği, e-posta içerik testi. Betiği kullanmadan `site_settings`'e service-role ile elle
+yazım bu kapıyı atlar (panelden yazımı #1536'nın kısıtlayıcı politikası kapatır; service-role için ayrı kayıt).
+
 ## 9. Kapılar (ikinci PR'da yazılır — adıyla, sabotaj kollarıyla)
 
 | kapı | ne ölçer | sabotaj |
@@ -204,6 +244,8 @@ Doğrulama satırı (uygula sonrası): `fiyat görünür ürün (veri): 348 / 37
 | **INV-SATIS-KIPI-3** | `VERCEL_ENV=production` + `SATIS_KIPI_ONIZLEME=1` → **kapalı**; `preview` → açık | koşul kaldırılır → düşer |
 | **INV-SATIS-KIPI-4** | betik `--uygula`siz: mock istemcide `.update/.insert` çağrı sayısı **0**; `--uygula` onaysız → çıkış 1 | `if (!UYGULA) return` silinir → düşer |
 | **INV-SATIS-KIPI-5** | `tutarliMi()` üç hâl: açık+0 ✓ · kapalı+37 ✓ · açık+5 ✗ | ara hâli kabul eden değişiklik → düşer |
+| **INV-SATIS-KIPI-6** | anahtar açık olsa bile satıcı bilgisi yer tutucuysa ödeme adımı açılmaz (`odemeKarari`); ziyaretçi ham `[YER_TUTUCU]` görmez (INV-LEGAL-GORUNUM-1) | `odemeKarari` çağrısı ya da görünüm nesnesi kaldırılır → düşer |
+| **INV-SATIS-KIPI-7** | açılış önkoşulları (§8.1): 11 kalem (K1..K11), her biri tek tek RET verir; ölçülemedi = ret; boş/eksik sonuç = ret; K1/K6 dışı muaf olamaz; yazımdan hemen önce K2/K4/K5 yeniden ölçülür; kapı yazmadan önce ve ret = çıkış 1 | `if (UYGULA && !onkosulSonuc.izin)` ya da yeniden ölçüm silinir → düşer |
 | boş-koşum koruması | her kapı en az bir gerçek girdi görmeden "geçti" demez | — |
 
 ## 10. PR bölümlemesi — kota ve kapı gerekçeli (OPS 2026-09-06 kabul)
@@ -223,8 +265,12 @@ Sıra güvenli: B, C'siz çalışır (fail-closed); C, B'siz zararsız (fonksiyo
   çoklu-instance davranışı (Vercel yönetir, dokümanda "caveat").
 - **Atomik değil:** 37 kategori + 1 anahtar ayrı yazımlar; yedek + `--geri-al` telafi eder, önlemez.
 - **Betik onayı doğrulayamaz**, kaydeder. Kapı insan.
-- **`DELETE`** tetikte yok; satır silinirse fonksiyon kapalı döner ama tazeleme atmaz → sayfalar 3600 sn eski.
-  Betik silmez; silen bilerek siler.
+- **`DELETE`** artık tetiklenir (REC-168 A; üç tetik) ve fonksiyon satır yokken kapalı döner. Betik silmez; silen bilerek
+  siler. ~~"sayfalar 3600 sn eski"~~ cümlesi bu dosya için YANLIŞTI: önbellek süresizdi (§4, Ç1); şimdi `revalidate: 300`.
+- **Docker gölgesi gerektiren KALAN (PGlite kapsamaz; satış açılmadan ALTYAPI'nın listesine):** (1) gerçek
+  `handle_supabase_webhook()` ile (Vault sırrı + pg_net) webhook'un route'a ulaşması ve `revalidateTag`'in tetiklenmesi,
+  (2) gerçek JWT/`auth.uid()` çözümlemesiyle panel kilidi, (3) `denetim_izi_site_settings` tetiğinin `satis_kipi` değişiminde
+  `admin_audit_log` satırı yazması. Canlıda `satis-kipi-canli.mjs` (ROLLBACK'li) aynı davranışları migration sonrası ölçer.
 - **PDP tazelemesi** REC-169'a bağlı; o inene kadar `hide_price` değişimi PDP'de **3600 sn** gecikir (§4).
 - **BORÇ:** `.rpc()`'ye dönüş (§3.4) · `sitemap.ts` claim'i (§8-7) · ESLint bu ağaçta junction üzerinden
   yüklenemedi — CI'da koşar (`ci.yml` yol filtresi yok); tsc: `satisKipi.ts`'te **0 hata**, ağaç genelinde

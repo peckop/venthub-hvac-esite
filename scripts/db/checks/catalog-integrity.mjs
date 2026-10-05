@@ -241,7 +241,11 @@ const CHECKS = [
             and k.key ~ '_(v|m3h|w|pa|kg|mm|a|ls|pct|c|l|ms|hz|db|kw|24h)$'
             and (p.technical_specs->>k.key) is not null
             and (p.technical_specs->>k.key) <> ''
-            and (p.technical_specs->>k.key) !~ '^[0-9]+(\\.[0-9]+)?$'
+            -- TİP sorulur, metin biçimi DEĞİL (2026-09-23): eski regex '^[0-9]+(\\.[0-9]+)?$' eksi
+            -- işaretini tanımıyordu → -20 °C (37 satır, jsonb number) "sayı değil" sayılıp TÜM PR'ları
+            -- yanlış-kırmızıya boyadı. jsonb_typeof hem -20'yi doğru geçirir hem metin "-20"/"380 V"yi
+            -- yakalar. Ölçüm (canlı, 2026-09-23): bu anahtarlarda 3584 değer, hepsi 'number'.
+            and jsonb_typeof(p.technical_specs->k.key) <> 'number'
           group by k.key, b.name`,
     key: (r) => `spec-type:${r.key}|${r.brand}`,
     detail: (r) => `${r.n} kayıt · ör. "${r.sample_value}" (${r.sample_sku}) — sayı değil`,

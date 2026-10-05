@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 
-import { SITE_URL } from '@/config/siteUrl'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
-import { localizedHref, Routes } from '@/utils/routes'
+import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
+import { Routes } from '@/utils/routes'
 
 import PageComponent from '../../../../../views/calculators/DuctCalcPage'
 
@@ -15,8 +15,9 @@ import PageComponent from '../../../../../views/calculators/DuctCalcPage'
  * katmanından. Hangisinin kazandığı ORTAMA göre değişiyordu: canlıda `Seo`'nunki,
  * önizlemede kabuğunki. Yani sekme ve arama sonucu başlığı deterministik değildi.
  *
- * ÇÖZÜM tek yazıcıdır. Bu rota artık metadata'sını burada üretir; `DuctCalcPage`
- * layout'a `metadataRotadanMi` geçerek `<Seo>`'yu susturur. İkinci yazıcı kalmaz.
+ * ÇÖZÜM tek yazıcıdır. Bu rota artık metadata'sını burada üretir (`sayfaUstVerisi`).
+ * REC-150 Adım 5 (2026-09-24): dört hesaplayıcı da göç etti; `CalculatorLayout`'tan `<Seo>`
+ * ve geçici `metadataRotadanMi` bayrağı SİLİNDİ. İkinci yazıcı yapısal olarak yok.
  *
  * ⚠`'use client'` KALKTI — mecburiyetten değil, ZORUNLULUKTAN: Next.js bir `'use client'`
  * dosyasından `generateMetadata` export edilmesine izin vermez. Bu aynı zamanda CLAUDE.md
@@ -26,8 +27,8 @@ import PageComponent from '../../../../../views/calculators/DuctCalcPage'
  * görünümler değil — dört hesaplayıcı görünümünün hiçbirinde `'use client'` yoktu, hepsi
  * rotadan miras alıyordu. Burayı sunucuya çevirmek o mirası kesti ve ilk denemede
  * `next build` patladı ("useState yalnız Client Component'te çalışır"). Bu yüzden sınır
- * artık `DuctCalcPage`'in kendi başında ilan ediliyor. Kalan üç rota göç ederken aynı
- * taşıma onların görünümlerinde de yapılmalı.
+ * artık `DuctCalcPage`'in kendi başında ilan ediliyor. Aynı taşıma Adım 5'te kalan üç
+ * görünüme de yapıldı (HRV, hava perdesi, jet fan).
  *
  * ⭐BAŞLIK BİÇİMİ BİLEREK AYNI BIRAKILDI: canlı bugün
  * "Kanal Basınç Kaybı Hesaplayıcı | Ürün Seçici | VentHub" basıyor. Göç bir SEO
@@ -45,33 +46,14 @@ export async function generateMetadata({
   const { lang } = await params
   const dict = lang === 'en' ? en : tr
 
-  const yol = Routes.destek.hesaplayicilar('kanal')
-  const trUrl = `${SITE_URL}${localizedHref(yol, 'tr')}`
-  const enUrl = `${SITE_URL}${localizedHref(yol, 'en')}`
-
-  const baslik = `${dict.calculators.duct.title} | ${dict.urunSecici.ustBaslik} | VentHub`
-
-  return {
-    title: baslik,
-    description: dict.calculators.duct.description,
-    alternates: {
-      canonical: lang === 'en' ? enUrl : trUrl,
-      // hreflang: kök layout bir taban miras bırakıyor ama `canonical` yazan sayfa kendi
-      // `languages` bloğunu da yazmalı — yoksa INV-CANONICAL-2 kırmızı verir ve daha
-      // önemlisi iki dil birbirine bağlanmaz.
-      languages: {
-        tr: trUrl,
-        en: enUrl,
-        'x-default': trUrl,
-      },
-    },
-    openGraph: {
-      title: baslik,
-      description: dict.calculators.duct.description,
-      url: lang === 'en' ? enUrl : trUrl,
-      siteName: 'VentHub',
-    },
-  }
+  // REC-150 Adım 5 (2026-09-24): pilotun elle yazdığı blok ortak yardımcıya taşındı
+  // (`sayfaUstVerisi` — canonical + tr/en/x-default + EN dizin dışılığı); dört hesaplayıcı aynı kalıp.
+  return sayfaUstVerisi({
+    lang,
+    yol: Routes.destek.hesaplayicilar('kanal'),
+    baslik: `${dict.calculators.duct.title} | ${dict.urunSecici.ustBaslik} | VentHub`,
+    aciklama: dict.calculators.duct.description,
+  })
 }
 
 export default function Page() {

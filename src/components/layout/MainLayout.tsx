@@ -123,9 +123,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
                     masaüstünde header'ın sağ kümesine, mobilde alt çubuğun Hesap
                     yaprağının en üstüne. Önce yalnız yukarı kaydırmıştım (alt çubuğu
                     kapatmasın diye); o çakışmayı çözerdi ama tasarım kararına uymazdı.
-                    Bayrak KAPALIYKEN bugünkü yüzen hâl aynen sürer. */}
+                    Bayrak KAPALIYKEN yüzen hâl YALNIZ GENİŞ EKRANDA sürer (`hidden lg:block`).
+                    ⭐ÖLÇÜLDÜ (REC-89, 2026-09-24, iPhone 13 görünümü): mobilde yüzen düğme
+                    ürün sayfasında küçük görsellerin ve kart metninin üstüne biniyordu. Mobilde
+                    yeri açılır menünün üst satırı (MegaMenu, `lg:hidden`) — menü düğmesi de
+                    `lg:hidden` olduğundan iki kırılım BİREBİR tamamlayıcı: dil seçicisiz ekran
+                    genişliği yok. Kırılımlardan biri değişirse öteki de değişir. */}
                 {!YENI_KABUK_GEZINMESI && (
-                    <div className="pointer-events-auto">
+                    <div className="pointer-events-auto hidden lg:block">
                         <LanguageSwitcher />
                     </div>
                 )}

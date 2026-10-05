@@ -111,7 +111,14 @@ export const en: typeof tr = {
         'ducted-central-hrv': 'Ducted Central Units',
         'single-room-hrv': 'Single Room Units',
         'speed-controllers': 'Speed Controllers',
-        'water-coils': 'Water Coil Duct Heaters'
+        'water-coils': 'Water Coil Duct Heaters',
+        // REC-300 Faz 1-B: bound by the DB migration; the corrosion branch moves to a NEW key.
+        'corrosion-fans': 'Corrosion-Resistant Fans',
+        'plug-fans': 'Plug Fans',
+        'cabinet-fans': 'Cabinet Fans',
+        'unheated-curtain': 'Unheated Air Curtains',
+        'electric-curtain': 'Electrically Heated Air Curtains',
+        'spare-parts': 'Spare Parts and Sensors'
       }
     },
     viewAll: 'View all',
@@ -248,7 +255,7 @@ export const en: typeof tr = {
         summary: 'Provides fresh air with heat recovery; key criteria are airflow, efficiency/SFP and external static pressure.',
         steps: ['Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).', 'Efficiency/SFP: 70–85% efficiency, low SFP.', 'Pressure: external static matching filter/duct losses.'],
         pitfalls: ['Focusing on efficiency while ignoring external static'],
-        image: '/images/hvac_installation_close_up_premium_4.png'
+        image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg'
       },
       'air-curtain': {
         image: '/images/hvac_installation_close_up_premium_3.webp',
@@ -259,9 +266,57 @@ export const en: typeof tr = {
       }
     }
   },
+  // KNOWLEDGE HUB (decision 92, 2026-09-24) — template texts only; article bodies live elsewhere.
+  bilgiMerkezi: {
+    ad: 'Knowledge Hub',
+    anaSayfa: 'Home',
+    liste: {
+      seoBaslik: 'Knowledge Hub — Ventilation Guides | VentHub',
+      seoAciklama: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',
+      baslik: 'Knowledge Hub',
+      altBaslik: 'Answers to the questions asked when selecting ventilation products: how they work, how to select them, what to watch out for.',
+      aramaEtiketi: 'Search articles',
+      aramaYerTutucu: 'Type a topic or term',
+      sonucYok: 'No article matches your search.',
+      oku: 'Read the article',
+      bosBaslik: 'Guides in preparation',
+      bosAciklama: 'Sourced and verified guides are being prepared. Until the first articles are published, you can size your requirement with the Product Selector below.',
+      seciciBaslik: 'Product Selector',
+      seciciAciklama: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
+      seciciDugme: 'Open the Product Selector',
+    },
+    yazi: {
+      yazar: 'VentHub',
+      okumaSuresi: '{{count}} min read',
+      guncelleme: 'Updated',
+      icindekiler: 'Contents',
+      urunlerBaslik: 'Related product families',
+      urunDugme: 'View family',
+      ilgiliBaslik: 'Related articles',
+      teklifBaslik: 'Get a quote for your project',
+      teklifAciklama: 'Describe your needs in the contact form; we will prepare a quote for the right product.',
+      teklifDugme: 'Request a quote',
+      listeyeDon: 'Back to the Knowledge Hub',
+    },
+    // REC-452: guide links under category and family pages + home knowledge block.
+    ilgiliRehberler: 'Guides on this topic',
+    sonRehberler: 'Latest guides',
+    konular: {
+      konfor: 'Comfort',
+      guvenlik: 'Safety',
+      verimlilik: 'Efficiency',
+    },
+  },
   meta: {
     siteTitle: 'VentHub — Premium HVAC Solutions',
     siteDesc: 'Car park jet fans, air curtains, heat recovery units and duct fans — engineering-led product selection and technical support.',
+  },
+
+  sayfaBulunamadi: {
+    baslik: 'Page not found',
+    aciklama: 'The page you are looking for may have been moved or removed. You can browse our products or return to the home page.',
+    anaSayfa: 'Back to home',
+    urunler: 'Browse products',
   },
 
   home: {
@@ -685,6 +740,20 @@ export const en: typeof tr = {
     },
     orbital: {
       dragHint: 'Drag to Spin',
+      tapProductHint: 'Tap a Product',
+      swipeHint: 'Swipe Left-Right',
+      pickCategoryHint: 'Pick a Category',
+      discoverTitle: 'Discover Our Product Range',
+      subcategoriesTitle: '{{name}} Subcategories',
+      openMainDesktop: 'Click: Open Category • Double-click: Go to Page',
+      openMainTouch: 'Tap: Open • Double Tap: Go',
+      openSubDesktop: 'Click to Open the Product Page',
+      openSubTouch: 'Tap to Open the Page',
+    },
+    radialMenu: {
+      subcategoriesCount: 'Subcategories ({{count}})',
+      noSubcategories: 'No Subcategories',
+      viewProducts: 'View Products',
     },
     category3DIcon: {
       dragHint: 'Hold to Rotate',
@@ -846,7 +915,16 @@ export const en: typeof tr = {
     cookieTitle: 'Cookie Policy (Draft)',
     distanceSalesTitle: 'Distance Sales Agreement (Draft)',
     preInformationTitle: 'Pre-Information Form (Draft)',
-    termsTitle: 'Terms of Use (Draft)'
+    termsTitle: 'Terms of Use (Draft)',
+    // Page metadata (meta description) — see tr.ts.
+    seo: {
+      kvkk: 'Clarification text on the processing of personal data under Turkish Law No. 6698 (KVKK).',
+      privacy: 'How personal data is collected, used and protected on the VentHub website.',
+      cookie: 'Cookies used on the VentHub website and how to manage cookie preferences.',
+      terms: 'Terms of use of the VentHub website.',
+      distanceSales: 'Distance sales agreement for purchases made through VentHub.',
+      preInformation: 'Pre-information form provided to the consumer before a distance sale.',
+    }
   },
   footer: {
     quickLinks: 'Quick Links',
@@ -859,12 +937,8 @@ export const en: typeof tr = {
     // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
     // is published. Restored together with the TR dictionary (parity) once real.
     email: 'info@venthub.com.tr',
-    social: {
-      facebook: 'Facebook',
-      instagram: 'Instagram',
-      linkedin: 'LinkedIn',
-      twitter: 'Twitter'
-    }
+    // social DELIBERATELY ABSENT (REC-285, 2026-09-24): links pointed at platform home pages.
+    // Restored together with the TR dictionary (parity) once real account URLs exist.
   },
   contactPage: {
     form: {
@@ -933,6 +1007,9 @@ export const en: typeof tr = {
     vision: 'Our Vision'
   },
   category: {
+    // REC-497: used when the category has no description of its own (metadata.description_i18n).
+    // No unverifiable "highest quality / most economical" claim; sales mode is quote-based, no price promise.
+    seoYedekAciklama: 'Browse the product families, models and technical specifications in the {{ad}} category in the VentHub catalog.',
     family: {
       variantCount: '{{count}} models',
       count: '{{count}} product families',
@@ -1065,9 +1142,9 @@ export const en: typeof tr = {
       venthubSolution: 'VentHub Solution',
     },
     series: {
-      technicalFamily: 'Technical Product Family',
-      heroDefaultDesc: 'Browse professional ventilation solutions by their technical series.',
-      seriesDetail: 'Series Detail',
+      technicalFamily: 'Subcategory',
+      heroDefaultDesc: 'Browse professional ventilation solutions by their technical product families.',
+      seriesDetail: 'Subcategory Detail',
       requestQuote: 'Request a Quote',
       colModel: 'Model',
       colPrice: 'Price',
@@ -1084,6 +1161,7 @@ export const en: typeof tr = {
     notFound: 'Category Not Found',
     backHome: 'Back to home',
     breadcrumbHome: 'Home',
+    breadcrumbAria: 'Breadcrumb',
     premiumCollection: 'Premium Collection',
     findModel: 'Find Suitable Model',
     productCount: 'Product Count',
@@ -1108,9 +1186,9 @@ export const en: typeof tr = {
     smartControlDesc: 'Uninterrupted fresh air with automatic speed adjustment according to air quality.',
     longTermInvestment: 'Long Term Investment',
     longTermInvestmentDesc: 'Maintenance-free motor technology and durable polymer body.',
-    allSeries: 'All Series',
-    chooseSeriesDesc: 'Choose the series that suits your needs',
-    inspectSeries: 'Inspect Series',
+    allSeries: 'All Subcategories',
+    chooseSeriesDesc: 'Choose the subcategory that suits your needs',
+    inspectSeries: 'Explore',
     whyCategory: 'Why {{category}}?',
     electricVsAmbientAlt: 'Electric vs Ambient Air Comparison',
     modernLoftAlt: 'Modern Loft Application',
@@ -1132,15 +1210,15 @@ export const en: typeof tr = {
     why3Title: 'Long Life',
     why3Desc: 'Corrosion-resistant body and heavy-duty components.',
     filters: 'Filters',
-    subcategories: 'Sub-categories',
+    subcategories: 'Subcategories',
     brands: 'Brands',
     airflow: 'Airflow (m³/h)',
     showcase: {
       defaultDescription: 'The technical authority on high-performance, intelligent and sustainable ventilation systems.',
       premiumTitle: 'Premium Engineering Solutions',
       catalog: 'Category Catalog',
-      subGroups: 'Sub Product Groups',
-      exploreSeries: 'Explore Series',
+      subGroups: 'Subcategories',
+      exploreSeries: 'Explore',
       guarantee: 'VentHub Guarantee',
       discover: 'Discover',
       whyVenthubTitle: 'Why VentHub Engineering?',
@@ -1247,6 +1325,7 @@ export const en: typeof tr = {
       drive_code: 'Drive Code',
       enclosure_class: 'Enclosure Type',
       enclosure_size: 'Enclosure Size',
+      electrical_protection_class: 'Electrical Protection Class',
       erp_compliant: 'ErP Compliant',
       filter_classes: 'Filter Class',
       fire_rating: 'Fire Rating',
@@ -1274,6 +1353,7 @@ export const en: typeof tr = {
       min_operating_temperature_c: 'Min. Operating Temperature',
       min_static_pressure_pa: 'Min. Static Pressure',
       min_voltage_v: 'Min. Voltage',
+      motor_efficiency_class: 'Motor Efficiency Class',
       motor_poles: 'Motor Poles',
       motor_type: 'Motor Type',
       noise_level_db_a: 'Noise Level',
@@ -1377,7 +1457,8 @@ export const en: typeof tr = {
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
-      sku: 'SKU',
+      /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
+      modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
     },
     actions: {
@@ -1497,6 +1578,8 @@ export const en: typeof tr = {
     all: 'All',
     pending: 'Pending',
     paid: 'Paid',
+    processing: 'Preparing',
+    statusUnknown: 'Status Updating',
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
@@ -1541,8 +1624,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
-    /** SKU as of the order date (snapshot) — not the current catalog SKU. */
-    skuLabel: 'SKU: {{sku}}',
+    /** The item's CURRENT catalog model code (not an order-time snapshot); never the raw SKU. */
+    modelCodeLabel: 'Model Code: {{code}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',
@@ -1908,7 +1991,9 @@ export const en: typeof tr = {
     pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
     eyebrow: 'Global Signatures of Excellence',
     exploreBrand: 'Explore Brand',
-    seoDesc: 'Industrial ventilation brands under the VentHub umbrella',
+    seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
+    seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
+    seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
@@ -1972,6 +2057,14 @@ export const en: typeof tr = {
     home: {
       subtitle: 'Quickly find the information you need.',
       warrantyDesc: 'Warranty coverage and authorized service',
+    },
+    // Page metadata (meta description) — see tr.ts.
+    seo: {
+      faqTitle: 'Frequently Asked Questions',
+      faq: 'Frequently asked questions about quotes, payment and installation, with answers.',
+      shipping: 'Information on delivery times, shipping costs and shipment tracking.',
+      returns: 'Right of withdrawal, return conditions and how to request a return.',
+      warranty: 'Warranty coverage and authorized service information.',
     },
     returns: {
       title: 'Returns & Exchanges',
@@ -2163,7 +2256,8 @@ export const en: typeof tr = {
       shipStatus: {
         delivered: 'Delivered',
         shipped: 'Shipped',
-        preparing: 'Preparing'
+        preparing: 'Preparing',
+        awaitingPayment: 'Awaiting Payment'
       },
       shipSteps: {
         preparing: 'Prepared',
@@ -2337,6 +2431,7 @@ export const en: typeof tr = {
       statusDelivered: 'Delivered',
       statusShipped: 'In Transit',
       statusPreparing: 'Preparing',
+      statusAwaitingPayment: 'Awaiting Payment',
       stepShipped: 'Shipped',
       stepDelivered: 'Delivered',
       subtitle: 'Track the shipping status and tracking details of your orders here.',
@@ -2491,7 +2586,7 @@ export const en: typeof tr = {
         noPermission: 'You do not have permission for this action',
         pricesSaved: 'Prices saved',
         pricesSaveFailed: 'Could not save prices',
-        priceRequired: 'Enter a price for every item before sending the quote'
+        priceRequired: 'Before sending the quote, give every item a price, the same currency and a future validity date'
       }
     }
   },
@@ -2554,6 +2649,8 @@ export const en: typeof tr = {
     // ⛔"Results carry over into your quote request" REMOVED (2026-09-05, code review):
     // no such hand-off exists. The PR that removes promise boxes was introducing a new promise.
     aciklama: 'Run a pre-assessment from volume, airflow and pressure inputs.',
+    // REC-497: search-result description (page copy is unchanged).
+    seoDescription: 'Run a pre-assessment for duct fans, heat recovery, air curtains and jet fans from your volume, airflow and pressure inputs.',
     araclar: {
       kanal: {
         ad: 'Duct fan sizing',
@@ -2684,6 +2781,8 @@ export const en: typeof tr = {
       description: 'Air duct velocity calculation and pressure drop estimation',
       infoText: 'Calculates air velocity and estimated pressure loss based on flow rate and duct dimensions.',
       form: {
+        inputTitle: 'Duct Details',
+        inputDesc: 'Enter airflow and duct dimensions',
         shape: 'Duct Type',
         round: 'Circular',
         roundDesc: 'Spiral or welded pipe',
@@ -2691,8 +2790,11 @@ export const en: typeof tr = {
         rectangularDesc: 'Angled duct',
         material: 'Material',
         steel: 'Galvanized Steel',
+        steelDesc: 'Standard',
         pvc: 'PVC',
+        pvcDesc: 'Low friction',
         flex: 'Flex Duct',
+        flexDesc: 'Flexible',
         airflow: 'Airflow',
         airflowTooltip: 'Amount of air that needs to pass through the duct',
         diameter: 'Duct Diameter',
@@ -2703,6 +2805,8 @@ export const en: typeof tr = {
         lengthTooltip: 'Total duct length'
       },
       results: {
+        title: 'Calculation Results',
+        subtitle: 'Air velocity and pressure loss values',
         velocity: 'Air Velocity',
         specificLoss: 'Pressure Loss (Specific)',
         totalLoss: 'Total Pressure Loss',
@@ -2716,18 +2820,28 @@ export const en: typeof tr = {
       infoText: 'Calculates annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units (ERV).',
       form: {
         type: 'Device Type',
+        typeDesc: 'Select the heat recovery system',
         hrv: 'HRV (Heat Recovery)',
         hrvDesc: 'Heat recovery only',
         erv: 'ERV (Energy Recovery)',
         ervDesc: 'Heat + Moisture recovery',
         climate: 'Climate Zone',
         cold: 'Cold',
+        coldDesc: 'North / mountain regions',
         temperate: 'Temperate',
+        temperateDesc: 'Central belt',
         hot: 'Hot',
+        hotDesc: 'South / coastal regions',
         usage: 'Space Type',
+        usageDesc: 'Building, climate and usage details',
+        residential: 'Residential',
+        residentialDesc: 'Domestic use',
         office: 'Office',
+        officeDesc: 'Workplace',
         commercial: 'Commercial',
+        commercialDesc: 'Retail / shopping mall',
         occupancy: 'Number of People',
+        unitPeople: 'people',
         workingHours: 'Daily Operation',
         electricityPrice: 'Electricity Unit Price',
         sensibleEfficiency: 'Sensible Efficiency',
@@ -2735,6 +2849,15 @@ export const en: typeof tr = {
         area: 'Area (m²)'
       },
       results: {
+        title: 'Calculation Results',
+        subtitle: 'Estimated annual energy savings',
+        savingsTitle: 'Annual Savings',
+        annualEnergySaving: 'Annual Energy Saving',
+        annualCostSaving: 'Annual Cost Saving',
+        unitKwhPerYear: 'kWh/y',
+        unitCostPerYear: '₺/y',
+        unitKgPerYear: 'kg/y',
+        unitYears: 'years',
         heatingGain: 'Heating Gain',
         coolingGain: 'Cooling Gain',
         co2Reduction: 'CO₂ Reduction',
@@ -3061,6 +3184,7 @@ export const en: typeof tr = {
     close: 'Close',
     coldStorage: 'Cold Storage',
     coldStorageDesc: 'Cold chain protection',
+    coldStorageTip: 'Protects the cold chain and prevents product spoilage',
     consultUs: 'Consult us',
     customOffer: 'Request Custom Offer',
     doorHeight: 'What is Your Door Height?',
@@ -3075,6 +3199,8 @@ export const en: typeof tr = {
     heatingYesDesc: 'For winter comfort',
     heightMeter: 'Height (Meter)',
     industrial: 'Industrial Facility',
+    industrialDesc: 'Factory, logistics facility',
+    industrialTip: 'Isolates dust, smoke and harmful substances',
     insulation: 'For insulation and savings',
     matchScore: '{{score}}% Match',
     meter: 'Meter',

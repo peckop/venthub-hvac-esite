@@ -1,0 +1,30 @@
+{
+  "kimlik": "TR-YON-YANGIN-2007",
+  "eksen": "F",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2007/12/20071219-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2007/12/20071219-2.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Resmî Gazete arşivinden doğrudan curl ile okundu (orijinal 2007 metni; bu, en güncel konsolide metin DEĞİL — sonraki değişiklikler ayrı RG'lerde).",
+      "alinti": "19 Aralık 2007 ÇARŞAMBA ... Sayı : 26735 ... BİNALARIN YANGINDAN KORUNMASI HAKKINDA YÖNETMELİK — MADDE 60-(2) Toplam alanı 2000 m²'yi aşan bodrumlardaki kapalı otoparklar için mekanik duman tahliye sistemi yapılması şarttır. ... saatte en az 9 hava değişimi sağlaması gerekir.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2007/12/20071219-2.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2007/12/20071219-2.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Aynı RG sayfası; MADDE 87 fıkra 8 ikincil kaynaktaki (2015 değişikliğe atıf yapan hukuk sitesi) madde numarasıyla birebir örtüşüyor.",
+      "alinti": "MADDE 87- (1) Yangın hâlinde, mevcut iklimlendirme ve havalandırma tesisatı duman kontrol sistemi olarak da kullanılabilir. ... (8) Havalandırma ve duman tahliye kanallarının yangın kompartımanı duvarlarını delmemesi gerekir.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

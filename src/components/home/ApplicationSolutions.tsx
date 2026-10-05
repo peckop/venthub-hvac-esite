@@ -2,11 +2,21 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { localizedHref, Routes } from '@/utils/routes';
+import { ADRES_SEMASI_K3B } from '@/config/features'
+import { type CategorySlugSource, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
+import { adresDili, adresRotalari } from '@/utils/yuzeyAdresleri'
 
 interface SolutionItem {
   id: 'entrance' | 'comfort'
+  /** Kanonik EN slug (`categories.slug`) — kategorinin listeden bulunma anahtarı ve EN adresi. */
   categorySlug: string
+  /**
+   * TR GÖRÜNEN slug (`categories.metadata.slug.tr`, canlı DB 2026-09-27). YEDEK değerdir: kategori
+   * listesi sayfaya gelmediyse (veri alınamadı) TR kartı yine doğrudan görünen slug'a gitsin.
+   * Normal yolda slug listeden `getLocalizedCategorySlug` ile çözülür; DB'de değişirse sayfa yine
+   * tek 308 ile doğruya gider (kırık bağlantı olmaz).
+   */
+  trSlug: string
   subSlug?: string
   image: string
   span: string
@@ -47,16 +57,44 @@ const solutions: SolutionItem[] = [
     // 'air-curtains' artık ALT değil ANA kategori — alt slug verilmez.
     id: 'entrance',
     categorySlug: 'air-curtains',
+    trSlug: 'hava-perdeleri',
     image: '/images/bento/entrance.jpg',
     span: 'sm:col-span-2 lg:col-span-1'
   },
   {
     id: 'comfort',
     categorySlug: 'heat-recovery-vmc',
+    trSlug: 'isi-geri-kazanim',
     image: '/images/bento/comfort.jpg',
     span: 'sm:col-span-2 lg:col-span-1'
   }
 ]
+
+/**
+ * Kartın hedefi — `adresRotalari` üzerinden (REC-300 Faz 3d), görünen slug dile göre (URN-19).
+ *
+ * ESKİ KUSUR (ölçüldü 2026-10-03, canlı ham HTML): TR kartı bayrak KAPALIYKEN kanonik EN slug'a
+ * (`/tr/category/air-curtains`) gidiyordu; sayfa katmanı 308 ile `hava-perdeleri`ne düzeltiyordu.
+ * Yani site içi bağlantının kendisi yönlendirilen adresti (bağlantı kalitesi + fazladan sıçrama).
+ * Artık kök slug HER İKİ kipte dile göre çözülür: kategori listede varsa `getLocalizedCategorySlug`
+ * (kural 7), yoksa TR için `trSlug` yedeği, EN için kanonik slug. Bayrak yalnız adresin ŞEMASINI
+ * (`/category/x` ↔ `/kategori/x`) değiştirir, hangi slug'ın kullanılacağını değil.
+ */
+export function cozumKartiAdresi(
+  item: Pick<SolutionItem, 'categorySlug' | 'trSlug' | 'subSlug'>,
+  lang: string,
+  bayrak: boolean = ADRES_SEMASI_K3B,
+  categories: ReadonlyArray<CategorySlugSource> = [],
+) {
+  const dil = adresDili(lang)
+  const kategori = categories.find((c) => c.slug === item.categorySlug)
+  const kok = kategori
+    ? getLocalizedCategorySlug(kategori, dil)
+    : dil === 'tr'
+      ? item.trSlug
+      : item.categorySlug
+  return adresRotalari(dil, bayrak).category(kok, item.subSlug)
+}
 
 interface LocalizedDict {
   eyebrow: string;
@@ -75,9 +113,11 @@ interface LocalizedDict {
 interface ApplicationSolutionsProps {
   dictionary: LocalizedDict;
   lang: string;
+  /** Sayfanın zaten çektiği kategori listesi; kart slug'ı buradan dile göre çözülür (boşsa yedek). */
+  categories?: ReadonlyArray<CategorySlugSource>;
 }
 
-const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary: t, lang }) => {
+const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary: t, lang, categories = [] }) => {
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden bg-white">
       {/* Background Decorative Elements */}
@@ -127,7 +167,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
                 data-observe="fade-up"
                 className={`opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass} group relative overflow-hidden rounded-3xl bg-slate-100 h-300px sm:h-400px lg:h-450px ${item.span}`}
               >
-                <Link href={localizedHref(Routes.category(item.categorySlug, item.subSlug), lang)} className="block w-full h-full relative">
+                <Link href={cozumKartiAdresi(item, lang, ADRES_SEMASI_K3B, categories)} className="block w-full h-full relative">
                   <Image
                     src={item.image}
                     alt={itemDict.title}
@@ -177,7 +217,7 @@ const ApplicationSolutions: React.FC<ApplicationSolutionsProps> = ({ dictionary:
 
         <div className="mt-16 text-center">
           <Link
-            href={localizedHref(Routes.products(), lang)}
+            href={adresRotalari(adresDili(lang)).products()}
             className="inline-flex items-center gap-4 group"
           >
             {/* ⭐KONTRAST ONARIMI (REC-268). Ölçüldü (Lighthouse a11y, master'ın yerel üretim

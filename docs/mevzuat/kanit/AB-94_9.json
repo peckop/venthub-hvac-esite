@@ -1,0 +1,42 @@
+{
+  "kimlik": "AB-94/9",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/equipment-potentially-explosive-atmospheres-atex_en",
+      "son_url": "https://single-market-economy.ec.europa.eu/sectors/mechanical-engineering/equipment-potentially-explosive-atmospheres-atex_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Komisyon resmi sayfası; 94/9/EC'nin yerini 2014/34/EU'nun aldığını teyit ediyor (repealed/replaced).",
+      "alinti": "...it is applicable from 20 April 2016, replacing the previous Directive 94/9/EC.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://ec.europa.eu/docsroom/documents/13132/attachments/1/translations",
+      "son_url": "https://ec.europa.eu/docsroom/documents/13132/attachments/1/translations",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Komisyon'un resmi geçiş SSS belgesi; eski sertifikaların koşullu geçerliliğini ve yeni ürünler için 2014/34/EU zorunluluğunu netleştiriyor.",
+      "alinti": "Will certificates issued in accordance with Directive 94/9/EC still be valid after 20 April 2016? Yes. According to Article 41(2) of Directive 2014/34/EU, certificates issued under Directive 94/9/EC ... will remain valid under Directive 2014/34/EU until their fixed expiration date. ... Before 20 April 2016 all the EC declarations of conformity for ATEX products placed on the EU market must be in line with Directive 94/9/EC. EU declarations of conformity and certificates must be in accordance to the new Directive 2014/34/EU as of 20 April 2016 for ATEX products placed on the EU market or put into service for the first time as by that date.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2016/06/20160630-13.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "TR tarafında da 94/9/AT (94/9/EC'nin TR karşılığı) yönetmeliğinin kaldırıldığı ayrıca teyit ediliyor.",
+      "alinti": "Yürürlükten kaldırılan Yönetmelik (94/9/AT), yürürlükten kaldırılmıştır.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

@@ -169,7 +169,8 @@ interface Ratchet {
 const RATCHETS: Ratchet[] = [
   {
     ad: 'max-w-7xl (§2.1 konteyner)',
-    tavan: 49,
+    // 2026-09-29 · 49 -> 48: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü silindi.
+    tavan: 48,
     say: () => countMatches(/\bmax-w-7xl\b/g),
     gerekce: 'Tek sayfa genişliği token üzerinden verilmeli.',
   },
@@ -202,7 +203,19 @@ const RATCHETS: Ratchet[] = [
     // Lighthouse ölçümü). `industrial-gray` token'ına geçti, aynı zeminde 9,9:1. Yani
     // ham gri borcunun bu satırı, bir ERİŞİLEBİLİRLİK kusuruydu — token'a geçmek ikisini
     // birden kapattı. Kazanç yan ürün değil, tam olarak hedefti.
-    tavan: 1456,
+    // 2026-09-24 · 1456 -> 1452: REC-285 — altbilgideki dört sahte sosyal bağlantı
+    // (platform ana sayfalarına gidiyordu) kaldırıldı; `text-gray-300` ×4 gitti. Kazanç yan ürün.
+    // 2026-09-29 · 1452 -> 1446: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü
+    // (iki kart, DB'de olmayan alt kategorilere bağlıydı ve hiç çizilmiyordu) silindi; 6 ham gri gitti.
+    // 2026-10-01 · 1446 -> 1444: URN-1 — sipariş durum eşlemesi ortak yardımcıya taşındı, kopya kalktı.
+    // 2026-10-03 · 1444 -> 1442: URN-25 — kategori ve /products kök Suspense yedek görünümleri kalktı;
+    // iki `text-slate-500` gitti. Kazanç yan ürün.
+    // 2026-10-05 · 1442 -> 1440: URN-32 — iki ham gri kalktı: arama sonucundaki marka/SKU ayracı
+    // (`text-gray-300`, SearchOverlay) ve sipariş detayındaki ham SKU satırı (`text-slate-500`,
+    // OrderDetailPage). Marka `text-slate-600` ve favori satırı `text-slate-400` yerinde kaldı
+    // (net etkisi 0); sipariş detayına eklenen model kodu satırı token (`text-steel-gray`) kullanır.
+    // Kazanç yan ürün.
+    tavan: 1440,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -211,14 +224,17 @@ const RATCHETS: Ratchet[] = [
     // 2026-08-28 · 391 → 378 (aynı kaldırma).
     // 2026-09-01 · 378 → 377 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 377 -> 375: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 375,
+    // 2026-09-29 · 375 -> 372: REC-434 — aynı ölü bölümün silinmesi.
+    tavan: 372,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
   {
     ad: 'ham vurgu: blue-*/indigo-* (§2.3)',
     // 2026-09-01 · 148 -> 144: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 144,
+    // 2026-09-29 · 144 -> 139: REC-434 — aynı ölü bölümün silinmesi.
+    // 2026-10-01 · 139 -> 137: URN-1 — aynı kopya eşlemenin kalkması.
+    tavan: 137,
     say: () => countMatches(/\b(?:blue|indigo)-\d{2,3}\b/g),
     gerekce: 'Vurgu rengi marka token üzerinden; ham Tailwind paleti hiyerarşiyi bozar.',
   },
@@ -239,7 +255,7 @@ const RATCHETS: Ratchet[] = [
   },
   {
     ad: 'keyfi w/h/text/gap-[...] (kural 8)',
-    tavan: 6,
+    tavan: 5,
     say: () =>
       countMatches(/\b(?:w|h|max-w|min-h|min-w|max-h|text|gap|top|left|right|bottom)-\[[^\]]+\]/g),
     gerekce: 'Arbitrary Tailwind değeri yasak; tokens.js kullan.',

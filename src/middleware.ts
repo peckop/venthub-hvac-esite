@@ -4,8 +4,13 @@ import { NextResponse } from 'next/server'
 
 import { createRedirectResponse,resolveUserClaims } from '@/utils/router'
 
+import { ADRES_SEMASI_K3B } from './config/features'
+import { eskiAdresEsle } from './lib/adres/eslestirici'
+import { ESKI_ADRES_HARITASI } from './lib/adres/haritaKaynagi'
+import { ADRES_DILI_ACIK, rotaDiliDilsizOku } from './lib/adres/rotaDiliTablo'
 import { resolveTenant } from './lib/tenantResolver'
-import { tercihEdilenDil } from './utils/dilTespiti'
+import { type DesteklenenDil, tercihEdilenDil } from './utils/dilTespiti'
+import { kokDosyaKarari } from './utils/kokDosya'
 import { Routes } from './utils/routes'
 
 export const config = {
@@ -19,7 +24,7 @@ const ADMIN_ROLES = new Set(['super_admin', 'admin', 'moderator', 'warehouse', '
 const LOCALES = ['tr', 'en'] as const
 const DEFAULT_LOCALE = 'tr' as const
 
-function detectLocale(request: NextRequest): string {
+function detectLocale(request: NextRequest): DesteklenenDil {
   const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
   if (cookieLocale === 'tr' || cookieLocale === 'en') return cookieLocale
   
@@ -55,6 +60,51 @@ export async function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl
+
+  // ── REC-300 Faz 3: ESKİ ADRES HARİTASI (yalnız `ADRES_SEMASI_K3B` açıkken) ──
+  // Dil önekinden ÖNCE: dilsiz eski adres (`/category/fanlar`) dil tespiti + hedef tek adımda → tek
+  // hop (bugün 4). Harita derleme anında üretilmiş JSON; burada DB sorgusu YOK (kural 12, REC-289).
+  // Kiracı yalnız kendi haritasını okur. Kurallar ve niçin: src/lib/adres/eslestirici.ts.
+  if (ADRES_SEMASI_K3B) {
+    const eslesme = eskiAdresEsle(ESKI_ADRES_HARITASI?.kiracilar[tenantId], {
+      yol: pathname,
+      sku: request.nextUrl.searchParams.get('sku'),
+      dilTespit: () => detectLocale(request),
+    })
+    if (eslesme) {
+      const url = request.nextUrl.clone()
+      url.pathname = eslesme.hedef
+      url.search = ''
+      const yanit = redirectResponse(url, eslesme.durum)
+      // Tarayıcı 308'i kalıcı önbelleğe almasın (plan §5 m.9, v4 D4): bayat harita düzeltilince
+      // ziyaretçi eski hedefe kilitli kalmasın.
+      yanit.headers.set('Cache-Control', 'max-age=0, must-revalidate')
+      return yanit
+    }
+  }
+
+  // ── ROTA DİLİ DİLSİZ KOLU (OPS-52 PR-C2; yalnız `NEXT_PUBLIC_ADRES_DILI=1` iken) ──
+  // Dilsiz eski adres (`/about`) bugün 307 `/tr/about`, sonra config 308 `/tr/hakkimizda` = İKİ sıçrama
+  // (A9 bütçesi 1). Burada tablodan TEK adımda hedef dilin YENİ adresine gidilir. Yalnız tablo araması:
+  // DB yok (kural 12). K3B kolundan SONRA (K3B kendi eski adreslerini önce çözer), dil öneki kolundan ÖNCE.
+  // Dilli eski adres (`/tr/about`) bu kola GİRMEZ: tek 308'i config verir. Aşama 2 önekleri tabloda yoktur.
+  //
+  // ⚠DİL SEÇİMİ = `detectLocale` + 307, deterministik TR 308 DEĞİL. A9'un "Türkçe slug'lı dilsiz eski adres →
+  // TR 308" hükmü içeriğin YALNIZ Türkçe olduğu adresler içindir (kategori slug'ı `fanlar`). Statik sayfaların iki
+  // dilde de içeriği var ve `/about` dilden bağımsız bir ad: 308 İngilizce ziyaretçiyi tarayıcıda kalıcı olarak
+  // Türkçeye çiviler ve geri alınamaz (next.config'teki "dilsiz kural yok" gerekçesi, REC-127). Sorgu dizesi AYNEN
+  // taşınır (`/contact?dept=satis`); kalıcı önbelleğe karşı başlık K3B koluyla aynı.
+  if (ADRES_DILI_ACIK) {
+    const dilsiz = rotaDiliDilsizOku(pathname)
+    if (dilsiz) {
+      const url = request.nextUrl.clone()
+      url.pathname = dilsiz[detectLocale(request)]
+      const yanit = redirectResponse(url, 307)
+      yanit.headers.set('Cache-Control', 'max-age=0, must-revalidate')
+      return yanit
+    }
+  }
+
   const segments = pathname.split('/').filter(Boolean)
   const firstSegment = segments[0]
 
@@ -74,19 +124,28 @@ export async function middleware(request: NextRequest) {
     // dil-enjeksiyon kolu bu ölçütü SAĞLAMIYOR, oraya bak.
     if (effectiveSegments[0] === 'admin') {
       const url = request.nextUrl.clone()
-      url.pathname = `/admin${pathname.substring(3 + firstSegment.length)}`
+      // Dil önekini (`/<dil>`) söker, `/admin…` kalır. Eskiden `/admin${substring(3 + dil)}` idi:
+      // hem öneki hem `/a`yı yiyordu → canlıda `/tr/admin` 308 `/admindmin` (2026-09-25 ölçüldü).
+      url.pathname = pathname.substring(1 + firstSegment.length)
       return redirectResponse(url, 308)
     }
   } else {
     // Inject language prefix for user-facing routes missing a locale segments
     const isAuthApi = firstSegment === 'auth' && (segments[1] === 'callback' || segments[1] === 'signout')
-    // ⚠ `.txt` MUAFİYETİ TEK KURALA İNDİRİLDİ (REC-127). Eskiden robots.txt ve llms.txt
-    // tek tek sayılıyordu; IndexNow doğrulama dosyası (`public/<anahtar>.txt`) da aynı
-    // muafiyete ihtiyaç duyuyor ve ADI ANAHTARIN KENDİSİ olduğu için önceden yazılamaz.
-    // Kök seviyedeki her `.txt` muaf: hepsi bot/araç dosyası, hiçbiri dile göre değişmiyor.
-    const isRootTextFile = segments.length === 1 && pathname.endsWith('.txt')
+    // ⚠ KÖK `.txt`/`.xml` MUAFİYETİ YALNIZ BİLİNEN DOSYALARA (REC-127 → URN-15). REC-127 kök
+    // seviyedeki HER `.txt`yi muaf tutuyordu (IndexNow anahtar dosyası için); dosyası olmayan ad
+    // (`/ai.txt`) `[lang]` rotasına dil değeri olarak düşüp 500 veriyordu (2026-10-02 ölçüldü).
+    // Bilinen ad → muaf; kök seviyede bilinmeyen `.txt`/`.xml` → doğrudan 404. Yalnız ad listesi
+    // (DB yok, kural 12). Liste ve niçin: src/utils/kokDosya.ts.
+    const kokDosya = kokDosyaKarari(pathname, segments)
+    if (kokDosya === 'bilinmeyen') {
+      return new NextResponse('Not Found', {
+        status: 404,
+        headers: { 'content-type': 'text/plain; charset=utf-8' },
+      })
+    }
     const isSpecialRoute = firstSegment === 'admin' || firstSegment === 'api' || isAuthApi ||
-                           pathname.endsWith('sitemap.xml') || isRootTextFile
+                           kokDosya === 'bilinen'
 
     if (!isSpecialRoute) {
       const url = request.nextUrl.clone()
@@ -120,7 +179,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Redirects Column 1: UUID → Slug SEO canonicalization ──
-  if (effectiveSegments.length === 2 && effectiveSegments[0] === 'products') {
+  // REC-300 Faz 3 madde 6 (REC-289): K3-b açıkken bu dal ATLANIR — Edge'de DB sorgusu yasak (kural 12);
+  // UUID'yi sayfa katmanı çözer (`resolveProductRoute` 0. adım → modelin adresine tek 308).
+  // Kapalıyken (bugün) davranış aynen.
+  if (!ADRES_SEMASI_K3B && effectiveSegments.length === 2 && effectiveSegments[0] === 'products') {
     const identifier = effectiveSegments[1]
 
     if (UUID_REGEX.test(identifier)) {

@@ -226,7 +226,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
   it('K7 · TRİPWIRE — sayfa ve ana görünüm `kategoriler` prop\'unu ZİNCİR boyunca geçirir', () => {
     const kok = path.resolve(__dirname, '../../..')
     const halkalar = [
-      'src/app/[lang]/products/page.tsx',
+      'src/app/_components/urunlerSayfasi.tsx', // REC-300 Faz 3b-2: kategoriler={...} rota gövdesiyle buraya taşındı
       'src/views/CategoryMasterView.tsx',
     ]
 

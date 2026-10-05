@@ -67,28 +67,41 @@ function cevabiCoz(ham: unknown): SatisKipi {
   return { acik: true, damga: typeof damga === 'string' ? damga : null, kaynak: 'db' }
 }
 
+/**
+ * Önbellek süresi (sn): webhook düşerse ya da satır DELETE/yeniden adlandırılırsa "açık" en fazla bu kadar
+ * bayat kalır (REC-168 plan-challenger Ç1: eskiden süresizdi, repodaki diğer tüm `unstable_cache`ler 3600).
+ * Kısa tutulur çünkü yanlış yöndeki bayatlık paraya dokunur.
+ */
+export const SATIS_KIPI_ONBELLEK_SN = 300
+
+/**
+ * DB'den okur; BAŞARISIZ okumada FIRLATIR — `unstable_cache` fırlatan çağrıyı ÖNBELLEĞE YAZMAZ.
+ * Eskiden hata `KAPALI` dönerdi ve o KAPALI süresiz saklanırdı: geçici bir ağ hatası, webhook gelene kadar
+ * mağazayı kapalı tutardı (açık anahtar bile). Şimdi hata önbelleğe girmez; `satisKipiOku` yakalar ve o
+ * çağrıda KAPALI'ya düşer (fail-closed korunur, ama bayatlık kalıcı olmaz).
+ */
 async function dbdenOku(): Promise<SatisKipi> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!url || !anon) return KAPALI
-  try {
-    const yanit = await fetch(`${url}/rest/v1/rpc/satis_kipi_oku`, {
-      method: 'POST',
-      headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json' },
-      body: '{}',
-      // Next fetch önbelleği DEĞİL, unstable_cache bu fonksiyonu sarar; iki katmanlı önbellek yanıltır.
-      cache: 'no-store',
-    })
-    if (!yanit.ok) return KAPALI // 404 = RPC henüz yok (migration inmedi) → bugünkü davranış
-    return cevabiCoz(await yanit.json())
-  } catch {
-    return KAPALI
-  }
+  if (!url || !anon) return KAPALI // ortam değişkeni çalışma anında değişmez; bu KAPALI'nın önbelleğe girmesi doğru
+  const yanit = await fetch(`${url}/rest/v1/rpc/satis_kipi_oku`, {
+    method: 'POST',
+    headers: { apikey: anon, Authorization: `Bearer ${anon}`, 'Content-Type': 'application/json' },
+    body: '{}',
+    // Next fetch önbelleği DEĞİL, unstable_cache bu fonksiyonu sarar; iki katmanlı önbellek yanıltır.
+    cache: 'no-store',
+  })
+  // 404 = RPC henüz yok (migration inmedi) → yine KAPALI, yalnız artık önbelleğe yazılmaz.
+  if (!yanit.ok) throw new Error(`satis_kipi_oku ${yanit.status}`)
+  return cevabiCoz(await yanit.json())
 }
 
 // Anahtar tenant başına kurulur (getCachedHomeData deseni): aynı tenantId → aynı önbellek girdisi.
 const onbellekli = (tenantId: string) =>
-  unstable_cache(dbdenOku, ['satis-kipi', tenantId], { tags: [SATIS_KIPI_TAG, satisKipiTag(tenantId)] })
+  unstable_cache(dbdenOku, ['satis-kipi', tenantId], {
+    tags: [SATIS_KIPI_TAG, satisKipiTag(tenantId)],
+    revalidate: SATIS_KIPI_ONBELLEK_SN,
+  })
 
 /**
  * Satış kipini okur. RSC / route handler / sitemap içinden çağrılır; istemci bileşenine PROP ile geçilir.
@@ -99,5 +112,9 @@ export async function satisKipiOku(tenantId: string = resolveTenant(undefined).t
   if (process.env.VERCEL_ENV === 'preview' && process.env.SATIS_KIPI_ONIZLEME === '1') {
     return { acik: true, damga: null, kaynak: 'onizleme-zorlama' }
   }
-  return onbellekli(tenantId)()
+  try {
+    return await onbellekli(tenantId)()
+  } catch {
+    return KAPALI // okunamadı → bu çağrıda KAPALI; hata önbelleğe yazılmadığı için bir sonraki çağrı yeniden dener
+  }
 }

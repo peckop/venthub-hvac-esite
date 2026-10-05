@@ -218,7 +218,8 @@ serve(async (req) => {
 
     const brandName = branding.brandName
     const brandPrimary = branding.brandPrimaryColor
-    const brandLogoUrl = branding.brandLogoUrl
+    // REC-382: logo bu e-postada BASILMAZ — başlık şeridi marka renginde, lacivert logo orada
+    // okunmuyor ve yanında h1 {{brand_name}} zaten var (tek görünüm). Diğer üç e-posta logoyu basar.
     // REC-154: marka değerleriyle AYNI kaynaktan (getTenantBranding) gelir — ayrı yol yok.
     const supportEmail = branding.supportEmail
     const companyFooter = branding.companyFooter
@@ -246,7 +247,6 @@ serve(async (req) => {
         order_number: siparisNo,
         brand_name: brandName,
         brand_primary_color: brandPrimary,
-        brand_logo_url: brandLogoUrl,
         support_email: supportEmail,
         company_footer: companyFooter,
       })

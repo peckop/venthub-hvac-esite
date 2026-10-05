@@ -173,6 +173,45 @@ describe('INV-DEFTER-BAYATLIK: defter yaşı ÖLÇÜLÜR, eşitleme TETİKLENMEZ
     expect(calistir().trim(), 'ikinci kez de öttü — soğuma penceresi çalışmıyor').toBe('')
   })
 
+  /**
+   * INV-PYTHON3-1 (ARC-14, 2026-10-01): Windows'ta `python3` yalnız Microsoft Store yönlendiricisidir.
+   * Kanca `python` hata kodu verince `python3`e düşüyordu ve her Stop turunda Mağaza sayfası açılıyordu
+   * (Recep sordu: "Python için bu neden çıkıyor, kurmalı mıyım"). Gerçek Python `python`/`py` adıyla kurulu.
+   */
+  it('INV-PYTHON3-1 kaynak: kancalar ve pano betikleri `python3`ü ÇAĞIRMAZ (ne dizi elemanı ne çalıştırma)', () => {
+    const dizinler = [path.join(KOK, '.claude', 'hooks'), path.join(KOK, 'scripts', 'board')]
+    const ihlal: string[] = []
+    for (const dizin of dizinler) {
+      for (const ad of fs.readdirSync(dizin)) {
+        if (!/\.(cjs|js|mjs|ts|ps1|cmd|sh)$/.test(ad)) continue
+        const kaynak = fs.readFileSync(path.join(dizin, ad), 'utf8')
+        // (a) çalıştırma çağrısının ilk argümanı, (b) yorumlayıcı listesi / dizi elemanı olarak tırnaklı ad.
+        if (/\b(execFileSync|execFile|spawnSync|spawn|execSync|exec)\(\s*['"`]python3\b/.test(kaynak)) ihlal.push(ad + ' (çağrı)')
+        if (/\[[^\]\n]*['"`]python3['"`][^\]\n]*\]/.test(kaynak)) ihlal.push(ad + ' (liste)')
+      }
+    }
+    expect(ihlal, '`python3` Windows’ta Mağaza yönlendiricisidir; `python` ya da `py` kullan').toEqual([])
+  })
+
+  it('INV-PYTHON3-1 kaynak: yorumlayıcıdan yorumlayıcıya geçiş YALNIZ ENOENT ile (betik hatası gizlenmez)', () => {
+    const kaynak = fs.readFileSync(KANCA, 'utf8')
+    expect(kaynak, 'yorumlayıcı listesi python/py olmalı').toMatch(/YORUMLAYICILAR = \['python', 'py'\]/)
+    expect(kaynak, 'ENOENT dalı yok — her hatada sıradakine düşmek Mağaza’yı geri getirir').toMatch(/e\.code === 'ENOENT'/)
+  })
+
+  it('INV-PYTHON3-1 davranış: betik hata verince başka yorumlayıcıya DÜŞMEZ, sebebi söyler', () => {
+    // Sahte depoda proje_takip_sync.py yok: python "dosya açılamadı" (kod ≠ 0/3) verir.
+    // Eski kod burada python3e düşerdi (Windows'ta Mağaza açılır); yeni kod durup sebebi yazar.
+    // Python hiç kurulu değilse (CI) ENOENT yolu: "python/py bulunamadi".
+    const c = stderrOku({ VENTHUB_REPO: sahteDepo(saatOnce(20)), VENTHUB_DEFTER_ESIK_SAAT: '6' }, 'bbbbbbbb-1111-4111-8111-111111111111')
+    const pythonKurulu = ['python', 'py'].some((ad) => spawnSync(ad, ['--version'], { encoding: 'utf8' }).status === 0)
+    // Kurulu makinede YALNIZ "betik hatası" kabul: "bulunamadı" demek hatada sıradakine düşmüş demektir.
+    expect(c, 'ölçüm sebebi yazılmamış ya da hata sırasında başka yorumlayıcıya düşülmüş').toMatch(
+      pythonKurulu ? /OLCULEMEDI \(betik cikis kodu \d+ \((python|py)\)\)/ : /OLCULEMEDI \(python\/py bulunamadi\)/,
+    )
+    expect(c, 'python3 adı çıktıya sızdı — çağrılmış olabilir').not.toMatch(/python3/)
+  })
+
   it('TURU BLOKLAMAZ: daima çıkış 0', () => {
     // execFileSync sıfırdan farklı çıkışta fırlatır; buraya gelmek kanıttır.
     expect(() => kostur({ VENTHUB_DEFTER_ESIK_SAAT: '0' }, 'aaaaaaa0-1111-4111-8111-111111111111')).not.toThrow()

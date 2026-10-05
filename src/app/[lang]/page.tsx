@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { dilGecerliMi } from '@/i18n/yoldanDil'
+import { enKuraliRobots, hreflangAlani } from '@/lib/seo/enYayinKurali'
 import { getCategories } from '@/lib/services/category.service'
 import { getProducts } from '@/lib/services/product.service'
 import { supabaseStaticClient } from '@/lib/supabase/static'
@@ -14,6 +17,7 @@ import { getDictValue } from '../../i18n/getDictValue'
 import { compareText } from '../../i18n/sort'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
 import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { adresDili, adresRotalari } from '../../utils/yuzeyAdresleri'
 import HomePage from '../../views/HomePage'
 
 /**
@@ -72,6 +76,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params
+  if (!dilGecerliMi(lang)) notFound()
   const dict = lang === 'en' ? en : tr
 
   const siteUrl = SITE_URL
@@ -88,11 +93,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // sayfaları yalın, ana sayfa bölge kodlu. Aynı sitede iki biçim tutarsız sinyal üretir.
     alternates: {
       canonical: canonical,
-      languages: {
-        tr: `${siteUrl}/tr`,
-        en: `${siteUrl}/en`,
-        'x-default': `${siteUrl}/tr`,
-      },
+      // `EN_YAYIN` kapalıyken hreflang YOK, yalnız canonical (REC-300 3e-3); açılınca geri gelir.
+      ...hreflangAlani({
+        languages: {
+          tr: `${siteUrl}/tr`,
+          en: `${siteUrl}/en`,
+          'x-default': `${siteUrl}/tr`,
+        },
+      }),
     },
     openGraph: {
       title: dict.home.seoTitle,
@@ -101,7 +109,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'VentHub',
       images: [
         {
-          url: `${siteUrl}/images/hvac_heat_recovery_7.png`,
+          // Eskiden `hvac_heat_recovery_7.png` — dosya depoda HİÇ yoktu, paylaşım önizlemesi 404
+          // (BLOG canlı tabanı, 2026-09-24). Varsayılan kart; kapı: INV-GORSEL-VAR-1.
+          url: `${siteUrl}/images/og-default.jpg`,
           width: 1200,
           height: 630,
         },
@@ -113,12 +123,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: dict.home.seoTitle,
       description: dict.home.seoDesc,
-      images: [`${siteUrl}/images/hvac_heat_recovery_7.png`],
+      images: [`${siteUrl}/images/og-default.jpg`],
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    // Kendi `robots`unu yazan sayfa dil layout'unun `noindex`ini EZER (canlıda `/en` `index, follow`
+    // döndü, 2026-09-29): EN kapalıyken `noindex, follow`, aksi hâlde bugünkü `index, follow`.
+    robots: enKuraliRobots(lang, { index: true, follow: true }),
   }
 }
 
@@ -141,7 +150,13 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
     for (const row of countRes.data ?? []) {
       productCounts[row.category_id] = row.product_count ?? 0
     }
-    return { catData, prodData, productCounts }
+    // `kolonKumesi` (REC-140, 2026-09-24): önbellek anahtarı = bu fonksiyonun METNİ + anahtar
+    // parçaları (next/dist/.../unstable-cache.js `fixedKey`). Kolon listesi içe aktarılan bir
+    // sabit olduğundan anahtar onu görmez; Vercel veri önbelleği dağıtımlar arası paylaşılır.
+    // Bu dizge değişmeseydi yeni dağıtım alış fiyatlı eski `prodData` kaydını ≤1 saat sunardı.
+    // Dizge küçültmede korunur (kullanılan değer). Vitrin kolon kümesi değişince artırılır.
+    // Anahtar parçası yerine burada: `anasayfa-rotasi-statik` testi parçaları birebir sabitler.
+    return { catData, prodData, productCounts, kolonKumesi: 'vitrin-v2-rec140' }
   },
   ['home-page-data', lang, tenantId],
   // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
@@ -151,6 +166,9 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
 
 export default async function RootPage({ params }: Props) {
   const { lang } = await params
+  // Derin savunma (URN-15): layout ile paralel render edilir; geçersiz dil `compareText`teki
+  // `Intl.Collator`a ulaşıp 500 vermesin.
+  if (!dilGecerliMi(lang)) notFound()
   const dict = lang === 'en' ? en : tr
 
   // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59 Adım B/1 — Recep kararı 2026-09-04:
@@ -226,7 +244,8 @@ export default async function RootPage({ params }: Props) {
       "url": siteUrl,
       "potentialAction": {
         "@type": "SearchAction",
-        "target": `${siteUrl}/${lang}/products?q={search_term_string}`,
+        // REC-300 Faz 3d: tüm ürünler adresi `adresUret`'ten (kapalıyken `/${lang}/products` ile aynı).
+        "target": `${siteUrl}${adresRotalari(adresDili(lang)).products()}?q={search_term_string}`,
         "query-input": "required name=search_term_string"
       }
     },

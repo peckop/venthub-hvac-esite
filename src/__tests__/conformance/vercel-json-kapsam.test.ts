@@ -65,6 +65,8 @@ import { describe, expect, it } from 'vitest'
  */
 const KOK = path.resolve(__dirname, '../../..')
 const YOL = path.join(KOK, 'vercel.json')
+/** Adında `/` geçen her dal (minimatch). `master` hiç eşleşmez. */
+const GENEL_KALIP = '*/**'
 
 describe('INV-VERCEL-KAPSAM-1: vercel.json dar kalir', () => {
   it('vercel.json VAR ve ayristirilabiliyor (kapi KOR kosmasin)', () => {
@@ -74,7 +76,9 @@ describe('INV-VERCEL-KAPSAM-1: vercel.json dar kalir', () => {
 
   it('KAPSAM DAR: panel ayarini ezecek yeni ust anahtar YOK', () => {
     const cfg = JSON.parse(fs.readFileSync(YOL, 'utf8')) as Record<string, unknown>
-    const izinli = new Set(['$schema'])
+    // `git` (2026-09-23, OPS hükmü): yalnız `deploymentEnabled` dal-kalıbı haritası — aşağıdaki
+    // INV-VERCEL-DAL-1 kolu içeriğini ayrıca sınırlar.
+    const izinli = new Set(['$schema', 'git'])
     const fazla = Object.keys(cfg).filter((k) => !izinli.has(k))
     expect(
       fazla,
@@ -104,5 +108,48 @@ describe('INV-VERCEL-KAPSAM-1: vercel.json dar kalir', () => {
           '(bkz. deploy-build-skip-standard.md D15).',
       ).not.toContain('*')
     }
+  })
+
+  /**
+   * INV-VERCEL-DAL-1 (2026-09-23). Kota ölçümü: son 24 saatte 96 dağıtımın 71'i önizleme
+   * CANCELED — dal kapısının (ignore betiği) iptal ettiği kayıtlar KOTAYA SAYILIYOR (§D15.1'in
+   * açık sorusu; tavan 11:1xZ'de doldu). Güncel Vercel belgesi dal eşlemesinde minimatch
+   * kalıbı tanır (`"internal-*": false`). 09-08'deki `"*"` başarısızlığının açıklaması: minimatch
+   * `*` `/` karakterini GEÇMEZ; bizim dallarımız `altyapi/...` biçiminde. Bu yüzden her kalıp
+   * önek + `/**` (ya da `/` içermeyen bot dalları için `önek-*`) olarak yazılır.
+   * `"*"` / `"**"` YASAK: master'ı da kapatabilir ve öncelik kuralı belgede yok.
+   */
+  it('INV-VERCEL-DAL-1: dal haritası yalnız önek kalıbı, master asla kapanmaz', () => {
+    const cfg = JSON.parse(fs.readFileSync(YOL, 'utf8')) as {
+      git?: Record<string, unknown> & { deploymentEnabled?: Record<string, unknown> }
+    }
+    expect(Object.keys(cfg.git ?? {}), 'git altında yalnız deploymentEnabled').toEqual(['deploymentEnabled'])
+    const harita = cfg.git?.deploymentEnabled ?? {}
+    const anahtarlar = Object.keys(harita)
+    expect(anahtarlar.length, 'harita boş — kural hiçbir dalı kapatmıyor').toBeGreaterThan(5)
+    for (const k of anahtarlar) {
+      expect(harita[k], `${k} yalnız false olabilir`).toBe(false)
+      if (k === GENEL_KALIP) continue
+      expect(k, `${k}: önek/**, önek-*/** ya da önek-* biçiminde olmalı`).toMatch(/^[a-z0-9][a-z0-9-]*(-\*)?(\/\*\*|-\*)$/)
+    }
+    expect(anahtarlar).not.toContain('**')
+    expect(anahtarlar).not.toContain('master')
+    // 2026-09-24: açık liste yeni şerit açılınca unutuldu (blog/** yoktu → #1362 kota yedi). Genel kalıp
+    // adında `/` geçen her dalı kapatır; master'da `/` yok → hiç eşleşmez (D15.4 eki).
+    expect(anahtarlar, `${GENEL_KALIP} genel kalıbı zorunlu — yeni şerit dalları listeye yazılmayı beklemez`).toContain(GENEL_KALIP)
+    // Şerit dalları kesin kapsamda (collaboration-protocol dal adlandırması) — genel kalıbın yedeği.
+    for (const serit of ['altyapi/**', 'urun/**', 'urun-*/**', 'ops/**', 'blog/**']) expect(anahtarlar).toContain(serit)
+  })
+
+  it('INV-VERCEL-DAL-1 sabotaj: master\'ı kapatan ya da jokerli harita reddedilir', () => {
+    const desen = /^[a-z0-9][a-z0-9-]*(-\*)?(\/\*\*|-\*)$/
+    expect(desen.test('**')).toBe(false)
+    expect(desen.test('*')).toBe(false)
+    expect(desen.test('master')).toBe(false)
+    expect(desen.test('altyapi/**')).toBe(true)
+    expect(desen.test('jules-*')).toBe(true)
+    // Genel kalıp öncek desenine UYMAZ (bilinçli ayrık istisna) ve joker yasağını delmez.
+    expect(desen.test(GENEL_KALIP)).toBe(false)
+    expect(GENEL_KALIP).not.toBe('**')
   })
 })

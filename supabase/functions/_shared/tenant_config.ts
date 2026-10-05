@@ -46,6 +46,19 @@ export interface TenantBranding {
 // Bu dosyada yalnız `getTenantBranding` kaldı — 5 bildirim ucu onu kullanıyor.
 
 /**
+ * INV-EPOSTA-KIMLIK-1 (REC-368/REC-382, 2026-09-24) — sistem varsayılanları TEK yerde.
+ * Zincirin son halkası; tenant config ve ortam değişkeni boşsa devreye girer.
+ * Eskiden: logo `venthub-hvac-esite.vercel.app` (altyapı adresi, müşteriye verilmez),
+ * gönderici `onboarding@resend.dev` (Resend deneme adresi — yalnız hesap sahibine teslim eder,
+ * müşteri e-postası sessizce kaybolur) ve notification-service'te `noreply@venthub.com`
+ * (.tr DEĞİL, bize ait olmayan alan adı). `venthub.com.tr` Resend'de doğrulandı; 09-24 RAW
+ * ölçümü: From=info@venthub.com.tr, DKIM d=venthub.com.tr pass.
+ * Kapı: src/__tests__/conformance/eposta-kimlik-varsayilan.test.ts
+ */
+export const VARSAYILAN_GONDERICI = 'VentHub <info@venthub.com.tr>'
+export const VARSAYILAN_LOGO_URL = 'https://venthub.com.tr/images/logo.png'
+
+/**
  * Dynamically fetches branding configurations for a given tenant_id.
  * Falls back sequentially: Tenant DB Config -> Deno Environment Variables -> Hardcoded System Defaults.
  */
@@ -86,8 +99,8 @@ export async function getTenantBranding(tenantId: string): Promise<TenantBrandin
   const brandLogoUrl = 
     dbConfig.brand_logo_url || 
     dbConfig.brandLogoUrl || 
-    Deno.env.get('BRAND_LOGO_URL') || 
-    'https://venthub-hvac-esite.vercel.app/images/logo.png'
+    Deno.env.get('BRAND_LOGO_URL') ||
+    VARSAYILAN_LOGO_URL
 
   const brandPrimaryColor = 
     dbConfig.brand_primary_color || 
@@ -99,7 +112,7 @@ export async function getTenantBranding(tenantId: string): Promise<TenantBrandin
     dbConfig.email_from ||
     dbConfig.EMAIL_FROM ||
     Deno.env.get('EMAIL_FROM') ||
-    'VentHub <onboarding@resend.dev>'
+    VARSAYILAN_GONDERICI
 
   // REC-154 · destek adresi. Zincir yukarıdakilerle BİREBİR AYNI (tenant config → ortam →
   // sistem varsayılanı); yeni bir yol açılmadı, çünkü ayrı yol = ayrı bayatlama noktası.

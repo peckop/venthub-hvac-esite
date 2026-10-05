@@ -42,18 +42,10 @@ export default function RootLayout({
             <body className={`${inter.variable} ${inter.className}`}>
                 <Providers>
                     <ClientLayout>
-                        <script
-                            id="json-ld-website"
-                            type="application/ld+json"
-                            dangerouslySetInnerHTML={{
-                                __html: JSON.stringify({
-                                    "@context": "https://schema.org",
-                                    "@type": "WebSite",
-                                    "name": "VentHub",
-                                    "url": SITE_URL
-                                }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')
-                            }}
-                        />
+                        {/* WebSite JSON-LD burada YOK (PR-1, bot karnesi 2026-09-24): kök düzen onu
+                            HER sayfaya basıyordu, ana sayfa da kendi (SearchAction'lı) ikizini —
+                            ana sayfada iki WebSite düğümü. Kimlik bloğu yalnız ana sayfada:
+                            src/app/[lang]/page.tsx `jsonLds`. */}
                         {children}
                     </ClientLayout>
 

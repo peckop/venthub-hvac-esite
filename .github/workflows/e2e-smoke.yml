@@ -12,6 +12,11 @@ name: E2E Smoke (admin + checkout)
 # PR'ı "beklenen kontrol gelmedi" ile kilitler. Ad değişecekse önce branch protection
 # kuralı güncellenmeli, sonra job — bu sırayla.
 # Ayrı workflow: ana CI'ı bloklamaz; oturana kadar iterasyon, sonra istenirse required yapılır.
+#
+# ⚠️ `vars.E2E_SUPABASE_URL` = CANLI proje (2026-09-24 ölçüldü, değer basılmadan eşitlik). Bu iş her
+# PR'da canlı veritabanına bağlanır: admin-smoke yalnız okur; checkout-smoke test hesabının sepetine
+# 1 ürün ekler, ödeme adımına bilinçli girmez; teklif-eposta-smoke CI'da atlanır (E2E_TEKLIF_EPOSTA yok).
+# Canlıya YAZAN spec buraya (`e2e/`) KONMAZ — `e2e-canli/` + canli-kanit-tek-sefer.yml (INV-CANLI-KANIT-1).
 
 on:
   pull_request:
@@ -78,7 +83,7 @@ jobs:
           version: 10
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
           cache: 'pnpm'
@@ -190,7 +195,7 @@ jobs:
 
       - name: Upload Playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
           path: playwright-report/

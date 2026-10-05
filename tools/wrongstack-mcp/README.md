@@ -4,9 +4,10 @@
 
 | | |
 |---|---|
-| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.19`, `@wrongstack/codebase-index-mcp@1.0.19`, `@wrongstack/kanban-mcp@1.0.19`, `@wrongstack/mailbox-mcp@1.0.19`, lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
+| **KAYNAK** | WrongStack (Ersin Koç) — `@wrongstack/sage-mcp@1.0.26`, `@wrongstack/codebase-index-mcp@1.0.26`, `@wrongstack/kanban-mcp@1.0.26`, `@wrongstack/mailbox-mcp@1.0.26` (09-27 1.0.19'dan yükseltildi), lisans **MIT** (npm `license` alanı; ilk ikisi 2026-09-17, son ikisi 2026-09-18 ölçüldü). |
 | **ALINAN** | İki MCP sunucusu olduğu gibi: SAGE hafıza (bilgi dosyaya/sembole çapalı, hedef değişince yeniden doğrulanır) ve kod dizini (arama, paket/dosya/sembol grafiği). |
 | **BİZDEN** | Kurulum biçimi (lock commit'li, kurulum betiği kapalı), kod dizininin **salt-okuma** kaydı, kalıcı servis ilanı, uyum testi `INV-WRONGSTACK-MCP-1`. |
+| **ALINAN (skill, 09-28)** | `@wrongstack/core` 1.0.26'dan dört skill `.claude/skills/`'e: `verify-before-done`, `multi-agent`, `wrongstack-kanban`, `wrongstack-mailbox-mcp`. Gövde değiştirilmedi; her birinin başına **araç eşlemesi** (kaynaktaki `delegate`/`collab_debug`/`mcp_use`/`kanban` adlarının bizdeki karşılığı ya da YOK) + 12 maddelik **VentHub ek kuralları** eklendi, açıklama ≤300 karaktere yeniden yazıldı. `mailbox-bridge` ve `multi-agent/references/collab-debug.md` ALINMADI (bizde karşılığı yok). Karar 165 W3. |
 | **ALINMAYAN** | WrongStack ajan ürünü (Claude Code'un alternatifi), WebUI/CodeMap, kod dizininin `--writable` yüzeyi. CodeGraph **yerinde kalır**; hangisinin kalacağı OPS kıyasıyla belli olacak (REC-345). |
 
 Karar: Recep, OPS penceresi 2026-09-17 ("bence alalım, beklemeyelim") + ALTYAPI penceresinde teyit ("evet kur"). Kayıt: REC-345 Kova C.
@@ -25,7 +26,49 @@ Ana depo kökünde (kısa yol şart — derin Temp yolunda npm 5 dk takıldı, O
 ```bash
 cd tools/wrongstack-mcp
 npm ci --ignore-scripts
+cd ../.. && for y in tools/wrongstack-mcp/yamalar/*.patch; do git -c core.autocrlf=false -c core.eol=lf apply "$y"; done
 ```
+
+**Yamalar (`yamalar/`) kurulumun parçasıdır.** `npm ci` her koşuda paketi yeniden yazar ve yamayı
+siler; bu yüzden ikinci satır atlanmaz. Yama uygulandıktan sonra MCP sunucusu yeniden bağlanana kadar
+(`/mcp` → yeniden bağlan ya da pencere kapat-aç) eski kod bellekte koşar. Durum ölçümü (repo kökünden):
+`git -c core.autocrlf=false -c core.eol=lf apply --reverse --check <yama>` çıkış 0 = uygulanmış (ya da
+`node tools/wrongstack-mcp/kurulum.cjs --denetle`). Kapılar: `INV-WRONGSTACK-KANBAN-YAMA-1`,
+`INV-WRONGSTACK-SAGE-YAMA-1`. Yama adı `<paket>-<sürüm>-<konu>.patch`; sürüm kurulu paketle uyuşmazsa
+kurulum betiği `HATA` verir (önce kilit dosyasına bakar, hiçbir süreci durdurmadan).
+**Bayrakların niçini (2026-09-30 ölçüldü):** düz `git apply` yama uygulanan dosyanın tamamını CRLF'e
+çeviriyordu (depo içinde `.gitattributes` `*.js text` + Windows'ta `core.eol=native`; depo dışında sistem
+`core.autocrlf=true`) ve geri alınca dosya bayt bayt eski hâle dönmüyordu. `core.autocrlf=false` tek başına
+engellemez; `core.eol=lf` engeller. Canlı kanban-mcp `cli.js` bugüne kadar bu yüzden CRLF idi (545 CR).
+
+### Sürüm yükseltme (ana depoda) — pencereler açıkken YAPILMAZ
+
+Arka plan süreçleri (`project-server.js`) pencere kapanınca da ayakta kalır ve paket dosyalarını
+açık tutar. Paketin içinde Windows için derlenmiş modül var; süreçler açıkken `npm ci` dosyaları
+değiştiremeyebilir, değiştirse bile eski kod bellekte koşar (09-27: makinede 30 WrongStack süreci).
+**Tek komut (OPS kararı 09-27):** `node tools/wrongstack-mcp/kurulum.cjs`. Açılış sırası:
+1. Bütün Claude pencereleri kapalı.
+2. YALNIZ ARAÇ penceresi açılır ve betiği koşar. Betik kendi penceresinin WrongStack sunucularını
+   ve daemon'ları durdurur, `npm ci --ignore-scripts` koşar, yamaları uygular, doğrular.
+   Başka pencereye ait sunucu görürse hiçbir şeye dokunmadan `HATA` der.
+3. Son satır `HAZIR` → ARAÇ penceresi `/mcp` ile WrongStack sunucularını yeniden bağlar.
+4. Öteki pencereler açılır.
+`--denetle` yalnız doğrular (sürümler, yamalar, `.mcp.json` giriş dosyaları), hiçbir şey değiştirmez.
+Kapı: `INV-WRONGSTACK-KURULUM-1` (başka pencere varken hiçbir süreç kapatılmaz).
+
+**⛔Yeni sürümde yama ÇIKMAZI (yamalı paket yükseltilirken):** yama bir sürüme özeldir ve kurulum betiği
+sürüm kayınca `package-lock.json`'a bakıp `npm ci`dan ÖNCE `HATA` verir; ama yeni yamayı üretmek için
+yeni paketin kurulu olması gerekir. Sıra: (1) `package.json` + `package-lock.json` yeni sürüme çekilir;
+(2) eski yama `yamalar/` dışına geçici alınır (betik yamasız `npm ci` koşabilsin); (3) `node tools/wrongstack-mcp/kurulum.cjs`
+koşar, yamasız yeni paket kurulur; (4) yeni paketin kaynağında yama satırları yeniden ölçülür (kaynak
+işaretleri: `extractCandidatesFromMessage`, `hasCamelBoundary`, `normalizeTerm`, tanım cümlesi regex'i), yama yeni sürüm adıyla
+(`<paket>-<yeni sürüm>-<konu>.patch`) üretilip `yamalar/`a konur; (5) `kurulum.cjs --denetle` `HAZIR` verene ve
+`INV-WRONGSTACK-*-YAMA-1` yeşil olana dek tekrarlanır. Yukarı akış düzeltmişse yama silinir, yenisi üretilmez.
+
+1.0.19 → 1.0.26 ölçümü (2026-09-27): dört sunucu el sıkıştı. kanban 2 araç (1.0.26 istemci eski
+1.0.19 daemon'una bağlanıp okudu), codebase-index 6, sage 15 (sage.db **kopyasında** arama),
+mailbox 3. sage.db şeması değişmedi (`user_version` 0, 31 nesne, aynı imza). Yama yeniden üretildi
+(satırlar kaydı, içerik aynı).
 
 `pnpm` **kullanılmaz**: ana lockfile'a ve worktree'lerin `node_modules` bağına dokunmaz.
 Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açılışta onaya sorar.
@@ -96,6 +139,47 @@ Sunucular `.mcp.json` ile kayıtlıdır; Claude Code proje sunucusunu ilk açıl
    kullanılır. **Pencere içi ölçüm açık:** genişleme + kimliğin MCP sürecine ulaşması + iki pencerenin
    farklı kimlik alması, ana ağaç güncellenip pencereler kapatılıp açıldıktan sonra ölçülür.
    `INV-WRONGSTACK-MCP-1` kaydı ve kimlik biçimini kolla tutar.
-9. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
+9. **Kanban yazma dönüşü tüm panoyu taşıyordu → yamalı (2026-09-27, karar 144, REC-391 K1).**
+   `kanban-mcp` `callTool` sonucu `{ content: result }` diye olduğu gibi döndürüyor; aracın kendi
+   özet kesicisi (`kanbanTool.serialize` → pano okumayan eylemde panoyu {sütun → kart sayısı}
+   özetine indirir) MCP yolunda **hiç çağrılmıyor**. 1.0.26'da da aynı satır (ölçüldü). Bedel:
+   47 KB'lık panoda her `add_task`/`add_note`/`transition_task` 48,6 KB dönüyordu.
+   `yamalar/kanban-mcp-1.0.26-ozet-donus.patch` başarılı sonucu kesiciden geçirir; kesici girintili
+   metin döndürdüğü için sonuç `JSON.parse` ile nesneye çevrilir, sunucu sıkı biçimde yazar.
+   Yalnız panoyu döndüren eylemlerde (`add_note`, `update_task`, `move_task`, `assign_task`…)
+   özet kartı da kaybettirirdi; yama `args.taskId` kartını özetin yanına koyar.
+   ⛔**Yama İKİ dosyaya uygulanır: `dist/cli.js` ve `dist/index.js`.** `.mcp.json`'ın çalıştırdığı
+   `cli.js`, callTool'un kendi kopyasını taşır ve index.js'i yüklemez. İlk yama (#1437) yalnız
+   index.js'e uygulandı, kapı yeşildi, canlıda hiçbir şey değişmedi (09-27 akşam ölçüldü). Kapı artık
+   hedef dosyayı `.mcp.json`'dan okur.
+   Ölçüm (gerçek pano, yamalı cli.js stdio, 23 kart): `add_task` 58 KB → **1.297** bayt,
+   `add_note` → **1.778** bayt (etkilenen kart dahil), `get_board` 58.750 → 58.750 (değişmez).
+   Hata sonucu (`ok:false`) kesiciye girmez. Sürüm yükseltilince yama adı ve içeriği yeniden ölçülür;
+   kapı sürüm uyuşmazlığında KIRMIZI verir. Yukarı akış kaydı: WrongStack GitHub issue.
+10. **Sage alan-terimi çıkarıcısı Türkçe harfleri atıyordu → yamalı (2026-09-30, REC-519 kapsam 4).**
+   `@wrongstack/sage` `SageDomainTermExtractor` yalnız ASCII varsayar: `normalizeTerm("Şerit")` → `"erit"`,
+   `("çıktı")` → `"kt"`, `("ığış")` → boş anahtar; "İstanbul Şubesi Müdürü" hiç aday olmaz, "ÇıkışKapısı"
+   camelCase sayılmaz, Türkçe harfle biten terimin tanım cümlesi bulunmaz (`\b` ASCII-sözcük tanımlıdır).
+   `yamalar/sage-1.0.26-domain-terms-turkce.patch` (6 hunk) regex'leri Unicode sınıflarına (`\p{L}` `\p{Lu}`
+   `\p{Ll}`) çevirir, girdiyi ve anahtarı NFC'ye çevirir ve "İ"nin küçük harfinin ürettiği birleşik noktayı
+   (U+0307) siler; İngilizce sonuç normal metinde değişmez (aynı terimler, aynı güven). **Uzunluk üst sınırı
+   (bağımsız inceleme O1):** boşluksuz çok uzun sözcük `new RegExp(terim)` kurulumunda "Stack overflow" atıyordu
+   (yamasız ~33-50k, yamanın ilk sürümünde 8k karakterde); adaylar artık tek sözcükte ≤200, başlık sözcüğünde ≤80
+   harfle sınırlı — daha uzun sözcük aday OLMAZ (yamasız İngilizce 10k'lık "WorkTree…" adayı çıkıyordu; anlamlı
+   terim değildi). İki sadeleştirme (ölçüldü, gereksiz oldukları için yamada YOK): `hasCamelBoundary`in
+   `^\p{Lu}\p{Ll}+\p{Lu}` kuralı `\p{Ll}\p{Lu}` kuralının alt kümesi (12,2 milyon dizede fark 0); tanım cümlesindeki
+   sözcük-sınırı sonrasındaki `\s+` yüzünden zaten işlevsizdi. Tek dosya: `dist/index.js` — `sage-mcp` kendi kopyasını taşımaz,
+   `@wrongstack/sage`'i içe aktarır (ölçüldü). ⚠Bugün hiçbir VentHub süreci bu çıkarıcıyı ÇAĞIRMIYOR (`sage-mcp`
+   araçlarında yok; yalnız kütüphane dışa aktarımı) — yama, çıkarıcıyı kullanacak iş için hazır tutulur, sunucu
+   davranışını şimdi değiştirmez. **Bilinen sınır:** anahtar yerel-bağımsız küçültülür, yani "Işık" → `işık`,
+   "ışık" → `ışık` (ayrı anahtar); `toLocaleLowerCase('tr')` İngilizce "INDEX"i bozacağı için kullanılmadı.
+   **Ne zaman düşer:** `sage` sürümü 1.0.26'dan kayınca yama uymaz; `kurulum.cjs` sürüm farkını adıyla söyler,
+   yama yeni sürümde yeniden üretilir (kaynak satırlar `extractCandidatesFromMessage`, `hasCamelBoundary`,
+   `normalizeTerm`) ya da yukarı akış düzeltince silinir. Kapı `INV-WRONGSTACK-SAGE-YAMA-1` (yamasız/yamalı kopya
+   karşılaştırması + sunucunun yüklediği dosya; yama biçimi ayrıca CI'da, kurulu paket olmadan sahte ağaçta
+   `git apply` ile ölçülür). **Yamalanmadı (bilinen sınır, kapsam dışı):** `isStoplisted` içindeki ASCII kısaltma
+   kuralı (`/^[A-Z0-9]{2,8}$/`) Türkçe büyük harfli kısa sözcükleri ("ÇAĞ") kısaltma saymaz; backtick içindeki
+   böyle bir sözcük aday olabilir. Etkisi küçük; gerekirse ayrı kayıt.
+11. **Alt süreç `process.env` KALITIR.** Doğrulayıcı komutları bunu miras alır. Azaltma: komut
    kümesi `gh` ile sınırlı ve ağ/paket komutları yasak listesinde. Ama bu bir **azaltmadır**,
    sıfırlama değil — kart açıklamasına ve doğrulayıcı komutuna sır yazılmaz.

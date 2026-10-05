@@ -28,6 +28,8 @@ import { useAuth } from '../../hooks/useAuth'
 import { useCart } from '../../hooks/useCartHook'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { bilgiMerkeziListeHref } from '../../utils/bilgiMerkezi'
+import { adresDili, urunlerBolumuOnekleri } from '../../utils/yuzeyAdresleri'
 import LanguageSwitcher from '../LanguageSwitcher'
 import TeklifPaneliIcerigi from './TeklifPaneliIcerigi'
 
@@ -66,8 +68,10 @@ const YOLLAR: Record<SekmeKimlik, string> = {
 export default function MobilAltSekmeCubugu() {
   // Bayrak kapalıyken HİÇBİR şey render edilmez — hook'lardan önce dönmüyoruz ki
   // React hook sırası bozulmasın; erken dönüş en aşağıda, tüm hook'lardan sonra.
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
+  // Karar 92: "Teknik destek" yaprağı Bilgi Merkezi'ne gider; EN kapalıyken bağlantı basılmaz.
+  const bilgiMerkeziHref = bilgiMerkeziListeHref(lang)
   const pathname = usePathname()
   const { getCartCount } = useCart()
   const { user } = useAuth()
@@ -186,9 +190,11 @@ export default function MobilAltSekmeCubugu() {
             {t('altSekme.destek')}
           </h2>
           <nav className="flex flex-col gap-1">
-            <Link href={Routes.destek.home()} onClick={kapat} className={yaprakOgesi}>
-              {t('altSekme.teknikDestek')}
-            </Link>
+            {bilgiMerkeziHref && (
+              <Link href={bilgiMerkeziHref} onClick={kapat} className={yaprakOgesi}>
+                {t('altSekme.teknikDestek')}
+              </Link>
+            )}
             <Link href={Routes.contact()} onClick={kapat} className={yaprakOgesi}>
               {t('altSekme.iletisim')}
             </Link>
@@ -286,7 +292,7 @@ export default function MobilAltSekmeCubugu() {
           type="button"
           aria-expanded={urunlerAcik}
           onClick={() => { setDestekAcik(false); setUrunlerAcik((a) => !a) }}
-          className={sekmeSinifi(aktif(Routes.products()) || urunlerAcik)}
+          className={sekmeSinifi(urunlerBolumuOnekleri(adresDili(lang)).some((yol) => aktif(yol)) || urunlerAcik)}
         >
           <Ikon d={YOLLAR.urunler} />
           {t('altSekme.urunler')}

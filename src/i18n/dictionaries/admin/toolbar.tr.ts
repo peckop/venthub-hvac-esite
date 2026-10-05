@@ -6,13 +6,4 @@ export const toolbar = {
   makeActive: 'Aktif Yap',
   makePassive: 'Pasif Yap',
   feature: 'Vitrine Çıkar',
-  updatePrice: 'Fiyat Güncelle',
-  bulkPriceUpdate: 'Toplu Fiyat Güncelleme',
-  percentage: 'Yüzde',
-  fixedAmount: 'Sabit Tutar',
-  placeholderPercent: 'Örn: 15 (zam) veya -10 (indirim)',
-  placeholderFixed: 'Örn: 500 (ekle) veya -200 (düş)',
-  invalidNumberAlert: 'Geçerli bir sayı giriniz.',
-  priceHintPercent: 'Pozitif değer = Zam, Negatif değer = İndirim',
-  priceHintFixed: 'Pozitif değer = Fiyata Ekle, Negatif değer = Fiyattan Düş',
 };

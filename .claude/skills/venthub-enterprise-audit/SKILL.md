@@ -1,5 +1,7 @@
 ---
 name: venthub-enterprise-audit
+context: fork
+agent: denetim-opus
 description: 'Proje teslimi öncesi "10/10 Onay" denetim motorudur. L1-L12 adımlarını
   çalıştırıp PASS/FAIL raporu üretir. Tetikleyicileri: enterprise audit, 10/10 check,
   sprint delivery check. Genel linter denetimi, veritabanı sıfırlama veya git işlemleri

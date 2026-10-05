@@ -138,4 +138,23 @@ describe('generateProductDatasheet Fallback Handling', () => {
 
     fetchSpy.mockRestore()
   })
+
+  // URN-33 — müşteriye giden föy PDF'i İÇ SKU basmaz (INV-SKU-GORUNMEZ-1, K7).
+  // Eskiden üst bilgide `Ref: ${product.sku || product.id.substring(0, 8)}` vardı. Gerçek üretici
+  // koşar, jsPDF'e giden TÜM `text()` çağrıları toplanır; hiçbirinde ne SKU ne kimlik parçası
+  // geçer, model kodu ise gövdede bir kez durur.
+  it.each([['tr'], ['en']])('föyde iç SKU ve kimlik parçası basılmaz, model kodu basılır (%s)', async (lang) => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'))
+
+    await generateProductDatasheet(mockProduct, undefined, undefined, lang)
+
+    const basilan = mockText.mock.calls.flatMap((c) => (Array.isArray(c[0]) ? c[0] : [c[0]])).map(String)
+    expect(basilan.length).toBeGreaterThan(3) // boş evren değil: üst bilgi + başlık + model satırı basıldı
+    expect(basilan.join('\n')).not.toContain(mockProduct.sku)
+    expect(basilan.join('\n')).not.toContain(mockProduct.id.substring(0, 8).toUpperCase())
+    expect(basilan.some((m) => m.startsWith('Ref:'))).toBe(false)
+    expect(basilan.filter((m) => m.includes(mockProduct.model_code as string))).toHaveLength(1)
+
+    fetchSpy.mockRestore()
+  })
 })

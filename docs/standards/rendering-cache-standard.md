@@ -99,13 +99,32 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `product_prices` | `on_product_prices_ins_del` + `on_product_prices_upd` (`WHEN`) | var | **yalnız** o ürünün aile PDP yolu + (varsa) **ailenin SERİSİ** — keşif tag'lerine DOKUNMAZ (PS-042) |
 | `product_images` | `on_product_images_change` | var | **aile** PDP yolu + (varsa) **ailenin SERİSİ** + keşif tag'leri + `/sitemap.xml` — ⚠️ tablo bugün **0 satır**; zincir T069 görsel yüklemesinden ÖNCE yerinde olmalı (sonra kurulursa görseller girer, hiçbir sayfa tazelenmez) |
 | `brands` | `on_brands_change` | var | markanın **tüm ailelerinin** PDP yolları + keşif tag'leri |
+| `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout) yeniden üretilir; keşif/ana sayfa etiketlerine DOKUNMAZ. Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
+
+> **SİTE HARİTASI MODEL `lastmod`'U (REC-300 3e-2, 2026-10-02):** model adresinin `lastModified`'ı `products.updated_at`'tir; `on_products_change` tetiği değere bakmadığı için aynı değerli toplu UPDATE de modelin `updated_at`'ini kaydırır ("hepsi değişti" sinyali) — bilinçli kabul, tetiği değere duyarlı yapmak ayrı ALTYAPI kartıdır.
 
 > **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı
 > kullanmak sessiz bir kaçaktır: prerender edilmiş yol aile slug'ı olduğu için var olmayan bir
 > yol geçersiz kılınır ve sayfa hiç yenilenmez. `products` ve `inventory_movements` dalları tam
 > bunu yapıyordu (2026-08-15 denetimi yakaladı); dört dal (`products`/`inventory_movements`/
 > `product_prices`/`product_images`) artık tek yardımcıdan (`revalidateFamilyChain`) çözüyor.
+>
+> **YOL LİSTESİ ADRES ŞEMASINDAN GELİR (REC-300 Faz 3g, 2026-09-30).** Webhook aile ve kategori yollarını sabit
+> `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
+> her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
+> olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
+> Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
+> bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
+> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Kalan (3g-2):** model adresi
+> (`/tr/urun/<slug>-p-<sku>`) — `slug_i18n` verisi gelince.
+>
+> **ESKİ DEĞER TAZELEMESİ (URN-12, REC-300 3g-2a, 2026-10-02).** Webhook yalnız yeni değeri değil, UPDATE'te `old_record`'daki
+> ESKİ değeri de tazeler: aile/kategori slug'ı (kategoride `metadata.slug` ve `parent_id` dahil; üst değişince çocukların eski
+> iki segmentli yolu), ürünün eski `family_id` (+ serisi), eski ve yeni `category_id` + `subcategory_id`. Yollar/etiketler tekilleştirilir.
+> `old_record` INSERT'te NULL, DELETE'te `record` NULL (DELETE zaten eski satırı tazeler); UPDATE'te `old_record` eksikse yalnız yeni
+> değer tazelenir (güvenli düşüş). Gerekçe: A→B→A dönüşünde önbellekli 308 döngü yapabilir (ana plan m.9, O2; önbellek doluluğu ÖLÇÜLMEDİ).
+> Kapı: `route.tags.test.ts` `U12-a..s` (sabotajla kanıtlandı).
 >
 > **`revalidateTag` yalnız o tag'i tüketen bir `unstable_cache` varsa iş görür.** `familyTag`'in
 > tüketicisi yoktu → çağrı sessiz no-op'tu. PDP verisi `React.cache()` ile sarılı olduğundan

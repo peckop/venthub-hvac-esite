@@ -1,0 +1,42 @@
+{
+  "kimlik": "TR-YON-ATEX-1999/92",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "resmigazete.gov.tr arşivinde 30 Nisan 2013 tarihli, 28633 sayılı nüsha; başlık ve sayı doğrudan bu HTML'den birebir doğrulandı.",
+      "alinti": "Sayı : 28633 ... ÇALIŞANLARIN PATLAYICI ORTAMLARIN TEHLİKELERİNDEN KORUNMASI HAKKINDA YÖNETMELİK",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Aynı belgenin ekinden (bölge-kategori eşleştirme tablosu) birebir alıntı; grep ile satır satır doğrulandı (satır 1103, 1106, 1110).",
+      "alinti": "Bölge 0 veya Bölge 20: Kategori 1 ekipman, Bölge 1 veya Bölge 21: Kategori 1 veya 2 ekipman, Bölge 2 veya Bölge 22: Kategori 1, 2 veya 3 ekipman",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://mevzuat.gov.tr/anasayfa/MevzuatFihristDetayIframe?MevzuatTur=7&MevzuatNo=18335&MevzuatTertip=5",
+      "son_url": "https://mevzuat.gov.tr/anasayfa/MevzuatFihristDetayIframe?MevzuatTur=7&MevzuatNo=18335&MevzuatTertip=5",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "mevzuat.gov.tr",
+      "resmi": true,
+      "durum_satiri": "mevzuat.gov.tr güncel konsolide metin sayfası; başlık teyidi. Not: mevzuat.gov.tr'ye ilk denemelerde IPv6 rotası zaman aşımına uğradı, -4 (IPv4 zorla) ile başarılı oldu.",
+      "alinti": "ÇALIŞANLARIN PATLAYICI ORTAMLARIN TEHLİKELERİNDEN KORUNMASI HAKKINDA YÖNETMELİK",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

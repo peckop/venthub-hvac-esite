@@ -1,0 +1,30 @@
+{
+  "kimlik": "AB-1999/92",
+  "eksen": "C",
+  "kaynaklar": [
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:31999L0092",
+      "son_url": "",
+      "http": 202,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "EUR-Lex AWS WAF challenge (bkz. EU-2014/34 kalemindeki not); bu direktif için EU tarafı doğrulama ikincil kaynak (TR yönetmeliğin dayanak maddesi) üzerinden yapıldı.",
+      "alinti": "ERİŞİLEMEDİ",
+      "alinti_dogrulandi": false
+    },
+    {
+      "url": "https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm",
+      "son_url": "https://www.resmigazete.gov.tr/eskiler/2013/04/20130430-6.htm",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "www.resmigazete.gov.tr",
+      "resmi": true,
+      "durum_satiri": "Türk yönetmeliğinin BİRİNCİ BÖLÜM Dayanak maddesinden birebir alıntı; EU direktifinin varlığını ve kabul tarihini ikincil resmi kaynaktan doğruluyor.",
+      "alinti": "16/12/1999 tarihli ve 1999/92/EC sayılı Avrupa Parlamentosu ve Konseyi Direktifine paralel olarak",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

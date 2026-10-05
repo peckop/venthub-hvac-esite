@@ -23,17 +23,64 @@ export interface FamiliesPage {
   total: number
 }
 
+/**
+ * `get_product_families_enriched` ÇAĞRILARI SÜREÇ İÇİNDE SIRAYA ALINIR (REC-300 onarımı, ALTYAPI ölçümü 2026-09-29).
+ *
+ * NİÇİN: RPC ağır (çağrı başı ~14.185 tampon; tek başına 77 ms). Next build'i statik sayfaları (24 kategori × 2 dil
+ * + ürünler + aile parametreleri + site haritası ≈ 52 çağrı) EŞZAMANLI üretir; anon rolün 3 sn
+ * `statement_timeout`'una eşzamanlı yük altında düşer → `getAllFamilySlugs` hata verir, eskiden `.catch`
+ * bunu yutup ürünsüz site haritası üretiyordu (INV-SITEMAP-HATA-1'den önce). Süreç başına aynı anda TEK
+ * çağrı: sıra bekleyen çağrı DB'ye hiç gitmediği için timeout SAYAÇ İSTEMEZ; çağrı SAYISI değişmez,
+ * yalnız tepe eşzamanlılık düşer (build işçisi sayısı kadar).
+ * Kural 12 (önbellek anahtarında lang+tenant) bilerek dokunulmadı: sayaç düşürmek için anahtar bozulmaz.
+ */
+export const FAMILY_RPC_ESZAMANLI = 1
+let calisanRpc = 0
+const bekleyenRpc: Array<() => void> = []
+
+async function rpcSlotuAl(): Promise<void> {
+  if (calisanRpc < FAMILY_RPC_ESZAMANLI) {
+    calisanRpc++
+    return
+  }
+  // Slot BİRAKAN çağrıdan devredilir (calisanRpc değişmez) — arada başka çağrı araya giremez.
+  await new Promise<void>((devral) => bekleyenRpc.push(devral))
+}
+
+function rpcSlotunuBirak(): void {
+  const siradaki = bekleyenRpc.shift()
+  if (siradaki) siradaki()
+  else calisanRpc--
+}
+
+/**
+ * Aile RPC'lerinin (`get_product_families_enriched`, `get_family_detail`) TEK ortak sıra kapısı.
+ * İki RPC AYNI sayacı paylaşır (iki ayrı sayaç değil): derlemede tepe eşzamanlılık toplamda
+ * `FAMILY_RPC_ESZAMANLI` olur. `get_family_detail` ölçümü (2026-09-29): tek çağrı 25 ms / 2.208 tampon;
+ * kırmızı CI koşusunda 57014 `getCachedFamilyDetail`'de düştü — detay RPC'si semaforsuzdu (REC-300).
+ */
+async function aileRpcSirali<T>(cagri: () => PromiseLike<T>): Promise<T> {
+  await rpcSlotuAl()
+  try {
+    return await cagri()
+  } finally {
+    rpcSlotunuBirak() // hata/iptal da slotu bırakır: kuyruk kilitlenmez
+  }
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}
 ): Promise<FamiliesPage> {
-  const { data, error } = await supabase.rpc('get_product_families_enriched', {
-    p_category_ids: params.categoryIds,
-    p_limit: params.limit ?? 24,
-    p_offset: params.offset ?? 0,
-    p_search_query: params.searchQuery,
-    p_brand: params.brand,
-  })
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_product_families_enriched', {
+      p_category_ids: params.categoryIds,
+      p_limit: params.limit ?? 24,
+      p_offset: params.offset ?? 0,
+      p_search_query: params.searchQuery,
+      p_brand: params.brand,
+    })
+  )
 
   if (error) throw error
   const items = (data ?? []) as FamilyListItem[]
@@ -155,10 +202,12 @@ export async function getFamilyDetail(
   slug: string,
   lang: string
 ): Promise<FamilyDetail | null> {
-  const { data, error } = await supabase.rpc('get_family_detail', {
-    p_slug: slug,
-    p_lang: lang,
-  })
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_family_detail', {
+      p_slug: slug,
+      p_lang: lang,
+    })
+  )
 
   if (error) throw error
   const detail = parseFamilyDetail(data)
@@ -509,4 +558,67 @@ export async function getAllFamilySlugs(
     }
   }
   return slugs
+}
+
+/** Site haritasına girecek bir MODEL: ailesinin slug'ı, SKU'su ve kendi `updated_at`'i (REC-300 3e-2). */
+export interface FamilyModelSitemapRow {
+  aileSlug: string
+  sku: string
+  updatedAt: string | null
+}
+
+export interface FamilySitemapData {
+  /** aile slug'ı → ailenin ve aktif varyantlarının en son `updated_at`'i (REC-454). */
+  aileTarihleri: Map<string, string>
+  /** Aktif + silinmemiş modeller (arşiv/pasif model YOK); sıra: aile sırası, sonra sorgu sırası. */
+  modeller: FamilyModelSitemapRow[]
+}
+
+/**
+ * Site haritası verisi: aile `lastmod`'u (REC-454) + aktif model listesi (REC-300 3e-2), TEK sorgudan.
+ *
+ * `aileTarihleri`: aile slug'ı → ailenin ve AKTİF varyantlarının en son `updated_at`'i. Sayfada görünen
+ * veri (aile metni, model satırları) bu iki tablodan gelir.
+ *
+ * NİÇİN: harita her üretimde `new Date()` yazıyordu → 87 adresin 61'i her gün "bugün değişti".
+ * Google lastmod'u yalnız tutarlı biçimde doğruysa kullanır; her gün her şeyi değişmiş ilan eden
+ * haritada tarihi yok sayar (yeni rehber yazısının gerçek tarihi de kaybolur). 2026-09-30 ölçümü:
+ * bu iki sütun gerçek değişikliği gösteriyor (47 aile, tarihler 08-27…09-26 arasına yayılmış,
+ * toplu günlük yazımla oynamıyor).
+ *
+ * `modeller`: aynı sorgunun `products` ilişkisinden (sku eklendi; İKİNCİ SORGU YOK). Model `lastModified`'ı
+ * modelin kendi `updated_at`'idir. SINIR (OPS hükmü 2026-10-02): aynı değerli toplu UPDATE de `updated_at`'i
+ * kaydırır (tetik değere bakmaz); bilinçli kabul — bkz. rendering-cache-standard.md.
+ *
+ * Aktif varyantı olmayan aile haritada zaten yok; seri slug'larının kendi varyantı olmadığı için
+ * `aileTarihleri`nde YOKTUR → çağıran lastmod YAZMAZ (uydurma tarih yok). Hata FIRLATILIR (yutulmaz).
+ */
+export async function getFamilySitemapData(
+  supabase: SupabaseClient<Database>
+): Promise<FamilySitemapData> {
+  const { data, error } = await supabase
+    .from('product_families')
+    .select('slug, updated_at, products(sku, updated_at, status, deleted_at)')
+    .is('deleted_at', null)
+    .range(0, 4999)
+  if (error) throw error
+  const aileTarihleri = new Map<string, string>()
+  const modeller: FamilyModelSitemapRow[] = []
+  for (const aile of data ?? []) {
+    const aktif = (aile.products ?? []).filter((p) => p.status === 'active' && p.deleted_at === null)
+    if (!aile.slug || aktif.length === 0) continue
+    const enSon = [aile.updated_at, ...aktif.map((p) => p.updated_at)]
+      .filter((t): t is string => typeof t === 'string')
+      .reduce((a, b) => (Date.parse(b) > Date.parse(a) ? b : a), '1970-01-01T00:00:00Z')
+    aileTarihleri.set(aile.slug, enSon)
+    for (const p of aktif) {
+      if (!p.sku) continue
+      modeller.push({
+        aileSlug: aile.slug,
+        sku: p.sku,
+        updatedAt: typeof p.updated_at === 'string' ? p.updated_at : null,
+      })
+    }
+  }
+  return { aileTarihleri, modeller }
 }

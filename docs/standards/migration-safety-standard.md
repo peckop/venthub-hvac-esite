@@ -120,6 +120,23 @@ denetler — (1) `BEGIN`/`COMMIT` sayıları dengeli, (2) işlem-dışı ifade `
 > (CLAUDE.md kural 13: merge = prod'a otomatik apply). Bekçi üç ihlal tipi de **bilerek
 > yaratılarak** kanıtlandı; üçü de FAIL verdi, dosyalar silindi.
 
+## KURAL: şemanın görünen yüzü değişirse tip dosyası ve şema tabanı AYNI SAATTE (2026-09-24)
+
+Yeni tablo, kolon, görünüm kolonu ya da fonksiyon imzası ekleyen/değiştiren migration merge
+edildiğinde `src/types/database.types.ts` canlıdan geride kalır ve **INV-TIP-DRIFT-1 bütün
+şeritlerin PR'larında kırmızıya döner** — kusur tek PR'da değil filonun tamamında görünür.
+Tip dosyası migration canlıya inmeden canlıdan üretilemez; o yüzden sıra sabittir:
+
+1. Migration PR'ı açıklamasına "tip takibi: <sahip>" satırı; sahibi (URUN) merge'ten ÖNCE haberdar edilir.
+2. Merge → `supabase-migrate.yml` yeşil.
+3. Sahibi aynı saatte `pnpm supabase:gen` PR'ını açar ve birleştirir.
+4. **Şema tabanı (her migration için, salt tanım değişikliği dahil):** INV-TABAN-TAZE-1 "en yeni migration damgası taban tarihinden yeni olamaz" der → migration'ı getiren şerit aynı gün `sema-tabani-uret.yml` (workflow_dispatch) koşturur ve `supabase/baselines/<tarih>_public_schema.sql` PR'ını açar. Aynı gün birden çok migration varsa taban günün SONUNCUSUNDAN sonra bir kez üretilir, ama filo kırmızıysa beklenmez.
+
+Olay: REC-140 Faz 1 (#1369, `product_costs`) — takip yalnız PR açıklamasına yazıldı, sahibi merge'ten
+önce uyarılmadı; birkaç şeridin PR'ı (#1372 dahil) tip-drift ile kırmızıya döndü. Salt tanım
+değiştiren migration (aynı kolon listesi/imza, ör. `create or replace view` aynı kolonlarla) tip
+dosyasını etkilemez — bu madde ona uygulanmaz.
+
 ## Kapsam ve sınırlar
 
 - Bu cetvel **yıkıcı** değişiklikler içindir: `DROP COLUMN/TABLE/FUNCTION`,

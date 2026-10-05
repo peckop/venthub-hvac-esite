@@ -13,6 +13,7 @@ import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
+import { kategoriArgumanlari } from '../../utils/yuzeyAdresleri'
 import { VentHubCanvas } from './3d/core'
 import Category3DIcon from './Category3DIcon'
 
@@ -24,6 +25,10 @@ export interface ProductItem {
     title: string
     image: string
     categorySlug?: string
+    /** Adreste görünen (dile göre) slug; yoksa `id` (bugünkü davranış). */
+    urlSlug?: string
+    /** Alt kategori kartında üst kategorinin görünen slug'ı (çift tık adresi tam nesneyle kurulur). */
+    parentSlug?: string
     modelType?: string // [NEW]
 }
 
@@ -258,8 +263,11 @@ const OrbitalCard: React.FC<{
     const handleDoubleClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         e.stopPropagation()
         // Çift tık: Direkt kategori sayfasına git
-        router.push(Routes.category(item.id))
-    }, [router, item.id, Routes])
+        // REC-403: bayrak kapalıyken bugünkü tek slug (`id`) çağrısı birebir; açıkken dile göre slug
+        // (+ üst) ile kanonik adres — sayfa katmanında bir fazla 308 sıçraması yok.
+        const k = kategoriArgumanlari(item.id, { slug: item.urlSlug ?? item.id, ustSlug: item.parentSlug })
+        router.push(Routes.category(k.slug, k.subSlug))
+    }, [router, item.id, item.urlSlug, item.parentSlug, Routes])
 
     const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
         e.stopPropagation() // Sadece BU kart hover alsın, arkadakiler almasın
@@ -502,12 +510,11 @@ const OrbitalCard: React.FC<{
                     style={{ pointerEvents: 'none', transition: 'opacity 0.5s', opacity: 1 }}
                 >
                     <div
-                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg"
+                        className="text-xs md:text-sm font-semibold whitespace-nowrap px-3 py-1.5 rounded-lg text-white"
                         style={{
                             background: 'rgba(0,0,0,0.85)',
                             backdropFilter: 'blur(8px)',
                             border: `1px solid ${hovered ? CONFIG.glowColor : 'rgba(34,211,238,0.3)'}`,
-                            color: '#fff',
                             textShadow: '0 1px 3px rgba(0,0,0,0.8)',
                         }}
                     >

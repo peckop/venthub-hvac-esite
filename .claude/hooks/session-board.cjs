@@ -10,11 +10,12 @@
  * böylece kullanıcı mesaj taşıyıcısı olmaktan kurtulur.
  *
  * stdin: { session_id, cwd, ... }
- * stdout: { hookSpecificOutput: { hookEventName, additionalContext } }
+ * stdout: { hookSpecificOutput: { hookEventName, additionalContext, sessionTitle? } }
+ *   sessionTitle = şeridin pencere adı ("Araç", "Ops"…; yalnız claim varsa ve source startup/resume/fork; REC-525, aşağıda).
  */
 const fs = require('fs')
 const path = require('path')
-const { spawn, execFileSync } = require('child_process')
+const { execFileSync } = require('child_process')
 
 function readStdin() {
   try { return fs.readFileSync(0, 'utf8') } catch { return '' }
@@ -122,24 +123,274 @@ const source = input.source || 'startup'
  * Neden koparılmış: `git fetch` ağ işidir; oturum açılışını bekletmemeli. Çıktı
  * `~/.orion/registry-autosync.log`'a düşer.
  *
- * ⚠ `windowsHide: true` ŞART — ölçüldü (2026-08-27). Windows'ta `detached: true` ile başlatılan
- * çocuk süreç, `windowsHide` verilmezse KENDİ konsolunu alır: bir `conhost.exe` penceresi açılıp
- * kapanır. Görünür etkisi "her oturum açılışında bir pencere yanıp söndü" — Recep bunu bildirdi
- * ve teşhis sırasında ölçtük; o gün sayılan 18 pencerenin 1'i buydu (kalan 17 Antigravity MCP
- * config'inden, `npx`/çıplak komut → `.cmd` → `cmd.exe`; ayrı olarak onarıldı).
- * `stdio: 'ignore'` bunu ÖNLEMEZ — çıktıyı yutar, pencereyi değil.
+ * ⚠ PENCERE (ölçüldü 2026-08-27 ve 2026-09-29): `windowsHide: true` yalnız çocuğun KENDİ penceresini
+ * gizler. `detached` çocuk konsolsuzdur; içinden çalışan `git fetch` yeni konsol → Windows Terminal'de
+ * `git.exe` başlıklı pencere açar (her oturum açılışında ve compact bitişinde 3-4 pencere — Recep 09-29).
+ * Bu yüzden başlatma scripts/board/kopuk-baslat.cjs'ten geçer: çocuğun her child_process çağrısına
+ * `windowsHide` eklenir (REC-415). `detached: true` başka yerde YASAK; test zorlar.
  */
 try {
-  const child = spawn(process.execPath, [path.join(__dirname, '..', '..', 'scripts', 'board', 'registry-autosync.cjs')], {
-    detached: true,
-    stdio: 'ignore',
-    windowsHide: true,
-  })
-  child.unref()
+  require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs'))
+    .kopukBaslat(path.join(__dirname, '..', '..', 'scripts', 'board', 'registry-autosync.cjs'))
 } catch { /* senkron başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
 
-let context = `Oturum kimliğin: ${sid}\n`
-context += `Açılış türü (source): ${source}\n`
+/**
+ * Linear arşiv adımı (karar 187, REC-433): kapanmış ve 2 günden eski kayıtlar günde EN ÇOK BİR kez
+ * arşivlenir (Linear ücretsiz planı 250 kayıtta doluyor). Anahtar yoksa ya da bugün koşulduysa hiçbir
+ * şey başlatılmaz. Kopuk ve gizli süreç (REC-415), LLM yok, silme yok. Betik: scripts/board/linear-arsiv.cjs
+ */
+try {
+  const kopuk = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'kopuk-baslat.cjs'))
+  require(path.join(__dirname, '..', '..', 'scripts', 'board', 'linear-arsiv.cjs')).gunlukBaslat({
+    anahtar: process.env.LINEAR_API_KEY || '',
+    baslat: (betik, args) => kopuk.kopukBaslat(betik, args),
+  })
+} catch { /* arşiv başlatılamadıysa oturumu bloklama — bir sonraki açılışta tekrar denenir */ }
+
+/**
+ * ⭐ÇIKTI TAVANI (REC-433 alt işi, Ops 09-29; HARİTA 1.2 ölçümü). Bir SessionStart kancasının
+ * `additionalContext` çıktısı 10.000 karakteri aşınca bağlama YALNIZ ilk ~2.000 karakter + "Output too
+ * large" + dosya yolu girer. Ölçüldü (bu kanca, compact): 11.458 karakter; durum bloğu ve son konuşma
+ * dökümü büyüdükçe 21–39 KB'a çıktı ve Recep'in aynen sözü pencereye HİÇ girmedi.
+ *
+ * Çözüm: çıktı BÖLÜMLERDEN kurulur, her bölümün tam metni + tek satırlık işaretçisi (ozet) vardır.
+ * Toplam TOPLAM_TAVAN'ı aşarsa en az önemli bölümden başlayarak tam metin işaretçiye çevrilir.
+ * Öncelik 0 (kimlik) hiçbir zaman küçültülmez. Bölüm başına da kendi tavanı vardır (DURUM_TAVAN,
+ * `enjeksiyonKisa`), yani tipik çıktı tavanın çok altında kalır; koruma yalnız sigortadır.
+ * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
+ */
+// VH_SESSIONSTART_TOPLAM_TEST yalnız kapı testindedir (daralma yolunu zorlar); üretimde ayarlı olmaz.
+// let: yalnız OPS rolünde departman haritası kısa özetinin uzunluğu kadar genişler (HRT-29; bölüm küçülmez, bkz. haritaBolumuEkle),
+// ama genişleme MUTLAK_TAVAN'ı aşamaz: kancanın kendi sınırı 10.000'dir; 9.000 + 1.855 = 10.855 compact açılışında kırpılıyordu
+// (OPS denetimi, #1690 bulgu 1: ölçülen 10.719). Taşan pay öncelik 0 olmayan bölümlerden (durum, döküm) orantılı alınır.
+let TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
+const MUTLAK_TAVAN = 9900
+const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
+const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
+const bolumler = []
+/**
+ * oncelik: küçük = vazgeçilmez (0 = asla küçülmez). ozet: bütçe aşılınca tam metnin yerine geçen tek satır.
+ * daralt(n): (isteğe bağlı) bölümü ~n karaktere DARALTAN işlev — durum bloğu ve Recep'in sözü için: bütçe
+ * aşılınca bunlar toptan işaretçiye çevrilmez, ORANTILI daralır (ajan kör kalmasın; Recep endişesi 09-29).
+ */
+function bolum(ad, oncelik, tam, ozet = '', daralt = null) {
+  if (tam) bolumler.push({ ad, oncelik, tam, ozet, daralt })
+}
+/**
+ * Bölümleri EKLEME sırasıyla birleştirir. Tavan aşılırsa SIRAYLA:
+ *  1) en önemsiz bölümler (öncelik ≥4: yöntem, pano, filo, notlar) işaretçiye çevrilir;
+ *  2) hâlâ aşıyorsa `daralt`ı olan bölümler (durum + Recep sözü) taşma payı kadar ORANTILI daraltılır;
+ *  3) hâlâ aşıyorsa: önce daraltılamayan bilgi satırları, EN SON durum + Recep sözü işaretçiye çevrilir.
+ * (Ölçüldü 09-29 CI: durum 4.500 + döküm 3.600 en kötü durumda 9.000'i aşıyor ve eski sigorta Recep'in
+ * sözünü BÜTÜNÜYLE işaretçiye çeviriyordu — 2. adım bunu önler.)
+ */
+function birlestir() {
+  const kullan = bolumler.map((b) => b.tam)
+  const topla = () => kullan.reduce((n, m) => n + m.length, 0)
+  const sira = bolumler.map((b, i) => i).sort((a, b) => bolumler[b].oncelik - bolumler[a].oncelik)
+  for (const i of sira) {
+    if (topla() <= TOPLAM_TAVAN) break
+    if (bolumler[i].oncelik >= 4) kullan[i] = bolumler[i].ozet
+  }
+  const asim = topla() - TOPLAM_TAVAN
+  if (asim > 0) {
+    const dar =sira.filter((i) => bolumler[i].daralt && bolumler[i].oncelik > 0 && kullan[i] === bolumler[i].tam)
+    const uzunluk = dar.reduce((n, i) => n + kullan[i].length, 0)
+    for (const i of dar) {
+      const pay = Math.ceil((asim * kullan[i].length) / uzunluk)
+      kullan[i] = bolumler[i].daralt(Math.max(0, kullan[i].length - pay)) || kullan[i]
+    }
+  }
+  // 3) Hâlâ aşıyorsa: ÖNCE daraltılamayan bilgi satırları (compact kolu, şerit, tazelik, posta…) işaretçiye, durum bloğu
+  //    ve Recep'in sözü (daralt'lı bölümler) EN SON. Eski sıra yalnız öncelik numarasına bakıyordu; ana ağaç bayatken
+  //    tazelik satırı uzayınca Recep'in sözü toptan düşüyordu (ortama bağlı, 09-29'da bir koşumda görüldü).
+  const sonSira = [...sira].sort(
+    (a, b) => (bolumler[a].daralt ? 1 : 0) - (bolumler[b].daralt ? 1 : 0) || bolumler[b].oncelik - bolumler[a].oncelik,
+  )
+  for (const i of sonSira) {
+    if (topla() <= TOPLAM_TAVAN) break
+    if (bolumler[i].oncelik === 0) continue
+    kullan[i] = bolumler[i].ozet
+  }
+  let metin = kullan.join('')
+  if (metin.length > TOPLAM_TAVAN) {
+    metin = metin.slice(0, TOPLAM_TAVAN - 90) + '\n…(SessionStart tavani: cikti kirpildi — durum dosyasini ve panoyu ELLE oku)\n'
+  }
+  return metin
+}
+/** Uzun metni baş + son parça olarak kısaltır (durum bloğunda en yeni satırlar sonda). */
+function kes(metin, tavan, yol) {
+  if (metin.length <= tavan) return metin
+  const bas = Math.floor(tavan * 0.4)
+  const son = tavan - bas
+  return (
+    metin.slice(0, bas) +
+    `\n…(KIRPILDI: ${metin.length - tavan} karakter — tamamini OKU: ${yol})\n` +
+    metin.slice(-son)
+  )
+}
+
+/**
+ * Pano özetini kısaltır: her şeritte şerit adı + pencere adı + kimlik etiketi kalır, glob listesi ilk ikisine
+ * iner (ölçüldü: dört şeritte glob listesi ~2.000 karakterdi; kimlik ve şerit adı asıl bilgi).
+ * Biçim `  · LANE (ad) — glob, glob, … [sid, N dk önce]`; tutmayan satır olduğu gibi (en çok 200 karakter).
+ */
+function kisaPano(ozet) {
+  return String(ozet)
+    .split('\n')
+    .map((satir) => {
+      const m = /^(\s*·\s+.+?)\s+—\s+(.*?)(\s*\[[^\]]*\])?\s*$/.exec(satir)
+      if (!m) return satir.length > 200 ? satir.slice(0, 200) + '…' : satir
+      const globlar = m[2].split(/,\s*/)
+      const gosterilen = globlar.slice(0, 2).join(', ')
+      const fazla = globlar.length > 2 ? ` (+${globlar.length - 2})` : ''
+      return `${m[1]} — ${gosterilen}${fazla}${m[3] || ''}`
+    })
+    .join('\n')
+}
+
+bolum('kimlik', 0, `Oturum kimliğin: ${sid}\nAçılış türü (source): ${source}\n`)
+
+/**
+ * ⭐ROL KARTI SATIRI (REC-433 Faz 1.2, Ops 09-29): pencere açılırken kendi rolünü, yetkisini ve sınırını
+ * bilsin — "hatırlayan pencereye" bağlı kalmasın. Kart HARİTA'nın üreticisinden (`scripts/belge/
+ * rol-karti-uret.cjs --ozet <ROL>`, tek satır ≤300 karakter; tam kart docs/roller/<ROL>.md) gelir.
+ * Rol = pano şeridi (claim), yoksa `CC_LANE` ortam değişkeni. FAIL-OPEN: üretici yok/rol yok/hata →
+ * satır yine basılır ("ROL KARTI:" her zaman görünür), ama bilgi yerine sebep yazılır; oturum bloklanmaz.
+ * Öncelik 0: asla işaretçiye çevrilmez (300 karakterlik tek satır bütçeyi zorlamaz).
+ */
+let rolSeridi = process.env.CC_LANE || ''
+function rolKartiSatiri(lane) {
+  const rol = String(lane || '').trim().toUpperCase()
+  if (!rol) return 'ROL KARTI: (bu oturumun seridi/rolu bilinmiyor — serit talep et ya da docs/roller/ altina bak)\n'
+  try {
+    // VH_ROL_KARTI_URETICI yalnız test içindir (kapı sahte üreticiyle koşar); üretimde ayarlı olmaz.
+    const uretici = process.env.VH_ROL_KARTI_URETICI ||
+      path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
+    if (!fs.existsSync(uretici)) return `ROL KARTI: ${rol} (kart uretici bu agacta yok — docs/roller/${rol}.md varsa oku)\n`
+    const ozet = execFileSync(process.execPath, [uretici, '--ozet', rol], {
+      encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'],
+    }).replace(/\s+/g, ' ').trim()
+    if (!ozet) return `ROL KARTI: ${rol} (bu rol icin kart yok — docs/roller/ altina bak)\n`
+    return `ROL KARTI: ${rol} — ${ozet} (tamami: docs/roller/${rol}.md)\n`
+  } catch (e) {
+    return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
+  }
+}
+/**
+ * ⭐PENCERE ADI = ŞERİT ADI (REC-525, 2026-09-30). `hookSpecificOutput.sessionTitle` `/rename` ile AYNI etkidir
+ * (belge: code.claude.com/docs/en/hooks). Pencereleri IDE eklentisi açıyor, `--name` bayrağı yok ve her açılış
+ * `--resume=<sid>`; ad verilmezse pencereler `venthub-hvac-72` gibi anlamsız adlarla açılır ve şerit ↔ pencere
+ * eşlemesi (SendMessage) karışır (REC-404). Ad oturumla KALICIdır: bir kez verilince sonraki resume'lar da taşır.
+ *
+ * KURALLAR:
+ *  · ELLE VERİLMİŞ FARKLI AD EZİLMEZ (ORTA-1): belge (SessionStart girdisi) `session_title` alanını verir — "oturum
+ *    başlığı zaten ayarlıysa (--name, /rename)". Dolu VE tablodaki adla farklıysa alan HİÇ eklenmez. Boşsa ya da
+ *    tablodaki adla AYNIYSA (harf ve Türkçe harf farksız: "Araç" = "arac" = "ARAÇ") kanonik ad YAZILIR (REC-525 takip:
+ *    restart/resume'da harness dökümdeki /rename adını geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri
+ *    yazmak sonucu değiştirmez, kaydı düzeltir);
+ *  · yalnız pano talebi varsa; talep yoksa alan HİÇ eklenmez (`CC_LANE` yedeği de kullanılmaz: ortam değişkeni bir
+ *    ad taahhüdü değil, rol ipucudur). Talep BAYAT (TTL 4 saat, makine kapanıp sabah resume) olsa da KENDİ sid'inin
+ *    talebiyse ad verilir (ORTA-3, `board.tumTalepler`; başka pencerenin talebi karışmaz); BIRAKILMIŞ talep ad vermez;
+ *  · ÇAKIŞMA (ORTA-2): aynı adı verecek başka CANLI oturum varsa (aynı şerit ya da aynı ad) alan eklenmez —
+ *    iki pencere aynı adı taşırsa SendMessage to:"Araç" belirsizleşir;
+ *  · yalnız startup/resume/fork — belge clear ve compact'ta alanı yok sayar, gereksiz çıktı basılmaz;
+ *  · ad ÇIPLAK pano yazımı (ARAC) değil, Recep'in pencereleri elle verdiği İNSAN adıdır ("Araç", "Ops", "Yetenek",
+ *    "Harita" — Recep 09-30). Eşleme TEK KAYNAKTA: scripts/board/pencere-adlari.cjs (`ad(serit)` + `TABLO`); başka
+ *    üreticiler de oradan alır, burada kopya YOK. Tabloda olmayan şerit → ilk harf büyük, kalanı küçük (Türkçe
+ *    karakter ÜRETİLMEZ, tahmin yok); string değil/boş/`lane` yer tutucusu → '' (alan eklenmez);
+ *  · FAIL-OPEN: modül/hesap hatası → '' (alan yok, mevcut çıktı aynen); kanca `claude agents` ÇAĞIRMAZ (yavaşlatır).
+ *
+ * BİLİNEN SINIRLAR (dürüst liste):
+ *  · claim'siz YENİ pencere ilk açılışta ad ALMAZ: o an pano talebi yoktur. Şerit talep edilince pencere ad alır
+ *    yalnız SONRAKİ açılışta (resume/startup/fork); pencere içinde anlık yeniden adlandırma bu kancanın işi değil;
+ *  · fork'ta yeni oturum YENİ sid alır ve claim'i yoktur → fork ilk açılışta ad almaz (belge fork'ta alanı uygular,
+ *    ama pano kimlik bağı olmadan şerit bilinemez);
+ *  · claim ile pencere adı bağı yalnız sid'dir; iki pencere aynı şeridi talep ederse ikisi de ad ALMAZ (ORTA-2 seçimi:
+ *    belirsiz ad, adsızlıktan kötü).
+ */
+const PENCERE_ADI_KAYNAKLARI = new Set(['startup', 'resume', 'fork'])
+let pencereAdi = ''
+/**
+ * Bu pencerenin adı ('' = alan eklenmez). Sırayla: kendi sid'inin talebi (bayat dahil, bırakılmış hariç; ORTA-3) →
+ * tablodan ad → mevcut `session_title` dolu VE tablodaki adla FARKLIYSA ezme (Recep'in verdiği başka ad, ORTA-1);
+ * boş ya da aynıysa (harf/Türkçe harf farksız, `ayniMi`) kanonik adı YAZ (REC-525 takip: restart/resume'da harness
+ * dökümdeki adı geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri yazmak sonucu değiştirmez) →
+ * başka canlı oturum aynı adı alıyor/taşıyor mu (ORTA-2). Her hata → ''.
+ */
+function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
+  try {
+    const benim = board.tumTalepler().find((c) => c.sid === kendiSid)
+    if (!benim) return ''
+    const modul = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const ad = modul.ad(benim.lane)
+    if (!ad) return ''
+    if (typeof mevcutAd === 'string' && mevcutAd.trim() && !modul.ayniMi(mevcutAd, ad)) return ''
+    const digerleri = live.filter((c) => c.sid !== kendiSid)
+    if (digerleri.some((c) => modul.ad(c.lane) === ad)) return ''
+    const adlar = board.pencereAdlari()
+    if (digerleri.some((c) => modul.ayniMi(adlar.get(c.sid), ad))) return ''
+    return ad
+  } catch {
+    return '' // modül/pano hatası: alan eklenmez, mevcut çıktı aynen (fail-open)
+  }
+}
+
+/**
+ * ⭐DEPARTMAN HARİTASI (HRT-29, OPS-27 eki): rol OPS ise açılışta 16 departmanın görev + dosya alanı + açılış yolu kısa özeti
+ * gelir (OPS işi neye göre dağıttığını bilsin; YTN-13 olayı). Özet `rol-karti-uret.cjs --harita-ozet`ten (≤2 KB, üretilmiş
+ * tam harita docs/roller/DEPARTMAN-HARITASI.md). Bölüm KÜÇÜLMEZ (öncelik 0) ve tavan onun uzunluğu kadar genişler: yoksa OPS'un
+ * büyük durum bloğu haritayı hep işaretçiye iterdi. FAIL-OPEN: üretici yok/hata → yalnız işaretçi satırı; oturum bloklanmaz.
+ */
+const HARITA_OZET_CALISMA_SINIRI = 2100 // üretici sınırı 2.048 bayt (HARITA_OZET_SINIRI); koşu anında 52 bayt pay
+function haritaIsaretcisi(sebep) {
+  return 'DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md (16 departman: gorev, dosya alani, acilis yolu) — ' +
+    `kisa ozet uretilemedi (${sebep}), dosyayi oku.\n`
+}
+function haritaBolumuEkle() {
+  if (String(rolSeridi || '').trim().toUpperCase() !== 'OPS') return
+  let tam
+  try {
+    const uretici = process.env.VH_ROL_KARTI_URETICI ||
+      path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
+    if (!fs.existsSync(uretici)) {
+      tam = haritaIsaretcisi('uretici bu agacta yok')
+    } else {
+      // maxBuffer: kaçak üretici bağlamı değil yalnız bu çağrıyı patlatır (ENOBUFS → işaretçi).
+      const ozet = execFileSync(process.execPath, [uretici, '--harita-ozet'], {
+        encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 16 * 1024,
+      })
+      if (!ozet || !ozet.trim()) tam = haritaIsaretcisi('uretici bos cikti verdi')
+      else if (Buffer.byteLength(ozet, 'utf8') > HARITA_OZET_CALISMA_SINIRI) {
+        tam = haritaIsaretcisi(`ozet ${Buffer.byteLength(ozet, 'utf8')} bayt > ${HARITA_OZET_CALISMA_SINIRI} sinir`)
+      } else tam = ozet.endsWith('\n') ? ozet : ozet + '\n'
+    }
+  } catch (e) {
+    tam = haritaIsaretcisi(`${(e && (e.code || e.message)) || 'bilinmeyen'}`)
+  }
+  TOPLAM_TAVAN = Math.min(TOPLAM_TAVAN + tam.length, Math.max(TOPLAM_TAVAN, MUTLAK_TAVAN))
+  bolumler.splice(2, 0, { ad: 'departman-haritasi', oncelik: 0, tam, ozet: haritaIsaretcisi('tavan') })
+}
+
+/**
+ * Pano talebi yokken rol ipucu: pencere başlığı tablodaki görünen adla (Türkçe katlamalı) eşleşirse o şerit ("Ops" → OPS).
+ * Claim yoksa OPS açılışta "ROL KARTI: bilinmiyor" görüyordu (HRT-29 kök sebep 1). Eşleşme yoksa/hata → '' (rol değişmez).
+ */
+function rolBasliktan(baslik) {
+  try {
+    const m = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const satir = m.TABLO.find((s) => m.ayniMi(baslik, s[1]))
+    return satir ? satir[0] : ''
+  } catch {
+    return ''
+  }
+}
+
+/** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
+function rolBolumuEkle() {
+  const satir = rolKartiSatiri(rolSeridi)
+  bolumler.splice(1, 0, { ad: 'rol-karti', oncelik: 0, tam: satir, ozet: satir })
+}
 
 // RESUME UYANDIRMA REFLEKSI (Recep 08-22 onayi: yalniz otomatik uyandirma). Makine kapanip
 // acildiginda oturumlar 'resume' ile geri gelir ama gozcu/cron olabilir; ekip SAGIR acilir.
@@ -148,7 +399,7 @@ context += `Açılış türü (source): ${source}\n`
 // Bu kanca ajan degil harness'tir; mesaji ATAMAZ — yalnizca lidere TALIMAT yazar, mesaji ajan atar.
 if (source === 'resume') {
   const lider = /audit|ops/i.test(process.env.CC_LANE || '') || sid === 'cb0467f1-f1a3-437d-bc15-52c0bd90feb3'
-  context +=
+  bolum('resume', 1,
     // ⛔REC-328: "uclunu yeniden kur" talimati kaldirildi (gozcu/cron EMEKLI).
     // Resume'da gercekten kaybolan sey MEKANIZMA degil, KIMIN NEREDE OLDUGU bilgisidir.
     // KARAR 53 (2026-09-19): "gozcu/cron KURULMAZ" GENEL YASAK DEGILDI — kota sikisikken
@@ -159,8 +410,9 @@ if (source === 'resume') {
       ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele ve ' +
         'uyuyan her birine SendMessage at: "makine dondu, hangi isteydin, serit talebini tazele". ' +
         'Bekleme yapma; mesaj tek kanaldir.\n'
-      : 'Serit talebini TAZELE (canlilik atistan gelir) ve liderin uyandirma mesajini bekleme — ' +
-        'hangi iste oldugunu SendMessage ile lidere yaz.\n')
+      : 'Serit talebin acilista (startup/resume) OTOMATIK yenilenir (claim-yenile); yenilenmediyse pano blogu ' +
+        '"TALEP EDILMEMIS" ya da UYARI basar — o zaman elle claim al. Liderin uyandirma mesajini bekleme — ' +
+        'hangi iste oldugunu SendMessage ile lidere yaz.\n'))
 }
 
 // COMPACT DONUSU (REC-86 Faz 1). Bu kol `resume`den AYRI: resume'da makine dondu ve MEKANIZMA
@@ -172,25 +424,54 @@ if (source === 'resume') {
 // dayaniyordu. Burasi onu MEKANIZMAYA cevirir: dosyanin son blogunu ajanin onune KOYAR, cunku
 // "oku" demek ile okutmak ayni sey degil.
 if (source === 'compact') {
-  context +=
+  bolum('compact-kol', 1,
     '⭐COMPACT DONUSU — baglamin kirpildi. ILK GORUNUR SATIRIN "bana ulasan son girdin: <ozet>" ' +
     'olacak (gecis aninda yazilan mesaj YUTULABILIR; teslimati garanti edemeyiz ama kaybi 1 turda ' +
-    'TESPIT ettirebiliriz). Durum dosyanin son blogu asagida — okumadan is baslatma.\n'
+    'TESPIT ettirebiliriz). Durum dosyanin son blogu asagida — okumadan is baslatma.\n')
   try {
     const kapi = require(path.join(__dirname, 'precompact-durum-kapisi.cjs'))
-    const d = kapi.durumDosyasiBul(sid)
+    // transcript_path verilir: proje dizini sid taramasına değil, oturumun kendi kaydına dayanır (döküm koluyla aynı çözümleme).
+    const d = kapi.durumDosyasiBul(sid, input.transcript_path)
     if (d) {
       const yasDk = Math.round((Date.now() - d.mt) / 60000)
-      context += `DURUM DOSYAN: ${d.ad} (${yasDk} dk once guncellenmis)\n`
-      context += '--- SON BLOK ---\n' + kapi.sonBlok(d.tam) + '\n--- SON BLOK BITTI ---\n'
+      const baslik = `DURUM DOSYAN: ${d.ad} (${yasDk} dk once guncellenmis)\n`
+      const sonBlok = kapi.sonBlok(d.tam)
+      const durumMetni = (tavan) => baslik + '--- SON BLOK ---\n' + kes(sonBlok, tavan, d.tam) + '\n--- SON BLOK BITTI ---\n'
+      const durumTam = durumMetni(DURUM_TAVAN)
+      bolum('durum', 2, durumTam,
+        baslik + `(son blok tavan yuzunden yok — okumadan is baslatma: ${d.tam})\n`,
+        // Toplam tavan aşılırsa toptan işaretçi değil, taşma payı kadar daral (baş + son parça yine kalır).
+        (n) => durumMetni(Math.max(1200, Math.min(sonBlok.length, DURUM_TAVAN) - (durumTam.length - n))))
     } else {
-      context +=
+      bolum('durum', 2,
         '⚠DURUM DOSYAN BULUNAMADI — compact oncesi yazilmamis demektir. Ne kaybettigini ' +
-        'bilmiyorsun; ilerlemeden once panoyu ve son PR/commit durumunu OLC.\n'
+        'bilmiyorsun; ilerlemeden once panoyu ve son PR/commit durumunu OLC.\n')
     }
   } catch (e) {
     // Kanca oturumu bloklamaz ama sessiz de gecmez: sebep bilinmeli.
-    context += `⚠durum dosyasi enjeksiyonu basarisiz (${(e && (e.code || e.message)) || 'bilinmeyen'}) — ELLE oku.\n`
+    bolum('durum', 2, `⚠durum dosyasi enjeksiyonu basarisiz (${(e && (e.code || e.message)) || 'bilinmeyen'}) — ELLE oku.\n`)
+  }
+  // SON KONUŞMA DÖKÜMÜ (Ops 09-28): Recep'in son mesajları AYNEN — özet onları değiştirmiş olabilir.
+  // Kısa biçim (REC-433): yalnız Recep mesajları, mesaj başına ve toplam tavanlı; cevaplar dosyada.
+  try {
+    const kapi = require(path.join(__dirname, 'precompact-durum-kapisi.cjs'))
+    const dokum = require(path.join(__dirname, 'son-konusma-dokumu.cjs'))
+    const proje = kapi.projeDiziniBul(sid, input.transcript_path)
+    const memoryDir = proje && path.join(proje, 'memory')
+    const dokumMetni = (tavan) => {
+      const m = memoryDir && dokum.enjeksiyonKisa(memoryDir, sid, { tavan })
+      return m ? '--- SON KONUSMA (ozetsiz; Recep sozu burada AYNEN) ---\n' + m + '\n--- SON KONUSMA BITTI ---\n' : ''
+    }
+    const dokumTam = dokumMetni(DOKUM_TAVAN)
+    bolum('son-konusma', 3,
+      dokumTam || '⚠son konusma dokumu YOK — PreCompact kancasi kosmamis olabilir; ozetle yetin, Recep sozunu ONA SOR.\n',
+      dokumTam
+        ? `SON KONUSMA dokumu (Recep sozu AYNEN): ${dokum.dosyaYolu(memoryDir, sid)} — ilk is OKU.\n`
+        : '',
+      // Toplam tavan aşılırsa Recep'in sözü toptan işaretçiye çevrilmez: en eski mesajlar düşer, en yeniler AYNEN kalır.
+      dokumTam ? (n) => dokumMetni(Math.max(1000, DOKUM_TAVAN - (dokumTam.length - n))) : null)
+  } catch (e) {
+    bolum('son-konusma', 3, `⚠son konusma dokumu okunamadi (${(e && (e.code || e.message)) || 'bilinmeyen'}).\n`)
   }
 }
 
@@ -229,15 +510,13 @@ try {
     const ilk = String((kayitlar[0] || {}).ts || '').slice(0, 10)
     const tasiyicisiz = kayitlar.filter((k) => k.sebep === 'tasiyici-yok').length
     const dosya = kayitlar.reduce((a, k) => a + (Number(k.dosya) || 0), 0)
-    context +=
+    // Tek satır (REC-433 tavanı): kabul edilmiş eksik GÖRÜNÜR kalır, üç satırlık gerekçe düşer.
+    bolum('belgesiz', 5,
       '⚠COMPANION BELGESIZ: ' + kayitlar.length + ' commit belge URETMEDI' +
-      (ilk ? ' (ilk: ' + ilk + ')' : '') + ' — ' + tasiyicisiz + ' tanesi TASIYICISIZLIK, ' +
-      'toplam ' + dosya + ' dosya belgesiz.\n' +
-      '  Tasiyici KAPALI ve bu RECEP IN KARARI (2026-08-31, "kapali kalsin") — ariza DEGIL, ' +
-      'KABUL EDILMIS EKSIK.\n' +
-      '  Bu satirin isi eksigi gorunur tutmak. Sayi durmadan buyuyorsa karar Recep e YENIDEN ' +
-      'goturulur; kendi basina ACMA.\n' +
-      (bozuk ? '  UYARI: defterde ' + bozuk + ' bozuk satir atlandi.\n' : '')
+      (ilk ? ' (ilk: ' + ilk + ')' : '') + ', ' + tasiyicisiz + ' tasiyicisizlik, ' + dosya + ' dosya — ' +
+      'Tasiyici KAPALI = RECEP IN KARARI (08-31), kabul edilmis eksik; sayi surekli buyuyorsa Recep e yeniden goturulur, kendi basina ACMA.' +
+      (bozuk ? ' (defterde ' + bozuk + ' bozuk satir atlandi)' : '') + '\n',
+      '⚠COMPANION BELGESIZ: ' + kayitlar.length + ' commit (kabul edilmis eksik, Recep karari 08-31).\n')
   }
 } catch {
   /* defter modülü yok/bozuk: oturum açılışı bundan etkilenmez */
@@ -245,13 +524,34 @@ try {
 
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
+  /**
+   * ⭐CLAIM YENİLEME (Ops 09-30): startup/resume'da bu oturumun KENDİ süresi dolmuş talebi varsa aynı şerit + aynı
+   * desenlerle yeniden alınır; canlı başka oturum aynı şeridi/çakışan deseni tutuyorsa ALINMAZ, tek satır UYARI basılır.
+   * `liveClaims()` çağrısından ÖNCE koşar: yenilenen talep aşağıda `mine` olarak görünür (şerit satırı, rol kartı, ad).
+   * clear/compact'ta dokunulmaz. FAIL-OPEN: yenile() asla fırlatmaz; hata → alan yok, oturum açılışı aynen (hata stderr'e).
+   * Mantık ve kurallar: scripts/board/claim-yenile.cjs (kapı: claim-yenile.test.ts).
+   */
+  try {
+    const y = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'claim-yenile.cjs')).yenile(board, sid, { source })
+    if (y.satir) bolum('claim-yenile', 1, y.satir, y.islem === 'yenile' ? 'CLAIM YENILENDI (pano: board.cjs who)\n' : '⚠CLAIM YENILENMEDI (canli cakisma; board.cjs who)\n')
+    if (y.islem === 'hata') process.stderr.write(`[session-board] claim yenileme atlandi (${y.sebep}) — oturum acilisi etkilenmedi.\n`)
+  } catch (e) {
+    process.stderr.write(`[session-board] claim yenileme modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — oturum acilisi etkilenmedi.\n`)
+  }
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
+  if (mine && mine.lane) rolSeridi = mine.lane
+  // compact/clear girdisinde session_title YOK (belge: yalnız startup/resume/fork); pid kaydındaki ad (`~/.claude/sessions`)
+  // her açılış türünde okunur. Rol ipucudur, ad taahhüdü değil; claim'li pencere bunu kullanmaz (yukarıdaki `mine.lane`).
+  // Niyet: pano talebi olmayan HER rolde (9 tablo rolü) kart gelsin — yalnız OPS'ta değil.
+  if (!rolSeridi) rolSeridi = rolBasliktan(input.session_title || board.pencereAdlari().get(sid))
+  pencereAdi = pencereAdiKarari(board, live, sid, input.session_title)
 
-  context += mine
+  bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
     : `Şeridin: TALEP EDİLMEMİŞ. Çok dosyalı bir işe başlamadan önce şeridi al:\n` +
-      `  node scripts/board/board.cjs claim --sid ${sid} --lane <ad> --globs "src/**"\n`
+      `  node scripts/board/board.cjs claim --sid ${sid} --lane <ad> --globs "src/**"\n`,
+    mine ? `Şeridin: ${mine.lane}\n` : 'Şeridin: TALEP EDİLMEMİŞ (board.cjs claim)\n')
 
   // MEKANİZMA (T115-VH) — oturumun İLK işi.
   //
@@ -286,34 +586,37 @@ try {
   // yalnizca artik BASKA bir seyi kanitliyor: o gun kaybedilen sey, kanitlanamayan bir
   // katmana guvenilmesiydi. Cozum katmani daha iyi olcmek degil, ONA IHTIYAC DUYMAMAK oldu.
   // Cetvel: docs/standards/fleet-mechanism-standard.md.
-  context +=
-    'FILO ILETISIMI: dogrudan mesaj (SendMessage) + is bitince notify_when_idle. ' +
-    'Pano = claim (dosya sahipligi) + canlilik; NOT KUTUSU DEGIL. Emir = Linear kaydi ' +
-    '(Recep sozu ONCE kayda yazilir, sonra serit emri alir). Eski gozcu uclusu EMEKLI (REC-328); ' +
-    'zamanlayici/cron/loop gerekiyorsa ONCE Recep ile konus (karar 53). ' +
-    'POSTA KUTUSU (karar 54): kapali pencereye mesaj = mailbox_manage send, alici = TAM oturum ' +
-    'numarasi (asagidaki panoda); kisa 8 hane SESSIZCE duser. Kutuya sir ve Recep onayi yazilmaz.\n'
+  // Kısa biçim (REC-433 tavanı): ayrıntı docs/standards/fleet-mechanism-standard.md'de.
+  bolum('filo', 4,
+    'FILO ILETISIMI: dogrudan mesaj (SendMessage) + is bitince notify_when_idle; kapali pencereye ' +
+    'mailbox_manage send (alici = TAM oturum kimligi, kisa 8 hane SESSIZCE duser). Pano = claim + canlilik, ' +
+    'NOT KUTUSU DEGIL. Emir = Linear kaydi. Zamanlayici/cron/loop ONCE Recep ile (karar 53). ' +
+    'Kutuya sir ve Recep onayi yazilmaz. Ayrinti: docs/standards/fleet-mechanism-standard.md\n',
+    'FILO: SendMessage + notify_when_idle; emir = Linear; ayrinti fleet-mechanism-standard.md\n')
 
-  context += board.summary(sid) + '\n'
+  bolum('pano', 5, kisaPano(board.summary(sid)) + '\n', 'PANO: node scripts/board/board.cjs who\n')
 
   const notes = board.notesFor(sid, mine && mine.lane)
   if (notes.length > 0) {
-    context += 'OKUNMAMIŞ NOTLAR:\n' +
+    const tam = 'OKUNMAMIŞ NOTLAR:\n' +
       notes.map(n => `  · ${String(n.sid).slice(0, 8)} → ${n.to || 'herkes'}: ${n.text}`).join('\n') + '\n'
+    // Öncelik 4: Ops sırası kimlik → durum bloğu → Recep sözü → gerisi; notlar Recep sözünden ÖNCE küçülür.
+    bolum('notlar', 4, tam.length > 800 ? tam.slice(0, 750) + `\n…(${notes.length} not; kirpildi — panoyu oku)\n` : tam,
+      `OKUNMAMIŞ NOTLAR: ${notes.length} adet — panoyu oku\n`)
   }
 } catch (e) {
   // Pano okunamazsa oturum yine de açılır — koordinasyon katmanı fail-open (bkz. lane-guard).
-  context += `(pano okunamadı: ${e && e.message})\n`
+  bolum('pano-hata', 5, `(pano okunamadı: ${e && e.message})\n`)
 }
 
 // ANA AĞAÇ TAZELİĞİ (REC-345, karar 44 — ölçüldü 2026-09-17): kancalar/CLAUDE.md/.mcp.json ana
 // ağaçtan yüklenir; ana ağaç 50 commit gerideyken dört merge'lü düzenek hiçbir pencerede etkin
 // değildi ve hiçbir kapı görmedi. Güncelse satır basılmaz (sessizlik kuralı). Ağ beklemez.
 try {
-  context += require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'))
-    .acilisSatiri(input.cwd || process.cwd())
+  bolum('tazelik', 1, require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-agac-tazelik.cjs'))
+    .acilisSatiri(input.cwd || process.cwd()))
 } catch (e) {
-  context += `⚠ana agac tazelik modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — tazelik OLCULMEDI.\n`
+  bolum('tazelik', 1, `⚠ana agac tazelik modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — tazelik OLCULMEDI.\n`)
 }
 
 // SAGE DOSYA DERSİ İŞARETLERİ (Recep 2026-09-18: "gün içinde defalarca compact oluyor").
@@ -331,29 +634,31 @@ if (source === 'compact' || source === 'clear') {
 
 // YÖNTEM GÖSTERGESİ (T144-VH, Recep 08-21): ajan panoya baktığında cetveli de görsün —
 // tarayıcıda ayrı sayfa değil, bakılan yerin yanında. Öneri, dayatma değil; sapma yazılır.
-context += 'YÖNTEM CETVELİ (docs/standards/execution-method-standard.md): iş emrinde YÖNTEM: satırı ' +
-  'ZORUNLU, seçim SERBEST (ölç, seç, sapmayı bir cümleyle yaz). Kısa harita: günler süren sahipli prod-kapılı iş=ŞERİT · ' +
-  'çok-eksen salt-okuma ölçüm=Sonnet alt-ajan ×N · bağımsız çürütme/çok-eksen denetim=Workflow (emirde "workflow kullan") · ' +
-  'aynı değişiklik çok hedefe=maestro · geniş tarama=agy-orchestrate · plan→plan-challenger (migration/veri göçü ZORUNLU) · ' +
-  'PR=diff-review · tek dosya=elle. İkiz şerit açılmaz; canlı şerit tavanı 2-3.\n'
+// Kısa biçim (REC-433 tavanı): kısa harita cetvelin kendisinde; burada yalnız işaretçi.
+bolum('yontem', 6,
+  'YÖNTEM CETVELİ (docs/standards/execution-method-standard.md): iş emrinde YÖNTEM: satırı ZORUNLU, seçim ' +
+  'SERBEST (ölç, seç, sapmayı yaz); harita ve karar tablosu cetvelde.\n')
 
 // POSTA KUTUSU SAYACI (karar 54, 2026-09-21): açılışta kutuya bakılmazsa kapalı pencereye
 // bırakılan mesaj yine kaybolur. 0 → satır yok; ölçülemezse "ölçülemedi" satırı (temiz sayılmaz).
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
-const yaz = () =>
-  process.stdout.write(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: context,
-    },
-  }))
+const yaz = () => {
+  rolBolumuEkle()
+  haritaBolumuEkle()
+  const cikti = {
+    hookEventName: 'SessionStart',
+    additionalContext: birlestir(),
+  }
+  if (pencereAdi && PENCERE_ADI_KAYNAKLARI.has(source)) cikti.sessionTitle = pencereAdi
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: cikti }))
+}
 ;(async () => {
   try {
     const sayac = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'posta-kutusu-sayac.cjs'))
     const kok = path.join(__dirname, '..', '..')
-    context += sayac.acilisSatiri(await sayac.okunmamis(sid, { kok, zamanAsimiMs: 5000 }))
+    bolum('posta', 1, sayac.acilisSatiri(await sayac.okunmamis(sid, { kok, zamanAsimiMs: 5000 })))
   } catch (e) {
-    context += `⚠posta kutusu sayaci yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — kutu OLCULMEDI.\n`
+    bolum('posta', 1, `⚠posta kutusu sayaci yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — kutu OLCULMEDI.\n`)
   }
   yaz()
 })()

@@ -6,8 +6,9 @@ isletme yoktu; her parca elle kosuluyordu ve biri unutulunca defter bayat kaliyo
 SIRAYLA kosar, her adimi OLCER (baslik + olcum satiri), kirmizi adimi gizlemez, sonunda tek ekranlik gun-kapanisi belgesi
 + state.json kaydi birakir.
 
-Adimlar (numaralar sabit; kosum sirasi 1 2 3 4 5 6 8 7 11 9 12 10 — sinav (8) yol haritasindan (7) ONCE kosar ki 'belge'
-kanitlari taze olsun; Linear ayna (11) ve ekran (9) yol haritasindan sonra; 2. tur esitle (12) ekrandan sonra; state (10) en son):
+Adimlar (numaralar sabit; kosum sirasi 1 2 3 4 5 6 8 7 11 9 12 13 10 — sinav (8) yol haritasindan (7) ONCE kosar ki 'belge'
+kanitlari taze olsun; Linear ayna (11) ve ekran (9) yol haritasindan sonra; 2. tur esitle (12) ve belgeler defteri (13) ekrandan sonra;
+state (10) en son):
    1 pano_disa_aktar.py --gun 7        → <pano koku>/pano-olaylari-son7gun-<tarih>.md (ev dizini; ESKI TARIHLI kopya silinir,
                                          daha yeni tarihli kopya varsa dokunulmaz + KIRMIZI)
    2 konusma_gunlugu.py uret --gun     → <gunluk koku>/<dun>.md + <bugun>.md (Turkiye gunu); §10.6: kokteki 14 gunden eski gun
@@ -35,6 +36,10 @@ kanitlari taze olsun; Linear ayna (11) ve ekran (9) yol haritasindan sonra; 2. t
                                          kuyrugu + §4 defter + §5 yol haritasi/sinav/ayna + §6 CURUDU/uyari); SURE YAZILMAZ (ayni
                                          --simdi + ayni girdi → bayt-ayni); eski TARIHLI gun dosyalari silinir (tek kopya)
   12 proje_takip_sync.py esitle        (2. tur) — demet 11 (7/8/9 ciktilari) AYNI kapanista deftere gider (cetvel §10.3)
+  13 belge-defteri.cjs yukle           — BELGELER defteri (15 kaynak; scripts/belge/belge-defteri.cjs, REC-473): cikis 0 tam → `olc` ile
+                                         taze olculur · 1 oturum/ag olculemedi (hicbir sey yazilmadi, KIRMIZI) · 2 kismi (eski kaynaklar
+                                         korunur, KIRMIZI) · 3 --kuru; adim 5 auth KIRMIZI ise ATLANDI (kuru dahil, ag'a cikilmaz);
+                                         betik/node yok = KIRMIZI; `tara` (LLM) BAGLANMAZ
   10 state.json "gun_kapanisi"         — {damga, adimlar, seviye, sureler}; --kuru'da "gun_kapanisi_kuru" yazilir, kapiya damga
                                          BIRAKILMAZ (kuru kosum defteri esitlemez; eski kuru kaydi 'gun_kapanisi'den dusurulur)
 
@@ -46,7 +51,7 @@ Kurallar: calisma dizininden bagimsiz (repo koku = bu dosya/../..) · konsol utf
 (python alt betik 900 sn, esitle 1800 sn, notebooklm 180 sn; sinav haric) · cikis kodu + son 3 satir kaydedilir · depoya
 yazilan metin pano_disa_aktar sir suzgeci (lin_api_/authorization dahil) + makine yolu suzgeci (~/, ../Users/, depo koku)
 · ev dizini yollari depoya kok ADIYLA yazilir (<pano kökü>/…) · LINEAR_API_KEY hicbir yerde basilmaz · hata olan adim KIRMIZI,
-bagimsiz adimlar devam eder, bagimli adim "ATLANDI: sebep" · adim 10/12 ekrandan sonra KIRMIZI olursa ekrana satir EKLENIR.
+bagimsiz adimlar devam eder, bagimli adim "ATLANDI: sebep" · adim 10/12/13 ekrandan sonra KIRMIZI olursa ekrana satir EKLENIR.
 Cikis kodu: 0 hepsi yesil (yol haritasi/sinav KIRMIZI satirlari ekranda gorunur, adimi kirmizi yapmaz) · 2 HATA (arguman,
 --simdi kapisi, manifest yok) · 3 en az bir adim KIRMIZI.
 Acilis kapisi: scripts/nlm/acilis_kapisi.py — state.json gun_kapanisi.damga'yi okur; 24 saatten eskiyse KIRMIZI, gelecek
@@ -55,7 +60,7 @@ Cetvel: docs/standards/proje-takip-defteri-standard.md §10 (§10.3 esitleme her
 siniri — adim 2 arsivi, §10.7 bayatlik — adim 6 dogrulama yarisi, §10.8 durum sozcukleri — §1 'kalem' sutunu ve §6)
 """
 from __future__ import annotations
-import argparse, datetime as dt, glob, io, json, os, re, subprocess, sys, time
+import argparse, datetime as dt, glob, io, json, os, re, shutil, subprocess, sys, time
 from collections import Counter
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -71,6 +76,7 @@ PY = sys.executable
 NLM_ZAMAN = 180          # notebooklm list/delete + sinav oncesi 'ready' beklemesi
 ALT_ZAMAN = 900          # python alt betikler (sinav haric)
 ESITLE_ZAMAN = 1800      # proje_takip_sync esitle (kaynak yukleme)
+BELGE_ZAMAN = int(os.environ.get("VENTHUB_BELGE_ZAMAN") or 1800)  # belge-defteri.cjs yukle: 15 yukleme + 'hazir' bekleme (betigin kendi NLM_ZAMAN'i 900 sn; ustunde kal). Ortam degiskeni yalniz TEST icin
 BAYAT_GUN = 7            # Linear acik is bayatlik esigi (linear_disa_aktar §4 ile ayni)
 GUNLUK_PENCERE = 14      # cetvel §10.6
 AUTH_HATA = re.compile(r"Authentication expired|AUTH_REQUIRED|Not logged in|notebooklm login|login required", re.I)
@@ -82,8 +88,9 @@ REPO_DESEN = re.compile(r"[\\/]+".join(re.escape(p) for p in re.split(r"[\\/]", 
 ADIM_ADI = {1: "Pano disa aktarimi (son 7 gun)", 2: "Konusma gunlugu (dun + bugun; §10.6 arsiv)", 3: "Linear is dagilimi",
             4: "Linear Kararlar aynasi", 5: "Defter olc → esitle (1. tur)", 6: "Defter budama (yetim/eksik/mukerrer kaynak)",
             7: "Yol haritasi dogrula", 8: "Hafiza sinavi", 9: "Tek ekran (gun-kapanisi md)", 10: "state.json kaydi",
-            11: "Linear ayna (yol haritasi → Linear belge + depo aynasi)", 12: "Defter esitle (2. tur: demet 11)"}
-KOSUM_SIRASI = [1, 2, 3, 4, 5, 6, 8, 7, 11, 9, 12, 10]
+            11: "Linear ayna (yol haritasi → Linear belge + depo aynasi)", 12: "Defter esitle (2. tur: demet 11)",
+            13: "Belgeler defteri (belge-defteri.cjs yukle; REC-473)"}
+KOSUM_SIRASI = [1, 2, 3, 4, 5, 6, 8, 7, 11, 9, 12, 13, 10]
 KALEM = {"YESIL": "YAPILDI", "KIRMIZI": "AÇIK", "SIRADA": "YARIN", "ATLANDI": "ATLANDI"}   # cetvel §10.8 durum sozcukleri
 SERIT_SIRASI = ["URUN", "ALTYAPI", "OPS", "DESIGN", "Q-Validator"]
 RECEP = "Recep kapısı"
@@ -622,6 +629,41 @@ def adim12(c, a):
     a["durum"], a["olcum"] = "YESIL", f"{parca} · esitle: {n} demet yenilendi (demet 11 ayni kapanista defterde, §10.3)"
 
 
+def adim13(c, a):
+    """REC-473: BELGELER defteri (15 kaynak) her kapanista tazelenir. Sozlesme (REC-473 yorumu, HARITA):
+    yukle → cikis 0 tam · 1 oturum/ag olculemedi, HICBIR SEY yazilmadi (KIRMIZI) · 2 kismi, eski kaynaklar korunur (KIRMIZI) · 3 --kuru;
+    olc → 0 taze (<=2 gun) · 1 bayat · 2 olculemedi. `tara` (LLM) kapanisa BAGLANMAZ."""
+    node = shutil.which("node")
+    betik_yolu = os.environ.get("VENTHUB_BELGE_DEFTERI_BETIK") or os.path.join(REPO, "scripts", "belge", "belge-defteri.cjs")  # ortam degiskeni yalniz test icin (sahte betik)
+    if not node:
+        return kirmizi(a, "node yok: belge-defteri.cjs kosulamaz", rc=127)
+    if not os.path.exists(betik_yolu):  # betik yok = KIRMIZI (ATLANDI sessiz yesil birakirdi; ekranda iz kalmazdi)
+        return kirmizi(a, f"belge-defteri.cjs yok ({rel(betik_yolu)}) → BELGELER DEFTERI TAZELENEMEZ", rc=127)
+    if c.get("auth_ok") is False:  # kuru dahil: ag'a hic cikilmaz (adim 5 zaten KIRMIZI, kapanis yesil gorunmez)
+        a["durum"], a["olcum"] = "ATLANDI", "ATLANDI: defter on-kapi KIRMIZI (adim 5, notebooklm oturumu) → BELGELER DEFTERI BAYAT"
+        return
+    rc, out, _ = kos([node, betik_yolu, "yukle"] + (["--kuru"] if c["kuru"] else []), timeout=BELGE_ZAMAN)
+    a["rc"], a["son"] = rc, son3(out)
+    if c["kuru"]:
+        if rc != 3:
+            return kirmizi(a, f"belge-defteri yukle --kuru beklenen cikis 3 degil (cikis {rc})")
+        a["durum"], a["olcum"] = "YESIL", "KURU: belgeler defteri YUKLENMEDI (durum dosyasi degismedi)"
+        return
+    if rc == 124:
+        return kirmizi(a, "belge-defteri yukle zaman asimi → BELGELER DEFTERI BAYAT olabilir")
+    if rc == 1:  # sozlesme: oturum/ag olculemedi, hicbir sey yazilmadi; betikteki beklenmeyen istisna da 1 verir → son satirlara bak
+        return kirmizi(a, "belge-defteri yukle: oturum/ag olculemedi, HICBIR SEY yazilmadi (sozlesme; beklenmeyen istisna da 1 verir, son satirlara bak) → BELGELER DEFTERI BAYAT")
+    if rc == 2:
+        return kirmizi(a, "belge-defteri yukle: KISMI (bazi gruplar yuklenemedi/silinemedi); eski kaynaklar korundu, durum yazilmadi → BELGELER DEFTERI BAYAT")
+    if rc != 0:
+        return kirmizi(a, f"belge-defteri yukle beklenmeyen cikis {rc}")
+    rc2, out2, _ = kos([node, betik_yolu, "olc"], timeout=60)
+    olc_satir = temiz(next((l.strip() for l in out2.splitlines() if l.strip()), ""))[:200]
+    if rc2 != 0:
+        return kirmizi(a, f"yukle tam dondu ama olc cikis {rc2} (0 beklenirdi): {olc_satir}", rc=rc2)
+    a["durum"], a["olcum"] = "YESIL", f"yukle: tam · {olc_satir}"
+
+
 # ---------------------------------------------------------------- Linear santiye hesaplari (is-dagilimi JSON)
 def serit_kumesi(r):
     s = set()
@@ -1104,7 +1146,7 @@ def main():
             elif n == 10:
                 adim10(c, x, adimlar, t_baslangic)
             else:
-                {1: adim1, 2: adim2, 3: adim3, 4: adim4, 5: adim5, 6: adim6, 7: adim7, 8: adim8, 11: adim11, 12: adim12}[n](c, x)
+                {1: adim1, 2: adim2, 3: adim3, 4: adim4, 5: adim5, 6: adim6, 7: adim7, 8: adim8, 11: adim11, 12: adim12, 13: adim13}[n](c, x)
         except Exception as e:  # bir adimin patlamasi digerlerini durdurmaz; sebep gorunur
             kirmizi(x, f"beklenmeyen hata: {type(e).__name__}", rc=-1, son=[temiz(str(e))[:200]])
         x["sure"] = time.monotonic() - t0
@@ -1114,7 +1156,7 @@ def main():
             for sat in x["son"]:
                 print("     | " + sat)
         print(f"   sure {mmss(x['sure'])} · {x['durum']}")
-    # ekran yazildiktan SONRA kirmizi olan adim (10/12) belgeye satir olarak eklenir: belge ile konsol celismez
+    # ekran yazildiktan SONRA kirmizi olan adim (10/12/13) belgeye satir olarak eklenir: belge ile konsol celismez
     if c.get("ekran") and 9 in secili:
         sonra_kir = [ile[n] for n in secili[secili.index(9) + 1:] if ile[n]["durum"] == "KIRMIZI"]
         if sonra_kir:

@@ -46,7 +46,7 @@
  * Çıkış DAİMA 0 — turu bloklamaz. Ama ölçemezse **"ölçülemedi (sebep)"** yazar; sessiz
  * kalmak bayatlığı "yok" göstermek olur (is-kirmizi-degil-adim-kirmizi).
  *
- * stdin: { session_id?, cwd? } · stdout: tek satır (bağlama eklenir) · çıkış: 0
+ * stdin: { session_id?, cwd?, transcript_path? } · stdout: satırlar (bağlama eklenir) · çıkış: 0
  */
 
 const fs = require('fs')
@@ -81,8 +81,10 @@ const ESIK_GUN = Number(process.env.VENTHUB_DEFTER_ESIK_GUN || 2)
 /** Önbellek bu yaştan eskiyse SAYI KULLANILMAZ — bayat sayı yanlış güven üretir. */
 const ONBELLEK_ESIK_SAAT = Number(process.env.VENTHUB_DEFTER_ONBELLEK_SAAT || 24)
 
+/** Yalnız BELLEK bloğu kullanır: arka plan ölçümü gerçek oturumda (UUID kimlik) başlar, testte değil. */
+let girdi = {}
 try {
-  JSON.parse(fs.readFileSync(0, 'utf8') || '{}')
+  girdi = JSON.parse(fs.readFileSync(0, 'utf8') || '{}') || {}
 } catch {
   /* girdi okunamadı: bu kanca girdiye BAĞLI DEĞİL, ölçmeye devam eder */
 }
@@ -288,13 +290,94 @@ try {
   const parca = []
   if (d.dogrulanmadi.length > 0) parca.push('⛔DOGRULANMAMIS ' + d.dogrulanmadi.length + ' dosya (bir kosum DUSTU)')
   if (d.gun === null) parca.push('HIC YEDEK YOK')
-  else if (d.gun > 2) parca.push('son yedek ' + d.gun + ' gun once')
+  // Eşik DEPO BAŞINA (kanban 24 saat, sage 72 saat): ayrı depoların gecikmesi ayrı söylenir (ARC-9).
+  else for (const g of d.geciken || []) parca.push(g.depo + ' yedegi ' + g.saat + ' saat once')
+  // Recep sözü defteri (ARC-15): karar kaydı; yedeği hiç yoksa ya da 24 saati aştıysa konuşur. Defter yoksa susar.
+  try {
+    const dy = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri-yedek.cjs'))
+    const dd = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri.cjs'))
+    if (require('fs').existsSync(dd.defterYolu())) {
+      const y = dy.durum()
+      if (y.dogrulanmadi.length > 0) parca.push('⛔defter yedegi DOGRULANMAMIS ' + y.dogrulanmadi.length + ' dosya')
+      if (y.sonYedek === null) parca.push('defter HIC YEDEK YOK')
+      else if (y.gecikti) parca.push('defter yedegi ' + y.saat + ' saat once')
+    }
+  } catch (e) {
+    parca.push('defter yedegi OLCULEMEDI (' + String(e.message).slice(0, 50) + ')')
+  }
   if (parca.length > 0) {
     process.stdout.write('⚠SAGE: ' + parca.join(' · ') + '\n')
     process.stdout.write('  ONARIM: node scripts/hijyen/sage-yedek.cjs (salt-okuma, ~1 sn, git disina yazar)\n')
   }
 } catch (e) {
   process.stdout.write('⚠SAGE: YEDEK DURUMU OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── BELLEK (Ops emri 2026-09-25) — EŞİKLİ, SAGE gibi ──
+ * 3 GB üstü tek süreç ya da 2 GB altı boş bellek varsa konuşur. Ölçüm arka planda ve
+ * önbellekten; bu blok bütçeye yalnız bir dosya okuması ekler. Gerekçe: bellek-yoklama.cjs.
+ */
+try {
+  const by = require(path.join(__dirname, 'bellek-yoklama.cjs'))
+  const simdi = Date.now()
+  const s = by.satir(by.oku(), simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    by.gerekirseTazele(simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠BELLEK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── BAĞLAM (karar 148, 2026-09-27) — HER MESAJDA ──
+ * Eşik altında düz "BAGLAM: 146k/1M"; compact sınırından sonra cevap yoksa "compact sonrasi".
+ * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son
+ * 512 KB'ı okunur (~1 ms). Gerekçe ve ölçüm tanımı: baglam-doluluk.cjs.
+ */
+try {
+  const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
+  const token = bd.sonBaglam(girdi.transcript_path)
+  const pencere = bd.compactPenceresi(DEPO)
+  const s = bd.satir(token, pencere)
+  if (s) process.stdout.write(s + '\n')
+  // Modlar bu ölçümü pencere başına dosyadan okur (ARC-33 madde 2); yazım hatası satırı bozmaz.
+  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE)
+} catch (e) {
+  process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── BELGE (REC-400 D2, HARİTA tarifi) — EŞİKLİ ──
+ * Yalnız önbellek okunur; ölçüm 6 saatte bir arka planda. Gerekçe: belge-satiri.cjs.
+ */
+try {
+  const bs = require(path.join(__dirname, 'belge-satiri.cjs'))
+  const simdi = Date.now()
+  const s = bs.satir(bs.oku(bs.onbellekYolu(PANO)), simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    bs.gerekirseTazele(PANO, DEPO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠BELGE: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── WRONGSTACK (ARC-24, karar 257) — HER MESAJDA, EŞİKSİZ ──
+ * "bizde X, son Y": sabitli sürüm taze okunur, son sürüm GitHub'dan günde en çok bir kez
+ * arka planda ölçülüp önbelleğe yazılır. Ağ yoksa "OLCULEMEDI". Gerekçe: wrongstack-satiri.cjs.
+ */
+try {
+  const ws = require(path.join(__dirname, 'wrongstack-satiri.cjs'))
+  const simdi = Date.now()
+  process.stdout.write(ws.satir(ws.oku(ws.onbellekYolu(PANO)), DEPO, simdi) + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ws.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠WRONGSTACK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 process.exit(0)

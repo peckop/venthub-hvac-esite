@@ -9,7 +9,7 @@
 | Katman | v1.0 (2026-08-20 → 09-14) | **v2.0 — YÜRÜRLÜKTE** |
 |---|---|---|
 | Haberleşme | pano notu + gözcü (Monitor) okur | **`SendMessage` doğrudan; iş bitince `notify_when_idle`** |
-| Emir | pano notu / sıralı emir | **Linear kaydı** — Recep sözü **önce kayda** (tırnak + pencere + saat), sonra şeride emir |
+| Emir | pano notu / sıralı emir | **Kanban kartı** (karar 219) — Recep sözü **önce karta** (tırnak + pencere + saat), sonra şeride emir |
 | Pano | not kutusu **ve** canlılık | **yalnız `claim` (dosya sahipliği) + canlılık** |
 | Uyanma | cron + tur-sonu `ScheduleWakeup` | eski üçlü **EMEKLİ** · uyandırma = mesaj. ⚠**Karar 53 (2026-09-19):** cron / zamanlayıcı / loop genel olarak yasak **değil** — dönemsel bir karardı; gerekiyorsa **önce Recep'le konuşulur** |
 | Kanıt ritüeli | `mechanism-setup.cjs plan → prob → dogrula` | **YOK.** Betik **EMEKLİ**, çağrılmaz |
@@ -21,7 +21,7 @@
 2. Lider oturumun `TARAMA` katmanı **asılmış**, `TESLIM` kanıtı **6955 dk (~4,8 gün)** bayattı —
    ve filo o süre boyunca **kayıpsız** çalıştı. Bütün emirler `SendMessage` ile gitti.
 3. ALTYAPI gözcüsü **kapatıldıktan sonra** pano `who` canlılığı **0 dk** kaldı: canlılık
-   **claim atışından** gelir, gözcüden değil. Üçlünün koruduğu sanılan şey zaten başka
+   **claim atışından** gelir, gözcüden değil (⚠2026-09-30'dan beri canlılığın **gerçek kaynağı** `claude agents --json`'dır; bkz. §35). Üçlünün koruduğu sanılan şey zaten başka
    yerden geliyordu.
 
 Buna karşılık maliyeti **her turda bir uyarı satırı** ve **her açılışta bir kurulum ritüeliydi**.
@@ -39,6 +39,10 @@ bakmadığı şeyi kanıtlamaz" dersinin aynadaki hâli: **kırmızı da bakmad�
   notuydu ve pano notu pasif bir kutudur. `SendMessage` **itici** bir kanaldır — mesaj
   konuşmaya düşer, okunmak için bir bekçi gerekmez. Yani doğru ders şu olmalıydı:
   **pasif kanal mekanizma ister; itici kanal istemez.**
+- **Ayırt edici test** (§4'ten, 2026-09-29): gözlem, mekanizma çalışmasaydı FARKLI olmalı; öz-test
+  ("kendine test notu at") tanım gereği yanlış negatif verir.
+- **Ölçemedim ≠ geçti** (§5'ten, 2026-09-29): kanıtlanmayan katman çökmüş sayılır (fail-closed);
+  KANITSIZ "yok" demek değildir.
 - **2026-09-01'in 62 dakikalık kaybı** hâlâ geçerli: o gün kanıtlanamayan bir katmana
   güvenildi. Çözüm o katmanı daha iyi ölçmek değil, **ona ihtiyaç duymamak** oldu.
 
@@ -94,6 +98,67 @@ gerekmez. Linear **proje yorumu pasif**: bir kutuya yazılır ve kimse bakmazsa 
 hangi sınıfta olduğu, ne kadar küçük olduğuna değil, **kendi tetiği olup olmadığına**
 bakılarak söylenir.
 
+### 0.3 Pencereler iş gereği birbirine DOĞRUDAN yazar (Recep, 2026-09-29)
+
+Recep'in sözü: *"ihtiyaç halinde birbirine yazabilmeli, işlerini bırakıp değil, iş gereği; sorumlulukların bilincinde olmalıyız."* OPS aracı değildir; pencereler `SendMessage` ile doğrudan konuşur. Kurallar:
+
+1. **Ne zaman yazılır:** başka pencerenin işine bağlıysan ya da onun alanında bulgu yaptıysan. Mesajın ilk satırı `<KİMDEN> → <KİME>: konu`, ilgili Kanban numarası yazılı.
+2. **İş bırakılmaz:** alan sahibi elindeki adımı bitirir, sonra kısa cevap verir; gerekirse kendi kuyruğuna kart açar.
+3. **OPS'a da tek satır:** sıra/öncelik değiştiren, başkasının dosyasına dokunan ya da karar isteyen her şey. Pencereler kendi aralarında karar vermez; Recep'e soru dolaştırılmaz.
+4. **Açılışta claim alınır:** claim'siz pencere panoda "kapalı" görünür ve yazışma adresi belirsizleşir.
+
+Pencere adı ile şerit eşlemesi değişkendir; adres için `ListAgents` ve panoya (`board.cjs who`) bakılır, ad ezberlenmez.
+
+---
+
+### 0.4 Yürürlükteki kural dizini — bölüm başına TEK satır (REC-400 H3, 2026-09-29)
+
+> **Bu dizin nedir:** aşağıdaki §1–§34 bölümleri **vaka kaydıdır** (o günün ölçümü, sabotaj tabloları, reddedilen
+> seçenekler); kural cümlesi her bölümde vakanın içine gömülüdür. Bu tablo, her bölümün bugün de geçerli olan tek
+> cümlelik kuralını ve onu zorlayan kapıyı bir arada gösterir; bölümler **taşınmadı ve değiştirilmedi** (53 dosya ve
+> `fleet-mechanism-integrity.test.ts` bölüm adlarına ve içeriğine atıf yapıyor). Çelişirse bölümün kendi metni ve
+> ölçülen kapı kazanır; bu dizin özettir.
+> **Durum sütunu** 3 alt-ajanın çıkardığı sınıflamadır (HARİTA örnekleme yapmadı). **ALTYAPI (cetvelin ölçüm sahibi)
+> §2–§7 ve §16 için hükmünü verdi (2026-09-29); bu satırlarda kesin, kalan satırlar ÖNERİLEN'dir ve ALTYAPI gözden geçirir.** GEÇERLİ = bugün de uygulanan kural · TARİHSEL = v1.0 gözcü/cron modeli, §0'da
+> emekli · BELİRSİZ = metinden anlaşılmıyor, sahibi karar verir.
+
+| § | Kısa başlık | Yürürlükteki kural (tek cümle) | Zorlayan kapı/test | Durum |
+|---|---|---|---|---|
+| 1 | Niçin bu cetvel var (ölçülmüş vaka) | Talimat davranış üretmez, mekanizma üretir; yazılı bir ders açılış adımına bağlanmadıkça bilgi verir, davranış vermez (sağırlık sessizdir, 2026-08-20 vakası). | yok | GEÇERLİ (L129-132) |
+| 2 | Üç katman (gözcü, cron, ScheduleWakeup) ve üçünün birlikte ölmesi | Gözcü (persistent Monitor), cron (CronCreate) ve tur-sonu uyanışı (ScheduleWakeup) aynı oturumda yaşar, uygulama kapanınca üçü birden ölür; tek kanal yedeklilik değildir, üçü birlikte istenir; SessionStart kancası hatırlatır, UserPromptSubmit her turda kırmızı satır basar. | yok (SessionStart / UserPromptSubmit kancaları adıyla geçiyor, INV kimliği yok) | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 3 | Kural (kurulum, prob kanıtı, OFSETLER, sonTarama) | Her şerit oturumu ilk turunda üç katmanı kurar ve mechanism-setup.cjs prob çıktısıyla kanıtlar; cron ofseti OFSETLER tablosundan okunur, gözcü kalıcı imleç tutup her taramada sonTarama damgası basar, olay akışı kodda UTF-8'e zorlanır. | mechanism-setup.cjs (prob) | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 4 | Ayırt edici test, öz-test değil (4.1 testin sınırı) | prob panoya farklı bir sid ile dış olay yazar ve gözcü imlecinin olayın ötesine geçmesini bekler ("kendine test notu at" öz-testi yanlış negatif üretir); prob okumayı kanıtlar, bildirimin ajana ulaştığını dogrula --jeton ayrıca kanıtlar. | mechanism-setup.cjs prob, dogrula --jeton | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 5 | Ölçülen ile beyan edileni ayırmak (fail-closed) | dogrula çıktısı ÖLÇÜLDÜ, BEYAN ve ÖLÇÜLEMEZ (ScheduleWakeup) sınıflarını karıştırmaz ve kanıtlanmayan katman çökmüş sayılır; KANITSIZ "gözcüsü yok" demek değildir. | dogrula (mechanism-setup.cjs); INV yok | TARİHSEL — TAŞINDI (docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md) |
+| 6 | Yoklama, üç eksenli canlılık | board.cjs yoklama (rollcall) filoyu ATIS (heartbeat), GOZCU (imlecin son tarama yaşı) ve SES (son not yaşı) eksenlerinde ölçer, okuyan fiil olduğu için --sid istemez. | board.cjs yoklama (INV kimliği yok) | GEÇERLİ (ALTYAPI hükmü 09-29: `yoklama` bugün canlı, ATIS ve SES eksenleri geçerli; GOZCU ekseni tarihsel, komut onu TARAMA/TESLİM diye yeniden adlandırdı) |
+| 7 | Kapsam sınırı, adıyla | Duyma, uyanma, yedek kanal, yoklama ve kurulum kanıtı mekanikleştirilir; slot verme, kuyruk sırası ve çakışma hakemliği hüküm katmanıdır ve orkestratörde kalır; INV-MECH-1 yalnız yapıyı ölçer, çalıştığını ölçmez. | INV-MECH-1 | GEÇERLİ, birinci paragraf TARİHSEL — TAŞINDI (ALTYAPI hükmü 09-29: hüküm-katmanı ayrımı ve INV-MECH-1 paragrafı geçerli; "mekanikleştirilen" listesi arşive gitti) |
+| 8 | Kapı eklendiğinde kanıt zorunluluğu | Bu cetveli zorlayan her kol bilerek bozularak (sabotajla) kanıtlanır; kanıtlanmamış bir kapı kapı değildir. | sabotaj tablosu (dogrula/prob/kanca brifingi); sonraki bölümlerde INV-BASH-WRITE-2, INV-HOOKS-2 vb. aynı yöntemle | GEÇERLİ (L241; ilke L503-506 ve L634-652'de sonraki bölümlere uygulanıyor, ancak L231-239 sabotaj tablosunun kendisi gözcü/prob'a ait tarihsel örnektir) |
+| 9 | Kanca yazım kuralları: kök, kimlik, koparılmış süreç (9.1-9.7) | Kanca çalışma ağacını cwd'den çözmez (yol verilmişse hedefin kendi git deposundan, verilmemişse sid'den ağaç kimliğiyle), sid'i tekil varsaymaz ve belirsizliği görünür uyarıyla bildirir, git status ölçen kanca -uall kullanır, detached spawn windowsHide:true ile başlar, kanıt kapının kendi akışına bağlanır ve bozuk/boş stdin fail-open ama stderr'e "stdin okunamadi, karisilmadi" yazar. | INV-BASH-WRITE-2 (src/__tests__/conformance/bash-write-audit-tree.test.ts), INV-HOOKS-2 (src/__tests__/conformance/githooks-doc-scope.test.ts) | GEÇERLİ (L253, L286-294, L302-311, L363-377, L412-437) |
+| 10 | Compact dayanıklılığı: 4 sabit alan + PreCompact kapısı (10.1-10.6) | Her oturumun durum dosyası SON GİRDİ, AÇIK KUYRUK, VERİLEN SÖZLER, BEKLEYEN KARARLAR alanlarını taşır; PreCompact kapısı durum dosyası hiç yoksa bloklar (exit 2), bayat (60 dk), eksik alan veya MEMORY.md 16384 baytı aşarsa yalnız uyarır, SessionStart(compact) durum dosyasının son bloğunu bağlama enjekte eder. | src/__tests__/conformance/precompact-durum-kapisi.test.ts (8 kol, 6 sabotaj); kaçış valfi VENTHUB_PRECOMPACT_KAPALI=1 | GEÇERLİ (L452-467, L478-484, L486-491; PreCompact'ta exit 2'nin compact'i iptal ettiği ölçülmemiş, L493-501) |
+| 11 | KİMLİK: vekil kanıt ile asıl kanıt (E1-v2, 11.1-11.9.2) | lane-precommit kimliği CLAUDE_CODE_SESSION_ID (ASIL) ile <git-dir>/venthub-sid (VEKİL) sırasıyla okur, çelişkide asıl kazanır ve vekil dosya görünür uyarıyla onarılır, panoda hiç görülmemiş sid uyarır ama şerit kontrolünü atlamaz; taban tazeleme merge'inden sonra kayıp taraması koşulur ve çakışan dosya önce üretilmiş/kaynak diye manifest yapısına (artefaktlar[].ad ve kaynak.dosyalar) bakılarak sınıflandırılır, `--theirs` kaynak dosyada içerik silmektir. | e1-kimlik-kontrolu.test.ts; lane-precommit (E1) kapısı; INV kimliği yok | GEÇERLİ (L572-577, L583-595, L697-699, L737-743) |
+| 12 | Geri alma muafiyeti (+ birleştirme muafiyeti) | Bir alarm yazan kapı, önerdiği düzeltmenin kendi kapılarından geçtiğini ölçmek zorundadır; geri-alma ve merge muafiyetleri dar, çok şartlı (tüm hedefler geri-alma sebepli, yalnız izole worktree, ölçülemezse fail-closed) ve sesli olur. | `bash-write-guard`, `bash-write-audit.cjs`, `lane-precommit.cjs` (kancalar); ayrı INV-/test dosyası adı yok (sabotaj tabloları 6/6 ve 6 sabotaj·5 KIRMIZI·1 bilinen sınır tarif edilmiş) | GEÇERLİ (L767-769) |
+| 13 | Ağır-sınıf test eşiği | Ağır conformance testinin zaman aşımı test dosyası başına `vi.setConfig({ testTimeout: 60_000 })` ile yazılır, global `vitest.config.ts` değeri 20 sn kalır ve eşiğin yanına ölçülmüş boş-gövde değeri ile 27× notu yazılır. | `vi.setConfig` (test dosyası başına), `vitest.config.ts`; INV kimliği yok (etkilenen: `build-skip-positive-logic`, `eol-normalization` vb.) | GEÇERLİ (L880-886) |
+| 14 | `board.cjs` bayrak semantiği | `--globs` tekrarlanırsa birikir (birleşim, stderr'e yol sayısı yazılır), `--sid/--lane/--to/--text` tekrarlanırsa iki değer birden yazılarak HATA (exit 1) verilir; sessizce ezme yoktur. | `src/__tests__/conformance/board-globs-tekrarlanan-bayrak.test.ts` (5 kol; INV kimliği yok) | GEÇERLİ (L925-929) |
+| 15 | Üretilmiş artefakt ihlali ≠ dikiş yeri ihlali | Üretilmiş artefakt (manifest kaydı, manifestin kendisi, kardeş kaynağı olan companion `.md`) ihlali `bash-write-audit`'te yapısal olarak sınıflanır: DÜŞÜK ŞİDDET görünür kalır ama bloklamaz ve panoya not göndermez, sınıf ölçülemezse fail-closed gerçek sayılır. | `src/__tests__/conformance/bash-write-audit-uretilmis-sinifi.test.ts` (6 kol; INV kimliği yok) | GEÇERLİ (L1008-1015) |
+| 16 | Mekanizma PR'ı inince ana dizin tazelenir | `scripts/board/**`, `.claude/hooks/**`, `.githooks/**` değiştiren PR master'a inince OPS'a bildirilir, OPS aynı turda ana dizini ff-pull eder (companion olmayan kirli dosya varsa yapılmaz), tek satır içerik kanıtı basılır ve otomatik tazeleme bilerek reddedilmiştir; ancak §20.2 (L1543-1547) merge ritüelinde koşullu otomatik ff-only sarma getirdiği için iki metnin birbirine göre kapsamı belgeden anlaşılmıyor. | yok (§16'da kapı yok; ilgili: `ana-agac-tazelik.test.ts` INV-ANA-AGAC-TAZE-1 yalnız §20.2'de geçiyor) | GEÇERLİ (ALTYAPI hükmü 09-29: kancalar ve pano aracı hâlâ ana dizinden yüklenir, tazeleme kuralı olduğu gibi durur; §20.2 ile çelişki yok) |
+| 17 | Adres keşfedilebilirliği | Makine dönüşü sonrası ilk `SendMessage`'tan önce `ListAgents` zorunludur, ad↔şerit eşleşmesi işbaşı notundan teyit edilir ve adres yanlışsa geri alınamaz sınıfta içerik aktarılmaz; pano-sid uzayı ile mesaj-adres uzayı ayrı ayrı doğrulanır. | `board-hedef-serit-adi.test.ts` (INV-BOARD-9; `note` çıktısı alıcı şerit adını basar) | GEÇERLİ (L1115-1122, L1143) |
+| 18 | İzin-reddi olay günlüğü | Normalde serbest bir iş reddedilirse bir kez AYNEN yeniden denenir, ret kılık değiştirilerek dolanılmaz, `deny` kuralı kip değiştirerek/ayar gevşetilerek açılmaz (iş insan eline geçer), ikinci ret ve eksik kalan mekanizma katmanı panoya bildirilir. | `scripts/board/izin-reddi-gunlugu.cjs` + `izin-reddi-gunlugu.test.ts` (INV-BOARD-10, 8 kol) | GEÇERLİ (L1198-1222) |
+| 19 | Kimlik "açılış" kaydıdır, "sahiplik" değil | Ortak/ana ağaca (`absolute-git-dir === git-common-dir`) kimlik yazılmaz ve oradaki eski kayıt silinir, denetlenen küme kimlik ağaçları ∪ cwd ağacı ∪ ortak ana ağaçtır, ortak ana ağaç koşulsuz denetlenir ve baskındır, oradaki kir şerit ihlali gibi raporlanmaz/bloklamaz ama sessiz de kalmaz. | `e1-kimlik-kontrolu.test.ts` (10 kol) + `bash-write-audit-tree.test.ts` (13 kol); INV kimliği yok | GEÇERLİ (L1280-1304) |
+| 20 | Çakışık PR'a hiç kapı koşmaz (20.1 merge ritüeli betiği, 20.2 ana ağaç tazeliği) | Self-merge ön koşulu iki ayrı ölçümdür: (a) `mergeable_state != dirty` ve `merge_commit_sha != null` (REST'ten okunur), (b) en az bir GH Actions kolu görülmüş olması; `gh pr merge` doğrudan çağrılmaz, merge yalnız `merge-ritueli.cjs ... --merge` ile yapılır, migration'lı PR yalnız `--onay` ile, ortak ağaca dokunan git komutu `-C <yol>` ile yazılır. | `scripts/hijyen/merge-ritueli.cjs` + `src/__tests__/conformance/merge-ritueli.test.ts` (19 kol); §20.2 için `ana-agac-tazelik.test.ts` (INV-ANA-AGAC-TAZE-1); INV kimliği yalnız bu ikisinde | GEÇERLİ (L1393-1399, L1452-1455, L1526-1547) |
+| 21 | Kabul edilmiş eksik sessiz olamaz (companion üreteci, REC-67) | Kabul edilmiş bir eksiğin tek şartı görünür olmasıdır: başarısızlık çıkış kodundan değil çıktıdan fail-closed sınıflanır, kanıt logu kırpılmaz, kalıcı defter (`orion-belgesiz.jsonl`) eklemeli tutulur, sayaç oturum açılışında yüzeye çıkar ve büyüyen eksik yeniden Recep'e gider. | `src/__tests__/conformance/companion-defter.test.ts` (11 kol; INV kimliği yok) | GEÇERLİ (L1618-1632) |
+| 22 | Üretilmiş artefakt çakışması: tek komut, sessiz çözüm yok | Taban tazeleme tek komuttur (`node scripts/hijyen/taban-tazele.cjs --agac <ağaç>`): ilan listesi manifestten okunur, ilan dışı tek yolda çakışma varsa durulur, yeniden üretim yalnız ilan edilmiş artefaktları commit'ler, çıkış kodu dürüsttür ve `--help` yan etkisizdir; `.gitattributes merge=ours` reddedilmiştir. | `src/__tests__/conformance/taban-tazele.test.ts` (24 kol); INV-DOC-4b (artefakt kaynak-SHA↔manifest kapısı, belgede anılıyor) | GEÇERLİ (L1713-1732, L1696-1709) |
+| 23 | Yedeklilik türle ölçülür | Yedeklilik katman sayısıyla değil kaç katmanın konuşmayı BAŞLATABİLDİĞİYLE ölçülür, imleç taramayı kanıtlar duymayı değil (sütun TARAMA ve TESLIM diye ayrıldı), ve sessizlik eşikleri (eşik değerleri yalnız makine-okunur ESIKLER bloğunda yaşar) cetveldeki makine-okunur blokta yaşar, eşik değiştirmek cetveli değiştirmektir. | board-invariants (eşik bloğu silinirse/bozulursa alarm; 54 kol, sabotaj 8/8) | GEÇERLİ (L1894-1898, L1906-1910) |
+| 24 | Kimlik sızdıran mutlak yol (REC-102) | Mutlak yol kapısı üç katmanlıdır: kod/konfig SIKI (yeni kalem = KIRMIZI), prose (.md) MANDAL (artmama şartı), companion `source_path:` ve `.archive/` kapsam dışı; gerekçeler makine-okunur ilan dosyasında durur ve kapının göremediği kalem adıyla yazılır. | docs/mutlak-yol-istisnalari.json (ilan dosyası); kapının kimliği bölümde adlanmıyor; INV-CETVEL-YAPI yalnız kusurlu bulunan başka kapı olarak anılıyor | GEÇERLİ (L2004-2013) |
+| 25 | Fikstür sahadaki biçimi üretmeli | Türkçe metinle çalışan her eşleştirme ASCII-katlanmış metne karşı koşar ve fikstür sahada gerçekten yazılan biçimi (dile bağlı varyantlar dahil) üretmek zorundadır; kolun yeşilliği fikstürün ürettiği biçim kadardır. | precompact-durum-kapisi.cjs konformans takımı (Türkçe dolu=YEŞİL / alanı silinmiş=UYARIR çifti, sabotaj 5/5); INV kimliği yok | GEÇERLİ (L2075-2077, L2109-2110) |
+| 26 | Kullanıcıya görünen metin ölçütten üretilir | Eksen adları başlıkta ve help metninde elle tekrar edilmez, tek `EKSENLER` listesinden üretilir; kol üretildiğini bağımsız beklenen küme/sayı sözcüğüyle ölçer ve yasak ad `yorumsuz` kaynakta aranır. | yok (konformans kolları anılıyor ama INV kimliği/dosya adı verilmiyor) | GEÇERLİ (L2126-2133, L2149) |
+| 27 | Bedelsiz hata kapı doğurmaz (ölçüm tarafı) | Durum DEĞİŞTİREN (yazan) board fiilleri koşan dosyanın yolunu (`__filename`) tek ortak noktada stderr'e beyan eder; okuyan fiiller (yoklama/who) beyan etmez. | INV-BOARD-KONUM-1 (4 kol, sabotaj 4/4) | GEÇERLİ (L2192-2204, L2208-2212) |
+| 28 | Ayrışma tur başına ölçülür (uyarı + sayım) | Komutlarda mutlak yol ve git için daima `git -C <ağaç>` kullanılır, `git add -A` yasaktır (add açık dosya yolu alır), ve ana dizin + canlı şerit talebi birleşiminde tur-sonu kancası UYARIR ve SAYAR. | kapı değil, uyarı (tur-sonu kancası + sayaç); kancanın testleri: INV-BOARD-KONUM-2 (4 kol), INV-BEYANSIZ-OLCUM-1 (8 kol) | GEÇERLİ (L2243-2249, L2352-2354) |
+| 29 | Karara giden ölçüm betikten gelir | Karara giden her sayı bir BETİKTEN gelir ve kaynak (betik, çıktı dosyası, tarih) gösterir; elden sorgu/tek seferlik grep yalnız keşiftir, geri alınamaz işlemin sayısı işlemden hemen önce yeniden ölçülür. | yok (kural 1 KAYNAK/CETVEL bloğunun sayısal karşılığı olarak anılıyor) | GEÇERLİ (L2383-2394) |
+| 30 | Dal origin'de var ≠ iş yedekli | Merge edilmemiş ağaç/dal için kayıp ölçütü tektir, `git rev-list --count origin/<dal>..HEAD == 0` (yönlü: yerel ileri = kayıp riski), merge sonrası dal silmede ölçüt ağaç farkıdır, ve başkasının dal ucu oynatılmaz (ayrı `yedek/<ad>-<tarih>` dalı kullanılır). | yok | GEÇERLİ (L2427-2456) |
+| 31 | Teslimat kanıtı bağımsız tanık ister | Teslimat kanıtı için bağımsız atan (`prob --to`, kendine verilemez) + eşleşme (`dogrula --gordum`) + tazelik (≤180 sn) üçü birlikte gerekir, gözcü yalnız `Monitor(persistent: true)` ile kurulur, cron kurulmaz (uyandırma SendMessage ile); bu koşullar sağlanınca "YEŞİL" denmesi §34 ile geçersizdir. | src/__tests__/conformance/fleet-mechanism-integrity.test.ts (altı kol); INV kimliği bölümde yok | GEÇERLİ (L2469-2470, L2518-2519, L2526-2529) |
+| 32 | Canlı durum okuyan kapı pinlenir | Canlı depo durumunu okuyan kapı okumasını TEK BİR ANA (`git rev-parse HEAD` SHA) sabitler ve sonuçları modül düzeyinde memoize eder, fikstüre çevrilmez; pinlenemeyen index okuması iki kez okunup eşitse kabul edilir. | yok (kuralı zorlayan kapı adlanmıyor; pinlenecek kapılar: taban-tazele.test.ts, uretilmis-artefakt-ilan-kapsami.test.ts; kuralın uygulandığı belgeden doğrulanmıyor) | GEÇERLİ (L2590-2593, L2602-2608) |
+| 33 | Bekleyen jeton kuyruktur | Bekleyen jetonlar atan başına `bekleyenler` sözlüğünde yaşar (doğrulanan kayıt TÜKETİLDİ sayılır, eşiği aşan kayıt düşer), beklenen jeton ekrana BASILMAZ, `prob --to` başkasının canlı doğrulanmamış kaydında DURUR (çıkış 2, `--yine-de` ile geçilir) ve cron katmanı KAPALI (Recep kararı 2026-09-06, yeniden görüşülecek). | INV-MECH-JETON-KUYRUK (fleet-mechanism-integrity.test.ts; sabotajda 23 testten 4 düştü) | GEÇERLİ (L2646-2659, L2667-2670, L2679-2682) |
+| 34 | Teslimat katmanında YEŞİL yoktur (REC-287) | Teslimat katmanında `YESIL` sınıfı YOKTUR: akranın taze jetonu `ZAYIF-PAYLASILAN` (bu katmanın tavanı, kırmızı SAYMAZ, damga yazılır), kendi probunun jetonu `ZAYIF-OZ` (KIRMIZI sayar), sınıf damgaya `teslimKanitSinifi` olarak yazılır. | INV-MECH-BAGIMSIZLIK-1 (fleet-mechanism-integrity.test.ts) | GEÇERLİ (L2751-2752, L2758-2762, L2784-2791) |
+
 ---
 
 ## 1. Niçin bu cetvel var — ölçülmüş vaka, tahmin değil
@@ -120,71 +185,16 @@ Buradan çıkan hüküm:
 > **Talimat davranış üretmez; mekanizma üretir.** Yazılı bir ders, açılış adımına
 > bağlanmadıkça bilgi verir, davranış vermez.
 
-## 2. Üç katman — ve üçünün de aynı anda ölmesi
+## 2–5. v1.0 gözcü/cron modeli — TAŞINDI (tarihsel, yürürlükte değil)
 
-| katman | ne yapar | ömrü |
-|---|---|---|
-| **gözcü** (persistent Monitor) | panoyu tarar, yeni notu bildirime çevirir | oturumla ölür |
-| **cron** (CronCreate, ofsetli) | şeridi düzenli uyandırır | oturumla ölür |
-| **tur-sonu uyanışı** (ScheduleWakeup) | gözcü ölürse ikinci kanal | tur sonunda **yeniden kurulur** |
-
-**Üçü de aynı oturumun içinde yaşar ve uygulama kapanınca üçü birden ölür.** Yeni oturum
-bunları devralmaz. Bu yüzden yeni oturumun **ilk işi** kurulumdur — ve bunu hatırlatmak
-insana bırakılmaz (bırakıldı, dört kez başarısız oldu): `SessionStart` kancası hatırlatır,
-`UserPromptSubmit` kancası her turda kırmızı satır basar.
-
-**Tek kanal yedeklilik değildir.** Gözcü tek başına ölürse şerit sağır kalır; cron tek başına
-kalırsa notlar 20 dakika bekler. Üçü birlikte istenir.
-
-## 3. Kural
-
-1. Her şerit oturumu, ilk turunda üç katmanı kurar ve **kanıtlar**.
-2. Kurulum **beyanla** kapanmaz. Geçerli kanıt, `mechanism-setup.cjs prob` çıktısıdır.
-3. Cron ofseti **tablodan** okunur (`mechanism-setup.cjs` içindeki `OFSETLER`), hatırdan
-   yazılmaz. İki şerit aynı dakikayı paylaşamaz.
-4. Gözcü **kalıcı imleç** tutar ve her taramada `sonTarama` damgası basar. Damga basmayan
-   gözcü, canlılığı dışarıdan ölçülemediği için **kanıtsız** sayılır.
-5. Gözcünün olay akışı **kodda** UTF-8'e zorlanır; konsol kodlamasına güvenilmez.
-6. Mekanizma kırmızısı, brifingin **sessizlik kuralına tabi değildir**.
-
-## 4. Ayırt edici test — öz-test değil
-
-`prob` fiili panoya **dış** bir olay yazar ve gözcünün kalıcı imlecinin o olayın **ötesine**
-geçmesini bekler. Ayırt ediciliği şuradan gelir:
-
-> Gözcü çalışmıyorsa imleç **asla** ilerlemez. Yani gözlem, mekanizma çalışmasaydı **farklı**
-> olurdu.
-
-Olayı yazan süreç gözcüden ayrıdır ve **farklı bir sid** kullanır. Bu bir detay değil,
-tasarımın kilit noktasıdır: gözcü kendi notlarını eler, dolayısıyla **"kendine test notu at"**
-biçimindeki öz-test, tanım gereği **yanlış negatif** üretir. Her gözcü sahibinin sorması
-gereken soru budur: *filtrem, görmem gereken hangi sınıfı tanım gereği dışarıda bırakıyor?*
-
-### 4.1 Testin sınırı — adıyla
-
-`prob` gözcünün panoyu **okuduğunu** kanıtlar; bildirimin **ajana ulaştığını** kanıtlamaz.
-Teslimat ayrı bir kanıttır: probun ürettiği jeton bildirimde görülür ve
-`dogrula --jeton <jeton>` ile geri yazılır. İkisini tek kanıt saymak, okuma ile duyma
-arasındaki farkı siler.
-
-## 5. Ölçülen ile beyan edileni ayırmak (fail-closed)
-
-`dogrula` çıktısı üç sınıf kullanır ve bunları **karıştırmaz**:
-
-| sınıf | anlamı | örnek |
-|---|---|---|
-| **ÖLÇÜLDÜ** | araç baktı ve gördü | gözcü imlecinin yaşı |
-| **BEYAN** | ajan söyledi, disk doğrulayamaz | cron id (tek geçerli ölçüm: `CronList`) |
-| **ÖLÇÜLEMEZ** | diskte izi yok | `ScheduleWakeup` |
-
-Kanıtlanmayan katman **çökmüş sayılır** (fail-closed). "Ölçemedim" ile "geçti" aynı kovaya
-girerse bekçinin varlık sebebi silinir.
-
-`KANITSIZ` etiketi **"gözcüsü yok" demek değildir**: şeridin kendi izleyicisi olabilir ama
-ölçülebilir imleç sözleşmesini yazmıyordur. Fail-closed davranış aynı kalır, ama hüküm doğru
-adlandırılır — yanlış hüküm, doğru davranıştan daha uzun yaşar.
+Üç katman (gözcü + cron + tur-sonu uyanışı), kurulum kuralı, ayırt edici prob testi ve ölçülen/beyan edilen ayrımı
+v1.0 modeline aittir; model 2026-09-14'te emekli edildi (§0). Kod yorumlarındaki §2–§5 atıfları için tam metin:
+`docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md` (kelimesi kelimesine, silinmedi).
 
 ## 6. Yoklama — üç eksenli canlılık
+
+> **Güncel (2026-09-29, ALTYAPI hükmü):** aşağıdaki GOZCU ekseni tarihseldir; komut onu artık TARAMA/TESLİM olarak
+> yeniden adlandırılmış basar ve "gözcü EMEKLİ, bu sütun arıza değil" der. Canlı ölçüm ATIS ve SES eksenleridir.
 
 `board.cjs yoklama` (eşanlamlı: `rollcall`) filoyu **üç ayrı eksende** ölçer:
 
@@ -204,8 +214,8 @@ olurdu. Yazan fiiller kimliksiz koşmaz; okuyan fiiller koşar.
 
 ## 7. Kapsam sınırı — ADIYLA
 
-**Mekanikleştirilen:** duyma (gözcü), uyanma (cron), yedek kanal (wakeup), yoklama, kurulum
-metninin üretimi ve kurulumun kanıtı.
+**Mekanikleştirilen (v1.0 modeli, TARİHSEL):** liste `docs/archive/fleet-mechanism-v1-gozcu-cron-tarihce.md`
+dosyasının "§7 birinci paragraf" bölümüne taşındı (2026-09-29, ALTYAPI hükmü). Canlı olan yalnız yoklama (§6).
 
 **Bilinçli olarak mekanikleştirilMEYEN:** slot verme, kuyruk sırası, çakışma hakemliği.
 Bunlar **hüküm katmanıdır** ve orkestratörde kalır. Gerekçe: bu kararlar tempo, risk ve
@@ -459,7 +469,7 @@ bir yargı olur, oysa alanın varlığı bir ölçümdür. Kapı bu dördünü a
 | eşik | değer | ölçüm tabanı |
 |---|---|---|
 | durum dosyası bayatlık | **60 dakika** | 2026-08-28: aktif beş şeridin dosyaları 1/9/17/27/35/39/46 dk yaşındaydı; bir sonraki değer 356 dk (kapanmış gün). 60, en eski aktif dosyaya pay bırakır ve kapanmış günü ayırt eder. 30 seçilseydi o gün AUTH yanlış alarm alırdı. |
-| `MEMORY.md` boyut | **16384 bayt** | indeks ~24.4KB'de okunamaz oluyor, 27.5KB'de sessizce kırpıldığı gözlendi. Ölçü **bayt**, satır değil — kırpma bayta bakar. |
+| `MEMORY.md` boyut | **200 satır YA DA ~25.000 bayt** (hangisi önce dolarsa); yumuşak 160 satır / 20.000 bayt | 2026-09-29 REC-433 1.9 yeniden ölçümü: 48 KB/250 satır 129. satırda, 7 KB/600 satır 200. satırda kesildi; model bağlamına "Only part of it was loaded" notu düşüyor. Eski "16384" değeri doğrulanmadı. Sınırın ötesi sessizce düşer (kullanıcıya görünmez). |
 
 Eşikler koddan **export edilir** ve conformance testi cetveldeki sayıyla eşleştiğini ölçer;
 sihirli sayı bırakmak, sonraki değiştirenin neyi neden değiştirdiğini bilememesi demektir.
@@ -1109,6 +1119,24 @@ claim'i `4a8eaf9c` **tazeydi**. Yani biri tazelenirken öteki bayatlayabilir.
    akran aktarımı onay yerine **geçmez**; yanlış adrese düşen bir GO, düştüğü şerit
    tarafından **taşınmaz** — yalnız *"teslimat kayboldu, kendi kanalından al"* denir.
    (Vaka 3 böyle kapatıldı.)
+4. **Onay yolu (karar 224, Recep 2026-10-01, OPS penceresi).** Recep'in sözü: *"canlı haricinde sen işi
+   bitirebilmelisin ama ben ister sana ister de o pencerede gidip yine onay verebilirim"*. Yani **canlı DIŞINDAKİ
+   işlerde** departman onayı doğrudan OPS'tan alınır; Recep'in OPS'ta verdiği evet için OPS sözünü ve saatini
+   aktarır ve kaydı OPS panosundaki REC-425 kartına not olarak yazar (departman doğrulayabilsin). "Canlı" =
+   Recep kapıları 1-5 (migration'lı PR, sır/anahtar/parola yazmak, geçmişi silen/zorlayan git, canlı veritabanına
+   yazım, para harcatan her şey) ve aşağıdaki liste; bunlar Recep'te kalır, OPS yalnız bunların dışındakini onaylar. Bu, madde 3'teki yanlış adrese düşen akran aktarımı DEĞİLDİR: adres doğrulanmıştır ve kaynak
+   Recep'in kendi sözüdür. **Recep'in onayını aktarma yetkisi YALNIZ OPS'tadır** (Recep, 2026-10-01:
+   *"pencereler arası onay sadece senin için geçerli ops, sen yöneticisin"*); bir departman başka bir departmana
+   Recep onayı aktaramaz (madde 3 aynen geçerlidir).
+   - **Son hâl (Recep, OPS penceresi, 2026-10-01):** *"canlı haricinde kimsenin penceresinde evet hayır yazmak zorunda
+     olmak istemiyorum."* Canlı dışındaki her onayı Recep yalnız OPS penceresinde verir. Ayar/izin/kullanıcı düzeyi
+     dosya (`recep.md`, settings gibi) değişikliği gerekiyorsa departman metni ya da komutu hazırlar, Recep OPS'ta
+     evet der, değişikliği OPS kendi penceresinde uygular (eş mesajı izin sayılmaz kuralı böyle korunur).
+     Recep dilerse departman penceresine de yazabilir (yasak değil, zorunlu da değil): o söz geçerlidir, departman
+     sözü aynı turda saatiyle OPS'a bildirir (karar defteri kancası REC-554 gelene kadar geçici kural).
+   - **Recep'in başka pencereye yazması gereken tek durum CANLI'dır:** prod, migration'lı PR, gerçek para, geri alınamaz
+     silme. Recep sözü o pencerede.
+   - Ayar dosyası davranış kuralı: `hafiza-yazma-duzeni-standard.md` başlık notu.
 
 ### Aracın yanıltan çıktısı — ve ailesi
 
@@ -2778,3 +2806,64 @@ yardım metninden *"atanin ekranina basilir"* **kalktı** · `gozcu.cjs` basım 
 **yok** (gerekçenin dayanağı; süzgeç eklenirse kol kırmızı verip gerekçenin yeniden ölçülmesini
 ister) · açılış satırı *"KANITLI"* demez ve sınıfı **damgadan** okur · yoklama sınırı koşulsuz
 basar · cetvel bu hükmü taşır.
+
+---
+
+## 35. PANO CANLILIĞININ GERÇEK KAYNAĞI `claude agents --json` — hayalet ve kayıp pencere (REC-524)
+
+**Ölçülmüş sorun (F8, 2026-09-30):** pano canlılığı **claim atışından** türetiliyordu (§0 madde 3). Atış,
+oturumun *yaşadığını* değil en son ne zaman atış *yazdığını* söyler. İki kör nokta: pencere kapandı ama
+4 saatlik kira dolmadı → şerit "canlı" görünür (**hayalet**); pencere açık ama hiç claim almadı → pano onu hiç
+göstermez (**kayıp pencere**).
+
+**Kaynak:** `claude agents --json` aktif oturumları verir (`pid`, `cwd`, `kind`, `startedAt`, `sessionId`, `name`,
+`status` busy/idle); daemon gerekmez; ölçüldü 2026-09-30, ~0,65 sn. Birleştirme anahtarı `sessionId` = pano `sid`.
+Mantık `scripts/board/canlilik.cjs`, kablo `board.cjs` `summary`.
+⚠`--all` KULLANILMAZ: `claude agents --help` ona "with --json: also include completed background sessions" der
+(bitmiş oturumlar canlılık kaynağı değildir); ayrıca `status: completed` kayıtlar ayrıştırmada atılır.
+
+| Durum | Koşul | Pano gösterimi |
+|---|---|---|
+| canlı | claim var + listede var | `●canlı/meşgul` ya da `●canlı/boşta`, ad `claude agents`'tan |
+| hayalet | claim var + listede yok | `○KAPALI(hayalet …)`; başlıkta sayılır; ad/şerit **çakışması** saymaz |
+| yeni süreç | claim'siz, `startedAt` < 5 dk | `◦YENİ SÜREÇ (henüz claim almadı, Ndk önce açıldı)` |
+| şeritsiz açık pencere | claim'siz, ≥ 5 dk (ya da `startedAt` yok) | `⚠ŞERİTSİZ AÇIK PENCERE` satırı |
+| alt süreç | claim'siz + (`kind` interaktif değil · ad `vh-…` · `cwd` son parçası `vh-…` worktree) | `◦ALT SÜREÇ N (ana pencere sayılmaz)`; **claim'i olan pencere asla alt süreç sayılmaz**; alt süreç "yeni" de sayılmaz |
+| ölçülemedi | `claude` yok · 8 sn'de dönmedi · JSON bozuk · çıkış kodu ≠ 0 | eski çıktı **aynen** + TEK satır `canlılık ölçülemedi (sebep)`; durum etiketi **basılmaz** |
+
+**Kurallar:** (1) fail-open ama **sessiz değil** — "ölçemedim" ne "hepsi canlı" ne "hepsi kapalı" diye okunur;
+(2) `spawnSync` `timeout: 8000` + `windowsHide: true`; (3) 30 sn önbellek (`<pano dizini>/canlilik-onbellek.json`):
+**yalnız başarılı ölçüm ve zaman aşımı** önbelleklenir (ENOENT/bozuk JSON/çıkış kodu değil: hızlı hata 30 sn yalan
+sürmesin); önbellekten gelen satır `önbellek ≤30sn` etiketi taşır; önbellekte **çağıranın kendi oturumu yoksa**
+önbellek yok sayılır (30 sn içinde açılan pencere kendi claim'ini "hayalet" görmesin); (4) **izole pano**
+(`VENTHUB_BOARD_DIR` verilmiş — test/deneme) gerçek `claude`ı çağırmaz, çünkü sahte sid'ler gerçek listeyle
+birleşince hepsi "hayalet" görünürdü; `VENTHUB_CANLILIK_KAPALI=0` açar, `=1` kapatır, `VENTHUB_CANLILIK_HAM=<dosya>`
+(test) her zaman açar; (5) kullanıcı ayar dizinindeki `sessions/<pid>.json` ad kaynağı **yedek** olarak durur, `claude agents` adı
+üstüne yazar; (6) `board-brief` (her tur) **değişmedi** — tur başına süreç açmaz; canlılık `who` ve SessionStart
+pano bloğunda.
+
+**Kapı:** `INV-PANO-CANLILIK-1..17` (`src/__tests__/conformance/pano-canlilik-claude-agents.test.ts`): hayalet ·
+şeritsiz pencere · alt süreç (+ claim'li pencere alt süreç değil) · meşgul/boşta · zaman aşımı (+ `--all` yok) ·
+bozuk JSON (tek satır, eski çıktı korunur) · boş dizi · `claude` yok (ENOENT, PATH boşken **gerçek** süreç yolu) ·
+önbellek · izole pano kural matrisi (hermetik) · hayalet çakışma saymaz · claim'siz + açık pencereler · önbellekte
+çağıran yoksa yeniden ölç · `completed` sayılmaz · hızlı hata önbelleklenmez + etiket + tmp çöp bırakmaz ·
+çıkış kodu · yeni süreç (< 5 dk). Her kolun sabotajı ölçülmüştür (REC-524 PR gövdesi).
+
+---
+
+## 36. ÖLÇÜM İÇİN AÇILAN `claude -p` ALT SÜRECİ — kabuk mirası giriş etiketi (OPS emri 2026-09-30; sekme etkisi ÖLÇÜLMEDİ)
+
+**Kural:** ölçüm ya da deneme için açılan **her** `claude -p` alt süreci `CLAUDE_CODE_ENTRYPOINT=sdk-cli` ile,
+`--no-session-persistence` bayrağıyla ve **oturum klasörünün değil scratchpad klasörünün** içinden koşar.
+
+**Niçin (OPS emri; gerekçenin ölçülen kısmı dar):** alt süreç kabuktan `CLAUDE_CODE_ENTRYPOINT=claude-vscode` değerini miras alırsa oturum kaydına **eklenti etiketiyle**
+yazılır; ARAÇ ölçümü: kabuk mirasıyla açılan terminal denemeleri `claude-vscode` taşıdı, temiz ortamla (`CLAUDE*` değişkenleri silinip `Start-Process`) `entrypoint=cli` döndü
+(ARAÇ ekip deneyi 2, 2026-09-30). OPS emrinin dayanağı "YETENEK vakası: dört sekmenin dördünde `entrypoint=claude-vscode`" idi; **bu kayıt kanıt dosyalarında bulunamadı**
+ve editörün oturum yöneticisi terminal oturumlarını da listeliyor (ARAÇ notu, OPS ölçtü): yani etiketin sekmeyi tek başına doğurduğu **kanıtlanmış değildir.**
+
+**Ölçüm (ARAÇ, 2026-10-01; temiz ortam, scratchpad cwd, `--no-session-persistence`):** her iki kolda da koşarken kullanıcı
+ayar dizinindeki `sessions/` altına **1 kayıt yazılır, bitince silinir** (`kind=interactive`). Fark yalnız `entrypoint` alanı:
+`sdk-cli` kolunda `sdk-cli`, kontrol kolunda `claude-vscode`. Yani "`claude -p` oturum kaydı hiç yazmaz" **yanlıştır**.
+⚠**ÖLÇÜLMEDİ:** editörün oturum listesinde/sekmesinde görünüp görünmediği (kayıt birkaç sn yaşar, ölçen tarafta editör yok);
+bu Recep gözüyle ölçülecek. Kural bu yüzden "OPS emri + kayıtta `entrypoint=sdk-cli` yazılır" olarak uygulanır,
+"sekmeyi kapatır" diye anılmaz.

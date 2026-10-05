@@ -1,0 +1,42 @@
+{
+  "kimlik": "AB-2024/1834",
+  "eksen": "B",
+  "kaynaklar": [
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32024R1834",
+      "son_url": "https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32024R1834",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Date of end of validity: No end date",
+      "alinti": "Date of effect: 24/07/2026; Application See Art 10 Deadline: 24/07/2026; See Art 9.2 Deadline: 27/07/2030; At the latest See Art 8",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834",
+      "son_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "n/a (madde metni)",
+      "alinti": "1.   This Regulation lays down ecodesign requirements for the placing on the market or putting into service of fans with an electric input power between 125 W and 500 kW (≥ 125 W and ≤ 500 kW) at their best efficiency point, including where they are integrated into other products.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02024R1834-20251228",
+      "son_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02024R1834-20251228",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Konsolide metin (02024R1834-20251228), ▼M1 = 32025R2481 ile değişen bölüm işareti",
+      "alinti": "▼M1 1.   Regulation (EU) No 327/2011 is repealed with effect from 24 July 2026. However, Annexes I, II and III to that Regulation shall continue to apply until 24 July 2027 to fans integrated into other products, and until 24 July 2037 to spare part fans ... ▼M1 Article 10 ... It shall apply from 24 July 2026. However, Article 9(2) shall apply from 24 July 2024.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

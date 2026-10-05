@@ -18,7 +18,21 @@ import { formatDateTime } from '../../i18n/datetime'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { VARIANT_DETAIL_COLUMNS } from '../../lib/services/product.columns'
+import { ORDER_STEPS, orderStatusBadgeClass, orderStatusLabelKey, orderStepIndex } from '../../utils/orderStatusDisplay'
+import { getProductModelLabel } from '../../utils/productHelpers'
 import { siparisNoGoster } from '../../utils/siparisNo'
+
+/**
+ * Kalemin gömülü ürününden (`products ( model_code )`) GÖRÜNEN model kodu. PostgREST many-to-one
+ * gömmeyi nesne döndürür; dizi gelirse ilk eleman. Ürün okunamadıysa (RLS/boş) ya da kod boşsa
+ * `null` — `getProductModelLabel` hiçbir zaman ham `sku`ya düşmez, bu yüzden hata yolu da "satır yok".
+ */
+function kalemModelKodu(urun: unknown): string | null {
+  const satir: unknown = Array.isArray(urun) ? urun[0] : urun
+  if (!satir || typeof satir !== 'object') return null
+  const kod = (satir as { model_code?: unknown }).model_code
+  return getProductModelLabel({ model_code: typeof kod === 'string' ? kod : null })
+}
 
 interface ShippingAddress {
   fullAddress?: string
@@ -34,8 +48,11 @@ interface OrderItem {
   id: string
   product_id?: string
   product_name: string
-  /** Sipariş anındaki SKU (snapshot). Katalogtaki güncel SKU değil. */
-  product_sku?: string
+  /**
+   * GÜNCEL katalog model kodu (`products.model_code`), sipariş-anı snapshot'ı DEĞİL — şemada
+   * `model_code` snapshot'ı yok. Kod boşsa/ürün okunamadıysa `null`; ham SKU'ya ASLA düşülmez.
+   */
+  model_code?: string | null
   quantity: number
   unit_price: number
   total_price: number
@@ -105,7 +122,8 @@ export default function OrderDetailPage() {
             invoice_info, legal_consents,
             venthub_order_items (
               id, product_id, quantity, product_image_url,
-              product_name_snapshot, unit_price_snapshot, product_sku_snapshot
+              product_name_snapshot, unit_price_snapshot,
+              products ( model_code )
             )
           `)
           .eq('id', id)
@@ -128,7 +146,7 @@ export default function OrderDetailPage() {
             id: String(it.id),
             product_id: it.product_id ? String(it.product_id) : undefined,
             product_name: String(it.product_name_snapshot),
-            product_sku: it.product_sku_snapshot ? String(it.product_sku_snapshot) : undefined,
+            model_code: kalemModelKodu(it.products),
             quantity: qty,
             unit_price: unit,
             total_price: unit * qty,
@@ -250,35 +268,9 @@ export default function OrderDetailPage() {
   }
 
   // Status helpers
-  const getStatusColor = (status: string) => {
-    switch ((status || '').toLowerCase()) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'paid':
-      case 'confirmed': return 'bg-blue-100 text-blue-800'
-      case 'shipped': return 'bg-purple-100 text-purple-800'
-      case 'delivered': return 'bg-green-100 text-green-800'
-      case 'failed':
-      case 'cancelled': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-  const getStatusText = (status: string) => {
-    switch ((status || '').toLowerCase()) {
-      case 'pending': return t('orders.pending')
-      case 'paid':
-      case 'confirmed': return t('orders.paid')
-      case 'shipped': return t('orders.shipped')
-      case 'delivered': return t('orders.delivered')
-      case 'failed': return t('orders.failed')
-      case 'cancelled': return t('orders.cancelled')
-      case 'refunded': return t('orders.refunded')
-      default: return status
-    }
-  }
-  const steps = ['pending', 'paid', 'shipped', 'delivered'] as const
-  // Normalize 'confirmed' status to 'paid' for progress bar
-  const normalizedStatus = (order.status || 'pending').toLowerCase() === 'confirmed' ? 'paid' : (order.status || 'pending').toLowerCase()
-  const activeIdx = Math.max(steps.indexOf(normalizedStatus as typeof steps[number]), 0)
+  // Durum eşlemesi ortak yardımcıdan gelir (URN-1): sipariş listesiyle aynı kuralı kullanır.
+  const getStatusText = (status: string) => t(orderStatusLabelKey(status))
+  const activeIdx = orderStepIndex(order.status || 'pending')
 
   return (
     <div className="min-h-screen bg-clean-white py-8">
@@ -306,7 +298,7 @@ export default function OrderDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${getStatusColor(order.status)}`}>{getStatusText(order.status)}</span>
+              <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm ${orderStatusBadgeClass(order.status)}`}>{getStatusText(order.status)}</span>
               {order.payment_status?.toLowerCase() === 'partial_refunded' && (
                 <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider shadow-sm bg-orange-100 text-orange-800">{t('orders.partialRefunded')}</span>
               )}
@@ -317,13 +309,13 @@ export default function OrderDetailPage() {
           {/* Detailed Stepper */}
           <div className="mt-2 py-2">
             <div className="flex items-center gap-2 max-w-2xl mx-auto">
-              {steps.map((s, idx) => (
+              {ORDER_STEPS.map((s, idx) => (
                 <React.Fragment key={s}>
                   <div className="flex flex-col items-center min-w-80px">
                     <div className={`w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center transition-colors shadow-sm ${idx <= activeIdx ? 'bg-primary-navy text-white' : 'bg-slate-100 text-slate-400 border border-slate-200'}`}>{idx + 1}</div>
                     <span className={`mt-2 text-xs uppercase font-bold tracking-wider ${idx <= activeIdx ? 'text-primary-navy' : 'text-slate-400'}`}>{getStatusText(s)}</span>
                   </div>
-                  {idx < steps.length - 1 && (
+                  {idx < ORDER_STEPS.length - 1 && (
                     <div className={`flex-1 h-1 rounded-full ${activeIdx >= idx + 1 ? 'bg-primary-navy' : 'bg-slate-100'}`}></div>
                   )}
                 </React.Fragment>
@@ -426,10 +418,15 @@ export default function OrderDetailPage() {
                           ) : (
                             item.product_name
                           )}
-                          {/* Sipariş anındaki SKU — katalogtaki güncel SKU değil (W2b-2 snapshot). */}
-                          {item.product_sku ? (
-                            <div className="mt-0.5 text-xs font-normal text-slate-500">
-                              {t('orders.skuLabel', { sku: item.product_sku })}
+                          {/* URN-32: sipariş-anı `product_sku_snapshot` satırı KALDIRILDI. Sipariş detayı
+                              müşteriye gösterilir ve kural (INV-SKU-GORUNMEZ-1) "HİÇBİR müşteri yüzeyinde"
+                              der; snapshot/fatura görünümü için muafiyet yok. Satır sorgudan da çıktı —
+                              ekranda basılmayan iç kod müşteri tarayıcısına da inmesin.
+                              Yerine ürün sayfasının müşteriye zaten gösterdiği GÜNCEL katalog `model_code`'u
+                              (snapshot değil; şemada model_code snapshot'ı yok). Kod yoksa satır HİÇ çizilmez. */}
+                          {item.model_code ? (
+                            <div className="mt-0.5 text-xs font-normal text-steel-gray">
+                              {t('orders.modelCodeLabel', { code: item.model_code })}
                             </div>
                           ) : null}
                         </td>

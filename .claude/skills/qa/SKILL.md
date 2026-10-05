@@ -160,7 +160,7 @@ Bölümler: Hedef + mod + dal + tarih · Gezilen sayfalar (tr/en, masaüstü/mob
 · Sağlık puanı önce → sonra · **Kural-5 tablosu:** sayfa → `TEXT_WORDS` · **PR özeti (tek satır):**
 "QA: N bulgu, M düzeltildi, puan X → Y."
 
-Yeni deferred bulgular Linear/iş emri kaydı ister; kaydı sen açma, raporda "emir gerek" de.
+Yeni deferred bulgular iş emri kaydı (Kanban kartı) ister; kartı sen açma, raporda "emir gerek" de.
 
 ## Bitiş durumu
 

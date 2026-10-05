@@ -377,4 +377,13 @@ describe('INV-CATALOG-1 — katalog bütünlüğü kapısı', () => {
     // Süzgeci OLMAYAN bir kural hâlâ süzgeçsiz görünmeli — aksi hâlde tarayıcı kördür.
     expect(kuralSql('product-no-subcategory')).not.toMatch(/f\.deleted_at is null/)
   })
+
+  it('spec-type TİP sorar, metin biçimi DEĞİL — eksi sayı (-20 °C) yanlış-kırmızı vermez (2026-09-23)', () => {
+    // Eski regex '^[0-9]+(\.[0-9]+)?$' eksiyi tanımıyordu: min_operating_temperature_c = -20
+    // (37 satır, jsonb number) tüm PR'ları kırmızıya boyadı. Canlıda sabotaj koşuldu:
+    // sayı -20 / 3.5 → geçer; metin "-20" / "380 V" → KIRMIZI.
+    const sql = kuralSql('spec-type')
+    expect(sql).toMatch(/jsonb_typeof\(p\.technical_specs->k\.key\) <> 'number'/)
+    expect(sql).not.toMatch(/!~ '\^\[0-9\]/)
+  })
 })

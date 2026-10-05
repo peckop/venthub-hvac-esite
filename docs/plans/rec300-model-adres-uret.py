@@ -50,7 +50,7 @@ TIP = {
     'chimney-fans': ('baca fani', 'chimney fan', ['cap', 'debi'], ['somine ve baca fani']),
     'frequency-converters': ('frekans invertoru', 'frequency converter', ['guc_kw', 'gerilim', 'faz'], ['frekans konvertoru']),
     'speed-controllers': ('hiz anahtari', 'speed controller', [], ['hiz anahtari']),
-    'ambient-air-curtains': ('isiticisiz hava perdesi', 'ambient air curtain', ['uzunluk'], []),
+    'ambient-air-curtains': ('isiticisiz hava perdesi', 'unheated air curtain', ['uzunluk'], []),  # EN dal adı 'Unheated Air Curtains' (Faz 1-B, 2026-09-23)
     'electric-heated-air-curtains': ('elektrikli isiticili hava perdesi', 'electric heated air curtain', ['uzunluk'], []),
     'air-curtains': ('hava perdesi', 'air curtain', ['uzunluk'], []),
     'ducted-central-hrv': ('isi geri kazanim cihazi', 'heat recovery unit', ['debi'], ['isi geri kazanim cihazi']),

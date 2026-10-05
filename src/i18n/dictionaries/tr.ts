@@ -127,7 +127,15 @@ export const tr = {
         'ducted-central-hrv': 'Kanallı Merkezi Üniteler',
         'single-room-hrv': 'Tekil Oda Üniteleri',
         'speed-controllers': 'Hız Anahtarları',
-        'water-coils': 'Sulu Batarya Kanal Tipi'
+        'water-coils': 'Sulu Batarya Kanal Tipi',
+        // REC-300 Faz 1-B (K17 ağacı, karar 78b + 84): anahtarı veritabanı migration'ı bağlar.
+        // Korozyon dalı YENİ anahtara geçer (`acid-fans` değişmez) → ad ile adres aynı anda döner.
+        'corrosion-fans': 'Korozyon Dayanımlı Fanlar',
+        'plug-fans': 'Plug Fanlar',
+        'cabinet-fans': 'Hücreli Aspiratörler',
+        'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
+        'electric-curtain': 'Elektrikli Isıtıcılı Hava Perdeleri',
+        'spare-parts': 'Yedek Parça ve Sensörler'
       }
     },
     viewAll: 'Tümü',
@@ -208,6 +216,20 @@ export const tr = {
     },
     orbital: {
       dragHint: 'Tut Çevir',
+      tapProductHint: 'Ürüne Tıkla',
+      swipeHint: 'Sol-Sağ Çevir',
+      pickCategoryHint: 'Kategoriyi Seç',
+      discoverTitle: 'Ürün Yelpazemizi Keşfedin',
+      subcategoriesTitle: '{{name}} Alt Kategorileri',
+      openMainDesktop: 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git',
+      openMainTouch: 'Dokun: Aç • Çift Dokun: Git',
+      openSubDesktop: 'Tıklayarak Ürün Sayfasına Gidin',
+      openSubTouch: 'Dokunarak Sayfaya Gidin',
+    },
+    radialMenu: {
+      subcategoriesCount: 'Alt Kategoriler ({{count}})',
+      noSubcategories: 'Alt Kategori Yok',
+      viewProducts: 'Ürünleri Gör',
     },
     category3DIcon: {
       dragHint: 'Tut Çevir',
@@ -336,7 +358,7 @@ export const tr = {
       },
       hrv: {
         title: 'Isı Geri Kazanım (HRV/ERV)',
-        image: '/images/hvac_installation_close_up_premium_4.png',
+        image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg',
         summary: 'Taze havayı ısı geri kazanımı ile sağlayan cihazlar; seçimde debi, verim/SFP ve harici statik basınç kritik.',
         steps: ['Debi: kişi/mahale göre toplam m³/h (EN 16798-1/ASHRAE 62.1 aralıkları).', 'Verim/SFP: %70–85 verim, düşük SFP (işletme maliyeti).', 'Basınç: filtre/kanal kayıplarına uygun harici statik basınç.'],
         pitfalls: ['Yüksek verime bakıp harici statik basıncı atlamak']
@@ -349,9 +371,61 @@ export const tr = {
       }
     }
   },
+  // BİLGİ MERKEZİ (karar 92, 2026-09-24) — rehber yazılarının liste ve yazı sayfası şablonu.
+  // Yazıların kendi metni sözlükte DEĞİL (src/data/bilgiMerkezi/yazilar.ts; ileride DB tablosu):
+  // burada yalnız şablonun sabit metinleri durur (rehber-yazisi-standard.md R3).
+  bilgiMerkezi: {
+    ad: 'Bilgi Merkezi',
+    anaSayfa: 'Ana sayfa',
+    liste: {
+      seoBaslik: 'Bilgi Merkezi — Havalandırma Rehber Yazıları | VentHub',
+      seoAciklama: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
+      baslik: 'Bilgi Merkezi',
+      altBaslik: 'Havalandırma ürünlerini seçerken sorulan soruların cevapları: nasıl çalışır, nasıl seçilir, nelere dikkat edilir.',
+      aramaEtiketi: 'Yazılarda ara',
+      aramaYerTutucu: 'Konu ya da terim yazın',
+      sonucYok: 'Aramanıza uyan yazı bulunamadı.',
+      oku: 'Yazıyı oku',
+      bosBaslik: 'Rehberler hazırlanıyor',
+      bosAciklama: 'Kaynakları belirtilmiş, doğrulanmış rehber yazıları hazırlanıyor. İlk yazılar yayına girene kadar ihtiyacınızı aşağıdaki Ürün Seçici ile hesaplayabilirsiniz.',
+      seciciBaslik: 'Ürün Seçici',
+      seciciAciklama: 'Kanal, ısı geri kazanım, hava perdesi ve jet fan hesaplarını tek yerden yapın.',
+      seciciDugme: 'Ürün Seçici’yi aç',
+    },
+    yazi: {
+      yazar: 'VentHub',
+      okumaSuresi: '{{count}} dakika okuma',
+      guncelleme: 'Güncelleme',
+      icindekiler: 'İçindekiler',
+      urunlerBaslik: 'İlgili ürün aileleri',
+      urunDugme: 'Aileyi incele',
+      ilgiliBaslik: 'İlgili yazılar',
+      teklifBaslik: 'Projeniz için teklif alın',
+      teklifAciklama: 'İhtiyacınızı iletişim formundan yazın; uygun ürün için teklif hazırlayalım.',
+      teklifDugme: 'Teklif iste',
+      listeyeDon: 'Bilgi Merkezi’ne dön',
+    },
+    // REC-452: kategori ve aile sayfasının altındaki rehber bağlantıları + ana sayfa bilgi bloğu.
+    ilgiliRehberler: 'Bu konudaki rehber yazıları',
+    sonRehberler: 'Son rehber yazıları',
+    konular: {
+      konfor: 'Konfor',
+      guvenlik: 'Güvenlik',
+      verimlilik: 'Verimlilik',
+    },
+  },
   meta: {
     siteTitle: 'VentHub — Premium HVAC Çözümleri',
     siteDesc: 'Otopark jet fanı, hava perdesi, ısı geri kazanım cihazı ve kanal fanı çözümleri; mühendislik destekli ürün seçimi ve teknik danışmanlık.',
+  },
+
+  // 404 sayfası (src/app/not-found.tsx). Next.js'in hazır sayfası İngilizce metin + ikinci bir
+  // <title> basıyordu (2026-09-24 canlı ölçüm: /tr/... adresinde iki başlık).
+  sayfaBulunamadi: {
+    baslik: 'Sayfa bulunamadı',
+    aciklama: 'Aradığınız sayfa taşınmış ya da kaldırılmış olabilir. Ürünlere göz atabilir ya da ana sayfaya dönebilirsiniz.',
+    anaSayfa: 'Ana sayfaya dön',
+    urunler: 'Ürünlere göz at',
   },
 
   home: {
@@ -841,7 +915,17 @@ export const tr = {
     cookieTitle: 'Çerez Politikası (Taslak)',
     distanceSalesTitle: 'Mesafeli Satış Sözleşmesi (Taslak)',
     preInformationTitle: 'Ön Bilgilendirme Formu (Taslak)',
-    termsTitle: 'Kullanım Koşulları (Taslak)'
+    termsTitle: 'Kullanım Koşulları (Taslak)',
+    // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: yasal sayfalar varsayılan site
+    // açıklamasını basıyordu. Yalnız belgenin konusu adlandırılır.
+    seo: {
+      kvkk: '6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni.',
+      privacy: 'VentHub web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu.',
+      cookie: 'VentHub web sitesinde kullanılan çerezler ve çerez tercihlerinin yönetimi.',
+      terms: 'VentHub web sitesinin kullanım koşulları.',
+      distanceSales: 'VentHub üzerinden yapılan satışlara ilişkin mesafeli satış sözleşmesi.',
+      preInformation: 'Mesafeli satış öncesinde tüketiciye sunulan ön bilgilendirme formu.',
+    }
   },
   footer: {
     quickLinks: 'Hızlı Linkler',
@@ -854,12 +938,8 @@ export const tr = {
     // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
     // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
     email: 'info@venthub.com.tr',
-    social: {
-      facebook: 'Facebook',
-      twitter: 'Twitter',
-      linkedin: 'LinkedIn',
-      instagram: 'Instagram'
-    }
+    // social BİLİNÇLİ YOK (REC-285, 2026-09-24): bağlantılar platform ana sayfasına gidiyordu.
+    // Gerçek hesap adresleri gelince EN sözlüğüyle BİRLİKTE geri eklenir (parite).
   },
   auth: {
     pwStrength: {
@@ -980,7 +1060,11 @@ export const tr = {
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin mühendislik harikası çözümlerini projelerinizle buluşturuyoruz.',
     eyebrow: 'Mükemmelliğin Global İmzaları',
     exploreBrand: 'Markayı Keşfedin',
-    seoDesc: 'VentHub çatısı altındaki endüstriyel havalandırma markaları',
+    seoDesc: 'VentHub kataloğundaki endüstriyel havalandırma ve HVAC markaları. Her markanın ürün ailelerini, modellerini ve teknik özelliklerini inceleyin.',
+    // REC-497: marka kaydındaki üretici övgüsü ("dünya lideri" vb.) arama açıklamasından atılınca kalan metin
+    // kısa kalırsa ya da hiç kalmazsa kullanılır. Yalnız kayıttaki doğrulanabilir alan (uzmanlık) konuşur.
+    seoYedekUzmanlik: 'VentHub kataloğunda {{uzmanlik}} alanındaki ürünleri inceleyin.',
+    seoYedek: '{{ad}} markasının ürün ailelerini, modellerini ve teknik özelliklerini VentHub kataloğunda inceleyin.',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
@@ -1055,7 +1139,9 @@ export const tr = {
       submitFailed: 'Mesajınız gönderilemedi. Lütfen tekrar deneyin; sorun sürerse bize doğrudan ulaşın.',
     },
     title: 'İletişim',
-    subtitle: 'Size her konuda yardımcı olmaktan mutluluk duyarız.',
+    // REC-497: bu metnin TEK tüketicisi sayfanın üst verisi (arama sonucu açıklaması); eski metin
+    // 51 karakterdi ("Size her konuda yardımcı olmaktan mutluluk duyarız.") ve sayfayı anlatmıyordu.
+    subtitle: 'VentHub ile iletişime geçin: ürün seçimi, teknik sorular ve teklif talepleriniz için formu doldurun ya da e-posta ile yazın.',
   },
   aboutPage: {
     title: 'Hakkımızda',
@@ -1347,6 +1433,9 @@ export const tr = {
     unexpected: 'Beklenmedik bir hata oluştu'
   },
   category: {
+    // REC-497: kategorinin KENDİ açıklaması (metadata.description_i18n) yoksa arama sonucu açıklaması.
+    // "en kaliteli/ekonomik" gibi sitede doğrulanamayan iddia YOK; satış modu teklif usulü, fiyat vaadi YOK.
+    seoYedekAciklama: '{{ad}} kategorisindeki ürün ailelerini, modelleri ve teknik özellikleri VentHub kataloğunda inceleyin.',
     family: {
       variantCount: '{{count}} model',
       count: '{{count}} ürün ailesi',
@@ -1505,6 +1594,7 @@ export const tr = {
     notFound: 'Kategori bulunamadı',
     backHome: 'Ana Sayfaya Dön',
     breadcrumbHome: 'Ana Sayfa',
+    breadcrumbAria: 'Sayfa yolu',
     premiumCollection: 'Premium Koleksiyon',
     findModel: 'Bana Uygun Modeli Bul',
     productCount: 'Ürün Sayısı',
@@ -1674,6 +1764,7 @@ export const tr = {
       drive_code: 'Sürücü Kodu',
       enclosure_class: 'Muhafaza Tipi',
       enclosure_size: 'Muhafaza Boyutu',
+      electrical_protection_class: 'Elektrik Koruma Sınıfı',
       erp_compliant: 'ErP Uyumlu',
       filter_classes: 'Filtre Sınıfı',
       fire_rating: 'Yangın Sınıfı',
@@ -1701,6 +1792,7 @@ export const tr = {
       min_operating_temperature_c: 'Minimum Çalışma Sıcaklığı',
       min_static_pressure_pa: 'Minimum Statik Basınç',
       min_voltage_v: 'Minimum Voltaj',
+      motor_efficiency_class: 'Motor Verim Sınıfı',
       motor_poles: 'Motor Kutup Sayısı',
       motor_type: 'Motor Tipi',
       noise_level_db_a: 'Ses Seviyesi',
@@ -1804,7 +1896,8 @@ export const tr = {
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Mühendislik Analizi',
-      sku: 'SKU',
+      /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
+      modelCode: 'Model Kodu',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
     },
     actions: {
@@ -1907,6 +2000,16 @@ export const tr = {
     home: {
       subtitle: 'İhtiyacınız olan bilgilere hızlıca ulaşın.',
       warrantyDesc: 'Garanti kapsamı ve yetkili servis bilgileri',
+    },
+    // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: bu dört sayfa varsayılan site
+    // açıklamasını basıyordu. Yeni vaat YOK: yalnız sayfanın zaten anlattığı konu adlandırılır.
+    seo: {
+      // Sekme başlığı: sayfa H1'i "SSS" kısaltmasıdır; arama sonucunda tam ad okunur.
+      faqTitle: 'Sık Sorulan Sorular',
+      faq: 'Teklif, ödeme ve kurulum hakkında sık sorulan sorular ve cevapları.',
+      shipping: 'Teslimat süresi, kargo ücreti ve gönderi takibi hakkında bilgi.',
+      returns: 'Cayma hakkı, iade koşulları ve iade talebinin nasıl yapılacağı.',
+      warranty: 'Garanti kapsamı ve yetkili servis bilgileri.',
     },
     returns: {
       title: 'İade ve Değişim',
@@ -2107,7 +2210,8 @@ export const tr = {
       shipStatus: {
         delivered: 'Teslim Edildi',
         shipped: 'Kargoda',
-        preparing: 'Hazırlanıyor'
+        preparing: 'Hazırlanıyor',
+        awaitingPayment: 'Ödeme Bekleniyor'
       },
       shipSteps: {
         preparing: 'Hazırlandı',
@@ -2119,6 +2223,7 @@ export const tr = {
       statusDelivered: 'Teslim Edildi',
       statusShipped: 'Kargoda',
       statusPreparing: 'Hazırlanıyor',
+      statusAwaitingPayment: 'Ödeme Bekleniyor',
       stepShipped: 'Kargoya Verildi',
       stepDelivered: 'Teslim Edildi',
       subtitle: 'Siparişlerinizin kargo durumunu ve takip bilgilerini buradan izleyebilirsiniz.',
@@ -2344,8 +2449,8 @@ export const tr = {
     reorderedToast: '{{count}} ürün sepete eklendi',
     reorderNotFound: 'Ürünler stokta bulunamadı',
     reorderError: 'Tekrar sipariş sırasında hata',
-    /** Sipariş anındaki SKU (snapshot) — katalogtaki güncel SKU değil. */
-    skuLabel: 'SKU: {{sku}}',
+    /** Kalemin GÜNCEL katalog model kodu (sipariş-anı snapshot'ı değil); ham SKU değildir. */
+    modelCodeLabel: 'Model Kodu: {{code}}',
     shippingInfo: 'Kargo / Takip',
     carrier: 'Kargo Firması',
     trackingNumber: 'Takip Numarası',
@@ -2365,6 +2470,8 @@ export const tr = {
     paid: 'Ödendi',
     partialRefunded: 'Kısmi İade Edildi',
     pending: 'Beklemede',
+    processing: 'Hazırlanıyor',
+    statusUnknown: 'Durum Güncelleniyor',
     refunded: 'İade Edildi',
     shipped: 'Sevk Edildi',
     startDate: 'Başlangıç Tarihi',
@@ -2514,7 +2621,7 @@ export const tr = {
         noPermission: 'Bu işlem için yetkiniz yok',
         pricesSaved: 'Fiyatlar kaydedildi',
         pricesSaveFailed: 'Fiyatlar kaydedilemedi',
-        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat girin'
+        priceRequired: 'Teklif göndermeden önce tüm kalemlere fiyat, aynı para birimi ve ileri tarihli geçerlilik girin'
       }
     }
   },
@@ -2579,6 +2686,8 @@ export const tr = {
     // böyle bir aktarım YOK — hesaplayıcılar sonucu teklif akışına taşımıyor. Vaat kutularını
     // temizleyen PR'ın kendisi yeni bir vaat getiriyordu; aynı K1 hatası, bu kez benden.
     aciklama: 'Hacim, debi ve basınç girdilerinizle ön değerlendirme yapın.',
+    // REC-497: arama sonucu açıklaması (60 karakterlik sayfa metni çok kısaydı; sayfa metni değişmez).
+    seoDescription: 'Hacim, debi ve basınç değerlerinizle kanal fanı, ısı geri kazanım, hava perdesi ve jet fan için ön değerlendirme yapın.',
     araclar: {
       kanal: {
         ad: 'Kanal fanı hesabı',
@@ -2709,6 +2818,8 @@ export const tr = {
       description: 'Hava kanalı hız hesaplaması ve basınç düşümü tahmini',
       infoText: 'Debi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplar.',
       form: {
+        inputTitle: 'Kanal Bilgileri',
+        inputDesc: 'Debi ve kanal ölçülerini girin',
         shape: 'Kanal Tipi',
         round: 'Yuvarlak',
         roundDesc: 'Spiral veya kaynaklı boru',
@@ -2716,8 +2827,11 @@ export const tr = {
         rectangularDesc: 'Köşeli kanal',
         material: 'Malzeme',
         steel: 'Galvaniz Saç',
+        steelDesc: 'Standart',
         pvc: 'PVC',
+        pvcDesc: 'Düşük sürtünmeli',
         flex: 'Flex Kanal',
+        flexDesc: 'Esnek',
         airflow: 'Hava Debisi',
         airflowTooltip: 'Kanaldan geçmesi gereken hava miktarı',
         diameter: 'Kanal Çapı',
@@ -2728,6 +2842,8 @@ export const tr = {
         lengthTooltip: 'Toplam kanal boyu'
       },
       results: {
+        title: 'Hesaplama Sonuçları',
+        subtitle: 'Hava hızı ve basınç kaybı değerleri',
         velocity: 'Hava Hızı',
         specificLoss: 'Basınç Kaybı (Spesifik)',
         totalLoss: 'Toplam Basınç Kaybı',
@@ -2741,18 +2857,28 @@ export const tr = {
       infoText: 'Isı geri kazanım cihazlarının (IGK) veya entalpi geri kazanım cihazlarının (ERV) yıllık enerji tasarruf potansiyelini hesaplar.',
       form: {
         type: 'Cihaz Tipi',
+        typeDesc: 'Isı geri kazanım sistemini seçin',
         hrv: 'HRV (Isı Geri Kazanım)',
         hrvDesc: 'Sadece duyulur ısı',
         erv: 'ERV (Enerji Geri Kazanım)',
         ervDesc: 'Isı + Nem geri kazanımı',
         climate: 'İklim Bölgesi',
         cold: 'Soğuk',
+        coldDesc: 'Kuzey / dağlık bölgeler',
         temperate: 'Ilıman',
+        temperateDesc: 'Orta kuşak',
         hot: 'Sıcak',
+        hotDesc: 'Güney / kıyı bölgeleri',
         usage: 'Mahal Tipi',
+        usageDesc: 'Bina, iklim ve kullanım bilgileri',
+        residential: 'Konut',
+        residentialDesc: 'Ev kullanımı',
         office: 'Ofis',
+        officeDesc: 'İş yeri',
         commercial: 'Ticari',
+        commercialDesc: 'Mağaza / alışveriş merkezi',
         occupancy: 'Kişi Sayısı',
+        unitPeople: 'kişi',
         workingHours: 'Günlük Çalışma',
         electricityPrice: 'Elektrik Birim Fiyatı',
         sensibleEfficiency: 'Duyulur Verim',
@@ -2760,6 +2886,15 @@ export const tr = {
         area: 'Alan (m²)'
       },
       results: {
+        title: 'Hesaplama Sonuçları',
+        subtitle: 'Tahmini yıllık enerji tasarrufu',
+        savingsTitle: 'Yıllık Tasarruf',
+        annualEnergySaving: 'Yıllık Enerji Tasarrufu',
+        annualCostSaving: 'Yıllık Maliyet Tasarrufu',
+        unitKwhPerYear: 'kWh/yıl',
+        unitCostPerYear: '₺/yıl',
+        unitKgPerYear: 'kg/yıl',
+        unitYears: 'yıl',
         heatingGain: 'Isıtma Kazancı',
         coolingGain: 'Soğutma Kazancı',
         co2Reduction: 'CO₂ Azaltımı',
@@ -3064,7 +3199,10 @@ export const tr = {
     },
     coldStorage: 'Soğuk Hava Deposu',
     coldStorageDesc: 'Soğuk zincir koruması',
+    coldStorageTip: 'Soğuk zinciri KORUR, ürün bozulmasını engeller',
     industrial: 'Endüstriyel Tesis',
+    industrialDesc: 'Fabrika, lojistik tesisi',
+    industrialTip: 'Toz, duman ve zararlı madde izolasyonu sağlar',
     retail: 'Market / Süpermarket',
     retailDesc: 'Soğutucu reyonlar',
     retailTip: 'Soğutucu reyonlardan sıcak havayı uzak tutar',

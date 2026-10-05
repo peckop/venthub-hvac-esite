@@ -103,4 +103,18 @@ describe('groupTechnicalSpecs', () => {
       custom_spec: 'Value'
     })
   })
+
+  it('REC-172 tur 2: IE verim sınıfı ve elektrik koruma sınıfı ELEKTRİK grubunda; benzer adlı alan kaymaz', () => {
+    const grouped = groupTechnicalSpecs({
+      motor_efficiency_class: 'IE3',
+      electrical_protection_class: 'Class II',
+      insulation_class: 'F',
+      heat_recovery_efficiency_pct: 90,
+    })
+    expect(grouped?.electrical.specs).toEqual({
+      motor_efficiency_class: 'IE3',
+      electrical_protection_class: 'Class II',
+    })
+    expect(grouped?.other.specs).toEqual({ insulation_class: 'F', heat_recovery_efficiency_pct: 90 })
+  })
 })

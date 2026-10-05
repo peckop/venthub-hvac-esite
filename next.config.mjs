@@ -1,5 +1,25 @@
+import { readFileSync } from 'node:fs';
+
 import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from "@sentry/nextjs";
+
+import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
+import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.mjs';
+import { adresDiliOku, rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri } from './src/config/rotaDili.mjs';
+
+/**
+ * `EN_YAYIN` bayrağının TEK kaynağı `src/config/features.ts`. Bu dosya TypeScript içe aktaramadığı
+ * için değer metinden okunur; okunamazsa `enYayinOku` ATAR (sessizce "kapalı" varsaymaz).
+ * Test aynı okuyucunun `features.ts`'teki gerçek değeri verdiğini ölçer (INV-BILGI-MERKEZI-YONLENDIRME-1).
+ */
+const EN_YAYIN = enYayinOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
+/** `ADRES_SEMASI_K3B` — aynı gerekçe; okuyucu `k3bOku` (INV-MARKA-KAYNAK-1 gerçek değeri ölçer). */
+const ADRES_SEMASI_K3B = k3bOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
+/**
+ * Rota dili anahtarı (OPS-52): `NEXT_PUBLIC_ADRES_DILI`, derleme anında okunur; YALNIZ tam `1` açar,
+ * yok/bozuk = kapalı. K3B'den AYRI anahtar (biri tek başına geri alınır). Cetvel: src/config/rotaDili.mjs.
+ */
+const ADRES_DILI = adresDiliOku(process.env.NEXT_PUBLIC_ADRES_DILI);
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -161,7 +181,28 @@ const nextConfig = {
                 destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT',
                 permanent: true,
             },
+
+            // ── KARAR 92 (Recep, 2026-09-24) — Bilgi Merkezi kendi adresine taşındı.
+            // `/destek/merkez` + `/destek/konular/*` → `/tr/bilgi-merkezi` · `/en/knowledge-hub`
+            // (EN yalnız `EN_YAYIN` açıkken; kapalıyken EN kategori/destek karşılığı). Liste ve
+            // gerekçe tek dosyada: src/config/bilgiMerkeziYonlendirmeleri.mjs. Hepsi tek hop.
+            ...bilgiMerkeziYonlendirmeleri(EN_YAYIN),
+
+            // ── REC-374 (2026-09-27) — marka listesi DB ile hizalandı; listeden çıkan üç slug
+            // (`frekans-konvertoru` → frekans konvertörleri kategorisi; `flexiva`, `casals` → marka
+            // listesi). K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
+            // src/config/markaYonlendirmeleri.mjs · kapı INV-MARKA-KAYNAK-1. Hepsi tek hop.
+            ...markaYonlendirmeleri(ADRES_SEMASI_K3B),
+
+            // ── OPS-52 (kararlar 267/269/270) — sayfa adresleri dile göre yazılır
+            // (`/tr/about` → `/tr/hakkimizda`). Anahtar kapalıyken liste BOŞ. Gerekçe, tablo ve
+            // yeniden yazım karşılığı: src/config/rotaDili.mjs. Hepsi tek hop.
+            ...rotaDiliYonlendirmeleri(ADRES_DILI),
         ];
+    },
+    async rewrites() {
+        // Yeni adres → mevcut klasör (sayfa dosyası aranmadan önce). Anahtar kapalıyken boş.
+        return { beforeFiles: rotaDiliYenidenYazimlari(ADRES_DILI) };
     },
     async headers() {
         return [
@@ -206,10 +247,10 @@ const nextConfig = {
                 // `follow` KASITLI: sayfa dizine girmesin ama içindeki bağlantılar izlensin —
                 // hesap/sepet sayfasından vitrine giden yollar kapanmasın.
                 //
-                // KAPSAM SINIRI: `/checkout` bilerek YOK — o yüzey ALTYAPI şeridinin claim'inde
-                // (`src/app/[lang]/checkout/**`). Aynı kusuru taşıyorsa sahibi kapatır; başka
-                // şeridin dosyasına buradan uzanılmaz.
-                source: '/:lang(tr|en)/:yuzey(auth|account|cart)/:path*',
+                // `checkout` + `payment-success` (PR-1, bot karnesi 2026-09-24): ödeme sayfası
+                // dizine AÇIKTI. O gün burada "checkout ALTYAPI'nın claim'inde" diye bilerek dışarıda
+                // bırakılmıştı; yüzey artık URUN şeridinde (src/app/**), sahibi kapatıyor.
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart|checkout|payment-success)/:path*',
                 headers: [
                     { key: 'X-Robots-Tag', value: 'noindex, follow' },
                 ],
@@ -218,7 +259,7 @@ const nextConfig = {
                 // Yüzeyin kendisi (alt yol olmadan): /tr/account · /tr/cart · /en/cart …
                 // Yukarıdaki desen `:path*` ile eşleşiyor ama kökü ayrıca yazmak, deseni
                 // okuyanın "kök dahil mi" diye tereddüt etmesini önler.
-                source: '/:lang(tr|en)/:yuzey(auth|account|cart)',
+                source: '/:lang(tr|en)/:yuzey(auth|account|cart|checkout|payment-success)',
                 headers: [
                     { key: 'X-Robots-Tag', value: 'noindex, follow' },
                 ],

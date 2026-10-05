@@ -132,7 +132,11 @@ describe('INV-TEK-ADRES-1 — kategori adresi tekilliği', () => {
       'iki seviyeli rota yeniden içerik üretiyor (PageComponent) — kanonik ikiye böl��nür',
     ).not.toContain('PageComponent')
     expect(kaynak).not.toContain('generateStaticParams')
-    expect(kaynak).not.toContain('generateMetadata')
+    // REC-300 Faz 3b-2: bayrak AÇIKKEN EN iki seviyeli adres kanonik olur ve metadata üretir;
+    // bayrak KAPALIYKEN metadata boş kalmalı (kanonik ikiye bölünmez).
+    expect(kaynak, 'iki seviyeli rota bayrak kapalıyken metadata üretiyor').toMatch(
+      /if\s*\(\s*!ADRES_SEMASI_K3B\s*\)\s*return\s*\{\s*\}/,
+    )
   })
 
   it('K4 · özel yüzeyler (giriş/hesap/sepet) dizine girmez, ama bağlantıları izlenir', () => {
@@ -152,18 +156,17 @@ describe('INV-TEK-ADRES-1 — kategori adresi tekilliği', () => {
       'noindex, nofollow yazılmış — hesap/sepet sayfasından vitrine giden yollar kapanır',
     ).not.toMatch(/X-Robots-Tag['"]\s*,\s*value:\s*['"][^'"]*nofollow/)
 
-    // Üç yüzey de kapsamda olmalı.
-    for (const yuzey of ['auth', 'account', 'cart']) {
-      expect(kaynak, `${yuzey} yüzeyi X-Robots-Tag kapsamında değil`).toMatch(
-        new RegExp(`\\(auth\\|account\\|cart\\)`),
-      )
-      expect(yuzey).toBeTruthy()
+    // Beş yüzey de kapsamda olmalı. REC-150 Adım 5 / bot karnesi 2026-09-24: ödeme sayfası
+    // (`checkout`) dizine AÇIKTI; o gün "başka şeridin claim'inde" diye bilerek dışarıda
+    // bırakılmıştı — yüzey artık URUN'un `src/app/**` alanında, sahibi kapattı. Ödeme sonucu
+    // (`payment-success`) aynı sınıf. Her yüzey desenin İÇİNDE ayrı ayrı aranır (sıra serbest):
+    // eskiden tek bir sabit dizge aranıyordu ve döngü değişkenini hiç kullanmıyordu.
+    const desenler = [...kaynak.matchAll(/:yuzey\(([^)]*)\)/g)].map(m => m[1].split('|'))
+    expect(desenler.length, 'X-Robots desenlerinde :yuzey(...) grubu bulunamadi — olcut kor').toBeGreaterThan(0)
+    for (const yuzey of ['auth', 'account', 'cart', 'checkout', 'payment-success']) {
+      for (const grup of desenler) {
+        expect(grup, `${yuzey} yüzeyi X-Robots-Tag deseninde değil (${grup.join('|')})`).toContain(yuzey)
+      }
     }
-
-    // KAPSAM SINIRI kayıtlı kalsın: checkout başka şeridin claim'inde, bilerek dışarıda.
-    expect(
-      kaynak,
-      'checkout X-Robots-Tag desenine eklenmiş — o yüzey ALTYAPI claim\'inde, sahibi kapatır',
-    ).not.toMatch(/\(auth\|account\|cart\|checkout\)/)
   })
 })

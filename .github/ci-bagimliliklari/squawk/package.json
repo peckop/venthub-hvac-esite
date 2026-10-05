@@ -1,0 +1,8 @@
+{
+  "name": "venthub-ci-squawk",
+  "private": true,
+  "description": "CI (migration-linter): yalniz squawk-cli, KILITLI. Kok package.json'dan bagimsiz kurulur; sebep .github/ci-bagimliliklari/README.md",
+  "dependencies": {
+    "squawk-cli": "2.65.0"
+  }
+}

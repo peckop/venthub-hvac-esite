@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """
-Extract and update product brands from product names
-Fixes the issue where all products have brand='AVenS' but actual brand is in product name
+Marka tahmini RAPORU — ürün adından marka çıkarır, mevcut markayla KARŞILAŞTIRIR. YAZMAZ.
+
+⛔ YAZMA YOLU KALDIRILDI (REC-209, 2026-09-23). Eski hali konsol "yes" onayıyla canlıda `products.brand`
+güncelliyordu; kiracı süzgeci yoktu ve bilinen marka listesinde SEAT yoktu. Canlı ölçüm (2026-09-23,
+betiğin mantığı SQL'de taklit edildi): koşulsaydı **173 ürünün markası "AVenS" olacaktı** — SEAT 82 ·
+Nicotra Gebhardt 35 · Danfoss 35 · Vortice 21. Marka bugün içe alımda kaynaktan geliyor; bu betiğin
+yazacağı doğru bir değer yok. Marka düzeltmesi gerekirse iki anahtarlı, koşullu, yedekli bir yazıcıyla
+(`scripts/icerik-hatti/teknik-duzelt.py` kalıbı) ve Recep onayıyla yapılır — buraya yazma geri EKLENMEZ.
+Kapı: `scripts/icerik-hatti/__tests__/fiyat-bosluk.test.ts` "YAZMAZ" bloğu bu dosyayı da tarar.
 """
 
 import os
@@ -147,35 +154,11 @@ def main():
             logger.info(f"  Current: {update['current_brand']} → New: {update['new_brand']}")
             logger.info(f"  Confidence: {update['confidence']:.0%}")
     
-    # Confirm before updating
+    # YALNIZ RAPOR — yazma yolu yok (dosya başı). Uyuşmazlık = adla marka ayrışıyor; hangisinin
+    # doğru olduğunu bu betik BİLEMEZ (ad markayı taşımayabilir: "SEAT 25 …", "FC-51 …").
     logger.info(f"\n{'='*60}")
-    logger.info(f"Ready to update {stats['to_update']} products")
+    logger.info(f"RAPOR: adından çıkarılan marka {stats['to_update']} üründe mevcut markadan farklı — HİÇBİRİ YAZILMADI")
     logger.info(f"{'='*60}")
-    
-    response = input("\nProceed with update? (yes/no): ")
-    
-    if response.lower() != 'yes':
-        logger.info("Update cancelled by user")
-        return
-    
-    # Execute updates
-    logger.info("\n3. Updating products...")
-    updated_count = 0
-    
-    for update in updates:
-        try:
-            supabase.table('products').update({
-                'brand': update['new_brand']
-            }).eq('id', update['id']).execute()
-            updated_count += 1
-            
-            if updated_count % 50 == 0:
-                logger.info(f"  Updated {updated_count}/{stats['to_update']}...")
-        except Exception as e:
-            logger.error(f"Error updating {update['name']}: {e}")
-    
-    logger.info(f"\n✓ Update complete: {updated_count} products updated")
-    logger.info("="*60)
 
 if __name__ == "__main__":
     try:
