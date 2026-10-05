@@ -734,6 +734,18 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     expect(uretici.haritaSorunlari(undefined, sisik).join('\n')).toMatch(/kısa özet \d+ bayt > 2048/)
   })
 
+  // OPS denetimi (#1690 bulgu 3): kısa satırlar elle yazılır; "bayat kalamaz" yalnız tam harita için doğruydu.
+  it('BAĞ: kısa özetin dosya alanı parçaları kart Dosyalar metninde geçer; kart ya da kısa satır kayınca yakalanır', () => {
+    expect(uretici.haritaSorunlari()).toEqual([])
+    // kısa satır kartta olmayan bir alana kayarsa
+    const kaymis = { ...uretici.HARITA_KISA, ARAC: [uretici.HARITA_KISA.ARAC[0], 'hooks, olmayan/dizin'] }
+    expect(uretici.haritaSorunlari(undefined, kaymis).join('\n')).toMatch(/ARAC kısa dosya alanı "olmayan\/dizin" kart Dosyalar metninde yok/)
+    // kartın Dosyalar metni değişip kısa satır eski kalırsa
+    const ropy = JSON.parse(JSON.stringify(uretici.ROLLER)) as Record<string, { dosyalar: string }>
+    ropy.ADMIN.dosyalar = ropy.ADMIN.dosyalar.replace(/src\/views\/admin\/\*\*/g, 'src/views/yonetim/**')
+    expect(uretici.haritaSorunlari(ropy).join('\n')).toMatch(/ADMIN kısa dosya alanı "views\/admin" kart Dosyalar metninde yok/)
+  })
+
   it('AYIRT EDİCİLİK: OPS kartından işaretçi silinirse kart denetimi yakalar', () => {
     const kartlar = uretici.uret()
     const bozuk = { ...kartlar, OPS: kartlar.OPS.replace(uretici.HARITA_ISARETCISI, '') }

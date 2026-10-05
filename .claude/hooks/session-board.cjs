@@ -160,8 +160,11 @@ try {
  * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
  */
 // VH_SESSIONSTART_TOPLAM_TEST yalnız kapı testindedir (daralma yolunu zorlar); üretimde ayarlı olmaz.
-// let: yalnız OPS rolünde departman haritası kısa özetinin uzunluğu kadar genişler (HRT-29; bölüm küçülmez, bkz. haritaBolumuEkle).
+// let: yalnız OPS rolünde departman haritası kısa özetinin uzunluğu kadar genişler (HRT-29; bölüm küçülmez, bkz. haritaBolumuEkle),
+// ama genişleme MUTLAK_TAVAN'ı aşamaz: kancanın kendi sınırı 10.000'dir; 9.000 + 1.855 = 10.855 compact açılışında kırpılıyordu
+// (OPS denetimi, #1690 bulgu 1: ölçülen 10.719). Taşan pay öncelik 0 olmayan bölümlerden (durum, döküm) orantılı alınır.
 let TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
+const MUTLAK_TAVAN = 9900
 const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
 const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
 const bolumler = []
@@ -339,24 +342,34 @@ function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
  * tam harita docs/roller/DEPARTMAN-HARITASI.md). Bölüm KÜÇÜLMEZ (öncelik 0) ve tavan onun uzunluğu kadar genişler: yoksa OPS'un
  * büyük durum bloğu haritayı hep işaretçiye iterdi. FAIL-OPEN: üretici yok/hata → yalnız işaretçi satırı; oturum bloklanmaz.
  */
+const HARITA_OZET_CALISMA_SINIRI = 2100 // üretici sınırı 2.048 bayt (HARITA_OZET_SINIRI); koşu anında 52 bayt pay
+function haritaIsaretcisi(sebep) {
+  return 'DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md (16 departman: gorev, dosya alani, acilis yolu) — ' +
+    `kisa ozet uretilemedi (${sebep}), dosyayi oku.\n`
+}
 function haritaBolumuEkle() {
   if (String(rolSeridi || '').trim().toUpperCase() !== 'OPS') return
-  const isaretci = 'DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md (16 departman: gorev, dosya alani, acilis yolu) — kisa ozet uretilemedi, dosyayi oku.\n'
-  let tam = isaretci
+  let tam
   try {
     const uretici = process.env.VH_ROL_KARTI_URETICI ||
       path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
-    if (fs.existsSync(uretici)) {
+    if (!fs.existsSync(uretici)) {
+      tam = haritaIsaretcisi('uretici bu agacta yok')
+    } else {
+      // maxBuffer: kaçak üretici bağlamı değil yalnız bu çağrıyı patlatır (ENOBUFS → işaretçi).
       const ozet = execFileSync(process.execPath, [uretici, '--harita-ozet'], {
-        encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'],
+        encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 16 * 1024,
       })
-      if (ozet && ozet.trim()) tam = ozet.endsWith('\n') ? ozet : ozet + '\n'
+      if (!ozet || !ozet.trim()) tam = haritaIsaretcisi('uretici bos cikti verdi')
+      else if (Buffer.byteLength(ozet, 'utf8') > HARITA_OZET_CALISMA_SINIRI) {
+        tam = haritaIsaretcisi(`ozet ${Buffer.byteLength(ozet, 'utf8')} bayt > ${HARITA_OZET_CALISMA_SINIRI} sinir`)
+      } else tam = ozet.endsWith('\n') ? ozet : ozet + '\n'
     }
-  } catch {
-    tam = isaretci
+  } catch (e) {
+    tam = haritaIsaretcisi(`${(e && (e.code || e.message)) || 'bilinmeyen'}`)
   }
-  TOPLAM_TAVAN += tam.length
-  bolumler.splice(2, 0, { ad: 'departman-haritasi', oncelik: 0, tam, ozet: isaretci })
+  TOPLAM_TAVAN = Math.min(TOPLAM_TAVAN + tam.length, Math.max(TOPLAM_TAVAN, MUTLAK_TAVAN))
+  bolumler.splice(2, 0, { ad: 'departman-haritasi', oncelik: 0, tam, ozet: haritaIsaretcisi('tavan') })
 }
 
 /**
@@ -528,7 +541,10 @@ try {
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
-  if (!rolSeridi) rolSeridi = rolBasliktan(input.session_title)
+  // compact/clear girdisinde session_title YOK (belge: yalnız startup/resume/fork); pid kaydındaki ad (`~/.claude/sessions`)
+  // her açılış türünde okunur. Rol ipucudur, ad taahhüdü değil; claim'li pencere bunu kullanmaz (yukarıdaki `mine.lane`).
+  // Niyet: pano talebi olmayan HER rolde (9 tablo rolü) kart gelsin — yalnız OPS'ta değil.
+  if (!rolSeridi) rolSeridi = rolBasliktan(input.session_title || board.pencereAdlari().get(sid))
   pencereAdi = pencereAdiKarari(board, live, sid, input.session_title)
 
   bolum('serit', 2, mine

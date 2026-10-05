@@ -701,8 +701,11 @@ function ozet(ad) {
 /**
  * DEPARTMAN HARİTASI (HRT-29, OPS-27 eki): OPS işi dağıtırken 16 departmanın görevini, dosya alanını ve AÇILIŞ YOLUNU tek
  * yerde görsün. Tam harita `docs/roller/DEPARTMAN-HARITASI.md` (üretilmiş, Görev ve Dosyalar bölümleri rol kartlarından
- * aynen); açılışa (session-board, rol OPS) `--harita-ozet` ile ≤ HARITA_OZET_SINIRI baytlık kısa özet girer. Kısa satırlar
- * aşağıda TEK yerde (rol tablosunun komşusu) durur ve bayat kalamaz: dosya üretilmiş metinle bayt bayt karşılaştırılır.
+ * aynen); açılışa (session-board, rol OPS) `--harita-ozet` ile ≤ HARITA_OZET_SINIRI baytlık kısa özet girer.
+ * BAYATLIK KAPSAMI (OPS denetimi, #1690 bulgu 3): TAM harita dosyası bayat kalamaz (üretilmiş metinle bayt bayt karşılaştırılır).
+ * KISA satırlar (HARITA_KISA) elle yazılır ve karttan türemez; bağ iki yerden ölçülür: her rolün satırı olmalı ve satırdaki
+ * dosya alanı parçalarının her biri rolün kart Dosyalar metninde geçmelidir (`haritaSorunlari`). Görev cümlesi özet olduğu için
+ * metin olarak kartla eşlenmez; kart Görev'i değişince özet satırı elle gözden geçirilir.
  * Açılış yolu ELLE yazılmaz: `scripts/board/pencere-adlari.cjs` tablosundaki rol `departman-ac` ile terminalden açılabilir
  * (T), değilse yalnız masaüstü (ölçüm 2026-10-05: tabloda olmayan rolde departman-ac "rol taninmiyor" verir).
  */
@@ -714,18 +717,18 @@ const HARITA_ISARETCISI = [
   'Tam harita: `docs/roller/DEPARTMAN-HARITASI.md` (üretilmiş; her departman için görev, dosya alanı ve açılış yolu). Kart açmadan önce işin hangi departmana düştüğüne oradan bak; pencere açılışında kısa özeti gelir.',
 ].join('\n')
 const HARITA_KISA = {
-  OPS: ['Orkestratör: sıra, öncelik, karar no; Recep\'e tek yüz', 'kod sahibi değil'],
+  OPS: ['Orkestratör: sıra, öncelik, karar no; Recep\'e tek yüz', 'kod dosyası sahibi değil'],
   ARAC: ['Kanca, WrongStack, araç envanteri', 'hooks, scripts/board, tools'],
   ALTYAPI: ['CI, bağımlılık, güvenlik denetimi', 'package.json, .github/workflows'],
   HARITA: ['Belge ve hafıza düzeni, rol kartları', 'CLAUDE.md, docs/README, scripts/belge, docs/roller'],
   URUN: ['Vitrin: ürün, kategori, marka sayfaları, adresler', 'components/products, views/category, next.config'],
   ADMIN: ['Yönetici paneli ekranları', 'views/admin, components/admin, app/admin'],
   KATALOG: ['Ürün verisi hattı: PDF\'den ürün satırına, CSV, fiyat', 'scripts/icerik-hatti, scripts/db/product-data'],
-  'GEO-SEO': ['Arama motoru ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-* ve seo-*'],
+  'GEO-SEO': ['Arama motoru ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-*, docs/audits/seo-*'],
   BLOG: ['Rehber yazıları', 'rehber-yazisi-standard, taslaklar'],
-  MARKA: ['Marka kimliği: logo, palet, yazı tipi', 'Design-MARKA çıktıları'],
+  MARKA: ['Marka kimliği: logo, palet, yazı tipi', 'Design-MARKA proje çıktıları'],
   MEVZUAT: ['Mevzuat ve standart kaydı (kanıtlı)', 'docs/mevzuat/**, mevzuat-kaydi-standard'],
-  SATIS: ['Teklif (RFQ), ödeme yetkisi, KVKK, e-postalar', '*quote* migration ve edge, quoteService'],
+  SATIS: ['Teklif (RFQ), ödeme yetkisi, KVKK, e-postalar', '*quote*, quote-notification-webhook, quoteService'],
   TASARIM: ['Design ↔ site köprüsü: token, yazı tipi, bileşen', 'src/design-system, tailwind.config'],
   EDGE: ['Supabase Edge Function katmanı ve deploy', 'supabase/functions, scripts/edge'],
   I18N: ['TR/EN sözlükler ve i18n kapıları', 'src/i18n, i18n-*.test.ts'],
@@ -773,12 +776,24 @@ function haritaDosyasi(roller = ROLLER, tablo) {
   ].join('\n')
 }
 
-/** Harita sorunları (boş = temiz): her rolün kısa satırı var ve sınırlı, özet bütçede ve her rolü ile açılış harfini taşıyor. */
+/** Karşılaştırma biçimi: küçük harf, glob yıldızı ve ters tırnak atılır, boşluklar tekleşir. */
+function haritaNorm(metin) {
+  return String(metin).toLowerCase().replace(/[*`]/g, '').replace(/\s+/g, ' ').trim()
+}
+
+/** Harita sorunları (boş = temiz): her rolün kısa satırı var, dosya alanı kart Dosyalar metninde geçiyor, özet bütçede. */
 function haritaSorunlari(roller = ROLLER, kisa = HARITA_KISA, tablo) {
   const s = []
   for (const ad of Object.keys(roller)) {
     const k = kisa[ad]
-    if (!k || !k[0] || !k[1]) s.push(`harita: ${ad} için kısa görev/alan satırı yok`)
+    if (!k || !k[0] || !k[1]) {
+      s.push(`harita: ${ad} için kısa görev/alan satırı yok`)
+      continue
+    }
+    const kart = haritaNorm(roller[ad].dosyalar)
+    for (const parca of k[1].split(',').map(haritaNorm).filter(Boolean)) {
+      if (!kart.includes(parca)) s.push(`harita: ${ad} kısa dosya alanı "${parca}" kart Dosyalar metninde yok (kart değişti, kısa satır bayat)`)
+    }
   }
   for (const ad of Object.keys(kisa)) if (!roller[ad]) s.push(`harita: ${ad} rol tablosunda yok`)
   const ozetMetin = haritaOzet(roller, kisa, tablo)
