@@ -288,3 +288,119 @@ describe('istek yolu işleme — ikinci dereceden yavaşlama (ReDoS) yok', () =>
     expect(cekirdek.rotaDiliYolu('/about///', 'tr', TABLO, true)).toBe('/hakkimizda/')
   })
 })
+
+describe('rotaDiliHedefleriniYenile — mevcut kuralların hedefleri tabloyla yenilenir (R4)', () => {
+  const SECICI = { id: 'secici', klasor: 'urun-secici', tr: 'secici', en: 'selector' }
+  const AYNI = { id: 'ayni', klasor: 'ayni-klasor', tr: 'ortak', en: 'ortak' }
+  const T = [...TABLO, SECICI, AYNI]
+  const k = (source: string, destination: string, permanent = true) => ({ source, destination, permanent })
+  const yenile = (kurallar: ReturnType<typeof k>[], acik = true) => cekirdek.rotaDiliHedefleriniYenile(kurallar, acik, T)
+
+  it('KAPALI: girdi dizisi AYNEN döner (aynı referans), değişecek kural içerse de', () => {
+    const girdi = [k('/:lang(tr|en)/destek/hesaplayicilar', '/:lang/urun-secici')]
+    expect(yenile(girdi, false)).toBe(girdi)
+    expect(kabuk.rotaDiliHedefleriniYenile(girdi, false)).toBe(girdi)
+  })
+
+  it('/:lang hedefi dile göre ayrışıyorsa İKİ kurala bölünür (kaynak /tr ve /en, tr önce)', () => {
+    expect(yenile([k('/:lang(tr|en)/destek/hesaplayicilar', '/:lang/urun-secici')])).toEqual([
+      k('/tr/destek/hesaplayicilar', '/tr/secici'),
+      k('/en/destek/hesaplayicilar', '/en/selector'),
+    ])
+  })
+
+  it('/:lang hedefi iki dilde AYNI görünen yola gidiyorsa TEK kural kalır (/:lang korunur)', () => {
+    expect(yenile([k('/:lang(tr|en)/eski', '/:lang/ayni-klasor')])).toEqual([k('/:lang(tr|en)/eski', '/:lang/ortak')])
+  })
+
+  it('/:lang hedefi iki dilde değişmiyorsa kural nesnesi AYNI referans', () => {
+    const kural = k('/:lang(tr|en)/x', '/:lang/bilinmeyen')
+    expect(yenile([kural])[0]).toBe(kural)
+  })
+
+  it('açık dilli hedef: yalnız o dilin görünen yolu', () => {
+    expect(yenile([k('/en/destek/merkez', '/en/urun-secici'), k('/tr/destek/merkez', '/tr/urun-secici')])).toEqual([
+      k('/en/destek/merkez', '/en/selector'),
+      k('/tr/destek/merkez', '/tr/secici'),
+    ])
+  })
+
+  it('bir dilde klasörle aynı kalan hedef değişmez (referans): /en/about', () => {
+    const kural = k('/en/eski', '/en/about')
+    expect(yenile([kural])[0]).toBe(kural)
+    expect(yenile([k('/tr/eski', '/tr/about')])).toEqual([k('/tr/eski', '/tr/hakkimizda')])
+  })
+
+  it('sorgu dizesi ve parça hedefte AYNEN; sondaki eğik çizgi korunur', () => {
+    expect(yenile([k('/:lang(tr|en)/a', '/:lang/about?x=1&y=%2Fabout')])).toEqual([
+      k('/tr/a', '/tr/hakkimizda?x=1&y=%2Fabout'),
+      k('/en/a', '/en/about?x=1&y=%2Fabout'),
+    ])
+    expect(yenile([k('/en/a', '/en/urun-secici/?sku=A#bolum')])).toEqual([k('/en/a', '/en/selector/?sku=A#bolum')])
+  })
+
+  it('altYollar: kuyruk belirteci ve alt yol taşınır; altYollar OLMAYAN satırda kuyruklu hedef çevrilmez', () => {
+    expect(yenile([k('/en/a', '/en/destek/:path*')])).toEqual([k('/en/a', '/en/support/:path*')])
+    expect(yenile([k('/en/a', '/en/destek/ekip')])).toEqual([k('/en/a', '/en/support/ekip')])
+    const tr = k('/tr/a', '/tr/destek/:path*') // TR'de klasörle aynı → değişmez
+    expect(yenile([tr])[0]).toBe(tr)
+    const kuyruklu = k('/en/a', '/en/urun-secici/:path*') // satır altYollar değil: hedef satırın TAMAMINI kapsamıyor
+    expect(yenile([kuyruklu])[0]).toBe(kuyruklu)
+  })
+
+  it('altYollar: kuyruk klasörün doğrudan sonunda değil, daha derinde olsa da hedef çevrilir (zincir doğmaz)', () => {
+    expect(yenile([k('/en/a', '/en/destek/ekip/:path*')])).toEqual([k('/en/a', '/en/support/ekip/:path*')])
+    expect(yenile([k('/en/a', '/en/destek/k/:a/:path*')])).toEqual([k('/en/a', '/en/support/k/:a/:path*')])
+    expect(yenile([k('/:lang(tr|en)/a', '/:lang/destek/ekip/:path*')])).toEqual([
+      k('/tr/a', '/tr/destek/ekip/:path*'),
+      k('/en/a', '/en/support/ekip/:path*'),
+    ])
+  })
+
+  it('⭐kuyruk ayrımı: örtüşen satırda en uzun eşleşme altYollar olmayan sss ise kuyruklu hedef çevrilmez (genel destek satırına DÜŞMEZ)', () => {
+    // Kuyruk ayrılmazsa "/destek/sss/:path*" genel destek (altYollar) satırına düşer ve yanlış "/support/sss/:path*" olurdu.
+    const sssKuyruklu = k('/en/a', '/en/destek/sss/:path*')
+    expect(yenile([sssKuyruklu])[0]).toBe(sssKuyruklu)
+    // sss'nin alt yolu ise genel destek satırına aittir (adres üretimiyle aynı: /destek/sss/ek → /support/sss/ek)
+    expect(yenile([k('/en/a', '/en/destek/sss/ek/:path*')])).toEqual([k('/en/a', '/en/support/sss/ek/:path*')])
+  })
+
+  it('⭐EN UZUN EŞLEŞME: /destek/sss genel destek satırını ezer', () => {
+    expect(yenile([k('/en/a', '/en/destek/sss')])).toEqual([k('/en/a', '/en/support/faq')])
+    expect(yenile([k('/en/a', '/en/destek/iade')])).toEqual([k('/en/a', '/en/support/iade')])
+  })
+
+  it('eşleşmeyen kural nesneleri DEĞİŞMEZ (aynı referans): dilsiz hedef, tabloda olmayan yol, mutlak adres', () => {
+    const kurallar = [
+      k('/category/fanlar/:path*', '/category/fans/:path*'),
+      k('/tr/a', '/tr/products/x'),
+      k('/en/b', 'https://baska.test/urun-secici'),
+      k('/en/c', '/en/urun-secicix'),
+    ]
+    const cikti = yenile(kurallar)
+    cikti.forEach((kural, i) => expect(kural, kurallar[i].source).toBe(kurallar[i]))
+  })
+
+  it('girdiyi DEĞİŞTİRMEZ, deterministik ve İDEMPOTENT', () => {
+    const girdi = [
+      k('/:lang(tr|en)/destek/hesaplayicilar', '/:lang/urun-secici'),
+      k('/en/destek/merkez', '/en/urun-secici'),
+      k('/category/fanlar/:path*', '/category/fans/:path*'),
+    ]
+    const once = JSON.stringify(girdi)
+    const bir = yenile(girdi)
+    expect(JSON.stringify(girdi)).toBe(once)
+    expect(yenile(girdi)).toEqual(bir)
+    expect(yenile(bir)).toEqual(bir)
+    bir.forEach((kural, i) => expect(yenile(bir)[i]).toBe(kural)) // ikinci geçişte hiçbir nesne yeniden üretilmez
+  })
+
+  it('bölünemeyen kaynak (":lang(tr|en)" ile başlamıyor) ATAR: sessizce yanlış hedefte bırakılmaz', () => {
+    expect(() => yenile([k('/destek/hesaplayicilar', '/:lang/urun-secici')])).toThrow(/bölünemez/)
+  })
+
+  it('ek alanlar (permanent) bölünen kurallara taşınır', () => {
+    const [tr, en] = yenile([k('/:lang(tr|en)/a', '/:lang/urun-secici', false)])
+    expect([tr.permanent, en.permanent]).toEqual([false, false])
+  })
+})

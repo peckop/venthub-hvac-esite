@@ -11,6 +11,7 @@ import {
   ASAMA_2_ONEKLERI,
   ROTA_DILI,
   rotaDiliEsle,
+  rotaDiliHedefleriniYenile,
   rotaDiliTablosuDogrula,
   rotaDiliYenidenYazimlari,
   rotaDiliYonlendirmeleri,
@@ -237,14 +238,19 @@ describe('zincirVarMi — tek hop kuralı (adres-semasi-standard.md A9)', () => 
   it('⭐BİRLEŞİM: açık kipte bilgi merkezi + marka + rota dili kuralları zincir kurmaz (bayrak kombinasyonlarının hepsi)', () => {
     for (const enYayin of [false, true]) {
       for (const k3b of [false, true]) {
-        const birlesim = [
-          ...bilgiMerkeziYonlendirmeleri(enYayin),
-          ...markaYonlendirmeleri(k3b),
-          ...rotaDiliYonlendirmeleri(true),
-        ]
+        // next.config'teki gerçek düzen: mevcut kuralların hedefleri ÖNCE tabloyla yenilenir (R4), sonra rota dili kuralları.
+        const mevcut = [...bilgiMerkeziYonlendirmeleri(enYayin), ...markaYonlendirmeleri(k3b)]
+        const birlesim = [...rotaDiliHedefleriniYenile(mevcut, true, ROTA_DILI), ...rotaDiliYonlendirmeleri(true)]
         expect(zincirVarMi(birlesim), `EN_YAYIN=${enYayin} K3B=${k3b}`).toBeNull()
       }
     }
+  })
+
+  it('⛔SABOTAJ: hedefler YENİLENMEZSE (R4) varsayılan tabloyla zincir kurulur (EN kapalı → /en/urun-secici, tablo onu yeniden adlandırdı)', () => {
+    const yenilenmemis = [...bilgiMerkeziYonlendirmeleri(false), ...rotaDiliYonlendirmeleri(true)]
+    const bulgu = zincirVarMi(yenilenmemis)
+    expect(bulgu).not.toBeNull()
+    expect(bulgu?.hedef.source).toBe('/en/urun-secici')
   })
 
   it('⛔SABOTAJ: tabloya bilgi merkezi adresini taşıyan satır girerse birleşimde zincir görünür', () => {

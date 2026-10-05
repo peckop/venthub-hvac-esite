@@ -93,10 +93,13 @@ describe('LanguageSwitcher — kapalı kip: bugünkü davranış + sorgu / parç
 })
 
 describe('LanguageSwitcher — ALT-14 (a): Bilgi Merkezi (anahtardan bağımsız, EN yayını kapalı)', () => {
-  it.each([undefined, '1'])('anahtar %s: /tr/bilgi-merkezi/yazi → EN: 404 değil /en/urun-secici, sorgu / parça düşer', async (anahtar) => {
+  it.each([
+    [undefined, '/en/urun-secici'],
+    ['1', '/en/selector'],
+  ])('anahtar %s: /tr/bilgi-merkezi/yazi → EN: 404 değil %s (açıkken Ürün Seçici\'nin görünen adresi), sorgu / parça düşer', async (anahtar, hedef) => {
     const { push } = await kur(anahtar, '/tr/bilgi-merkezi/frekans-konvertoru-nedir', '/tr/bilgi-merkezi/frekans-konvertoru-nedir?x=1#bolum', 'tr')
     tikla('EN')
-    expect(push).toHaveBeenCalledWith('/en/urun-secici')
+    expect(push).toHaveBeenCalledWith(hedef)
   })
 
   it('/tr/bilgi-merkezi (liste) → EN: /en/urun-secici', async () => {
