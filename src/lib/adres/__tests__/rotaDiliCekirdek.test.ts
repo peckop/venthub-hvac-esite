@@ -357,6 +357,14 @@ describe('rotaDiliHedefleriniYenile — mevcut kuralların hedefleri tabloyla ye
     ])
   })
 
+  it('⭐kuyruk ayrımı: örtüşen satırda en uzun eşleşme altYollar olmayan sss ise kuyruklu hedef çevrilmez (genel destek satırına DÜŞMEZ)', () => {
+    // Kuyruk ayrılmazsa "/destek/sss/:path*" genel destek (altYollar) satırına düşer ve yanlış "/support/sss/:path*" olurdu.
+    const sssKuyruklu = k('/en/a', '/en/destek/sss/:path*')
+    expect(yenile([sssKuyruklu])[0]).toBe(sssKuyruklu)
+    // sss'nin alt yolu ise genel destek satırına aittir (adres üretimiyle aynı: /destek/sss/ek → /support/sss/ek)
+    expect(yenile([k('/en/a', '/en/destek/sss/ek/:path*')])).toEqual([k('/en/a', '/en/support/sss/ek/:path*')])
+  })
+
   it('⭐EN UZUN EŞLEŞME: /destek/sss genel destek satırını ezer', () => {
     expect(yenile([k('/en/a', '/en/destek/sss')])).toEqual([k('/en/a', '/en/support/faq')])
     expect(yenile([k('/en/a', '/en/destek/iade')])).toEqual([k('/en/a', '/en/support/iade')])
