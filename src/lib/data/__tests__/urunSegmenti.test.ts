@@ -66,6 +66,12 @@ describe('urunSegmentiniCoz', () => {
     expect(db.modelBySku).not.toHaveBeenCalled()
   })
 
+  it('adres takma adı (ſ → S): aynı SKU\'ya çözülen ama kanonik olmayan adres 200 DEĞİL, TEK 308 (çürütme bulgu 3)', async () => {
+    await expect(urunSegmentiniCoz('storm-10-p-%C5%BFea-1', 'tr')).rejects.toThrow('REDIRECT:/tr/urun/storm-10-p-sea-1')
+    await expect(urunSegmentiniCoz('storm-10-p-ſea-1', 'en')).rejects.toThrow('REDIRECT:/en/products/storm-10-p-sea-1')
+    expect(db.modelBySku).not.toHaveBeenCalled()
+  })
+
   it('büyük harfli SKU ama yayında DEĞİL → 404 (308 ölü adrese taşımaz), DB\'ye gitmeden', async () => {
     await expect(urunSegmentiniCoz('x-p-YOK-1', 'tr')).rejects.toThrow('NOT_FOUND')
     expect(db.modelBySku).not.toHaveBeenCalled()

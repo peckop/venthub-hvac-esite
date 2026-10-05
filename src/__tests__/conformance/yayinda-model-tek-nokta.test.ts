@@ -38,16 +38,32 @@ function dosyalar(dizin: string, cikti: string[] = []): string[] {
 /** Yorumları siler (ayırıcı metni yorumlarda serbestçe geçer; kod değildir). */
 const yorumsuz = (kaynak: string): string => kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1')
 
-/** Kaynakta ayırıcı metnini TIRNAK/ŞABLON içinde yazan satırlar. */
+/**
+ * Kaynakta ayırıcı metnini YORUM DIŞI HER bağlamda (tırnak, şablon, düzenli ifade) yazan satırlar. Bitişik metin
+ * birleştirmeleri ('-' + 'p' + '-') önce tek metne indirilir. ⚠Sınır: dizi birleştirme (`['-','p','-'].join('')`) ve
+ * karakter kodundan kurma görülmez; kalıcı çare AST taramasıdır (kayıt: bu PR'ın gövdesi, ÇÜRÜTME bulgu 2).
+ */
 function ayiriciKullanimlari(kaynak: string): string[] {
-  const kacis = MODEL_AYIRICI.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const desen = new RegExp(`['"\`][^'"\`\\n]*${kacis}`)
-  return yorumsuz(kaynak).split('\n').filter((satir) => desen.test(satir))
+  const birlesik = yorumsuz(kaynak).replace(/['"`]\s*\+\s*['"`]/g, '')
+  return birlesik.split('\n').filter((satir) => satir.includes(MODEL_AYIRICI))
 }
 
 const gor = (yol: string) => relative(KOK, yol).split(sep).join('/')
 const URETIM = dosyalar(SRC)
 const okun = new Map(URETIM.map((d) => [gor(d), readFileSync(d, 'utf8')]))
+/** `scripts/` de taranır: ayırıcıyı betikte yinelemek de "tek nokta"yı bozar (çürütme bulgu 2: ağ denetim betiği). */
+const BETIKLER = dosyalar(join(KOK, 'scripts'))
+const okunTum = new Map([...okun, ...BETIKLER.map((d): [string, string] => [gor(d), readFileSync(d, 'utf8')])])
+/**
+ * Açık istisna: ayırıcıyı biçim modülünden alamayan dosya (`.mjs`, TS modülünü içe aktaramaz) ve gerekçesi. Yeni satır
+ * bilerek eklenir; desen ayırıcıyla uyumlu kalsın diye aşağıdaki test onu ölçer.
+ */
+const AYIRICI_ISTISNALARI = new Map([
+  [
+    'scripts/seo/adres-yayin-denetim.mjs',
+    'BLOG ağ denetimi: haritadaki model adreslerini SAYAR, adres üretmez; .mjs olduğundan TS modülünü içe aktaramaz',
+  ],
+])
 
 const BICIM_MODULU = 'src/utils/modelAdresBicimi.ts'
 const ADRES_URETICI = 'src/utils/adresUret.ts'
@@ -73,11 +89,20 @@ describe('INV-YAYINDA-MODEL-6a — model adresi biçimi tek modülde', () => {
     expect(ayiriciKullanimlari(okun.get(BICIM_MODULU) ?? '')).not.toEqual([])
   })
 
-  it('ayırıcı metni başka hiçbir üretim dosyasında kod olarak yazılmaz', () => {
-    const ihlal = [...okun.entries()]
-      .filter(([yol]) => yol !== BICIM_MODULU)
+  it('ayırıcı metni başka hiçbir üretim ya da betik dosyasında kod olarak yazılmaz (açık istisna hariç)', () => {
+    expect(BETIKLER.length).toBeGreaterThan(20)
+    const ihlal = [...okunTum.entries()]
+      .filter(([yol]) => yol !== BICIM_MODULU && !AYIRICI_ISTISNALARI.has(yol))
       .flatMap(([yol, kaynak]) => ayiriciKullanimlari(kaynak).map((s) => `${yol}: ${s.trim()}`))
     expect(ihlal).toEqual([])
+  })
+
+  it('açık istisna ölü değil ve deseni ayırıcıyla UYUMLU (biçim değişirse burada kırılır)', () => {
+    for (const yol of AYIRICI_ISTISNALARI.keys()) {
+      const kaynak = okunTum.get(yol) ?? ''
+      expect(ayiriciKullanimlari(kaynak)).not.toEqual([])
+      expect(kaynak).toContain(`export const MODEL_DESENI = /${MODEL_AYIRICI}`)
+    }
   })
 
   it('MODEL_AYIRICI yalnız biçim modülü ve adres üreticisinin (yeniden dışa aktarım) içinde anılır', () => {
@@ -96,6 +121,11 @@ describe('INV-YAYINDA-MODEL-6a — model adresi biçimi tek modülde', () => {
     const kotu = `const h = \`/tr/urun/\${slug}${MODEL_AYIRICI}\${sku}\``
     expect(ayiriciKullanimlari(kotu).length).toBe(1)
     expect(ayiriciKullanimlari(`// yorumda ${MODEL_AYIRICI} serbest`)).toEqual([])
+    // Çürütme bulgu 2: düzenli ifade olarak dışa aktarılan desen ve parça parça birleştirilen metin de yakalanır.
+    expect(ayiriciKullanimlari(`export const X = /${MODEL_AYIRICI}([a-z0-9]+)$/`).length).toBe(1)
+    const parcali = [...MODEL_AYIRICI].map((k) => `'${k}'`).join(' + ')
+    expect(ayiriciKullanimlari(`const a = ${parcali}`).length).toBe(1)
+    expect(ayiriciKullanimlari(`const a = ${[...MODEL_AYIRICI].map((k) => `"${k}"`).join(' +\n ')}`).length).toBe(1)
   })
 })
 

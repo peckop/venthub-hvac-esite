@@ -62,5 +62,8 @@ export function modelAdresiCoz(segment: string): CozulmusModelAdresi | null {
   const slugMetni = cozulmus.slice(0, i)
   const skuParca = cozulmus.slice(i + MODEL_AYIRICI.length)
   if (!slugMetni || !skuParca) return null
-  return { slugMetni, sku: skuParca.toUpperCase(), skuKanonik: skuParca === skuParca.toLowerCase() }
+  // Kanonik = büyük-küçük harf gidiş-dönüşünde DEĞİŞMEYEN metin. Yalnız `toLowerCase` karşılaştırması yetmezdi: 'ſ'
+  // (uzun s) ve 'ı' (noktasız i) büyütülünce 'S' ve 'I' olur (listedeki SKU'ya çözülür) ama küçük harfte kendileri
+  // kalır; adres 200 verir, 308 vermezdi.
+  return { slugMetni, sku: skuParca.toUpperCase(), skuKanonik: skuParca === skuParca.toUpperCase().toLowerCase() }
 }

@@ -97,6 +97,11 @@ describe('modelAdresiCoz', () => {
   it('büyük harfli SKU çözülür ama kanonik DEĞİL (çağıran 308 verir)', () => {
     expect(modelAdresiCoz('kanal-fani-p-VRT-1')?.skuKanonik).toBe(false)
   })
+  it('büyük harfte İngilizce harfe dönüşen başka harfler (ſ, ı) kanonik DEĞİL: aynı SKU\'ya çözülür, çağıran 308 verir', () => {
+    expect(modelAdresiCoz('fan-p-vrt-1ſ')).toMatchObject({ sku: 'VRT-1S', skuKanonik: false })
+    expect(modelAdresiCoz('fan-p-vırt-1')).toMatchObject({ sku: 'VIRT-1', skuKanonik: false })
+    expect(modelAdresiCoz('fan-p-vrt-1s')?.skuKanonik).toBe(true)
+  })
   it('-p- yoksa aile adresi → null', () => {
     expect(modelAdresiCoz('storm-serisi')).toBeNull()
   })

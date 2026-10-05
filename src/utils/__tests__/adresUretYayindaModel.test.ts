@@ -142,6 +142,8 @@ describe('modelSecimiHedefi (handleSelectVariant kararı) — liste dışına mo
     const kaynak = readFileSync(join(process.cwd(), 'src/app/_components/ProductDetailPageView.tsx'), 'utf8')
     const govde = kaynak.slice(kaynak.indexOf('const handleSelectVariant'), kaynak.indexOf('const modelAdresi = '))
     expect(govde).toContain('modelSecimiHedefi(')
+    // 4. argüman "model sayfasındayız" bilgisidir (çürütme bulgu 1): `true` yazılırsa kapalı kipte de push yapılırdı.
+    expect(govde).toMatch(/modelSecimiHedefi\(adresDili\(lang\), family\.slug, sku, sunucuSku !== null\)/)
     // push YALNIZ kararın verdiği adrese ve YALNIZ `git` kararında; başka hiçbir push/adres kurulumu yok.
     expect(govde).toMatch(/if \(hedef\.tur === 'git'\) \{\s*router\.push\(hedef\.adres as Route/)
     expect(govde.match(/router\.push\(/g)).toHaveLength(1)
