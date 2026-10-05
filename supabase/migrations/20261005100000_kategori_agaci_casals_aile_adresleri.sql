@@ -1,4 +1,32 @@
--- REC-300 Faz 1-B — KATEGORİ AĞACI (K17) + CASALS MARKASI + 40 AİLE ADRESİ (karar 86)
+-- REC-300 Faz 1-B — KATEGORİ AĞACI (K17) + CASALS AİLELERİ + 40 AİLE ADRESİ (karar 86)
+--
+-- ═════════════════════════════════════════════════════════════════════════════
+-- SIRA BAĞIMLILIĞI (2026-10-05 yükseltmesi) — #1692 ÖNCE İNER, BU MIGRATION ONDAN SONRA
+-- ═════════════════════════════════════════════════════════════════════════════
+-- Ön koşul: supabase/migrations/20261004120000_casals_flexiva_markalari_siginak_kok.sql (OPS-51, #1692) uygulanmış
+-- olmalı. O migration Casals MARKASINI, dört Casals ailesinin brand_id'sini, ailelerin adındaki 'AVenS' → 'Casals'
+-- dönüşümünü ve 53 ürünün `products.brand` metnini yazar. Bu migration artık marka EKLEMEZ: Casals kimliği SLUG'dan
+-- okunur (sabit kimlik yok); marka ya da aile ataması yoksa RAISE EXCEPTION ile durur ve hiçbir şey yazmaz.
+-- Dosya adı damgası bu yüzden #1692'nin ARDINA alındı (20260923103812 → 20261005100000): ledger modeli her yeni dosyayı
+-- uygular ve damga sırasıyla koşar; eski damga, ikisi aynı itmede inerse bu migration'ı #1692'den ÖNCE çalıştırırdı.
+-- Dosya henüz hiçbir yerde uygulanmadığı için yeniden adlandırma ledger'ı etkilemez.
+--
+-- İKİ PR ARASINDA KESİŞEN SATIRLAR VE ÇÖZÜMÜ (ölçüm: canlı SELECT 2026-10-05; #1692 henüz uygulanmamış):
+--   brands            casals       #1692 ekler (kimliği DB üretir). Bu migration sabit kimlikle ekliyordu → ÇIKARILDI, slug'dan okur.
+--   product_families  brand_id     4 Casals ailesi: #1692 yazar. Bu migration'daki aynı atama ÇIKARILDI, yalnız doğrular.
+--   product_families  name         #1692 'AVenS …' → 'Casals …' (name + name_i18n tr/en). Üç aile (ENKELFAN, NIMAX, NIMUS) için
+--                                  iki migration AYNI adı üretiyordu: çift yazım çıkarıldı, ad yalnız doğrulanır.
+--                                  plug ailesi (avens-plug-fanlar → casals-kentalfan-plug): #1692 'Casals Plug Fanlar',
+--                                  bu migration 'Casals KENTALFAN Plug Fanlar' + series_code KENTALFAN yazıyordu. Adres
+--                                  (slug) kentalfan olduğu için ÖLÇÜLEN #1352 davranışı KORUNDU (adım 5b); name_i18n de
+--                                  aynı adı taşısın diye tr + en güncellenir. Tek blok: istenmezse 5b çıkarılır.
+--   products          brand        53 ürün 'AVenS' → 'Casals': #1692 yazar. Bu migration'daki UPDATE ÇIKARILDI, yalnız doğrular.
+--   product_families  slug         YALNIZ bu migration (40 aile). #1692 aile slug'ına dokunmaz; ama #1692'nin guard'ı ESKİ
+--                                  slug'larla arar → #1692 bu migration'dan SONRA koşamaz (sıra bu yüzden sabit).
+--   product_families  category_id/subcategory_id   #1692: yalnız Sığınak ailesi. Bu migration: 6 aile (plug, hücreli, perde).
+--                                  Küme ayrık, çakışma yok. avens-siginak-… ailesinin SLUG'ı bu migration'da değişir (adım 7).
+--   categories        parent_id    #1692: shelter-ventilation kök olur. Bu migration: 4 yeni dal ekler, kök/dal ataması ayrık.
+--   categories        name/menu_label/translation_key/metadata.slug.tr   YALNIZ bu migration (korozyon 3, yedek parça 4, radyal 4b).
 --
 -- ═════════════════════════════════════════════════════════════════════════════
 -- NİÇİN (plan: docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md §5 Faz 1-B — v5)
@@ -9,19 +37,25 @@
 -- eski adrese 308 verir → bu migration canlıda KIRIK ADRES ÜRETMEZ (ölçüm: §8 kabul).
 --
 -- Kararlar: K17 (ağaç, R1 kapandı: bugünkü 18 + 4 dal) · 78b (iki perde dalı pazar kelimesi:
--- `isiticisiz-hava-perdeleri`, `elektrikli-isiticili-hava-perdeleri`) · 84 (korozyon dalı) · 86 (39
--- aile slug'ı; istisna Casals 4 aile K17 kısa biçim — OPS hükmü 2026-09-23, Kararlar belgesi 86
--- metni — ve 2 perde ailesi 78b kelimesi) · Recep 11-09: ENKELFAN/KENTALFAN/NIMAX/NIMUS Casals'tır,
--- HF/S ve HF/FW AVenS kalır.
+-- `isiticisiz-hava-perdeleri`, `elektrikli-isiticili-hava-perdeleri`) · 84 + 287 (korozyon dalı: ad VE adres,
+-- Recep, OPS-74; adım 3) · 288 (radyal dalı görünen adı, Recep, OPS-76; adım 4b) · 86 (39 aile slug'ı; istisna
+-- Casals 4 aile K17 kısa biçim — OPS hükmü 2026-09-23, Kararlar belgesi 86 metni — ve 2 perde ailesi 78b
+-- kelimesi) · Recep 11-09: ENKELFAN/KENTALFAN/NIMAX/NIMUS Casals'tır, HF/S ve HF/FW AVenS kalır.
 --
--- ÖLÇÜM (canlı SELECT, 2026-09-23 ~10:30Z):
+-- ÖLÇÜM (canlı SELECT; ilk ölçüm 2026-09-23 ~10:30Z, yenileme 2026-10-05 — sayılar DEĞİŞMEDİ):
 --   · Fanlar altındaki TÜM dallar `level = 1`, `sort_order = 0`. 09-11 Design taslağı `level 2`,
 --     `sort_order 60/70` yazıyordu — YANLIŞ; komşudan ölçülen değer kullanıldı.
 --   · Taşınan 6 aile / 44 ürün (plug 14+9, hücreli 7+6, perde 4+4); Casals 4 aile = 53 ürün
---     (KENTALFAN 14 · ENKELFAN 9 · NIMAX 15 · NIMUS 15); `brands`'ta casals YOK.
---   · Aile slug değişimi 40 (39 + avens-plug-fanlar; plan §6'daki "43" çift sayımdı).
---   · Kategori adı sözlükten gelir (`common.categoryList.<translation_key>`, getCategoryDisplayName):
---     adı değişen/yeni dallar YENİ anahtarlara bağlanır (PR #1349 bu migration'dan ÖNCE merge edilir).
+--     (KENTALFAN 14 · ENKELFAN 9 · NIMAX 15 · NIMUS 15). 2026-10-05: 4 yeni dal canlıda YOK; 8 hedef aile
+--     tek kiracıda, 44 ürünün 44'ü beklenen kök/dalda; 40 aile slug'ı 40/40 ESKİ durumda (yeni slug'ı olan yok).
+--   · Korozyon dalı (2026-10-05): name 'Asit Dayanımlı Fanlar', menu_label NULL, translation_key 'sub.acid-fans'
+--     (canlıda bu anahtarı kullanan TEK satır), TR slug 'asit-dayanikli-fanlar'; yeni TR slug'ı başka kategoride yok.
+--     Radyal dalı: name VE menu_label 'Santrifüj / Radyal Fanlar', translation_key 'sub.radial', slug
+--     'centrifugal-fans' / 'radyal-fanlar'. Yedek parça dalı: translation_key NULL.
+--     Aile slug değişimi 40 (39 + avens-plug-fanlar; plan §6'daki "43" çift sayımdı).
+--   · Kategori adı sözlükten gelir (`common.categoryList.<translation_key>`, getCategoryDisplayName): yeni dallar
+--     ve korozyon dalı yeni anahtarlara bağlanır (PR #1349 bu migration'dan ÖNCE merge edildi); korozyon (287) ve
+--     radyal (288) sözlük değerleri (TR/EN) bu PR'da DB ile BİRLİKTE değişir.
 --
 -- SAPMA (plan §5 Faz 1-B m.6 "`products.slug_i18n` + get_family_detail aynı PR"): bu migration'da
 -- YOK. O alan Faz 2 model slug'larının ön şartıdır, Faz 1-B'nin değil; RPC dönüş tipini değiştirmek
@@ -29,12 +63,18 @@
 --
 -- GERİ ALMA: veri migration'ı; eski değerler aşağıdaki VALUES listelerinde ve §1 dökümünde. Ters
 -- yön aynı listeyle (yeni → eski) yazılır; takma adlar Faz 1-A tetiğiyle kendiliğinden ters döner
--- (A→B→A: canlı slug önceliklidir). Yeni 4 dal ve Casals markası ürünler geri taşındıktan sonra
--- silinir (FK RESTRICT sırayı zorlar).
+-- (A→B→A: canlı slug önceliklidir). Yeni 4 dal ürünler geri taşındıktan sonra silinir (FK RESTRICT sırayı
+-- zorlar). Casals markası, marka/ad/ürün marka metni #1692'nindir: geri alma onun dosyasındaki tarife bağlıdır.
+-- Korozyon dalı: name 'Asit Dayanımlı Fanlar', menu_label NULL, translation_key 'sub.acid-fans', TR slug
+-- 'asit-dayanikli-fanlar' (eski sözlük anahtarı 'acid-fans' bu yüzden sözlükte DURUR). Radyal dalı: name ve menu_label
+-- 'Santrifüj / Radyal Fanlar'. Yedek parça translation_key NULL. Plug ailesi 5b: name/name_i18n 'Casals Plug Fanlar' /
+-- 'Casals Plug Fans', series_code NULL.
 --
 -- YAN ETKİ (bilerek): `products`/`product_families`/`categories` üzerindeki `on_*_change` webhook
 -- tetikleri her satır için bir tazeleme isteği atar (~100 satır). Emsal: karar 45 migration'ı 17
--- aile satırıyla aynı yoldan geçti, sorun ölçülmedi.
+-- aile satırıyla aynı yoldan geçti, sorun ölçülmedi. Ek: `arama_aile_kuyrukla` (plug ailesinin adı) ve
+-- `arama_kategori_kuyrukla` (korozyon ve radyal adı) arama yeniden-indeks kuyruğuna satır yazar (pg_cron her 5 dk
+-- boşaltır); `url_takma_ad_kategori` korozyon TR slug'ı değişince eski adresi yazar (radyal slug'ı değişmez: takma ad yok).
 --
 -- Cetvel: docs/standards/migration-safety-standard.md · category-taxonomy-standard.md §8 (her
 -- taşımada İKİ tablo: products VE product_families) · CLAUDE.md kural 12 (tek kiracı kapısı), 13.
@@ -45,7 +85,8 @@ set statement_timeout = '60s';
 BEGIN;
 
 -- Kilitler başta, sabit sırada, tek seferde (Faz 1-A güvenlik incelemesi bulgu 1 kalıbı).
-lock table public.brands, public.categories, public.product_families, public.products
+-- `brands` YOK: bu migration markaya yazmaz (Casals #1692'dedir), yalnız okur.
+lock table public.categories, public.product_families, public.products
   in share row exclusive mode;
 
 DO $$
@@ -65,13 +106,13 @@ DECLARE
   a_hffw      constant uuid := '362cd0ae-9352-4626-a8fc-978dafd3052b';
   a_ad        constant uuid := 'b5c120f1-6416-49a2-9de2-dee732204680';
   a_had       constant uuid := '08e5834b-7935-4ff0-970e-3c2ba8149284';
-  m_avens     constant uuid := 'f99a5254-21f8-4b14-933a-722270d5da93';
   -- yeni satırlar (sabit kimlik → ikinci koşum aynı satırı bulur)
-  m_casals    constant uuid := '1aefd0f0-22b4-4bab-bef6-d1618b89ea62';
   k_plug      constant uuid := 'd3f4096d-ea2e-4cb2-8569-280c33f5531e';
   k_hucreli   constant uuid := 'fe1dcb4e-d67d-4462-a4a8-dc12e5d695bf';
   k_isiticisiz constant uuid := 'a260bbbf-e576-4cea-98dc-d7d9c1692cdd';
   k_elektrikli constant uuid := '341cd0df-545e-4355-ad38-9c1d90c1bc0d';
+  -- Casals markasının kimliği SABİT DEĞİL: #1692 DB'de üretir, aşağıda slug'dan okunur.
+  v_casals uuid;
   n int;
   r record;
 BEGIN
@@ -104,15 +145,15 @@ BEGIN
    WHERE id NOT IN (k_plug, k_hucreli, k_isiticisiz, k_elektrikli, k_korozyon)  -- kendileri: ikinci koşum
      AND (slug IN ('plug-fans','cabinet-fans','unheated-air-curtains','electric-heated-air-curtains')
           OR metadata->'slug'->>'tr' IN ('plug-fanlar','hucreli-aspiratorler','isiticisiz-hava-perdeleri',
-                                         'elektrikli-isiticili-hava-perdeleri','korozyon-dayanimli-fanlar'));
+                                         'elektrikli-isiticili-hava-perdeleri','korozyona-ve-aside-dayanimli-fanlar'));
   IF n > 0 THEN RAISE EXCEPTION 'KAPI 1: % kategori yeni dal adreslerinden birini zaten kullanıyor', n; END IF;
 
-  -- ── 1) CASALS MARKASI ────────────────────────────────────────────────────────────────────
-  INSERT INTO public.brands (id, tenant_id, name, slug)
-  VALUES (m_casals, v_t, 'Casals', 'casals')
-  ON CONFLICT (tenant_id, slug) DO NOTHING;
-  IF NOT EXISTS (SELECT 1 FROM public.brands WHERE id = m_casals AND slug = 'casals' AND tenant_id = v_t) THEN
-    RAISE EXCEPTION '1: casals markası başka kimlikle var — elle incele';
+  -- ── 1) CASALS MARKASI — #1692'DE EKLENİR; burada YALNIZ slug'dan okunur ───────────────────
+  -- Marka ekleme bölümü bilerek yok (çift tanım, #1692'nin farklı kimliğiyle çakışırdı). Yoksa durulur:
+  -- ardından gelen aile adımları ancak marka varsa anlamlıdır.
+  SELECT id INTO v_casals FROM public.brands WHERE tenant_id = v_t AND slug = 'casals';
+  IF v_casals IS NULL THEN
+    RAISE EXCEPTION '1: casals markası yok — #1692 (20261004120000_casals_flexiva_markalari_siginak_kok.sql) önce uygulanmalı';
   END IF;
 
   -- ── 2) DÖRT YENİ DAL (komşu ölçümü: level 1, sort_order 0, hide_price true) ──────────────
@@ -138,47 +179,96 @@ BEGIN
      (k_isiticisiz, k_perde, 'unheated-air-curtains'), (k_elektrikli, k_perde, 'electric-heated-air-curtains'));
   IF n <> 4 THEN RAISE EXCEPTION '2: 4 yeni dal beklenen değerlerde değil (% eşleşti) — elle incele', n; END IF;
 
-  -- ── 3) KOROZYON DALI (karar 84) — ad + TR slug + yeni sözlük anahtarı; kanonik EN slug SABİT ──
+  -- ── 3) KOROZYON DALI — AD + TR SLUG + SÖZLÜK ANAHTARI, TEK BLOK (karar 287, Recep; OPS-74) ──
+  -- TR ad 'Korozyona ve Aside Dayanımlı Fanlar' (name + menu_label), TR slug 'korozyona-ve-aside-dayanimli-fanlar',
+  -- yeni anahtar `sub.corrosion-fans` (sözlük TR/EN değerleri aynı PR'da: EN 'Corrosion- and Acid-Resistant Fans').
+  -- Kanonik EN slug (`acid-resistant-fans`) SABİT. Görünen ad önce sözlükten çözülür (`sub.corrosion-fans`);
+  -- name/menu_label sözlüğün bulunmadığı yolların (yönetim, arama, yedek zincir) aynı adı göstermesi içindir.
+  -- Ad ile adres AYNI UPDATE'te döner (tek tetik turu): iki ayrı UPDATE ad ile adresi bir an ayrı bırakırdı.
+  -- Eski TR adres `asit-dayanikli-fanlar`: Faz 1-A tetiği `url_takma_adlari`'na yazar (aşağıda ölçülür);
+  -- eşleyici tek adımda 308 ile yeni adrese gider (kanıt: src/lib/adres/__tests__/korozyon-tek-sicrama.test.ts).
   UPDATE public.categories
-     SET name = 'Korozyon Dayanımlı Fanlar',
+     SET name = 'Korozyona ve Aside Dayanımlı Fanlar',
+         menu_label = 'Korozyona ve Aside Dayanımlı Fanlar',
          translation_key = 'sub.corrosion-fans',
-         metadata = jsonb_set(metadata, '{slug,tr}', '"korozyon-dayanimli-fanlar"'),
+         metadata = jsonb_set(metadata, '{slug,tr}', '"korozyona-ve-aside-dayanimli-fanlar"'),
          updated_at = now()
-   WHERE id = k_korozyon AND metadata->'slug'->>'tr' = 'asit-dayanikli-fanlar'
-     AND translation_key = 'sub.acid-fans';
-  GET DIAGNOSTICS n = ROW_COUNT;
-  IF n = 0 AND NOT EXISTS (SELECT 1 FROM public.categories WHERE id = k_korozyon
-       AND metadata->'slug'->>'tr' = 'korozyon-dayanimli-fanlar' AND translation_key = 'sub.corrosion-fans') THEN
-    RAISE EXCEPTION '3: korozyon dalı ne eski ne yeni durumda — elle değişmiş, incele';
+   WHERE id = k_korozyon AND tenant_id = v_t
+     AND translation_key = 'sub.acid-fans' AND metadata->'slug'->>'tr' = 'asit-dayanikli-fanlar';
+  -- İlk koşum de ikinci koşum de AYNI son durumu ölçer; yarım/elle değişmiş satır adıyla durdurur.
+  SELECT count(*) INTO n FROM public.categories
+   WHERE id = k_korozyon AND tenant_id = v_t
+     AND name = 'Korozyona ve Aside Dayanımlı Fanlar' AND menu_label = 'Korozyona ve Aside Dayanımlı Fanlar'
+     AND translation_key = 'sub.corrosion-fans'
+     AND metadata->'slug'->>'tr' = 'korozyona-ve-aside-dayanimli-fanlar'
+     AND slug = 'acid-resistant-fans' AND metadata->'slug'->>'en' = 'acid-resistant-fans';
+  IF n <> 1 THEN RAISE EXCEPTION '3: korozyon dalı ne eski ne yeni durumda (ad/anahtar/slug) — elle değişmiş, incele'; END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
+                  WHERE tur = 'kategori' AND dil = 'tr' AND eski_slug = 'asit-dayanikli-fanlar'
+                    AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
+    RAISE EXCEPTION '3: korozyon dalının eski TR adresi takma ada yazılmadı — eski adres 404 olurdu';
   END IF;
 
   -- ── 4) YEDEK PARÇA — boş translation_key (ham ad render ediliyordu) ──────────────────────
   UPDATE public.categories SET translation_key = 'sub.spare-parts', updated_at = now()
    WHERE id = k_yedek AND translation_key IS NULL;
 
-  -- ── 5) CASALS AİLELERİ: marka + ad (+ KENTALFAN seri kodu); ürünlerin marka metni ─────────
-  UPDATE public.product_families SET brand_id = m_casals, name = 'Casals KENTALFAN Plug Fanlar',
-         series_code = 'KENTALFAN', updated_at = now()
-   WHERE id = a_kentalfan AND brand_id = m_avens;
-  UPDATE public.product_families SET brand_id = m_casals, name = 'Casals ENKELFAN EC Motorlu Plug Fanlar',
+  -- ── 4b) RADYAL DALI — yalnız görünen ad (karar 288, Recep; OPS-76): name + menu_label ────────
+  -- TR 'Radyal (Santrifüj) Fanlar'; EN ad sözlükte ('Radial (Centrifugal) Fans', `sub.radial`, görünen ad ÖNCE
+  -- sözlükten gelir → DB ve sözlük BİRLİKTE). Slug (`centrifugal-fans` / `radyal-fanlar`) ve translation_key
+  -- (`sub.radial`) DEĞİŞMEZ → takma ad yazılmaz, eski adres yok. YALNIZ beklenen eski adda yazar: name ve
+  -- menu_label ikisi de 'Santrifüj / Radyal Fanlar' değilse UPDATE hiçbir satıra dokunmaz ve aşağıdaki kapı durdurur.
+  UPDATE public.categories
+     SET name = 'Radyal (Santrifüj) Fanlar',
+         menu_label = 'Radyal (Santrifüj) Fanlar',
          updated_at = now()
-   WHERE id = a_enkelfan AND brand_id = m_avens;
-  UPDATE public.product_families SET brand_id = m_casals, name = 'Casals NIMAX Santrifüj Fanlar',
-         updated_at = now()
-   WHERE id = a_nimax AND brand_id = m_avens;
-  UPDATE public.product_families SET brand_id = m_casals, name = 'Casals NIMUS Santrifüj Fanlar',
-         updated_at = now()
-   WHERE id = a_nimus AND brand_id = m_avens;
-  SELECT count(*) INTO n FROM public.product_families
-   WHERE id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND brand_id = m_casals;
-  IF n <> 4 THEN RAISE EXCEPTION '5: 4 Casals ailesi bekleniyordu, %', n; END IF;
+   WHERE id = k_radyal AND tenant_id = v_t
+     AND name = 'Santrifüj / Radyal Fanlar' AND menu_label = 'Santrifüj / Radyal Fanlar';
+  -- Son durum (ilk koşum ve ikinci koşum aynı): ad iki alanda yeni, adres ve anahtar yerinde. Başka her durum
+  -- (tek alanı elle değişmiş, üçüncü bir ad, slug/anahtar kaymış) adıyla durdurur.
+  SELECT count(*) INTO n FROM public.categories
+   WHERE id = k_radyal AND tenant_id = v_t
+     AND name = 'Radyal (Santrifüj) Fanlar' AND menu_label = 'Radyal (Santrifüj) Fanlar'
+     AND translation_key = 'sub.radial'
+     AND slug = 'centrifugal-fans' AND metadata->'slug'->>'tr' = 'radyal-fanlar';
+  IF n <> 1 THEN RAISE EXCEPTION '4b: radyal dalı elle değişmiş (ad/menu_label/anahtar/slug beklenen durumda değil) — incele'; END IF;
 
-  UPDATE public.products SET brand = 'Casals', updated_at = now()
-   WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND tenant_id = v_t AND brand = 'AVenS';
+  -- ── 5) CASALS AİLELERİ — marka, ad (3 aile) ve ürün marka metni #1692'DE yazılır; burada DOĞRULANIR ──
+  -- Çift tanım kalmasın diye bu migration'ın eski aile/ürün UPDATE'leri çıkarıldı. #1692 uygulanmamışsa
+  -- aileler hâlâ AVenS markasında/adındadır ve aşağıdaki kapılar adıyla durdurur.
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND brand_id = v_casals;
+  IF n <> 4 THEN RAISE EXCEPTION '5: 4 Casals ailesinden % tanesi casals markasında — #1692 önce uygulanmalı', n; END IF;
+
   SELECT count(*) INTO n FROM public.products
    WHERE family_id IN (a_kentalfan, a_enkelfan, a_nimax, a_nimus) AND tenant_id = v_t
      AND deleted_at IS NULL AND brand = 'Casals';
-  IF n <> 53 THEN RAISE EXCEPTION '5: 53 Casals ürünü bekleniyordu, %', n; END IF;
+  IF n <> 53 THEN RAISE EXCEPTION '5: 53 Casals ürünü bekleniyordu, % — #1692 önce uygulanmalı ya da veri değişmiş', n; END IF;
+
+  -- #1692'nin ürettiği aile adları, bu migration'ın bilinen hedefleriyle aynı mı (üç aile; plug 5b'de).
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE (id, name) IN ((a_enkelfan, 'Casals ENKELFAN EC Motorlu Plug Fanlar'),
+                        (a_nimax,    'Casals NIMAX Santrifüj Fanlar'),
+                        (a_nimus,    'Casals NIMUS Santrifüj Fanlar'));
+  IF n <> 3 THEN RAISE EXCEPTION '5: ENKELFAN/NIMAX/NIMUS aile adları beklenen ''Casals …'' biçiminde değil (% eşleşti)', n; END IF;
+
+  -- ── 5b) KENTALFAN — plug ailesinin adı + seri kodu (#1692 'Casals Plug Fanlar' yazar; adres kentalfan) ──
+  -- Tek blok: istenmezse bütünüyle çıkarılabilir (adres adımları buna dayanmaz). name_i18n aynı adı taşır.
+  UPDATE public.product_families
+     SET name = 'Casals KENTALFAN Plug Fanlar',
+         name_i18n = coalesce(name_i18n, '{}'::jsonb) || jsonb_build_object('tr', 'Casals KENTALFAN Plug Fanlar',
+                                                                           'en', 'Casals KENTALFAN Plug Fans'),
+         series_code = 'KENTALFAN',
+         updated_at = now()
+   WHERE id = a_kentalfan AND brand_id = v_casals
+     AND (name IS DISTINCT FROM 'Casals KENTALFAN Plug Fanlar'
+          OR (name_i18n->>'tr') IS DISTINCT FROM 'Casals KENTALFAN Plug Fanlar'
+          OR (name_i18n->>'en') IS DISTINCT FROM 'Casals KENTALFAN Plug Fans'
+          OR series_code IS DISTINCT FROM 'KENTALFAN');
+  SELECT count(*) INTO n FROM public.product_families
+   WHERE id = a_kentalfan AND name = 'Casals KENTALFAN Plug Fanlar' AND series_code = 'KENTALFAN'
+     AND (name_i18n->>'tr') = 'Casals KENTALFAN Plug Fanlar' AND (name_i18n->>'en') = 'Casals KENTALFAN Plug Fans';
+  IF n <> 1 THEN RAISE EXCEPTION '5b: KENTALFAN ailesi beklenen ad/seri kodunda değil'; END IF;
 
   -- ── 6) TAŞIMA — İKİ TABLO BİRLİKTE (taksonomi cetveli §8) ──────────────────────────────
   FOR r IN SELECT * FROM (VALUES
@@ -274,18 +364,14 @@ BEGIN
 
   -- ── 8) GUARD — Faz 1-A tetiği eski adları yazdı mı (adres kırılmaz kanıtı) ───────────────
   -- Takma adın VARLIĞI yetmez, DOĞRU aileyi göstermesi ölçülür (güvenlik incelemesi).
+  -- (Korozyon dalının eski TR adresi takma ad kontrolü, kendi bloğuyla birlikte 3'tedir.)
   SELECT count(*) INTO n FROM faz1b_aile p
     JOIN public.product_families f ON f.slug = p.yeni AND f.tenant_id = v_t AND f.deleted_at IS NULL
     JOIN public.url_takma_adlari t
       ON t.tur = 'aile' AND t.eski_slug = p.eski AND t.tenant_id = v_t AND t.hedef_id = f.id;
   IF n <> 40 THEN RAISE EXCEPTION '8: 40 aile takma adı bekleniyordu, % — eski adresler 404 olurdu', n; END IF;
-  IF NOT EXISTS (SELECT 1 FROM public.url_takma_adlari
-                  WHERE tur = 'kategori' AND dil = 'tr' AND eski_slug = 'asit-dayanikli-fanlar'
-                    AND tenant_id = v_t AND hedef_id = k_korozyon) THEN
-    RAISE EXCEPTION '8: korozyon dalının eski TR adresi takma ada yazılmadı';
-  END IF;
 
-  RAISE NOTICE 'Faz 1-B tamam: 4 dal, Casals (4 aile / 53 ürün), 44 ürün taşındı, 40 aile slug''ı';
+  RAISE NOTICE 'Faz 1-B tamam: 4 dal, Casals (4 aile / 53 ürün, #1692 üstüne), 44 ürün taşındı, 40 aile slug''ı, korozyon (ad + adres) ve radyal (ad)';
 END $$;
 
 COMMIT;
