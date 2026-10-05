@@ -53,7 +53,7 @@ tablosu, §4 şerit sınırları, satır 486/491 eşzamanlı alt ajan sınırı,
 | `ADRES_SEMASI_K3B` | `src/config/features.ts:130` | `false` (10-05). **Yorum (`:127-128`): "AÇMA (Faz 3-C, tek PR, geri dönüşsüz adım): yalnız Faz 4 ön izlemesinde Recep 'gördüm, tamam' dedikten sonra (karar 68). Aynı PR eski-adres haritasını ve `next.config`'ten silinecek satırları taşır."** | Adres şeması (REC-300/442; URUN/ALTYAPI) | Ops (açılış PR'ı; adres planına göre) |
 | `YENI_KABUK_GEZINMESI` | `src/config/features.ts:58` | `false`; 3 kilit testi `= false` bekliyor | Mobil alt sekme çubuğu + header "Teklif" paneli, **birlikte** | Ops |
 | `YENI_GORUNUM` | `src/config/features.ts` (tek satır, **YENİ**) | yok → `false` doğar | Token/font/DS bileşen görünümünün tümü | Ops |
-| Paket alt bayrakları | `src/config/gorunum/<paket>.ts` (YENİ, paket başına bir dosya) | `false` doğar | O paketin yeni yerleşimi | Ops (açılış PR'ı) |
+| Paket alt bayrakları | `src/config/gorunum/<paket>.ts` (YENİ, paket başına bir dosya) | `false` doğar | O paketin yeni yerleşimi | TASARIM (açılış PR'ı) + OPS onayı |
 
 Yeni görünüm = `YENI_GORUNUM && <PAKET>_GORUNUM`. Bayraklar **derleme sabitidir** (`features.ts` gerekçesi: `NEXT_PUBLIC_` unutulursa sessizce kapalı kalır).
 **Bayrak okuma doğrudan sabitle yazılır** (`if (YENI_GORUNUM && ANA_GORUNUM)`), fonksiyon sarmalayıcıyla değil; amaç derleyicinin ölü dalı atmasıdır.
@@ -122,14 +122,16 @@ Faz 4 (sayfalar) → paketler Çar–Per, anahtar paket bayrağı · Faz 5 → 1
 
 ### 2.1 Açılış PR'ı kontrol listesi (Ops 10-05; kart **TSR-10**, TASARIM panosu, `hafta-41`)
 
-Açılış PR'ını **Ops** açar; aşağıdaki dört madde merge'ten ÖNCE işaretli olmalıdır. Liste hafızada değil **kartta** tutulur (Ops kararı 10-05); bu bölüm kartın belgedeki aynasıdır, çelişirse kart kazanır.
+Açılış PR'ını **TASARIM** açar; **OPS** bu listeyi işaretletir ve birleşme onayını verir (OPS kod yazmaz, rol kartı); aşağıdaki altı madde merge'ten ÖNCE işaretli olmalıdır. Liste hafızada değil **kartta** tutulur (Ops kararı 10-05); bu bölüm kartın belgedeki aynasıdır, çelişirse kart kazanır.
 
 | # | Madde | Neden / kanıt | Sahip |
 |---|---|---|---|
-| 1 | **Inter tanımı `src/app/layout.tsx`'ten KALDIRILIR**; `<body>` sınıfı bayrak açıkken yeni ailenin `variable`/`className`'ini taşır; Inter **yalnız** `src/app/admin/layout.tsx`'te kalır (Faz 2b'de eklendi, ADMIN kartı ADM-9) | S1 v5 ölçümü: root'ta tanımlı Inter kullanılmasa da preload edilir; açılışta Archivo ile **iki** font önyüklenir, M6 kötüleşir. Faz 2b'de Inter root'ta KALIR (bayrak kapalıyken vitrin Inter'de kalmak zorunda, §1.3 "fark 0") | Ops (açılış PR'ı) |
-| 2 | **Archivo `preload: false` → `true`**; Source Serif 4 ve IBM Plex Mono `false` kalır | §1.2: açılış PR'ı yalnız Archivo'yu `true` yapar. `latin` + `latin-ext` ise Archivo **2** preload bağlantısı üretir (S1: her `preload:true` aile, subsets sayısı kadar bağlantı); M6'nın beklenen sayısı buna göre yazılır. Preload sayımı **Linux/CI'da** ölçülür: yerel Windows `next build` `next-font-manifest.json`'u `"app":{}` üretir (yol ayracı), orada sayım yanıltıcı 0 verir | Ops (açılış PR'ı) + ALTYAPI (M6 ölçümü) |
+| 1 | **Inter tanımı `src/app/layout.tsx`'ten KALDIRILIR**; `<body>` sınıfı bayrak açıkken yeni ailenin `variable`/`className`'ini taşır; Inter **yalnız** `src/app/admin/layout.tsx`'te kalır (Faz 2b'de eklendi, ADMIN kartı ADM-9) | S1 v5 ölçümü: root'ta tanımlı Inter kullanılmasa da preload edilir; açılışta Archivo ile **iki** font önyüklenir, M6 kötüleşir. Faz 2b'de Inter root'ta KALIR (bayrak kapalıyken vitrin Inter'de kalmak zorunda, §1.3 "fark 0") | TASARIM (açılış PR'ı) + OPS onayı |
+| 2 | **Archivo `preload: false` → `true`**; Source Serif 4 ve IBM Plex Mono `false` kalır | §1.2: açılış PR'ı yalnız Archivo'yu `true` yapar. `latin` + `latin-ext` ise Archivo **2** preload bağlantısı üretir (S1: her `preload:true` aile, subsets sayısı kadar bağlantı); M6'nın beklenen sayısı buna göre yazılır. Preload sayımı **Linux/CI'da** ölçülür: yerel Windows `next build` `next-font-manifest.json`'u `"app":{}` üretir (yol ayracı), orada sayım yanıltıcı 0 verir | TASARIM (açılış PR'ı) + OPS onayı; ALTYAPI (M6 ölçümü) |
 | 3 | **Açılıştan önce ölçülecek:** portal'lı admin diyalog ve toast'ların yazı tipi (bayrak AÇIKKEN; `body`'ye basılan elemanlar yeni aileyi alıyor mu) | §1.4 "Bilinmeyen (ÖLÇÜLMEDİ)". Admin yerleşiminin kendi Inter sınıfı yalnız yerleşimin içindeki elemanları kapsar; kök `body`'ye portal'la basılanlar kapsam dışı olabilir | **ADMIN** (ADM-9) |
 | 4 | Bayrak açıkken admin `getComputedStyle().fontFamily` bayrak kapalıyla aynı (giriş sonrası ekranlar dahil) | Faz 2b PR'ı kapalı/açık karşılaştırmasını yazar; girişli ekran test kimliği olmadığından **ölçülmedi** olabilir (kimlik uydurulmaz) | TASARIM (ölçüm) + ADMIN (onay) |
+| 5 | Design'ın **"yayına çıkmaması gereken 9 yer tutucu"** listesi açılışta **0** olur | OPS-46 teslimi, Linear belge `7bc050f56e00`; listedeki her yer tutucu açılıştan önce gerçek içerikle ya da kapsam dışı bırakma kararıyla kapanır | **ÜRÜN** (maddeyi ÜRÜN kendisi TASARIM'a yazar) |
+| 6 | Bayrak **AÇIKKEN** axe kapısı (#1708, `e2e/axe-anasayfa.e2e.ts`, INV-AXE-1): ana sayfa TR 390 px **ihlal 0**, `color-contrast` "karar verilemedi" düğüm sayısı tavanı **17'yi aşmaz** | Kapı bayrak kapalıyken taban 0 ihlal ve tavan 17 ile kuruldu (ALTYAPI); bayrak açık hâl yeni renk/yazı tipi getirdiği için ayrıca ölçülür; artış bilinçli ise tavan elle yükseltilip kayda geçer | **ALTYAPI** |
 
 **Sonuç yoksa:** madde "ölçülmedi" yazılır, açılış kararı Ops'ta kalır; sessizce geçilmez.
 
@@ -217,7 +219,7 @@ Her lider kendi çalışanlarını açar, denetler, bağımsız doğrulayıcı �
 | Dosya | Tek sahip | Kural |
 |---|---|---|
 | `tailwind.config.js` · `src/index.css` · `src/design-system/tokens.js` · **`src/app/layout.tsx` (kök)** | **TOK (TASARIM)** | Salı'da DS'in **66 adının tamamı** tek PR'da; paketler **token talebi** (ad + gerekçe) TASARIM'a yazar. **Per 18:00'da dondurulur**; sonrası yalnız kırmızı düzeltme. Paketler dokunmaz |
-| `src/config/features.ts` | **ROTA/ADRES (URUN)** | `YENI_GORUNUM` satırını Salı **tek PR**'da TASARIM ekler (Ops izniyle); sonra **kimse** düzenlemez; açılış PR'ını Ops açar |
+| `src/config/features.ts` | **ROTA/ADRES (URUN)** | `YENI_GORUNUM` satırını Salı **tek PR**'da TASARIM ekler (Ops izniyle); sonra **kimse** düzenlemez; açılış PR'ını TASARIM açar, OPS onaylar (OPS kod yazmaz, §2.1) |
 | `src/config/gorunum/<paket>.ts` | Paket sahibi | Dosya paket başına ayrı; `index.ts` TOK'un |
 | `src/i18n/dictionaries/{tr,en}.ts` | **SOZLUK (I18N)** | Sözlük `gorunum` kökü **tek satır** (Salı iskelet). Paketler yeni anahtarı **kendi parça dosyalarına** yazar (`dictionaries/gorunum/<paket>.{tr,en}.ts`). **ÇELİŞKİ (adlandırıldı):** `docs/roller/I18N.md:15` "tr.ts'i fiilen düzenleyen URUN" ve `:18` "ajanlar sözlüğe yazmaz, müdür merkezi birleştirir"; bu plan "tek sahip SOZLUK" diyor ve paket ajanlarının parça dosyasına yazmasını öneriyor. **Sapma talebi I18N müdürüne**; kabul edilmezse yerine **yalnız merkezi birleştirme dalgaları** geçerli |
 | **Sözlük dalgaları ↔ paket PR'ı zamanlaması** | I18N | Paket PR'ı kendi anahtarları olmadan `i18n-key-resolution`/`dead-key` kapılarında **kırmızı kalır**. Dalgalar: **Çar öğle (#1), Per sabah (#2), Per 18:00 (#3), Cum 09:00 (#4, son)**; paket PR'ı anahtarlarını **bir sonraki dalgadan önce** I18N'e iletir; parça dosyası yöntemi kabul edilirse anahtar PR'la birlikte gider ve dalga yalnız doğrulama olur. Cuma 09:00'dan sonra yeni anahtar yok |
