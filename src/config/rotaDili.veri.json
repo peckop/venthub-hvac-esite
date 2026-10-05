@@ -6,5 +6,8 @@
   { "id": "yasal-kvkk", "klasor": "legal/kvkk", "tr": "yasal/kvkk-aydinlatma-metni", "en": "legal/privacy-notice-kvkk" },
   { "id": "yasal-gizlilik", "klasor": "legal/gizlilik-politikasi", "tr": "yasal/gizlilik-politikasi", "en": "legal/privacy-policy" },
   { "id": "yasal-cerez", "klasor": "legal/cerez-politikasi", "tr": "yasal/cerez-politikasi", "en": "legal/cookie-policy" },
-  { "id": "yasal-mesafeli", "klasor": "legal/mesafeli-satis-sozlesmesi", "tr": "yasal/mesafeli-satis-sozlesmesi", "en": "legal/distance-sales-contract" }
+  { "id": "yasal-mesafeli", "klasor": "legal/mesafeli-satis-sozlesmesi", "tr": "yasal/mesafeli-satis-sozlesmesi", "en": "legal/distance-sales-contract" },
+  { "id": "yasal-kullanim-kosullari", "klasor": "legal/kullanim-kosullari", "tr": "yasal/kullanim-kosullari", "en": "legal/terms-of-use" },
+  { "id": "yasal-on-bilgilendirme", "klasor": "legal/on-bilgilendirme-formu", "tr": "yasal/on-bilgilendirme-formu", "en": "legal/pre-information-form" },
+  { "id": "yasal-iptal-iade", "klasor": "destek/iade-degisim", "tr": "yasal/iptal-ve-iade", "en": "legal/cancellation-and-returns" }
 ]

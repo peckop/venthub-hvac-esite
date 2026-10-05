@@ -180,8 +180,12 @@ describe('açık kip — iç bağlantılar (header / footer / navigationConfig) 
     expect(m.localizedHref('/en/about', 'en')).toBe('/en/about')
     expect(m.localizedHref('/admin/about', 'tr')).toBe('/admin/about')
     expect(m.localizedHref('/api/contact', 'tr')).toBe('/api/contact')
-    expect(m.localizedHref('/destek/iade-degisim', 'tr')).toBe('/tr/destek/iade-degisim') // tabloda yok: bugünkü adres
-    expect(m.localizedHref('/legal/kullanim-kosullari', 'en')).toBe('/en/legal/kullanim-kosullari')
+    expect(m.localizedHref('/destek/garanti-servis', 'tr')).toBe('/tr/destek/garanti-servis') // tabloda yok (karar 293): bugünkü adres
+    expect(m.localizedHref('/destek/teslimat-kargo', 'en')).toBe('/en/destek/teslimat-kargo')
+    // ALT-33 (karar 293 A): bu üçü tabloda, iç bağlantı yeni adresi taşır.
+    expect(m.localizedHref('/destek/iade-degisim', 'tr')).toBe('/tr/yasal/iptal-ve-iade')
+    expect(m.localizedHref('/legal/kullanim-kosullari', 'en')).toBe('/en/legal/terms-of-use')
+    expect(m.localizedHref('/legal/on-bilgilendirme-formu', 'tr')).toBe('/tr/yasal/on-bilgilendirme-formu')
     expect(m.localizedHref('/about/ekip', 'tr')).toBe('/tr/about/ekip') // altYollar kapalı: alt yol bu satırın işi değil
     expect(m.localizedHref('/aboutx', 'tr')).toBe('/tr/aboutx')
     expect(m.localizedHref('/about', 'de')).toBe('/de/about')
