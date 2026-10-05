@@ -27,7 +27,8 @@ const path = require('node:path')
 const { spawnSync } = require('node:child_process')
 
 // Kanban kart ön ekleri (ölçüldü 2026-10-04: panolardaki başlık ön ekleri). Yeni departman ön eki → buraya.
-const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG']
+// TSR/DIL/MRK/MVZ/STS 10-05: docs/standards/is-kayit-duzeni-standard.md §1 tablosu; eksikken bu departmanların kartı «bilinen kart değil» diye bloklanırdı.
+const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS']
 const KART_NO = new RegExp('\\b(?:' + ONEKLER.join('|') + ')-\\d{1,5}\\b', 'g')
 const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi
 
@@ -54,7 +55,10 @@ const KARAR_KELIMESI = /(önerim|\bevet\b|\bhay[ıi]r\b|\bonay)/i
 // sormaz (ölçüm 10-05: üçüncü kişi hâli 81.745 geçmiş mesajda gürültünün çoğuydu); "senin onayını bekliyor", "onayın gerekiyor", "demen yeterli" sorar.
 const ISTEK_IFADESI = /(demen\s+(?:yeterli|gerek(?:iyor|li)?|lazım)|evet\s+demen|hay[ıi]r\s+demen|karar\s+vermen|\bonay[ıi]n\s+(?:gerek|laz)|\bsenin\s+(?:[^\s.,;:|]+\s+){0,3}?(?:onay|karar)[a-zçğıöşü]*\s+(?:bekli|gerek|laz))/i
 // Bitmiş iş anlatımı istek değildir: "**284.** evet verildi, uygulandı".
-const BITMIS = /\b(verildi|verdin|verdi|dedin|dediğin|uygulandı|uyguladım|alındı|kapandı|kapattım|işlendi|yapıldı|birleşti|tamamlandı)\b/i
+// \b Türkçe harflerde (ı ü ö ş ç ğ) kelime sınırı saymaz: «alındı», «kapandı» kaçıyordu → yan yana harf yok diye ölçülür.
+const BITMIS = /(?<![a-zçğıöşü])(?:verildi|verdin|verdi|dedin|dediğin|uygulandı|uyguladım|alındı|kapandı|kapattım|işlendi|yapıldı|birleşti|tamamlandı)(?![a-zçğıöşü])/i
+// Tırnak, «» ve ters tırnak içi alıntıdır, istek değildir (örnek ifadeyi anan satır Recep'ten bir şey istemez).
+const tirnaksiz = (satir) => String(satir).replace(/«[^»]*»|"[^"]*"|“[^”]*”|`[^`]*`/g, ' ')
 const SEPARATOR = /^\s*\|[\s:|-]+\|\s*$/
 
 /** Tablo hücrelerini ayırır: "| a | b |" → ['a','b']. */
@@ -143,8 +147,8 @@ function maddeleriCikar(metin) {
       }
     }
     if (SATIR_KALIBI.test(satir)) maddeler.push({ metin: satir.trim() })
-    else if (KARAR_MADDESI.test(satir) && KARAR_KELIMESI.test(satir) && !BITMIS.test(satir) && !MUAF.test(satir)) maddeler.push({ metin: satir.trim() })
-    else if (ISTEK_IFADESI.test(satir) && !OLUMSUZ.test(satir) && !BITMIS.test(satir) && !MUAF.test(satir)) maddeler.push({ metin: satir.trim() })
+    else if (KARAR_MADDESI.test(satir) && KARAR_KELIMESI.test(tirnaksiz(satir)) && !BITMIS.test(satir) && !MUAF.test(satir)) maddeler.push({ metin: satir.trim() })
+    else if (ISTEK_IFADESI.test(tirnaksiz(satir)) && !OLUMSUZ.test(satir) && !BITMIS.test(satir) && !MUAF.test(satir)) maddeler.push({ metin: satir.trim() })
   }
   return maddeler
 }
