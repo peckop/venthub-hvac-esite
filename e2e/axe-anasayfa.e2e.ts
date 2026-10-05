@@ -1,5 +1,5 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, type Page, test } from "@playwright/test";
+import AxeBuilder from '@axe-core/playwright'
+import { expect, type Page, test } from '@playwright/test'
 
 /**
  * INV-AXE-1 — ana sayfa (TR, 390 px) gerçek tarayıcıda axe taramasından GEÇMELİ; ihlal tabanı sabit.
@@ -25,61 +25,50 @@ import { expect, type Page, test } from "@playwright/test";
  * (axe karar veremedi: görsel/gradyan arka plan); bu "geçti" değildir ve bu kapının görmediği alandır,
  * elle/PageSpeed ölçümüne kalır. Kural kimliği → en çok düğüm.
  */
-const TABAN: Readonly<Record<string, number>> = {};
+const TABAN: Readonly<Record<string, number>> = {}
 
-const ETIKETLER = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] as const;
+const ETIKETLER = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] as const
 
 async function ac(page: Page): Promise<void> {
-  await page.setViewportSize({ width: 390, height: 844 });
-  const res = await page.goto("/tr", { waitUntil: "networkidle" });
+  await page.setViewportSize({ width: 390, height: 844 })
+  const res = await page.goto('/tr', { waitUntil: 'networkidle' })
   // Uygulama gerçekliği: koruma/hata sayfası değil, bizim sayfamız (html[lang] + gövde içeriği).
-  expect(res?.status(), "/tr HTTP durumu").toBe(200);
-  await expect(page.locator("html")).toHaveAttribute("lang", "tr");
-  await expect(page.locator('main, [role="main"]').first()).toBeVisible();
+  expect(res?.status(), '/tr HTTP durumu').toBe(200)
+  await expect(page.locator('html')).toHaveAttribute('lang', 'tr')
+  await expect(page.locator('main, [role="main"]').first()).toBeVisible()
 }
 
-test.describe("INV-AXE-1 — ana sayfa TR 390px axe taraması", () => {
-  test("ihlal tabanı aşılmadı", async ({ page }, testInfo) => {
-    await ac(page);
-    const sonuc = await new AxeBuilder({ page })
-      .withTags([...ETIKETLER])
-      .analyze();
-    const bulunan = Object.fromEntries(
-      sonuc.violations.map((v) => [v.id, v.nodes.length]),
-    );
+test.describe('INV-AXE-1 — ana sayfa TR 390px axe taraması', () => {
+  test('ihlal tabanı aşılmadı', async ({ page }, testInfo) => {
+    await ac(page)
+    const sonuc = await new AxeBuilder({ page }).withTags([...ETIKETLER]).analyze()
+    const bulunan = Object.fromEntries(sonuc.violations.map((v) => [v.id, v.nodes.length]))
     testInfo.annotations.push({
-      type: "ihlaller",
+      type: 'ihlaller',
       description: JSON.stringify(bulunan),
-    });
+    })
 
-    const yeni = Object.keys(bulunan).filter((id) => !(id in TABAN));
+    const yeni = Object.keys(bulunan).filter((id) => !(id in TABAN))
     const artan = Object.entries(bulunan)
       .filter(([id, n]) => id in TABAN && n > TABAN[id])
-      .map(([id, n]) => `${id}: ${n} > taban ${TABAN[id]}`);
-    expect(
-      yeni,
-      `TABANDA olmayan yeni axe kuralı ihlali: ${yeni.join(", ")}`,
-    ).toEqual([]);
-    expect(artan, `taban aşıldı: ${artan.join(" | ")}`).toEqual([]);
-  });
+      .map(([id, n]) => `${id}: ${n} > taban ${TABAN[id]}`)
+    expect(yeni, `TABANDA olmayan yeni axe kuralı ihlali: ${yeni.join(', ')}`).toEqual([])
+    expect(artan, `taban aşıldı: ${artan.join(' | ')}`).toEqual([])
+  })
 
-  test("enstrüman kanıtı: alt metni olmayan görsel axe tarafından görülüyor", async ({
-    page,
-  }) => {
-    await ac(page);
+  test('enstrüman kanıtı: alt metni olmayan görsel axe tarafından görülüyor', async ({ page }) => {
+    await ac(page)
     await page.evaluate(() => {
-      const img = document.createElement("img");
-      img.src = "data:image/gif;base64,R0lGODlhAQABAAAAACw=";
-      img.width = 4;
-      img.height = 4;
-      document.body.appendChild(img);
-    });
-    const sonuc = await new AxeBuilder({ page })
-      .withTags([...ETIKETLER])
-      .analyze();
+      const img = document.createElement('img')
+      img.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACw='
+      img.width = 4
+      img.height = 4
+      document.body.appendChild(img)
+    })
+    const sonuc = await new AxeBuilder({ page }).withTags([...ETIKETLER]).analyze()
     expect(
       sonuc.violations.map((v) => v.id),
-      "axe alt metni olmayan görseli GÖREMEDİ: tarama ölçüm-geçersiz (ölçülemedi ≠ geçti)",
-    ).toContain("image-alt");
-  });
-});
+      'axe alt metni olmayan görseli GÖREMEDİ: tarama ölçüm-geçersiz (ölçülemedi ≠ geçti)',
+    ).toContain('image-alt')
+  })
+})
