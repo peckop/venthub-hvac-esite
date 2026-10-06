@@ -382,4 +382,22 @@ try {
   process.stdout.write('⚠WRONGSTACK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
+/**
+ * ── DÜNYA DURUMU (ALT-38) — EŞİKLİ ──
+ * PR kapısından çıkan dünya durumu testlerinin zamanlı koşusu (dunya-durumu.yml) kırmızı, iptal ya da
+ * sessizce ölmüşse konuşur; yoluna girdiğinde susar. Yalnız önbellek okunur, ölçüm arka planda
+ * (30 dakikada bir). PR'ı BLOKLAMAZ. Gerekçe: dunya-durumu-satiri.cjs.
+ */
+try {
+  const ds = require(path.join(__dirname, 'dunya-durumu-satiri.cjs'))
+  const simdi = Date.now()
+  const s = ds.satir(ds.oku(ds.onbellekYolu(PANO)), DEPO, simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ds.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠DUNYA: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
 process.exit(0)

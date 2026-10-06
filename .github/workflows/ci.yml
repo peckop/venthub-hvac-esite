@@ -17,14 +17,27 @@ on:
     branches: [master]
   workflow_dispatch:
 
+# ALT-38: `edited` (PR başlığı/gövdesi düzenleme) AYRI grupta. Kod değişmedi; koşan TAM koşuyu İPTAL ETMEMELİ.
+# Ölçüldü (10-03..10-06): 187 PR koşusunun 50'si aynı commit'in tekrarıydı, 30'u iptal edilen bir koşudan sonra geldi.
+# `push` ve `workflow_dispatch` olaylarında `github.event.action` yoktur (boş): grup eskisiyle AYNI kalır.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.ref }}${{ github.event.action == 'edited' && '-edited' || '' }}
   cancel-in-progress: true
+
+# Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU (CLAUDE.md Notlar).
+# `actions: read` YALNIZ edited aynasının (scripts/ci/edited-ayna.cjs) önceki koşuları okuması içindir;
+# hiçbir yazma yetkisi verilmez (PR kayıt kapısı etiket yazmaz, bilerek). `pull-requests: read`: elle tetiklemede
+# `gh pr list` (merge-ref çözümü).
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
 
 jobs:
   ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # `edited` koşusu tam koşunun bitmesini bekleyebilir (en çok 11 dk) ve gerekirse paketin tamamını koşar.
+    timeout-minutes: ${{ github.event.action == 'edited' && 30 || 15 }}
     # KRİTİK: GitHub Actions'ın örtük varsayılanı `bash -e` — pipefail YOK.
     # Adımlar `... 2>&1 | tee X.log` şeklinde olduğu için exit kodu tee'den geliyordu
     # (her zaman 0) → Lint/Type check/Test/Build/Deno check adımlarının HİÇBİRİ
@@ -136,23 +149,45 @@ jobs:
           PR_YAZAR: ${{ github.event.pull_request.user.login }}
         run: node scripts/board/pr-kayit-kapisi.cjs
 
+      # ALT-38 — `edited` AYNASI (cetvel: docs/standards/test-karnesi-standard.md §6; mantık ve test: scripts/ci/edited-ayna.cjs).
+      # Yalnız PR düzenlemesinde koşar. Aynı head SHA için bu koşudan ÖNCE başlamış bir TAM koşu `success` ile bitmişse ve
+      # base dalı o koşudan sonra ilerlememişse ağır adımlar ATLANIR (kod ve taban aynı: gerçek yeşile dayanır);
+      # tam koşu sürüyorsa bitmesi BEKLENİR; kırmızı/iptal/belirsiz/hata durumunda TAM koşu yapılır. Bir düzenleme kırmızı
+      # bir koşuyu yeşile ÇEVİREMEZ. PR kayıt kapısı yukarıda bu adımdan ÖNCE ve HER ZAMAN koşar. Adın BAŞI kod ile
+      # birebir aynı olmalı (INV-CI-EDITED-1): ayna koşusunu bu adımın sonucundan tanıyoruz.
+      - name: edited ayna kararı
+        id: ayna
+        if: github.event_name == 'pull_request' && github.event.action == 'edited'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          KOSU_ID: ${{ github.run_id }}
+        run: node scripts/ci/edited-ayna.cjs
+
       - name: Setup Deno
+        if: steps.ayna.outputs.atla != 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: v2.x
 
       - name: Install dependencies
+        if: steps.ayna.outputs.atla != 'true'
         run: pnpm install --prefer-offline --config.allow-scripts true
 
       - name: Lint (blocking)
+        if: steps.ayna.outputs.atla != 'true'
         run: pnpm run lint 2>&1 | tee ci-lint.log
 
       - name: Type check
+        if: steps.ayna.outputs.atla != 'true'
         run: pnpm exec tsc --noEmit 2>&1 | tee ci-typecheck.log
 
       # Edge Functions (Deno) Next.js tsc kapsamı DIŞINDA — tsconfig supabase/'i hariç tutar.
       # Bu adım 2026-05'te maskesiz kalan edge bozulmasını (T011) yakalamak için eklendi: kalıcı kapı.
       - name: Deno check (edge functions — kapı-körlüğü guard)
+        if: steps.ayna.outputs.atla != 'true'
         # --node-modules-dir=none ŞART: `auto` node_modules/.deno/ yaratıp pnpm ağacını kirletiyor
         # (undici@8.10.0 oradan çözülüp jsdom'u kırıyordu → adversarial.test.ts çöküyordu).
         # Bu regresyon #494'te girdi ama CI o zaman pipefail'siz olduğu için görünmedi.
@@ -162,6 +197,7 @@ jobs:
       # searchParams key, mangled method çağrısı) GÖREMEZ — T011'de bu sınıf iki kez kaçtı.
       # Bu guard bozulma imzasını doğrudan tarar (unambiguous underscore-prefix desenleri).
       - name: Edge mangle-guard (string-literal — deno check göremez)
+        if: steps.ayna.outputs.atla != 'true'
         run: |
           # NOT: son iki sınıf sonradan eklendi — `_data:`/`_text:` gibi mangled OBJE ANAHTARLARI
           # ilk guard'ın kör noktasıydı ve checkout'u kırık bıraktı (frontend `data.data` bekliyordu).
@@ -185,6 +221,7 @@ jobs:
       # bu haliyle deploy edilse tamamen kırılırdı. deno check göremez (tip hatası değil),
       # mangle-guard göremez (underscore deseni değil) → ayrı kapı ŞART.
       - name: Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)
+        if: steps.ayna.outputs.atla != 'true'
         run: |
           hits=""
           for f in supabase/functions/*/index.ts; do
@@ -204,14 +241,24 @@ jobs:
       # Sabit-kodlu DB bağlantı dizesi (şifreli) tekrar commit'lenmesin — kredensiyeller env'den.
       # İnterpolasyonlu (`${...}`) satırlar hariç tutulur (onlar değişkenden kurulur, sır değil).
       - name: Secret guard (hardcoded DB connection string)
+        if: steps.ayna.outputs.atla != 'true'
         run: |
           hits=$(grep -rnE "postgresql://[^'\"]*:[^'\"@]*@" --include='*.ts' --include='*.js' --include='*.cjs' --include='*.mjs' . | grep -v node_modules | grep -v '\${' || true)
           if [ -n "$hits" ]; then echo "::error::Hardcoded DB connection string (with password) detected — use process.env.DATABASE_URL:"; echo "$hits"; exit 1; fi
 
+      # ALT-38 (karar: dünya durumu testleri PR'ı bloklamaz): pull_request olayında scripts/ci/dunya-durumu-testleri.json
+      # listesindeki testler DIŞARIDA koşar (kip `dislan`); master push, elle koşum ve yerel `pnpm test` TAM paketi koşar,
+      # ayrıca dunya-durumu.yml zamanlı olarak yalnız onları koşar (kip `yalniz`). Çıkan her test silinmez, yeni yeri listede
+      # ve karnede yazılıdır; INV-TEST-KOSU-1 bu bağın kopmadığını doğrular. Neden: bir PR'ın kodundan bağımsız kırmızı
+      # (INV-TABAN-TAZE-1: son 10 kırmızının 5'i) suçsuz PR'ı bekletiyor ve yazar düzeltemiyor.
       - name: Test
+        if: steps.ayna.outputs.atla != 'true'
+        env:
+          VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}
         run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
 
       - name: Build (blocking)
+        if: steps.ayna.outputs.atla != 'true'
         run: pnpm run build:ci 2>&1 | tee ci-build.log
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co

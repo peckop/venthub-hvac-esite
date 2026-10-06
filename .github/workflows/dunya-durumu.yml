@@ -1,0 +1,73 @@
+name: Dunya durumu
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ALT-38 — DÜNYA DURUMU TESTLERİNİN YENİ YERİ (PR kapısından çıkanlar burada koşar)
+#
+# NEDEN VAR: `ci` işinin Test adımı pull_request olayında scripts/ci/dunya-durumu-testleri.json
+# listesindeki testleri DIŞARIDA bırakır (kip `dislan`): bir PR'ın koduna bağlı olmayan kırmızı
+# (ör. INV-TABAN-TAZE-1: master'a migration girince tabanı bayat kalan suçsuz PR'lar) PR'ı bloklamasın.
+# Çıkan test SİLİNMEZ ve ZAYIFLAMAZ; iki yerde koşar:
+#   1. master push: `ci` işinin Test adımı TAM paketi koşar. UYARI: master push koşuları aynı
+#      concurrency grubunda iptal edilebilir (ölçüldü 07-06..10-06: 1119 master koşusunun 419'u iptal),
+#      yani tek başına güvence DEĞİLDİR.
+#   2. BU İŞ AKIŞI: zamanlı (6 saatte bir) + elle; YALNIZ listedeki testleri koşar (kip `yalniz`).
+#      Asıl güvence budur: bir master koşusu iptal edilse de en geç 6 saat sonra görülür.
+#
+# KIRMIZIDA KİME HABER GİDER: bu iş akışı kırmızı bitince OPS'un her mesajında gördüğü kanca satırı
+# `DUNYA:` (.claude/hooks/defter-tazelik-satiri.cjs) "SON ZAMANLI KOŞU KIRMIZI" yazar; bu satır PR'ı
+# bloklamaz, yalnız görünür kılar. INV-TABAN-TAZE-1'in kendi görünen yüzü `TABAN:` satırı zaten vardır.
+#
+# Cetvel: docs/standards/test-karnesi-standard.md §5. Kapı: INV-TEST-KOSU-1 (her listeli testin bu iş
+# akışında VE master push'ta gerçekten koştuğunu doğrular; liste ↔ iş akışı bağı kopamaz).
+# ══════════════════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    # 6 saatte bir, tam saat DEĞİL (GitHub tam saatlerde zamanlanmış işleri geciktiriyor).
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+# Depo PUBLIC: `permissions:` yazılınca varsayılanlar düşer, `contents: read` ZORUNLU
+# (CLAUDE.md Notlar — yoksa checkout "Repository not found" verir).
+permissions:
+  contents: read
+
+concurrency:
+  group: dunya-durumu
+  cancel-in-progress: false
+
+jobs:
+  dunya-durumu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # Tam geçmiş: listedeki testler git geçmişi / migration damgası okuyabilir (ci işiyle aynı).
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --config.allow-scripts true
+
+      # `yalniz`: yalnız dünya durumu listesi koşar. `--passWithNoTests`: liste boşaltılırsa kırmızı DEĞİL
+      # (INV-TEST-KOSU-1 boş listeyi ayrıca yakalar); iş akışı kendi başına anlamsız yere kırılmasın.
+      - name: Dunya durumu testleri
+        env:
+          VENTHUB_DUNYA_DURUMU: yalniz
+        run: pnpm test -- --run --reporter=dot --passWithNoTests 2>&1 | tee dunya-durumu.log

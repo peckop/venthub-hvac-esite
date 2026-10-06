@@ -1,0 +1,15 @@
+{
+  "surum": 1,
+  "aciklama": "PR kapısından (ci işinin Test adımı, pull_request olayı) ÇIKARILAN dünya durumu testleri. Kod: scripts/ci/dunya-durumu.cjs; cetvel: docs/standards/test-karnesi-standard.md §5. Bu testler SİLİNMEZ: master push (ci işi, tam paket) ve zamanlı iş akışında (dunya-durumu.yml) koşar; kırmızıyı OPS her mesajdaki kanca satırından görür. Yeni kayıt neden + kanıt + yeni yer taşımak ZORUNDA (INV-TEST-KOSU-1).",
+  "testler": [
+    {
+      "test": "src/__tests__/conformance/taban-tazeligi.test.ts",
+      "kimlik": "INV-TABAN-TAZE-1",
+      "eskiYer": "pull_request (ci işi, Test adımı)",
+      "yeniYer": ["master-push", "zamanli"],
+      "neden": "Şema tabanının en yeni migration'dan geri kalıp kalmadığını ölçer. Cevap pull request'in koduna değil master'ın o anki durumuna ve tabanın son dökülme tarihine bağlıdır; taban prod'dan elle dökülür (sema-tabani-uret.yml), yani suçsuz bir PR'ın yazarı düzeltemez.",
+      "kanit": "CI geçmişi 2026-07-06..10-06 (scripts/test-karnesi/ci-gecmis.cjs): 55 kırmızı koşu, 39 farklı dal, 52'si dünya olayı kümesinde (altı küme: aynı test ≥3 dalda 12 saat içinde), 11'i master push. OPS ölçümü 10-06: son 10 kırmızının 5'i (#1692 migrate sonrası suçsuz PR'lar).",
+      "gorunenYuz": "kanca satırı TABAN (.claude/hooks/defter-tazelik-satiri.cjs): her mesajda taban yaşı ve sonrasındaki migration sayısı görünür"
+    }
+  ]
+}
