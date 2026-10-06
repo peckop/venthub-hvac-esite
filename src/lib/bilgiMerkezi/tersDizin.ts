@@ -60,7 +60,7 @@ function acikDil(lang: string, enYayin: boolean): YaziDili | null {
  * O dilde Bilgi Merkezi kapalıysa ya da yazı yoksa BOŞ dizi — görünüm bloğu hiç basmaz.
  */
 export function ilgiliRehberler(
-  hedef: RehberHedefi,
+  hedef: RehberHedefi | readonly RehberHedefi[],
   lang: string,
   adet: number = 3,
   yazilar: readonly RehberYazisi[] = YAZILAR,
@@ -68,8 +68,13 @@ export function ilgiliRehberler(
 ): RehberBaglantisi[] {
   const dil = acikDil(lang, enYayin)
   if (!dil) return []
+  // Birden çok kimlik: yeniden adlandırılan ailenin eski slug'ı da sayılır (`eskiAileSluglari.ts`).
+  const aranan = typeof hedef === 'string' ? [hedef] : hedef
   return dildekiYazilar(dil, yazilar)
-    .filter((y) => yazininHedefleri(y, dil).has(hedef))
+    .filter((y) => {
+      const hedefler = yazininHedefleri(y, dil)
+      return aranan.some((h) => hedefler.has(h))
+    })
     .slice(0, adet)
     .map((y) => baglanti(y, dil))
 }

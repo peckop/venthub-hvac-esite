@@ -128,6 +128,15 @@ describe('1. TABLO ↔ DİSK — her satırın sayfası var, yeni adres başka s
         const ilk = s[dil].split('/')[0]
         const kendi = s.klasor.split('/')[0]
         if (ilk === kendi) continue
+        // ALT-33 (karar 293): bir satırın yeni adresi başka sayfanın klasör önekini paylaşabilir (iade-degisim EN →
+        // `legal/cancellation-and-returns`; `legal/` kardeşi sayfaların klasörü) YALNIZ o klasörde dinamik ([param]) alt
+        // klasör YOKSA: yeniden yazım `beforeFiles`, ama dinamik bir kardeş yeni adresi yutabilirdi. Tam yolun sayfaya
+        // denk gelmemesi aşağıdaki testte ayrıca ölçülür.
+        if (ustKlasorler.includes(ilk)) {
+          const dinamik = readdirSync(join(APP, ilk), { withFileTypes: true }).some((d) => d.isDirectory() && d.name.startsWith('['))
+          expect(dinamik, `${s.id} ${dil}: "${s[dil]}" → "${ilk}" app klasörü ve dinamik alt klasörü var`).toBe(false)
+          continue
+        }
         expect(ustKlasorler, `${s.id} ${dil}: "${s[dil]}" → "${ilk}" bir app klasörü`).not.toContain(ilk)
       }
     }
@@ -282,6 +291,9 @@ describe('4. ADRES ÜRETİMİ (açık kip) — iç bağlantı, kanonik, hreflang
     'legal/gizlilik-politikasi': () => import('../../app/[lang]/legal/gizlilik-politikasi/page'),
     'legal/cerez-politikasi': () => import('../../app/[lang]/legal/cerez-politikasi/page'),
     'legal/mesafeli-satis-sozlesmesi': () => import('../../app/[lang]/legal/mesafeli-satis-sozlesmesi/page'),
+    'legal/kullanim-kosullari': () => import('../../app/[lang]/legal/kullanim-kosullari/page'),
+    'legal/on-bilgilendirme-formu': () => import('../../app/[lang]/legal/on-bilgilendirme-formu/page'),
+    'destek/iade-degisim': () => import('../../app/[lang]/destek/iade-degisim/page'),
     'destek/sss': () => import('../../app/[lang]/destek/sss/page'),
     about: () => import('../../app/[lang]/about/page'),
     contact: () => import('../../app/[lang]/contact/page'),
@@ -418,7 +430,7 @@ describe('6. DİLSİZ (gerçek middleware) — tek sıçrama, görünen yola', (
   }, 60_000)
 })
 
-describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 yeni satırı literal (tablo bunlardan sapamaz)', () => {
+describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 satırı + ALT-33 (karar 293 A) 3 satırı literal (tablo bunlardan sapamaz)', () => {
   const BEKLENEN = [
     { id: 'secici', klasor: 'urun-secici', tr: 'secici', en: 'selector' },
     { id: 'sss', klasor: 'destek/sss', tr: 'sss', en: 'faq' },
@@ -426,9 +438,13 @@ describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 yeni satırı literal (tablo b
     { id: 'yasal-gizlilik', klasor: 'legal/gizlilik-politikasi', tr: 'yasal/gizlilik-politikasi', en: 'legal/privacy-policy' },
     { id: 'yasal-cerez', klasor: 'legal/cerez-politikasi', tr: 'yasal/cerez-politikasi', en: 'legal/cookie-policy' },
     { id: 'yasal-mesafeli', klasor: 'legal/mesafeli-satis-sozlesmesi', tr: 'yasal/mesafeli-satis-sozlesmesi', en: 'legal/distance-sales-contract' },
+    // ALT-33 · karar 293 = A (Recep, 10-05): üç satır daha. İade metni aynı sayfada kalır (klasör destek/iade-degisim), adresi yasaldır.
+    { id: 'yasal-kullanim-kosullari', klasor: 'legal/kullanim-kosullari', tr: 'yasal/kullanim-kosullari', en: 'legal/terms-of-use' },
+    { id: 'yasal-on-bilgilendirme', klasor: 'legal/on-bilgilendirme-formu', tr: 'yasal/on-bilgilendirme-formu', en: 'legal/pre-contract-information' },
+    { id: 'yasal-iptal-iade', klasor: 'destek/iade-degisim', tr: 'yasal/iptal-ve-iade', en: 'legal/cancellation-and-returns' },
   ]
 
-  it('tablo karar 267/269 satırları + 6 yeni satır literal değerlerle birebir', () => {
+  it('tablo karar 267/269 satırları + PR-D 6 satırı + ALT-33 3 satırı literal değerlerle birebir', () => {
     expect(TABLO.map((s) => s.id)).toEqual(['hakkimizda', 'iletisim', ...BEKLENEN.map((b) => b.id)])
     for (const b of BEKLENEN) expect(TABLO.find((s) => s.id === b.id)).toEqual(b)
   })
@@ -449,24 +465,27 @@ describe('KESİN DEĞERLER — OPS-52 PR-D\'nin 6 yeni satırı literal (tablo b
       ['/en/legal/cerez-politikasi', '/en/legal/cookie-policy'],
       ['/tr/legal/mesafeli-satis-sozlesmesi', '/tr/yasal/mesafeli-satis-sozlesmesi'],
       ['/en/legal/mesafeli-satis-sozlesmesi', '/en/legal/distance-sales-contract'],
+      ['/tr/legal/kullanim-kosullari', '/tr/yasal/kullanim-kosullari'],
+      ['/en/legal/kullanim-kosullari', '/en/legal/terms-of-use'],
+      ['/tr/legal/on-bilgilendirme-formu', '/tr/yasal/on-bilgilendirme-formu'],
+      ['/en/legal/on-bilgilendirme-formu', '/en/legal/pre-contract-information'],
+      ['/tr/destek/iade-degisim', '/tr/yasal/iptal-ve-iade'],
+      ['/en/destek/iade-degisim', '/en/legal/cancellation-and-returns'],
     ]
     for (const [eski, yeni] of hedefler) {
       expect(r, eski).toContainEqual({ source: eski, destination: yeni, permanent: true })
       expect(w, yeni).toContainEqual({ source: yeni, destination: eski })
     }
-    expect(r).toHaveLength(14) // 12 + hakkımızda/iletişim TR
-    expect(w).toHaveLength(14)
+    expect(r).toHaveLength(20) // 18 + hakkımızda/iletişim TR
+    expect(w).toHaveLength(20)
   })
 
-  it('Aşama 1 dışında kalanlar tabloda YOK: garanti-servis, iade-degisim, teslimat-kargo, hesaplayicilar, kullanim-kosullari, on-bilgilendirme-formu', () => {
+  it('Tabloda OLMAYANLAR (karar 293: destek altında kalır, 308 yok): garanti-servis, teslimat-kargo, hesaplayicilar', () => {
     const klasorler = new Set(TABLO.map((s) => s.klasor))
     for (const disarida of [
       'destek/garanti-servis',
-      'destek/iade-degisim',
       'destek/teslimat-kargo',
       'destek/hesaplayicilar',
-      'legal/kullanim-kosullari',
-      'legal/on-bilgilendirme-formu',
     ]) {
       expect(klasorler.has(disarida), disarida).toBe(false)
     }

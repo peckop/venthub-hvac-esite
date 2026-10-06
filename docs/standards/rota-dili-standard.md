@@ -106,6 +106,9 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 | yasal-gizlilik | `legal/gizlilik-politikasi` | `yasal/gizlilik-politikasi` | `legal/privacy-policy` | kabul OPS #24 |
 | yasal-cerez | `legal/cerez-politikasi` | `yasal/cerez-politikasi` | `legal/cookie-policy` | kabul OPS #24 |
 | yasal-mesafeli | `legal/mesafeli-satis-sozlesmesi` | `yasal/mesafeli-satis-sozlesmesi` | `legal/distance-sales-contract` | kabul OPS #24 · satış kipi |
+| yasal-kullanim-kosullari | `legal/kullanim-kosullari` | `yasal/kullanim-kosullari` | `legal/terms-of-use` | **karar 293 A** (ALT-33, 10-05) · EN ad kıyas önerisi, Design teyidi bekliyor |
+| yasal-on-bilgilendirme | `legal/on-bilgilendirme-formu` | `yasal/on-bilgilendirme-formu` | `legal/pre-contract-information` | **karar 293 A** · EN ad aynı |
+| yasal-iptal-iade | `destek/iade-degisim` | `yasal/iptal-ve-iade` | `legal/cancellation-and-returns` | **karar 293 A** · sayfa klasörü AYNI kalır (yeniden yazım), metin ve "satış kapalı" notu aynı; Footer iç bağlantısı `localizedHref` ile kendiliğinden döner |
 
 **Girmeyenler, nedeniyle (R8, R7):**
 
@@ -116,8 +119,7 @@ Kaynak: Linear belgesi "Adres hedef listesi 2026-10-04 (OPS-48)" (Design). Liste
 | bilgi merkezi çatısı | kendi mekanizması (`bilgiMerkeziYonlendirmeleri.mjs`, karar 92, `EN_YAYIN`) | — |
 | giriş, hesap, ödeme, sipariş | Aşama 2 (karar 270, R5) | sonraki aşama |
 
-**Bilinen (Design listesinde adı olmayan mevcut sayfalar):** `destek/garanti-servis`, `destek/iade-degisim`, `destek/teslimat-kargo`, `legal/kullanim-kosullari`,
-`legal/on-bilgilendirme-formu` 11 Ekim'de bugünkü adreslerinde kalır (OPS hükmü 10-04). `legal/*` iki sayfa TR tarafında İngilizce `legal` segmentini taşır,
-bu karar 270 ilkesiyle (TR'de Türkçe adres) **çelişir**; Design'dan hedef ad istendi (OPS-48 kalan iş), ad gelince ayrı satır olarak eklenir ve 11 Ekim'i bloklamaz.
-Design 10-05'te bu beş sayfa için ad önerdi, ama prototipte tasarlanıp tasarlanmadığı ve `destek/iade-degisim` ile `yasal/iptal-ve-iade`'nin aynı konu olup olmadığı (çift sayfa riski) ölçülmedi; OPS Design'a sordu (Linear emir #30). Cevaba göre ya satır eklenir ya eski adres 308 ile yönlendirilir; o güne kadar beş sayfa tabloda DEĞİLDİR.
-Aynı nedenle `/en/destek/...` hâlâ Türkçe alt adlar taşıyor (`garanti-servis` vb.); EN'de İngilizce karşılığı yoktur.
+**Karar 293 = A (Recep, 2026-10-05, ALT-33):** `legal/kullanim-kosullari`, `legal/on-bilgilendirme-formu` ve `destek/iade-degisim` tabloya GİRDİ (yukarıdaki üç satır): açık kipte eski adres tek 308,
+yeni adres 200 (yeniden yazım, klasör aynı). İade metni ve "satış kapalı" notu değişmez; hukuk onayı ön koşulu kaldırıldı. `destek/garanti-servis` ve `destek/teslimat-kargo` destek altında KALIR (308 yok, Design 9a324708).
+EN adlar Design CSV hedefiyle teyit edildi (2026-10-05): `terms-of-use` ve `cancellation-and-returns` aynı, ön bilgilendirme `pre-contract-information` (kıyas önerisi `pre-information-form` idi, değişti). Ad yeniden değişirse tek satır + literal test değeri güncellenir.
+Kalan sınır: `/en/destek/garanti-servis`, `/en/destek/teslimat-kargo` hâlâ Türkçe alt ad taşıyor (EN'de İngilizce karşılığı yoktur).
