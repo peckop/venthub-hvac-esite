@@ -52,7 +52,7 @@ doğru kalır.
 | `pre-commit` | Companion `.md` dokümanı olmayan **yeni** kaynak dosyaları listeler | **Hayır** — uyarı, `exit 0` |
 | `post-commit` | `system_tree.md` tazeler + son commit'in dosyaları için companion üretir (arka planda) | Hayır |
 | `post-merge` | Pull/merge ile **gelen** kod için companion + şema/edge master'ı tazeler, `registry-sync` koşturur | Hayır |
-| `pre-push` | Birleşmiş ve açık PR'ı olmayan dala push'u reddeder (INV-KAPALI-DAL-1, `scripts/hijyen/kapali-dal-push.cjs`) | **Evet** — `gh`/ağ yoksa uyarır ve geçirir; kaçış `VH_KAPALI_DAL_IZIN=1` |
+| `pre-push` | (1) İtilecek TÜM nesneleri (sonradan silinenler dahil) döküm kapısından geçirir: çıkış 1 → push ENGELLENİR, çıkış 2 (ölçülemedi) → yüksek sesli uyarı + izin (INV-DEPO-DOKUM-1, `scripts/security/depo-dokum-kapisi.cjs --pre-push`); (2) birleşmiş ve açık PR'ı olmayan dala push'u reddeder (INV-KAPALI-DAL-1, `scripts/hijyen/kapali-dal-push.cjs`) | **Evet, ikisi de atlanabilir** — `git push --no-verify` her ikisini atlar (ağa çıkışı yalnız bu kanca yakalar; CI yalnız birleşmeyi durdurur); `gh`/ağ yoksa (2) uyarır ve geçirir, kaçış `VH_KAPALI_DAL_IZIN=1` |
 
 > `post-merge` bu dizine en son geldi (2026-08-15) ve o gecikme pahalıya patladı: diğer
 > ikisi versiyonlanırken o `.git/hooks/` içinde unutuldu, orada da log-yolu hatasını

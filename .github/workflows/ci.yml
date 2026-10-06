@@ -195,6 +195,13 @@ jobs:
         with:
           deno-version: v2.x
 
+      # ALT-39 (INV-DEPO-DOKUM-1): veritabanı dökümü, kişisel veri, ödeme parçası ve fiyat-maliyet listesi master'a birleşmesin.
+      # Bağımlılıksız (git + node, saniyeler) olduğu için Install'dan ÖNCE; `if:` YOK. ⚠"Her koşuda" DEĞİL: önceki bir adım
+      # kırmızıysa bu adım da koşmaz (Actions varsayılanı). PR'da tam geçmiş varsa ara commit'leri de tarar. ⚠Ağa çıkışı bu adım
+      # DURDURAMAZ: onu yalnız `.githooks/pre-push` yakalar (`--no-verify` ile atlanabilir). Cetvel: docs/standards/depoya-giremeyecek-veri-standard.md
+      - name: Döküm kapısı (depoya giremeyecek veri)
+        run: node scripts/security/depo-dokum-kapisi.cjs
+
       - name: Install dependencies
         if: steps.ayna.outputs.atla != 'true'
         run: pnpm install --prefer-offline --config.allow-scripts true

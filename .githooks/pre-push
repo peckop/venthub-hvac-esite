@@ -1,13 +1,36 @@
 #!/bin/sh
-# Kapali dala push bekcisi (INV-KAPALI-DAL-1) — birlesmis ve acik PR'i olmayan dala push'u REDDEDER.
+# Push bekcileri — iki ayri kapi, ikisi de pre-push'ta, sirayla.
 #
-# NEDEN VAR (2026-09-22, #1305): squash-merge sonrasi ritüel uzak dali siliyor; ayni dala sonradan
-# itilen commit GitHub'da SESSIZCE yeni dal acar ve master'a hic girmez (9 commit 12 gun kayboldu).
-# Mantik ve testler: scripts/hijyen/kapali-dal-push.cjs. gh/ag yoksa UYARIR ve gecirir (fail-open).
-# Bilincli yeniden kullanim: VH_KAPALI_DAL_IZIN=1 git push ...
+# (1) DEPO DOKUM KAPISI (ALT-39, INV-DEPO-DOKUM-1, scripts/security/depo-dokum-kapisi.cjs --pre-push):
+#     itilecek TUM nesneleri (sonradan silinen dosyalar DAHIL) tarar. Cikis 1 -> push ENGELLENIR.
+#     Olculemezse (cikis 2: nesne tavani, git/dosya hatasi, ayristirilamayan veri dosyasi) YUKSEK SESLE uyarir ve
+#     push'a IZIN VERIR: kesin kapi CI'dir (master'a birlesmeyi durdurur). ⚠DURUST SINIR: `git push --no-verify`
+#     bu kancayi atlar; AGA cikisi yalniz bu kanca yakalar ve atlanabilir. CI ise yalniz birlesmeyi durdurur.
+#
+# (2) Kapali dal push bekcisi (INV-KAPALI-DAL-1) — birlesmis ve acik PR'i olmayan dala push'u REDDEDER.
+#     NEDEN VAR (2026-09-22, #1305): squash-merge sonrasi ritüel uzak dali siliyor; ayni dala sonradan
+#     itilen commit GitHub'da SESSIZCE yeni dal acar ve master'a hic girmez (9 commit 12 gun kayboldu).
+#     Mantik ve testler: scripts/hijyen/kapali-dal-push.cjs. gh/ag yoksa UYARIR ve gecirir (fail-open).
+#     Bilincli yeniden kullanim: VH_KAPALI_DAL_IZIN=1 git push ...
+#
+# git pre-push stdin'i BIR KEZ okunur ve iki kapiya da verilir.
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+command -v node >/dev/null 2>&1 || { echo "[pre-push] UYARI: node yok — dokum kapisi ve kapali-dal kontrolu YAPILMADI." >&2; exit 0; }
+GIRDI=$(cat)
+
+DOKUM="$ROOT/scripts/security/depo-dokum-kapisi.cjs"
+if [ -f "$DOKUM" ]; then
+  printf '%s\n' "$GIRDI" | node "$DOKUM" --pre-push
+  RC=$?
+  if [ "$RC" -eq 1 ]; then
+    echo "[depo-dokum] PUSH ENGELLENDI: itilecek nesnelerde kisisel veri / odeme parcasi / fiyat-maliyet dokumu / ikili veritabani var (liste yukarida)." >&2
+    exit 1
+  elif [ "$RC" -ne 0 ]; then
+    echo "[depo-dokum] !!! UYARI !!! itilecek nesneler OLCULEMEDI (cikis $RC): push'a IZIN VERILIYOR ama dokum kontrolu YAPILMADI. Kesin kapi CI'dir; nedeni yukaridaki mesajdan oku." >&2
+  fi
+fi
+
 BETIK="$ROOT/scripts/hijyen/kapali-dal-push.cjs"
 [ -f "$BETIK" ] || exit 0
-command -v node >/dev/null 2>&1 || { echo "[kapali-dal] UYARI: node yok — kontrol YAPILMADI." >&2; exit 0; }
-exec node "$BETIK"
+printf '%s\n' "$GIRDI" | node "$BETIK"
