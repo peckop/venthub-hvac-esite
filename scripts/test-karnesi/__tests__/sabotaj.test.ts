@@ -44,6 +44,7 @@ const S = require_(KOSUCU) as {
   sabotajUygula: (repo: string, adimlar: unknown[], test: string) => unknown[]
   geriAl: (kayitlar: unknown[]) => void
   agacKirli: (repo: string) => string[]
+  yanEtkiyiTemizle: (repo: string) => string[]
   bagliWorktreeMi: (repo: string) => boolean
 }
 
@@ -83,6 +84,9 @@ function depoKur(): string {
   gecici.push(d)
   const git = (...a: string[]) => execFileSync('git', ['-C', d, '-c', 'user.email=t@t', '-c', 'user.name=t', '-c', 'core.autocrlf=false', ...a], { encoding: 'utf8' })
   git('init', '-q')
+  // Depo AYARINA yazılır (yukarıdaki `-c` yalnız bu yardımcının çağrılarına geçerdi): koşucunun kendi `git checkout`/`reset` çağrıları da LF
+  // yazmalı. Aksi hâlde Windows'ta sistem `core.autocrlf=true` ise geri yüklenen dosya CRLF olur, sha tutmaz (CI/Linux'ta bu fark yoktur).
+  git('config', 'core.autocrlf', 'false')
   fs.mkdirSync(path.join(d, 'docs'), { recursive: true })
   fs.writeFileSync(path.join(d, 'docs', 'a.md'), 'bir\niki\nüç\n')
   fs.writeFileSync(path.join(d, 'docs', 'crlf.md'), 'x\r\ny\r\n')
@@ -385,39 +389,164 @@ describe('GERÇEK git deposunda uygula ve geri al', () => {
     S.geriAl(kayit)
     expect(S.agacKirli(d)).toEqual([])
   })
+
+  // ALT-38b: AYNI yolda `sil` + `ekle` (dosyayı silip yeni içerikle yeniden yaratan sabotaj). `ekle` indekse `git add -f` yapar; eski
+  // geri alma `git rm --cached` ile indeks girdisini tümüyle SİLİYORDU, `sil` kaydı dosyayı özgün içerikle diske geri yazıyordu. Sonuç:
+  // dosya özgün ama İNDEKS kirli (`D  x` + `?? x`): sha doğrulaması bunu görmez (yalnız dosya baytına bakar), ağaç temiz sayılmaz ve
+  // koşucunun yan etki temizliği `?? x`i `git clean` ile SİLERDİ. Doğrusu: geri alma indeksi de özgün hâline getirir (HEAD girdisi geri gelir).
+  it.each<[string, string]>([
+    ['farklı içerik', 'yeni içerik\n'],
+    ['AYNI içerik (indekse hiçbir değişiklik girmez, girdi yine de silinirdi)', 'silinecek\n'],
+  ])('sil + ekle AYNI yolda (%s): geri alınca dosya özgün, indeks ve çalışma ağacı TEMİZ (porcelain boş)', (_ad, icerik) => {
+    const d = depoKur()
+    const once = sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))
+    const kayit = S.sabotajUygula(d, [{ tur: 'sil', dosya: 'sil-beni.txt' }, { tur: 'ekle', dosya: 'sil-beni.txt', icerik }], 'src/x.test.ts')
+    expect(fs.readFileSync(path.join(d, 'sil-beni.txt'), 'utf8')).toBe(icerik)
+    S.geriAl(kayit)
+    expect(sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))).toBe(once)
+    expect(gitCikti(d, 'status', '--porcelain')).toBe('')
+    expect(gitCikti(d, 'diff', '--cached', '--stat').trim()).toBe('')
+    expect(gitCikti(d, 'ls-files')).toContain('sil-beni.txt')
+    expect(S.agacKirli(d)).toEqual([])
+  })
+
+  it('sil + ekle + degistir AYNI yolda (üç adım): ters sırayla geri alınır, indeks ve ağaç temiz', () => {
+    const d = depoKur()
+    const once = sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))
+    const kayit = S.sabotajUygula(
+      d,
+      [
+        { tur: 'sil', dosya: 'sil-beni.txt' },
+        { tur: 'ekle', dosya: 'sil-beni.txt', icerik: 'bir\niki\n' },
+        { tur: 'degistir', dosya: 'sil-beni.txt', bul: 'iki', yerine: 'BOZUK' },
+      ],
+      'src/x.test.ts',
+    )
+    expect(fs.readFileSync(path.join(d, 'sil-beni.txt'), 'utf8')).toBe('bir\nBOZUK\n')
+    S.geriAl(kayit)
+    expect(sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))).toBe(once)
+    expect(gitCikti(d, 'status', '--porcelain')).toBe('')
+  })
+
+  // Ters sıra: önce YENİ dosya eklenir (indeks aracılığıyla "izlenen" olur), sonra silinir. Geri alma dosyayı ve indeks girdisini kaldırmalı.
+  it('ekle (yeni dosya) + sil AYNI yolda: geri alma yeni dosyayı ve indeks girdisini tümüyle kaldırır', () => {
+    const d = depoKur()
+    const kayit = S.sabotajUygula(
+      d,
+      [{ tur: 'ekle', dosya: 'docs/yeni/gecici.md', icerik: '# gecici\n' }, { tur: 'sil', dosya: 'docs/yeni/gecici.md' }],
+      'src/x.test.ts',
+    )
+    expect(fs.existsSync(path.join(d, 'docs', 'yeni', 'gecici.md'))).toBe(false)
+    S.geriAl(kayit)
+    expect(fs.existsSync(path.join(d, 'docs', 'yeni'))).toBe(false)
+    expect(gitCikti(d, 'ls-files')).not.toContain('gecici')
+    expect(gitCikti(d, 'status', '--porcelain')).toBe('')
+  })
+
+  it('YENİ dosya için `ekle` geri alınınca indeks girdisi de kalkar (yalnız `ekle`; regresyon: reset yeni dosyada da girdiyi siler)', () => {
+    const d = depoKur()
+    const kayit = S.sabotajUygula(d, [{ tur: 'ekle', dosya: 'docs/yeni/yalniz.md', icerik: '# yalniz\n' }], 'src/x.test.ts')
+    expect(gitCikti(d, 'ls-files')).toContain('docs/yeni/yalniz.md')
+    S.geriAl(kayit)
+    expect(gitCikti(d, 'ls-files')).not.toContain('yalniz')
+    expect(gitCikti(d, 'status', '--porcelain')).toBe('')
+    expect(fs.existsSync(path.join(d, 'docs', 'yeni'))).toBe(false)
+  })
 })
 
 describe('agacKirli — temiz-başlangıç denetiminin dayanağı', () => {
   // Boş dönen bir `agacKirli` hem "ağaç temiz başlamalı" kapısını hem de her sabotajdan sonraki denetimi sessizce açar;
   // yukarıdaki testler yalnız `[]` beklediği için böyle bir bozulmayı göremezdi. Burada her kirlilik türü AYRI sınanır.
-  it('izlenmeyen, değiştirilmiş, indekse eklenmiş ve silinmiş: her kirlilik türü tam 1 satırla bildirilir; temizlenince boş döner', () => {
+  // ALT-38b: satırlar TAM metinle karşılaştırılır (`XY yol`: ilk iki karakter durum kodu, baştaki boşluk DAHİL). Önceki sürümde `git()`
+  // çıktıyı `.trim()` ediyordu: ilk satırın baştaki boşluğu düşüyordu (` M docs/a.md` → `M docs/a.md`) ve bu test kusuru GİZLEMEK için
+  // yalnız `includes(dosya)` diyordu; kusur `yanEtkiyiTemizle`deki `slice(3)` yolunu bozuyor, izlenen dosyadaki yan etki temizlenmiyordu.
+  it('izlenmeyen, değiştirilmiş, indekse eklenmiş ve silinmiş: her kirlilik türü tam 1 satırla (durum kodu ve baştaki boşluk dahil) bildirilir; temizlenince boş döner', () => {
     const d = depoKur()
-    const kirletmeler: Array<{ ad: string; kirlet: () => void; dosya: string }> = [
-      { ad: 'izlenmeyen yeni dosya', kirlet: () => fs.writeFileSync(path.join(d, 'yeni.txt'), 'y'), dosya: 'yeni.txt' },
-      { ad: 'değiştirilmiş izlenen dosya', kirlet: () => fs.appendFileSync(path.join(d, 'docs', 'a.md'), 'ek\n'), dosya: 'docs/a.md' },
+    const kirletmeler: Array<{ ad: string; kirlet: () => void; satir: string }> = [
+      { ad: 'izlenmeyen yeni dosya', kirlet: () => fs.writeFileSync(path.join(d, 'yeni.txt'), 'y'), satir: '?? yeni.txt' },
+      { ad: 'değiştirilmiş izlenen dosya', kirlet: () => fs.appendFileSync(path.join(d, 'docs', 'a.md'), 'ek\n'), satir: ' M docs/a.md' },
       {
         ad: 'indekse eklenmiş dosya',
         kirlet: () => {
           fs.writeFileSync(path.join(d, 'hazir.txt'), 'h')
           gitCikti(d, 'add', 'hazir.txt')
         },
-        dosya: 'hazir.txt',
+        satir: 'A  hazir.txt',
       },
-      { ad: 'silinmiş izlenen dosya', kirlet: () => fs.rmSync(path.join(d, 'sil-beni.txt')), dosya: 'sil-beni.txt' },
+      { ad: 'silinmiş izlenen dosya', kirlet: () => fs.rmSync(path.join(d, 'sil-beni.txt')), satir: ' D sil-beni.txt' },
     ]
     expect(S.agacKirli(d)).toEqual([])
     const sorunlar: string[] = []
-    for (const { ad, kirlet, dosya } of kirletmeler) {
+    for (const { ad, kirlet, satir } of kirletmeler) {
       kirlet()
-      // (git çıktısı kırpıldığı için ilk satırın baştaki boşluğu düşebilir: satır yerine dosya adı ve satır sayısı sınanır.)
       const satirlar = S.agacKirli(d)
-      if (satirlar.length !== 1 || !satirlar[0].includes(dosya)) sorunlar.push(`${ad}: ${JSON.stringify(satirlar)}`)
+      if (satirlar.length !== 1 || satirlar[0] !== satir) sorunlar.push(`${ad}: ${JSON.stringify(satirlar)} (beklenen ${JSON.stringify([satir])})`)
       const kok = tmpAltinda(d)
       gitCikti(kok, 'reset', '--hard', '-q')
       gitCikti(kok, 'clean', '-fdq')
       if (S.agacKirli(d).length !== 0) sorunlar.push(`${ad}: temizlenemedi`)
     }
     expect(sorunlar).toEqual([])
+  })
+
+  it('çok satırlı çıktıda İLK satırın baştaki boşluğu korunur (` M` ilk satır), yalnız SONDAKİ satır sonu kırpılır', () => {
+    const d = depoKur()
+    fs.appendFileSync(path.join(d, 'docs', 'a.md'), 'ek\n')
+    fs.rmSync(path.join(d, 'sil-beni.txt'))
+    fs.writeFileSync(path.join(d, 'yeni.txt'), 'y')
+    expect(S.agacKirli(d)).toEqual([' M docs/a.md', ' D sil-beni.txt', '?? yeni.txt'])
+  })
+})
+
+// ALT-38b: test koşusunun bıraktığı yan etkiyi temizleyen yardımcı. Önceki sürümde `git()` çıktıyı `.trim()` ediyordu: ilk satır
+// ` M docs/a.md` → `M docs/a.md` oluyor, `slice(3)` yolu `ocs/a.md` (kök dosyada `.md`) yapıyor, `git checkout -- <bozuk yol>` sessizce
+// başarısız oluyor ve İZLENEN dosyadaki yan etki (üretilen belge, güncellenen özet dosyası) temizlenmiyordu: koşucu "sonrası ağaç
+// temiz değil — DURDU" ile çıkış 2 verirdi. Yol çıkarma yalnız İLK satırda bozuk olduğundan, ilk satırı ` M` olan durum ayrı sınanır.
+describe('yanEtkiyiTemizle — test koşusunun bıraktığı yan etki (ALT-38b)', () => {
+  it('İZLENEN dosyadaki değişiklik (` M`, ilk satır) temizlenir: yol doğru çıkarılır, dosya byte-byte özgün, ağaç temiz, liste kırpılmış', () => {
+    const d = depoKur()
+    const once = sha(fs.readFileSync(path.join(d, 'docs', 'a.md')))
+    fs.appendFileSync(path.join(d, 'docs', 'a.md'), 'üretilen satır\n')
+    expect(S.agacKirli(d)).toEqual([' M docs/a.md'])
+    expect(S.yanEtkiyiTemizle(d)).toEqual(['M docs/a.md'])
+    expect(sha(fs.readFileSync(path.join(d, 'docs', 'a.md')))).toBe(once)
+    expect(S.agacKirli(d)).toEqual([])
+  })
+
+  it('kök dizindeki kısa yollu izlenen dosya (değişmiş ya da silinmiş) da geri gelir', () => {
+    const d = depoKur()
+    const once = sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))
+    fs.appendFileSync(path.join(d, 'sil-beni.txt'), 'ek\n')
+    expect(S.yanEtkiyiTemizle(d)).toEqual(['M sil-beni.txt'])
+    expect(sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))).toBe(once)
+    fs.rmSync(path.join(d, 'sil-beni.txt'))
+    expect(S.yanEtkiyiTemizle(d)).toEqual(['D sil-beni.txt'])
+    expect(sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))).toBe(once)
+    expect(S.agacKirli(d)).toEqual([])
+  })
+
+  it('karışık yan etki: izlenen değişiklik + silinen izlenen + izlenmeyen dosya + izlenmeyen DİZİN + boşluklu ad: hepsi temizlenir ve listelenir', () => {
+    const d = depoKur()
+    const once = { a: sha(fs.readFileSync(path.join(d, 'docs', 'a.md'))), sil: sha(fs.readFileSync(path.join(d, 'sil-beni.txt'))) }
+    fs.appendFileSync(path.join(d, 'docs', 'a.md'), 'x\n')
+    fs.rmSync(path.join(d, 'sil-beni.txt'))
+    fs.writeFileSync(path.join(d, 'yan etki.txt'), 'boşluklu ad\n')
+    fs.mkdirSync(path.join(d, 'uretilen', 'alt'), { recursive: true })
+    fs.writeFileSync(path.join(d, 'uretilen', 'alt', 'x.json'), '{}')
+    // (sıra git'e bağlıdır: izlenenler önce, izlenmeyenler sonra; sıralı karşılaştırılır)
+    expect([...S.yanEtkiyiTemizle(d)].sort()).toEqual(['?? "yan etki.txt"', '?? uretilen/', 'D sil-beni.txt', 'M docs/a.md'])
+    expect(sha(fs.readFileSync(path.join(d, 'docs', 'a.md')))).toBe(once.a)
+    expect(sha(fs.readFileSync(path.join(d, 'sil-beni.txt')))).toBe(once.sil)
+    expect(fs.existsSync(path.join(d, 'yan etki.txt'))).toBe(false)
+    expect(fs.existsSync(path.join(d, 'uretilen'))).toBe(false)
+    expect(S.agacKirli(d)).toEqual([])
+  })
+
+  it('temizlenecek bir şey yoksa BOŞ dizi döner ve hiçbir dosyaya dokunmaz', () => {
+    const d = depoKur()
+    const once = sha(fs.readFileSync(path.join(d, 'docs', 'a.md')))
+    expect(S.yanEtkiyiTemizle(d)).toEqual([])
+    expect(sha(fs.readFileSync(path.join(d, 'docs', 'a.md')))).toBe(once)
   })
 })
 
@@ -484,8 +613,17 @@ interface SahteVitestAyari {
   uykuMs?: number
   /** Rapor temiz olsa da bu çıkış koduyla biter. */
   cikis?: number
-  /** Her koşuda çalışma dizinine izlenmeyen bir dosya bırakır (yan etki). */
-  yanEtki?: boolean
+  /**
+   * İZLENMEYEN `kalinti.txt` bırakır (yan etki): `true` her koşuda, 'taban' yalnız sabotajsız (taban) koşuda, 'sabotaj' yalnız
+   * sabotajlı koşuda. Kipler ayrıdır: "taban sonrası temizlik" ile "sabotaj sonrası temizlik" biri ötekini gizleyemesin.
+   */
+  yanEtki?: boolean | 'taban' | 'sabotaj'
+  /** İZLENEN `docs/uretilen.md`ye satır ekler (üretilen belge yan etkisi); kip değerleri `yanEtki` ile aynıdır. */
+  izlenenYanEtki?: boolean | 'taban' | 'sabotaj'
+  /** İNDEKSE yeni dosya ekler (`git add`): koşucunun temizleyemediği yan etki (ağacı temiz saymamalı). */
+  indeksYanEtki?: boolean
+  /** Sabotajlı koşunun SONUNDA `docs/a.md`yi silip yerine DİZİN koyar: geri alma yazarken EISDIR alır (geri alma başarısız). */
+  dosyaYerineDizin?: boolean
 }
 
 interface SahteIz {
@@ -497,6 +635,9 @@ interface SahteIz {
   homeUstu: string | null
   tmp: string | null
   aMd: string | null
+  /** Koşunun BAŞINDA `docs/uretilen.md` içeriği ve `kalinti.txt` var mı: önceki koşunun artığı temizlendi mi tanığı. */
+  uretilen: string | null
+  kalinti: boolean
 }
 
 /**
@@ -508,7 +649,8 @@ interface SahteIz {
 function sahteVitestYaz(repo: string, iz: string, ayar: SahteVitestAyari = {}): void {
   const dizin = path.join(repo, 'node_modules', 'vitest')
   fs.mkdirSync(dizin, { recursive: true })
-  const kaynak = String.raw`import fs from 'node:fs'
+  const kaynak = String.raw`import { execFileSync } from 'node:child_process'
+import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
@@ -535,10 +677,22 @@ try {
   fs.writeFileSync(path.join(os.homedir(), 'ev-yazma-izi.txt'), 'x')
 } catch {}
 const aMd = oku('docs/a.md')
-fs.appendFileSync(IZ, JSON.stringify({ arg, cwd: process.cwd(), env: process.env, homedir: os.homedir(), evIcerik, homeUstu, tmp, aMd }) + '\n')
-if (AYAR.yanEtki) fs.writeFileSync('kalinti.txt', 'yan etki\n')
+const bozuk = aMd === null || !aMd.includes('iki')
+const uretilen = oku('docs/uretilen.md')
+const kalinti = fs.existsSync('kalinti.txt')
+fs.appendFileSync(IZ, JSON.stringify({ arg, cwd: process.cwd(), env: process.env, homedir: os.homedir(), evIcerik, homeUstu, tmp, aMd, uretilen, kalinti }) + '\n')
+const ne = (v) => v === true || (v === 'taban' && !bozuk) || (v === 'sabotaj' && bozuk)
+if (ne(AYAR.yanEtki)) fs.writeFileSync('kalinti.txt', 'yan etki\n')
+if (ne(AYAR.izlenenYanEtki)) fs.appendFileSync('docs/uretilen.md', 'üretildi\n')
+if (AYAR.indeksYanEtki) {
+  fs.writeFileSync('hazir-yan.txt', 'indekse\n')
+  execFileSync('git', ['add', 'hazir-yan.txt'], { stdio: 'ignore' })
+}
 const bitir = () => {
-  const bozuk = aMd === null || !aMd.includes('iki')
+  if (AYAR.dosyaYerineDizin && bozuk) {
+    fs.rmSync('docs/a.md', { force: true })
+    fs.mkdirSync('docs/a.md')
+  }
   const rapor = {
     numTotalTests: 1,
     numPassedTests: bozuk ? 0 : 1,
@@ -610,6 +764,8 @@ function kosucuKur(): Kurulum {
   fs.writeFileSync(path.join(ana, '.gitignore'), 'node_modules/\n')
   fs.mkdirSync(path.join(ana, 'docs'))
   fs.writeFileSync(path.join(ana, 'docs', 'a.md'), 'bir\niki\nüç\n')
+  // İZLENEN "üretilen belge": sahte vitest bunu değiştirebilir (izlenenYanEtki); koşucu özgün hâline getirmelidir.
+  fs.writeFileSync(path.join(ana, 'docs', 'uretilen.md'), 'uretilen\n')
   fs.writeFileSync(path.join(ana, 'ornek.test.ts'), '// sahte test: koşucu bunu SAHTE vitest ile koşar\n')
   git(ana, 'add', '-A')
   git(ana, '-c', `core.hooksPath=${path.join(kok, 'kanca-yok')}`, 'commit', '-q', '-m', 'ilk')
@@ -879,5 +1035,95 @@ describe('koşucu UÇTAN UCA (CLI + sahte vitest): ana ağaç/kirli ağaç reddi
     expect(s.satirlar[0].yanEtki).toEqual(['?? kalinti.txt'])
     expect(fs.existsSync(path.join(k.wt, 'kalinti.txt'))).toBe(false)
     expect(porcelain(k.wt)).toBe('')
+  })
+
+  // ── ALT-38b: yan etki temizliği ve geri alma, uçtan uca ──────────────────────────────────────────────────────────────
+  const URETILEN_OZGUN = 'uretilen\n'
+  const uretilenOku = () => fs.readFileSync(path.join(k.wt, 'docs', 'uretilen.md'), 'utf8')
+
+  // Test koşusu İZLENEN bir dosyayı değiştirirse (üretilen belge, güncellenen özet): koşucu temizler, `yanEtki`ye yazar, DURMAZ.
+  // Önceki sürümde `git()` çıktıyı `.trim()` ediyordu: ilk satır ` M docs/uretilen.md` → `M docs/uretilen.md`, `slice(3)` →
+  // `ocs/uretilen.md`: temizlik sessizce başarısız olur, koşucu "sonrası ağaç temiz değil — DURDU" ile çıkış 2 verirdi.
+  it('test koşusunun İZLENEN dosyada bıraktığı yan etki TEMİZLENİR ve kayda geçer: çıkış 0, koşucu durmaz, dosya özgün, ağaç temiz', () => {
+    hazirla(k, k.wt, { izlenenYanEtki: true })
+    const s = kos(k, k.wt)
+    expect(s.sonuc.status, s.sonuc.stderr).toBe(0)
+    expect(s.satirlar).toHaveLength(1)
+    expect(s.satirlar[0].hukum).toBe('KIRMIZI')
+    expect(s.satirlar[0].yanEtki).toEqual(['M docs/uretilen.md'])
+    expect(uretilenOku()).toBe(URETILEN_OZGUN)
+    expect(porcelain(k.wt)).toBe('')
+  })
+
+  // Taban ve sabotaj sonrası temizlik AYRI çağrılardır ve kayıtları ayrıdır; ikisi aynı satırı yazınca biri ötekini gizler.
+  // Kipler ayrı sınanır: yan etki yalnız tabanda / yalnız sabotajlı koşuda.
+  it('yan etki YALNIZ tabanda: taban sonrası temizlenir (sabotajlı koşu özgün ağaçla BAŞLAR) ve kayda geçer', () => {
+    hazirla(k, k.wt, { yanEtki: 'taban', izlenenYanEtki: 'taban' })
+    const s = kos(k, k.wt)
+    expect(s.sonuc.status, s.sonuc.stderr).toBe(0)
+    expect(s.iz).toHaveLength(2)
+    // Her koşu özgün ağaçla başlar: taban sonrası temizlik YAPILMASAYDI ikinci koşu birincinin artığını görürdü.
+    expect(s.iz.map((i) => i.uretilen)).toEqual([URETILEN_OZGUN, URETILEN_OZGUN])
+    expect(s.iz.map((i) => i.kalinti)).toEqual([false, false])
+    expect([...s.satirlar[0].yanEtki].sort()).toEqual(['?? kalinti.txt', 'M docs/uretilen.md'])
+    expect(porcelain(k.wt)).toBe('')
+  })
+
+  it('yan etki YALNIZ sabotajlı koşuda: sabotaj sonrası temizlenir ve kayda geçer (taban kaydı onu gizleyemez)', () => {
+    hazirla(k, k.wt, { yanEtki: 'sabotaj', izlenenYanEtki: 'sabotaj' })
+    const s = kos(k, k.wt)
+    expect(s.sonuc.status, s.sonuc.stderr).toBe(0)
+    expect(s.iz).toHaveLength(2)
+    expect([...s.satirlar[0].yanEtki].sort()).toEqual(['?? kalinti.txt', 'M docs/uretilen.md'])
+    expect(uretilenOku()).toBe(URETILEN_OZGUN)
+    expect(porcelain(k.wt)).toBe('')
+  })
+
+  // AYNI yolda `sil` + `ekle`: eski geri alma indeksi `D  x` + `?? x` bırakıyordu; ardından yan etki temizliği `?? x`i `git clean` ile
+  // SİLİYOR (özgün dosya worktree'den yok oluyor) ve koşucu "ağaç temiz değil" ile çıkış 2 veriyordu.
+  it('plan: AYNI yolda sil + ekle sabotajı: koşucu çıkış 0 ile biter, dosya özgün, indeks ve ağaç temiz (`D  ` + `??` kalmaz), yan etki YOK', () => {
+    hazirla(k, k.wt)
+    const plan = path.join(k.kok, 'plan-sil-ekle.json')
+    fs.writeFileSync(
+      plan,
+      JSON.stringify({
+        surum: 1,
+        testler: [
+          {
+            test: 'ornek.test.ts',
+            korur: 'sahte test: docs/a.md iki satırını',
+            sabotajlar: [{ ad: 'sil + ekle aynı yol', adimlar: [{ tur: 'sil', dosya: 'docs/a.md' }, { tur: 'ekle', dosya: 'docs/a.md', icerik: 'bozuk\n' }] }],
+          },
+        ],
+      }),
+    )
+    const s = kos(k, k.wt, ['--plan', plan])
+    expect(s.sonuc.status, s.sonuc.stderr).toBe(0)
+    expect(s.satirlar[0].hukum).toBe('KIRMIZI')
+    expect(s.satirlar[0].yanEtki).toEqual([])
+    expect(s.iz.map((i) => i.aMd)).toEqual(['bir\niki\nüç\n', 'bozuk\n'])
+    expect(fs.readFileSync(path.join(k.wt, 'docs', 'a.md'), 'utf8')).toBe('bir\niki\nüç\n')
+    expect(porcelain(k.wt)).toBe('')
+    expect(gitCikti(k.wt, 'diff', '--cached', '--stat').trim()).toBe('')
+  })
+
+  // Koşucu yalnız çalışma ağacını geri yükler (`checkout`/`clean`); indekse eklenmiş dosya bu yolla temizlenemez. Kapı o zaman AÇIK
+  // KALMAMALI: ağaç temiz sanılıp sonraki test kirli ağaçta koşmaz, koşucu DURUR (çıkış 2) ve o testin kaydını YAZMAZ.
+  it('temizlenemeyen yan etki (indekse eklenmiş dosya): koşucu ağacı temiz SANMAZ, DURUR (çıkış 2), kayıt yazılmaz', () => {
+    hazirla(k, k.wt, { indeksYanEtki: true })
+    const s = kos(k, k.wt)
+    expect(s.sonuc.status, s.sonuc.stderr).toBe(2)
+    expect(s.sonuc.stderr).toContain('ornek.test.ts sonrası ağaç temiz değil — DURDU')
+    expect(s.ciktiVar).toBe(false)
+  })
+
+  // Geri alma başarısız olursa (burada dosyanın yerine DİZİN konmuş: yazma EISDIR verir) koşucu devam ETMEZ: çıkış 2, "ağaç kirli olabilir".
+  // `finally` içindeki bu çıkış e2e'de erişilebilir tek ihlal yoludur (sha uyuşmazlığı zorlanamaz; o kol `geriAl` birim testindedir).
+  it('geri alma BAŞARISIZ olursa (dosya yerine dizin: EISDIR) koşucu DURUR: çıkış 2, "ağaç kirli olabilir", kayıt yazılmaz', () => {
+    hazirla(k, k.wt, { dosyaYerineDizin: true })
+    const s = kos(k, k.wt)
+    expect(s.sonuc.status, s.sonuc.stderr).toBe(2)
+    expect(s.sonuc.stderr).toContain('DURDU (ağaç kirli olabilir)')
+    expect(s.ciktiVar).toBe(false)
   })
 })

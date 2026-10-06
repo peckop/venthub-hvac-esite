@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
@@ -87,6 +88,7 @@ const C = require_(path.join(KOK, 'scripts/test-karnesi/ci-gecmis.cjs')) as {
   pencereler: (b: string, e: string, gun: number) => Array<[string, string]>
   testAdimiSuresi: (isler: unknown) => number | null
   argumanlar: (argv: string[], bugun?: Date) => Record<string, unknown>
+  sureOrnegiSec: (kosular: KosuKaydi[], n: number) => KosuKaydi[]
   kosuKaydi: (r: HamKosu) => KosuKaydi
   pencereyiCek: (
     repo: string,
@@ -511,8 +513,10 @@ describe('argumanlar — bayrak tablosu ve doğrulama', () => {
   })
 
   // `--pencere-gun 0` doğrulamasız `pencereler()`i ilerlemeyen döngüye sokardı (bellek dolana dek): doğrulama TEK koruma.
-  it.each<[string]>([['0'], ['-3'], ['abc'], [''], ['0.5']])('--pencere-gun %j geçersizdir: fırlatır', (deger) => {
-    expect(() => C.argumanlar(['--cikti', 'x', '--pencere-gun', deger], BUGUN)).toThrow('--pencere-gun >= 1 olmalı')
+  // ALT-38b: mesaj "tamsayı" der (önceki metin `--pencere-gun >= 1 olmalı`ydı) ve 1.5 artık geçersizdir (yalnız `>= 1`
+  // denetlendiği için kesirli gün sessizce kabul edilirdi).
+  it.each<[string]>([['0'], ['-3'], ['abc'], [''], ['0.5'], ['1.5']])('--pencere-gun %j geçersizdir: fırlatır', (deger) => {
+    expect(() => C.argumanlar(['--cikti', 'x', '--pencere-gun', deger], BUGUN)).toThrow('--pencere-gun >= 1 tamsayı olmalı')
   })
   it('--pencere-gun 1 sınırında KABUL edilir', () => {
     expect(C.argumanlar(['--cikti', 'x', '--pencere-gun', '1'], BUGUN).pencereGun).toBe(1)
@@ -521,6 +525,101 @@ describe('argumanlar — bayrak tablosu ve doğrulama', () => {
   it('hata metinleri tam: bilinmeyen bayrak adı ve eksik --cikti', () => {
     expect(() => C.argumanlar(['--cikti', 'x', '--yok'], BUGUN)).toThrow('bilinmeyen bayrak: --yok')
     expect(() => C.argumanlar(['--es', '2'], BUGUN)).toThrow('--cikti gerekli')
+  })
+})
+
+// ── ALT-38b: sayısal bayraklar TAMSAYI olmalı ──────────────────────────────────────────────────────────────────────────
+// Önceki sürüm `Number(...)` ile okuyup yalnız `--pencere-gun >= 1` denetliyordu. Sonuçlar: `--pencere-gun 1.5` kabul edilir (pencere
+// sınırları kayar), `--es abc` NaN olur (`havuz` HİÇ işçi açmaz, sonuç dizisi `undefined` dolar ve çökme yalnız sonradan, anlamsız bir
+// "reading 'kosuId'" hatasıyla görünür), `--sure-ornek ''` sessizce 0 sayılır. Doğrulama yalnız "sayıya çevrilir mi"ye değil YAZIMA bakar:
+// işaretsiz, ondalıksız, 10'luk tamsayı ve güvenli tamsayı sınırı. Kapı atlanabilirse veri sessizce yanlış olur: tablolar TÜRÜ kapatır.
+describe('argumanlar — sayısal bayraklar tamsayı olmalı (ALT-38b)', () => {
+  const BUGUN = new Date('2026-10-06T10:00:00Z')
+  const VARSAYILAN = { cikti: 'x', baslangic: '2026-07-06', bitis: '2026-10-07', pencereGun: 7, es: 5, isAkisi: 'ci.yml', repo: null, sureOrnek: 30 }
+  const BAYRAKLAR: Array<{ bayrak: string; alan: string; enAz: number; varsayilan: number }> = [
+    { bayrak: '--pencere-gun', alan: 'pencereGun', enAz: 1, varsayilan: 7 },
+    { bayrak: '--es', alan: 'es', enAz: 1, varsayilan: 5 },
+    { bayrak: '--sure-ornek', alan: 'sureOrnek', enAz: 0, varsayilan: 30 },
+  ]
+  // Her bayrak için GEÇERSİZ yazımlar: kesirli, sayı olmayan, boş/boşluklu, işaretli, üslü/onaltılı, sonsuz, ASCII dışı rakam ve
+  // güvenli tamsayı sınırının (2^53 - 1) üstü. `Number()`ın sessizce SAYIYA çevirdikleri ('' → 0, '0x10' → 16, '1e3' → 1000) dahil.
+  const GECERSIZ = [
+    '1.5', '0.5', '2.0', 'abc', '', ' ', ' 7', '7 ', '-1', '-3', '-0', '+3', '1e3', '0x10', '1,5', 'Infinity', 'NaN', '٣',
+    '9007199254740992', '99999999999999999999',
+  ]
+  const hataMesaji = (fn: () => unknown): string => {
+    try {
+      fn()
+    } catch (e) {
+      return (e as Error).message
+    }
+    return '(fırlatmadı)'
+  }
+
+  describe.each(BAYRAKLAR)('$bayrak (en az $enAz)', ({ bayrak, alan, enAz, varsayilan }) => {
+    const mesaj = `${bayrak} >= ${enAz} tamsayı olmalı`
+
+    // Alt sınırın hemen altı da geçersizdir: `--pencere-gun`/`--es` için 0, `--sure-ornek` için -1 (GECERSIZ'de var).
+    it.each<[string]>([...GECERSIZ, ...(enAz === 1 ? ['0'] : [])].map((d): [string] => [d]))('%j geçersizdir: TAM mesajla fırlatır', (deger) => {
+      expect(hataMesaji(() => C.argumanlar(['--cikti', 'x', bayrak, deger], BUGUN))).toBe(mesaj)
+    })
+
+    it.each<[string]>([[String(enAz)], [String(enAz + 1)], ['7'], ['007'], ['9007199254740991']])(
+      '%j geçerlidir: sayıya çevrilir, YALNIZ bu alan değişir (tam nesne eşitliği)',
+      (deger) => {
+        expect(C.argumanlar(['--cikti', 'x', bayrak, deger], BUGUN)).toEqual({ ...VARSAYILAN, [alan]: Number(deger) })
+      },
+    )
+
+    // Değeri hiç verilmemiş bayrak (son argüman) sessizce varsayılana DÜŞMEZ: "bayrak verildi ama değer yok" ile "bayrak hiç verilmedi"
+    // ayrı durumlardır; ikincisi varsayılan, birincisi KULLANIM HATASI.
+    it('değeri verilmemiş bayrak (son argüman) varsayılana düşmez: fırlatır', () => {
+      expect(hataMesaji(() => C.argumanlar(['--cikti', 'x', bayrak], BUGUN))).toBe(mesaj)
+    })
+    it('değer yerine başka bir bayrak adı gelirse o ad DEĞER olarak okunur ve geçersizdir: fırlatır', () => {
+      expect(hataMesaji(() => C.argumanlar(['--cikti', 'x', bayrak, '--repo'], BUGUN))).toBe(mesaj)
+    })
+
+    it('bayrak hiç yazılmazsa varsayılan kalır; birden çok yazılırsa SON değer kazanır', () => {
+      expect(C.argumanlar(['--cikti', 'x'], BUGUN)[alan]).toBe(varsayilan)
+      expect(C.argumanlar(['--cikti', 'x', bayrak, String(enAz + 1), bayrak, String(enAz + 4)], BUGUN)[alan]).toBe(enAz + 4)
+    })
+  })
+
+  // Hata önceliği eskisiyle AYNI kalır (c: "mevcut hata yolu değişmez"): bilinmeyen bayrak (okuma sırasında) → eksik --cikti →
+  // sayı doğrulaması. Doğrulama okuma döngüsünün İÇİNE alınırsa `--cikti` eksikken de sayı hatası görünürdü.
+  it('hata önceliği: bilinmeyen bayrak, sonra eksik --cikti, sonra sayı doğrulaması', () => {
+    expect(() => C.argumanlar(['--es', 'abc'], BUGUN)).toThrow('--cikti gerekli')
+    expect(() => C.argumanlar(['--sure-ornek', '1.5', '--pencere-gun', '0'], BUGUN)).toThrow('--cikti gerekli')
+    expect(() => C.argumanlar(['--cikti', 'x', '--es', 'abc', '--yok'], BUGUN)).toThrow('bilinmeyen bayrak: --yok')
+    expect(() => C.argumanlar(['--cikti', 'x', '--es', 'abc'], BUGUN)).toThrow('--es >= 1 tamsayı olmalı')
+  })
+})
+
+describe('sureOrnegiSec — süre örneği: en yeni N başarılı koşu (ALT-38b)', () => {
+  const kosu = (id: number, sonuc: string, gun: string) => C.kosuKaydi(hamKosu(id, `2026-10-${gun}T09:00:00Z`, sonuc))
+  // eskiden yeniye; başarılılar: 1, 3, 5, 6 (2 kırmızı, 4 iptal örneklenemez)
+  const HEPSI = [kosu(1, 'success', '01'), kosu(2, 'failure', '02'), kosu(3, 'success', '03'), kosu(4, 'cancelled', '04'), kosu(5, 'success', '05'), kosu(6, 'success', '06')]
+
+  // `slice(-0)` `slice(0)`dır: n=0 TÜM başarılıları verirdi (0 örnek isteyen hepsini örneklerdi). 0 = örnek YOK.
+  it.each<[number, number[]]>([
+    [0, []],
+    [1, [6]],
+    [2, [5, 6]],
+    [3, [3, 5, 6]],
+    [4, [1, 3, 5, 6]],
+    [5, [1, 3, 5, 6]],
+    [1000, [1, 3, 5, 6]],
+  ])('n=%i → %j (yalnız başarılılar, en yeniler, eskiden yeniye)', (n, beklenen) => {
+    expect(C.sureOrnegiSec(HEPSI, n).map((k) => k.kosuId)).toEqual(beklenen)
+  })
+
+  it('girdiyi değiştirmez; başarılı koşu yoksa boş döner', () => {
+    const once = HEPSI.map((k) => k.kosuId)
+    C.sureOrnegiSec(HEPSI, 2)
+    expect(HEPSI.map((k) => k.kosuId)).toEqual(once)
+    expect(C.sureOrnegiSec([kosu(7, 'failure', '07')], 3)).toEqual([])
+    expect(C.sureOrnegiSec([], 3)).toEqual([])
   })
 })
 
@@ -1249,6 +1348,76 @@ describe('main — sahte GitHub + geçici dosya (ağ yok, gerçek gh yok)', () =
     expect(belge.kosular).toHaveLength(6)
   })
 
+  // ALT-38b: `.slice(-Math.max(0, n))` n=0 iken `slice(-0)` = `slice(0)` = TÜM başarılı koşulardı: "0 örnek" isteyen her başarılı koşunun
+  // `jobs`ını çekerdi (yüzlerce gereksiz çağrı; karne "örnek 0" yerine tam örneklem gösterirdi). 0 = örnekleme YOK: ek API çağrısı yok,
+  // başarılı koşularda süre alanı YOK (karne bunu "ölçülmedi" okur: sayı olmayan alan ölçüm sayılmaz).
+  it.each<[number, number[]]>([
+    [0, []],
+    [1, [104]],
+    [2, [103, 104]],
+    [10, [101, 103, 104]],
+  ])('--sure-ornek %i: süresi örneklenen başarılı koşular %j; jobs çağrısı YALNIZ onlar (ve kırmızı koşu) için', async (n, ornekIdleri) => {
+    const SURE: Record<number, number> = { 101: 50, 103: 60, 104: 70 }
+    const { belge, cagrilar, stderr } = await calistir([...PENCERE_BAYRAKLARI, '--sure-ornek', String(n)], {
+      pencereler: {
+        [W1]: {
+          satirlar: [
+            hamKosu(101, '2026-10-02T09:00:00Z', 'success'),
+            hamKosu(102, '2026-10-03T09:00:00Z', 'failure'),
+            hamKosu(103, '2026-10-04T09:00:00Z', 'success'),
+            hamKosu(104, '2026-10-05T09:00:00Z', 'success'),
+          ],
+        },
+      },
+      isler: {
+        101: isYaniti([['Test', 'success', 50]], 'success'),
+        102: isYaniti([['Lint', 'failure', 20]]),
+        103: isYaniti([['Test', 'success', 60]], 'success'),
+        104: isYaniti([['Test', 'success', 70]], 'success'),
+      },
+    })
+    const isCagrilari = cagrilar.map((c) => c.args.join(' ')).filter((s) => s.includes('/jobs?'))
+    expect(isCagrilari.sort()).toEqual(
+      [102, ...ornekIdleri].map((id) => `api repos/sahip/depo/actions/runs/${id}/jobs?per_page=30`).sort(),
+    )
+    for (const id of [101, 103, 104]) {
+      const k = belge.kosular.find((x) => x.kosuId === id)
+      if (ornekIdleri.includes(id)) {
+        expect(k?.testAdimiSuresiSn, `koşu ${id}`).toBe(SURE[id])
+      } else {
+        expect(k, `koşu ${id}`).not.toHaveProperty('testAdimiSuresiSn')
+        expect(k, `koşu ${id}`).not.toHaveProperty('isBilgisiAlinamadi')
+      }
+    }
+    // kırmızı koşu `--sure-ornek`ten bağımsız işlenir (jobs çağrısı kırık adımı bulmak için zaten gerekir)
+    expect(belge.kosular.find((x) => x.kosuId === 102)).toMatchObject({ basarisizAdimlar: ['Lint'], testAdimiSuresiSn: null })
+    expect(stderr).toContain(`kırmızı 1, süre örneği ${ornekIdleri.length}. Uyarı: 0\n`)
+  })
+
+  // Kullanım hatası: ana akış `gh`ye HİÇ dokunmadan, açık mesajla reddedilir (ağ ve `gh repo view` bile yok), çıktı yazılmaz.
+  it.each<[string[], string]>([
+    [['--sure-ornek', '1.5'], '--sure-ornek >= 0 tamsayı olmalı'],
+    [['--sure-ornek', '-1'], '--sure-ornek >= 0 tamsayı olmalı'],
+    [['--sure-ornek', 'abc'], '--sure-ornek >= 0 tamsayı olmalı'],
+    [['--sure-ornek', ''], '--sure-ornek >= 0 tamsayı olmalı'],
+    [['--es', '0'], '--es >= 1 tamsayı olmalı'],
+    [['--es', 'abc'], '--es >= 1 tamsayı olmalı'],
+    [['--es', '2.5'], '--es >= 1 tamsayı olmalı'],
+    [['--pencere-gun', '1.5'], '--pencere-gun >= 1 tamsayı olmalı'],
+    [['--pencere-gun', 'abc'], '--pencere-gun >= 1 tamsayı olmalı'],
+  ])('geçersiz sayısal bayrak %j: açık mesajla reddedilir, HİÇ gh çağrısı yapılmaz, çıktı yazılmaz', async (bayraklar, mesaj) => {
+    stderrYakala()
+    const cikti = geciciCikti()
+    const cagrilar: string[][] = []
+    const gh: GhCagri = async (args) => {
+      cagrilar.push(args)
+      throw new Error('gh çağrılmamalıydı')
+    }
+    await expect(C.main([...bayraklar, '--cikti', cikti], { gh })).rejects.toThrow(mesaj)
+    expect(cagrilar).toEqual([])
+    expect(fs.existsSync(cikti)).toBe(false)
+  })
+
   it('HATA: pencere alınamazsa ana akış O HATAYLA reddedilir ve çıktı dosyası YAZILMAZ (kısmi karne yok)', async () => {
     stderrYakala()
     const cikti = geciciCikti()
@@ -1271,8 +1440,64 @@ describe('main — sahte GitHub + geçici dosya (ağ yok, gerçek gh yok)', () =
       'not a git repository',
     )
     expect(cagrilar).toEqual([['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner']])
-    await expect(C.main(['--cikti', cikti, '--pencere-gun', '0'], { gh: bozuk })).rejects.toThrow('--pencere-gun >= 1 olmalı')
+    await expect(C.main(['--cikti', cikti, '--pencere-gun', '0'], { gh: bozuk })).rejects.toThrow('--pencere-gun >= 1 tamsayı olmalı')
     expect(cagrilar).toHaveLength(1)
     expect(fs.existsSync(cikti)).toBe(false)
+  })
+})
+
+// ── CLI SÜRECİ ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+// `main().catch(...)` ("[ci-gecmis] HATA: <mesaj>" + çıkış kodu 1) yalnız GERÇEK süreçte (`require.main === module`) çalışır; `main`i
+// doğrudan çağıran testler bu kolu görmez. Kullanım hatası bu yoldan çıkar: açık mesaj + çıkış 1 + çıktı dosyası yok.
+// HERMETİK: süreç `--require` ile `child_process.execFile`ı (gh sarmalayıcısının tek çıkışı) sahteyle değiştirilmiş başlar;
+// doğrulama bozulur da kod `gh`ye uzanırsa süreç 97 koduyla ölür (ağ ve gerçek `gh` ASLA yok) ve test mesajdan/koddan kırmızı olur.
+describe('CLI süreci — kullanım hatası: açık mesaj, çıkış kodu 1, gh ÇAĞRILMAZ (sahte execFile)', () => {
+  const gecici: string[] = []
+  afterEach(() => {
+    for (const d of gecici.splice(0)) fs.rmSync(d, { recursive: true, force: true })
+  })
+
+  const SAHTE_EXEC = [
+    "const cp = require('node:child_process');",
+    'cp.execFile = () => {',
+    "  process.stderr.write('SAHTE-GH-CAGRILDI\\n');",
+    '  process.exit(97);',
+    '};',
+    '',
+  ].join('\n')
+
+  function kos(args: string[], { ciktiVer = true }: { ciktiVer?: boolean } = {}) {
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'ci-gecmis-cli-'))
+    gecici.push(dizin)
+    const sahte = path.join(dizin, 'sahte-exec.cjs')
+    fs.writeFileSync(sahte, SAHTE_EXEC)
+    const cikti = path.join(dizin, 'alt', 'ci-gecmis.json')
+    const r = spawnSync(
+      process.execPath,
+      ['--require', sahte, path.join(KOK, 'scripts/test-karnesi/ci-gecmis.cjs'), ...(ciktiVer ? ['--cikti', cikti] : []), ...args],
+      { encoding: 'utf8', timeout: 30_000, env: { ...process.env } },
+    )
+    return { status: r.status, stderr: r.stderr ?? '', ciktiVar: fs.existsSync(cikti) }
+  }
+
+  it.each<[string[], string]>([
+    [['--sure-ornek', '1.5'], '[ci-gecmis] HATA: --sure-ornek >= 0 tamsayı olmalı\n'],
+    [['--sure-ornek', '-1'], '[ci-gecmis] HATA: --sure-ornek >= 0 tamsayı olmalı\n'],
+    [['--es', 'abc'], '[ci-gecmis] HATA: --es >= 1 tamsayı olmalı\n'],
+    [['--es', '0'], '[ci-gecmis] HATA: --es >= 1 tamsayı olmalı\n'],
+    [['--pencere-gun', '1.5'], '[ci-gecmis] HATA: --pencere-gun >= 1 tamsayı olmalı\n'],
+    [['--pencere-gun', '0'], '[ci-gecmis] HATA: --pencere-gun >= 1 tamsayı olmalı\n'],
+    [['--yok'], '[ci-gecmis] HATA: bilinmeyen bayrak: --yok\n'],
+  ])('%j → stderr tam satır, çıkış kodu 1, gh çağrılmaz, çıktı dosyası yazılmaz', (args, satir) => {
+    const s = kos(args)
+    expect(s.stderr).toBe(satir)
+    expect(s.status).toBe(1)
+    expect(s.ciktiVar).toBe(false)
+  })
+
+  it('--cikti eksikse de aynı yol: "[ci-gecmis] HATA: --cikti gerekli", çıkış kodu 1 (sayı hatası ondan ÖNCE görünmez)', () => {
+    const s = kos(['--es', 'abc'], { ciktiVer: false })
+    expect(s.stderr).toBe('[ci-gecmis] HATA: --cikti gerekli\n')
+    expect(s.status).toBe(1)
   })
 })

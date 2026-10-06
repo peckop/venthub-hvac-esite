@@ -11,6 +11,9 @@
  *   [--baslangic 2026-07-06] [--bitis 2026-10-07] [--pencere-gun 7] [--es 5]
  *   [--is-akisi ci.yml] [--repo sahip/depo] [--sure-ornek 30]
  *
+ * Sayısal bayraklar TAMSAYI olmalı: --pencere-gun >= 1, --es >= 1, --sure-ornek >= 0 (0 = başarılı koşuların süresi
+ * HİÇ örneklenmez). "1.5", "-1", "abc", "" gibi değerler KULLANIM HATASIDIR: "HATA: <bayrak> >= <en az> tamsayı olmalı", çıkış 1.
+ *
  * NEDEN PENCERE: `status=failure&page=N` ile sayfalamak GitHub'da kararsız çıktı (ölçüldü
  * 2026-10-06: 400 satırın yalnız 320'si benzersiz, en yeni tarih 09-16 — son üç haftanın
  * kırmızıları eksikti). `created=<gün>..<gün>` pencereleri her pencerede 1000 sonuç sınırının
@@ -42,6 +45,33 @@ function ansiSoy(metin) {
   return String(metin).replace(ANSI, '');
 }
 
+/**
+ * Sayısal bayraklar: [`argumanlar` alanı, bayrak adı, en küçük değer]. Hepsi TAMSAYIdır (ALT-38b).
+ *   --pencere-gun >= 1  pencere uzunluğu (gün). 0 `pencereler()`i ilerlemeyen döngüye sokar; 1.5 pencere sınırlarını kaydırır.
+ *   --es          >= 1  aynı anda koşan `gh` çağrısı sayısı (`havuz` işçi sayısı). NaN `havuz`u HİÇ işçi açmayan boş döngüye çevirir:
+ *                       sonuç dizisi `undefined` dolar ve hata yalnız sonradan, anlamsız bir "reading 'kosuId'" mesajıyla görünür.
+ *   --sure-ornek  >= 0  süresi örneklenecek EN YENİ başarılı koşu sayısı; 0 = örnekleme yok (bkz. `sureOrnegiSec`).
+ */
+const SAYISAL_BAYRAKLAR = [
+  ['pencereGun', '--pencere-gun', 1],
+  ['es', '--es', 1],
+  ['sureOrnek', '--sure-ornek', 0],
+];
+
+/**
+ * Sayısal bayrak değerini doğrular ve sayıya çevirir. `Number(ham) >= enAz` YETMEZ: `Number('')` ve `Number(' ')` 0, `Number('0x10')` 16,
+ * `Number('1e3')` 1000 verir; `--sure-ornek ''` sessizce "0 örnek" olurdu. Bu yüzden YAZIMA bakılır: yalnız işaretsiz, ondalıksız,
+ * 10'luk rakamlar ("7", "007") ve sonuç güvenli tamsayı sınırında (2^53 - 1) olmalı. Aksi KULLANIM HATASIDIR; `main` bunu
+ * "HATA: <mesaj>" + çıkış kodu 1 ile bildirir. `ham` `undefined` olabilir: bayrak yazıldı ama değeri verilmedi (son argüman).
+ */
+function tamsayiBayrak(bayrak, ham, enAz) {
+  if (typeof ham === 'string' && /^[0-9]+$/.test(ham)) {
+    const n = Number(ham);
+    if (Number.isSafeInteger(n) && n >= enAz) return n;
+  }
+  throw new Error(`${bayrak} >= ${enAz} tamsayı olmalı`);
+}
+
 function argumanlar(argv, bugun = new Date()) {
   const gunEkle = (d, n) => new Date(d.getTime() + n * 86400000);
   const a = {
@@ -54,23 +84,29 @@ function argumanlar(argv, bugun = new Date()) {
     repo: null,
     sureOrnek: 30,
   };
+  // Sayısal bayrakların HAM metni (alan → metin; değeri verilmemişse `undefined`). Doğrulama `--cikti` denetiminden SONRA yapılır:
+  // hata önceliği eskisiyle aynı kalır (bilinmeyen bayrak → eksik --cikti → sayı), "bayrak yazıldı ama değeri yok" ile "bayrak
+  // hiç yazılmadı" da ayrı kalır (ikincisi varsayılan, birincisi kullanım hatası).
+  const ham = new Map();
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
     if (k === '--cikti') a.cikti = argv[++i];
     else if (k === '--baslangic') a.baslangic = argv[++i];
     else if (k === '--bitis') a.bitis = argv[++i];
-    else if (k === '--pencere-gun') a.pencereGun = Number(argv[++i]);
-    else if (k === '--es') a.es = Number(argv[++i]);
+    else if (k === '--pencere-gun') ham.set('pencereGun', argv[++i]);
+    else if (k === '--es') ham.set('es', argv[++i]);
     else if (k === '--is-akisi') a.isAkisi = argv[++i];
     else if (k === '--repo') a.repo = argv[++i];
-    else if (k === '--sure-ornek') a.sureOrnek = Number(argv[++i]);
+    else if (k === '--sure-ornek') ham.set('sureOrnek', argv[++i]);
     else throw new Error(`bilinmeyen bayrak: ${k}`);
   }
   if (!a.cikti) throw new Error('--cikti gerekli');
   // Varsayılan: günlük saklama süresinin biraz ötesi (92 gün) → bugünün ertesi günü.
   if (!a.baslangic) a.baslangic = gunEkle(bugun, -92).toISOString().slice(0, 10);
   if (!a.bitis) a.bitis = gunEkle(bugun, 1).toISOString().slice(0, 10);
-  if (!(a.pencereGun >= 1)) throw new Error('--pencere-gun >= 1 olmalı');
+  for (const [alan, bayrak, enAz] of SAYISAL_BAYRAKLAR) {
+    if (ham.has(alan)) a[alan] = tamsayiBayrak(bayrak, ham.get(alan), enAz);
+  }
   return a;
 }
 
@@ -238,6 +274,17 @@ async function basariliKosuSuresi(repo, k, ghCagri = ghDene) {
   }
 }
 
+/**
+ * Süre örneği: EN YENİ `n` başarılı koşu (`kosular` eskiden yeniye sıralıdır). `n` 0 ise BOŞ döner: `slice(-0)` `slice(0)` ile aynıdır
+ * ve TÜM başarılı koşuları verirdi (0 örnek isteyen hepsinin `jobs`ını çekerdi: yüzlerce gereksiz çağrı, karnede tam örneklem).
+ * Boş örnek, "başarılı koşu yok" yolunun aynısıdır: `havuz([])` hiçbir çağrı yapmaz, kayıtlar süre alanı OLMADAN kalır
+ * (karne sayı olmayan alanı ölçüm saymaz: "ölçülmedi"). Kırmızı koşular bundan bağımsızdır (kırık adımı bulmak için zaten `jobs` çekilir).
+ */
+function sureOrnegiSec(kosular, n) {
+  if (n === 0) return [];
+  return kosular.filter((k) => k.sonuc === 'success').slice(-n);
+}
+
 async function havuz(isler, es, fn) {
   const sonuc = new Array(isler.length);
   let sira = 0;
@@ -274,9 +321,7 @@ async function main(argv = process.argv.slice(2), { gh: ghFn = gh } = {}) {
   }
   const hepsi = [...tum.values()].sort((x, y) => x.olusturma.localeCompare(y.olusturma));
   const kirmizilar = hepsi.filter((k) => k.sonuc === 'failure');
-  const basarililar = hepsi
-    .filter((k) => k.sonuc === 'success')
-    .slice(-Math.max(0, a.sureOrnek));
+  const basarililar = sureOrnegiSec(hepsi, a.sureOrnek);
   process.stderr.write(
     `[ci-gecmis] ${hepsi.length} koşu (${repo}, ${a.baslangic}..${a.bitis}); kırmızı ${kirmizilar.length}, ` +
       `süre örneği ${basarililar.length}. Uyarı: ${uyarilar.length}\n`,
@@ -343,5 +388,6 @@ module.exports = {
   main,
   pencereler,
   pencereyiCek,
+  sureOrnegiSec,
   testAdimiSuresi,
 };

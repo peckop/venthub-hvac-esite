@@ -222,7 +222,11 @@ function hukumVer(taban, denemeler) {
 
 function git(repo, args) {
   const r = cp.spawnSync('git', ['-C', repo, ...args], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  return { kod: r.status, cikti: (r.stdout || '').trim(), hata: (r.stderr || '').trim() };
+  // `cikti` YALNIZ SONDAN kırpılır (ALT-38b): `git status --porcelain` satırları `XY yol` biçimindedir ve X boşluk olabilir (` M a.md`).
+  // `.trim()` ilk satırın baştaki boşluğunu siliyordu (→ `M a.md`); `yanEtkiyiTemizle`deki `slice(3)` yolu bozuyordu (→ `.md`), test
+  // koşusunun İZLENEN dosyada bıraktığı yan etki temizlenmiyor ve koşucu "sonrası ağaç temiz değil — DURDU" ile çıkış 2 veriyordu.
+  // Öteki çağıranlar (`rev-parse` yolları, `ls-files`) baştaki boşluk taşımaz: sondaki satır sonu yine kırpılır, davranışları değişmez.
+  return { kod: r.status, cikti: (r.stdout || '').trimEnd(), hata: (r.stderr || '').trim() };
 }
 
 function bagliWorktreeMi(repo) {
@@ -351,7 +355,12 @@ function geriAl(kayitlar) {
   for (const k of [...kayitlar].reverse()) {
     if (k.tur === 'ekle') {
       fs.rmSync(k.mutlak, { force: true });
-      if (k.repo) git(k.repo, ['rm', '--cached', '-q', '--ignore-unmatch', '--', k.rel]);
+      // İNDEKS de özgün hâline döner (ALT-38b): `git reset -q -- <yol>` girdiyi HEAD'dekine çevirir. Yeni dosyada HEAD'de girdi yoktur, girdi
+      // kalkar; AYNI yolda `sil` + `ekle` ile yaratılmış İZLENEN dosyada HEAD girdisi GERİ GELİR. Önceki `git rm --cached` her iki durumda
+      // girdiyi tümüyle silerdi: `sil` kaydı dosyayı özgün içerikle diske geri yazınca ağaç `D  x` + `?? x` kalırdı (sha doğrulaması yalnız
+      // dosya baytına baktığı için bunu görmez) ve yan etki temizliği `?? x`i `git clean` ile SİLERDİ. Ağaç sabotaj başında temiz olduğundan
+      // indeks == HEAD'dir; HEAD'e dönmek özgün indekse dönmektir.
+      if (k.repo) git(k.repo, ['reset', '-q', '--', k.rel]);
       // Oluşturulan boş üst dizinler kalmasın (yalnız boşsa silinir).
       let d = path.dirname(k.mutlak);
       for (let i = 0; i < 4; i += 1) {
@@ -376,6 +385,8 @@ function geriAl(kayitlar) {
 /** Test koşusunun bıraktığı yan etkiyi (izlenen dosya değişimi / yeni dosya) listeler ve temizler. */
 function yanEtkiyiTemizle(repo) {
   const satirlar = agacKirli(repo);
+  // Porcelain satırı `XY yol`: iki durum karakteri (X boşluk olabilir) + bir boşluk, sonra yol. `slice(3)` bu yüzden HAM satırdan alınır;
+  // `git()` baştaki boşluğu kırpsaydı (ALT-38b'den önceki `.trim()`) ilk satırın yolu bozulurdu. Boşluklu adlar git'te tırnaklanır.
   const yol = (s) => s.slice(3).replace(/^"|"$/g, '');
   for (const s of satirlar) {
     const rel = yol(s);
@@ -585,4 +596,5 @@ module.exports = {
   planDogrula,
   sabotajUygula,
   vitestSinifla,
+  yanEtkiyiTemizle,
 };
