@@ -7,7 +7,7 @@
       "aileler": [
         "nicotra-gebhardt-dd",
         "storm-serisi",
-        "vortice-lineo-quiet",
+        "vortice-lineo-quiet-sessiz-kanal-fanlari",
         "vortice-vort-commercial-in-line-rectangular",
         "vortice-vorticent-cms-atex"
       ],
@@ -115,7 +115,7 @@
         "vortice-lineo-200-quiet": 2,
         "vortice-lineo-250-quiet": 2,
         "vortice-lineo-315-quiet": 2,
-        "vortice-lineo-quiet": 2,
+        "vortice-lineo-quiet-sessiz-kanal-fanlari": 2,
         "vortice-vort-commercial-in-line-rectangular": 3,
         "vortice-vorticent-cms-atex": 4
       },
