@@ -2,7 +2,9 @@ import { MetadataRoute } from 'next'
 
 import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
+import { sitemapModelMi } from '../config/yayindaModeller'
 import { HVAC_BRANDS } from '../data/brands'
+import { rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
 import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
 import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
 import { urunsuzMarkaSluglari } from '../lib/seo/markaUrunDurumu'
@@ -122,8 +124,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const dilYolu = (lang: string) => adresRotalari(adresDili(lang))
 
   // Ürün listesi şemaya duyarlıdır (`/products` ↔ `/urunler`); diğer statik sayfalar şemadan bağımsız.
+  // Statik sayfalar dilde GÖRÜNEN adresle ilan edilir (rota dili, OPS-52): kanonik = sitemap adresi
+  // (canonical-url-standard); ikisi de aynı `rotaDiliYoluOku` tablosundan çıkar. Anahtar kapalıyken
+  // `rotaDiliYoluOku` rotayı AYNEN döndürür → bugünkü `/${lang}${route}`.
   const statikYol = (lang: string, route: string): string =>
-    route === '/products' ? dilYolu(lang).products() : `/${lang}${route}`
+    route === '/products' ? dilYolu(lang).products() : `/${lang}${rotaDiliYoluOku(route, lang)}`
 
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({
@@ -225,7 +230,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // `lastModified` = modelin kendi `updated_at`'i; yoksa alan yazılmaz (uydurma tarih yok, REC-454).
   const modelRoutes: MetadataRoute.Sitemap = ADRES_SEMASI_K3B
     ? locales.flatMap((lang) =>
-        modeller.map((m) => ({
+        // URN-31: yalnız yayındaki listedeki TEMEL modeller (sürüm kanoniği temele gider; liste dışı modelin sayfası
+        // yok). Boş liste = sıfır satır. DB'deki aktiflik süzgeci serviste, liste süzgeci burada.
+        modeller.filter((m) => sitemapModelMi(m.sku)).map((m) => ({
           url: `${baseUrl}${dilYolu(lang).product(m.aileSlug, m.sku)}`,
           ...(m.updatedAt ? { lastModified: new Date(m.updatedAt) } : {}),
           changefreq: 'weekly',

@@ -343,7 +343,9 @@ try {
   const s = bd.satir(token, pencere)
   if (s) process.stdout.write(s + '\n')
   // Modlar bu ölçümü pencere başına dosyadan okur (ARC-33 madde 2); yazım hatası satırı bozmaz.
-  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE)
+  // Compact hazırlığı (ARC-31 madde 2): durum dosyası yolu + "yarım iş" ifadesi de aynı dosyaya; kokpit satırı bundan kurar.
+  const durum = bd.pencereDurumOzeti(bd.PENCERE_KLASORU, girdi.session_id, girdi.transcript_path, token, pencere)
+  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE, undefined, durum)
 } catch (e) {
   process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }

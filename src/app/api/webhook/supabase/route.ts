@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { aileYollari, kategoriYollari } from '@/lib/adres/tazelemeYollari'
+import { skuModelYollari } from '@/lib/adres/yayindaModelYollari'
 import {
   discoveryTag,
   familyTag,
@@ -383,6 +384,20 @@ export async function POST(request: NextRequest) {
         revalidatedTags.push(...eskiTags)
         if (eskiTruncated) fanoutTruncated = true
       }
+
+      /**
+       * ALT-16 (REC-300 3g-2): YAYINDAKİ model sayfası. Ürün satırı (ad, fiyat, stok, aktiflik, aile/kategori)
+       * değişince o SKU'nun model sayfası (TR + EN) ISR yüzünden 1 saate kadar bayat kalırdı. Yollar
+       * `adresUret`'in tek noktasından gelir (`skuModelYollari`, URN-31); burada yol metni YOKTUR. Liste dışı SKU
+       * ve boş liste → boş küme: davranış aynı. Çağrı başına en çok 2 SKU (yeni + eski) × 2 dil = 4 ek yol.
+       * SKU değiştiyse eski SKU'nun sayfası da bayatlar (`eskiDeger`: yalnız UPDATE + iki görüntü varken).
+       */
+      const modelSkulari = [metin(activeRecord.sku), eskiDeger(record, old_record, 'sku')].filter(
+        (s): s is string => s !== undefined
+      )
+      const modelYollari = [...new Set(modelSkulari.flatMap((s) => skuModelYollari(s)))]
+      for (const p of modelYollari) revalidatePath(p)
+      revalidatedPaths.push(...modelYollari)
 
       if (shouldRevalidateDiscovery) {
         revalidateTag(PRODUCTS_DISCOVERY_TAG)

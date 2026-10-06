@@ -90,7 +90,8 @@ export const en: typeof tr = {
         ghost: 'In-line / Duct Fans',
         smoke: 'Smoke Exhaust Fans',
         jet: 'Car Park Jet Fans',
-        radial: 'Radial Fans',
+        // Decision 288 (Recep, OPS-76): matches the TR name 'Radyal (Santrifüj) Fanlar'; address and key are unchanged.
+        radial: 'Radial (Centrifugal) Fans',
         roof: 'Roof Fans',
         'axial-ind': 'Industrial Axial Fans',
         'air-curtain': 'Air Curtains',
@@ -113,7 +114,8 @@ export const en: typeof tr = {
         'speed-controllers': 'Speed Controllers',
         'water-coils': 'Water Coil Duct Heaters',
         // REC-300 Faz 1-B: bound by the DB migration; the corrosion branch moves to a NEW key.
-        'corrosion-fans': 'Corrosion-Resistant Fans',
+        // Decision 287 (Recep, OPS-74): matches the TR name; the old `acid-fans` key stays for rollback and the deploy window.
+        'corrosion-fans': 'Corrosion- and Acid-Resistant Fans',
         'plug-fans': 'Plug Fans',
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
@@ -1457,7 +1459,8 @@ export const en: typeof tr = {
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
-      sku: 'SKU',
+      /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
+      modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
     },
     actions: {
@@ -1623,8 +1626,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
-    /** SKU as of the order date (snapshot) — not the current catalog SKU. */
-    skuLabel: 'SKU: {{sku}}',
+    /** The item's CURRENT catalog model code (not an order-time snapshot); never the raw SKU. */
+    modelCodeLabel: 'Model Code: {{code}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',

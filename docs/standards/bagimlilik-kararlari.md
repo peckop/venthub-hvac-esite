@@ -244,8 +244,16 @@ kilit dosyasında geçişli paket 3.1.2 → 3.1.8 yükseltilerek (4 satır, over
 yedinci bir kayıt (`GHSA-qw65-cvwx-89v3`, `fast-uri` <3.1.7) çıkmıştı, 3.1.8 onu da kapsıyor. Liste
 BOŞ, tavan 6 → 0. Yeni bir yüksek/kritik kayıt çıkarsa yine kabul değil önce kapatma denenir.
 
+⭐**2026-10-05 — DÖRDÜNCÜ KAYIT, KAPATILAMADI (ALT-32):** `GHSA-vfj7-8cjw-p6xm` (`braces` ≤3.0.3, derin iç içe
+desenle yığın taşması, DoS) 09-18'de yayımlandı ve **düzeltme sürümü YOK** (GitHub `first_patched_version` boş,
+`pnpm audit` "Patched versions <0.0.0", `npm view braces version` = 3.0.3 = son sürüm). Yükseltme ve override
+imkânsız; yol derleme zamanı araçları: `@sentry/webpack-plugin` → `unplugin` → `chokidar` ve `tailwindcss` →
+`fast-glob`/`micromatch`/`chokidar`. Desenleri **bizim yapılandırma dosyalarımız** verir, kullanıcı girdisi
+braces'e hiç ulaşmaz; sunucu yanıt yolunda ve tarayıcı paketinde yok. İlk kabul satırı tavanı 0 → 1 yaptı (OPS hükmü, 10-05).
+
 | GHSA | paket | önem | kabul | gerekçe | kaldırma şartı |
 |---|---|---|---|---|---|
+| `GHSA-vfj7-8cjw-p6xm` | braces | high | 2026-10-05 | derleme zamanı (sentry webpack-plugin, tailwind); düzeltme sürümü yok; desenler bizim dosyalarımızdan, kullanıcı girdisi ulaşmaz | `npm view braces version` 3.0.3'ten büyük VE `pnpm why braces` çıktısındaki tüm tüketiciler onu çekiyor; ya da `pnpm audit --prod` bu kaydı artık vermiyor |
 
 ## 8 · OVERRIDE KALDIRMA ŞARTI — karar 52
 

@@ -1,11 +1,24 @@
 // @vitest-environment node
 import { gzipSync } from 'node:zlib'
 
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { modellerdenVeri, yayindaVeriAyarla } from '@/config/__tests__/yayindaTestKiti'
 
 import { envanterUret } from '../envanter'
 import { EDGE_GZIP_SINIRI_BAYT } from '../haritaTipi'
 import { FIKSTUR_DOSYASI, fiksturHaritasi, modelSlugluHarita } from './fikstur'
+
+// URN-31: model hedefi yalnız yayındaki listedeki SKU için üretilir; adres metni listeden (fikstürdeki Faz 2 metinleri).
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() =>
+  yayindaVeriAyarla(
+    modellerdenVeri([
+      { aile: 'storm-serisi', sku: 'SEA-61143003', tr: 'storm-14-atex-cati-fani', en: 'storm-14-atex-roof-fan' },
+      { aile: 'vortice-vort-commercial-in-line-rectangular', sku: 'VRT-CA-IL-4020-ES-RECT', tr: 'vortice-ca-il-4020-kanal-fani', en: 'vortice-ca-il-4020-duct-fan' },
+    ]),
+  ),
+)
 
 /**
  * INV-ADRES-HARITA-1 (plan §7): haritanın tanıdığı her eski adres TEK hop; hedefte query yok; hiçbir

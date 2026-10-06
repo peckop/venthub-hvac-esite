@@ -5,6 +5,8 @@
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { modellerdenVeri, yayindaVeriAyarla } from '@/config/__tests__/yayindaTestKiti'
+
 const db = vi.hoisted(() => ({
   modelBySku: vi.fn(),
   familySlugById: vi.fn(),
@@ -39,8 +41,15 @@ vi.mock('next/navigation', () => ({
 
 import { eskiTrUrunAdresiniYonlendir } from '../urunSegmenti'
 
+// URN-31: model sayfası yalnız yayındaki listedeki SKU için vardır; adres metni listeden (burada `storm-10`).
+// Liste dışı / yanlış metin / sürüm davranışı: urunSegmentiYayinda.test.ts.
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+
 beforeEach(() => {
   vi.clearAllMocks()
+  yayindaVeriAyarla(
+    modellerdenVeri(['SEA-61143003', 'SEA-1'].map((sku) => ({ aile: 'storm-serisi', sku, tr: 'storm-10', en: 'storm-10' }))),
+  )
 })
 
 describe('eskiTrUrunAdresiniYonlendir', () => {

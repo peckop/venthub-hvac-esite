@@ -7,6 +7,7 @@ import React from 'react'
 import { resolveProductImageUrl } from '@/lib/images/productImage'
 import type { WithDisplayPrice } from '@/lib/services/displayPrice.service'
 import type { Product } from '@/types/ui-models'
+import { getProductModelLabel } from '@/utils/productHelpers'
 
 import { useCart } from '../hooks/useCartHook'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
@@ -49,6 +50,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   const { addToCart } = useCart()
 
   const displayPrice = product.displayPrice ?? null
+
+  // URN-32: kartta görünen kod YALNIZ `model_code`; yoksa satır HİÇ çizilmez (ham `sku` basılmaz —
+  // INV-SKU-GORUNMEZ-1, `getProductModelLabel`'ın hükmü).
+  // Yalnız `model_code` okunur: `name_i18n` (Json) çözücünün ad tipine uymaz, tip zorlaması (`as`) gerekmez.
+  const modelKodu = getProductModelLabel({ model_code: product.model_code })
 
   /**
    * İKİ AYRI SORU, İKİ AYRI DEĞİŞKEN — eskiden `quoteMode` ikisini birbirine yapıştırıyordu
@@ -100,8 +106,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
           <div className="ml-5 flex-1 flex flex-col justify-center min-w-0">
             <div className="flex items-center space-x-2 mb-1">
               <span className="text-xs font-bold uppercase tracking-wider text-secondary-blue">{product.brand}</span>
-              <span className="text-xs text-steel-gray">/</span>
-              <span className="text-xs text-steel-gray font-medium truncate">{product.sku}</span>
+              {modelKodu && <span className="text-xs text-steel-gray">/</span>}
+              {modelKodu && <span className="text-xs text-steel-gray font-medium truncate">{modelKodu}</span>}
             </div>
             <h3 className="text-base sm:text-lg font-bold text-industrial-gray group-hover:text-primary-navy transition-colors line-clamp-1">
               {product.name}
@@ -174,7 +180,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
             <span className="text-xs font-bold uppercase tracking-wider text-secondary-blue">
               {product.brand}
             </span>
-            <span className="text-xs text-steel-gray font-medium">{product.sku}</span>
+            {modelKodu && <span className="text-xs text-steel-gray font-medium">{modelKodu}</span>}
           </div>
           
           <h3 className="text-sm font-bold text-industrial-gray leading-snug min-h-10 line-clamp-2 mb-4 group-hover:text-primary-navy transition-colors">

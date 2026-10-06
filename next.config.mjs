@@ -5,7 +5,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
 import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.mjs';
-import { adresDiliOku, rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri } from './src/config/rotaDili.mjs';
+import { adresDiliOku, rotaDiliHedefleriniYenile, rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri } from './src/config/rotaDili.mjs';
 
 /**
  * `EN_YAYIN` bayrağının TEK kaynağı `src/config/features.ts`. Bu dosya TypeScript içe aktaramadığı
@@ -55,7 +55,7 @@ const nextConfig = {
         ],
     },
     async redirects() {
-        return [
+        const mevcutKurallar = [
             // ── T162 — Lineo çap aileleri TEK ailede birleşti (docs/standards/catalog-depth-standard.md §K1).
             // Altı çap ailesi 2026-08-21'de açılmış, 2026-08-23'te kapatıldı: çap bir KARAR noktası
             // değil, aynı sayfadaki seçicidir. Kapanan altı adres sitemap'te DURUYORDU; yönlendirme
@@ -188,17 +188,20 @@ const nextConfig = {
             // gerekçe tek dosyada: src/config/bilgiMerkeziYonlendirmeleri.mjs. Hepsi tek hop.
             ...bilgiMerkeziYonlendirmeleri(EN_YAYIN),
 
-            // ── REC-374 (2026-09-27) — marka listesi DB ile hizalandı; listeden çıkan üç slug
-            // (`frekans-konvertoru` → frekans konvertörleri kategorisi; `flexiva`, `casals` → marka
-            // listesi). K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
+            // ── REC-374 (2026-09-27) — marka listesi DB ile hizalandı. `frekans-konvertoru` → frekans
+            // konvertörleri kategorisi 308; `casals` ve `flexiva` OPS-51 (#1686) ile 308'den çıkıp marka
+            // olarak listeye dönüyor. K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
             // src/config/markaYonlendirmeleri.mjs · kapı INV-MARKA-KAYNAK-1. Hepsi tek hop.
             ...markaYonlendirmeleri(ADRES_SEMASI_K3B),
-
-            // ── OPS-52 (kararlar 267/269/270) — sayfa adresleri dile göre yazılır
-            // (`/tr/about` → `/tr/hakkimizda`). Anahtar kapalıyken liste BOŞ. Gerekçe, tablo ve
-            // yeniden yazım karşılığı: src/config/rotaDili.mjs. Hepsi tek hop.
-            ...rotaDiliYonlendirmeleri(ADRES_DILI),
         ];
+
+        // ── OPS-52 (kararlar 267/269/270) — sayfa adresleri dile göre yazılır (`/tr/about` → `/tr/hakkimizda`).
+        // Anahtar kapalıyken iki parça da değişmez/boş. Gerekçe, tablo ve yeniden yazım karşılığı: src/config/rotaDili.mjs.
+        //  · Yukarıdaki MEVCUT kuralların hedefleri tabloyla yenilenir (R4): hedefi eski klasör adresi olan kural
+        //    (`/destek/hesaplayicilar` → `/urun-secici`, bilgi merkezi EN-kapalı kuralları) yeni adrese gider, zincir olmaz.
+        //    Kapalıyken `rotaDiliHedefleriniYenile` girdiyi AYNEN (aynı referans) döndürür.
+        //  · Rota dili kuralları (eski klasör adresi → yeni adres) zaten yeni adrese gider, yenilemeye girmez. Hepsi tek hop.
+        return [...rotaDiliHedefleriniYenile(mevcutKurallar, ADRES_DILI), ...rotaDiliYonlendirmeleri(ADRES_DILI)];
     },
     async rewrites() {
         // Yeni adres → mevcut klasör (sayfa dosyası aranmadan önce). Anahtar kapalıyken boş.
