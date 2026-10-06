@@ -13,7 +13,7 @@ import { odemeSiparisleEslesiyorMu } from '../odeme_eslesme'
  * 13 SENTETİK İyzico yanıtıdır. Dosya, eski dökümdeki 13 gerçek yanıtın YAPISINI
  * (alan adları, iç içe şekil, bu testin okuduğu ilişkiler) taşır; DEĞERLERİ satır başına
  * BAĞIMSIZ üretilmiş sentetik değerlerdir ve gerçek veriden TÜRETİLMEDİ (ölçekleme,
- * kaydırma ya da harf eşlemesi yok — dosyadaki `_aciklama`). Gerçek döküm herkese açık
+ * kaydırma ya da harf eşlemesi yok — dosyadaki `aciklama`). Gerçek döküm herkese açık
  * depodan KALDIRILDI (ALT-39): kart parçası, yetkilendirme kodu, belirteç ve müşteri alanı
  * içeriyordu. Kural cetveli: `docs/standards/depoya-giremeyecek-veri-standard.md`
  * (zorlayan kapı: INV-DEPO-DOKUM-1).
@@ -43,7 +43,7 @@ type FiksturSatiri = {
   payment_debug?: { raw?: Record<string, unknown> } | null
 }
 
-type Fikstur = { _aciklama: string; satirlar: FiksturSatiri[] }
+type Fikstur = { aciklama: string; satirlar: FiksturSatiri[] }
 
 const FIKSTUR = resolve(
   process.cwd(),
@@ -338,10 +338,10 @@ describe('INV-PAY-ESLESME-1 — fikstür SENTETİK (kişisel veri sızıntı kol
     }
   })
 
-  it('fikstür kendini SENTETİK ilan ediyor (_aciklama)', () => {
+  it('fikstür kendini SENTETİK ilan ediyor (aciklama)', () => {
     const f = fiksturOku()
-    expect(f._aciklama).toMatch(/SENTETİK/)
-    expect(f._aciklama).toMatch(/TÜRETİLMEDİ/)
-    expect(f._aciklama).toMatch(/GERÇEK DEĞER YOK/)
+    expect(f.aciklama).toMatch(/SENTETİK/)
+    expect(f.aciklama).toMatch(/TÜRETİLMEDİ/)
+    expect(f.aciklama).toMatch(/GERÇEK DEĞER YOK/)
   })
 })
