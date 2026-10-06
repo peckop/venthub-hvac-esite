@@ -8,7 +8,6 @@ import { markaBulAdla } from '@/data/brands'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { getDictValue } from '@/i18n/getDictValue'
-import { aileRehberHedefleri } from '@/lib/bilgiMerkezi/eskiAileSluglari'
 import { ilgiliRehberler } from '@/lib/bilgiMerkezi/tersDizin'
 import { getCachedFamilyDetail, preloadFamily } from '@/lib/data/preload'
 import type { ProductRouteResolution } from '@/lib/data/productRoute'
@@ -346,7 +345,7 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
           (unavailable) blok yok; yazı yoksa `IlgiliRehberler` hiçbir şey basmaz. */}
       {family && (
         <IlgiliRehberler
-          rehberler={ilgiliRehberler(aileRehberHedefleri(family.slug), lang)}
+          rehberler={ilgiliRehberler(`vh:aile/${family.slug}`, lang)}
           baslik={t('bilgiMerkezi.ilgiliRehberler')}
         />
       )}

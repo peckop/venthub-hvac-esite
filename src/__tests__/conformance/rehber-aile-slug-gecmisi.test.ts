@@ -4,20 +4,20 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { YAZILAR } from '../../data/bilgiMerkezi/yazilar'
-import { aileRehberHedefleri, ESKI_AILE_SLUGLARI } from '../../lib/bilgiMerkezi/eskiAileSluglari'
 import { ilgiliRehberler, yazininHedefleri } from '../../lib/bilgiMerkezi/tersDizin'
 
 /**
  * INV-REHBER-SLUG-GECMISI-1 — yeniden adlandırılan bir aileye bağlı rehber, aile sayfasından KAYBOLMAZ.
  *
  * NİÇİN (REC-300 Faz 1-B, #1352; 2026-10-05 doğrulayıcı + slug taraması): ters dizin aile sayfasından
- * rehbere TAM dizgi eşleşmesiyle bakar. Rehber `vh:aile/danfoss-fc51` yazar; migration aileyi
+ * rehbere TAM dizgi eşleşmesiyle bakar. Rehber `vh:aile/danfoss-fc51` yazarken migration aileyi
  * `danfoss-vlt-micro-drive-fc-51` yapınca aile sayfasındaki "ilgili rehberler" bloğu HATASIZ boşalırdı:
- * tip doğru, test yeşil, kapı sessiz. Kod ile migration aynı anda canlıya çıkmadığı için sayfa eski ve
- * yeni slug'la AYRI AYRI aranır (`ESKI_AILE_SLUGLARI`).
+ * tip doğru, test yeşil, kapı sessiz.
  *
- * Kapı migration'ın KENDİ 40 çiftinden türer; elle liste yoktur: bir rehber yeniden adlandırılan bir ailenin
- * eski slug'ını anıyor ve eşlemede yoksa KIRMIZI. Yeni bir rehber eski slug'la yazılırsa da yakalar.
+ * URN-53 (#1352 canlıda ölçüldü, 2026-10-06): geçiş köprüsü (`ESKI_AILE_SLUGLARI`, sayfa iki slug'la aranırdı)
+ * KALDIRILDI; rehberler yeni slug'ları yazar, aile sayfası yalnız kendi güncel slug'ıyla arar. Kapı bu yüzden
+ * artık tersini bekler: hiçbir rehber migration'ın 40 çiftinin ESKİ slug'ını anmaz (anarsa aile sayfası
+ * bloğu HATASIZ boşalır, köprü yok). Kapı migration'ın KENDİ 40 çiftinden türer; elle liste yoktur.
  */
 
 const MIGRATION = path.join(
@@ -59,34 +59,22 @@ describe('INV-REHBER-SLUG-GECMISI-1 — yeniden adlandırılan aileye bağlı re
     expect(anilan.size).toBeGreaterThan(0)
   })
 
-  it('bir rehber yeniden adlandırılan ailenin ESKİ slug\'ını anıyorsa eşlemede olmalı', () => {
-    const eksikler = ciftler
-      .filter(([eski]) => anilan.has(eski))
-      .filter(([eski, yeni]) => !(ESKI_AILE_SLUGLARI[yeni] ?? []).includes(eski))
-      .map(([eski, yeni]) => `${eski} → ${yeni}`)
+  it('hiçbir rehber yeniden adlandırılan ailenin ESKİ slug\'ını anmaz (aile sayfası yalnız güncel slug\'la arar)', () => {
+    const eskiyiAnanlar = ciftler.filter(([eski]) => anilan.has(eski)).map(([eski, yeni]) => `${eski} → ${yeni}`)
     expect(
-      eksikler,
-      `Bu aileler yeniden adlandırılıyor ve rehberler hâlâ eski slug'ı anıyor; ESKİ_AILE_SLUGLARI'na ` +
-        `eklenmezse aile sayfasındaki "ilgili rehberler" bloğu boşalır: ${eksikler.join(' | ')}`,
+      eskiyiAnanlar,
+      `Bu ailelerin slug'ı değişti ama rehberler eski slug'ı anıyor; aile sayfasındaki "ilgili rehberler" bloğu ` +
+        `HATASIZ boşalır. yazilar.ts'te yeni slug'a çevir: ${eskiyiAnanlar.join(' | ')}`,
     ).toEqual([])
   })
 
-  it('eşlemedeki her satır migration\'ın gerçek bir çifti (kimse uydurma/bayat satır bırakmaz)', () => {
-    for (const [yeni, eskiler] of Object.entries(ESKI_AILE_SLUGLARI)) {
-      for (const eski of eskiler) {
-        expect(ciftler, `${eski} → ${yeni} migration'da yok`).toContainEqual([eski, yeni])
-      }
-    }
-  })
-
-  it('DAVRANIŞ — eski ve yeni slug aynı rehberleri döndürür (yayındaki içerik)', () => {
-    for (const [yeni, eskiler] of Object.entries(ESKI_AILE_SLUGLARI)) {
-      const yeniSonuc = ilgiliRehberler(aileRehberHedefleri(yeni), 'tr', 3, YAZILAR, false).map((r) => r.href)
-      expect(yeniSonuc.length, `${yeni} sayfasında ilgili rehber YOK`).toBeGreaterThan(0)
-      for (const eski of eskiler) {
-        const eskiSonuc = ilgiliRehberler(aileRehberHedefleri(eski), 'tr', 3, YAZILAR, false).map((r) => r.href)
-        expect(yeniSonuc).toEqual(eskiSonuc)
-      }
+  it('DAVRANIŞ — rehberin anıdığı her yeni slug aile sayfasından o rehbere döner (yayındaki içerik)', () => {
+    const yeniler = new Set(ciftler.map(([, yeni]) => yeni))
+    const baglananYeniler = [...anilan].filter((s) => yeniler.has(s))
+    expect(baglananYeniler.length, 'yeni slug\'la anılan yeniden adlandırılmış aile yok: kapı boş evrende yeşil kalır').toBeGreaterThan(0)
+    for (const yeni of baglananYeniler) {
+      const sonuc = ilgiliRehberler(`vh:aile/${yeni}`, 'tr', 3, YAZILAR, false).map((r) => r.href)
+      expect(sonuc.length, `${yeni} sayfasında ilgili rehber YOK`).toBeGreaterThan(0)
     }
   })
 })
