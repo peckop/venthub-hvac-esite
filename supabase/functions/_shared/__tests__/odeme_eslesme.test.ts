@@ -283,7 +283,7 @@ describe('INV-PAY-ESLESME-1 — fikstür SENTETİK (kişisel veri sızıntı kol
     }
   })
 
-  it('opak alanlar açıkça SAHTE işaretli: belirteç, imza, yetkilendirme kodu, sunucu başvurusu, kart ailesi', () => {
+  it('opak alanlar açıkça SAHTE işaretli: belirteç, imza, yetkilendirme kodu, sunucu başvurusu, kart ailesi, ödeme ve işlem numarası', () => {
     for (const { raw } of fiksturVakalari()) {
       expect(String(raw.token), 'token sahte işaretli değil').toMatch(/^SENTETIK-TOKEN-\d{2}$/)
       expect(String(raw.signature), 'signature sahte işaretli değil').toMatch(/^SENTETIK-IMZA-\d{2}$/)
@@ -292,7 +292,30 @@ describe('INV-PAY-ESLESME-1 — fikstür SENTETİK (kişisel veri sızıntı kol
         /^sentetik-host-ref-\d{2}$/,
       )
       expect(String(raw.cardFamily), 'cardFamily uydurma sözcük değil').toMatch(/^TestKarti[A-Z]$/)
+      // ALT-39 2. tur (D6): bu iki alan gerçek iyzico biçimli 8 haneli sayılardı ("açıkça sahte" iddiasına rağmen, hiçbir test
+      // kilitlemiyordu). Kod bunlara sayısal bakmaz; metinsel SENTETIK-… biçimi gerçek numarayla karışamaz.
+      expect(String(raw.paymentId), 'paymentId sahte işaretli değil').toMatch(/^SENTETIK-ODEME-\d{2}$/)
+      const kalemler = raw.itemTransactions as Array<Record<string, unknown>>
+      expect(kalemler.length, 'kalem yok').toBeGreaterThan(0)
+      for (const k of kalemler) {
+        expect(String(k.paymentTransactionId), 'paymentTransactionId sahte işaretli değil').toMatch(/^SENTETIK-ISLEM-\d{2}-\d+$/)
+      }
     }
+  })
+
+  it('ödeme ve işlem numaraları TEKİL ve hiçbir dize yedi haneli saf sayı değil (gerçek numara biçimi yok)', () => {
+    const tumu: string[] = []
+    const gez = (d: unknown): void => {
+      if (typeof d === 'string') tumu.push(d)
+      else if (Array.isArray(d)) d.forEach(gez)
+      else if (d && typeof d === 'object') Object.values(d).forEach(gez)
+    }
+    gez(fiksturOku())
+    expect(tumu.filter((s) => /^\d{7,}$/.test(s)), 'yedi+ haneli saf sayı dizesi var').toEqual([])
+    const v = fiksturVakalari()
+    expect(new Set(v.map((x) => String(x.raw.paymentId))).size).toBe(13)
+    const islemler = v.flatMap((x) => (x.raw.itemTransactions as Array<Record<string, unknown>>).map((k) => String(k.paymentTransactionId)))
+    expect(new Set(islemler).size).toBe(islemler.length)
   })
 
   it('13 sipariş id si ve 13 conversation_id TEKİL (çakışma yok)', () => {

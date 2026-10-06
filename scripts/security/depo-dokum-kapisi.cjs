@@ -8,8 +8,9 @@
  * ⭐DÜRÜST SINIR (bulgu 1): bu kapı iki yerde koşar ve ikisi aynı şeyi söylemez.
  *   · CI: master'a BİRLEŞMEYİ durdurur. Veri, dal itildiği an zaten herkese açık olabilir.
  *   · `.githooks/pre-push`: AĞA ÇIKIŞI durdurur (itilecek TÜM nesneleri, sonradan silinenler dahil, tarar) —
- *     ama `git push --no-verify` ile atlanabilir. Kapı ölçemezse (çıkış 2) kanca yüksek sesle uyarır ve
- *     izin verir; kesin kapı CI'dır.
+ *     ama `git push --no-verify` ile atlanabilir. ⭐Kapı ölçemezse (çıkış 2) kanca push'u YİNE ENGELLER
+ *     (ALT-39 2. tur, Y1: ölçemeyen kapı yeşil vermez; ağa çıkış geri alınamaz). Bilinçli geçiş:
+ *     `VH_DOKUM_OLCULEMEDI_IZIN=1 git push`. ⚠Kanca dala bağlıdır: cetvel §7 "geçiş sınırı".
  *
  * TETİK: izlenen json/jsonl/ndjson/csv/tsv/sql dosyaları ve izlenen yollar (ağaç kipi); itilecek nesneler
  *        (`--yeni-nesneler`, `--pre-push`); GitHub Actions `pull_request` ve tam geçmiş varsa PR'ın ara
@@ -20,27 +21,41 @@
  * KURALLAR — her biri DEĞERE değil ŞEKLE bakar (değer taşıyan hiçbir şey basılmaz):
  *   R1  kişisel alan adı DOLU değerle (json/jsonl/ndjson/csv/tsv). Sözlük iki katmanlıdır: KISISEL_ALANLAR
  *       (belirgin adlar, ≥1 dolu satır) ve KISISEL_GENEL_ALANLAR (email, full_name, phone… ≥3 dolu satır;
- *       i18n/şema dosyalarında tek tük geçen etiketler yanlış alarm olmasın). Sözlük şema tabanından
- *       türetilmiştir ve testi tabanı OKUYARAK kapsamı doğrular.
- *   R2  .sql veri ifadesi (INSERT … VALUES / COPY … FROM stdin) içinde kişisel alan; kolon listesiz
- *       INSERT/COPY'nin hassas tabloya yazması. CREATE/ALTER/politika/`$$` gövdeleri MASUMDUR.
+ *       i18n/şema dosyalarında tek tük geçen etiketler yanlış alarm olmasın). ⭐EŞLEŞME TOLERANSLIDIR
+ *       (2. tur, O2): ad bir kişisel KÖKÜ içeriyorsa (applicant_email, email_to, contact_phone, identity_*,
+ *       eposta, telefon, adres, musteri…) ya da `ip`/`gsm` TAM PARÇAYSA (accept_ip) genel alandır; aksan ve
+ *       büyük-küçük harf fark etmez. Kökleri şema tabanını TARAYAN test sınar: kişisel kalıba uyan her kolon
+ *       ya kapsanır ya da adıyla gerekçeli "bilerek dışarıda" listesindedir.
+ *   R2  .sql veri ifadesi (INSERT … VALUES / COPY … FROM stdin / UPDATE … SET <kişisel alan> = <dize>) içinde
+ *       kişisel alan; kolon listesiz INSERT/COPY'nin hassas tabloya yazması. ⭐Genel alan ve R3 eşikleri
+ *       İFADE başına DEĞİL, DOSYA genelinde TABLO başına sayılır (`pg_dump --column-inserts` her satırı ayrı
+ *       INSERT yazar); hassas tabloda genel alan eşiği 1. CREATE/ALTER/politika/`$$` gövdeleri MASUMDUR.
  *   R3  fiyat/maliyet dökümü: ≥5 satırda kimlik + pozitif fiyat/maliyet (JSON, JSONL, CSV, SQL kolon listesi).
  *       Eşleşme önek/sonek toleranslıdır (purchase/cost/alış/maliyet, para birimi eki; model_code, *_kod).
- *   R4  yol kuralı: db-backup, pg_dump, .dump*, sıkıştırılmış/arşiv/ikili uzantılar, toc.dat.
+ *   R4  yol kuralı: db-backup, pg_dump, .dump*, sıkıştırılmış/arşiv/ikili/tablo uzantıları (.parquet .ods .mdb
+ *       .accdb dahil), toc.dat.
  *   R5  ödeme parçası: binNumber VE lastFourDigits birlikte ve değerler sıfır sayacı DEĞİL.
- *   R6  izlenen ikili veritabanı (.db/.sqlite/.sqlite3 ya da SQLite imzası): içine bakılamaz.
+ *   R6  izlenen ikili veritabanı (.db/.sqlite/.sqlite3 ya da SQLite imzası): içine bakılamaz. ⭐İmza UZANTIDAN
+ *       BAĞIMSIZ okunur (2. tur, O1): ağaç kipinde her izlenen dosyanın ilk baytları, itilen nesne kipinde her
+ *       aday blob'un başlığı (`app.db.20261006`, `x.sqlite.orig` gibi yedek adları görünmez kalmasın).
  *   Ölçülemedi (çıkış 2): başlıksız CSV/TSV, ayrıştırılamayan veri dosyası, NUL baytlı veri dosyası.
  *   R3, R6 ve (tek kanıtlı sandbox-kart örneği için) R5 dosya bazlı İZİN LİSTESİ alır (gerekçe + kanıt); R1/R2/R4 ASLA.
+ *   ⭐İzin kaydı yol + kural + BLOB'a bağlıdır (2. tur, O4; `git hash-object`): dosya sonradan değişirse izin düşer
+ *   ve kanıt yeniden ölçülür. Yalnız yol+kurala bakan izin, içeriği sabit olmadığı için "anlamsal kaçış" idi.
  *
  * KİPLER
  *   (varsayılan)                  izlenen AĞAÇ taraması (+ GitHub Actions PR ise ara commit'ler)
- *   --yeni-nesneler <uç> [--haric <ref>]  `git rev-list --objects <uç> --not --remotes` ya da `--not <ref>`
+ *   --yeni-nesneler <uç> [--haric <ref>]  `git rev-list --objects <uç> --not --remotes` ya da `--not <ref>`;
+ *                                 her blob İÇERİĞİYLE ve ONU TAŞIYAN HER YOLLA ölçülür (`git diff-tree -r`, D2)
  *   --pre-push                    git'in pre-push stdin'ini okur, itilecek uçları tarar
  *   --kok <dizin>                 depo kökü
  *
  * ÇIKIŞ KODU: 0 temiz · 1 ihlal · 2 ölçülemedi (git yok, depo değil, dosya okunamadı, tavan aşıldı,
  * başlıksız/ayrıştırılamayan veri dosyası, argüman bilinmiyor, boş evren). ⭐2 de KIRMIZIDIR: ölçemeyen
- * kapı yeşil vermez. ⚠Ölçemedim ile ihlal AYRI sonuçlardır.
+ * kapı yeşil vermez (kancada da: Y1). ⚠Ölçemedim ile ihlal AYRI sonuçlardır.
+ * ⭐TAVAN AŞIMI (nesne sayısı, okunacak bayt) TÜM TARAMAYI İPTAL ETMEZ (Y1): sığan nesneler taranır (ihlal varsa
+ * çıkış 1), sığmayanlar "ölçülemedi" diye ADIYLA listelenir (çıkış 2). Aksi hâlde saldırgan önüne çöp yığıp asıl
+ * dökümü taranmayan nesneler arasına itebilirdi.
  *
  * ⛔DEĞER BASMAZ: çıktıda yalnız DOSYA ADI, KURAL ADI, ALAN ADI ve SAYI vardır.
  *
@@ -79,6 +94,8 @@ const KISISEL_ALANLAR = Object.freeze([
   'card_token',
   'card_user_key',
   'cvc',
+  // 2. tur (O2, şema tabanı taraması): sipariş satırındaki fatura profili anlık görüntüsü (firma adı, vergi no, adres) — `invoice_info` ile aynı sınıf.
+  'invoice_profile',
 ])
 
 /** R1 genel kişisel alanlar (≥KISISEL_ESIK dolu satır): şema tabanındaki kişisel kolonlar, `name` hariç (aşırı genel). */
@@ -106,7 +123,51 @@ const KISISEL_GENEL_ALANLAR = Object.freeze([
 /** Genel kişisel alanda en az bu kadar dolu satır varsa dökümdür. */
 const KISISEL_ESIK = 3
 
-/** R2: kolon listesiz INSERT/COPY bu tablolara yazıyorsa ihlal (şema tabanından: kişisel kolon taşıyan tablolar + maliyet). */
+/**
+ * R1 tolerans KÖKLERİ (O2): normalleştirilmiş anahtar (aksan/büyük-küçük/ayraç atılmış) bunlardan birini İÇERİYORSA
+ * GENEL kişisel alandır (≥KISISEL_ESIK dolu satır): `applicant_email`, `email_to`, `contact_phone`, `identity_verified_at`,
+ * Türkçe `eposta`, `telefon`, `ad_soyad`, `adres`, `vergi_no`, `musteri_adi`. Kök kısaltılırsa kapsam daralır, uzatılırsa
+ * yanlış alarm artar: değişikliği şema tabanını tarayan test (depo-dokum-kapisi.test.ts) sınar.
+ */
+const KISISEL_GENEL_KOKLER = Object.freeze([
+  'email',
+  'eposta',
+  'phone',
+  'telefon',
+  'identity',
+  'fullname',
+  'firstname',
+  'lastname',
+  'contactname',
+  'adsoyad',
+  'soyad',
+  'adres',
+  'musteri',
+  'postalcode',
+  'postakodu',
+  'taxno',
+  'taxnumber',
+  'taxoffice',
+  'vergino',
+  'vergidairesi',
+])
+
+/**
+ * Kısa adlar başka sözcüklerin İÇİNDE geçer (`ship`, `recip`, `zip`): yalnız TAM PARÇA eşleşir.
+ *   · KISISEL_GENEL_PARCALAR: parça herhangi bir yerde (`gsm`, `gsm_no`, `cep_gsm`).
+ *   · KISISEL_GENEL_SON_PARCALAR: parça bileşik adın SON parçasıysa (`accept_ip`, `clientIp`, `remote_ip`: "…_ip"). Tek başına
+ *     ya da başta (`ip`, `ip_rating`, `ip_class`) DEĞİL: bu depoda `ip_rating` ürünün koruma sınıfıdır (ölçüldü, yanlış alarm).
+ */
+const KISISEL_GENEL_PARCALAR = Object.freeze(['gsm'])
+const KISISEL_GENEL_SON_PARCALAR = Object.freeze(['ip'])
+
+/** Belirgin (≥1 dolu satır) tolerans kökleri: kimlik numarası biçimleri (`tc_kimlik_no`, `tcno`, `kimlik_no`). */
+const KISISEL_BELIRGIN_KOKLER = Object.freeze(['tckn', 'tckimlik', 'tcno', 'kimlikno'])
+
+/**
+ * R2: kolon listesiz INSERT/COPY bu tablolara yazıyorsa ihlal; kolon listeli yazımda da genel alan eşiği 1'dir
+ * (şema tabanından: kişisel kolon taşıyan tablolar + maliyet). 2. tur (O2): taban TARANARAK genişletildi.
+ */
 const HASSAS_TABLOLAR = Object.freeze([
   'user_profiles',
   'contact_messages',
@@ -115,6 +176,13 @@ const HASSAS_TABLOLAR = Object.freeze([
   'user_invoice_profiles',
   'venthub_orders',
   'product_costs',
+  'data_subject_requests',
+  'order_email_events',
+  'quote_email_events',
+  'shipping_email_events',
+  'inventory_settings',
+  'venthub_quotes',
+  'wizard_selections',
 ])
 
 /** R3 kimlik yarısı: tam ad kümesi + `*_kod` soneki. */
@@ -157,6 +225,10 @@ const R4_UZANTILARI = Object.freeze([
   'xlsx',
   'xls',
   'har',
+  'parquet',
+  'ods',
+  'mdb',
+  'accdb',
 ])
 
 /** R4: yol kalıpları. Ad, çıktıda gösterilen kalıptır. */
@@ -170,50 +242,68 @@ const YOL_KURALLARI = Object.freeze([
   { ad: 'toc.dat', eslesir: (k) => k === 'toc.dat' || k.endsWith('/toc.dat') },
 ])
 
-/** R6: ikili veritabanı uzantıları ve SQLite imzası. */
+/**
+ * R6: ikili veritabanı uzantıları ve SQLite imzası. ⭐İmzaya UZANTIDAN BAĞIMSIZ bakılır (2. tur, O1): önceki sürüm
+ * yalnız 7 uzantıda bakıyordu; `app.db.20261006` (tarih sonekli) ve `x.sqlite.orig` (yedek sonekli) görünmüyordu.
+ */
 const R6_UZANTILARI = Object.freeze(['db', 'sqlite', 'sqlite3'])
 const SQLITE_IMZASI = 'SQLite format 3'
-/** İmzaya yalnız bu uzantılı (ya da uzantısız) izlenen dosyalarda bakılır: uzantı değiştirme kasıtlı kapsam dışıdır. */
-const R6_IMZA_UZANTILARI = Object.freeze(['', 'bak', 'bin', 'dat', 'data', 'old', 'tmp'])
 
 /** İzin listesi hangi kurallara açık: R1/R2/R4 ASLA. R5 yalnız kanıtlı sandbox-kart örneği için (tek dosya). */
 const IZIN_KURALLARI = Object.freeze(['R3', 'R5', 'R6'])
 
 /**
- * İZİN LİSTESİ — DOSYA BAZLI. Her satır: { yol, kural, neden, kanit }.
+ * İZİN LİSTESİ — DOSYA BAZLI. Her satır: { yol, kural, blob, neden, kanit }.
+ *   blob: izin verilen İÇERİĞİN `git hash-object` çıktısı (40 hane). ⭐Eşleşme yol + kural + BLOB (O4): dosya
+ *         sonradan gerçek veriyle güncellenirse blob değişir, izin DÜŞER, kapı kırmızı olur ve kanıt yeniden ölçülür.
+ *         Blob'u olmayan ya da uyuşmayan kayıt hiçbir şeyi muaf tutmaz (fail-closed).
  *   R3: `kanit` "fiyat sahte/örnek" olduğunu GÖSTERMELİ.
- *   R6: `kanit` içerik taramasının SAYILARINI taşımalı ve "ayrı kayıt: numara OPS'tan" demeli.
- * Sınırını `depo-dokum-kapisi.test.ts` koyar: tavan, yetim satır yasağı, glob yasağı, kural kümesi.
+ *   R5/R6: `kanit` ölçümün SAYILARINI taşımalı ve "ayrı kayıt önerilecek (numarayı OPS verir)" demeli
+ *          (gerçek bir kayıt numarası YOKTUR; numarayı OPS verir).
+ * Sınırını `depo-dokum-kapisi.test.ts` koyar: tavan, yetim satır yasağı, glob yasağı, kural kümesi, blob bağı.
  */
 const IZIN_LISTESI = Object.freeze([
   {
     yol: 'support/iyzico_support_payload.json',
     kural: 'R5',
+    blob: '3285b69040f28c13121d76e0cb4dfdb66a840f81',
     neden:
       'iyzico destek talebine eklenen örnek yük: kart parçaları sandbox test kartı biçiminde, müşteri kartı değil. İzlemeden çıkarma ayrı iştir.',
     kanit:
-      'kart parçası taraması (sayı): 5 örnek, 5/5 son dört hane 000d biçimli (sandbox test kartı biçimi), metinde "sandbox" geçiyor; yayımlanmış test kartı listesine karşı doğrulama ağ ister ve YAPILMADI; ayrı kayıt: numara OPS\'tan',
+      'kart parçası taraması (sayı): 5 örnek, 5/5 son dört hane 000d biçimli (sandbox test kartı biçimi), metinde "sandbox" geçiyor; yayımlanmış test kartı listesine karşı doğrulama ağ ister ve YAPILMADI; ayrı kayıt önerilecek (numarayı OPS verir)',
   },
   {
     yol: 'memory.db',
     kural: 'R6',
+    blob: '2e2372f9ff7023084588d5f97a2e933dd23eea7f',
     neden: 'Kök dizindeki boş yerel hafıza veritabanı izleniyor; içerik taraması boş çıktı. İzlemeden çıkarma ayrı iştir.',
     kanit:
-      'içerik taraması (salt okuma, 2026-10-06): 4096 bayt, 0 tablo, e-posta/telefon/UUID/TCKN deseni 0; ayrı kayıt: numara OPS\'tan',
+      'içerik taraması (salt okuma, 2026-10-06): 4096 bayt, 0 tablo, e-posta/telefon/UUID/TCKN deseni 0; ayrı kayıt önerilecek (numarayı OPS verir)',
   },
   {
     yol: 'registry/registry.db',
     kural: 'R6',
+    blob: 'e69f52d7f4c4212d19976fbc438fa3d23967d768',
     neden: 'Kayıt defteri (registry) SQLite dosyası izleniyor; içerik taraması kişisel veri bulmadı. İzlemeden çıkarma ayrı iştir.',
     kanit:
-      'içerik taraması (salt okuma, 2026-10-06): 49152 bayt, 2 tablo (projects 11 satır, tasks 77 satır), e-posta/telefon/UUID/TCKN deseni 0; ayrı kayıt: numara OPS\'tan',
+      'içerik taraması (salt okuma, 2026-10-06): 49152 bayt, 2 tablo (projects 11 satır, tasks 77 satır), e-posta/telefon/UUID/TCKN deseni 0; ayrı kayıt önerilecek (numarayı OPS verir)',
   },
   {
     yol: 'registry/_legacy/registry.db',
     kural: 'R6',
+    blob: '5d9ae9dabb048664cee1a5405e386d21b3e53128',
     neden: 'Eski kayıt defteri SQLite dosyası izleniyor; içerik taraması kişisel veri bulmadı. İzlemeden çıkarma ayrı iştir.',
     kanit:
-      'içerik taraması (salt okuma, 2026-10-06): 61440 bayt, 3 tablo (agent_memory 4, projects 8, tasks 77 satır), e-posta/telefon/UUID/TCKN deseni 0; ayrı kayıt: numara OPS\'tan',
+      'içerik taraması (salt okuma, 2026-10-06): 61440 bayt, 3 tablo (agent_memory 4, projects 8, tasks 77 satır), e-posta/telefon/UUID/TCKN deseni 0; ayrı kayıt önerilecek (numarayı OPS verir)',
+  },
+  {
+    yol: '.cc/memory.db.pre_qwen.20260524_1830',
+    kural: 'R6',
+    blob: '61572e7b3caf04b2c46cb435885fb21cafc2e228',
+    neden:
+      'Eski (qwen öncesi, 2026-05-24) yerel hafıza veritabanı yedeği SQLite imzasıyla izleniyor (uzantısı .db değil: ALT-39 2. tur O1 imza taramasının yeni isabeti); içerik taraması kişisel veri bulmadı. İzlemeden çıkarma ayrı iştir.',
+    kanit:
+      'içerik taraması (salt okuma, 2026-10-06): 102400 bayt, 8 tablo (toplam 4 satır: _meta 3, memory_nodes 1; kalan 6 tablo boş), serbest sayfa 0, e-posta/telefon/UUID/TCKN deseni 0 (hem tablo hücreleri hem ham bayt taraması); ayrı kayıt önerilecek (numarayı OPS verir)',
   },
 ])
 
@@ -236,7 +326,65 @@ const HASSAS_TABLO_NORM = new Set(HASSAS_TABLOLAR.map(norm))
 const kimlikAnahtariMi = (nk) => KIMLIK_NORM.has(nk) || KIMLIK_SONEKLERI.some((s) => nk.length > s.length && nk.endsWith(s))
 const fiyatAnahtariMi = (nk) => FIYAT_KOKLERI.some((k) => nk.includes(k))
 
-const EPOSTA_DESENI = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
+/** Anahtarı parçalara ayırır: `_` `-` boşluk ve camelCase sınırları (acceptIp → accept, ip; GSMNo → gsm, no). */
+function anahtarParcalari(ad) {
+  return String(ad)
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
+    .split(/[^A-Za-z0-9çÇğĞıİöÖşŞüÜ]+/)
+    .filter(Boolean)
+    .map(norm)
+}
+
+/** Parça kuralları (KISISEL_GENEL_PARCALAR herhangi bir yerde, KISISEL_GENEL_SON_PARCALAR bileşik adın sonunda). */
+function kisiselParcaMi(parcalar) {
+  if (parcalar.some((p) => KISISEL_GENEL_PARCALAR.includes(p))) return true
+  return parcalar.length >= 2 && KISISEL_GENEL_SON_PARCALAR.includes(parcalar[parcalar.length - 1])
+}
+
+/**
+ * URL/yol değeri (`/tr/urun/x`, `https://…`): bu depoda `adres` çoğunlukla URL ADRESİDİR (adres_tr, adres matrisi); kişisel adres
+ * değil. Tolerans (genel sınıf) için böyle bir değer "dolu kişisel değer" sayılmaz. Belirgin adlarda uygulanmaz.
+ */
+const urlDegeriMi = (v) => typeof v === 'string' && /^\s*(?:\/|https?:\/\/)/i.test(v)
+
+const sinifOnbellek = new Map()
+
+/**
+ * Bir alan adının kişisel sınıfı (O2, TOLERANSLI): 'belirgin' (≥1 dolu satır) · 'genel' (≥KISISEL_ESIK dolu satır) · null.
+ * Sıra: tam sözlük adı → tolerans kökü (içerir) → tam parça (`ip`, `gsm`). Aksan/büyük-küçük/ayraç fark etmez.
+ * JSON anahtarı, CSV başlığı, SQL kolonu ve ham metin anahtarı AYNI sınıflandırıcıdan geçer: kapsam tek yerde.
+ */
+function kisiselAlanSinifi(ad) {
+  const anahtar = String(ad)
+  const onceki = sinifOnbellek.get(anahtar)
+  if (onceki !== undefined) return onceki
+  const nk = norm(anahtar)
+  let sinif = null
+  if (KISISEL_NORM.has(nk) || KISISEL_BELIRGIN_KOKLER.some((k) => nk.includes(k))) sinif = 'belirgin'
+  else if (
+    GENEL_NORM.has(nk) ||
+    KISISEL_GENEL_KOKLER.some((k) => nk.includes(k)) ||
+    kisiselParcaMi(anahtarParcalari(anahtar))
+  ) {
+    sinif = 'genel'
+  }
+  if (anahtar.length <= 256) {
+    if (sinifOnbellek.size >= 20000) sinifOnbellek.clear()
+    sinifOnbellek.set(anahtar, sinif)
+  }
+  return sinif
+}
+
+/**
+ * Çıktıya basılacak alan etiketi: yalnız kimlik-benzeri (harf/rakam/_/-, ≤40) anahtar olduğu gibi basılır. Tolerans
+ * sayesinde artık ham anahtar rastgele metin olabilir (sözlük adı değil); değer basmama ilkesi için başka biçim basılmaz.
+ */
+const alanEtiketi = (ad) => (/^[A-Za-z0-9_-]{1,40}$/.test(String(ad).trim()) ? String(ad).trim() : '(kişisel kalıba uyan anahtar)')
+
+// D3: sınırlı nicelikler. Önceki desen `[A-Za-z0-9._%+-]+@…` uzun harf dizisinde (200 000 harflik başlık hücresi) KARESELDİ.
+// RFC 5321: yerel kısım ≤64, alan ≤255; üst alan adı ≤24 yeter (arama bölümsel, anchor yok).
+const EPOSTA_DESENI = /[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9.-]{1,255}\.[A-Za-z]{2,24}/
 const UUID_DESENI = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/
 const SAF_SAYI_DESENI = /^[+-]?\d+(?:[.,]\d+)?$/
 
@@ -464,10 +612,13 @@ function jsonGez(belgeler, satirDizisi) {
   let r5 = false
   let enCok = satirDizisi ? belgeler.filter(fiyatSatiriMi).length : 0
   const kisiselSay = (k, v) => {
-    const nk = norm(k)
-    if (KISISEL_NORM.has(nk) && doluMu(v)) alanlar.add(k)
-    if (GENEL_NORM.has(nk) && doluMu(v)) {
-      const g = genel.get(nk) || { ad: k, sayi: 0 }
+    const sinif = kisiselAlanSinifi(k)
+    if (sinif === null || !doluMu(v)) return
+    if (sinif === 'genel' && urlDegeriMi(v)) return
+    if (sinif === 'belirgin') alanlar.add(alanEtiketi(k))
+    else {
+      const nk = norm(k)
+      const g = genel.get(nk) || { ad: alanEtiketi(k), sayi: 0 }
       g.sayi++
       genel.set(nk, g)
     }
@@ -514,23 +665,70 @@ function alanDeseni(ad) {
  * Satır satır değil TÜM metin üzerinde çalışır: çok satırlı nesneler de yakalanır.
  */
 function hamTara(metin) {
-  const dolu = '(?:"[^"\\s][^"]*"|\'[^\'\\s][^\']*\'|-?\\d|\\{\\s*["\'\\w]|\\[\\s*["\'\\w{])'
+  const dolu = HAM_DOLU
   const say = (ad) => {
     const p = alanDeseni(ad)
     const duz = new RegExp(`["']?${p}["']?\\s*[:=]\\s*${dolu}`, 'gi')
     const akis = new RegExp(`["']${p}["']\\s*\\]\\s*,\\s*${dolu}`, 'gi')
     return (metin.match(duz) || []).length + (metin.match(akis) || []).length
   }
-  const alanlar = KISISEL_ALANLAR.filter((a) => say(a) >= 1).sort()
-  const genel = KISISEL_GENEL_ALANLAR.filter((a) => say(a) >= KISISEL_ESIK).sort()
+  const belirgin = new Set(KISISEL_ALANLAR.filter((a) => say(a) >= 1))
+  const genelKume = new Set(KISISEL_GENEL_ALANLAR.filter((a) => say(a) >= KISISEL_ESIK))
+  // Tolerans (O2): sözlükte olmayan ama kişisel kalıba uyan anahtarlar (applicant_email, accept_ip, telefon…).
+  for (const g of hamAnahtarlar(metin).values()) {
+    if (g.sinif === 'belirgin' && g.sayi >= 1) belirgin.add(g.ad)
+    if (g.sinif === 'genel' && g.sayi >= KISISEL_ESIK) genelKume.add(g.ad)
+  }
+  const alanlar = [...belirgin].sort()
+  const genel = [...genelKume].sort()
   const binler = [...metin.matchAll(new RegExp(`["']?${alanDeseni('bin_number')}["']?\\s*[:=]\\s*["']?(\\d{6})`, 'gi'))].map((m) => m[1])
   const sonDortVar = new RegExp(`["']?${alanDeseni('last_four_digits')}["']?\\s*[:=]`, 'i').test(metin)
   const r5 = sonDortVar && binler.some((b) => !BIN_SAYACI.test(b))
+  // D3: anahtar çevresindeki `[A-Za-z_]*` SINIRSIZDI (alternasyonun iki yanında): uzun harf dizisinde kübik geri izleme, ham
+  // taramayı (ayrıştırılamayan dosya = saldırganın seçtiği girdi) kilitlerdi. Sınır {0,40}: gerçek anahtar adları bundan kısadır.
   const fiyat = (
-    metin.match(/["']?[A-Za-z_]*(?:price|cost|fiyat|maliyet|alis)[A-Za-z_]*["']?\s*[:=]\s*["']?[1-9]\d*(?:[.,]\d+)?/gi) || []
+    metin.match(/["']?[A-Za-z_]{0,40}(?:price|cost|fiyat|maliyet|alis)[A-Za-z_]{0,40}["']?\s*[:=]\s*["']?[1-9]\d*(?:[.,]\d+)?/gi) || []
   ).length
-  const kimlik = (metin.match(/["'](?:id|sku|slug|product_id|product_sku|model_code|[A-Za-z_]*kod)["']\s*[:=]/gi) || []).length
+  const kimlik = (metin.match(/["'](?:id|sku|slug|product_id|product_sku|model_code|[A-Za-z_]{0,40}kod)["']\s*[:=]/gi) || []).length
   return { alanlar, genel, r5, r3: fiyat >= FIYAT_ESIGI && kimlik >= FIYAT_ESIGI }
+}
+
+/** Ham metinde "dolu görünen değer" başlangıcı: dize, sayı, nesne ya da dizi açılışı. */
+const HAM_DOLU = '(?:"[^"\\s][^"]*"|\'[^\'\\s][^\']*\'|-?\\d|\\{\\s*["\'\\w]|\\[\\s*["\'\\w{])'
+
+/**
+ * Tolerans taraması (O2): `anahtar<ayraç>dolu değer` çiftlerini bulur; anahtar ayraçtan GERİYE doğru en çok 48 karakter
+ * okunur (sınırsız ileri desen yok: doğrusal). Tam sözlük adları `say` ile sayılır, burada atlanır (çift sayım olmasın).
+ * @returns {Map<string, {ad: string, sinif: string, sayi: number}>}
+ */
+function hamAnahtarlar(metin) {
+  const sonuc = new Map()
+  const ayrac = /[:=]/g
+  const dolu = new RegExp(`\\s*${HAM_DOLU}`, 'y')
+  let m
+  while ((m = ayrac.exec(metin)) !== null) {
+    let j = m.index - 1
+    while (j >= 0 && (metin[j] === ' ' || metin[j] === '\t')) j--
+    if (j >= 0 && (metin[j] === '"' || metin[j] === "'")) j--
+    const son = j
+    let n = 0
+    while (j >= 0 && n < 48 && /[A-Za-z0-9_ -]/.test(metin[j])) {
+      j--
+      n++
+    }
+    const ad = metin.slice(j + 1, son + 1).trim()
+    if (ad === '') continue
+    const nk = norm(ad)
+    if (KISISEL_NORM.has(nk) || GENEL_NORM.has(nk)) continue
+    const sinif = kisiselAlanSinifi(ad)
+    if (sinif === null) continue
+    dolu.lastIndex = m.index + 1
+    if (!dolu.test(metin)) continue
+    const g = sonuc.get(nk) || { ad: alanEtiketi(ad), sinif, sayi: 0 }
+    g.sayi++
+    sonuc.set(nk, g)
+  }
+  return sonuc
 }
 
 // ── CSV / TSV ───────────────────────────────────────────────────────────────────────────────────
@@ -615,10 +813,14 @@ function csvKisisel({ baslik, govde }) {
   const alanlar = new Set()
   const genel = new Set()
   baslik.forEach((b, i) => {
-    const nb = norm(b)
-    const dolu = govde.filter((r) => (r[i] || '').trim() !== '').length
-    if (KISISEL_NORM.has(nb) && dolu >= 1) alanlar.add(String(b).trim())
-    if (GENEL_NORM.has(nb) && dolu >= KISISEL_ESIK) genel.add(String(b).trim())
+    const sinif = kisiselAlanSinifi(b)
+    if (sinif === null) return
+    const dolu = govde.filter((r) => {
+      const hucre = (r[i] || '').trim()
+      return hucre !== '' && !(sinif === 'genel' && urlDegeriMi(hucre))
+    }).length
+    if (sinif === 'belirgin' && dolu >= 1) alanlar.add(alanEtiketi(b))
+    if (sinif === 'genel' && dolu >= KISISEL_ESIK) genel.add(alanEtiketi(b))
   })
   return { alanlar: [...alanlar].sort(), genel: [...genel].sort() }
 }
@@ -824,12 +1026,120 @@ const kolonAdlari = (liste) =>
     : null
 const tabloAdi = (ham) => ham.replace(/"/g, '').split('.').pop()
 
+/** Dize İÇERİKLERİNİ aynı uzunlukta `_` ile doldurur: konumlar korunur, yapı (parantez, virgül, anahtar sözcük) aranabilir. */
+const dizeleriKapat = (metin) => metin.replace(/'(?:[^']|'')*'/g, (s) => `'${'_'.repeat(s.length - 2)}'`)
+
+/**
+ * `kapali` metinde (dizeler doldurulmuş) `bas`tan itibaren, parantez DIŞINDA ve dize/tırnaklı ad DIŞINDA ilk anahtar sözcüğün
+ * konumu; yoksa -1. Anahtar sözcükler küçük harf verilir.
+ */
+function ustSeviyeAnahtar(kapali, bas, anahtarlar) {
+  let derin = 0
+  let dizede = false
+  let tirnakta = false
+  for (let i = bas; i < kapali.length; i++) {
+    const c = kapali[i]
+    if (dizede) {
+      if (c === "'") dizede = false
+      continue
+    }
+    if (tirnakta) {
+      if (c === '"') tirnakta = false
+      continue
+    }
+    if (c === "'") dizede = true
+    else if (c === '"') tirnakta = true
+    else if (c === '(') derin++
+    else if (c === ')') derin--
+    else if (derin === 0 && /[A-Za-z_]/.test(c) && !/[A-Za-z0-9_]/.test(kapali[i - 1] || ' ')) {
+      let j = i
+      while (j < kapali.length && /[A-Za-z0-9_]/.test(kapali[j])) j++
+      if (anahtarlar.includes(kapali.slice(i, j).toLowerCase())) return i
+      i = j - 1
+    }
+  }
+  return -1
+}
+
+/** `[bas, son)` aralığını parantez DIŞINDAKİ virgüllerden böler: [[a, b], …] konum çiftleri. */
+function ustSeviyeParcalar(kapali, bas, son) {
+  const sonuc = []
+  let derin = 0
+  let bol = bas
+  let dizede = false
+  let tirnakta = false
+  for (let i = bas; i < son; i++) {
+    const c = kapali[i]
+    if (dizede) {
+      if (c === "'") dizede = false
+      continue
+    }
+    if (tirnakta) {
+      if (c === '"') tirnakta = false
+      continue
+    }
+    if (c === "'") dizede = true
+    else if (c === '"') tirnakta = true
+    else if (c === '(') derin++
+    else if (c === ')') derin--
+    else if (c === ',' && derin === 0) {
+      sonuc.push([bol, i])
+      bol = i + 1
+    }
+  }
+  sonuc.push([bol, son])
+  return sonuc
+}
+
+/** Parçadaki ilk üst düzey atama `=` konumu (`<=`, `>=`, `!=`, `:=` değil); yoksa -1. */
+function atamaKonumu(kapali, a, b) {
+  let derin = 0
+  for (let i = a; i < b; i++) {
+    const c = kapali[i]
+    if (c === '(') derin++
+    else if (c === ')') derin--
+    else if (c === '=' && derin === 0 && !/[<>!:=]/.test(kapali[i - 1] || ' ') && kapali[i + 1] !== '=') return i
+  }
+  return -1
+}
+
+/** UPDATE sağ tarafı VERİ literali mi: boş olmayan dize, dollar-quote ya da ≥5 haneli sayı (boş dize, NULL, fonksiyon, sütun DEĞİL). */
+const veriLiteraliMi = (rhs) => /^[eEnNbBxX]?'(?:[^']|'')+'/.test(rhs) || /^\$[A-Za-z_]*\$/.test(rhs) || /^[+-]?\d{5,}(?!\d)/.test(rhs)
+
+/**
+ * `UPDATE [ONLY] <tablo> SET <kolon> = <dize>, …` ifadesi (O3): yalnız DEĞER atanan kolonlar `kolonlar` olur (`SET x = lower(x)`
+ * ve WHERE koşulları veri DEĞİLDİR). Satır sayısı bilinemez: ifade başına 1 (alt sınır).
+ * @returns {null | {tur: 'UPDATE', tablo: string, kolonlar: string[], satir: number}}
+ */
+function updateAyrinti(metin) {
+  const kapali = dizeleriKapat(metin)
+  const baslik = /^\s*update\s+(?:only\s+)?((?:"[^"]*"|[^\s(".]+)(?:\.(?:"[^"]*"|[^\s(".]+))*)/i.exec(kapali)
+  if (!baslik) return null
+  const setKonumu = ustSeviyeAnahtar(kapali, baslik[0].length, ['set'])
+  if (setKonumu < 0) return null
+  const bas = setKonumu + 3
+  let son = ustSeviyeAnahtar(kapali, bas, ['from', 'where', 'returning'])
+  if (son < 0) son = kapali.length
+  const kolonlar = []
+  for (const [a, b] of ustSeviyeParcalar(kapali, bas, son)) {
+    const es = atamaKonumu(kapali, a, b)
+    if (es < 0) continue
+    if (!veriLiteraliMi(metin.slice(es + 1, b).trim().replace(/^\(\s*/, ''))) continue
+    for (const k of kapali.slice(a, es).replace(/[()]/g, ' ').split(',')) {
+      const ad = k.trim().replace(/"/g, '').split('.').pop()
+      if (ad) kolonlar.push(ad)
+    }
+  }
+  return { tur: 'UPDATE', tablo: tabloAdi(baslik[1]), kolonlar, satir: 1 }
+}
+
 /**
  * Bir SQL ifadesinin VERİ ifadesi olup olmadığı ve ayrıntısı. `INSERT ... SELECT` ve tanımlar veri DEĞİLDİR.
- * @returns {null | {tur: 'COPY'|'INSERT', tablo: string, kolonlar: string[]|null, satir: number}}
+ * @returns {null | {tur: 'COPY'|'INSERT'|'UPDATE', tablo: string, kolonlar: string[]|null, satir: number}}
  */
 function veriIfadesiAyrinti(ifade) {
   const metin = ifade.metin
+  if (/^\s*update\b/i.test(metin)) return updateAyrinti(metin)
   if (COPY_STDIN.test(metin)) {
     const m = COPY_BASLIK.exec(metin)
     return { tur: 'COPY', tablo: m ? tabloAdi(m[1]) : '', kolonlar: m ? kolonAdlari(m[2]) : null, satir: ifade.veriSatiri }
@@ -860,25 +1170,58 @@ function veriIfadesiTuru(ifade) {
 function sqlDegerlendir(sql) {
   const { ifadeler, bozuk } = sqlBol(sql)
   const bulgular = []
+  // O3: satırlar DOSYA genelinde TABLO başına toplanır. `pg_dump --column-inserts` her satırı AYRI INSERT yazar (satır=1);
+  // ifade başına sayan eşik bunu hiç görmezdi. Tablo adı normalleştirilir (şema öneki ve tırnak atılmış).
+  const tablolar = new Map() // norm(tablo) -> { ad, hassas, turler: Set, genel: Map(nk -> {ad, satir}), r3: number }
+  const tabloKaydi = (ad) => {
+    const nt = norm(ad)
+    if (!tablolar.has(nt)) {
+      const etiket = /^[A-Za-z0-9_$-]{1,63}$/.test(ad) ? ad : '(tablo adı çözülemedi)'
+      tablolar.set(nt, { ad: etiket, hassas: HASSAS_TABLO_NORM.has(nt), turler: new Set(), genel: new Map(), r3: 0 })
+    }
+    return tablolar.get(nt)
+  }
   for (const ifade of ifadeler) {
     const a = veriIfadesiAyrinti(ifade)
     if (!a) continue
-    const alanlar = new Set((ifade.metin.match(KISISEL_SQL) || []).map((x) => x.toLowerCase()))
+    // UPDATE'te kişisel adın İFADE METNİNDE geçmesi yetmez (`SET customer_email = lower(customer_email)` veri atamaz): yalnız
+    // değer atanan kolonlar sayılır. INSERT/COPY'de eski davranış korunur (alan adı ifade metninde geçiyorsa).
+    const alanlar = new Set(a.tur === 'UPDATE' ? [] : (ifade.metin.match(KISISEL_SQL) || []).map((x) => x.toLowerCase()))
     const kol = a.kolonlar ? a.kolonlar.map(norm) : []
+    const t = tabloKaydi(a.tablo)
     for (const k of a.kolonlar || []) {
-      const nk = norm(k)
-      if (KISISEL_NORM.has(nk)) alanlar.add(k.toLowerCase())
-      if (GENEL_NORM.has(nk) && a.satir >= KISISEL_ESIK) alanlar.add(k.toLowerCase())
+      const sinif = kisiselAlanSinifi(k)
+      if (sinif === 'belirgin') alanlar.add(alanEtiketi(k).toLowerCase())
+      else if (sinif === 'genel') {
+        const nk = norm(k)
+        const g = t.genel.get(nk) || { ad: alanEtiketi(k), satir: 0 }
+        g.satir += a.satir
+        t.genel.set(nk, g)
+        t.turler.add(a.tur)
+      }
     }
     if (alanlar.size > 0) bulgular.push({ kural: 'R2', ayrinti: `${a.tur} ifadesi, alan: ${[...alanlar].sort().join(', ')}` })
-    if (a.kolonlar === null && HASSAS_TABLO_NORM.has(norm(a.tablo))) {
-      bulgular.push({ kural: 'R2', ayrinti: `${a.tur} ifadesi kolon listesiz, hassas tablo: ${a.tablo}` })
+    if (a.kolonlar === null && t.hassas) {
+      bulgular.push({ kural: 'R2', ayrinti: `${a.tur} ifadesi kolon listesiz, hassas tablo: ${t.ad}` })
     }
-    if (kol.some(kimlikAnahtariMi) && kol.some(fiyatAnahtariMi) && a.satir >= FIYAT_ESIGI) {
-      bulgular.push({ kural: 'R3', ayrinti: `${a.tur} ifadesi, ${a.satir} satır (kimlik + fiyat kolonu)` })
+    if (kol.some(kimlikAnahtariMi) && kol.some(fiyatAnahtariMi)) {
+      t.r3 += a.satir
+      t.turler.add(a.tur)
     }
     if (kol.includes('binnumber') && kol.includes('lastfourdigits')) {
       bulgular.push({ kural: 'R5', ayrinti: `${a.tur} ifadesi: binNumber + lastFourDigits kolonları` })
+    }
+  }
+  for (const t of tablolar.values()) {
+    // Hassas tabloda genel alan eşiği 1: o tabloya kolon listesiyle yazılan TEK satır bile kişisel veridir (tek satırlık tohum).
+    const esik = t.hassas ? 1 : KISISEL_ESIK
+    const vurgu = [...t.genel.values()].filter((g) => g.satir >= esik).map((g) => g.ad)
+    const turler = [...t.turler].sort().join('/')
+    if (vurgu.length > 0) {
+      bulgular.push({ kural: 'R2', ayrinti: `${turler} ifadeleri, tablo ${t.ad}: genel alan (dosya genelinde ≥${esik} satır): ${vurgu.sort().join(', ')}` })
+    }
+    if (t.r3 >= FIYAT_ESIGI) {
+      bulgular.push({ kural: 'R3', ayrinti: `${turler} ifadeleri, tablo ${t.ad}: ${t.r3} satır (kimlik + fiyat kolonu, dosya genelinde)` })
     }
   }
   return { bulgular, bozuk }
@@ -946,29 +1289,40 @@ function dosyaTara(yol, metin) {
   return dosyaDegerlendir(yol, metin).bulgular
 }
 
-/** İzin listesi bu dosya + kural için geçerli mi? YALNIZ IZIN_KURALLARI. */
-function izinliMi(yol, kural, izin) {
-  return IZIN_KURALLARI.includes(kural) && izin.some((e) => e.yol === yol && e.kural === kural)
+/**
+ * İzin listesi bu dosya + kural + BLOB için geçerli mi? YALNIZ IZIN_KURALLARI (O4).
+ * `blobOku`: içeriğin `git hash-object` değerini döner (yalnız yol+kural eşleşince çağrılır); bilinmiyorsa `null`.
+ * Kayıtta `blob` yoksa ya da içerikle uyuşmuyorsa izin YOKTUR: içeriği sabit olmayan izin, dosya sonradan gerçek veriyle
+ * güncellense de sürerdi ("anlamsal kaçış").
+ */
+function izinliMi(yol, kural, izin, blobOku) {
+  if (!IZIN_KURALLARI.includes(kural)) return false
+  const adaylar = izin.filter((e) => e.yol === yol && e.kural === kural && typeof e.blob === 'string' && /^[0-9a-f]{40}$/.test(e.blob))
+  if (adaylar.length === 0) return false
+  const blob = blobOku()
+  return typeof blob === 'string' && adaylar.some((e) => e.blob === blob)
 }
 
 /**
  * Tüm ağacı tarar.
- * @param {{dosyalar:string[], oku:(yol:string)=>string|null, izin?:ReadonlyArray<{yol:string,kural:string}>, ikili?:(yol:string)=>boolean}} g
+ * @param {{dosyalar:string[], oku:(yol:string)=>string|null, izin?:ReadonlyArray<{yol:string,kural:string,blob?:string}>, ikili?:(yol:string)=>boolean, blobOf?:(yol:string)=>string|null}} g
  *   `oku`: içerik döner; dosya diskte yoksa `null` (atlanır); okunamıyorsa FIRLATIR (çağıran 2 döner).
- *   `ikili`: yolu SQLite imzasına karşı denetler (uzantısı R6 olmayan adaylar için).
+ *   `ikili`: yolu SQLite imzasına karşı denetler (UZANTIDAN BAĞIMSIZ: her dosya için çağrılır, uzantısı R6 olanlar hariç).
+ *   `blobOf`: yolun içeriğinin `git hash-object` değeri; verilmezse izin kaydı hiçbir şeyi muaf tutmaz (fail-closed).
  */
-function tara({ dosyalar, oku, izin = IZIN_LISTESI, ikili }) {
+function tara({ dosyalar, oku, izin = IZIN_LISTESI, ikili, blobOf }) {
   const ihlaller = []
   const izinliler = []
   const olculemedi = []
   let veriDosyasi = 0
-  const kaydet = (kayit) => (izinliMi(kayit.dosya, kayit.kural, izin) ? izinliler : ihlaller).push(kayit)
+  const kaydet = (kayit) =>
+    (izinliMi(kayit.dosya, kayit.kural, izin, () => (blobOf ? blobOf(kayit.dosya) : null)) ? izinliler : ihlaller).push(kayit)
   for (const yol of dosyalar) {
     for (const ad of yolIhlali(yol)) ihlaller.push({ kural: 'R4', ad: KURALLAR.R4, dosya: yol, ayrinti: `kalıp: ${ad}` })
     const uz = uzanti(yol)
     if (ikiliUzantiMi(yol)) {
       kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: `izlenen ikili veritabanı (.${uz})` })
-    } else if (ikili && R6_IMZA_UZANTILARI.includes(uz) && ikili(yol)) {
+    } else if (ikili && ikili(yol)) {
       kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'izlenen ikili veritabanı (SQLite imzası)' })
     }
     if (!VERI_UZANTILARI.includes(uz)) continue
@@ -1028,20 +1382,43 @@ function diskOkuyucu(kok, sinir = BUYUK_DOSYA_SINIRI) {
   }
 }
 
-/** Yolun ilk 16 baytı SQLite imzası mı? (yalnız R6 aday uzantıları için çağrılır) */
+/** Başlığın (ilk baytların) SQLite imzası olup olmadığı. */
+const sqliteBaslikMi = (tampon) => tampon.length >= SQLITE_IMZASI.length && tampon.toString('latin1', 0, SQLITE_IMZASI.length) === SQLITE_IMZASI
+
+/**
+ * Yolun ilk 16 baytı SQLite imzası mı? UZANTIDAN BAĞIMSIZ, her izlenen dosya için çağrılır (O1). Diskte olmayan ya da düzenli
+ * dosya olmayan yol (alt modül, bağ) `false`; BAŞKA bir okuma hatası FIRLATIR (çağıran çıkış 2 döner): okunamayan dosya
+ * "ikili değil" diye geçmez.
+ */
 function sqliteImzasiMi(kok) {
   return (yol) => {
+    const mutlak = path.join(kok, yol)
+    let st
     try {
-      const fd = fs.openSync(path.join(kok, yol), 'r')
-      try {
-        const tampon = Buffer.alloc(16)
-        const n = fs.readSync(fd, tampon, 0, 16, 0)
-        return n >= SQLITE_IMZASI.length && tampon.toString('latin1', 0, SQLITE_IMZASI.length) === SQLITE_IMZASI
-      } finally {
-        fs.closeSync(fd)
-      }
+      st = fs.lstatSync(mutlak)
+    } catch (e) {
+      if (e && e.code === 'ENOENT') return false
+      throw e
+    }
+    if (!st.isFile() || st.size < SQLITE_IMZASI.length) return false
+    const fd = fs.openSync(mutlak, 'r')
+    try {
+      const tampon = Buffer.alloc(16)
+      const n = fs.readSync(fd, tampon, 0, 16, 0)
+      return sqliteBaslikMi(tampon.subarray(0, n))
+    } finally {
+      fs.closeSync(fd)
+    }
+  }
+}
+
+/** Yolun içeriğinin `git hash-object` değeri (izin kaydının blob bağı). Hesaplanamazsa `null` → izin yok (fail-closed). */
+function gitBlobu(kok, env) {
+  return (yol) => {
+    try {
+      return git(kok, env, ['hash-object', '--', yol]).toString('utf8').trim()
     } catch {
-      return false
+      return null
     }
   }
 }
@@ -1050,14 +1427,29 @@ function sqliteImzasiMi(kok) {
 
 /**
  * `git rev-list --objects <uç>... --not (--remotes | <haric>...)` ile erişilen TÜM blob'ları tarar:
- * sonradan silinmiş dosyalar dahil. Yol kuralları (R4/R6) her yola, içerik kuralları veri uzantılı blob'lara.
- * Tavan aşılırsa ya da bir blob okunamazsa FIRLATIR (çağıran 2 döner).
+ * sonradan silinmiş dosyalar dahil. Yol kuralları (R4/R6) her yola, içerik kuralları veri uzantılı blob'lara,
+ * SQLite imzası (R6) UZANTIDAN BAĞIMSIZ her aday blob'un başlığına uygulanır.
+ *
+ * ⭐D2: `rev-list --objects` her blob'u TEK yolla basar (ilk gördüğü). Aynı içerik hem uzantısız hem veri uzantılı yolla
+ * itilirse içerik taraması basılan yola bağlı olurdu. Yollar bu yüzden commit başına `git diff-tree -r` ile (yeni/değişen)
+ * toplanır ve her blob TAŞIYAN HER YOLLA ölçülür.
+ *
+ * ⭐Y1: tavan (nesne sayısı, okunacak bayt) aşılırsa TÜM TARAMA İPTAL EDİLMEZ: sığanlar taranır, sığmayanlar "ölçülemedi"
+ * diye listelenir (çıkış 2). Git hatası ya da okunamayan blob yine FIRLATIR (çağıran 2 döner).
  */
 function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = IZIN_LISTESI, nesneTavani = NESNE_TAVANI, okumaTavani = OKUMA_TAVANI }) {
   const args = ['rev-list', '--objects', ...ucler, '--not', ...(haric.length > 0 ? haric : ['--remotes'])]
-  const satirlar = git(kok, env, args).toString('utf8').split('\n').filter((s) => s.trim() !== '')
-  if (satirlar.length > nesneTavani) {
-    throw new Error(`yeni nesne sayısı tavanı aştı (${satirlar.length} > ${nesneTavani}); taranamadı`)
+  const tumSatirlar = git(kok, env, args).toString('utf8').split('\n').filter((s) => s.trim() !== '')
+  const ihlaller = []
+  const izinliler = []
+  const olculemedi = []
+  let satirlar = tumSatirlar
+  if (tumSatirlar.length > nesneTavani) {
+    satirlar = tumSatirlar.slice(0, nesneTavani)
+    olculemedi.push({
+      dosya: '(yeni nesneler)',
+      ayrinti: `yeni nesne sayısı tavanı aştı (${tumSatirlar.length} > ${nesneTavani}): ilk ${nesneTavani} nesne tarandı, kalan ${tumSatirlar.length - nesneTavani} nesne TARANAMADI`,
+    })
   }
   const yollar = new Map() // sha -> Set(yol)
   const tumSha = []
@@ -1078,11 +1470,29 @@ function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = I
       if (p.length === 3) bilgi.set(p[0], { tur: p[1], boyut: Number(p[2]) })
     }
   }
-  const ihlaller = []
-  const izinliler = []
-  const olculemedi = []
-  const kaydet = (kayit) => (izinliMi(kayit.dosya, kayit.kural, izin) ? izinliler : ihlaller).push(kayit)
-  const okunacak = []
+  // D2: her yeni commit'in yeni/değişen yolları (birleşme commit'inde `-c`: yalnız çakışma çözümü). Yalnız YENİ blob'lar sayılır.
+  const commitler = tumSha.filter((s) => bilgi.get(s)?.tur === 'commit')
+  if (commitler.length > 0) {
+    const parcalar = git(kok, env, ['diff-tree', '--stdin', '-r', '-c', '--root', '--no-commit-id', '--no-abbrev', '-z'], `${commitler.join('\n')}\n`)
+      .toString('utf8')
+      .split('\0')
+    for (let i = 0; i < parcalar.length; i++) {
+      const baslik = parcalar[i]
+      if (!baslik.startsWith(':')) continue
+      const ebeveyn = baslik.length - baslik.replace(/^:+/, '').length // başındaki `:` sayısı = ebeveyn sayısı (birleşmede ≥2)
+      const alanlar = baslik.replace(/^:+/, '').split(' ')
+      const hedefKip = alanlar[ebeveyn]
+      const hedefSha = alanlar[2 * ebeveyn + 1]
+      const yol = parcalar[i + 1]
+      i++ // yol belirteci
+      if (!yol || hedefKip === '160000' || !hedefSha || bilgi.get(hedefSha)?.tur !== 'blob') continue
+      if (!yollar.has(hedefSha)) yollar.set(hedefSha, new Set())
+      yollar.get(hedefSha).add(yol)
+    }
+  }
+  const kaydet = (kayit, blob) => (izinliMi(kayit.dosya, kayit.kural, izin, () => blob) ? izinliler : ihlaller).push(kayit)
+  const veriOgeleri = [] // içeriği kural taramasına girecek blob'lar (veri uzantılı yolu olanlar)
+  const imzaOgeleri = [] // yalnız SQLite başlığına bakılacak aday blob'lar
   let blobSayisi = 0
   const goruldu = new Set()
   for (const [sha, kumeler] of yollar) {
@@ -1098,22 +1508,42 @@ function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = I
         }
       }
       if (ikiliUzantiMi(yol)) {
-        const anahtar = `R6\0${yol}`
+        const anahtar = `R6\0${yol}\0${sha}`
         if (!goruldu.has(anahtar)) {
           goruldu.add(anahtar)
-          kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: `izlenen ikili veritabanı (.${uzanti(yol)})` })
+          kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: `izlenen ikili veritabanı (.${uzanti(yol)})` }, sha)
         }
       }
     }
-    const veriYolu = [...kumeler].find((y) => VERI_UZANTILARI.includes(uzanti(y)))
-    if (veriYolu) {
-      if (b.boyut > BUYUK_DOSYA_SINIRI) olculemedi.push({ dosya: veriYolu, ayrinti: `veri blob'u çok büyük (${b.boyut} bayt); taranamadı` })
-      else okunacak.push({ sha, yol: veriYolu, boyut: b.boyut })
+    const yolListesi = [...kumeler]
+    const veriYollari = yolListesi.filter((y) => VERI_UZANTILARI.includes(uzanti(y)))
+    // Uzantısı zaten R6 olan yollar yukarıda kaydedildi; AYNI içeriği taşıyan BAŞKA yollar (a-yedek, veri.json) imzayla ayrıca ölçülür.
+    const digerYollar = yolListesi.filter((y) => !ikiliUzantiMi(y))
+    if (veriYollari.length > 0 && b.boyut > BUYUK_DOSYA_SINIRI) {
+      olculemedi.push({ dosya: veriYollari[0], ayrinti: `veri blob'u çok büyük (${b.boyut} bayt); taranamadı` })
+    } else if (veriYollari.length > 0) {
+      veriOgeleri.push({ sha, yollar: yolListesi, veriYollari, digerYollar, boyut: b.boyut })
+    } else if (digerYollar.length > 0 && b.boyut >= SQLITE_IMZASI.length) {
+      imzaOgeleri.push({ sha, yollar: yolListesi, veriYollari: [], digerYollar, boyut: b.boyut })
     }
   }
+  // Okuma bütçesi: önce veri blob'ları, sonra imza adayları; SIĞMAYAN "ölçülemedi" (Y1: sığanı tara, kalanı listele).
+  const okunacak = []
+  const atlanan = []
   let toplam = 0
-  for (const o of okunacak) toplam += o.boyut
-  if (toplam > okumaTavani) throw new Error(`okunacak veri blob'ları tavanı aştı (${toplam} > ${okumaTavani} bayt); taranamadı`)
+  for (const o of [...veriOgeleri, ...imzaOgeleri]) {
+    if (toplam + o.boyut > okumaTavani) atlanan.push(o)
+    else {
+      toplam += o.boyut
+      okunacak.push(o)
+    }
+  }
+  for (const o of atlanan.slice(0, 20)) {
+    olculemedi.push({ dosya: o.yollar[0], ayrinti: `okuma tavanı aşıldı (${okumaTavani} bayt): bu blob (${o.boyut} bayt) TARANAMADI` })
+  }
+  if (atlanan.length > 20) {
+    olculemedi.push({ dosya: '(yeni nesneler)', ayrinti: `okuma tavanı nedeniyle ${atlanan.length - 20} blob daha TARANAMADI (ilk 20 adıyla yukarıda)` })
+  }
   let veriBlob = 0
   // 64 MB'lık gruplar halinde oku
   for (let bas = 0; bas < okunacak.length; ) {
@@ -1130,17 +1560,29 @@ function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = I
       const nl = cikti.indexOf(0x0a, konum)
       const baslik = cikti.toString('utf8', konum, nl).split(' ')
       const boyut = Number(baslik[2])
-      if (baslik[1] !== 'blob' || !Number.isFinite(boyut)) throw new Error(`blob okunamadı: ${g.yol}`)
-      const icerik = metneCevir(cikti.subarray(nl + 1, nl + 1 + boyut))
+      if (baslik[1] !== 'blob' || !Number.isFinite(boyut)) throw new Error(`blob okunamadı: ${g.yollar[0]}`)
+      const ham = cikti.subarray(nl + 1, nl + 1 + boyut)
       konum = nl + 1 + boyut + 1
+      // O1: SQLite imzası UZANTIDAN BAĞIMSIZ (uzantısı zaten R6 olanlar yukarıda kaydedildi)
+      if (sqliteBaslikMi(ham)) {
+        for (const yol of g.digerYollar) kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'itilen ikili veritabanı (SQLite imzası)' }, g.sha)
+      }
+      if (g.veriYollari.length === 0) continue
       veriBlob++
+      const icerik = metneCevir(ham)
       if (icerik.includes(String.fromCharCode(0))) {
-        olculemedi.push({ dosya: g.yol, ayrinti: "veri blob'unda NUL baytı (BOM'suz UTF-16 ya da ikili içerik); okunamadı" })
+        olculemedi.push({ dosya: g.veriYollari[0], ayrinti: "veri blob'unda NUL baytı (BOM'suz UTF-16 ya da ikili içerik); okunamadı" })
         continue
       }
-      const d = dosyaDegerlendir(g.yol, icerik)
-      for (const x of d.bulgular) kaydet({ kural: x.kural, ad: KURALLAR[x.kural], dosya: g.yol, ayrinti: x.ayrinti })
-      for (const o of d.olculemedi) olculemedi.push({ dosya: g.yol, ayrinti: o })
+      // Aynı içerik her VERİ UZANTISIYLA bir kez değerlendirilir, bulgu her yol için ayrı kaydedilir.
+      const onbellek = new Map()
+      for (const yol of g.veriYollari) {
+        const uz = uzanti(yol)
+        if (!onbellek.has(uz)) onbellek.set(uz, dosyaDegerlendir(yol, icerik))
+        const d = onbellek.get(uz)
+        for (const x of d.bulgular) kaydet({ kural: x.kural, ad: KURALLAR[x.kural], dosya: yol, ayrinti: x.ayrinti }, g.sha)
+        for (const o of d.olculemedi) olculemedi.push({ dosya: yol, ayrinti: o })
+      }
     }
   }
   return { ihlaller, izinliler, olculemedi, taranan: { dosya: tumSha.length, veri: veriBlob, blob: blobSayisi } }
@@ -1228,22 +1670,27 @@ function calistir(argv, ortam = {}) {
         hata('Çalıştırma hatası: git ls-files hiç dosya döndürmedi (boş evren ölçüm değildir). Kapı YEŞİL VERMEZ.')
         return 2
       }
-      sonuclar.push(tara({ dosyalar, oku: diskOkuyucu(kok), izin, ikili: sqliteImzasiMi(kok) }))
-      // GitHub Actions pull_request + tam geçmiş: PR'ın ara commit'lerindeki (sonradan silinenler dahil) nesneler de taranır.
-      if (env.GITHUB_EVENT_NAME === 'pull_request') {
-        const sig = git(kok, env, ['rev-parse', '--is-shallow-repository']).toString('utf8').trim()
-        let ebeveyn2 = false
-        try {
-          git(kok, env, ['rev-parse', '--verify', '--quiet', 'HEAD^2'])
-          ebeveyn2 = true
-        } catch {
-          ebeveyn2 = false
-        }
-        if (sig === 'false' && ebeveyn2) {
-          sonuclar.push(yeniNesneleriTara({ kok, ucler: ['HEAD'], haric: ['HEAD^1'], env, izin }))
-          etiket = 'ağaç + PR ara commit\'leri'
-        } else {
-          yaz('Not: PR ara commit taraması atlandı (depo sığ ya da birleşme commit\'i değil); `fetch-depth: 0` ister. Yalnız ağaç tarandı.')
+      sonuclar.push(tara({ dosyalar, oku: diskOkuyucu(kok), izin, ikili: sqliteImzasiMi(kok), blobOf: gitBlobu(kok, env) }))
+      // Ara commit taraması (D4): OLAYDAN BAĞIMSIZ. HEAD bir birleşme commit'iyse (GitHub'ın `refs/pull/N/merge` biçimi: HEAD^1 =
+      // taban, HEAD^2 = PR ucu) ve geçmiş tamsa, PR'ın ara commit'lerindeki (sonradan silinenler dahil) nesneler de taranır.
+      // Önceki sürüm yalnız `pull_request` olayında tarıyordu: elle tetiklemede (workflow_dispatch) aynı birleşme commit'i sessizce atlanıyordu.
+      const sig = git(kok, env, ['rev-parse', '--is-shallow-repository']).toString('utf8').trim()
+      let ebeveyn2 = false
+      try {
+        git(kok, env, ['rev-parse', '--verify', '--quiet', 'HEAD^2'])
+        ebeveyn2 = true
+      } catch {
+        ebeveyn2 = false
+      }
+      if (sig !== 'true' && ebeveyn2) {
+        sonuclar.push(yeniNesneleriTara({ kok, ucler: ['HEAD'], haric: ['HEAD^1'], env, izin }))
+        etiket = "ağaç + PR ara commit'leri"
+      } else {
+        const neden = sig === 'true' ? 'depo sığ (shallow)' : "HEAD birleşme commit'i değil"
+        yaz(`Not: ara commit taraması atlandı (${neden}); \`fetch-depth: 0\` ve birleşme commit'i ister. Yalnız ağaç tarandı.`)
+        // PR/elle tetiklemede bu bir yapılandırma kusurudur: Actions ekranında GÖRÜNÜR olsun (log'a gömülü kalmasın).
+        if (env.GITHUB_ACTIONS === 'true' && ['pull_request', 'pull_request_target', 'workflow_dispatch'].includes(env.GITHUB_EVENT_NAME)) {
+          yaz(`::warning title=Depo döküm kapısı::Ara commit taraması atlandı (${kacis(neden)}): PR'ın sonradan silinen dosyaları taranmadı.`)
         }
       }
     }
@@ -1299,6 +1746,10 @@ module.exports = {
   OKUMA_TAVANI,
   KISISEL_ALANLAR,
   KISISEL_GENEL_ALANLAR,
+  KISISEL_GENEL_KOKLER,
+  KISISEL_GENEL_PARCALAR,
+  KISISEL_GENEL_SON_PARCALAR,
+  KISISEL_BELIRGIN_KOKLER,
   KISISEL_ESIK,
   HASSAS_TABLOLAR,
   KIMLIK_ANAHTARLARI,
@@ -1310,6 +1761,7 @@ module.exports = {
   IZIN_KURALLARI,
   IZIN_LISTESI,
   norm,
+  kisiselAlanSinifi,
   yolIhlali,
   sayiyaCevir,
   pozitifSayi,
@@ -1325,6 +1777,8 @@ module.exports = {
   yeniNesneleriTara,
   itilecekUclar,
   diskOkuyucu,
+  sqliteImzasiMi,
+  gitBlobu,
   calistir,
 }
 

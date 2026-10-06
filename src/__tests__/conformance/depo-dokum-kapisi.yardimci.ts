@@ -18,7 +18,7 @@ export const TABAN_YOLU = path.join(KOK, 'supabase/baselines/2026-10-05_public_s
 export type Bulgu = { kural: string; ayrinti: string }
 export type Kayit = { kural: string; ad: string; dosya: string; ayrinti: string }
 export type OlculemediKaydi = { dosya: string; ayrinti: string }
-export type IzinKaydi = { yol: string; kural: string; neden?: string; kanit?: string }
+export type IzinKaydi = { yol: string; kural: string; blob?: string; neden?: string; kanit?: string }
 export type TaramaSonucu = {
   ihlaller: Kayit[]
   izinliler: Kayit[]
@@ -36,7 +36,14 @@ export type Kapi = {
   YOL_KURALLARI: ReadonlyArray<{ ad: string }>
   IZIN_KURALLARI: readonly string[]
   IZIN_LISTESI: readonly IzinKaydi[]
+  KISISEL_GENEL_KOKLER: readonly string[]
+  KISISEL_GENEL_PARCALAR: readonly string[]
+  KISISEL_GENEL_SON_PARCALAR: readonly string[]
+  KISISEL_BELIRGIN_KOKLER: readonly string[]
   norm: (s: string) => string
+  kisiselAlanSinifi: (ad: string) => 'belirgin' | 'genel' | null
+  sqliteImzasiMi: (kok: string) => (yol: string) => boolean
+  gitBlobu: (kok: string, env: NodeJS.ProcessEnv) => (yol: string) => string | null
   yolIhlali: (yol: string) => string[]
   pozitifSayi: (v: unknown) => boolean
   metneCevir: (t: Buffer) => string
@@ -49,6 +56,7 @@ export type Kapi = {
     oku: (yol: string) => string | null
     izin?: readonly IzinKaydi[]
     ikili?: (yol: string) => boolean
+    blobOf?: (yol: string) => string | null
   }) => TaramaSonucu
   yeniNesneleriTara: (g: {
     kok: string
@@ -60,6 +68,17 @@ export type Kapi = {
   }) => TaramaSonucu
   itilecekUclar: (stdin: string) => string[]
   diskOkuyucu: (kok: string, sinir?: number) => (yol: string) => string | null
+  calistir: (
+    argv: string[],
+    ortam?: {
+      cwd?: string
+      env?: NodeJS.ProcessEnv
+      yaz?: (s: string) => void
+      hata?: (s: string) => void
+      izin?: readonly IzinKaydi[]
+      stdin?: string
+    },
+  ) => number
 }
 
 export const kapi = createRequire(import.meta.url)(BETIK) as Kapi
@@ -70,7 +89,7 @@ export const kurallar = (yol: string, metin: string): string[] =>
 
 /** Test sahipliğinde, bilerek BAĞIMSIZ yazılmış beklenen listeler: kapıdaki liste değişirse kırmızı. */
 export const BEKLENEN_KISISEL = ['customer_email', 'customer_phone', 'customer_name', 'billing_address', 'shipping_address']
-export const BEKLENEN_KISISEL_EK = ['invoice_info', 'tckn', 'card_number', 'card_token', 'card_user_key', 'cvc']
+export const BEKLENEN_KISISEL_EK = ['invoice_info', 'tckn', 'card_number', 'card_token', 'card_user_key', 'cvc', 'invoice_profile']
 export const BEKLENEN_GENEL = [
   'email',
   'e_mail',
@@ -99,6 +118,14 @@ export const BEKLENEN_HASSAS_TABLOLAR = [
   'user_invoice_profiles',
   'venthub_orders',
   'product_costs',
+  // ALT-39 2. tur (O2): şema tabanı taraması
+  'data_subject_requests',
+  'order_email_events',
+  'quote_email_events',
+  'shipping_email_events',
+  'inventory_settings',
+  'venthub_quotes',
+  'wizard_selections',
 ]
 
 // Uydurma işaretçi değerler: çıktıda ASLA geçmemeli. (BOM, kaçış dizisi yazmadan kod noktasıyla kurulur.)
