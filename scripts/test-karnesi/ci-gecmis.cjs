@@ -89,9 +89,10 @@ function pencereler(baslangic, bitis, pencereGun) {
   return sonuc;
 }
 
-function gh(args, { json = false } = {}) {
+/** `execFileFn`: testlerde sahte süreç çağrısı enjekte edilir (gerçek süreç yok); üretimde `execFile` (davranış aynı). */
+function gh(args, { json = false } = {}, execFileFn = execFile) {
   return new Promise((resolve, reject) => {
-    execFile('gh', args, { maxBuffer: 256 * 1024 * 1024, windowsHide: true }, (err, stdout, stderr) => {
+    execFileFn('gh', args, { maxBuffer: 256 * 1024 * 1024, windowsHide: true }, (err, stdout, stderr) => {
       if (err) {
         const e = new Error(`gh ${args.slice(0, 3).join(' ')}: ${(stderr || err.message).trim().slice(0, 300)}`);
         e.kod = err.code;
@@ -111,12 +112,15 @@ function gh(args, { json = false } = {}) {
   });
 }
 
-/** Geçici hatalarda (ağ, 5xx, hız sınırı) üç deneme; kalıcı hatada hemen bırakır. */
-async function ghDene(args, secenek, deneme = 3) {
+/**
+ * Geçici hatalarda (ağ, 5xx, hız sınırı) üç deneme; kalıcı hatada hemen bırakır.
+ * `ghFn`: testlerde sahte `gh` enjekte edilir (ağ ve gerçek `gh` yok); üretimde gerçek `gh` (davranış aynı).
+ */
+async function ghDene(args, secenek, deneme = 3, ghFn = gh) {
   let son;
   for (let i = 1; i <= deneme; i += 1) {
     try {
-      return await gh(args, secenek);
+      return await ghFn(args, secenek);
     } catch (e) {
       son = e;
       if (/HTTP 4(0[0-9]|10|22)\b/.test(e.message) && !/HTTP 429/.test(e.message)) break;
@@ -167,11 +171,12 @@ function kosuKaydi(r) {
   };
 }
 
-async function pencereyiCek(repo, isAkisi, [b, e]) {
+/** `ghCagri`: `(args, secenek) => Promise` (üretimde `ghDene`); testlerde sahte GitHub enjekte edilir. */
+async function pencereyiCek(repo, isAkisi, [b, e], ghCagri = ghDene) {
   const kosular = new Map();
   let toplam = null;
   for (let sayfa = 1; ; sayfa += 1) {
-    const yanit = await ghDene(
+    const yanit = await ghCagri(
       ['api', `repos/${repo}/actions/workflows/${isAkisi}/runs?created=${b}..${e}&per_page=100&page=${sayfa}`],
       { json: true },
     );
@@ -195,10 +200,10 @@ function testAdimiSuresi(isler) {
   return null;
 }
 
-async function kirmiziKosuyuIsle(repo, k) {
+async function kirmiziKosuyuIsle(repo, k, ghCagri = ghDene) {
   const kayit = { ...k, basarisizAdimlar: [], testDosyalari: [] };
   try {
-    const isler = await ghDene(['api', `repos/${repo}/actions/runs/${k.kosuId}/jobs?per_page=30`], { json: true });
+    const isler = await ghCagri(['api', `repos/${repo}/actions/runs/${k.kosuId}/jobs?per_page=30`], { json: true });
     for (const is of isler.jobs || []) {
       if (is.conclusion !== 'failure') continue;
       for (const adim of is.steps || []) {
@@ -213,7 +218,7 @@ async function kirmiziKosuyuIsle(repo, k) {
   const testKirik = kayit.basarisizAdimlar.some((ad) => /^test$/i.test(ad.trim())) || kayit.isBilgisiAlinamadi;
   if (!testKirik) return kayit;
   try {
-    const log = await ghDene(['run', 'view', String(k.kosuId), '--repo', repo, '--log-failed']);
+    const log = await ghCagri(['run', 'view', String(k.kosuId), '--repo', repo, '--log-failed']);
     kayit.testDosyalari = basarisizTestleriAyikla(log);
     const n = basarisizDosyaSayisiOku(log);
     if (n !== null) kayit.basarisizDosyaSayisi = n;
@@ -224,9 +229,9 @@ async function kirmiziKosuyuIsle(repo, k) {
   return kayit;
 }
 
-async function basariliKosuSuresi(repo, k) {
+async function basariliKosuSuresi(repo, k, ghCagri = ghDene) {
   try {
-    const isler = await ghDene(['api', `repos/${repo}/actions/runs/${k.kosuId}/jobs?per_page=30`], { json: true });
+    const isler = await ghCagri(['api', `repos/${repo}/actions/runs/${k.kosuId}/jobs?per_page=30`], { json: true });
     return { ...k, testAdimiSuresiSn: testAdimiSuresi(isler) };
   } catch (e) {
     return { ...k, isBilgisiAlinamadi: e.message };
@@ -248,14 +253,19 @@ async function havuz(isler, es, fn) {
   return sonuc;
 }
 
-async function main() {
-  const a = argumanlar(process.argv.slice(2));
+/**
+ * `argv` ve `ghFn`: testlerde sahte bayrak listesi ve sahte `gh` enjekte edilir (ağ ve gerçek `gh` yok).
+ * Üretimde `main()` çağrısı eskisiyle aynıdır: `process.argv`, gerçek `gh`, `ghDene` üç denemesi.
+ */
+async function main(argv = process.argv.slice(2), { gh: ghFn = gh } = {}) {
+  const a = argumanlar(argv);
+  const ghCagri = (args, secenek) => ghDene(args, secenek, 3, ghFn);
   const repo =
-    a.repo || (await gh(['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner'])).trim();
+    a.repo || (await ghFn(['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner'])).trim();
   const tum = new Map();
   const uyarilar = [];
   for (const p of pencereler(a.baslangic, a.bitis, a.pencereGun)) {
-    const { kosular, toplam, pencere } = await pencereyiCek(repo, a.isAkisi, p);
+    const { kosular, toplam, pencere } = await pencereyiCek(repo, a.isAkisi, p, ghCagri);
     for (const k of kosular) tum.set(k.kosuId, k);
     if (toplam !== null && kosular.length !== toplam) {
       uyarilar.push(`${pencere}: total_count=${toplam} ama ${kosular.length} benzersiz koşu alındı`);
@@ -278,12 +288,12 @@ async function main() {
     if (bitti % 25 === 0) process.stderr.write(`[ci-gecmis] ${bitti}/${toplamIs}\n`);
   };
   const kirmiziKayitlar = await havuz(kirmizilar, a.es, async (k) => {
-    const r = await kirmiziKosuyuIsle(repo, k);
+    const r = await kirmiziKosuyuIsle(repo, k, ghCagri);
     ilerle();
     return r;
   });
   const basariliKayitlar = await havuz(basarililar, a.es, async (k) => {
-    const r = await basariliKosuSuresi(repo, k);
+    const r = await basariliKosuSuresi(repo, k, ghCagri);
     ilerle();
     return r;
   });
@@ -322,8 +332,16 @@ if (require.main === module) {
 module.exports = {
   ansiSoy,
   argumanlar,
+  basariliKosuSuresi,
   basarisizDosyaSayisiOku,
   basarisizTestleriAyikla,
+  gh,
+  ghDene,
+  havuz,
+  kirmiziKosuyuIsle,
+  kosuKaydi,
+  main,
   pencereler,
+  pencereyiCek,
   testAdimiSuresi,
 };
