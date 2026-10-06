@@ -83,7 +83,7 @@ Test, gerçek yanıtın yapısına ihtiyaç duyar, **değerine** değil (ders: "
    testin "opak alanlar" kolu kilitler (2. tur, D6).
 4. **Makine doğrulaması şart:** üretici, özgün dökümdeki tüm dizeleri ve kimlikleri toplayıp fikstür metninde alt dize olarak arar;
    biri kalırsa **fırlatır**. Üretici tek kullanımlıktır ve depoya girmez (ham dökümün yolunu taşır).
-5. Fikstür kendini ilan eder (`_aciklama`: ARINDIRILMIŞ, GERÇEK DEĞER YOK) ve kendi testi sızıntıyı yakalar (alan adı, `@`, `example.*`
+5. Fikstür kendini ilan eder (`aciklama`: ARINDIRILMIŞ, GERÇEK DEĞER YOK; anahtar BİLEREK alt çizgisizdir: CI "Edge mangle-guard" `supabase/functions/**/*.ts` altında `{ _x:` ile başlayan nesne anahtarını bozulma sayar) ve kendi testi sızıntıyı yakalar (alan adı, `@`, `example.*`
    sunucuları, sıfır sayaçlı BIN/son dört). Yeri: `supabase/functions/_shared/__tests__/fixtures/odeme-eslesme-13-yanit.json`.
 
 ## 6. Geçmiş temizliği bu işin DIŞINDA
