@@ -77,6 +77,8 @@ async function harita(k: { aileler: AileSatiri[]; enYayin: boolean; k3b: boolean
   vi.doMock('@/lib/services/family.service', async (orijinal) => ({
     ...(await orijinal<typeof import('@/lib/services/family.service')>()),
     getAllFamilySlugs: async () => k.aileler.map((a) => ({ slug: a.slug })),
+    // OPS-51: ürünsüz marka kararı DB sayımı okur; canlıya uygun: Flexiva ürünsüz (0, haritada YOK), diğerleri ürünlü.
+    getBrandFamilyCount: async (_supabase: unknown, marka: string) => (marka === 'Flexiva' ? 0 : 1),
   }))
   const { SITE_URL } = await import('../../config/siteUrl')
   const { adresUret } = await import('../../utils/adresUret')

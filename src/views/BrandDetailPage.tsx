@@ -57,15 +57,12 @@ const BRAND_DETAILS: Record<string, {
       { labelKey: 'statWarranty', value: { tr: '2 Yıl', en: '2 Years' } }
     ]
   },
+  // OPS-51 (2026-10-04): Casals'ın eski hikâyesi ("140 yıl / en köklü / tercih edilen") ve 1881 / 140+ yıl satırları
+  // KAYNAKSIZDI → çıkarıldı; hikâye metni `brands.ts` kaydındaki doğrulanabilir `description`'a düşer. Kalan satır:
+  // Vortice Group şirketi (Casals katalog baskısındaki "VORTICE GROUP COMPANIES" listesi).
   casals: {
-    story: {
-      tr: 'Casals, 140 yılı aşkın geçmişiyle İspanya\'nın en köklü fan üreticilerinden biridir. Endüstriyel ve ticari havalandırma çözümlerinde Avrupa\'nın tercih edilen markasıdır.',
-      en: 'With more than 140 years of history, Casals is one of Spain\'s most established fan manufacturers and a preferred European brand for industrial and commercial ventilation.'
-    },
     stats: [
-      { labelKey: 'estPrefix', value: '1881' },
-      { labelKey: 'statExperience', value: { tr: '140+ Yıl', en: '140+ Years' } },
-      { labelKey: 'statGroup', value: 'Vortice' }
+      { labelKey: 'statGroup', value: 'Vortice Group' }
     ]
   },
   'nicotra-gebhardt': {
@@ -78,25 +75,22 @@ const BRAND_DETAILS: Record<string, {
       { labelKey: 'statGroup', value: 'Regal Rexnord' },
       { labelKey: 'statExpertise', value: { tr: 'Endüstriyel Fan', en: 'Industrial Fans' } }
     ]
-  },
-  flexiva: {
-    story: {
-      tr: 'Flexiva, esnek kanal sistemleri ve havalandırma aksesuarlarında uzmanlaşmış global bir markadır. Patentli sızdırmazlık teknolojileri ve kolay montaj özellikleriyle öne çıkar.',
-      en: 'Flexiva is a global brand specialising in flexible duct systems and ventilation accessories, distinguished by patented sealing technology and fast installation.'
-    },
-    stats: [
-      { labelKey: 'statExpertise', value: { tr: 'Kanal Sistemleri', en: 'Duct Systems' } },
-      { labelKey: 'statProduction', value: { tr: 'Türkiye', en: 'Türkiye' } },
-      { labelKey: 'statQuality', value: { tr: 'CE Sertifikalı', en: 'CE Certified' } }
-    ]
   }
+  // OPS-51: `flexiva` kaydı KALDIRILDI — "global marka / patentli sızdırmazlık" hikâyesi ve "CE Sertifikalı / Türkiye /
+  // Kanal Sistemleri" satırları kaynaksızdı (kaynak dizininde Flexiva için 0 sayfa). Sayfa `brands.ts` kaydına düşer.
 }
 
 export interface BrandDetailPageProps {
   initialBrandSlug?: string
+  /**
+   * OPS-51: markanın DB'de aktif ürünü yok (sunucu kararı; `markaUrunDurumu.ts`). Üst veri (noindex) ve site haritasıyla
+   * AYNI kaynaktan gelir — ürün sayısı sıfırken "teklif isteyin" cümlesi ve bağlantısı çizilir, ürün girince kalkar.
+   * Verilmezse `false` (bugünkü "ürünleri henüz katalogda değil" cümlesi).
+   */
+  urunsuz?: boolean
 }
 
-const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) => {
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false }) => {
   const { t, lang } = useI18n()
   // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
   const Routes = useLocalizedRoutes()
@@ -197,18 +191,26 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           </h1>
 
           <div ref={heroMetaRef} className={scrollAnimationClasses.fadeIn(heroMetaVisible) + " mt-8 flex flex-wrap justify-center gap-8 text-xs font-black uppercase tracking-hvac-loose text-cyan-400"}>
-            <div className="flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
-              {brandText(brand.country, lang)} {t('brands.detail.originSuffix')}
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
-              {t('brands.detail.estPrefix')} {brand.founded}
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
-              {brandText(brand.specialty, lang)}
-            </div>
+            {/* Kaynağı doğrulanamayan alan YAZILMAZ (brands.ts başlığı): yoksa satır hiç çizilmez, "Kuruluş" etiketi
+                değersiz kalmaz (OPS-51: Casals'ta kuruluş yılı, Flexiva'da ülke/kuruluş/uzmanlık yok). */}
+            {brand.country && (
+              <div className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
+                {brandText(brand.country, lang)} {t('brands.detail.originSuffix')}
+              </div>
+            )}
+            {brand.founded && (
+              <div className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
+                {t('brands.detail.estPrefix')} {brand.founded}
+              </div>
+            )}
+            {brand.specialty && (
+              <div className="flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-glow-sm" />
+                {brandText(brand.specialty, lang)}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -266,12 +268,14 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
                         </span>
                       </div>
                     ))}
-                    <div className="flex justify-between items-end border-b border-white/10 pb-4">
-                      <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
-                        {t('brands.detail.headquarters')}
-                      </span>
-                      <span className="text-sm font-medium">{brandText(brand.headquarters, lang)}</span>
-                    </div>
+                    {brand.headquarters && (
+                      <div className="flex justify-between items-end border-b border-white/10 pb-4">
+                        <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
+                          {t('brands.detail.headquarters')}
+                        </span>
+                        <span className="text-sm font-medium">{brandText(brand.headquarters, lang)}</span>
+                      </div>
+                    )}
                     {brand.website && (
                       <div className="flex justify-between items-end border-b border-white/10 pb-4">
                         <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
@@ -341,7 +345,22 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug }) =
           ) : (
             <div className="text-center py-20 bg-white rounded-hvac-3xl border border-dashed border-slate-200">
               <Package className="mx-auto text-slate-200 mb-4" size={48} />
-              <p className="text-slate-400 font-light italic">{t('brands.detail.noProducts')}</p>
+              {/* `urunsuz` = sunucunun DB'deki aktif ürün sayısından türettiği karar (`markaSayfasi.tsx` →
+                  `markaUrunDurumu.ts`); üst veri/site haritasıyla AYNI kaynak (statik bayrak YOK, OPS-51). */}
+              {/* Teklif yolu = iletişim formu (`Routes.contact()`): özel teklif akışının depodaki sayfası
+                  (EnhancedNeedsWizard "customOffer" ve contactPage.heroDesc "özel teklifler" aynı rotaya gider);
+                  sepet tabanlı QuoteRequestButton ürünsüz markada boş listeyle çalışmaz. */}
+              <p className="text-slate-400 font-light italic">
+                {urunsuz ? t('brands.detail.productsOnRequest', { ad: brand.name }) : t('brands.detail.noProducts')}
+              </p>
+              {urunsuz && (
+                <Link
+                  href={Routes.contact()}
+                  className="mt-4 inline-block text-cyan-600 font-bold uppercase tracking-widest text-xs underline underline-offset-8 focus-visible:outline-2"
+                >
+                  {t('brands.detail.productsOnRequestCta')}
+                </Link>
+              )}
             </div>
           )}
         </div>
