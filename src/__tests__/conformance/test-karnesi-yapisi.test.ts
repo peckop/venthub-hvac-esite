@@ -7,9 +7,13 @@ import { describe, expect, it } from 'vitest'
 /**
  * INV-TEST-KARNE-1 · test karnesi YAPISAL olarak tutarlı ve "çıkan her kapı karnede görünür" (ALT-38).
  *
+ * TETİK: docs/audits/test-karnesi-*.json, scripts/ci/dunya-durumu-testleri.json, scripts/test-karnesi/karne-uret.cjs
+ * YER: PR
+ *
  * Karne (docs/audits/test-karnesi-*.json) üretilmiş bir ölçüm belgesidir; cetvel: docs/standards/test-karnesi-standard.md.
  * Bu kapı karnenin İÇ TUTARLILIĞINI ve iki sözü korur:
- *   1. her kayıt yedi soruya cevap taşır; ölçülmeyen "olculmedi" ve NEDENİYLE yazılır (tahmin yazılmaz),
+ *   1. her kayıt sekiz soruya cevap taşır (8. soru: bu test hangi dosya değişince koşmalı); ölçülmeyen "olculmedi" ve
+ *      NEDENİYLE yazılır (tahmin yazılmaz); sabotajı UYGULANAMAYAN/ATLANAN test "ölçüldü" sayılmaz,
  *   2. ölçülmemiş bir testin önerisi "KORU" olamaz (boş yere güven üretme),
  *   3. PR kapısından çıkan (scripts/ci/dunya-durumu-testleri.json) HER test karnede yeni yeriyle görünür:
  *      "hiçbir koruma sessizce düşmez" sözünün mekanik karşılığı.
@@ -24,8 +28,11 @@ const KOK = path.resolve(__dirname, '../../..')
 const D = require_(path.join(KOK, 'scripts/ci/dunya-durumu.cjs')) as { listeyiOku: () => { testler: DunyaKaydi[] } }
 
 const DENETIM_DIZINI = path.join(KOK, 'docs', 'audits')
-const SORULAR = ['q1_korur', 'q2_ci', 'q3_sabotaj', 'q4_ortam', 'q5_sure', 'q6_kopya', 'q7_kanban'] as const
+const SORULAR = ['q1_korur', 'q2_ci', 'q3_sabotaj', 'q4_ortam', 'q5_sure', 'q6_kopya', 'q7_kanban', 'q8_tetik'] as const
 const KUMELER = ['conformance', 'birim', 'betik', 'edge', 'e2e', 'smoke', 'diger']
+const TETIK_KAYNAKLARI = ['beyan', 'statik', 'yok']
+/** sabotaj.cjs'in "hiçbir şey ölçmedi" hükümleri: karnede q3 bunlar için "ölçüldü" diyemez. */
+const OLCULMEYEN_HUKUMLER = ['UYGULANAMADI', 'TABAN_ATLANDI']
 
 type DunyaKaydi = { test: string; yeniYer: string[] }
 type Kayit = {
@@ -38,6 +45,7 @@ type Kayit = {
   q5_sure?: Record<string, unknown>
   q6_kopya?: Record<string, unknown>
   q7_kanban?: Record<string, unknown>
+  q8_tetik?: { kaynak: string; tetik: unknown; yer?: string; olculmedi?: string }
   dunyaDurumu: { yeniYer: string[] } | null
   oneri?: { tur: string }
 }
@@ -79,6 +87,18 @@ function denetle(k: Karne, dunyaListesi: DunyaKaydi[]): string[] {
     if (q3 && q3.durum !== 'olculdu' && q3.durum !== 'olculmedi') ihlal.push(`${ad}: q3.durum geçersiz (${q3.durum})`)
     if (q3 && q3.durum === 'olculmedi' && !q3.neden) ihlal.push(`${ad}: sabotaj ÖLÇÜLMEDİ ama nedeni yazılmamış`)
     if (q3 && q3.durum === 'olculdu' && !q3.hukum) ihlal.push(`${ad}: sabotaj ölçüldü ama hüküm yok`)
+    if (q3 && q3.durum === 'olculdu' && q3.hukum && OLCULMEYEN_HUKUMLER.includes(q3.hukum)) {
+      ihlal.push(`${ad}: sabotaj hükmü ${q3.hukum} hiçbir şey ölçmedi ama karne "ölçüldü" diyor`)
+    }
+    const q8 = r.q8_tetik
+    if (q8) {
+      if (!TETIK_KAYNAKLARI.includes(q8.kaynak)) ihlal.push(`${ad}: q8.kaynak geçersiz (${q8.kaynak})`)
+      else if (q8.kaynak === 'yok' && !q8.olculmedi) ihlal.push(`${ad}: tetik ÖLÇÜLMEDİ ama nedeni yazılmamış`)
+      else if (q8.kaynak !== 'yok' && !(Array.isArray(q8.tetik) && q8.tetik.length > 0 && q8.tetik.every((t) => typeof t === 'string' && t.length > 0))) {
+        ihlal.push(`${ad}: ${q8.kaynak} tetiği boş ya da metin olmayan öğe taşıyor`)
+      }
+      if (q8.kaynak === 'beyan' && q8.yer !== 'PR' && q8.yer !== 'zamanli') ihlal.push(`${ad}: beyan YER değeri geçersiz (${q8.yer})`)
+    }
     if (r.q4_ortam && !['bagli', 'supheli', 'bagimsiz'].includes(r.q4_ortam.hukum)) ihlal.push(`${ad}: q4.hukum geçersiz`)
     if (q3 && q3.durum === 'olculmedi' && r.oneri && r.oneri.tur === 'KORU') ihlal.push(`${ad}: ölçülmemiş test KORU önerisi alamaz`)
     if (!r.oneri) ihlal.push(`${ad}: oneri yok`)
@@ -168,5 +188,47 @@ describe('INV-TEST-KARNE-1 — karne yapısal olarak tutarlı, çıkan her kapı
     const r = denetle(k, dunya).join('|')
     expect(r).toContain('tekrar')
     expect(r).toContain('dosyaSayisi')
+  })
+
+  it('sabotaj 6: sekizinci soru (tetik) düşerse, geçersiz kaynak/boş tetik/nedensiz ölçülmedi/geçersiz YER yakalanır', () => {
+    const silik = kopya()
+    silik.kayitlar[0] = alanSil(silik.kayitlar[0], 'q8_tetik')
+    expect(denetle(silik, dunya).join('|')).toContain('q8_tetik yok')
+
+    const kaynak = kopya()
+    kaynak.kayitlar[0].q8_tetik = { kaynak: 'tahmin', tetik: ['a'] }
+    expect(denetle(kaynak, dunya).join('|')).toContain('q8.kaynak geçersiz (tahmin)')
+
+    const bos = kopya()
+    bos.kayitlar[0].q8_tetik = { kaynak: 'statik', tetik: [] }
+    expect(denetle(bos, dunya).join('|')).toContain('statik tetiği boş')
+    bos.kayitlar[0].q8_tetik = { kaynak: 'statik', tetik: [1] }
+    expect(denetle(bos, dunya).join('|')).toContain('metin olmayan öğe')
+
+    const nedensiz = kopya()
+    nedensiz.kayitlar[0].q8_tetik = { kaynak: 'yok', tetik: [] }
+    expect(denetle(nedensiz, dunya).join('|')).toContain('tetik ÖLÇÜLMEDİ ama nedeni yazılmamış')
+
+    const yer = kopya()
+    yer.kayitlar[0].q8_tetik = { kaynak: 'beyan', tetik: ['src/**'], yer: 'bilmiyorum' }
+    expect(denetle(yer, dunya).join('|')).toContain('beyan YER değeri geçersiz (bilmiyorum)')
+  })
+
+  it('sabotaj 7: sabotajı UYGULANAMAYAN ya da taban atlanan test "ölçüldü" yazılırsa yakalanır (7a)', () => {
+    for (const hukum of OLCULMEYEN_HUKUMLER) {
+      const k = kopya()
+      k.kayitlar[0].q3_sabotaj = { durum: 'olculdu', hukum }
+      expect(denetle(k, dunya).join('|')).toContain(`sabotaj hükmü ${hukum} hiçbir şey ölçmedi`)
+    }
+    const dogru = kopya()
+    dogru.kayitlar[0].q3_sabotaj = { durum: 'olculmedi', hukum: 'UYGULANAMADI', neden: 'sabotaj uygulanamadı' }
+    expect(denetle(dogru, dunya).join('|')).not.toContain('hiçbir şey ölçmedi')
+  })
+
+  it('bugünkü karnede 8. soru dosyaların hepsinde dolu ve ölçülmeyen sabotaj hiçbir kayıtta "ölçüldü" değil', () => {
+    const kaynaklar = new Set(karne.kayitlar.map((r) => r.q8_tetik?.kaynak))
+    for (const k of kaynaklar) expect(TETIK_KAYNAKLARI).toContain(k)
+    const yanlis = karne.kayitlar.filter((r) => r.q3_sabotaj?.durum === 'olculdu' && OLCULMEYEN_HUKUMLER.includes(r.q3_sabotaj.hukum ?? ''))
+    expect(yanlis.map((r) => r.dosya)).toEqual([])
   })
 })

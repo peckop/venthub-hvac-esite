@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * ALT-38 · TEST KARNESİ ÜRETİCİSİ — her test dosyası için yedi soru, ölçülen ve ÖLÇÜLMEYEN ayrı.
+ * ALT-38 · TEST KARNESİ ÜRETİCİSİ — her test dosyası için sekiz soru, ölçülen ve ÖLÇÜLMEYEN ayrı.
  *
  * Girdiler (hepsi ölçüm çıktısı; bu betik HİÇBİR ŞEY ÖLÇMEZ, yalnız birleştirir ve sınıflar):
  *   --ci        ci-gecmis.cjs çıktısı (GitHub `ci.yml` koşuları ve kırmızılardaki başarısız test dosyaları)
  *   --vitest    tam yerel vitest JSON raporu (süre ve yerel kırmızı)
  *   --sabotaj   sabotaj.cjs JSONL dizini (gNN.jsonl; koruduğu şey bozulunca kırmızı veriyor mu)
- *   statik.cjs  kaynak tarama (çağrılır): ortam imzası, benzerlik adayı, INV/karar/cetvel atıfları
+ *   statik.cjs  kaynak tarama (çağrılır): ortam imzası, benzerlik adayı, INV/karar/cetvel atıfları, okunan yollar
+ *   beyan.cjs   testin başlığındaki TETİK:/YER: beyanı (8. soru: bu test hangi dosya değişince koşmalı)
  *   scripts/ci/dunya-durumu-testleri.json  PR kapısından çıkan testler ve yeni yerleri
  *
  * Çıktı: `--cikti-json` (makine okunur, her test dosyası için bir kayıt) ve `--cikti-md` (insan özeti).
@@ -23,6 +24,7 @@ const path = require('node:path');
 
 const KOK = path.resolve(__dirname, '..', '..');
 const statik = require('./statik.cjs');
+const beyan = require('./beyan.cjs');
 
 /** Aynı testin ≥ MIN_DAL farklı dalda, arka arkaya KUMELEME_SAAT içinde kırmızı vermesi bir "dünya olayı" kümesidir. */
 const KUMELEME_SAAT = 12;
@@ -166,6 +168,10 @@ function sabotajOzeti({ sab, ekler = [], kume }) {
   if (sab.hukum === 'CELISKI') {
     return { durum: 'celiski', kaynaklar: sab.celiski, neden: 'aynı test için farklı hüküm çıktı; çözülmedi, karar insanındır' };
   }
+  // Kayıt VAR ama hiçbir şey ölçülmemiş (UYGULANAMADI / TABAN_ATLANDI / bilinmeyen hüküm): soru 3 "ölçüldü" demez (7a).
+  if (!OLCULEN_HUKUMLER.has(sab.hukum)) {
+    return { durum: 'olculmedi', hukum: sab.hukum, neden: `sabotaj hükmü ${sab.hukum || 'yok'}: hiçbir şey ölçülmedi (sabotaj uygulanamadı ya da taban atlandı)` };
+  }
   const den = sab.denemeler || [];
   const ajan = sab.ajan || {};
   const yakalanmayanlar = den.filter((d) => d.sonuc === 'GECTI').map((d) => d.ad);
@@ -183,6 +189,22 @@ function sabotajOzeti({ sab, ekler = [], kume }) {
     tekrar: sab.tekrar,
     not: ajan.not || undefined,
   };
+}
+
+/**
+ * Sekizinci soru (bu test hangi dosya değişince koşmalı): testin KENDİ beyanı (başlıkta TETİK:/YER:) varsa o; yoksa statik
+ * taramanın okuduğu yol dizgeleri (KESİN DEĞİL: yalnız testin kaynakta adını andığı yollar); ikisi de yoksa "ölçülmedi".
+ * `beyanSonucu`: beyan.beyanOku() çıktısı ya da null.
+ */
+function tetikOzeti({ beyanSonucu, okunanYollar, dunya }) {
+  if (beyanSonucu && beyanSonucu.tetik && beyanSonucu.tetik.length) {
+    return { kaynak: 'beyan', tetik: beyanSonucu.tetik, yer: beyanSonucu.yer || (dunya ? 'zamanli' : 'PR') };
+  }
+  const yollar = Array.isArray(okunanYollar) ? okunanYollar : [];
+  if (yollar.length) {
+    return { kaynak: 'statik', tetik: yollar, yer: dunya ? 'zamanli' : 'PR', kesin: false, not: 'testin kaynakta adını andığı yol dizgeleri: kapsam kesin değil; beyan yazılınca kesinleşir' };
+  }
+  return { kaynak: 'yok', tetik: [], yer: dunya ? 'zamanli' : 'PR', olculmedi: 'beyan yok ve test hiçbir yol dizgesi okumuyor: hangi değişiklikte koşacağı belirlenemedi (yalnız TAM pakette koşar)' };
 }
 
 /** Aday öneri. KARAR DEĞİL: silme/taşıma insan onayıdır. */
@@ -219,11 +241,20 @@ function oneriVer({ sabotaj, ortam, ci, kopya, dunya }) {
   if (sabotaj.durum === 'olculdu' && !OLCULEN_HUKUMLER.has(sabotaj.hukum)) {
     return { tur: 'OLCULMEDI', sebepler: [`sabotaj hükmü ${sabotaj.hukum || 'yok'}: hiçbir şey ölçülmedi (sabotaj uygulanamadı ya da taban atlandı)`] };
   }
-  if (sabotaj.durum !== 'olculdu') return { tur: 'OLCULMEDI', sebepler: ['sabotaj yoklaması bu dosya için yapılmadı'] };
+  if (sabotaj.durum !== 'olculdu') return { tur: 'OLCULMEDI', sebepler: [sabotaj.hukum ? sabotaj.neden : 'sabotaj yoklaması bu dosya için yapılmadı'] };
   return { tur: 'KORU', sebepler: [] };
 }
 
 // ------------------------------------------------------------------ girdi okuyucular
+
+/** Test dosyasının başlığındaki beyanı diskten okur; dosya okunamazsa null (8. soru statik okumaya düşer). */
+function beyanDisktenOku(dosya) {
+  try {
+    return beyan.beyanOku(fs.readFileSync(path.join(KOK, dosya), 'utf8'));
+  } catch {
+    return null;
+  }
+}
 
 function jsonOku(yol) {
   return JSON.parse(fs.readFileSync(yol, 'utf8'));
@@ -353,7 +384,7 @@ function ilkEklenme() {
 
 // ------------------------------------------------------------------ birleştirme
 
-function karneUret({ ci, vitest, sabotaj, ek = new Map(), dunyaListesi, tarih, ciPencere }) {
+function karneUret({ ci, vitest, sabotaj, ek = new Map(), dunyaListesi, tarih, ciPencere, beyanOku = beyanDisktenOku }) {
   const stat = statik.testDosyalari().map(statik.analiz);
   const yakin = statik.benzerlik(
     // benzerlik parmak izi ister; analiz() onu döndürür
@@ -409,6 +440,8 @@ function karneUret({ ci, vitest, sabotaj, ek = new Map(), dunyaListesi, tarih, c
     const q7 = { ajan: ajan.kanban === undefined ? null : ajan.kanban, statikAday: Boolean(s.kanbanAdayi) };
 
     const d = dunya.get(s.dosya) || null;
+    // 8) hangi dosya değişince koşmalı
+    const q8 = tetikOzeti({ beyanSonucu: beyanOku(s.dosya), okunanYollar: s.okunanYollar, dunya: Boolean(d) });
     const oneri = oneriVer({ sabotaj: q3, ortam: q4, ci: c, kopya: q6, dunya: d });
     return {
       dosya: s.dosya,
@@ -425,6 +458,7 @@ function karneUret({ ci, vitest, sabotaj, ek = new Map(), dunyaListesi, tarih, c
       q5_sure: q5,
       q6_kopya: q6,
       q7_kanban: q7,
+      q8_tetik: q8,
       dunyaDurumu: d ? { yeniYer: d.yeniYer, neden: d.neden, kanit: d.kanit } : null,
       oneri,
     };
@@ -466,6 +500,9 @@ function ozetle(karne, ci) {
     sabotajKismi: say((k) => k.q3_sabotaj.durum === 'olculdu' && k.q3_sabotaj.kismi),
     ortam: ortamlar,
     oneriler,
+    tetikBeyanli: say((k) => k.q8_tetik.kaynak === 'beyan'),
+    tetikStatik: say((k) => k.q8_tetik.kaynak === 'statik'),
+    tetikOlculmeyen: say((k) => k.q8_tetik.kaynak === 'yok'),
     ciKirmiziVerenDosya: say((k) => k.q2_ci.kirmizi > 0),
     ciHicKirmiziVermeyen: say((k) => k.q2_ci.kirmizi === 0),
     ci: ciOz,
@@ -497,6 +534,9 @@ function mdYaz(karne, oz) {
       ['sabotajla ÖLÇÜLMEYEN dosya', String(oz.sabotajOlculmeyen)],
       ['sabotajda ÇELİŞKİ (aynı test için farklı hüküm, çözülmedi)', String(oz.sabotajCeliski)],
       ['KISMİ koruma (kırmızı veriyor ama ölçülen bir bozulmaya yeşil kalıyor)', String(oz.sabotajKismi)],
+      ['8. soru: TETİK beyanı yazılı dosya (kesin)', String(oz.tetikBeyanli)],
+      ['8. soru: yalnız statik okumadan (kesin DEĞİL)', String(oz.tetikStatik)],
+      ['8. soru: ÖLÇÜLMEDİ (beyan yok, okunan yol yok)', String(oz.tetikOlculmeyen)],
       ['CI penceresinde kırmızı veren dosya', String(oz.ciKirmiziVerenDosya)],
       ['CI penceresinde HİÇ kırmızı vermeyen dosya', String(oz.ciHicKirmiziVermeyen)],
     ],
@@ -583,10 +623,10 @@ function mdYaz(karne, oz) {
   );
   L.push('## Tüm dosyalar');
   L.push('');
-  L.push('Ayrıntı (yedi soru, her dosya için) `test-karnesi-*.json` içindedir. Bu tablo yalnız özet sütunlarını verir.');
+  L.push('Ayrıntı (sekiz soru, her dosya için) `test-karnesi-*.json` içindedir. Bu tablo yalnız özet sütunlarını verir.');
   L.push('');
   tablo(
-    ['Dosya', 'Küme', 'CI kırmızı', 'Sabotaj', 'Ortam', 'Süre (ms)', 'Aday'],
+    ['Dosya', 'Küme', 'CI kırmızı', 'Sabotaj', 'Ortam', 'Süre (ms)', 'Tetik', 'Aday'],
     karne.kayitlar.map((k) => [
       `\`${k.dosya}\``,
       k.kume,
@@ -594,6 +634,7 @@ function mdYaz(karne, oz) {
       k.q3_sabotaj.durum === 'olculdu' ? `${k.q3_sabotaj.hukum} (${k.q3_sabotaj.yakalanan}/${k.q3_sabotaj.denenen})` : 'ölçülmedi',
       k.q4_ortam.hukum,
       k.q5_sure.olculmedi ? 'ölçülmedi' : String(k.q5_sure.testMs),
+      k.q8_tetik.kaynak === 'yok' ? 'ölçülmedi' : `${k.q8_tetik.kaynak} (${k.q8_tetik.tetik.length})`,
       k.oneri.tur,
     ]),
   );
@@ -660,5 +701,6 @@ module.exports = {
   sabotajOku,
   sabotajOzeti,
   sonrakiSonuc,
+  tetikOzeti,
   yerineGecenOku,
 };
