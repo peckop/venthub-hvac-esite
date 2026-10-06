@@ -72,7 +72,7 @@ describe('40 aile slug değişimi: eski adres → 11 Ekim adresi, TEK 308 (zinci
     ['/tr/products/vortice-vort-commercial-in-line-rectangular', `/tr/urun/${AILE.rect.yeni}`],
     // Bugünkü ara adres (migration sonrası, 11 Ekim ÖNCESİ): yeni slug'la eski şema yolu da tek hop
     [`/tr/products/${AILE.lineo.yeni}`, `/tr/urun/${AILE.lineo.yeni}`],
-    // Tohum: Lineo çap aileleri (T162) eski adresi, hedefi ESKİ slug olsa bile takma ad üzerinden tek hop
+    // Tohum: Lineo çap aileleri (T162) eski adresi; tohum hedefi artık YENİ slug (URN-53), tek hop
     ['/tr/products/vortice-lineo-100-quiet', `/tr/urun/${AILE.lineo.yeni}`],
     ['/en/products/vortice-lineo-315-quiet', `/en/products/${AILE.lineo.yeni}`],
   ])('%s → %s', async (yol, hedef) => {
@@ -89,6 +89,16 @@ describe('40 aile slug değişimi: eski adres → 11 Ekim adresi, TEK 308 (zinci
   })
 
   it('AYIRT EDİCİLİK: aile takma adı yazılmazsa eski slug çözülmez (migration adım 8 bu yüzden RAISE eder)', async () => {
-    await expect(haritaKur(false)).rejects.toThrow(/hedef aile bu kiracıda yok/)
+    const harita = await haritaKur(false)
+    expect(esle(harita, '/tr/products/vortice-lineo-quiet').sonuc).toBeNull()
+    expect(esle(harita, '/tr/products/nicotra-gebhardt-dd').sonuc).toBeNull()
+    // Karşı yön (kanıt, kapının "her şey null" diye yeşil kalmadığı): takma adla aynı adresler çözülür.
+    const takmali = await haritaKur(true)
+    expect(esle(takmali, '/tr/products/vortice-lineo-quiet').sonuc).toEqual({ hedef: `/tr/urun/${AILE.lineo.yeni}`, durum: 308 })
+  })
+
+  it('URN-53: tohum Lineo çap hedefi YENİ slug; takma ad yazılmasa da çap adresi tek hop (zincir kalmaz)', async () => {
+    const harita = await haritaKur(false)
+    expect(esle(harita, '/tr/products/vortice-lineo-100-quiet').sonuc).toEqual({ hedef: `/tr/urun/${AILE.lineo.yeni}`, durum: 308 })
   })
 })

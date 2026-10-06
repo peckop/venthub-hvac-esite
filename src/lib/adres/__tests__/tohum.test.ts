@@ -52,7 +52,7 @@ describe('tohum dosyası', () => {
     const liste = [...(caplar?.[1] ?? '').matchAll(/'(\d+)'/g)].map((m) => m[1])
     expect(liste).toHaveLength(6)
     for (const cap of liste) {
-      expect(tohum.aileler.find((a) => a.eski === `vortice-lineo-${cap}-quiet`)?.hedef).toBe('vortice-lineo-quiet')
+      expect(tohum.aileler.find((a) => a.eski === `vortice-lineo-${cap}-quiet`)?.hedef).toBe('vortice-lineo-quiet-sessiz-kanal-fanlari')
     }
   })
 
