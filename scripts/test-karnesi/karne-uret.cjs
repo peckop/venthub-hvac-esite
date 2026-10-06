@@ -29,6 +29,13 @@ const KUMELEME_SAAT = 12;
 const MIN_DAL = 3;
 const SURUM = 1;
 
+/**
+ * sabotaj.cjs `hukumVer` sözlüğünde bir şey ÖLÇMÜŞ olan hükümler. UYGULANAMADI (hiçbir sabotaj uygulanamadı) ve TABAN_ATLANDI
+ * (taban koşusunda tüm testler atlandı) kayıt bırakır ama ÖLÇÜM DEĞİLDİR: "ölçülemeyen cevap 'ölçülmedi' yazılır".
+ * Sözlük KAPALI tutulur: koşucuya yeni bir hüküm eklenirse bu listeye girene kadar öneri KORU değil OLCULMEDI olur.
+ */
+const OLCULEN_HUKUMLER = new Set(['KIRMIZI', 'YESIL', 'TABAN_KIRMIZI']);
+
 // ------------------------------------------------------------------ saf fonksiyonlar (test edilir)
 
 /** Zaman damgalı koşuları, ardışık aralığı ≤ KUMELEME_SAAT olan kümelere böler. */
@@ -206,6 +213,11 @@ function oneriVer({ sabotaj, ortam, ci, kopya, dunya }) {
   if (kopya.olculen.length > 0 && ci.kirmizi === 0) {
     sebepler.push(`aynı sabotajı ${kopya.olculen.length} başka test de yakalıyor ve bu test pencerede hiç kırmızı vermedi`);
     return { tur: 'COKLU-KORUMA-ADAYI', sebepler };
+  }
+  // Kayıt VAR ama hiçbir şey ölçülmemiş (UYGULANAMADI / TABAN_ATLANDI / bilinmeyen hüküm): "ölçüldü" sayılmaz, KORU yazılmaz.
+  // Sırası "kayıt yok" ile AYNIDIR (CI kanıtı ve çoklu koruma önce gelir): OLCULMEDI düşük öncelikli, KORU'dan hemen öncedir.
+  if (sabotaj.durum === 'olculdu' && !OLCULEN_HUKUMLER.has(sabotaj.hukum)) {
+    return { tur: 'OLCULMEDI', sebepler: [`sabotaj hükmü ${sabotaj.hukum || 'yok'}: hiçbir şey ölçülmedi (sabotaj uygulanamadı ya da taban atlandı)`] };
   }
   if (sabotaj.durum !== 'olculdu') return { tur: 'OLCULMEDI', sebepler: ['sabotaj yoklaması bu dosya için yapılmadı'] };
   return { tur: 'KORU', sebepler: [] };
