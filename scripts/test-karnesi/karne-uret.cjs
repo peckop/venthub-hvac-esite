@@ -147,10 +147,44 @@ function imzaListesi(ortam) {
   return s;
 }
 
+/**
+ * Üçüncü soru (koruduğu şey bozulunca kırmızı veriyor mu): sabotaj kaydı + ek yoklamalar → karne alanı.
+ * `kismi` = test KIRMIZI veriyor ama ölçülen gerçekçi bozulmalardan en az birine (ana kayıtta ya da ek yoklamada) YEŞİL kaldı.
+ * Kayıt yoksa "ölçülmedi" (tahmin yazılmaz); conformance dışı dosyalar için kapsam notu ayrıdır.
+ */
+function sabotajOzeti({ sab, ekler = [], kume }) {
+  if (!sab) {
+    return { durum: 'olculmedi', neden: kume === 'conformance' ? 'sabotaj yoklaması bu dosyaya ulaşmadı' : 'kapsam dışı: bugünkü yoklama yalnız conformance testleri' };
+  }
+  if (sab.hukum === 'CELISKI') {
+    return { durum: 'celiski', kaynaklar: sab.celiski, neden: 'aynı test için farklı hüküm çıktı; çözülmedi, karar insanındır' };
+  }
+  const den = sab.denemeler || [];
+  const ajan = sab.ajan || {};
+  const yakalanmayanlar = den.filter((d) => d.sonuc === 'GECTI').map((d) => d.ad);
+  const ekYakalanmayan = ekler.filter((d) => d.sonuc === 'GECTI').map((d) => d.ad);
+  return {
+    durum: 'olculdu',
+    hukum: sab.hukum,
+    denenen: den.filter((d) => d.sonuc === 'KIRMIZI' || d.sonuc === 'GECTI').length,
+    yakalanan: den.filter((d) => d.sonuc === 'KIRMIZI').length,
+    yakalanmayanlar,
+    gecersiz: den.filter((d) => d.sonuc !== 'KIRMIZI' && d.sonuc !== 'GECTI').map((d) => `${d.ad}: ${d.sonuc}`),
+    ekDenenen: ekler.filter((d) => d.sonuc === 'KIRMIZI' || d.sonuc === 'GECTI').length,
+    ekYakalanmayan,
+    kismi: sab.hukum === 'KIRMIZI' && yakalanmayanlar.length + ekYakalanmayan.length > 0,
+    tekrar: sab.tekrar,
+    not: ajan.not || undefined,
+  };
+}
+
 /** Aday öneri. KARAR DEĞİL: silme/taşıma insan onayıdır. */
 function oneriVer({ sabotaj, ortam, ci, kopya, dunya }) {
   const sebepler = [];
   if (dunya) return { tur: 'TASINDI', sebepler: [`PR kapısından çıktı; yeni yer: ${dunya.yeniYer.join(' + ')}`] };
+  if (sabotaj.durum === 'celiski') {
+    return { tur: 'CELISKI-INCELE', sebepler: [`aynı test için farklı hüküm: ${(sabotaj.kaynaklar || []).map((x) => `${x.dosya}=${x.hukum}`).join(', ')}`] };
+  }
   if (sabotaj.durum === 'olculdu' && sabotaj.hukum === 'YESIL') {
     sebepler.push(`${sabotaj.denenen} sabotajın hiçbiri yakalanmadı`);
     return { tur: 'SAHTE-YESIL-ADAYI', sebepler };
@@ -162,6 +196,12 @@ function oneriVer({ sabotaj, ortam, ci, kopya, dunya }) {
   if (ortam.hukum === 'bagli' && ci.kirmizi > 0 && ci.dunyaKumesi / ci.kirmizi >= 0.5) {
     sebepler.push(`CI kırmızılarının çoğu PR'dan bağımsız (${ci.dunyaKumesi}/${ci.kirmizi})`);
     return { tur: 'TASI-ADAYI-DUNYA-DURUMU', sebepler };
+  }
+  // Kısmi koruma, silme adayı DEĞİL güçlendirme adayıdır: bir kolu korur, bir kolu görmez. Çoklu koruma adaylığından ÖNCE gelir.
+  if (sabotaj.durum === 'olculdu' && sabotaj.kismi) {
+    const ad = [...sabotaj.yakalanmayanlar, ...(sabotaj.ekYakalanmayan || [])];
+    sebepler.push(`${ad.length} bozulma yakalanmadı: ${ad.slice(0, 3).join('; ')}${ad.length > 3 ? '; …' : ''}`);
+    return { tur: 'KISMI-KORUMA', sebepler };
   }
   if (kopya.olculen.length > 0 && ci.kirmizi === 0) {
     sebepler.push(`aynı sabotajı ${kopya.olculen.length} başka test de yakalıyor ve bu test pencerede hiç kırmızı vermedi`);
@@ -177,15 +217,82 @@ function jsonOku(yol) {
   return JSON.parse(fs.readFileSync(yol, 'utf8'));
 }
 
+/**
+ * Aynı test BİRDEN ÇOK sabotaj kaydında geçerse SESSİZCE biri seçilmez (Recep 10-06: "çelişki çelişki olarak raporlanır"):
+ *   · kayıt tek ise o kullanılır;
+ *   · `yerine-gecen.json` o test için bir kaydı AÇIKÇA yerine geçen ilan etmişse (gerekçeyle) o seçilir, `tekrar` ile işaretlenir;
+ *   · ilan yok ve hükümler AYNI ise son kayıt kullanılır, `tekrar: ayni-hukum` ile işaretlenir;
+ *   · ilan yok ve hükümler FARKLI ise hüküm 'CELISKI' olur (karar insanındır; karnede ayrı bölümde listelenir).
+ * `liste`: [{ dosya, kayit }] (dosya sırasıyla); `ilan`: { dosya, neden } | undefined.
+ */
+function sabotajBirlestir(test, liste, ilan) {
+  if (liste.length === 1) return liste[0].kayit;
+  const kaynaklar = liste.map((x) => ({ dosya: x.dosya, hukum: x.kayit.hukum }));
+  const secilen = ilan ? liste.find((x) => x.dosya === ilan.dosya) : undefined;
+  if (secilen) return { ...secilen.kayit, tekrar: { tur: 'yerine-gecti', secilen: ilan.dosya, neden: ilan.neden, kaynaklar } };
+  if (new Set(kaynaklar.map((x) => x.hukum)).size === 1) {
+    const son = liste[liste.length - 1];
+    return { ...son.kayit, tekrar: { tur: 'ayni-hukum', secilen: son.dosya, kaynaklar } };
+  }
+  return { test, hukum: 'CELISKI', denemeler: [], ajan: {}, celiski: kaynaklar };
+}
+
+/** `yerine-gecen.json`: [{ test, dosya, neden }]. Bozuk ilan FIRLATIR (fail-closed: ilan sessizce kaybolmaz). */
+function yerineGecenOku(dizin) {
+  const yol = path.join(dizin, 'yerine-gecen.json');
+  const harita = new Map();
+  if (!fs.existsSync(yol)) return harita;
+  const liste = JSON.parse(fs.readFileSync(yol, 'utf8'));
+  if (!Array.isArray(liste)) throw new Error('yerine-gecen.json bir dizi olmalı');
+  for (const x of liste) {
+    if (!x || !x.test || !x.dosya || !x.neden) throw new Error(`yerine-gecen.json kaydı eksik (test, dosya, neden zorunlu): ${JSON.stringify(x)}`);
+    harita.set(x.test, { dosya: x.dosya, neden: x.neden });
+  }
+  return harita;
+}
+
 function sabotajOku(dizin) {
   const harita = new Map();
   if (!dizin || !fs.existsSync(dizin)) return harita;
+  const kayitlar = new Map();
   for (const f of fs.readdirSync(dizin).filter((x) => /^g\d+\.jsonl$/.test(x)).sort()) {
     for (const s of fs.readFileSync(path.join(dizin, f), 'utf8').split('\n')) {
       if (!s.trim()) continue;
       try {
         const k = JSON.parse(s);
-        harita.set(k.test, k);
+        if (!kayitlar.has(k.test)) kayitlar.set(k.test, []);
+        kayitlar.get(k.test).push({ dosya: f, kayit: k });
+      } catch {
+        /* yarım satır: atlanır */
+      }
+    }
+  }
+  const ilanlar = yerineGecenOku(dizin);
+  for (const [test, liste] of kayitlar) harita.set(test, sabotajBirlestir(test, liste, ilanlar.get(test)));
+  return harita;
+}
+
+/**
+ * EK YOKLAMALAR: ajanın ilk sabotajı yakalansa bile, aynı test için BAŞKA bir kolu bozduğu kayıtlar
+ * (`gNN-ek*.jsonl`, `ek/*.jsonl`). Ana kaydı (hüküm) EZMEZ; yalnız "kısmi koruma" kanıtı olarak eklenir:
+ * test KIRMIZI verir ama bu kol bozulunca YEŞİL kalıyorsa o kolda KORUMA YOKTUR.
+ */
+function ekOku(dizin) {
+  const harita = new Map();
+  if (!dizin || !fs.existsSync(dizin)) return harita;
+  const dosyalar = fs.readdirSync(dizin).filter((x) => /^g\d+-ek[^/\\]*\.jsonl$/.test(x)).map((x) => path.join(dizin, x));
+  const ekDizin = path.join(dizin, 'ek');
+  if (fs.existsSync(ekDizin)) {
+    for (const f of fs.readdirSync(ekDizin).filter((x) => x.endsWith('.jsonl'))) dosyalar.push(path.join(ekDizin, f));
+  }
+  for (const yol of dosyalar.sort()) {
+    for (const s of fs.readFileSync(yol, 'utf8').split('\n')) {
+      if (!s.trim()) continue;
+      try {
+        const k = JSON.parse(s);
+        if (!k.test) continue;
+        if (!harita.has(k.test)) harita.set(k.test, []);
+        for (const d of k.denemeler || []) harita.get(k.test).push({ ad: d.ad, sonuc: d.sonuc, kaynak: path.basename(yol) });
       } catch {
         /* yarım satır: atlanır */
       }
@@ -234,7 +341,7 @@ function ilkEklenme() {
 
 // ------------------------------------------------------------------ birleştirme
 
-function karneUret({ ci, vitest, sabotaj, dunyaListesi, tarih, ciPencere }) {
+function karneUret({ ci, vitest, sabotaj, ek = new Map(), dunyaListesi, tarih, ciPencere }) {
   const stat = statik.testDosyalari().map(statik.analiz);
   const yakin = statik.benzerlik(
     // benzerlik parmak izi ister; analiz() onu döndürür
@@ -264,21 +371,7 @@ function karneUret({ ci, vitest, sabotaj, dunyaListesi, tarih, ciPencere }) {
       ? { pencere: ciPencere, ...c }
       : { pencere: null, olculmedi: 'CI geçmişi verilmedi' };
     // 3) sabotaj
-    let q3;
-    if (!sab) q3 = { durum: 'olculmedi', neden: s.kume === 'conformance' ? 'sabotaj yoklaması bu dosyaya ulaşmadı' : 'kapsam dışı: bugünkü yoklama yalnız conformance testleri' };
-    else {
-      const den = sab.denemeler || [];
-      const gecerli = den.filter((d) => d.sonuc === 'KIRMIZI' || d.sonuc === 'GECTI');
-      q3 = {
-        durum: 'olculdu',
-        hukum: sab.hukum,
-        denenen: gecerli.length,
-        yakalanan: den.filter((d) => d.sonuc === 'KIRMIZI').length,
-        yakalanmayanlar: den.filter((d) => d.sonuc === 'GECTI').map((d) => d.ad),
-        gecersiz: den.filter((d) => d.sonuc !== 'KIRMIZI' && d.sonuc !== 'GECTI').map((d) => `${d.ad}: ${d.sonuc}`),
-        not: ajan.not || undefined,
-      };
-    }
+    const q3 = sabotajOzeti({ sab, ekler: ek.get(s.dosya) || [], kume: s.kume });
     // 6) kopya
     const q6 = {
       olculen: (sab && sab.ortakKirmizi) || [],
@@ -356,7 +449,9 @@ function ozetle(karne, ci) {
     kumeler,
     sabotajHukumleri: hukumler,
     sabotajOlculen: say((k) => k.q3_sabotaj.durum === 'olculdu'),
-    sabotajOlculmeyen: say((k) => k.q3_sabotaj.durum !== 'olculdu'),
+    sabotajOlculmeyen: say((k) => k.q3_sabotaj.durum === 'olculmedi'),
+    sabotajCeliski: say((k) => k.q3_sabotaj.durum === 'celiski'),
+    sabotajKismi: say((k) => k.q3_sabotaj.durum === 'olculdu' && k.q3_sabotaj.kismi),
     ortam: ortamlar,
     oneriler,
     ciKirmiziVerenDosya: say((k) => k.q2_ci.kirmizi > 0),
@@ -388,6 +483,8 @@ function mdYaz(karne, oz) {
       ...Object.entries(oz.kumeler).map(([k, n]) => [`· ${k}`, String(n)]),
       ['sabotajla ÖLÇÜLEN dosya', String(oz.sabotajOlculen)],
       ['sabotajla ÖLÇÜLMEYEN dosya', String(oz.sabotajOlculmeyen)],
+      ['sabotajda ÇELİŞKİ (aynı test için farklı hüküm, çözülmedi)', String(oz.sabotajCeliski)],
+      ['KISMİ koruma (kırmızı veriyor ama ölçülen bir bozulmaya yeşil kalıyor)', String(oz.sabotajKismi)],
       ['CI penceresinde kırmızı veren dosya', String(oz.ciKirmiziVerenDosya)],
       ['CI penceresinde HİÇ kırmızı vermeyen dosya', String(oz.ciHicKirmiziVermeyen)],
     ],
@@ -426,6 +523,23 @@ function mdYaz(karne, oz) {
     (k) => [`\`${k.dosya}\``, k.dunyaDurumu.yeniYer.join(' + '), k.dunyaDurumu.neden.replace(/\|/g, '/'), k.dunyaDurumu.kanit.replace(/\|/g, '/')],
   );
   bol(
+    'ÇELİŞKİLER (aynı test için farklı sabotaj hükmü; çözülmedi, sessizce seçilmedi)',
+    (k) => k.q3_sabotaj.durum === 'celiski',
+    ['Test', 'Kayıtlar'],
+    (k) => [`\`${k.dosya}\``, k.q3_sabotaj.kaynaklar.map((x) => `${x.dosya}=${x.hukum}`).join('; ')],
+  );
+  bol(
+    'Yerine geçen ölçümler (bilinçli tekrar: önceki kaydın yerine açıkça ilan edilmiş yeniden ölçüm)',
+    (k) => k.q3_sabotaj.tekrar && k.q3_sabotaj.tekrar.tur === 'yerine-gecti',
+    ['Test', 'Seçilen kayıt', 'Neden', 'Kayıtlar'],
+    (k) => [
+      `\`${k.dosya}\``,
+      k.q3_sabotaj.tekrar.secilen,
+      String(k.q3_sabotaj.tekrar.neden).replace(/\|/g, '/'),
+      k.q3_sabotaj.tekrar.kaynaklar.map((x) => `${x.dosya}=${x.hukum}`).join('; '),
+    ],
+  );
+  bol(
     'Sahte yeşil adayları (sabotajların hiçbiri yakalanmadı)',
     (k) => k.oneri.tur === 'SAHTE-YESIL-ADAYI',
     ['Test', 'Korur', 'Denenen', 'Not'],
@@ -444,10 +558,16 @@ function mdYaz(karne, oz) {
     (k) => [`\`${k.dosya}\``, k.q6_kopya.olculen.map((x) => `\`${x.split('/').pop()}\``).join(', ')],
   );
   bol(
-    'Kısmi koruma (bazı sabotajlar yakalanmadı)',
-    (k) => k.q3_sabotaj.durum === 'olculdu' && k.q3_sabotaj.hukum === 'KIRMIZI' && k.q3_sabotaj.yakalanmayanlar.length > 0,
-    ['Test', 'Yakalanmayan sabotaj'],
-    (k) => [`\`${k.dosya}\``, k.q3_sabotaj.yakalanmayanlar.map((x) => String(x).replace(/\|/g, '/')).join('; ').slice(0, 260)],
+    'Kısmi koruma (test kırmızı veriyor ama bazı bozulmalara yeşil kalıyor: silme adayı DEĞİL, güçlendirme adayı)',
+    (k) => k.q3_sabotaj.durum === 'olculdu' && k.q3_sabotaj.kismi,
+    ['Test', 'Yakalanmayan bozulma'],
+    (k) => [
+      `\`${k.dosya}\``,
+      [...k.q3_sabotaj.yakalanmayanlar, ...(k.q3_sabotaj.ekYakalanmayan || []).map((x) => `${x} (ek yoklama)`)]
+        .map((x) => String(x).replace(/\|/g, '/'))
+        .join('; ')
+        .slice(0, 300),
+    ],
   );
   L.push('## Tüm dosyalar');
   L.push('');
@@ -496,6 +616,7 @@ function main() {
     ci,
     vitest: vitestOku(a.vitest, testler),
     sabotaj: sabotajOku(a.sabotaj),
+    ek: ekOku(a.sabotaj),
     dunyaListesi,
     tarih: a.tarih,
     ciPencere,
@@ -510,4 +631,22 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { MIN_DAL, KUMELEME_SAAT, SURUM, ciOzeti, imzaListesi, karneUret, kumele, mdYaz, oneriVer, ortamHukmu, ozetle, sonrakiSonuc };
+module.exports = {
+  MIN_DAL,
+  KUMELEME_SAAT,
+  SURUM,
+  ciOzeti,
+  ekOku,
+  imzaListesi,
+  karneUret,
+  kumele,
+  mdYaz,
+  oneriVer,
+  ortamHukmu,
+  ozetle,
+  sabotajBirlestir,
+  sabotajOku,
+  sabotajOzeti,
+  sonrakiSonuc,
+  yerineGecenOku,
+};
