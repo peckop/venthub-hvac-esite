@@ -39,14 +39,11 @@ import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/cat
  *
  * Bekçi: `src/__tests__/conformance/silent-fan-series-binding.test.ts` (INV-SILENTFAN-SERI-1).
  *
- * İKİ SLUG (REC-300 Faz 1-B, #1352): migration aileyi `vortice-lineo-quiet` →
- * `vortice-lineo-quiet-sessiz-kanal-fanlari` yapar. Kod ile migration AYNI ANDA canlıya çıkmaz
- * (Vercel dağıtımı ile `supabase-migrate` ayrı iş), o yüzden iki slug da seri sayılır. Sihirbaza
- * giden değer, sayfadaki aile listesinin GERÇEKTEN taşıdığı slug'dır (`sessizFanSerisi`); sabit
- * bir slug'ı sorguya körü körüne vermek, migration'dan sonra "aile bulunamadı → boş liste" olurdu.
- * Eski slug migration'ın canlıda ölçüldüğü bir sonraki işte (URN-53) buradan silinir.
+ * TEK SLUG (REC-300 Faz 1-B #1352 canlıda ölçüldü, URN-53): migration aileyi `vortice-lineo-quiet` →
+ * `vortice-lineo-quiet-sessiz-kanal-fanlari` yaptı; geçiş dönemindeki eski slug buradan SİLİNDİ. Sihirbaza
+ * giden değer yine sayfadaki aile listesinin GERÇEKTEN taşıdığı slug'dır (`sessizFanSerisi`).
  */
-const SESSIZ_FAN_SERILERI = ['vortice-lineo-quiet', 'vortice-lineo-quiet-sessiz-kanal-fanlari'] as const
+const SESSIZ_FAN_SERILERI = ['vortice-lineo-quiet-sessiz-kanal-fanlari'] as const
 
 interface CategoryLandingProps {
     category: DomainCategory
