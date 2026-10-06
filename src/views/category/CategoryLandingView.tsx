@@ -38,8 +38,15 @@ import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/cat
  * sihirbaz başka ürün önerir; hiçbir sayı bunu göstermez).
  *
  * Bekçi: `src/__tests__/conformance/silent-fan-series-binding.test.ts` (INV-SILENTFAN-SERI-1).
+ *
+ * İKİ SLUG (REC-300 Faz 1-B, #1352): migration aileyi `vortice-lineo-quiet` →
+ * `vortice-lineo-quiet-sessiz-kanal-fanlari` yapar. Kod ile migration AYNI ANDA canlıya çıkmaz
+ * (Vercel dağıtımı ile `supabase-migrate` ayrı iş), o yüzden iki slug da seri sayılır. Sihirbaza
+ * giden değer, sayfadaki aile listesinin GERÇEKTEN taşıdığı slug'dır (`sessizFanSerisi`); sabit
+ * bir slug'ı sorguya körü körüne vermek, migration'dan sonra "aile bulunamadı → boş liste" olurdu.
+ * Eski slug migration'ın canlıda ölçüldüğü bir sonraki işte (URN-53) buradan silinir.
  */
-const SESSIZ_FAN_SERISI = 'vortice-lineo-quiet'
+const SESSIZ_FAN_SERILERI = ['vortice-lineo-quiet', 'vortice-lineo-quiet-sessiz-kanal-fanlari'] as const
 
 interface CategoryLandingProps {
     category: DomainCategory
@@ -79,7 +86,8 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     // Doğru bağ, anlatının gerçek konusu olan seridir.
     //
     // Seri kanonik slug ile aranır; `catalog-integrity` slug-unresolved kolu bu sabiti korur.
-    const isSilentFan = families.some((aile) => aile.slug === SESSIZ_FAN_SERISI)
+    const sessizFanSerisi = families.find((aile) => (SESSIZ_FAN_SERILERI as readonly string[]).includes(aile.slug))?.slug ?? null
+    const isSilentFan = sessizFanSerisi !== null
     const isDehumidifier = category.slug === 'dehumidifiers'
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
@@ -244,11 +252,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                 />
             )}
 
-            {isSilentFan && (
+            {sessizFanSerisi !== null && (
                 <SilentFanWizard
                     isOpen={wizardOpen}
                     onClose={() => setWizardOpen(false)}
-                    familySlug={SESSIZ_FAN_SERISI}
+                    familySlug={sessizFanSerisi}
                 />
             )}
         </div>
