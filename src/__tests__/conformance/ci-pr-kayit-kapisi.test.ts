@@ -139,7 +139,8 @@ describe('INV-CI-KAYIT-KAPISI-1 — karar 187 kapısı ci iş akışına doğru 
   })
 
   it('sabotaj 5: ci işine pull-requests: write girerse yakalanır', () => {
-    const bozuk = ciMetni.replace('    timeout-minutes: 15\n', '    timeout-minutes: 15\n    permissions:\n      pull-requests: write\n')
+    // Çapa `runs-on` satırı (tek iş): `timeout-minutes` satırı ALT-38'de ifadeye döndü ve çapayı sessizce kırdı.
+    const bozuk = ciMetni.replace('    runs-on: ubuntu-latest\n', '    runs-on: ubuntu-latest\n    permissions:\n      pull-requests: write\n')
     expect(bozuk).not.toBe(ciMetni)
     expect(kapiBaglantisiniDenetle(bozuk).join('|')).toContain('pull-requests: write')
   })
