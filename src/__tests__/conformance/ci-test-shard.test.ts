@@ -720,8 +720,8 @@ describe("INV-CI-SHARD-1 — test-shard işi ve ci bekleme adımı ci.yml'ye do�
     expect(isIf).toBe(SHARD_IF)
     expect(bekle ? adimIfSatirlari(bekle) : null).toEqual([isIf])
     expect(test ? adimIfSatirlari(test) : null).toEqual([`if: steps.ayna.outputs.atla != 'true' && !(${isIf.slice('if: '.length)})`])
-    // üç yerde aynı ifade (iş, bekleme adımı, Test dışlaması): biri değişirse test kırmızı
-    expect(ci.split(SHARD_OLAYI).length - 1).toBe(3)
+    // üç yerde aynı ifade (iş, bekleme adımı, Test dışlaması): biri değişirse test kırmızı (yorum satırları sayılmaz: yorum düzeltmesi bu testi kırmızı yapmaz)
+    expect(yorumsuz(s).join('\n').split(SHARD_OLAYI).length - 1).toBe(3)
   })
 
   it('bekleme adımı `ci` işinin SON adımı; `ci` job düzeyinde yalnız bilinen anahtarlar; test-shard işi `needs` taşımaz', () => {
