@@ -106,21 +106,47 @@ describe('INV-HARITA-URET-1 · iş akışı yapısı', () => {
   })
 })
 
+/**
+ * ALT-37e (karar 310): üreteç `url_takma_adlari` tablosunu anon'a kapalı tuttuğu için TEK bir rpc çağırır:
+ * yalnız-okuma liste işlevi. Başka her rpc adı yazma olabileceğinden YASAK; çağrı `get: true` ile yapılır
+ * (PostgREST GET'i salt-okunur işlemde koşturur: işlev gövdesi yanlışlıkla yazsa bile düşer).
+ * İşlevin kendisinin salt-okunurluğu `url-takma-adlari-listele.test.ts` içinde SQL düzeyinde ölçülür.
+ */
+const IZINLI_RPC = 'url_takma_adlari_listele'
+const URETEC = 'src/lib/adres/haritaUret.ts'
+
+/** Yorum satırları çıkarılır: "insert/update yok" gibi açıklamalar çağrı sayılmasın. */
+const kodOku = (dosya: string): string =>
+  oku(dosya)
+    .split('\n')
+    .filter((s) => !/^\s*(\*|\/\*|\/\/)/.test(s))
+    .join('\n')
+
 describe('INV-HARITA-URET-1 · yazma çağrısı 0', () => {
-  const DOSYALAR = [
-    'scripts/adres/harita-uret.ts',
-    'scripts/adres/harita-uret-yardimci.ts',
-    'src/lib/adres/haritaUret.ts',
-  ]
+  const DOSYALAR = ['scripts/adres/harita-uret.ts', 'scripts/adres/harita-uret-yardimci.ts', URETEC]
   it.each(DOSYALAR)('%s: yazma çağrısı yok', (dosya: string) => {
-    // Yorum satırları çıkarılır: "insert/update yok" gibi açıklamalar çağrı sayılmasın.
-    const kod = oku(dosya)
-      .split('\n')
-      .filter((s) => !/^\s*(\*|\/\*|\/\/)/.test(s))
-      .join('\n')
-    expect(kod).not.toMatch(/\.(insert|update|upsert|delete|rpc)\s*\(/)
+    const kod = kodOku(dosya)
+    expect(kod).not.toMatch(/\.(insert|update|upsert|delete)\s*\(/)
     expect(kod).not.toMatch(/\.(storage|functions)\b/)
     expect(kod).not.toMatch(/auth\.admin/)
+    // rpc: izinli tek ad dışında HİÇBİRİ (adı string değilse ya da başkaysa kırmızı).
+    for (const m of kod.matchAll(/\.rpc\s*\(\s*([^,)]*)/g)) {
+      expect(m[1].trim(), `${dosya}: izinsiz rpc ${m[1].trim()}`).toBe(`'${IZINLI_RPC}'`)
+    }
+  })
+
+  it('rpc YALNIZ üreteçte: tek çağrı, izinli işlev, `get: true`; çalıştırıcı ve yardımcıda hiç yok', () => {
+    const cagrilar = [...kodOku(URETEC).matchAll(/\.rpc\s*\(([^)]*)\)/g)].map((m) => m[1])
+    expect(cagrilar).toHaveLength(1)
+    expect(cagrilar[0]).toContain(`'${IZINLI_RPC}'`)
+    expect(cagrilar[0], 'GET kipi yok: çağrı POST ile salt-okunur olmayan işlemde koşar').toMatch(/\{\s*get:\s*true\s*\}/)
+    for (const dosya of ['scripts/adres/harita-uret.ts', 'scripts/adres/harita-uret-yardimci.ts']) {
+      expect(kodOku(dosya), `${dosya}: rpc yok olmalı`).not.toMatch(/\.rpc\s*\(/)
+    }
+  })
+
+  it('üreteç `url_takma_adlari` tablosunu DOĞRUDAN okumaz (tablo anon\'a kapalı: yalnız liste işlevi)', () => {
+    expect(kodOku(URETEC)).not.toMatch(/\.from\(\s*['"`]url_takma_adlari['"`]\s*\)/)
   })
 })
 
