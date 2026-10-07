@@ -86,7 +86,12 @@ const SINIF_RUN_GOVDESI = String.raw`if ! git show HEAD^1:${SINIF_BETIGI} > "${S
   printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
   exit 0
 fi
-node "${SINIF_KOPYA}"`
+cikis=0
+node "${SINIF_KOPYA}" || cikis=$?
+if [ "$cikis" -ne 0 ]; then
+  echo "::warning::değişiklik sınıfı: tam — sınıflayıcı çöktü (çıkış kodu $cikis), tam paket koşar"
+  printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+fi`
 
 /** Ayna koşusunda ATLANAN adımlar: hepsi `beklenenKosul(ad)` satırını taşır (çoğu KOSUL; Build ve Next önbelleği KOSUL_BUILD). */
 const AGIR = [

@@ -7,7 +7,7 @@
 > `INV-CI-EDITED-1` → `src/__tests__/conformance/ci-edited-ayna.test.ts` ·
 > `INV-CI-EDITED-2` → `scripts/ci/__tests__/edited-ayna.test.ts` ·
 > `INV-DUNYA-SATIRI-1` → `src/__tests__/conformance/dunya-durumu-satiri.test.ts` ·
-> `INV-CI-SINIF-1` ve `INV-CI-SINIF-2` → `src/__tests__/conformance/ci-degisiklik-sinifi.test.ts`
+> `INV-CI-SINIF-1`, `INV-CI-SINIF-2` ve `INV-CI-SINIF-3` → `src/__tests__/conformance/ci-degisiklik-sinifi.test.ts`
 >
 > **Kapsam:** bu sürüm testlerin NEREDE koşacağını yönetir (§1–§5). Her test dosyasının KARNESİ (neyi koruyor, gerçekten
 > kırmızı veriyor mu, ortama bağlı mı, aynısını başka test koruyor mu) ve silme listesi kuralı işin ikinci teslimiyle (ALT-38b)
@@ -68,7 +68,7 @@ liste (`git show HEAD^1:scripts/ci/dunya-durumu-testleri.json`): bir PR listeye 
 çeviremez; yeni kayıt kendi PR'ında dışlanmaz, birleşince sonraki PR'larda etkili olur. Taban listesi okunamazsa (git yok, ilk PR, bozuk
 dosya) HİÇBİR test dışlanmaz: tam paket koşar, uyarı yazılır. Yerel kullanım ve testler taban listesini `VENTHUB_DUNYA_TABAN_LISTESI=<dosya yolu>`
 ile elle verebilir (doluyken okunamıyorsa git'e DÜŞÜLMEZ). Liste `dislan` ve `yalniz` kiplerinde her yüklemede doğrulanır, geçersizse
-yapılandırma FIRLATIR. Dışlama mekanizmasının kendi koruyucu testleri (`INV-CI-EDITED-1/2`, `INV-TEST-KOSU-1`, `INV-DUNYA-SATIRI-1`, `INV-CI-SINIF-1/2`
+yapılandırma FIRLATIR. Dışlama mekanizmasının kendi koruyucu testleri (`INV-CI-EDITED-1/2`, `INV-TEST-KOSU-1`, `INV-DUNYA-SATIRI-1`, `INV-CI-SINIF-1/2/3`
 dosyaları ve sınıflayıcının karar tablosu `degisiklik-sinifi.test.ts`, `DISLANAMAZ` sabiti) listeye GİREMEZ.
 
 **Görünen yüz.** Zamanlı koşunun kırmızısı ya da sessizce ölmesi `DUNYA:` kanca satırında görünür (`.claude/hooks/dunya-durumu-satiri.cjs`,
@@ -117,6 +117,11 @@ Koşullar yalnız daraltma yönündedir: dar küme (belge, edge, betik, karma) A
 `if`/`needs` taşımaz: atlanan iş zorunlu kontrolde YEŞİL sayılır ve sınıf işi çökerse boşluk açılırdı; adım düzeyi koşul kullanılır, iş her durumda
 `admin-smoke` adıyla koşar ve biter.
 
+**Sınıflayıcı çökerse (INV-CI-SINIF-3).** Sınıflayıcı kendi içinde hiçbir hatayı dışarı fırlatmaz (her hata `tam` yazar, son sigortası vardır); yine de tümden çökerse
+(sözdizimi hatası, bellek, sinyal) adım KIRMIZI kalmaz: `sinif=tam` yazar, `::warning::` verir ve tam paket koşar. Kırmızı kalsaydı, tabandaki sınıflayıcı bozulduğunda onu
+düzelten PR de aynı bozuk kopyayı (`HEAD^1`) koşup birleşemezdi (kilitlenme). Adımın GERÇEK gövdesi testte gerçek git ve bash ile koşar: belge farkı `belge`, kod farkı `tam`,
+çöken sınıflayıcı `tam`, taban kopyası yok `tam`; yedek silinirse çöken sınıflayıcı adımı kırmızı yapar (kontrol testi).
+
 **Tanım ölçülür (INV-CI-SINIF-2).** "Siteye dokunmayan" elle listeye değil ölçüme dayanır: derleme girdisi (src/ ve kök ayar dosyaları) src/ ve public/ DIŞINA bir
 dosya aktarırsa ya da dosya sisteminden okursa o hedef `tam` olmak zorundadır; `package.json`ın build, lint, test, type-check ve prepare betiklerinin çağırdığı
 `scripts/` dosyaları (`assert-node-major.mjs`, `setup-hooks.mjs`) tam yol girdisiyle `tam`dır; atlanabilen e2e işinin çağırdığı betikler `scripts/ci/` altındadır.
@@ -134,6 +139,7 @@ girdileri içerik özetiyle doğrulanır, sonucu değiştirmez.
 |---|---|---|
 | `INV-CI-SINIF-1` | `ci-degisiklik-sinifi.test.ts` | sınıf kararının iki iş akışına bağı: dar küme sınıflayıcıdan türer ve `tam` içermez; YALNIZ `Build (blocking)` ve Next.js önbelleği sınıfı okur (Test ve öteki kapılar okumaz); `admin-smoke` iş düzeyinde `if`/`needs` taşımaz; her ağır e2e adımı tam koşulu taşır; iki sınıf adımı birebir aynı ve tabandan çıkarılır |
 | `INV-CI-SINIF-2` | `ci-degisiklik-sinifi.test.ts` | "siteye dokunmayan" tanımının ölçümü: derleme girdisinin src/ ve public/ dışına giden her kenarı `tam`; dosya okuyan derleme girdisi yalnız bilinen iki dosya; package.json CI hattı betikleri ve e2e işinin betikleri `tam` |
+| `INV-CI-SINIF-3` | `ci-degisiklik-sinifi.test.ts` | sınıf adımının GERÇEK gövdesi gerçek git ve bash ile koşar: belge farkı `belge`, kod farkı `tam`; sınıflayıcı çökerse adım kırmızı olmaz `sinif=tam` yazar (yedek silinirse kırmızı: kontrol testi); taban kopyası yoksa `tam`. bash yoksa atlanır, CI'da (ubuntu) her zaman koşar |
 | `INV-TEST-KOSU-1` | `test-kosu-kapsami.test.ts`, `dunya-durumu.test.ts` | her test dosyası bir yerde koşar; listedeki her kaydın dosyası var, gerekçesi ve kanıtı dolu, yeni yeri `zamanli` içeriyor; `dislan` kümesi PR listesi ∩ taban listesi; koruyucu testler listeye giremez; `ci` işinin Test adımı `dislan` kipini yalnız `pull_request`te verir; zamanlı iş akışı `yalniz` kipinde ve `schedule` ile koşar |
 | `INV-CI-EDITED-1` | `ci-edited-ayna.test.ts` | aynanın `ci.yml`'ye bağlantısı: ağır adımlar atlama koşulu taşır, hep koşan adımlar (kayıt kapısı, taban izi) taşımaz, iz adımı adı ve sırası, ayna adımı kayıt kapısından sonra ve karar betiğini TABAN kopyasından koşturur, `edited` ayrı grupta, izinler en az, tam geçmiş |
 | `INV-CI-EDITED-2` | `edited-ayna.test.ts` | aynanın karar mantığı ve GitHub çağrısının biçimi: atla yalnız aynı head ve AYNI taban izli tam koşu `success` iken; taban değişti, mekanizmaya dokunuldu, merge-ref biçimi bozuk ya da iz yoksa TAM; çağrı bütçesi |

@@ -1,11 +1,13 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { execFileSync, spawnSync } from 'node:child_process'
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
+import os from 'node:os'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-CI-SINIF-1 / INV-CI-SINIF-2 · değişiklik sınıfı iki iş akışına DOĞRU bağlı ve "siteye dokunmayan" tanımı ÖLÇÜLMÜŞ (ALT-38c).
+ * INV-CI-SINIF-1 / INV-CI-SINIF-2 / INV-CI-SINIF-3 · değişiklik sınıfı iki iş akışına DOĞRU bağlı ve "siteye dokunmayan" tanımı ÖLÇÜLMÜŞ (ALT-38c).
  *
  * NİÇİN VAR: PR'ın değişen dosyaları yalnız dar sınıflardaysa (belge, edge, betik, karma; mantık: scripts/ci/degisiklik-sinifi.cjs) `ci` işinin
  * `Build` adımı ve `admin-smoke` işinin ağır adımları ATLANIR. Atlanan adım kırmızı olamaz: yanlış atlama "kod değişti, kapı görmedi" demektir.
@@ -16,6 +18,9 @@ import { describe, expect, it } from 'vitest'
  *   SINIF-2 · TANIM: "siteye dokunmayan" tanımı elle listeye değil ÖLÇÜME dayanır: `next build` girdisi (src/ ve kök ayar dosyaları) src/ ve public/
  *     DIŞINA bir dosya aktarırsa ya da dosya sisteminden okursa, hedef sınıflayıcıda `tam` olmak zorundadır; package.json'ın CI hattında çağırdığı her
  *     betik `tam`dır; atlanabilen işlerin çağırdığı her betik `tam`dır. Yeni bir bağımlılık eklenirse bu dosya KIRMIZI olur ve listeye bilinçle eklenir.
+ *   SINIF-3 · DAVRANIŞ: sınıf adımının GERÇEK gövdesi (ci.yml'den çıkarılır) gerçek git ve bash ile koşar: belge farkı `belge`, kod farkı `tam`; sınıflayıcı
+ *     tümden ÇÖKERSE adım KIRMIZI değil `tam` yazar (çökme yedeği: tabandaki sınıflayıcı bozulursa onu düzelten PR kendi bozuk kopyasını koşup kilitlenirdi);
+ *     taban kopyası yoksa `tam`. bash yoksa (ör. Git Bash'siz Windows) bu bölüm atlanır; CI'da (ubuntu) her zaman koşar.
  *
  * Ölçüm yüzeyi: `node:fs` + satır taraması (YAML ayrıştırıcı yok; girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8). Ayrıştırılamayan yapı
  * KIRMIZIDIR (boş sonuç "uyumlu" sayılmaz). İş akışlarını DEĞİŞTİRMEZ.
@@ -41,6 +46,8 @@ const SINIF_ADI = "Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanı
 const CI_SINIF_OKUYAN = ['Next.js derleme önbelleği', 'Build (blocking)']
 const E2E_HEP_KOSAN = ['Merge-ref çözümle (yalnız elle tetiklemede)', 'Checkout', SINIF_ADI]
 const E2E_YUKLEME_ADIMI = 'Upload Playwright report on failure'
+/** Çökme yedeği: `node` çıkış kodu sıfırdan farklıysa adım `tam` yazar (gövde girintisi atılmış hâliyle, adımın SON satırları). */
+const COKME_YEDEGI = /node "\$RUNNER_TEMP\/degisiklik-sinifi\.cjs" \|\| cikis=\$\?\nif \[ "\$cikis" -ne 0 \]; then\n[^\n]*\n  printf 'sinif=tam\\n[^\n]*>> "\$GITHUB_OUTPUT"\nfi$/
 
 // ── AYRIŞTIRICI ──────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -127,6 +134,9 @@ function ciDenetle(ci: string): string[] {
   if (ad.length === 0) return ['ci.yml `jobs.ci.steps` ayrıştırılamadı: hiçbir adım denetlenmedi']
   const sinif = ad.filter((a) => a.ad === SINIF_ADI)
   if (sinif.length !== 1) ihlal.push(`ci.yml: "${SINIF_ADI}" adımı TAM BİR tane olmalı (bulunan ${sinif.length})`)
+  else if (sinif[0].govde === null || !COKME_YEDEGI.test(sinif[0].govde)) {
+    ihlal.push('ci.yml: sınıf adımında ÇÖKME YEDEĞİ yok (`node ... || cikis=$?` ve `sinif=tam` yazımı): sınıflayıcı çökerse adım kırmızı kalır, onu düzelten PR de kilitlenir')
+  }
   for (const a of ad) {
     const okur = yorumsuz(a.satirlar).some((s) => /steps\.sinif\./.test(s))
     if (okur && !CI_SINIF_OKUYAN.includes(a.ad)) {
@@ -245,6 +255,7 @@ describe('INV-CI-SINIF-1 · sınıf kararı iki iş akışında AYNI ve güvenli
     { ad: 'dar kümeden `karma` düşer', boz: (c) => c.split(DAR_LITERAL).join('["belge","edge","betik"]'), beklenen: 'dar sınıf kümesi sınıflayıcıyla AYNI değil' },
     { ad: 'dar kümeye `tam` girer', boz: (c) => c.split(DAR_LITERAL).join('["belge","edge","betik","karma","tam"]'), beklenen: 'dar sınıf kümesi sınıflayıcıyla AYNI değil' },
     { ad: 'sınıf adımı silinir', boz: (c) => c.replace(`- name: ${SINIF_ADI}`, '- name: Başka ad'), beklenen: `"${SINIF_ADI}" adımı TAM BİR tane olmalı` },
+    { ad: 'çökme yedeği silinir (sınıflayıcı çökerse adım kırmızı kalır)', boz: (c) => c.replace(' || cikis=$?', ''), beklenen: 'ÇÖKME YEDEĞİ yok' },
   ]
   it.each(CI_BOZ)('sabotaj ci.yml: $ad', ({ boz, beklenen }) => {
     const bozuk = boz(ci)
@@ -262,6 +273,7 @@ describe('INV-CI-SINIF-1 · sınıf kararı iki iş akışında AYNI ve güvenli
     { ad: 'sınıf adımı PR koşulunu kaybeder', boz: (c) => c.replace("        if: github.event_name == 'pull_request'\n        run: |\n          if ! git show", '        run: |\n          if ! git show'), beklenen: 'sınıf adımı `if: github.event_name' },
     { ad: 'sınıf adımı PR kopyasını koşar (tabandan çıkarılmaz)', boz: (c) => c.replace('git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs', 'cat scripts/ci/degisiklik-sinifi.cjs'), beklenen: 'sınıf adımının gövdesi ci.yml\'dekiyle BİREBİR aynı değil' },
     { ad: 'yükleme adımı koşulunu kaybeder', boz: (c) => c.replace(`- name: ${E2E_YUKLEME_ADIMI}\n        if: failure()\n`, `- name: ${E2E_YUKLEME_ADIMI}\n`), beklenen: `"${E2E_YUKLEME_ADIMI}" \`if: failure()\` olmalı` },
+    { ad: 'çökme yedeği yalnız bu iş akışında silinir (iki yerde farklı karar)', boz: (c) => c.replace(' || cikis=$?', ''), beklenen: 'sınıf adımının gövdesi ci.yml\'dekiyle BİREBİR aynı değil' },
   ]
   it.each(E2E_BOZ)('sabotaj e2e-smoke.yml: $ad', ({ boz, beklenen }) => {
     const bozuk = boz(e2e)
@@ -341,4 +353,113 @@ describe('INV-CI-SINIF-2 · "siteye dokunmayan" tanımı ölçülür: derleme gi
       expect(['belge', 'betik', 'edge'], yol).toContain(sinifi(yol))
     }
   })
+})
+
+// ── SINIF-3 · DAVRANIŞ ───────────────────────────────────────────────────────────────────────────────────────────
+
+/** Adım gövdesi bash betiğidir. Windows'ta yalnız Git for Windows'un bash'i kabul edilir (PATH'teki `bash` WSL olabilir: yollar uyuşmaz). */
+function bashBul(): string | null {
+  const adaylar = process.platform === 'win32' ? ['C:/Program Files/Git/bin/bash.exe'] : ['bash']
+  for (const aday of adaylar) {
+    try {
+      if (path.isAbsolute(aday) && !existsSync(aday)) continue
+      execFileSync(aday, ['-c', 'exit 0'], { stdio: 'ignore' })
+      return aday
+    } catch {
+      /* sonraki aday */
+    }
+  }
+  return null
+}
+const BASH = bashBul()
+
+interface AdimSonucu {
+  cikis: number
+  /** `$GITHUB_OUTPUT` dosyasının içeriği (sonraki adımların okuyacağı çıktı). */
+  cikti: string
+  /** Adımın ekran çıktısı (stdout + stderr): `::warning::` satırı burada görünür. */
+  ekran: string
+}
+
+/** Sınıf adımının gövdesini gerçek bir git deposunda koşar: `taban` HEAD^1'deki sınıflayıcıdır (null: taban kopyası yok), `degisen` PR'ın eklediği dosyalar. */
+function sinifAdiminiKos(govde: string, taban: string | null, degisen: Record<string, string>): AdimSonucu {
+  const dizin = mkdtempSync(path.join(os.tmpdir(), 'vh-sinif-'))
+  const gecici = mkdtempSync(path.join(os.tmpdir(), 'vh-sinif-tmp-'))
+  const ileri = (p: string): string => p.replace(/\\/g, '/')
+  try {
+    const git = (...args: string[]): string => execFileSync('git', args, { cwd: dizin, stdio: 'pipe', encoding: 'utf8' })
+    const yaz = (rel: string, icerik: string): void => {
+      const hedef = path.join(dizin, rel)
+      mkdirSync(path.dirname(hedef), { recursive: true })
+      writeFileSync(hedef, icerik)
+    }
+    git('init', '-q')
+    git('config', 'user.email', 'sinif@test.local')
+    git('config', 'user.name', 'sinif')
+    git('config', 'commit.gpgsign', 'false')
+    yaz('README.md', 'taban\n')
+    if (taban !== null) yaz('scripts/ci/degisiklik-sinifi.cjs', taban)
+    git('add', '-A')
+    git('commit', '-q', '-m', 'taban')
+    for (const [rel, icerik] of Object.entries(degisen)) yaz(rel, icerik)
+    git('add', '-A')
+    git('commit', '-q', '-m', 'pr')
+    const ciktiDosyasi = path.join(gecici, 'github_output')
+    writeFileSync(ciktiDosyasi, '')
+    const sonuc = spawnSync(BASH as string, ['-eo', 'pipefail', '-c', govde], {
+      cwd: dizin,
+      encoding: 'utf8',
+      env: { ...process.env, RUNNER_TEMP: ileri(gecici), GITHUB_OUTPUT: ileri(ciktiDosyasi), MSYS_NO_PATHCONV: '1' },
+    })
+    return { cikis: sonuc.status ?? -1, cikti: readFileSync(ciktiDosyasi, 'utf8'), ekran: `${sonuc.stdout}${sonuc.stderr}` }
+  } finally {
+    rmSync(dizin, { recursive: true, force: true })
+    rmSync(gecici, { recursive: true, force: true })
+  }
+}
+
+describe.skipIf(BASH === null)('INV-CI-SINIF-3 · sınıf adımının gerçek gövdesi gerçek git ve bash ile koşar', () => {
+  const govde = adimlar(yukle('.github/workflows/ci.yml'), 'ci').find((a) => a.ad === SINIF_ADI)?.govde ?? ''
+  const gercekSiniflayici = readFileSync(path.join(KOK, 'scripts/ci/degisiklik-sinifi.cjs'), 'utf8')
+  const BELGE_FARKI = { 'docs/audits/x.md': 'belge\n' }
+  const ZAMAN = 60_000
+
+  it('gövde ayrıştırıldı (boş gövde "geçti" sayılmaz)', () => {
+    expect(govde).toContain('degisiklik-sinifi.cjs')
+  })
+
+  it('yalnız belge değişirse `sinif=belge`, çıkış 0 (Build atlanır)', () => {
+    const s = sinifAdiminiKos(govde, gercekSiniflayici, BELGE_FARKI)
+    expect(s.cikis).toBe(0)
+    expect(s.cikti).toMatch(/^sinif=belge$/m)
+  }, ZAMAN)
+
+  it('site kodu değişirse `sinif=tam` (Build koşar)', () => {
+    const s = sinifAdiminiKos(govde, gercekSiniflayici, { 'src/app/page.tsx': 'export {}\n' })
+    expect(s.cikis).toBe(0)
+    expect(s.cikti).toMatch(/^sinif=tam$/m)
+  }, ZAMAN)
+
+  it('sınıflayıcı tümden ÇÖKERSE adım kırmızı olmaz: `sinif=tam` yazılır ve uyarı verilir (Build koşar)', () => {
+    const s = sinifAdiminiKos(govde, '}}} sözdizimi hatası\n', BELGE_FARKI)
+    expect(s.cikis).toBe(0)
+    expect(s.cikti).toMatch(/^sinif=tam$/m)
+    expect(s.cikti).toContain('sınıflayıcı çöktü')
+    expect(s.ekran).toContain('::warning::değişiklik sınıfı: tam — sınıflayıcı çöktü')
+  }, ZAMAN)
+
+  it('taban kopyası yoksa `sinif=tam` (mekanizma henüz tabanda değil)', () => {
+    const s = sinifAdiminiKos(govde, null, BELGE_FARKI)
+    expect(s.cikis).toBe(0)
+    expect(s.cikti).toMatch(/^sinif=tam$/m)
+    expect(s.cikti).toContain('taban kopyası yok')
+  }, ZAMAN)
+
+  it('KONTROL: çökme yedeği olmasaydı çöken sınıflayıcı adımı KIRMIZI yapardı (yukarıdaki test boş değil)', () => {
+    const yedeksiz = govde.replace(' || cikis=$?', '')
+    expect(yedeksiz).not.toBe(govde)
+    const s = sinifAdiminiKos(yedeksiz, '}}} sözdizimi hatası\n', BELGE_FARKI)
+    expect(s.cikis).not.toBe(0)
+    expect(s.cikti).not.toMatch(/^sinif=/m)
+  }, ZAMAN)
 })

@@ -95,7 +95,12 @@ jobs:
             printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          node "$RUNNER_TEMP/degisiklik-sinifi.cjs"
+          cikis=0
+          node "$RUNNER_TEMP/degisiklik-sinifi.cjs" || cikis=$?
+          if [ "$cikis" -ne 0 ]; then
+            echo "::warning::değişiklik sınıfı: tam — sınıflayıcı çöktü (çıkış kodu $cikis), tam paket koşar"
+            printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup pnpm
         if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
