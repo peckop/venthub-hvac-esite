@@ -380,6 +380,20 @@ describe('main (seçim modu): birleşim = seçim, kesişim 0; boş parça yeşil
   })
 })
 
+// ══ 4b. CI ortamı kanaryası ═══════════════════════════════════════════════════════════════════════════════════════════════════════
+describe('CI ortamı kanaryası: testlerin koştuğu adımın ortamı temiz (canlı ders: #1741 koşu 2)', () => {
+  // `SHARD` ve `SECIM_*` YALNIZ dağıtım adımının ortamındadır; Test adımına girerlerse bu test sürecine (ve tüm alt süreçlerine) miras kalırlardı. Yalnız GERÇEK runner'da anlamlıdır (yerelde zaten tanımsız).
+  it.skipIf(!process.env.GITHUB_ACTIONS)('SHARD, SECIM_TAM ve SECIM_SAYI test sürecinde TANIMSIZ: dağıtım adımının değişkenleri testlere sızmaz', () => {
+    for (const ad of ['SHARD', 'SECIM_TAM', 'SECIM_SAYI']) expect(process.env[ad], ad).toBeUndefined()
+  })
+
+  it('dağıtıcı kendi alt süreçlerine (vitest list) shard listesini ve VITEST* değişkenlerini VERMEZ; seçim değişkenlerini okumaz (argümanla alır)', () => {
+    const kaynak = readFileSync(BETIK, 'utf8')
+    expect(kaynak).not.toMatch(/process\.env\.(?:SECIM_TAM|SECIM_SAYI|SHARD)\b/)
+    expect(kaynak).toMatch(/delete env\[ORTAM_ADI\]/)
+  })
+})
+
 // ══ 5. gerçek süreç (vitest KURULU OLMAYAN geçici kök) ══════════════════════════════════════════════════════════════════════
 describe('gerçek süreç: boş seçim kurulumsuz kökte 0 ile biter ve `kos=false` yazar; boş OLMAYAN seçim aynı kökte kırmızıdır', () => {
   /** Betiğin KENDİ kopyası geçici bir kökte (scripts/ci/): `node_modules` yok, yani `vitest list` çalışamaz. Ortam bilerek ve açıkça kurulur (üst sürecin shard/VITEST değişkenleri sızmaz). */
