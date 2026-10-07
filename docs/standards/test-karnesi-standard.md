@@ -255,3 +255,8 @@ Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz, hepsi d
 3. **Ölçüm makinesi**: harita Windows'ta ölçüldü; Linux'ta atlanan ya da farklı kolu izleyen test (platforma bağlı `skipIf`) ölçümde görünmeyebilir, bu testler
    atlandığında `belirsiz` işaretlenir. Linux ölçümü (1a) bunu da kapatır.
 4. **Geriye dönük pencere** bir aydır (2026-09-07..10-07, `ci.yml` koşuları): `karne.json`un üç aylık `ci` özeti koşu başına değişen dosya taşımaz.
+5. **Kod PR'ında seçimin kendi maliyeti.** `vitest related` (içe aktarma grafiği) tüm test dosyaları için kurulur: yerelde (Windows, 16 çekirdek, tek süreç) 41-57 sn,
+   belge PR'ında 0,5-1,4 sn (grafik hesaplanmaz). 4 shard seçimi ayrı hesapladığı için kod PR'ında Test işlemci süresi %26'ya inse de shard başına duvar süresi
+   tam paketle yaklaşık aynı kalır; kazanç belge PR'ındadır. Kapatma yolu: her testin içe aktarma kapanımını ve kapanımdaki dosya özetlerini haritaya önbellek olarak
+   yazmak; seçimde yalnız özeti uyuşmayan (ya da dosya eklenen/silinen) testlerin grafiğini canlı hesaplamak. Önbellek yalnız HIZ içindir, geçersizse canlı hesaba düşer
+   (doğruluk haritanın tazeliğine bağlı olmaz). Ölçülmeden açılmaz: seçim `vitest related` sonucunun ÜST KÜMESİ olmalı (94 PR ve B4 ile karşılaştırılır).
