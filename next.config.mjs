@@ -4,6 +4,7 @@ import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from "@sentry/nextjs";
 
 import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
+import { E2E_TIP_LINT_ATLA_ANAHTARI, e2eHizliDerlemeAyari, e2eTipLintAtlaOku } from './src/config/e2eHizliDerleme.mjs';
 import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.mjs';
 import { adresDiliOku, rotaDiliHedefleriniYenile, rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri } from './src/config/rotaDili.mjs';
 
@@ -20,6 +21,12 @@ const ADRES_SEMASI_K3B = k3bOku(readFileSync(new URL('./src/config/features.ts',
  * yok/bozuk = kapalı. K3B'den AYRI anahtar (biri tek başına geri alınır). Cetvel: src/config/rotaDili.mjs.
  */
 const ADRES_DILI = adresDiliOku(process.env.NEXT_PUBLIC_ADRES_DILI);
+/**
+ * ALT-38f: e2e-smoke Build adımına ÖZGÜ anahtar (`VENTHUB_E2E_TIP_LINT_ATLA`, YALNIZ tam `1`): `next build`in tip ve lint aşaması koşmaz
+ * (`ci` ikisini zaten zorunlu kontrol olarak koşar). Başka hiçbir yerde verilmez; kapalıyken yapılandırmaya HİÇBİR anahtar eklenmez.
+ * Cetvel ve kapı: src/config/e2eHizliDerleme.mjs · INV-E2E-HIZLI-1/2/3.
+ */
+const E2E_TIP_LINT_ATLA = e2eTipLintAtlaOku(process.env[E2E_TIP_LINT_ATLA_ANAHTARI]);
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -30,6 +37,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
     reactStrictMode: true,
     typedRoutes: true,
+    // ALT-38f: anahtar kapalıyken BOŞ nesne (anahtar eklenmez); açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds`.
+    ...e2eHizliDerlemeAyari(E2E_TIP_LINT_ATLA),
     images: {
         // KÖPRÜ (2026-08-30, Recep butonla onayladı): Vercel görsel optimizasyonu KAPALI.
         // Sebep: Hobby planın aylık kaynak-görsel sınırı doldu (katalog 1042 görsel) →
