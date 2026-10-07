@@ -65,7 +65,35 @@ const AYNA_BETIGI_KAYNAK = readFileSync(path.join(KOK, AYNA_BETIGI), 'utf8').rep
 
 /** Ağır adımların `if:` SATIRI: hepsi buna BİREBİR eşit olmalı (alt-dize değil: `|| always()` kuyruğu alt-dizeyi korur). */
 const KOSUL = "if: steps.ayna.outputs.atla != 'true'"
-/** Ayna koşusunda ATLANAN adımlar: hepsi bu koşulu taşır. */
+
+// ── ALT-38c · DEĞİŞİKLİK SINIFI: Build ve önbelleği YALNIZ dar sınıfta atlanır ─────────────────────────────────────────
+/** Dar sınıf kümesi (sınıflayıcının `belge`, `edge`, `betik` ve `karma` çıktıları): `tam`, boş ve bilinmeyen değer Build'i ATLATMAZ. */
+const DAR_KUME = `'["belge","edge","betik","karma"]'`
+/** Build'in `if:` satırı: ayna koşulu VE dar sınıf DEĞİL. Koşul yalnız DARALTMA yönündedir (çıktı yoksa Build koşar). */
+const KOSUL_BUILD = `if: steps.ayna.outputs.atla != 'true' && !contains(fromJSON(${DAR_KUME}), steps.sinif.outputs.sinif)`
+const SINIF_ADI = "Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanır)"
+const SINIF_ID = 'sinif'
+const NEXT_ONBELLEK_ADI = 'Next.js derleme önbelleği'
+const NODE_ONBELLEK_ADI = 'Node derleme önbelleği (V8 bayt kodu)'
+/** Ağır adımların beklenen `if:` satırı: varsayılan KOSUL; Build ve Next önbelleği (Build ile BİREBİR aynı koşul) sınıf koşulunu da taşır. */
+const AGIR_KOSULU: Record<string, string> = { 'Build (blocking)': KOSUL_BUILD, [NEXT_ONBELLEK_ADI]: KOSUL_BUILD }
+const beklenenKosul = (ad: string): string => AGIR_KOSULU[ad] ?? KOSUL
+/** Sınıf adımının betiği ve tabandan çıkarılan kopyası (edited ayna ile AYNI güven sınırı: PR betiği değiştirip kendi kararını veremez). */
+const SINIF_BETIGI = 'scripts/ci/degisiklik-sinifi.cjs'
+const SINIF_KOPYA = '$RUNNER_TEMP/degisiklik-sinifi.cjs'
+const SINIF_RUN_GOVDESI = String.raw`if ! git show HEAD^1:${SINIF_BETIGI} > "${SINIF_KOPYA}" 2>/dev/null; then
+  echo "::notice::değişiklik sınıfı: tam — taban kopyası yok (HEAD^1:${SINIF_BETIGI})"
+  printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+  exit 0
+fi
+cikis=0
+node "${SINIF_KOPYA}" || cikis=$?
+if [ "$cikis" -ne 0 ]; then
+  echo "::warning::değişiklik sınıfı: tam — sınıflayıcı çöktü (çıkış kodu $cikis), tam paket koşar"
+  printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+fi`
+
+/** Ayna koşusunda ATLANAN adımlar: hepsi `beklenenKosul(ad)` satırını taşır (çoğu KOSUL; Build ve Next önbelleği KOSUL_BUILD). */
 const AGIR = [
   'Setup Deno',
   'Install dependencies',
@@ -75,7 +103,9 @@ const AGIR = [
   'Edge mangle-guard (string-literal — deno check göremez)',
   'Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)',
   'Secret guard (hardcoded DB connection string)',
+  NODE_ONBELLEK_ADI,
   'Test',
+  NEXT_ONBELLEK_ADI,
   'Build (blocking)',
 ]
 
@@ -187,6 +217,14 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     govde: AYNA_RUN_GOVDESI,
     env: AYNA_ENV,
     anahtarlar: ['name', 'id', 'if', 'env', 'run'],
+  },
+  // ALT-38c: her PR koşusunda (ayna koşusu dahil) sınıfı yazar; ayna kararından BAĞIMSIZ (ayna koşulu taşırsa düzenleme koşusunda sınıf yazılmaz).
+  {
+    ad: SINIF_ADI,
+    kosul: PR_KOSULU,
+    id: SINIF_ID,
+    govde: SINIF_RUN_GOVDESI,
+    anahtarlar: ['name', 'id', 'if', 'run'],
   },
 ]
 const HEP_KOSAN = HEP_KOSAN_BEKLENTISI.map((h) => h.ad)
@@ -434,9 +472,9 @@ function agirAdimlariDenetle(adimlar: Adim[]): string[] {
   for (const a of adimlar.filter((x) => AGIR.includes(x.ad))) {
     const kosullar = adimIfSatirlari(a)
     if (kosullar.length === 0) ihlal.push(`AĞIR adım "${a.ad}" atlama koşulu taşımıyor: ayna koşusu paketin tamamını koşar`)
-    else if (kosullar.length !== 1 || kosullar[0] !== KOSUL) {
+    else if (kosullar.length !== 1 || kosullar[0] !== beklenenKosul(a.ad)) {
       ihlal.push(
-        `AĞIR adım "${a.ad}" atlama koşulu TAM eşit değil: bulunan \`${kosullar.join(' ; ')}\`, beklenen \`${KOSUL}\` (ek koşul ya da kuyruk adımı ayna kararından bağımsız koşturur ya da hiç koşturmaz)`,
+        `AĞIR adım "${a.ad}" atlama koşulu TAM eşit değil: bulunan \`${kosullar.join(' ; ')}\`, beklenen \`${beklenenKosul(a.ad)}\` (ek koşul ya da kuyruk adımı ayna kararından bağımsız koşturur ya da hiç koşturmaz)`,
       )
     }
     ihlal.push(...kapiAtlatmaDenetle(a, 'AĞIR', false))
@@ -503,6 +541,15 @@ function hepKosanAdimlariDenetle(adimlar: Adim[]): string[] {
  * İz, kırmızı bitebilecek HER adımdan önce yazılmalı: iz taşımayan kırmızı koşu B4'e ("aynı head+taban için herhangi biri kırmızıysa
  * TAM") GÖRÜNMEZ ve eski bir yeşil koşu üzerinden atlama açılır.
  */
+/** ALT-38c sırası: sınıf adımı Checkout'tan SONRA (HEAD^1 gerekir) ve onu OKUYAN adımlardan ÖNCE (çıktı yazılmadan okunursa Build hep koşar). */
+const SINIF_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
+  [CHECKOUT_ADI, SINIF_ADI, 'sınıf adımı Checkout\'tan ÖNCE: depo yokken `git show HEAD^1:` çalışmaz, sınıf hiçbir koşuda yazılmaz (Build hep koşar: kazanç sıfır)'],
+  [SINIF_ADI, NEXT_ONBELLEK_ADI, 'Next.js önbelleği sınıf adımından ÖNCE: koşulu henüz yazılmamış çıktıyı okur (dar sınıfta da geri yüklenir)'],
+  [SINIF_ADI, 'Build (blocking)', 'Build sınıf adımından ÖNCE: koşulu henüz yazılmamış çıktıyı okur (dar sınıfta da koşar: kazanç sıfır)'],
+  [NEXT_ONBELLEK_ADI, 'Build (blocking)', 'Build Next.js önbelleğinden ÖNCE: önbellek geri yüklenmeden derler (kazanç sıfır)'],
+  [NODE_ONBELLEK_ADI, 'Test', 'Test Node önbelleğinden ÖNCE: önbellek geri yüklenmeden koşar (kazanç sıfır)'],
+]
+
 const IZ_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
   [CHECKOUT_ADI, TABAN_ADI, "taban SHA'sı adımı Checkout'tan ÖNCE: depo yokken `git rev-parse HEAD^1` boş döner, iz hiçbir koşuda yazılmaz (ayna hep TAM der)"],
   [TABAN_ADI, IZ_ADI, "iz adımı taban SHA'sı adımından ÖNCE: ad henüz üretilmemiş (boş) çıktıyı okur, iz yazılmaz"],
@@ -522,7 +569,7 @@ function siraDenetle(adimlar: Adim[]): string[] {
     const i = sira(ad)
     if (aynaSira >= 0 && i >= 0 && i < aynaSira) ihlal.push(`AĞIR adım "${ad}" ayna adımından ÖNCE: koşul henüz hesaplanmamışken koşar`)
   }
-  for (const [once, sonra, neden] of IZ_SIRASI) {
+  for (const [once, sonra, neden] of [...IZ_SIRASI, ...SINIF_SIRASI]) {
     const i = sira(once)
     const j = sira(sonra)
     if (i >= 0 && j >= 0 && j < i) ihlal.push(neden)
@@ -1053,6 +1100,21 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'Install dependencies koşulu başka adımın çıktısına bakar', boz: (c) => adimAnahtariniYaz(c, 'Install dependencies', 'if', "if: steps.mergeref.outputs.atla != 'true'"), beklenen: ['AĞIR adım "Install dependencies" atlama koşulu TAM eşit değil'] },
   { ad: 'Build adımına ikinci `if:` satırı', boz: (c) => adimaAnahtarEkle(c, 'Build (blocking)', "if: github.event_name != 'pull_request'"), beklenen: ['AĞIR adım "Build (blocking)" atlama koşulu TAM eşit değil'] },
   { ad: 'Build koşulu silinir', boz: (c) => adimAnahtariniYaz(c, 'Build (blocking)', 'if', null), beklenen: ['AĞIR adım "Build (blocking)" atlama koşulu taşımıyor'] },
+  // ── ALT-38c: Build'in sınıf koşulu YALNIZ daraltma yönünde, TAM eşitlikle sabit ─────────────────────────────────────────
+  { ad: "Build'den dar-sınıf koşulu silinir (her PR'da koşar: kazanç sıfır)", boz: (c) => adimAnahtariniYaz(c, 'Build (blocking)', 'if', KOSUL), beklenen: ['AĞIR adım "Build (blocking)" atlama koşulu TAM eşit değil'] },
+  { ad: "Build koşulu POZİTİF mantığa çevrilir (`sinif == 'tam'`: çıktı boşken ya da adım hiç koşmadıysa Build ATLANIR)", boz: (c) => adimAnahtariniYaz(c, 'Build (blocking)', 'if', "if: steps.ayna.outputs.atla != 'true' && steps.sinif.outputs.sinif == 'tam'"), beklenen: ['AĞIR adım "Build (blocking)" atlama koşulu TAM eşit değil'] },
+  { ad: "Build'in dar kümesine `tam` girer (her PR'da Build atlanır: kapı sessizce ölür)", boz: (c) => adimAnahtariniYaz(c, 'Build (blocking)', 'if', KOSUL_BUILD.replace('"karma"]', '"karma","tam"]')), beklenen: ['AĞIR adım "Build (blocking)" atlama koşulu TAM eşit değil'] },
+  { ad: "Build koşulu `|| always()` kuyruğu alır (ayna ve sınıf kararından bağımsız koşar)", boz: (c) => adimAnahtariniYaz(c, 'Build (blocking)', 'if', `${KOSUL_BUILD} || always()`), beklenen: ['AĞIR adım "Build (blocking)" atlama koşulu TAM eşit değil'] },
+  { ad: 'Test adımı sınıf koşulu alır (KAPSAM KAYBI: testler dar sınıfta atlanır)', boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', KOSUL_BUILD), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
+  { ad: 'Type check sınıf koşulu alır (tip kapsamı dar sınıfta düşer)', boz: (c) => adimAnahtariniYaz(c, 'Type check', 'if', KOSUL_BUILD), beklenen: ['AĞIR adım "Type check" atlama koşulu TAM eşit değil'] },
+  { ad: 'Next.js önbelleği sınıf koşulunu kaybeder', boz: (c) => adimAnahtariniYaz(c, NEXT_ONBELLEK_ADI, 'if', KOSUL), beklenen: [`AĞIR adım "${NEXT_ONBELLEK_ADI}" atlama koşulu TAM eşit değil`] },
+  { ad: 'Node önbelleği ayna koşulunu kaybeder (ayna koşusunda da geri yüklenir)', boz: (c) => adimAnahtariniYaz(c, NODE_ONBELLEK_ADI, 'if', null), beklenen: [`AĞIR adım "${NODE_ONBELLEK_ADI}" atlama koşulu taşımıyor`] },
+  { ad: 'sınıf adımı PR koşulunu kaybeder (push ve elle koşumda da koşar)', boz: (c) => adimAnahtariniYaz(c, SINIF_ADI, 'if', null), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" beklenen \`${PR_KOSULU}\` koşulunu taşımıyor`] },
+  { ad: 'sınıf adımına ayna koşulu girer (düzenleme koşusunda sınıf yazılmaz)', boz: (c) => adimAnahtariniYaz(c, SINIF_ADI, 'if', `${PR_KOSULU} && steps.ayna.outputs.atla != 'true'`), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" atlama koşulu taşıyor`] },
+  { ad: "sınıf adımı PR'ın KENDİ kopyasından koşar (tabandan çıkarılmaz: PR sınıflayıcıyı değiştirip her şeye `belge` dedirtebilir)", boz: (c) => adimRunBlogunuDegistir(c, SINIF_ADI, [`        run: node ${SINIF_BETIGI}`]), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" \`run: |\` (çok satırlı, satırlar olduğu gibi) bloğu değil`] },
+  { ad: 'sınıf adımının taban kopyası yok dalı `tam` yerine `belge` yazar', boz: (c) => adimRunBlogunuDegistir(c, SINIF_ADI, SINIF_RUN_GOVDESI.replace("printf 'sinif=tam", "printf 'sinif=belge").split('\n').map((s) => `          ${s}`)), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" run gövdesi beklenen TAM gövde değil`] },
+  { ad: 'sınıf adımı `continue-on-error: true` alır', boz: (c) => adimaAnahtarEkle(c, SINIF_ADI, 'continue-on-error: true'), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" continue-on-error taşıyor`] },
+  { ad: 'sınıf adımının `id` satırı değişir (Build koşulu çıktıyı okuyamaz: hep koşar)', boz: (c) => adimAnahtariniYaz(c, SINIF_ADI, 'id', 'id: siniflar'), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" \`id: ${SINIF_ID}\` satırı yok`] },
   { ad: 'Build adımına `continue-on-error: true`', boz: (c) => adimaAnahtarEkle(c, 'Build (blocking)', 'continue-on-error: true'), beklenen: ['AĞIR adım "Build (blocking)" continue-on-error taşıyor'] },
   { ad: 'Lint `run` satırına `|| true` (tek satırlık ağır adım hatayı yutar)', boz: (c) => adimAnahtariniYaz(c, 'Lint (blocking)', 'run', 'run: pnpm run lint 2>&1 | tee ci-lint.log || true'), beklenen: ['AĞIR adım "Lint (blocking)" run komutu hatayı yutuyor'] },
   { ad: 'Test `run` satırına `|| :`', boz: (c) => adimAnahtariniYaz(c, 'Test', 'run', 'run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log || :'), beklenen: ['AĞIR adım "Test" run komutu hatayı yutuyor'] },
@@ -1189,7 +1251,7 @@ describe('INV-CI-EDITED-1 — edited aynası ci iş akışına doğru bağlı', 
 
   it('ağır adımların koşulu SATIR eşitliğiyle aynı (includes ile değil)', () => {
     expect(agirAdimlariDenetle(adimlariAyir(ci))).toEqual([])
-    expect(AGIR.map((ad) => ifSatirlari(ci, ad))).toEqual(AGIR.map(() => [KOSUL]))
+    expect(AGIR.map((ad) => ifSatirlari(ci, ad))).toEqual(AGIR.map((ad) => [beklenenKosul(ad)]))
   })
 
   it('ayna adımının ortam değişkenleri DEĞERLERİYLE birebir (HEAD_SHA/KOSU_ID/TABAN_DEGISTI dahil; BASE_REF YOK)', () => {
