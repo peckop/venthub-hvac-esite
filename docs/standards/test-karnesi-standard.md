@@ -172,7 +172,7 @@ yazılmazsa dosya varsayılan ağırlıkla yine bir parçaya girer (kapsam kayb�
 
 ### 4.3 `admin-smoke` süresi: tip ve lint e2e'de kapalı, webpack önbelleği, apt Build ile paralel (ALT-38f)
 
-**Neden.** Kod PR'ında en uzun bekleyen zorunlu kontrol `admin-smoke` idi. Başlangıç ölçümü (88 başarılı koşu, 2026-10-04..07): iş medyanı 285 sn (p90 313, en uzun 640).
+**Neden.** Kod PR'ında en uzun bekleyen zorunlu kontrol `admin-smoke` idi. Başlangıç ölçümü (88 başarılı koşu, 2026-10-04..07): iş medyanı 285 sn (p10 237, p90 310, en kısa 198, en uzun 640).
 Adım medyanları (sn): kurulum 53 (bağımlılık kurulumu 35) · apt 15 · Build 166,5 · Playwright 39,5. Tek bir Build günlüğünde: 92 sn derleme, 51 sn "Linting and checking validity of types",
 26 sn sayfa üretimi. apt adımı 3 koşuda (%3,4) 187, 339 ve 341 sn sürdü (ilk deneme 300 sn sınırını doldurdu, ikinci deneme geçti).
 
@@ -191,13 +191,23 @@ Adım medyanları (sn): kurulum 53 (bağımlılık kurulumu 35) · apt 15 · Bui
 3. **apt adımı Build ile PARALEL** (`scripts/ci/arka-plan.sh`, cetvel `ci-runner-install-standard.md` §2.9, INV-E2E-HIZLI-3/4). `playwright install-deps` arka planda başlar, `bekle` adımı Build'ten sonra toplar; sınır 300 sn × 2'den 75 sn × 2'ye indi.
    Gerçek kapı değişmedi: tarayıcı probu `bekle`den SONRA ve fataldir.
 
-**Ölçüm** (PR #1742, aynı iş, adım dökümü sn):
+**Ölçüm** (PR #1742, gerçek CI koşuları, aynı iş, sn). Her sütunda tek tek koşular yazılır: GitHub koşucusunun hızı koşudan koşuya ±%30 oynar (önceki 88 koşuda iş toplamı 198-313, ilk bağımlılık kurulumu 25-45 sn),
+bu yüzden tek koşuyu medyanla kıyaslamak yanıltır; aynı koşucu hızı için kurulum satırına bakılır.
 
-| | önceki medyan (88 koşu) | SOĞUK (önbellek yok) | SICAK, önek (kaynak değişti) | SICAK, tam eşleşme (boş commit) |
-|---|---|---|---|---|
-| iş toplamı | 285 | 241 | ÖLÇÜM_ONEK_TOPLAM | ÖLÇÜM_TAM_TOPLAM |
-| Build | 166,5 | 126 (derleme 91 + sayfa 32) | ÖLÇÜM_ONEK_BUILD | ÖLÇÜM_TAM_BUILD |
-| apt (iş süresine katkısı) | 15 (takılınca 187-341) | 0 (arka planda 19 sn sürdü) | ÖLÇÜM_ONEK_APT | ÖLÇÜM_TAM_APT |
+| | önceki medyan (88 koşu) | SOĞUK (önbellek yok): koşu 1 · koşu 3 | SICAK (aynı anahtar, boş commit): koşu 4 · koşu 5 |
+|---|---|---|---|
+| **iş toplamı** | **285** (p10 237, p90 310) | **241 · 180** | **201 · 142** |
+| kurulum (iş başlatma, checkout, pnpm, Node, bağımlılık) | 53 | 53 · 39 | 55 · 39 |
+| tarayıcı + sistem bağımlılıkları (apt dahil) | 20 (apt 15; 3 koşuda 187-341) | 7 · 3 | 7 · 5 |
+| Build | 166,5 | 128 · 92 | 76 · 62 |
+| ↳ webpack derleme (günlükteki "Compiled successfully") | 92 | 91 · 66 | 31,6 · 28,1 |
+| Playwright testi | 39,5 | 43 · 37 | 56 · 32 |
+| diğer (adım sonrası, önbellek kaydı) | 1 | 6 · 5 | 3 · 1 |
+
+Kaldıraç başına (koşu içi, günlükten): **tip ve lint kapalı** Build'ten ~40 sn düşürür (derleme 91 sn aynı, "Linting and checking" aşaması hiç koşmaz); **apt paralel** adımı iş süresinden çıkarır (arka planda 15-19 sn
+sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi); **webpack önbelleği** derlemeyi 91 → 28-32 sn'ye indirir (yalnız `.rscinfo` ile birlikte). Ara koşu 2 (yalnız `webpack/` saklanan ilk sürüm): iş 228 sn, derleme 89 sn.
+**Sonuç:** sıcak önbellekle iş ≤ ~200 sn (201 ve 142); önbelleksiz ilk koşuda 180-241 sn (önceki medyan 285), her iki durumda `ci`den (252 sn) kısa. Apt takılması (%3,4) bu 5 koşuda tetiklenmedi: kuyruğun kesilmesi mekanizma ve test
+olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
 
 **Güvenlik yönü.** (a) Anahtar yanlış yere sızarsa `ci`/Vercel/yerel derleme tipsiz kalırdı: `INV-E2E-HIZLI-2` anahtarın adım düzeyi dışında hiçbir yerde olmadığını ölçer. (b) apt arka planda ölürse `bekle` komutu ön planda yeniden
 koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir. (c) Önbellek yalnız hızdır: bayat girdi yok sayılır, canlı veri önbelleğe girmez. **Bilinen sınır:** depo önbellek kotası 10 GB'ın %96'sında (2026-10-07);
