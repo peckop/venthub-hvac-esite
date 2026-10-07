@@ -424,6 +424,9 @@ describe('INV-DEPO-DOKUM-1 · R2 SQL satırları DOSYA genelinde TABLO başına 
     ["UPDATE public.venthub_orders SET status = 'x' WHERE customer_email = 'a@ornek.test';", 'kişisel alan yalnız koşulda'],
     ["UPDATE public.bulten SET email = 'a@ornek.test' WHERE id = 1;", 'hassas olmayan tablo, genel alan, tek ifade'],
     ["UPDATE public.products SET name = 'x' WHERE id = 1;", 'kişisel olmayan kolon'],
+    // ALT-39 son tur (sabotaj O3-6 ile bulundu): SET listesi `from`/`where` sınırında biter. Sınır düşerse çok tablolu `FROM a, b` virgülü
+    // listeyi böler ve WHERE içindeki `b.customer_email = '...'` bir ATAMA sanılırdı (yanlış alarm: meşru düzeltme migration'ı bloklanır).
+    ["UPDATE public.venthub_orders SET status = 'x' FROM public.a, public.b WHERE b.customer_email = 'a@ornek.test';", 'çok tablolu FROM: kişisel alan yalnız koşulda'],
   ])('UPDATE TEMİZ: %s [%s]', (sql) => {
     expect(kurallar('duzelt.sql', sql)).toEqual([])
   })
@@ -1559,6 +1562,14 @@ describe('INV-DEPO-DOKUM-1 · İZİN LİSTESİ sınırlı (R3 / R6; R5 kart par�
     for (const blob of [undefined, '', 'abc', 'A'.repeat(40), 'g'.repeat(40), `${BLOB_A}0`]) {
       const s = kapi.tara({ dosyalar: ['veri/urunler.json'], oku, izin: [{ yol: 'veri/urunler.json', kural: 'R3', blob }], blobOf: () => BLOB_A })
       expect(s.ihlaller.map((k) => k.kural), `blob=${String(blob)}`).toEqual(['R3'])
+    }
+    // ALT-39 son tur (sabotaj O4-4 ile bulundu): biçim denetimi EŞİTLİKTEN ayrı bir savunmadır. Yukarıdaki döngüde biçimsiz kayıt zaten
+    // gerçek blob'a eşit olmadığı için denetim düşse de test yeşil kalıyordu; burada `blobOf` kaydın KENDİ biçimsiz değerini döndürür
+    // (eşitlik sağlanır) ve izin yine VERİLMEZ.
+    for (const blob of ['', 'abc', 'A'.repeat(40), 'g'.repeat(40), `${BLOB_A}0`]) {
+      const s = kapi.tara({ dosyalar: ['veri/urunler.json'], oku, izin: [{ yol: 'veri/urunler.json', kural: 'R3', blob }], blobOf: () => blob })
+      expect(s.ihlaller.map((k) => k.kural), `eşit ama biçimsiz blob=${blob}`).toEqual(['R3'])
+      expect(s.izinliler, `eşit ama biçimsiz blob=${blob}`).toEqual([])
     }
   })
 

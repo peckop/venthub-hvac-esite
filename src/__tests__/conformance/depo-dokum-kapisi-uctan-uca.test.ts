@@ -308,6 +308,23 @@ describe('INV-DEPO-DOKUM-1 · YENİ NESNELER: sonradan silinen dosya, PR ara com
     expect(s2.ihlaller.map((k) => k.dosya).sort()).toEqual(['a-yedek', 'z-yerel.db'])
   })
 
+  // ALT-39 son tur (sabotaj D2-2 ile bulundu): `git diff-tree --root` düşünce bu kol hiçbir testte kırmızı vermiyordu. Depo İLK KEZ itilirken
+  // (atlanacak uç yok) kök commit tarama aralığındadır; `--root` olmadan kök commit'in yolları hiç toplanmaz ve "aynı içerik, çok yol"
+  // kapanışı (D2) tam bu durumda geri açılırdı.
+  it('D2: KÖK commit (depo ilk kez itilir, atlanacak uç yok) aynı içeriği iki yolla taşırsa yine HER yolla ölçülür (diff-tree --root)', { timeout: 90_000 }, () => {
+    const d = geciciDizin('depo-dokum-yol-')
+    git(d, 'init', '-q')
+    const icerik = JSON.stringify([{ id: 1, customer_email: GIZLI_EPOSTA }])
+    yaz(d, 'a-ham', icerik) // alfabetik ÖNCE: `rev-list --objects` bu yolu basar (veri uzantısı yok)
+    yaz(d, 'z-veri.json', icerik)
+    const kok = commitle(d, 'kok commit: ayni icerik iki yol')
+    expect(gitCikti(d, 'rev-list', '--max-parents=0', kok).trim()).toBe(kok) // gerçekten KÖK commit
+    // uzak dal yok: `--not --remotes` hiçbir şeyi dışlamaz, kök commit tarama aralığındadır
+    const s = kapi.yeniNesneleriTara({ kok: d, ucler: [kok] })
+    expect(s.ihlaller.map((k) => `${k.kural} ${k.dosya}`)).toEqual(['R1 z-veri.json'])
+    expect(JSON.stringify(s)).not.toContain('gizli.kisi')
+  })
+
   // ── O1: itilen nesne kipinde SQLite imzası (uzantıdan bağımsız) ─────────────────────────────────
   it('O1: itilen nesne kipinde SQLite imzası UZANTIDAN BAĞIMSIZ okunur: app.db.20261006, x.sqlite.orig, uzantısız, .png → R6; düz metin temiz', { timeout: 90_000 }, () => {
     const d = geciciDizin('depo-dokum-imza-')
