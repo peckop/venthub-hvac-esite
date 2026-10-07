@@ -16,8 +16,11 @@
  *  3. eski kategori adresleri (tohum `src/data/eski-adres-tohum.json`): hedef yeni ağacın (#1352,
  *     Faz 1-B) adresidir, canlı veritabanında henüz yok → durum BEKLİYOR (gerçek yazılır, hata sayılmaz).
  *
- * DURUM: OK · KIRMIZI (beklenenden farklı ya da ZİNCİR: 2+ sıçrama) · HATA (ağ/zaman aşımı/429/5xx) ·
- * BEKLİYOR (bağlı olduğu veri henüz yok). Çıkış: 0 KIRMIZI ve HATA yok · 1 var · 2 kullanım/girdi hatası.
+ * DURUM: OK · KIRMIZI (beklenenden farklı ya da ZİNCİR: 2+ sıçrama, döngü, sıçrama sınırı aşımı: bunlar
+ * ölçüm hatası değil sitenin yönlendirme kusurudur) · HATA (ölçülemedi: ağ/zaman aşımı/429/5xx) ·
+ * BEKLİYOR (bağlı olduğu veri henüz yok). "Ölçemedim" ile "ihlal" ayrı sayılır, ayrı yazılır.
+ * Çıkış: 0 KIRMIZI ve HATA yok · 1 var · 2 kullanım/girdi hatası (BOŞ beklenti listesi de 2: hiçbir şey
+ * taranmadan yeşil çıkılmaz).
  *
  * SALT OKUMA: yalnız GET (matris.cjs ile aynı istemci: gövde okunmaz, elle yönlendirme, 10 sn zaman aşımı).
  *
@@ -41,6 +44,11 @@ const TOHUM_YOLU = path.join(KOK, 'src', 'data', 'eski-adres-tohum.json')
 const DILLER = ['tr', 'en']
 const EN_COK_ESZAMANLI = 4
 const KATEGORI_ORNEK_SAYISI = 6
+/** Ölçüm hatası değil, sitenin kendi yönlendirme kusuru olan `adresiIzle` hataları → KIRMIZI (zincir). */
+const ZINCIR_HATALARI = new Map([
+  ['dongu', 'DÖNGÜ'],
+  ['hop-siniri', 'SIÇRAMA SINIRI AŞILDI'],
+])
 
 // ── Saf fonksiyonlar ─────────────────────────────────────────────────────────
 
@@ -135,6 +143,9 @@ function degerlendir(beklenti, satir) {
     ? `HATA ${satir.hata}`
     : `${satir.ilk ? satir.ilk.durum : '?'}${satir.hop > 0 ? ` → ${satir.sonUrl}` : ''} (son ${satir.sonDurum}, sıçrama ${satir.hop})`
   if (beklenti.bekliyor) return { durum: 'BEKLİYOR', gercek }
+  if (satir.hata && ZINCIR_HATALARI.has(satir.hata)) {
+    return { durum: 'KIRMIZI', gercek: `ZİNCİR (${ZINCIR_HATALARI.get(satir.hata)}): sıçrama ${satir.hop}, son ${satir.sonUrl}` }
+  }
   if (satir.hata) return { durum: 'HATA', gercek }
   if (satir.hop >= 2) return { durum: 'KIRMIZI', gercek: `${gercek} · ZİNCİR` }
   const ilk = satir.ilk ? satir.ilk.durum : null
@@ -170,15 +181,35 @@ function ozetle(sonuclar) {
 
 // ── Giriş/çıkış ──────────────────────────────────────────────────────────────
 
+/** `--taban` yalnız http/https olabilir (yalnız GET atılır; başka protokol ölçüm değildir). Sondaki `/` atılır. */
+function tabanDogrula(deger) {
+  let url
+  try {
+    url = new URL(deger)
+  } catch {
+    throw new Error(`--taban geçerli bir adres değil: ${deger}`)
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') throw new Error(`--taban yalnız http ya da https olabilir: ${deger}`)
+  return deger.replace(/\/+$/, '')
+}
+
 function argumanlariOku(argv) {
-  const sec = { taban: VARSAYILAN_TABAN, cikti: null, modelListesi: VARSAYILAN_MODEL_LISTESI, ek: 0, liste: false }
+  const sec = {
+    taban: VARSAYILAN_TABAN,
+    cikti: null,
+    modelListesi: VARSAYILAN_MODEL_LISTESI,
+    tablo: TABLO_YOLU,
+    tohum: TOHUM_YOLU,
+    ek: 0,
+    liste: false,
+  }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     const deger = () => {
       if (argv[i + 1] === undefined) throw new Error(`${a} bir değer ister`)
       return argv[++i]
     }
-    if (a === '--taban') sec.taban = deger()
+    if (a === '--taban') sec.taban = tabanDogrula(deger())
     else if (a === '--cikti') sec.cikti = deger()
     else if (a === '--model-listesi') sec.modelListesi = deger()
     else if (a === '--ornek') {
@@ -192,9 +223,9 @@ function argumanlariOku(argv) {
 }
 
 async function girdileriOku(sec) {
-  const tablo = JSON.parse(fs.readFileSync(TABLO_YOLU, 'utf8'))
-  const modeller = csvOku(fs.readFileSync(sec.modelListesi, 'utf8'))
-  const tohum = JSON.parse(fs.readFileSync(TOHUM_YOLU, 'utf8'))
+  const tablo = JSON.parse(fs.readFileSync(sec.tablo || TABLO_YOLU, 'utf8'))
+  const modeller = csvOku(fs.readFileSync(sec.modelListesi || VARSAYILAN_MODEL_LISTESI, 'utf8'))
+  const tohum = JSON.parse(fs.readFileSync(sec.tohum || TOHUM_YOLU, 'utf8'))
   // Tablo geçerliliği çekirdeğin doğrulayıcısıyla ölçülür (tek kaynak); bozuksa tarama başlamaz.
   const cekirdek = await import(pathToFileURL(path.join(KOK, 'src', 'config', 'rotaDiliCekirdek.mjs')).href)
   cekirdek.rotaDiliTablosuDogrula(tablo)
@@ -203,16 +234,22 @@ async function girdileriOku(sec) {
 
 async function ana(argv, bag = {}) {
   const yaz = bag.yaz || ((m) => process.stdout.write(m + '\n'))
+  const hataYaz = bag.hata || ((m) => process.stderr.write(m + '\n'))
   let sec
   let girdi
   try {
     sec = argumanlariOku(argv)
     girdi = bag.girdi || (await girdileriOku(sec))
   } catch (e) {
-    ;(bag.hata || ((m) => process.stderr.write(m + '\n')))(`onizleme-tarama: ${e.message}`)
+    hataYaz(`onizleme-tarama: ${e.message}`)
     return 2
   }
   const beklentiler = beklentileriUret({ ...girdi, ek: sec.ek })
+  if (beklentiler.length === 0) {
+    // Boş evren yeşil sayılmaz: hiçbir şey taranmadan "kırmızı 0" demek ölçüm değildir.
+    hataYaz('onizleme-tarama: beklenti listesi boş (rota dili tablosu ve model listesi okunamadı mı?)')
+    return 2
+  }
   if (sec.liste) {
     for (const b of beklentiler) yaz(`${b.grup}\t${b.adres}\t${beklenenMetni(b)}${b.bekliyor ? '\t(bekliyor)' : ''}`)
     return 0
@@ -234,14 +271,24 @@ async function ana(argv, bag = {}) {
 
   const ozet = ozetle(sonuclar)
   yaz(tabloYaz(sonuclar))
-  yaz(`\nTARAMA ${sec.taban}: ${ozet.toplam} adres · OK ${ozet.ok} · KIRMIZI ${ozet.kirmizi} · HATA ${ozet.hata} · BEKLİYOR ${ozet.bekliyor}`)
+  const sorunlu = sonuclar.filter((s) => s.durum === 'KIRMIZI' || s.durum === 'HATA')
+  if (sorunlu.length > 0) {
+    yaz('\nSORUNLU SATIRLAR')
+    for (const s of sorunlu) yaz(`  ${s.durum} ${s.adres} · beklenen: ${beklenenMetni(s.beklenti)} · gerçek: ${s.gercek}`)
+  }
+  yaz(`\nTARAMA ${sec.taban}: ${ozet.toplam} beklenti · OK ${ozet.ok} · KIRMIZI ${ozet.kirmizi} · HATA ${ozet.hata} · BEKLİYOR ${ozet.bekliyor}`)
   if (sec.cikti) {
-    fs.writeFileSync(sec.cikti, JSON.stringify({ surum: 1, taban: sec.taban, ozet, sonuclar }, null, 2) + '\n')
+    try {
+      fs.writeFileSync(sec.cikti, JSON.stringify({ surum: 1, taban: sec.taban, ozet, sonuclar }, null, 2) + '\n')
+    } catch (e) {
+      hataYaz(`onizleme-tarama: çıktı yazılamadı: ${e.message}`)
+      return 2
+    }
   }
   return ozet.kirmizi > 0 || ozet.hata > 0 ? 1 : 0
 }
 
-module.exports = { csvOku, modelOrnekle, beklentileriUret, degerlendir, tabloYaz, ozetle, argumanlariOku, ana }
+module.exports = { csvOku, modelOrnekle, beklentileriUret, degerlendir, tabloYaz, ozetle, argumanlariOku, girdileriOku, ana }
 
 if (require.main === module) {
   ana(process.argv.slice(2)).then(
