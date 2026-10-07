@@ -511,6 +511,8 @@ describe('INV-DEPO-DOKUM-1 · R2 N1 (3. tur): INSERT ... SELECT, WITH önekli IN
 
   it.each([
     ['INSERT INTO public.venthub_orders (customer_email) SELECT customer_email FROM public.eski_siparisler;', 'DB içi kopya: dize literal\'i yok'],
+    // kolon listesiz DB içi kopya hassas tabloya yazar ama VERİ taşımaz (tablo yedekleme/taşıma migration'ı): "kolon listesiz hassas tablo" kuralı literal olmadan çalışmaz
+    ['INSERT INTO public.venthub_orders SELECT * FROM public.eski_siparisler;', 'kolon listesiz DB içi kopya, hassas tablo: literal yok'],
     ["INSERT INTO public.user_profiles (id, email, role) SELECT auth.uid(), auth.jwt() ->> 'email', 'admin' WHERE NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE email = 'x@ornek.test');", 'e-posta kolonu JWT talebinden dolar; literal yalnız rol ve koşulda (gerçek betik biçimi)'],
     ["WITH x AS (SELECT * FROM public.venthub_orders WHERE customer_email = 'a@ornek.test') SELECT * FROM x;", 'salt SELECT (WITH)'],
     ["INSERT INTO public.products (id, name) SELECT id, name FROM public.old_products WHERE name = 'x';", 'kişisel olmayan tablo, koşulda literal'],
@@ -1195,6 +1197,8 @@ describe('INV-DEPO-DOKUM-1 · R4 yol kuralı (bulgu 4a)', () => {
     'docs/notlar/x.dumpster.txt',
     'src/lib/walker.ts',
     'docs/notlar/kayit-wal-notu.md',
+    'docs/notlar/trade-journal', // uzantısız, `-journal` ile biten ama SQLite uzantısı olmayan ad
+    'scripts/bin/gece-wal',
   ])('TEMİZ: %s', (yol) => {
     expect(kapi.yolIhlali(yol)).toEqual([])
   })
