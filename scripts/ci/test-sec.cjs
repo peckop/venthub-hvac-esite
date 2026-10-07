@@ -59,10 +59,14 @@ const childProcess = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const nodeModule = require('node:module');
+const os = require('node:os');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
 const HARITA_SURUMU = 1;
+/** İçe aktarma grafiğini kuran paralel işçi süreçlerinin üst sınırı (belleği ve CI çekirdeğini aşmamak için); `VENTHUB_TEST_SEC_ISCI` ile (1..8) ezilir, 1 = sıralı. */
+const ISCI_AZAMI = 4;
+const ISCI_ZAMAN_ASIMI_MS = 15 * 60 * 1000;
 /** Bu sayıya ULAŞAN ya da AŞAN değişiklik listesi `tam`dır (kaba bir PR değil; degisiklik-sinifi.cjs ile aynı sınır). */
 const DOSYA_SINIRI = 2000;
 const EN_UZUN_YOL = 1024;
@@ -639,6 +643,120 @@ function posix(yol) {
   return yol.split(path.sep).join('/');
 }
 
+// ---------------------------------------------------------------------------------------------------------------------------
+// İçe aktarma grafiği: paralel kurulum (kod PR'ında seçimin süresi bununla belirlenir)
+// ---------------------------------------------------------------------------------------------------------------------------
+
+/** Dizi `n` ayrık parçaya bölünür: i. parça = sıra % n === i (birleşimleri liste, kesişimleri boş). Parçalama GİRDİ SIRASINA bağlıdır: çağıran sıralı vermelidir. SAF. */
+function parcala(liste, n) {
+  const sayi = Number.isInteger(n) && n > 0 ? n : 1;
+  const parcalar = Array.from({ length: sayi }, () => []);
+  liste.forEach((oge, sira) => parcalar[sira % sayi].push(oge));
+  return parcalar;
+}
+
+/** Paralel işçi sayısı: `VENTHUB_TEST_SEC_ISCI` (1..8 tam sayı; 1 = sıralı) ya da çekirdek sayısı (en çok ISCI_AZAMI). Geçersiz ortam değeri SIRALI (1) sayılır. SAF (ortam ve çekirdek parametre). */
+function isciSayisi(ortam = process.env, cekirdek = typeof os.availableParallelism === 'function' ? os.availableParallelism() : os.cpus().length) {
+  const ham = ortam.VENTHUB_TEST_SEC_ISCI;
+  if (ham !== undefined && ham !== '') {
+    const n = Number(ham);
+    return Number.isInteger(n) && n >= 1 && n <= 8 ? n : 1;
+  }
+  return Math.max(1, Math.min(ISCI_AZAMI, Number.isInteger(cekirdek) ? cekirdek : 1));
+}
+
+/**
+ * İşçi çıktılarını (`[test, [bağımlılık...]]` dizileri) Map<test, Set<bağımlılık>> yapar. Beklenen her test TAM BİR KEZ gelmeli: eksik, yinelenen ya da
+ * bilinmeyen test ve bozuk girdi FIRLATIR (çağıran sıralı kuruluma düşer; eksik bir grafik testi sessizce düşürürdü). SAF.
+ */
+function grafikBirlestir(parcalar, beklenenTestler) {
+  const beklenen = new Set(beklenenTestler);
+  const harita = new Map();
+  if (!Array.isArray(parcalar)) throw new Error('işçi çıktıları dizi değil');
+  for (const parca of parcalar) {
+    if (!Array.isArray(parca)) throw new Error('işçi çıktısı dizi değil');
+    for (const girdi of parca) {
+      if (!Array.isArray(girdi) || girdi.length !== 2 || typeof girdi[0] !== 'string' || !dizgeDizisiMi(girdi[1])) throw new Error('işçi girdisi geçersiz');
+      const [test, bagimliliklar] = girdi;
+      if (!beklenen.has(test)) throw new Error(`işçi bilinmeyen test döndürdü: ${test.slice(0, 80)}`);
+      if (harita.has(test)) throw new Error(`test iki işçide: ${test.slice(0, 80)}`);
+      harita.set(test, new Set(bagimliliklar));
+    }
+  }
+  if (harita.size !== beklenen.size) throw new Error(`işçilerden ${beklenen.size - harita.size} test eksik geldi`);
+  return harita;
+}
+
+/**
+ * İçe aktarma grafiği: n > 1 ise n işçi sürecinde PARALEL (her biri ayrı vitest oturumu, sıra % n kuralıyla ayrık parça); herhangi bir hata ya da tutarsızlıkta
+ * SIRALI kuruluma düşer (doğruluk aynı, süre uzun). Dönüş Map<test, Set<mutlak bağımlılık>>. `isciCalistir(i, n)` ve `siraliKur()` enjekte edilir.
+ */
+async function grafikKur({ n, testler, isciCalistir, siraliKur }) {
+  if (n > 1) {
+    try {
+      const parcalar = await Promise.all(Array.from({ length: n }, (_, i) => isciCalistir(i, n)));
+      return grafikBirlestir(parcalar, testler);
+    } catch {
+      // paralel kurulum başarısız: sıralıya düş
+    }
+  }
+  return siraliKur();
+}
+
+/** Bu betiği işçi kipinde (`--ice-isci --kok <dizin> --parca i/n`) ayrı süreçte koşturur; çıktının son satırı `{"ice":[[test,[bağımlılık...]],...]}` JSON'udur. */
+function isciSureciCalistir(kok, i, n) {
+  return new Promise((coz, reddet) => {
+    childProcess.execFile(
+      process.execPath,
+      [__filename, '--ice-isci', '--kok', kok, '--parca', `${i}/${n}`],
+      { maxBuffer: 256 * 1024 * 1024, timeout: ISCI_ZAMAN_ASIMI_MS, windowsHide: true, env: process.env },
+      (hata, cikti) => {
+        if (hata) {
+          reddet(hata);
+          return;
+        }
+        try {
+          const satirlar = String(cikti).split('\n').filter((s) => s.trim() !== '');
+          const sonuc = JSON.parse(satirlar[satirlar.length - 1]);
+          if (!sonuc || !Array.isArray(sonuc.ice)) throw new Error('işçi çıktısı geçersiz');
+          coz(sonuc.ice);
+        } catch (e) {
+          reddet(e);
+        }
+      },
+    );
+  });
+}
+
+/** İşçi gövdesi: kendi vitest oturumunda, SIRALI test listesinin i. parçasının bağımlılıklarını hesaplar. Dönüş `[[test, [mutlak bağımlılık...]], ...]`. */
+async function iceIsci(kok, i, n) {
+  const vitestNode = nodeModule.createRequire(path.join(kok, 'package.json')).resolve('vitest/node');
+  const { createVitest } = await import(pathToFileURL(vitestNode).href);
+  const vitest = await createVitest('test', { watch: false, reporters: [], root: kok }, {});
+  try {
+    const spec = await vitest.specifications.globTestSpecifications();
+    const sirali = spec.map((s) => [posix(path.relative(kok, s.moduleId)), s]).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+    const benim = parcala(sirali, n)[i] || [];
+    return await Promise.all(benim.map(async ([ad, s]) => [ad, [...(await vitest.specifications.getTestDependencies(s))]]));
+  } finally {
+    await vitest.close();
+  }
+}
+
+/** İşçi kipi girişi: `--kok` ve `--parca i/n` doğrulanır, sonuç tek satır JSON olarak yazılır; hata çıkış 1 (üst süreç sıralıya düşer). */
+async function iceIsciMain(argv) {
+  const al = (ad) => {
+    const sira = argv.indexOf(ad);
+    return sira === -1 ? undefined : argv[sira + 1];
+  };
+  const kok = al('--kok');
+  const parca = /^(\d+)\/(\d+)$/.exec(String(al('--parca')));
+  if (!kok || !parca || Number(parca[2]) < 1 || Number(parca[1]) >= Number(parca[2])) throw new Error('işçi kipi: --kok <dizin> --parca i/n gerekli');
+  // Ortam (VENTHUB_DUNYA_DURUMU dahil) üst süreçten AYNEN miras kalır: işçi ile üst süreç aynı test evrenini görmeli (aksi halde birleştirme "eksik test" der ve sıralıya düşer).
+  const ice = await iceIsci(path.resolve(kok), Number(parca[1]), Number(parca[2]));
+  process.stdout.write(`${JSON.stringify({ ice })}\n`);
+}
+
 /**
  * vitest programatik oturumu: yapılandırma `vitest.config.ts` (ortam `VENTHUB_DUNYA_DURUMU` dikkate alınır). Dönüş:
  *   testler          vitest'in listelediği test dosyaları (köke göreli POSIX)
@@ -657,14 +775,18 @@ async function vitestOturumuAc(kok) {
   const testler = spec.map(goreli).sort();
   const mutlak = (yol) => posix(path.resolve(kok, yol));
   let bagimliliklar = null;
+  // Grafik kurulumu tek süreçte ~40-57 sn (ölçüldü): işçi süreçlerine bölünür, hata/tutarsızlıkta sıralıya düşer (aynı sonuç).
+  const grafigiKur = () =>
+    grafikKur({
+      n: isciSayisi(),
+      testler,
+      isciCalistir: (i, toplam) => isciSureciCalistir(kok, i, toplam),
+      siraliKur: async () => new Map(await Promise.all(spec.map(async (s) => [goreli(s), await vitest.specifications.getTestDependencies(s)]))),
+    });
   const ilgili = async (dosyalar) => {
     const kume = new Set(dosyalar.map(mutlak));
     if (typeof vitest.specifications.getTestDependencies === 'function') {
-      if (!bagimliliklar) {
-        // vitest'in kendi `filterTestsBySource`ı gibi PARALEL (dönüşümler eşzamansız; ardışık beklemek grafiği kurma süresini katlar).
-        const bagimlilikListesi = await Promise.all(spec.map(async (s) => [goreli(s), await vitest.specifications.getTestDependencies(s)]));
-        bagimliliklar = new Map(bagimlilikListesi);
-      }
+      if (!bagimliliklar) bagimliliklar = await grafigiKur();
       const bulunan = [];
       for (const [test, deps] of bagimliliklar) {
         for (const d of kume) {
@@ -943,7 +1065,16 @@ function yazCikti(sonuc, arg, ortam, yaz, toplam) {
   }
 }
 
-if (require.main === module) {
+if (require.main === module && process.argv.includes('--ice-isci')) {
+  // İŞÇİ kipi (içe aktarma grafiğinin bir parçası): hata çıkış 1 verir, üst süreç sıralı kuruluma düşer. CI çıktı sözleşmesi (çıkış 0) bu kipte geçerli DEĞİLDİR.
+  iceIsciMain(process.argv.slice(2)).then(
+    () => process.exit(0),
+    (e) => {
+      process.stderr.write(`[test-sec isci] HATA: ${hataMetni(e)}\n`);
+      process.exit(1);
+    },
+  );
+} else if (require.main === module) {
   // CI kipinde çıkış kodu DAİMA 0'dır (hata = tam çıktısı); `--yerel` kipinde seçilen testleri koşturan vitest'in çıkış kodu geçer.
   calistir(process.argv.slice(2)).then(
     (sonuc) => process.exit(sonuc && typeof sonuc.cikisKodu === 'number' ? sonuc.cikisKodu : 0),
@@ -966,12 +1097,16 @@ module.exports = {
   calistir,
   dosyaOzeti,
   globEslesir,
+  grafikBirlestir,
+  grafikKur,
   haritaEslesmeleri,
   haritaSorunu,
   icerikOzeti,
   ilgiliAdaylari,
   indeksKur,
+  isciSayisi,
   kureselGirdiNedeni,
+  parcala,
   sabitOnek,
   satirTemizle,
   sec,

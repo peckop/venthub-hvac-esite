@@ -68,6 +68,15 @@ type Modul = {
   aracOzeti: (kok: string) => string
   ilgiliAdaylari: (yollar: string[], dosyaVarMi?: (y: string) => boolean) => string[]
   calistir: (argv: string[], secenekler: Record<string, unknown>) => Promise<Sonuc>
+  parcala: <T>(liste: T[], n: number) => T[][]
+  isciSayisi: (ortam?: Record<string, string | undefined>, cekirdek?: number) => number
+  grafikBirlestir: (parcalar: unknown, beklenenTestler: string[]) => Map<string, Set<string>>
+  grafikKur: (g: {
+    n: number
+    testler: string[]
+    isciCalistir: (i: number, n: number) => Promise<unknown>
+    siraliKur: () => Promise<Map<string, Set<string>>>
+  }) => Promise<Map<string, Set<string>>>
 }
 
 const require_ = createRequire(import.meta.url)
@@ -945,5 +954,131 @@ describe('INV-TEST-SEC-1 · 5. CLI (calistir): çıktı sözleşmesi, hata → t
   it('ilgiliAdaylari: yalnız var olan, test olmayan, içe aktarılabilir dosyalar', () => {
     expect(M.ilgiliAdaylari(['a.ts', 'b.md', 'c.test.ts', 'd.json', 'e.csv', 'f.sql'], (y) => y !== 'd.json')).toEqual(['a.ts'])
     expect(M.ilgiliAdaylari(['a.ts', 'd.json'])).toEqual(['a.ts', 'd.json'])
+  })
+})
+
+describe('INV-TEST-SEC-1 · 6. içe aktarma grafiğinin paralel kurulumu (doğruluk sıralıyla AYNI; her belirsizlikte sıralıya düşer)', () => {
+  const TESTLER = ['t/a.test.ts', 't/b.test.ts', 't/c.test.ts', 't/d.test.ts', 't/e.test.ts']
+  const bag = (test: string) => [test, [`/k/${test}.dep`, '/k/ortak.ts']]
+
+  it('parcala: parçalar ayrık, birleşimleri liste, sıra % n kuralı; n geçersizse tek parça', () => {
+    const p = M.parcala(TESTLER, 3)
+    expect(p).toEqual([['t/a.test.ts', 't/d.test.ts'], ['t/b.test.ts', 't/e.test.ts'], ['t/c.test.ts']])
+    expect(p.flat().sort()).toEqual([...TESTLER].sort())
+    expect(M.parcala(TESTLER, 8).filter((x) => x.length > 0)).toHaveLength(5)
+    for (const n of [0, -1, 1.5, Number.NaN]) expect(M.parcala(TESTLER, n)).toEqual([TESTLER])
+    expect(M.parcala([], 4)).toEqual([[], [], [], []])
+  })
+
+  it('isciSayisi: çekirdek sayısı ile sınırlı (en çok 4); VENTHUB_TEST_SEC_ISCI 1..8 ezer; geçersiz değer SIRALI (1) sayılır', () => {
+    expect(M.isciSayisi({}, 16)).toBe(4)
+    expect(M.isciSayisi({}, 2)).toBe(2)
+    expect(M.isciSayisi({}, 1)).toBe(1)
+    expect(M.isciSayisi({}, Number.NaN)).toBe(1)
+    expect(M.isciSayisi({ VENTHUB_TEST_SEC_ISCI: '6' }, 2)).toBe(6)
+    expect(M.isciSayisi({ VENTHUB_TEST_SEC_ISCI: '1' }, 16)).toBe(1)
+    for (const kotu of ['0', '9', '-1', '2.5', 'abc', ' ']) expect(M.isciSayisi({ VENTHUB_TEST_SEC_ISCI: kotu }, 16), kotu).toBe(1)
+    expect(M.isciSayisi({ VENTHUB_TEST_SEC_ISCI: '' }, 16)).toBe(4)
+  })
+
+  it('grafikBirlestir: her beklenen test TAM BİR KEZ; çıktı Map<test, Set>', () => {
+    const g = M.grafikBirlestir([[bag('t/a.test.ts'), bag('t/b.test.ts')], [bag('t/c.test.ts')]], ['t/a.test.ts', 't/b.test.ts', 't/c.test.ts'])
+    expect([...g.keys()].sort()).toEqual(['t/a.test.ts', 't/b.test.ts', 't/c.test.ts'])
+    expect([...(g.get('t/b.test.ts') ?? [])].sort()).toEqual(['/k/ortak.ts', '/k/t/b.test.ts.dep'])
+  })
+
+  it.each([
+    ['eksik test', [[bag('t/a.test.ts')]], ['t/a.test.ts', 't/b.test.ts'], /eksik/],
+    ['yinelenen test (iki işçide)', [[bag('t/a.test.ts')], [bag('t/a.test.ts')]], ['t/a.test.ts'], /iki işçide/],
+    ['bilinmeyen test', [[bag('t/x.test.ts')]], ['t/a.test.ts'], /bilinmeyen/],
+    ['parça dizi değil', ['bozuk'], ['t/a.test.ts'], /dizi değil/],
+    ['girdi çifti değil', [[['t/a.test.ts']]], ['t/a.test.ts'], /geçersiz/],
+    ['bağımlılık dizgesi değil', [[['t/a.test.ts', [1, 2]]]], ['t/a.test.ts'], /geçersiz/],
+    ['test adı dizge değil', [[[5, []]]], ['t/a.test.ts'], /geçersiz/],
+  ] as const)('grafikBirlestir: %s → FIRLATIR (sessizce düşen test olmaz)', (_ad, parcalar, beklenen, mesaj) => {
+    expect(() => M.grafikBirlestir(parcalar, [...beklenen])).toThrow(mesaj)
+  })
+
+  it('grafikBirlestir: parçalar dizi değilse FIRLATIR', () => {
+    expect(() => M.grafikBirlestir('bozuk', ['t/a.test.ts'])).toThrow(/dizi değil/)
+  })
+
+  const sirali = async () => new Map(TESTLER.map((t) => [t, new Set([`/k/${t}.dep`, '/k/ortak.ts'])]))
+
+  it('grafikKur: n > 1 ise işçiler koşar (her biri kendi i/n parçasıyla), sıralı kurulum ÇAĞRILMAZ', async () => {
+    const cagrilar: string[] = []
+    let siraliCagri = 0
+    const g = await M.grafikKur({
+      n: 3,
+      testler: TESTLER,
+      isciCalistir: async (i, n) => {
+        cagrilar.push(`${i}/${n}`)
+        return M.parcala(TESTLER, n)[i].map(bag)
+      },
+      siraliKur: async () => {
+        siraliCagri += 1
+        return sirali()
+      },
+    })
+    expect(cagrilar.sort()).toEqual(['0/3', '1/3', '2/3'])
+    expect(siraliCagri).toBe(0)
+    expect([...g.keys()].sort()).toEqual([...TESTLER].sort())
+  })
+
+  it('grafikKur: n = 1 ise doğrudan sıralı kurulum (işçi yok)', async () => {
+    let isci = 0
+    const g = await M.grafikKur({ n: 1, testler: TESTLER, isciCalistir: async () => { isci += 1; return [] }, siraliKur: sirali })
+    expect(isci).toBe(0)
+    expect(g.size).toBe(TESTLER.length)
+  })
+
+  it('grafikKur: bir işçi HATA verirse sıralı kuruluma düşer (aynı sonuç)', async () => {
+    const g = await M.grafikKur({
+      n: 4,
+      testler: TESTLER,
+      isciCalistir: async (i, n) => {
+        if (i === 2) throw new Error('işçi çöktü')
+        return M.parcala(TESTLER, n)[i].map(bag)
+      },
+      siraliKur: sirali,
+    })
+    expect([...g.keys()].sort()).toEqual([...TESTLER].sort())
+    expect([...(g.get('t/a.test.ts') ?? [])].sort()).toEqual(['/k/ortak.ts', '/k/t/a.test.ts.dep'])
+  })
+
+  it('grafikKur: işçiler EKSİK test dönerse (tutarsız evren) sıralı kuruluma düşer, eksik grafikle ilerlenmez', async () => {
+    let siraliCagri = 0
+    const g = await M.grafikKur({
+      n: 2,
+      testler: TESTLER,
+      isciCalistir: async (i, n) => M.parcala(TESTLER, n)[i].filter((t) => t !== 't/e.test.ts').map(bag),
+      siraliKur: async () => {
+        siraliCagri += 1
+        return sirali()
+      },
+    })
+    expect(siraliCagri).toBe(1)
+    expect(g.has('t/e.test.ts')).toBe(true)
+  })
+
+  it('grafikKur: işçi dizi olmayan çıktı verirse de sıralıya düşer', async () => {
+    const g = await M.grafikKur({ n: 2, testler: TESTLER, isciCalistir: async () => 'çöp', siraliKur: sirali })
+    expect(g.size).toBe(TESTLER.length)
+  })
+
+  it('işçi kipi (`--ice-isci`): geçersiz ya da eksik argüman, parça i >= n ve vitest çözülemeyen kök ÇIKIŞ 1 verir, stdout\'a JSON YAZMAZ (üst süreç sıralıya düşer; CI çıkış-0 sözleşmesi bu kipte geçerli değil)', () => {
+    const bosKok = mkdtempSync(path.join(tmpdir(), 'test-sec-isci-'))
+    for (const argv of [['--ice-isci'], ['--ice-isci', '--kok', bosKok], ['--ice-isci', '--kok', bosKok, '--parca', '5/2'], ['--ice-isci', '--kok', bosKok, '--parca', 'x/y'], ['--ice-isci', '--kok', bosKok, '--parca', '0/2']]) {
+      const r = spawnSync(process.execPath, [KAYNAK_YOLU, ...argv], { encoding: 'utf8' })
+      expect(r.status, argv.join(' ')).toBe(1)
+      expect(r.stdout, argv.join(' ')).toBe('')
+      expect(r.stderr, argv.join(' ')).toMatch(/\[test-sec isci\] HATA/)
+    }
+  })
+
+  it('grafikKur: sıralı kurulum da başarısızsa HATA yukarı çıkar (çağıran `tam` der; sessiz boş grafik olmaz)', async () => {
+    await expect(
+      M.grafikKur({ n: 2, testler: TESTLER, isciCalistir: async () => { throw new Error('işçi') }, siraliKur: async () => { throw new Error('sıralı de çöktü') } }),
+    ).rejects.toThrow(/sıralı de çöktü/)
   })
 })

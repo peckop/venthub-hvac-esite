@@ -16,7 +16,7 @@
 | PR karışımı (94 PR, #1628..#1736) | ort. test %32,1, ort. süre %34,0 (medyan %22,4): tam paketin yaklaşık üçte biri |
 | Geriye dönük doğrulama (259 kırmızı koşu, 09-07..10-07) | 171 değerlendirilebilir: 100 seçildi, 28 TAM, 43 ham kaçırma; 43'ünün 43'ü açıklandı: **gerçek kaçırma 0** |
 | Hedef (belge PR'ında Test ≤40 sn) | **tutmuyor**: belge PR'ında Test tam paketin %12,8'i; sebep §3 ve §4'te |
-| Seçimin kendi maliyeti | belge PR'ında 0,5-1,4 sn; kod PR'ında 41-57 sn (vitest grafiği, yerel ölçüm): kod PR'ında duvar kazancı küçük, belge PR'ında Test adımı ≈68 sn → ≈10 sn (tahmin) |
+| Seçimin kendi maliyeti (yerel ölçüm, 16 çekirdek) | belge PR'ında 0,5-1,4 sn; kod PR'ında vitest grafiği tek süreçte 41-57 sn, 4 işçide 26 sn. Test adımı shard başına tahmin: belge ≈68 sn → ≈10 sn, kod (medyan) ≈68 sn → ≈41-60 sn |
 
 Okuma notu: "süre" sütunları duvar saati değil, CI günlüğünden kurulan işlemci-saniye modelidir (§3); yüzdeler oransaldır.
 
@@ -109,10 +109,11 @@ Ham 43 kaçırma, günlükten çıkarılan kırık BAŞLIKLARLA sınıflanır (`
 6. **Süre modeli CI günlüğünden** tek bir koşudan (09:05) kurulur; paralel iş sayısına bölünmemiş işlemci-saniyedir. `test-shard` (4 iş) ile duvar süresi ≈ model ÷ (4 × işçi paralelliği) + sabit kurulum.
 7. **ESLint** `scripts/ci/**` yollarını yok sayar (yapılandırma); bu dosyalarda eslint çıktısı boştur, denetim `tsc` ve testlerdendir.
 8. Test dosyası `test-sec.test.ts` (gerçek git kullanan bir senaryo) ve `test-haritasi-kaydedici.test.ts` (kaydedici kaydediciyi sınar: ölçüm altında kırmızı) `belirsiz` sınıfındadır; ikisi her PR'da koşar (yaklaşık 10 işlemci-sn).
-9. **Seçimin kendi maliyeti ölçüldü** (Windows, 16 çekirdek, tek süreç; CI'da ölçülmedi): belge PR'ında 0,5 sn (`--vitestsiz`) ile 1,4 sn; kod PR'ında `vitest` içe aktarma grafiği
-   kurulduğu için 41 sn (sıralı) ile 57 sn (bir değişen dosya, uçtan uca CLI). `test-shard` her shard'da seçimi ayrı hesapladığından kod PR'ında shard başına duvar süresi tam paketle yaklaşık
-   aynı kalır (tahmin: tam paket shard başına ≈68 sn = 756 ÷ 4 ÷ 2,8 paralellik; kod PR'ı medyan ≈15 sn test + 40-57 sn seçim), belge PR'ında ≈10 sn. Kod PR'ının kazancı için grafiğin
-   haritada önbelleğe alınması gerekir (cetvel §6.7 madde 5).
+9. **Seçimin kendi maliyeti ölçüldü** (Windows, 16 çekirdek; CI'da ölçülmedi): belge PR'ında 0,5 sn (`--vitestsiz`) ile 1,4 sn; kod PR'ında `vitest` içe aktarma grafiği kurulduğu için tek süreçte
+   41-57 sn. Grafik 4 işçi sürecinde paralel kurulur (`grafikKur`: her işçi sıra % n kuralıyla ayrık parça alır; işçi hatasında ya da tutarsız çıktıda sıralıya düşer): 26 sn (2 işçi 31 sn, 8 işçi 22 sn);
+   sonuç sıralıyla bayt bayt aynıdır (10 dosya ve toplu sorgu, doğrulandı). `test-shard` her shard'da seçimi ayrı hesapladığından kod PR'ında shard başına duvar süresi tahmini: ≈15 sn test +
+   ≈26-45 sn seçim (4 çekirdekli CI'da yerelden uzun olabilir): tam paketin ≈68 sn'siyle aynı mertebede ya da biraz altında; belge PR'ında ≈10 sn. Kod PR'ının asıl kazancı için grafiğin haritada
+   doğrulamalı önbelleğe alınması gerekir (cetvel §6.7 madde 5).
 
 ## 7 · Yeniden üretme
 
