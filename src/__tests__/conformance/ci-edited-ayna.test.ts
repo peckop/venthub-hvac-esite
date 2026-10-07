@@ -175,6 +175,9 @@ const AGIR = [
 const KAPI_ADI = 'PR kayıt kapısı (karar 187)'
 const CHECKOUT_ADI = 'Checkout'
 const PNPM_ADI = 'Setup pnpm'
+/** ALT-39 · depoya giremeyecek veri kapısı: bağımlılıksız (git + node), ayna koşusunda DA koşar (sızıntı kapısı düzenlemeyle atlatılamaz). */
+const DOKUM_KAPISI_ADI = 'Döküm kapısı (depoya giremeyecek veri)'
+const DOKUM_KAPISI_RUN = 'run: node scripts/security/depo-dokum-kapisi.cjs'
 
 // ── B1 · TABAN İZİ: iki adım, Checkout'tan hemen sonra, her pull_request koşusunda ─────────────────────────────────────
 const TABAN_ADI = "Taban SHA'sı (merge-ref birinci ebeveyn)"
@@ -281,6 +284,12 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     govde: AYNA_RUN_GOVDESI,
     env: AYNA_ENV,
     anahtarlar: ['name', 'id', 'if', 'env', 'run'],
+  },
+  {
+    ad: DOKUM_KAPISI_ADI,
+    kosul: null,
+    run: DOKUM_KAPISI_RUN,
+    anahtarlar: ['name', 'run'],
   },
   // ALT-38c: her PR koşusunda (ayna koşusu dahil) sınıfı yazar; ayna kararından BAĞIMSIZ (ayna koşulu taşırsa düzenleme koşusunda sınıf yazılmaz).
   {
@@ -1186,6 +1195,15 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'ayna adımına `continue-on-error: true`', boz: (c) => adimaAnahtarEkle(c, AYNA_ADIM_ADI, 'continue-on-error: true'), beklenen: ['HEP KOŞAN adım "edited ayna kararı" continue-on-error taşıyor'] },
   { ad: 'ayna adımı koşulu `edited` ile sınırlı değil', boz: (c) => adimAnahtariniYaz(c, AYNA_ADIM_ADI, 'if', "if: github.event_name == 'pull_request'"), beklenen: ['HEP KOŞAN adım "edited ayna kararı" atlama koşulu taşıyor'] },
   { ad: 'ayna `run` gövdesinin son komutuna `|| true` (betik hatası yutulur)', boz: (c) => adimSatiriniYaz(c, AYNA_ADIM_ADI, NODE_KOMUTU, `${NODE_KOMUTU} || true`), beklenen: ['run komutu hatayı yutuyor', 'run gövdesi beklenen TAM gövde değil'] },
+
+  // ── ALT-39 · döküm kapısı: ayna koşusunda DA koşar, koşulsuz, hata yutmaz, betiği değişmez ─────────────────────────────
+  { ad: 'döküm kapısına ayna koşulu girer (edited koşusunda sızıntı kapısı atlanır)', boz: (c) => adimaAnahtarEkle(c, DOKUM_KAPISI_ADI, KOSUL), beklenen: [`HEP KOŞAN adım "${DOKUM_KAPISI_ADI}" atlama koşulu taşıyor`] },
+  { ad: "döküm kapısına `if: github.event_name != 'pull_request'` (PR'da hiç koşmaz)", boz: (c) => adimaAnahtarEkle(c, DOKUM_KAPISI_ADI, "if: github.event_name != 'pull_request'"), beklenen: [`HEP KOŞAN adım "${DOKUM_KAPISI_ADI}" atlama koşulu taşıyor`] },
+  { ad: 'döküm kapısına `continue-on-error: true` (kırmızı kapı işi yeşil bırakır)', boz: (c) => adimaAnahtarEkle(c, DOKUM_KAPISI_ADI, 'continue-on-error: true'), beklenen: [`HEP KOŞAN adım "${DOKUM_KAPISI_ADI}" continue-on-error taşıyor`] },
+  { ad: 'döküm kapısı `run` satırı hatayı yutar (`|| true`)', boz: (c) => adimAnahtariniYaz(c, DOKUM_KAPISI_ADI, 'run', `${DOKUM_KAPISI_RUN} || true`), beklenen: ['run komutu hatayı yutuyor', 'run satırı beklenen TAM'] },
+  { ad: 'döküm kapısı başka betiği koşturur (kapı değil)', boz: (c) => adimAnahtariniYaz(c, DOKUM_KAPISI_ADI, 'run', 'run: node scripts/security/baska-betik.cjs'), beklenen: ['run satırı beklenen TAM'] },
+  { ad: 'döküm kapısına beklenmeyen anahtar (timeout-minutes)', boz: (c) => adimaAnahtarEkle(c, DOKUM_KAPISI_ADI, 'timeout-minutes: 1'), beklenen: ['beklenmeyen anahtar `timeout-minutes`'] },
+  { ad: 'döküm kapısı adımı silinir', boz: (c) => adimiSil(c, DOKUM_KAPISI_ADI), beklenen: [`adım "${DOKUM_KAPISI_ADI}" ci.yml içinde yok`] },
 
   // ── ağır adımlar: `if:` SATIR eşitliği ─────────────────────────────────────────────────────────────────────────────
   { ad: "Test koşuluna `|| always()` kuyruğu (alt-dize durur)", boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', `${KOSUL} || always()`), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
