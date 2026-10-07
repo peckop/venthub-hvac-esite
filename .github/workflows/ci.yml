@@ -220,7 +220,7 @@ jobs:
       # ve JSON'u bir test içe aktarırsa tip denetimi değişir. Bu yüzden uzantı dar tutulur ve git'in kendi yol süzgeciyle (`:(exclude,glob)`) sınanır: dışarıda KALAN tek bir fark varsa
       # (kod, JSON, silinen ya da taşınan dosya, hata) çıktı YAZILMAZ ve her kapı koşar. Yalnız `pull_request` olayında ve `edited` DIŞINDA koşar (`edited` koşusunda `ci` içindeki Test
       # kuruluma ihtiyaç duyar); koşul `test-shard` işinin olayıyla birebir aynıdır. Çıktı yoksa ya da başka değerse HER ŞEY koşar (koşullar yalnız DARALTMA yönünde).
-      # `edited ayna kararı`ndan bağımsızdır (HEP KOŞAN, INV-CI-EDITED-1). PR kayıt kapısı, Secret guard, taban izi ve sınıf adımı bu yolda DA koşar.
+      # `edited ayna kararı`ndan bağımsızdır (HEP KOŞAN, INV-CI-EDITED-1). PR kayıt kapısı, Secret guard, Döküm kapısı (`.csv` dökümü bu yola GİRER), taban izi ve sınıf adımı bu yolda DA koşar.
       - name: Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)
         id: hizli
         if: github.event_name == 'pull_request' && github.event.action != 'edited' && steps.sinif.outputs.sinif == 'belge'

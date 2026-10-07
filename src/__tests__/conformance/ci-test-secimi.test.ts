@@ -39,8 +39,9 @@ const HIZLI_ATLANANLAR = [
   ...['Setup Deno', 'Install dependencies', 'Lint (blocking)', 'Type check', 'Deno check (edge functions — kapı-körlüğü guard)'],
   ...['Edge mangle-guard (string-literal — deno check göremez)', 'Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)', 'Node derleme önbelleği (V8 bayt kodu)'],
 ]
-/** Hızlı yoldan ETKİLENMEYEN ci adımları: bu kapılar belge PR'ında DA koşar (kayıt kapısı, gizli bilgi taraması, sınıf, taban izi, bekleme). */
-const HIZLI_OKUMAYANLAR = ["Secret guard (hardcoded DB connection string)", 'PR kayıt kapısı (karar 187)', 'Test', 'Build (blocking)', 'Test shard sonuçları (bekle ve doğrula)']
+/** Hızlı yoldan ETKİLENMEYEN ci adımları: bu kapılar belge PR'ında DA koşar (kayıt kapısı, gizli bilgi taraması, döküm kapısı: `.csv` dökümü hızlı yola GİRER, sınıf, taban izi, bekleme). */
+const DOKUM_ADI = 'Döküm kapısı (depoya giremeyecek veri)'
+const HIZLI_OKUMAYANLAR = ["Secret guard (hardcoded DB connection string)", 'PR kayıt kapısı (karar 187)', DOKUM_ADI, 'Test', 'Build (blocking)', 'Test shard sonuçları (bekle ve doğrula)']
 const SHARD_SIRASI = ['Checkout', 'Setup pnpm', 'Setup Node', SEC_ADI, 'Setup Deno', 'Install dependencies', 'Node derleme önbelleği (V8 bayt kodu)', SECV_ADI, 'Test dağıtımı (shard ${{ matrix.shard }}/4)', 'Test (shard ${{ matrix.shard }}/4)']
 const KUR_RUN = 'run: pnpm install --prefer-offline --config.allow-scripts true --ignore-scripts'
 /** `ci` içindeki kurulum: lifecycle betikleri AÇIK kalır (tsc orada gerçek tip kapısı: koordinatör kararı, ALT-38e). */
@@ -468,6 +469,7 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'Lint koşulu hızlı yolun çıktısını POZİTİF okur (`belge == true` iken değil, çıktı yoksa ATLANIR)', boz: (c) => sd(c, ciAdim(c, 'Lint (blocking)'), /^if: /, "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge == 'false'"), beklenen: '"Lint (blocking)" koşulu TAM' },
   { ad: 'Type check hızlı yolu okumaz (belge PR\'ında tsc koşar: kazanç sıfır)', boz: (c) => sd(c, ciAdim(c, 'Type check'), /^if: /, "if: steps.ayna.outputs.atla != 'true'"), beklenen: '"Type check" koşulu TAM' },
   { ad: 'Secret guard hızlı yolu okur (belge PR\'ında gizli bilgi taraması atlanır)', boz: (c) => sd(c, ciAdim(c, 'Secret guard (hardcoded DB connection string)'), /^if: /, KOSUL_HIZLI), beklenen: '"Secret guard (hardcoded DB connection string)" hızlı yol çıktısını okuyor' },
+  { ad: "Döküm kapısı hızlı yolu okur (belge PR'ında `.csv` dökümü ve kişisel veri taraması atlanır)", boz: (c) => metinDegistir(c, ciAdim(c, DOKUM_ADI), 'run: node scripts/security/depo-dokum-kapisi.cjs', `if: steps.hizli.outputs.belge != 'true'\n        run: node scripts/security/depo-dokum-kapisi.cjs`), beklenen: `"${DOKUM_ADI}" hızlı yol çıktısını okuyor` },
   { ad: 'PR kayıt kapısı hızlı yolu okur (belge PR\'ında kayıt kapısı atlanır)', boz: (c) => sd(c, ciAdim(c, 'PR kayıt kapısı (karar 187)'), /^if: /, `if: github.event_name == 'pull_request' && steps.hizli.outputs.belge != 'true'`), beklenen: '"PR kayıt kapısı (karar 187)" hızlı yol çıktısını okuyor' },
   { ad: "`ci` Test'i hızlı yolu okur (edited koşusunda Test kurulumsuz kalır)", boz: (c) => sd(c, ciAdim(c, 'Test'), /^if: /, KOSUL_HIZLI), beklenen: '"Test" hızlı yol çıktısını okuyor' },
   { ad: 'hızlı yol adımı sınıf adımından ÖNCEYE taşınır (sınıf çıktısı henüz yazılmamışken karar verir)', boz: (c) => {
