@@ -83,14 +83,17 @@ KISMİ olduğunu görmek, gölge kümeyi elle kurmak. O keşif bir kez yapıldı
 ⛔**Eksik olan şey ölçüm değil, ALARM'dı:** bugüne kadar tabanın bayatladığını söyleyen hiçbir
 şey yoktu. Fark edildiği gün yeniden keşfe başlanır ve **o zaman** gerçekten iki gün gider.
 
-**Alarm iki yerde konuşur, ikisi de aynı ölçütü kullanır:**
+**Alarm şu yerlerde konuşur, ölçüt aynıdır** (ALT-38, 2026-10-06: tazelik kolu pull request kapısından çıktı,
+çünkü master'a bir migration girince suçsuz PR'lar kendi kodundan bağımsız kırmızı oluyordu; CI geçmişinde 55
+kırmızı koşu, 39 farklı dal):
 
 | Nerede | Ne zaman | Ne yapar |
 |---|---|---|
-| `src/__tests__/conformance/taban-tazeligi.test.ts` | her PR (CI) | taban geride kalmışsa **bloklar** |
+| `src/__tests__/conformance/taban-tazeligi-dunya.test.ts` | master'a her push'ta (CI) ve zamanlı koşuda (`dunya-durumu.yml`) | taban geride kalmışsa **kırmızı verir; PR'ı bloklamaz** |
+| `src/__tests__/conformance/taban-tazeligi.test.ts` | her PR (CI) | kapının KENDİ kodunu korur: evren boş olamaz, kısmi dosya taban seçilmez, damga biçimi, bu README'nin tablosu |
 | `.claude/hooks/defter-tazelik-satiri.cjs` (`TABAN:` satırı) | her turda, oturum içinde | **görünür** uyarı + onarım yolu |
 
-İkincisi niçin şart: ölçen ama **kararın verildiği yerde görünmeyen** kapı, görünmeyen kapıdır
+Kanca satırı niçin şart: ölçen ama **kararın verildiği yerde görünmeyen** kapı, görünmeyen kapıdır
 (REC-342'de ölçüldü — defter bayatlık kancası 7 gün doğru kırmızı verdi ve kimse görmedi).
 
 **ÖLÇÜT — sır gerektirmez, ağ gerektirmez.** Recep'in kendi düzeltmesi bunu mümkün kıldı:

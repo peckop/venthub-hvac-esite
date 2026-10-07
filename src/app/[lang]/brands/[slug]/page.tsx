@@ -4,7 +4,7 @@ import { notFound, permanentRedirect } from 'next/navigation'
 import { ADRES_SEMASI_K3B } from '../../../../config/features'
 import { HVAC_BRANDS } from '../../../../data/brands'
 import { adresUret } from '../../../../utils/adresUret'
-import { markaBul, MarkaSayfasi, markaUstVerisi, markaUstVerisiK3b } from '../../../_components/markaSayfasi'
+import { markaBul, MarkaSayfasi, markaUrunsuzMu, markaUstVerisi, markaUstVerisiK3b } from '../../../_components/markaSayfasi'
 
 /**
  * `/[lang]/brands/<marka>` — marka sayfası.
@@ -50,8 +50,9 @@ type Params = { params: Promise<{ lang: string, slug: string }> }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, slug } = await params
-  if (ADRES_SEMASI_K3B) return lang === 'en' ? markaUstVerisiK3b(lang, slug) : {}
-  return markaUstVerisi(lang, slug)
+  // OPS-51: ürünsüz marka kararı DB'deki aktif ürün sayısından (gövdeyle AYNI kaynak: `markaUrunsuzMu`).
+  if (ADRES_SEMASI_K3B) return lang === 'en' ? markaUstVerisiK3b(lang, slug, await markaUrunsuzMu(lang, slug)) : {}
+  return markaUstVerisi(lang, slug, await markaUrunsuzMu(lang, slug))
 }
 
 export default async function Page({ params }: Params) {

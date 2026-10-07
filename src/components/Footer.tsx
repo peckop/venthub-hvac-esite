@@ -15,6 +15,8 @@ const FOOTER_ICON_MAIL = 'M'
 const WEEKDAY_HOURS = '09:00 - 18:00'
 const SATURDAY_HOURS = '09:00 - 14:00'
 const HVAC_SUFFIX = 'HVAC.'
+/** Altbilgide gösterilecek en çok kök kategori (bugün 7 ürünlü kök var; 8. kök gelirse tavan bilinçli kararla artar). */
+const FOOTER_KATEGORI_TAVANI = 8
 
 const Footer: React.FC = () => {
   const { t, lang } = useI18n()
@@ -23,8 +25,12 @@ const Footer: React.FC = () => {
   // Karar 92: Bilgi Merkezi adresi dile göre; EN kapalıyken bağlantı basılmaz.
   const bilgiMerkeziHref = bilgiMerkeziListeHref(lang)
 
+  // OPS-51: Sığınak 7. KÖK oldu (ürünlü kök sayısı 6 → 7). Eskiden burada `.slice(0, 8)` ve aşağıda İKİNCİ bir
+  // `.slice(0, 6)` vardı (ilk depo işlemi, gerekçe yorumu YOK): kategoriler `level, name` sırasıyla geldiği için 7. kök
+  // ("Sığınak…", S > K) altbilgiden SESSİZCE düşerdi. Tek tavan kaldı (8); tüm ürünlü kökler görünür.
+  // Kapı: src/components/__tests__/FooterKategoriler.test.tsx (7 kök → 7 bağlantı).
   const mainCategories = React.useMemo(() => {
-    return globalCategories.filter(c => !c.parent_id).slice(0, 8);
+    return globalCategories.filter(c => !c.parent_id).slice(0, FOOTER_KATEGORI_TAVANI);
   }, [globalCategories]);
 
   return (
@@ -115,7 +121,7 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="font-semibold mb-4">{t('footer.categories')}</h3>
             <ul className="space-y-2">
-              {mainCategories.slice(0, 6).map((category) => (
+              {mainCategories.map((category) => (
                 <li key={category.slug}>
                   <Link
                     href={Routes.category(getLocalizedCategorySlug(category, lang))}

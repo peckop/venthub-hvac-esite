@@ -49,37 +49,37 @@ const TENANT = 'd3b07384-d113-495f-a558-8c38634e0000'
 // pazarlama metni üretmez; kaynakta ne yazıyorsa o gider.
 const AILELER = [
   {
-    slug: 'avens-qe-b-kasa', ad: 'AVenS QE-B Kasa Serisi', marka: 'avens', seri: 'QE-B',
+    slug: 'avens-qe-b-kasa-serisi', ad: 'AVenS QE-B Kasa Serisi', marka: 'avens', seri: 'QE-B',
     kok: 'fans', yaprak: 'bathroom-toilet-fans', sku: /^AVE-1156[0-9]$/,
     metin: 'Gömme ya da duvar/tavan montajı için ABS plastikten üretilen temel fan kasası ve valf grubu. TÜV Alman Enstitüsü onaylı, DIN 18017-3 standardına uygun; toz ve sıva girişini önleyen kare çerçeve ile birlikte gelir. Yangına dayanıklı K90 ve paslanmaz çelik valfli çeşitleri, ikinci bir odadan hava çıkarmaya izin veren bağlantı noktalı sürümleri vardır.',
   },
   {
-    slug: 'avens-dikdortgen-kanal-radyal', ad: 'AVenS Dikdörtgen Kanal Tipi Radyal Fanlar', marka: 'avens', seri: 'AVENS-DK',
+    slug: 'avens-dikdortgen-kanal-tipi-radyal-fanlar', ad: 'AVenS Dikdörtgen Kanal Tipi Radyal Fanlar', marka: 'avens', seri: 'AVENS-DK',
     kok: 'commercial-ventilation', yaprak: 'rectangular-duct-fans', sku: /^AVE-1(200|250|316|317|355|360|410)$/,
     metin: 'Galvaniz çelik metal gövdeli, kendinden flanşlı, standart kablo ile uzatılmış elektrik bağlantı terminaline sahip, aşırı yük korumalı dikdörtgen kanal tipi radyal fan.',
   },
   {
-    slug: 'vortice-vorticent-cms-atex', ad: 'Vortice VORTICENT CMS ATEX Santrifüj Fanlar', marka: 'vortice', seri: 'CMS-ATEX',
+    slug: 'vortice-vorticent-cms-atex-santrifuj-fanlar', ad: 'Vortice VORTICENT CMS ATEX Santrifüj Fanlar', marka: 'vortice', seri: 'CMS-ATEX',
     kok: 'fans', yaprak: 'ex-proof-atex-fans', sku: /^VRT-253/,
     metin: 'ATEX sertifikalı, patlayıcı ortamlara kurulum için tasarlanmış santrifüj fan ailesi. Çelik sactan, tamamen birleştirilmiş veya kaynaklı gövde; alüminyum sacdan yapılmış öne eğik pervane; bakır veya alüminyumdan yapılmış, kıvılcım önleyici giriş halkası. Zone 1 ve Zone 2 sürümleri, fan ve motor için ayrı ATEX işaretleriyle listelenir.',
   },
   {
-    slug: 'seat-atex-ptc-sensor', ad: 'SEAT ATEX PTC Sensörü', marka: 'seat', seri: 'PTC',
+    slug: 'seat-atex-ptc-sensoru', ad: 'SEAT ATEX PTC Sensörü', marka: 'seat', seri: 'PTC',
     kok: 'fans', yaprak: 'ex-proof-atex-fans', sku: /^SEA-810105$/,
     metin: 'SEAT ATEX serisi fanlarda motor sargı sıcaklığını izleyen PTC termistör sensörü. ATEX kurulumlarında motor korumasının parçasıdır.',
   },
   {
-    slug: 'avens-nimus', ad: 'AVenS NIMUS Santrifüj Fanlar', marka: 'avens', seri: 'NIMUS',
+    slug: 'casals-nimus', ad: 'AVenS NIMUS Santrifüj Fanlar', marka: 'avens', seri: 'NIMUS',
     kok: 'fans', yaprak: 'centrifugal-fans', sku: /^AVE-NS/,
     metin: 'Çelik gövdeli, direkt akuple, orta basınçlı, korozyona dayanıklı santrifüj fan. IP-55 koruma ve F sınıfı elektrik yalıtımına sahiptir. Taşınan hava en fazla 130 °C, ortam sıcaklığı en fazla 60 °C olacak şekilde sürekli çalışır. Temiz veya tozlu hava taşımaya uygundur; boya kabinleri, toz toplama, gıda işleme ve endüstriyel koku kontrolü gibi uygulamalarda kullanılır.',
   },
   {
-    slug: 'avens-nimax', ad: 'AVenS NIMAX Santrifüj Fanlar', marka: 'avens', seri: 'NIMAX',
+    slug: 'casals-nimax', ad: 'AVenS NIMAX Santrifüj Fanlar', marka: 'avens', seri: 'NIMAX',
     kok: 'fans', yaprak: 'centrifugal-fans', sku: /^AVE-NX/,
     metin: 'Çelik gövdeli, direkt akuple, orta basınçlı, korozyona dayanıklı santrifüj fan. IP-55 koruma ve F sınıfı elektrik yalıtımına sahiptir; emme veya boşaltma kanalına monte edilmek üzere tasarlanmıştır. Taşınan hava en fazla 130 °C, ortam sıcaklığı en fazla 60 °C olacak şekilde sürekli çalışır.',
   },
   {
-    slug: 'avens-enkelfan-ec-plug', ad: 'AVenS ENKELFAN EC Motorlu Plug Fanlar', marka: 'avens', seri: 'ENKEC',
+    slug: 'casals-enkelfan-ec-plug', ad: 'AVenS ENKELFAN EC Motorlu Plug Fanlar', marka: 'avens', seri: 'ENKEC',
     kok: 'fans', yaprak: 'centrifugal-fans', sku: /^AVE-ENKEC/,
     metin: 'Geriye eğik seyrek kanatlı, tek emişli, doğrudan tahrikli EC motorlu OEM plug fan. Sürekli çalışma sıcaklık aralığı -20 °C ile +60 °C arasındadır. Klima santralleri, ısı geri kazanım cihazları ve plenum kutularında kullanılır.',
   },

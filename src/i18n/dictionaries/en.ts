@@ -90,7 +90,8 @@ export const en: typeof tr = {
         ghost: 'In-line / Duct Fans',
         smoke: 'Smoke Exhaust Fans',
         jet: 'Car Park Jet Fans',
-        radial: 'Radial Fans',
+        // Decision 288 (Recep, OPS-76): matches the TR name 'Radyal (Santrifüj) Fanlar'; address and key are unchanged.
+        radial: 'Radial (Centrifugal) Fans',
         roof: 'Roof Fans',
         'axial-ind': 'Industrial Axial Fans',
         'air-curtain': 'Air Curtains',
@@ -113,7 +114,8 @@ export const en: typeof tr = {
         'speed-controllers': 'Speed Controllers',
         'water-coils': 'Water Coil Duct Heaters',
         // REC-300 Faz 1-B: bound by the DB migration; the corrosion branch moves to a NEW key.
-        'corrosion-fans': 'Corrosion-Resistant Fans',
+        // Decision 287 (Recep, OPS-74): matches the TR name; the old `acid-fans` key stays for rollback and the deploy window.
+        'corrosion-fans': 'Corrosion- and Acid-Resistant Fans',
         'plug-fans': 'Plug Fans',
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
@@ -1994,6 +1996,8 @@ export const en: typeof tr = {
     seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
     seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
     seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
+    // OPS-51: meta description of the brand page without products (same fact as the page body; no product/time promise).
+    seoUrunsuz: '{{ad}} products are not yet in the VentHub catalog; contact us for product information and a quote.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
@@ -2022,6 +2026,11 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
+      // OPS-51 (decision 265 + OPS ruling): ONLY for a brand with zero active products in the DB (currently Flexiva); the
+      // decision is derived on the server from the active product count (`markaUrunDurumu.ts`), no static flag.
+      // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
+      productsOnRequest: 'Request a quote from us for {{ad}} products.',
+      productsOnRequestCta: 'Go to the contact form',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak

@@ -25,6 +25,9 @@ import {
  * FİKSTÜRÜ YENİLEMEK: yalnız başka bir kapı bilerek adres değiştirdiğinde (örn. karar 92 listesi büyüdü).
  * Üretim: next.config.mjs'i anahtarsız içe aktar, `{ redirects: await redirects(), headers: await headers() }`
  * JSON'unu yaz. Rota dili satırı eklemek fikstürü DEĞİŞTİRMEZ (kapalı kipte hiçbir etkisi yok).
+ *
+ * YENİLEME KAYDI: OPS-51 (karar 264 + 265, 2026-10-05) casals ve flexiva marka 308'lerini bilerek kaldırdı
+ * (tr/en × 2 = 4 satır); fikstürden yalnız bu dört kayıt çıktı (49 → 45), başka fark yok.
  */
 
 const ANAHTAR = 'NEXT_PUBLIC_ADRES_DILI'
@@ -59,7 +62,7 @@ async function yukle(anahtar: string | undefined) {
 
 describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres farkı', () => {
   it('ÖN KOŞUL — fikstür dolu evren (boş evrende yeşil kapı ölçüm değildir)', () => {
-    expect(FIKSTUR.redirects).toHaveLength(49)
+    expect(FIKSTUR.redirects).toHaveLength(45)
     expect(FIKSTUR.headers).toHaveLength(3)
   })
 
@@ -104,7 +107,7 @@ describe('INV-ROTA-DILI-KAPALI-1 — anahtar kapalı → canlıda sıfır adres 
     expect(cikti.headers).toEqual(FIKSTUR.headers)
   }, 60_000)
 
-  it('açık kipte TÜM next.config yönlendirmeleri (49 mevcut + rota dili) tek hop: zincir/döngü yok', async () => {
+  it('açık kipte TÜM next.config yönlendirmeleri (45 mevcut + rota dili) tek hop: zincir/döngü yok', async () => {
     const cikti = await yukle('1')
     const bulgu = zincirVarMi(cikti.redirects)
     expect(bulgu, bulgu ? `${bulgu.kaynak.source} -> ${bulgu.kaynak.destination} sonra ${bulgu.hedef.source}` : '').toBeNull()

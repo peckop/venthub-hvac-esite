@@ -41,8 +41,8 @@ describe('kural 1 — dil önekli eski adres → TEK 308', () => {
     ['/en/category/fanlar', '/en/category/fans'], // EN önekinde TR slug
     ['/tr/products/storm-serisi', '/tr/urun/storm-serisi'], // aile, eski önek
     ['/en/products/seat-storm', '/en/products/storm-serisi'], // eski aile slug'ı (takma ad)
-    ['/tr/products/vortice-lineo-100-quiet', '/tr/urun/vortice-lineo-quiet'], // tohum: Lineo çap
-    ['/en/products/vortice-lineo-315-quiet', '/en/products/vortice-lineo-quiet'],
+    ['/tr/products/vortice-lineo-100-quiet', '/tr/urun/vortice-lineo-quiet-sessiz-kanal-fanlari'], // tohum: Lineo çap (URN-53: yeni slug)
+    ['/en/products/vortice-lineo-315-quiet', '/en/products/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     ['/tr/products/vortice-ca-il-4020-es-rect-16076', '/tr/urun/vortice-vort-commercial-in-line-rectangular'], // tohum/takma: ürün
     ['/tr/products/vorticent-cms-atex-35-14-t4-4kw-253490106xn', '/tr/urun/vortice-vorticent-cms-atex'], // config'te satırı YOK, takma adda var
     ['/tr/products', '/tr/urunler'],
