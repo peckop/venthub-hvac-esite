@@ -18,7 +18,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
  * koruyucu testleri (DISLANAMAZ) hiçbir listede yer alamaz. Bozulan her halka, bir PR'ın kendi kırmızı testini (ve kapıyı koruyan testi)
  * listeye yazıp `ci`'ı yeşile çevirmesi demektir ve HİÇBİR KIRMIZI GÖRÜNMEZ. Bu dosya halkaları TEK TEK ölçer:
  *   1. SÖZLEŞME YÜZEYİ: dışa açılan adlar, sabitler (kip adı, taban ortam adı, liste yolu) literal sınanır,
- *   2. DISLANAMAZ: beş kayıt TAM liste; her biri diskte VAR; her biri `dogrula` ve `ayar` (dislan, yalniz) tarafından reddedilir;
+ *   2. DISLANAMAZ: yedi kayıt TAM liste; her biri diskte VAR; her biri `dogrula` ve `ayar` (dislan, yalniz) tarafından reddedilir;
  *      takma yazımlar (`./x`, `a//x`, `a/./x`, `a/../x`, `a\x`) vitest'te AYNI dosyayı dışlar (ölçüldü) ve aynı sertlikle reddedilir,
  *   3. TAM KİP: liste HİÇ okunmaz, doğrulanmaz, taban sorulmaz, git çağrılmaz (patlayan liste / patlayan okuma ile kanıtlanır),
  *   4. GEÇERSİZ KİP önce gelir, GEÇERSİZ LİSTE `dislan` ve `yalniz`'da FIRLATIR (mesaj biçimi, 5 hata sınırı, enjeksiyonun iletilmesi),
@@ -86,9 +86,11 @@ const KOK_SAHTE = '/sahte/kok'
 const DISLANAMAZ_BEKLENEN = [
   'scripts/ci/__tests__/edited-ayna.test.ts',
   'scripts/ci/__tests__/dunya-durumu.test.ts',
+  'scripts/ci/__tests__/degisiklik-sinifi.test.ts',
   'src/__tests__/conformance/ci-edited-ayna.test.ts',
   'src/__tests__/conformance/test-kosu-kapsami.test.ts',
   'src/__tests__/conformance/dunya-durumu-satiri.test.ts',
+  'src/__tests__/conformance/ci-degisiklik-sinifi.test.ts',
 ]
 const GERCEK_KAYIT = 'src/__tests__/conformance/taban-tazeligi-dunya.test.ts'
 const KORUYUCU_MESAJI = 'bu test dışlama mekanizmasının KENDİ koruyucusu, PR kapısından çıkarılamaz'

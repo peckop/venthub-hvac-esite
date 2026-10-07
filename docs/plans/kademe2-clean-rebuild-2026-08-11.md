@@ -56,8 +56,9 @@ merge edilir (merge = prod'a otomatik apply, CLAUDE.md Kural 13). Kod PR'larınd
 ### F0 — Yedek + kontrollü tasfiye (tek migration)
 
 1. **Yedek:** `products`, `product_images`, `venthub_orders(+items)`, `shopping_carts(+cart_items)`
-   tam dökümü → `docs/archive/db-backup-pre-kademe2/` (CSV; 219 eski satış fiyatı ileride fiyat
-   motoru çapraz-kontrolü için burada yaşar). Yedek dosyaları commit'lenir (repo = sigorta).
+   tam dökümü → eski döküm dizini (CSV; 219 eski satış fiyatı ileride fiyat
+   motoru çapraz-kontrolü için burada yaşardı). ⚠ALT-39: bu karar GERİ ALINDI; depo herkese açık olduğu için döküm ağaçtan
+   kaldırıldı ve bir daha depoya girmez (cetvel: `docs/standards/depoya-giremeyecek-veri-standard.md`); geçmişten silme ALT-41.
 2. **Tasfiye migration'ı** (sıra FK'ya göre): test sipariş kalemleri + siparişler + sepetler +
    `inventory_movements` (varsa) + `product_prices` + `product_images` + `products` satırları.
    `TRUNCATE` değil kayıtlı `DELETE` (audit izi migration dosyasında).
