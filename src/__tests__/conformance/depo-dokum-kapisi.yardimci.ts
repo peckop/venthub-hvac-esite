@@ -109,6 +109,12 @@ export const BEKLENEN_GENEL = [
   'tax_number',
   'tax_office',
   'ip_address',
+  // ALT-39 3. tur (N3): şema DIŞI API/döküm adları (iyzico `buyer.registrationAddress`, düz `address`): tam ad eşleşmesi
+  'address',
+  'registration_address',
+  'home_address',
+  'work_address',
+  'delivery_address',
 ]
 export const BEKLENEN_HASSAS_TABLOLAR = [
   'user_profiles',
@@ -126,7 +132,12 @@ export const BEKLENEN_HASSAS_TABLOLAR = [
   'inventory_settings',
   'venthub_quotes',
   'wizard_selections',
+  // ALT-39 3. tur (N3): auth şeması (public şema tabanında YOK; testte AUTH_TABLOLARI olarak adıyla ayrılır)
+  'users',
+  'identities',
 ]
+/** Hassas listede olup public şema tabanında bulunmayan auth şeması tabloları (`auth.users`, `auth.identities`): tabanı tarayan kanarya bunları ayrı sayar. */
+export const AUTH_TABLOLARI = ['users', 'identities']
 
 // Uydurma işaretçi değerler: çıktıda ASLA geçmemeli. (BOM, kaçış dizisi yazmadan kod noktasıyla kurulur.)
 export const BOM = String.fromCharCode(0xfeff)

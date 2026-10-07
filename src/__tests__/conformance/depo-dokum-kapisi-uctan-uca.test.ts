@@ -348,6 +348,35 @@ describe('INV-DEPO-DOKUM-1 · YENİ NESNELER: sonradan silinen dosya, PR ara com
     expect(r.cikti).not.toContain('yedek/duz.orig')
   })
 
+  // 3. tur (N6): `pg_dump -Fc` özel biçim arşivi (`PGDMP`) itilen nesne kipinde de uzantıdan bağımsız R6; WAL/journal yan dosyaları R4.
+  it('N6: itilen nesne kipinde pg_dump özel biçim arşivi (PGDMP) UZANTIDAN BAĞIMSIZ R6; x.dump-20261007 ve SQLite WAL/journal yan dosyaları R4; düz metin temiz', { timeout: 90_000 }, () => {
+    const d = geciciDizin('depo-dokum-pgdump-')
+    git(d, 'init', '-q')
+    yaz(d, 'README.md', '# proje')
+    const taban = commitle(d, 'taban')
+    const pg = (i: number) => Buffer.concat([Buffer.from('PGDMP'), Buffer.from([1, 14, 0]), Buffer.alloc(80), Buffer.from(String(i))])
+    const pgYollari = ['yedek/sunucu.bin', 'yedek/dosya', 'yedek/resim.png']
+    pgYollari.forEach((ad, i) => yaz(d, ad, pg(i)))
+    const yanDosyalar = ['yedek/uygulama.db-wal', 'yedek/uygulama.sqlite-journal', 'yedek/uygulama.db-shm']
+    yanDosyalar.forEach((ad) => yaz(d, ad, 'yan dosya'))
+    yaz(d, 'yedek/sunucu.dump-20261007', 'x')
+    yaz(d, 'yedek/sunucu.dump_eski', 'x')
+    yaz(d, 'yedek/duz.bin', 'düz metin, PGDMP DEĞİL başlıkta yok')
+    yaz(d, 'yedek/dumpling.md', 'yemek tarifi')
+    const uc = commitle(d, 'pg_dump arsivleri ve yan dosyalar')
+    const s = kapi.yeniNesneleriTara({ kok: d, ucler: [uc], haric: [taban] })
+    const r6 = s.ihlaller.filter((k) => k.kural === 'R6').map((k) => k.dosya).sort()
+    expect(r6).toEqual([...pgYollari].sort())
+    expect(s.ihlaller.filter((k) => k.kural === 'R6').every((k) => /pg_dump arşiv imzası/.test(k.ayrinti))).toBe(true)
+    const r4 = s.ihlaller.filter((k) => k.kural === 'R4').map((k) => k.dosya).sort()
+    expect(r4).toEqual([...yanDosyalar, 'yedek/sunucu.dump-20261007', 'yedek/sunucu.dump_eski'].sort())
+    expect(s.ihlaller.map((k) => k.dosya)).not.toContain('yedek/duz.bin')
+    expect(s.ihlaller.map((k) => k.dosya)).not.toContain('yedek/dumpling.md')
+    const cli = kapiyiKos(d, ['--pre-push'], {}, `refs/heads/x ${uc} refs/heads/x ${'0'.repeat(40)}\n`)
+    expect(cli.kod, cli.cikti).toBe(1)
+    expect(cli.cikti).toContain('yedek/sunucu.bin')
+  })
+
   it('O1: imzalı VERİ uzantılı blob da imza kuralına takılır (data.json içine SQLite); NUL baytlı içerik ayrıca ölçülemedi', { timeout: 90_000 }, () => {
     const d = geciciDizin('depo-dokum-imza-')
     git(d, 'init', '-q')

@@ -162,6 +162,18 @@ graphify-out/
 **/[Dd][Bb]-[Bb]ackup*
 *.dump
 *.dump.*
+*.dump-*
+*.dump_*
 *.sql.gz
 *.backup
 *.pgdump
+# SQLite yan dosyalari (WAL/shm/journal): imza tasimaz ama yazilmamis islemleri tutar (3. tur, N6)
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite3-journal

@@ -78,6 +78,12 @@ const VERI_UZANTILARI = Object.freeze(['json', 'jsonl', 'ndjson', 'csv', 'tsv', 
 /** Bundan büyük veri dosyası TARANAMAZ → ölçülemedi (fail-closed). */
 const BUYUK_DOSYA_SINIRI = 64 * 1024 * 1024
 
+/**
+ * JSON gövdesi ayrıştırıldıktan sonra yapının DIŞINDA kalan, yorum OLMAYAN metnin (boşluk/NUL/BOM hariç) en çok bu kadar karakteri
+ * hoş görülür (UTF-16 gövde + CRLF çöpü, `;` gibi artıklar); fazlası "ölçülemedi" (3. tur, N2).
+ */
+const JSON_DISI_SINIR = 16
+
 /** Yeni nesneler kipi tavanları: aşılırsa ölçülemedi (çıkış 2). */
 const NESNE_TAVANI = 200000
 const OKUMA_TAVANI = 512 * 1024 * 1024
@@ -119,6 +125,12 @@ const KISISEL_GENEL_ALANLAR = Object.freeze([
   'tax_number',
   'tax_office',
   'ip_address',
+  // 3. tur (N3): şema DIŞI API/döküm adları (iyzico `buyer.registrationAddress`, düz `address`); tam ad eşleşmesi.
+  'address',
+  'registration_address',
+  'home_address',
+  'work_address',
+  'delivery_address',
 ])
 
 /** Genel kişisel alanda en az bu kadar dolu satır varsa dökümdür. */
@@ -151,6 +163,10 @@ const KISISEL_GENEL_KOKLER = Object.freeze([
   'taxoffice',
   'vergino',
   'vergidairesi',
+  // 3. tur (N3): ödeme sağlayıcı / API yanıtlarındaki alıcı blokları (iyzico `buyer`: surname). `address` KÖK DEĞİL, TAM AD olarak
+  // KISISEL_GENEL_ALANLAR'da: kök olsaydı `address_type` (etiket) gibi kişisel olmayan şema kolonları yanlış alarm verirdi.
+  'surname',
+  'zipcode', // `zipCode`, `zip_code`; tek başına `zip` KİŞİSEL DEĞİL (sıkıştırma bayrağı gibi kullanımlar: ölçülmüş yanlış alarm sınıfı)
 ])
 
 /**
@@ -159,11 +175,11 @@ const KISISEL_GENEL_KOKLER = Object.freeze([
  *   · KISISEL_GENEL_SON_PARCALAR: parça bileşik adın SON parçasıysa (`accept_ip`, `clientIp`, `remote_ip`: "…_ip"). Tek başına
  *     ya da başta (`ip`, `ip_rating`, `ip_class`) DEĞİL: bu depoda `ip_rating` ürünün koruma sınıfıdır (ölçüldü, yanlış alarm).
  */
-const KISISEL_GENEL_PARCALAR = Object.freeze(['gsm'])
+const KISISEL_GENEL_PARCALAR = Object.freeze(['gsm', 'iban', 'tel', 'cep'])
 const KISISEL_GENEL_SON_PARCALAR = Object.freeze(['ip'])
 
 /** Belirgin (≥1 dolu satır) tolerans kökleri: kimlik numarası biçimleri (`tc_kimlik_no`, `tcno`, `kimlik_no`). */
-const KISISEL_BELIRGIN_KOKLER = Object.freeze(['tckn', 'tckimlik', 'tcno', 'kimlikno'])
+const KISISEL_BELIRGIN_KOKLER = Object.freeze(['tckn', 'tckimlik', 'tcno', 'kimlikno', 'identitynumber', 'vkn'])
 
 /**
  * R2: kolon listesiz INSERT/COPY bu tablolara yazıyorsa ihlal; kolon listeli yazımda da genel alan eşiği 1'dir
@@ -184,6 +200,9 @@ const HASSAS_TABLOLAR = Object.freeze([
   'inventory_settings',
   'venthub_quotes',
   'wizard_selections',
+  // 3. tur (N3): auth şeması (`auth.users`, `auth.identities`: e-posta, telefon, sağlayıcı kimliği); tablo adı şema önekinden bağımsız eşleşir.
+  'users',
+  'identities',
 ])
 
 /** R3 kimlik yarısı: tam ad kümesi + `*_kod` soneki. */
@@ -236,11 +255,14 @@ const R4_UZANTILARI = Object.freeze([
 const YOL_KURALLARI = Object.freeze([
   { ad: 'db-backup', eslesir: (k) => k.includes('db-backup') },
   { ad: 'pg_dump', eslesir: (k) => k.includes('pg_dump') },
-  { ad: '.dump', eslesir: (k) => /\.dump(\.[a-z0-9]+)?$/.test(k) },
+  // `.dump` ardından ayraçla (`.` `-` `_`) gelen her sonek: `x.dump`, `x.dump.gz`, `x.dump-20261007`, `x.dump_eski`; `x.dumpling.md` DEĞİL (3. tur, N6).
+  { ad: '.dump', eslesir: (k) => /\.dump(?:[._-][a-z0-9._-]*)?$/.test(k) },
   { ad: '.sql.gz', eslesir: (k) => k.endsWith('.sql.gz') },
   { ad: '.sql.dump', eslesir: (k) => k.endsWith('.sql.dump') },
   ...R4_UZANTILARI.map((u) => ({ ad: `.${u}`, eslesir: (k) => k.endsWith(`.${u}`) })),
   { ad: 'toc.dat', eslesir: (k) => k === 'toc.dat' || k.endsWith('/toc.dat') },
+  // 3. tur (N6): SQLite yan dosyaları (WAL/shm/journal) SQLite imzası taşımaz ama yazılmamış işlemleri (kişisel veri dahil) tutar.
+  { ad: 'sqlite-wal/shm/journal', eslesir: (k) => /\.(?:db|db3|sqlite|sqlite3)-(?:wal|shm|journal)$/.test(k) },
 ])
 
 /**
@@ -249,6 +271,8 @@ const YOL_KURALLARI = Object.freeze([
  */
 const R6_UZANTILARI = Object.freeze(['db', 'sqlite', 'sqlite3'])
 const SQLITE_IMZASI = 'SQLite format 3'
+/** 3. tur (N6): `pg_dump -Fc` (özel biçim) arşivinin ilk 5 baytı. Uzantısı ne olursa olsun (`yedek.bin`, uzantısız) R6. */
+const PGDUMP_IMZASI = 'PGDMP'
 
 /**
  * İzin listesi hangi kurallara açık: R1/R2/R4/R5 ASLA. R5 (ödeme kartı parçası) son tur (ALT-39) öncesinde yalnız kanıtlı bir
@@ -324,7 +348,11 @@ const fiyatAnahtariMi = (nk) => FIYAT_KOKLERI.some((k) => nk.includes(k))
 
 /** Anahtarı parçalara ayırır: `_` `-` boşluk ve camelCase sınırları (acceptIp → accept, ip; GSMNo → gsm, no). */
 function anahtarParcalari(ad) {
-  return String(ad)
+  // 3. tur (N5): `([A-Z]+)([A-Z][a-z])` uzun BÜYÜK HARF dizisinde KARESEL geri izler (10^6 harflik anahtar CI'ı kilitlerdi). Kişisel bir
+  // alan adı 128 karakteri aşmaz; uzun anahtarda ilk 64 ve son 64 karakter ayrılır (SON_PARCALAR kuralı sondaki parçaya bakar).
+  const ham = String(ad)
+  const kisa = ham.length > 128 ? `${ham.slice(0, 64)} ${ham.slice(-64)}` : ham
+  return kisa
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
     .split(/[^A-Za-z0-9çÇğĞıİöÖşŞüÜ]+/)
@@ -467,8 +495,11 @@ function satirBelgeleri(metin) {
   return { belgeler, basarisiz }
 }
 
-/** JSONC'yi (// ve blok yorum, sondaki virgül) düz JSON'a çevirir; dize içeriğine dokunmaz. */
-function jsonYorumTemizle(t) {
+/**
+ * JSONC'yi (// ve blok yorum, sondaki virgül) düz JSON'a çevirir; dize içeriğine dokunmaz.
+ * `yorumlar` verilirse atılan her yorumun metni oraya eklenir (3. tur, N2: yorumdaki kayıtlar da ham metin taramasına girer).
+ */
+function jsonYorumTemizle(t, yorumlar) {
   let o = ''
   let i = 0
   const n = t.length
@@ -493,13 +524,17 @@ function jsonYorumTemizle(t) {
       continue
     }
     if (c === '/' && d === '/') {
+      const yorumBasi = i
       while (i < n && t[i] !== '\n') i++
+      if (yorumlar) yorumlar.push(t.slice(yorumBasi, i))
       continue
     }
     if (c === '/' && d === '*') {
+      const yorumBasi = i
       i += 2
       while (i < n && !(t[i] === '*' && t[i + 1] === '/')) i++
       i += 2
+      if (yorumlar) yorumlar.push(t.slice(yorumBasi, Math.min(i, n)))
       continue
     }
     o += c
@@ -549,34 +584,46 @@ function jsonYorumTemizle(t) {
  */
 function jsonBelgeleri(metin, uz) {
   const t = bomSil(metin)
+  // 3. tur (N2): `atilan` = ayrıştırma BAŞARILI olsa da yapının DIŞINDA kalıp hiç taranmayan metin (yorumlar, baş/son çöp); çağıran ham
+  // metin taramasına sokar. `disMetin` = bunun YORUM OLMAYAN kısmının boşluk/NUL/BOM dışı karakter sayısı (büyükse "ölçülemedi").
   if (uz === 'jsonl' || uz === 'ndjson') {
     const s = satirBelgeleri(t)
-    return { belgeler: s.belgeler, satirlar: true, ayristirilamadi: s.basarisiz > 0 }
+    return { belgeler: s.belgeler, satirlar: true, ayristirilamadi: s.basarisiz > 0, atilan: '', disMetin: 0 }
   }
   try {
-    return { belgeler: [JSON.parse(t)], satirlar: false, ayristirilamadi: false }
+    return { belgeler: [JSON.parse(t)], satirlar: false, ayristirilamadi: false, atilan: '', disMetin: 0 }
   } catch {
     // devam
   }
+  const yorumlar = []
   try {
-    return { belgeler: [JSON.parse(jsonYorumTemizle(t))], satirlar: false, ayristirilamadi: false }
+    return { belgeler: [JSON.parse(jsonYorumTemizle(t, yorumlar))], satirlar: false, ayristirilamadi: false, atilan: yorumlar.join('\n'), disMetin: 0 }
   } catch {
     // devam
   }
   const s = satirBelgeleri(t)
-  if (s.belgeler.length > 0 && s.basarisiz === 0) return { belgeler: s.belgeler, satirlar: true, ayristirilamadi: false }
+  if (s.belgeler.length > 0 && s.basarisiz === 0) return { belgeler: s.belgeler, satirlar: true, ayristirilamadi: false, atilan: '', disMetin: 0 }
   // Karışık kodlama / başta ya da sonda çöp (ör. UTF-16 gövde + tek baytlık CRLF): ilk `{`/`[` ile son `}`/`]` arası.
   const baslar = [t.indexOf('{'), t.indexOf('[')].filter((i) => i >= 0)
   const bas = baslar.length > 0 ? Math.min(...baslar) : -1
   const son = Math.max(t.lastIndexOf('}'), t.lastIndexOf(']'))
   if (bas >= 0 && son > bas) {
+    const icYorumlar = []
     try {
-      return { belgeler: [JSON.parse(jsonYorumTemizle(t.slice(bas, son + 1)))], satirlar: false, ayristirilamadi: false }
+      const belge = JSON.parse(jsonYorumTemizle(t.slice(bas, son + 1), icYorumlar))
+      const dis = `${t.slice(0, bas)}\n${t.slice(son + 1)}`
+      return {
+        belgeler: [belge],
+        satirlar: false,
+        ayristirilamadi: false,
+        atilan: [dis, ...icYorumlar].join('\n'),
+        disMetin: dis.replace(/[\s\0]/g, '').split(String.fromCharCode(0xfeff)).join('').length,
+      }
     } catch {
       // devam
     }
   }
-  return { belgeler: [], satirlar: false, ayristirilamadi: true }
+  return { belgeler: [], satirlar: false, ayristirilamadi: true, atilan: '', disMetin: 0 }
 }
 
 /** Bir nesne "kimlik + pozitif fiyat/maliyet" taşıyan DB satırı imzası mı? */
@@ -847,9 +894,18 @@ function csvFiyatSatiri({ baslik, govde }) {
 // ── SQL ──────────────────────────────────────────────────────────────────────────────────────────
 
 const COPY_STDIN = /^\s*copy\b[\s\S]*?\bfrom\s+stdin\b/i
-const COPY_BASLIK = /^\s*copy\s+(\S+?)\s*(?:\(([^)]*)\))?\s*from\s+stdin\b/i
+// 3. tur (N5): başlık desenleri `baslikMetni()` çıktısında (dizeler `''`, her boşluk dizisi TEK boşluk) koşar ve niceliyicileri SINIRLIDIR.
+// Eski desenler (`(\S+?)\s*(?:\(([^)]*)\))?\s*...`) uzun '(' ya da boşluk dizisinde KARESEL geri izliyordu (CI zaman aşımı, pre-push asılı).
+// 3. tur (N1): `INSERT INTO t AS a (...)` takma adı ve `VALUES` dışında `SELECT`/`WITH` biçimi (üçüncü yakalama grubu) tanınır.
+const COPY_BASLIK = /^ ?copy ([^ (]{1,200}) ?(?:\(([^)]{0,20000})\))? ?from stdin\b/i
 const INSERT_INTO = /^\s*insert\s+into\b/i
-const INSERT_BASLIK = /^\s*insert\s+into\s+(\S+?)\s*(?:\(([^)]*)\))?\s*(?:overriding\s+\w+\s+value\s+)?values\b/i
+const INSERT_BASLIK = /^ ?insert into ([^ (]{1,200})(?: as [^ (]{1,100})? ?(?:\(([^)]{0,20000})\))? ?(?:overriding \w+ value )?(values|select|with)\b/i
+/**
+ * Başlık ayrıştırması girdisi: dizeler `''`, boşluk dizileri TEK boşluk (doğrusal), SONRA ilk `BASLIK_SINIRI` karakter. Sıra önemlidir:
+ * önce kesip sonra sadeleştirmek, tablo adı ile kolon listesi arasına çok sayıda boşluk koyarak başlığı kesilen kısma iterdi (kapı kör kalırdı).
+ */
+const BASLIK_SINIRI = 60000
+const baslikMetni = (metin) => metin.replace(/'(?:[^']|'')*'/g, "''").replace(/\s+/g, ' ').slice(0, BASLIK_SINIRI)
 const KISISEL_SQL = new RegExp(`\\b(${KISISEL_ALANLAR.join('|')})\\b`, 'gi')
 /** Dollar-quote etiketi: ASCII harf/rakam/alt çizgi ve Latin-1 üstü harfler (\x80-\xff). */
 const DOLAR_ETIKETI = /^\$([A-Za-z_\x80-\xff][A-Za-z0-9_\x80-\xff]*)?\$/
@@ -1107,8 +1163,11 @@ const veriLiteraliMi = (rhs) => /^[eEnNbBxX]?'(?:[^']|'')+'/.test(rhs) || /^\$[A
  * ve WHERE koşulları veri DEĞİLDİR). Satır sayısı bilinemez: ifade başına 1 (alt sınır).
  * @returns {null | {tur: 'UPDATE', tablo: string, kolonlar: string[], satir: number}}
  */
-function updateAyrinti(metin) {
+function updateAyrinti(metin, cteDize = false) {
   const kapali = dizeleriKapat(metin)
+  // 3. tur (N1): veri `SET` sağ tarafında değil, ifadenin başka yerindeki VALUES listesindeyse (`WITH d AS (VALUES ('x')) UPDATE ... FROM d`,
+  // `UPDATE ... FROM (VALUES ('x')) v`) sağ taraf bir sütun/alt sorgu görünür; dize taşıyan VALUES varken atama hedefleri veri alır sayılır.
+  const degerListesi = cteDize || (/\bvalues\b/i.test(kapali) && /'_+'/.test(kapali))
   const baslik = /^\s*update\s+(?:only\s+)?((?:"[^"]*"|[^\s(".]+)(?:\.(?:"[^"]*"|[^\s(".]+))*)/i.exec(kapali)
   if (!baslik) return null
   const setKonumu = ustSeviyeAnahtar(kapali, baslik[0].length, ['set'])
@@ -1120,7 +1179,7 @@ function updateAyrinti(metin) {
   for (const [a, b] of ustSeviyeParcalar(kapali, bas, son)) {
     const es = atamaKonumu(kapali, a, b)
     if (es < 0) continue
-    if (!veriLiteraliMi(metin.slice(es + 1, b).trim().replace(/^\(\s*/, ''))) continue
+    if (!degerListesi && !veriLiteraliMi(metin.slice(es + 1, b).trim().replace(/^\(\s*/, ''))) continue
     for (const k of kapali.slice(a, es).replace(/[()]/g, ' ').split(',')) {
       const ad = k.trim().replace(/"/g, '').split('.').pop()
       if (ad) kolonlar.push(ad)
@@ -1130,26 +1189,80 @@ function updateAyrinti(metin) {
 }
 
 /**
- * Bir SQL ifadesinin VERİ ifadesi olup olmadığı ve ayrıntısı. `INSERT ... SELECT` ve tanımlar veri DEĞİLDİR.
+ * `INSERT INTO t [AS a] [(kolonlar)] VALUES | SELECT | WITH ...` (O3 + 3. tur N1). `VALUES`: satır sayısı demet sayısıdır. `SELECT`/`WITH`:
+ * satır sayısı bilinemez (alt sınır 1) ve YALNIZ SELECT listesinde (ya da dize taşıyan bir VALUES/CTE'den beslenen ifadede) boş olmayan DİZE
+ * literal'i varsa veridir: `INSERT ... SELECT a FROM baska_tablo` veritabanı içi kopyadır, veri DEĞİLDİR (migration'larda yaygın).
+ * @param {string} metin  `INSERT` ile başlayan ifade
+ * @param {boolean} cteDize  başındaki `WITH ... ` CTE'sinde dize literal'i var mı
+ */
+function insertAyrinti(metin, cteDize) {
+  const bas = baslikMetni(metin)
+  const m = INSERT_BASLIK.exec(bas)
+  const bicim = m ? m[3].toLowerCase() : /\bvalues\b/i.test(bas) ? 'values' : null
+  if (bicim === null) return null
+  const tablo = m ? tabloAdi(m[1]) : ''
+  const kolonlar = m ? kolonAdlari(m[2]) : null
+  if (bicim === 'values') {
+    const idx = metin.search(/\bvalues\b/i)
+    return { tur: 'INSERT', tablo, kolonlar, satir: idx < 0 ? 0 : demetSayisi(metin.slice(idx + 6)) }
+  }
+  const kapali = dizeleriKapat(metin)
+  const sel = ustSeviyeAnahtar(kapali, 0, ['select'])
+  const baslangic = sel + 6
+  const bitis = sel < 0 ? -1 : ustSeviyeAnahtar(kapali, baslangic, ['from', 'where', 'on', 'returning'])
+  const son = sel < 0 ? 0 : bitis < 0 ? kapali.length : bitis
+  const liste = sel < 0 ? '' : kapali.slice(baslangic, son)
+  // Veri CTE'den ya da `FROM (VALUES ...)` alt sorgusundan akıyorsa SELECT listesi sütun adlarından ibarettir: dize TÜM ifadede aranır.
+  const dizeVar = cteDize || /'_+'/.test(kapali)
+  const dizeAkisi = cteDize || bicim === 'with' || /\bvalues\b/i.test(kapali)
+  if (!seciliVeriMi(liste) && !(dizeAkisi && dizeVar)) return null
+  // Kolon listesi SELECT öğeleriyle HİZALANIR: yalnız DEĞER (literal) alan kolonlar veri alır (`auth.jwt() ->> 'email'` e-posta kolonuna
+  // literal yazmaz). Hizalanamazsa (`*` bir sütunu birden çok kolona açar, sayı uyuşmuyor) ya da veri akışı varsa TÜM kolonlar (korumacı).
+  let verili = kolonlar
+  if (kolonlar && sel >= 0 && !dizeAkisi && !liste.includes('*')) {
+    const parcalar = ustSeviyeParcalar(kapali, baslangic, son)
+    if (parcalar.length === kolonlar.length) verili = kolonlar.filter((_, i) => seciliVeriMi(kapali.slice(parcalar[i][0], parcalar[i][1])))
+  }
+  return { tur: 'INSERT', tablo, kolonlar: verili, satir: 1, secim: true }
+}
+
+/**
+ * SELECT öğesi/listesi (dizeleri `_` ile doldurulmuş metin) VERİ literal'i taşıyor mu: boş olmayan bir dize literal'i VAR ve o literal bir JSON
+ * anahtarı (`->> 'email'`, `-> 'k'`, `#>> '{a}'`) ya da `current_setting('k')` argümanı DEĞİL.
+ */
+function seciliVeriMi(kapaliOge) {
+  const re = /'_+'/g
+  let m
+  while ((m = re.exec(kapaliOge)) !== null) {
+    // Yalnız literalin hemen öncesindeki KISA pencere bakılır (tüm öneki taramak çok literalli ifadede karesel olurdu).
+    const onceki = kapaliOge.slice(Math.max(0, m.index - 40), m.index).trimEnd()
+    if (/(?:->>|->|#>>|#>)$/.test(onceki) || /current_setting\($/i.test(onceki)) continue
+    return true
+  }
+  return false
+}
+
+/**
+ * Bir SQL ifadesinin VERİ ifadesi olup olmadığı ve ayrıntısı. Tanımlar (CREATE/ALTER/politika) ve dize literal'i taşımayan
+ * `INSERT ... SELECT` (DB içi kopya) veri DEĞİLDİR. `WITH ... INSERT/UPDATE` CTE önekini atlar (3. tur, N1).
  * @returns {null | {tur: 'COPY'|'INSERT'|'UPDATE', tablo: string, kolonlar: string[]|null, satir: number}}
  */
 function veriIfadesiAyrinti(ifade) {
-  const metin = ifade.metin
-  if (/^\s*update\b/i.test(metin)) return updateAyrinti(metin)
+  let metin = ifade.metin
+  let cteDize = false
+  if (/^\s*with\b/i.test(metin)) {
+    const kapali = dizeleriKapat(metin)
+    const k = ustSeviyeAnahtar(kapali, 0, ['insert', 'update'])
+    if (k < 0) return null // salt SELECT/DELETE: veri yazmaz
+    cteDize = /'_+'/.test(kapali)
+    metin = metin.slice(k)
+  }
+  if (/^\s*update\b/i.test(metin)) return updateAyrinti(metin, cteDize)
   if (COPY_STDIN.test(metin)) {
-    const m = COPY_BASLIK.exec(metin)
+    const m = COPY_BASLIK.exec(baslikMetni(metin))
     return { tur: 'COPY', tablo: m ? tabloAdi(m[1]) : '', kolonlar: m ? kolonAdlari(m[2]) : null, satir: ifade.veriSatiri }
   }
-  if (INSERT_INTO.test(metin) && /\bvalues\b/i.test(metin.replace(/'(?:[^']|'')*'/g, "''"))) {
-    const m = INSERT_BASLIK.exec(metin.replace(/'(?:[^']|'')*'/g, "''"))
-    const idx = metin.search(/\bvalues\b/i)
-    return {
-      tur: 'INSERT',
-      tablo: m ? tabloAdi(m[1]) : '',
-      kolonlar: m ? kolonAdlari(m[2]) : null,
-      satir: idx < 0 ? 0 : demetSayisi(metin.slice(idx + 6)),
-    }
-  }
+  if (INSERT_INTO.test(metin)) return insertAyrinti(metin, cteDize)
   return null
 }
 
@@ -1182,7 +1295,8 @@ function sqlDegerlendir(sql) {
     if (!a) continue
     // UPDATE'te kişisel adın İFADE METNİNDE geçmesi yetmez (`SET customer_email = lower(customer_email)` veri atamaz): yalnız
     // değer atanan kolonlar sayılır. INSERT/COPY'de eski davranış korunur (alan adı ifade metninde geçiyorsa).
-    const alanlar = new Set(a.tur === 'UPDATE' ? [] : (ifade.metin.match(KISISEL_SQL) || []).map((x) => x.toLowerCase()))
+    // `INSERT ... SELECT` (a.secim) için de yalnız DEĞER alan kolonlar sayılır: WHERE/NOT EXISTS koşulundaki kişisel ad veri DEĞİLDİR (3. tur, N1).
+    const alanlar = new Set(a.tur === 'UPDATE' || a.secim ? [] : (ifade.metin.match(KISISEL_SQL) || []).map((x) => x.toLowerCase()))
     const kol = a.kolonlar ? a.kolonlar.map(norm) : []
     const t = tabloKaydi(a.tablo)
     for (const k of a.kolonlar || []) {
@@ -1243,9 +1357,9 @@ function dosyaDegerlendir(yol, metin) {
   const uz = uzanti(yol)
   const bulgular = []
   const olculemedi = []
-  const kisiselEkle = (alanlar, genel) => {
-    if (alanlar.length > 0) bulgular.push({ kural: 'R1', ayrinti: `alan: ${alanlar.join(', ')}` })
-    if (genel.length > 0) bulgular.push({ kural: 'R1', ayrinti: `genel alan (≥${KISISEL_ESIK} dolu satır): ${genel.join(', ')}` })
+  const kisiselEkle = (alanlar, genel, ek = '') => {
+    if (alanlar.length > 0) bulgular.push({ kural: 'R1', ayrinti: `alan: ${alanlar.join(', ')}${ek}` })
+    if (genel.length > 0) bulgular.push({ kural: 'R1', ayrinti: `genel alan (≥${KISISEL_ESIK} dolu satır): ${genel.join(', ')}${ek}` })
   }
   if (uz === 'json' || uz === 'jsonl' || uz === 'ndjson') {
     const j = jsonBelgeleri(metin, uz)
@@ -1260,6 +1374,18 @@ function dosyaDegerlendir(yol, metin) {
       kisiselEkle(alanlar, genel)
       if (r5) bulgular.push({ kural: 'R5', ayrinti: 'binNumber + lastFourDigits (sıfır sayacı değil)' })
       if (enCok >= FIYAT_ESIGI) bulgular.push({ kural: 'R3', ayrinti: `${enCok} satır (kimlik + fiyat)` })
+      // 3. tur (N2): ayrıştırma başarılı ama yapının DIŞINDA kalan metin (`/* {...kayıtlar...} */` yorumları, `[]` öncesi/sonrası düz metin)
+      // önceden hiç taranmıyordu: ham metin taramasına girer; yorum OLMAYAN dış metin büyükse dosya "ölçülemedi" olur (CSV/düz döküm gizlenemez).
+      if (j.atilan && j.atilan.trim() !== '') {
+        const h = hamTara(j.atilan)
+        const dis = ' (JSON yapısı dışındaki metin: yorum ya da baş/son çöp)'
+        kisiselEkle(h.alanlar, h.genel, dis)
+        if (h.r5) bulgular.push({ kural: 'R5', ayrinti: `binNumber + lastFourDigits (ham metin taraması${dis})` })
+        if (h.r3) bulgular.push({ kural: 'R3', ayrinti: `≥${FIYAT_ESIGI} kimlik + fiyat/maliyet anahtarı (ham metin taraması${dis})` })
+      }
+      if (j.disMetin > JSON_DISI_SINIR) {
+        olculemedi.push(`JSON yapısının DIŞINDA ${j.disMetin} karakterlik yorum olmayan metin var (başta/sonda düz metin ya da CSV olabilir); taranamadı`)
+      }
     }
   } else if (uz === 'csv' || uz === 'tsv') {
     const tablo = csvTablo(metin, uz)
@@ -1319,7 +1445,7 @@ function tara({ dosyalar, oku, izin = IZIN_LISTESI, ikili, blobOf }) {
     if (ikiliUzantiMi(yol)) {
       kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: `izlenen ikili veritabanı (.${uz})` })
     } else if (ikili && ikili(yol)) {
-      kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'izlenen ikili veritabanı (SQLite imzası)' })
+      kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'izlenen ikili veritabanı (SQLite imzası ya da pg_dump arşiv imzası)' })
     }
     if (!VERI_UZANTILARI.includes(uz)) continue
     const metin = oku(yol)
@@ -1380,6 +1506,10 @@ function diskOkuyucu(kok, sinir = BUYUK_DOSYA_SINIRI) {
 
 /** Başlığın (ilk baytların) SQLite imzası olup olmadığı. */
 const sqliteBaslikMi = (tampon) => tampon.length >= SQLITE_IMZASI.length && tampon.toString('latin1', 0, SQLITE_IMZASI.length) === SQLITE_IMZASI
+/** Başlığın `pg_dump -Fc` arşiv imzası olup olmadığı (N6). */
+const pgDumpBaslikMi = (tampon) => tampon.length >= PGDUMP_IMZASI.length && tampon.toString('latin1', 0, PGDUMP_IMZASI.length) === PGDUMP_IMZASI
+/** İkili veritabanı/döküm başlığı: SQLite ya da pg_dump özel biçim. R6 imza taraması (ağaç ve itilen nesne) bunu kullanır. */
+const ikiliBaslikMi = (tampon) => sqliteBaslikMi(tampon) || pgDumpBaslikMi(tampon)
 
 /**
  * Yolun ilk 16 baytı SQLite imzası mı? UZANTIDAN BAĞIMSIZ, her izlenen dosya için çağrılır (O1). Diskte olmayan ya da düzenli
@@ -1401,7 +1531,7 @@ function sqliteImzasiMi(kok) {
     try {
       const tampon = Buffer.alloc(16)
       const n = fs.readSync(fd, tampon, 0, 16, 0)
-      return sqliteBaslikMi(tampon.subarray(0, n))
+      return ikiliBaslikMi(tampon.subarray(0, n))
     } finally {
       fs.closeSync(fd)
     }
@@ -1560,8 +1690,8 @@ function yeniNesneleriTara({ kok, ucler, haric = [], env = process.env, izin = I
       const ham = cikti.subarray(nl + 1, nl + 1 + boyut)
       konum = nl + 1 + boyut + 1
       // O1: SQLite imzası UZANTIDAN BAĞIMSIZ (uzantısı zaten R6 olanlar yukarıda kaydedildi)
-      if (sqliteBaslikMi(ham)) {
-        for (const yol of g.digerYollar) kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'itilen ikili veritabanı (SQLite imzası)' }, g.sha)
+      if (ikiliBaslikMi(ham)) {
+        for (const yol of g.digerYollar) kaydet({ kural: 'R6', ad: KURALLAR.R6, dosya: yol, ayrinti: 'itilen ikili veritabanı (SQLite imzası ya da pg_dump arşiv imzası)' }, g.sha)
       }
       if (g.veriYollari.length === 0) continue
       veriBlob++

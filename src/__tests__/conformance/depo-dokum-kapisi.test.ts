@@ -5,7 +5,7 @@ import path from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import type { IzinKaydi } from './depo-dokum-kapisi.yardimci'
-import { BEKLENEN_GENEL, BEKLENEN_HASSAS_TABLOLAR, BEKLENEN_KISISEL, BEKLENEN_KISISEL_EK, BOM, CI_YOLU, commitle, geciciDizin, geciciTemizle, git, GITIGNORE_YOLU, GIZLI_AD, GIZLI_ADRES, GIZLI_BIN, GIZLI_EPOSTA, GIZLI_FIYAT, GIZLI_SON4, kapi, kapiyiKos, KOK, kurallar, sahteDepo, TABAN_YOLU, temizOrtam, yaz } from './depo-dokum-kapisi.yardimci'
+import { AUTH_TABLOLARI, BEKLENEN_GENEL, BEKLENEN_HASSAS_TABLOLAR, BEKLENEN_KISISEL, BEKLENEN_KISISEL_EK, BOM, CI_YOLU, commitle, geciciDizin, geciciTemizle, git, GITIGNORE_YOLU, GIZLI_AD, GIZLI_ADRES, GIZLI_BIN, GIZLI_EPOSTA, GIZLI_FIYAT, GIZLI_SON4, kapi, kapiyiKos, KOK, kurallar, sahteDepo, TABAN_YOLU, temizOrtam, yaz } from './depo-dokum-kapisi.yardimci'
 
 /**
  * INV-DEPO-DOKUM-1 · Veritabanı dökümü, kişisel veri, ödeme parçası ve fiyat/maliyet listesi HERKESE AÇIK
@@ -87,6 +87,7 @@ describe('INV-DEPO-DOKUM-1 · kapının kendi sözleşmesi', () => {
       '.mdb',
       '.accdb',
       'toc.dat',
+      'sqlite-wal/shm/journal', // ALT-39 3. tur (N6): SQLite yan dosyaları
     ])
   })
 
@@ -138,7 +139,9 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı kapsamı (bulgu 2): açık liste kol
   it('taban okundu ve hassas tabloların hepsi tabanda VAR (kanarya)', () => {
     const t = tabanKolonlari()
     expect(t.size).toBeGreaterThan(30)
-    for (const tablo of kapi.HASSAS_TABLOLAR) expect(t.has(tablo), `${tablo} tabanda yok`).toBe(true)
+    // auth şeması tabloları (users, identities) public şema tabanında YOK (3. tur, N3): adıyla ayrılır, hassas listede OLMALARI ayrıca sınanır
+    for (const tablo of kapi.HASSAS_TABLOLAR.filter((x) => !AUTH_TABLOLARI.includes(x))) expect(t.has(tablo), `${tablo} tabanda yok`).toBe(true)
+    for (const tablo of AUTH_TABLOLARI) expect(kapi.HASSAS_TABLOLAR, `${tablo}: auth tablosu hassas listede olmalı`).toContain(tablo)
   })
 
   it.each(Object.entries(KISISEL_KOLONLAR))('%s: listelenen kişisel kolonlar tabanda VAR ve sözlük hepsini KAPSIYOR', (tablo, kolonlar) => {
@@ -243,7 +246,7 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı TARAMASI (O2): kişisel kalıba uyan
   it('hassas listedeki her tablo tabanda VAR ve ya kişisel kolon taşır ya da maliyet tablosudur (çöp giriş yok)', () => {
     const tablolar = tabloKolonlari()
     const kapsananTablolar = new Set(kisiselKolonlar().filter((x) => x.kapsanir).map((x) => x.tablo))
-    for (const t of kapi.HASSAS_TABLOLAR) {
+    for (const t of kapi.HASSAS_TABLOLAR.filter((x) => !AUTH_TABLOLARI.includes(x))) {
       expect(tablolar.has(t), `${t} tabanda yok`).toBe(true)
       expect(kapsananTablolar.has(t) || MALIYET_TABLOLARI.includes(t), `${t}: kişisel kolonu yok ve maliyet tablosu değil`).toBe(true)
     }
@@ -261,7 +264,7 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı TARAMASI (O2): kişisel kalıba uyan
     'contact_phone', 'mobile_phone', 'telefon', 'telefon_no', 'cep_telefonu', 'Telefon Numarası',
     'accept_ip', 'clientIp', 'remote_ip', 'user-ip',
     'gsm', 'gsm_no', 'GSMNo',
-    'identity_number', 'Identity', 'identity_verified_at',
+    'Identity', 'identity_verified_at', // BİLİNÇLİ DEĞİŞİKLİK (3. tur, N3): `identity_number` artık BELİRGİN (aşağıdaki tablo): TCKN taşır
     'eposta', 'E-Posta', 'musteri_eposta',
     'ad_soyad', 'AdSoyad', 'Ad Soyad', 'soyad',
     'adres', 'teslimat_adresi', 'Adres Satırı',
@@ -271,7 +274,7 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı TARAMASI (O2): kişisel kalıba uyan
     expect(kapi.kisiselAlanSinifi(ad)).toBe('genel')
   })
 
-  it.each(['tc_kimlik_no', 'TcKimlik', 'tcno', 'kimlik_no', 'TCKN', 'customer_email', 'billing_address', 'invoice_profile'])(
+  it.each(['tc_kimlik_no', 'TcKimlik', 'tcno', 'kimlik_no', 'TCKN', 'customer_email', 'billing_address', 'invoice_profile', 'identity_number', 'identityNumber', 'vkn', 'VKN', 'vkn_no'])(
     'tolerans: %s BELİRGİN kişisel alandır (≥1 dolu satır)',
     (ad) => {
       expect(kapi.kisiselAlanSinifi(ad)).toBe('belirgin')
@@ -289,13 +292,50 @@ describe('INV-DEPO-DOKUM-1 · şema tabanı TARAMASI (O2): kişisel kalıba uyan
   const uc = (alan: string, deger = 'dolu-deger') => JSON.stringify(Array.from({ length: 3 }, (_, i) => ({ id: `u${i}`, [alan]: `${deger}${i}` })))
   const iki = (alan: string) => JSON.stringify(Array.from({ length: 2 }, (_, i) => ({ id: `u${i}`, [alan]: `dolu${i}` })))
 
-  it.each(['applicant_email', 'email_to', 'accept_ip', 'telefon', 'ad_soyad', 'vergi_no', 'musteri_adi', 'identity_number'])(
+  it.each(['applicant_email', 'email_to', 'accept_ip', 'telefon', 'ad_soyad', 'vergi_no', 'musteri_adi'])(
     'JSON: tolerans adı %s 3 dolu satırda R1, 2 satırda TEMİZ',
     (alan) => {
       expect(kurallar('d.json', uc(alan))).toEqual(['R1'])
       expect(kurallar('d.json', iki(alan))).toEqual([])
     },
   )
+
+  // ── 3. tur (N3): ödeme sağlayıcı alıcı bloğu (iyzico `buyer`), auth şeması, kısa/Türkçe adlar ───────────────────────────────
+  // Bulgu: sözlük yalnız public şema kolon adlarına göre ayarlıydı; asıl sızıntı türü (ödeme yanıtı + alıcı bloğu) şemada olmayan adlarla
+  // (identityNumber, surname, registrationAddress, gsmNumber, zipCode) geliyordu ve 1-2 kayıtlık dökümde hiç tanınmıyordu.
+  it.each(['address', 'registrationAddress', 'home_address', 'surname', 'zipCode', 'zip_code', 'iban', 'IBAN', 'tel', 'tel_no', 'cep', 'cep_no', 'gsmNumber'])(
+    'N3: %s GENEL kişisel alandır',
+    (ad) => {
+      expect(kapi.kisiselAlanSinifi(ad)).toBe('genel')
+    },
+  )
+
+  it.each(['concept', 'telemetry', 'hotel', 'tribanner', 'zip', 'status'])(
+    'N3: %s kişisel DEĞİL (kısa kökler yalnız TAM parça; `zip` tek başına yok)',
+    (ad) => {
+      expect(kapi.kisiselAlanSinifi(ad)).toBeNull()
+    },
+  )
+
+  it.each(['address', 'registrationAddress', 'surname', 'zipCode', 'iban', 'tel', 'cep'])('N3 JSON: %s 3 dolu satırda R1, 2 satırda TEMİZ', (alan) => {
+    expect(kurallar('d.json', uc(alan))).toEqual(['R1'])
+    expect(kurallar('d.json', iki(alan))).toEqual([])
+  })
+
+  it('N3 JSON: iyzico `buyer` bloğu (TEK kayıt): identityNumber BELİRGİN → R1; kimlik numarası olmayan tek kayıtlık alıcı bloğu eşik altında TEMİZ', () => {
+    const alici = { id: 'x', name: 'Ad', surname: 'Soyad', email: 'a@ornek.test', gsmNumber: '0500', registrationAddress: 'Adres 1', zipCode: '34000', ip: '10.0.0.1', city: 'X', country: 'Y' }
+    expect(kurallar('odeme.json', JSON.stringify({ buyer: { ...alici, identityNumber: '11111111111' } }))).toEqual(['R1'])
+    expect(kurallar('odeme.json', JSON.stringify({ buyer: alici }))).toEqual([]) // genel adlar eşiği (≥3 satır) altında: bilinen sınır, cetvel §8
+    expect(JSON.stringify(kapi.dosyaTara('odeme.json', JSON.stringify({ buyer: { identityNumber: '11111111111' } })))).not.toContain('11111111111')
+  })
+
+  it('N3 SQL: auth şeması tabloları (users, identities) HASSAS; şema öneki fark etmez', () => {
+    expect(kapi.HASSAS_TABLOLAR).toContain('users')
+    expect(kapi.HASSAS_TABLOLAR).toContain('identities')
+    expect(kurallar('d.sql', "INSERT INTO auth.users VALUES ('a');")).toEqual(['R2']) // kolonsuz yazım, hassas tablo
+    expect(kurallar('d.sql', "INSERT INTO auth.users (id, email) VALUES ('1', 'a@ornek.test');")).toEqual(['R2']) // tek satır, genel alan, hassas tablo eşiği 1
+    expect(kurallar('d.sql', "INSERT INTO auth.identities (id, provider) VALUES ('1', 'google');")).toEqual([]) // kişisel kolon yok: tablo adı tek başına yetmez
+  })
 
   it('JSON: belirgin tolerans adı (tc_kimlik_no) TEK dolu satırda bile R1', () => {
     expect(kurallar('d.json', JSON.stringify({ tc_kimlik_no: 'dolu' }))).toEqual(['R1'])
@@ -451,6 +491,51 @@ describe('INV-DEPO-DOKUM-1 · R2 SQL satırları DOSYA genelinde TABLO başına 
 })
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
+describe('INV-DEPO-DOKUM-1 · R2 N1 (3. tur): INSERT ... SELECT, WITH önekli INSERT/UPDATE, takma ad, VALUES alt sorgusu', () => {
+  // Bulgu: R2 yalnız `INSERT INTO t (kolonlar) VALUES`, `UPDATE` ve `COPY` biçimlerini veri sayıyordu; aynı veriyi `SELECT 'x' WHERE NOT EXISTS`
+  // (idempotent tohum), `WITH ...` öneki, `INSERT INTO t AS a` takma adı ya da `FROM (VALUES ...)` alt sorgusuyla yazan ifade kapıyı geçiyordu.
+  it.each([
+    ["INSERT INTO public.venthub_orders (id, customer_email) SELECT 'x', 'a@ornek.test' WHERE NOT EXISTS (SELECT 1 FROM public.venthub_orders WHERE id = 'x');", 'idempotent tohum: belirgin kolona literal'],
+    ["INSERT INTO public.venthub_orders AS o (id, customer_name) VALUES ('1', 'Ad Soyad');", 'takma ad (AS o) + VALUES'],
+    ["WITH yeni AS (SELECT 'x'::text AS id) INSERT INTO public.venthub_orders (id, customer_email) VALUES ('1', 'a@ornek.test');", 'WITH öneki + VALUES'],
+    ["WITH d(e) AS (VALUES ('a@ornek.test')) INSERT INTO public.venthub_orders (customer_email) SELECT e FROM d;", 'veri CTE VALUES içinde, ana ifade yalnız SELECT e'],
+    ["INSERT INTO public.user_profiles (id, email) SELECT gen_random_uuid(), 'a@ornek.test';", 'hassas tablo, genel alan, tek satır (eşik 1)'],
+    ["INSERT INTO public.venthub_orders (customer_email) SELECT * FROM (VALUES ('a@ornek.test')) AS v(e);", 'FROM (VALUES ...) alt sorgusu'],
+    ["WITH d AS (VALUES ('a@ornek.test')) UPDATE public.venthub_orders SET customer_email = d.column1 FROM d WHERE id = 1;", 'WITH + UPDATE, sağ taraf CTE sütunu'],
+    ["UPDATE public.venthub_orders SET customer_email = v.e FROM (VALUES ('a@ornek.test')) v(e) WHERE id = 1;", 'UPDATE ... FROM (VALUES ...)'],
+    ["INSERT INTO public.venthub_orders SELECT 'x', 'a@ornek.test';", 'kolon listesiz SELECT, hassas tablo'],
+    ["insert into   public.venthub_orders   as o   (customer_phone)   select   '0500 000 00 00'  ;", 'küçük harf ve bol boşluk'],
+  ])('KIRMIZI (R2): %s [%s]', (sql) => {
+    expect(kurallar('tohum.sql', sql)).toEqual(['R2'])
+  })
+
+  it.each([
+    ['INSERT INTO public.venthub_orders (customer_email) SELECT customer_email FROM public.eski_siparisler;', 'DB içi kopya: dize literal\'i yok'],
+    ["INSERT INTO public.user_profiles (id, email, role) SELECT auth.uid(), auth.jwt() ->> 'email', 'admin' WHERE NOT EXISTS (SELECT 1 FROM public.user_profiles WHERE email = 'x@ornek.test');", 'e-posta kolonu JWT talebinden dolar; literal yalnız rol ve koşulda (gerçek betik biçimi)'],
+    ["WITH x AS (SELECT * FROM public.venthub_orders WHERE customer_email = 'a@ornek.test') SELECT * FROM x;", 'salt SELECT (WITH)'],
+    ["INSERT INTO public.products (id, name) SELECT id, name FROM public.old_products WHERE name = 'x';", 'kişisel olmayan tablo, koşulda literal'],
+    ["UPDATE public.products SET name = 'x' FROM (VALUES ('y')) v WHERE true;", 'kişisel olmayan kolon, VALUES alt sorgusu'],
+    ["INSERT INTO public.venthub_orders (customer_email) SELECT current_setting('app.admin_mail');", 'current_setting argümanı anahtar, veri değil'],
+    ["INSERT INTO public.audit_log (id, kaynak) SELECT 'x', 'tohum' WHERE NOT EXISTS (SELECT 1 FROM public.venthub_orders WHERE customer_email = 'a@ornek.test');", 'belirgin ad yalnız NOT EXISTS koşulunda: ifade metninde geçer ama atanmaz'],
+  ])('TEMİZ: %s [%s]', (sql) => {
+    expect(kurallar('tohum.sql', sql)).toEqual([])
+  })
+
+  it('SELECT biçimi bulgusu DEĞER taşımaz', () => {
+    const [b] = kapi.dosyaTara('tohum.sql', `INSERT INTO public.venthub_orders (customer_email) SELECT '${GIZLI_EPOSTA}';`)
+    expect(b.kural).toBe('R2')
+    expect(JSON.stringify(b)).not.toContain('gizli.kisi')
+  })
+
+  it('SELECT biçimi: hizalama kolon listesiyle yapılır (literal başka kolonda ise kişisel kolon temiz); hizalanamayınca korumacı', () => {
+    // literal yalnız `role` konumunda: kişisel kolon (customer_email) değer almıyor
+    expect(kurallar('d.sql', "INSERT INTO public.venthub_orders (customer_email, status) SELECT o.customer_email, 'x' FROM public.eski o;")).toEqual([])
+    // sayı uyuşmuyor (`*`): hizalanamaz → TÜM kolonlar değer alır sayılır (korumacı)
+    expect(kurallar('d.sql', "INSERT INTO public.venthub_orders (customer_email, status) SELECT *, 'x' FROM public.eski;")).toEqual(['R2'])
+  })
+})
+
+// ═════════════════════════════════════════════════════════════════
 describe('INV-DEPO-DOKUM-1 · D3: sınırsız düzenli ifade YOK — uzun girdi doğrusal zamanda biter', () => {
   /** Girdiyi AYRI süreçte, sert zaman aşımıyla çözer: kübik/karesel desen geri gelirse test KİLİTLENMEZ, kırmızı olur. */
   function zamanOlc(kod: string): { bitti: boolean; ms: number; cikti: string } {
@@ -481,6 +566,50 @@ describe('INV-DEPO-DOKUM-1 · D3: sınırsız düzenli ifade YOK — uzun girdi 
   it('200 000 harflik uzun hücre başlıkta VE gövdede: sonuç yine doğru (başlıksız CSV sayılmaz)', () => {
     const r = kapi.dosyaDegerlendir('a.csv', `${'a'.repeat(2000)},b\n1,2\n`)
     expect(r.olculemedi).toEqual([])
+  })
+
+  // ── 3. tur (N5): O2 ile gelen camelCase ayırma deseni ve eski SQL başlık desenleri KARESELDİ ────────────────────────────────────
+  it('N5: 300 000 BÜYÜK HARFLİK anahtar adı 2 sn içinde sınıflanır (camelCase ayırma deseni karesel değil)', { timeout: 40_000 }, () => {
+    const o = zamanOlc(`const k=require(${kapiYolu});const t=Date.now();k.kisiselAlanSinifi('A'.repeat(300000));console.log(Date.now()-t)`)
+    expect(o.bitti, `zaman aşımı ya da hata: ${o.cikti}`).toBe(true)
+    expect(Number(o.cikti.trim())).toBeLessThan(2000)
+  })
+
+  it('N5: 300 000 BÜYÜK HARFLİK JSON anahtarı olan dosya 2 sn içinde değerlendirilir', { timeout: 40_000 }, () => {
+    const o = zamanOlc(`const k=require(${kapiYolu});const t=Date.now();k.dosyaDegerlendir('a.json',JSON.stringify([{['A'.repeat(300000)]:'x'}]));console.log(Date.now()-t)`)
+    expect(o.bitti, `zaman aşımı ya da hata: ${o.cikti}`).toBe(true)
+    expect(Number(o.cikti.trim())).toBeLessThan(2000)
+  })
+
+  it('N5: uzun anahtarın SONUNDAKİ parça hâlâ okunur (`..._ip` son parça kuralı): ilk 64 + son 64 karakter ayrılır', () => {
+    expect(kapi.kisiselAlanSinifi(`${'a'.repeat(300)}_client_ip`)).toBe('genel')
+    expect(kapi.kisiselAlanSinifi(`${'a'.repeat(300)}_ip_rating`)).toBeNull()
+  })
+
+  it('N5: 300 000 "(" içeren INSERT başlığı ve COPY başlığı 2 sn içinde ayrıştırılır (başlık desenleri sınırlı)', { timeout: 40_000 }, () => {
+    const o = zamanOlc(
+      `const k=require(${kapiYolu});const t=Date.now();k.dosyaDegerlendir('d.sql','INSERT INTO '+'('.repeat(300000)+' VALUES (1);');k.dosyaDegerlendir('e.sql','COPY '+'('.repeat(300000)+' FROM stdin;');console.log(Date.now()-t)`,
+    )
+    expect(o.bitti, `zaman aşımı ya da hata: ${o.cikti}`).toBe(true)
+    expect(Number(o.cikti.trim())).toBeLessThan(2000)
+  })
+
+  it('N5: tablo adından sonra 300 000 boşluk olan INSERT başlığı 2 sn içinde ayrıştırılır (bitişik `\\s*` karesel değil) ve doğru çözülür', { timeout: 40_000 }, () => {
+    const o = zamanOlc(
+      `const k=require(${kapiYolu});const t=Date.now();const d=k.dosyaDegerlendir('d.sql','INSERT INTO public.venthub_orders'+' '.repeat(300000)+'(customer_email) VALUES (1);');console.log(Date.now()-t+' '+d.bulgular.map((b)=>b.kural).join(','))`,
+    )
+    expect(o.bitti, `zaman aşımı ya da hata: ${o.cikti}`).toBe(true)
+    const [ms, kural] = o.cikti.trim().split(' ')
+    expect(Number(ms)).toBeLessThan(2000)
+    expect(kural).toBe('R2') // boşluk dizisi başlığı gizleyemez: belirgin kolon yine yakalanır
+  })
+
+  it('N5: çok literalli SELECT listesi (her biri JSON anahtarı) 2 sn içinde ölçülür (literal öncesi pencere sınırlı)', { timeout: 40_000 }, () => {
+    const o = zamanOlc(
+      `const k=require(${kapiYolu});const t=Date.now();k.dosyaDegerlendir('d.sql','INSERT INTO public.t (a) SELECT '+"j->>'k'||".repeat(100000)+"j;");console.log(Date.now()-t)`,
+    )
+    expect(o.bitti, `zaman aşımı ya da hata: ${o.cikti}`).toBe(true)
+    expect(Number(o.cikti.trim())).toBeLessThan(2000)
   })
 
   it('e-posta deseni sınırlı ama gerçek adresi yakalıyor: başlıksız CSV hâlâ ölçülemedi', () => {
@@ -553,7 +682,40 @@ describe('INV-DEPO-DOKUM-1 · R1 kişisel alan adı DOLU değerle (JSON/JSONL/CS
     expect(kapi.dosyaDegerlendir('a.json', jsonc).olculemedi).toEqual([])
   })
 
-  // ── genel alanlar: ≥3 dolu satır eşiği (bulgu 2) ──────────────────────────────────────────
+  // ── 3. tur (N2): JSON başarıyla ayrıştırılınca yapının DIŞINDA kalan metin hiç taranmıyordu ────────────────────────────────────
+  // Bulgu: yorumlara (`/* {...} */`, `//`) gömülmüş kayıtlar ya da `[]` öncesinde/sonrasında düz metin/CSV dökümü, dosya "çözüldü" diye kapıdan temiz çıkıyordu.
+  it.each([
+    ['blok yorumda belirgin alanlı kayıt', `[{ "id": 1 }]\n/* { "customer_email": "${GIZLI_EPOSTA}" } */`],
+    ['satır yorumunda belirgin alanlı kayıt', `// { "customer_name": "${GIZLI_AD}" }\n[{ "id": 1 }]`],
+    ['yorumda iç içe kayıt, `key=value` biçimi', `{ "id": 1 } /* customer_phone = "0500 000 00 00" */`],
+  ])('N2 KIRMIZI (R1): %s', (_ad, metin) => {
+    expect(kurallar('a.json', metin)).toEqual(['R1'])
+    expect(JSON.stringify(kapi.dosyaDegerlendir('a.json', metin))).not.toContain('gizli.kisi')
+  })
+
+  it('N2: yorumdaki kişisel olmayan metin TEMİZ ve ölçülemedi değil (yanlış alarm yok)', () => {
+    const metin = '// derleme notu: { sürüm, [x] }\n/* tasarım: customer_email alanı kaldırıldı */\n{ "id": 1 }'
+    expect(kurallar('a.json', metin)).toEqual([])
+    expect(kapi.dosyaDegerlendir('a.json', metin).olculemedi).toEqual([])
+  })
+
+  it('N2: `[]` sonrası düz metin/CSV dökümü ve baştaki düz metin → ölçülemedi (gizlenemez); küçük artık (`;`) ve UTF-16 CRLF çöpü TEMİZ', () => {
+    const csv = '[]\ncustomer_email,customer_name\na@ornek.test,Ad Soyad\nb@ornek.test,Ad Iki\n'
+    const r = kapi.dosyaDegerlendir('a.json', csv)
+    expect(r.olculemedi.length).toBe(1)
+    expect(r.olculemedi[0]).toMatch(/DIŞINDA/)
+    expect(kapi.dosyaDegerlendir('a.json', 'kayıt listesi aşağıdadır, dikkat:\n[{ "id": 1 }]').olculemedi.length).toBe(1)
+    expect(kapi.dosyaDegerlendir('a.json', '{ "a": 1 };').olculemedi).toEqual([])
+    expect(kapi.dosyaDegerlendir('a.json', '{ "a": 1 }\n\n  ').olculemedi).toEqual([])
+  })
+
+  it('N2: baş/son çöpün içindeki kayıt ham taramaya girer (ölçülemedi yanında R1 de çıkar)', () => {
+    const r = kapi.dosyaDegerlendir('a.json', `[{ "id": 1 }]\n"customer_email": "${GIZLI_EPOSTA}" bu da veri, ayrıca uzun bir metin ekliyoruz`)
+    expect(r.bulgular.map((b) => b.kural)).toEqual(['R1'])
+    expect(r.olculemedi.length).toBe(1)
+  })
+
+  // ── genel alanlar: ≥3 dolu satır eşiği (bulgu 2)──────────────────────────────────────────
   it.each(BEKLENEN_GENEL)('genel alan %s: 3 dolu nesnede R1 KIRMIZI, 2 dolu nesnede TEMİZ', (alan) => {
     const n = (k: number) => JSON.stringify(Array.from({ length: k }, (_, i) => ({ id: `u${i}`, [alan]: `deger${i}` })))
     expect(kurallar('kullanicilar.json', n(3))).toEqual(['R1'])
@@ -1002,6 +1164,18 @@ describe('INV-DEPO-DOKUM-1 · R4 yol kuralı (bulgu 4a)', () => {
     ['rapor/musteriler.ods', '.ods'],
     ['rapor/eski.mdb', '.mdb'],
     ['rapor/yeni.accdb', '.accdb'],
+    // 3. tur (N6): cetvel `.dump*` diyordu, kod yalnız `.dump` ve tek uzantıyı yakalıyordu; tarih/yedek sonekli adlar kaçıyordu.
+    ['yedek/sunucu.dump-20261007', '.dump'],
+    ['yedek/sunucu.dump_eski', '.dump'],
+    ['yedek/sunucu.dump.20261007', '.dump'],
+    ['yedek/sunucu.dump.sql.gz', '.dump'],
+    // 3. tur (N6): SQLite yan dosyaları (WAL/shm/journal): imza taşımaz, yazılmamış işlemleri tutar
+    ['yedek/uygulama.db-wal', 'sqlite-wal/shm/journal'],
+    ['yedek/uygulama.db-shm', 'sqlite-wal/shm/journal'],
+    ['yedek/uygulama.db-journal', 'sqlite-wal/shm/journal'],
+    ['yedek/uygulama.sqlite-wal', 'sqlite-wal/shm/journal'],
+    ['yedek/uygulama.sqlite3-journal', 'sqlite-wal/shm/journal'],
+    ['YEDEK/UYGULAMA.DB-WAL', 'sqlite-wal/shm/journal'],
   ])('KIRMIZI: %s → %s', (yol, kalip) => {
     expect(kapi.yolIhlali(yol)).toContain(kalip)
   })
@@ -1016,6 +1190,11 @@ describe('INV-DEPO-DOKUM-1 · R4 yol kuralı (bulgu 4a)', () => {
     'docs/toc.dat.md',
     'src/atoc.dat',
     'src/zipper.ts',
+    // N6: `.dump` yalnız AYRAÇLA devam eden sonekte kırmızıdır; sözcüğün parçası olan `dumpling` değil. `-wal` yalnız SQLite uzantısından sonra.
+    'docs/yemek/dumpling.md',
+    'docs/notlar/x.dumpster.txt',
+    'src/lib/walker.ts',
+    'docs/notlar/kayit-wal-notu.md',
   ])('TEMİZ: %s', (yol) => {
     expect(kapi.yolIhlali(yol)).toEqual([])
   })
@@ -1065,6 +1244,32 @@ describe('INV-DEPO-DOKUM-1 · R6 izlenen ikili veritabanı (bulgu 9)', () => {
     expect(imza('imzali')).toBe(true)
   })
 
+  // 3. tur (N6): `pg_dump -Fc` (özel biçim) arşivinin sihirli sayısı. Uzantısı `.bin`/uzantısız olan dökümü SQLite imzası görmezdi.
+  it('pg_dump özel biçim arşivi (PGDMP imzası) UZANTIDAN BAĞIMSIZ → R6; sqliteImzasiMi true; imza yalnız dosyanın BAŞINDA', () => {
+    const d = geciciDizin('depo-dokum-pgdump-')
+    fs.writeFileSync(path.join(d, 'sunucu.bin'), Buffer.concat([Buffer.from('PGDMP'), Buffer.from([1, 14, 0]), Buffer.alloc(40)]))
+    fs.writeFileSync(path.join(d, 'ortada'), Buffer.concat([Buffer.from('xxxxxxxx'), Buffer.from('PGDMP'), Buffer.alloc(40)]))
+    fs.writeFileSync(path.join(d, 'kucuk-harf'), Buffer.concat([Buffer.from('pgdmp'), Buffer.alloc(40)]))
+    const imza = kapi.sqliteImzasiMi(d)
+    expect(imza('sunucu.bin')).toBe(true)
+    expect(imza('ortada')).toBe(false)
+    expect(imza('kucuk-harf')).toBe(false)
+    const s = kapi.tara({ dosyalar: ['sunucu.bin', 'ortada'], oku: () => null, izin: [], ikili: imza })
+    expect(s.ihlaller.map((k) => `${k.kural} ${k.dosya}`)).toEqual(['R6 sunucu.bin'])
+    expect(s.ihlaller[0].ayrinti).toMatch(/pg_dump arşiv imzası/)
+  })
+
+  it('CLI: pg_dump özel biçim arşivi (uzantısı .bin ve uzantısız) R6 KIRMIZI; düz metin temiz', { timeout: 60_000 }, () => {
+    const pgdump = Buffer.concat([Buffer.from('PGDMP'), Buffer.from([1, 14, 0]), Buffer.alloc(120)])
+    const d = sahteDepo({ 'veri/yedek.bin': pgdump, 'veri/dosya': pgdump, 'veri/duz.bin': Buffer.from('düz metin, dökümle ilgisi yok') })
+    const r = kapiyiKos(d)
+    expect(r.kod).toBe(1)
+    expect(r.cikti).toContain('veri/yedek.bin')
+    expect(r.cikti).toContain('veri/dosya')
+    expect(r.cikti).not.toContain('veri/duz.bin')
+    expect(r.cikti).toContain('ikili-veritabani')
+  })
+
   it('CLI: gerçek SQLite imzalı dosya (uzantı değiştirilmiş: .bak ve uzantısız) R6 KIRMIZI', { timeout: 60_000 }, () => {
     const imza = Buffer.concat([Buffer.from('SQLite format 3'), Buffer.from([0]), Buffer.alloc(100)])
     const d = sahteDepo({ 'veri/yedek.bak': imza, 'veri/dosya': imza, 'veri/duz.bak': Buffer.from('düz metin') })
@@ -1106,7 +1311,7 @@ describe('INV-DEPO-DOKUM-1 · .gitignore kalıpları (bulgu 8)', () => {
       .map((s) => s.trim())
       .filter((s) => s !== '' && !s.startsWith('#'))
 
-  it.each(['**/db-backup*', '**/[Dd][Bb]-[Bb]ackup*', '*.dump', '*.dump.*', '*.sql.gz', '*.backup', '*.pgdump'])('`%s` var', (kalip) => {
+  it.each(['**/db-backup*', '**/[Dd][Bb]-[Bb]ackup*', '*.dump', '*.dump.*', '*.dump-*', '*.dump_*', '*.sql.gz', '*.backup', '*.pgdump', '*.db-wal', '*.db-shm', '*.db-journal', '*.sqlite-wal', '*.sqlite3-journal'])('`%s` var', (kalip) => {
     expect(kalipLari()).toContain(kalip)
   })
 
@@ -1114,7 +1319,7 @@ describe('INV-DEPO-DOKUM-1 · .gitignore kalıpları (bulgu 8)', () => {
     const d = geciciDizin('depo-dokum-ignore-')
     git(d, 'init', '-q')
     fs.copyFileSync(GITIGNORE_YOLU, path.join(d, '.gitignore'))
-    for (const yol of ['yedek/db-backup-1/x.json', 'a/b/DB-Backup-2026/x.json', 'x/sunucu.dump', 'x/sunucu.dump.gz', 'x/s.sql.gz', 'x/s.backup', 'x/s.pgdump']) {
+    for (const yol of ['yedek/db-backup-1/x.json', 'a/b/DB-Backup-2026/x.json', 'x/sunucu.dump', 'x/sunucu.dump.gz', 'x/sunucu.dump-20261007', 'x/sunucu.dump_eski', 'x/s.sql.gz', 'x/s.backup', 'x/s.pgdump', 'x/uygulama.db-wal', 'x/uygulama.sqlite-journal']) {
       const r = spawnSync('git', ['check-ignore', '-q', yol], { cwd: d, env: temizOrtam() })
       expect(r.status, `${yol} ignore edilmiyor`).toBe(0)
     }
