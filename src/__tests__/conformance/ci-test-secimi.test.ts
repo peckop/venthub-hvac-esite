@@ -6,20 +6,16 @@ import { describe, expect, it } from 'vitest'
 /**
  * INV-CI-SECIM-1 · test seçimi ve belge hızlı yolu `ci.yml`'ye DOĞRU bağlı (ALT-38e, cetvel: docs/standards/test-karnesi-standard.md §4.3).
  *
- * NİÇİN VAR: PR'da yalnız değişenle ilgili testler koşar (seçici: scripts/ci/test-sec.cjs, dağıtıcı girdisi: scripts/ci/test-shard.cjs `--secim`) ve yalnız .md/.txt/.csv değişen belge PR'ında
- * kod kapıları (kurulum, Lint, tip, Deno) atlanır. Seçim yalnız DARALTIR; bu dosya daraltmanın SESSİZCE genişlemesini (kapsam kaybı) ve yanlış yerde açılmasını önler. Bozulma yolları:
+ * NİÇİN VAR: PR'da yalnız değişenle ilgili testler koşar (scripts/ci/test-sec.cjs; dağıtıcı girdisi `--secim`) ve yalnız .md/.txt/.csv değişen belge PR'ında kod kapıları (kurulum, Lint, tip, Deno) atlanır.
+ * Seçim yalnız DARALTIR; bu dosya daraltmanın SESSİZCE genişlemesini (kapsam kaybı) ve yanlış yerde açılmasını önler. Bozulma yolları (hepsi SESSİZDİR):
  *   1. seçici PR'ın KENDİ kopyasından koşar (PR seçiciyi değiştirip kendi testini eler): `git show HEAD^1:` dışı kaynak, `node scripts/ci/test-sec.cjs`, harita PR'dan,
- *   2. seçici `edited`, master push, elle koşum ya da zamanlı koşuda da çalışır (yalnız `test-shard` işinde ve yalnız `pull_request` (edited hariç) olayında VARDIR; `ci` içindeki Test o olaylarda TAM koşar),
- *   3. koşul POZİTİF mantığa çevrilir ("seçim boşsa koş" yerine "doluysa koş"): çıktı eksik/başka değerse kurulum ve test ATLANIR (kapı sessizce düşer). Koşullar yalnız DARALTMA yönündedir:
- *      `tam=false` VE `secilen-sayisi=0` yazılı değilse kurulum, seçim 2/2, dağıtım ve Test KOŞAR (aşağıdaki ifade değerlendirmesi bunu GERÇEK doğruluk tablosuyla ölçer),
- *   4. çökme yedeği düşer (seçici çökünce adım kırmızı kalır: tabandaki seçici bozulursa onu düzelten PR kilitlenir) ya da yedek `tam=false` yazar (seçici çökünce testler ELENİR),
- *   5. belge hızlı yolu `belge` sınıfına güvenir: `.claude/` ve `docs/` altındaki `.cjs`/`.mjs` dosyaları `belge`dir ama `eslint .` onları tarar (ölçüldü). Hızlı yol kararı git'in kendi yol süzgeciyle yalnız .md/.txt/.csv
- *      farkında `belge=true` yazar; `edited` koşusunda ve `belge` dışı sınıfta ASLA açılmaz; kod kapıları çıktıyı `!= 'true'` ile okur (çıktı yoksa koşar),
- *   6. lifecycle betikleri (kökün `postinstall`ı `tsc --noEmit`) yalnız `test-shard` işinde kapalıdır; `ci` içindeki kurulum DEĞİŞMEZ (orada tsc gerçek tip kapısıdır).
- * Davranış (gerçek bash + git ile adımların gövdeleri) ve kapsam kanıtı: ci-test-secimi-kapsam.test.ts (INV-CI-SECIM-2).
- *
- * Ölçüm yüzeyi: `node:fs` + satır taraması (YAML ayrıştırıcı yok; girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8, env 10). Ayrıştırılamayan yapı KIRMIZIDIR. ci.yml'i DEĞİŞTİRMEZ.
- * Sabotaj testleri YAML metnini BELLEKTE bozar ve denetimin KIRMIZI verdiğini ölçer.
+ *   2. seçici edited, master push, elle koşum ya da zamanlı koşuda çalışır (yalnız `test-shard` işinde VARDIR; `ci` içindeki Test o olaylarda TAM koşar),
+ *   3. koşul POZİTİF mantığa çevrilir: çıktı eksik/başka değerse kurulum ve test ATLANIR. Koşullar yalnız DARALTMA yönündedir (aşağıdaki ifade değerlendirmesi GERÇEK doğruluk tablosunu ölçer),
+ *   4. çökme yedeği düşer (kırmızı kalır: tabandaki seçici bozulursa onu düzelten PR kilitlenir) ya da yedek `tam=false` yazar (seçici çökünce testler ELENİR),
+ *   5. belge hızlı yolu `belge` sınıfına güvenir: `.claude/`, `docs/` altındaki `.cjs`/`.mjs` dosyaları `belge`dir ama `eslint .` onları tarar (ölçüldü); karar git yol süzgeciyle yalnız md/txt/csv farkında,
+ *   6. lifecycle betikleri (kökün `postinstall`ı `tsc --noEmit`) yalnız `test-shard` kurulumunda kapalıdır; `ci` kurulumu DEĞİŞMEZ (orada tsc gerçek tip kapısıdır).
+ * Davranış (gerçek bash + git) ve kapsam kanıtı: ci-test-secimi-kapsam.test.ts (INV-CI-SECIM-2). Ölçüm yüzeyi: `node:fs` + satır taraması (girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8, env 10);
+ * ayrıştırılamayan yapı KIRMIZIDIR; sabotaj testleri YAML'ı BELLEKTE bozar, ci.yml'i DEĞİŞTİRMEZ.
  */
 
 const KOK = path.resolve(__dirname, '../../..')
@@ -37,29 +33,12 @@ const KOSUL_HIZLI = "if: steps.ayna.outputs.atla != 'true' && steps.hizli.output
 const HIZLI_ADI = 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)'
 const HIZLI_KOSULU = `if: ${SHARD_OLAYI} && steps.sinif.outputs.sinif == 'belge'`
 const HIZLI_ATLANANLAR = [
-  'Setup Deno',
-  'Install dependencies',
-  'Lint (blocking)',
-  'Type check',
-  'Deno check (edge functions — kapı-körlüğü guard)',
-  'Edge mangle-guard (string-literal — deno check göremez)',
-  'Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)',
-  'Node derleme önbelleği (V8 bayt kodu)',
+  ...['Setup Deno', 'Install dependencies', 'Lint (blocking)', 'Type check', 'Deno check (edge functions — kapı-körlüğü guard)'],
+  ...['Edge mangle-guard (string-literal — deno check göremez)', 'Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)', 'Node derleme önbelleği (V8 bayt kodu)'],
 ]
 /** Hızlı yoldan ETKİLENMEYEN ci adımları: bu kapılar belge PR'ında DA koşar (kayıt kapısı, gizli bilgi taraması, sınıf, taban izi, bekleme). */
 const HIZLI_OKUMAYANLAR = ["Secret guard (hardcoded DB connection string)", 'PR kayıt kapısı (karar 187)', 'Test', 'Build (blocking)', 'Test shard sonuçları (bekle ve doğrula)']
-const SHARD_SIRASI = [
-  'Checkout',
-  'Setup pnpm',
-  'Setup Node',
-  SEC_ADI,
-  'Setup Deno',
-  'Install dependencies',
-  'Node derleme önbelleği (V8 bayt kodu)',
-  SECV_ADI,
-  'Test dağıtımı (shard ${{ matrix.shard }}/4)',
-  'Test (shard ${{ matrix.shard }}/4)',
-]
+const SHARD_SIRASI = ['Checkout', 'Setup pnpm', 'Setup Node', SEC_ADI, 'Setup Deno', 'Install dependencies', 'Node derleme önbelleği (V8 bayt kodu)', SECV_ADI, 'Test dağıtımı (shard ${{ matrix.shard }}/4)', 'Test (shard ${{ matrix.shard }}/4)']
 const KUR_RUN = 'run: pnpm install --prefer-offline --config.allow-scripts true --ignore-scripts'
 /** `ci` içindeki kurulum: lifecycle betikleri AÇIK kalır (tsc orada gerçek tip kapısı: koordinatör kararı, ALT-38e). */
 const CI_KUR_RUN = 'run: pnpm install --prefer-offline --config.allow-scripts true'
