@@ -152,3 +152,28 @@ graphify-out/
 # (2) secret-scan ikili dosyanin icini goremez → hafizaya dusen sir/musteri verisi kapidan gecer;
 # (3) icerik PR gozunden gecmeden yazilir. Desen sonda / ile her derinlikte.
 .wrongstack/
+
+# ALT-39 (INV-DEPO-DOKUM-1): veritabani dokumu, yedek ve sikistirilmis dokum dosyalari herkese acik depoya girmez
+# (gecmiste depoya bir veri dokumu girmisti). Yerelde pg_dump/yedek almak serbest, commitlenmesin diye desenler burada.
+# Bu satirlar yalniz kazaya karsi ILK perde: `git add -f` ile asilir; asil zorlayici scripts/security/depo-dokum-kapisi.cjs
+# (CI ve pre-push). `**/db-backup*` her derinlikte; Linux'ta buyuk-kucuk harf duyarli oldugu icin `DB-Backup-*` ikizi de var.
+# Cetvel: docs/standards/depoya-giremeyecek-veri-standard.md
+**/db-backup*
+**/[Dd][Bb]-[Bb]ackup*
+*.dump
+*.dump.*
+*.dump-*
+*.dump_*
+*.sql.gz
+*.backup
+*.pgdump
+# SQLite yan dosyalari (WAL/shm/journal): imza tasimaz ama yazilmamis islemleri tutar (3. tur, N6)
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite3-journal
