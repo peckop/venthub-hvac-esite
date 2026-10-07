@@ -122,6 +122,8 @@ else
 fi`
 /** Hızlı yolla atlanabilen kod kapıları: ayna koşulu VE hızlı yol çıktısı `true` DEĞİL (çıktı yok/başka değerse KOŞAR: koşul yalnız DARALTMA yönünde). */
 const KOSUL_HIZLI = "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'"
+/** Kurulum hızlı yolda YALNIZ pnpm önbelleği isabet ettiyse (`setup-node` `cache-hit`) atlanır: ıskada `setup-node`'un kayıt adımı var olmayan depoyu kaydetmeye çalışıp işi kırmızı yapar. Çıktı yoksa KOŞAR. */
+const KOSUL_KURULUM_HIZLI = "if: steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')"
 const HIZLI_ATLANANLAR = [
   'Setup Deno',
   'Install dependencies',
@@ -139,6 +141,7 @@ const AGIR_KOSULU: Record<string, string> = {
   [NEXT_ONBELLEK_ADI]: KOSUL_BUILD,
   Test: KOSUL_TEST,
   ...Object.fromEntries(HIZLI_ATLANANLAR.map((ad) => [ad, KOSUL_HIZLI])),
+  'Install dependencies': KOSUL_KURULUM_HIZLI,
 }
 const beklenenKosul = (ad: string): string => AGIR_KOSULU[ad] ?? KOSUL
 /** Sınıf adımının betiği ve tabandan çıkarılan kopyası (edited ayna ile AYNI güven sınırı: PR betiği değiştirip kendi kararını veremez). */
@@ -266,7 +269,7 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     anahtarlar: ['name', 'if', 'run'],
   },
   { ad: PNPM_ADI, kosul: null },
-  { ad: 'Setup Node', kosul: null },
+  { ad: 'Setup Node', kosul: null, id: 'node' },
   {
     ad: KAPI_ADI,
     kosul: PR_KOSULU,

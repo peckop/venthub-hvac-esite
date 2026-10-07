@@ -21,6 +21,7 @@ const IFADE = {
   kurulum: "steps.sec.outputs.bos != 'true'",
   test: "steps.sec.outputs.bos != 'true' && steps.dagit.outputs.kos != 'false'",
   kapi: "steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'",
+  kurulumHizli: "steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')",
   hizli: "github.event_name == 'pull_request' && github.event.action != 'edited' && steps.sinif.outputs.sinif == 'belge'",
   eski: "(steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')",
 }
@@ -124,6 +125,16 @@ describe('INV-CI-SECIM-1 (ifade) · `if:` ifadelerinin GERÇEK doğruluk tablosu
     for (const ayna of [undefined, '', 'false']) expect(kosar(ayna, 'true'), `ayna=${ayna} belge=true`).toBe(false)
     expect(kosar('true', undefined), 'ayna atlatıyorsa belge çıktısı ne olursa olsun atlanır (eski davranış)').toBe(false)
     expect(kosar('true', 'true')).toBe(false)
+  })
+
+  it('`ci` kurulumu hızlı yolda YALNIZ pnpm önbelleği İSABET ettiyse atlanır; ıskada, çıktı yokken ya da başka değerde KOŞAR (setup-node kayıt adımı var olmayan depoyla işi kırmızı yapmasın)', () => {
+    const kosar = (ayna: string | undefined, belge: string | undefined, isabet: string | undefined): boolean =>
+      ifadeDegerlendir(IFADE.kurulumHizli, baglam({ 'steps.ayna.outputs.atla': ayna, 'steps.hizli.outputs.belge': belge, 'steps.node.outputs.cache-hit': isabet }))
+    expect(kosar(undefined, 'true', 'true'), 'belge + önbellek isabeti: kurulum atlanır (kazanç)').toBe(false)
+    for (const isabet of [undefined, '', 'false', '0', 'evet']) expect(kosar(undefined, 'true', isabet), `belge + isabet=${String(isabet)}: kurulum KOŞAR`).toBe(true)
+    for (const belge of [undefined, '', 'false', 'evet']) for (const isabet of [undefined, 'true', 'false']) expect(kosar(undefined, belge, isabet), `belge=${String(belge)} isabet=${String(isabet)}`).toBe(true)
+    expect(kosar('true', 'true', 'false'), 'ayna atlatıyorsa (edited) kurulum atlanır: eski davranış').toBe(false)
+    expect(kosar('true', undefined, undefined)).toBe(false)
   })
 
   it('hızlı yol adımı yalnız shard olayında (`edited` hariç pull_request) ve `belge` sınıfında açılır; push, elle koşum, edited ve başka sınıf açmaz', () => {

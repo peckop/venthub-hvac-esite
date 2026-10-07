@@ -33,6 +33,8 @@ const KURULUM = "steps.sec.outputs.bos != 'true'"
 /** Eski (terk edilen) koşul biçimi: ifade doğruluk tablosu, neden bırakıldığını ÇALIŞTIRARAK gösterir. */
 const ESKI_KURULUM = "(steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')"
 const KOSUL_HIZLI = "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'"
+/** `ci` kurulumu: hızlı yolda YALNIZ pnpm önbelleği isabet ettiyse atlanır (`setup-node` `cache-hit`); ıskada kurulum koşar ve kaydedilen önbellek gerçek olur. Çıktı yoksa KOŞAR. */
+const KOSUL_KURULUM_HIZLI = "if: steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')"
 const HIZLI_ADI = 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)'
 const HIZLI_KOSULU = `if: ${SHARD_OLAYI} && steps.sinif.outputs.sinif == 'belge'`
 const HIZLI_ATLANANLAR = [
@@ -320,9 +322,13 @@ function hizliYolDenetle(ci: string): string[] {
       ihlal.push(`ci işinde "${kapi}" adımı yok`)
       continue
     }
-    if (ifSatirlari(a).join(' ; ') !== KOSUL_HIZLI) ihlal.push(`"${kapi}" koşulu TAM \`${KOSUL_HIZLI}\` değil (bulunan: ${ifSatirlari(a).join(' ; ') || 'yok'}): belge PR'ında koşar (kazanç sıfır) ya da çıktı yokken ATLANIR (kapı sessizce düşer)`)
+    // kurulum hızlı yolda yalnız pnpm önbelleği İSABET ettiyse atlanır (ıskada setup-node kayıt adımı kırmızı verir); öteki kapılar yalnız hızlı yol çıktısına bakar
+    const beklenen = kapi === 'Install dependencies' ? KOSUL_KURULUM_HIZLI : KOSUL_HIZLI
+    if (ifSatirlari(a).join(' ; ') !== beklenen) ihlal.push(`"${kapi}" koşulu TAM \`${beklenen}\` değil (bulunan: ${ifSatirlari(a).join(' ; ') || 'yok'}): belge PR'ında koşar (kazanç sıfır), çıktı yokken ATLANIR (kapı sessizce düşer) ya da önbellek ıskasında kurulum atlanıp setup-node kayıt adımı işi kırmızı yapar`)
     if (sinifSirasi.indexOf(kapi) < iHizli) ihlal.push(`"${kapi}" hızlı yol adımından ÖNCE: koşulu henüz yazılmamış çıktıyı okur (belge PR'ında da koşar)`)
   }
+  const setupNode = adimlar.filter((a) => a.ad === 'Setup Node')
+  if (setupNode.length !== 1 || idDegeri(setupNode[0]) !== 'node') ihlal.push('`ci` işinde "Setup Node" TAM BİR tane ve `id: node` olmalı: kurulum koşulu `steps.node.outputs.cache-hit`i okur; kimlik düşerse çıktı hep boştur (hızlı yolda kurulum hiç atlanmaz: kazanç sıfır)')
   for (const kapi of HIZLI_OKUMAYANLAR) {
     const a = adimlar.find((x) => x.ad === kapi)
     if (a && /steps\.hizli\./.test(yorumsuz(a.satirlar).join('\n'))) ihlal.push(`"${kapi}" hızlı yol çıktısını okuyor: belge PR'ında da KOŞMALI (kayıt kapısı, gizli bilgi taraması, Test, Build ve bekleme adımı atlanamaz)`)
@@ -491,6 +497,8 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'hızlı yol her koşuda `belge=true` yazar (süzgeç sonucuna bakmaz)', boz: (c) => metinDegistir(c, hizliAr(c), 'else\n', 'else\n            echo "belge=true" >> "$GITHUB_OUTPUT"\n'), beklenen: 'TEK yerde yazmalı' },
   { ad: 'Lint koşulu hızlı yolun çıktısını POZİTİF okur (`belge == true` iken değil, çıktı yoksa ATLANIR)', boz: (c) => sd(c, ciAdim(c, 'Lint (blocking)'), /^if: /, "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge == 'false'"), beklenen: '"Lint (blocking)" koşulu TAM' },
   { ad: 'Type check hızlı yolu okumaz (belge PR\'ında tsc koşar: kazanç sıfır)', boz: (c) => sd(c, ciAdim(c, 'Type check'), /^if: /, "if: steps.ayna.outputs.atla != 'true'"), beklenen: '"Type check" koşulu TAM' },
+  { ad: '`ci` kurulum koşulu önbellek ıskasını yok sayar (yalnız hızlı yol çıktısına bakar: ıskada kurulum atlanır, setup-node kayıt adımı var olmayan depoyla işi kırmızı yapar)', boz: (c) => sd(c, ciAdim(c, 'Install dependencies'), /^if: /, KOSUL_HIZLI), beklenen: '"Install dependencies" koşulu TAM' },
+  { ad: '`ci` Setup Node kimliği düşer (`cache-hit` okunamaz: hızlı yolda kurulum hiç atlanmaz, kazanç sıfır)', boz: (c) => sd(c, ciAdim(c, 'Setup Node'), 'id: node', null), beklenen: '`id: node` olmalı' },
   { ad: 'Secret guard hızlı yolu okur (belge PR\'ında gizli bilgi taraması atlanır)', boz: (c) => sd(c, ciAdim(c, 'Secret guard (hardcoded DB connection string)'), /^if: /, KOSUL_HIZLI), beklenen: '"Secret guard (hardcoded DB connection string)" hızlı yol çıktısını okuyor' },
   { ad: "Döküm kapısı hızlı yolu okur (belge PR'ında `.csv` dökümü ve kişisel veri taraması atlanır)", boz: (c) => metinDegistir(c, ciAdim(c, DOKUM_ADI), 'run: node scripts/security/depo-dokum-kapisi.cjs', `if: steps.hizli.outputs.belge != 'true'\n        run: node scripts/security/depo-dokum-kapisi.cjs`), beklenen: `"${DOKUM_ADI}" hızlı yol çıktısını okuyor` },
   { ad: 'PR kayıt kapısı hızlı yolu okur (belge PR\'ında kayıt kapısı atlanır)', boz: (c) => sd(c, ciAdim(c, 'PR kayıt kapısı (karar 187)'), /^if: /, `if: github.event_name == 'pull_request' && steps.hizli.outputs.belge != 'true'`), beklenen: '"PR kayıt kapısı (karar 187)" hızlı yol çıktısını okuyor' },
