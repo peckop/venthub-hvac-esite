@@ -109,6 +109,24 @@ asıl şey ölçülür.
 Burada uygulanışı: `playwright install-deps` en-iyi-çaba; ardından Chromium'u
 gerçekten açıp bir sayfa render eden ~5 saniyelik prob fatal.
 
+### 2.9 Paralel arka plan kurulumu (ALT-38f, 2026-10-07)
+
+Kural 1-5 ve 2.8 DEĞİŞMEZ; yalnız kurulumun NEREDE koştuğu değişti. `admin-smoke` işinde `playwright install-deps`, Build ile PARALEL arka planda koşar
+(`scripts/ci/arka-plan.sh baslat`); sonucunu Build'ten sonraki `bekle` adımı toplar. Ölçüm (88 başarılı koşu, 2026-10-04..07): adım sıralıyken medyan 15 sn
+(p90 23 sn, sağlıklı en uzun 52 sn) ve 3 koşuda (%3,4) 187, 339, 341 sn (ilk deneme 300 sn sınırını doldurdu). Build medyan 166 sn olduğundan adımın onu beklemesi için sebep yoktu.
+
+- **Başlatan adım kural 1-2'ye uyar.** Adım `timeout-minutes` ilan eder ve komut `retry-bounded.sh` ile koşar; kapı (INV-CI-INSTALL-1) bu paralel yolu da tarar,
+  çünkü komut metni adımın gövdesindedir. Kemer aritmetiği (2.7): 75 sn × 2 + 10 = 160 sn < 4 dk.
+- **Sınır 300 sn'den 75 sn'ye indi** (sağlıklı en uzunun 1,4 katı): takılan ilk deneme 75 sn'de kesilir, ikinci deneme geçer; eskiden kuyruk 340 sn'ye çıkıyordu. Sağlıklı süre
+  Build'in içinde kaldığı için kuyruk işin süresini uzatmaz. En kötü durumda (iki deneme de takılır) `bekle`, `baslat`tan 240 sn sonrasına kadar bekler.
+- **`bekle` en-iyi-çabadır** (`continue-on-error`): 2.8 ile aynı gerekçe, asıl kapı prob. Prob `bekle`den SONRA koşar ve fataldir; eksik kütüphanede iş ADIYLA kırmızıdır
+  (sessiz yeşil yok). Prob yarım kurulumu görmesin diye `bekle` probtan ÖNCE gelir (INV-E2E-HIZLI-3 sırayı ölçer).
+- **Süreç ölürse yeniden koşar.** Arka plan işlemi sonuç yazmadan ölürse (ör. runner öldürürse) `bekle` komutu ön planda yeniden koşturur ve uyarı verir: mekanizma bozulsa bile
+  iş eski sıralı davranışına düşer, paralellik kaybolur, doğruluk kaybolmaz. Süre dolarsa (124) komut ÖLDÜRÜLMEZ: kendi sınırı vardır, kapıyı prob verir.
+- **Ne kuruyor.** Günlükte komutun YENİ kurduğu tek şey yazı tipleridir (`fonts-freefont-ttf`, `fonts-ipafont-gothic`, `fonts-unifont`, `fonts-wqy-zenhei` ve xfonts paketleri) ve beş mesa/freetype
+  yükseltmesi; Chromium'un çalışma kütüphaneleri koşucu imajında zaten kurulu ("already the newest version"). Adım 2.6'ya göre KALDIRILABİLİR görünür, ama yazı tipi kümesini
+  değiştirir: test ortamının yazı tipi kümesi değişirse reflow ve axe ölçümleri etkilenebilir. O karar ayrı bir iştir ve ÖLÇÜLMEDİ; bu işte yalnız adımın maliyeti gizlendi.
+
 ## 3. Muafiyetler — ADLA yazılır
 
 **Şu an muafiyet YOK.** Liste bilerek boş: tek muafiyet (`db-advisor.yml`) yazıldığı
@@ -136,3 +154,6 @@ bir kaldırma koşuluyla birlikte yazılır.
 `src/__tests__/conformance/ci-install-bounded.test.ts` — INV-CI-INSTALL-1.
 Kapı, iş akışı dosyalarını okur; ağdan indiren her adımda kural 1 ve 2'yi arar.
 Yeni bir iş akışı sınırsız `apt-get` ya da `playwright install` yazarsa kırmızı yanar.
+
+Paralel yol (2.9) için ek kapılar: `INV-E2E-HIZLI-3` (`e2e-smoke-paralel-kurulum.test.ts`: adım sırası, sınır ve deneme sayısı, `bekle` süresi ve en-iyi-çaba,
+probun fatal olması ve `bekle`den sonra gelmesi) ve `INV-E2E-HIZLI-4` (`scripts/ci/__tests__/arka-plan.test.ts`: betik gerçek bash ile, sabotajlı).

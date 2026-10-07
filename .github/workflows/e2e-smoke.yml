@@ -24,7 +24,7 @@ name: E2E Smoke (admin + checkout)
 # ALT-38f: işin süresi kısaltıldı (88 başarılı koşuda medyan 285 sn; en uzun adım Build 166 sn, apt kuyruğu 3 koşuda 187-341 sn). Üç kaldıraç, her biri
 # ADIYLA aşağıda: (1) Build'te tip ve lint aşaması YALNIZ burada kapalı (`ci` ikisini zaten zorunlu kontrol olarak koşar), (2) webpack derleme önbelleği,
 # (3) apt adımı Build ile PARALEL arka planda ve kuyruğu 75 sn × 2 ile sınırlı. Hiçbiri kapıyı gevşetmez: tarayıcı probu ve Playwright testi aynen koşar.
-# Cetvel: docs/standards/test-karnesi-standard.md §4.2 · docs/standards/ci-runner-install-standard.md §2.9 · kapılar INV-E2E-HIZLI-1/2/3.
+# Cetvel: docs/standards/test-karnesi-standard.md §4.3 · docs/standards/ci-runner-install-standard.md §2.9 · kapılar INV-E2E-HIZLI-1/2/3/4.
 
 on:
   pull_request:

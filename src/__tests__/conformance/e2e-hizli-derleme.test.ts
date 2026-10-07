@@ -1,6 +1,8 @@
 // @vitest-environment node
+import { spawnSync } from 'node:child_process'
 import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -143,6 +145,20 @@ describe('INV-E2E-HIZLI-1 · anahtar ve yapılandırma', () => {
     process.env[ANAHTAR] = '1'
     const c = await yukle(undefined)
     expect('typescript' in c).toBe(false)
+  }, 120_000)
+
+  it('YENİ SÜREÇ (`next build`in yapılandırmayı yüklemesi gibi): anahtar yalnız o sürecin ortamından okunur, ortamda yoksa HİÇBİR ayar eklenmez', () => {
+    const betik = `const m = await import(${JSON.stringify(pathToFileURL(path.join(KOK, 'next.config.mjs')).href)}); const c = m.default; console.log(JSON.stringify({ ts: c.typescript ?? null, es: c.eslint ?? null }))`
+    const calistir = (env: NodeJS.ProcessEnv): { ts: unknown; es: unknown } => {
+      const s = spawnSync(process.execPath, ['--input-type=module', '-e', betik], { encoding: 'utf8', env, timeout: 60_000 })
+      expect(s.status, s.stderr).toBe(0)
+      return JSON.parse(s.stdout.trim().split('\n').pop() ?? '{}') as { ts: unknown; es: unknown }
+    }
+    const temiz: NodeJS.ProcessEnv = { ...process.env }
+    delete temiz[ANAHTAR]
+    expect(calistir({ ...temiz, [ANAHTAR]: '1' })).toEqual({ ts: { ignoreBuildErrors: true }, es: { ignoreDuringBuilds: true } })
+    expect(calistir(temiz)).toEqual({ ts: null, es: null })
+    expect(calistir({ ...temiz, [ANAHTAR]: 'true' })).toEqual({ ts: null, es: null })
   }, 120_000)
 })
 
