@@ -57,6 +57,8 @@ export default defineConfig({
     ...(dunyaDurumu.include ? { include: dunyaDurumu.include } : {}),
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',
+    // ALT-38c DENEME (MERGE YOK, yalnız ölçüm): test dosyaları arası yalıtım KAPALI.
+    isolate: false,
     testTimeout: 20000,
     hookTimeout: 12000,
     teardownTimeout: 8000,
