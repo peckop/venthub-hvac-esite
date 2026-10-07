@@ -215,10 +215,7 @@ Deno.serve(async (req) => {
     // Eski hâl: `if (conversationId) retrieveReq.conversationId = conversationId`.
     // Ölçümle görüldü ki İyzico bu alanı kendi kaydından DÖNDÜRMÜYOR, bizim verdiğimizi
     // YANSITIYOR: gönderilen 11 koşumda yanıtta var, gönderilmeyen 2 koşumda hiç yok
-    // (eski dökümdeki 13 gerçek yanıt; döküm kişisel veri taşıdığı için depodan
-    // kaldırıldı — ALT-39. Yapı ve ilişkileri korunmuş, değerleri tamamen sentetik (gerçek
-    // değerden türetilmemiş) fikstür:
-    // `supabase/functions/_shared/__tests__/fixtures/odeme-eslesme-13-yanit.json`).
+    // (`docs/archive/db-backup-pre-kademe2/venthub_orders.json`, 13 gerçek yanıt).
     //
     // Yani isteğin verdiği değeri gönderip yanıtta geri almak, saldırganın seçtiği değeri
     // "doğrulanmış" gibi geri getirir. Eşleşme kapısının çapası bu yüzden `basketId`;

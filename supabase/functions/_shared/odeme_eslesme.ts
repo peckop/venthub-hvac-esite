@@ -15,13 +15,9 @@
  * o yansımayı siparişin kendi değeriyle karşılaştırıyordu. Saldırgan kurbanın
  * `conversation_id`'sini de verirse kapı AÇILIR.
  *
- * Ölçümle kanıtlandı (eski dökümdeki 13 gerçek yanıt): `conversationId` gönderilen
- * 11 koşumda yanıtta VAR, gönderilmeyen 2 koşumda HİÇ YOK. Yani İyzico kendi kayıtlı
- * değerini döndürmüyor, bizim verdiğimizi YANSITIYOR.
- * (Döküm kişisel veri taşıdığı için depodan KALDIRILDI — ALT-39. Bu ölçümlerin tutarlılığını
- * kilitleyen test, yapı ve ilişkileri korunmuş, değerleri tamamen SENTETİK olan (gerçek
- * değerden türetilmemiş) fikstürü okur:
- * `supabase/functions/_shared/__tests__/fixtures/odeme-eslesme-13-yanit.json`.)
+ * Ölçümle kanıtlandı (`docs/archive/db-backup-pre-kademe2/venthub_orders.json`, 13 gerçek
+ * yanıt): `conversationId` gönderilen 11 koşumda yanıtta VAR, gönderilmeyen 2 koşumda
+ * HİÇ YOK. Yani İyzico kendi kayıtlı değerini döndürmüyor, bizim verdiğimizi YANSITIYOR.
  *
  * `basketId` farklı: `iyzico-callback` onu isteğe HİÇ koymuyor (ölçüldü: dosyada `basketId`
  * geçmiyor). Dolayısıyla yanıttaki `basketId`, İyzico'nun O TOKEN için kendi tuttuğu
