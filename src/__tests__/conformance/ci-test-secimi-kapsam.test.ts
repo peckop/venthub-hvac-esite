@@ -569,3 +569,33 @@ describe('INV-CI-SECIM-2 (B) · KAPSAM: tam ise birleşim = vitest list, seçim 
     expect(tam.cikti).toBe('kos=true\n')
   }, 240_000)
 })
+
+// ══ ÖLÇÜM: hızlı yolun DAYANAĞI (INV-CI-SECIM-1) ═══════════════════════════════════════════════════════════════════════════════════
+// "md/txt/csv farkı Lint, tip ve Deno sonucunu değiştiremez" iddiası elle değil ÖLÇÜMLE durur: yapılandırmalar bu uzantıları okumaz. Biri değişirse (ör. lint'e markdown, tsc'ye .md) bu test KIRMIZI olur ve hızlı yol gözden geçirilir.
+describe('INV-CI-SECIM-1 (ölçüm) · md/txt/csv uzantıları Lint, tip denetimi ve Deno kapılarının girdisi DEĞİL', () => {
+  const oku = (y: string): string => readFileSync(path.join(KOK, y), 'utf8').replace(/\r\n/g, '\n')
+  const betikler = (JSON.parse(oku('package.json')) as { scripts: Record<string, string> }).scripts
+
+  it('tsc: tsconfig `include` yalnız .ts/.tsx desenleri; `tsc --noEmit` süzgeçsiz kök (dosya/proje süzgeci yok)', () => {
+    const include = (JSON.parse(oku('tsconfig.json')) as { include: string[] }).include
+    expect(include.filter((g) => !/\.(?:ts|tsx)$/.test(g))).toEqual([])
+    expect(betikler['type-check']).toMatch(/\btsc --noEmit$/)
+  })
+
+  it('eslint: `eslint .` (süzgeçsiz kök, --ext yok); yapılandırma dosya sistemini ve docs/ yolunu okumaz, `files` desenleri md/txt/csv içermez', () => {
+    expect(betikler.lint).toMatch(/\beslint \.$/)
+    const cfg = oku('eslint.config.cjs')
+    expect(cfg).not.toMatch(/readFileSync|readdirSync|docs\//)
+    expect((cfg.match(/files:\s*\[[^\]]*\]/g) ?? []).join(' ')).not.toMatch(/\.(?:md|txt|csv)\b/)
+  })
+
+  it('deno check: yalnız supabase/functions/*/index.ts (docs ya da metin dosyası içe aktarmaz: kaynakta `docs/` ya da .md/.txt/.csv içe aktarma yok)', () => {
+    expect(CI_METNI).toContain('run: deno check --node-modules-dir=none supabase/functions/*/index.ts')
+    const kaynak = execFileSync('git', ['ls-files', 'supabase/functions'], { cwd: KOK, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
+      .split('\n')
+      .filter((d) => /\.(?:ts|tsx|js|mjs)$/.test(d) && !/__tests__|\.test\./.test(d)) // testler vitest'tedir (seçici kapsar), deno check onları denetlemez
+    expect(kaynak.length).toBeGreaterThan(20)
+    // yalnız İÇE AKTARMA (statik `from` ve dinamik `import()`) tip denetimine girer; yorumdaki `docs/` anması ya da çalışma anında dosya okuma deno check'in girdisi değildir
+    for (const d of kaynak) expect(oku(d), d).not.toMatch(/\bfrom\s+['"][^'"]*(?:\.(?:md|txt|csv)|\/docs\/)[^'"]*['"]|\bimport\s*\(\s*['"][^'"]*(?:\.(?:md|txt|csv)|\/docs\/)/)
+  })
+})
