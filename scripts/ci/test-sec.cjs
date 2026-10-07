@@ -95,6 +95,10 @@ const KURESEL_GIRDILER = Object.freeze([
   'supabase/migrations/',
   'scripts/assert-node-major.mjs',
   'scripts/setup-hooks.mjs',
+  // KOŞUM KAPANIMI: her vitest koşumunda yüklenen ama HİÇBİR testin okuma kaydında görünmeyen yerel dosyalar. `vitest.global-setup.ts` ana süreçte koşar ve
+  // bunu `createRequire` ile yükler (kaydedici worker'da çalıştığı için görmez; harita bunu yalnız kendi testine bağlar). Yeni bir bağımlılık `vitest*` kök
+  // dosyalarına eklenirse buraya da yazılmak ZORUNDADIR: `INV-TEST-SEC-1` blok 7 koşum kapanımını kaynaktan çıkarır ve listede olmayanı KIRMIZI yapar.
+  'scripts/board/vitest-defter-ortami.cjs',
   'package.json',
   'pnpm-lock.yaml',
   'pnpm-workspace.yaml',

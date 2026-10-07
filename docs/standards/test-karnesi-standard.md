@@ -218,11 +218,18 @@ biri öbürünün kör noktasını kapatır. Belge, CSV, SQL gibi içe aktarıla
 ### 6.2 Küresel girdiler
 
 Değişirse `tam`: `.github/`, `.githooks/`, `scripts/ci/`, `supabase/migrations/`, `scripts/assert-node-major.mjs`, `scripts/setup-hooks.mjs`,
-`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc`, `.nvmrc`, `.node-version`, `.gitignore`, `.gitattributes`, `tsconfig*.json`,
+`scripts/board/vitest-defter-ortami.cjs`, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc`, `.nvmrc`, `.node-version`, `.gitignore`, `.gitattributes`, `tsconfig*.json`,
 `vitest*`, `playwright*`, `next.config.*`, `eslint.config.*`, `.eslintrc*`, `tailwind.config.*`, `postcss.config.*`, `knip.*`, `middleware.*`; ek
 olarak sınıflayıcının (`scripts/ci/degisiklik-sinifi.cjs`) "her zaman tam" listesi (`src/` ve `public/` HARİÇ: bunlar daraltılmak istenen
 yüzeylerdir) ve haritanın kurulum evresinde okunan yolları. SSOT `KURESEL_GIRDILER`dir; her girdinin `INV-TEST-SEC-1` örnek tablosunda satırı
 olmak ZORUNDADIR (yeni küresel girdi örneksiz eklenemez, listeyi daraltmak kırmızı verir).
+
+**Koşum kapanımı.** Her vitest koşumunda yüklenen yerel dosyalar küreseldir, çünkü kaydedici worker'da çalışır ve ana süreçte yüklenenleri GÖRMEZ: global kurulum
+(`vitest.global-setup.ts`) ana süreçte koşar ve `scripts/board/vitest-defter-ortami.cjs`i yükler; harita bu dosyayı yalnız kendi testine bağlıyordu ve değişince
+seçim o testle sınırlı kalıyordu (alt38e bulgusu, 10-07). `INV-TEST-SEC-1` blok 7 `vitest*` kök dosyalarının (yapılandırma, kurulum, global kurulum) yerel
+`import`/`require`/`createRequire` kapanımını KAYNAKTAN çıkarır; küresel listede olmayan dosyayı ve kanıtlanamayan yüklemeyi (dinamik argüman, `require` dışı adla
+bağlanmış `createRequire`, çözülemeyen yerel belirteç) KIRMIZI yapar: yeni bir koşum bağımlılığı listeye yazılmadan birleşemez. Sınır: kapı yalnız YÜKLEME
+kapanımını bilir; kurulum dosyalarının veri okumalarını (`readFileSync`) bilmez (şu an yalnız `scripts/ci/dunya-durumu.cjs`, o da küresel dizinde).
 
 ### 6.3 Test haritası (`scripts/ci/test-haritasi.json`)
 
@@ -285,7 +292,7 @@ Bakım kuralları:
 
 | Kapı | Dosya (`scripts/ci/__tests__/`) | Neyi ölçer |
 |---|---|---|
-| `INV-TEST-SEC-1` | `test-sec.test.ts` | seçicinin karar mantığı (senaryolar, SABOTAJ tablosu, küresel girdi örnek tablosu, glob eşleştirici, CLI çıktı sözleşmesi, `--yerel`); gerçek harita ve gerçek git ile belge değişimi daraltır, belirsiz testler HER ZAMAN seçilir |
+| `INV-TEST-SEC-1` | `test-sec.test.ts` | seçicinin karar mantığı (senaryolar, SABOTAJ tablosu, küresel girdi örnek tablosu, glob eşleştirici, CLI çıktı sözleşmesi, `--yerel`, içe aktarma grafiğinin paralel kurulumu, sınıflayıcı yükleme sırası: önce seçicinin yanı sonra kök, koşum kapanımı kapısı); gerçek harita ve gerçek git ile belge değişimi daraltır, belirsiz testler HER ZAMAN seçilir |
 | `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur |
 | `INV-TEST-HARITA-KAYDEDICI-1` | `test-haritasi-kaydedici.test.ts` | yakalama (fs, dizin, glob, alt süreç sınıflaması, `node` çocuğu, belirlenimli kayıt) |
 | `INV-TEST-SEC-GERIYE-1` | `test-sec-geriye.test.ts` | geriye dönük doğrulamanın sayım mantığı: kategori önceliği, kaçırma yalnız ASIL kategoriden, kaçırılanın açıklanması (açıklanamayan = GERÇEK kaçırma), CI günlüğünden süre modeli |

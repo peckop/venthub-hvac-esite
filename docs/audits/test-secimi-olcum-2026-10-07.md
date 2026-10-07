@@ -114,6 +114,11 @@ Ham 43 kaçırma, günlükten çıkarılan kırık BAŞLIKLARLA sınıflanır (`
    sonuç sıralıyla bayt bayt aynıdır (10 dosya ve toplu sorgu, doğrulandı). `test-shard` her shard'da seçimi ayrı hesapladığından kod PR'ında shard başına duvar süresi tahmini: ≈15 sn test +
    ≈26-45 sn seçim (4 çekirdekli CI'da yerelden uzun olabilir): tam paketin ≈68 sn'siyle aynı mertebede ya da biraz altında; belge PR'ında ≈10 sn. Kod PR'ının asıl kazancı için grafiğin haritada
    doğrulamalı önbelleğe alınması gerekir (cetvel §6.7 madde 5).
+10. **Koşum kapanımı boşluğu kapatıldı** (alt38e bulgusu, doğrulandı): `vitest.global-setup.ts` ana süreçte `scripts/board/vitest-defter-ortami.cjs`i yükler; kaydedici worker'da çalıştığı için
+    harita bunu yalnız kendi testine bağlıyordu (`kuresel` boş) ve dosya değişince her koşum etkilenirken seçim o testle sınırlı kalıyordu. Dosya küresel listeye eklendi (değişirse TAM) ve
+    `INV-TEST-SEC-1` blok 7 `vitest*` kök dosyalarının yerel yükleme kapanımını kaynaktan çıkarıp küresel listede OLMAYANI kırmızı yapar (sentetik ağaç senaryoları + gerçek ağaçta kapanım:
+    `vitest.config.ts`, `vitest.global-setup.ts`, `vitest.setup.ts`, `vitest-setup.tsx`, `vitest.smoke.config.ts`, `scripts/ci/dunya-durumu.cjs`, `scripts/board/vitest-defter-ortami.cjs`). PR örnek ölçümü
+    değişmedi: son 100 birleşmiş PR'da bu dosyaya dokunan tek PR zaten küresel girdili (#1652). Aynı mesajdaki ikinci not (sınıflayıcı önce seçicinin yanından yüklenir) bozulmadı ve bir testle sabitlendi.
 
 ## 7 · Yeniden üretme
 

@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -67,6 +67,7 @@ type Modul = {
   icerikOzeti: (metin: string) => string
   aracOzeti: (kok: string) => string
   ilgiliAdaylari: (yollar: string[], dosyaVarMi?: (y: string) => boolean) => string[]
+  kureselGirdiNedeni: (yol: string, girdiler: readonly string[]) => string | null
   calistir: (argv: string[], secenekler: Record<string, unknown>) => Promise<Sonuc>
   parcala: <T>(liste: T[], n: number) => T[][]
   isciSayisi: (ortam?: Record<string, string | undefined>, cekirdek?: number) => number
@@ -177,6 +178,7 @@ const KURESEL_ORNEKLER: Record<string, string[]> = {
   'supabase/migrations/': ['supabase/migrations/20260101000000_x.sql'],
   'scripts/assert-node-major.mjs': ['scripts/assert-node-major.mjs'],
   'scripts/setup-hooks.mjs': ['scripts/setup-hooks.mjs'],
+  'scripts/board/vitest-defter-ortami.cjs': ['scripts/board/vitest-defter-ortami.cjs'],
   'package.json': ['package.json'],
   'pnpm-lock.yaml': ['pnpm-lock.yaml'],
   'pnpm-workspace.yaml': ['pnpm-workspace.yaml'],
@@ -705,6 +707,42 @@ describe('INV-TEST-SEC-1 · 5. CLI (calistir): çıktı sözleşmesi, hata → t
     expect(s.githubCikti).toMatch(/\ntoplam=2\n/)
   })
 
+  it('sınıflayıcı yükleme SIRASI: önce SEÇİCİNİN YANINDAKİ kopya, yoksa kök (ci.yml sınıflayıcıyı tabandan seçicinin yanına koyar; PR kopyası kurulumdan önce koşmaz)', () => {
+    const kok = kokKur()
+    haritaYaz(kok)
+    // iki sınıflayıcı kökü de haritanın BİLDİĞİ kök adlar olmalı: yoksa "bilinmeyen kök → tam" kuralı sınıflayıcıdan bağımsız tam üretir ve ölçüm bozulur.
+    const haritaYolu = path.join(kok, 'scripts/ci/test-haritasi.json')
+    const harita = JSON.parse(readFileSync(haritaYolu, 'utf8')) as Harita
+    harita.kokler.push('kok-ozel', 'yan-ozel')
+    writeFileSync(haritaYolu, JSON.stringify(harita))
+    writeFileSync(path.join(kok, 'scripts/ci/degisiklik-sinifi.cjs'), "module.exports = { HER_ZAMAN_TAM: ['kok-ozel/'] }\n")
+    const baz = mkdtempSync(path.join(tmpdir(), 'test-sec-yan-'))
+    const yan = path.join(baz, 'secici-yan')
+    const bos = path.join(baz, 'secici-bos')
+    for (const d of [yan, bos]) {
+      mkdirSync(d, { recursive: true })
+      copyFileSync(KAYNAK_YOLU, path.join(d, 'test-sec.cjs'))
+    }
+    writeFileSync(path.join(yan, 'degisiklik-sinifi.cjs'), "module.exports = { HER_ZAMAN_TAM: ['yan-ozel/'] }\n")
+    writeFileSync(path.join(baz, 'testler.json'), JSON.stringify([T_BELGE, T_SAF]))
+    const calistir = (secici: string, degisen: string) => {
+      writeFileSync(path.join(baz, 'degisen.txt'), `${degisen}\n`)
+      const r = spawnSync(
+        process.execPath,
+        [path.join(secici, 'test-sec.cjs'), '--kok', kok, '--vitestsiz', '--json', '--test-listesi', path.join(baz, 'testler.json'), '--degisen-dosya', path.join(baz, 'degisen.txt')],
+        { encoding: 'utf8' },
+      )
+      expect(r.status, r.stderr).toBe(0)
+      return JSON.parse(r.stdout.split('\n')[0]) as { tam: boolean; neden: string[] }
+    }
+    // yan kopya VAR: yanın küresel girdisi etkili, kökünki YOK SAYILIR
+    expect(calistir(yan, 'yan-ozel/a.md').tam, 'yan kopyanın girdisi küresel olmalı').toBe(true)
+    expect(calistir(yan, 'kok-ozel/a.md').tam, 'yan kopya varken kökteki sınıflayıcıya BAKILMAZ').toBe(false)
+    // yan kopya YOK: köke düşer
+    expect(calistir(bos, 'kok-ozel/a.md').tam, 'yan kopya yoksa kökteki sınıflayıcı yüklenir').toBe(true)
+    expect(calistir(bos, 'yan-ozel/a.md').tam).toBe(false)
+  })
+
   it('--vitestsiz: içe aktarılabilir dosya değiştiyse karar vitest ister: tam=true ve neden "vitest gerekli"', async () => {
     const kok = kokKur()
     haritaYaz(kok)
@@ -1080,5 +1118,198 @@ describe('INV-TEST-SEC-1 · 6. içe aktarma grafiğinin paralel kurulumu (doğru
     await expect(
       M.grafikKur({ n: 2, testler: TESTLER, isciCalistir: async () => { throw new Error('işçi') }, siraliKur: async () => { throw new Error('sıralı de çöktü') } }),
     ).rejects.toThrow(/sıralı de çöktü/)
+  })
+})
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// 7. KOŞUM KAPANIMI: her vitest koşumunda yüklenen yerel dosyalar KÜRESELDİR
+// ---------------------------------------------------------------------------------------------------------------------------
+// Neden: kaydedici worker'da çalışır; `vitest.global-setup.ts` (ana süreç), yapılandırma ve kurulum dosyalarının yüklediği yerel dosyaları GÖRMEZ, harita
+// bunları yalnız kendi testine bağlar. Bu dosyalardan biri değişirse HER koşum etkilenir ama seçim o testle sınırlı kalırdı (alt38e bulgusu: vitest-defter-ortami.cjs).
+// Kapı kaynaktan çıkarır: `vitest*` kök dosyalarının (yapılandırma, kurulum, global kurulum) yerel `import`/`require` kapanımı küresel listede OLMAK ZORUNDADIR.
+// Yürüyüş kaba bir ayrıştırıcıdır (yorum silme + düzenli ifade); bu yüzden dinamik/çözülemeyen yükleme "kanıtlanamaz" sayılır ve kapıyı KIRMIZI yapar
+// (sessizce atlamaz), yürüyüşün kendisi de sentetik ağaçlarda sınanır.
+
+const KOD_UZANTILARI = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']
+const COZUM_UZANTILARI = [...KOD_UZANTILARI, '.json']
+const SABIT_BELIRTEC_DESENLERI = [
+  /\b(?:import|export)\b[^'"`;]*?\bfrom\s*(['"])([^'"\n]+)\1/g,
+  /\bimport\s*(['"])([^'"\n]+)\1/g,
+  /\bimport\s*\(\s*(['"`])([^'"`\n$]+)\1\s*\)/g,
+  /\brequire(?:\.resolve)?\s*\(\s*(['"`])([^'"`\n$]+)\1\s*\)/g,
+  /\bcreateRequire\s*\([^)]*\)\s*\(\s*(['"`])([^'"`\n$]+)\1\s*\)/g,
+]
+const YUKLEME_CAGRISI = /\b(?:import|require(?:\.resolve)?)\s*\(/g
+const CREATE_REQUIRE_CAGRISI = /\bcreateRequire\s*\([^)]*\)\s*\(/g
+const CREATE_REQUIRE_TAKMA_AD = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*createRequire\s*\(/g
+/** Çağrının argümanı TEK bir sabit metin mi (`'x'`, kapanış parantezine kadar başka bir şey yok)? Birleştirme, şablon `${}` ve değişken burada elenir. */
+const SABIT_ARGUMAN = /^\s*(['"`])[^'"`\n$]*\1\s*\)/
+
+/** Kapanımı KANITLANAMAZ yapan yükleme biçimleri: sabit metin olmayan argüman ve `require` dışı adla bağlanmış createRequire. */
+function dinamikSebepler(kaynak: string): string[] {
+  const sebepler: string[] = []
+  for (const m of kaynak.matchAll(YUKLEME_CAGRISI)) {
+    if (!SABIT_ARGUMAN.test(kaynak.slice((m.index ?? 0) + m[0].length))) sebepler.push('dinamik yükleme: import()/require() argümanı sabit metin değil')
+  }
+  for (const m of kaynak.matchAll(CREATE_REQUIRE_CAGRISI)) {
+    if (!SABIT_ARGUMAN.test(kaynak.slice((m.index ?? 0) + m[0].length))) sebepler.push('dinamik yükleme: createRequire(...)(...) argümanı sabit metin değil')
+  }
+  for (const m of kaynak.matchAll(CREATE_REQUIRE_TAKMA_AD)) {
+    if (m[1] !== 'require') sebepler.push(`createRequire takma adı (${m[1]}): çağrıları izlenemez, değişkene "require" adını verin`)
+  }
+  return [...new Set(sebepler)]
+}
+
+/** Yorumları siler; dizge içindeki `//` (URL) korunur (öncesinde `:` ya da tırnak varsa). */
+function yorumsuz(kaynak: string): string {
+  return kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/gm, '$1')
+}
+
+function yerelBelirtec(belirtec: string): boolean {
+  return belirtec.startsWith('./') || belirtec.startsWith('../') || belirtec.startsWith('@/')
+}
+
+/** Yerel belirteci kökteki var olan dosyaya çözer (`@/` = `src/`); bulunamazsa null. */
+function belirteciCozumle(kok: string, kimden: string, belirtec: string): string | null {
+  const taban = belirtec.startsWith('@/') ? path.posix.join('src', belirtec.slice(2)) : path.posix.join(path.posix.dirname(kimden), belirtec)
+  if (taban.startsWith('..') || path.posix.isAbsolute(taban)) return null
+  const adaylar = [taban, ...COZUM_UZANTILARI.map((u) => `${taban}${u}`), ...COZUM_UZANTILARI.map((u) => `${taban}/index${u}`)]
+  for (const aday of adaylar) {
+    try {
+      if (statSync(path.join(kok, aday)).isFile()) return aday
+    } catch {
+      /* bu aday yok */
+    }
+  }
+  return null
+}
+
+/** `vitest*` kök dosyalarından başlayarak yerel yükleme kapanımı. `kanitlanamayan`: dinamik yükleme ve çözülemeyen yerel belirteçler. */
+function kosumKapanimi(kok: string): { dosyalar: string[]; kanitlanamayan: string[] } {
+  const sira = readdirSync(kok).filter((a) => /^vitest.*\.[cm]?[jt]sx?$/.test(a) && statSync(path.join(kok, a)).isFile())
+  const gorulen = new Set<string>()
+  const kanitlanamayan: string[] = []
+  while (sira.length > 0) {
+    const yol = sira.shift() as string
+    if (gorulen.has(yol)) continue
+    gorulen.add(yol)
+    if (!KOD_UZANTILARI.some((u) => yol.endsWith(u))) continue
+    const kaynak = yorumsuz(readFileSync(path.join(kok, yol), 'utf8'))
+    for (const sebep of dinamikSebepler(kaynak)) kanitlanamayan.push(`${yol}: ${sebep}`)
+    for (const desen of SABIT_BELIRTEC_DESENLERI) {
+      for (const eslesme of kaynak.matchAll(desen)) {
+        const belirtec = eslesme[2]
+        if (!yerelBelirtec(belirtec)) continue
+        const cozulen = belirteciCozumle(kok, yol, belirtec)
+        if (cozulen === null) kanitlanamayan.push(`${yol}: yerel belirteç çözülemedi (${belirtec})`)
+        else if (!gorulen.has(cozulen)) sira.push(cozulen)
+      }
+    }
+  }
+  return { dosyalar: [...gorulen].sort(), kanitlanamayan: [...new Set(kanitlanamayan)].sort() }
+}
+
+function kureselOlmayanlar(dosyalar: string[], girdiler: readonly string[]): string[] {
+  return dosyalar.filter((y) => M.kureselGirdiNedeni(y, girdiler) === null)
+}
+
+describe('INV-TEST-SEC-1 · 7. koşum kapanımı: her vitest koşumunda yüklenen yerel dosyalar KÜRESEL girdidir (kaydedici ana süreci görmez)', () => {
+  it('GERÇEK ağaç: `vitest*` kök dosyalarının yerel kapanımı küresel listede; dinamik ya da çözülemeyen yükleme YOK', () => {
+    const k = kosumKapanimi(KOK)
+    expect(k.kanitlanamayan, 'kapanım kanıtlanamıyor: yüklemeyi sabit metne çevirin ya da dosyayı küresel listeye elle ekleyip bu kapıyı güncelleyin').toEqual([])
+    // yürüyüşün gerçekten çalıştığını kanıtlar: boş ya da eksik kapanım sessizce yeşil olmasın
+    for (const beklenen of ['vitest.config.ts', 'vitest.global-setup.ts', 'vitest.setup.ts', 'vitest-setup.tsx', 'scripts/board/vitest-defter-ortami.cjs', 'scripts/ci/dunya-durumu.cjs']) {
+      expect(k.dosyalar, `kapanımda ${beklenen} olmalı`).toContain(beklenen)
+    }
+    expect(
+      kureselOlmayanlar(k.dosyalar, M.KURESEL_GIRDILER),
+      'her koşumda yüklenen bu dosyalar KURESEL_GIRDILER listesinde (scripts/ci/test-sec.cjs) ve KURESEL_ORNEKLER tablosunda (bu dosya) yok: değişince yalnız kendi testi seçilir, oysa HER koşum etkilenir',
+    ).toEqual([])
+  })
+
+  it('kapı vakumlu değil: listeden `scripts/board/vitest-defter-ortami.cjs` çıkarılırsa kapanım denetimi o dosyayı kapsanmayan olarak YAKALAR', () => {
+    const k = kosumKapanimi(KOK)
+    const eksik = M.KURESEL_GIRDILER.filter((g) => g !== 'scripts/board/vitest-defter-ortami.cjs')
+    expect(kureselOlmayanlar(k.dosyalar, eksik)).toEqual(['scripts/board/vitest-defter-ortami.cjs'])
+  })
+
+  it('yürüyüş varsayımı: vitest.config.ts "@" takma adı hâlâ ./src ve globalSetup/setupFiles köke göreli dosya adlarıdır', () => {
+    const yapilandirma = readFileSync(path.join(KOK, 'vitest.config.ts'), 'utf8')
+    expect(yapilandirma).toMatch(/"@"\s*:\s*path\.resolve\(__dirname,\s*"\.\/src"\)/)
+    expect(yapilandirma).toMatch(/globalSetup:\s*\[\s*'vitest\.global-setup\.ts'\s*\]/)
+    expect(yapilandirma).toMatch(/setupFiles:\s*\[\s*'vitest\.setup\.ts',\s*'vitest-setup\.tsx'\s*\]/)
+  })
+
+  describe('yürüyüş sentetik ağaçta', () => {
+    function agac(dosyalar: Record<string, string>): string {
+      const kok = mkdtempSync(path.join(tmpdir(), 'kosum-kapanimi-'))
+      for (const [yol, icerik] of Object.entries(dosyalar)) {
+        mkdirSync(path.dirname(path.join(kok, yol)), { recursive: true })
+        writeFileSync(path.join(kok, yol), icerik)
+      }
+      return kok
+    }
+
+    it('import from, yan etkili import, dinamik import("..."), require, createRequire(...)("..."), export * from; alias @/ ve index; özyinelemeli; döngü sonlanır', () => {
+      const kok = agac({
+        'vitest.config.ts': "import a from './lib/a'\nimport './lib/yan'\ncreateRequire(import.meta.url)('./lib/b.cjs')\nexport * from './lib/c'\n",
+        'vitest.global-setup.ts': "const require = createRequire(import.meta.url)\nexport default () => require('./scripts/g.cjs')\nawait import('./lib/dinamik-sabit')\n",
+        'vitest.setup.ts': "import x from '@/ortak'\nimport { y } from './lib/klasor'\n",
+        'lib/a.ts': "import b from './b.cjs'\nexport default b\n",
+        'lib/b.cjs': "const a = require('./a')\nmodule.exports = a\n",
+        'lib/yan.ts': 'export {}\n',
+        'lib/c.ts': "export { z } from './d.json'\n",
+        'lib/d.json': '{}\n',
+        'lib/dinamik-sabit.ts': 'export {}\n',
+        'lib/klasor/index.ts': 'export const y = 1\n',
+        'scripts/g.cjs': "module.exports = require('./h.cjs')\n",
+        'scripts/h.cjs': "const fs = require('node:fs')\nmodule.exports = fs\n",
+        'src/ortak.ts': 'export default 1\n',
+      })
+      const k = kosumKapanimi(kok)
+      expect(k.kanitlanamayan).toEqual([])
+      expect(k.dosyalar).toEqual(
+        ['lib/a.ts', 'lib/b.cjs', 'lib/c.ts', 'lib/d.json', 'lib/dinamik-sabit.ts', 'lib/klasor/index.ts', 'lib/yan.ts', 'scripts/g.cjs', 'scripts/h.cjs', 'src/ortak.ts', 'vitest.config.ts', 'vitest.global-setup.ts', 'vitest.setup.ts'].sort(),
+      )
+    })
+
+    it('yorumdaki require/import SAYILMAZ; node: yerleşikleri ve çıplak paket adları yerel değildir; dizge içindeki // korunur', () => {
+      const kok = agac({
+        'vitest.config.ts': "// require('./yorumda-yok')\n/* import './blok-yorum' */\nimport fs from 'node:fs'\nimport react from '@vitejs/plugin-react'\nimport v from 'vitest/config'\nconst u = 'https://ornek.dev/x' // import('./satir-sonu')\nrequire('./gercek')\n",
+        'gercek.cjs': 'module.exports = 1\n',
+      })
+      const k = kosumKapanimi(kok)
+      expect(k.dosyalar).toEqual(['gercek.cjs', 'vitest.config.ts'])
+      expect(k.kanitlanamayan).toEqual([])
+    })
+
+    it.each([
+      ['require(değişken)', "const ad = 'x'\nrequire(ad)\n", /dinamik yükleme/],
+      ['import(değişken)', 'const ad = x\nawait import(ad)\n', /dinamik yükleme/],
+      ['require(şablon ${})', 'require(`./x/${ad}.cjs`)\n', /dinamik yükleme/],
+      ['require(birleştirme)', "require('./x/' + ad)\n", /dinamik yükleme/],
+      ['require.resolve(değişken)', 'require.resolve(ad)\n', /dinamik yükleme/],
+      ['import(birleştirme)', "await import('./x/' + ad)\n", /dinamik yükleme/],
+      ['createRequire(...)(değişken)', 'createRequire(import.meta.url)(ad)\n', /dinamik yükleme: createRequire/],
+      ['createRequire(...)(birleştirme)', "createRequire(import.meta.url)('./x/' + ad)\n", /dinamik yükleme: createRequire/],
+      ['createRequire takma adı (r)', "const r = createRequire(import.meta.url)\nr('./x.cjs')\n", /createRequire takma adı \(r\)/],
+      ['olmayan yerel dosya', "import x from './yok-boyle-dosya'\n", /çözülemedi \(\.\/yok-boyle-dosya\)/],
+      ['olmayan alias', "import x from '@/yok/boyle'\n", /çözülemedi \(@\/yok\/boyle\)/],
+      ['kökün dışına çıkan belirteç', "import x from '../../disarida'\n", /çözülemedi \(\.\.\/\.\.\/disarida\)/],
+    ] as const)('%s → kanıtlanamaz (kapıyı KIRMIZI yapar, sessizce atlanmaz)', (_ad, icerik, mesaj) => {
+      const kok = agac({ 'vitest.config.ts': icerik })
+      const k = kosumKapanimi(kok)
+      expect(k.kanitlanamayan.join('\n')).toMatch(mesaj)
+    })
+
+    it('giriş yalnız `vitest*` KÖK kod dosyaları: vitest.config.md, alt dizindeki vitest.setup.ts ve başka kök dosyalar yürünmez', () => {
+      const kok = agac({
+        'vitest.config.md': "require('./yok-ama-yurunmez')\n",
+        'baska.ts': "import './x'\n",
+        'vitest.setup.ts': 'export {}\n',
+        'alt/vitest.setup.ts': "import './x'\n",
+      })
+      expect(kosumKapanimi(kok).dosyalar).toEqual(['vitest.setup.ts'])
+    })
   })
 })
