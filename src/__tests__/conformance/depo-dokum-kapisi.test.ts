@@ -709,6 +709,9 @@ describe('INV-DEPO-DOKUM-1 · R1 kişisel alan adı DOLU değerle (JSON/JSONL/CS
     expect(kapi.dosyaDegerlendir('a.json', 'kayıt listesi aşağıdadır, dikkat:\n[{ "id": 1 }]').olculemedi.length).toBe(1)
     expect(kapi.dosyaDegerlendir('a.json', '{ "a": 1 };').olculemedi).toEqual([])
     expect(kapi.dosyaDegerlendir('a.json', '{ "a": 1 }\n\n  ').olculemedi).toEqual([])
+    // sayım BOŞLUK/NUL/BOM hariç karakterlere bakar: çöp yolundan (düz ayrıştırma başarısız) geçen ve çoğu boşluk olan artık yanlış alarm vermez
+    expect(kapi.dosyaDegerlendir('a.json', `{ "a": 1 };${' '.repeat(60)}\n\n`).olculemedi).toEqual([])
+    expect(kapi.dosyaDegerlendir('a.json', `{ "a": 1 };${' '.repeat(60)}\n\n${'x'.repeat(40)}`).olculemedi.length).toBe(1)
   })
 
   it('N2: baş/son çöpün içindeki kayıt ham taramaya girer (ölçülemedi yanında R1 de çıkar)', () => {
