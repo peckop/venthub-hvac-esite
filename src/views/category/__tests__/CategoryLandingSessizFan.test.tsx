@@ -95,14 +95,14 @@ function aile(slug: string): FamilyListItem {
   }
 }
 
-describe('sessiz fan anlatısı + sihirbazı: eski ve yeni aile slug\'ı', () => {
-  it('ESKİ slug (migration öncesi): anlatı açık, sihirbaz eski slug ile beslenir', () => {
+describe('sessiz fan anlatısı + sihirbazı: aile slug\'ı', () => {
+  it('URN-53: ESKİ slug artık seri DEĞİL (geçiş köprüsü kaldırıldı): anlatı ve sihirbaz açılmaz', () => {
     render(<CategoryLanding category={kategori} families={[aile('vortice-lineo'), aile('vortice-lineo-quiet')]} />)
-    expect(screen.queryByTestId('SilentFanProblem')).not.toBeNull()
-    expect(screen.getByTestId('sessiz-fan-sihirbazi').getAttribute('data-aile')).toBe('vortice-lineo-quiet')
+    expect(screen.queryByTestId('SilentFanProblem')).toBeNull()
+    expect(screen.queryByTestId('sessiz-fan-sihirbazi')).toBeNull()
   })
 
-  it('YENİ slug (migration sonrası): anlatı açık, sihirbaz YENİ slug ile beslenir', () => {
+  it('YENİ slug (#1352 sonrası): anlatı açık, sihirbaz YENİ slug ile beslenir', () => {
     render(<CategoryLanding category={kategori} families={[aile('vortice-lineo-quiet-sessiz-kanal-fanlari')]} />)
     expect(screen.queryByTestId('SilentFanProblem')).not.toBeNull()
     expect(screen.getByTestId('sessiz-fan-sihirbazi').getAttribute('data-aile')).toBe('vortice-lineo-quiet-sessiz-kanal-fanlari')

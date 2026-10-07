@@ -133,7 +133,7 @@ for (const b of [...belgeler.values()].sort((x, y) => x.dosya.localeCompare(y.do
     if (marka && slug.startsWith(marka)) {
       if (slug === aday) { eslesen.push([a, 'dizin adi tam']); continue }
       if (dizinSon && slug.startsWith(aday + '-')) { eslesen.push([a, 'dizin adi on ek']); continue }
-      // Kısa aile simgesi (`at`, `dd`): dizin `radyal-fanlar-at` ↔ slug `nicotra-gebhardt-at`.
+      // Kısa aile simgesi (`at`, `dd`): dizin `radyal-fanlar-at` ↔ slug `nicotra-gebhardt-at-cift-emisli-radyal-fanlar`.
       // 3-harf tekillik şartı bunları eliyordu; marka önkoşulu burada zaten sağlandığı için
       // iki harflik simgeye bu kademede güvenilebilir.
       // SINIR: yalnız KISA AİLE SİMGESİ (at · dd · adh · rdh · fc102). Uzun/genel son ekler

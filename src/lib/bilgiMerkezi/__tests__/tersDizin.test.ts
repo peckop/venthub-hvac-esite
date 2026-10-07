@@ -64,7 +64,7 @@ describe('ters dizin — kategori/aile → rehber', () => {
       ilgiliRehberler(h, 'tr', 3, YAZILAR, false).map((r) => r.href)
     const adres = '/tr/bilgi-merkezi/frekans-konvertoru-nedir'
     expect(tr('vh:kategori/frequency-converters')).toContain(adres)
-    for (const aile of ['danfoss-fc51', 'danfoss-fc101', 'danfoss-fc102'] as const) {
+    for (const aile of ['danfoss-vlt-micro-drive-fc-51', 'danfoss-vlt-hvac-basic-drive-fc-101', 'danfoss-vlt-hvac-drive-fc-102'] as const) {
       expect(tr(`vh:aile/${aile}`)).toContain(adres)
     }
   })

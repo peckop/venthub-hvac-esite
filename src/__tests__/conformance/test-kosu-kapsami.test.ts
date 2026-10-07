@@ -212,6 +212,8 @@ const CI_TEST_ADIMI = [
   "  if: steps.ayna.outputs.atla != 'true'",
   '  env:',
   "    VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}",
+  // ALT-38c: V8 bayt kodu önbelleği (yalnız hız; süzgeç DEĞİL: hiçbir test dışlanmaz). Dizin runner geçici alanında, `Node derleme önbelleği` adımıyla geri yüklenir.
+  '    NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache',
   '  run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log',
 ]
 /** `Test` adımı `steps.ayna.outputs.atla` ile atlanabilir: ayna adımı master push'ta ÇALIŞMAMALI (yoksa tam paket sessizce atlanır). */
@@ -794,7 +796,7 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     expect(ciYmlHatalari(degistir(ciN, /(tee ci-test\.log)/, '$1 # satır sonu yorumu')), 'ci.yml: satır sonu yorumu').toEqual([])
     expect(ciYmlHatalari(degistir(ciN, /(- name: Test\n)/, '$1        # arada yorum\n\n')), 'ci.yml: araya yorum ve boş satır').toEqual([])
     expect(
-      ciYmlHatalari(degistir(ciN, /(- name: Test\n)(\s+if: [^\n]+\n)(\s+env:\n\s+VENTHUB_DUNYA_DURUMU: [^\n]+\n)/, '$1$3$2')),
+      ciYmlHatalari(degistir(ciN, /(- name: Test\n)(\s+if: [^\n]+\n)(\s+env:\n\s+VENTHUB_DUNYA_DURUMU: [^\n]+\n\s+NODE_COMPILE_CACHE: [^\n]+\n)/, '$1$3$2')),
       'ci.yml: if ve env sırası değişir',
     ).toEqual([])
     expect(cronHatalari(degistir(dunyaN, /- cron: '[^']+'/, "$& # her 6 saatte")), 'dunya-durumu.yml: cron satırında yorum').toEqual([])

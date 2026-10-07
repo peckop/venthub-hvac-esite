@@ -1,5 +1,5 @@
 {
-  "not": "KAPALI KİP (NEXT_PUBLIC_ADRES_DILI yok) çıktıları; OPS-52 PR-C1 işe başlamadan ÖNCE üretildi (HEAD 407c42fe8).",
+  "not": "KAPALI KİP (NEXT_PUBLIC_ADRES_DILI yok) çıktıları; OPS-52 PR-C1 işe başlamadan ÖNCE üretildi (HEAD 407c42fe8). | BİLİNÇLİ YENİLEME: #1686, yeni marka Casals (tr/en marka satırı; Flexiva ürünsüz olduğu için haritada YOK), OPS onayı 10-06. Başka satır değişmedi.",
   "localizedHref": {
     "tr": {
       "home()": "/tr",
@@ -321,6 +321,10 @@
         "alternates": null
       },
       {
+        "url": "http://localhost:3000/tr/brands/casals",
+        "alternates": null
+      },
+      {
         "url": "http://localhost:3000/tr/brands/seat",
         "alternates": null
       },
@@ -545,6 +549,15 @@
         }
       },
       {
+        "url": "http://localhost:3000/tr/brands/casals",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/casals",
+            "en": "http://localhost:3000/en/brands/casals"
+          }
+        }
+      },
+      {
         "url": "http://localhost:3000/tr/brands/seat",
         "alternates": {
           "languages": {
@@ -586,6 +599,15 @@
           "languages": {
             "tr": "http://localhost:3000/tr/brands/avens",
             "en": "http://localhost:3000/en/brands/avens"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/casals",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/casals",
+            "en": "http://localhost:3000/en/brands/casals"
           }
         }
       },

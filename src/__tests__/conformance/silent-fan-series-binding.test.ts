@@ -70,7 +70,7 @@ function jsxProp(sf: ts.SourceFile, eleman: string, prop: string): ts.JsxAttribu
 describe('INV-SILENTFAN-SERI-1 — anlatı ve sihirbaz aynı SERİye bağlı', () => {
   const gorunum = ayrıştır(GORUNUM, ts.ScriptKind.TSX)
 
-  it('SABİT — seri kimlikleri tek bir yerde, dizgi değişmezi dizisi olarak yaşar; İKİ slug da var', () => {
+  it('SABİT — seri kimlikleri tek bir yerde, dizgi değişmezi dizisi olarak yaşar; yalnız YENİ slug var', () => {
     const sabit = degiskenBildirimi(gorunum, 'SESSIZ_FAN_SERILERI')
     expect(sabit, 'SESSIZ_FAN_SERILERI sabiti bulunamadı').not.toBeNull()
     // `[...] as const` → AsExpression içindeki dizi değişmezi.
@@ -78,9 +78,9 @@ describe('INV-SILENTFAN-SERI-1 — anlatı ve sihirbaz aynı SERİye bağlı', (
     if (dizi && ts.isAsExpression(dizi)) dizi = dizi.expression
     expect(dizi && ts.isArrayLiteralExpression(dizi), 'sabit bir dizgi dizisi olmalı').toBe(true)
     const degerler = (dizi as ts.ArrayLiteralExpression).elements.map((e) => (ts.isStringLiteral(e) ? e.text : null))
-    // REC-300 Faz 1-B (#1352): kod ile migration aynı anda canlıya çıkmaz → eski VE yeni slug.
-    // Biri düşerse migration'ın önünde ya da arkasında anlatı ve sihirbaz sessizce kalkar.
-    expect(degerler).toEqual(['vortice-lineo-quiet', 'vortice-lineo-quiet-sessiz-kanal-fanlari'])
+    // URN-53: #1352 canlıda ölçüldü, geçiş dönemindeki eski slug kaldırıldı. Yeni slug düşerse anlatı ve
+    // sihirbaz sessizce kalkar; eski slug geri gelirse bayat bir köprü yeniden doğar.
+    expect(degerler).toEqual(['vortice-lineo-quiet-sessiz-kanal-fanlari'])
   })
 
   it('TETİKLEYİCİ — seri, SERİ listesinden hesaplanır, kategori slugundan DEĞİL', () => {

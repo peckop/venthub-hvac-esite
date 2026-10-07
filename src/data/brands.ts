@@ -22,6 +22,18 @@
  * Kapı: INV-MARKA-KAYNAK-1 (src/data/__tests__/markaKaynagi.test.ts) — listeyi DB fikstürüne bağlar.
  * Yeni markanın metni üreticinin RESMÎ sitesinden alınır; kaynak URL kaydın üstünde yazılır,
  * doğrulanamayan alan (founded/headquarters) YAZILMAZ.
+ *
+ * OPS-51 (2026-10-04, karar 264 + 265): `casals` ve `flexiva` LİSTEYE DÖNDÜ (308'leri kalktı).
+ *  · `casals` AYRI MARKA (AVenS distribütör): 4 aile / 53 model DB'de `brands.casals`'a bağlandı
+ *    (migration 20261004120000). Metin YALNIZ doğrulanabilir bilgiden (Casals katalog baskısındaki
+ *    firma adresi ve Vortice Group şirketleri listesi; AVenS distribütörlüğü = karar 264). Eski metindeki
+ *    "140 yıl / en köklü / tercih edilen" ve 1881 kuruluş yılı KAYNAKSIZ olduğu için YAZILMADI.
+ *  · `flexiva` ürünü OLMAYAN marka. "Ürünsüz mü" bilgisi bu dosyada TUTULMAZ (statik `urunsuz` bayrağı KALKTI):
+ *    marka sayfası (noindex,follow + "teklif isteyin" cümlesi) ve site haritası kararı render/harita anında DB'deki
+ *    aktif ürün sayısından türer (`src/lib/seo/markaUrunDurumu.ts`); ürün girince sayfa kendiliğinden indekslenir ve
+ *    haritaya girer. INV-MARKA-KAYNAK-1 (e) fikstürde ürünsüz kalan listedeki marka için kapalı bir istisna listesi tutar.
+ *    Kaynak dizininde Flexiva için 0 sayfa var (ölçüldü 2026-10-04) → ülke/kuruluş/merkez/uzmanlık YAZILMADI
+ *    ve eski kaydın "patentli / global marka" iddiaları atıldı; metni Design yazacak, kaynağı gelince eklenir.
  */
 
 /** Dile göre çözülen metin. İki dil de ZORUNLU — eksik dil sessizce Türkçe göstermesin. */
@@ -31,7 +43,11 @@ export interface HVACBrand {
   name: string
   slug: string
   description: BrandText
-  country: BrandText
+  /**
+   * Menşei. İsteğe bağlı YALNIZ kaynağı doğrulanamayan ürünsüz markada (ülke YAZILMAZ);
+   * ürünü olan her markada zorunludur (INV-MARKA-I18N-1 ölçer: fikstürde aktif ürünü > 0 olan markada zorunlu).
+   */
+  country?: BrandText
   founded?: number
   headquarters?: BrandText
   website?: string
@@ -75,6 +91,22 @@ export const HVAC_BRANDS: HVACBrand[] = [
     headquarters: { tr: 'İstanbul', en: 'Istanbul' },
     website: 'https://www.avens.com.tr',
     specialty: { tr: 'Endüstriyel Klima Santralleri', en: 'Industrial Air Handling Units' }
+  },
+  {
+    // KAYNAK (2026-10-04): Vortice Industrial / Casals katalog baskısının firma adresi bloğu ("CASALS VENTILACIÓN
+    // AIR INDUSTRIAL S.L., Ctra. Camprodon, s/n, 17860 Sant Joan de les Abadesses (Girona) Spain", casals.com) ve aynı
+    // katalogdaki "VORTICE GROUP COMPANIES" listesi — <ingestor>/kaynak-dizini/sayfalar.jsonl. Distribütörlük
+    // (AVenS) = karar 264 (Recep). Kuruluş yılı ve "en köklü / 140 yıl" iddiası kaynakta YOK → yazılmadı.
+    name: 'Casals',
+    slug: 'casals',
+    description: {
+      tr: 'İspanya\'da Sant Joan de les Abadesses (Girona) merkezli endüstriyel fan markası; Vortice Group şirketlerinden biridir. Plug fan, Enkelfan EC plug, NIMUS ve NIMAX aileleri AVenS distribütörlüğüyle sunulur.',
+      en: 'An industrial fan brand based in Sant Joan de les Abadesses (Girona), Spain, and a Vortice Group company. Its plug fan, Enkelfan EC plug, NIMUS and NIMAX families are supplied through AVenS as distributor.'
+    },
+    country: { tr: 'İspanya', en: 'Spain' },
+    headquarters: { tr: 'Sant Joan de les Abadesses, Girona', en: 'Sant Joan de les Abadesses, Girona' },
+    website: 'https://www.casals.com',
+    specialty: { tr: 'Endüstriyel Fanlar', en: 'Industrial Fans' }
   },
   {
     // KAYNAK (2026-09-27): https://www.seat-ventilation.com/ (merkez adresi Verniolle, "Made in
@@ -123,6 +155,20 @@ export const HVAC_BRANDS: HVACBrand[] = [
     headquarters: { tr: 'Waldenburg', en: 'Waldenburg' },
     website: 'https://www.nicotra-gebhardt.com',
     specialty: { tr: 'Yüksek Verimli Santrifüj Fanlar', en: 'High-Efficiency Centrifugal Fans' }
+  },
+  {
+    // KAYNAK YOK (2026-10-04): kaynak dizininde Flexiva için 0 sayfa, DB'de ürün 0. Bu yüzden ülke / kuruluş / merkez /
+    // uzmanlık / web sitesi YAZILMADI; eski kaydın "Türkiye'nin global markası / patentli sızdırmazlık" cümleleri
+    // doğrulanamadığı için atıldı. `description` yalnız durumu söyler (olgu: marka kaydı var, ürün yok). Marka sayfasının
+    // asıl metnini Design yazacak; kaynak gelince bu kayıt tamamlanır. `description` ÜRÜN DURUMUNDAN BAĞIMSIZ yazıldı
+    // ("ürünleri henüz katalogda değil" cümlesi KALDIRILDI): ürün durumunu bu statik metin değil DB sayısı söyler
+    // (ürünsüzken sayfa/meta "teklif isteyin" cümlesini kendisi basar; ürün gelince statik "ürün yok" cümlesi yalan olurdu).
+    name: 'Flexiva',
+    slug: 'flexiva',
+    description: {
+      tr: 'Flexiva marka kaydı katalogda açıldı.',
+      en: 'The Flexiva brand record is open in the catalogue.'
+    }
   }
 ]
 

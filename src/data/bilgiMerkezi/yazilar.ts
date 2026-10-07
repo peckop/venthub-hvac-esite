@@ -56,7 +56,7 @@ export const YAZILAR: readonly RehberYazisi[] = [
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
     guncellemeTarihi: '2026-09-25',
-    urunler: ['vh:aile/danfoss-fc101', 'vh:aile/danfoss-fc102', 'vh:aile/danfoss-fc51'],
+    urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
         slug: 'frekans-konvertoru-nedir',
@@ -119,7 +119,7 @@ Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıl
 | Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] | Modele göre; ürün sayfasına bakınız |
 | Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] | Yerleşik PID kontrolü, pompa kademeleme [1] |
 
-Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-fc51), [FC 101](vh:aile/danfoss-fc101) ve [FC 102](vh:aile/danfoss-fc102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
+Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 101](vh:aile/danfoss-vlt-hvac-basic-drive-fc-101) ve [FC 102](vh:aile/danfoss-vlt-hvac-drive-fc-102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
 
 ## HVAC'a özel işlevler
 

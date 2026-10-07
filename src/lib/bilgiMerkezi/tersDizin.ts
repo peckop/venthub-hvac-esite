@@ -68,7 +68,7 @@ export function ilgiliRehberler(
 ): RehberBaglantisi[] {
   const dil = acikDil(lang, enYayin)
   if (!dil) return []
-  // Birden çok kimlik: yeniden adlandırılan ailenin eski slug'ı da sayılır (`eskiAileSluglari.ts`).
+  // Birden çok kimlik verilebilir (herhangi biri eşleşirse yazı döner).
   const aranan = typeof hedef === 'string' ? [hedef] : hedef
   return dildekiYazilar(dil, yazilar)
     .filter((y) => {
