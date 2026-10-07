@@ -1168,7 +1168,7 @@ function updateAyrinti(metin, cteDize = false) {
   const kapali = dizeleriKapat(metin)
   // 3. tur (N1): veri `SET` sağ tarafında değil, ifadenin başka yerindeki VALUES listesindeyse (`WITH d AS (VALUES ('x')) UPDATE ... FROM d`,
   // `UPDATE ... FROM (VALUES ('x')) v`) sağ taraf bir sütun/alt sorgu görünür; dize taşıyan VALUES varken atama hedefleri veri alır sayılır.
-  const degerListesi = cteDize || (/\bvalues\b/i.test(kapali) && /'_+'/.test(kapali))
+  const degerListesi = cteDize || (/\bvalues\b/i.test(kapali) && dizeLiteraliVar(kapali))
   const baslik = /^\s*update\s+(?:only\s+)?((?:"[^"]*"|[^\s(".]+)(?:\.(?:"[^"]*"|[^\s(".]+))*)/i.exec(kapali)
   if (!baslik) return null
   const setKonumu = ustSeviyeAnahtar(kapali, baslik[0].length, ['set'])
@@ -1214,7 +1214,7 @@ function insertAyrinti(metin, cteDize) {
   const son = sel < 0 ? 0 : bitis < 0 ? kapali.length : bitis
   const liste = sel < 0 ? '' : kapali.slice(baslangic, son)
   // Veri CTE'den ya da `FROM (VALUES ...)` alt sorgusundan akıyorsa SELECT listesi sütun adlarından ibarettir: dize TÜM ifadede aranır.
-  const dizeVar = cteDize || /'_+'/.test(kapali)
+  const dizeVar = cteDize || dizeLiteraliVar(kapali)
   const dizeAkisi = cteDize || bicim === 'with' || /\bvalues\b/i.test(kapali)
   if (!seciliVeriMi(liste) && !(dizeAkisi && dizeVar)) return null
   // Kolon listesi SELECT öğeleriyle HİZALANIR: yalnız DEĞER (literal) alan kolonlar veri alır (`auth.jwt() ->> 'email'` e-posta kolonuna
@@ -1228,8 +1228,17 @@ function insertAyrinti(metin, cteDize) {
 }
 
 /**
- * SELECT öğesi/listesi (dizeleri `_` ile doldurulmuş metin) VERİ literal'i taşıyor mu: boş olmayan bir dize literal'i VAR ve o literal bir JSON
- * anahtarı (`->> 'email'`, `-> 'k'`, `#>> '{a}'`) ya da `current_setting('k')` argümanı DEĞİL.
+ * Dollar-quote literal'i (`$$x$$`, `$etiket$x$etiket$`): `sqlBol` gövdeyi `$etiket$ $etiket$` biçimine BOŞALTIR; açılış ve kapanış işaretinin
+ * arasında tek boşluk kalır. Boş mu dolu mu ayırt edilemez, korumacı olarak literal sayılır (3. tur kendi taraması: `SELECT $$a@b$$` kaçıyordu).
+ */
+const DOLAR_LITERALI = /(\$(?:[A-Za-z_\x80-\xff][A-Za-z0-9_\x80-\xff]*)?\$) \1/
+
+/** Kapatılmış ifade metninde (dizeler `_` dolgulu) boş olmayan dize ya da dollar-quote literal'i var mı. */
+const dizeLiteraliVar = (kapali) => /'_+'/.test(kapali) || DOLAR_LITERALI.test(kapali)
+
+/**
+ * SELECT öğesi/listesi (dizeleri `_` ile doldurulmuş metin) VERİ literal'i taşıyor mu: boş olmayan bir dize (ya da dollar-quote) literal'i VAR
+ * ve o literal bir JSON anahtarı (`->> 'email'`, `-> 'k'`, `#>> '{a}'`) ya da `current_setting('k')` argümanı DEĞİL.
  */
 function seciliVeriMi(kapaliOge) {
   const re = /'_+'/g
@@ -1240,7 +1249,7 @@ function seciliVeriMi(kapaliOge) {
     if (/(?:->>|->|#>>|#>)$/.test(onceki) || /current_setting\($/i.test(onceki)) continue
     return true
   }
-  return false
+  return DOLAR_LITERALI.test(kapaliOge)
 }
 
 /**
@@ -1255,7 +1264,7 @@ function veriIfadesiAyrinti(ifade) {
     const kapali = dizeleriKapat(metin)
     const k = ustSeviyeAnahtar(kapali, 0, ['insert', 'update'])
     if (k < 0) return null // salt SELECT/DELETE: veri yazmaz
-    cteDize = /'_+'/.test(kapali)
+    cteDize = dizeLiteraliVar(kapali)
     metin = metin.slice(k)
   }
   if (/^\s*update\b/i.test(metin)) return updateAyrinti(metin, cteDize)

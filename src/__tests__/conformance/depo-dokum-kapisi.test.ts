@@ -505,6 +505,11 @@ describe('INV-DEPO-DOKUM-1 · R2 N1 (3. tur): INSERT ... SELECT, WITH önekli IN
     ["UPDATE public.venthub_orders SET customer_email = v.e FROM (VALUES ('a@ornek.test')) v(e) WHERE id = 1;", 'UPDATE ... FROM (VALUES ...)'],
     ["INSERT INTO public.venthub_orders SELECT 'x', 'a@ornek.test';", 'kolon listesiz SELECT, hassas tablo'],
     ["insert into   public.venthub_orders   as o   (customer_phone)   select   '0500 000 00 00'  ;", 'küçük harf ve bol boşluk'],
+    // dollar-quote literal'i: `sqlBol` gövdeyi `$etiket$ $etiket$` yapar; `'...'` arayan test bunu görmezdi (3. tur kendi taraması)
+    ['INSERT INTO public.venthub_orders (customer_email) SELECT $$a@ornek.test$$;', 'dollar-quote literal (SELECT)'],
+    ['INSERT INTO public.venthub_orders (customer_email) SELECT $q$a@ornek.test$q$;', 'etiketli dollar-quote literal (SELECT)'],
+    ['WITH d(e) AS (VALUES ($$a@ornek.test$$)) INSERT INTO public.venthub_orders (customer_email) SELECT e FROM d;', 'CTE VALUES içinde dollar-quote'],
+    ['UPDATE public.venthub_orders SET customer_email = v.e FROM (VALUES ($$a@ornek.test$$)) v(e) WHERE id = 1;', 'UPDATE ... FROM (VALUES dollar-quote)'],
   ])('KIRMIZI (R2): %s [%s]', (sql) => {
     expect(kurallar('tohum.sql', sql)).toEqual(['R2'])
   })
