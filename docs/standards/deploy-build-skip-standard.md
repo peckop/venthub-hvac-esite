@@ -44,11 +44,14 @@ tetikler**; yalnız §D3'te ADIYLA sayılan sınıf atlanır.
 | `scripts/board/**` | Şerit panosu araçları. Ölçüldü (2026-08-26): `package.json`, `next.config.mjs`, `vercel.json`, `.github/workflows/*` içinde `scripts/board` geçen **tek bir referans yok**. Pozitif kontrolle doğrulandı — aynı arama `scripts/setup-hooks` için referans **buluyor**. → D3.1 |
 | `scripts/hijyen/**` | Ağaç hijyeni araçları (kirli sayacı, ağaç-silme kapısı). Ölçüldü (2026-08-27): aynı arama, aynı dosyalar — `scripts/hijyen` geçen **0 referans**; pozitif kontrol `scripts/setup-hooks` için **1 referans** buluyor, yani arama gerçekten arıyor. Gerekçe `scripts/board/**` ile aynı sınıf. |
 | `.githooks/**` | Git kancalarının **kendisi** (kancaları kuran betik değil). Derleme hattıyla dolaylı bağı VAR ama üç ölçülmüş sebeple atlanabilir. → D3.1 |
+| `__tests__/**` · `*.test.{ts,tsx,cjs,mjs}` · `e2e/**` · `e2e-canli/**` | Test dosyaları (ALT-44, 2026-10-07). Ölçüldü: üretim kodu test dosyasından içe aktarmıyor (**0**; aynı arama test dosyalarında **23** buluyor), Pages Router yok, testler CI'da aynen koşar. **Test OLMAYAN src dosyaları ve `public/**` HER ZAMAN build.** → D3.2 |
 
 **Bilerek DIŞARIDA (build tetikler):** `supabase/migrations/**` — build'i doğrudan
 etkilemez, ama önizleme dağıtımı migration'ın vitrine yansımasını görmenin **tek**
 yoludur ve bu depoda migration merge'i prod'a **otomatik** uygulanır. Ayrıca
-`.gitignore`, `package.json`, tüm yapılandırma ve elbette `src/**`.
+`.gitignore`, `package.json`, tüm yapılandırma, `public/**` (statik varlık olduğu gibi
+yayınlanır, `.md` dahil: D3.2) ve elbette `src/**` (yalnız **test olmayan** dosyalar; test
+kalıpları D3.2).
 
 **Listeye ekleme kuralı:** yeni bir sınıf eklemek isteyen, "bu dosya türü derlemeye
 girmiyor" iddiasını **ölçerek** kanıtlar (import taraması + yapılandırma kontrolü) ve
@@ -95,6 +98,35 @@ INV-BUILD-SKIP bu iki tuzağı **adıyla** ölçer (`scripts/vercel-ignore-build
 `.githooksfake/pre-commit → BUILD`). Sabotaj sınavı **5/5**: kapsamı `scripts/*`'a
 genişletmek, eğik çizgiyi düşürmek, eklenen satırı sökmek ve ölçüm aracını körleştirmek
 — dördü de kırmızı verdi; bozulmamış hâl yeşil kaldı (sınav vacuous değil).
+
+### D3.2 — Test sınıfı ve `public/` kapısı (2026-10-07, ALT-44)
+
+**NİÇİN:** Vercel ücretsiz ekipte "Dağıtım Depolama" doldu (OPS, Vercel e-postası 10-07 14:49). Son 30 günde (09-07..10-07) master'a **620** commit girdi; bu cetvelin kuralları bunların **137'sini** (%22,1) atlatıyordu. Eksik bölge TAHMİNLE değil, **her commit'in kendi dosya listesiyle gerçek betik koşturularak** ölçüldü (eski betik ve yeni betik, `VERCEL_GIT_COMMIT_REF=master`, liste-dosyası kipi):
+
+| Kural kümesi | Atlanan commit (30 gün, 620) | Not |
+|---|---|---|
+| eski (D3 tablosu, D3.1'e kadar) | **137** (%22,1) | taban |
+| + test sınıfı (bu iş) | **269** (%43,4) | **+132**, geri kayma **0** (eski ATLA → yeni BUILD olan commit yok) |
+| (ölçüldü, EKLENMEDİ) + `scripts/<dizin>/` | 381 (%61,5) | +112; en büyük: `scripts/belge` +38, `icerik-hatti` +23, `db` +15, `seo` +11; AYRI karar (D3.1 "kapsam dar tutulur": her dizin için ölçüm + bekçi kolu) |
+| (ölçüldü, EKLENMEDİ) `supabase/functions/`, `tools/` | +1, +0 | kazanç ~0: sınıf eklemenin bedeli kazançtan büyük |
+
+⚠ Bunlar ÜST SINIRDIR (D14): her derleme başarılı ve taban hep güncel varsayılır; yoğun günde taban geride kalır ve oran düşer. Yeni atlanan dosyaların sınıfı (ölçüldü): **166** dosya `__tests__/` içinde, **5** dosya `e2e/` içinde; başka hiçbir yol yeni atlanmadı.
+
+**NEDEN GÜVENLİ — ölçülen iddia:** "derlemeye giren hiçbir dosya test dosyasından içe aktarmaz ve bir test dosyası rota olamaz".
+1. **İçe aktarma taraması (2026-10-07, `INV-BUILD-SKIP-TEST` bunu depo üzerinde HER koşuda yeniden ölçer):** üretim kodu (src içindeki test olmayan dosya + kök yapılandırmalar) içinde `__tests__` ya da `.test` içe aktaran dosya: **0** (statik `import`/`export … from`, `import()` ve `require()` biçimleri). **POZİTİF KONTROL:** aynı arama test dosyalarında **23** dosya buluyor, yani arama gerçekten arıyor; ayrıca sentetik satırlarla (bulunması ve bulunmaması gerekenler: `latest`, `@testing-library`, `.test-helper`) sınanır.
+2. **Pages Router YOK** (`src/pages`, `pages` yok; bekçi sabitler): `pages/` altındaki her dosya (test dahil) rota olurdu. App Router'da `__tests__` alt çizgili (private) klasördür ve `x.test.ts` özel dosya adı değildir.
+3. **Test dosyaları Vercel'in `postinstall` tip denetiminde görünür** (`tsconfig.json` `include` `**/*.ts(x)`; `postinstall` = `pnpm run type-check`); aynı denetim CI'da (`Type check`, zorunlu `ci`) HER PR'da koşar → bir test dosyasının tip hatası zaten master'a girmez. Atlama CI kapılarını **körleştirmiyor**: testler `test-shard` işlerinde aynen koşar; atlanan YALNIZ Vercel derlemesidir. (ÖN KOŞUL, D3.1'deki gibi: `ci.yml`'e yol filtresi eklenirse bu satır yeniden ölçülür.)
+
+**HER ZAMAN BUILD kalanlar (OPS şartı, bekçi kollarıyla sabit):** src içindeki test OLMAYAN her dosya (`src/test/setup.ts` dahil); `next.config.*`, `package.json`, kilit dosyası ve kök yapılandırmalar; build zinciri betikleri (`scripts/assert-node-major.mjs`, `scripts/setup-hooks.mjs`, `scripts/vercel-ignore-build.sh`; `package.json`'ın `install/postinstall/prepare/prebuild/build/vercel-build` zincirinde adı geçen her betik bekçide TÜRETİLİR ve BUILD olduğu doğrulanır); adında "test" geçen ama test olmayan dosyalar (`contest.ts`, `TestimonialCard.tsx`, `latest.ts`); `__tests__` adına benzeyen dizinler (`__tests__fake`, `__test__`); `.test.ts.bak`, `.test.json`, `.tests.ts`; `public/**` altındaki HER ŞEY. KARMA commit'te TEK bir test olmayan dosya bile varsa BUILD (D2: tek ilgili dosya yeter).
+
+**`public/` KAPISI (aynı PR, mevcut bir deliğin kapatılması):** `*.md` kuralı `public/` altını da kapsıyordu; `public/x.md` olduğu gibi YAYINLANIR (`/x.md` olarak sunulur), yani siteye dokunur. "Hiçbir kod `.md` import etmiyor" ölçümü (D3, ilk satır) KOD için geçerlidir, statik varlık için değil. `public/*` artık `*.md` ve test kalıplarının ÖNÜNDE `BUILD` döndürür (`case` ilk eşleşeni alır: SIRA bekçiyle sabittir). Ölçüm: bugün `public/` altında 1 `.md` var (`public/decoders/README.md`); eski kural bu dosyanın değişikliğini atlatırdı.
+
+**Kaldırılan kol:** REC-168'in "kip betiğinin kapısı (`src/**` atlanmaz) → BUILD" kolu `buildGerektiren`'den KALDIRILDI ve `atlanabilir` listesine taşındı (artık test sınıfı). O kolun korumak istediği şey (kapı değişirse kontrol koşsun) testlerin CI'da aynen koşmasıyla zaten güvencede.
+
+**Bekçi:** `build-skip-positive-logic.test.ts` — `buildGerektiren`'e 20, `atlanabilir`'e 13 yeni kol; yeni `INV-BUILD-SKIP-TEST` (içe aktarma taraması + pozitif kontrol, Pages Router yok, yaşam döngüsü betikleri BUILD).
+**Bozma (sabotaj) sınavı (2026-10-07):** 14 bozma, her biri AYRI uygulanıp yalnız bu kapı koşturuldu ve her seferinde `git checkout` ile geri alındı: **14/14 KIRMIZI, hayatta kalan 0.** Bozmalar: `public/` kapısını kaldırmak ya da `ATLA` döndürtmek; test desenini `*test*` ile genişletmek (`contest.ts`, `latest.ts` atlanırdı); `src/*` tümünü atlatmak; `*/__tests__/*` kalıbını `*__tests__*` yapmak; kökteki `__tests__` kuralını silmek; `e2e/`, `e2e-canli/`, `*.test.cjs`, `*.test.tsx` kurallarını tek tek bozmak; `scripts/*` tümünü atlatmak; varsayılan yönü `ATLA` yapmak (negatif liste); tüm test kurallarını kaldırmak; üretim dosyasına `__tests__` içe aktarması sokmak (`INV-BUILD-SKIP-TEST` kırmızı verir). Bozulmamış hâl yeşil kaldı. **Ölçüm hatası ve düzeltmesi:** ilk koşuda 3 bozma (kökteki `__tests__` kuralını silmek, varsayılan yönü `ATLA` yapmak, tüm test kurallarını kaldırmak) UYGULANAMADI: Windows çalışma kopyası CRLF olduğundan çok satırlı kalıp eşleşmedi ve koşucu bunları "atlandı" diye yazdı. Atlanan bozma ölçülmüş sayılmaz; koşucu satır sonunu algılayacak şekilde düzeltilip yalnız o üçü yeniden koşturuldu (3/3 kırmızı).
+
+**Dürüst sınır:** bu iş Vercel'in "Dağıtım Depolama" sayacını sıfırlamaz (saklama süresi ayarı proje sahibinindir; eski dağıtımlara dokunulmadı) ve Vercel'de yalnız 7 sürüm durduğu ölçüldüğü için sayacın Vercel tarafında takılı kalmış olması MUHTEMELDİR (OPS, 10-07). Bu iş yalnız yeni dağıtım üretim hızını yaklaşık yarıya indirir (üst sınır 137 → 269 atlanan).
 
 ## D4 — Karşılaştırma tabanı `VERCEL_GIT_PREVIOUS_SHA`, `HEAD^` DEĞİL
 
