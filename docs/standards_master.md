@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-10-07T11:03:04.237867+00:00
+compiled_at: 2026-10-07T11:09:59.356710+00:00
 total_compiled_files: 102
-source_commit: 4dfd81f6f
+source_commit: 1b8ab7e07
 source: ['docs/standards', 'docs/reference']
 ---
 
@@ -26443,7 +26443,8 @@ yönetildiğini söyler) · kural 8/9 (`tokens.js` SSOT, R3F).
 > `INV-CI-EDITED-1` → `src/__tests__/conformance/ci-edited-ayna.test.ts` ·
 > `INV-CI-EDITED-2` → `scripts/ci/__tests__/edited-ayna.test.ts` ·
 > `INV-DUNYA-SATIRI-1` → `src/__tests__/conformance/dunya-durumu-satiri.test.ts` ·
-> `INV-CI-SINIF-1`, `INV-CI-SINIF-2` ve `INV-CI-SINIF-3` → `src/__tests__/conformance/ci-degisiklik-sinifi.test.ts`
+> `INV-CI-SINIF-1`, `INV-CI-SINIF-2` ve `INV-CI-SINIF-3` → `src/__tests__/conformance/ci-degisiklik-sinifi.test.ts` ·
+> `INV-CI-SHARD-1` ve `INV-CI-SHARD-2` → `src/__tests__/conformance/ci-test-shard.test.ts`
 >
 > **Kapsam:** bu sürüm testlerin NEREDE koşacağını yönetir (§1–§5). Her test dosyasının KARNESİ (neyi koruyor, gerçekten
 > kırmızı veriyor mu, ortama bağlı mı, aynısını başka test koruyor mu) ve silme listesi kuralı işin ikinci teslimiyle (ALT-38b)
@@ -26468,7 +26469,7 @@ yer yazılıdır, yeni yerde gerçekten koştuğunu bir kapı doğrular, kırmı
 
 | Yer | Ne zaman | Hangi testler | Kırmızıda ne olur |
 |---|---|---|---|
-| PR kapısı (`ci` işinin Test adımı, `pull_request` olayı) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`) | zorunlu kontrol `ci` kırmızı, birleştirme durur |
+| PR kapısı (`pull_request` olayı: paralel `test-shard` işleri, §4.2; `ci` işinin Test adımı yalnız `edited` koşusunda) | PR açılınca ve her güncellemede | dünya durumu listesi DIŞINDAKİ hepsi (kip `dislan`), her dosya TAM BİR shard'da | kırmızı shard `ci`yi kırmızı yapar (son adım bekler), birleştirme durur |
 | master push (`ci` işi, aynı Test adımı) | master'a her birleşmede | TAM paket, liste dahil (kip boş) | master kırmızı; ⚠ aynı `concurrency` grubunda koşu iptal edilebilir (07-06..10-06: 1119 master koşusunun 419'u iptal), tek başına güvence DEĞİLDİR |
 | Zamanlı (`dunya-durumu.yml`) | 6 saatte bir (`23 */6 * * *`) ve elle | YALNIZ dünya durumu listesi (kip `yalniz`) | iş akışı kırmızı; PR'ı bloklamaz, kanca satırı `DUNYA:` her mesajda gösterir |
 | Yerel `pnpm test` | elle | TAM paket (kip boş) | geliştiricinin terminalinde |
@@ -26569,6 +26570,39 @@ dosya aktarırsa ya da dosya sisteminden okursa o hedef `tam` olmak zorundadır;
 **Önbellekler.** Next.js derleme önbelleği (`.next/cache`, Build ile AYNI koşul) ve Node V8 bayt kodu önbelleği (`NODE_COMPILE_CACHE`, yalnız Test adımı) yalnız hızdır;
 girdileri içerik özetiyle doğrulanır, sonucu değiştirmez.
 
+### 4.2 Test shard'ları: PR'da testler paralel işlerde koşar (ALT-38c-2)
+
+**Neden.** `ci` işinin Test adımı tek işte yaklaşık 4:30-6:30 dk sürüyordu (ALT-38c ölçümü, 2026-10-06; süre payının %90'ı dosya okuyan conformance kapılarıdır); belge ya da kod PR'ının zorunlu kontrolü bu süre kadar bekliyordu.
+Testler birbirinden bağımsız dosyalar olduğundan paralel koşabilir. Vitest'in kendi `--shard=i/N`'i dosya SAYISINA böler; tek dosyası 130 sn süren kanca testleri olduğundan dengesiz kalır.
+Bu yüzden her dosya bilinen süresiyle (`scripts/ci/test-sureleri.json`, yerel ölçüm) en az yüklü parçaya atanır.
+
+**Tasarım.**
+
+- `pull_request` olayında (`edited` HARİÇ) `ci` işindeki `Test` adımı KAPALIDIR; dört `test-shard (i/4)` işi paralel koşar. Her iş `node scripts/ci/test-shard.cjs --shard i --toplam 4` ile
+  `vitest list --filesOnly --json` çıktısını (koşan paketin kendi listesi, `dislan` kipi dahil) süreye göre LPT ile böler, kendi parçasını yazar; `VENTHUB_TEST_SHARD_DOSYALARI` ile `vitest.config.ts`
+  `include`ı o parçaya sınırlanır. Aynı girdi her işte aynı bölmeyi üretir (ortak durum yok). Ölçüm (yerel, 2026-10-07, `dislan` kipi): 625 dosya (+1 dünya durumu dosyası = tam paket 626), parçalar 154/157/157/157 dosya, birleşim = liste, kesişim 0, en yüklü/ortalama 1,00.
+- `ci` işinin SON adımı "Test shard sonuçları (bekle ve doğrula)" (`scripts/ci/test-shard-bekle.cjs`), AYNI koşunun AYNI denemesinin (`run_id` + `run_attempt`) `test-shard (i/N)` işlerinin HEPSİ `success`
+  olmadan yeşil vermez. Lint, tip, Deno kapıları ve Build shard'larla ÜST ÜSTE koşar, bu yüzden bekleme en sondadır. Zorunlu kontrol `ci` adıdır; `needs`'li ayrı bir toplayıcı iş YOKTUR
+  (`ci`yi bölmek `edited` aynasını ve testlerini yeniden yazdırırdı, aynası `ci` işinin adımlarını okur).
+- master push, elle koşum ve `edited` koşusunda `Test` `ci` içinde eskisi gibi TAM koşar (`Test`in koşulu shard olayının tersidir: `... && !(github.event_name == 'pull_request' && github.event.action != 'edited')`).
+  Böylece her olayda testler TAM BİR yerde koşar: PR'da shard'larda, öteki olaylarda `ci` içinde.
+
+**Güvenlik yönü: her belirsizlik KIRMIZIDIR.**
+
+- Kırmızı, iptal, atlanan ya da başka her bitmiş sonuç `success` değilse kırmızıdır ve kalan shard'lar beklenmeden hemen kırmızı verilir. Beklenen N shard'dan eksik olan (45 sn listeleme gecikmesi
+  toleransından sonra), fazladan ya da aynı adı taşıyan iş, 900 sn zaman aşımı, üst üste 3 kez okunamayan API ve geçersiz ortam kırmızıdır; doğrulanamayan shard yeşil sayılmaz.
+- Dağıtıcı ya doğru böler ya kırmızı verir: her dosya TAM BİR parçaya girer (birleşim = `vitest list`, kesişim 0); boş parça, tekrar eden dosya, geçersiz N, kök dışı ya da `..` içeren yol, boş liste,
+  bozuk süre dosyası ve çalışmayan `vitest list` çıkış kodu 1 verir. Süresi yazılmamış (yeni) dosya varsayılan ağırlıkla dağıtılır: kapsam kaybı sıfır.
+- Shard'ların Test adımı atlanamaz: `if`, `continue-on-error`, `|| true` taşımaz; kabuk açık `bash` (pipefail, `| tee` kırmızıyı yutmaz); `--shard "$SHARD"` matrix numarasını taşır, `--toplam`, matrix
+  sayısı, `ci`nin `SHARD_TOPLAM`ı ve iş adındaki `/N` AYNI sayıdır. Dünya durumu testleri shard'larda `dislan` kipiyle dışarıda kalır (§3): kapsam kanıtı shard'lar ∪ dünya durumu listesi = tam paket.
+
+**Yeniden koşum kuralı.** Bekleyici yalnız bu denemenin (`run_attempt`) iş listesine bakar; önceki denemenin yeşili bu denemeye TAŞINMAZ. Kısmi yeniden koşumda (yalnız kırmızı işler yeniden koşturulunca) iş listesinde
+görünmeyen shard "eksik" sayılır ve `ci` KIRMIZI olur: çare "Re-run all jobs" (ya da yeni commit). Bu bilinçli fail-closed seçimdir: eksik kanıt yeşil sayılmaz.
+
+**Sayıyı değiştirmek.** Shard sayısı dört yerde yazılıdır (matrix, `--toplam`, `ci`nin `SHARD_TOPLAM`ı, iş adındaki `/N`) ve `INV-CI-SHARD-1` hepsinin eşitliğini ölçer (adım adındaki `/N` yalnız etikettir).
+Sayı değişince bölme otomatik uyar; denge `INV-CI-SHARD-2`de en yüklü/ortalama <= 1,25 olarak ölçülür. Yeni ağır test dosyası eklenince `scripts/ci/test-sureleri.json`a süresi yazılırsa denge korunur;
+yazılmazsa dosya varsayılan ağırlıkla yine bir parçaya girer (kapsam kaybı olmaz, yalnız denge bozulabilir).
+
 ## 5. Kapılar ve görünen yüzler
 
 | Kapı | Dosya | Neyi ölçer |
@@ -26580,8 +26614,10 @@ girdileri içerik özetiyle doğrulanır, sonucu değiştirmez.
 | `INV-CI-EDITED-1` | `ci-edited-ayna.test.ts` | aynanın `ci.yml`'ye bağlantısı: ağır adımlar atlama koşulu taşır, hep koşan adımlar (kayıt kapısı, taban izi) taşımaz, iz adımı adı ve sırası, ayna adımı kayıt kapısından sonra ve karar betiğini TABAN kopyasından koşturur, `edited` ayrı grupta, izinler en az, tam geçmiş |
 | `INV-CI-EDITED-2` | `edited-ayna.test.ts` | aynanın karar mantığı ve GitHub çağrısının biçimi: atla yalnız aynı head ve AYNI taban izli tam koşu `success` iken; taban değişti, mekanizmaya dokunuldu, merge-ref biçimi bozuk ya da iz yoksa TAM; çağrı bütçesi |
 | `INV-DUNYA-SATIRI-1` | `dunya-durumu-satiri.test.ts` | kanca satırı: yalnız `master` sorgusu, eşikler, ölçüm hatasında ve 404'te bilinen kırmızının korunması, çözülemeyen damganın susmaması, dış metnin satıra girmemesi, kancaya bağlantı |
+| `INV-CI-SHARD-1` | `ci-test-shard.test.ts` | `test-shard` işinin ve `ci` bekleme adımının `ci.yml` bağı: iş yalnız `pull_request` (edited hariç) koşar, `needs`/`continue-on-error`/`environment` yok, `fail-fast: false`, kabuk `bash`, adımlarda `if`/`continue-on-error`/hata yutma yok; matrix sayısı = `--toplam` = `SHARD_TOPLAM` = iş adındaki `/N` ve bekleyicinin beklediği adlar; `--shard "$SHARD"`, `dislan`, `VENTHUB_TEST_SHARD_DOSYALARI`; bekleme adımı `ci`nin SON adımı (`if`, ortam, `run` tam eşitlik, `KOSU_DENEME` dahil); `ci` Test koşulu shard olayının tersi; `actions: read`; YAML'ın verdiği ortamla bekleyici sahte API'de çalışır. Sabotaj tablosu: 70 bozulma yakalanır |
+| `INV-CI-SHARD-2` | `ci-test-shard.test.ts`, `test-shard.test.ts`, `test-shard-bekle.test.ts` | bölmenin KAPSAMI gerçek `vitest list` ile: birleşim = liste, kesişim 0, her parça dolu, en yüklü/ortalama <= 1,25, belirlenimli ve girdi sırasından bağımsız, süresi bilinmeyen dosya da dağıtılır; shard'lar ∪ dünya durumu listesi = tam paket; `VENTHUB_TEST_SHARD_DOSYALARI` ile gerçek `vitest list` her parça için TAM o parçayı döner; özel karakterli yollar düz metin eşleşir. Birim: dağıtıcının ve bekleyicinin karar tabloları, her hata kırmızı |
 
-Yeni bir dünya durumu kaydı ya da yeni bir `ci` adımı ekleyen değişiklik bu altı kapıdan geçer; kapı kırmızıysa kayıt ya da sınıflandırma
+Yeni bir dünya durumu kaydı ya da yeni bir `ci` adımı ekleyen değişiklik bu kapılardan geçer; kapı kırmızıysa kayıt ya da sınıflandırma
 eksiktir, kapı gevşetilmez. Karne bölümü (§6 ve sonrası) ALT-38b ile bu tabloya kapı ekler.
 
 
