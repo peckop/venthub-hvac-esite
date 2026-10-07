@@ -207,9 +207,12 @@ const DUNYA_ADIMI = [
   '    VENTHUB_DUNYA_DURUMU: yalniz',
   '  run: pnpm test -- --run --reporter=dot --passWithNoTests 2>&1 | tee dunya-durumu.log',
 ]
+// ALT-38c-2 (FELSEFE DEĞİŞTİ): pull_request'te (edited HARİÇ) `ci` içindeki Test KAPALI; o olayda testler `test-shard` işlerinde koşar ve KAPSAM KANITI artık shard
+// bölmesidir (INV-CI-SHARD-2: bölmenin birleşimi `vitest list`in tamamıdır, parçalar ayrıktır; INV-CI-SHARD-1: işin ve bekleme adımının ci.yml'e bağı). Test adımı master push,
+// elle koşum ve `edited` koşusunda `ci` içinde eskisi gibi TAM koşar; bu kapının "master push'ta KOŞAR" sözü aynen geçerlidir (koşul push'ta açık: `!(false)`).
 const CI_TEST_ADIMI = [
   '  name: Test',
-  "  if: steps.ayna.outputs.atla != 'true'",
+  "  if: steps.ayna.outputs.atla != 'true' && !(github.event_name == 'pull_request' && github.event.action != 'edited')",
   '  env:',
   "    VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}",
   // ALT-38c: V8 bayt kodu önbelleği (yalnız hız; süzgeç DEĞİL: hiçbir test dışlanmaz). Dizin runner geçici alanında, `Node derleme önbelleği` adımıyla geri yüklenir.
@@ -769,10 +772,16 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
       ['ek tetikleyici', degistir(dunyaN, /(\n {2}workflow_dispatch:)/, '$1\n  push:\n    branches: [yok]'), /schedule/],
     ]
     for (const [ad, bozuk, beklenen] of cronBozuk) expect(cronHatalari(bozuk).join('\n'), `dunya-durumu.yml: ${ad}`).toMatch(beklenen)
-    const testAdimi = /(- name: Test\n\s+if: steps\.ayna\.outputs\.atla != 'true')/
+    // ALT-38c-2: Test'in `if:` satırı `... && !(<shard olayı>)` oldu; çapalar SATIRIN TAMAMINI yeniden yazar (önek çapası yarım bozma üretirdi).
+    // `ci` artık dosyadaki SON iş değil (arkasında `test-shard` işi var): "steps sonrasında" bozmaları `ci` işinin SONUNA, `test-shard:` başlığının önüne eklenir.
+    const testKosulu = /(- name: Test\n\s+)if: [^\n]+\n/
+    const testIf = (kosul: string): string => `$1if: ${kosul}\n`
+    const ciIsSonunaEkle = (n: string, ekle: string): string => degistir(n, /\n( {2}test-shard:\n)/, `\n${ekle}\n$1`)
     const ciBozuk: Array<[string, string, RegExp]> = [
-      ["Test adımı master push'ta atlanır", degistir(ciN, testAdimi, "$1 && github.event_name == 'pull_request'"), /"Test" adımı[\s\S]*FARKLI/],
-      ['Test adımı koşulu kalkar', degistir(ciN, /(- name: Test\n)\s+if: steps\.ayna\.outputs\.atla != 'true'\n/, '$1'), /"Test" adımı[\s\S]*FARKLI/],
+      ["Test adımı master push'ta atlanır", degistir(ciN, testKosulu, testIf("steps.ayna.outputs.atla != 'true' && github.event_name == 'pull_request'")), /"Test" adımı[\s\S]*FARKLI/],
+      ["Test adımı PR'da `edited` dahil kapanır (edited koşusunda testler hiçbir yerde koşmaz)", degistir(ciN, testKosulu, testIf("steps.ayna.outputs.atla != 'true' && github.event_name != 'pull_request'")), /"Test" adımı[\s\S]*FARKLI/],
+      ["Test adımı hiç kapanmaz (PR'da testler hem `ci` içinde hem shard'larda koşar)", degistir(ciN, testKosulu, testIf("steps.ayna.outputs.atla != 'true'")), /"Test" adımı[\s\S]*FARKLI/],
+      ['Test adımı koşulu kalkar', degistir(ciN, /(- name: Test\n)\s+if: [^\n]+\n/, '$1'), /"Test" adımı[\s\S]*FARKLI/],
       ['Test adımı continue-on-error', degistir(ciN, /(- name: Test\n)/, '$1        continue-on-error: true\n'), /"Test" adımı[\s\S]*FARKLI/],
       ['Test adımı || true', degistir(ciN, /(tee ci-test\.log)/, '$1 || true'), /"Test" adımı[\s\S]*FARKLI/],
       ['Test adımı daralır', degistir(ciN, /(run: pnpm test -- --run)/, '$1 src/__tests__/conformance'), /"Test" adımı[\s\S]*FARKLI/],
@@ -781,7 +790,8 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
       ['push yalniz başka dal', degistir(ciN, /branches: \[master\]/, 'branches: [main]'), /push tetikleyicisi/],
       ['push tetikleyicisi silinir', degistir(ciN, /\n {2}push:\n {4}branches: \[master\]/, ''), /push tetikleyicisi/],
       ['iş koşulu', degistir(ciN, /( {4}runs-on: ubuntu-latest\n)/, "$1    if: github.event_name == 'pull_request'\n"), /izin verilmeyen anahtar \[if\]/],
-      ['iş koşulu steps sonrasında', `${ciN.trimEnd()}\n    if: github.event_name == 'pull_request'\n`, /izin verilmeyen anahtar \[if\]/],
+      ['iş koşulu steps sonrasında', ciIsSonunaEkle(ciN, "    if: github.event_name == 'pull_request'"), /izin verilmeyen anahtar \[if\]/],
+      ['iş continue-on-error steps sonrasında', ciIsSonunaEkle(ciN, '    continue-on-error: true'), /izin verilmeyen anahtar \[continue-on-error\]/],
       ['iş continue-on-error', degistir(ciN, /( {4}runs-on: ubuntu-latest\n)/, '$1    continue-on-error: true\n'), /izin verilmeyen anahtar \[continue-on-error\]/],
       ['kabuk (pipefail) bloğu silinir', degistir(ciN, /\n {4}defaults:\n {6}run:\n {8}shell: bash/, ''), /varsayılan kabuk/],
       [
@@ -801,8 +811,12 @@ describe('INV-TEST-KOSU-1 — her test dosyası bir yerde koşar, çıkan testin
     ).toEqual([])
     expect(cronHatalari(degistir(dunyaN, /- cron: '[^']+'/, "$& # her 6 saatte")), 'dunya-durumu.yml: cron satırında yorum').toEqual([])
     // İş anahtarlarının sırası serbesttir: `defaults` bloğu `steps:` sonrasına taşınırsa KIRMIZI vermez (yanlış sebeple düşmesin).
-    const kabukSonda = (n: string) => `${degistir(n, /\n {4}defaults:\n {6}run:\n {8}shell: bash/, '').trimEnd()}\n    defaults:\n      run:\n        shell: bash\n`
-    expect(ciYmlHatalari(kabukSonda(ciN)), 'ci.yml: defaults steps sonrasında').toEqual([])
+    // ci.yml'de `ci` işi son iş değil (ALT-38c-2): taşınan blok `ci` işinin SONUNA (sonraki iş `test-shard:`ın önüne) konur; dunya-durumu.yml tek işlidir (dosya sonu).
+    const kabuksuz = (n: string) => degistir(n, /\n {4}defaults:\n {6}run:\n {8}shell: bash/, '')
+    const KABUK_SONDA = '\n    defaults:\n      run:\n        shell: bash'
+    const kabukSonda = (n: string) => `${kabuksuz(n).trimEnd()}${KABUK_SONDA}\n`
+    const ciKabukSonda = (n: string) => degistir(kabuksuz(n), /\n( {2}test-shard:\n)/, `${KABUK_SONDA}\n$1`)
+    expect(ciYmlHatalari(ciKabukSonda(ciN)), 'ci.yml: defaults steps sonrasında').toEqual([])
     expect(dunyaYmlHatalari(kabukSonda(dunyaN)), 'dunya-durumu.yml: defaults steps sonrasında').toEqual([])
   })
 
