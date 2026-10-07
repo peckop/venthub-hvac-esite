@@ -55,7 +55,8 @@
  * başlıksız/ayrıştırılamayan veri dosyası, argüman bilinmiyor, boş evren). ⭐2 de KIRMIZIDIR: ölçemeyen
  * kapı yeşil vermez (kancada da: Y1). ⚠Ölçemedim ile ihlal AYRI sonuçlardır.
  * ⭐TAVAN AŞIMI (nesne sayısı, okunacak bayt) TÜM TARAMAYI İPTAL ETMEZ (Y1): sığan nesneler taranır (ihlal varsa
- * çıkış 1), sığmayanlar "ölçülemedi" diye ADIYLA listelenir (çıkış 2). Aksi hâlde saldırgan önüne çöp yığıp asıl
+ * çıkış 1), sığmayanlar "ölçülemedi" diye listelenir (çıkış 2): okuma (bayt) tavanında blob'lar ADIYLA (ilk 20, kalanı sayıyla),
+ * nesne SAYISI tavanında kalan nesneler SAYIYLA (yüz binlerce nesneyi adlandırmak anlamsız). Aksi hâlde saldırgan önüne çöp yığıp asıl
  * dökümü taranmayan nesneler arasına itebilirdi.
  *
  * ⛔DEĞER BASMAZ: çıktıda yalnız DOSYA ADI, KURAL ADI, ALAN ADI ve SAYI vardır.
