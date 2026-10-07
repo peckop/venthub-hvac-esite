@@ -18,6 +18,14 @@ const dunyaDurumu = (createRequire(import.meta.url)("./scripts/ci/dunya-durumu.c
 // SESSİZ kalmaz: yazılmazsa "dışlama çalışıyor" sanılır ama her PR'da tam paket koşardı (ALT-38a B3).
 if (dunyaDurumu.uyari) process.stderr.write(`[dunya-durumu] ${dunyaDurumu.uyari}\n`)
 
+// ALT-38c-2: `VENTHUB_TEST_SHARD_DOSYALARI` (JSON liste dosyası) doluysa YALNIZ o listedeki test dosyaları koşar (ci.yml `test-shard` işleri; liste
+// scripts/ci/test-shard.cjs ile üretilir, parçaların birleşimi TÜM paketin listesidir: INV-CI-SHARD-2). Boşsa (yerel `pnpm test`, master push, edited,
+// zamanlı koşu) hiçbir şey değişmez. Bozuk/boş liste FIRLATIR: sessizce tam pakete ya da boş pakete düşmez.
+const shardInclude = (createRequire(import.meta.url)("./scripts/ci/test-shard.cjs") as {
+  ortamdanInclude: (env: NodeJS.ProcessEnv) => string[] | null
+}).ortamdanInclude(process.env)
+if (shardInclude && dunyaDurumu.include) throw new Error("VENTHUB_TEST_SHARD_DOSYALARI ile VENTHUB_DUNYA_DURUMU=yalniz birlikte kullanılamaz")
+
 export default defineConfig({
   plugins: [react() as PluginOption],
   resolve: {
@@ -55,6 +63,7 @@ export default defineConfig({
     // kilit hiç koşmadı ve kontrol listesinde yeşil göründü.
     exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/empirical_*.test.ts', 'tests/smoke/**', ...dunyaDurumu.exclude],
     ...(dunyaDurumu.include ? { include: dunyaDurumu.include } : {}),
+    ...(shardInclude ? { include: shardInclude } : {}),
     // Use threads pool (default) for better stability on Windows/CI
     pool: 'threads',
     testTimeout: 20000,
