@@ -120,7 +120,15 @@ Ham 43 kaçırma, günlükten çıkarılan kırık BAŞLIKLARLA sınıflanır (`
     `vitest.config.ts`, `vitest.global-setup.ts`, `vitest.setup.ts`, `vitest-setup.tsx`, `vitest.smoke.config.ts`, `scripts/ci/dunya-durumu.cjs`, `scripts/board/vitest-defter-ortami.cjs`). PR örnek ölçümü
     değişmedi: son 100 birleşmiş PR'da bu dosyaya dokunan tek PR zaten küresel girdili (#1652). Aynı mesajdaki ikinci not (sınıflayıcı önce seçicinin yanından yüklenir) bozulmadı ve bir testle sabitlendi.
 
-## 7 · Yeniden üretme
+## 7 · Birleşme sonrası güncelleme (master #1741 dahil, 16:25)
+
+Dalın ucuna master birleştirildi (#1728, #1737, #1739-#1741: sınıflayıcı, shard, ölçüm belgesi). Ağaç 632 test dosyasına çıktı (8 yeni master testi); harita aynı ağaçta yenilendi
+(`--yalniz` ile 13 dosya: 8 yeni + 5 bayat): **630/632 kayıtlı**, `belirsiz` 41 → **45** (yeni dört: `ci-degisiklik-sinifi` bash, `ci-test-shard` esbuild, `depo-dokum-kapisi` ve
+`depo-dokum-kapisi-uctan-uca` git), haritada olmayan 2 (tümüyle `describe.skip`), **her zaman koşan 47 (%7,4)**. `--kontrol`: sorun 0, bayat 0. B4 yeniden koşuldu: 171 değerlendirilebilir koşuda
+ham 43 aynı, **gerçek kaçırma 0** (ASIL koşularda ortalama seçilen dosya 194,0 → 198,7: yeni testler). PR örnek ölçümü (§3) yeniden koşulmadı; yöntem aynı, belge PR'ında seçilen dosya yaklaşık +4.
+Yukarıdaki sayılar (§1-§6) 2b0e252db tabanındaki 624 dosyalık ağacın ölçümüdür ve bu haliyle bırakıldı.
+
+## 8 · Yeniden üretme
 
 ```
 # PR örnekleri (CI süre modeliyle)
