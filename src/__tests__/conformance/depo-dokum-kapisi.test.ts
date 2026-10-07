@@ -90,8 +90,10 @@ describe('INV-DEPO-DOKUM-1 · kapının kendi sözleşmesi', () => {
     ])
   })
 
-  it('izin listesi yalnız R3, R5 ve R6 kurallarına açık (R1/R2/R4 ASLA)', () => {
-    expect([...kapi.IZIN_KURALLARI]).toEqual(['R3', 'R5', 'R6'])
+  // support/ ağaçtan silindi (ALT-39 son tur): R5'in (ödeme kartı parçası) TEK izinli örneği oydu. Kartın izin yolu artık YOK:
+  // gerçek kart parçası da, "sandbox" diye anılan da kırmızıdır; arındırılmış fikstür sıfır sayacıyla (00000d / 000d) geçer.
+  it('izin listesi yalnız R3 ve R6 kurallarına açık (R1/R2/R4/R5 ASLA)', () => {
+    expect([...kapi.IZIN_KURALLARI]).toEqual(['R3', 'R6'])
   })
 })
 
@@ -1361,25 +1363,23 @@ describe('INV-DEPO-DOKUM-1 · CI BAĞLAMA (adım var, erken, atlanmıyor, kırm�
 })
 
 // ══════════════════════════════════════════════════════════════════════════════════════════════
-// BİLİNÇLİ DEĞİŞİKLİK (ALT-39 2. tur, O1): 4 → 5. Beşinci kayıt, uzantıdan bağımsız SQLite imza taramasının gerçek ağaçtaki YENİ isabetidir
-// (`.cc/memory.db.pre_qwen.20260524_1830`; salt okuma ölçümü kanıt metninde). Artırmak bu satırı değiştirmek demektir.
-const IZIN_TAVANI = 5 // R6 x4 (izlenen SQLite dosyaları) + R5 x1 (sandbox kart örneği)
+// BİLİNÇLİ DEĞİŞİKLİK (ALT-39 son tur): 5 → 4. 2. turda O1 imza taraması beşinci kaydı getirmişti (`.cc/memory.db.pre_qwen.20260524_1830`,
+// R6); `support/` ağaçtan SİLİNİNCE R5 kaydı (tek ödeme kartı örneği) kalktı ve kartın izin yolu da kapandı. Dört kayıt da R6'dır
+// (izlenen SQLite dosyaları; salt okuma ölçümü kanıt metinlerinde). Artırmak bu satırı değiştirmek demektir.
+const IZIN_TAVANI = 4 // R6 x4 (izlenen SQLite dosyaları); R5 (ödeme kartı parçası) için izin YOK
 /** "Gerçek bir kayıt numarası YOK": numarayı OPS verir. Kanıt metinleri bu dürüst ifadeyi taşır (sahte numara değil). */
 const OPS_IFADESI = /ayrı kayıt önerilecek \(numarayı OPS verir\)/
 
 /** Bir izin kaydının sözleşmeye uyup uymadığı: sorun listesi (boş = uyuyor). */
 function izinKaydiSorunlari(e: IzinKaydi, izlenen: Set<string>): string[] {
   const s: string[] = []
-  if (!['R3', 'R5', 'R6'].includes(e.kural)) s.push('yalnız R3, R5 ve R6 izin alabilir (R1/R2/R4 ASLA)')
+  if (!['R3', 'R6'].includes(e.kural)) s.push('yalnız R3 ve R6 izin alabilir (R1/R2/R4/R5 ASLA)')
   if (/[*?[\]\\]/.test(e.yol) || e.yol.startsWith('/') || e.yol.startsWith('./')) s.push('yol düz dosya yolu olmalı (glob/kök/göreli yok)')
   if (!e.blob || !/^[0-9a-f]{40}$/.test(e.blob)) s.push('blob (git hash-object, 40 onaltılık hane) eksik: izin içeriğe bağlı olmalı')
   if (!e.neden || e.neden.trim().length < 20) s.push('neden eksik ya da çok kısa')
   if (e.kural === 'R3' && (!e.kanit || !/(sahte|örnek|ornek)/i.test(e.kanit))) s.push('R3 kanıtı "fiyat sahte/örnek" olduğunu göstermiyor')
   if (e.kural === 'R6' && (!e.kanit || !/içerik taraması/.test(e.kanit) || !/\d/.test(e.kanit) || !OPS_IFADESI.test(e.kanit))) {
     s.push('R6 kanıtı içerik taraması sayılarını ve "ayrı kayıt önerilecek (numarayı OPS verir)" ifadesini taşımıyor')
-  }
-  if (e.kural === 'R5' && (!e.kanit || !/sandbox/i.test(e.kanit) || !/\d/.test(e.kanit) || !OPS_IFADESI.test(e.kanit))) {
-    s.push('R5 kanıtı sandbox test kartı biçimini (sayıyla) ve "ayrı kayıt önerilecek (numarayı OPS verir)" ifadesini taşımıyor')
   }
   if (e.kanit && /ayrı kayıt: numara OPS/.test(e.kanit)) s.push('kanıt gerçek olmayan bir "kayıt: numara" ifadesi taşıyor (dürüst ifade: "ayrı kayıt önerilecek (numarayı OPS verir)")')
   if (!izlenen.has(e.yol)) s.push('yol izlenen ağaçta yok (yetim satır)')
@@ -1401,7 +1401,7 @@ function blobHash(icerik: Buffer): string {
   return String(r.stdout).trim()
 }
 
-describe('INV-DEPO-DOKUM-1 · İZİN LİSTESİ sınırlı (R3 / R5 / R6)', () => {
+describe('INV-DEPO-DOKUM-1 · İZİN LİSTESİ sınırlı (R3 / R6; R5 kart parçası için izin YOK)', () => {
   const izlenen = (): Set<string> => {
     const r = spawnSync('git', ['ls-files', '-z'], { cwd: KOK, env: temizOrtam(), encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 })
     return new Set((r.stdout ?? '').split('\0').filter(Boolean))
@@ -1415,7 +1415,6 @@ describe('INV-DEPO-DOKUM-1 · İZİN LİSTESİ sınırlı (R3 / R5 / R6)', () =>
   it('izin listesi BEKLENEN kayıtlarla aynı (sessiz izin yok): hangi dosya, hangi kural', () => {
     expect(kapi.IZIN_LISTESI.map((e) => `${e.kural} ${e.yol}`).sort()).toEqual(
       [
-        'R5 support/iyzico_support_payload.json',
         'R6 memory.db',
         'R6 registry/_legacy/registry.db',
         'R6 registry/registry.db',
@@ -1484,9 +1483,11 @@ describe('INV-DEPO-DOKUM-1 · İZİN LİSTESİ sınırlı (R3 / R5 / R6)', () =>
     expect(izinKaydiSorunlari({ ...ikili, kanit: 'içerik taraması yok sayı yok' }, ag)).not.toEqual([])
     expect(izinKaydiSorunlari({ ...ikili, kanit: 'tablo 2 sayı var' }, ag)).not.toEqual([])
     expect(izinKaydiSorunlari({ ...ikili, kanit: 'içerik taraması: 2 tablo' }, ag)).not.toEqual([])
+    // R5 (ödeme kartı parçası) için izin yolu YOK (ALT-39 son tur): iyi görünen kayıt (blob, neden, "sandbox" kanıtı, yol hepsi sözleşmeye uygun)
+    // yalnız kural R5 olduğu için reddedilir. Kural kümesi gevşerse (R5 geri gelirse) bu kol kırmızı olur.
     const kart: IzinKaydi = { yol: 'veri/kart.json', kural: 'R5', blob: 'd'.repeat(40), neden: 'destek yükü örneği, sandbox test kartı', kanit: 'sandbox kart biçimi: 5/5 örnek; ayrı kayıt önerilecek (numarayı OPS verir)' }
-    expect(izinKaydiSorunlari(kart, ag)).toEqual([])
-    expect(izinKaydiSorunlari({ ...kart, kanit: 'gerçek kart 5/5' }, ag)).not.toEqual([])
+    expect(izinKaydiSorunlari(kart, ag)).toEqual(['yalnız R3 ve R6 izin alabilir (R1/R2/R4/R5 ASLA)'])
+    expect(izinKaydiSorunlari({ ...iyi, kural: 'R5' }, ag)).not.toEqual([])
   })
 
   const fiyatDokumu = JSON.stringify(Array.from({ length: 6 }, (_, i) => ({ id: `p${i}`, price: 100 + i })))
@@ -1505,16 +1506,25 @@ describe('INV-DEPO-DOKUM-1 · İZİN LİSTESİ sınırlı (R3 / R5 / R6)', () =>
     expect(b.izinliler).toEqual([])
   })
 
-  it('mekanik: R6 ve R5 izin kayıtları o DOSYAYI muaf tutar (kural eşleşmeli: R3 kaydı R6 isabetini tutmaz)', () => {
+  it('mekanik: R6 izin kaydı o DOSYAYI muaf tutar (kural eşleşmeli: R3 kaydı R6 isabetini tutmaz)', () => {
     const a = kapi.tara({ dosyalar: ['veri/yerel.db'], oku: () => null, izin: [{ yol: 'veri/yerel.db', kural: 'R6', blob: BLOB_A }], blobOf: () => BLOB_A })
     expect(a.ihlaller).toEqual([])
     expect(a.izinliler.map((k) => k.kural)).toEqual(['R6'])
     const b = kapi.tara({ dosyalar: ['veri/yerel.db'], oku: () => null, izin: [{ yol: 'veri/yerel.db', kural: 'R3', blob: BLOB_A }], blobOf: () => BLOB_A })
     expect(b.ihlaller.map((k) => k.kural)).toEqual(['R6'])
+  })
+
+  // ALT-39 son tur: R5 (ödeme kartı parçası) İZİN ALMAZ. Tek izinli örnek (`support/`) ağaçtan silindi; kayıt yazılsa, yol ve blob
+  // tam eşleşse de kapı kırmızı kalır. (Arındırılmış fikstür sıfır sayacı taşır ve R5'e hiç takılmaz: izne ihtiyacı yok.)
+  it('mekanik: R5 (kart parçası) İZİN ALMAZ: kayıt R5 yazsa da, yol ve blob eşleşse de KIRMIZI; support/ benzeri dosya geri gelirse kapı yakalar', () => {
     const kart = JSON.stringify({ binNumber: GIZLI_BIN, lastFourDigits: GIZLI_SON4 })
     const c = kapi.tara({ dosyalar: ['veri/kart.json'], oku: () => kart, izin: [{ yol: 'veri/kart.json', kural: 'R5', blob: BLOB_A }], blobOf: () => BLOB_A })
-    expect(c.ihlaller).toEqual([])
-    expect(c.izinliler.map((k) => k.kural)).toEqual(['R5'])
+    expect(c.izinliler).toEqual([])
+    expect(c.ihlaller.map((k) => k.kural)).toEqual(['R5'])
+    const destek = kapi.tara({ dosyalar: ['support/iyzico_support_payload.json'], oku: () => kart, izin: kapi.IZIN_LISTESI, blobOf: () => BLOB_A })
+    expect(destek.ihlaller.map((k) => k.kural)).toEqual(['R5'])
+    expect(destek.izinliler).toEqual([])
+    expect(kapi.IZIN_LISTESI.filter((e) => e.kural === 'R5')).toEqual([])
   })
 
   it('mekanik: R1/R2/R4 İZİN ALMAZ (kayıt kural R1 yazsa da, yol ve blob izinli olsa da)', () => {

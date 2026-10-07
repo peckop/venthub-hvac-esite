@@ -39,7 +39,8 @@
  *       BAĞIMSIZ okunur (2. tur, O1): ağaç kipinde her izlenen dosyanın ilk baytları, itilen nesne kipinde her
  *       aday blob'un başlığı (`app.db.20261006`, `x.sqlite.orig` gibi yedek adları görünmez kalmasın).
  *   Ölçülemedi (çıkış 2): başlıksız CSV/TSV, ayrıştırılamayan veri dosyası, NUL baytlı veri dosyası.
- *   R3, R6 ve (tek kanıtlı sandbox-kart örneği için) R5 dosya bazlı İZİN LİSTESİ alır (gerekçe + kanıt); R1/R2/R4 ASLA.
+ *   R3 ve R6 dosya bazlı İZİN LİSTESİ alır (gerekçe + kanıt); R1/R2/R4/R5 ASLA (R5: ödeme kartı parçası; tek izinli
+ *   örnek `support/` ağaçtan silindi, kartın izin yolu da kapandı).
  *   ⭐İzin kaydı yol + kural + BLOB'a bağlıdır (2. tur, O4; `git hash-object`): dosya sonradan değişirse izin düşer
  *   ve kanıt yeniden ölçülür. Yalnız yol+kurala bakan izin, içeriği sabit olmadığı için "anlamsal kaçış" idi.
  *
@@ -249,8 +250,12 @@ const YOL_KURALLARI = Object.freeze([
 const R6_UZANTILARI = Object.freeze(['db', 'sqlite', 'sqlite3'])
 const SQLITE_IMZASI = 'SQLite format 3'
 
-/** İzin listesi hangi kurallara açık: R1/R2/R4 ASLA. R5 yalnız kanıtlı sandbox-kart örneği için (tek dosya). */
-const IZIN_KURALLARI = Object.freeze(['R3', 'R5', 'R6'])
+/**
+ * İzin listesi hangi kurallara açık: R1/R2/R4/R5 ASLA. R5 (ödeme kartı parçası) son tur (ALT-39) öncesinde yalnız kanıtlı bir
+ * sandbox-kart örneği için açıktı; o dosya (`support/`) ağaçtan silindi ve izin yolu da kapatıldı: arındırılmış fikstür sıfır
+ * sayacıyla (BIN 00000d, son dört 000d) R5'e zaten takılmaz, kart parçası taşıyan başka dosya kırmızı kalır.
+ */
+const IZIN_KURALLARI = Object.freeze(['R3', 'R6'])
 
 /**
  * İZİN LİSTESİ — DOSYA BAZLI. Her satır: { yol, kural, blob, neden, kanit }.
@@ -258,20 +263,11 @@ const IZIN_KURALLARI = Object.freeze(['R3', 'R5', 'R6'])
  *         sonradan gerçek veriyle güncellenirse blob değişir, izin DÜŞER, kapı kırmızı olur ve kanıt yeniden ölçülür.
  *         Blob'u olmayan ya da uyuşmayan kayıt hiçbir şeyi muaf tutmaz (fail-closed).
  *   R3: `kanit` "fiyat sahte/örnek" olduğunu GÖSTERMELİ.
- *   R5/R6: `kanit` ölçümün SAYILARINI taşımalı ve "ayrı kayıt önerilecek (numarayı OPS verir)" demeli
+ *   R6: `kanit` ölçümün SAYILARINI taşımalı ve "ayrı kayıt önerilecek (numarayı OPS verir)" demeli
  *          (gerçek bir kayıt numarası YOKTUR; numarayı OPS verir).
  * Sınırını `depo-dokum-kapisi.test.ts` koyar: tavan, yetim satır yasağı, glob yasağı, kural kümesi, blob bağı.
  */
 const IZIN_LISTESI = Object.freeze([
-  {
-    yol: 'support/iyzico_support_payload.json',
-    kural: 'R5',
-    blob: '3285b69040f28c13121d76e0cb4dfdb66a840f81',
-    neden:
-      'iyzico destek talebine eklenen örnek yük: kart parçaları sandbox test kartı biçiminde, müşteri kartı değil. İzlemeden çıkarma ayrı iştir.',
-    kanit:
-      'kart parçası taraması (sayı): 5 örnek, 5/5 son dört hane 000d biçimli (sandbox test kartı biçimi), metinde "sandbox" geçiyor; yayımlanmış test kartı listesine karşı doğrulama ağ ister ve YAPILMADI; ayrı kayıt önerilecek (numarayı OPS verir)',
-  },
   {
     yol: 'memory.db',
     kural: 'R6',

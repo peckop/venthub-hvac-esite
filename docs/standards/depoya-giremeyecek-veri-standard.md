@@ -1,11 +1,11 @@
-# Depoya Giremeyecek Veri — Cetvel v1.2
+# Depoya Giremeyecek Veri — Cetvel v1.3
 
 > **Kapsam:** herkese açık (PUBLIC) depoya veritabanı dökümü, müşteri/ödeme verisi, ödeme parçası ve fiyat-maliyet listesi girmez.
 > **Zorlayan kapı:** `INV-DEPO-DOKUM-1` → `src/__tests__/conformance/depo-dokum-kapisi.test.ts` (hızlı birim kolları) ve
 > `depo-dokum-kapisi-uctan-uca.test.ts` (sahte git deposu, CLI, kanca; yardımcılar `depo-dokum-kapisi.yardimci.ts`)
 > (betik `scripts/security/depo-dokum-kapisi.cjs`; CI `ci` işinde 'Döküm kapısı (depoya giremeyecek veri)' adımı ve `.githooks/pre-push`)
 > **Sahibi:** ALTYAPI · **Kayıt:** Kanban: ALT-39 · **İlk yazım:** 2026-10-06
-> **Son doğrulama:** 2026-10-06.
+> **Son doğrulama:** 2026-10-07.
 
 ## 1. Amaç
 
@@ -26,6 +26,9 @@ tutar girmez"), `secret-exposure-audit-2026-08-15.md` (sır imzaları).
   inceleme (bu sürüm v1.2): itme öncesi kanca ölçülemedi'de izin veriyordu (Y1), R6 imzası yalnız 7 uzantıda bakıyordu (O1),
   R1 sözlüğü tabanı değil elle yazılmış listeyi doğruluyordu (O2), SQL eşikleri ifade başınaydı (O3), izin kaydı içeriğe bağlı
   değildi (O4); ayrıca D2-D7 (yol toplama, kübik düzenli ifade, ara commit olayı, kanca dala bağlı, fikstür kimlikleri, belge hizası).
+- **2026-10-07 son tur (bu sürüm v1.3):** kök dizindeki `support/` klasörü ağaçtan SİLİNDİ (içinde döküm dışı kullanılan bir şey yoktu: atıflar
+  yalnız bu işin kendi kayıtlarıydı); R5'in tek izinli örneği oydu, **kartın izin yolu da kapatıldı** (§4). İkinci turdaki 13 bulgunun düzeltmesi
+  45 bozma (sabotaj) ile sınandı: her bozma ilgili testi KIRMIZI yaptı.
 - **Kapı boşluğu:** hiçbir kapı kişisel veriye ya da tablo imzasına bakmıyordu; dökümü okuyan testler önce arındırılmış fikstüre bağlandı.
 
 ## 3. Kurallar (kapı DEĞERE değil ŞEKLE bakar)
@@ -36,7 +39,7 @@ tutar girmez"), `secret-exposure-audit-2026-08-15.md` (sır imzaları).
 | **R2** `sql-veri-ifadesi-kisisel-alan` | `.sql` veri ifadesi (`INSERT … VALUES`, `COPY … FROM stdin`, `UPDATE … SET <kişisel alan> = <dize>`) içinde kişisel alan; **kolon listesiz** INSERT/COPY'nin hassas tabloya yazması | `CREATE`, `ALTER`, politika, indeks, yorum ve `$$` gövdeleri **masumdur**. **Satırlar DOSYA genelinde TABLO başına toplanır** (O3): `pg_dump --column-inserts` her satırı ayrı INSERT yazar; genel alan eşiği (≥3) ve R3 eşiği (≥5) toplam satıra bakar. **Hassas tabloda genel alan eşiği 1**: kolon listesiyle yazılan tek satırlık tohum bile kırmızıdır. `UPDATE` yalnız **değer atanan** kolonu sayar (`SET x = lower(x)` veri atamaz; boş dize atama değildir). Hassas tablolar şema tabanından, tarayarak: kişisel kolon taşıyanlar + maliyet tablosu (14 tablo, betikteki `HASSAS_TABLOLAR`) |
 | **R3** `fiyat-dokumu` | JSON dizisi (her derinlik), JSONL, CSV ya da SQL kolon listesinde **≥5** satır: kimlik **ve** pozitif fiyat/maliyet | Eşleşme **önek/sonek toleranslı**: fiyat kökleri `price`, `cost`, `fiyat`, `maliyet`, `alış` (para birimi eki dahil: `purchase_price_eur`); kimlik `id`, `sku`, `slug`, `product_id`, `model_code`, `*_kod` |
 | **R4** `dokum-yolu` | izlenen yolda `db-backup`, `pg_dump`, `.dump*`, `.sql.gz` ya da sıkıştırılmış/arşiv/ikili/tablo uzantısı (`.gz .zip .tar .tgz .zst .xz .bz2 .7z .rar .backup .pgdump .xlsx .xls .har .parquet .ods .mdb .accdb`), `toc.dat` | İçerikten bağımsız; boş dosya bile kırmızı |
-| **R5** `odeme-parcasi` | `binNumber` **ve** `lastFourDigits` birlikte, değerler **sıfır sayacı** (`00000d` / `000d`) **değilse** | Gerçek ödeme yanıtı fikstür diye eklenirse yakalanır; arındırılmış fikstürün sıfır sayacı geçer |
+| **R5** `odeme-parcasi` | `binNumber` **ve** `lastFourDigits` birlikte, değerler **sıfır sayacı** (`00000d` / `000d`) **değilse** | Gerçek ödeme yanıtı fikstür diye eklenirse yakalanır; arındırılmış fikstürün sıfır sayacı geçer. **İzin ALMAZ** (§4): "sandbox kartı" diye anılan örnek bile kırmızıdır |
 | **R6** `ikili-veritabani` | izlenen `.db/.sqlite/.sqlite3` ya da SQLite imzalı dosya; **imza UZANTIDAN BAĞIMSIZ** okunur (O1): ağaç kipinde her izlenen dosyanın ilk baytları, itilen nesne kipinde her aday blob'un başlığı (`app.db.20261006`, `x.sqlite.orig`, uzantısız yedek) | İçine bakılamaz (secret-scan da göremez); izin listesi dosya + **blob** bazlıdır (§4) |
 
 - **Ölçülemedi (çıkış 2):** başlıksız CSV/TSV (ilk satır veri gibi: e-posta/UUID/saf sayı), ayrıştırılamayan veri dosyası, NUL baytlı
@@ -49,15 +52,17 @@ tutar girmez"), `secret-exposure-audit-2026-08-15.md` (sır imzaları).
   adıyla "ölçülemedi" diye listelenir (çıkış 2).
 - **Çıktı DEĞER BASMAZ:** yalnız dosya adı, kural adı, alan adı, sayı. Her kırmızı çıktı çözüm komutunu da basar.
 
-## 4. İzin listesi (R3, R5, R6)
+## 4. İzin listesi (R3, R6)
 
-`IZIN_LISTESI` (betikte) **dosya bazlıdır** (glob yok) ve **yalnız R3, R5, R6** içindir; R1/R2/R4 **hiçbir koşulda** izin almaz: sahte
-değerli bir müşteri alanı bile kırmızıdır, çünkü kapı değeri sahte mi gerçek mi ayırt edemez. Her satır `blob`, `neden` ve `kanıt`
-taşır (R3: "fiyat sahte/örnek"; R6: içerik taraması **sayıları** ve "ayrı kayıt önerilecek (numarayı OPS verir)"; R5: sandbox kart
-biçimi, sayıyla). **Eşleşme yol + kural + BLOB'tur** (O4): `blob` izin verilen içeriğin `git hash-object` değeridir; dosya sonradan
-(gerçek veriyle) güncellenirse blob değişir, izin düşer, kapı kırmızı olur ve kanıt YENİDEN ölçülür. (Önceki sürüm yalnız yol+kurala
-bakıyordu: içeriği sabit olmayan izin, kapının "anlamsal kaçışıydı".) Blob'u olmayan ya da uyuşmayan kayıt hiçbir şeyi muaf tutmaz.
-Tavan **5** (artırmak testi değiştirmektir; 4'ten 5'e O1'in yeni isabeti), yetim satır ve glob yasak, kural kümesi testle sabit.
+`IZIN_LISTESI` (betikte) **dosya bazlıdır** (glob yok) ve **yalnız R3 ve R6** içindir; R1/R2/R4/**R5** **hiçbir koşulda** izin almaz: sahte
+değerli bir müşteri alanı bile kırmızıdır, çünkü kapı değeri sahte mi gerçek mi ayırt edemez; ödeme kartı parçası (R5) için de izin yolu
+YOKTUR (son tur: tek izinli örnek `support/` silindi; "sandbox kartı" iddiası ağ ister ve kapı bunu doğrulayamaz; sıfır sayaçlı arındırılmış
+fikstür zaten R5'e takılmaz). Her satır `blob`, `neden` ve `kanıt` taşır (R3: "fiyat sahte/örnek"; R6: içerik taraması **sayıları** ve
+"ayrı kayıt önerilecek (numarayı OPS verir)"). **Eşleşme yol + kural + BLOB'tur** (O4): `blob` izin verilen içeriğin `git hash-object`
+değeridir; dosya sonradan (gerçek veriyle) güncellenirse blob değişir, izin düşer, kapı kırmızı olur ve kanıt YENİDEN ölçülür.
+(Önceki sürüm yalnız yol+kurala bakıyordu: içeriği sabit olmayan izin, kapının "anlamsal kaçışıydı".) Blob'u olmayan ya da uyuşmayan
+kayıt hiçbir şeyi muaf tutmaz. Tavan **4** (artırmak testi değiştirmektir; 2. turda O1'in yeni isabeti 4'ü 5 yapmıştı, `support/` silinince
+R5 kaydı kalktı ve tavan 4'e indi), yetim satır ve glob yasak, kural kümesi testle sabit.
 Bugünkü kayıtlar (hepsi gerekçeli):
 
 - **R6 × 4:** `memory.db`, `registry/registry.db`, `registry/_legacy/registry.db` — salt okuma ölçümünde (2026-10-06) 0, 2 ve 3 tablo;
@@ -65,9 +70,7 @@ Bugünkü kayıtlar (hepsi gerekçeli):
   `.db` değil): 102400 bayt, 8 tablo (toplam 4 satır), serbest sayfa 0, e-posta/telefon/UUID/TCKN deseni **0** (hücre ve ham bayt
   taraması). Hepsinde izlemeden çıkarma ayrı kayıttır (numarayı OPS verir); desen sayısı sıfırdan büyük çıksaydı izin eklenmez, kapı
   kırmızı bırakılırdı.
-- **R5 × 1:** `support/iyzico_support_payload.json` — iyzico destek talebi örnek yükü; 5/5 örnekte son dört hane `000d` (sandbox test kartı
-  biçimi), metinde "sandbox" geçiyor. ⚠Yayımlanmış test kartı listesine karşı doğrulama ağ ister ve YAPILMADI; OPS teyidi bekler.
-- R3: kayıt yok (gerçek ağaçta isabet çıkmadı).
+- R3: kayıt yok (gerçek ağaçta isabet çıkmadı). R5: kayıt yok ve olamaz (yukarıda).
 
 ## 5. Fikstür arındırma kuralı
 
