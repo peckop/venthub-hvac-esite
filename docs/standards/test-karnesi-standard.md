@@ -136,7 +136,7 @@ girdileri içerik özetiyle doğrulanır, sonucu değiştirmez.
 
 ### 4.2 Test shard'ları: PR'da testler paralel işlerde koşar (ALT-38c-2)
 
-**Neden.** `ci` işinin Test adımı tek işte yaklaşık 4:30-6:30 dk sürüyordu (ölçüm: `docs/audits/ci-test-olcum-2026-10-06.md`); belge ya da kod PR'ının zorunlu kontrolü bu süre kadar bekliyordu.
+**Neden.** `ci` işinin Test adımı tek işte yaklaşık 4:30-6:30 dk sürüyordu (ALT-38c ölçümü, 2026-10-06; süre payının %90'ı dosya okuyan conformance kapılarıdır); belge ya da kod PR'ının zorunlu kontrolü bu süre kadar bekliyordu.
 Testler birbirinden bağımsız dosyalar olduğundan paralel koşabilir. Vitest'in kendi `--shard=i/N`'i dosya SAYISINA böler; tek dosyası 130 sn süren kanca testleri olduğundan dengesiz kalır.
 Bu yüzden her dosya bilinen süresiyle (`scripts/ci/test-sureleri.json`, yerel ölçüm) en az yüklü parçaya atanır.
 
@@ -144,7 +144,7 @@ Bu yüzden her dosya bilinen süresiyle (`scripts/ci/test-sureleri.json`, yerel 
 
 - `pull_request` olayında (`edited` HARİÇ) `ci` işindeki `Test` adımı KAPALIDIR; dört `test-shard (i/4)` işi paralel koşar. Her iş `node scripts/ci/test-shard.cjs --shard i --toplam 4` ile
   `vitest list --filesOnly --json` çıktısını (koşan paketin kendi listesi, `dislan` kipi dahil) süreye göre LPT ile böler, kendi parçasını yazar; `VENTHUB_TEST_SHARD_DOSYALARI` ile `vitest.config.ts`
-  `include`ı o parçaya sınırlanır. Aynı girdi her işte aynı bölmeyi üretir (ortak durum yok). Ölçüm (yerel, 2026-10-07): 622 dosya, parçalar 153/155/157/157 dosya, en yüklü/ortalama 1,00.
+  `include`ı o parçaya sınırlanır. Aynı girdi her işte aynı bölmeyi üretir (ortak durum yok). Ölçüm (yerel, 2026-10-07, `dislan` kipi): 625 dosya (+1 dünya durumu dosyası = tam paket 626), parçalar 154/157/157/157 dosya, birleşim = liste, kesişim 0, en yüklü/ortalama 1,00.
 - `ci` işinin SON adımı "Test shard sonuçları (bekle ve doğrula)" (`scripts/ci/test-shard-bekle.cjs`), AYNI koşunun AYNI denemesinin (`run_id` + `run_attempt`) `test-shard (i/N)` işlerinin HEPSİ `success`
   olmadan yeşil vermez. Lint, tip, Deno kapıları ve Build shard'larla ÜST ÜSTE koşar, bu yüzden bekleme en sondadır. Zorunlu kontrol `ci` adıdır; `needs`'li ayrı bir toplayıcı iş YOKTUR
   (`ci`yi bölmek `edited` aynasını ve testlerini yeniden yazdırırdı, aynası `ci` işinin adımlarını okur).
