@@ -68,9 +68,10 @@ type Kontrol = (betik: string) => Promise<string | null>
 const hemenDoner: Kontrol = async (betik) => {
   const d = gecici('hemen')
   try {
-    const b = kos(betik, d, ['baslat', 'h', '--', 'bash', '-c', 'sleep 2; echo bitti-h'])
+    // Komut 3 sn uyur, eşik 2,5 sn: yavaş bir bash başlangıcı (yük altında yüzlerce ms) yanlış kırmızı vermez, tutulan boru ise en az 3 sn sürer.
+    const b = kos(betik, d, ['baslat', 'h', '--', 'bash', '-c', 'sleep 3; echo bitti-h'])
     if (b.status !== 0) return `baslat çıkış kodu ${b.status}`
-    if (b.ms >= 1500) return `baslat ${b.ms} ms sürdü: komut bitene kadar döndü ya da çıktı borusunu tuttu (paralellik yok)`
+    if (b.ms >= 2500) return `baslat ${b.ms} ms sürdü: komut bitene kadar döndü ya da çıktı borusunu tuttu (paralellik yok)`
     const w = kos(betik, d, ['bekle', 'h', '30'])
     if (w.status !== 0 || !w.stdout.includes('bitti-h')) return `bekle başarısız ya da günlük yok (çıkış ${w.status})`
     return null
