@@ -1344,6 +1344,12 @@ function ciBaglantisiniDenetle(ciMetni: string): string[] {
   const ihlaller: string[] = []
   const satirlar = ciMetni.split(/\r?\n/)
   const yorumsuz = (s: string[]): string[] => s.filter((x) => !/^\s*#/.test(x))
+  // ci.yml artık BİRDEN ÇOK iş taşıyor (master #1741: `test-shard` kendi Checkout/Install/Test adımlarıyla): konum aramaları YALNIZ `ci`
+  // işinin satır aralığında yapılır; yoksa başka işin adımı bulunur ve "adım yok" kırmızısı sessizce yeşile döner (sabotajla/birleştirmeyle bulundu).
+  const ciBas = satirlar.findIndex((s) => /^ {2}ci:\s*$/.test(s))
+  const ciSonraki = ciBas < 0 ? -1 : satirlar.findIndex((s, i) => i > ciBas && /^ {2}[A-Za-z0-9_-]+:\s*$/.test(s))
+  const ciSon = ciSonraki < 0 ? satirlar.length : ciSonraki
+  const ciIcinde = (re: RegExp): number => (ciBas < 0 ? -1 : satirlar.findIndex((s, i) => i > ciBas && i < ciSon && re.test(s)))
   const adimSatirlari = satirlar.map((s, i) => (/^ {6}- name:/.test(s) && s.includes(ADIM_ADI) ? i : -1)).filter((i) => i >= 0)
   if (adimSatirlari.length !== 1) {
     ihlaller.push(`'${ADIM_ADI}' adımı ${adimSatirlari.length} kez var (tam 1 olmalı)`)
@@ -1386,17 +1392,17 @@ function ciBaglantisiniDenetle(ciMetni: string): string[] {
     if (isBasligi.some((s) => /^\s+shell:/.test(s) && !/:\s*bash\s*$/.test(s))) ihlaller.push('`ci` işi varsayılan kabuğu bash değil')
   }
 
-  const kurulum = satirlar.findIndex((s) => /^ {6}- name: Install dependencies\s*$/.test(s))
+  const kurulum = ciIcinde(/^ {6}- name: Install dependencies\s*$/)
   if (kurulum < 0) ihlaller.push("'Install dependencies' adımı bulunamadı (konum ölçülemedi)")
   else if (bas > kurulum) ihlaller.push("adım 'Install dependencies'ten SONRA: önceki adımlar kırmızıyken ve bağımlılıksız çalışabilecekken geç koşuyor")
-  const testBas = satirlar.findIndex((s) => /^ {6}- name: Test\s*$/.test(s))
+  const testBas = ciIcinde(/^ {6}- name: Test\s*$/)
   if (testBas < 0) ihlaller.push("'Test' adımı bulunamadı (konum ölçülemedi)")
   else if (bas > testBas) ihlaller.push("adım 'Test'ten SONRA: testler kırmızıyken hiç koşmaz")
 
   // D4: ara commit taraması TAM GEÇMİŞ ister (sığ klonda `HEAD^1`/`HEAD^2` yok → sessizce atlanır). Bağımlılık: Checkout `with:` altında
   // `fetch-depth: 0`. ⚠Girdi kümesinin TAM sabitlemesi `ci-edited-ayna.test.ts`'tedir (CHECKOUT_GIRDILERI); burada tekrar EDİLMEZ, yalnız
   // bu kapının bağımlılığı doğrulanır (biri yanlışlıkla gevşetilirse iki test de kırmızı verir, ama bu test KENDİ nedenini söyler).
-  const coBas = satirlar.findIndex((s) => /^ {6}- name: Checkout\s*$/.test(s))
+  const coBas = ciIcinde(/^ {6}- name: Checkout\s*$/)
   if (coBas < 0) ihlaller.push("'Checkout' adımı bulunamadı: `fetch-depth: 0` ölçülemedi")
   else {
     const coSon = satirlar.findIndex((s, i) => i > coBas && /^ {6}- name:/.test(s))
