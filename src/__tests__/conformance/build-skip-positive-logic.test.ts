@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -184,9 +184,31 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       // --- scripts/kip eklenirken (2026-09-07, REC-168) ---
       // Aynı kapsam-darlığı sınavı: `scripts/kip*` yazılsaydı bu satır sessizce atlanırdı.
       ['kip ADINA benzeyen ama farklı yol', ['scripts/kipfake.ts']],
-      // ⭐SINIF SINIRI: betiğin KENDİSİ atlanır ama onu SINAYAN kapı `src/**` altında
-      // ve `src/**` bilerek atlanmaz — yani kapı değişirse build KOŞAR.
-      ['kip betiğinin kapısı (src/** atlanmaz)', ['src/__tests__/conformance/satis-kipi-anahtari.test.ts']],
+      // (REC-168'deki "kip betiğinin kapısı (src/** atlanmaz) → BUILD" kolu ALT-44'te KALDIRILDI: test dosyaları
+      // artık atlanan sınıftır, kol `atlanabilir` listesine TAŞINDI. Gerekçe: cetvel D3.2.)
+      // --- ALT-44 (2026-10-07): TEST sınıfı eklenirken KAPSAM-DARLIĞI SINAVI ---
+      // Test kalıpları DERLEMEYE GİREN hiçbir dosyayı yutmamalı. OPS şartı: src içindeki test OLMAYAN
+      // dosya, build zinciri betikleri, next.config ve package/kilit HEP BUILD; şüphede BUILD.
+      ['src içindeki test OLMAYAN dosya (lib)', ['src/lib/foo.ts']],
+      ['src içindeki test OLMAYAN dosya (bileşen)', ['src/components/Button.tsx']],
+      ['src/test altındaki test OLMAYAN yardımcı (vitest kurulumu)', ['src/test/setup.ts']],
+      ['adında "test" geçen ama test OLMAYAN dosya', ['src/lib/contest.ts']],
+      ['adında "test" geçen bileşen', ['src/components/TestimonialCard.tsx']],
+      ['"test" ile biten ad (latest)', ['src/utils/latest.ts']],
+      ['__tests__ ADINA benzeyen ama farklı dizin', ['src/__tests__fake/x.ts']],
+      ['tek alt çizgili dizin adı', ['src/__test__/x.ts']],
+      ['.test.ts ADINA benzeyen ama farklı uzantı (.bak)', ['src/lib/x.test.ts.bak']],
+      ['.test.json (uzantı kalıbı dışında)', ['src/lib/x.test.json']],
+      ['.tests.ts (çoğul, kalıp dışında)', ['src/lib/x.tests.ts']],
+      ['public altında __tests__ adlı klasör (statik varlık YAYINLANIR)', ['public/__tests__/a.js']],
+      ['public altında .test.ts adlı dosya', ['public/x.test.ts']],
+      ['public altında markdown (statik dosya olarak YAYINLANIR)', ['public/notlar.md']],
+      ['KARMA: test + test OLMAYAN src dosyası', ['src/__tests__/conformance/x.test.ts', 'src/lib/foo.ts']],
+      ['KARMA: test + next.config', ['src/__tests__/conformance/x.test.ts', 'next.config.mjs']],
+      ['KARMA: test + package.json', ['src/lib/__tests__/x.test.ts', 'package.json']],
+      ['KARMA: test + kilit dosyası', ['e2e/x.e2e.ts', 'pnpm-lock.yaml']],
+      ['KARMA: test + build zinciri betiği', ['src/__tests__/conformance/x.test.ts', 'scripts/assert-node-major.mjs']],
+      ['build zinciri betiği (assert-node-major)', ['scripts/assert-node-major.mjs']],
     ]
 
     for (const [ad, dosyalar] of buildGerektiren) {
@@ -210,6 +232,20 @@ describe('INV-BUILD-SKIP · ignore-build betiği pozitif mantıkla karar verir',
       // aynı arama `scripts/setup-hooks` için BULUYOR — yani arama gerçekten arıyor).
       ['satış kipi geçiş betiği', ['scripts/kip/satis-kipine-gec.mjs']],
       ['git kancasının kendisi', ['.githooks/pre-commit']],
+      // --- ALT-44 (2026-10-07): TEST sınıfı (cetvel D3.2). Atlanan YALNIZ Vercel derlemesidir; testler CI'da koşar. ---
+      ['kip betiğinin kapısı (eski REC-168 kolu: artık test sınıfı)', ['src/__tests__/conformance/satis-kipi-anahtari.test.ts']],
+      ['src/__tests__ altında test', ['src/__tests__/conformance/x.test.ts']],
+      ['__tests__ içindeki test yardımcısı (adı test değil, dizini __tests__)', ['src/__tests__/conformance/x.yardimci.ts']],
+      ['iç içe __tests__ (src/lib)', ['src/lib/__tests__/y.test.ts']],
+      ['kökteki __tests__ (yardımcı; adı test değil, kökteki dizin kuralı yük taşır)', ['__tests__/z.yardimci.ts']],
+      ['iç içe __tests__ yardımcısı (src/lib; adı test değil, derin dizin kuralı yük taşır)', ['src/lib/__tests__/y.yardimci.ts']],
+      ['bileşenin yanındaki test', ['src/components/category/SilentFanWizard.test.tsx']],
+      ['.test.cjs betik testi', ['scripts/ci/degisiklik-sinifi.test.cjs']],
+      ['.test.mjs', ['src/lib/x.test.mjs']],
+      ['edge fonksiyonu içindeki test', ['supabase/functions/_shared/__tests__/odeme_eslesme.test.ts']],
+      ['e2e senaryosu', ['e2e/checkout-smoke.e2e.ts']],
+      ['canlı e2e senaryosu', ['e2e-canli/x.canli.ts']],
+      ['yalnız testlerden oluşan KARMA (test + belge)', ['src/__tests__/conformance/x.test.ts', 'docs/standards/x.md']],
     ]
 
     for (const [ad, dosyalar] of atlanabilir) {
@@ -445,5 +481,101 @@ describe('INV-BUILD-SKIP · karşılaştırma tabanı gerçek depoda çözülür
     const gunluk = gunlukAl(dir)
     expect(gunluk, 'çekme yolu hiç koşmamış').toMatch(/taban = /)
     expect(depodaKararVer(dir)).toBe('ATLA')
+  })
+})
+
+/**
+ * INV-BUILD-SKIP-TEST (ALT-44, 2026-10-07) · TEST sınıfının "derlemeye girmiyor" iddiası ÖLÇÜLÜR ve SABİTLENİR.
+ *
+ * NİÇİN: Vercel "Dağıtım Depolama" doldu; 30 günde 620 master commit'inin yalnız 137'si atlanıyordu ve test dosyaları tek başına +132 commit açar
+ * (cetvel D3.2). Test dosyasını atlatmak ancak şu iddia doğruysa güvenlidir: "derlemeye giren hiçbir dosya test dosyasından içe aktarmaz ve bir test
+ * dosyası Next rotası olamaz". Bu kapı o iddiayı DEPONUN ÜZERİNDE ölçer; biri üretim koduna `__tests__` içinden bir yardımcı bağlarsa KIRMIZI olur
+ * ve sınıf yeniden düşünülür (sessizce atlama sınıfı büyümez).
+ *   1. üretim kodu (src içindeki test OLMAYAN dosya + kök yapılandırmalar) test dosyası ya da __tests__ içeriği içe aktarmaz (statik import,
+ *      `import()` ve `require()` biçimleri). Tarayıcının gerçekten aradığı pozitif kontrolle sınanır (aksi halde "0 bulgu" vacuous olurdu).
+ *   2. Sayfa dizini (src/pages, pages) YOK: Pages Router olsaydı `pages/` altındaki her dosya (test dahil) bir rota olurdu.
+ *   3. Vercel'in install/build zincirinde çalışan her betik (package.json yaşam döngüsü betikleri, iç içe `pnpm run` dahil) BUILD tetikler.
+ */
+describe('INV-BUILD-SKIP-TEST · test sınıfı derlemeye giren hiçbir dosyayı yutmaz (depo üzerinde ölçüm)', () => {
+  const TESTE_ATIF = /(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"][^'"]*(?:__tests__|\.test)(?:['"/.])/
+  const TEST_YOLU = /(^|\/)__tests__\/|\.test\.(?:ts|tsx|cjs|mjs)$|^e2e(?:-canli)?\//
+  const KAYNAK_UZANTISI = /\.(?:ts|tsx|js|jsx|mjs|cjs)$/
+
+  function kaynakDosyalari(dizin: string, cikti: string[] = []): string[] {
+    for (const girdi of readdirSync(join(REPO_KOK, dizin), { withFileTypes: true })) {
+      const yol = `${dizin}/${girdi.name}`
+      if (girdi.isDirectory()) {
+        if (girdi.name !== 'node_modules' && girdi.name !== '.next') kaynakDosyalari(yol, cikti)
+      } else if (KAYNAK_UZANTISI.test(girdi.name)) {
+        cikti.push(yol)
+      }
+    }
+    return cikti
+  }
+
+  const srcDosyalari = kaynakDosyalari('src')
+  const kokYapilandirmalar = [
+    'next.config.mjs',
+    'instrumentation.ts',
+    'sentry.client.config.ts',
+    'sentry.server.config.ts',
+    'sentry.edge.config.ts',
+  ].filter((ad) => existsSync(join(REPO_KOK, ad)))
+  const uretimDosyalari = [...srcDosyalari.filter((y) => !TEST_YOLU.test(y)), ...kokYapilandirmalar]
+  const testDosyalari = srcDosyalari.filter((y) => TEST_YOLU.test(y))
+
+  it('ölçüm aracı gerçekten arıyor (pozitif kontrol): sentetik içe aktarmalar yakalanır, temiz satırlar yakalanmaz', () => {
+    for (const satir of [
+      "import x from '../__tests__/y'",
+      "const a = require('./z.test')",
+      "const m = await import('../a.test')",
+      "export { b } from '../lib/__tests__/helper'",
+    ]) {
+      expect(TESTE_ATIF.test(satir), satir).toBe(true)
+    }
+    for (const satir of [
+      "import x from './latest'",
+      "import { render } from '@testing-library/react'",
+      "import { describe } from 'vitest'",
+      "import y from './contest-banner'",
+      "import z from './foo.test-helper'",
+    ]) {
+      expect(TESTE_ATIF.test(satir), satir).toBe(false)
+    }
+  })
+
+  it('ölçüm yüzeyi boş değil: yüzlerce üretim dosyası ve test dosyası taranır; testler gerçekten test dosyası içe aktarır (gerçek pozitif)', () => {
+    expect(uretimDosyalari.length).toBeGreaterThan(200)
+    expect(testDosyalari.length).toBeGreaterThan(200)
+    const gercekPozitif = testDosyalari.filter((y) => TESTE_ATIF.test(readFileSync(join(REPO_KOK, y), 'utf8')))
+    expect(gercekPozitif.length).toBeGreaterThan(5)
+  })
+
+  it('üretim kodu (src içindeki test OLMAYAN dosya + kök yapılandırmalar) test dosyası ya da __tests__ içeriği İÇE AKTARMAZ', () => {
+    const ihlal = uretimDosyalari.filter((y) => TESTE_ATIF.test(readFileSync(join(REPO_KOK, y), 'utf8')))
+    expect(ihlal, `test dosyasından içe aktaran üretim dosyası: ${ihlal.join(', ')}`).toEqual([])
+  })
+
+  it('Pages Router YOK (src/pages, pages): bir test dosyası rota olamaz', () => {
+    expect(existsSync(join(REPO_KOK, 'src/pages'))).toBe(false)
+    expect(existsSync(join(REPO_KOK, 'pages'))).toBe(false)
+  })
+
+  it("Vercel'in install/build zincirinde adı geçen her betik (yaşam döngüsü betikleri, iç içe `pnpm run` dahil) BUILD tetikler", () => {
+    const paket = JSON.parse(readFileSync(join(REPO_KOK, 'package.json'), 'utf8')) as { scripts: Record<string, string> }
+    const kokler = ['preinstall', 'install', 'postinstall', 'prepare', 'prebuild', 'build', 'postbuild', 'vercel-build']
+    const betikYollari = (ad: string, gorulen: Set<string>): string[] => {
+      if (gorulen.has(ad)) return []
+      gorulen.add(ad)
+      const komut = paket.scripts[ad]
+      if (typeof komut !== 'string') return []
+      const yollar = [...komut.matchAll(/scripts\/[\w./-]+\.(?:mjs|cjs|js|ts|sh)/g)].map((m) => m[0])
+      for (const m of komut.matchAll(/(?:pnpm|npm)(?: run)? ([\w:.-]+)/g)) yollar.push(...betikYollari(m[1], gorulen))
+      return yollar
+    }
+    const yollar = [...new Set(kokler.flatMap((k) => betikYollari(k, new Set<string>())))]
+    // Boş türetme "uyumlu" sayılmaz: build (assert-node-major) ve prepare (setup-hooks) en az iki betik verir.
+    expect(yollar.length).toBeGreaterThanOrEqual(2)
+    for (const yol of yollar) expect(kararVer([yol]), yol).toBe('BUILD')
   })
 })
