@@ -114,7 +114,7 @@ gerçekten açıp bir sayfa render eden ~5 saniyelik prob fatal.
 Kural 1-5 ve 2.8 DEĞİŞMEZ; yalnız kurulumun NEREDE koştuğu değişti. `admin-smoke` işinde `playwright install-deps`, Build ile PARALEL arka planda koşar
 (`scripts/ci/arka-plan.sh baslat`); sonucunu Build'ten sonraki `bekle` adımı toplar. Ölçüm (88 başarılı koşu, 2026-10-04..07): adım sıralıyken medyan 15 sn
 (p90 23 sn, sağlıklı en uzun 52 sn) ve 3 koşuda (%3,4) 187, 339, 341 sn (ilk deneme 300 sn sınırını doldurdu). Build medyan 166 sn olduğundan adımın onu beklemesi için sebep yoktu.
-Paralel yolun canlı ölçümü (PR #1742, 5 koşu): komut arka planda 15-19 sn sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi (derleme 91 sn, önceki 92 sn). Takılma bu koşularda
+Paralel yolun canlı ölçümü (PR #1742, 6 koşu): komut arka planda 15-25 sn sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi (derleme 91 sn, önceki 92 sn). Takılma bu koşularda
 tetiklenmedi: kuyruğun kesilmesi mekanizma ve test (INV-E2E-HIZLI-3/4) olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
 
 - **Başlatan adım kural 1-2'ye uyar.** Adım `timeout-minutes` ilan eder ve komut `retry-bounded.sh` ile koşar; kapı (INV-CI-INSTALL-1) bu paralel yolu da tarar,

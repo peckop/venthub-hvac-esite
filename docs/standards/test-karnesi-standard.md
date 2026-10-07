@@ -1,6 +1,6 @@
 # Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.0
 
-**Sürüm 1.0 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-06 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296**
+**Sürüm 1.0 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-07 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -194,20 +194,20 @@ Adım medyanları (sn): kurulum 53 (bağımlılık kurulumu 35) · apt 15 · Bui
 **Ölçüm** (PR #1742, gerçek CI koşuları, aynı iş, sn). Her sütunda tek tek koşular yazılır: GitHub koşucusunun hızı koşudan koşuya ±%30 oynar (önceki 88 koşuda iş toplamı 198-313, ilk bağımlılık kurulumu 25-45 sn),
 bu yüzden tek koşuyu medyanla kıyaslamak yanıltır; aynı koşucu hızı için kurulum satırına bakılır.
 
-| | önceki medyan (88 koşu) | SOĞUK (önbellek yok): koşu 1 · koşu 3 | SICAK (aynı anahtar, boş commit): koşu 4 · koşu 5 |
+| | önceki medyan (88 koşu) | SOĞUK (önbellek yok): koşu 1 · koşu 3 | SICAK (aynı anahtar, kaynak değişmeden): koşu 4 · koşu 5 · koşu 6 |
 |---|---|---|---|
-| **iş toplamı** | **285** (p10 237, p90 310) | **241 · 180** | **201 · 142** |
-| kurulum (iş başlatma, checkout, pnpm, Node, bağımlılık) | 53 | 53 · 39 | 55 · 39 |
-| tarayıcı + sistem bağımlılıkları (apt dahil) | 20 (apt 15; 3 koşuda 187-341) | 7 · 3 | 7 · 5 |
-| Build | 166,5 | 128 · 92 | 76 · 62 |
-| ↳ webpack derleme (günlükteki "Compiled successfully") | 92 | 91 · 66 | 31,6 · 28,1 |
-| Playwright testi | 39,5 | 43 · 37 | 56 · 32 |
-| diğer (adım sonrası, önbellek kaydı) | 1 | 6 · 5 | 3 · 1 |
+| **iş toplamı** | **285** (p10 237, p90 310) | **241 · 180** | **201 · 142 · 174** |
+| kurulum (iş başlatma, checkout, pnpm, Node, bağımlılık) | 53 | 53 · 39 | 55 · 39 · 49 |
+| tarayıcı + sistem bağımlılıkları (apt dahil) | 20 (apt 15; 3 koşuda 187-341) | 7 · 3 | 7 · 5 · 4 |
+| Build | 166,5 | 128 · 92 | 76 · 62 · 73 |
+| ↳ webpack derleme (günlükteki "Compiled successfully") | 92 | 91 · 66 | 31,6 · 28,1 · 36,1 |
+| Playwright testi | 39,5 | 43 · 37 | 56 · 32 · 44 |
+| diğer (adım sonrası, önbellek kaydı) | 1 | 6 · 5 | 3 · 1 · 2 |
 
 Kaldıraç başına (koşu içi, günlükten): **tip ve lint kapalı** Build'ten ~40 sn düşürür (derleme 91 sn aynı, "Linting and checking" aşaması hiç koşmaz); **apt paralel** adımı iş süresinden çıkarır (arka planda 15-19 sn
-sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi); **webpack önbelleği** derlemeyi 91 → 28-32 sn'ye indirir (yalnız `.rscinfo` ile birlikte). Ara koşu 2 (yalnız `webpack/` saklanan ilk sürüm): iş 228 sn, derleme 89 sn.
-**Sonuç:** sıcak önbellekle iş ≤ ~200 sn (201 ve 142); önbelleksiz ilk koşuda 180-241 sn (önceki medyan 285), her iki durumda `ci`den (252 sn) kısa. Apt takılması (%3,4) bu 5 koşuda tetiklenmedi: kuyruğun kesilmesi mekanizma ve test
-olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
+sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi); **webpack önbelleği** derlemeyi 91 → 28-36 sn'ye indirir (yalnız `.rscinfo` ile birlikte). Ara koşu 2 (yalnız `webpack/` saklanan ilk sürüm): iş 228 sn, derleme 89 sn.
+**Sonuç:** sıcak önbellekle iş 142-201 sn (üç koşu, medyan 174; hedef ≤ ~200 sn tutuyor); önbelleksiz ilk koşuda 180-241 sn (önceki medyan 285), her iki durumda `ci`den (252 sn) kısa. Apt takılması (%3,4) bu 6 koşuda
+tetiklenmedi: kuyruğun kesilmesi mekanizma ve test olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
 
 **Güvenlik yönü.** (a) Anahtar yanlış yere sızarsa `ci`/Vercel/yerel derleme tipsiz kalırdı: `INV-E2E-HIZLI-2` anahtarın adım düzeyi dışında hiçbir yerde olmadığını ölçer. (b) apt arka planda ölürse `bekle` komutu ön planda yeniden
 koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir. (c) Önbellek yalnız hızdır: bayat girdi yok sayılır, canlı veri önbelleğe girmez. **Bilinen sınır:** depo önbellek kotası 10 GB'ın %96'sında (2026-10-07);
