@@ -44,6 +44,8 @@ const TOHUM_YOLU = path.join(KOK, 'src', 'data', 'eski-adres-tohum.json')
 const DILLER = ['tr', 'en']
 const EN_COK_ESZAMANLI = 4
 const KATEGORI_ORNEK_SAYISI = 6
+/** UTF-8 BOM (U+FEFF): Excel'in yazdığı CSV'nin ilk sütun adına yapışır; görünmez karakter yerine kod noktasıyla denetlenir. */
+const BOM_KODU = 0xfeff
 /** Ölçüm hatası değil, sitenin kendi yönlendirme kusuru olan `adresiIzle` hataları → KIRMIZI (zincir). */
 const ZINCIR_HATALARI = new Map([
   ['dongu', 'DÖNGÜ'],
@@ -54,7 +56,8 @@ const ZINCIR_HATALARI = new Map([
 
 /** `;` ayraçlı, BOM'lu CSV → nesne listesi. Tırnaklı hücre kullanılmayan düz biçim (model listesi). */
 function csvOku(metin) {
-  const satirlar = metin.replace(/^﻿/, '').replace(/\r\n/g, '\n').split('\n').filter((s) => s.trim() !== '')
+  const govde = metin.charCodeAt(0) === BOM_KODU ? metin.slice(1) : metin
+  const satirlar = govde.replace(/\r\n/g, '\n').split('\n').filter((x) => x.trim() !== '')
   if (satirlar.length < 2) throw new Error('CSV boş ya da yalnız başlık')
   const baslik = satirlar[0].split(';')
   return satirlar.slice(1).map((satir) => {

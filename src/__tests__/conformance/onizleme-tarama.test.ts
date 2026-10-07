@@ -202,7 +202,7 @@ afterAll(() => {
 
 describe('csvOku', () => {
   it('BOM + CRLF + boş satır: ilk sütun adı BOM taşımaz, satırlar nesne olur', () => {
-    const r = betik.csvOku('﻿sku;ad;not\r\nA-1;Bir;\r\n\r\nB-2;İki;x\r\n')
+    const r = betik.csvOku(String.fromCharCode(0xfeff) + 'sku;ad;not\r\nA-1;Bir;\r\n\r\nB-2;İki;x\r\n')
     expect(Object.keys(r[0])).toEqual(['sku', 'ad', 'not'])
     expect(r).toEqual([
       { sku: 'A-1', ad: 'Bir', not: '' },
@@ -224,19 +224,21 @@ describe('csvOku', () => {
 // ── 2. modelOrnekle ──────────────────────────────────────────────────────────
 
 describe('modelOrnekle', () => {
-  const girdi = [model('B-1', 'aile-a'), model('A-1', 'aile-b'), model('A-2', 'aile-b'), model('B-0', 'aile-a')]
+  /** Her test KENDİ kopyasını alır: ortak dizi, yerinde sıralayan bir hatayı sonraki testlerde gizlerdi (mutasyon M07). */
+  const girdiYap = (): Model[] => [model('B-1', 'aile-a'), model('A-1', 'aile-b'), model('A-2', 'aile-b'), model('B-0', 'aile-a')]
 
   it('her aileden SKU sırasıyla ilk model; aileler alfabetik', () => {
     // SKU sırası A-1(aile-b) A-2(aile-b) B-0(aile-a) B-1(aile-a): ilk görülen aile aile-b, ama sonuç aile-a ile başlar.
-    expect(betik.modelOrnekle(girdi).map((m) => m.sku)).toEqual(['B-0', 'A-1'])
+    expect(betik.modelOrnekle(girdiYap()).map((m) => m.sku)).toEqual(['B-0', 'A-1'])
   })
 
   it('ek örnek: aile başına 1 + ek model; aile boyunu aşan ek hepsini verir', () => {
-    expect(betik.modelOrnekle(girdi, 1).map((m) => m.sku)).toEqual(['B-0', 'B-1', 'A-1', 'A-2'])
-    expect(betik.modelOrnekle(girdi, 9)).toHaveLength(4)
+    expect(betik.modelOrnekle(girdiYap(), 1).map((m) => m.sku)).toEqual(['B-0', 'B-1', 'A-1', 'A-2'])
+    expect(betik.modelOrnekle(girdiYap(), 9)).toHaveLength(4)
   })
 
   it('girdi sırasından bağımsız ve girdiyi DEĞİŞTİRMEZ', () => {
+    const girdi = girdiYap()
     const kopya = structuredClone(girdi)
     const ilk = betik.modelOrnekle(girdi, 1)
     expect(girdi).toEqual(kopya)
@@ -344,6 +346,7 @@ describe('degerlendir', () => {
     ['200 beklerken 404 KIRMIZI', b200, izle({ ilk: { durum: 404 }, sonDurum: 404 }), 'KIRMIZI'],
     ['308 beklerken yönlendirme yok KIRMIZI', b308, izle(), 'KIRMIZI'],
     ['zincir (2 sıçrama) KIRMIZI, son hedef doğru olsa bile', b308, tek308({ hop: 2 }), 'KIRMIZI'],
+    ['sıçrama sayısı beklenenden farklıysa KIRMIZI (ilk durum ve hedef doğru olsa bile; sözleşme vakası, mutasyon M27)', b200, izle({ hop: 1 }), 'KIRMIZI'],
     ['döngü KIRMIZI (ölçüm hatası değil)', b308, tek308({ hata: 'dongu' }), 'KIRMIZI'],
     ['sıçrama sınırı aşımı KIRMIZI', b308, tek308({ hata: 'hop-siniri', hop: 6 }), 'KIRMIZI'],
     ['zaman aşımı HATA', b308, izle({ ilk: null, sonDurum: null, hata: 'zaman-asimi' }), 'HATA'],
