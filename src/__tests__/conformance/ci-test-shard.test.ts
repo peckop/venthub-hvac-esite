@@ -943,4 +943,20 @@ describe('INV-CI-SHARD-2 — shard bölmesi KAPSAMI kanıtlar (birleşim = vites
     const hepsi = await vitestDosyalari(ortamKur(''), ['--root', proje, '--config', cfg], proje)
     expect(hepsi).toEqual(sirali([...secilen, ...yabanci]))
   }, 120_000)
+
+  // CANLI BULGU (#1741 koşu 2, `test-shard (1/4)` kırmızı): shard işleri `pnpm test`i VENTHUB_TEST_SHARD_DOSYALARI ile koşar ve değişken alt süreçlere MİRAS KALIR;
+  // `test-kosu-kapsami.test.ts` gerçek config'i `vitest list` alt süreçlerinde ölçer (üç kip) ve shard listesi ona sızarsa küme shard'ın dosyalarına daralır / config
+  // "yalniz ile birlikte kullanılamaz" diye fırlatır. Yerel koşuda değişken yoktur: bu hata yalnız burada, shard ortamı AÇIKKEN yakalanır.
+  it("shard ortamı ALT SÜREÇLERE SIZMAZ: VENTHUB_TEST_SHARD_DOSYALARI + dislan verilirken test-kosu-kapsami'nin gerçek-config alt süreçleri (vitest list) yine geçer", async () => {
+    const dosya = path.join(gecici, 'sizinti-liste.json')
+    writeFileSync(dosya, `${JSON.stringify(['src/__tests__/conformance/test-kosu-kapsami.test.ts'])}\n`)
+    const ortam = ortamKur('dislan', { [SHARD.ORTAM_ADI]: dosya })
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      [path.join(KOK, 'node_modules', 'vitest', 'vitest.mjs'), 'run', 'src/__tests__/conformance/test-kosu-kapsami.test.ts', '-t', 'GERÇEK config', '--no-color', '--maxWorkers=1'],
+      { cwd: KOK, env: ortam, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 110_000, windowsHide: true },
+    )
+    expect(stdout).toMatch(/Tests\s+\d+ passed/)
+    expect(stdout).not.toMatch(/\d+ failed/)
+  }, 120_000)
 })

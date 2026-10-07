@@ -405,6 +405,12 @@ function ciYmlHatalari(ci: string): string[] {
 
 type Kip = '' | 'dislan' | 'yalniz'
 const VITEST_GIRISI = path.join(KOK, 'node_modules', 'vitest', 'vitest.mjs')
+/**
+ * ALT-38c-2: ci.yml `test-shard` işleri `pnpm test`i bu ortam değişkeniyle koşar ve DEĞİŞKEN ALT SÜREÇLERE MİRAS KALIR. Gerçek config'i ölçen bu alt süreçler (üç kip)
+ * shard'ın listesine DAYALI bir kümeyle ölçerdi (canlı ölçüm: #1741 koşu 2, `test-shard (1/4)` kırmızı: "yalniz" kipi `VENTHUB_TEST_SHARD_DOSYALARI ile ...
+ * birlikte kullanılamaz` ile fırlattı). Ad `scripts/ci/test-shard.cjs`ten OKUNMAZ (alt süreç ortamı bilerek sabit adlarla kurulur).
+ */
+const SHARD_ORTAM = 'VENTHUB_TEST_SHARD_DOSYALARI'
 const ALT_SUREC_ZAMAN_ASIMI_MS = 80_000
 /** Terminal renk kaçışları (ESC [ ... m); ESC karakteri koddan üretilir ki kural gevşetmeden okunabilsin. */
 const ANSI = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g')
@@ -418,7 +424,7 @@ function ortamKur(kip: Kip, taban: string | null = LISTE_MUTLAK): NodeJS.Process
   // `process.env` yayılımı ProcessEnv tipini korur (Next'in zorunlu kıldığı NODE_ENV dahil: boş nesne bu tipe uymaz); sızmaması gerekenler sonra silinir.
   const e: NodeJS.ProcessEnv = { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' }
   for (const k of Object.keys(e)) {
-    if (k.startsWith('VITEST') || k === 'VENTHUB_DUNYA_DURUMU' || k === TABAN_ORTAM) delete e[k]
+    if (k.startsWith('VITEST') || k === 'VENTHUB_DUNYA_DURUMU' || k === TABAN_ORTAM || k === SHARD_ORTAM) delete e[k]
   }
   if (kip) e.VENTHUB_DUNYA_DURUMU = kip
   if (taban) e[TABAN_ORTAM] = taban
