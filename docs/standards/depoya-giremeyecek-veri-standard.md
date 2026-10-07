@@ -27,8 +27,11 @@ tutar girmez"), `secret-exposure-audit-2026-08-15.md` (sır imzaları).
   R1 sözlüğü tabanı değil elle yazılmış listeyi doğruluyordu (O2), SQL eşikleri ifade başınaydı (O3), izin kaydı içeriğe bağlı
   değildi (O4); ayrıca D2-D7 (yol toplama, kübik düzenli ifade, ara commit olayı, kanca dala bağlı, fikstür kimlikleri, belge hizası).
 - **2026-10-07 son tur (bu sürüm v1.3):** kök dizindeki `support/` klasörü ağaçtan SİLİNDİ (içinde döküm dışı kullanılan bir şey yoktu: atıflar
-  yalnız bu işin kendi kayıtlarıydı); R5'in tek izinli örneği oydu, **kartın izin yolu da kapatıldı** (§4). İkinci turdaki 13 bulgunun düzeltmesi
-  45 bozma (sabotaj) ile sınandı: her bozma ilgili testi KIRMIZI yaptı.
+  yalnız bu işin kendi kayıtlarıydı); R5'in tek izinli örneği oydu, **kartın izin yolu da kapatıldı** (§4). **3. tur** bağımsız güvenlik incelemesi
+  2. turun 13 bulgusundan 11'ini kapalı, 1'ini kısmen kapalı buldu ve 7 yeni bulgu yazdı (N1-N7); N1, N2, N3, N5, N6 bu sürümde kapandı, N4 ve N7
+  ayrı kayıtta (§8). Düzeltmeler **bozma (sabotaj) ölçümüyle** sınandı: her bozma AYRI plan olarak atılabilir kopyalarda koşuldu; ilk koşuda
+  yeşil kalan her bozma bir test boşluğu ya da yanlış test eşleştirmesiydi ve test eklenerek kapatıldı, yeniden koşuda KIRMIZI verdi
+  (sayılar PR gövdesinde: sayı her turda değiştiği için bu cetvel sayı taşımaz). Davranışı değiştirmeyen tek bozma (eşdeğer mutant) adıyla ayrıldı.
 - **Kapı boşluğu:** hiçbir kapı kişisel veriye ya da tablo imzasına bakmıyordu; dökümü okuyan testler önce arındırılmış fikstüre bağlandı.
 
 ## 3. Kurallar (kapı DEĞERE değil ŞEKLE bakar)
@@ -144,4 +147,6 @@ Kapının **görmediği** biçimler (kasıtlı ya da maliyeti yüksek; yeşil ç
   (özel/yedek) uzağa itilmişse herkese açık uzağa itilirken nesneleri taranmaz (öneri: kancadan uzak adını geçir, `--not --remotes=<uzak>`).
 - Ek bilinen sınırlar: **XML hiç taranmaz** (UBL-TR e-fatura: alıcı VKN/TCKN, ad, adres; e-fatura işinden önce eklenmeli); `INSERT … SELECT … UNION ALL`
   çok satırlı tohumda satır sayısı alt sınırdır (1: genel alan eşiği ≥3 satır sayılmaz, hassas tabloda eşik 1 olduğu için etkilenmez); `$$`/`DO`
-  gövdeleri masum sayılır (uygulanmış migration'larda e-posta literal'i olabilir, kapı tasarım gereği görmez).
+  gövdeleri masum sayılır (uygulanmış migration'larda e-posta literal'i olabilir, kapı tasarım gereği görmez). Çözümlenmeyen SQL biçimleri
+  (3. tur sonrası kendi taramamız): veri DEĞİŞTİREN CTE (`WITH ins AS (INSERT … RETURNING …) SELECT …`: ana ifade SELECT olduğu için CTE
+  içindeki INSERT görülmez) ve parantezli SELECT (`INSERT INTO t (a) (SELECT 'x')`).

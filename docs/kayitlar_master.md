@@ -2,9 +2,9 @@
 
 ---
 project_name: venthub-hvac
-compiled_at: 2026-10-06T13:24:01.838830+00:00
+compiled_at: 2026-10-07T11:03:05.125923+00:00
 total_compiled_files: 281
-source_commit: b7af23b8e
+source_commit: 4dfd81f6f
 source: ['docs/audits', 'docs/plans']
 ---
 
@@ -1151,11 +1151,13 @@ madde 1 gereği araç sayılmaz.
 | `scripts/seo/__tests__/yayinda-model-veri-uret.test.ts` | INV-YAYINDA-MODEL-9 · yayındaki model listesi ↔ Faz 2 CSV birebirliği (URN-31) | URUN | ci test takımı | URN-31 (yeni, ilk koşu yeşil) | kendisi test | YENI |
 | `scripts/seo/yayinda-model-ag-kapisi.mjs` | YAYINDAKİ MODELLER AĞ KAPISI — canlı DB'ye salt SELECT: liste SKU'ları aktif/silinmemiş/doğru ailede mi (URN-31). Boş listede ağsız 0. ⚠AĞA ÇIKAR (liste doluyken) | URUN | liste açma PR'ı öncesi elle | URN-31 (yeni; canlıda koşulmadı) | yayinda-model-ag-kapisi.test.ts | YENI |
 | `scripts/seo/yayinda-model-veri-uret.mjs` | YAYINDAKİ MODELLER VERİ ÜRETİCİSİ — SKU listesi + Faz 2 CSV → `src/config/yayindaModeller.veri.json`; `--yenile` CSV değişince listeyi yeniler (URN-31). Ağa çıkmaz | URUN | liste açma PR'ı + CSV değişince elle | URN-31 (yeni, ilk koşu yeşil) | yayinda-model-veri-uret.test.ts | YENI |
+| `scripts/ci/degisiklik-sinifi.cjs` | DEĞİŞİKLİK SINIFLAYICI — PR'ın değişen dosyalarını belge / edge / betik / karma / tam sınıflar; YALNIZ dar sınıfta `Build (blocking)` ve e2e ağır adımları atlanır, şüphede HEP tam (ALT-38c) | ALTYAPI | `.github/workflows/ci.yml` ve `e2e-smoke.yml` (`Değişiklik sınıfı` adımı, tabandan çıkarılıp koşar) | 2026-10-07 bağlandı; canlı ölçüm PR'ın kendi koşusunda | `degisiklik-sinifi.test.ts` + `ci-degisiklik-sinifi.test.ts` (INV-CI-SINIF-1/2) | KAL |
+| `scripts/ci/__tests__/degisiklik-sinifi.test.ts` | Sınıflayıcının karar tablosu: yol normalleştirme, sınıf önekleri, HER_ZAMAN_TAM (tam yol girdileri dahil), çıktı enjeksiyonu, gerçek git ile uçtan uca; yanlış yön HEP `tam` (ALT-38c) | ALTYAPI | ci test takımı | 2026-10-07 yazıldı, ilk koşu yeşil | kendisi test | KAL |
 | `scripts/ci/__tests__/edited-ayna.test.ts` | INV-CI-EDITED-2 · `edited` aynasının karar mantığı: yalnız "aynı head SHA için tam koşu success + base ilerlememiş" atlatır, her belirsizlik tam koşudur (ALT-38) | ALTYAPI | ci test takımı | 2026-10-06 yazıldı, ilk koşu yeşil | kendisi test | KAL |
 | `scripts/ci/dunya-durumu.cjs` | DÜNYA DURUMU TESTLERİ — PR kapısından çıkan testlerin listesi (`dunya-durumu-testleri.json`), doğrulayıcısı ve `VENTHUB_DUNYA_DURUMU` kipleri (tam / dislan / yalniz); `vitest.config.ts` kullanır (ALT-38) | ALTYAPI | `vitest.config.ts` (her vitest koşusu), `src/__tests__/conformance/test-kosu-kapsami.test.ts` | 2026-10-06 yazıldı, ilk koşu yeşil | `test-kosu-kapsami.test.ts` (INV-TEST-KOSU-1) | KAL |
 | `scripts/ci/edited-ayna.cjs` | `edited` AYNASI — PR başlığı/gövdesi düzenlenince önceki tam yeşil koşuyu doğrulayıp ağır adımları atlatır; belirsizlikte tam koşu (ALT-38) | ALTYAPI | `.github/workflows/ci.yml` (`edited ayna kararı` adımı) | 2026-10-06 yazıldı; canlı ölçüm PR'ın kendi edited koşusunda | `edited-ayna.test.ts` (INV-CI-EDITED-2) + `ci-edited-ayna.test.ts` (INV-CI-EDITED-1) | KAL |
 | `scripts/ci/__tests__/dunya-durumu.test.ts` | INV-TEST-KOSU-1 (B3) · dünya durumu dışlama listesinin güven sınırı: kesişim (PR listesi ∩ taban), geçersiz listede fırlatma, DISLANAMAZ, taban okuma (git HEAD^1), komut satırı (ALT-38a) | ALTYAPI | ci test takımı | 2026-10-06 yazıldı, ilk koşu yeşil | kendisi test | KAL |
-| `scripts/security/depo-dokum-kapisi.cjs` | DEPO DÖKÜM KAPISI — izlenen dosyalarda veritabanı dökümü, dolu kişisel alan (R1/R2), fiyat-maliyet dökümü (R3), döküm yolu (R4), ödeme parçası (R5) ve ikili veritabanı (R6) arar; itilecek nesneleri de tarar (sonradan silinenler dahil); DEĞER BASMAZ, çıkış 0/1/2 (ALT-39) | ALTYAPI | `.github/workflows/ci.yml` 'Döküm kapısı (depoya giremeyecek veri)' adımı (Install'dan önce, `if:` yok; önceki adım kırmızıysa koşmaz) ve `.githooks/pre-push` (`--pre-push`; `--no-verify` ile atlanır); elle: `node scripts/security/depo-dokum-kapisi.cjs` | 2026-10-06: gerçek ağaçta 0 isabet; eski döküm geçici depoya geri konunca R1 + R3 + R4 kırmızı (çıkış 1) | `depo-dokum-kapisi.test.ts` + `depo-dokum-kapisi-uctan-uca.test.ts` (INV-DEPO-DOKUM-1) | KAL |
+| `scripts/security/depo-dokum-kapisi.cjs` | DEPO DÖKÜM KAPISI — izlenen dosyalarda veritabanı dökümü, dolu kişisel alan (R1/R2), fiyat-maliyet dökümü (R3), döküm yolu (R4), ödeme parçası (R5) ve ikili veritabanı (R6) arar; itilecek nesneleri de tarar (sonradan silinenler dahil; aynı içerik taşıyan her yolla); DEĞER BASMAZ, çıkış 0/1/2 (2 de itme öncesi kancada push'u engeller; ALT-39) | ALTYAPI | `.github/workflows/ci.yml` 'Döküm kapısı (depoya giremeyecek veri)' adımı (Install'dan önce, `if:` yok; önceki adım kırmızıysa koşmaz) ve `.githooks/pre-push` (`--pre-push`; çıkış 1 ve 2 engeller, bilinçli geçiş `VH_DOKUM_OLCULEMEDI_IZIN=1`; `--no-verify` ile atlanır; kanca dala bağlıdır); elle: `node scripts/security/depo-dokum-kapisi.cjs` | 2026-10-06: gerçek ağaçta 0 isabet; eski döküm geçici depoya geri konunca R1 + R3 + R4 kırmızı (çıkış 1) | `depo-dokum-kapisi.test.ts` + `depo-dokum-kapisi-uctan-uca.test.ts` (INV-DEPO-DOKUM-1) | KAL |
 
 ### 3.3 · skill (39 tekil ad, 64 satır ağaç-bazlı)
 
@@ -1432,7 +1434,7 @@ gerektirmez).
 | duzenli-gorevler-standard | Düzenli Görevler Standardı (v0.1 TASLAK — 2026-10-03): rol kartına Amaç + Düzenli görevler tablosu, veri dosyası `scripts/belge/rol-gorevleri.json`, üretici `rol-karti-uret.cjs` | HARITA | `docs/README.md` (soru→dosya haritası), `docs/roller/GEO-SEO-gorevler.md` (betik taramasi) | 2026-10-03 yazıldı; rol-kartlari 54/54 | `rol-kartlari.test.ts` (Amaç ve Düzenli görevler iddiaları) | KAL |
 | rota-dili-standard | Rota Dili Standardı (statik sayfa adresleri: TR Türkçe, EN İngilizce) | ALTYAPI | `docs/README.md` (soru→dosya haritası), `src/config/rotaDili.mjs`, `src/config/rotaDiliCekirdek.mjs` (betik taramasi) | 2026-10-04 yazıldı; PR-A…C2 kodu ve kapıları aynı yığında | `rota-dili-kapali-sifir-fark.test.ts` (INV-ROTA-DILI-KAPALI-1), `rota-dili-adres-uretimi.test.ts` (INV-ROTA-DILI-KAPALI-2), `rotaDiliCekirdek.test.ts` (INV-ROTA-DILI-CEKIRDEK-1, Edge güvenlik taraması), `rotaDili.test.ts` | KAL |
 | test-karnesi-standard | Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.0 (ALT-38, 2026-10-06): testin nerede koşacağı (PR kapısı / master push / zamanlı), dünya durumu testlerinin PR kapısından çıkarılma kuralı, edited aynası; test karnesi bölümü ikinci teslimle gelir | ALTYAPI | `docs/README.md` (soru→dosya haritası), `.github/workflows/ci.yml`, `.github/workflows/dunya-durumu.yml`, `scripts/ci/dunya-durumu-testleri.json` | 2026-10-06 yazıldı; dört kapısı aynı PR'da yeşil | INV-TEST-KOSU-1 (`test-kosu-kapsami.test.ts`), INV-CI-EDITED-1 (`ci-edited-ayna.test.ts`), INV-CI-EDITED-2 (`edited-ayna.test.ts`), INV-DUNYA-SATIRI-1 (`dunya-durumu-satiri.test.ts`) | KAL |
-| depoya-giremeyecek-veri-standard | Depoya Giremeyecek Veri — Cetvel v1.0 (ALT-39): PUBLIC depoya veritabanı dökümü, müşteri/ödeme verisi ve fiyat-maliyet listesi girmez; R1-R6 kuralları, izin kayıtları (tavan 4, her biri gerekçeli), fikstürün gerçek değerden türetilmeden sentetik üretilmesi kuralı, geçmiş temizliği ALT-41'de | ALTYAPI | `docs/README.md` (soru→dosya haritası), `.github/workflows/ci.yml` (adım yorumu) | 2026-10-06 yazıldı; kapı ve testi aynı yığında | `depo-dokum-kapisi.test.ts` (INV-DEPO-DOKUM-1), `odeme_eslesme.test.ts` (sentetik fikstür kolları) | KAL |
+| depoya-giremeyecek-veri-standard | Depoya Giremeyecek Veri — Cetvel v1.3 (ALT-39, son tur): PUBLIC depoya veritabanı dökümü, müşteri/ödeme verisi ve fiyat-maliyet listesi girmez; R1-R6 kuralları (R1 toleranslı eşleşme, R6 uzantıdan bağımsız imza), izin kayıtları (yalnız R3 ve R6, tavan 4; R5 kart parçası izin ALMAZ; her biri gerekçeli ve BLOB'a bağlı), fikstürün gerçek değerden türetilmeden sentetik üretilmesi kuralı, geçmiş temizliği ALT-41'de | ALTYAPI | `docs/README.md` (soru→dosya haritası), `.github/workflows/ci.yml` (adım yorumu) | 2026-10-06 yazıldı; kapı ve testi aynı yığında | `depo-dokum-kapisi.test.ts` (INV-DEPO-DOKUM-1), `odeme_eslesme.test.ts` (sentetik fikstür kolları) | KAL |
 
 ---
 
@@ -31969,8 +31971,9 @@ merge edilir (merge = prod'a otomatik apply, CLAUDE.md Kural 13). Kod PR'larınd
 ### F0 — Yedek + kontrollü tasfiye (tek migration)
 
 1. **Yedek:** `products`, `product_images`, `venthub_orders(+items)`, `shopping_carts(+cart_items)`
-   tam dökümü → `docs/archive/db-backup-pre-kademe2/` (CSV; 219 eski satış fiyatı ileride fiyat
-   motoru çapraz-kontrolü için burada yaşar). Yedek dosyaları commit'lenir (repo = sigorta).
+   tam dökümü → eski döküm dizini (CSV; 219 eski satış fiyatı ileride fiyat
+   motoru çapraz-kontrolü için burada yaşardı). ⚠ALT-39: bu karar GERİ ALINDI; depo herkese açık olduğu için döküm ağaçtan
+   kaldırıldı ve bir daha depoya girmez (cetvel: `docs/standards/depoya-giremeyecek-veri-standard.md`); geçmişten silme ALT-41.
 2. **Tasfiye migration'ı** (sıra FK'ya göre): test sipariş kalemleri + siparişler + sepetler +
    `inventory_movements` (varsa) + `product_prices` + `product_images` + `products` satırları.
    `TRUNCATE` değil kayıtlı `DELETE` (audit izi migration dosyasında).
