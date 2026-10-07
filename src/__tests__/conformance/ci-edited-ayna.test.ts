@@ -41,6 +41,15 @@ import { describe, expect, it } from 'vitest'
  *  11. `fetch-depth: 0` (B1/B2): `HEAD^1` ve `git show HEAD^1:` sığ klonda çalışmaz, ayna sessizce hep TAM der. Checkout `with:` girdileri TAM
  *      küme (`ref` merge-ref'te kalmalı: PR başı checkout'unda `HEAD^1` taban olmaz).
  *
+ * ALT-38c-2 · TEST SHARD'LARI (felsefe değişti: PR'da `ci` içindeki Test KAPALI, testler `test-shard` işlerinde koşar):
+ *  12. `Test` adımının koşulu artık `steps.ayna.outputs.atla != 'true' && !(<shard olayı>)`: master push, elle koşum ve `edited` koşusunda `ci` içinde TAM koşar
+ *      (eskisi gibi), pull_request'in (edited hariç) koşusunda koşmaz. Koşul ya hiç kapanmazsa PR'da testler İKİ yerde koşar (süre kazancı sıfır), PR'da `edited`
+ *      dahil kapanırsa ya da push'ta kapanırsa HİÇBİR yerde koşmaz (kapsam kaybı): satır eşitliğiyle sabit.
+ *  13. `ci` işinin SON adımı "Test shard sonuçları (bekle ve doğrula)": aynı koşunun `test-shard` işlerinin hepsi `success` olmadan `ci` yeşil olmaz. Bu adım ayna
+ *      kararına BAĞLI DEĞİLDİR (koşulu yalnız olaydır: `edited` koşusunda zaten Test `ci` içinde koşar) ve HER koşulda kapı gibi sertleştirilir: `if` satır eşitliği,
+ *      `continue-on-error` ve hata yutma yok, ortam değerleri sabit, Build'den SONRA. Matrix sayısı ile bağı ve son-adım kuralı INV-CI-SHARD-1'de, kapsam kanıtı
+ *      INV-CI-SHARD-2'dedir (ci-test-shard.test.ts).
+ *
  * SABOTAJ TESTLERİ ÇAPASIZDIR: bozucular adımı/anahtarı ADIYLA bulup satırı BÜTÜNÜYLE yeniden yazar (bul-değiştir metni yok);
  * ci.yml sabotaj yoklamasında zaten bozulmuşsa fikstür kırılmaz, yani sabotaj testi yalnız KENDİ denetimi çalışmazsa kırmızı olur.
  *
@@ -75,8 +84,26 @@ const SINIF_ADI = "Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanı
 const SINIF_ID = 'sinif'
 const NEXT_ONBELLEK_ADI = 'Next.js derleme önbelleği'
 const NODE_ONBELLEK_ADI = 'Node derleme önbelleği (V8 bayt kodu)'
-/** Ağır adımların beklenen `if:` satırı: varsayılan KOSUL; Build ve Next önbelleği (Build ile BİREBİR aynı koşul) sınıf koşulunu da taşır. */
-const AGIR_KOSULU: Record<string, string> = { 'Build (blocking)': KOSUL_BUILD, [NEXT_ONBELLEK_ADI]: KOSUL_BUILD }
+
+// ── ALT-38c-2 · TEST SHARD'LARI: pull_request'te (edited hariç) Test `ci` içinde KOŞMAZ, `test-shard` işlerinde koşar ──────────────
+/** Testlerin shard işlerinde koştuğu olay: pull_request ve `edited` DEĞİL. `test-shard` işinin `if`i, bekleme adımının `if`i ve Test'in dışlaması AYNI ifadeyi taşır. */
+const SHARD_OLAYI = "github.event_name == 'pull_request' && github.event.action != 'edited'"
+/** `ci` içindeki Test: ayna koşulu VE shard olayı DEĞİL (master push, elle koşum ve `edited` koşusunda eskisi gibi TAM koşar). */
+const KOSUL_TEST = `if: steps.ayna.outputs.atla != 'true' && !(${SHARD_OLAYI})`
+const SHARD_BEKLE_ADI = 'Test shard sonuçları (bekle ve doğrula)'
+const SHARD_BEKLE_KOSULU = `if: ${SHARD_OLAYI}`
+const SHARD_BEKLE_RUN = 'run: node scripts/ci/test-shard-bekle.cjs'
+/** Bekleme adımının ortamı: `SHARD_TOPLAM` değeri desenle sınanır (matrix sayısıyla eşitliği INV-CI-SHARD-1 ölçer); ötekiler TAM değer. */
+const SHARD_BEKLE_ENV: Record<string, string | RegExp> = {
+  GH_TOKEN: '${{ github.token }}',
+  DEPO: '${{ github.repository }}',
+  KOSU_ID: '${{ github.run_id }}',
+  KOSU_DENEME: '${{ github.run_attempt }}',
+  SHARD_TOPLAM: /^'[1-9]\d*'$/,
+}
+
+/** Ağır adımların beklenen `if:` satırı: varsayılan KOSUL; Build ve Next önbelleği (Build ile BİREBİR aynı koşul) sınıf koşulunu da taşır; Test shard olayında kapanır. */
+const AGIR_KOSULU: Record<string, string> = { 'Build (blocking)': KOSUL_BUILD, [NEXT_ONBELLEK_ADI]: KOSUL_BUILD, Test: KOSUL_TEST }
 const beklenenKosul = (ad: string): string => AGIR_KOSULU[ad] ?? KOSUL
 /** Sınıf adımının betiği ve tabandan çıkarılan kopyası (edited ayna ile AYNI güven sınırı: PR betiği değiştirip kendi kararını veremez). */
 const SINIF_BETIGI = 'scripts/ci/degisiklik-sinifi.cjs'
@@ -93,7 +120,7 @@ if [ "$cikis" -ne 0 ]; then
   printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
 fi`
 
-/** Ayna koşusunda ATLANAN adımlar: hepsi `beklenenKosul(ad)` satırını taşır (çoğu KOSUL; Build ve Next önbelleği KOSUL_BUILD). */
+/** Ayna koşusunda ATLANAN adımlar: hepsi `beklenenKosul(ad)` satırını taşır (çoğu KOSUL; Build ve Next önbelleği KOSUL_BUILD; Test KOSUL_TEST). */
 const AGIR = [
   'Setup Deno',
   'Install dependencies',
@@ -166,8 +193,8 @@ interface HepKosanBeklentisi {
   run?: string
   /** Beklenen ÇOK SATIRLI `run: |` gövdesi (LF, girinti atılmış); verilirse `run:` bir LİTERAL blok (`|`, `|-`, `|+`) olmalıdır, `>` olamaz. */
   govde?: string
-  /** Beklenen ortam değişkenleri: TAM küme ve TAM değerler; verilmezse denetlenmez. */
-  env?: Record<string, string>
+  /** Beklenen ortam değişkenleri: TAM küme ve TAM değerler (değeri RegExp olan girdi desenle sınanır); verilmezse denetlenmez. */
+  env?: Record<string, string | RegExp>
   /** Beklenen `with:` girdileri: TAM küme ve TAM değerler; verilmezse denetlenmez. */
   girdiler?: Record<string, string>
   /** Beklenen `uses:` ÖNEKİ (eylem adı, `@` dahil); verilirse eylem başka bir şeyle değiştirilemez. */
@@ -178,7 +205,8 @@ interface HepKosanBeklentisi {
 
 /**
  * Ayna koşusunda DA koşan adımlar: HİÇBİRİ ayna koşulu taşımaz (özellikle PR kayıt kapısı); kendi koşulları TAM eşitlikle sabit.
- * Sıra dosya sırasıdır; zorunlu sıra ayrıca `siraDenetle`de sınanır.
+ * Sıra dosya sırasıdır; zorunlu sıra ayrıca `siraDenetle`de sınanır. (ALT-38c-2: shard bekleme adımı `edited` koşusunda kendi olay koşuluyla
+ * koşmaz; sınıfı yine buradadır çünkü AYNA KARARINA bağlı değildir: bağlansaydı ayna onu sessizce atlatabilirdi.)
  */
 const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
   {
@@ -234,6 +262,15 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     id: SINIF_ID,
     govde: SINIF_RUN_GOVDESI,
     anahtarlar: ['name', 'id', 'if', 'run'],
+  },
+  // ALT-38c-2: shard sonuçlarını bekleyen SON adım. `edited` koşusunda KOŞMAZ (Test o koşuda `ci` içinde koşar) ama bu ayna kararına bağlı DEĞİL, olay koşuludur:
+  // ayna koşulu taşırsa `steps.ayna` bu adımı da sessizce atlatabilir. Kapı gibi sertleştirilir: kırmızı shard burada `ci`yi kırmızı yapar.
+  {
+    ad: SHARD_BEKLE_ADI,
+    kosul: SHARD_BEKLE_KOSULU,
+    run: SHARD_BEKLE_RUN,
+    env: SHARD_BEKLE_ENV,
+    anahtarlar: ['name', 'if', 'env', 'run'],
   },
 ]
 const HEP_KOSAN = HEP_KOSAN_BEKLENTISI.map((h) => h.ad)
@@ -449,17 +486,17 @@ function hataYutanSatirlar(a: Adim, govdeyiTara: boolean): string[] {
 }
 
 /** `env:` / `with:` haritası TAM küme ve TAM değer: eksik, farklı değerli ve fazladan girdi ayrı ayrı bildirilir. */
-function haritaDenetle(harita: Map<string, string>, beklenen: Record<string, string>, onEk: string, ifade: { yok: string; fazla: string }): string[] {
+function haritaDenetle(harita: Map<string, string>, beklenen: Record<string, string | RegExp>, onEk: string, ifade: { yok: string; fazla: string }): string[] {
   const ihlal: string[] = []
   for (const [ad, deger] of Object.entries(beklenen)) {
     const bulunan = harita.get(ad)
     if (bulunan === undefined) ihlal.push(`${onEk} ${ad} ${ifade.yok}`)
-    else if (bulunan !== deger) ihlal.push(`${onEk} ${ad} değeri beklenen değil: bulunan \`${bulunan}\`, beklenen \`${deger}\``)
+    else if (typeof deger === 'string' ? bulunan !== deger : !deger.test(bulunan)) ihlal.push(`${onEk} ${ad} değeri beklenen değil: bulunan \`${bulunan}\`, beklenen \`${String(deger)}\``)
   }
   for (const ad of harita.keys()) if (!(ad in beklenen)) ihlal.push(`${onEk} ${ifade.fazla} ${ad}`)
   return ihlal
 }
-const envDenetle = (a: Adim, beklenen: Record<string, string>, onEk: string) =>
+const envDenetle = (a: Adim, beklenen: Record<string, string | RegExp>, onEk: string) =>
   haritaDenetle(a.env, beklenen, onEk, { yok: 'ortam değişkeni yok', fazla: 'beklenmeyen ortam değişkeni' })
 const girdiDenetle = (a: Adim, beklenen: Record<string, string>, onEk: string) =>
   haritaDenetle(a.girdiler, beklenen, onEk, { yok: 'girdisi yok', fazla: 'beklenmeyen girdi' })
@@ -559,6 +596,15 @@ const SINIF_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
   [NODE_ONBELLEK_ADI, 'Test', 'Test Node önbelleğinden ÖNCE: önbellek geri yüklenmeden koşar (kazanç sıfır)'],
 ]
 
+/**
+ * ALT-38c-2 sırası: bekleme adımı Build'den SONRA. Lint, Type check ve Build shard işleriyle ÜST ÜSTE koşar; bekleme erkene alınırsa `ci` shard'lar bitene dek
+ * hiçbir şey yapmaz (süre kazancı sıfır). "SON adım" kuralı (bekleme adımından sonra adım yok) INV-CI-SHARD-1'de ayrıca sınanır.
+ */
+const SHARD_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
+  ['Build (blocking)', SHARD_BEKLE_ADI, "bekleme adımı Build'den ÖNCE: ci shard'lar bitene dek bekler, Lint/Build onlarla üst üste koşmaz (süre kazancı sıfır)"],
+  ['Test', SHARD_BEKLE_ADI, "bekleme adımı Test'ten ÖNCE: master push ve elle koşumda sıra bozulur"],
+]
+
 const IZ_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
   [CHECKOUT_ADI, TABAN_ADI, "taban SHA'sı adımı Checkout'tan ÖNCE: depo yokken `git rev-parse HEAD^1` boş döner, iz hiçbir koşuda yazılmaz (ayna hep TAM der)"],
   [TABAN_ADI, IZ_ADI, "iz adımı taban SHA'sı adımından ÖNCE: ad henüz üretilmemiş (boş) çıktıyı okur, iz yazılmaz"],
@@ -578,7 +624,7 @@ function siraDenetle(adimlar: Adim[]): string[] {
     const i = sira(ad)
     if (aynaSira >= 0 && i >= 0 && i < aynaSira) ihlal.push(`AĞIR adım "${ad}" ayna adımından ÖNCE: koşul henüz hesaplanmamışken koşar`)
   }
-  for (const [once, sonra, neden] of [...IZ_SIRASI, ...SINIF_SIRASI]) {
+  for (const [once, sonra, neden] of [...IZ_SIRASI, ...SINIF_SIRASI, ...SHARD_SIRASI]) {
     const i = sira(once)
     const j = sira(sonra)
     if (i >= 0 && j >= 0 && j < i) ihlal.push(neden)
@@ -1133,6 +1179,29 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'sınıf adımının taban kopyası yok dalı `tam` yerine `belge` yazar', boz: (c) => adimRunBlogunuDegistir(c, SINIF_ADI, SINIF_RUN_GOVDESI.replace("printf 'sinif=tam", "printf 'sinif=belge").split('\n').map((s) => `          ${s}`)), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" run gövdesi beklenen TAM gövde değil`] },
   { ad: 'sınıf adımı `continue-on-error: true` alır', boz: (c) => adimaAnahtarEkle(c, SINIF_ADI, 'continue-on-error: true'), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" continue-on-error taşıyor`] },
   { ad: 'sınıf adımının `id` satırı değişir (Build koşulu çıktıyı okuyamaz: hep koşar)', boz: (c) => adimAnahtariniYaz(c, SINIF_ADI, 'id', 'id: siniflar'), beklenen: [`HEP KOŞAN adım "${SINIF_ADI}" \`id: ${SINIF_ID}\` satırı yok`] },
+  // ── ALT-38c-2: Test'in koşulu shard olayının TERSİ, TAM eşitlikle (çift koşu da kapsam kaybı da kırmızı) ────────────────────────
+  { ad: "Test koşulu hiç kapanmaz (PR'da testler HEM `ci` içinde HEM shard'larda koşar: çift koşu, süre kazancı sıfır)", boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', KOSUL), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
+  { ad: "Test koşulu PR'da `edited` dahil kapanır (edited koşusunda testler HİÇBİR yerde koşmaz: kapsam kaybı)", boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', "if: steps.ayna.outputs.atla != 'true' && github.event_name != 'pull_request'"), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
+  { ad: "Test koşulu push ve elle koşumda da kapanır (master'da testler hiç koşmaz: yalnız PR olayına bağlanmış)", boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', "if: steps.ayna.outputs.atla != 'true' && github.event_name == 'pull_request'"), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
+  { ad: 'Test koşulunda `!(...)` düşer (shard olayı AÇIKÇA koşturur: PR da hem ci hem shard)', boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', `if: steps.ayna.outputs.atla != 'true' && (${SHARD_OLAYI})`), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
+  { ad: 'Test koşulu ayna koşulunu kaybeder (ayna koşusunda da tam paket koşar: kazanç sıfır)', boz: (c) => adimAnahtariniYaz(c, 'Test', 'if', `if: !(${SHARD_OLAYI})`), beklenen: ['AĞIR adım "Test" atlama koşulu TAM eşit değil'] },
+
+  // ── ALT-38c-2: shard bekleme adımı (kırmızı shard = kırmızı `ci`: bu adım atlanır ya da yutulursa shard kırmızısı görünmez olur) ────
+  { ad: 'bekleme adımı silinir (shard kırmızısı `ci`yi kırmızı yapmaz: zorunlu kontrol yeşil kalır)', boz: (c) => adimiSil(c, SHARD_BEKLE_ADI), beklenen: [`adım "${SHARD_BEKLE_ADI}" ci.yml içinde yok`] },
+  { ad: 'bekleme adımından `if:` silinir (push ve elle koşumda da koşar, shard işi olmadığından orada kırmızı verir)', boz: (c) => adimAnahtariniYaz(c, SHARD_BEKLE_ADI, 'if', null), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" beklenen`, 'koşulunu taşımıyor'] },
+  { ad: "bekleme adımı koşulu `edited`i de kapsar (edited koşusunda shard yok: adım hep kırmızı)", boz: (c) => adimAnahtariniYaz(c, SHARD_BEKLE_ADI, 'if', "if: github.event_name == 'pull_request'"), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" atlama koşulu taşıyor`] },
+  { ad: 'bekleme adımına ayna koşulu girer (ayna kararı shard sonucunu atlatabilir)', boz: (c) => adimAnahtariniYaz(c, SHARD_BEKLE_ADI, 'if', `${SHARD_BEKLE_KOSULU} && steps.ayna.outputs.atla != 'true'`), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" atlama koşulu taşıyor`] },
+  { ad: 'bekleme adımına ikinci `if:` satırı (`always()`: kırmızı shard varken de koşturur ya da hiç koşturmaz)', boz: (c) => adimaAnahtarEkle(c, SHARD_BEKLE_ADI, 'if: always()'), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" atlama koşulu taşıyor`] },
+  { ad: 'bekleme adımına `continue-on-error: true` (kırmızı shard adımı kırmızı yapsa da iş yeşil kalır)', boz: (c) => adimaAnahtarEkle(c, SHARD_BEKLE_ADI, 'continue-on-error: true'), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" continue-on-error taşıyor`] },
+  { ad: 'bekleme `run` satırına `|| true` (bekleyicinin kırmızısı yutulur)', boz: (c) => adimAnahtariniYaz(c, SHARD_BEKLE_ADI, 'run', `${SHARD_BEKLE_RUN} || true`), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" run komutu hatayı yutuyor`, 'run satırı beklenen TAM'] },
+  { ad: 'bekleme `run` satırı başka betiği koşar', boz: (c) => adimAnahtariniYaz(c, SHARD_BEKLE_ADI, 'run', 'run: node scripts/ci/test-shard-bekle-eski.cjs'), beklenen: ['run satırı beklenen TAM'] },
+  { ad: 'bekleme adımından `KOSU_DENEME` düşer (yeniden koşumda eski deneme yeşili sayılır ya da betik kırılır)', boz: (c) => adimEnviniYaz(c, SHARD_BEKLE_ADI, 'KOSU_DENEME', null), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" KOSU_DENEME ortam değişkeni yok`] },
+  { ad: 'bekleme `KOSU_ID` run_number olur (başka koşunun shard işleri okunur)', boz: (c) => adimEnviniYaz(c, SHARD_BEKLE_ADI, 'KOSU_ID', '${{ github.run_number }}'), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" KOSU_ID değeri beklenen değil`] },
+  { ad: 'bekleme `DEPO` başka depoya bakar', boz: (c) => adimEnviniYaz(c, SHARD_BEKLE_ADI, 'DEPO', 'baska/depo'), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" DEPO değeri beklenen değil`] },
+  { ad: 'bekleme `SHARD_TOPLAM` boşaltılır (bekleyici geçersiz ortamla kırmızı kalır)', boz: (c) => adimEnviniYaz(c, SHARD_BEKLE_ADI, 'SHARD_TOPLAM', "''"), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" SHARD_TOPLAM değeri beklenen değil`] },
+  { ad: 'bekleme adımına fazladan ortam değişkeni (BEKLEME_SN: bekleme süresi kısalır)', boz: (c) => adimEnviniYaz(c, SHARD_BEKLE_ADI, 'BEKLEME_SN', '1'), beklenen: [`HEP KOŞAN adım "${SHARD_BEKLE_ADI}" beklenmeyen ortam değişkeni BEKLEME_SN`] },
+  { ad: "bekleme adımı Build'den ÖNCEYE taşınır (shard'larla üst üste binme kazancı kaybolur)", boz: (c) => adimiTasi(c, SHARD_BEKLE_ADI, 'Build (blocking)', 'once'), beklenen: ["bekleme adımı Build'den ÖNCE"] },
+  { ad: 'bekleme adımı Test adımından ÖNCEYE taşınır', boz: (c) => adimiTasi(c, SHARD_BEKLE_ADI, 'Test', 'once'), beklenen: ["bekleme adımı Test'ten ÖNCE"] },
   { ad: 'Build adımına `continue-on-error: true`', boz: (c) => adimaAnahtarEkle(c, 'Build (blocking)', 'continue-on-error: true'), beklenen: ['AĞIR adım "Build (blocking)" continue-on-error taşıyor'] },
   { ad: 'Lint `run` satırına `|| true` (tek satırlık ağır adım hatayı yutar)', boz: (c) => adimAnahtariniYaz(c, 'Lint (blocking)', 'run', 'run: pnpm run lint 2>&1 | tee ci-lint.log || true'), beklenen: ['AĞIR adım "Lint (blocking)" run komutu hatayı yutuyor'] },
   { ad: 'Test `run` satırına `|| :`', boz: (c) => adimAnahtariniYaz(c, 'Test', 'run', 'run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log || :'), beklenen: ['AĞIR adım "Test" run komutu hatayı yutuyor'] },
@@ -1270,6 +1339,24 @@ describe('INV-CI-EDITED-1 — edited aynası ci iş akışına doğru bağlı', 
   it('ağır adımların koşulu SATIR eşitliğiyle aynı (includes ile değil)', () => {
     expect(agirAdimlariDenetle(adimlariAyir(ci))).toEqual([])
     expect(AGIR.map((ad) => ifSatirlari(ci, ad))).toEqual(AGIR.map((ad) => [beklenenKosul(ad)]))
+  })
+
+  it('ALT-38c-2: Test koşulu shard olayının TERSİ, bekleme adımının koşulu shard olayının KENDİSİ; bekleme adımı Build ve Test SONRASI, ayna kararına bağlı değil', () => {
+    const adimlar = adimlariAyir(ci)
+    expect(ifSatirlari(ci, 'Test')).toEqual([KOSUL_TEST])
+    expect(ifSatirlari(ci, SHARD_BEKLE_ADI)).toEqual([SHARD_BEKLE_KOSULU])
+    // iki koşul AYNI ifadeden türer: biri değişirse öteki de değişmek zorunda (testlerin hiçbir yerde ya da iki yerde koşma boşluğu)
+    expect(KOSUL_TEST).toContain(`!(${SHARD_OLAYI})`)
+    expect(SHARD_BEKLE_KOSULU).toBe(`if: ${SHARD_OLAYI}`)
+    expect(adimlar.filter((a) => a.ad === SHARD_BEKLE_ADI)).toHaveLength(1)
+    expect(siraDenetle(adimlar)).toEqual([])
+    const sira = (ad: string) => adimlar.findIndex((a) => a.ad === ad)
+    expect(sira('Test')).toBeGreaterThanOrEqual(0)
+    expect(sira('Build (blocking)')).toBeLessThan(sira(SHARD_BEKLE_ADI))
+    expect(sira('Test')).toBeLessThan(sira(SHARD_BEKLE_ADI))
+    const bekle = adimlar.find((a) => a.ad === SHARD_BEKLE_ADI)
+    expect(bekle, 'bekleme adımı yok').toBeDefined()
+    expect(yorumsuz(bekle?.satirlar ?? []).join('\n')).not.toMatch(/steps\.ayna\.outputs/)
   })
 
   it('ayna adımının ortam değişkenleri DEĞERLERİYLE birebir (HEAD_SHA/KOSU_ID/TABAN_DEGISTI dahil; BASE_REF YOK)', () => {
