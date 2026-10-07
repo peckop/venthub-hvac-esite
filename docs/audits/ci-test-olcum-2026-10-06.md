@@ -59,4 +59,14 @@ Büyük dosyaların hepsi kanca/araç testidir (alt süreç açar); onların tet
 | ALT-38c-3 `isolate: false` ölçümü (birleşme YOK) | sırada | ölçüm sonucu bu bölüme satır olarak eklenir |
 | Karar 308 test seçimi | sırada | `okunan_yollar` sütunu girdi |
 
-_Canlı ölçüm satırları (gerçek CI koşusundan) teslimlerle eklenir._
+## 6. Canlı ölçüm: değişiklik sınıfı (ALT-38c-1, #1739)
+
+Saf belge PR'ı (bu PR'ın iki dosyası) aynı commit için iki tabana karşı koşturuldu. Süreler GitHub Actions iş API'sinden okundu (adım başına saniye); koşucu değişkenliği
+yüksektir (aynı Test adımı 252-387 sn arasında çıktı), bu yüzden tek koşu "kesin" değil **büyüklük sırası**dır.
+
+| Koşu | `ci` (zorunlu) | `admin-smoke` (zorunlu) | Test | Build | Not |
+|---|---|---|---|---|---|
+| ÖNCE: `master` tabanı (eski `ci.yml`), 2026-10-07 09:04Z | 11:41 | 4:31 | 387 sn | 182 sn | her şey koşar |
+| #1739'un kendi koşuları (sınıflayıcı tabanda yok → `tam`) | 11:34 (soğuk), 8:32 (sıcak) | 5:02, 4:42 | 362, 270 sn | 187, 124 sn | önbellekler: sıcak koşuda Test −92 sn, Build −63 sn (tek örnek) |
+
+_SONRA satırları (taban #1739 dalı, sınıf `belge`: Build ve e2e atlanır) bu PR'ın sonraki koşusundan eklenir._
