@@ -430,23 +430,30 @@ jobs:
             echo "::warning::test seçimi: tam — seçici çöktü (çıkış kodu $cikis), tam paket koşar"
             printf 'tam=true\nneden=seçici çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
           fi
+          tam=$(sed -n 's/^tam=//p' "$GITHUB_OUTPUT" | tail -n 1)
+          sayi=$(sed -n 's/^secilen-sayisi=//p' "$GITHUB_OUTPUT" | tail -n 1)
+          bos=false
+          if [ "$tam" = "false" ] && [ "$sayi" = "0" ]; then bos=true; fi
+          echo "bos=$bos" >> "$GITHUB_OUTPUT"
 
-      # Kurulum ve Test YALNIZ seçim kendiliğinden BOŞ DEĞİLSE koşar. Koşul: seçici `tam=false` VE `secilen-sayisi=0` dememişse (çıktı yok, `true`, sayı başka) koşar. YAML'da `!` ile başlayan ifade etiket
-      # sayıldığı için olumsuzlama De Morgan biçimindedir.
+      # Kurulum ve Test YALNIZ seçim kendiliğinden BOŞ DEĞİLSE koşar: adım SON satırında `bos=true` ya da `bos=false` yazar; `true` YALNIZ seçicinin SON `tam=false` VE `secilen-sayisi=0` yazdığı durumdadır
+      # (çökme yedeği `tam=true`yu ezer; seçicinin kendi yazdığı bir `bos` de bu son satırla ezilir). Koşullar `bos` çıktısını `!= 'true'` ile okur: çıktı yoksa ya da başka değerse KOŞAR.
+      # Seçicinin ham çıktısı koşulda KULLANILMAZ: GitHub eşitsiz türleri sayıya çevirir ve eksik çıktı (null) ile `'0'` ikisi de 0 olur, yani `secilen-sayisi != '0'` eksik çıktıda "atla" derdi
+      # (doküman: "Null → 0", sayısal dize → sayı). `'true'` sayıya çevrilemez (NaN): bu karşılaştırmada yalnız TAM `true` atlatır.
       - name: Setup Deno
-        if: (steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')
+        if: steps.sec.outputs.bos != 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: v2.x
 
       # Lifecycle betikleri KAPALI (`--ignore-scripts`): kökün `postinstall`ı `tsc --noEmit` koşturur (~20 sn, her shard'da) ve testler onu kullanmaz; tip denetimi `ci` işindedir (orada DEĞİŞMEZ).
       - name: Install dependencies
-        if: (steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')
+        if: steps.sec.outputs.bos != 'true'
         run: pnpm install --prefer-offline --config.allow-scripts true --ignore-scripts
 
       # `ci` ile AYNI anahtar: master push'ta kaydedilen önbellek PR'ın ilk koşusunda bile sıcak gelir (yalnız hız; sonuç değişmez).
       - name: Node derleme önbelleği (V8 bayt kodu)
-        if: (steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')
+        if: steps.sec.outputs.bos != 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ runner.temp }}/node-compile-cache
@@ -457,7 +464,7 @@ jobs:
       # shard'ın göreceği kümeyle aynı olsun diye verilir; bu adım test KOŞTURMAZ (ortamı alt süreçlere sızmaz).
       - name: Test seçimi (tabandan, vitest ile)
         id: secv
-        if: (steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')
+        if: steps.sec.outputs.bos != 'true'
         env:
           VENTHUB_DUNYA_DURUMU: dislan
         run: |
@@ -478,7 +485,7 @@ jobs:
       # yazar. SECIM_* değişkenleri yalnız bu adımdadır: testlerin koştuğu adımın ortamına GİRMEZ (alt süreçlere sızmaz; canlı ders: #1741 koşu 2).
       - name: Test dağıtımı (shard ${{ matrix.shard }}/4)
         id: dagit
-        if: (steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')
+        if: steps.sec.outputs.bos != 'true'
         env:
           SHARD: ${{ matrix.shard }}
           VENTHUB_DUNYA_DURUMU: dislan
@@ -488,7 +495,7 @@ jobs:
 
       # Test: bu parçaya test düştüyse koşar. `kos` yalnız `false` ise atlanır; çıktı yoksa ya da başka değerse KOŞAR (kapı sessizce düşmez). Kabuk bash (pipefail): `| tee` kırmızıyı yutmaz.
       - name: Test (shard ${{ matrix.shard }}/4)
-        if: (steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0') && steps.dagit.outputs.kos != 'false'
+        if: steps.sec.outputs.bos != 'true' && steps.dagit.outputs.kos != 'false'
         env:
           VENTHUB_DUNYA_DURUMU: dislan
           NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache

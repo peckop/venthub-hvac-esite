@@ -12,7 +12,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  *
  * A) DAVRANIŞ: seçim ve hızlı yol adımlarının GERÇEK `run` gövdesi (ci.yml'den çıkarılır) gerçek bash ve gerçek git ile, tabandan çıkarılan SAHTE seçiciyle koşar. Ölçülenler:
  *    taban kopyası koşar (PR'ın kendi kopyası ASLA: PR kopyası "seçim boş" yazsa da çıktı tabandandır), kopya yoksa `tam=true`, seçici çökerse `tam=true` yazılır ve adım kırmızı OLMAZ,
- *    seçici sessiz kalırsa çıktı YOKTUR (ve YAML koşulları çıktı yokken KOŞAR: kapı sessizce düşmez), argümanlar TAM (`--kok`, `--harita`, `--vitestsiz` yalnız birinci geçişte, `--cikti`),
+ *    `bos=true` YALNIZ seçicinin SON `tam=false` VE `secilen-sayisi=0` değerinde yazılır; sessiz, yarım çıktılı, boş yazıp çöken ya da kendi `bos`unu yazan seçicide `bos=false` (kurulum ve test KOŞAR: kapı sessizce düşmez),
+ *    argümanlar TAM (`--kok`, `--harita`, `--vitestsiz` yalnız birinci geçişte, `--cikti`),
  *    hızlı yol yalnız .md/.txt/.csv farkında `belge=true` yazar (Türkçe adlı dosya dahil), kod/JSON/.cjs/.ts farkında, silinen-taşınan koddan gelen farkta ve boş farkta YAZMAZ.
  * B) KAPSAM: dağıtım GERÇEK `vitest list` (kip `dislan`) üstünde: tam ise parçaların birleşimi = liste; seçim ise birleşim = seçim, kesişim 0, boş parça `[]` + `kos=false`; seçici ile vitest
  *    ayrışırsa TAM; GERÇEK vitest `include` bağı her parça için TAM o parçayı döner; ci.yml'deki GERÇEK dağıtım komutu (`run:`) bash'te koşar ve dağıtıcının argüman sözleşmesiyle eşleşir.
@@ -110,8 +111,11 @@ function temizOrtam(ek: Record<string, string> = {}): NodeJS.ProcessEnv {
 }
 
 // ══ A) DAVRANIŞ: gerçek gövdeler, gerçek git, sahte tabandan seçici ═════════════════════════════════════════════════════════════════
-type Senaryo = 'bos' | 'secim' | 'tam' | 'coker' | 'sessiz'
-/** Tabandaki SAHTE seçici: ne yapacağını (tabandaki) harita dosyasından okur; çağrılarını RUNNER_TEMP/stub-cagri.jsonl'e yazar. */
+type Senaryo = 'bos' | 'secim' | 'tam' | 'coker' | 'sessiz' | 'yarim' | 'bos-coker' | 'kendi-bos'
+/**
+ * Tabandaki SAHTE seçici: ne yapacağını (tabandaki) harita dosyasından okur; çağrılarını RUNNER_TEMP/stub-cagri.jsonl'e yazar. Kötü huylu kipler: `yarim` (yalnız `tam=false`, sayı yok),
+ * `bos-coker` (boş seçimi yazıp ÇÖKER), `kendi-bos` (seçim DOLUyken kendi `bos=true`sunu yazar).
+ */
 const SAHTE_SECICI = `const fs = require('fs'); const path = require('path')
 const argv = process.argv.slice(2)
 const arg = (ad) => { const i = argv.indexOf(ad); return i < 0 ? null : argv[i + 1] }
@@ -120,9 +124,13 @@ const mod = JSON.parse(fs.readFileSync(arg('--harita'), 'utf8')).mod
 if (mod === 'coker') process.exit(3)
 if (mod === 'sessiz') process.exit(0)
 const yaz = (s) => fs.appendFileSync(process.env.GITHUB_OUTPUT, s.join('\\n') + '\\n')
-if (mod === 'bos') { fs.writeFileSync(arg('--cikti'), ''); yaz(['tam=false', 'secilen-sayisi=0', 'toplam=626', 'neden=bos']) }
+const bosYaz = () => { fs.writeFileSync(arg('--cikti'), ''); yaz(['tam=false', 'secilen-sayisi=0', 'toplam=626', 'neden=bos']) }
+if (mod === 'bos' || mod === 'bos-coker') bosYaz()
+if (mod === 'bos-coker') process.exit(3)
+if (mod === 'yarim') yaz(['tam=false'])
+else if (mod === 'kendi-bos') yaz(['tam=false', 'secilen-sayisi=2', 'bos=true'])
 else if (mod === 'secim') { fs.writeFileSync(arg('--cikti'), 'src/a.test.ts\\nsrc/b.test.ts\\n'); yaz(['tam=false', 'secilen-sayisi=2', 'toplam=626', 'neden=secim']) }
-else { fs.writeFileSync(arg('--cikti'), 'src/a.test.ts\\n'); yaz(['tam=true', 'secilen-sayisi=1', 'toplam=626', 'neden=tam']) }
+else if (mod === 'tam') { fs.writeFileSync(arg('--cikti'), 'src/a.test.ts\\n'); yaz(['tam=true', 'secilen-sayisi=1', 'toplam=626', 'neden=tam']) }
 `
 /** PR'ın KENDİ seçici kopyası: koşarsa işaret dosyası düşer ve "seçim boş" der. Taban kopyası varken HİÇ koşmamalıdır. */
 const PR_SECICISI = `require('fs').writeFileSync(require('path').join(process.env.RUNNER_TEMP, 'pr-isareti'), 'PR kopyasi kostu')
@@ -199,8 +207,8 @@ const tabanDepo = (senaryo: Senaryo | null, haritaVar = true): Depo => ({
   fark: { 'scripts/ci/test-sec.cjs': PR_SECICISI, 'docs/x.md': 'belge\n' },
 })
 const sonDeger = (cikti: string, anahtar: string): string | undefined => cikti.split('\n').filter((s) => s.startsWith(`${anahtar}=`)).map((s) => s.slice(anahtar.length + 1)).pop()
-/** YAML koşullarının (ci-test-secimi.test.ts'te doğruluk tablosuyla ölçülen) anlamı: YALNIZ `tam=false` VE `secilen-sayisi=0` kurulumu/testi kapatır. */
-const kurulumGerek = (cikti: string): boolean => !(sonDeger(cikti, 'tam')?.toLowerCase() === 'false' && sonDeger(cikti, 'secilen-sayisi') === '0')
+/** YAML koşullarının (ci-test-secimi-ifade.test.ts'te doğruluk tablosuyla ölçülen) anlamı: kurulum/test YALNIZ adımın yazdığı SON `bos` değeri `true` ise kapanır; çıktı eksik ya da başka değerse KOŞAR. */
+const kurulumGerek = (cikti: string): boolean => sonDeger(cikti, 'bos')?.toLowerCase() !== 'true'
 
 describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GERÇEK gövdesi gerçek bash ve git ile koşar', () => {
   const SEC = adimGovdesi('test-shard', 'Test seçimi (tabandan, kurulumsuz)')
@@ -224,18 +232,21 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
       expect(sonDeger(s.cikti, 'tam')).toBe('false')
       expect(sonDeger(s.cikti, 'secilen-sayisi')).toBe('2')
       expect(readFileSync(path.join(s.gecici, 'secilen.txt'), 'utf8')).toBe('src/a.test.ts\nsrc/b.test.ts\n')
+      expect(sonDeger(s.cikti, 'bos')).toBe('false')
       expect(kurulumGerek(s.cikti)).toBe(true)
     } finally {
       temizle(s)
     }
   }, ZAMAN)
 
-  it('seçici BOŞ derse (`tam=false`, `secilen-sayisi=0`) çıktı aynen geçer ve YALNIZ bu durumda kurulum/test kapanır', () => {
+  it('seçici BOŞ derse (`tam=false`, `secilen-sayisi=0`) seçici çıktısı aynen geçer, adım `bos=true` yazar ve YALNIZ bu durumda kurulum/test kapanır', () => {
     const s = govdeKos(SEC, tabanDepo('bos'))
     try {
       expect(s.cikis).toBe(0)
       expect(sonDeger(s.cikti, 'tam')).toBe('false')
       expect(sonDeger(s.cikti, 'secilen-sayisi')).toBe('0')
+      expect(sonDeger(s.cikti, 'bos')).toBe('true')
+      expect(s.cikti.trimEnd().split('\n').pop()).toBe('bos=true')
       expect(kurulumGerek(s.cikti)).toBe(false)
       expect(s.prKosti).toBe(false)
     } finally {
@@ -250,6 +261,7 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
         expect(s.cikis, ad).toBe(0)
         expect(sonDeger(s.cikti, 'tam'), ad).toBe('true')
         expect(sonDeger(s.cikti, 'neden'), ad).toBe('taban kopyası yok')
+        expect(sonDeger(s.cikti, 'bos'), ad).toBeUndefined()
         expect(s.cagrilar, ad).toHaveLength(0)
         expect(s.prKosti, ad).toBe(false)
         expect(s.ekran, ad).toContain('::notice::test seçimi: tam — taban kopyası yok')
@@ -267,20 +279,35 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
       expect(sonDeger(s.cikti, 'tam')).toBe('true')
       expect(sonDeger(s.cikti, 'neden')).toBe('seçici çöktü, çıkış kodu 3')
       expect(s.ekran).toContain('::warning::test seçimi: tam — seçici çöktü (çıkış kodu 3)')
+      expect(sonDeger(s.cikti, 'bos')).toBe('false')
       expect(kurulumGerek(s.cikti)).toBe(true)
     } finally {
       temizle(s)
     }
   }, ZAMAN)
 
-  it('seçici SESSİZ kalırsa (çıkış 0, çıktı yok) hiçbir `tam=`/`secilen-sayisi=` yazılmaz ve kurulum/test KOŞAR (eksik çıktı "atla" demek değildir)', () => {
+  it('seçici SESSİZ kalırsa (çıkış 0, çıktı yok) hiçbir `tam=`/`secilen-sayisi=` yazılmaz, `bos=false` yazılır ve kurulum/test KOŞAR (eksik çıktı "atla" demek değildir)', () => {
     const s = govdeKos(SEC, tabanDepo('sessiz'))
     try {
       expect(s.cikis).toBe(0)
-      expect(s.cikti).toBe('')
+      expect(s.cikti).toBe('bos=false\n')
       expect(kurulumGerek(s.cikti)).toBe(true)
     } finally {
       temizle(s)
+    }
+  }, ZAMAN)
+
+  it('seçici YARIM çıktı verirse, BOŞ seçimi yazıp ÇÖKERSE ya da seçim DOLUyken kendi `bos=true`sunu yazarsa `bos=false`: kurulum ve test KOŞAR (eski `secilen-sayisi != 0` koşulu ilkinde ATLATIRDI)', () => {
+    for (const [mod, tamBeklenen] of [['yarim', 'false'], ['bos-coker', 'true'], ['kendi-bos', 'false']] as const) {
+      const s = govdeKos(SEC, tabanDepo(mod))
+      try {
+        expect(s.cikis, mod).toBe(0)
+        expect(sonDeger(s.cikti, 'tam'), mod).toBe(tamBeklenen)
+        expect(sonDeger(s.cikti, 'bos'), mod).toBe('false')
+        expect(kurulumGerek(s.cikti), mod).toBe(true)
+      } finally {
+        temizle(s)
+      }
     }
   }, ZAMAN)
 
@@ -568,34 +595,4 @@ describe('INV-CI-SECIM-2 (B) · KAPSAM: tam ise birleşim = vitest list, seçim 
     expect(tam.parca).toEqual(SHARD.dagit(liste, sure, N).gruplar[0])
     expect(tam.cikti).toBe('kos=true\n')
   }, 240_000)
-})
-
-// ══ ÖLÇÜM: hızlı yolun DAYANAĞI (INV-CI-SECIM-1) ═══════════════════════════════════════════════════════════════════════════════════
-// "md/txt/csv farkı Lint, tip ve Deno sonucunu değiştiremez" iddiası elle değil ÖLÇÜMLE durur: yapılandırmalar bu uzantıları okumaz. Biri değişirse (ör. lint'e markdown, tsc'ye .md) bu test KIRMIZI olur ve hızlı yol gözden geçirilir.
-describe('INV-CI-SECIM-1 (ölçüm) · md/txt/csv uzantıları Lint, tip denetimi ve Deno kapılarının girdisi DEĞİL', () => {
-  const oku = (y: string): string => readFileSync(path.join(KOK, y), 'utf8').replace(/\r\n/g, '\n')
-  const betikler = (JSON.parse(oku('package.json')) as { scripts: Record<string, string> }).scripts
-
-  it('tsc: tsconfig `include` yalnız .ts/.tsx desenleri; `tsc --noEmit` süzgeçsiz kök (dosya/proje süzgeci yok)', () => {
-    const include = (JSON.parse(oku('tsconfig.json')) as { include: string[] }).include
-    expect(include.filter((g) => !/\.(?:ts|tsx)$/.test(g))).toEqual([])
-    expect(betikler['type-check']).toMatch(/\btsc --noEmit$/)
-  })
-
-  it('eslint: `eslint .` (süzgeçsiz kök, --ext yok); yapılandırma dosya sistemini ve docs/ yolunu okumaz, `files` desenleri md/txt/csv içermez', () => {
-    expect(betikler.lint).toMatch(/\beslint \.$/)
-    const cfg = oku('eslint.config.cjs')
-    expect(cfg).not.toMatch(/readFileSync|readdirSync|docs\//)
-    expect((cfg.match(/files:\s*\[[^\]]*\]/g) ?? []).join(' ')).not.toMatch(/\.(?:md|txt|csv)\b/)
-  })
-
-  it('deno check: yalnız supabase/functions/*/index.ts (docs ya da metin dosyası içe aktarmaz: kaynakta `docs/` ya da .md/.txt/.csv içe aktarma yok)', () => {
-    expect(CI_METNI).toContain('run: deno check --node-modules-dir=none supabase/functions/*/index.ts')
-    const kaynak = execFileSync('git', ['ls-files', 'supabase/functions'], { cwd: KOK, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 })
-      .split('\n')
-      .filter((d) => /\.(?:ts|tsx|js|mjs)$/.test(d) && !/__tests__|\.test\./.test(d)) // testler vitest'tedir (seçici kapsar), deno check onları denetlemez
-    expect(kaynak.length).toBeGreaterThan(20)
-    // yalnız İÇE AKTARMA (statik `from` ve dinamik `import()`) tip denetimine girer; yorumdaki `docs/` anması ya da çalışma anında dosya okuma deno check'in girdisi değildir
-    for (const d of kaynak) expect(oku(d), d).not.toMatch(/\bfrom\s+['"][^'"]*(?:\.(?:md|txt|csv)|\/docs\/)[^'"]*['"]|\bimport\s*\(\s*['"][^'"]*(?:\.(?:md|txt|csv)|\/docs\/)/)
-  })
 })

@@ -16,8 +16,8 @@
  * Cetvel: docs/standards/test-karnesi-standard.md §4.2 ve §4.3. Test: scripts/ci/__tests__/test-shard.test.ts, test-shard-secim.test.ts, INV-CI-SHARD-1/2, INV-CI-SECIM-1/2.
  *
  * TEST SEÇİMİ (ALT-38e, §4.3): `--secim` grubu verilirse ve seçici çıktısı baştan sona tutarlıysa (`tam=false`, sayı = dosyadaki satır sayısı, yollar geçerli ve diskte var,
- * seçilen her dosya `vitest list`te) `vitest list` yerine SEÇİLEN dosyalar aynı LPT ile dağıtılır. Seçim YALNIZ DARALTIR: tutarsızlık, okunamayan dosya, `tam=true` ya da eksik değer
- * HER ZAMAN tam dağıtımdır (uyarıyla). Seçim modunda boş parça meşrudur (`kos=false`); tam modda boş parça kırmızıdır. Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir).
+ * seçilen her dosya `vitest list`te) `vitest list` yerine SEÇİLEN dosyalar aynı LPT ile dağıtılır. Seçim YALNIZ DARALTIR: tutarsızlık, okunamayan dosya ya da eksik değer HER ZAMAN tam
+ * dağıtımdır (`::warning::`); seçicinin KENDİ `tam=true` kararı da tam dağıtımdır ama meşrudur (`::notice::`). Seçim modunda boş parça meşrudur (`kos=false`); tam modda boş parça kırmızıdır. Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir).
  */
 'use strict';
 

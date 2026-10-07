@@ -28,7 +28,10 @@ const CI_ISI = 'ci'
 const SHARD_OLAYI = "github.event_name == 'pull_request' && github.event.action != 'edited'"
 const SEC_ADI = 'Test seçimi (tabandan, kurulumsuz)'
 const SECV_ADI = 'Test seçimi (tabandan, vitest ile)'
-const KURULUM = "(steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')"
+/** Kurulum/Test koşulu: YALNIZ `sec` adımının ürettiği `bos` çıktısı TAM `true` ise kapanır. Ham `secilen-sayisi != '0'` KULLANILMAZ: eksik çıktı (null) ile '0' sayıya çevrilince ikisi de 0'dır (doküman). */
+const KURULUM = "steps.sec.outputs.bos != 'true'"
+/** Eski (terk edilen) koşul biçimi: ifade doğruluk tablosu, neden bırakıldığını ÇALIŞTIRARAK gösterir. */
+const ESKI_KURULUM = "(steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')"
 const KOSUL_HIZLI = "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'"
 const HIZLI_ADI = 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)'
 const HIZLI_KOSULU = `if: ${SHARD_OLAYI} && steps.sinif.outputs.sinif == 'belge'`
@@ -64,7 +67,15 @@ if [ "$cikis" -ne 0 ]; then
   echo "::warning::test seçimi: tam — seçici çöktü (çıkış kodu $cikis), tam paket koşar"
   printf 'tam=true\nneden=seçici çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
 fi`
-const SEC_GOVDESI = `${GOVDE_BASI}\n${GOVDE_SONU('--vitestsiz ')}`
+/** `bos` YALNIZ seçicinin yazdığı SON `tam=` ve `secilen-sayisi=` değerlerinden türer (çökme yedeğinin `tam=true`su seçicinin eski `tam=false`ını ezer: GitHub son satırı alır) ve SON satırda HER ZAMAN yazılır (seçicinin kendi yazdığı `bos` ezilir). */
+const BOS_KOSULU = 'if [ "$tam" = "false" ] && [ "$sayi" = "0" ]; then bos=true; fi'
+const BOS_YAZIMI = 'echo "bos=$bos" >> "$GITHUB_OUTPUT"'
+const BOS_BLOKU = String.raw`tam=$(sed -n 's/^tam=//p' "$GITHUB_OUTPUT" | tail -n 1)
+sayi=$(sed -n 's/^secilen-sayisi=//p' "$GITHUB_OUTPUT" | tail -n 1)
+bos=false
+${BOS_KOSULU}
+${BOS_YAZIMI}`
+const SEC_GOVDESI = `${GOVDE_BASI}\n${GOVDE_SONU('--vitestsiz ')}\n${BOS_BLOKU}`
 const SECV_GOVDESI = `${GOVDE_V_BASI}\n${GOVDE_SONU('')}`
 
 // ── AYRIŞTIRICI (satır taraması) ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -196,8 +207,25 @@ function govdeDenetle(ad: string, govde: string | null, vitestsiz: boolean): str
   if (!k.some((s) => s.includes('|| cikis=$?')) || !k.some((s) => s.includes("printf 'tam=true") && s.includes('"$GITHUB_OUTPUT"'))) {
     ihlal.push(`"${ad}" çökme yedeği yok (\`|| cikis=$?\` + \`tam=true\` yazımı): seçici çökerse adım kırmızı kalır, tabandaki bozuk seçiciyi düzelten PR de kilitlenir`)
   }
-  if (k.some((s) => /tam=false|secilen-sayisi=/.test(s))) ihlal.push(`"${ad}" kendisi \`tam=false\` ya da \`secilen-sayisi=\` yazıyor: seçim kararı YALNIZ tabandan çıkan seçiciden gelir (yedek boş seçim uyduramaz)`)
+  // YAZIM yasağı (okuma serbest: `sed 's/^tam=//p'`): seçim kararını adım kendisi `tam=false` ya da `secilen-sayisi=` yazarak UYDURAMAZ
+  if (k.some((s) => /(?:printf|echo)\b[^\n]*(?:tam=false|secilen-sayisi=)/.test(s))) ihlal.push(`"${ad}" kendisi \`tam=false\` ya da \`secilen-sayisi=\` yazıyor: seçim kararı YALNIZ tabandan çıkan seçiciden gelir (yedek boş seçim uyduramaz)`)
   if (k.some((s) => HATA_YUTAN.test(s))) ihlal.push(`"${ad}" hatayı yutuyor (\`|| true\` / \`; true\`): çöken seçici sessiz geçer`)
+  // `bos` kararı: YALNIZ kurulumsuz birinci geçişte; seçicinin SON `tam=false` + `secilen-sayisi=0` değerlerinden (çökme yedeğinden SONRA), TEK yazımla ve gövdenin SON satırında
+  const bosSatirlari = k.filter((s) => /\bbos\b/.test(s))
+  if (!vitestsiz) {
+    if (bosSatirlari.length) ihlal.push(`"${ad}" \`bos\` yazıyor: kurulum atlama kararı YALNIZ kurulumsuz birinci geçişin işidir (ikinci geçiş kurulumdan sonradır)`)
+    return ihlal
+  }
+  const okumalar = k.filter((s) => /^(?:tam|sayi)=\$\(sed -n 's\/\^(?:tam|secilen-sayisi)=\/\/p' "\$GITHUB_OUTPUT" \| tail -n 1\)$/.test(s))
+  const yazimlar = bosSatirlari.filter((s) => s.includes('"$GITHUB_OUTPUT"'))
+  const dogrular = k.filter((s) => s.includes('bos=true'))
+  const yedek = k.findIndex((s) => s.includes('neden=seçici çöktü'))
+  if (yazimlar.length !== 1 || yazimlar[0] !== BOS_YAZIMI) ihlal.push(`"${ad}" \`bos\` çıktısını TEK yerde ve YALNIZ \`${BOS_YAZIMI}\` ile yazmalı (bulunan: ${yazimlar.join(' ; ') || 'yok'}): kurulum/test atlama kararı bu çıktıdan türer`)
+  if (k[k.length - 1] !== BOS_YAZIMI) ihlal.push(`"${ad}" \`bos\` yazımı gövdenin SON satırı değil: seçicinin ya da sonradan koşan bir komutun yazdığı \`bos\` onu ezer (seçim DOLUyken kurulum ve test ATLANIR)`)
+  if (dogrular.length !== 1 || dogrular[0] !== BOS_KOSULU) ihlal.push(`"${ad}" \`bos=true\` YALNIZ \`${BOS_KOSULU}\` ile atanmalı (bulunan: ${dogrular.join(' ; ') || 'yok'}): tam=false VE sayı 0 dışında da kurulum ve test ATLANIR (kapı sessizce düşer)`)
+  if (k.filter((s) => s === 'bos=false').length !== 1 || k.indexOf('bos=false') > k.indexOf(BOS_KOSULU)) ihlal.push(`"${ad}" \`bos\` varsayılanı koşuldan ÖNCE ve \`bos=false\` olmalı: aksi hâlde koşul tutmadığında da kurulum ve test ATLANIR ya da çıktı belirsiz kalır`)
+  if (okumalar.length !== 2) ihlal.push(`"${ad}" seçicinin SON \`tam=\` ve \`secilen-sayisi=\` satırlarını (\`tail -n 1\`) okumuyor: çökme yedeğinin \`tam=true\`su seçicinin eski \`tam=false\`ını ezemez, boş seçim yanlış okunur`)
+  if (yedek < 0 || k.indexOf(BOS_KOSULU) < yedek) ihlal.push(`"${ad}" \`bos\` kararı çökme yedeğinden ÖNCE (ya da yedek yok): seçici çöktüğünde bile eski \`tam=false\` değerinden boş seçim türer`)
   return ihlal
 }
 
@@ -312,57 +340,6 @@ const matrisSayisi = (metin: string): number | null => {
 }
 const N0 = matrisSayisi(CI_METNI) ?? 4
 
-// ── GÜVENLİ SÖZ DİZİMİ İFADE DEĞERLENDİRİCİ: `if:` ifadelerinin GERÇEK doğruluk tablosu (GitHub semantiği: dizge karşılaştırması büyük/küçük harf duyarsız, eksik çıktı '') ────────────
-type Baglam = Record<string, string>
-function ifadeDegerlendir(ifade: string, baglam: Baglam): boolean {
-  const belirtecler = [...ifade.matchAll(/\s*(&&|\|\||!=|==|!|\(|\)|'[^']*'|[A-Za-z_][\w.-]*)/g)].map((m) => m[1])
-  if (belirtecler.join('').replace(/\s/g, '') !== ifade.replace(/\s/g, '')) throw new Error(`ifade ayrıştırılamadı: ${ifade}`)
-  let i = 0
-  const deger = (b: string): string => (b.startsWith("'") ? b.slice(1, -1) : (baglam[b] ?? ''))
-  const esit = (a: string, b: string): boolean => a.toLowerCase() === b.toLowerCase()
-  const dogruMu = (v: string | boolean): boolean => (typeof v === 'boolean' ? v : v !== '')
-  function birincil(): string | boolean {
-    const b = belirtecler[i++]
-    if (b === '(') {
-      const v = veya()
-      i++
-      return v
-    }
-    if (b === '!') return !dogruMu(birincil())
-    return deger(b)
-  }
-  function esitlik(): string | boolean {
-    let sol = birincil()
-    while (belirtecler[i] === '==' || belirtecler[i] === '!=') {
-      const op = belirtecler[i++]
-      const sag = birincil()
-      const e = esit(String(sol), String(sag))
-      sol = op === '==' ? e : !e
-    }
-    return sol
-  }
-  function ve(): string | boolean {
-    let sol = esitlik()
-    while (belirtecler[i] === '&&') {
-      i++
-      const sag = esitlik()
-      sol = dogruMu(sol) ? sag : sol
-    }
-    return sol
-  }
-  function veya(): string | boolean {
-    let sol = ve()
-    while (belirtecler[i] === '||') {
-      i++
-      const sag = ve()
-      sol = dogruMu(sol) ? sol : sag
-    }
-    return sol
-  }
-  return dogruMu(veya())
-}
-const ifIcerigi = (satir: string): string => satir.replace(/^if:\s*/, '')
-
 // ── SABOTAJ ARAÇLARI (satırı içeriğiyle bulur; hedef yoksa metni DEĞİŞTİRMEZ: tablo testi "değişmedi"yi KIRMIZI sayar) ──────────────────────────────────────────────────
 const adimAraligi = (c: string, isId: string, ad: string): { bas: number; bit: number } | null => {
   const s = c.split('\n')
@@ -434,8 +411,37 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: "seçim 2/2 ortamı `dislan`ı kaybeder (seçici dünya durumu testlerini de görür, shard'ın kümesinden ayrışır)", boz: (c) => sd(c, secv(c), 'VENTHUB_DUNYA_DURUMU: dislan', null), beklenen: 'seçim 2/2 ortamı TAM' },
 
   // ── koşullar yalnız DARALTMA yönünde ───────────────────────────────────────────────────────────────────────────────────────────
-  { ad: 'kurulum koşulu POZİTİF mantığa çevrilir (`tam == false && sayi == 0` iken ATLAMAK yerine `!= ... ||` düşer: çıktı yokken kurulum atlanır)', boz: (c) => sd(c, shardAdim(c, 'Install dependencies'), /^if: /, "if: steps.sec.outputs.tam == 'true'"), beklenen: '"Install dependencies" koşulu TAM' },
-  { ad: 'kurulum koşulu yalnız `tam` değerine bakar (`secilen-sayisi` düşer: `tam=false` ile seçim DOLUyken de kurulum atlanır)', boz: (c) => sd(c, shardAdim(c, 'Install dependencies'), /^if: /, "if: steps.sec.outputs.tam != 'false'"), beklenen: '"Install dependencies" koşulu TAM' },
+  { ad: "kurulum koşulu POZİTİF mantığa çevrilir (`bos == 'false'` iken koşar: çıktı yokken kurulum ATLANIR)", boz: (c) => sd(c, shardAdim(c, 'Install dependencies'), /^if: /, "if: steps.sec.outputs.bos == 'false'"), beklenen: '"Install dependencies" koşulu TAM' },
+  { ad: "kurulum koşulu ESKİ biçime döner (`secilen-sayisi != '0'`: çıktı eksikken `tam=false` ile null ve '0' eşit sayılır, kurulum ATLANIR)", boz: (c) => sd(c, shardAdim(c, 'Install dependencies'), /^if: /, `if: ${ESKI_KURULUM}`), beklenen: '"Install dependencies" koşulu TAM' },
+  { ad: '`bos` kararı `tam` okumasını kaybeder (yalnız sayı 0 iken bos: `tam=true` ile de kurulum ve test ATLANIR)', boz: (c) => metinDegistir(c, sec(c), BOS_KOSULU, 'if [ "$sayi" = "0" ]; then bos=true; fi'), beklenen: '`bos=true` YALNIZ' },
+  { ad: '`bos` kararı sayıya bakmaz (`tam=false` tek başına: seçim DOLUyken de kurulum ve test ATLANIR)', boz: (c) => metinDegistir(c, sec(c), BOS_KOSULU, 'if [ "$tam" = "false" ]; then bos=true; fi'), beklenen: '`bos=true` YALNIZ' },
+  { ad: '`bos` varsayılanı `true` olur (koşul tutmasa da her PR kurulumsuz ve testsiz yeşil biter)', boz: (c) => metinDegistir(c, sec(c), 'bos=false\n', 'bos=true\n'), beklenen: '`bos` varsayılanı' },
+  {
+    ad: "`bos` seçicinin İLK satırlarından okunur (`tail` yerine `head`: çökme yedeğinin `tam=true`su seçicinin eski `tam=false`ını ezemez)",
+    boz: (c) => {
+      const a = metinDegistir(c, sec(c), '| tail -n 1)', '| head -n 1)')
+      return metinDegistir(a, sec(a), '| tail -n 1)', '| head -n 1)')
+    },
+    beklenen: 'SON `tam=`',
+  },
+  {
+    ad: '`bos` yazımı seçiciden ÖNCEYE taşınır (seçicinin kendi yazdığı `bos=true` son satır olur: seçim DOLUyken kurulum ve test ATLANIR)',
+    boz: (c) => {
+      const a = metinDegistir(c, sec(c), `\n          ${BOS_YAZIMI}`, '')
+      return metinDegistir(a, sec(a), 'cikis=0\n', `${BOS_YAZIMI}\n          cikis=0\n`)
+    },
+    beklenen: 'SON satırı değil',
+  },
+  {
+    ad: '`bos` kararı çökme yedeğinden ÖNCE verilir (boş seçimi yazıp çöken seçici kurulumu ve testi ATLATIR: tabandaki bozuk seçici testleri eler)',
+    boz: (c) => {
+      const blok = BOS_BLOKU.split('\n').join('\n          ')
+      const a = metinDegistir(c, sec(c), `\n          ${blok}`, '')
+      return metinDegistir(a, sec(a), 'if [ "$cikis" -ne 0 ]; then', `${blok}\n          if [ "$cikis" -ne 0 ]; then`)
+    },
+    beklenen: 'çökme yedeğinden ÖNCE',
+  },
+  { ad: 'ikinci geçiş de `bos` yazar (kurulum atlama kararı kurulumdan SONRA verilir)', boz: (c) => metinDegistir(c, secv(c), 'cikis=0\n', 'echo "bos=true" >> "$GITHUB_OUTPUT"\ncikis=0\n'), beklenen: 'kurulum atlama kararı YALNIZ kurulumsuz birinci geçişin işidir' },
   { ad: 'Deno kurulumu seçim kapısını kaybeder (boş seçimde de kurulur: kazanç kaybı)', boz: (c) => sd(c, shardAdim(c, 'Setup Deno'), /^if: /, null), beklenen: '"Setup Deno" koşulu TAM' },
   { ad: "V8 önbelleği boş seçimde de geri yüklenir", boz: (c) => sd(c, shardAdim(c, 'Node derleme önbelleği (V8 bayt kodu)'), /^if: /, null), beklenen: '"Node derleme önbelleği (V8 bayt kodu)" koşulu TAM' },
   { ad: "seçim 2/2 koşulu düşer (boş seçimde kurulumsuz ortamda vitest açmaya çalışır)", boz: (c) => sd(c, secv(c), /^if: /, null), beklenen: `"${SECV_ADI}" koşulu TAM` },
@@ -486,7 +492,7 @@ const BOZULMALAR: readonly Bozulma[] = [
       if (!a || !hedef) return c
       const satirlar = c.split('\n')
       const blok = satirlar.splice(a.bas, a.bit - a.bas)
-      satirlar.splice(hedef.bit - blok.length, 0, ...blok)
+      satirlar.splice(a.bas < hedef.bas ? hedef.bit - blok.length : hedef.bit, 0, ...blok) // blok hedefin ÖNÜNDEYSE çıkarma hedefi kaydırır; ARKASINDAYSA (ikinci uygulama) kaydırmaz
       return satirlar.join('\n')
     }, beklenen: 'test-shard adım sırası beklenen değil' },
   { ad: 'seçim 2/2 silinir (dağıtıcı çıktı bulamaz, hep TAM: seçimin kazancı yok)', boz: (c) => aralikSil(c, secv(c)), beklenen: 'test-shard adım sırası beklenen değil' },
@@ -510,65 +516,6 @@ describe('INV-CI-SECIM-1 — test seçimi ve belge hızlı yolu ci.yml’ye doğ
   it('shard adım adları matrix sayısıyla (N) uyumlu; seçim adımlarının adı ve gövdesi sabit sözleşmedir', () => {
     expect(isAdimlari(CI_METNI, SHARD_ISI).map((a) => a.ad)).toEqual(SHARD_SIRASI.map((a) => a.replace('/4)', `/${N0})`)))
     expect(runGovdesi(isAdimlari(CI_METNI, SHARD_ISI)[3])).toBe(SEC_GOVDESI)
-  })
-
-  it('İFADE DEĞERLENDİRME (doğruluk tablosu): kurulum/test koşulu YALNIZ `tam=false` VE `secilen-sayisi=0` iken kapanır; çıktı eksik, boş, `true`, büyük harf ya da başka değerse KOŞAR', () => {
-    const kosar = (tam: string | undefined, sayi: string | undefined): boolean => {
-      const b: Baglam = {}
-      if (tam !== undefined) b['steps.sec.outputs.tam'] = tam
-      if (sayi !== undefined) b['steps.sec.outputs.secilen-sayisi'] = sayi
-      return ifadeDegerlendir(KURULUM, b)
-    }
-    for (const tam of [undefined, '', 'true', 'TRUE', 'evet', '0', 'null']) for (const sayi of [undefined, '', '0', '3', 'abc']) expect(kosar(tam, sayi), `tam=${tam} sayi=${sayi}`).toBe(true)
-    for (const sayi of [undefined, '', '3', '10', 'abc', '00']) expect(kosar('false', sayi), `tam=false sayi=${sayi}`).toBe(true)
-    expect(kosar('false', '0')).toBe(false)
-    expect(kosar('FALSE', '0'), 'GitHub dizge karşılaştırması büyük/küçük harf duyarsızdır: seçici hep küçük harf yazar, dağıtıcı ise yalnız TAM `false`i seçim sayar').toBe(false)
-  })
-
-  it('İFADE DEĞERLENDİRME: Test koşulu boş parçada (`kos=false`) kapanır, `kos` yoksa/başka değerse ve seçim doluysa KOŞAR', () => {
-    const testKosulu = ifIcerigi(`if: ${KURULUM} && steps.dagit.outputs.kos != 'false'`)
-    const kos = (tam: string, sayi: string, kosDeger: string | undefined): boolean => {
-      const b: Baglam = { 'steps.sec.outputs.tam': tam, 'steps.sec.outputs.secilen-sayisi': sayi }
-      if (kosDeger !== undefined) b['steps.dagit.outputs.kos'] = kosDeger
-      return ifadeDegerlendir(testKosulu, b)
-    }
-    expect(kos('true', '', undefined), 'tam paket: dağıtım çıktısı henüz yok/boş: Test KOŞAR').toBe(true)
-    expect(kos('false', '3', 'true')).toBe(true)
-    expect(kos('false', '3', '')).toBe(true)
-    expect(kos('false', '3', 'evet')).toBe(true)
-    expect(kos('false', '3', 'false'), 'parçaya test düşmedi: vitest koşmaz').toBe(false)
-    expect(kos('false', '0', undefined), 'kendiliğinden boş seçim: kurulum da yok, Test de yok').toBe(false)
-    expect(kos('false', '0', 'true'), 'boş seçimde dağıtım çıktısı ne derse desin Test kurulumsuz koşmaz').toBe(false)
-  })
-
-  it('İFADE DEĞERLENDİRME: kod kapıları hızlı yolda yalnız `belge=true` iken (ve ayna atlatmıyorken) atlanır; çıktı eksik/başka değerse KOŞAR', () => {
-    const kapi = ifIcerigi(KOSUL_HIZLI)
-    const kosar = (ayna: string | undefined, belge: string | undefined): boolean => {
-      const b: Baglam = {}
-      if (ayna !== undefined) b['steps.ayna.outputs.atla'] = ayna
-      if (belge !== undefined) b['steps.hizli.outputs.belge'] = belge
-      return ifadeDegerlendir(kapi, b)
-    }
-    for (const ayna of [undefined, '', 'false']) for (const belge of [undefined, '', 'false', 'evet', '1', 'TRUE-DEGIL']) expect(kosar(ayna, belge), `ayna=${ayna} belge=${belge}`).toBe(true)
-    for (const ayna of [undefined, '', 'false']) expect(kosar(ayna, 'true'), `ayna=${ayna} belge=true`).toBe(false)
-    expect(kosar('true', undefined), 'ayna atlatıyorsa belge çıktısı ne olursa olsun atlanır (eski davranış)').toBe(false)
-    expect(kosar('true', 'true')).toBe(false)
-  })
-
-  it('İFADE DEĞERLENDİRME: hızlı yol adımı yalnız shard olayında (`edited` hariç pull_request) ve `belge` sınıfında açılır; push, elle koşum, edited ve başka sınıf açmaz', () => {
-    const k = ifIcerigi(HIZLI_KOSULU)
-    const a = (olay: string, eylem: string, sinif: string | undefined): boolean => {
-      const b: Baglam = { 'github.event_name': olay, 'github.event.action': eylem }
-      if (sinif !== undefined) b['steps.sinif.outputs.sinif'] = sinif
-      return ifadeDegerlendir(k, b)
-    }
-    expect(a('pull_request', 'opened', 'belge')).toBe(true)
-    expect(a('pull_request', 'synchronize', 'belge')).toBe(true)
-    expect(a('pull_request', 'reopened', 'belge')).toBe(true)
-    expect(a('pull_request', 'edited', 'belge'), 'edited koşusunda ci içindeki Test kurulum ister').toBe(false)
-    expect(a('push', '', 'belge')).toBe(false)
-    expect(a('workflow_dispatch', '', 'belge')).toBe(false)
-    for (const sinif of ['tam', 'betik', 'edge', 'karma', '', undefined]) expect(a('pull_request', 'opened', sinif), String(sinif)).toBe(false)
   })
 
   it('tüm öteki iş akışlarında (dunya-durumu, e2e-smoke...) seçici ve harita anılmaz; vitest yapılandırması seçiciyi bilmez', () => {

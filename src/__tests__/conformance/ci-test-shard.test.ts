@@ -78,10 +78,10 @@ const SHARD_TEST_ONEKI = 'Test (shard '
 /** ALT-38e: dağıtım Test adımından AYRILDI (boş parçada vitest koşmasın diye `kos` çıktısı verir); `test-shard.cjs` yalnız bu adımda çağrılır. */
 const SHARD_DAGIT_ONEKI = 'Test dağıtımı (shard '
 /**
- * ALT-38e: kurulum, seçim 2/2, dağıtım ve Test YALNIZ seçim kendiliğinden BOŞ değilken koşar (çıktı yok, `true` ya da başka değer: KOŞAR; De Morgan biçimi: YAML `!` ile başlayan değeri etiket sayar).
- * Seçim adımlarının gövdeleri, olay kapanışları ve sabotajları: ci-test-secimi.test.ts (INV-CI-SECIM-1).
+ * ALT-38e: kurulum, seçim 2/2, dağıtım ve Test YALNIZ seçim kendiliğinden BOŞ değilken koşar: `bos` çıktısı TAM `true` değilse (eksik, boş ya da başka değer: KOŞAR). Seçicinin ham çıktısı koşulda kullanılmaz:
+ * GitHub eşitsiz türleri sayıya çevirir (null ve '0' ikisi de 0), `secilen-sayisi != '0'` eksik çıktıda "atla" derdi. Seçim adımlarının gövdeleri, olay kapanışları ve sabotajları: ci-test-secimi.test.ts (INV-CI-SECIM-1).
  */
-const SECIM_KURULUM = "(steps.sec.outputs.tam != 'false' || steps.sec.outputs.secilen-sayisi != '0')"
+const SECIM_KURULUM = "steps.sec.outputs.bos != 'true'"
 const SHARD_KOSULLU_ADIMLAR = ['Setup Deno', 'Install dependencies', 'Node derleme önbelleği (V8 bayt kodu)', 'Test seçimi (tabandan, vitest ile)']
 /** Shard adımının beklenen `if:` satırı; null = adımda HİÇ `if:` olmamalı (atlanabilir adım shard'ı testsiz YEŞİL bitirir). */
 function shardAdimKosulu(ad: string): string | null {
