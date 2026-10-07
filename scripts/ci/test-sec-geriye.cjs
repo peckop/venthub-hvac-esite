@@ -1,23 +1,30 @@
 #!/usr/bin/env node
 /**
- * ALT-38d · GERİYE DÖNÜK DOĞRULAMA (karar 308, B4): "seçici, CI'da kırmızı veren her PR koşusunda kırılan testi SEÇER miydi?"
- * Kaçırılan = 0 olmalı. Koşuyu ayrı süreçlere bölmek için üç kip (hepsi satır başına JSON, ayrı ajanlara dağıtılabilir):
+ * ALT-38d · SEÇİCİNİN GERİYE DÖNÜK DOĞRULAMASI VE PR ÖLÇÜMÜ (karar 308, B4). Tek süreçte koşar (ajan dağıtımı gerekmez).
  *
- *   --liste [--gun 30] [--ci-gecmis dosya.json]
- *       Aday kırmızı koşular: `pull_request` olayı, sonuç `failure`, kırılan test dosyası bilinen koşular (ci-gecmis.json:
- *       `kosular[].testDosyalari`). Her satır: { kosuId, dal, sha, tarih, kirilan: [test yolları] }.
- *   --kos girdi.jsonl [--harita yol] [--depo sahip/depo] [--taban master]
- *       Her aday için değişen dosyalar `gh api repos/<depo>/compare/<taban>...<sha>` ile alınır (PR'ın o koşudaki farkı: taban ile
- *       dal ucu arasındaki merge-base farkı; squash ile birleşmiş PR'ın dal commit'leri GitHub'da durur), seçici BUGÜNKÜ harita ve
- *       ağaçla koşar. Her satır: { kosuId, dal, sha, degisen, durum, tam, secilen, kirilan, kacirilan, kapsamDisi, neden }.
- *       durum: SECILDI (tüm ölçülebilir kırılanlar seçildi) | TAM (seçici tam dedi: kaçırma imkânsız) | KACIRILDI | OLCULEMEDI.
- *   --ozet sonuc1.jsonl [sonuc2.jsonl ...]
- *       Satırları toplar: { kosu, secildi, tam, kacirildi, olculemedi, kacirilanlar: [...] }.
+ *   --b4 kirmizi-kosular.json [--cikti sonuc.jsonl] [--harita yol] [--depo sahip/depo] [--taban master]
+ *       "Seçici, CI'da kırmızı veren her PR koşusunda kırılan testi SEÇER miydi?" Kaçırılan = 0 olmalı.
+ *       Girdi kaydı: { runId, attempt, event, prNo, dal, headSha, baseSha, olusturma, kirilanAdimlar[], kirilanTestDosyalari[],
+ *       degisenDosyalar[], testAyiklanamadi, degisenDosyaYok, sonradanYesilAyniCommit, dalDeneme }; dosya dizi ya da { kosular | kayitlar }.
+ *       Değişen dosyalar KAYITTAN alınır; yalnız `degisenDosyaYok` ise `gh api compare/<baseSha>...<headSha>` çağrılır.
+ *       Her koşu için seçici BUGÜNKÜ harita ve ağaçla koşar. Kategoriler (HER BİRİ AYRI sayılır, kaçırma sayısına KARIŞMAZ):
+ *         ASIL            normal kayıt: kırılan test(ler) bilinir; seçilmediyse KACIRILDI sayılır
+ *         TEST-AYIKLANAMADI  kırılan test dosyası log'dan çıkarılamadı: değerlendirilemez
+ *         TEST-YOK        kırılan test dosyası listesi boş (kırmızı adım Test değil: Lint, Build, Install...): değerlendirilecek test yok
+ *         DAL-DENEME      dal üzerindeki deneme koşusu (`dalDeneme`)
+ *         SONRADAN-YESIL  aynı commit sonradan yeşile döndü (`sonradanYesilAyniCommit`): dünya durumu/dalgalanma
+ *         PR-DISI         `event` pull_request değil (seçici yalnız PR kapısında koşar)
+ *       durum (ASIL için): SECILDI | TAM (seçici tam dedi: kaçırma imkânsız) | KACIRILDI | OLCULEMEDI.
+ *       Ayrı kategorilerde seçim yine hesaplanır ve `kacirilan` bilgi olarak yazılır, ama özetin "kacirilanlar" listesine GİRMEZ.
+ *   --ozet sonuc.jsonl [...]   satırları toplar (kaçırılan listesi dahil).
+ *   --pr-olc --sure vitest-0.json [...] [--belge 12] [--kod 12] [--limit 150] [--depo ...]
+ *       Son birleşmiş PR'lardan (bu ağacın atası olanlar) belge-yalnız ve kod PR'ı seçer, her biri için seçilen test dosyası/test/süre ve
+ *       tam pakete göre yüzdeyi yazar. `--sure`: ölçüm koşusunun `vitest-*.json` dosyaları (dosya süreleri ve test sayıları).
  *
- * SINIRLAR (dürüstçe): (1) harita ve içe aktarma grafiği BUGÜNÜN ağacındandır; koşudan sonra silinen/değişen testler `kapsamDisi`
- * sayılır, bugün var olan testin geçmiş bağımlılığı bugünkü hâliyle ölçülür. (2) `compare` en çok 300 dosya verir; ≥300 ise `tam`
- * varsayılır. (3) merge-base'i master'da olan (ör. normal birleştirme commit'iyle girmiş) bir dal ucu için fark boş gelir: OLCULEMEDI.
- * (4) Dünya durumu testleri (`dunya-durumu-testleri.json`) PR kapısında koşmadığı için `kapsamDisi`dır.
+ * SINIRLAR (dürüstçe): (1) harita ve içe aktarma grafiği BUGÜNÜN ağacındandır; koşudan sonra silinen/değişen testler `kapsamDisi` sayılır.
+ * (2) Kayıtta dosya DURUMU (silindi/taşındı) yoksa tüm yollar var sayılır (silinmiş kod dosyası kuralı işlemez); bu kural yalnız ek tam üretir,
+ * yani kaçırma saymayı gizlemez. (3) `compare` en çok 300 dosya verir; ≥300 ise `tam` varsayılır. (4) Dünya durumu testleri PR kapısında
+ * koşmadığı için `kapsamDisi`dır.
  */
 'use strict';
 
@@ -29,21 +36,24 @@ const sec = require('./test-sec.cjs');
 
 const KOK = path.resolve(__dirname, '..', '..');
 const DOSYA_SINIRI_COMPARE = 300;
+const AYRI_KATEGORILER = ['TEST-AYIKLANAMADI', 'TEST-YOK', 'DAL-DENEME', 'SONRADAN-YESIL', 'PR-DISI'];
 
-function satirYaz(nesne) {
-  process.stdout.write(`${JSON.stringify(nesne)}\n`);
+function satirYaz(nesne, hedef = null) {
+  const metin = `${JSON.stringify(nesne)}\n`;
+  if (hedef) fs.appendFileSync(hedef, metin, 'utf8');
+  else process.stdout.write(metin);
 }
 
 function argumanlar(argv) {
-  const s = { liste: false, kos: null, ozet: [], gun: 30, ciGecmis: null, harita: 'scripts/ci/test-haritasi.json', depo: null, taban: 'master' };
+  const s = { b4: null, cikti: null, ozet: [], prOlc: false, harita: 'scripts/ci/test-haritasi.json', depo: null, taban: 'master', sure: [], belge: 12, kod: 12, limit: 150 };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--liste') s.liste = true;
-    else if (a === '--kos') s.kos = argv[++i];
-    else if (a === '--ozet') {
-      while (argv[i + 1] && !argv[i + 1].startsWith('--')) s.ozet.push(argv[++i]);
-    } else if (a === '--gun') s.gun = Number.parseInt(argv[++i], 10);
-    else if (a === '--ci-gecmis') s.ciGecmis = argv[++i];
+    if (a === '--b4') s.b4 = argv[++i];
+    else if (a === '--cikti') s.cikti = argv[++i];
+    else if (a === '--pr-olc') s.prOlc = true;
+    else if (a === '--ozet' || a === '--sure') {
+      while (argv[i + 1] && !argv[i + 1].startsWith('--')) (a === '--ozet' ? s.ozet : s.sure).push(argv[++i]);
+    } else if (['--belge', '--kod', '--limit'].includes(a)) s[a.slice(2)] = Number.parseInt(argv[++i], 10);
     else if (a === '--harita') s.harita = argv[++i];
     else if (a === '--depo') s.depo = argv[++i];
     else if (a === '--taban') s.taban = argv[++i];
@@ -52,113 +62,284 @@ function argumanlar(argv) {
   return s;
 }
 
+function gh(args) {
+  return childProcess.execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true });
+}
+
 function depoAdi() {
   const url = childProcess.execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: KOK, encoding: 'utf8', windowsHide: true }).trim();
   const eslesme = /github\.com[:/]([^/]+\/[^/.]+)(?:\.git)?$/.exec(url);
-  if (!eslesme) throw new Error(`origin adresi GitHub deposu değil: ${url.replace(/\/\/[^@]*@/, '//')}`);
+  if (!eslesme) throw new Error('origin adresi GitHub deposu değil');
   return eslesme[1];
 }
 
-function adaylariListele(s) {
-  if (!s.ciGecmis) throw new Error('--ci-gecmis <ci-gecmis.json> verilmedi (ALT-38 ci geçmişi; depoda tutulmaz)');
-  const veri = JSON.parse(fs.readFileSync(s.ciGecmis, 'utf8'));
-  const sinir = new Date(Date.now() - s.gun * 86400000).toISOString();
-  let sayi = 0;
-  for (const k of veri.kosular) {
-    if (k.olay !== 'pull_request' || k.sonuc !== 'failure' || k.olusturma < sinir) continue;
-    const kirilan = [...new Set((k.testDosyalari || []).map((t) => String(t.dosya || '').split('\\').join('/')).filter(Boolean))].sort();
-    if (kirilan.length === 0) continue;
-    satirYaz({ kosuId: k.kosuId, dal: k.dal, sha: k.sha, tarih: k.olusturma, kirilan });
-    sayi += 1;
-  }
-  process.stderr.write(`[geriye] ${sayi} aday kırmızı koşu (son ${s.gun} gün)\n`);
-}
-
-/** `gh api compare` ile bir dal ucunun taban ile farkı: { degisen: string[], silinen: Set } ya da fırlatır. */
-function degisenleriAl(depo, taban, sha) {
-  const ham = childProcess.execFileSync('gh', ['api', `repos/${depo}/compare/${taban}...${sha}`], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true });
-  const cevap = JSON.parse(ham);
-  const dosyalar = cevap.files || [];
+/** Yol kayıtlarını (metin ya da { filename|dosya|yol|path, status|durum, previous_filename|onceki }) değişen/silinen kümelerine çevirir. */
+function dosyaKumeleri(kayitlar) {
   const degisen = new Set();
   const silinen = new Set();
-  for (const f of dosyalar) {
-    degisen.add(f.filename);
-    if (f.status === 'removed') silinen.add(f.filename);
-    if (f.previous_filename) {
-      degisen.add(f.previous_filename);
-      silinen.add(f.previous_filename);
+  for (const f of kayitlar || []) {
+    if (typeof f === 'string') {
+      degisen.add(f.split('\\').join('/'));
+      continue;
+    }
+    if (!f || typeof f !== 'object') continue;
+    const ad = f.filename || f.dosya || f.yol || f.path;
+    if (typeof ad !== 'string') continue;
+    degisen.add(ad.split('\\').join('/'));
+    const durum = String(f.status || f.durum || '').toLowerCase();
+    if (durum === 'removed' || durum === 'silindi' || durum === 'deleted') silinen.add(ad.split('\\').join('/'));
+    const onceki = f.previous_filename || f.onceki;
+    if (typeof onceki === 'string' && onceki !== '') {
+      degisen.add(onceki.split('\\').join('/'));
+      silinen.add(onceki.split('\\').join('/'));
     }
   }
-  return { degisen: [...degisen].sort(), silinen, kesik: dosyalar.length >= DOSYA_SINIRI_COMPARE };
+  return { degisen: [...degisen].sort(), silinen };
 }
 
-async function koslariDegerlendir(s) {
-  const depo = s.depo || depoAdi();
+/** `gh api compare` ile iki commit arasındaki fark (yalnız kayıtta değişen dosya yoksa). */
+function degisenleriAl(depo, taban, sha) {
+  const cevap = JSON.parse(gh(['api', `repos/${depo}/compare/${taban}...${sha}`]));
+  const dosyalar = cevap.files || [];
+  return { ...dosyaKumeleri(dosyalar), kesik: dosyalar.length >= DOSYA_SINIRI_COMPARE };
+}
+
+/** `gh api pulls/N/files` (sayfalı) ile bir PR'ın dosyaları. */
+function prDosyalari(depo, no) {
+  const ham = gh(['api', `repos/${depo}/pulls/${no}/files`, '--paginate', '--jq', '.[] | [.filename, .status, (.previous_filename // "")] | @tsv']);
+  const kayitlar = ham
+    .split('\n')
+    .filter((s) => s !== '')
+    .map((s) => {
+      const [filename, status, onceki] = s.split('\t');
+      return { filename, status, previous_filename: onceki || undefined };
+    });
+  return dosyaKumeleri(kayitlar);
+}
+
+async function oturumVeBaglam(s) {
   const harita = JSON.parse(fs.readFileSync(path.join(KOK, s.harita), 'utf8'));
   process.env.VENTHUB_DUNYA_DURUMU = 'dislan';
   const oturum = await sec.vitestOturumuAc(KOK);
-  const evren = new Set(oturum.testler);
   const tazelik = sec.tazelikHesapla(KOK, oturum.testler);
+  return { harita, oturum, tazelik, evren: new Set(oturum.testler) };
+}
+
+/** Bir değişiklik kümesi için seçici sonucu (bağlamdaki harita, tazelik ve ÖNBELLEKLİ içe aktarma grafiğiyle). */
+async function secimYap(baglam, degisen, silinen) {
+  const dosyaVarMi = (y) => !silinen.has(y);
+  const adaylar = sec.ilgiliAdaylari(degisen, dosyaVarMi);
+  const ilgiliSonuc = adaylar.length > 0 ? await baglam.oturum.ilgili(adaylar) : [];
+  return sec.sec({ degisenDosyalar: degisen, testDosyalari: baglam.oturum.testler, harita: baglam.harita, ilgili: () => ilgiliSonuc, tazelik: baglam.tazelik, dosyaVarMi });
+}
+
+function kayitlariOku(dosya) {
+  const ham = JSON.parse(fs.readFileSync(dosya, 'utf8'));
+  const dizi = Array.isArray(ham) ? ham : ham.kosular || ham.kayitlar || ham.runs;
+  if (!Array.isArray(dizi)) throw new Error('B4 dosyası dizi değil ({ kosular | kayitlar } da kabul)');
+  return dizi;
+}
+
+/** Kaydın kategorisi (öncelik sırası sabit: bir kayıt TEK kategoriye girer). */
+function kategori(k) {
+  if (k.testAyiklanamadi) return 'TEST-AYIKLANAMADI';
+  if (kirilanTestler(k).length === 0) return 'TEST-YOK';
+  if (k.event && k.event !== 'pull_request') return 'PR-DISI';
+  if (k.dalDeneme) return 'DAL-DENEME';
+  if (k.sonradanYesilAyniCommit) return 'SONRADAN-YESIL';
+  return 'ASIL';
+}
+
+function kirilanTestler(k) {
+  const ham = Array.isArray(k.kirilanTestDosyalari) ? k.kirilanTestDosyalari : [];
+  return [...new Set(ham.map((t) => (typeof t === 'string' ? t : t && (t.dosya || t.file)) || '').map((t) => String(t).split('\\').join('/')).filter(Boolean))].sort();
+}
+
+async function b4Degerlendir(s) {
+  const depo = s.depo;
+  const kayitlar = kayitlariOku(s.b4);
+  const baglam = await oturumVeBaglam(s);
+  const sonuclar = [];
   try {
-    for (const satir of fs.readFileSync(s.kos, 'utf8').split('\n')) {
-      if (satir.trim() === '') continue;
-      const aday = JSON.parse(satir);
-      const cikti = { kosuId: aday.kosuId, dal: aday.dal, sha: aday.sha, degisen: 0, durum: 'OLCULEMEDI', tam: false, secilen: 0, kirilan: aday.kirilan, kacirilan: [], kapsamDisi: [], neden: [] };
+    for (const k of kayitlar) {
+      const kat = kategori(k);
+      const kirilan = kirilanTestler(k);
+      const cikti = { runId: k.runId, attempt: k.attempt, prNo: k.prNo ?? null, dal: k.dal, kategori: kat, degisen: 0, durum: 'OLCULEMEDI', tam: false, secilen: 0, kirilan, kacirilan: [], kapsamDisi: [], neden: [] };
       try {
-        const fark = degisenleriAl(depo, s.taban, aday.sha);
-        cikti.degisen = fark.degisen.length;
-        if (fark.degisen.length === 0) {
-          cikti.neden = ['compare boş döndü: dal ucu tabanda (merge-base farkı yok)'];
-          satirYaz(cikti);
-          continue;
+        if (kat === 'TEST-AYIKLANAMADI' || kat === 'TEST-YOK') {
+          cikti.neden = [kat === 'TEST-YOK' ? 'kırılan test dosyası yok (kırmızı adım test değil)' : "kırılan test dosyası log'dan çıkarılamadı"];
+        } else {
+          let fark = dosyaKumeleri(k.degisenDosyalar);
+          let kesik = false;
+          if (k.degisenDosyaYok || fark.degisen.length === 0) {
+            const taban = k.baseSha || s.taban;
+            const uzak = degisenleriAl(depo || depoAdi(), taban, k.headSha);
+            fark = uzak;
+            kesik = uzak.kesik;
+          }
+          cikti.degisen = fark.degisen.length;
+          if (fark.degisen.length === 0) {
+            cikti.neden = ['değişen dosya listesi boş (kayıtta yok, compare da boş)'];
+          } else {
+            const olculebilir = kirilan.filter((t) => baglam.evren.has(t));
+            cikti.kapsamDisi = kirilan.filter((t) => !baglam.evren.has(t));
+            const sonuc = await secimYap(baglam, fark.degisen, fark.silinen);
+            cikti.tam = sonuc.tam || kesik;
+            cikti.secilen = sonuc.secilen.length;
+            cikti.neden = sonuc.neden.slice(0, 3);
+            const secilenKume = new Set(sonuc.secilen);
+            cikti.kacirilan = cikti.tam ? [] : olculebilir.filter((t) => !secilenKume.has(t));
+            if (olculebilir.length === 0) {
+              cikti.neden.push('kırılan testlerin hiçbiri bugünkü PR evreninde yok (silinmiş ya da dünya durumu)');
+            } else {
+              cikti.durum = cikti.kacirilan.length > 0 ? 'KACIRILDI' : cikti.tam ? 'TAM' : 'SECILDI';
+            }
+          }
         }
-        const olculebilir = aday.kirilan.filter((t) => evren.has(t));
-        cikti.kapsamDisi = aday.kirilan.filter((t) => !evren.has(t));
-        const dosyaVarMi = (y) => !fark.silinen.has(y);
-        const adaylar = sec.ilgiliAdaylari(fark.degisen, dosyaVarMi);
-        const ilgiliSonuc = adaylar.length > 0 ? await oturum.ilgili(adaylar) : [];
-        const sonuc = sec.sec({ degisenDosyalar: fark.degisen, testDosyalari: oturum.testler, harita, ilgili: () => ilgiliSonuc, tazelik, dosyaVarMi });
-        cikti.tam = sonuc.tam || fark.kesik;
-        cikti.secilen = sonuc.secilen.length;
-        cikti.neden = sonuc.neden.slice(0, 3);
-        const secilenKume = new Set(sonuc.secilen);
-        cikti.kacirilan = cikti.tam ? [] : olculebilir.filter((t) => !secilenKume.has(t));
-        cikti.durum = olculebilir.length === 0 ? 'OLCULEMEDI' : cikti.kacirilan.length > 0 ? 'KACIRILDI' : cikti.tam ? 'TAM' : 'SECILDI';
-        if (olculebilir.length === 0) cikti.neden.push('kırılan testlerin hiçbiri bugünkü PR evreninde yok (silinmiş ya da dünya durumu)');
       } catch (e) {
         cikti.neden = [`hata: ${String(e && e.message ? e.message : e).slice(0, 200)}`];
       }
-      satirYaz(cikti);
+      satirYaz(cikti, s.cikti);
+      sonuclar.push(cikti);
     }
   } finally {
-    await oturum.kapat();
+    await baglam.oturum.kapat();
   }
+  satirYaz(ozetKur(sonuclar), s.cikti);
+}
+
+/** Sonuç satırlarından özet: ASIL kayıtlar ayrı, ayrı kategoriler ayrı sayılır; kaçırılanlar yalnız ASIL'den. */
+function ozetKur(satirlar) {
+  const ozet = { tur: 'OZET', kosu: 0, asil: { toplam: 0, secildi: 0, tam: 0, kacirildi: 0, olculemedi: 0 }, ayri: {}, kacirilanlar: [], ayriKacirilanlar: [] };
+  for (const k of AYRI_KATEGORILER) ozet.ayri[k] = { toplam: 0, kacirildi: 0 };
+  for (const k of satirlar) {
+    if (!k || k.tur === 'OZET') continue;
+    ozet.kosu += 1;
+    if (k.kategori === 'ASIL') {
+      ozet.asil.toplam += 1;
+      if (k.durum === 'SECILDI') ozet.asil.secildi += 1;
+      else if (k.durum === 'TAM') ozet.asil.tam += 1;
+      else if (k.durum === 'KACIRILDI') {
+        ozet.asil.kacirildi += 1;
+        ozet.kacirilanlar.push({ runId: k.runId, attempt: k.attempt, prNo: k.prNo, dal: k.dal, kacirilan: k.kacirilan });
+      } else ozet.asil.olculemedi += 1;
+    } else if (ozet.ayri[k.kategori]) {
+      ozet.ayri[k.kategori].toplam += 1;
+      if (k.kacirilan && k.kacirilan.length > 0) {
+        ozet.ayri[k.kategori].kacirildi += 1;
+        ozet.ayriKacirilanlar.push({ kategori: k.kategori, runId: k.runId, dal: k.dal, kacirilan: k.kacirilan });
+      }
+    }
+  }
+  return ozet;
 }
 
 function ozetle(dosyalar) {
-  const ozet = { kosu: 0, secildi: 0, tam: 0, kacirildi: 0, olculemedi: 0, kacirilanlar: [] };
+  const satirlar = [];
   for (const d of dosyalar) {
     for (const satir of fs.readFileSync(d, 'utf8').split('\n')) {
-      if (satir.trim() === '' || !satir.startsWith('{')) continue;
-      const k = JSON.parse(satir);
-      ozet.kosu += 1;
-      if (k.durum === 'SECILDI') ozet.secildi += 1;
-      else if (k.durum === 'TAM') ozet.tam += 1;
-      else if (k.durum === 'KACIRILDI') {
-        ozet.kacirildi += 1;
-        ozet.kacirilanlar.push({ kosuId: k.kosuId, dal: k.dal, kacirilan: k.kacirilan });
-      } else ozet.olculemedi += 1;
+      if (satir.trim() !== '' && satir.startsWith('{')) satirlar.push(JSON.parse(satir));
     }
   }
-  satirYaz(ozet);
+  satirYaz(ozetKur(satirlar));
+}
+
+/** PR türü: belge (tüm yollar docs/ .claude/ .agent/ ya da kök *.md), kuresel (küresel yol var), kod (src/ var), diger. */
+function prTuru(degisen) {
+  const belgeMi = (y) => /^(?:docs|\.claude|\.agent)\//.test(y) || (!y.includes('/') && y.endsWith('.md') && !y.startsWith('.'));
+  if (degisen.every(belgeMi)) return 'belge';
+  if (degisen.some((y) => sec.kureselGirdiNedeni(y, sec.KURESEL_GIRDILER) !== null)) return 'kuresel';
+  if (degisen.some((y) => y.startsWith('src/'))) return 'kod';
+  return 'diger';
+}
+
+/** vitest sonuç dosyaları: test dosyası → { sn, test }. */
+function sureleriOku(dosyalar) {
+  const harita = new Map();
+  for (const dosya of dosyalar) {
+    const ham = JSON.parse(fs.readFileSync(dosya, 'utf8'));
+    for (const r of ham.testResults || []) {
+      const goreli = path.relative(KOK, r.name).split(path.sep).join('/');
+      harita.set(goreli, { sn: Math.max(0, (r.endTime - r.startTime) / 1000), test: (r.assertionResults || []).length });
+    }
+  }
+  return harita;
+}
+
+function agacinAtasiMi(oid) {
+  try {
+    childProcess.execFileSync('git', ['merge-base', '--is-ancestor', oid, 'HEAD'], { cwd: KOK, stdio: 'ignore', windowsHide: true });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function prOlc(s) {
+  if (s.sure.length === 0) throw new Error('--sure <vitest-*.json ...> gerekli (ölçüm koşusunun süre ve test sayıları)');
+  const depo = s.depo || depoAdi();
+  const sureler = sureleriOku(s.sure);
+  const baglam = await oturumVeBaglam(s);
+  const toplam = { dosya: baglam.oturum.testler.length, test: 0, sn: 0 };
+  for (const t of baglam.oturum.testler) {
+    const k = sureler.get(t) || { sn: 0, test: 0 };
+    toplam.test += k.test;
+    toplam.sn += k.sn;
+  }
+  const kota = { belge: s.belge, kod: s.kod };
+  const sayac = { belge: 0, kod: 0, kuresel: 0, diger: 0 };
+  try {
+    const liste = JSON.parse(gh(['pr', 'list', '--state', 'merged', '--base', s.taban, '--limit', String(s.limit), '--json', 'number,title,mergeCommit']));
+    for (const pr of liste) {
+      if (sayac.belge >= kota.belge && sayac.kod >= kota.kod) break;
+      if (!pr.mergeCommit || !agacinAtasiMi(pr.mergeCommit.oid)) continue;
+      let fark;
+      try {
+        fark = prDosyalari(depo, pr.number);
+      } catch {
+        continue;
+      }
+      if (fark.degisen.length === 0) continue;
+      const tur = prTuru(fark.degisen);
+      if ((tur === 'belge' || tur === 'kod') && sayac[tur] >= kota[tur]) continue;
+      const sonuc = await secimYap(baglam, fark.degisen, fark.silinen);
+      let test = 0;
+      let sn = 0;
+      for (const t of sonuc.secilen) {
+        const k = sureler.get(t) || { sn: 0, test: 0 };
+        test += k.test;
+        sn += k.sn;
+      }
+      sayac[tur] += 1;
+      satirYaz({
+        pr: pr.number,
+        tur,
+        baslik: pr.title.slice(0, 80),
+        degisen: fark.degisen.length,
+        tam: sonuc.tam,
+        secilenDosya: sonuc.secilen.length,
+        toplamDosya: toplam.dosya,
+        secilenTest: test,
+        toplamTest: toplam.test,
+        testYuzde: Number(((100 * test) / toplam.test).toFixed(1)),
+        secilenSureSn: Number(sn.toFixed(1)),
+        toplamSureSn: Number(toplam.sn.toFixed(1)),
+        sureYuzde: Number(((100 * sn) / toplam.sn).toFixed(1)),
+        neden: sonuc.neden,
+      }, s.cikti);
+    }
+    process.stderr.write(`[pr-olc] belge ${sayac.belge}/${kota.belge} · kod ${sayac.kod}/${kota.kod} · küresel ${sayac.kuresel} · diğer ${sayac.diger}\n`);
+  } finally {
+    await baglam.oturum.kapat();
+  }
 }
 
 async function main() {
   const s = argumanlar(process.argv.slice(2));
-  if (s.liste) adaylariListele(s);
-  else if (s.kos) await koslariDegerlendir(s);
+  if (s.b4) await b4Degerlendir(s);
+  else if (s.prOlc) await prOlc(s);
   else if (s.ozet.length > 0) ozetle(s.ozet);
-  else throw new Error('kip seçilmedi: --liste | --kos <jsonl> | --ozet <jsonl...>');
+  else throw new Error('kip seçilmedi: --b4 <dosya> | --ozet <jsonl...> | --pr-olc --sure <vitest-*.json...>');
 }
 
 if (require.main === module) {
@@ -171,4 +352,4 @@ if (require.main === module) {
   );
 }
 
-module.exports = { adaylariListele, degisenleriAl, ozetle };
+module.exports = { dosyaKumeleri, kategori, kirilanTestler, ozetKur, prTuru };

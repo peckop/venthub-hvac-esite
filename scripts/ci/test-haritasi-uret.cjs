@@ -2,17 +2,19 @@
 /**
  * ALT-38d · TEST HARİTASI ÜRETİCİSİ (karar 308, B1) — `scripts/ci/test-haritasi.json`u ÖLÇÜMLE üretir.
  *
- * AKIŞ: (1) TEK tam vitest koşusu (`VENTHUB_DUNYA_DURUMU=dislan`, PR kapısıyla aynı küme; yapılandırma
- * `test-haritasi.vitest.config.ts`: kaydedici setupFiles ile açılır, `vitest.config.ts`e dokunulmaz) her test dosyasının okuduğu
- * dosya/dizinleri ham kayıt olarak bir geçici klasöre yazar; (2) bu betik ham kayıtları birleştirir, sıkıştırır, ana süreçte vite'ın
- * yaptığı `import.meta.glob` okumalarını kaynaktan çıkarıp ÖLÇÜMLE doğrular ve haritayı BELİRLENİMLİ biçimde yazar.
+ * AKIŞ: (1) tam vitest koşusu (`VENTHUB_DUNYA_DURUMU=dislan`, PR kapısıyla aynı küme; yapılandırma
+ * `test-haritasi.vitest.config.ts`: kaydedici setupFiles ile açılır, `vitest.config.ts`e dokunulmaz; test listesi `--parti` parçaya bölünür ve
+ * her parça ayrı vitest sürecidir: kesilirse en çok bir parça kaybolur) her test dosyasının okuduğu dosya/dizinleri ham kayıt olarak bir geçici
+ * klasöre yazar; (2) bu betik ham kayıtları birleştirir, sıkıştırır, ana süreçte vite'ın yaptığı `import.meta.glob` okumalarını kaynaktan
+ * çıkarıp ÖLÇÜMLE doğrular ve haritayı BELİRLENİMLİ biçimde yazar.
  *
  * Kullanım:
  *   node scripts/ci/test-haritasi-uret.cjs                       tam koşu + harita yaz
+ *   node scripts/ci/test-haritasi-uret.cjs --devam <ham klasör>   yarım kalan koşuyu sürdür (yalnız sonuç dosyası olmayan parçalar koşar)
  *   node scripts/ci/test-haritasi-uret.cjs --yalniz a.test.ts …  yalnız bu testleri yeniden ölç, kalanını koru (araç özeti AYNI olmalı)
- *   node scripts/ci/test-haritasi-uret.cjs --ham <klasor>         koşmadan, var olan ham kayıt klasöründen yaz (vitest.json aynı klasörde)
+ *   node scripts/ci/test-haritasi-uret.cjs --ham <klasor>         koşmadan, var olan ham kayıt klasöründen yaz (vitest-*.json aynı klasörde)
  *   node scripts/ci/test-haritasi-uret.cjs --kontrol              depodaki haritayı ağaçla karşılaştır (yazmaz; sorun varsa çıkış 1)
- *   Seçenekler: --isci N (varsayılan 6) · --cikti yol (varsayılan scripts/ci/test-haritasi.json) · --ham-sil (koşudan sonra ham klasörü sil)
+ *   Seçenekler: --isci N (varsayılan 6) · --parti N (varsayılan 12) · --cikti yol (varsayılan scripts/ci/test-haritasi.json) · --ham-sil
  *
  * ELE ALINAN KÖR NOKTALAR (ölçüldü; sessiz kaçtığı için burada yazılı):
  *   1. `import.meta.glob(..., { query: '?raw' })` vite'ın ANA SÜRECİNDE okunur (78 test): kaydedici göremez. Desenler kaynaktan çıkarılır
@@ -235,7 +237,11 @@ function sikistir(girdi, esik = ESIK) {
   for (const f of okunan) dizineSayac.set(ustDizin(f), (dizineSayac.get(ustDizin(f)) || 0) + 1);
   for (const [d, n] of dizineSayac) if (n >= esik.dosyaDizin) dizin.add(d);
   dizinYut();
-  for (;;) {
+  // Her verimli tur en az bir girdiyi yutar: tur sayısı girdi sayısını AŞAMAZ. Aşarsa sonlanmayan döngü demektir; takılmak yerine FIRLATIR
+  // (sessiz sonsuz döngü ölçüm koşusunu ve CI'ı kilitlerdi).
+  const turSiniri = okunan.size + dizin.size + ozy.size + 8;
+  for (let tur = 0; ; tur++) {
+    if (tur > turSiniri) throw new Error('sikistir sonlanmadı (tur sınırı aşıldı): girdi sıkıştırılamıyor');
     const sayac = new Map();
     const say = (yol, alan) => {
       const parcalar = yol === '.' ? [] : yol.split('/');
@@ -521,7 +527,8 @@ function serilestir(harita) {
 function kontrolEt(kok, testler, harita = null, metin = null) {
   const sorunlar = [];
   const yol = path.join(kok, HARITA_YOLU);
-  const ham = metin !== null ? metin : fs.readFileSync(yol, 'utf8');
+  // Satır sonu normalleştirilir: Windows çalışma ağacı (`* text=auto`) CRLF'e çevirmiş olabilir; depodaki bayt dizisi LF'tir.
+  const ham = (metin !== null ? metin : fs.readFileSync(yol, 'utf8')).split('\r\n').join('\n');
   const nesne = harita !== null ? harita : JSON.parse(ham);
   const biçim = sec.haritaSorunu(nesne);
   if (biçim) sorunlar.push(`harita biçimi geçersiz: ${biçim}`);
@@ -673,7 +680,8 @@ async function calistir(argv, kok = path.resolve(__dirname, '..', '..')) {
   }
   const ham = hamKlasoruOku(klasor, kok);
   const kaynakOku = (yol) => fs.readFileSync(path.join(kok, yol), 'utf8');
-  const { harita, ozet } = haritaKur({ kok, ham, testler: olculecek, kaynakOku, dosyalar, uretim: uretimBilgisi(kok) });
+  const yoksayilan = yoksayilanYollar(kok, ham);
+  const { harita, ozet } = haritaKur({ kok, ham, testler: olculecek, kaynakOku, dosyalar, uretim: uretimBilgisi(kok), yoksayilan });
   if (onceki) {
     const birlesik = { ...onceki.testler };
     for (const t of olculecek) delete birlesik[t];
@@ -710,8 +718,10 @@ module.exports = {
   kayitKur,
   kodGlobTaramasi,
   kontrolEt,
+  partilereBol,
   rawYolu,
   serilestir,
   sikistir,
   surecEtiketi,
+  yoksayilanYollar,
 };

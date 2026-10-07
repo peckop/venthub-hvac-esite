@@ -30,6 +30,10 @@
  *   --vitestsiz  vitest AÇMAZ (kurulumdan önce koşar): test listesi `git ls-files` ile (vitest listesinin ÜST KÜMESİ: dağıtıcı kendi
  *                `vitest list`iyle kesiştirmeli). İçe aktarılabilir dosya değiştiyse karar vitest ister: `tam=true` + "vitest gerekli" nedeni;
  *                kurulumdan sonra bu bayraksız yeniden koşulur. Yalnız md/csv/sql/yaml gibi dosyalar değiştiyse seçimi kendisi verir.
+ *   --yerel      YEREL kullanım (`pnpm test:ilgili`): değişen dosyalar tabana (`--taban`, varsayılan origin/master, yoksa master) göre git'ten
+ *                alınır (kayıtlı + kaydedilmemiş izlenen dosyalar + izlenmeyen yeni dosyalar), seçilen testler vitest ile koşar. TAM'a
+ *                düşerse `TAM: <sebep>` yazılır ve HİÇBİR test koşmaz (yerelde tam paket yok; CI koşar). `--kuru` yalnız seçimi listeler.
+ *                Çıkış kodu = seçilen testleri koşturan vitest'in çıkış kodu.
  *   Değişen dosyalar varsayılan olarak `git diff -z --name-only --no-renames HEAD^1 HEAD`ten (PR'ın birleştirme commit'i) okunur.
  *   Çıkış kodu DAİMA 0'dır; hata `tam` olarak yazılır. `$GITHUB_OUTPUT` varsa `tam=`, `secilen-sayisi=`, `toplam=`, `neden=` eklenir.
  *   `--cikti` dosyası satır başına bir test yoludur (`tam` ise TÜM testler); tam ve liste YOKSA (git/harita hatası) dosya yazılmaz, eskisi silinir:
@@ -657,8 +661,9 @@ async function vitestOturumuAc(kok) {
     const kume = new Set(dosyalar.map(mutlak));
     if (typeof vitest.specifications.getTestDependencies === 'function') {
       if (!bagimliliklar) {
-        bagimliliklar = new Map();
-        for (const s of spec) bagimliliklar.set(goreli(s), await vitest.specifications.getTestDependencies(s));
+        // vitest'in kendi `filterTestsBySource`ı gibi PARALEL (dönüşümler eşzamansız; ardışık beklemek grafiği kurma süresini katlar).
+        const bagimlilikListesi = await Promise.all(spec.map(async (s) => [goreli(s), await vitest.specifications.getTestDependencies(s)]));
+        bagimliliklar = new Map(bagimlilikListesi);
       }
       const bulunan = [];
       for (const [test, deps] of bagimliliklar) {
@@ -708,7 +713,7 @@ function yolDosyasiniOku(dosya) {
   return metin.split(ayrac).map((s) => s.replace(/\r$/, '')).filter((s) => s !== '');
 }
 
-const VARSAYILAN_ARGUMANLAR = Object.freeze({ kok: null, harita: null, cikti: null, degisenDosya: null, testListesi: null, vitestsiz: false, json: false });
+const VARSAYILAN_ARGUMANLAR = Object.freeze({ kok: null, harita: null, cikti: null, degisenDosya: null, testListesi: null, vitestsiz: false, json: false, yerel: false, taban: null, kuru: false });
 
 function argumanlariCoz(argv) {
   const secenek = { ...VARSAYILAN_ARGUMANLAR };
@@ -721,9 +726,67 @@ function argumanlariCoz(argv) {
     else if (a === '--test-listesi') secenek.testListesi = argv[++i];
     else if (a === '--vitestsiz') secenek.vitestsiz = true;
     else if (a === '--json') secenek.json = true;
+    else if (a === '--yerel') secenek.yerel = true;
+    else if (a === '--taban') secenek.taban = argv[++i];
+    else if (a === '--kuru') secenek.kuru = true;
     else throw new Error(`bilinmeyen argüman: ${String(a).slice(0, 60)}`);
   }
   return secenek;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------
+// YEREL kullanım (`pnpm test:ilgili`): değişen dosyalar master'a göre, seçilen testler koşar, TAM'a düşerse sebep yazılır
+// ---------------------------------------------------------------------------------------------------------------------------
+
+/** Yerel taban: `HEAD` ile `--taban` (varsayılan origin/master, yoksa master) arasındaki ORTAK ATA. Hiçbiri yoksa FIRLATIR. */
+function tabanBul(gitCalistir, kok, istenen) {
+  const adaylar = istenen ? [istenen] : ['origin/master', 'master'];
+  for (const ref of adaylar) {
+    try {
+      const sha = String(gitCalistir(['-C', kok, 'merge-base', 'HEAD', ref])).trim();
+      if (/^[0-9a-f]{7,40}$/.test(sha)) return sha;
+    } catch {
+      /* bu ref yok: sonrakini dene */
+    }
+  }
+  throw new Error(`taban bulunamadı (${adaylar.join(', ')}): git fetch origin master`);
+}
+
+/** Yerel değişenler: tabana göre çalışma ağacı farkı (kayıtlı + kaydedilmemiş izlenen dosyalar, silinenler dahil) ∪ izlenmeyen yeni dosyalar (`.gitignore` hariç). */
+function yerelDegisenler(gitCalistir, kok, taban) {
+  const izlenen = yollariAyir(gitCalistir(['-C', kok, 'diff', '--name-only', '-z', '--no-renames', taban]));
+  const yeni = yollariAyir(gitCalistir(['-C', kok, 'ls-files', '--others', '--exclude-standard', '-z']));
+  return [...new Set([...izlenen, ...yeni])].sort();
+}
+
+/** Seçilen test dosyalarını vitest ile koşar (yerel tam paket DEĞİL). Dönüş: vitest çıkış kodu. */
+function vitestiKos(kok, dosyalar) {
+  const vitestBin = path.join(kok, 'node_modules', 'vitest', 'vitest.mjs');
+  const sonuc = childProcess.spawnSync(process.execPath, [vitestBin, 'run', '--passWithNoTests', ...dosyalar], {
+    cwd: kok,
+    stdio: 'inherit',
+    env: { ...process.env, VENTHUB_DUNYA_DURUMU: process.env.VENTHUB_DUNYA_DURUMU || 'dislan' },
+    windowsHide: true,
+  });
+  return typeof sonuc.status === 'number' ? sonuc.status : 1;
+}
+
+/** `--yerel` çıktısı ve koşusu. TAM ise HİÇBİR test koşmaz (yerelde tam paket yok; CI koşar) ve sebebi yazar. Dönüş: çıkış kodu. */
+function yerelBitir(sonuc, toplam, arg, vitestKos, kok, yaz) {
+  if (sonuc.tam) {
+    yaz(`TAM: ${sonuc.neden[0]}\n  Yerelde tam paket koşturulmaz (CI koşar); gerekirse elle: pnpm test -- --run\n`);
+    return 0;
+  }
+  yaz(`Seçilen ${sonuc.secilen.length}/${toplam} test dosyası (${sonuc.neden.slice(1, 4).join('; ')})\n`);
+  if (sonuc.secilen.length === 0) {
+    yaz('Koşacak test yok.\n');
+    return 0;
+  }
+  if (arg.kuru) {
+    for (const t of sonuc.secilen) yaz(`  ${t}\n`);
+    return 0;
+  }
+  return vitestKos(kok, sonuc.secilen);
 }
 
 /** Çıktıya girecek tek satırlık metin (iş akışı komutu enjeksiyonuna karşı: kontrol karakteri → boşluk, `%` silinir, `::` tek olur). */
@@ -756,6 +819,18 @@ function siniflayiciYukle(kok) {
   return null;
 }
 
+const ILGILI_GEREKLI = 'vitest-related-gerekli';
+
+/** `sec`e "içe aktarma grafiği gerekirse söyle" diye verilir: gerekmiyorsa hiç çağrılmaz, gerekiyorsa bu hata `sec`in `tam` nedenine girer. */
+function ilgiliGerekliSinyali() {
+  throw new Error(ILGILI_GEREKLI);
+}
+
+/** `sec` sonucu "grafik gerekli" sinyali yüzünden mi `tam` oldu (gerçek bir tam nedeni değil)? */
+function ilgiliGerekliMi(sonuc) {
+  return sonuc.tam === true && sonuc.neden.some((n) => n.includes(ILGILI_GEREKLI));
+}
+
 /** `git ls-files` ile test dosyaları (vitest'siz kip): vitest listesinin ÜST KÜMESİ (dışlanan testler de olabilir; dağıtıcı kendi listesiyle kesiştirir). */
 function gitTestListesi(gitCalistir, kok) {
   const ham = gitCalistir(['-C', kok, 'ls-files', '-z']);
@@ -770,40 +845,50 @@ function gitTestListesi(gitCalistir, kok) {
  * ASLA fırlatmaz: her hata `tam` olarak yazılır. Sonucu da döner.
  */
 async function calistir(argv, secenekler = {}) {
-  const { gitCalistir = gercekGit, oturumAc = vitestOturumuAc, ortam = process.env, kok: kokVarsayilan = kokDizini(), yaz = (m) => process.stdout.write(m) } = secenekler;
+  const { gitCalistir = gercekGit, oturumAc = vitestOturumuAc, ortam = process.env, kok: kokVarsayilan = kokDizini(), yaz = (m) => process.stdout.write(m), vitestKos = vitestiKos } = secenekler;
   let sonuc;
   let testler = [];
   let oturum = null;
+  const argGuvenli = argumanlarGuvenli(argv);
+  let kokKullanilan = kokVarsayilan;
   try {
     const arg = argumanlariCoz(argv);
     const kok = arg.kok ? path.resolve(arg.kok) : kokVarsayilan;
+    kokKullanilan = kok;
     const haritaYolu = path.resolve(kok, arg.harita || 'scripts/ci/test-haritasi.json');
     const siniflayici = siniflayiciYukle(kok);
-    const degisen = arg.degisenDosya ? yolDosyasiniOku(arg.degisenDosya) : yollariAyir(gitCalistir(['-C', kok, ...GIT_ARGUMANLARI]));
+    // Yerel kipte vitest.config.ts'in PR kapısı kümesini görmesi için (dünya durumu testleri dışarıda); enjekte oturumda ortam kirletilmez.
+    if (arg.yerel && oturumAc === vitestOturumuAc && !process.env.VENTHUB_DUNYA_DURUMU) process.env.VENTHUB_DUNYA_DURUMU = 'dislan';
+    let degisen;
+    if (arg.degisenDosya) degisen = yolDosyasiniOku(arg.degisenDosya);
+    else if (arg.yerel) degisen = yerelDegisenler(gitCalistir, kok, tabanBul(gitCalistir, kok, arg.taban));
+    else degisen = yollariAyir(gitCalistir(['-C', kok, ...GIT_ARGUMANLARI]));
+    if (arg.yerel && degisen.length === 0) {
+      yaz('Değişiklik yok (tabana göre): koşacak test yok.\n');
+      return { tam: false, secilen: [], neden: ['değişiklik yok'], cikisKodu: 0 };
+    }
     const harita = JSON.parse(fs.readFileSync(haritaYolu, 'utf8'));
     if (arg.testListesi) testler = testListesiniOku(arg.testListesi, kok);
     else if (arg.vitestsiz) testler = gitTestListesi(gitCalistir, kok);
     const normaller = degisen.map((d) => yoluNormalle(d).yol).filter((y) => typeof y === 'string');
     const dosyaVarMi = (y) => fs.existsSync(path.join(kok, y));
     const adaylar = ilgiliAdaylari(normaller, dosyaVarMi);
-    let ilgiliSonuc = null;
     if (arg.vitestsiz && adaylar.length > 0) {
       sonuc = tamSonuc([`vitest gerekli: içe aktarılabilir dosya değişti (${adaylar[0]}${adaylar.length > 1 ? ` +${adaylar.length - 1}` : ''}); kurulumdan sonra --vitestsiz OLMADAN koşulmalı`], testler);
     } else {
-      if (!arg.vitestsiz && (testler.length === 0 || adaylar.length > 0)) {
+      // vitest oturumu yalnız test LİSTESİ için (~2 sn) gerekirse açılır; içe aktarma grafiği (en pahalı iş, 20-60 sn) yalnız karar GERÇEKTEN ona
+      // bağlıysa kurulur: küresel dosya, bilinmeyen kök, silinen kod ve belge-yalnız değişikliklerde `sec` grafiğe hiç bakmadan karar verir.
+      if (!arg.vitestsiz && testler.length === 0) {
         oturum = await oturumAc(kok);
-        if (testler.length === 0) testler = oturum.testler;
-        if (adaylar.length > 0) ilgiliSonuc = await oturum.ilgili(adaylar);
+        testler = oturum.testler;
       }
-      sonuc = sec({
-        degisenDosyalar: degisen,
-        testDosyalari: testler,
-        harita,
-        ilgili: () => ilgiliSonuc,
-        tazelik: tazelikHesapla(kok, testler),
-        dosyaVarMi,
-        siniflayici,
-      });
+      const girdi = { degisenDosyalar: degisen, testDosyalari: testler, harita, tazelik: tazelikHesapla(kok, testler), dosyaVarMi, siniflayici };
+      sonuc = sec({ ...girdi, ilgili: ilgiliGerekliSinyali });
+      if (ilgiliGerekliMi(sonuc) && adaylar.length > 0) {
+        if (!oturum) oturum = await oturumAc(kok);
+        const ilgiliSonuc = await oturum.ilgili(adaylar);
+        sonuc = sec({ ...girdi, ilgili: () => ilgiliSonuc });
+      }
     }
   } catch (e) {
     sonuc = tamSonuc([`seçim hesaplanamadı (${hataMetni(e)}): güvenli tarafta tam`], testler);
@@ -816,7 +901,8 @@ async function calistir(argv, secenekler = {}) {
       }
     }
   }
-  yazCikti(sonuc, argumanlarGuvenli(argv), ortam, yaz, testler.length);
+  if (argGuvenli.yerel) return { ...sonuc, cikisKodu: yerelBitir(sonuc, testler.length, argGuvenli, vitestKos, kokKullanilan, yaz) };
+  yazCikti(sonuc, argGuvenli, ortam, yaz, testler.length);
   return sonuc;
 }
 
@@ -858,8 +944,9 @@ function yazCikti(sonuc, arg, ortam, yaz, toplam) {
 }
 
 if (require.main === module) {
+  // CI kipinde çıkış kodu DAİMA 0'dır (hata = tam çıktısı); `--yerel` kipinde seçilen testleri koşturan vitest'in çıkış kodu geçer.
   calistir(process.argv.slice(2)).then(
-    () => process.exit(0),
+    (sonuc) => process.exit(sonuc && typeof sonuc.cikisKodu === 'number' ? sonuc.cikisKodu : 0),
     (e) => {
       process.stdout.write(`tam=true\n::notice::test seçimi: TAM — beklenmeyen hata (${satirTemizle(hataMetni(e))})\n`);
       process.exit(0);
@@ -889,8 +976,10 @@ module.exports = {
   satirTemizle,
   sec,
   suslerleAc,
+  tabanBul,
   tazelikHesapla,
   vitestOturumuAc,
+  yerelDegisenler,
   yoluNormalle,
   yollariAyir,
 };
