@@ -25,6 +25,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  *   7. `actions: read` düşer: bekleyici koşunun işlerini okuyamaz, `ci` her PR'da kırmızı kalır,
  *   8. dağıtımın kendisi bozulur: bir test dosyası hiçbir shard'a girmez, iki shard'a girer ya da shard'ın dosya listesi `vitest list`ten farklı olur (INV-CI-SHARD-2).
  * "Dışarıda" olan dünya durumu testleri kapsama dahil edilir: shard'lar ∪ dünya durumu listesi = tam paket (kip boş, `vitest list`).
+ * ALT-38e (test seçimi, §4.3): dağıtım (`Test dağıtımı`) ve vitest koşumu (`Test`) AYRI adımlardır; kurulum, dağıtım ve Test yalnız seçim kendiliğinden boş değilken, Test ayrıca parçaya test düştüyse koşar.
+ * `if` bu adımlarda YALNIZ beklenen TAM satırla serbesttir (aşağıdaki `shardAdimKosulu`); Test'in ortamında `SHARD`/`SECIM_*` YOKTUR (alt süreçlere sızmasın). Seçim adımlarının gövdesi ve davranışı: ci-test-secimi*.test.ts.
  *
  * Ölçüm yüzeyi: `node:fs` + satır taraması (YAML ayrıştırıcı yok; girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8, env 10) + alt süreçte
  * `vitest list --filesOnly --json` (ağ yok, test KOŞMAZ). ci.yml'i DEĞİŞTİRMEZ. Sabotaj testleri YAML metnini BELLEKTE bozar ve denetimin KIRMIZI verdiğini ölçer.

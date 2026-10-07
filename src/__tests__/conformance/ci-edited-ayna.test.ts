@@ -50,6 +50,9 @@ import { describe, expect, it } from 'vitest'
  *      `continue-on-error` ve hata yutma yok, ortam değerleri sabit, Build'den SONRA. Matrix sayısı ile bağı ve son-adım kuralı INV-CI-SHARD-1'de, kapsam kanıtı
  *      INV-CI-SHARD-2'dedir (ci-test-shard.test.ts).
  *
+ * ALT-38e · BELGE HIZLI YOLU: yeni HEP KOŞAN adım "Hızlı yol" (sınıf adımından sonra; `edited` DIŞINDAKİ pull_request'te ve sınıf `belge` iken yalnız .md/.txt/.csv farkında `belge=true` yazar) ve onu okuyan sekiz kod kapısı
+ *  (Setup Deno, kurulum, Lint, tip, Deno check, edge guard'ları, V8 önbelleği: `if` = ayna koşulu VE `steps.hizli.outputs.belge != 'true'`). Ayna koşulu burada da korunur; çıktı yoksa kapılar KOŞAR. Ayrıntı: ci-test-secimi.test.ts.
+ *
  * SABOTAJ TESTLERİ ÇAPASIZDIR: bozucular adımı/anahtarı ADIYLA bulup satırı BÜTÜNÜYLE yeniden yazar (bul-değiştir metni yok);
  * ci.yml sabotaj yoklamasında zaten bozulmuşsa fikstür kırılmaz, yani sabotaj testi yalnız KENDİ denetimi çalışmazsa kırmızı olur.
  *
