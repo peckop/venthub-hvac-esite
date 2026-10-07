@@ -51,14 +51,18 @@ const TEST_DESENI = /\.(test|spec)\.(ts|tsx|js|cjs|mjs)$/;
  *   dunya-durumu.test.ts       bu modülün kendi birim testi (kesişim, doğrulama, taban okuma, DISLANAMAZ),
  *   ci-edited-ayna.test.ts     ci.yml ile ayna adımının bağı,
  *   test-kosu-kapsami.test.ts  INV-TEST-KOSU-1: liste ↔ iş akışları ↔ vitest.config.ts bağı,
- *   dunya-durumu-satiri.test.ts  zamanlı koşunun kırmızısını her mesajda gösteren kanca satırı.
+ *   dunya-durumu-satiri.test.ts  zamanlı koşunun kırmızısını her mesajda gösteren kanca satırı,
+ *   degisiklik-sinifi.test.ts  (ALT-38c) sınıflayıcının karar tablosu: yanlış yön HEP `tam`,
+ *   ci-degisiklik-sinifi.test.ts (ALT-38c) INV-CI-SINIF-1/2: sınıfın iş akışlarına bağı ve "siteye dokunmayan" tanımının ölçümü.
  */
 const DISLANAMAZ = Object.freeze([
   'scripts/ci/__tests__/edited-ayna.test.ts',
   'scripts/ci/__tests__/dunya-durumu.test.ts',
+  'scripts/ci/__tests__/degisiklik-sinifi.test.ts',
   'src/__tests__/conformance/ci-edited-ayna.test.ts',
   'src/__tests__/conformance/test-kosu-kapsami.test.ts',
   'src/__tests__/conformance/dunya-durumu-satiri.test.ts',
+  'src/__tests__/conformance/ci-degisiklik-sinifi.test.ts',
 ]);
 
 function listeyiOku(kok = KOK) {

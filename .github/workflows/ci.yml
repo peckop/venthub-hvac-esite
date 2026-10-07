@@ -189,6 +189,31 @@ jobs:
           fi
           node "$RUNNER_TEMP/edited-ayna.cjs"
 
+      # ALT-38c — DEĞİŞİKLİK SINIFI (cetvel: docs/standards/test-karnesi-standard.md; mantık ve test: scripts/ci/degisiklik-sinifi.cjs).
+      # PR'ın değişen dosyalarının TÜMÜ dar sınıflardaysa (belge, edge, betik, karma) `next build` girdisine dokunulmamıştır (ölçüldü:
+      # src/ ve next.config.mjs src/ dışına import etmez; build-sırası betikleri tam listededir) ve `Build (blocking)` ATLANIR; e2e-smoke.yml
+      # aynı kararı kendi işinde verir. TEST adımı HİÇBİR sınıfta atlanmaz (kapsam kaybı sıfır: testlerin %90'ı dosya okuyan kapılardır).
+      # Sınıflayıcı TABANDAN çıkarılıp koşar (edited ayna ile aynı güven sınırı: PR betiği değiştirip kendi kararını veremez); taban kopyası yoksa
+      # `tam` yazılır. Çıktı boş/eksik/bilinmiyorsa HER ŞEY koşar (koşullar yalnız DARALTMA yönünde: bkz. Build koşulu). Sınıflayıcı tümden ÇÖKERSE
+      # (sözdizimi hatası, bellek, sinyal: kendi son sigortasının da aştığı durum) adım `tam` yazıp uyarır: KIRMIZI değil, tam paket koşar; aksi halde
+      # tabandaki sınıflayıcı bozulduğunda onu düzelten PR de aynı bozuk kopyayı koşup kırmızı kalır (kilitlenme). Adım yalnız pull_request'te
+      # koşar: master push ve elle koşum her zaman TAM paketi koşar. Adın, sırası ve gövdesi INV-CI-EDITED-1 ve INV-CI-SINIF-1/3 ile sabit.
+      - name: Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanır)
+        id: sinif
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$RUNNER_TEMP/degisiklik-sinifi.cjs" 2>/dev/null; then
+            echo "::notice::değişiklik sınıfı: tam — taban kopyası yok (HEAD^1:scripts/ci/degisiklik-sinifi.cjs)"
+            printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cikis=0
+          node "$RUNNER_TEMP/degisiklik-sinifi.cjs" || cikis=$?
+          if [ "$cikis" -ne 0 ]; then
+            echo "::warning::değişiklik sınıfı: tam — sınıflayıcı çöktü (çıkış kodu $cikis), tam paket koşar"
+            printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Deno
         if: steps.ayna.outputs.atla != 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
@@ -269,22 +294,121 @@ jobs:
           hits=$(grep -rnE "postgresql://[^'\"]*:[^'\"@]*@" --include='*.ts' --include='*.js' --include='*.cjs' --include='*.mjs' . | grep -v node_modules | grep -v '\${' || true)
           if [ -n "$hits" ]; then echo "::error::Hardcoded DB connection string (with password) detected — use process.env.DATABASE_URL:"; echo "$hits"; exit 1; fi
 
+      # ALT-38c — Node V8 bayt kodu önbelleği (resmi öneri: vitest.dev/guide/improving-performance; Node >= 22.1, burada 24). YALNIZ hız içindir:
+      # önbellek girdileri kaynak içeriğinin özetiyle doğrulanır, bayat ya da bozuk girdi yok sayılır (sonuç değişmez). Ortam değişkeni yalnız
+      # Test adımına verilir; dizin runner geçici alanındadır (çalışma ağacına dosya düşmez: depo tarayan testler görmez).
+      - name: Node derleme önbelleği (V8 bayt kodu)
+        if: steps.ayna.outputs.atla != 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/node-compile-cache
+          key: node-compile-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: node-compile-${{ runner.os }}-node24-
+
       # ALT-38 (karar: dünya durumu testleri PR'ı bloklamaz): pull_request olayında scripts/ci/dunya-durumu-testleri.json
       # listesindeki testler DIŞARIDA koşar (kip `dislan`); master push, elle koşum ve yerel `pnpm test` TAM paketi koşar,
       # ayrıca dunya-durumu.yml zamanlı olarak yalnız onları koşar (kip `yalniz`). Çıkan her test silinmez: neden, kanıt ve
       # yeni yeri listede yazılıdır ve INV-TEST-KOSU-1 bu bağın kopmadığını doğrular (cetvel:
       # docs/standards/test-karnesi-standard.md §3). Neden: bir PR'ın kodundan bağımsız kırmızı
       # (INV-TABAN-TAZE-1: son 10 kırmızının 5'i) suçsuz PR'ı bekletiyor ve yazar düzeltemiyor.
+      # ALT-38c-2: pull_request'te (edited HARİÇ) Test bu işte KOŞMAZ; aşağıdaki `test-shard` işlerinde N paralel koşar ve bu işin SON adımı ("Test shard
+      # sonuçları") hepsinin başarıyla bitmesini bekler (kırmızı shard = kırmızı `ci`). master push, elle koşum ve `edited` koşusunda Test eskisi gibi burada
+      # TAM koşar. Koşul yalnız DARALTMA yönünde değildir: bu adım atlanınca test paketinin geri kalanını `test-shard` işleri üstlenir (INV-CI-SHARD-1/2).
       - name: Test
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && !(github.event_name == 'pull_request' && github.event.action != 'edited')
         env:
           VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}
+          NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache
         run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
 
+      # ALT-38c — Next.js derleme önbelleği (resmi öneri: nextjs.org/docs/app/guides/ci-build-caching). Yalnız Build'in koşacağı koşuda geri yüklenir
+      # (koşul Build ile BİREBİR aynı). Anahtar: işletim sistemi + kilit dosyası + kaynak özeti; kaynak değişince son kayıt önekle geri yüklenir
+      # (restore-keys) ve derleme yalnız değişen modülleri yeniden derler. YALNIZ hız içindir: Next önbellek girdilerini içerik özetiyle doğrular.
+      - name: Next.js derleme önbelleği
+        if: steps.ayna.outputs.atla != 'true' && !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**', 'next.config.mjs') }}
+          restore-keys: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      # ALT-38c — koşul YALNIZ daraltma yönünde: dar sınıf (belge, edge, betik, karma) AÇIKÇA yazılmışsa atlanır; çıktı boş, `tam`, bilinmeyen
+      # ya da adım hiç koşmamışsa (push, elle koşum, hata) Build KOŞAR. Küme, sınıflayıcının dar sınıflarıyla birebirdir (INV-CI-SINIF-1).
       - name: Build (blocking)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif)
         run: pnpm run build:ci 2>&1 | tee ci-build.log
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
 
+
+      # ALT-38c-2 — TEST SHARD SONUÇLARI (mantık ve test: scripts/ci/test-shard-bekle.cjs). pull_request'te (edited hariç) Test aşağıdaki `test-shard` işlerinde koşar;
+      # bu adım AYNI koşunun AYNI denemesindeki shard işlerinin HEPSİNİN `success` olmasını bekler (Lint ve Build ile üst üste ilerlediği için son adımdır).
+      # Kırmızı/iptal/atlanan/eksik shard, zaman aşımı ve okunamayan API KIRMIZIDIR. `ci` adı ve adımları değişmez. SHARD_TOPLAM matrix ile BİREBİR aynı olmalı.
+      - name: Test shard sonuçları (bekle ve doğrula)
+        if: github.event_name == 'pull_request' && github.event.action != 'edited'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPO: ${{ github.repository }}
+          KOSU_ID: ${{ github.run_id }}
+          KOSU_DENEME: ${{ github.run_attempt }}
+          SHARD_TOPLAM: '4'
+        run: node scripts/ci/test-shard-bekle.cjs
+
+  # ALT-38c-2 — TEST SHARD'LARI (cetvel: docs/standards/test-karnesi-standard.md §4.2). Yalnız pull_request'te ve `edited` DEĞİLKEN koşar. Zorunlu kontrol bu iş
+  # DEĞİL `ci`dir; kırmızı bir shard `ci`yi kırmızı yapar. Dosyalar süreye göre dengeli dağıtılır (scripts/ci/test-shard.cjs); her test dosyası TAM BİR shard'a girer.
+  # Kurulum `ci` ile aynıdır (tam geçmiş: INV-DOC-2 `git log` okur; Deno: bazı testler `deno` çağırır). Matrix sayısı `ci`nin SHARD_TOPLAM'ı ve `--toplam` ile aynı olmalı.
+  test-shard:
+    name: test-shard (${{ matrix.shard }}/4)
+    if: github.event_name == 'pull_request' && github.event.action != 'edited'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --config.allow-scripts true
+
+      # `ci` ile AYNI anahtar: master push'ta kaydedilen önbellek PR'ın ilk koşusunda bile sıcak gelir (yalnız hız; sonuç değişmez).
+      - name: Node derleme önbelleği (V8 bayt kodu)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/node-compile-cache
+          key: node-compile-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: node-compile-${{ runner.os }}-node24-
+
+      - name: Test (shard ${{ matrix.shard }}/4)
+        env:
+          SHARD: ${{ matrix.shard }}
+          VENTHUB_DUNYA_DURUMU: dislan
+          NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache
+        run: |
+          node scripts/ci/test-shard.cjs --shard "$SHARD" --toplam 4 --cikti "$RUNNER_TEMP/shard.json"
+          VENTHUB_TEST_SHARD_DOSYALARI="$RUNNER_TEMP/shard.json" pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
