@@ -68,6 +68,40 @@ async function aileRpcSirali<T>(cagri: () => PromiseLike<T>): Promise<T> {
   }
 }
 
+/**
+ * Markanın AKTİF ÜRÜNÜ OLAN aile sayısı (OPS-51: marka sayfası/site haritası "ürünsüz marka" kararının tek girdisi).
+ *
+ * KAYNAK `getFamiliesEnriched` ile AYNI RPC ve AYNI süzgeç (`brands.name ilike`, aile → `products.status='active'`
+ * ve `deleted_at is null` iç birleşimi): marka sayfasının vitrininde kart olarak görünen her şey bu sayıdadır, yani
+ * "sayı 0" = sayfada gösterilecek ürün yok. `limit 1`: yalnız `total_count` (pencere sayımı, limitten ÖNCE hesaplanır)
+ * okunur, kapak görseli/ad çevirisi sorgusu açılmaz.
+ *
+ * HATA YUTULMAZ: RPC hatası FIRLATILIR (boş/sıfır sayıya ÇEVRİLMEZ). Sıfır "ürünsüz" kararı demektir ve o karar
+ * noindex + site haritası dışı yazar; geçici bir DB hatasının sessizce "0 ürün" olması ürünlü markayı dizinden düşürürdü.
+ * Aynı sıra kapısından (`aileRpcSirali`) geçer: derlemede tepe eşzamanlılık değişmez.
+ */
+export async function getBrandFamilyCount(
+  supabase: SupabaseClient<Database>,
+  brandName: string
+): Promise<number> {
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_product_families_enriched', {
+      p_limit: 1,
+      p_offset: 0,
+      p_brand: brandName,
+    })
+  )
+  if (error) throw error
+  const satirlar = data ?? []
+  if (satirlar.length === 0) return 0
+  const toplam = Number(satirlar[0]?.total_count)
+  // Satır var ama sayım okunamadı → "0" DEĞİL, hata (aynı gerekçe: yanlış ürünsüz kararı yazılmaz).
+  if (!Number.isFinite(toplam) || toplam < 1) {
+    throw new Error(`getBrandFamilyCount: ${brandName} için total_count okunamadı`)
+  }
+  return toplam
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}

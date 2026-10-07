@@ -173,8 +173,8 @@ const ekle = (u, alan, bizim, bizimKaynak, ur, ayniBuyukluk = true, not = '') =>
 // Web'de üretici belgesi OLMADIĞI ölçülen aileler (ingestor kaynak-dizini/edinme-2026-09-22.json
 // "disarida", 2026-09-22) — "henüz okunmadı" ile karışmasın: burada okunacak belge YOK, AVenS'ten istendi.
 const BELGESIZ_AILE = {
-  'avens-dikdortgen-kanal-radyal': 'web\'de föy yok — AVenS\'ten istendi',
-  'avens-sulu-batarya': 'web\'de föy yok — AVenS\'ten istendi',
+  'avens-dikdortgen-kanal-tipi-radyal-fanlar': 'web\'de föy yok — AVenS\'ten istendi',
+  'avens-sulu-batarya-kanal-tipi': 'web\'de föy yok — AVenS\'ten istendi',
 }
 // bizdeDegerYok: üretici kaynağı var ama bizde karşılaştırılacak değer YOK — fark değil BOŞLUK;
 // sessizce düşmesin diye ayrı sayılır (ilk koşumda Enkelfan 9 ürün böyle kayboluyordu).

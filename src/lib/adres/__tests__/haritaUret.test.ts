@@ -59,7 +59,7 @@ describe('eskiAdresHaritasiUret — fikstür', () => {
     const hrv = harita.kategoriSluglari['isi-geri-kazanim-cihazlari'].hedef
     expect('kategori' in hrv && harita.kategoriler[hrv.kategori].en).toBe('heat-recovery-vmc')
     expect(harita.kategoriSluglari['air-purifiers'].hedef).toEqual({ urunler: true })
-    expect(harita.aileSluglari['vortice-lineo-315-quiet']).toBe(harita.aileler.indexOf('vortice-lineo-quiet'))
+    expect(harita.aileSluglari['vortice-lineo-315-quiet']).toBe(harita.aileler.indexOf('vortice-lineo-quiet-sessiz-kanal-fanlari'))
     expect(harita.urunSluglari['vortice-ca-il-8060-es-rect-16080']).toBe('VRT-CA-IL-8060-ES-RECT')
   })
 
@@ -122,7 +122,7 @@ describe('eskiAdresHaritasiUret — FAIL-CLOSED (plan §4.1 Y2)', () => {
   it('tohum hedefi bulunamazsa HATA', async () => {
     const tablolar = {
       ...FIKSTUR_TABLOLARI,
-      product_families: FIKSTUR_TABLOLARI.product_families.filter((f) => f.slug !== 'vortice-lineo-quiet'),
+      product_families: FIKSTUR_TABLOLARI.product_families.filter((f) => f.slug !== 'vortice-lineo-quiet-sessiz-kanal-fanlari'),
       products: FIKSTUR_TABLOLARI.products.filter((p) => p.sku !== 'VRT-17160'),
     }
     await expect(uret({ tablolar })).rejects.toThrow(/tohum ailesi "vortice-lineo-100-quiet"/)

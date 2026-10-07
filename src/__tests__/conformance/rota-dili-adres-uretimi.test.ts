@@ -74,6 +74,8 @@ async function siteHaritasi(anahtar: string | undefined, enYayin: boolean) {
   vi.doMock('@/lib/services/family.service', async (orijinal) => ({
     ...(await orijinal<typeof import('@/lib/services/family.service')>()),
     getAllFamilySlugs: async () => [{ slug: 'test-aile-1' }],
+    // OPS-51: ürünsüz marka kararı DB sayımı okur; canlıya uygun: Flexiva ürünsüz (0, haritada YOK), diğerleri ürünlü.
+    getBrandFamilyCount: async (_supabase: unknown, marka: string) => (marka === 'Flexiva' ? 0 : 1),
   }))
   const { default: sitemap } = await import('../../app/sitemap')
   const satirlar = await sitemap()

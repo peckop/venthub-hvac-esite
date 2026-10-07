@@ -106,7 +106,8 @@ export const tr = {
         ghost: 'Kanal İçi Hayalet Fanlar',
         smoke: 'Duman Egzoz Fanları',
         jet: 'Otopark Jet Fanları',
-        radial: 'Radyal Fanlar',
+        // Karar 288 (Recep, OPS-76): ad `categories.name`/`menu_label` ile aynı dize; adres (`radyal-fanlar`) ve anahtar değişmez.
+        radial: 'Radyal (Santrifüj) Fanlar',
         roof: 'Çatı Tipi Fanlar',
         'axial-ind': 'Aksiyel Sanayi Fanları',
         'air-curtain': 'Hava Perdeleri',
@@ -130,7 +131,9 @@ export const tr = {
         'water-coils': 'Sulu Batarya Kanal Tipi',
         // REC-300 Faz 1-B (K17 ağacı, karar 78b + 84): anahtarı veritabanı migration'ı bağlar.
         // Korozyon dalı YENİ anahtara geçer (`acid-fans` değişmez) → ad ile adres aynı anda döner.
-        'corrosion-fans': 'Korozyon Dayanımlı Fanlar',
+        // Karar 287 (Recep, OPS-74): ad `categories.name`/`menu_label` ve TR adresiyle (`korozyona-ve-aside-dayanimli-fanlar`) aynı.
+        // Eski `acid-fans` anahtarı geri alma ve dağıtım penceresi için DURUR (canlıda yalnız bu dal kullanıyordu).
+        'corrosion-fans': 'Korozyona ve Aside Dayanımlı Fanlar',
         'plug-fans': 'Plug Fanlar',
         'cabinet-fans': 'Hücreli Aspiratörler',
         'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
@@ -1065,6 +1068,8 @@ export const tr = {
     // kısa kalırsa ya da hiç kalmazsa kullanılır. Yalnız kayıttaki doğrulanabilir alan (uzmanlık) konuşur.
     seoYedekUzmanlik: 'VentHub kataloğunda {{uzmanlik}} alanındaki ürünleri inceleyin.',
     seoYedek: '{{ad}} markasının ürün ailelerini, modellerini ve teknik özelliklerini VentHub kataloğunda inceleyin.',
+    // OPS-51: ürünsüz marka sayfasının meta açıklaması (sayfa gövdesiyle aynı olgu; ürün/zaman vaadi yok).
+    seoUrunsuz: '{{ad}} ürünleri henüz VentHub kataloğunda yer almıyor; ürün bilgisi ve teklif için bizimle iletişime geçin.',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
@@ -1094,6 +1099,11 @@ export const tr = {
       // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
       // olmayan bir VAAT. Artık olgu: marka katalogda var, ürünleri henüz yok.
       noProducts: 'Bu markanın ürünleri henüz katalogda değil.',
+      // OPS-51 (karar 265 + OPS hükmü): YALNIZ DB'de aktif ürünü 0 olan marka (şu an Flexiva) için; karar sunucuda
+      // aktif ürün sayısından türer (`markaUrunDurumu.ts`), statik bayrak yok.
+      // ZAMAN VAADİ YOK (INV-VAAT-SIZINTI-2 / REC-148): olgu + eylem — ürün katalogda yok, teklif istenir.
+      productsOnRequest: '{{ad}} ürünleri için bizden teklif isteyin.',
+      productsOnRequestCta: 'İletişim formuna git',
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş',
       // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak

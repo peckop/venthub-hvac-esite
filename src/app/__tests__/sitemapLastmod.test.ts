@@ -27,6 +27,8 @@ async function sitemapKur(aileTarihleri: () => Promise<Map<string, string>>) {
   vi.doMock('@/lib/services/family.service', () => ({
     getAllFamilySlugs: async () => [{ slug: 'tarihli-aile' }, { slug: 'seri-slug' }],
     getFamilySitemapData: async () => ({ aileTarihleri: await aileTarihleri(), modeller: [] }),
+    // OPS-51: marka ürün sayısı ENJEKTE (DB yerine): marka satırları (lastmod yazılmaz kolu) haritada kalır.
+    getBrandFamilyCount: async () => 5,
   }))
   return (await import('../sitemap')).default
 }

@@ -94,6 +94,8 @@ async function harita(kosul: Kosul) {
   vi.doMock('@/lib/services/family.service', async (orijinal) => ({
     ...(await orijinal<typeof import('@/lib/services/family.service')>()),
     getAllFamilySlugs: async () => kosul.aileler.map((a) => ({ slug: a.slug })),
+    // OPS-51: marka ürün sayısı ENJEKTE (DB yerine; gerçek sayım ayrı RPC'dir ve bu dosyanın `product_families` sayacını bozmasın).
+    getBrandFamilyCount: async () => 5,
   }))
   const { SITE_URL } = await import('../../config/siteUrl')
   const { default: sitemap } = await import('../sitemap')

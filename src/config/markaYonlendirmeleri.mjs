@@ -1,14 +1,17 @@
 /**
  * YAYINDAN KALKAN MARKA ADRESLERİ — kalıcı (308) yönlendirme listesinin TEK üreticisi (REC-374).
  *
- * NİÇİN: marka listesi (`src/data/brands.ts`) artık DB'de aktif ürünü olan markalardır. Üç eski
+ * NİÇİN: marka listesi (`src/data/brands.ts`) DB'de aktif ürünü olan markalardır. REC-374'te üç eski
  * slug listeden çıktı; adresleri canlıda 200 veriyordu (2026-09-27 ölçüldü) ve site haritasında
- * ilan ediliyordu. Yönlendirmesiz bırakılırsa üçü de 404'e düşer:
+ * ilan ediliyordu. Yönlendirmesiz bırakılırsa 404'e düşerler.
+ *
+ * OPS-51 (karar 264 + 265, 2026-10-04): iki slug LİSTEYE GERİ DÖNDÜ ve buradan SİLİNDİ (ikisi birlikte
+ * olursa sayfa erişilmez olur — INV-MARKA-KAYNAK-1 bu çakışmada kırmızı yanar):
+ *  · `casals` — AYRI MARKA oldu (AVenS distribütör); 4 ailesi / 53 modeli `brands.casals`'a bağlandı
+ *    (supabase/migrations/20261004120000_casals_flexiva_markalari_siginak_kok.sql).
+ *  · `flexiva` — marka kaydı açıldı, ÜRÜNÜ YOK; sayfa "ürünler yakında" durumuyla yayında (brands.ts `yakinda`).
+ * Geriye tek satır kaldı:
  *  · `frekans-konvertoru` — marka DEĞİL, ürün türü → frekans konvertörleri KATEGORİSİNE.
- *  · `flexiva` — DB'de marka olarak hiç yok → marka listesine.
- *  · `casals` — DB'de ürünü 0 → marka listesine. Casals ürünleri DB'ye girince (REC-374 1-B) marka
- *    listeye geri eklenir ve bu satır AYNI PR'da SİLİNİR (ikisi birlikte olursa sayfa erişilmez olur —
- *    INV-MARKA-KAYNAK-1 bu çakışmada kırmızı yanar).
  *
  * NİÇİN .mjs: `next.config.mjs` TypeScript içe aktaramaz (aynı gerekçe: bilgiMerkeziYonlendirmeleri.mjs).
  * Test bu fonksiyonu doğrudan çağırır ve hedefleri `adresUret(…, dil, bayrak)` ile İKİ bayrak
@@ -33,8 +36,6 @@ export const KALDIRILAN_MARKALAR = Object.freeze({
     kok: { tr: 'kontrol-sistemleri', en: 'control-systems' },
     dal: { tr: 'frekans-konvertorleri', en: 'frequency-converters' },
   },
-  flexiva: { tur: 'liste' },
-  casals: { tur: 'liste' },
 })
 
 /** Yeni şemada (K3-b) dile göre bölüm adları — `adresUret.ts` BOLUM tablosuyla aynı olmalı (test ölçer). */
