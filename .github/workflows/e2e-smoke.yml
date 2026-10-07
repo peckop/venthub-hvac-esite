@@ -17,6 +17,9 @@ name: E2E Smoke (admin + checkout)
 # PR'da canlı veritabanına bağlanır: admin-smoke yalnız okur; checkout-smoke test hesabının sepetine
 # 1 ürün ekler, ödeme adımına bilinçli girmez; teklif-eposta-smoke CI'da atlanır (E2E_TEKLIF_EPOSTA yok).
 # Canlıya YAZAN spec buraya (`e2e/`) KONMAZ — `e2e-canli/` + canli-kanit-tek-sefer.yml (INV-CANLI-KANIT-1).
+#
+# ALT-38c: PR'ın değişen dosyaları YALNIZ dar sınıflardaysa (belge, edge, betik, karma; mantık: scripts/ci/degisiklik-sinifi.cjs) bu işin ağır
+# adımları atlanır (derleme girdisi değişmedi; ölçüm: INV-CI-SINIF-2). Migration, .github, src, public, kök ayarlar ve sınıflanamayan her yol TAM koşar.
 
 on:
   pull_request:
@@ -76,13 +79,32 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ steps.mergeref.outputs.ref || '' }}
+          # ALT-38c: sınıflayıcının farkı (`git diff HEAD^1 HEAD`) için birleştirme commit'i ve ebeveynleri gerekir; varsayılan derinlik 1 bunları getirmez.
+          fetch-depth: 2
+
+      # ALT-38c — DEĞİŞİKLİK SINIFI (ci.yml'deki eşiyle AYNI adım; INV-CI-SINIF-1 ikisinin birebir aynı olduğunu doğrular).
+      # PR'ın değişen dosyalarının TÜMÜ dar sınıflardaysa (belge, edge, betik, karma) siteye dokunulmamıştır: derleme, tarayıcı ve canlı veritabanı
+      # smoke'u ATLANIR; iş yine koşar ve `admin-smoke` adıyla YEŞİL biter (zorunlu kontrol adı değişmez; iş düzeyinde `if`/`needs` KULLANILMAZ:
+      # sınıf işi çökerse bağımlı iş "atlandı" = yeşil sayılırdı, adım düzeyi bu deliği kapatır). Çıktı boş/eksik/bilinmiyorsa HER ŞEY koşar.
+      - name: Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanır)
+        id: sinif
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$RUNNER_TEMP/degisiklik-sinifi.cjs" 2>/dev/null; then
+            echo "::notice::değişiklik sınıfı: tam — taban kopyası yok (HEAD^1:scripts/ci/degisiklik-sinifi.cjs)"
+            printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          node "$RUNNER_TEMP/degisiklik-sinifi.cjs"
 
       - name: Setup pnpm
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           version: 10
 
       - name: Setup Node
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
@@ -90,6 +112,7 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         run: pnpm install --prefer-offline --config.allow-scripts true
 
       # ══════════════════════════════════════════════════════════════════════
@@ -109,10 +132,12 @@ jobs:
       # `timeout-minutes` ikinci kemerdir: betik bozulursa iş bütçesini yemesin.
       # ══════════════════════════════════════════════════════════════════════
       - name: apt sertlestirmesi
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 3
         run: bash scripts/ci/apt-hardening.sh
 
       - name: Playwright tarayici onbellegi
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         id: pw-cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
@@ -141,6 +166,7 @@ jobs:
       # Bu fail-open DEĞİL: kapı bir vekilden (apt çıkış kodu) ASIL ŞEYE (Chromium
       # gerçekten açılıyor mu) taşındı ve asıl şey daha güçlü bir iddiadır.
       - name: Playwright sistem bagimliliklari (en iyi caba)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         continue-on-error: true
         timeout-minutes: 11
         env:
@@ -148,6 +174,7 @@ jobs:
         run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install-deps chromium
 
       - name: Install Playwright Chromium
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 11
         run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install chromium
 
@@ -155,6 +182,7 @@ jobs:
       # ADIYLA düşer. "apt geçti" demek tarayıcının çalıştığını kanıtlamaz; bu adım
       # kanıtlar. Ucuz (~5 sn) ve teşhis mesajı net.
       - name: Tarayici gercekten aciliyor mu
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 3
         run: |
           node -e "
@@ -176,6 +204,7 @@ jobs:
           "
 
       - name: Build (real Supabase env)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         run: pnpm run build:ci
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}
@@ -184,9 +213,11 @@ jobs:
       # ALT-34 · M6: bayrak kapalıyken (bugün) HTML'e yalnız Inter font önyüklemesi basılır; fazlası KIRMIZI, boş
       # manifest ÖLÇÜLEMEDİ = kırmızı. Yalnız Linux'ta anlamlı (Windows'ta manifest boş). Cetvel: plan v2.2 §4 M6.
       - name: Font preload olcumu (kapali kip, yalniz Inter)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         run: node scripts/ci/font-preload-olc.cjs --beklenen Inter
 
       - name: Run smoke suite (admin + checkout)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         run: pnpm exec playwright test
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}

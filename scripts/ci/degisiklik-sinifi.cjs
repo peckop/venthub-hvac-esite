@@ -85,15 +85,20 @@ const DAR_SINIFLAR = Object.freeze({
 });
 
 /**
- * HER ZAMAN `tam` (mekanizma/küresel). Üç yazım biçimi:
- *   `dizin/`  dizin öneki (`/` sınırında; dizin adının kendisi bir DOSYA olarak gelirse de eşleşir: `scripts/ci`),
- *   `ad`      KÖK dizindeki tam dosya adı,
- *   `a*b`     KÖK dizindeki ad deseni (en çok BİR `*`, boş eşleşebilir: `tsconfig*.json` → `tsconfig.json`).
+ * HER ZAMAN `tam` (mekanizma/küresel). Dört yazım biçimi:
+ *   `dizin/`      dizin öneki (`/` sınırında; dizin adının kendisi bir DOSYA olarak gelirse de eşleşir: `scripts/ci`),
+ *   `ad`          KÖK dizindeki tam dosya adı,
+ *   `a*b`         KÖK dizindeki ad deseni (en çok BİR `*`, boş eşleşebilir: `tsconfig*.json` → `tsconfig.json`),
+ *   `dizin/ad`    TAM YOL (ALT-38c): yalnız o dosya, başka hiçbir şey (`scripts/assert-node-major.mjs.bak`, alt dizin, büyük harf EŞLEŞMEZ).
  * Kök yazımlar YALNIZ kökte eşleşir (`docs/package.json` mekanizma değildir; `docs/` belgedir). Dar sınıflardan ÖNCE değerlendirilir.
+ * Tam yol girdileri dar bir önekin (`scripts/`) ALTINDAKİ build-sırası betiklerdir: `package.json`ın build/lint/test/type-check/prepare
+ * betikleri onları çağırır, değişirse siteye dokunulmuş sayılır (derivasyon testi: src/__tests__/conformance/ci-degisiklik-sinifi.test.ts).
  */
 const HER_ZAMAN_TAM = Object.freeze([
   '.github/',
   'scripts/ci/',
+  'scripts/assert-node-major.mjs',
+  'scripts/setup-hooks.mjs',
   '.githooks/',
   'src/',
   'public/',
@@ -186,6 +191,9 @@ function herZamanTamNedeni(yol) {
   for (const girdi of HER_ZAMAN_TAM) {
     if (girdi.endsWith('/')) {
       if (yol.startsWith(girdi) || yol === girdi.slice(0, -1)) return `küresel/mekanizma yolu (${girdi})`;
+    } else if (girdi.indexOf('/') !== -1) {
+      // TAM YOL girdisi: yalnız birebir eşitlik (önek, sonek, alt dizin ve büyük/küçük harf farkı eşleşmez).
+      if (yol === girdi) return `küresel/mekanizma dosyası (${girdi})`;
     } else if (kokteMi && kokDeseniEslesirMi(girdi, yol)) {
       return `küresel/mekanizma dosyası (${girdi})`;
     }

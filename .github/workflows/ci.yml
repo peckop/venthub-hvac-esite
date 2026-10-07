@@ -189,6 +189,24 @@ jobs:
           fi
           node "$RUNNER_TEMP/edited-ayna.cjs"
 
+      # ALT-38c — DEĞİŞİKLİK SINIFI (cetvel: docs/standards/test-karnesi-standard.md; mantık ve test: scripts/ci/degisiklik-sinifi.cjs).
+      # PR'ın değişen dosyalarının TÜMÜ dar sınıflardaysa (belge, edge, betik, karma) `next build` girdisine dokunulmamıştır (ölçüldü:
+      # src/ ve next.config.mjs src/ dışına import etmez; build-sırası betikleri tam listededir) ve `Build (blocking)` ATLANIR; e2e-smoke.yml
+      # aynı kararı kendi işinde verir. TEST adımı HİÇBİR sınıfta atlanmaz (kapsam kaybı sıfır: testlerin %90'ı dosya okuyan kapılardır).
+      # Sınıflayıcı TABANDAN çıkarılıp koşar (edited ayna ile aynı güven sınırı: PR betiği değiştirip kendi kararını veremez); taban kopyası yoksa
+      # `tam` yazılır. Çıktı boş/eksik/bilinmiyorsa HER ŞEY koşar (koşullar yalnız DARALTMA yönünde: bkz. Build koşulu). Adım yalnız pull_request'te
+      # koşar: master push ve elle koşum her zaman TAM paketi koşar. Adın, sırası ve gövdesi INV-CI-EDITED-1 ve INV-CI-SINIF-1 ile sabit.
+      - name: Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanır)
+        id: sinif
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$RUNNER_TEMP/degisiklik-sinifi.cjs" 2>/dev/null; then
+            echo "::notice::değişiklik sınıfı: tam — taban kopyası yok (HEAD^1:scripts/ci/degisiklik-sinifi.cjs)"
+            printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          node "$RUNNER_TEMP/degisiklik-sinifi.cjs"
+
       - name: Setup Deno
         if: steps.ayna.outputs.atla != 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
@@ -269,6 +287,17 @@ jobs:
           hits=$(grep -rnE "postgresql://[^'\"]*:[^'\"@]*@" --include='*.ts' --include='*.js' --include='*.cjs' --include='*.mjs' . | grep -v node_modules | grep -v '\${' || true)
           if [ -n "$hits" ]; then echo "::error::Hardcoded DB connection string (with password) detected — use process.env.DATABASE_URL:"; echo "$hits"; exit 1; fi
 
+      # ALT-38c — Node V8 bayt kodu önbelleği (resmi öneri: vitest.dev/guide/improving-performance; Node >= 22.1, burada 24). YALNIZ hız içindir:
+      # önbellek girdileri kaynak içeriğinin özetiyle doğrulanır, bayat ya da bozuk girdi yok sayılır (sonuç değişmez). Ortam değişkeni yalnız
+      # Test adımına verilir; dizin runner geçici alanındadır (çalışma ağacına dosya düşmez: depo tarayan testler görmez).
+      - name: Node derleme önbelleği (V8 bayt kodu)
+        if: steps.ayna.outputs.atla != 'true'
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ runner.temp }}/node-compile-cache
+          key: node-compile-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: node-compile-${{ runner.os }}-node24-
+
       # ALT-38 (karar: dünya durumu testleri PR'ı bloklamaz): pull_request olayında scripts/ci/dunya-durumu-testleri.json
       # listesindeki testler DIŞARIDA koşar (kip `dislan`); master push, elle koşum ve yerel `pnpm test` TAM paketi koşar,
       # ayrıca dunya-durumu.yml zamanlı olarak yalnız onları koşar (kip `yalniz`). Çıkan her test silinmez: neden, kanıt ve
@@ -279,10 +308,24 @@ jobs:
         if: steps.ayna.outputs.atla != 'true'
         env:
           VENTHUB_DUNYA_DURUMU: ${{ github.event_name == 'pull_request' && 'dislan' || '' }}
+          NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache
         run: pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
 
+      # ALT-38c — Next.js derleme önbelleği (resmi öneri: nextjs.org/docs/app/guides/ci-build-caching). Yalnız Build'in koşacağı koşuda geri yüklenir
+      # (koşul Build ile BİREBİR aynı). Anahtar: işletim sistemi + kilit dosyası + kaynak özeti; kaynak değişince son kayıt önekle geri yüklenir
+      # (restore-keys) ve derleme yalnız değişen modülleri yeniden derler. YALNIZ hız içindir: Next önbellek girdilerini içerik özetiyle doğrular.
+      - name: Next.js derleme önbelleği
+        if: steps.ayna.outputs.atla != 'true' && !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif)
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**', 'next.config.mjs') }}
+          restore-keys: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      # ALT-38c — koşul YALNIZ daraltma yönünde: dar sınıf (belge, edge, betik, karma) AÇIKÇA yazılmışsa atlanır; çıktı boş, `tam`, bilinmeyen
+      # ya da adım hiç koşmamışsa (push, elle koşum, hata) Build KOŞAR. Küme, sınıflayıcının dar sınıflarıyla birebirdir (INV-CI-SINIF-1).
       - name: Build (blocking)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif)
         run: pnpm run build:ci 2>&1 | tee ci-build.log
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co

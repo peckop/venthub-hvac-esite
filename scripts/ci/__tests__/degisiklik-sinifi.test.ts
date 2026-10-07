@@ -76,6 +76,8 @@ const DAR_BEKLENEN = {
 const HER_ZAMAN_TAM_BEKLENEN = [
   '.github/',
   'scripts/ci/',
+  'scripts/assert-node-major.mjs',
+  'scripts/setup-hooks.mjs',
   '.githooks/',
   'src/',
   'public/',
@@ -180,6 +182,8 @@ const HER_ZAMAN_TAM_YOLLARI = [
   'scripts/ci/__tests__/y.test.ts',
   'scripts/ci/dunya-durumu-testleri.json',
   'scripts/ci',
+  'scripts/assert-node-major.mjs',
+  'scripts/setup-hooks.mjs',
   '.githooks/pre-commit',
   '.githooks/lib/x.sh',
   'src/a.ts',
@@ -301,6 +305,11 @@ describe('sözleşme yüzeyi', () => {
     for (const girdi of M.HER_ZAMAN_TAM) {
       if (girdi.endsWith('/')) {
         expect(girdi.includes('*')).toBe(false)
+      } else if (girdi.includes('/')) {
+        // TAM YOL girdisi (ALT-38c): joker YOK, mutlak değil, `//`/`./`/`..` yok (birebir eşitlikle eşleşir; normalleştirilmiş yol ile karşılaştırılır)
+        expect(girdi.includes('*')).toBe(false)
+        expect(girdi.startsWith('/')).toBe(false)
+        expect(girdi.split('/').every((p) => p !== '' && p !== '.' && p !== '..')).toBe(true)
       } else {
         expect(girdi.includes('/')).toBe(false)
         expect(girdi.split('*').length - 1).toBeLessThanOrEqual(1)
@@ -525,6 +534,34 @@ describe('önek çakışma denetimi', () => {
     }
     for (const yol of ['scripts/ci-baska/x.js', 'scripts/ci.sh', 'scripts/cix/y.js', 'scripts/c/x.js', 'scripts/CI/x.cjs']) expect(sinifi(yol), yol).toBe('betik')
     expect(sinifi('scripts/ci')).toBe('tam')
+  })
+
+  it('TAM YOL girdileri (ALT-38c): yalnız birebir eşitlik tam yapar; sonek, önek, alt dizin, büyük harf, başka uzantı ve normalleşen yazımlar doğru sınıfta', () => {
+    const tamYollar = M.HER_ZAMAN_TAM.filter((g) => !g.endsWith('/') && g.includes('/'))
+    expect(tamYollar).toEqual(['scripts/assert-node-major.mjs', 'scripts/setup-hooks.mjs'])
+    for (const yol of tamYollar) {
+      expect(s(yol), yol).toEqual(TAM_SEKLI)
+      expect(s(yol).neden[0]).toContain(`(${yol})`)
+      expect(s(yol).neden[0]).toContain('küresel/mekanizma dosyası')
+      // komşular: `scripts/` altındakiler betik (dar), dışındakiler sınıflanamayan tam
+      for (const komsu of [`${yol}.bak`, `${yol}x`, `x${yol}`, yol.replace('scripts/', 'Scripts/'), yol.replace('scripts/', 'scripts/alt/'), yol.replace(/\.mjs$/, '.cjs'), yol.replace(/\.mjs$/, '.MJS')]) {
+        expect(sinifi(komsu), komsu).toBe(komsu.startsWith('scripts/') ? 'betik' : 'tam')
+      }
+      // normalleştirme sonrası aynı yol: tam kalır (daraltma yok)
+      for (const yazim of [`./${yol}`, yol.replace('scripts/', 'scripts//'), yol.replace('scripts/', 'scripts/./'), yol.replace('scripts/', 'scripts\\')]) {
+        expect(s(yazim), yazim).toEqual(TAM_SEKLI)
+        expect(s(yazim).neden[0]).toContain('küresel/mekanizma dosyası')
+      }
+    }
+  })
+
+  it('tam yol girdilerinin dar öneklerle çakışması YALNIZ adlı istisnalardır (yeni bir tam yol girdisi bilinçle buraya eklenir)', () => {
+    const tamYollar = M.HER_ZAMAN_TAM.filter((g) => !g.endsWith('/') && g.includes('/'))
+    const cakisanlar: string[] = []
+    for (const [sinif, onekler] of Object.entries(M.DAR_SINIFLAR)) {
+      for (const onek of onekler) for (const yol of tamYollar) if (yol.startsWith(onek)) cakisanlar.push(`${sinif}:${onek} ↔ ${yol}`)
+    }
+    expect(cakisanlar).toEqual(['betik:scripts/ ↔ scripts/assert-node-major.mjs', 'betik:scripts/ ↔ scripts/setup-hooks.mjs'])
   })
 
   it('kök çakışması: HER_ZAMAN_TAM kök desenleri ile kök `*.md` kuralı çakışırsa TAM kazanır (öncelik, dar sınıf kuralından ÖNCE)', () => {
