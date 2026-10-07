@@ -50,7 +50,9 @@ function sureleriOku(dosya = SURE_DOSYASI) {
 
 /** Mutlak ya da göreli yolu depo köküne GÖRELİ POSIX yola çevirir; kök dışı, `..` içeren ve boş yol FIRLATIR. */
 function yoluNormallestir(yol, kok = KOK) {
-  const s = String(yol).replace(/\\/g, '/');
+  // `vitest list` kaydında `file` yoksa `String(undefined)` "undefined" adlı geçerli bir göreli yol olurdu: metin olmayan girdi sessizce yol sayılmaz.
+  if (typeof yol !== 'string') throw new Error(`test yolu metin olmalı (verilen ${JSON.stringify(yol) ?? String(yol)})`);
+  const s = yol.replace(/\\/g, '/');
   const kokS = `${String(kok).replace(/\\/g, '/').replace(/\/+$/, '')}/`;
   const rel = s.toLowerCase().startsWith(kokS.toLowerCase()) ? s.slice(kokS.length) : s;
   if (rel === '' || rel.startsWith('/') || /^[A-Za-z]:/.test(rel) || rel.split('/').includes('..') || rel.split('/').includes('')) {
