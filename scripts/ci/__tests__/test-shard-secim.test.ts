@@ -29,7 +29,7 @@ interface SecimGirdisi {
   tam: unknown
   sayi: unknown
 }
-type SecimKarari = { mod: 'secim'; dosyalar: string[] } | { mod: 'tam'; neden: string }
+type SecimKarari = { mod: 'secim'; dosyalar: string[] } | { mod: 'tam'; neden: string; mesru?: boolean }
 interface Enjeksiyon {
   listele?: () => string[]
   sureOku?: () => SureTablosu
@@ -43,7 +43,7 @@ const S = require_(BETIK) as {
   SECIM_ARGUMANLARI: string[]
   argumanlar: (argv: string[]) => { shard: number; toplam: number; cikti: string; secim?: { dosya: string; tam: string; sayi: string } }
   dagit: (dosyalar: string[], sure: SureTablosu, toplam: number) => { gruplar: string[][]; yuk: number[] }
-  kumeyiBelirle: (secim: SecimGirdisi | undefined, listele: () => string[], g?: Enjeksiyon['secimGirdisi']) => { dosyalar: string[]; mod: string; uyari?: string }
+  kumeyiBelirle: (secim: SecimGirdisi | undefined, listele: () => string[], g?: Enjeksiyon['secimGirdisi']) => { dosyalar: string[]; mod: string; uyari?: string; bilgi?: string }
   main: (argv?: string[], g?: Enjeksiyon) => number
   secimiCoz: (girdi: unknown, g?: Enjeksiyon['secimGirdisi']) => SecimKarari
 }
@@ -125,6 +125,8 @@ describe('secimiCoz: seçici çıktısı baştan sona tutarlı değilse TAM; FIR
     for (const tam of ['true', '', undefined, 'FALSE', 'False', ' false', 'false ', 'evet', 0, null, false, {}]) {
       const k = S.secimiCoz({ dosya: 's.txt', tam, sayi: '1' }, g([LISTE[0]]))
       expect(k.mod, JSON.stringify(tam)).toBe('tam')
+      // yalnız seçicinin KENDİ `tam=true` kararı meşrudur (bilgi); ötekilerin hepsi çıktı tutarsızlığıdır (uyarı)
+      expect((k as { mesru?: boolean }).mesru === true, JSON.stringify(tam)).toBe(tam === 'true')
     }
     expect((S.secimiCoz({ dosya: 's.txt', tam: 'true', sayi: '1' }, g([LISTE[0]])) as { neden: string }).neden).toContain('seçici tam dedi')
   })
@@ -232,11 +234,15 @@ describe('kumeyiBelirle: hangi küme dağıtılır; boş seçimde `vitest list` 
     expect(k.uyari).toContain('src/yok/ayrisan.test.ts')
   })
 
-  it('seçici tam dedi / çıktı tutarsız: TAM + uyarı; neden uyarıda yazılı', () => {
-    expect(S.kumeyiBelirle({ dosya: 's.txt', tam: 'true', sayi: '5' }, () => LISTE, okuyucu(satirlar(LISTE.slice(0, 5)))).uyari).toContain('seçici tam dedi')
+  it('seçici KENDİSİ tam dedi: TAM + BİLGİ (uyarı değil: meşru karar); çıktı tutarsız: TAM + UYARI; neden mesajda yazılı', () => {
+    const meşru = S.kumeyiBelirle({ dosya: 's.txt', tam: 'true', sayi: '5' }, () => LISTE, okuyucu(satirlar(LISTE.slice(0, 5))))
+    expect(meşru).toMatchObject({ dosyalar: LISTE, mod: 'tam' })
+    expect(meşru.bilgi).toContain('seçici tam dedi')
+    expect(meşru.uyari, 'seçicinin kendi tam kararı sarı uyarı üretmez (her küresel PR dört shard\'da uyarı gösterirdi)').toBeUndefined()
     const k = S.kumeyiBelirle({ dosya: 's.txt', tam: 'false', sayi: '9' }, () => LISTE, okuyucu(satirlar([LISTE[0]])))
     expect(k).toMatchObject({ dosyalar: LISTE, mod: 'tam' })
     expect(k.uyari).toContain('satır var')
+    expect(k.bilgi).toBeUndefined()
   })
 })
 
@@ -312,19 +318,29 @@ describe('main (seçim modu): birleşim = seçim, kesişim 0; boş parça yeşil
     expect(r.loglar.join('\n')).toContain('BOŞ')
   })
 
-  it('seçici tam dedi ya da çıktı tutarsız: TAM paket dağıtılır, `::warning::` ve `kos=true`; parçalar birleşince vitest listesinin TAMAMI', () => {
-    for (const girdi of [secimArg('true', 3), secimArg('false', 2), secimArg('', ''), secimArg('false', 'abc')]) {
+  it('seçici tam dedi: TAM paket dağıtılır, `::notice::` (uyarı YOK) ve `kos=true`; çıktı tutarsız (sayı, boş, geçersiz): TAM paket, `::warning::` ve `kos=true`; parçalar birleşince vitest listesinin TAMAMI', () => {
+    const MESRU = [secimArg('true', 3)]
+    const TUTARSIZ = [secimArg('false', 2), secimArg('', ''), secimArg('false', 'abc')]
+    for (const girdi of [...MESRU, ...TUTARSIZ]) {
       const parcalar: string[] = []
       let uyari = ''
+      let bilgi = ''
       for (let i = 1; i <= 4; i++) {
         const r = kos(arg(i, 4, girdi, `p${i}.json`), { secimGirdisi: okuyucu(satirlar([LISTE[0], LISTE[1], LISTE[2]])) })
         expect(r.kod, girdi.join(' ')).toBe(0)
         expect(r.ciktilar).toEqual(['kos=true\n'])
         parcalar.push(...parca(r.yazilan, `p${i}.json`))
         uyari = r.loglar.find((m) => m.startsWith('::warning::')) ?? uyari
+        bilgi = r.loglar.find((m) => m.startsWith('::notice::test shard: seçim kullanılmadı')) ?? bilgi
       }
       expect(sirali(parcalar), girdi.join(' ')).toEqual(sirali(LISTE))
-      expect(uyari, girdi.join(' ')).toMatch(/^::warning::test shard: seçim kullanılmadı, TAM paket dağıtılıyor: /)
+      if (MESRU.includes(girdi)) {
+        expect(uyari, `${girdi.join(' ')}: meşru tam kararı uyarı üretmez`).toBe('')
+        expect(bilgi).toBe('::notice::test shard: seçim kullanılmadı, TAM paket dağıtılıyor: seçici tam dedi')
+      } else {
+        expect(uyari, girdi.join(' ')).toMatch(/^::warning::test shard: seçim kullanılmadı, TAM paket dağıtılıyor: /)
+        expect(bilgi, `${girdi.join(' ')}: tutarsızlık bilgi değil uyarıdır`).toBe('')
+      }
     }
   })
 

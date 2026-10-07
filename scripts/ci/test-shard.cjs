@@ -163,7 +163,9 @@ function secimiCoz(girdi, g = {}) {
 
 function secimiCozIc({ dosya, tam, sayi }, { oku = fs.readFileSync, varMi = fs.existsSync, kok = KOK }) {
   const tamKarar = (neden) => ({ mod: 'tam', neden });
-  if (tam !== 'false') return tamKarar(tam === 'true' ? 'seçici tam dedi' : `seçici çıktısı yok ya da anlaşılamadı (tam=${JSON.stringify(String(tam).slice(0, 20))})`);
+  // Seçicinin KENDİ kararı `tam` (küresel dosya, harita bayat...) MEŞRU bir sonuçtur (`mesru: true`): uyarı değil bilgi olarak bildirilir. Öteki her tam, çıktı tutarsızlığıdır ve UYARI verir.
+  if (tam === 'true') return { mod: 'tam', neden: 'seçici tam dedi', mesru: true };
+  if (tam !== 'false') return tamKarar(`seçici çıktısı yok ya da anlaşılamadı (tam=${JSON.stringify(String(tam).slice(0, 20))})`);
   if (!/^(?:0|[1-9]\d{0,5})$/.test(String(sayi))) return tamKarar(`seçilen sayısı geçersiz (${JSON.stringify(String(sayi).slice(0, 20))})`);
   let metin;
   try {
@@ -190,12 +192,16 @@ const tekSatir = (m) => String(m).replace(/[\r\n]+/g, ' ').slice(0, 300);
 /**
  * Hangi dosya kümesinin dağıtılacağı: seçim geçerliyse SEÇİLEN (vitest listesiyle tutarlıysa), değilse `vitest list`in tamamı.
  * Seçim modunda seçilenin her dosyası vitest'in kendi listesinde OLMALIDIR: olmayan varsa seçici ile vitest ayrışmıştır, şüphede TAM.
- * Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir). Dönüş: `{ dosyalar, mod: 'secim'|'tam', uyari?: string }`.
+ * Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir). Dönüş: `{ dosyalar, mod: 'secim'|'tam', uyari?: string, bilgi?: string }`:
+ * `bilgi` seçicinin KENDİ `tam` kararı (meşru), `uyari` çıktı tutarsızlığı ya da seçici-vitest ayrışmasıdır (`::warning::`).
  */
 function kumeyiBelirle(secim, listele, secimGirdisi) {
   if (!secim) return { dosyalar: listele(), mod: 'tam' };
   const karar = secimiCoz(secim, secimGirdisi);
-  if (karar.mod === 'tam') return { dosyalar: listele(), mod: 'tam', uyari: `seçim kullanılmadı, TAM paket dağıtılıyor: ${karar.neden}` };
+  if (karar.mod === 'tam') {
+    const mesaj = `seçim kullanılmadı, TAM paket dağıtılıyor: ${karar.neden}`;
+    return karar.mesru ? { dosyalar: listele(), mod: 'tam', bilgi: mesaj } : { dosyalar: listele(), mod: 'tam', uyari: mesaj };
+  }
   if (karar.dosyalar.length === 0) return { dosyalar: [], mod: 'secim' };
   const liste = listele();
   const bilinen = new Set(liste);
@@ -215,8 +221,9 @@ function main(argv = process.argv.slice(2), g = {}) {
     const { shard, toplam, cikti, secim } = argumanlar(argv);
     if (shard < 1 || shard > toplam) throw new Error(`--shard ${shard}, 1..${toplam} aralığında olmalı`);
     const sure = sureOku();
-    const { dosyalar, mod, uyari } = kumeyiBelirle(secim, listele, secimGirdisi);
+    const { dosyalar, mod, uyari, bilgi } = kumeyiBelirle(secim, listele, secimGirdisi);
     if (uyari) log(`::warning::test shard: ${tekSatir(uyari)}`);
+    if (bilgi) log(`::notice::test shard: ${tekSatir(bilgi)}`);
     const { gruplar, yuk } = dagit(dosyalar, sure, toplam);
     const benim = gruplar[shard - 1];
     if (benim.length === 0 && mod === 'tam') throw new Error(`shard ${shard}/${toplam} BOŞ (${dosyalar.length} dosya): bölme geçersiz`);
