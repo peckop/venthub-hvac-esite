@@ -1,114 +1,27 @@
-import { execFile, execFileSync, spawnSync } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { createRequire } from 'node:module'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { promisify } from 'node:util'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { adimEnv, adimGovdesi, BASH, CI_METNI, type Depo, govdeKos, ileri, KOK, LISTE_MUTLAK, SHARD, sirali, sonDeger, temizle, temizOrtam } from './ci-test-secimi.yardimci'
+
 /**
  * INV-CI-SECIM-2 · test seçiminin DAVRANIŞI ve KAPSAM KANITI (ALT-38e, cetvel: docs/standards/test-karnesi-standard.md §4.3). Bağ (ci.yml metni): ci-test-secimi.test.ts (INV-CI-SECIM-1).
+ * Ortak yardımcılar: ci-test-secimi.yardimci.ts; belge hızlı yolunun davranışı: ci-test-secimi-hizli.test.ts.
  *
- * A) DAVRANIŞ: seçim ve hızlı yol adımlarının GERÇEK `run` gövdesi (ci.yml'den çıkarılır) gerçek bash ve gerçek git ile, tabandan çıkarılan SAHTE seçiciyle koşar. Ölçülenler:
+ * A) DAVRANIŞ: seçim adımlarının GERÇEK `run` gövdesi (ci.yml'den çıkarılır) gerçek bash ve gerçek git ile, tabandan çıkarılan SAHTE seçiciyle koşar. Ölçülenler:
  *    taban kopyası koşar (PR'ın kendi kopyası ASLA: PR kopyası "seçim boş" yazsa da çıktı tabandandır), kopya yoksa `tam=true`, seçici çökerse `tam=true` yazılır ve adım kırmızı OLMAZ,
  *    `bos=true` YALNIZ seçicinin SON `tam=false` VE `secilen-sayisi=0` değerinde yazılır; sessiz, yarım çıktılı, boş yazıp çöken ya da kendi `bos`unu yazan seçicide `bos=false` (kurulum ve test KOŞAR: kapı sessizce düşmez),
- *    argümanlar TAM (`--kok`, `--harita`, `--vitestsiz` yalnız birinci geçişte, `--cikti`),
- *    hızlı yol yalnız .md/.txt/.csv farkında `belge=true` yazar (Türkçe adlı dosya dahil), kod/JSON/.cjs/.ts farkında, silinen-taşınan koddan gelen farkta ve boş farkta YAZMAZ.
- * B) KAPSAM: dağıtım GERÇEK `vitest list` (kip `dislan`) üstünde: tam ise parçaların birleşimi = liste; seçim ise birleşim = seçim, kesişim 0, boş parça `[]` + `kos=false`; seçici ile vitest
- *    ayrışırsa TAM; GERÇEK vitest `include` bağı her parça için TAM o parçayı döner; ci.yml'deki GERÇEK dağıtım komutu (`run:`) bash'te koşar ve dağıtıcının argüman sözleşmesiyle eşleşir.
- *
- * Alt süreçlere ortam AÇIKÇA kurulur: üst sürecin VENTHUB_TEST_SHARD_DOSYALARI, VITEST* ve kip değişkenleri sızmaz (canlı ders: #1741 koşu 2). bash yoksa (Git Bash'siz Windows) A bölümü atlanır;
- * CI'da (ubuntu) her zaman koşar.
+ *    argümanlar TAM (`--kok`, `--harita`, `--vitestsiz` yalnız birinci geçişte, `--cikti`), sınıflayıcı da tabandan (PR kopyası seçici sürecinde ASLA yüklenmez).
+ * B) KAPSAM: dağıtım GERÇEK `vitest list` (kip `dislan`) üstünde: tam ise parçaların birleşimi = liste; seçim ise birleşim = seçim, kesişim 0, boş parça `[]` + `kos=false`; karma kipte (bir iş tam'a düşer)
+ *    birleşim ⊇ seçim; seçici ile vitest ayrışırsa TAM; GERÇEK vitest `include` bağı her parça için TAM o parçayı döner; ci.yml'deki GERÇEK dağıtım komutu (`run:`) bash'te koşar.
+ * bash yoksa (Git Bash'siz Windows) A bölümü atlanır; CI'da (ubuntu) her zaman koşar. Alt süreç ortamı: ci-test-secimi.yardimci.ts.
  */
 
-const require_ = createRequire(import.meta.url)
-const KOK = path.resolve(__dirname, '../../..')
-const CI_METNI = readFileSync(path.join(KOK, '.github/workflows/ci.yml'), 'utf8').replace(/\r\n/g, '\n')
-const LISTE_MUTLAK = path.join(KOK, 'scripts/ci/dunya-durumu-testleri.json')
 const execFileAsync = promisify(execFile)
-const SHARD = require_(path.join(KOK, 'scripts/ci/test-shard.cjs')) as {
-  ORTAM_ADI: string
-  dagit: (dosyalar: string[], sure: SureTablosu, toplam: number) => { gruplar: string[][]; yuk: number[] }
-  main: (argv: string[], g?: Enjeksiyon) => number
-  sureleriOku: () => SureTablosu
-  vitestListesi: (kok?: string, ortam?: NodeJS.ProcessEnv) => string[]
-  yoluNormallestir: (yol: string, kok?: string) => string
-}
-interface SureTablosu {
-  sureler: Map<string, number>
-  varsayilan: number
-}
-interface Enjeksiyon {
-  listele?: () => string[]
-  yaz?: (dosya: string, icerik: string) => void
-  log?: (m: string) => void
-  ortam?: Record<string, string | undefined>
-  ekle?: (dosya: string, icerik: string) => void
-  secimGirdisi?: { oku?: (d: string, k: string) => string; varMi?: (y: string) => boolean }
-}
-
-const sirali = (a: readonly string[]): string[] => [...a].sort((x, y) => (x < y ? -1 : x > y ? 1 : 0))
-const ileri = (p: string): string => p.replace(/\\/g, '/')
-
-// ── ci.yml'den adım gövdesi/komutu/ortamı çıkarma (satır taraması) ─────────────────────────────────────────────────────────────────
-function adimSatirlari(isId: string, ad: string): string[] {
-  const s = CI_METNI.split('\n')
-  const is = s.findIndex((x) => x === `  ${isId}:`)
-  const bas = s.findIndex((x, i) => i > is && x.startsWith('      - name: ') && x.slice(14).trimEnd() === ad)
-  if (is < 0 || bas < 0) throw new Error(`adım yok: ${isId}/${ad}`)
-  const sonraki = s.findIndex((x, i) => i > bas && (/^ {6}- /.test(x) || /^ {0,2}\S/.test(x)))
-  return s.slice(bas, sonraki < 0 ? s.length : sonraki)
-}
-/** `run: |` gövdesi (girinti 10 atılmış) ya da tek satırlık `run:` değeri. */
-function adimGovdesi(isId: string, ad: string): string {
-  const sat = adimSatirlari(isId, ad)
-  const i = sat.findIndex((x) => /^ {8}run:/.test(x))
-  if (i < 0) throw new Error(`run yok: ${ad}`)
-  const deger = sat[i].replace(/^ {8}run:\s?/, '')
-  if (!/^\|[-+]?$/.test(deger)) return deger
-  const govde: string[] = []
-  for (const x of sat.slice(i + 1)) {
-    if (x.trim() !== '' && !x.startsWith(' '.repeat(10))) break
-    govde.push(x.startsWith(' '.repeat(10)) ? x.slice(10) : '')
-  }
-  return govde.join('\n').replace(/\n+$/, '')
-}
-function adimEnv(isId: string, ad: string): Record<string, string> {
-  const sat = adimSatirlari(isId, ad)
-  const i = sat.findIndex((x) => /^ {8}env:\s*$/.test(x))
-  const env: Record<string, string> = {}
-  if (i < 0) return env
-  for (const x of sat.slice(i + 1)) {
-    const m = /^ {10}([A-Za-z_][\w-]*):\s?(.*)$/.exec(x)
-    if (!m) break
-    env[m[1]] = m[2].trim()
-  }
-  return env
-}
-
-// ── bash ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-function bashBul(): string | null {
-  const adaylar = process.platform === 'win32' ? ['C:/Program Files/Git/bin/bash.exe'] : ['bash']
-  for (const aday of adaylar) {
-    try {
-      if (path.isAbsolute(aday) && !existsSync(aday)) continue
-      execFileSync(aday, ['-c', 'exit 0'], { stdio: 'ignore' })
-      return aday
-    } catch {
-      /* sonraki aday */
-    }
-  }
-  return null
-}
-const BASH = bashBul()
-
-/** Alt sürecin ortamı: üstün VITEST*, shard listesi ve kip değişkenleri SIZMAZ; geri kalanı (PATH vb.) taşınır, `ek` açıkça verilir. */
-function temizOrtam(ek: Record<string, string> = {}): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { ...process.env, MSYS_NO_PATHCONV: '1' }
-  for (const k of Object.keys(env)) if (k.startsWith('VITEST') || k === SHARD.ORTAM_ADI || k === 'VENTHUB_DUNYA_DURUMU' || k === 'VENTHUB_DUNYA_TABAN_LISTESI' || k === 'GITHUB_OUTPUT') delete env[k]
-  return { ...env, ...ek }
-}
 
 // ══ A) DAVRANIŞ: gerçek gövdeler, gerçek git, sahte tabandan seçici ═════════════════════════════════════════════════════════════════
 type Senaryo = 'bos' | 'secim' | 'tam' | 'coker' | 'sessiz' | 'yarim' | 'bos-coker' | 'kendi-bos'
@@ -120,6 +33,7 @@ const SAHTE_SECICI = `const fs = require('fs'); const path = require('path')
 const argv = process.argv.slice(2)
 const arg = (ad) => { const i = argv.indexOf(ad); return i < 0 ? null : argv[i + 1] }
 fs.appendFileSync(path.join(process.env.RUNNER_TEMP, 'stub-cagri.jsonl'), JSON.stringify({ argv, cwd: process.cwd(), dunya: process.env.VENTHUB_DUNYA_DURUMU || '' }) + '\\n')
+for (const y of [path.join(__dirname, 'degisiklik-sinifi.cjs'), path.join(arg('--kok'), 'scripts', 'ci', 'degisiklik-sinifi.cjs')]) { try { require(y); break } catch {} } // gerçek seçicinin siniflayiciYukle'si: önce YANI, sonra kök
 const mod = JSON.parse(fs.readFileSync(arg('--harita'), 'utf8')).mod
 if (mod === 'coker') process.exit(3)
 if (mod === 'sessiz') process.exit(0)
@@ -136,77 +50,17 @@ else if (mod === 'tam') { fs.writeFileSync(arg('--cikti'), 'src/a.test.ts\\n'); 
 const PR_SECICISI = `require('fs').writeFileSync(require('path').join(process.env.RUNNER_TEMP, 'pr-isareti'), 'PR kopyasi kostu')
 require('fs').appendFileSync(process.env.GITHUB_OUTPUT, 'tam=false\\nsecilen-sayisi=0\\n')
 `
+/** Sınıflayıcının tabandaki ve PR'daki kopyaları: yüklenince hangisinin yüklendiğini işaret dosyasına yazar (zararsız; gerçek seçici bunu `require` eder). */
+const sinifKopyasi = (kim: string): string => `require('fs').appendFileSync(require('path').join(process.env.RUNNER_TEMP, 'sinif-yuklendi'), '${kim};')\n`
 
-interface AdimSonucu {
-  cikis: number
-  cikti: string
-  ekran: string
-  cagrilar: Array<{ argv: string[]; cwd: string; dunya: string }>
-  prKosti: boolean
-  repo: string
-  gecici: string
-}
-
-interface Depo {
-  /** Tabandaki dosyalar (yol → içerik). */
-  taban: Record<string, string>
-  /** PR'ın farkı: yol → yeni içerik; null = silinir. */
-  fark: Record<string, string | null>
-  /** PR commit'i README.md'yi de değiştirir (varsayılan: evet); `false` ise `fark` boşken PR commit'i GERÇEKTEN boştur (HEAD^1 ile aynı ağaç). */
-  readmeDegis?: boolean
-}
-
-/** Gerçek bir git deposu: taban commit'i + PR commit'i (HEAD^1 = taban). Gövdeyi bash'te koşar; deponun ve geçici dizinin yolunu ve çıktıyı döner. */
-function govdeKos(govde: string, depo: Depo, env: Record<string, string> = {}, oncekiGecici?: string): AdimSonucu {
-  const repo = mkdtempSync(path.join(tmpdir(), 'vh-secim-'))
-  const gecici = oncekiGecici ?? mkdtempSync(path.join(tmpdir(), 'vh-secim-tmp-'))
-  const git = (...args: string[]): string => execFileSync('git', args, { cwd: repo, stdio: 'pipe', encoding: 'utf8' })
-  const yaz = (rel: string, icerik: string): void => {
-    const hedef = path.join(repo, rel)
-    mkdirSync(path.dirname(hedef), { recursive: true })
-    writeFileSync(hedef, icerik)
-  }
-  git('init', '-q')
-  for (const [k, v] of [['user.email', 'secim@test.local'], ['user.name', 'secim'], ['commit.gpgsign', 'false'], ['core.autocrlf', 'false'], ['core.ignorecase', 'false'], ['core.quotepath', 'false']]) git('config', k, v)
-  yaz('README.md', 'taban\n')
-  for (const [rel, icerik] of Object.entries(depo.taban)) yaz(rel, icerik)
-  git('add', '-A')
-  git('commit', '-q', '-m', 'taban')
-  if (depo.readmeDegis !== false) yaz('README.md', 'pr\n')
-  for (const [rel, icerik] of Object.entries(depo.fark)) {
-    if (icerik === null) rmSync(path.join(repo, rel), { force: true })
-    else yaz(rel, icerik)
-  }
-  git('add', '-A')
-  git('commit', '-q', '--allow-empty', '-m', 'pr')
-  // Her adımın KENDİ $GITHUB_OUTPUT dosyası vardır (GitHub adım başına ayrı dosya verir): önceki geçişin çıktısı taşınmaz.
-  const ciktiDosyasi = path.join(gecici, 'github_output')
-  writeFileSync(ciktiDosyasi, '')
-  const r = spawnSync(BASH as string, ['-eo', 'pipefail', '-c', govde], {
-    cwd: repo,
-    encoding: 'utf8',
-    env: temizOrtam({ RUNNER_TEMP: ileri(gecici), GITHUB_OUTPUT: ileri(ciktiDosyasi), GITHUB_WORKSPACE: ileri(repo), ...env }),
-  })
-  const cagriDosyasi = path.join(gecici, 'stub-cagri.jsonl')
-  const cagrilar = existsSync(cagriDosyasi)
-    ? readFileSync(cagriDosyasi, 'utf8').split('\n').filter(Boolean).map((s) => JSON.parse(s) as { argv: string[]; cwd: string; dunya: string })
-    : []
-  return { cikis: r.status ?? -1, cikti: readFileSync(ciktiDosyasi, 'utf8'), ekran: `${r.stdout}${r.stderr}`, cagrilar, prKosti: existsSync(path.join(gecici, 'pr-isareti')), repo, gecici }
-}
-const temizle = (...s: AdimSonucu[]): void => {
-  for (const x of s) {
-    rmSync(x.repo, { recursive: true, force: true })
-    rmSync(x.gecici, { recursive: true, force: true })
-  }
-}
-const tabanDepo = (senaryo: Senaryo | null, haritaVar = true): Depo => ({
+const tabanDepo =(senaryo: Senaryo | null, haritaVar = true, sinifVar = true): Depo => ({
   taban: {
     ...(senaryo === null ? {} : { 'scripts/ci/test-sec.cjs': SAHTE_SECICI }),
     ...(senaryo === null || !haritaVar ? {} : { 'scripts/ci/test-haritasi.json': JSON.stringify({ mod: senaryo }) }),
+    ...(senaryo === null || !sinifVar ? {} : { 'scripts/ci/degisiklik-sinifi.cjs': sinifKopyasi('TABAN') }),
   },
-  fark: { 'scripts/ci/test-sec.cjs': PR_SECICISI, 'docs/x.md': 'belge\n' },
+  fark: { 'scripts/ci/test-sec.cjs': PR_SECICISI, 'scripts/ci/degisiklik-sinifi.cjs': sinifKopyasi('PR'), 'docs/x.md': 'belge\n' },
 })
-const sonDeger = (cikti: string, anahtar: string): string | undefined => cikti.split('\n').filter((s) => s.startsWith(`${anahtar}=`)).map((s) => s.slice(anahtar.length + 1)).pop()
 /** YAML koşullarının (ci-test-secimi-ifade.test.ts'te doğruluk tablosuyla ölçülen) anlamı: kurulum/test YALNIZ adımın yazdığı SON `bos` değeri `true` ise kapanır; çıktı eksik ya da başka değerse KOŞAR. */
 const kurulumGerek = (cikti: string): boolean => sonDeger(cikti, 'bos')?.toLowerCase() !== 'true'
 
@@ -225,6 +79,7 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
     try {
       expect(s.cikis).toBe(0)
       expect(s.prKosti, "PR'ın kendi seçici kopyası koştu").toBe(false)
+      expect(s.sinif, "seçici sürecinde yalnız TABANIN sınıflayıcısı yüklenir; PR'ın kopyası ASLA (PR kodu kurulumdan önce koşmasın)").toBe('TABAN;')
       expect(s.cagrilar).toHaveLength(1)
       const c = s.cagrilar[0]
       expect(c.argv).toEqual(['--kok', ileri(s.repo), '--harita', `${ileri(s.gecici)}/secici/test-haritasi.json`, '--vitestsiz', '--cikti', `${ileri(s.gecici)}/secilen.txt`])
@@ -254,8 +109,8 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
     }
   }, ZAMAN)
 
-  it('taban kopyası YOK (seçici ya da harita): `tam=true` + neden, çıkış 0, seçici HİÇ koşmaz (mekanizma henüz tabanda değil)', () => {
-    for (const [ad, depo] of [['seçici yok', tabanDepo(null)], ['harita yok', tabanDepo('bos', false)]] as const) {
+  it('taban kopyası YOK (seçici, harita ya da sınıflayıcı): `tam=true` + neden, çıkış 0, seçici HİÇ koşmaz (mekanizma henüz tabanda değil; sınıflayıcı yoksa PR kopyası yüklenmesin)', () => {
+    for (const [ad, depo] of [['seçici yok', tabanDepo(null)], ['harita yok', tabanDepo('bos', false)], ['sınıflayıcı yok', tabanDepo('bos', true, false)]] as const) {
       const s = govdeKos(SEC, depo)
       try {
         expect(s.cikis, ad).toBe(0)
@@ -264,6 +119,7 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
         expect(sonDeger(s.cikti, 'bos'), ad).toBeUndefined()
         expect(s.cagrilar, ad).toHaveLength(0)
         expect(s.prKosti, ad).toBe(false)
+        expect(s.sinif, ad).toBe('')
         expect(s.ekran, ad).toContain('::notice::test seçimi: tam — taban kopyası yok')
         expect(kurulumGerek(s.cikti), ad).toBe(true)
       } finally {
@@ -323,6 +179,17 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
     }
   }, ZAMAN)
 
+  it("KONTROL: sınıflayıcı tabandan çıkarılmasaydı seçici onu PR'ın kopyasından yüklerdi ve PR kodu kurulumdan ÖNCE seçici sürecinde koşardı (yukarıdaki test boş değil)", () => {
+    const eksik = SEC.replace(' || ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$d/degisiklik-sinifi.cjs" 2>/dev/null', '')
+    expect(eksik).not.toBe(SEC)
+    const s = govdeKos(eksik, tabanDepo('secim'))
+    try {
+      expect(s.sinif).toBe('PR;')
+    } finally {
+      temizle(s)
+    }
+  }, ZAMAN)
+
   it('İKİNCİ geçiş (vitest ile): birincinin tabandan çıkardığı kopyayı koşar, `--vitestsiz` YOK, dünya durumu kipi `dislan` verilir; kopyalar yoksa `tam=true` ve seçici koşmaz', () => {
     const depo = tabanDepo('secim')
     const ilk = govdeKos(SEC, depo)
@@ -362,99 +229,6 @@ describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · seçim adımlarının GER�
   }, ZAMAN)
 })
 
-// ── hızlı yol ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-describe.skipIf(BASH === null)('INV-CI-SECIM-2 (A) · hızlı yol gövdesi gerçek git ile: YALNIZ .md/.txt/.csv farkında `belge=true`', () => {
-  const HIZLI = adimGovdesi('ci', 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)')
-  const kos = (taban: Record<string, string>, fark: Record<string, string | null>): AdimSonucu => govdeKos(HIZLI, { taban, fark })
-  const ZAMAN = 60_000
-  const TABAN = { 'src/a.ts': 'export {}\n', 'docs/eski.md': 'e\n', 'docs/veri.json': '{}\n', '.claude/hooks/x.cjs': '1\n' }
-
-  it('gövde ci.yml’den okundu', () => {
-    expect(HIZLI).toContain('git diff --quiet --no-renames HEAD^1 HEAD')
-  })
-
-  const EVET: Array<[string, Record<string, string | null>]> = [
-    ['yalnız bir .md', { 'docs/a.md': 'x\n' }],
-    ['kök README ve .md birlikte', { 'README.md': 'degisti\n', 'docs/standards/b.md': 'y\n' }],
-    ['.txt ve .csv', { 'docs/notlar.txt': 't\n', 'docs/audits/olcum.csv': 'a,b\n' }],
-    ['Türkçe ve boşluklu dosya adı', { 'docs/Ölçüm raporu — Ekim.md': 'ö\n' }],
-    ['.claude altında .md ve .txt', { '.claude/skills/x/NOT.md': 'n\n', '.claude/notlar.txt': 'n\n' }],
-    ['silinen .md', { 'docs/eski.md': null }],
-    ['.md uzantılı ama adında nokta çok olan dosya', { 'docs/a.b.c.md': 'z\n' }],
-  ]
-  it.each(EVET)('belge=true: %s', (_ad, fark) => {
-    const s = kos(TABAN, fark)
-    try {
-      expect(s.cikis).toBe(0)
-      expect(sonDeger(s.cikti, 'belge')).toBe('true')
-      expect(s.cikti).toBe('belge=true\n')
-      expect(s.ekran).toContain('::notice::hızlı yol: belge')
-    } finally {
-      temizle(s)
-    }
-  }, ZAMAN)
-
-  const HAYIR: Array<[string, Record<string, string | null>]> = [
-    ['.md + .cjs (eslint . onu tarar)', { 'docs/a.md': 'x\n', '.claude/hooks/x.cjs': '2\n' }],
-    ['yalnız .cjs', { '.claude/hooks/yeni.cjs': '1\n' }],
-    ['.mjs', { 'docs/araclar/y.mjs': 'export {}\n' }],
-    ['.ts (tsc girdisi)', { 'docs/yeni.ts': 'export {}\n' }],
-    ['.tsx', { 'docs/yeni.tsx': 'export {}\n' }],
-    ['.json (test içe aktarabilir: tip denetimini değiştirir)', { 'docs/veri.json': '{"a":1}\n' }],
-    ['.py ve .sh', { 'docs/a.py': 'x\n', 'docs/b.sh': 'x\n' }],
-    ['.yaml', { 'docs/a.yaml': 'a: 1\n' }],
-    ['uzantısız dosya', { 'docs/Makefile': 'x\n' }],
-    ['.md.cjs (uzantı son ekten okunur)', { 'docs/a.md.cjs': 'x\n' }],
-    ['büyük harfli .MD (Linux’ta farklı dosya türü: temkinli)', { 'docs/A.MD': 'x\n' }],
-    ['site kodu', { 'src/a.ts': 'export const a = 1\n' }],
-    ['.md + site kodu', { 'docs/a.md': 'x\n', 'src/a.ts': 'export const a = 1\n' }],
-    ['kod dosyası silinir, aynı yola .md eklenir (taşıma numarası: eski yol kod)', { 'src/a.ts': null, 'docs/a.md': 'x\n' }],
-    ['silinen .cjs', { '.claude/hooks/x.cjs': null }],
-    ['paket ve kilit dosyası', { 'package.json': '{}\n' }],
-    ['iş akışı', { '.github/workflows/ci.yml': 'name: x\n' }],
-  ]
-  it.each(HAYIR)('çıktı YOK (tüm kapılar koşar): %s', (_ad, fark) => {
-    const s = kos(TABAN, fark)
-    try {
-      expect(s.cikis).toBe(0)
-      expect(s.cikti).toBe('')
-      expect(s.ekran).toContain('::notice::hızlı yol: yok')
-    } finally {
-      temizle(s)
-    }
-  }, ZAMAN)
-
-  it('boş fark (PR commit’i HEAD^1 ile aynı ağaç): çıktı YOK (kanıtsız hızlı yol açılmaz)', () => {
-    const s = govdeKos(HIZLI, { taban: TABAN, fark: {}, readmeDegis: false })
-    try {
-      expect(s.cikis).toBe(0)
-      expect(s.cikti).toBe('')
-      expect(s.ekran).toContain('::notice::hızlı yol: yok')
-    } finally {
-      temizle(s)
-    }
-  }, ZAMAN)
-
-  it('git hatası (HEAD^1 yok: tek commitli depo) çıktı YAZMAZ ve adımı kırmızı yapmaz', () => {
-    const repo = mkdtempSync(path.join(tmpdir(), 'vh-secim-tek-'))
-    const gecici = mkdtempSync(path.join(tmpdir(), 'vh-secim-tmp-'))
-    try {
-      for (const a of [['init', '-q'], ['config', 'user.email', 'x@y.z'], ['config', 'user.name', 'x'], ['config', 'commit.gpgsign', 'false']]) execFileSync('git', a, { cwd: repo, stdio: 'pipe' })
-      writeFileSync(path.join(repo, 'a.md'), 'x\n')
-      execFileSync('git', ['add', '-A'], { cwd: repo, stdio: 'pipe' })
-      execFileSync('git', ['commit', '-q', '-m', 'tek'], { cwd: repo, stdio: 'pipe' })
-      const ciktiDosyasi = path.join(gecici, 'github_output')
-      writeFileSync(ciktiDosyasi, '')
-      const r = spawnSync(BASH as string, ['-eo', 'pipefail', '-c', HIZLI], { cwd: repo, encoding: 'utf8', env: temizOrtam({ GITHUB_OUTPUT: ileri(ciktiDosyasi) }) })
-      expect(r.status).toBe(0)
-      expect(readFileSync(ciktiDosyasi, 'utf8')).toBe('')
-    } finally {
-      rmSync(repo, { recursive: true, force: true })
-      rmSync(gecici, { recursive: true, force: true })
-    }
-  }, ZAMAN)
-})
-
 // ══ B) KAPSAM KANITI: gerçek `vitest list` + gerçek dağıtıcı + gerçek vitest include bağı ═══════════════════════════════════════════
 describe('INV-CI-SECIM-2 (B) · KAPSAM: tam ise birleşim = vitest list, seçim ise birleşim = seçim; kesişim 0; hiçbir test dosyası düşmez ya da iki kez koşmaz', () => {
   const N = Number(/^ {8}shard: \[([\d, ]+)\]$/m.exec(CI_METNI)?.[1].split(',').length ?? 4)
@@ -470,25 +244,25 @@ describe('INV-CI-SECIM-2 (B) · KAPSAM: tam ise birleşim = vitest list, seçim 
     if (gecici) rmSync(gecici, { recursive: true, force: true })
   })
 
-  /** Dağıtıcıyı ci.yml'deki argümanlarla ve enjeksiyonla N parça için koşar: `{ parcalar, kos }`. */
-  function parcalar(tam: string, secim: readonly string[], sayi: string = String(secim.length)): { parcalar: string[][]; kos: string[] } {
-    const dosya = 'secilen.txt'
-    const sonuc: string[][] = []
+  /** TEK shard işini ci.yml'deki argümanlarla ve enjeksiyonla koşar: `{ parca, kos }`. */
+  function isKos(i: number, tam: string, secim: readonly string[], sayi: string = String(secim.length)): { parca: string[]; kos: string } {
+    const yazilan = new Map<string, string>()
     const kos: string[] = []
-    for (let i = 1; i <= N; i++) {
-      const yazilan = new Map<string, string>()
-      const kod = SHARD.main(['--shard', String(i), '--toplam', String(N), '--cikti', 'p.json', '--secim', dosya, '--secim-tam', tam, '--secim-sayi', sayi], {
-        listele: () => liste,
-        yaz: (d, ic) => void yazilan.set(d, ic),
-        log: () => undefined,
-        ortam: { GITHUB_OUTPUT: 'x' },
-        ekle: (_d, ic) => void kos.push(ic.trim()),
-        secimGirdisi: { oku: () => `${secim.join('\n')}${secim.length ? '\n' : ''}`, varMi: () => true },
-      })
-      expect(kod, `shard ${i}/${N}`).toBe(0)
-      sonuc.push(JSON.parse(yazilan.get('p.json') ?? 'null') as string[])
-    }
-    return { parcalar: sonuc, kos }
+    const kod = SHARD.main(['--shard', String(i), '--toplam', String(N), '--cikti', 'p.json', '--secim', 'secilen.txt', '--secim-tam', tam, '--secim-sayi', sayi], {
+      listele: () => liste,
+      yaz: (d, ic) => void yazilan.set(d, ic),
+      log: () => undefined,
+      ortam: { GITHUB_OUTPUT: 'x' },
+      ekle: (_d, ic) => void kos.push(ic.trim()),
+      secimGirdisi: { oku: () => `${secim.join('\n')}${secim.length ? '\n' : ''}`, varMi: () => true },
+    })
+    expect(kod, `shard ${i}/${N}`).toBe(0)
+    return { parca: JSON.parse(yazilan.get('p.json') ?? 'null') as string[], kos: kos[0] }
+  }
+  /** Dağıtıcıyı N parça için AYNI girdiyle koşar: `{ parcalar, kos }`. */
+  function parcalar(tam: string, secim: readonly string[], sayi: string = String(secim.length)): { parcalar: string[][]; kos: string[] } {
+    const isler = Array.from({ length: N }, (_, i) => isKos(i + 1, tam, secim, sayi))
+    return { parcalar: isler.map((x) => x.parca), kos: isler.map((x) => x.kos) }
   }
   const kesisimYok = (p: string[][]): void => {
     const hepsi = p.flat()
@@ -521,8 +295,20 @@ describe('INV-CI-SECIM-2 (B) · KAPSAM: tam ise birleşim = vitest list, seçim 
       kesisimYok(r.parcalar)
       expect(r.kos, `K=${k}`).toEqual(r.parcalar.map((p) => `kos=${p.length > 0}`))
       for (const p of r.parcalar) for (const d of p) expect(liste, `K=${k}: ${d} vitest listesinde yok`).toContain(d)
-      if (k >= N) r.parcalar.forEach((p, i) => expect(p.length, `K=${k} parça ${i + 1} boş`).toBeGreaterThan(0))
       if (k === 0) expect(r.parcalar.every((p) => p.length === 0)).toBe(true)
+    }
+  })
+
+  it("KARMA KİP (çürütme bulgusu): işlerin bir kısmı tam'a düşer (seçici çıktısı yok), kalanı seçimde kalır; birleşim HER KOMBİNASYONDA ⊇ seçim, kesişim 0; hepsi seçimdeyken = seçim", () => {
+    for (const k of [1, 5, 60, 150]) {
+      const secim = liste.filter((_, i) => i % Math.max(1, Math.floor(liste.length / k)) === 0).slice(0, k)
+      for (let maske = 0; maske < 2 ** N; maske++) {
+        const isler = Array.from({ length: N }, (_, i) => ((maske >> i) & 1 ? isKos(i + 1, '', secim, '') : isKos(i + 1, 'false', secim)))
+        const birlesim = isler.flatMap((x) => x.parca)
+        expect(secim.filter((d) => !birlesim.includes(d)), `K=${k} maske=${maske}: seçilen ama HİÇBİR işte koşmayan test`).toEqual([])
+        kesisimYok(isler.map((x) => x.parca))
+        if (maske === 0) expect(sirali(birlesim), `K=${k}: hepsi seçimde`).toEqual(sirali(secim))
+      }
     }
   })
 
@@ -537,7 +323,7 @@ describe('INV-CI-SECIM-2 (B) · KAPSAM: tam ise birleşim = vitest list, seçim 
     const a = parcalar('false', secim)
     const b = parcalar('false', [...secim].reverse())
     expect(b.parcalar).toEqual(a.parcalar)
-    expect(a.parcalar).toEqual(SHARD.dagit(secim, sure, N).gruplar)
+    expect(a.parcalar).toEqual(SHARD.dagit(liste, sure, N).gruplar.map((g) => g.filter((d) => secim.includes(d)))) // bölme TAM listede, seçim yalnız süzer (karma kip güvencesi)
   })
 
   it('GERÇEK vitest include bağı: seçimden çıkan her dolu parça için `VENTHUB_TEST_SHARD_DOSYALARI` ile gerçek `vitest list` TAM o parçayı döner; birleşim = seçim', async () => {

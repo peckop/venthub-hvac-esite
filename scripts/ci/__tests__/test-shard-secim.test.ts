@@ -11,8 +11,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  * Bağlantı ve kapsam kanıtı (gerçek `vitest list`, ci.yml): src/__tests__/conformance/ci-test-secimi.test.ts (INV-CI-SECIM-1/2).
  *
  * Tek değişmez: seçim YALNIZ DARALTIR. Seçici `tam` demedikçe, çıktısı baştan sona tutarlı olmadıkça ya da seçilen bir dosya vitest listesinde yoksa dağıtım TAMDIR (uyarıyla);
- * seçim geçerliyse seçilenler aynı LPT ile dağıtılır (birleşim = seçim, kesişim 0, hiçbir dosya düşmez ya da iki kez koşmaz). Boş parça YALNIZ seçim modunda meşrudur
- * (`kos=false`: vitest koşmaz, iş yeşil biter); tam modda boş parça kırmızıdır (eski kural). Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir).
+ * seçim geçerliyse bölme yine TAM listenin LPT'sindedir ve her iş kendi parçasını seçimle SÜZER (birleşim = seçim, kesişim 0, hiçbir dosya düşmez ya da iki kez koşmaz).
+ * KARMA KİP: dört iş seçimi bağımsız hesaplar; biri tam'a düşse bile birleşim ⊇ seçim (çürütme bulgusu: bölme seçim üstünde olsaydı seçilen testler hiçbir işte koşmazdı).
+ * Boş parça YALNIZ seçim modunda meşrudur (`kos=false`: vitest koşmaz, iş yeşil biter); tam modda boş parça kırmızıdır (eski kural). Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir).
  * Hiçbir test ağa ya da gerçek vitest'e dokunmaz; gerçek süreç testi vitest KURULU OLMAYAN geçici bir kökte koşar.
  */
 
@@ -43,7 +44,7 @@ const S = require_(BETIK) as {
   SECIM_ARGUMANLARI: string[]
   argumanlar: (argv: string[]) => { shard: number; toplam: number; cikti: string; secim?: { dosya: string; tam: string; sayi: string } }
   dagit: (dosyalar: string[], sure: SureTablosu, toplam: number) => { gruplar: string[][]; yuk: number[] }
-  kumeyiBelirle: (secim: SecimGirdisi | undefined, listele: () => string[], g?: Enjeksiyon['secimGirdisi']) => { dosyalar: string[]; mod: string; uyari?: string; bilgi?: string }
+  kumeyiBelirle: (secim: SecimGirdisi | undefined, listele: () => string[], g?: Enjeksiyon['secimGirdisi']) => { dosyalar: string[]; secilen: Set<string> | null; mod: string; uyari?: string; bilgi?: string }
   main: (argv?: string[], g?: Enjeksiyon) => number
   secimiCoz: (girdi: unknown, g?: Enjeksiyon['secimGirdisi']) => SecimKarari
 }
@@ -194,7 +195,7 @@ describe('secimiCoz: seçici çıktısı baştan sona tutarlı değilse TAM; FIR
 })
 
 // ══ 3. kumeyiBelirle ══════════════════════════════════════════════════════════════════════════════════════════════════════
-describe('kumeyiBelirle: hangi küme dağıtılır; boş seçimde `vitest list` ÇAĞRILMAZ, seçilen vitest listesinde yoksa TAM', () => {
+describe('kumeyiBelirle: bölünecek küme HER ZAMAN tam liste (seçim yalnız süzer); boş seçimde `vitest list` ÇAĞRILMAZ, seçilen vitest listesinde yoksa TAM', () => {
   function sayacli(): { listele: () => string[]; cagri: () => number } {
     let n = 0
     return {
@@ -208,20 +209,20 @@ describe('kumeyiBelirle: hangi küme dağıtılır; boş seçimde `vitest list` 
 
   it('seçim grubu yok: vitest listesinin TAMAMI, uyarı yok (eski davranış)', () => {
     const s = sayacli()
-    expect(S.kumeyiBelirle(undefined, s.listele)).toEqual({ dosyalar: LISTE, mod: 'tam' })
+    expect(S.kumeyiBelirle(undefined, s.listele)).toEqual({ dosyalar: LISTE, secilen: null, mod: 'tam' })
     expect(s.cagri()).toBe(1)
   })
 
-  it('geçerli seçim ve hepsi vitest listesinde: SEÇİLENLER dağıtılır, vitest list bir kez çağrılır', () => {
+  it('geçerli seçim ve hepsi vitest listesinde: BÖLÜNECEK küme vitest listesinin TAMAMI, SEÇİLENLER ayrı kümede (parçayı yalnız süzer); vitest list bir kez çağrılır', () => {
     const s = sayacli()
     const k = S.kumeyiBelirle({ dosya: 's.txt', tam: 'false', sayi: '2' }, s.listele, okuyucu(satirlar([LISTE[7], LISTE[3]])))
-    expect(k).toEqual({ dosyalar: [LISTE[3], LISTE[7]], mod: 'secim' })
+    expect(k).toEqual({ dosyalar: LISTE, secilen: new Set([LISTE[3], LISTE[7]]), mod: 'secim' })
     expect(s.cagri()).toBe(1)
   })
 
-  it('BOŞ seçim: kume boş, mod seçim ve `vitest list` HİÇ ÇAĞRILMAZ (kurulum atlanmış olabilir)', () => {
+  it('BOŞ seçim: bölünecek küme boş, seçilen boş, mod seçim ve `vitest list` HİÇ ÇAĞRILMAZ (kurulum atlanmış olabilir)', () => {
     const s = sayacli()
-    expect(S.kumeyiBelirle({ dosya: 's.txt', tam: 'false', sayi: '0' }, s.listele, okuyucu(''))).toEqual({ dosyalar: [], mod: 'secim' })
+    expect(S.kumeyiBelirle({ dosya: 's.txt', tam: 'false', sayi: '0' }, s.listele, okuyucu(''))).toEqual({ dosyalar: [], secilen: new Set(), mod: 'secim' })
     expect(s.cagri()).toBe(0)
   })
 
@@ -230,6 +231,7 @@ describe('kumeyiBelirle: hangi küme dağıtılır; boş seçimde `vitest list` 
     const k = S.kumeyiBelirle({ dosya: 's.txt', tam: 'false', sayi: '2' }, s.listele, okuyucu(satirlar([LISTE[0], 'src/yok/ayrisan.test.ts'])))
     expect(k.mod).toBe('tam')
     expect(k.dosyalar).toEqual(LISTE)
+    expect(k.secilen, 'seçim yutulmuş: süzme yok').toBeNull()
     expect(k.uyari).toContain('vitest listesinde yok')
     expect(k.uyari).toContain('src/yok/ayrisan.test.ts')
   })
@@ -282,7 +284,34 @@ describe('main (seçim modu): birleşim = seçim, kesişim 0; boş parça yeşil
         expect(hepsi.length, `K=${k} N=${n}: kesişim/çoğalma`).toBe(k)
         expect(sirali(hepsi), `K=${k} N=${n}: birleşim`).toEqual(secim)
         expect(new Set(hepsi).size, `K=${k} N=${n}`).toBe(hepsi.length)
-        if (k >= n) parcalar.forEach((p, i) => expect(p.length, `K=${k} N=${n} shard ${i + 1} boş`).toBeGreaterThan(0))
+        // bölme TAM liste üzerindedir: her parça, tam listenin kendi parçasının seçimle kesişimidir (seçimin kendi LPT'si DEĞİL)
+        const tamBolme = S.dagit(LISTE, SURELER, n).gruplar
+        parcalar.forEach((p, i) => expect(p, `K=${k} N=${n} shard ${i + 1}`).toEqual(tamBolme[i].filter((d) => secim.includes(d))))
+      }
+    }
+  })
+
+  it("KARMA KİP (çürütme bulgusu): dört işin bir kısmı tam'a düşer, kalanı seçimde kalır; birleşim HER KOMBİNASYONDA ⊇ seçim (hiçbir seçilen test düşmez)", () => {
+    const rnd = rastgele(20261008)
+    const N = 4
+    for (const k of [1, 3, 8, 20, 39]) {
+      const secim = sirali([...LISTE].map((d) => [d, rnd()] as const).sort((a, b) => a[1] - b[1]).slice(0, k).map((x) => x[0]))
+      for (let maske = 0; maske < 2 ** N; maske++) {
+        // bit i = 1: shard i+1 işi tam'a düştü (seçici çöktü ya da çıktısı okunamadı); 0: seçimde kaldı
+        const parcalar: string[][] = []
+        for (let i = 1; i <= N; i++) {
+          const tamaDustu = (maske >> (i - 1)) & 1
+          const girdi = tamaDustu ? secimArg('', '') : secimArg('false', k)
+          const r = kos(arg(i, N, girdi, `p${i}.json`), { secimGirdisi: okuyucu(satirlar(secim)) })
+          expect(r.kod, `K=${k} maske=${maske} shard ${i}`).toBe(0)
+          parcalar.push(parca(r.yazilan, `p${i}.json`))
+        }
+        const birlesim = new Set(parcalar.flat())
+        const dusen = secim.filter((d) => !birlesim.has(d))
+        expect(dusen, `K=${k} maske=${maske}: seçilen ama HİÇBİR işte koşmayan test`).toEqual([])
+        expect(parcalar.flat().length, `K=${k} maske=${maske}: aynı test iki işte koşuyor`).toBe(birlesim.size)
+        if (maske === 0) expect(sirali([...birlesim]), `K=${k}: hepsi seçimde: birleşim = seçim`).toEqual(secim)
+        if (maske === 2 ** N - 1) expect(sirali([...birlesim]), `K=${k}: hepsi tam: birleşim = tüm liste`).toEqual(sirali(LISTE))
       }
     }
   })
@@ -304,10 +333,22 @@ describe('main (seçim modu): birleşim = seçim, kesişim 0; boş parça yeşil
     expect(r.loglar.join('\n')).toMatch(/^::notice::test shard 3\/4 \(seçim\): bu parçaya test düşmedi \(seçilen 0 dosya\); vitest koşmaz, iş yeşil biter$/)
   })
 
-  it('dolu parça: `kos=true`, bilgi satırında (seçim) etiketi ve toplam seçilen sayısı', () => {
-    const r = kos(arg(1, 2, secimArg('false', 6)), { secimGirdisi: okuyucu(satirlar(LISTE.slice(0, 6))) })
+  it('dolu parça: `kos=true`, bilgi satırında (seçim) etiketi ve toplam seçilen sayısı; ağırlıklar yalnız SEÇİLENLERİN ağırlığıdır', () => {
+    const secim = S.dagit(LISTE, SURELER, 2).gruplar[0].slice(0, 6) // 1. parçaya tam listenin bölmesinde düşen altı dosya: parça kesin dolu
+    const r = kos(arg(1, 2, secimArg('false', secim.length)), { secimGirdisi: okuyucu(satirlar(secim)) })
     expect(r.ciktilar).toEqual(['kos=true\n'])
-    expect(r.loglar[0]).toMatch(/^::notice::test shard 1\/2 \(seçim\): \d+ dosya, ağırlık [\d.]+ sn \(.*; toplam 6 dosya\)$/)
+    expect(r.loglar[0]).toMatch(/^::notice::test shard 1\/2 \(seçim\): 6 dosya, ağırlık [\d.]+ sn \(.*; toplam 6 dosya\)$/)
+    const secimAgirligi = secim.reduce((s, d) => s + (SURELER.sureler.get(d) ?? SURELER.varsayilan), 0)
+    expect(Number(/ağırlık ([\d.]+) sn/.exec(r.loglar[0])?.[1])).toBeCloseTo(secimAgirligi, 1)
+  })
+
+  it('parçaya seçilen düşmediyse (seçim başka parçada): `kos=false`, parça `[]`, çıkış 0, iş yeşil (tam modun kırmızı boş parça kuralı buraya sızmaz)', () => {
+    const baskasinda = S.dagit(LISTE, SURELER, 4).gruplar[2].slice(0, 2) // yalnız 3. parçanın dosyaları seçildi
+    const r = kos(arg(1, 4, secimArg('false', baskasinda.length)), { secimGirdisi: okuyucu(satirlar(baskasinda)) })
+    expect(r.kod).toBe(0)
+    expect(r.yazilan.get('c.json')).toBe('[]\n')
+    expect(r.ciktilar).toEqual(['kos=false\n'])
+    expect(r.loglar.join('\n')).toContain('(seçilen 2 dosya)')
   })
 
   it('TAM modda (seçici tam dedi) boş parça HÂLÂ KIRMIZI: seçim modunun hoşgörüsü tam moda sızmaz', () => {

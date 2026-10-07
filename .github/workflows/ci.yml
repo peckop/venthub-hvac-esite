@@ -419,15 +419,16 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
-      # ALT-38e — SEÇİM 1/2 (KURULUMSUZ): taban kopyası `$RUNNER_TEMP/secici/` altına çıkar (seçici + harita), `--vitestsiz` ile vitest AÇILMAZ. Yalnız içe aktarılamaz dosyalar (md, csv, sql...) değiştiyse
+      # ALT-38e — SEÇİM 1/2 (KURULUMSUZ): taban kopyası `$RUNNER_TEMP/secici/` altına çıkar (seçici + harita + SINIFLAYICI: seçici sınıflayıcıyı önce kendi yanından, yoksa checkout'tan yükler; yanında olmazsa PR'ın
+      # kendi sınıflayıcısı kurulumdan ÖNCE seçici sürecinde koşar ve `bos` kararını yazabilir), `--vitestsiz` ile vitest AÇILMAZ. Yalnız içe aktarılamaz dosyalar (md, csv, sql...) değiştiyse
       # kendisi cevap verir; içe aktarılabilir bir dosya (ts, tsx, js, json...) değiştiyse `tam=true` yazar ve ikinci geçiş (aşağıda, kurulumdan sonra) karar verir. Ad ve gövde INV-CI-SECIM-1 ile TAM sabit.
       - name: Test seçimi (tabandan, kurulumsuz)
         id: sec
         run: |
           d="$RUNNER_TEMP/secici"
           mkdir -p "$d"
-          if ! git show HEAD^1:scripts/ci/test-sec.cjs > "$d/test-sec.cjs" 2>/dev/null || ! git show HEAD^1:scripts/ci/test-haritasi.json > "$d/test-haritasi.json" 2>/dev/null; then
-            echo "::notice::test seçimi: tam — taban kopyası yok (HEAD^1:scripts/ci/test-sec.cjs, test-haritasi.json)"
+          if ! git show HEAD^1:scripts/ci/test-sec.cjs > "$d/test-sec.cjs" 2>/dev/null || ! git show HEAD^1:scripts/ci/test-haritasi.json > "$d/test-haritasi.json" 2>/dev/null || ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$d/degisiklik-sinifi.cjs" 2>/dev/null; then
+            echo "::notice::test seçimi: tam — taban kopyası yok (HEAD^1:scripts/ci/test-sec.cjs, test-haritasi.json, degisiklik-sinifi.cjs)"
             printf 'tam=true\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -476,7 +477,7 @@ jobs:
           VENTHUB_DUNYA_DURUMU: dislan
         run: |
           d="$RUNNER_TEMP/secici"
-          if [ ! -s "$d/test-sec.cjs" ] || [ ! -s "$d/test-haritasi.json" ]; then
+          if [ ! -s "$d/test-sec.cjs" ] || [ ! -s "$d/test-haritasi.json" ] || [ ! -s "$d/degisiklik-sinifi.cjs" ]; then
             echo "::notice::test seçimi: tam — taban kopyası yok"
             printf 'tam=true\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
             exit 0
@@ -489,7 +490,8 @@ jobs:
           fi
 
       # Dağıtım: seçici çıktısı (`tam`, `secilen-sayisi`, liste dosyası) dağıtıcıya ARGÜMAN olarak verilir ve orada doğrulanır (tutarsızsa TAM paket). Parçaya hiç test düşmediyse (seçim modunda meşru) `kos=false`
-      # yazar. SECIM_* değişkenleri yalnız bu adımdadır: testlerin koştuğu adımın ortamına GİRMEZ (alt süreçlere sızmaz; canlı ders: #1741 koşu 2).
+      # yazar. KARMA KİP: dört iş seçimi BAĞIMSIZ hesaplar; biri tam'a düşerse (seçici çöktü) bölmeler ayrışıp seçilen testler hiçbir işte koşmasın diye bölme HER ZAMAN `vitest list`in tam listesindedir,
+      # seçim yalnız kendi parçayı süzer (birleşim ⊇ seçim). SECIM_* değişkenleri yalnız bu adımdadır: testlerin koştuğu adımın ortamına GİRMEZ (alt süreçlere sızmaz; canlı ders: #1741 koşu 2).
       - name: Test dağıtımı (shard ${{ matrix.shard }}/4)
         id: dagit
         if: steps.sec.outputs.bos != 'true'

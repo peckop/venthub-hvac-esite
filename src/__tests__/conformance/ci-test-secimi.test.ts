@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
  *
  * NİÇİN VAR: PR'da yalnız değişenle ilgili testler koşar (scripts/ci/test-sec.cjs; dağıtıcı girdisi `--secim`) ve yalnız .md/.txt/.csv değişen belge PR'ında kod kapıları (kurulum, Lint, tip, Deno) atlanır.
  * Seçim yalnız DARALTIR; bu dosya daraltmanın SESSİZCE genişlemesini (kapsam kaybı) ve yanlış yerde açılmasını önler. Bozulma yolları (hepsi SESSİZDİR):
- *   1. seçici PR'ın KENDİ kopyasından koşar (PR seçiciyi değiştirip kendi testini eler): `git show HEAD^1:` dışı kaynak, `node scripts/ci/test-sec.cjs`, harita PR'dan,
+ *   1. seçici PR'ın KENDİ kopyasından koşar (PR seçiciyi değiştirip kendi testini eler): `git show HEAD^1:` dışı kaynak, `node scripts/ci/test-sec.cjs`, harita PR'dan, sınıflayıcı PR'dan (seçici onu checkout'tan yükler),
  *   2. seçici edited, master push, elle koşum ya da zamanlı koşuda çalışır (yalnız `test-shard` işinde VARDIR; `ci` içindeki Test o olaylarda TAM koşar),
  *   3. koşul POZİTİF mantığa çevrilir: çıktı eksik/başka değerse kurulum ve test ATLANIR. Koşullar yalnız DARALTMA yönündedir (aşağıdaki ifade değerlendirmesi GERÇEK doğruluk tablosunu ölçer),
  *   4. çökme yedeği düşer (kırmızı kalır: tabandaki seçici bozulursa onu düzelten PR kilitlenir) ya da yedek `tam=false` yazar (seçici çökünce testler ELENİR),
@@ -51,13 +51,13 @@ const HATA_YUTAN = /\|\|\s*(?:true\b|:(?:\s|$)|exit\s+0\b)|;\s*true\s*$/
 /** Seçim adımlarının beklenen GÖVDESİ (LF, girinti atılmış). `String.raw`: printf'in `\n`'leri kaçış DEĞİL, dosyadaki iki karakterdir. */
 const GOVDE_BASI = String.raw`d="$RUNNER_TEMP/secici"
 mkdir -p "$d"
-if ! git show HEAD^1:scripts/ci/test-sec.cjs > "$d/test-sec.cjs" 2>/dev/null || ! git show HEAD^1:scripts/ci/test-haritasi.json > "$d/test-haritasi.json" 2>/dev/null; then
-  echo "::notice::test seçimi: tam — taban kopyası yok (HEAD^1:scripts/ci/test-sec.cjs, test-haritasi.json)"
+if ! git show HEAD^1:scripts/ci/test-sec.cjs > "$d/test-sec.cjs" 2>/dev/null || ! git show HEAD^1:scripts/ci/test-haritasi.json > "$d/test-haritasi.json" 2>/dev/null || ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$d/degisiklik-sinifi.cjs" 2>/dev/null; then
+  echo "::notice::test seçimi: tam — taban kopyası yok (HEAD^1:scripts/ci/test-sec.cjs, test-haritasi.json, degisiklik-sinifi.cjs)"
   printf 'tam=true\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
   exit 0
 fi`
 const GOVDE_V_BASI = String.raw`d="$RUNNER_TEMP/secici"
-if [ ! -s "$d/test-sec.cjs" ] || [ ! -s "$d/test-haritasi.json" ]; then
+if [ ! -s "$d/test-sec.cjs" ] || [ ! -s "$d/test-haritasi.json" ] || [ ! -s "$d/degisiklik-sinifi.cjs" ]; then
   echo "::notice::test seçimi: tam — taban kopyası yok"
   printf 'tam=true\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
   exit 0
@@ -201,6 +201,8 @@ function govdeDenetle(ad: string, govde: string | null, vitestsiz: boolean): str
     if (dosyaKaynaklari.length !== 1 || !/git show HEAD\^1:scripts\/ci\/test-sec\.cjs/.test(ham) || !/git show HEAD\^1:scripts\/ci\/test-haritasi\.json/.test(ham)) {
       ihlal.push(`"${ad}" seçiciyi ve haritayı \`git show HEAD^1:\` ile TABANDAN çıkarmıyor (PR kopyası ya da başka ebeveyn): PR seçiciyi/haritayı değiştirip kendi testini eler`)
     }
+    // Seçici sınıflayıcıyı önce KENDİ YANINDAN, yoksa checkout'tan (PR kopyası) yükler: tabandan çıkarılıp seçicinin yanına konmazsa PR kodu kurulumdan ÖNCE seçici sürecinde koşar
+    if (!/git show HEAD\^1:scripts\/ci\/degisiklik-sinifi\.cjs > "\$d\/degisiklik-sinifi\.cjs"/.test(ham)) ihlal.push(`"${ad}" sınıflayıcıyı (degisiklik-sinifi.cjs) tabandan çıkarıp seçicinin YANINA ($d) koymuyor: seçici onu PR'ın kopyasından yükler ve PR kodu seçici sürecinde koşar (\`bos\` kararını bile yazabilir)`)
     if (!/>\s*"\$d\/test-sec\.cjs"/.test(dosyaKaynaklari.join('\n')) || !k.some((s) => s.includes('> "$d/test-haritasi.json"'))) ihlal.push(`"${ad}" kopyaları \`$RUNNER_TEMP/secici\` altına yazmıyor`)
   } else if (dosyaKaynaklari.length !== 0) {
     ihlal.push(`"${ad}" yeniden \`git show\` yapıyor: ikinci geçiş birinci geçişin tabandan çıkardığı kopyayı koşturmalı (iki farklı kopya, iki farklı karar)`)
@@ -259,6 +261,8 @@ function shardSecimDenetle(metin: string): string[] {
     const a = adimlar.find((x) => x.ad.replace(/\/\d+\)$/, '/4)') === ad)
     if (!a) continue
     const beklenen = ad.startsWith('Test (shard') ? `if: ${KURULUM} && steps.dagit.outputs.kos != 'false'` : `if: ${KURULUM}`
+    // `kos` çıktısını Test adımı `steps.dagit`ten okur: kimlik düşerse çıktı hiç okunmaz, boş parçada da vitest boş listeyle koşar (sahte kırmızı) ve parça atlama kazancı sıfırlanır
+    if (ad.startsWith('Test dağıtımı') && idDegeri(a) !== 'dagit') ihlal.push('dağıtım adımı `id: dagit` değil: Test adımı `kos` çıktısını okuyamaz (boş parçada vitest boş listeyle koşar)')
     if (ifSatirlari(a).join(' ; ') !== beklenen) ihlal.push(`"${a.ad}" koşulu TAM \`${beklenen}\` değil (bulunan: ${ifSatirlari(a).join(' ; ') || 'yok'}): seçim kapısı gevşer (kurulum/test sessizce atlanır) ya da hiç kapanmaz (kazanç sıfır)`)
   }
   const kur = bul('Install dependencies')
@@ -326,8 +330,26 @@ function hizliYolDenetle(ci: string): string[] {
   return ihlal
 }
 
+/**
+ * Ortam ve kabuk sızıntısı (`ci` ve `test-shard` işleri): iş akışı ya da iş düzeyinde `env:` yasak (SHARD, SECIM_*, VENTHUB_TEST_SHARD_DOSYALARI testlerin alt süreçlerine sızar: canlı ders #1741 koşu 2);
+ * adım düzeyinde `shell:` ve `working-directory:` yasak (işin `bash` kabuğu pipefail açar; `shell: sh` ile `| tee` kırmızıyı yutar, kapı sessizce düşer).
+ */
+function ortamDenetle(ci: string): string[] {
+  const ihlal: string[] = []
+  const satirlar = ci.split('\n')
+  if (satirlar.some((s) => /^env:/.test(s))) ihlal.push('iş akışı düzeyinde `env:` var: değişkenler tüm işlerin testlerinin alt süreçlerine sızar (SHARD, SECIM_*, VENTHUB_TEST_SHARD_DOSYALARI)')
+  for (const isId of [CI_ISI, SHARD_ISI]) {
+    const is = isAraligi(satirlar, isId)
+    if (is && satirlar.slice(is.bas, is.bit).some((s) => /^ {4}env:/.test(s))) ihlal.push(`\`${isId}\` işinde iş düzeyinde \`env:\` var: değişkenler tüm adımlara ve testlerin alt süreçlerine sızar`)
+    for (const a of isAdimlari(ci, isId)) {
+      if (a.anahtarlar.some((k) => k.anahtar === 'shell' || k.anahtar === 'working-directory')) ihlal.push(`"${a.ad}" adımı adım düzeyinde \`shell:\`/\`working-directory:\` taşıyor: işin bash (pipefail) kabuğu ezilir, \`| tee\` kırmızıyı yutar`)
+    }
+  }
+  return ihlal
+}
+
 function denetle(ci: string, digerleri: Array<{ dosya: string; metin: string }>, vitestCfg: string): string[] {
-  return [...shardSecimDenetle(ci), ...olayKapanisiDenetle(ci, digerleri, vitestCfg), ...hizliYolDenetle(ci)]
+  return [...shardSecimDenetle(ci), ...olayKapanisiDenetle(ci, digerleri, vitestCfg), ...hizliYolDenetle(ci), ...ortamDenetle(ci)]
 }
 
 // ── GİRDİLER ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -393,6 +415,7 @@ const BOZULMALAR: readonly Bozulma[] = [
   // ── seçici PR'ın kendi kopyasından değil TABANDAN koşar ────────────────────────────────────────────────────────────────────────
   { ad: "seçici PR'ın KENDİ kopyasından koşar (`node scripts/ci/test-sec.cjs`): PR seçiciyi değiştirip kendi testini eler", boz: (c) => metinDegistir(c, sec(c), 'node "$d/test-sec.cjs"', 'node scripts/ci/test-sec.cjs'), beklenen: "PR'ın KENDİ seçicisini koşturuyor" },
   { ad: 'seçici merge commit’in kendisinden (HEAD:) çıkarılır: PR kopyası tabanmış gibi koşar', boz: (c) => metinDegistir(c, sec(c), 'git show HEAD^1:scripts/ci/test-sec.cjs', 'git show HEAD:scripts/ci/test-sec.cjs'), beklenen: 'TABANDAN çıkarmıyor' },
+  { ad: "SINIFLAYICI tabandan çıkarılmaz (seçici onu PR'ın kopyasından yükler: PR kodu kurulumdan ÖNCE seçici sürecinde koşar)", boz: (c) => metinDegistir(c, sec(c), ' || ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$d/degisiklik-sinifi.cjs" 2>/dev/null', ''), beklenen: 'sınıflayıcıyı' },
   { ad: 'seçici PR başından (HEAD^2:) çıkarılır', boz: (c) => metinDegistir(c, sec(c), 'git show HEAD^1:scripts/ci/test-sec.cjs', 'git show HEAD^2:scripts/ci/test-sec.cjs'), beklenen: 'TABANDAN çıkarmıyor' },
   { ad: 'HARİTA PR kopyasından okunur (PR haritayı şişirip testlerini haritaya "bağlar"): `git show` yerine çalışma ağacından kopyalanır', boz: (c) => metinDegistir(c, sec(c), 'git show HEAD^1:scripts/ci/test-haritasi.json', 'cat scripts/ci/test-haritasi.json'), beklenen: 'TABANDAN çıkarmıyor' },
   { ad: 'tabandan çıkarılan kopya koşmaz, harita yolu PR ağacına bakar (`--harita scripts/ci/test-haritasi.json`)', boz: (c) => metinDegistir(c, sec(c), '--harita "$d/test-haritasi.json"', '--harita scripts/ci/test-haritasi.json'), beklenen: '`--harita "$d/test-haritasi.json"` yok' },
@@ -486,6 +509,11 @@ const BOZULMALAR: readonly Bozulma[] = [
   // ── lifecycle betikleri: yalnız shard kurulumunda kapalı ─────────────────────────────────────────────────────────────────────
   { ad: "shard kurulumu `--ignore-scripts`i kaybeder (kökün postinstall'ı tsc'yi her shard'da yeniden koşar: ~20 sn kayıp)", boz: (c) => sd(c, shardAdim(c, 'Install dependencies'), 'run: pnpm install --prefer-offline --config.allow-scripts true --ignore-scripts', 'run: pnpm install --prefer-offline --config.allow-scripts true'), beklenen: 'shard kurulumu TAM' },
   { ad: '`ci` kurulumuna `--ignore-scripts` girer (tsc `ci` işinde gerçek tip kapısıdır, lifecycle orada kapatılmaz)', boz: (c) => sd(c, ciAdim(c, 'Install dependencies'), 'run: pnpm install --prefer-offline --config.allow-scripts true', 'run: pnpm install --prefer-offline --config.allow-scripts true --ignore-scripts'), beklenen: '`ci` kurulumu TAM' },
+
+  // ── ortam ve kabuk sızıntısı, dağıtım kimliği ────────────────────────────────────────────────────────────────────────────────────
+  { ad: 'dağıtım adımının `id`si düşer (Test adımı `kos` çıktısını okuyamaz: boş parçada vitest boş listeyle koşar)', boz: (c) => sd(c, shardAdim(c, `Test dağıtımı (shard \${{ matrix.shard }}/${N0})`), 'id: dagit', null), beklenen: '`id: dagit` değil' },
+  { ad: 'shard Test adımına `shell: sh` girer (pipefail yok: `| tee` kırmızı testi yutar)', boz: (c) => metinDegistir(c, shardAdim(c, `Test (shard \${{ matrix.shard }}/${N0})`), 'run: VENTHUB_TEST_SHARD_DOSYALARI', 'shell: sh\n        run: VENTHUB_TEST_SHARD_DOSYALARI'), beklenen: 'adım düzeyinde `shell:`' },
+  { ad: 'iş akışı düzeyinde `env: VENTHUB_TEST_SHARD_DOSYALARI` (her işin ve her testin alt süreçlerine sızar)', boz: (c) => c.replace('\njobs:\n', '\nenv:\n  VENTHUB_TEST_SHARD_DOSYALARI: C:/yok.json\njobs:\n'), beklenen: 'iş akışı düzeyinde `env:`' },
 
   // ── sıra ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   { ad: 'seçim 1/2 kurulumdan SONRAYA kayar (kurulumsuz karar verilemez: boş seçimde kurulum atlanamaz)', boz: (c) => {

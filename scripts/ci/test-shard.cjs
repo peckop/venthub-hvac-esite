@@ -16,7 +16,8 @@
  * Cetvel: docs/standards/test-karnesi-standard.md §4.2 ve §4.3. Test: scripts/ci/__tests__/test-shard.test.ts, test-shard-secim.test.ts, INV-CI-SHARD-1/2, INV-CI-SECIM-1/2.
  *
  * TEST SEÇİMİ (ALT-38e, §4.3): `--secim` grubu verilirse ve seçici çıktısı baştan sona tutarlıysa (`tam=false`, sayı = dosyadaki satır sayısı, yollar geçerli ve diskte var,
- * seçilen her dosya `vitest list`te) `vitest list` yerine SEÇİLEN dosyalar aynı LPT ile dağıtılır. Seçim YALNIZ DARALTIR: tutarsızlık, okunamayan dosya ya da eksik değer HER ZAMAN tam
+ * seçilen her dosya `vitest list`te) parça SEÇİLENLERLE SÜZÜLÜR: bölme yine `vitest list`in TAM listesindedir (dört shard işi seçimi bağımsız hesaplar; biri tam'a düşerse bölmeler ayrışıp seçilen
+ * testler düşmesin: birleşim her koşulda ⊇ seçim). Seçim YALNIZ DARALTIR: tutarsızlık, okunamayan dosya ya da eksik değer HER ZAMAN tam
  * dağıtımdır (`::warning::`); seçicinin KENDİ `tam=true` kararı da tam dağıtımdır ama meşrudur (`::notice::`). Seçim modunda boş parça meşrudur (`kos=false`); tam modda boş parça kırmızıdır. Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir).
  */
 'use strict';
@@ -190,30 +191,38 @@ function secimiCozIc({ dosya, tam, sayi }, { oku = fs.readFileSync, varMi = fs.e
 const tekSatir = (m) => String(m).replace(/[\r\n]+/g, ' ').slice(0, 300);
 
 /**
- * Hangi dosya kümesinin dağıtılacağı: seçim geçerliyse SEÇİLEN (vitest listesiyle tutarlıysa), değilse `vitest list`in tamamı.
+ * Hangi kümenin BÖLÜNECEĞİ ve seçim modunda hangi dosyaların KOŞACAĞI. Dönüş: `{ dosyalar, secilen, mod: 'secim'|'tam', uyari?: string, bilgi?: string }`:
+ * `dosyalar` bölünecek küme, `secilen` seçim modunda koşacak dosyaların kümesi (tam modda null), `bilgi` seçicinin KENDİ `tam` kararı (meşru), `uyari` çıktı tutarsızlığı ya da seçici-vitest ayrışmasıdır.
+ *
+ * KARMA KİP GÜVENCESİ (ALT-38e, çürütme bulgusu): dört shard işi seçimi BİRBİRİNDEN BAĞIMSIZ hesaplar. Biri tam'a düşer (seçici çöktü, ikinci geçiş zaman aşımı), ötekiler seçimde kalırsa
+ * bölme iki ayrı kümede yapılır ve seçilen testler HİÇBİR işte koşmaz. Bu yüzden bölme HER ZAMAN `vitest list`in TAM listesi üzerindedir (her iş AYNI bölmeyi görür); seçim yalnız kendi parçayı
+ * SÜZER. Bir iş tam'a düşse de birleşim ⊇ seçim (hiçbir seçilen test düşmez); tüm işler seçimdeyse birleşim = seçim, kesişim 0. Bedel: seçilenler parçalara tam listenin LPT'sine göre dağılır
+ * (seçimin kendi LPT'sinden dengesiz); dengeyi bozmayan çözüm tek bir yerde seçim yapmayı gerektirir.
  * Seçim modunda seçilenin her dosyası vitest'in kendi listesinde OLMALIDIR: olmayan varsa seçici ile vitest ayrışmıştır, şüphede TAM.
- * Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir). Dönüş: `{ dosyalar, mod: 'secim'|'tam', uyari?: string, bilgi?: string }`:
- * `bilgi` seçicinin KENDİ `tam` kararı (meşru), `uyari` çıktı tutarsızlığı ya da seçici-vitest ayrışmasıdır (`::warning::`).
+ * Boş seçimde `vitest list` ÇAĞRILMAZ (kurulum atlanmış olabilir): küme boş, parça boştur; tam'a düşen bir işin bölmesini etkilemez.
  */
 function kumeyiBelirle(secim, listele, secimGirdisi) {
-  if (!secim) return { dosyalar: listele(), mod: 'tam' };
+  if (!secim) return { dosyalar: listele(), secilen: null, mod: 'tam' };
   const karar = secimiCoz(secim, secimGirdisi);
   if (karar.mod === 'tam') {
     const mesaj = `seçim kullanılmadı, TAM paket dağıtılıyor: ${karar.neden}`;
-    return karar.mesru ? { dosyalar: listele(), mod: 'tam', bilgi: mesaj } : { dosyalar: listele(), mod: 'tam', uyari: mesaj };
+    return karar.mesru ? { dosyalar: listele(), secilen: null, mod: 'tam', bilgi: mesaj } : { dosyalar: listele(), secilen: null, mod: 'tam', uyari: mesaj };
   }
-  if (karar.dosyalar.length === 0) return { dosyalar: [], mod: 'secim' };
+  if (karar.dosyalar.length === 0) return { dosyalar: [], secilen: new Set(), mod: 'secim' };
   const liste = listele();
   const bilinen = new Set(liste);
   const yabanci = karar.dosyalar.filter((d) => !bilinen.has(d));
-  if (yabanci.length > 0) return { dosyalar: liste, mod: 'tam', uyari: `seçim kullanılmadı, TAM paket dağıtılıyor: seçilen ${yabanci.length} dosya vitest listesinde yok (örn. ${yabanci[0]})` };
-  return { dosyalar: karar.dosyalar, mod: 'secim' };
+  if (yabanci.length > 0) {
+    return { dosyalar: liste, secilen: null, mod: 'tam', uyari: `seçim kullanılmadı, TAM paket dağıtılıyor: seçilen ${yabanci.length} dosya vitest listesinde yok (örn. ${yabanci[0]})` };
+  }
+  return { dosyalar: liste, secilen: new Set(karar.dosyalar), mod: 'secim' };
 }
 
 /**
  * Komut satırı çekirdeği. `g` test için enjekte edilir. Dönüş: çıkış kodu (0 yeşil, 1 kırmızı). ASLA sessizce başarısız olmaz.
  * TAM modda boş parça KIRMIZIDIR (bölme geçersiz). SEÇİM modunda (`--secim` grubu geçerliyse) boş parça meşrudur: seçilen az olabilir; o zaman parça `[]` yazılır,
  * `kos=false` çıktısı verilir ve ci.yml o parçada vitest koşturmaz. `$GITHUB_OUTPUT`a `kos=true|false` YALNIZ `--secim` grubu verildiyse yazılır.
+ * Bölme tam liste üzerindedir, seçim parçayı süzer (karma kip güvencesi: `kumeyiBelirle`).
  */
 function main(argv = process.argv.slice(2), g = {}) {
   const { listele = vitestListesi, sureOku = sureleriOku, yaz = fs.writeFileSync, log = (m) => process.stdout.write(`${m}\n`), ortam = process.env, ekle = fs.appendFileSync, secimGirdisi = {} } = g;
@@ -221,21 +230,24 @@ function main(argv = process.argv.slice(2), g = {}) {
     const { shard, toplam, cikti, secim } = argumanlar(argv);
     if (shard < 1 || shard > toplam) throw new Error(`--shard ${shard}, 1..${toplam} aralığında olmalı`);
     const sure = sureOku();
-    const { dosyalar, mod, uyari, bilgi } = kumeyiBelirle(secim, listele, secimGirdisi);
+    const { dosyalar, secilen, mod, uyari, bilgi } = kumeyiBelirle(secim, listele, secimGirdisi);
     if (uyari) log(`::warning::test shard: ${tekSatir(uyari)}`);
     if (bilgi) log(`::notice::test shard: ${tekSatir(bilgi)}`);
-    const { gruplar, yuk } = dagit(dosyalar, sure, toplam);
-    const benim = gruplar[shard - 1];
+    const { gruplar, yuk: tamYuk } = dagit(dosyalar, sure, toplam);
+    const benim = secilen ? gruplar[shard - 1].filter((d) => secilen.has(d)) : gruplar[shard - 1];
     if (benim.length === 0 && mod === 'tam') throw new Error(`shard ${shard}/${toplam} BOŞ (${dosyalar.length} dosya): bölme geçersiz`);
     yaz(cikti, `${JSON.stringify(benim)}\n`);
     if (secim) kosCiktisiniYaz(benim.length > 0, ortam, ekle, log);
     if (benim.length === 0) {
-      log(`::notice::test shard ${shard}/${toplam} (seçim): bu parçaya test düşmedi (seçilen ${dosyalar.length} dosya); vitest koşmaz, iş yeşil biter`);
+      log(`::notice::test shard ${shard}/${toplam} (seçim): bu parçaya test düşmedi (seçilen ${secilen.size} dosya); vitest koşmaz, iş yeşil biter`);
       return 0;
     }
+    // Seçim modunda ağırlıklar yalnız SEÇİLENLER içindir (parçalara tam listenin bölmesine göre dağıldıkları için dengesizlik burada görünür).
+    const agirlik = (d) => (sure.sureler.has(d) ? sure.sureler.get(d) : sure.varsayilan);
+    const yuk = secilen ? gruplar.map((grup) => grup.reduce((s, d) => (secilen.has(d) ? s + agirlik(d) : s), 0)) : tamYuk;
     const ort = yuk.reduce((a, b) => a + b, 0) / toplam;
     const etiket = mod === 'secim' ? ' (seçim)' : '';
-    log(`::notice::test shard ${shard}/${toplam}${etiket}: ${benim.length} dosya, ağırlık ${yuk[shard - 1].toFixed(1)} sn (tüm shard'lar: ${yuk.map((y) => y.toFixed(0)).join(' / ')}; en yüklü/ortalama ${(Math.max(...yuk) / ort).toFixed(2)}; toplam ${dosyalar.length} dosya)`);
+    log(`::notice::test shard ${shard}/${toplam}${etiket}: ${benim.length} dosya, ağırlık ${yuk[shard - 1].toFixed(1)} sn (tüm shard'lar: ${yuk.map((y) => y.toFixed(0)).join(' / ')}; en yüklü/ortalama ${(ort > 0 ? Math.max(...yuk) / ort : 1).toFixed(2)}; toplam ${secilen ? secilen.size : dosyalar.length} dosya)`);
     return 0;
   } catch (e) {
     log(`::error::test shard dağıtımı BAŞARISIZ: ${tekSatir(e && e.message ? e.message : e)}`);
