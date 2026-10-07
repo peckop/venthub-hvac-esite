@@ -197,14 +197,20 @@ jobs:
 
       # ── ALT-38f · (2) WEBPACK DERLEME ÖNBELLEĞİ (e2e'ye ÖZGÜ) ────────────────────────────────────────────────────────
       # `ci`nin önbelleğinden AYRI anahtar öneki: bu iş GERÇEK Supabase env'iyle derler (ci sahte env, 132 sayfa; burada 282), çıktılar farklıdır.
-      # YALNIZ `.next/cache/webpack`: `.next/cache` bütününü saklamak `fetch-cache`i de geri yükler; `unstable_cache` ile okunan CANLI veri
-      # (ana sayfa, kategori, marka, ürünler; revalidate 3600) önceki koşunun verisiyle sayfaya girerdi. Bu iş canlı veriyle derlemeyi vaat eder.
-      # Webpack girdileri içerik özetiyle doğrular: bayat girdi yok sayılır, sonuç değişmez (yalnız hız). Koşul Build ile BİREBİR aynı.
+      # ÜÇ yol, `.next/cache` BÜTÜNÜ DEĞİL: `fetch-cache`i geri yüklemek `unstable_cache` ile okunan CANLI veriyi (ana sayfa, kategori, marka, ürünler;
+      # revalidate 3600) önceki koşunun verisiyle sayfaya sokardı; bu iş canlı veriyle derlemeyi vaat eder.
+      # ⚠ `webpack/` TEK BAŞINA YETMEZ (2026-10-07, PR #1742 ikinci koşuda ÖLÇÜLDÜ: önbellek geri yüklendi, derleme 91 sn → 89 sn, kazanç sıfır): Next her derlemede
+      # rastgele bir sunucu-eylemi şifreleme anahtarı üretir, SWC yükleyicisinin seçeneklerine ve webpack önbellek kimliğine katar. Anahtar `.next/cache/.rscinfo`da
+      # 14 gün saklanır; geri yüklenmezse HER derlemede kimlik değişir ve webpack önbelleği hiç isabet etmez. `.previewinfo` aynı sınıf (önizleme anahtarları).
+      # Önbellek yalnız hızdır: webpack girdileri içerik özetiyle doğrular, bayat girdi yok sayılır. Koşul Build ile BİREBİR aynı.
       - name: Next.js derleme onbellegi (e2e)
         if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
-          path: ${{ github.workspace }}/.next/cache/webpack
+          path: |
+            ${{ github.workspace }}/.next/cache/webpack
+            ${{ github.workspace }}/.next/cache/.rscinfo
+            ${{ github.workspace }}/.next/cache/.previewinfo
           key: e2e-nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**', 'next.config.mjs') }}
           restore-keys: e2e-nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 

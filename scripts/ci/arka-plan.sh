@@ -74,6 +74,12 @@ baslat() {
   echo "arka-plan: '$AD' baslatildi (pid $!): $*"
 }
 
+# Süreç yaşıyor mu? pid POZİTİF TAM SAYI olmalı: `kill -0 0` mevcut sürecin GRUBUNA sinyal verir ve HEP başarılıdır (pid dosyası yok ya da bozuksa
+# "yaşıyor" sanılır, bekle süre dolana kadar boşuna bekler ve yedek koşu hiç devreye girmezdi).
+yasiyor() {
+  [[ "${1:-}" =~ ^[1-9][0-9]*$ ]] && kill -0 "$1" 2>/dev/null
+}
+
 yedek_kos() {
   echo "::warning title=arka-plan::'$AD' sonuc yazmadan OLDU (runner arka plan islemini oldurmus olabilir): komut ON PLANDA yeniden kosuyor"
   yazdir_gunluk
@@ -93,11 +99,11 @@ bekle() {
   fi
   local bas pid son bekleme_bas
   bas="$(cat "$ONEK.baslangic")"
-  pid="$(cat "$ONEK.pid" 2>/dev/null || echo 0)"
+  pid="$(cat "$ONEK.pid" 2>/dev/null || true)"
   son=$((bas + toplam))
   bekleme_bas="$(date +%s)"
   while [ ! -f "$ONEK.cikis" ]; do
-    if ! kill -0 "$pid" 2>/dev/null; then
+    if ! yasiyor "$pid"; then
       # Süreç yok: sonucu ölümden hemen önce yazmış olabilir (yarış). Dosya yoksa mekanizma bozulmuştur → yedek koşu.
       [ -f "$ONEK.cikis" ] && break
       local yedek_kodu=0

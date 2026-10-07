@@ -9,9 +9,11 @@ import { describe, expect, it } from 'vitest'
  * INV-E2E-HIZLI-3 · e2e-smoke'ta paralel apt, webpack önbelleği ve kapının yeri (ALT-38f).
  *
  * NİÇİN VAR: `admin-smoke` işinde (a) `playwright install-deps` Build ile PARALEL arka planda koşar, sonucu Build'ten sonra `bekle` toplar;
- * (b) `.next/cache/webpack` e2e'ye ÖZGÜ anahtarla önbelleğe alınır. İkisi de kapıyı gevşetebilecek yerlerdir: paralel apt'nin sonucu beklenmeden tarayıcı
- * probu koşarsa ya da prob en-iyi-çabaya düşerse eksik kütüphanede iş SESSİZ yeşil olabilir; önbellek anahtarı `ci`ninkiyle çakışırsa sahte-env çıktısı gerçek-env
- * derlemesine karışır; önbelleğe `fetch-cache` girerse canlı veri bayat gelir. Bu dosya o yerleri ölçer ve bilerek bozulmuş kopyada kırmızı verdiğini kanıtlar.
+ * (b) `.next/cache/webpack` + `.rscinfo` + `.previewinfo` e2e'ye ÖZGÜ anahtarla önbelleğe alınır. İkisi de kapıyı gevşetebilecek ya da kazancı sessizce sıfırlayabilecek
+ * yerlerdir: paralel apt'nin sonucu beklenmeden tarayıcı probu koşarsa ya da prob en-iyi-çabaya düşerse eksik kütüphanede iş SESSİZ yeşil olabilir; önbellek anahtarı
+ * `ci`ninkiyle çakışırsa sahte-env çıktısı gerçek-env derlemesine karışır; önbelleğe `fetch-cache` girerse canlı veri bayat gelir; `.rscinfo` (Next'in şifreleme anahtarı,
+ * webpack önbellek kimliğine girer) saklanmazsa önbellek geri yüklenir ama HİÇ isabet etmez (ilk sürümde ölçüldü: derleme 91 sn → 89 sn). Bu dosya o yerleri ölçer ve
+ * bilerek bozulmuş kopyada kırmızı verdiğini kanıtlar.
  * Sınıf koşulları (INV-CI-SINIF-1) ve `ci-install-bounded` (INV-CI-INSTALL-1) ayrı dosyalarda durur; burada TEKRAR edilmez.
  * Ölçüm yüzeyi: `node:fs` + satır taraması (YAML ayrıştırıcı yok; girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8). İş akışlarını DEĞİŞTİRMEZ.
  */
@@ -60,16 +62,16 @@ function adimlar(metin: string, isId: string): Adim[] {
       const k = /^ {8}([A-Za-z0-9_-]+):\s?(.*)$/.exec(sat[i])
       if (!k) continue
       a.anahtarlar.set(k[1], k[2].trim())
-      const altSatirlar = (): string[] => {
-        const g: string[] = []
-        for (let j = i + 1; j < sat.length && /^ {10}\S/.test(sat[j]); j++) g.push(sat[j])
-        return g
-      }
       if (k[1] === 'with' || k[1] === 'env') {
         const hedef = k[1] === 'with' ? a.girdiler : a.env
-        for (const g of altSatirlar()) {
-          const e = /^ {10}([A-Za-z0-9_-]+):\s?(.*)$/.exec(g)
-          if (e) hedef.set(e[1], e[2].trim())
+        let son: string | null = null
+        // girinti 10 = girdi anahtarı; girinti 12 = blok skaler (`path: |`) içeriği: değere `\n` ile eklenir
+        for (let j = i + 1; j < sat.length && /^ {10}/.test(sat[j]); j++) {
+          const e = /^ {10}([A-Za-z0-9_-]+):\s?(.*)$/.exec(sat[j])
+          if (e) {
+            son = e[1]
+            hedef.set(son, e[2].trim())
+          } else if (son !== null && /^ {12}\S/.test(sat[j])) hedef.set(son, `${hedef.get(son) ?? ''}\n${sat[j].trim()}`)
         }
       }
       if (k[1] === 'run') {
@@ -98,6 +100,13 @@ const AD = {
 } as const
 
 const CI_ONBELLEK_ADI = 'Next.js derleme önbelleği'
+
+/** e2e-smoke.yml'deki derleme önbelleği `path` bloğu (birebir; sabotaj dönüşümleri bunu değiştirir). */
+const ONBELLEK_YOL_BLOGU =
+  '          path: |\n' +
+  '            ${{ github.workspace }}/.next/cache/webpack\n' +
+  '            ${{ github.workspace }}/.next/cache/.rscinfo\n' +
+  '            ${{ github.workspace }}/.next/cache/.previewinfo\n'
 
 /** `${{ runner.os }}` → Linux; `${{ hashFiles(args) }}` → args'a bağlı kararlı özet. Aynı argüman = aynı belirteç (iki iş akışının anahtarları karşılaştırılabilsin). */
 function somutlastir(ifade: string): string {
@@ -179,8 +188,18 @@ function kurulumDenetle(e2e: string, ci: string): string[] {
   // (d) webpack önbelleği
   const onbellek = bul(AD.nextCache) as Adim
   if (!/^actions\/cache@[0-9a-f]{40}\b/.test(onbellek.anahtarlar.get('uses') ?? '')) ihlal.push('ÖNBELLEK: `actions/cache@<40 haneli SHA>` ile kullanılmıyor (sabitleme)')
-  const yol = onbellek.girdiler.get('path') ?? ''
-  if (!/\/\.next\/cache\/webpack$/.test(yol)) ihlal.push(`ÖNBELLEK: path "${yol}" yalnız \`.next/cache/webpack\` değil: bütün \`.next/cache\` canlı veriyi tutan \`fetch-cache\`i de geri yükler (bayat veri)`)
+  const yollar = (onbellek.girdiler.get('path') ?? '')
+    .split('\n')
+    .map((s) => s.trim())
+    .filter((s) => s !== '' && s !== '|')
+  const onbellekYolu = (ad: string): string => `\${{ github.workspace }}/.next/cache/${ad}`
+  if (!yollar.includes(onbellekYolu('webpack'))) ihlal.push('ÖNBELLEK: `.next/cache/webpack` yolu yok (derleme önbelleği saklanmıyor)')
+  if (!yollar.includes(onbellekYolu('.rscinfo'))) {
+    ihlal.push('ÖNBELLEK: `.next/cache/.rscinfo` yolu yok: Next her derlemede rastgele bir şifreleme anahtarı üretip webpack önbellek kimliğine katar, anahtar geri yüklenmezse önbellek HİÇ isabet etmez (ölçüldü: derleme 91 sn → 89 sn, kazanç sıfır)')
+  }
+  if (!yollar.includes(onbellekYolu('.previewinfo'))) ihlal.push('ÖNBELLEK: `.next/cache/.previewinfo` yolu yok (önizleme anahtarları her derlemede değişir)')
+  const fazla = yollar.filter((y) => ![onbellekYolu('webpack'), onbellekYolu('.rscinfo'), onbellekYolu('.previewinfo')].includes(y))
+  if (fazla.length > 0) ihlal.push(`ÖNBELLEK: beklenmeyen yol ${JSON.stringify(fazla)}: bütün \`.next/cache\` ya da \`fetch-cache\` canlı veriyi önceki koşudan geri yükler (bayat veri); yalnız webpack + .rscinfo + .previewinfo`)
   const anahtar = onbellek.girdiler.get('key') ?? ''
   const geri = onbellek.girdiler.get('restore-keys') ?? ''
   if (!anahtar.startsWith('e2e-nextjs-')) ihlal.push(`ÖNBELLEK: anahtar "e2e-nextjs-" ile başlamıyor (bulunan "${anahtar}"): ci'nin sahte-env çıktısıyla çakışır`)
@@ -291,8 +310,18 @@ describe('INV-E2E-HIZLI-3 · paralel apt, derleme önbelleği ve kapının yeri'
     },
     {
       ad: 'derleme önbelleği bütün `.next/cache`i tutar (fetch-cache ile canlı veri bayatlar)',
-      boz: (c) => c.replace('path: ${{ github.workspace }}/.next/cache/webpack', 'path: ${{ github.workspace }}/.next/cache'),
+      boz: (c) => c.replace(ONBELLEK_YOL_BLOGU, '          path: ${{ github.workspace }}/.next/cache\n'),
       beklenen: 'fetch-cache',
+    },
+    {
+      ad: 'önbellek yalnız webpack/ (ilk sürümün hatası: şifreleme anahtarı saklanmaz, önbellek hiç isabet etmez)',
+      boz: (c) => c.replace(ONBELLEK_YOL_BLOGU, '          path: ${{ github.workspace }}/.next/cache/webpack\n'),
+      beklenen: '`.next/cache/.rscinfo` yolu yok',
+    },
+    {
+      ad: 'önbelleğe fetch-cache eklenir (canlı veri önceki koşudan gelir)',
+      boz: (c) => c.replace(ONBELLEK_YOL_BLOGU, `${ONBELLEK_YOL_BLOGU}            \${{ github.workspace }}/.next/cache/fetch-cache\n`),
+      beklenen: 'beklenmeyen yol',
     },
     {
       ad: 'önbellek anahtarı ci ile aynı biçime döner (sahte-env çıktısı karışır)',

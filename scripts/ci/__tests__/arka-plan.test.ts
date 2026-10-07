@@ -135,6 +135,25 @@ const oluYedek: Kontrol = async (betik) => {
   }
 }
 
+/** SÖZ 3b · pid dosyası yok/sıfır/bozuksa süreç YAŞIYOR sanılmaz (`kill -0 0` hep başarılıdır): bekle süre dolana kadar asılmaz, yedek koşu devreye girer. */
+const pidBozuk: Kontrol = async (betik) => {
+  const d = gecici('pid')
+  try {
+    for (const [ad, icerik] of [['sifir', '0\n'], ['bos', ''], ['harf', 'abc\n']] as const) {
+      const sistem = `p-${ad}`
+      writeFileSync(path.join(d, `${sistem}.baslangic`), `${Math.floor(Date.now() / 1000)}\n`)
+      writeFileSync(path.join(d, `${sistem}.pid`), icerik)
+      writeFileSync(path.join(d, `${sistem}.komut`), "bash -c 'echo yedek-kosu; exit 3' \n")
+      const w = kos(betik, d, ['bekle', sistem, '6'])
+      if (w.status !== 3) return `pid "${icerik.trim()}" iken çıkış ${w.status}, beklenen 3 (süreç yaşıyor sanıldı: yedek koşu devreye girmedi)`
+      if (!w.stdout.includes('yedek-kosu')) return `pid "${icerik.trim()}" iken yedek koşu çıktısı yok`
+    }
+    return null
+  } finally {
+    temizle(d)
+  }
+}
+
 /** SÖZ 4 · aynı ad ikinci kez başlatılınca ESKİ sonuç yeni koşuya karışmaz. */
 const eskiSonucKarismaz: Kontrol = async (betik) => {
   const d = gecici('eski')
@@ -156,6 +175,7 @@ const KONTROLLER: Array<[string, Kontrol]> = [
   ['bekle komutun çıkış kodunu aynen taşır ve günlüğü yazdırır', cikisKodu],
   ['bekle: süre dolunca 124, başlatılmamışsa 125, geçersiz adda 2', sureVeHatalar],
   ['öldürülen arka plan işlemi ön planda yeniden koşar (alıntı + ortam korunur, uyarı verir)', oluYedek],
+  ['pid dosyası yok/sıfır/bozuksa süreç yaşıyor sanılmaz (yedek koşu devreye girer)', pidBozuk],
   ['aynı ad yeniden başlatılınca eski sonuç karışmaz', eskiSonucKarismaz],
 ]
 
@@ -228,6 +248,12 @@ describe.skipIf(BASH === null)('INV-E2E-HIZLI-4 · arka-plan.sh gerçek bash ile
       boz: (m) => m.replace("printf '%q ' \"$@\"", "printf '%s ' \"$@\""),
       kontrol: oluYedek,
       beklenen: 'beklenen 4',
+    },
+    {
+      ad: 'pid doğrulaması kalkar (`kill -0 0` süreç grubuna sinyal verir: pid 0 "yaşıyor" sanılır, bekle boşuna asılır)',
+      boz: (m) => m.replace('[[ "${1:-}" =~ ^[1-9][0-9]*$ ]] && kill -0 "$1" 2>/dev/null', 'kill -0 "$1" 2>/dev/null'),
+      kontrol: pidBozuk,
+      beklenen: 'süreç yaşıyor sanıldı',
     },
     {
       ad: 'eski sonuç dosyası temizlenmez (aynı ad yeniden başlatılınca bayat kod okunur)',
