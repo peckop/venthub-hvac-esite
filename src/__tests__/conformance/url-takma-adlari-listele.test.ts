@@ -233,12 +233,14 @@ type PgliteKurucu = new () => PgliteDb
 /** PGlite'ı yükler; yoksa null. Depoya bağımlılık ekli değil: `PGLITE_GIRIS` (dist/index.js) ya da paket adı. */
 async function pgliteYukle(): Promise<PgliteKurucu | null> {
   const giris = (process.env.PGLITE_GIRIS ?? '').trim()
-  const paketAdi = '@electric-sql/pglite'
   try {
-    // Değişken belirteç: Vite derleme anında çözmeye çalışıp paket yokken dosyanın TAMAMINI düşürmesin.
+    // INV-KAPI-IMPORT-1 (kapi-import-guvenligi.test.ts): `await import(` sonrası ya TIRNAKLI belirteç ya da pathToFileURL/.href
+    // olmalı; ham değişken yol YASAK. Paket adı bu yüzden LİTERAL yazılır. Paket yokken (depoda bağımlılık değil) dinamik
+    // import çalışma anında reddedilir ve aşağıdaki catch null döndürür; Vite SSR eksik paketi Node'a bırakır, dosya düşmez.
+    // `as string`: paket depoda YOK, çıplak literal tsc'de TS2307 verir (CI "Type check"); tür iddiası belirteci çözülmez yapar.
     const modul: unknown = giris
       ? await import(/* @vite-ignore */ pathToFileURL(giris).href)
-      : await import(/* @vite-ignore */ paketAdi)
+      : await import(/* @vite-ignore */ '@electric-sql/pglite' as string)
     const kurucu = (modul as { PGlite?: unknown }).PGlite
     return typeof kurucu === 'function' ? (kurucu as PgliteKurucu) : null
   } catch {
