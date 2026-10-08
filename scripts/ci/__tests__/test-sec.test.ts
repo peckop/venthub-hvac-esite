@@ -1106,8 +1106,14 @@ describe('INV-TEST-SEC-1 · 6. içe aktarma grafiğinin paralel kurulumu (doğru
 
   it('işçi kipi (`--ice-isci`): geçersiz ya da eksik argüman, parça i >= n ve vitest çözülemeyen kök ÇIKIŞ 1 verir, stdout\'a JSON YAZMAZ (üst süreç sıralıya düşer; CI çıkış-0 sözleşmesi bu kipte geçerli değil)', () => {
     const bosKok = mkdtempSync(path.join(tmpdir(), 'test-sec-isci-'))
+    // Hermetik ortam: pnpm'in `vitest` kabuğu (`pnpm test`, `pnpm exec vitest`) NODE_PATH'e vitest'in sanal-depo yolunu koyar ve çocuk süreç bunu miras alır;
+    // `createRequire(kök).resolve` NODE_PATH'i de tarar, yani BOŞ kökte bile `vitest/node` "çözülür", işçi çıkış 0 verir (CI test-shard 4/4 kırmızısı, koşu
+    // 37628802492; yerelde `node vitest.mjs` kabuksuz başladığı için geçiyordu). Sözleşme "KÖKÜN kendi node_modules'ında vitest yoksa çıkış 1" olduğundan sınanan
+    // süreçte NODE_PATH yoktur (Windows'ta ad büyük/küçük harf duyarsızdır).
+    const ortam: NodeJS.ProcessEnv = {}
+    for (const [ad, deger] of Object.entries(process.env)) if (ad.toUpperCase() !== 'NODE_PATH') ortam[ad] = deger
     for (const argv of [['--ice-isci'], ['--ice-isci', '--kok', bosKok], ['--ice-isci', '--kok', bosKok, '--parca', '5/2'], ['--ice-isci', '--kok', bosKok, '--parca', 'x/y'], ['--ice-isci', '--kok', bosKok, '--parca', '0/2']]) {
-      const r = spawnSync(process.execPath, [KAYNAK_YOLU, ...argv], { encoding: 'utf8' })
+      const r = spawnSync(process.execPath, [KAYNAK_YOLU, ...argv], { encoding: 'utf8', env: ortam })
       expect(r.status, argv.join(' ')).toBe(1)
       expect(r.stdout, argv.join(' ')).toBe('')
       expect(r.stderr, argv.join(' ')).toMatch(/\[test-sec isci\] HATA/)
