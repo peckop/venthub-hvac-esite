@@ -477,7 +477,7 @@ kuralları AYNEN geçerlidir: zaman damgası yok, anahtarlar sıralı, LF, araç
 | `noktalar` · `nokta_sayisi` | `[[Q m³/h, P Pa], …]`, Q artan, 0,1'e yuvarlı |
 | `kalibrasyon` | eksen etiketlerinden uydurulan doğrunun azami artığı (Q, P) |
 | `cipa` · `sapma_pct` | doğrulama çıpası (kitapçıktaki azami değer) ve ölçülen sapma |
-| `kapi` | `tuttu` · `tutmadi` · `cipasiz` · `monoton_degil` |
+| `kapi` | `tuttu` · `tutmadi` · `cipasiz` · `monoton_degil` · `okunamadi` (bölgede seçilen renkte çizgi bulunamadı) |
 | `faz1_girer` | yalnız `kapi = tuttu` olan eğri veritabanına girmeye aday; geri kalanı çıkarılır ama girmez |
 | `girdi_ozeti` | `sha256(pdf_hash + okuma tarifi + araç sürümü)`; aynı özet → yeniden çıkarım YOK |
 
@@ -501,7 +501,9 @@ monoton azalmalı. Çıpa olarak kitapçıktaki azami değer tablosu kullanılı
 | Nicotra ADH s.8 | vektör, log-log nomogram | çıkarım DENENMEDİ: çok eğrili log-log, azami değer tablosu yok → ayrı kart |
 | SEAT 15 fişi s.2 | raster, 1094×1076 px (≈180 dpi), yarı-log | 3 eğri (2870 · 1450 · 930 d/dk) 15 · 8 · 5 nokta; kalibrasyon artığı Q ±2,1 m³/h, P %0,48; kapı SINANAMADI (fişte azami değer tablosu yok) → `cipasiz` |
 
-**Betik.** `scripts/kaynak_dizini/egri_cikar.py` (ingestor, `cikar.py`'nin yanında). Sınav:
+**Betik.** `scripts/kaynak_dizini/egri_cikar.py` (ingestor, `cikar.py`'nin yanında; peckop/venthub-pdf-ingestor#1).
+`python scripts/kaynak_dizini/egri_cikar.py --kontrol` bayat ya da eksik okumayı adıyla basar. İlk profil Faz 0
+sayfası: Vortice LINEO 315 V0, maks hız sapma %0,12 · min hız sapma %0,47, ikisi `tuttu`. Sınav:
 `scripts/kaynak_dizini/testler/egri_cikar_sinavi.py` (CI, yalnız stdlib: kalibrasyon, kapı, determinizm,
 sabotaj) ve `egri_cikar_pdf_sinavi.py` (yerel, PyMuPDF ile sentetik PDF).
 
