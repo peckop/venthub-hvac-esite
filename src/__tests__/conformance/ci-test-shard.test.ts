@@ -25,6 +25,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  *   7. `actions: read` düşer: bekleyici koşunun işlerini okuyamaz, `ci` her PR'da kırmızı kalır,
  *   8. dağıtımın kendisi bozulur: bir test dosyası hiçbir shard'a girmez, iki shard'a girer ya da shard'ın dosya listesi `vitest list`ten farklı olur (INV-CI-SHARD-2).
  * "Dışarıda" olan dünya durumu testleri kapsama dahil edilir: shard'lar ∪ dünya durumu listesi = tam paket (kip boş, `vitest list`).
+ * ALT-38e (test seçimi, §4.3): dağıtım (`Test dağıtımı`) ve vitest koşumu (`Test`) AYRI adımlardır; kurulum, dağıtım ve Test yalnız seçim kendiliğinden boş değilken, Test ayrıca parçaya test düştüyse koşar.
+ * `if` bu adımlarda YALNIZ beklenen TAM satırla serbesttir (aşağıdaki `shardAdimKosulu`); Test'in ortamında `SHARD`/`SECIM_*` YOKTUR (alt süreçlere sızmasın). Seçim adımlarının gövdesi ve davranışı: ci-test-secimi*.test.ts.
  *
  * Ölçüm yüzeyi: `node:fs` + satır taraması (YAML ayrıştırıcı yok; girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8, env 10) + alt süreçte
  * `vitest list --filesOnly --json` (ağ yok, test KOŞMAZ). ci.yml'i DEĞİŞTİRMEZ. Sabotaj testleri YAML metnini BELLEKTE bozar ve denetimin KIRMIZI verdiğini ölçer.
@@ -73,6 +75,20 @@ const TEST_IF = `if: steps.ayna.outputs.atla != 'true' && !(${SHARD_OLAYI})`
 const BEKLE_ADI = 'Test shard sonuçları (bekle ve doğrula)'
 const BEKLE_RUN = 'run: node scripts/ci/test-shard-bekle.cjs'
 const SHARD_TEST_ONEKI = 'Test (shard '
+/** ALT-38e: dağıtım Test adımından AYRILDI (boş parçada vitest koşmasın diye `kos` çıktısı verir); `test-shard.cjs` yalnız bu adımda çağrılır. */
+const SHARD_DAGIT_ONEKI = 'Test dağıtımı (shard '
+/**
+ * ALT-38e: kurulum, seçim 2/2, dağıtım ve Test YALNIZ seçim kendiliğinden BOŞ değilken koşar: `bos` çıktısı TAM `true` değilse (eksik, boş ya da başka değer: KOŞAR). Seçicinin ham çıktısı koşulda kullanılmaz:
+ * GitHub eşitsiz türleri sayıya çevirir (null ve '0' ikisi de 0), `secilen-sayisi != '0'` eksik çıktıda "atla" derdi. Seçim adımlarının gövdeleri, olay kapanışları ve sabotajları: ci-test-secimi.test.ts (INV-CI-SECIM-1).
+ */
+const SECIM_KURULUM = "steps.sec.outputs.bos != 'true'"
+const SHARD_KOSULLU_ADIMLAR = ['Setup Deno', 'Install dependencies', 'Node derleme önbelleği (V8 bayt kodu)', 'Test seçimi (tabandan, vitest ile)']
+/** Shard adımının beklenen `if:` satırı; null = adımda HİÇ `if:` olmamalı (atlanabilir adım shard'ı testsiz YEŞİL bitirir). */
+function shardAdimKosulu(ad: string): string | null {
+  if (SHARD_KOSULLU_ADIMLAR.includes(ad) || ad.startsWith(SHARD_DAGIT_ONEKI)) return `if: ${SECIM_KURULUM}`
+  if (ad.startsWith(SHARD_TEST_ONEKI)) return `if: ${SECIM_KURULUM} && steps.dagit.outputs.kos != 'false'`
+  return null
+}
 /** test-shard işinde bulunabilecek job düzeyi anahtarlar: başkası (needs, continue-on-error, environment, permissions...) bilinçle eklenir. */
 const IS_ANAHTARLARI = ['name', 'if', 'runs-on', 'timeout-minutes', 'strategy', 'defaults', 'steps']
 const IS_ANAHTARI_NEDENI: Record<string, string> = {
@@ -83,14 +99,27 @@ const IS_ANAHTARI_NEDENI: Record<string, string> = {
 }
 /** Komutun hatasını yutan kuyruklar: `|| true`, `|| :`, `|| exit 0`, `; true`. */
 const HATA_YUTAN = /\|\|\s*(?:true\b|:(?:\s|$)|exit\s+0\b)|;\s*true\s*$/
-/** Shard Test adımının ortamı: TAM küme ve TAM değer. */
+/**
+ * Shard Test adımının ortamı: TAM küme ve TAM değer. ALT-38e: `SHARD` ve `SECIM_*` burada YOKTUR (yalnız dağıtım adımındadır): testlerin koştuğu adımın ortamındaki her değişken ALT SÜREÇLERE MİRAS KALIR
+ * (canlı ders: #1741 koşu 2, test-shard (1/4) kırmızı); bu yüzden Test adımının ortamı en küçük kümede tutulur.
+ */
 const SHARD_TEST_ENV: Record<string, string> = {
-  SHARD: '${{ matrix.shard }}',
   VENTHUB_DUNYA_DURUMU: 'dislan',
   NODE_COMPILE_CACHE: '${{ runner.temp }}/node-compile-cache',
 }
-const KOMUT_DAGIT = (n: number): string => `node scripts/ci/test-shard.cjs --shard "$SHARD" --toplam ${n} --cikti "$RUNNER_TEMP/shard.json"`
+/** Dağıtım adımının ortamı: seçici çıktısı (`secv` adımı) argüman olarak değil ENV olarak okunur (kabuğa `${{ }}` gömülmez: enjeksiyon). */
+const SHARD_DAGIT_ENV: Record<string, string> = {
+  SHARD: '${{ matrix.shard }}',
+  VENTHUB_DUNYA_DURUMU: 'dislan',
+  SECIM_TAM: '${{ steps.secv.outputs.tam }}',
+  SECIM_SAYI: '${{ steps.secv.outputs.secilen-sayisi }}',
+}
+const KOMUT_DAGIT = (n: number): string =>
+  `node scripts/ci/test-shard.cjs --shard "$SHARD" --toplam ${n} --cikti "$RUNNER_TEMP/shard.json" --secim "$RUNNER_TEMP/secilen.txt" --secim-tam "$SECIM_TAM" --secim-sayi "$SECIM_SAYI"`
 const KOMUT_KOS = 'VENTHUB_TEST_SHARD_DOSYALARI="$RUNNER_TEMP/shard.json" pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log'
+/** Tek satırlık `run:` anahtar satırları (adımlar artık blok değil, tek komut taşır). */
+const RUN_DAGIT = (n: number): string => `run: ${KOMUT_DAGIT(n)}`
+const RUN_KOS = `run: ${KOMUT_KOS}`
 /** Bekleme adımının ortamı (SHARD_TOPLAM hariç: değeri matrix sayısından türer). */
 const BEKLE_ENV_SABIT: Record<string, string> = {
   GH_TOKEN: '${{ github.token }}',
@@ -212,16 +241,10 @@ const isAdimlari = (metin: string, isId: string): Adim[] => {
   return is ? adimlariAyir(s, is) : []
 }
 
-/** Adımın `run: |` gövdesinin KOMUT satırları (girinti, boş satır ve kabuk yorumu atılmış). `run:` blok değilse null. */
-function runKomutlari(a: Adim): string[] | null {
-  const r = a.anahtarlar.find((k) => k.anahtar === 'run')
-  if (!r || !/^[|>][-+]?$/.test(r.deger)) return null
-  const govde: string[] = []
-  for (const s of a.satirlar.slice(r.no - a.bas + 1)) {
-    if (!bosMu(s) && girinti(s) <= 8) break
-    govde.push(s)
-  }
-  return govde.map((s) => s.trim()).filter((s) => s !== '' && !s.startsWith('#'))
+/** Adımın TEK satırlık `run:` komutu (ALT-38e: dağıtım ve Test adımları tek komut taşır, blok DEĞİL). Tek `run:` yoksa ya da blok (`|`, `>`) ise null. */
+function tekSatirRun(a: Adim): string | null {
+  const r = a.anahtarlar.filter((k) => k.anahtar === 'run')
+  return r.length === 1 && !/^[|>][-+]?$/.test(r[0].deger) ? r[0].deger : null
 }
 
 /** `strategy.matrix.shard` satır içi listesi (`[1, 2, 3, 4]`); okunamazsa null. */
@@ -363,8 +386,13 @@ function shardAdimlariniDenetle(metin: string): string[] {
   const ihlal: string[] = []
   for (const a of adimlar) {
     if (a.ad === '') ihlal.push(`test-shard işinde adsız adım (satır ${a.bas + 1}): adı yazılır`)
-    if (adimIfSatirlari(a).length) {
-      ihlal.push(`shard adımı "${a.ad}" \`if:\` taşıyor (${adimIfSatirlari(a).join(' ; ')}): adım atlanırsa shard hiçbir test koşmadan YEŞİL biter ve \`ci\` yeşil görünür`)
+    // ALT-38e: `if:` yalnız seçim adımlarının atladığı adımlarda ve TAM beklenen satırla serbesttir (başka her `if:` shard'ı testsiz YEŞİL bitirebilir).
+    const beklenenIf = shardAdimKosulu(a.ad)
+    const bulunanIf = adimIfSatirlari(a)
+    if (beklenenIf === null && bulunanIf.length) {
+      ihlal.push(`shard adımı "${a.ad}" \`if:\` taşıyor (${bulunanIf.join(' ; ')}): adım atlanırsa shard hiçbir test koşmadan YEŞİL biter ve \`ci\` yeşil görünür`)
+    } else if (beklenenIf !== null && (bulunanIf.length !== 1 || bulunanIf[0] !== beklenenIf)) {
+      ihlal.push(`shard adımı "${a.ad}" \`if:\` satırı beklenen TAM \`${beklenenIf}\` değil (bulunan: ${bulunanIf.join(' ; ') || 'yok'}): seçim kapısı gevşer ya da adım gereksiz yere atlanır (shard testsiz YEŞİL biter)`)
     }
     ihlal.push(...kapiAtlatmaDenetle(a, 'shard adımı'))
   }
@@ -377,31 +405,38 @@ function shardAdimlariniDenetle(metin: string): string[] {
     if (eylem.length !== 1 || !eylem[0].startsWith('actions/checkout@')) ihlal.push(`shard Checkout adımı \`uses: actions/checkout@…\` değil (bulunan: ${eylem.join(' ; ') || 'yok'})`)
     ihlal.push(...haritaDenetle(checkout[0].girdiler, { 'fetch-depth': '0' }, 'shard Checkout adımında', 'girdisi yok', 'beklenmeyen girdi'))
   }
-  // Test adımı: `test-shard.cjs` çağıran TAM BİR adım
-  const testler = adimlar.filter((a) => yorumsuz(a.satirlar).join('\n').includes('test-shard.cjs'))
-  if (testler.length !== 1) {
-    ihlal.push(`\`test-shard.cjs\` çağıran adım TAM BİR tane olmalı (bulunan ${testler.length}): dağıtım yapılmıyor ya da iki kez yapılıyor`)
+  // Dağıtım adımı: `test-shard.cjs` çağıran TAM BİR adım (ALT-38e: Test adımından ayrıldı; parçaya test düşmezse vitest koşmasın diye `kos` çıktısı verir)
+  const dagitlar = adimlar.filter((a) => yorumsuz(a.satirlar).join('\n').includes('test-shard.cjs'))
+  if (dagitlar.length !== 1) {
+    ihlal.push(`\`test-shard.cjs\` çağıran adım TAM BİR tane olmalı (bulunan ${dagitlar.length}): dağıtım yapılmıyor ya da iki kez yapılıyor`)
     return ihlal
   }
-  const test = testler[0]
+  const dagit = dagitlar[0]
+  if (!dagit.ad.startsWith(SHARD_DAGIT_ONEKI)) ihlal.push(`shard dağıtım adımının adı \`${SHARD_DAGIT_ONEKI}…\` ile başlamıyor (bulunan: \`${dagit.ad}\`)`)
+  ihlal.push(...haritaDenetle(dagit.env, SHARD_DAGIT_ENV, 'shard dağıtım adımında', 'ortam değişkeni yok', 'beklenmeyen ortam değişkeni'))
+  const dagitKomut = tekSatirRun(dagit)
+  if (dagitKomut === null) ihlal.push('shard dağıtım adımının `run:` değeri TEK satırlık komut değil (blok ya da çoklu `run:`): dağıtım komutu denetlenemedi')
+  // Test adımı: `pnpm test` koşturan TAM BİR adım (testlerin gerçekten koştuğu yer)
+  const kosanlar = adimlar.filter((a) => a !== dagit && yorumsuz(a.satirlar).join('\n').includes('pnpm test'))
+  if (kosanlar.length !== 1) {
+    ihlal.push(`\`pnpm test\` koşturan adım TAM BİR tane olmalı (bulunan ${kosanlar.length}): testler hiç koşmuyor ya da iki kez koşuyor`)
+    return ihlal
+  }
+  const test = kosanlar[0]
   if (!test.ad.startsWith(SHARD_TEST_ONEKI)) ihlal.push(`shard Test adımının adı \`${SHARD_TEST_ONEKI}…\` ile başlamıyor (bulunan: \`${test.ad}\`)`)
   ihlal.push(...haritaDenetle(test.env, SHARD_TEST_ENV, 'shard Test adımında', 'ortam değişkeni yok', 'beklenmeyen ortam değişkeni'))
-  const komutlar = runKomutlari(test)
-  if (!komutlar) {
-    ihlal.push('shard Test adımının `run: |` (çok satırlı) bloğu okunamadı: dağıtım ve koşum komutları denetlenemedi')
-    return ihlal
-  }
-  const dagit = komutlar[0] ?? ''
-  const kos = komutlar[1] ?? ''
-  if (komutlar.length !== 2) ihlal.push(`shard Test adımının run gövdesi TAM İKİ komut olmalı (dağıtım, koşum); bulunan ${komutlar.length}`)
-  const toplam = /--toplam\s+(\S+)/.exec(dagit)?.[1]
+  const kosKomut = tekSatirRun(test)
+  if (kosKomut === null) ihlal.push('shard Test adımının `run:` değeri TEK satırlık komut değil (blok ya da çoklu `run:`): koşum komutu denetlenemedi')
+  const dagitSatiri = dagitKomut ?? ''
+  const kos = kosKomut ?? ''
+  const toplam = /--toplam\s+(\S+)/.exec(dagitSatiri)?.[1]
   if (toplam !== undefined && n !== null && toplam !== String(n)) {
-    ihlal.push(`shard Test adımında \`--toplam ${toplam}\` matrix sayısı ${n} ile aynı değil: bölme ${toplam} parçaya yapılır, parçaların bir kısmı HİÇBİR işe girmez (ya da bazı işler boş kalır)`)
+    ihlal.push(`shard dağıtım adımında \`--toplam ${toplam}\` matrix sayısı ${n} ile aynı değil: bölme ${toplam} parçaya yapılır, parçaların bir kısmı HİÇBİR işe girmez (ya da bazı işler boş kalır)`)
   }
-  if (!/--shard\s+"\$SHARD"/.test(dagit)) {
-    ihlal.push('shard Test adımı `--shard "$SHARD"` kullanmıyor: matrix işleri AYNI parçayı koşar, öteki parçalar HİÇ koşmaz ama işler yeşil görünür')
+  if (!/--shard\s+"\$SHARD"/.test(dagitSatiri)) {
+    ihlal.push('shard dağıtım adımı `--shard "$SHARD"` kullanmıyor: matrix işleri AYNI parçayı koşar, öteki parçalar HİÇ koşmaz ama işler yeşil görünür')
   }
-  const cikti = /--cikti\s+(\S+)/.exec(dagit)?.[1]
+  const cikti = /--cikti\s+(\S+)/.exec(dagitSatiri)?.[1]
   const okunan = /^VENTHUB_TEST_SHARD_DOSYALARI=(\S+)\s/.exec(kos)?.[1]
   if (okunan === undefined) {
     ihlal.push('shard Test adımı `VENTHUB_TEST_SHARD_DOSYALARI=<liste>` vermiyor: vitest include sınırı yok, her shard TAM paketi koşar (n kat israf) ya da liste hiç okunmaz')
@@ -410,9 +445,8 @@ function shardAdimlariniDenetle(metin: string): string[] {
   }
   if (!/\bpnpm test -- --run\b/.test(kos)) ihlal.push('shard Test adımı `pnpm test -- --run` koşturmuyor')
   if (n !== null) {
-    const beklenen = [KOMUT_DAGIT(n), KOMUT_KOS]
-    const i = [...Array(Math.max(komutlar.length, beklenen.length)).keys()].find((j) => komutlar[j] !== beklenen[j])
-    if (i !== undefined) ihlal.push(`shard Test adımı run gövdesi beklenen TAM gövde değil (komut ${i + 1}: bulunan \`${komutlar[i] ?? '(yok)'}\`, beklenen \`${beklenen[i] ?? '(yok)'}\`)`)
+    if (dagitKomut !== null && dagitKomut !== KOMUT_DAGIT(n)) ihlal.push(`shard dağıtım adımı run komutu beklenen TAM komut değil (bulunan \`${dagitKomut}\`, beklenen \`${KOMUT_DAGIT(n)}\`)`)
+    if (kosKomut !== null && kosKomut !== KOMUT_KOS) ihlal.push(`shard Test adımı run komutu beklenen TAM komut değil (bulunan \`${kosKomut}\`, beklenen \`${KOMUT_KOS}\`)`)
   }
   return ihlal
 }
@@ -500,6 +534,7 @@ function adimAraligi(c: string, isId: string, ad: string, onEk = false): Aralik 
 }
 const bekleAr = (c: string): Aralik | null => adimAraligi(c, CI_ISI, BEKLE_ADI)
 const shardTestAr = (c: string): Aralik | null => adimAraligi(c, SHARD_ISI, SHARD_TEST_ONEKI, true)
+const shardDagitAr = (c: string): Aralik | null => adimAraligi(c, SHARD_ISI, SHARD_DAGIT_ONEKI, true)
 const ciTestAr = (c: string): Aralik | null => adimAraligi(c, CI_ISI, 'Test')
 const shardCheckoutAr = (c: string): Aralik | null => adimAraligi(c, SHARD_ISI, 'Checkout')
 
@@ -603,10 +638,10 @@ const BOZULMALAR: readonly Bozulma[] = [
   { ad: 'iş adındaki /N farklı (bekleyici işi bulamaz, ci hep kırmızı)', boz: (c) => sd(c, isAr(c, SHARD_ISI), /^name: test-shard /, `name: test-shard (\${{ matrix.shard }}/${N0 + 1})`), beklenen: [`iş adındaki /${N0 + 1} matrix sayısı ${N0} ile aynı değil`] },
   { ad: 'iş adı biçimi değişir (`test-shard (i/N)` yerine `shard i`)', boz: (c) => sd(c, isAr(c, SHARD_ISI), /^name: test-shard /, 'name: shard ${{ matrix.shard }}'), beklenen: ['test-shard işinin adı beklenen `test-shard (${{ matrix.shard }}/N)` biçiminde değil'] },
   { ad: 'iş adından matrix numarası düşer (tüm işler AYNI adı taşır: bekleyici tekrar der)', boz: (c) => sd(c, isAr(c, SHARD_ISI), /^name: test-shard /, 'name: test-shard'), beklenen: ['test-shard işinin adı beklenen'] },
-  { ad: 'dağıtım komutu `--toplam` matrix sayısından farklı (parçaların bir kısmı hiçbir işe girmez)', boz: (c) => sd(c, shardTestAr(c), KOMUT_DAGIT(N0), KOMUT_DAGIT(N0 - 1)), beklenen: [`\`--toplam ${N0 - 1}\` matrix sayısı ${N0} ile aynı değil`] },
-  { ad: 'dağıtım komutunda `--shard "$SHARD"` yerine sabit 1 (tüm işler AYNI parçayı koşar: öteki parçalar hiç koşmaz, işler yeşil)', boz: (c) => sd(c, shardTestAr(c), KOMUT_DAGIT(N0), KOMUT_DAGIT(N0).replace('--shard "$SHARD"', '--shard 1')), beklenen: ['`--shard "$SHARD"` kullanmıyor'] },
-  { ad: 'SHARD ortamı matrix numarası yerine sabit 1 olur (dağıtım komutu aynen durur, parça hep 1)', boz: (c) => sd(c, shardTestAr(c), 'SHARD: ${{ matrix.shard }}', 'SHARD: 1'), beklenen: ['shard Test adımında SHARD değeri beklenen değil'] },
-  { ad: 'SHARD ortamı silinir (dağıtıcı geçersiz argümanla kırmızı kalır)', boz: (c) => sd(c, shardTestAr(c), 'SHARD: ${{ matrix.shard }}', null), beklenen: ['shard Test adımında SHARD ortam değişkeni yok'] },
+  { ad: 'dağıtım komutu `--toplam` matrix sayısından farklı (parçaların bir kısmı hiçbir işe girmez)', boz: (c) => sd(c, shardDagitAr(c), RUN_DAGIT(N0), RUN_DAGIT(N0 - 1)), beklenen: [`\`--toplam ${N0 - 1}\` matrix sayısı ${N0} ile aynı değil`] },
+  { ad: 'dağıtım komutunda `--shard "$SHARD"` yerine sabit 1 (tüm işler AYNI parçayı koşar: öteki parçalar hiç koşmaz, işler yeşil)', boz: (c) => sd(c, shardDagitAr(c), RUN_DAGIT(N0), RUN_DAGIT(N0).replace('--shard "$SHARD"', '--shard 1')), beklenen: ['`--shard "$SHARD"` kullanmıyor'] },
+  { ad: 'SHARD ortamı matrix numarası yerine sabit 1 olur (dağıtım komutu aynen durur, parça hep 1)', boz: (c) => sd(c, shardDagitAr(c), 'SHARD: ${{ matrix.shard }}', 'SHARD: 1'), beklenen: ['shard dağıtım adımında SHARD değeri beklenen değil'] },
+  { ad: 'SHARD ortamı silinir (dağıtıcı geçersiz argümanla kırmızı kalır)', boz: (c) => sd(c, shardDagitAr(c), 'SHARD: ${{ matrix.shard }}', null), beklenen: ['shard dağıtım adımında SHARD ortam değişkeni yok'] },
 
   // ── ci.yml'de testin KAÇ yerde koştuğu: PR'da shard'lar, başka olaylarda ci ─────────────────────────────────────────────────────
   { ad: "ci Test'in `if`i hiç kapanmaz (PR'da testler HEM ci içinde HEM shard'larda koşar: çift koşu)", boz: (c) => sd(c, ciTestAr(c), /^if: /, "if: steps.ayna.outputs.atla != 'true'"), beklenen: ['ci Test adımının `if:` satırı beklenen TAM'] },
@@ -639,19 +674,27 @@ const BOZULMALAR: readonly Bozulma[] = [
 
   // ── shard Test adımı: atlanamaz, kırmızıyı yutamaz, doğru ortam ve komut ───────────────────────────────────────────────────────────
   { ad: 'shard Test adımına `continue-on-error: true`', boz: (c) => adimaEkle(c, shardTestAr(c), 'continue-on-error: true'), beklenen: ['continue-on-error taşıyor'] },
-  { ad: 'shard Test adımına `if: false` (adım atlanır, shard hiç test koşmadan yeşil)', boz: (c) => adimaEkle(c, shardTestAr(c), 'if: false'), beklenen: ['`if:` taşıyor'] },
-  { ad: 'shard Test adımının koşum komutuna `|| true`', boz: (c) => sd(c, shardTestAr(c), KOMUT_KOS, `${KOMUT_KOS} || true`), beklenen: ['run komutu hatayı yutuyor'] },
-  { ad: 'shard Test adımının koşum komutu `; true` ile biter', boz: (c) => sd(c, shardTestAr(c), KOMUT_KOS, `${KOMUT_KOS}; true`), beklenen: ['run komutu hatayı yutuyor'] },
+  { ad: 'shard Test adımına ikinci `if: false` (adım atlanır, shard hiç test koşmadan yeşil)', boz: (c) => adimaEkle(c, shardTestAr(c), 'if: false'), beklenen: ['`if:` satırı beklenen TAM'] },
+  { ad: 'shard Test adımının koşulu `kos` kapısını kaybeder (boş parçada da vitest koşar: boş liste FIRLATIR, parça kırmızı)', boz: (c) => sd(c, shardTestAr(c), /^if: /, `if: ${SECIM_KURULUM}`), beklenen: ['`if:` satırı beklenen TAM'] },
+  { ad: 'shard Test adımının koşulu başka bir çıktıya bakar (seçim kapısı gevşer)', boz: (c) => sd(c, shardTestAr(c), /^if: /, "if: steps.dagit.outputs.kos != 'false'"), beklenen: ['`if:` satırı beklenen TAM'] },
+  { ad: 'shard Test adımının koşum komutuna `|| true`', boz: (c) => sd(c, shardTestAr(c), RUN_KOS, `${RUN_KOS} || true`), beklenen: ['run komutu hatayı yutuyor'] },
+  { ad: 'shard Test adımının koşum komutu `; true` ile biter', boz: (c) => sd(c, shardTestAr(c), RUN_KOS, `${RUN_KOS}; true`), beklenen: ['run komutu hatayı yutuyor'] },
   { ad: "shard Test adımında `dislan` kipi kalkar (dünya durumu testleri PR'ı bloklar)", boz: (c) => sd(c, shardTestAr(c), 'VENTHUB_DUNYA_DURUMU: dislan', null), beklenen: ['shard Test adımında VENTHUB_DUNYA_DURUMU ortam değişkeni yok'] },
   { ad: 'shard Test adımında kip boş (tam paket: dünya durumu testleri de koşar)', boz: (c) => sd(c, shardTestAr(c), 'VENTHUB_DUNYA_DURUMU: dislan', "VENTHUB_DUNYA_DURUMU: ''"), beklenen: ['VENTHUB_DUNYA_DURUMU değeri beklenen değil'] },
   { ad: 'shard Test adımında kip `yalniz` (yalnız dünya durumu testleri: vitest.config.ts shard listesiyle birlikte FIRLATIR)', boz: (c) => sd(c, shardTestAr(c), 'VENTHUB_DUNYA_DURUMU: dislan', 'VENTHUB_DUNYA_DURUMU: yalniz'), beklenen: ['VENTHUB_DUNYA_DURUMU değeri beklenen değil'] },
-  { ad: 'shard Test adımına fazladan ortam değişkeni', boz: (c) => se(c, shardTestAr(c), 'SHARD: ${{ matrix.shard }}', 'CI_TEST_ATLA: 1'), beklenen: ['shard Test adımında beklenmeyen ortam değişkeni CI_TEST_ATLA'] },
-  { ad: 'koşum komutundan `VENTHUB_TEST_SHARD_DOSYALARI` düşer (her shard TAM paketi koşar)', boz: (c) => sd(c, shardTestAr(c), KOMUT_KOS, KOMUT_KOS.replace('VENTHUB_TEST_SHARD_DOSYALARI="$RUNNER_TEMP/shard.json" ', '')), beklenen: ['`VENTHUB_TEST_SHARD_DOSYALARI=<liste>` vermiyor'] },
-  { ad: "koşum komutu başka dosyayı okur (dağıtıcının yazdığı liste hiç okunmaz)", boz: (c) => sd(c, shardTestAr(c), KOMUT_KOS, KOMUT_KOS.replace('$RUNNER_TEMP/shard.json', '$RUNNER_TEMP/baska.json')), beklenen: ['aynı değil: shard listesi hiç okunmaz'] },
-  { ad: 'koşum komutu `pnpm test -- --run` yerine `pnpm lint` olur (test hiç koşmaz)', boz: (c) => sd(c, shardTestAr(c), KOMUT_KOS, KOMUT_KOS.replace('pnpm test -- --run --reporter=dot', 'pnpm lint')), beklenen: ['`pnpm test -- --run` koşturmuyor'] },
-  { ad: 'dağıtım komutu silinir (shard listesi yazılmaz)', boz: (c) => sd(c, shardTestAr(c), KOMUT_DAGIT(N0), null), beklenen: ['`test-shard.cjs` çağıran adım TAM BİR tane olmalı (bulunan 0)'] },
-  { ad: 'shard Test adımı tümüyle silinir', boz: (c) => aralikSil(c, shardTestAr(c)), beklenen: ['`test-shard.cjs` çağıran adım TAM BİR tane olmalı (bulunan 0)'] },
-  { ad: 'shard Test adımına üçüncü komut eklenir (iki dağıtım)', boz: (c) => se(c, shardTestAr(c), KOMUT_KOS, KOMUT_DAGIT(N0)), beklenen: ['shard Test adımının run gövdesi TAM İKİ komut olmalı'] },
+  { ad: 'shard Test adımına fazladan ortam değişkeni', boz: (c) => se(c, shardTestAr(c), 'VENTHUB_DUNYA_DURUMU: dislan', 'CI_TEST_ATLA: 1'), beklenen: ['shard Test adımında beklenmeyen ortam değişkeni CI_TEST_ATLA'] },
+  // CANLI DERS (#1741 koşu 2): Test adımının ortamındaki HER değişken testlerin alt süreçlerine miras kalır; `SHARD` ve `SECIM_*` bu yüzden yalnız dağıtım adımındadır.
+  { ad: "shard Test adımının ortamına `SHARD` girer (shard değişkeni testlerin alt süreçlerine sızar)", boz: (c) => se(c, shardTestAr(c), 'VENTHUB_DUNYA_DURUMU: dislan', 'SHARD: ${{ matrix.shard }}'), beklenen: ['shard Test adımında beklenmeyen ortam değişkeni SHARD'] },
+  { ad: "shard Test adımının ortamına `SECIM_TAM` girer (seçici çıktısı testlerin alt süreçlerine sızar)", boz: (c) => se(c, shardTestAr(c), 'VENTHUB_DUNYA_DURUMU: dislan', 'SECIM_TAM: ${{ steps.secv.outputs.tam }}'), beklenen: ['shard Test adımında beklenmeyen ortam değişkeni SECIM_TAM'] },
+  { ad: 'shard dağıtım adımına fazladan ortam değişkeni', boz: (c) => se(c, shardDagitAr(c), 'SHARD: ${{ matrix.shard }}', 'CI_TEST_ATLA: 1'), beklenen: ['shard dağıtım adımında beklenmeyen ortam değişkeni CI_TEST_ATLA'] },
+  { ad: 'koşum komutundan `VENTHUB_TEST_SHARD_DOSYALARI` düşer (her shard TAM paketi koşar)', boz: (c) => sd(c, shardTestAr(c), RUN_KOS, RUN_KOS.replace('VENTHUB_TEST_SHARD_DOSYALARI="$RUNNER_TEMP/shard.json" ', '')), beklenen: ['`VENTHUB_TEST_SHARD_DOSYALARI=<liste>` vermiyor'] },
+  { ad: "koşum komutu başka dosyayı okur (dağıtıcının yazdığı liste hiç okunmaz)", boz: (c) => sd(c, shardTestAr(c), RUN_KOS, RUN_KOS.replace('$RUNNER_TEMP/shard.json', '$RUNNER_TEMP/baska.json')), beklenen: ['aynı değil: shard listesi hiç okunmaz'] },
+  { ad: 'koşum komutu `pnpm test -- --run` yerine `pnpm lint` olur (test hiç koşmaz)', boz: (c) => sd(c, shardTestAr(c), RUN_KOS, RUN_KOS.replace('pnpm test -- --run --reporter=dot', 'pnpm lint')), beklenen: ['`pnpm test` koşturan adım TAM BİR tane olmalı (bulunan 0)'] },
+  { ad: 'dağıtım komutu silinir (shard listesi yazılmaz)', boz: (c) => sd(c, shardDagitAr(c), RUN_DAGIT(N0), null), beklenen: ['`test-shard.cjs` çağıran adım TAM BİR tane olmalı (bulunan 0)'] },
+  { ad: 'shard dağıtım adımı tümüyle silinir', boz: (c) => aralikSil(c, shardDagitAr(c)), beklenen: ['`test-shard.cjs` çağıran adım TAM BİR tane olmalı (bulunan 0)'] },
+  { ad: 'shard Test adımı tümüyle silinir (testler hiç koşmaz, işler yeşil)', boz: (c) => aralikSil(c, shardTestAr(c)), beklenen: ['`pnpm test` koşturan adım TAM BİR tane olmalı (bulunan 0)'] },
+  { ad: 'shard işine ikinci dağıtım adımı eklenir (iki dağıtım: ikincisi birincinin parçasını ezer)', boz: (c) => seTam(c, shardDagitAr(c), RUN_DAGIT(N0), ['      - name: Sahte dağıtım', '        run: node scripts/ci/test-shard.cjs --shard 1 --toplam 4 --cikti x.json']), beklenen: ['`test-shard.cjs` çağıran adım TAM BİR tane olmalı (bulunan 2)'] },
+  { ad: 'shard işine ikinci test adımı eklenir (iki kez koşar)', boz: (c) => seTam(c, shardTestAr(c), RUN_KOS, ['      - name: Test (shard sahte)', '        run: pnpm test -- --run']), beklenen: ['`pnpm test` koşturan adım TAM BİR tane olmalı (bulunan 2)'] },
   { ad: 'shard işine adsız adım eklenir (önceki adımın bloğuna yutulmaz)', boz: (c) => seTam(c, shardCheckoutAr(c), 'fetch-depth: 0', ['      - run: echo x']), beklenen: ['test-shard işinde adsız adım'] },
   { ad: 'shard Checkout `fetch-depth: 0` düşer (sığ klon: HEAD^1 ve git log yok)', boz: (c) => sd(c, shardCheckoutAr(c), 'fetch-depth: 0', null), beklenen: ['shard Checkout adımında fetch-depth girdisi yok'] },
   { ad: 'shard Checkout `ref` PR başına çevrilir (merge-ref DEĞİL: `ci` ile farklı ağaç test edilir)', boz: (c) => se(c, shardCheckoutAr(c), 'fetch-depth: 0', 'ref: ${{ github.event.pull_request.head.sha }}'), beklenen: ['shard Checkout adımında beklenmeyen girdi ref'] },
@@ -702,9 +745,8 @@ describe("INV-CI-SHARD-1 — test-shard işi ve ci bekleme adımı ci.yml'ye do�
   it('shard sayısı dört yerde AYNI: matrix, `--toplam`, `ci` SHARD_TOPLAM ve iş adındaki /N; bekleyicinin beklediği adlar işin gerçek adlarıyla birebir', () => {
     const ad = isAdi(ci, SHARD_ISI)
     const adN = Number(/\/(\d+)\)$/.exec(ad)?.[1])
-    const shardTest = isAdimlari(ci, SHARD_ISI).find((a) => a.ad.startsWith(SHARD_TEST_ONEKI))
-    const komutlar = shardTest ? runKomutlari(shardTest) : null
-    const dagitN = Number(/--toplam\s+(\d+)/.exec(komutlar?.[0] ?? '')?.[1])
+    const shardDagit = isAdimlari(ci, SHARD_ISI).find((a) => a.ad.startsWith(SHARD_DAGIT_ONEKI))
+    const dagitN = Number(/--toplam\s+(\d+)/.exec((shardDagit ? tekSatirRun(shardDagit) : null) ?? '')?.[1])
     const bekleN = Number(/^'(\d+)'$/.exec(isAdimlari(ci, CI_ISI).find((a) => a.ad === BEKLE_ADI)?.env.get('SHARD_TOPLAM') ?? '')?.[1])
     expect([adN, dagitN, bekleN]).toEqual([N0, N0, N0])
     const gercek = (matrisDegerleri(ci) ?? []).map((v) => ad.replace('${{ matrix.shard }}', String(v)))
@@ -720,8 +762,8 @@ describe("INV-CI-SHARD-1 — test-shard işi ve ci bekleme adımı ci.yml'ye do�
     expect(isIf).toBe(SHARD_IF)
     expect(bekle ? adimIfSatirlari(bekle) : null).toEqual([isIf])
     expect(test ? adimIfSatirlari(test) : null).toEqual([`if: steps.ayna.outputs.atla != 'true' && !(${isIf.slice('if: '.length)})`])
-    // üç yerde aynı ifade (iş, bekleme adımı, Test dışlaması): biri değişirse test kırmızı (yorum satırları sayılmaz: yorum düzeltmesi bu testi kırmızı yapmaz)
-    expect(yorumsuz(s).join('\n').split(SHARD_OLAYI).length - 1).toBe(3)
+    // dört yerde aynı ifade (iş, bekleme adımı, Test dışlaması, ALT-38e hızlı yol adımı: shard olayında ve sınıf `belge` iken): biri değişirse test kırmızı (yorum satırları sayılmaz: yorum düzeltmesi bu testi kırmızı yapmaz)
+    expect(yorumsuz(s).join('\n').split(SHARD_OLAYI).length - 1).toBe(4)
   })
 
   it('bekleme adımı `ci` işinin SON adımı; `ci` job düzeyinde yalnız bilinen anahtarlar; test-shard işi `needs` taşımaz', () => {

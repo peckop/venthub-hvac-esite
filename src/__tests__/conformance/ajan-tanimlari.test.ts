@@ -40,6 +40,17 @@ const uretici = createRequire(import.meta.url)(path.join(kok, 'scripts', 'belge'
 const setler = JSON.parse(fs.readFileSync(path.join(kok, uretici.SETLER_YOLU), 'utf8')) as Setler
 const etkinMi = (ad: string) => fs.existsSync(path.join(kok, '.claude', 'skills', ad, 'SKILL.md'))
 const kopya = (): Setler => JSON.parse(JSON.stringify(setler)) as Setler
+/**
+ * KARAR 314 (Recep, 2026-10-08; ALT-45) — çalışan türü → dosyadaki `model:` değeri. Üretici sabiti (`TUR_MODEL`), diskteki tanımlar ve
+ * execution-method-standard.md §10.3 "Rol → model tablosu" AYNI olmak zorundadır. Bu nesne bilerek elle yazılıdır: üreticiden
+ * okunsaydı, sabiti değiştiren her PR kapıyı da kendiliğinden yeşil tutardı (totoloji).
+ */
+const KARAR_314_MODEL: Record<string, string> = {
+  arastirmaci: 'claude-haiku-5-5',
+  uygulayici: 'sonnet',
+  curutucu: 'sonnet',
+  dogrulayici: 'sonnet',
+}
 const ornek = (tur: string): Satir => {
   const s = setler.setler.find((x) => x.uret && x.tur === tur && x.adiylaCagir.length > 0) ?? setler.setler.find((x) => x.uret && x.tur === tur)
   if (!s) throw new Error(`örnek satır yok: ${tur}`)
@@ -122,10 +133,10 @@ describe('INV-AJAN-TANIM-1 — tanımın içeriği', () => {
     expect(uretici.tanim(s)).not.toContain('bekleyen-skill-x')
   })
 
-  it('model değeri sabit ve beklenen (totoloji değil): her tür sonnet', () => {
-    for (const tur of ['arastirmaci', 'uygulayici', 'curutucu', 'dogrulayici']) {
-      expect(uretici.TUR_MODEL[tur]).toBe('sonnet')
-      expect(uretici.tanim(ornek(tur))).toMatch(/^model: sonnet$/m)
+  it('model değerleri sabit ve beklenen (totoloji değil): karar 314 rol→model tablosu, ne eksik ne fazla tür', () => {
+    expect(uretici.TUR_MODEL).toEqual(KARAR_314_MODEL)
+    for (const [tur, model] of Object.entries(KARAR_314_MODEL)) {
+      expect(uretici.tanim(ornek(tur)), tur).toMatch(new RegExp(`^model: ${model}$`, 'm'))
     }
   })
 
@@ -259,5 +270,88 @@ describe('INV-AJAN-TANIM-1 — bağlam maliyeti tavanı', () => {
     const [ilkDosya] = Object.keys(cikti)
     cikti[ilkDosya] = cikti[ilkDosya].replace(/^description:\s*(.*)$/m, (_m, d: string) => `description: ${d}${' x'.repeat(2000)}`)
     expect(maliyetKarakter(cikti)).toBeGreaterThan(TAVAN_KARAKTER)
+  })
+})
+
+/**
+ * MODEL KAYDI (karar 314, ALT-45): "açacağımız her departman bu plana uysun ama kayıtlı olsun" (Recep, 2026-10-08).
+ * Üç yüzey AYNI olmak zorundadır; biri değişince diğerleri kırmızı verir:
+ *   1. ÜRETİCİ sabiti `TUR_MODEL` (tek kaynak; yeni departman buradan geçer, kendiliğinden uyar),
+ *   2. DİSKTEKİ `.claude/agents/*.md` dosyalarının `model:` satırı (üretici çıktısıyla mandal zaten var; bu kol model satırını ADIYLA ölçer),
+ *   3. KAYIT: execution-method-standard.md §10.3 "Rol → model tablosu".
+ * Üretilmeyen iki tanım (`denetim-opus`, `security-reviewer`) `opus` KALIR (karar 314: değişmez).
+ */
+const TR_TUR_ADI: Record<string, string> = { araştırmacı: 'arastirmaci', uygulayıcı: 'uygulayici', çürütücü: 'curutucu', doğrulayıcı: 'dogrulayici' }
+
+/** Cetveldeki "Rol → model tablosu"nu okur: `| **Tür** | `model` | ... |` satırları, bir sonraki başlığa kadar. */
+function belgeModelTablosu(metin: string): Record<string, string> {
+  const satirlar = metin.replace(/\r/g, '').split('\n')
+  const bas = satirlar.findIndex((s) => /^#{3,4} .*Rol → model tablosu/.test(s))
+  if (bas === -1) throw new Error('execution-method-standard.md: "Rol → model tablosu" başlığı yok')
+  const tablo: Record<string, string> = {}
+  for (const s of satirlar.slice(bas + 1)) {
+    if (/^#{1,4} /.test(s)) break
+    const m = /^\|\s*\*\*([^*|]+)\*\*\s*\|\s*`([^`|]+)`\s*\|/.exec(s)
+    if (!m) continue
+    const tur = TR_TUR_ADI[m[1].trim().toLocaleLowerCase('tr-TR')]
+    if (!tur) throw new Error(`tabloda bilinmeyen tür adı: ${m[1]}`)
+    tablo[tur] = m[2]
+  }
+  return tablo
+}
+
+describe('INV-AJAN-TANIM-1 — model kaydı (karar 314): üretici sabiti = diskteki tanımlar = cetvel tablosu', () => {
+  const dizin = path.join(kok, '.claude', 'agents')
+  const diskModel = (ad: string): string | undefined => {
+    const fm = fs.readFileSync(path.join(dizin, ad), 'utf8').replace(/\r/g, '').split('---')[1] ?? ''
+    return /^model:\s*(\S+)\s*$/m.exec(fm)?.[1]
+  }
+  const turOku = (ad: string): string | undefined => /-(arastirmaci|uygulayici|curutucu|dogrulayici)\.md$/.exec(ad)?.[1]
+
+  it('diskteki her üretilmiş çalışan tanımının model satırı TUR_MODEL[tür] ile aynıdır (model satırı ADIYLA ölçülür)', () => {
+    const dosyalar = Object.keys(uretici.uret(setler))
+    expect(dosyalar.length).toBeGreaterThan(40)
+    const farkli: string[] = []
+    for (const ad of dosyalar) {
+      const tur = turOku(ad)
+      const beklenen = tur ? uretici.TUR_MODEL[tur] : undefined
+      if (!tur || diskModel(ad) !== beklenen) farkli.push(`${ad}: ${diskModel(ad) ?? 'model yok'} ≠ ${beklenen ?? '?'}`)
+    }
+    expect(farkli, `node scripts/belge/ajan-tanimi-uret.cjs --yaz (${farkli.join('; ')})`).toEqual([])
+  })
+
+  it('her araştırmacı dosyası claude-haiku-5-5, her öteki üretilmiş tür sonnet (tabloyla sabitlenmiş, üreticiden okunmaz)', () => {
+    const dosyalar = Object.keys(uretici.uret(setler))
+    expect(dosyalar.filter((a) => a.endsWith('-arastirmaci.md')).length).toBeGreaterThanOrEqual(14)
+    for (const ad of dosyalar) expect(diskModel(ad), ad).toBe(KARAR_314_MODEL[turOku(ad) ?? '?'])
+  })
+
+  it('üretilmeyen tanımlar değişmedi: denetim-opus ve security-reviewer opus KALIR', () => {
+    expect(diskModel('denetim-opus.md')).toBe('opus')
+    expect(diskModel('security-reviewer.md')).toBe('opus')
+  })
+
+  it('cetveldeki "Rol → model tablosu" TUR_MODEL ile birebir aynıdır (kayıt: yeni departman bu plana uyar)', () => {
+    const cetvel = fs.readFileSync(path.join(kok, 'docs', 'standards', 'execution-method-standard.md'), 'utf8')
+    expect(belgeModelTablosu(cetvel)).toEqual(uretici.TUR_MODEL)
+  })
+
+  it('ayırt edici: tablo ayrıştırıcısı bozulmuş cetvelde farkı yakalar (yanlış model, eksik satır) ve sağlam metni doğru okur', () => {
+    const saglam = [
+      '### 10.3 x',
+      '#### Rol → model tablosu (karar 314)',
+      '| Tür | Model | Gerekçe |',
+      '|---|---|---|',
+      '| **Araştırmacı** | `claude-haiku-5-5` | a |',
+      '| **Uygulayıcı** | `sonnet` | b |',
+      '| **Çürütücü** | `sonnet` | c |',
+      '| **Doğrulayıcı** | `sonnet` | d |',
+      '#### Sonraki başlık',
+      '| **Doğrulayıcı** | `haiku` | tablonun DIŞINDA, okunmamalı |',
+    ].join('\n')
+    expect(belgeModelTablosu(saglam)).toEqual(KARAR_314_MODEL)
+    expect(belgeModelTablosu(saglam.replace('`claude-haiku-5-5`', '`sonnet`'))).not.toEqual(KARAR_314_MODEL)
+    expect(belgeModelTablosu(saglam.replace('| **Çürütücü** | `sonnet` | c |\n', ''))).not.toEqual(KARAR_314_MODEL)
+    expect(() => belgeModelTablosu('başlık yok')).toThrow(/başlığı yok/)
   })
 })
