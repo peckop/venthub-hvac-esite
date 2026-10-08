@@ -444,6 +444,67 @@ Kanıt tablosu `tenant_id` alanını **taşır** — 2026-09-06'da ölçüldü: 
 bugün tek kiracı (`d3b07384-d113-495f-a558-8c38634e0000`). Kiracı ayrımı
 sonradan eklenirse veri geriye dönük yeniden üretilmek zorunda kalmasın diye alan baştan var.
 
+### Eğri çizimi — grafikten nokta okuma (KTL-7, kararlar 318 · 319 · 320, 2026-10-08)
+
+**Niçin var.** Hiçbir kitapçık fan eğrisini sayı tablosu olarak vermiyor; eğri her yerde yalnız GRAFİK
+(tabloda yalnız model başına azami debi ve azami basınç var). Veritabanındaki 145 eğrinin 141'i üç noktalı
+ve ortadaki nokta okunmamış, **hesaplanmış** (kök ve rakamlar: `docs/audits/ktl7-pq-egri-olcumu-2026-10-08.md`).
+Üretici eğrileri 8–15 noktalı ve içbükeydir; seçici çalışma noktasını bu eğriden hesapladığı için az nokta
+yanlış "yeter/yetmez" demektir. Yukarıdaki "KANITSIZ 208'in 166'sı eğri" satırının cevabı budur.
+
+**Bu, §6.3 kuralının istisnası değil GENİŞLEMESİDİR.** Kuralın amacı "bir kez çıkar, kalıcı tut"tür. Eğri
+çizimini okumak PDF'in çizim katmanını açar (metin taraması değil); bunu her ajan kendi başına yapsaydı aynı
+sayfa yeniden okunurdu. Bu yüzden okuma dizinin **yeni bir çıktı türü** olarak girer: hash'li, deterministik,
+tek betik. Ajan eğri okumaz; `egriler.jsonl`'dan okur.
+
+**Kural 1 — nokta uydurulmaz.** Her nokta kitapçıktaki bir çizgi üzerinde ölçülmüş bir konumdur. Eksik
+yeri formülle, komşu modelden ya da "makul değerle" doldurmak yok. Okunamayan sayfa `kapi` alanında
+adıyla belirtilir, gizlenmez.
+
+**Kural 2 — türetilen eğri etiketsiz taşınmaz.** `pq_curve` yanında `pq_curve_kaynak` gider
+(`spec-axis-standard.md §2.3`: `kitapcik_tablo` · `kitapcik_grafik` · `turetilmis`). Kapı:
+`scripts/kademe2-load/planla.mjs` `pqKapisi` — etiketsiz eğri ya da hesapla kurulmuş-ama-ölçüm-diye-etiketli
+üçgen plan KIRMIZI (`scripts/kademe2-load/__tests__/planla.test.ts`, kapıyı kaldırınca test kırmızı).
+
+**Çıktı türü.** `kaynak-dizini/egriler.jsonl` (ingestor), eğri başına bir satır. `cikar.py`'nin determinizm
+kuralları AYNEN geçerlidir: zaman damgası yok, anahtarlar sıralı, LF, araç ve sürümü satırda.
+
+| Alan | Anlamı |
+|---|---|
+| `pdf_hash` · `dosya` · `sayfa` | kaynak (`sayfalar.jsonl` ile aynı anahtar) |
+| `profil_id` · `egri` | hangi okuma tarifi, hangi eğri (örn. `min_hiz`, `maks_hiz`) |
+| `yontem` | `vektor` (A) ya da `raster` (B) |
+| `noktalar` · `nokta_sayisi` | `[[Q m³/h, P Pa], …]`, Q artan, 0,1'e yuvarlı |
+| `kalibrasyon` | eksen etiketlerinden uydurulan doğrunun azami artığı (Q, P) |
+| `cipa` · `sapma_pct` | doğrulama çıpası (kitapçıktaki azami değer) ve ölçülen sapma |
+| `kapi` | `tuttu` · `tutmadi` · `cipasiz` · `monoton_degil` |
+| `faz1_girer` | yalnız `kapi = tuttu` olan eğri veritabanına girmeye aday; geri kalanı çıkarılır ama girmez |
+| `girdi_ozeti` | `sha256(pdf_hash + okuma tarifi + araç sürümü)`; aynı özet → yeniden çıkarım YOK |
+
+**Yöntem.** Okuma tarifi (`kaynak-dizini/egri-profilleri.json`) sayfa, grafik bölgesi, eksen tipi (doğrusal /
+log) ve çıpayı söyler; eksen etiketleri sayfanın kendi metninden okunur.
+
+- **A — vektör (varsayılan).** Eğri PDF'te çizim yoluysa (`get_drawings`) köşe noktaları okunur, etiket
+  konumlarıyla kalibre edilir. Çizim hassasiyetinde; görüntü yok.
+- **B — raster.** Grafik görüntüyse eğri rengi piksel izlenir. **Yalnız çıpası olan sayfa `tuttu` alabilir**;
+  çıpasız raster sayfa çıkarılır ama `cipasiz` işaretlenir ve veritabanına girmez.
+
+**Kapı.** Eğrinin uç noktaları kitapçıktaki azami debi ve azami basınçla **±%2** içinde olmalı ve eğri
+monoton azalmalı. Çıpa olarak kitapçıktaki azami değer tablosu kullanılır; tablosu olmayan sayfada (Nicotra:
+çalışma noktası etiketi) çıpa tarifte açıkça yazılır, yazılmadıysa `cipasiz`.
+
+**Faz 0 ölçümü (2026-10-08, salt okuma).**
+
+| Sayfa | Yöntem | Sonuç |
+|---|---|---|
+| Vortice Commercial In-Line s.11–13 (LINEO 315 V0) | vektör, 0 görüntü | **±%2 kapısı TUTTU**: azami debi 1740 / 2301 m³/h (tablo 1740 / 2300), azami basınç 426 / 736 Pa (tablo 426,7 / 735,8); en büyük sapma %0,2; kalibrasyon artığı Q 0,9 m³/h, P 0,5 Pa. Min ve maks hız kademesi iki ayrı eğri olarak grafikte var |
+| Nicotra ADH s.8 | vektör, log-log nomogram | çıkarım DENENMEDİ: çok eğrili log-log, azami değer tablosu yok → ayrı kart |
+| SEAT 15 fişi s.2 | raster, 1094×1076 px (≈180 dpi), yarı-log | 3 eğri (2870 · 1450 · 930 d/dk) 15 · 8 · 5 nokta; kalibrasyon artığı Q ±2,1 m³/h, P %0,48; kapı SINANAMADI (fişte azami değer tablosu yok) → `cipasiz` |
+
+**Betik.** `scripts/kaynak_dizini/egri_cikar.py` (ingestor, `cikar.py`'nin yanında). Sınav:
+`scripts/kaynak_dizini/testler/egri_cikar_sinavi.py` (CI, yalnız stdlib: kalibrasyon, kapı, determinizm,
+sabotaj) ve `egri_cikar_pdf_sinavi.py` (yerel, PyMuPDF ile sentetik PDF).
+
 ---
 
 ## 6.4 KATALOG DEFTERİ (NotebookLM) — soru yüzeyi, KANIT DEĞİL (K14, 2026-09-09)
