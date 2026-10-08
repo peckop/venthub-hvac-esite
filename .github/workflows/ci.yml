@@ -140,7 +140,9 @@ jobs:
         with:
           version: 10
 
+      # `id: node`: belge hızlı yolunda kurulum yalnız pnpm deposu önbelleği İSABET ettiyse atlanır (`cache-hit` çıktısı, aşağıda `Install dependencies`).
       - name: Setup Node
+        id: node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
@@ -214,8 +216,26 @@ jobs:
             printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
           fi
 
+      # ALT-38e — BELGE HIZLI YOLU (cetvel: docs/standards/test-karnesi-standard.md §4.3). Sınıf `belge` (tabandan çıkan sınıflayıcı) VE değişen her dosya `.md`, `.txt` ya da `.csv` ise
+      # aşağıdaki kod kapıları (kurulum: yalnız pnpm önbelleği isabet ettiyse, aşağıda `Install dependencies`; Lint, tip, Deno ve edge kapıları, V8 önbelleği) ATLANIR: bu dosyalar Lint, tsc ve deno check'in girdisi değildir. `belge` sınıfı tek başına YETMEZ:
+      # `.claude/`, `docs/` ve `.agent/` altındaki `.cjs`/`.mjs` dosyaları da `belge`dir ama `eslint .` onları tarar (ölçüldü: `.claude/hooks/*.cjs` ignore edilmiyor), `.ts`/`.tsx` tsc'nin girdisidir
+      # ve JSON'u bir test içe aktarırsa tip denetimi değişir. Bu yüzden uzantı dar tutulur ve git'in kendi yol süzgeciyle (`:(exclude,glob)`) sınanır: dışarıda KALAN tek bir fark varsa
+      # (kod, JSON, silinen ya da taşınan dosya, hata) çıktı YAZILMAZ ve her kapı koşar. Yalnız `pull_request` olayında ve `edited` DIŞINDA koşar (`edited` koşusunda `ci` içindeki Test
+      # kuruluma ihtiyaç duyar); koşul `test-shard` işinin olayıyla birebir aynıdır. Çıktı yoksa ya da başka değerse HER ŞEY koşar (koşullar yalnız DARALTMA yönünde).
+      # `edited ayna kararı`ndan bağımsızdır (HEP KOŞAN, INV-CI-EDITED-1). PR kayıt kapısı, Secret guard, Döküm kapısı (`.csv` dökümü bu yola GİRER), taban izi ve sınıf adımı bu yolda DA koşar.
+      - name: Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)
+        id: hizli
+        if: github.event_name == 'pull_request' && github.event.action != 'edited' && steps.sinif.outputs.sinif == 'belge'
+        run: |
+          if ! git diff --quiet --no-renames HEAD^1 HEAD && git diff --quiet --no-renames HEAD^1 HEAD -- . ':(exclude,glob)**/*.md' ':(exclude,glob)**/*.txt' ':(exclude,glob)**/*.csv'; then
+            echo "::notice::hızlı yol: belge — değişen her dosya .md/.txt/.csv; Lint, tip ve Deno kapıları atlanır"
+            echo "belge=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::hızlı yol: yok — sınıf belge ama .md/.txt/.csv dışında bir fark var; tüm kapılar koşar"
+          fi
+
       - name: Setup Deno
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: v2.x
@@ -227,22 +247,24 @@ jobs:
       - name: Döküm kapısı (depoya giremeyecek veri)
         run: node scripts/security/depo-dokum-kapisi.cjs
 
+      # Hızlı yolda (belge) kurulum YALNIZ pnpm deposu önbelleği isabet ettiyse atlanır: ıskada `setup-node`'un önbellek KAYIT adımı (iş sonunda) var olmayan depoyu kaydetmeye çalışıp `Path Validation Error`
+      # ile işi kırmızı yapar (v7.0.0 kaynağı: hata yakalanmaz) ve boş depoyu kaydetmek önbelleği zehirlerdi; ıskada kurulum koşar ki kaydedilen önbellek gerçek olsun. Çıktı yoksa da KOŞAR.
       - name: Install dependencies
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')
         run: pnpm install --prefer-offline --config.allow-scripts true
 
       - name: Lint (blocking)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: pnpm run lint 2>&1 | tee ci-lint.log
 
       - name: Type check
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: pnpm exec tsc --noEmit 2>&1 | tee ci-typecheck.log
 
       # Edge Functions (Deno) Next.js tsc kapsamı DIŞINDA — tsconfig supabase/'i hariç tutar.
       # Bu adım 2026-05'te maskesiz kalan edge bozulmasını (T011) yakalamak için eklendi: kalıcı kapı.
       - name: Deno check (edge functions — kapı-körlüğü guard)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         # --node-modules-dir=none ŞART: `auto` node_modules/.deno/ yaratıp pnpm ağacını kirletiyor
         # (undici@8.10.0 oradan çözülüp jsdom'u kırıyordu → adversarial.test.ts çöküyordu).
         # Bu regresyon #494'te girdi ama CI o zaman pipefail'siz olduğu için görünmedi.
@@ -252,7 +274,7 @@ jobs:
       # searchParams key, mangled method çağrısı) GÖREMEZ — T011'de bu sınıf iki kez kaçtı.
       # Bu guard bozulma imzasını doğrudan tarar (unambiguous underscore-prefix desenleri).
       - name: Edge mangle-guard (string-literal — deno check göremez)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: |
           # NOT: son iki sınıf sonradan eklendi — `_data:`/`_text:` gibi mangled OBJE ANAHTARLARI
           # ilk guard'ın kör noktasıydı ve checkout'u kırık bıraktı (frontend `data.data` bekliyordu).
@@ -276,7 +298,7 @@ jobs:
       # bu haliyle deploy edilse tamamen kırılırdı. deno check göremez (tip hatası değil),
       # mangle-guard göremez (underscore deseni değil) → ayrı kapı ŞART.
       - name: Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         run: |
           hits=""
           for f in supabase/functions/*/index.ts; do
@@ -305,7 +327,7 @@ jobs:
       # önbellek girdileri kaynak içeriğinin özetiyle doğrulanır, bayat ya da bozuk girdi yok sayılır (sonuç değişmez). Ortam değişkeni yalnız
       # Test adımına verilir; dizin runner geçici alanındadır (çalışma ağacına dosya düşmez: depo tarayan testler görmez).
       - name: Node derleme önbelleği (V8 bayt kodu)
-        if: steps.ayna.outputs.atla != 'true'
+        if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ runner.temp }}/node-compile-cache
@@ -365,6 +387,12 @@ jobs:
   # ALT-38c-2 — TEST SHARD'LARI (cetvel: docs/standards/test-karnesi-standard.md §4.2). Yalnız pull_request'te ve `edited` DEĞİLKEN koşar. Zorunlu kontrol bu iş
   # DEĞİL `ci`dir; kırmızı bir shard `ci`yi kırmızı yapar. Dosyalar süreye göre dengeli dağıtılır (scripts/ci/test-shard.cjs); her test dosyası TAM BİR shard'a girer.
   # Kurulum `ci` ile aynıdır (tam geçmiş: INV-DOC-2 `git log` okur; Deno: bazı testler `deno` çağırır). Matrix sayısı `ci`nin SHARD_TOPLAM'ı ve `--toplam` ile aynı olmalı.
+  #
+  # ALT-38e — TEST SEÇİMİ (cetvel: §4.3; mantık: scripts/ci/test-sec.cjs, dağıtıcı girdisi: scripts/ci/test-shard.cjs `--secim`). Seçim YALNIZ BU İŞTE vardır: bu iş yalnız `pull_request`te (edited HARİÇ)
+  # koşar; master push, elle koşum, `edited` ve zamanlı koşuda seçici HİÇ çalışmaz ve tam paket koşar (`ci` içindeki Test). Seçici, haritası ve sınıflayıcısı PR'ın kendi kopyasından DEĞİL TABANDAN (`git show HEAD^1:`)
+  # çıkarılıp koşar (PR'ın seçici kopyası koşmaz); taban kopyası yoksa, seçici çökerse ya da çıktısı okunamazsa TAM. İki geçiş: (1) KURULUMDAN ÖNCE `--vitestsiz` (vitest açılmaz): seçim
+  # kendiliğinden BOŞSA (`tam=false` ve `secilen-sayisi=0`) kurulum, seçim, dağıtım ve Test atlanır, iş saniyeler içinde YEŞİL biter; (2) kurulumdan sonra vitest'li geçiş nihai seçimi verir. Koşullar yalnız
+  # DARALTMA yönündedir: çıktı eksik, boş ya da başka bir değerse kurulum ve test KOŞAR. Kırmızı bir seçici testi atlatamaz: her tutarsızlık dağıtıcıda TAM paket olur.
   test-shard:
     name: test-shard (${{ matrix.shard }}/4)
     if: github.event_name == 'pull_request' && github.event.action != 'edited'
@@ -395,27 +423,93 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
+      # ALT-38e — SEÇİM 1/2 (KURULUMSUZ): taban kopyası `$RUNNER_TEMP/secici/` altına çıkar (seçici + harita + SINIFLAYICI: seçici sınıflayıcıyı önce kendi yanından, yoksa checkout'tan yükler; yanında olmazsa PR'ın
+      # kendi sınıflayıcısı kurulumdan ÖNCE seçici sürecinde koşar ve `bos` kararını yazabilir), `--vitestsiz` ile vitest AÇILMAZ. Yalnız içe aktarılamaz dosyalar (md, csv, sql...) değiştiyse
+      # kendisi cevap verir; içe aktarılabilir bir dosya (ts, tsx, js, json...) değiştiyse `tam=true` yazar ve ikinci geçiş (aşağıda, kurulumdan sonra) karar verir. Ad ve gövde INV-CI-SECIM-1 ile TAM sabit.
+      - name: Test seçimi (tabandan, kurulumsuz)
+        id: sec
+        run: |
+          d="$RUNNER_TEMP/secici"
+          mkdir -p "$d"
+          if ! git show HEAD^1:scripts/ci/test-sec.cjs > "$d/test-sec.cjs" 2>/dev/null || ! git show HEAD^1:scripts/ci/test-haritasi.json > "$d/test-haritasi.json" 2>/dev/null || ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$d/degisiklik-sinifi.cjs" 2>/dev/null; then
+            echo "::notice::test seçimi: tam — taban kopyası yok (HEAD^1:scripts/ci/test-sec.cjs, test-haritasi.json, degisiklik-sinifi.cjs)"
+            printf 'tam=true\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cikis=0
+          node "$d/test-sec.cjs" --kok "$GITHUB_WORKSPACE" --harita "$d/test-haritasi.json" --vitestsiz --cikti "$RUNNER_TEMP/secilen.txt" || cikis=$?
+          if [ "$cikis" -ne 0 ]; then
+            echo "::warning::test seçimi: tam — seçici çöktü (çıkış kodu $cikis), tam paket koşar"
+            printf 'tam=true\nneden=seçici çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+          fi
+          tam=$(sed -n 's/^tam=//p' "$GITHUB_OUTPUT" | tail -n 1)
+          sayi=$(sed -n 's/^secilen-sayisi=//p' "$GITHUB_OUTPUT" | tail -n 1)
+          bos=false
+          if [ "$tam" = "false" ] && [ "$sayi" = "0" ]; then bos=true; fi
+          echo "bos=$bos" >> "$GITHUB_OUTPUT"
+
+      # Kurulum ve Test YALNIZ seçim kendiliğinden BOŞ DEĞİLSE koşar: adım SON satırında `bos=true` ya da `bos=false` yazar; `true` YALNIZ seçicinin SON `tam=false` VE `secilen-sayisi=0` yazdığı durumdadır
+      # (çökme yedeği `tam=true`yu ezer; seçicinin kendi yazdığı bir `bos` de bu son satırla ezilir). Koşullar `bos` çıktısını `!= 'true'` ile okur: çıktı yoksa ya da başka değerse KOŞAR.
+      # Seçicinin ham çıktısı koşulda KULLANILMAZ: GitHub eşitsiz türleri sayıya çevirir ve eksik çıktı (null) ile `'0'` ikisi de 0 olur, yani `secilen-sayisi != '0'` eksik çıktıda "atla" derdi
+      # (doküman: "Null → 0", sayısal dize → sayı). `'true'` sayıya çevrilemez (NaN): bu karşılaştırmada yalnız TAM `true` atlatır.
       - name: Setup Deno
+        if: steps.sec.outputs.bos != 'true'
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
           deno-version: v2.x
 
+      # Lifecycle betikleri KAPALI (`--ignore-scripts`): kökün `postinstall`ı `tsc --noEmit` koşturur (~20 sn, her shard'da) ve testler onu kullanmaz; tip denetimi `ci` işindedir (orada DEĞİŞMEZ).
       - name: Install dependencies
-        run: pnpm install --prefer-offline --config.allow-scripts true
+        if: steps.sec.outputs.bos != 'true'
+        run: pnpm install --prefer-offline --config.allow-scripts true --ignore-scripts
 
       # `ci` ile AYNI anahtar: master push'ta kaydedilen önbellek PR'ın ilk koşusunda bile sıcak gelir (yalnız hız; sonuç değişmez).
       - name: Node derleme önbelleği (V8 bayt kodu)
+        if: steps.sec.outputs.bos != 'true'
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ runner.temp }}/node-compile-cache
           key: node-compile-${{ runner.os }}-node24-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: node-compile-${{ runner.os }}-node24-
 
-      - name: Test (shard ${{ matrix.shard }}/4)
+      # ALT-38e — SEÇİM 2/2 (VİTEST'Lİ): aynı taban kopyası, bayraksız; vitest'in KENDİ test listesi ve `related` grafiğiyle nihai seçimi verir (dağıtıcı yalnız bu geçişin çıktısını okur). `dislan` kipi
+      # shard'ın göreceği kümeyle aynı olsun diye verilir; bu adım test KOŞTURMAZ (ortamı alt süreçlere sızmaz).
+      - name: Test seçimi (tabandan, vitest ile)
+        id: secv
+        if: steps.sec.outputs.bos != 'true'
+        env:
+          VENTHUB_DUNYA_DURUMU: dislan
+        run: |
+          d="$RUNNER_TEMP/secici"
+          if [ ! -s "$d/test-sec.cjs" ] || [ ! -s "$d/test-haritasi.json" ] || [ ! -s "$d/degisiklik-sinifi.cjs" ]; then
+            echo "::notice::test seçimi: tam — taban kopyası yok"
+            printf 'tam=true\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cikis=0
+          node "$d/test-sec.cjs" --kok "$GITHUB_WORKSPACE" --harita "$d/test-haritasi.json" --cikti "$RUNNER_TEMP/secilen.txt" || cikis=$?
+          if [ "$cikis" -ne 0 ]; then
+            echo "::warning::test seçimi: tam — seçici çöktü (çıkış kodu $cikis), tam paket koşar"
+            printf 'tam=true\nneden=seçici çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Dağıtım: seçici çıktısı (`tam`, `secilen-sayisi`, liste dosyası) dağıtıcıya ARGÜMAN olarak verilir ve orada doğrulanır (tutarsızsa TAM paket). Parçaya hiç test düşmediyse (seçim modunda meşru) `kos=false`
+      # yazar. KARMA KİP: dört iş seçimi BAĞIMSIZ hesaplar; biri tam'a düşerse (seçici çöktü) bölmeler ayrışıp seçilen testler hiçbir işte koşmasın diye bölme HER ZAMAN `vitest list`in tam listesindedir,
+      # seçim yalnız kendi parçayı süzer (birleşim ⊇ seçim). SECIM_* değişkenleri yalnız bu adımdadır: testlerin koştuğu adımın ortamına GİRMEZ (alt süreçlere sızmaz; canlı ders: #1741 koşu 2).
+      - name: Test dağıtımı (shard ${{ matrix.shard }}/4)
+        id: dagit
+        if: steps.sec.outputs.bos != 'true'
         env:
           SHARD: ${{ matrix.shard }}
           VENTHUB_DUNYA_DURUMU: dislan
+          SECIM_TAM: ${{ steps.secv.outputs.tam }}
+          SECIM_SAYI: ${{ steps.secv.outputs.secilen-sayisi }}
+        run: node scripts/ci/test-shard.cjs --shard "$SHARD" --toplam 4 --cikti "$RUNNER_TEMP/shard.json" --secim "$RUNNER_TEMP/secilen.txt" --secim-tam "$SECIM_TAM" --secim-sayi "$SECIM_SAYI"
+
+      # Test: bu parçaya test düştüyse koşar. `kos` yalnız `false` ise atlanır; çıktı yoksa ya da başka değerse KOŞAR (kapı sessizce düşmez). Kabuk bash (pipefail): `| tee` kırmızıyı yutmaz.
+      - name: Test (shard ${{ matrix.shard }}/4)
+        if: steps.sec.outputs.bos != 'true' && steps.dagit.outputs.kos != 'false'
+        env:
+          VENTHUB_DUNYA_DURUMU: dislan
           NODE_COMPILE_CACHE: ${{ runner.temp }}/node-compile-cache
-        run: |
-          node scripts/ci/test-shard.cjs --shard "$SHARD" --toplam 4 --cikti "$RUNNER_TEMP/shard.json"
-          VENTHUB_TEST_SHARD_DOSYALARI="$RUNNER_TEMP/shard.json" pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
+        run: VENTHUB_TEST_SHARD_DOSYALARI="$RUNNER_TEMP/shard.json" pnpm test -- --run --reporter=dot 2>&1 | tee ci-test.log
