@@ -193,7 +193,7 @@ Seçici çıktısı dağıtıcıya argüman olarak verilir, ortam değişkeni ol
 `eslint .` onları tarar (2026-10-07 ölçümü: `.claude/hooks/*.cjs` ignore edilmiyor; 52 `.cjs` + 11 `.mjs` belge dizinlerinde), `.ts`/`.tsx` tsc'nin girdisidir, JSON'u bir test içe aktarırsa tip denetimi değişir. Bu yüzden `Hızlı yol` adımı git'in kendi yol süzgeciyle (`:(exclude,glob)**/*.md`, `.txt`, `.csv`) yalnız bu üç uzantıdaki farkta
 `belge=true` yazar; dışarıda kalan tek bir fark (kod, JSON, silinen ya da taşınan kod dosyası, boş fark, git hatası) çıktıyı YAZMAZ ve her kapı koşar. `edited` koşusunda adım hiç açılmaz (o koşuda `ci`nin Test'i kuruluma ihtiyaç duyar). Kod kapıları çıktıyı `!= 'true'` ile okur.
 
-**Belge PR'ında kazanç nereden gelir.** Belirsiz testler (alt38d ölçümü, 2026-10-07: 41 test) her PR'da koşar; bu yüzden belge PR'ında bile seçim boş kalmaz, shard'lar kurulum yapar ve boş seçim yolu savunmadır. Belge hızlı yolunun kazancı `ci` işindeki kurulum, Lint, tip ve Deno atlamasıdır; `ci` son adımda shard'ları bekler, yani süre en yavaş shard'a da bağlıdır.
+**Belge PR'ında kazanç nereden gelir.** Belirsiz testler (alt38d ölçümü, 2026-10-07: 41 test; harita 2026-10-08: 50 test) her PR'da koşar; bu yüzden belge PR'ında bile seçim boş kalmaz, shard'lar kurulum yapar ve boş seçim yolu savunmadır. Bu işin kendi testlerinden beşi alt süreç (bash, git, esbuild) başlattığı için bu kümeye girer; en ağır üçü yerelde (Windows) 18-31 sn sürer ve süreleri `test-sureleri.json`da yazılıdır (yazılmasa dağıtıcı üçünü de varsayılan 0,1 sn sayıp aynı shard'a yığabilirdi). Belge hızlı yolunun kazancı `ci` işindeki kurulum, Lint, tip ve Deno atlamasıdır; `ci` son adımda shard'ları bekler, yani süre en yavaş shard'a da bağlıdır.
 
 **Kabul edilen riskler.** (1) PR kodunun çalıştığı yerler: birinci geçiş (kurulumsuz, `bos` kararı) yalnız tabandan çıkan kodla koşar; ikinci geçişte vitest PR'ın `vitest.config.ts` ve `scripts/ci/` dosyalarını yükler ve testlerin kendisi PR kodudur. Garanti "PR'ın seçici kopyası koşmaz"dır, kötü niyetli PR'a karşı değil: `ci.yml`'i değiştirebilen PR her kapıyı değiştirebilir, kapı inceleme ve
 `ci.yml`/`scripts/ci/` değişikliğinin küresel (tam) sayılmasıdır. (2) Kurulum atlanınca `setup-node`'un önbellek KAYIT adımı (iş sonunda), pnpm deposu önbelleğinde ıska varsa `Path Validation Error` ile işi kırmızı yapar (v7.0.0 kaynağı: `saveCache` hatası yakalanmaz; boş depoyu kaydetmek de önbelleği zehirlerdi). `ci` içindeki hızlı yol bunu
@@ -345,6 +345,7 @@ birleşmez. `kirmizi-kosular` kaydı: koşu başına değişen dosyalar, kırıl
 |---|---|
 | Test evreni, harita kapsamı | 624 dosya; conformance 345/345 kayıtlı (312 kesin eşlenmiş, 33 `belirsiz`); tümü 622/624 (2 dosya tümüyle `describe.skip`) |
 | Her zaman koşan | 43 (41 `belirsiz` + 2 haritada olmayan) |
+| Güncel harita (2026-10-08, ALT-38e testleri kayıtlıyken; `test-haritasi-uret.cjs --kontrol`: sorun 0) | 636/639 kayıtlı (3 kayıtsız test); 50 `belirsiz` + 3 haritada olmayan = 53 her zaman koşan; conformance 355 kayıtlı (314 kesin, 41 `belirsiz`) |
 | Belge-yalnız PR (12 gerçek PR) | ortalama 833 test (%11,0), CI günlüğünden modellenen Test süresi %12,8 |
 | Kod PR (64 gerçek PR) | ortalama 1803 test (%23,8), süre %26,2 (medyan %22,5) |
 | Küresel girdili PR | 13/94: hepsi TAM |
