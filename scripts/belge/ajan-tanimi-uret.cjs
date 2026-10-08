@@ -34,8 +34,15 @@ const path = require('node:path')
 const SETLER_YOLU = path.join('docs', 'audits', 'skill-departman-setleri-2026-09-30.json')
 const AJAN_DIZINI = path.join('.claude', 'agents')
 
-/** Çalışan türü → model. Execution-method §10.3: model açık yazılır; kullanıcı ayarı modelsizi Sonnet'e düşürür. */
-const TUR_MODEL = { arastirmaci: 'sonnet', uygulayici: 'sonnet', curutucu: 'sonnet', dogrulayici: 'sonnet' }
+/**
+ * Çalışan türü → model. Execution-method §10.3: model açık yazılır; kullanıcı ayarı modelsizi Sonnet'e düşürür.
+ * KARAR 314 (Recep, 2026-10-08; ALT-45): ARAŞTIRMACI Haiku 5.5 (salt-okuma, yargı vermez; sonucunu doğrulayıcı ve müdür doğrular);
+ * uygulayıcı, çürütücü ve doğrulayıcı Sonnet KALIR. TAM model kimliği yazılır, `haiku` takma adı DEĞİL: takma ad kayar
+ * (2026-09-30 ölçümünde `haiku` → claude-haiku-4-5-20251001, 2026-10-08'de → claude-haiku-5-5); kimlik kayıtlı kalır.
+ * Rol→model tablosu ve gerekçe: execution-method-standard.md §10.3 "Rol → model tablosu"; tabloyu bu sabitle karşılaştıran kapı:
+ * INV-AJAN-TANIM-1 (src/__tests__/conformance/ajan-tanimlari.test.ts). Yeni departman bu üreticiden geçer, kendiliğinden uyar.
+ */
+const TUR_MODEL = { arastirmaci: 'claude-haiku-5-5', uygulayici: 'sonnet', curutucu: 'sonnet', dogrulayici: 'sonnet' }
 
 /** Çalışan türü → Türkçe ad ve görev cümlesi (execution-method §10.3 tablosundan). */
 const TURLER = {
