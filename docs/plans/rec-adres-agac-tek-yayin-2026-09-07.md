@@ -152,6 +152,15 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
 - **Bayat harita (O1):** derlemeden sonra değişen slug'da zincir en çok **2 hop** (harita → eski hedef → sayfa
   308) — cetvele yazılır. Slug değişince tazeleme: webhook dalı Vercel **deploy hook**'unu tetikler (gün
   içinde ≤ 1 yeniden derleme, sıraya alınır) + gecelik derleme yedeği.
+- **Takma ad okuma yolu (karar 310 A, 10-08 canlı salt-okuma ölçümü):** `url_takma_adlari` anon'a kapalıdır (42501) ve
+  Vercel derleme ortamına `service_role` KONMAZ; tek yol parametresiz, yalnız-okuma `public.url_takma_adlari_listele()`
+  (SECURITY DEFINER, süzgeç `tenant_id = (select jwt_tenant_id())`). Derleme anon anahtarıyla koşar, anahtarda
+  `app_metadata.tenant_id` yoktur → `jwt_tenant_id()` **varsayılan kiracıyı** döndürür (gövdede claim yok/boş/bozuk →
+  varsayılan; anon claim'iyle ölçüldü: dönen kiracı `tenants`'taki tek kiracı, 49 takma ad satırının 49'u onun).
+  Tohumdaki `kiraciId` varsayılandan farklıysa işlev YABANCI satır döndürür ve üretici hata verip derlemeyi düşürür
+  (fail-closed, `haritaUret.ts`); parametre eklenmedi, çünkü anon çağıran kiracıyı kendisi seçerdi. İşlev canlıda henüz
+  yok (migration, kural 13); bekçi `url-takma-adlari-listele.test.ts`: ikinci kiracı satırı varken yabancı satır
+  dönerse KIRMIZI.
 
 ## 5. Fazlar
 
