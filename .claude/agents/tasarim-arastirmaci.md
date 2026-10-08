@@ -1,7 +1,7 @@
 ---
 name: tasarim-arastirmaci
 description: TASARIM departmanının araştırmacı çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
-model: sonnet
+model: claude-haiku-5-5
 disallowedTools: Edit, Write, NotebookEdit
 skills:
   - venthub-tasarim-dili

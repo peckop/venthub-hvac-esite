@@ -438,6 +438,30 @@ deneyi, HARİTA dökümü yeniden okudu, 2026-09-30): model parametresiz açıla
 göstermez. Ajan tipinin kendi `model:` başlığı varsa (`denetim-opus`, `security-reviewer`: `opus`) o öncelikli olur (§5.4); başlıksız tipte ve `model` verilmeyen çağrıda Sonnet'e düşülür.
 Haiku (ya da Opus) istenen her `Agent` çağrısında `model` açıkça yazılır (§5.1 workflow betiği için aynı kuraldır: **bir seçim yapmamak da seçimdir**).
 
+#### Rol → model tablosu (karar 314, Recep 2026-10-08; ALT-45; kapı INV-AJAN-TANIM-1)
+
+| Tür | Dosyadaki `model:` | Gerekçe |
+|---|---|---|
+| **Araştırmacı** | `claude-haiku-5-5` | Salt-okuma, yargı vermez; çıktısını doğrulayıcı ve müdür yeniden ölçer (aşağıdaki sıra). OPS kartı (10-08): Haiku 5.5 fiyatı Sonnet 5.5'in ~1/20'si (100 bin jeton altı istem; üstünde ~1/4) ve AYNI haftalık havuzdan düşer. |
+| **Uygulayıcı** | `sonnet` | Dosya yazar, kapıları koşar; Haiku denenmedi. |
+| **Çürütücü** | `sonnet` | Kaçırdığı bulgu, hatalı kodun kontrolden geçmesi demektir; Haiku denenmedi. |
+| **Doğrulayıcı** | `sonnet` | Son halka. Dosyada Sonnet kalır; çağrı başına `model` ile Haiku denenir (aşağıdaki "Doğrulayıcı Haiku denemesi"), dosyadaki karar ölçümden sonra. |
+
+- **Değişmeyenler:** `denetim-opus` ve `security-reviewer` `opus` KALIR; departman pencereleri (müdür) değişmez.
+- **Tek kaynak ve kayıt:** model YALNIZ `scripts/belge/ajan-tanimi-uret.cjs` içindeki `TUR_MODEL` sabitinde değişir (elle düzenleme yok); yeni bir departman bu üreticiden geçtiği için bu tabloya kendiliğinden uyar. Kapı `INV-AJAN-TANIM-1`: üretici sabiti = diskteki `model:` satırları = bu tablo; üçünden biri değişirse kırmızı.
+- **Tam kimlik, takma ad değil:** `haiku` takma adı kayar (2026-09-30 ölçümünde `claude-haiku-4-5-20251001`, 2026-10-08'de `claude-haiku-5-5`); dosyaya tam kimlik yazılır.
+- **Doğrulayıcı Haiku denemesi (OPS, karar 314):** bir gün çağrı başına `model` ile Haiku denenir; ölçülecek: test çıktısını doğru okuyor mu, kırmızıya yeşil diyor mu. Sonuç bu satıra yazılır. **Henüz ölçülmedi.**
+
+**Ölçümler (2026-10-08, ALTYAPI; alt ajan döküm dosyasındaki `model` alanı ve `claude -p` çıktısındaki `modelUsage` okundu, beyan değil):**
+
+| Soru | Sonuç |
+|---|---|
+| Çağrıda `model: "haiku"` + kullanıcı ayarı `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` + tanımda `model: sonnet` | Çağrı parametresi kazandı: dökümde yalnız `claude-haiku-5-5`. |
+| Taze süreçte (`claude -p`) tanım dosyasındaki `model: claude-haiku-5-5` (çağrıda model yok, ortam değişkeni `sonnet` duruyor) | Uygulandı: `modelUsage` = `claude-sonnet-5-5` (ebeveyn) + `claude-haiku-5-5` (araştırmacı). Claude Code belgesindeki sıra da bu: çağrı parametresi > tanımdaki `model` > `CLAUDE_CODE_SUBAGENT_MODEL` > ana oturum modeli. |
+| Haiku'ya geçen araştırmacı pencerenin effort ayarını alıyor mu | Evet: aynı görev (iki koşuda da doğru cevap 3/13), tanımda effort yok; ebeveyn `--effort low` iken Haiku düşünme jetonu 499, `--effort max` iken 8.084 (16 kat). n=1 koşu/seviye; düşünme jetonu effort'un vekilidir. Bu yüzden tanıma `effort` YAZILMAZ (OPS, karar 314 eki). |
+| Açık pencerede tanım dosyası diskte değişince sonraki çağrı yeni tanımı alıyor mu | Bu pencerede almadı: dosyaya `model: claude-haiku-5-5` ve gövdeye işaret satırı yazıldı, sonraki çağrı Sonnet'te koştu ve işareti görmedi. Claude Code belgesi `.claude/agents/` dizinini izlediğini ve yeniden başlatma gerekmediğini söylüyor (üç istisna: yeni açılan agents dizini, `--add-dir` ile eklenen dizin, `--disable-slash-commands`); çelişki ÇÖZÜLMEDİ (bu pencerenin tanımları ek dizinden gelmiş olabilir). Kural: yeni tanımın geçerli olduğundan emin olmak için pencere yeniden açılır. |
+| Maliyet göstergesi | CLI 2.1.288 Haiku 5.5 fiyat tablosunu taşımıyor (`costBasis: unknown`; belge Haiku 5.5 için v2.1.293+ diyor): `total_cost_usd` Haiku payında GÜVENİLMEZ (0,42 USD göründü, Sonnet ebeveyn 0,35). Gerçek kota etkisi ÖLÇÜLMEDİ. |
+
 **Sıra:** çalışan → müdür denetimi → bağımsız doğrulayıcı → müdür hükmü. Ekip liderli işte: çalışan → ekip liderinin
 denetimi → liderin çalıştırdığı bağımsız doğrulayıcı → lider özeti → müdür denetimi (özeti örnekler, kaynağa iner). **Bağımsızlık şartı:** doğrulayıcı
 üretenle aynı ajan değildir. Ölçüm yapılan işte soruları seçen ölçümü yapmaz, puanlayan cevap üretmez
