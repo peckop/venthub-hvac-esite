@@ -1893,6 +1893,7 @@ export const tr = {
     relatedProducts: 'İlgili Ürünler',
     officialDistributor: 'MARKA GÜVENCESİ',
     priceAvailability: 'Fiyat & Stok',
+    quoteLabel: 'Teklif',
     shareCopied: 'Link kopyalandı!',
     messages: {
       pdfStarted: 'PDF üretiliyor...'
