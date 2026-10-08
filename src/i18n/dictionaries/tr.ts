@@ -655,7 +655,7 @@ export const tr = {
         heatRecovery: 'Enerji Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin amiral gemisi çözümleri.',
+        featured: 'VentHub ürün ailesinden öne çıkan seçili modeller ve teknik özellikleri.',
         newArrivals: 'VentHub ürün ailesine yeni katılan, enerji verimliliği en yüksek ve modern tasarımlı yeni nesil cihazlar.',
         bestSellers: 'VentHub ürün ailesinden, teknik özellikleriyle öne çıkan seçili modeller.',
         airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan profesyonel seriler.',
@@ -1055,8 +1055,8 @@ export const tr = {
     },
     sectionTitle: 'Premium HVAC Markaları',
     sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının ürünlerini marka güvencesiyle sunuyoruz.',
-    subtitlePart1: 'Dünyaca Tanınan',
-    subtitlePart2: 'HVAC Markaları',
+    subtitlePart1: 'Sunduğumuz',
+    subtitlePart2: 'Markalar',
     viewAll: 'Tüm Markaları Gör',
     pageTitle: 'Markalar',
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin mühendislik harikası çözümlerini projelerinizle buluşturuyoruz.',

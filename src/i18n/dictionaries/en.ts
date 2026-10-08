@@ -543,7 +543,7 @@ export const en: typeof tr = {
         heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
-        featured: 'Flagship project solutions that have received full marks in durability and efficiency tests by our engineering team.',
+        featured: 'Featured models from the VentHub product family and their technical specifications.',
         newArrivals: 'New generation devices with the highest energy efficiency and modern design, recently added to the VentHub product family.',
         bestSellers: 'Selected models from the VentHub product family, chosen for their technical specifications.',
         airCurtains: 'Professional series that protect indoor comfort by creating an invisible thermal barrier at entrance areas.',
@@ -1985,8 +1985,8 @@ export const en: typeof tr = {
     },
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: 'We offer products of leading global HVAC brands with full brand assurance.',
-    subtitlePart1: 'Globally Recognized',
-    subtitlePart2: 'HVAC Brands',
+    subtitlePart1: 'Our',
+    subtitlePart2: 'Brands',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
     pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
