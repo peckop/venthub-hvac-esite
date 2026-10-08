@@ -221,3 +221,156 @@ Seçici çıktısı dağıtıcıya argüman olarak verilir, ortam değişkeni ol
 
 Yeni bir dünya durumu kaydı ya da yeni bir `ci` adımı ekleyen değişiklik bu kapılardan geçer; kapı kırmızıysa kayıt ya da sınıflandırma
 eksiktir, kapı gevşetilmez. Karne bölümü (§6 ve sonrası) ALT-38b ile bu tabloya kapı ekler.
+
+## 6. Test seçimi (karar 308)
+
+**Sürüm 1.1 · 2026-10-07 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38d (karar 308, OPS-91) · Ölçüm: `docs/audits/test-secimi-olcum-2026-10-07.md`**
+
+Bu bölüm PR kapısında HANGİ testlerin koşacağını belirler: tam paket yerine yalnız değişenle ilgili olanlar. §2'deki "PR kapısı" satırını
+daraltır, başka satırı değiştirmez: master push, zamanlı iş ve yerel `pnpm test` TAM kalır; seçim yalnız `pull_request` olayında, `ci` işinin
+test dağıtımında uygulanır. Yerel kısayol `pnpm test:ilgili` aynı seçiciyi koşturur ama TAM'a düşerse hiçbir test koşmaz (yerelde tam paket yok;
+CI koşar).
+
+**İlke: seçici bir testi yanlışlıkla ELEMEZ.** Seçilmeyen testin koruduğu kural sessizce kırılır ve kimse kırmızı görmez; fazladan seçmenin
+bedeli ise yalnız dakikadır. Bu yüzden şüphe, hata, bilinmeyen ve hesaplanamayan her durum `tam`dır (tam = vitest'in listelediği HER test),
+`sec` hiçbir koşulda fırlatmaz ve `tam` sonucunda seçilen liste de TÜM testlerdir (`tam` bayrağını okumayı unutan tüketici bile hepsini
+koşturur; boş liste "hiçbir şey koşma" demek olurdu, o yön asla varsayılan olmaz). Seçilmeyen testin korumasını master push (TAM) ve zamanlı
+koşu taşır; bu bölüm yeni bir tam paket zamanlayıcısı kurmaz.
+
+### 6.1 Karar sırası (`scripts/ci/test-sec.cjs`)
+
+| Sıra | Koşul | Sonuç |
+|---|---|---|
+| 1 | Değişen yol KÜRESEL girdi (§6.2) | `tam` |
+| 2 | Haritanın bilmediği kök ad (yeni üst dizin ya da kök dosya) | `tam`: sınıflanamayan yüzey |
+| 3 | Silinmiş ya da taşınmış KOD dosyası | `tam`: içe aktaran test, dosya yokken `vitest related` grafiğinde görünmez |
+| 4 | Değişen dosya bir TEST dosyası | o test seçilir |
+| 5 | İçe aktarılabilir dosya değişti | `vitest related` (içe aktarma grafiği) sonucu eklenir |
+| 6 | Testin koşarken okuduğu dosya/dizin ya da `import.meta.glob` deseni değişen yolu kapsıyor | o test seçilir |
+| 7 | Haritada kaydı OLMAYAN test, kaynağı ölçümden sonra değişmiş (bayat kayıt) test, `belirsiz` test | HER ZAMAN seçilir |
+| 8 | Değişen liste boş ya da 2000+ dosya; git, harita ya da vitest hatası; harita biçimi, sürümü ya da ölçüm aracı özeti uyuşmuyor | `tam` |
+
+5 ve 6 BİRLEŞTİRİLİR: `related` vite'ın `?raw` ve `import.meta.glob` okumalarını görmez (78 test), harita ise içe aktarma grafiğini görmez;
+biri öbürünün kör noktasını kapatır. Belge, CSV, SQL gibi içe aktarılamaz dosyada `related` hiç hesaplanmaz.
+
+### 6.2 Küresel girdiler
+
+Değişirse `tam`: `.github/`, `.githooks/`, `scripts/ci/`, `supabase/migrations/`, `scripts/assert-node-major.mjs`, `scripts/setup-hooks.mjs`,
+`scripts/board/vitest-defter-ortami.cjs`, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.npmrc`, `.nvmrc`, `.node-version`, `.gitignore`, `.gitattributes`, `tsconfig*.json`,
+`vitest*`, `playwright*`, `next.config.*`, `eslint.config.*`, `.eslintrc*`, `tailwind.config.*`, `postcss.config.*`, `knip.*`, `middleware.*`; ek
+olarak sınıflayıcının (`scripts/ci/degisiklik-sinifi.cjs`) "her zaman tam" listesi (`src/` ve `public/` HARİÇ: bunlar daraltılmak istenen
+yüzeylerdir) ve haritanın kurulum evresinde okunan yolları. SSOT `KURESEL_GIRDILER`dir; her girdinin `INV-TEST-SEC-1` örnek tablosunda satırı
+olmak ZORUNDADIR (yeni küresel girdi örneksiz eklenemez, listeyi daraltmak kırmızı verir).
+
+**Koşum kapanımı.** Her vitest koşumunda yüklenen yerel dosyalar küreseldir, çünkü kaydedici worker'da çalışır ve ana süreçte yüklenenleri GÖRMEZ: global kurulum
+(`vitest.global-setup.ts`) ana süreçte koşar ve `scripts/board/vitest-defter-ortami.cjs`i yükler; harita bu dosyayı yalnız kendi testine bağlıyordu ve değişince
+seçim o testle sınırlı kalıyordu (alt38e bulgusu, 10-07). `INV-TEST-SEC-1` blok 7 `vitest*` kök dosyalarının (yapılandırma, kurulum, global kurulum) yerel
+`import`/`require`/`createRequire` kapanımını KAYNAKTAN çıkarır; küresel listede olmayan dosyayı ve kanıtlanamayan yüklemeyi (dinamik argüman, `require` dışı adla
+bağlanmış `createRequire`, çözülemeyen yerel belirteç) KIRMIZI yapar: yeni bir koşum bağımlılığı listeye yazılmadan birleşemez. Sınır: kapı yalnız YÜKLEME
+kapanımını bilir; kurulum dosyalarının veri okumalarını (`readFileSync`) bilmez (şu an yalnız `scripts/ci/dunya-durumu.cjs`, o da küresel dizinde).
+
+### 6.3 Test haritası (`scripts/ci/test-haritasi.json`)
+
+**Harita bir ÖLÇÜMDÜR, tahmin değil.** Test kaynağına bakıp okunan yolu tahmin etmek hesaplanan yolu (`path.join(KOK, ad)`), döngüyle gezilen
+dizini ve alt süreçte okunan dosyayı sessizce kaçırır. Bu yüzden üretici her testi GERÇEKTEN koşturur ve `fs` çağrılarını yakalar
+(`test-haritasi-kaydedici.cjs`: vitest `setupFiles` ile yalnız ölçüm yapılandırmasında yüklenir, `vitest.config.ts`e dokunulmaz; PR kapısında ve
+normal `pnpm test`te yüklenmez). Kaydedilen: okunan dosya, okunan dizin (doğrudan çocuklar), özyinelemeli alt ağaç, `import.meta.glob` desenleri
+(vite bunları ana süreçte okuduğu için kaydedici görmez; üretici kaynaktan çıkarır ve ölçülen `?raw` genişlemesiyle doğrular), test kaynağının özeti (`sha`)
+ve `belirsiz` işareti. `node` çocuklarının okumaları izlenir (çocuğa `NODE_OPTIONS=--require` verilir); `git` (repo içinde, dosyaya bağlı alt komut),
+python, sh, cmd, esbuild, powershell izlenemez ve test `belirsiz` olur: HER PR'da koşar. Ölçümde atlanan ya da kırmızı olan test de `belirsiz`dir.
+
+Çıktı BELİRLENİMLİDİR (tarih, makine adı, süre yok; hepsi sıralı): aynı ağaç + aynı ham kayıt = bayt bayt aynı dosya.
+
+| Komut | Ne yapar |
+|---|---|
+| `node scripts/ci/test-haritasi-uret.cjs` | tam ölçüm koşusu (PR kapısıyla aynı küme, `VENTHUB_DUNYA_DURUMU=dislan`; parçalara bölünür, kesilirse en çok bir parça kaybolur) + harita yaz |
+| `... --devam <ham klasör>` | yarım kalan koşuyu sürdürür (yalnız sonuç dosyası olmayan parçalar koşar) |
+| `... --yalniz a.test.ts b.test.ts` | yalnız bu testleri yeniden ölçer, kalanını korur (ölçüm aracı özeti AYNI olmalı) |
+| `... --ham <klasör>` | koşmadan, var olan ham kayıttan yazar |
+| `... --kontrol` | haritayı ağaçla karşılaştırır, yazmaz; biçim, canonical bayt, ölçüm aracı özeti sorunu varsa çıkış 1 |
+
+Bakım kuralları:
+
+| Olay | Ne olur | Ne yapılır |
+|---|---|---|
+| Yeni test dosyası | haritada yok → HER ZAMAN koşar (atlanamaz) | birleşmeden sonra `--yalniz <yeni testler>` ile kaydedilir (yaklaşık 1 dk); iki dalda aynı anda kaydetmeyin (aynı dosya çakışır) |
+| Test dosyası değişti | bayat kayıt → HER ZAMAN koşar (zaten değişen testtir) | birleşmeden sonra `--yalniz` |
+| Ölçüm aracı değişti (kaydedici, kurulum dosyaları, `test-haritasi.vitest.config.ts`) | araç özeti uyuşmaz → TAM; `INV-TEST-HARITA-1` KIRMIZI | tam yeniden üretim (yaklaşık 20 dk, 6 işçi) |
+| Test silindi | hayalet kayıt (zararsız) | sonraki üretimde düşer |
+| Testin dolaylı bağımlılığı değişti (testin içe aktardığı yardımcı başka dosya okumaya başladı) | test kaynağı değişmediği için kayıt bayat görünmez; `related` o PR'da testi seçer, sonraki PR'lar yeni okumayı harita yenilenene dek görmez | master push TAM koşar (güvenlik ağı); gece yenileme önerisi §6.7 |
+
+### 6.4 Güvenlik ağı: hiçbir koruma sessizce düşmez
+
+| Durum | Davranış | Kanıt |
+|---|---|---|
+| Küresel dosya, bilinmeyen kök ad, silinmiş kod dosyası | `tam` | `INV-TEST-SEC-1` blok 1 ve 3 |
+| Boş değişen liste, 2000+ dosya, git/harita/vitest hatası, bozuk girdi | `tam`; `sec` fırlatmaz | `INV-TEST-SEC-1` blok 1 ve 5 |
+| Harita bayat, bozuk, sürüm ya da araç özeti uyuşmuyor | `tam` | `INV-TEST-SEC-1`, `INV-TEST-HARITA-1` blok 6 |
+| Haritada olmayan (yeni) test | her zaman seçilir | `INV-TEST-SEC-1` blok 1 |
+| Bayat kayıt, `belirsiz` test | her zaman seçilir | `INV-TEST-SEC-1` blok 1 |
+| `tam` sonucu | `secilen` = TÜM testler | `INV-TEST-SEC-1` blok 1 ve 5 |
+| Seçicinin kaynağına konan tek hata (küresel liste daralır, harita yok sayılır, bilinmeyen test seçilmez, `tam` yerine boş seçim döner) | en az bir senaryo KIRMIZI | `INV-TEST-SEC-1` blok 2 (sabotaj tablosu) |
+| Üreticiye konan tek hata | en az bir senaryo KIRMIZI | `INV-TEST-HARITA-1` blok 7 |
+| master push, `workflow_dispatch`, `schedule`, yerel `pnpm test` | seçim UYGULANMAZ, TAM | §6.5 koşul 1 |
+
+### 6.5 Bağlama koşulları (`ci.yml` ve `test-shard` için)
+
+1. Seçim yalnız `pull_request` olayında, varsayılan (birleştirme commit'i) checkout'ta ve `fetch-depth >= 2` ile uygulanır (`HEAD^1` için); push ve elle
+   koşumda seçim YOK SAYILIR.
+2. Betik ve harita PR'ın kendi kopyasından değil TABANDAN (`git show HEAD^1:scripts/ci/test-sec.cjs`) çıkarılıp koşturulur (`--kok "$GITHUB_WORKSPACE"
+   --harita "$RUNNER_TEMP/test-haritasi.json"`); PR bunlara dokunuyorsa `scripts/ci/` zaten küresel olduğundan `tam`dır.
+3. Seçim yalnız DARALTIR: çıktı yoksa ya da okunamazsa HER ŞEY koşar. Tüketici önce `tam` çıktısına bakar. Çıkış kodu daima 0'dır, hata `tam` olarak
+   yazılır; `$GITHUB_OUTPUT`a `tam=`, `secilen-sayisi=`, `toplam=`, `neden=` eklenir (`neden` tek satır, enjeksiyona kapalı).
+4. Dağıtım: seçilen liste ∩ `vitest list --filesOnly` çıktısı shard'lara dağıtılır. Beklenen shard sayısı SABİT kalır; boş kalan shard bile `success`
+   verir (bekleme adımı sayıya bakar). Seçim hiçbir zaman boş değildir (belirsiz testler her PR'da seçilir); boş yol yine de güvenli yazılır.
+5. Kurulumdan ÖNCE koşan ilk geçiş `--vitestsiz`tir (`git ls-files` ile üst küme liste; yalnız belge/CSV/SQL gibi dosyalar değiştiyse kendi seçimini verir,
+   içe aktarılabilir dosya değiştiyse `tam=true` ve "vitest gerekli" der); kurulumdan sonra ikinci geçiş bayraksız koşar.
+
+### 6.6 Kapılar (bu bölümün kendi tablosu)
+
+| Kapı | Dosya (`scripts/ci/__tests__/`) | Neyi ölçer |
+|---|---|---|
+| `INV-TEST-SEC-1` | `test-sec.test.ts` | seçicinin karar mantığı (senaryolar, SABOTAJ tablosu, küresel girdi örnek tablosu, glob eşleştirici, CLI çıktı sözleşmesi, `--yerel`, içe aktarma grafiğinin paralel kurulumu, sınıflayıcı yükleme sırası: önce seçicinin yanı sonra kök, koşum kapanımı kapısı); gerçek harita ve gerçek git ile belge değişimi daraltır, belirsiz testler HER ZAMAN seçilir |
+| `INV-TEST-HARITA-1` | `test-haritasi-uret.test.ts` | üreticinin senaryoları ve sabotajı; depodaki harita seçicinin kabul ettiği biçimde, canonical baytlarla ve GÜNCEL ölçüm aracı özetiyle (bayat harita KIRMIZI), her okuma seçicinin indeksiyle geri bulunur |
+| `INV-TEST-HARITA-KAYDEDICI-1` | `test-haritasi-kaydedici.test.ts` | yakalama (fs, dizin, glob, alt süreç sınıflaması, `node` çocuğu, belirlenimli kayıt) |
+| `INV-TEST-SEC-GERIYE-1` | `test-sec-geriye.test.ts` | geriye dönük doğrulamanın sayım mantığı: kategori önceliği, kaçırma yalnız ASIL kategoriden, kaçırılanın açıklanması (açıklanamayan = GERÇEK kaçırma), CI günlüğünden süre modeli |
+
+**Seçiciyi gevşeten her değişiklik (küresel listeyi daraltmak, `belirsiz` kapsamını azaltmak, yeni bir "atla" kuralı) önce B4 ile ölçülür:**
+`node scripts/ci/test-sec-geriye.cjs --b4 <kırmızı koşular.json> --log-dizini <günlükler>` çıktısında `gercekKacirilan` listesi BOŞ olmadan
+birleşmez. `kirmizi-kosular` kaydı: koşu başına değişen dosyalar, kırılan test dosyaları ve (günlükten) kırılan başlıklar.
+
+### 6.7 Ölçülmüş durum ve açık konular (2026-10-07)
+
+| Ölçü (ayrıntı ve ham veri: `docs/audits/test-secimi-olcum-2026-10-07.md` ve `.csv`) | Değer |
+|---|---|
+| Test evreni, harita kapsamı | 624 dosya; conformance 345/345 kayıtlı (312 kesin eşlenmiş, 33 `belirsiz`); tümü 622/624 (2 dosya tümüyle `describe.skip`) |
+| Her zaman koşan | 43 (41 `belirsiz` + 2 haritada olmayan) |
+| Belge-yalnız PR (12 gerçek PR) | ortalama 833 test (%11,0), CI günlüğünden modellenen Test süresi %12,8 |
+| Kod PR (64 gerçek PR) | ortalama 1803 test (%23,8), süre %26,2 (medyan %22,5) |
+| Küresel girdili PR | 13/94: hepsi TAM |
+| Geriye dönük (259 kırmızı CI koşusu, 2026-09-07..10-07) | 171 değerlendirilebilir koşunun 43'ü ham kaçırma; 34'ü dünya durumu kolu (artık PR kapısında yok), 10'u devralınan kırmızı (kök master push TAM ya da seçilmiş PR); gerçek kaçırma 0 |
+| `belirsiz` kümesini belge PR'ında atlamanın bedeli | son ayda 17 belge PR kırmızısının 10'u PR'da görünmezdi (`arac-envanteri`, `mutlak-yol-sizintisi`, `belge-tazelik`) |
+
+Hedef (belge PR'ında Test ≤40 sn) bu ağaçta TUTMAZ: belge PR'ında Test tam paketin yaklaşık %13'üdür ve bunun %11 puanı `belirsiz` kümesinden gelir; seçim hiçbir belge PR'ında
+boş değildir, kurulum atlanamaz. Kazanç Test adımındadır (yaklaşık %87 az işlemci süresi); PR duvar süresini bundan sonra kurulum, lint ve derleme belirler.
+
+Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz, hepsi daha dar seçim içindir):
+
+1. **`belirsiz` kümesi** (izlenemeyen alt süreç) belge-yalnız PR'ın süresinin büyük kısmını oluşturur; yeni belge eklendiğinde sonucu gerçekten değişen
+   belge yapısı kapılarını da içerir (`git ls-files`, `git log` ile `docs/` sayanlar), bu yüzden belge PR'ında bile atlanamaz. Kapatma yolları: (a) Linux'ta
+   `strace -f` ile ölçüm (alt süreç okumaları görünür, `belirsiz` kümesi kapanır); (b) 40 haneli revizyona bağlı `git show|cat-file|ls-tree|log`
+   komutlarının kaydedicide "dosyaya bağlı değil" sayılması (değişmez geçmiş, çalışma ağacına bağlı değil); (c) yalnız `git ls-files` kullanan testlerin
+   yalnız EKLENEN/SİLİNEN dosyada seçilmesi (adlar kümesine bağlıdır, içeriğe değil). Üçü de ölçüm aracını değiştirir (tam yeniden üretim) ve B4 ile
+   doğrulanmadan açılmaz.
+2. **Haritanın yenilenmesi**: yeni test dosyaları birleşmeden sonra `--yalniz` ile kaydedilir (§6.3). Tam yenileme için yeni bir tam-paket zamanlayıcısı
+   önerilmez; master push TAM koşusu zaten tüm testleri koşturuyor, haritanın ham kaydı o koşuda `test-haritasi.vitest.config.ts` ile alınıp yapıt olarak
+   saklanabilir (`--ham` ile haritaya yazılır). Bu bir öneridir, kurulu değildir.
+3. **Ölçüm makinesi**: harita Windows'ta ölçüldü; Linux'ta atlanan ya da farklı kolu izleyen test (platforma bağlı `skipIf`) ölçümde görünmeyebilir, bu testler
+   atlandığında `belirsiz` işaretlenir. Linux ölçümü (1a) bunu da kapatır.
+4. **Geriye dönük pencere** bir aydır (2026-09-07..10-07, `ci.yml` koşuları): `karne.json`un üç aylık `ci` özeti koşu başına değişen dosya taşımaz.
+5. **Kod PR'ında seçimin kendi maliyeti.** `vitest related` (içe aktarma grafiği) tüm test dosyaları için kurulur: tek süreçte yerelde (Windows, 16 çekirdek) 41-57 sn,
+   belge PR'ında 0,5-1,4 sn (grafik hesaplanmaz). Grafik 4 işçi sürecinde PARALEL kurulur (`grafikKur`; `VENTHUB_TEST_SEC_ISCI=1` sıralıya zorlar; işçi hatasında ya da tutarsız
+   çıktıda sıralıya düşer, sonuç sıralıyla bayt bayt AYNI doğrulandı): 26 sn (2 işçi 31, 8 işçi 22 sn). 4 shard seçimi ayrı hesapladığı için kod PR'ında shard başına duvar süresi
+   tam paketle aynı mertebede ya da biraz altında kalır (4 çekirdekli CI'da yerelden uzun olabilir); kazanç belge PR'ındadır. Kapatma yolu: her testin içe aktarma kapanımını ve
+   kapanımdaki dosya özetlerini haritaya önbellek olarak yazmak; seçimde yalnız özeti uyuşmayan (ya da dosya eklenen/silinen) testlerin grafiğini canlı hesaplamak. Önbellek yalnız
+   HIZ içindir, geçersizse canlı hesaba düşer (doğruluk haritanın tazeliğine bağlı olmaz). Ölçülmeden açılmaz: seçim `vitest related` sonucunun ÜST KÜMESİ olmalı (94 PR ve B4 ile karşılaştırılır).
