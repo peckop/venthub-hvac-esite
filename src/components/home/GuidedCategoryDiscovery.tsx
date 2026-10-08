@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { normalizeImageUrl } from '@/utils/imageUtils'
+import { normalizeImageUrl, YER_TUTUCU_GORSEL } from '@/utils/imageUtils'
 
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -38,7 +38,8 @@ interface GuidedCategoryDiscoveryProps {
   introKey?: string | null
 }
 
-const FALLBACK_CATEGORY_IMAGE = '/images/vortice_lineo_futuristic.webp'
+// URN-57: yedek artık ürün içermeyen nötr yer tutucu (eskiden başka bir markanın fan fotoğrafıydı).
+const FALLBACK_CATEGORY_IMAGE = YER_TUTUCU_GORSEL
 
 const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
   displayCategories = [],
@@ -157,7 +158,7 @@ const GuidedCategoryDiscovery: React.FC<GuidedCategoryDiscoveryProps> = ({
                            ölçüldü. Artık `aspect-square` — başlık ne olursa olsun eşit. */}
                     <Image
                       src={finalSrc}
-                      alt={category.displayName}
+                      alt={finalSrc === YER_TUTUCU_GORSEL ? t('common.imagePreparing') : category.displayName}
                       fill
                       sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, (max-width: 1200px) 50vw, 25vw"
                       className="object-contain object-center p-6 transition-transform duration-1.5s ease-out group-hover:scale-105"

@@ -31,6 +31,7 @@ export const tr = {
   },
   common: {
     technicalDrawing: 'Teknik Çizim',
+    imagePreparing: 'Ürün görseli hazırlanıyor',
     errorGeneric: 'Bir hata oluştu',
     devMode: 'Geliştirici Modu',
     userFallback: 'Kullanıcı',
@@ -631,10 +632,6 @@ export const tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Sınıf',
-      gradeValue: 'A++',
-      standardLabel: 'Standart',
-      standardValue: 'ERP',
       eyebrow: 'Ürün Showroom',
       title: 'Endüstriyel Ürün Portföyü',
       subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
