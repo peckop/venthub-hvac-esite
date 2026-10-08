@@ -332,6 +332,17 @@ export interface BuildBreadcrumbJsonLdParams {
 }
 
 /**
+ * Kırıntı basamağının mutlak adresi. REC-494: ana sayfa basamağı (`path: '/'`) `https://…/tr/`
+ * (sonda eğik çizgi) üretiyordu; sitenin kanonik ana sayfası `/tr` ve `/tr/` 308 verir — yani
+ * yapılandırılmış veri her sayfada yönlendirilen adresi gösteriyordu. Sondaki eğik çizgi atılır
+ * (adres her zaman en az `/<dil>` taşır, boşalmaz).
+ */
+function kirintiAdresi(baseUrl: string, lang: string, path: string): string {
+  const adres = `${baseUrl}${dilOnekliMi(path) ? path : `/${lang}${path}`}`
+  return adres.endsWith('/') ? adres.slice(0, -1) : adres
+}
+
+/**
  * Breadcrumb zinciri → schema.org BreadcrumbList.
  *
  * NİÇİN AYRI BİR FONKSİYON: BreadcrumbList'i bugüne kadar YALNIZ `Breadcrumb.tsx` bileşeni
@@ -370,7 +381,7 @@ export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Reco
       name: step.name,
       // K3-b (REC-300 Faz 3d): adım `adresUret` çıktısı (zaten dil önekli) olabilir — önek ikinci
       // kez eklenmez. Dilsiz yol (bugünkü çağıranlar) bugünkü gibi `/${lang}` ile birleşir.
-      ...(step.path ? { item: `${baseUrl}${dilOnekliMi(step.path) ? step.path : `/${lang}${step.path}`}` } : {}),
+      ...(step.path ? { item: kirintiAdresi(baseUrl, lang, step.path) } : {}),
     })),
   }
 }
