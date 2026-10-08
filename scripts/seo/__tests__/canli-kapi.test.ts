@@ -573,3 +573,32 @@ describe('INV-LLMS-GERCEK-1 · llms.txt beyanı haritayla tutarlı', () => {
     expect(llmsBulgu(haritaKur(yazilanSayfa - 1, yazilanKategori), llms).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
   })
 })
+
+describe('INV-CANLI-KAPI-1 · VITRIN-IDDIA (URN-60, karar 295)', () => {
+  it('sabotaj: yasak ifade sayfanın GÖRÜNEN metninde KIRMIZI; her ifade ayrı yakalanır', () => {
+    for (const ifade of ['%92 Optimizasyon', 'Çok Satanlar', 'Geniş stok ağımız', 'Dünya Devlerinin Partneri', 'Sistem.Veri.Canlı', '81 il kargo']) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[1], '<h1>', `<h1>${ifade} `)
+      const b = kodlar(v, 'VITRIN-IDDIA')
+      expect(b.length, `"${ifade}" yakalanmadı`).toBeGreaterThan(0)
+      expect(b[0].adres).toBe('/tr/a')
+      expect(b[0].seviye).toBe('KIRMIZI')
+    }
+  })
+  it('Türkçe büyük/küçük harf simetrisi: DETERMİNİSTİK, Deterministik, deterministik üçü de yakalanır (REC-343 körlüğü yok)', () => {
+    for (const yazim of ['DETERMİNİSTİK SİSTEMLER', 'Deterministik Sistemler', 'deterministik sistemler']) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[2], '<h1>', `<h1>${yazim} `)
+      expect(adresler(v, 'VITRIN-IDDIA'), yazim).toEqual(['/tr/b'])
+    }
+  })
+  it('görünen metin değilse sayılmaz: <script> içi ve etiket özniteliği yanlış alarm vermez', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], '</body>', '<script>var x = "Çok Satanlar %92"</script><div data-x="Geniş stok"></div></body>')
+    expect(kodlar(v, 'VITRIN-IDDIA')).toEqual([])
+  })
+  it('temiz sentetik site hiç VITRIN-IDDIA bulgusu vermez ve kuralı kayıtlıdır', () => {
+    expect(kodlar(temiz(), 'VITRIN-IDDIA')).toEqual([])
+    expect(Object.keys(KURAL_NO)).toContain('VITRIN-IDDIA')
+  })
+})

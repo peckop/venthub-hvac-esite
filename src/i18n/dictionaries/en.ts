@@ -1445,6 +1445,7 @@ export const en: typeof tr = {
     relatedProducts: 'Related Products',
     officialDistributor: 'BRAND ASSURANCE',
     priceAvailability: 'Price & Availability',
+    quoteLabel: 'Quote',
     shareCopied: 'Link copied!',
     messages: {
       pdfStarted: 'Generating PDF...'
