@@ -348,10 +348,10 @@ export const en: typeof tr = {
         entryPaths: 'guided decision flow'
       },
       trustStrip: {
-        authorizedBrands: 'World-renowned brands',
-        engineeringSupport: 'Engineering guidance',
-        nationwideDelivery: 'Nationwide delivery',
-        projectGuidance: 'Project-led selection support'
+        authorizedBrands: 'Brand and model catalogue',
+        engineeringSupport: 'Product Selector tools',
+        nationwideDelivery: 'Orders by quotation',
+        projectGuidance: 'Technical specification tables'
       },
       quickChips: {
         fans: 'Fans',
@@ -403,7 +403,7 @@ export const en: typeof tr = {
           {
             eyebrow: 'PRECISION HVAC SYSTEMS',
             title: 'Technical Excellence and Smart Flow',
-            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
+            subtitle: 'End-to-end ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
             products: [
               {
                 label: 'Industrial Solutions',
@@ -419,7 +419,7 @@ export const en: typeof tr = {
       }
     },
     cinematicShowcase: {
-      hudStatus: 'System.Data.Live',
+      hudStatus: 'Product family',
       eyebrow: 'ENGINEERING FOCUS',
       title: 'Vortice Lineo Quiet Series',
       subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
@@ -548,31 +548,31 @@ export const en: typeof tr = {
       }
     },
     trustProof: {
-      eyebrow: 'Trust and Proof',
-      title: 'We build trust with clear operational realities, not decorative promises.',
-      subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
-      badge: 'VERIFIED',
+      eyebrow: 'Catalogue and Tools',
+      title: 'Catalogue, Product Selector and Quote',
+      subtitle: 'Browse fan, air curtain, heat recovery and frequency converter models, run a pre-assessment from your volume, airflow and pressure inputs, and request a quote.',
+      badge: 'ON VENTHUB',
       visualAlt: 'VentHub Reliability Proof and Quality Certificates',
       items: {
         brands: {
-          eyebrow: 'Brand Layer',
-          title: 'Premium brand selection',
-          description: 'Represented brands are not only visual assets; they carry solution quality and category credibility.'
+          eyebrow: 'Catalogue',
+          title: 'Brands and Models',
+          description: 'Product families and models from AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT and Vortice, with technical specification tables.'
         },
         guidance: {
-          eyebrow: 'Expert Layer',
-          title: 'Engineering-guided direction',
-          description: 'We aim to move users not only into product lists, but into a more accurate selection flow.'
+          eyebrow: 'Calculation',
+          title: 'Pre-sizing with the Product Selector',
+          description: 'Enter values such as volume, airflow and pressure; the duct fan, heat recovery, air curtain and jet fan calculators give a preliminary assessment.'
         },
         delivery: {
-          eyebrow: 'Operations Layer',
-          title: 'Delivery and supply visibility',
-          description: 'Delivery and supply expectations are made clearer, more predictable and more professional.'
+          eyebrow: 'Logistics',
+          title: 'Delivery planning',
+          description: 'Delivery time and shipping terms are settled at the quotation stage, according to your project.'
         },
         support: {
-          eyebrow: 'Continuity Layer',
-          title: 'Accessible after-sales support',
-          description: 'Support, quoting and knowledge-center flows are not disconnected; they are parts of the same trust architecture.'
+          eyebrow: 'Contact',
+          title: 'Request a Quote, Ask a Question',
+          description: 'Send quote requests and questions through the contact form or info@venthub.com.tr. Technical specifications are on the product pages.'
         }
       }
     },
@@ -974,7 +974,7 @@ export const en: typeof tr = {
   },
   aboutPage: {
     title: 'About VentHub',
-    heroTitle: 'Turkey\'s Trusted HVAC Platform',
+    heroTitle: 'Ventilation products:',
     whySubtitle: 'We work to be worthy of your trust',
     experience: 'Years of Experience',
     distributorship: 'Global Brand Network',
@@ -987,7 +987,7 @@ export const en: typeof tr = {
     trustTitle: 'Operational Trust',
     trustDesc: 'We manage our supply and operations with discipline, aiming for on-time delivery while staying loyal to your project schedules.',
     heroBadge: '15+ Years of Engineering Experience',
-    heroTitleItalic: 'the Air',
+    heroTitleItalic: 'catalogue and selection tools',
     heroDesc: 'VentHub brings highly efficient, technological, and sustainable ventilation systems to the Turkish market for modern living and industrial spaces.',
     storyTitle: 'We Build the Climate',
     storyTitleItalic: 'of the Future Today',
