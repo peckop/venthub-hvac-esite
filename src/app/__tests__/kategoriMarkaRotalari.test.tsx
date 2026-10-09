@@ -335,7 +335,8 @@ describe('eski marka rotası — bugünküyle aynı', () => {
     // İki dil de ölçülür: EN öneki yeni şemada da `brands` olduğu için yalnız EN'e bakan kol
     // şema kaymasını GÖRMEZ (sabotaj S14 ilk koşumda tam bu yüzden yeşil kaldı).
     for (const lang of ['tr', 'en'] as const) {
-      const el = await GercekMarkaSayfasi({ lang, slug: 'avens', sayac: async () => 5 })
+      // URN-79: gövde DB'den katalog özeti de okur; bu test adresi ölçer → özet okuyucusu ENJEKTE (ağ/önbellek yok).
+      const el = await GercekMarkaSayfasi({ lang, slug: 'avens', sayac: async () => 5, katalogOzeti: async () => null })
       const cocuklar = (el.props as { children: ReactElement<{ dangerouslySetInnerHTML: { __html: string } }>[] })
         .children
       const jsonLd = JSON.parse(cocuklar[0].props.dangerouslySetInnerHTML.__html) as { url: string }

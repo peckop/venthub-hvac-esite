@@ -34,6 +34,15 @@
  *    haritaya girer. INV-MARKA-KAYNAK-1 (e) fikstürde ürünsüz kalan listedeki marka için kapalı bir istisna listesi tutar.
  *    Kaynak dizininde Flexiva için 0 sayfa var (ölçüldü 2026-10-04) → ülke/kuruluş/merkez/uzmanlık YAZILMADI
  *    ve eski kaydın "patentli / global marka" iddiaları atıldı; metni Design yazacak, kaynağı gelince eklenir.
+ *
+ * URN-79 (2026-10-09, OPS karar 317 tarama hükümleri): üreticinin kendi sitesinden alınan ve vitrinde DOĞRULANAMAYAN
+ * üstünlük/ömür/oran cümleleri kayıtlardan KALKTI ("dünya lideri", "standartları belirliyor", "öncüsüdür", "%80'e
+ * varan", "en geniş ürün gamı", "operatör güvenliğini koruyan uzun ömürlü", "yüksek performanslı", "Yüksek Verimli").
+ * Yerine kayıttaki doğrulanabilir alanlardan (menşei, uzmanlık) kurulan nötr cümle kondu; ürün aileleri ve kategorileri
+ * sayfa gövdesinde DB'den türer (`markaSayfasi.tsx` → `getBrandCatalogSummary`). KURULUŞ YILI kuralı: `founded` yalnız
+ * kaynak dizininde marka adıyla birebir geçiyorsa kalır — Vortice 1954 ve SEAT 1968 geçiyor; Avens 2010, Danfoss 1933,
+ * Nicotra 1959 geçmiyor (ölçüldü) → alan ve sayfadaki her kullanımı kaldırıldı. Kapı: INV-MARKA-IDDIA-1
+ * (`src/__tests__/conformance/marka-iddia-yasagi.test.ts`).
  */
 
 /** Dile göre çözülen metin. İki dil de ZORUNLU — eksik dil sessizce Türkçe göstermesin. */
@@ -69,6 +78,10 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     name: 'Vortice',
     slug: 'vortice',
+    // URN-79 (2026-10-09): "dünya lideri / standartları belirliyor" kalktı (kaynaksız üstünlük). Yerine yalnız kayıtlı alanlar
+    // (menşei, uzmanlık) ve katalogdaki uygulama alanı kondu ("domestic, commercial and industrial applications" —
+    // Vortice broşürleri, kaynak dizini). Kuruluş yılı 1954 kaynak dizininde marka adıyla geçer ("Since 1954 Vortice has
+    // been…", 7 sayfa) → kalır.
     description: {
       tr: 'İtalyan havalandırma üreticisi. Katalogda kanal, radyal, aksiyel ve çatı fanları, banyo fanları, hava perdeleri, ısı geri kazanım cihazları ve nem alma cihazları yer alır.',
       en: 'An Italian ventilation manufacturer. The catalogue includes duct, centrifugal, axial and roof fans, bathroom fans, air curtains, heat recovery units and dehumidifiers.'
@@ -82,12 +95,14 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     name: 'Avens',
     slug: 'avens',
+    // URN-79: "yüksek performanslı / enerji verimliliği odaklı" (ölçütsüz sıfat) kalktı; yerine menşei + uzmanlık alanı.
+    // `founded: 2010` KALDIRILDI: kuruluş yılı kaynak dizininde marka adıyla geçmiyor (ölçüldü 2026-10-09; "2010" yalnız
+    // bir basınç değeri) → yazılmaz. Kaynak (resmî belge) gelince geri eklenir.
     description: {
       tr: 'Türkiye merkezli havalandırma markası. Katalogda kanal ısıtıcıları, sulu bataryalar, ısı geri kazanım cihazları, sığınak havalandırma üniteleri ve radyal fanlar yer alır.',
       en: 'A Turkey-based ventilation brand. The catalogue includes duct heaters, water coils, heat recovery units, shelter ventilation units and centrifugal fans.'
     },
     country: { tr: 'Türkiye', en: 'Türkiye' },
-    founded: 2010,
     headquarters: { tr: 'İstanbul', en: 'Istanbul' },
     website: 'https://www.avens.com.tr',
     specialty: { tr: 'Kanal Isıtıcı, Batarya ve Fanlar', en: 'Duct Heaters, Coils and Fans' }
@@ -128,17 +143,21 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     // KAYNAK (2026-09-27): https://www.danfoss.com/en/about-danfoss/company/history/ (1933, Mads
     // Clausen, Nordborg; merkez hâlâ Nordborg'da) · https://www.danfoss.com/en/about-danfoss/our-businesses/drives/
-    // ("Pioneers of VFDs since 1968", enerji tüketiminde %80'e varan azaltım) ·
+    // (üretici öz beyanları: öncülük ve enerji tasarrufu oranı — URN-79'da YAZILMADI, aşağıya bkz.) ·
     // https://www.danfoss.com/en/about-danfoss/ ("family-owned company").
     // Katalogdaki Danfoss ürünleri frekans konvertörleridir (FC 51 / FC 101 / FC 102).
     name: 'Danfoss',
     slug: 'danfoss',
+    // URN-79: "1968'den bu yana … öncüsüdür" (üretici öz beyanı, atıfsız) ve "enerji tüketimini %80'e varan oranda azaltır"
+    // (atıfsız üretici sayısı; Danfoss FC102 kataloğunda örnek "%50'den fazla") kalktı. `founded: 1933` KALDIRILDI:
+    // kuruluş yılı kaynak dizininde marka adıyla geçmiyor (ölçüldü 2026-10-09; Danfoss için 1933/1968/Nordborg/pioneer 0
+    // eşleşme) → yazılmaz. Danfoss'un resmî sitesi yukarıda KAYNAK olarak duruyor ama kaynak dizini DEĞİL; dizine
+    // eklenince (catalog-ingestion-standard.md §6.3) yıl geri gelebilir.
     description: {
       tr: '1933\'te Danimarka\'da kurulan bir aile şirketi. Danfoss Drives, 1968\'den beri frekans konvertörü (değişken frekanslı sürücü) üretiyor; şirket, motor hızını ihtiyaca göre ayarlayarak enerji tüketiminde %80\'e varan azalma sağlanabileceğini belirtiyor.',
       en: 'A family-owned company founded in Denmark in 1933. Danfoss Drives has made variable-frequency drives since 1968; the company states that matching motor speed to demand can reduce energy consumption by up to 80%.'
     },
     country: { tr: 'Danimarka', en: 'Denmark' },
-    founded: 1933,
     headquarters: { tr: 'Nordborg', en: 'Nordborg' },
     website: 'https://www.danfoss.com',
     specialty: { tr: 'Frekans Konvertörleri', en: 'Variable-Frequency Drives' }
@@ -146,12 +165,14 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     name: 'Nicotra Gebhardt',
     slug: 'nicotra-gebhardt',
+    // URN-79: "dünyanın en geniş ve teknolojik ürün gamına sahip" (Nicotra kataloğu "dünya" demiyor) kalktı; uzmanlık
+    // etiketinden "Yüksek Verimli" sıfatı kalktı. `founded: 1959` KALDIRILDI: kaynak dizininde marka adıyla geçmiyor
+    // (ölçüldü 2026-10-09: Nicotra Gebhardt belgelerinde Waldenburg ve İtalya adresi var, kuruluş yılı yok) → yazılmaz.
     description: {
       tr: 'Almanya\'da Waldenburg adresli endüstriyel santrifüj (radyal) fan üreticisi. Katalogda ADH, RDH, AT ve DD ürün aileleri yer alır.',
       en: 'An industrial centrifugal (radial) fan manufacturer with an address in Waldenburg, Germany. The catalogue includes the ADH, RDH, AT and DD product families.'
     },
     country: { tr: 'Almanya', en: 'Germany' },
-    founded: 1959,
     headquarters: { tr: 'Waldenburg', en: 'Waldenburg' },
     website: 'https://www.nicotra-gebhardt.com',
     specialty: { tr: 'Santrifüj (Radyal) Fanlar', en: 'Centrifugal (Radial) Fans' }
