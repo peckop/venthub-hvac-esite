@@ -100,7 +100,7 @@ describe('INV-ALTGRUP-GORSEL-1 — alt grup kartı kategori görselini okur', ()
 
   it('K5 (hüküm kilidi) — görseli OLMAYAN kategoriye yer tutucu BASILMAZ', () => {
     // ⭐BU KOL BİR KURALI DEĞİL BİR HÜKMÜ kilitler (REC-291, benim kararım):
-    // `VentImage` görsel bulunamayınca `category-placeholder.png` basar. Onu koşulsuz
+    // `VentImage` görsel bulunamayınca nötr yer tutucuyu (YER_TUTUCU_GORSEL) basar. Onu koşulsuz
     // çizmek, hangi kategorinin görseli eksik olduğunu EKRANDA GÖRÜNMEZ yapar — bugün
     // 10/13'ün dolu olması sorunu ucuz sanmaya yol açar. Bu yüzden görsel bloğu
     // `image_url` doluyken çizilir; boşsa kart ikon düzeninde kalır.
