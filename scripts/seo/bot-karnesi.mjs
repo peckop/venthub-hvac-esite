@@ -107,8 +107,16 @@ export const bilincliKurallar = (enYayinAcik) => [
   { sinif: 'HREFLANG-YOK', kosul: () => enYayinAcik === false, gerekce: 'EN_YAYIN kapalı: tek dilli site' },
 ]
 const BILINCLI = bilincliKurallar(EN_YAYIN_ACIK)
-/** Kendi <title>'ını yazmayan sayfanın aldığı layout varsayılanı (TR/EN). */
-const VARSAYILAN_BASLIK = /^VentHub — Premium HVAC (Çözümleri|Solutions)$/
+/**
+ * Kendi <title>'ını yazmayan sayfanın aldığı layout varsayılanı (`meta.siteTitle`, TR/EN). İKİ biçim birlikte tanınır (SEO-25, abartı taraması 10-09):
+ * ESKİ ("Premium" üstünlük sıfatı) ve YENİ (ana sayfanın 09-07'den beri canlı başlığıyla AYNI metin). Başlık hangi sırayla dağılırsa dağılsın
+ * "kendi title yok" kusuru görünür kalır. ⚠ YENİ varsayılan ana sayfanın kendi başlığıyla aynıdır: ana sayfa (`tur === 'ana'`) YENİ biçimde kusur
+ * sayılmaz, ESKİ biçime düşerse sayılır. Kaynak bağı: sözlükteki `meta.siteTitle` bu kalıpla eşleşmek zorundadır (bot-karnesi-en-yayin.test.ts, INV-BOT-KARNESI-BASLIK-1).
+ */
+const ESKI_VARSAYILAN_BASLIK = /^VentHub — Premium HVAC (Çözümleri|Solutions)$/
+const YENI_VARSAYILAN_BASLIK = /^VentHub \| (Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri|Industrial Ventilation and HVAC Engineering Solutions)$/
+export const varsayilanBaslikMi = (baslik, tur) =>
+  ESKI_VARSAYILAN_BASLIK.test(baslik) || (tur !== 'ana' && YENI_VARSAYILAN_BASLIK.test(baslik))
 
 // ─── yardımcılar ───────────────────────────────────────────────────────────────
 const bekle = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -281,7 +289,7 @@ async function main() {
       s.h1 = a.h1; s.ic = a.ic; s.kelime = a.kelime; s.metinOzet = a.metinOzet
       s.jsonld = a.jsonld.map((x) => x.tur)
       if (a.title.length !== 1) s.sorunlar.push(`TITLE-SAYISI ${a.title.length}`)
-      if (a.title.length === 1 && VARSAYILAN_BASLIK.test(a.title[0])) s.sorunlar.push('VARSAYILAN-BASLIK (kendi title/description yok)')
+      if (a.title.length === 1 && varsayilanBaslikMi(a.title[0], tur)) s.sorunlar.push('VARSAYILAN-BASLIK (kendi title/description yok)')
       if (!a.aciklama.length) s.sorunlar.push('ACIKLAMA-YOK')
       if (a.h1 !== 1) s.sorunlar.push(`H1-SAYISI ${a.h1}`)
       if (a.jsonld.some((x) => !x.gecerli)) s.sorunlar.push('JSONLD-GECERSIZ')
