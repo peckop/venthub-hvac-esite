@@ -311,7 +311,7 @@ export const en: typeof tr = {
     },
   },
   meta: {
-    siteTitle: 'VentHub — Premium HVAC Solutions',
+    siteTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
     siteDesc: 'Car park jet fans, air curtains, heat recovery units and duct fans — engineering-led product selection and technical support.',
   },
 
