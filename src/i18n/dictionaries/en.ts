@@ -403,7 +403,7 @@ export const en: typeof tr = {
           {
             eyebrow: 'PRECISION HVAC SYSTEMS',
             title: 'Technical Excellence and Smart Flow',
-            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
+            subtitle: 'End-to-end ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
             products: [
               {
                 label: 'Industrial Solutions',

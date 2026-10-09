@@ -513,7 +513,7 @@ export const tr = {
           {
             eyebrow: 'HASSAS HVAC SİSTEMLERİ',
             title: 'Teknik Mükemmeliyet ve Akıllı Akış',
-            subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca deterministik havalandırma mühendisliği.',
+            subtitle: 'Endüstriyel mutfak, otopark ve konfor alanları için uçtan uca havalandırma mühendisliği.',
             products: [
               {
                 label: 'Endüstriyel Çözümler',
