@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { MARKA_YASAK_IFADELER } from '@/data/__tests__/markaIddiaListesi'
+import { MARKA_YASAK_IFADELER, yasakIfadeIhlalleri } from '@/data/__tests__/markaIddiaListesi'
 import { HVAC_BRANDS, type HVACBrand } from '@/data/brands'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
@@ -46,7 +46,7 @@ describe('markaAciklamasi: tek kaynak (meta + JSON-LD), süzgeçli', () => {
     const trMetin = markaAciklamasi('tr', SENTETIK, false)
     expect(trMetin).toBe('Testfan: Kanal tipi fanlar üretir. VentHub kataloğunda kanal fanları alanındaki ürünleri inceleyin.')
     const enMetin = markaAciklamasi('en', SENTETIK, false)
-    expect(enMetin).toBe('Testfan: It makes duct fans. Browse duct fans products in the VentHub catalog.')
+    expect(enMetin).toBe(`Testfan: It makes duct fans. ${en.brands.seoYedekUzmanlik.replace('{{uzmanlik}}', 'duct fans')}`)
     for (const m of [trMetin, enMetin]) {
       expect(m).not.toContain('**')
       expect(ovguVarMi(m), m).toBe(false)
@@ -90,7 +90,7 @@ describe('Brand JSON-LD açıklaması (b)', () => {
         expect(jsonLd.description, `${lang} ${b.slug}`).toBe(markaAciklamasi(lang, b, false))
         expect(jsonLd.description).not.toContain('**')
         expect(ovguVarMi(jsonLd.description), `${lang} ${b.slug}: ${jsonLd.description}`).toBe(false)
-        for (const { ifade } of MARKA_YASAK_IFADELER) expect(ifade.test(jsonLd.description), `${lang} ${b.slug}: ${ifade}`).toBe(false)
+        expect(yasakIfadeIhlalleri(b.slug, jsonLd.description).map((y) => String(y.ifade)), `${lang} ${b.slug}: ${jsonLd.description}`).toEqual([])
       }
     }
   })

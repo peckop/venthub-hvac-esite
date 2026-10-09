@@ -51,6 +51,49 @@ export const KAYNAKLI_KURULUS: Readonly<Record<string, { yil: number; kaynak: st
 }
 
 /**
+ * WEB ADRESİYLE ATIFLI OLGU İSTİSNASI (URN-82, Blog yanıtı 2026-10-09): kaynak dizini yalnız katalog PDF'lerini kapsar; üreticinin
+ * kendi resmî web sayfasında birebir geçen olgu, SAYFA ADRESİ burada yazılıysa marka metninde yer alabilir. İstisna iki şeyle
+ * sınırlıdır ve genişletmek için kaynak adresi yazmak ZORUNLUDUR (sessizce eklenemez):
+ *  · `yillar`: metinde geçmesine izin verilen yıllar (kuruluş yılı alanı `founded` değildir; o hâlâ KAYNAKLI_KURULUS'a bağlı).
+ *  · `atifliOran`: yasak listesindeki bir ORAN ifadesi (`yasakIfadeler` içindeki deseni) yalnız metinde şirkete atfedildiğinde
+ *    ("belirtiyor", "states") serbesttir; atıfsız olgu cümlesi hâlâ KIRMIZI.
+ * Danfoss: BLOG ham metni C:/Users/alize/blog-calisma/marka-ham/danfoss/ (10-09); BLG-7 `docs/standards/marka-olgu-kaydi.json`
+ * dosyasını getirince bu tablo o dosyadan okunacak.
+ */
+export const WEB_ATIFLI_OLGU: Readonly<Record<string, { yillar: readonly number[]; atifliOran: readonly RegExp[]; kaynaklar: readonly string[] }>> = {
+  danfoss: {
+    yillar: [1933, 1968],
+    atifliOran: [/%\s?80|up to 80\s?%/i],
+    kaynaklar: [
+      'https://www.danfoss.com/en/about-danfoss/company/history/ — "began on September 1, 1933, when Mads Clausen founded Danfoss"; "Mass production of frequency converters began in 1968"',
+      'https://www.danfoss.com/en/about-danfoss/our-businesses/drives/ — "reducing energy consumption by up to 80%" (üreticinin beyanı)',
+    ],
+  },
+}
+
+/** Şirkete atfeden fiil/kalıp: atıflı oran cümlesinin parçası (TR "belirtiyor", EN "states"). */
+const ATIF_KALIBI = /belirtiyor|states|according to|says/i
+
+/** Bir marka metnindeki yasak ifadeler; web adresiyle atıflı olgu istisnası uygulanmış hâli. Sözlük şablonlarında slug olmaz (istisna yok). */
+export function yasakIfadeIhlalleri(slug: string | undefined, metin: string): YasakIfade[] {
+  const istisna = slug ? WEB_ATIFLI_OLGU[slug] : undefined
+  return MARKA_YASAK_IFADELER.filter(({ ifade }) => {
+    const eslesme = new RegExp(ifade.source, ifade.flags.replace('g', '')).exec(metin)
+    if (!eslesme) return false
+    // Atıf eşleşmenin HEMEN çevresinde aranır (±200 karakter): sayfanın başka yerinde geçen "states" istisnayı açmaz.
+    const cevre = metin.slice(Math.max(0, eslesme.index - 200), eslesme.index + eslesme[0].length + 200)
+    const atifliSerbest = istisna?.atifliOran.some((o) => o.source === ifade.source && o.flags === ifade.flags) && ATIF_KALIBI.test(cevre)
+    return !atifliSerbest
+  })
+}
+
+/** Marka metninde geçmesine izin verilen yıllar: kaynak dizininde kanıtlı kuruluş yılı + web adresiyle atıflı yıllar. */
+export function izinliYillar(slug: string): number[] {
+  const kurulus = KAYNAKLI_KURULUS[slug]?.yil
+  return [...(kurulus === undefined ? [] : [kurulus]), ...(WEB_ATIFLI_OLGU[slug]?.yillar ?? [])]
+}
+
+/**
  * Metindeki yıl benzeri sayılar (tam 4 haneli rakam dizisi, 1800-2099). Model kodları/sayfa sayıları için tek başına geçen
  * sayılar da yakalanır; marka metninde bunlar yoktur.
  *

@@ -1,8 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { KAYNAKLI_KURULUS, MARKA_YASAK_IFADELER, yillariBul } from '@/data/__tests__/markaIddiaListesi'
-import { HVAC_BRANDS } from '@/data/brands'
+import { izinliYillar, yasakIfadeIhlalleri, yillariBul } from '@/data/__tests__/markaIddiaListesi'
+import { brandText, HVAC_BRANDS } from '@/data/brands'
+import { en } from '@/i18n/dictionaries/en'
+import { tr } from '@/i18n/dictionaries/tr'
 import { I18nProvider } from '@/i18n/I18nProvider'
 
 import BrandDetailPage from '../BrandDetailPage'
@@ -64,12 +66,12 @@ describe('çizilen marka sayfası yasak iddia taşımaz (a)', () => {
       it(`${lang} · ${b.slug}: yasak ifade yok; yıllar yalnız kaynaklı kuruluş yılı`, async () => {
         const { container, unmount } = await ciz(b.slug, lang)
         const metin = container.textContent ?? ''
-        for (const { ifade, neden } of MARKA_YASAK_IFADELER) {
-          expect(ifade.test(metin), `${lang} ${b.slug}: ${ifade} (${neden}) → "${metin.slice(0, 240)}"`).toBe(false)
+        for (const { ifade, neden } of yasakIfadeIhlalleri(b.slug, metin)) {
+          expect.fail(`${lang} ${b.slug}: ${ifade} (${neden}) → "${metin.slice(0, 240)}"`)
         }
-        const izinli = KAYNAKLI_KURULUS[b.slug]?.yil
+        const izinli = izinliYillar(b.slug)
         for (const yil of yillariBul(metin)) {
-          expect(yil, `${lang} ${b.slug}: kaynaksız yıl ${yil}`).toBe(izinli)
+          expect(izinli, `${lang} ${b.slug}: kaynaksız yıl ${yil}`).toContain(yil)
         }
         unmount()
       })
@@ -81,14 +83,16 @@ describe('kurumsal özet kutusu (c)', () => {
   it('Avens: Garanti / "2 Yıl" satırı YOK; kalan satırlar (Üretim, Merkez, Web) dolu — TR', async () => {
     const { container } = await ciz('avens', 'tr')
     const satirlar = ozetSatirlari(container)
-    expect(satirlar.map((s) => s[0])).toEqual(['Üretim', 'Merkez', 'Web Otoritesi'])
-    expect(satirlar[0]).toEqual(['Üretim', 'Türkiye'])
+    const d = tr.brands.detail
+    expect(satirlar.map((s) => s[0])).toEqual([d.statProduction, d.headquarters, d.webAuthority])
+    expect(satirlar[0]).toEqual([d.statProduction, 'Türkiye'])
     expect(container.textContent).not.toMatch(/Garanti|2 Yıl/)
   })
 
   it('Avens: Warranty / "2 Years" satırı YOK; kalan satırlar dolu — EN', async () => {
     const { container } = await ciz('avens', 'en')
-    expect(ozetSatirlari(container).map((s) => s[0])).toEqual(['Manufacturing', 'Headquarters', 'Web Authority'])
+    const d = en.brands.detail
+    expect(ozetSatirlari(container).map((s) => s[0])).toEqual([d.statProduction, d.headquarters, d.webAuthority])
     expect(container.textContent).not.toMatch(/Warranty|2 Years/)
   })
 
@@ -103,7 +107,8 @@ describe('kurumsal özet kutusu (c)', () => {
           expect(s[1], `${lang} ${b.slug}: boş değer`).not.toBe('')
           expect(s[0], `${lang} ${b.slug}: ham sözlük anahtarı`).not.toMatch(/^brands\./)
         }
-        const baslikVar = /Kurumsal Özet|Corporate Snapshot/.test(container.querySelector('aside')?.textContent ?? '')
+        const aside = container.querySelector('aside')?.textContent ?? ''
+        const baslikVar = aside.includes(tr.brands.detail.corporateSnapshot) || aside.includes(en.brands.detail.corporateSnapshot)
         expect(baslikVar, `${lang} ${b.slug}: başlık var ↔ satır var`).toBe(satirlar.length > 0)
         unmount()
       }
@@ -113,19 +118,21 @@ describe('kurumsal özet kutusu (c)', () => {
   it('Flexiva (çizilecek özet satırı yok): başlıksız kutu, "katalog iste" düğmesi yine çizilir', async () => {
     const { container } = await ciz('flexiva', 'tr')
     expect(ozetSatirlari(container)).toEqual([])
-    expect(container.querySelector('aside')?.textContent).not.toContain('Kurumsal Özet')
-    expect(screen.getByRole('button', { name: 'Marka Kataloglarını İste' })).toBeTruthy()
+    expect(container.querySelector('aside')?.textContent).not.toContain(tr.brands.detail.corporateSnapshot)
+    expect(screen.getByRole('button', { name: tr.brands.detail.requestCatalog })).toBeTruthy()
   })
 
   it('Vortice: kaynaklı kuruluş yılı hem üst şeritte hem özet kutusunda görünür (kaynaklı yıl KALIR)', async () => {
     const { container } = await ciz('vortice', 'tr')
-    expect(ozetSatirlari(container)).toContainEqual(['Kuruluş', '1954'])
-    expect(container.textContent).toContain('Kuruluş 1954')
+    const kurulus = tr.brands.detail.estPrefix
+    expect(ozetSatirlari(container)).toContainEqual([kurulus, '1954'])
+    expect(container.textContent).toContain(`${kurulus} 1954`)
   })
 
   it('Nicotra Gebhardt: kaynaksız "Kuruluş 1959" satırı yok; Grup ve Uzmanlık satırları kalır', async () => {
     const { container } = await ciz('nicotra-gebhardt', 'tr')
-    expect(ozetSatirlari(container).map((s) => s[0])).toEqual(['Grup', 'Uzmanlık', 'Merkez', 'Web Otoritesi'])
+    const d = tr.brands.detail
+    expect(ozetSatirlari(container).map((s) => s[0])).toEqual([d.statGroup, d.statExpertise, d.headquarters, d.webAuthority])
     expect(container.textContent).not.toContain('1959')
   })
 })
@@ -137,7 +144,8 @@ describe('DB\'den türeyen özet paragrafı (d)', () => {
     const { container } = await ciz('vortice', 'tr', OZET_TR)
     const p = screen.getByText(OZET_TR)
     expect(p.tagName).toBe('P')
-    expect(container.textContent).toContain('İtalya menşeli havalandırma üreticisi.')
+    const vortice = HVAC_BRANDS.find((b) => b.slug === 'vortice')
+    expect(container.textContent).toContain(brandText(vortice?.description, 'tr'))
   })
 
   it('urunOzeti verilmezse ya da boşsa paragraf çizilmez', async () => {

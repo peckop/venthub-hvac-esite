@@ -18,7 +18,14 @@
  */
 import { describe, expect, it } from 'vitest'
 
-import { KAYNAKLI_KURULUS, MARKA_YASAK_IFADELER, yillariBul } from '../../data/__tests__/markaIddiaListesi'
+import {
+  izinliYillar,
+  KAYNAKLI_KURULUS,
+  MARKA_YASAK_IFADELER,
+  WEB_ATIFLI_OLGU,
+  yasakIfadeIhlalleri,
+  yillariBul,
+} from '../../data/__tests__/markaIddiaListesi'
 import { HVAC_BRANDS } from '../../data/brands'
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
@@ -42,8 +49,8 @@ describe('INV-MARKA-IDDIA-1 (a): marka kayıtları yasak iddia ifadesi taşımaz
     const ihlal: string[] = []
     for (const b of HVAC_BRANDS) {
       for (const [yol, metin] of markaMetinleri(b)) {
-        for (const { ifade, neden } of MARKA_YASAK_IFADELER) {
-          if (ifade.test(metin)) ihlal.push(`${yol}: ${ifade} — ${neden}\n    "${metin}"`)
+        for (const { ifade, neden } of yasakIfadeIhlalleri(b.slug, metin)) {
+          ihlal.push(`${yol}: ${ifade} — ${neden}\n    "${metin}"`)
         }
       }
     }
@@ -75,14 +82,45 @@ describe('INV-MARKA-IDDIA-1 (b): kuruluş yılı yalnız kaynak dizininde kanıt
   it('marka metinlerinde geçen her yıl, o markanın kaynaklı kuruluş yılıdır (metne gömülü "1933\'te", "2010" gibi yıllar yok)', () => {
     const ihlal: string[] = []
     for (const b of HVAC_BRANDS) {
-      const izinli = KAYNAKLI_KURULUS[b.slug]?.yil
+      const izinli = izinliYillar(b.slug)
       for (const [yol, metin] of markaMetinleri(b)) {
         for (const yil of yillariBul(metin)) {
-          if (yil !== izinli) ihlal.push(`${yol}: "${yil}" kaynaksız yıl — "${metin}"`)
+          if (!izinli.includes(yil)) ihlal.push(`${yol}: "${yil}" kaynaksız yıl — "${metin}"`)
         }
       }
     }
     expect(ihlal, ihlal.join('\n')).toEqual([])
+  })
+})
+
+describe('INV-MARKA-IDDIA-1 (b2): web adresiyle atıflı olgu istisnası dar kalır (URN-82)', () => {
+  it('her istisna en az bir resmî web adresi taşır ve markası kayıtlıdır', () => {
+    for (const [slug, kayit] of Object.entries(WEB_ATIFLI_OLGU)) {
+      expect(HVAC_BRANDS.some((b) => b.slug === slug), `${slug}: marka kaydı yok`).toBe(true)
+      expect(kayit.kaynaklar.length, slug).toBeGreaterThan(0)
+      for (const k of kayit.kaynaklar) expect(k, `${slug}: kaynak adresi yok`).toMatch(/^https:\/\/www\./)
+    }
+  })
+
+  it('oran cümlesi yalnız şirkete atfedildiğinde serbest; atıfsız aynı oran KIRMIZI; istisnası olmayan markada KIRMIZI', () => {
+    const atifliTr = 'Şirket, motor hızını ayarlayarak enerji tüketiminde %80\'e varan azalma sağlanabileceğini belirtiyor.'
+    const atifsizTr = 'Enerji tüketimini %80\'e varan oranda azaltır.'
+    const atifliEn = 'The company states that matching motor speed to demand can reduce energy consumption by up to 80%.'
+    const atifsizEn = 'It reduces energy consumption by up to 80%.'
+    expect(yasakIfadeIhlalleri('danfoss', atifliTr)).toEqual([])
+    expect(yasakIfadeIhlalleri('danfoss', atifliEn)).toEqual([])
+    expect(yasakIfadeIhlalleri('danfoss', atifsizTr).length).toBeGreaterThan(0)
+    expect(yasakIfadeIhlalleri('danfoss', atifsizEn).length).toBeGreaterThan(0)
+    expect(yasakIfadeIhlalleri('vortice', atifliTr).length).toBeGreaterThan(0)
+    expect(yasakIfadeIhlalleri(undefined, atifliEn).length).toBeGreaterThan(0)
+  })
+
+  it('yıl izni yalnız tabloda: Danfoss 1933 ve 1968, kaynaklı kuruluşlu markalar kendi yılı, diğerleri hiçbir yıl', () => {
+    expect(izinliYillar('danfoss').sort()).toEqual([1933, 1968])
+    expect(izinliYillar('vortice')).toEqual([1954])
+    expect(izinliYillar('seat')).toEqual([1968])
+    expect(izinliYillar('avens')).toEqual([])
+    expect(izinliYillar('nicotra-gebhardt')).toEqual([])
   })
 })
 

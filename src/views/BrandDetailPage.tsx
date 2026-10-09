@@ -43,8 +43,9 @@ const BRAND_DETAILS: Record<string, {
 }> = {
   vortice: {
     stats: [
+      // URN-82 (2026-10-09): "90+" ülke satırı KALKTI — Blog tablosu etiketi bilerek boşalttı (`statCountries: ''`): kaynak
+      // dizininde Vortice için ülke sayısı karşılığı yok. Etiketsiz bir değer basmak yarım satır olurdu.
       { labelKey: 'estPrefix', value: '1954' },
-      { labelKey: 'statCountries', value: '90+' },
       { labelKey: 'statGroup', value: 'Vortice Group' }
     ]
   },
