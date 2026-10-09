@@ -166,8 +166,8 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'Flexiva',
     slug: 'flexiva',
     description: {
-      tr: 'Flexiva ürünleri henüz katalogda yer almıyor.',
-      en: 'Flexiva products are not yet in the catalogue.'
+      tr: 'Flexiva markası katalogda kayıtlıdır.',
+      en: 'Flexiva is a brand registered in the catalogue.'
     }
   }
 ]

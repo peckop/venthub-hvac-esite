@@ -243,7 +243,7 @@ export const en: typeof tr = {
       'hava-perdesi': {
         title: 'Air Curtain',
         summary: 'An air curtain creates downward airflow across the door opening; store and market entrances are typical uses.',
-        steps: ['Measure the door width; the selection is based on it.', 'Measure the door height from the floor and check whether mounting above the door is possible.', 'Decide whether you need entrance heating: unheated models create airflow only, electric heated models also heat the entrance.'],
+        steps: ['Measure the door width; the selection is based on it.', 'Measure the door height from the floor and check whether mounting above the door is possible.', 'Decide whether you need entrance heating: unheated models create airflow only, electrically heated models also heat the entrance.'],
         pitfalls: ['Choosing without checking door width', 'Expecting heating from an unheated model', 'Choosing without checking door height']
       },
       'jet-fan': {
@@ -263,7 +263,7 @@ export const en: typeof tr = {
       'air-curtain': {
         image: '/images/hvac_installation_close_up_premium_3.webp',
         pitfalls: ['Choosing without checking door width', 'Expecting heating from an unheated model', 'Choosing without checking door height'],
-        steps: ['Measure the door width; the selection is based on it.', 'Measure the door height from the floor and check whether mounting above the door is possible.', 'Decide whether you need entrance heating: unheated models create airflow only, electric heated models also heat the entrance.'],
+        steps: ['Measure the door width; the selection is based on it.', 'Measure the door height from the floor and check whether mounting above the door is possible.', 'Decide whether you need entrance heating: unheated models create airflow only, electrically heated models also heat the entrance.'],
         summary: 'Door width, door height and whether you need entrance heating determine the air curtain choice.',
         title: 'Air Curtain Selection'
       }
@@ -312,7 +312,7 @@ export const en: typeof tr = {
   },
   meta: {
     siteTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
-    siteDesc: 'Duct fans, air curtains and heat recovery units. Product Selector sizing for duct fans, HRV, air curtains and jet fans.',
+    siteDesc: 'Duct fans, air curtains and heat recovery units; engineering-led product selection. Product Selector sizing for duct fans, HRV, air curtains and jet fans.',
   },
 
   sayfaBulunamadi: {
@@ -324,15 +324,15 @@ export const en: typeof tr = {
 
   home: {
     seoTitle: 'VentHub | Fan, Air Curtain and Heat Recovery Product Catalogue',
-    seoDesc: 'Technical specifications for fans, air curtains and heat recovery units, plus duct fan, HRV, air curtain and jet fan calculators. Request a quote.',
+    seoDesc: 'Technical specifications for fans, air curtains and heat recovery units, plus duct fan, HRV, air curtain and jet fan calculators for engineering-backed selection. Request a quote.',
     hero: {
-      eyebrow: 'HVAC Product Catalogue and Quotes',
+      eyebrow: 'Engineering-Guided HVAC Product Catalogue',
       title: 'Find the right product family by category.',
       titleLineOne: 'Find the right product',
       titleLineTwo: 'family by category.',
       subtitle: 'Move from the category list to a product family and reach the quote form.',
       primaryCta: 'Explore Products',
-      secondaryCta: 'Get a Fast Quote',
+      secondaryCta: 'Request a Quote',
       quickAccessLabel: 'Quick Access',
       visualAlt: 'VentHub industrial HVAC solution visual',
       visualEyebrow: 'Category Selection',
@@ -340,7 +340,7 @@ export const en: typeof tr = {
       visualSubtitle: 'Reach product families by category, run a preliminary assessment with the Product Selector, request a quote.',
       visualPoints: {
         selection: 'Access to product families by category',
-        routing: 'Contact form and e-mail for quotes'
+        routing: 'Contact form and email for quotes'
       },
       metrics: {
         coreCategories: 'start from a main category',
@@ -396,7 +396,7 @@ export const en: typeof tr = {
               },
               {
                 label: 'Brushless EC Motor',
-                subLabel: 'Low energy use in EC motor models'
+                subLabel: 'Per the manufacturer, low energy use in EC motor models'
               }
             ]
           },
@@ -423,7 +423,7 @@ export const en: typeof tr = {
       eyebrow: 'MIXED FLOW DUCT FAN',
       title: 'Vortice Lineo Quiet Product Family',
       subtitle: 'A mixed flow duct fan with the sound-absorbing lining integrated into the outer housing.',
-      description: 'LINEO QUIET has an AC induction motor and LINEO QUIET ES a brushless EC motor; the brushless EC model provides low energy consumption.',
+      description: 'LINEO QUIET has an AC induction motor and LINEO QUIET ES a brushless EC motor; per the manufacturer, the brushless EC model provides low energy consumption.',
       cta: 'View Technical Data',
       badge: 'AC / EC MOTOR',
       componentLabel: 'System Component',
@@ -514,35 +514,35 @@ export const en: typeof tr = {
           eyebrow: 'Heat Recovery',
           title: 'Ducted central and single room units',
           description: 'The Product Selector sizes heat recovery (HRV); results are a pre-assessment.',
-          point1: 'Ducted central families',
-          point2: 'Single room families'
+          point1: 'Ducted central heat recovery product families',
+          point2: 'Single-room heat recovery product families'
         }
       }
     },
     featuredCommercial: {
       eyebrow: 'Product Showcase',
       title: 'Fans and Ventilation Products',
-      subtitle: 'Use the tabs to browse models, air curtains and heat recovery products from the catalogue.',
+      subtitle: 'Use the tabs to browse models from the catalogue.',
       cta: 'Browse All Product Families',
       panelEyebrow: 'Technical Focus',
       tabs: {
-        featured: 'Featured',
-        newArrivals: 'Duct Fans',
-        bestSellers: 'Product Families',
+        featured: 'Models',
+        newArrivals: 'More Models',
+        bestSellers: 'Further Models',
         airCurtains: 'Air Curtains',
         heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Models from the Catalogue',
-        newArrivals: 'Newly Added Models',
-        bestSellers: 'Catalogue Products',
+        newArrivals: 'Models from the Catalogue',
+        bestSellers: 'Models from the Catalogue',
         airCurtains: 'Air Curtain Models',
         heatRecovery: 'Heat Recovery'
       },
       panelDescriptions: {
-        featured: 'Models selected from the catalogue and their technical specifications; details are on the product page.',
-        newArrivals: 'Models recently added to the catalogue; open the product page for details.',
-        bestSellers: 'Examples from the models in the catalogue; details are on the product page.',
+        featured: 'Models from the catalogue and their technical specifications; details are on the product page.',
+        newArrivals: 'Models from the catalogue and their technical specifications; details are on the product page.',
+        bestSellers: 'Models from the catalogue and their technical specifications; details are on the product page.',
         airCurtains: 'Air curtains that separate indoor air from outside with an airflow along the doorway; unheated and electrically heated models.',
         heatRecovery: 'Heat recovery units in ducted central and single-room types.'
       }
@@ -587,7 +587,7 @@ export const en: typeof tr = {
       statsPipelineLabel: 'In the Catalogue',
       eyebrow: 'Guides and Support',
       title: 'Guides and Sizing',
-      subtitle: 'Read the guides and use the calculators before choosing a product; check the FAQ and delivery information before requesting a quote.',
+      subtitle: 'Read the guides (published in Turkish) and use the calculators before choosing a product; check the FAQ and delivery information before requesting a quote.',
       cta: 'Explore',
       hub: {
         title: 'Ventilation Guide Articles',
@@ -630,15 +630,15 @@ export const en: typeof tr = {
     finalCta: {
       eyebrow: 'Final Step',
       title: 'Send your requirements, request a quote.',
-      subtitle: 'Run a preliminary assessment with the Product Selector, browse the product families, and use the contact form or e-mail to request a quote.',
+      subtitle: 'Run a preliminary assessment with the Product Selector, browse the product families, and use the contact form or email to request a quote.',
       primaryCta: 'Request Quote',
       secondaryCta: 'Get in Touch',
       tertiaryCta: 'Explore Products'
     },
     heroTitle: 'Clean Air, the Right Product Family',
-    heroSubtitle: 'Ventilation product catalogue and calculators: fans, air curtains, heat recovery and frequency converters.',
+    heroSubtitle: 'Engineering-driven ventilation product catalogue and calculators: fans, air curtains, heat recovery and frequency converters.',
     bottomCtaTitle: 'Let us help you choose the right product.',
-    bottomCtaSubtitle: 'Send your project details through the contact form or by e-mail.',
+    bottomCtaSubtitle: 'Send your project details through the contact form or by email.',
     whyParagraph: 'Browse duct fan, air curtain and heat recovery models, pre-size with the Product Selector and request a quote.',
     why: {
       premiumTitle: 'Brands',
@@ -734,7 +734,7 @@ export const en: typeof tr = {
     // REC-338 — see the TR dictionary for the measurement that motivated these keys.
     discovery: {
       seoTitle: 'All Products | Industrial Ventilation and HVAC — VentHub',
-      seoDesc: 'Product families in one list: fans, heat recovery, air curtains, frequency converters and accessories. Request a quote to order.',
+      seoDesc: 'Product families in one list: fans, heat recovery, air curtains, frequency converters and accessories. Engineering-led selection; request a quote to order.',
     },
     orbital: {
       dragHint: 'Drag to Spin',
@@ -771,9 +771,9 @@ export const en: typeof tr = {
       createNewProject: 'Create New Project',
       projectNamePlaceholder: 'Project Name (e.g. Office Building Ventilation)',
       cancel: 'Cancel',
-      footerHint: 'You can manage your projects from the my account page, download product lists as PDF, or request a quote.',
+      footerHint: 'You can manage your projects from the my account page.',
     },
-    heroTitle: 'Browse fans, air curtains, heat recovery and control products',
+    heroTitle: 'Discover fans, air curtains, heat recovery and control products: engineering-led selection',
     heroSubtitle: 'Reach a product family from the categories or brand pages, or type a model name or code in the search box.',
     itemsListed: 'items listed',
     // REC-115: removed with the dead CategoryHero component.
@@ -1001,7 +1001,7 @@ export const en: typeof tr = {
     ctaTitleItalic: 'Use the Contact Form',
     ctaContact: 'Contact Us',
     ctaExplore: 'Explore Products',
-    seoDescription: 'VentHub lists fans, air curtains, heat recovery units and frequency converters. Use the Product Selector for a pre-assessment and request a quote.',
+    seoDescription: 'VentHub lists fans, air curtains, heat recovery units and frequency converters. For engineering-oriented selection, use the Product Selector for a pre-assessment and request a quote.',
     vision: 'Catalogue, Sizing, Quote'
   },
   category: {
@@ -1035,7 +1035,7 @@ export const en: typeof tr = {
       q1: 'What does an air curtain do?',
       a1: 'An air curtain separates indoor air from outdoor air with a stream of air blown downwards across the door, limiting air exchange while the door is open. Shop and supermarket entrances, restaurants and warehouse doors are typical applications.',
       q2: 'Should I choose an electric or an ambient-air model?',
-      a2: 'This depends on where you use it. Unheated (ambient-air) models only create an airflow; electric heated models also heat the entrance. If you want heating at the entrance, choose an electric heated model; if not, choose an unheated one.',
+      a2: 'This depends on where you use it. Unheated (ambient-air) models only create an airflow; electrically heated models also heat the entrance. If you want heating at the entrance, choose an electrically heated model; if not, choose an unheated one.',
       q3: 'What size should the air curtain be?',
       a3: 'An air curtain is chosen according to the door width. The door\'s height above the floor and whether the unit can be mounted above the door also affect the choice. For details, see the technical specifications on the product page.',
       q4: 'How is an air curtain installed?',
@@ -1054,7 +1054,7 @@ export const en: typeof tr = {
       warrantyDesc: 'Subject to manufacturer/importer terms',
       // REC-104: see tr.ts — payment/shipping promise keys removed.
       techSupportTitle: 'Enquiry and Quote',
-      techSupportDesc: 'By form or e-mail',
+      techSupportDesc: 'By form or email',
     },
     typeComparison: {
       sectionTitle: 'Which Type of Air Curtain Is Right for You?',
@@ -1070,7 +1070,7 @@ export const en: typeof tr = {
       electricBestFor4: '',
       electricNotFor1: 'Entrances not to heat',
       electricNotFor2: '',
-      ambientTitle: 'Ambient Air',
+      ambientTitle: 'Unheated',
       ambientSubtitle: 'Unheated models',
       ambientBenefit1: 'Creates an airflow only',
       ambientBenefit2: 'Downward air stream',
@@ -1087,14 +1087,14 @@ export const en: typeof tr = {
       notForLabel: 'NOT RECOMMENDED:',
       modelsCta: '{{title}} Models',
       stillUndecided: 'Still undecided?',
-      wizardPitch: 'If you are undecided, the air curtain calculator in the Product Selector gives a preliminary assessment.',
+      wizardPitch: 'If you are undecided, enter your door size and heating preference for a preliminary assessment.',
       helpMe: 'Help Me',
     },
     bottomCta: {
       nextStep: 'Your Next Step',
       helpText: 'You can send your questions about {{category}}.',
       viewAllProducts: 'View all products',
-      findFit: 'Find the Right One for Me',
+      findFit: 'Open the Selection Wizard',
       findFitDesc: 'Run a preliminary calculation',
       expertSupport: 'Contact Form',
       expertSupportDesc: 'Submit a project enquiry',
@@ -1109,20 +1109,20 @@ export const en: typeof tr = {
       tempDiffDesc: 'The indoor-outdoor temperature difference when the door is opened',
       airflowTitle: 'Airflow',
       airflowDesc: 'Outdoor air entering through an open door',
-      pestTitle: 'Dust Entry',
-      pestDesc: 'Dust entering through an open door',
+      pestTitle: 'Dust and Insect Entry',
+      pestDesc: 'Dust and insects entering through an open door',
       crossMark: '❌',
       checkMark: '✓',
       withoutTitle: 'Without an Air Curtain',
       withoutPoint1: 'Indoor and outdoor air mix',
       withoutPoint2: 'Hot and cold air can pass through',
       withoutPoint3: 'Dust can enter',
-      withoutPoint4: '',
+      withoutPoint4: 'Dust and insects can enter',
       withTitle: 'With an Air Curtain',
       withPoint1: 'Invisible air barrier',
       withPoint2: 'Limits air and heat exchange',
       withPoint3: 'Limits dust entry',
-      withPoint4: '',
+      withPoint4: 'Per the manufacturer, prevents dust and insect entry',
     },
     landing: {
       expertiseArea: 'Product Category',
@@ -1141,8 +1141,8 @@ export const en: typeof tr = {
     },
     series: {
       technicalFamily: 'Subcategory',
-      heroDefaultDesc: 'Browse products by technical product family; specification tables are on the product pages.',
-      seriesDetail: 'Product Family Details',
+      heroDefaultDesc: 'Browse professional ventilation solutions by their technical product families.',
+      seriesDetail: 'Subcategory Detail',
       requestQuote: 'Request a Quote',
       colModel: 'Model',
       colPrice: 'Price',
@@ -1153,7 +1153,7 @@ export const en: typeof tr = {
       trust2Title: 'Product Selector',
       trust2Desc: 'Gives a preliminary assessment from volume, flow rate and pressure inputs.',
       trust3Title: 'Enquiry and Quote',
-      trust3Desc: 'You can send your questions by form or e-mail.',
+      trust3Desc: 'You can send your questions by form or email.',
     },
     loading: 'Loading category... ',
     notFound: 'Category Not Found',
@@ -1169,7 +1169,7 @@ export const en: typeof tr = {
     ambientAir: 'Ambient Air (Unheated)',
     ambientAirDesc: 'Unheated models (Vortice AD) create an air flow across the door opening only and do not heat the entrance.',
     electricHeated: 'Electric Heated',
-    electricHeatedDesc: 'Electric heated models heat the air flow passing through the door, providing heating at the entrance.',
+    electricHeatedDesc: 'Electrically heated models heat the air flow passing through the door, providing heating at the entrance.',
     ambientPoint1: 'Creates an airflow only.',
     ambientPoint2: 'Choose this type if no heating is wanted at the entrance.',
     ambientPoint3: 'Uses an air flow to block hot and cold air at the door opening.',
@@ -1186,10 +1186,10 @@ export const en: typeof tr = {
     longTermInvestmentDesc: 'The manufacturer states low energy use for EC brushless LINEO QUIET ES.',
     allSeries: 'All Subcategories',
     chooseSeriesDesc: 'Choose the subcategory that suits your needs.',
-    inspectSeries: 'Explore Subcategory',
+    inspectSeries: 'Explore',
     whyCategory: 'Why {{category}}?',
     electricVsAmbientAlt: 'Electric vs Ambient Air Comparison',
-    modernLoftAlt: 'Modern Loft Application',
+    modernLoftAlt: 'Illustration of a Vortice Lineo Quiet duct fan in an interior space',
     lineoQuietQuote: 'Lineo Quiet ES is a mixed-flow duct fan with sound-absorbing cladding and an EC brushless motor.',
     industrialLabAlt: 'Industrial Laboratory Application',
     lineoTechnicalAlt: 'Lineo Quiet Technical Detail',
@@ -1244,7 +1244,7 @@ export const en: typeof tr = {
         {
           title: 'Airflow',
           description: 'The device blows a stream of air downwards across the door.',
-          detail: 'Unheated models only create an airflow; electric heated models also heat the entrance.'
+          detail: 'Unheated models only create an airflow; electrically heated models also heat the entrance.'
         },
         {
           title: 'Invisible Barrier',
@@ -1283,12 +1283,12 @@ export const en: typeof tr = {
         },
         {
           value: '{aile}',
-          label: 'Families',
+          label: 'Vortice Product Families',
           desc: 'Listed in the catalogue'
         },
         {
           value: '{model}',
-          label: 'Active Models',
+          label: 'Vortice Active Models',
           desc: 'Vortice models in the catalogue'
         },
         {
@@ -1501,7 +1501,7 @@ export const en: typeof tr = {
           desc: 'Models with a sound level between {{esik2}} and {{esik3}} dB(A).'
         },
         industrial: {
-          label: 'Industrial Noise Level',
+          label: 'Noise level: 60 dB(A) and above',
           desc: 'Models with a sound level above {{esik3}} dB(A).'
         }
       },
@@ -1535,7 +1535,7 @@ export const en: typeof tr = {
           desc: 'Models with an airflow between {{esik1}} and {{esik2}} m³/h.'
         },
         industrialFlow: {
-          label: 'Industrial Airflow Capacity',
+          label: 'Airflow: above 2,000 m³/h',
           desc: 'Models with an airflow above {{esik2}} m³/h.'
         }
       }
@@ -1787,9 +1787,9 @@ export const en: typeof tr = {
     },
     addressStep: {
       standardName: 'Standard',
-      standardEta: 'Stated in your quote',
+      standardEta: 'Clarified at the quote stage',
       expressName: 'Express',
-      expressEta: 'Stated in your quote',
+      expressEta: 'Clarified at the quote stage',
     },
     saved: {
       title: 'Saved Addresses',
@@ -1966,15 +1966,15 @@ export const en: typeof tr = {
     // REC-355 Phase 1: payment captured but order match unverified (needs_review).
     // This screen NEVER offers "try again" — the money is taken; a retry risks a double charge.
     reviewTitle: 'Payment Received, Verification in Progress',
-    reviewDesc: 'Your payment was successfully received from your bank. We are still verifying the match with your order and will complete it shortly.',
-    reviewWarning: 'Please do not pay again. We will notify you by email once verification is complete.',
+    reviewDesc: 'Your payment was received from your bank. Your order stays pending until the payment is matched to it and confirmed.',
+    reviewWarning: 'Please do not pay again. For any questions, you can write to info@venthub.com.tr.',
     reviewBackHome: 'Back to Home',
     orderCompletedTitle: 'Your Order is Complete!',
     orderNoLabel: 'Order No',
     orderCompletedDesc: 'Your order has been received successfully. A confirmation email will be sent shortly.',
     dateLabel: 'Date',
     itemsCountLabel: 'Items',
-    securedBy3d: 'Secured by 3D',
+    securedBy3d: '',
     viewOrderDetails: 'View Order Details',
     failedGeneric: 'Payment could not be completed',
     failedToast: 'Payment failed: {{msg}}',
@@ -1985,7 +1985,7 @@ export const en: typeof tr = {
   },
   brands: {
     page: {
-      statGlobal: 'Global',
+      statGlobal: '{marka}',
     },
     sectionTitle: 'Brands in the Catalogue',
     sectionSubtitle: 'Browse AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT and Vortice products and their specifications.',
@@ -2009,7 +2009,7 @@ export const en: typeof tr = {
       title: 'Ordering by Quotation',
       description: 'Online payment is not open yet; request a quote to place an order. Delivery time and shipping terms are settled at the quotation stage.',
       original: 'Technical specification tables',
-      standard: 'Quotes by form or e-mail',
+      standard: 'Brands with products in the catalogue',
       imageAlt: 'Technical Infrastructure and HVAC Installation'
     },
     detail: {
@@ -2024,7 +2024,7 @@ export const en: typeof tr = {
       headquarters: 'Headquarters',
       webAuthority: 'Website',
       officialSite: 'Official Site',
-      requestCatalog: 'Request Brand Catalogs',
+      requestCatalog: 'Request a Quote',
       featuredSystems: 'Product Families',
       allProductGroups: 'All Product Families',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
@@ -2038,7 +2038,7 @@ export const en: typeof tr = {
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak
       // `BRAND_DETAILS` icinde tasinir; etiket burada, cunku arayuz metnidir.
-      statCountries: 'Countries',
+      statCountries: '',
       statGroup: 'Group',
       statProduction: 'Manufacturing',
       statWarranty: 'Models',
@@ -2491,7 +2491,7 @@ export const en: typeof tr = {
   },
   quotes: {
     title: 'My Quote Requests',
-    subtitle: 'Create quote requests and track the pricing process.',
+    subtitle: 'Track your quote requests and their status here.',
     empty: 'You have no quote requests yet.',
     emptyHint: 'For products without a visible price, use "Request Quote" to open a request.',
     fetchError: 'Could not load quote records',
@@ -2674,14 +2674,14 @@ export const en: typeof tr = {
       },
       havaPerdesi: {
         ad: 'Air curtain sizing',
-        aciklama: 'Find the required curtain airflow and model from door width and height.',
+        aciklama: 'Calculate the required curtain airflow from door dimensions and operating conditions.',
       },
       jetFan: {
         ad: 'Jet fan sizing',
         aciklama: 'Calculate the thrust demand and fan count for car parks and similar spaces.',
       },
     },
-    not: 'These are pre-assessments; for a final selection, write via the contact form or by e-mail.',
+    not: 'These are pre-assessments; for a final selection, write via the contact form or by email.',
   },
   calculators: {
     recommendations: 'Recommendations',
@@ -2697,9 +2697,9 @@ export const en: typeof tr = {
       contactLink: 'get in touch',
     },
     airCurtain: {
-      trafficLowDesc: '< 50 passes/hour',
-      trafficMediumDesc: '50-200 passes/hour',
-      trafficHighDesc: '> 200 passes/hour',
+      trafficLowDesc: 'Infrequent passage',
+      trafficMediumDesc: 'Moderate passage',
+      trafficHighDesc: 'Frequent passage',
       newCalculation: 'New Calculation',
       calculate: 'Calculate',
       title: 'Air Curtain Calculator',
@@ -2957,7 +2957,7 @@ export const en: typeof tr = {
         },
         {
           title: 'Quiet Settings',
-          description: 'Fan noise can distract in quiet settings such as libraries and offices.'
+          description: ''
         }
       ],
       visual: {
@@ -3043,11 +3043,11 @@ export const en: typeof tr = {
           value: ''
         },
         {
-          label: 'Families',
+          label: 'Vortice Product Families',
           value: '{aile}'
         },
         {
-          label: 'Active Models',
+          label: 'Vortice Active Models',
           value: '{model}'
         },
         {
@@ -3108,7 +3108,7 @@ export const en: typeof tr = {
     badgeBest: 'Ranked 1st',
     badgeQuietest: 'Lowest dB(A)',
     badgeEfficient: 'EC motor',
-    cardDelivers: 'In your duct',
+    cardDelivers: 'Calculated in your duct',
     cardNoise: 'Noise level',
     cardDiameter: 'Connection diameter',
     cardCta: 'View product',
@@ -3194,7 +3194,7 @@ export const en: typeof tr = {
     analyzing: 'Analysing Models...',
     centralSystem: 'If central system is available',
     close: 'Close',
-    coldStorage: 'Cold Storage',
+    coldStorage: 'Warehouse',
     coldStorageDesc: 'Warehouse doors',
     coldStorageTip: 'Limits air exchange through the open door',
     consultUs: 'Consult us',
@@ -3203,7 +3203,7 @@ export const en: typeof tr = {
     electricHeater: 'Electric Heater',
     entranceDesc: 'Shop, market and restaurant entrance',
     entranceDoor: 'Entrance Door',
-    entranceTip: 'Unheated or electric heated models can be chosen',
+    entranceTip: 'Unheated or electrically heated models can be chosen',
     findSuitable: 'Find the Suitable One for Me',
     goBack: 'Go Back',
     heatingNeed: 'Is Heating Needed?',
@@ -3214,7 +3214,7 @@ export const en: typeof tr = {
     industrialDesc: 'Warehouse door',
     industrialTip: 'Limits dust entry at open doors',
     insulation: 'For airflow only',
-    matchScore: '{{score}}% Match',
+    matchScore: 'Fit score: {{score}}/100',
     meter: 'Metre',
     mountType: 'Which mounting type is needed?',
     next: 'Continue',

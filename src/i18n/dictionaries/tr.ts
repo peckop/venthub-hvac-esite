@@ -216,7 +216,7 @@ export const tr = {
     // ve `rel="canonical"` etiketi de yoktu.
     discovery: {
       seoTitle: 'Tüm Ürünler | Endüstriyel Havalandırma ve HVAC — VentHub',
-      seoDesc: 'Ürün aileleri tek listede: fanlar, ısı geri kazanım, hava perdeleri, frekans konvertörleri ve aksesuarlar. Sipariş için teklif istenir.',
+      seoDesc: 'Ürün aileleri tek listede: fanlar, ısı geri kazanım, hava perdeleri, frekans konvertörleri ve aksesuarlar. Mühendislik destekli seçim; sipariş için teklif istenir.',
     },
     orbital: {
       dragHint: 'Tut Çevir',
@@ -253,7 +253,7 @@ export const tr = {
       createNewProject: 'Yeni Proje Oluştur',
       projectNamePlaceholder: 'Proje Adı (Örn: Ofis Binası Havalandırması)',
       cancel: 'İptal Et',
-      footerHint: 'Projelerinizi hesabım sayfasından yönetebilir, ürün listelerini PDF olarak indirebilir veya teklif isteyebilirsiniz.',
+      footerHint: 'Projelerinizi hesabım sayfasından yönetebilirsiniz.',
     },
     allProductsTitle: 'Tüm Ürünlerimiz',
     systemTotalPrefix: 'Katalogdaki tüm',
@@ -261,7 +261,7 @@ export const tr = {
     viewList: 'Liste',
     emptyTitle: 'Ürün Bulunamadı',
     emptyDesc: 'Daha fazla ürün görmek için kategorilerden birini seçin.',
-    heroTitle: 'Fan, hava perdesi, ısı geri kazanım ve kontrol ürünlerini inceleyin',
+    heroTitle: 'Fan, hava perdesi, ısı geri kazanım ve kontrol ürünlerini keşfedin: mühendislik odaklı seçim',
     heroSubtitle: 'Kategorilerden ya da marka sayfalarından ürün ailesine ulaşın; arama alanına model adı ya da kodu yazın.',
     itemsListed: 'ürün listeleniyor',
     // REC-115: `products.resultsFound` KALDIRILDI — tek tüketicisi CategoryHero'ydu.
@@ -420,7 +420,7 @@ export const tr = {
   },
   meta: {
     siteTitle: 'VentHub | Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri',
-    siteDesc: 'Kanal fanı, hava perdesi ve ısı geri kazanım ürünleri. Ürün Seçici ile kanal fanı, HRV, hava perdesi ve jet fan hesapları.',
+    siteDesc: 'Kanal fanı, hava perdesi ve ısı geri kazanım ürünleri; mühendislik destekli ürün seçimi. Ürün Seçici ile kanal fanı, HRV, hava perdesi ve jet fan hesapları.',
   },
 
   // 404 sayfası (src/app/not-found.tsx). Next.js'in hazır sayfası İngilizce metin + ikinci bir
@@ -434,15 +434,15 @@ export const tr = {
 
   home: {
     seoTitle: 'VentHub | Fan, Hava Perdesi ve Isı Geri Kazanım Ürün Kataloğu',
-    seoDesc: 'Fan, hava perdesi ve ısı geri kazanım ürünlerinin teknik özellikleri; kanal fanı, HRV, hava perdesi ve jet fan hesaplayıcıları. Teklif isteyin.',
+    seoDesc: 'Fan, hava perdesi ve ısı geri kazanım ürünlerinin teknik özellikleri; mühendislik destekli seçim için kanal fanı, HRV, hava perdesi ve jet fan hesaplayıcıları. Teklif isteyin.',
     hero: {
-      eyebrow: 'HVAC Ürün Kataloğu ve Teklif',
+      eyebrow: 'Mühendislik Odaklı HVAC Ürün Kataloğu',
       title: 'Doğru ürün ailesini kategoriden bulun.',
       titleLineOne: 'Doğru ürün ailesini',
       titleLineTwo: 'kategoriden bulun.',
       subtitle: 'Kategori listesinden ürün ailesine geçin ve teklif formuna ulaşın.',
       primaryCta: 'Ürünleri Keşfet',
-      secondaryCta: 'Hızlı Teklif Al',
+      secondaryCta: 'Teklif İste',
       quickAccessLabel: 'Hızlı Erişim',
       visualAlt: 'VentHub endüstriyel HVAC çözüm görseli',
       visualEyebrow: 'Kategori Seçimi',
@@ -506,7 +506,7 @@ export const tr = {
               },
               {
                 label: 'EC Fırçasız Motor',
-                subLabel: 'EC motorlu modellerde düşük enerji tüketimi'
+                subLabel: 'Üreticiye göre EC motorlu modellerde düşük enerji tüketimi'
               }
             ]
           },
@@ -535,7 +535,7 @@ export const tr = {
       eyebrow: 'KANAL TİPİ KARMA AKIŞLI FAN',
       title: 'Vortice Lineo Quiet Ürün Ailesi',
       subtitle: 'Ses emici kaplaması dış gövdeye entegre, karma akışlı kanal fanı.',
-      description: 'AC endüksiyon motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES modelleri vardır; EC fırçasız model düşük enerji tüketimi sağlar.',
+      description: 'AC endüksiyon motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES modelleri vardır; üreticiye göre EC fırçasız model düşük enerji tüketimi sağlar.',
       cta: 'Teknik Verileri İncele',
       badge: 'AC / EC MOTOR',
       componentLabel: 'Sistem Bileşeni',
@@ -626,35 +626,35 @@ export const tr = {
           eyebrow: 'Isı Geri Kazanım',
           title: 'Kanallı merkezi ve tekil oda üniteleri',
           description: 'Ürün Seçici\'de ısı geri kazanım (HRV) hesabı yapılır; sonuç ön değerlendirmedir.',
-          point1: 'Kanallı merkezi aileler',
-          point2: 'Tekil oda aileleri'
+          point1: 'Kanallı merkezi ısı geri kazanım ürün aileleri',
+          point2: 'Tekil oda ısı geri kazanım ürün aileleri'
         }
       }
     },
     featuredCommercial: {
       eyebrow: 'Ürün Vitrini',
       title: 'Fanlar ve Havalandırma Ürünleri',
-      subtitle: 'Katalogdan modelleri, hava perdelerini ve ısı geri kazanım ürünlerini sekmelerden seçerek inceleyin.',
+      subtitle: 'Katalogdan modelleri sekmelerden seçerek inceleyin.',
       cta: 'Tüm Ürün Ailelerini İncele',
       panelEyebrow: 'Teknik Odak',
       tabs: {
-        featured: 'Öne Çıkanlar',
-        newArrivals: 'Kanal Fanları',
-        bestSellers: 'Ürün Aileleri',
+        featured: 'Modeller',
+        newArrivals: 'Diğer Modeller',
+        bestSellers: 'Daha Fazla Model',
         airCurtains: 'Hava Perdeleri',
         heatRecovery: 'Isı Geri Kazanım'
       },
       panelTitles: {
         featured: 'Katalogdan Modeller',
-        newArrivals: 'Yeni Eklenen Modeller',
-        bestSellers: 'Katalog Ürünleri',
+        newArrivals: 'Katalogdan Modeller',
+        bestSellers: 'Katalogdan Modeller',
         airCurtains: 'Hava Perdesi Modelleri',
         heatRecovery: 'Isı Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Katalogdan seçilen modeller ve teknik özellikleri; ayrıntılar ürün sayfasında.',
-        newArrivals: 'Kataloğa yeni eklenen modeller; ayrıntı için ürün sayfasını açın.',
-        bestSellers: 'Katalogdaki modellerden örnekler; ayrıntılar ürün sayfasında.',
+        featured: 'Katalogdan modeller ve teknik özellikleri; ayrıntılar ürün sayfasında.',
+        newArrivals: 'Katalogdan modeller ve teknik özellikleri; ayrıntılar ürün sayfasında.',
+        bestSellers: 'Katalogdan modeller ve teknik özellikleri; ayrıntılar ürün sayfasında.',
         airCurtains: 'Kapı boyunca üflenen hava akımıyla içerideki havayı dışarıdan ayıran hava perdeleri; ısıtıcısız ve elektrikli ısıtıcılı modeller.',
         heatRecovery: 'Kanallı merkezi ve tekil oda tipinde ısı geri kazanım üniteleri.'
       }
@@ -749,7 +749,7 @@ export const tr = {
       tertiaryCta: 'Ürünleri Keşfet'
     },
     heroTitle: 'Temiz Hava, Doğru Ürün Ailesi',
-    heroSubtitle: 'Havalandırma ürünleri kataloğu ve hesaplayıcılar: fan, hava perdesi, ısı geri kazanım ve frekans konvertörü.',
+    heroSubtitle: 'Mühendislik odaklı havalandırma ürünleri kataloğu ve hesaplayıcılar: fan, hava perdesi, ısı geri kazanım ve frekans konvertörü.',
     bottomCtaTitle: 'Doğru ürünü seçmenize yardımcı olalım.',
     bottomCtaSubtitle: 'Proje detayınızı iletişim formu ya da e-posta ile iletin.',
     whyParagraph: 'Kanal fanı, hava perdesi ve ısı geri kazanım modellerini inceleyin; Ürün Seçici ile ön hesap yapın, teklif isteyin.',
@@ -1048,7 +1048,7 @@ export const tr = {
   },
   brands: {
     page: {
-      statGlobal: 'Küresel',
+      statGlobal: '{marka}',
     },
     sectionTitle: 'Katalogdaki Markalar',
     sectionSubtitle: 'AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT ve Vortice ürünlerini teknik özellikleriyle inceleyin.',
@@ -1074,7 +1074,7 @@ export const tr = {
       title: 'Teklifle Sipariş',
       description: 'Çevrimiçi ödeme henüz açık değil; sipariş için teklif isteyin. Teslimat süresi ve sevkiyat koşulları teklif aşamasında netleştirilir.',
       original: 'Teknik özellik tabloları',
-      standard: 'Form ve e-posta ile teklif',
+      standard: 'Katalogda ürünü olan marka',
       imageAlt: 'Teknik Altyapı ve HVAC Kurulumu'
     },
     detail: {
@@ -1089,7 +1089,7 @@ export const tr = {
       headquarters: 'Merkez',
       webAuthority: 'Web Sitesi',
       officialSite: 'Resmi Web Sitesi',
-      requestCatalog: 'Marka Kataloglarını İste',
+      requestCatalog: 'Teklif İste',
       featuredSystems: 'Ürün Aileleri',
       allProductGroups: 'Tüm Ürün Aileleri',
       // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
@@ -1104,7 +1104,7 @@ export const tr = {
       estPrefix: 'Kuruluş',
       // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak
       // `BRAND_DETAILS` içinde taşınır; etiket burada, çünkü arayüz metnidir.
-      statCountries: 'Ülke Sayısı',
+      statCountries: '',
       statGroup: 'Grup',
       statProduction: 'Üretim',
       statWarranty: 'Model',
@@ -1178,7 +1178,7 @@ export const tr = {
     ctaTitleItalic: 'İletişim Formunu Kullanın',
     ctaContact: 'İletişime Geçin',
     ctaExplore: 'Ürünleri Keşfedin',
-    seoDescription: 'VentHub’da fan, hava perdesi, ısı geri kazanım ve frekans konvertörü ürünleri listelenir. Ürün Seçici ile ön değerlendirme yapılır, teklif istenebilir.',
+    seoDescription: 'VentHub’da fan, hava perdesi, ısı geri kazanım ve frekans konvertörü ürünleri listelenir; mühendislik odaklı seçim için Ürün Seçici ile ön değerlendirme yapılır, teklif istenebilir.',
     whySubtitle: 'Ürün kataloğunda listelenen markalar',
   },
   cartToast: {
@@ -1242,9 +1242,9 @@ export const tr = {
     },
     addressStep: {
       standardName: 'Standart',
-      standardEta: 'Teklifinizde belirtilir',
+      standardEta: 'Teklif aşamasında netleşir',
       expressName: 'Ekspres',
-      expressEta: 'Teklifinizde belirtilir',
+      expressEta: 'Teklif aşamasında netleşir',
     },
     saved: {
       title: 'Kayıtlı Adresler',
@@ -1421,15 +1421,15 @@ export const tr = {
     // REC-355 Faz 1: ödeme alındı ama sipariş eşleşmesi doğrulanamadı (needs_review).
     // Bu ekranda ASLA "tekrar dene" gösterilmez — para çekilmiştir, ikinci ödeme riski doğar.
     reviewTitle: 'Ödemeniz Alındı, Doğrulama Sürüyor',
-    reviewDesc: 'Ödemeniz bankanızdan başarıyla alındı. Siparişinizle eşleştirme kontrolümüz sürüyor ve kısa süre içinde tamamlanacak.',
-    reviewWarning: 'Lütfen tekrar ödeme yapmayın. Ekip doğrulamayı tamamladığında size e-posta ile bilgi verilecektir.',
+    reviewDesc: 'Ödemeniz bankanızdan alındı. Ödeme siparişinizle eşleştirilip doğrulanana kadar siparişiniz beklemede kalır.',
+    reviewWarning: 'Lütfen tekrar ödeme yapmayın. Sorularınız için info@venthub.com.tr adresine yazabilirsiniz.',
     reviewBackHome: 'Ana Sayfaya Dön',
     orderCompletedTitle: 'Siparişiniz Tamamlandı!',
     orderNoLabel: 'Sipariş No',
     orderCompletedDesc: 'Siparişiniz başarıyla alındı. Onay e-postası kısa süre içinde gönderilecektir.',
     dateLabel: 'Tarih',
     itemsCountLabel: 'Ürünler',
-    securedBy3d: '3D Secure ile korundu',
+    securedBy3d: '',
     viewOrderDetails: 'Sipariş Detaylarını Gör',
     failedGeneric: 'Ödeme tamamlanamadı',
     failedToast: 'Ödeme hatası: {{msg}}',
@@ -1511,7 +1511,7 @@ export const tr = {
       electricBestFor4: '',
       electricNotFor1: 'Isıtılmayacak girişler',
       electricNotFor2: '',
-      ambientTitle: 'Ortam Havalı',
+      ambientTitle: 'Isıtıcısız',
       ambientSubtitle: 'Isıtmasız modeller',
       ambientBenefit1: 'Yalnızca hava akımı oluşturur',
       ambientBenefit2: 'Aşağı yönlü hava akımı',
@@ -1528,14 +1528,14 @@ export const tr = {
       notForLabel: 'TERCİH EDİLMEZ:',
       modelsCta: '{{title}} Modelleri',
       stillUndecided: 'Hala kararsız mısınız?',
-      wizardPitch: 'Kararsızsanız Ürün Seçici\'deki hava perdesi hesabıyla ön değerlendirme yapabilirsiniz.',
+      wizardPitch: 'Kararsızsanız kapı ölçüsü ve ısıtma isteğinizi girerek ön değerlendirme yapabilirsiniz.',
       helpMe: 'Bana Yardım Et',
     },
     bottomCta: {
       nextStep: 'Sıradaki Adımınız',
-      helpText: '{{category}} için sorularınızı iletebilirsiniz.',
+      helpText: 'Sorularınızı {{category}} için iletebilirsiniz.',
       viewAllProducts: 'Tüm ürünleri görüntüle',
-      findFit: 'Bana Uygun Olanı Bul',
+      findFit: 'Seçim Sihirbazını Aç',
       findFitDesc: 'Ön hesap yapın',
       expertSupport: 'İletişim Formu',
       expertSupportDesc: 'Proje sorusu iletin',
@@ -1550,20 +1550,20 @@ export const tr = {
       tempDiffDesc: 'Kapı açıldığında iç-dış ortam sıcaklık farkı',
       airflowTitle: 'Hava Akışı',
       airflowDesc: 'Açık kapıdan dış hava girişi',
-      pestTitle: 'Toz Girişi',
-      pestDesc: 'Kapı açıkken içeri toz girişi',
+      pestTitle: 'Toz ve Böcek Girişi',
+      pestDesc: 'Kapı açıkken içeri toz ve böcek girişi',
       crossMark: '❌',
       checkMark: '✓',
       withoutTitle: 'Hava Perdesi Olmadan',
       withoutPoint1: 'İç ve dış hava karışır',
       withoutPoint2: 'Sıcak ve soğuk hava geçebilir',
       withoutPoint3: 'Toz içeri girebilir',
-      withoutPoint4: '',
+      withoutPoint4: 'Toz ve böcek girebilir',
       withTitle: 'Hava Perdesi İle',
       withPoint1: 'Görünmez hava bariyeri',
       withPoint2: 'Hava ve ısı geçişini sınırlar',
       withPoint3: 'Toz girişini sınırlar',
-      withPoint4: '',
+      withPoint4: 'Üreticiye göre toz ve böcek girişini önler',
     },
     landing: {
       expertiseArea: 'Ürün Kategorisi',
@@ -1582,8 +1582,8 @@ export const tr = {
     },
     series: {
       technicalFamily: 'Teknik Ürün Ailesi',
-      heroDefaultDesc: 'Ürünleri teknik ürün ailelerine göre inceleyin; özellik tabloları ürün sayfalarındadır.',
-      seriesDetail: 'Ürün Ailesi Detayı',
+      heroDefaultDesc: 'Profesyonel havalandırma çözümlerini teknik serilerine göre inceleyin.',
+      seriesDetail: 'Seri Detayı',
       requestQuote: 'Teklif Alın',
       colModel: 'Model',
       colPrice: 'Fiyat',
@@ -1645,10 +1645,10 @@ export const tr = {
     longTermInvestmentDesc: 'Üretici, EC fırçasız LINEO QUIET ES için düşük enerji tüketimi belirtiyor.',
     allSeries: 'Tüm Alt Kategoriler',
     chooseSeriesDesc: 'İhtiyacınıza uygun alt kategoriyi seçin.',
-    inspectSeries: 'Alt Kategoriyi İncele',
+    inspectSeries: 'Seriyi İncele',
     whyCategory: 'Neden {{category}}?',
     electricVsAmbientAlt: 'Elektrikli vs Ortam Havalı Karşılaştırma',
-    modernLoftAlt: 'Modern Loft Uygulaması',
+    modernLoftAlt: 'Vortice Lineo Quiet kanal fanının iç mekânda gösterildiği çizim',
     lineoQuietQuote: 'Lineo Quiet ES, ses emici kaplamalı, EC fırçasız motorlu karma akışlı bir kanal fanıdır.',
     industrialLabAlt: 'Endüstriyel Laboratuvar Uygulaması',
     lineoTechnicalAlt: 'Lineo Quiet Teknik Detay',
@@ -1730,12 +1730,12 @@ export const tr = {
         },
         {
           value: '{aile}',
-          label: 'Ürün Ailesi',
+          label: 'Vortice Ürün Ailesi',
           desc: 'Katalogda yer alan'
         },
         {
           value: '{model}',
-          label: 'Aktif Model',
+          label: 'Vortice Aktif Model',
           desc: 'Katalogdaki Vortice modelleri'
         },
         {
@@ -1911,7 +1911,7 @@ export const tr = {
       engineeringAnalysis: 'Teknik Özet',
       /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
       modelCode: 'Model Kodu',
-      datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
+      datasheetPdf: 'TEKNİK DOKÜMAN (PDF)'
     },
     actions: {
       interactive3D: '3D GÖRÜNÜM',
@@ -1951,7 +1951,7 @@ export const tr = {
           desc: 'Ses seviyesi {{esik2}}–{{esik3}} dB(A) aralığında olan modeller.'
         },
         industrial: {
-          label: 'Endüstriyel Ses Seviyesi',
+          label: 'Ses seviyesi: 60 dB(A) ve üzeri',
           desc: 'Ses seviyesi {{esik3}} dB(A) üzerinde olan modeller.'
         }
       },
@@ -1985,7 +1985,7 @@ export const tr = {
           desc: 'Hava debisi {{esik1}}–{{esik2}} m³/h aralığında olan modeller.'
         },
         industrialFlow: {
-          label: 'Endüstriyel Hava Debisi',
+          label: 'Debi: 2000 m³/h üzeri',
           desc: 'Hava debisi {{esik2}} m³/h üzerinde olan modeller.'
         }
       }
@@ -2527,7 +2527,7 @@ export const tr = {
   },
   quotes: {
     title: 'Teklif Taleplerim',
-    subtitle: 'Teklif taleplerinizi oluşturun ve fiyatlama sürecini takip edin.',
+    subtitle: 'Teklif taleplerinizi ve durumlarını buradan takip edin.',
     empty: 'Henüz bir teklif talebiniz bulunmuyor.',
     emptyHint: 'Fiyatı görünmeyen ürünlerde "Teklif İste" ile talep açabilirsiniz.',
     fetchError: 'Teklif kayıtları yüklenemedi',
@@ -2712,7 +2712,7 @@ export const tr = {
       },
       havaPerdesi: {
         ad: 'Hava perdesi hesabı',
-        aciklama: 'Kapı genişliği ve yüksekliğine göre gerekli perde debisini ve modelini bulun.',
+        aciklama: 'Kapı ölçülerine ve kullanım koşullarına göre gerekli perde debisini hesaplayın.',
       },
       jetFan: {
         ad: 'Jet fan hesabı',
@@ -2735,9 +2735,9 @@ export const tr = {
       contactLink: 'iletişime geçin',
     },
     airCurtain: {
-      trafficLowDesc: '< 50 geçiş/saat',
-      trafficMediumDesc: '50-200 geçiş/saat',
-      trafficHighDesc: '> 200 geçiş/saat',
+      trafficLowDesc: 'Seyrek geçiş',
+      trafficMediumDesc: 'Orta yoğunlukta geçiş',
+      trafficHighDesc: 'Sık geçiş',
       newCalculation: 'Yeni Hesaplama',
       calculate: 'Hesapla',
       title: 'Hava Perdesi Hesaplayıcı',
@@ -2998,7 +2998,7 @@ export const tr = {
         },
         {
           title: 'Sessiz Ortamlar',
-          description: 'Fan sesi, kütüphane ve ofis gibi sessiz ortamlarda dikkat dağıtabilir.'
+          description: ''
         }
       ],
       visual: {
@@ -3087,11 +3087,11 @@ export const tr = {
           value: ''
         },
         {
-          label: 'Ürün Ailesi',
+          label: 'Vortice Ürün Ailesi',
           value: '{aile}'
         },
         {
-          label: 'Aktif Model',
+          label: 'Vortice Aktif Model',
           value: '{model}'
         },
         {
@@ -3128,7 +3128,7 @@ export const tr = {
     badgeBest: '1. sırada',
     badgeQuietest: 'En düşük dB(A)',
     badgeEfficient: 'EC motorlu',
-    cardDelivers: 'Sizin kanalınızda',
+    cardDelivers: 'Kanalınızda hesaplanan',
     cardNoise: 'Ses seviyesi',
     cardDiameter: 'Bağlantı çapı',
     cardCta: 'Ürünü incele',
@@ -3210,7 +3210,7 @@ export const tr = {
       headerTitle: 'İhtiyaç Analiz Sihirbazı',
       meterUnit: 'm',
     },
-    coldStorage: 'Soğuk Hava Deposu',
+    coldStorage: 'Depo',
     coldStorageDesc: 'Depo kapıları',
     coldStorageTip: 'Kapı açıkken iç ve dış hava geçişini sınırlar',
     industrial: 'Endüstriyel Tesis',
@@ -3233,7 +3233,7 @@ export const tr = {
     step6Title: 'Girdilerinize Göre Modeller',
     step6Desc: 'Ön değerlendirme sonucunda listelenen modeller.',
     analyzing: 'Modeller Analiz Ediliyor...',
-    matchScore: '% {{score}} Uyum',
+    matchScore: 'Uyum puanı: {{score}}/100',
     restart: 'Yeniden Başla',
     customOffer: 'Özel Teklif İste',
     entranceDoor: 'Giriş Kapısı',
