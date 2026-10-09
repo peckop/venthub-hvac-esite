@@ -458,10 +458,10 @@ export const tr = {
         entryPaths: 'akıllı yönlendirme akışı'
       },
       trustStrip: {
-        authorizedBrands: 'Dünyaca tanınan markalar',
-        engineeringSupport: 'Mühendislik yönlendirmesi',
-        nationwideDelivery: 'Türkiye geneli sevkiyat',
-        projectGuidance: 'Proje odaklı seçim desteği'
+        authorizedBrands: 'Marka ve model kataloğu',
+        engineeringSupport: 'Ürün Seçici araçları',
+        nationwideDelivery: 'Teklif üzerinden sipariş',
+        projectGuidance: 'Teknik özellik tabloları'
       },
       quickChips: {
         fans: 'Fanlar',
@@ -531,7 +531,7 @@ export const tr = {
     cinematicShowcase: {
       // REC-113: dekoratif HUD metni ama YİNE DE ekranda okunan Türkçe-sayfa metnidir.
       // Noktalı "makine" üslubu korunarak çevrildi.
-      hudStatus: 'Sistem.Veri.Canlı',
+      hudStatus: 'Ürün ailesi',
       eyebrow: 'MÜHENDİSLİK ODAK NOKTASI',
       title: 'Vortice Lineo Quiet Serisi',
       subtitle: 'Aero-akustik gövde tasarımı ile sessizliğin yeni dijital standardı.',
@@ -660,21 +660,21 @@ export const tr = {
       }
     },
     trustProof: {
-      eyebrow: 'Güven ve Uzmanlık',
-      title: 'Mühendislik Hassasiyeti, Operasyonel Güven',
-      subtitle: 'Havalandırma projelerinizde sadece bir tedarikçi değil, teknik çözüm ortağınızız. Her adımda doğrulanabilir kalite ve uzman desteği sunuyoruz.',
-      badge: 'ONAYLI',
+      eyebrow: 'Katalog ve Araçlar',
+      title: 'Katalog, Ürün Seçici ve Teklif',
+      subtitle: 'Fan, hava perdesi, ısı geri kazanım ve frekans konvertörü modellerini inceleyin; hacim, debi ve basınç değerlerinizle ön değerlendirme yapın; teklif isteyin.',
+      badge: 'VENTHUB\'DA',
       visualAlt: 'Teknik Kurulum',
       items: {
         brands: {
-          eyebrow: 'Güvence',
-          title: 'Marka ve Garanti Güvencesi',
-          description: 'Dünya devi HVAC markalarının en güncel ve sertifikalı ürün gamını marka güvencesiyle sunuyoruz.'
+          eyebrow: 'Katalog',
+          title: 'Markalar ve Modeller',
+          description: 'AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT ve Vortice ürün aileleri ve modelleri, teknik özellik tablolarıyla.'
         },
         guidance: {
-          eyebrow: 'Analiz',
-          title: 'Mühendislik Odaklı Seçim',
-          description: 'İhtiyacınızı sadece ürünle değil, debi ve basınç hesaplamaları içeren teknik analizlerle en verimli şekilde çözüyoruz.'
+          eyebrow: 'Hesap',
+          title: 'Ürün Seçici ile Ön Hesap',
+          description: 'Hacim, debi ve basınç gibi değerlerinizi girin; kanal fanı, ısı geri kazanım, hava perdesi ve jet fan hesaplayıcıları ön değerlendirme yapar.'
         },
         delivery: {
           eyebrow: 'Lojistik',
@@ -682,9 +682,9 @@ export const tr = {
           description: 'Teslimat süresi ve sevkiyat koşulları, teklif aşamasında projenize göre netleştirilir.'
         },
         support: {
-          eyebrow: 'Süreklilik',
-          title: 'Kesintisiz Teknik Destek',
-          description: 'Satış sonrası teknik dökümantasyon, montaj rehberliği ve uzman kadromuzla sisteminizin ömrü boyunca yanınızdayız.'
+          eyebrow: 'İletişim',
+          title: 'Teklif İsteyin, Soru Sorun',
+          description: 'Teklif ve sorularınızı iletişim formu ya da info@venthub.com.tr ile iletebilirsiniz. Teknik özellikler ürün sayfalarında yer alır.'
         }
       }
     },
@@ -1163,8 +1163,8 @@ export const tr = {
     trustTitle: 'Operasyonel Güven',
     trustDesc: 'Tedarik ve operasyon süreçlerimizi proje takvimlerinize sadık kalacak şekilde titizlikle yönetiyor, zamanında teslimatı hedefliyoruz.',
     heroBadge: '15+ Yıl Mühendislik Deneyimi',
-    heroTitle: 'Havayı',
-    heroTitleItalic: 'Yeniden Tanımlıyoruz',
+    heroTitle: 'Havalandırma ürünleri:',
+    heroTitleItalic: 'katalog ve seçim araçları',
     heroDesc: 'VentHub, modern yaşam ve endüstriyel alanlar için yüksek verimli, teknolojik ve sürdürülebilir havalandırma sistemlerini Türkiye pazarına sunar.',
     storyTitle: 'Geleceğin İklimini',
     storyTitleItalic: 'Bugün Kuruyoruz',
