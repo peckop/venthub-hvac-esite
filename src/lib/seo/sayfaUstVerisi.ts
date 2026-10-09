@@ -26,6 +26,15 @@ import { enKapaliMi, hreflangAlani, NOINDEX_FOLLOW } from './enYayinKurali'
  * yüzden yardımcı aynı kuralı kendisi uygular — `robots` alanını yalnız gerektiğinde doldurur,
  * TR'de dokunmaz (INV-EN-YAYIN-1 bunu ölçer).
  */
+/**
+ * VARSAYILAN PAYLAŞIM GÖRSELİ (URN-61, 2026-10-09 ölçümü: rehber, hakkımızda, iletişim, yasal, ürünler ve
+ * markalar listesi `og:image` taşımıyordu, `twitter:card` "summary" idi). Dil layout'unun `openGraph`ı ve
+ * sayfaların kendi `openGraph`ı kök layout'un görselini EZER — görsel her yazıcıda açıkça yazılmalıdır. Kendi
+ * görseli olan sayfalar (kategori, aile, marka) bunu geçersiz kılar. Next, `openGraph.images` doluysa
+ * `twitter:card`ı kendiliğinden `summary_large_image` yapar.
+ */
+export const VARSAYILAN_OG_GORSELI = [{ url: '/images/og-default.jpg', width: 1200, height: 630 }]
+
 export interface SayfaUstVerisiGirdisi {
   lang: string
   /** Dilsiz yol, `Routes.*` çıktısı (ör. `/destek/sss`). */
@@ -93,6 +102,8 @@ export function sayfaUstVerisi({
       siteName: 'VentHub',
       type: ogTuru,
       locale: lang === 'en' ? 'en_US' : 'tr_TR',
+      // İşlem yüzeyleri (sepet, ödeme, giriş) paylaşılmaz: dizin dışı sayfaya görsel yazılmaz.
+      ...(dizinDisi ? {} : { images: VARSAYILAN_OG_GORSELI }),
     },
   }
 }

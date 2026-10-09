@@ -16,6 +16,12 @@ export interface MakaleJsonLdGirdisi {
   dil: 'tr' | 'en'
   yayinTarihi: string
   guncellemeTarihi: string
+  /**
+   * Yazının görseli, tam adres (`https://…`). Verilmezse `image` alanı HİÇ yazılmaz: boş ya da uydurma
+   * görsel beyanı, olmayan beyandan kötüdür. Yazı kaydına kapak alanı gelene kadar çağıran varsayılan
+   * paylaşım görselini verir (R3.1: kapak, yazıya özgü ürün görseli olunca o geçer).
+   */
+  gorsel?: string
 }
 
 export function makaleJsonLd(g: MakaleJsonLdGirdisi): Record<string, unknown> {
@@ -31,6 +37,7 @@ export function makaleJsonLd(g: MakaleJsonLdGirdisi): Record<string, unknown> {
     dateModified: g.guncellemeTarihi,
     author: kurum,
     publisher: kurum,
+    ...(g.gorsel ? { image: [g.gorsel] } : {}),
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     url,
   }

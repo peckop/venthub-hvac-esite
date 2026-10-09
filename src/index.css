@@ -869,6 +869,28 @@ p, li {
   }
 }
 
+/* REHBER İÇİNDEKİLER (URN-61): tek <details>; lg ve üstünde başlıksız, çerçevesiz, HER ZAMAN AÇIK yan sütun.
+   `::details-content` Chrome 131 / Safari 18.4 / Firefox 143 ve sonrası; desteklemeyen tarayıcıda
+   @supports bloğu hiç uygulanmaz ve öğe masaüstünde de kapalı açılır kutu olarak çalışır. */
+@media (min-width: 1024px) {
+  @supports selector(::details-content) {
+    details.rehber-icindekiler {
+      border-width: 0;
+      border-radius: 0;
+      padding: 0;
+    }
+    details.rehber-icindekiler > summary {
+      display: none;
+    }
+    details.rehber-icindekiler > div {
+      margin-top: 0;
+    }
+    details.rehber-icindekiler::details-content {
+      content-visibility: visible;
+    }
+  }
+}
+
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
 .custom-scrollbar-light::-webkit-scrollbar { width: 4px; }

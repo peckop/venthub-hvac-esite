@@ -5,6 +5,7 @@ import { ADRES_SEMASI_K3B } from '@/config/features'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { enKuraliRobots, hreflangAlani } from '@/lib/seo/enYayinKurali'
+import { VARSAYILAN_OG_GORSELI } from '@/lib/seo/sayfaUstVerisi'
 import { adresUret } from '@/utils/adresUret'
 
 import { SITE_URL } from '../../../config/siteUrl'
@@ -90,6 +91,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       siteName: 'VentHub',
       locale: lang === 'en' ? 'en_US' : 'tr_TR',
       type: 'website',
+      images: VARSAYILAN_OG_GORSELI,
     },
     // Kendi `robots`unu yazan sayfa dil layout'unun `noindex`ini EZER (canlıda `/en/products`
     // `index, follow` döndü, 2026-09-29): EN kapalıyken `noindex, follow`, aksi hâlde bugünkü değer.

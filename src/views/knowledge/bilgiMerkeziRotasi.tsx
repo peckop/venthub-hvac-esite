@@ -12,7 +12,7 @@ import { markdownAyristir } from '../../lib/bilgiMerkezi/markdown'
 import { yaziSayfasiHazirla } from '../../lib/bilgiMerkezi/sayfa'
 import { varsayilanKaynak } from '../../lib/data/bilgiMerkeziKaynak'
 import { buildBreadcrumbJsonLd } from '../../lib/seo/jsonld'
-import { sayfaUstVerisi } from '../../lib/seo/sayfaUstVerisi'
+import { sayfaUstVerisi, VARSAYILAN_OG_GORSELI } from '../../lib/seo/sayfaUstVerisi'
 import { bilgiMerkeziDilAcik, bilgiMerkeziYaziHref } from '../../utils/bilgiMerkezi'
 import { bilgiMerkeziRotalari } from '../../utils/bilgiMerkeziRotalari'
 import BilgiMerkeziListe from './BilgiMerkeziListe'
@@ -158,6 +158,8 @@ export async function YaziRotasi({ params, bolumDili }: { params: Params; bolumD
     dil: bolumDili,
     yayinTarihi: yazi.yayinTarihi,
     guncellemeTarihi: yazi.guncellemeTarihi,
+    // Yazı kaydında kapak alanı yok (R3.1 taslak): üst veri ile AYNI varsayılan görsel (URN-61).
+    gorsel: `${SITE_URL}${VARSAYILAN_OG_GORSELI[0].url}`,
   })
   const kirinti = buildBreadcrumbJsonLd({
     lang: bolumDili,

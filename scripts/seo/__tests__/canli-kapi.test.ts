@@ -34,14 +34,17 @@ type Ek = {
 type Satir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
 type Veri = { harita: { satirlar: Satir[]; hreflangSayisi?: number }; sayfalar: Sayfa[]; ek: Ek }
 type Bulgu = { kod: string; seviye: string; adres: string; kanit: string; bilinen?: string }
-type HtmlSecenek = { title?: string | null; desc?: string | null; h1?: string; lang?: string | null; icon?: boolean; ld?: unknown[]; links?: string[] }
+type HtmlSecenek = { title?: string | null; desc?: string | null; h1?: string; lang?: string | null; icon?: boolean; ld?: unknown[]; links?: string[]; og?: boolean }
+
+const OG_GORSEL_ADRESI = 'https://venthub.com.tr/images/og-default.jpg'
 
 function html(o: HtmlSecenek = {}): string {
-  const { title = 'Sayfa | VentHub', desc = ACIKLAMA_OK, h1 = 'Sayfa', lang = 'tr', icon = false, ld = [], links = [] } = o
+  const { title = 'Sayfa | VentHub', desc = ACIKLAMA_OK, h1 = 'Sayfa', lang = 'tr', icon = false, ld = [], links = [], og = true } = o
   return [
     '<!DOCTYPE html>', lang === null ? '<html>' : `<html lang="${lang}">`, '<head>',
     title === null ? '' : `<title>${title}</title>`,
     desc === null ? '' : `<meta name="description" content="${desc}"/>`,
+    og ? `<meta property="og:image" content="${OG_GORSEL_ADRESI}"/><meta name="twitter:card" content="summary_large_image"/>` : '',
     icon ? '<link rel="icon" href="/favicon.ico"/>' : '',
     ...ld.map((x) => '<script type="application/ld+json">' + (typeof x === 'string' ? x : JSON.stringify(x)) + '</script>'),
     '</head><body>', `<h1>${h1}</h1>`, ...links.map((l) => `<a href="${l}">bağlantı</a>`), '</body></html>',
@@ -600,5 +603,52 @@ describe('INV-CANLI-KAPI-1 · VITRIN-IDDIA (URN-60, karar 295)', () => {
   it('temiz sentetik site hiç VITRIN-IDDIA bulgusu vermez ve kuralı kayıtlıdır', () => {
     expect(kodlar(temiz(), 'VITRIN-IDDIA')).toEqual([])
     expect(Object.keys(KURAL_NO)).toContain('VITRIN-IDDIA')
+  })
+})
+
+describe('INV-CANLI-KAPI-1 · OG-GORSEL (URN-61, 2026-10-09 ölçümü: rehber/hakkımızda/iletişim/yasal/liste sayfaları og:image taşımıyordu)', () => {
+  it('sabotaj: dizine açık sayfada og:image yok KIRMIZI, yalnız o sayfa; boş content da yakalanır', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], /<meta property="og:image"[^>]*>/, '')
+    const b = kodlar(v, 'OG-GORSEL')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/a'])
+    expect(b[0].seviye).toBe('KIRMIZI')
+    expect(b[0].kanit).toContain('og:image')
+
+    const bos = temiz()
+    govdeDegistir(bos.sayfalar[2], OG_GORSEL_ADRESI, '  ')
+    expect(adresler(bos, 'OG-GORSEL')).toEqual(['/tr/b'])
+  })
+  it('sabotaj: twitter:card summary ya da hiç yok KIRMIZI (summary_large_image beklenir); kanıt satırı durumu yazar', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], 'content="summary_large_image"', 'content="summary"')
+    govdeDegistir(v.sayfalar[2], /<meta name="twitter:card"[^>]*>/, '')
+    const b = kodlar(v, 'OG-GORSEL')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/a', '/tr/b'])
+    expect(b[0].kanit).toContain('"summary"')
+    expect(b[1].kanit).toContain('yok')
+  })
+  it('<meta> öznitelik sırası önemsiz: content önce, property sonra yazılsa da görsel bulunur (yanlış alarm yok)', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], /<meta property="og:image" content="([^"]*)"\/>/, '<meta content="$1" property="og:image">')
+    expect(kodlar(v, 'OG-GORSEL')).toEqual([])
+  })
+  it('noindex sayfa sayılmaz: dizin dışı yüzeyde görsel aranmaz', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], /<meta property="og:image"[^>]*>/, '')
+    govdeDegistir(v.sayfalar[1], '</head>', '<meta name="robots" content="noindex, follow"/></head>')
+    expect(kodlar(v, 'OG-GORSEL')).toEqual([])
+  })
+  it('sayfaAlanlari: og:image ve twitter:card okunur, yoksa null', () => {
+    const var_ = sayfaAlanlari(html())
+    expect(var_.ogGorsel).toBe(OG_GORSEL_ADRESI)
+    expect(var_.twitterKart).toBe('summary_large_image')
+    const yok = sayfaAlanlari(html({ og: false }))
+    expect(yok.ogGorsel).toBeNull()
+    expect(yok.twitterKart).toBeNull()
+  })
+  it('temiz sentetik site hiç OG-GORSEL bulgusu vermez ve kuralı kayıtlıdır', () => {
+    expect(kodlar(temiz(), 'OG-GORSEL')).toEqual([])
+    expect(Object.keys(KURAL_NO)).toContain('OG-GORSEL')
   })
 })

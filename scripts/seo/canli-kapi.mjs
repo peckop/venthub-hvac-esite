@@ -20,7 +20,8 @@
  *   ACIKLAMA-KESIK/SABLON/KISA 5 · LANG 6 · FAVICON 2 · LASTMOD-BUGUN 42 · LASTMOD-TOPLU 29 · ROBOTS-KALIP 15 (44) ·
  *   SOFT404 1 (54) · IC-BAGLANTI-YONLENDIRME 12 · YONLENDIRME-ZINCIRI 14 · JSONLD-* 66/18/17/58/59/20/62 ·
  *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse) ·
- *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse).
+ *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse) ·
+ *   OG-GORSEL (URN-61: dizine açık sayfada `og:image` yok ya da `twitter:card` summary_large_image değil).
  *
  * Kullanım: node scripts/seo/canli-kapi.mjs [--taban https://venthub.com.tr] [--cikti <depo dışı klasör>]
  *           [--bilinen <json>] [--kayit-durum <json>] [--bugun YYYY-MM-DD]
@@ -74,6 +75,7 @@ export const KURAL_NO = {
   'LLMS-SAYFA': '-',
   'LLMS-DIL': '-',
   'VITRIN-IDDIA': '-',
+  'OG-GORSEL': '-',
 }
 const KOD_SIRASI = Object.keys(KURAL_NO)
 
@@ -135,6 +137,8 @@ export function sayfaAlanlari(html) {
   const metalar = [...ust.matchAll(aciliEtiket('meta'))].map((m) => ozellikler(m[1]))
   const aciklama = metalar.find((m) => (m.name || '').toLowerCase() === 'description')
   const robots = metalar.filter((m) => (m.name || '').toLowerCase() === 'robots').map((m) => m.content || '').join(',')
+  const ogGorsel = metalar.find((m) => (m.property || '').toLowerCase() === 'og:image')
+  const twitterKart = metalar.find((m) => (m.name || '').toLowerCase() === 'twitter:card')
   const h1 = /<h1\b[^>]*>([\s\S]*?)<\/h1\s*>/i.exec(govde)
   const htmlEt = aciliEtiket('html').exec(temiz)
   const linkler = [...ust.matchAll(aciliEtiket('link'))].map((m) => ozellikler(m[1]))
@@ -144,6 +148,8 @@ export function sayfaAlanlari(html) {
     h1: h1 ? bosluksuz(h1[1]) : null,
     lang: htmlEt ? (ozellikler(htmlEt[1]).lang ?? null) : null,
     metaRobots: robots,
+    ogGorsel: ogGorsel ? bosluksuz(ogGorsel.content || '') : null,
+    twitterKart: twitterKart ? bosluksuz(twitterKart.content || '') : null,
     ikonVar: linkler.some((l) => (l.rel || '').toLowerCase().split(/\s+/).includes('icon') && (l.href || '').trim() !== ''),
   }
 }
@@ -342,6 +348,23 @@ function vitrinIddiaKontrolu(sayfalar, cikti) {
   }
 }
 
+/**
+ * OG-GORSEL (URN-61, 2026-10-09 ölçümü: rehber, hakkımızda, iletişim, yasal, ürünler ve markalar listesi
+ * `og:image` taşımıyor, `twitter:card` "summary" basıyordu). Sitedeki dizine açık her sayfa paylaşım görseli
+ * beyan eder ve kartı `summary_large_image` olur. `noindex` sayfa (EN kapalıyken /en, işlem yüzeyleri) paylaşılan
+ * yayın sayfası değildir, sayılmaz.
+ */
+function ogGorselKontrolu(ozet, cikti) {
+  for (const { yol, a } of ozet) {
+    if (/noindex/i.test(a.metaRobots || '')) continue
+    if (!a.ogGorsel) {
+      cikti.push(bulgu('OG-GORSEL', 'KIRMIZI', yol, '<meta property="og:image"> yok ya da boş (paylaşım önizlemesinde görsel çıkmaz)'))
+    } else if (a.twitterKart !== 'summary_large_image') {
+      cikti.push(bulgu('OG-GORSEL', 'KIRMIZI', yol, `twitter:card ${a.twitterKart == null ? 'yok' : `"${a.twitterKart}"`} (summary_large_image beklenir)`))
+    }
+  }
+}
+
 const metinBaytlari = (b) => [...(b || [])].slice(0, 24).map((x) => (x >= 32 && x < 127 ? String.fromCharCode(x) : '.')).join('')
 const ICO = [0, 0, 1, 0]
 const PNG = [0x89, 0x50, 0x4e, 0x47]
@@ -511,6 +534,7 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   const ozet = tamam.map((s) => ({ yol: s.yol, a: sayfaAlanlari(s.html) }))
   baslikKontrolleri(ozet, cikti)
   aciklamaKontrolleri(ozet, cikti)
+  ogGorselKontrolu(ozet, cikti)
   dilKontrolu(tamam, ek.enSayfalar, cikti)
   faviconKontrolu(sayfalar, ek.varliklar, cikti)
   lastmodKontrolu(harita, bugun, cikti)

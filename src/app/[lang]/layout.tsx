@@ -4,6 +4,7 @@ import React from 'react'
 
 import { EN_YAYIN } from '@/config/features'
 import { dilGecerliMi } from '@/i18n/yoldanDil'
+import { VARSAYILAN_OG_GORSELI } from '@/lib/seo/sayfaUstVerisi'
 
 import { en } from '../../i18n/dictionaries/en'
 import { tr } from '../../i18n/dictionaries/tr'
@@ -71,6 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       siteName: 'VentHub',
       type: 'website',
       locale: lang === 'en' ? 'en_US' : 'tr_TR',
+      // Kök layout'un görseli bu bloğun altında EZİLİR (Next openGraph'ı bütün olarak değiştirir);
+      // kendi `openGraph`ını yazmayan sayfalar (ör. ürün seçici) görseli buradan alır (URN-61).
+      images: VARSAYILAN_OG_GORSELI,
     },
   }
 }

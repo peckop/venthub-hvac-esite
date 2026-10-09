@@ -103,22 +103,18 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
           </p>
         </header>
 
-        {icindekiler.length > 0 && (
-          <details className="mt-8 rounded-hvac-sm border border-light-gray p-4 lg:hidden">
-            <summary className={`flex min-h-11 cursor-pointer items-center font-semibold text-primary-navy ${odakSinifi}`}>{icindekilerBasligi}</summary>
-            <div className="mt-4">
-              <Icindekiler ogeler={icindekiler} baslik={icindekilerBasligi} />
-            </div>
-          </details>
-        )}
-
-        <div className="mt-10 lg:grid lg:grid-cols-4 lg:gap-12">
+        {/* TEK İÇİNDEKİLER (URN-61): liste ham HTML'de BİR kez (eskiden açılır kutu + yan sütun diye iki kez
+            basılıyordu; kopya içerik sinyali). Dar ekranda açılır kutu; lg ve üstünde AYNI öğe yan sütunda
+            yapışkan ve her zaman açık — yerleşimi `.rehber-icindekiler` CSS'i yapar (src/index.css). Tarayıcı
+            `::details-content`i bilmiyorsa yan sütun kapalı açılır kutu olarak kalır, içerik kaybolmaz. */}
+        <div className={`${icindekiler.length > 0 ? 'mt-8 lg:mt-10' : 'mt-10'} lg:grid lg:grid-cols-4 lg:gap-12`}>
           {icindekiler.length > 0 && (
-            <aside className="hidden lg:col-span-1 lg:block">
-              <div className="sticky top-24">
+            <details className="rehber-icindekiler mb-10 rounded-hvac-sm border border-light-gray p-4 lg:sticky lg:top-24 lg:col-span-1 lg:mb-0 lg:self-start">
+              <summary className={`flex min-h-11 cursor-pointer items-center font-semibold text-primary-navy ${odakSinifi}`}>{icindekilerBasligi}</summary>
+              <div className="mt-4">
                 <Icindekiler ogeler={icindekiler} baslik={icindekilerBasligi} />
               </div>
-            </aside>
+            </details>
           )}
 
           <div className={`min-w-0 max-w-content ${icindekiler.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
