@@ -88,9 +88,10 @@ export const ABARTI_KALIPLARI = [
 /**
  * DAR MUAFIYET: sayi sozcugunun HEMEN onunde duran "hizli/hizlidir/hizlilar" hiz KADEMESI SAYISI teknik
  * terimidir ("iki hizli motor" = two speed), olcusuz sifat degil. Kalip taramasindan once metinden cikarilir.
- * "hizli", "cok hizli", "hizli kurulum", "yuksek hizli", "iki cok hizli" HALA reddedilir.
+ * TEK HANELI RAKAM da ayni terimdir ("4 hizli kontrol secenegi" = 4 hiz kademesi; KTL-15, HR 450 AVEL D); "14 hizli"
+ * ya da "4 cok hizli" degil. "hizli", "cok hizli", "hizli kurulum", "yuksek hizli", "iki cok hizli" HALA reddedilir.
  */
-export const SAYI_HIZLI_MUAFIYETI = /(?<![\p{L}\p{N}])(?:tek|iki|üç|dört|çift)\s+hızlı(?:dır|lar)?(?![\p{L}\p{N}])/giu
+export const SAYI_HIZLI_MUAFIYETI = /(?<![\p{L}\p{N}])(?:tek|iki|üç|dört|çift|[1-9])\s+hızlı(?:dır|lar)?(?![\p{L}\p{N}])/giu
 
 /** @returns {{ ad: string, eslesen: string }[]} metinde bulunan abarti kaliplari (bos = temiz) */
 export function abartiBul(metin) {

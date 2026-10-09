@@ -17,26 +17,52 @@
  * `--yaz` bayrağı VE `CANLI_YAZIM_ONAYI` ortam değişkeni birlikte gerekir. Biri eksikse
  * kuru koşum. Onay dizgesi kayda geçer (kim, ne zaman, hangi karar).
  *
+ * ── KALIP KAPISI (KTL-15, 2026-10-09)
+ * `yeni` metin AĞA ÇIKMADAN ÖNCE `urun-aciklama-duzelt-kurallar.mjs` kapısından geçer: iç referans, abartı
+ * kalıbı, editör notu (KALKTI/KALKAR/SİLİNİR…), biçim artığı, EN planda Türkçe harf (P1–P3e). Kapı kırmızıysa
+ * HİÇBİR ŞEY okunmaz, HİÇBİR ŞEY yazılmaz, çıkış 1 — `--yaz` olsa bile. `--kapi-yalniz`: yalnız kapı, ağ/anahtar yok.
+ *
  * KOŞUM: node urun-aciklama-duzelt.mjs --plan <json> --url <URL> --key <KEY> [--yaz] [--out <dizin>]
- * Çıkış: 0 geçti · 1 yazım hatası · 2 ÖLÇÜLEMEDİ (fail-closed).
+ *        node urun-aciklama-duzelt.mjs --plan <json> --kapi-yalniz
+ * Çıkış: 0 geçti · 1 kalıp kapısı kırmızı / yazım hatası · 2 ÖLÇÜLEMEDİ (plan şeması, ağ; fail-closed).
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { planKapisi, sonucBicimBozuklugu } from './urun-aciklama-duzelt-kurallar.mjs'
+
 const arg = (n, d = null) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : d }
 const PLAN = arg('plan'), URL_ = arg('url'), KEY = arg('key'), OUT = arg('out', '.')
 const YAZ = process.argv.includes('--yaz')
+const KAPI_YALNIZ = process.argv.includes('--kapi-yalniz')
 const ONAY = process.env.CANLI_YAZIM_ONAYI || ''
 
-if (!PLAN || !URL_ || !KEY) {
-  console.error('kullanım: --plan <json> --url <URL> --key <KEY> [--yaz] [--out <dizin>]')
+if (!PLAN || (!KAPI_YALNIZ && (!URL_ || !KEY))) {
+  console.error('kullanım: --plan <json> --url <URL> --key <KEY> [--yaz] [--out <dizin>]  |  --plan <json> --kapi-yalniz')
   process.exit(2)
 }
-const plan = JSON.parse(readFileSync(PLAN, 'utf8'))
-const { eski, yeni, diller, skus } = plan
-if (!eski || !yeni || !Array.isArray(diller) || !Array.isArray(skus)) {
-  console.error('ÖLÇÜLEMEDİ — plan eksik: eski, yeni, diller[], skus[] zorunlu'); process.exit(2)
+let plan
+try { plan = JSON.parse(readFileSync(PLAN, 'utf8')) } catch (e) {
+  console.error(`ÖLÇÜLEMEDİ — plan okunamadı ya da JSON değil: ${PLAN} (${e.message})`); process.exit(2)
 }
+
+const kapi = planKapisi(plan)
+if (kapi.semaHatalari.length) {
+  console.error('ÖLÇÜLEMEDİ — plan şeması geçersiz:')
+  for (const h of kapi.semaHatalari) console.error(`   ${h}`)
+  process.exit(2)
+}
+console.log('KALIP KAPISI (yeni metin, ağdan önce):')
+for (const k of kapi.kurallar) {
+  const e = k.ok === true ? 'GEÇTİ ' : k.ok === false ? 'GEÇMEDİ' : '  -   '
+  console.log(`   ${k.kural.padEnd(3)} ${k.ad.padEnd(14)} ${e} ${k.ayrinti}`.trimEnd())
+}
+if (!kapi.gecti) {
+  console.error('⛔ KALIP KAPISI KIRMIZI — hiçbir şey okunmadı, hiçbir şey yazılmadı.'); process.exit(1)
+}
+if (KAPI_YALNIZ) { console.log('KAPI TEMİZ — ağa çıkılmadı (--kapi-yalniz).'); process.exit(0) }
+console.log('')
+const { eski, yeni, diller, skus } = plan
 
 const rest = async (p, method = 'GET', body) => {
   const r = await fetch(`${URL_}/rest/v1/${p}`, {
@@ -59,6 +85,7 @@ if (urunler.length !== skus.length) {
 console.log(`PLAN: "${eski}" → "${yeni}"  ·  diller: ${diller.join(', ')}  ·  ${skus.length} ürün\n`)
 const degisecek = []
 let atlanan = 0
+let bicimRed = 0
 for (const u of urunler) {
   const yeniNesne = { ...(u.description_i18n || {}) }
   const satir = []
@@ -72,7 +99,10 @@ for (const u of urunler) {
       atlanan++
       continue
     }
-    yeniNesne[d] = metin.split(eski).join(yeni)
+    const sonuc = metin.split(eski).join(yeni)
+    const bozuk = sonucBicimBozuklugu(metin, sonuc)   // P4: değişimin KENDİ yarattığı biçim bozukluğu
+    if (bozuk.length) { satir.push(`${d}: SONUÇ BİÇİMİ BOZUK (${bozuk.join(', ')}) — RED`); bicimRed++; continue }
+    yeniNesne[d] = sonuc
     satir.push(`${d}: 1 → değişecek`)
   }
   const fark = diller.some(d => (u.description_i18n || {})[d] !== yeniNesne[d])
@@ -81,6 +111,9 @@ for (const u of urunler) {
   if (fark) degisecek.push({ id: u.id, sku: u.sku, onceki: u.description_i18n, sonraki: yeniNesne })
 }
 
+if (bicimRed) {
+  console.error(`\n⛔ P4 SONUÇ BİÇİMİ KIRMIZI — ${bicimRed} alan; plan metni bozar, hiçbir şey yazılmadı.`); process.exit(1)
+}
 console.log(`\nÖZET: değişecek ${degisecek.length} ürün · atlanan alan ${atlanan}`)
 if (!degisecek.length) { console.log('Değişecek bir şey yok — çıkılıyor.'); process.exit(0) }
 

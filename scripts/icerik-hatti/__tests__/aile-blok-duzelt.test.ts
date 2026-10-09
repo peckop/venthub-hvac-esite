@@ -286,6 +286,18 @@ describe('K3 yeni metin: iç referans ve abartı kalıbı (saf)', () => {
       expect(dene(m).durum, m).toBe('red')
     }
   })
+  it('TEK HANELİ RAKAM da hız kademesi sayısıdır (KTL-15): "4 hızlı kontrol seçeneği", "3 hızlıdır" geçer', () => {
+    for (const m of ['4 hızlı kontrol seçeneğine sahip.', 'Motor 3 hızlıdır.', '2 hızlı motor.']) {
+      expect(abartiBul(m), m).toEqual([])
+      expect(dene(m).durum, m).toBe('uygula')
+    }
+  })
+  it('rakam muafiyeti dar: "14 hızlı", "4 çok hızlı", "4. hızlı" hâlâ RED', () => {
+    for (const m of ['14 hızlı motor.', '4 çok hızlı motor.', '4. hızlı motor.']) {
+      expect(abartiBul(m).map((a) => a.ad), m).toContain('hızlı')
+      expect(dene(m).durum, m).toBe('red')
+    }
+  })
   it('ekli biçimler yakalanır: üstünlüğü, estetiği, tasarrufu, en iyisi', () => {
     for (const m of ['Üstünlüğü kanıtlıdır.', 'Estetiği öne çıkar.', 'Tasarrufu artırır.', 'En iyisidir.']) expect(abartiBul(m).length, m).toBeGreaterThan(0)
   })
