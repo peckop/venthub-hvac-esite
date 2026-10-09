@@ -105,6 +105,10 @@ export const bilincliKurallar = (enYayinAcik) => [
   // EN_YAYIN kapalı = tek dilli site: hiçbir sayfada hreflang BEKLENMEZ (#1493). Bayrak KAYNAKTAN okunur;
   // okunamazsa (null) ya da açıksa kural devreye GİRMEZ ve hreflang eksiği kusur olarak kalır.
   { sinif: 'HREFLANG-YOK', kosul: () => enYayinAcik === false, gerekce: 'EN_YAYIN kapalı: tek dilli site' },
+  // Adres şeması geçişi (SEO-29, Pazar 11 Ekim): SABIT listedeki eski statik adres TEK 308 ile site haritasındaki yeni adrese gidiyorsa bu
+  // planlı geçiştir (adres-semasi-standard A9: tek hop 308). Geçici yönlendirme (307), zincir, haritada olmayan hedef ve haritadan örneklenen
+  // dinamik adresin yönlendirmesi kusur KALIR: haritadaki adres zaten son adres olmalı.
+  { sinif: 'YONLENDIRME', kosul: (s) => s.statik === true && s.zincir === '308→200' && s.haritada === 'loc', gerekce: 'adres geçişi: eski adres tek 308 ile haritadaki yeni adrese' },
 ]
 const BILINCLI = bilincliKurallar(EN_YAYIN_ACIK)
 /**
@@ -117,12 +121,60 @@ const ESKI_VARSAYILAN_BASLIK = /^VentHub — Premium HVAC (Çözümleri|Solution
 const YENI_VARSAYILAN_BASLIK = /^VentHub \| (Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri|Industrial Ventilation and HVAC Engineering Solutions)$/
 export const varsayilanBaslikMi = (baslik, tur) =>
   ESKI_VARSAYILAN_BASLIK.test(baslik) || (tur !== 'ana' && YENI_VARSAYILAN_BASLIK.test(baslik))
+/**
+ * Başlık kontrolünde kullanılacak tür: yönlendirmenin SONUNDAKİ adres ana sayfaysa (`/tr`, `/en`) tür `ana` sayılır (SEO-29).
+ * NİÇİN: kök "/" 308 ile /tr'ye gider; ölçülen gövde ana sayfanınkidir ama tür adı `kok` olduğu için ana sayfa istisnası devreye
+ * girmiyor, canlı karnede sahte VARSAYILAN-BASLIK çıkıyordu (10-09 19:05).
+ */
+export const baslikTuru = (tur, son) => (/^\/(tr|en)$/.test(son) ? 'ana' : tur)
 
 // ─── yardımcılar ───────────────────────────────────────────────────────────────
 const bekle = (ms) => new Promise((r) => setTimeout(r, ms))
 const ozet = (s) => createHash('sha256').update(s).digest('hex').slice(0, 12)
 const mutlak = (u) => (u.startsWith('http') ? u : TABAN + u)
 const yol = (u) => { try { return new URL(u, TABAN).pathname.replace(/\/$/, '') || '/' } catch { return u } }
+
+/** SABIT listedeki türler: adresleri elle yazılıdır; şema geçişinde eski adres 308 ile yenisine gider (bilinçli kural YONLENDIRME). */
+const STATIK_TURLER = new Set(SABIT.map(([ad]) => ad))
+/**
+ * Site haritasından örneklenen dinamik türler. Her tür İKİ adres şemasını tanır (SEO-29): eski (/tr/category, /tr/products,
+ * /tr/brands) ve yeni (ADRES_SEMASI_K3B açık: /tr/kategori, /tr/urun, /tr/markalar; docs/plans/rec300-design-adres-semasi-v3-2026-09-11.md).
+ * Kodda adres listesi YOK, yalnız yol kalıbı. `zorunlu`: haritada örneği yoksa karne bunu ORNEK-YOK kusuru yazar (sessiz körlük olmasın);
+ * `yeniSemadaZorunlu`: eski şemada kategoriler tek seviyeli olduğu için alt kategori yalnız yeni şema haritasında beklenir;
+ * model sayfaları isteğe bağlıdır (Pazar 11 Ekim'de yayındaki-model listesi boş, karar 327).
+ */
+const DINAMIK_TURLER = [
+  { ad: 'kategori', desen: /^\/tr\/(category|kategori)\/[^/]+$/, zorunlu: true },
+  { ad: 'alt-kategori', desen: /^\/tr\/(category|kategori)\/[^/]+\/[^/]+$/, yeniSemadaZorunlu: true },
+  { ad: 'aile-urun', desen: /^\/tr\/(products\/[^/]+|urun\/(?![^/]*-p-)[^/]+)$/, n: 3, zorunlu: true },
+  { ad: 'model', desen: /^\/tr\/urun\/[^/]+-p-[^/]+$/ },
+  { ad: 'marka', desen: /^\/tr\/(brands|markalar)\/[^/]+$/, zorunlu: true },
+]
+const YENI_SEMA = /^\/tr\/(kategori|urun|markalar)\//
+
+/**
+ * Site haritası XML'inden dinamik türlere örnek seçer (belirlenimci: haritadaki ilk sıra) + ilk örneğin GERÇEK EN karşılığı.
+ * EN karşılığı yalnız hreflang="en" eşleşmesi varsa eklenir: eşleşme yokken `yol('')` "/" döndürdüğü için eski kod her türe
+ * hayalet "/" satırı ekliyordu (canlı 10-09: üç sahte satır, SEO-29).
+ * @param {string} haritaXml
+ * @returns {{ turler: Array<[string, string[]]>, eksik: string[] }} turler: örneği olan türler; eksik: örneği olmayan ZORUNLU türler
+ */
+export function ornekTurleri(haritaXml) {
+  const locList = [...String(haritaXml).matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => {
+    const loc = (m[1].match(/<loc>([^<]+)<\/loc>/) || [])[1]
+    const en = (m[1].match(/hreflang="en"[^>]*href="([^"]+)"/) || m[1].match(/href="([^"]+)"[^>]*hreflang="en"/) || [])[1]
+    return { loc: loc ? yol(loc) : null, en: en ? yol(en) : null }
+  }).filter((x) => x.loc)
+  const yeniSema = locList.some((x) => YENI_SEMA.test(x.loc))
+  const turler = []
+  const eksik = []
+  for (const t of DINAMIK_TURLER) {
+    const secilen = locList.filter((x) => t.desen.test(x.loc)).slice(0, t.n ?? 2)
+    if (secilen.length) turler.push([t.ad, secilen.flatMap((x, i) => (i === 0 && x.en ? [x.loc, x.en] : [x.loc]))])
+    else if (t.zorunlu || (t.yeniSemadaZorunlu && yeniSema)) eksik.push(t.ad)
+  }
+  return { turler, eksik }
+}
 
 async function getir(adres, ua, azami = 6) {
   const zincir = []
@@ -225,22 +277,9 @@ async function main() {
   const haritaLoc = new Set([...haritaXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => yol(m[1])))
   const haritaAlt = new Set([...haritaXml.matchAll(/<xhtml:link[^>]*href="([^"]+)"/g)].map((m) => yol(m[1])))
 
-  // Site haritasından her dinamik türe iki temsilci (belirlenimci: haritadaki ilk sıra) + EN karşılığı
-  const locList = [...haritaXml.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((m) => ({
-    loc: yol((m[1].match(/<loc>([^<]+)<\/loc>/) || [])[1] || ''),
-    en: yol((m[1].match(/hreflang="en"[^>]*href="([^"]+)"/) || m[1].match(/href="([^"]+)"[^>]*hreflang="en"/) || [])[1] || ''),
-  }))
-  const turet = (ad, re, n = 2) => {
-    const secilen = locList.filter((x) => re.test(x.loc)).slice(0, n)
-    return [ad, secilen.flatMap((x, i) => (i === 0 && x.en ? [x.loc, x.en] : [x.loc]))]
-  }
-  const TURLER = [
-    ...SABIT,
-    turet('kategori', /^\/tr\/category\/[^/]+$/),
-    turet('alt-kategori', /^\/tr\/category\/[^/]+\/[^/]+$/),
-    turet('aile-urun', /^\/tr\/products\/[^/]+$/, 3),
-    turet('marka', /^\/tr\/brands\/[^/]+$/),
-  ]
+  // Site haritasından her dinamik türe temsilci (iki şema; örneksiz zorunlu tür aşağıda ORNEK-YOK satırı olur)
+  const { turler: dinamik, eksik } = ornekTurleri(haritaXml)
+  const TURLER = [...SABIT, ...dinamik]
 
   const onbellek = new Map()
   const gGetir = async (a) => {
@@ -253,7 +292,7 @@ async function main() {
   for (const [tur, adresler] of TURLER) {
     for (const adres of adresler) {
       const g = await gGetir(adres)
-      const s = { tur, adres, zincir: g.zincir.join('→'), durum: g.durum, son: yol(g.url || adres), sorunlar: [] }
+      const s = { tur, adres, zincir: g.zincir.join('→'), durum: g.durum, son: yol(g.url || adres), statik: STATIK_TURLER.has(tur), sorunlar: [] }
       if (typeof g.durum !== 'number') { s.sorunlar.push(`GETIRILEMEDI ${g.durum} ${g.hata || ''}`); hatalar.push(adres); satirlar.push(s); continue }
       const a = g.govde ? ayristir(g.govde) : null
       // Bot başına görünür kelime + metin özeti
@@ -289,7 +328,7 @@ async function main() {
       s.h1 = a.h1; s.ic = a.ic; s.kelime = a.kelime; s.metinOzet = a.metinOzet
       s.jsonld = a.jsonld.map((x) => x.tur)
       if (a.title.length !== 1) s.sorunlar.push(`TITLE-SAYISI ${a.title.length}`)
-      if (a.title.length === 1 && varsayilanBaslikMi(a.title[0], tur)) s.sorunlar.push('VARSAYILAN-BASLIK (kendi title/description yok)')
+      if (a.title.length === 1 && varsayilanBaslikMi(a.title[0], baslikTuru(tur, s.son))) s.sorunlar.push('VARSAYILAN-BASLIK (kendi title/description yok)')
       if (!a.aciklama.length) s.sorunlar.push('ACIKLAMA-YOK')
       if (a.h1 !== 1) s.sorunlar.push(`H1-SAYISI ${a.h1}`)
       if (a.jsonld.some((x) => !x.gecerli)) s.sorunlar.push('JSONLD-GECERSIZ')
@@ -324,6 +363,10 @@ async function main() {
       }
       satirlar.push(s)
     }
+  }
+  // Örneksiz zorunlu tür = ölçülemeyen tür: sessiz geçmez, sorunlu satır olur (SEO-29; şema değişip desen tanımazsa burada görünür).
+  for (const tur of eksik) {
+    satirlar.push({ tur, adres: '(örnek yok)', zincir: '-', durum: null, son: '-', statik: false, sorunlar: [`ORNEK-YOK ${tur} (site haritasında bu türün adresi bulunamadı; desenler eski ve yeni şemayı tanıyor)`] })
   }
 
   // Yinelenen başlık / metin (200 dönen, farklı son adresler arasında)
