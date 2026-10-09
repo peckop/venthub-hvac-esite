@@ -91,7 +91,7 @@ bugün hiçbir sayısal debi yüzeyinde görünemez — ve alan dolu olduğu iç
 |---|---|
 | debi | `max_delivery_m3h` 242 · `nominal_delivery_m3h` 89 · `min_delivery_m3h` 21 · `max_delivery_ls` 180 |
 | basınç | `max_static_pressure_pa` 160 · `nominal_static_pressure_pa` 78 · `min_static_pressure_pa` 15 |
-| ses | `noise_level_db_a` 142 (Vortice) · `noise_lpa_3m_db` 66 (SEAT) |
+| ses | `noise_level_db_a` 142 (Vortice) · `noise_lpa_3m_db` 66 (SEAT) — URN-58 (2026-10-09): mesafe alanı veride yok (77 anahtarda ölçüm koşulu taşıyan yok), bu yüzden `noise_level_db_a` etiketi vitrinde ve föyde "Ses seviyesi (üretici beyanı)" / "Sound level (manufacturer's declaration)"; mesafe üretici föyünden doğrulanmadan etikete YAZILMAZ. `noise_lpa_3m_db` mesafeyi adında taşır, etiketi "(3 m)" kalır |
 | güç | `max_absorbed_power_w` 279 · `rated_power_w` 33 (sürücü) · `heating_power_w` 8 · `optional_heater_power_w` 3 · `heating_capacity_kw` 4 |
 | gerilim | `voltage_v` 274 · `min_voltage_v` / `max_voltage_v` 33 · `voltage_alt_v` 7 |
 | akım | `absorbed_current_a` 163 · `rated_output_current_a` 33 · `max_current_a` 2 |

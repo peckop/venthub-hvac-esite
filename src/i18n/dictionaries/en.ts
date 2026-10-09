@@ -1354,7 +1354,9 @@ export const en: typeof tr = {
       motor_efficiency_class: 'Motor Efficiency Class',
       motor_poles: 'Motor Poles',
       motor_type: 'Motor Type',
-      noise_level_db_a: 'Noise Level',
+      // URN-58: this field carries NO measurement distance/type (spec-axis-standard K2) — the label says
+      // "manufacturer's declaration" and must not state a distance unless verified against the maker's datasheet.
+      noise_level_db_a: 'Sound level (manufacturer\'s declaration)',
       noise_lpa_3m_db: 'Sound Pressure (3 m)',
       nominal_delivery_m3h: 'Nominal Airflow',
       nominal_static_pressure_pa: 'Nominal Static Pressure',
@@ -1387,6 +1389,12 @@ export const en: typeof tr = {
       weight_kg: 'Weight',
       width_mm: 'Width',
       wiring: 'Wiring Type'
+    },
+    // Teknik ozellik DEGER metinleri (URN-58) — formatSpecValue mantiksal (true/false) degeri buradan basar.
+    // Ham "true"/"false" musteriye gitmez; canli kapi SPEC-HAM-DEGER yayindaki sayfada bunu olcer.
+    specValues: {
+      yes: 'Yes',
+      no: 'No'
     },
     // Teknik ozellik GRUP basliklari — specLabel.ts 'pdp.specGroups.<grup>' yolunu arar.
     // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
