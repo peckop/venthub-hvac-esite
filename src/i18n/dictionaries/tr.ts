@@ -1659,7 +1659,6 @@ export const tr = {
     lineoQuietQuote: 'Lineo Quiet ES, ses emici kaplamalı, EC fırçasız motorlu karma akışlı bir kanal fanıdır.',
     industrialLabAlt: 'Endüstriyel Laboratuvar Uygulaması',
     lineoTechnicalAlt: 'Lineo Quiet Teknik Detay',
-    lineoNeonAlt: 'Vortice Lineo Quiet görseli',
     vorticeHeritageAlt: 'Vortice markası ve Tribiano (İtalya) merkezi',
     airCurtainDiagramAlt: 'Hava Perdesi Çalışma Prensibi',
     whyCategorySubtitle: 'Katalogda ürün aileleri, ürün sayfaları ve teknik özellik tabloları bulunur.',

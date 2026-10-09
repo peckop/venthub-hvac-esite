@@ -1191,7 +1191,6 @@ export const en: typeof tr = {
     lineoQuietQuote: 'Lineo Quiet ES is a mixed-flow duct fan with sound-absorbing cladding and an EC brushless motor.',
     industrialLabAlt: 'Industrial Laboratory Application',
     lineoTechnicalAlt: 'Lineo Quiet Technical Detail',
-    lineoNeonAlt: 'Vortice Lineo Quiet image',
     vorticeHeritageAlt: 'Vortice brand and its Tribiano (Italy) headquarters',
     airCurtainDiagramAlt: 'Air Curtain Operating Principle',
     whyCategorySubtitle: 'The catalogue includes product families, product pages and technical specification tables.',
