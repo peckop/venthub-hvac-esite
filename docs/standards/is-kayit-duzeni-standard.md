@@ -201,7 +201,8 @@ ya da PR numarası + iki satır özet; `→`, `KANIT:`, `#<PR no>` ya da commit 
 kartlarda `completedAt` boştur), ikisi de yoksa `sonAnlamli` ve satır "yaklaşık" diye işaretlenir. `sonAnlamli` ilk tercih DEĞİLDİR: eski
 karta bugün düşülen not onu bugüne taşır. Betik yalnız Done kolonundaki kartı sayar; hiç Done'a çekilmemiş teslim (kart Backlog'da
 kalmış, PR birleşmiş) bu ölçüye girmez; onu `node scripts/board/teslim-kart-koprusu.cjs` ölçer (bugün origin/master'a giren her PR'ın
-numarası ya da commit kısaltması o gün yazılmış bir kart notunda geçmeli; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)";
+numarası (`#N`, `PR N` ya da `.../pull/N`; komşu numara anmak sayılmaz: `#17`, `#1786`'yı karşılamaz) ya da tek başına duran en az 7
+karakterlik commit kısaltması o gün yazılmış bir kart notunda geçmeli; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)";
 eşik **0**; ölçülemeyen hal çıkış 2). İkisi birlikte koşulur; notsuz bulunan teslim sahibine yazılır, OPS'a özet gider.
 
 **Ölçülmüş tuzaklar ve karşılıkları:**

@@ -16,8 +16,10 @@
  *
  * ÖLÇÜ: "teslim" = origin/master'da başlığı "(#N)" ile biten commit (PR birleştirmesi). Not = kart-not-sayimi.cjs ile AYNI kural (yazarı
  * system değil, en az 10 harf/rakam, teslim GÜNÜNDE yazılmış). Teslim "kartlı" sayılır: PR numarası `#N` (tam eşleşme: #17, #1786'yı
- * karşılamaz), `PR N`, `pull/N` ya da 7+ karakterlik commit kısaltması HERHANGİ bir kartın bugünkü notunda geçiyorsa. Not başka kartta da
- * olabilir; numaranın doğru karta yazıldığı ölçülmez. Başlıktaki kart numarası yalnız raporda sahibi bulmak içindir.
+ * karşılamaz), `PR N`, `pull/N` ya da tek başına duran 7+ karakterlik commit kısaltması (salt rakamlıysa yalnız tamamı; "1234567 TL" bir
+ * kısaltma değildir) HERHANGİ bir kartın bugünkü notunda geçiyorsa. Not başka kartta da olabilir; numaranın doğru karta yazıldığı
+ * ölçülmez. Başlıktaki kart numarası (harf sonekli "ALT-37e" dahil) yalnız raporda sahibi bulmak içindir.
+ * Gün sınırı: [gün 00:00:00, gün 23:59:59] +03:00, İKİ ucu da kapsayıcı; sonraki günün 00:00:00 damgalı commit'i o günün sayılır.
  * Çıktı departman (başlığın ilk sözcüğü) başına: "URUN: Teslim 8, kart notunda geçmeyen 4: #1774 (URN-58), ...".
  * PR numarasız commit (doğrudan master) ayrı SAYILIR ve çıkış kodunu etkilemez.
  *
@@ -35,14 +37,20 @@ const K = require('./kart-not-sayimi.cjs')
 
 const REPO = path.resolve(__dirname, '..', '..')
 const { VeriHatasi, gunAdi, gunGecerli, bugun, notSayilir } = K
-const KART_NO = /\b([A-Z]{2,5}-\d+)\b/
+/** Kart numarası, tek harf sonekli olanlar dahil ("ALT-37e", "TSR-10b": 10-08'de üç PR sonek yüzünden kartsız göründü). */
+const KART_NO = /\b([A-Z]{2,5}-\d+[a-z]?)\b/
 const PR_SONU = /\(#(\d{2,6})\)\s*$/
+/** Commit kısaltması en az bu kadar karakter (git %h) olmalı; daha kısası PR anmaz. */
+const KISA_MIN = 7
+/** Metindeki 7-40 karakterlik onaltılık sözcükler (harf ya da rakama bitişik olmayan): commit kısaltması adayı. */
+const HEX_SOZCUK = /(?<![0-9A-Za-z])[0-9a-f]{7,40}(?![0-9A-Za-z])/gi
 /** Türkçe büyük harf katlama: "HARİTA" ve "HARITA" aynı departman. */
 const DEPARTMAN_ASCII = { İ: 'I', Ş: 'S', Ğ: 'G', Ü: 'U', Ö: 'O', Ç: 'C' }
 
 function departman(baslik) {
   const ilk = String(baslik).trim().split(/[\s(:]/)[0] || '?'
-  return ilk.replace(/[İŞĞÜÖÇ]/g, (c) => DEPARTMAN_ASCII[c]).toUpperCase()
+  // Önce büyüt, sonra katla: küçük harfli "ürün" de "URUN" olur ("İ" büyütmede değişmez, katlamada "I" olur).
+  return ilk.toUpperCase().replace(/[İŞĞÜÖÇ]/g, (c) => DEPARTMAN_ASCII[c])
 }
 
 /** "kısa|başlık" satırlarından teslim listesi. PR numarasız commit ayrı döner. */
@@ -63,15 +71,25 @@ function teslimleriCoz(satirlar) {
   return { teslimler, prSiz }
 }
 
-/** Metin bu teslimi anıyor mu: #N (tam eşleşme), "PR N", "pull/N" ya da 7+ karakterlik commit kısaltması. */
+/**
+ * Metin bu teslimi anıyor mu: #N (tam eşleşme), "PR N", "pull/N" ya da commit kısaltması.
+ * Kısaltma TEK BAŞINA duran bir sözcük olmalı ve teslimin %h değeriyle öneki paylaşmalı (not kısaltılmış ya da daha uzun sha yazmış olabilir);
+ * başka bir sözcüğün ortasındaki parça anmak sayılmaz. Salt rakamdan oluşan sözcük tutar/sayı olabilir: yalnız kısaltmanın TAMAMI
+ * (ya da daha uzun sha) anar. Yanlış "anıldı" sessizce temiz görünür, yanlış "anılmadı" gürültü yapar: belirsizlikte ikincisi seçilir.
+ */
 function notAniyor(metin, teslim) {
   const m = String(metin)
   const n = teslim.pr
   if (new RegExp(`(?<![0-9A-Za-z])#${n}(?![0-9])`).test(m)) return true
   if (new RegExp(`\\bPR\\s*#?${n}(?![0-9])`, 'i').test(m)) return true
   if (new RegExp(`/pull/${n}(?![0-9])`).test(m)) return true
-  const kisa = teslim.kisa.slice(0, 7)
-  return kisa.length >= 7 && m.toLowerCase().includes(kisa.toLowerCase())
+  const kisa = String(teslim.kisa).toLowerCase()
+  if (kisa.length < KISA_MIN) return false
+  return (m.match(HEX_SOZCUK) || []).some((p) => {
+    const s = p.toLowerCase()
+    if (/^[0-9]+$/.test(s)) return s.startsWith(kisa)
+    return s.startsWith(kisa) || kisa.startsWith(s)
+  })
 }
 
 /** O gün (TR) yazılmış dolu, sistem dışı tüm notların metni. */
@@ -118,9 +136,12 @@ function gitGunlugu(gun, repo, fetchYok) {
     const f = git('fetch', 'origin', 'master', '--quiet')
     if (f.status !== 0) throw new VeriHatasi(`git fetch origin master başarısız (origin/master taze değil): ${(f.stderr || '').trim().split('\n').pop()}`)
   }
-  const sonraki = new Date(`${gun}T00:00:00+03:00`)
-  sonraki.setUTCDate(sonraki.getUTCDate() + 1)
-  const r = git('log', 'origin/master', `--since=${gun}T00:00:00+03:00`, `--until=${sonraki.toISOString()}`, '--format=%h|%s')
+  // git --since ve --until İKİSİ de kapsayıcıdır: sonraki günün 00:00:00 damgalı commit'i iki günde birden sayılırdı.
+  // Bitiş, sonraki günün başından bir saniye önce (git zaman damgası saniye çözünürlüklüdür).
+  const bitis = new Date(`${gun}T00:00:00+03:00`)
+  bitis.setUTCDate(bitis.getUTCDate() + 1)
+  bitis.setUTCSeconds(bitis.getUTCSeconds() - 1)
+  const r = git('log', 'origin/master', `--since=${gun}T00:00:00+03:00`, `--until=${bitis.toISOString()}`, '--format=%h|%s')
   if (r.status !== 0) throw new VeriHatasi(`git log origin/master okunamadı: ${(r.stderr || '').trim().split('\n').pop()}`)
   const satirlar = r.stdout.split('\n').filter(Boolean)
   if (satirlar.length === 0) throw new VeriHatasi(`origin/master'da ${gun} günü hiç commit yok — ölçülemedi ("temiz" değil)`)
@@ -195,10 +216,11 @@ function kontrol(d, gun) {
   return d.kayitlar
 }
 
-function main(argv) {
+/** `simdi` yalnız test içindir (varsayılan gün saat dilimi sınırında sınanabilsin diye saat dışarıdan verilir). */
+function main(argv, simdi = new Date()) {
   try {
     const a = argumanlar(argv)
-    const gun = a.gun || bugun()
+    const gun = a.gun || bugun(simdi)
     const satirlar = a.logDosya ? logOku(a.logDosya) : gitGunlugu(gun, a.repo, a.fetchYok)
     const kayitlar = kanbanOku(a, gun)
     const sonuc = olc(kayitlar, satirlar, gun)

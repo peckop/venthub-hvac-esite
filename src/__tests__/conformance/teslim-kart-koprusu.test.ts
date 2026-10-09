@@ -12,7 +12,7 @@ import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
 type Not = { author: string; content: string; createdAt: string }
 type Kayit = { identifier: string; status?: string; serit?: string; notes?: Not[] }
@@ -32,6 +32,7 @@ type Modul = {
   gununNotlari: (kayitlar: Kayit[], gun: string) => string[]
   olc: (kayitlar: Kayit[], satirlar: string[], gun: string) => Sonuc
   satirlariYaz: (sonuc: Sonuc) => string[]
+  main: (argv: string[], simdi?: Date) => number
 }
 
 const KOK = spawnSync('git', ['rev-parse', '--path-format=absolute', '--show-toplevel'], { encoding: 'utf8' }).stdout.trim()
@@ -60,6 +61,9 @@ describe('INV-TESLIM-KART-1 · departman ve teslim ayrıştırma', () => {
     ['URUN (URN-58): x', 'URUN'],
     ['ALTYAPI (ALT-37e): x', 'ALTYAPI'],
     ['Tasarım: x', 'TASARIM'],
+    ['ürün (x)', 'URUN'],
+    ['şeker: x', 'SEKER'],
+    ['harita: x', 'HARITA'],
   ])('"%s" → %s', (baslik, beklenen) => {
     expect(T.departman(baslik)).toBe(beklenen)
   })
@@ -79,6 +83,25 @@ describe('INV-TESLIM-KART-1 · departman ve teslim ayrıştırma', () => {
     const { teslimler, prSiz } = T.teslimleriCoz(['aaa1111|URUN (URN-1): #1786 sonrası düzeltme'])
     expect(teslimler).toHaveLength(0)
     expect(prSiz).toHaveLength(1)
+  })
+
+  it('PARANTEZLİ atıf da başlık sonunda değilse teslim sayılmaz; sonda olan sayılır ($ çapası)', () => {
+    const ortada = T.teslimleriCoz(['aaa1111|URUN (URN-1): ara (#1786) devam'])
+    expect(ortada.teslimler).toHaveLength(0)
+    expect(ortada.prSiz).toHaveLength(1)
+    const ikisi = T.teslimleriCoz(['aaa1111|URUN (URN-1): ara (#1786) devam (#1774)'])
+    expect(ikisi.teslimler.map((t) => t.pr)).toEqual(['1774'])
+  })
+
+  it('harf sonekli kart numarası düşmez (10-08: ALT-38e, ALT-37d, ALT-37b başlıkları kartsız görünüyordu)', () => {
+    const { teslimler } = T.teslimleriCoz([
+      'a111111|ALTYAPI (ALT-37e): x (#1745)',
+      'a222222|ALTYAPI (ALT-38e): x (#1744)',
+      'a333333|TASARIM (TSR-10b): x (#1730)',
+      'a444444|ALTYAPI (ALT-45): sonek yok (#1759)',
+      'a555555|HARİTA (HRT-47 sonrası): x (#1790)',
+    ])
+    expect(teslimler.map((t) => t.kart)).toEqual(['ALT-37e', 'ALT-38e', 'TSR-10b', 'ALT-45', 'HRT-47'])
   })
 
   it('"kısa|başlık" biçiminde olmayan günlük satırı VERİ HATASI', () => {
@@ -109,6 +132,52 @@ describe('INV-TESLIM-KART-1 · notAniyor (eşleşme kuralları)', () => {
   it('PR numarasının KENDİSİ başka numaranın önekiyse karıştırmaz (#178 teslimi, "#1786" notunda anılmış sayılmaz)', () => {
     expect(T.notAniyor('#1786 birleşti', { pr: '178', kisa: 'zzzzzzz' })).toBe(false)
   })
+
+  it('"PR N" ve "/pull/N" kuralları da komşu numarayı karıştırmaz (üç kuralın üçü ayrı sınanır)', () => {
+    expect(T.notAniyor('PR 17860 açıldı', t)).toBe(false)
+    expect(T.notAniyor('https://github.com/o/r/pull/17860', t)).toBe(false)
+    expect(T.notAniyor('PR 178 açıldı', t)).toBe(false)
+    expect(T.notAniyor('PR 1786 açıldı', t)).toBe(true)
+    expect(T.notAniyor('https://github.com/o/r/pull/1786', t)).toBe(true)
+  })
+
+  describe('commit kısaltması: tek başına duran sözcük, öneki paylaşan', () => {
+    const h = { pr: '9999', kisa: 'bcb3047b1' }
+
+    it.each([
+      ['bcb3047b1', 'tam kısaltma'],
+      ['commit bcb3047', 'not kısaltılmış (7 karakter)'],
+      ['COMMIT BCB3047B1 girdi', 'büyük harf'],
+      [`sha ${'bcb3047b1'}${'0'.repeat(31)}`, 'tam 40 karakterlik sha'],
+      ['(bcb3047b1)', 'parantez içinde'],
+    ])('"%s" anar (%s)', (m) => {
+      expect(T.notAniyor(m, h)).toBe(true)
+    })
+
+    it.each([
+      ['xbcb3047b1y', 'harfe bitişik'],
+      ['abcb3047b1', 'başka sözcüğün ortasındaki parça'],
+      ['bcb3047b1z', 'sonda harf var'],
+      ['bcb304', '6 karakter'],
+      ['bcb3048 farklı: bcb3049', 'ilgisiz 7 karakterlik sözcükler (önek paylaşmaz)'],
+    ])('"%s" ANMAZ (%s)', (m) => {
+      expect(T.notAniyor(m, h)).toBe(false)
+    })
+
+    it('SALT RAKAMLI kısaltma: sayı/tutar kısaltma sayılmaz, tam kısaltma sayılır (3,5% commit\'in ilk 7 hanesi rakamdır)', () => {
+      const r = { pr: '9999', kisa: '1234567ab' }
+      expect(T.notAniyor('tutar 1234567 TL', r)).toBe(false)
+      expect(T.notAniyor('ab1234567cd', r)).toBe(false)
+      expect(T.notAniyor('kod 1234567ab bitti', r)).toBe(true)
+      expect(T.notAniyor('kod 1234567ab0123 bitti', r)).toBe(true)
+    })
+
+    it('eşik ve büyük/küçük harf: 7 karakterden kısa kısaltmanın kendisi anmaz; büyük harf eşdeğerdir', () => {
+      expect(T.notAniyor('abc', { pr: '1', kisa: 'abc' })).toBe(false)
+      expect(T.notAniyor('abcdef', { pr: '1', kisa: 'abcdef' })).toBe(false)
+      expect(T.notAniyor('COMMIT 17C2F5F', { pr: '1', kisa: '17c2f5f69' })).toBe(true)
+    })
+  })
 })
 
 describe('INV-TESLIM-KART-1 · gununNotlari', () => {
@@ -117,6 +186,27 @@ describe('INV-TESLIM-KART-1 · gununNotlari', () => {
       kart('URN-1', [not('PR #1774 birleşti, iki satır özet.'), not('PR #1752 dünkü not', DUN_IKI), not('kısa'), not('PR #1766 sistem satırı', BUGUN_IKI, 'system')]),
     ]
     expect(T.gununNotlari(kayitlar, GUN)).toEqual(['PR #1774 birleşti, iki satır özet.'])
+  })
+
+  it('gün SONRASI not da sayılmaz: 10-08 teslimini 10-09\'da yazılmış not karşılamaz (10-08: #1759/#1756/#1750 gerçek örnek)', () => {
+    const k = [kart('URN-1', [not('PR #1774 sonradan yazıldı, iki satır özet.', BUGUN_IKI)])]
+    expect(T.gununNotlari(k, '2026-10-08')).toEqual([])
+    expect(T.gununNotlari(k, '2026-10-10')).toEqual([])
+    expect(T.gununNotlari(k, GUN)).toHaveLength(1)
+  })
+
+  it('not günü TÜRKİYE gününe göredir (UTC değil): TR 00:30 notu o günün, TR ertesi 00:30 notu ertesi günün', () => {
+    const trGeceIki = '2026-10-08T21:30:00.000Z' // TR 10-09 00:30
+    const trErtesiGece = '2026-10-09T21:30:00.000Z' // TR 10-10 00:30
+    const k = [kart('URN-1', [not('PR #1774 gece yarısından sonra yazıldı.', trGeceIki), not('PR #1752 ertesi gün yazıldı, iki satır.', trErtesiGece)])]
+    expect(T.gununNotlari(k, GUN)).toEqual(['PR #1774 gece yarısından sonra yazıldı.'])
+    expect(T.gununNotlari(k, '2026-10-10')).toEqual(['PR #1752 ertesi gün yazıldı, iki satır.'])
+  })
+
+  it('notes alanı olmayan ya da null olan kayıt çökmez, atlanır', () => {
+    const k = [{ identifier: 'X-1' }, { identifier: 'X-2', notes: null as unknown as Not[] }, kart('URN-1', [not('PR #1774 birleşti, iki satır özet.')])]
+    expect(T.gununNotlari(k as Kayit[], GUN)).toEqual(['PR #1774 birleşti, iki satır özet.'])
+    expect(T.olc(k as Kayit[], [LOG[0]], GUN)).toMatchObject({ teslim: 1, notsuz: 0 })
   })
 })
 
@@ -157,6 +247,45 @@ describe('INV-TESLIM-KART-1 · olc (saf işlev)', () => {
       'URUN: Teslim 2, kart notunda geçmeyen 2: #1774 (URN-58), #1752 (REC-491)',
       'TOPLAM 2026-10-09: Teslim 2, kart notunda geçmeyen 2',
     ])
+  })
+
+  it('departmanlar ada göre SIRALI yazılır (günlük sırası değil): HARİTA, URUN; toplam en sonda', () => {
+    const s = T.olc([kart('URN-58', [not('PR #1774, #1752, #1779 ve #1771 birleşti; iki satır özet.')])], LOG, GUN)
+    expect(T.satirlariYaz(s)).toEqual([
+      'HARITA: Teslim 2, kart notunda geçmeyen 0',
+      'URUN: Teslim 2, kart notunda geçmeyen 0',
+      'TOPLAM 2026-10-09: Teslim 4, kart notunda geçmeyen 0',
+    ])
+  })
+
+  it('varsayılan gün TÜRKİYE gününden gelir: UTC 21:30 TR\'de ertesi gün (saat dışarıdan verilir)', () => {
+    const dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'teslim-kart-saat-'))
+    try {
+      const logYol = path.join(dizin, 'log.txt')
+      const kanbanYol = path.join(dizin, 'k.json')
+      fs.writeFileSync(logYol, LOG[0], 'utf8')
+      fs.writeFileSync(kanbanYol, JSON.stringify({ kayitlar: [kart('URN-58', [])] }), 'utf8')
+      const gunler = [
+        ['2026-10-09T20:59:00.000Z', '2026-10-09'], // TR 23:59
+        ['2026-10-09T21:00:00.000Z', '2026-10-10'], // TR 00:00
+        ['2026-10-09T21:30:00.000Z', '2026-10-10'], // TR 00:30
+      ]
+      for (const [saat, beklenen] of gunler) {
+        const yazilan: string[] = []
+        const spy = vi.spyOn(process.stdout, 'write').mockImplementation(((m: string | Uint8Array) => {
+          yazilan.push(String(m))
+          return true
+        }) as typeof process.stdout.write)
+        try {
+          T.main(['--log-dosya', logYol, '--dosya', kanbanYol, '--json'], new Date(saat))
+        } finally {
+          spy.mockRestore()
+        }
+        expect((JSON.parse(yazilan.join('')) as Sonuc).gun, saat).toBe(beklenen)
+      }
+    } finally {
+      fs.rmSync(dizin, { recursive: true, force: true })
+    }
   })
 })
 
@@ -221,6 +350,24 @@ describe('INV-TESLIM-KART-1 · komut satırı', () => {
     expect(r.cikti).toContain('HATA')
   })
 
+  it('değersiz bayrak DOĞRU sebeple reddedilir: bir sonraki bayrak değer sayılmaz ("--log-dosya --json" dosya adı olarak okunmaz)', () => {
+    for (const a of [['--dosya'], ['--log-dosya', '--json'], ['--dosya', '--json']]) {
+      const r = cli(...a)
+      expect(r.kod, r.cikti).toBe(2)
+      expect(r.cikti, a.join(' ')).toContain('bir değer ister')
+    }
+  })
+
+  it('bayatlık eşiği: damga istenen günde ya da sonrasında ise veri bayat DEĞİL (çıkış 0), önceki günde ise bayat (çıkış 2)', () => {
+    const k = tamNot()
+    const calis = (damga: string) => cli('--log-dosya', log(), '--dosya', yaz(`damga-${damga.slice(0, 10)}.json`, { damga, kayitlar: k }), '--gun', GUN)
+    expect(calis('2026-10-09T05:00:00Z').kod).toBe(0) // aynı gün
+    expect(calis('2026-10-10T05:00:00Z').kod).toBe(0) // sonraki gün
+    const bayat = calis('2026-10-08T05:00:00Z') // önceki gün
+    expect(bayat.kod, bayat.cikti).toBe(2)
+    expect(bayat.cikti).toContain('bayat')
+  })
+
   describe('gerçek git yolu (geçici depo, origin/master = HEAD)', () => {
     let repo = ''
     const git = (...a: string[]) => spawnSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', ...a], { encoding: 'utf8' })
@@ -236,22 +383,35 @@ describe('INV-TESLIM-KART-1 · komut satırı', () => {
       repo = fs.mkdtempSync(path.join(os.tmpdir(), 'teslim-kart-git-'))
       expect(git('init', '-q').status).toBe(0)
       commit('2026-10-08T23:59:00+03:00', 'URUN (URN-9): dünün son dakikası (#1700)')
+      commit('2026-10-09T00:00:00+03:00', 'URUN (URN-8): tam gece yarısı, günün ilk saniyesi (#1701)')
       commit('2026-10-09T00:00:30+03:00', 'URUN (URN-1): günün ilk dakikası (#1774)')
       commit('2026-10-09T23:59:00+03:00', 'HARİTA (HRT-1): günün son dakikası (#1779)')
+      commit('2026-10-09T23:59:59+03:00', 'HARİTA (HRT-2): günün son saniyesi (#1702)')
+      commit('2026-10-10T00:00:00+03:00', 'URUN (URN-7): tam gece yarısı, ertesi günün ilk saniyesi (#1703)')
       commit('2026-10-10T00:00:30+03:00', 'URUN (URN-2): yarının ilk dakikası (#1800)')
       expect(git('update-ref', 'refs/remotes/origin/master', 'HEAD').status).toBe(0)
-    })
+    }, 60_000)
     afterAll(() => {
       if (repo) fs.rmSync(repo, { recursive: true, force: true })
     })
 
-    it('TR günü sınırı: yalnız 10-09 00:00-24:00 (UTC+3) arasındaki iki teslim sayılır; dünün ve yarının commit\'i dışarıda', () => {
-      const f = yaz('git-kanban.json', { kayitlar: [kart('URN-1', [])] })
-      const r = cli('--repo', repo, '--fetch-yok', '--dosya', f, '--gun', GUN, '--json')
+    const prler = (gun: string) => {
+      const f = yaz(`git-kanban-${gun}.json`, { kayitlar: [kart('URN-1', [])] })
+      const r = cli('--repo', repo, '--fetch-yok', '--dosya', f, '--gun', gun, '--json')
       expect(r.kod, r.cikti).toBe(1)
       const s = JSON.parse(r.stdout) as Sonuc
-      expect(s.teslim).toBe(2)
-      expect(Object.values(s.departmanlar).flatMap((d) => d.notsuz.map((n) => n.pr)).sort()).toEqual(['1774', '1779'])
+      return Object.values(s.departmanlar).flatMap((d) => d.notsuz.map((n) => n.pr)).sort()
+    }
+
+    it('TR günü sınırı: yalnız 10-09 00:00:00-23:59:59 (UTC+3) arasındaki teslimler sayılır; dünün ve yarının commit\'i dışarıda', () => {
+      expect(prler(GUN)).toEqual(['1701', '1702', '1774', '1779'])
+    })
+
+    it('tam gece yarısı (00:00:00) damgalı commit YALNIZ kendi gününde sayılır; git --until kapsayıcı olduğundan iki günde birden çıkmaz', () => {
+      expect(prler('2026-10-08')).toEqual(['1700'])
+      expect(prler('2026-10-10')).toEqual(['1703', '1800'])
+      const tum = [...prler('2026-10-08'), ...prler(GUN), ...prler('2026-10-10')]
+      expect(new Set(tum).size, 'bir PR iki günde sayıldı').toBe(tum.length)
     })
 
     it('o gün hiç commit yoksa ÖLÇÜLEMEDİ (çıkış 2), temiz değil', () => {
