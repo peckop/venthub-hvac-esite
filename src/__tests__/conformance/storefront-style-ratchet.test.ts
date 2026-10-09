@@ -215,7 +215,7 @@ const RATCHETS: Ratchet[] = [
     // OrderDetailPage). Marka `text-slate-600` ve favori satırı `text-slate-400` yerinde kaldı
     // (net etkisi 0); sipariş detayına eklenen model kodu satırı token (`text-steel-gray`) kullanır.
     // Kazanç yan ürün.
-    tavan: 1439,
+    tavan: 1436,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -225,7 +225,7 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-01 · 378 → 377 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 377 -> 375: REC-115 olu bilesen CategoryHero silindi.
     // 2026-09-29 · 375 -> 372: REC-434 — aynı ölü bölümün silinmesi.
-    tavan: 372,
+    tavan: 370,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
@@ -243,7 +243,7 @@ const RATCHETS: Ratchet[] = [
     // 2026-08-28 · 133 → 124 (aynı kaldırma).
     // 2026-09-01 · 124 → 122 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 122 -> 120: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 120,
+    tavan: 118,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },

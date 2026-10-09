@@ -22,6 +22,7 @@ export const en: typeof tr = {
   },
   common: {
     technicalDrawing: 'Technical Drawing',
+    imagePreparing: 'Product image coming soon',
     errorGeneric: 'An error occurred',
     devMode: 'Developer Mode',
     userFallback: 'User',
@@ -519,10 +520,6 @@ export const en: typeof tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Grade',
-      gradeValue: 'A++',
-      standardLabel: 'Standard',
-      standardValue: 'ERP',
       eyebrow: 'Product Showroom',
       title: 'Industrial Product Portfolio',
       subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
