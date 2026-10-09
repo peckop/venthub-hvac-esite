@@ -115,10 +115,11 @@ const TrustProofSection: React.FC<TrustProofSectionProps> = ({ dictionary: t, tr
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
               {trustStripKeys.map((key) => (
                 <div key={key} className="flex flex-col items-center justify-center rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center transition-shadow hover:bg-white hover:shadow-xl hover:shadow-slate-200/50">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    {t.badge || 'Trusted'}
-                  </div>
-                  <div className="mt-1 text-xs font-bold text-slate-900 leading-tight">
+                  {/* Rozet metni boşsa rozet BASILMAZ: eski 'Trusted' yedeği kaynaksız iddiaydı (URN-77). */}
+                  {t.badge ? (
+                    <div className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">{t.badge}</div>
+                  ) : null}
+                  <div className="text-xs font-bold text-slate-900 leading-tight">
                     {stripDict[key]}
                   </div>
                 </div>

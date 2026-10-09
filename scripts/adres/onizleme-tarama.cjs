@@ -10,9 +10,16 @@
  *       · yeni adres → 200, yönlendirme yok;
  *       · eski dilli adres (`/tr/legal/kvkk`) → TEK 308, hedef tablodaki yeni adres, hedef 200;
  *       · eski DİLSİZ adres (`/legal/kvkk`) → TEK sıçrama (307/308), hedef yeni adres (R4).
- *  2. model adres listesi (`docs/plans/rec300-model-adres-listesi-2026-09-23.csv`, 442 model, 47 aile):
- *     her aileden en az 1 model (+ `--ornek N` ek örnek): yeni TR/EN adres → 200; bugünkü
- *     `/tr|en/products/<slug_bugun>` → TEK 308, hedef CSV'deki yeni adres.
+ *  2. model adres listesi (`docs/plans/rec300-model-adres-listesi-2026-09-23.csv`, 442 model, 47 aile) +
+ *     YAYINDAKİ MODELLER listesi (`src/config/yayindaModeller.veri.json`, karar 259 kısa pilot): her aileden
+ *     en az 1 model (+ `--ornek N` ek örnek). Bir modelin kendi sayfası olup olmadığına SİTENİN KENDİ VERİ DOSYASI
+ *     karar verir (CSV adresin ne olacağını söyler, açık olup olmadığını söylemez; ölçüldü: liste boşken 442
+ *     modelin hiçbiri sayfa almaz ve CSV'den kurulan beklenti 188 sahte kırmızı üretir):
+ *       · listede VAR (açık):  yeni TR/EN adres → 200; bugünkü `/tr|en/products/<slug_bugun>` → TEK 308, hedef
+ *         CSV'deki yeni model adresi.
+ *       · listede YOK (kapalı): yeni model adresi → 404 (model sayfası yoktur); bugünkü adres → TEK 308, hedef
+ *         ÜRÜN AİLESİ sayfası (model adresinin son parçası `aile_yeni` ile değişir), orada 200.
+ *     Her iki yön de ölçülür: liste "açık" derken site kapalıysa da, "kapalı" derken site açıksa da KIRMIZI.
  *  3. eski kategori adresleri (tohum `src/data/eski-adres-tohum.json`): hedef yeni ağacın (#1352,
  *     Faz 1-B) adresidir, canlı veritabanında henüz yok → durum BEKLİYOR (gerçek yazılır, hata sayılmaz).
  *
@@ -27,6 +34,7 @@
  * KULLANIM
  *   node scripts/adres/onizleme-tarama.cjs --taban http://localhost:3000 [--cikti tarama.json] [--ornek 2]
  *   node scripts/adres/onizleme-tarama.cjs --liste        # ağ yok; yalnız beklenen adresleri yazar
+ *   (--tablo, --model-listesi, --tohum, --yayinda-listesi: girdi dosyalarını değiştirir; varsayılan = bu ağaç)
  */
 'use strict'
 
@@ -39,6 +47,7 @@ const { adresiIzle, ag, sirala } = require('./matris.cjs')
 const KOK = path.resolve(__dirname, '..', '..')
 const VARSAYILAN_TABAN = 'http://localhost:3000'
 const VARSAYILAN_MODEL_LISTESI = path.join(KOK, 'docs', 'plans', 'rec300-model-adres-listesi-2026-09-23.csv')
+const YAYINDA_LISTESI_YOLU = path.join(KOK, 'src', 'config', 'yayindaModeller.veri.json')
 const TABLO_YOLU = path.join(KOK, 'src', 'config', 'rotaDili.veri.json')
 const TOHUM_YOLU = path.join(KOK, 'src', 'data', 'eski-adres-tohum.json')
 const DILLER = ['tr', 'en']
@@ -82,11 +91,42 @@ function modelOrnekle(modeller, ek = 0) {
   return secilen
 }
 
+/** SKU kimliği büyük harf ve kenar boşluksuzdur (DB biçimi; `config/yayindaModeller.ts` ile aynı normalleştirme). */
+const kimlik = (sku) => String(sku).trim().toUpperCase()
+
+const duzNesne = (x) => x !== null && typeof x === 'object' && !Array.isArray(x)
+
+/**
+ * Yayındaki modeller listesi → model adresi (200) olan SKU'ların kümesi. Aile altındaki modeller ve sürümler dahil.
+ * Biçim bozuksa ya da liste hiç verilmediyse ATAR: "okunamadı" boş liste sayılmaz (boş liste = hiçbir model açık değil
+ * = bambaşka bir beklenti kümesi; sessizce ona düşmek sahte yeşil ya da sahte kırmızı üretir).
+ * @param {{modeller: Record<string, Record<string, unknown>>, surumler: Record<string, unknown>}} yayinda
+ * @returns {Set<string>}
+ */
+function yayindaSkuKumesi(yayinda) {
+  if (!duzNesne(yayinda) || !duzNesne(yayinda.modeller) || !duzNesne(yayinda.surumler)) {
+    throw new Error('yayındaki modeller listesi verilmedi ya da biçimi bozuk ({ modeller: {...}, surumler: {...} } bekleniyordu)')
+  }
+  const sku = new Set()
+  for (const [aile, kayitlar] of Object.entries(yayinda.modeller)) {
+    if (!duzNesne(kayitlar)) throw new Error(`yayındaki modeller listesi bozuk: "${aile}" ailesinin kaydı nesne değil`)
+    for (const k of Object.keys(kayitlar)) sku.add(kimlik(k))
+  }
+  for (const k of Object.keys(yayinda.surumler)) sku.add(kimlik(k))
+  return sku
+}
+
+/** Model adresinin son parçası ürün ailesi adıyla değişir: `/tr/urun/<model>` → `/tr/urun/<aile>` (kapalı modelin düştüğü sayfa). */
+function aileAdresi(modelAdresi, aile) {
+  return modelAdresi.replace(/[^/]+$/, aile)
+}
+
 /**
  * Beklenti listesi (kararlı sıra, tekrarsız). Bir beklenti:
  * { grup, adres, ilkDurum: sayı|sayı[]|null, hop: sayı, sonUrl: yol|null, sonDurum: sayı|null, bekliyor?: string }
  */
-function beklentileriUret({ tablo, modeller, tohum, ek = 0 }) {
+function beklentileriUret({ tablo, modeller, tohum, yayinda, ek = 0 }) {
+  const acik = yayindaSkuKumesi(yayinda)
   const liste = []
   const gorulen = new Set()
   const ekle = (b) => {
@@ -119,10 +159,18 @@ function beklentileriUret({ tablo, modeller, tohum, ek = 0 }) {
   }
 
   for (const m of modelOrnekle(modeller, ek)) {
-    ekle({ grup: 'model-yeni', adres: m.adres_tr, ilkDurum: 200, hop: 0, sonUrl: m.adres_tr, sonDurum: 200 })
-    ekle({ grup: 'model-yeni', adres: m.adres_en, ilkDurum: 200, hop: 0, sonUrl: m.adres_en, sonDurum: 200 })
-    ekle({ grup: 'model-eski', adres: `/tr/products/${m.slug_bugun}`, ilkDurum: 308, hop: 1, sonUrl: m.adres_tr, sonDurum: 200 })
-    ekle({ grup: 'model-eski', adres: `/en/products/${m.slug_bugun}`, ilkDurum: 308, hop: 1, sonUrl: m.adres_en, sonDurum: 200 })
+    if (acik.has(kimlik(m.sku))) {
+      ekle({ grup: 'model-yeni', adres: m.adres_tr, ilkDurum: 200, hop: 0, sonUrl: m.adres_tr, sonDurum: 200 })
+      ekle({ grup: 'model-yeni', adres: m.adres_en, ilkDurum: 200, hop: 0, sonUrl: m.adres_en, sonDurum: 200 })
+      ekle({ grup: 'model-eski', adres: `/tr/products/${m.slug_bugun}`, ilkDurum: 308, hop: 1, sonUrl: m.adres_tr, sonDurum: 200 })
+      ekle({ grup: 'model-eski', adres: `/en/products/${m.slug_bugun}`, ilkDurum: 308, hop: 1, sonUrl: m.adres_en, sonDurum: 200 })
+    } else {
+      // Kapalı model (pilot listede yok): model sayfası YOKTUR (404), eski adres ürün ailesi sayfasına gider.
+      ekle({ grup: 'model-yeni-kapali', adres: m.adres_tr, ilkDurum: 404, hop: 0, sonUrl: m.adres_tr, sonDurum: 404 })
+      ekle({ grup: 'model-yeni-kapali', adres: m.adres_en, ilkDurum: 404, hop: 0, sonUrl: m.adres_en, sonDurum: 404 })
+      ekle({ grup: 'model-eski-aileye', adres: `/tr/products/${m.slug_bugun}`, ilkDurum: 308, hop: 1, sonUrl: aileAdresi(m.adres_tr, m.aile_yeni), sonDurum: 200 })
+      ekle({ grup: 'model-eski-aileye', adres: `/en/products/${m.slug_bugun}`, ilkDurum: 308, hop: 1, sonUrl: aileAdresi(m.adres_en, m.aile_yeni), sonDurum: 200 })
+    }
   }
 
   const kategoriler = (tohum && tohum.kategoriler) || []
@@ -201,6 +249,7 @@ function argumanlariOku(argv) {
     taban: VARSAYILAN_TABAN,
     cikti: null,
     modelListesi: VARSAYILAN_MODEL_LISTESI,
+    yayindaListesi: YAYINDA_LISTESI_YOLU,
     tablo: TABLO_YOLU,
     tohum: TOHUM_YOLU,
     ek: 0,
@@ -215,6 +264,7 @@ function argumanlariOku(argv) {
     if (a === '--taban') sec.taban = tabanDogrula(deger())
     else if (a === '--cikti') sec.cikti = deger()
     else if (a === '--model-listesi') sec.modelListesi = deger()
+    else if (a === '--yayinda-listesi') sec.yayindaListesi = deger()
     else if (a === '--ornek') {
       const n = Number(deger())
       if (!Number.isInteger(n) || n < 0 || n > 20) throw new Error('--ornek 0-20 arası tam sayı ister')
@@ -229,10 +279,26 @@ async function girdileriOku(sec) {
   const tablo = JSON.parse(fs.readFileSync(sec.tablo || TABLO_YOLU, 'utf8'))
   const modeller = csvOku(fs.readFileSync(sec.modelListesi || VARSAYILAN_MODEL_LISTESI, 'utf8'))
   const tohum = JSON.parse(fs.readFileSync(sec.tohum || TOHUM_YOLU, 'utf8'))
+  // Hangi modelin sayfası var kararı sitenin kendi veri dosyasındadır; okunamazsa tarama başlamaz (ana → çıkış 2).
+  const yayinda = JSON.parse(fs.readFileSync(sec.yayindaListesi || YAYINDA_LISTESI_YOLU, 'utf8'))
   // Tablo geçerliliği çekirdeğin doğrulayıcısıyla ölçülür (tek kaynak); bozuksa tarama başlamaz.
   const cekirdek = await import(pathToFileURL(path.join(KOK, 'src', 'config', 'rotaDiliCekirdek.mjs')).href)
   cekirdek.rotaDiliTablosuDogrula(tablo)
-  return { tablo, modeller, tohum }
+  return { tablo, modeller, tohum, yayinda }
+}
+
+/** Pilot listenin okunur özeti: kaç kayıt var, örneklenen modellerden kaçı açık/kapalı. */
+function pilotOzeti(girdi, ek) {
+  const acik = yayindaSkuKumesi(girdi.yayinda)
+  const ornek = modelOrnekle(girdi.modeller, ek)
+  const acikOrnek = ornek.filter((m) => acik.has(kimlik(m.sku))).length
+  const kayit = Object.values(girdi.yayinda.modeller).reduce((n, k) => n + Object.keys(k).length, 0)
+  const surum = Object.keys(girdi.yayinda.surumler).length
+  return (
+    `PİLOT LİSTE (yayındaki modeller): ${kayit} model + ${surum} sürüm açık. Örneklenen ${ornek.length} modelden ` +
+    `açık: ${acikOrnek} (yeni adres 200, eski adres yeni adrese 308); ` +
+    `kapalı: ${ornek.length - acikOrnek} (yeni adres 404, eski adres ürün ailesine 308).`
+  )
 }
 
 async function ana(argv, bag = {}) {
@@ -247,7 +313,13 @@ async function ana(argv, bag = {}) {
     hataYaz(`onizleme-tarama: ${e.message}`)
     return 2
   }
-  const beklentiler = beklentileriUret({ ...girdi, ek: sec.ek })
+  let beklentiler
+  try {
+    beklentiler = beklentileriUret({ ...girdi, ek: sec.ek })
+  } catch (e) {
+    hataYaz(`onizleme-tarama: ${e.message}`)
+    return 2
+  }
   if (beklentiler.length === 0) {
     // Boş evren yeşil sayılmaz: hiçbir şey taranmadan "kırmızı 0" demek ölçüm değildir.
     hataYaz('onizleme-tarama: beklenti listesi boş (rota dili tablosu ve model listesi okunamadı mı?)')
@@ -279,7 +351,8 @@ async function ana(argv, bag = {}) {
     yaz('\nSORUNLU SATIRLAR')
     for (const s of sorunlu) yaz(`  ${s.durum} ${s.adres} · beklenen: ${beklenenMetni(s.beklenti)} · gerçek: ${s.gercek}`)
   }
-  yaz(`\nTARAMA ${sec.taban}: ${ozet.toplam} beklenti · OK ${ozet.ok} · KIRMIZI ${ozet.kirmizi} · HATA ${ozet.hata} · BEKLİYOR ${ozet.bekliyor}`)
+  yaz(`\n${pilotOzeti(girdi, sec.ek)}`)
+  yaz(`TARAMA ${sec.taban}: ${ozet.toplam} beklenti · OK ${ozet.ok} · KIRMIZI ${ozet.kirmizi} · HATA ${ozet.hata} · BEKLİYOR ${ozet.bekliyor}`)
   if (sec.cikti) {
     try {
       fs.writeFileSync(sec.cikti, JSON.stringify({ surum: 1, taban: sec.taban, ozet, sonuclar }, null, 2) + '\n')
@@ -291,7 +364,7 @@ async function ana(argv, bag = {}) {
   return ozet.kirmizi > 0 || ozet.hata > 0 ? 1 : 0
 }
 
-module.exports = { csvOku, modelOrnekle, beklentileriUret, degerlendir, tabloYaz, ozetle, argumanlariOku, girdileriOku, ana }
+module.exports = { csvOku, modelOrnekle, yayindaSkuKumesi, beklentileriUret, degerlendir, tabloYaz, ozetle, argumanlariOku, girdileriOku, ana }
 
 if (require.main === module) {
   ana(process.argv.slice(2)).then(
