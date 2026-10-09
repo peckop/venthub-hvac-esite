@@ -3,12 +3,29 @@ import autoTable from 'jspdf-autotable';
 
 import type { Product } from '@/types/ui-models';
 
-import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
+import { en } from '../i18n/dictionaries/en';
+import { tr } from '../i18n/dictionaries/tr';
+import { getDictValue } from '../i18n/getDictValue';
+import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER, type SpecValueTranslate } from '../utils/productHelpers';
 import { specFieldLabel, specGroupLabel } from '../utils/specLabel';
 import { getAbsoluteAssetUrl,getBase64ImageFromUrl, getPdfSiteHost, PDF_COLORS, PDF_FONTS } from './pdfAssets';
 
 /** `specLabel.ts` ile AYNI imza — ikinci bir tip tanımı, ikinci bir davranış kapısıdır. */
 type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string) => string
+
+/** Föyün varsayılan dili: `generateProductDatasheet`'in `lang` varsayılanı ve `t`'siz değer çözümü TEK yerden okur. */
+const VARSAYILAN_FOY_DILI = 'tr';
+
+/**
+ * URN-58: değer metinleri ("Var"/"Yok", "Yes"/"No") dil ister. Üretimde föyü açan sayfa kendi `t`'sini verir ve vitrinle
+ * AYNI çözücü kullanılır. `t` verilmediği hâlde (testler, `t`'siz çağrılar) sessizce ham "true"/"false" basmak yerine
+ * sözlük `lang` ile doğrudan okunur — böylece föy hiçbir yoldan makine değeri basmaz.
+ */
+function degerCozucu(t: TranslateFn | undefined, lang: string = VARSAYILAN_FOY_DILI): SpecValueTranslate {
+    if (t) return t; // aynı çözücü, sarmalayıcı yok: `t(değişken)` çağrısı eklemek INV-6 ön koşulunu da kırar
+    const sozluk = lang === 'en' ? en : tr;
+    return (key) => getDictValue(sozluk, key);
+}
 
 /**
  * ⭐SAF ÇEKİRDEK — föyün teknik özellik satırlarını üretir. `jsPDF`'e DOKUNMAZ.
@@ -25,9 +42,10 @@ type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string)
  */
 export function buildSpecRows(
     specs: Record<string, unknown>,
-    opts: { t?: TranslateFn; translateKey?: (key: string) => string } = {},
+    opts: { t?: TranslateFn; translateKey?: (key: string) => string; lang?: string } = {},
 ): string[][] {
-    const { t, translateKey } = opts;
+    const { t, translateKey, lang } = opts;
+    const degerT = degerCozucu(t, lang);
     const gruplar = groupTechnicalSpecs(specs) || {};
     const satirlar: string[][] = [];
 
@@ -38,8 +56,8 @@ export function buildSpecRows(
             // ETİKET: `t` varsa vitrinin TAM yolu (i18n sözlüğü → küratörlü → humanize).
             // Yoksa eski parametre yolu — ayrışır, ve bu ayrışma kapıda ADIYLA ölçülür.
             const label = t ? specFieldLabel(key, t) : (translateKey ? translateKey(key) : key);
-            // DEĞER: `t` GEREKTİRMEZ — birim eklemesi her hâlde uygulanır.
-            satirlar.push([label, formatSpecValue(key, value)]);
+            // DEĞER: birim eklemesi `t` GEREKTİRMEZ; mantıksal değer ("Var"/"Yok") dil ister → `degerT` (URN-58).
+            satirlar.push([label, formatSpecValue(key, value, degerT)]);
         }
     }
     return satirlar;
@@ -65,7 +83,8 @@ export function buildSpecGroupLabels(specs: Record<string, unknown>, t: Translat
  * ("aynı ölçüt, iki uygulama") ve bu kez bir MÜŞTERİ BELGESİNDEYDİ.
  *
  * ⚠PARİTE İKİ PARÇALIDIR ve ikisi AYNI ANDA gelmez:
- *   · **değer + sıra** → `t` GEREKTİRMEZ, bu PR ile geldi.
+ *   · **değer + sıra** → birim eki `t` GEREKTİRMEZ, bu PR ile geldi. (URN-58: mantıksal değer "Var"/"Yok" dil ister;
+ *     `t` yoksa sözlük `lang` ile okunur, bkz. `degerCozucu` — ham "true"/"false" hiçbir yoldan basılmaz.)
  *   · **etiket** → `specFieldLabel(key, t)` i18n sözlüğünü okur, yani `t` ŞARTTIR.
  *     `t` verilmezse eski `translateKey` yoluna düşülür ve etiket vitrinden AYRIŞIR
  *     (`"Ip Rating"` ↔ `"Koruma Sınıfı (IP)"`). Çağıran taraf (`ProductDetailPageView`)
@@ -76,7 +95,7 @@ export async function generateProductDatasheet(
     product: Product,
     imageUrl?: string,
     translateKey?: (key: string) => string,
-    lang: string = 'tr',
+    lang: string = VARSAYILAN_FOY_DILI,
     t?: TranslateFn
 ): Promise<void> {
     const doc = new jsPDF({
@@ -268,7 +287,7 @@ export async function generateProductDatasheet(
     // DOĞRU olan bu; ama sonuç, hepsi boşsa satır kalmamasıdır. O hâlde tablo HİÇ çizilmez:
     // başlığı basıp altını boş bırakmak, okuyana "veri yok" değil "üretim bozuk" dedirtir.
     const specRows = product.technical_specs
-        ? buildSpecRows(product.technical_specs as Record<string, unknown>, { t, translateKey })
+        ? buildSpecRows(product.technical_specs as Record<string, unknown>, { t, translateKey, lang })
         : [];
     if (specRows.length > 0) {
         // Sayfa sonu kontrolü
