@@ -156,7 +156,9 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
     // Bu dizge değişmeseydi yeni dağıtım alış fiyatlı eski `prodData` kaydını ≤1 saat sunardı.
     // Dizge küçültmede korunur (kullanılan değer). Vitrin kolon kümesi değişince artırılır.
     // Anahtar parçası yerine burada: `anasayfa-rotasi-statik` testi parçaları birebir sabitler.
-    return { catData, prodData, productCounts, kolonKumesi: 'vitrin-v2-rec140' }
+    // v3 (REC-493, 2026-10-09): `prodData` satırlarına `family_slug` eklendi (ürün kartı aile adresine bağlanır).
+    // Bump edilmeseydi yeni dağıtım `family_slug`sız eski kaydı ≤1 saat sunar, kartlar 308'li adrese düşerdi.
+    return { catData, prodData, productCounts, kolonKumesi: 'vitrin-v3-rec493' }
   },
   ['home-page-data', lang, tenantId],
   // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)

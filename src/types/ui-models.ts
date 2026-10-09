@@ -26,6 +26,13 @@ export type DomainProduct = Omit<DbProduct, 'name' | 'description' | 'brand' | '
   name: string;
   description: string;
   brand: string;
+  /**
+   * REC-493: ürünün AİLE slug'ı — PDP adresi aile adresidir (`/products/<aile>?sku=<kod>`), `slug` ise
+   * MODEL slug'ıdır ve 308 ile aileye gider. YALNIZ `getProducts` doldurur (ana sayfa kartları);
+   * diğer okuyucularda alan YOKTUR (`undefined`), bu yüzden opsiyoneldir. `null` = ürünün ailesi yok ya da
+   * anonim rol ailesini göremiyor → kart eski model adresine düşer.
+   */
+  family_slug?: string | null;
 };
 
 // Moved from src/lib/supabase.ts

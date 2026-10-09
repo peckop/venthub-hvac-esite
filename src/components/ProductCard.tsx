@@ -56,6 +56,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   // Yalnız `model_code` okunur: `name_i18n` (Json) çözücünün ad tipine uymaz, tip zorlaması (`as`) gerekmez.
   const modelKodu = getProductModelLabel({ model_code: product.model_code })
 
+  // REC-493: PDP AİLE adresidir; `product.slug` ise MODEL slug'ıdır ve her tıklama 308 alıyordu
+  // (canlı kapı 2026-10-09: ana sayfadaki 4 kartın 4'ü). Aile slug'ı varsa doğrudan hedefe
+  // (`/<dil>/products/<aile>?sku=<kod>`), yoksa — aile satırı gelmedi ya da anonim rol göremedi —
+  // ESKİ model adresi AYNEN (yönlendirme zinciri yine doğru yere götürür). Dil öneki ve adres şeması
+  // (ADRES_SEMASI_K3B) `Routes` vekilinde; burada elle birleştirme yok.
+  const urunAdresi = product.family_slug
+    ? Routes.product(product.family_slug, product.sku)
+    : Routes.product(product.slug!)
+
   /**
    * İKİ AYRI SORU, İKİ AYRI DEĞİŞKEN — eskiden `quoteMode` ikisini birbirine yapıştırıyordu
    * (`hidePrice || fiyat yok`), bu yüzden fiyatı GİZLEMEK istemek sepete eklemeyi de
@@ -90,7 +99,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
   // LIST VIEW LAYOUT
   if (isList) {
     return (
-      <Link href={Routes.product(product.slug!)} className="block w-full">
+      <Link href={urunAdresi} className="block w-full">
         <div className="group relative flex items-center bg-white rounded-2xl border border-light-gray p-4 transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-0.5 overflow-hidden">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 flex-shrink-0 bg-light-gray/50 rounded-xl overflow-hidden p-2">
             <VentImage
@@ -145,7 +154,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(function ProductCard(
 
   // GRID VIEW
   return (
-    <Link href={Routes.product(product.slug!)} className="block h-full">
+    <Link href={urunAdresi} className="block h-full">
       <div className={`group relative flex flex-col h-full bg-white rounded-2xl border border-light-gray transition-transform duration-300 hover:shadow-hvac-lg hover:-translate-y-1 overflow-hidden ${compact ? 'p-3' : 'p-4'}`}>
         
         {/* Badges Overlay */}

@@ -71,6 +71,35 @@ export const mapDatabaseProductToDomain = (dbProd: DbProduct): DomainProduct => 
 }
 
 /**
+ * `product_families(slug)` gömmesinin GEVŞEK biçimi. PostgREST many-to-one ilişkiyi (products.family_id →
+ * product_families.id) nesne olarak döndürür; ama tip-ayrıştırıcısının ya da ileride bir ilişki
+ * değişikliğinin diziye çevirmesi derleyiciyi sessiz bırakıp çalışma anında `undefined` üretirdi — iki biçim de
+ * kabul edilir (family.service.ts `embeddedBrandName` ile aynı savunma).
+ */
+export type EmbeddedFamily = { slug: string } | { slug: string }[] | null | undefined
+
+/**
+ * Gömülü aile satırından slug'ı çıkarır (REC-493). Aile yoksa (family_id boş), RLS ailesini göstermiyorsa
+ * (silinmiş/başka kiracı → gömme `null` gelir) ya da slug boşsa `null` — çağıran eski model adresine düşer.
+ */
+export const familySlugFromEmbed = (aile: EmbeddedFamily): string | null => {
+  const satir = Array.isArray(aile) ? aile[0] : aile
+  const slug = satir?.slug
+  return typeof slug === 'string' && slug.length > 0 ? slug : null
+}
+
+/**
+ * `mapDatabaseProductToDomain` + ailenin slug'ı. AYRI işlev: `.map(mapDatabaseProductToDomain)` ikinci
+ * argüman olarak dizin geçirir, ek parametre eklemek bütün `toUIProductList` çağrılarını sessizce bozardı.
+ */
+export const mapDatabaseProductWithFamilyToDomain = (
+  dbProd: DbProduct,
+  familySlug: string | null
+): DomainProduct => {
+  return { ...mapDatabaseProductToDomain(dbProd), family_slug: familySlug }
+}
+
+/**
  * List converters for bulk data.
  */
 export const toUICategoryList = (cats: DbCategory[]): DomainCategory[] => {

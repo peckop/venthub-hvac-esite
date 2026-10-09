@@ -2,10 +2,12 @@ import { describe, expect,it } from 'vitest'
 
 import type { DbCategory, DbProduct } from '../../types/db-rows'
 import {
+    familySlugFromEmbed,
     isRecord,
     mapCategoryWithLocale,
     mapDatabaseCategoryToDomain,
     mapDatabaseProductToDomain,
+    mapDatabaseProductWithFamilyToDomain,
     toSupabaseJson,
     toUICategoryList,
     toUIProductList
@@ -116,6 +118,43 @@ describe('type-converters', () => {
             expect(result.name).toBe('')
             expect(result.description).toBe('')
             expect(result.brand).toBe('Venthub')
+        })
+    })
+
+    describe('familySlugFromEmbed (REC-493)', () => {
+        it('tekil gömmeden (nesne) slug çıkarır', () => {
+            expect(familySlugFromEmbed({ slug: 'avens-elektrikli-kanal-isiticilari' })).toBe('avens-elektrikli-kanal-isiticilari')
+        })
+
+        it('dizi biçiminde gelirse ilk satırın slug\'ını alır', () => {
+            expect(familySlugFromEmbed([{ slug: 'aile-a' }, { slug: 'aile-b' }])).toBe('aile-a')
+        })
+
+        it('aile yok / RLS göstermiyor / boş dizi / boş slug → null (çağıran eski adrese düşer)', () => {
+            expect(familySlugFromEmbed(null)).toBeNull()
+            expect(familySlugFromEmbed(undefined)).toBeNull()
+            expect(familySlugFromEmbed([])).toBeNull()
+            expect(familySlugFromEmbed({ slug: '' })).toBeNull()
+        })
+    })
+
+    describe('mapDatabaseProductWithFamilyToDomain (REC-493)', () => {
+        it('ürünü eşler ve family_slug\'ı ekler', () => {
+            const dbProd: Partial<DbProduct> = { id: '1', name: 'Isıtıcı 12 kW', slug: 'model-slug' }
+            const result = mapDatabaseProductWithFamilyToDomain(dbProd as DbProduct, 'aile-slug')
+            expect(result.name).toBe('Isıtıcı 12 kW')
+            expect(result.slug).toBe('model-slug')
+            expect(result.family_slug).toBe('aile-slug')
+        })
+
+        it('aile slug\'ı null ise alan null taşınır (yok değil): "aileyi bulamadık" ile "hiç sormadık" ayrışır', () => {
+            const result = mapDatabaseProductWithFamilyToDomain({ id: '2' } as DbProduct, null)
+            expect(result.family_slug).toBeNull()
+        })
+
+        it('toUIProductList family_slug ÜRETMEZ — alanı yalnız getProducts doldurur', () => {
+            const [urun] = toUIProductList([{ id: '3', name: 'X' }] as DbProduct[])
+            expect(urun).not.toHaveProperty('family_slug')
         })
     })
 

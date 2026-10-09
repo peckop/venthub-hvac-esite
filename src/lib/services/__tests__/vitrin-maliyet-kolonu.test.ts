@@ -8,6 +8,7 @@ import { ADMIN_PRODUCT_FORM_COLUMNS } from '@/components/admin/products/productF
 import {
   FAMILY_LIST_COLUMNS,
   VARIANT_DETAIL_COLUMNS,
+  VARIANT_DETAIL_FAMILY_COLUMNS,
   VARIANT_LIST_COLUMNS,
 } from '../product.columns'
 
@@ -99,6 +100,7 @@ function yoneticiYaDaMotor(goreli: string): boolean {
 describe('vitrin kolon listeleri maliyet taşımaz', () => {
   it.each([
     ['VARIANT_DETAIL_COLUMNS', VARIANT_DETAIL_COLUMNS],
+    ['VARIANT_DETAIL_FAMILY_COLUMNS', VARIANT_DETAIL_FAMILY_COLUMNS],
     ['VARIANT_LIST_COLUMNS', VARIANT_LIST_COLUMNS],
     ['FAMILY_LIST_COLUMNS', FAMILY_LIST_COLUMNS],
   ])('%s', (_ad, liste) => {

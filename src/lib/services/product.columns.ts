@@ -26,6 +26,21 @@ export const VARIANT_DETAIL_COLUMNS =
   'id, name, brand, sku, slug, model_code, category_id, subcategory_id, status, is_featured, description_i18n, family_id, stock_qty, low_stock_threshold, low_stock_override, technical_specs, created_at, updated_at'
 
 /**
+ * Ana sayfa ürün kartları (REC-493) — VARIANT_DETAIL_COLUMNS + ailenin slug'ı (PostgREST gömmesi).
+ *
+ * NİÇİN: `products.slug` MODEL düzeyindedir; PDP ise AİLE adresidir. Kart `Routes.product(slug)` ile
+ * model slug'ına bağlanınca her tıklama önce 308 alıyordu (canlı kapı 2026-10-09: 4 kart, dört href
+ * `/tr/products/<model-slug>` → `/tr/products/<aile>?sku=<kod>`). Aile slug'ı satırla birlikte gelirse kart
+ * doğrudan hedefe bağlanır.
+ *
+ * `VARIANT_DETAIL_COLUMNS` KENDİSİ DEĞİŞMEZ: sekiz tüketicisi var (sepet, ürün seçici, sihirbaz, sipariş
+ * detayı…) ve hiçbiri aile slug'ını istemiyor; gömme yalnız bu listeyi okuyan `getProducts`ta. Maliyet
+ * kolonu taşımaz (vitrin-maliyet-kolonu testi bu listeyi de ölçer). `as const`: PostgREST tip-ayrıştırıcısı
+ * gömmeyi ancak literal dizgeden okur (bkz. project.service.ts, aynı desen).
+ */
+export const VARIANT_DETAIL_FAMILY_COLUMNS = `${VARIANT_DETAIL_COLUMNS}, product_families(slug)` as const
+
+/**
  * Liste/kart bağlamları — technical_specs taşınmaz (PS-041: spec'ler liste
  * payload'ına girmez).
  */

@@ -3,9 +3,14 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../../types/database.types'
 import type { DbAdminSearchResult,DbProduct } from '../../types/db-rows'
 import type { FtsProductResult, Product, SearchSuggestion } from '../../types/ui-models'
-import { mapDatabaseProductToDomain,toUIProductList } from '../type-converters'
+import {
+  familySlugFromEmbed,
+  mapDatabaseProductToDomain,
+  mapDatabaseProductWithFamilyToDomain,
+  toUIProductList,
+} from '../type-converters'
 import { attachDisplayPrices, type WithDisplayPrice, withDisplayPrices } from './displayPrice.service'
-import { VARIANT_DETAIL_COLUMNS } from './product.columns'
+import { VARIANT_DETAIL_COLUMNS, VARIANT_DETAIL_FAMILY_COLUMNS } from './product.columns'
 
 /**
  * W4b · Müşteri yüzeyine hizmet eden her okumada vitrin fiyatını iliştirir.
@@ -72,9 +77,12 @@ export async function ftsSearchProducts(
 }
 
 export async function getProducts(supabase: SupabaseClient<Database>, limit?: number): Promise<WithDisplayPrice<Product>[]> {
+  // REC-493: ana sayfa kartları AİLE adresine bağlanır; `products.slug` model slug'ıdır ve her tıklama
+  // 308 alırdı. Aile slug'ı aynı sorguda `product_families(slug)` gömmesiyle gelir (tek tur; aile görünmüyorsa
+  // gömme `null` döner ve kart eski model adresine düşer — hata değil, yedek).
   let query = supabase
     .from('products')
-    .select(VARIANT_DETAIL_COLUMNS)
+    .select(VARIANT_DETAIL_FAMILY_COLUMNS)
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('is_featured', { ascending: false })
@@ -86,7 +94,12 @@ export async function getProducts(supabase: SupabaseClient<Database>, limit?: nu
 
   const { data, error } = await query
   if (error) throw error
-  return withDisplayPricesSafe(supabase, toUIProductList((data as DbProduct[]) || []))
+  // Gömme satırdan AYRILIR: `...dbProd` yayılımı onu ürün nesnesine taşır, ana sayfa RSC yüküne ham iç
+  // yapı olarak binerdi. Kalan satır, eski `(data as DbProduct[])` daraltmasının aynısıyla DbProduct olur.
+  const urunler = (data ?? []).map(({ product_families, ...satir }) =>
+    mapDatabaseProductWithFamilyToDomain(satir as DbProduct, familySlugFromEmbed(product_families))
+  )
+  return withDisplayPricesSafe(supabase, urunler)
 }
 
 // Get all products without limit
