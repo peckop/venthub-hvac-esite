@@ -201,8 +201,15 @@ function cmdKos(cmdYol: string, argv: string[], d: Duzenek): SpawnSyncReturns<st
 /** Tablo TEK KAYNAKTAN okunur: testte kopya YOK (kopya olursa tablo değişince test sessizce ayrışır). */
 const require = createRequire(import.meta.url)
 const TABLO = (require(path.join(KOK, 'scripts/board/pencere-adlari.cjs')) as { TABLO: ReadonlyArray<readonly [string, string]> }).TABLO
-/** Pencere tavanı da TEK KAYNAKTAN okunur (karar 328: 8): testte sayı kopyası YOK; tavan değişirse test onunla birlikte hareket eder. */
-const TAVAN = (require(path.join(KOK, 'scripts/board/departman-ortak.cjs')) as { PENCERE_TAVANI: number }).PENCERE_TAVANI
+/**
+ * Pencere tavanı da TEK KAYNAKTAN okunur (karar 328: 8): testte sayı kopyası YOK; tavan değişirse test onunla birlikte hareket eder.
+ * ⚠AYRI SÜREÇTE okunur, bu süreçte `require` EDİLMEZ: departman-ortak.cjs pano/oturum dizinini YÜKLENİRKEN okur
+ * (KAPAT-3 bloğu bu yüzden ortamı yüklemeden önce izole eder). Burada yüklenirse modül varsayılan dizinlerle önbelleğe
+ * girer, KAPAT-3'ün izolasyonu işlemez ve 7 test "panoda geçmiş oturum yok" diye düşer (#1782 ilk uç, CI'da ölçüldü).
+ */
+const TAVAN = Number(
+  spawnSync(process.execPath, ['-p', `require(${JSON.stringify(path.join(KOK, 'scripts/board/departman-ortak.cjs'))}).PENCERE_TAVANI`], { encoding: 'utf8', windowsHide: true, timeout: 30_000 }).stdout.trim(),
+)
 
 function asciiMi(metin: string): boolean {
   for (const ch of metin) if ((ch.codePointAt(0) ?? 0) > 127) return false
