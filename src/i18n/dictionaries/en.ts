@@ -2937,34 +2937,34 @@ export const en: typeof tr = {
   },
   categorySilentFan: {
     problem: {
-      withoutMark: '✕',
-      withMark: '✓',
+      withoutMark: '•',
+      withMark: '•',
       eyebrow: 'SOUND AND COMFORT',
-      title: 'End Noise That Disrupts Your Peace',
-      subtitle: 'Standard duct fans don\'t just move air; they move noise into your living spaces. Discover the new standard of silence with Vortice Lineo Quiet.',
+      title: 'Duct Fan with Sound-Absorbing Lining',
+      subtitle: 'The Vortice Lineo Quiet family consists of duct-type, mixed-flow fans; the sound-absorbing lining is integrated into the outer casing.',
       painPoints: [
         {
-          title: 'Acoustic Pollution',
-          description: 'The hum created by conventional fans makes it difficult to focus and reduces comfort.'
+          title: 'Sound-Absorbing Lining',
+          description: 'The lining is designed to reduce the noise emitted into the room.'
         },
         {
-          title: 'Low Efficiency',
-          description: 'Noisy fans are often aerodynamically inefficient and consume more energy.'
+          title: 'Mixed-Flow Fan',
+          description: 'A duct-type fan. Diameter and flow-rate values are listed in the model datasheet.'
         },
         {
-          title: 'Vibration Issues',
-          description: 'Poorly isolated devices cause vibration and secondary noise on mounting surfaces.'
+          title: 'Two Motor Options',
+          description: 'Available with an AC induction motor (LINEO QUIET) or an EC brushless motor (LINEO QUIET ES).'
         },
         {
-          title: 'Disrupted Focus',
+          title: 'Quiet Settings',
           description: 'Constant noise can reduce productivity in libraries and offices by 20%.'
         }
       ],
       visual: {
-        without: 'With Standard Fan',
-        with: 'With Lineo Quiet',
-        withoutPoints: ['High decibel levels', 'Mechanical vibration', 'Turbulent airflow', 'Energy loss'],
-        withPoints: ['Whisper quiet', '60% energy saving', 'Laminar airflow', 'Vibration-free operation']
+        without: 'AC Motor Model',
+        with: 'EC Motor Model',
+        withoutPoints: ['LINEO QUIET', 'AC induction motor', 'Mixed-flow fan', 'Sound-absorbing casing lining'],
+        withPoints: ['LINEO QUIET ES', '60% energy saving', 'Mixed-flow fan', 'Vibration-free operation']
       }
     },
     howItWorks: {
@@ -2987,31 +2987,31 @@ export const en: typeof tr = {
       ]
     },
     comparison: {
-      standardLabel: 'Standard:',
-      quietLabel: 'Quiet:',
-      title: 'Why Lineo Quiet?',
-      standard: 'Standard Fans',
-      quiet: 'Vortice Lineo Quiet',
+      standardLabel: 'AC:',
+      quietLabel: 'EC:',
+      title: 'Motor Options',
+      standard: 'LINEO QUIET (AC)',
+      quiet: 'LINEO QUIET ES (EC)',
       features: [
         {
-          label: 'Noise Level',
-          standard: '55-65 dB(A)',
+          label: 'Casing',
+          standard: 'Sound-absorbing lining',
           quiet: '25-30 dB(A)'
         },
         {
           label: 'Energy Consumption',
-          standard: 'High (AC Motor)',
+          standard: 'See the model datasheet',
           quiet: '60% Saving (ES/EC Motor)'
         },
         {
-          label: 'Air Quality',
-          standard: 'Turbulent Flow',
-          quiet: 'Laminar and Continuous'
+          label: 'Motor Type',
+          standard: 'AC induction',
+          quiet: 'EC brushless'
         },
         {
-          label: 'Mounting',
-          standard: 'Complex and Rigid',
-          quiet: 'Fast and Vibration Isolated'
+          label: 'Flow',
+          standard: 'Mixed',
+          quiet: 'Mixed'
         }
       ]
     },
@@ -3024,11 +3024,11 @@ export const en: typeof tr = {
         },
         {
           q: 'Is it hard to install?',
-          a: 'No, thanks to quick-mount clamps, you don\'t need to disconnect the device from the duct for maintenance or installation.'
+          a: 'For installation and maintenance, refer to the product\'s user manual and the manufacturer\'s documentation. Please keep the manual.'
         },
         {
-          q: 'Which areas is it suitable for?',
-          a: 'Ideal for anywhere silence is critical, such as libraries, offices, bedrooms, and hotel rooms.'
+          q: 'What is Vortice Lineo Quiet?',
+          a: 'A duct-type, mixed-flow fan with two model groups: the AC-motor LINEO QUIET and the EC-motor LINEO QUIET ES.'
         }
       ]
     },

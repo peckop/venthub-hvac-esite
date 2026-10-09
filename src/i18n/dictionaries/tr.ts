@@ -2978,34 +2978,34 @@ export const tr = {
   },
   categorySilentFan: {
     problem: {
-      withoutMark: '✕',
-      withMark: '✓',
+      withoutMark: '•',
+      withMark: '•',
       eyebrow: 'SES VE KONFOR',
-      title: 'Huzurunuzu Bozan Seslere Son Verin',
-      subtitle: 'Standart kanal fanları sadece havayı değil, gürültüyü de yaşam alanlarınıza taşır. Vortice Lineo Quiet ile sessizliğin yeni standardını keşfedin.',
+      title: 'Ses Emici Kaplamalı Kanal Fanı',
+      subtitle: 'Vortice Lineo Quiet ailesi, kanal tipi karma akışlı fanlardan oluşur; ses emici kaplama dış gövdeye entegredir.',
       painPoints: [
         {
-          title: 'Akustik Kirlilik',
-          description: 'Konvansiyonel fanların yarattığı uğultu, odaklanmayı zorlaştırır ve konforu düşürür.'
+          title: 'Ses Emici Kaplama',
+          description: 'Kaplama, ortama yayılan ses emisyonunu azaltmak üzere tasarlanmıştır.'
         },
         {
-          title: 'Düşük Verimlilik',
-          description: 'Gürültülü fanlar genellikle aerodinamik olarak verimsizdir ve daha fazla enerji harcar.'
+          title: 'Karma Akışlı Fan',
+          description: 'Kanal tipi bir fandır. Çap ve debi değerleri model föyünde yer alır.'
         },
         {
-          title: 'Titreşim Sorunları',
-          description: 'İzole edilmemiş cihazlar montaj yüzeylerinde titreşim ve ikincil gürültüye sebep olur.'
+          title: 'İki Motor Seçeneği',
+          description: 'AC endüksiyon motorlu (LINEO QUIET) ya da EC fırçasız motorlu (LINEO QUIET ES) seçilebilir.'
         },
         {
-          title: 'Bölünen Odak',
+          title: 'Sessiz Ortamlar',
           description: 'Sürekli gürültü, kütüphane ve ofislerde verimliliği %20 oranında düşürebilir.'
         }
       ],
       visual: {
-        without: 'Standart Fan İle',
-        with: 'Lineo Quiet İle',
-        withoutPoints: ['Yüksek desibel seviyeleri', 'Mekanik titreşim', 'Türbülanslı hava akışı', 'Enerji kaybı'],
-        withPoints: ['Fısıltı düzeyinde sessizlik', '%60 enerji tasarrufu', 'Laminar hava akışı', 'Titreşimsiz çalışma']
+        without: 'AC Motorlu Model',
+        with: 'EC Motorlu Model',
+        withoutPoints: ['LINEO QUIET', 'AC endüksiyon motor', 'Karma akışlı fan', 'Ses emici gövde kaplaması'],
+        withPoints: ['LINEO QUIET ES', '%60 enerji tasarrufu', 'Karma akışlı fan', 'Titreşimsiz çalışma']
       }
     },
     howItWorks: {
@@ -3028,34 +3028,34 @@ export const tr = {
       ]
     },
     comparison: {
-      standardLabel: 'Standart:',
+      standardLabel: 'AC:',
       // REC-113: karşılığı 'Standart:' olan ETİKET; İngilizce kalması tabloyu iki dilli
       // gösteriyordu. Ürün hattı adı ('Vortice Lineo Quiet') AYNEN kalır — çevrilen şey
       // etiket, özel ad değil.
-      quietLabel: 'Sessiz:',
-      title: 'Neden Lineo Quiet?',
-      standard: 'Standart Fanlar',
-      quiet: 'Vortice Lineo Quiet',
+      quietLabel: 'EC:',
+      title: 'Motor Seçenekleri',
+      standard: 'LINEO QUIET (AC)',
+      quiet: 'LINEO QUIET ES (EC)',
       features: [
         {
-          label: 'Ses Seviyesi',
-          standard: '55-65 dB(A)',
+          label: 'Gövde',
+          standard: 'Ses emici kaplama',
           quiet: '25-30 dB(A)'
         },
         {
           label: 'Enerji Tüketimi',
-          standard: 'Yüksek (AC Motor)',
+          standard: 'Model föyüne bakın',
           quiet: '%60 Tasarruf (ES/EC Motor)'
         },
         {
-          label: 'Hava Kalitesi',
-          standard: 'Türbülanslı Akış',
-          quiet: 'Laminar ve Sürekli'
+          label: 'Motor Tipi',
+          standard: 'AC endüksiyon',
+          quiet: 'EC fırçasız'
         },
         {
-          label: 'Montaj',
-          standard: 'Karmaşık ve Sert',
-          quiet: 'Hızlı ve Titreşim İzole'
+          label: 'Akış',
+          standard: 'Karma',
+          quiet: 'Karma'
         }
       ]
     },
@@ -3068,11 +3068,11 @@ export const tr = {
         },
         {
           q: 'Montajı zor mu?',
-          a: 'Hayır, hızlı montaj kelepçeleri sayesinde bakım veya kurulum için cihazı kanaldan ayırmanız gerekmez.'
+          a: 'Montaj ve bakımda başvuru kaynağı, ürünün kullanım kılavuzu ve üretici belgesidir. Kılavuzu saklayınız.'
         },
         {
-          q: 'Hangi alanlar için uygundur?',
-          a: 'Kütüphaneler, ofisler, yatak odaları ve otel odaları gibi sessizliğin kritik olduğu her yer için idealdir.'
+          q: 'Vortice Lineo Quiet nedir?',
+          a: 'Kanal tipi karma akışlı bir fandır; AC motorlu LINEO QUIET ve EC motorlu LINEO QUIET ES olmak üzere iki model grubu vardır.'
         }
       ]
     },

@@ -1,4 +1,3 @@
-import { Check, X } from 'lucide-react'
 import React from 'react'
 
 import VentImage from '@/components/ui/VentImage'
@@ -26,12 +25,10 @@ const SilentFanTypeComparison: React.FC = () => {
                     <div className="lg:col-span-2 relative min-h-300px flex items-center justify-center bg-slate-100">
                         <div className="absolute inset-0 opacity-20 grayscale bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800')" }} />
                         <div className="relative text-center z-10 p-8">
-                            <h3 className="text-2xl font-bold text-slate-400 uppercase tracking-hvac-normal mb-4">
+                            {/* AC motorlu model. ✕/✓ simgeleri ve soluk stil kalktı: iki eşit motor seçeneği (URN-81). */}
+                            <h3 className="text-2xl font-bold text-slate-700 uppercase tracking-hvac-normal mb-4">
                                 {String(tr('standard'))}
                             </h3>
-                            <div className="text-slate-300">
-                                <X size={64} className="mx-auto" />
-                            </div>
                         </div>
                     </div>
 
@@ -58,9 +55,6 @@ const SilentFanTypeComparison: React.FC = () => {
                             <h3 className="text-2xl font-bold text-white uppercase tracking-hvac-normal mb-4">
                                 {String(tr('quiet'))}
                             </h3>
-                            <div className="text-blue-400">
-                                <Check size={64} className="mx-auto" />
-                            </div>
                         </div>
                     </div>
 
@@ -71,11 +65,11 @@ const SilentFanTypeComparison: React.FC = () => {
                                 {features.map((f, i: number) => (
                                     <div key={i} className="h-73px flex items-center justify-center gap-12 -mx-48">
                                         {/* Standard value (Left side of middle col) */}
-                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-500 w-32 text-center">
+                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-700 w-48 text-center">
                                             {f.standard}
                                         </div>
                                         {/* Quiet value (Right side of middle col) */}
-                                        <div className="bg-blue-600 px-4 py-2 rounded-lg shadow-xl shadow-blue-500/20 text-sm font-bold text-white w-48 text-center ring-2 ring-blue-400/50">
+                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-700 w-48 text-center">
                                             {f.quiet}
                                         </div>
                                     </div>
@@ -92,12 +86,12 @@ const SilentFanTypeComparison: React.FC = () => {
                             <span className="text-xs uppercase font-bold text-slate-400 mb-2 block">{f.label}</span>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <span className="text-xs font-bold text-slate-400 uppercase">{String(tr('standardLabel'))}</span>
-                                    <p className="text-sm font-medium text-slate-600">{f.standard}</p>
+                                    <span className="text-xs font-bold text-slate-500 uppercase">{String(tr('standardLabel'))}</span>
+                                    <p className="text-sm font-medium text-slate-900">{f.standard}</p>
                                 </div>
                                 <div>
-                                    <span className="text-xs font-bold text-blue-500 uppercase">{String(tr('quietLabel'))}</span>
-                                    <p className="text-sm font-bold text-slate-900">{f.quiet}</p>
+                                    <span className="text-xs font-bold text-slate-500 uppercase">{String(tr('quietLabel'))}</span>
+                                    <p className="text-sm font-medium text-slate-900">{f.quiet}</p>
                                 </div>
                             </div>
                         </div>
