@@ -52,7 +52,7 @@ Kararlar: K3-b, K4, **157**, **161**, **164 = A**, **249** (toplu IndexNow yaln�
 1. Önkoşul ölçümleri: Recep önizlemesi (Faz 4) onayı · `canli-olc.sh` ve `canli-kapi.mjs` taban satırı · linkinator + unlighthouse taraması · GSC taban ölçümü (SEO-1/SEO-2 #1648 ile alındı, yayın günü yenilenir).
 2. **Faz 3-C merge** (bayrak `true` + harita + config'ten 19 satır silme). Aynı yayında #1738 (tek gövde) bayrağa bağlı iner.
 3. Deploy sonrası yayın ölçümü: 5 örnek yeni adres 200, eski adresler **tek** 308, site haritası satır sayısı = beklenen, hreflang/canonical, linkinator kırık 0 ve zincir 0.
-4. IndexNow (karar 164 A, 249): anahtar dosyası 200 ve 32 bayt ölçülür → `--kuru` sayısı beklenene eşit mi → toplu betik bir kez; pilot kapsamında sayı 0 (ölçüt 3).
+4. IndexNow (karar 164 A, 249): anahtar dosyası 200 ve 32 bayt ölçülür → `--kuru` sayısı beklenene eşit mi → toplu betik bir kez; pilot kapsamında sayı 0 (ölçüt 3). **Karar 327 (OPS, 2026-10-09):** İngilizce vitrin 18 Ekim'de açılacak; Pazar günü `EN_YAYIN` kapalı, IndexNow yalnız TR. Pilottaki “bildirim 0” hükmünün yerine geçmez: Pazar günü yalnız adresi değişen TR sayfalar bildirilir. Beklenen URL sayısını GEO-SEO verir. Adım adım komutlar: `docs/plans/yayin-gunu-runbook-2026-10-11.md` §5.
 5. GSC site haritası yeniden gönderilir; KATALOG ve OPS'a haber (karar 157): katalog paketi canlı DB'den yeniden üretir.
 6. İki hafta izleme (ana plan §8).
 
