@@ -701,7 +701,6 @@ export const tr = {
     knowledge: {
       headingPrefix: 'Rehberler ve',
       headingAccent: 'Hesaplar',
-      statsPipelineLabel: 'Katalogda',
       eyebrow: 'Bilgi Merkezi ve Destek',
       title: 'Rehberler ve Hesaplar',
       subtitle: 'Ürün seçmeden önce rehber yazılarını okuyun ve hesaplayıcıları kullanın; teklif istemeden önce SSS ve teslimat bilgilerine göz atın.',
@@ -765,12 +764,6 @@ export const tr = {
       expertText: 'Ürün Seçici; kanal fanı, ısı geri kazanım, hava perdesi ve jet fan için hesap yapar.',
       fastTitle: 'Teklifle Sipariş',
       fastText: 'Teslimat koşulları teklifte belirtilir.'
-    },
-    stats: {
-      premiumBrands: 'Marka',
-      productTypes: 'Ürün Ailesi',
-      yearsExperience: 'Model',
-      happyCustomers: 'Ana Kategori'
     },
     galleryTitle: 'Ürün Galerisi',
     gallerySubtitle: 'Ürün ailelerine göz atın',
@@ -937,7 +930,9 @@ export const tr = {
     contact: 'İletişim',
     workingHours: 'Teklif ve Sorular',
     weekdays: 'Teklif ve sorularınız için e-posta gönderin ya da iletişim formunu doldurun.',
-    saturday: '',
+    // URN-82: `workingHours`/`weekdays` anahtar ADLARI tarihsel (Blog tablosu bu adlarla yazar); değerleri artık saat değil,
+    // "Teklif ve Sorular" başlığı ve yönlendirme cümlesidir. `saturday` boştu ve tüketicisi yoktu → kalktı.
+    contactForm: 'İletişim formu',
     rights: 'Tüm hakları saklıdır.',
     // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
     // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).

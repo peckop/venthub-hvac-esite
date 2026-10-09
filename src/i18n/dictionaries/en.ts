@@ -589,7 +589,6 @@ export const en: typeof tr = {
     knowledge: {
       headingPrefix: 'Guides and',
       headingAccent: 'Sizing',
-      statsPipelineLabel: 'In the Catalogue',
       eyebrow: 'Guides and Support',
       title: 'Guides and Sizing',
       subtitle: 'Read the guides (published in Turkish) and use the calculators before choosing a product; check the FAQ and delivery information before requesting a quote.',
@@ -652,12 +651,6 @@ export const en: typeof tr = {
       expertText: 'The Product Selector runs duct fan, heat recovery, air curtain and jet fan sizing.',
       fastTitle: 'Order by Quote',
       fastText: 'Delivery terms are stated in the quote.'
-    },
-    stats: {
-      premiumBrands: 'Brands',
-      productTypes: 'Product Families',
-      yearsExperience: 'Models',
-      happyCustomers: 'Main Categories'
     },
     galleryTitle: 'Product Gallery',
     gallerySubtitle: 'Browse product families',
@@ -935,7 +928,7 @@ export const en: typeof tr = {
     contact: 'Contact',
     workingHours: 'Quotes and Questions',
     weekdays: 'For quotes and questions, send an email or fill in the contact form.',
-    saturday: '',
+    contactForm: 'Contact form',
     rights: 'All rights reserved.',
     // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
     // is published. Restored together with the TR dictionary (parity) once real.

@@ -130,22 +130,30 @@ describe('INV-VITRIN-KAYNAKSIZ-1 (URN-80)', () => {
       expect(ihlal, 'kaynaksız çalışma saati geri gelmiş:\n' + ihlal.join('\n')).toEqual([])
     })
 
-    it.each(DILLER)('%s altbilgi sözlüğünde çalışma saati anahtarları yok; iletişim formu bağlantısı ve e-posta var', (_dil, d) => {
+    it.each(DILLER)('%s altbilgi sözlüğünde saat aralığı yok; başlık ve yönlendirme cümlesi, iletişim formu bağlantısı ve e-posta var', (_dil, d) => {
       const altbilgi = d.footer as Record<string, unknown>
-      for (const anahtar of ['workingHours', 'weekdays', 'saturday']) {
-        expect(Object.keys(altbilgi), `footer.${anahtar} geri gelmiş`).not.toContain(anahtar)
+      // URN-82: `workingHours`/`weekdays` anahtar ADLARI tarihsel (Blog tablosu bu adlarla yazar); değerleri artık saat değil,
+      // "Teklif ve Sorular" başlığı ve yönlendirme cümlesi. Kapı adı değil DEĞERİ denetler: saat aralığı geri gelirse kırılır.
+      expect(Object.keys(altbilgi), 'footer.saturday (boş, tüketicisiz anahtar) geri gelmiş').not.toContain('saturday')
+      for (const anahtar of ['workingHours', 'weekdays'] as const) {
+        const deger = altbilgi[anahtar]
+        expect(deger, `footer.${anahtar} metin değil`).toEqual(expect.any(String))
+        expect((deger as string).trim().length, `footer.${anahtar} boş`).toBeGreaterThan(3)
+        expect(deger as string, `footer.${anahtar} saat aralığı taşıyor`).not.toMatch(/\d{1,2}\s?[:.]\s?\d{2}/)
+        expect(deger as string, `footer.${anahtar} çalışma saati kalıbı`).not.toMatch(/Çalışma Saat|Working Hours|Hafta İçi|Cumartesi|Saturday|Monday/i)
       }
       expect(altbilgi.contactForm, 'footer.contactForm (iletişim formu bağlantı metni) yok').toEqual(expect.any(String))
       expect((altbilgi.contactForm as string).length).toBeGreaterThan(3)
       expect(altbilgi.email).toBe('info@venthub.com.tr')
     })
 
-    it('Footer bileşeni saat sabitlerini ve sözlük anahtarlarını kullanmıyor', () => {
+    it('Footer bileşeni saat sabitleri taşımıyor; "Teklif ve Sorular" başlığını, cümlesini ve iletişim bağlantısını sözlükten çiziyor', () => {
       const sabitler = metinSabitleri(oku('src', 'components', 'Footer.tsx'), 'Footer.tsx').join('\n')
-      for (const yasak of ['footer.workingHours', 'footer.weekdays', 'footer.saturday']) {
-        expect(sabitler, `${yasak} Footer'da yeniden kullanılıyor`).not.toContain(yasak)
+      expect(sabitler, 'footer.saturday Footer\'da yeniden kullanılıyor').not.toContain('footer.saturday')
+      expect(sabitler).not.toMatch(/\d{1,2}\s?:\s?\d{2}/)
+      for (const gerekli of ['footer.workingHours', 'footer.weekdays', 'footer.contactForm']) {
+        expect(sabitler, `${gerekli} Footer'da çizilmiyor`).toContain(gerekli)
       }
-      expect(sabitler).toContain('footer.contactForm')
     })
   })
 

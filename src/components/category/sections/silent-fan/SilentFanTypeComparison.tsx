@@ -65,11 +65,11 @@ const SilentFanTypeComparison: React.FC = () => {
                                 {features.map((f, i: number) => (
                                     <div key={i} className="h-73px flex items-center justify-center gap-12 -mx-48">
                                         {/* Standard value (Left side of middle col) */}
-                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-700 w-48 text-center">
+                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-industrial-gray w-48 text-center">
                                             {f.standard}
                                         </div>
                                         {/* Quiet value (Right side of middle col) */}
-                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-slate-700 w-48 text-center">
+                                        <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-lg border border-slate-200 shadow-sm text-sm font-medium text-industrial-gray w-48 text-center">
                                             {f.quiet}
                                         </div>
                                     </div>

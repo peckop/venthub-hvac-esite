@@ -20,7 +20,7 @@ const SilentFanProblem: React.FC = () => {
     const colors = [
         { text: 'text-blue-500', bg: 'bg-blue-50' },
         { text: 'text-orange-500', bg: 'bg-orange-50' },
-        { text: 'text-slate-500', bg: 'bg-slate-50' },
+        { text: 'text-steel-gray', bg: 'bg-light-gray' },
         { text: 'text-purple-500', bg: 'bg-purple-50' }
     ]
 

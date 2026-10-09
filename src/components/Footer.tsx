@@ -150,10 +150,14 @@ const Footer: React.FC = () => {
             </div>
 
             {/* URN-80: "Çalışma Saatleri" kutusu KALDIRILDI — hafta içi ve cumartesi saat aralıklarının hiçbir
-                kaynağı yoktu (2025-08-23 ilk şablon commit'inden kalma). Yerine iletişim formu bağlantısı
-                girer; saat gerçek ve kayıtlı olunca sözlükle birlikte (TR+EN) geri eklenir.
+                kaynağı yoktu (2025-08-23 ilk şablon commit'inden kalma). URN-82: yerinde Blog tablosunun "Teklif ve
+                Sorular" başlığı ve yönlendirme cümlesi (sözlük anahtarları `footer.workingHours` / `footer.weekdays`:
+                adları tarihsel, değerleri saat değil) ve iletişim formu bağlantısı durur; saat gerçek ve kayıtlı olunca
+                sözlükle birlikte (TR+EN) geri eklenir.
                 Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts */}
             <div className="mt-4">
+              <h4 className="text-sm font-semibold mb-1">{t('footer.workingHours')}</h4>
+              <p className="text-gray-300 text-sm mb-2">{t('footer.weekdays')}</p>
               <Link
                 href={Routes.contact()}
                 className="inline-block text-sm font-medium text-white underline underline-offset-4 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"

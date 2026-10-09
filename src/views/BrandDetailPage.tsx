@@ -235,7 +235,7 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
                 </p>
                 {/* URN-79: ürün aileleri ve kategorileri sunucuda DB'den kurulur (`markaSayfasi.tsx`); yoksa paragraf çizilmez. */}
                 {urunOzeti && (
-                  <p className="text-base text-slate-500 font-light leading-relaxed">{urunOzeti}</p>
+                  <p className="text-base text-steel-gray font-light leading-relaxed">{urunOzeti}</p>
                 )}
               </div>
 
