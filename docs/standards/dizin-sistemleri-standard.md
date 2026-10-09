@@ -107,3 +107,4 @@ buradan yapılmaz.
 |---|---|---|
 | 2026-10-02 | SEO-1 dizin görünürlüğü (bot erişimi, sunucu HTML'i, Bing/Google dizini, konu sorguları, yapay zekâ arama aracı) | `docs/audits/dizin-gorunurluk-olcum-2026-10-02.md` |
 | 2026-10-02 | REC-300 yayın öncesi tabanlar (EN ad, Search Console, bağlantı, PSI) | `docs/audits/rec-300-taban-2026-10-02.md` |
+| 2026-10-09 | SEO-2 taban yenilemesi, 10-06 yayınından sonra (Search Console, bağlantı, PSI, canlı kapı) | `docs/audits/rec-300-taban-2026-10-09.md` |
