@@ -1801,7 +1801,7 @@ export const tr = {
       motor_efficiency_class: 'Motor Verim Sınıfı',
       motor_poles: 'Motor Kutup Sayısı',
       motor_type: 'Motor Tipi',
-      noise_level_db_a: 'Ses Seviyesi',
+      noise_level_db_a: 'Ses seviyesi (üretici beyanı)',
       noise_lpa_3m_db: 'Ses Basıncı (3 m)',
       nominal_delivery_m3h: 'Nominal Debi',
       nominal_static_pressure_pa: 'Nominal Statik Basınç',
@@ -1834,6 +1834,12 @@ export const tr = {
       weight_kg: 'Ağırlık',
       width_mm: 'Genişlik',
       wiring: 'Bağlantı Tipi'
+    },
+    // Teknik ozellik DEGER metinleri (URN-58) — formatSpecValue mantiksal (true/false) degeri buradan basar.
+    // Ham "true"/"false" musteriye gitmez; canli kapi SPEC-HAM-DEGER yayindaki sayfada bunu olcer.
+    specValues: {
+      yes: 'Var',
+      no: 'Yok'
     },
     // Teknik ozellik GRUP basliklari — specLabel.ts 'pdp.specGroups.<grup>' yolunu arar.
     // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
