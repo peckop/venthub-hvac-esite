@@ -14,7 +14,13 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  *
  * Betik (`scripts/adres/onizleme-tarama.cjs`) açık kipte derlenmiş sunucuya YALNIZ GET atar ve her adresin
  * beklenen cevabı verip vermediğini yazar: rota dili tablosu (yeni 200 / eski tek 308 / dilsiz tek sıçrama),
- * model adres listesi (aile başına en az 1 model), eski kategori adresleri (#1352'ye bağlı: BEKLİYOR).
+ * model adres listesi (aile başına en az 1 model; AÇIK model yeni adres 200, KAPALI model yeni adres 404 ve eski
+ * adres ürün ailesine tek 308: açık/kapalı kararı sitenin pilot listesinden gelir), eski kategori adresleri
+ * (#1352'ye bağlı: BEKLİYOR).
+ *
+ * ⭐9 Ekim dersi: beklenti yalnız CSV'den kurulunca (442 modelin hepsi açık sanılıyordu) gerçek önizlemede 188
+ * sahte kırmızı çıktı, çünkü pilot liste boştu. Bu dosyadaki "pilot liste" vakaları o hatanın ÇİFT YÖNLÜ
+ * tekrarını yakalar: liste "açık" derken site kapalıysa da, liste "kapalı" derken site açıksa da kırmızı.
  *
  * Bu dosya betiğin KENDİSİNİN doğru ölçtüğünü sınar. Sekiz bölüm:
  *  1-4. Saf parçalar: csvOku (BOM, CRLF), modelOrnekle, beklentileriUret, degerlendir (her durum kararı).
@@ -55,10 +61,16 @@ interface Model {
 interface Tohum {
   kategoriler?: { eski: string }[]
 }
+/** `src/config/yayindaModeller.veri.json` biçimi: aile → SKU → slug'lar; sürümler SKU → temel + slug'lar. */
+interface Yayinda {
+  modeller: Record<string, Record<string, { tr: string; en: string }>>
+  surumler: Record<string, { temel: string; tr: string; en: string }>
+}
 interface Girdi {
   tablo: TabloSatiri[]
   modeller: Model[]
   tohum: Tohum | null
+  yayinda: Yayinda
 }
 interface Beklenti {
   grup: string
@@ -90,7 +102,8 @@ interface Bag {
 interface Betik {
   csvOku: (metin: string) => Record<string, string>[]
   modelOrnekle: (modeller: Model[], ek?: number) => Model[]
-  beklentileriUret: (girdi: Girdi & { ek?: number }) => Beklenti[]
+  yayindaSkuKumesi: (yayinda: unknown) => Set<string>
+  beklentileriUret: (girdi: Omit<Girdi, 'yayinda'> & { yayinda?: unknown; ek?: number }) => Beklenti[]
   degerlendir: (beklenti: Beklenti, satir: Izlenen) => Karar
   ozetle: (sonuclar: { durum: string }[]) => { toplam: number; ok: number; kirmizi: number; hata: number; bekliyor: number }
   argumanlariOku: (argv: string[]) => Record<string, unknown>
@@ -110,6 +123,8 @@ const MODELLER: Model[] = HAM_MODELLER.map((s) => ({
   adres_en: s.adres_en,
 }))
 const KATEGORI_SAYISI = (TOHUM.kategoriler ?? []).length
+/** Sitenin GERÇEK pilot listesi (9 Ekim'de boş). Test, listenin içeriğine değil ondan TÜREYEN ilişkilere dayanır. */
+const YAYINDA_GERCEK = JSON.parse(fs.readFileSync(path.join(KOK, 'src', 'config', 'yayindaModeller.veri.json'), 'utf8')) as Yayinda
 
 // ── Yardımcılar ──────────────────────────────────────────────────────────────
 
@@ -121,25 +136,48 @@ const model = (sku: string, aile: string): Model => ({
   adres_en: `/en/products/${sku.toLowerCase()}-en-p`,
 })
 
-/** Küçük, elle okunabilir girdi: 2 tablo satırı (biri EN adresi değişmeyen), 2 aile / 3 model, 2 kategori. */
+/** Pilot liste boş: hiçbir model sayfası yok (mekanizma PR'ındaki ve 9 Ekim'deki gerçek durum). */
+const BOS_YAYINDA: Yayinda = { modeller: {}, surumler: {} }
+
+/** Verilen modellerin HEPSİ açık olan liste (aile → SKU → slug'lar; slug adresin son parçasıdır). */
+function hepsiYayinda(modeller: Model[]): Yayinda {
+  const slug = (adres: string): string => adres.split('/').pop() ?? ''
+  const liste: Yayinda = { modeller: {}, surumler: {} }
+  for (const m of modeller) {
+    liste.modeller[m.aile_yeni] ??= {}
+    liste.modeller[m.aile_yeni][m.sku] = { tr: slug(m.adres_tr), en: slug(m.adres_en) }
+  }
+  return liste
+}
+
+/** Küçük, elle okunabilir girdi: 2 tablo satırı (biri EN adresi değişmeyen), 2 aile / 3 model, 2 kategori; üç model de AÇIK. */
+const KUCUK_MODELLER = [model('B-2', 'aile-b'), model('A-9', 'aile-a'), model('A-1', 'aile-a')]
 const KUCUK: Girdi = {
   tablo: [
     { id: 'hakkimizda', klasor: 'about', tr: 'hakkimizda', en: 'about' },
     { id: 'sss', klasor: 'destek/sss', tr: 'sss', en: 'faq' },
   ],
-  modeller: [model('B-2', 'aile-b'), model('A-9', 'aile-a'), model('A-1', 'aile-a')],
+  modeller: KUCUK_MODELLER,
   tohum: { kategoriler: [{ eski: 'fanlar' }, { eski: 'hava-perdeleri' }] },
+  yayinda: hepsiYayinda(KUCUK_MODELLER),
 }
-/** KUCUK için: 9 rota dili + 8 model (2 aile × 4) + 2 kategori. */
+/** KUCUK için: 9 rota dili + 8 model (2 aile × 4) + 2 kategori. Açık da olsa kapalı da olsa model beklentisi sayısı aynıdır. */
 const KUCUK_TOPLAM = 19
 const KUCUK_BEKLIYOR = 2
 
+/** Küçük girdi, pilot liste değiştirilmiş (örn. boş liste = hiçbir model açık değil). */
+const kucukListeyle = (yayinda: Yayinda): Girdi => ({ ...KUCUK, yayinda })
+
+const sku = (s: string): string => s.trim().toUpperCase()
+
 /**
- * Kusursuz sunucu cevapları: BEKLENTİ LİSTESİNDEN DEĞİL, doğrudan tablo ve CSV'den kurulur.
- * Yeni adres 200; eski dilli adres tek 308; dilsiz eski adres tek 307 → TR yeni adres; model eski adres tek 308.
+ * Kusursuz sunucu cevapları: BEKLENTİ LİSTESİNDEN DEĞİL, doğrudan tablo, CSV ve pilot listeden kurulur.
+ * Yeni adres 200; eski dilli adres tek 308; dilsiz eski adres tek 307 → TR yeni adres.
+ * Model: pilot listede VARSA (açık) yeni adres 200 ve eski adres tek 308 → yeni model adresi; YOKSA (kapalı) yeni model
+ * adresi cevapsız (404) ve eski adres tek 308 → ürün ailesi sayfası (model adresinin son parçası aile adıyla değişir), orada 200.
  * Kategori adresleri BİLEREK yok (canlıda hedef ağaç yok → 404): satırlar BEKLİYOR kalmalı.
  */
-function kusursuzCevaplar(girdi: Pick<Girdi, 'tablo' | 'modeller'>): Cevaplar {
+function kusursuzCevaplar(girdi: Pick<Girdi, 'tablo' | 'modeller' | 'yayinda'>): Cevaplar {
   const c: Cevaplar = new Map()
   for (const s of girdi.tablo) {
     for (const dil of ['tr', 'en'] as const) {
@@ -148,11 +186,21 @@ function kusursuzCevaplar(girdi: Pick<Girdi, 'tablo' | 'modeller'>): Cevaplar {
     }
     c.set(`/${s.klasor}`, [307, `/tr/${s.tr}`])
   }
+  const acik = new Set([...Object.values(girdi.yayinda.modeller).flatMap((a) => Object.keys(a)), ...Object.keys(girdi.yayinda.surumler)].map(sku))
   for (const m of girdi.modeller) {
-    c.set(m.adres_tr, [200])
-    c.set(m.adres_en, [200])
-    c.set(`/tr/products/${m.slug_bugun}`, [308, m.adres_tr])
-    c.set(`/en/products/${m.slug_bugun}`, [308, m.adres_en])
+    if (acik.has(sku(m.sku))) {
+      c.set(m.adres_tr, [200])
+      c.set(m.adres_en, [200])
+      c.set(`/tr/products/${m.slug_bugun}`, [308, m.adres_tr])
+      c.set(`/en/products/${m.slug_bugun}`, [308, m.adres_en])
+    } else {
+      const aileTr = m.adres_tr.replace(/[^/]+$/, m.aile_yeni)
+      const aileEn = m.adres_en.replace(/[^/]+$/, m.aile_yeni)
+      c.set(`/tr/products/${m.slug_bugun}`, [308, aileTr])
+      c.set(`/en/products/${m.slug_bugun}`, [308, aileEn])
+      c.set(aileTr, [200])
+      c.set(aileEn, [200])
+    }
   }
   return c
 }
@@ -253,7 +301,11 @@ describe('modelOrnekle', () => {
 // ── 3. beklentileriUret ──────────────────────────────────────────────────────
 
 describe('beklentileriUret', () => {
-  const uret = (g: Partial<Girdi> & { ek?: number } = {}) => betik.beklentileriUret({ ...KUCUK, ...g })
+  /** Pilot liste açıkça verilmediyse verilen modellerin HEPSİ açık sayılır (önceki vakalar açık modeli sınar). */
+  const uret = (g: Partial<Girdi> & { ek?: number } = {}) => {
+    const girdi = { ...KUCUK, ...g }
+    return betik.beklentileriUret({ ...girdi, yayinda: g.yayinda ?? hepsiYayinda(girdi.modeller) })
+  }
   const adresler = (b: Beklenti[], grup: string) => b.filter((x) => x.grup === grup).map((x) => x.adres)
   const bul = (b: Beklenti[], grup: string, adres: string) => b.find((x) => x.grup === grup && x.adres === adres)
 
@@ -284,6 +336,48 @@ describe('beklentileriUret', () => {
     expect(bul(b, 'model-eski', '/tr/products/a-1-eski')).toMatchObject({ ilkDurum: 308, hop: 1, sonUrl: '/tr/urun/a-1-p', sonDurum: 200 })
     expect(bul(b, 'model-eski', '/en/products/a-1-eski')).toMatchObject({ ilkDurum: 308, hop: 1, sonUrl: '/en/products/a-1-en-p', sonDurum: 200 })
     expect(bul(b, 'model-yeni', '/tr/urun/b-2-p')).toMatchObject({ ilkDurum: 200, hop: 0, sonUrl: '/tr/urun/b-2-p', sonDurum: 200 })
+  })
+
+  it('⭐KAPALI model (pilot listede yok): yeni adres 404; bugünkü adres TEK 308 → ÜRÜN AİLESİ sayfası (TR ve EN)', () => {
+    const b = uret({ tablo: [], tohum: null, yayinda: BOS_YAYINDA })
+    expect(adresler(b, 'model-yeni')).toEqual([])
+    expect(adresler(b, 'model-eski')).toEqual([])
+    expect(adresler(b, 'model-yeni-kapali')).toEqual(['/tr/urun/a-1-p', '/en/products/a-1-en-p', '/tr/urun/b-2-p', '/en/products/b-2-en-p'])
+    expect(adresler(b, 'model-eski-aileye')).toEqual(['/tr/products/a-1-eski', '/en/products/a-1-eski', '/tr/products/b-2-eski', '/en/products/b-2-eski'])
+    expect(bul(b, 'model-yeni-kapali', '/tr/urun/a-1-p')).toMatchObject({ ilkDurum: 404, hop: 0, sonUrl: '/tr/urun/a-1-p', sonDurum: 404 })
+    expect(bul(b, 'model-eski-aileye', '/tr/products/a-1-eski')).toMatchObject({ ilkDurum: 308, hop: 1, sonUrl: '/tr/urun/aile-a', sonDurum: 200 })
+    expect(bul(b, 'model-eski-aileye', '/en/products/b-2-eski')).toMatchObject({ ilkDurum: 308, hop: 1, sonUrl: '/en/products/aile-b', sonDurum: 200 })
+  })
+
+  it('karışık liste: açık model kendi adresini, kapalı model aile adresini bekler (karar SKU başına verilir)', () => {
+    const yalnizA1: Yayinda = { modeller: { 'aile-a': { 'A-1': { tr: 'a-1-p', en: 'a-1-en-p' } } }, surumler: {} }
+    const b = uret({ tablo: [], tohum: null, yayinda: yalnizA1 })
+    expect(adresler(b, 'model-yeni')).toEqual(['/tr/urun/a-1-p', '/en/products/a-1-en-p'])
+    expect(adresler(b, 'model-eski')).toEqual(['/tr/products/a-1-eski', '/en/products/a-1-eski'])
+    expect(adresler(b, 'model-yeni-kapali')).toEqual(['/tr/urun/b-2-p', '/en/products/b-2-en-p'])
+    expect(adresler(b, 'model-eski-aileye')).toEqual(['/tr/products/b-2-eski', '/en/products/b-2-eski'])
+  })
+
+  it('sürüm kaydı da açık sayılır; SKU küçük harf/boşluklu yazılsa da eşleşir (sitenin kimlik normalleştirmesi)', () => {
+    const surumle: Yayinda = { modeller: {}, surumler: { ' b-2 ': { temel: 'A-1', tr: 'b-2-p', en: 'b-2-en-p' } } }
+    expect(adresler(uret({ tablo: [], tohum: null, yayinda: surumle }), 'model-yeni')).toEqual(['/tr/urun/b-2-p', '/en/products/b-2-en-p'])
+    const bosluklu: Yayinda = { modeller: { 'aile-a': { ' a-1 ': { tr: 'a-1-p', en: 'a-1-en-p' } } }, surumler: {} }
+    expect(adresler(uret({ tablo: [], tohum: null, yayinda: bosluklu }), 'model-yeni')).toEqual(['/tr/urun/a-1-p', '/en/products/a-1-en-p'])
+  })
+
+  it('⭐liste verilmediyse ya da biçimi bozuksa ATAR: "okunamadı" boş liste sayılmaz (sessizce kapalı kipe düşmez)', () => {
+    const calis = (yayinda: unknown) => () => betik.beklentileriUret({ ...KUCUK, yayinda })
+    expect(calis(undefined)).toThrow(/yayındaki modeller listesi/)
+    expect(calis(null)).toThrow(/yayındaki modeller listesi/)
+    expect(calis({ modeller: [], surumler: {} })).toThrow(/yayındaki modeller listesi/)
+    expect(calis({ modeller: {} })).toThrow(/yayındaki modeller listesi/)
+    expect(calis({ modeller: { 'aile-a': 5 }, surumler: {} })).toThrow(/aile-a/)
+  })
+
+  it('yayindaSkuKumesi: aile altındaki modeller + sürümler, büyük harf kimlik; boş liste boş küme', () => {
+    const k = betik.yayindaSkuKumesi({ modeller: { x: { 'a-1': {}, 'B-2': {} } }, surumler: { ' c-3 ': {} } })
+    expect([...k].sort()).toEqual(['A-1', 'B-2', 'C-3'])
+    expect(betik.yayindaSkuKumesi(BOS_YAYINDA).size).toBe(0)
   })
 
   it('--ornek (ek): aile başına ek model gelir (3 model × TR/EN)', () => {
@@ -391,6 +485,68 @@ describe('tarama (ana) — sahte getir', () => {
     expect(ozetSayilari(c)).toEqual({ toplam: KUCUK_TOPLAM, ok: KUCUK_TOPLAM - KUCUK_BEKLIYOR, kirmizi: 0, hata: 0, bekliyor: KUCUK_BEKLIYOR })
     expect(c.yazilan.join('\n')).not.toContain('SORUNLU')
     expect(c.hatalar).toEqual([])
+  })
+
+  it('⭐PİLOT LİSTE BOŞ + kusursuz sunucu: çıkış 0, kırmızı 0; özet kaç modelin açık/kapalı olduğunu söyler', async () => {
+    const g = kucukListeyle(BOS_YAYINDA)
+    const c = await calistir(taban, { girdi: g, getir: sahteGetir(kusursuzCevaplar(g)) })
+    expect(c.kod, c.yazilan.join('\n')).toBe(0)
+    expect(ozetSayilari(c)).toEqual({ toplam: KUCUK_TOPLAM, ok: KUCUK_TOPLAM - KUCUK_BEKLIYOR, kirmizi: 0, hata: 0, bekliyor: KUCUK_BEKLIYOR })
+    const metin = c.yazilan.join('\n')
+    expect(metin).toContain('PİLOT LİSTE (yayındaki modeller): 0 model + 0 sürüm açık.')
+    expect(metin).toContain('Örneklenen 2 modelden açık: 0')
+    expect(metin).toContain('kapalı: 2')
+    expect(metin).toContain('| model-eski-aileye | `/tr/products/a-1-eski` |')
+  })
+
+  it('PİLOT LİSTE KARIŞIK: bir model açık, biri kapalı; ikisi de kendi beklentisiyle geçer', async () => {
+    const g = kucukListeyle({ modeller: { 'aile-a': { 'A-1': { tr: 'a-1-p', en: 'a-1-en-p' } } }, surumler: {} })
+    const c = await calistir(taban, { girdi: g, getir: sahteGetir(kusursuzCevaplar(g)) })
+    expect(c.kod, c.yazilan.join('\n')).toBe(0)
+    expect(ozetSayilari(c).kirmizi).toBe(0)
+    expect(c.yazilan.join('\n')).toContain('PİLOT LİSTE (yayındaki modeller): 1 model + 0 sürüm açık. Örneklenen 2 modelden açık: 1')
+  })
+
+  it('⭐SABOTAJ — liste "KAPALI" diyor ama site model sayfasını AÇMIŞ (yeni model adresi 200): KIRMIZI', async () => {
+    const g = kucukListeyle(BOS_YAYINDA)
+    const c0 = kusursuzCevaplar(g)
+    c0.set('/tr/urun/a-1-p', [200])
+    const c = await calistir(taban, { girdi: g, getir: sahteGetir(c0) })
+    expect(c.kod).toBe(1)
+    expect(ozetSayilari(c)).toMatchObject({ kirmizi: 1, hata: 0 })
+    expect(c.yazilan.join('\n')).toMatch(/KIRMIZI \/tr\/urun\/a-1-p · beklenen: 404 · gerçek: 200/)
+  })
+
+  it('⭐SABOTAJ — liste "AÇIK" diyor ama site model sayfasını vermiyor (404): yeni adres ve ona giden eski adres KIRMIZI', async () => {
+    const c0 = kusursuzCevaplar(KUCUK)
+    c0.delete('/tr/urun/a-1-p')
+    const c = await calistir(taban, { girdi: KUCUK, getir: sahteGetir(c0) })
+    expect(c.kod).toBe(1)
+    expect(ozetSayilari(c).kirmizi).toBe(2)
+    const metin = c.yazilan.join('\n')
+    expect(metin).toContain('KIRMIZI /tr/urun/a-1-p')
+    expect(metin).toContain('KIRMIZI /tr/products/a-1-eski')
+  })
+
+  it('⭐SABOTAJ — kapalı modelin eski adresi ürün ailesi yerine MODEL adresine giderse KIRMIZI (liste ve site ayrışmış)', async () => {
+    const g = kucukListeyle(BOS_YAYINDA)
+    const c0 = kusursuzCevaplar(g)
+    c0.set('/tr/products/a-1-eski', [308, '/tr/urun/a-1-p'])
+    c0.set('/tr/urun/a-1-p', [200])
+    const c = await calistir(taban, { girdi: g, getir: sahteGetir(c0) })
+    expect(c.kod).toBe(1)
+    expect(ozetSayilari(c).kirmizi).toBe(2) // eski adres yanlış hedefe + model adresi 404 olması gerekirken 200
+    expect(c.yazilan.join('\n')).toContain('KIRMIZI /tr/products/a-1-eski')
+  })
+
+  it('⭐SABOTAJ — kapalı modelin eski adresi YANLIŞ aileye giderse KIRMIZI (hedef sayfa 200 olsa bile)', async () => {
+    const g = kucukListeyle(BOS_YAYINDA)
+    const c0 = kusursuzCevaplar(g)
+    c0.set('/tr/products/a-1-eski', [308, '/tr/urun/aile-b']) // aile-b sayfası vardır (200); a-1'in ailesi aile-a
+    const c = await calistir(taban, { girdi: g, getir: sahteGetir(c0) })
+    expect(c.kod).toBe(1)
+    expect(ozetSayilari(c)).toMatchObject({ kirmizi: 1, hata: 0 })
+    expect(c.yazilan.join('\n')).toContain('KIRMIZI /tr/products/a-1-eski')
   })
 
   it('tablo çıktısı: başlık + her beklenti için 1 satır (adres · beklenen · gerçek · durum)', async () => {
@@ -520,7 +676,7 @@ describe('tarama (ana) — sahte getir', () => {
   })
 
   it('eşzamanlılık sınırı: aynı anda en çok 4 istek (ve gerçekten paralel)', async () => {
-    const girdi: Girdi = { tablo: TABLO, modeller: MODELLER, tohum: TOHUM }
+    const girdi: Girdi = { tablo: TABLO, modeller: MODELLER, tohum: TOHUM, yayinda: hepsiYayinda(MODELLER) }
     const asil = sahteGetir(kusursuzCevaplar(girdi))
     let anlik = 0
     let enCok = 0
@@ -574,6 +730,7 @@ describe('komut satırı ve girdi hataları (çıkış 2)', () => {
   const kotuArgumanlar: [string, string[], RegExp][] = [
     ['bilinmeyen bayrak', ['--bilinmeyen'], /bilinmeyen bayrak/],
     ['--taban değersiz', ['--taban'], /bir değer ister/],
+    ['--yayinda-listesi değersiz', ['--yayinda-listesi'], /bir değer ister/],
     ['--taban adres değil', ['--taban', 'localhost 3000'], /geçerli bir adres değil/],
     ['--taban http/https dışı', ['--taban', 'ftp://x.test'], /yalnız http ya da https/],
     ['--ornek sayı değil', ['--ornek', 'x'], /0-20 arası/],
@@ -599,12 +756,46 @@ describe('komut satırı ve girdi hataları (çıkış 2)', () => {
   })
 
   it('⭐FAIL-CLOSED: beklenti listesi BOŞSA çıkış 2 (hiçbir şey taranmadan yeşil çıkılmaz), --liste dahil', async () => {
-    const bos: Girdi = { tablo: [], modeller: [], tohum: null }
+    const bos: Girdi = { tablo: [], modeller: [], tohum: null, yayinda: BOS_YAYINDA }
     for (const argv of [[], ['--liste']]) {
       const c = await calistir(argv, { girdi: bos })
       expect(c.kod, argv.join(' ')).toBe(2)
       expect(c.hatalar.join('\n')).toContain('beklenti listesi boş')
     }
+  })
+
+  it('⭐pilot listesi hiç verilmediyse çıkış 2 ve sebep yazılır (sessizce "hepsi kapalı" kipine düşmez), --liste dahil', async () => {
+    const eksik = { tablo: KUCUK.tablo, modeller: KUCUK.modeller, tohum: KUCUK.tohum } as Girdi
+    for (const argv of [[], ['--liste']]) {
+      const c = await calistir(argv, { girdi: eksik })
+      expect(c.kod, argv.join(' ')).toBe(2)
+      expect(c.hatalar.join('\n')).toContain('yayındaki modeller listesi')
+    }
+  })
+
+  it('pilot listesi dosyası yoksa ya da biçimi bozuksa çıkış 2 (sessizce atlanmaz)', async () => {
+    const yok = await calistir(['--liste', '--yayinda-listesi', path.join(geciciDizin(), 'yok.json')])
+    expect(yok.kod).toBe(2)
+    expect(yok.hatalar.join('\n')).toMatch(/ENOENT|no such file/i)
+    const bozukYol = path.join(geciciDizin(), 'bozuk.json')
+    fs.writeFileSync(bozukYol, JSON.stringify({ modeller: [] }))
+    const bozuk = await calistir(['--liste', '--yayinda-listesi', bozukYol])
+    expect(bozuk.kod).toBe(2)
+    expect(bozuk.hatalar.join('\n')).toContain('yayındaki modeller listesi')
+  })
+
+  it('--yayinda-listesi gerçekten okunur: tüm modelleri açan liste kapalı grupları siler, açık grupları getirir', async () => {
+    const yol = path.join(geciciDizin(), 'hepsi-acik.json')
+    fs.writeFileSync(yol, JSON.stringify(hepsiYayinda(MODELLER)))
+    const acik = await calistir(['--liste', '--yayinda-listesi', yol])
+    expect(acik.kod).toBe(0)
+    expect(acik.yazilan.some((s) => s.startsWith('model-yeni\t'))).toBe(true)
+    expect(acik.yazilan.some((s) => s.startsWith('model-yeni-kapali\t'))).toBe(false)
+    const bos = path.join(geciciDizin(), 'bos.json')
+    fs.writeFileSync(bos, JSON.stringify(BOS_YAYINDA))
+    const kapali = await calistir(['--liste', '--yayinda-listesi', bos])
+    expect(kapali.yazilan.some((s) => s.startsWith('model-yeni-kapali\t'))).toBe(true)
+    expect(kapali.yazilan.some((s) => s.startsWith('model-yeni\t'))).toBe(false)
   })
 
   it('model listesi okunamazsa çıkış 2 (sessizce atlanmaz)', async () => {
@@ -664,8 +855,22 @@ describe('⭐GERÇEK DEPO', () => {
     expect(bozuk).toEqual([])
   })
 
+  it('⭐GERÇEK pilot liste: model beklentileri sitenin kendi listesinden türer (açık + kapalı = aile × 2, her iki yönde)', () => {
+    const b = betik.beklentileriUret({ tablo: TABLO, modeller: MODELLER, tohum: TOHUM, yayinda: YAYINDA_GERCEK })
+    const say = (g: string) => b.filter((x) => x.grup === g).length
+    const aile = new Set(MODELLER.map((m) => m.aile_yeni)).size
+    expect(say('model-yeni') + say('model-yeni-kapali')).toBe(aile * 2)
+    expect(say('model-eski') + say('model-eski-aileye')).toBe(aile * 2)
+    expect(say('model-yeni')).toBe(say('model-eski'))
+    expect(say('model-yeni-kapali')).toBe(say('model-eski-aileye'))
+    // Liste boşsa tüm örnekler kapalıdır; doluysa açık sayısı listedeki kayıtlardan fazla olamaz.
+    const kayit = Object.values(YAYINDA_GERCEK.modeller).reduce((n, k) => n + Object.keys(k).length, 0) + Object.keys(YAYINDA_GERCEK.surumler).length
+    if (kayit === 0) expect(say('model-yeni-kapali')).toBe(aile * 2)
+    expect(say('model-yeni') / 2).toBeLessThanOrEqual(kayit)
+  })
+
   it('beklenti sayıları tablo ve model listesinden TÜRER (sabit sayı değil, ilişki); hiçbir adres iki beklenti taşımaz', () => {
-    const b = betik.beklentileriUret({ tablo: TABLO, modeller: MODELLER, tohum: TOHUM })
+    const b = betik.beklentileriUret({ tablo: TABLO, modeller: MODELLER, tohum: TOHUM, yayinda: hepsiYayinda(MODELLER) })
     const say = (g: string) => b.filter((x) => x.grup === g).length
     const aile = new Set(MODELLER.map((m) => m.aile_yeni)).size
     expect(say('rota-dili-dilsiz')).toBe(TABLO.length)
@@ -678,8 +883,19 @@ describe('⭐GERÇEK DEPO', () => {
     expect(new Set(b.map((x) => x.adres)).size, 'bir adres iki beklenti taşıyor (çelişki olabilir)').toBe(b.length)
   })
 
+  it('⭐GERÇEK DEPO + TÜM modeller açık dünya: kusursuz sunucu (442 modelin sayfası var) da çıkış 0, kırmızı 0 verir', async () => {
+    // Pilot liste açıldığında (URUN'un liste açma PR'ı) tarama aynı kusursuz sonucu vermeli; dosya ile ENJEKTE edilir.
+    const yol = path.join(geciciDizin(), 'hepsi-acik.json')
+    fs.writeFileSync(yol, JSON.stringify(hepsiYayinda(MODELLER)))
+    const girdi: Girdi = { tablo: TABLO, modeller: MODELLER, tohum: TOHUM, yayinda: hepsiYayinda(MODELLER) }
+    const c = await calistir(['--taban', TABAN, '--yayinda-listesi', yol], { getir: sahteGetir(kusursuzCevaplar(girdi)) })
+    expect(c.kod, c.yazilan.filter((s) => s.startsWith('  ')).join('\n')).toBe(0)
+    expect(ozetSayilari(c)).toMatchObject({ kirmizi: 0, hata: 0 })
+    expect(c.yazilan.join('\n')).not.toContain('model-yeni-kapali')
+  })
+
   it('⭐GERÇEK DEPO + kusursuz sahte sunucu: çıkış 0, kırmızı 0, hata 0; yalnız kategori satırları BEKLİYOR', async () => {
-    const girdi: Girdi = { tablo: TABLO, modeller: MODELLER, tohum: TOHUM }
+    const girdi: Girdi = { tablo: TABLO, modeller: MODELLER, tohum: TOHUM, yayinda: YAYINDA_GERCEK }
     const istekler: string[] = []
     // `girdi` ENJEKTE EDİLMEZ: betik tabloyu, CSV'yi ve tohumu kendi okur (varsayılan yollar + çekirdek doğrulayıcı)
     const c = await calistir(['--taban', TABAN], { getir: sahteGetir(kusursuzCevaplar(girdi), istekler) })

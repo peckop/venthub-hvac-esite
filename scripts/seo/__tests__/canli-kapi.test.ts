@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   kontrolEt, haritaCoz, sayfaAlanlari, jsonldBloklari, robotsDisallow, robotsEslesir,
-  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu,
+  bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu, hamDegerHucreleri,
 } from '../canli-kapi.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -600,5 +600,59 @@ describe('INV-CANLI-KAPI-1 · VITRIN-IDDIA (URN-60, karar 295)', () => {
   it('temiz sentetik site hiç VITRIN-IDDIA bulgusu vermez ve kuralı kayıtlıdır', () => {
     expect(kodlar(temiz(), 'VITRIN-IDDIA')).toEqual([])
     expect(Object.keys(KURAL_NO)).toContain('VITRIN-IDDIA')
+  })
+})
+
+describe('INV-CANLI-KAPI-1 · SPEC-HAM-DEGER (URN-58, karar 298)', () => {
+  /** Ürün sayfasının teknik tablosundaki gerçek işaretleme kalıbı: etiket span'ı + değer span'ı (tek satır). */
+  const satir = (etiket: string, deger: string): string =>
+    `<div class="flex justify-between"><span class="text-xs font-bold">${etiket}</span><span class="text-xs font-black">${deger}</span></div>`
+
+  it('sabotaj: hücrenin görünür metni tam `true`/`false` ise KIRMIZI; gövde çift olunca sayı da çift, etiket=değer kanıtta', () => {
+    const v = temiz()
+    const govde = [satir('Zamanlayıcı', 'false'), satir('ErP Uyumlu', 'true'), satir('Higrostat', 'false')].join('')
+    govdeDegistir(v.sayfalar[1], '</body>', govde + govde + '</body>') // Lineo Quiet'te ölçülen hâl: her alan iki kez
+    const b = kodlar(v, 'SPEC-HAM-DEGER')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/a'])
+    expect(b[0].seviye).toBe('KIRMIZI')
+    expect(b[0].kanit).toContain('6 teknik tablo hücresinde')
+    for (const parca of ['Zamanlayıcı=false', 'ErP Uyumlu=true', 'Higrostat=false']) expect(b[0].kanit, parca).toContain(parca)
+  })
+  it('sabotaj: <td>/<dd> hücresi, tırnak içinde ">" taşıyan öznitelik ve React yazı-sınırı yorumu (<!-- -->) da yakalanır', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[2], '</body>',
+      '<table><tr><th>Bypass</th><td>false</td></tr></table>' +
+      '<dl><dt>Ters Dönüş</dt><dd data-x="a>b">true</dd></dl>' +
+      '<div><span>Sensör</span><span><!-- -->false<!-- --></span></div></body>')
+    const b = kodlar(v, 'SPEC-HAM-DEGER')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/b'])
+    expect(b[0].kanit).toContain('3 teknik tablo hücresinde')
+    for (const parca of ['Bypass=false', 'Ters Dönüş=true', 'Sensör=false']) expect(b[0].kanit, parca).toContain(parca)
+  })
+  it('iyi girdi: sözlük metni (Var/Yok, Yes/No), kod öğeleri, cümle içi sözcük, script/JSON-LD/yorum, öznitelik, büyük harf YANLIŞ ALARM vermez', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], '</body>', [
+      satir('Zamanlayıcı', 'Yok'), satir('ErP Uyumlu', 'Var'), satir('Timer', 'No'), satir('ErP', 'Yes'),
+      '<code>true</code><pre>false</pre><kbd>true</kbd><samp>false</samp>',
+      '<p>Bu ifade true değildir; false positive yoktur.</p><span>truefalse</span><span>false positive</span>',
+      '<input value="true"><div data-flag="false"></div>',
+      '<script>var a = "true"; window.__x = {k: false}</script><script type="application/ld+json">{"x": true}</script>',
+      '<!-- <span>true</span> --><span>True</span><span>FALSE</span>',
+      '</body>',
+    ].join(''))
+    expect(kodlar(v, 'SPEC-HAM-DEGER')).toEqual([])
+  })
+  it('hamDegerHucreleri: önceki kapanan öğe yoksa etiket "?"; temiz sentetik site bulgu vermez ve kural kayıtlıdır', () => {
+    expect(hamDegerHucreleri('<div><span>true</span></div>')).toEqual([{ deger: 'true', etiket: '?' }])
+    expect(hamDegerHucreleri('<div><b>Etiket</b> <i>false</i></div>')).toEqual([{ deger: 'false', etiket: 'Etiket' }])
+    expect(hamDegerHucreleri('')).toEqual([])
+    expect(kodlar(temiz(), 'SPEC-HAM-DEGER')).toEqual([])
+    expect(Object.keys(KURAL_NO)).toContain('SPEC-HAM-DEGER')
+  })
+  it('çıkış kodu: SPEC-HAM-DEGER yeni KIRMIZI olarak çıkışı 1 yapar (bilinen listesinde yoksa susturulmaz)', () => {
+    const v = temiz()
+    govdeDegistir(v.sayfalar[1], '</body>', satir('Zamanlayıcı', 'false') + '</body>')
+    expect(cikisKodu(kontrolEt(v))).toBe(1)
+    expect(cikisKodu(kontrolEt(temiz()))).toBe(0)
   })
 })

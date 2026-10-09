@@ -41,6 +41,8 @@ const TABLO = Object.freeze([
   Object.freeze(['EDGE', 'Edge']),
   Object.freeze(['I18N', 'I18N']),
   Object.freeze(['MEVZUAT', 'Mevzuat']),
+  // HRT-35 (karar 322, OPS-93, 2026-10-09): TAKİP departmanı etkin. MÜHENDİSLİK planlı ve kapalıdır (karar 315, ad kesinleşmedi): tabloya girmez.
+  Object.freeze(['TAKIP', 'Takip']),
 ])
 
 /** Aramalar Map üzerinden yapılır (nesne prototipi adlarına karşı ek güvence; anahtarlar zaten büyük harf). */

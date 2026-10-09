@@ -58,12 +58,16 @@ export const translateSpecKey = (key: string): string => {
  *
  * @param key - The specification key, typically containing a unit suffix (e.g., 'airflow_speed_max_ms', 'voltage_v')
  * @param value - The raw value to be formatted, usually a number or numeric string
+ * @param t - Dictionary resolver of the CURRENT language (URN-58). Required on purpose: boolean values ("has_timer: false")
+ *            are printed from the dictionary ("Var"/"Yok", "Yes"/"No"), and a caller that forgets the language must fail to
+ *            compile instead of silently printing the raw "true"/"false".
  * @returns The formatted string with the appropriate unit appended, or '-' for missing values
  *
  * @example
- * formatSpecValue('airflow_speed_max_ms', 15) // returns "15 m / s"
- * formatSpecValue('weight_kg', 10) // returns "10 kg"
- * formatSpecValue('voltage_v', null) // returns "-"
+ * formatSpecValue('airflow_speed_max_ms', 15, t) // returns "15 m / s"
+ * formatSpecValue('weight_kg', 10, t) // returns "10 kg"
+ * formatSpecValue('voltage_v', null, t) // returns "-"
+ * formatSpecValue('has_timer', false, t) // returns "Yok" (TR) / "No" (EN)
  */
 /**
  * Anahtar son-eki → görünen birim. UZUNDAN KISAYA sıralanır ve sıralama ELLE DEĞİL
@@ -110,21 +114,30 @@ const UNIT_BY_KEY: Readonly<Record<string, string>> = {
 }
 
 /**
+ * Sözlük çözücünün asgari imzası (URN-58). `useI18n().t` ve föyün `TranslateFn`'i buna uyar; çağıran tarafın
+ * kendi `t`'sini olduğu gibi geçirmesi yeter, ikinci bir çeviri yolu kurulmaz.
+ */
+export type SpecValueTranslate = (key: string) => string
+
+/**
  * Nesne/dizi değer → okunur metin. `String({})` "[object Object]" verir ve bu, müşteriye giden föyde
  * ölçüler satırında görülmüş bir kusurdur (Katalog, Downloads/AVenS_Aksiyal_Jet_Fan_Sistemi_Datasheet.pdf).
  * Canlı veritabanında bugün nesne/dizi değerli özellik yok (2026-10-09 sorgu: 0 ürün); bu, ilk gelen
  * değerin ham makine metniyle basılmasını önleyen savunmadır. İçi boş sonuç `''` döner (çağıran `-` yazar).
+ * URN-58: iç içe mantıksal değer de ("true"/"false" değil) sözlükten basılır — `t` bu yüzden buraya da iner.
  */
-const nesneMetni = (value: unknown, derinlik = 0): string => {
+const nesneMetni = (value: unknown, t: SpecValueTranslate, derinlik = 0): string => {
   if (value === null || value === undefined) return '';
+  if (value === true) return t('pdp.specValues.yes');
+  if (value === false) return t('pdp.specValues.no');
   if (Array.isArray(value)) {
-    return value.map((x) => nesneMetni(x, derinlik + 1)).filter(Boolean).join(', ');
+    return value.map((x) => nesneMetni(x, t, derinlik + 1)).filter(Boolean).join(', ');
   }
   if (typeof value === 'object') {
     if (derinlik >= 2) return '';
     return Object.entries(value as Record<string, unknown>)
       .map(([k, v]) => {
-        const m = nesneMetni(v, derinlik + 1);
+        const m = nesneMetni(v, t, derinlik + 1);
         return m ? `${k}: ${m}` : '';
       })
       .filter(Boolean)
@@ -133,10 +146,21 @@ const nesneMetni = (value: unknown, derinlik = 0): string => {
   return String(value);
 };
 
-export const formatSpecValue = (key: string, value: unknown): string => {
+/**
+ * ⭐NİÇİN `t` ZORUNLU (URN-58, karar 298): bu fonksiyon önceden `String(value)` basıyordu ve canlıdaki Lineo Quiet
+ * ailesinin teknik tablosunda "Zamanlayıcı false", "ErP Uyumlu true", "Higrostat false" görünüyordu (her biri gövde
+ * çift olduğu için iki kez). Canlı sorgu (2026-10-09): 11 mantıksal anahtar, hepsi JSON boolean (metin "true" yok);
+ * müşteriye ham makine değeri gidiyordu. Dil bilgisi olmadan "Var/Yok" mü "Yes/No" mu basılacağı bilinemez; `t`'yi opsiyonel yapmak, unutan çağrının
+ * sessizce Türkçeye (ya da ham değere) düşmesi demektir — `getProductDisplayName`'in lang dersi (REC-110) ile aynı gerekçe.
+ */
+export const formatSpecValue = (key: string, value: unknown, t: SpecValueTranslate): string => {
   if (value === null || value === undefined) return '-';
+  // Mantıksal değer: iki dilde de karşılığı `pdp.specValues` altında (TR "Var"/"Yok", EN "Yes"/"No"). Anahtarlar
+  // DOĞRUDAN `t('...')` çağrısında yazılır ki INV-5 (anahtar çözümü) ve ölü-anahtar kapısı tüketiciyi görsün.
+  if (value === true) return t('pdp.specValues.yes');
+  if (value === false) return t('pdp.specValues.no');
   // Birim eki yalnız tekil sayı/metne uygulanır; nesne/dizide hangi birimin kime ait olduğu belli değildir.
-  if (typeof value === 'object') return nesneMetni(value) || '-';
+  if (typeof value === 'object') return nesneMetni(value, t) || '-';
   const stringValue = String(value);
   const lowerKey = key.toLowerCase();
 

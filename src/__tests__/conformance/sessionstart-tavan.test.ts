@@ -288,13 +288,16 @@ describe('enjeksiyonKisa · Recep mesajları aynen ama sınırlı', () => {
 
 describe('HRT-29 · rol OPS ise açılışta departman haritası kısa özeti gelir', () => {
   const HARITA_TAVANI = 2048
-  const ROLLER = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA', 'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK']
+  const ROLLER = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA', 'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK', 'TAKIP']
+  /** HRT-35 (karar 315): planlı ama kapalı departman; açılış harfi yerine "açılış yok" yazar. */
+  const PLANLI = 'MÜHENDİSLİK'
 
-  it('CC_LANE=OPS: 16 departman satırı ve açılış harfleri görünür, çıktı tavanı yalnız özet kadar genişler', () => {
+  it('CC_LANE=OPS: 17 departman satırı + planlı MÜHENDİSLİK ve açılış harfleri görünür, çıktı tavanı yalnız özet kadar genişler', () => {
     const { ek, durum } = calistir('startup', { CC_LANE: 'OPS' })
     expect(durum).toBe(0)
     expect(ek).toContain('DEPARTMAN HARİTASI')
     for (const ad of ROLLER) expect(ek, `${ad} satırı yok`).toContain(`${ad} · `)
+    expect(ek).toMatch(new RegExp(`${PLANLI} · PLANLI, KAPALI .* · açılış yok`))
     expect(ek).toMatch(/ · M\/T\n/)
     expect(ek.length).toBeLessThanOrEqual(TAVAN + HARITA_TAVANI)
     expect(ek.startsWith(`Oturum kimliğin: ${SID}`)).toBe(true)
@@ -314,7 +317,7 @@ describe('HRT-29 · rol OPS ise açılışta departman haritası kısa özeti ge
 
   it('OPS compact: harita özeti bütünüyle durur ve Recep sözü hâlâ aynen görünür (taşan pay durum bloğundan alınır)', () => {
     const { ek } = calistir('compact', { CC_LANE: 'OPS' })
-    for (const ad of ROLLER) expect(ek, `${ad} satırı yok`).toContain(`${ad} · `)
+    for (const ad of [...ROLLER, PLANLI]) expect(ek, `${ad} satırı yok`).toContain(`${ad} · `)
     expect(ek).toContain(SON_MESAJ_BASI)
   }, 60_000)
 
