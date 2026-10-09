@@ -394,7 +394,7 @@ describe('INV-KART-NOT-1 · komut satırı', () => {
  */
 describe('INV-KART-NOT-1 · canlı yol (sahte pano dosyası, VENTHUB_KANBAN_DB)', () => {
   const pythonBul = (): string | null => {
-    for (const ad of ['python', 'python3']) {
+    for (const ad of ['python', 'py']) {
       const r = spawnSync(ad, ['--version'], { encoding: 'utf8' })
       if (r.status === 0 && /Python 3\./.test(`${r.stdout}${r.stderr}`)) return ad
     }

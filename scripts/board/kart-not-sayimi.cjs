@@ -178,14 +178,14 @@ function dosyadanOku(yol, gun) {
 }
 
 function canlidanOku(gun) {
-  for (const py of ['python', 'python3']) {
+  for (const py of ['python', 'py']) {
     const r = spawnSync(py, [DISA_AKTAR, '--tam'], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout: 120000 })
     if (r.error && r.error.code === 'ENOENT') continue
     if (r.error) throw new VeriHatasi(`${py} çalıştırılamadı: ${r.error.message}`)
     if (r.status !== 0) throw new VeriHatasi(`dışa aktarım çıkış ${r.status}: ${(r.stderr || '').trim().split('\n').pop()}`)
     return kayitlariCoz(r.stdout, gun)
   }
-  throw new VeriHatasi('python bulunamadı (python ya da python3 PATH içinde olmalı)')
+  throw new VeriHatasi('python bulunamadı (python ya da py PATH içinde olmalı)')
 }
 
 function argumanlar(argv) {
