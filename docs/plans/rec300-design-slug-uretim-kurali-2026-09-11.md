@@ -97,14 +97,14 @@ Emir bu hükmü gerekçesiyle bize bırakmış. **Kategori slug'ı kısa ve kano
 3. **Her zenginleştirme bir göç demek:** 308 zinciri, sitemap yenilemesi, `translation_key` ve sözlük dokunuşu. 22 dolu dal × iki dil = 44 adres; kazancı ölçülmemiş bir işlem için.
 4. **Kanonik kimlik EN slug'dır** (plan §1). Kimliği pazarlama metniyle şişirmek, kimliğin işini bozar.
 
-**Tek istisna — ad düzeltmesinden doğan slug:** Recep kararı `Asit Dayanımlı → Korozyon Dayanımlı Fanlar` (11-09). Burada TR slug `asit-dayanikli-fanlar` artık adı yansıtmıyor. Öneri: `metadata.slug.tr = korozyon-dayanimli-fanlar` yazılır, eski TR slug 308 ile yaşar, **kanonik EN slug `acid-resistant-fans` DEĞİŞMEZ** (kimlik sabit kalır, kod ve CSV dokunulmaz).
+**Tek istisna — ad düzeltmesinden doğan slug:** Recep kararı `Asit Dayanımlı → Korozyon Dayanımlı Fanlar` (11-09). Burada TR slug `asit-dayanikli-fanlar` artık adı yansıtmıyor. Öneri: `metadata.slug.tr = korozyon-dayanimli-fanlar` yazılır, eski TR slug 308 ile yaşar, **kanonik EN slug `acid-resistant-fans` DEĞİŞMEZ** (kimlik sabit kalır, kod ve CSV dokunulmaz). **Yerine geçti: karar 292 (10-05):** kanonik EN slug `corrosion-and-acid-resistant-fans` oldu, eski EN slug `acid-resistant-fans` 308 ile yaşar; "DEĞİŞMEZ" hükmü bu slug için artık geçerli değil (TR adres ve ad için karar 287 de bkz.). Model adres listesinin `dal` sütunu ve adres üreticisi ÜRÜN şeridindedir; güncellemesi orada yapılır.
 
 ## 7 · Ölçülen düzeltmeler (slug tarafı)
 
 | Kayıt | Bugün | Kusur | Öneri |
 |---|---|---|---|
 | `centrifugal-fans` | ad `Santrifüj / Radyal Fanlar`, tr slug `radyal-fanlar` | **ad** eğik çizgili; slug **doğru** | ad → `Radyal (Santrifüj) Fanlar`. Slug değişmez → **301 yok** |
-| `acid-resistant-fans` | ad `Asit Dayanımlı Fanlar`, tr slug `asit-dayanikli-fanlar` | ad/slug "dayanımlı↔dayanıklı" tutarsız | ad → `Korozyon Dayanımlı Fanlar`, tr slug → `korozyon-dayanimli-fanlar` + 308 |
+| `acid-resistant-fans` | ad `Asit Dayanımlı Fanlar`, tr slug `asit-dayanikli-fanlar` | ad/slug "dayanımlı↔dayanıklı" tutarsız | ad → `Korozyon Dayanımlı Fanlar`, tr slug → `korozyon-dayanimli-fanlar` + 308. **Yerine geçti: karar 287 (ad, TR slug) ve karar 292 (10-05, EN slug → `corrosion-and-acid-resistant-fans`, eskisi 308)** |
 | `spare-parts-sensors` | `translation_key = null` | cetvel §4 `translation_key` zorunlu; ham `c.name` render yasak | `sub.spare-parts` açılır, sözlüğe tr+en girer |
 | `jet-fans` + `parking-jet-fan` | ikisi de `is_active=false`, ürün 0 | **iki satır aynı kavram**; tr slug'lar neredeyse çakışıyor (`otopark-jet-fanlari` / `otopark-jet-fan`) | tek satıra indirilir (cetvel §6 `parking-jet-fan` kanonik), diğeri kapatılır |
 | Ürün slug'ları | yok | `products.metadata.slug` alanı yok | §1 hükmü ile açılır |
