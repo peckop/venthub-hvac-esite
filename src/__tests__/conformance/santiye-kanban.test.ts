@@ -67,7 +67,7 @@ const PANOLAR: Pano[] = [
         notes: [{ createdAt: '2026-09-20T00:00:00.000Z', author: 'HARITA', content: 'not metni: kart içi bilgi' }],
       }),
       kart('numarasız başlık', 'backlog', { id: 'abcdef0123456789' }),
-      kart('ARC-3 · biten iş', 'done', { completedAt: '2026-09-30T00:00:00.000Z' }),
+      kart('ARC-3 · biten iş', 'done', { id: 'arc3-0000-0000', completedAt: '2026-09-30T00:00:00.000Z' }),
     ],
   },
   // başlığın ortasında numara (gerçek panoda 13 kart böyle) ve 4 harfli önek; küçük harfli pano adı şerit adını büyütür
@@ -79,8 +79,18 @@ const PANOLAR: Pano[] = [
   { title: 'DENEME-yonetilen (YTN-4, sil)', tasks: [kart('YTN-4 · deney', 'todo')] },
 ]
 
+/** HRT-44: Kanban olay kaydı (kanban_events). ARC-3 önce in-progress'e, 09-30'da Done'a (iki kez: son an geçerli), sonra todo'ya taşınmış gibi. */
+const OLAYLAR = [
+  { type: 'task.moved', taskId: 'arc3-0000-0000', ts: '2026-09-29T10:00:00.000Z', after: { columnId: 'in-progress' } },
+  { type: 'task.moved', taskId: 'arc3-0000-0000', ts: '2026-09-29T12:00:00.000Z', after: { columnId: 'done' } },
+  { type: 'task.moved', taskId: 'arc3-0000-0000', ts: '2026-09-30T00:00:01.000Z', after: { columnId: 'done' } },
+  { type: 'task.moved', taskId: 'arc3-0000-0000', ts: '2026-10-02T00:00:00.000Z', after: { columnId: 'todo' } },
+  { type: 'task.note.added', taskId: 'arc3-0000-0000', ts: '2026-10-03T00:00:00.000Z', note: 'taşıma değil' },
+]
+
 let dizin = ''
 let db = ''
+let dbOlaysiz = ''
 let bosDb = ''
 
 function py(betik: string, args: string[]) {
@@ -103,15 +113,25 @@ beforeAll(() => {
     'c.execute("create table kanban_boards (id text, payload text, revision integer, updated_at text)")',
     'for i, p in enumerate(json.load(open(sys.argv[2], encoding="utf-8"))):',
     '    c.execute("insert into kanban_boards values (?,?,?,?)", (str(i), json.dumps(p, ensure_ascii=False), 1, ""))',
+    'if len(sys.argv) > 3:',
+    '    c.execute("create table kanban_events (seq integer primary key autoincrement, board_id text not null, payload text not null)")',
+    '    for e in json.load(open(sys.argv[3], encoding="utf-8")):',
+    '        c.execute("insert into kanban_events (board_id, payload) values (?,?)", ("0", json.dumps(e, ensure_ascii=False)))',
     'c.commit()',
     'os._exit(0)',
   ].join('\n')
   const girdi = path.join(dizin, 'panolar.json')
   fs.writeFileSync(girdi, JSON.stringify(PANOLAR), 'utf-8')
+  const olaylar = path.join(dizin, 'olaylar.json')
+  fs.writeFileSync(olaylar, JSON.stringify(OLAYLAR), 'utf-8')
   const k = path.join(dizin, 'kur.py')
   fs.writeFileSync(k, betik, 'utf-8')
-  const r = py(k, [db, girdi])
+  const r = py(k, [db, girdi, olaylar])
   expect(r.cikis, r.stderr).toBe(0)
+  // olay tablosu OLMAYAN pano dosyası (eski/sade): --tam yine çalışmalı, doneAt boş kalmalı
+  dbOlaysiz = path.join(dizin, 'olaysiz.sqlite')
+  const r2 = py(k, [dbOlaysiz, girdi])
+  expect(r2.cikis, r2.stderr).toBe(0)
 })
 
 afterAll(() => {
@@ -200,6 +220,8 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
         expect(k, `${String(k.identifier)} bayraksız çıktıda içerik taşımamalı`).not.toHaveProperty('description')
         expect(k).not.toHaveProperty('notes')
         expect(k).not.toHaveProperty('completedAt')
+        expect(k).not.toHaveProperty('doneAt')
+        expect(k).not.toHaveProperty('id')
       }
     })
 
@@ -217,12 +239,28 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
       expect(ara('ARC-2')).toMatchObject({ description: '', notes: [], completedAt: null })
       // HRT-44: Done'a geçiş anı --tam ile çıkar (kart-not-sayimi.cjs "bugün Done oldu" sorusunu buradan cevaplar)
       expect(ara('ARC-3')?.completedAt).toBe('2026-09-30T00:00:00.000Z')
-      // description/notes/completedAt çıkarılınca bayraksız çıktıyla birebir (başka alan kaymadı)
+      // description/notes/completedAt/doneAt/id çıkarılınca bayraksız çıktıyla birebir (başka alan kaymadı)
       const cikarilmis = kayitlar.map((k) => {
-        const { description: _d, notes: _n, completedAt: _c, ...geri } = k
+        const { description: _d, notes: _n, completedAt: _c, doneAt: _o, id: _i, ...geri } = k
         return geri
       })
       expect(sirala(cikarilmis)).toEqual(sirala(oku(sade)))
+    })
+
+    it('HRT-44: doneAt = Done kolonuna SON taşınma anı (kanban_events); Done dışı taşıma ve not olayı sayılmaz; olaysız kart null; id tam kimlik', () => {
+      const tam = path.join(dizin, 'tam-doneat.json')
+      expect(py(DISA, ['--db', db, '--hedef', tam, '--tam']).cikis).toBe(0)
+      const kayitlar = oku(tam)
+      const ara = (no: string) => kayitlar.find((k) => k.identifier === no)
+      expect(ara('ARC-3')).toMatchObject({ id: 'arc3-0000-0000', doneAt: '2026-09-30T00:00:01.000Z' })
+      expect(ara('ARC-1')?.doneAt).toBeNull()
+    })
+
+    it('HRT-44: kanban_events tablosu OLMAYAN pano dosyasında --tam çalışır, doneAt null kalır (çökmez, sessizce sahte tarih üretmez)', () => {
+      const tam = path.join(dizin, 'tam-olaysiz.json')
+      const r = py(DISA, ['--db', dbOlaysiz, '--hedef', tam, '--tam'])
+      expect(r.cikis, r.stderr).toBe(0)
+      for (const k of oku(tam)) expect(k.doneAt, String(k.identifier)).toBeNull()
     })
 
     it('--tam çıktısı depoda İZLENEBİLİR yola yazılmaz: çıkış 2, dosya oluşmaz', () => {

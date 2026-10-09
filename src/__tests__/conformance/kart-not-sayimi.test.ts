@@ -17,21 +17,26 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 type Not = { author: string; content: string; createdAt: string }
 type Kayit = {
   identifier: string
+  id?: string
   status: string
   serit: string
   completedAt?: string | null
+  doneAt?: string | null
   sonAnlamli?: string | null
   notes?: Not[]
 }
 type Serit = { done: string[]; notsuz: string[]; kanitsiz: string[]; tarihsiz: string[] }
 type Modul = {
   gunAdi: (iso: string | null | undefined) => string | null
+  gunGecerli: (gun: string) => boolean
+  bugun: (simdi?: Date) => string | null
+  etiket: (k: Kayit) => string
   notSayilir: (not: unknown) => boolean
   kanitVar: (not: { content: string }) => boolean
   say: (kayitlar: Kayit[], gun: string) => Record<string, Serit>
   ozetle: (s: Record<string, Serit>, secenek?: { kanitZorunlu?: boolean }) => { done: number; notsuz: number; kanitsiz: number; eksik: number; cikis: number }
   satirlar: (s: Record<string, Serit>, gun: string) => string[]
-  kayitlariCoz: (metin: string) => Kayit[]
+  kayitlariCoz: (metin: string, gun?: string) => Kayit[]
   MIN_NOT: number
 }
 
@@ -72,6 +77,23 @@ describe('INV-KART-NOT-1 · gün sınırı (Europe/Istanbul)', () => {
     expect(S.gunAdi('')).toBeNull()
     expect(S.gunAdi('yarın')).toBeNull()
   })
+
+  it('varsayılan "bugün" TR gününü verir, UTC gününü değil (gece yarısı sınırı)', () => {
+    expect(S.bugun(new Date('2026-10-09T20:59:59Z'))).toBe('2026-10-09')
+    expect(S.bugun(new Date('2026-10-09T22:30:00Z'))).toBe('2026-10-10')
+    expect(S.bugun()).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(S.bugun()).not.toBe('2000-01-01')
+  })
+
+  it.each([
+    ['2026-10-09', true],
+    ['2026-13-45', false],
+    ['2026-02-30', false],
+    ['09.10.2026', false],
+    ['', false],
+  ])('takvim günü "%s" geçerli mi: %s', (gun, beklenen) => {
+    expect(S.gunGecerli(gun)).toBe(beklenen)
+  })
 })
 
 describe('INV-KART-NOT-1 · say (saf işlev)', () => {
@@ -95,9 +117,44 @@ describe('INV-KART-NOT-1 · say (saf işlev)', () => {
     expect(S.notSayilir(not('x'.repeat(S.MIN_NOT - 1)))).toBe(false)
   })
 
+  it('"tamam" + çok boşluk uzunluk eşiğini AŞTIRMAZ (boşluk soyulur: eşik harf/rakam sayar)', () => {
+    expect(S.notSayilir(not(`tamam${' '.repeat(20)}`))).toBe(false)
+    expect(S.notSayilir(not(`ta\n\n\t m am${' '.repeat(5)}`))).toBe(false)
+  })
+
+  it.each([
+    ['11 nokta', '.'.repeat(11)],
+    ['sıfır genişlikli boşluk x20', '​'.repeat(20)],
+    ['5 emoji', '😀😀😀😀😀'],
+    ['tire ve işaret', '-----!!!!!?????'],
+  ])('içeriksiz not (%s) not sayılmaz', (_ad, icerik) => {
+    expect(S.notSayilir(not(icerik))).toBe(false)
+  })
+
+  it('Türkçe harfli ve rakamlı gerçek not sayılır', () => {
+    expect(S.notSayilir(not('Teslim: şğüöçı 12345'))).toBe(true)
+  })
+
   it('kira bırakma gibi system satırları not sayılmaz', () => {
     const sistem = not('Claim released: HARITA: is bitti, kira birakiliyor', BUGUN_IKI, 'system')
     expect(S.say([kart('HRT-5', { notes: [sistem] })], GUN).HARITA.notsuz).toEqual(['HRT-5'])
+  })
+
+  it.each(['System', 'system ', ' SYSTEM'])('yazar "%s" de sistem sayılır (boşluk ve büyük harf duyarsız)', (yazar) => {
+    expect(S.notSayilir(not('Claim released: kira birakiliyor', BUGUN_IKI, yazar))).toBe(false)
+  })
+
+  it('null öğeli notes sessizce atlanır, gerçek not yine sayılır', () => {
+    const k = kart('HRT-5b')
+    k.notes = [null as unknown as Not, 5 as unknown as Not, 'metin' as unknown as Not, not(DOLU)]
+    expect(S.say([k], GUN).HARITA.notsuz).toEqual([])
+  })
+
+  it('numara tekil değildir: kart etiketi tam kimliğin ilk 8 karakterini taşır', () => {
+    expect(S.etiket(kart('KTL-9', { id: '3f2a91bc-aaaa-bbbb' }))).toBe('KTL-9 [3f2a91bc]')
+    expect(S.etiket(kart('KTL-9'))).toBe('KTL-9')
+    const s = S.say([kart('KTL-9', { id: '3f2a91bc-aaaa', notes: [] })], GUN)
+    expect(s.HARITA.notsuz).toEqual(['KTL-9 [3f2a91bc]'])
   })
 
   it('"bugün Done" completedAt ile belirlenir: dün Done olup bugün not alan kart SAYILMAZ (sonAnlamli tuzağı)', () => {
@@ -109,10 +166,34 @@ describe('INV-KART-NOT-1 · say (saf işlev)', () => {
     expect(S.say([kart('HRT-7', { status: 'In Review', notes: [] })], GUN)).toEqual({})
   })
 
-  it('completedAt boşsa sonAnlamli ile sayılır ve "tarihsiz" diye İŞARETLENİR', () => {
-    const s = S.say([kart('BLG-4', { completedAt: null, notes: [] })], GUN)
+  it('completedAt ve doneAt ikisi de boşsa sonAnlamli ile sayılır ve "tarihsiz" diye İŞARETLENİR', () => {
+    const s = S.say([kart('BLG-4', { completedAt: null, doneAt: null, notes: [] })], GUN)
     expect(s.HARITA).toEqual({ done: ['BLG-4'], notsuz: ['BLG-4'], kanitsiz: [], tarihsiz: ['BLG-4'] })
-    expect(S.satirlar(s, GUN)[0]).toContain('completedAt yok')
+    expect(S.satirlar(s, GUN)[0]).toContain('Done tarihi yok')
+  })
+
+  it('ARŞİVLİ kart (completedAt boş): Done günü doneAt (olay kaydı) ile belirlenir, sonAnlamli ile DEĞİL', () => {
+    // BLG-4 örneği: 10-08'de Done'a taşındı; 10-09'da düşülen not kartı bugüne ATLATMAMALI (doğrulayıcı bulgusu B1a)
+    const arsivli = kart('BLG-4', { completedAt: null, doneAt: DUN_IKI, sonAnlamli: BUGUN_IKI, notes: [not(DOLU)] })
+    expect(S.say([arsivli], GUN)).toEqual({})
+    // aynı kart dünün sayımında görünür; notu BUGÜN yazıldığı için dünün sayımında notsuz kalır (gecikmiş not kırmızıyı silmez)
+    const dun = S.say([arsivli], '2026-10-08')
+    expect(dun.HARITA).toEqual({ done: ['BLG-4'], notsuz: ['BLG-4'], kanitsiz: [], tarihsiz: [] })
+  })
+
+  it('doneAt bugünse tarihsiz DEĞİL ve notsuz yakalanır', () => {
+    const s = S.say([kart('KTL-9', { completedAt: null, doneAt: BUGUN_IKI, notes: [] })], GUN)
+    expect(s.HARITA).toEqual({ done: ['KTL-9'], notsuz: ['KTL-9'], kanitsiz: [], tarihsiz: [] })
+  })
+
+  it('completedAt doneAt\'ten önceliklidir', () => {
+    const k = kart('HRT-14', { completedAt: DUN_IKI, doneAt: BUGUN_IKI })
+    expect(S.say([k], GUN)).toEqual({})
+  })
+
+  it('SESSİZ KAÇAK sınırı: eski kart bugün arşive taşınıp olay kaydı yoksa (completedAt+doneAt boş, not yok) sayaçta görünmez — belgelenmiş sınır', () => {
+    const k = kart('REC-1', { completedAt: null, doneAt: null, sonAnlamli: DUN_IKI, notes: [] })
+    expect(S.say([k], GUN)).toEqual({})
   })
 
   it('şeritler ayrı sayılır', () => {
@@ -136,19 +217,34 @@ describe('INV-KART-NOT-1 · say (saf işlev)', () => {
 })
 
 describe('INV-KART-NOT-1 · kanıt izi (v2)', () => {
-  it.each(['Teslim → docs/standards/x.md', 'KANIT: gh pr checks 1786 yeşil', 'PR #1786 birleşti', 'PR 1786 birleşti', 'commit 17c2f5f69 master\'da'])(
-    '"%s" kanıt izi sayılır',
-    (c) => {
-      expect(S.kanitVar({ content: c })).toBe(true)
-    },
-  )
+  it.each([
+    'Teslim → docs/standards/x.md',
+    'KANIT: gh pr checks 1786 yeşil',
+    'Kanıt: gh pr checks yeşil',
+    'kanit: test 48/48',
+    'PR #1786 birleşti',
+    'PR 1786 birleşti',
+    "commit 17c2f5f69 master'da",
+  ])('"%s" kanıt izi sayılır', (c) => {
+    expect(S.kanitVar({ content: c })).toBe(true)
+  })
 
-  it.each(['Bitti, her şey tamam görünüyor.', 'deadbeef gibi rakamsız onaltılı sözcük kanıt değildir', 'Çalışıyor diye düşünüyorum yani.'])(
-    '"%s" kanıt izi DEĞİLDİR',
-    (c) => {
-      expect(S.kanitVar({ content: c })).toBe(false)
-    },
-  )
+  it.each([
+    'Bitti, her şey tamam görünüyor.',
+    'deadbeef gibi rakamsız onaltılı sözcük kanıt değildir',
+    'Çalışıyor diye düşünüyorum yani.',
+    'kanitsiz teslim edildi, düzeltiyorum',
+    'tarih 20261009 yazildi',
+    'dosya #12 incelendi',
+    '1234567 yalnız rakam, onaltılı sözcük değil',
+  ])('"%s" kanıt izi DEĞİLDİR (yanlış pozitif tuzağı)', (c) => {
+    expect(S.kanitVar({ content: c })).toBe(false)
+  })
+
+  it('iki notlu kartta biri kanıtlıysa kart kanıtsız SAYILMAZ (some, every değil)', () => {
+    const k = kart('HRT-15', { notes: [not('Bitti, her şey tamam görünüyor.'), not('KANIT: gh pr checks 1786 yeşil')] })
+    expect(S.say([k], GUN).HARITA.kanitsiz).toEqual([])
+  })
 
   it('kanıtsız not varsayılanda yalnız raporlanır (çıkış 0), --kanit-zorunlu ile eksik sayılır (çıkış 1)', () => {
     const s = S.say([kart('HRT-11', { notes: [not('Bitti, her şey tamam görünüyor.')] })], GUN)
@@ -220,17 +316,48 @@ describe('INV-KART-NOT-1 · komut satırı', () => {
     expect(cli('--dosya', f, '--gun', GUN, '--kanit-zorunlu').kod).toBe(1)
   })
 
-  it.each([
-    ['dosya yok', ['--dosya', 'yok-boyle-bir-dosya.json', '--gun', GUN]],
-    ['bozuk JSON', ['--dosya', '@bozuk', '--gun', GUN]],
-    ['kayitlar[] yok', ['--dosya', '@sema', '--gun', GUN]],
-    ['gün biçimi bozuk', ['--dosya', '@sema', '--gun', '09.10.2026']],
-    ['bilinmeyen argüman', ['--hepsi']],
-  ])('ölçülemeyen hal sessiz geçmez: %s → çıkış 2', (_ad, args) => {
-    const cozulmus = args.map((a) => (a === '@bozuk' ? yaz('bozuk.json', '{ yarım') : a === '@sema' ? yaz('sema.json', { baska: [] }) : a))
-    const r = cli(...cozulmus)
+  const hatali: Record<string, () => string[]> = {
+    'dosya yok': () => ['--dosya', 'yok-boyle-bir-dosya.json', '--gun', GUN],
+    'bozuk JSON': () => ['--dosya', yaz('bozuk.json', '{ yarım'), '--gun', GUN],
+    'kayitlar[] yok': () => ['--dosya', yaz('sema.json', { baska: [] }), '--gun', GUN],
+    'kayitlar[] BOŞ (ölçülemedi, temiz değil)': () => ['--dosya', yaz('bos.json', { kayitlar: [] }), '--gun', GUN],
+    'veride hiç Done kartı yok (durum eşlemesi bozuk olabilir)': () => [
+      '--dosya',
+      yaz('done-yok.json', { kayitlar: [kart('HRT-1', { status: 'Todo' }), kart('HRT-2', { status: '?' })] }),
+      '--gun',
+      GUN,
+    ],
+    'BAYAT dosya (damga istenen günden eski)': () => [
+      '--dosya',
+      yaz('bayat.json', { damga: '2026-10-01T09:00:00Z', kayitlar: [kart('HRT-1')] }),
+      '--gun',
+      GUN,
+    ],
+    'kayıt olmayan öğe (null)': () => ['--dosya', yaz('null-kayit.json', { kayitlar: [null, kart('HRT-1')] }), '--gun', GUN],
+    '--dosya değersiz (canlıya SESSİZCE düşmez)': () => ['--dosya'],
+    '--dosya yanında başka bayrak': () => ['--dosya', '--json'],
+    '--gun değersiz': () => ['--gun'],
+    'gün biçimi bozuk': () => ['--dosya', yaz('sema2.json', { kayitlar: [kart('HRT-1')] }), '--gun', '09.10.2026'],
+    'takvimde olmayan gün': () => ['--dosya', yaz('sema3.json', { kayitlar: [kart('HRT-1')] }), '--gun', '2026-13-45'],
+    'bilinmeyen argüman': () => ['--hepsi'],
+  }
+  it.each(Object.keys(hatali))('ölçülemeyen hal sessiz geçmez: %s → çıkış 2', (ad) => {
+    const r = cli(...hatali[ad]())
     expect(r.kod, r.cikti).toBe(2)
-    expect(r.cikti).toContain('HATA:')
+    expect(r.cikti).toContain('HATA')
+  })
+
+  it('damga istenen günle AYNI ya da sonrası ise bayat sayılmaz', () => {
+    const f = yaz('taze.json', { damga: '2026-10-09T15:48:51Z', kayitlar: [kart('HRT-1')] })
+    expect(cli('--dosya', f, '--gun', GUN).kod).toBe(0)
+    expect(cli('--dosya', f, '--gun', '2026-10-08').kod).toBe(0)
+  })
+
+  it('bilinmeyen Kanban kolonundaki kart sayımı bozmaz ama stderr\'e UYARI yazılır', () => {
+    const f = yaz('kolon.json', { kayitlar: [kart('HRT-1'), kart('HRT-2', { status: '?' })] })
+    const r = cli('--dosya', f, '--gun', GUN)
+    expect(r.kod, r.cikti).toBe(0)
+    expect(r.cikti).toContain('UYARI: 1 kart bilinmeyen Kanban kolonunda')
   })
 
   it('notes alanı olmayan dışa aktarım (--tam unutulmuş) çıkış 2 verir', () => {
@@ -240,5 +367,102 @@ describe('INV-KART-NOT-1 · komut satırı', () => {
     const r = cli('--dosya', f, '--gun', GUN)
     expect(r.kod, r.cikti).toBe(2)
     expect(r.cikti).toContain('--tam')
+  })
+
+  it('kayıt biçimi bozuksa beklenmeyen istisna "notsuz var" (1) ile KARIŞMAZ: çıkış 2', () => {
+    const f = yaz('bozuk-not.json', { kayitlar: [kart('HRT-1', { notes: 'metin' as unknown as Not[] })] })
+    const r = cli('--dosya', f, '--gun', GUN)
+    expect(r.kod, r.cikti).toBe(2)
+  })
+})
+
+/**
+ * CANLI YOL (--dosya OLMADAN): betik kanban_disa_aktar.py'yi --tam ile çağırır ve "bugün" TR gününden gelir. Gerçek panoya DOKUNMAZ:
+ * VENTHUB_KANBAN_DB ile sahte bir pano dosyası (python stdlib sqlite3) gösterilir. Bu paket üç şeyi sabitler: --tam bayrağı canlı yolda
+ * gerçekten geçiyor (yoksa notes eksik, çıkış 2), varsayılan gün bugün, ve ARŞİVLİ Done kartı (completedAt boş) olay kaydından tarihleniyor.
+ */
+describe('INV-KART-NOT-1 · canlı yol (sahte pano dosyası, VENTHUB_KANBAN_DB)', () => {
+  const pythonBul = (): string | null => {
+    for (const ad of ['python', 'python3']) {
+      const r = spawnSync(ad, ['--version'], { encoding: 'utf8' })
+      if (r.status === 0 && /Python 3\./.test(`${r.stdout}${r.stderr}`)) return ad
+    }
+    return null
+  }
+  const PY = pythonBul()
+  let dizin = ''
+  const simdi = new Date().toISOString()
+  const dun = new Date(Date.now() - 36 * 3600 * 1000).toISOString()
+
+  type Gorev = { id: string; title: string; columnId: string; status: string; createdAt: string; completedAt?: string; notes?: Not[] }
+  const kur = (ad: string, gorevler: Gorev[], olaylar: unknown[]): string => {
+    const yol = path.join(dizin, `${ad}.sqlite`)
+    const girdi = path.join(dizin, `${ad}.json`)
+    fs.writeFileSync(girdi, JSON.stringify({ pano: { title: 'VentHub HARİTA', tasks: gorevler }, olaylar }), 'utf8')
+    const betik = [
+      'import json, sqlite3, sys',
+      'd = json.load(open(sys.argv[2], encoding="utf-8"))',
+      'c = sqlite3.connect(sys.argv[1])',
+      'c.execute("create table kanban_boards (id text, payload text, revision integer, updated_at text)")',
+      'c.execute("create table kanban_events (seq integer primary key autoincrement, board_id text not null, payload text not null)")',
+      'c.execute("insert into kanban_boards values (?,?,?,?)", ("0", json.dumps(d["pano"], ensure_ascii=False), 1, ""))',
+      'for e in d["olaylar"]:',
+      '    c.execute("insert into kanban_events (board_id, payload) values (?,?)", ("0", json.dumps(e, ensure_ascii=False)))',
+      'c.commit()',
+    ].join('\n')
+    const k = path.join(dizin, `${ad}.py`)
+    fs.writeFileSync(k, betik, 'utf8')
+    const r = spawnSync(PY as string, [k, yol, girdi], { encoding: 'utf8' })
+    expect(r.status, r.stderr).toBe(0)
+    return yol
+  }
+  const canli = (db: string, ...a: string[]) => {
+    const r = spawnSync(process.execPath, [BETIK, ...a], {
+      encoding: 'utf8',
+      env: { ...process.env, VENTHUB_KANBAN_DB: db, PYTHONIOENCODING: 'utf-8' },
+    })
+    return { kod: r.status, cikti: `${r.stdout}${r.stderr}`, stdout: r.stdout }
+  }
+  const dolu: Not = { author: 'HARITA', content: 'Teslim: PR #1786 birleşti; iki satır özet.', createdAt: simdi }
+  const tasindi = (id: string, ts: string) => ({ type: 'task.moved', taskId: id, ts, after: { columnId: 'done' } })
+
+  beforeAll(() => {
+    expect(PY, 'python bulunamadı: kapı atlanmaz, kırmızı verir').not.toBeNull()
+    dizin = fs.mkdtempSync(path.join(os.tmpdir(), 'kart-not-canli-'))
+  })
+  afterAll(() => {
+    if (dizin) fs.rmSync(dizin, { recursive: true, force: true })
+  })
+
+  it('bugün Done olan kart notlu: varsayılan gün, --tam bayrağı ve canlı yol çalışır (çıkış 0)', () => {
+    const db = kur('temiz', [{ id: 'aaaaaaaa-1', title: 'HRT-90 · notlu', columnId: 'done', status: 'completed', createdAt: dun, completedAt: simdi, notes: [dolu] }], [])
+    const r = canli(db)
+    expect(r.kod, r.cikti).toBe(0)
+    expect(r.stdout).toContain('HARITA: Done(bugün) 1, notsuz 0')
+  })
+
+  it('SABOTAJ: aynı panoda notu silinmiş kart çıkış 1 verir ve kimliğiyle anılır', () => {
+    const db = kur('sabotaj', [{ id: 'bbbbbbbb-2', title: 'HRT-91 · notsuz', columnId: 'done', status: 'completed', createdAt: dun, completedAt: simdi, notes: [] }], [])
+    const r = canli(db)
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.stdout).toContain('notsuz 1: HRT-91 [bbbbbbbb]')
+  })
+
+  it('ARŞİVLİ Done kartı (completedAt boş): olay kaydındaki taşınma anından tarihlenir ve notsuzsa yakalanır', () => {
+    const db = kur('arsivli', [{ id: 'cccccccc-3', title: 'HRT-92 · arşivli', columnId: 'done', status: 'archived', createdAt: dun, notes: [] }], [tasindi('cccccccc-3', simdi)])
+    const r = canli(db)
+    expect(r.kod, r.cikti).toBe(1)
+    expect(r.stdout).toContain('notsuz 1: HRT-92 [cccccccc]')
+    expect(r.stdout).not.toContain('Done tarihi yok')
+  })
+
+  it('ARŞİVLİ kart dün taşındıysa bugünün sayımına girmez (bugün düşülen not onu bugüne atlatmaz)', () => {
+    const db = kur('arsivli-dun', [
+      { id: 'dddddddd-4', title: 'HRT-93 · dün arşivlendi', columnId: 'done', status: 'archived', createdAt: dun, notes: [dolu] },
+      { id: 'eeeeeeee-5', title: 'HRT-94 · bugün', columnId: 'done', status: 'completed', createdAt: dun, completedAt: simdi, notes: [dolu] },
+    ], [tasindi('dddddddd-4', dun)])
+    const r = canli(db)
+    expect(r.kod, r.cikti).toBe(0)
+    expect(r.stdout).toContain('Done(bugün) 1, notsuz 0')
   })
 })
