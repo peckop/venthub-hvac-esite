@@ -53,7 +53,7 @@ CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: t
 
 ## Çalışma düzeni
 - Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).
-- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM + KAYNAK/CETVEL. Linear donuk (karar 219): yeni kayıt açılmaz.
+- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM + KAYNAK/CETVEL. Linear iş kaydı olarak emekli (karar 324): yeni kayıt açılmaz.
 - PR gövdesi `Kanban: <numara>` taşır (karar 324: Linear iş kaydı olarak emekli; `Fixes REC-nn` ve `Kayıtsız:` yolları 10-08'de kapandı); çok PR'lık iş her biri tek PR'la biten alt kartlara bölünür; kartsız iş yok, önce kart açılır.
 - Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa kapı durdurur); dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).
 - Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.
