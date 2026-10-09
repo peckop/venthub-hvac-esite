@@ -20,7 +20,8 @@
  *   ACIKLAMA-KESIK/SABLON/KISA 5 · LANG 6 · FAVICON 2 · LASTMOD-BUGUN 42 · LASTMOD-TOPLU 29 · ROBOTS-KALIP 15 (44) ·
  *   SOFT404 1 (54) · IC-BAGLANTI-YONLENDIRME 12 · YONLENDIRME-ZINCIRI 14 · JSONLD-* 66/18/17/58/59/20/62 ·
  *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse) ·
- *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse).
+ *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse) ·
+ *   SPEC-HAM-DEGER (ek, URN-58: teknik tablo hücresinin görünür metni tam `true`/`false` ise).
  *
  * Kullanım: node scripts/seo/canli-kapi.mjs [--taban https://venthub.com.tr] [--cikti <depo dışı klasör>]
  *           [--bilinen <json>] [--kayit-durum <json>] [--bugun YYYY-MM-DD]
@@ -74,6 +75,7 @@ export const KURAL_NO = {
   'LLMS-SAYFA': '-',
   'LLMS-DIL': '-',
   'VITRIN-IDDIA': '-',
+  'SPEC-HAM-DEGER': '-',
 }
 const KOD_SIRASI = Object.keys(KURAL_NO)
 
@@ -342,6 +344,42 @@ function vitrinIddiaKontrolu(sayfalar, cikti) {
   }
 }
 
+/**
+ * SPEC-HAM-DEGER (URN-58, karar 298): teknik tablo hücresinde ham makine değeri. Mantıksal özellik ("Zamanlayıcı",
+ * "ErP Uyumlu", "Higrostat") sözlükten "Var/Yok" ("Yes/No") basılır; görünen metni TAM OLARAK `true` ya da `false`
+ * olan bir hücre, biçimlendiricinin dil bilmeden `String(value)` bastığı eski hâlin izidir (canlıda Lineo Quiet
+ * ailesinde ölçüldü: gövde çift olduğu için her alan iki kez). Hücre = alt öğesi olmayan öğe (`<span>`, `<td>`, `<dd>`,
+ * `<div>` …); yorum/script/style/template atılır, yani JSON-LD ve RSC yükündeki `true` sayılmaz. Kod gösteren öğeler
+ * (`code`, `pre`, `kbd`, `samp`) ve cümle içinde geçen sözcük sayılmaz. Büyük/küçük harf duyarlıdır: ham değer
+ * küçük harftir, "True" yazılmış metin editoryal içeriktir. Çıktı sayfa başına TEK bulgu (hücre sayısı + etiket=değer).
+ */
+const KOD_OGELERI = new Set(['code', 'pre', 'kbd', 'samp'])
+const HAM_DEGER_HUCRESI = /<([a-zA-Z][a-zA-Z0-9-]*)(?=[\s/>])(?:[^>"']|"[^"]*"|'[^']*')*>\s*(true|false)\s*<\/\1\s*>/g
+
+/** Ham HTML → [{ deger, etiket }]; `etiket` hücreden hemen önceki kapanan öğenin metni (yoksa '?'). */
+export function hamDegerHucreleri(html) {
+  const temiz = temizle(html)
+  const bulunan = []
+  for (const m of temiz.matchAll(HAM_DEGER_HUCRESI)) {
+    if (KOD_OGELERI.has(m[1].toLowerCase())) continue
+    const once = temiz.slice(Math.max(0, m.index - 400), m.index)
+    const etiket = />([^<>]{1,80})<\/[a-zA-Z][a-zA-Z0-9-]*\s*>\s*$/.exec(once)
+    bulunan.push({ deger: m[2], etiket: etiket ? bosluksuz(etiket[1]) || '?' : '?' })
+  }
+  return bulunan
+}
+
+function specHamDegerKontrolu(sayfalar, cikti) {
+  for (const s of sayfalar) {
+    if (s.html == null) continue
+    const hucreler = hamDegerHucreleri(s.html)
+    if (hucreler.length === 0) continue
+    const ozet = [...new Set(hucreler.map((h) => `${h.etiket}=${h.deger}`))].slice(0, 6).join(', ')
+    cikti.push(bulgu('SPEC-HAM-DEGER', 'KIRMIZI', s.yol,
+      `${hucreler.length} teknik tablo hücresinde ham makine değeri (${ozet}); doğrusu sözlükten "Var/Yok" ("Yes/No") — formatSpecValue, URN-58`))
+  }
+}
+
 const metinBaytlari = (b) => [...(b || [])].slice(0, 24).map((x) => (x >= 32 && x < 127 ? String.fromCharCode(x) : '.')).join('')
 const ICO = [0, 0, 1, 0]
 const PNG = [0x89, 0x50, 0x4e, 0x47]
@@ -522,6 +560,7 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   yonlendirmeKontrolleri(tamam, ek, taban, cikti)
   jsonldKontrolleri(tamam, cikti)
   vitrinIddiaKontrolu(tamam, cikti)
+  specHamDegerKontrolu(tamam, cikti)
   for (const s of harita.satirlar) {
     if (s.changefreq) cikti.push(bulgu('ROBOTS-HARITA-ALAN', 'UYARI', s.loc, `<changefreq>${s.changefreq}</changefreq>: Google yok sayar (kod anahtarı yanlış, REC-498)`))
   }

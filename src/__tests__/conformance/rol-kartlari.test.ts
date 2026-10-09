@@ -54,17 +54,21 @@ type Uretici = {
   gorevEksikRoller: () => string[]
   isAkisiMetinleri: (kok: string) => string[]
   AMAC_SINIRI: number
-  haritaOzet: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][]) => string
-  haritaDosyasi: (roller?: Record<string, unknown>, tablo?: string[][]) => string
-  haritaSorunlari: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][]) => string[]
+  haritaOzet: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][], planli?: Record<string, Planli>) => string
+  haritaDosyasi: (roller?: Record<string, unknown>, tablo?: string[][], planli?: Record<string, Planli>) => string
+  haritaSorunlari: (roller?: Record<string, unknown>, kisa?: Record<string, string[]>, tablo?: string[][], planli?: Record<string, Planli>) => string[]
   terminaldenAcilir: (ad: string, tablo?: string[][]) => boolean
   HARITA_DOSYASI: string
   HARITA_KISA: Record<string, string[]>
+  PLANLI: Record<string, Planli>
   HARITA_OZET_SINIRI: number
   HARITA_ISARETCISI: string
   DURUM_SATIRI_KURALI: string
   CALISMA: string
 }
+
+/** HRT-35: kurulması planlı ama kapalı departman (rol kartı yok, haritada görünür). */
+type Planli = { gorev: string; alan: string; durum: string }
 
 type Gorev = {
   gorev: string
@@ -87,6 +91,8 @@ const BEKLENEN_ROLLER = [
   'OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'ADMIN', 'KATALOG', 'GEO-SEO', 'BLOG', 'MARKA',
   // REC-522: kartı olmayan altı departman (OPS kararı 2026-09-30).
   'MEVZUAT', 'SATIS', 'TASARIM', 'EDGE', 'I18N', 'YETENEK',
+  // HRT-35 (karar 322, OPS-93): tek işi takip olan etkin departman. MÜHENDİSLİK planlı/kapalı olduğu için burada DEĞİL (PLANLI).
+  'TAKIP',
 ]
 
 describe('INV-ROL-1 — rol kartı üreticisi ayırt edici', () => {
@@ -273,7 +279,7 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   const uretilen = uretici.uret()
   const kuralMetinleri = uretici.uretKurallar()
 
-  it('beklenen 16 rolün hepsi var, fazlası yok', () => {
+  it('beklenen 17 rolün hepsi var, fazlası yok', () => {
     expect(Object.keys(uretilen).sort()).toEqual([...BEKLENEN_ROLLER].sort())
   })
 
@@ -444,12 +450,57 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(fs.existsSync(path.join(KOK, 'docs/olcum/erisim-envanteri.md'))).toBe(true)
   })
 
-  it('karar 219: her kartta PR gövdesi `Kanban: <numara>` taşır, geçiş penceresinde Fixes de kabul, istisna yalnız Kayıtsız: <sebep>', () => {
+  // Karar 324 (2026-10-08): Linear iş kaydı olarak emekli; eski yollar (`Fixes REC-nn`, `Kayıtsız:`) kapıda KIRMIZI verir
+  // (scripts/board/pr-kayit-kapisi.cjs ESKI_YOL_SON_GUN). Kart bunları "kabul" diye ANMAZ; yalnız kapandıklarını söyler.
+  it('karar 324: her kartta PR gövdesi `Kanban: <numara>` taşır, eski yollar kapandı, kartsız iş yok', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('PR gövdesi `Kanban: <numara>`')
-      expect(metin, ad).toContain('`Fixes REC-nn` de kabul')
-      expect(metin, ad).toContain('`Kayıtsız: <sebep>`')
+      expect(metin, ad).toContain('yolları 10-08\'de kapandı')
+      expect(metin, ad).toContain('kartsız iş yok, önce kart açılır')
+      expect(metin, ad).not.toContain('`Fixes REC-nn` de kabul')
+      expect(metin, ad).not.toContain('yalnız `Kayıtsız: <sebep>`')
     }
+  })
+
+  it('karar 324: kartlarda ve cetvelde "deneme / 10-08\'e kadar" geçiş cümlesi canlı kural olarak kalmadı', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) expect(metin, ad).not.toMatch(/10-08'e kadar|deneme boyunca/i)
+    const cetvel = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'is-kayit-duzeni-standard.md'), 'utf8')
+    expect(cetvel).not.toMatch(/10-08'e kadar|DENEME BOYUNCA|Geçiş penceresi \(/)
+    expect(cetvel).toContain('karar 324')
+    expect(cetvel).toContain('| TAKIP (karar 322) | `TKP` | `TKP-1` |')
+  })
+
+  // HRT-36 (Recep emri, OPS aktardı 10-09): son 7 günde sage'e 5 kayıt, hiçbirinde departman etiketi yok, bugün 0.
+  // Ders satırı rol etiketini ve gün sonu sayısını ister; Kanban satırı sütun/status/not/kanıt dörtlüsünü ister.
+  const HRT36_SAGE = ['`wrongstack-sage remember`', '`audience.roles=[<ROL>]`', 'tags [rol, ders]', '"sage\'e bugün N ders"']
+  const HRT36_KANBAN = ['Kanban: her iş bir kart', 'sütun ve status birlikte değişir', 'her adımda not düşülür', 'Done yalnız kanıtla']
+  // Üçüncü ortak satır (Recep 10-09 12:3x, OPS aktardı): olgu resmî kaynaktan alınır, kaynakta birebir yoksa yazılmaz.
+  // Kuralın metni tek yerde durur (rehber-yazisi-standard R2.3); kartta yalnız atıf var, kural ikinci kez yazılmaz.
+  const HRT36_OLGU = ['OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı)', 'resmî kaynaktan al', 'kaynakta birebir yoksa yazılmaz', 'yapay zekâ özeti kanıt değildir', '`rehber-yazisi-standard.md` R2.3']
+  const HRT36_HEPSI = [...HRT36_SAGE, ...HRT36_KANBAN, ...HRT36_OLGU]
+
+  it('HRT-36: her kartta sage anında ders, Kanban sütun/status/not/kanıt ve resmî kaynak olgu satırı var', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      for (const parca of HRT36_HEPSI) expect(metin, `${ad}: ${parca}`).toContain(parca)
+    }
+  })
+
+  it('HRT-36 atıf geçerli: kartın R2.3 dediği madde cetvelde gerçekten var', () => {
+    const rehber = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'rehber-yazisi-standard.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(rehber).toMatch(/^### R2\.3 /m)
+  })
+
+  it('HRT-36 kolu ayırt edici: etiketsiz ders, sütunsuz Kanban ya da kaynaksız olgu satırı bozuk kopyada yakalanır', () => {
+    const eksik = (m: string) => HRT36_HEPSI.some((p) => !m.includes(p))
+    const sagesiz = Object.values(uretilen)[0].replace('`audience.roles=[<ROL>]`', '')
+    const sutunsuz = Object.values(uretilen)[0].replace('sütun ve status birlikte değişir', '')
+    const kaynaksiz = Object.values(uretilen)[0].replace('kaynakta birebir yoksa yazılmaz', '')
+    const atifsiz = Object.values(uretilen)[0].replace('`rehber-yazisi-standard.md` R2.3', '')
+    expect(eksik(sagesiz)).toBe(true)
+    expect(eksik(sutunsuz)).toBe(true)
+    expect(eksik(kaynaksiz)).toBe(true)
+    expect(eksik(atifsiz)).toBe(true)
+    for (const ad of Object.keys(uretilen)) expect(eksik(uretilen[ad]), ad).toBe(false)
   })
 
   it('karar 219/220: hiçbir kart Linear\'ı iş kaydı olarak şart koşmaz; numara biçimi <KISA AD>-<sayı>', () => {
@@ -685,7 +736,7 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     }
   })
 
-  it('kısa özet ≤ 2 KB, 16 departmanı ve her satırda açılış harfini (M ya da M/T) taşır', () => {
+  it('kısa özet ≤ 2 KB, 17 etkin departmanı ve her satırda açılış harfini (M ya da M/T) taşır', () => {
     expect(Buffer.byteLength(ozet, 'utf8')).toBeLessThanOrEqual(uretici.HARITA_OZET_SINIRI)
     for (const ad of roller) {
       const satir = ozet.split('\n').find((l) => l.startsWith(`${ad} · `))
@@ -704,7 +755,7 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
       const tanindi = !/rol taninmiyor/.test(`${r.stdout}${r.stderr}`)
       expect(uretici.terminaldenAcilir(ad), `${ad}: harita T=${uretici.terminaldenAcilir(ad)} ama departman-ac tanıma=${tanindi}`).toBe(tanindi)
     }
-  }, 60_000)
+  }, 180_000)
 
   it('OPS kartı yalnız işaretçiyi taşır (tam harita kartta değil), diğer kartlarda işaretçi yok', () => {
     const kartlar = uretici.uret()
@@ -746,6 +797,42 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
     const ropy = JSON.parse(JSON.stringify(uretici.ROLLER)) as Record<string, { dosyalar: string }>
     ropy.ADMIN.dosyalar = ropy.ADMIN.dosyalar.replace(/src\/views\/admin\/\*\*/g, 'src/views/yonetim/**')
     expect(uretici.haritaSorunlari(ropy).join('\n')).toMatch(/ADMIN kısa dosya alanı "views\/admin" kart Dosyalar metninde yok/)
+  })
+
+  // HRT-35 (karar 315, OPS-92): planlı ama KAPALI departman rol kartı olmaz; yine de haritada görünür ki iş yazılmasın.
+  it('PLANLI: MÜHENDİSLİK haritada "açılış yok" satırıyla görünür, rol kartı ve açılış harfi yoktur', () => {
+    expect(Object.keys(uretici.PLANLI)).toEqual(['MÜHENDİSLİK'])
+    expect(roller).not.toContain('MÜHENDİSLİK')
+    const satir = ozet.split('\n').find((l) => l.startsWith('MÜHENDİSLİK · '))
+    expect(satir, 'MÜHENDİSLİK satırı özette yok').toBeTruthy()
+    expect(satir as string).toMatch(/PLANLI, KAPALI/)
+    expect(satir as string).toMatch(/ · açılış yok$/)
+    expect(satir as string).not.toMatch(/ · (M\/T|M)$/)
+    const tam = uretici.haritaDosyasi()
+    expect(tam).toMatch(/\| MÜHENDİSLİK \(planlı, kapalı\) \|.*hvac_solver_core\.py.*ductFanSelection\.ts.*\| açılış yok: /)
+    expect(uretici.terminaldenAcilir('MÜHENDİSLİK')).toBe(false)
+    expect(fs.existsSync(path.join(KOK, 'docs', 'roller', 'MUHENDISLIK.md'))).toBe(false)
+  })
+
+  it('PLANLI: TAKİP etkin departmandır (M/T), rol kartı ve kurallar dosyası vardır', () => {
+    const satir = ozet.split('\n').find((l) => l.startsWith('TAKIP · '))
+    expect(satir as string).toMatch(/ · M\/T$/)
+    expect(uretici.terminaldenAcilir('TAKIP')).toBe(true)
+    for (const dosya of ['TAKIP.md', 'TAKIP-kurallar.md']) expect(fs.existsSync(path.join(KOK, 'docs', 'roller', dosya)), dosya).toBe(true)
+  })
+
+  it('AYIRT EDİCİLİK: planlı satır silinirse özet ve tam harita değişir; alanı eksik, kartı da olan ya da tabloya girmiş planlı departman yakalanır', () => {
+    expect(uretici.haritaSorunlari()).toEqual([])
+    expect(uretici.haritaOzet(undefined, undefined, undefined, {})).not.toBe(uretici.haritaOzet())
+    expect(uretici.haritaDosyasi(undefined, undefined, {})).not.toBe(uretici.haritaDosyasi())
+    const ad = 'MÜHENDİSLİK'
+    const p = uretici.PLANLI[ad]
+    expect(uretici.haritaSorunlari(undefined, undefined, undefined, { [ad]: { ...p, alan: '' } }).join('\n')).toMatch(/planlı MÜHENDİSLİK için görev\/alan\/durum eksik/)
+    expect(uretici.haritaSorunlari(undefined, undefined, undefined, { [ad]: { ...p, durum: 'açık' } }).join('\n')).toMatch(/durumu "planlı, kapalı" ile başlamalı/)
+    // rol kartı açılmışsa (ROLLER'de) artık planlı değildir
+    expect(uretici.haritaSorunlari(undefined, undefined, undefined, { ARAC: { ...p } }).join('\n')).toMatch(/ARAC hem planlı hem rol kartı var/)
+    // pencere adı tablosuna girmişse (departman-ac açabilir) kapalı değildir
+    expect(uretici.haritaSorunlari(undefined, undefined, [[ad, 'Muhendislik']], undefined).join('\n')).toMatch(/planlı MÜHENDİSLİK pencere adı tablosunda/)
   })
 
   it('AYIRT EDİCİLİK: OPS kartından işaretçi silinirse kart denetimi yakalar', () => {

@@ -57,6 +57,17 @@ export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
     title: "VentHub - Endüstriyel Havalandırma",
     description: "Türkiye'nin En Büyük B2B HVAC ve Endüstriyel Fan Platformu",
+    // REC-491: ikon HTML'e bağlı değildi, /favicon.ico dosyası aslında SVG'ydi; arama motoru site
+    // ikonunu bulamıyordu. Üç biçim: SVG (modern tarayıcı), 48x48 PNG (Google'ın istediği 48'in
+    // katı), gerçek ICO (adres çubuğu yedeği) + iOS ana ekranı için 180x180.
+    icons: {
+        icon: [
+            { url: '/favicon.svg', type: 'image/svg+xml' },
+            { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+            { url: '/favicon.ico', sizes: '48x48' },
+        ],
+        apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    },
     openGraph: {
         title: "VentHub - Endüstriyel Havalandırma",
         description: "Türkiye'nin En Büyük B2B HVAC ve Endüstriyel Fan Platformu",

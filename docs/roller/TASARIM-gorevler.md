@@ -1,0 +1,18 @@
+# DÜZENLİ GÖREVLER: TASARIM
+
+> Üretilmiştir (`scripts/belge/rol-karti-uret.cjs`, veri: `scripts/belge/rol-gorevleri.json`); elle düzenleme. Yöneten cetvel: `docs/standards/duzenli-gorevler-standard.md`. Rol kartı: `docs/roller/TASARIM.md`.
+
+## Amaç
+Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.
+
+## Görevler
+| Görev | Sıklık | Tetik | Bağlı mı | Çıktı | Eşik |
+|---|---|---|---|---|---|
+| Token, palet ve görünüm kapılarını her değişiklikte koştur: marka paleti (INV-PALET-1), Tailwind sınıf geçerliliği ve AA kontrast, storefront stil çıtası, admin tema değişmezleri, görünüm anahtarı testi | her dağıtım | Actions: .github/workflows/ci.yml pull_request ve master push'ta koşar | evet | Kırmızı test PR'ı kilitler; kusur PR sahibine ve ilgili Kanban kartına | Düşen test 0 (merge ritüeli) |
+| Erişilebilirlik tabanı: ana sayfa TR 390 px axe taraması tabandan artmaz (e2e/axe-anasayfa.e2e.ts, INV-AXE-1; kapı sahibi ALTYAPI) | her dağıtım | Actions: .github/workflows/e2e-smoke.yml pull_request ve master push'ta koşar; playwright e2e/ altındaki axe spec'ini topluyor (testMatch **/*.e2e.ts) | evet | Kırmızı kapı PR'ı kilitler; kusur Kanban kartı | Taban 0 ihlal; color-contrast "karar verilemedi" tavanı 17, artarsa kırmızı (ALTYAPI #1708) |
+| Yeni görünüm bayrağını (YENI_GORUNUM) ya da yazı tipini değiştiren her işte bayrak AÇIK geçici dalla KAPALI dalı kıyasla: erişilebilirlik tabanı, font preload sayımı (M6, Linux/CI), admin ekranı yazı tipi aynı | olay | kart kapısı: scripts/belge/kart-plan-kapisi.cjs'e bu ölçüm satırını istetmek (henüz yok; kuracak: HARİTA) | hayır (kuracak: HARITA) | Ölçüm tablosu PR gövdesine; fark Kanban kartı TASARIM'a, admin farkı ADMIN'e | TASLAK: bayrak kapalıyken fark 0; açıkken preload ve axe tavanını ALTYAPI (M6, M3) belirler, ALTYAPI teyit eder |
+| Tasarım sistemi kopyasının koddaki adlarla eşitliği: Design'daki adlar (bugün 66) ile :root ve Tailwind adlarını karşılaştır (INV-TOKEN-PARITE-1) | her dağıtım | Actions: Design kopyası (ds-kaynak) ve kapı henüz yok; yeni iş akışı ya da ci içinde test olarak kurulacak (kuracak: ALTYAPI) | hayır (kuracak: ALTYAPI) | Eksik ya da değeri farklı ad için Kanban kartı TASARIM'a; Design önerisi "öneri" diye kayda geçer | TASLAK: eksik ve farklı değerli ad 0; ALTYAPI ile teyit |
+| Design'ın yeni yorumunu ve cevabını oku ve kayda geçir (öneri diye işaretle, karar sayma; OPS'a bildir) (`scripts/board/linear-okundu.cjs`) | olay | istem satırı tazelik: scripts/board/linear-yeni-yorum.cjs istem satırındaki "LINEAR: N yeni yorum" satırını üretir ve metni okundu komutunu verir (kanca .claude/hooks/board-brief.cjs, .claude/settings.json'da bağlı); sayaç dört Design projesinin (MENU, KATALOG, MARKA, BELGE) ve ALTYAPI'nın proje yorumlarını sayar, aynı şeridin kendi yorumlarını saymaz | evet | Kanban kartı notu ve OPS'a mesaj; karar OPS'tan | TASLAK: okunmamış Design yorumu 0; süre eşiğini OPS belirler |
+| Yapılan ekranı Design karesiyle yan yana ölç (kare kabul ölçüm satırı, skill venthub-tasarim-dili) | olay | kart kapısı: scripts/belge/kart-plan-kapisi.cjs kare kabul satırını istemiyor (henüz yok; kuracak: HARİTA); bir ekranı değiştiren her PR'da | hayır (kuracak: HARITA) | PR gövdesine kare numarası ve ölçüm satırı; fark Kanban kartı ÜRÜN'e (sayfa) ya da TASARIM'a (token, bileşen) | TASLAK: geçti/kaldı ölçütü venthub-tasarim-dili skill'indeki ölçüm satırıdır; TASARIM teyit eder |
+
+6 görev, tetiğe bağlı 3. Tetiğin kurulmasını bekleyen: HARITA 2 · ALTYAPI 1.
