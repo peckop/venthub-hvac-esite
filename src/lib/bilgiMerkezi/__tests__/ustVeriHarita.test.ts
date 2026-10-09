@@ -95,4 +95,11 @@ describe('makaleJsonLd', () => {
     expect(j.author).toEqual({ '@type': 'Organization', name: 'VentHub', url: SITE_URL })
     expect(j.url).toBe(`${SITE_URL}/tr/bilgi-merkezi/x`)
   })
+
+  // URN-61: Article görsel beyanı yalnız görsel verilince yazılır; boş ya da uydurma `image` olmayan beyandan kötü.
+  it('görsel verilirse image dizisi yazılır, verilmezse alan HİÇ yok', () => {
+    const temel = { baseUrl: SITE_URL, yol: '/tr/bilgi-merkezi/x', baslik: 'X', aciklama: 'Y', dil: 'tr' as const, yayinTarihi: '2026-09-24', guncellemeTarihi: '2026-09-24' }
+    expect(makaleJsonLd({ ...temel, gorsel: `${SITE_URL}/images/og-default.jpg` }).image).toEqual([`${SITE_URL}/images/og-default.jpg`])
+    expect('image' in makaleJsonLd(temel), 'görsel verilmediği hâlde image alanı yazıldı').toBe(false)
+  })
 })
