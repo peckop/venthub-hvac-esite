@@ -1,6 +1,6 @@
 /**
  * INV-HAZIR-OZELLIK-1 — Claude Code'un hazır özelliklerinden KURAL DİZİNİ depoda gerçekten var mı, ajan tanımlarında
- * yazma kapısı ve hafıza kapsamı bozulmamış mı (Kanban OPS-102, 2026-10-09).
+ * yazma kapısı ve hafıza kapsamı bozulmamış mı (Kanban OPS-101, 2026-10-09).
  *
  * NİÇİN VAR: özellik 30 Eylül'de onaylandı ama depoya hiç girmedi; "yapıldı" sanıldı, kanıt aranmadı
  * (`.claude/rules` yoktu, 53 ajan tanımında `memory:` yoktu). Bu kapı kural dosyasını DOSYA olarak ölçer ve geri alınmasını yakalar.

@@ -1,6 +1,6 @@
 # Filo ortak kurallar
 
-Bu dosyada `paths` alanı yoktur; bu yüzden her açılışta diskten yüklenir. Kurulum ve ölçüm kaydı: Kanban OPS-102. Ayrıntı: docs/roller/*-kurallar.md, docs/standards/is-kayit-duzeni-standard.md, docs/standards/execution-method-standard.md ve docs/standards/fleet-mechanism-standard.md.
+Bu dosyada `paths` alanı yoktur; bu yüzden her açılışta diskten yüklenir. Kurulum ve ölçüm kaydı: Kanban OPS-101. Ayrıntı: docs/roller/*-kurallar.md, docs/standards/is-kayit-duzeni-standard.md, docs/standards/execution-method-standard.md ve docs/standards/fleet-mechanism-standard.md.
 
 Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız görev metnindeki kapsama uyar: kart açmaz, Recep'e yazmaz, compact notu üretmez, sage'e yazmaz; dersi ve kanıtı raporunda açana döner.
 
@@ -22,7 +22,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 
 ## İş ve kart
 
-- Her iş bir Kanban kartıdır; numara `<ÖN EK>-<sayı>` biçimindedir (`OPS-102`; Linear'dan taşınan kartta `REC-nn`). Numara pano sayacından alınır, uydurulmaz. Kartsız iş başlatma.
+- Her iş bir Kanban kartıdır; numara `<ÖN EK>-<sayı>` biçimindedir (`OPS-101`; Linear'dan taşınan kartta `REC-nn`). Numara pano sayacından alınır, uydurulmaz. Kartsız iş başlatma.
 - Emri alan müdür kartı kendi panosunda aynı turda aç ve kart numarasını emri verene dön; numarasız emri kabul edilmiş sayma.
 - Her emirde `YÖNTEM:` satırını (önerilen yöntem ve bir cümle gerekçe) ve `KAYNAK/CETVEL:` satırını oku; ikisi yoksa emri eksik say.
 - Yöntemi değiştirirsen işbaşı notuna `YÖNTEM: X yerine Y, çünkü ...` yaz; yazılmamış sapma hatadır.
