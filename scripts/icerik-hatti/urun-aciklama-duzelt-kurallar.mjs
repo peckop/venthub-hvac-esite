@@ -22,9 +22,14 @@
  *   P3e EN dili         : diller 'en' iceriyorsa yeni Turkce harf (çğıöşüÇĞİÖŞÜ) tasimaz.
  *   P4  sonuc bicimi    : (AG ASAMASI, `sonucBicimBozuklugu`) degisimden SONRAKI metinde, ONCEKI metinde olmayan cift
  *                         bosluk / noktalamadan once bosluk / tekrarli noktalama / kenar bosluk → RED (cikis 1).
+ *   K   tam-1 / zaten uygulanmis (AG ASAMASI, `urunPlani`): `eski` alanda TAM 1 kez (overlap'li sayim; 0 ya da 2+ →
+ *                         ATLANDI) ve sonuc P4'ten gecer. `eski` alanda yok VE `yeni` alanda tam 1 kez (ya da `yeni`
+ *                         `eski`yi iceriyor ve alanda tam 1 kez) → "ZATEN UYGULANMIS" (hata degil; ikinci kosum 0 degisiklik).
+ *                         Not: `eski` yanlis yazilmis ama `yeni` metinde baska yerde 1 kez geciyorsa da ayni etiket cikar;
+ *                         bu yuzden etiket yazimdan once insan gozuyle okunan kuru kosum satirinda gorunur.
  * Kapsam: P2/P3 yalniz `yeni` dizgesini sinar; alanin DISINDA kalan metne bakmaz.
  */
-import { abartiBul, artikBul } from './aile-blok-duzelt-kurallar.mjs'
+import { abartiBul, artikBul, say } from './aile-blok-duzelt-kurallar.mjs'
 import { REF_DESENI } from './aile-metni-kurallar.mjs'
 
 /**
@@ -163,6 +168,52 @@ export function yeniKapisi(plan) {
     ekle('P3e', 'EN dili', null, 'diller en icermiyor')
   }
   return kurallar
+}
+
+// ---- AG ASAMASI: BIR URUN SATIRINA PLAN --------------------------------------------------------------
+/**
+ * @typedef {{ description_i18n?: unknown }} UrunSatiri
+ * @typedef {{ satirlar: string[], sonraki: Record<string, unknown>, degisti: boolean, atlanan: number, zaten: number, bicimRed: number }} UrunPlani
+ */
+
+/**
+ * Bir urun satirina plani uygular (SAF: ag yok, girdi degismez). Her dil icin: METIN YOK | ZATEN UYGULANMIS |
+ * "N kez geciyor — ATLANDI" | SONUC BICIMI BOZUK (P4, RED) | "1 → degisecek". Yaris sonrasi TAZE satira yeniden
+ * uygulamak icin de ayni fonksiyon kullanilir.
+ * @param {UrunSatiri} urun
+ * @param {Plan} plan
+ * @returns {UrunPlani}
+ */
+export function urunPlani(urun, plan) {
+  const { eski, yeni, diller } = plan
+  const onceki = duzNesne(urun.description_i18n) ? /** @type {Record<string, unknown>} */ (urun.description_i18n) : {}
+  /** @type {Record<string, unknown>} */
+  const sonraki = { ...onceki }
+  /** @type {string[]} */
+  const satirlar = []
+  let atlanan = 0
+  let zaten = 0
+  let bicimRed = 0
+  for (const d of diller) {
+    const metin = sonraki[d]
+    if (typeof metin !== 'string') { satirlar.push(`${d}: METİN YOK`); atlanan++; continue }
+    const nEski = say(metin, eski)
+    const nYeni = say(metin, yeni)
+    if (eski !== yeni && nYeni === 1 && (nEski === 0 || yeni.includes(eski))) {
+      satirlar.push(`${d}: ZATEN UYGULANMIŞ (yeni metin alanda tam 1 kez)`)
+      zaten++
+      continue
+    }
+    if (nEski !== 1) { satirlar.push(`${d}: ${nEski} kez geçiyor — ATLANDI`); atlanan++; continue }
+    const i = metin.indexOf(eski)
+    const sonuc = metin.slice(0, i) + yeni + metin.slice(i + eski.length)   // `replace` DEGIL: yeni'deki "$&" harfiyen kalsin
+    const bozuk = sonucBicimBozuklugu(metin, sonuc)
+    if (bozuk.length) { satirlar.push(`${d}: SONUÇ BİÇİMİ BOZUK (${bozuk.join(', ')}) — RED`); bicimRed++; continue }
+    sonraki[d] = sonuc
+    satirlar.push(`${d}: 1 → değişecek`)
+  }
+  const degisti = diller.some((d) => onceki[d] !== sonraki[d])
+  return { satirlar, sonraki, degisti, atlanan, zaten, bicimRed }
 }
 
 /**

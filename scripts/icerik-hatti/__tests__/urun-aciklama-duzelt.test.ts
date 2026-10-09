@@ -8,7 +8,7 @@
  *   E1 kapı ağdan ÖNCE (kırmızıda sahte sunucuya sıfır istek) · E2 çıkış kodları (0/1/2) · E3 yazma yolu bozulmadı.
  */
 import { execFile } from 'node:child_process'
-import { existsSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { tmpdir } from 'node:os'
@@ -18,7 +18,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { abartiBul } from '../aile-blok-duzelt-kurallar.mjs'
 import {
-  editorIsaretiBul, planKapisi, planSemasi, sonucBicimBozuklugu, trHarfBul, yeniKapisi,
+  editorIsaretiBul, planKapisi, planSemasi, sonucBicimBozuklugu, trHarfBul, urunPlani, yeniKapisi,
 } from '../urun-aciklama-duzelt-kurallar.mjs'
 
 const BETIK = join(__dirname, '..', 'urun-aciklama-duzelt.mjs')
@@ -197,11 +197,30 @@ describe('P4 sonuç biçimi', () => {
 // ------------------------------------------------------------------------------------------------
 // Uçtan uca — sahte PostgREST
 // ------------------------------------------------------------------------------------------------
-type Urun = { id: string; sku: string; name: string; description_i18n: Record<string, string> }
+type Urun = { id: string; sku: string; name: string; updated_at: string; description_i18n: Record<string, string> }
+// updated_at "+00:00" taşır: yazıcı bunu KODLAMAZSA sunucu '+'yı boşluk okur ve koşullu PATCH eşleşmez (PostgREST gibi).
 const ilkUrunler = (): Urun[] => [
-  { id: 'u1', sku: 'VRT-1', name: 'Ex fan 1', description_i18n: { tr: 'Güvenli fan, yüksek verimli ex-proof tasarım.', en: 'Safe fan, high-efficiency ex-proof design.' } },
-  { id: 'u2', sku: 'VRT-2', name: 'Ex fan 2', description_i18n: { tr: 'Güvenli fan, yüksek verimli ex-proof tasarım.', en: 'Safe fan, high-efficiency ex-proof design.' } },
+  { id: 'u1', sku: 'VRT-1', name: 'Ex fan 1', updated_at: '2026-10-09T10:00:00.123456+00:00', description_i18n: { tr: 'Güvenli fan, yüksek verimli ex-proof tasarım.', en: 'Safe fan, high-efficiency ex-proof design.' } },
+  { id: 'u2', sku: 'VRT-2', name: 'Ex fan 2', updated_at: '2026-10-09T10:00:01.654321+00:00', description_i18n: { tr: 'Güvenli fan, yüksek verimli ex-proof tasarım.', en: 'Safe fan, high-efficiency ex-proof design.' } },
 ]
+
+/**
+ * Sunucu kipleri: normal · yaris-bir (başka yazar PATCH'ten hemen önce satırı değiştirir, ürün başına 1 kez) ·
+ * yaris-surekli (her PATCH'ten önce) · yaris-ayni (başka yazar AYNI değişikliği yapar) · rls (PATCH sessizce 0 satır,
+ * satır değişmez) · yut (PATCH yazmış gibi döner ama saklamaz) · jsonb-siralama (saklanan nesnenin anahtar sırası bozulur).
+ */
+type Kip = 'normal' | 'yaris-bir' | 'yaris-surekli' | 'yaris-ayni' | 'rls' | 'yut' | 'jsonb-siralama' | 'get-401' | 'patch-500'
+let kip = 'normal' as Kip
+const yarisYapildi = new Set<string>()
+let zamanSayaci = 0
+const yeniZaman = () => `2026-10-09T11:00:${String(++zamanSayaci).padStart(2, '0')}.000000+00:00`
+const EZ_NOT = ' (eşzamanlı düzenleme)'
+const baskaYazar = (u: Urun, ayni: boolean) => {
+  u.description_i18n = ayni
+    ? { ...u.description_i18n, tr: u.description_i18n.tr.replace(', yüksek verimli ex-proof', ' ex-proof') }
+    : { ...u.description_i18n, en: u.description_i18n.en + EZ_NOT }
+  u.updated_at = yeniZaman()
+}
 
 let urunler: Urun[] = ilkUrunler()
 const istekler: { yontem: string; yol: string; govde: string }[] = []
@@ -220,6 +239,9 @@ beforeAll(async () => {
       const json = (kod: number, v: unknown) => { res.writeHead(kod, { 'content-type': 'application/json' }); res.end(JSON.stringify(v)) }
       if (url.pathname !== '/rest/v1/products') return json(404, {})
       if (req.method === 'GET') {
+        if (kip === 'get-401') return json(401, { message: 'Invalid API key' })
+        const idKosul = url.searchParams.get('id')
+        if (idKosul) return json(200, urunler.filter((u) => `eq.${u.id}` === idKosul))
         const istenen = [...(url.searchParams.get('sku') ?? '').matchAll(/"([^"]+)"/g)].map((m) => m[1])
         return json(200, urunler.filter((u) => istenen.includes(u.sku)))
       }
@@ -227,7 +249,20 @@ beforeAll(async () => {
         const id = (url.searchParams.get('id') ?? '').replace(/^eq\./, '')
         const u = urunler.find((x) => x.id === id)
         if (!u) return json(200, [])
-        Object.assign(u, JSON.parse(govde))
+        if (kip === 'patch-500') return json(500, { message: 'internal error' })
+        if (kip === 'yaris-surekli' || ((kip === 'yaris-bir' || kip === 'yaris-ayni') && !yarisYapildi.has(u.id))) {
+          baskaYazar(u, kip === 'yaris-ayni')
+          yarisYapildi.add(u.id)
+        }
+        if (kip === 'rls') return json(200, [])
+        const kosul = url.searchParams.get('updated_at')   // URLSearchParams kodlanmamış '+'yı BOŞLUK okur (PostgREST gibi)
+        if (kosul !== null && kosul !== `eq.${u.updated_at}`) return json(200, [])
+        const istenenNesne = (JSON.parse(govde) as { description_i18n: Record<string, string> }).description_i18n
+        if (kip === 'yut') return json(200, [{ ...u, description_i18n: istenenNesne }])
+        u.description_i18n = kip === 'jsonb-siralama'
+          ? Object.fromEntries(Object.entries(istenenNesne).sort(([a], [b]) => (a < b ? -1 : 1)))
+          : istenenNesne
+        u.updated_at = yeniZaman()   // products_set_updated_at tetiği
         return json(200, [u])
       }
       return json(405, {})
@@ -240,7 +275,10 @@ afterAll(async () => {
   await new Promise<void>((coz) => sunucu.close(() => coz()))
   rmSync(gecici, { recursive: true, force: true })
 })
-beforeEach(() => { urunler = ilkUrunler(); istekler.length = 0 })
+beforeEach(() => {
+  urunler = ilkUrunler(); istekler.length = 0; kip = 'normal'; yarisYapildi.clear(); zamanSayaci = 0
+  rmSync(join(gecici, 'cikti'), { recursive: true, force: true })   // "envanter yok/var" doğrulamaları testler arası sızmasın
+})
 
 let sayac = 0
 const planDosyasi = (p: unknown) => {
@@ -345,5 +383,202 @@ describe('P4 uçtan uca — sonuç metni bozulursa HİÇBİR ŞEY yazılmaz', ()
     expect(r.stderr).toContain('P4 SONUÇ BİÇİMİ KIRMIZI')
     expect(istekler.filter((i) => i.yontem === 'PATCH')).toEqual([])
     expect(urunler[0].description_i18n.tr).toBe('Güvenli fan, yüksek verimli ex-proof tasarım.')
+  })
+})
+
+// ------------------------------------------------------------------------------------------------
+// K — urunPlani (saf): tam-1 eşleşme + "zaten uygulanmış"
+// ------------------------------------------------------------------------------------------------
+describe('K urunPlani — tam-1 eşleşme ve "zaten uygulanmış" ayrımı', () => {
+  const satir = (tr: string, en = 'Safe fan.') => ({ description_i18n: { tr, en } })
+  const p = plan({ eski: ', yüksek verimli ex-proof', yeni: ' ex-proof', diller: ['tr'] })
+
+  it('eski tam 1 kez: değişecek, yalnız o dil değişir, girdi DEĞİŞMEZ', () => {
+    const girdi = satir('Fan, yüksek verimli ex-proof tasarım.')
+    const kopya = JSON.stringify(girdi)
+    const r = urunPlani(girdi, p)
+    expect(r.degisti).toBe(true)
+    expect(r.sonraki).toEqual({ tr: 'Fan ex-proof tasarım.', en: 'Safe fan.' })
+    expect(r.satirlar).toEqual(['tr: 1 → değişecek'])
+    expect(JSON.stringify(girdi)).toBe(kopya)
+  })
+  it('eski yok + yeni tam 1 kez → ZATEN UYGULANMIŞ (ATLANDI değil), değişiklik yok', () => {
+    const r = urunPlani(satir('Fan ex-proof tasarım.'), p)
+    expect(r.degisti).toBe(false)
+    expect(r.zaten).toBe(1)
+    expect(r.atlanan).toBe(0)
+    expect(r.satirlar[0]).toContain('ZATEN UYGULANMIŞ')
+  })
+  it('eski de yeni de yok → ATLANDI (zaten sayılmaz: yanlış plan olabilir, elle bak)', () => {
+    const r = urunPlani(satir('Başka bir metin.'), p)
+    expect(r).toMatchObject({ degisti: false, zaten: 0, atlanan: 1 })
+    expect(r.satirlar[0]).toBe('tr: 0 kez geçiyor — ATLANDI')
+  })
+  it('eski 2 kez → ATLANDI; yeni de 2 kez → ATLANDI (belirsiz)', () => {
+    expect(urunPlani(satir('a, yüksek verimli ex-proof b, yüksek verimli ex-proof'), p).satirlar[0]).toContain('2 kez geçiyor — ATLANDI')
+    const r = urunPlani(satir('a ex-proof b ex-proof'), p)
+    expect(r.zaten).toBe(0)
+    expect(r.atlanan).toBe(1)
+  })
+  it('yeni, eski\'yi İÇERİYORSA ve alanda tam 1 kez varsa ikinci koşum tekrar eklemez (idempotent)', () => {
+    const q = plan({ eski: 'ex-proof', yeni: 'ATEX ex-proof', diller: ['tr'] })
+    const ilk = urunPlani(satir('Fan ex-proof tasarım.'), q)
+    expect(ilk.sonraki.tr).toBe('Fan ATEX ex-proof tasarım.')
+    const ikinci = urunPlani({ description_i18n: ilk.sonraki }, q)
+    expect(ikinci.degisti).toBe(false)
+    expect(ikinci.zaten).toBe(1)
+  })
+  it('eski kendi üstüne biner ("aa" ⊂ "aaa" = 2 eşleşme): ATLANDI, tahminle yazılmaz', () => {
+    const r = urunPlani(satir('xaaay'), plan({ eski: 'aa', yeni: 'b', diller: ['tr'] }))
+    expect(r.degisti).toBe(false)
+    expect(r.satirlar[0]).toContain('2 kez geçiyor — ATLANDI')
+  })
+  it('yeni\'deki "$&" ve "$1" harfiyen kalır (replace kullanılmaz)', () => {
+    const r = urunPlani(satir('Fan ve motor.'), plan({ eski: ' ve ', yeni: ' $& $1 ', diller: ['tr'] }))
+    expect(r.sonraki.tr).toBe('Fan $& $1 motor.')
+  })
+  it('metin yok → METİN YOK, atlanan sayılır; description_i18n null/dizi ise boş nesne gibi davranır', () => {
+    expect(urunPlani({ description_i18n: { en: 'x' } }, p)).toMatchObject({ degisti: false, atlanan: 1 })
+    expect(urunPlani({ description_i18n: null }, p).satirlar[0]).toBe('tr: METİN YOK')
+    expect(urunPlani({ description_i18n: ['tr'] }, p).satirlar[0]).toBe('tr: METİN YOK')
+    expect(urunPlani({}, p).atlanan).toBe(1)
+  })
+  it('P4: sonuç metni bozulursa RED, o dil değişmez', () => {
+    const r = urunPlani(satir('Fan, yüksek verimli ex-proof.'), plan({ eski: 'yüksek verimli ', yeni: ' ', diller: ['tr'] }))
+    expect(r).toMatchObject({ degisti: false, bicimRed: 1 })
+    expect(r.satirlar[0]).toContain('SONUÇ BİÇİMİ BOZUK')
+  })
+  it('iki dil: biri değişir, diğeri zaten uygulanmış — ikisi ayrı sayılır', () => {
+    const q = plan({ eski: 'Smart home', yeni: 'Wireless', diller: ['tr', 'en'] })
+    const r = urunPlani({ description_i18n: { tr: 'Smart home sensörü', en: 'Wireless sensor' } }, q)
+    expect(r).toMatchObject({ degisti: true, zaten: 1, atlanan: 0 })
+    expect(r.sonraki).toEqual({ tr: 'Wireless sensörü', en: 'Wireless sensor' })
+  })
+})
+
+// ------------------------------------------------------------------------------------------------
+// E4 — eşzamanlılık, geri okuma, ikinci koşum (sahte PostgREST, koşullu PATCH)
+// ------------------------------------------------------------------------------------------------
+describe('E4 koşullu PATCH, yarış, geri okuma, ikinci koşum', () => {
+  const YAZ_PLAN = () => planDosyasi(plan())
+  const patchler = () => istekler.filter((i) => i.yontem === 'PATCH')
+
+  it('PATCH updated_at ile KOŞULLUDUR ve değer KODLANMIŞ gider (+ → %2B, : → %3A)', async () => {
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(0)
+    expect(patchler().length).toBe(2)
+    for (const i of patchler()) {
+      expect(i.yol).toContain('updated_at=eq.2026-10-09T10%3A00%3A0')
+      expect(i.yol).toContain('%2B00%3A00')
+      expect(i.yol).not.toMatch(/updated_at=eq\.[^&]*\+/)
+    }
+  })
+  it('yarış (ürün başına 1 kez): taze metne yeniden uygulanır, eşzamanlı düzenleme KAYBOLMAZ', async () => {
+    kip = 'yaris-bir'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(0)
+    expect(r.stdout).toContain('taze metne yeniden uygulanıyor')
+    expect(r.stdout).toContain('yarış yeniden denemesi: 2')
+    expect(patchler().length).toBe(4)
+    for (const u of urunler) {
+      expect(u.description_i18n.tr).toBe('Güvenli fan ex-proof tasarım.')
+      expect(u.description_i18n.en).toBe(`Safe fan, high-efficiency ex-proof design.${EZ_NOT}`)
+    }
+    const env = readdirSync(join(gecici, 'cikti')).filter((a) => a.startsWith('aciklama-')).sort().pop() as string
+    const kayit = JSON.parse(readFileSync(join(gecici, 'cikti', env), 'utf8')) as { yarislar: { sku: string; onceki: Record<string, string> }[] }
+    expect(kayit.yarislar.map((y) => y.sku)).toEqual(['VRT-1', 'VRT-2'])
+    expect(kayit.yarislar[0].onceki.en).toContain(EZ_NOT)
+  })
+  it('sürekli yarış: yeniden denemede de 0 satır → çıkış 1, ilk üründe durur, TR hiçbir üründe değişmez', async () => {
+    kip = 'yaris-surekli'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(1)
+    expect(r.stderr).toContain('yeniden denemede de 0 satır')
+    expect(patchler().length).toBe(2)
+    for (const u of urunler) expect(u.description_i18n.tr).toBe('Güvenli fan, yüksek verimli ex-proof tasarım.')
+  })
+  it('RLS/yetki: PATCH 0 satır ama satır DEĞİŞMEMİŞ → yarış sayılmaz, yeniden denenmez, çıkış 1', async () => {
+    kip = 'rls'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(1)
+    expect(r.stderr).toContain('DEĞİŞMEMİŞ')
+    expect(r.stderr).toContain('yetki/RLS')
+    expect(patchler().length).toBe(1)
+  })
+  it('yutulan PATCH (yazmış gibi döner, saklamaz): geri okuma farkı yakalanır, çıkış 1', async () => {
+    kip = 'yut'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(1)
+    expect(r.stderr).toContain('geri okuma beklenenden FARKLI')
+    expect(urunler[0].description_i18n.tr).toBe('Güvenli fan, yüksek verimli ex-proof tasarım.')
+  })
+  it('jsonb anahtar sırasını bozsa bile geri okuma geçer (kanonik eşitlik)', async () => {
+    kip = 'jsonb-siralama'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(0)
+    expect(Object.keys(urunler[0].description_i18n)).toEqual(['en', 'tr'])
+    expect(r.stdout).toContain('geri okuma: hepsi beklenen')
+  })
+  it('ikinci koşum zararsız: "ZATEN UYGULANMIŞ", çıkış 0, ek PATCH yok', async () => {
+    const p = YAZ_PLAN()
+    expect((await calistir(ag(p, '--yaz'), true)).kod).toBe(0)
+    expect(patchler().length).toBe(2)
+    const ikinci = await calistir(ag(p, '--yaz'), true)
+    expect(ikinci.kod).toBe(0)
+    expect(ikinci.stdout).toContain('ZATEN UYGULANMIŞ')
+    expect(ikinci.stdout).toContain('zaten uygulanmış 2')
+    expect(ikinci.stdout).toContain('hepsi zaten uygulanmış')
+    expect(patchler().length).toBe(2)
+  })
+  it('yarışta BAŞKASI aynı değişikliği yapmışsa tekrar yazılmaz ("yarışta zaten uygulanmış")', async () => {
+    kip = 'yaris-ayni'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(0)
+    expect(r.stdout).toContain('yarışta zaten uygulanmış: 2')
+    expect(patchler().length).toBe(2)
+    for (const u of urunler) expect(u.description_i18n.tr).toBe('Güvenli fan ex-proof tasarım.')
+  })
+  it('HATA YOLU — updated_at okunamadı: koşullu PATCH kurulamaz, çıkış 2, PATCH yok, envanter yok', async () => {
+    delete (urunler[0] as Partial<Urun>).updated_at
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('updated_at okunamadı')
+    expect(patchler()).toEqual([])
+    expect(existsSync(join(gecici, 'cikti'))).toBe(false)
+  })
+  it('HATA YOLU — okuma 401 (yetki/anahtar): çıkış 1, hiçbir şey yazılmaz', async () => {
+    kip = 'get-401'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(1)
+    expect(r.stderr).toContain('DB HATA 401')
+    expect(patchler()).toEqual([])
+  })
+  it('HATA YOLU — PATCH 500: çıkış 1, ilk üründe durur, envanter ÖNCEDEN yazılmıştır', async () => {
+    kip = 'patch-500'
+    const r = await calistir(ag(YAZ_PLAN(), '--yaz'), true)
+    expect(r.kod).toBe(1)
+    expect(r.stderr).toContain('DB HATA 500')
+    expect(patchler().length).toBe(1)
+    expect(readdirSync(join(gecici, 'cikti')).some((a) => a.startsWith('aciklama-'))).toBe(true)
+  })
+  it('HATA YOLU — ağ yok (bağlantı reddedildi): yakalanmamış hata DEĞİL, ÖLÇÜLEMEDİ çıkış 2', async () => {
+    const r = await calistir(['--plan', YAZ_PLAN(), '--url', 'http://127.0.0.1:1', '--key', 'k', '--out', join(gecici, 'cikti'), '--yaz'], true)
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('ÖLÇÜLEMEDİ — ağ hatası GET')
+    expect(r.stderr).not.toContain('at ')   // yığın izi yok
+  })
+  it('HATA YOLU — istenen SKU canlıda yok (veri boş): çıkış 2, hiçbir şey yazılmaz', async () => {
+    const r = await calistir(ag(planDosyasi(plan({ skus: ['VRT-1', 'VRT-YOK'] })), '--yaz'), true)
+    expect(r.kod).toBe(2)
+    expect(r.stderr).toContain('istenen 2 ürün, dönen 1')
+    expect(patchler()).toEqual([])
+  })
+  it('kuru koşum updated_at taşır ama PATCH atmaz; zaten uygulanmış satır kuru koşumda da görünür', async () => {
+    urunler[0].description_i18n.tr = 'Güvenli fan ex-proof tasarım.'
+    const r = await calistir(ag(YAZ_PLAN()))
+    expect(r.kod).toBe(0)
+    expect(r.stdout).toContain('VRT-1')
+    expect(r.stdout).toMatch(/VRT-1[\s\S]*ZATEN UYGULANMIŞ[\s\S]*VRT-2[\s\S]*1 → değişecek/)
+    expect(patchler()).toEqual([])
   })
 })
