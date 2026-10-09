@@ -470,6 +470,26 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     expect(cetvel).toContain('| TAKIP (karar 322) | `TKP` | `TKP-1` |')
   })
 
+  // HRT-36 (Recep emri, OPS aktardı 10-09): son 7 günde sage'e 5 kayıt, hiçbirinde departman etiketi yok, bugün 0.
+  // Ders satırı rol etiketini ve gün sonu sayısını ister; Kanban satırı sütun/status/not/kanıt dörtlüsünü ister.
+  const HRT36_SAGE = ['`wrongstack-sage remember`', '`audience.roles=[<ROL>]`', 'tags [rol, ders]', '"sage\'e bugün N ders"']
+  const HRT36_KANBAN = ['Kanban: her iş bir kart', 'sütun ve status birlikte değişir', 'her adımda not düşülür', 'Done yalnız kanıtla']
+
+  it('HRT-36: her kartta sage anında ders satırı ve Kanban sütun/status/not/kanıt satırı var', () => {
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      for (const parca of [...HRT36_SAGE, ...HRT36_KANBAN]) expect(metin, `${ad}: ${parca}`).toContain(parca)
+    }
+  })
+
+  it('HRT-36 kolu ayırt edici: etiketsiz ders satırı ya da sütunsuz Kanban satırı bozuk kopyada yakalanır', () => {
+    const eksik = (m: string) => [...HRT36_SAGE, ...HRT36_KANBAN].some((p) => !m.includes(p))
+    const sagesiz = Object.values(uretilen)[0].replace('`audience.roles=[<ROL>]`', '')
+    const sutunsuz = Object.values(uretilen)[0].replace('sütun ve status birlikte değişir', '')
+    expect(eksik(sagesiz)).toBe(true)
+    expect(eksik(sutunsuz)).toBe(true)
+    for (const ad of Object.keys(uretilen)) expect(eksik(uretilen[ad]), ad).toBe(false)
+  })
+
   it('karar 219/220: hiçbir kart Linear\'ı iş kaydı olarak şart koşmaz; numara biçimi <KISA AD>-<sayı>', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
       expect(metin, ad).toContain('`<KISA AD>-<sayı>`')
