@@ -70,27 +70,27 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'Vortice',
     slug: 'vortice',
     description: {
-      tr: '1954 yılından bu yana havalandırma teknolojilerinde dünya lideri. İtalyan tasarımı ve ileri mühendislik çözümleriyle konut, ticari ve endüstriyel iklimlendirmede standartları belirliyor.',
-      en: 'A world leader in ventilation technology since 1954. Italian design and advanced engineering set the standard across residential, commercial and industrial air treatment.'
+      tr: 'İtalyan havalandırma üreticisi. Katalogda kanal, radyal, aksiyel ve çatı fanları, banyo fanları, hava perdeleri, ısı geri kazanım cihazları ve nem alma cihazları yer alır.',
+      en: 'An Italian ventilation manufacturer. The catalogue includes duct, centrifugal, axial and roof fans, bathroom fans, air curtains, heat recovery units and dehumidifiers.'
     },
     country: { tr: 'İtalya', en: 'Italy' },
     founded: 1954,
     headquarters: { tr: 'Tribiano, Milano', en: 'Tribiano, Milan' },
     website: 'https://www.vortice.it',
-    specialty: { tr: 'Aspiratörler & Isı Geri Kazanım', en: 'Extractor Fans & Heat Recovery' }
+    specialty: { tr: 'Fanlar, Hava Perdeleri, Isı Geri Kazanım', en: 'Fans, Air Curtains, Heat Recovery' }
   },
   {
     name: 'Avens',
     slug: 'avens',
     description: {
-      tr: 'Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleri. Modern mühendislik yaklaşımlarıyla enerji verimliliği odaklı sistemler geliştirir.',
-      en: 'High-performance industrial ventilation and air handling unit solutions. Modern engineering practice applied to energy-efficient system design.'
+      tr: 'Türkiye merkezli havalandırma markası. Katalogda kanal ısıtıcıları, sulu bataryalar, ısı geri kazanım cihazları, sığınak havalandırma üniteleri ve radyal fanlar yer alır.',
+      en: 'A Turkey-based ventilation brand. The catalogue includes duct heaters, water coils, heat recovery units, shelter ventilation units and centrifugal fans.'
     },
     country: { tr: 'Türkiye', en: 'Türkiye' },
     founded: 2010,
     headquarters: { tr: 'İstanbul', en: 'Istanbul' },
     website: 'https://www.avens.com.tr',
-    specialty: { tr: 'Endüstriyel Klima Santralleri', en: 'Industrial Air Handling Units' }
+    specialty: { tr: 'Kanal Isıtıcı, Batarya ve Fanlar', en: 'Duct Heaters, Coils and Fans' }
   },
   {
     // KAYNAK (2026-10-04): Vortice Industrial / Casals katalog baskısının firma adresi bloğu ("CASALS VENTILACIÓN
@@ -116,8 +116,8 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'SEAT',
     slug: 'seat',
     description: {
-      tr: '1968\'den bu yana Fransa\'da üretim yapan, korozif gaz ve hava tahliyesinde uzman fan üreticisi. Polipropilen (PP) santrifüj fanlarıyla laboratuvar, kimya ve ilaç sanayi, yüzme havuzu, atık su arıtma ve ATEX ortamlarında operatör ve personel güvenliğini koruyan uzun ömürlü çözümler sunar.',
-      en: 'A French fan manufacturer specialising in the extraction of corrosive gases and air since 1968. Its polypropylene (PP) centrifugal fans provide long-lasting extraction for laboratories, the chemical and pharmaceutical industries, swimming pools, wastewater treatment and ATEX environments, keeping operators and personnel safe.'
+      tr: '1968\'de Fransa\'da kurulan, korozif gaz ve hava tahliyesi için fan üreticisi. Katalogda polipropilen (PP) fan ürün aileleri SEAT, JET ve STORM yer alır; üreticinin çözüm alanları arasında laboratuvar, kimya ve ilaç sanayi, yüzme havuzu, atık su arıtma ve patlayıcı ortamlar (ATEX) bulunur.',
+      en: 'A French fan manufacturer established in 1968, producing fans for corrosive gas and air extraction. The catalogue includes the polypropylene (PP) fan product families SEAT, JET and STORM; the manufacturer\'s solution areas include laboratories, the chemical and pharmaceutical industries, swimming pools, wastewater treatment and explosive atmospheres (ATEX).'
     },
     country: { tr: 'Fransa', en: 'France' },
     founded: 1968,
@@ -134,8 +134,8 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'Danfoss',
     slug: 'danfoss',
     description: {
-      tr: '1933\'te Danimarka\'da kurulan bir aile şirketi. Danfoss Drives 1968\'den bu yana frekans konvertörlerinin (değişken frekanslı sürücüler) öncüsüdür; motor hızını ihtiyaca göre ayarlayarak enerji tüketimini %80\'e varan oranda azaltır.',
-      en: 'A family-owned company founded in Denmark in 1933. Danfoss Drives has pioneered variable-frequency drives since 1968, matching motor speed to demand to reduce energy consumption by up to 80%.'
+      tr: '1933\'te Danimarka\'da kurulan bir aile şirketi. Danfoss Drives, 1968\'den beri frekans konvertörü (değişken frekanslı sürücü) üretiyor; şirket, motor hızını ihtiyaca göre ayarlayarak enerji tüketiminde %80\'e varan azalma sağlanabileceğini belirtiyor.',
+      en: 'A family-owned company founded in Denmark in 1933. Danfoss Drives has made variable-frequency drives since 1968; the company states that matching motor speed to demand can reduce energy consumption by up to 80%.'
     },
     country: { tr: 'Danimarka', en: 'Denmark' },
     founded: 1933,
@@ -147,14 +147,14 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'Nicotra Gebhardt',
     slug: 'nicotra-gebhardt',
     description: {
-      tr: 'Alman mühendisliği ve İtalyan tasarımının birleşimiyle, endüstriyel santrifüj fanlarda dünyanın en geniş ve teknolojik ürün gamına sahip üreticisi.',
-      en: 'German engineering combined with Italian design, offering one of the world\'s broadest and most advanced ranges of industrial centrifugal fans.'
+      tr: 'Almanya\'da Waldenburg adresli endüstriyel santrifüj (radyal) fan üreticisi. Katalogda ADH, RDH, AT ve DD ürün aileleri yer alır.',
+      en: 'An industrial centrifugal (radial) fan manufacturer with an address in Waldenburg, Germany. The catalogue includes the ADH, RDH, AT and DD product families.'
     },
     country: { tr: 'Almanya', en: 'Germany' },
     founded: 1959,
     headquarters: { tr: 'Waldenburg', en: 'Waldenburg' },
     website: 'https://www.nicotra-gebhardt.com',
-    specialty: { tr: 'Yüksek Verimli Santrifüj Fanlar', en: 'High-Efficiency Centrifugal Fans' }
+    specialty: { tr: 'Santrifüj (Radyal) Fanlar', en: 'Centrifugal (Radial) Fans' }
   },
   {
     // KAYNAK YOK (2026-10-04): kaynak dizininde Flexiva için 0 sayfa, DB'de ürün 0. Bu yüzden ülke / kuruluş / merkez /
@@ -166,8 +166,8 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'Flexiva',
     slug: 'flexiva',
     description: {
-      tr: 'Flexiva marka kaydı katalogda açıldı.',
-      en: 'The Flexiva brand record is open in the catalogue.'
+      tr: 'Flexiva ürünleri henüz katalogda yer almıyor.',
+      en: 'Flexiva products are not yet in the catalogue.'
     }
   }
 ]

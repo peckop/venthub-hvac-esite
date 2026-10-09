@@ -175,9 +175,9 @@ Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasınd
 
 ## Sık sorulan sorular
 
-### Frekans konvertörü ile inverter aynı şey mi?
+### Frekans konvertörü ile invertör aynı şey mi?
 
-Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. Evirici (inverter) ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
+Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
 
 ### Frekans konvertörü ne kadar enerji tasarrufu sağlar?
 

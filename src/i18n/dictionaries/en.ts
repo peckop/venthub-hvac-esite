@@ -22,7 +22,7 @@ export const en: typeof tr = {
   },
   common: {
     technicalDrawing: 'Technical Drawing',
-    imagePreparing: 'Product image coming soon',
+    imagePreparing: 'Product image is being prepared',
     errorGeneric: 'An error occurred',
     devMode: 'Developer Mode',
     userFallback: 'User',
@@ -52,7 +52,7 @@ export const en: typeof tr = {
     brands: 'Brands',
     about: 'About',
     contact: 'Contact',
-    knowledgeHub: 'Knowledge Hub',
+    knowledgeHub: '',
     signOut: 'Sign Out',
     signIn: 'Sign In',
     signUp: 'Sign Up',
@@ -66,20 +66,20 @@ export const en: typeof tr = {
     allProducts: 'All Products',
     exploreProducts: 'Explore Products',
     getQuote: 'Get a Quote',
-    addToCart: 'Add to Cart',
+    addToCart: 'Add to quote list',
     categoryList: {
       residential: 'Residential Ventilation',
       commercial: 'Commercial Ventilation',
       industrial: 'Industrial Ventilation',
       hrv: 'VMC & Heat Recovery',
       'air-treatment': 'Air Treatment',
-      hygiene: 'Hygiene and Sanitizer',
+      hygiene: 'Hygiene and Sanitation',
       summer: 'Summer Ventilation',
       ac: 'Air Conditioning',
       heating: 'Electric Heating',
       hvls: 'Industrial Ceiling Fans',
       accessories: 'Accessories and Components',
-      'smart-home': 'Smart Home',
+      'smart-home': 'Control Systems',
       'parking-jet': 'Car Park Jet Fans',
       // REC-103: see tr.ts — 8 of the 23 active DB categories had no key here at all,
       // so /en pages silently fell back to the Turkish `menu_label`.
@@ -125,7 +125,7 @@ export const en: typeof tr = {
       }
     },
     viewAll: 'View all',
-    featured: 'Featured Products',
+    featured: 'Sample Product Families',
     homeLabel: 'Home',
     notFound: 'No results found',
     searchPlaceholder: 'Product name, brand...',
@@ -142,21 +142,21 @@ export const en: typeof tr = {
     next: 'Next',
     remove: 'Remove',
     more: 'More',
-    whatsappAriaLabel: 'Message on WhatsApp',
-    whatsappTitle: 'Message on WhatsApp',
-    whatsappTooltip: 'Engineering Line',
-    whatsappSupportMessage: 'Quick support from website',
+    whatsappAriaLabel: 'Write by email',
+    whatsappTitle: 'Write by email',
+    whatsappTooltip: '',
+    whatsappSupportMessage: 'Contact us by form or email',
     pdf: 'PDF',
     sku: 'SKU',
     share: 'Share',
     requestQuote: 'Request Quote',
     // REC-115: removed with the dead CategoryHero component (INV-6 dead key).
     // NOTE: `category.trustSignals.fastDelivery` is a DIFFERENT key and is alive.
-    series: 'Series',
+    series: 'Product family',
     reset: 'Reset',
     whatsapp: {
       faqSupportMessage: 'I could not find the answer I was looking for on the FAQ page...',
-      supportMessageDefault: 'Hello, I would like to contact the VentHub HVAC support team.',
+      supportMessageDefault: 'Hello, I would like to get in touch with VentHub HVAC.',
     },
     actions: 'Actions',
     addToProject: 'Add to Project List',
@@ -199,12 +199,12 @@ export const en: typeof tr = {
   },
   knowledge: {
     hub: {
-      title: 'Knowledge is the Raw Material of Engineering',
-      subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
-      eyebrow: 'Technical Intelligence Unit',
-      searchPlaceholder: 'Search for topic, technical term or product family...',
+      title: 'Choosing Ventilation Products',
+      subtitle: 'Read the guide articles and use the Product Selector for a preliminary assessment from your volume and airflow values.',
+      eyebrow: 'Guide Articles',
+      searchPlaceholder: 'Search the guide articles...',
       readStart: 'Start Reading',
-      heroAlt: 'Engineering Knowledge Hub Visual',
+      heroAlt: 'Image for the ventilation guide articles page',
       readTime: '{{count}} min read',
       // ⛔OLD KEYS REMOVED (2026-09-05): calculatorsSoon · selectorSoon · inDevelopment ·
       // inPlanning. All of them announced something that ALREADY EXISTS as "coming soon":
@@ -214,8 +214,8 @@ export const en: typeof tr = {
       selectorDesc: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
       selectorCta: 'Open the Product Selector',
       notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
-      notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
-      contactExpert: 'Talk to an Expert',
+      notFoundDesc: 'You can send your question through the contact form or to info@venthub.com.tr.',
+      contactExpert: 'Get in Touch',
       categories: {
         comfort: 'Comfort',
         safety: 'Safety',
@@ -230,7 +230,7 @@ export const en: typeof tr = {
     },
     topic: {
       warnBadge: '!',
-      eyebrow: 'Technical Intelligence',
+      eyebrow: 'Technical Information',
       notFoundTitle: 'Topic not found',
       notFoundDesc: 'The topic you are looking for may not be added yet.',
       backToHub: 'Back to hub',
@@ -242,29 +242,29 @@ export const en: typeof tr = {
     topics: {
       'hava-perdesi': {
         title: 'Air Curtain',
-        summary: 'Installed above entrances to preserve comfort and reduce energy loss; device should fully cover door width.',
-        steps: ['Door width = device width (unbroken barrier).', 'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.', 'Nozzle tilted 10–15° inwards; auto speed via door contact.'],
-        pitfalls: ['Device too short', 'Too low velocity', 'Tilting nozzle outward']
+        summary: 'An air curtain creates downward airflow across the door opening; store and market entrances are typical uses.',
+        steps: ['Measure the door width; the selection is based on it.', 'Measure the door height from the floor and check whether mounting above the door is possible.', 'Decide whether you need entrance heating: unheated models create airflow only, electric heated models also heat the entrance.'],
+        pitfalls: ['Choosing without checking door width', 'Expecting heating from an unheated model', 'Choosing without checking door height']
       },
       'jet-fan': {
         title: 'Jet Fan (Parking)',
-        summary: 'Ceiling fans that direct flow to exhaust for CO/NOx and smoke scenarios; layout must avoid dead zones.',
-        steps: ['Flow: Volume × ACH (e.g. 7,200 m³ × 8 ACH ≈ 57,600 m³/h).', 'Thrust 50–100 N typical; pick by distance and plan.', 'Layout: axis spacing 25–35 m; drive to exhaust; cover sensor zones.'],
+        summary: 'Jet fans direct air in enclosed spaces. The catalogue has no jet fan product; the calculator is in the Product Selector.',
+        steps: ['Flow: Volume × ACH (e.g. 7,200 m³ × 8 ACH ≈ 57,600 m³/h).', 'Thrust depends on distance and layout; see the Product Selector.', 'The result is a preliminary assessment; request a quote for final selection.'],
         pitfalls: ['Leaving dead zones', 'Missing sensor coverage'],
         image: '/images/hvac_installation_close_up_premium_3.webp'
       },
       hrv: {
         title: 'Heat Recovery (HRV/ERV)',
         summary: 'Provides fresh air with heat recovery; key criteria are airflow, efficiency/SFP and external static pressure.',
-        steps: ['Airflow by occupancy/space (EN 16798-1 / ASHRAE 62.1 ranges).', 'Efficiency/SFP: 70–85% efficiency, low SFP.', 'Pressure: external static matching filter/duct losses.'],
+        steps: ['Set the airflow (m³/h) with the volume and flow inputs of the heat recovery (HRV) calculator in the Product Selector.', 'Compare efficiency and SFP values in the product\'s technical datasheet.', 'Pressure: external static matching filter/duct losses.'],
         pitfalls: ['Focusing on efficiency while ignoring external static'],
         image: '/images/heat_recovery_ventilator_hrv_system_diagram.jpg'
       },
       'air-curtain': {
         image: '/images/hvac_installation_close_up_premium_3.webp',
-        pitfalls: ['Device too short', 'Too low velocity', 'Tilting nozzle outward'],
-        steps: ['Door width = device width (unbroken barrier).', 'Nozzle velocity 7–9 m/s; at floor 2–3 m/s target.', 'Nozzle tilted 10–15° inwards; auto speed via door contact.'],
-        summary: 'For correct air curtain selection, door height, width and usage purpose (comfort/industrial) are decisive.',
+        pitfalls: ['Choosing without checking door width', 'Expecting heating from an unheated model', 'Choosing without checking door height'],
+        steps: ['Measure the door width; the selection is based on it.', 'Measure the door height from the floor and check whether mounting above the door is possible.', 'Decide whether you need entrance heating: unheated models create airflow only, electric heated models also heat the entrance.'],
+        summary: 'Door width, door height and whether you need entrance heating determine the air curtain choice.',
         title: 'Air Curtain Selection'
       }
     }
@@ -282,8 +282,8 @@ export const en: typeof tr = {
       aramaYerTutucu: 'Type a topic or term',
       sonucYok: 'No article matches your search.',
       oku: 'Read the article',
-      bosBaslik: 'Guides in preparation',
-      bosAciklama: 'Sourced and verified guides are being prepared. Until the first articles are published, you can size your requirement with the Product Selector below.',
+      bosBaslik: 'Guides',
+      bosAciklama: 'Guides continue to be published. You can run duct, heat recovery, air curtain and jet fan calculations with the Product Selector.',
       seciciBaslik: 'Product Selector',
       seciciAciklama: 'Duct, heat recovery, air curtain and jet fan sizing in one place.',
       seciciDugme: 'Open the Product Selector',
@@ -312,7 +312,7 @@ export const en: typeof tr = {
   },
   meta: {
     siteTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
-    siteDesc: 'Car park jet fans, air curtains, heat recovery units and duct fans — engineering-led product selection and technical support.',
+    siteDesc: 'Duct fans, air curtains and heat recovery units. Product Selector sizing for duct fans, HRV, air curtains and jet fans.',
   },
 
   sayfaBulunamadi: {
@@ -323,29 +323,29 @@ export const en: typeof tr = {
   },
 
   home: {
-    seoTitle: 'VentHub | Industrial Ventilation and HVAC Engineering Solutions',
-    seoDesc: 'The right product, the right calculation, the right solution. From parking ventilation to heat recovery — engineering-backed selection at VentHub.',
+    seoTitle: 'VentHub | Fan, Air Curtain and Heat Recovery Product Catalogue',
+    seoDesc: 'Technical specifications for fans, air curtains and heat recovery units, plus duct fan, HRV, air curtain and jet fan calculators. Request a quote.',
     hero: {
-      eyebrow: 'Engineering-Guided HVAC Commerce',
-      title: 'Enter the right HVAC path from the first screen.',
-      titleLineOne: 'Enter the right HVAC',
-      titleLineTwo: 'path from the first screen.',
-      subtitle: '3D discovery, category flow and quote routing come together in one focused layer.',
+      eyebrow: 'HVAC Product Catalogue and Quotes',
+      title: 'Find the right product family by category.',
+      titleLineOne: 'Find the right product',
+      titleLineTwo: 'family by category.',
+      subtitle: 'Move from the category list to a product family and reach the quote form.',
       primaryCta: 'Explore Products',
       secondaryCta: 'Get a Fast Quote',
       quickAccessLabel: 'Quick Access',
       visualAlt: 'VentHub industrial HVAC solution visual',
-      visualEyebrow: 'Controlled Discovery',
-      visualTitle: 'Start the category decision from the first screen with 3D discovery.',
-      visualSubtitle: 'The homepage no longer behaves like a simple showcase; it acts like a real decision hub across category, scenario and expert support.',
+      visualEyebrow: 'Category Selection',
+      visualTitle: 'Start with a category, then move to a product family.',
+      visualSubtitle: 'Reach product families by category, run a preliminary assessment with the Product Selector, request a quote.',
       visualPoints: {
-        selection: 'Fast routing by category and application',
-        routing: 'Short access to quote and expert support'
+        selection: 'Access to product families by category',
+        routing: 'Contact form and e-mail for quotes'
       },
       metrics: {
-        coreCategories: 'core categories for a faster start',
-        productSeries: '{{count}} series and sub-family routes',
-        entryPaths: 'guided decision flow'
+        coreCategories: 'start from a main category',
+        productSeries: 'routes to {{count}} product families',
+        entryPaths: 'from application to product family'
       },
       trustStrip: {
         authorizedBrands: 'Brand and model catalogue',
@@ -361,57 +361,57 @@ export const en: typeof tr = {
         quote: 'Request Quote'
       },
       categorySummaries: {
-        fans: 'Compare ATEX, industrial and commercial fan families faster.',
+        fans: 'Compare ATEX, industrial and commercial fan families side by side.',
         airCurtains: 'Move toward the right air curtain family for entrance comfort and energy-loss control.',
-        heatRecovery: 'Evaluate fresh-air and efficiency balance through a heat recovery route.',
-        speedControl: 'Select fan control, drive and speed management in the right equipment layer.'
+        heatRecovery: 'Compare ducted central and single-room heat recovery families.',
+        speedControl: 'Speed switches and frequency converters.'
       },
       sinevizyon: {
         altMain: 'VentHub Industrial Ventilation Systems',
-        altProduct: 'VentHub Special Product Series',
+        altProduct: 'VentHub Product Family',
         slides: [
           {
-            eyebrow: 'ADVANCED AERODYNAMIC ENGINEERING',
-            title: 'Industrial Ventilation Layers',
-            subtitle: 'Statically balanced and acoustically optimized solution axes in high-flow systems.',
+            eyebrow: 'VORTICE DUCT FANS',
+            title: 'Vortice Lineo and Lineo Quiet',
+            subtitle: 'Mixed flow duct fans: Lineo, and Lineo Quiet with a sound-absorbing lining.',
             products: [
               {
-                label: 'Vortice Lineo',
+                label: 'Lineo Quiet',
                 subLabel: 'Mixed Flow Duct Fan'
               },
               {
                 label: 'Lineo Quiet',
-                subLabel: 'Ultra Quiet Performance'
+                subLabel: 'Quiet Duct Fan'
               }
             ]
           },
           {
-            eyebrow: 'FUTURISTIC CLIMATE CONTROL',
-            title: 'Vortice Lineo Quiet: The Future of Silence',
-            subtitle: 'The perfect balance of minimum energy consumption, maximum air transfer efficiency, and premium silent comfort.',
+            eyebrow: 'QUIET DUCT FANS',
+            title: 'Vortice Lineo Quiet: Two Motor Options',
+            subtitle: 'LINEO QUIET with an AC induction motor and LINEO QUIET ES with a brushless EC motor, in one duct fan family.',
             products: [
               {
-                label: 'Air Flow Technology',
-                subLabel: 'Laminar Flow Control'
+                label: 'Sound-Absorbing Lining',
+                subLabel: 'Built into the Housing'
               },
               {
-                label: 'EC Motor Efficiency',
-                subLabel: 'Low Energy Consumption'
+                label: 'Brushless EC Motor',
+                subLabel: 'Low energy use in EC motor models'
               }
             ]
           },
           {
-            eyebrow: 'PRECISION HVAC SYSTEMS',
-            title: 'Technical Excellence and Smart Flow',
-            subtitle: 'End-to-end ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
+            eyebrow: 'VORTICE LINEO DUCT FANS',
+            title: 'Residential, Commercial and Industrial Use',
+            subtitle: 'A mixed flow fan that mounts inside a duct, horizontally or vertically, with a three-speed induction motor.',
             products: [
               {
-                label: 'Industrial Solutions',
-                subLabel: 'High Capacity'
+                label: 'In-Duct Mounting',
+                subLabel: 'Horizontal or Vertical'
               },
               {
-                label: 'Smart Control',
-                subLabel: 'Automation Integration'
+                label: 'Three-Speed Motor',
+                subLabel: 'Induction Motor'
               }
             ]
           }
@@ -420,79 +420,79 @@ export const en: typeof tr = {
     },
     cinematicShowcase: {
       hudStatus: 'Product family',
-      eyebrow: 'ENGINEERING FOCUS',
-      title: 'Vortice Lineo Quiet Series',
-      subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
-      description: 'Provides ultra-quiet operation efficiency even at high static pressure, thanks to its special silencer-layered outer body and dynamically balanced motor structure.',
-      cta: 'Access High-Resolution Technical Data',
-      badge: 'INDUSTRIAL FOCUS',
+      eyebrow: 'MIXED FLOW DUCT FAN',
+      title: 'Vortice Lineo Quiet Product Family',
+      subtitle: 'A mixed flow duct fan with the sound-absorbing lining integrated into the outer housing.',
+      description: 'LINEO QUIET has an AC induction motor and LINEO QUIET ES a brushless EC motor; the brushless EC model provides low energy consumption.',
+      cta: 'View Technical Data',
+      badge: 'AC / EC MOTOR',
       componentLabel: 'System Component',
       hotspots: {
-        motor: 'High Efficiency EC Motor',
-        motorDetail: 'EC motor technology providing precise speed and torque management.',
-        clamps: 'Anti-Vibration Clamps',
-        clampsDetail: 'Vibration damping modules for quick service and assembly.',
-        housing: 'Acoustic Composite Housing',
-        housingDetail: 'Sound-absorbing layers for minimum acoustic emission.',
-        airflow: 'Laminar Flow Vanes',
-        airflowDetail: 'Vane design providing maximum air guidance efficiency.'
+        motor: 'EC and AC Motor Options',
+        motorDetail: 'Per the manufacturer, EC brushless LINEO QUIET ES offers low energy consumption.',
+        clamps: 'Duct Connection',
+        clampsDetail: 'Models are offered in different diameters.',
+        housing: 'Sound-Absorbing Lining',
+        housingDetail: 'Sound-absorbing lining is fully integrated into the outer housing.',
+        airflow: 'Mixed Flow Fan',
+        airflowDetail: 'Lineo Quiet is a duct-type mixed flow fan.'
       }
     },
     quickEntry: {
-      eyebrow: 'Starting Layer',
-      title: 'Choose the first step without friction.',
-      subtitle: 'Start from category, application or support and enter the same premium decision flow.',
+      eyebrow: 'Starting Point',
+      title: 'Start with a category, a calculation or a quote',
+      subtitle: 'Browse categories, use the Product Selector for a preliminary assessment, or request a quote.',
       items: {
         category: {
-          title: 'Search by Category',
-          description: 'Move into the right product family through the core category structure.'
+          title: 'Browse by Category',
+          description: 'From ATEX fans to quiet duct fans, browse the product families with their technical data.'
         },
         application: {
           title: 'Find by Application',
-          description: 'Select solutions by parking, kitchen, entrance and comfort scenarios.'
+          description: 'Air curtains for doorways, PP fans for corrosive gas extraction, duct fans.'
         },
         support: {
-          title: 'Get Technical Support',
-          description: 'Reach FAQs, support flows and the knowledge hub quickly.'
+          title: 'Product Selector',
+          description: 'Run duct fan, heat recovery, air curtain and jet fan sizing.'
         },
         quote: {
-          title: 'Request a Fast Quote',
-          description: 'Share your need briefly and get expert guidance toward the right solution.'
+          title: 'Request a Project Quote',
+          description: 'Send your requirements through the contact form or to info@venthub.com.tr.'
         }
       }
     },
     guidedDiscovery: {
       eyebrowLabel: 'VENTILATION SOLUTIONS',
-      heading: 'The Engineering Aesthetics of Airflow',
-      intro: 'Discover industrial-grade ventilation solutions curated by VentHub.',
-      cardFallback: 'Professional Ventilation Solutions',
-      eyebrow: 'Primary Discovery Layer',
-      title: 'See the core category structure at a glance and choose the right entry point.',
-      subtitle: 'This section does not repeat the 3D hero. It presents the main product families in a simpler way and moves users toward category, series and product detail with more control.',
-      seriesCount: '{{count}} series',
-      categoryFallback: 'Premium HVAC solutions designed to accelerate category selection.',
-      panelEyebrow: 'Decision Flow',
-      panelTitle: 'Move from category selection to product decision faster.',
-      panelBody: 'We create a clearer navigation structure that guides users first to the right family, then to the relevant series, and finally to product detail.',
-      panelFallback: 'Review product families, sub-series and the next discovery step for this category in one place.',
+      heading: 'Ventilation Products by Category',
+      intro: 'Browse the fan, air curtain, heat recovery and control system families and models.',
+      cardFallback: 'Ventilation Products',
+      eyebrow: 'VENTILATION SOLUTIONS',
+      title: 'Ventilation Products by Category',
+      subtitle: 'Choose a category, browse its product families; for a quote, use the contact form or email.',
+      seriesCount: '{{count}} product families',
+      categoryFallback: 'Browse the product families and models in this category.',
+      panelEyebrow: 'STEP BY STEP',
+      panelTitle: 'From category to product and quote',
+      panelBody: 'Product pages include technical specification tables. Send quote requests and questions through the contact form or info@venthub.com.tr.',
+      panelFallback: 'View the product families in this category and the models in each.',
       primaryCta: 'Open Category',
       secondaryCta: 'View Scenarios',
-      seriesEyebrow: 'Series Shortcuts',
-      seriesTitle: '{{category}} series',
-      seriesFallback: 'Review this product family and its key variations.',
-      footerNote: 'Category discovery starts here and makes the series logic easier to understand before entering product detail.',
+      seriesEyebrow: 'FAMILY QUICK ACCESS',
+      seriesTitle: '{{category}} product families',
+      seriesFallback: 'Review the models and technical specifications of this product family.',
+      footerNote: 'Category selection starts here; model details are on the product page.',
       steps: {
         select: {
-          title: 'Choose the right core category',
-          description: 'Start from the main families such as fans, air curtains, heat recovery, or speed control.'
+          title: 'Choose a category',
+          description: 'Start from a main category such as fans, air curtains, heat recovery or control systems.'
         },
         compare: {
-          title: 'Narrow the series logic quickly',
-          description: 'Move into the right branch by application, capacity, or technical need through the sub-series structure.'
+          title: 'Choose a Product Family',
+          description: 'For fans, for example, choose one of the duct, roof, axial and ATEX product families.'
         },
         convert: {
-          title: 'Move to product and quote with control',
-          description: 'Once the category and series are clear, product evaluation and quoting move forward with less friction.'
+          title: 'Pick a product and request a quote',
+          description: 'Check the technical specification table on the product page, then request a quote for the model you need.'
         }
       },
       loading: 'Preparing categories...'
@@ -500,51 +500,51 @@ export const en: typeof tr = {
     applicationSolutions: {
       eyebrow: 'Scenario-Led Solutions',
       title: 'You can also start from the use case, not only from the product.',
-      subtitle: 'From store entrance comfort to commercial space comfort, we present HVAC needs through a solution logic.',
+      subtitle: 'Air curtains for store entrances; ducted central or single room units for heat recovery.',
       viewAll: 'View All',
       items: {
         entrance: {
           eyebrow: 'Entrance Comfort',
           title: 'Store entrance and air curtain solutions',
-          description: 'Make air curtain discovery clearer for entrance comfort and reduced energy loss at openings.',
-          point1: 'Entrance comfort-led selection',
-          point2: 'Structure that reduces energy loss'
+          description: 'A downward airflow across the doorway separates indoor air from outside at store, restaurant and warehouse doors.',
+          point1: 'Selection by door size',
+          point2: 'Unheated or electrically heated'
         },
         comfort: {
-          eyebrow: 'Commercial Comfort',
-          title: 'Heat recovery and efficient commercial climate control',
-          description: 'Evaluate indoor air quality and energy efficiency needs in commercial spaces through a heat recovery-led route.',
-          point1: 'Efficiency-led product family',
-          point2: 'Transition to comfort and fresh air balance'
+          eyebrow: 'Heat Recovery',
+          title: 'Ducted central and single room units',
+          description: 'The Product Selector sizes heat recovery (HRV); results are a pre-assessment.',
+          point1: 'Ducted central families',
+          point2: 'Single room families'
         }
       }
     },
     featuredCommercial: {
-      eyebrow: 'Product Showroom',
-      title: 'Industrial Product Portfolio',
-      subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
-      cta: 'Explore Entire Collection',
+      eyebrow: 'Product Showcase',
+      title: 'Fans and Ventilation Products',
+      subtitle: 'Use the tabs to browse models, air curtains and heat recovery products from the catalogue.',
+      cta: 'Browse All Product Families',
       panelEyebrow: 'Technical Focus',
       tabs: {
         featured: 'Featured',
-        newArrivals: 'New Arrivals',
-        bestSellers: 'Product Selection',
+        newArrivals: 'Duct Fans',
+        bestSellers: 'Product Families',
         airCurtains: 'Air Curtains',
         heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
-        featured: 'Performance Leaders',
-        newArrivals: 'Latest Technologies',
-        bestSellers: 'Selected Products',
-        airCurtains: 'Climate Protection Systems',
-        heatRecovery: 'Energy Recovery'
+        featured: 'Models from the Catalogue',
+        newArrivals: 'Newly Added Models',
+        bestSellers: 'Catalogue Products',
+        airCurtains: 'Air Curtain Models',
+        heatRecovery: 'Heat Recovery'
       },
       panelDescriptions: {
-        featured: 'Featured models from the VentHub product family and their technical specifications.',
-        newArrivals: 'New generation devices with the highest energy efficiency and modern design, recently added to the VentHub product family.',
-        bestSellers: 'Selected models from the VentHub product family, chosen for their technical specifications.',
-        airCurtains: 'Professional series that protect indoor comfort by creating an invisible thermal barrier at entrance areas.',
-        heatRecovery: 'Economic units that recover heat from waste air with up to 90% efficiency while meeting fresh air needs.'
+        featured: 'Models selected from the catalogue and their technical specifications; details are on the product page.',
+        newArrivals: 'Models recently added to the catalogue; open the product page for details.',
+        bestSellers: 'Examples from the models in the catalogue; details are on the product page.',
+        airCurtains: 'Air curtains that separate indoor air from outside with an airflow along the doorway; unheated and electrically heated models.',
+        heatRecovery: 'Heat recovery units in ducted central and single-room types.'
       }
     },
     trustProof: {
@@ -552,7 +552,7 @@ export const en: typeof tr = {
       title: 'Catalogue, Product Selector and Quote',
       subtitle: 'Browse fan, air curtain, heat recovery and frequency converter models, run a pre-assessment from your volume, airflow and pressure inputs, and request a quote.',
       badge: 'ON VENTHUB',
-      visualAlt: 'VentHub Reliability Proof and Quality Certificates',
+      visualAlt: 'Rectangular and round ventilation ducts suspended from a ceiling',
       items: {
         brands: {
           eyebrow: 'Catalogue',
@@ -577,30 +577,30 @@ export const en: typeof tr = {
       }
     },
     strategicBrands: {
-      eyebrow: 'Strategic Brands',
-      title: 'The brands we work with are not only logos, but the base of the solution architecture.',
-      subtitle: 'We turn the brand area from passive logo wallpaper into a carrier of quality, trust and product positioning.'
+      eyebrow: 'Catalogue Brands',
+      title: 'Brands for fans, air curtains, heat recovery and frequency converters',
+      subtitle: 'Brands and product families have their own pages; product pages include data sheets and specification tables.'
     },
     knowledge: {
-      headingPrefix: 'Engineering',
-      headingAccent: 'Layer',
-      statsPipelineLabel: 'Project Pipeline',
-      eyebrow: 'Knowledge and Support Layer',
-      title: 'Make technical decision paths visible and reachable.',
-      subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
+      headingPrefix: 'Guides and',
+      headingAccent: 'Sizing',
+      statsPipelineLabel: 'In the Catalogue',
+      eyebrow: 'Guides and Support',
+      title: 'Guides and Sizing',
+      subtitle: 'Read the guides and use the calculators before choosing a product; check the FAQ and delivery information before requesting a quote.',
       cta: 'Explore',
       hub: {
-        title: 'Knowledge is the Raw Material of Engineering',
-        subtitle: 'Discover technical guides, calculation tools, and application scenarios we prepared for right HVAC decisions.',
-        searchPlaceholder: 'Search for topic, technical term or product family...',
+        title: 'Ventilation Guide Articles',
+        subtitle: 'Every guide article has a Sources section, and guide articles are published in Turkish. Use the Product Selector for calculations.',
+        searchPlaceholder: 'Search...',
         readStart: 'Start Reading',
         // ⛔DUPLICATE "coming soon" COPY REMOVED (2026-09-05). This block lives under
         // `home.knowledge.hub` and was NEVER rendered — `KnowledgeBlock`'s props type has no
         // `hub`, and nothing in the repo reads `home.knowledge`. The same untruth existed
         // twice: once on screen, once dead. The dead one is gone too, so nobody restores it.
         notFoundTitle: 'Couldn\'t find the technical info you\'re looking for?',
-        notFoundDesc: 'Our engineering team is ready to provide custom documentation support for your complex projects.',
-        contactExpert: 'Talk to an Expert',
+        notFoundDesc: 'You can send your question through the contact form or by email.',
+        contactExpert: 'Get in Touch',
         readTime: '{{count}} min read',
         categories: {
           comfort: 'Comfort',
@@ -610,71 +610,71 @@ export const en: typeof tr = {
       },
       items: {
         guides: {
-          eyebrow: 'Knowledge Hub',
-          title: 'Selection guides and technical content',
-          description: 'Use category-based guides and topic pages to make product selection more informed.'
+          eyebrow: '',
+          title: '',
+          description: 'Guide articles are published in Turkish; each article has a Sources section.'
         },
         // "Product Selector", not "Calculators" (decision K17): one name, one destination.
         calculators: {
           eyebrow: 'Product Selector',
-          title: 'Size the right product for your space',
+          title: 'Preliminary assessment: volume, flow, pressure',
           description: 'Duct, HRV, air-curtain and jet fan sizing in one place.'
         },
         support: {
           eyebrow: 'Support',
-          title: 'FAQ and operational support flow',
-          description: 'Move more comfortably into quote and after-sales processes through FAQs and support paths.'
+          title: 'FAQ, delivery, returns, warranty pages',
+          description: 'Orders start with a quote request. You can send questions through the contact form or by email.'
         }
       }
     },
     finalCta: {
       eyebrow: 'Final Step',
-      title: 'Let’s clarify the right HVAC solution together.',
-      subtitle: 'Complete the flow we built from category discovery to technical support with expert guidance, quotation and product exploration.',
+      title: 'Send your requirements, request a quote.',
+      subtitle: 'Run a preliminary assessment with the Product Selector, browse the product families, and use the contact form or e-mail to request a quote.',
       primaryCta: 'Request Quote',
-      secondaryCta: 'Talk to an Expert',
+      secondaryCta: 'Get in Touch',
       tertiaryCta: 'Explore Products'
     },
-    heroTitle: 'Clean Air, Clean Future',
-    heroSubtitle: 'Engineering-driven ventilation platform. 6 leading brands and 50+ product types for professional ventilation solutions.',
+    heroTitle: 'Clean Air, the Right Product Family',
+    heroSubtitle: 'Ventilation product catalogue and calculators: fans, air curtains, heat recovery and frequency converters.',
     bottomCtaTitle: 'Let us help you choose the right product.',
-    bottomCtaSubtitle: 'Share your project details, our engineering team will guide you quickly.',
-    whyParagraph: 'With 15+ years of experience and world-class products, we are your trusted partner in the HVAC industry.',
+    bottomCtaSubtitle: 'Send your project details through the contact form or by e-mail.',
+    whyParagraph: 'Browse duct fan, air curtain and heat recovery models, pre-size with the Product Selector and request a quote.',
     why: {
-      premiumTitle: 'Premium Quality',
-      premiumText: 'We select only the highest-quality products from globally recognized brands.',
-      expertTitle: 'Expert Support',
-      expertText: 'Our HVAC experts provide 24/7 technical support to find the best solution.',
-      fastTitle: 'Fast Delivery',
-      fastText: 'Rapid and reliable delivery across Turkey.'
+      premiumTitle: 'Brands',
+      premiumText: 'Products from {marka} brands; product pages carry datasheets and specification tables.',
+      expertTitle: 'Pre-assessment',
+      expertText: 'The Product Selector runs duct fan, heat recovery, air curtain and jet fan sizing.',
+      fastTitle: 'Order by Quote',
+      fastText: 'Delivery terms are stated in the quote.'
     },
     stats: {
-      premiumBrands: 'Premium Brands',
-      productTypes: 'Product Types',
-      yearsExperience: 'Years Experience',
-      happyCustomers: 'Happy Customers'
+      premiumBrands: 'Brands',
+      productTypes: 'Product Families',
+      yearsExperience: 'Models',
+      happyCustomers: 'Main Categories'
     },
     galleryTitle: 'Product Gallery',
-    gallerySubtitle: 'Browse featured products',
+    gallerySubtitle: 'Browse product families',
     caseStudies: {
-      title: 'Success Stories',
-      subtitle: 'Results from real projects',
+      title: 'Application Areas',
+      subtitle: 'Air curtain use areas and jet fan sizing',
       viewDetails: 'View Details',
       items: {
         parking: {
-          title: 'Parking Jet Fan Project',
-          summary: 'Significant reduction in energy consumption and improvement in air quality with CO sensor control.',
+          title: 'Jet Fan Sizing',
+          summary: 'Jet fan sizing in the Product Selector takes volume, flow and pressure inputs; the result is a preliminary assessment.',
           metrics: {
-            energySavings: 'Energy Savings',
-            duration: 'Duration'
+            energySavings: '',
+            duration: ''
           }
         },
         airCurtain: {
           title: 'Air Curtain Application',
-          summary: 'Increased entrance comfort, reduced heat loss, and temperature stability around the door.',
+          summary: 'An air curtain creates a downward airflow across the door opening that limits the passage of hot and cold air.',
           metrics: {
-            comfortIncrease: 'Comfort Increase',
-            roi: 'Return on Investment'
+            comfortIncrease: '',
+            roi: ''
           }
         }
       }
@@ -682,44 +682,44 @@ export const en: typeof tr = {
   },
   homeCta: {
     title: 'Let’s Talk About Your Project',
-    subtitle: 'Give us brief info, we’ll shape the right solution together.',
-    button: 'Get Quote / Expert Support'
+    subtitle: 'Send a short project description via the contact form or email.',
+    button: 'Request a Quote'
   },
   homeProcess: {
     title: 'How We Work',
-    subtitle: 'A transparent and predictable process from kickoff to delivery',
+    subtitle: 'From catalogue to quote: delivery terms are clarified at the quote stage',
     stepPrefix: 'Step',
     steps: {
       need: {
         title: 'Understanding Your Needs',
-        desc: 'We clarify the use case via a short call or form.'
+        desc: 'Share your intended use through the contact form or at info@venthub.com.tr.'
       },
       analysis: {
-        title: 'Analysis & Calculation',
-        desc: 'We review airflow, pressure, acoustics, energy efficiency and regulations.'
+        title: 'Preliminary Calculation',
+        desc: 'Enter volume, flow and pressure in the Product Selector for a preliminary calculation. The results are preliminary assessments.'
       },
       proposal: {
         title: 'Solution / Proposal',
         desc: 'We propose suitable product families, alternatives and lead times.'
       },
       implementation: {
-        title: 'Implementation Support',
-        desc: 'We streamline with install guides, commissioning and technical support.'
+        title: 'Installation and Maintenance',
+        desc: 'For installation and maintenance, refer to the product\'s user manual and manufacturer documentation.'
       },
       support: {
-        title: 'Support',
-        desc: 'After-sales training, spare parts and service network for sustainability.'
+        title: 'FAQ and Contact',
+        desc: 'For technical questions, you can use the contact form or email.'
       }
     }
   },
   homeShowcase: {
     slide1: {
-      title: 'Expertise in Industrial Ventilation',
-      subtitle: 'Solutions tailored to your project and the right product selection'
+      title: 'Fans, air curtains and heat recovery',
+      subtitle: 'Run a preliminary assessment with the Product Selector'
     },
     slide2: {
-      title: 'Energy Efficiency & Comfort',
-      subtitle: 'Better performance at lower cost with proper engineering'
+      title: 'Fans, Converters, Heat Recovery',
+      subtitle: 'Examples from the models in the catalogue'
     },
     slide3: {
       title: 'Guided by Your Needs',
@@ -734,7 +734,7 @@ export const en: typeof tr = {
     // REC-338 — see the TR dictionary for the measurement that motivated these keys.
     discovery: {
       seoTitle: 'All Products | Industrial Ventilation and HVAC — VentHub',
-      seoDesc: 'Every VentHub product family in one list: fans, heat recovery, air curtains, ducting and accessories. Engineering-led selection.',
+      seoDesc: 'Product families in one list: fans, heat recovery, air curtains, frequency converters and accessories. Request a quote to order.',
     },
     orbital: {
       dragHint: 'Drag to Spin',
@@ -757,7 +757,7 @@ export const en: typeof tr = {
       dragHint: 'Hold to Rotate',
     },
     smartInference: {
-      aiInsightBadge: 'AI INSIGHT V2.1',
+      aiInsightBadge: 'PRODUCT INFO',
     },
     blueprint: {
       scanning: 'Scanning Blueprint...',
@@ -769,16 +769,16 @@ export const en: typeof tr = {
       existingProjects: 'My Projects',
       noProjects: 'You don\'t have any projects yet.',
       createNewProject: 'Create New Project',
-      projectNamePlaceholder: 'Project Name (e.g. Hilton Hotel Renovation)',
+      projectNamePlaceholder: 'Project Name (e.g. Office Building Ventilation)',
       cancel: 'Cancel',
       footerHint: 'You can manage your projects from the my account page, download product lists as PDF, or request a quote.',
     },
-    heroTitle: 'Discover HVAC products: engineering-led selection, fast quotes',
-    heroSubtitle: 'Find the right product quickly with application-guided areas, popular categories and featured products.',
+    heroTitle: 'Browse fans, air curtains, heat recovery and control products',
+    heroSubtitle: 'Reach a product family from the categories or brand pages, or type a model name or code in the search box.',
     itemsListed: 'items listed',
     // REC-115: removed with the dead CategoryHero component.
-    popularCategories: 'Popular Categories',
-    hubTitle: 'Professional HVAC Solutions',
+    popularCategories: 'Main Categories',
+    hubTitle: 'HVAC Product Families',
     searchPlaceholder: 'Search product or model...',
     noResults: 'No Results Found',
     clearFilters: 'Clear Filters',
@@ -788,13 +788,13 @@ export const en: typeof tr = {
     allProductsTitle: 'All Our Products',
     emptyDesc: 'Select one of the categories to see more products.',
     emptyTitle: 'No Products Found',
-    systemTotalPrefix: 'All in system',
+    systemTotalPrefix: 'All in catalogue',
     viewGrid: 'Grid',
     viewList: 'List'
   },
   megamenu: {
     elite: {
-      defaultDescription: 'High-quality ventilation solutions.',
+      defaultDescription: 'Browse ventilation product families.',
       viewAll: 'View All',
     },
     classic: {
@@ -802,8 +802,8 @@ export const en: typeof tr = {
       title: 'Categories',
     },
     categoryHub: {
-      featuredTechnology: 'FEATURED TECHNOLOGY',
-      defaultDescription: 'High-performance, smart industrial solution.',
+      featuredTechnology: 'TECHNOLOGY',
+      defaultDescription: 'Subcategories and product families are listed here.',
       back: 'Go Back',
       subCategoryCount: '{{count}} Subcategories',
     },
@@ -864,7 +864,7 @@ export const en: typeof tr = {
     favorites: 'Favorites',
     cart: 'Cart',
     brandName: 'VentHub',
-    brandTagline: 'HVAC Premium',
+    brandTagline: 'HVAC Catalogue',
     commandSearchCompact: 'Search...'
   },
   roles: {
@@ -928,9 +928,9 @@ export const en: typeof tr = {
     quickLinks: 'Quick Links',
     categories: 'Categories',
     contact: 'Contact',
-    workingHours: 'Working Hours',
-    weekdays: 'Monday - Friday',
-    saturday: 'Saturday',
+    workingHours: 'Quotes and Questions',
+    weekdays: 'For quotes and questions, send an email or fill in the contact form.',
+    saturday: '',
     rights: 'All rights reserved.',
     // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
     // is published. Restored together with the TR dictionary (parity) once real.
@@ -940,29 +940,29 @@ export const en: typeof tr = {
   },
   contactPage: {
     form: {
-      heroBadge: 'Global Connectivity',
+      heroBadge: 'Quotes and Questions',
       heroTitle: 'Let\'s Shape Your',
       heroTitleAccent: 'Project Together',
-      heroDesc: 'Get in touch directly with our expert engineering team for technical documentation, product selection, or custom quotes.',
-      cardPhoneTitle: 'Engineering Line',
-      cardPhoneLabel: 'Call Now',
+      heroDesc: 'For product selection, technical questions and quote requests, fill in the form or send an email.',
+      cardPhoneTitle: '',
+      cardPhoneLabel: 'Write via the form',
       cardEmailTitle: 'Technical Quote',
       cardEmailLabel: 'Send Email',
       // cardOffice* REMOVED (2026-08-28): no real office address, so no card.
-      directAccessLabel: 'Direct Access',
-      supportTitle: 'Technical Support',
-      supportTitleAccent: 'By Your Side Anytime',
-      supportDesc: 'We deliver fast solutions for your complex HVAC projects. Request technical documentation or get instant support via our WhatsApp line.',
-      whatsappCta: 'WhatsApp Engineering Line',
-      responseTime: 'Average Response Time: 15 Minutes',
+      directAccessLabel: 'Contact Options',
+      supportTitle: 'Technical Questions',
+      supportTitleAccent: 'By Form and Email',
+      supportDesc: 'Product pages carry technical datasheets and specification tables; if you have a further technical question, you can send it by email.',
+      whatsappCta: 'Send a Technical Question',
+      responseTime: 'Request a quote to place an order',
       successTitle: 'Your Message Has Been Sent',
-      successDesc: 'Our engineering team will get back to you as soon as possible.',
+      successDesc: 'If you have anything to add, you can send an email.',
       newMessage: 'Send a New Message',
       labelName: 'Full Name',
       labelEmail: 'Email',
       labelSubject: 'Subject / Project Name',
       labelMessage: 'Your Message',
-      subjectPlaceholder: 'e.g. Car Park Jet Fan Project',
+      subjectPlaceholder: 'e.g. Duct Fan Project Quote',
       messagePlaceholder: 'Write your requirements here...',
       submitButton: 'Submit Request',
       consentText: 'I have read and agree.',
@@ -970,39 +970,39 @@ export const en: typeof tr = {
       submitFailed: 'We could not send your message. Please try again; if the problem persists, contact us directly.',
     },
     title: 'Contact',
-    subtitle: 'Contact us for your project or product questions. We will get back to you as soon as possible.',
+    subtitle: 'Contact us for product selection, technical questions or quote requests. Use the form or write to us by email.',
   },
   aboutPage: {
     title: 'About VentHub',
     heroTitle: 'Ventilation products:',
-    whySubtitle: 'We work to be worthy of your trust',
-    experience: 'Years of Experience',
-    distributorship: 'Global Brand Network',
-    completedProject: 'Product Types',
-    shippingNetwork: 'Province Delivery Network',
-    precisionTitle: 'Engineering Precision',
-    precisionDesc: 'We do not just sell products; we offer engineering solutions with project-specific airflow, pressure, and efficiency calculations.',
-    standardsTitle: 'Global Standards',
-    standardsDesc: 'We bring the latest and certified technologies of world-leading HVAC brands to the local market.',
-    trustTitle: 'Operational Trust',
-    trustDesc: 'We manage our supply and operations with discipline, aiming for on-time delivery while staying loyal to your project schedules.',
-    heroBadge: '15+ Years of Engineering Experience',
+    whySubtitle: 'Brands listed in the product catalogue',
+    experience: 'Brands with Products',
+    distributorship: 'Product Families',
+    completedProject: 'Active Models',
+    shippingNetwork: 'Product Selector Tools',
+    precisionTitle: 'Product Selector Tools',
+    precisionDesc: 'Run a pre-assessment for duct fans, heat recovery (HRV), air curtains and jet fans from your volume, airflow and pressure inputs.',
+    standardsTitle: 'Sourced Guides',
+    standardsDesc: 'Guide articles are published in Turkish; each one carries its own Sources section.',
+    trustTitle: 'Orders by Quote',
+    trustDesc: 'Online sales are currently closed; orders start with a quote request. The quote states the shipping fee and carrier; the tracking number is sent by email.',
+    heroBadge: 'Catalogue and Quotation Site',
     heroTitleItalic: 'catalogue and selection tools',
-    heroDesc: 'VentHub brings highly efficient, technological, and sustainable ventilation systems to the Turkish market for modern living and industrial spaces.',
-    storyTitle: 'We Build the Climate',
-    storyTitleItalic: 'of the Future Today',
-    storyDesc1: 'VentHub is positioned not just as a supplier but as a technological solution partner in the ventilation sector. With more than 15 years of field experience, we bring Europe\'s most prestigious brands together with Turkey\'s major projects.',
-    storyDesc2: 'In our operations, we prioritize engineering ethics and operational excellence above everything. For us, every product is a component, and every project is a work of ventilation art.',
-    teamTitle: 'Engineering &',
-    teamSubtitle: 'Technical Support Approach',
-    brandTitle: 'Our Brand',
-    brandTitleItalic: 'Portfolio',
-    ctaTitle: 'Are You Ready to Meet',
-    ctaTitleItalic: 'Your Engineering Partner?',
+    heroDesc: 'VentHub lists products such as fans, air curtains, heat recovery units and frequency converters by brand, product family and model.',
+    storyTitle: 'Find, Calculate,',
+    storyTitleItalic: 'Request a Quote',
+    storyDesc1: 'The catalogue has brand pages, product family pages and product pages; the product pages carry technical specification tables. You can browse products by brand or by product family.',
+    storyDesc2: 'Product Selector results are a pre-assessment; to request a quote, use the contact form or email. Guide articles are published in Turkish.',
+    teamTitle: 'Product Selector &',
+    teamSubtitle: 'Guide Articles (Turkish)',
+    brandTitle: 'Brands in',
+    brandTitleItalic: 'the Catalogue',
+    ctaTitle: 'For a Quote or a Question,',
+    ctaTitleItalic: 'Use the Contact Form',
     ctaContact: 'Contact Us',
     ctaExplore: 'Explore Products',
-    seoDescription: 'VentHub: engineering-oriented ventilation solutions. The right product selection in industrial ventilation, backed by 15 years of field experience.',
-    vision: 'Our Vision'
+    seoDescription: 'VentHub lists fans, air curtains, heat recovery units and frequency converters. Use the Product Selector for a pre-assessment and request a quote.',
+    vision: 'Catalogue, Sizing, Quote'
   },
   category: {
     // REC-497: used when the category has no description of its own (metadata.description_i18n).
@@ -1029,202 +1029,202 @@ export const en: typeof tr = {
     },
     faq: {
       heading: 'Frequently Asked Questions',
-      subtitle: 'The most common questions about air curtains',
+      subtitle: 'Choosing, installing and maintaining air curtains',
       moreQuestions: 'Do you have other questions?',
       contactUs: 'Contact us →',
-      q1: 'Does an air curtain really save energy?',
-      a1: 'Yes, an air curtain preserves the indoor temperature while the door is open and can provide energy savings of up to 30%. This saving is especially pronounced in businesses with frequent door openings (stores, restaurants, markets).',
+      q1: 'What does an air curtain do?',
+      a1: 'An air curtain separates indoor air from outdoor air with a stream of air blown downwards across the door, limiting air exchange while the door is open. Shop and supermarket entrances, restaurants and warehouse doors are typical applications.',
       q2: 'Should I choose an electric or an ambient-air model?',
-      a2: 'This depends on where you use it. If you want heating at the doorway during winter, an electric heated model is ideal. If you have a cold storage room or an existing heating system, an ambient-air model is sufficient and more economical.',
+      a2: 'This depends on where you use it. Unheated (ambient-air) models only create an airflow; electric heated models also heat the entrance. If you want heating at the entrance, choose an electric heated model; if not, choose an unheated one.',
       q3: 'What size should the air curtain be?',
-      a3: 'The air curtain width should be equal to or slightly wider than the door width. For example, a 120 cm or 150 cm model is suitable for a 120 cm door. Installation height also matters - pay attention to the maximum height stated in the device\'s technical specifications.',
-      q4: 'Is installation difficult?',
-      a4: 'Air curtains are usually mounted by hanging them above the door. Professional installation is recommended, but a technician with basic electrical knowledge can easily install one. The installation kit and mounting guide come with the product.',
-      q5: 'Does it require maintenance?',
-      a5: 'Minimal maintenance is sufficient. Cleaning the filters and dusting the fan blades 1-2 times a year is recommended. Regular maintenance extends the device\'s lifespan and preserves its performance.',
-      q6: 'How long is the Vortice warranty?',
-      a6: 'Vortice products are sold with a 2-year manufacturer warranty. Under the warranty, faults arising from manufacturing defects are repaired or replaced free of charge. We handle your warranty processes quickly under full brand assurance.',
+      a3: 'An air curtain is chosen according to the door width. The door\'s height above the floor and whether the unit can be mounted above the door also affect the choice. For details, see the technical specifications on the product page.',
+      q4: 'How is an air curtain installed?',
+      a4: 'Whether the unit can be mounted above the door affects the choice of model. For installation, see the product\'s user manual and the manufacturer\'s documentation.',
+      q5: 'How is it maintained?',
+      a5: 'For maintenance, see the product\'s user manual and the manufacturer\'s documentation.',
+      q6: 'What does the Vortice warranty cover?',
+      a6: 'Warranty coverage may vary depending on the manufacturer or importer. Please keep your warranty document and user manual. For questions, you can write to info@venthub.com.tr.',
     },
     trustSignals: {
       // REC-104: see tr.ts — brand-specific wording, the fixed "2-year" claim and the
       // certification row were removed.
-      authorizedDealerTitle: 'Authorized Distribution',
-      authorizedDealerDesc: 'Genuine products, official supply chain',
-      warrantyTitle: 'Manufacturer Warranty',
+      authorizedDealerTitle: 'Technical Datasheet',
+      authorizedDealerDesc: 'Specification tables on product pages',
+      warrantyTitle: 'Warranty Information',
       warrantyDesc: 'Subject to manufacturer/importer terms',
       // REC-104: see tr.ts — payment/shipping promise keys removed.
-      techSupportTitle: 'Technical Support',
-      techSupportDesc: 'Expert consultation',
+      techSupportTitle: 'Enquiry and Quote',
+      techSupportDesc: 'By form or e-mail',
     },
     typeComparison: {
       sectionTitle: 'Which Type of Air Curtain Is Right for You?',
-      sectionSubtitle: 'Choose the right type for your needs. Both offer the same quality, designed for different purposes.',
-      electricSubtitle: 'Ideal for winter use',
+      sectionSubtitle: 'Choose the type according to whether you want heating at the entrance.',
+      electricSubtitle: 'For heating the entrance',
       electricBenefit1: 'Warm air barrier at the entrance',
-      electricBenefit2: 'Energy savings during winter months',
-      electricBenefit3: 'Improves customer comfort',
-      electricBenefit4: 'Thermostat-controlled heating',
-      electricBestFor1: 'Store entrances',
-      electricBestFor2: 'Restaurant doors',
-      electricBestFor3: 'Hotel lobbies',
-      electricBestFor4: 'In cold climates',
-      electricNotFor1: 'Cold storage rooms',
-      electricNotFor2: 'Summer use',
+      electricBenefit2: 'Also heats the entrance area',
+      electricBenefit3: 'Airflow and heating in one unit',
+      electricBenefit4: 'Chosen if heating is wanted',
+      electricBestFor1: 'Entrances to heat',
+      electricBestFor2: '',
+      electricBestFor3: '',
+      electricBestFor4: '',
+      electricNotFor1: 'Entrances not to heat',
+      electricNotFor2: '',
       ambientTitle: 'Ambient Air',
-      ambientSubtitle: 'Focused on energy savings',
-      ambientBenefit1: 'Low energy consumption',
-      ambientBenefit2: 'Cold chain protection',
-      ambientBenefit3: 'Hygiene barrier',
-      ambientBenefit4: 'Supplement to existing heating system',
-      ambientBestFor1: 'Cold storage rooms',
-      ambientBestFor2: 'Supermarket aisles',
-      ambientBestFor3: 'Hospitals',
-      ambientBestFor4: 'Summer venues',
-      ambientNotFor1: 'Unheated spaces',
-      ambientNotFor2: 'In very cold climates',
-      advantagesLabel: 'ADVANTAGES',
-      bestForLabel: 'BEST FOR:',
+      ambientSubtitle: 'Unheated models',
+      ambientBenefit1: 'Creates an airflow only',
+      ambientBenefit2: 'Downward air stream',
+      ambientBenefit3: 'Vortice AD family',
+      ambientBenefit4: 'Chosen if heating is not wanted',
+      ambientBestFor1: 'Entrances not to heat',
+      ambientBestFor2: '',
+      ambientBestFor3: '',
+      ambientBestFor4: '',
+      ambientNotFor1: 'Entrances needing heating',
+      ambientNotFor2: '',
+      advantagesLabel: 'FEATURES',
+      bestForLabel: 'SUITABLE:',
       notForLabel: 'NOT RECOMMENDED:',
       modelsCta: '{{title}} Models',
       stillUndecided: 'Still undecided?',
-      wizardPitch: 'Our 2-minute needs analysis wizard will recommend the most suitable type and model for you.',
+      wizardPitch: 'If you are undecided, the air curtain calculator in the Product Selector gives a preliminary assessment.',
       helpMe: 'Help Me',
     },
     bottomCta: {
       nextStep: 'Your Next Step',
-      helpText: 'Let us help you find the most suitable {{category}}',
+      helpText: 'You can send your questions about {{category}}.',
       viewAllProducts: 'View all products',
       findFit: 'Find the Right One for Me',
-      findFitDesc: 'The right model in 3 steps',
-      expertSupport: 'Expert Support',
-      expertSupportDesc: 'Get project consulting',
+      findFitDesc: 'Run a preliminary calculation',
+      expertSupport: 'Contact Form',
+      expertSupportDesc: 'Submit a project enquiry',
       backToTop: 'Back to Top',
     },
     problemSection: {
-      headerTitle: 'How Much Energy Is Escaping Through Your Door?',
-      headerSubtitle: 'An open door = an open wallet. Every day you lose energy and money without realizing it.',
+      headerTitle: 'Air and Heat Exchange at an Open Door',
+      headerSubtitle: 'When a door stays open, indoor and outdoor air mix.',
       energyLossTitle: 'Energy Loss',
-      energyLossDesc: 'The average annual cost of heat escaping through an open door',
+      energyLossDesc: 'Heat transfer between indoors and outdoors while the door is open',
       tempDiffTitle: 'Temperature Difference',
       tempDiffDesc: 'The indoor-outdoor temperature difference when the door is opened',
       airflowTitle: 'Airflow',
-      airflowDesc: 'Uncontrolled wind and dust entry',
-      pestTitle: 'Pest Entry',
-      pestDesc: 'Free passage of insects and dust particles',
+      airflowDesc: 'Outdoor air entering through an open door',
+      pestTitle: 'Dust Entry',
+      pestDesc: 'Dust entering through an open door',
       crossMark: '❌',
       checkMark: '✓',
       withoutTitle: 'Without an Air Curtain',
-      withoutPoint1: 'Continuous heat loss',
-      withoutPoint2: 'High energy bills',
-      withoutPoint3: 'Low comfort',
-      withoutPoint4: 'Easy pest entry',
+      withoutPoint1: 'Indoor and outdoor air mix',
+      withoutPoint2: 'Hot and cold air can pass through',
+      withoutPoint3: 'Dust can enter',
+      withoutPoint4: '',
       withTitle: 'With an Air Curtain',
-      withPoint1: 'Invisible energy barrier',
-      withPoint2: 'Up to 30% savings',
-      withPoint3: 'Comfortable indoor environment',
-      withPoint4: 'Shield against pests',
+      withPoint1: 'Invisible air barrier',
+      withPoint2: 'Limits air and heat exchange',
+      withPoint3: 'Limits dust entry',
+      withPoint4: '',
     },
     landing: {
-      expertiseArea: 'Area of Expertise',
-      descriptionFallback: 'Discover professional solutions with their technical details.',
+      expertiseArea: 'Product Category',
+      descriptionFallback: 'Browse product families with their technical specifications.',
       detailedReview: 'View Details',
       viewModels: 'View Models',
-      dehumidifierTitle: 'Engineering Precision in Humidity Control',
-      dehumidifierDesc: 'Maintain ideal air quality with dehumidification technologies optimized for industrial and comfort spaces.',
-      dehumidifierCapacityValue: '35L/Day',
+      dehumidifierTitle: 'Dehumidifiers',
+      dehumidifierDesc: 'The catalogue lists Vortice Deumido dehumidifiers; technical specifications are given on the product pages.',
+      dehumidifierCapacityValue: '',
       dehumidifierCapacityLabel: 'Capacity',
-      dehumidifierNoiseValue: '42dB',
-      dehumidifierNoiseLabel: 'Quiet Operation',
+      dehumidifierNoiseValue: '',
+      dehumidifierNoiseLabel: 'Sound Level',
       modelsSuffix: 'Models',
       filterAll: 'All Models',
       venthubSolution: 'VentHub Solution',
     },
     series: {
       technicalFamily: 'Subcategory',
-      heroDefaultDesc: 'Browse professional ventilation solutions by their technical product families.',
-      seriesDetail: 'Subcategory Detail',
+      heroDefaultDesc: 'Browse products by technical product family; specification tables are on the product pages.',
+      seriesDetail: 'Product Family Details',
       requestQuote: 'Request a Quote',
       colModel: 'Model',
       colPrice: 'Price',
       colAction: 'Action',
       skuLabel: 'SKU: {{sku}}',
-      trust1Title: 'Technical Performance',
-      trust1Desc: 'All data is 100% verified with factory test reports.',
-      trust2Title: 'Precision Engineering',
-      trust2Desc: 'The most accurate airflow and pressure match for your project.',
-      trust3Title: 'Expert Support',
-      trust3Desc: 'Instant technical documentation and selection support from our engineers.',
+      trust1Title: 'Technical Datasheet',
+      trust1Desc: 'Product pages include datasheets and specification tables.',
+      trust2Title: 'Product Selector',
+      trust2Desc: 'Gives a preliminary assessment from volume, flow rate and pressure inputs.',
+      trust3Title: 'Enquiry and Quote',
+      trust3Desc: 'You can send your questions by form or e-mail.',
     },
     loading: 'Loading category... ',
     notFound: 'Category Not Found',
     backHome: 'Back to home',
     breadcrumbHome: 'Home',
     breadcrumbAria: 'Breadcrumb',
-    premiumCollection: 'Premium Collection',
+    premiumCollection: 'Lineo Quiet Family',
     findModel: 'Find Suitable Model',
     productCount: 'Product Count',
     discoverMore: 'Discover More',
     whichAirCurtain: 'Which Air Curtain Should You Choose?',
-    airCurtainHelper: 'Let us help you determine the best solution for your needs.',
+    airCurtainHelper: 'Door size and the need for heating at the entrance determine the choice.',
     ambientAir: 'Ambient Air (Unheated)',
-    ambientAirDesc: 'Ideal for areas with little temperature difference between indoor and outdoor or situations where only air isolation is required.',
+    ambientAirDesc: 'Unheated models (Vortice AD) create an air flow across the door opening only and do not heat the entrance.',
     electricHeated: 'Electric Heated',
-    electricHeatedDesc: 'Increases comfort by blowing warm air inside while breaking the cold air coming from outside in winter months.',
-    ambientPoint1: 'Provides minimum energy consumption.',
-    ambientPoint2: 'It is the most accurate choice for cold storage rooms.',
-    ambientPoint3: 'Used in regions that are cool in summer and mild in winter.',
-    electricPoint1: 'Creates a "Warm Welcome" effect at the entrance.',
-    electricPoint2: 'Supports the space as an additional heating source.',
-    electricPoint3: 'Recommended for Mall, Store and Restaurant entrances.',
+    electricHeatedDesc: 'Electric heated models heat the air flow passing through the door, providing heating at the entrance.',
+    ambientPoint1: 'Creates an airflow only.',
+    ambientPoint2: 'Choose this type if no heating is wanted at the entrance.',
+    ambientPoint3: 'Uses an air flow to block hot and cold air at the door opening.',
+    electricPoint1: 'Creates a heated air flow across the door opening.',
+    electricPoint2: 'Heating applies only to the air passing through the door.',
+    electricPoint3: 'A typical use at store and restaurant entrances.',
     inspectModels: 'Inspect Models',
     modernLiving: 'Modern Living Spaces',
-    modernLivingDesc: 'Minimalist design and comfort in whisper quietness.',
-    flexibilityEsthetics: 'Flexibility and Aesthetics',
+    modernLivingDesc: 'Duct fan with sound-absorbing lining built into the casing.',
+    flexibilityEsthetics: 'Size and Motor Options',
     smartControl: 'Smart Control',
-    smartControlDesc: 'Uninterrupted fresh air with automatic speed adjustment according to air quality.',
-    longTermInvestment: 'Long Term Investment',
-    longTermInvestmentDesc: 'Maintenance-free motor technology and durable polymer body.',
+    smartControlDesc: 'According to the manufacturer, the brushless EC LINEO QUIET ES offers low energy consumption.',
+    longTermInvestment: 'Selection by door size',
+    longTermInvestmentDesc: 'The manufacturer states low energy use for EC brushless LINEO QUIET ES.',
     allSeries: 'All Subcategories',
-    chooseSeriesDesc: 'Choose the subcategory that suits your needs',
-    inspectSeries: 'Explore',
+    chooseSeriesDesc: 'Choose the subcategory that suits your needs.',
+    inspectSeries: 'Explore Subcategory',
     whyCategory: 'Why {{category}}?',
     electricVsAmbientAlt: 'Electric vs Ambient Air Comparison',
     modernLoftAlt: 'Modern Loft Application',
-    lineoQuietQuote: 'Lineo Quiet ES is not just a fan; it is the silent hero of modern architecture.',
+    lineoQuietQuote: 'Lineo Quiet ES is a mixed-flow duct fan with sound-absorbing cladding and an EC brushless motor.',
     industrialLabAlt: 'Industrial Laboratory Application',
     lineoTechnicalAlt: 'Lineo Quiet Technical Detail',
-    lineoNeonAlt: 'Lineo Quiet Neon Engineering Design',
-    vorticeHeritageAlt: 'Vortice Lineo Brand Heritage and History',
+    lineoNeonAlt: 'Vortice Lineo Quiet image',
+    vorticeHeritageAlt: 'Vortice brand and its Tribiano (Italy) headquarters',
     airCurtainDiagramAlt: 'Air Curtain Operating Principle',
-    whyCategorySubtitle: 'We add value to your projects with production at industrial standards and high engineering solutions.',
+    whyCategorySubtitle: 'The catalogue includes product families, product pages and technical specification tables.',
     lineoTechnologyTitle: 'Vortice Lineo Quiet ES Technology',
     howItWorksTitle: 'How It Works',
-    lineoTechnologyDesc: 'Perfect harmony of silence and performance. Meet the advanced aerodynamic design.',
+    lineoTechnologyDesc: 'Mixed-flow duct fan; available with AC induction or EC brushless motors.',
     howItWorksDesc: 'The air curtain creates an invisible barrier, separating the indoor and outdoor environments.',
-    why1Title: 'High Efficiency',
-    why1Desc: 'Energy-saving motor technology in compliance with ErP standards.',
-    why2Title: 'Silent Operation',
-    why2Desc: 'Special acoustic insulation and aerodynamic fan design.',
-    why3Title: 'Long Life',
-    why3Desc: 'Corrosion-resistant body and heavy-duty components.',
+    why1Title: 'Datasheets',
+    why1Desc: 'Technical values (motor, airflow and pressure) are listed in the technical table on each product page.',
+    why2Title: 'Noise Values',
+    why2Desc: 'Noise level information is listed in the technical table on the product page.',
+    why3Title: 'Documents and Manuals',
+    why3Desc: 'The product manual and manufacturer documents are the reference for installation and maintenance.',
     filters: 'Filters',
     subcategories: 'Subcategories',
     brands: 'Brands',
     airflow: 'Airflow (m³/h)',
     showcase: {
-      defaultDescription: 'The technical authority on high-performance, intelligent and sustainable ventilation systems.',
-      premiumTitle: 'Premium Engineering Solutions',
-      catalog: 'Category Catalog',
+      defaultDescription: 'Product families, models and technical specification tables in this category.',
+      premiumTitle: 'Product Catalogue',
+      catalog: 'Category Catalogue',
       subGroups: 'Subcategories',
       exploreSeries: 'Explore',
-      guarantee: 'VentHub Guarantee',
+      guarantee: 'VentHub Catalogue',
       discover: 'Discover',
-      whyVenthubTitle: 'Why VentHub Engineering?',
-      premiumEngineeringAlt: 'Premium Engineering Visual',
+      whyVenthubTitle: 'What the Catalogue Offers',
+      premiumEngineeringAlt: 'Category image',
       features: [
-        { title: 'Industrial Certification', desc: 'Fully approved systems that have passed international tests.' },
-        { title: 'High Performance', desc: 'Aerodynamic design with maximum efficiency and low energy consumption.' },
-        { title: 'Smart Control', desc: 'Seamless integration with BMS and central automation systems.' }
+        { title: 'Technical Datasheet', desc: 'Product pages include datasheets and specification tables.' },
+        { title: 'Product Selector', desc: 'Preliminary calculators for duct fans, heat recovery, air curtains and jet fans.' },
+        { title: 'Orders by Quote', desc: 'Delivery terms are clarified at the quotation stage, based on your project.' }
       ]
     },
     pressure: 'Pressure (Pa)',
@@ -1237,14 +1237,14 @@ export const en: typeof tr = {
     feature: 'Feature',
     localSearchPlaceholder: 'Search within this category (name/brand/model/SKU)',
     howItWorksAirCurtain: {
-      title: 'How an Air Curtain Works?',
-      subtitle: 'A simple yet effective principle: Invisible air wall',
+      title: 'How Does an Air Curtain Work?',
+      subtitle: 'A stream of air blown downwards across the door',
       diagramAlt: 'Air Curtain Working Principle',
       steps: [
         {
-          title: 'Powerful Airflow',
-          description: 'The device creates a controlled airflow at high speed.',
-          detail: 'Uniform and strong airflow is provided by specially designed fans and blades.'
+          title: 'Airflow',
+          description: 'The device blows a stream of air downwards across the door.',
+          detail: 'Unheated models only create an airflow; electric heated models also heat the entrance.'
         },
         {
           title: 'Invisible Barrier',
@@ -1252,49 +1252,49 @@ export const en: typeof tr = {
           detail: 'This air curtain separates the indoor and outdoor environments without a physical barrier.'
         },
         {
-          title: 'Isolation',
-          description: 'Outdoor air, dust, insects, and odors cannot enter.',
-          detail: 'Indoor temperature is preserved, hygiene standards are maintained.'
+          title: 'Separation',
+          description: 'Limits the entry of outdoor air and dust.',
+          detail: 'The transfer of heat between indoor and outdoor spaces is limited.'
         },
         {
-          title: 'Comfort',
-          description: 'Ideal environment is provided for customers and employees.',
-          detail: 'Even if the door remains open, indoor comfort is not compromised.'
+          title: 'Where It Is Used',
+          description: 'Shop and supermarket entrances, restaurants and warehouse doors are typical applications.',
+          detail: 'Door size and the need for heating determine the choice.'
         }
       ]
     },
     vorticeBrand: {
-      compassoDoro: 'Compasso d\'Oro',
-      italianEngineering: 'Italian Engineering',
+      compassoDoro: '',
+      italianEngineering: 'Italy-Based Brand',
       whyVortice: 'Why Vortice?',
-      description1: 'Founded in Milan in 1954, Vortice has been the pioneer of ventilation technology worldwide for over 70 years.',
-      description2: 'Founded by Attilio Pagani, the company won Italy\'s most prestigious design award, Compasso d\'Oro, with its very first product. Today, it serves millions of users in more than 90 countries.',
-      authorizedDealer: 'Brand Assurance',
-      ceCertified: 'CE Certified',
+      description1: 'Vortice is an Italy-based ventilation brand; the catalogue lists its fans, air curtains and heat recovery units.',
+      description2: 'Models, technical datasheets and specification tables are on the product pages; for duct fans, air curtains and heat recovery, you can run a preliminary calculation in the Product Selector.',
+      authorizedDealer: 'Technical Data',
+      ceCertified: 'Calculators',
       // REC-104 second pass: see tr.ts — the fixed two-year claim survived here.
-      warranty: 'Manufacturer Warranty',
-      premiumComfort: 'Premium Comfort',
-      authorizedDealerNotice: 'VentHub supplies Vortice products with full brand assurance.',
+      warranty: 'Ordering by Quote',
+      premiumComfort: 'Air curtain above a door',
+      authorizedDealerNotice: 'Request a quote for Vortice models by form or email.',
       highlights: [
         {
-          value: '70+',
-          label: 'Years Experience',
-          desc: 'Ventilation since 1954'
+          value: '',
+          label: '',
+          desc: 'An Italy-based brand'
         },
         {
-          value: '90+',
-          label: 'Countries',
-          desc: 'Global distribution network'
+          value: '{aile}',
+          label: 'Families',
+          desc: 'Listed in the catalogue'
         },
         {
-          value: '3x',
-          label: 'Compasso d\'Oro',
-          desc: 'Italy\'s most prestigious design award'
+          value: '{model}',
+          label: 'Active Models',
+          desc: 'Vortice models in the catalogue'
         },
         {
-          value: '#1',
-          label: 'Europe',
-          desc: 'Leader in the ventilation sector'
+          value: 'Italy',
+          label: 'Country',
+          desc: 'Headquarters: Tribiano (Milan)'
         }
       ]
     }
@@ -1436,18 +1436,18 @@ export const en: typeof tr = {
     featured: 'Featured',
     brand: 'Brand',
     model: 'Model',
-    inStock: 'In Stock',
-    outOfStock: 'Out of Stock',
+    inStock: 'Confirmed by quote',
+    outOfStock: 'Request Quote',
     vatIncluded: '(VAT Included)',
     vatExcluded: '(+VAT)',
     qty: 'Quantity:',
-    addToCart: 'Add to Cart',
+    addToCart: 'Get a Quote',
     techQuote: 'Request Technical Offer',
     // ⛔descFallback REMOVED (REC-148 A4, 2026-09-05) — it was a promise; the card is now
     // simply not rendered when there is no description.
     relatedProducts: 'Related Products',
-    officialDistributor: 'BRAND ASSURANCE',
-    priceAvailability: 'Price & Availability',
+    officialDistributor: 'MANUFACTURER DATA',
+    priceAvailability: 'Price and Quote',
     quoteLabel: 'Quote',
     shareCopied: 'Link copied!',
     messages: {
@@ -1461,7 +1461,7 @@ export const en: typeof tr = {
       category: 'Category',
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
-      engineeringAnalysis: 'Engineering Analysis',
+      engineeringAnalysis: 'Technical Summary',
       /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
       modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
@@ -1484,59 +1484,59 @@ export const en: typeof tr = {
     },
     trust: {
       // REC-104: see tr.ts — freeShipping / securePayment removed.
-      warranty: 'Manufacturer Warranty'
+      warranty: 'Warranty Information'
     },
     engineering: {
       noise: {
         ultraQuiet: {
-          label: 'Ultra Quiet Operation',
-          desc: 'Whisper-quiet performance designed for acoustics-sensitive living and working environments.'
+          label: 'Low Noise Level',
+          desc: 'Models with a sound level of {{esik1}} dB(A) or below.'
         },
         officeComfort: {
-          label: 'Office Comfort Level',
-          desc: 'Low noise level suitable for offices, libraries, and study rooms.'
+          label: 'Medium-Low Noise Level',
+          desc: 'Models with a sound level between {{esik1}} and {{esik2}} dB(A).'
         },
         standard: {
           label: 'Standard Noise Level',
-          desc: 'Acceptable sound level for standard comfort zones and commercial spaces.'
+          desc: 'Models with a sound level between {{esik2}} and {{esik3}} dB(A).'
         },
         industrial: {
           label: 'Industrial Noise Level',
-          desc: 'Noise level designed for high-capacity ventilation in industrial plants.'
+          desc: 'Models with a sound level above {{esik3}} dB(A).'
         }
       },
       efficiency: {
         diamond: {
-          label: 'Diamond Energy Efficiency',
-          desc: 'Maximum thermal efficiency minimizing energy consumption.'
+          label: 'Thermal Efficiency {{esik1}}% and Above',
+          desc: 'Models with a thermal efficiency of {{esik1}}% or above.'
         },
         platinum: {
-          label: 'Platinum Energy Efficiency',
-          desc: 'High thermal recovery rate providing significant energy savings.'
+          label: 'Thermal Efficiency {{esik2}}–{{esik1}}%',
+          desc: 'Models with a thermal efficiency between {{esik2}}% and {{esik1}}%.'
         },
         gold: {
-          label: 'Gold Energy Efficiency',
-          desc: 'Standard-compliant energy recovery efficiency for modern HVAC designs.'
+          label: 'Thermal Efficiency {{esik3}}–{{esik2}}%',
+          desc: 'Models with a thermal efficiency between {{esik3}}% and {{esik2}}%.'
         }
       },
       motor: {
         ec: {
           label: 'EC Motor Technology',
-          desc: 'Brushless motor design with low energy consumption and precise speed control.'
+          desc: 'Model with a brushless (EC) motor.'
         },
         ac: {
           label: 'AC Motor Technology',
-          desc: 'Durable and reliable classic AC motor technology.'
+          desc: 'Model with an AC motor.'
         }
       },
       capacity: {
         highFlow: {
-          label: 'High Airflow Capacity',
-          desc: 'Ideal performance for medium to large residential and commercial spaces.'
+          label: 'Airflow Capacity',
+          desc: 'Models with an airflow between {{esik1}} and {{esik2}} m³/h.'
         },
         industrialFlow: {
           label: 'Industrial Airflow Capacity',
-          desc: 'High-capacity airflow designed for large industrial plants and warehouses.'
+          desc: 'Models with an airflow above {{esik2}} m³/h.'
         }
       }
     }
@@ -1763,7 +1763,7 @@ export const en: typeof tr = {
     kapali: {
       // REC-148 A7 — OPS ruling, K1a: the sales mode is CLOSED, not absent.
       baslik: 'We are in quote mode; ordering and payment are closed.',
-      aciklama: 'Our store is being set up. Prices are current; you can request a quote and we will get back to you the same day.',
+      aciklama: 'Online payment is not open yet; you can request a quote to place an order.',
       whatsappCta: 'Request a quote on WhatsApp',
       emailCta: 'Request a quote by email',
     },
@@ -1787,9 +1787,9 @@ export const en: typeof tr = {
     },
     addressStep: {
       standardName: 'Standard',
-      standardEta: '3–5 business days',
+      standardEta: 'Stated in your quote',
       expressName: 'Express',
-      expressEta: '1–2 business days',
+      expressEta: 'Stated in your quote',
     },
     saved: {
       title: 'Saved Addresses',
@@ -1987,17 +1987,17 @@ export const en: typeof tr = {
     page: {
       statGlobal: 'Global',
     },
-    sectionTitle: 'Premium HVAC Brands',
-    sectionSubtitle: 'We offer products of leading global HVAC brands with full brand assurance.',
+    sectionTitle: 'Brands in the Catalogue',
+    sectionSubtitle: 'Browse AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT and Vortice products and their specifications.',
     subtitlePart1: 'Our',
     subtitlePart2: 'Brands',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
-    pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
-    eyebrow: 'Global Signatures of Excellence',
+    pageSubtitle: 'Explore the product families, models and technical specifications of the brands that have products in the catalogue.',
+    eyebrow: 'Brand Catalogue',
     exploreBrand: 'Explore Brand',
     seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
-    seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
+    seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalogue.',
     seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
     // OPS-51: meta description of the brand page without products (same fact as the page body; no product/time promise).
     seoUrunsuz: '{{ad}} products are not yet in the VentHub catalog; contact us for product information and a quote.',
@@ -2005,34 +2005,34 @@ export const en: typeof tr = {
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
     trust: {
-      eyebrow: 'Supply Chain',
-      title: 'Assured Supply',
-      description: 'Thanks to our established supply network, you have access to the latest technologies, full technical support, and competitive lead times.',
-      original: 'Brand Assurance',
-      standard: 'Global Standard Compliance',
+      eyebrow: 'Ordering',
+      title: 'Ordering by Quotation',
+      description: 'Online payment is not open yet; request a quote to place an order. Delivery time and shipping terms are settled at the quotation stage.',
+      original: 'Technical specification tables',
+      standard: 'Quotes by form or e-mail',
       imageAlt: 'Technical Infrastructure and HVAC Installation'
     },
     detail: {
-      curatedSolutions: 'Curated Solutions',
-      heritage: 'Engineering Heritage',
-      authorityTitle: 'Technological Authority of Engineering',
-      globalVision: 'Global Vision',
-      globalVisionDesc: 'setting standards for efficiency and sustainability in projects worldwide, building the ventilation technologies of the future today.',
-      technicalExcellence: 'Technical Excellence',
-      technicalExcellenceDesc: 'Each product is tested to withstand the toughest industrial conditions and optimized for acoustic performance.',
+      curatedSolutions: 'Catalogue Products',
+      heritage: 'Brand Information',
+      authorityTitle: 'About the Brand',
+      globalVision: 'In the Catalogue',
+      globalVisionDesc: '{{ad}} has {aile} product families and {model} models in the VentHub catalogue.',
+      technicalExcellence: 'Technical Data',
+      technicalExcellenceDesc: 'Product pages carry datasheets and specification tables.',
       corporateSnapshot: 'Corporate Snapshot',
       headquarters: 'Headquarters',
-      webAuthority: 'Web Authority',
+      webAuthority: 'Website',
       officialSite: 'Official Site',
       requestCatalog: 'Request Brand Catalogs',
-      featuredSystems: 'Featured Systems',
-      allProductGroups: 'All Product Groups',
+      featuredSystems: 'Product Families',
+      allProductGroups: 'All Product Families',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
       // OPS-51 (decision 265 + OPS ruling): ONLY for a brand with zero active products in the DB (currently Flexiva); the
       // decision is derived on the server from the active product count (`markaUrunDurumu.ts`), no static flag.
       // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
-      productsOnRequest: 'Request a quote from us for {{ad}} products.',
+      productsOnRequest: '{{ad}} products are not in the catalogue yet; you can use the contact form for questions.',
       productsOnRequestCta: 'Go to the contact form',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
@@ -2041,10 +2041,10 @@ export const en: typeof tr = {
       statCountries: 'Countries',
       statGroup: 'Group',
       statProduction: 'Manufacturing',
-      statWarranty: 'Warranty',
-      statExperience: 'Experience',
-      statExpertise: 'Expertise',
-      statQuality: 'Quality'
+      statWarranty: 'Models',
+      statExperience: 'Product Families',
+      statExpertise: 'Product Type',
+      statQuality: 'Category'
     }
   },
   quickView: {
@@ -2057,8 +2057,8 @@ export const en: typeof tr = {
   support: {
     contactCta: {
       title: 'Couldn\'t find the answer you were looking for?',
-      subtitle: 'Contact us directly via WhatsApp and we\'ll be happy to help.',
-      button: 'Ask on WhatsApp',
+      subtitle: 'Send your question via the contact form or info@venthub.com.tr.',
+      button: 'Ask by email',
     },
     links: {
       faq: 'FAQ',
@@ -2068,7 +2068,7 @@ export const en: typeof tr = {
     },
     home: {
       subtitle: 'Quickly find the information you need.',
-      warrantyDesc: 'Warranty coverage and authorized service',
+      warrantyDesc: 'Coverage may vary by manufacturer or importer',
     },
     // Page metadata (meta description) — see tr.ts.
     seo: {
@@ -2076,32 +2076,32 @@ export const en: typeof tr = {
       faq: 'Frequently asked questions about quotes, payment and installation, with answers.',
       shipping: 'Information on delivery times, shipping costs and shipment tracking.',
       returns: 'Right of withdrawal, return conditions and how to request a return.',
-      warranty: 'Warranty coverage and authorized service information.',
+      warranty: 'Warranty coverage and keeping your warranty documents.',
     },
     returns: {
       title: 'Returns & Exchanges',
       // REC-104: see tr.ts — status note above the legal terms.
       onlineKapaliNotu: 'Online sales are currently closed; the terms below apply once online sales open.',
       desc1: 'You may use your right of withdrawal within 14 days. The product must be unused and resalable with invoice and all accessories included.',
-      desc2: 'Please contact our support team with your order number for a return request. After approval, shipping instructions will be provided.'
+      desc2: 'For a return request, please write via the contact form or email with your order number.'
     },
     shipping: {
-      desc1: 'Delivery usually takes 1–5 business days and may vary depending on campaigns and stock.',
+      desc1: 'Delivery time and shipping terms are clarified at the quote stage, depending on your project.',
       // REC-104: see tr.ts — checkout reference replaced with the quote.
       desc2: 'The shipping fee and carrier are stated in your quote. Tracking number will be sent via email.'
     },
     warranty: {
       desc1: 'Warranty coverage may vary by manufacturer/importer. Please keep the warranty card and user manual.',
-      desc2: 'For service info or malfunction records, contact our support team.'
+      desc2: 'You can send service and fault questions via the contact form or email.'
     },
     faq: {
       // REC-104: see tr.ts — aligned with the checkout.kapali copy.
-      q1: 'When will I hear back about my quote request?',
-      a1: 'We usually get back to you within the same business day.',
+      q1: 'How can I submit a request for a quote?',
+      a1: 'You can request a quote through the contact form or by email.',
       q2: 'What are the payment methods?',
       a2: 'Our store is still being set up, so online payment is not open yet. You can request a quote from us to place an order.',
-      q3: 'Do you provide installation service?',
-      a3: 'It may vary by product. Please contact our support team.'
+      q3: 'How can I send an installation question?',
+      a3: 'You can send installation questions via the contact form or email.'
     }
   },
   account: {
@@ -2192,8 +2192,8 @@ export const en: typeof tr = {
       shippingMethod: 'Shipping Method',
       express: 'Express',
       standard: 'Standard',
-      expressDetail: 'Express (1–2 business days)',
-      standardDetail: 'Standard (3–5 business days)',
+      expressDetail: 'Express (timing in your quote)',
+      standardDetail: 'Standard (timing in your quote)',
       invoiceInfo: 'Invoice Details',
       typeLabel: 'Type:',
       companyTitleLabel: 'Title:',
@@ -2261,7 +2261,7 @@ export const en: typeof tr = {
       securityCenterDesc: 'Securely manage your password, 2FA settings, and session information.',
       viewSecurity: 'View',
       needHelp: 'Need support?',
-      needHelpDesc: 'Get instant help with orders, returns, or balance.',
+      needHelpDesc: 'For orders, returns or balance, write to info@venthub.com.tr.',
       customerService: 'Customer Service',
       wave: '👋',
       orderHash: '{{code}}',
@@ -2512,7 +2512,7 @@ export const en: typeof tr = {
       contactRequired: 'Full name, phone and email are required — a quote must name its recipient',
       kvkkConsent: 'I have read the privacy notice',
       kvkkRequired: 'Please confirm you have read the privacy notice to continue',
-      duplicateToast: 'You just sent this request — our team is already on it',
+      duplicateToast: 'You have just sent this request; it has been received.',
       rateLimitToast: 'Too many requests sent; please try again a little later',
       guestSignupInvite: 'Create an account to track this request and your future quotes.',
       guestSignupCta: 'Create Account',
@@ -2534,14 +2534,14 @@ export const en: typeof tr = {
       validUntil: 'Valid Until',
       total: 'Total',
       note: 'Note',
-      awaitingPricing: 'Awaiting pricing — our team is reviewing your request.',
+      awaitingPricing: 'Your request has been received; pricing is pending.',
       accept: 'Accept Quote',
       reject: 'Reject Quote',
       acceptConfirm: 'Are you sure you want to accept this quote?',
       rejectConfirm: 'Are you sure you want to reject this quote?',
       decisionSuccess: 'Your decision has been saved',
       decisionError: 'Could not save your decision',
-      acceptedNext: 'You accepted the quote. Our team will contact you for the order steps.',
+      acceptedNext: 'You accepted the quote. For questions, write to info@venthub.com.tr.',
       backToList: 'Back to my quotes',
       notFound: 'Quote not found'
     },
@@ -2619,15 +2619,15 @@ export const en: typeof tr = {
     },
     valueProp: {
       badge: 'VENTHUB B2B',
-      title: 'Professional Solutions\nFor Your Projects',
-      description: 'Get special quotes at competitive prices for your industrial ventilation needs. Our engineering support team will get back to you quickly.',
-      feature1: 'Free Project Support',
-      feature2: 'Fast Pricing & Stock Information',
-      feature3: 'Exclusive B2B Conditions'
+      title: 'Request a Quote for Your Projects',
+      description: 'Send your product and project details through the contact form or to info@venthub.com.tr. Orders start with a quote request.',
+      feature1: 'Product Selector Sizing',
+      feature2: 'Shipping and Delivery Terms in the Quote',
+      feature3: 'Datasheets on Product Pages'
     },
     success: {
       title: 'Request Received!',
-      description: 'Your quote request has been successfully sent to our engineering team. We will contact you as soon as possible.'
+      description: 'Your quote request has been received. For questions, write to info@venthub.com.tr.'
     },
     form: {
       title: 'Get a Quote',
@@ -2657,7 +2657,7 @@ export const en: typeof tr = {
   // selector": other product groups will get engines later. One name, one destination.
   urunSecici: {
     ustBaslik: 'Product Selector',
-    baslik: 'Size the right product for your space',
+    baslik: 'Run a pre-assessment for your space',
     // ⛔"Results carry over into your quote request" REMOVED (2026-09-05, code review):
     // no such hand-off exists. The PR that removes promise boxes was introducing a new promise.
     aciklama: 'Run a pre-assessment from volume, airflow and pressure inputs.',
@@ -2681,7 +2681,7 @@ export const en: typeof tr = {
         aciklama: 'Calculate the thrust demand and fan count for car parks and similar spaces.',
       },
     },
-    not: 'These are pre-assessments; ask our technical team before making a final selection.',
+    not: 'These are pre-assessments; for a final selection, write via the contact form or by e-mail.',
   },
   calculators: {
     recommendations: 'Recommendations',
@@ -2703,8 +2703,8 @@ export const en: typeof tr = {
       newCalculation: 'New Calculation',
       calculate: 'Calculate',
       title: 'Air Curtain Calculator',
-      description: 'Ideal air curtain selection based on door dimensions and usage conditions',
-      infoText: 'This tool performs pre-sizing in accordance with engineering standards (ISO 27327-1). It calculates required airflow, nozzle velocity, and motor power.',
+      description: 'Air curtain calculation based on door dimensions and operating conditions',
+      infoText: 'This tool is the air curtain calculator in the Product Selector. Calculations are a preliminary assessment.',
       steps: {
         dimensions: 'Door Dimensions',
         dimensionsDesc: 'Width and height',
@@ -2731,19 +2731,19 @@ export const en: typeof tr = {
       },
       applications: {
         comfort: {
-          label: 'Comfort / Energy',
-          desc: 'General commercial areas, shops',
-          info: 'Provides energy savings for general commercial areas. Nozzle speed: 8-12 m/s'
+          label: 'Stores and Markets',
+          desc: 'Store and market entrance',
+          info: 'A typical application at store, market and restaurant entrances.'
         },
         insect: {
-          label: 'Insect Control',
-          desc: 'Food businesses, restaurants',
-          info: 'Prevents insect entry for food businesses and restaurants. Nozzle speed: 12-15 m/s'
+          label: 'Insect Entry',
+          desc: 'Restaurant entrance',
+          info: 'According to the manufacturer\'s description, aimed at preventing insect entry.'
         },
         coldRoom: {
-          label: 'Cold Room',
-          desc: 'Cold storage, refrigerated',
-          info: 'Minimizes temperature loss in cold storage rooms. Nozzle speed: 15-18 m/s'
+          label: 'Warehouse Door',
+          desc: 'Warehouse door entrance',
+          info: 'Uses an air flow to block hot and cold air at a warehouse door.'
         }
       },
       conditions: {
@@ -2777,7 +2777,7 @@ export const en: typeof tr = {
         efficiencyOptimal: 'Optimal',
         efficiencyAcceptable: 'Acceptable',
         efficiencyWarning: 'Borderline',
-        efficiencyOptimalDesc: 'Calculated parameters will provide ideal performance',
+        efficiencyOptimalDesc: 'Results are a preliminary assessment; request a quote for final selection.',
         efficiencyAcceptableDesc: 'Performance is acceptable, improvement can be considered if needed',
         efficiencyWarningDesc: 'A more powerful model or additional measures may be required',
         efficiencyMarginal: 'Marginal',
@@ -2799,12 +2799,12 @@ export const en: typeof tr = {
         round: 'Circular',
         roundDesc: 'Spiral or welded pipe',
         rectangular: 'Rectangular',
-        rectangularDesc: 'Angled duct',
+        rectangularDesc: 'Rectangular-section duct',
         material: 'Material',
         steel: 'Galvanized Steel',
         steelDesc: 'Standard',
         pvc: 'PVC',
-        pvcDesc: 'Low friction',
+        pvcDesc: 'Plastic duct material',
         flex: 'Flex Duct',
         flexDesc: 'Flexible',
         airflow: 'Airflow',
@@ -2829,21 +2829,21 @@ export const en: typeof tr = {
     hrv: {
       title: 'HRV Energy Saving Calculator',
       description: 'Heat recovery unit efficiency and energy saving calculation',
-      infoText: 'Calculates annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units (ERV).',
+      infoText: 'Calculates the annual energy saving potential of heat recovery (HRV) or energy recovery (ERV) units.',
       form: {
         type: 'Device Type',
         typeDesc: 'Select the heat recovery system',
         hrv: 'HRV (Heat Recovery)',
-        hrvDesc: 'Heat recovery only',
+        hrvDesc: 'Sensible heat only',
         erv: 'ERV (Energy Recovery)',
         ervDesc: 'Heat + Moisture recovery',
         climate: 'Climate Zone',
         cold: 'Cold',
-        coldDesc: 'North / mountain regions',
+        coldDesc: 'Cold climate conditions',
         temperate: 'Temperate',
-        temperateDesc: 'Central belt',
+        temperateDesc: 'Temperate climate conditions',
         hot: 'Hot',
-        hotDesc: 'South / coastal regions',
+        hotDesc: 'Hot climate conditions',
         usage: 'Space Type',
         usageDesc: 'Building, climate and usage details',
         residential: 'Residential',
@@ -2851,7 +2851,7 @@ export const en: typeof tr = {
         office: 'Office',
         officeDesc: 'Workplace',
         commercial: 'Commercial',
-        commercialDesc: 'Retail / shopping mall',
+        commercialDesc: 'Commercial use area',
         occupancy: 'Number of People',
         unitPeople: 'people',
         workingHours: 'Daily Operation',
@@ -2875,13 +2875,13 @@ export const en: typeof tr = {
         co2Reduction: 'CO₂ Reduction',
         co2Desc: 'Annual carbon emission reduction',
         payback: 'Payback Period',
-        paybackDesc: 'Estimated return on investment'
+        paybackDesc: 'Estimated investment payback'
       }
     },
     jetFan: {
       pageTitle: 'Jet Fan Calculator',
-      pageDescription: 'Parking and tunnel jet fan thrust and ventilation calculation',
-      pageInfoText: 'Calculates the required number of jet fans, thrust force, and ventilation airflow in enclosed parking lots or tunnels. Compliant with NFPA 502 and BS 7346 standards.',
+      pageDescription: 'Jet fan calculation',
+      pageInfoText: 'This tool is the jet fan calculator in the Product Selector. Calculations are a preliminary assessment.',
       smokeWarning: 'The smoke exhaust calculation is for preliminary design purposes. Professional fire engineer consultancy is required.',
       parkingShortDesc: 'Enclosed parking ventilation',
       tunnelShortDesc: 'Road or subway tunnel',
@@ -2904,8 +2904,8 @@ export const en: typeof tr = {
       ventilationMetrics: 'Ventilation Metrics',
       requiredAirflow: 'Required Airflow',
       airChangeRate: 'Air Change Rate',
-      achParkingHint: 'Parking: 6-10 ACH recommended',
-      achTunnelHint: 'Tunnel: 15+ ACH recommended',
+      achParkingHint: 'Enter the air change rate',
+      achTunnelHint: 'Tunnel: take ACH from the specification or regulations',
       fanRequirements: 'Jet Fan Requirements',
       fanCountTitle: 'Jet Fan Count',
       unitPiece: 'units',
@@ -2957,32 +2957,32 @@ export const en: typeof tr = {
         },
         {
           title: 'Quiet Settings',
-          description: 'Constant noise can reduce productivity in libraries and offices by 20%.'
+          description: 'Fan noise can distract in quiet settings such as libraries and offices.'
         }
       ],
       visual: {
         without: 'AC Motor Model',
         with: 'EC Motor Model',
         withoutPoints: ['LINEO QUIET', 'AC induction motor', 'Mixed-flow fan', 'Sound-absorbing casing lining'],
-        withPoints: ['LINEO QUIET ES', '60% energy saving', 'Mixed-flow fan', 'Vibration-free operation']
+        withPoints: ['LINEO QUIET ES', 'EC brushless motor', 'Mixed-flow fan', 'Sound-absorbing casing lining']
       }
     },
     howItWorks: {
       eyebrow: 'TECHNOLOGY',
-      title: 'Engineering Behind Silent Power',
-      subtitle: 'Vortice Lineo Quiet offers whisper-level performance with its aerodynamically optimized housing and sound-absorbing layers.',
+      title: 'Vortice Lineo Quiet Construction',
+      subtitle: 'Vortice Lineo Quiet is a mixed-flow duct fan with a sound-absorbing lining integrated into its outer casing.',
       steps: [
         {
           title: 'Sound-Absorbing Housing',
-          description: 'Special composite outer body traps motor noise inside.'
+          description: 'The sound-absorbing lining is integrated into the outer casing.'
         },
         {
-          title: 'Laminar Flow',
-          description: 'Air guiding vanes reduce turbulence and cut noise at the source.'
+          title: 'Mixed Flow',
+          description: 'A duct-type mixed-flow fan; technical specifications are on the product page.'
         },
         {
-          title: 'Dynamic Balance',
-          description: 'High-precision fan impeller ensures vibration-free and silent circulation.'
+          title: 'Motor Options',
+          description: 'LINEO QUIET with AC induction motor and LINEO QUIET ES with brushless EC motor.'
         }
       ]
     },
@@ -2996,12 +2996,12 @@ export const en: typeof tr = {
         {
           label: 'Casing',
           standard: 'Sound-absorbing lining',
-          quiet: '25-30 dB(A)'
+          quiet: ''
         },
         {
           label: 'Energy Consumption',
           standard: 'See the model datasheet',
-          quiet: '60% Saving (ES/EC Motor)'
+          quiet: ''
         },
         {
           label: 'Motor Type',
@@ -3020,7 +3020,7 @@ export const en: typeof tr = {
       items: [
         {
           q: 'How quiet is it really?',
-          a: 'Lineo Quiet is close to whisper sound (approx. 25 dB) at low speed. This is less than half of a normal conversation.'
+          a: 'The sound-absorbing lining is integrated into the outer casing, designed to reduce emitted noise. Specifications are on the product page.'
         },
         {
           q: 'Is it hard to install?',
@@ -3033,26 +3033,26 @@ export const en: typeof tr = {
       ]
     },
     brand: {
-      eyebrow: 'ENGINEERING HERITAGE',
-      title: 'Italian Silence: The Vortice Legend',
-      description: 'Directing the ventilation world since 1954, Vortice represents the pinnacle in the silent duct fan category with the Lineo Quiet series.',
-      badges: ['Brand Assurance', '2 Year Manufacturer Warranty'],
+      eyebrow: 'ITALY-BASED BRAND',
+      title: 'Vortice Lineo Quiet Duct Fans',
+      description: 'Lineo Quiet is a family of mixed-flow duct fans with a sound-absorbing lining built into the casing, offered as LINEO QUIET (AC motor) and LINEO QUIET ES (EC motor).',
+      badges: ['AC / EC Motor', 'Mixed-Flow Fan Family'],
       stats: [
         {
-          label: 'Years Experience',
-          value: '70+'
+          label: '',
+          value: ''
         },
         {
-          label: 'Countries',
-          value: '90+'
+          label: 'Families',
+          value: '{aile}'
         },
         {
-          label: 'Compasso d\'Oro',
-          value: '3x'
+          label: 'Active Models',
+          value: '{model}'
         },
         {
-          label: 'Europe',
-          value: '#1'
+          label: 'Country',
+          value: 'Italy'
         }
       ]
     }
@@ -3105,9 +3105,9 @@ export const en: typeof tr = {
     calculating: 'Calculating models for your installation…',
     resultTitle: 'Three recommendations for you',
     resultNeed: 'Your room is about {hacim} m³ — this space needs {debi} m³ of air per hour.',
-    badgeBest: 'Best match',
-    badgeQuietest: 'Quietest',
-    badgeEfficient: 'Most efficient',
+    badgeBest: 'Ranked 1st',
+    badgeQuietest: 'Lowest dB(A)',
+    badgeEfficient: 'EC motor',
     cardDelivers: 'In your duct',
     cardNoise: 'Noise level',
     cardDiameter: 'Connection diameter',
@@ -3144,7 +3144,7 @@ export const en: typeof tr = {
     },
     roomHint: {
       bathroom: 'Moisture and odour must clear fast',
-      kitchen: 'Highest airflow, for cooking fumes',
+      kitchen: 'Check the airflow rating for cooking fumes',
       bedroom: 'Night-time quiet is decisive',
       living: 'Continuous, calm ventilation',
       office: 'Fresh air for occupancy',
@@ -3166,9 +3166,9 @@ export const en: typeof tr = {
       flex: 'Flexible duct',
     },
     materialHint: {
-      galvanized: 'Most common; low friction',
-      pvc: 'Lowest friction',
-      flex: 'Easy to fit, but much higher friction',
+      galvanized: 'Friction is included in the calculation',
+      pvc: 'Friction is included in the calculation',
+      flex: 'Friction is evaluated in the calculation',
     },
     quiet: {
       normal: 'Not a priority',
@@ -3191,52 +3191,52 @@ export const en: typeof tr = {
       meterUnit: 'm',
     },
     ambient: 'Ambient (Unheated)',
-    analyzing: 'Analyzing Models...',
+    analyzing: 'Analysing Models...',
     centralSystem: 'If central system is available',
     close: 'Close',
     coldStorage: 'Cold Storage',
-    coldStorageDesc: 'Cold chain protection',
-    coldStorageTip: 'Protects the cold chain and prevents product spoilage',
+    coldStorageDesc: 'Warehouse doors',
+    coldStorageTip: 'Limits air exchange through the open door',
     consultUs: 'Consult us',
     customOffer: 'Request Custom Offer',
     doorHeight: 'What is Your Door Height?',
     electricHeater: 'Electric Heater',
-    entranceDesc: 'Shop, restaurant, hotel entrance',
+    entranceDesc: 'Shop, market and restaurant entrance',
     entranceDoor: 'Entrance Door',
-    entranceTip: 'Increases customer comfort, prevents energy loss',
+    entranceTip: 'Unheated or electric heated models can be chosen',
     findSuitable: 'Find the Suitable One for Me',
     goBack: 'Go Back',
     heatingNeed: 'Is Heating Needed?',
     heatingNoDesc: 'Air barrier only',
     heatingYesDesc: 'For winter comfort',
-    heightMeter: 'Height (Meter)',
+    heightMeter: 'Height (Metre)',
     industrial: 'Industrial Facility',
-    industrialDesc: 'Factory, logistics facility',
-    industrialTip: 'Isolates dust, smoke and harmful substances',
-    insulation: 'For insulation and savings',
+    industrialDesc: 'Warehouse door',
+    industrialTip: 'Limits dust entry at open doors',
+    insulation: 'For airflow only',
     matchScore: '{{score}}% Match',
-    meter: 'Meter',
-    mountType: 'How Should the Mounting Type Be?',
+    meter: 'Metre',
+    mountType: 'Which mounting type is needed?',
     next: 'Continue',
     notSure: 'Not Sure',
     recessedMount: 'Recessed (In-Ceiling)',
     restart: 'Restart',
     retail: 'Market / Supermarket',
-    retailDesc: 'Refrigerated aisles',
-    retailTip: 'Keeps hot air away from refrigerated aisles',
+    retailDesc: 'Supermarket entrance',
+    retailTip: 'Supermarket entrances are a typical use',
     standardMount: 'Standard (Wall/Ceiling Suspended)',
     start: 'Start',
     step: 'Step',
-    step1Desc: 'To determine the most suitable technical specifications, select the application area first.',
+    step1Desc: 'To start choosing an air curtain, select the application area first.',
     step1Title: 'Where is the area of use?',
-    step2Desc: 'It is critical that the air curtain covers the entire opening.',
+    step2Desc: 'The air curtain is chosen according to the door width.',
     step2Title: 'Enter door dimensions',
     step3Title: 'Is heating needed?',
-    step6Desc: 'Recommendations filtered by engineering criteria.',
-    step6Title: 'Most Suitable Models for You',
-    threeSteps: 'Custom product recommendation in 3 steps',
+    step6Desc: 'Models listed as a result of the preliminary assessment.',
+    step6Title: 'Models for Your Inputs',
+    threeSteps: 'Model suggestion based on size and heating',
     waterHeater: 'Water Heated (LPHW)',
-    widthMeter: 'Width (Meter)',
+    widthMeter: 'Width (Metre)',
     winterComfort: 'For winter comfort',
     wizardTitle: 'Needs Analysis Wizard'
   },
@@ -3248,7 +3248,7 @@ export const en: typeof tr = {
   },
   undecidedUserCta: {
     title: 'Not sure which product is right for your project?',
-    description: 'Share your project details with our expert engineers. Let us select the most accurate fan for you in compliance with airflow, pressure losses, and regulations.',
-    buttonText: 'Get Expert Support'
+    description: 'Run a preliminary assessment in the Product Selector with your volume, airflow and pressure values, and send questions through the contact form.',
+    buttonText: 'Open Product Selector'
   }
 };
