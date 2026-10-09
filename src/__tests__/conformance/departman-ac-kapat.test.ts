@@ -288,9 +288,9 @@ function tabloFarki(roller: readonly string[], tablo: ReadonlyArray<readonly [st
   return { eksik: roller.filter((r) => !anahtar.has(r)), fazla: [...anahtar].filter((s) => !roller.includes(s)).sort() }
 }
 
-describe('INV-DEPARTMAN-AC-9 · tablo (pencere-adlari.cjs) ↔ rol kartları (docs/roller): 16 departmanın hepsi açılabilir (ARC-61)', () => {
+describe('INV-DEPARTMAN-AC-9 · tablo (pencere-adlari.cjs) ↔ rol kartları (docs/roller): 17 departmanın hepsi açılabilir (ARC-61, HRT-35)', () => {
   it('rol kartı listesi okunabiliyor ve boş değil (kapı sessizce geçmesin)', () => {
-    expect(rolKartlari().length).toBeGreaterThanOrEqual(16)
+    expect(rolKartlari().length).toBeGreaterThanOrEqual(17)
   })
 
   it('TABLO anahtarları = rol kartları: eksik de fazla da KIRMIZI, mesaj eksik/fazla rolü adıyla söyler', () => {
@@ -330,9 +330,16 @@ describe('INV-DEPARTMAN-AC-9 · tablo (pencere-adlari.cjs) ↔ rol kartları (do
     }
   }, 240_000)
 
-  it('geçersiz hata mesajı artık 16 görünen adın hepsini listeler', () => {
+  it('geçersiz hata mesajı artık 17 görünen adın hepsini listeler (HRT-35: Takip dahil)', () => {
     const k = ac('bilinmez', yeniDuzenek())
-    for (const ad of ['Tasarım', 'Satış', 'Marka', 'Katalog', 'Edge', 'I18N', 'Mevzuat']) expect(k.plan.sebep).toContain(ad)
+    for (const ad of ['Tasarım', 'Satış', 'Marka', 'Katalog', 'Edge', 'I18N', 'Mevzuat', 'Takip']) expect(k.plan.sebep).toContain(ad)
+  })
+
+  it('HRT-35: TAKİP (karar 322) açılabilir; MÜHENDİSLİK planlı/kapalı olduğu için tabloda YOK ve "rol taninmiyor" der', () => {
+    expect(new Map(TABLO).get('TAKIP')).toBe('Takip')
+    expect(TABLO.some(([s]) => /^M[ÜU]HEND[İI]SL[İI]K$/.test(s))).toBe(false)
+    const k = ac('MUHENDISLIK', yeniDuzenek())
+    expect(k.err + k.out).toContain('rol taninmiyor')
   })
 })
 

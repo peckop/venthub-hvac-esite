@@ -228,7 +228,7 @@ const CALISMA = [
   '## Çalışma düzeni',
   '- Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree\'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).',
   '- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, tablo is-kayit-duzeni §1; taşınan kart REC-nn korur) + emirde YÖNTEM + KAYNAK/CETVEL. Linear donuk (karar 219): yeni kayıt açılmaz.',
-  '- PR gövdesi `Kanban: <numara>` taşır (2026-10-08\'e kadar `Fixes REC-nn` de kabul); çok PR\'lık iş her biri tek PR\'la biten alt kartlara bölünür; kartsız iş yalnız `Kayıtsız: <sebep>` (karar 187).',
+  '- PR gövdesi `Kanban: <numara>` taşır (karar 324: Linear iş kaydı olarak emekli; `Fixes REC-nn` ve `Kayıtsız:` yolları 10-08\'de kapandı); çok PR\'lık iş her biri tek PR\'la biten alt kartlara bölünür; kartsız iş yok, önce kart açılır.',
   '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa kapı durdurur); dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).',
   '- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.',
   '- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Kanban (kim hangi dosyada için claim panosu); hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.',
@@ -319,7 +319,7 @@ const ROLLER = {
   MARKA: {
     gorev: 'Marka kimliği: logo, palet, yazı tipi ve belge sistemi (Design-MARKA projesi).',
     dosyalar: 'Design-MARKA proje çıktıları ve yorumları; markanın belge sistemi.',
-    yetki: 'Tasarım kararı önerisi ve marka kılavuzu; Linear proje yorumları tasarım yüzeyidir (karar 219 Design istisnası, deneme boyunca 2026-10-08\'e kadar).',
+    yetki: 'Tasarım kararı önerisi ve marka kılavuzu; Linear proje yorumları tasarım yüzeyidir (karar 219 Design istisnası, karar 324 ile kalıcı).',
     yasak: 'Tasarım = hedef, canlı = eski: canlıya uygulama URUN işidir; para harcatan tasarım aracı Recep kapısıdır.',
     yetenek: 'venthub-tasarim-dili, design-dna, tipografi ve erişilebilirlik skill\'leri.',
     durum: 'Kapalı (iş dondurma).',
@@ -373,6 +373,29 @@ const ROLLER = {
     yasak: '`.agent/skills` çift ağacı kasıtlıdır, birleştirme/silme önerilmez; settings.json ve .mcp.json (skillOverrides dahil) OPS kapısıdır; "aynı iş" iddiası yan yana koşum olmadan, skill hükmü SKILL.md okunmadan yazılmaz; Bright Data denemesi bitene kadar ona dokunulmaz; departmanın ihtiyaç kararını departman verir.',
     yetenek: 'plan-challenger, verify-before-done, skills-creator (kısmen: `.agent` ağacına yazar), find-skills (kısmen: dış kurulum onay ister), diff-review; transkript sayım betiği, `pnpm skills:verify`, skills-gate iş akışı.',
     durum: 'Açık. Skill atama tablosunun içeriğini bu rol doldurur (iskelet HARİTA\'da, REC-509).',
+  },
+  // HRT-35 (karar 322, OPS-93, 2026-10-09): tek işi takip; kod yazmaz, işi az olsun ki her zaman açık tutulabilsin.
+  TAKIP: {
+    gorev: 'Tek işi takip: Claude Code, WrongStack (en sıkı izlenen araç) ve notebooklm-py sürümleri, MCP bağlantı sağlığı, bağımlılık güncelleme PR\'ları (her biri için fayda/risk/hüküm: birleştir / önce sına / beklet) ve işimize yarayan yeni özellikler. Her gün "ne çıktı · bize faydası · risk · kime iş" raporunu OPS\'a verir; bulduğu işi sahibine kart olarak açar. Kod yazmaz.',
+    dosyalar: 'docs/audits/takip-* (salt-okuma raporları), docs/olcum/wrongstack-ozellik-envanteri.md ("bize ne" satırı). Kod dosyası sahibi değildir.',
+    yetki: 'Salt-okuma ölçüm ve rapor; güncelleme PR\'ına hüküm yazma; bulduğu işi sahibine kart açma (yükseltmeyi ALTYAPI ya da ARAÇ yapar); WrongStack 3 sürümü geçince ARAÇ\'a kart.',
+    yasak: 'Kod, ayar ve bağımlılık değişikliği yazmaz; PR birleştirmez, sürüm yükseltmez; sayı/sürüm hükmü betikle doğrulanmadan yazılmaz; para harcatan servis Recep kapısıdır.',
+    yetenek: 'wrongstack-kanban, research-web, security-scanner, bagimlilik-guvenlik-yukseltme cetveli.',
+    durum: 'Açık (karar 322, OPS-93). "VentHub TAKİP" panosu ve takip-arastirmaci çalışan tanımı henüz yok (ALT-45).',
+  },
+}
+
+/**
+ * PLANLI DEPARTMANLAR (HRT-35, karar 315, OPS-92, 2026-10-09): kurulması planlı ama KAPALI olan departman rol kartı olmaz
+ * (ROLLER'e girmez: INV-ROL-1 sayımı, kurallar dosyası, pencere adı tablosu yalnız açılabilir rolleri sayar). Yine de departman
+ * haritasında görünür ki OPS işi dağıtırken olmayan bir departmana iş yazmasın ve Recep "eklenmemiş" demesin.
+ * Adı kesinleşince ROLLER'e kart olarak taşınır ve buradan çıkar. Açılış yolu YOK: `departman-ac` bu adı tanımaz.
+ */
+const PLANLI = {
+  'MÜHENDİSLİK': {
+    gorev: 'Hesap çekirdeği (06-21 kararı: tek çekirdek), katsayılar ve üç katmanlı seçim (karar 316); çekirdek iki yerde çatallı: venthub-pdf-ingestor/src/hvac_solver_core.py ve src/lib/hvac/ductFanSelection.ts',
+    alan: 'hvac_solver_core.py, ductFanSelection.ts',
+    durum: 'planlı, kapalı: ad kesinleşmedi (karar 315 ertelendi, OPS-92); kesinleşince rol kartı açılır',
   },
 }
 
@@ -739,16 +762,17 @@ const HARITA_KISA = {
   HARITA: ['Belge ve hafıza düzeni, rol kartları', 'CLAUDE.md, docs/README, scripts/belge, docs/roller'],
   URUN: ['Vitrin: ürün, kategori, marka, arama sonuç sayfaları, adresler','components/products, views/category, next.config'],
   ADMIN: ['Yönetici paneli ekranları', 'views/admin, components/admin, app/admin'],
-  KATALOG: ['Ürün verisi hattı: PDF\'den ürün satırına, CSV, fiyat', 'scripts/icerik-hatti, scripts/db/product-data'],
-  'GEO-SEO': ['Arama motoru ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-*, docs/audits/seo-*'],
+  KATALOG: ['Ürün verisi hattı: PDF, CSV, fiyat','scripts/icerik-hatti, scripts/db/product-data'],
+  'GEO-SEO': ['Arama ve yapay zekâ görünürlüğü ölçümü', 'scripts/seo, docs/audits/geo-*'],
   BLOG: ['Rehber yazıları', 'rehber-yazisi-standard, taslaklar'],
   MARKA: ['Marka kimliği: logo, palet, yazı tipi', 'Design-MARKA proje çıktıları'],
   MEVZUAT: ['Mevzuat ve standart kaydı (kanıtlı)', 'docs/mevzuat/**, mevzuat-kaydi-standard'],
-  SATIS: ['Teklif (RFQ), ödeme yetkisi, KVKK, e-postalar', '*quote*, quote-notification-webhook, quoteService'],
+  SATIS: ['Teklif (RFQ), ödeme yetkisi, KVKK, e-postalar', '*quote*, quoteService'],
   TASARIM: ['Design ↔ site köprüsü: token, yazı tipi, bileşen', 'src/design-system, tailwind.config'],
   EDGE: ['Supabase Edge Function katmanı ve deploy', 'supabase/functions, scripts/edge'],
   I18N: ['TR/EN sözlükler ve i18n kapıları', 'src/i18n, i18n-*.test.ts'],
   YETENEK: ['Skill\'leri departmana bağlama ve ölçme', 'docs/audits/skill-*, .claude/skills'],
+  TAKIP: ['Sürüm/güncelleme takibi, günlük rapor', 'docs/audits/takip-*'],
 }
 
 /** Rol `departman-ac` ile terminalden açılabilir mi: pencere adı tablosunda (şerit adıyla) var mı. */
@@ -757,27 +781,33 @@ function terminaldenAcilir(ad, tablo = require(path.join(__dirname, '..', 'board
 }
 
 /** Kısa özet: bir departman = bir satır; açılış harfi M (masaüstü) ya da M/T (T = ekip modu için terminal). */
-function haritaOzet(roller = ROLLER, kisa = HARITA_KISA, tablo) {
+function haritaOzet(roller = ROLLER, kisa = HARITA_KISA, tablo, planli = PLANLI) {
   const satirlar = Object.keys(roller).map((ad) => {
     const [gorev, alan] = kisa[ad] || ['(kısa satır yok)', '']
     return `${ad} · ${gorev} · ${alan} · ${terminaldenAcilir(ad, tablo) ? 'M/T' : 'M'}`
   })
+  // Planlı, kapalı departman: açılış harfi yok ("açılış yok"); iş yazılmaması için görünür kalır.
+  const planliSatirlar = Object.entries(planli).map(([ad, p]) => `${ad} · PLANLI, KAPALI (${p.gorev.split(' (')[0]}) · ${p.alan} · açılış yok`)
   return [
     'DEPARTMAN HARİTASI (departman · görev · dosya alanı · açılış; tam harita: docs/roller/DEPARTMAN-HARITASI.md)',
     'Açılış: M = masaüstü; T = ekip modu gerekirse terminal (scripts\\board\\departman-ac.cmd <AD>). T yazmayan departman terminalden AÇILAMAZ (pencere adı tablosunda yok).',
     ...satirlar,
+    ...planliSatirlar,
     '',
   ].join('\n')
 }
 
 /** Tam harita dosyası: Görev ve Dosyalar bölümleri rol tablosundan aynen; açılış sütunu tablodan türetilir. */
-function haritaDosyasi(roller = ROLLER, tablo) {
+function haritaDosyasi(roller = ROLLER, tablo, planli = PLANLI) {
   const satirlar = Object.entries(roller).map(([ad, r]) => {
     const acilis = terminaldenAcilir(ad, tablo)
       ? 'masaüstü, ya da ekip modu gerekiyorsa terminal: `scripts\\board\\departman-ac.cmd ' + ad + '`'
       : 'yalnız masaüstü (terminal: YOK, pencere adı tablosunda yok)'
     return `| ${ad} | ${hucre(r.gorev)} | ${hucre(r.dosyalar)} | ${acilis} |`
   })
+  for (const [ad, p] of Object.entries(planli)) {
+    satirlar.push(`| ${ad} (${p.durum.split(':')[0]}) | ${hucre(p.gorev)} | ${hucre(p.alan)} | açılış yok: ${hucre(p.durum.split(': ').slice(1).join(': '))} |`)
+  }
   return [
     '# DEPARTMAN HARİTASI',
     '',
@@ -798,8 +828,15 @@ function haritaNorm(metin) {
 }
 
 /** Harita sorunları (boş = temiz): her rolün kısa satırı var, dosya alanı kart Dosyalar metninde geçiyor, özet bütçede. */
-function haritaSorunlari(roller = ROLLER, kisa = HARITA_KISA, tablo) {
+function haritaSorunlari(roller = ROLLER, kisa = HARITA_KISA, tablo, planli = PLANLI) {
   const s = []
+  // Planlı departman: görev, alan ve durum dolu olmalı; rol kartı olursa (ROLLER) ya da açılabilirse artık planlı değildir.
+  for (const [ad, p] of Object.entries(planli)) {
+    if (!p.gorev || !p.alan || !p.durum) s.push(`harita: planlı ${ad} için görev/alan/durum eksik`)
+    if (!/^planlı, kapalı/.test(p.durum || '')) s.push(`harita: planlı ${ad} durumu "planlı, kapalı" ile başlamalı`)
+    if (roller[ad] || Object.keys(roller).some((r) => r.toLocaleUpperCase('tr') === ad.toLocaleUpperCase('tr'))) s.push(`harita: ${ad} hem planlı hem rol kartı var (planlıdan çıkarılmalı)`)
+    if (terminaldenAcilir(ad, tablo)) s.push(`harita: planlı ${ad} pencere adı tablosunda (açılabilir, kapalı değil)`)
+  }
   for (const ad of Object.keys(roller)) {
     const k = kisa[ad]
     if (!k || !k[0] || !k[1]) {
@@ -812,7 +849,7 @@ function haritaSorunlari(roller = ROLLER, kisa = HARITA_KISA, tablo) {
     }
   }
   for (const ad of Object.keys(kisa)) if (!roller[ad]) s.push(`harita: ${ad} rol tablosunda yok`)
-  const ozetMetin = haritaOzet(roller, kisa, tablo)
+  const ozetMetin = haritaOzet(roller, kisa, tablo, planli)
   const bayt = Buffer.byteLength(ozetMetin, 'utf8')
   if (bayt > HARITA_OZET_SINIRI) s.push(`harita: kısa özet ${bayt} bayt > ${HARITA_OZET_SINIRI}`)
   return s
@@ -923,6 +960,7 @@ module.exports = {
   terminaldenAcilir,
   HARITA_DOSYASI,
   HARITA_KISA,
+  PLANLI,
   HARITA_OZET_SINIRI,
   HARITA_ISARETCISI,
   uret,
