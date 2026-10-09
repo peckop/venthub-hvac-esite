@@ -199,6 +199,7 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
       for (const k of oku(hedef)) {
         expect(k, `${String(k.identifier)} bayraksız çıktıda içerik taşımamalı`).not.toHaveProperty('description')
         expect(k).not.toHaveProperty('notes')
+        expect(k).not.toHaveProperty('completedAt')
       }
     })
 
@@ -213,10 +214,12 @@ describe('INV-SANTIYE-1: iş dağılımı Kanban panosundan üretilir', () => {
       expect(ara('ARC-1')?.description).toBe('ÖNCEKİ ÇALIŞMA: aranan yerler tamam; CSV adı urun-listesi.csv')
       expect(ara('REC-538')?.notes).toEqual([{ author: 'HARITA', content: 'not metni: kart içi bilgi', createdAt: '2026-09-20T00:00:00.000Z' }])
       // alanı olmayan kart: boş metin ve boş liste (None/eksik anahtar değil)
-      expect(ara('ARC-2')).toMatchObject({ description: '', notes: [] })
-      // description/notes çıkarılınca bayraksız çıktıyla birebir (başka alan kaymadı)
+      expect(ara('ARC-2')).toMatchObject({ description: '', notes: [], completedAt: null })
+      // HRT-44: Done'a geçiş anı --tam ile çıkar (kart-not-sayimi.cjs "bugün Done oldu" sorusunu buradan cevaplar)
+      expect(ara('ARC-3')?.completedAt).toBe('2026-09-30T00:00:00.000Z')
+      // description/notes/completedAt çıkarılınca bayraksız çıktıyla birebir (başka alan kaymadı)
       const cikarilmis = kayitlar.map((k) => {
-        const { description: _d, notes: _n, ...geri } = k
+        const { description: _d, notes: _n, completedAt: _c, ...geri } = k
         return geri
       })
       expect(sirala(cikarilmis)).toEqual(sirala(oku(sade)))

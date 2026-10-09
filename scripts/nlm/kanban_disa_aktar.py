@@ -18,7 +18,9 @@ completedAt/labels/notes):
   · Recep kapısı = "Recep kapısı" etiketi.
 
 --tam (HRT-28, ARC-30 isteği): kayıtlara kartın `description` metni ve `notes` listesi (author, content, createdAt) da
-eklenir; "ÖNCEKİ ÇALIŞMA" gibi kart İÇİ bilgiler aranabilsin diye. Bayrak yoksa çıktı bayt bayt aynıdır. İçerik taşıyan çıktı
+eklenir; "ÖNCEKİ ÇALIŞMA" gibi kart İÇİ bilgiler aranabilsin diye. `completedAt` (kartın Done'a geçtiği an; HRT-44) da yalnız --tam ile
+çıkar: "bugün Done oldu" sorusunun cevabı sonAnlamli değildir (eski bir karta bugün düşülen not onu bugüne taşır).
+Bayrak yoksa çıktı bayt bayt aynıdır. İçerik taşıyan çıktı
 depoya sızmasın diye: --tam ile --hedef depo içinde git'in yok saymadığı (izlenebilir) bir yolsa betik YAZMAZ, çıkış 2.
 Hedefsiz (stdout) kullanım ve depo dışı hedef serbesttir.
 
@@ -76,7 +78,7 @@ def tam_alanlar(kart):
         {"author": n.get("author"), "content": n.get("content") or "", "createdAt": n.get("createdAt")}
         for n in (kart.get("notes") or []) if isinstance(n, dict)
     ]
-    return {"description": kart.get("description") or "", "notes": notlar}
+    return {"description": kart.get("description") or "", "completedAt": kart.get("completedAt"), "notes": notlar}
 
 
 def hedef_izlenebilir(hedef):
