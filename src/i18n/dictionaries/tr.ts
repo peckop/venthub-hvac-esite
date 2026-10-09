@@ -419,7 +419,7 @@ export const tr = {
     },
   },
   meta: {
-    siteTitle: 'VentHub — Premium HVAC Çözümleri',
+    siteTitle: 'VentHub | Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri',
     siteDesc: 'Otopark jet fanı, hava perdesi, ısı geri kazanım cihazı ve kanal fanı çözümleri; mühendislik destekli ürün seçimi ve teknik danışmanlık.',
   },
 
