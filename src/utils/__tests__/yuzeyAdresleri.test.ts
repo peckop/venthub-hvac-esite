@@ -242,31 +242,31 @@ describe('CollectionPage JSON-LD (kategori + seri)', () => {
     buildCategoryJsonLd({
       lang: 'tr', baseUrl: 'https://x', categorySlug: 'kanal-tipi-fanlar', name: 'K', description: 'd',
       total: 1, page: 1, pageSize: 24, families: aileler, sayfaYolu, bayrak,
-    }) as { url: string; itemListElement: { url: string }[] }
+    }) as { url: string; mainEntity: { itemListElement: { url: string }[] } }
 
   it('KAPALI birebir bugünkü (sayfaYolu verilse bile okunmaz)', () => {
     for (const ld of [kategori(undefined), kategori(false, '/tr/kategori/fanlar/kanal-tipi-fanlar')]) {
       expect(ld.url).toBe('https://x/tr/category/kanal-tipi-fanlar')
-      expect(ld.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
+      expect(ld.mainEntity.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
     }
   })
 
   it('AÇIK: sayfa yolu iki seviyeli kanonik, aile adresleri adresUret', () => {
     const ld = kategori(true, '/tr/kategori/fanlar/kanal-tipi-fanlar')
     expect(ld.url).toBe('https://x/tr/kategori/fanlar/kanal-tipi-fanlar')
-    expect(ld.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
+    expect(ld.mainEntity.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
   })
 
   it('seri: KAPALI bugünkü, AÇIK adresUret', () => {
     const seri = (bayrak?: boolean) =>
       buildSeriesLandingJsonLd({ lang: 'tr', baseUrl: 'https://x', seriesSlug: 'lineo', name: 'L', description: 'd', models: aileler, bayrak }) as {
         url: string
-        itemListElement: { url: string }[]
+        mainEntity: { itemListElement: { url: string }[] }
       }
     expect(seri().url).toBe('https://x/tr/products/lineo')
-    expect(seri().itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
+    expect(seri().mainEntity.itemListElement[0].url).toBe('https://x/tr/products/storm-serisi')
     expect(seri(true).url).toBe('https://x/tr/urun/lineo')
-    expect(seri(true).itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
+    expect(seri(true).mainEntity.itemListElement[0].url).toBe('https://x/tr/urun/storm-serisi')
   })
 })
 
