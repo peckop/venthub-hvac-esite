@@ -158,9 +158,14 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
   `app_metadata.tenant_id` yoktur → `jwt_tenant_id()` **varsayılan kiracıyı** döndürür (gövdede claim yok/boş/bozuk →
   varsayılan; anon claim'iyle ölçüldü: dönen kiracı `tenants`'taki tek kiracı, 49 takma ad satırının 49'u onun).
   Tohumdaki `kiraciId` varsayılandan farklıysa işlev YABANCI satır döndürür ve üretici hata verip derlemeyi düşürür
-  (fail-closed, `haritaUret.ts`); parametre eklenmedi, çünkü anon çağıran kiracıyı kendisi seçerdi. İşlev canlıda henüz
-  yok (migration, kural 13); bekçi `url-takma-adlari-listele.test.ts`: ikinci kiracı satırı varken yabancı satır
-  dönerse KIRMIZI.
+  (fail-closed, `haritaUret.ts`); parametre eklenmedi, çünkü anon çağıran kiracıyı kendisi seçerdi. İşlev canlıda
+  (migration #1757, 10-08, kural 13). Listede hedefi görünmeyen (silinmiş aile) takma adlar da bulunur: işlev kiracının
+  satırlarının TAMAMINI döner, hedefin görünürlüğüne bakmaz; ürün ve kategori zaten anon'a kiracı süzgeciyle açıktır,
+  aile yalnız silinmemişse (`deleted_at is null`). Bekçi `url-takma-adlari-listele.test.ts`: statik kol CI'da koşar
+  (gövde normalize edilmiş TEK beklenen dizeyle birebir karşılaştırılır; alt dize yetmez, `is not null` gibi süzgeci
+  söken yazımlar geçerdi). Davranış kolu (ikinci kiracı satırı varken yabancı satır dönerse KIRMIZI) PGlite ister;
+  PGlite depoda bağımlılık olmadığı için CI'da KOŞMAZ, yerelde `PGLITE_ZORUNLU=1` ile koşar (komut test dosyasının
+  başlığında).
 
 ## 5. Fazlar
 

@@ -17,9 +17,10 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
  * yazma yolu, arama yolu kaçırma ya da `sebep` (iç kimlikler) sızıntısı olmasın.
  *
  * KOLLAR
- *  A. STATİK SQL — migration zincirinin SON hâlini hesaplar (CI'da prod DB yok). Tanım, gövde, yetki, tablo.
- *  B. TİP DOSYASI — `database.types.ts` elle eklendi (canlıdan üretilemez: işlev henüz canlıda yok); dosya ile
- *     `returns table` kolonları ayrışırsa tipler yalan söyler.
+ *  A. STATİK SQL — migration zincirinin SON hâlini hesaplar (CI'da prod DB yok). Tanım, gövde (normalize edilmiş TEK
+ *     beklenen dizeyle BİREBİR; alt dize/desen yetmez, aşağıdaki BEKLENEN_GOVDE), yetki, tablo.
+ *  B. TİP DOSYASI — `database.types.ts` (işlev girdisi #1757'de elle eklendi; 2026-10-09'da `pnpm supabase:gen` çıktısıyla
+ *     satır satır aynı ölçüldü); dosya ile `returns table` kolonları ayrışırsa tipler yalan söyler.
  *  C. DAVRANIŞ (PGlite, bellek-içi PostgreSQL) — migration'ın KENDİ SQL'i iki kiracılı veride koşar: anon, service_role
  *     ve başka kiracının JWT'si için yalnız KENDİ kiracısının satırları döner; YABANCI KİRACI SATIRI DÖNERSE KIRMIZI.
  *  D. AYIRT EDİCİLİK — her kol, bilerek bozulmuş migration kopyasında KIRMIZI verir (vakumda yeşil yok).
@@ -45,6 +46,16 @@ const TABLO = 'url_takma_adlari'
 /** `returns table` kolonları, SIRASIYLA. `sebep` (iç kimlikler) ve `created_at` BİLEREK yok. */
 const KOLONLAR = ['tenant_id uuid', 'tur text', 'dil text', 'eski_slug text', 'hedef_id uuid'] as const
 const ACIK_ROLLER = ['anon', 'authenticated', 'service_role'] as const
+/**
+ * Gövdenin BEKLENEN TEK hâli (normalize: yorumsuz, küçük harf, tek boşluk, sonda `;`). Gövde bu dizeyle BİREBİR eşit
+ * olmalı. Alt dize/desen eşleşmesi YETMEZ: `where t.tenant_id = (select public.jwt_tenant_id()) is not null` (IS önceliği:
+ * `(a = b) is not null` her satırda true), `coalesce(<süzgeç>, true)` ve `union all` ile eklenmiş süzgeçsiz ikinci SELECT
+ * desenlerini geçer ve süzgeci fiilen söker; anon HER kiracının eski adreslerini okur (kural 12). Gövdeyi bilerek değiştiren
+ * bu sabiti de bilerek değiştirir: anon'a açık bir listenin gövdesi sözleşmedir.
+ */
+const BEKLENEN_GOVDE =
+  'select t.tenant_id, t.tur, t.dil, t.eski_slug, t.hedef_id from public.url_takma_adlari t ' +
+  'where t.tenant_id = (select public.jwt_tenant_id()) order by t.tur, t.dil, t.eski_slug;'
 
 type Mig = { ad: string; sql: string }
 
@@ -120,6 +131,11 @@ function fonksiyonHatalari(zincir: Mig[]): string[] {
   }
   if (!/\border by (?:t\.)?tur, (?:t\.)?dil, (?:t\.)?eski_slug\b/.test(g)) {
     h.push('(j) siralama yok — sayfali okuma (offset/limit) tekrar ve atlama uretir')
+  }
+  // (g)-(j) alt dize/desen kontrolleridir ve süzgeci etkisizleştiren yazımları geçirir (BEKLENEN_GOVDE açıklaması):
+  // gövde TEK beklenen dizeyle birebir eşit değilse yukarıdakilerin hiçbiri tetiklenmemiş olsa bile KIRMIZI.
+  if (g !== BEKLENEN_GOVDE) {
+    h.push(`(m) govde beklenen TEK dizeyle birebir degil — suzgec/siralama/kolon degisikligi bilincli olmali. bulunan: ${g}`)
   }
   return h
 }
@@ -505,6 +521,26 @@ describe('INV-TAKMA-AD-LISTE-1 · url_takma_adlari_listele() sözleşmesi', () =
       ],
       ['gövdeye yazma/kilit eklendi (for update)', (s) => s.replace(/order by/i, 'for update order by'), /\(i\) govde yazma/],
       ['sıralama kaldırıldı', (s) => s.replace(/order by t\.tur, t\.dil, t\.eski_slug/i, ''), /\(j\) siralama yok/],
+      // ⭐Süzgeci fiilen söken ama (g)-(j) alt dize/desen kontrollerini GEÇEN yazımlar: yalnız (m) birebir karşılaştırması yakalar.
+      [
+        'kiracı süzgeci IS NOT NULL ile etkisizleştirildi (IS önceliği: her satır true)',
+        (s) => s.replace(/(where\s+t\.tenant_id\s*=\s*\(select public\.jwt_tenant_id\(\)\))/i, '$1 is not null'),
+        /\(m\) govde beklenen TEK dizeyle birebir degil/,
+      ],
+      [
+        'kiracı süzgeci coalesce(..., true) içine alındı',
+        (s) => s.replace(/where\s+(t\.tenant_id\s*=\s*\(select public\.jwt_tenant_id\(\)\))/i, 'where coalesce($1, true)'),
+        /\(m\) govde beklenen TEK dizeyle birebir degil/,
+      ],
+      [
+        'süzgeçsiz ikinci SELECT union all ile eklendi',
+        (s) =>
+          s.replace(
+            /order by t\.tur, t\.dil, t\.eski_slug/i,
+            'union all select u.tenant_id, u.tur, u.dil, u.eski_slug, u.hedef_id from public.url_takma_adlari u order by tur, dil, eski_slug',
+          ),
+        /\(m\) govde beklenen TEK dizeyle birebir degil/,
+      ],
       [
         'PUBLIC\'e EXECUTE verildi',
         (s) => s.replace(/(grant execute on function public\.url_takma_adlari_listele\(\) to anon, authenticated, service_role;)/i, '$1\ngrant execute on function public.url_takma_adlari_listele() to public;'),
