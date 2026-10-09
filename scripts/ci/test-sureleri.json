@@ -4,6 +4,7 @@
   "varsayilan_sn": 0.1,
   "sureler": {
     "scripts/ci/__tests__/test-shard-bekle.test.ts": 0.6,
+    "scripts/ci/__tests__/test-shard-secim.test.ts": 0.9,
     "scripts/ci/__tests__/test-shard.test.ts": 2.2,
     "scripts/icerik-hatti/__tests__/aile-metni-yaz.test.ts": 1.2,
     "scripts/icerik-hatti/__tests__/en-jeton-kapisi.test.ts": 2.5,
@@ -43,6 +44,10 @@
     "src/__tests__/conformance/build-skip-positive-logic.test.ts": 17,
     "src/__tests__/conformance/catalog-integrity-gate.test.ts": 1.2,
     "src/__tests__/conformance/ci-edited-ayna.test.ts": 0.7,
+    "src/__tests__/conformance/ci-test-secimi-hizli.test.ts": 23.7,
+    "src/__tests__/conformance/ci-test-secimi-kapsam.test.ts": 31.2,
+    "src/__tests__/conformance/ci-test-secimi-uyum.test.ts": 18.2,
+    "src/__tests__/conformance/ci-test-secimi.test.ts": 0.4,
     "src/__tests__/conformance/ci-test-shard.test.ts": 11.3,
     "src/__tests__/conformance/claim-yenile.test.ts": 18.4,
     "src/__tests__/conformance/commit-oncesi-uyarilar-kilidi.test.ts": 1.3,
@@ -193,5 +198,5 @@
     "src/views/category/__tests__/SeriesLandingView.test.tsx": 0.4,
     "supabase/functions/_shared/__tests__/satis_kipi.test.ts": 0.3
   },
-  "_ek_olcum": "2026-10-07 yerel tek dosya koşusu (ALT-38c-2 koruma testleri): yeni test-shard dosyaları, genişleyen ci-edited-ayna ve CSV öncesi yazılmamış test-kosu-kapsami eklendi; mutlak saniye değil, sıra ve pay güvenilirdir."
+  "_ek_olcum": "2026-10-07 yerel tek dosya koşusu (ALT-38c-2 koruma testleri): yeni test-shard dosyaları, genişleyen ci-edited-ayna ve CSV öncesi yazılmamış test-kosu-kapsami eklendi; mutlak saniye değil, sıra ve pay güvenilirdir. 2026-10-08 (ALT-38e): ci-test-secimi* ve test-shard-secim.test.ts harita koşusunun ham vitest raporundan (yerel Windows; alt süreç başlatan testlerin Linux süresi daha düşük olabilir, sıra ve pay güvenilirdir)."
 }

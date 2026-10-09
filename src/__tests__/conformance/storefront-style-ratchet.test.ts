@@ -215,7 +215,7 @@ const RATCHETS: Ratchet[] = [
     // OrderDetailPage). Marka `text-slate-600` ve favori satırı `text-slate-400` yerinde kaldı
     // (net etkisi 0); sipariş detayına eklenen model kodu satırı token (`text-steel-gray`) kullanır.
     // Kazanç yan ürün.
-    tavan: 1438,
+    tavan: 1436,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
