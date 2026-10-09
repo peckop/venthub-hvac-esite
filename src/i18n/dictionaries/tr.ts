@@ -1801,9 +1801,6 @@ export const tr = {
       motor_efficiency_class: 'Motor Verim Sınıfı',
       motor_poles: 'Motor Kutup Sayısı',
       motor_type: 'Motor Tipi',
-      // URN-58: bu alan ölçüm mesafesi/türü TAŞIMAZ (spec-axis-standard K2, canlı veride koşul alanı yok) — etiket
-      // "üretici beyanı" der ve mesafe YAZMAZ. Mesafeyi üretici föyünden doğrulanmadan buraya yazmak yasaktır.
-      // Kardeşi noise_lpa_3m_db mesafeyi adında taşır, o yüzden etiketi "(3 m)" kalır.
       noise_level_db_a: 'Ses seviyesi (üretici beyanı)',
       noise_lpa_3m_db: 'Ses Basıncı (3 m)',
       nominal_delivery_m3h: 'Nominal Debi',

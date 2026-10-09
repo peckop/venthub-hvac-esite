@@ -1354,8 +1354,6 @@ export const en: typeof tr = {
       motor_efficiency_class: 'Motor Efficiency Class',
       motor_poles: 'Motor Poles',
       motor_type: 'Motor Type',
-      // URN-58: this field carries NO measurement distance/type (spec-axis-standard K2) — the label says
-      // "manufacturer's declaration" and must not state a distance unless verified against the maker's datasheet.
       noise_level_db_a: 'Sound level (manufacturer\'s declaration)',
       noise_lpa_3m_db: 'Sound Pressure (3 m)',
       nominal_delivery_m3h: 'Nominal Airflow',
