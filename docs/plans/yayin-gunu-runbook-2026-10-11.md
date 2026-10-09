@@ -1,6 +1,6 @@
 # Yayın günü runbook'u — Pazar 11 Ekim 2026 (yeni adres şeması)
 
-**Sürüm 0.1 (taslak, OPS incelemesi için) · 2026-10-09 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-37 (OPS emri 2026-10-09) · Dayanak: `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` Faz 3-C/4/5, §6, §7, §11 · `docs/plans/rec-300-plan-tazeleme-2026-10-08.md` §3 · `docs/standards/rota-dili-standard.md` R2, R3, §3**
+**Sürüm 0.2 (OPS yanıtlarıyla; OPS incelemesi için) · 2026-10-09 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-37 (OPS emri 2026-10-09) · Dayanak: `docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md` Faz 3-C/4/5, §6, §7, §11 · `docs/plans/rec-300-plan-tazeleme-2026-10-08.md` §3 · `docs/standards/rota-dili-standard.md` R2, R3, §3**
 
 > **Bu dosya niçin var.** Yayın gününde "şimdi ne yapıyorduk" sorusu hatırlanarak cevaplanmasın. Her adımın komutu, beklenen çıktısı, durma ölçütü ve geri alma yolu burada yazılıdır. Komutların hepsi mevcut betiklerdir; bu belgeyi yazarken **kapalı durumdaki canlı siteye** yalnız GET atan iki ölçüm denendi (§3.1, §9). Bir komutun çıktısı burada yazılı beklentiden saparsa **durulur ve OPS'a sorulur**; beklenti sessizce değiştirilmez.
 
@@ -16,20 +16,20 @@
 
 **Roller.** OPS: pencereyi açar/kapatır, 3-C'yi birleştirir, karar kapısını verir, Recep'e haber verir. ALTYAPI: ölçümler, Vercel değişkeni, doğrulama, geri alma yürütmesi. URUN: 3-C PR'ının içeriği. GEO-SEO: IndexNow, GSC, `llms.txt`. KATALOG: karar 157 haberi.
 
-**Saatler (ÖNERİ, OPS onaylar).** Hazırlık Cumartesi akşamı. Pencere Pazar **10:00–11:30**: 10:00 duyuru + T0 matrisi · 10:10 env değişkeni · 10:12 3-C birleştirme · ~10:20 dağıtım hazır · 10:20–10:45 doğrulama · **10:45 karar kapısı** · 11:00 IndexNow · 11:20 GSC ve haberler.
+**Saatler (OPS onayladı, 09 Ekim).** Hazırlık Cumartesi akşamı. Pencere Pazar **10:00–11:30**: 10:00 duyuru + T0 matrisi · 10:10 env değişkeni · 10:12 3-C birleştirme · ~10:20 dağıtım hazır · 10:20–10:45 doğrulama · **10:45 karar kapısı** · 11:00 IndexNow · 11:20 GSC ve haberler.
 
 ## 1. Ön koşullar (hepsi ✔ olmadan pencere açılmaz)
 
 | # | Ön koşul | Nasıl doğrulanır | Sahibi | Durum (09 Ekim 15:40) |
 |---|---|---|---|---|
 | 1 | Recep'in Cuma önizleme onayı ("gördüm, tamam", karar 68) | OPS'un Recep'ten aldığı yanıt | OPS | bekliyor |
-| 2 | **3-C PR'ı hazır ve CI yeşil**: `ADRES_SEMASI_K3B = true` + eski adres haritası + `next.config`'ten 19 satırın silinmesi (+ #1738 tek gövde bayrağı, karar 298 şartı) | `gh pr view <no> --repo peckop/venthub-hvac-esite --json mergeable,statusCheckRollup`; PR açıklamasında **beklenen site haritası sayısı** ve **harita dosyasının yolu** yazılı | URUN / OPS | **PR henüz açık değil** (bkz. §10 madde 1) |
+| 2 | **3-C PR'ı hazır ve CI yeşil**: `ADRES_SEMASI_K3B = true` + eski adres haritası + `next.config`'ten 19 satırın silinmesi (+ #1738 tek gövde bayrağı, karar 298 şartı) | `gh pr view <no> --repo peckop/venthub-hvac-esite --json mergeable,statusCheckRollup`; PR açıklamasında **beklenen site haritası sayısı** ve **harita dosyasının yolu** yazılı | URUN / OPS | URUN hazırlıyor, **Cumartesi 14:00'e kadar** (OPS, 09 Ekim) |
 | 3 | Birleştirme dondurması: pencere boyunca başka PR birleşmez (her birleşme Production dağıtımı başlatır; env değişkeni `1` iken erken açılış riski) | OPS duyurusu | OPS | planlanacak |
 | 4 | Taban ölçümleri alındı (§3) | `C:/tmp/yayin-11-ekim/` dosyaları | ALTYAPI | Cumartesi akşamı |
 | 5 | Geri alma hedefi bilinir: şimdiki Production dağıtımı READY ve **dağıtım numarası not edildi** | Vercel → Deployments (ya da Vercel MCP `list_deployments`) | ALTYAPI | Cumartesi akşamı |
 | 6 | Production `NEXT_PUBLIC_ADRES_DILI` şimdi `0` (ya da tanımsız); Preview `1` | Vercel → Settings → Environment Variables | ALTYAPI | Cumartesi akşamı |
 | 7 | IndexNow anahtar dosyası yayında: `curl -s https://venthub.com.tr/$INDEXNOW_KEY.txt \| wc -c` → **32** | komutun kendisi | ALTYAPI / GEO-SEO | Cumartesi akşamı |
-| 8 | `EN_YAYIN` kararı: kapalı (OPS'ta bekleyen karar; bu runbook kapalı varsayar) | OPS | OPS | bekliyor |
+| 8 | `EN_YAYIN` **kapalı**. Karar 327: İngilizce vitrin 18 Ekim'de açılacak; Pazar günü açılmaz | OPS kararı | OPS | karar verildi |
 
 ## 2. Hazırlık: taban ölçümleri (Cumartesi akşamı; hepsi **kapalı** durumda)
 
@@ -75,11 +75,14 @@ Komutlar çalışma ağacı `C:/tmp/vh-alt38-s27` (ya da güncel `master`) için
 
 IndexNow **geri alınamayan dış eylemdir**: Bing'e eski adresler gitmesin diye (karar 164 A, K4) yayından sonra, doğrulamadan sonra gönderilir.
 
+**Karar 327 (OPS, 09 Ekim):** İngilizce vitrin 18 Ekim'de açılacak; Pazar günü `EN_YAYIN` kapalı, IndexNow yalnız TR. Pilottaki “bildirim 0” hükmünün yerine geçmez: Pazar günü yalnız adresi değişen TR sayfalar bildirilir. Beklenen URL sayısını GEO-SEO verir.
+
 | # | Adım | Komut | Beklenen |
 |---|---|---|---|
 | 5.1 | Anahtar dosyası | `curl -s https://venthub.com.tr/$INDEXNOW_KEY.txt \| wc -c` | 32 |
 | 5.2 | Yerel kopya 3-C'yi içerir (kapı bayrağı `src/config/features.ts` metninden okur) | `git -C C:/tmp/vh-alt38-s27 fetch origin && git -C C:/tmp/vh-alt38-s27 merge --ff-only origin/master` ve `grep -n "ADRES_SEMASI_K3B = " src/config/features.ts` | `= true` |
-| 5.3 | Kuru koşum | `INDEXNOW_KEY=<anahtar> node scripts/seo/indexnow-bildir.mjs --kuru` | bulunan URL sayısı **beklenen sayıya eşit** (§10 madde 5); `EN_YAYIN` kapalı olduğundan site haritasında EN adresi yok, yani gönderilecek liste kendiliğinden yalnız TR |
+| 5.0 | **Ön iş (Cumartesi):** bugünkü `indexnow-bildir.mjs`'te “yalnız adresi değişenleri bildir” kipi **yok** (var olanlar: süzgeçsiz tüm harita ve `--yalniz-degismeyen`, ikincisi ters yönde). Gereken bayrak: `--yalniz-yeni <eski-adresler.json>` = yeni site haritası − taban site haritası (§2.3'ün çıktısı) | kod değişikliği + test (`indexnowBetikKapisi`) | bayrak testiyle birlikte master'da; **yoksa 5.3 ve 5.4 çalıştırılmaz** (§10 madde 5) |
+| 5.3 | Kuru koşum | `INDEXNOW_KEY=<anahtar> node scripts/seo/indexnow-bildir.mjs --kuru --yalniz-yeni C:/tmp/yayin-11-ekim/taban/eski-adresler.json` | bulunan URL sayısı **GEO-SEO'nun verdiği beklenen sayıya eşit**; liste yalnız TR (`EN_YAYIN` kapalı, site haritasında EN yok) ve yalnız adresi değişen sayfalar |
 | 5.4 | Gönderim (TEK kez) | 5.3'ün `--kuru`suz hâli | 200 ya da 202 (202: anahtar doğrulaması bekliyor, kabul edildi) |
 
 ## 6. Yayın sonrası (A9)
@@ -109,11 +112,17 @@ Faz 1-B (kategori ağacı, 40 aile) 6 Ekim'de birleşti (#1352); yayın günü l
 - `onizleme-tarama.cjs --liste` (ağ yok): beklenen adres sayısı **247**; `matris.cjs --liste`: 241.
 - Henüz **koşulmayanlar:** §2.2–2.5, §4 (açma olmadan anlamsız), §5 (IndexNow anahtarı gerekir).
 
-## 10. Açık noktalar (OPS)
+## 10. OPS kararları (09 Ekim) ve açık kalanlar
 
-1. **3-C PR'ını kim hazırlıyor?** Açık PR yok. PR açıklamasında şu üçü yazılı olmalı: beklenen site haritası sayısı, eski→yeni harita dosyasının yolu, #1738'in aynı yayında olup olmadığı (karar 298 özeti şartı).
-2. Pencere saati: öneri Pazar 10:00; Recep'e önceden haber verilip verilmeyeceği.
-3. **Vercel değişkenini kim değiştirir?** Öneri: ALTYAPI, OPS "şimdi" dedikten sonra (üretim ayarı değişikliği, açık onay).
-4. `EN_YAYIN`: kapalı (24/28 kategori EN açıklaması eksik; karar OPS'ta).
-5. **Karar 327** ("IndexNow yalnız TR") metni depoda yok. Bu belge `EN_YAYIN` kapalıyken site haritasında EN bulunmadığı için toplu betiğin kendiliğinden yalnız TR göndereceğini varsayar; beklenen URL sayısını OPS/GEO-SEO verir (5.3). Plan tazelemesi §3 ölçüt 3 pilotta bildirim sayısını **0** diyordu; karar 327 bunun yerine geçiyorsa 5.3 sayısı buna göre.
+**Karar verildi**
+
+1. 3-C PR'ını **URUN** hazırlıyor, **Cumartesi 14:00'e kadar**. Açıklamasında beklenen site haritası sayısı, eski→yeni harita dosyasının yolu ve #1738'in aynı yayında olup olmadığı yazılı olacak (OPS URUN'a yazdı).
+2. Pencere **Pazar 10:00–11:30** onaylandı; Recep'e önceden OPS haber verir.
+3. Vercel değişkenini (`NEXT_PUBLIC_ADRES_DILI`) **ALTYAPI** değiştirir, **Pazar günü OPS'un “şimdi” mesajından sonra**.
+4. **Karar 327:** İngilizce vitrin 18 Ekim'de açılacak; Pazar günü `EN_YAYIN` kapalı, IndexNow yalnız TR. Pilottaki “bildirim 0” hükmünün yerine geçmez: Pazar günü yalnız adresi değişen TR sayfalar bildirilir. Beklenen URL sayısını GEO-SEO verir.
+
+**Açık**
+
+5. IndexNow betiğine “yalnız adresi değişenler” kipi (§5.0): sahibi ve takvimi OPS belirler; Cumartesi bitmeden master'da olmalı.
 6. Canlı kapının kayıt durumunu hâlâ Linear API'sinden okuması (SEO-19 kapsamı): 2.4 için `--kayit-durum` JSON'u hazırlanmalı.
+7. **Açık beklenen matris** (§2.2) 3-C PR'ının **kendi dalından** üretilmelidir: Cuma önizlemesi bayrak yamasıyla derlendi, 3-C'nin içeriğiyle aynı olduğu doğrulanmadı. PR Cumartesi 14:00'te açılınca o dalın önizleme derlemesi (≈ 25 dk) ve matrisi alınır.
