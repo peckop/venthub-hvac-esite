@@ -47,7 +47,9 @@ export const tr = {
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
     brandTagline: 'Ventilation & HVAC',
-    brandLegalName: 'VentHub HVAC Solutions.',
+    // URN-83: şirket henüz kurulmadı; yasal unvan ("… Solutions." gibi) yazılmaz. Unvan kesinleşince bu değer
+    // tescilli unvanla DEĞİŞİR (anahtar adı bu yüzden "LegalName" kaldı). Kullanan: giriş sayfası alt yazısı.
+    brandLegalName: 'VentHub',
     vortice: 'Vortice',
     comma: ',',
     decrease: 'Azalt',
@@ -2703,8 +2705,11 @@ export const tr = {
     seoDescription: 'Hacim, debi ve basınç değerlerinizle kanal fanı, ısı geri kazanım, hava perdesi ve jet fan için ön değerlendirme yapın.',
     araclar: {
       kanal: {
-        ad: 'Kanal fanı hesabı',
-        aciklama: 'Hacim ve hava değişim sayısından gerekli debiyi ve basıncı çıkarın.',
+        // URN-83: kart "hacim ve hava değişim sayısından debi" diyordu ama bağlantı KANAL BASINÇ KAYBI hesaplayıcısına
+        // gider (hedef: `calculators.duct` — debi + kanal ölçüsü girilir, hava hızı ve tahmini basınç kaybı çıkar).
+        // Kart metni hedef sayfanın kendi cümlesine çekildi; ondan fazlası söylenmez.
+        ad: 'Kanal basınç kaybı hesabı',
+        aciklama: 'Debi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplayın.',
       },
       hrv: {
         ad: 'Isı geri kazanım (HRV) hesabı',
