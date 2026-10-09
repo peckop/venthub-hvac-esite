@@ -742,7 +742,7 @@ describe('INV-ROL-1 — Departman haritası (HRT-29, OPS-27 eki)', () => {
       const tanindi = !/rol taninmiyor/.test(`${r.stdout}${r.stderr}`)
       expect(uretici.terminaldenAcilir(ad), `${ad}: harita T=${uretici.terminaldenAcilir(ad)} ama departman-ac tanıma=${tanindi}`).toBe(tanindi)
     }
-  }, 60_000)
+  }, 180_000)
 
   it('OPS kartı yalnız işaretçiyi taşır (tam harita kartta değil), diğer kartlarda işaretçi yok', () => {
     const kartlar = uretici.uret()

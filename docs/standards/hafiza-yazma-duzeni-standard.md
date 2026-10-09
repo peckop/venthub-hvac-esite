@@ -33,6 +33,8 @@
 BLOG, MARKA, MEVZUAT, SATIS, TASARIM, EDGE, I18N, YETENEK (ASCII, büyük harf; tek kaynak `scripts/belge/rol-karti-uret.cjs`
 içindeki `ROLLER`). Pencerenin görünen adını Recep verir (`scripts/board/pencere-adlari.cjs`); görünen ad rol değildir.
 
+**Ders etiketi (HRT-36, Recep emri 2026-10-09).** Katman 4'e giden her ders anında `wrongstack-sage remember` ile yazılır: `audience.roles=[<rol>]` (rol kimliği küçük harf, mevcut kayıtlarda `altyapi`, `urun`, `geo-seo`) ve etiketler `[rol, ders]`. Rol etiketi olmayan kayıt role özel enjekte edilmez, genel proje hafızasına düşer ve departman bazında sayılamaz. Etiket öneridir, kanca zorlamaz; gün sonu raporunda "sage'e bugün N ders" yazılır, sayım etiketten yapılır. Ölçüm gerekçesi (OPS, 10-09): son 7 günde 5 kayıt, hiçbirinde departman etiketi yok. Satır her rol kartında `rol-karti-uret.cjs` ortak bloğundan gelir.
+
 **Cetvellerin içeriği** sahibi departmanda kalır (`docs/roller/cetvel-sahipligi.md`); bu cetvel yalnız hafıza ve talimat
 katmanlarını yönetir.
 
@@ -557,6 +559,7 @@ otomatik yazılan son dokunma zamanıdır, bilginin yazıldığı ya da olduğu 
   şöyle yazıyor (tarih)" kalıbı ve bayatlık kuralı; **§9b** durum dosyasının günlük döndürülmesi (DEVİR bloğu dosyanın sonunda + bugün/dün, `gecmis/` kayıpsız iki adım, kapı `gecmis/`'i taramaz; ilk uygulama OPS durum dosyası 2026-10-04: 336.438 → 106.480 bayt, betik `scripts/belge/durum-dondur.py`).
   §1 satır 3, §8 (D33, D34), §10 (v0.9 eki), §11 (iki açık soru) buna göre güncellendi. Başlıktaki "v0.7" bayattı (değişiklik kaydı v0.8'e gelmişti): v0.9 yapıldı.
   Kanca değişmedi; v0.9 bağımsız okuyucudan geçmedi, uygulamayla doğrulanacak.
+- 2026-10-09 v0.9 eki (HRT-36, Recep emri, OPS aktardı): §1 sonuna "Ders etiketi" paragrafı (sage'e anında, `audience.roles` + `[rol, ders]`, öneri; kanca yok). Rol kartlarına ders ve Kanban (sütun/status/not/kanıt) ortak satırları geldi (`rol-karti-uret.cjs`).
 - 2026-10-05 v0.9 eki (HRT-31, OPS isteği): §9b madde 7, durum dosyasının sonunda standart `Yarım iş: yok|var — ...` satırı (ARAÇ'ın #1702 kancası okuyor; biçim gerçek `yarimIsOku` ile ölçüldü). Rol kartlarına tek cümle, kurallar dosyalarına blok eklendi (`rol-karti-uret.cjs`). Kanca ve yazma kapıları değişmedi.
 
 - 2026-10-01 v0.8 (v0.7 son okuma turu; statü: uygulamayla doğrulanacak): 1 engelleyici + 4 orta + 3 düşük işlendi. §6 "Bash kaza yolları" `genisletmeli`'yi §5/D13d ile hizaladı (kanca işaretler); kalem 7 öncesi `unlink`/`rmdir`/`mv` kaynağı açık delik olarak §6'ya yazıldı;
