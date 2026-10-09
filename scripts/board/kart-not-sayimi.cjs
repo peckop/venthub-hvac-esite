@@ -232,4 +232,21 @@ function main(argv) {
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2))
 
-module.exports = { gunAdi, gunGecerli, bugun, notSayilir, kanitVar, etiket, doneGunu, say, ozetle, satirlar, kayitlariCoz, main, MIN_NOT, VeriHatasi }
+module.exports = {
+  gunAdi,
+  gunGecerli,
+  bugun,
+  notSayilir,
+  kanitVar,
+  etiket,
+  doneGunu,
+  say,
+  ozetle,
+  satirlar,
+  kayitlariCoz,
+  dosyadanOku,
+  canlidanOku,
+  main,
+  MIN_NOT,
+  VeriHatasi,
+}

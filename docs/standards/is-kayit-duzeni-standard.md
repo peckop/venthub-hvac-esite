@@ -200,7 +200,9 @@ ya da PR numarası + iki satır özet; `→`, `KANIT:`, `#<PR no>` ya da commit 
 "Bugün Done oldu" Done'a geçiş anıdır: `completedAt`, yoksa Kanban olay kaydındaki son Done taşıması (`doneAt`; Done kolonundaki arşivli
 kartlarda `completedAt` boştur), ikisi de yoksa `sonAnlamli` ve satır "yaklaşık" diye işaretlenir. `sonAnlamli` ilk tercih DEĞİLDİR: eski
 karta bugün düşülen not onu bugüne taşır. Betik yalnız Done kolonundaki kartı sayar; hiç Done'a çekilmemiş teslim (kart Backlog'da
-kalmış, PR birleşmiş) bu ölçüye girmez.
+kalmış, PR birleşmiş) bu ölçüye girmez; onu `node scripts/board/teslim-kart-koprusu.cjs` ölçer (bugün origin/master'a giren her PR'ın
+numarası ya da commit kısaltması o gün yazılmış bir kart notunda geçmeli; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)";
+eşik **0**; ölçülemeyen hal çıkış 2). İkisi birlikte koşulur; notsuz bulunan teslim sahibine yazılır, OPS'a özet gider.
 
 **Ölçülmüş tuzaklar ve karşılıkları:**
 

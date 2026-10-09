@@ -1,0 +1,216 @@
+#!/usr/bin/env node
+'use strict'
+
+/**
+ * TESLİM-KART KÖPRÜSÜ (HRT-47, OPS 10-09 "teslim-kart köprüsü: EVET"; cetvel: docs/standards/is-kayit-duzeni-standard.md "Teslim notu").
+ *
+ * NİÇİN VAR: kart-not-sayimi.cjs (HRT-44) yalnız Done kolonundaki kartı görür. 10-09'da URUN'un dört teslimi (#1774 URN-58, #1752 REC-491,
+ * #1766 URN-72, #1754 URN-57) master'a girdi, kartları Backlog'da kaldı ve hiçbirinde not yoktu: sayaç bunları göremedi. Bu betik ters yönden
+ * bakar: bugün master'a giren her PR'ın numarası (ya da commit kısaltması) bugün yazılmış bir kart notunda geçiyor mu?
+ *
+ * KULLANIM (yerelde; CI'da KOŞMAZ: Kanban verisi git dışıdır, depo public):
+ *   node scripts/board/teslim-kart-koprusu.cjs                      (bugün, Europe/Istanbul günü; canlı Kanban + origin/master)
+ *   node scripts/board/teslim-kart-koprusu.cjs --gun 2026-10-09 [--json]
+ *   node scripts/board/teslim-kart-koprusu.cjs --dosya <disa-aktar --tam çıktısı.json> --log-dosya <"kısa|başlık" satırları>   (test/elle)
+ *   node scripts/board/teslim-kart-koprusu.cjs --repo <git dizini> --fetch-yok                                                   (test)
+ *
+ * ÖLÇÜ: "teslim" = origin/master'da başlığı "(#N)" ile biten commit (PR birleştirmesi). Not = kart-not-sayimi.cjs ile AYNI kural (yazarı
+ * system değil, en az 10 harf/rakam, teslim GÜNÜNDE yazılmış). Teslim "kartlı" sayılır: PR numarası `#N` (tam eşleşme: #17, #1786'yı
+ * karşılamaz), `PR N`, `pull/N` ya da 7+ karakterlik commit kısaltması HERHANGİ bir kartın bugünkü notunda geçiyorsa. Not başka kartta da
+ * olabilir; numaranın doğru karta yazıldığı ölçülmez. Başlıktaki kart numarası yalnız raporda sahibi bulmak içindir.
+ * Çıktı departman (başlığın ilk sözcüğü) başına: "URUN: Teslim 8, kart notunda geçmeyen 4: #1774 (URN-58), ...".
+ * PR numarasız commit (doğrudan master) ayrı SAYILIR ve çıkış kodunu etkilemez.
+ *
+ * ÖLÇÜLEMEDİ ≠ TEMİZ (çıkış 2): origin/master okunamadı/taze değil (fetch başarısız), o gün hiç commit yok (log boş), Kanban verisi okunamadı,
+ * bayat dışa aktarım, geçersiz argüman.
+ *
+ * ÇIKIŞ KODU: 0 notsuz teslim yok · 1 en az bir teslim kart notunda geçmiyor · 2 ölçülemedi.
+ */
+
+const fs = require('node:fs')
+const path = require('node:path')
+const { spawnSync } = require('node:child_process')
+
+const K = require('./kart-not-sayimi.cjs')
+
+const REPO = path.resolve(__dirname, '..', '..')
+const { VeriHatasi, gunAdi, gunGecerli, bugun, notSayilir } = K
+const KART_NO = /\b([A-Z]{2,5}-\d+)\b/
+const PR_SONU = /\(#(\d{2,6})\)\s*$/
+/** Türkçe büyük harf katlama: "HARİTA" ve "HARITA" aynı departman. */
+const DEPARTMAN_ASCII = { İ: 'I', Ş: 'S', Ğ: 'G', Ü: 'U', Ö: 'O', Ç: 'C' }
+
+function departman(baslik) {
+  const ilk = String(baslik).trim().split(/[\s(:]/)[0] || '?'
+  return ilk.replace(/[İŞĞÜÖÇ]/g, (c) => DEPARTMAN_ASCII[c]).toUpperCase()
+}
+
+/** "kısa|başlık" satırlarından teslim listesi. PR numarasız commit ayrı döner. */
+function teslimleriCoz(satirlar) {
+  const teslimler = []
+  const prSiz = []
+  for (const satir of satirlar) {
+    if (!satir.trim()) continue
+    const i = satir.indexOf('|')
+    if (i < 1) throw new VeriHatasi(`git günlüğü satırı "kısa|başlık" biçiminde değil: ${satir.slice(0, 40)}`)
+    const kisa = satir.slice(0, i).trim()
+    const baslik = satir.slice(i + 1).trim()
+    const pr = baslik.match(PR_SONU)
+    const kart = (baslik.match(KART_NO) || [])[1] || null
+    if (!pr) prSiz.push({ kisa, baslik, departman: departman(baslik), kart })
+    else teslimler.push({ kisa, baslik, pr: pr[1], departman: departman(baslik), kart })
+  }
+  return { teslimler, prSiz }
+}
+
+/** Metin bu teslimi anıyor mu: #N (tam eşleşme), "PR N", "pull/N" ya da 7+ karakterlik commit kısaltması. */
+function notAniyor(metin, teslim) {
+  const m = String(metin)
+  const n = teslim.pr
+  if (new RegExp(`(?<![0-9A-Za-z])#${n}(?![0-9])`).test(m)) return true
+  if (new RegExp(`\\bPR\\s*#?${n}(?![0-9])`, 'i').test(m)) return true
+  if (new RegExp(`/pull/${n}(?![0-9])`).test(m)) return true
+  const kisa = teslim.kisa.slice(0, 7)
+  return kisa.length >= 7 && m.toLowerCase().includes(kisa.toLowerCase())
+}
+
+/** O gün (TR) yazılmış dolu, sistem dışı tüm notların metni. */
+function gununNotlari(kayitlar, gun) {
+  const metinler = []
+  for (const k of kayitlar) {
+    if (!k || !Array.isArray(k.notes)) continue
+    for (const n of k.notes) if (notSayilir(n) && gunAdi(n.createdAt) === gun) metinler.push(String(n.content))
+  }
+  return metinler
+}
+
+function olc(kayitlar, satirlar, gun) {
+  const { teslimler, prSiz } = teslimleriCoz(satirlar)
+  const notlar = gununNotlari(kayitlar, gun)
+  const departmanlar = {}
+  for (const t of teslimler) {
+    const d = (departmanlar[t.departman] ||= { teslim: 0, notsuz: [] })
+    d.teslim += 1
+    if (!notlar.some((m) => notAniyor(m, t))) d.notsuz.push({ pr: t.pr, kart: t.kart, kisa: t.kisa })
+  }
+  const notsuz = Object.values(departmanlar).reduce((a, d) => a + d.notsuz.length, 0)
+  return { gun, teslim: teslimler.length, notsuz, departmanlar, prSiz, cikis: notsuz > 0 ? 1 : 0 }
+}
+
+function satirlariYaz(sonuc) {
+  const adlar = Object.keys(sonuc.departmanlar).sort()
+  const cikti = adlar.map((ad) => {
+    const d = sonuc.departmanlar[ad]
+    const liste = d.notsuz.map((t) => `#${t.pr}${t.kart ? ` (${t.kart})` : ''}`).join(', ')
+    return `${ad}: Teslim ${d.teslim}, kart notunda geçmeyen ${d.notsuz.length}${d.notsuz.length ? `: ${liste}` : ''}`
+  })
+  if (sonuc.prSiz.length) {
+    cikti.push(`PR numarasız commit ${sonuc.prSiz.length} (çıkış kodunu etkilemez): ${sonuc.prSiz.map((c) => c.kisa).join(', ')}`)
+  }
+  cikti.push(`TOPLAM ${sonuc.gun}: Teslim ${sonuc.teslim}, kart notunda geçmeyen ${sonuc.notsuz}`)
+  return cikti
+}
+
+/** origin/master'ın TR gününe düşen "kısa|başlık" satırları. Okunamazsa ya da boşsa VeriHatasi (ölçülemedi ≠ temiz). */
+function gitGunlugu(gun, repo, fetchYok) {
+  const git = (...a) => spawnSync('git', ['-C', repo, ...a], { encoding: 'utf8', timeout: 60000 })
+  if (!fetchYok) {
+    const f = git('fetch', 'origin', 'master', '--quiet')
+    if (f.status !== 0) throw new VeriHatasi(`git fetch origin master başarısız (origin/master taze değil): ${(f.stderr || '').trim().split('\n').pop()}`)
+  }
+  const sonraki = new Date(`${gun}T00:00:00+03:00`)
+  sonraki.setUTCDate(sonraki.getUTCDate() + 1)
+  const r = git('log', 'origin/master', `--since=${gun}T00:00:00+03:00`, `--until=${sonraki.toISOString()}`, '--format=%h|%s')
+  if (r.status !== 0) throw new VeriHatasi(`git log origin/master okunamadı: ${(r.stderr || '').trim().split('\n').pop()}`)
+  const satirlar = r.stdout.split('\n').filter(Boolean)
+  if (satirlar.length === 0) throw new VeriHatasi(`origin/master'da ${gun} günü hiç commit yok — ölçülemedi ("temiz" değil)`)
+  return satirlar
+}
+
+function argumanlar(argv) {
+  const a = { gun: null, dosya: null, logDosya: null, repo: REPO, fetchYok: false, json: false }
+  const deger = (i, ad) => {
+    const v = argv[i + 1]
+    if (v === undefined || v.startsWith('--')) throw new VeriHatasi(`${ad} bir değer ister`)
+    return v
+  }
+  for (let i = 0; i < argv.length; i++) {
+    const x = argv[i]
+    if (x === '--gun') a.gun = deger(i++, x)
+    else if (x === '--dosya') a.dosya = deger(i++, x)
+    else if (x === '--log-dosya') a.logDosya = deger(i++, x)
+    else if (x === '--repo') a.repo = deger(i++, x)
+    else if (x === '--fetch-yok') a.fetchYok = true
+    else if (x === '--json') a.json = true
+    else throw new VeriHatasi(`bilinmeyen argüman: ${x}`)
+  }
+  if (a.gun !== null && !gunGecerli(a.gun)) throw new VeriHatasi('--gun geçerli bir takvim günü olmalı (YYYY-MM-DD)')
+  return a
+}
+
+function logOku(yol) {
+  try {
+    const satirlar = fs.readFileSync(yol, 'utf8').split(/\r?\n/).filter(Boolean)
+    if (satirlar.length === 0) throw new VeriHatasi(`git günlüğü dosyası boş: ${yol}`)
+    return satirlar
+  } catch (e) {
+    if (e instanceof VeriHatasi) throw e
+    throw new VeriHatasi(`günlük dosyası okunamadı: ${yol} (${e.code || 'hata'})`)
+  }
+}
+
+/** Not verisi: --tam dışa aktarımı. Done şartı aranmaz (köprü Done dışı kartları da görür); kayıt boşluğu ve bayatlık denetlenir. */
+function kanbanOku(a, gun) {
+  if (a.dosya) {
+    let d
+    try {
+      d = JSON.parse(fs.readFileSync(a.dosya, 'utf8'))
+    } catch (e) {
+      throw new VeriHatasi(`Kanban dosyası okunamadı/çözülemedi: ${a.dosya} (${e.code || 'JSON'})`)
+    }
+    return kontrol(d, gun)
+  }
+  for (const py of ['python', 'py']) {
+    const r = spawnSync(py, [path.join(REPO, 'scripts', 'nlm', 'kanban_disa_aktar.py'), '--tam'], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout: 120000 })
+    if (r.error && r.error.code === 'ENOENT') continue
+    if (r.error) throw new VeriHatasi(`${py} çalıştırılamadı: ${r.error.message}`)
+    if (r.status !== 0) throw new VeriHatasi(`dışa aktarım çıkış ${r.status}: ${(r.stderr || '').trim().split('\n').pop()}`)
+    try {
+      return kontrol(JSON.parse(r.stdout), gun)
+    } catch (e) {
+      if (e instanceof VeriHatasi) throw e
+      throw new VeriHatasi('dışa aktarım JSON çözülemedi')
+    }
+  }
+  throw new VeriHatasi('python bulunamadı (python ya da py PATH içinde olmalı)')
+}
+
+function kontrol(d, gun) {
+  if (!d || !Array.isArray(d.kayitlar) || d.kayitlar.length === 0) throw new VeriHatasi('kayitlar[] yok ya da boş — Kanban verisi ölçülemedi')
+  if (d.kayitlar.some((k) => !k || typeof k !== 'object')) throw new VeriHatasi('kayitlar[] içinde kayıt olmayan öğe var')
+  if (d.damga) {
+    const g = gunAdi(d.damga)
+    if (g !== null && g < gun) throw new VeriHatasi(`dışa aktarım damgası (${d.damga}) istenen günden (${gun}) eski — bayat dosya`)
+  }
+  return d.kayitlar
+}
+
+function main(argv) {
+  try {
+    const a = argumanlar(argv)
+    const gun = a.gun || bugun()
+    const satirlar = a.logDosya ? logOku(a.logDosya) : gitGunlugu(gun, a.repo, a.fetchYok)
+    const kayitlar = kanbanOku(a, gun)
+    const sonuc = olc(kayitlar, satirlar, gun)
+    if (a.json) process.stdout.write(`${JSON.stringify(sonuc, null, 2)}\n`)
+    else process.stdout.write(`${satirlariYaz(sonuc).join('\n')}\n`)
+    return sonuc.cikis
+  } catch (e) {
+    process.stderr.write(`HATA${e instanceof VeriHatasi ? '' : ' (beklenmeyen)'}: ${e.message}\n`)
+    return 2
+  }
+}
+
+if (require.main === module) process.exitCode = main(process.argv.slice(2))
+
+module.exports = { departman, teslimleriCoz, notAniyor, gununNotlari, olc, satirlariYaz, gitGunlugu, main }
