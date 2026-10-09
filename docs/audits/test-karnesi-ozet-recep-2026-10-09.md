@@ -9,7 +9,7 @@
 - Depoda **654 test dosyası** (**7.271 test**) var. **347** dosyaya bilerek hata konarak bakıldı (hepsi kural/uyum testi, 6–7 Ekim); **307** dosyaya bakılmadı (birim, uçtan uca, edge, betik testleri ve ölçümden sonra eklenenler).
 - **Silinecek test yok.** Silmeye yetecek kanıt çıkmadı: en güçlü üç aday için denenen bozma sayısı birer tane ve eşlerinin ikisi de kendi başına kısmi korumalı. Üçü eşleriyle **birleşir**.
 - **2 test PR dışındaki işe taşınır** (üç ayda 10 kırmızı, 10'u da PR'dan bağımsız toplu olay).
-- **218 test güçlendirilecek:** kırmızı veriyorlar ama ölçülen bir bozmaya yeşil kalıyorlar. Denenen 558 bozmanın 345'i yakalandı (%62), kaçan bozma sayısı 213.
+- **218 test güçlendirilecek:** kırmızı veriyorlar (en az bir bozmayı yakalıyorlar) ama denenen bir ya da daha fazla bozmaya yeşil kalıyorlar. Toplam 709 bozma denendi, 306'sı yakalanmadı (ana turda 213, ek yoklamada 93).
 - **PR süresi kazancı yaklaşık 0 dk.** Bekleme süresini testler değil derleme ve denetim işi (`ci`) belirliyor: 9 Ekim'in son 5 PR'ında `ci` 88–273 sn, en yavaş test dilimi 83–125 sn sürdü.
 
 ## 2. Tablo
@@ -58,7 +58,7 @@ Testler dört dilimde paralel koşuyor ve `ci` işinin son adımı dilimlerin bi
 ## 4. Sınırlar
 
 - Bozma ölçümü 347 dosyada yapıldı; 307 dosya “ölçülmedi” ve bu yüzden **kalır** yazıldı (tahmin yok).
-- Bozmalar el yapımıdır; %62 yakalama oranı genel bir kalite puanı değil, bu 558 bozmaya karşı ölçümdür.
+- Ölçüm bir teste bozmaları sırayla dener ve ilk yakalanışta durur (`sabotaj.cjs`). Bu yüzden “kaç bozmadan kaçı yakalandı” bir oran olarak verilmez: ölçülen 347 testin 345'i en az bir bozmayı yakaladı, 221'inin en az bir bozması kaçtı. “Hiçbir bozması kaçmadı” (117 test) “tam korunuyor” demek değildir, kalan bozmalar denenmedi. Bozmalar el yapımıdır, rastgele örnek değildir.
 - Süreler yerel Windows koşusundan (3 işçi, çekişmeli) gelir; CI'da dosya başına süre ölçülmedi, yalnız dilim toplamları ölçüldü.
 - Dünya durumu hükümleri 6 Temmuz–7 Ekim CI geçmişine dayanır; 6 Ekim'de taşınan şema tabanı kolu tabloda ayrıca gösterilmiştir.
 

@@ -4,8 +4,9 @@
  *
  * NİÇİN: test karnesinin 8. sorusu "bu test neyi değişince koşmalı?"dır (OPS, 2026-10-06; Recep sorusu: "kapıları
  * oluşturuyoruz, bu kapılar yine çalışacak mı, test süresini yakacak mı?"). Eski testler için cevap statik taramadan
- * (`statik.cjs`, okunan yollar) çıkarılır; YENİ her test cevabını başlık yorumunda KENDİSİ yazar. Beyansız yeni test
- * birleşmez (`INV-TEST-BEYAN-1`, `src/__tests__/conformance/test-beyan-kapisi.test.ts`).
+ * (`statik.cjs`, okunan yollar) çıkarılır; YENİ her test cevabını başlık yorumunda KENDİSİ yazar. Beyansız yeni testi
+ * reddedecek kapı (`INV-TEST-BEYAN-1`, `test-beyan-kapisi.test.ts`) bu sürümde KURULU DEĞİL: yeni zorunluluk getirir ve
+ * ayrı karar ister (cetvel docs/standards/test-karnesi-standard.md §7.7, madde 5).
  *
  * BİÇİM (test dosyasının ilk 80 satırında, yorum içinde; iki satır):
  *   TETİK: src/lib/pricing/**, docs/standards/pricing-standard.md
