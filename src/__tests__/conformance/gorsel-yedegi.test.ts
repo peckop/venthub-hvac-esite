@@ -285,6 +285,30 @@ const BOZMALAR: Bozma[] = [
             yeni: "error ? '/images/placeholders/product-placeholder.png' : normalizeImageUrl(src)",
         },
     },
+    {
+        // Eski dize UZUN çıpa: kısa ` width="400" height="400"` dizesi dosyada iki kez geçer (tam-bir-kez koruması patlardı).
+        ad: 'yer tutucu SVG kök etiketinden width/height düşer (boyutsuz SVG, WebGL dokusu için içsel boyut yok)',
+        beklenen: 'SVG-BOYUT',
+        degistir: {
+            dosya: `public${YER_TUTUCU_GORSEL}`,
+            eski: '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox',
+            yeni: '<svg xmlns="http://www.w3.org/2000/svg" viewBox',
+        },
+    },
+    {
+        ad: 'Orbital doku yedeği yer tutucu sabitine bağlı olmaktan çıkar (başka bir fotoğrafa sabitlenir)',
+        beklenen: 'ORBITAL',
+        degistir: {
+            dosya: 'src/components/products/OrbitalProductsShowcase.tsx',
+            eski: 'useTexture(finalPath || YER_TUTUCU_GORSEL)',
+            yeni: "useTexture(finalPath || '/images/hero_hvac_industrial_premium_1.webp')",
+        },
+    },
+    {
+        ad: 'public/images/placeholders klasörü geri gelir (içinde bir .png dosyası)',
+        beklenen: 'PNG-KLASORU',
+        olustur: { yol: 'public/images/placeholders/product-placeholder.png', icerik: 'kopyada-bozma' },
+    },
 ]
 
 /** Bozmayı kopyaya uygular ve etkilenen mutlak yolu döner. Eski dize kopyada TAM BİR KEZ bulunmalı. */
