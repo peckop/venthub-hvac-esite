@@ -539,6 +539,11 @@ export const tr = {
       cta: 'Yüksek Çözünürlüklü Teknik Verilere Ulaş',
       badge: 'ENDÜSTRİYEL ODAK',
       componentLabel: 'Sistem Bileşeni',
+      // URN-80: görsel alt metinleri — görselin ne gösterdiğini söyler, üstünlük iddiası taşımaz.
+      imageAlt: {
+        airflow: 'Vortice Lineo serisi kanal tipi fan, hava akışı çizgileriyle',
+        side: 'Vortice Lineo serisi kanal tipi fan, yandan görünüm'
+      },
       hotspots: {
         motor: 'Yüksek Verimli EC Motor',
         motorDetail: 'Hassas devir ve tork yönetimi sağlayan EC motor teknolojisi.',
@@ -696,7 +701,6 @@ export const tr = {
     knowledge: {
       headingPrefix: 'Mühendislik',
       headingAccent: 'Katmanı',
-      statsPipelineLabel: 'Proje Hattı',
       eyebrow: 'Bilgi ve Destek Katmanı',
       title: 'Mühendislik Estetiği',
       subtitle: 'Rehberler, hesaplayıcılar ve destek merkezi sayesinde kullanıcı yalnızca ürüne değil, doğru karar ortamına da sonuçları saniyeler içinde ulaşır.',
@@ -761,12 +765,9 @@ export const tr = {
       fastTitle: 'Hızlı Teslimat',
       fastText: 'Türkiye genelinde hızlı ve güvenli teslimat.'
     },
-    stats: {
-      premiumBrands: 'Premium Marka',
-      productTypes: 'Ürün Çeşidi',
-      yearsExperience: 'Yıl Deneyim',
-      happyCustomers: 'Mutlu Müşteri'
-    },
+    // `home.stats` KALDIRILDI (URN-80, 2026-10-09): dört anahtardan üçü zaten hiçbir yerde okunmuyordu,
+    // dördüncüsü (yearsExperience) "15+ Yıl Deneyim" sayaç kartını besliyordu ve o rakamın kaynağı yoktu.
+    // Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts
     galleryTitle: 'Ürün Galerisi',
     gallerySubtitle: 'Öne çıkan ürünlere göz atın',
     caseStudies: {
@@ -930,9 +931,10 @@ export const tr = {
     quickLinks: 'Hızlı Linkler',
     categories: 'Kategoriler',
     contact: 'İletişim',
-    workingHours: 'Çalışma Saatleri',
-    weekdays: 'Hafta İçi',
-    saturday: 'Cumartesi',
+    contactForm: 'İletişim formunu doldurun',
+    // workingHours/weekdays/saturday BİLİNÇLİ YOK (URN-80, 2026-10-09): hafta içi ve cumartesi saat
+    // aralıklarının kaynağı yoktu. Gerçek çalışma saati kayıtlı olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
+    // Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts
     rights: 'Tüm hakları saklıdır.',
     // address/phone BİLİNÇLİ YOK (2026-08-28): uydurma adres ve numara yayınlanmaz.
     // Gerçek bilgi olunca EN sözlüğüyle BİRLİKTE geri eklenir (parite).
@@ -1545,9 +1547,12 @@ export const tr = {
       headerTitle: 'Kapınızdan Ne Kadar Enerji Kaçıyor?',
       headerSubtitle: 'Açık kapı = Açık cüzdan. Her gün farkında olmadan enerji ve para kaybediyorsunuz.',
       energyLossTitle: 'Enerji Kaybı',
-      energyLossDesc: 'Açık kapıdan kaçan ısının yıllık ortalama maliyeti',
+      // URN-80: iki açıklama eskiden büyük rakamın alt yazısıydı ("... yıllık ortalama maliyeti"); rakam kalkınca
+      // eksik cümle kalırdı. Yerine Vortice AIR DOOR kataloğundaki (p.4) olgu girdi: hava perdesi "yazın
+      // serinletilmiş, kışın ısıtılmış havanın kaçmasını" ve "bir ortamdan ötekine ısı geçişini" önler.
+      energyLossDesc: 'Yazın serinletilmiş, kışın ısıtılmış hava açık kapıdan dışarı kaçar',
       tempDiffTitle: 'Sıcaklık Farkı',
-      tempDiffDesc: 'Kapı açıldığında iç-dış ortam sıcaklık farkı',
+      tempDiffDesc: 'Kapı açıldığında iç ve dış ortam arasında ısı geçişi olur',
       airflowTitle: 'Hava Akışı',
       airflowDesc: 'Kontrolsüz rüzgar ve toz girişi',
       pestTitle: 'Zararlı Girişi',
@@ -1561,7 +1566,9 @@ export const tr = {
       withoutPoint4: 'Zararlı girişi kolay',
       withTitle: 'Hava Perdesi İle',
       withPoint1: 'Görünmez enerji bariyeri',
-      withPoint2: '%30\'a varan tasarruf',
+      // URN-80: "%30'a varan tasarruf" kaynaksızdı (kaynak dizininde yüzde yok); katalog (AIR DOOR, p.6)
+      // yalnız ısıtma ve soğutma maliyetinde tasarruftan söz ediyor.
+      withPoint2: 'Isıtma ve soğutma maliyetinde tasarruf',
       withPoint3: 'Konforlu iç ortam',
       withPoint4: 'Zararlılara karşı kalkan',
     },

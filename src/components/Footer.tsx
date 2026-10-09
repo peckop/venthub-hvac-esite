@@ -12,8 +12,6 @@ import BuildTag from './BuildTag'
 // ADDRESS/PHONE ikon sabitleri, adres+telefon satırlarıyla birlikte kaldırıldı
 // (2026-08-28) — kullanılmayan sabit bırakmak lint'i kırardı.
 const FOOTER_ICON_MAIL = 'M'
-const WEEKDAY_HOURS = '09:00 - 18:00'
-const SATURDAY_HOURS = '09:00 - 14:00'
 const HVAC_SUFFIX = 'HVAC.'
 /** Altbilgide gösterilecek en çok kök kategori (bugün 7 ürünlü kök var; 8. kök gelirse tavan bilinçli kararla artar). */
 const FOOTER_KATEGORI_TAVANI = 8
@@ -142,17 +140,26 @@ const Footer: React.FC = () => {
                   değer basılmaz (2026-08-28 taraması); gerçek bilgi gelince geri eklenir. */}
               <div className="flex items-center space-x-3">
                 <span className="text-secondary-blue flex-shrink-0">{FOOTER_ICON_MAIL}</span>
-                <span className="text-gray-300 text-sm">{t('footer.email')}</span>
+                <a
+                  href={`mailto:${t('footer.email')}`}
+                  className="text-gray-300 hover:text-white transition-colors text-sm"
+                >
+                  {t('footer.email')}
+                </a>
               </div>
             </div>
 
-            {/* Working Hours */}
-            <div className="mt-4 p-3 bg-white/5 rounded-lg">
-              <h4 className="font-medium text-sm mb-2">{t('footer.workingHours')}</h4>
-              <p className="text-gray-300 text-xs">
-                {t('footer.weekdays')}: {WEEKDAY_HOURS}<br />
-                {t('footer.saturday')}: {SATURDAY_HOURS}
-              </p>
+            {/* URN-80: "Çalışma Saatleri" kutusu KALDIRILDI — hafta içi ve cumartesi saat aralıklarının hiçbir
+                kaynağı yoktu (2025-08-23 ilk şablon commit'inden kalma). Yerine iletişim formu bağlantısı
+                girer; saat gerçek ve kayıtlı olunca sözlükle birlikte (TR+EN) geri eklenir.
+                Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts */}
+            <div className="mt-4">
+              <Link
+                href={Routes.contact()}
+                className="inline-block text-sm font-medium text-white underline underline-offset-4 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"
+              >
+                {t('footer.contactForm')}
+              </Link>
             </div>
           </div>
         </div>

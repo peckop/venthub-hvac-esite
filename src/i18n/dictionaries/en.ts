@@ -427,6 +427,11 @@ export const en: typeof tr = {
       cta: 'Access High-Resolution Technical Data',
       badge: 'INDUSTRIAL FOCUS',
       componentLabel: 'System Component',
+      // URN-80: image alt texts — say what the image shows, carry no superiority claim.
+      imageAlt: {
+        airflow: 'Vortice Lineo series in-line duct fan, with airflow lines',
+        side: 'Vortice Lineo series in-line duct fan, side view'
+      },
       hotspots: {
         motor: 'High Efficiency EC Motor',
         motorDetail: 'EC motor technology providing precise speed and torque management.',
@@ -584,7 +589,6 @@ export const en: typeof tr = {
     knowledge: {
       headingPrefix: 'Engineering',
       headingAccent: 'Layer',
-      statsPipelineLabel: 'Project Pipeline',
       eyebrow: 'Knowledge and Support Layer',
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
@@ -648,12 +652,8 @@ export const en: typeof tr = {
       fastTitle: 'Fast Delivery',
       fastText: 'Rapid and reliable delivery across Turkey.'
     },
-    stats: {
-      premiumBrands: 'Premium Brands',
-      productTypes: 'Product Types',
-      yearsExperience: 'Years Experience',
-      happyCustomers: 'Happy Customers'
-    },
+    // `home.stats` REMOVED (URN-80, 2026-10-09): three of its four keys were already read nowhere, the fourth
+    // (yearsExperience) fed the "15+ Years Experience" counter card whose figure had no source.
     galleryTitle: 'Product Gallery',
     gallerySubtitle: 'Browse featured products',
     caseStudies: {
@@ -928,9 +928,9 @@ export const en: typeof tr = {
     quickLinks: 'Quick Links',
     categories: 'Categories',
     contact: 'Contact',
-    workingHours: 'Working Hours',
-    weekdays: 'Monday - Friday',
-    saturday: 'Saturday',
+    contactForm: 'Fill in the contact form',
+    // workingHours/weekdays/saturday DELIBERATELY ABSENT (URN-80, 2026-10-09): the weekday and Saturday
+    // time ranges had no source. Restored together with the TR dictionary (parity) once real hours are recorded.
     rights: 'All rights reserved.',
     // address/phone DELIBERATELY ABSENT (2026-08-28): no fabricated address or number
     // is published. Restored together with the TR dictionary (parity) once real.
@@ -1104,9 +1104,11 @@ export const en: typeof tr = {
       headerTitle: 'How Much Energy Is Escaping Through Your Door?',
       headerSubtitle: 'An open door = an open wallet. Every day you lose energy and money without realizing it.',
       energyLossTitle: 'Energy Loss',
-      energyLossDesc: 'The average annual cost of heat escaping through an open door',
+      // URN-80: these two used to be captions of a big figure; see tr.ts. Replaced with the fact from the
+      // Vortice AIR DOOR catalogue (p.4): an air curtain stops cooled air escaping in summer and heated air in winter.
+      energyLossDesc: 'In summer cooled air, in winter heated air escapes through an open door',
       tempDiffTitle: 'Temperature Difference',
-      tempDiffDesc: 'The indoor-outdoor temperature difference when the door is opened',
+      tempDiffDesc: 'Heat is transferred between indoors and outdoors once the door is open',
       airflowTitle: 'Airflow',
       airflowDesc: 'Uncontrolled wind and dust entry',
       pestTitle: 'Pest Entry',
@@ -1120,7 +1122,8 @@ export const en: typeof tr = {
       withoutPoint4: 'Easy pest entry',
       withTitle: 'With an Air Curtain',
       withPoint1: 'Invisible energy barrier',
-      withPoint2: 'Up to 30% savings',
+      // URN-80: "Up to 30% savings" had no source; the catalogue (AIR DOOR, p.6) only speaks of heating and cooling cost savings.
+      withPoint2: 'Savings on heating and cooling costs',
       withPoint3: 'Comfortable indoor environment',
       withPoint4: 'Shield against pests',
     },

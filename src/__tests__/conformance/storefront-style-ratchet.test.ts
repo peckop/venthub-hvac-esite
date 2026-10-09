@@ -215,7 +215,9 @@ const RATCHETS: Ratchet[] = [
     // OrderDetailPage). Marka `text-slate-600` ve favori satırı `text-slate-400` yerinde kaldı
     // (net etkisi 0); sipariş detayına eklenen model kodu satırı token (`text-steel-gray`) kullanır.
     // Kazanç yan ürün.
-    tavan: 1436,
+    // 2026-10-09 · 1436 -> 1435: URN-80 — ana sayfadaki kaynaksız "15+ Yıl Deneyim" sayaç kartı kalktı;
+    // altındaki `text-slate-500` etiketi de gitti. Kazanç yan ürün.
+    tavan: 1435,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -243,7 +245,8 @@ const RATCHETS: Ratchet[] = [
     // 2026-08-28 · 133 → 124 (aynı kaldırma).
     // 2026-09-01 · 124 → 122 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 122 -> 120: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 118,
+    // 2026-10-09 · 118 -> 117: URN-80 — aynı sayaç kartının `font-black` rakamı kalktı. Kazanç yan ürün.
+    tavan: 117,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },
