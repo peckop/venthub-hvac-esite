@@ -201,6 +201,8 @@ HTML'i `curl` ile çeken denetçi (Opus) yakaladı.
    düşürmez, çevre metni R5.1 3d'ye gider — kelime sezgisi ayırt etmez (ölçüldü: olağan "pages are added
    or removed" cümlesi de işaret verdi).
 
+**Marka ve üretici olguları (BLG-7, 2026-10-09):** ülke, kuruluş, merkez, web adresi, grup bağı ve üretici beyanındaki yıl/yüzde bu kuralın en çok yanıldığı alandır (AVenS için başka şirketin sitesi, Nicotra Gebhardt için resmî sitede olmayan 1959, Vortice için "kuruldu" denmeyen 1954). Bu olgular yazıdan önce [marka-olgu-kaydi.json](marka-olgu-kaydi.json) kaydına, orada DOGRULANDI ya da TEK_KAYNAK hâliyle girer; `scripts/rehber/marka-olgu-dogrula.mjs` aynı ham-kaynak ve normalize kuralıyla (`alinti-dogrula.mjs` yardımcıları) çalışır. Kural ve ayrıntı: `vitrin-genel-metin-standard.md` M8. Rehber yazısında "X 1954'ten beri…" ya da "Y merkezli…" cümlesi, kayıtta yazılabilir olgusu olmadan yazılmaz.
+
 ### R2.4 Müşteriye görünen atıf biçimi
 
 - Metin içinde numara: `[1]`. Yazının sonunda "Kaynaklar" listesi: yayıncı · başlık · (belge sayfası) ·
