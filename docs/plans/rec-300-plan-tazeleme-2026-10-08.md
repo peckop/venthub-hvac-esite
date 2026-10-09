@@ -10,7 +10,8 @@
 `yayin-gorunurluk-denetim-standard.md` (IndexNow satırı) · [ops52-adres-dili-mekanizma-plani-2026-10-04.md](ops52-adres-dili-mekanizma-plani-2026-10-04.md) ·
 Kararlar: K3-b, K4, **157**, **161**, **164 = A**, **249** (toplu IndexNow yalnız yayında değişmeyen adreslere), **259** (kısa pilot; metni bu depoda yok, kabul ölçütleri Kanban kartı URN-38 notundan).
 **Ölçüm tazeliği:** master `51fc924f4` (2026-10-08); bayraklar `src/config/features.ts` → `ADRES_SEMASI_K3B = false` (satır 130), `EN_YAYIN = false` (satır 114);
-`get_search_suggestions` dönüş tipi canlı veritabanından okundu 2026-10-08.
+`get_search_suggestions` dönüş tipi canlı veritabanından okundu 2026-10-08;
+§4'teki aile EN adı, kategori EN açıklaması ve REC-434 ölçümleri canlı DB ve canlı sayfadan 2026-10-09 (URN-73).
 **YÖNTEM:** şerit (URUN), elle; kod yayını yok.
 
 ## 1. 09-29'dan bu yana ne değişti
@@ -58,9 +59,12 @@ Kararlar: K3-b, K4, **157**, **161**, **164 = A**, **249** (toplu IndexNow yaln�
 ## 4. Riskler / açık noktalar
 
 * **3f migration** (Recep "şimdi yap"): `get_search_suggestions` dönüş tipi değişir (DROP+CREATE aynı işlemde), tek tüketici aynı PR'da. Kural 13 gereği `--auto` ile birleşmez.
-* **Önkoşul ölçülmedi:** 7 ailenin EN adı dolu mu; EN vitrin bayrağı (`EN_YAYIN`) bu yayında açılıyor mu (OPS'ta bekleyen karar).
+* **Önkoşul ölçümü (canlı DB, 2026-10-09; `product_families.name_i18n`, `categories.metadata.description_i18n`):**
+  * 7 ailenin EN adı **dolu** (REC-226 ile gelen aileler, toplam 67 ürün; güncel slug'lar `casals-nimax`, `casals-nimus`, `casals-enkelfan-ec-plug`, `vortice-vorticent-cms-atex-santrifuj-fanlar`, `avens-qe-b-kasa-serisi`, `avens-dikdortgen-kanal-tipi-radyal-fanlar`, `seat-atex-ptc-sensoru`; önceki planlardaki `avens-nimax` gibi adlar eskidir). 47 aktif ailenin 47'sinde EN adı dolu, EN adında Türkçe harf 0; EN adı TR adıyla aynı olan 8 aile marka/model adıdır.
+  * `EN_YAYIN` şart 3 (kategori EN açıklaması) **karşılanmıyor: 24/28.** 10-06'da açılan dört alt kategori (`cabinet-fans`, `plug-fans`, `electric-heated-air-curtains`, `unheated-air-curtains`; 44 ürün) hem TR hem EN açıklamada boş. Alan KATALOG'un (`description_i18n`). Bu dört `/en/` sayfasında görünür metin 170-177 kelime ve Türkçe harf 0: boşluk Türkçe sızıntı değil, kategori paragrafının yokluğu.
+  * `EN_YAYIN`'ın bu yayında açılıp açılmayacağı OPS'ta bekleyen karar; bayrak bugün `false`.
 * **#1738** karar 298 özetine kadar birleşmez; 3-C sırası değişirse ürün sayfası çift gövde ile (H1=2) kalmaya devam eder (bugünkü durum, canlı ölçüldü 10-08).
-* **REC-434** (ölü hızlı seçim slug'ları): bu tazelemede yeniden ölçülmedi; yayından önce kapanması beklenir.
+* **REC-434** (ölü hızlı seçim slug'ları): **kapalı.** #1501 iki ölü kartı kaldırdı ve `showcaseOluSlug` kapısını ekledi; kayıt 2026-09-30'da Done. Ölçüm 2026-10-09: kaynakta `elektrikli-isitici` / `ortam-havali` adres olarak 0 (kalanlar yorum satırı ve 3D model adı eşlemesi), DB'de bu adla kategori 0, canlı `/tr/category/hava-perdeleri` sayfasındaki iç bağlantılar 2/2 HTTP 200. Yayın öncesi yapılacak iş yok.
 
 ## 5. OPS'tan beklenen
 
