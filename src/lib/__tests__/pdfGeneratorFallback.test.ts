@@ -139,6 +139,23 @@ describe('generateProductDatasheet Fallback Handling', () => {
     fetchSpy.mockRestore()
   })
 
+  // URN-72 — föy TARAYICIDA üretilir; alt bilgi tarayıcıdaki gerçek alan adını basar, "localhost" ASLA.
+  // Eskiden `SITE_URL` basılıyordu ve tarayıcıda env boş olduğundan canlıda her föyün altında
+  // "localhost:3000" yazıyordu (canlı pakette ölçüldü, 2026-10-09). `window` gerçek tarayıcı gibi taklit edilir.
+  it('föyün alt bilgisi tarayıcıdaki alan adını basar, localhost basmaz', async () => {
+    vi.stubGlobal('window', { location: { host: 'venthub.com.tr', origin: 'https://venthub.com.tr' } })
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'))
+    try {
+      await generateProductDatasheet(mockProduct)
+      const basilan = mockText.mock.calls.flatMap((c) => (Array.isArray(c[0]) ? c[0] : [c[0]])).map(String)
+      expect(basilan, 'alt bilgi alan adı basılmadı').toContain('venthub.com.tr')
+      expect(basilan.join('\n')).not.toContain('localhost')
+    } finally {
+      vi.unstubAllGlobals()
+      fetchSpy.mockRestore()
+    }
+  })
+
   // URN-33 — müşteriye giden föy PDF'i İÇ SKU basmaz (INV-SKU-GORUNMEZ-1, K7).
   // Eskiden üst bilgide `Ref: ${product.sku || product.id.substring(0, 8)}` vardı. Gerçek üretici
   // koşar, jsPDF'e giden TÜM `text()` çağrıları toplanır; hiçbirinde ne SKU ne kimlik parçası

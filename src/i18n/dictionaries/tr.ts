@@ -31,6 +31,7 @@ export const tr = {
   },
   common: {
     technicalDrawing: 'Teknik Çizim',
+    imagePreparing: 'Ürün görseli hazırlanıyor',
     errorGeneric: 'Bir hata oluştu',
     devMode: 'Geliştirici Modu',
     userFallback: 'Kullanıcı',
@@ -573,11 +574,11 @@ export const tr = {
       }
     },
     guidedDiscovery: {
-      eyebrowLabel: 'DETERMİNİSTİK SİSTEMLER',
+      eyebrowLabel: 'HAVALANDIRMA ÇÖZÜMLERİ',
       heading: 'Hava Akışının Mühendislik Estetiği',
       intro: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.',
       cardFallback: 'Profesyonel Havalandırma Çözümleri',
-      eyebrow: 'DETERMİNİSTİK SİSTEMLER',
+      eyebrow: 'HAVALANDIRMA ÇÖZÜMLERİ',
       title: 'Hava Akışının Mühendislik Estetiği',
       subtitle: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin. Proje tipinize göre en verimli giriş noktasını seçin.',
       seriesCount: '{{count}} Seri',
@@ -631,10 +632,6 @@ export const tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Sınıf',
-      gradeValue: 'A++',
-      standardLabel: 'Standart',
-      standardValue: 'ERP',
       eyebrow: 'Ürün Showroom',
       title: 'Endüstriyel Ürün Portföyü',
       subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
@@ -643,21 +640,21 @@ export const tr = {
       tabs: {
         featured: 'Öne Çıkanlar',
         newArrivals: 'Yeni Gelenler',
-        bestSellers: 'Çok Satanlar',
+        bestSellers: 'Ürün Seçkisi',
         airCurtains: 'Hava Perdeleri',
         heatRecovery: 'Isı Geri Kazanım'
       },
       panelTitles: {
         featured: 'Performans Liderleri',
         newArrivals: 'En Yeni Teknolojiler',
-        bestSellers: 'En Çok Tercih Edilenler',
+        bestSellers: 'Seçili Ürünler',
         airCurtains: 'İklim Koruma Sistemleri',
         heatRecovery: 'Enerji Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin amiral gemisi çözümleri.',
+        featured: 'VentHub ürün ailesinden öne çıkan seçili modeller ve teknik özellikleri.',
         newArrivals: 'VentHub ürün ailesine yeni katılan, enerji verimliliği en yüksek ve modern tasarımlı yeni nesil cihazlar.',
-        bestSellers: 'Sektör profesyonelleri ve büyük projeler tarafından en çok sipariş edilen, güvenilirliği sahada kanıtlanmış modeller.',
+        bestSellers: 'VentHub ürün ailesinden, teknik özellikleriyle öne çıkan seçili modeller.',
         airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan profesyonel seriler.',
         heatRecovery: 'Taze hava ihtiyacını karşılarken atık havadaki ısıyı %90\'a varan verimle geri kazanan ekonomik üniteler.'
       }
@@ -681,8 +678,8 @@ export const tr = {
         },
         delivery: {
           eyebrow: 'Lojistik',
-          title: 'Hızlı ve Güvenli Sevkiyat',
-          description: 'Geniş stok ağımız ve profesyonel lojistik partnerlerimizle, proje takviminizi aksatmadan tam zamanında teslimat yapıyoruz.'
+          title: 'Teslimat Planlaması',
+          description: 'Teslimat süresi ve sevkiyat koşulları, teklif aşamasında projenize göre netleştirilir.'
         },
         support: {
           eyebrow: 'Süreklilik',
@@ -700,7 +697,6 @@ export const tr = {
       headingPrefix: 'Mühendislik',
       headingAccent: 'Katmanı',
       statsPipelineLabel: 'Proje Hattı',
-      statsOptimization: '%92 Optimizasyon',
       eyebrow: 'Bilgi ve Destek Katmanı',
       title: 'Mühendislik Estetiği',
       subtitle: 'Rehberler, hesaplayıcılar ve destek merkezi sayesinde kullanıcı yalnızca ürüne değil, doğru karar ortamına da sonuçları saniyeler içinde ulaşır.',
@@ -1056,8 +1052,8 @@ export const tr = {
     },
     sectionTitle: 'Premium HVAC Markaları',
     sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının ürünlerini marka güvencesiyle sunuyoruz.',
-    subtitlePart1: 'Dünya Devlerinin',
-    subtitlePart2: 'Güvenilir Partneri',
+    subtitlePart1: 'Sunduğumuz',
+    subtitlePart2: 'Markalar',
     viewAll: 'Tüm Markaları Gör',
     pageTitle: 'Markalar',
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin mühendislik harikası çözümlerini projelerinizle buluşturuyoruz.',
@@ -1893,6 +1889,7 @@ export const tr = {
     relatedProducts: 'İlgili Ürünler',
     officialDistributor: 'MARKA GÜVENCESİ',
     priceAvailability: 'Fiyat & Stok',
+    quoteLabel: 'Teklif',
     shareCopied: 'Link kopyalandı!',
     messages: {
       pdfStarted: 'PDF üretiliyor...'

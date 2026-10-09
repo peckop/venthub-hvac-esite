@@ -17,6 +17,9 @@
  * geçirecek satır `ProductDetailPageView`'da, yani **URUN şeridinin claim'inde**. Bu PR `t`
  * yolunu KURAR ve ölçer; `t` geçilmediğindeki ayrışma da ayrıca ölçülür ki boşluk kaybolmasın.
  */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { buildSpecGroupLabels,buildSpecRows } from '../../lib/pdfGenerator'
@@ -172,6 +175,38 @@ describe('INV-FOY-PARITE-1 · föy ile vitrin AYNI çıktıyı üretir', () => {
       ciftBirim,
       'kusur föy ile vitrini AYRIŞTIRIYOR — o zaman bu artık mandal değil, parite ihlalidir',
     ).toEqual(vitrinSatirlari({ max_ambient_temp_c: '25°' }))
+  })
+
+  /**
+   * INV-FOY-NESNE-1 (URN-72, 2026-10-09). Müşterinin elindeki bir föyde ölçüler satırında "[object Object]"
+   * görüldü (Katalog, 7 Haziran tarihli PDF). `formatSpecValue` `String(value)` kullandığı için nesne/dizi
+   * değer ham makine metniyle basılıyordu. Canlı veritabanında bugün böyle değer yok (0 ürün); kapı, ilk
+   * gelen değerin müşteri belgesine sızmasını ve föy ile vitrinin AYRIŞMASINI önler.
+   */
+  it('INV-FOY-NESNE-1: nesne ve dizi değer "[object Object]" basmaz; föy ile vitrin aynı metni üretir', () => {
+    const girdi = { dimensions: { length: 120, width: 80 }, certificates: ['CE', 'ISO 9001'], bos_nesne: {}, bos_dizi: [] }
+    const foy = buildSpecRows(girdi, { t })
+    const metin = foy.map((s) => s.join(' = ')).join('\n')
+    expect(metin, 'nesne/dizi değer ham makine metniyle basılıyor').not.toContain('[object')
+    expect(foy, 'föy ile vitrin ayrışmış').toEqual(vitrinSatirlari(girdi))
+    expect(formatSpecValue('dimensions', { length: 120, width: 80 })).toBe('length: 120, width: 80')
+    expect(formatSpecValue('certificates', ['CE', 'ISO 9001'])).toBe('CE, ISO 9001')
+    expect(formatSpecValue('x', { ic: { daha_ic: { cok_ic: 1 } } }), 'derinlik sınırı').toBe('-')
+    expect(formatSpecValue('x', {})).toBe('-')
+    expect(formatSpecValue('weight_kg', 10), 'tekil değerde birim eki korunur').toBe('10 kg')
+  })
+
+  /**
+   * INV-FOY-ADRES-1 (URN-72). Föy TARAYICIDA üretilir; `SITE_URL` `process.env` okur ve tarayıcıda env
+   * boştur → `http://localhost:3000`. Canlı pakette ölçüldü: indirilen her föyün alt bilgisi "localhost:3000"
+   * basıyordu. Davranış testi `pdfGeneratorFallback.test.ts`'te; bu kol KAYNAĞI bekler ki aynı yola geri
+   * dönülürse davranış testinin fikstürü atlatsa bile kırmızı olsun.
+   */
+  it('INV-FOY-ADRES-1: föy üreticisi SITE_URL kullanmaz (tarayıcıda localhost:3000 basar)', () => {
+    const kaynak = readFileSync(join(process.cwd(), 'src', 'lib', 'pdfGenerator.ts'), 'utf8')
+    expect(kaynak, 'pdfGenerator.ts SITE_URL kullanıyor; tarayıcıdaki alan adı için getPdfSiteHost() kullanılmalı').not.toMatch(
+      /\bSITE_URL\b/,
+    )
   })
 
   it('grup başlıkları da tek kaynaktan gelir (Faz 2 hazırlığı, bugünden ölçülür)', () => {

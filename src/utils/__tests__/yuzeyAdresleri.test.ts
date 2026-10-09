@@ -143,7 +143,7 @@ describe('kırıntı yolu (aile sayfası BreadcrumbList + breadcrumbUtils)', () 
       ],
     }) as { itemListElement: { item?: string }[] }
     expect(ld.itemListElement.map((i) => i.item)).toEqual([
-      'https://x/tr/',
+      'https://x/tr', // REC-494: ana sayfa sonda eğik çizgisiz (`/tr/` 308 verir)
       'https://x/tr/category/fanlar',
       'https://x/tr/kategori/fanlar/kanal-tipi-fanlar',
       undefined,

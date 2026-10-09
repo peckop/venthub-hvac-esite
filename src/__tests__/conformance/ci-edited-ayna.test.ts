@@ -50,6 +50,9 @@ import { describe, expect, it } from 'vitest'
  *      `continue-on-error` ve hata yutma yok, ortam değerleri sabit, Build'den SONRA. Matrix sayısı ile bağı ve son-adım kuralı INV-CI-SHARD-1'de, kapsam kanıtı
  *      INV-CI-SHARD-2'dedir (ci-test-shard.test.ts).
  *
+ * ALT-38e · BELGE HIZLI YOLU: yeni HEP KOŞAN adım "Hızlı yol" (sınıf adımından sonra; `edited` DIŞINDAKİ pull_request'te ve sınıf `belge` iken yalnız .md/.txt/.csv farkında `belge=true` yazar) ve onu okuyan sekiz kod kapısı
+ *  (Setup Deno, kurulum, Lint, tip, Deno check, edge guard'ları, V8 önbelleği: `if` = ayna koşulu VE `steps.hizli.outputs.belge != 'true'`). Ayna koşulu burada da korunur; çıktı yoksa kapılar KOŞAR. Ayrıntı: ci-test-secimi.test.ts.
+ *
  * SABOTAJ TESTLERİ ÇAPASIZDIR: bozucular adımı/anahtarı ADIYLA bulup satırı BÜTÜNÜYLE yeniden yazar (bul-değiştir metni yok);
  * ci.yml sabotaj yoklamasında zaten bozulmuşsa fikstür kırılmaz, yani sabotaj testi yalnız KENDİ denetimi çalışmazsa kırmızı olur.
  *
@@ -102,8 +105,44 @@ const SHARD_BEKLE_ENV: Record<string, string | RegExp> = {
   SHARD_TOPLAM: /^'[1-9]\d*'$/,
 }
 
-/** Ağır adımların beklenen `if:` satırı: varsayılan KOSUL; Build ve Next önbelleği (Build ile BİREBİR aynı koşul) sınıf koşulunu da taşır; Test shard olayında kapanır. */
-const AGIR_KOSULU: Record<string, string> = { 'Build (blocking)': KOSUL_BUILD, [NEXT_ONBELLEK_ADI]: KOSUL_BUILD, Test: KOSUL_TEST }
+// ── ALT-38e · BELGE HIZLI YOLU: yalnız .md/.txt/.csv belge PR'ında kod kapıları (kurulum, Lint, tip, Deno) atlanır ─────────────────
+/** Hızlı yol adımı: `edited` DIŞINDAKİ pull_request'te ve sınıf `belge` iken değerlendirir; ayna kararından BAĞIMSIZDIR (HEP KOŞAN). Gövde ve sabotajlar INV-CI-SECIM-1'dedir (ci-test-secimi.test.ts). */
+const HIZLI_ADI = 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)'
+const HIZLI_ID = 'hizli'
+const HIZLI_KOSULU = `if: ${SHARD_OLAYI} && steps.sinif.outputs.sinif == 'belge'`
+/**
+ * Hızlı yol adımının gövdesi (LF, girinti atılmış). `belge` sınıfı tek başına YETMEZ: `.claude/` ve `docs/` altındaki `.cjs`/`.mjs` dosyaları `belge` olduğu halde `eslint .` onları tarar (ölçüldü).
+ * Git'in kendi yol süzgeci (`:(exclude,glob)`) dışarıda KALAN her farkı (kod, JSON, silinen ya da taşınan dosya, git hatası) görür; ilk komut boş farkı dışlar.
+ */
+const HIZLI_RUN_GOVDESI = String.raw`if ! git diff --quiet --no-renames HEAD^1 HEAD && git diff --quiet --no-renames HEAD^1 HEAD -- . ':(exclude,glob)**/*.md' ':(exclude,glob)**/*.txt' ':(exclude,glob)**/*.csv'; then
+  echo "::notice::hızlı yol: belge — değişen her dosya .md/.txt/.csv; Lint, tip ve Deno kapıları atlanır"
+  echo "belge=true" >> "$GITHUB_OUTPUT"
+else
+  echo "::notice::hızlı yol: yok — sınıf belge ama .md/.txt/.csv dışında bir fark var; tüm kapılar koşar"
+fi`
+/** Hızlı yolla atlanabilen kod kapıları: ayna koşulu VE hızlı yol çıktısı `true` DEĞİL (çıktı yok/başka değerse KOŞAR: koşul yalnız DARALTMA yönünde). */
+const KOSUL_HIZLI = "if: steps.ayna.outputs.atla != 'true' && steps.hizli.outputs.belge != 'true'"
+/** Kurulum hızlı yolda YALNIZ pnpm önbelleği isabet ettiyse (`setup-node` `cache-hit`) atlanır: ıskada `setup-node`'un kayıt adımı var olmayan depoyu kaydetmeye çalışıp işi kırmızı yapar. Çıktı yoksa KOŞAR. */
+const KOSUL_KURULUM_HIZLI = "if: steps.ayna.outputs.atla != 'true' && (steps.hizli.outputs.belge != 'true' || steps.node.outputs.cache-hit != 'true')"
+const HIZLI_ATLANANLAR = [
+  'Setup Deno',
+  'Install dependencies',
+  'Lint (blocking)',
+  'Type check',
+  'Deno check (edge functions — kapı-körlüğü guard)',
+  'Edge mangle-guard (string-literal — deno check göremez)',
+  'Edge CORS guard (ölü getCorsHeaders importu + eksik Allow-Origin)',
+  NODE_ONBELLEK_ADI,
+]
+
+/** Ağır adımların beklenen `if:` satırı: varsayılan KOSUL; Build ve Next önbelleği (Build ile BİREBİR aynı koşul) sınıf koşulunu da taşır; Test shard olayında kapanır; kod kapıları hızlı yol çıktısını okur. */
+const AGIR_KOSULU: Record<string, string> = {
+  'Build (blocking)': KOSUL_BUILD,
+  [NEXT_ONBELLEK_ADI]: KOSUL_BUILD,
+  Test: KOSUL_TEST,
+  ...Object.fromEntries(HIZLI_ATLANANLAR.map((ad) => [ad, KOSUL_HIZLI])),
+  'Install dependencies': KOSUL_KURULUM_HIZLI,
+}
 const beklenenKosul = (ad: string): string => AGIR_KOSULU[ad] ?? KOSUL
 /** Sınıf adımının betiği ve tabandan çıkarılan kopyası (edited ayna ile AYNI güven sınırı: PR betiği değiştirip kendi kararını veremez). */
 const SINIF_BETIGI = 'scripts/ci/degisiklik-sinifi.cjs'
@@ -230,7 +269,7 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     anahtarlar: ['name', 'if', 'run'],
   },
   { ad: PNPM_ADI, kosul: null },
-  { ad: 'Setup Node', kosul: null },
+  { ad: 'Setup Node', kosul: null, id: 'node' },
   {
     ad: KAPI_ADI,
     kosul: PR_KOSULU,
@@ -261,6 +300,14 @@ const HEP_KOSAN_BEKLENTISI: HepKosanBeklentisi[] = [
     kosul: PR_KOSULU,
     id: SINIF_ID,
     govde: SINIF_RUN_GOVDESI,
+    anahtarlar: ['name', 'id', 'if', 'run'],
+  },
+  // ALT-38e: hızlı yol kararı. Ayna koşulu taşırsa `edited` dışındaki koşuda da atlanabilir; koşulu yalnız olay ve sınıftır. Çıktısı yoksa kod kapıları KOŞAR.
+  {
+    ad: HIZLI_ADI,
+    kosul: HIZLI_KOSULU,
+    id: HIZLI_ID,
+    govde: HIZLI_RUN_GOVDESI,
     anahtarlar: ['name', 'id', 'if', 'run'],
   },
   // ALT-38c-2: shard sonuçlarını bekleyen SON adım. `edited` koşusunda KOŞMAZ (Test o koşuda `ci` içinde koşar) ama bu ayna kararına bağlı DEĞİL, olay koşuludur:
@@ -594,6 +641,9 @@ const SINIF_SIRASI: ReadonlyArray<readonly [string, string, string]> = [
   [SINIF_ADI, 'Build (blocking)', 'Build sınıf adımından ÖNCE: koşulu henüz yazılmamış çıktıyı okur (dar sınıfta da koşar: kazanç sıfır)'],
   [NEXT_ONBELLEK_ADI, 'Build (blocking)', 'Build Next.js önbelleğinden ÖNCE: önbellek geri yüklenmeden derler (kazanç sıfır)'],
   [NODE_ONBELLEK_ADI, 'Test', 'Test Node önbelleğinden ÖNCE: önbellek geri yüklenmeden koşar (kazanç sıfır)'],
+  // ALT-38e: hızlı yol adımı sınıf adımından SONRA (sınıf çıktısını okur) ve onu OKUYAN kod kapılarından ÖNCE (çıktı yazılmadan okunursa her kapı koşar: kazanç sıfır).
+  [SINIF_ADI, HIZLI_ADI, 'hızlı yol adımı sınıf adımından ÖNCE: sınıf çıktısı henüz yazılmamışken karar verir (hızlı yol hiç açılmaz: kazanç sıfır)'],
+  ...HIZLI_ATLANANLAR.map((ad) => [HIZLI_ADI, ad, `"${ad}" hızlı yol adımından ÖNCE: koşulu henüz yazılmamış çıktıyı okur (belge PR'ında da koşar: kazanç sıfır)`] as const),
 ]
 
 /**
