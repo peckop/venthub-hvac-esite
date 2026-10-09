@@ -2,14 +2,56 @@ import '../index.css'
 
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Archivo, IBM_Plex_Mono, Inter, Source_Serif_4 } from 'next/font/google'
 import { Suspense } from 'react'
 
+import { YENI_GORUNUM } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
 
 import { ClientLayout,Providers } from '../components/layout/ClientLayout'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-sans' })
+
+/*
+  YENİ GÖRÜNÜM FONTLARI (TSR-9, Faz 2b; plan v2.2 §1.2). ÜÇ AİLE de `preload: false`:
+  Next, `next-font-loader` modülü grafikte VARSA `preload: true` fontu bayrak kapalıyken de
+  HER sayfanın HTML'ine `<link rel=preload>` basar (S1 spike 2026-10-05, ölçüldü). `preload: false`
+  `<link>`i 0 yapar; bedel: `@font-face` CSS'i kapalıyken de CSS'e girer (plan §1.3: kabul).
+  Açılış PR'ı yalnız Archivo'yu `true` yapar.
+  `variable` adları mevcut CSS değişkenleriyle ÇAKIŞMAZ (`--font-sans` Inter'indir; DS'in
+  `--font-sans/-serif/-mono` adları `index.css` `:root[data-gorunum='yeni']` kapsamında bu üç adı gösterir).
+  `subsets`: DS tipografisi Türkçe karakter (ğ, ş, İ) ister → `latin-ext`.
+*/
+const archivo = Archivo({
+    subsets: ['latin', 'latin-ext'],
+    display: 'swap',
+    variable: '--font-archivo',
+    preload: false,
+})
+const kaynakSerif = Source_Serif_4({
+    subsets: ['latin', 'latin-ext'],
+    display: 'swap',
+    variable: '--font-source-serif',
+    preload: false,
+})
+const plexMono = IBM_Plex_Mono({
+    subsets: ['latin', 'latin-ext'],
+    weight: ['400', '500'],
+    display: 'swap',
+    variable: '--font-plex-mono',
+    preload: false,
+})
+
+/*
+  Kapalıyken BUGÜNKÜ `<body>` sınıfı (`inter.variable` + `inter.className`; ikisi BİRLİKTE değişir,
+  çünkü `className` `font-family`'yi doğrudan yazar ve `--font-sans`'ı atlar). Açıkken yeni aile:
+  Archivo `className`'i gövde fontunu, üç `variable` sınıfı `<html>`e basılır ki
+  `:root[data-gorunum='yeni']` `var(--font-archivo)` vb. adları çözebilsin.
+*/
+const GOVDE_SINIFI = YENI_GORUNUM ? archivo.className : `${inter.variable} ${inter.className}`
+const KOK_SINIFI = YENI_GORUNUM
+    ? `${archivo.variable} ${kaynakSerif.variable} ${plexMono.variable}`
+    : undefined
 
 export const metadata: Metadata = {
     metadataBase: new URL(SITE_URL),
@@ -38,8 +80,13 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="tr" data-scroll-behavior="smooth">
-            <body className={`${inter.variable} ${inter.className}`}>
+        <html
+            lang="tr"
+            data-scroll-behavior="smooth"
+            data-gorunum={YENI_GORUNUM ? 'yeni' : undefined}
+            className={KOK_SINIFI}
+        >
+            <body className={GOVDE_SINIFI}>
                 <Providers>
                     <ClientLayout>
                         {/* WebSite JSON-LD burada YOK (PR-1, bot karnesi 2026-09-24): kök düzen onu

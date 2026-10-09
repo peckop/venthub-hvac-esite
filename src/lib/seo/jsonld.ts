@@ -15,6 +15,7 @@
  */
 
 import { ADRES_SEMASI_K3B } from '../../config/features'
+import { sitemapModelMi } from '../../config/yayindaModeller'
 import type { FamilyListItem } from '../../types/ui-models'
 import { adresUret } from '../../utils/adresUret'
 import { dildekiMetin } from '../../utils/dilMetni'
@@ -102,7 +103,9 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     // kanoniğe girmez). Faz 2 öncesi slug metni aile slug'ıdır (rota modeli SKU'dan çözer).
     // ⚠Adres SKU'yu (küçük harf) taşır — plan §2 şemasının kendisi (`…-p-<sku>`); `sku` ALANI yine
     // yazılmaz (INV-SKU-GORUNMEZ-1 K2). Adres `adresRotalari` üzerinden (`adresUret` model nesnesi).
-    if (bayrak) {
+    // URN-31: yalnız DİZİNE AÇIK model adresi yazılır (`sitemapModelMi`: yayındaki listedeki temel model). Liste dışı
+    // varyantın model sayfası yok (404); sürüm sayfasının kanoniği temele gider — ikisinde de url YOK.
+    if (bayrak && sitemapModelMi(variant.sku)) {
       productNode.url = `${baseUrl}${adresRotalari(dilOf(lang), true).product(family.slug, variant.sku)}`
     }
 
@@ -329,6 +332,17 @@ export interface BuildBreadcrumbJsonLdParams {
 }
 
 /**
+ * Kırıntı basamağının mutlak adresi. REC-494: ana sayfa basamağı (`path: '/'`) `https://…/tr/`
+ * (sonda eğik çizgi) üretiyordu; sitenin kanonik ana sayfası `/tr` ve `/tr/` 308 verir — yani
+ * yapılandırılmış veri her sayfada yönlendirilen adresi gösteriyordu. Sondaki eğik çizgi atılır
+ * (adres her zaman en az `/<dil>` taşır, boşalmaz).
+ */
+function kirintiAdresi(baseUrl: string, lang: string, path: string): string {
+  const adres = `${baseUrl}${dilOnekliMi(path) ? path : `/${lang}${path}`}`
+  return adres.endsWith('/') ? adres.slice(0, -1) : adres
+}
+
+/**
  * Breadcrumb zinciri → schema.org BreadcrumbList.
  *
  * NİÇİN AYRI BİR FONKSİYON: BreadcrumbList'i bugüne kadar YALNIZ `Breadcrumb.tsx` bileşeni
@@ -367,7 +381,7 @@ export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Reco
       name: step.name,
       // K3-b (REC-300 Faz 3d): adım `adresUret` çıktısı (zaten dil önekli) olabilir — önek ikinci
       // kez eklenmez. Dilsiz yol (bugünkü çağıranlar) bugünkü gibi `/${lang}` ile birleşir.
-      ...(step.path ? { item: `${baseUrl}${dilOnekliMi(step.path) ? step.path : `/${lang}${step.path}`}` } : {}),
+      ...(step.path ? { item: kirintiAdresi(baseUrl, lang, step.path) } : {}),
     })),
   }
 }

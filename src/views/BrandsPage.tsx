@@ -83,14 +83,18 @@ const BrandsPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <h2 className="min-w-0 truncate text-2xl font-bold text-slate-900 tracking-tight">{brand.name}</h2>
                       <div className="h-px flex-1 mx-4 bg-slate-100 group-hover:bg-cyan-500/20 transition-colors" />
-                      <span className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
-                        {brandText(brand.country, lang)}
-                      </span>
+                      {brand.country && (
+                        <span className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
+                          {brandText(brand.country, lang)}
+                        </span>
+                      )}
                     </div>
-                    
-                    <div className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-600/80">
-                      {brandText(brand.specialty, lang)}
-                    </div>
+
+                    {brand.specialty && (
+                      <div className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-600/80">
+                        {brandText(brand.specialty, lang)}
+                      </div>
+                    )}
                     
                     <p className="text-sm text-slate-500 font-light leading-relaxed line-clamp-3">
                       {brandText(brand.description, lang)}

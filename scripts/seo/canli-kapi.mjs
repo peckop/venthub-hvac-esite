@@ -73,6 +73,7 @@ export const KURAL_NO = {
   'HARITA-ADRES-DURUM': '73',
   'LLMS-SAYFA': '-',
   'LLMS-DIL': '-',
+  'VITRIN-IDDIA': '-',
 }
 const KOD_SIRASI = Object.keys(KURAL_NO)
 
@@ -305,6 +306,42 @@ function dilKontrolu(sayfalar, enSayfalar, cikti) {
   }
 }
 
+/**
+ * VITRIN-IDDIA (URN-60, karar 295): vitrinde DAYANAKSIZ ya da kararla kaldırılmış iddia ifadeleri. Her ifade
+ * sayfanın GÖRÜNEN metninde (script/style/etiket atıldıktan sonra) aranır. Karşılaştırma iki tarafı AYNI Türkçe
+ * küçültmeyle yapar (REC-343: ASCII sabit + Türkçe küçültme "AI"yı ıi'ye çevirip eşleşmiyordu; simetri bunu önler).
+ * Liste kararlarla büyür: yeni yasak ifade BURAYA, tek yerden. `kaynak` = neden yasak olduğu.
+ */
+export const VITRIN_YASAK_IFADELER = [
+  { ifade: '%92', kaynak: 'dayanaksız "%92 Optimizasyon" (URN-60 adım 1)' },
+  { ifade: 'Çok Satanlar', kaynak: 'teklif kipinde satış verisi yok; "Öne çıkanlar" (karar 295)' },
+  { ifade: 'Geniş stok', kaynak: 'stok vaadi dayanaksız (URN-60 adım 1)' },
+  { ifade: 'Dünya Devlerinin', kaynak: 'distribütörlük/partner iddiası yok (karar 295)' },
+  { ifade: 'DETERMİNİSTİK', kaynak: 'bilgi taşımayan başlık (URN-60 adım 2)' },
+  { ifade: 'Sistem.Veri.Canlı', kaynak: 'dekoratif HUD metni bağlantı metni olmamalı (URN-60 adım 3)' },
+  { ifade: 'beğendiğim', kaynak: 'tasarım referansı ekran görüntüsü, şirket görseli değil (URN-60 adım 5)' },
+  { ifade: '81 il', kaynak: '81 ile kargo vaadi kalktı (karar 295)' },
+  { ifade: 'Partneri', kaynak: 'partner dili yalnız yetkili distribütörlük için (karar 295; yok)' },
+]
+
+const trKucuk = (s) => String(s).toLocaleLowerCase('tr')
+const gorunenMetin = (html) => String(html)
+  .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+  .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+  .replace(/<[^>]+>/g, ' ')
+  .replace(/&amp;/g, '&')
+  .replace(/\s+/g, ' ')
+
+function vitrinIddiaKontrolu(sayfalar, cikti) {
+  for (const s of sayfalar) {
+    if (s.html == null) continue
+    const metin = trKucuk(gorunenMetin(s.html))
+    for (const { ifade, kaynak } of VITRIN_YASAK_IFADELER) {
+      if (metin.includes(trKucuk(ifade))) cikti.push(bulgu('VITRIN-IDDIA', 'KIRMIZI', s.yol, `yasak ifade "${ifade}" görünen metinde: ${kaynak}`))
+    }
+  }
+}
+
 const metinBaytlari = (b) => [...(b || [])].slice(0, 24).map((x) => (x >= 32 && x < 127 ? String.fromCharCode(x) : '.')).join('')
 const ICO = [0, 0, 1, 0]
 const PNG = [0x89, 0x50, 0x4e, 0x47]
@@ -484,6 +521,7 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   }
   yonlendirmeKontrolleri(tamam, ek, taban, cikti)
   jsonldKontrolleri(tamam, cikti)
+  vitrinIddiaKontrolu(tamam, cikti)
   for (const s of harita.satirlar) {
     if (s.changefreq) cikti.push(bulgu('ROBOTS-HARITA-ALAN', 'UYARI', s.loc, `<changefreq>${s.changefreq}</changefreq>: Google yok sayar (kod anahtarı yanlış, REC-498)`))
   }

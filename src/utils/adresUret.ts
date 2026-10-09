@@ -17,6 +17,8 @@
 import type { Route } from 'next'
 
 import { ADRES_SEMASI_K3B } from '../config/features'
+import { modelSlugu } from '../config/yayindaModeller'
+import { modelSegmentiUret } from './modelAdresBicimi'
 import { localizedHref, Routes } from './routes'
 
 export type AdresDili = 'tr' | 'en'
@@ -29,7 +31,11 @@ export type AdresNesnesi =
   | { tur: 'urunler' }
   | { tur: 'kategori'; kok: string; dal?: string | null }
   | { tur: 'aile'; slug: string }
-  /** `slug` = modelin kendi adres metni (Faz 2, `slug_i18n`). Yeni şemada yoksa aile adresine düşülür. */
+  /**
+   * Model: adres metni (slug_tr/slug_en) YAYINDAKİ MODELLER listesinden gelir (`config/yayindaModeller`); `slug`
+   * alanı eski çağrı yerleri için kabul edilir ve YOK SAYILIR. Liste dışı SKU'nun model sayfası yoktur → aile
+   * adresi + `?sku=` seçimi (URN-31). `aileSlug` yalnız bu yedek yol içindir.
+   */
   | { tur: 'model'; aileSlug: string; sku: string; slug?: string | null }
   | { tur: 'marka'; slug: string }
 
@@ -39,8 +45,9 @@ const BOLUM: Record<AdresDili, { urunler: string; kategori: string; urun: string
   en: { urunler: 'products', kategori: 'category', urun: 'products', marka: 'brands' },
 }
 
-/** Model adresinde slug metni ile SKU'yu ayıran işaret. Slug metninde ve SKU başında geçemez (plan §2, D1). */
-export const MODEL_AYIRICI = '-p-'
+// Model adresi BİÇİMİ (ayırıcı, üretim, ayrıştırma) tek modülde: `modelAdresBicimi.ts`. Eski içe aktarma yolları korunur.
+export type { CozulmusModelAdresi } from './modelAdresBicimi'
+export { MODEL_AYIRICI, modelAdresiCoz } from './modelAdresBicimi'
 
 const seg = (s: string) => encodeURIComponent(s)
 
@@ -72,15 +79,17 @@ function yeniAdres(n: AdresNesnesi, dil: AdresDili): Route {
     case 'aile':
       return localizedHref(`/${b.urun}/${seg(n.slug)}`, dil)
     case 'model': {
-      // SKU adreste küçük harf (plan §2). Slug yoksa (Faz 2 öncesi veri) aile adresi: kırık adres
-      // üretmek yerine doğru sayfaya, eksik ayrıntıyla gidilir — hata yutulmaz, geliştirmede bağırır.
-      if (!n.slug) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.error(`[adresUret] model ${n.sku} için slug yok — aile adresine düşüldü (Faz 2 verisi eksik)`)
-        }
-        return localizedHref(`/${b.urun}/${seg(n.aileSlug)}`, dil)
+      // TEK NOKTA (URN-31, INV-YAYINDA-MODEL-4/6): model adresi YALNIZ yayındaki listedeki SKU için üretilir; adres
+      // metni listedeki `slug_<dil>`'dir (çağıranın metni yok sayılır). Liste dışı SKU'nun model sayfası YOKTUR
+      // (404): aile sayfası + `?sku=` seçimi — bugünkü (kapalı kip) davranışın yeni şemadaki karşılığı. Boş liste =
+      // hiçbir model adresi (fail-closed). Redirect hedefinde sorgu istenmezse `yonlendirmeNesnesi` kullanılır.
+      const slug = modelSlugu(n.sku, dil)
+      if (slug === null) {
+        const aile = localizedHref(`/${b.urun}/${seg(n.aileSlug)}`, dil)
+        const sku = n.sku.trim()
+        return (sku ? `${aile}?sku=${encodeURIComponent(sku)}` : aile) as Route
       }
-      return localizedHref(`/${b.urun}/${seg(n.slug)}${MODEL_AYIRICI}${seg(n.sku.toLowerCase())}`, dil)
+      return localizedHref(`/${b.urun}/${modelSegmentiUret(slug, n.sku)}`, dil)
     }
     case 'marka':
       return localizedHref(`/${b.marka}/${seg(n.slug)}`, dil)
@@ -94,32 +103,11 @@ export function adresUret(n: AdresNesnesi, dil: AdresDili, bayrak: boolean = ADR
   return bayrak ? yeniAdres(n, dil) : bugunkuAdres(n, dil)
 }
 
-export interface CozulmusModelAdresi {
-  /** Adresteki slug metni (yanlış olabilir — doğrusu SKU'dan bulunur, farklıysa 308). */
-  slugMetni: string
-  /** DB biçiminde SKU (büyük harf; DB kısıtı `^[A-Z0-9-]+$`). */
-  sku: string
-  /** Adresteki SKU zaten kanonik (küçük harf) biçimde mi? Değilse çağıran 308 verir. */
-  skuKanonik: boolean
-}
-
 /**
- * `/urun/<segment>` segmentinin model adresi olup olmadığını çözer (plan §5 Faz 3 madde 3).
- * SON `-p-`'den bölünür: slug metni `-p-` içeremez, SKU `P-` ile başlayamaz (D1) — ikisi birlikte
- * bölmeyi tek anlamlı yapar. `-p-` yoksa → null (aile adresi). Boş parça → null (geçersiz).
- * SAF: DB'ye bakmaz; SKU'nun var olup olmadığını çağıran ölçer.
+ * YÖNLENDİRME HEDEFİ nesnesi (URN-31): bir SKU'ya 308 verilirken hedef. Liste İÇİ → modelin kendi adresi; liste DIŞI
+ * → AİLE adresi, SORGUSUZ (model sayfası yok; `?sku=` taşımak hedefte yeniden eşleşir, middleware'de `%3F` olur).
+ * Adres metni yine `adresUret`'ten çıkar; bu fonksiyon yalnız hangi nesnenin kurulacağını söyler.
  */
-export function modelAdresiCoz(segment: string): CozulmusModelAdresi | null {
-  let cozulmus: string
-  try {
-    cozulmus = decodeURIComponent(segment)
-  } catch {
-    return null
-  }
-  const i = cozulmus.lastIndexOf(MODEL_AYIRICI)
-  if (i < 0) return null
-  const slugMetni = cozulmus.slice(0, i)
-  const skuParca = cozulmus.slice(i + MODEL_AYIRICI.length)
-  if (!slugMetni || !skuParca) return null
-  return { slugMetni, sku: skuParca.toUpperCase(), skuKanonik: skuParca === skuParca.toLowerCase() }
+export function yonlendirmeNesnesi(aileSlug: string, sku: string): AdresNesnesi {
+  return modelSlugu(sku, 'tr') === null ? { tur: 'aile', slug: aileSlug } : { tur: 'model', aileSlug, sku }
 }

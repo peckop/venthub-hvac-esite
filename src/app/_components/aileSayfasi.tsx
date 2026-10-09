@@ -3,6 +3,7 @@ import { notFound, permanentRedirect } from 'next/navigation'
 
 import { ADRES_SEMASI_K3B } from '@/config/features'
 import { SITE_URL } from '@/config/siteUrl'
+import { kanonikModelSku } from '@/config/yayindaModeller'
 import { markaBulAdla } from '@/data/brands'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
@@ -72,9 +73,12 @@ export function aileSayfasiAdresleri(
   if (!bayrak) {
     return { tr: `${SITE_URL}/tr${Routes.product(aileSlug)}`, en: `${SITE_URL}/en${Routes.product(aileSlug)}` }
   }
+  // URN-31: canonical = `kanonikModelSku` — model kendisi, SÜRÜM temel modelin adresi (URN-27 asgarisi); liste
+  // dışı SKU (rota zaten 404 verir) 404 adrese işaret etmesin diye aile adresine düşer.
+  const kanonikSku = sunucuSku ? kanonikModelSku(sunucuSku) : null
   const yol = (dil: 'tr' | 'en') =>
-    sunucuSku
-      ? adresUret({ tur: 'model', aileSlug, sku: sunucuSku, slug: aileSlug }, dil, true)
+    kanonikSku
+      ? adresUret({ tur: 'model', aileSlug, sku: kanonikSku }, dil, true)
       : adresUret({ tur: 'aile', slug: aileSlug }, dil, true)
   return { tr: `${SITE_URL}${yol('tr')}`, en: `${SITE_URL}${yol('en')}` }
 }
@@ -232,6 +236,14 @@ export async function AileSayfasi({ lang, slug, sunucuSku = null }: AileSayfasiP
   // `unavailable` = veri yok DEĞİL, veriye ULAŞILAMADI (ağ/RPC/env). 404 basılmaz —
   // önbelleğe alınabilen kalıcı bir yokluk beyanı olurdu; mevcut "bulunamadı" görünümü çizilir.
   const detail = resolution.kind === 'family' ? resolution.detail : null
+
+  // URN-38: MODEL rotasında (canonical'ı kendi adresi) veri yoksa içi boş 200 çizilmez — o sayfa
+  // önbelleğe girer ve indekslenebilirdi. Hata fırlatılır: sayfa önbelleğe alınmaz, ISR son iyi
+  // sayfayı korur. Aile rotası (`sunucuSku` yok) bugünkü "bulunamadı" görünümünü çizmeye devam eder.
+  if (sunucuSku && !detail) {
+    throw new Error(`model sayfası verisi alınamadı (${slug}, ${sunucuSku}): veriye ulaşılamadı`)
+  }
+
   const family = detail?.family ?? null
   const variants = detail?.variants ?? []
 

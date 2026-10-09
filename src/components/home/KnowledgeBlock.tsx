@@ -61,7 +61,6 @@ interface KnowledgeBlockProps {
     headingPrefix: string;
     headingAccent: string;
     statsPipelineLabel: string;
-    statsOptimization: string;
     /**
      * ⭐`eyebrow` TİPE EKLENDİ (REC-148 B5, 2026-09-05) — ÖLÜ ANAHTARDI.
      *
@@ -234,12 +233,6 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                   <div className="text-xs font-bold uppercase tracking-hvac-normal text-slate-500 mt-1">
                     {statsExperience}
                   </div>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full w-11/12 bg-gradient-to-r from-cyan-600 to-cyan-400" />
-                  </div>
-                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{t.statsOptimization}</div>
                 </div>
               </div>
             </div>

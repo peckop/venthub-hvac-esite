@@ -20,7 +20,16 @@
  * İstemci bileşenlerinde kullanılırsa `NEXT_PUBLIC_` önekli olmayan değişkenler paketlenmez ve
  * `localhost`'a düşülür — o yüzden istemcide kullanma.
  */
-const stripTrailingSlash = (url: string) => url.replace(/\/+$/, '')
+/**
+ * Sondaki eğik çizgileri atar. `replace(/\/+$/, '')` YERİNE doğrusal döngü: o desen çok sayıda ardışık `/` +
+ * başka karakter içeren değerde ikinci dereceden yavaşlar (ALT-15; aynı kusur `adres/eslestirici.ts`'te düzeltildi).
+ * Girdi ortam değişkeni olduğu için bugün saldırıyla tetiklenmez; desen ailesi tek tip kalsın diye aynı biçim.
+ */
+const stripTrailingSlash = (url: string) => {
+    let son = url.length
+    while (son > 0 && url.charCodeAt(son - 1) === 47) son--
+    return url.slice(0, son)
+}
 
 const getSiteUrl = () => {
     if (typeof process !== 'undefined') {

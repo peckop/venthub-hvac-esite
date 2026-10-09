@@ -31,6 +31,7 @@ export const tr = {
   },
   common: {
     technicalDrawing: 'Teknik Çizim',
+    imagePreparing: 'Ürün görseli hazırlanıyor',
     errorGeneric: 'Bir hata oluştu',
     devMode: 'Geliştirici Modu',
     userFallback: 'Kullanıcı',
@@ -106,7 +107,8 @@ export const tr = {
         ghost: 'Kanal İçi Hayalet Fanlar',
         smoke: 'Duman Egzoz Fanları',
         jet: 'Otopark Jet Fanları',
-        radial: 'Radyal Fanlar',
+        // Karar 288 (Recep, OPS-76): ad `categories.name`/`menu_label` ile aynı dize; adres (`radyal-fanlar`) ve anahtar değişmez.
+        radial: 'Radyal (Santrifüj) Fanlar',
         roof: 'Çatı Tipi Fanlar',
         'axial-ind': 'Aksiyel Sanayi Fanları',
         'air-curtain': 'Hava Perdeleri',
@@ -130,7 +132,9 @@ export const tr = {
         'water-coils': 'Sulu Batarya Kanal Tipi',
         // REC-300 Faz 1-B (K17 ağacı, karar 78b + 84): anahtarı veritabanı migration'ı bağlar.
         // Korozyon dalı YENİ anahtara geçer (`acid-fans` değişmez) → ad ile adres aynı anda döner.
-        'corrosion-fans': 'Korozyon Dayanımlı Fanlar',
+        // Karar 287 (Recep, OPS-74): ad `categories.name`/`menu_label` ve TR adresiyle (`korozyona-ve-aside-dayanimli-fanlar`) aynı.
+        // Eski `acid-fans` anahtarı geri alma ve dağıtım penceresi için DURUR (canlıda yalnız bu dal kullanıyordu).
+        'corrosion-fans': 'Korozyona ve Aside Dayanımlı Fanlar',
         'plug-fans': 'Plug Fanlar',
         'cabinet-fans': 'Hücreli Aspiratörler',
         'unheated-curtain': 'Isıtıcısız Hava Perdeleri',
@@ -570,11 +574,11 @@ export const tr = {
       }
     },
     guidedDiscovery: {
-      eyebrowLabel: 'DETERMİNİSTİK SİSTEMLER',
+      eyebrowLabel: 'HAVALANDIRMA ÇÖZÜMLERİ',
       heading: 'Hava Akışının Mühendislik Estetiği',
       intro: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.',
       cardFallback: 'Profesyonel Havalandırma Çözümleri',
-      eyebrow: 'DETERMİNİSTİK SİSTEMLER',
+      eyebrow: 'HAVALANDIRMA ÇÖZÜMLERİ',
       title: 'Hava Akışının Mühendislik Estetiği',
       subtitle: 'VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin. Proje tipinize göre en verimli giriş noktasını seçin.',
       seriesCount: '{{count}} Seri',
@@ -628,10 +632,6 @@ export const tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Sınıf',
-      gradeValue: 'A++',
-      standardLabel: 'Standart',
-      standardValue: 'ERP',
       eyebrow: 'Ürün Showroom',
       title: 'Endüstriyel Ürün Portföyü',
       subtitle: 'Sektörün en güvenilir ve verimli ürünlerini, teknik detayları ve uygulama avantajlarıyla birlikte keşfedin.',
@@ -640,21 +640,21 @@ export const tr = {
       tabs: {
         featured: 'Öne Çıkanlar',
         newArrivals: 'Yeni Gelenler',
-        bestSellers: 'Çok Satanlar',
+        bestSellers: 'Ürün Seçkisi',
         airCurtains: 'Hava Perdeleri',
         heatRecovery: 'Isı Geri Kazanım'
       },
       panelTitles: {
         featured: 'Performans Liderleri',
         newArrivals: 'En Yeni Teknolojiler',
-        bestSellers: 'En Çok Tercih Edilenler',
+        bestSellers: 'Seçili Ürünler',
         airCurtains: 'İklim Koruma Sistemleri',
         heatRecovery: 'Enerji Geri Kazanımı'
       },
       panelDescriptions: {
-        featured: 'Mühendislik ekibimiz tarafından dayanıklılık ve verimlilik testlerinden tam not almış, projelerin amiral gemisi çözümleri.',
+        featured: 'VentHub ürün ailesinden öne çıkan seçili modeller ve teknik özellikleri.',
         newArrivals: 'VentHub ürün ailesine yeni katılan, enerji verimliliği en yüksek ve modern tasarımlı yeni nesil cihazlar.',
-        bestSellers: 'Sektör profesyonelleri ve büyük projeler tarafından en çok sipariş edilen, güvenilirliği sahada kanıtlanmış modeller.',
+        bestSellers: 'VentHub ürün ailesinden, teknik özellikleriyle öne çıkan seçili modeller.',
         airCurtains: 'Giriş alanlarında görünmez bir termal bariyer oluşturarak iç mekan konforunu koruyan profesyonel seriler.',
         heatRecovery: 'Taze hava ihtiyacını karşılarken atık havadaki ısıyı %90\'a varan verimle geri kazanan ekonomik üniteler.'
       }
@@ -678,8 +678,8 @@ export const tr = {
         },
         delivery: {
           eyebrow: 'Lojistik',
-          title: 'Hızlı ve Güvenli Sevkiyat',
-          description: 'Geniş stok ağımız ve profesyonel lojistik partnerlerimizle, proje takviminizi aksatmadan tam zamanında teslimat yapıyoruz.'
+          title: 'Teslimat Planlaması',
+          description: 'Teslimat süresi ve sevkiyat koşulları, teklif aşamasında projenize göre netleştirilir.'
         },
         support: {
           eyebrow: 'Süreklilik',
@@ -697,7 +697,6 @@ export const tr = {
       headingPrefix: 'Mühendislik',
       headingAccent: 'Katmanı',
       statsPipelineLabel: 'Proje Hattı',
-      statsOptimization: '%92 Optimizasyon',
       eyebrow: 'Bilgi ve Destek Katmanı',
       title: 'Mühendislik Estetiği',
       subtitle: 'Rehberler, hesaplayıcılar ve destek merkezi sayesinde kullanıcı yalnızca ürüne değil, doğru karar ortamına da sonuçları saniyeler içinde ulaşır.',
@@ -1053,8 +1052,8 @@ export const tr = {
     },
     sectionTitle: 'Premium HVAC Markaları',
     sectionSubtitle: 'Dünyanın önde gelen HVAC markalarının ürünlerini marka güvencesiyle sunuyoruz.',
-    subtitlePart1: 'Dünya Devlerinin',
-    subtitlePart2: 'Güvenilir Partneri',
+    subtitlePart1: 'Sunduğumuz',
+    subtitlePart2: 'Markalar',
     viewAll: 'Tüm Markaları Gör',
     pageTitle: 'Markalar',
     pageSubtitle: 'Dünyanın en prestijli HVAC üreticilerinin mühendislik harikası çözümlerini projelerinizle buluşturuyoruz.',
@@ -1065,6 +1064,8 @@ export const tr = {
     // kısa kalırsa ya da hiç kalmazsa kullanılır. Yalnız kayıttaki doğrulanabilir alan (uzmanlık) konuşur.
     seoYedekUzmanlik: 'VentHub kataloğunda {{uzmanlik}} alanındaki ürünleri inceleyin.',
     seoYedek: '{{ad}} markasının ürün ailelerini, modellerini ve teknik özelliklerini VentHub kataloğunda inceleyin.',
+    // OPS-51: ürünsüz marka sayfasının meta açıklaması (sayfa gövdesiyle aynı olgu; ürün/zaman vaadi yok).
+    seoUrunsuz: '{{ad}} ürünleri henüz VentHub kataloğunda yer almıyor; ürün bilgisi ve teklif için bizimle iletişime geçin.',
     notFound: 'Marka bulunamadı',
     backToAll: 'Tüm markalara dön',
     aboutBrand: 'hakkında bilgi',
@@ -1094,6 +1095,11 @@ export const tr = {
       // REC-148 A6: eskiden "yakında eklenecektir" idi — eklenip eklenmeyeceği belli
       // olmayan bir VAAT. Artık olgu: marka katalogda var, ürünleri henüz yok.
       noProducts: 'Bu markanın ürünleri henüz katalogda değil.',
+      // OPS-51 (karar 265 + OPS hükmü): YALNIZ DB'de aktif ürünü 0 olan marka (şu an Flexiva) için; karar sunucuda
+      // aktif ürün sayısından türer (`markaUrunDurumu.ts`), statik bayrak yok.
+      // ZAMAN VAADİ YOK (INV-VAAT-SIZINTI-2 / REC-148): olgu + eylem — ürün katalogda yok, teklif istenir.
+      productsOnRequest: '{{ad}} ürünleri için bizden teklif isteyin.',
+      productsOnRequestCta: 'İletişim formuna git',
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş',
       // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak
@@ -1883,6 +1889,7 @@ export const tr = {
     relatedProducts: 'İlgili Ürünler',
     officialDistributor: 'MARKA GÜVENCESİ',
     priceAvailability: 'Fiyat & Stok',
+    quoteLabel: 'Teklif',
     shareCopied: 'Link kopyalandı!',
     messages: {
       pdfStarted: 'PDF üretiliyor...'
@@ -1896,7 +1903,8 @@ export const tr = {
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Mühendislik Analizi',
-      sku: 'SKU',
+      /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
+      modelCode: 'Model Kodu',
       datasheetPdf: 'TEKNİK DÖKÜMAN (PDF)'
     },
     actions: {
@@ -2448,8 +2456,8 @@ export const tr = {
     reorderedToast: '{{count}} ürün sepete eklendi',
     reorderNotFound: 'Ürünler stokta bulunamadı',
     reorderError: 'Tekrar sipariş sırasında hata',
-    /** Sipariş anındaki SKU (snapshot) — katalogtaki güncel SKU değil. */
-    skuLabel: 'SKU: {{sku}}',
+    /** Kalemin GÜNCEL katalog model kodu (sipariş-anı snapshot'ı değil); ham SKU değildir. */
+    modelCodeLabel: 'Model Kodu: {{code}}',
     shippingInfo: 'Kargo / Takip',
     carrier: 'Kargo Firması',
     trackingNumber: 'Takip Numarası',

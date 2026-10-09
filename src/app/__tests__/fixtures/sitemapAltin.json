@@ -81,6 +81,11 @@
    "priority": 0.6
   },
   {
+   "url": "{BASE}/tr/brands/casals",
+   "changefreq": "weekly",
+   "priority": 0.6
+  },
+  {
    "url": "{BASE}/tr/brands/seat",
    "changefreq": "weekly",
    "priority": 0.6
@@ -404,6 +409,17 @@
    }
   },
   {
+   "url": "{BASE}/tr/brands/casals",
+   "changefreq": "weekly",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
+    }
+   }
+  },
+  {
    "url": "{BASE}/tr/brands/seat",
    "changefreq": "weekly",
    "priority": 0.6,
@@ -455,6 +471,17 @@
     "languages": {
      "tr": "{BASE}/tr/brands/avens",
      "en": "{BASE}/en/brands/avens"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/casals",
+   "changefreq": "weekly",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
     }
    }
   },

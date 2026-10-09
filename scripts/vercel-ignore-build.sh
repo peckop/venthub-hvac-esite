@@ -232,6 +232,10 @@ fi
 
 # --- Build GEREKTİRMEYEN sınıf (POZİTİF liste, her biri gerekçeli) ----------
 #
+#  [ALT-44, 2026-10-07] SINIF SINIRLARI: `public/**` HER ZAMAN build tetikler (statik varlık olduğu gibi
+#                    yayınlanır; `*.md` ve test kalıplarından ÖNCE değerlendirilir). TEST sınıfı (aşağıda
+#                    `__tests__/`, `*.test.ts|tsx|cjs|mjs`, `e2e/`, `e2e-canli/`) derlemeye giren bir
+#                    dosyayı kapsamaz: src içindeki test OLMAYAN her dosya BUILD'dir. Cetvel D3.2.
 #  *.md            → Ölçüldü (2026-08-18): depoda hiçbir kod `.md` import ETMİYOR
 #                    ve `next.config.mjs`'te MDX/remark yok. Companion doküman
 #                    üretimi de `.md` yazar; bu israfın ana kaynağıydı.
@@ -274,6 +278,11 @@ fi
 
 is_build_irrelevant() {
   case "$1" in
+    # ⭐ALT-44 (2026-10-07) — `public/` ALTINDA HİÇBİR ŞEY atlanmaz, ne `.md` ne test deseni:
+    # `public/` dosyaları olduğu gibi YAYINLANIR (`public/x.md` `/x.md` olarak sunulur); "hiçbir kod
+    # `.md` import etmiyor" ölçümü (aşağıdaki `*.md`) kod için geçerlidir, statik varlık için DEĞİL.
+    # `case` İLK EŞLEŞENİ alır: bu satır `*.md` ve test desenlerinin ÖNÜNDE durmak ZORUNDA.
+    public/*)        return 1 ;;
     *.md)            return 0 ;;
     docs/*)          return 0 ;;
     .claude/*)       return 0 ;;
@@ -304,6 +313,21 @@ is_build_irrelevant() {
     # yalniz VERCEL DERLEMESI. Sondaki '/' kasitli (scripts/kipfake.ts sessizce atlanmasin).
     scripts/kip/*)   return 0 ;;
     .githooks/*)     return 0 ;;
+    # ⭐ALT-44 (2026-10-07) — TEST DOSYALARI (Vercel "Dağıtım Depolama" doldu; 30 günde 620 master
+    # commit'inin yalnız 137'si atlanıyordu, testler tek başına +132 açar: cetvel D3.2).
+    # Atlanan şey YALNIZ Vercel derlemesidir: testler CI'da (`ci` + `test-shard`) aynen koşar.
+    # Dört kalıp, hepsi `/` sınırında ya da UZANTI SONLU (adında "test" geçen her dosya DEĞİL):
+    #   __tests__/ dizini (kökte ya da her derinlikte) · *.test.ts|tsx|cjs|mjs · e2e/ · e2e-canli/
+    # TEST OLMAYAN yardımcılar (src içindeki başka her dosya, ör. src/test/setup.ts), `next.config.*`,
+    # `package.json`, kilit dosyası ve build zinciri betikleri BU KALIPLARA GİRMEZ → BUILD (şüphede BUILD).
+    __tests__/*)     return 0 ;;
+    */__tests__/*)   return 0 ;;
+    *.test.ts)       return 0 ;;
+    *.test.tsx)      return 0 ;;
+    *.test.cjs)      return 0 ;;
+    *.test.mjs)      return 0 ;;
+    e2e/*)           return 0 ;;
+    e2e-canli/*)     return 0 ;;
     *)               return 1 ;;
   esac
 }

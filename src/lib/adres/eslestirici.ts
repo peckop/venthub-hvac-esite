@@ -19,7 +19,8 @@
  * Pasif kategori → aktif üst kategoriye; üstü de pasifse tüm ürünler (plan §5 Faz 3 m.5, v4 O4).
  * Model adresi biçimindeki yollar (`…-p-<sku>`) haritanın değil sayfa çözücüsünün işidir → null.
  */
-import { type AdresDili, type AdresNesnesi, adresUret, MODEL_AYIRICI } from '@/utils/adresUret'
+import { type AdresDili, type AdresNesnesi, adresUret, yonlendirmeNesnesi } from '@/utils/adresUret'
+import { modelSegmentiMi } from '@/utils/modelAdresBicimi'
 
 import type { KategoriHedefi, KiraciHaritasi } from './haritaTipi'
 
@@ -42,10 +43,15 @@ const KATEGORI_ONEKLERI = new Set(['category', 'kategori'])
 const URUN_ONEKLERI = new Set(['products', 'urun'])
 const TUM_URUNLER_ONEKLERI = new Set(['products', 'urunler'])
 
-/** Sondaki eğik çizgileri atar (kök `/` hariç). */
+/**
+ * Sondaki eğik çizgileri atar (kök `/` hariç). `replace(/\/+$/, '')` YERİNE doğrusal döngü: o desen çok sayıda
+ * ardışık `/` + başka karakter içeren yollarda ikinci dereceden yavaşlar (64.000 `/` ≈ 3 sn CPU) ve bu fonksiyon
+ * middleware'de İSTEK yolunda çalışır (ALT-15; aynı kusur OPS-52 PR-C2'de ölçülüp düzeltildi).
+ */
 function normalizeEt(yol: string): string {
-  const kirpilmis = yol.replace(/\/+$/, '')
-  return kirpilmis === '' ? '/' : kirpilmis
+  let son = yol.length
+  while (son > 0 && yol.charCodeAt(son - 1) === 47) son--
+  return son === 0 ? '/' : yol.slice(0, son)
 }
 
 /** Segmentleri çözer; bozuk yüzde kodlamada null (eşleşme yok — bugünkü akış karar versin). */
@@ -98,16 +104,15 @@ function modelNesnesi(harita: KiraciHaritasi, sku: string): ((dil: AdresDili) =>
   if (!model) return null
   const aileSlug = harita.aileler[model.aile]
   if (aileSlug === undefined) return null
-  return (dil) => {
-    const slug = model.slug[dil]
-    // Model adres metni yoksa (Faz 2 verisi eksik) aile adresi: kırık model adresi üretilmez.
-    return slug ? { tur: 'model', aileSlug, sku, slug } : { tur: 'aile', slug: aileSlug }
-  }
+  // URN-31: liste İÇİ SKU → modelin adresi (metin yayındaki listeden); liste DIŞI SKU → AİLE adresi, SORGUSUZ
+  // (middleware `url.pathname = hedef` atar; hedefte `?` olursa `%3F` olur — bu yüzden `?sku=`'lu aile adresi
+  // üreten model nesnesi buradan ASLA çıkmaz, bkz. `yonlendirmeNesnesi`). Haritadaki `slug` alanı artık okunmaz.
+  return () => yonlendirmeNesnesi(aileSlug, sku)
 }
 
 function urunCoz(harita: KiraciHaritasi, segment: string, skuParametresi: string | null): Cozum | null {
   // `…-p-<sku>` yeni model adresidir; kanonikliğine (büyük harf, yanlış slug) sayfa çözücüsü karar verir.
-  if (segment.includes(MODEL_AYIRICI)) return null
+  if (modelSegmentiMi(segment)) return null
   if (skuParametresi) {
     const buyuk = skuParametresi.trim().toUpperCase()
     const sku = buyuk in harita.modeller ? buyuk : harita.eskiSkular[buyuk]

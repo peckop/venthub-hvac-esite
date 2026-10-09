@@ -89,10 +89,9 @@ export async function icBaglantiCoz(kimlik: string, dil: AdresDili, kaynak: IcBa
         if (yeni) bulunan = await kaynak.model(yeni.toUpperCase())
       }
       if (!bulunan) throw new IcBaglantiHatasi(kimlik, 'SKU katalogda yok (takma ad da yok)')
-      // Faz 2 öncesi modelin slug metni yok → metin aile slug'ı (Faz 3b/3d sözleşmesi; rota modeli
-      // SKU'dan çözer). Metin verilmeseydi K3-b açıkken `adresUret` AİLE adresine düşer ve bağlantı
-      // seçili modeli kaybederdi (REC-300 Faz 3d). Kapalıyken metin okunmaz: çıktı bugünkü `?sku=`.
-      return adresUret({ tur: 'model', aileSlug: bulunan.aileSlug, sku: bulunan.sku, slug: bulunan.aileSlug }, dil)
+      // K3-b açıkken adres `adresUret`'ten: yayındaki listedeki SKU → modelin sayfası (metin listeden), liste
+      // dışı SKU → aile sayfası + `?sku=` (seçili model korunur; URN-31). Kapalıyken çıktı bugünkü `?sku=`.
+      return adresUret({ tur: 'model', aileSlug: bulunan.aileSlug, sku: bulunan.sku }, dil)
     }
     case 'aile': {
       let bulunan = await kaynak.aile(anahtar)

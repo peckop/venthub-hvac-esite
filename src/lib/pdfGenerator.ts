@@ -3,10 +3,9 @@ import autoTable from 'jspdf-autotable';
 
 import type { Product } from '@/types/ui-models';
 
-import { SITE_URL } from '../config/siteUrl';
 import { formatSpecValue, getProductModelLabel, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../utils/productHelpers';
 import { specFieldLabel, specGroupLabel } from '../utils/specLabel';
-import { getAbsoluteAssetUrl,getBase64ImageFromUrl, PDF_COLORS, PDF_FONTS } from './pdfAssets';
+import { getAbsoluteAssetUrl,getBase64ImageFromUrl, getPdfSiteHost, PDF_COLORS, PDF_FONTS } from './pdfAssets';
 
 /** `specLabel.ts` ile AYNI imza — ikinci bir tip tanımı, ikinci bir davranış kapısıdır. */
 type TranslateFn = (key: string, paramsOrAlt?: Record<string, unknown> | string) => string
@@ -154,9 +153,10 @@ export async function generateProductDatasheet(
         const title = lang === 'tr' ? 'TEKNİK ÜRÜN FÖYÜ' : 'TECHNICAL DATASHEET';
         doc.text(title, pageWidth - margin, 20, { align: 'right' });
 
-        doc.setFont(fontName, 'normal');
-        doc.setFontSize(9);
-        doc.text(`Ref: ${product.sku || product.id.substring(0, 8).toUpperCase()}`, pageWidth - margin, 26, { align: 'right' });
+        // URN-33: buradaki `Ref: <iç SKU>` satırı KALDIRILDI. Müşteri belgesine iç kod basıyordu
+        // (yedeği de `product.id` parçasıydı, o da iç kimlik). Model kodu zaten gövdede,
+        // markanın yanında `getProductModelLabel` ile basılıyor ("Model Kodu: …"); üst bilgiye
+        // ikinci bir kopya koymak hem gereksiz hem sızıntı yolu. Bekçi: INV-SKU-GORUNMEZ-1 (K7).
     };
 
     // ----- FOOTER (ALT BİLGİ) -----
@@ -175,7 +175,7 @@ export async function generateProductDatasheet(
         // URL'yi sağ tarafa (sayfa numarasının üstüne) veya ortaya çakışmayacak şekilde koyalım
         doc.setTextColor(PDF_COLORS.primary[0], PDF_COLORS.primary[1], PDF_COLORS.primary[2]);
         doc.setFont(fontName, 'bold');
-        doc.text(SITE_URL.replace(/^https?:\/\//, ''), pageWidth / 2, pageHeight - 12, { align: 'center' });
+        doc.text(getPdfSiteHost(), pageWidth / 2, pageHeight - 12, { align: 'center' });
 
         doc.setFont(fontName, 'normal');
         doc.setTextColor(PDF_COLORS.lightText[0], PDF_COLORS.lightText[1], PDF_COLORS.lightText[2]);

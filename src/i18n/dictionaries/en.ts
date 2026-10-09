@@ -22,6 +22,7 @@ export const en: typeof tr = {
   },
   common: {
     technicalDrawing: 'Technical Drawing',
+    imagePreparing: 'Product image coming soon',
     errorGeneric: 'An error occurred',
     devMode: 'Developer Mode',
     userFallback: 'User',
@@ -90,7 +91,8 @@ export const en: typeof tr = {
         ghost: 'In-line / Duct Fans',
         smoke: 'Smoke Exhaust Fans',
         jet: 'Car Park Jet Fans',
-        radial: 'Radial Fans',
+        // Decision 288 (Recep, OPS-76): matches the TR name 'Radyal (Santrifüj) Fanlar'; address and key are unchanged.
+        radial: 'Radial (Centrifugal) Fans',
         roof: 'Roof Fans',
         'axial-ind': 'Industrial Axial Fans',
         'air-curtain': 'Air Curtains',
@@ -113,7 +115,8 @@ export const en: typeof tr = {
         'speed-controllers': 'Speed Controllers',
         'water-coils': 'Water Coil Duct Heaters',
         // REC-300 Faz 1-B: bound by the DB migration; the corrosion branch moves to a NEW key.
-        'corrosion-fans': 'Corrosion-Resistant Fans',
+        // Decision 287 (Recep, OPS-74): matches the TR name; the old `acid-fans` key stays for rollback and the deploy window.
+        'corrosion-fans': 'Corrosion- and Acid-Resistant Fans',
         'plug-fans': 'Plug Fans',
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
@@ -459,7 +462,7 @@ export const en: typeof tr = {
       }
     },
     guidedDiscovery: {
-      eyebrowLabel: 'DETERMINISTIC SYSTEMS',
+      eyebrowLabel: 'VENTILATION SOLUTIONS',
       heading: 'The Engineering Aesthetics of Airflow',
       intro: 'Discover industrial-grade ventilation solutions curated by VentHub.',
       cardFallback: 'Professional Ventilation Solutions',
@@ -517,10 +520,6 @@ export const en: typeof tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Grade',
-      gradeValue: 'A++',
-      standardLabel: 'Standard',
-      standardValue: 'ERP',
       eyebrow: 'Product Showroom',
       title: 'Industrial Product Portfolio',
       subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
@@ -529,21 +528,21 @@ export const en: typeof tr = {
       tabs: {
         featured: 'Featured',
         newArrivals: 'New Arrivals',
-        bestSellers: 'Best Sellers',
+        bestSellers: 'Product Selection',
         airCurtains: 'Air Curtains',
         heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Performance Leaders',
         newArrivals: 'Latest Technologies',
-        bestSellers: 'Most Preferred',
+        bestSellers: 'Selected Products',
         airCurtains: 'Climate Protection Systems',
         heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
-        featured: 'Flagship project solutions that have received full marks in durability and efficiency tests by our engineering team.',
+        featured: 'Featured models from the VentHub product family and their technical specifications.',
         newArrivals: 'New generation devices with the highest energy efficiency and modern design, recently added to the VentHub product family.',
-        bestSellers: 'Reliable models proven in the field, most ordered by industry professionals and large projects.',
+        bestSellers: 'Selected models from the VentHub product family, chosen for their technical specifications.',
         airCurtains: 'Professional series that protect indoor comfort by creating an invisible thermal barrier at entrance areas.',
         heatRecovery: 'Economic units that recover heat from waste air with up to 90% efficiency while meeting fresh air needs.'
       }
@@ -586,7 +585,6 @@ export const en: typeof tr = {
       headingPrefix: 'Engineering',
       headingAccent: 'Layer',
       statsPipelineLabel: 'Project Pipeline',
-      statsOptimization: '92% Optimization',
       eyebrow: 'Knowledge and Support Layer',
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
@@ -1444,6 +1442,7 @@ export const en: typeof tr = {
     relatedProducts: 'Related Products',
     officialDistributor: 'BRAND ASSURANCE',
     priceAvailability: 'Price & Availability',
+    quoteLabel: 'Quote',
     shareCopied: 'Link copied!',
     messages: {
       pdfStarted: 'Generating PDF...'
@@ -1457,7 +1456,8 @@ export const en: typeof tr = {
       noSpecsAvailable: 'No technical specifications available for this product.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
-      sku: 'SKU',
+      /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
+      modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
     },
     actions: {
@@ -1623,8 +1623,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
-    /** SKU as of the order date (snapshot) — not the current catalog SKU. */
-    skuLabel: 'SKU: {{sku}}',
+    /** The item's CURRENT catalog model code (not an order-time snapshot); never the raw SKU. */
+    modelCodeLabel: 'Model Code: {{code}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',
@@ -1983,8 +1983,8 @@ export const en: typeof tr = {
     },
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: 'We offer products of leading global HVAC brands with full brand assurance.',
-    subtitlePart1: 'Trusted Partner of',
-    subtitlePart2: 'World Giants',
+    subtitlePart1: 'Our',
+    subtitlePart2: 'Brands',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
     pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
@@ -1993,6 +1993,8 @@ export const en: typeof tr = {
     seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
     seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
     seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
+    // OPS-51: meta description of the brand page without products (same fact as the page body; no product/time promise).
+    seoUrunsuz: '{{ad}} products are not yet in the VentHub catalog; contact us for product information and a quote.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
@@ -2021,6 +2023,11 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
+      // OPS-51 (decision 265 + OPS ruling): ONLY for a brand with zero active products in the DB (currently Flexiva); the
+      // decision is derived on the server from the active product count (`markaUrunDurumu.ts`), no static flag.
+      // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
+      productsOnRequest: 'Request a quote from us for {{ad}} products.',
+      productsOnRequestCta: 'Go to the contact form',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak

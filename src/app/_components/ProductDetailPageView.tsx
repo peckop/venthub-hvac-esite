@@ -31,7 +31,6 @@ import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
 import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
-import { ADRES_SEMASI_K3B } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCart } from '../../hooks/useCartHook'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -49,7 +48,6 @@ import { getProductById } from '../../lib/services/product.service'
 import { supabaseBrowserClient as supabase } from '../../lib/supabase/client'
 import type { CategoryMetadata } from '../../types/db-rows'
 import type { FamilyListItem,Product } from '../../types/ui-models'
-import { adresUret } from '../../utils/adresUret'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { dildekiMetin } from '../../utils/dilMetni'
 import { musteriyeGorunurAciklama } from '../../utils/icIngestNotu'
@@ -62,7 +60,7 @@ import {
   translateSpecKey} from '../../utils/productHelpers'
 import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
-import { adresDili, adresRotalari, modelBaglantiAdresi } from '../../utils/yuzeyAdresleri'
+import { adresDili, adresRotalari, modelBaglantiAdresi, modelSecimiHedefi } from '../../utils/yuzeyAdresleri'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -309,16 +307,12 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   // Varyant seçimi yalnız ?sku='yı günceller — sayfa yeniden yüklenmez, kaydırma korunur.
   const handleSelectVariant = useCallback((sku: string) => {
-    // Model rotası: her modelin kendi kanonik adresi var → o adrese GİDİLİR (push: geri tuşu
-    // önceki modele döner). Slug metni Faz 2'de `slug_i18n`'den gelecek; o güne kadar aile slug'ı
-    // metin olarak kullanılır — rota modeli SKU'dan çözdüğü için adres yine doğru sayfayı açar.
-    // K3-b açıkken (REC-300 Faz 3d, plan §1 "`?sku=` kalkar") aile sayfasında da seçim modelin
-    // adresine gider — `?sku=` yazıcısı yalnız bayrak KAPALIYKEN (bugün) çalışır.
-    if ((sunucuSku || ADRES_SEMASI_K3B) && family) {
-      router.push(
-        adresUret({ tur: 'model', aileSlug: family.slug, sku, slug: family.slug }, lang === 'en' ? 'en' : 'tr'),
-        { scroll: false },
-      )
+    // Karar `modelSecimiHedefi`'nde (URN-31, INV-YAYINDA-MODEL-4): yayındaki listedeki modelin kendi sayfasına GİDİLİR
+    // (push: geri tuşu önceki modele döner); yayında OLMAYAN modelin adresine push EDİLMEZ (404 olurdu) — aile
+    // sayfasında `?sku=` yazıcısı, model sayfasında aile sayfası + `?sku=` adresine gidilir. Adres metni listeden.
+    const hedef = family ? modelSecimiHedefi(adresDili(lang), family.slug, sku, sunucuSku !== null) : { tur: 'sorgu' as const }
+    if (hedef.tur === 'git') {
+      router.push(hedef.adres as Route, { scroll: false })
       return
     }
     // Tıklama yalnız istemcide olur — mevcut query'yi konumdan okumak useSearchParams
@@ -666,7 +660,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability')}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{/* URN-60: teklif kipinde "Fiyat & Stok" başlığı yanlış vaat (fiyat/stok gösterilmiyor);
+                    kip `quoteMode` tek kaynağından (satis-kipi-gecis) okunur. */}
+                  {quoteMode ? t('pdp.quoteLabel') : t('pdp.priceAvailability')}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -704,7 +700,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                         Kardeş yüzeyler bu çözücüye çoktan geçmişti (VariantSelector:78,
                         JSON-LD `mpn`); geride kalan tek yer burasıydı. */}
                     {variantLabel && (
-                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {variantLabel}</span>
+                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.modelCode')}: {variantLabel}</span>
                     )}
                   </div>
                 </div>
