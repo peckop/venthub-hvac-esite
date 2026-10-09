@@ -159,8 +159,9 @@ describe('INV-I18N-TERS-1 · Türkçe yüzeyde İngilizce metin kalmaz', () => {
     // TR ve EN değerleri artık FARKLI olmak zorunda. Biri eski hâline döndürülürse
     // yukarıdaki kol da yakalar, ama bu kol NEYİN döndüğünü ADIYLA söyler.
     const kapatilan: [string, string][] = [
-      ['knowledge.hub.eyebrow', 'TEKNİK BİLGİ MERKEZİ'],
-      ['category.showcase.premiumTitle', 'Premium Mühendislik Çözümleri'],
+      // BLG-6 (10-09): üst başlık 'REHBER YAZILARI' oldu (TR yüzeyde İngilizce değil, EN ile de farklı).
+      ['knowledge.hub.eyebrow', 'REHBER YAZILARI'],
+      ['category.showcase.premiumTitle', 'Ürün Kataloğu'],
       ['home.cinematicShowcase.hudStatus', 'Ürün ailesi'],
       // URN-81: eski 'Sessiz:' / 'Quiet:' etiketi motor seçeneği başlığına döndü ('EC:' iki dilde aynı olduğu için
       // TR≠EN koşulunu taşıyamaz); aynı bölümün başlığı iki dilde de farklı ve kapatılan kusurun yerini tutar.

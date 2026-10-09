@@ -282,7 +282,7 @@ export const tr = {
     },
     recentSearches: 'Son Aramalar',
     clearRecent: 'Temizle',
-    popularCategories: 'Popüler Kategoriler',
+    popularCategories: 'Ana Kategoriler',
     noResults: 'Sonuç bulunamadı',
     keyboardHint: 'Ok tuşları ile gezinebilirsiniz',
     // REC-340: Enter artık "tüm sonuçlar"a değil, SEÇİLİ kaleme gider — arama tek aşamalı.
@@ -1582,8 +1582,8 @@ export const tr = {
     },
     series: {
       technicalFamily: 'Teknik Ürün Ailesi',
-      heroDefaultDesc: 'Profesyonel havalandırma çözümlerini teknik serilerine göre inceleyin.',
-      seriesDetail: 'Seri Detayı',
+      heroDefaultDesc: 'Ürünleri teknik ürün ailelerine göre inceleyin; özellik tabloları ürün sayfalarındadır.',
+      seriesDetail: 'Ürün Ailesi Detayı',
       requestQuote: 'Teklif Alın',
       colModel: 'Model',
       colPrice: 'Fiyat',
@@ -1611,7 +1611,7 @@ export const tr = {
       premiumTitle: 'Ürün Kataloğu',
       catalog: 'Kategori Kataloğu',
       subGroups: 'Alt Kategoriler',
-      exploreSeries: 'Serileri İncele',
+      exploreSeries: 'Ürün Ailelerini İncele',
       guarantee: 'VentHub Kataloğu',
       discover: 'Keşfet',
       whyVenthubTitle: 'Katalogda Neler Var?',
@@ -1645,7 +1645,7 @@ export const tr = {
     longTermInvestmentDesc: 'Üretici, EC fırçasız LINEO QUIET ES için düşük enerji tüketimi belirtiyor.',
     allSeries: 'Tüm Alt Kategoriler',
     chooseSeriesDesc: 'İhtiyacınıza uygun alt kategoriyi seçin.',
-    inspectSeries: 'Seriyi İncele',
+    inspectSeries: 'Alt Kategoriyi İncele',
     whyCategory: 'Neden {{category}}?',
     electricVsAmbientAlt: 'Elektrikli vs Ortam Havalı Karşılaştırma',
     modernLoftAlt: 'Vortice Lineo Quiet kanal fanının iç mekânda gösterildiği çizim',
@@ -1740,7 +1740,7 @@ export const tr = {
         },
         {
           value: 'İtalya',
-          label: 'Ülke',
+          label: 'Vortice Ürün Ailesi',
           desc: 'Merkez: Tribiano (Milano)'
         }
       ]
@@ -1994,7 +1994,7 @@ export const tr = {
   quickView: {
     title: 'Hızlı Bakış',
     close: 'Kapat',
-    addToCart: 'Sepete Ekle',
+    addToCart: 'Teklif için listeye ekle',
     viewProduct: 'Ürünü Gör',
     // ⛔descFallback KALDIRILDI (REC-148 A5) — açıklama yoksa paragraf hiç çizilmiyor.
   },
@@ -3095,7 +3095,7 @@ export const tr = {
           value: '{model}'
         },
         {
-          label: 'Ülke',
+          label: 'Vortice Ürün Ailesi',
           value: 'İtalya'
         }
       ]

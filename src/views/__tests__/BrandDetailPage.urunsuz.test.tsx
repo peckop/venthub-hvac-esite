@@ -33,7 +33,8 @@ vi.stubGlobal(
   },
 )
 
-const TEKLIF_EN ='Request a quote from us for Flexiva products.'
+// BLG-6 (10-09): tedarik ima eden "Request a quote" cümlesi kalktı; ürünsüz marka cümlesi katalogda olmadığını söyler.
+const TEKLIF_EN = 'Flexiva products are not in the catalogue yet; you can use the contact form for questions.'
 const URUNSUZ_DEGIL_EN = 'This brand has no products in the catalogue yet.'
 
 function ciz(urunsuz: boolean | undefined) {

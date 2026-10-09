@@ -183,7 +183,7 @@ export const en: typeof tr = {
     },
     recentSearches: 'Recent Searches',
     clearRecent: 'Clear',
-    popularCategories: 'Popular Categories',
+    popularCategories: 'Main Categories',
     noResults: 'No results found',
     keyboardHint: 'Navigate with arrow keys',
     // REC-340: Enter now goes to the SELECTED item, not to a second "all results" step.
@@ -1141,7 +1141,7 @@ export const en: typeof tr = {
     },
     series: {
       technicalFamily: 'Subcategory',
-      heroDefaultDesc: 'Browse professional ventilation solutions by their technical product families.',
+      heroDefaultDesc: 'Browse products by technical product families; specification tables are on the product pages.',
       seriesDetail: 'Subcategory Detail',
       requestQuote: 'Request a Quote',
       colModel: 'Model',
@@ -1433,7 +1433,7 @@ export const en: typeof tr = {
     productNotFound: 'Product Not Found',
     backHome: 'Back to home',
     back: 'Go Back',
-    featured: 'Featured',
+    featured: 'Models',
     brand: 'Brand',
     model: 'Model',
     inStock: 'Confirmed by quote',
@@ -2050,7 +2050,7 @@ export const en: typeof tr = {
   quickView: {
     title: 'Quick View',
     close: 'Close',
-    addToCart: 'Add to Cart',
+    addToCart: 'Add to quote list',
     viewProduct: 'View Product',
     // ⛔descFallback REMOVED (REC-148 A5) — no description, no paragraph.
   },
