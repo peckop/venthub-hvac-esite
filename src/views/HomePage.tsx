@@ -64,7 +64,6 @@ const HomePage: React.FC<HomePageProps> = ({
           <KnowledgeBlock
             dictionary={dictionary.knowledge}
             finalCtaDict={dictionary.finalCta}
-            statsExperience={dictionary.stats?.yearsExperience || ''}
             lang={lang}
           />
         </div>

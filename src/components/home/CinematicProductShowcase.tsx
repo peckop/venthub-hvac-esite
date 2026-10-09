@@ -60,10 +60,13 @@ const Hotspot: React.FC<HotspotProps> = ({ x, y, label, detail, isActive, onTogg
   )
 }
 
+// URN-80: `label` (görselin alt metni) eskiden ham İngilizce pazarlama sözüydü ('Futuristic Premium' /
+// '360 Series View'); görselin NE gösterdiğini söylemiyordu ve sözlük dışıydı. Artık sözlük anahtarı
+// (`altKey`): her iki görsel de Vortice Lineo serisi kanal tipi fandır (dosya adı + sözlükteki seri adı).
 const productImages = [
-  { 
-    src: '/images/vortice_lineo_futuristic.webp', 
-    label: 'Futuristic Premium',
+  {
+    src: '/images/vortice_lineo_futuristic.webp',
+    altKey: 'home.cinematicShowcase.imageAlt.airflow',
     hotspots: [
       { x: 55, y: 35, key: 'motor' },
       { x: 25, y: 65, key: 'clamps' },
@@ -72,8 +75,8 @@ const productImages = [
     ]
   },
   { 
-    src: '/images/products/vortice_lineo_360.png', 
-    label: '360 Series View',
+    src: '/images/products/vortice_lineo_360.png',
+    altKey: 'home.cinematicShowcase.imageAlt.side',
     hotspots: [
       { x: 45, y: 45, key: 'motor' },
       { x: 75, y: 30, key: 'airflow' },
@@ -163,7 +166,7 @@ const CinematicProductShowcase: React.FC = () => {
 
                     <Image
                       src={productImages[activeImageIdx].src}
-                      alt={productImages[activeImageIdx].label}
+                      alt={t(productImages[activeImageIdx].altKey)}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
                       className="object-contain drop-shadow-cinematic-drop z-20"
@@ -203,7 +206,7 @@ const CinematicProductShowcase: React.FC = () => {
                 >
                   <Image 
                     src={img.src} 
-                    alt={img.label} 
+                    alt={t(img.altKey)}
                     fill 
                     sizes="(max-width: 768px) 80px, 80px"
                     className="object-cover p-2" 

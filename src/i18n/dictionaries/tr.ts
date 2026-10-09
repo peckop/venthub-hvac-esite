@@ -539,6 +539,11 @@ export const tr = {
       cta: 'Teknik Verileri İncele',
       badge: 'AC / EC MOTOR',
       componentLabel: 'Sistem Bileşeni',
+      // URN-80: görsel alt metinleri — görselin ne gösterdiğini söyler, üstünlük iddiası taşımaz.
+      imageAlt: {
+        airflow: 'Vortice Lineo serisi kanal tipi fan, hava akışı çizgileriyle',
+        side: 'Vortice Lineo serisi kanal tipi fan, yandan görünüm'
+      },
       hotspots: {
         motor: 'EC ve AC Motor Seçenekleri',
         motorDetail: 'Üreticiye göre EC fırçasız LINEO QUIET ES düşük enerji tüketimi sağlar.',
@@ -1554,7 +1559,7 @@ export const tr = {
       energyLossTitle: 'Enerji Kaybı',
       energyLossDesc: 'Kapı açıkken iç ve dış ortam arasında ısı geçişi',
       tempDiffTitle: 'Sıcaklık Farkı',
-      tempDiffDesc: 'Kapı açıldığında iç-dış ortam sıcaklık farkı',
+      tempDiffDesc: 'Kapı açıldığında iç ve dış ortam arasında ısı geçişi olur',
       airflowTitle: 'Hava Akışı',
       airflowDesc: 'Açık kapıdan dış hava girişi',
       pestTitle: 'Toz ve Böcek Girişi',

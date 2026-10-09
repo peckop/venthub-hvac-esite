@@ -427,6 +427,11 @@ export const en: typeof tr = {
       cta: 'View Technical Data',
       badge: 'AC / EC MOTOR',
       componentLabel: 'System Component',
+      // URN-80: image alt texts — say what the image shows, carry no superiority claim.
+      imageAlt: {
+        airflow: 'Vortice Lineo series in-line duct fan, with airflow lines',
+        side: 'Vortice Lineo series in-line duct fan, side view'
+      },
       hotspots: {
         motor: 'EC and AC Motor Options',
         motorDetail: 'Per the manufacturer, EC brushless LINEO QUIET ES offers low energy consumption.',
@@ -1106,7 +1111,7 @@ export const en: typeof tr = {
       energyLossTitle: 'Energy Loss',
       energyLossDesc: 'Heat transfer between indoors and outdoors while the door is open',
       tempDiffTitle: 'Temperature Difference',
-      tempDiffDesc: 'The indoor-outdoor temperature difference when the door is opened',
+      tempDiffDesc: 'Heat is transferred between indoors and outdoors once the door is open',
       airflowTitle: 'Airflow',
       airflowDesc: 'Outdoor air entering through an open door',
       pestTitle: 'Dust and Insect Entry',
