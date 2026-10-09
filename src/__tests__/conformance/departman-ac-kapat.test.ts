@@ -201,6 +201,8 @@ function cmdKos(cmdYol: string, argv: string[], d: Duzenek): SpawnSyncReturns<st
 /** Tablo TEK KAYNAKTAN okunur: testte kopya YOK (kopya olursa tablo değişince test sessizce ayrışır). */
 const require = createRequire(import.meta.url)
 const TABLO = (require(path.join(KOK, 'scripts/board/pencere-adlari.cjs')) as { TABLO: ReadonlyArray<readonly [string, string]> }).TABLO
+/** Pencere tavanı da TEK KAYNAKTAN okunur (karar 328: 8): testte sayı kopyası YOK; tavan değişirse test onunla birlikte hareket eder. */
+const TAVAN = (require(path.join(KOK, 'scripts/board/departman-ortak.cjs')) as { PENCERE_TAVANI: number }).PENCERE_TAVANI
 
 function asciiMi(metin: string): boolean {
   for (const ch of metin) if ((ch.codePointAt(0) ?? 0) > 127) return false
@@ -442,7 +444,7 @@ describe('INV-DEPARTMAN-AC-3 · pencere ZATEN AÇIKSA açılmaz ("zaten açık: 
     const d = yeniDuzenek()
     claim(d, S_ARAC, 'ARAC')
     oturumKaydi(d, S_ARAC, { name: 'Araç' })
-    for (let i = 0; i < 5; i++) oturumKaydi(d, `0000000${i}-2222-4333-8444-555555555555`)
+    for (let i = 0; i < TAVAN; i++) oturumKaydi(d, `0000000${i}-2222-4333-8444-555555555555`)
     expect(ac('Araç', d).plan.karar).toBe('zaten-acik')
   })
 
@@ -510,60 +512,66 @@ describe('INV-DEPARTMAN-AC-3 · pencere ZATEN AÇIKSA açılmaz ("zaten açık: 
   })
 })
 
-describe('INV-DEPARTMAN-AC-4 · pencere TAVANI: en çok 5 açık departman penceresi; OPS ve alt süreçler SAYILMAZ', () => {
+describe('INV-DEPARTMAN-AC-4 · pencere TAVANI: en çok 8 açık departman penceresi (karar 328); OPS ve alt süreçler SAYILMAZ', () => {
   const doldur = (d: Duzenek, n: number): void => {
     for (let i = 0; i < n; i++) oturumKaydi(d, `1000000${i}-2222-4333-8444-555555555555`, { name: `venthub-hvac-${i}` })
   }
 
-  it('5 açık pencere → AÇILMAZ, çıkış 1, uyarı "5/5"; sahte claude BAŞLAMAZ', () => {
+  // Karar 328 (OPS, 10-09): 5 → 8. Sayı testte bilerek AYRICA kilitlenir; yoksa kaynak 5'e geri dönerse test de onunla
+  // birlikte 5'e döner ve hiçbir şey kırmızı vermezdi (tek kaynaktan okumanın bedeli).
+  it('tavan karar 328 gereği 8 (kaynak değişirse bu satır bilerek kırılır)', () => {
+    expect(TAVAN).toBe(8)
+  })
+
+  it(`${TAVAN} açık pencere → AÇILMAZ, çıkış 1, uyarı "${TAVAN}/${TAVAN}"; sahte claude BAŞLAMAZ`, () => {
     const d = yeniDuzenek()
-    doldur(d, 5)
+    doldur(d, TAVAN)
     const k = ac('Araç', d)
     expect(k.kod).toBe(1)
     expect(k.plan.karar).toBe('tavan')
-    expect(k.plan.sayi).toBe(5)
-    expect(k.plan.tavan).toBe(5)
-    expect(k.plan.mesaj).toContain('5/5')
+    expect(k.plan.sayi).toBe(TAVAN)
+    expect(k.plan.tavan).toBe(TAVAN)
+    expect(k.plan.mesaj).toContain(`${TAVAN}/${TAVAN}`)
     expect(k.plan.komut).toBeUndefined()
     expect(fs.existsSync(d.marker)).toBe(false)
   })
 
-  it('4 açık pencere → açılır (sınır tam 5)', () => {
+  it(`${TAVAN - 1} açık pencere → açılır (sınır tam ${TAVAN})`, () => {
     const d = yeniDuzenek()
-    doldur(d, 4)
+    doldur(d, TAVAN - 1)
     expect(ac('Araç', d).plan.karar).toBe('ac')
   })
 
-  it('OPS SAYILMAZ (pano claim inin şerit adından): 4 diğer + 1 OPS = 5 pencere ama sayı 4 → açılır', () => {
+  it(`OPS SAYILMAZ (pano claim inin şerit adından): ${TAVAN - 1} diğer + 1 OPS = ${TAVAN} pencere ama sayı ${TAVAN - 1} → açılır`, () => {
     const d = yeniDuzenek()
-    doldur(d, 4)
+    doldur(d, TAVAN - 1)
     claim(d, S_OPS, 'OPS')
     oturumKaydi(d, S_OPS, { name: 'venthub-hvac-ops' }) // adı tanıtıcı DEĞİL: yalnız claim şeridi OPS diyor
     expect(ac('Araç', d).plan.karar).toBe('ac')
   })
 
-  it('OPS SAYILMAZ (pencere adından, tablo eşlemesi "Ops"): claim olmasa da 4 diğer + "Ops" adlı pencere → açılır', () => {
+  it(`OPS SAYILMAZ (pencere adından, tablo eşlemesi "Ops"): claim olmasa da ${TAVAN - 1} diğer + "Ops" adlı pencere → açılır`, () => {
     const d = yeniDuzenek()
-    doldur(d, 4)
+    doldur(d, TAVAN - 1)
     oturumKaydi(d, S_OPS, { name: 'Ops' })
     expect(ac('Araç', d).plan.karar).toBe('ac')
   })
 
-  it('OPS dışında 5 pencere + OPS = 6 pencere → yine DOLU (OPS bir kontenjan açmaz, yalnız yer yemez)', () => {
+  it(`OPS dışında ${TAVAN} pencere + OPS = ${TAVAN + 1} pencere → yine DOLU (OPS bir kontenjan açmaz, yalnız yer yemez)`, () => {
     const d = yeniDuzenek()
-    doldur(d, 5)
+    doldur(d, TAVAN)
     claim(d, S_OPS, 'OPS')
     oturumKaydi(d, S_OPS, { name: 'Ops' })
     const k = ac('Araç', d)
     expect(k.plan.karar).toBe('tavan')
-    expect(k.plan.sayi).toBe(5)
+    expect(k.plan.sayi).toBe(TAVAN)
   })
 
   // ORTA-1 (PR #1598 denetimi): OPS sayıma girmediği gibi açılış kapısına da takılmaz. Ops, tavan doluyken başka bir
   // departmanı kapatmayı koordine eden penceredir. Ayırt edici çift: aynı düzenekte Araç REDDEDİLİR, Ops AÇILIR.
-  it('OPS tavandan MUAF: 5 ana pencere açıkken Ops AÇILIR (Araç aynı düzenekte reddedilir)', () => {
+  it(`OPS tavandan MUAF: ${TAVAN} ana pencere açıkken Ops AÇILIR (Araç aynı düzenekte reddedilir)`, () => {
     const d = yeniDuzenek()
-    doldur(d, 5)
+    doldur(d, TAVAN)
     claim(d, S_OPS, 'OPS', saatOnce(3)) // Ops kapalı; geçmişi var
     const o = ac('Ops', d)
     expect(o.kod).toBe(0)
@@ -578,26 +586,27 @@ describe('INV-DEPARTMAN-AC-4 · pencere TAVANI: en çok 5 açık departman pence
 
   it('OPS muafiyeti zaten-açık kararını bozmaz: Ops açıkken tekrar Ops → "zaten açık"', () => {
     const d = yeniDuzenek()
-    doldur(d, 5)
+    doldur(d, TAVAN)
     oturumKaydi(d, S_OPS, { name: 'Ops' })
     expect(ac('Ops', d).plan.karar).toBe('zaten-acik')
   })
 
   it('alt süreç / gözlemci pencereleri (vh-… adı, kind ≠ interactive) SAYILMAZ', () => {
     const d = yeniDuzenek()
-    doldur(d, 4)
+    doldur(d, TAVAN - 1)
     oturumKaydi(d, 'c0000001-2222-4333-8444-555555555555', { name: 'vh-arac-9' })
     oturumKaydi(d, 'c0000002-2222-4333-8444-555555555555', { name: 'gozlemci', kind: 'background' })
     expect(ac('Araç', d).plan.karar).toBe('ac')
   })
 
-  it('agents listesi otorite iken de sayım aynı kurallarla (5 ana pencere, OPS hariç)', () => {
+  it(`agents listesi otorite iken de sayım aynı kurallarla (${TAVAN} ana pencere, OPS hariç)`, () => {
     const d = yeniDuzenek()
     const p = (i: number, name: string) => ({ pid: 5000 + i, cwd: 'C:\\x', kind: 'interactive', startedAt: 1, sessionId: `2000000${i}-2222-4333-8444-555555555555`, name, status: 'idle' })
-    const ham = agentsHam(d, [p(0, 'a'), p(1, 'b'), p(2, 'c'), p(3, 'd'), p(4, 'e'), p(5, 'Ops')])
+    const ana = Array.from({ length: TAVAN }, (_, i) => p(i, `pencere-${i}`))
+    const ham = agentsHam(d, [...ana, p(TAVAN, 'Ops')])
     const k = ac('Araç', d, [], { VENTHUB_CANLILIK_HAM: ham })
     expect(k.plan.karar).toBe('tavan')
-    expect(k.plan.sayi).toBe(5)
+    expect(k.plan.sayi).toBe(TAVAN)
   })
 })
 
@@ -837,11 +846,11 @@ describe('INV-DEPARTMAN-AC-7 · kabuk sarmalayıcıları: .cmd ince, .ps1 doğru
     const h = cmdKos(AC_CMD, ['yok', '--kuru'], d)
     expect(h.status).toBe(1)
     expect(h.stdout).toContain('HATA: rol taninmiyor')
-    for (let i = 0; i < 5; i++) oturumKaydi(d, `3000000${i}-2222-4333-8444-555555555555`)
+    for (let i = 0; i < TAVAN; i++) oturumKaydi(d, `3000000${i}-2222-4333-8444-555555555555`)
     const t = cmdKos(AC_CMD, ['Araç', '--kuru'], d)
     expect(t.status).toBe(1)
     expect(t.stdout).toContain('UYARI')
-    expect(t.stdout).toContain('5/5')
+    expect(t.stdout).toContain(`${TAVAN}/${TAVAN}`)
     expect(fs.existsSync(d.marker)).toBe(false)
   }, 120_000)
 })
