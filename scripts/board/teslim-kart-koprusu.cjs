@@ -21,7 +21,8 @@
  * ölçülmez. Başlıktaki kart numarası (harf sonekli "ALT-37e" dahil) yalnız raporda sahibi bulmak içindir.
  * Gün sınırı: [gün 00:00:00, gün 23:59:59] +03:00, İKİ ucu da kapsayıcı; sonraki günün 00:00:00 damgalı commit'i o günün sayılır.
  * Çıktı departman (başlığın ilk sözcüğü) başına: "URUN: Teslim 8, kart notunda geçmeyen 4: #1774 (URN-58), ...".
- * PR numarasız commit (doğrudan master) ayrı SAYILIR ve çıkış kodunu etkilemez.
+ * PR numarasız commit (doğrudan master) ve bot PR'ı (başlığı "chore(deps…):" ya da "chore(ci…):" ile başlayan dependabot birleştirmesi)
+ * ayrı SAYILIR, teslim/notsuz toplamına girmez ve çıkış kodunu etkilemez.
  *
  * ÖLÇÜLEMEDİ ≠ TEMİZ (çıkış 2): origin/master okunamadı/taze değil (fetch başarısız), o gün hiç commit yok (log boş), Kanban verisi okunamadı,
  * bayat dışa aktarım, geçersiz argüman.
@@ -40,6 +41,11 @@ const { VeriHatasi, gunAdi, gunGecerli, bugun, notSayilir } = K
 /** Kart numarası, tek harf sonekli olanlar dahil ("ALT-37e", "TSR-10b": 10-08'de üç PR sonek yüzünden kartsız göründü). */
 const KART_NO = /\b([A-Z]{2,5}-\d+[a-z]?)\b/
 const PR_SONU = /\(#(\d{2,6})\)\s*$/
+/**
+ * Bot PR'ı (dependabot): başlık "chore(deps…):" ya da "chore(ci…):" ile başlar (10-08: #1749, #1695). Sahibi bir departman değil, kartı
+ * yok; PR numarasız commit gibi AYRI satırda sayılır ve çıkış kodunu etkilemez (OPS kararı, 10-10). Son 400 commit'te başka bot öneki yok.
+ */
+const BOT_BASLIK = /^chore\((?:deps|ci)[^)]*\)\s*:/i
 /** Commit kısaltması en az bu kadar karakter (git %h) olmalı; daha kısası PR anmaz. */
 const KISA_MIN = 7
 /** Metindeki 7-40 karakterlik onaltılık sözcükler (harf ya da rakama bitişik olmayan): commit kısaltması adayı. */
@@ -53,10 +59,11 @@ function departman(baslik) {
   return ilk.toUpperCase().replace(/[İŞĞÜÖÇ]/g, (c) => DEPARTMAN_ASCII[c])
 }
 
-/** "kısa|başlık" satırlarından teslim listesi. PR numarasız commit ayrı döner. */
+/** "kısa|başlık" satırlarından teslim listesi. PR numarasız commit ve bot PR'ı (dependabot) ayrı döner. */
 function teslimleriCoz(satirlar) {
   const teslimler = []
   const prSiz = []
+  const botlar = []
   for (const satir of satirlar) {
     if (!satir.trim()) continue
     const i = satir.indexOf('|')
@@ -66,9 +73,10 @@ function teslimleriCoz(satirlar) {
     const pr = baslik.match(PR_SONU)
     const kart = (baslik.match(KART_NO) || [])[1] || null
     if (!pr) prSiz.push({ kisa, baslik, departman: departman(baslik), kart })
+    else if (BOT_BASLIK.test(baslik)) botlar.push({ kisa, baslik, pr: pr[1] })
     else teslimler.push({ kisa, baslik, pr: pr[1], departman: departman(baslik), kart })
   }
-  return { teslimler, prSiz }
+  return { teslimler, prSiz, botlar }
 }
 
 /**
@@ -103,7 +111,7 @@ function gununNotlari(kayitlar, gun) {
 }
 
 function olc(kayitlar, satirlar, gun) {
-  const { teslimler, prSiz } = teslimleriCoz(satirlar)
+  const { teslimler, prSiz, botlar } = teslimleriCoz(satirlar)
   const notlar = gununNotlari(kayitlar, gun)
   const departmanlar = {}
   for (const t of teslimler) {
@@ -112,7 +120,7 @@ function olc(kayitlar, satirlar, gun) {
     if (!notlar.some((m) => notAniyor(m, t))) d.notsuz.push({ pr: t.pr, kart: t.kart, kisa: t.kisa })
   }
   const notsuz = Object.values(departmanlar).reduce((a, d) => a + d.notsuz.length, 0)
-  return { gun, teslim: teslimler.length, notsuz, departmanlar, prSiz, cikis: notsuz > 0 ? 1 : 0 }
+  return { gun, teslim: teslimler.length, notsuz, departmanlar, prSiz, botlar, cikis: notsuz > 0 ? 1 : 0 }
 }
 
 function satirlariYaz(sonuc) {
@@ -124,6 +132,9 @@ function satirlariYaz(sonuc) {
   })
   if (sonuc.prSiz.length) {
     cikti.push(`PR numarasız commit ${sonuc.prSiz.length} (çıkış kodunu etkilemez): ${sonuc.prSiz.map((c) => c.kisa).join(', ')}`)
+  }
+  if (sonuc.botlar.length) {
+    cikti.push(`Bot PR ${sonuc.botlar.length} (dependabot; teslim sayılmaz, çıkış kodunu etkilemez): ${sonuc.botlar.map((b) => `#${b.pr}`).join(', ')}`)
   }
   cikti.push(`TOPLAM ${sonuc.gun}: Teslim ${sonuc.teslim}, kart notunda geçmeyen ${sonuc.notsuz}`)
   return cikti

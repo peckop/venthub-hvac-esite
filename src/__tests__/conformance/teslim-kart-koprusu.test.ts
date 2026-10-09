@@ -23,11 +23,16 @@ type Sonuc = {
   notsuz: number
   departmanlar: Record<string, { teslim: number; notsuz: { pr: string; kart: string | null; kisa: string }[] }>
   prSiz: { kisa: string }[]
+  botlar: { kisa: string; baslik: string; pr: string }[]
   cikis: number
 }
 type Modul = {
   departman: (baslik: string) => string
-  teslimleriCoz: (satirlar: string[]) => { teslimler: Teslim[]; prSiz: { kisa: string; kart: string | null }[] }
+  teslimleriCoz: (satirlar: string[]) => {
+    teslimler: Teslim[]
+    prSiz: { kisa: string; kart: string | null }[]
+    botlar: { kisa: string; baslik: string; pr: string }[]
+  }
   notAniyor: (metin: string, teslim: { pr: string; kisa: string }) => boolean
   gununNotlari: (kayitlar: Kayit[], gun: string) => string[]
   olc: (kayitlar: Kayit[], satirlar: string[], gun: string) => Sonuc
@@ -91,6 +96,22 @@ describe('INV-TESLIM-KART-1 · departman ve teslim ayrıştırma', () => {
     expect(ortada.prSiz).toHaveLength(1)
     const ikisi = T.teslimleriCoz(['aaa1111|URUN (URN-1): ara (#1786) devam (#1774)'])
     expect(ikisi.teslimler.map((t) => t.pr)).toEqual(['1774'])
+  })
+
+  it('bot PR\'ı (dependabot "chore(deps…):" / "chore(ci…):") teslim DEĞİL, ayrı döner; insan başlıkları ve başka chore kapsamları teslimdir', () => {
+    const { teslimler, prSiz, botlar } = T.teslimleriCoz([
+      'b111111|chore(deps): bump next from 15.5.26 to 15.5.27 in the guvenlik group (#1749)',
+      'b222222|chore(ci): bump actions/cache from 4.3.0 to 6.1.0 (#1695)',
+      'b333333|chore(deps-dev): bump vitest (#1700)',
+      'b444444|Chore(CI): büyük harfli yazılmış (#1701)',
+      'c111111|chore(docs): belge düzeltmesi (#1702)',
+      'c222222|chore: kapsamsız (#1703)',
+      'c333333|URUN (URN-1): not chore(deps): bump başlığın ortasında geçer (#1704)',
+      'c444444|chore(deps): PR numarasız bot commit',
+    ])
+    expect(botlar.map((b) => b.pr)).toEqual(['1749', '1695', '1700', '1701'])
+    expect(teslimler.map((t) => t.pr)).toEqual(['1702', '1703', '1704'])
+    expect(prSiz.map((c) => c.kisa)).toEqual(['c444444'])
   })
 
   it('harf sonekli kart numarası düşmez (10-08: ALT-38e, ALT-37d, ALT-37b başlıkları kartsız görünüyordu)', () => {
@@ -249,6 +270,22 @@ describe('INV-TESLIM-KART-1 · olc (saf işlev)', () => {
     ])
   })
 
+  it('bot PR\'ı teslim/notsuz toplamına GİRMEZ ve çıkış kodunu etkilemez; ayrı satırda görünür (OPS kararı 10-10: 10-08\'de #1749 ve #1695 çıkış 1 üretiyordu)', () => {
+    const bot = ['b111111|chore(deps): bump next (#1749)', 'b222222|chore(ci): bump actions/cache (#1695)']
+    const sadeceBot = T.olc([kart('URN-58', [])], bot, GUN)
+    expect(sadeceBot).toMatchObject({ teslim: 0, notsuz: 0, cikis: 0 })
+    expect(sadeceBot.botlar.map((b) => b.pr)).toEqual(['1749', '1695'])
+    expect(sadeceBot.departmanlar).toEqual({})
+    const karisik = T.olc([kart('URN-58', [])], [...bot, LOG[0]], GUN)
+    expect(karisik).toMatchObject({ teslim: 1, notsuz: 1, cikis: 1 })
+    expect(T.satirlariYaz(karisik)).toEqual([
+      'URUN: Teslim 1, kart notunda geçmeyen 1: #1774 (URN-58)',
+      'Bot PR 2 (dependabot; teslim sayılmaz, çıkış kodunu etkilemez): #1749, #1695',
+      'TOPLAM 2026-10-09: Teslim 1, kart notunda geçmeyen 1',
+    ])
+    expect(T.satirlariYaz(T.olc([], [LOG[0]], GUN)).join('\n')).not.toContain('Bot PR')
+  })
+
   it('departmanlar ada göre SIRALI yazılır (günlük sırası değil): HARİTA, URUN; toplam en sonda', () => {
     const s = T.olc([kart('URN-58', [not('PR #1774, #1752, #1779 ve #1771 birleşti; iki satır özet.')])], LOG, GUN)
     expect(T.satirlariYaz(s)).toEqual([
@@ -321,6 +358,18 @@ describe('INV-TESLIM-KART-1 · komut satırı', () => {
     const r = cli('--log-dosya', log(), '--dosya', yaz('sabotaj.json', { kayitlar: [kart('URN-58', [])] }), '--gun', GUN)
     expect(r.kod, r.cikti).toBe(1)
     expect(r.stdout).toContain('URUN: Teslim 2, kart notunda geçmeyen 2: #1774 (URN-58), #1752 (REC-491)')
+  })
+
+  it('yalnız bot PR\'ı varsa çıkış 0 (CHORE sahipsiz departman olmaz), bot satırı yazılır; --json botlar listesini taşır', () => {
+    const botLog = yaz('bot-log.txt', ['b111111|chore(deps): bump next (#1749)', 'b222222|chore(ci): bump actions/cache (#1695)'].join('\n'))
+    const kanban = yaz('bot-k.json', { kayitlar: [kart('URN-58', [])] })
+    const r = cli('--log-dosya', botLog, '--dosya', kanban, '--gun', GUN)
+    expect(r.kod, r.cikti).toBe(0)
+    expect(r.stdout).toContain('Bot PR 2 (dependabot; teslim sayılmaz, çıkış kodunu etkilemez): #1749, #1695')
+    expect(r.stdout).not.toContain('CHORE')
+    expect(r.stdout).toContain('TOPLAM 2026-10-09: Teslim 0, kart notunda geçmeyen 0')
+    const j = cli('--log-dosya', botLog, '--dosya', kanban, '--gun', GUN, '--json')
+    expect((JSON.parse(j.stdout) as Sonuc).botlar.map((b) => b.pr)).toEqual(['1749', '1695'])
   })
 
   it('--json makine çıktısı verir ve çıkış kodunu korur', () => {
