@@ -474,19 +474,32 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
   // Ders satırı rol etiketini ve gün sonu sayısını ister; Kanban satırı sütun/status/not/kanıt dörtlüsünü ister.
   const HRT36_SAGE = ['`wrongstack-sage remember`', '`audience.roles=[<ROL>]`', 'tags [rol, ders]', '"sage\'e bugün N ders"']
   const HRT36_KANBAN = ['Kanban: her iş bir kart', 'sütun ve status birlikte değişir', 'her adımda not düşülür', 'Done yalnız kanıtla']
+  // Üçüncü ortak satır (Recep 10-09 12:3x, OPS aktardı): olgu resmî kaynaktan alınır, kaynakta birebir yoksa yazılmaz.
+  // Kuralın metni tek yerde durur (rehber-yazisi-standard R2.3); kartta yalnız atıf var, kural ikinci kez yazılmaz.
+  const HRT36_OLGU = ['OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı)', 'resmî kaynaktan al', 'kaynakta birebir yoksa yazılmaz', 'yapay zekâ özeti kanıt değildir', '`rehber-yazisi-standard.md` R2.3']
+  const HRT36_HEPSI = [...HRT36_SAGE, ...HRT36_KANBAN, ...HRT36_OLGU]
 
-  it('HRT-36: her kartta sage anında ders satırı ve Kanban sütun/status/not/kanıt satırı var', () => {
+  it('HRT-36: her kartta sage anında ders, Kanban sütun/status/not/kanıt ve resmî kaynak olgu satırı var', () => {
     for (const [ad, metin] of Object.entries(uretilen)) {
-      for (const parca of [...HRT36_SAGE, ...HRT36_KANBAN]) expect(metin, `${ad}: ${parca}`).toContain(parca)
+      for (const parca of HRT36_HEPSI) expect(metin, `${ad}: ${parca}`).toContain(parca)
     }
   })
 
-  it('HRT-36 kolu ayırt edici: etiketsiz ders satırı ya da sütunsuz Kanban satırı bozuk kopyada yakalanır', () => {
-    const eksik = (m: string) => [...HRT36_SAGE, ...HRT36_KANBAN].some((p) => !m.includes(p))
+  it('HRT-36 atıf geçerli: kartın R2.3 dediği madde cetvelde gerçekten var', () => {
+    const rehber = fs.readFileSync(path.join(KOK, 'docs', 'standards', 'rehber-yazisi-standard.md'), 'utf8').replace(/\r\n/g, '\n')
+    expect(rehber).toMatch(/^### R2\.3 /m)
+  })
+
+  it('HRT-36 kolu ayırt edici: etiketsiz ders, sütunsuz Kanban ya da kaynaksız olgu satırı bozuk kopyada yakalanır', () => {
+    const eksik = (m: string) => HRT36_HEPSI.some((p) => !m.includes(p))
     const sagesiz = Object.values(uretilen)[0].replace('`audience.roles=[<ROL>]`', '')
     const sutunsuz = Object.values(uretilen)[0].replace('sütun ve status birlikte değişir', '')
+    const kaynaksiz = Object.values(uretilen)[0].replace('kaynakta birebir yoksa yazılmaz', '')
+    const atifsiz = Object.values(uretilen)[0].replace('`rehber-yazisi-standard.md` R2.3', '')
     expect(eksik(sagesiz)).toBe(true)
     expect(eksik(sutunsuz)).toBe(true)
+    expect(eksik(kaynaksiz)).toBe(true)
+    expect(eksik(atifsiz)).toBe(true)
     for (const ad of Object.keys(uretilen)) expect(eksik(uretilen[ad]), ad).toBe(false)
   })
 
