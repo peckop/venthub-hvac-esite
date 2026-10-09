@@ -4,6 +4,7 @@ import React from 'react'
 import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMu } from '@/utils/bosDegerKorumasi'
 
 const SilentFanVorticeBrand: React.FC = () => {
     const { t, dict } = useI18n()
@@ -13,7 +14,11 @@ const SilentFanVorticeBrand: React.FC = () => {
 
     // We know the order or we can just use the icons array directly like before.
     const icons = [Clock, Globe, Award, Star]
-    const stats = bDict.stats || []
+    // URN-84: tablo bazı sayaç kartlarını (kuruluş yılı) BOŞ bırakır. Değer VE etiket birlikte boşsa kart
+    // çizilmez; yalnız biri boşsa o alan basılmaz. Simge, sözlükteki özgün sıraya bağlı kalır (index korunur).
+    const stats = (bDict.stats || []).flatMap((item, index) =>
+        doluMu(item.value) || doluMu(item.label) ? [{ item, index }] : []
+    )
 
     return (
         <section ref={sectionRef} className="py-20 bg-slate-900 text-white relative overflow-hidden">
@@ -38,22 +43,24 @@ const SilentFanVorticeBrand: React.FC = () => {
                             {String(tr('description'))}
                         </p>
 
-                        <div className="grid grid-cols-2 gap-6 mb-10">
-                            {stats.map((item, index: number) => {
-                                const Icon = icons[index % icons.length]
-                                return (
-                                    <div key={index} className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-                                            <Icon className="text-blue-400" size={24} />
+                        {stats.length > 0 && (
+                            <div className="grid grid-cols-2 gap-6 mb-10">
+                                {stats.map(({ item, index }) => {
+                                    const Icon = icons[index % icons.length]
+                                    return (
+                                        <div key={index} className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                                                <Icon className="text-blue-400" size={24} />
+                                            </div>
+                                            <div>
+                                                {doluMu(item.value) && <div className="text-2xl font-black text-white">{item.value}</div>}
+                                                {doluMu(item.label) && <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{item.label}</div>}
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="text-2xl font-black text-white">{item.value}</div>
-                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{item.label}</div>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
 
                         <div className="flex flex-wrap gap-4">
                             {(bDict.badges || []).map((badge: string, i: number) => (

@@ -4,11 +4,15 @@ import React from 'react'
 import VentImage from '@/components/ui/VentImage'
 import useScrollAnimation, { scrollAnimationClasses } from '@/hooks/useScrollAnimation'
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMu } from '@/utils/bosDegerKorumasi'
 
 interface PainPoint {
     title: string
     description: string
 }
+
+/** Kart sayısına göre geniş ekran sütunu (Tailwind sınıfı TAM dize olmalı, birleştirilmez). */
+const KART_SUTUNLARI: Record<number, string> = { 1: 'lg:grid-cols-1', 2: 'lg:grid-cols-2', 3: 'lg:grid-cols-3' }
 
 const SilentFanProblem: React.FC = () => {
     const { t, dict } = useI18n()
@@ -24,7 +28,11 @@ const SilentFanProblem: React.FC = () => {
         { text: 'text-purple-500', bg: 'bg-purple-50' }
     ]
 
-    const painPoints = pDict.painPoints || []
+    // URN-84: tablo bir kartı BOŞ bırakabilir (kaldırma). Başlık VE açıklama birlikte boşsa kart çizilmez;
+    // yalnız biri boşsa o alan basılmaz. Simge/renk sözlükteki özgün sıraya bağlı kalır (index korunur).
+    const painPoints = (pDict.painPoints || []).flatMap((point: PainPoint, index: number) =>
+        doluMu(point.title) || doluMu(point.description) ? [{ point, index }] : []
+    )
 
     return (
         <section ref={sectionRef} className="py-16 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
@@ -43,8 +51,8 @@ const SilentFanProblem: React.FC = () => {
                 </div>
 
                 {/* Problem Cards Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
-                    {painPoints.map((point: PainPoint, index: number) => {
+                <div className={`grid grid-cols-2 md:grid-cols-2 ${KART_SUTUNLARI[painPoints.length] ?? 'lg:grid-cols-4'} gap-4 sm:gap-6 mb-12`}>
+                    {painPoints.map(({ point, index }) => {
                         const Icon = icons[index % icons.length]
                         const color = colors[index % colors.length]
                         return (
@@ -56,12 +64,16 @@ const SilentFanProblem: React.FC = () => {
                                 <div className={`w-10 h-10 sm:w-14 sm:h-14 ${color.bg} rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
                                     <Icon className={color.text} size={20} />
                                 </div>
-                                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">
-                                    {point.title}
-                                </h3>
-                                <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
-                                    {point.description}
-                                </p>
+                                {doluMu(point.title) && (
+                                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">
+                                        {point.title}
+                                    </h3>
+                                )}
+                                {doluMu(point.description) && (
+                                    <p className="text-xs sm:text-sm text-gray-500 hidden sm:block">
+                                        {point.description}
+                                    </p>
+                                )}
                             </div>
                         )
                     })}
