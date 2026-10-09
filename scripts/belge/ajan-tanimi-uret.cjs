@@ -75,6 +75,9 @@ function tanim(satir) {
     `name: ${dosyaAdi(satir.dept, satir.tur)}`,
     `description: ${aciklama(satir.dept, satir.tur)}`,
     `model: ${TUR_MODEL[satir.tur]}`,
+    // Ajan hafızası KULLANICI kapsamında: ~/.claude/agent-memory/<ad>/MEMORY.md (depo dışı; depo PUBLIC, worktree'ler arası bölünmez).
+    // `project`/`local` hafızayı depoya yazar. Yazmayan türlerde disallowedTools yazmayı kapalı tutar (hafıza yetkisi onu açmaz; 10-09 ölçüldü).
+    'memory: user',
   ]
   if (YAZMAYAN.has(satir.tur)) f.push('disallowedTools: Edit, Write, NotebookEdit')
   const skills = (satir.onYukle || []).map((o) => o.ad)

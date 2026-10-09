@@ -35,6 +35,8 @@ const KURAL_SATIR_TAVANI = 120
 const KURAL_ISARETLERI = ['/compact', 'kart numara', 'mekanik', 'YÖNTEM:', 'ağır komut'] as const
 /** Yazmayan çalışan türleri (ajan-tanimi-uret.cjs YAZMAYAN ile aynı üç ad). */
 const SALT_OKUMA = /-(arastirmaci|curutucu|dogrulayici)\.md$/
+/** Üreticinin yazdığı yardımcı ajan adları (dört tür); security-reviewer ve denetim-opus bu kalıpta değildir. */
+const YARDIMCI = /-(arastirmaci|uygulayici|curutucu|dogrulayici)\.md$/
 
 const lf = (m: string): string => m.replace(/\r\n/g, '\n')
 
@@ -114,6 +116,17 @@ describe('INV-HAZIR-OZELLIK-1 — ajan hafızası ve yazma kapısı', () => {
       .map((f) => ({ f, v: alan(ajanFm(f), 'memory') }))
       .filter((x) => x.v !== undefined && x.v !== 'user')
     expect(yanlis).toEqual([])
+  })
+
+  it('üretilen her yardımcıda (-arastirmaci, -uygulayici, -curutucu, -dogrulayici) `memory: user` var; allowlist\'li iki tanım (security-reviewer, denetim-opus) hafızasız kalır', () => {
+    const yardimcilar = ajanDosyalari().filter((f) => YARDIMCI.test(f))
+    expect(yardimcilar.length, 'kapı boş kümeyi geçmesin: üretilen yardımcı sayısı beklenenden az').toBeGreaterThan(40)
+    const eksik = yardimcilar.filter((f) => alan(ajanFm(f), 'memory') !== 'user')
+    expect(eksik, 'üretici `memory: user` yazmıyor ya da dosya elle bozulmuş (scripts/belge/ajan-tanimi-uret.cjs --yaz)').toEqual([])
+    // Muaf iki tanım: tools allowlist'i var; memory verilince Read/Write/Edit otomatik açılır (ÖLÇÜLMEDİ). Eklenirse karar yeniden verilir.
+    const muaflar = ajanDosyalari().filter((f) => !YARDIMCI.test(f))
+    expect(muaflar.sort()).toEqual(['denetim-opus.md', 'security-reviewer.md'])
+    expect(muaflar.filter((f) => alan(ajanFm(f), 'memory') !== undefined)).toEqual([])
   })
 
   it('ayırt edici: ayrıştırıcı yazma kapısının açılmasını ve yanlış kapsamı yakalar', () => {
