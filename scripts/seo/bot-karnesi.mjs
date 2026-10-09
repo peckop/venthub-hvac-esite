@@ -111,7 +111,7 @@ const BILINCLI = bilincliKurallar(EN_YAYIN_ACIK)
  * Kendi <title>'ını yazmayan sayfanın aldığı layout varsayılanı (`meta.siteTitle`, TR/EN). İKİ biçim birlikte tanınır (SEO-25, abartı taraması 10-09):
  * ESKİ ("Premium" üstünlük sıfatı) ve YENİ (ana sayfanın 09-07'den beri canlı başlığıyla AYNI metin). Başlık hangi sırayla dağılırsa dağılsın
  * "kendi title yok" kusuru görünür kalır. ⚠ YENİ varsayılan ana sayfanın kendi başlığıyla aynıdır: ana sayfa (`tur === 'ana'`) YENİ biçimde kusur
- * sayılmaz, ESKİ biçime düşerse sayılır. Kaynak bağı: sözlükteki `meta.siteTitle` bu kalıpla eşleşmek zorundadır (bot-karnesi-baslik.test.ts).
+ * sayılmaz, ESKİ biçime düşerse sayılır. Kaynak bağı: sözlükteki `meta.siteTitle` bu kalıpla eşleşmek zorundadır (bot-karnesi-en-yayin.test.ts, INV-BOT-KARNESI-BASLIK-1).
  */
 const ESKI_VARSAYILAN_BASLIK = /^VentHub — Premium HVAC (Çözümleri|Solutions)$/
 const YENI_VARSAYILAN_BASLIK = /^VentHub \| (Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri|Industrial Ventilation and HVAC Engineering Solutions)$/
