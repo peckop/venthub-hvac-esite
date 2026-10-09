@@ -2959,10 +2959,6 @@ export const en: typeof tr = {
         {
           title: 'Two Motor Options',
           description: 'Available with an AC induction motor (LINEO QUIET) or an EC brushless motor (LINEO QUIET ES).'
-        },
-        {
-          title: 'Quiet Settings',
-          description: ''
         }
       ],
       visual: {
@@ -2991,35 +2987,9 @@ export const en: typeof tr = {
         }
       ]
     },
-    comparison: {
-      standardLabel: 'AC:',
-      quietLabel: 'EC:',
-      title: 'Motor Options',
-      standard: 'LINEO QUIET (AC)',
-      quiet: 'LINEO QUIET ES (EC)',
-      features: [
-        {
-          label: 'Casing',
-          standard: 'Sound-absorbing lining',
-          quiet: ''
-        },
-        {
-          label: 'Energy Consumption',
-          standard: 'See the model datasheet',
-          quiet: ''
-        },
-        {
-          label: 'Motor Type',
-          standard: 'AC induction',
-          quiet: 'EC brushless'
-        },
-        {
-          label: 'Flow',
-          standard: 'Mixed',
-          quiet: 'Mixed'
-        }
-      ]
-    },
+    // 'comparison' (Motor Options table) removed — Blog BLG-6 final table (OPS ruling b, 10-09): once the rows
+    // with identical cells are gone the whole table goes; the two motor options are already described in
+    // problem.painPoints[2] and problem.visual.
     faq: {
       title: 'Frequently Asked Questions',
       items: [

@@ -163,9 +163,7 @@ describe('INV-I18N-TERS-1 · Türkçe yüzeyde İngilizce metin kalmaz', () => {
       ['knowledge.hub.eyebrow', 'REHBER YAZILARI'],
       ['category.showcase.premiumTitle', 'Ürün Kataloğu'],
       ['home.cinematicShowcase.hudStatus', 'Ürün ailesi'],
-      // URN-81: eski 'Sessiz:' / 'Quiet:' etiketi motor seçeneği başlığına döndü ('EC:' iki dilde aynı olduğu için
-      // TR≠EN koşulunu taşıyamaz); aynı bölümün başlığı iki dilde de farklı ve kapatılan kusurun yerini tutar.
-      ['categorySilentFan.comparison.title', 'Motor Seçenekleri'],
+      // categorySilentFan.comparison (eski 'Sessiz:' / 'Quiet:' etiketi) bölümüyle birlikte kalktı (BLG-6 son tablo).
     ]
     for (const [anahtar, beklenen] of kapatilan) {
       expect(trD[anahtar], `${anahtar} eski İngilizce değerine dönmüş olabilir`).toBe(beklenen)

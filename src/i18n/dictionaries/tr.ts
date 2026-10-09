@@ -1747,7 +1747,7 @@ export const tr = {
         },
         {
           value: 'İtalya',
-          label: 'Vortice Ürün Ailesi',
+          label: 'Ülke',
           desc: 'Merkez: Tribiano (Milano)'
         }
       ]
@@ -3002,10 +3002,6 @@ export const tr = {
         {
           title: 'İki Motor Seçeneği',
           description: 'AC endüksiyon motorlu (LINEO QUIET) ya da EC fırçasız motorlu (LINEO QUIET ES) seçilebilir.'
-        },
-        {
-          title: 'Sessiz Ortamlar',
-          description: ''
         }
       ],
       visual: {
@@ -3034,38 +3030,9 @@ export const tr = {
         }
       ]
     },
-    comparison: {
-      standardLabel: 'AC:',
-      // REC-113: karşılığı 'Standart:' olan ETİKET; İngilizce kalması tabloyu iki dilli
-      // gösteriyordu. Ürün hattı adı ('Vortice Lineo Quiet') AYNEN kalır — çevrilen şey
-      // etiket, özel ad değil.
-      quietLabel: 'EC:',
-      title: 'Motor Seçenekleri',
-      standard: 'LINEO QUIET (AC)',
-      quiet: 'LINEO QUIET ES (EC)',
-      features: [
-        {
-          label: 'Gövde',
-          standard: 'Ses emici kaplama',
-          quiet: ''
-        },
-        {
-          label: 'Enerji Tüketimi',
-          standard: 'Model föyüne bakın',
-          quiet: ''
-        },
-        {
-          label: 'Motor Tipi',
-          standard: 'AC endüksiyon',
-          quiet: 'EC fırçasız'
-        },
-        {
-          label: 'Akış',
-          standard: 'Karma',
-          quiet: 'Karma'
-        }
-      ]
-    },
+    // 'comparison' (Motor Seçenekleri tablosu) kalktı — Blog BLG-6 son tablosu (OPS hükmü b, 10-09): iki
+    // hücresi aynı kalan satırlar kalkınca tablo tümden kalkar; iki motor seçeneği problem.painPoints[2]
+    // ve problem.visual içinde zaten anlatılıyor.
     faq: {
       title: 'Sıkça Sorulan Sorular',
       items: [
@@ -3102,7 +3069,7 @@ export const tr = {
           value: '{model}'
         },
         {
-          label: 'Vortice Ürün Ailesi',
+          label: 'Ülke',
           value: 'İtalya'
         }
       ]

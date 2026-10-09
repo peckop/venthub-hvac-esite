@@ -170,7 +170,8 @@ const RATCHETS: Ratchet[] = [
   {
     ad: 'max-w-7xl (§2.1 konteyner)',
     // 2026-09-29 · 49 -> 48: REC-434 — hava perdesi vitrinindeki ölü "hangi hava perdesi" bölümü silindi.
-    tavan: 48,
+    // 2026-10-09 · 48 -> 47: URN-82 — sessiz fan sayfasındaki karşılaştırma bölümü (SilentFanTypeComparison) kalktı.
+    tavan: 47,
     say: () => countMatches(/\bmax-w-7xl\b/g),
     gerekce: 'Tek sayfa genişliği token üzerinden verilmeli.',
   },
@@ -217,7 +218,9 @@ const RATCHETS: Ratchet[] = [
     // Kazanç yan ürün.
     // 2026-10-09 · 1436 -> 1435: URN-80 — ana sayfadaki kaynaksız "15+ Yıl Deneyim" sayaç kartı kalktı;
     // altındaki `text-slate-500` etiketi de gitti. Kazanç yan ürün.
-    tavan: 1435,
+    // 2026-10-09 · 1435 -> 1421: URN-82 — sessiz fan sayfasındaki karşılaştırma bölümü (Blog BLG-6 son tablo,
+    // OPS hükmü b: "tablo tümden kalkar") silindi; sayaç bu yüzden 14 düştü (ölçülen: 1435 -> 1421). Kazanç yan ürün.
+    tavan: 1421,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -227,7 +230,8 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-01 · 378 → 377 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 377 -> 375: REC-115 olu bilesen CategoryHero silindi.
     // 2026-09-29 · 375 -> 372: REC-434 — aynı ölü bölümün silinmesi.
-    tavan: 370,
+    // 2026-10-09 · 370 -> 368: URN-82 — sessiz fan karşılaştırma bölümünün silinmesi.
+    tavan: 368,
     say: () => countMatches(/\brounded-(?:xl|2xl|3xl)\b/g),
     gerekce: 'Köşe yarıçapı rounded-hvac-* skalasından.',
   },
@@ -236,7 +240,8 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-01 · 148 -> 144: REC-115 olu bilesen CategoryHero silindi.
     // 2026-09-29 · 144 -> 139: REC-434 — aynı ölü bölümün silinmesi.
     // 2026-10-01 · 139 -> 137: URN-1 — aynı kopya eşlemenin kalkması.
-    tavan: 137,
+    // 2026-10-09 · 137 -> 136: URN-82 — sessiz fan karşılaştırma bölümünün silinmesi.
+    tavan: 136,
     say: () => countMatches(/\b(?:blue|indigo)-\d{2,3}\b/g),
     gerekce: 'Vurgu rengi marka token üzerinden; ham Tailwind paleti hiyerarşiyi bozar.',
   },

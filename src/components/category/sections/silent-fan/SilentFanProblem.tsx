@@ -43,7 +43,7 @@ const SilentFanProblem: React.FC = () => {
                 </div>
 
                 {/* Problem Cards Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12">
                     {painPoints.map((point: PainPoint, index: number) => {
                         const Icon = icons[index % icons.length]
                         const color = colors[index % colors.length]
