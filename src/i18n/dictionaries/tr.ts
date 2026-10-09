@@ -1100,6 +1100,13 @@ export const tr = {
       // ZAMAN VAADİ YOK (INV-VAAT-SIZINTI-2 / REC-148): olgu + eylem — ürün katalogda yok, teklif istenir.
       productsOnRequest: '{{ad}} ürünleri için bizden teklif isteyin.',
       productsOnRequestCta: 'İletişim formuna git',
+      // URN-79: marka sayfasının DB'den türeyen özet cümleleri (üretici övgüsü yerine). Şablon yer tutucuları: {{ad}} marka
+      // adı, {{sayi}} aktif ürünlü aile sayısı, {{kategoriler}} / {{aileler}} virgülle ayrılmış adlar, {{diger}} listede
+      // gösterilmeyen aile sayısı. Cümlelerin hiçbiri üstünlük/ölçüt iddiası taşımaz — yalnız katalogdaki olgu.
+      catalogSummary: 'VentHub kataloğunda {{ad}} markasının ürün ailesi sayısı: {{sayi}}.',
+      catalogCategories: 'Kategoriler: {{kategoriler}}.',
+      catalogFamilies: 'Ürün aileleri: {{aileler}}.',
+      catalogFamiliesMore: 'Ürün aileleri: {{aileler}} ve {{diger}} aile daha.',
       originSuffix: 'Menşei',
       estPrefix: 'Kuruluş',
       // REC-98: "Kurumsal Özet" satırlarının ETİKETLERİ. Değer tarafı veri olarak

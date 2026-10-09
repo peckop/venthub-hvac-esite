@@ -102,6 +102,71 @@ export async function getBrandFamilyCount(
   return toplam
 }
 
+/**
+ * Marka sayfasındaki DB'den türeyen özet cümlenin ham girdisi (URN-79).
+ * Dilden BAĞIMSIZ ham veri taşır; ad çözümü render anında yapılır (`familyName`, `getCategoryDisplayName`) —
+ * `unstable_cache` içeriği dile bağımlı olmasın (aynı gerekçe: `FamilyListItem.name_i18n`, REC-108 plan §6.5/B2).
+ */
+export interface BrandCatalogSummary {
+  /** Markanın AKTİF ÜRÜNÜ OLAN aile sayısı (RPC pencere sayımı; `getBrandFamilyCount` ile aynı değer). */
+  total: number
+  /** İlk `BRAND_CATALOG_FAMILY_LIMIT` aile (RPC sırasıyla): ad + ad çevirileri. */
+  families: Array<{ name: string; name_i18n: { tr?: string | null; en?: string | null } | null }>
+  /** Ailelerin bağlı olduğu AKTİF kategoriler (alt kategori varsa o, yoksa ana kategori), ilk görünme sırasıyla, tekil. */
+  categories: Array<{
+    name: string
+    slug: string
+    menu_label: string | null
+    translation_key: string | null
+  }>
+}
+
+/** RPC tarafında 96'ya kırpılır (`GetFamiliesParams.limit`); özet bu sınırın altında kalır. */
+export const BRAND_CATALOG_FAMILY_LIMIT = 96
+
+/**
+ * Markanın sitedeki ürün aileleri ve kategorileri (URN-79: marka sayfası metni DB'den türer, üretici övgüsünden değil).
+ *
+ * KAYNAK `getFamiliesEnriched` (= marka sayfasının vitrininde kart olarak görünen aileler) + `categories` tablosundan
+ * yalnız o ailelerin kategori satırları. Aileler `products.status='active'` iç birleşimiyle süzülür (RPC), kategori
+ * `is_active` ile süzülür: pasif kategori adı metne girmez (sayfası olmayan kategori anılmaz).
+ * Aile yoksa hiç kategori sorgusu atılmaz. HATA YUTULMAZ (RPC/sorgu hatası FIRLATILIR); "özet yok" kararını çağıran verir.
+ * Cache: çağıran (`markaSayfasi.tsx`) `PRODUCTS_DISCOVERY_TAG` ile sarar — `product_families`, `products`, `brands` ve
+ * `categories` değişimi webhook'ta bu etiketi zaten tazeler (rendering-cache-standard.md §3).
+ */
+export async function getBrandCatalogSummary(
+  supabase: SupabaseClient<Database>,
+  brandName: string
+): Promise<BrandCatalogSummary> {
+  const { items, total } = await getFamiliesEnriched(supabase, { brand: brandName, limit: BRAND_CATALOG_FAMILY_LIMIT })
+  if (items.length === 0) return { total: 0, families: [], categories: [] }
+
+  const kategoriIdleri = [
+    ...new Set(items.map((i) => i.subcategory_id ?? i.category_id).filter((id): id is string => !!id)),
+  ]
+  let categories: BrandCatalogSummary['categories'] = []
+  if (kategoriIdleri.length > 0) {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('id,name,slug,menu_label,translation_key')
+      .in('id', kategoriIdleri)
+      .eq('is_active', true)
+    if (error) throw error
+    const satirById = new Map((data ?? []).map((r) => [r.id, r]))
+    // İlk görünme sırası korunur (aile sırası); aktif olmayan ya da okunamayan kategori atlanır.
+    categories = kategoriIdleri.flatMap((id) => {
+      const r = satirById.get(id)
+      return r ? [{ name: r.name, slug: r.slug, menu_label: r.menu_label, translation_key: r.translation_key }] : []
+    })
+  }
+
+  return {
+    total,
+    families: items.map((i) => ({ name: i.name, name_i18n: i.name_i18n ?? null })),
+    categories,
+  }
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}

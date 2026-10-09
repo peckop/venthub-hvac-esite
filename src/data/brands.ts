@@ -34,6 +34,15 @@
  *    haritaya girer. INV-MARKA-KAYNAK-1 (e) fikstürde ürünsüz kalan listedeki marka için kapalı bir istisna listesi tutar.
  *    Kaynak dizininde Flexiva için 0 sayfa var (ölçüldü 2026-10-04) → ülke/kuruluş/merkez/uzmanlık YAZILMADI
  *    ve eski kaydın "patentli / global marka" iddiaları atıldı; metni Design yazacak, kaynağı gelince eklenir.
+ *
+ * URN-79 (2026-10-09, OPS karar 317 tarama hükümleri): üreticinin kendi sitesinden alınan ve vitrinde DOĞRULANAMAYAN
+ * üstünlük/ömür/oran cümleleri kayıtlardan KALKTI ("dünya lideri", "standartları belirliyor", "öncüsüdür", "%80'e
+ * varan", "en geniş ürün gamı", "operatör güvenliğini koruyan uzun ömürlü", "yüksek performanslı", "Yüksek Verimli").
+ * Yerine kayıttaki doğrulanabilir alanlardan (menşei, uzmanlık) kurulan nötr cümle kondu; ürün aileleri ve kategorileri
+ * sayfa gövdesinde DB'den türer (`markaSayfasi.tsx` → `getBrandCatalogSummary`). KURULUŞ YILI kuralı: `founded` yalnız
+ * kaynak dizininde marka adıyla birebir geçiyorsa kalır — Vortice 1954 ve SEAT 1968 geçiyor; Avens 2010, Danfoss 1933,
+ * Nicotra 1959 geçmiyor (ölçüldü) → alan ve sayfadaki her kullanımı kaldırıldı. Kapı: INV-MARKA-IDDIA-1
+ * (`src/__tests__/conformance/marka-iddia-yasagi.test.ts`).
  */
 
 /** Dile göre çözülen metin. İki dil de ZORUNLU — eksik dil sessizce Türkçe göstermesin. */
@@ -69,9 +78,13 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     name: 'Vortice',
     slug: 'vortice',
+    // URN-79 (2026-10-09): "dünya lideri / standartları belirliyor" kalktı (kaynaksız üstünlük). Yerine yalnız kayıtlı alanlar
+    // (menşei, uzmanlık) ve katalogdaki uygulama alanı kondu ("domestic, commercial and industrial applications" —
+    // Vortice broşürleri, kaynak dizini). Kuruluş yılı 1954 kaynak dizininde marka adıyla geçer ("Since 1954 Vortice has
+    // been…", 7 sayfa) → kalır.
     description: {
-      tr: '1954 yılından bu yana havalandırma teknolojilerinde dünya lideri. İtalyan tasarımı ve ileri mühendislik çözümleriyle konut, ticari ve endüstriyel iklimlendirmede standartları belirliyor.',
-      en: 'A world leader in ventilation technology since 1954. Italian design and advanced engineering set the standard across residential, commercial and industrial air treatment.'
+      tr: 'İtalya menşeli havalandırma üreticisi. Konut, ticari ve endüstriyel uygulamalara yönelik aspiratör ve ısı geri kazanım ürünleri sunar.',
+      en: 'An Italian ventilation manufacturer. It offers extractor fans and heat recovery products for residential, commercial and industrial applications.'
     },
     country: { tr: 'İtalya', en: 'Italy' },
     founded: 1954,
@@ -82,12 +95,14 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     name: 'Avens',
     slug: 'avens',
+    // URN-79: "yüksek performanslı / enerji verimliliği odaklı" (ölçütsüz sıfat) kalktı; yerine menşei + uzmanlık alanı.
+    // `founded: 2010` KALDIRILDI: kuruluş yılı kaynak dizininde marka adıyla geçmiyor (ölçüldü 2026-10-09; "2010" yalnız
+    // bir basınç değeri) → yazılmaz. Kaynak (resmî belge) gelince geri eklenir.
     description: {
-      tr: 'Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleri. Modern mühendislik yaklaşımlarıyla enerji verimliliği odaklı sistemler geliştirir.',
-      en: 'High-performance industrial ventilation and air handling unit solutions. Modern engineering practice applied to energy-efficient system design.'
+      tr: 'Türkiye menşeli marka; endüstriyel havalandırma ve klima santralleri alanında ürün sunar.',
+      en: 'A brand originating in Türkiye, offering products in industrial ventilation and air handling units.'
     },
     country: { tr: 'Türkiye', en: 'Türkiye' },
-    founded: 2010,
     headquarters: { tr: 'İstanbul', en: 'Istanbul' },
     website: 'https://www.avens.com.tr',
     specialty: { tr: 'Endüstriyel Klima Santralleri', en: 'Industrial Air Handling Units' }
@@ -116,8 +131,10 @@ export const HVAC_BRANDS: HVACBrand[] = [
     name: 'SEAT',
     slug: 'seat',
     description: {
-      tr: '1968\'den bu yana Fransa\'da üretim yapan, korozif gaz ve hava tahliyesinde uzman fan üreticisi. Polipropilen (PP) santrifüj fanlarıyla laboratuvar, kimya ve ilaç sanayi, yüzme havuzu, atık su arıtma ve ATEX ortamlarında operatör ve personel güvenliğini koruyan uzun ömürlü çözümler sunar.',
-      en: 'A French fan manufacturer specialising in the extraction of corrosive gases and air since 1968. Its polypropylene (PP) centrifugal fans provide long-lasting extraction for laboratories, the chemical and pharmaceutical industries, swimming pools, wastewater treatment and ATEX environments, keeping operators and personnel safe.'
+      // URN-79: "operatör ve personel güvenliğini koruyan uzun ömürlü" (güvenlik/ömür vaadi; kaynak dizininde karşılığı
+      // yok) kalktı. 1968 kuruluşu kaynak dizininde geçer ("1968 : Creation of SEAT", SEAT-CATALOGUE.pdf s.4) → kalır.
+      tr: '1968\'den bu yana Fransa\'da üretim yapan, korozif gaz ve hava tahliyesinde uzman fan üreticisi. Polipropilen (PP) santrifüj fanlarıyla laboratuvar, kimya ve ilaç sanayi, yüzme havuzu, atık su arıtma ve ATEX ortamlarına yönelik çözümler sunar.',
+      en: 'A French fan manufacturer specialising in the extraction of corrosive gases and air since 1968. Its polypropylene (PP) centrifugal fans are offered for laboratories, the chemical and pharmaceutical industries, swimming pools, wastewater treatment and ATEX environments.'
     },
     country: { tr: 'Fransa', en: 'France' },
     founded: 1968,
@@ -128,17 +145,21 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     // KAYNAK (2026-09-27): https://www.danfoss.com/en/about-danfoss/company/history/ (1933, Mads
     // Clausen, Nordborg; merkez hâlâ Nordborg'da) · https://www.danfoss.com/en/about-danfoss/our-businesses/drives/
-    // ("Pioneers of VFDs since 1968", enerji tüketiminde %80'e varan azaltım) ·
+    // (üretici öz beyanları: öncülük ve enerji tasarrufu oranı — URN-79'da YAZILMADI, aşağıya bkz.) ·
     // https://www.danfoss.com/en/about-danfoss/ ("family-owned company").
     // Katalogdaki Danfoss ürünleri frekans konvertörleridir (FC 51 / FC 101 / FC 102).
     name: 'Danfoss',
     slug: 'danfoss',
+    // URN-79: "1968'den bu yana … öncüsüdür" (üretici öz beyanı, atıfsız) ve "enerji tüketimini %80'e varan oranda azaltır"
+    // (atıfsız üretici sayısı; Danfoss FC102 kataloğunda örnek "%50'den fazla") kalktı. `founded: 1933` KALDIRILDI:
+    // kuruluş yılı kaynak dizininde marka adıyla geçmiyor (ölçüldü 2026-10-09; Danfoss için 1933/1968/Nordborg/pioneer 0
+    // eşleşme) → yazılmaz. Danfoss'un resmî sitesi yukarıda KAYNAK olarak duruyor ama kaynak dizini DEĞİL; dizine
+    // eklenince (catalog-ingestion-standard.md §6.3) yıl geri gelebilir.
     description: {
-      tr: '1933\'te Danimarka\'da kurulan bir aile şirketi. Danfoss Drives 1968\'den bu yana frekans konvertörlerinin (değişken frekanslı sürücüler) öncüsüdür; motor hızını ihtiyaca göre ayarlayarak enerji tüketimini %80\'e varan oranda azaltır.',
-      en: 'A family-owned company founded in Denmark in 1933. Danfoss Drives has pioneered variable-frequency drives since 1968, matching motor speed to demand to reduce energy consumption by up to 80%.'
+      tr: 'Danimarka\'da kurulan bir aile şirketi. Danfoss Drives, frekans konvertörleri (değişken frekanslı sürücüler) sunar.',
+      en: 'A family-owned company founded in Denmark. Danfoss Drives offers variable-frequency drives.'
     },
     country: { tr: 'Danimarka', en: 'Denmark' },
-    founded: 1933,
     headquarters: { tr: 'Nordborg', en: 'Nordborg' },
     website: 'https://www.danfoss.com',
     specialty: { tr: 'Frekans Konvertörleri', en: 'Variable-Frequency Drives' }
@@ -146,15 +167,17 @@ export const HVAC_BRANDS: HVACBrand[] = [
   {
     name: 'Nicotra Gebhardt',
     slug: 'nicotra-gebhardt',
+    // URN-79: "dünyanın en geniş ve teknolojik ürün gamına sahip" (Nicotra kataloğu "dünya" demiyor) kalktı; uzmanlık
+    // etiketinden "Yüksek Verimli" sıfatı kalktı. `founded: 1959` KALDIRILDI: kaynak dizininde marka adıyla geçmiyor
+    // (ölçüldü 2026-10-09: Nicotra Gebhardt belgelerinde Waldenburg ve İtalya adresi var, kuruluş yılı yok) → yazılmaz.
     description: {
-      tr: 'Alman mühendisliği ve İtalyan tasarımının birleşimiyle, endüstriyel santrifüj fanlarda dünyanın en geniş ve teknolojik ürün gamına sahip üreticisi.',
-      en: 'German engineering combined with Italian design, offering one of the world\'s broadest and most advanced ranges of industrial centrifugal fans.'
+      tr: 'Alman mühendisliği ve İtalyan tasarımının birleşimiyle endüstriyel santrifüj fanlar sunar.',
+      en: 'German engineering combined with Italian design, offering industrial centrifugal fans.'
     },
     country: { tr: 'Almanya', en: 'Germany' },
-    founded: 1959,
     headquarters: { tr: 'Waldenburg', en: 'Waldenburg' },
     website: 'https://www.nicotra-gebhardt.com',
-    specialty: { tr: 'Yüksek Verimli Santrifüj Fanlar', en: 'High-Efficiency Centrifugal Fans' }
+    specialty: { tr: 'Endüstriyel Santrifüj Fanlar', en: 'Industrial Centrifugal Fans' }
   },
   {
     // KAYNAK YOK (2026-10-04): kaynak dizininde Flexiva için 0 sayfa, DB'de ürün 0. Bu yüzden ülke / kuruluş / merkez /

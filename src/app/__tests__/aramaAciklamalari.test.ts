@@ -83,25 +83,30 @@ describe('marka açıklaması', () => {
     })
   }
 
-  it('tr: üstünlük cümlesi atılınca kalan iddiasız cümle korunur (Danfoss), kalmazsa uzmanlık yedeği gelir (Vortice)', () => {
+  // URN-79 (karar 317): kayıtlardaki üstünlük cümleleri ("dünya lideri", "öncüsüdür", "%80'e varan"…) KALDIRILDI. Eskiden
+  // bu iki test süzgecin ATTIĞI cümleyi ölçüyordu (Danfoss: "1933" cümlesi kalır; Vortice: hepsi atılır, uzmanlık yedeği
+  // gelir). Artık kayıtta atılacak cümle yok: açıklama doğrudan kaydın nötr cümlesinden türer. Süzgeç + yedek davranışı
+  // sentetik kayıtla `markaSayfasiIddia.test.ts`'te ve cümle düzeyinde `ovguAyikla.test.ts`'te ölçülür.
+  it('tr: açıklama kaydın nötr cümlesinden türer, marka adı başa eklenir, kaynaksız kuruluş yılı (Danfoss 1933) yok', () => {
     const danfoss = String(markaUstVerisi('tr', 'danfoss').description)
-    expect(danfoss).toContain('1933')
-    expect(danfoss).toContain('VentHub kataloğunda')
-    expect(ovguVarMi(danfoss)).toBe(false)
+    expect(danfoss).toBe("Danfoss: Danimarka'da kurulan bir aile şirketi. Danfoss Drives, frekans konvertörleri (değişken frekanslı sürücüler) sunar.")
+    expect(danfoss).not.toMatch(/1933|1968|%80|öncü/)
     const vortice = String(markaUstVerisi('tr', 'vortice').description)
-    expect(vortice.startsWith('Vortice: ')).toBe(true)
-    expect(vortice).toContain('VentHub kataloğunda')
-    expect(ovguVarMi(vortice)).toBe(false)
+    expect(vortice).toBe(
+      'Vortice: İtalya menşeli havalandırma üreticisi. Konut, ticari ve endüstriyel uygulamalara yönelik aspiratör ve ısı geri kazanım ürünleri sunar.',
+    )
+    expect(vortice).not.toMatch(/dünya|lider|standart/i)
   })
 
-  it('en: iddia atılınca yedek cümle gelir, ham sözlük anahtarı sızmaz (Vortice, Danfoss)', () => {
+  it('en: açıklama kaydın nötr cümlesinden türer; ham sözlük anahtarı sızmaz (Vortice, Danfoss)', () => {
     const vortice = String(markaUstVerisi('en', 'vortice').description)
-    expect(vortice.startsWith('Vortice: ')).toBe(true)
-    expect(vortice).toContain('VentHub catalog')
-    expect(ovguVarMi(vortice)).toBe(false)
+    expect(vortice).toBe(
+      'Vortice: An Italian ventilation manufacturer. It offers extractor fans and heat recovery products for residential, commercial and industrial applications.',
+    )
+    expect(vortice).not.toMatch(/world|leader|standard/i)
     const danfoss = String(markaUstVerisi('en', 'danfoss').description)
-    expect(danfoss).toContain('1933')
-    expect(danfoss).toContain('VentHub catalog')
+    expect(danfoss).toBe('Danfoss: A family-owned company founded in Denmark. Danfoss Drives offers variable-frequency drives.')
+    expect(danfoss).not.toMatch(/1933|1968|80%|pioneer/)
   })
 
   it('marka adı kayıt metninde yoksa başa eklenir, varsa tekrarlanmaz', () => {

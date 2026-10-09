@@ -2034,6 +2034,13 @@ export const en: typeof tr = {
       // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
       productsOnRequest: 'Request a quote from us for {{ad}} products.',
       productsOnRequestCta: 'Go to the contact form',
+      // URN-79: brand page summary sentences derived from the DB (instead of manufacturer praise). Placeholders: {{ad}} brand
+      // name, {{sayi}} number of families with active products, {{kategoriler}} / {{aileler}} comma-separated names,
+      // {{diger}} number of families not listed. None of the sentences makes a superiority/benchmark claim — catalogue facts only.
+      catalogSummary: 'Product families of {{ad}} in the VentHub catalog: {{sayi}}.',
+      catalogCategories: 'Categories: {{kategoriler}}.',
+      catalogFamilies: 'Product families: {{aileler}}.',
+      catalogFamiliesMore: 'Product families: {{aileler}} and {{diger}} more.',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak

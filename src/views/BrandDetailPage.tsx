@@ -19,7 +19,7 @@ import { getFamiliesEnriched } from '../lib/services/family.service'
 import type { FamilyListItem } from '../types/ui-models'
 
 /**
- * Marka hikâyesi ve kurumsal özet satırları — VERİ katmanı (bkz. `src/data/brands.ts` başlığı).
+ * Kurumsal özet satırları — VERİ katmanı (bkz. `src/data/brands.ts` başlığı).
  * REC-98 (2026-08-31): eskiden tek dilliydi; `/en/brands/<slug>` canlıda Türkçe kalıyordu.
  *
  * İki ayrım KASITLI:
@@ -27,19 +27,21 @@ import type { FamilyListItem } from '../types/ui-models'
  *  · `value`    = VERİ → dile göre burada taşınır; dilden bağımsız olan (yıl, özel ad)
  *                 düz `string` bırakılır — çevrilecek bir şeyi yok.
  * Ölü alanlar (founded/headquarters/website) KALDIRILDI: render `brand.*` okuyor,
- * bunlar hiç kullanılmıyordu (ölçüldü: yalnız `story` ve `stats` okunuyor).
+ * bunlar hiç kullanılmıyordu (ölçüldü: yalnız `stats` okunuyor).
+ *
+ * URN-79 (2026-10-09): marka HİKÂYESİ (`story`) alanı KALKTI. Vortice / Avens / Nicotra hikâyeleri üreticinin kendi
+ * övgüsüydü ("dünya çapında tanınan", "lider konumdadır", "Türkiye'nin önde gelen yerli markası", "dünya lideridir" —
+ * kaynak dizininde karşılığı yok) ve sayfa metni artık TEK kaynaktan gelir: `brands.ts` kaydındaki nötr `description` +
+ * sunucunun DB'den kurduğu `urunOzeti` (ürün aileleri ve kategorileri). Satırlardan şunlar da kalktı (kaynak dizininde
+ * marka adıyla geçmiyor, ölçüldü 2026-10-09): Avens "Kuruluş 2010" ve "Garanti 2 Yıl" (Avens fiyat listesinde 2 yıl yok;
+ * garanti-servis sayfasıyla çelişiyordu), Nicotra "Kuruluş 1959".
  */
 type BrandStat = { labelKey: string; value: BrandText | string }
 
 const BRAND_DETAILS: Record<string, {
-  story?: BrandText
   stats?: BrandStat[]
 }> = {
   vortice: {
-    story: {
-      tr: 'Vortice, 1954 yılında İtalya\'da kurulmuş, dünya çapında tanınan bir havalandırma çözümleri üreticisidir. 70 yılı aşkın deneyimiyle konut, ticari ve endüstriyel havalandırma sistemlerinde lider konumdadır.',
-      en: 'Founded in Italy in 1954, Vortice is a globally recognised manufacturer of ventilation solutions. With over 70 years of experience it leads in residential, commercial and industrial ventilation systems.'
-    },
     stats: [
       { labelKey: 'estPrefix', value: '1954' },
       { labelKey: 'statCountries', value: '90+' },
@@ -47,31 +49,19 @@ const BRAND_DETAILS: Record<string, {
     ]
   },
   avens: {
-    story: {
-      tr: 'Avens, Türkiye\'nin önde gelen yerli HVAC markasıdır. Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleriyle modern mühendislik yaklaşımlarını birleştirir.',
-      en: 'Avens is a leading domestic HVAC brand in Türkiye, combining modern engineering practice with high-performance industrial ventilation and air handling unit solutions.'
-    },
     stats: [
-      { labelKey: 'estPrefix', value: '2010' },
-      { labelKey: 'statProduction', value: { tr: 'Türkiye', en: 'Türkiye' } },
-      { labelKey: 'statWarranty', value: { tr: '2 Yıl', en: '2 Years' } }
+      { labelKey: 'statProduction', value: { tr: 'Türkiye', en: 'Türkiye' } }
     ]
   },
   // OPS-51 (2026-10-04): Casals'ın eski hikâyesi ("140 yıl / en köklü / tercih edilen") ve 1881 / 140+ yıl satırları
-  // KAYNAKSIZDI → çıkarıldı; hikâye metni `brands.ts` kaydındaki doğrulanabilir `description`'a düşer. Kalan satır:
-  // Vortice Group şirketi (Casals katalog baskısındaki "VORTICE GROUP COMPANIES" listesi).
+  // KAYNAKSIZDI → çıkarıldı. Kalan satır: Vortice Group şirketi (Casals katalog baskısındaki "VORTICE GROUP COMPANIES" listesi).
   casals: {
     stats: [
       { labelKey: 'statGroup', value: 'Vortice Group' }
     ]
   },
   'nicotra-gebhardt': {
-    story: {
-      tr: 'Nicotra Gebhardt, endüstriyel fan teknolojisinde dünya lideridir. Alman mühendisliği ve İtalyan tasarımını bir araya getirerek en zorlu havalandırma ihtiyaçlarına çözüm sunar.',
-      en: 'Nicotra Gebhardt is a world leader in industrial fan technology, bringing German engineering together with Italian design to solve the most demanding ventilation requirements.'
-    },
     stats: [
-      { labelKey: 'estPrefix', value: '1959' },
       { labelKey: 'statGroup', value: 'Regal Rexnord' },
       { labelKey: 'statExpertise', value: { tr: 'Endüstriyel Fan', en: 'Industrial Fans' } }
     ]
@@ -88,9 +78,14 @@ export interface BrandDetailPageProps {
    * Verilmezse `false` (bugünkü "ürünleri henüz katalogda değil" cümlesi).
    */
   urunsuz?: boolean
+  /**
+   * URN-79: markanın sitedeki ürün aileleri ve kategorileri, sunucuda DB'den kurulmuş HAZIR cümle(ler)
+   * (`markaSayfasi.tsx` → `markaKatalogOzetMetni`, dil çözülmüş). Boş ya da verilmezse paragraf hiç çizilmez (uydurma metin yok).
+   */
+  urunOzeti?: string
 }
 
-const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false }) => {
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false, urunOzeti = '' }) => {
   const { t, lang } = useI18n()
   // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
   const Routes = useLocalizedRoutes()
@@ -107,7 +102,11 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
   )
   
   const detail = brand ? BRAND_DETAILS[brand.slug] : null
-  
+  // URN-79: "Kurumsal Özet" kutusu yalnız çizilecek bir satır VARSA çizilir (satır = kayıttaki özet satırı, merkez ya da web sitesi).
+  // Aksi hâlde başlığı olup içi boş bir kutu kalırdı (kaynağı doğrulanamayan satırlar kaldırıldıkça bu olasılık arttı).
+  const ozetSatirlari = detail?.stats ?? []
+  const ozetVar = ozetSatirlari.length > 0 || !!brand?.headquarters || !!brand?.website
+
   const [families, setFamilies] = useState<FamilyListItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -229,10 +228,16 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
                   {t('brands.detail.authorityTitle').split(' ').slice(1).join(' ')}
                 </span>
               </h2>
-              <p className="text-xl text-slate-500 font-light leading-relaxed mb-12 text-center lg:text-left max-w-3xl">
-                {brandText(detail?.story || brand.description, lang)}
-              </p>
-              
+              <div className="mb-12 space-y-6 text-center lg:text-left max-w-3xl">
+                <p className="text-xl text-slate-500 font-light leading-relaxed">
+                  {brandText(brand.description, lang)}
+                </p>
+                {/* URN-79: ürün aileleri ve kategorileri sunucuda DB'den kurulur (`markaSayfasi.tsx`); yoksa paragraf çizilmez. */}
+                {urunOzeti && (
+                  <p className="text-base text-slate-500 font-light leading-relaxed">{urunOzeti}</p>
+                )}
+              </div>
+
               <div className="grid sm:grid-cols-2 gap-12">
                 <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
                   <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.globalVision')}</h3>
@@ -253,12 +258,14 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
               <div className="rounded-hvac-2xl bg-slate-950 p-10 text-white overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 blur-3xl" />
                 <div className="relative z-10">
+                  {ozetVar && (
+                  <>
                   <div className="text-xs font-bold uppercase tracking-hvac-relaxed text-cyan-400 mb-8">
                     {t('brands.detail.corporateSnapshot')}
                   </div>
                   
                   <div className="space-y-6">
-                    {detail?.stats?.map((stat, i) => (
+                    {ozetSatirlari.map((stat, i) => (
                       <div key={i} className="flex justify-between items-end border-b border-white/10 pb-4">
                         <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
                           {t(`brands.detail.${stat.labelKey}`)}
@@ -293,11 +300,13 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
                       </div>
                     )}
                   </div>
+                  </>
+                  )}
 
                   <Link href={Routes.contact()}>
-                    <button 
+                    <button
                       aria-label={t('brands.detail.requestCatalog')}
-                      className="mt-12 w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 active:scale-95"
+                      className={`${ozetVar ? 'mt-12 ' : ''}w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 active:scale-95`}
                     >
                       {t('brands.detail.requestCatalog')}
                     </button>

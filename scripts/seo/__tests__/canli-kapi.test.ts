@@ -585,6 +585,34 @@ describe('INV-CANLI-KAPI-1 · VITRIN-IDDIA (URN-60, karar 295)', () => {
       expect(b[0].seviye).toBe('KIRMIZI')
     }
   })
+  it('URN-79 sabotaj: marka kayıtlarından kalkan üretici övgüleri (TR+EN) geri gelirse KIRMIZI; React\'in `&#x27;` yazdığı kesme işaretli hâl de yakalanır', () => {
+    const geriGelenler = [
+      '1954 yılından bu yana havalandırma teknolojilerinde dünya lideri',
+      'A world leader in ventilation technology since 1954',
+      'konut, ticari ve endüstriyel iklimlendirmede standartları belirliyor',
+      'endüstriyel santrifüj fanlarda dünyanın en geniş ve teknolojik ürün gamına sahip üreticisi',
+      'frekans konvertörlerinin öncüsüdür',
+      'enerji tüketimini %80&#x27;e varan oranda azaltır',
+      'Avens, Türkiye&#x27;nin önde gelen yerli HVAC markasıdır',
+      'Yüksek Verimli Santrifüj Fanlar',
+    ]
+    for (const ifade of geriGelenler) {
+      const v = temiz()
+      govdeDegistir(v.sayfalar[1], '<h1>', `<h1>${ifade} `)
+      const b = kodlar(v, 'VITRIN-IDDIA')
+      expect(b.length, `"${ifade}" yakalanmadı`).toBeGreaterThan(0)
+      expect(b[0].adres).toBe('/tr/a')
+    }
+  })
+  it('URN-79: yeni marka cümleleri (nötr menşei/uzmanlık + DB özeti) yanlış alarm vermez', () => {
+    const v = temiz()
+    govdeDegistir(
+      v.sayfalar[1],
+      '<h1>',
+      '<h1>İtalya menşeli havalandırma üreticisi. VentHub kataloğunda Vortice markasının ürün ailesi sayısı: 31. Kategoriler: Aksiyel Fanlar. ',
+    )
+    expect(kodlar(v, 'VITRIN-IDDIA')).toEqual([])
+  })
   it('Türkçe büyük/küçük harf simetrisi: DETERMİNİSTİK, Deterministik, deterministik üçü de yakalanır (REC-343 körlüğü yok)', () => {
     for (const yazim of ['DETERMİNİSTİK SİSTEMLER', 'Deterministik Sistemler', 'deterministik sistemler']) {
       const v = temiz()
