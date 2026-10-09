@@ -137,7 +137,7 @@ const ContactPage: React.FC = () => {
                   <card.icon size={24} strokeWidth={1.5} />
                 </div>
                 {/* URN-84: telefon kartı başlığı tabloda BOŞ (numara ENV'e bağlı, canlıda kart çizilmiyor); ENV açılırsa boş <h3> basılmaz. */}
-                {doluMu(card.title) && <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{card.title}</h3>}
+                {card.title !== null && <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{card.title}</h3>}
                 <div className="text-2xl font-medium text-slate-900 mb-6 tracking-tight">{card.value}</div>
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-600">
                   {card.label} <ArrowRight size={12} />
