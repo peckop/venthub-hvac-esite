@@ -268,6 +268,17 @@ describe('INV-KART-NOT-1 · ozetle ve çıktı biçimi', () => {
   it('bugün Done yoksa bunu söyler (boş çıktı "temiz" ile karışmasın)', () => {
     expect(S.satirlar({}, GUN)[0]).toContain("Done'a geçen kart yok")
   })
+
+  it('satırlar şerit adına göre sıralıdır (koşudan koşuya aynı düzen)', () => {
+    const s = S.say([kart('OPS-1', { serit: 'OPS' }), kart('ALT-1', { serit: 'ALTYAPI' }), kart('HRT-1')], GUN)
+    expect(S.satirlar(s, GUN).map((l) => l.split(':')[0])).toEqual(['ALTYAPI', 'HARITA', 'OPS'])
+  })
+
+  it('başka güne ait Done kartta notes alanı olmasa da hata YOK (veri hatası yalnız sayılan günün kartlarında)', () => {
+    const eski = kart('HRT-20', { completedAt: DUN_IKI, doneAt: null })
+    delete eski.notes
+    expect(() => S.say([eski, kart('HRT-21')], GUN)).not.toThrow()
+  })
 })
 
 describe('INV-KART-NOT-1 · komut satırı', () => {
