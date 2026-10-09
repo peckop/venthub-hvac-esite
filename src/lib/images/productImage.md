@@ -80,7 +80,7 @@ Gerçek bir görsel atanmamış ürünler için deterministik bir yer tutucu gö
 ### [N3_NASIL] AST Pointer: src/lib/images/productImage.ts::productImagePlaceholder
 - **params**: `_seed` (string) — kullanılmıyor (alt çizgi öneki ile işaretli)
 - **ic_degiskenler**: yok
-- **Dönüş**: string — `PRODUCT_IMAGE_PLACEHOLDER` sabitinin değeri
+- **Dönüş**: string — `YER_TUTUCU_GORSEL` (ürün içermeyen nötr yer tutucu, `@/utils/imageUtils`)
 
 ---
 

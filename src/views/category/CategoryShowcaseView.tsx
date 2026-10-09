@@ -149,7 +149,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         10'unda DOLU; yani veri hazırdı, onu okuyan kart yoktu.
 
                                         ⛔YER TUTUCU BİLEREK YOK: `VentImage` görsel bulunamayınca
-                                        `category-placeholder.png` basar. Onu her karta koymak, hangi
+                                        nötr yer tutucuyu (YER_TUTUCU_GORSEL) basar. Onu her karta koymak, hangi
                                         kategorinin görseli eksik olduğunu EKRANDA GÖRÜNMEZ yapardı.
                                         Bu yüzden bileşen yalnız `image_url` doluyken çiziliyor; boşsa
                                         kart aşağıdaki ikon düzeninde kalır — eksiklik hem ziyaretçiye

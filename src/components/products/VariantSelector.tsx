@@ -358,7 +358,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                     </span>
                     {specKeys.map((key) => (
                       <span key={key} className="text-xs font-bold text-industrial-gray truncate">
-                        {formatSpecValue(key, v.technical_specs?.[key] ?? null)}
+                        {formatSpecValue(key, v.technical_specs?.[key] ?? null, t)}
                       </span>
                     ))}
                     <span className="text-xs font-black text-primary-navy text-right whitespace-nowrap">

@@ -22,6 +22,7 @@ export const en: typeof tr = {
   },
   common: {
     technicalDrawing: 'Technical Drawing',
+    imagePreparing: 'Product image coming soon',
     errorGeneric: 'An error occurred',
     devMode: 'Developer Mode',
     userFallback: 'User',
@@ -347,10 +348,10 @@ export const en: typeof tr = {
         entryPaths: 'guided decision flow'
       },
       trustStrip: {
-        authorizedBrands: 'World-renowned brands',
-        engineeringSupport: 'Engineering guidance',
-        nationwideDelivery: 'Nationwide delivery',
-        projectGuidance: 'Project-led selection support'
+        authorizedBrands: 'Brand and model catalogue',
+        engineeringSupport: 'Product Selector tools',
+        nationwideDelivery: 'Orders by quotation',
+        projectGuidance: 'Technical specification tables'
       },
       quickChips: {
         fans: 'Fans',
@@ -402,7 +403,7 @@ export const en: typeof tr = {
           {
             eyebrow: 'PRECISION HVAC SYSTEMS',
             title: 'Technical Excellence and Smart Flow',
-            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
+            subtitle: 'End-to-end ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
             products: [
               {
                 label: 'Industrial Solutions',
@@ -418,7 +419,7 @@ export const en: typeof tr = {
       }
     },
     cinematicShowcase: {
-      hudStatus: 'System.Data.Live',
+      hudStatus: 'Product family',
       eyebrow: 'ENGINEERING FOCUS',
       title: 'Vortice Lineo Quiet Series',
       subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
@@ -461,7 +462,7 @@ export const en: typeof tr = {
       }
     },
     guidedDiscovery: {
-      eyebrowLabel: 'DETERMINISTIC SYSTEMS',
+      eyebrowLabel: 'VENTILATION SOLUTIONS',
       heading: 'The Engineering Aesthetics of Airflow',
       intro: 'Discover industrial-grade ventilation solutions curated by VentHub.',
       cardFallback: 'Professional Ventilation Solutions',
@@ -519,10 +520,6 @@ export const en: typeof tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Grade',
-      gradeValue: 'A++',
-      standardLabel: 'Standard',
-      standardValue: 'ERP',
       eyebrow: 'Product Showroom',
       title: 'Industrial Product Portfolio',
       subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
@@ -531,51 +528,51 @@ export const en: typeof tr = {
       tabs: {
         featured: 'Featured',
         newArrivals: 'New Arrivals',
-        bestSellers: 'Best Sellers',
+        bestSellers: 'Product Selection',
         airCurtains: 'Air Curtains',
         heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Performance Leaders',
         newArrivals: 'Latest Technologies',
-        bestSellers: 'Most Preferred',
+        bestSellers: 'Selected Products',
         airCurtains: 'Climate Protection Systems',
         heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
-        featured: 'Flagship project solutions that have received full marks in durability and efficiency tests by our engineering team.',
+        featured: 'Featured models from the VentHub product family and their technical specifications.',
         newArrivals: 'New generation devices with the highest energy efficiency and modern design, recently added to the VentHub product family.',
-        bestSellers: 'Reliable models proven in the field, most ordered by industry professionals and large projects.',
+        bestSellers: 'Selected models from the VentHub product family, chosen for their technical specifications.',
         airCurtains: 'Professional series that protect indoor comfort by creating an invisible thermal barrier at entrance areas.',
         heatRecovery: 'Economic units that recover heat from waste air with up to 90% efficiency while meeting fresh air needs.'
       }
     },
     trustProof: {
-      eyebrow: 'Trust and Proof',
-      title: 'We build trust with clear operational realities, not decorative promises.',
-      subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
-      badge: 'VERIFIED',
+      eyebrow: 'Catalogue and Tools',
+      title: 'Catalogue, Product Selector and Quote',
+      subtitle: 'Browse fan, air curtain, heat recovery and frequency converter models, run a pre-assessment from your volume, airflow and pressure inputs, and request a quote.',
+      badge: 'ON VENTHUB',
       visualAlt: 'VentHub Reliability Proof and Quality Certificates',
       items: {
         brands: {
-          eyebrow: 'Brand Layer',
-          title: 'Premium brand selection',
-          description: 'Represented brands are not only visual assets; they carry solution quality and category credibility.'
+          eyebrow: 'Catalogue',
+          title: 'Brands and Models',
+          description: 'Product families and models from AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT and Vortice, with technical specification tables.'
         },
         guidance: {
-          eyebrow: 'Expert Layer',
-          title: 'Engineering-guided direction',
-          description: 'We aim to move users not only into product lists, but into a more accurate selection flow.'
+          eyebrow: 'Calculation',
+          title: 'Pre-sizing with the Product Selector',
+          description: 'Enter values such as volume, airflow and pressure; the duct fan, heat recovery, air curtain and jet fan calculators give a preliminary assessment.'
         },
         delivery: {
-          eyebrow: 'Operations Layer',
-          title: 'Delivery and supply visibility',
-          description: 'Delivery and supply expectations are made clearer, more predictable and more professional.'
+          eyebrow: 'Logistics',
+          title: 'Delivery planning',
+          description: 'Delivery time and shipping terms are settled at the quotation stage, according to your project.'
         },
         support: {
-          eyebrow: 'Continuity Layer',
-          title: 'Accessible after-sales support',
-          description: 'Support, quoting and knowledge-center flows are not disconnected; they are parts of the same trust architecture.'
+          eyebrow: 'Contact',
+          title: 'Request a Quote, Ask a Question',
+          description: 'Send quote requests and questions through the contact form or info@venthub.com.tr. Technical specifications are on the product pages.'
         }
       }
     },
@@ -588,7 +585,6 @@ export const en: typeof tr = {
       headingPrefix: 'Engineering',
       headingAccent: 'Layer',
       statsPipelineLabel: 'Project Pipeline',
-      statsOptimization: '92% Optimization',
       eyebrow: 'Knowledge and Support Layer',
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
@@ -978,7 +974,7 @@ export const en: typeof tr = {
   },
   aboutPage: {
     title: 'About VentHub',
-    heroTitle: 'Turkey\'s Trusted HVAC Platform',
+    heroTitle: 'Ventilation products:',
     whySubtitle: 'We work to be worthy of your trust',
     experience: 'Years of Experience',
     distributorship: 'Global Brand Network',
@@ -991,7 +987,7 @@ export const en: typeof tr = {
     trustTitle: 'Operational Trust',
     trustDesc: 'We manage our supply and operations with discipline, aiming for on-time delivery while staying loyal to your project schedules.',
     heroBadge: '15+ Years of Engineering Experience',
-    heroTitleItalic: 'the Air',
+    heroTitleItalic: 'catalogue and selection tools',
     heroDesc: 'VentHub brings highly efficient, technological, and sustainable ventilation systems to the Turkish market for modern living and industrial spaces.',
     storyTitle: 'We Build the Climate',
     storyTitleItalic: 'of the Future Today',
@@ -1358,7 +1354,7 @@ export const en: typeof tr = {
       motor_efficiency_class: 'Motor Efficiency Class',
       motor_poles: 'Motor Poles',
       motor_type: 'Motor Type',
-      noise_level_db_a: 'Noise Level',
+      noise_level_db_a: 'Sound level (manufacturer\'s declaration)',
       noise_lpa_3m_db: 'Sound Pressure (3 m)',
       nominal_delivery_m3h: 'Nominal Airflow',
       nominal_static_pressure_pa: 'Nominal Static Pressure',
@@ -1391,6 +1387,12 @@ export const en: typeof tr = {
       weight_kg: 'Weight',
       width_mm: 'Width',
       wiring: 'Wiring Type'
+    },
+    // Teknik ozellik DEGER metinleri (URN-58) — formatSpecValue mantiksal (true/false) degeri buradan basar.
+    // Ham "true"/"false" musteriye gitmez; canli kapi SPEC-HAM-DEGER yayindaki sayfada bunu olcer.
+    specValues: {
+      yes: 'Yes',
+      no: 'No'
     },
     // Teknik ozellik GRUP basliklari — specLabel.ts 'pdp.specGroups.<grup>' yolunu arar.
     // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
@@ -1446,6 +1448,7 @@ export const en: typeof tr = {
     relatedProducts: 'Related Products',
     officialDistributor: 'BRAND ASSURANCE',
     priceAvailability: 'Price & Availability',
+    quoteLabel: 'Quote',
     shareCopied: 'Link copied!',
     messages: {
       pdfStarted: 'Generating PDF...'
@@ -1986,8 +1989,8 @@ export const en: typeof tr = {
     },
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: 'We offer products of leading global HVAC brands with full brand assurance.',
-    subtitlePart1: 'Trusted Partner of',
-    subtitlePart2: 'World Giants',
+    subtitlePart1: 'Our',
+    subtitlePart2: 'Brands',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
     pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',

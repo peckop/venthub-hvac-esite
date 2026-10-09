@@ -43,7 +43,11 @@ const DAR_LITERAL = '["belge","edge","betik","karma"]'
 const KOSUL_E2E = `if: \${{ !contains(fromJSON('${DAR_LITERAL}'), steps.sinif.outputs.sinif) }}`
 const PR_KOSULU = "if: github.event_name == 'pull_request'"
 const SINIF_ADI = "Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanır)"
-const CI_SINIF_OKUYAN = ['Next.js derleme önbelleği', 'Build (blocking)']
+/**
+ * `ci` içinde sınıf çıktısını OKUYAN adımlar. ALT-38e: üçüncü okuyucu "Hızlı yol" kararıdır (yalnız `belge` + yalnız .md/.txt/.csv farkı; koşulu ve gövdesi INV-CI-EDITED-1'de TAM sabit);
+ * kod kapıları (Lint, tip, Deno...) sınıfı KENDİLERİ okumaz, o kararın çıktısını (`steps.hizli.outputs.belge`) okur: Test ve öteki kapılar hâlâ HİÇBİR sınıfta doğrudan atlanmaz.
+ */
+const CI_SINIF_OKUYAN = ['Next.js derleme önbelleği', 'Build (blocking)', 'Hızlı yol (yalnız .md/.txt/.csv belgesi; kod kapıları atlanır)']
 const E2E_HEP_KOSAN = ['Merge-ref çözümle (yalnız elle tetiklemede)', 'Checkout', SINIF_ADI]
 const E2E_YUKLEME_ADIMI = 'Upload Playwright report on failure'
 /** Çökme yedeği: `node` çıkış kodu sıfırdan farklıysa adım `tam` yazar (gövde girintisi atılmış hâliyle, adımın SON satırları). */
@@ -140,7 +144,7 @@ function ciDenetle(ci: string): string[] {
   for (const a of ad) {
     const okur = yorumsuz(a.satirlar).some((s) => /steps\.sinif\./.test(s))
     if (okur && !CI_SINIF_OKUYAN.includes(a.ad)) {
-      ihlal.push(`ci.yml: adım "${a.ad}" sınıf çıktısını okuyor: YALNIZ Build ve Next.js önbelleği dar sınıfta atlanabilir (Test ve öteki kapılar HİÇBİR sınıfta atlanmaz: kapsam kaybı sıfır)`)
+      ihlal.push(`ci.yml: adım "${a.ad}" sınıf çıktısını okuyor: YALNIZ Build, Next.js önbelleği ve hızlı yol kararı sınıfı okur (Test ve öteki kapılar HİÇBİR sınıfta doğrudan atlanmaz: kapsam kaybı sıfır)`)
     }
   }
   for (const ad2 of CI_SINIF_OKUYAN) {

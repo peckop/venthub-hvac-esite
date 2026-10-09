@@ -660,7 +660,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability')}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{/* URN-60: teklif kipinde "Fiyat & Stok" başlığı yanlış vaat (fiyat/stok gösterilmiyor);
+                    kip `quoteMode` tek kaynağından (satis-kipi-gecis) okunur. */}
+                  {quoteMode ? t('pdp.quoteLabel') : t('pdp.priceAvailability')}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -1019,7 +1021,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
                                         <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
+                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val, t)}</span>
                                       </div>
                                     ))}
                                   </div>

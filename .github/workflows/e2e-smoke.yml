@@ -21,10 +21,11 @@ name: E2E Smoke (admin + checkout)
 # ALT-38c: PR'ın değişen dosyaları YALNIZ dar sınıflardaysa (belge, edge, betik, karma; mantık: scripts/ci/degisiklik-sinifi.cjs) bu işin ağır
 # adımları atlanır (derleme girdisi değişmedi; ölçüm: INV-CI-SINIF-2). Migration, .github, src, public, kök ayarlar ve sınıflanamayan her yol TAM koşar.
 #
-# ALT-38f: işin süresi kısaltıldı (88 başarılı koşuda medyan 285 sn; en uzun adım Build 166 sn, apt kuyruğu 3 koşuda 187-341 sn). Üç kaldıraç, her biri
-# ADIYLA aşağıda: (1) Build'te tip ve lint aşaması YALNIZ burada kapalı (`ci` ikisini zaten zorunlu kontrol olarak koşar), (2) webpack derleme önbelleği,
-# (3) apt adımı Build ile PARALEL arka planda ve kuyruğu 75 sn × 2 ile sınırlı. Hiçbiri kapıyı gevşetmez: tarayıcı probu ve Playwright testi aynen koşar.
-# Cetvel: docs/standards/test-karnesi-standard.md §4.3 · docs/standards/ci-runner-install-standard.md §2.9 · kapılar INV-E2E-HIZLI-1/2/3/4.
+# ALT-38f: işin süresi kısaltıldı (88 başarılı koşuda medyan 285 sn; en uzun adım Build 166 sn, apt kuyruğu 3 koşuda 187-341 sn). İki kaldıraç, her biri
+# ADIYLA aşağıda: (1) Build'te tip ve lint aşaması YALNIZ burada kapalı (`ci` ikisini zaten zorunlu kontrol olarak koşar), (2) apt adımı Build ile PARALEL
+# arka planda ve kuyruğu 75 sn × 2 ile sınırlı. Hiçbiri kapıyı gevşetmez: tarayıcı probu ve Playwright testi aynen koşar. Üçüncü bir kaldıraç (webpack derleme
+# önbelleği) ölçüldü ve ÇIKARILDI: kod PR'ının toplam süresini kısaltmıyor, depo önbellek kotasını tüketiyor (cetvel §4.4).
+# Cetvel: docs/standards/test-karnesi-standard.md §4.4 · docs/standards/ci-runner-install-standard.md §2.9 · kapılar INV-E2E-HIZLI-1/2/3/4.
 
 on:
   pull_request:
@@ -149,7 +150,7 @@ jobs:
       - name: Playwright tarayici onbellegi
         if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         id: pw-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ms-playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
@@ -175,7 +176,7 @@ jobs:
       #
       # Bu fail-open DEĞİL: kapı bir vekilden (apt çıkış kodu) ASIL ŞEYE (Chromium
       # gerçekten açılıyor mu) taşındı ve asıl şey daha güçlü bir iddiadır.
-      # ── ALT-38f · (3) apt ADIMI BUILD İLE PARALEL (2026-10-07, 88 başarılı koşuda ölçüldü) ────────────────────────────
+      # ── ALT-38f · (2) apt ADIMI BUILD İLE PARALEL (2026-10-07, 88 başarılı koşuda ölçüldü) ────────────────────────────
       # Eskiden bu adım Build'ten ÖNCE sırayla koşuyordu: medyan 15 sn (p90 23 sn) ve 3 koşuda (%3,4) 187, 339, 341 sn (ilk deneme 300 sn'lik sınırı
       # doldurdu). Günlükte komutun YENİ kurduğu tek şey yazı tipleri; Chromium'un çalışma kütüphaneleri koşucu imajında zaten var ("already the newest").
       # Bu yüzden Build'i beklemesi için sebep yok: arka planda başlar (scripts/ci/arka-plan.sh), sonucu Build'ten SONRA `bekle` adımı toplar.
@@ -194,25 +195,6 @@ jobs:
         if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 11
         run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install chromium
-
-      # ── ALT-38f · (2) WEBPACK DERLEME ÖNBELLEĞİ (e2e'ye ÖZGÜ) ────────────────────────────────────────────────────────
-      # `ci`nin önbelleğinden AYRI anahtar öneki: bu iş GERÇEK Supabase env'iyle derler (ci sahte env, 132 sayfa; burada 282), çıktılar farklıdır.
-      # ÜÇ yol, `.next/cache` BÜTÜNÜ DEĞİL: `fetch-cache`i geri yüklemek `unstable_cache` ile okunan CANLI veriyi (ana sayfa, kategori, marka, ürünler;
-      # revalidate 3600) önceki koşunun verisiyle sayfaya sokardı; bu iş canlı veriyle derlemeyi vaat eder.
-      # ⚠ `webpack/` TEK BAŞINA YETMEZ (2026-10-07, PR #1742 ikinci koşuda ÖLÇÜLDÜ: önbellek geri yüklendi, derleme 91 sn → 89 sn, kazanç sıfır): Next her derlemede
-      # rastgele bir sunucu-eylemi şifreleme anahtarı üretir, SWC yükleyicisinin seçeneklerine ve webpack önbellek kimliğine katar. Anahtar `.next/cache/.rscinfo`da
-      # 14 gün saklanır; geri yüklenmezse HER derlemede kimlik değişir ve webpack önbelleği hiç isabet etmez. `.previewinfo` aynı sınıf (önizleme anahtarları).
-      # Önbellek yalnız hızdır: webpack girdileri içerik özetiyle doğrular, bayat girdi yok sayılır. Koşul Build ile BİREBİR aynı.
-      - name: Next.js derleme onbellegi (e2e)
-        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: |
-            ${{ github.workspace }}/.next/cache/webpack
-            ${{ github.workspace }}/.next/cache/.rscinfo
-            ${{ github.workspace }}/.next/cache/.previewinfo
-          key: e2e-nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**', 'next.config.mjs') }}
-          restore-keys: e2e-nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
       # ── ALT-38f · (1) TİP VE LİNT AŞAMASI BURADA KAPALI ──────────────────────────────────────────────────────────────
       # `VENTHUB_E2E_TIP_LINT_ATLA=1` next.config.mjs'de `typescript.ignoreBuildErrors` ve `eslint.ignoreDuringBuilds` açar (src/config/e2eHizliDerleme.mjs).

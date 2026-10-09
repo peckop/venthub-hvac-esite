@@ -1,19 +1,16 @@
 // @vitest-environment node
-import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
 /**
- * INV-E2E-HIZLI-3 · e2e-smoke'ta paralel apt, webpack önbelleği ve kapının yeri (ALT-38f).
+ * INV-E2E-HIZLI-3 · e2e-smoke'ta paralel apt ve kapının yeri (ALT-38f).
  *
- * NİÇİN VAR: `admin-smoke` işinde (a) `playwright install-deps` Build ile PARALEL arka planda koşar, sonucu Build'ten sonra `bekle` toplar;
- * (b) `.next/cache/webpack` + `.rscinfo` + `.previewinfo` e2e'ye ÖZGÜ anahtarla önbelleğe alınır. İkisi de kapıyı gevşetebilecek ya da kazancı sessizce sıfırlayabilecek
- * yerlerdir: paralel apt'nin sonucu beklenmeden tarayıcı probu koşarsa ya da prob en-iyi-çabaya düşerse eksik kütüphanede iş SESSİZ yeşil olabilir; önbellek anahtarı
- * `ci`ninkiyle çakışırsa sahte-env çıktısı gerçek-env derlemesine karışır; önbelleğe `fetch-cache` girerse canlı veri bayat gelir; `.rscinfo` (Next'in şifreleme anahtarı,
- * webpack önbellek kimliğine girer) saklanmazsa önbellek geri yüklenir ama HİÇ isabet etmez (ilk sürümde ölçüldü: derleme 91 sn → 89 sn). Bu dosya o yerleri ölçer ve
- * bilerek bozulmuş kopyada kırmızı verdiğini kanıtlar.
+ * NİÇİN VAR: `admin-smoke` işinde `playwright install-deps` Build ile PARALEL arka planda koşar, sonucu Build'ten sonra `bekle` toplar. Bu, kapıyı gevşetebilecek ya da
+ * kazancı sessizce sıfırlayabilecek bir yerdir: paralel apt'nin sonucu beklenmeden tarayıcı probu koşarsa ya da prob en-iyi-çabaya düşerse eksik kütüphanede iş SESSİZ
+ * yeşil olabilir. Bu dosya o yeri ölçer ve bilerek bozulmuş kopyada kırmızı verdiğini kanıtlar.
+ * (Webpack derleme önbelleği bu PR'ın ilk sürümünde de vardı ve ÇIKARILDI: cetvel §4.4; bu kapı onun için bir şey denetlemez.)
  * Sınıf koşulları (INV-CI-SINIF-1) ve `ci-install-bounded` (INV-CI-INSTALL-1) ayrı dosyalarda durur; burada TEKRAR edilmez.
  * Ölçüm yüzeyi: `node:fs` + satır taraması (YAML ayrıştırıcı yok; girinti sabit: iş 2, iş anahtarı 4, adım 6, adım anahtarı 8). İş akışlarını DEĞİŞTİRMEZ.
  */
@@ -91,7 +88,6 @@ const AD = {
   pwCache: 'Playwright tarayici onbellegi',
   chromium: 'Install Playwright Chromium',
   baslat: 'Playwright sistem bagimliliklari (arka planda baslat)',
-  nextCache: 'Next.js derleme onbellegi (e2e)',
   build: 'Build (real Supabase env)',
   bekle: 'Playwright sistem bagimliliklari (bekle, en iyi caba)',
   prob: 'Tarayici gercekten aciliyor mu',
@@ -99,29 +95,14 @@ const AD = {
   smoke: 'Run smoke suite (admin + checkout)',
 } as const
 
-const CI_ONBELLEK_ADI = 'Next.js derleme önbelleği'
-
-/** e2e-smoke.yml'deki derleme önbelleği `path` bloğu (birebir; sabotaj dönüşümleri bunu değiştirir). */
-const ONBELLEK_YOL_BLOGU =
-  '          path: |\n' +
-  '            ${{ github.workspace }}/.next/cache/webpack\n' +
-  '            ${{ github.workspace }}/.next/cache/.rscinfo\n' +
-  '            ${{ github.workspace }}/.next/cache/.previewinfo\n'
-
-/** `${{ runner.os }}` → Linux; `${{ hashFiles(args) }}` → args'a bağlı kararlı özet. Aynı argüman = aynı belirteç (iki iş akışının anahtarları karşılaştırılabilsin). */
-function somutlastir(ifade: string): string {
-  const ozet = (s: string): string => `H${createHash('sha1').update(s).digest('hex').slice(0, 8)}`
-  return ifade.replace(/\$\{\{\s*runner\.os\s*\}\}/g, 'Linux').replace(/\$\{\{\s*hashFiles\(([^)]*)\)\s*\}\}/g, (_m, arg: string) => ozet(arg))
-}
-
 /** Bir apt/indirme sarmalayıcısının en kötü süresi (sn): `retry-bounded.sh` kemer aritmetiğiyle AYNI formül (INV-CI-INSTALL-1). */
 const enKotu = (sinir: number, deneme: number): number => sinir * deneme + 10 * (deneme - 1)
 
 const BASLAT_DESENI = /^bash scripts\/ci\/arka-plan\.sh baslat (\S+) -- bash scripts\/ci\/retry-bounded\.sh (\d+) (\d+) -- pnpm exec playwright install-deps chromium$/
 const BEKLE_DESENI = /^bash scripts\/ci\/arka-plan\.sh bekle (\S+) (\d+)$/
 
-/** e2e-smoke.yml kurulum sırası, paralel apt ve önbellek denetimi. Boş dizi = uyumlu. */
-function kurulumDenetle(e2e: string, ci: string): string[] {
+/** e2e-smoke.yml kurulum sırası ve paralel apt denetimi. Boş dizi = uyumlu. */
+function kurulumDenetle(e2e: string): string[] {
   const ihlal: string[] = []
   const ad = adimlar(e2e, 'admin-smoke')
   if (ad.length === 0) return ['`admin-smoke` işi ayrıştırılamadı']
@@ -138,7 +119,6 @@ function kurulumDenetle(e2e: string, ci: string): string[] {
     ['pwCache', 'chromium', 'tarayıcı önbelleği Chromium kurulumundan ÖNCE geri yüklenmeli'],
     ['baslat', 'build', 'apt Build ile PARALEL başlamalı: Build\'ten ÖNCE başlatılmıyor (kazanç sıfır)'],
     ['chromium', 'build', 'Chromium indirmesi Build\'ten önce bitmeli'],
-    ['nextCache', 'build', 'derleme önbelleği Build\'ten ÖNCE geri yüklenmeli (sonra ise hiç işe yaramaz)'],
     ['build', 'bekle', '`bekle` Build\'ten SONRA gelmeli (paralellik yoksa kazanç yok)'],
     ['bekle', 'prob', 'tarayıcı probu `bekle`den SONRA koşmalı: apt bitmeden prob "eksik kütüphane" diye yanlış kırmızı verir ya da yarım kurulumla yeşil geçer'],
     ['prob', 'smoke', 'tarayıcı probu Playwright testinden ÖNCE koşmalı'],
@@ -185,36 +165,6 @@ function kurulumDenetle(e2e: string, ci: string): string[] {
   if (prob.anahtarlar.has('continue-on-error')) ihlal.push('PROB: `continue-on-error` taşıyor: Chromium açılmasa da iş yeşil (SESSİZ YEŞİL)')
   if (!/chromium\.launch\(\)/.test(prob.govde ?? '') || !/process\.exit\(1\)/.test(prob.govde ?? '')) ihlal.push('PROB: gövde Chromium\'u gerçekten açmıyor ya da başarısızlıkta `process.exit(1)` yapmıyor')
 
-  // (d) webpack önbelleği
-  const onbellek = bul(AD.nextCache) as Adim
-  if (!/^actions\/cache@[0-9a-f]{40}\b/.test(onbellek.anahtarlar.get('uses') ?? '')) ihlal.push('ÖNBELLEK: `actions/cache@<40 haneli SHA>` ile kullanılmıyor (sabitleme)')
-  const yollar = (onbellek.girdiler.get('path') ?? '')
-    .split('\n')
-    .map((s) => s.trim())
-    .filter((s) => s !== '' && s !== '|')
-  const onbellekYolu = (ad: string): string => `\${{ github.workspace }}/.next/cache/${ad}`
-  if (!yollar.includes(onbellekYolu('webpack'))) ihlal.push('ÖNBELLEK: `.next/cache/webpack` yolu yok (derleme önbelleği saklanmıyor)')
-  if (!yollar.includes(onbellekYolu('.rscinfo'))) {
-    ihlal.push('ÖNBELLEK: `.next/cache/.rscinfo` yolu yok: Next her derlemede rastgele bir şifreleme anahtarı üretip webpack önbellek kimliğine katar, anahtar geri yüklenmezse önbellek HİÇ isabet etmez (ölçüldü: derleme 91 sn → 89 sn, kazanç sıfır)')
-  }
-  if (!yollar.includes(onbellekYolu('.previewinfo'))) ihlal.push('ÖNBELLEK: `.next/cache/.previewinfo` yolu yok (önizleme anahtarları her derlemede değişir)')
-  const fazla = yollar.filter((y) => ![onbellekYolu('webpack'), onbellekYolu('.rscinfo'), onbellekYolu('.previewinfo')].includes(y))
-  if (fazla.length > 0) ihlal.push(`ÖNBELLEK: beklenmeyen yol ${JSON.stringify(fazla)}: bütün \`.next/cache\` ya da \`fetch-cache\` canlı veriyi önceki koşudan geri yükler (bayat veri); yalnız webpack + .rscinfo + .previewinfo`)
-  const anahtar = onbellek.girdiler.get('key') ?? ''
-  const geri = onbellek.girdiler.get('restore-keys') ?? ''
-  if (!anahtar.startsWith('e2e-nextjs-')) ihlal.push(`ÖNBELLEK: anahtar "e2e-nextjs-" ile başlamıyor (bulunan "${anahtar}"): ci'nin sahte-env çıktısıyla çakışır`)
-  if (!geri.startsWith('e2e-nextjs-')) ihlal.push(`ÖNBELLEK: restore-keys "e2e-nextjs-" ile başlamıyor (bulunan "${geri}"): önek yoksa kaynak değişince sıcak başlangıç olmaz ya da ci'nin önbelleği gelir`)
-  const ciOnbellek = adimlar(ci, 'ci').find((a) => a.ad === CI_ONBELLEK_ADI)
-  if (!ciOnbellek) ihlal.push(`ÖNBELLEK: ci.yml'de "${CI_ONBELLEK_ADI}" adımı yok (çakışma karşılaştırması yapılamadı)`)
-  else {
-    const e2eKey = somutlastir(anahtar)
-    const e2eGeri = somutlastir(geri)
-    const ciKey = somutlastir(ciOnbellek.girdiler.get('key') ?? '')
-    const ciGeri = somutlastir(ciOnbellek.girdiler.get('restore-keys') ?? '')
-    if (e2eGeri === '' || ciGeri === '') ihlal.push('ÖNBELLEK: restore-keys boş')
-    else if (ciKey.startsWith(e2eGeri) || e2eKey.startsWith(ciGeri)) ihlal.push('ÖNBELLEK: e2e ve ci anahtar/restore-keys önekleri BİRBİRİNİ eşliyor (sahte-env çıktısı gerçek-env derlemesine karışır)')
-    if (!e2eKey.startsWith(e2eGeri)) ihlal.push('ÖNBELLEK: restore-keys, kendi anahtarının öneki değil (önek eşleşmesi hiç tutmaz)')
-  }
   return ihlal
 }
 
@@ -230,20 +180,12 @@ function adimiTasi(metin: string, tasinan: string, onune: string): string {
   return sat.join('\n')
 }
 
-describe('INV-E2E-HIZLI-3 · paralel apt, derleme önbelleği ve kapının yeri', () => {
+describe('INV-E2E-HIZLI-3 · paralel apt ve kapının yeri', () => {
   const e2e = oku('.github/workflows/e2e-smoke.yml')
-  const ci = oku('.github/workflows/ci.yml')
 
-  it('gerçek e2e-smoke.yml uyumlu (ölçüm yüzeyi dolu: on adım bulundu)', () => {
-    expect(adimlar(e2e, 'admin-smoke').length).toBeGreaterThan(14)
-    expect(kurulumDenetle(e2e, ci)).toEqual([])
-  })
-
-  it('önbellek anahtarı somutlaştırması: aynı hashFiles argümanı aynı belirteç, farklı argüman farklı belirteç', () => {
-    const a = somutlastir("${{ hashFiles('pnpm-lock.yaml') }}")
-    expect(somutlastir("${{ hashFiles('pnpm-lock.yaml') }}")).toBe(a)
-    expect(somutlastir("${{ hashFiles('src/**') }}")).not.toBe(a)
-    expect(somutlastir('${{ runner.os }}-x')).toBe('Linux-x')
+  it('gerçek e2e-smoke.yml uyumlu (ölçüm yüzeyi dolu: iş adımları bulundu)', () => {
+    expect(adimlar(e2e, 'admin-smoke').length).toBeGreaterThan(13)
+    expect(kurulumDenetle(e2e)).toEqual([])
   })
 
   const BOZ: Array<{ ad: string; boz: (c: string) => string; beklenen: string }> = [
@@ -309,36 +251,6 @@ describe('INV-E2E-HIZLI-3 · paralel apt, derleme önbelleği ve kapının yeri'
       beklenen: `adım "${AD.prob}" TAM BİR tane olmalı`,
     },
     {
-      ad: 'derleme önbelleği bütün `.next/cache`i tutar (fetch-cache ile canlı veri bayatlar)',
-      boz: (c) => c.replace(ONBELLEK_YOL_BLOGU, '          path: ${{ github.workspace }}/.next/cache\n'),
-      beklenen: 'fetch-cache',
-    },
-    {
-      ad: 'önbellek yalnız webpack/ (ilk sürümün hatası: şifreleme anahtarı saklanmaz, önbellek hiç isabet etmez)',
-      boz: (c) => c.replace(ONBELLEK_YOL_BLOGU, '          path: ${{ github.workspace }}/.next/cache/webpack\n'),
-      beklenen: '`.next/cache/.rscinfo` yolu yok',
-    },
-    {
-      ad: 'önbelleğe fetch-cache eklenir (canlı veri önceki koşudan gelir)',
-      boz: (c) => c.replace(ONBELLEK_YOL_BLOGU, `${ONBELLEK_YOL_BLOGU}            \${{ github.workspace }}/.next/cache/fetch-cache\n`),
-      beklenen: 'beklenmeyen yol',
-    },
-    {
-      ad: 'önbellek anahtarı ci ile aynı biçime döner (sahte-env çıktısı karışır)',
-      boz: (c) => c.replaceAll('e2e-nextjs-${{ runner.os }}-', '${{ runner.os }}-nextjs-'),
-      beklenen: 'ci\'nin sahte-env çıktısıyla çakışır',
-    },
-    {
-      ad: 'önbellek adımı Build\'ten SONRAYA taşınır (hiç işe yaramaz)',
-      boz: (c) => adimiTasi(c, AD.nextCache, AD.bekle),
-      beklenen: 'derleme önbelleği Build\'ten ÖNCE geri yüklenmeli',
-    },
-    {
-      ad: 'restore-keys düşer ya da öneki bozulur (kaynak değişince sıcak başlangıç olmaz)',
-      boz: (c) => c.replace("          restore-keys: e2e-nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-\n", ''),
-      beklenen: 'restore-keys',
-    },
-    {
       ad: 'apt başlatma adımı Build\'ten SONRAYA taşınır (paralellik yok)',
       boz: (c) => adimiTasi(c, AD.baslat, AD.bekle),
       beklenen: 'Build\'ten ÖNCE başlatılmıyor',
@@ -347,6 +259,6 @@ describe('INV-E2E-HIZLI-3 · paralel apt, derleme önbelleği ve kapının yeri'
   it.each(BOZ)('⛔SABOTAJ e2e-smoke.yml: $ad', ({ boz, beklenen }) => {
     const bozuk = boz(e2e)
     expect(bozuk, 'bozucu hiçbir şeyi değiştirmedi (çapa kayıp)').not.toBe(e2e)
-    expect(kurulumDenetle(bozuk, ci).join(' | ')).toContain(beklenen)
+    expect(kurulumDenetle(bozuk).join(' | ')).toContain(beklenen)
   })
 })
