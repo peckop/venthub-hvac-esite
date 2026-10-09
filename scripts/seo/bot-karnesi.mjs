@@ -32,6 +32,10 @@ import { join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
+// Model adresi biçimi tek noktada (INV-YAYINDA-MODEL-6a): ayırıcı metni bu dosyada yazılmaz; .mjs TS biçim modülünü içe
+// aktaramadığı için kapının açık istisnası olan ağ denetim betiğinin deseni kullanılır.
+import { MODEL_DESENI } from './adres-yayin-denetim.mjs'
+
 /**
  * EN_YAYIN bayrağını KAYNAKTAN okur (src/config/features.ts) — betiğe sabit yazılmaz (REC-439).
  * NİÇİN: bayrak kapalıyken site tek dillidir; hreflang beyanı BİLİNÇLİ yoktur (#1493). Betik bunu
@@ -146,8 +150,8 @@ const STATIK_TURLER = new Set(SABIT.map(([ad]) => ad))
 const DINAMIK_TURLER = [
   { ad: 'kategori', desen: /^\/tr\/(category|kategori)\/[^/]+$/, zorunlu: true },
   { ad: 'alt-kategori', desen: /^\/tr\/(category|kategori)\/[^/]+\/[^/]+$/, yeniSemadaZorunlu: true },
-  { ad: 'aile-urun', desen: /^\/tr\/(products\/[^/]+|urun\/(?![^/]*-p-)[^/]+)$/, n: 3, zorunlu: true },
-  { ad: 'model', desen: /^\/tr\/urun\/[^/]+-p-[^/]+$/ },
+  { ad: 'aile-urun', desen: /^\/tr\/(products|urun)\/[^/]+$/, model: false, n: 3, zorunlu: true },
+  { ad: 'model', desen: /^\/tr\/urun\/[^/]+$/, model: true },
   { ad: 'marka', desen: /^\/tr\/(brands|markalar)\/[^/]+$/, zorunlu: true },
 ]
 const YENI_SEMA = /^\/tr\/(kategori|urun|markalar)\//
@@ -169,7 +173,9 @@ export function ornekTurleri(haritaXml) {
   const turler = []
   const eksik = []
   for (const t of DINAMIK_TURLER) {
-    const secilen = locList.filter((x) => t.desen.test(x.loc)).slice(0, t.n ?? 2)
+    // `model`: tanımlıysa adresin model biçiminde olup olmaması da şarttır (aile ile model aynı /tr/urun/ önekini paylaşır).
+    const uygun = (loc) => t.desen.test(loc) && (t.model === undefined || MODEL_DESENI.test(loc) === t.model)
+    const secilen = locList.filter((x) => uygun(x.loc)).slice(0, t.n ?? 2)
     if (secilen.length) turler.push([t.ad, secilen.flatMap((x, i) => (i === 0 && x.en ? [x.loc, x.en] : [x.loc]))])
     else if (t.zorunlu || (t.yeniSemadaZorunlu && yeniSema)) eksik.push(t.ad)
   }
