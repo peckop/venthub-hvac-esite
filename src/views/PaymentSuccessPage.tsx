@@ -3,7 +3,7 @@
 import { AlertCircle, CheckCircle, Loader, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
@@ -17,7 +17,27 @@ import { useI18n } from '../i18n/I18nProvider'
 import { reportError } from '../lib/errorReporter'
 import { doluMu } from '../utils/bosDegerKorumasi'
 
-type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
+/** `belirsiz`: ödeme alınmış olabilir ama doğrulanamadı (inceleme ekranı "alındı" demez, "başarısız" da demez). */
+type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string; belirsiz?: boolean }
+
+/**
+ * URL'den gelen kimlik metni ekrana YALNIZ güvenli biçimdeyse basılır (harf, rakam, tire, alt çizgi; en çok 64).
+ * Adres elle yazılabildiği için "numaranız: <her şey>" biçiminde bir cümle de ekrana basılabilirdi (güvenlik
+ * incelemesi 10-10, bulgu 5). Biçime uymayan değer yok sayılır; numara satırı çıkmaz.
+ */
+function guvenliKimlik(deger: string | null | undefined): string | undefined {
+  return deger && /^[A-Za-z0-9_-]{1,64}$/.test(deger) ? deger : undefined
+}
+
+/**
+ * Sipariş satırı ÖDENMİŞ mi? `iyzico-callback` başarıda tek yazımla `status='confirmed'` + `payment_status='paid'`
+ * yazar (iki ayrı sözlük: yaşam döngüsü / ödeme). Biri yeter; ikisi de yoksa ödeme doğrulanmış sayılmaz.
+ * Yalnız OKUMA — bu sayfa sipariş durumu yazmaz (CLAUDE.md kural 11: durumlar monoton, yazan taraf callback).
+ */
+function siparisOdenmisMi(satir: { status?: string | null; payment_status?: string | null } | null | undefined): boolean {
+  if (!satir) return false
+  return satir.payment_status === 'paid' || satir.status === 'paid' || satir.status === 'confirmed'
+}
 
 const PaymentSuccessPage: React.FC = () => {
   const searchParams = useSearchParams()
@@ -33,6 +53,13 @@ const PaymentSuccessPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'inceleme'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
+  // URN-83: doğrulama artık başarı yolunda da bir `await` ile başlıyor (veritabanı okuması). Etki bağımlılıkları
+  // (`clearCart` kimliği kullanıcı/sepet yüklenince değişir) bu bekleme sırasında etkiyi yeniden koşturabilir;
+  // korumasız hâlde çift okuma, çift sepet temizliği ve çift bildirim olurdu. Doğrulama sayfa başına BİR KEZ koşar.
+  const dogrulamaBasladi = useRef(false)
+  // Başarı ekranındaki "sipariş detayı" bağlantısı YALNIZ veritabanında ödenmiş görünen siparişin kimliğine gider;
+  // URL'deki `orderId` tek başına bağlantı hedefi olmaz (güvenlik incelemesi 10-10, bulgu 4/5).
+  const [dogrulananSiparisId, setDogrulananSiparisId] = useState<string | undefined>(undefined)
 
   // Başarı teyit edilmeden sepeti temizleme! Yalnızca doğrulanmış başarıda temizlenecek.
 
@@ -60,12 +87,54 @@ const PaymentSuccessPage: React.FC = () => {
       } catch { }
     }
 
+    // Sipariş veritabanında ödenmiş görünüyor mu? Yalnız okuma; hata/boş/yetkisiz okuma = DOĞRULANAMADI (false).
+    async function siparisDogrulandiMi(oid: string): Promise<boolean> {
+      try {
+        const { data, error } = await (supabase
+          .from('venthub_orders'))
+          .select('status, payment_status')
+          .eq('id', oid)
+          .maybeSingle()
+        if (error) return false
+        return siparisOdenmisMi(data)
+      } catch {
+        return false
+      }
+    }
+
+    // Sipariş satırı OKUNABİLİYOR mu (var ve bu ziyaretçiye görünür)? Yalnız varlık: ÖDENMİŞ olduğunu söylemez.
+    async function siparisKaydiVarMi(oid: string): Promise<boolean> {
+      try {
+        const { data, error } = await (supabase
+          .from('venthub_orders'))
+          .select('id')
+          .eq('id', oid)
+          .maybeSingle()
+        return !error && Boolean(data)
+      } catch {
+        return false
+      }
+    }
+
+    // BELİRSİZ sonuç: ödeme alınmış olabilir ama doğrulanamadı (doğrulama hatası, ağ yok, "bekliyor"). Müşteriye
+    // "Ödeme Başarısız / Tekrar Dene" DENMEZ: parası çekilmiş müşteri ikinci kez öder (çift tahsilat, güvenlik
+    // incelemesi 10-10 bulgu 1). Sepet de silinmez (başarı kanıtlanmadı); yalnız "kontrol ediliyor" ekranı çıkar.
+    function belirsizSonucuGoster() {
+      setStatus('inceleme')
+      setPaymentInfo({ conversationId: guvenliKimlik(orderId) || guvenliKimlik(conversationId), belirsiz: true })
+    }
+
     async function verify() {
       try {
-        // 1) Eğer callback status=success ile yönlendirdiyse, doğrudan başarı kabul et
-        if (statusParam === 'success') {
+        // 1) Callback / yoklama `status=success` ile yönlendirdi. URN-83: bu URL parametresi TEK BAŞINA kanıt DEĞİLDİR —
+        // adres elle yazılabilir; eskiden hiçbir doğrulama yapılmadan "Siparişiniz Tamamlandı" + DEMO-ORDER basılıyor ve
+        // sepet siliniyordu. Başarı yalnız sipariş kimliği VARSA ve sipariş veritabanında ödenmiş görünüyorsa basılır.
+        // Doğrulanamazsa aşağıdaki akış sürer (token → sipariş kimliği → hata): başarı basılmaz, sepet silinmez.
+        if (statusParam === 'success' && orderId && (await siparisDogrulandiMi(orderId))) {
           setStatus('success')
-          setPaymentInfo({ conversationId: conversationId || orderId, token })
+          // Numara DOĞRULANMIŞ sipariş kimliğidir; URL'deki conversationId ikincildir ve yalnız güvenli biçimdeyse basılır.
+          setPaymentInfo({ conversationId: guvenliKimlik(orderId) || guvenliKimlik(conversationId), token })
+          setDogrulananSiparisId(orderId)
           clearCart({ silent: true })
           try {
             localStorage.removeItem('venthub-cart');
@@ -75,16 +144,24 @@ const PaymentSuccessPage: React.FC = () => {
             localStorage.setItem('vh_last_order_status', 'success');
             localStorage.setItem('vh_clear_server_cart_once', '1');
           } catch { }
-          if (orderId) await fetchOrderDetails(orderId)
+          await fetchOrderDetails(orderId)
           toast.success(t('checkout.paymentSuccess'))
           return
         }
 
         // 1b) Callback eslesmeyi dogrulayamadiysa: para alindi, siparis beklemede.
         // Sepet temizlenir (odeme gerceklesti) ama tekrar odeme yolu KAPALI kalir.
+        // URN-83 (güvenlik incelemesi 10-10, bulgu 3): bu URL parametresi de TEK BAŞINA kanıt DEĞİLDİR; elle yazılan
+        // `?status=needs_review` ziyaretçinin sepetini siliyordu. Sepet yalnız sipariş kimliği VARSA ve o sipariş bu
+        // ziyaretçiye görünüyorsa silinir; aksi hâlde inceleme ekranı çıkar ama hiçbir yazım yapılmaz.
         if (statusParam === 'needs_review') {
+          const kayitVar = orderId ? await siparisKaydiVarMi(orderId) : false
+          if (!kayitVar) {
+            belirsizSonucuGoster()
+            return
+          }
           setStatus('inceleme')
-          setPaymentInfo({ conversationId: conversationId || orderId, token })
+          setPaymentInfo({ conversationId: guvenliKimlik(orderId) || guvenliKimlik(conversationId), token })
           clearCart({ silent: true })
           try {
             localStorage.removeItem('venthub-cart');
@@ -94,7 +171,7 @@ const PaymentSuccessPage: React.FC = () => {
             localStorage.setItem('vh_last_order_status', 'needs_review');
             localStorage.setItem('vh_clear_server_cart_once', '1');
           } catch { }
-          if (orderId) await fetchOrderDetails(orderId)
+          await fetchOrderDetails(orderId)
           return
         }
 
@@ -105,16 +182,16 @@ const PaymentSuccessPage: React.FC = () => {
           })
 
           if (error) {
+            // Doğrulama çağrısı düştü: ödemenin alınıp alınmadığı BİLİNMİYOR → belirsiz (başarısız DEĞİL).
             reportError(error, { context: 'Callback verify error' })
-            setStatus('error')
-            setPaymentInfo({ errorMessage: error.message || t('payment.verifyError') })
+            belirsizSonucuGoster()
             toast.error(t('payment.verifyError'))
             return
           }
 
           if (data?.status === 'needs_review') {
             setStatus('inceleme')
-            setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
+            setPaymentInfo({ conversationId: guvenliKimlik(data?.iyzico?.conversationId) || guvenliKimlik(conversationId) || guvenliKimlik(orderId), token })
             clearCart({ silent: true })
             try {
               localStorage.removeItem('venthub-cart');
@@ -130,7 +207,11 @@ const PaymentSuccessPage: React.FC = () => {
 
           if (data?.status === 'success') {
             setStatus('success')
-            setPaymentInfo({ conversationId: conversationId || orderId || data?.iyzico?.conversationId, token })
+            // Numara SUNUCUDAN gelen değerdir (callback cevabı); URL'deki değerler ikincildir ve güvenli biçimdeyse basılır.
+            setPaymentInfo({ conversationId: guvenliKimlik(data?.iyzico?.conversationId) || guvenliKimlik(conversationId) || guvenliKimlik(orderId), token })
+            // Token ile gelen başarıyı URL'deki `orderId`'ye BAĞLAYAN bir alan callback cevabında yok (EDGE işi, ayrı
+            // kart): bağlantı yalnız sipariş veritabanında ödenmiş görünüyorsa o kimliğe gider, yoksa sipariş listesine.
+            if (orderId && (await siparisDogrulandiMi(orderId))) setDogrulananSiparisId(orderId)
             clearCart({ silent: true })
             try {
               localStorage.removeItem('venthub-cart');
@@ -145,10 +226,18 @@ const PaymentSuccessPage: React.FC = () => {
             return
           }
 
-          setStatus('error')
-          const msg = data?.iyzico?.errorMessage || t('payment.failedGeneric')
-          setPaymentInfo({ errorMessage: msg })
-          toast.error(t('payment.failedToast', { msg }))
+          // `failure` cevabı ekranı "başarısız" yapar. NOT: iyzico-callback bugün `retrieve` null döndüğünde ve
+          // catch yolunda da `failure` yönlendiriyor; bu dal kesin ret kanıtı DEĞİL, o yollar `pending` verene
+          // kadar (URN-89, Pazar sonrası) çift tahsilat riski kısmen sürer. `pending` ya da tanınmayan bir cevap
+          // "başarısız" demek değildir: ödeme alınmış olabilir → belirsiz.
+          if (data?.status === 'failure') {
+            setStatus('error')
+            const msg = data?.iyzico?.errorMessage || t('payment.failedGeneric')
+            setPaymentInfo({ errorMessage: msg })
+            toast.error(t('payment.failedToast', { msg }))
+            return
+          }
+          belirsizSonucuGoster()
           return
         }
 
@@ -160,21 +249,22 @@ const PaymentSuccessPage: React.FC = () => {
 
           const { data, error } = await (supabase
             .from('venthub_orders'))
-            .select('status')
+            .select('status, payment_status')
             .eq('id', orderId)
             .maybeSingle()
 
           if (error) {
+            // Sipariş okunamadı: ödemenin durumu BİLİNMİYOR → belirsiz (başarısız DEĞİL).
             reportError(error, { context: 'Order fetch error' })
-            setStatus('error')
-            setPaymentInfo({ errorMessage: 'Sipariş doğrulama hatası' })
-            toast.error('Sipariş doğrulama hatası')
+            belirsizSonucuGoster()
+            toast.error(t('payment.verifyError'))
             return
           }
 
-          if (data && (data.status === 'paid' || data.status === 'confirmed')) {
+          if (siparisOdenmisMi(data)) {
             setStatus('success')
-            setPaymentInfo({ conversationId: conversationId || orderId, token })
+            setPaymentInfo({ conversationId: guvenliKimlik(orderId) || guvenliKimlik(conversationId), token })
+            setDogrulananSiparisId(orderId)
             clearCart({ silent: true })
             try {
               localStorage.removeItem('venthub-cart');
@@ -190,28 +280,32 @@ const PaymentSuccessPage: React.FC = () => {
           }
         }
 
-        // 4) Diğer durumlarda hatayı göster
-        if (errorMessage) {
+        // 4) Buraya gelindiyse ödeme DOĞRULANMADI. "Ödeme Başarısız" ekranı yalnız callback'in `failure`
+        // yönlendirmesi ya da bir `errorMessage` ile çıkar; callback `failure`'ı bugün `retrieve` null ve catch
+        // yollarında da verdiği için bu kesin ret kanıtı sayılmaz (düzeltme URN-89). Geri kalan her durum
+        // (`status=success` ama sipariş ödenmiş görünmüyor, sipariş bulunamadı, `pending`, parametresiz adres)
+        // BELİRSİZDİR: ödeme alınmış olabilir, "Tekrar Dene" çift tahsilat demektir (güvenlik incelemesi 10-10).
+        // URL'deki `errorMessage` ekrana BASILMAZ (adres elle yazılabilir; bulgu 5): sözlükteki genel metin çıkar.
+        if (statusParam === 'failure' || errorMessage) {
           setStatus('error')
-          setPaymentInfo({ errorMessage })
+          setPaymentInfo({ errorMessage: t('payment.failedGeneric') })
           try { localStorage.setItem('vh_last_order_status', 'failure') } catch { }
-          toast.error(t('payment.errorDuring', { msg: errorMessage }))
+          toast.error(t('payment.failedGeneric'))
         } else {
-          setStatus('error')
-          setPaymentInfo({ errorMessage: t('payment.unverified') })
-          try { localStorage.setItem('vh_last_order_status', 'failure') } catch { }
-          toast.error(t('payment.unverified'))
+          belirsizSonucuGoster()
         }
       } catch (e: unknown) {
+        // Beklenmeyen hata: ödemenin durumu BİLİNMİYOR → belirsiz (başarısız DEĞİL).
         reportError(e, { context: 'Verify catch error' })
-        const err = e as { message?: string }
-        setStatus('error')
-        setPaymentInfo({ errorMessage: err?.message || t('payment.unexpected') })
+        belirsizSonucuGoster()
         toast.error(t('payment.unexpected'))
       }
     }
 
-    if (status === 'loading') verify()
+    if (status === 'loading' && !dogrulamaBasladi.current) {
+      dogrulamaBasladi.current = true
+      verify()
+    }
   }, [searchParams, clearCart, status, t])
 
   if (status === 'loading') {
@@ -243,18 +337,31 @@ const PaymentSuccessPage: React.FC = () => {
           <div className="bg-warning-orange/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
             <ShieldCheck size={32} className="text-warning-orange" />
           </div>
+          {/* İki ayrı metin: `alındı, eşleştirme sürüyor` (callback needs_review dedi, para çekildi) ile `belirsiz`
+              (doğrulanamadı: ödeme alınmış OLABİLİR). Belirsizde "alındı" DENMEZ, "başarısız" da denmez. */}
           <h2 className="text-2xl font-bold text-industrial-gray mb-4">
-            {t('payment.reviewTitle')}
+            {paymentInfo?.belirsiz ? t('payment.pendingTitle') : t('payment.reviewTitle')}
           </h2>
           <p className="text-steel-gray mb-4">
-            {t('payment.reviewDesc')}
+            {paymentInfo?.belirsiz ? t('payment.pendingDesc') : t('payment.reviewDesc')}
           </p>
           <p className="text-industrial-gray font-semibold mb-6">
-            {t('payment.reviewWarning')}
+            {paymentInfo?.belirsiz ? t('payment.pendingWarning') : t('payment.reviewWarning')}
           </p>
           {paymentInfo?.conversationId && (
             <p className="text-sm text-steel-gray mb-6">
               {t('payment.orderNoLabel')}: <span className="font-mono">{paymentInfo.conversationId}</span>
+            </p>
+          )}
+          {paymentInfo?.belirsiz && doluMu(t('footer.email')) && (
+            <p className="text-sm text-steel-gray mb-6">
+              {t('payment.pendingContactLabel')}:{' '}
+              <a
+                href={`mailto:${t('footer.email')}`}
+                className="text-primary-navy underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary-blue"
+              >
+                {t('footer.email')}
+              </a>
             </p>
           )}
           <div className="space-y-3">
@@ -308,6 +415,10 @@ const PaymentSuccessPage: React.FC = () => {
     )
   }
 
+  // Bağlantı hedefi yalnız DOĞRULANMIŞ sipariş kimliğidir (veritabanında ödenmiş görünen); yoksa (ör. yalnız token ile
+  // doğrulanan başarı) "sipariş detayı" boş ya da uydurma kimlikli adrese değil sipariş listesine gider.
+  const siparisKimligi = dogrulananSiparisId
+
   return (
     <div className="min-h-screen bg-light-gray flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
@@ -317,9 +428,12 @@ const PaymentSuccessPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-industrial-gray mb-4">
           {t('payment.orderCompletedTitle')}
         </h2>
-        <p className="text-steel-gray mb-6">
-          {t('payment.orderNoLabel')}: <strong>{paymentInfo?.conversationId || 'DEMO-ORDER'}</strong>
-        </p>
+        {/* URN-83: sipariş numarası yoksa satır HİÇ çıkmaz — eskiden burada sabit "DEMO-ORDER" yazıyordu. */}
+        {paymentInfo?.conversationId && (
+          <p className="text-steel-gray mb-6">
+            {t('payment.orderNoLabel')}: <strong>{paymentInfo.conversationId}</strong>
+          </p>
+        )}
         <p className="text-steel-gray mb-8">
           {t('payment.orderCompletedDesc')}
         </p>
@@ -353,7 +467,7 @@ const PaymentSuccessPage: React.FC = () => {
         )}
         <div className="space-y-3">
           <Link
-            href={Routes.account.orderDetail(searchParams?.get('orderId') || '')}
+            href={siparisKimligi ? Routes.account.orderDetail(siparisKimligi) : Routes.account.orders()}
             className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
           >
             {t('payment.viewOrderDetails')}

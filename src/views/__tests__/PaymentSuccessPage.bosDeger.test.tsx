@@ -41,7 +41,13 @@ vi.mock('@/lib/supabase/client', () => ({
   supabaseBrowserClient: {
     functions: { invoke: vi.fn() },
     from: vi.fn(() => ({
-      select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn(async () => ({ data: null, error: null })) })) })),
+      // URN-83: başarı ekranı yalnız veritabanında ÖDENMİŞ görünen siparişte çıkar; bu test rozeti ölçtüğü için
+      // sipariş ödenmiş döner (yoksa doğrulama başarısız sayılır, "kontrol ediliyor" ekranı çıkar ve rozet hiç çizilmez).
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: vi.fn(async () => ({ data: { status: 'confirmed', payment_status: 'paid' }, error: null })),
+        })),
+      })),
     })),
   },
 }))

@@ -8,7 +8,11 @@ import { doluMetinler } from '@/utils/bosDegerKorumasi'
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
 interface TypeComparisonProps {
-    onOpenWizard: () => void
+    /**
+     * Sihirbaz tetikleyicisi. VERİLMEZSE "kararsız mısınız" kartı hiç çizilmez (URN-83: hava perdesi
+     * sihirbazı kapalıyken kart, bozuk bir akışa davet etmesin; bkz. `airCurtainWizardGate.ts`).
+     */
+    onOpenWizard?: () => void
     onSelectType: (type: 'elektrikli' | 'ortam') => void
 }
 
@@ -197,23 +201,25 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 </div>
 
                 {/* Wizard CTA for Uncertain Users */}
-                <div className="text-center p-8 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-100">
-                    <HelpCircle className="mx-auto text-purple-500 mb-4" size={40} />
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {t('category.typeComparison.stillUndecided')}
-                    </h3>
-                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                        {t('category.typeComparison.wizardPitch')}
-                    </p>
-                    <button
-                        type="button"
-                        onClick={onOpenWizard}
-                        className="focus-ring px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors inline-flex items-center gap-2"
-                    >
-                        <HelpCircle size={20} />
-                        {t('category.typeComparison.helpMe')}
-                    </button>
-                </div>
+                {onOpenWizard && (
+                    <div className="text-center p-8 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl border border-purple-100">
+                        <HelpCircle className="mx-auto text-purple-500 mb-4" size={40} />
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {t('category.typeComparison.stillUndecided')}
+                        </h3>
+                        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                            {t('category.typeComparison.wizardPitch')}
+                        </p>
+                        <button
+                            type="button"
+                            onClick={onOpenWizard}
+                            className="focus-ring px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors inline-flex items-center gap-2"
+                        >
+                            <HelpCircle size={20} />
+                            {t('category.typeComparison.helpMe')}
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     )
