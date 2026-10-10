@@ -11,7 +11,12 @@
  * PLAN (--plan <plan.json>):
  *   {"kalemler":[{"slug":"<kategori slug>","yol":["description_i18n","tr"],"eski":null,"yeni":"<metin>","tam":true}]}
  *   yol: ["description_i18n","tr"|"en"] · ["hero_description"] · ["marketing_title"] · ["features",<i>,"title"|"description"]
+ *        KTL-21 arama sonucu alanları: ["@kolon","seo_title"|"seo_desc"] (categories KOLONLARI) ·
+ *        ["seo_title_en"|"seo_desc_en"] (metadata). Uzunluk: başlık 20-50 (eksiz), açıklama 110-155.
  *   tam=true : alanın BÜTÜN değeri değişir; eski = şu anki tam değer (alan boş/yok ise eski=null).
+ *   GERİ ALMA (KTL-21): yalnız arama alanlarında yeni=null "alanı boşalt" demektir (tam=true, eski = şu anki
+ *   tam değer ZORUNLU; kör silme yok). Kolon null olur, metadata anahtarı silinir. Yazım planının tersi:
+ *   her kalemde eski ↔ yeni yer değiştirir (yazımdan önce alan boştu → geri alma yeni=null).
  *   tam=false: eski = alanda TAM 1 kez geçen parça; yalnız o parça yeni ile değişir.
  *   Bir kategorinin birden çok kalemi SIRAYLA uygulanır, kategori başına TEK PATCH gider.
  *
@@ -42,12 +47,23 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { kanon, kategoriPlani, alanOku, yolEtiketi } from './kategori-meta-duzelt-kurallar.mjs'
+import { kanon, kategoriPlani, alanOku, yolEtiketi, KOLON } from './kategori-meta-duzelt-kurallar.mjs'
 
 /** @typedef {import('./kategori-meta-duzelt-kurallar.mjs').Kalem} Kalem */
-/** @typedef {{ id: string, tenant_id: string, slug: string, metadata: Record<string, unknown> | null, updated_at: string }} KategoriSatiri */
+/** @typedef {{ id: string, tenant_id: string, slug: string, metadata: Record<string, unknown> | null, updated_at: string, seo_title?: string | null, seo_desc?: string | null }} KategoriSatiri */
 
-const SECIM = 'id,tenant_id,slug,metadata,updated_at'
+// KTL-21: seo_title / seo_desc ÜST DÜZEY kolonlar; satır, çekirdeğin tek belge kuralıyla çalışması için
+// {...metadata, "@kolon": {seo_title, seo_desc}} belgesine çevrilir (belge()); yazımda geri bölünür (bol()).
+const SECIM = 'id,tenant_id,slug,metadata,updated_at,seo_title,seo_desc'
+
+/** Satır → çekirdek belgesi. "@kolon" anahtarı gerçek bir metadata anahtarı olamaz. */
+const belge = (/** @type {KategoriSatiri} */ s) => ({ ...(s.metadata ?? {}), [KOLON]: { seo_title: s.seo_title ?? null, seo_desc: s.seo_desc ?? null } })
+
+/** Belge → {metadata, kolon}. */
+function bol(/** @type {Record<string, unknown>} */ b) {
+  const { [KOLON]: kolon, ...metadata } = b
+  return { metadata, kolon: /** @type {{ seo_title: string | null, seo_desc: string | null }} */ (kolon ?? { seo_title: null, seo_desc: null }) }
+}
 const ISTEK_SURESI_MS = 30000
 
 /** Çıkış: mesajları yazıp kodla biter (process.exit çağrılmaz: çıktı kesilmesin). */
@@ -133,7 +149,7 @@ async function tekSatirOku(/** @type {string} */ id) {
   return /** @type {KategoriSatiri} */ (k[0])
 }
 
-const yedekSatiri = (/** @type {KategoriSatiri} */ s) => ({ id: s.id, tenant_id: s.tenant_id, slug: s.slug, updated_at: s.updated_at, metadata: s.metadata })
+const yedekSatiri = (/** @type {KategoriSatiri} */ s) => ({ id: s.id, tenant_id: s.tenant_id, slug: s.slug, updated_at: s.updated_at, metadata: s.metadata, seo_title: s.seo_title ?? null, seo_desc: s.seo_desc ?? null })
 
 /** Yedek dosyasını yazar ve OKUYARAK doğrular (yazımdan ÖNCE). Var olan dosya ezilmez. */
 function yedekYaz(/** @type {string} */ yol, /** @type {ReturnType<typeof yedekSatiri>[]} */ satirlar) {
@@ -151,7 +167,8 @@ function yedekDogrula(/** @type {string} */ yol, /** @type {ReturnType<typeof ye
   let oku
   try { oku = JSON.parse(readFileSync(yol, 'utf8')) } catch { throw new Cikis(1, [`⛔ yedek dosyası okunamadı/bozuk: ${yol} — YAZIM YAPILMADI`]) }
   const tamam = Array.isArray(oku?.satirlar) && oku.satirlar.length === satirlar.length
-    && satirlar.every((s, i) => oku.satirlar[i]?.id === s.id && kanon(oku.satirlar[i]?.metadata) === kanon(s.metadata))
+    && satirlar.every((s, i) => oku.satirlar[i]?.id === s.id && kanon(oku.satirlar[i]?.metadata) === kanon(s.metadata)
+      && (oku.satirlar[i]?.seo_title ?? null) === (s.seo_title ?? null) && (oku.satirlar[i]?.seo_desc ?? null) === (s.seo_desc ?? null))
   if (!tamam) throw new Cikis(1, [`⛔ yedek içeriği canlıyla uyuşmuyor: ${yol} — YAZIM YAPILMADI`])
 }
 
@@ -167,14 +184,22 @@ function yedegeEkle(/** @type {string} */ yol, /** @type {KategoriSatiri} */ sat
 async function kategoriyeYaz(/** @type {KategoriSatiri} */ ilk, /** @type {Kalem[]} */ kalemler) {
   let satir = ilk
   for (let deneme = 0; deneme < 2; deneme++) {
-    const p = kategoriPlani(satir.metadata, kalemler)
+    const p = kategoriPlani(belge(satir), kalemler)
     if (p.red) throw new Cikis(1, [`⛔ ${satir.slug}: yeniden okunan satırda kalem RED (canlı bu arada değişmiş): ${p.sonuclar.filter(s => s.durum === 'red').map(s => `${yolEtiketi(s.kalem.yol)}: ${s.sebep}`).join('; ')}`])
-    if (!p.degisen) return { yazildi: false, beklenen: satir.metadata, sonuclar: p.sonuclar }
+    if (!p.degisen) return { yazildi: false, beklenen: belge(satir), sonuclar: p.sonuclar }
+    // KTL-21: yalnız DEĞİŞEN parça gönderilir: metadata değiştiyse metadata, kolon değiştiyse o kolon.
+    const yeniBelge = /** @type {Record<string, unknown>} */ (p.yeni_metadata)
+    const { metadata: yeniMeta, kolon: yeniKolon } = bol(yeniBelge)
+    /** @type {Record<string, unknown>} */
+    const govdeNesnesi = {}
+    if (kanon(yeniMeta) !== kanon(satir.metadata ?? {})) govdeNesnesi.metadata = yeniMeta
+    if ((yeniKolon.seo_title ?? null) !== (satir.seo_title ?? null)) govdeNesnesi.seo_title = yeniKolon.seo_title
+    if ((yeniKolon.seo_desc ?? null) !== (satir.seo_desc ?? null)) govdeNesnesi.seo_desc = yeniKolon.seo_desc
     const url = `${U}/rest/v1/categories?id=eq.${encodeURIComponent(satir.id)}&tenant_id=eq.${encodeURIComponent(satir.tenant_id)}&updated_at=eq.${encodeURIComponent(satir.updated_at)}&select=id`
-    const r = await istek(url, { method: 'PATCH', headers: { ...H, Prefer: 'return=representation' }, body: JSON.stringify({ metadata: p.yeni_metadata }) }, 1)
+    const r = await istek(url, { method: 'PATCH', headers: { ...H, Prefer: 'return=representation' }, body: JSON.stringify(govdeNesnesi) }, 1)
     await durumKontrol(r, `${satir.slug} yazımı`, 1)
     const govde = await r.json().catch(() => null)
-    if (Array.isArray(govde) && govde.length === 1) return { yazildi: true, beklenen: p.yeni_metadata, sonuclar: p.sonuclar }
+    if (Array.isArray(govde) && govde.length === 1) return { yazildi: true, beklenen: yeniBelge, sonuclar: p.sonuclar }
     if (!Array.isArray(govde) || govde.length > 1) throw new Cikis(1, [`⛔ ${satir.slug}: PATCH yanıtı beklenmedik (${JSON.stringify(govde)?.slice(0, 120)})`])
     if (deneme === 1) throw new Cikis(1, [`⛔ ${satir.slug}: PATCH iki kez 0 satır etkiledi — satır sürekli değişiyor ya da yazma yetkisi yok (RLS yazmayı sessizce boşaltır). Yazılmadı.`])
     console.log(`  ↻ ${satir.slug}: 0 satır etkilendi (yarış ya da yetki); satır yeniden okunup kalemler yeniden uygulanacak (tek deneme)`)
@@ -224,14 +249,14 @@ async function main() {
       for (const k of tekrar) { console.log(`  ⛔ ${yolEtiketi(Array.isArray(k.yol) ? k.yol : [])}: R4 aynı alan planda birden çok kalemde`); red++ }
       continue
     }
-    const p = kategoriPlani(satirlar[0].metadata, ks)
+    const p = kategoriPlani(belge(satirlar[0]), ks)
     for (const s of p.sonuclar) {
       const etiket = yolEtiketi(Array.isArray(s.kalem?.yol) ? s.kalem.yol : [])
       const kurallar = s.kurallar.map(x => `${x.gecti ? '✓' : '✗'}${x.kural}${!x.gecti && x.ayrinti ? ` (${x.ayrinti})` : ''}`).join(' ')
       if (s.durum === 'red') { red++; console.log(`  ⛔ ${etiket}  RED: ${s.sebep}\n     kurallar: ${kurallar}`); continue }
       if (s.durum === 'ayni') { ayni++; console.log(`  = ${etiket}  zaten uygulanmış (atlanır)\n     kurallar: ${kurallar}`); continue }
       yazilacak++
-      console.log(`  → ${etiket}${s.kalem.tam ? '' : '  (parça)'}\n     ESKİ: ${s.kalem.tam ? (s.once === undefined || s.once === null || s.once === '' ? '(boş)' : s.once) : s.kalem.eski}\n     YENİ: ${s.kalem.tam ? s.sonra : s.kalem.yeni}\n     kurallar: ${kurallar}`)
+      console.log(`  → ${etiket}${s.kalem.tam ? '' : '  (parça)'}\n     ESKİ: ${s.kalem.tam ? (s.once === undefined || s.once === null || s.once === '' ? '(boş)' : s.once) : s.kalem.eski}\n     YENİ: ${s.sonra === null ? '(boş — alan temizlenir)' : s.kalem.tam ? s.sonra : s.kalem.yeni}\n     kurallar: ${kurallar}`)
     }
     if (p.degisen && !p.red) yazimlar.push({ satir: satirlar[0], kalemler: ks })
   }
@@ -261,7 +286,8 @@ async function main() {
   const sonra = new Map((await kategorileriOku()).map(c => [c.id, c]))
   const farkli = []
   for (const z of yazilan) {
-    const canli = sonra.get(z.id)?.metadata
+    const satirSonra = sonra.get(z.id)
+    const canli = satirSonra ? belge(satirSonra) : undefined
     if (kanon(canli) !== kanon(z.beklenen)) {
       farkli.push(`${z.slug}: ${z.kalemler.filter(k => kanon(alanOku(canli, k.yol)) !== kanon(alanOku(/** @type {Record<string, unknown>} */ (z.beklenen), k.yol))).map(k => yolEtiketi(k.yol)).join(', ') || 'diğer anahtarlar değişmiş'}`)
     }
