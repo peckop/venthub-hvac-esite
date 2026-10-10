@@ -17,6 +17,7 @@ import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAn
 import { useI18n } from '../i18n/I18nProvider'
 import { getFamiliesEnriched } from '../lib/services/family.service'
 import type { FamilyListItem } from '../types/ui-models'
+import { doluMu } from '../utils/bosDegerKorumasi'
 
 /**
  * Marka hikâyesi ve kurumsal özet satırları — VERİ katmanı (bkz. `src/data/brands.ts` başlığı).
@@ -258,10 +259,14 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
                   </div>
                   
                   <div className="space-y-6">
-                    {detail?.stats?.map((stat, i) => (
+                    {/* URN-84: etiketi sözlükte BOŞ kalan satır (statCountries) çizilmez; etiketsiz değer tek başına anlamsız. */}
+                    {detail?.stats
+                      ?.map((stat) => ({ stat, etiket: t(`brands.detail.${stat.labelKey}`) }))
+                      .filter(({ etiket }) => doluMu(etiket))
+                      .map(({ stat, etiket }, i) => (
                       <div key={i} className="flex justify-between items-end border-b border-white/10 pb-4">
                         <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
-                          {t(`brands.detail.${stat.labelKey}`)}
+                          {etiket}
                         </span>
                         <span className="text-sm font-medium">
                           {typeof stat.value === 'string' ? stat.value : brandText(stat.value, lang)}
