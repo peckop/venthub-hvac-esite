@@ -65,7 +65,9 @@ vi.mock('../../lib/services/category.service', () => ({
 }))
 vi.mock('../../lib/services/family.service', () => ({
   getAllFamilySlugs: async () => [{ slug: 'vortice-lineo-quiet' }],
-  getFamilyLastModified: async () => new Map<string, string>(),
+  getFamilySitemapData: async () => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
+  // OPS-51: marka ürün sayısı ENJEKTE (DB yerine); bu dosya EN yayın anahtarını ölçer, marka kararını değil.
+  getBrandFamilyCount: async () => 5,
 }))
 
 /** `EN_YAYIN` verilen değerde sabitlenir; modül grafiği sıfırdan yüklenir. */
@@ -73,6 +75,8 @@ async function bayrakla(acik: boolean) {
   vi.resetModules()
   vi.doMock('../../config/features', () => ({
     EN_YAYIN: acik,
+    // Site haritası adresleri `yuzeyAdresleri` üzerinden üretilir (REC-300 3e-1); o modül bu bayrağı okur.
+    ADRES_SEMASI_K3B: false,
     UC_BOYUT_MUSTERI_YUZEYINDE: false,
     YENI_KABUK_GEZINMESI: false,
   }))

@@ -17,6 +17,15 @@ name: E2E Smoke (admin + checkout)
 # PR'da canlı veritabanına bağlanır: admin-smoke yalnız okur; checkout-smoke test hesabının sepetine
 # 1 ürün ekler, ödeme adımına bilinçli girmez; teklif-eposta-smoke CI'da atlanır (E2E_TEKLIF_EPOSTA yok).
 # Canlıya YAZAN spec buraya (`e2e/`) KONMAZ — `e2e-canli/` + canli-kanit-tek-sefer.yml (INV-CANLI-KANIT-1).
+#
+# ALT-38c: PR'ın değişen dosyaları YALNIZ dar sınıflardaysa (belge, edge, betik, karma; mantık: scripts/ci/degisiklik-sinifi.cjs) bu işin ağır
+# adımları atlanır (derleme girdisi değişmedi; ölçüm: INV-CI-SINIF-2). Migration, .github, src, public, kök ayarlar ve sınıflanamayan her yol TAM koşar.
+#
+# ALT-38f: işin süresi kısaltıldı (88 başarılı koşuda medyan 285 sn; en uzun adım Build 166 sn, apt kuyruğu 3 koşuda 187-341 sn). İki kaldıraç, her biri
+# ADIYLA aşağıda: (1) Build'te tip ve lint aşaması YALNIZ burada kapalı (`ci` ikisini zaten zorunlu kontrol olarak koşar), (2) apt adımı Build ile PARALEL
+# arka planda ve kuyruğu 75 sn × 2 ile sınırlı. Hiçbiri kapıyı gevşetmez: tarayıcı probu ve Playwright testi aynen koşar. Üçüncü bir kaldıraç (webpack derleme
+# önbelleği) ölçüldü ve ÇIKARILDI: kod PR'ının toplam süresini kısaltmıyor, depo önbellek kotasını tüketiyor (cetvel §4.4).
+# Cetvel: docs/standards/test-karnesi-standard.md §4.4 · docs/standards/ci-runner-install-standard.md §2.9 · kapılar INV-E2E-HIZLI-1/2/3/4.
 
 on:
   pull_request:
@@ -76,13 +85,37 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ steps.mergeref.outputs.ref || '' }}
+          # ALT-38c: sınıflayıcının farkı (`git diff HEAD^1 HEAD`) için birleştirme commit'i ve ebeveynleri gerekir; varsayılan derinlik 1 bunları getirmez.
+          fetch-depth: 2
+
+      # ALT-38c — DEĞİŞİKLİK SINIFI (ci.yml'deki eşiyle AYNI adım; INV-CI-SINIF-1 ikisinin birebir aynı olduğunu doğrular).
+      # PR'ın değişen dosyalarının TÜMÜ dar sınıflardaysa (belge, edge, betik, karma) siteye dokunulmamıştır: derleme, tarayıcı ve canlı veritabanı
+      # smoke'u ATLANIR; iş yine koşar ve `admin-smoke` adıyla YEŞİL biter (zorunlu kontrol adı değişmez; iş düzeyinde `if`/`needs` KULLANILMAZ:
+      # sınıf işi çökerse bağımlı iş "atlandı" = yeşil sayılırdı, adım düzeyi bu deliği kapatır). Çıktı boş/eksik/bilinmiyorsa HER ŞEY koşar.
+      - name: Değişiklik sınıfı (siteye dokunmayan PR'da Build atlanır)
+        id: sinif
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git show HEAD^1:scripts/ci/degisiklik-sinifi.cjs > "$RUNNER_TEMP/degisiklik-sinifi.cjs" 2>/dev/null; then
+            echo "::notice::değişiklik sınıfı: tam — taban kopyası yok (HEAD^1:scripts/ci/degisiklik-sinifi.cjs)"
+            printf 'sinif=tam\nneden=taban kopyası yok\n' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          cikis=0
+          node "$RUNNER_TEMP/degisiklik-sinifi.cjs" || cikis=$?
+          if [ "$cikis" -ne 0 ]; then
+            echo "::warning::değişiklik sınıfı: tam — sınıflayıcı çöktü (çıkış kodu $cikis), tam paket koşar"
+            printf 'sinif=tam\nneden=sınıflayıcı çöktü, çıkış kodu %s\n' "$cikis" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Setup pnpm
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           version: 10
 
       - name: Setup Node
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
@@ -90,6 +123,7 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         run: pnpm install --prefer-offline --config.allow-scripts true
 
       # ══════════════════════════════════════════════════════════════════════
@@ -109,12 +143,14 @@ jobs:
       # `timeout-minutes` ikinci kemerdir: betik bozulursa iş bütçesini yemesin.
       # ══════════════════════════════════════════════════════════════════════
       - name: apt sertlestirmesi
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 3
         run: bash scripts/ci/apt-hardening.sh
 
       - name: Playwright tarayici onbellegi
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         id: pw-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ms-playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
@@ -140,21 +176,54 @@ jobs:
       #
       # Bu fail-open DEĞİL: kapı bir vekilden (apt çıkış kodu) ASIL ŞEYE (Chromium
       # gerçekten açılıyor mu) taşındı ve asıl şey daha güçlü bir iddiadır.
-      - name: Playwright sistem bagimliliklari (en iyi caba)
-        continue-on-error: true
-        timeout-minutes: 11
+      # ── ALT-38f · (2) apt ADIMI BUILD İLE PARALEL (2026-10-07, 88 başarılı koşuda ölçüldü) ────────────────────────────
+      # Eskiden bu adım Build'ten ÖNCE sırayla koşuyordu: medyan 15 sn (p90 23 sn) ve 3 koşuda (%3,4) 187, 339, 341 sn (ilk deneme 300 sn'lik sınırı
+      # doldurdu). Günlükte komutun YENİ kurduğu tek şey yazı tipleri; Chromium'un çalışma kütüphaneleri koşucu imajında zaten var ("already the newest").
+      # Bu yüzden Build'i beklemesi için sebep yok: arka planda başlar (scripts/ci/arka-plan.sh), sonucu Build'ten SONRA `bekle` adımı toplar.
+      # Kuyruk kesildi: 75 sn × 2 deneme (en kötü 160 sn, Build'in süresinin içinde); eskiden 300 sn × 2.
+      # Kapı AYNI: yetenek probu (aşağıda) `bekle`den SONRA koşar ve fataldir; bu iki adım en-iyi-çabadır (continue-on-error), çünkü asıl soru
+      # "apt geçti mi" değil "tarayıcı açılıyor mu"dur (cetvel: ci-runner-install-standard.md §2.8, §2.9).
+      # ⚠ Adım gövdesi `retry-bounded.sh` ile koşar ve `timeout-minutes` taşır: INV-CI-INSTALL-1 bu paralel yolu da denetler (kemer aritmetiği: 160 sn < 4 dk).
+      - name: Playwright sistem bagimliliklari (arka planda baslat)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
+        timeout-minutes: 4
         env:
           RETRY_APT_TEMIZLE: '1'
-        run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install-deps chromium
+        run: bash scripts/ci/arka-plan.sh baslat pw-deps -- bash scripts/ci/retry-bounded.sh 75 2 -- pnpm exec playwright install-deps chromium
 
       - name: Install Playwright Chromium
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 11
         run: bash scripts/ci/retry-bounded.sh 300 2 -- pnpm exec playwright install chromium
 
+      # ── ALT-38f · (1) TİP VE LİNT AŞAMASI BURADA KAPALI ──────────────────────────────────────────────────────────────
+      # `VENTHUB_E2E_TIP_LINT_ATLA=1` next.config.mjs'de `typescript.ignoreBuildErrors` ve `eslint.ignoreDuringBuilds` açar (src/config/e2eHizliDerleme.mjs).
+      # Ölçüm: bir koşuda 92 sn derleme + 51 sn "Linting and checking validity of types". Tip ve lint hatası `ci` işinde ÜÇ yerde kırmızı verir
+      # (Lint, Type check, `Build (blocking)`); burada bir kez daha ölçmek aynı hatayı ikinci kez bulmaktır. Anahtar YALNIZ bu adımın env'inde:
+      # iş düzeyine, `$GITHUB_ENV`e, başka adıma ya da başka iş akışına KONMAZ (INV-E2E-HIZLI-2 denetler); sızarsa `ci`, Vercel ve yerel derleme tipsiz kalır.
+      - name: Build (real Supabase env)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
+        run: pnpm run build:ci
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.E2E_SUPABASE_ANON_KEY }}
+          VENTHUB_E2E_TIP_LINT_ATLA: '1'
+
+      # Paralel başlayan apt'nin sonucu burada toplanır (en çok `baslat`tan 240 sn sonrasına kadar). Süreç sonuç yazmadan ölmüşse komut ÖN PLANDA
+      # yeniden koşar (eski sıralı davranışa düşer). Adım işi DÜŞÜRMEZ; kapıyı aşağıdaki prob verir. `RETRY_APT_TEMIZLE` yedek koşu için burada da şart.
+      - name: Playwright sistem bagimliliklari (bekle, en iyi caba)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
+        continue-on-error: true
+        timeout-minutes: 7
+        env:
+          RETRY_APT_TEMIZLE: '1'
+        run: bash scripts/ci/arka-plan.sh bekle pw-deps 240
+
       # GERÇEK KAPI: sistem bağımlılıkları eksikse Chromium burada açılmaz ve iş
       # ADIYLA düşer. "apt geçti" demek tarayıcının çalıştığını kanıtlamaz; bu adım
-      # kanıtlar. Ucuz (~5 sn) ve teşhis mesajı net.
+      # kanıtlar. Ucuz (~5 sn) ve teşhis mesajı net. ALT-38f: artık Build'ten SONRA ve `bekle`den SONRA koşar.
       - name: Tarayici gercekten aciliyor mu
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         timeout-minutes: 3
         run: |
           node -e "
@@ -175,13 +244,14 @@ jobs:
             })
           "
 
-      - name: Build (real Supabase env)
-        run: pnpm run build:ci
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.E2E_SUPABASE_ANON_KEY }}
+      # ALT-34 · M6: bayrak kapalıyken (bugün) HTML'e yalnız Inter font önyüklemesi basılır; fazlası KIRMIZI, boş
+      # manifest ÖLÇÜLEMEDİ = kırmızı. Yalnız Linux'ta anlamlı (Windows'ta manifest boş). Cetvel: plan v2.2 §4 M6.
+      - name: Font preload olcumu (kapali kip, yalniz Inter)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
+        run: node scripts/ci/font-preload-olc.cjs --beklenen Inter
 
       - name: Run smoke suite (admin + checkout)
+        if: ${{ !contains(fromJSON('["belge","edge","betik","karma"]'), steps.sinif.outputs.sinif) }}
         run: pnpm exec playwright test
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ vars.E2E_SUPABASE_URL }}

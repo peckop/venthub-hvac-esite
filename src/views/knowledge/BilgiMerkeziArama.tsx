@@ -17,7 +17,8 @@ import { foldForSearch } from '../../i18n/case'
 export interface ListeKarti {
   href: string
   baslik: string
-  ozet: string
+  /** Kartta görünen metin (yazının `kartOzeti`); meta açıklaması DEĞİL. Boşsa paragraf çizilmez. */
+  kartOzeti: string
   konu: string
   tarih: string
   tarihIso: string
@@ -39,7 +40,7 @@ export default function BilgiMerkeziArama({ kartlar, dil, metin }: Props) {
   const gorunen = useMemo(() => {
     const aranan = foldForSearch(sorgu.trim(), dil)
     if (!aranan) return kartlar
-    return kartlar.filter((k) => foldForSearch(`${k.baslik} ${k.ozet} ${k.konu}`, dil).includes(aranan))
+    return kartlar.filter((k) => foldForSearch(`${k.baslik} ${k.kartOzeti} ${k.konu}`, dil).includes(aranan))
   }, [sorgu, kartlar, dil])
 
   return (
@@ -76,7 +77,7 @@ export default function BilgiMerkeziArama({ kartlar, dil, metin }: Props) {
                   <time dateTime={k.tarihIso}>{k.tarih}</time>
                 </span>
                 <h2 className="mt-3 text-xl font-bold tracking-tight text-primary-navy">{k.baslik}</h2>
-                <p className="mt-3 flex-1 text-base text-industrial-gray">{k.ozet}</p>
+                {k.kartOzeti ? <p className="mt-3 flex-1 text-base text-industrial-gray">{k.kartOzeti}</p> : <span className="flex-1" />}
                 <span className="mt-6 text-sm font-semibold text-brand-cyan-ink">{metin.oku}</span>
               </Link>
             </li>

@@ -16,8 +16,8 @@
 
 | Sınıf | Nasıl | Nerede | Neden |
 |---|---|---|---|
-| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
-| **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · hakkımızda · iletişim | İçerik deploy dışında değişmez |
+| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP) · **hakkımızda** (canlı marka/ürün/aile sayacı, URN-75). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
+| **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · iletişim | İçerik deploy dışında değişmez |
 | **Dinamik** | `export const dynamic = 'force-dynamic'` | Admin/** · hesap/** · API rotaları | Kullanıcıya/oturuma özel; önbelleklenirse veri sızar |
 
 **`ssr: false` ana rotalarda YASAK** (CLAUDE.md kural 4). İstemci-tarafı veri gerektiren
@@ -102,11 +102,40 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout) yeniden üretilir; keşif/ana sayfa etiketlerine DOKUNMAZ. Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
+> **HAKKIMIZDA SAYACI (URN-75, 2026-10-09).** `/[lang]/about` artık `tam statik` DEĞİL: marka / aktif ürün / aile sayısı
+> `getSiteSayaclari` ile canlı veriden gelir (`src/app/_components/siteSayaclari.ts`, `unstable_cache`, anahtar
+> `['site-sayaclari', lang, tenantId]`, etiket `PRODUCTS_DISCOVERY_TAG` + `discoveryTag(tenantId)`, `revalidate = 3600`).
+> Dayandığı üç tablo (`products` status/family_id/deleted_at, `product_families`, `brands`) keşif etiketini ZATEN tazelediği için
+> yeni tetik/handler dalı gerekmedi. Okunamazsa sayaç `null` olur ve kartlar çizilmez (uydurma sayı yok). Kapı:
+> `INV-HAKKIMIZDA-SAYAC-1` (`src/__tests__/conformance/hakkimizda-sayac.test.ts`). **Canlı tazeleme ölçümü** (§1.1: ürün değişince sayfanın
+> gerçekten yenilendiği) yayın sonrası ayrıca yapılır; bu kapı kaynağı ölçer.
+>
+> **SİTE HARİTASI MODEL `lastmod`'U (REC-300 3e-2, 2026-10-02):** model adresinin `lastModified`'ı `products.updated_at`'tir; `on_products_change` tetiği değere bakmadığı için aynı değerli toplu UPDATE de modelin `updated_at`'ini kaydırır ("hepsi değişti" sinyali) — bilinçli kabul, tetiği değere duyarlı yapmak ayrı ALTYAPI kartıdır.
+
 > **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı
 > kullanmak sessiz bir kaçaktır: prerender edilmiş yol aile slug'ı olduğu için var olmayan bir
 > yol geçersiz kılınır ve sayfa hiç yenilenmez. `products` ve `inventory_movements` dalları tam
 > bunu yapıyordu (2026-08-15 denetimi yakaladı); dört dal (`products`/`inventory_movements`/
 > `product_prices`/`product_images`) artık tek yardımcıdan (`revalidateFamilyChain`) çözüyor.
+>
+> **YOL LİSTESİ ADRES ŞEMASINDAN GELİR (REC-300 Faz 3g, 2026-09-30).** Webhook aile ve kategori yollarını sabit
+> `/tr/products/<slug>` biçiminde yazmaz; `src/lib/adres/tazelemeYollari.ts` (`aileYollari`, `kategoriYollari`)
+> her iki şemada (bugünkü + K3-b) ve iki dilde üretir. Sebep: `ADRES_SEMASI_K3B` açılınca canlı adres `/tr/urun/<slug>`
+> olur; sabit yol yanlış sayfayı tazeler. Bedel: aile başına 3 benzersiz yol (EN'de iki şema aynı yolu verir; `Set` tekilleştirir) (price_lists fan-out **47 aile → 141 çağrı**).
+> Kategori dalı: yeni şemanın iki segmentli yolu (`/tr/kategori/<üst>/<alt>`, EN `/en/category/<üst>/<alt>`) üretilir;
+> bugünkü şemanın `/<dil>/category/<üst>/<alt>` yolu üretilmez (bayrak kapalıyken yalnız 308, önbelleği yok — URN-7 ölçümü 2026-10-01).
+> Kapı: `INV-TAZELEME-YOL-1` (`src/lib/adres/__tests__/tazelemeYollari.test.ts`). **Model adresi (3g-2, ALT-16, 2026-10-05):**
+> products dalı, ürün SKU'su (UPDATE'te eski SKU da) `yayindaModeller` listesindeyse modelin TR + EN sayfa yolunu
+> (`/tr/urun/<slug>-p-<sku>`) `skuModelYollari` (adres tek noktası `adresUret`) ile tazeler; liste dışı SKU ve boş listede
+> ek yol yoktur, çağrı başına en çok 4 ek yol. Kapı: `INV-WEBHOOK-MODEL-YOLU-1`
+> (`src/app/api/webhook/supabase/__tests__/route.model-yolu{,.acik}.test.ts`, bayrak kapalı ve açık kip).
+>
+> **ESKİ DEĞER TAZELEMESİ (URN-12, REC-300 3g-2a, 2026-10-02).** Webhook yalnız yeni değeri değil, UPDATE'te `old_record`'daki
+> ESKİ değeri de tazeler: aile/kategori slug'ı (kategoride `metadata.slug` ve `parent_id` dahil; üst değişince çocukların eski
+> iki segmentli yolu), ürünün eski `family_id` (+ serisi), eski ve yeni `category_id` + `subcategory_id`. Yollar/etiketler tekilleştirilir.
+> `old_record` INSERT'te NULL, DELETE'te `record` NULL (DELETE zaten eski satırı tazeler); UPDATE'te `old_record` eksikse yalnız yeni
+> değer tazelenir (güvenli düşüş). Gerekçe: A→B→A dönüşünde önbellekli 308 döngü yapabilir (ana plan m.9, O2; önbellek doluluğu ÖLÇÜLMEDİ).
+> Kapı: `route.tags.test.ts` `U12-a..s` (sabotajla kanıtlandı).
 >
 > **`revalidateTag` yalnız o tag'i tüketen bir `unstable_cache` varsa iş görür.** `familyTag`'in
 > tüketicisi yoktu → çağrı sessiz no-op'tu. PDP verisi `React.cache()` ile sarılı olduğundan

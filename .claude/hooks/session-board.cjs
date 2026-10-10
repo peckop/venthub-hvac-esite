@@ -10,7 +10,8 @@
  * böylece kullanıcı mesaj taşıyıcısı olmaktan kurtulur.
  *
  * stdin: { session_id, cwd, ... }
- * stdout: { hookSpecificOutput: { hookEventName, additionalContext } }
+ * stdout: { hookSpecificOutput: { hookEventName, additionalContext, sessionTitle? } }
+ *   sessionTitle = şeridin pencere adı ("Araç", "Ops"…; yalnız claim varsa ve source startup/resume/fork; REC-525, aşağıda).
  */
 const fs = require('fs')
 const path = require('path')
@@ -159,7 +160,11 @@ try {
  * Kapı: INV-SESSIONSTART-TAVAN-1 (dört açılış türü, şişirilmiş durum dosyası + döküm).
  */
 // VH_SESSIONSTART_TOPLAM_TEST yalnız kapı testindedir (daralma yolunu zorlar); üretimde ayarlı olmaz.
-const TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
+// let: yalnız OPS rolünde departman haritası kısa özetinin uzunluğu kadar genişler (HRT-29; bölüm küçülmez, bkz. haritaBolumuEkle),
+// ama genişleme MUTLAK_TAVAN'ı aşamaz: kancanın kendi sınırı 10.000'dir; 9.000 + 1.855 = 10.855 compact açılışında kırpılıyordu
+// (OPS denetimi, #1690 bulgu 1: ölçülen 10.719). Taşan pay öncelik 0 olmayan bölümlerden (durum, döküm) orantılı alınır.
+let TOPLAM_TAVAN = Number(process.env.VH_SESSIONSTART_TOPLAM_TEST) || 9000
+const MUTLAK_TAVAN = 9900
 const DURUM_TAVAN = 4500 // 09-29 Recep endişesi: ajanı KÖR bırakma; 3000 → 4500 (tipik son blok ~2.000, uzun blokta baş+son korunur)
 const DOKUM_TAVAN = 3600 // Recep'in son 8 mesajı (mesaj başına ≤1.500) için bölüm bütçesi; toplam aşılırsa orantılı daralır
 const bolumler = []
@@ -272,6 +277,115 @@ function rolKartiSatiri(lane) {
     return `ROL KARTI: ${rol} (kart okunamadi: ${(e && (e.code || e.message)) || 'bilinmeyen'} — docs/roller/${rol}.md'yi ELLE oku)\n`
   }
 }
+/**
+ * ⭐PENCERE ADI = ŞERİT ADI (REC-525, 2026-09-30). `hookSpecificOutput.sessionTitle` `/rename` ile AYNI etkidir
+ * (belge: code.claude.com/docs/en/hooks). Pencereleri IDE eklentisi açıyor, `--name` bayrağı yok ve her açılış
+ * `--resume=<sid>`; ad verilmezse pencereler `venthub-hvac-72` gibi anlamsız adlarla açılır ve şerit ↔ pencere
+ * eşlemesi (SendMessage) karışır (REC-404). Ad oturumla KALICIdır: bir kez verilince sonraki resume'lar da taşır.
+ *
+ * KURALLAR:
+ *  · ELLE VERİLMİŞ FARKLI AD EZİLMEZ (ORTA-1): belge (SessionStart girdisi) `session_title` alanını verir — "oturum
+ *    başlığı zaten ayarlıysa (--name, /rename)". Dolu VE tablodaki adla farklıysa alan HİÇ eklenmez. Boşsa ya da
+ *    tablodaki adla AYNIYSA (harf ve Türkçe harf farksız: "Araç" = "arac" = "ARAÇ") kanonik ad YAZILIR (REC-525 takip:
+ *    restart/resume'da harness dökümdeki /rename adını geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri
+ *    yazmak sonucu değiştirmez, kaydı düzeltir);
+ *  · yalnız pano talebi varsa; talep yoksa alan HİÇ eklenmez (`CC_LANE` yedeği de kullanılmaz: ortam değişkeni bir
+ *    ad taahhüdü değil, rol ipucudur). Talep BAYAT (TTL 4 saat, makine kapanıp sabah resume) olsa da KENDİ sid'inin
+ *    talebiyse ad verilir (ORTA-3, `board.tumTalepler`; başka pencerenin talebi karışmaz); BIRAKILMIŞ talep ad vermez;
+ *  · ÇAKIŞMA (ORTA-2): aynı adı verecek başka CANLI oturum varsa (aynı şerit ya da aynı ad) alan eklenmez —
+ *    iki pencere aynı adı taşırsa SendMessage to:"Araç" belirsizleşir;
+ *  · yalnız startup/resume/fork — belge clear ve compact'ta alanı yok sayar, gereksiz çıktı basılmaz;
+ *  · ad ÇIPLAK pano yazımı (ARAC) değil, Recep'in pencereleri elle verdiği İNSAN adıdır ("Araç", "Ops", "Yetenek",
+ *    "Harita" — Recep 09-30). Eşleme TEK KAYNAKTA: scripts/board/pencere-adlari.cjs (`ad(serit)` + `TABLO`); başka
+ *    üreticiler de oradan alır, burada kopya YOK. Tabloda olmayan şerit → ilk harf büyük, kalanı küçük (Türkçe
+ *    karakter ÜRETİLMEZ, tahmin yok); string değil/boş/`lane` yer tutucusu → '' (alan eklenmez);
+ *  · FAIL-OPEN: modül/hesap hatası → '' (alan yok, mevcut çıktı aynen); kanca `claude agents` ÇAĞIRMAZ (yavaşlatır).
+ *
+ * BİLİNEN SINIRLAR (dürüst liste):
+ *  · claim'siz YENİ pencere ilk açılışta ad ALMAZ: o an pano talebi yoktur. Şerit talep edilince pencere ad alır
+ *    yalnız SONRAKİ açılışta (resume/startup/fork); pencere içinde anlık yeniden adlandırma bu kancanın işi değil;
+ *  · fork'ta yeni oturum YENİ sid alır ve claim'i yoktur → fork ilk açılışta ad almaz (belge fork'ta alanı uygular,
+ *    ama pano kimlik bağı olmadan şerit bilinemez);
+ *  · claim ile pencere adı bağı yalnız sid'dir; iki pencere aynı şeridi talep ederse ikisi de ad ALMAZ (ORTA-2 seçimi:
+ *    belirsiz ad, adsızlıktan kötü).
+ */
+const PENCERE_ADI_KAYNAKLARI = new Set(['startup', 'resume', 'fork'])
+let pencereAdi = ''
+/**
+ * Bu pencerenin adı ('' = alan eklenmez). Sırayla: kendi sid'inin talebi (bayat dahil, bırakılmış hariç; ORTA-3) →
+ * tablodan ad → mevcut `session_title` dolu VE tablodaki adla FARKLIYSA ezme (Recep'in verdiği başka ad, ORTA-1);
+ * boş ya da aynıysa (harf/Türkçe harf farksız, `ayniMi`) kanonik adı YAZ (REC-525 takip: restart/resume'da harness
+ * dökümdeki adı geri yüklemiyor, pid kaydına türetilmiş ad yazıyor; aynı değeri yazmak sonucu değiştirmez) →
+ * başka canlı oturum aynı adı alıyor/taşıyor mu (ORTA-2). Her hata → ''.
+ */
+function pencereAdiKarari(board, live, kendiSid, mevcutAd) {
+  try {
+    const benim = board.tumTalepler().find((c) => c.sid === kendiSid)
+    if (!benim) return ''
+    const modul = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const ad = modul.ad(benim.lane)
+    if (!ad) return ''
+    if (typeof mevcutAd === 'string' && mevcutAd.trim() && !modul.ayniMi(mevcutAd, ad)) return ''
+    const digerleri = live.filter((c) => c.sid !== kendiSid)
+    if (digerleri.some((c) => modul.ad(c.lane) === ad)) return ''
+    const adlar = board.pencereAdlari()
+    if (digerleri.some((c) => modul.ayniMi(adlar.get(c.sid), ad))) return ''
+    return ad
+  } catch {
+    return '' // modül/pano hatası: alan eklenmez, mevcut çıktı aynen (fail-open)
+  }
+}
+
+/**
+ * ⭐DEPARTMAN HARİTASI (HRT-29, OPS-27 eki): rol OPS ise açılışta 16 departmanın görev + dosya alanı + açılış yolu kısa özeti
+ * gelir (OPS işi neye göre dağıttığını bilsin; YTN-13 olayı). Özet `rol-karti-uret.cjs --harita-ozet`ten (≤2 KB, üretilmiş
+ * tam harita docs/roller/DEPARTMAN-HARITASI.md). Bölüm KÜÇÜLMEZ (öncelik 0) ve tavan onun uzunluğu kadar genişler: yoksa OPS'un
+ * büyük durum bloğu haritayı hep işaretçiye iterdi. FAIL-OPEN: üretici yok/hata → yalnız işaretçi satırı; oturum bloklanmaz.
+ */
+const HARITA_OZET_CALISMA_SINIRI = 2100 // üretici sınırı 2.048 bayt (HARITA_OZET_SINIRI); koşu anında 52 bayt pay
+function haritaIsaretcisi(sebep) {
+  return 'DEPARTMAN HARITASI: docs/roller/DEPARTMAN-HARITASI.md (16 departman: gorev, dosya alani, acilis yolu) — ' +
+    `kisa ozet uretilemedi (${sebep}), dosyayi oku.\n`
+}
+function haritaBolumuEkle() {
+  if (String(rolSeridi || '').trim().toUpperCase() !== 'OPS') return
+  let tam
+  try {
+    const uretici = process.env.VH_ROL_KARTI_URETICI ||
+      path.join(__dirname, '..', '..', 'scripts', 'belge', 'rol-karti-uret.cjs')
+    if (!fs.existsSync(uretici)) {
+      tam = haritaIsaretcisi('uretici bu agacta yok')
+    } else {
+      // maxBuffer: kaçak üretici bağlamı değil yalnız bu çağrıyı patlatır (ENOBUFS → işaretçi).
+      const ozet = execFileSync(process.execPath, [uretici, '--harita-ozet'], {
+        encoding: 'utf8', timeout: 4000, windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 16 * 1024,
+      })
+      if (!ozet || !ozet.trim()) tam = haritaIsaretcisi('uretici bos cikti verdi')
+      else if (Buffer.byteLength(ozet, 'utf8') > HARITA_OZET_CALISMA_SINIRI) {
+        tam = haritaIsaretcisi(`ozet ${Buffer.byteLength(ozet, 'utf8')} bayt > ${HARITA_OZET_CALISMA_SINIRI} sinir`)
+      } else tam = ozet.endsWith('\n') ? ozet : ozet + '\n'
+    }
+  } catch (e) {
+    tam = haritaIsaretcisi(`${(e && (e.code || e.message)) || 'bilinmeyen'}`)
+  }
+  TOPLAM_TAVAN = Math.min(TOPLAM_TAVAN + tam.length, Math.max(TOPLAM_TAVAN, MUTLAK_TAVAN))
+  bolumler.splice(2, 0, { ad: 'departman-haritasi', oncelik: 0, tam, ozet: haritaIsaretcisi('tavan') })
+}
+
+/**
+ * Pano talebi yokken rol ipucu: pencere başlığı tablodaki görünen adla (Türkçe katlamalı) eşleşirse o şerit ("Ops" → OPS).
+ * Claim yoksa OPS açılışta "ROL KARTI: bilinmiyor" görüyordu (HRT-29 kök sebep 1). Eşleşme yoksa/hata → '' (rol değişmez).
+ */
+function rolBasliktan(baslik) {
+  try {
+    const m = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'pencere-adlari.cjs'))
+    const satir = m.TABLO.find((s) => m.ayniMi(baslik, s[1]))
+    return satir ? satir[0] : ''
+  } catch {
+    return ''
+  }
+}
+
 /** Kimlikten HEMEN sonra (ikinci sıra) yerleştirilir: kimlik ilk satır kalır, rol kartı ondan hemen sonra gelir. */
 function rolBolumuEkle() {
   const satir = rolKartiSatiri(rolSeridi)
@@ -296,7 +410,8 @@ if (source === 'resume') {
       ? '⭐LIDERSIN: uyandirma refleksi — ListAgents ile canli peer oturumlarini listele ve ' +
         'uyuyan her birine SendMessage at: "makine dondu, hangi isteydin, serit talebini tazele". ' +
         'Bekleme yapma; mesaj tek kanaldir.\n'
-      : 'Serit talebini TAZELE (canlilik atistan gelir) ve liderin uyandirma mesajini bekleme — ' +
+      : 'Serit talebin acilista (startup/resume) OTOMATIK yenilenir (claim-yenile); yenilenmediyse pano blogu ' +
+        '"TALEP EDILMEMIS" ya da UYARI basar — o zaman elle claim al. Liderin uyandirma mesajini bekleme — ' +
         'hangi iste oldugunu SendMessage ile lidere yaz.\n'))
 }
 
@@ -409,9 +524,28 @@ try {
 
 try {
   const board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
+  /**
+   * ⭐CLAIM YENİLEME (Ops 09-30): startup/resume'da bu oturumun KENDİ süresi dolmuş talebi varsa aynı şerit + aynı
+   * desenlerle yeniden alınır; canlı başka oturum aynı şeridi/çakışan deseni tutuyorsa ALINMAZ, tek satır UYARI basılır.
+   * `liveClaims()` çağrısından ÖNCE koşar: yenilenen talep aşağıda `mine` olarak görünür (şerit satırı, rol kartı, ad).
+   * clear/compact'ta dokunulmaz. FAIL-OPEN: yenile() asla fırlatmaz; hata → alan yok, oturum açılışı aynen (hata stderr'e).
+   * Mantık ve kurallar: scripts/board/claim-yenile.cjs (kapı: claim-yenile.test.ts).
+   */
+  try {
+    const y = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'claim-yenile.cjs')).yenile(board, sid, { source })
+    if (y.satir) bolum('claim-yenile', 1, y.satir, y.islem === 'yenile' ? 'CLAIM YENILENDI (pano: board.cjs who)\n' : '⚠CLAIM YENILENMEDI (canli cakisma; board.cjs who)\n')
+    if (y.islem === 'hata') process.stderr.write(`[session-board] claim yenileme atlandi (${y.sebep}) — oturum acilisi etkilenmedi.\n`)
+  } catch (e) {
+    process.stderr.write(`[session-board] claim yenileme modulu yuklenemedi (${(e && (e.code || e.message)) || 'bilinmeyen'}) — oturum acilisi etkilenmedi.\n`)
+  }
   const live = board.liveClaims()
   const mine = live.find(c => c.sid === sid)
   if (mine && mine.lane) rolSeridi = mine.lane
+  // compact/clear girdisinde session_title YOK (belge: yalnız startup/resume/fork); pid kaydındaki ad (`~/.claude/sessions`)
+  // her açılış türünde okunur. Rol ipucudur, ad taahhüdü değil; claim'li pencere bunu kullanmaz (yukarıdaki `mine.lane`).
+  // Niyet: pano talebi olmayan HER rolde (9 tablo rolü) kart gelsin — yalnız OPS'ta değil.
+  if (!rolSeridi) rolSeridi = rolBasliktan(input.session_title || board.pencereAdlari().get(sid))
+  pencereAdi = pencereAdiKarari(board, live, sid, input.session_title)
 
   bolum('serit', 2, mine
     ? `Şeridin: ${mine.lane} — ${mine.globs.join(', ')}\n`
@@ -510,12 +644,13 @@ bolum('yontem', 6,
 // Üst sınır 5 sn: kanca açılışı bekletmesin (ölçüldü ~0,8–1,2 sn).
 const yaz = () => {
   rolBolumuEkle()
-  process.stdout.write(JSON.stringify({
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext: birlestir(),
-    },
-  }))
+  haritaBolumuEkle()
+  const cikti = {
+    hookEventName: 'SessionStart',
+    additionalContext: birlestir(),
+  }
+  if (pencereAdi && PENCERE_ADI_KAYNAKLARI.has(source)) cikti.sessionTitle = pencereAdi
+  process.stdout.write(JSON.stringify({ hookSpecificOutput: cikti }))
 }
 ;(async () => {
   try {

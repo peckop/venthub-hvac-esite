@@ -8,8 +8,8 @@ import type { Route } from 'next'
  * (en). `Routes`'taki diğer yollar dilden bağımsız olduğu için tek başına önek yetiyordu; burada
  * yetmez: EN'de `/en/bilgi-merkezi` üretmek ölü adres olurdu.
  *
- * NİÇİN AYRI DOSYA: `routes.ts` hiçbir modül içe aktarmayan saf bir tablodur; bu dosya da öyle
- * (döngüsel bağımlılık yok). Bölüm adları `src/config/bilgiMerkeziYonlendirmeleri.mjs` →
+ * NİÇİN AYRI DOSYA: `routes.ts` yalnız saf, fs'siz modülleri içe aktarır (rotaDiliTablo → rotaDiliCekirdek + JSON); bu dosya hiçbir modül
+ * içe aktarmayan saf bir tablodur (döngüsel bağımlılık yok). Bölüm adları `src/config/bilgiMerkeziYonlendirmeleri.mjs` →
  * `BILGI_MERKEZI_BOLUMU` ile aynı olmak zorunda; test ölçer (INV-BILGI-MERKEZI-YONLENDIRME-1).
  *
  * ⚠EN bölümü `EN_YAYIN` kapalıyken ÜRETİLMEZ (rehber-yazisi-standard.md R6). Bağlantı basan yüzey

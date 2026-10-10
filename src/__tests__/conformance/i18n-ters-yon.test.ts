@@ -161,7 +161,7 @@ describe('INV-I18N-TERS-1 · Türkçe yüzeyde İngilizce metin kalmaz', () => {
     const kapatilan: [string, string][] = [
       ['knowledge.hub.eyebrow', 'TEKNİK BİLGİ MERKEZİ'],
       ['category.showcase.premiumTitle', 'Premium Mühendislik Çözümleri'],
-      ['home.cinematicShowcase.hudStatus', 'Sistem.Veri.Canlı'],
+      ['home.cinematicShowcase.hudStatus', 'Ürün ailesi'],
       ['categorySilentFan.comparison.quietLabel', 'Sessiz:'],
     ]
     for (const [anahtar, beklenen] of kapatilan) {

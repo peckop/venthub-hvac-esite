@@ -35,8 +35,10 @@ const KURULU = fs.existsSync(path.join(ARAC, 'node_modules', '@wrongstack', 'kan
 const YAMASIZ_SATIR = 'return { content: result, isError: failed };'
 
 const yamalar = fs.readdirSync(YAMALAR).filter((d) => d.endsWith('.patch'))
-const deps = (JSON.parse(fs.readFileSync(path.join(ARAC, 'package.json'), 'utf8')) as { dependencies: Record<string, string> })
-  .dependencies
+// Kilitli sürüm package-lock.json'dan okunur (doğrudan bağımlılık olmayan sage gibi paketler de var —
+// sage-mcp'nin geçişli bağımlılığı; package.json'da yalnız *-mcp paketleri sabitli).
+const kilit = (JSON.parse(fs.readFileSync(path.join(ARAC, 'package-lock.json'), 'utf8')) as { packages: Record<string, { version?: string }> })
+  .packages
 
 interface Gorev {
   id: string
@@ -85,7 +87,7 @@ describe('INV-WRONGSTACK-KANBAN-YAMA-1 · kanban yazma dönüşü özetlenir', (
       const m = y.match(/^([a-z0-9-]+?)-(\d+\.\d+\.\d+)-/)
       expect(m, `yama adı <paket>-<sürüm>-… biçiminde değil: ${y}`).not.toBeNull()
       const [, paket, surum] = m as RegExpMatchArray
-      expect(deps[`@wrongstack/${paket}`], `${y}: kilitli sürüm farklı — yama yeniden ölçülmeli`).toBe(surum)
+      expect(kilit[`node_modules/@wrongstack/${paket}`]?.version, `${y}: kilitli sürüm farklı — yama yeniden ölçülmeli`).toBe(surum)
     }
   })
 
@@ -101,7 +103,7 @@ describe('INV-WRONGSTACK-KANBAN-YAMA-1 · kanban yazma dönüşü özetlenir', (
   it('README kurulumu npm ci ardından yamaları uygular', () => {
     const r = fs.readFileSync(path.join(ARAC, 'README.md'), 'utf8')
     const ci = r.indexOf('npm ci --ignore-scripts')
-    const uygula = r.indexOf('git apply "$y"')
+    const uygula = r.indexOf('core.eol=lf apply "$y"')
     expect(ci, 'kurulum satırı yok').toBeGreaterThan(-1)
     expect(uygula, 'yama uygulama satırı yok').toBeGreaterThan(ci)
   })

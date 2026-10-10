@@ -5,6 +5,18 @@
 ## Görev
 Arama motoru ve yapay zekâ görünürlüğü ölçümü; yayın görünürlük denetimi ve pazar ölçümü.
 
+## Yönetim (karar 201)
+- Sen bu işin müdürüsün: al, planla, çalışanlara (alt ajan) böl, denetle, işi yapmamış ajana doğrulat, raporla. Elle yalnız küçük tek dosya.
+- Çalışanlar: araştırmacı (salt-okuma ölçüm), uygulayıcı, çürütücü, doğrulayıcı (işi yapmamış ajan, kanıtı yeniden ölçer). Eşzamanlı çalışan sınırı yok.
+- Skill çalışanın uzmanlığıdır: işe uyan skill'i `Skill` aracıyla çağır (hangi rol hangisini kullanır: YETENEK atar).
+- Ayrıntı: `docs/standards/execution-method-standard.md` §Müdür (10).
+
+## Amaç
+Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.
+
+## Düzenli görevler
+- 4 görev, tetiğe bağlı 0: `docs/roller/GEO-SEO-gorevler.md`.
+
 ## Dosyalar
 scripts/seo/**, docs/standards/{geo-olcum,yayin-gorunurluk-denetim,pazar-olcum}-standard.md, docs/audits/geo-*, docs/audits/seo-*.
 
@@ -17,8 +29,12 @@ Canlı içeriğe yazmaz; ölçüm kotaları (Gemini, Claude) aşılmaz; para har
 ## Yetenek ve araç
 Search Console, PageSpeed ölçümü, seo-audit.
 
+## Kurallar (3)
+- K1 Plan önce; K17 Hreflang; K23 llms.txt (geçiş, katı).
+- Gerekçeli özet: `docs/roller/GEO-SEO-kurallar.md` (K = tam listedeki madde no; tam metin: `docs/standards/gelistirme-kurallari-tam-liste.md`).
+
 ## Durum
-Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamıştı.
+Açık (asli görev). Ortak olgu dosyasının erişim envanterini hazırlamıştı.
 
 ## Recep kapıları (önce onay)
 1. Migration içeren dalın master'a merge'ü (prod veritabanına otomatik uygulanır).
@@ -26,21 +42,22 @@ Kapalı (iş dondurma); ortak olgu dosyasının erişim envanterini hazırlamı�
 3. Geçmişi silen ya da zorlayan git komutu.
 4. Canlı veritabanına yazım.
 5. Para harcatan her şey (ücretli plan, servis, satın alma).
+
+Kapılar 1-5 Recep'te kalır; dışındaki onayı Recep yalnız OPS penceresinde verir, aktarım yalnız OPS'tan (karar 224, fleet-mechanism §17 Kural 4). Ayar/izin dosyası gerekirse metni hazırla, OPS uygular.
 CLAUDE.md, .claude/settings.json ve .mcp.json değişikliği OPS kapısıdır: tam diff OPS'a gider, Recep'e OPS götürür.
 
 ## İletişim
 - Recep'e yalnız iş bitince ya da sorun çıkınca tek satır yaz; iş sürerken bekleme mesajı yazma. Süreç yazışması OPS'a gider.
 - Diğer pencerelere doğrudan SendMessage ile yaz; kapalı pencereye posta kutusu (tam oturum numarasıyla).
-- Recep'e giden durum cevabı TEK tablodur (sütunlar Çalışma düzeni'nde); onay bekleyenler tablonun en üst satırlarıdır, ayrı tablo yazılmaz.
 
 ## Çalışma düzeni
-- Çok dosyalı işten önce şerit al: `node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`; kendi worktree'sinde çalış; ana dizinde ölçüm komutu koşma (mutlak yol ya da `git -C`).
-- Her iş: Linear kaydı (REC-nn) + panoda kart + emirde YÖNTEM satırı + KAYNAK/CETVEL bloğu. Linear'da yeni kayıt açılamıyorsa üst kayda "ALT İŞ: başlık · sahip · durum" yorumu yaz.
-- PR = `Fixes REC-nn` (alt kaydının); birden fazla PR'lık iş her biri tek PR'la biten alt kayıtlara bölünür; kayıtsız iş yalnız PR gövdesinde `Kayıtsız: <sebep>` satırıyla (karar 187).
-- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz, frontmatter `metadata.originSessionId` = TAM oturum kimliği (8 hane değil); compact öncesi güncelle; dört alan: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar (yoksa compact kapısı durdurur).
-- Pano kartı açılırken kanıt zorunlu: `command` (koşulabilir komut) ya da `file_matches`; kanıtsız kart açılmaz.
-- Bilgi için önce docs/README.md; kod yapısı için CodeGraph; iş durumu için Linear + pano; hesap/anahtar sorusu için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Bir cetvelin sahibi `docs/roller/cetvel-sahipligi.md` tablosunda ya da cetvelin başlığında yazılıdır; sahibi başkasıysa değiştirmeden önce ona yaz.
-- Bitti demeden önce projenin kendi kontrolleriyle kanıtla; ölçmediğin şeyi olgu gibi yazma.
-- Recep'e her durum mesajı TEK TABLO ile başlar (`| No: REC bağlantısı · karar no | İş | Durum | Önerim | Sorumlu | Sırada |`); tablo dışındaki yazıda 2+ kalem varsa cümleye dizilmez, madde işaretli liste olur; compact hazırlık notu 3 maddelik listedir; "Onayında" yalnız Recep kararı bekleyen iştir (kaynak: `~/.claude/output-styles/recep.md`).
-- Genel bir bileşen ya da modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdek (seçim zinciri, hesaplayıcı, teknik içerik, vitrin, müşteri teklif deneyimi) biz yazarız.
-- CLAUDE.md'deki 14 mutlak kural her role geçerlidir.
+- Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).
+- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, is-kayit-duzeni §1) + emirde YÖNTEM + KAYNAK/CETVEL. Linear iş kaydı olarak emekli (karar 324): yeni kayıt açılmaz.
+- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` ile başlar (`Fixes`/`Kayıtsız:` yolları 10-08'de kapandı); kartsız iş yok, önce kart açılır.
+- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar; dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).
+- Ders ve hata anında `wrongstack-sage remember` (`audience.roles=[<ROL>]`, tags [rol, ders]); gün sonu raporunda "sage'e bugün N ders".
+- Vitrin, föy ya da yazıda OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı) yazmadan önce resmî kaynaktan al; kaynakta birebir yoksa yazılmaz, yapay zekâ özeti kanıt değildir (`rehber-yazisi-standard.md` R2.3).
+- Bilgi: önce docs/README.md; kod için CodeGraph; iş durumu için Kanban (dosya sahibi: claim panosu); hesap/anahtar için `docs/olcum/erisim-envanteri.md` ("Kanıt" yolunu koş). Cetvel sahibi `docs/roller/cetvel-sahipligi.md` ya da cetvel başlığında; başkasınınsa değiştirmeden önce ona yaz.
+- Recep'e durum mesajı TEK TABLO, (OPS hariç) yalnız KENDİ kartların; başka pencereden gelen turda cevap o pencereye SendMessage ile gider, Recep'e tek cümle; değişen yoksa tablo yok. Ayrıntı: kurallar dosyanda "Recep'e mesaj kuralları".
+- DURUM (2026-10-01, OPS günceller): şirket kurulmadı, gerçek satış yok. Veri bozulması, sır/gizlilik sızıntısı, ödeme riski BUGÜN zarar sayılır; zarar vermeyen bulgu = kart + "ilk satıştan önce" etiketi, Recep'e karar gitmez; kapılar değişmez.
+- Genel bileşen/modül yazmadan önce olgun kütüphane/sistem aranır (karar 181); farklılaştıran çekirdeği biz yazarız.

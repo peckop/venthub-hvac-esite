@@ -108,6 +108,29 @@ ve `discharge_velocity_curve` (8) ise nesne dizisi (`{"airflow_m3h":…, "effici
 Aynı tabloda **üç farklı şekil**. Okuyan taraf şekli varsaymaz, tanır ve tanıyamadığında
 uydurmaz (bkz. `ductFanSelection.parsePQCurve`).
 
+**Eğrinin kaynağı etiketlidir — `pq_curve_kaynak` (karar 320, 2026-10-08).** `pq_curve` taşıyan
+her kayıt, eğrinin nereden geldiğini yanında söyler. Üç değer vardır, dördüncü yoktur:
+
+| Değer | Anlamı |
+|---|---|
+| `kitapcik_tablo` | noktalar kitapçıktaki sayısal tablodan alındı |
+| `kitapcik_grafik` | noktalar kitapçıktaki grafikten okundu (catalog-ingestion §6.3 "Eğri çizimi": yöntem, ±%2 kapısı ve sapma kayıtlı) |
+| `turetilmis` | noktalar azami debi ve azami basınçtan HESAPLA kuruldu; ölçüm DEĞİL |
+
+**Boş etiket "bilinmiyor" demektir** ve yalnız bu karardan ÖNCE yüklenmiş kayıtlarda bulunabilir; seçici
+etiketsiz eğriyi "yaklaşık" sayar. Yeni yüklemede boş etiket KABUL EDİLMEZ
+(`scripts/kademe2-load/planla.mjs` `pqKapisi`: etiketsiz eğri plan KIRMIZI).
+
+Kapı ayrıca şunu durdurur: orta debi tam `Qmax/2` ve orta basınç tam `%50` ya da `%75·Pmax` olan üç
+noktalı eğri `turetilmis` dışında bir etiket taşıyamaz. Bu kapı gerçeği HÜKMETMEZ — desene uymayan
+ama uydurma bir eğriyi etiketliyse geçirir — etiketsizliği ve "hesaplanmış ama ölçüm diye etiketli"
+yalanını durdurur. Gerçek doğruluk §6.3'ün ±%2 kapısının işidir.
+
+*Niçin:* 2026-10-08 ölçümü (`docs/audits/ktl7-pq-egri-olcumu-2026-10-08.md`) — 141 üç noktalı eğrinin
+ortadaki noktası kitapçıktan okunmamıştı: 58 ürün `%75`, 48 ürün `%50` formülüyle, 35 ürün (QBK, AVenS Plug)
+betiğe elle yazılmış değerle kurulmuştu; etiket olmadığı için seçici hepsini ölçüm sandı ve eğriler düz
+çizgi gibi göründü.
+
 ## 3. Yeni marka / yeni kaynak bağlanırken
 
 İlk soru "hangi alanlar geldi" **değildir**. Sırasıyla:

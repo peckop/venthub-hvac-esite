@@ -96,6 +96,10 @@ export const YENI_KABUK_GEZINMESI = false
  *  1. `/en/…` görünür metninde Türkçe kelime **0** (REC-210 ile bugün karşılandı).
  *  2. 8 ailenin gerçek İngilizce adı yazılmış (REC-109).
  *  3. 23 aktif kategorinin İngilizce açıklaması dolu (REC-161 alanı açıyor).
+ *  ⚠2. maddenin ÖLÇÜLEBİLİR hâli (KATALOG ölçümü 2026-09-27, REC-300 Faz 3e-5): "EN adı TR adının aynısı" tek
+ *  başına hata DEĞİLDİR — 8 ailede EN=TR olan ad özel addır (marka/model adı). Hata olan: TR'de Türkçe harf ya da
+ *  kelime geçen adın EN'de AYNEN durması. Şart bu kuralla ölçülür; kategori tarafı 24/24 kategoride EN açıklama
+ *  dolu olarak ölçüldü (madde 3 karşılanmış görünüyor — açmadan önce yeniden ölçülür, bayat sayı sayılmaz).
  *
  * GERİ AÇMA: bu değeri `true` yap — site haritası EN adresleri yeniden ilan eder,
  * `noindex` düşer. Sonra Search Console'a yeni site haritası bildirilir. Başka hiçbir
@@ -125,3 +129,28 @@ export const EN_YAYIN = false
  */
 export const ADRES_SEMASI_K3B = false
 
+
+/**
+ * ⭐YENİ GÖRÜNÜM (TSR-9, Faz 2b) — token/font/DS bileşen görünümünün TÜMÜ için DERLEME SABİTİ.
+ * `false` iken canlıda ziyaretçinin gördüğü fark 0'dır (plan §1.3).
+ *
+ * Plan: docs/plans/tasarim-kod-plani-v2.2-2026-10-05.md §1.1–§1.3 (anahtar kümesi, mekanizma,
+ * "kapalı = fark 0" tanımı) · §1.4 (admin dondurma). Yeni görünüm = `YENI_GORUNUM && <PAKET>_GORUNUM`.
+ *
+ * NE YAPAR (açıkken): kök `<html>` `data-gorunum="yeni"` basar; `src/index.css`
+ * `:root[data-gorunum='yeni']` kapsamı `--primary-navy`/`--brand-cyan`/`--radius` ve font
+ * değişkenlerini DS değerine çevirir; `<body>` Inter yerine Archivo ailesini taşır
+ * (`variable` ile `className` BİRLİKTE değişir). Admin (`[data-admin-theme]`) eski değerlerde donuk
+ * kalır (kendi Inter nesnesi: `src/app/admin/layout.tsx`).
+ *
+ * NİÇİN ENV DEĞİL SABİT: `NEXT_PUBLIC_` öneki unutulursa değer sessizce `undefined` olur ve bayrak
+ * kapalı gibi davranır, kimse fark etmez; sabit ise derleyiciye ölü dalı attırır.
+ * Okuma doğrudan sabitle yazılır (`if (YENI_GORUNUM && X)`), fonksiyon sarmalayıcıyla değil.
+ *
+ * AÇMA: yalnız Ops, açılış PR'ıyla (9 Ekim yerel önizleme hükmünden sonra). Açılış PR'ı ayrıca:
+ *  · Archivo `preload`'ını `true` yapar (üç aile bugün `preload: false`; açılışta yalnız Archivo),
+ *  · kök Inter tanımını kaldırır (admin kendi Inter'ini taşır).
+ * GERİ ALMA: bu değeri `false` yap — görünüm anahtarı veri/adres etkisi yaratmaz (adres anahtarının
+ * aksine geri alınabilir).
+ */
+export const YENI_GORUNUM = false

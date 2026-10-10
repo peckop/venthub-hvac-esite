@@ -28,6 +28,9 @@
  * KOŞTURMA:
  *   node scripts/hijyen/sage-yedek.cjs            # yedek al + doğrula
  *   node scripts/hijyen/sage-yedek.cjs --liste    # mevcut yedekleri yaz
+ *   node scripts/hijyen/sage-yedek.cjs --geri kanban [dosya] [--evet]
+ *                                                 # yedekten geri yükle (ARC-9); --evet yoksa yalnız plan.
+ *                                                 # Servis canlıyken REDDEDER; eski dosyalar .oncesi-<damga> kalır.
  *
  * Yöneten cetvel: docs/standards/hafiza-kancalari-standard.md §7.
  */
@@ -60,14 +63,40 @@ function kok() {
  * `ana`: kayıt sayısının anlamlı olduğu tablo (varsa). Yoksa parmak izi tüm tabloların
  * satır sayılarından kurulur — depo biçimini bilmek gerekmez.
  */
+/**
+ * ⭐DEPO BAŞINA SIKLIK VE SAKLAMA (ARC-9, 2026-10-01; karar 219: Linear donuk, iş kartlarının
+ * TEK kaynağı Kanban). Ölçüldü 10-01: 24 saat kuralı yüzünden sabah 08:53Z yedeğinde 10 pano /
+ * 387 kart vardı, öğlen canlıda 12 pano / 414 kart; aradaki 27 kart ertesi sabaha kadar yedeksizdi.
+ *
+ * `tazeSaat`  : son yedek bundan yeniyse kanca o depoyu ATLAR (kanban 1 saat, sage 24 saat).
+ * `uyariSaat` : son yedek bundan eskiyse istem satırı KONUŞUR (kanban 24 saat, sage 72 saat).
+ * `saklama`   : `{ son, gunluk }` — en yeni `son` kopya + son `gunluk` günün her biri için o günün
+ *               EN YENİ kopyası. Yoksa düz kural: en yeni `TUTULACAK` kopya. (Saatlik yedekte düz
+ *               "son 14" yalnız ~14 saati tutardı; dünkü pano bugün silinmiş olurdu.)
+ * `servis`    : çalışan servisin pid dosyası (varsa). `--geri` servis CANLIYKEN reddeder.
+ */
 const DEPOLAR = [
-  { ad: 'sage', goreli: ['.wrongstack', 'memories', 'sage.db'], onek: 'sage-', uzanti: '.db', ana: 'memories' },
+  {
+    ad: 'sage',
+    goreli: ['.wrongstack', 'memories', 'sage.db'],
+    onek: 'sage-',
+    uzanti: '.db',
+    ana: 'memories',
+    tazeSaat: 24,
+    uyariSaat: 72,
+    saklama: null,
+    servis: null,
+  },
   {
     ad: 'kanban',
     goreli: ['.wrongstack', 'kanbans', '_kanban.sqlite'],
     onek: 'kanban-',
     uzanti: '.sqlite',
     ana: null,
+    tazeSaat: 1,
+    uyariSaat: 24,
+    saklama: { son: 24, gunluk: 30 },
+    servis: ['.wrongstack', 'kanban-server.json'],
   },
 ]
 
@@ -152,6 +181,51 @@ function parmakIzi(yol, ana = 'memories') {
   }
 }
 
+/**
+ * Kanban veritabanının İÇERİK sayımı: pano, kart, olay + bütünlük denetimi (ARC-9).
+ *
+ * ⭐NİÇİN AYRI: kartlar `kanban_boards.payload` JSON'unun İÇİNDE yaşar. Satır sayısı parmak izi
+ * "12 pano satırı var" der ama bir payload boşalmış ya da bozulmuşsa GÖRMEZ. Kart sayısı
+ * payload'ların içinden okunur; `pragma integrity_check` sayfa düzeyindeki bozulmayı yakalar.
+ *
+ * `kanban_boards` tablosu yoksa (başka biçimde bir veritabanı) `null` döner — uydurma sayı yok.
+ * Kart İÇERİĞİNİ okuyan katman burası DEĞİL: `scripts/nlm/kanban_disa_aktar.py` (HARİTA). Burada
+ * yalnız sayım var; ikinci bir okuyucu yazılmaz.
+ *
+ * @returns {{pano:number, kart:number, olay:number|null, bozukPayload:number, butunluk:string}|null}
+ */
+function kanbanSayim(yol) {
+  const { DatabaseSync } = sqlite()
+  const db = new DatabaseSync(yol, { readOnly: true })
+  try {
+    const varMi = (t) =>
+      db.prepare("select count(*) as c from sqlite_master where type='table' and name=?").get(t).c > 0
+    if (!varMi('kanban_boards')) return null
+    let kart = 0
+    let bozukPayload = 0
+    const satirlar = db.prepare('select payload from kanban_boards').all()
+    for (const r of satirlar) {
+      try {
+        const p = JSON.parse(String(r.payload))
+        if (!Array.isArray(p.tasks)) bozukPayload++
+        else kart += p.tasks.length
+      } catch {
+        bozukPayload++
+      }
+    }
+    const olay = varMi('kanban_events') ? Number(db.prepare('select count(*) as c from kanban_events').get().c) : null
+    const b = db.prepare('pragma integrity_check').all()
+    const butunluk = b.length === 1 && String(Object.values(b[0])[0]) === 'ok' ? 'ok' : 'BOZUK'
+    return { pano: satirlar.length, kart, olay, bozukPayload, butunluk }
+  } finally {
+    try {
+      db.close()
+    } catch {
+      /* süreç zaten bitiyor */
+    }
+  }
+}
+
 function damga(d) {
   const p = (n) => String(n).padStart(2, '0')
   return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}${p(
@@ -173,8 +247,10 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
   const hedef = path.join(dizin, `${depo.onek}${damga(simdi)}${depo.uzanti}`)
 
   let kaynakIzi
+  let kaynakKanban = null
   try {
     kaynakIzi = parmakIzi(kaynak, depo.ana)
+    if (depo.ad === 'kanban') kaynakKanban = kanbanSayim(kaynak)
     const { DatabaseSync } = sqlite()
     const db = new DatabaseSync(kaynak, { readOnly: true })
     try {
@@ -226,8 +302,49 @@ function yedekAl(simdi = new Date(), depoAdi = 'sage') {
     }
   }
 
+  /**
+   * ⭐KANBAN İÇERİK DOĞRULAMASI (ARC-9): satır sayıları tutsa da kart sayısı ve bütünlük ayrıca
+   * ölçülür. Kaynakta `kanban_boards` yoksa (`null`) bu adım atlanır — olmayan şey karşılaştırılmaz.
+   */
+  let yedekKanban = null
+  if (kaynakKanban) {
+    let sebep = null
+    try {
+      yedekKanban = kanbanSayim(hedef)
+      if (!yedekKanban) sebep = 'yedekte kanban_boards tablosu yok'
+      else if (yedekKanban.butunluk !== 'ok') sebep = 'butunluk denetimi BOZUK'
+      else if (yedekKanban.bozukPayload > 0) sebep = `${yedekKanban.bozukPayload} pano payload'i okunamiyor`
+      else if (yedekKanban.pano !== kaynakKanban.pano || yedekKanban.kart !== kaynakKanban.kart)
+        sebep = `kart sayimi uyusmuyor (kaynak ${kaynakKanban.pano} pano / ${kaynakKanban.kart} kart, yedek ${yedekKanban.pano} / ${yedekKanban.kart})`
+    } catch (e) {
+      sebep = 'kart sayimi yapilamadi: ' + String((e && e.message) || e).slice(0, 120)
+    }
+    if (sebep) {
+      const bozuk = hedef + '.DOGRULANMADI'
+      try {
+        fs.renameSync(hedef, bozuk)
+      } catch {
+        /* aynı: durum kırmızı kalır */
+      }
+      return {
+        durum: 'dogrulanmadi',
+        yol: bozuk,
+        kaynak: kaynakIzi,
+        yedek: yedekIzi,
+        sebep,
+      }
+    }
+  }
+
   budama(dizin, depo.ad)
-  return { durum: 'alindi', depo: depo.ad, yol: hedef, kaynak: kaynakIzi, yedek: yedekIzi }
+  return {
+    durum: 'alindi',
+    depo: depo.ad,
+    yol: hedef,
+    kaynak: kaynakIzi,
+    yedek: yedekIzi,
+    kanban: yedekKanban,
+  }
 }
 
 /**
@@ -253,7 +370,9 @@ function budama(dizin = yedekDizini(), depoAdi = 'sage') {
   } catch {
     return []
   }
-  const silinecek = dosyalar.slice(0, Math.max(0, dosyalar.length - TUTULACAK))
+  const silinecek = depo.saklama
+    ? kademeliSilinecek(dosyalar, depo)
+    : dosyalar.slice(0, Math.max(0, dosyalar.length - TUTULACAK))
   for (const f of silinecek) {
     try {
       fs.unlinkSync(path.join(dizin, f))
@@ -262,6 +381,182 @@ function budama(dizin = yedekDizini(), depoAdi = 'sage') {
     }
   }
   return silinecek
+}
+
+/**
+ * KADEMELİ SAKLAMA: en yeni `son` kopya + son `gunluk` günün her birinin EN YENİ kopyası kalır.
+ * Dosya adındaki damga (`<onek>YYYY-MM-DDTHHMMZ`) sıralıdır; gün, adın içinden okunur (mtime
+ * değil — kopyalanan/taşınan dosyada mtime yalan söyler). Adı çözülemeyen dosya SİLİNMEZ.
+ *
+ * @param {string[]} dosyalar eskiden yeniye sıralı adlar
+ * @returns {string[]} silinecek adlar
+ */
+function kademeliSilinecek(dosyalar, depo) {
+  const { son, gunluk } = depo.saklama
+  const kalan = new Set(dosyalar.slice(Math.max(0, dosyalar.length - son)))
+  const gunSonu = new Map() // gün → o günün en yeni dosyası
+  for (const f of dosyalar) {
+    const m = f.slice(depo.onek.length).match(/^(\d{4}-\d{2}-\d{2})T/)
+    if (!m) {
+      kalan.add(f)
+      continue
+    }
+    gunSonu.set(m[1], f) // sıralı geldiği için son yazan en yenidir
+  }
+  const gunler = [...gunSonu.keys()].sort()
+  for (const g of gunler.slice(Math.max(0, gunler.length - gunluk))) kalan.add(gunSonu.get(g))
+  return dosyalar.filter((f) => !kalan.has(f))
+}
+
+/** Verilen pid yaşıyor mu. Yetki hatası (EPERM) "yaşıyor" demektir; yalnız ESRCH "yok"tur. */
+function surecCanli(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch (e) {
+    return Boolean(e && e.code === 'EPERM')
+  }
+}
+
+/**
+ * YEDEKTEN GERİ YÜKLEME (ARC-9). Yalnız `servis` tanımlı depolar (bugün: kanban).
+ *
+ * ⛔SERVİS CANLIYKEN REDDEDER: çalışan servis dosyayı açık tutar; altından değiştirmek ya
+ * başarısız olur ya da servis eski içeriği WAL'dan geri yazar. Önce servis kapatılır.
+ * ⛔HİÇBİR ŞEY SİLİNMEZ: mevcut veritabanı ve WAL/SHM dosyaları `.oncesi-<damga>` ekiyle yan yana
+ * bırakılır. Geri yükleme yanlış çıkarsa eski hâl bir yeniden adlandırma uzağındadır.
+ * ⭐`evet` verilmeden yalnız NE YAPACAĞINI söyler (`kuru`). Yedek, yazılmadan ÖNCE doğrulanır;
+ * yazıldıktan SONRA parmak izi yedekle karşılaştırılır.
+ *
+ * @param {string} depoAdi
+ * @param {string|null} dosyaAdi yedek dizinindeki dosya adı; verilmezse en yeni sağlam yedek
+ * @param {{evet?: boolean, simdi?: Date}} secenek
+ */
+function geriYukle(depoAdi, dosyaAdi = null, secenek = {}) {
+  const depo = DEPOLAR.find((d) => d.ad === depoAdi)
+  if (!depo) return { durum: 'hata', sebep: `bilinmeyen depo: ${depoAdi}` }
+  if (!depo.servis)
+    return {
+      durum: 'hata',
+      sebep: `${depo.ad} icin geri yukleme tanimli degil (servis denetimi yok)`,
+    }
+
+  const dizin = yedekDizini()
+  const desen = new RegExp('^' + depo.onek + '.*' + depo.uzanti.replace('.', '\\.') + '$')
+  const saglam = liste(dizin, depo.onek).filter((y) => desen.test(y.ad))
+  const secilen = dosyaAdi ? saglam.find((y) => y.ad === path.basename(dosyaAdi)) : saglam[saglam.length - 1]
+  if (!secilen) {
+    return {
+      durum: 'hata',
+      sebep: dosyaAdi ? `yedek bulunamadi: ${dosyaAdi}` : `${dizin} altinda ${depo.ad} yedegi yok`,
+    }
+  }
+  const yedekYol = path.join(dizin, secilen.ad)
+
+  let yedekIzi
+  let icerik = null
+  try {
+    yedekIzi = parmakIzi(yedekYol, depo.ana)
+    icerik = depo.ad === 'kanban' ? kanbanSayim(yedekYol) : null
+  } catch (e) {
+    return {
+      durum: 'hata',
+      sebep: 'yedek acilamadi: ' + String((e && e.message) || e).slice(0, 160),
+    }
+  }
+  if (icerik && (icerik.butunluk !== 'ok' || icerik.bozukPayload > 0)) {
+    return {
+      durum: 'hata',
+      sebep: `yedek saglam degil (butunluk ${icerik.butunluk}, bozuk payload ${icerik.bozukPayload})`,
+    }
+  }
+
+  const k = kok()
+  let pid = null
+  try {
+    pid = Number(JSON.parse(fs.readFileSync(path.join(k, ...depo.servis), 'utf8')).pid)
+  } catch {
+    /* servis dosyası yok ya da okunamıyor: servis çalışmıyor sayılır */
+  }
+  if (surecCanli(pid)) {
+    return {
+      durum: 'servis-canli',
+      yedek: secilen.ad,
+      sebep: `${depo.ad} servisi calisiyor (pid ${pid}); once servisi kapat, sonra yeniden dene`,
+    }
+  }
+
+  const hedef = kaynakYolu(k, depo.ad)
+  const tasinacak = [hedef, hedef + '-wal', hedef + '-shm'].filter((f) => fs.existsSync(f))
+  if (!secenek.evet) {
+    return {
+      durum: 'kuru',
+      yedek: secilen.ad,
+      hedef,
+      tasinacak,
+      iz: yedekIzi,
+      icerik,
+    }
+  }
+
+  const ek =
+    '.oncesi-' +
+    (secenek.simdi || new Date())
+      .toISOString()
+      .replace(/[-:]/g, '')
+      .replace(/\.\d+Z$/, 'Z')
+  const tasinan = []
+  try {
+    for (const f of tasinacak) {
+      fs.renameSync(f, f + ek)
+      tasinan.push(f)
+    }
+    fs.mkdirSync(path.dirname(hedef), { recursive: true })
+    const { DatabaseSync } = sqlite()
+    const db = new DatabaseSync(yedekYol, { readOnly: true })
+    try {
+      // Yedek SALT-OKUMA açılır; hedef yeni dosyadır (eskisi az önce yana alındı).
+      db.exec(`VACUUM INTO '${hedef.replace(/'/g, "''")}'`)
+    } finally {
+      try {
+        db.close()
+      } catch {
+        /* süreç zaten bitiyor */
+      }
+    }
+    const sonIz = parmakIzi(hedef, depo.ana)
+    if (JSON.stringify(sonIz.satirlar) !== JSON.stringify(yedekIzi.satirlar)) {
+      throw new Error('geri yuklenen dosya yedekle uyusmuyor')
+    }
+  } catch (e) {
+    // GERİ SAR: yarım kalan hedef kaldırılır, yana alınanlar eski adına döner.
+    try {
+      if (tasinan.includes(hedef) && fs.existsSync(hedef)) fs.unlinkSync(hedef)
+    } catch {
+      /* geri sarma en iyi çabadır; sebep aşağıda raporlanır */
+    }
+    for (const f of tasinan) {
+      try {
+        if (!fs.existsSync(f)) fs.renameSync(f + ek, f)
+      } catch {
+        /* aynı */
+      }
+    }
+    return {
+      durum: 'hata',
+      yedek: secilen.ad,
+      sebep: 'geri yukleme basarisiz, eski hal korundu: ' + String((e && e.message) || e).slice(0, 160),
+    }
+  }
+  return {
+    durum: 'geri-yuklendi',
+    yedek: secilen.ad,
+    hedef,
+    oncesi: tasinan.map((f) => f + ek),
+    iz: yedekIzi,
+    icerik,
+  }
 }
 
 function liste(dizin = yedekDizini(), onek = null) {
@@ -302,11 +597,15 @@ function sonDurum(dizin = yedekDizini(), simdi = Date.now()) {
     } catch {
       /* kök çözülemedi: depo "ilgisiz" sayılır, uydurma rapor üretilmez */
     }
+    const saat = son ? Math.floor((simdi - Date.parse(son.tarih)) / 3_600_000) : null
     return {
       depo: d.ad,
       kaynakVar,
       sonYedek: son ? son.tarih : null,
       gun: son ? Math.floor((simdi - Date.parse(son.tarih)) / 86_400_000) : null,
+      saat,
+      // Depo kendi eşiğini taşır (kanban 24 saat, sage 72 saat); yedeği hiç olmayan depo ayrıca raporlanır.
+      gecikti: saat !== null && saat >= d.uyariSaat,
       adet: saglam.length,
     }
   })
@@ -327,6 +626,7 @@ function sonDurum(dizin = yedekDizini(), simdi = Date.now()) {
     gun: secilen ? secilen.gun : null,
     dogrulanmadi,
     adet: temel.reduce((a, d) => a + d.adet, 0),
+    geciken: temel.filter((d) => d.gecikti).map((d) => ({ depo: d.depo, saat: d.saat })),
     depolar,
   }
 }
@@ -343,9 +643,48 @@ module.exports = {
   liste,
   damga,
   sonDurum,
+  kanbanSayim,
+  kademeliSilinecek,
+  surecCanli,
+  geriYukle,
 }
 
 if (require.main === module) {
+  const geriIdx = process.argv.indexOf('--geri')
+  if (geriIdx !== -1) {
+    /**
+     * `--geri <depo> [yedek-dosya-adi] [--evet]` — `--evet` YOKSA yalnız planı yazar.
+     * Çıkış: 0 = plan yazıldı / geri yüklendi · 1 = reddedildi ya da başarısız · 2 = kullanım hatası.
+     */
+    const kalan = process.argv.slice(geriIdx + 1).filter((a) => !a.startsWith('--'))
+    if (!kalan[0]) {
+      process.stderr.write('kullanim: sage-yedek.cjs --geri <depo> [yedek-dosya-adi] [--evet]\n')
+      process.exit(2)
+    }
+    const r = geriYukle(kalan[0], kalan[1] || null, {
+      evet: process.argv.includes('--evet'),
+    })
+    const sayim = r.icerik ? `${r.icerik.pano} pano / ${r.icerik.kart} kart` : r.iz ? `kayit ${r.iz.sayi}` : ''
+    if (r.durum === 'kuru') {
+      process.stdout.write(
+        `sage-yedek [${kalan[0]}]: GERI YUKLEME PLANI (hicbir sey degismedi)\n` +
+          `  yedek    : ${r.yedek} (${sayim})\n` +
+          `  hedef    : ${r.hedef}\n` +
+          `  yana alinacak (.oncesi-<damga>, SILINMEZ): ${r.tasinacak.length ? r.tasinacak.map((f) => path.basename(f)).join(', ') : 'yok'}\n` +
+          `  uygulamak icin ayni komutu --evet ile kos\n`,
+      )
+      process.exit(0)
+    }
+    if (r.durum === 'geri-yuklendi') {
+      process.stdout.write(
+        `sage-yedek [${kalan[0]}]: GERI YUKLENDI ve DOGRULANDI <- ${r.yedek} (${sayim})\n` +
+          `  eski hal: ${r.oncesi.length ? r.oncesi.map((f) => path.basename(f)).join(', ') : 'yoktu'}\n`,
+      )
+      process.exit(0)
+    }
+    process.stderr.write(`sage-yedek [${kalan[0]}]: ⛔${String(r.durum).toUpperCase()} — ${r.sebep}\n`)
+    process.exit(1)
+  }
   if (process.argv.includes('--liste')) {
     const l = liste()
     if (!l.length) process.stdout.write(`sage-yedek: ${yedekDizini()} altinda yedek YOK\n`)
@@ -367,9 +706,10 @@ if (require.main === module) {
     if (s.durum === 'alindi') {
       alinan++
       const aktif = s.yedek.aktif === null ? '' : ` (aktif ${s.yedek.aktif})`
+      const kart = s.kanban ? ` · ${s.kanban.pano} pano / ${s.kanban.kart} kart, butunluk ${s.kanban.butunluk}` : ''
       process.stdout.write(
         `sage-yedek [${s.depo}]: ALINDI ve DOGRULANDI -> ${s.yol}\n` +
-          `  kayit ${s.yedek.sayi}${aktif}, tablo ${s.yedek.tablolar.length} — kaynakla BIREBIR\n`,
+          `  kayit ${s.yedek.sayi}${aktif}, tablo ${s.yedek.tablolar.length}${kart} — kaynakla BIREBIR\n`,
       )
     } else if (s.durum === 'kaynak-yok') {
       process.stdout.write(

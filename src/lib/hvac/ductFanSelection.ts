@@ -131,6 +131,8 @@ export interface AdaySonucu {
   puan: number
   /** Debi yetersizse ya da çap uyuşmuyorsa dolu gelir; elenme sebebi. */
   elenmeSebebi: ElenmeSebebi | null
+  /** Eğri ≤3 noktalı: çalışma noktası yaklaşıktır, "yeter" hükmü üreticiyle doğrulanmalı. */
+  yaklasikEgri: boolean
 }
 
 export type ElenmeSebebi = 'debi-yetersiz' | 'cap-uyusmuyor' | 'veri-yok'
@@ -190,6 +192,20 @@ export function parsePQCurve(ham: unknown): PQNoktasi[] {
   // Debiye göre artan sırada olmalı; kaynak sırasına GÜVENİLMEZ.
   noktalar.sort((a, b) => a.debiM3h - b.debiM3h)
   return noktalar
+}
+
+/**
+ * Bu sayıya ya da daha azına sahip eğri ÜRETİCİ GRAFİĞİ SAYILMAZ (karar 316/317, 2026-10-08).
+ * Katalog ölçümü: 141 üç-noktalı eğrinin orta noktası kitapçıktan değil formülden (debi tam
+ * %50 Qmax; basınç %75 ya da %50 Pmax = düz çizgi). Tek koşul nokta sayısıdır; veri tam
+ * eğriyle düzelince bu not KENDİLİĞİNDEN kalkar.
+ */
+export const YAKLASIK_EGRI_NOKTA_ESIGI = 3
+
+/** Eğri var ama üretici grafiği olamayacak kadar seyrek mi? Eğri yoksa (0 nokta) false. */
+export function egriYaklasikMi(ham: unknown): boolean {
+  const n = parsePQCurve(ham).length
+  return n > 0 && n <= YAKLASIK_EGRI_NOKTA_ESIGI
 }
 
 /**
@@ -323,6 +339,7 @@ export function degerlendir(
       karsilamaOrani: 0,
       puan: 0,
       elenmeSebebi: 'veri-yok',
+      yaklasikEgri: false,
     }
   }
 
@@ -371,6 +388,7 @@ export function degerlendir(
     karsilamaOrani,
     puan: elenmeSebebi ? 0 : puan,
     elenmeSebebi,
+    yaklasikEgri: egri.length <= YAKLASIK_EGRI_NOKTA_ESIGI,
   }
 }
 

@@ -37,6 +37,7 @@
 export type Sinif =
   | 'anasayfa'
   | 'liste'
+  | 'liste-en'
   | 'altgruplu-kategori'
   | 'yaprak-kategori'
   | 'pdp'
@@ -273,6 +274,15 @@ export interface Kural {
   markerlar: RegExp[]
   /** İzin verilen `BAILOUT_TO_CLIENT_SIDE_RENDERING` sayısı (bilinçli ssr:false adaları). */
   maxBailout: number
+  /**
+   * ⭐GÖVDE GİZLİ AKIŞ BLOĞUNA İTİLMEZ (URN-25): HTML'de `<div hidden id="S:n">` bloğu 0 ve
+   * `<h1>` bu bloklarının DIŞINDA. Verilmezse bu ölçüt koşmaz — yalnız ölçülmüş sınıflara
+   * verilir (kategori + /products); marka sayfaları ve PDP hâlâ S bloğu taşıyor (kapsam dışı)
+   * ve bu bayrak onları kırmızıya çevirmesin diye varsayılan KAPALI.
+   * Niçin ayrı bir ölçüt: `BAILOUT_TO_CLIENT_SIDE_RENDERING` sayımı bu arızayı GÖRMEZ — gövde
+   * HTML'de vardır, yalnız `hidden` blokta durur (ölçüldü: bailout 0 iken gizli kelime 719).
+   */
+  govdeGorunur?: boolean
   /**
    * ZORUNLU KAPIDA da koşar mı?
    *
@@ -554,6 +564,18 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
       sinif: 'liste',
       markerlar: [/<h1[\s>]/, /data-ssr="family-card"/],
       maxBailout: 0,
+      govdeGorunur: true,
+      kapida: true,
+    },
+
+    // Ürün listesi, İNGİLİZCE: aynı çekirdek (`urunlerSayfasi`), ayrı üretilmiş HTML — `en/products.html`
+    // ayrı dosya olduğu için ayrı ölçülür (URN-25: tr 99/1015, en 93/1165 kelime gizli blokta idi).
+    {
+      yol: '/en/products',
+      sinif: 'liste-en',
+      markerlar: [/<h1[\s>]/, /data-ssr="family-card"/],
+      maxBailout: 0,
+      govdeGorunur: true,
       kapida: true,
     },
 
@@ -583,6 +605,7 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
             sinif: 'altgruplu-kategori' as Sinif,
             markerlar: [/<h1[\s>]/, />Alt Ürün Grupları</],
             maxBailout: 0,
+            govdeGorunur: true,
             kapida: false,
           },
         ]
@@ -616,6 +639,7 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
         ? [/<h1[\s>]/, /data-ssr="family-card"/]
         : [/<h1[\s>]/, /(data-ssr="family-card"|>Alt Ürün Grupları<)/],
       maxBailout: 0,
+      govdeGorunur: true,
       kapida: true,
     },
 
@@ -675,9 +699,60 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
   return yalnizKapi ? hepsi.filter((k) => k.kapida) : hepsi
 }
 
+/**
+ * HTML'deki gizli akış bloklarının (`<div hidden id="S:n">…</div>`) açılış/kapanış konumları.
+ * `<div>` derinliği sayılır: ilk `</div>` bloğu kapatmaz, iç içe div'ler atlanır. Eşleşmeyen
+ * (kapanmamış) blok HTML sonuna kadar sayılır — kusurlu çıktı "blok yok" gibi okunmaz.
+ */
+export function gizliAkisBloklari(html: string): Array<{ bas: number; son: number }> {
+  const bloklar: Array<{ bas: number; son: number }> = []
+  const acilis = /<div hidden id="S:\d+">/g
+  let m: RegExpExecArray | null
+  while ((m = acilis.exec(html))) {
+    const etiket = /<(\/?)div\b[^>]*>/g
+    etiket.lastIndex = m.index + m[0].length
+    let derinlik = 1
+    let son = html.length
+    let t: RegExpExecArray | null
+    while ((t = etiket.exec(html))) {
+      derinlik += t[1] ? -1 : 1
+      if (derinlik === 0) {
+        son = etiket.lastIndex
+        break
+      }
+    }
+    bloklar.push({ bas: m.index, son })
+    acilis.lastIndex = son
+  }
+  return bloklar
+}
+
+/** `<h1>` açılışlarının kaçı gizli akış bloklarının DIŞINDA (gerçekten görünür yerde). */
+export function gorunurH1Sayisi(html: string): number {
+  const bloklar = gizliAkisBloklari(html)
+  let say = 0
+  for (const h of html.matchAll(/<h1[\s>]/g)) {
+    const i = h.index ?? 0
+    if (!bloklar.some((b) => i >= b.bas && i < b.son)) say++
+  }
+  return say
+}
+
 /** Bir yanıt gövdesini bir kurala göre denetler; ihlal listesi döner (boş = geçti). */
 export function ihlaller(kural: Kural, html: string): string[] {
   const cikti: string[] = []
+  if (kural.govdeGorunur) {
+    const blok = gizliAkisBloklari(html).length
+    if (blok > 0) {
+      cikti.push(
+        `${kural.yol} (${kural.sinif}) gövde gizli akış bloğunda: <div hidden id="S:n"> ${blok} adet ` +
+          '(Suspense sınırı içeriği sarıyor; JS çalıştırmayan okuyucu h1 ve listeyi görmez)'
+      )
+    }
+    if (gorunurH1Sayisi(html) === 0) {
+      cikti.push(`${kural.yol} (${kural.sinif}) görünür yerde <h1> yok (gizli blokta ya da hiç yok)`)
+    }
+  }
   for (const m of kural.markerlar) {
     if (!m.test(html)) cikti.push(`${kural.yol} (${kural.sinif}) SSR HTML'inde beklenen içerik yok: ${m}`)
   }

@@ -28,8 +28,21 @@ export type YaziKonusu = 'konfor' | 'guvenlik' | 'verimlilik'
 export interface YaziMetni {
   /** Adres metni (o dilde). */
   slug: string
-  /** Liste kartı ve meta açıklaması. Gövdenin ilk paragrafıyla aynı cevap, tek cümle. */
+  /**
+   * META AÇIKLAMASI: `<meta name="description">`, `og:description` ve `Article` JSON-LD `description`.
+   * Gövdenin ilk paragrafıyla aynı cevap, tek cümle. Hiçbir kartta BASILMAZ (`kartOzeti`).
+   */
   ozet: string
+  /**
+   * KART METNİ — her kart yüzeyi bunu basar: liste kartı ve araması (BilgiMerkeziListe, BilgiMerkeziArama),
+   * ana sayfa Bilgi bloğu (KnowledgeBlock), kategori ve aile sayfasının "ilgili rehberler" kartları
+   * (tersDizin.ts → IlgiliRehberler) ve yazı altı "ilgili yazılar" (sayfa.ts → RehberYazisiSayfasi).
+   * ZORUNLU ve `ozet`ten FARKLI olmalıdır: kart ile meta açıklaması aynı alandan geliyordu ve tam başlık
+   * aramasında yazı yerine liste sayfası görünüyordu (SEO-30). Yazının KENDİ metninden yazılır; gövdede
+   * olmayan sayı, marka ya da iddia eklenmez. Kapılar: src/lib/bilgiMerkezi/__tests__/kartOzeti.test.tsx
+   * ve kartOzetiYuzeyler.test.tsx.
+   */
+  kartOzeti: string
   /** Markdown; tek `# ` başlık (H1) ile başlar. */
   govde: string
 }
@@ -55,12 +68,17 @@ export const YAZILAR: readonly RehberYazisi[] = [
     kimlik: 'frekans-konvertoru',
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
-    guncellemeTarihi: '2026-09-25',
-    urunler: ['vh:aile/danfoss-fc101', 'vh:aile/danfoss-fc102', 'vh:aile/danfoss-fc51'],
+    // Gövdenin SON değişikliği: 2026-10-08, #1755 ("Fiyatı belirleyen etkenler" giriş cümlesi). Daha önce
+    // 2026-10-06, #1733 (aile bağlantı kimlikleri). Site haritası lastmod'u ve Article `dateModified` buradan.
+    guncellemeTarihi: '2026-10-08',
+    urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
         slug: 'frekans-konvertoru-nedir',
         ozet: 'Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır.',
+        // Kart metni yazının kendi bölüm başlıklarından ve seçim ölçütlerinden derlenir: yeni iddia, sayı ya da marka yok.
+        kartOzeti:
+          'Frekans konvertörünün nasıl çalıştığı, fan ve pompada neden kullanıldığı ve seçimde bakılacak ölçütler: besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
 
 Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
@@ -119,7 +137,7 @@ Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıl
 | Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] | Modele göre; ürün sayfasına bakınız |
 | Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] | Yerleşik PID kontrolü, pompa kademeleme [1] |
 
-Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-fc51), [FC 101](vh:aile/danfoss-fc101) ve [FC 102](vh:aile/danfoss-fc102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
+Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 101](vh:aile/danfoss-vlt-hvac-basic-drive-fc-101) ve [FC 102](vh:aile/danfoss-vlt-hvac-drive-fc-102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
 
 ## HVAC'a özel işlevler
 
@@ -156,7 +174,7 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 
 ## Fiyatı belirleyen etkenler
 
-Bu yazıda fiyat verilmez; güncel fiyat ürün sayfasında görünür. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
+Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
 
 - **Güç ve giriş gerilimi.** Aynı aile içinde modeli güç ve gerilim sınıfı belirler; örneğin FC 101 0,25 kW ile 90 kW arasında, üç fazlı 200–240 V, 380–480 V ve 525–600 V girişle üretilir [2].
 - **Koruma sınıfı ve kitler.** FC 101 IP20 ya da IP54 gövdeyle sunulur; IP21 isteğe bağlı bir kitle sağlanır [3].

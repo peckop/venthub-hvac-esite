@@ -36,7 +36,8 @@ export default function IlgiliRehberler({ rehberler, baslik }: IlgiliRehberlerPr
               className={`block h-full rounded-hvac-sm border border-light-gray p-5 hover:border-brand-cyan-ink ${odakSinifi}`}
             >
               <span className="block font-semibold text-primary-navy">{r.baslik}</span>
-              <span className="mt-2 block text-base text-industrial-gray">{r.ozet}</span>
+              {/* Kart metni `kartOzeti`dir (meta açıklaması DEĞİL); boşsa çizilmez, yerine meta konmaz. */}
+              {r.kartOzeti ? <span className="mt-2 block text-base text-industrial-gray">{r.kartOzeti}</span> : null}
             </Link>
           </li>
         ))}

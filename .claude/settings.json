@@ -166,6 +166,12 @@
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-yedek-oturum-sonu.cjs\"",
             "statusMessage": "sage-yedek",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/sage-hijyen-oturum-sonu.cjs\"",
+            "statusMessage": "sage-hijyen",
+            "timeout": 90
           }
         ]
       }
@@ -197,6 +203,17 @@
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/defter-tazelik-satiri.cjs\"",
             "timeout": 10,
             "statusMessage": "defter tazelik satiri"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-enjeksiyonu.cjs\"",
+            "timeout": 10,
+            "statusMessage": "hafiza (konu)"
           }
         ]
       }
@@ -247,6 +264,10 @@
           },
           {
             "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/kartsiz-beklenti-kapisi.cjs\""
+          },
+          {
+            "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/verify-on-stop.cjs\"",
             "timeout": 120,
             "statusMessage": "verify (eslint --fix + tsc)",
@@ -264,6 +285,13 @@
             "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/son-konusma-dokumu.cjs\"",
             "timeout": 60,
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/hafiza-kullanim-sayaci.cjs\"",
+            "timeout": 30,
+            "async": true,
+            "statusMessage": "hafiza kullanim sayaci"
           }
         ]
       }

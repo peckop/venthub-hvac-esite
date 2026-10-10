@@ -100,6 +100,31 @@ describe('INV-RETURN-1 · iade geçiş sözleşmesi tek ve tutarlı', () => {
     ).toEqual([])
   })
 
+  it('istemcinin webhook\'tan FAZLA verdiği geçişler tam olarak bilinen üç admin kararıdır', () => {
+    // Yukarıdaki alt küme testi TEK YÖNLÜDÜR (REC-551, mutasyon raporu T2): istemci makinesine
+    // fazladan geçiş eklenince fark etmez. Tam eşitlik de İSTENMEZ — aşağıdaki üç geçiş kargo
+    // firmasının değil admin'in kararıdır. Bu yüzden FARKIN KENDİSİ kilitlenir: listeye yeni bir
+    // satır eklenmesi gerekiyorsa, o geçişin neden yalnız istemcide olduğu burada yazılmalıdır.
+    const YALNIZ_ISTEMCI: Record<string, string> = {
+      'requested -> approved': 'iadeyi onaylamak admin kararıdır; kargo firması talebi onaylayamaz',
+      'requested -> rejected': 'iadeyi reddetmek admin kararıdır; kargo firması talebi reddedemez',
+      'received -> refunded': 'para iadesi admin kararıdır ve PSP kanıtıyla yazılır; kargo firması ödeme durumu ilan edemez',
+    }
+    const fark: string[] = []
+    for (const kaynak of RETURN_STATUSES) {
+      const webhook = new Set<string>(CARRIER_ALLOWED_TRANSITIONS[kaynak])
+      for (const hedef of allowedNextStatuses(kaynak)) {
+        if (!webhook.has(hedef)) fark.push(`${kaynak} -> ${hedef}`)
+      }
+    }
+    expect(
+      fark.sort(),
+      'İstemci durum makinesi, webhook\'un tanımadığı YENİ bir geçiş veriyor (ya da bilinen bir ' +
+        'admin geçişi kalkmış). Bu geçiş kargo firmasına da açılmalı mı, yoksa yalnız admin kararı ' +
+        'mı? Karar ver; yalnız admin kararıysa gerekçesiyle YALNIZ_ISTEMCI listesine ekle.',
+    ).toEqual(Object.keys(YALNIZ_ISTEMCI).sort())
+  })
+
   it('webhook `refunded` YAZAMAZ — para kararı kargo firmasının değil', () => {
     const yazabilen = (Object.keys(CARRIER_ALLOWED_TRANSITIONS) as ReturnStatus[]).filter((k) =>
       (CARRIER_ALLOWED_TRANSITIONS[k] as readonly string[]).includes('refunded'),

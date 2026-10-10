@@ -215,8 +215,9 @@ try {
  * gösterir. Bu yüzden satır MEVCUT kancaya ekleniyor; kancanın kendi işi ~135-240 ms
  * bandında kalır.
  *
- * ⭐NİÇİN GÖRÜNÜR OLMASI ŞART (REC-342 dersi): aynı ölçümü yapan bir CI kapısı var
- * (`taban-tazeligi.test.ts`) ama o yalnız PR'da konuşur. Recep'in sorusu *"DB'de değişiklik
+ * ⭐NİÇİN GÖRÜNÜR OLMASI ŞART (REC-342 dersi): aynı ölçümü yapan bir kapı var
+ * (`taban-tazeligi-dunya.test.ts`) ama o yalnız master'a her push'ta ve zamanlı koşuda konuşur
+ * (ALT-38: PR kapısından çıktı, suçsuz PR'ları bekletiyordu). Recep'in sorusu *"DB'de değişiklik
  * yaptığım an yedeğin bayat olacak, tazelemek yine 2 gün mü sürecek"* — o an PR anı DEĞİL,
  * karar anıdır. Ölçen ama kararın verildiği yerde görünmeyen kapı, görünmeyen kapıdır.
  *
@@ -290,7 +291,21 @@ try {
   const parca = []
   if (d.dogrulanmadi.length > 0) parca.push('⛔DOGRULANMAMIS ' + d.dogrulanmadi.length + ' dosya (bir kosum DUSTU)')
   if (d.gun === null) parca.push('HIC YEDEK YOK')
-  else if (d.gun > 2) parca.push('son yedek ' + d.gun + ' gun once')
+  // Eşik DEPO BAŞINA (kanban 24 saat, sage 72 saat): ayrı depoların gecikmesi ayrı söylenir (ARC-9).
+  else for (const g of d.geciken || []) parca.push(g.depo + ' yedegi ' + g.saat + ' saat once')
+  // Recep sözü defteri (ARC-15): karar kaydı; yedeği hiç yoksa ya da 24 saati aştıysa konuşur. Defter yoksa susar.
+  try {
+    const dy = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri-yedek.cjs'))
+    const dd = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri.cjs'))
+    if (require('fs').existsSync(dd.defterYolu())) {
+      const y = dy.durum()
+      if (y.dogrulanmadi.length > 0) parca.push('⛔defter yedegi DOGRULANMAMIS ' + y.dogrulanmadi.length + ' dosya')
+      if (y.sonYedek === null) parca.push('defter HIC YEDEK YOK')
+      else if (y.gecikti) parca.push('defter yedegi ' + y.saat + ' saat once')
+    }
+  } catch (e) {
+    parca.push('defter yedegi OLCULEMEDI (' + String(e.message).slice(0, 50) + ')')
+  }
   if (parca.length > 0) {
     process.stdout.write('⚠SAGE: ' + parca.join(' · ') + '\n')
     process.stdout.write('  ONARIM: node scripts/hijyen/sage-yedek.cjs (salt-okuma, ~1 sn, git disina yazar)\n')
@@ -317,23 +332,6 @@ try {
 }
 
 /**
- * ── HAFIZA KUYRUĞU (REC-422, Ops emri 2026-09-30) — EŞİKLİ ──
- * claude-mem'in bekleyen olay kuyruğu 300'ü aşarsa konuşur. Kuyruk yalnız bellektedir: makine
- * kapanınca kaybolur (09-29: 5.469 olay). Ölçüm arka planda ve önbellekten. Gerekçe: hafiza-kuyrugu.cjs.
- */
-try {
-  const hk = require(path.join(__dirname, 'hafiza-kuyrugu.cjs'))
-  const simdi = Date.now()
-  const s = hk.satir(hk.oku(), simdi)
-  if (s) process.stdout.write(s + '\n')
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
-    hk.gerekirseTazele(simdi)
-  }
-} catch (e) {
-  process.stdout.write('⚠HAFIZA KUYRUK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
-}
-
-/**
  * ── BAĞLAM (karar 148, 2026-09-27) — HER MESAJDA ──
  * Eşik altında düz "BAGLAM: 146k/1M"; compact sınırından sonra cevap yoksa "compact sonrasi".
  * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son
@@ -341,8 +339,14 @@ try {
  */
 try {
   const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
-  const s = bd.satir(bd.sonBaglam(girdi.transcript_path), bd.compactPenceresi(DEPO))
+  const token = bd.sonBaglam(girdi.transcript_path)
+  const pencere = bd.compactPenceresi(DEPO)
+  const s = bd.satir(token, pencere)
   if (s) process.stdout.write(s + '\n')
+  // Modlar bu ölçümü pencere başına dosyadan okur (ARC-33 madde 2); yazım hatası satırı bozmaz.
+  // Compact hazırlığı (ARC-31 madde 2): durum dosyası yolu + "yarım iş" ifadesi de aynı dosyaya; kokpit satırı bundan kurar.
+  const durum = bd.pencereDurumOzeti(bd.PENCERE_KLASORU, girdi.session_id, girdi.transcript_path, token, pencere)
+  bd.pencereDosyasiYaz(bd.PENCERE_KLASORU, girdi.session_id, token, pencere, process.env.CC_LANE, undefined, durum)
 } catch (e) {
   process.stdout.write('⚠BAGLAM: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
@@ -361,6 +365,40 @@ try {
   }
 } catch (e) {
   process.stdout.write('⚠BELGE: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── WRONGSTACK (ARC-24, karar 257) — HER MESAJDA, EŞİKSİZ ──
+ * "bizde X, son Y": sabitli sürüm taze okunur, son sürüm GitHub'dan günde en çok bir kez
+ * arka planda ölçülüp önbelleğe yazılır. Ağ yoksa "OLCULEMEDI". Gerekçe: wrongstack-satiri.cjs.
+ */
+try {
+  const ws = require(path.join(__dirname, 'wrongstack-satiri.cjs'))
+  const simdi = Date.now()
+  process.stdout.write(ws.satir(ws.oku(ws.onbellekYolu(PANO)), DEPO, simdi) + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ws.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠WRONGSTACK: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
+ * ── DÜNYA DURUMU (ALT-38) — EŞİKLİ ──
+ * PR kapısından çıkan dünya durumu testlerinin zamanlı koşusu (dunya-durumu.yml) kırmızı, iptal ya da
+ * sessizce ölmüşse konuşur; yoluna girdiğinde susar. Yalnız önbellek okunur, ölçüm arka planda
+ * (30 dakikada bir). PR'ı BLOKLAMAZ. Gerekçe: dunya-durumu-satiri.cjs.
+ */
+try {
+  const ds = require(path.join(__dirname, 'dunya-durumu-satiri.cjs'))
+  const simdi = Date.now()
+  const s = ds.satir(ds.oku(ds.onbellekYolu(PANO)), DEPO, simdi)
+  if (s) process.stdout.write(s + '\n')
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(girdi.session_id || ''))) {
+    ds.gerekirseTazele(PANO, simdi)
+  }
+} catch (e) {
+  process.stdout.write('⚠DUNYA: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
 }
 
 process.exit(0)

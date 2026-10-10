@@ -22,6 +22,7 @@ export const en: typeof tr = {
   },
   common: {
     technicalDrawing: 'Technical Drawing',
+    imagePreparing: 'Product image coming soon',
     errorGeneric: 'An error occurred',
     devMode: 'Developer Mode',
     userFallback: 'User',
@@ -37,7 +38,9 @@ export const en: typeof tr = {
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
     brandTagline: 'Ventilation & HVAC',
-    brandLegalName: 'VentHub HVAC Solutions.',
+    // URN-83: the company is not incorporated yet; no legal entity name (e.g. "… Solutions.") is written. Once the
+    // registered name exists this value is REPLACED with it (hence the key name stays "LegalName"). Used by: login footer.
+    brandLegalName: 'VentHub',
     vortice: 'Vortice',
     comma: ',',
     decrease: 'Decrease',
@@ -90,7 +93,8 @@ export const en: typeof tr = {
         ghost: 'In-line / Duct Fans',
         smoke: 'Smoke Exhaust Fans',
         jet: 'Car Park Jet Fans',
-        radial: 'Radial Fans',
+        // Decision 288 (Recep, OPS-76): matches the TR name 'Radyal (Santrifüj) Fanlar'; address and key are unchanged.
+        radial: 'Radial (Centrifugal) Fans',
         roof: 'Roof Fans',
         'axial-ind': 'Industrial Axial Fans',
         'air-curtain': 'Air Curtains',
@@ -113,7 +117,8 @@ export const en: typeof tr = {
         'speed-controllers': 'Speed Controllers',
         'water-coils': 'Water Coil Duct Heaters',
         // REC-300 Faz 1-B: bound by the DB migration; the corrosion branch moves to a NEW key.
-        'corrosion-fans': 'Corrosion-Resistant Fans',
+        // Decision 287 (Recep, OPS-74): matches the TR name; the old `acid-fans` key stays for rollback and the deploy window.
+        'corrosion-fans': 'Corrosion- and Acid-Resistant Fans',
         'plug-fans': 'Plug Fans',
         'cabinet-fans': 'Cabinet Fans',
         'unheated-curtain': 'Unheated Air Curtains',
@@ -345,10 +350,10 @@ export const en: typeof tr = {
         entryPaths: 'guided decision flow'
       },
       trustStrip: {
-        authorizedBrands: 'World-renowned brands',
-        engineeringSupport: 'Engineering guidance',
-        nationwideDelivery: 'Nationwide delivery',
-        projectGuidance: 'Project-led selection support'
+        authorizedBrands: 'Brand and model catalogue',
+        engineeringSupport: 'Product Selector tools',
+        nationwideDelivery: 'Orders by quotation',
+        projectGuidance: 'Technical specification tables'
       },
       quickChips: {
         fans: 'Fans',
@@ -400,7 +405,7 @@ export const en: typeof tr = {
           {
             eyebrow: 'PRECISION HVAC SYSTEMS',
             title: 'Technical Excellence and Smart Flow',
-            subtitle: 'End-to-end deterministic ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
+            subtitle: 'End-to-end ventilation engineering for industrial kitchens, parking lots, and comfort zones.',
             products: [
               {
                 label: 'Industrial Solutions',
@@ -416,7 +421,7 @@ export const en: typeof tr = {
       }
     },
     cinematicShowcase: {
-      hudStatus: 'System.Data.Live',
+      hudStatus: 'Product family',
       eyebrow: 'ENGINEERING FOCUS',
       title: 'Vortice Lineo Quiet Series',
       subtitle: 'The new digital standard of silence with an aero-acoustic housing design.',
@@ -459,7 +464,7 @@ export const en: typeof tr = {
       }
     },
     guidedDiscovery: {
-      eyebrowLabel: 'DETERMINISTIC SYSTEMS',
+      eyebrowLabel: 'VENTILATION SOLUTIONS',
       heading: 'The Engineering Aesthetics of Airflow',
       intro: 'Discover industrial-grade ventilation solutions curated by VentHub.',
       cardFallback: 'Professional Ventilation Solutions',
@@ -517,10 +522,6 @@ export const en: typeof tr = {
       }
     },
     featuredCommercial: {
-      gradeLabel: 'Grade',
-      gradeValue: 'A++',
-      standardLabel: 'Standard',
-      standardValue: 'ERP',
       eyebrow: 'Product Showroom',
       title: 'Industrial Product Portfolio',
       subtitle: 'Discover the most reliable and efficient products in the sector, along with technical details and application advantages.',
@@ -529,51 +530,51 @@ export const en: typeof tr = {
       tabs: {
         featured: 'Featured',
         newArrivals: 'New Arrivals',
-        bestSellers: 'Best Sellers',
+        bestSellers: 'Product Selection',
         airCurtains: 'Air Curtains',
         heatRecovery: 'Heat Recovery'
       },
       panelTitles: {
         featured: 'Performance Leaders',
         newArrivals: 'Latest Technologies',
-        bestSellers: 'Most Preferred',
+        bestSellers: 'Selected Products',
         airCurtains: 'Climate Protection Systems',
         heatRecovery: 'Energy Recovery'
       },
       panelDescriptions: {
-        featured: 'Flagship project solutions that have received full marks in durability and efficiency tests by our engineering team.',
+        featured: 'Featured models from the VentHub product family and their technical specifications.',
         newArrivals: 'New generation devices with the highest energy efficiency and modern design, recently added to the VentHub product family.',
-        bestSellers: 'Reliable models proven in the field, most ordered by industry professionals and large projects.',
+        bestSellers: 'Selected models from the VentHub product family, chosen for their technical specifications.',
         airCurtains: 'Professional series that protect indoor comfort by creating an invisible thermal barrier at entrance areas.',
         heatRecovery: 'Economic units that recover heat from waste air with up to 90% efficiency while meeting fresh air needs.'
       }
     },
     trustProof: {
-      eyebrow: 'Trust and Proof',
-      title: 'We build trust with clear operational realities, not decorative promises.',
-      subtitle: 'The trust layer on the VentHub homepage should make the verified working model and expert support approach visible.',
-      badge: 'VERIFIED',
+      eyebrow: 'Catalogue and Tools',
+      title: 'Catalogue, Product Selector and Quote',
+      subtitle: 'Browse fan, air curtain, heat recovery and frequency converter models, run a pre-assessment from your volume, airflow and pressure inputs, and request a quote.',
+      badge: 'ON VENTHUB',
       visualAlt: 'VentHub Reliability Proof and Quality Certificates',
       items: {
         brands: {
-          eyebrow: 'Brand Layer',
-          title: 'Premium brand selection',
-          description: 'Represented brands are not only visual assets; they carry solution quality and category credibility.'
+          eyebrow: 'Catalogue',
+          title: 'Brands and Models',
+          description: 'Product families and models from AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT and Vortice, with technical specification tables.'
         },
         guidance: {
-          eyebrow: 'Expert Layer',
-          title: 'Engineering-guided direction',
-          description: 'We aim to move users not only into product lists, but into a more accurate selection flow.'
+          eyebrow: 'Calculation',
+          title: 'Pre-sizing with the Product Selector',
+          description: 'Enter values such as volume, airflow and pressure; the duct fan, heat recovery, air curtain and jet fan calculators give a preliminary assessment.'
         },
         delivery: {
-          eyebrow: 'Operations Layer',
-          title: 'Delivery and supply visibility',
-          description: 'Delivery and supply expectations are made clearer, more predictable and more professional.'
+          eyebrow: 'Logistics',
+          title: 'Delivery planning',
+          description: 'Delivery time and shipping terms are settled at the quotation stage, according to your project.'
         },
         support: {
-          eyebrow: 'Continuity Layer',
-          title: 'Accessible after-sales support',
-          description: 'Support, quoting and knowledge-center flows are not disconnected; they are parts of the same trust architecture.'
+          eyebrow: 'Contact',
+          title: 'Request a Quote, Ask a Question',
+          description: 'Send quote requests and questions through the contact form or info@venthub.com.tr. Technical specifications are on the product pages.'
         }
       }
     },
@@ -586,7 +587,6 @@ export const en: typeof tr = {
       headingPrefix: 'Engineering',
       headingAccent: 'Layer',
       statsPipelineLabel: 'Project Pipeline',
-      statsOptimization: '92% Optimization',
       eyebrow: 'Knowledge and Support Layer',
       title: 'Make technical decision paths visible and reachable.',
       subtitle: 'Guides, calculators and support-center routes help users reach not only products, but a better decision environment.',
@@ -740,6 +740,20 @@ export const en: typeof tr = {
     },
     orbital: {
       dragHint: 'Drag to Spin',
+      tapProductHint: 'Tap a Product',
+      swipeHint: 'Swipe Left-Right',
+      pickCategoryHint: 'Pick a Category',
+      discoverTitle: 'Discover Our Product Range',
+      subcategoriesTitle: '{{name}} Subcategories',
+      openMainDesktop: 'Click: Open Category • Double-click: Go to Page',
+      openMainTouch: 'Tap: Open • Double Tap: Go',
+      openSubDesktop: 'Click to Open the Product Page',
+      openSubTouch: 'Tap to Open the Page',
+    },
+    radialMenu: {
+      subcategoriesCount: 'Subcategories ({{count}})',
+      noSubcategories: 'No Subcategories',
+      viewProducts: 'View Products',
     },
     category3DIcon: {
       dragHint: 'Hold to Rotate',
@@ -962,12 +976,12 @@ export const en: typeof tr = {
   },
   aboutPage: {
     title: 'About VentHub',
-    heroTitle: 'Turkey\'s Trusted HVAC Platform',
+    heroTitle: 'Ventilation products:',
     whySubtitle: 'We work to be worthy of your trust',
     experience: 'Years of Experience',
     distributorship: 'Global Brand Network',
     completedProject: 'Product Types',
-    shippingNetwork: 'Province Delivery Network',
+    productFamilies: 'Product Families',
     precisionTitle: 'Engineering Precision',
     precisionDesc: 'We do not just sell products; we offer engineering solutions with project-specific airflow, pressure, and efficiency calculations.',
     standardsTitle: 'Global Standards',
@@ -975,7 +989,7 @@ export const en: typeof tr = {
     trustTitle: 'Operational Trust',
     trustDesc: 'We manage our supply and operations with discipline, aiming for on-time delivery while staying loyal to your project schedules.',
     heroBadge: '15+ Years of Engineering Experience',
-    heroTitleItalic: 'the Air',
+    heroTitleItalic: 'catalogue and selection tools',
     heroDesc: 'VentHub brings highly efficient, technological, and sustainable ventilation systems to the Turkish market for modern living and industrial spaces.',
     storyTitle: 'We Build the Climate',
     storyTitleItalic: 'of the Future Today',
@@ -993,6 +1007,9 @@ export const en: typeof tr = {
     vision: 'Our Vision'
   },
   category: {
+    // REC-497: used when the category has no description of its own (metadata.description_i18n).
+    // No unverifiable "highest quality / most economical" claim; sales mode is quote-based, no price promise.
+    seoYedekAciklama: 'Browse the product families, models and technical specifications in the {{ad}} category in the VentHub catalog.',
     family: {
       variantCount: '{{count}} models',
       count: '{{count}} product families',
@@ -1125,9 +1142,9 @@ export const en: typeof tr = {
       venthubSolution: 'VentHub Solution',
     },
     series: {
-      technicalFamily: 'Technical Product Family',
-      heroDefaultDesc: 'Browse professional ventilation solutions by their technical series.',
-      seriesDetail: 'Series Detail',
+      technicalFamily: 'Subcategory',
+      heroDefaultDesc: 'Browse professional ventilation solutions by their technical product families.',
+      seriesDetail: 'Subcategory Detail',
       requestQuote: 'Request a Quote',
       colModel: 'Model',
       colPrice: 'Price',
@@ -1144,6 +1161,7 @@ export const en: typeof tr = {
     notFound: 'Category Not Found',
     backHome: 'Back to home',
     breadcrumbHome: 'Home',
+    breadcrumbAria: 'Breadcrumb',
     premiumCollection: 'Premium Collection',
     findModel: 'Find Suitable Model',
     productCount: 'Product Count',
@@ -1168,9 +1186,9 @@ export const en: typeof tr = {
     smartControlDesc: 'Uninterrupted fresh air with automatic speed adjustment according to air quality.',
     longTermInvestment: 'Long Term Investment',
     longTermInvestmentDesc: 'Maintenance-free motor technology and durable polymer body.',
-    allSeries: 'All Series',
-    chooseSeriesDesc: 'Choose the series that suits your needs',
-    inspectSeries: 'Inspect Series',
+    allSeries: 'All Subcategories',
+    chooseSeriesDesc: 'Choose the subcategory that suits your needs',
+    inspectSeries: 'Explore',
     whyCategory: 'Why {{category}}?',
     electricVsAmbientAlt: 'Electric vs Ambient Air Comparison',
     modernLoftAlt: 'Modern Loft Application',
@@ -1192,15 +1210,15 @@ export const en: typeof tr = {
     why3Title: 'Long Life',
     why3Desc: 'Corrosion-resistant body and heavy-duty components.',
     filters: 'Filters',
-    subcategories: 'Sub-categories',
+    subcategories: 'Subcategories',
     brands: 'Brands',
     airflow: 'Airflow (m³/h)',
     showcase: {
       defaultDescription: 'The technical authority on high-performance, intelligent and sustainable ventilation systems.',
       premiumTitle: 'Premium Engineering Solutions',
       catalog: 'Category Catalog',
-      subGroups: 'Sub Product Groups',
-      exploreSeries: 'Explore Series',
+      subGroups: 'Subcategories',
+      exploreSeries: 'Explore',
       guarantee: 'VentHub Guarantee',
       discover: 'Discover',
       whyVenthubTitle: 'Why VentHub Engineering?',
@@ -1338,7 +1356,7 @@ export const en: typeof tr = {
       motor_efficiency_class: 'Motor Efficiency Class',
       motor_poles: 'Motor Poles',
       motor_type: 'Motor Type',
-      noise_level_db_a: 'Noise Level',
+      noise_level_db_a: 'Sound level (manufacturer\'s declaration)',
       noise_lpa_3m_db: 'Sound Pressure (3 m)',
       nominal_delivery_m3h: 'Nominal Airflow',
       nominal_static_pressure_pa: 'Nominal Static Pressure',
@@ -1371,6 +1389,12 @@ export const en: typeof tr = {
       weight_kg: 'Weight',
       width_mm: 'Width',
       wiring: 'Wiring Type'
+    },
+    // Teknik ozellik DEGER metinleri (URN-58) — formatSpecValue mantiksal (true/false) degeri buradan basar.
+    // Ham "true"/"false" musteriye gitmez; canli kapi SPEC-HAM-DEGER yayindaki sayfada bunu olcer.
+    specValues: {
+      yes: 'Yes',
+      no: 'No'
     },
     // Teknik ozellik GRUP basliklari — specLabel.ts 'pdp.specGroups.<grup>' yolunu arar.
     // Bunlar yoksa groupTechnicalSpecs'in HARDCODED Turkce etiketi kullaniliyordu:
@@ -1426,6 +1450,7 @@ export const en: typeof tr = {
     relatedProducts: 'Related Products',
     officialDistributor: 'BRAND ASSURANCE',
     priceAvailability: 'Price & Availability',
+    quoteLabel: 'Quote',
     shareCopied: 'Link copied!',
     messages: {
       pdfStarted: 'Generating PDF...'
@@ -1437,9 +1462,11 @@ export const en: typeof tr = {
       productDescription: 'Product Description',
       category: 'Category',
       noSpecsAvailable: 'No technical specifications available for this product.',
+      approxCurve: 'Approximate curve — being refined from the manufacturer chart.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
-      sku: 'SKU',
+      /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
+      modelCode: 'Model Code',
       datasheetPdf: 'DATASHEET (PDF)'
     },
     actions: {
@@ -1559,6 +1586,8 @@ export const en: typeof tr = {
     all: 'All',
     pending: 'Pending',
     paid: 'Paid',
+    processing: 'Preparing',
+    statusUnknown: 'Status Updating',
     shipped: 'Shipped',
     delivered: 'Delivered',
     failed: 'Failed',
@@ -1603,8 +1632,8 @@ export const en: typeof tr = {
     reorderedToast: '{{count}} items added to cart',
     reorderNotFound: 'Items not found in stock',
     reorderError: 'Error during reorder',
-    /** SKU as of the order date (snapshot) — not the current catalog SKU. */
-    skuLabel: 'SKU: {{sku}}',
+    /** The item's CURRENT catalog model code (not an order-time snapshot); never the raw SKU. */
+    modelCodeLabel: 'Model Code: {{code}}',
     shippingInfo: 'Shipping / Tracking',
     carrier: 'Carrier',
     trackingNumber: 'Tracking Number',
@@ -1943,6 +1972,12 @@ export const en: typeof tr = {
     reviewDesc: 'Your payment was successfully received from your bank. We are still verifying the match with your order and will complete it shortly.',
     reviewWarning: 'Please do not pay again. We will notify you by email once verification is complete.',
     reviewBackHome: 'Back to Home',
+    // UNCERTAIN result (verification error, no network, "pending"): we do NOT say the payment was taken, nor that it
+    // was not. The charge may have gone through, so there is no "failed" screen and no "try again" (double charge).
+    pendingTitle: 'Checking Your Payment',
+    pendingDesc: 'We could not confirm the result of your payment right now. The payment may have been taken; we are checking its status.',
+    pendingWarning: 'Please do not pay again. You can follow the status on your orders page.',
+    pendingContactLabel: 'For questions',
     orderCompletedTitle: 'Your Order is Complete!',
     orderNoLabel: 'Order No',
     orderCompletedDesc: 'Your order has been received successfully. A confirmation email will be sent shortly.',
@@ -1953,8 +1988,6 @@ export const en: typeof tr = {
     failedGeneric: 'Payment could not be completed',
     failedToast: 'Payment failed: {{msg}}',
     verifyError: 'Verification error',
-    errorDuring: 'Error: {{msg}}',
-    unverified: 'Payment could not be verified',
     unexpected: 'An unexpected error occurred'
   },
   brands: {
@@ -1963,14 +1996,18 @@ export const en: typeof tr = {
     },
     sectionTitle: 'Premium HVAC Brands',
     sectionSubtitle: 'We offer products of leading global HVAC brands with full brand assurance.',
-    subtitlePart1: 'Trusted Partner of',
-    subtitlePart2: 'World Giants',
+    subtitlePart1: 'Our',
+    subtitlePart2: 'Brands',
     viewAll: 'See All Brands',
     pageTitle: 'Brands',
     pageSubtitle: 'We bring the engineering masterpieces of the world\'s most prestigious HVAC manufacturers to your projects.',
     eyebrow: 'Global Signatures of Excellence',
     exploreBrand: 'Explore Brand',
-    seoDesc: 'Industrial ventilation brands under the VentHub umbrella',
+    seoDesc: 'Industrial ventilation and HVAC brands in the VentHub catalog. Browse the product families, models and technical specifications of each brand.',
+    seoYedekUzmanlik: 'Browse {{uzmanlik}} products in the VentHub catalog.',
+    seoYedek: 'Browse the product families, models and technical specifications of {{ad}} in the VentHub catalog.',
+    // OPS-51: meta description of the brand page without products (same fact as the page body; no product/time promise).
+    seoUrunsuz: '{{ad}} products are not yet in the VentHub catalog; contact us for product information and a quote.',
     notFound: 'Brand not found',
     backToAll: 'Back to all brands',
     aboutBrand: 'information',
@@ -1999,6 +2036,11 @@ export const en: typeof tr = {
       allProductGroups: 'All Product Groups',
       // REC-148 A6: was "will be added soon" — a promise with no guarantee behind it.
       noProducts: 'This brand has no products in the catalogue yet.',
+      // OPS-51 (decision 265 + OPS ruling): ONLY for a brand with zero active products in the DB (currently Flexiva); the
+      // decision is derived on the server from the active product count (`markaUrunDurumu.ts`), no static flag.
+      // NO time promise (INV-VAAT-SIZINTI-2 / REC-148): fact + action — not in the catalogue, request a quote.
+      productsOnRequest: 'Request a quote from us for {{ad}} products.',
+      productsOnRequestCta: 'Go to the contact form',
       originSuffix: 'Origin',
       estPrefix: 'EST.',
       // REC-98: "Corporate Snapshot" satirlarinin ETIKETLERI. Deger tarafi veri olarak
@@ -2233,7 +2275,8 @@ export const en: typeof tr = {
       shipStatus: {
         delivered: 'Delivered',
         shipped: 'Shipped',
-        preparing: 'Preparing'
+        preparing: 'Preparing',
+        awaitingPayment: 'Awaiting Payment'
       },
       shipSteps: {
         preparing: 'Prepared',
@@ -2407,6 +2450,7 @@ export const en: typeof tr = {
       statusDelivered: 'Delivered',
       statusShipped: 'In Transit',
       statusPreparing: 'Preparing',
+      statusAwaitingPayment: 'Awaiting Payment',
       stepShipped: 'Shipped',
       stepDelivered: 'Delivered',
       subtitle: 'Track the shipping status and tracking details of your orders here.',
@@ -2624,10 +2668,15 @@ export const en: typeof tr = {
     // ⛔"Results carry over into your quote request" REMOVED (2026-09-05, code review):
     // no such hand-off exists. The PR that removes promise boxes was introducing a new promise.
     aciklama: 'Run a pre-assessment from volume, airflow and pressure inputs.',
+    // REC-497: search-result description (page copy is unchanged).
+    seoDescription: 'Run a pre-assessment for duct fans, heat recovery, air curtains and jet fans from your volume, airflow and pressure inputs.',
     araclar: {
       kanal: {
-        ad: 'Duct fan sizing',
-        aciklama: 'Derive the required airflow and pressure from room volume and air change rate.',
+        // URN-83: the card said "airflow from volume and air change rate" but the link goes to the DUCT PRESSURE LOSS
+        // calculator (target: `calculators.duct` — enter flow rate + duct size, get air velocity and estimated pressure loss).
+        // The card now follows the target page's own sentence; it claims nothing beyond it.
+        ad: 'Duct pressure loss calculation',
+        aciklama: 'Calculate air velocity and estimated pressure loss from flow rate and duct dimensions.',
       },
       hrv: {
         ad: 'Heat recovery (HRV) sizing',
@@ -2754,6 +2803,8 @@ export const en: typeof tr = {
       description: 'Air duct velocity calculation and pressure drop estimation',
       infoText: 'Calculates air velocity and estimated pressure loss based on flow rate and duct dimensions.',
       form: {
+        inputTitle: 'Duct Details',
+        inputDesc: 'Enter airflow and duct dimensions',
         shape: 'Duct Type',
         round: 'Circular',
         roundDesc: 'Spiral or welded pipe',
@@ -2761,8 +2812,11 @@ export const en: typeof tr = {
         rectangularDesc: 'Angled duct',
         material: 'Material',
         steel: 'Galvanized Steel',
+        steelDesc: 'Standard',
         pvc: 'PVC',
+        pvcDesc: 'Low friction',
         flex: 'Flex Duct',
+        flexDesc: 'Flexible',
         airflow: 'Airflow',
         airflowTooltip: 'Amount of air that needs to pass through the duct',
         diameter: 'Duct Diameter',
@@ -2773,6 +2827,8 @@ export const en: typeof tr = {
         lengthTooltip: 'Total duct length'
       },
       results: {
+        title: 'Calculation Results',
+        subtitle: 'Air velocity and pressure loss values',
         velocity: 'Air Velocity',
         specificLoss: 'Pressure Loss (Specific)',
         totalLoss: 'Total Pressure Loss',
@@ -2786,18 +2842,28 @@ export const en: typeof tr = {
       infoText: 'Calculates annual energy saving potential of heat recovery units (HRV) or enthalpic recovery units (ERV).',
       form: {
         type: 'Device Type',
+        typeDesc: 'Select the heat recovery system',
         hrv: 'HRV (Heat Recovery)',
         hrvDesc: 'Heat recovery only',
         erv: 'ERV (Energy Recovery)',
         ervDesc: 'Heat + Moisture recovery',
         climate: 'Climate Zone',
         cold: 'Cold',
+        coldDesc: 'North / mountain regions',
         temperate: 'Temperate',
+        temperateDesc: 'Central belt',
         hot: 'Hot',
+        hotDesc: 'South / coastal regions',
         usage: 'Space Type',
+        usageDesc: 'Building, climate and usage details',
+        residential: 'Residential',
+        residentialDesc: 'Domestic use',
         office: 'Office',
+        officeDesc: 'Workplace',
         commercial: 'Commercial',
+        commercialDesc: 'Retail / shopping mall',
         occupancy: 'Number of People',
+        unitPeople: 'people',
         workingHours: 'Daily Operation',
         electricityPrice: 'Electricity Unit Price',
         sensibleEfficiency: 'Sensible Efficiency',
@@ -2805,6 +2871,15 @@ export const en: typeof tr = {
         area: 'Area (m²)'
       },
       results: {
+        title: 'Calculation Results',
+        subtitle: 'Estimated annual energy savings',
+        savingsTitle: 'Annual Savings',
+        annualEnergySaving: 'Annual Energy Saving',
+        annualCostSaving: 'Annual Cost Saving',
+        unitKwhPerYear: 'kWh/y',
+        unitCostPerYear: '₺/y',
+        unitKgPerYear: 'kg/y',
+        unitYears: 'years',
         heatingGain: 'Heating Gain',
         coolingGain: 'Cooling Gain',
         co2Reduction: 'CO₂ Reduction',
@@ -3044,6 +3119,8 @@ export const en: typeof tr = {
     badgeQuietest: 'Quietest',
     badgeEfficient: 'Most efficient',
     cardDelivers: 'In your duct',
+    cardDeliversApprox: 'In your duct (approx.)',
+    cardApproxCurve: 'Approximate curve — being refined from the manufacturer chart. Please confirm this model\'s suitability with the manufacturer.',
     cardNoise: 'Noise level',
     cardDiameter: 'Connection diameter',
     cardCta: 'View product',
@@ -3131,6 +3208,7 @@ export const en: typeof tr = {
     close: 'Close',
     coldStorage: 'Cold Storage',
     coldStorageDesc: 'Cold chain protection',
+    coldStorageTip: 'Protects the cold chain and prevents product spoilage',
     consultUs: 'Consult us',
     customOffer: 'Request Custom Offer',
     doorHeight: 'What is Your Door Height?',
@@ -3145,6 +3223,8 @@ export const en: typeof tr = {
     heatingYesDesc: 'For winter comfort',
     heightMeter: 'Height (Meter)',
     industrial: 'Industrial Facility',
+    industrialDesc: 'Factory, logistics facility',
+    industrialTip: 'Isolates dust, smoke and harmful substances',
     insulation: 'For insulation and savings',
     matchScore: '{{score}}% Match',
     meter: 'Meter',

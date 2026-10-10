@@ -161,11 +161,15 @@ describe('INV-PAY-ESLESME-2 — müşteri yüzü', () => {
 })
 
 describe('INV-PAY-ESLESME-2 — ölçüm evreni kaybolmamış', () => {
-  it('13 gerçek yanıtı taşıyan arşiv dosyası YERİNDE', () => {
+  it('13 ödeme yanıtının YAPISINI taşıyan SENTETİK fikstür YERİNDE', () => {
     // ⭐Bu kol bir BAĞIMLILIK ilanı: karar testi bu dosyayı okuyor. Dosya taşınırsa
     // o test 0 vakayla sessizce geçebilir; burada yokluğu KIRMIZI verir.
-    const p = resolve(KOK, 'docs/archive/db-backup-pre-kademe2/venthub_orders.json')
-    const rows = JSON.parse(readFileSync(p, 'utf8')) as Array<{ payment_debug?: { raw?: unknown } }>
-    expect(rows.filter((r) => r.payment_debug?.raw).length).toBe(13)
+    // Fikstür, eski dökümdeki 13 gerçek yanıtın YAPISINI taşır; değerleri satır başına
+    // bağımsız sentetiktir ve gerçek veriden türetilmedi. Döküm depodan kaldırıldı (ALT-39).
+    const p = resolve(KOK, 'supabase/functions/_shared/__tests__/fixtures/odeme-eslesme-13-yanit.json')
+    const f = JSON.parse(readFileSync(p, 'utf8')) as {
+      satirlar: Array<{ payment_debug?: { raw?: unknown } }>
+    }
+    expect(f.satirlar.filter((r) => r.payment_debug?.raw).length).toBe(13)
   })
 })

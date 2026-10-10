@@ -68,6 +68,40 @@ async function aileRpcSirali<T>(cagri: () => PromiseLike<T>): Promise<T> {
   }
 }
 
+/**
+ * Markanın AKTİF ÜRÜNÜ OLAN aile sayısı (OPS-51: marka sayfası/site haritası "ürünsüz marka" kararının tek girdisi).
+ *
+ * KAYNAK `getFamiliesEnriched` ile AYNI RPC ve AYNI süzgeç (`brands.name ilike`, aile → `products.status='active'`
+ * ve `deleted_at is null` iç birleşimi): marka sayfasının vitrininde kart olarak görünen her şey bu sayıdadır, yani
+ * "sayı 0" = sayfada gösterilecek ürün yok. `limit 1`: yalnız `total_count` (pencere sayımı, limitten ÖNCE hesaplanır)
+ * okunur, kapak görseli/ad çevirisi sorgusu açılmaz.
+ *
+ * HATA YUTULMAZ: RPC hatası FIRLATILIR (boş/sıfır sayıya ÇEVRİLMEZ). Sıfır "ürünsüz" kararı demektir ve o karar
+ * noindex + site haritası dışı yazar; geçici bir DB hatasının sessizce "0 ürün" olması ürünlü markayı dizinden düşürürdü.
+ * Aynı sıra kapısından (`aileRpcSirali`) geçer: derlemede tepe eşzamanlılık değişmez.
+ */
+export async function getBrandFamilyCount(
+  supabase: SupabaseClient<Database>,
+  brandName: string
+): Promise<number> {
+  const { data, error } = await aileRpcSirali(() =>
+    supabase.rpc('get_product_families_enriched', {
+      p_limit: 1,
+      p_offset: 0,
+      p_brand: brandName,
+    })
+  )
+  if (error) throw error
+  const satirlar = data ?? []
+  if (satirlar.length === 0) return 0
+  const toplam = Number(satirlar[0]?.total_count)
+  // Satır var ama sayım okunamadı → "0" DEĞİL, hata (aynı gerekçe: yanlış ürünsüz kararı yazılmaz).
+  if (!Number.isFinite(toplam) || toplam < 1) {
+    throw new Error(`getBrandFamilyCount: ${brandName} için total_count okunamadı`)
+  }
+  return toplam
+}
+
 export async function getFamiliesEnriched(
   supabase: SupabaseClient<Database>,
   params: GetFamiliesParams = {}
@@ -560,9 +594,25 @@ export async function getAllFamilySlugs(
   return slugs
 }
 
+/** Site haritasına girecek bir MODEL: ailesinin slug'ı, SKU'su ve kendi `updated_at`'i (REC-300 3e-2). */
+export interface FamilyModelSitemapRow {
+  aileSlug: string
+  sku: string
+  updatedAt: string | null
+}
+
+export interface FamilySitemapData {
+  /** aile slug'ı → ailenin ve aktif varyantlarının en son `updated_at`'i (REC-454). */
+  aileTarihleri: Map<string, string>
+  /** Aktif + silinmemiş modeller (arşiv/pasif model YOK); sıra: aile sırası, sonra sorgu sırası. */
+  modeller: FamilyModelSitemapRow[]
+}
+
 /**
- * Site haritası `lastmod` kaynağı (REC-454): aile slug'ı → ailenin ve AKTİF varyantlarının en son
- * `updated_at`'i. Sayfada görünen veri (aile metni, model satırları) bu iki tablodan gelir.
+ * Site haritası verisi: aile `lastmod`'u (REC-454) + aktif model listesi (REC-300 3e-2), TEK sorgudan.
+ *
+ * `aileTarihleri`: aile slug'ı → ailenin ve AKTİF varyantlarının en son `updated_at`'i. Sayfada görünen
+ * veri (aile metni, model satırları) bu iki tablodan gelir.
  *
  * NİÇİN: harita her üretimde `new Date()` yazıyordu → 87 adresin 61'i her gün "bugün değişti".
  * Google lastmod'u yalnız tutarlı biçimde doğruysa kullanır; her gün her şeyi değişmiş ilan eden
@@ -570,26 +620,39 @@ export async function getAllFamilySlugs(
  * bu iki sütun gerçek değişikliği gösteriyor (47 aile, tarihler 08-27…09-26 arasına yayılmış,
  * toplu günlük yazımla oynamıyor).
  *
+ * `modeller`: aynı sorgunun `products` ilişkisinden (sku eklendi; İKİNCİ SORGU YOK). Model `lastModified`'ı
+ * modelin kendi `updated_at`'idir. SINIR (OPS hükmü 2026-10-02): aynı değerli toplu UPDATE de `updated_at`'i
+ * kaydırır (tetik değere bakmaz); bilinçli kabul — bkz. rendering-cache-standard.md.
+ *
  * Aktif varyantı olmayan aile haritada zaten yok; seri slug'larının kendi varyantı olmadığı için
- * burada YOKTUR → çağıran lastmod YAZMAZ (uydurma tarih yok). Hata FIRLATILIR (yutulmaz).
+ * `aileTarihleri`nde YOKTUR → çağıran lastmod YAZMAZ (uydurma tarih yok). Hata FIRLATILIR (yutulmaz).
  */
-export async function getFamilyLastModified(
+export async function getFamilySitemapData(
   supabase: SupabaseClient<Database>
-): Promise<Map<string, string>> {
+): Promise<FamilySitemapData> {
   const { data, error } = await supabase
     .from('product_families')
-    .select('slug, updated_at, products(updated_at, status, deleted_at)')
+    .select('slug, updated_at, products(sku, updated_at, status, deleted_at)')
     .is('deleted_at', null)
     .range(0, 4999)
   if (error) throw error
-  const sonuc = new Map<string, string>()
+  const aileTarihleri = new Map<string, string>()
+  const modeller: FamilyModelSitemapRow[] = []
   for (const aile of data ?? []) {
     const aktif = (aile.products ?? []).filter((p) => p.status === 'active' && p.deleted_at === null)
     if (!aile.slug || aktif.length === 0) continue
     const enSon = [aile.updated_at, ...aktif.map((p) => p.updated_at)]
       .filter((t): t is string => typeof t === 'string')
       .reduce((a, b) => (Date.parse(b) > Date.parse(a) ? b : a), '1970-01-01T00:00:00Z')
-    sonuc.set(aile.slug, enSon)
+    aileTarihleri.set(aile.slug, enSon)
+    for (const p of aktif) {
+      if (!p.sku) continue
+      modeller.push({
+        aileSlug: aile.slug,
+        sku: p.sku,
+        updatedAt: typeof p.updated_at === 'string' ? p.updated_at : null,
+      })
+    }
   }
-  return sonuc
+  return { aileTarihleri, modeller }
 }

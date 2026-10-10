@@ -4,7 +4,9 @@ import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from "@sentry/nextjs";
 
 import { bilgiMerkeziYonlendirmeleri, enYayinOku } from './src/config/bilgiMerkeziYonlendirmeleri.mjs';
+import { E2E_TIP_LINT_ATLA_ANAHTARI, e2eHizliDerlemeAyari, e2eTipLintAtlaOku } from './src/config/e2eHizliDerleme.mjs';
 import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.mjs';
+import { adresDiliOku, rotaDiliHedefleriniYenile, rotaDiliYenidenYazimlari, rotaDiliYonlendirmeleri } from './src/config/rotaDili.mjs';
 
 /**
  * `EN_YAYIN` bayrağının TEK kaynağı `src/config/features.ts`. Bu dosya TypeScript içe aktaramadığı
@@ -14,6 +16,17 @@ import { k3bOku, markaYonlendirmeleri } from './src/config/markaYonlendirmeleri.
 const EN_YAYIN = enYayinOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
 /** `ADRES_SEMASI_K3B` — aynı gerekçe; okuyucu `k3bOku` (INV-MARKA-KAYNAK-1 gerçek değeri ölçer). */
 const ADRES_SEMASI_K3B = k3bOku(readFileSync(new URL('./src/config/features.ts', import.meta.url), 'utf8'));
+/**
+ * Rota dili anahtarı (OPS-52): `NEXT_PUBLIC_ADRES_DILI`, derleme anında okunur; YALNIZ tam `1` açar,
+ * yok/bozuk = kapalı. K3B'den AYRI anahtar (biri tek başına geri alınır). Cetvel: src/config/rotaDili.mjs.
+ */
+const ADRES_DILI = adresDiliOku(process.env.NEXT_PUBLIC_ADRES_DILI);
+/**
+ * ALT-38f: e2e-smoke Build adımına ÖZGÜ anahtar (`VENTHUB_E2E_TIP_LINT_ATLA`, YALNIZ tam `1`): `next build`in tip ve lint aşaması koşmaz
+ * (`ci` ikisini zaten zorunlu kontrol olarak koşar). Başka hiçbir yerde verilmez; kapalıyken yapılandırmaya HİÇBİR anahtar eklenmez.
+ * Cetvel ve kapı: src/config/e2eHizliDerleme.mjs · INV-E2E-HIZLI-1/2/3.
+ */
+const E2E_TIP_LINT_ATLA = e2eTipLintAtlaOku(process.env[E2E_TIP_LINT_ATLA_ANAHTARI]);
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -24,6 +37,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
     reactStrictMode: true,
     typedRoutes: true,
+    // ALT-38f: anahtar kapalıyken BOŞ nesne (anahtar eklenmez); açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds`.
+    ...e2eHizliDerlemeAyari(E2E_TIP_LINT_ATLA),
     images: {
         // KÖPRÜ (2026-08-30, Recep butonla onayladı): Vercel görsel optimizasyonu KAPALI.
         // Sebep: Hobby planın aylık kaynak-görsel sınırı doldu (katalog 1042 görsel) →
@@ -49,7 +64,7 @@ const nextConfig = {
         ],
     },
     async redirects() {
-        return [
+        const mevcutKurallar = [
             // ── T162 — Lineo çap aileleri TEK ailede birleşti (docs/standards/catalog-depth-standard.md §K1).
             // Altı çap ailesi 2026-08-21'de açılmış, 2026-08-23'te kapatıldı: çap bir KARAR noktası
             // değil, aynı sayfadaki seçicidir. Kapanan altı adres sitemap'te DURUYORDU; yönlendirme
@@ -57,7 +72,7 @@ const nextConfig = {
             // (Aile slug'ı `/products/<slug>` biçimindedir; varyant `?sku=` ile aynı sayfada seçilir.)
             ...['100', '125', '150', '200', '250', '315'].map((cap) => ({
                 source: `/:lang(tr|en)/products/vortice-lineo-${cap}-quiet`,
-                destination: '/:lang/products/vortice-lineo-quiet',
+                destination: '/:lang/products/vortice-lineo-quiet-sessiz-kanal-fanlari',
                 permanent: true,
             })),
             // ── Ürün Seçici (karar K17, 2026-09-05) — ÖLÜ DİZİN ADRESİNİN ONARIMI.
@@ -125,7 +140,7 @@ const nextConfig = {
             // kayıp değil, çünkü o gün zaten bu satıra dokunulacak.
             {
                 source: '/:lang(tr|en)/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921',
-                destination: '/:lang/products/nicotra-gebhardt-dd?sku=NIC-11921',
+                destination: '/:lang/products/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar?sku=NIC-11921',
                 permanent: true,
             },
 
@@ -152,27 +167,27 @@ const nextConfig = {
             // müşteri aradığı MODELE düşer, ailenin başına değil.
             {
                 source: '/:lang(tr|en)/products/vortice-ca-il-4020-es-rect-16076',
-                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-4020-ES-RECT',
                 permanent: true,
             },
             {
                 source: '/:lang(tr|en)/products/vortice-ca-il-5035-es-rect-16077',
-                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-5035-ES-RECT',
                 permanent: true,
             },
             {
                 source: '/:lang(tr|en)/products/vortice-ca-il-6040-es-rect-16078',
-                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-6040-ES-RECT',
                 permanent: true,
             },
             {
                 source: '/:lang(tr|en)/products/vortice-ca-il-7050-es-rect-16079',
-                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-7050-ES-RECT',
                 permanent: true,
             },
             {
                 source: '/:lang(tr|en)/products/vortice-ca-il-8060-es-rect-16080',
-                destination: '/:lang/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT',
+                destination: '/:lang/products/vortice-vort-commercial-in-line-dikdortgen-kanal-fanlari?sku=VRT-CA-IL-8060-ES-RECT',
                 permanent: true,
             },
 
@@ -182,12 +197,24 @@ const nextConfig = {
             // gerekçe tek dosyada: src/config/bilgiMerkeziYonlendirmeleri.mjs. Hepsi tek hop.
             ...bilgiMerkeziYonlendirmeleri(EN_YAYIN),
 
-            // ── REC-374 (2026-09-27) — marka listesi DB ile hizalandı; listeden çıkan üç slug
-            // (`frekans-konvertoru` → frekans konvertörleri kategorisi; `flexiva`, `casals` → marka
-            // listesi). K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
+            // ── REC-374 (2026-09-27) — marka listesi DB ile hizalandı. `frekans-konvertoru` → frekans
+            // konvertörleri kategorisi 308; `casals` ve `flexiva` OPS-51 (#1686) ile 308'den çıkıp marka
+            // olarak listeye dönüyor. K3-b açıkken `/tr/markalar/<slug>` de aynı hedefe. Liste ve gerekçe:
             // src/config/markaYonlendirmeleri.mjs · kapı INV-MARKA-KAYNAK-1. Hepsi tek hop.
             ...markaYonlendirmeleri(ADRES_SEMASI_K3B),
         ];
+
+        // ── OPS-52 (kararlar 267/269/270) — sayfa adresleri dile göre yazılır (`/tr/about` → `/tr/hakkimizda`).
+        // Anahtar kapalıyken iki parça da değişmez/boş. Gerekçe, tablo ve yeniden yazım karşılığı: src/config/rotaDili.mjs.
+        //  · Yukarıdaki MEVCUT kuralların hedefleri tabloyla yenilenir (R4): hedefi eski klasör adresi olan kural
+        //    (`/destek/hesaplayicilar` → `/urun-secici`, bilgi merkezi EN-kapalı kuralları) yeni adrese gider, zincir olmaz.
+        //    Kapalıyken `rotaDiliHedefleriniYenile` girdiyi AYNEN (aynı referans) döndürür.
+        //  · Rota dili kuralları (eski klasör adresi → yeni adres) zaten yeni adrese gider, yenilemeye girmez. Hepsi tek hop.
+        return [...rotaDiliHedefleriniYenile(mevcutKurallar, ADRES_DILI), ...rotaDiliYonlendirmeleri(ADRES_DILI)];
+    },
+    async rewrites() {
+        // Yeni adres → mevcut klasör (sayfa dosyası aranmadan önce). Anahtar kapalıyken boş.
+        return { beforeFiles: rotaDiliYenidenYazimlari(ADRES_DILI) };
     },
     async headers() {
         return [
