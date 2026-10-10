@@ -121,15 +121,22 @@ const k = (t) => (t >= 1_000_000 ? (t / 1_000_000).toFixed(1).replace('.0', '') 
  * kapı (hafiza-baglam-ve-belge-satiri.test.ts) etiketleri yasaklar.
  */
 const HAZIRLIK_NOTU =
-  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA UC MADDELIK LISTE yaz; her madde '- ' ile baslayan " +
+  " ⭐RECEP'E COMPACT HAZIRLIK NOTU: bu cevabinin SONUNA UC PARCA yaz. " +
+  "Birinci parca UC MADDELIK LISTE; her madde '- ' ile baslayan " +
   'ayri bir satir ve tam cumle, yan yana tek paragraf YOK, harfli ya da numarali etiket YOK. ' +
   'Birinci madde: durum dosyam guncel mi (dosya adi + saat). ' +
   'Ikinci madde: yarim is var mi (varsa ne, ne zaman guvenli noktaya gelir). ' +
   "Ucuncu madde: hukum, 'Simdi compact yapabilirsin' ya da 'X bitince soyleyecegim'. " +
-  'Compact yapilana kadar her cevapta kisaca tekrarla. ' +
-  "Listenin altina Recep'e su tek cumleyi de yaz: " +
+  // ARC-69 (OPS 10-09): rol kurallarında şart olan satır kancada yoktu; pencere her istemde kancayı görüyor,
+  // kurallar dosyasını görmüyor. Metin .claude/rules/filo-ortak.md "Compact" bölümündeki kalıpla AYNI olmalı.
+  "Ikinci parca, listenin altinda, uc ters tirnakla acilan TEK KOD BLOGU icinde Recep'in kopyalayip yapistiracagi su /compact satiri: " +
+  "/compact Recep'in son sozlerini aynen koru. Sunlari koru: <numara (durum)>, ..., yarim isler (<kisa adlar>). " +
+  'Ayrinti durum dosyamda. Arac ciktilarini ve eski olcum ayrintilarini at. ' +
+  'Durumu cumleye KOPYALAMA, ayrinti durum dosyasinda durur; durum dosyan guncel degilse bu satiri vermeden ONCE onu yaz. ' +
+  "Ucuncu parca, en altta, Recep'e su tek cumle: " +
   '"Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir. ' +
-  'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz."'
+  'Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz." ' +
+  'Compact yapilana kadar her cevapta kisaca tekrarla.'
 
 /** Ölçülecek şey yoksa null; eşik altında düz satır, eşiklerde uyarı. */
 function satir(token, pencere) {
