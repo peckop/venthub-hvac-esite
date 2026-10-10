@@ -18,6 +18,7 @@ type Modul = {
   degerlendir: (aciklama: string, secenek?: { onceki?: 'zorunlu' | 'uyari' }) => Sonuc
   kartiOku: (no: string, yol: string) => string
   oncekiKipi: (olusturuldu: string | undefined) => 'zorunlu' | 'uyari'
+  prGovdeIlkSatiri: (govde: string) => { tamam: boolean; ilk: string }
   ONCEKI_CALISMA_YURURLUK: string
 }
 
@@ -424,7 +425,7 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
   it('--pr-govde-dosyasi: gövdede REC-nn varsa stderr UYARI basar ama çıkış kodu değişmez (0)', () => {
     const yol = sahteDosya('a8.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-14 · deneme', description: TAM_PLAN }] }])
     const govde = path.join(gecici, 'govde-rec.md')
-    fs.writeFileSync(govde, 'Özet.\nFixes REC-508\nKanban: HRT-14\n')
+    fs.writeFileSync(govde, 'Kanban: HRT-14\nÖzet.\nFixes REC-508\n')
     const r = spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
     expect(r.status).toBe(0)
     expect(r.stderr).toMatch(/UYARI: PR gövdesinde Linear numarası REC-508 var; kapanmaması gerekiyorsa sil, yalnız Kanban: <no> yaz/)
@@ -433,7 +434,7 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
   it('--pr-govde-dosyasi: gövdede REC-nn yoksa uyarı yok, çıkış 0', () => {
     const yol = sahteDosya('a9.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-14 · deneme', description: TAM_PLAN }] }])
     const govde = path.join(gecici, 'govde-temiz.md')
-    fs.writeFileSync(govde, 'Özet.\nKanban: HRT-14\n')
+    fs.writeFileSync(govde, 'Kanban: HRT-14\nÖzet.\n')
     const r = spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
     expect(r.status).toBe(0)
     expect(r.stderr).not.toMatch(/UYARI/)
@@ -446,10 +447,10 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
       fs.writeFileSync(govde, govdeMetni)
       return spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
     }
-    const tek = calistir('Özet.\nKanban: REC-411\n', 'govde-kanban-rec.md')
+    const tek = calistir('Kanban: REC-411\nÖzet.\n', 'govde-kanban-rec.md')
     expect(tek.status).toBe(0)
     expect(tek.stderr).not.toMatch(/UYARI/)
-    const fixesli = calistir('Özet.\nKanban: REC-411\nFixes REC-5\n', 'govde-kanban-fixes.md')
+    const fixesli = calistir('Kanban: REC-411\nÖzet.\nFixes REC-5\n', 'govde-kanban-fixes.md')
     expect(fixesli.status).toBe(0)
     expect(fixesli.stderr).toMatch(/UYARI: PR gövdesinde Linear numarası REC-5 var/)
     expect(fixesli.stderr).not.toMatch(/REC-411/)
@@ -490,9 +491,38 @@ describe('INV-KART-PLAN-1 · kartiOku (sahte sqlite; gerçek Kanban dosyasına d
   it('--pr-govde-dosyasi ile okunan kart sınıf uyarısı vermez (yalnız --kart)', () => {
     const yol = sahteDosya('a12.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-26 · etiketsiz', description: TAM_PLAN, labels: [] }] }])
     const govde = path.join(gecici, 'govde-sinif.md')
-    fs.writeFileSync(govde, 'Özet.\nKanban: HRT-26\n')
+    fs.writeFileSync(govde, 'Kanban: HRT-26\nÖzet.\n')
     const r = spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
     expect(r.status).toBe(0)
     expect(r.stderr).not.toMatch(/sınıf etiketi/)
+  })
+
+  // HRT-46 (OPS emri): PR gövdesinin İLK boş olmayan satırı `Kanban: <NO>` olur; numara aşağıda gömülü kalırsa kayıt görünmez.
+  it('prGovdeIlkSatiri: ilk boş olmayan satır Kanban numarasıysa tamam; boş satır, BOM ve markdown süsü tolere edilir', () => {
+    for (const govde of ['Kanban: HRT-46\nÖzet.', '\n\n  Kanban: ARC-3, HRT-12\nÖzet.', '> Kanban: REC-411', '- Kanban: HRT-46', '﻿Kanban: HRT-46', 'Kanban: HRT-46\r\nÖzet.']) {
+      expect(K.prGovdeIlkSatiri(govde).tamam, JSON.stringify(govde)).toBe(true)
+    }
+  })
+
+  it('prGovdeIlkSatiri: numara ilk satırda değilse, başlık/yorum/özet öndeyse ya da numara geçersizse tamam DEĞİL ve ilk satırı söyler', () => {
+    for (const govde of ['Özet.\nKanban: HRT-46', '# Başlık\nKanban: HRT-46', '<!-- şablon -->\nKanban: HRT-46', 'Kanban: yok\nKanban: HRT-46', 'Kanban: hrt-46', '']) {
+      expect(K.prGovdeIlkSatiri(govde).tamam, JSON.stringify(govde)).toBe(false)
+    }
+    expect(K.prGovdeIlkSatiri('\n\nÖzet metni burada.\nKanban: HRT-46').ilk).toBe('Özet metni burada.')
+  })
+
+  it('--pr-govde-dosyasi: Kanban satırı var ama ilk satır değilse çıkış 1 ve ilk satır mesajda; ilk satırsa (boş satırlardan sonra da) çıkış 0', () => {
+    const yol = sahteDosya('a13.sqlite', [{ title: 'VentHub TEST', tasks: [{ title: 'HRT-46 · deneme', description: TAM_PLAN }] }])
+    const calistir = (govdeMetni: string, ad: string) => {
+      const govde = path.join(gecici, ad)
+      fs.writeFileSync(govde, govdeMetni)
+      return spawnSync(process.execPath, [KAPI_YOLU, '--pr-govde-dosyasi', govde], { encoding: 'utf8', env: { ...process.env, VENTHUB_KANBAN_DB: yol } })
+    }
+    const sonda = calistir('Özet metni.\nKanban: HRT-46\n', 'govde-ilk-degil.md')
+    expect(sonda.status).toBe(1)
+    expect(sonda.stdout).toMatch(/PR gövdesinin İLK satırı "Kanban: <NO>" olmalı \(şu an: "Özet metni\."\)/)
+    const basta = calistir('\n\nKanban: HRT-46\nÖzet metni.\n', 'govde-ilk-bosluklu.md')
+    expect(basta.status).toBe(0)
+    expect(basta.stdout).not.toMatch(/EKSİK/)
   })
 })

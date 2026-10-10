@@ -16,6 +16,9 @@
     "scripts/icerik-hatti/__tests__/teknik-duzelt.test.ts": 4.2,
     "scripts/icerik-hatti/__tests__/toplu-sunum-k70.test.ts": 1.8,
     "scripts/icerik-hatti/__tests__/uretici-fark-tablosu.test.ts": 0.6,
+    "scripts/test-karnesi/__tests__/ci-gecmis.test.ts": 2.0,
+    "scripts/test-karnesi/__tests__/karne-uret.test.ts": 0.5,
+    "scripts/test-karnesi/__tests__/sabotaj.test.ts": 86.4,
     "src/__tests__/conformance/aile-adi-tek-kaynak.test.ts": 0.5,
     "src/__tests__/conformance/aile-kategori-kapisi.test.ts": 0.5,
     "src/__tests__/conformance/ajan-tanimlari.test.ts": 0.3,
@@ -129,6 +132,7 @@
     "src/__tests__/conformance/taban-tazele.test.ts": 38,
     "src/__tests__/conformance/taban-tazeligi.test.ts": 0.3,
     "src/__tests__/conformance/tailwind-token-sinif-gecerliligi.test.ts": 0.5,
+    "src/__tests__/conformance/test-karnesi-yapisi.test.ts": 0.5,
     "src/__tests__/conformance/test-kosu-kapsami.test.ts": 10.6,
     "src/__tests__/conformance/uretilmis-artefakt-ilan-kapsami.test.ts": 1.5,
     "src/__tests__/conformance/uretilmis-artefakt-tazeligi.test.ts": 0.8,
@@ -198,5 +202,5 @@
     "src/views/category/__tests__/SeriesLandingView.test.tsx": 0.4,
     "supabase/functions/_shared/__tests__/satis_kipi.test.ts": 0.3
   },
-  "_ek_olcum": "2026-10-07 yerel tek dosya koşusu (ALT-38c-2 koruma testleri): yeni test-shard dosyaları, genişleyen ci-edited-ayna ve CSV öncesi yazılmamış test-kosu-kapsami eklendi; mutlak saniye değil, sıra ve pay güvenilirdir. 2026-10-08 (ALT-38e): ci-test-secimi* ve test-shard-secim.test.ts harita koşusunun ham vitest raporundan (yerel Windows; alt süreç başlatan testlerin Linux süresi daha düşük olabilir, sıra ve pay güvenilirdir)."
+  "_ek_olcum": "2026-10-07 yerel tek dosya koşusu (ALT-38c-2 koruma testleri): yeni test-shard dosyaları, genişleyen ci-edited-ayna ve CSV öncesi yazılmamış test-kosu-kapsami eklendi; mutlak saniye değil, sıra ve pay güvenilirdir. 2026-10-08 (ALT-38e): ci-test-secimi* ve test-shard-secim.test.ts harita koşusunun ham vitest raporundan (yerel Windows; alt süreç başlatan testlerin Linux süresi daha düşük olabilir, sıra ve pay güvenilirdir). 2026-10-09 (ALT-38b): test-karnesi testleri (sabotaj, ci-gecmis, karne-uret, yapı kapısı) tek dosya koşusundan, vitest 'tests' süresi (yerel Windows; sıra ve pay güvenilir)."
 }

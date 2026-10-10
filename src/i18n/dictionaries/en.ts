@@ -38,7 +38,9 @@ export const en: typeof tr = {
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
     brandTagline: 'Ventilation & HVAC',
-    brandLegalName: 'VentHub HVAC Solutions.',
+    // URN-83: the company is not incorporated yet; no legal entity name (e.g. "… Solutions.") is written. Once the
+    // registered name exists this value is REPLACED with it (hence the key name stays "LegalName"). Used by: login footer.
+    brandLegalName: 'VentHub',
     vortice: 'Vortice',
     comma: ',',
     decrease: 'Decrease',
@@ -979,7 +981,7 @@ export const en: typeof tr = {
     experience: 'Years of Experience',
     distributorship: 'Global Brand Network',
     completedProject: 'Product Types',
-    shippingNetwork: 'Province Delivery Network',
+    productFamilies: 'Product Families',
     precisionTitle: 'Engineering Precision',
     precisionDesc: 'We do not just sell products; we offer engineering solutions with project-specific airflow, pressure, and efficiency calculations.',
     standardsTitle: 'Global Standards',
@@ -1460,6 +1462,7 @@ export const en: typeof tr = {
       productDescription: 'Product Description',
       category: 'Category',
       noSpecsAvailable: 'No technical specifications available for this product.',
+      approxCurve: 'Approximate curve — being refined from the manufacturer chart.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
       /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
@@ -1969,6 +1972,12 @@ export const en: typeof tr = {
     reviewDesc: 'Your payment was successfully received from your bank. We are still verifying the match with your order and will complete it shortly.',
     reviewWarning: 'Please do not pay again. We will notify you by email once verification is complete.',
     reviewBackHome: 'Back to Home',
+    // UNCERTAIN result (verification error, no network, "pending"): we do NOT say the payment was taken, nor that it
+    // was not. The charge may have gone through, so there is no "failed" screen and no "try again" (double charge).
+    pendingTitle: 'Checking Your Payment',
+    pendingDesc: 'We could not confirm the result of your payment right now. The payment may have been taken; we are checking its status.',
+    pendingWarning: 'Please do not pay again. You can follow the status on your orders page.',
+    pendingContactLabel: 'For questions',
     orderCompletedTitle: 'Your Order is Complete!',
     orderNoLabel: 'Order No',
     orderCompletedDesc: 'Your order has been received successfully. A confirmation email will be sent shortly.',
@@ -1979,8 +1988,6 @@ export const en: typeof tr = {
     failedGeneric: 'Payment could not be completed',
     failedToast: 'Payment failed: {{msg}}',
     verifyError: 'Verification error',
-    errorDuring: 'Error: {{msg}}',
-    unverified: 'Payment could not be verified',
     unexpected: 'An unexpected error occurred'
   },
   brands: {
@@ -2665,8 +2672,11 @@ export const en: typeof tr = {
     seoDescription: 'Run a pre-assessment for duct fans, heat recovery, air curtains and jet fans from your volume, airflow and pressure inputs.',
     araclar: {
       kanal: {
-        ad: 'Duct fan sizing',
-        aciklama: 'Derive the required airflow and pressure from room volume and air change rate.',
+        // URN-83: the card said "airflow from volume and air change rate" but the link goes to the DUCT PRESSURE LOSS
+        // calculator (target: `calculators.duct` — enter flow rate + duct size, get air velocity and estimated pressure loss).
+        // The card now follows the target page's own sentence; it claims nothing beyond it.
+        ad: 'Duct pressure loss calculation',
+        aciklama: 'Calculate air velocity and estimated pressure loss from flow rate and duct dimensions.',
       },
       hrv: {
         ad: 'Heat recovery (HRV) sizing',
@@ -3109,6 +3119,8 @@ export const en: typeof tr = {
     badgeQuietest: 'Quietest',
     badgeEfficient: 'Most efficient',
     cardDelivers: 'In your duct',
+    cardDeliversApprox: 'In your duct (approx.)',
+    cardApproxCurve: 'Approximate curve — being refined from the manufacturer chart. Please confirm this model\'s suitability with the manufacturer.',
     cardNoise: 'Noise level',
     cardDiameter: 'Connection diameter',
     cardCta: 'View product',

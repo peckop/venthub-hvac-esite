@@ -17,11 +17,13 @@ import { describe, expect, it } from 'vitest'
 import {
   calismaNoktasi,
   degerlendir,
+  egriYaklasikMi,
   type FanAdayi,
   hesaplaTasarimDebisi,
   parsePQCurve,
   type SecimGirdisi,
   secimYap,
+  YAKLASIK_EGRI_NOKTA_ESIGI,
 } from '../ductFanSelection'
 
 /** Gerçek ürün: Lineo 150 Quiet. Katalog serbest debisi 510 m³/h. */
@@ -304,5 +306,39 @@ describe('secimYap — üç ayrı öneri, çünkü öncelik tek boyutlu değil',
     // 200 m³/h · 150 mm · 6 m galvaniz · 2×90°+1×45° + terminaller → onlarca Pa mertebesi.
     expect(sonuc.sistemBasinciPa).toBeGreaterThan(20)
     expect(sonuc.sistemBasinciPa).toBeLessThan(120)
+  })
+})
+
+describe('INV-YAKLASIK-EGRI-1 — ≤3 noktalı eğri üretici grafiği sayılmaz (karar 316/317)', () => {
+  const BES_NOKTA = '[[0, 210], [100, 180], [255, 105], [400, 40], [510, 0]]'
+
+  it('nokta sayısı eşiği 3: 3 nokta yaklaşık, 4 ve üstü değil', () => {
+    expect(YAKLASIK_EGRI_NOKTA_ESIGI).toBe(3)
+    expect(egriYaklasikMi('[[0, 210.9], [255, 105.5], [510, 0]]')).toBe(true)
+    expect(egriYaklasikMi('[[0, 210], [510, 0]]')).toBe(true)
+    expect(egriYaklasikMi('[[0, 210], [100, 150], [300, 60], [510, 0]]')).toBe(false)
+    expect(egriYaklasikMi(BES_NOKTA)).toBe(false)
+  })
+
+  it('eğri yok / bozuk veri "yaklaşık" DEĞİL (ayrı durum: veri-yok)', () => {
+    expect(egriYaklasikMi(null)).toBe(false)
+    expect(egriYaklasikMi('bozuk')).toBe(false)
+    expect(egriYaklasikMi('[]')).toBe(false)
+  })
+
+  it('değerlendir: 3 noktalı eğri sonucu yaklasikEgri=true taşır, 5 noktalı taşımaz', () => {
+    const hesap = hesaplaTasarimDebisi('bathroom', 10, 2.5)
+    expect(degerlendir(aday(), hesap, TEMEL_GIRDI).yaklasikEgri).toBe(true)
+    expect(degerlendir(aday({ pqCurveHam: BES_NOKTA }), hesap, TEMEL_GIRDI).yaklasikEgri).toBe(false)
+    expect(degerlendir(aday({ pqCurveHam: null }), hesap, TEMEL_GIRDI).yaklasikEgri).toBe(false)
+  })
+
+  it('veri düzelince not KENDİLİĞİNDEN kalkar: aynı ürün 3 → 5 noktaya geçince bayrak düşer', () => {
+    const hesap = hesaplaTasarimDebisi('bathroom', 10, 2.5)
+    const once = secimYap([aday()], TEMEL_GIRDI)
+    const sonra = secimYap([aday({ pqCurveHam: BES_NOKTA })], TEMEL_GIRDI)
+    expect(hesap.tasarimDebiM3h).toBeGreaterThan(0)
+    expect(once.enUygun?.yaklasikEgri).toBe(true)
+    expect(sonra.enUygun?.yaklasikEgri).toBe(false)
   })
 })

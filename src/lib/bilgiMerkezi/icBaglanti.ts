@@ -127,6 +127,8 @@ export async function icBaglantiCoz(kimlik: string, dil: AdresDili, kaynak: IcBa
       // Tüm ürünler bir vitrin NESNESİDİR → adresi `adresUret`'ten (K3-b açıkken `/tr/urunler`;
       // kapalıyken `localizedHref(Routes.products())` ile aynı `/tr/products`). REC-300 Faz 3d.
       if (anahtar === 'urunler') return adresUret({ tur: 'urunler' }, dil)
+      // Marka listesi de bir vitrin nesnesidir (URN-85): K3-b açıkken TR `/tr/markalar`, kapalıyken `/<dil>/brands`.
+      if (anahtar === 'markalar') return adresUret({ tur: 'markalar' }, dil)
       return localizedHref(uret(), dil)
     }
   }

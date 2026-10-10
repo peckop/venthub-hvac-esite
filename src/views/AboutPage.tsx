@@ -1,5 +1,5 @@
-import { 
-  Award,   Factory, Globe, Microscope,
+import {
+  Award,   Factory, Layers, Microscope,
 Shield, Target, Zap} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -13,12 +13,15 @@ import { ScrollReveal } from '../components/ScrollReveal'
 import { HVAC_BRANDS } from '../data/brands'
 import { en } from '../i18n/dictionaries/en'
 import { tr } from '../i18n/dictionaries/tr'
+import type { SiteSayaclari } from '../lib/services/siteSayaclari.service'
 
 interface AboutPageProps {
   lang?: string
+  /** Canlı marka / aktif ürün / aile sayıları (URN-75). `null` = okunamadı: sayaç kartları çizilmez. */
+  sayaclar?: SiteSayaclari | null
 }
 
-const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
+const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) => {
   const dict = lang === 'en' ? en : tr
 
   // Server-component safe translation helper
@@ -37,13 +40,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
   }
 
   const stats = [
-    // Sayılar dayanaklı: 15+ = kurucunun saha yılı, 6 = markalar sayfasındaki marka sayısı,
-    // 50+ = katalogdaki ürün çeşidi, 81 = kargoyla tüm illere sevkiyat vaadi.
-    // Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30 dürüstlük temizliği).
+    // 15+ = kurucunun saha yılı (elle, dayanaklı). Marka / aktif ürün / aile sayıları ELLE YAZILMAZ: canlı veriden
+    // gelir (`sayaclar`, URN-75); okunamadıysa bu üç kart hiç çizilmez, eski ya da uydurma sayı basılmaz.
+    // Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30), '81 İl' dayanaksız vaatti (karar 295).
     { value: '15+', label: t('aboutPage.experience'), icon: Zap },
-    { value: '6', label: t('aboutPage.distributorship'), icon: Award },
-    { value: '50+', label: t('aboutPage.completedProject'), icon: Factory },
-    { value: '81', label: t('aboutPage.shippingNetwork'), icon: Globe }
+    ...(sayaclar
+      ? [
+          { value: String(sayaclar.markaSayisi), label: t('aboutPage.distributorship'), icon: Award },
+          { value: String(sayaclar.aktifUrunSayisi), label: t('aboutPage.completedProject'), icon: Factory },
+          { value: String(sayaclar.aileSayisi), label: t('aboutPage.productFamilies'), icon: Layers }
+        ]
+      : [])
   ]
 
   const coreValues = [
