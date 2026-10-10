@@ -262,8 +262,8 @@ export function yasalBaslik(baslik: string, config: LegalConfig = legalConfig): 
  * kalır; sayı/süre gibi dolu alanlara DOKUNULMAZ (yalnız tamamı köşeli parantezli metin alanları değişir).
  */
 const YER_TUTUCU_GORUNUM_METNI = {
-  tr: 'Şirket bilgileri kuruluşla eklenecek',
-  en: 'Company details will be added upon incorporation',
+  tr: 'Bilgi eklenecek',
+  en: 'To be added',
 } as const
 
 function gorunumHaline(config: LegalConfig, dil: keyof typeof YER_TUTUCU_GORUNUM_METNI): LegalConfig {

@@ -192,7 +192,7 @@ describe('INV-SATIS-KIPI-7: açılış önkoşulları (ölçülemedi = ret, boş
 
   const BOZMALAR: Array<[string, string, () => { ayar?: Ayar; ctx?: Partial<Ctx> }]> = [
     ['K1', 'ham [SATICI_UNVAN] yer tutucu', () => ({ ayar: { sayfaMetni: 'Satıcı: [SATICI_UNVAN]' } })],
-    ['K1', 'görünüm metni (gizlenmiş yer tutucu)', () => ({ ayar: { sayfaMetni: 'Satıcı: Şirket bilgileri kuruluşla eklenecek' } })],
+    ['K1', 'görünüm metni (gizlenmiş yer tutucu)', () => ({ ayar: { sayfaMetni: 'Satıcı: Bilgi eklenecek' } })],
     ['K2', 'ödeme ortamı sandbox', () => ({ ayar: { healthz: { status: 200, govde: { durum: 'saglikli', config: { odeme_ortami: 'sandbox' } } } } })],
     ['K2', 'healthz 503 bozuk', () => ({ ayar: { healthz: { status: 503, govde: { durum: 'bozuk', config: { odeme_ortami: 'prod' } } } } })],
     ['K3', 'kapı canlıda YOK (409 boş sepet)', () => ({ ayar: { probe: { status: 409, govde: '{"error":"VALIDATION_EMPTY_CART"}' } } })],
