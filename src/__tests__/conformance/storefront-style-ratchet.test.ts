@@ -222,7 +222,9 @@ const RATCHETS: Ratchet[] = [
     // OPS hükmü b: "tablo tümden kalkar") silindi; sayaç bu yüzden 14 düştü (ölçülen: 1435 -> 1421). Kazanç yan ürün.
     // 2026-10-10 · 1436 -> 1435: URN-84 — nem alma çip satırları tek eşlemeye indi (iki yazılı kutu bire düştü). Kazanç yan ürün.
     // 2026-10-10 · URN-82 yenileme: iki dalın kazancı birleşti; birleşik değer master üstünde ÖLÇÜLDÜ (aşağıdaki sayı).
-    tavan: 1420,
+    // 2026-10-10 · 1420 -> 1418: URN-82 yer tutucu düzeltmesi — Markalar sayfası güven şeridindeki iki sayaç (sabit "%100"
+    // ve ham `{marka}` değeri; ikisi de kaynaksız/ham) kalktı, ikisinin `text-slate-500` etiketi gitti. Kazanç yan ürün.
+    tavan: 1418,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -255,7 +257,8 @@ const RATCHETS: Ratchet[] = [
     // 2026-10-09 · 118 -> 117: URN-80 — aynı sayaç kartının `font-black` rakamı kalktı. Kazanç yan ürün.
     // 2026-10-10 · 118 -> 117: URN-84 — nem alma çip satırları tek eşlemeye indi (iki `font-black` bire düştü). Kazanç yan ürün.
     // 2026-10-10 · URN-82 yenileme: iki dalın kazancı birleşti; birleşik değer master üstünde ÖLÇÜLDÜ (aşağıdaki sayı).
-    tavan: 116,
+    // 2026-10-10 · 116 -> 114: URN-82 yer tutucu düzeltmesi — Markalar sayfası sayaçlarının iki `font-black` etiketi kalktı.
+    tavan: 114,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },

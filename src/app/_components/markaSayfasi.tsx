@@ -172,17 +172,41 @@ export function markaKatalogOzetMetni(lang: string, markaAdi: string, ozet: Bran
   return cumleler.join(' ')
 }
 
+/** Marka sayfasındaki "Katalogda" kutusunun sayıları (aile ve model). İkisi de bilinmiyorsa kutu hiç çizilmez. */
+export interface MarkaKatalogSayilari {
+  aile: number
+  model: number
+}
+
 /**
- * Sayfa gövdesinin DB'den türeyen özet paragrafı. ÖZET İSTEĞE BAĞLI METİNDİR: okunamazsa sayfa onsuz çizilir (uyarı basılır)
- * — "ürünsüz marka" kararının tersine yanlış sonuç noindex/harita gibi bir sessiz hasar yazmaz; ISR yenilemesini
- * kırmak yerine bir sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Hata önbelleğe YAZILMAZ (okuyucu fırlatır).
+ * Özetten kutu sayıları (URN-82): aile VE model sayısı geçerli, pozitif tam sayı değilse `null`. Eksik ya da kesik
+ * sayı ("12 ürün ailesi ve 0 model") basılmaz; yer tutucu ham bırakılmaz — kutu çizilmez (`BrandDetailPage`).
  */
-async function markaUrunOzeti(lang: string, brand: Marka, oku: MarkaKatalogOzetiOkuyucu): Promise<string> {
+export function markaKatalogSayilari(ozet: BrandCatalogSummary | null): MarkaKatalogSayilari | null {
+  if (!ozet) return null
+  const { total, models } = ozet
+  if (!Number.isInteger(total) || total < 1) return null
+  if (typeof models !== 'number' || !Number.isInteger(models) || models < 1) return null
+  return { aile: total, model: models }
+}
+
+/**
+ * Sayfa gövdesinin DB'den türeyen özet paragrafı + kutu sayıları. ÖZET İSTEĞE BAĞLI METİNDİR: okunamazsa sayfa onsuz
+ * çizilir (uyarı basılır) — "ürünsüz marka" kararının tersine yanlış sonuç noindex/harita gibi bir sessiz hasar
+ * yazmaz; ISR yenilemesini kırmak yerine bir sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Hata önbelleğe
+ * YAZILMAZ (okuyucu fırlatır).
+ */
+async function markaKatalogVerisi(
+  lang: string,
+  brand: Marka,
+  oku: MarkaKatalogOzetiOkuyucu,
+): Promise<{ urunOzeti: string; katalogSayilari: MarkaKatalogSayilari | null }> {
   try {
-    return markaKatalogOzetMetni(lang, brand.name, await oku(brand.name))
+    const ozet = await oku(brand.name)
+    return { urunOzeti: markaKatalogOzetMetni(lang, brand.name, ozet), katalogSayilari: markaKatalogSayilari(ozet) }
   } catch (hata) {
     console.warn(`[markaSayfasi] ${brand.name} katalog özeti okunamadı; sayfa özet paragrafsız çiziliyor`, hata)
-    return ''
+    return { urunOzeti: '', katalogSayilari: null }
   }
 }
 
@@ -292,9 +316,9 @@ export async function MarkaSayfasi({
   const brand = HVAC_BRANDS.find(b => b.slug === slug)
   const urunsuz = await markaUrunsuzMu(lang, slug, sayac)
   // Ürünsüz markada (DB'de aktif ürün 0) listelenecek aile yok → özet sorgusu hiç atılmaz.
-  const urunOzeti = brand && !urunsuz
-    ? await markaUrunOzeti(lang, brand, katalogOzeti ?? ((ad) => getCachedMarkaKatalogOzeti(lang, DEFAULT_TENANT_ID, ad)))
-    : ''
+  const { urunOzeti, katalogSayilari } = brand && !urunsuz
+    ? await markaKatalogVerisi(lang, brand, katalogOzeti ?? ((ad) => getCachedMarkaKatalogOzeti(lang, DEFAULT_TENANT_ID, ad)))
+    : { urunOzeti: '', katalogSayilari: null }
 
   // REC-98: `brand.description` artık iki dilli bir NESNE. Doğrudan yazılsaydı JSON-LD'ye
   // `{"tr":"...","en":"..."}` gömülürdü — tip hatası vermeden, sessizce bozuk yapısal veri.
@@ -316,7 +340,7 @@ export async function MarkaSayfasi({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') }}
       />
-      <PageComponent initialBrandSlug={slug} urunsuz={urunsuz} urunOzeti={urunOzeti} />
+      <PageComponent initialBrandSlug={slug} urunsuz={urunsuz} urunOzeti={urunOzeti} katalogSayilari={katalogSayilari} />
     </>
   )
 }

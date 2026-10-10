@@ -85,9 +85,14 @@ export interface BrandDetailPageProps {
    * (`markaSayfasi.tsx` → `markaKatalogOzetMetni`, dil çözülmüş). Boş ya da verilmezse paragraf hiç çizilmez (uydurma metin yok).
    */
   urunOzeti?: string
+  /**
+   * URN-82: "Katalogda" kutusunun aile ve model sayısı (sunucuda DB'den, `markaSayfasi.tsx` → `markaKatalogSayilari`).
+   * Verilmezse kutu hiç çizilmez: sözlük cümlesi `{{aile}}`/`{{model}}` ister, sayı yokken ham şablon basılmaz.
+   */
+  katalogSayilari?: { aile: number; model: number } | null
 }
 
-const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false, urunOzeti = '' }) => {
+const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, urunsuz = false, urunOzeti = '', katalogSayilari = null }) => {
   const { t, lang } = useI18n()
   // Localize Routes proxy'si: bileşendeki TÜM Routes.x() çağrıları dil-önekli olur (SSOT).
   const Routes = useLocalizedRoutes()
@@ -245,12 +250,14 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
               </div>
 
               <div className="grid sm:grid-cols-2 gap-12">
-                <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.globalVision')}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed font-light">
-                    {brand.name}{t('common.comma')} {t('brands.detail.globalVisionDesc')}
-                  </p>
-                </div>
+                {katalogSayilari && (
+                  <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
+                    <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.globalVision')}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed font-light">
+                      {t('brands.detail.globalVisionDesc', { ad: brand.name, aile: katalogSayilari.aile, model: katalogSayilari.model })}
+                    </p>
+                  </div>
+                )}
                 <div className="p-8 rounded-hvac-xl bg-slate-50 border border-slate-100">
                   <h3 className="text-lg font-bold text-slate-900 mb-4">{t('brands.detail.technicalExcellence')}</h3>
                   <p className="text-sm text-slate-500 leading-relaxed font-light">

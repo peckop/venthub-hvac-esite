@@ -11,6 +11,7 @@ import type { BrandCatalogSummary } from '@/lib/services/family.service'
 import {
   markaAciklamasi,
   markaKatalogOzetMetni,
+  markaKatalogSayilari,
   MarkaSayfasi,
   OZET_AILE_AZAMI,
   OZET_KATEGORI_AZAMI,
@@ -203,5 +204,38 @@ describe('MarkaSayfasi: gövde özet paragrafı (d)', () => {
   it('veri boşsa (özet null) paragraf boştur', async () => {
     const { gorunum } = parcalar(await MarkaSayfasi({ lang: 'tr', slug: 'avens', sayac: async () => 5, katalogOzeti: async () => null }))
     expect(gorunum.urunOzeti).toBe('')
+  })
+})
+
+describe('markaKatalogSayilari: "Katalogda" kutusunun sayıları (URN-82)', () => {
+  const OZET = (total: number, models: number | null | undefined): BrandCatalogSummary => ({
+    total,
+    families: [],
+    categories: [],
+    ...(models === undefined ? {} : { models }),
+  })
+
+  it('aile VE model geçerli pozitif tam sayıysa kutu sayıları döner', () => {
+    expect(markaKatalogSayilari(OZET(12, 87))).toEqual({ aile: 12, model: 87 })
+  })
+
+  it.each([
+    ['özet yok', null],
+    ['aile 0', OZET(0, 0)],
+    ['model bilinmiyor (liste kesilmiş → null)', OZET(12, null)],
+    ['model alanı yok', OZET(12, undefined)],
+    ['model 0', OZET(3, 0)],
+    ['aile tam sayı değil', OZET(2.5, 10)],
+    ['model NaN', OZET(3, Number.NaN)],
+  ])('%s → null (eksik ya da kesik sayı basılmaz, kutu çizilmez)', (_ad, ozet) => {
+    expect(markaKatalogSayilari(ozet)).toBeNull()
+  })
+
+  it('MarkaSayfasi görünüme `katalogSayilari` olarak aile + model geçirir; ürünsüz markada null', async () => {
+    const oku = async (): Promise<BrandCatalogSummary> => ({ total: 4, families: [], categories: [], models: 19 })
+    const urunlu = parcalar(await MarkaSayfasi({ lang: 'tr', slug: 'vortice', sayac: async () => 5, katalogOzeti: oku }))
+    expect(urunlu.gorunum.katalogSayilari).toEqual({ aile: 4, model: 19 })
+    const urunsuz = parcalar(await MarkaSayfasi({ lang: 'tr', slug: 'flexiva', sayac: async () => 0, katalogOzeti: oku }))
+    expect(urunsuz.gorunum.katalogSayilari).toBeNull()
   })
 })

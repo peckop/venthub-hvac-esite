@@ -119,6 +119,12 @@ export interface BrandCatalogSummary {
     menu_label: string | null
     translation_key: string | null
   }>
+  /**
+   * Markanın AKTİF model (ürün) sayısı = ailelerin `variant_count` toplamı (RPC aktif ürün sayar). YALNIZ liste tam
+   * geldiyse (`items.length === total`) toplanır; sayfa kesilmişse toplam eksik olurdu → `null` (bilinmiyor; çağıran
+   * sayıyı hiç basmaz, eksik sayı yazmaz). Alan yoksa da "bilinmiyor" demektir.
+   */
+  models?: number | null
 }
 
 /** RPC tarafında 96'ya kırpılır (`GetFamiliesParams.limit`); özet bu sınırın altında kalır. */
@@ -139,7 +145,7 @@ export async function getBrandCatalogSummary(
   brandName: string
 ): Promise<BrandCatalogSummary> {
   const { items, total } = await getFamiliesEnriched(supabase, { brand: brandName, limit: BRAND_CATALOG_FAMILY_LIMIT })
-  if (items.length === 0) return { total: 0, families: [], categories: [] }
+  if (items.length === 0) return { total: 0, families: [], categories: [], models: 0 }
 
   const kategoriIdleri = [
     ...new Set(items.map((i) => i.subcategory_id ?? i.category_id).filter((id): id is string => !!id)),
@@ -160,10 +166,12 @@ export async function getBrandCatalogSummary(
     })
   }
 
+  const modelSayisi = items.reduce((toplam, i) => toplam + Number(i.variant_count), 0)
   return {
     total,
     families: items.map((i) => ({ name: i.name, name_i18n: i.name_i18n ?? null })),
     categories,
+    models: items.length === total && Number.isInteger(modelSayisi) && modelSayisi >= 0 ? modelSayisi : null,
   }
 }
 

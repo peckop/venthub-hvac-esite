@@ -51,7 +51,6 @@ export const tr = {
     // tescilli unvanla DEĞİŞİR (anahtar adı bu yüzden "LegalName" kaldı). Kullanan: giriş sayfası alt yazısı.
     brandLegalName: 'VentHub',
     vortice: 'Vortice',
-    comma: ',',
     decrease: 'Azalt',
     increase: 'Artır',
     listingPrice: 'Liste Fiyatı',
@@ -175,10 +174,10 @@ export const tr = {
     none: 'Yok',
     yes: 'Evet',
     no: 'Hayır',
-    whatsappAriaLabel: 'E-posta ile yaz',
-    whatsappTitle: 'E-posta ile yaz',
+    whatsappAriaLabel: 'WhatsApp ile yaz',
+    whatsappTitle: 'WhatsApp ile yaz',
     whatsappTooltip: '',
-    whatsappSupportMessage: 'Formla ya da e-posta ile iletişim',
+    whatsappSupportMessage: 'Web sitesinden destek talebi',
     pdf: 'PDF',
     sku: 'SKU',
     share: 'Paylaş',
@@ -483,24 +482,24 @@ export const tr = {
         altProduct: 'VentHub Ürün Ailesi',
         slides: [
           {
-            eyebrow: 'VORTICE KANAL FANLARI',
+            eyebrow: 'VORTICE · AERODİNAMİK TASARIM',
             title: 'Vortice Lineo ve Lineo Quiet',
-            subtitle: 'Karma akışlı kanal fanları: Lineo ve ses emici kaplamalı Lineo Quiet.',
+            subtitle: 'Kanal içine takılan karma akışlı fanlar: standart Lineo ve ses emici kaplamalı Lineo Quiet.',
             products: [
               {
-                label: 'Lineo Quiet',
+                label: 'Vortice Lineo',
                 subLabel: 'Kanal Tipi Karma Akışlı Fan'
               },
               {
                 label: 'Lineo Quiet',
-                subLabel: 'Sessiz Kanal Fanı'
+                subLabel: 'Ses Emici Kaplamalı'
               }
             ]
           },
           {
-            eyebrow: 'SESSİZ KANAL FANLARI',
-            title: 'Vortice Lineo Quiet: İki Motor Seçeneği',
-            subtitle: 'AC endüksiyon motorlu LINEO QUIET ve EC fırçasız motorlu LINEO QUIET ES, aynı kanal fanı ailesinde.',
+            eyebrow: 'SESSİZ ÇALIŞMA',
+            title: 'Vortice Lineo Quiet: Ses Emici Gövde',
+            subtitle: 'Ses emici kaplama dış gövdeye entegre; AC motorlu LINEO QUIET ve EC motorlu LINEO QUIET ES olarak iki seçenek.',
             products: [
               {
                 label: 'Ses Emici Kaplama',
@@ -508,14 +507,14 @@ export const tr = {
               },
               {
                 label: 'EC Fırçasız Motor',
-                subLabel: 'Üreticiye göre EC motorlu modellerde düşük enerji tüketimi'
+                subLabel: 'LINEO QUIET ES modellerinde'
               }
             ]
           },
           {
-            eyebrow: 'VORTICE LINEO KANAL FANLARI',
+            eyebrow: 'MONTAJ VE KULLANIM',
             title: 'Konut, Ticari ve Endüstriyel Kullanım',
-            subtitle: 'Kanal içine yatay veya dikey monte edilebilen karma akışlı fan; üç hızlı endüksiyon motoru vardır.',
+            subtitle: 'Kanal içine yatay ya da dikey monte edilebilen karma akışlı fan; üç hızlı endüksiyon motoru vardır.',
             products: [
               {
                 label: 'Kanal İçi Montaj',
@@ -761,7 +760,7 @@ export const tr = {
     whyParagraph: 'Kanal fanı, hava perdesi ve ısı geri kazanım modellerini inceleyin; Ürün Seçici ile ön hesap yapın, teklif isteyin.',
     why: {
       premiumTitle: 'Markalar',
-      premiumText: 'Katalogda {marka} markanın ürünleri yer alır; ürün sayfalarında teknik föy ve özellik tabloları bulunur.',
+      premiumText: 'Katalogda birden çok markanın ürünleri yer alır; ürün sayfalarında teknik föy ve özellik tabloları bulunur.',
       expertTitle: 'Ön Değerlendirme',
       expertText: 'Ürün Seçici; kanal fanı, ısı geri kazanım, hava perdesi ve jet fan için hesap yapar.',
       fastTitle: 'Teklifle Sipariş',
@@ -1049,9 +1048,6 @@ export const tr = {
     }
   },
   brands: {
-    page: {
-      statGlobal: '{marka}',
-    },
     sectionTitle: 'Katalogdaki Markalar',
     sectionSubtitle: 'AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT ve Vortice ürünlerini teknik özellikleriyle inceleyin.',
     subtitlePart1: 'Sunduğumuz',
@@ -1075,8 +1071,6 @@ export const tr = {
       eyebrow: 'Sipariş',
       title: 'Teklifle Sipariş',
       description: 'Çevrimiçi ödeme henüz açık değil; sipariş için teklif isteyin. Teslimat süresi ve sevkiyat koşulları teklif aşamasında netleştirilir.',
-      original: 'Teknik özellik tabloları',
-      standard: 'Katalogda ürünü olan marka',
       imageAlt: 'Teknik Altyapı ve HVAC Kurulumu'
     },
     detail: {
@@ -1084,7 +1078,7 @@ export const tr = {
       heritage: 'Marka Bilgisi',
       authorityTitle: 'Marka Hakkında',
       globalVision: 'Katalogda',
-      globalVisionDesc: '{{ad}}, VentHub kataloğunda {aile} ürün ailesi ve {model} model ile yer alıyor.',
+      globalVisionDesc: '{{ad}}, VentHub kataloğunda {{aile}} ürün ailesi ve {{model}} model ile yer alıyor.',
       technicalExcellence: 'Teknik Veriler',
       technicalExcellenceDesc: 'Ürün sayfalarında teknik föy ve özellik tabloları bulunur.',
       corporateSnapshot: 'Kurumsal Özet',
@@ -1743,13 +1737,15 @@ export const tr = {
           desc: 'İtalya merkezli marka'
         },
         {
-          value: '{aile}',
-          label: 'Vortice Ürün Ailesi',
+          // URN-82: sayı (`{aile}`/`{model}` yer tutucusu) bu bileşene hiç verilmiyordu, ekranda ham şablon görünürdü; sayı
+          // kaynağı sunucudan prop aktarımı ister (ayrı kart). Değer VE etiket boşken kart çizilmez (URN-84 mekanizması).
+          value: '',
+          label: '',
           desc: 'Katalogda yer alan'
         },
         {
-          value: '{model}',
-          label: 'Vortice Aktif Model',
+          value: '',
+          label: '',
           desc: 'Katalogdaki Vortice modelleri'
         },
         {
@@ -1955,7 +1951,7 @@ export const tr = {
       noise: {
         ultraQuiet: {
           label: 'Düşük Ses Seviyesi',
-          desc: 'Ses seviyesi {{esik1}} dB(A) ve altında olan modeller.'
+          desc: 'Ses seviyesi {{esik1}} dB(A) altında olan modeller.'
         },
         officeComfort: {
           label: 'Orta-Düşük Ses Seviyesi',
@@ -1966,8 +1962,8 @@ export const tr = {
           desc: 'Ses seviyesi {{esik2}}–{{esik3}} dB(A) aralığında olan modeller.'
         },
         industrial: {
-          label: 'Ses seviyesi: 60 dB(A) ve üzeri',
-          desc: 'Ses seviyesi {{esik3}} dB(A) üzerinde olan modeller.'
+          label: 'Ses seviyesi: {{esik3}} dB(A) ve üzeri',
+          desc: 'Ses seviyesi {{esik3}} dB(A) ve üzerinde olan modeller.'
         }
       },
       efficiency: {
@@ -2000,7 +1996,7 @@ export const tr = {
           desc: 'Hava debisi {{esik1}}–{{esik2}} m³/h aralığında olan modeller.'
         },
         industrialFlow: {
-          label: 'Debi: 2000 m³/h üzeri',
+          label: 'Debi: {{esik2}} m³/h üzeri',
           desc: 'Hava debisi {{esik2}} m³/h üzerinde olan modeller.'
         }
       }
@@ -3072,12 +3068,14 @@ export const tr = {
           value: ''
         },
         {
-          label: 'Vortice Ürün Ailesi',
-          value: '{aile}'
+          // URN-82: sayı (`{aile}`/`{model}` yer tutucusu) bu bileşene hiç verilmiyordu, ekranda ham şablon görünürdü; sayı
+          // kaynağı sunucudan prop aktarımı ister (ayrı kart). Değer VE etiket boşken kart çizilmez (URN-84 mekanizması).
+          label: '',
+          value: ''
         },
         {
-          label: 'Vortice Aktif Model',
-          value: '{model}'
+          label: '',
+          value: ''
         },
         {
           label: 'Ülke',
@@ -3109,7 +3107,7 @@ export const tr = {
     step4Desc: 'Bu tercih sıralamayı değiştirir; yetersiz modeller yine de elenir.',
     calculating: 'Modeller sizin tesisatınıza göre hesaplanıyor…',
     resultTitle: 'Sizin için üç öneri',
-    resultNeed: 'Odanız yaklaşık {hacim} m³ — bu mahal için saatte {debi} m³ hava taşınması gerekiyor.',
+    resultNeed: 'Odanız yaklaşık {{hacim}} m³ — bu mahal için saatte {{debi}} m³ hava taşınması gerekiyor.',
     badgeBest: '1. sırada',
     badgeQuietest: 'En düşük dB(A)',
     badgeEfficient: 'EC motorlu',

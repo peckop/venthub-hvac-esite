@@ -42,7 +42,6 @@ export const en: typeof tr = {
     // registered name exists this value is REPLACED with it (hence the key name stays "LegalName"). Used by: login footer.
     brandLegalName: 'VentHub',
     vortice: 'Vortice',
-    comma: ',',
     decrease: 'Decrease',
     increase: 'Increase',
     listingPrice: 'List Price',
@@ -144,10 +143,10 @@ export const en: typeof tr = {
     next: 'Next',
     remove: 'Remove',
     more: 'More',
-    whatsappAriaLabel: 'Write by email',
-    whatsappTitle: 'Write by email',
+    whatsappAriaLabel: 'Message on WhatsApp',
+    whatsappTitle: 'Message on WhatsApp',
     whatsappTooltip: '',
-    whatsappSupportMessage: 'Contact us by form or email',
+    whatsappSupportMessage: 'Support request from the website',
     pdf: 'PDF',
     sku: 'SKU',
     share: 'Share',
@@ -373,24 +372,24 @@ export const en: typeof tr = {
         altProduct: 'VentHub Product Family',
         slides: [
           {
-            eyebrow: 'VORTICE DUCT FANS',
+            eyebrow: 'VORTICE · AERODYNAMIC DESIGN',
             title: 'Vortice Lineo and Lineo Quiet',
-            subtitle: 'Mixed flow duct fans: Lineo, and Lineo Quiet with a sound-absorbing lining.',
+            subtitle: 'Mixed flow fans installed inside the duct: standard Lineo and Lineo Quiet with a sound-absorbing lining.',
             products: [
               {
-                label: 'Lineo Quiet',
+                label: 'Vortice Lineo',
                 subLabel: 'Mixed Flow Duct Fan'
               },
               {
                 label: 'Lineo Quiet',
-                subLabel: 'Quiet Duct Fan'
+                subLabel: 'Sound-Absorbing Lining'
               }
             ]
           },
           {
-            eyebrow: 'QUIET DUCT FANS',
-            title: 'Vortice Lineo Quiet: Two Motor Options',
-            subtitle: 'LINEO QUIET with an AC induction motor and LINEO QUIET ES with a brushless EC motor, in one duct fan family.',
+            eyebrow: 'QUIET OPERATION',
+            title: 'Vortice Lineo Quiet: Sound-Absorbing Housing',
+            subtitle: 'The sound-absorbing lining is built into the outer housing; two options: LINEO QUIET with an AC motor and LINEO QUIET ES with an EC motor.',
             products: [
               {
                 label: 'Sound-Absorbing Lining',
@@ -398,14 +397,14 @@ export const en: typeof tr = {
               },
               {
                 label: 'Brushless EC Motor',
-                subLabel: 'Per the manufacturer, low energy use in EC motor models'
+                subLabel: 'In LINEO QUIET ES models'
               }
             ]
           },
           {
-            eyebrow: 'VORTICE LINEO DUCT FANS',
+            eyebrow: 'INSTALLATION AND USE',
             title: 'Residential, Commercial and Industrial Use',
-            subtitle: 'A mixed flow fan that mounts inside a duct, horizontally or vertically, with a three-speed induction motor.',
+            subtitle: 'A mixed flow fan that can be mounted inside the duct horizontally or vertically; it has a three-speed induction motor.',
             products: [
               {
                 label: 'In-Duct Mounting',
@@ -648,7 +647,7 @@ export const en: typeof tr = {
     whyParagraph: 'Browse duct fan, air curtain and heat recovery models, pre-size with the Product Selector and request a quote.',
     why: {
       premiumTitle: 'Brands',
-      premiumText: 'Products from {marka} brands; product pages carry datasheets and specification tables.',
+      premiumText: 'The catalogue carries products from several brands; product pages carry datasheets and specification tables.',
       expertTitle: 'Pre-assessment',
       expertText: 'The Product Selector runs duct fan, heat recovery, air curtain and jet fan sizing.',
       fastTitle: 'Order by Quote',
@@ -1283,13 +1282,15 @@ export const en: typeof tr = {
           desc: 'An Italy-based brand'
         },
         {
-          value: '{aile}',
-          label: 'Vortice Product Families',
+          // URN-82: the count (`{aile}`/`{model}` placeholder) was never passed to this component and the raw template showed;
+          // a real count needs a server prop (separate card). Card is not drawn while value AND label are empty (URN-84).
+          value: '',
+          label: '',
           desc: 'Listed in the catalogue'
         },
         {
-          value: '{model}',
-          label: 'Vortice Active Models',
+          value: '',
+          label: '',
           desc: 'Vortice models in the catalogue'
         },
         {
@@ -1492,7 +1493,7 @@ export const en: typeof tr = {
       noise: {
         ultraQuiet: {
           label: 'Low Noise Level',
-          desc: 'Models with a sound level of {{esik1}} dB(A) or below.'
+          desc: 'Models with a sound level below {{esik1}} dB(A).'
         },
         officeComfort: {
           label: 'Medium-Low Noise Level',
@@ -1503,8 +1504,8 @@ export const en: typeof tr = {
           desc: 'Models with a sound level between {{esik2}} and {{esik3}} dB(A).'
         },
         industrial: {
-          label: 'Noise level: 60 dB(A) and above',
-          desc: 'Models with a sound level above {{esik3}} dB(A).'
+          label: 'Noise level: {{esik3}} dB(A) and above',
+          desc: 'Models with a sound level of {{esik3}} dB(A) or above.'
         }
       },
       efficiency: {
@@ -1537,7 +1538,7 @@ export const en: typeof tr = {
           desc: 'Models with an airflow between {{esik1}} and {{esik2}} m³/h.'
         },
         industrialFlow: {
-          label: 'Airflow: above 2,000 m³/h',
+          label: 'Airflow: above {{esik2}} m³/h',
           desc: 'Models with an airflow above {{esik2}} m³/h.'
         }
       }
@@ -1990,9 +1991,6 @@ export const en: typeof tr = {
     unexpected: 'An unexpected error occurred'
   },
   brands: {
-    page: {
-      statGlobal: '{marka}',
-    },
     sectionTitle: 'Brands in the Catalogue',
     sectionSubtitle: 'Browse AVenS, Casals, Danfoss, Nicotra Gebhardt, SEAT and Vortice products and their specifications.',
     subtitlePart1: 'Our',
@@ -2014,8 +2012,6 @@ export const en: typeof tr = {
       eyebrow: 'Ordering',
       title: 'Ordering by Quotation',
       description: 'Online payment is not open yet; request a quote to place an order. Delivery time and shipping terms are settled at the quotation stage.',
-      original: 'Technical specification tables',
-      standard: 'Brands with products in the catalogue',
       imageAlt: 'Technical Infrastructure and HVAC Installation'
     },
     detail: {
@@ -2023,7 +2019,7 @@ export const en: typeof tr = {
       heritage: 'Brand Information',
       authorityTitle: 'About the Brand',
       globalVision: 'In the Catalogue',
-      globalVisionDesc: '{{ad}} has {aile} product families and {model} models in the VentHub catalogue.',
+      globalVisionDesc: '{{ad}} has {{aile}} product families and {{model}} models in the VentHub catalogue.',
       technicalExcellence: 'Technical Data',
       technicalExcellenceDesc: 'Product pages carry datasheets and specification tables.',
       corporateSnapshot: 'Corporate Snapshot',
@@ -3029,12 +3025,14 @@ export const en: typeof tr = {
           value: ''
         },
         {
-          label: 'Vortice Product Families',
-          value: '{aile}'
+          // URN-82: the count (`{aile}`/`{model}` placeholder) was never passed to this component and the raw template showed;
+          // a real count needs a server prop (separate card). Card is not drawn while value AND label are empty (URN-84).
+          label: '',
+          value: ''
         },
         {
-          label: 'Vortice Active Models',
-          value: '{model}'
+          label: '',
+          value: ''
         },
         {
           label: 'Country',
@@ -3090,7 +3088,7 @@ export const en: typeof tr = {
     step4Desc: 'This changes the ranking; underpowered models are still eliminated.',
     calculating: 'Calculating models for your installation…',
     resultTitle: 'Three recommendations for you',
-    resultNeed: 'Your room is about {hacim} m³ — this space needs {debi} m³ of air per hour.',
+    resultNeed: 'Your room is about {{hacim}} m³ — this space needs {{debi}} m³ of air per hour.',
     badgeBest: 'Ranked 1st',
     badgeQuietest: 'Lowest dB(A)',
     badgeEfficient: 'EC motor',

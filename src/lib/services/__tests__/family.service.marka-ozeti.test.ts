@@ -129,7 +129,7 @@ describe('getBrandCatalogSummary: servis sözleşmesi', () => {
 
   it('marka ürünsüzse (aile yok) boş özet döner ve kategori/ad-çeviri sorgusu hiç atılmaz', async () => {
     const { sahte, istekler } = istemci({ aileler: [], kategoriler: [] })
-    await expect(getBrandCatalogSummary(sahte, 'Flexiva')).resolves.toEqual({ total: 0, families: [], categories: [] })
+    await expect(getBrandCatalogSummary(sahte, 'Flexiva')).resolves.toEqual({ total: 0, families: [], categories: [], models: 0 })
     expect(istekler.map((i) => i.url).filter((u) => u.includes('/categories') || u.includes('/product_families'))).toEqual([])
   })
 
@@ -138,5 +138,31 @@ describe('getBrandCatalogSummary: servis sözleşmesi', () => {
     await expect(getBrandCatalogSummary(rpc.sahte, 'Vortice')).rejects.toMatchObject({ message: 'statement timeout' })
     const kat = istemci({ aileler: [aile('f1', 'A', { category_id: 'k1' })], kategoriler: [], kategoriHata: true })
     await expect(getBrandCatalogSummary(kat.sahte, 'Vortice')).rejects.toMatchObject({ message: 'permission denied' })
+  })
+})
+
+describe('getBrandCatalogSummary: model sayısı (URN-82, marka sayfası "Katalogda" kutusu)', () => {
+  it('liste TAM geldiyse (öğe sayısı = toplam) aile başına aktif model sayısının toplamıdır', async () => {
+    const { sahte } = istemci({
+      aileler: [
+        aile('f1', 'A', { variant_count: 5, total_count: 3 }),
+        aile('f2', 'B', { variant_count: 2, total_count: 3 }),
+        aile('f3', 'C', { variant_count: 10, total_count: 3 }),
+      ],
+      kategoriler: [],
+    })
+    const ozet = await getBrandCatalogSummary(sahte, 'Vortice')
+    expect(ozet.total).toBe(3)
+    expect(ozet.models).toBe(17)
+  })
+
+  it('liste KESİLMİŞSE (toplam öğeden büyük) eksik toplam basılmaz: models null', async () => {
+    const { sahte } = istemci({
+      aileler: [aile('f1', 'A', { variant_count: 5, total_count: 120 }), aile('f2', 'B', { variant_count: 2, total_count: 120 })],
+      kategoriler: [],
+    })
+    const ozet = await getBrandCatalogSummary(sahte, 'Vortice')
+    expect(ozet.total).toBe(120)
+    expect(ozet.models).toBeNull()
   })
 })

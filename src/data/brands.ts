@@ -36,13 +36,16 @@
  *    ve eski kaydın "patentli / global marka" iddiaları atıldı; metni Design yazacak, kaynağı gelince eklenir.
  *
  * URN-79 (2026-10-09, OPS karar 317 tarama hükümleri): üreticinin kendi sitesinden alınan ve vitrinde DOĞRULANAMAYAN
- * üstünlük/ömür/oran cümleleri kayıtlardan KALKTI ("dünya lideri", "standartları belirliyor", "öncüsüdür", "%80'e
- * varan", "en geniş ürün gamı", "operatör güvenliğini koruyan uzun ömürlü", "yüksek performanslı", "Yüksek Verimli").
- * Yerine kayıttaki doğrulanabilir alanlardan (menşei, uzmanlık) kurulan nötr cümle kondu; ürün aileleri ve kategorileri
- * sayfa gövdesinde DB'den türer (`markaSayfasi.tsx` → `getBrandCatalogSummary`). KURULUŞ YILI kuralı: `founded` yalnız
- * kaynak dizininde marka adıyla birebir geçiyorsa kalır — Vortice 1954 ve SEAT 1968 geçiyor; Avens 2010, Danfoss 1933,
- * Nicotra 1959 geçmiyor (ölçüldü) → alan ve sayfadaki her kullanımı kaldırıldı. Kapı: INV-MARKA-IDDIA-1
- * (`src/__tests__/conformance/marka-iddia-yasagi.test.ts`).
+ * üstünlük/ömür/oran cümleleri kayıtlardan KALKTI ("dünya lideri", "standartları belirliyor", "öncüsüdür", "en geniş
+ * ürün gamı", "operatör güvenliğini koruyan uzun ömürlü", "yüksek performanslı", "Yüksek Verimli"). Yerine kayıttaki
+ * doğrulanabilir alanlardan (menşei, uzmanlık) kurulan nötr cümle kondu; ürün aileleri ve kategorileri sayfa gövdesinde
+ * DB'den türer (`markaSayfasi.tsx` → `getBrandCatalogSummary`). KURULUŞ YILI kuralı: `founded` ALANI yalnız kaynak
+ * dizininde marka adıyla birebir geçiyorsa kalır — Vortice 1954 ve SEAT 1968 geçiyor; Avens 2010, Danfoss 1933,
+ * Nicotra 1959 geçmiyor (ölçüldü) → alan ve sayfadaki her "Kuruluş" satırı kaldırıldı.
+ * TEK İSTİSNA (URN-82, Blog son tablosu): Danfoss'un resmî sitesinde birebir geçen üç olgu (1933 kuruluş, 1968'den beri
+ * frekans konvertörü, "%80'e varan azalma") `description` metninde YALNIZ web adresiyle ve şirkete atfeden fiille
+ * ("belirtiyor" / "states") durur; atıfsız kullanımı kapı kırmızı yapar. Kaynak adresleri aşağıda Danfoss kaydındadır.
+ * Kapı: INV-MARKA-IDDIA-1 (`src/__tests__/conformance/marka-iddia-yasagi.test.ts`, liste `markaIddiaListesi.ts`).
  */
 
 /** Dile göre çözülen metin. İki dil de ZORUNLU — eksik dil sessizce Türkçe göstermesin. */
@@ -148,11 +151,11 @@ export const HVAC_BRANDS: HVACBrand[] = [
     // Katalogdaki Danfoss ürünleri frekans konvertörleridir (FC 51 / FC 101 / FC 102).
     name: 'Danfoss',
     slug: 'danfoss',
-    // URN-79: "1968'den bu yana … öncüsüdür" (üretici öz beyanı, atıfsız) ve "enerji tüketimini %80'e varan oranda azaltır"
-    // (atıfsız üretici sayısı; Danfoss FC102 kataloğunda örnek "%50'den fazla") kalktı. `founded: 1933` KALDIRILDI:
-    // kuruluş yılı kaynak dizininde marka adıyla geçmiyor (ölçüldü 2026-10-09; Danfoss için 1933/1968/Nordborg/pioneer 0
-    // eşleşme) → yazılmaz. Danfoss'un resmî sitesi yukarıda KAYNAK olarak duruyor ama kaynak dizini DEĞİL; dizine
-    // eklenince (catalog-ingestion-standard.md §6.3) yıl geri gelebilir.
+    // URN-79: "…öncüsüdür" (üretici öz beyanı, atıfsız) ve atıfsız "%80'e varan" cümlesi kalktı; `founded: 1933` ALANI
+    // KALDIRILDI (kuruluş yılı kaynak dizininde marka adıyla geçmiyor, ölçüldü 2026-10-09: Danfoss için 1933/1968/Nordborg/
+    // pioneer 0 eşleşme). URN-82: aşağıdaki `description` 1933, 1968 ve "%80'e varan" olgularını YİNE de taşır, ama yalnız
+    // yukarıdaki resmî site adreslerine atıfla ve "şirket belirtiyor" kalıbıyla (üretici beyanı olarak; kendi cümlemiz
+    // olarak değil). Kaynak dizini DEĞİL, resmî site; dizine eklenince (catalog-ingestion-standard.md §6.3) atıf kalkar.
     description: {
       tr: '1933\'te Danimarka\'da kurulan bir aile şirketi. Danfoss Drives, 1968\'den beri frekans konvertörü (değişken frekanslı sürücü) üretiyor; şirket, motor hızını ihtiyaca göre ayarlayarak enerji tüketiminde %80\'e varan azalma sağlanabileceğini belirtiyor.',
       en: 'A family-owned company founded in Denmark in 1933. Danfoss Drives has made variable-frequency drives since 1968; the company states that matching motor speed to demand can reduce energy consumption by up to 80%.'
