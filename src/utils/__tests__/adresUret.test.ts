@@ -22,8 +22,8 @@ beforeEach(() =>
 )
 
 describe('bayrak', () => {
-  it('Faz 3-C öncesi KAPALI — açılışı yalnız Faz 4 onaylı tek PR yapar', () => {
-    expect(ADRES_SEMASI_K3B).toBe(false)
+  it('Faz 3-C sonrası AÇIK — kapatmak yalnız runbook §7 merdivenidir (config satırları silindi, tek satırlık geri alma temiz değil)', () => {
+    expect(ADRES_SEMASI_K3B).toBe(true)
   })
 })
 

@@ -143,13 +143,16 @@ describe('INV-SERIES-LANDING-1: seri landing 200, ürünsüz aile gerçek 404', 
     expect(seriesLanding).not.toHaveBeenCalled()
   })
 
-  it('varyant slug → kanonik aile URL’ine 308 (sku URL-kodlanır)', async () => {
+  // Faz 3-C (URN-85 2/2): `?sku=` hedefi KAPALI kolun biçimidir (AÇIKKEN liste içi SKU modelin kendi adresine, liste
+  // dışı SKU sorgusuz aile adresine gider — `yuzeyAdresleri.test.ts` "resolveProductRoute — yönlendirme hedefi").
+  // Bu test kapalı kolun sku-kodlama sözleşmesini ölçer; kip 4. parametreyle AÇIKÇA verilir, gerçek sabite bakılmaz.
+  it('varyant slug → kanonik aile URL’ine 308 (sku URL-kodlanır; KAPALI kip)', async () => {
     const d = deps({
       variantBySlug: vi.fn(async () => ({ sku: 'A/B 100', family_id: 'fam-1' })),
       familySlugById: vi.fn(async () => 'lineo-100-quiet'),
     })
 
-    const result = await resolveProductRoute('eski-varyant-slug', 'en', d)
+    const result = await resolveProductRoute('eski-varyant-slug', 'en', d, false)
 
     expect(result.kind).toBe('redirect')
     if (result.kind !== 'redirect') throw new Error('redirect beklenirken ' + result.kind)
@@ -183,7 +186,9 @@ describe('INV-SERIES-LANDING-1: seri landing 200, ürünsüz aile gerçek 404', 
  * onu OKUDUĞUNU ve sırasını korur.
  */
 describe('INV-TAKMA-AD-OKUMA-1: eski ürün/aile slug’ı → bugünkü aile adresi', () => {
-  it('eski ÜRÜN slug’ı → aile URL’i + ?sku=', async () => {
+  // `?sku=` biçimi KAPALI kolundur (bkz. yukarıdaki not): kip açıkça `false` verilir; AÇIK kolun karşılığı
+  // `yuzeyAdresleri.test.ts`'te, yayındaki-model listesi enjekte edilerek ölçülür (üretim listesine bağlı kalmaz).
+  it('eski ÜRÜN slug’ı → aile URL’i + ?sku= (KAPALI kip)', async () => {
     const takmaAd = vi.fn(async (tur: 'urun' | 'aile') => (tur === 'urun' ? 'urun-id-1' : null))
     const d = deps({
       takmaAd,
@@ -191,7 +196,7 @@ describe('INV-TAKMA-AD-OKUMA-1: eski ürün/aile slug’ı → bugünkü aile ad
       familySlugById: vi.fn(async () => 'vorticent-cms-atex'),
     })
 
-    const result = await resolveProductRoute('vorticent-cms-atex-35-14-t4-4kw-253490106xn', 'tr', d)
+    const result = await resolveProductRoute('vorticent-cms-atex-35-14-t4-4kw-253490106xn', 'tr', d, false)
 
     expect(result).toEqual({
       kind: 'redirect',

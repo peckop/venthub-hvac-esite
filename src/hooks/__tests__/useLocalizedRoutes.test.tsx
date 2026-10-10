@@ -1,9 +1,14 @@
 import { renderHook } from '@testing-library/react';
 import React from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { I18nProvider } from '../../i18n/I18nProvider';
 import { useLocalizedRoutes } from '../useLocalizedRoutes';
+
+// Faz 3-C (URN-85 2/2) gerçek bayrağı `true` yaptı. Bu dosya proxy'nin KAPALI kolunu (Reflect + localizedHref
+// sarması, `Routes` tablosunun bugünkü adresleri) ölçer; bayrak burada KAPALIYA sabitlenir. Açık kol (adresRotalari
+// ile üst-örtü) `src/utils/__tests__/yuzeyAdresleriK3b.test.tsx` "useLocalizedRoutes vekili — K3-b açık"ta ölçülür.
+vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: false }));
 
 // CLIENT yol kilidi: useLocalizedRoutes proxy'si. localizedHref birim testi (utils/routes.test.ts)
 // saf fonksiyonu kanıtlar; bu test proxy'nin AYRI mantığını pinler — iç-içe obje recurse'ü ve

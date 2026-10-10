@@ -126,8 +126,12 @@ export const EN_YAYIN = false
  *
  * AÇMA (Faz 3-C, tek PR, geri dönüşsüz adım): yalnız Faz 4 ön izlemesinde Recep "gördüm, tamam"
  * dedikten sonra (karar 68). Aynı PR eski-adres haritasını ve `next.config`'ten silinecek satırları taşır.
+ *
+ * ⭐AÇILDI (Faz 3-C, 2026-10-10; yayın Pazar 11 Ekim 10:12, runbook v0.3 §3 A4): `true`. Eski-adres haritası
+ * `src/data/generated/eski-adres-haritasi.json`, `next.config`'ten 25 kuralın silinmesi ve bu satır TEK PR'dadır.
+ * Geri alma: bu sabiti `false` yapmak TEMİZ geri alma DEĞİLDİR (config satırları gitti); merdiven runbook §7.
  */
-export const ADRES_SEMASI_K3B = false
+export const ADRES_SEMASI_K3B = true
 
 
 /**

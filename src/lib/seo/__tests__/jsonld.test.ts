@@ -272,7 +272,8 @@ describe('buildCategoryJsonLd', () => {
       families: [],
     })
 
-    expect(jsonLd.url).toBe(`${BASE_URL}/tr/category/fanlar`)
+    // Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK → TR kategori adresi `/tr/kategori/<slug>` (EN: `/en/category/<slug>`).
+    expect(jsonLd.url).toBe(`${BASE_URL}/tr/kategori/fanlar`)
   })
 
   it('itemListElement URL\'lerinde /${lang} prefix\'i eksik olmaz (B9)', () => {
@@ -408,12 +409,13 @@ describe('buildSeriesLandingJsonLd', () => {
 
     const items = liste(jsonLd).itemListElement
     expect(items).toHaveLength(2)
+    // Faz 3-C: aile adresi TR'de `/tr/urun/<slug>` (EN: `/en/products/<slug>`); id/UUID adreste hiç geçmez.
     expect(items[0]).toEqual({
       '@type': 'ListItem',
       position: 1,
-      url: `${BASE_URL}/tr/products/lineo-100-quiet`,
+      url: `${BASE_URL}/tr/urun/lineo-100-quiet`,
     })
-    expect(items[1].url).toBe(`${BASE_URL}/tr/products/lineo-150-quiet`)
+    expect(items[1].url).toBe(`${BASE_URL}/tr/urun/lineo-150-quiet`)
     // Fiyat/offers hiç yazılmaz (kategori sayfasıyla aynı disiplin).
     expect(items[0]).not.toHaveProperty('offers')
   })

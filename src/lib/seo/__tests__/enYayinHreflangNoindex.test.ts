@@ -18,6 +18,11 @@ import type { DomainCategory } from '@/lib/type-converters'
  * bayrağın değeri değil, tüketicilerin ona GERÇEKTEN bağlı olmasıdır.
  *
  * ÖLÇMEDİĞİ: canlıda Google'ın davranışı (GSC, yayın sonrası).
+ *
+ * FAZ 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK. Bu kapı `EN_YAYIN`ı değiştirir, adres şemasını DEĞİL; şema gerçek
+ * (açık) değerinde kalır — canlıdaki bileşim ölçülür. Sonuçları: TR ürünler listesi `/tr/urunler` rotasından gelir
+ * (`/tr/products` 308 verir, üst verisi boştur); `/en/products` yerinde kalır; ürünler/marka/kategori üst verisi
+ * `sayfaUstVerisi` kalıbından çıkar (TR ve EN yayındayken `robots` YAZILMAZ = indekslenir; kapalıyken EN `noindex, follow`).
  */
 
 // Veri katmanı ağa gitmez; kalıcı mock'lar (`vi.mock` hoist edilir, `resetModules`tan etkilenmez).
@@ -67,11 +72,12 @@ async function bayrakla(acik: boolean) {
   const { sayfaUstVerisi } = await import('../sayfaUstVerisi')
   const ana = await import('../../../app/[lang]/page')
   const urunler = await import('../../../app/[lang]/products/page')
+  const urunlerTr = await import('../../../app/[lang]/urunler/page')
   const seciciSayfa = await import('../../../app/[lang]/urun-secici/page')
   const kategori = await import('../../../app/_components/kategoriSayfasi')
   const marka = await import('../../../app/_components/markaSayfasi')
   const { default: sitemap } = await import('../../../app/sitemap')
-  return { sayfaUstVerisi, ana, urunler, seciciSayfa, kategori, marka, sitemap }
+  return { sayfaUstVerisi, ana, urunler, urunlerTr, seciciSayfa, kategori, marka, sitemap }
 }
 
 describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
@@ -93,24 +99,33 @@ describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
     })
 
     it('/en ve /en/products: noindex, follow — sayfanın kendi robots\'u layout\'unkini EZMEZ; TR bugünkü', async () => {
-      const { ana, urunler } = await bayrakla(false)
+      const { ana, urunler, urunlerTr } = await bayrakla(false)
       expect((await ana.generateMetadata(EN_ISTEK)).robots).toEqual(NOINDEX)
       expect((await urunler.generateMetadata(EN_ISTEK)).robots).toEqual(NOINDEX)
       expect((await ana.generateMetadata(TR_ISTEK)).robots).toEqual(INDEX)
-      expect((await urunler.generateMetadata(TR_ISTEK)).robots).toEqual(INDEX)
+      // Faz 3-C: TR liste `/tr/urunler`'dedir; `sayfaUstVerisi` TR'de `robots` yazmaz → noindex DEĞİL, indekslenir.
+      const trListe = await urunlerTr.generateMetadata(TR_ISTEK)
+      expect(trListe.robots).toBeUndefined()
+      expect(trListe.alternates?.canonical).toMatch(/\/tr\/urunler$/)
     })
 
     it('el yazımı hreflang yüzeyleri (ana sayfa, ürünler, ürün seçici, marka, kategori): languages YOK, canonical KALIR', async () => {
-      const { ana, urunler, seciciSayfa, marka, kategori } = await bayrakla(false)
+      const { ana, urunler, urunlerTr, seciciSayfa, marka, kategori } = await bayrakla(false)
+      // Faz 3-C: canlıdaki yüzeyler K3b üst verileridir (TR liste `/tr/urunler` rotasından); kapalı-şema üst verileri
+      // (`markaUstVerisi`, `kategoriSayfasiUstVerisi`) geri alma kolu olarak listede KALIR — ikisi de EN_YAYIN'a bağlı.
       const metalar = [
         await ana.generateMetadata(TR_ISTEK),
         await ana.generateMetadata(EN_ISTEK),
-        await urunler.generateMetadata(TR_ISTEK),
+        await urunlerTr.generateMetadata(TR_ISTEK),
         await urunler.generateMetadata(EN_ISTEK),
         await seciciSayfa.generateMetadata(TR_ISTEK),
         await seciciSayfa.generateMetadata(EN_ISTEK),
+        marka.markaUstVerisiK3b('tr', 'avens'),
+        marka.markaUstVerisiK3b('en', 'avens'),
         marka.markaUstVerisi('tr', 'avens'),
         marka.markaUstVerisi('en', 'avens'),
+        kategori.kategoriSayfasiUstVerisiK3b('tr', KATEGORI(true), null),
+        kategori.kategoriSayfasiUstVerisiK3b('en', KATEGORI(true), null),
         kategori.kategoriSayfasiUstVerisi('tr', KATEGORI(true)),
         kategori.kategoriSayfasiUstVerisi('en', KATEGORI(true)),
       ]
@@ -150,20 +165,25 @@ describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
     })
 
     it('/en ve /en/products: bugünkü index, follow', async () => {
-      const { ana, urunler } = await bayrakla(true)
+      const { ana, urunler, urunlerTr } = await bayrakla(true)
       expect((await ana.generateMetadata(EN_ISTEK)).robots).toEqual(INDEX)
-      expect((await urunler.generateMetadata(EN_ISTEK)).robots).toEqual(INDEX)
       expect((await ana.generateMetadata(TR_ISTEK)).robots).toEqual(INDEX)
-      expect((await urunler.generateMetadata(TR_ISTEK)).robots).toEqual(INDEX)
+      // Faz 3-C: ürünler listesi `sayfaUstVerisi` kalıbından çıkar — iki dilde de `robots` YAZILMAZ (= index, follow).
+      // `toBeUndefined` "noindex basılmıyor" demektir: EN yayındayken `noindex, follow` geri gelirse KIRMIZI.
+      expect((await urunler.generateMetadata(EN_ISTEK)).robots).toBeUndefined()
+      expect((await urunlerTr.generateMetadata(TR_ISTEK)).robots).toBeUndefined()
     })
 
     it('el yazımı hreflang yüzeyleri: languages tr/en/x-default BİREBİR geri gelir', async () => {
-      const { ana, urunler, seciciSayfa, marka, kategori } = await bayrakla(true)
+      const { ana, urunler, urunlerTr, seciciSayfa, marka, kategori } = await bayrakla(true)
       const metalar = [
         await ana.generateMetadata(TR_ISTEK),
         await urunler.generateMetadata(EN_ISTEK),
+        await urunlerTr.generateMetadata(TR_ISTEK),
         await seciciSayfa.generateMetadata(TR_ISTEK),
+        marka.markaUstVerisiK3b('tr', 'avens'),
         marka.markaUstVerisi('tr', 'avens'),
+        kategori.kategoriSayfasiUstVerisiK3b('en', KATEGORI(true), null),
         kategori.kategoriSayfasiUstVerisi('en', KATEGORI(true)),
       ]
       for (const m of metalar) {
@@ -185,9 +205,10 @@ describe('INV-EN-YAYIN-2 — hreflang + /en noindex + pasif kategori', () => {
       const alternatesiOlmayan = satirlar.filter((s) => !s.alternates?.languages)
       // Bilgi Merkezi satırları (kendi kuralı: hreflang yalnız iki dil de yayındaysa) hariç tutulur.
       expect(alternatesiOlmayan.filter((s) => !s.url.includes('/bilgi-merkezi') && !s.url.includes('/knowledge-hub'))).toEqual([])
-      const ornek = satirlar.find((s) => s.url.endsWith('/tr/products'))
+      // Faz 3-C: TR ürünler listesi `/tr/urunler`; hreflang eşi `/en/products` (EN öneki değişmez).
+      const ornek = satirlar.find((s) => s.url.endsWith('/tr/urunler'))
       expect(ornek?.alternates?.languages).toEqual({
-        tr: expect.stringMatching(/\/tr\/products$/),
+        tr: expect.stringMatching(/\/tr\/urunler$/),
         en: expect.stringMatching(/\/en\/products$/),
       })
     })

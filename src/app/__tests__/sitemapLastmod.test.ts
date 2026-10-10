@@ -56,8 +56,9 @@ describe('INV-SITEMAP-LASTMOD-1 — lastmod gerçek değişiklikten ya da hiç',
   it('aile satırı veritabanındaki en son değişiklik tarihini taşır; tarihsiz (seri) satırda alan yok', async () => {
     const sitemap = await sitemapKur(async () => new Map([['tarihli-aile', '2026-09-20T10:00:00.000Z']]))
     const satirlar = await sitemap()
-    const aile = satirlar.find((s) => s.url.endsWith('/tr/products/tarihli-aile'))
-    const seri = satirlar.find((s) => s.url.endsWith('/tr/products/seri-slug'))
+    // Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK — TR aile adresi `/tr/urun/<slug>`.
+    const aile = satirlar.find((s) => s.url.endsWith('/tr/urun/tarihli-aile'))
+    const seri = satirlar.find((s) => s.url.endsWith('/tr/urun/seri-slug'))
     expect(aile?.lastModified && new Date(aile.lastModified).toISOString()).toBe('2026-09-20T10:00:00.000Z')
     expect(seri).toBeDefined()
     expect(seri && 'lastModified' in seri).toBe(false)
@@ -67,8 +68,13 @@ describe('INV-SITEMAP-LASTMOD-1 — lastmod gerçek değişiklikten ya da hiç',
     const sitemap = await sitemapKur(async () => new Map())
     const satirlar = await sitemap()
     const ana = satirlar.find((s) => s.url.endsWith('/tr'))
-    const marka = satirlar.find((s) => s.url.includes('/tr/brands/'))
-    const kategori = satirlar.find((s) => s.url.endsWith('/tr/category/fanlar'))
+    // Faz 3-C: marka `/tr/markalar/<slug>`, kategori `/tr/kategori/<slug>`. `toBeDefined` EKLENDİ: adres şeması
+    // değişince `find` boş dönüp `undefined && …` ile sessizce yeşil kalmasın (eski kapı tam böyle kırıldı).
+    const marka = satirlar.find((s) => s.url.includes('/tr/markalar/'))
+    const kategori = satirlar.find((s) => s.url.endsWith('/tr/kategori/fanlar'))
+    expect(ana).toBeDefined()
+    expect(marka).toBeDefined()
+    expect(kategori).toBeDefined()
     expect(ana && 'lastModified' in ana).toBe(false)
     expect(marka && 'lastModified' in marka).toBe(false)
     expect(kategori?.lastModified && new Date(kategori.lastModified).toISOString()).toBe('2026-09-01T00:00:00.000Z')

@@ -6,6 +6,9 @@
  * `/tr/category/air-curtains` ve `/tr/category/heat-recovery-vmc` veriyordu; sayfa katmanı 308 ile
  * düzeltiyordu. Bu test bileşenin ürettiği `href`'leri doğrudan okur (adres fonksiyonunu değil),
  * böylece bileşen eski çağrıya dönerse kırılır.
+ *
+ * Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK; TR bölüm adı `kategori` (`/tr/kategori/hava-perdeleri`), EN `category`.
+ * Ölçülen özellik DEĞİŞMEDİ: TR sayfada kanonik EN slug (`air-curtains`) hiçbir bağlantıda geçmez.
  */
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
@@ -36,13 +39,13 @@ const kategoriHrefleri = (kap: HTMLElement) =>
 describe('ApplicationSolutions — kart bağlantıları görünen slug ile (URN-19)', () => {
   it('TR, liste verilmiş: görünen TR slug', () => {
     const { container } = render(<ApplicationSolutions dictionary={sozluk} lang="tr" categories={kategoriler} />)
-    expect(kategoriHrefleri(container)).toEqual(['/tr/category/hava-perdeleri', '/tr/category/isi-geri-kazanim'])
+    expect(kategoriHrefleri(container)).toEqual(['/tr/kategori/hava-perdeleri', '/tr/kategori/isi-geri-kazanim'])
   })
 
   it('TR, liste verilmemiş (veri alınamadı): yedek TR slug — EN slug ASLA', () => {
     const { container } = render(<ApplicationSolutions dictionary={sozluk} lang="tr" />)
     const hrefler = kategoriHrefleri(container)
-    expect(hrefler).toEqual(['/tr/category/hava-perdeleri', '/tr/category/isi-geri-kazanim'])
+    expect(hrefler).toEqual(['/tr/kategori/hava-perdeleri', '/tr/kategori/isi-geri-kazanim'])
     expect(hrefler.join(' ')).not.toMatch(/air-curtains|heat-recovery-vmc/)
   })
 

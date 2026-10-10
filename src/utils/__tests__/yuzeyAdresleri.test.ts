@@ -6,8 +6,11 @@
  *     HESAPLANMAZ — hesaplansaydı ikisi birlikte bozulduğunda test yeşil kalırdı).
  *  2. AÇIK kip (`bayrak = true` parametresi) plan §2 şemasını verir; `?sku=` hiçbir yüzeyde yok.
  *
- * Varsayılan bayrakla (gerçek `features.ts`) koşar; bayrağın kendisi `adresUret.test.ts`'te sabit.
- * Açık kipin varsayılanla (vekil, middleware, bilgi merkezi) davranışı: `yuzeyAdresleriK3b.test.tsx`.
+ * Varsayılan bayrak bu dosyada KAPALIYA SABİTLENİR (aşağıdaki `vi.mock`): Faz 3-C (URN-85 2/2) `features.ts`
+ * değerini `true` yaptı; "varsayılan çağrı = bugünkü çıktı" sözleşmesini (parametresiz çağrıların KAPALI kolu)
+ * bu dosya ölçmeye devam eder — kod dalı bayrak geri alınırsa (runbook §7) yine canlıdır. Bayrağın kendi değeri
+ * `adresUret.test.ts`'te sabit. Varsayılanın GERÇEK (açık) değeriyle davranışı — vekil, middleware, bilgi merkezi —
+ * `yuzeyAdresleriK3b.test.tsx`'te ölçülür.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -30,6 +33,9 @@ import {
   urunDetayYoluMu,
   urunlerBolumuOnekleri,
 } from '../yuzeyAdresleri'
+
+// Faz 3-C sonrası: gerçek bayrak `true`; bu dosyanın "varsayılan = KAPALI" ölçümü için modül bayrağı sabitlenir.
+vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: false }))
 
 // URN-31: model adresi yalnız yayındaki listedeki SKU için üretilir; adres metni listeden. Varsayılan liste: üç SKU,
 // adres metni aile slug'ı (eski beklentilerle aynı). Bayrak KAPALI kolları listeden bağımsızdır (INV-YAYINDA-MODEL-7).
