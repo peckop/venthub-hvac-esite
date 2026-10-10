@@ -15,7 +15,13 @@ import { assertNoUuid, buildCategoryJsonLd } from '@/lib/seo/jsonld'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { getFamiliesEnriched } from '@/lib/services/family.service'
 import { supabaseStaticClient as supabase } from '@/lib/supabase/static'
-import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '@/utils/categoryHelpers'
+import {
+  getCategoryDescription,
+  getCategoryDisplayName,
+  getCategorySeoDescription,
+  getCategorySeoTitle,
+  getLocalizedCategorySlug,
+} from '@/utils/categoryHelpers'
 
 import { SITE_URL } from '../../config/siteUrl'
 import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
@@ -127,14 +133,22 @@ function kategoriMetinleri(lang: string, category: DomainCategory) {
   const t = (key: string) => getDictValue(dict, key)
   const displayName = getCategoryDisplayName(category, t)
 
+  // URN-91 alt iş 1 (KTL-21): arama sonucu başlığı ve açıklaması kategorinin `seo_title` / `seo_desc` kaydından gelir
+  // (TR sütun, EN `metadata.seo_*_en`; yuva kararı `getCategorySeoTitle` yorumunda). Kayıt yoksa BUGÜNKÜ davranış:
+  // başlık = görünen kategori adı, açıklama = aşağıdaki zincir. Görünür H1 ve sayfa gövdesi DEĞİŞMEZ — `seo_title`
+  // yalnız `<title>` ve og:title'a gider. Site eki " | VentHub" HER ZAMAN koda aittir: kayda yanlışlıkla yazılmış
+  // ek çift basılmaz.
+  const seoBaslik = getCategorySeoTitle(category, lang).replace(/\s*\|\s*VentHub\s*$/i, '').trim()
+  const baslik = `${seoBaslik || displayName} | VentHub`
+
   // REC-497: şablon ("en kaliteli ve ekonomik…") KALKTI. Canlı kapı 2026-10-02: 24 kategori sayfası
   // aynı kalıpla bitiyordu ve "en kaliteli/ekonomik" sitede doğrulanamayan bir iddiaydı. Açıklama
-  // kategorinin KENDİ metninden (metadata.description_i18n, dile göre) türer; metin yoksa (pasif
-  // kategori) sözlükteki yedek cümle. Aynı metin sayfa gövdesinde de basılır, yani arama sonucu
-  // ile sayfa birbirini çürütemez.
-  const kendiMetni = aciklamaKirp(getCategoryDescription(category, lang))
+  // önce `seo_desc` kaydından, yoksa kategorinin KENDİ metninden (metadata.description_i18n, dile göre)
+  // türer; hiçbiri yoksa (pasif kategori) sözlükteki yedek cümle. İkisi de tek kırpıcıdan geçer.
+  const kendiMetni =
+    aciklamaKirp(getCategorySeoDescription(category, lang)) || aciklamaKirp(getCategoryDescription(category, lang))
   const desc = kendiMetni || aciklamaKirp(t('category.seoYedekAciklama').replace('{{ad}}', displayName))
-  return { displayName, desc }
+  return { displayName, baslik, desc }
 }
 
 /** Kategori bulunamadığında üst veri (sayfa 404/308 verir; başlık yine dili bilir). */
@@ -149,7 +163,7 @@ export function kategoriBulunamadiUstVerisi(lang: string): Metadata {
  * Adresler bugünkü şemada (`/tr/category/<slug>` tek seviye).
  */
 export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory): Metadata {
-  const { displayName, desc } = kategoriMetinleri(lang, category)
+  const { baslik, desc } = kategoriMetinleri(lang, category)
 
   // hreflang: her dil kendi görünen slug'ıyla bildirilir; x-default = TR.
   const trUrl = `${SITE_URL}/tr/category/${getLocalizedCategorySlug(category, 'tr')}`
@@ -158,7 +172,7 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
   const pasif = pasifKategoriRobots(category)
 
   return {
-    title: `${displayName} | VentHub`,
+    title: baslik,
     description: desc,
     // O4 (REC-300): pasif (`is_active === false`) kategori sayfası 200 KALIR (bağlantı kırılmasın)
     // ama dizine girmez; aktif kategoride `robots` alanı YAZILMAZ (bugünkü). Sitemap zaten dışında.
@@ -175,7 +189,7 @@ export function kategoriSayfasiUstVerisi(lang: string, category: DomainCategory)
       }),
     },
     openGraph: {
-      title: `${displayName} | VentHub`,
+      title: baslik,
       description: desc,
       url: canonicalUrl,
       siteName: 'VentHub',
@@ -201,14 +215,14 @@ export function kategoriSayfasiUstVerisiK3b(
   category: DomainCategory,
   ust: KategoriUst | null,
 ): Metadata {
-  const { displayName, desc } = kategoriMetinleri(lang, category)
+  const { baslik, desc } = kategoriMetinleri(lang, category)
   const trYol = kategoriKanonikAdresi(category, ust, 'tr')
   const enYol = kategoriKanonikAdresi(category, ust, 'en')
   const m = sayfaUstVerisi({
     lang,
     yol: lang === 'en' ? enYol : trYol,
     dilYollari: { tr: trYol, en: enYol },
-    baslik: `${displayName} | VentHub`,
+    baslik,
     aciklama: desc,
   })
   const pasif = pasifKategoriRobots(category)
