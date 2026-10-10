@@ -2070,7 +2070,7 @@ export const tr = {
       q1: 'Teklif talebimi nasıl iletebilirim?',
       a1: 'İletişim formu ya da e-posta ile teklif isteyebilirsiniz.',
       q2: 'Ödeme yöntemleri nelerdir?',
-      a2: 'Mağazamız kuruluş aşamasında olduğu için çevrimiçi ödeme henüz açık değil. Sipariş için bizden teklif isteyebilirsiniz.',
+      a2: 'Çevrimiçi ödeme henüz açık değil. Sipariş için bizden teklif isteyebilirsiniz.',
       q3: 'Kurulum sorusunu nasıl iletebilirim?',
       a3: 'Kurulum sorularınızı iletişim formu ya da e-posta ile iletebilirsiniz.'
     }

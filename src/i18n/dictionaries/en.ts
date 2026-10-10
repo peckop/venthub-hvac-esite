@@ -2113,7 +2113,7 @@ export const en: typeof tr = {
       q1: 'How can I submit a request for a quote?',
       a1: 'You can request a quote through the contact form or by email.',
       q2: 'What are the payment methods?',
-      a2: 'Our store is still being set up, so online payment is not open yet. You can request a quote from us to place an order.',
+      a2: 'Online payment is not open yet. You can request a quote from us to place an order.',
       q3: 'How can I send an installation question?',
       a3: 'You can send installation questions via the contact form or email.'
     }
