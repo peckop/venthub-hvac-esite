@@ -80,7 +80,14 @@ function parcalar(el: unknown) {
   const jsonLd = JSON.parse(
     (cocuklar[0].props as { dangerouslySetInnerHTML: { __html: string } }).dangerouslySetInnerHTML.__html,
   ) as { description: string; name: string; url: string }
-  return { jsonLd, gorunum: cocuklar[1].props as { urunsuz: boolean; urunOzeti: string } }
+  return {
+    jsonLd,
+    gorunum: cocuklar[1].props as {
+      urunsuz: boolean
+      urunOzeti: string
+      katalogSayilari: { aile: number; model: number } | null
+    },
+  }
 }
 
 describe('Brand JSON-LD açıklaması (b)', () => {
