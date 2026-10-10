@@ -70,6 +70,16 @@ export interface FtsProductResult {
  * FamilyListItem: get_product_families_enriched RPC'sinin satır modeli (F5-B W0.2).
  * Aile-bazlı vitrin listelerinin (W2.1) veri birimi; varyant satırı listeye girmez.
  */
+/**
+ * Markanın katalogdaki sayıları (URN-82 marka sayfası "Katalogda" kutusu, URN-95 Vortice sayaç kartları).
+ * Sunucu `getBrandCatalogSummary`'den türetir ve prop olarak indirir; ikisi de geçerli pozitif tam sayıdır,
+ * yoksa `null` geçilir ve sayaç çizilmez (yer tutucu ham bırakılmaz).
+ */
+export interface KatalogSayilari {
+  aile: number;
+  model: number;
+}
+
 export interface FamilyListItem {
   id: string;
   name: string;

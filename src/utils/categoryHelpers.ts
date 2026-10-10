@@ -236,6 +236,35 @@ export const getCategorySeoDescription = (category: CategorySeoSource | null | u
     seoMetni(category, 'seo_desc', lang)
 
 /**
+ * ARAMA SONUCU ALANLARINI İSTEMCİYE GİDEN SATIRDAN ÇIKARIR (URN-105, 2026-10-10).
+ *
+ * `seo_title` / `seo_desc` (TR sütun) ile `metadata.seo_title_en` / `metadata.seo_desc_en` yalnız SUNUCUDA
+ * başlık ve açıklama üretir (`getCategorySeoTitle` / `getCategorySeoDescription`); hiçbir istemci bileşeni okumaz.
+ * Satırla birlikte gömülü veriye (RSC yükü) giderlerse EN sayfada Türkçe, TR sayfada İngilizce metin sayfa
+ * kaynağında durur: KTL-21 28 kategoriyi doldurduğu gün `e2e/dil-dususu` (INV-DIL-DUSUSU-1) kırmızı verdi ve
+ * her PR'ın E2E'sini kırdı (canlı ölçüm: `/en` 56, `/en/category/fans` 24 dolu alan). Sütun boşken sızıntı
+ * görünmüyordu; kusur kodda önceden vardı, veri onu görünür kıldı.
+ *
+ * Sütunlar `null`a çevrilir (tip sözleşmesi bozulmaz), `metadata` kopyalanır ve yalnız iki `*_en` anahtarı düşer;
+ * `slug`, `description_i18n`, `hide_price` aynen kalır. Girdi değiştirilmez.
+ */
+export function aramaAlanlariniAyikla<T extends { metadata?: unknown }>(kategori: T): T {
+    const cikti = { ...kategori }
+    const yazilabilir = cikti as Record<string, unknown>
+    for (const sutun of ['seo_title', 'seo_desc']) {
+        if (sutun in yazilabilir) yazilabilir[sutun] = null
+    }
+    const meta = cikti.metadata
+    if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
+        const m = { ...(meta as Record<string, unknown>) }
+        delete m.seo_title_en
+        delete m.seo_desc_en
+        yazilabilir.metadata = m
+    }
+    return cikti
+}
+
+/**
  * Safely parses an unknown value (typically a string or number) into a numeric price.
  * Handles common string formatting issues like commas, spaces, and currency symbols.
  *
@@ -266,7 +295,9 @@ export function kategoriMetniniIndir<T extends { description?: unknown; metadata
     kategori: T,
     lang: string
 ): T {
-    const cikti = { ...kategori }
+    // Arama sonucu alanları yalnız sunucuda kullanılır; dile göre indirmek yerine hiç gönderilmez (URN-105).
+    // Arama sonucu alanları yalnız sunucuda kullanılır; dile göre indirmek yerine hiç gönderilmez (URN-105).
+    const cikti = aramaAlanlariniAyikla(kategori)
     const meta = cikti.metadata
     if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
         const m = { ...(meta as Record<string, unknown>) }
