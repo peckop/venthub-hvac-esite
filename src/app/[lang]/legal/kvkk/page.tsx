@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { yasalBaslik } from '@/config/legal'
+import { yasalBaslik, yasalDizinDisi } from '@/config/legal'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
@@ -17,7 +17,8 @@ export async function generateStaticParams() {
 /**
  * Üst veri tek yazıcıda (bot karnesi 2026-09-24): yasal sayfalar varsayılan site başlığını
  * basıyor, canonical taşımıyor ve hreflang'ı ana sayfaya düşüyordu. Başlık H1 ile AYNI
- * (sözlükteki "(Taslak)" eki dahil — metnin durumu üst veride gizlenmez).
+ * (sözlükteki "(Taslak)" eki dahil — metnin durumu üst veride gizlenmez). Metin hazır olana kadar
+ * sayfa `noindex, follow` basar (URN-97): robots başlıkla AYNI koşuldan (`yasalDizinDisi`) gelir.
  */
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params
@@ -27,6 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     yol: Routes.legal.kvkk(),
     baslik: `${yasalBaslik(dict.legal.kvkkTitle)} | VentHub`,
     aciklama: dict.legal.seo.kvkk,
+    dizinDisi: yasalDizinDisi(),
   })
 }
 

@@ -257,6 +257,17 @@ export function yasalBaslik(baslik: string, config: LegalConfig = legalConfig): 
 }
 
 /**
+ * YASAL SAYFA ARAMA DİZİNİ DIŞI MI (URN-97, OPS hükmü 2026-10-10): metin hukukçu teyidi ve satıcı bilgileriyle HAZIR olana
+ * kadar yasal sayfalar `noindex, follow` basar; onaylanmamış taslak aramada belge gibi görünmesin. Sayfa erişilebilir kalır
+ * (footer ve yasal bağlantılar, doğrudan adres). Başlıktaki "(Taslak)" eki (`yasalBaslik`) ve uyarı bandıyla AYNI koşul
+ * (`isLegalContentReady`): başlık, bant ve robots hiçbir zaman ayrışmaz. Hazır olunca kendiliğinden kalkar. Altı sayfa da
+ * bunu `sayfaUstVerisi({ dizinDisi })`'ne verir; kapı: `src/app/__tests__/yasalSayfaDizinDisi.test.ts` (INV-YASAL-DIZIN-1).
+ */
+export function yasalDizinDisi(config: LegalConfig = legalConfig): boolean {
+  return !isLegalContentReady(config)
+}
+
+/**
  * GÖRÜNÜM METNİ: doldurulmamış alan ziyaretçiye ham `[SATICI_UNVAN]` olarak DEĞİL, bu cümleyle gösterilir
  * (OPS hükmü 2026-09-29: müşteriye görünen kusur = onarım). Taslak uyarı bandı (`isLegalContentReady`) olduğu gibi
  * kalır; sayı/süre gibi dolu alanlara DOKUNULMAZ (yalnız tamamı köşeli parantezli metin alanları değişir).
