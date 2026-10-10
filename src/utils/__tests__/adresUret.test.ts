@@ -49,6 +49,10 @@ describe('adresUret — KAPALI kip = bugünkü canlı adresler', () => {
   it('marka', () => {
     expect(adresUret({ tur: 'marka', slug: 'vortice' }, 'tr', k)).toBe('/tr/brands/vortice')
   })
+  it('marka listesi: iki dilde de bugünkü /brands', () => {
+    expect(adresUret({ tur: 'markalar' }, 'tr', k)).toBe('/tr/brands')
+    expect(adresUret({ tur: 'markalar' }, 'en', k)).toBe('/en/brands')
+  })
 })
 
 describe('adresUret — AÇIK kip = plan §2 hedef şeması', () => {
@@ -63,6 +67,7 @@ describe('adresUret — AÇIK kip = plan §2 hedef şeması', () => {
     ],
     [{ tur: 'aile', slug: 'storm-serisi' } as const, '/tr/urun/storm-serisi', '/en/products/storm-serisi'],
     [{ tur: 'marka', slug: 'vortice' } as const, '/tr/markalar/vortice', '/en/brands/vortice'],
+    [{ tur: 'markalar' } as const, '/tr/markalar', '/en/brands'],
   ])('%o', (n, tr, en) => {
     expect(adresUret(n, 'tr', a)).toBe(tr)
     expect(adresUret(n, 'en', a)).toBe(en)
