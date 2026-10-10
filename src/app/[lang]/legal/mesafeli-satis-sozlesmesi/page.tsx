@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { yasalBaslik } from '@/config/legal'
+import { yasalBaslik, yasalDizinDisi } from '@/config/legal'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     yol: Routes.legal.mesafeliSatis(),
     baslik: `${yasalBaslik(dict.legal.distanceSalesTitle)} | VentHub`,
     aciklama: dict.legal.seo.distanceSales,
+    dizinDisi: yasalDizinDisi(),
   })
 }
 

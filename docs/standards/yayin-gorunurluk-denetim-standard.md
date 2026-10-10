@@ -54,6 +54,13 @@ ayrı sayılır (ağaç `noindex`, bilinçli). Bayrak EN_YAYIN açılınca kalka
   GECICI 0 · YOK 0 · HEDEF-YANLIS 0**.
 - Site haritası: her adres doğrudan 200; model adresi sayısı = 442 (plan §1).
 - Canonical: her sayfada tek ve kendini gösterir. hreflang: tr + en + x-default (EN bilinçli istisnası hariç).
+- **Yasal sayfalar (URN-97, 2026-10-10):** altı yasal sayfa (kvkk, gizlilik, çerez, mesafeli satış, kullanım koşulları, ön bilgilendirme)
+  hukukçu teyidi ve satıcı bilgileri hazır olana kadar (`isLegalContentReady()` false) **`noindex, follow`** basar, hreflang yazmaz,
+  canonical kalır; sayfa erişilebilir kalır (footer bağlantıları, doğrudan adres) ve site haritasında yoktur. Başlıktaki "(Taslak)" eki ve
+  uyarı bandıyla AYNI koşuldan okunur (`yasalDizinDisi`); hazır olunca üçü birlikte kendiliğinden kalkar. Bu altı adreste `noindex`
+  KUSUR DEĞİLDİR: `bot-karnesi` bu adreslerde `noindex: EVET` gösterir (beklenen değer); araçların bunu bilinçli listeye alıp
+  almayacağı Geo-SEO'nun kararıdır (`canli-kapi` `noindex`'i yalnız gizli yüzeylerde ölçer, bu adresler o listede değildir). Kapı:
+  `src/app/__tests__/yasalSayfaDizinDisi.test.ts` (INV-YASAL-DIZIN-1). Canlı ölçüm: tarayıcı bölmesiyle `meta[name=robots]`.
 - Bağlantı taraması: kırık 0 · site içi yönlendirme 0 (plan §7 "kırık 0, zincir 0").
 - Yetim sayfa: **0** (site haritasındaki her sayfaya haritalı başka bir sayfadan ham HTML `<a href>` var;
   bilinçli istisna `--izin` ile verilir ve gerekçesi bu cetvelde yazılı olur).
