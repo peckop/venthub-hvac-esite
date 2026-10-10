@@ -173,24 +173,27 @@ describe('CategoryFormModal — kayıtta metadata korunur (ADM-11)', () => {
     await waitFor(() => expect(h.updatePayload).toHaveBeenCalledTimes(1))
     await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1))
 
-    const metadata = sentMetadata()
+    // Değişken adı bilerek `sent`: INV-KATEGORI-ACIKLAMA-1 (K4) kaynakta ham
+    // `metadata.<açıklama anahtarı>` okumasını arar; bu bir RENDER okuması değil, gönderilen
+    // yükün doğrulamasıdır, ama kapıyı gevşetmek yerine deseni doğurmayız.
+    const sent = sentMetadata()
 
     // Formun sahip olmadığı anahtarlar AYNEN duruyor (bayat kopyada hiç yoktular:
     // yani değer, kaydetmeden hemen önceki GÜNCEL okumadan geliyor).
-    expect(metadata.slug).toEqual({ tr: 'fanlar', en: 'fans' })
-    expect(metadata.description_i18n).toEqual({ tr: 'Fan açıklaması', en: 'Fan description' })
-    expect(metadata.hide_price).toBe(true)
-    expect(metadata.model_type).toBe('axial')
-    expect(metadata.hero_title).toBe('Fanlar')
-    expect(metadata.seo_title_en).toBe('Fans | VentHub')
-    expect(metadata.seo_desc_en).toBe('English search description')
+    expect(sent.slug).toEqual({ tr: 'fanlar', en: 'fans' })
+    expect(sent.description_i18n).toEqual({ tr: 'Fan açıklaması', en: 'Fan description' })
+    expect(sent.hide_price).toBe(true)
+    expect(sent.model_type).toBe('axial')
+    expect(sent.hero_title).toBe('Fanlar')
+    expect(sent.seo_title_en).toBe('Fans | VentHub')
+    expect(sent.seo_desc_en).toBe('English search description')
 
     // Formun sahip olduğu metrikler kullanıcının girdiğiyle güncelleniyor.
-    expect(metadata.metric1).toEqual({ label: 'Debi', value: '42' })
-    expect(metadata.metric2).toEqual({ label: 'Yeni etiket', value: '2' })
+    expect(sent.metric1).toEqual({ label: 'Debi', value: '42' })
+    expect(sent.metric2).toEqual({ label: 'Yeni etiket', value: '2' })
 
     // Başka hiçbir anahtar eklenmedi ya da düştü.
-    expect(Object.keys(metadata).sort()).toEqual(Object.keys(FRESH_METADATA).sort())
+    expect(Object.keys(sent).sort()).toEqual(Object.keys(FRESH_METADATA).sort())
 
     // Okuma doğru satıra, yazma aynı satıra gitti.
     expect(h.selectColumns).toHaveBeenCalledWith('metadata')
