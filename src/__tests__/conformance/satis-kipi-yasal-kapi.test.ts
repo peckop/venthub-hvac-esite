@@ -131,13 +131,32 @@ describe('INV-LEGAL-GORUNUM-1: ziyaretçi ham [YER_TUTUCU] görmez', () => {
       for (const [alan, deger] of Object.entries(gorunum)) {
         if (typeof deger === 'string') expect(deger, `${ad}.${alan} ham yer tutucu`).not.toMatch(/^\[[A-Z0-9_]+\]$/)
       }
-      expect(gorunum.sellerTitle).toBe(
-        ad === 'TR' ? 'Şirket bilgileri kuruluşla eklenecek' : 'Company details will be added upon incorporation',
-      )
+      expect(gorunum.sellerTitle).toBe(ad === 'TR' ? 'Bilgi eklenecek' : 'To be added')
       // Dolu alanlar ve sayısal eşik DEĞİŞMEZ.
       expect(gorunum.refundTime).toBe(ham.refundTime)
       expect(gorunum.deliveryTime).toBe(ham.deliveryTime)
       expect(gorunum.invoiceIdentityThreshold).toBe(ham.invoiceIdentityThreshold)
+    }
+  })
+
+  // URN-94 (karar 317): yer tutucunun yerine konan görünüm metni şirketin "kurulacağını" ima edemez. Eski metin
+  // ("Şirket bilgileri kuruluşla eklenecek") kaynaksız bir beyandı — şirketin kuruluş aşamasında olduğu hiçbir
+  // belgeyle kayıtlı değil. Yer tutucu yerine yalnız "bilgi eklenecek" denir; kuruluş/şirket/incorporation geçmez.
+  it('görünüm metni kuruluş/şirket beyanı taşımaz (kuruluş, şirket, incorporation, company geçmez)', () => {
+    for (const [ad, gorunum, ham] of [
+      ['TR', legalGorunumTr, legalConfig],
+      ['EN', legalGorunumEn, legalConfigEn],
+    ] as const) {
+      const alanlar = (Object.keys(ham) as Array<keyof typeof ham>).filter((alan) => {
+        const deger = ham[alan]
+        return typeof deger === 'string' && /^\[[A-Z0-9_]+\]$/.test(deger)
+      })
+      expect(alanlar.length, `${ad}: yer tutuculu alan yok, test boş kalmasın`).toBeGreaterThan(0)
+      for (const alan of alanlar) {
+        expect(String(gorunum[alan]), `${ad}.${alan} görünüm metni kuruluş/şirket beyanı taşıyor`).not.toMatch(
+          /kuruluş|şirket|incorporat|compan/i,
+        )
+      }
     }
   })
 

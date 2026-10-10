@@ -26,7 +26,7 @@ export const YASAL_SAYFA_SLUGLARI = [
 export const DILLER = ['tr', 'en']
 
 // `src/config/legal.ts` YER_TUTUCU_GORUNUM_METNI ile AYNI iki metin (test eşitliği ölçer).
-export const GORUNUM_METINLERI = ['Şirket bilgileri kuruluşla eklenecek', 'Company details will be added upon incorporation']
+export const GORUNUM_METINLERI = ['Bilgi eklenecek', 'To be added']
 
 const HAM_YER_TUTUCU = /\[[A-Z0-9_]{3,}\]/g
 
