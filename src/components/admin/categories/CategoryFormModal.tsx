@@ -11,7 +11,7 @@ import { z } from 'zod'
 import { useI18n } from '@/i18n/I18nProvider';
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
 
-import { toSupabaseJson } from '../../../lib/type-converters'
+import { isRecord, toSupabaseJson } from '../../../lib/type-converters'
 import type { Database } from '../../../types/database.types'
 import type { CategoryMetadata,DbCategory } from '../../../types/db-rows'
 import { adminButtonPrimaryClass } from '../../../utils/adminUi'
@@ -221,13 +221,39 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     const onSubmit = async (values: CategoryFormValues) => {
         setLoading(true)
         try {
-            const metadata: CategoryMetadata = {
+            // Formun sahip olduğu tek metadata parçası: iki metrik. Geri kalan her anahtar
+            // (slug, description_i18n, hide_price, model_type, hero_*, seo_*_en ...) formun
+            // DEĞİL; üzerine yazılmaz.
+            const metrics: Pick<CategoryMetadata, 'metric1' | 'metric2'> = {
                 metric1: { label: values.metric1_label || '', value: values.metric1_value || '' },
                 metric2: { label: values.metric2_label || '', value: values.metric2_value || '' }
             }
 
             if (category) {
-                // Update
+                // Update — `categories.metadata` kolonu tümden değiştirilir ve kolonda koruyan
+                // tetik YOK; bu yüzden yalnız metrikleri yazmak diğer anahtarları siler.
+                // Form açılışındaki `category.metadata` kopyası bayat olabilir (başka yazar
+                // araya girmiş olabilir): kaydetmeden hemen önce satırın GÜNCEL metadata'sı okunur.
+                const { data: current, error: readError } = await supabase
+                    .from('categories')
+                    .select('metadata')
+                    .eq('id', category.id)
+                    .maybeSingle()
+
+                // Okuma başarısızsa ya da satır yoksa güncel metadata bilinmiyor demektir:
+                // sessizce üzerine yazmak yerine kayıt yapılmaz, kullanıcıya açık hata gösterilir.
+                if (readError || !current) {
+                    toast.error(
+                        'Hata: Kategorinin güncel verisi okunamadı, kayıt yapılmadı' +
+                        (readError ? ' (' + readError.message + ')' : ''),
+                    )
+                    return
+                }
+
+                // null / dizi / ilkel değer → boş nesneden başla.
+                const currentMetadata: Record<string, unknown> = isRecord(current.metadata) ? current.metadata : {}
+                const metadata: Record<string, unknown> = { ...currentMetadata, ...metrics }
+
                 const updateData: CategoryUpdate = {
                     name: values.name,
                     slug: values.slug,
@@ -260,7 +286,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     is_featured: values.is_featured,
                     sort_order: values.sort_order,
                     image_url: values.image_url,
-                    metadata: toSupabaseJson(metadata),
+                    metadata: toSupabaseJson(metrics),
                     authority_content: []
                 }
 
