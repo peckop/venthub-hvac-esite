@@ -25,6 +25,7 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 const { spawnSync } = require('node:child_process')
+const { kuyrukSatirlari } = require('./transkript-kuyrugu.cjs')
 
 // Kanban kart ön ekleri (ölçüldü 2026-10-04: panolardaki başlık ön ekleri). Yeni departman ön eki → buraya.
 // TSR/DIL/MRK/MVZ/STS 10-05: docs/standards/is-kayit-duzeni-standard.md §1 tablosu; eksikken bu departmanların kartı «bilinen kart değil» diye bloklanırdı.
@@ -336,7 +337,23 @@ function main() {
     if (!tp || !fs.existsSync(tp)) process.exit(0)
     const oturum = input.session_id || 'x'
 
-    const satirlar = fs.readFileSync(tp, 'utf8').trim().split('\n').slice(-400)
+    // ARC-83: kayıt BÜTÜN okunmaz; 1,78 GB'lık konuşma dosyasında readFileSync dizge sınırını aşıp kancayı çökertiyordu.
+    let satirlar
+    try {
+      satirlar = kuyrukSatirlari(tp)
+    } catch (e) {
+      // §9.7: okunamayan kayıt → fail-OPEN ama SESSİZ DEĞİL.
+      process.stderr.write(
+        '[kartsiz-beklenti-kapisi] transkript okunamadi (' + ((e && e.code) || (e && e.message) || 'bilinmeyen') + '), karisilmadi\n',
+      )
+      process.exit(0)
+    }
+    if (satirlar.length === 0) {
+      if (fs.statSync(tp).size > 0) {
+        process.stderr.write('[kartsiz-beklenti-kapisi] transkript kuyrugunda tam satir yok (tek satir pencereyi asiyor), karisilmadi\n')
+      }
+      process.exit(0)
+    }
     const kayitlar = []
     for (const s of satirlar) {
       try {
