@@ -215,7 +215,8 @@ const RATCHETS: Ratchet[] = [
     // OrderDetailPage). Marka `text-slate-600` ve favori satırı `text-slate-400` yerinde kaldı
     // (net etkisi 0); sipariş detayına eklenen model kodu satırı token (`text-steel-gray`) kullanır.
     // Kazanç yan ürün.
-    tavan: 1436,
+    // 2026-10-10 · 1436 -> 1435: URN-84 — nem alma çip satırları tek eşlemeye indi (iki yazılı kutu bire düştü). Kazanç yan ürün.
+    tavan: 1435,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -243,7 +244,8 @@ const RATCHETS: Ratchet[] = [
     // 2026-08-28 · 133 → 124 (aynı kaldırma).
     // 2026-09-01 · 124 → 122 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 122 -> 120: REC-115 olu bilesen CategoryHero silindi.
-    tavan: 118,
+    // 2026-10-10 · 118 -> 117: URN-84 — nem alma çip satırları tek eşlemeye indi (iki `font-black` bire düştü). Kazanç yan ürün.
+    tavan: 117,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },

@@ -25,7 +25,8 @@ export function listeKartlari(dil: YaziDili, yazilar: readonly RehberYazisi[] = 
     return {
       href: bilgiMerkeziYaziHref(m.slug, dil),
       baslik: markdownAyristir(m.govde).h1,
-      ozet: m.ozet,
+      // Kart metni `kartOzeti`dir; meta açıklaması (`ozet`) kartta BASILMAZ (SEO-30). Boşsa kart metin çizmez.
+      kartOzeti: m.kartOzeti.trim(),
       konu: getDictValue(dict, `bilgiMerkezi.konular.${y.konu}`),
       tarih: tarihYaz(y.yayinTarihi, dil),
       tarihIso: y.yayinTarihi,

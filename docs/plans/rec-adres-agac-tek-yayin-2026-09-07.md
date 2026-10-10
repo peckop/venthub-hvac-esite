@@ -142,6 +142,11 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
   DB ile birebirlik **zamanlanmış iş** olarak prod DB'ye karşı ölçülür (INV-ADRES-HARITA-1'in DB kolu).
   Çelişki giderildi: **harita commit'lenmez** (derleme çıktısı); **envanter dosyası** (§6, eski → yeni tam
   liste) commit'lenir ve kapı onu okur.
+  **KARAR DEĞİŞTİ (10 Ekim 2026, Faz 3-C PR'ı #1811): harita COMMIT'LENİR**
+  (`src/data/generated/eski-adres-haritasi.json`); üretim `harita-uret.yml` (canlı DB'ye karşı salt-okuma,
+  migration sonrası); DB değişince yeniden üretilip commit'lenir; bayatlık kapısı
+  `harita-3c-karsiliklari.test.ts` + zamanlanmış DB kolu. Yukarıdaki "commit'lenmez" cümlesi bu kararla
+  yürürlükten kalktı.
 - **Dil (Y3, ölçüldü):** bugünkü `detectLocale` `accept-language` içinde `en` geçiyor mu diye bakıyor;
   Türkçe Chrome'un varsayılanı `tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7` → Türkçe ziyaretçi `/category/fans`'ta
   EN (noindex) sayfaya düşüyor. v5: **slug'ı Türkçe olan dilsiz eski adres deterministik TR'ye 308**
@@ -374,7 +379,7 @@ sınırına uzak; Cloudflare/OpenNext'te koşullu aynen çalışır). Kapanan: v
 | # | bulgu | derece | v5 cevabı |
 |---|---|---|---|
 | Y1 | DB'den üretilen harita, DB'de hiç olmamış eski adresleri (13 dilsiz kural kaynağının 7'si, 6 Lineo) kaybeder; 4 hedef bugün 404 | YÜKSEK | §4.1 tohum dosyası; ölü hedefler en yakın canlı adrese; silinen satır 25 |
-| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; harita commit'lenmez, envanter commit'lenir |
+| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; ~~harita commit'lenmez~~ → **KARAR DEĞİŞTİ (10 Ekim 2026, #1811): harita commit'lenir** (bkz. §4.1 karar notu); envanter commit'lenir |
 | Y3 | `detectLocale` Türkçe Chrome'u EN'e yolluyor (ölçüldü) | YÜKSEK | §4.1 Türkçe slug'lı dilsiz adres → TR 308; q değeri ayrıştırma |
 | Y4 | `/tr/products/<x>` için sayfa katmanı dalı yok | YÜKSEK | Faz 3 m.5 genişledi |
 | O1 | bayat harita 2 hop | ORTA | §4.1 cetvel + deploy hook + gecelik derleme |

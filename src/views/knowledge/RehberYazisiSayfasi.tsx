@@ -174,7 +174,8 @@ export default function RehberYazisiSayfasi({ sayfa }: { sayfa: YaziSayfasi }) {
                         className={`block h-full rounded-hvac-sm border border-light-gray p-5 hover:border-brand-cyan-ink ${odakSinifi}`}
                       >
                         <span className="block font-semibold text-primary-navy">{y.baslik}</span>
-                        <span className="mt-2 block text-base text-industrial-gray">{y.ozet}</span>
+                        {/* Kart metni `kartOzeti`dir (meta açıklaması DEĞİL); boşsa çizilmez, yerine meta konmaz. */}
+                        {y.kartOzeti ? <span className="mt-2 block text-base text-industrial-gray">{y.kartOzeti}</span> : null}
                       </Link>
                     </li>
                   ))}

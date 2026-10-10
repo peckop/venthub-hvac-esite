@@ -12,7 +12,7 @@ import { afterAll, describe, expect, it } from 'vitest'
  *
  * `node scripts/onizleme.mjs <dal> --adres` yeni adres şemasını YALNIZ ön izleme ağacında açar: iki derleme sabitini
  * yamalar (`ADRES_SEMASI_K3B`, harita bağlantısı), haritayı canlıdan üretir, `NEXT_PUBLIC_ADRES_DILI=1` ile derler,
- * yamaları geri alır ve Recep'in 17 adresini sınar. Bu dosya o düzeneğin KENDİSİNİN doğru çalıştığını sınar.
+ * yamaları geri alır ve Recep'in 18 adresini sınar. Bu dosya o düzeneğin KENDİSİNİN doğru çalıştığını sınar.
  *
  * ⭐BU DOSYA ÖLÇÜLMÜŞ İKİ TUZAĞA KARŞI YAZILDI (2026-10-09, deneme derlemesi):
  *   1. SESSİZ YAMA ATLAMA: "yama zaten uygulanmış mı" denetimi alt dizgiyle yapılınca, `haritaKaynagi.ts` başlığındaki
@@ -25,7 +25,7 @@ import { afterAll, describe, expect, it } from 'vitest'
  * 4 ön kontrol kararları · 5 derleme izi · 6 kaynak seçimi · 7 derleme hatası özeti · 8 port ve kilit · 9 betik kolu ·
  * 10 tam tarama özeti.
  *
- * ⚠KAPSAM SINIRI: sahte ağ ve sahte git kullanılır. Gerçek sunucunun 17 adrese ne cevap verdiği BURADA ölçülmez; o
+ * ⚠KAPSAM SINIRI: sahte ağ ve sahte git kullanılır. Gerçek sunucunun 18 adrese ne cevap verdiği BURADA ölçülmez; o
  * önizleme koşusunun çıktısındaki ön kontrol tablosudur.
  */
 
@@ -324,19 +324,21 @@ describe('INV-ONIZLEME-2 · adres önizleme kipi', async () => {
   })
 
   describe('3 · tıklama listesi okuyucu', () => {
-    it('gerçek belgeden 17 adres okunur; bekleyen satırlar (15-17) yeni adressiz, değişmeyen satır (9) eski = yeni', () => {
+    it('gerçek belgeden 18 adres okunur; bekleyen satırlar (15-17) yeni adressiz, değişmeyen satır (9) eski = yeni, satır 18 ?sku= adresi', () => {
       const yol = m.tiklamaListesiBul(KOK)
       expect(yol, 'docs/plans/onizleme-tiklama-listesi-*.md bulunamadı').not.toBeNull()
       const liste = m.tiklamaListesiOku(fs.readFileSync(yol as string, 'utf8'))
-      expect(liste.map((k) => k.no)).toEqual(Array.from({ length: 17 }, (_, i) => i + 1))
+      expect(liste.map((k) => k.no)).toEqual(Array.from({ length: 18 }, (_, i) => i + 1))
       expect(liste[0]).toEqual({ no: 1, eski: '/tr/about', yeni: '/tr/hakkimizda' })
       expect(liste[8].eski).toBe(liste[8].yeni)
       expect(liste[9]).toEqual({ no: 10, eski: '/legal/kvkk', yeni: '/tr/yasal/kvkk-aydinlatma-metni' })
       // 11-14: eski ürün adresi → yeni ürün adresi. Hedefin model mi aile mi olduğu pilot listeye bağlıdır (bugün liste boş: aile
       // sayfası); burada ölçülmez, yoksa URUN bir model açınca bu okuyucu testi belge değişmeden kırmızıya döner.
       expect(liste.slice(10, 14).every((k) => k.eski.includes('/products/') && k.yeni !== null && /^\/(tr|en)\//.test(k.yeni))).toBe(true)
-      expect(liste.slice(14).map((k) => k.yeni)).toEqual([null, null, null])
-      expect(liste.slice(14).every((k) => k.eski.startsWith('/category/'))).toBe(true)
+      expect(liste.slice(14, 17).map((k) => k.yeni)).toEqual([null, null, null])
+      expect(liste.slice(14, 17).every((k) => k.eski.startsWith('/category/'))).toBe(true)
+      // 18: eski ürün adresinin ?sku= biçimi, ailenin sayfasına tek sıçramayla gider ve sorgu düşer (URUN ölçümü, #1811).
+      expect(liste[17]).toEqual({ no: 18, eski: '/tr/products/storm-serisi?sku=SEA-61143003', yeni: '/tr/urun/storm-serisi' })
     })
 
     it('adres olmayan tablo satırları ve başlık satırı yok sayılır', () => {

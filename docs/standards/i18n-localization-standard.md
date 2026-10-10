@@ -198,6 +198,7 @@ GÖRÜNMÜYORDU (vitrin sözlük yedeğine düşüyordu) ama **latent**ti: içer
 - [ ] Dilsiz URL yok (her iç link `/tr|/en` önekli render ediliyor).
 - [ ] Hardcoded TR/EN literal yok (izinli semboller hariç).
 - [ ] EN deyimsel (`30%` değil `%30` değil; TR=EN sızıntısı yok — sadık-kopya yan etkisi taranmış).
+- [ ] Şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yok; tek istisna marka adı VentHub (HRT-46; yazılar için `rehber-yazisi-standard.md` R4 madde 10).
 
 ---
 

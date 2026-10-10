@@ -11,6 +11,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { reportError } from '../lib/errorReporter'
 import { submitContactMessage } from '../lib/services/contactMessageService'
 import { supabaseBrowserClient } from '../lib/supabase/client'
+import { doluMu } from '../utils/bosDegerKorumasi'
 import { getSupportLink, getWhatsAppNumber } from '../utils/whatsapp'
 
 const ContactPage: React.FC = () => {
@@ -135,7 +136,8 @@ const ContactPage: React.FC = () => {
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center mb-8 group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500">
                   <card.icon size={24} strokeWidth={1.5} />
                 </div>
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{card.title}</h3>
+                {/* URN-84: telefon kartı başlığı tabloda BOŞ (numara ENV'e bağlı, canlıda kart çizilmiyor); ENV açılırsa boş <h3> basılmaz. */}
+                {doluMu(card.title) && <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{card.title}</h3>}
                 <div className="text-2xl font-medium text-slate-900 mb-6 tracking-tight">{card.value}</div>
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-600">
                   {card.label} <ArrowRight size={12} />
