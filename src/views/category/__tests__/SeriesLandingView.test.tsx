@@ -93,14 +93,17 @@ describe('SeriesLandingView breadcrumb', () => {
     expect(nav.queryAllByRole('link')).toHaveLength(1) // yalnız Ana Sayfa link'i
   })
 
-  it('kategori VARSA breadcrumb\'a girer — doğru ada ve /category/<slug> href\'ine sahip', () => {
+  // Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK → TR kategori adresi `/tr/kategori/<slug>` (plan §2); EN `/en/category/<slug>`
+  // (aşağıdaki "lang=en" testi). Bu dosya adresin KENDİSİNİ değil, kırıntıda kategori basamağının bulunmasını ve
+  // dilin doğru önek/bölüm adıyla kurulmasını ölçer; bayrak sabitlenmez — varsayılan (gerçek) bayrakla koşar.
+  it('kategori VARSA breadcrumb\'a girer — doğru ada ve /kategori/<slug> href\'ine sahip', () => {
     const category = makeCategory({ id: 'cat-1', name: 'Kanal Tipi Fanlar', slug: 'kanal-tipi-fanlar' })
     renderView(makeSeries({ category_id: 'cat-1', category }))
     const nav = within(breadcrumbNav())
 
     const categoryLink = nav.getByRole('link', { name: 'Kanal Tipi Fanlar' })
     expect(categoryLink).toBeInTheDocument()
-    expect(categoryLink.getAttribute('href')).toBe('/tr/category/kanal-tipi-fanlar')
+    expect(categoryLink.getAttribute('href')).toBe('/tr/kategori/kanal-tipi-fanlar')
   })
 
   it('kategori + alt kategori VARSA breadcrumb DÖRT basamaklı olur ve alt kategori href\'i iki segmentli kurulur', () => {
@@ -119,10 +122,11 @@ describe('SeriesLandingView breadcrumb', () => {
     // Ana Sayfa + Kategori + Alt kategori = 3 link; seri adı (son basamak) link DEĞİL.
     expect(nav.queryAllByRole('link')).toHaveLength(3)
     const subLink = nav.getByRole('link', { name: 'Kanal Tipi' })
-    // REC-205: kırıntı yolundaki alt kategori basamağı artık alt kategorinin TEK SEVİYELİ
-    // kanonik adresine gider. Üst basamak ("Fanlar") kendi adresine gitmeye devam eder —
-    // yani kırıntı yolu hâlâ hiyerarşiyi ANLATIR, sadece adresler tekilleşti.
-    expect(subLink.getAttribute('href')).toBe('/tr/category/kanal-tipi')
+    // REC-205 → Faz 3-C: kırıntı yolundaki alt kategori basamağı artık KÖK/DAL iki seviyeli kanonik adrese
+    // gider (`/tr/kategori/<kök>/<dal>`, plan §2; REC-205 tek seviyeli dönemi bitti). Üst basamak ("Fanlar")
+    // kendi adresine gitmeye devam eder — kırıntı yolu hiyerarşiyi hem metinde hem adreste ANLATIR.
+    expect(subLink.getAttribute('href')).toBe('/tr/kategori/fanlar/kanal-tipi')
+    expect(nav.getByRole('link', { name: 'Fanlar' }).getAttribute('href')).toBe('/tr/kategori/fanlar')
   })
 
   it('lang="en" iken breadcrumb href\'leri /en önekiyle kurulur (elle /tr/ yazılmaz — INV-2)', () => {

@@ -1,41 +1,61 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { modellerdenVeri, yayindaVeriAyarla } from '../../../config/__tests__/yayindaTestKiti'
 import { YAZILAR } from '../../../data/bilgiMerkezi/yazilar'
 import { icBaglantiCoz, IcBaglantiHatasi, icBaglantilariCoz } from '../icBaglanti'
 import { yaziSayfasiHazirla } from '../sayfa'
 import { ORNEK_YAZI } from './ornekYazi'
 import { sahteKaynak } from './sahteKaynak'
 
+// URN-31: model adresi YALNIZ yayındaki listedeki SKU için üretilir. Üretimdeki liste derleme sabitidir ve zamanla
+// değişir; bu dosya kendi listesini verir ki model beklentileri listeye bağlı kalmasın (varsayılan: BOŞ liste).
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() => yayindaVeriAyarla(modellerdenVeri([])))
+
 /**
- * INV-BILGI-MERKEZI-IC-BAGLANTI-1 — `vh:<tür>/<anahtar>` sayfa üretilirken bugünkü adrese çözülür;
- * çözülemeyen kimlik ATAR (derleme durur, sessiz kırık bağlantı yok). Adres `adresUret` ile üretilir;
- * `ADRES_SEMASI_K3B` kapalıyken çıktı bugünkü `Routes` adresidir.
+ * INV-BILGI-MERKEZI-IC-BAGLANTI-1 — `vh:<tür>/<anahtar>` sayfa üretilirken o günün kanonik adresine çözülür;
+ * çözülemeyen kimlik ATAR (derleme durur, sessiz kırık bağlantı yok). Adres `adresUret` ile üretilir (varsayılan
+ * bayrakla). Faz 3-C (URN-85 2/2) sonrası `ADRES_SEMASI_K3B` AÇIK: çıktı plan §2 şemasıdır (`/tr/urun/<aile>`,
+ * `/tr/kategori/<kök>/<dal>`, `/tr/markalar/<marka>`; EN önekleri değişmez). Kapalı kolun adres tablosu
+ * `adresUret.test.ts`'te ölçülür.
  */
 describe('icBaglantiCoz', () => {
   const k = sahteKaynak()
 
-  it('aile → bugünkü aile adresi (dile göre önek)', async () => {
-    expect(await icBaglantiCoz('vh:aile/vortice-hava-perdesi', 'tr', k)).toBe('/tr/products/vortice-hava-perdesi')
+  it('aile → kanonik aile adresi (dile göre bölüm adı)', async () => {
+    expect(await icBaglantiCoz('vh:aile/vortice-hava-perdesi', 'tr', k)).toBe('/tr/urun/vortice-hava-perdesi')
     expect(await icBaglantiCoz('vh:aile/vortice-hava-perdesi', 'en', k)).toBe('/en/products/vortice-hava-perdesi')
   })
 
-  it('model → aile adresi + ?sku= (anahtar küçük harfle yazılır, DB biçimine çevrilir)', async () => {
-    expect(await icBaglantiCoz('vh:model/vrt-65195', 'tr', k)).toBe('/tr/products/vortice-hava-perdesi?sku=VRT-65195')
+  it('model, yayındaki listede DEĞİLSE → aile adresi + ?sku= (anahtar küçük harfle yazılır, DB biçimine çevrilir)', async () => {
+    expect(await icBaglantiCoz('vh:model/vrt-65195', 'tr', k)).toBe('/tr/urun/vortice-hava-perdesi?sku=VRT-65195')
+    expect(await icBaglantiCoz('vh:model/vrt-65195', 'en', k)).toBe('/en/products/vortice-hava-perdesi?sku=VRT-65195')
   })
 
-  it('kategori → dile göre görünen slug (kural 7); alt kategori tek seviyeli kanonik adres', async () => {
-    expect(await icBaglantiCoz('vh:kategori/air-curtains', 'tr', k)).toBe('/tr/category/hava-perdeleri')
+  it('model, yayındaki listedeyse → modelin kendi adresi (metin listeden, ?sku= YOK)', async () => {
+    yayindaVeriAyarla(
+      modellerdenVeri([
+        { aile: 'vortice-hava-perdesi', sku: 'VRT-65195', tr: 'vortice-ad-hava-perdesi', en: 'vortice-ad-air-curtain' },
+      ]),
+    )
+    expect(await icBaglantiCoz('vh:model/vrt-65195', 'tr', k)).toBe('/tr/urun/vortice-ad-hava-perdesi-p-vrt-65195')
+    expect(await icBaglantiCoz('vh:model/vrt-65195', 'en', k)).toBe('/en/products/vortice-ad-air-curtain-p-vrt-65195')
+  })
+
+  it('kategori → dile göre görünen slug (kural 7); alt kategori iki seviyeli kanonik adres (kök/dal)', async () => {
+    expect(await icBaglantiCoz('vh:kategori/air-curtains', 'tr', k)).toBe('/tr/kategori/hava-perdeleri')
     expect(await icBaglantiCoz('vh:kategori/air-curtains', 'en', k)).toBe('/en/category/air-curtains')
-    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/category/duman-egzoz-fanlari')
+    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/fanlar/duman-egzoz-fanlari')
   })
 
   it('ESKİ AD: aile/kategori bugün yoksa url_takma_adlari ile YENİ adrese çözülür', async () => {
-    expect(await icBaglantiCoz('vh:aile/eski-aile-adi', 'tr', k)).toBe('/tr/products/yeni-aile-adi')
-    expect(await icBaglantiCoz('vh:kategori/eski-kategori', 'tr', k)).toBe('/tr/category/hava-perdeleri')
+    expect(await icBaglantiCoz('vh:aile/eski-aile-adi', 'tr', k)).toBe('/tr/urun/yeni-aile-adi')
+    expect(await icBaglantiCoz('vh:kategori/eski-kategori', 'tr', k)).toBe('/tr/kategori/hava-perdeleri')
   })
 
   it('hesaplayıcı, marka ve sayfa kimlikleri', async () => {
     expect(await icBaglantiCoz('vh:hesaplayici/jet-fan', 'tr', k)).toBe('/tr/destek/hesaplayicilar/jet-fan')
+    expect(await icBaglantiCoz('vh:marka/vortice', 'tr', k)).toBe('/tr/markalar/vortice')
     expect(await icBaglantiCoz('vh:marka/vortice', 'en', k)).toBe('/en/brands/vortice')
     expect(await icBaglantiCoz('vh:sayfa/iletisim', 'tr', k)).toBe('/tr/contact')
   })

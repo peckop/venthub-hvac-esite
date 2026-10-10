@@ -82,6 +82,14 @@ const sayacKur = (tablo: Readonly<Record<string, number>>) => async (ad: string)
   if (!(ad in tablo)) throw new Error(`sayac: ${ad} tabloda yok`)
   return tablo[ad]
 }
+/**
+ * Site haritasındaki marka adresi — Faz 3-C (URN-85 2/2) sonrası `ADRES_SEMASI_K3B` AÇIK: TR `/tr/markalar/<slug>`, EN
+ * `/en/brands/<slug>` (plan §2; EN öneki değişmez). Beklenen metin üretici çağrılarak HESAPLANMAZ (site haritası zaten
+ * `adresUret`'ten gelir; ikisi birlikte bozulursa test yeşil kalırdı) — şema burada tek yerde yazılıdır.
+ */
+const haritaMarkaYolu = (dil: 'tr' | 'en', slug: string): string => `/${dil}/${dil === 'tr' ? 'markalar' : 'brands'}/${slug}`
+/** Site haritası marka satırı mı? (TR `markalar`, EN `brands`.) */
+const HARITA_MARKA_SATIRI = /\/(tr\/markalar|en\/brands)\//
 /** Site haritası testlerinde sahte `getBrandFamilyCount`'ın okuduğu tablo (her test kendi sayısını yazar). */
 const enjekte: { sayilar: Record<string, number> } = { sayilar: {} }
 /** Fikstürdeki aktif ürün sayılarından ad bazlı tablo (casals 53, flexiva 0, …). */
@@ -281,15 +289,17 @@ describe('INV-MARKA-KAYNAK-1 (c): site haritası marka kolu listeyi izler', () =
       enjekte.sayilar = fiksturSayilari()
       const { default: sitemap } = await import('../../app/sitemap')
       const girisler = await sitemap()
-      const markaUrlleri = new Set(girisler.map((g) => g.url).filter((u) => /\/(tr|en)\/brands\//.test(u)))
+      const markaUrlleri = new Set(girisler.map((g) => g.url).filter((u) => HARITA_MARKA_SATIRI.test(u)))
       const diller = enYayin ? DILLER : (['tr'] as const)
       // Haritaya YALNIZ aktif ürün sayısı > 0 olan markalar girer. Beklenen küme enjekte edilen sayıdan türer
       // (statik bayraktan DEĞİL): ürünlü marka haritadan düşerse de, ürünsüz marka haritaya girerse de KIRMIZI.
       const haritadaOlmali = HVAC_BRANDS.filter((b) => enjekte.sayilar[b.name] > 0).map((b) => b.slug)
-      const beklenen = new Set(diller.flatMap((d) => haritadaOlmali.map((s) => `${SITE_URL}/${d}${Routes.brand(s)}`)))
+      const beklenen = new Set(diller.flatMap((d) => haritadaOlmali.map((s) => `${SITE_URL}${haritaMarkaYolu(d, s)}`)))
       expect([...markaUrlleri].sort()).toEqual([...beklenen].sort())
-      expect(markaUrlleri.has(`${SITE_URL}/tr${Routes.brand('flexiva')}`), 'ürünsüz flexiva haritada').toBe(false)
-      expect(markaUrlleri.has(`${SITE_URL}/tr${Routes.brand('casals')}`), 'ürünlü casals haritada olmalı').toBe(true)
+      // Faz 3-C: eski TR marka adresi (`/tr/brands/…`) haritada KALMADI (aynı marka iki adresten ilan edilmez).
+      expect(girisler.map((g) => g.url).filter((u) => /\/tr\/brands\//.test(u)), 'eski /tr/brands adresi haritada').toEqual([])
+      expect(markaUrlleri.has(`${SITE_URL}${haritaMarkaYolu('tr', 'flexiva')}`), 'ürünsüz flexiva haritada').toBe(false)
+      expect(markaUrlleri.has(`${SITE_URL}${haritaMarkaYolu('tr', 'casals')}`), 'ürünlü casals haritada olmalı').toBe(true)
     })
   }
 
@@ -312,9 +322,9 @@ describe('INV-MARKA-KAYNAK-1 (c): site haritası marka kolu listeyi izler', () =
       enjekte.sayilar = { ...fiksturSayilari(), Flexiva: sayi }
       const { default: sitemap } = await import('../../app/sitemap')
       const urller = new Set((await sitemap()).map((g) => g.url))
-      expect(urller.has(`${SITE_URL}/tr${Routes.brand('flexiva')}`)).toBe(haritada)
+      expect(urller.has(`${SITE_URL}${haritaMarkaYolu('tr', 'flexiva')}`)).toBe(haritada)
       // Diğer markalar sayıdan etkilenmez (casals ürünlü kalır).
-      expect(urller.has(`${SITE_URL}/tr${Routes.brand('casals')}`)).toBe(true)
+      expect(urller.has(`${SITE_URL}${haritaMarkaYolu('tr', 'casals')}`)).toBe(true)
     })
   }
 

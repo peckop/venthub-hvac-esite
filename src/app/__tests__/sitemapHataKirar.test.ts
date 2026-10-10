@@ -63,8 +63,9 @@ describe('INV-SITEMAP-HATA-1 — veri hatası site haritasını üretilmez kıla
   it('sağlıklı veri: harita üretilir (kategori + aile satırı var)', async () => {
     const sitemap = await sitemapKur({})
     const satirlar = await sitemap()
-    expect(satirlar.some((s) => s.url.endsWith('/tr/category/fanlar'))).toBe(true)
-    expect(satirlar.some((s) => s.url.endsWith('/tr/products/vortice-lineo-quiet'))).toBe(true)
+    // Faz 3-C (URN-85 2/2): `ADRES_SEMASI_K3B` AÇIK — TR kategori `/tr/kategori/<slug>`, aile `/tr/urun/<slug>`.
+    expect(satirlar.some((s) => s.url.endsWith('/tr/kategori/fanlar'))).toBe(true)
+    expect(satirlar.some((s) => s.url.endsWith('/tr/urun/vortice-lineo-quiet'))).toBe(true)
   })
 
   it('aile sorgusu hata verirse harita ÜRETİLMEZ (eskiden ürünsüz harita)', async () => {
@@ -102,9 +103,11 @@ describe('INV-SITEMAP-HATA-1 — veri hatası site haritasını üretilmez kıla
       })
       const satirlar = await sitemap()
       expect(satirlar.length).toBeGreaterThan(5)
-      expect(satirlar.some((s) => s.url.endsWith('/tr/brands/vortice'))).toBe(true)
-      expect(satirlar.some((s) => s.url.includes('/tr/category/'))).toBe(false)
-      expect(satirlar.some((s) => s.url.includes('/tr/products/vortice'))).toBe(false)
+      // Faz 3-C: marka `/tr/markalar/<slug>`; kategori/aile satırı yok iddiası HEM yeni (`kategori`, `urun`) HEM eski
+      // (`category`, `products`) bölüm adlarını kapsar — yeni adlara geçince iddia boşa yeşil kalmasın.
+      expect(satirlar.some((s) => s.url.endsWith('/tr/markalar/vortice'))).toBe(true)
+      expect(satirlar.some((s) => /\/tr\/(kategori|category)\//.test(s.url))).toBe(false)
+      expect(satirlar.some((s) => /\/tr\/(urun|products)\/vortice/.test(s.url))).toBe(false)
     })
   })
 
