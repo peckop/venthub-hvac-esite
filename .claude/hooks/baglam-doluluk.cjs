@@ -154,6 +154,47 @@ function satir(token, pencere) {
 }
 
 /**
+ * ── KAYIT BOYUTU (ARC-82, Ops emri 2026-10-09 madde 3) ──
+ *
+ * Konuşma dosyası (`<sid>.jsonl`) compact'a rağmen küçülmez, yalnız büyür; 10-09 ölçümü: OPS 1,77 GB,
+ * Ürün 682 MB, Katalog 260 MB, toplam 4,6 GB (10-10: OPS 2,1 GB). Büyüdükçe dosyayı okuyan her şey
+ * yavaşlıyor ve çöküyor. Pencerenin kendi dosyasının boyutu her istemde görünür; eşikler aşılınca
+ * uyarı çıkar, 1,5 GB'ta "yeni oturuma devret" denir.
+ *
+ * ⭐Yalnız `statSync` (dosya AÇILMAZ, ~0,1 ms); okuma yok. Dosya/yol yoksa satır YOK (susar).
+ * ⭐Satır EŞİKSİZ görünür (BAGLAM gibi): Recep bağlamın yanında kayıt boyutunu da görür.
+ * Eşikler `VENTHUB_KAYIT_UYARI_MB` (1024) ve `VENTHUB_KAYIT_DEVRET_MB` (1536) ile ayarlanır.
+ *
+ * Not: 10-09 20:00 kapanması bellekten (OPS, main.log); dosya boyutu ikincil etken olarak ele alınır,
+ * kanıtlanmış sebep sayılmaz.
+ */
+const KAYIT_UYARI_MB = Number(process.env.VENTHUB_KAYIT_UYARI_MB || 1024)
+const KAYIT_DEVRET_MB = Number(process.env.VENTHUB_KAYIT_DEVRET_MB || 1536)
+
+/** Konuşma dosyasının boyutu (MB); yol yok/okunamıyorsa null. Dosya açılmaz. */
+function kayitBoyutuMb(kayitYolu) {
+  if (!kayitYolu) return null
+  try {
+    return fs.statSync(kayitYolu).size / (1024 * 1024)
+  } catch {
+    return null
+  }
+}
+
+/** Boyuta göre istem satırı; ölçülemediyse null. */
+function kayitSatiri(boyMb) {
+  if (typeof boyMb !== 'number' || !Number.isFinite(boyMb) || boyMb < 0) return null
+  const gb = (boyMb / 1024).toFixed(1).replace('.', ',')
+  if (boyMb >= KAYIT_DEVRET_MB) {
+    return '⛔KAYIT: ' + gb + ' GB — yeni oturuma DEVRET: konusma dosyasi 1,5 GB\'i asti, kancalar ve pencere yavaslar (10-09 olcumu).'
+  }
+  if (boyMb >= KAYIT_UYARI_MB) {
+    return '⚠KAYIT: ' + gb + ' GB — konusma dosyasi buyuyor; 1,5 GB\'ta yeni oturuma devret (devir belgesini simdiden hazirla).'
+  }
+  return 'KAYIT: ' + (boyMb < 1 ? '<1' : String(Math.round(boyMb))) + ' MB'
+}
+
+/**
  * ── PENCERE BAŞINA DURUM DOSYASI (ARC-33 madde 2, 10-04) ──
  *
  * Modlar (ops-kokpit) bağlamı `$.session.usage()` ile okuyunca değer donuyordu (kokpit 19, gerçek 27).
@@ -272,6 +313,10 @@ module.exports = {
   esikler,
   sonBaglam,
   satir,
+  kayitBoyutuMb,
+  kayitSatiri,
+  KAYIT_UYARI_MB,
+  KAYIT_DEVRET_MB,
   pencereDosyasiYaz,
   pencereDurumOzeti,
   yarimIsOku,

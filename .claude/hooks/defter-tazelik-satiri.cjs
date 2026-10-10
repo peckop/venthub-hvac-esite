@@ -352,6 +352,19 @@ try {
 }
 
 /**
+ * ── KAYIT (ARC-82) — HER MESAJDA ──
+ * Pencerenin konuşma dosyasının boyutu: "KAYIT: 612 MB"; 1 GB ⚠, 1,5 GB ⛔ yeni oturuma devret.
+ * Yalnız statSync (dosya açılmaz). Gerekçe ve eşikler: baglam-doluluk.cjs "KAYIT BOYUTU".
+ */
+try {
+  const bd = require(path.join(__dirname, 'baglam-doluluk.cjs'))
+  const s = bd.kayitSatiri(bd.kayitBoyutuMb(girdi.transcript_path))
+  if (s) process.stdout.write(s + '\n')
+} catch (e) {
+  process.stdout.write('⚠KAYIT: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
  * ── BELGE (REC-400 D2, HARİTA tarifi) — EŞİKLİ ──
  * Yalnız önbellek okunur; ölçüm 6 saatte bir arka planda. Gerekçe: belge-satiri.cjs.
  */
