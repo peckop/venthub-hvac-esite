@@ -578,12 +578,27 @@ describe('INV-ONIZLEME-2 · adres önizleme kipi', async () => {
 
   describe('8 · port ve ağaç kilidi', () => {
     it('portMusait: boş port true, dinlenen port false', async () => {
-      const sunucu = net.createServer()
-      await new Promise<void>((coz) => sunucu.listen(0, coz))
-      const port = (sunucu.address() as net.AddressInfo).port
-      expect(await m.portMusait(port)).toBe(false)
-      await new Promise<void>((coz) => sunucu.close(() => coz()))
-      expect(await m.portMusait(port)).toBe(true)
+      /** Geçici bir port açar, dinlerken `portMusait` yoklar, kapatır; kapandıktan sonraki yoklamayı döner. */
+      async function dinlenenSonraBos(): Promise<{ dinlenirken: boolean; kapaninca: boolean }> {
+        const sunucu = net.createServer()
+        await new Promise<void>((coz) => sunucu.listen(0, coz))
+        const port = (sunucu.address() as net.AddressInfo).port
+        const dinlenirken = await m.portMusait(port)
+        await new Promise<void>((coz) => sunucu.close(() => coz()))
+        return { dinlenirken, kapaninca: await m.portMusait(port) }
+      }
+      // NİÇİN DÖNGÜ: kapanıştan sonraki yoklamada işletim sistemi geçici portu paralel koşan başka bir teste/sürece
+      // verebilir (CI'da test dilimlerinde 10 Ekim'de bir kez görüldü: "expected false to be true"); bu tek yoklama
+      // dışarıdan tutulan porta bağlıdır, işlevin hatası değildir. Dinlenen port DAİMA false olmalı (bizim sunucumuz
+      // tutuyor, yarış yok); boş port için en çok 5 yeni port denenir — işlev "daima false" ise 5'i de düşer.
+      const denemeler: boolean[] = []
+      for (let i = 0; i < 5; i++) {
+        const sonuc = await dinlenenSonraBos()
+        expect(sonuc.dinlenirken).toBe(false)
+        denemeler.push(sonuc.kapaninca)
+        if (sonuc.kapaninca) break
+      }
+      expect(denemeler).toContain(true)
     })
 
     it('kilit: ilk alan alır, canlı sahip varken ikincisi REDDEDİLİR ve sahibin pid\'i söylenir', () => {
