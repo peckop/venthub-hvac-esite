@@ -193,6 +193,16 @@ Kartın **Done**'a geçmesi için kanıt zorunludur: `gh pr checks <PR>` çıkt�
 "Bitti", "tamam", "çalışıyor" gibi tek kelimelik özet **reddedilir** (aracın kendi belirsizlik
 süzgeci de bunları eliyor — ölçüldü).
 
+**Teslim notu (OPS 2026-10-09, HRT-44):** Done'a geçen her kartta, geçiş gününde yazılmış en az bir dolu not bulunur
+(yazar `system` olmayan, en az 10 harf ya da rakam içeren; nokta, boşluk, emoji not değildir). Not teslimin yerini söyler: dosya yolu
+ya da PR numarası + iki satır özet; `→`, `KANIT:`, `#<PR no>` ya da commit kısaltması "kanıt izi" sayılır. Ölçü:
+`node scripts/board/kart-not-sayimi.cjs` (şerit başına "Done(bugün) N, notsuz M: <no [kısa kimlik]>"; notsuz varsa çıkış 1; eşik **0**;
+`--kanit-zorunlu` ile kanıtsız not da eksik sayılır; ölçülemeyen hal çıkış 2, "temiz" sayılmaz).
+"Bugün Done oldu" Done'a geçiş anıdır: `completedAt`, yoksa Kanban olay kaydındaki son Done taşıması (`doneAt`; Done kolonundaki arşivli
+kartlarda `completedAt` boştur), ikisi de yoksa `sonAnlamli` ve satır "yaklaşık" diye işaretlenir. `sonAnlamli` ilk tercih DEĞİLDİR: eski
+karta bugün düşülen not onu bugüne taşır. Betik yalnız Done kolonundaki kartı sayar; hiç Done'a çekilmemiş teslim (kart Backlog'da
+kalmış, PR birleşmiş) bu ölçüye girmez.
+
 **Ölçülmüş tuzaklar ve karşılıkları:**
 
 | Tuzak | Ölçüm | Karşılık |
