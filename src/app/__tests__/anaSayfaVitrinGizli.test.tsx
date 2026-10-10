@@ -1,6 +1,7 @@
-import { render } from '@testing-library/react'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { tr } from '../../i18n/dictionaries/tr'
