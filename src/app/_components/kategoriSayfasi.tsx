@@ -28,12 +28,13 @@ import { discoveryTag, PRODUCTS_DISCOVERY_TAG } from '../../lib/cache/tags'
 import type { DomainCategory } from '../../lib/type-converters'
 import { mapDatabaseCategoryToDomain } from '../../lib/type-converters'
 import type { AuthorityContent,CategoryMetadata, DbCategory } from '../../types/db-rows'
-import type { FamilyListItem } from '../../types/ui-models'
+import type { FamilyListItem, KatalogSayilari } from '../../types/ui-models'
 import { kategoriMetniniIndir } from '../../utils/categoryHelpers'
 import { aileMetniniIndir } from '../../utils/dilMetni'
 import { DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
 import PageComponent from '../../views/CategoryPage'
 import IlgiliRehberler from '../../views/knowledge/IlgiliRehberler'
+import { getCachedMarkaKatalogOzeti, markaKatalogSayilari } from './markaSayfasi'
 
 /**
  * KATEGORİ SAYFASI — üst veri + gövde, İKİ rotanın ortak çekirdeği (REC-300 Faz 3b-2).
@@ -123,6 +124,26 @@ const SAYFA = 1
 const _getCachedSupabaseData = cache((id: string) => {
   return supabase.from('categories').select('*').eq('id', id).single()
 })
+
+/**
+ * Vortice marka adı (URN-95): marka sayfasının özetiyle AYNI önbellek girdisi (`getCachedMarkaKatalogOzeti`,
+ * anahtar `lang` + `tenantId` + marka adı); ayrı bir önbellek biçimi açılmaz. Etiketler `PRODUCTS_DISCOVERY_TAG` +
+ * kiracı etiketidir, yani aile/model eklenince hava perdesi ve sessiz fan sayaç kartları kendiliğinden tazelenir.
+ */
+const VORTICE_MARKA_ADI = 'Vortice'
+
+/**
+ * Vortice sayaç kartlarının sayıları (URN-95). Özet OKUNAMAZSA kategori sayfası yine çizilir, kartlar çizilmez
+ * (uyarı basılır): sayaç isteğe bağlı bir süstür, sayfayı kırmaz; hata önbelleğe yazılmaz, sonraki yenilemede döner.
+ */
+async function vorticeKatalogSayilari(lang: string, tenantId: string): Promise<KatalogSayilari | null> {
+  try {
+    return markaKatalogSayilari(await getCachedMarkaKatalogOzeti(lang, tenantId, VORTICE_MARKA_ADI))
+  } catch (hata) {
+    console.warn('[kategoriSayfasi] Vortice katalog özeti okunamadı; sayaç kartları çizilmiyor', hata)
+    return null
+  }
+}
 
 /** Başlık + açıklama — iki kipin ortak metni (sözlükten; RSC olduğumuz için `t` elle kurulur). */
 function kategoriMetinleri(lang: string, category: DomainCategory) {
@@ -267,6 +288,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
   let families: FamilyListItem[] = []
   let total = 0
   let subCategories: DomainCategory[] = []
+  let vorticeSayilari: KatalogSayilari | null = null
 
   if (category) {
     // ⭐DERLEME SABİTİ, `headers()` DEĞİL (REC-59). Eskiden `(await getTenantConfig()).id`
@@ -329,6 +351,13 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
     // giden gömülü veriye yazılıyordu (2026-09-23 ölçümü, /en/category/fans) → sayfanın diline iner.
     families = familiesPage.items.map((f) => aileMetniniIndir(f, lang))
     total = familiesPage.total
+
+    // URN-95: Vortice anlatısı yalnız hava perdesi kategorisinde ve Vortice ailesi listeleyen sayfada çizilebilir
+    // (sessiz fan serisi tetikleyicisi istemcide, `CategoryLandingView`). Diğer kategorilerde özet hiç okunmaz.
+    const vorticeGerekli =
+      category.slug === 'air-curtains' ||
+      families.some((f) => (f.brand_name ?? '').toLocaleLowerCase('en-US') === VORTICE_MARKA_ADI.toLocaleLowerCase('en-US'))
+    if (vorticeGerekli) vorticeSayilari = await vorticeKatalogSayilari(lang, tenantId)
   }
 
   // W3.1 (B9): itemListElement URL'lerine /${lang} prefix'i buildCategoryJsonLd
@@ -370,6 +399,7 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
         page={page}
         pageSize={PAGE_SIZE}
         initialSubCategories={subCategories.map((s) => kategoriMetniniIndir(s, lang))}
+        vorticeKatalogSayilari={vorticeSayilari}
       />
       {/* REC-452 (rehber-yazisi-standard R3.1): kategori → o konudaki rehber. Kimlik kanonik EN
           slug'dır (`vh:kategori/<categories.slug>`); yazı yoksa blok basılmaz. Veri kod sabiti

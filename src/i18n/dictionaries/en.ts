@@ -1283,15 +1283,15 @@ export const en: typeof tr = {
           desc: 'An Italy-based brand'
         },
         {
-          // URN-82: the count (`{aile}`/`{model}` placeholder) was never passed to this component and the raw template showed;
-          // a real count needs a server prop (separate card). Card is not drawn while value AND label are empty (URN-84).
+          // URN-95: the value is NOT in the dictionary; it is the catalogue count passed from the server (`vorticeSayac.ts`,
+          // card 1 = product families, card 2 = active models). No count, no card. No `{aile}`/`{model}` placeholder here.
           value: '',
-          label: '',
+          label: 'Vortice Product Families',
           desc: 'Listed in the catalogue'
         },
         {
           value: '',
-          label: '',
+          label: 'Vortice Active Models',
           desc: 'Vortice models in the catalogue'
         },
         {
@@ -3038,13 +3038,13 @@ export const en: typeof tr = {
           value: ''
         },
         {
-          // URN-82: the count (`{aile}`/`{model}` placeholder) was never passed to this component and the raw template showed;
-          // a real count needs a server prop (separate card). Card is not drawn while value AND label are empty (URN-84).
-          label: '',
+          // URN-95: the value is NOT in the dictionary; it is the catalogue count passed from the server (`vorticeSayac.ts`,
+          // card 1 = product families, card 2 = active models). No count, no card. No `{aile}`/`{model}` placeholder here.
+          label: 'Vortice Product Families',
           value: ''
         },
         {
-          label: '',
+          label: 'Vortice Active Models',
           value: ''
         },
         {

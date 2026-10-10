@@ -126,7 +126,7 @@ function markaMetinleri(lang: string, brand: Marka, urunsuz: boolean) {
  * (rendering-cache-standard.md §3), böylece aile ya da kategori eklenince/adı değişince özet cümle kendiliğinden yenilenir.
  * Anahtar `lang` VE `tenantId` içerir (kural 12). Hata FIRLATILIR (önbelleğe hata yazılmaz); karar `markaUrunOzeti`de.
  */
-const getCachedMarkaKatalogOzeti = (lang: string, tenantId: string, markaAdi: string) => unstable_cache(
+export const getCachedMarkaKatalogOzeti = (lang: string, tenantId: string, markaAdi: string) => unstable_cache(
   async () => getBrandCatalogSummary(supabaseStaticClient, markaAdi),
   ['brand-catalog-summary', lang, tenantId, markaAdi],
   { tags: [PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)], revalidate: 3600 }
