@@ -2,7 +2,7 @@
 'use strict'
 
 /**
- * TESLİM-KART KÖPRÜSÜ (HRT-47, OPS 10-09 "teslim-kart köprüsü: EVET"; cetvel: docs/standards/is-kayit-duzeni-standard.md "Teslim notu").
+ * TESLİM-KART KÖPRÜSÜ (HRT-47, OPS onayı 10-09; cetvel: docs/standards/is-kayit-duzeni-standard.md "Teslim notu").
  *
  * NİÇİN VAR: kart-not-sayimi.cjs (HRT-44) yalnız Done kolonundaki kartı görür. 10-09'da URUN'un dört teslimi (#1774 URN-58, #1752 REC-491,
  * #1766 URN-72, #1754 URN-57) master'a girdi, kartları Backlog'da kaldı ve hiçbirinde not yoktu: sayaç bunları göremedi. Bu betik ters yönden

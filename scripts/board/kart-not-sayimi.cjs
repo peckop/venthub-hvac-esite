@@ -2,7 +2,7 @@
 'use strict'
 
 /**
- * KART-NOT SAYACI (HRT-44, OPS 10-09 "kart notu olmayan teslimi kabul etmiyorum"; cetvel: docs/standards/is-kayit-duzeni-standard.md).
+ * KART-NOT SAYACI (HRT-44, OPS emri 10-09: kart notu olmayan teslim kabul edilmez; cetvel: docs/standards/is-kayit-duzeni-standard.md).
  *
  * NİÇİN VAR: "teslim karta yazılır" kuralı yazıyla kalırsa hatırlanana kadar yaşar (karar 244: kontrolü yazılamayan kural girmez).
  * 2026-10-09'da HRT-34 notsuz Done'a girdi ve bunu ancak elle sayım gösterdi. Bu betik o sayımı tek komuta çevirir:
