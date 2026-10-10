@@ -341,7 +341,8 @@ export async function KategoriSayfasi({ lang, category, categorySlug, ust = null
     // URN-95: Vortice anlatısı yalnız hava perdesi kategorisinde ve Vortice ailesi listeleyen sayfada çizilebilir
     // (sessiz fan serisi tetikleyicisi istemcide, `CategoryLandingView`). Diğer kategorilerde özet hiç okunmaz.
     const vorticeGerekli =
-      category.slug === 'air-curtains' || families.some((f) => (f.brand_name ?? '').toLowerCase() === VORTICE_MARKA_ADI.toLowerCase())
+      category.slug === 'air-curtains' ||
+      families.some((f) => (f.brand_name ?? '').toLocaleLowerCase('en-US') === VORTICE_MARKA_ADI.toLocaleLowerCase('en-US'))
     if (vorticeGerekli) vorticeSayilari = await vorticeKatalogSayilari(lang, tenantId)
   }
 
