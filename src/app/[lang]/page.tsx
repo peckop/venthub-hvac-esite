@@ -135,13 +135,28 @@ import { unstable_cache } from 'next/cache'
 
 import { TenantProvider } from '../../hooks/useTenant'
 import { HOME_DATA_TAG, homeDataTag } from '../../lib/cache/tags'
+import { satisKipiOku } from '../../lib/kip/satisKipi'
 import { DEFAULT_TENANT_CONFIG, DEFAULT_TENANT_ID } from '../../utils/tenantConstants'
+
+// URN-98 (Recep kararı 2026-10-10): ana sayfadaki ürün vitrini bloğu satış kipi kapalıyken ÇİZİLMEZ,
+// bu yüzden 12 ürünlük sorgu da koşmaz. Eskiden `getCachedHomeData` içindeydi ve blok çizilsin
+// çizilmesin her yeniden üretimde okunuyordu. Etiketler ana sayfa verisiyle AYNI kalır: ürün satırı
+// değişince webhook bu girdiyi de tazeler (rendering-cache-standard.md §3).
+// `kolonKumesi` korunur: vitrin kolon kümesi değişince artırılır, yoksa Vercel veri önbelleği
+// dağıtımlar arası paylaşıldığı için eski kayıt ≤1 saat sunulur (REC-140 dersi).
+const getCachedVitrinUrunleri = (lang: string, tenantId: string) => unstable_cache(
+  async () => {
+    const prodData = await getProducts(supabaseStaticClient, 12)
+    return { prodData, kolonKumesi: 'vitrin-v2-rec140' }
+  },
+  ['home-vitrin-urunleri', lang, tenantId],
+  { tags: [HOME_DATA_TAG, homeDataTag(tenantId)], revalidate: 3600 }
+)()
 
 const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
   async () => {
-    const [catData, prodData, countRes] = await Promise.all([
+    const [catData, countRes] = await Promise.all([
       getCategories(supabaseStaticClient),
-      getProducts(supabaseStaticClient, 12),
       supabaseStaticClient.rpc('get_category_counts')
     ])
     // Boş-kategori gizleme navigasyonla AYNI kural (CategoryContext ile tutarlı):
@@ -150,13 +165,10 @@ const getCachedHomeData = (lang: string, tenantId: string) => unstable_cache(
     for (const row of countRes.data ?? []) {
       productCounts[row.category_id] = row.product_count ?? 0
     }
-    // `kolonKumesi` (REC-140, 2026-09-24): önbellek anahtarı = bu fonksiyonun METNİ + anahtar
-    // parçaları (next/dist/.../unstable-cache.js `fixedKey`). Kolon listesi içe aktarılan bir
-    // sabit olduğundan anahtar onu görmez; Vercel veri önbelleği dağıtımlar arası paylaşılır.
-    // Bu dizge değişmeseydi yeni dağıtım alış fiyatlı eski `prodData` kaydını ≤1 saat sunardı.
-    // Dizge küçültmede korunur (kullanılan değer). Vitrin kolon kümesi değişince artırılır.
-    // Anahtar parçası yerine burada: `anasayfa-rotasi-statik` testi parçaları birebir sabitler.
-    return { catData, prodData, productCounts, kolonKumesi: 'vitrin-v2-rec140' }
+    // Ürün sorgusu (`prodData`, `kolonKumesi`) URN-98'de `getCachedVitrinUrunleri`ye taşındı; bu girdi
+    // yalnız kategori verisi ve sayaçları tutar. Anahtar bu fonksiyonun METNİ + anahtar parçalarıdır
+    // (next/dist/.../unstable-cache.js `fixedKey`), yani gövde değişince yeni dağıtım eski kaydı görmez.
+    return { catData, productCounts }
   },
   ['home-page-data', lang, tenantId],
   // revalidate: 3600 = emniyet kemeri — webhook sinyali kaçarsa (ör. deploy-sonrası sessizlik)
@@ -207,11 +219,30 @@ export default async function RootPage({ params }: Props) {
   try {
     const data = await getCachedHomeData(lang, tenantId)
     categories = toUICategoryList(data.catData)
-    products = (data.prodData as Product[]) || []
     productCounts = data.productCounts
   } catch (error) {
     console.warn('SSR Data Fetch Error:', error)
   }
+
+  // URN-98 (Recep kararı 2026-10-10): "Fanlar ve Havalandırma Ürünleri" vitrini fiyat açılana kadar
+  // ana sayfadan KALKAR; açılınca bugünkü biçimde dönmez. Çizim kapısı iki şarttır:
+  //   1) satış kipi açık (`satisKipiOku`, fail-closed: okunamazsa KAPALI → blok yok);
+  //   2) en az bir ürün SEÇİLMİŞ (`is_featured`). Bileşenin "ilk 4 ürün" yedeği ölçüde
+  //      0/441 seçili üründe elektrikli ısıtıcıyı fan vitrini diye basıyordu; kip açılsa da
+  //      seçim yapılmadan blok dönmez — dönüş bilinçli bir kürasyon işi olur.
+  // Kip kapalıyken 12 ürünlük sorgu HİÇ koşmaz. `satisKipiOku` `unstable_cache` içinde `no-store`
+  // fetch yapar; Next bunu o kapsamda dinamik işaretlemez (patch-fetch + markCurrentScopeAsDynamic,
+  // 15.5.27 ölçüldü) ve `resolveTenant(undefined)` başlık okumaz → ana sayfa statik kalır.
+  const kip = await satisKipiOku(tenantId)
+  if (kip.acik) {
+    try {
+      const vitrin = await getCachedVitrinUrunleri(lang, tenantId)
+      products = (vitrin.prodData as Product[]) || []
+    } catch (error) {
+      console.warn('SSR Vitrin Products Fetch Error:', error)
+    }
+  }
+  const urunVitrini = kip.acik && products.some((p) => p.is_featured)
 
   // SSOT: kategori adı DAİMA getCategoryDisplayName üzerinden çözülür
   // (translation_key → menu_label → name). Server Component olduğumuz için useI18n yok;
@@ -278,6 +309,7 @@ export default async function RootPage({ params }: Props) {
         initialCategories={displayCategories}
         rawCategories={categories}
         initialProducts={products}
+        urunVitrini={urunVitrini}
         dictionary={dict.home}
         lang={lang}
       />
