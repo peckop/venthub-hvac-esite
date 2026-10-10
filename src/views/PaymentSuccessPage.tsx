@@ -226,8 +226,10 @@ const PaymentSuccessPage: React.FC = () => {
             return
           }
 
-          // AÇIK RED yalnız callback'in `failure` cevabıdır (iyzico ödemeyi reddetti). `pending` ya da tanınmayan bir
-          // cevap "başarısız" demek değildir: ödeme alınmış olabilir → belirsiz.
+          // `failure` cevabı ekranı "başarısız" yapar. NOT: iyzico-callback bugün `retrieve` null döndüğünde ve
+          // catch yolunda da `failure` yönlendiriyor; bu dal kesin ret kanıtı DEĞİL, o yollar `pending` verene
+          // kadar (URN-89, Pazar sonrası) çift tahsilat riski kısmen sürer. `pending` ya da tanınmayan bir cevap
+          // "başarısız" demek değildir: ödeme alınmış olabilir → belirsiz.
           if (data?.status === 'failure') {
             setStatus('error')
             const msg = data?.iyzico?.errorMessage || t('payment.failedGeneric')
@@ -278,8 +280,9 @@ const PaymentSuccessPage: React.FC = () => {
           }
         }
 
-        // 4) Buraya gelindiyse ödeme DOĞRULANMADI. AÇIK RED yalnız callback'in `failure` yönlendirmesi ya da bir
-        // `errorMessage`'dır (iyzico reddetti): "Ödeme Başarısız" ekranı yalnız o zaman. Geri kalan her durum
+        // 4) Buraya gelindiyse ödeme DOĞRULANMADI. "Ödeme Başarısız" ekranı yalnız callback'in `failure`
+        // yönlendirmesi ya da bir `errorMessage` ile çıkar; callback `failure`'ı bugün `retrieve` null ve catch
+        // yollarında da verdiği için bu kesin ret kanıtı sayılmaz (düzeltme URN-89). Geri kalan her durum
         // (`status=success` ama sipariş ödenmiş görünmüyor, sipariş bulunamadı, `pending`, parametresiz adres)
         // BELİRSİZDİR: ödeme alınmış olabilir, "Tekrar Dene" çift tahsilat demektir (güvenlik incelemesi 10-10).
         // URL'deki `errorMessage` ekrana BASILMAZ (adres elle yazılabilir; bulgu 5): sözlükteki genel metin çıkar.

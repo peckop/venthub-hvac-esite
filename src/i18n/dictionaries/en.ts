@@ -1988,8 +1988,6 @@ export const en: typeof tr = {
     failedGeneric: 'Payment could not be completed',
     failedToast: 'Payment failed: {{msg}}',
     verifyError: 'Verification error',
-    errorDuring: 'Error: {{msg}}',
-    unverified: 'Payment could not be verified',
     unexpected: 'An unexpected error occurred'
   },
   brands: {

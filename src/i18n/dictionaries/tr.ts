@@ -1442,8 +1442,6 @@ export const tr = {
     failedGeneric: 'Ödeme tamamlanamadı',
     failedToast: 'Ödeme hatası: {{msg}}',
     verifyError: 'Doğrulama hatası',
-    errorDuring: 'Hata: {{msg}}',
-    unverified: 'Ödeme doğrulanamadı',
     unexpected: 'Beklenmedik bir hata oluştu'
   },
   category: {
