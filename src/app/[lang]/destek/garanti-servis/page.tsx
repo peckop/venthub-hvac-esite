@@ -14,7 +14,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return sayfaUstVerisi({
     lang,
     yol: Routes.destek.garantiServis(),
-    baslik: `${dict.support.links.warranty} | VentHub`,
+    // SEO-32: <title> ayrı anahtardan; `support.links.warranty` footer etiketi ve sayfa H1'idir.
+    baslik: `${dict.support.seo.warrantyTitle} | VentHub`,
     aciklama: dict.support.seo.warranty,
   })
 }

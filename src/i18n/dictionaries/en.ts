@@ -918,9 +918,10 @@ export const en: typeof tr = {
       kvkk: 'Clarification text on the processing of personal data under Turkish Law No. 6698 (KVKK).',
       privacy: 'How personal data is collected, used and protected on the VentHub website.',
       cookie: 'Cookies used on the VentHub website and how to manage cookie preferences.',
-      terms: 'Terms of use of the VentHub website.',
-      distanceSales: 'Distance sales agreement for purchases made through VentHub.',
-      preInformation: 'Pre-information form provided to the consumer before a distance sale.',
+      // SEO-32 (URN-91): see tr.ts — written from each page's own section headings.
+      terms: 'Terms of use for the VentHub website: scope of service, membership and account security, pricing and stock, intellectual property and disclaimer.',
+      distanceSales: 'Distance sales agreement for VentHub purchases: parties, payment and delivery, right of withdrawal, returns, defective goods and disputes.',
+      preInformation: 'Pre-information form for distance sales: essential characteristics, total price, payment, delivery, right of withdrawal and return costs.',
     }
   },
   footer: {
@@ -2080,12 +2081,16 @@ export const en: typeof tr = {
       warrantyDesc: 'Coverage may vary by manufacturer or importer',
     },
     // Page metadata (meta description) — see tr.ts.
+    // SEO-32 (URN-91): see tr.ts — `*Title` keys feed only the <title>, never the visible H1.
     seo: {
-      faqTitle: 'Frequently Asked Questions',
-      faq: 'Frequently asked questions about quotes, payment and installation, with answers.',
-      shipping: 'Information on delivery times, shipping costs and shipment tracking.',
-      returns: 'Right of withdrawal, return conditions and how to request a return.',
-      warranty: 'Warranty coverage and keeping your warranty documents.',
+      faqTitle: 'FAQ: Frequently Asked Questions',
+      faq: 'Frequently asked questions and answers on how to send a quote request or an installation question, and on payment methods. VentHub support.',
+      shippingTitle: 'Shipping & Delivery Information',
+      shipping: 'Delivery time and shipping terms are set at the quote stage. The shipping fee and carrier are stated in your quote; tracking is sent by e-mail.',
+      returnsTitle: 'Returns & Exchange Terms',
+      returns: 'Right of withdrawal, return conditions and how to send a return request with your order number via the contact form or e-mail.',
+      warrantyTitle: 'Warranty & Service: Coverage & Fault Questions',
+      warranty: 'Warranty coverage may vary by manufacturer or importer. Keep the warranty card and manual; send service and fault questions by form or e-mail.',
     },
     returns: {
       title: 'Returns & Exchanges',
@@ -2716,6 +2721,8 @@ export const en: typeof tr = {
       calculate: 'Calculate',
       title: 'Air Curtain Calculator',
       description: 'Air curtain calculation based on door dimensions and operating conditions',
+      // SEO-32 (URN-91): meta description; `description` is the page's VISIBLE subtitle and stays unchanged.
+      metaDescription: 'Calculate the required airflow, nozzle velocity and motor power from door dimensions, application, wind and traffic conditions.',
       infoText: 'This tool is the air curtain calculator in the Product Selector. Calculations are a preliminary assessment.',
       steps: {
         dimensions: 'Door Dimensions',
@@ -2803,6 +2810,8 @@ export const en: typeof tr = {
     duct: {
       title: 'Duct Pressure Loss Calculator',
       description: 'Air duct velocity calculation and pressure drop estimation',
+      // SEO-32 (URN-91): meta description; `description` is the visible subtitle and stays unchanged.
+      metaDescription: 'Calculate air velocity and estimated pressure loss from airflow and duct dimensions. Enter the duct type, material and dimensions.',
       infoText: 'Calculates air velocity and estimated pressure loss based on flow rate and duct dimensions.',
       form: {
         inputTitle: 'Duct Details',
@@ -2841,6 +2850,8 @@ export const en: typeof tr = {
     hrv: {
       title: 'HRV Energy Saving Calculator',
       description: 'Heat recovery unit efficiency and energy saving calculation',
+      // SEO-32 (URN-91): meta description; `description` is the visible subtitle and stays unchanged.
+      metaDescription: 'Calculate the annual energy saving potential of heat recovery (HRV) and energy recovery (ERV) units by device type and space type.',
       infoText: 'Calculates the annual energy saving potential of heat recovery (HRV) or energy recovery (ERV) units.',
       form: {
         type: 'Device Type',
@@ -2893,6 +2904,8 @@ export const en: typeof tr = {
     jetFan: {
       pageTitle: 'Jet Fan Calculator',
       pageDescription: 'Jet fan calculation',
+      // SEO-32 (URN-91): meta description; `pageDescription` is the visible subtitle and stays unchanged.
+      metaDescription: 'Calculate the number of jet fans, thrust force and ventilation airflow needed in enclosed car parks and tunnels from application and space details.',
       pageInfoText: 'This tool is the jet fan calculator in the Product Selector. Calculations are a preliminary assessment.',
       smokeWarning: 'The smoke exhaust calculation is for preliminary design purposes. Professional fire engineer consultancy is required.',
       parkingShortDesc: 'Enclosed parking ventilation',
