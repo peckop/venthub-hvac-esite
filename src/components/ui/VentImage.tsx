@@ -1,7 +1,8 @@
 import Image, { ImageProps } from 'next/image';
 import React from 'react';
 
-import { normalizeImageUrl } from '@/utils/imageUtils';
+import { useI18n } from '@/i18n/I18nProvider';
+import { normalizeImageUrl, YER_TUTUCU_GORSEL } from '@/utils/imageUtils';
 
 interface VentImageProps extends Omit<ImageProps, 'src'> {
   /**
@@ -9,40 +10,39 @@ interface VentImageProps extends Omit<ImageProps, 'src'> {
    */
   src: string | null | undefined;
   /**
-   * Görsel yüklenemediğinde veya src boş olduğunda gösterilecek tip
+   * @deprecated URN-69: yedek artık tek ve nötr (`YER_TUTUCU_GORSEL`); tipe göre farklı fotoğraf
+   * basılmaz. Prop yalnız eski çağıranlar derlensin diye duruyor ve etkisi yoktur.
    */
   fallbackType?: 'product' | 'category' | 'brand' | 'generic';
 }
 
-const FALLBACK_IMAGES = {
-  product: '/images/placeholders/product-placeholder.png',
-  category: '/images/placeholders/category-placeholder.png',
-  brand: '/images/placeholders/brand-placeholder.png',
-  generic: '/images/placeholders/generic-placeholder.png',
-};
-
 /**
  * VentHub Profesyonel Görsel Bileşeni (Expert Implementation)
- * 
+ *
  * Özellikler:
  * 1. Supabase Storage Entegrasyonu: Path'leri otomatik olarak full URL'e çevirir.
- * 2. Akıllı Fallback: Görsel bulunamadığında veya hata verdiğinde şık bir placeholder gösterir.
+ * 2. Akıllı Fallback: Görsel bulunamadığında veya hata verdiğinde ÜRÜN İÇERMEYEN nötr yer tutucu
+ *    (`YER_TUTUCU_GORSEL`) gösterir. Eskiden tip başına gerçek bir fan fotoğrafı basılıyordu: görseli
+ *    olmayan bir ısıtıcı, marka ya da kategori fan gibi görünüyordu (URN-69, URN-57 ile aynı sınıf).
+ *    Yer tutucu gösterilen yerde alt metin sözlükten gelir (`common.imagePreparing`), ürün adı değil.
  * 3. Performans Odaklı: Next.js Image optimizasyonunu zorunlu kılar (LCP & CLS koruması).
  * 4. UX: Yükleme sırasında yumuşak bir geçiş (transition) sağlar.
  */
-const VentImage: React.FC<VentImageProps> = ({ 
-  src, 
-  alt, 
-  fallbackType = 'generic',
+const VentImage: React.FC<VentImageProps> = ({
+  src,
+  alt,
+  fallbackType: _fallbackType,
   className,
-  ...props 
+  ...props
 }) => {
+  const { t } = useI18n();
   const [error, setError] = React.useState(false);
   const [isLoaded, setIsLoaded] = React.useState(false);
 
-  const finalSrc = error ? FALLBACK_IMAGES[fallbackType] : normalizeImageUrl(src, FALLBACK_IMAGES[fallbackType]);
+  const finalSrc = error ? YER_TUTUCU_GORSEL : normalizeImageUrl(src);
+  const yerTutucuGosteriliyor = finalSrc === YER_TUTUCU_GORSEL;
 
-  
+
   const { width, height, fill, ...rest } = props;
   
   // Strateji: 
@@ -67,7 +67,7 @@ const VentImage: React.FC<VentImageProps> = ({
       <Image
         {...rest}
         src={finalSrc}
-        alt={alt || 'VentHub HVAC'}
+        alt={yerTutucuGosteriliyor ? t('common.imagePreparing') : (alt || 'VentHub HVAC')}
         fill={isFillMode}
         width={isFillMode ? undefined : (width || (needsDefaultSizes ? 1200 : undefined))}
         height={isFillMode ? undefined : (height || (needsDefaultSizes ? 800 : undefined))}

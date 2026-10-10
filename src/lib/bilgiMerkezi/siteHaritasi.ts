@@ -29,7 +29,6 @@ export function bilgiMerkeziSiteHaritasi(
       url: tam(bilgiMerkeziRotalari.liste(dil), dil),
       // Yazı yoksa tarih YOK (REC-454): `new Date()` her üretimde "bugün değişti" derdi.
       ...(enYeni ? { lastModified: new Date(`${enYeni}T00:00:00Z`) } : {}),
-      changeFrequency: 'weekly',
       priority: 0.7,
       ...(acikDiller.length === 2
         ? {
@@ -48,7 +47,6 @@ export function bilgiMerkeziSiteHaritasi(
       satirlar.push({
         url: yolu(dil),
         lastModified: new Date(`${yazi.guncellemeTarihi}T00:00:00Z`),
-        changeFrequency: 'monthly',
         priority: 0.6,
         ...(diller.length === 2 ? { alternates: { languages: { tr: yolu('tr'), en: yolu('en') } } } : {}),
       })

@@ -17,8 +17,14 @@
  * geçirecek satır `ProductDetailPageView`'da, yani **URUN şeridinin claim'inde**. Bu PR `t`
  * yolunu KURAR ve ölçer; `t` geçilmediğindeki ayrışma da ayrıca ölçülür ki boşluk kaybolmasın.
  */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
+import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+import { getDictValue } from '../../i18n/getDictValue'
 import { buildSpecGroupLabels,buildSpecRows } from '../../lib/pdfGenerator'
 import { formatSpecValue, groupTechnicalSpecs, SPEC_SORT_ORDER } from '../../utils/productHelpers'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
@@ -68,6 +74,8 @@ const SOZLUK: Record<string, string> = {
   'pdp.specs.max_absorbed_power_w': 'Maks. Çekilen Güç',
   'pdp.specGroups.performance': 'Performans',
   'pdp.specGroups.electrical': 'Elektrik',
+  'pdp.specValues.yes': 'Var',
+  'pdp.specValues.no': 'Yok',
 }
 const t = (key: string, alt?: Record<string, unknown> | string): string => {
   if (SOZLUK[key]) return SOZLUK[key]
@@ -82,7 +90,7 @@ function vitrinSatirlari(specs: Record<string, unknown>): string[][] {
     const alanlar = Object.entries(group.specs || {})
     alanlar.sort(([a], [b]) => (SPEC_SORT_ORDER[a] ?? 99) - (SPEC_SORT_ORDER[b] ?? 99))
     for (const [key, value] of alanlar) {
-      satirlar.push([specFieldLabel(key, t), formatSpecValue(key, value)])
+      satirlar.push([specFieldLabel(key, t), formatSpecValue(key, value, t)])
     }
   }
   return satirlar
@@ -172,6 +180,117 @@ describe('INV-FOY-PARITE-1 · föy ile vitrin AYNI çıktıyı üretir', () => {
       ciftBirim,
       'kusur föy ile vitrini AYRIŞTIRIYOR — o zaman bu artık mandal değil, parite ihlalidir',
     ).toEqual(vitrinSatirlari({ max_ambient_temp_c: '25°' }))
+  })
+
+  /**
+   * INV-FOY-NESNE-1 (URN-72, 2026-10-09). Müşterinin elindeki bir föyde ölçüler satırında "[object Object]"
+   * görüldü (Katalog, 7 Haziran tarihli PDF). `formatSpecValue` `String(value)` kullandığı için nesne/dizi
+   * değer ham makine metniyle basılıyordu. Canlı veritabanında bugün böyle değer yok (0 ürün); kapı, ilk
+   * gelen değerin müşteri belgesine sızmasını ve föy ile vitrinin AYRIŞMASINI önler.
+   */
+  it('INV-FOY-NESNE-1: nesne ve dizi değer "[object Object]" basmaz; föy ile vitrin aynı metni üretir', () => {
+    const girdi = { dimensions: { length: 120, width: 80 }, certificates: ['CE', 'ISO 9001'], bos_nesne: {}, bos_dizi: [] }
+    const foy = buildSpecRows(girdi, { t })
+    const metin = foy.map((s) => s.join(' = ')).join('\n')
+    expect(metin, 'nesne/dizi değer ham makine metniyle basılıyor').not.toContain('[object')
+    expect(foy, 'föy ile vitrin ayrışmış').toEqual(vitrinSatirlari(girdi))
+    expect(formatSpecValue('dimensions', { length: 120, width: 80 }, t)).toBe('length: 120, width: 80')
+    expect(formatSpecValue('certificates', ['CE', 'ISO 9001'], t)).toBe('CE, ISO 9001')
+    expect(formatSpecValue('x', { ic: { daha_ic: { cok_ic: 1 } } }, t), 'derinlik sınırı').toBe('-')
+    expect(formatSpecValue('x', {}, t)).toBe('-')
+    expect(formatSpecValue('weight_kg', 10, t), 'tekil değerde birim eki korunur').toBe('10 kg')
+  })
+
+  /**
+   * INV-SPEC-HAM-DEGER-1 (URN-58, karar 298). Canlıda Lineo Quiet ailesinin teknik tablosunda "Zamanlayıcı false",
+   * "ErP Uyumlu true", "Higrostat false" görünüyordu (formatSpecValue `String(value)` basıyordu, gövde çift olduğu
+   * için her biri iki kez); ses satırı da hangi koşulda ölçüldüğünü söylemeden "26.1 dB(A)" diyordu. Bu kol GERÇEK
+   * sözlüklerle koşar (sahte `t` "Var/Yok" metninin sözlükte olduğunu ölçemez) ve föy ile vitrinin AYNI metni verdiğini
+   * iki dilde de kanıtlar. Veri fikstürü canlı şemadan (VRT-17160) gelir: has_timer false, erp_compliant true,
+   * has_humidistat false, noise_level_db_a 26.1.
+   */
+  describe('INV-SPEC-HAM-DEGER-1 · mantıksal değer ve ses etiketi (gerçek sözlükler)', () => {
+    const SOZLUKLER = { tr, en } as const
+    const gercekT = (lang: 'tr' | 'en') => (key: string, alt?: Record<string, unknown> | string): string => {
+      const v = getDictValue(SOZLUKLER[lang], key)
+      return v === key && typeof alt === 'string' ? alt : v
+    }
+    const vitrinGercek = (specs: Record<string, unknown>, lang: 'tr' | 'en'): string[][] => {
+      const tl = gercekT(lang)
+      const satirlar: string[][] = []
+      for (const [, group] of Object.entries(groupTechnicalSpecs(specs) || {})) {
+        const alanlar = Object.entries(group.specs || {})
+        alanlar.sort(([a], [b]) => (SPEC_SORT_ORDER[a] ?? 99) - (SPEC_SORT_ORDER[b] ?? 99))
+        for (const [key, value] of alanlar) satirlar.push([specFieldLabel(key, tl), formatSpecValue(key, value, tl)])
+      }
+      return satirlar
+    }
+    const deger = (satirlar: string[][], etiket: string): string | undefined => satirlar.find(([l]) => l === etiket)?.[1]
+
+    const DILLER: Array<'tr' | 'en'> = ['tr', 'en']
+    it.each(DILLER)('(%s) föy ile vitrin AYNI satırları üretir ve hiçbir hücre ham true/false değildir', (lang) => {
+      for (const [ad, specs] of Object.entries(ALTIN)) {
+        const foy = buildSpecRows(specs, { t: gercekT(lang), lang })
+        expect(foy, `${ad}/${lang}: föy ile vitrin ayrışıyor`).toEqual(vitrinGercek(specs, lang))
+        const ham = foy.filter(([, v]) => /^(true|false)$/.test(v))
+        expect(ham, `${ad}/${lang}: ham makine değeri müşteriye gidiyor`).toEqual([])
+      }
+    })
+
+    const LINEO_BOOLEAN: Array<['tr' | 'en', string, string]> = [
+      ['tr', 'Zamanlayıcı', 'Yok'], ['tr', 'ErP Uyumlu', 'Var'], ['tr', 'Higrostat', 'Yok'],
+      ['en', 'Timer', 'No'], ['en', 'ErP Compliant', 'Yes'], ['en', 'Humidistat', 'No'],
+    ]
+    it.each(LINEO_BOOLEAN)('(%s) Lineo 100 Quiet: "%s" satırı "%s" basar', (lang, etiket, beklenen) => {
+      const foy = buildSpecRows(URUN_17160, { t: gercekT(lang), lang })
+      expect(deger(foy, etiket), `${lang}/${etiket} satırı yok ya da yanlış`).toBe(beklenen)
+      expect(deger(vitrinGercek(URUN_17160, lang), etiket), `${lang}/${etiket}: vitrin ayrışıyor`).toBe(beklenen)
+    })
+
+    it('ses satırı koşulsuz "Ses Seviyesi" demez: etiket "üretici beyanı" der, değer birimli kalır, MESAFE UYDURULMAZ', () => {
+      const beklenen: Record<'tr' | 'en', string> = {
+        tr: 'Ses seviyesi (üretici beyanı)',
+        en: 'Sound level (manufacturer\'s declaration)',
+      }
+      for (const lang of DILLER) {
+        const foy = buildSpecRows(URUN_17160, { t: gercekT(lang), lang })
+        expect(deger(foy, beklenen[lang]), `${lang}: ses satırı beyan etiketiyle yok`).toBe('26.1 dB(A)')
+        expect(
+          foy.map(([l]) => l).filter((l) => /^(Ses Seviyesi|Noise Level)$/.test(l)),
+          `${lang}: koşulsuz eski ses etiketi geri gelmiş`,
+        ).toEqual([])
+        // Mesafe/ölçüm koşulu üretici föyünden doğrulanmadan etikete yazılmaz: "(1 m)", "2 m", "3 metre" yok.
+        expect(beklenen[lang], `${lang}: etikete doğrulanmamış mesafe yazılmış`).not.toMatch(/\d\s*(m\b|metre|meter|ft)/i)
+      }
+    })
+
+    it('mesafeyi adında taşıyan kardeş alan (SEAT noise_lpa_3m_db) "(3 m)" etiketini KORUR — iki eksen birleştirilmez', () => {
+      const foyTr = buildSpecRows(URUN_SEAT, { t: gercekT('tr'), lang: 'tr' })
+      expect(deger(foyTr, 'Ses Basıncı (3 m)')).toBe('70 dB')
+      const foyEn = buildSpecRows(URUN_SEAT, { t: gercekT('en'), lang: 'en' })
+      expect(deger(foyEn, 'Sound Pressure (3 m)')).toBe('70 dB')
+    })
+
+    it('`t` verilmeyen föy çağrısı da ham true/false BASMAZ: sözlük `lang` ile okunur (lang yoksa föyün varsayılanı TR)', () => {
+      const enSatirlar = buildSpecRows(URUN_17160, { translateKey: (k) => k, lang: 'en' })
+      expect(enSatirlar.map(([, v]) => v), 'lang=en: değerler İngilizce olmalı').toEqual(expect.arrayContaining(['Yes', 'No']))
+      const varsayilan = buildSpecRows(URUN_17160, { translateKey: (k) => k })
+      expect(varsayilan.map(([, v]) => v)).toEqual(expect.arrayContaining(['Var', 'Yok']))
+      for (const s of [...enSatirlar, ...varsayilan]) expect(s[1], `${s[0]}: ham makine değeri`).not.toMatch(/^(true|false)$/)
+    })
+  })
+
+  /**
+   * INV-FOY-ADRES-1 (URN-72). Föy TARAYICIDA üretilir; `SITE_URL` `process.env` okur ve tarayıcıda env
+   * boştur → `http://localhost:3000`. Canlı pakette ölçüldü: indirilen her föyün alt bilgisi "localhost:3000"
+   * basıyordu. Davranış testi `pdfGeneratorFallback.test.ts`'te; bu kol KAYNAĞI bekler ki aynı yola geri
+   * dönülürse davranış testinin fikstürü atlatsa bile kırmızı olsun.
+   */
+  it('INV-FOY-ADRES-1: föy üreticisi SITE_URL kullanmaz (tarayıcıda localhost:3000 basar)', () => {
+    const kaynak = readFileSync(join(process.cwd(), 'src', 'lib', 'pdfGenerator.ts'), 'utf8')
+    expect(kaynak, 'pdfGenerator.ts SITE_URL kullanıyor; tarayıcıdaki alan adı için getPdfSiteHost() kullanılmalı').not.toMatch(
+      /\bSITE_URL\b/,
+    )
   })
 
   it('grup başlıkları da tek kaynaktan gelir (Faz 2 hazırlığı, bugünden ölçülür)', () => {
