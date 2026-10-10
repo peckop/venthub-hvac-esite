@@ -38,6 +38,7 @@ import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { selectVariant } from '../../lib/data/selectVariant'
+import { egriYaklasikMi } from '../../lib/hvac/ductFanSelection'
 import { familyName } from '../../lib/i18n/familyName'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
@@ -1021,7 +1022,14 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
                                         <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val, t)}</span>
+                                        <span className="text-xs font-black text-industrial-gray text-right">
+                                          {formatSpecValue(key, val, t)}
+                                          {key === 'pq_curve' && egriYaklasikMi(val) && (
+                                            <span className="block text-xs font-normal normal-case tracking-normal text-steel-gray" data-testid="yaklasik-egri-notu">
+                                              {t('pdp.labels.approxCurve')}
+                                            </span>
+                                          )}
+                                        </span>
                                       </div>
                                     ))}
                                   </div>

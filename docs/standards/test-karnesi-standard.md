@@ -1,6 +1,6 @@
 # Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.2
 
-**Sürüm 1.2 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-09 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §7: ALT-38b**
+**Sürüm 1.2 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-09 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -11,6 +11,9 @@
 > `INV-CI-SHARD-1` ve `INV-CI-SHARD-2` → `src/__tests__/conformance/ci-test-shard.test.ts` ·
 > `INV-CI-SECIM-1` → `src/__tests__/conformance/ci-test-secimi.test.ts` ve `src/__tests__/conformance/ci-test-secimi-ifade.test.ts` ·
 > `INV-CI-SECIM-2` → `src/__tests__/conformance/ci-test-secimi-kapsam.test.ts`, `src/__tests__/conformance/ci-test-secimi-hizli.test.ts`, `src/__tests__/conformance/ci-test-secimi-uyum.test.ts` ve `scripts/ci/__tests__/test-shard-secim.test.ts` (ortak yardımcı: `ci-test-secimi.yardimci.ts`) ·
+> `INV-E2E-HIZLI-1` ve `INV-E2E-HIZLI-2` → `src/__tests__/conformance/e2e-hizli-derleme.test.ts` ·
+> `INV-E2E-HIZLI-3` → `src/__tests__/conformance/e2e-smoke-paralel-kurulum.test.ts` ·
+> `INV-E2E-HIZLI-4` → `scripts/ci/__tests__/arka-plan.test.ts` ·
 > `INV-TEST-KARNE-1` → `src/__tests__/conformance/test-karnesi-yapisi.test.ts` ·
 > `INV-TEST-KARNE-2` → `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` ·
 > `INV-TEST-KARNE-3` → `scripts/test-karnesi/__tests__/sabotaj.test.ts` ·
@@ -207,6 +210,44 @@ Seçici çıktısı dağıtıcıya argüman olarak verilir, ortam değişkeni ol
 **Dürüstçe ele alınmayanlar.** Harita bir ölçümdür (ölçümde çalışmayan kol eksik kalabilir: atlanan test `belirsiz` sayılır; master push tam koşar; haritanın gece yenilenmesi seçici cetvelindedir). Seçici ve harita tabandan geldiği için yeni seçici/harita ancak birleşince etkindir (ilk PR tam koşar). İlk ölçüm PR'ın kendi koşusundadır
 (`ci` süresi: okunmayan belge, okunan belge, kod PR'ı); yerel ölçüm yalnız kurulumdur (postinstall açık 29 sn, `--ignore-scripts` 3 sn).
 
+### 4.4 `admin-smoke` süresi: tip ve lint e2e'de kapalı, apt Build ile paralel (ALT-38f)
+
+**Neden.** Kod PR'ında en uzun bekleyen zorunlu kontrol `admin-smoke` idi. Başlangıç ölçümü (88 başarılı koşu, 2026-10-04..07): iş medyanı 285 sn (p10 237, p90 310, en kısa 198, en uzun 640).
+Adım medyanları (sn): kurulum 53 (bağımlılık kurulumu 35) · apt 15 · Build 166,5 · Playwright 39,5. Tek bir Build günlüğünde: 92 sn derleme, 51 sn "Linting and checking validity of types",
+26 sn sayfa üretimi. apt adımı 3 koşuda (%3,4) 187, 339 ve 341 sn sürdü (ilk deneme 300 sn sınırını doldurdu, ikinci deneme geçti).
+
+**İki kaldıraç.** Hiçbiri sınıf koşullarına (§4.1), iş adına (`admin-smoke`, zorunlu kontrol) ya da tarayıcı probuna dokunmaz; her adım hâlâ aynı tam koşulu taşır. Üçüncü bir kaldıraç (webpack derleme önbelleği) ölçüldü ve ÇIKARILDI (aşağıda).
+
+1. **Tip ve lint yalnız e2e Build'inde kapalı** (`src/config/e2eHizliDerleme.mjs`, INV-E2E-HIZLI-1/2). `VENTHUB_E2E_TIP_LINT_ATLA=1`, YALNIZ `Build (real Supabase env)` adımının adım env'inde verilir ve `next.config.mjs`e
+   `typescript.ignoreBuildErrors` ile `eslint.ignoreDuringBuilds` ekler (günlükte "Skipping validation of types" ve "Skipping linting"). Anahtar yok ya da tam `1` değilken yapılandırmaya HİÇBİR anahtar eklenmez
+   (bugünkü ayarla birebir aynı). `ci`, Vercel, yerel derleme, package.json, vercel.json, `.env*` ve öteki iş akışları anahtarı HİÇ vermez ve vermemesi testle ölçülür. **Kapsam boşluğu yok**: tip ve lint hatası
+   `ci` işinde üç yerde kırmızı verir (Lint, Type check, `Build (blocking)`) ve `ci` ile `admin-smoke` AYNI sınıf koşuluyla koşar/atlanır. **Önkoşul: `ci` zorunlu kontrol kalır.**
+2. **apt adımı Build ile PARALEL** (`scripts/ci/arka-plan.sh`, cetvel `ci-runner-install-standard.md` §2.9, INV-E2E-HIZLI-3/4). `playwright install-deps` arka planda başlar, `bekle` adımı Build'ten sonra toplar; sınır 300 sn × 2'den 75 sn × 2'ye indi.
+   Gerçek kapı değişmedi: tarayıcı probu `bekle`den SONRA ve fataldir.
+
+**Çıkarılan kaldıraç: webpack derleme önbelleği (OPS hükmü 2026-10-09).** Bu PR'ın ilk sürümünde e2e'ye özgü bir `actions/cache` adımı vardı (`.next/cache/webpack`, `.rscinfo`, `.previewinfo`; anahtar öneki `e2e-nextjs-`). Ölçüm: sıcak önbellekle derleme 91 → 28-36 sn, iş 142-201 sn. Çıkarıldı, çünkü (a) kod PR'ının toplam süresini `ci` işi belirler (2026-10-07 ölçümü: `ci` işi 340 sn, `admin-smoke` zaten `ci`nin altında); `admin-smoke`u 142-201 sn'ye indirmek kod PR'ı toplamına en çok ~40 sn kazandırır; (b) depo önbellek kotası 10 GB'ın 9,94 GB'ında (55 giriş) ve her e2e anahtarı yaklaşık 137 MB ekler: kazanç küçük, kota riski gerçek. Önbellek yalnız hız olduğundan çıkarılması kapıyı değiştirmez. Yeniden eklemek yeni karar ister (kaydı yalnız master push'a çevirip PR'da yalnız geri yüklemek bir seçenekti). Ölçüm kaydı aşağıda kalır.
+
+**Ölçüm** (PR #1742, gerçek CI koşuları, aynı iş, sn). Her sütunda tek tek koşular yazılır: GitHub koşucusunun hızı koşudan koşuya ±%30 oynar (önceki 88 koşuda iş toplamı 198-313, ilk bağımlılık kurulumu 25-45 sn),
+bu yüzden tek koşuyu medyanla kıyaslamak yanıltır; aynı koşucu hızı için kurulum satırına bakılır. SOĞUK sütunlar (önbellek yok) bu PR'da KALAN iki kaldıracı temsil eder; SICAK sütunlar ÇIKARILAN webpack önbelleğini de içerir. SOĞUK koşulardaki 'diğer' satırının 5-6 sn'si önbellek kaydıdır; önbelleksiz hâlde yoktur.
+
+| | önceki medyan (88 koşu) | SOĞUK (önbellek yok): koşu 1 · koşu 3 | SICAK (aynı anahtar, kaynak değişmeden): koşu 4 · koşu 5 · koşu 6 |
+|---|---|---|---|
+| **iş toplamı** | **285** (p10 237, p90 310) | **241 · 180** | **201 · 142 · 174** |
+| kurulum (iş başlatma, checkout, pnpm, Node, bağımlılık) | 53 | 53 · 39 | 55 · 39 · 49 |
+| tarayıcı + sistem bağımlılıkları (apt dahil) | 20 (apt 15; 3 koşuda 187-341) | 7 · 3 | 7 · 5 · 4 |
+| Build | 166,5 | 128 · 92 | 76 · 62 · 73 |
+| ↳ webpack derleme (günlükteki "Compiled successfully") | 92 | 91 · 66 | 31,6 · 28,1 · 36,1 |
+| Playwright testi | 39,5 | 43 · 37 | 56 · 32 · 44 |
+| diğer (adım sonrası, önbellek kaydı) | 1 | 6 · 5 | 3 · 1 · 2 |
+
+Kaldıraç başına (koşu içi, günlükten): **tip ve lint kapalı** Build'ten ~40 sn düşürür (derleme 91 sn aynı, "Linting and checking" aşaması hiç koşmaz); **apt paralel** adımı iş süresinden çıkarır (arka planda 15-19 sn
+sürdü, `bekle` adımında bekleme 0 sn, derleme süresi etkilenmedi); ÇIKARILAN **webpack önbelleği** derlemeyi 91 → 28-36 sn'ye indiriyordu (yalnız `.rscinfo` ile birlikte; yalnız `webpack/` saklanan ilk sürümde derleme 91 → 89 sn, iş 228 sn).
+**Sonuç (kalan iki kaldıraç = SOĞUK sütunlar):** önbelleksiz iki koşuda iş 241 ve 180 sn (önceki medyan 285), ikisi de `ci`den (252 sn) kısa; çıkarılan kaldıraçla (SICAK) 142-201 sn idi. İki koşu küçük bir örnektir. Apt takılması (%3,4) bu 6 koşuda
+tetiklenmedi: kuyruğun kesilmesi mekanizma ve test olarak kanıtlı, canlıda ÖLÇÜLMEDİ.
+
+**Güvenlik yönü.** (a) Anahtar yanlış yere sızarsa `ci`/Vercel/yerel derleme tipsiz kalırdı: `INV-E2E-HIZLI-2` anahtarın adım düzeyi dışında hiçbir yerde olmadığını ölçer. (b) apt arka planda ölürse `bekle` komutu ön planda yeniden
+koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir.
+
 ## 5. Kapılar ve görünen yüzler
 
 | Kapı | Dosya | Neyi ölçer |
@@ -226,6 +267,10 @@ Seçici çıktısı dağıtıcıya argüman olarak verilir, ortam değişkeni ol
 | `INV-TEST-KARNE-2` | `ci-gecmis.test.ts` | CI geçmişi toplayıcısı (`ci-gecmis.cjs`): GitHub günlüğündeki iki renk biçimi (gerçek ESC ve iki karakterlik `^[` metni) soyulur; başarısız test dosyaları ayıklanır; `created=` pencereleri `total_count` ile doğrulanır, sayfalama sınırı uyarı verir; bayrak tablosu ve sayısal bayrakların tamsayı olması; süre örneği en yeni N başarılı koşu; `gh` çağrısının kendisi (URL, sayfa, bayrak) sahte GitHub'da assert edilir, kırmızı koşuda günlük çekilir; eşzamanlılık sınırı ve yeniden deneme; kullanım hatasında `gh` ÇAĞRILMAZ, çıkış kodu 1 |
 | `INV-TEST-KARNE-3` | `sabotaj.test.ts` | Bozma koşucusunun (`sabotaj.cjs`) güvenlik vaadi: plan doğrulama ve hedef reddi (`.git`, `node_modules`, sınanan testin kendisi, depo dışı); hüküm tablosu (yakalanırsa KIRMIZI, yakalanmazsa YESIL, sabotajsız kırmızı TABAN_KIRMIZI); gerçek git deposunda dört bozma türü uygulanır ve geri alınır (içerik byte-byte eşit, indeks temiz, art arda adımlar ters sırayla, CRLF); bağlı olmayan ana ağaç reddi ve kanıtlanamıyorsa kapalı kalma; koşucu uçtan uca sahte vitest ile: ana ağaçta çıkış 3, kirli ağaçta çıkış 2 (kirli ağaca dokunmadan), alt sürece sır ve `CLAUDE*` gitmez, boş geçici ev, zaman aşımı ve yan etki temizliği |
 | `INV-TEST-KARNE-4` | `karne-uret.test.ts` | Karne üreticisinin (`karne-uret.cjs`) karar kuralları: dünya olayı kümesi (aynı test en az 3 FARKLI dalda, ardışık en çok 12 saat arayla kırmızı; eşiklerin altı, kendisi ve üstü ayrı); kırmızıdan sonra aynı dalda ne olduğu; ortam hükmü (ölçüm sinyali > imza > hiçbiri); öneri sırası (taşındı > sahte yeşil > ortam > dünya durumu adayı > kısmi koruma > çoklu koruma > ölçülmedi > koru) ve her öncelik çifti; `UYGULANAMADI` / `TABAN_ATLANDI` ölçümü `OLCULMEDI` yapar, `KORU` yapmaz; kısmi koruma `KORU` yazılmaz; aynı test için çelişen iki hüküm sessizce çözülmez, yalnız gerekçeli `yerine-gecen.json` ilanı geçer; ek yoklama ana hükmü ezmez; `statik.cjs` ve `sabotaj.cjs` ile sözleşme |
+| `INV-E2E-HIZLI-1` | `e2e-hizli-derleme.test.ts` | `VENTHUB_E2E_TIP_LINT_ATLA` okuyucusu YALNIZ tam `1` açar; açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds` (tam iki anahtar), kapalıyken `next.config.mjs`in dışa verdiği nesnede bu anahtarlar HİÇ yok ve adresler (redirects/headers/rewrites) aynı; yeni Node sürecinde anahtar yalnız o sürecin ortamından okunur. Sabotaj: 7 gevşek okuyucu, 6 bozuk ayar üreticisi |
+| `INV-E2E-HIZLI-2` | `e2e-hizli-derleme.test.ts` | anahtar YALNIZ `e2e-smoke.yml`in `Build (real Supabase env)` adımının ADIM env'inde ve değeri tam `'1'`; iş/iş akışı env'i, `$GITHUB_ENV`, başka adım, başka iş akışı (`ci.yml` dahil), package.json, vercel.json, `.env*`, `scripts/` ve Playwright/Vitest ayarlarında YOK; yazım ayrışması kırmızı. Sabotaj: 9 iş akışı bozulması + `ci.yml` + 3 yüzey |
+| `INV-E2E-HIZLI-3` | `e2e-smoke-paralel-kurulum.test.ts` | `admin-smoke` adım sırası (apt Build'ten önce başlar, `bekle` Build'ten sonra ve probtan ÖNCE, prob smoke'tan önce), apt sınırı ≤ 90 sn × 2 deneme ve kemer aritmetiği, `bekle` süresi ≥ en kötü süre, `bekle` en-iyi-çaba, prob `continue-on-error`suz ve fatal. Sabotaj: 14 bozulma |
+| `INV-E2E-HIZLI-4` | `scripts/ci/__tests__/arka-plan.test.ts` | `arka-plan.sh` gerçek bash ile: `baslat` hemen döner ve çıktı borusunu tutmaz, `bekle` çıkış kodunu taşır (124 süre, 125 başlatılmamış, 2 kullanım), öldürülen işlem ön planda yeniden koşar (alıntı + ortam korunur), pid dosyası yok/sıfır/bozuksa süreç yaşıyor sanılmaz, eski sonuç karışmaz. Sabotaj: 9 betik bozulması |
 
 Yeni bir dünya durumu kaydı ya da yeni bir `ci` adımı ekleyen değişiklik bu kapılardan geçer; kapı kırmızıysa kayıt ya da sınıflandırma
 eksiktir, kapı gevşetilmez. Karne bölümü (§7) bu tabloya `INV-TEST-KARNE-1` ile `INV-TEST-KARNE-4` arasını ekledi.
