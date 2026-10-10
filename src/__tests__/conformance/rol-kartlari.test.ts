@@ -591,6 +591,35 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('Çalışan açma (karar 251)')
   })
 
+  it('HRT-46: içerik kuralı yalnız içerik üreten beş rolün kurallar dosyasında (üretilen ve diskteki); kartta ve öteki rollerde yok; iki cetvelde yazılı', () => {
+    const kural =
+      'Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub\'dır.'
+    const icerikRolleri = ['BLOG', 'I18N', 'TASARIM', 'URUN', 'SATIS']
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      const disk = fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+      if (icerikRolleri.includes(ad)) {
+        expect(metin, `${ad} (üretilen)`).toContain(kural)
+        expect(disk, `${ad}-kurallar.md (disk)`).toContain(kural)
+      } else {
+        expect(metin, `${ad} (üretilen): içerik kuralı bu role ait değil`).not.toContain('## İçerik kuralı')
+        expect(disk, `${ad}-kurallar.md (disk): içerik kuralı bu role ait değil`).not.toContain('## İçerik kuralı')
+      }
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('## İçerik kuralı')
+      expect(metin, `${ad} kartı: PR gövdesi Kanban satırıyla başlar`).toContain('PR gövdesi `Kanban: <numara>` ile başlar')
+    }
+    const cetveller: Array<[string, string]> = [
+      ['rehber-yazisi-standard.md', '10. **Şirket iddiası ve reklam dili yok**'],
+      ['i18n-localization-standard.md', 'Şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yok'],
+      ['is-kayit-duzeni-standard.md', 'Her PR gövdesinin İLK satırı `Kanban: <numara>` olur'],
+    ]
+    for (const [dosya, parca] of cetveller) {
+      const metin = fs.readFileSync(path.join(KOK, 'docs', 'standards', dosya), 'utf8').replace(/\r\n/g, '\n')
+      expect(metin, dosya).toContain(parca)
+    }
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
