@@ -36,7 +36,8 @@ type Modul = {
   say: (kayitlar: Kayit[], gun: string) => Record<string, Serit>
   ozetle: (s: Record<string, Serit>, secenek?: { kanitZorunlu?: boolean }) => { done: number; notsuz: number; kanitsiz: number; eksik: number; cikis: number }
   satirlar: (s: Record<string, Serit>, gun: string) => string[]
-  kayitlariCoz: (metin: string, gun?: string) => Kayit[]
+  kayitlariCoz: (metin: string, gun?: string, secenek?: { doneSart?: boolean }) => Kayit[]
+  dosyadanOku: (yol: string, gun?: string, secenek?: { doneSart?: boolean }) => Kayit[]
   MIN_NOT: number
 }
 
@@ -356,6 +357,20 @@ describe('INV-KART-NOT-1 · komut satırı', () => {
     const r = cli(...hatali[ad]())
     expect(r.kod, r.cikti).toBe(2)
     expect(r.cikti).toContain('HATA')
+  })
+
+  it('doneSart: false Done dışı kartları da okur (teslim köprüsünün okuyucusu); varsayılan şart KAPANMAZ, öteki denetimler seçenekten bağımsız', () => {
+    const doneYok = JSON.stringify({ kayitlar: [kart('HRT-1', { status: 'Backlog' })] })
+    expect(() => S.kayitlariCoz(doneYok, GUN)).toThrow(/Done/)
+    expect(() => S.kayitlariCoz(doneYok, GUN, { doneSart: true })).toThrow(/Done/)
+    expect(S.kayitlariCoz(doneYok, GUN, { doneSart: false })).toHaveLength(1)
+    expect(() => S.kayitlariCoz(JSON.stringify({ kayitlar: [] }), GUN, { doneSart: false })).toThrow(/boş/)
+    const bayat = JSON.stringify({ damga: '2026-10-01T09:00:00Z', kayitlar: [kart('HRT-1', { status: 'Backlog' })] })
+    expect(() => S.kayitlariCoz(bayat, GUN, { doneSart: false })).toThrow(/bayat/)
+    // dosya yolu seçeneği aktarır
+    const f = yaz('done-yok-secenek.json', { kayitlar: [kart('HRT-1', { status: 'Backlog' })] })
+    expect(S.dosyadanOku(f, GUN, { doneSart: false })).toHaveLength(1)
+    expect(() => S.dosyadanOku(f, GUN)).toThrow(/Done/)
   })
 
   it('damga istenen günle AYNI ya da sonrası ise bayat sayılmaz', () => {

@@ -2,7 +2,7 @@
 'use strict'
 
 /**
- * KART-NOT SAYACI (HRT-44, OPS 10-09 "kart notu olmayan teslimi kabul etmiyorum"; cetvel: docs/standards/is-kayit-duzeni-standard.md).
+ * KART-NOT SAYACI (HRT-44, OPS emri 10-09: kart notu olmayan teslim kabul edilmez; cetvel: docs/standards/is-kayit-duzeni-standard.md).
  *
  * NİÇİN VAR: "teslim karta yazılır" kuralı yazıyla kalırsa hatırlanana kadar yaşar (karar 244: kontrolü yazılamayan kural girmez).
  * 2026-10-09'da HRT-34 notsuz Done'a girdi ve bunu ancak elle sayım gösterdi. Bu betik o sayımı tek komuta çevirir:
@@ -147,7 +147,11 @@ function satirlar(seritler, gun) {
 }
 
 /** Dışa aktarım metnini çöz ve ölçülebilirlik şartlarını denetle; sağlam değilse VeriHatasi (çıkış 2). */
-function kayitlariCoz(metin, gun) {
+/**
+ * `doneSart: false` Done dışı kartları da okuyan çağıran içindir (teslim-kart-koprusu.cjs): "veride hiç Done kartı yok"
+ * denetimi bu sayacın kendi bozulma işaretidir, köprünün değil. Bu okuyucunun tek kopyası burada durur.
+ */
+function kayitlariCoz(metin, gun, { doneSart = true } = {}) {
   let d
   try {
     d = JSON.parse(metin)
@@ -157,7 +161,7 @@ function kayitlariCoz(metin, gun) {
   if (!d || !Array.isArray(d.kayitlar)) throw new VeriHatasi('kayitlar[] yok — kanban_disa_aktar.py çıktısı değil')
   if (d.kayitlar.length === 0) throw new VeriHatasi('kayitlar[] boş — dışa aktarım hiç kart vermedi (ölçülemedi, "temiz" değil)')
   if (d.kayitlar.some((k) => !k || typeof k !== 'object')) throw new VeriHatasi('kayitlar[] içinde kayıt olmayan öğe var')
-  if (!d.kayitlar.some((k) => k.status === 'Done')) throw new VeriHatasi('veride hiç Done kartı yok — durum eşlemesi bozulmuş olabilir (ölçülemedi)')
+  if (doneSart && !d.kayitlar.some((k) => k.status === 'Done')) throw new VeriHatasi('veride hiç Done kartı yok — durum eşlemesi bozulmuş olabilir (ölçülemedi)')
   if (gun && d.damga) {
     const damgaGunu = gunAdi(d.damga)
     if (damgaGunu !== null && damgaGunu < gun) {
@@ -167,23 +171,23 @@ function kayitlariCoz(metin, gun) {
   return d.kayitlar
 }
 
-function dosyadanOku(yol, gun) {
+function dosyadanOku(yol, gun, secenek) {
   let metin
   try {
     metin = fs.readFileSync(yol, 'utf8')
   } catch (e) {
     throw new VeriHatasi(`dosya okunamadı: ${yol} (${e.code || 'hata'})`)
   }
-  return kayitlariCoz(metin, gun)
+  return kayitlariCoz(metin, gun, secenek)
 }
 
-function canlidanOku(gun) {
+function canlidanOku(gun, secenek) {
   for (const py of ['python', 'py']) {
     const r = spawnSync(py, [DISA_AKTAR, '--tam'], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout: 120000 })
     if (r.error && r.error.code === 'ENOENT') continue
     if (r.error) throw new VeriHatasi(`${py} çalıştırılamadı: ${r.error.message}`)
     if (r.status !== 0) throw new VeriHatasi(`dışa aktarım çıkış ${r.status}: ${(r.stderr || '').trim().split('\n').pop()}`)
-    return kayitlariCoz(r.stdout, gun)
+    return kayitlariCoz(r.stdout, gun, secenek)
   }
   throw new VeriHatasi('python bulunamadı (python ya da py PATH içinde olmalı)')
 }
@@ -232,4 +236,21 @@ function main(argv) {
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2))
 
-module.exports = { gunAdi, gunGecerli, bugun, notSayilir, kanitVar, etiket, doneGunu, say, ozetle, satirlar, kayitlariCoz, main, MIN_NOT, VeriHatasi }
+module.exports = {
+  gunAdi,
+  gunGecerli,
+  bugun,
+  notSayilir,
+  kanitVar,
+  etiket,
+  doneGunu,
+  say,
+  ozetle,
+  satirlar,
+  kayitlariCoz,
+  dosyadanOku,
+  canlidanOku,
+  main,
+  MIN_NOT,
+  VeriHatasi,
+}
