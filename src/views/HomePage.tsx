@@ -20,6 +20,11 @@ interface HomePageProps {
   initialCategories?: CategoryViewModelLite[]
   rawCategories?: DomainCategory[]
   initialProducts?: Product[]
+  /**
+   * URN-98: ürün vitrini bloğunun çizim kapısı (satış kipi açık VE seçili ürün var, karar sayfa
+   * sunucusunda). Varsayılan KAPALI: yeni bir çağıran kapıyı unutursa blok çıkmaz, çıkmaması güvenli yöndür.
+   */
+  urunVitrini?: boolean
   dictionary: typeof import('../i18n/dictionaries/tr').tr.home
   lang: string
 }
@@ -28,6 +33,7 @@ const HomePage: React.FC<HomePageProps> = ({
   initialCategories = [],
   rawCategories = [],
   initialProducts = [],
+  urunVitrini = false,
   dictionary,
   lang
 }) => {
@@ -55,9 +61,13 @@ const HomePage: React.FC<HomePageProps> = ({
 
           <TrustProofSection dictionary={dictionary.trustProof} trustStripDict={dictionary.hero.trustStrip} />
 
-          <RevealSection>
-            <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={rawCategories} />
-          </RevealSection>
+          {/* URN-98: kapalıyken sarmalayıcı da çizilmez; `space-y` yalnız var olan kardeşler arasına
+              aralık koyar, yani boşluk ya da çift aralık kalmaz. */}
+          {urunVitrini && (
+            <RevealSection>
+              <FeaturedCommercialBlocks initialProducts={initialProducts} initialCategories={rawCategories} />
+            </RevealSection>
+          )}
 
           <StrategicBrands dictionary={dictionary.strategicBrands} />
 
