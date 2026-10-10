@@ -920,9 +920,11 @@ export const tr = {
       kvkk: '6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni.',
       privacy: 'VentHub web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu.',
       cookie: 'VentHub web sitesinde kullanılan çerezler ve çerez tercihlerinin yönetimi.',
-      terms: 'VentHub web sitesinin kullanım koşulları.',
-      distanceSales: 'VentHub üzerinden yapılan satışlara ilişkin mesafeli satış sözleşmesi.',
-      preInformation: 'Mesafeli satış öncesinde tüketiciye sunulan ön bilgilendirme formu.',
+      // SEO-32 (URN-91): üç taslak belgenin açıklaması sayfanın kendi bölüm başlıklarından yazıldı
+      // (110-155 karakter). "taslağı" sözcüğü bilerek korunur: sayfanın kendisi taslaktır.
+      terms: 'VentHub web sitesinin kullanım koşulları taslağı: hizmet kapsamı, üyelik ve hesap güvenliği, fiyat ve stok, fikri mülkiyet, sorumluluk reddi.',
+      distanceSales: 'VentHub satışlarına ilişkin mesafeli satış sözleşmesi taslağı: taraflar, ödeme ve teslimat, cayma hakkı, iade, ayıplı mal ve uyuşmazlık.',
+      preInformation: 'Mesafeli satış öncesi ön bilgilendirme formu taslağı: ürünün nitelikleri, toplam bedel, ödeme, teslimat, cayma hakkı ve iade masrafı.',
     }
   },
   footer: {
@@ -2027,13 +2029,20 @@ export const tr = {
     },
     // Sayfa üst verisi (meta açıklama) — bot karnesi 2026-09-24: bu dört sayfa varsayılan site
     // açıklamasını basıyordu. Yeni vaat YOK: yalnız sayfanın zaten anlattığı konu adlandırılır.
+    //
+    // SEO-32 (URN-91): açıklamalar sayfa gövdesinin kendi cümlelerinden yazıldı (110-155 karakter).
+    // Başlık anahtarları (`*Title`) YALNIZ <title> içindir: `support.links.*` menüde ve sayfa H1'inde,
+    // `support.returns.title` iade sayfası H1'inde okunur; ayrı anahtar olmasaydı görünür başlık da değişirdi.
     seo: {
-      // Sekme başlığı: sayfa H1'i "SSS" kısaltmasıdır; arama sonucunda tam ad okunur.
-      faqTitle: 'Sık Sorulan Sorular',
-      faq: 'Teklif, ödeme ve kurulum hakkında sık sorulan sorular ve cevapları.',
-      shipping: 'Teslimat süresi, kargo ücreti ve gönderi takibi hakkında bilgi.',
-      returns: 'Cayma hakkı, iade koşulları ve iade talebinin nasıl yapılacağı.',
-      warranty: 'Garanti kapsamı ve garanti belgesinin saklanması.',
+      // Sekme başlığı: sayfa H1'i "SSS" kısaltmasıdır; arama sonucunda kısaltma ve tam ad birlikte okunur.
+      faqTitle: 'SSS: Sık Sorulan Sorular',
+      faq: 'Teklif talebine dönüş, ödeme yöntemleri ve kurulum hizmeti hakkında sık sorulan sorular ve cevapları. VentHub destek ve satış öncesi sorular.',
+      shippingTitle: 'Kargo ve Teslimat Bilgileri',
+      shipping: 'Kargo ücreti ve firması teklifte belirtilir, takip numarası e-posta ile iletilir. Teslimat süresi kampanya ve stok durumuna göre değişebilir.',
+      returnsTitle: 'İade ve Değişim Koşulları',
+      returns: 'Cayma hakkı, iade koşulları ve iade talebinin sipariş numarasıyla destek ekibine nasıl iletileceği; onay sonrası kargo talimatı paylaşılır.',
+      warrantyTitle: 'Garanti ve Servis: Kapsam ve Arıza Kaydı',
+      warranty: 'Garanti kapsamı üretici ya da ithalatçı firmaya göre değişir. Garanti belgesi ve kullanım kılavuzunu saklayın; arıza kaydı için destek ekibine ulaşın.',
     },
     returns: {
       title: 'İade ve Değişim',
@@ -2756,6 +2765,8 @@ export const tr = {
       calculate: 'Hesapla',
       title: 'Hava Perdesi Hesaplayıcı',
       description: 'Kapı ölçüsü ve kullanım koşullarına göre hava perdesi hesabı',
+      // SEO-32 (URN-91): arama sonucu açıklaması. `description` sayfanın GÖRÜNÜR alt başlığıdır, ona dokunulmaz.
+      metaDescription: 'Kapı ölçüleri, uygulama, rüzgar ve trafik koşullarına göre gerekli hava debisini, üfleme hızını ve motor gücünü hesaplayın; hava perdesi seçin.',
       infoText: 'Bu araç, Ürün Seçici\'deki hava perdesi hesabıdır. Hesaplar ön değerlendirmedir.',
       steps: {
         dimensions: 'Kapı Ölçüleri',
@@ -2843,6 +2854,8 @@ export const tr = {
     duct: {
       title: 'Kanal Basınç Kaybı Hesaplayıcı',
       description: 'Hava kanalı hız hesaplaması ve basınç düşümü tahmini',
+      // SEO-32 (URN-91): arama sonucu açıklaması; `description` görünür alt başlıktır, değişmez.
+      metaDescription: 'Hava debisi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplayın. Kanal tipi, malzeme ve ölçüler girilir.',
       infoText: 'Debi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplar.',
       form: {
         inputTitle: 'Kanal Bilgileri',
@@ -2881,6 +2894,8 @@ export const tr = {
     hrv: {
       title: 'Isı Geri Kazanım Tasarruf Hesaplayıcı',
       description: 'Isı geri kazanım cihazı verimliliği ve enerji tasarrufu hesabı',
+      // SEO-32 (URN-91): arama sonucu açıklaması; `description` görünür alt başlıktır, değişmez.
+      metaDescription: 'Isı geri kazanım (HRV) ve enerji geri kazanım (ERV) cihazlarının yıllık enerji tasarruf potansiyelini cihaz tipi ve mahal tipine göre hesaplayın.',
       infoText: 'Isı geri kazanım (HRV) veya enerji geri kazanım (ERV) cihazlarının yıllık enerji tasarruf potansiyelini hesaplar.',
       form: {
         type: 'Cihaz Tipi',
@@ -2936,6 +2951,8 @@ export const tr = {
       // Türkçedeydi ve tam da bu yüzden kimse fark etmemişti.
       pageTitle: 'Jet Fan Hesaplayıcı',
       pageDescription: 'Jet fan hesabı',
+      // SEO-32 (URN-91): arama sonucu açıklaması; `pageDescription` görünür alt başlıktır, değişmez.
+      metaDescription: 'Kapalı otopark ve tünellerde gerekli jet fan sayısını, itki kuvvetini ve havalandırma debisini hesaplayın; uygulama ve mekan bilgilerini girin.',
       pageInfoText: 'Bu araç, Ürün Seçici\'deki jet fan hesabıdır. Hesaplar ön değerlendirmedir.',
       smokeWarning: 'Duman tahliye hesabı ön tasarım amaçlıdır. Profesyonel yangın mühendisi danışmanlığı gereklidir.',
       parkingShortDesc: 'Kapalı otopark havalandırma',
