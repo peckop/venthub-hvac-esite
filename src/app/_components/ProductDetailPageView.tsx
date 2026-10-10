@@ -971,7 +971,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                               </div>
                             ))}
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
-                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
+                              {/* URN-83: teklif kipinde "Liste Fiyatı: Teknik Teklif İste" çelişkisi — fiyat yok, etiket de "fiyat"
+                                  demez. Üstteki fiyat bloğundaki URN-60 düzeltmesinin aynısı; kip `quoteMode` tek kaynağından. */}
+                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{quoteMode ? t('pdp.quoteLabel') : t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
                                 {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                               </span>

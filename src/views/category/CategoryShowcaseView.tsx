@@ -3,6 +3,7 @@ import { Activity, ArrowRight, ChevronDown, Layers,ShieldCheck, ThermometerSun, 
 import Link from 'next/link'
 import React, { useState } from 'react'
 
+import { AIR_CURTAIN_WIZARD_ENABLED } from '@/components/category/airCurtainWizardGate'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
@@ -33,7 +34,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     const [wizardOpen, setWizardOpen] = useState(false)
     
     const vm = wrapCategory(category)
-    const isAirCurtain = category.slug.includes('hava-perde')
+    // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; tüm giriş noktaları (kahraman düğmesi,
+    // BottomCTA, sihirbazın kendisi) tek kapıdan kapalı — `airCurtainWizardGate.ts`.
+    const havaPerdesiSihirbazi = category.slug.includes('hava-perde') && AIR_CURTAIN_WIZARD_ENABLED
     const [breadcrumbRef, breadcrumbVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
     const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
     const [heroTitleRef, heroTitleVisible] = useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })
@@ -89,7 +92,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         {vm?.description || t('category.showcase.defaultDescription')}
                     </p>
 
-                    {isAirCurtain && (
+                    {havaPerdesiSihirbazi && (
                         <button
                             ref={airCurtainBtnRef}
                             onClick={() => setWizardOpen(true)}
@@ -241,16 +244,18 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             </section>
 
             <BottomCTA 
-                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
-                showWizard={isAirCurtain}
+                onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
+                showWizard={havaPerdesiSihirbazi}
                 categoryName={vm?.displayName || getCategoryDisplayName(category, t)}
             />
 
-            <EnhancedNeedsWizard 
-                isOpen={wizardOpen} 
-                onClose={() => setWizardOpen(false)} 
-                parentSlug={category.slug}
-            />
+            {havaPerdesiSihirbazi && (
+                <EnhancedNeedsWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    parentSlug={category.slug}
+                />
+            )}
         </div>
     )
 }
