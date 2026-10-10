@@ -1426,6 +1426,12 @@ export const tr = {
     reviewDesc: 'Ödemeniz bankanızdan başarıyla alındı. Siparişinizle eşleştirme kontrolümüz sürüyor ve kısa süre içinde tamamlanacak.',
     reviewWarning: 'Lütfen tekrar ödeme yapmayın. Ekip doğrulamayı tamamladığında size e-posta ile bilgi verilecektir.',
     reviewBackHome: 'Ana Sayfaya Dön',
+    // BELİRSİZ sonuç (doğrulama hatası, ağ yok, "bekliyor"): ödemenin alındığı SÖYLENMEZ, alınmadığı da. Para çekilmiş
+    // olabilir; bu yüzden "başarısız" ekranı ve "tekrar dene" yok (çift tahsilat). Güvenlik incelemesi 10-10, bulgu 1.
+    pendingTitle: 'Ödemeniz Kontrol Ediliyor',
+    pendingDesc: 'Ödemenizin sonucunu şu an doğrulayamadık. Ödeme alınmış olabilir; durumu kontrol ediyoruz.',
+    pendingWarning: 'Lütfen tekrar ödeme yapmayın. Durumu siparişlerim sayfasından izleyebilirsiniz.',
+    pendingContactLabel: 'Sorularınız için',
     orderCompletedTitle: 'Siparişiniz Tamamlandı!',
     orderNoLabel: 'Sipariş No',
     orderCompletedDesc: 'Siparişiniz başarıyla alındı. Onay e-postası kısa süre içinde gönderilecektir.',

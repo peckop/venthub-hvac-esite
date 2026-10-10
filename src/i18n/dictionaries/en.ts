@@ -1972,6 +1972,12 @@ export const en: typeof tr = {
     reviewDesc: 'Your payment was successfully received from your bank. We are still verifying the match with your order and will complete it shortly.',
     reviewWarning: 'Please do not pay again. We will notify you by email once verification is complete.',
     reviewBackHome: 'Back to Home',
+    // UNCERTAIN result (verification error, no network, "pending"): we do NOT say the payment was taken, nor that it
+    // was not. The charge may have gone through, so there is no "failed" screen and no "try again" (double charge).
+    pendingTitle: 'Checking Your Payment',
+    pendingDesc: 'We could not confirm the result of your payment right now. The payment may have been taken; we are checking its status.',
+    pendingWarning: 'Please do not pay again. You can follow the status on your orders page.',
+    pendingContactLabel: 'For questions',
     orderCompletedTitle: 'Your Order is Complete!',
     orderNoLabel: 'Order No',
     orderCompletedDesc: 'Your order has been received successfully. A confirmation email will be sent shortly.',
