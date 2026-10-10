@@ -489,7 +489,8 @@ export function llmsKontrolu(harita, llms, cikti, adres = '/llms.txt') {
   const metin = String(llms)
   const yollar = harita.satirlar.map((s) => { try { return new URL(s.loc).pathname } catch { return s.loc } })
   const gercekSayfa = harita.satirlar.length
-  const gercekKategori = yollar.filter((y) => /\/category\//.test(y)).length
+  // K3-b bayrağı açıkken TR kategori adresi /tr/kategori/<slug>, kapalıyken /tr/category/<slug>: iki kipte de kategoridir (SEO-21)
+  const gercekKategori = yollar.filter((y) => /\/(?:category|kategori)\//.test(y)).length
   for (const m of metin.matchAll(/(\d[\d.,]*)\s+(?:indexable\s+)?(?:pages|urls)\b/gi)) {
     if (sayiOku(m[1]) !== gercekSayfa) cikti.push(bulgu('LLMS-SAYFA', 'KIRMIZI', adres, `llms.txt "${m[0]}" diyor, site haritasında ${gercekSayfa} adres var`))
   }
