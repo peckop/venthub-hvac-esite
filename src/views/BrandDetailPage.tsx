@@ -17,6 +17,7 @@ import useScrollAnimation, { scrollAnimationClasses } from '../hooks/useScrollAn
 import { useI18n } from '../i18n/I18nProvider'
 import { getFamiliesEnriched } from '../lib/services/family.service'
 import type { FamilyListItem } from '../types/ui-models'
+import { doluMu } from '../utils/bosDegerKorumasi'
 
 /**
  * Kurumsal özet satırları — VERİ katmanı (bkz. `src/data/brands.ts` başlığı).
@@ -105,7 +106,11 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
   const detail = brand ? BRAND_DETAILS[brand.slug] : null
   // URN-79: "Kurumsal Özet" kutusu yalnız çizilecek bir satır VARSA çizilir (satır = kayıttaki özet satırı, merkez ya da web sitesi).
   // Aksi hâlde başlığı olup içi boş bir kutu kalırdı (kaynağı doğrulanamayan satırlar kaldırıldıkça bu olasılık arttı).
-  const ozetSatirlari = detail?.stats ?? []
+  // URN-84: etiketi sözlükte BOŞ kalan satır çizilmez (etiketsiz değer tek başına anlamsız); "kutu var mı" kararı da
+  // yalnız ÇİZİLECEK satırlara bakar, yoksa tüm etiketleri boşalan markada başlığı olup içi boş kutu kalırdı.
+  const ozetSatirlari = (detail?.stats ?? [])
+    .map((stat) => ({ stat, etiket: t(`brands.detail.${stat.labelKey}`) }))
+    .filter(({ etiket }) => doluMu(etiket))
   const ozetVar = ozetSatirlari.length > 0 || !!brand?.headquarters || !!brand?.website
 
   const [families, setFamilies] = useState<FamilyListItem[]>([])
@@ -266,10 +271,10 @@ const BrandDetailPage: React.FC<BrandDetailPageProps> = ({ initialBrandSlug, uru
                   </div>
                   
                   <div className="space-y-6">
-                    {ozetSatirlari.map((stat, i) => (
+                    {ozetSatirlari.map(({ stat, etiket }, i) => (
                       <div key={i} className="flex justify-between items-end border-b border-white/10 pb-4">
                         <span className="text-xs uppercase font-bold text-slate-500 tracking-widest">
-                          {t(`brands.detail.${stat.labelKey}`)}
+                          {etiket}
                         </span>
                         <span className="text-sm font-medium">
                           {typeof stat.value === 'string' ? stat.value : brandText(stat.value, lang)}

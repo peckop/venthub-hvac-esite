@@ -16,8 +16,8 @@
 
 | Sınıf | Nasıl | Nerede | Neden |
 |---|---|---|---|
-| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
-| **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · hakkımızda · iletişim | İçerik deploy dışında değişmez |
+| **Statik + talep-üzerine ISR** | `generateStaticParams()` + **`revalidate = 3600` (yedek)**; birincil tazeleme webhook ile | Vitrin: ana sayfa · kategori · alt kategori · marka · ürün (PDP) · **hakkımızda** (canlı marka/ürün/aile sayacı, URN-75). *(`destek/konular` statik içerik — yedek eklenmedi)* | LCP/SEO. Bu sayfalar herkese aynı; istek başına üretmek israf |
+| **Tam statik** | `export const dynamic = 'force-static'` | Yasal metinler · iletişim | İçerik deploy dışında değişmez |
 | **Dinamik** | `export const dynamic = 'force-dynamic'` | Admin/** · hesap/** · API rotaları | Kullanıcıya/oturuma özel; önbelleklenirse veri sızar |
 
 **`ssr: false` ana rotalarda YASAK** (CLAUDE.md kural 4). İstemci-tarafı veri gerektiren
@@ -102,6 +102,14 @@ olmalıdır.** Biri eksikse veri değişir, sayfa değişmez — ve bunu hiçbir
 | `site_settings` | `on_site_settings_satis_kipi_ins` + `_upd` + `_del` (`WHEN key = 'satis_kipi'`) | var | **yalnız** `SATIS_KIPI_TAG` (+ `/sitemap.xml`) — `satisKipiOku()` sarmalını okuyan sayfalar (checkout) yeniden üretilir; keşif/ana sayfa etiketlerine DOKUNMAZ. Önbellek emniyet kemeri `revalidate: 300` (webhook düşerse "açık" en fazla 5 dk bayat). DELETE ve anahtar yeniden adlandırma da düşer (REC-168 plan-challenger Ç1/Ç4) |
 | `price_lists` | `on_price_lists_change` | var | **tüm** ailelerin PDP yolları — keşif'e DOKUNMAZ (fiyat yalnız PDP'de görünür, `product_prices` ile aynı gerekçe). ⚠️ **FAN-OUT SINIRI:** aile sayısı kadar yol tazelenir (ölçüm 2026-08-17: **32 aile → 64 çağrı**). Birkaç yüz aileye çıkıldığında tag tabanlı çözüme geçilmeli — sınır burada **sayıyla** yazılı ki sessizce yavaşlamasın |
 
+> **HAKKIMIZDA SAYACI (URN-75, 2026-10-09).** `/[lang]/about` artık `tam statik` DEĞİL: marka / aktif ürün / aile sayısı
+> `getSiteSayaclari` ile canlı veriden gelir (`src/app/_components/siteSayaclari.ts`, `unstable_cache`, anahtar
+> `['site-sayaclari', lang, tenantId]`, etiket `PRODUCTS_DISCOVERY_TAG` + `discoveryTag(tenantId)`, `revalidate = 3600`).
+> Dayandığı üç tablo (`products` status/family_id/deleted_at, `product_families`, `brands`) keşif etiketini ZATEN tazelediği için
+> yeni tetik/handler dalı gerekmedi. Okunamazsa sayaç `null` olur ve kartlar çizilmez (uydurma sayı yok). Kapı:
+> `INV-HAKKIMIZDA-SAYAC-1` (`src/__tests__/conformance/hakkimizda-sayac.test.ts`). **Canlı tazeleme ölçümü** (§1.1: ürün değişince sayfanın
+> gerçekten yenilendiği) yayın sonrası ayrıca yapılır; bu kapı kaynağı ölçer.
+>
 > **SİTE HARİTASI MODEL `lastmod`'U (REC-300 3e-2, 2026-10-02):** model adresinin `lastModified`'ı `products.updated_at`'tir; `on_products_change` tetiği değere bakmadığı için aynı değerli toplu UPDATE de modelin `updated_at`'ini kaydırır ("hepsi değişti" sinyali) — bilinçli kabul, tetiği değere duyarlı yapmak ayrı ALTYAPI kartıdır.
 
 > **PDP AİLE KANONİKTİR** (`/[lang]/products/[family-slug]`). Yol tazelenirken **ürün** slug'ı

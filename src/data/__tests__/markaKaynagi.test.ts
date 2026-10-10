@@ -506,7 +506,17 @@ describe('INV-MARKA-KAYNAK-1 (d): listeden çıkan slug\'ların 308 yönlendirme
           const dalIndeksi = h.kategoriler.push({ ...dalOlcum.slug, ust: kokIndeksi, aktif: dalOlcum.aktif }) - 1
           h.kategoriSluglari[dalOlcum.slug.en] = { hedef: { kategori: dalIndeksi }, bicim: 'en' }
           h.kategoriSluglari[dalOlcum.slug.tr] = { hedef: { kategori: dalIndeksi }, bicim: 'tr' }
+          // Kök TR adı: paylaşılan fikstür DB'nin migration ÖNCESİ kesitidir (`kontrol-sistemleri`); migration
+          // 20261010090000 kökü `kontrol-ve-suruculer` yapar. Ölçülen yeni ad buraya da yazılmazsa hedefin ilk
+          // parçası haritada bulunmaz, eşleyici hiçbir şeyi çözmeden null döner ve "çakışmaz" iddiası boşuna
+          // geçerdi (URN-85 çürütme bulgusu). Yeni ad eklenir, eski ad (fikstürde) takma ad olarak kalır.
+          const kokOlcum = DB_KATEGORILERI['control-systems']
+          h.kategoriler[kokIndeksi] = { ...h.kategoriler[kokIndeksi], tr: kokOlcum.slug.tr }
+          h.kategoriSluglari[kokOlcum.slug.tr] = { hedef: { kategori: kokIndeksi }, bicim: 'tr' }
           const esle = (yol: string) => eskiAdresEsle(h, { yol, sku: null, dilTespit: () => 'tr' })
+          // OLUMLU KONTROL: eşleyici kök adı gerçekten tanıyor (eski şemadaki yol kanonik adrese gider); tanımıyorsa
+          // aşağıdaki "null" iddiası hiçbir şeyi ölçmez.
+          expect(esle(`/tr/category/${kokOlcum.slug.tr}`), 'eşleyici yeni kök adı tanımıyor').not.toBeNull()
           const cakisan = kurallar.flatMap((k) => [k.source, k.destination]).filter((y) => esle(y) !== null)
           expect(cakisan).toEqual([])
         })

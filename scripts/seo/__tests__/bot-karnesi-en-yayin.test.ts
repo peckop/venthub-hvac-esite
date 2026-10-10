@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { bilincliKurallar, enYayinOku, varsayilanBaslikMi } from '../bot-karnesi.mjs'
+import { baslikTuru, bilincliKurallar, enYayinOku, ornekTurleri, varsayilanBaslikMi } from '../bot-karnesi.mjs'
 
 /**
  * INV-BOT-KARNESI-EN-YAYIN-1 · bot karnesi EN_YAYIN bayrağını KAYNAKTAN okur; bayrak kapalıyken hreflang
@@ -107,6 +107,145 @@ describe('INV-BOT-KARNESI-BASLIK-1 · varsayılan başlık tanıma', () => {
       'VentHub | Endüstriyel Havalandırma ve HVAC Mühendislik Çözümleri ',
       'VentHub — Premium HVAC',
     ]) expect(varsayilanBaslikMi(b, 'kategori'), b).toBe(false)
+  })
+})
+
+/**
+ * INV-BOT-KARNESI-ORNEK-1 · karne site haritasından her dinamik türe örnek alır; İKİ adres şemasını tanır, örneksiz zorunlu tür
+ * sessiz geçmez, EN karşılığı yokken hayalet "/" satırı üretmez (SEO-29).
+ *
+ * ÖLÇÜLMÜŞ VAKA (2026-10-09 19:05, canlı koşu): (1) hreflang'sız haritada EN karşılığı `yol('')` = "/" okunuyordu; kategori, aile ve
+ * marka türlerine üç hayalet "/" satırı eklendi, her biri sahte YONLENDIRME ve VARSAYILAN-BASLIK saydı. (2) Desenler yalnız eski şemayı
+ * (/tr/category, /tr/products, /tr/brands) tanıyordu; Pazar 11 Ekim'de harita /tr/kategori, /tr/urun, /tr/markalar olunca karne bu
+ * türlerden HİÇ örnek almayacak ve bunu hata saymayacaktı (sessiz körlük). (3) Kök "/" → /tr satırı ana sayfanın kendi başlığı yüzünden
+ * VARSAYILAN-BASLIK alıyordu; ana sayfa istisnası tür adına bakıyordu, yönlendirmenin sonundaki adrese değil.
+ *
+ * ⚠ KOLLAR BİRBİRİNİN YERİNE GEÇMEZ: iki şema, EN eşleşmesi var/yok, model ayrımı, örneksiz tür, başlık türü ve adres geçişi ayrı davranışlardır.
+ */
+const KOK = 'https://venthub.com.tr'
+type Satir = { loc: string; en?: string }
+const harita = (satirlar: Satir[]): string =>
+  `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${satirlar
+    .map(
+      (s) =>
+        `<url><loc>${KOK}${s.loc}</loc>${s.en ? `<xhtml:link rel="alternate" hreflang="tr" href="${KOK}${s.loc}"/><xhtml:link rel="alternate" hreflang="en" href="${KOK}${s.en}"/>` : ''}</url>`,
+    )
+    .join('')}</urlset>`
+const turAdresleri = (xml: string, tur: string): string[] => ornekTurleri(xml).turler.find(([ad]: [string, string[]]) => ad === tur)?.[1] ?? []
+const tumAdresler = (xml: string): string[] => ornekTurleri(xml).turler.flatMap(([, a]: [string, string[]]) => a)
+
+const ESKI_SEMA: Satir[] = [
+  { loc: '/tr' },
+  { loc: '/tr/products' },
+  { loc: '/tr/category/aksesuarlar' },
+  { loc: '/tr/category/fanlar' },
+  { loc: '/tr/category/hava-perdeleri' },
+  { loc: '/tr/products/avens-bvu' },
+  { loc: '/tr/products/seat-serisi' },
+  { loc: '/tr/products/vortice-lineo-quiet' },
+  { loc: '/tr/products/casals-hep' },
+  { loc: '/tr/brands/avens' },
+  { loc: '/tr/brands/vortice' },
+  { loc: '/tr/brands/seat' },
+]
+// SEO-26 simülasyonundan kısaltıldı (gerçek sitemap.ts, ADRES_SEMASI_K3B açık, NEXT_PUBLIC_ADRES_DILI=1): yeni şema adresleri.
+const YENI_SEMA: Satir[] = [
+  { loc: '/tr' },
+  { loc: '/tr/urunler' },
+  { loc: '/tr/brands' },
+  { loc: '/tr/kategori/aksesuarlar' },
+  { loc: '/tr/kategori/fanlar' },
+  { loc: '/tr/kategori/fanlar/kanal-tipi-fanlar' },
+  { loc: '/tr/kategori/fanlar/aksiyel-fanlar' },
+  { loc: '/tr/kategori/hava-perdeleri' },
+  { loc: '/tr/markalar/avens' },
+  { loc: '/tr/markalar/vortice' },
+  { loc: '/tr/urun/avens-bvu' },
+  { loc: '/tr/urun/seat-serisi' },
+  { loc: '/tr/urun/vortice-lineo-quiet' },
+  { loc: '/tr/urun/casals-hep' },
+]
+
+describe('INV-BOT-KARNESI-ORNEK-1 · örnekleme iki şemayı tanır', () => {
+  it('KOL O1 · hreflang\'sız ESKİ şema haritası: hiçbir türde hayalet "/" yok, TR örnekleri haritadaki ilk sırayla, eksik yok', () => {
+    const xml = harita(ESKI_SEMA)
+    expect(tumAdresler(xml), 'EN karşılığı yokken "/" eklendi (yol(\'\') düşmesi geri geldi)').not.toContain('/')
+    expect(turAdresleri(xml, 'kategori')).toEqual(['/tr/category/aksesuarlar', '/tr/category/fanlar'])
+    expect(turAdresleri(xml, 'aile-urun')).toEqual(['/tr/products/avens-bvu', '/tr/products/seat-serisi', '/tr/products/vortice-lineo-quiet'])
+    expect(turAdresleri(xml, 'marka')).toEqual(['/tr/brands/avens', '/tr/brands/vortice'])
+    expect(ornekTurleri(xml).eksik).toEqual([])
+  })
+
+  it('KOL O2 · hreflang\'lı haritada ilk örneğin GERÇEK EN karşılığı eklenir (EN yayını açıldığında davranış korunur)', () => {
+    const xml = harita([{ loc: '/tr/category/aksesuarlar', en: '/en/category/accessories' }, ...ESKI_SEMA.slice(3)])
+    expect(turAdresleri(xml, 'kategori')).toEqual(['/tr/category/aksesuarlar', '/en/category/accessories', '/tr/category/fanlar'])
+  })
+
+  it('KOL O3 · YENİ şema haritası: kategori, alt kategori, aile ve marka yeni adreslerden örneklenir, eksik yok', () => {
+    const xml = harita(YENI_SEMA)
+    expect(turAdresleri(xml, 'kategori')).toEqual(['/tr/kategori/aksesuarlar', '/tr/kategori/fanlar'])
+    expect(turAdresleri(xml, 'alt-kategori')).toEqual(['/tr/kategori/fanlar/kanal-tipi-fanlar', '/tr/kategori/fanlar/aksiyel-fanlar'])
+    expect(turAdresleri(xml, 'aile-urun')).toEqual(['/tr/urun/avens-bvu', '/tr/urun/seat-serisi', '/tr/urun/vortice-lineo-quiet'])
+    expect(turAdresleri(xml, 'marka')).toEqual(['/tr/markalar/avens', '/tr/markalar/vortice'])
+    expect(tumAdresler(xml)).not.toContain('/')
+    expect(ornekTurleri(xml).eksik).toEqual([])
+  })
+
+  it('KOL O4 · yeni şemada model adresi (-p-<sku>) aile sayılmaz, model türüne düşer', () => {
+    const model = '/tr/urun/seat-30-korozyon-dayanimli-radyal-fan-2476m3h-p-sea-51302000'
+    const xml = harita([{ loc: model }, ...YENI_SEMA])
+    expect(turAdresleri(xml, 'aile-urun')).not.toContain(model)
+    expect(turAdresleri(xml, 'model')).toEqual([model])
+  })
+
+  it('KOL O5 · model türü isteğe bağlıdır: model adresi olmayan yeni şema haritası eksik saymaz (Pazar\'da model listesi boş, karar 327)', () => {
+    expect(ornekTurleri(harita(YENI_SEMA)).eksik).not.toContain('model')
+  })
+})
+
+describe('INV-BOT-KARNESI-ORNEK-1 · örneksiz zorunlu tür sessiz geçmez', () => {
+  it('KOL O6 · yeni şema haritasında marka adresi yoksa eksik = [marka]', () => {
+    expect(ornekTurleri(harita(YENI_SEMA.filter((s) => !s.loc.startsWith('/tr/markalar/')))).eksik).toEqual(['marka'])
+  })
+
+  it('KOL O7 · yeni şema haritasında alt kategori yoksa eksik = [alt-kategori] (eski şemada alt kategori tek seviyeli olduğu için zorunlu değil)', () => {
+    expect(ornekTurleri(harita(YENI_SEMA.filter((s) => s.loc.split('/').length !== 5 || !s.loc.startsWith('/tr/kategori/')))).eksik).toEqual(['alt-kategori'])
+    expect(ornekTurleri(harita(ESKI_SEMA)).eksik).not.toContain('alt-kategori')
+  })
+
+  it('KOL O8 · boş ya da tanınmayan harita: üç zorunlu tür de eksik', () => {
+    expect(ornekTurleri(harita([])).eksik).toEqual(['kategori', 'aile-urun', 'marka'])
+    expect(ornekTurleri(harita([{ loc: '/tr/bambaska/adres' }])).eksik).toEqual(['kategori', 'aile-urun', 'marka'])
+  })
+})
+
+describe('INV-BOT-KARNESI-ORNEK-1 · başlık türü ve adres geçişi', () => {
+  it('KOL O9 · ana sayfa istisnası yönlendirmenin SONUNA bakar: kök "/" → /tr satırı yeni varsayılan başlıkta kusur değil', () => {
+    expect(baslikTuru('kok', '/tr')).toBe('ana')
+    expect(baslikTuru('kok', '/en')).toBe('ana')
+    for (const b of YENI_BASLIK) expect(varsayilanBaslikMi(b, baslikTuru('kok', '/tr')), b).toBe(false)
+  })
+
+  it('KOL O10 · ana sayfa dışındaki son adres tür adını korur ve yeni varsayılan başlık yine kusurdur', () => {
+    expect(baslikTuru('kategori', '/tr/kategori/fanlar')).toBe('kategori')
+    expect(baslikTuru('ana', '/tr')).toBe('ana')
+    for (const b of YENI_BASLIK) expect(varsayilanBaslikMi(b, baslikTuru('kategori', '/tr/kategori/fanlar')), b).toBe(true)
+  })
+
+  const gecis = () =>
+    (bilincliKurallar(false) as Array<{ sinif: string; kosul: (s: unknown) => boolean }>).find((k) => k.sinif === 'YONLENDIRME')
+
+  it('KOL O11 · statik eski adres TEK 308 ile haritadaki yeni adrese gidiyorsa bilinçli adres geçişidir', () => {
+    expect(gecis(), 'YONLENDIRME için adres geçişi bilinçli kuralı yok').toBeDefined()
+    expect(gecis()?.kosul({ statik: true, zincir: '308→200', haritada: 'loc' })).toBe(true)
+  })
+
+  it('KOL O12 · geçici yönlendirme, zincir, haritada olmayan hedef ve haritadan örneklenen dinamik adres kusur KALIR', () => {
+    const k = gecis()
+    expect(k?.kosul({ statik: true, zincir: '307→200', haritada: 'loc' })).toBe(false)
+    expect(k?.kosul({ statik: true, zincir: '308→308→200', haritada: 'loc' })).toBe(false)
+    expect(k?.kosul({ statik: true, zincir: '308→200', haritada: 'yok' })).toBe(false)
+    expect(k?.kosul({ statik: false, zincir: '308→200', haritada: 'loc' })).toBe(false)
   })
 })
 

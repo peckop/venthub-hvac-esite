@@ -21,7 +21,7 @@
  *     b. ağaçtaki yama tablosu uygulanır (scripts/adres/onizleme-adres.mjs YAMALAR: ADRES_SEMASI_K3B = true, harita bağlantısı);
  *     c. eski adres haritası CANLIDAN üretilir (anon anahtarla, salt okuma) ve doğrulanır;
  *     d. NEXT_PUBLIC_ADRES_DILI=1 ile derlenir; yamalar derleme biter bitmez (ya da çökerse çıkışta) GERİ ALINIR;
- *     e. sunucu açılınca Recep'in 17 adresi sınanır (docs/plans/onizleme-tiklama-listesi-*.md, aracın kendi ağacından)
+ *     e. sunucu açılınca Recep'in 18 adresi sınanır (docs/plans/onizleme-tiklama-listesi-*.md, aracın kendi ağacından)
  *        ve tablo basılır; ardından tam tarama (scripts/adres/onizleme-tarama.cjs) koşar, yalnız özeti basılır.
  *
  * GÜVENLİK (bekçi: src/__tests__/conformance/onizleme-yalitimi.test.ts · INV-ONIZLEME-1; adres kipi: onizleme-adres-kipi.test.ts · INV-ONIZLEME-2):

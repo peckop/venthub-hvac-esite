@@ -220,7 +220,9 @@ const RATCHETS: Ratchet[] = [
     // altındaki `text-slate-500` etiketi de gitti. Kazanç yan ürün.
     // 2026-10-09 · 1435 -> 1421: URN-82 — sessiz fan sayfasındaki karşılaştırma bölümü (Blog BLG-6 son tablo,
     // OPS hükmü b: "tablo tümden kalkar") silindi; sayaç bu yüzden 14 düştü (ölçülen: 1435 -> 1421). Kazanç yan ürün.
-    tavan: 1421,
+    // 2026-10-10 · 1436 -> 1435: URN-84 — nem alma çip satırları tek eşlemeye indi (iki yazılı kutu bire düştü). Kazanç yan ürün.
+    // 2026-10-10 · URN-82 yenileme: iki dalın kazancı birleşti; birleşik değer master üstünde ÖLÇÜLDÜ (aşağıdaki sayı).
+    tavan: 1420,
     say: () => countMatches(/\b(?:slate|gray)-\d{2,3}\b/g),
     gerekce: 'Gri TEK aile olmalı ve tema-farkındalı token üzerinden gelmeli.',
   },
@@ -251,7 +253,9 @@ const RATCHETS: Ratchet[] = [
     // 2026-09-01 · 124 → 122 (REC-104 vaat rozetlerinin kaldırılması).
     // 2026-09-01 · 122 -> 120: REC-115 olu bilesen CategoryHero silindi.
     // 2026-10-09 · 118 -> 117: URN-80 — aynı sayaç kartının `font-black` rakamı kalktı. Kazanç yan ürün.
-    tavan: 117,
+    // 2026-10-10 · 118 -> 117: URN-84 — nem alma çip satırları tek eşlemeye indi (iki `font-black` bire düştü). Kazanç yan ürün.
+    // 2026-10-10 · URN-82 yenileme: iki dalın kazancı birleşti; birleşik değer master üstünde ÖLÇÜLDÜ (aşağıdaki sayı).
+    tavan: 116,
     say: countFontBlackOutsideDisplay,
     gerekce: 'font-black yalnız text-display eşliğinde; başlık ağırlığı font-bold.',
   },

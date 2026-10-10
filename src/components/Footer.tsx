@@ -6,13 +6,15 @@ import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import { bilgiMerkeziListeHref } from '../utils/bilgiMerkezi'
+import { doluMu } from '../utils/bosDegerKorumasi'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import BuildTag from './BuildTag'
 
 // ADDRESS/PHONE ikon sabitleri, adres+telefon satırlarıyla birlikte kaldırıldı
 // (2026-08-28) — kullanılmayan sabit bırakmak lint'i kırardı.
 const FOOTER_ICON_MAIL = 'M'
-const HVAC_SUFFIX = 'HVAC.'
+/** Telif satırında marka adından sonra gelen cümle sonu (JSX'te çıplak metin `jsx-no-literals` kuralına takılır). */
+const TELIF_CUMLE_SONU = '.'
 /** Altbilgide gösterilecek en çok kök kategori (bugün 7 ürünlü kök var; 8. kök gelirse tavan bilinçli kararla artar). */
 const FOOTER_KATEGORI_TAVANI = 8
 
@@ -22,6 +24,10 @@ const Footer: React.FC = () => {
   const { categories: globalCategories } = useCategories()
   // Karar 92: Bilgi Merkezi adresi dile göre; EN kapalıyken bağlantı basılmaz.
   const bilgiMerkeziHref = bilgiMerkeziListeHref(lang)
+  // URN-84 + URN-82: "Teklif ve Sorular" başlığı ile yönlendirme cümlesi (anahtar adları `workingHours` / `weekdays` tarihsel)
+  // sözlükte BOŞ bırakılabilir; boş değer boş öğe olarak çizilmez (iletişim formu bağlantısı her durumda durur).
+  const teklifBaslik = t('footer.workingHours')
+  const teklifCumle = t('footer.weekdays')
 
   // OPS-51: Sığınak 7. KÖK oldu (ürünlü kök sayısı 6 → 7). Eskiden burada `.slice(0, 8)` ve aşağıda İKİNCİ bir
   // `.slice(0, 6)` vardı (ilk depo işlemi, gerekçe yorumu YOK): kategoriler `level, name` sırasıyla geldiği için 7. kök
@@ -153,11 +159,11 @@ const Footer: React.FC = () => {
                 kaynağı yoktu (2025-08-23 ilk şablon commit'inden kalma). URN-82: yerinde Blog tablosunun "Teklif ve
                 Sorular" başlığı ve yönlendirme cümlesi (sözlük anahtarları `footer.workingHours` / `footer.weekdays`:
                 adları tarihsel, değerleri saat değil) ve iletişim formu bağlantısı durur; saat gerçek ve kayıtlı olunca
-                sözlükle birlikte (TR+EN) geri eklenir.
+                sözlükle birlikte (TR+EN) geri eklenir. URN-84: başlık ya da cümle sözlükte boş kalırsa o öğe çizilmez.
                 Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts */}
             <div className="mt-4">
-              <h4 className="text-sm font-semibold mb-1">{t('footer.workingHours')}</h4>
-              <p className="text-gray-300 text-sm mb-2">{t('footer.weekdays')}</p>
+              {doluMu(teklifBaslik) && <h4 className="text-sm font-semibold mb-1">{teklifBaslik}</h4>}
+              {doluMu(teklifCumle) && <p className="text-gray-300 text-sm mb-2">{teklifCumle}</p>}
               <Link
                 href={Routes.contact()}
                 className="inline-block text-sm font-medium text-white underline underline-offset-4 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"
@@ -174,7 +180,9 @@ const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-300 text-sm">
-              © {new Date().getFullYear()} {t('header.brandName')} {HVAC_SUFFIX} {t('footer.rights')}
+              {/* URN-83: şirket kurulmadı — telif satırı yasal unvan / "HVAC." eki taşımaz; ad giriş sayfasıyla AYNI sözlük
+                  anahtarından gelir (`common.brandLegalName`), unvan kesinleşince tek yerden değişir. */}
+              © {new Date().getFullYear()} {t('common.brandLegalName')}{TELIF_CUMLE_SONU} {t('footer.rights')}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}

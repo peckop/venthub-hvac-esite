@@ -27,7 +27,8 @@ const path = require('node:path')
 const { spawnSync } = require('node:child_process')
 
 // Kanban kart ön ekleri (ölçüldü 2026-10-04: panolardaki başlık ön ekleri). Yeni departman ön eki → buraya.
-const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG']
+// TSR/DIL/MRK/MVZ/STS 10-05: docs/standards/is-kayit-duzeni-standard.md §1 tablosu; eksikken bu departmanların kartı «bilinen kart değil» diye bloklanırdı.
+const ONEKLER = ['OPS', 'ARC', 'HRT', 'URN', 'YTN', 'REC', 'ALT', 'ADM', 'KTL', 'SEO', 'EDG', 'BLG', 'TSR', 'DIL', 'MRK', 'MVZ', 'STS']
 const KART_NO = new RegExp('\\b(?:' + ONEKLER.join('|') + ')-\\d{1,5}\\b', 'g')
 const KART_UUID = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi
 
@@ -43,6 +44,52 @@ const MUAF = /compact/i
 const ATLATMA = /^\s*Kartsız:\s*(\S.{4,})$/im
 const MADDE = /^\s*(?:[-*•]|\d+[.)]|\*\*\d+[.)]?\*\*)\s+/
 const BASLIK_BENZERI = /^\s*(?:#{1,6}\s|\*\*[^*\n]{1,60}\*\*\s*$)/
+
+// ── ARC-43 genişletmesi (10-05): kapı OPS'un GERÇEK karar biçimlerine kördü ──
+// Ölçüm: "**285.** … Önerim evet", "bu pencerede evet demen yeterli", "| No | Karar | Önerim |" tablosu → 0 madde; sabah 285 ve 286
+// kartsız sorulup geçti. Recep output style'ının kendi karar biçimi bunlardır, yani kapı üslubun öngördüğü biçime kör kalmıştı.
+// Numaralı karar maddesi: satır başında kalın karar numarası ("**285.** …", "**Karar 285** …") VE aynı satırda öneri/evet/hayır/onay sözü.
+const KARAR_MADDESI = /^\s*(?:[-*•]\s+)?\*\*\s*(?:karar\s+)?\d{2,4}\s*[.)]?\s*\*\*\s*[.:)\-–—]?\s*\S/i
+const KARAR_KELIMESI = /(önerim|\bevet\b|\bhay[ıi]r\b|\bonay)/i
+// Doğrudan istek ifadeleri: bir şey yapmasını/demesini RECEP'ten bekler. İkinci kişi ŞARTTIR: "Ops'un onayını bekliyorum" Recep'e bir şey
+// sormaz (ölçüm 10-05: üçüncü kişi hâli 81.745 geçmiş mesajda gürültünün çoğuydu); "senin onayını bekliyor", "onayın gerekiyor", "demen yeterli" sorar.
+const ISTEK_IFADESI = /(demen\s+(?:yeterli|gerek(?:iyor|li)?|lazım)|evet\s+demen|hay[ıi]r\s+demen|karar\s+vermen|\bonay[ıi]n\s+(?:gerek|laz)|\bsenin\s+(?:[^\s.,;:|]+\s+){0,3}?(?:onay|karar)[a-zçğıöşü]*\s+(?:bekli|gerek|laz))/i
+// Bitmiş iş anlatımı istek değildir: "**284.** evet verildi, uygulandı".
+// \b Türkçe harflerde (ı ü ö ş ç ğ) kelime sınırı saymaz: «alındı», «kapandı» kaçıyordu → yan yana harf yok diye ölçülür.
+const BITMIS = /(?<![a-zçğıöşü])(?:verildi|verdin|verdi|dedin|dediğin|uygulandı|uyguladım|alındı|kapandı|kapattım|işlendi|yapıldı|birleşti|tamamlandı)(?![a-zçğıöşü])/i
+// Tırnak, «» ve ters tırnak içi alıntıdır, istek değildir (örnek ifadeyi anan satır Recep'ten bir şey istemez).
+const tirnaksiz = (satir) => String(satir).replace(/«[^»]*»|"[^"]*"|“[^”]*”|`[^`]*`/g, ' ')
+const SEPARATOR = /^\s*\|[\s:|-]+\|\s*$/
+
+/** Tablo hücrelerini ayırır: "| a | b |" → ['a','b']. */
+function hucreler(satir) {
+  return String(satir).trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((h) => h.trim())
+}
+
+/**
+ * "Önerim" sütunlu tablo (karar tablosu ya da tek tablo): Önerim hücresi DOLU (boş ya da "—" değil) her veri satırı bir istektir.
+ * Karar beklemeyen satırda Önerim boş/"—" olur (output style), o satır istek sayılmaz.
+ * Dönüş: { maddeler: [{metin}], sonSatir } — sonSatir tablonun son satırının dizinidir.
+ */
+function tablodanMaddeler(satirlar, bas) {
+  const baslik = hucreler(satirlar[bas])
+  const oneriSutunu = baslik.findIndex((h) => /^önerim$/i.test(h.replace(/\*/g, '')))
+  if (oneriSutunu < 0 || !SEPARATOR.test(satirlar[bas + 1] || '')) return null
+  // Durum sütunu varsa istek yalnız "Onayında" satırıdır (output style: Onayında = Recep'in kararını bekliyor); eski tablolar her satırda
+  // Önerim doldurmuştu, durumu Sürüyor/Bitti olan satır Recep'ten bir şey istemez. Durum sütunu yoksa (karar tablosu) Önerim dolu satır istektir.
+  const durumSutunu = baslik.findIndex((h) => /^durum$/i.test(h.replace(/\*/g, '')))
+  const maddeler = []
+  let k = bas + 2
+  for (; k < satirlar.length && /^\s*\|/.test(satirlar[k]); k++) {
+    const h = hucreler(satirlar[k])
+    const oneri = (h[oneriSutunu] || '').replace(/\*/g, '').trim()
+    if (oneri === '' || /^[—–\-]+$/.test(oneri)) continue
+    if (durumSutunu >= 0 && !/onayında/.test((h[durumSutunu] || '').replace(/\*/g, '').trim().toLocaleLowerCase('tr'))) continue
+    if (BITMIS.test(satirlar[k]) || MUAF.test(satirlar[k])) continue
+    maddeler.push({ metin: satirlar[k].trim() })
+  }
+  return { maddeler, sonSatir: k - 1 }
+}
 
 function kartBaslari(metin) {
   const bulunan = new Set()
@@ -91,7 +138,17 @@ function maddeleriCikar(metin) {
       i = j - 1
       continue
     }
+    if (/^\s*\|/.test(satir)) {
+      const t = tablodanMaddeler(satirlar, i)
+      if (t !== null) {
+        maddeler.push(...t.maddeler)
+        i = t.sonSatir
+        continue
+      }
+    }
     if (SATIR_KALIBI.test(satir)) maddeler.push({ metin: satir.trim() })
+    else if (KARAR_MADDESI.test(satir) && KARAR_KELIMESI.test(tirnaksiz(satir)) && !BITMIS.test(satir) && !MUAF.test(satir)) maddeler.push({ metin: satir.trim() })
+    else if (ISTEK_IFADESI.test(tirnaksiz(satir)) && !OLUMSUZ.test(satir) && !BITMIS.test(satir) && !MUAF.test(satir)) maddeler.push({ metin: satir.trim() })
   }
   return maddeler
 }

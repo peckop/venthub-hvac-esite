@@ -116,7 +116,8 @@ cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
   **önce ardıl kayıt açılır, sonra eski kayıt ona işaret ederek kapanır** (ORION §6).
 - **Kart yaşam döngüsü (karar 219; karar 187'nin Kanban karşılığı, Recep 2026-10-01).** Kanban'da otomatik
   kapanış YOKTUR: kart **kanıtla, elle** Done'a çekilir (§6.1: tek komut, çıkış koduyla konuşur).
-  - Her PR gövdesi `Kanban: <numara>` satırı taşır (`Kanban: HRT-2`; taşınan kart için `Kanban: REC-538`).
+  - Her PR gövdesinin İLK satırı `Kanban: <numara>` olur (`Kanban: HRT-2`; taşınan kart için `Kanban: REC-538`); numara aşağıda gömülü kalırsa
+    `node scripts/belge/kart-plan-kapisi.cjs --pr-govde-dosyasi <govde.md>` kırmızı verir (HRT-46; yerelde koşar, CI'da değil).
     Kapı bu satırı kabul eder (ARAÇ, PR 0).
   - **Geçiş penceresi KAPANDI (2026-10-08, karar 324):** kapı yalnız `Kanban:` satırını kabul eder; eski kalıplar
     `Fixes REC-nn` ve `Kayıtsız: <sebep>` ertesi günden beri KIRMIZI verir (`scripts/board/pr-kayit-kapisi.cjs`,

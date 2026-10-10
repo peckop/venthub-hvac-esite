@@ -47,7 +47,9 @@ export const tr = {
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
     brandTagline: 'Ventilation & HVAC',
-    brandLegalName: 'VentHub HVAC Solutions.',
+    // URN-83: şirket henüz kurulmadı; yasal unvan ("… Solutions." gibi) yazılmaz. Unvan kesinleşince bu değer
+    // tescilli unvanla DEĞİŞİR (anahtar adı bu yüzden "LegalName" kaldı). Kullanan: giriş sayfası alt yazısı.
+    brandLegalName: 'VentHub',
     vortice: 'Vortice',
     comma: ',',
     decrease: 'Azalt',
@@ -1159,10 +1161,13 @@ export const tr = {
   aboutPage: {
     title: 'Hakkımızda',
     vision: 'Katalog, Hesap, Teklif',
-    experience: 'Ürünü Olan Marka',
-    distributorship: 'Ürün Ailesi',
+    // Sayaç etiketleri KART SIRASINA göre (src/views/AboutPage.tsx `stats`): her anahtarın canlı değer kaynağı
+    // `hakkimizda-sayac.test.ts` içinde SABİTLENMİŞTİR (anahtar-kart kayması kırmızı verir). Anahtar adları tarihseldir:
+    // `distributorship` = ürünü olan marka sayısı (bayilik DEĞİL), `completedProject` = aktif model sayısı (proje DEĞİL).
+    experience: 'Yıllık Tecrübe',
+    distributorship: 'Ürünü Olan Marka',
     completedProject: 'Aktif Model',
-    shippingNetwork: 'Ürün Seçici Aracı',
+    productFamilies: 'Ürün Ailesi',
     precisionTitle: 'Ürün Seçici Araçları',
     precisionDesc: 'Hacim, debi ve basınç girdilerinizle kanal fanı, ısı geri kazanım (HRV), hava perdesi ve jet fan için ön değerlendirme yapabilirsiniz.',
     standardsTitle: 'Kaynaklı Rehberler',
@@ -1431,6 +1436,12 @@ export const tr = {
     reviewDesc: 'Ödemeniz bankanızdan alındı. Ödeme siparişinizle eşleştirilip doğrulanana kadar siparişiniz beklemede kalır.',
     reviewWarning: 'Lütfen tekrar ödeme yapmayın. Sorularınız için info@venthub.com.tr adresine yazabilirsiniz.',
     reviewBackHome: 'Ana Sayfaya Dön',
+    // BELİRSİZ sonuç (doğrulama hatası, ağ yok, "bekliyor"): ödemenin alındığı SÖYLENMEZ, alınmadığı da. Para çekilmiş
+    // olabilir; bu yüzden "başarısız" ekranı ve "tekrar dene" yok (çift tahsilat). Güvenlik incelemesi 10-10, bulgu 1.
+    pendingTitle: 'Ödemeniz Kontrol Ediliyor',
+    pendingDesc: 'Ödemenizin sonucunu şu an doğrulayamadık. Ödeme alınmış olabilir; durumu kontrol ediyoruz.',
+    pendingWarning: 'Lütfen tekrar ödeme yapmayın. Durumu siparişlerim sayfasından izleyebilirsiniz.',
+    pendingContactLabel: 'Sorularınız için',
     orderCompletedTitle: 'Siparişiniz Tamamlandı!',
     orderNoLabel: 'Sipariş No',
     orderCompletedDesc: 'Siparişiniz başarıyla alındı. Onay e-postası kısa süre içinde gönderilecektir.',
@@ -1441,8 +1452,6 @@ export const tr = {
     failedGeneric: 'Ödeme tamamlanamadı',
     failedToast: 'Ödeme hatası: {{msg}}',
     verifyError: 'Doğrulama hatası',
-    errorDuring: 'Hata: {{msg}}',
-    unverified: 'Ödeme doğrulanamadı',
     unexpected: 'Beklenmedik bir hata oluştu'
   },
   category: {
@@ -1913,6 +1922,7 @@ export const tr = {
       productDescription: 'Ürün Açıklaması',
       category: 'Kategori',
       noSpecsAvailable: 'Bu ürün için teknik özellik bulunmamaktadır.',
+      approxCurve: 'Yaklaşık eğri — üretici grafiğinden ayrıntılandırılıyor.',
       technicalDatasheet: 'TEKNİK VERİ SAYFASI',
       engineeringAnalysis: 'Teknik Özet',
       /** Ürün sayfasındaki kod satırının etiketi: değer `model_code`'dur, iç SKU değil (URN-32). */
@@ -2709,8 +2719,11 @@ export const tr = {
     seoDescription: 'Hacim, debi ve basınç değerlerinizle kanal fanı, ısı geri kazanım, hava perdesi ve jet fan için ön değerlendirme yapın.',
     araclar: {
       kanal: {
-        ad: 'Kanal fanı hesabı',
-        aciklama: 'Hacim ve hava değişim sayısından gerekli debiyi ve basıncı çıkarın.',
+        // URN-83: kart "hacim ve hava değişim sayısından debi" diyordu ama bağlantı KANAL BASINÇ KAYBI hesaplayıcısına
+        // gider (hedef: `calculators.duct` — debi + kanal ölçüsü girilir, hava hızı ve tahmini basınç kaybı çıkar).
+        // Kart metni hedef sayfanın kendi cümlesine çekildi; ondan fazlası söylenmez.
+        ad: 'Kanal basınç kaybı hesabı',
+        aciklama: 'Debi ve kanal ölçülerinize göre hava hızını ve tahmini basınç kaybını hesaplayın.',
       },
       hrv: {
         ad: 'Isı geri kazanım (HRV) hesabı',
@@ -3102,6 +3115,8 @@ export const tr = {
     badgeQuietest: 'En düşük dB(A)',
     badgeEfficient: 'EC motorlu',
     cardDelivers: 'Kanalınızda hesaplanan',
+    cardDeliversApprox: 'Kanalınızda hesaplanan (yaklaşık)',
+    cardApproxCurve: 'Yaklaşık eğri — üretici grafiğinden ayrıntılandırılıyor. Bu modelin yeterliliğini üreticiyle doğrulayın.',
     cardNoise: 'Ses seviyesi',
     cardDiameter: 'Bağlantı çapı',
     cardCta: 'Ürünü incele',

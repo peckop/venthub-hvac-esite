@@ -128,7 +128,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // (canonical-url-standard); ikisi de aynı `rotaDiliYoluOku` tablosundan çıkar. Anahtar kapalıyken
   // `rotaDiliYoluOku` rotayı AYNEN döndürür → bugünkü `/${lang}${route}`.
   const statikYol = (lang: string, route: string): string =>
-    route === '/products' ? dilYolu(lang).products() : `/${lang}${rotaDiliYoluOku(route, lang)}`
+    route === '/products'
+      ? dilYolu(lang).products()
+      : route === '/brands'
+        ? dilYolu(lang).brands() // marka listesi şemaya duyarlı (URN-85): TR `/tr/markalar` ↔ EN `/en/brands`
+        : `/${lang}${rotaDiliYoluOku(route, lang)}`
 
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({

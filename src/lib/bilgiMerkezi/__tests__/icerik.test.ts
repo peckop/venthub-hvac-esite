@@ -37,12 +37,12 @@ describe('Bilgi Merkezi yazıları', () => {
     }
   })
 
-  it('⭐KAYNAKSIZ SAYI YOK (R2): "Kaynaklar" bölümü olmayan yazının metninde ve özetinde rakam 0', () => {
+  it('⭐KAYNAKSIZ SAYI YOK (R2): "Kaynaklar" bölümü olmayan yazının metninde, özetinde ve kart özetinde rakam 0', () => {
     for (const { y, dil, m } of hepsi) {
       const kaynakliMi = /^## (Kaynaklar|Sources)\s*$/m.test(m.govde)
       if (kaynakliMi) continue
       // Bağlantı hedefleri (vh:model/<sku> gibi) metin değildir; yalnız görünen metin sayılır.
-      const gorunen = `${m.ozet}\n${m.govde.replace(/\]\([^)]*\)/g, ']')}`
+      const gorunen = `${m.ozet}\n${m.kartOzeti}\n${m.govde.replace(/\]\([^)]*\)/g, ']')}`
       expect(gorunen.match(/\d/g) ?? [], `${y.kimlik}/${dil}: kaynaksız rakam`).toEqual([])
     }
   })
