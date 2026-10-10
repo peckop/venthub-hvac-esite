@@ -1,6 +1,6 @@
-# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.0
+# Test Çalıştırma Düzeni ve Test Karnesi — Cetvel v1.2
 
-**Sürüm 1.0 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-07 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f**
+**Sürüm 1.2 · 2026-10-06 · Sahibi: ALTYAPI · Son doğrulama: 2026-10-09 · Kaynak: Kanban ALT-38 (OPS emri, Recep "başlat" dedi 10-06) ve karar 296; §4.3: ALT-38e, karar 308; §4.4: ALT-38f; §7: ALT-38b**
 
 > **Zorlayan kapılar:**
 > `INV-TEST-KOSU-1` → `src/__tests__/conformance/test-kosu-kapsami.test.ts` ·
@@ -13,11 +13,15 @@
 > `INV-CI-SECIM-2` → `src/__tests__/conformance/ci-test-secimi-kapsam.test.ts`, `src/__tests__/conformance/ci-test-secimi-hizli.test.ts`, `src/__tests__/conformance/ci-test-secimi-uyum.test.ts` ve `scripts/ci/__tests__/test-shard-secim.test.ts` (ortak yardımcı: `ci-test-secimi.yardimci.ts`) ·
 > `INV-E2E-HIZLI-1` ve `INV-E2E-HIZLI-2` → `src/__tests__/conformance/e2e-hizli-derleme.test.ts` ·
 > `INV-E2E-HIZLI-3` → `src/__tests__/conformance/e2e-smoke-paralel-kurulum.test.ts` ·
-> `INV-E2E-HIZLI-4` → `scripts/ci/__tests__/arka-plan.test.ts`
+> `INV-E2E-HIZLI-4` → `scripts/ci/__tests__/arka-plan.test.ts` ·
+> `INV-TEST-KARNE-1` → `src/__tests__/conformance/test-karnesi-yapisi.test.ts` ·
+> `INV-TEST-KARNE-2` → `scripts/test-karnesi/__tests__/ci-gecmis.test.ts` ·
+> `INV-TEST-KARNE-3` → `scripts/test-karnesi/__tests__/sabotaj.test.ts` ·
+> `INV-TEST-KARNE-4` → `scripts/test-karnesi/__tests__/karne-uret.test.ts`
 >
-> **Kapsam:** bu sürüm testlerin NEREDE koşacağını yönetir (§1–§5). Her test dosyasının KARNESİ (neyi koruyor, gerçekten
-> kırmızı veriyor mu, ortama bağlı mı, aynısını başka test koruyor mu) ve silme listesi kuralı işin ikinci teslimiyle (ALT-38b)
-> bu dosyaya §6'dan sonra eklenir. O zamana kadar karne bölümü bu cetvelde YOKTUR; "yok" bir eksik değil, işin ikinci teslimidir.
+> **Kapsam:** §1–§6 testlerin NEREDE koşacağını yönetir. §7 her test dosyasının KARNESİNİ (neyi koruyor, gerçekten kırmızı veriyor
+> mu, ortama bağlı mı, aynısını başka test koruyor mu, hangi dosya değişince koşmalı) ve silme listesi kuralını yönetir. Karne bir
+> ölçüm belgesidir, hüküm vermez: hiçbir test Recep onayı olmadan silinmez.
 
 ## 1. Amaç ve ilke
 
@@ -259,13 +263,17 @@ koşar; bekleme süresi dolarsa komut öldürülmez ve kapıyı prob verir.
 | `INV-CI-SHARD-2` | `ci-test-shard.test.ts`, `test-shard.test.ts`, `test-shard-bekle.test.ts` | bölmenin KAPSAMI gerçek `vitest list` ile: birleşim = liste, kesişim 0, her parça dolu, en yüklü/ortalama <= 1,25, belirlenimli ve girdi sırasından bağımsız, süresi bilinmeyen dosya da dağıtılır; shard'lar ∪ dünya durumu listesi = tam paket; `VENTHUB_TEST_SHARD_DOSYALARI` ile gerçek `vitest list` her parça için TAM o parçayı döner; özel karakterli yollar düz metin eşleşir. Birim: dağıtıcının ve bekleyicinin karar tabloları, her hata kırmızı |
 | `INV-CI-SECIM-1` | `ci-test-secimi.test.ts`, `ci-test-secimi-ifade.test.ts` (pinler: `ci-edited-ayna.test.ts`, `ci-test-shard.test.ts`, `ci-degisiklik-sinifi.test.ts`) | test seçiminin ve belge hızlı yolunun `ci.yml` bağı: seçici, harita ve sınıflayıcı YALNIZ `test-shard` işinde ve TABANDAN (`git show HEAD^1:`; PR kopyası, `HEAD:`, `HEAD^2:` ve çalışma ağacından harita yasak; sınıflayıcı seçicinin yanına konur, aksi hâlde seçici onu PR'dan yükler), seçim adımlarının GÖVDESİ tam eşitlik ve anlamsal değişmezler (tek `node`, `--kok`/`--harita`/`--cikti`, `--vitestsiz` yalnız birinci geçişte, çökme yedeği, seçici kendisi `tam=false` yazamaz; `bos` kararı yalnız birinci geçişte, seçicinin SON `tam`/`secilen-sayisi` değerinden, çökme yedeğinden SONRA ve gövdenin SON satırında); ifade doğruluk tablosu GERÇEK `if` metninden GitHub'ın tür dönüşümüyle değerlendirilir (kurulum/Test YALNIZ `bos` TAM `true` iken kapanır; çıktı eksik/boş/`false`/başka değer KOŞAR; eski `secilen-sayisi != '0'` biçimi yarım çıktıda ATLATIRDI); ÖLÇÜM (hızlı yolun dayanağı): tsconfig `include` yalnız .ts/.tsx, eslint yapılandırması docs/md/txt/csv okumaz, deno check kaynakları md/txt/csv içe aktarmaz; `ci`, öteki iş akışları ve `vitest.config.ts` seçiciyi bilmez (edited, push, elle koşum, zamanlı koşu tam); hızlı yol adımı (koşul, kimlik, sıra, çıktı tek yerde `belge=true`, yol süzgeci yalnız md/txt/csv) ve sekiz kod kapısının koşulu TAM eşitlik (kurulum: yalnız `cache-hit` isabetinde atlanır, `Setup Node` `id: node`); kayıt kapısı, Secret guard, Döküm kapısı, `ci` Test'i, Build ve bekleme adımı hızlı yolu OKUMAZ; shard kurulumu `--ignore-scripts`, `ci` kurulumu DEĞİŞMEZ; dağıtım adımı `id: dagit`; `ci` ve `test-shard` işlerinde iş akışı/iş düzeyinde `env:` ve adım düzeyinde `shell:`/`working-directory:` yasak (alt süreçlere sızıntı, pipefail kaybı). Sabotaj tablosu: 63 bozulma yakalanır |
 | `INV-CI-SECIM-2` | `ci-test-secimi-kapsam.test.ts`, `ci-test-secimi-hizli.test.ts`, `ci-test-secimi-uyum.test.ts`, `test-shard-secim.test.ts` | UYUM (seçici ve harita repoda varsa; yoksa atlanır): GERÇEK seçicinin çıktısı dağıtıcıda uygulanır ya da seçici tam dediyse tam dağıtılır, dağıtıcı çıktıyı REDDETMEZ (uyarı yok: sözleşme kaymadı), kurulumsuz geçiş nihai geçişin üst kümesidir. DAVRANIŞ (gerçek bash + gerçek git + tabandan sahte seçici): taban kopyası koşar PR kopyası ASLA, kopya yoksa `tam=true`, seçici çökerse kırmızı olmaz `tam=true`; `bos=true` YALNIZ seçicinin SON `tam=false` VE `secilen-sayisi=0` değerinde yazılır, sessiz, yarım çıktılı, boş yazıp çöken ya da kendi `bos`unu yazan seçicide `bos=false` ve koşullar KOŞAR; hızlı yol yalnız md/txt/csv farkında `belge=true` (Türkçe ad, silinen belge dahil), `.cjs`/`.mjs`/`.ts`/`.json`/silinen-taşınan kod/boş fark/git hatasında çıktı YOK. KAPSAM (gerçek `vitest list`, kip `dislan`): tam ise birleşim = liste; seçim (K = 0, 1, 3, 37, 200, tümü) ise birleşim = seçim, kesişim 0, boş parça `[]` + `kos=false`; KARMA KİP: dört işin her tam/seçim kombinasyonunda (K = 1, 5, 60, 150) birleşim ⊇ seçim, kesişim 0 (bölme tam listede, seçim parçayı süzer); seçilen vitest listesinde yoksa TAM; gerçek `include` bağı; ci.yml'deki GERÇEK dağıtım komutu bash'te koşar. Birim: seçici çıktısı doğrulaması (tutarsız sayı, geçersiz yol, tekrar, diskte yok = TAM), boş seçimde `vitest list` ÇAĞRILMAZ, tam modda boş parça kırmızı |
+| `INV-TEST-KARNE-1` | `test-karnesi-yapisi.test.ts` | en yeni `docs/audits/test-karnesi-*.json` YAPISAL olarak tutarlıdır (§7.5): sürüm, tarih, sayı ve kayıt tekrarı; her kayıtta sekiz soru bloğu; `olculmedi` nedensiz yazılamaz; sabotajı `UYGULANAMADI`/`TABAN_ATLANDI` olan kayıt "ölçüldü" olamaz; ölçülmemiş test `KORU` önerisi alamaz; 8. sorunun kaynak, tetik ve yer alanları geçerli; `scripts/ci/dunya-durumu-testleri.json`daki HER test karnede yeni yeriyle görünür; kanarya (300+ kayıt). Sabotaj: yedi bozulma yolu yakalanır. Karne tazeliği bilerek ölçülmez (§7.5) |
+| `INV-TEST-KARNE-2` | `ci-gecmis.test.ts` | CI geçmişi toplayıcısı (`ci-gecmis.cjs`): GitHub günlüğündeki iki renk biçimi (gerçek ESC ve iki karakterlik `^[` metni) soyulur; başarısız test dosyaları ayıklanır; `created=` pencereleri `total_count` ile doğrulanır, sayfalama sınırı uyarı verir; bayrak tablosu ve sayısal bayrakların tamsayı olması; süre örneği en yeni N başarılı koşu; `gh` çağrısının kendisi (URL, sayfa, bayrak) sahte GitHub'da assert edilir, kırmızı koşuda günlük çekilir; eşzamanlılık sınırı ve yeniden deneme; kullanım hatasında `gh` ÇAĞRILMAZ, çıkış kodu 1 |
+| `INV-TEST-KARNE-3` | `sabotaj.test.ts` | Bozma koşucusunun (`sabotaj.cjs`) güvenlik vaadi: plan doğrulama ve hedef reddi (`.git`, `node_modules`, sınanan testin kendisi, depo dışı); hüküm tablosu (yakalanırsa KIRMIZI, yakalanmazsa YESIL, sabotajsız kırmızı TABAN_KIRMIZI); gerçek git deposunda dört bozma türü uygulanır ve geri alınır (içerik byte-byte eşit, indeks temiz, art arda adımlar ters sırayla, CRLF); bağlı olmayan ana ağaç reddi ve kanıtlanamıyorsa kapalı kalma; koşucu uçtan uca sahte vitest ile: ana ağaçta çıkış 3, kirli ağaçta çıkış 2 (kirli ağaca dokunmadan), alt sürece sır ve `CLAUDE*` gitmez, boş geçici ev, zaman aşımı ve yan etki temizliği |
+| `INV-TEST-KARNE-4` | `karne-uret.test.ts` | Karne üreticisinin (`karne-uret.cjs`) karar kuralları: dünya olayı kümesi (aynı test en az 3 FARKLI dalda, ardışık en çok 12 saat arayla kırmızı; eşiklerin altı, kendisi ve üstü ayrı); kırmızıdan sonra aynı dalda ne olduğu; ortam hükmü (ölçüm sinyali > imza > hiçbiri); öneri sırası (taşındı > sahte yeşil > ortam > dünya durumu adayı > kısmi koruma > çoklu koruma > ölçülmedi > koru) ve her öncelik çifti; `UYGULANAMADI` / `TABAN_ATLANDI` ölçümü `OLCULMEDI` yapar, `KORU` yapmaz; kısmi koruma `KORU` yazılmaz; aynı test için çelişen iki hüküm sessizce çözülmez, yalnız gerekçeli `yerine-gecen.json` ilanı geçer; ek yoklama ana hükmü ezmez; `statik.cjs` ve `sabotaj.cjs` ile sözleşme |
 | `INV-E2E-HIZLI-1` | `e2e-hizli-derleme.test.ts` | `VENTHUB_E2E_TIP_LINT_ATLA` okuyucusu YALNIZ tam `1` açar; açıkken `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds` (tam iki anahtar), kapalıyken `next.config.mjs`in dışa verdiği nesnede bu anahtarlar HİÇ yok ve adresler (redirects/headers/rewrites) aynı; yeni Node sürecinde anahtar yalnız o sürecin ortamından okunur. Sabotaj: 7 gevşek okuyucu, 6 bozuk ayar üreticisi |
 | `INV-E2E-HIZLI-2` | `e2e-hizli-derleme.test.ts` | anahtar YALNIZ `e2e-smoke.yml`in `Build (real Supabase env)` adımının ADIM env'inde ve değeri tam `'1'`; iş/iş akışı env'i, `$GITHUB_ENV`, başka adım, başka iş akışı (`ci.yml` dahil), package.json, vercel.json, `.env*`, `scripts/` ve Playwright/Vitest ayarlarında YOK; yazım ayrışması kırmızı. Sabotaj: 9 iş akışı bozulması + `ci.yml` + 3 yüzey |
 | `INV-E2E-HIZLI-3` | `e2e-smoke-paralel-kurulum.test.ts` | `admin-smoke` adım sırası (apt Build'ten önce başlar, `bekle` Build'ten sonra ve probtan ÖNCE, prob smoke'tan önce), apt sınırı ≤ 90 sn × 2 deneme ve kemer aritmetiği, `bekle` süresi ≥ en kötü süre, `bekle` en-iyi-çaba, prob `continue-on-error`suz ve fatal. Sabotaj: 14 bozulma |
 | `INV-E2E-HIZLI-4` | `scripts/ci/__tests__/arka-plan.test.ts` | `arka-plan.sh` gerçek bash ile: `baslat` hemen döner ve çıktı borusunu tutmaz, `bekle` çıkış kodunu taşır (124 süre, 125 başlatılmamış, 2 kullanım), öldürülen işlem ön planda yeniden koşar (alıntı + ortam korunur), pid dosyası yok/sıfır/bozuksa süreç yaşıyor sanılmaz, eski sonuç karışmaz. Sabotaj: 9 betik bozulması |
 
 Yeni bir dünya durumu kaydı ya da yeni bir `ci` adımı ekleyen değişiklik bu kapılardan geçer; kapı kırmızıysa kayıt ya da sınıflandırma
-eksiktir, kapı gevşetilmez. Karne bölümü (§6 ve sonrası) ALT-38b ile bu tabloya kapı ekler.
+eksiktir, kapı gevşetilmez. Karne bölümü (§7) bu tabloya `INV-TEST-KARNE-1` ile `INV-TEST-KARNE-4` arasını ekledi.
 
 ## 6. Test seçimi (karar 308)
 
@@ -420,3 +428,146 @@ Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz, hepsi d
    tam paketle aynı mertebede ya da biraz altında kalır (4 çekirdekli CI'da yerelden uzun olabilir); kazanç belge PR'ındadır. Kapatma yolu: her testin içe aktarma kapanımını ve
    kapanımdaki dosya özetlerini haritaya önbellek olarak yazmak; seçimde yalnız özeti uyuşmayan (ya da dosya eklenen/silinen) testlerin grafiğini canlı hesaplamak. Önbellek yalnız
    HIZ içindir, geçersizse canlı hesaba düşer (doğruluk haritanın tazeliğine bağlı olmaz). Ölçülmeden açılmaz: seçim `vitest related` sonucunun ÜST KÜMESİ olmalı (94 PR ve B4 ile karşılaştırılır).
+
+## 7. Test karnesi (ALT-38b)
+
+**Sürüm 1.2 · 2026-10-09 · Sahibi: ALTYAPI · Kaynak: Kanban ALT-38 (OPS emri 10-09; Recep'in "hangi test kalır, hangisi silinir" sorusu) ve karar 296 · Ölçüm: `docs/audits/test-karnesi-2026-10-09.json` (ham, makine okunur) ve `.md` (insan özeti) · Recep özeti: `docs/audits/test-karnesi-ozet-recep-2026-10-09.md`**
+
+Karne, her test dosyası için sekiz sorunun cevabıdır ve **ölçülenle ölçülmeyen ayrı yazılır**. Bir ÖLÇÜM BELGESİDİR, hüküm vermez: `oneri` alanı bir ADAYDIR.
+Silme ve taşıma kararı insanındır; silme listesi Recep onayıyla çıkar, onaysız hiçbir test silinmez. Ölçülemeyen şey "ölçülmedi" ve nedeniyle yazılır,
+tahmin yazılmaz; ölçülmemiş test `KORU` önerisi alamaz.
+
+### 7.1 Parçalar
+
+| Parça | Dosya | Ne yapar |
+|---|---|---|
+| Üretici | `scripts/test-karnesi/karne-uret.cjs` | Ölçüm çıktılarını birleştirir ve sınıflar; **hiçbir şey ölçmez** |
+| Bozma ölçümü | `scripts/test-karnesi/sabotaj.cjs` | Bir testin koruduğu şeyi bozan sabotajları ("bozma") sırayla uygular, testi yeniden koşar, bozmayı geri alır ve sha256 ile doğrular; **ilk yakalanışta durur**. Yalnız bağlı worktree'de koşar, ana ağaçta ve testin kendisini bozmayı reddeder |
+| CI geçmişi | `scripts/test-karnesi/ci-gecmis.cjs` | GitHub'dan `ci.yml` koşularını ve kırmızılardaki başarısız test dosyalarını okur |
+| Statik tarama | `scripts/test-karnesi/statik.cjs` | Kaynaktan ortam imzası, benzerlik adayı, INV/karar/cetvel atıfları ve testin kaynakta andığı yolları çıkarır |
+| Tetik beyanı | `scripts/test-karnesi/beyan.cjs`, `beyan-tabani.json` | Testin başlığındaki `TETİK:` / `YER:` satırını okur (8. soru). Beyansız yeni testi reddeden kapı (`INV-TEST-BEYAN-1`) bu sürümde KURULU DEĞİLDİR (§7.7, madde 5) |
+| Çıktı | `docs/audits/test-karnesi-YYYY-AA-GG.json` ve `.md` | Karne: her test dosyası için bir kayıt. Recep'e giden düz özet ayrı dosyadır (`test-karnesi-ozet-recep-*.md`) |
+
+### 7.2 Sekiz soru
+
+| Alan | Soru | Cevap biçimi |
+|---|---|---|
+| `q1_korur` | Bu test neyi koruyor? | `metin` (tek cümle; bilinmiyorsa `null`), `kaynak` (cevabı kimin yazdığı), `inv` / `kararlar` / `cetveller` (atıflar) |
+| `q2_ci` | CI geçmişinde kaç kez kırmızı verdi, kaçı PR'dan bağımsız? | `kirmizi`, `dal`, `master`. `dunyaKumesi`: aynı testin, ardışık aralığı en çok 12 saat olan bir koşu zincirinde en az 3 farklı dalda kırmızı verdiği "dünya olayı" kümelerindeki kırmızılar (PR'ın hatası sayılmaz). Kümede olmayan `izole` kırmızılar, aynı daldaki sonraki koşuya göre `duzeldi` / `halaKirmizi` / `belirsiz` |
+| `q3_sabotaj` | Koruduğu şey bozulunca kırmızı veriyor mu? | `durum`: `olculdu` / `olculmedi` (+ `neden`). Ölçen hükümler: `KIRMIZI` (bir bozma yakalandı), `YESIL` (hiçbiri yakalanmadı), `TABAN_KIRMIZI` (bozma yapılmadan kırmızı). Ölçmeyen hükümler: `UYGULANAMADI`, `TABAN_ATLANDI`; karne bunlara "ölçüldü" demez. `denenen` / `yakalanan` / `yakalanmayanlar` ana tur, `ekDenenen` / `ekYakalanmayan` ek yoklama; `kismi`: hüküm `KIRMIZI` ama en az bir bozma yakalanmadı |
+| `q4_ortam` | Ortama (saat, ağ, ev dizini, makine, dünyanın durumu) bağlı mı? | `bagli`: sabotajsız taban koşusu ya da tam yerel koşu kırmızı, ya da CI kırmızılarının en az yarısı dünya olayı kümesinde. `supheli`: yalnız kaynak imzası (ev dizini, git geçmişi, ağ, veritabanı, sunucu, sabitlenmemiş saat) ya da ajan notu. `bagimsiz`: hiçbiri |
+| `q5_sure` | Ne kadar sürüyor? | `dosyaMs`, `testMs`, `testSayisi`: tam yerel koşu, 3 işçi, çekişmeli; yalnız GÖRELİ sıralama içindir. CI'da dosya başına süre ölçülmez |
+| `q6_kopya` | Aynı şeyi başka test de koruyor mu? | `olculen`: aynı bozmada kırmızı veren ve tabanda yeşil olan eş testler. `adaylar` / `olculenAday`: kaynak benzerliği, ölçüm değildir |
+| `q7_kanban` | Artık Kanban ya da kokpit mi koruyor? | Ajan değerlendirmesi (`ajan`), ölçüm değildir |
+| `q8_tetik` | Bu test hangi dosya değişince koşmalı? | `kaynak`: `beyan` (testin kendi `TETİK:` satırı), `statik` (kaynakta andığı yollar, KESİN DEĞİL), `yok` (+ `olculmedi` nedeni). `yer`: `PR` / `zamanli` |
+
+### 7.3 Öneri sözlüğü
+
+`oneri.tur` KAPALI bir sözlüktür. Sıra, üreticinin denetim sırasıdır; ilk eşleşen kazanır. Koşucuya yeni bir hüküm eklenirse, üreticinin "ölçen hükümler"
+listesine girene kadar öneri `OLCULMEDI` olur (sessizce `KORU` olmaz).
+
+| Sıra | `tur` | Koşul | Anlamı |
+|---|---|---|---|
+| 1 | `TASINDI` | PR kapısından zaten çıkmış (`scripts/ci/dunya-durumu-testleri.json`) | Dokunulmaz; yeni yeri `dunyaDurumu` alanında yazılı |
+| 2 | `CELISKI-INCELE` | İki ölçüm aynı test için farklı hüküm verdi | İnsan çözer |
+| 3 | `SAHTE-YESIL-ADAYI` | Denenen bozmaların hiçbiri yakalanmadı | Test mi bozma mı kör: yeniden ölçülür |
+| 4 | `ORTAM-INCELE` | Bozma yapılmadan bile kırmızı | Ortam ya da gerçek hata incelenir |
+| 5 | `TASI-ADAYI-DUNYA-DURUMU` | Ortama bağlı ve kırmızılarının en az yarısı dünya olayı kümesinde | PR kapısı dışına taşıma ya da bölme adayı (§7.4, madde 1) |
+| 6 | `KISMI-KORUMA` | Test kırmızı veriyor ama denenen bozmalardan en az biri (ana tur ya da ek yoklama) yakalanmadı | Güçlendirme adayı; silme adayı DEĞİLDİR |
+| 7 | `COKLU-KORUMA-ADAYI` | Aynı bozmayı başka test de yakalıyor ve test pencerede hiç kırmızı vermedi | Birleştirme adayı; silme için §7.4, madde 4 |
+| 8 | `OLCULMEDI` | Bozma ölçümü yok ya da hiçbir şey ölçmedi | Dokunulmaz; `KORU` yazılmaz |
+| 9 | `KORU` | Ölçüldü ve denenen bozmaların hiçbiri kaçmadı | Dokunulmaz. "Tam korunuyor" demek DEĞİLDİR: ana tur ilk yakalanışta durur, kalan bozmalar denenmez |
+
+### 7.4 Taşıma, bölme, güçlendirme, birleştirme ve silme
+
+1. **Taşıma ve bölme** (`TASI-ADAYI-DUNYA-DURUMU`): §3 geçerlidir. Bütün kırmızıları PR'dan bağımsız (dünya olayı) olan test `scripts/ci/dunya-durumu-testleri.json`a
+   taşınır; neden, kanıt ve yeni yer yazılır, kanıt `q2_ci` sayılarıdır. Kırmızılarının bir kısmı PR'ın KENDİ hatası olan test (`izole` kırmızılar sonraki koşuda
+   `duzeldi`) tümden taşınmaz: dünya durumu kolu ayrı dosyaya çıkar, PR kolu PR'da kalır (örnek: `taban-tazeligi` ve `taban-tazeligi-dunya`). Aksi hâlde PR'ın gerçek
+   hatasını yakalayan kol da kaçar.
+2. **Güçlendirme** (`KISMI-KORUMA`): test kalır. Yakalanmayan her bozma için bir kontrol eklenir ve o bozma yeniden uygulanıp testin kırmızı verdiği gösterilir.
+   Sıra: para, yetki ve veritabanı kapıları önce.
+3. **Birleştirme** (`COKLU-KORUMA-ADAYI`): iki testin bütün kontrolleri tek dosyada toplanır, hiçbiri düşmez. Kazanç dosya sayısıdır, süre değil (bugünkü üç adayın
+   toplamı yaklaşık 16 sn); öncelik düşüktür.
+4. **Silme listesi.** Karne kimseyi sildirmez. Bir test silme listesine ancak şu koşulların HEPSİYLE girer:
+   - öneri `COKLU-KORUMA-ADAYI`;
+   - adayın bozmaları, ilk yakalanışta DURMAYAN bir koşuda yeniden denenmiş; en az 3 FARKLI bozma çıkmış ve her birini en az bir eş test yakalıyor. Tek ya da
+     çift bozmanın örtüşmesi rastlantı olabilir; bir bozmayı yalnız aday yakalıyorsa aday silinmez. Bugünkü ölçüm ilk yakalanışta durduğundan bu koşullar için
+     AYRI bir ölçüm gerekir;
+   - Recep onayı.
+
+   Silme PR'ı adayın INV/karar atıflarını eşe taşır ve karneyi aynı PR'da yeniler.
+
+### 7.5 Kapı
+
+`INV-TEST-KARNE-1`, `src/__tests__/conformance/test-karnesi-yapisi.test.ts`: `docs/audits/` altındaki en yeni `test-karnesi-YYYY-AA-GG.json`u denetler.
+
+- Şema: sürüm 1, tarih biçimi, `dosyaSayisi` kayıt sayısına eşit, kayıt tekrarı yok, küme geçerli.
+- Her kayıtta sekiz soru bloğu var; `q4` hükmü sözlükte.
+- `olculmedi` nedensiz yazılamaz; `UYGULANAMADI` / `TABAN_ATLANDI` hükmü "ölçüldü" yazılamaz; ölçülmemiş test `KORU` önerisi alamaz.
+- 8. soruda `kaynak` geçerli; `beyan` / `statik` tetiği boş değil ve yalnız metin içerir; `yok` nedenli; `beyan` yeri `PR` ya da `zamanli`.
+- `scripts/ci/dunya-durumu-testleri.json`daki HER test karnede, `dunyaDurumu` alanı ve yeni yeriyle görünür ("hiçbir koruma sessizce düşmez" sözünün mekanik karşılığı, §1).
+- Kanarya: karne 300'den fazla kayıt taşır (boş belgeyle yeşil verilmez).
+
+Yedi sabotaj vakası denetçinin her kolunu bozar (alan silme, nedensiz `olculmedi`, dünya durumu kaydının silinmesi / yer değişmesi / alanın boşalması, tekrar ve sayı,
+8. soru kolları, sabotajı ölçmeyen hükmün "ölçüldü" yazılması).
+
+Karneyi üreten üç aracın kendi birim testleri de kapıdır, çünkü araç bozulursa karne sessizce yanlış üretilir ve hiçbir şey kırmızı vermez:
+
+- `INV-TEST-KARNE-2`, `scripts/test-karnesi/__tests__/ci-gecmis.test.ts`: CI geçmişi toplayıcısı. Doğum sebebi iki gerçek kusurdur (ALT-38, 2026-10-06 ölçüldü):
+  GitHub günlüğünün renk kodu gerçek ESC değil `^[` metni gelir (yalnız ESC'yi soyan ilk sürüm 182 kırmızı koşuda 0 test dosyası buldu) ve
+  `status=failure&page=N` sayfalaması kararsızdır (pencereler `total_count` ile doğrulanır).
+- `INV-TEST-KARNE-3`, `scripts/test-karnesi/__tests__/sabotaj.test.ts`: bozma koşucusu. Tek vaadi "bozduğunu tam geri alır, ana ağaca dokunmaz, sır görmez"dir;
+  vaat saf yüklemlerle değil koşucunun kendisi gerçek git deposunda ve sahte vitest ile uçtan uca koşarak ölçülür.
+- `INV-TEST-KARNE-4`, `scripts/test-karnesi/__tests__/karne-uret.test.ts`: öneri adayının hangi kanıttan çıktığı. Ölçülmemiş test `KORU` olamaz, kısmi koruma
+  `KORU` yazılamaz, çelişen iki hüküm sessizce çözülmez; her eşik üç yanıyla (altı, kendisi, üstü) ve her öncelik çifti ayrı satırdır.
+
+**Bilerek YOK: karne tazelik kapısı** (karne yaşı ya da "karnede olmayan yeni test dosyası"). Takvimle kırmızı olan kapı, PR'dan bağımsız kırmızı üretir; §1'deki
+`taban-tazeligi` örneği (55 kırmızı, 39 dal) aynı hatadır. Tazelik görev olarak yaşar (§7.6).
+
+### 7.6 Yenileme (görev; kapı değil)
+
+Karneyi ALTYAPI yeniler: ayda bir, ve bir kapıyı PR dışına çıkaran ya da yeni öneri türü / yeni soru ekleyen değişiklikten sonra. Sıra:
+
+1. `node scripts/test-karnesi/ci-gecmis.cjs --cikti <dizin>/ci-gecmis.json` (`--baslangic` ve `--bitis` ile pencere);
+2. tam yerel vitest JSON raporu (`--reporter=json --outputFile`);
+3. bozma ölçümü: `node scripts/test-karnesi/sabotaj.cjs --repo <bağlı worktree> --plan <plan.json> --cikti <dizin>/gNN.jsonl`; önce karnede `olculmedi` olanlar
+   (para, yetki ve veritabanı kapıları önce), sonra kaynağı değişenler;
+4. `node scripts/test-karnesi/karne-uret.cjs --ci <ci-gecmis.json> --vitest <vitest.json> --sabotaj <dizin> --cikti-json docs/audits/test-karnesi-YYYY-AA-GG.json --cikti-md docs/audits/test-karnesi-YYYY-AA-GG.md`.
+
+Eski tarihli karne silinmez. **Bilinen sınır:** ham bozma çıktıları (`gNN.jsonl`, yaklaşık 3 MB, test çıktı satırları taşır) ve bozma planları depoya girmez;
+2026-10-09 karnesinin 347 ölçümü yalnız karne JSON'unda yaşar. Üretici önceki karneyi girdi olarak OKUMAZ, bu yüzden bir sonraki yenileme eski ölçümleri kaybeder;
+önce `--onceki` bayrağı gerekir (§7.7, madde 4).
+
+### 7.7 Ölçülmüş durum ve açık konular (2026-10-09)
+
+| Ölçü (ham veri: `docs/audits/test-karnesi-2026-10-09.json`) | Değer |
+|---|---|
+| Test dosyası | 654 (conformance 361, birim 222, betik 46, e2e 17, edge 7, smoke 1) |
+| Bozma ölçümü yapılan / yapılmayan | 347 / 307 (ölçülenlerin hepsi conformance) |
+| Ölçülen 347'nin hükmü | 345 `KIRMIZI` · 1 `YESIL` · 1 `TABAN_KIRMIZI` |
+| Denenen / kaçan bozma | 709 / 306 (ana tur 558 / 213; ek yoklama 151 / 93, 107 testte) |
+| En az bir bozması kaçan test (`kismi`) | 221 |
+| Öneri dağılımı | `OLCULMEDI` 306 · `KISMI-KORUMA` 218 · `KORU` 117 · `TASI-ADAYI-DUNYA-DURUMU` 7 · `COKLU-KORUMA-ADAYI` 3 · `SAHTE-YESIL-ADAYI` 1 · `ORTAM-INCELE` 1 · `TASINDI` 1 |
+| 8. soru | 2 `beyan` · 292 `statik` (kesin değil) · 360 `yok` (hangi dosya değişince koşacağı belirlenemedi) |
+| Silinecek test | 0: §7.4 madde 4 sağlanmadı, üç adayın her birinde yalnız 1 bozma denendi |
+| CI penceresi | `ci.yml` koşuları, 2026-07-06..2026-10-07 |
+
+**Okuma kuralı.** `yakalanan` ana turda en çok 1'dir (ilk yakalanışta durulur), bu yüzden "yakalanan / denenen" bir yakalama oranı DEĞİLDİR ve hiçbir belgede oran
+olarak yazılmaz. Doğru okuma: ölçülen 347 testin 345'i en az bir bozmayı yakalar (gerçekten kırmızı verir); 221'inin en az bir bozması kaçar (güçlendirme listesi);
+117 testin denenen bozmalarından hiçbiri kaçmaz, ama bu kalan bozmaların denenmediği anlamına da gelir. Bozmalar el yapımıdır, rastgele örnek DEĞİLDİR.
+
+Açık konular (sahibi ALTYAPI; hiçbiri bu bölümü geçersiz kılmaz):
+
+1. **307 test ölçülmedi** (birim, betik, e2e, edge, smoke ve ölçümden sonra eklenen conformance testleri); hiçbirine tahmini hüküm yazılmadı. Sıradaki ölçüm
+   turu: para, yetki ve veritabanı kapıları önce (ALT-38k).
+2. **İki ölçüm yeniden yapılacak:** `belge-kart-plan-kapisi.test.ts` (bozma yapılmadan kırmızı: ölçüm makinesinde satır sonu CRLF; `ORTAM-INCELE`) ve
+   `instruction-surface-ppr.test.ts` (iki bozma yakalanmadı ama test yalnız kayıtlı dosyalara bakıyor, bozmalar kayıtlı değildi; `SAHTE-YESIL-ADAYI`).
+3. **Uygulama kayıtları** (bu PR'ın dışında, ayrı Kanban kartları): ALT-38i, PR kapısından çıkacak 2 test (`sessionstart-tavan`, `githooks-doc-scope`; üç ayda 10
+   kırmızı, ikisi de toplu olay) ve bölünecek 4 test (`comment-scrubber-scheme-safety`, `companion-parity-coverage`, `standard-section-integrity`,
+   `uretilmis-artefakt-tazeligi`); ALT-38j, birleşecek 3 test (`bash-write-audit-uretilmis-sinifi`, `e1-kimlik-kontrolu`, `storage-yazma-nobetcisi`, eşleriyle);
+   ALT-38k, güçlendirme dalgası 1 ve ölçülmeyen testlerin ölçümü.
+4. **`--onceki` bayrağı** (ALT-38l): üretici önceki karnenin `q3_sabotaj` sonuçlarını, kaynağı değişmemiş testler için devralır; bunsuz yenileme eski ölçümleri
+   kaybeder (§7.6).
+5. **`INV-TEST-BEYAN-1` kurulu değil.** "Beyansız yeni test birleşmez" kuralı her yeni test başlığına `TETİK:` / `YER:` yazma zorunluluğu getirir; bu yeni bir
+   zorunluluktur ve ayrı karar ister. Okuyucu ve taban (`beyan.cjs`, `beyan-tabani.json`) hazırdır; kapı karar sonrası eklenir.
+6. **Ölçüm tek makinede** (Windows) yapıldı; Linux'ta farklı kolu izleyen test (platforma bağlı atlama) farklı çıkabilir. CI'da dosya başına süre ölçülmedi.
