@@ -203,7 +203,8 @@ karta bugün düşülen not onu bugüne taşır. Betik yalnız Done kolonundaki 
 kalmış, PR birleşmiş) bu ölçüye girmez; onu `node scripts/board/teslim-kart-koprusu.cjs` ölçer (bugün origin/master'a giren her PR'ın
 numarası (`#N`, `PR N` ya da `.../pull/N`; komşu numara anmak sayılmaz: `#17`, `#1786`'yı karşılamaz) ya da tek başına duran en az 7
 karakterlik commit kısaltması o gün yazılmış bir kart notunda geçmeli; departman başına "Teslim N, kart notunda geçmeyen M: #PR (kart)";
-eşik **0**; ölçülemeyen hal çıkış 2). Dependabot birleştirmeleri (başlığı `chore(deps…):` ya da `chore(ci…):`) teslim sayılmaz: ayrı
+eşik **0**; ölçülemeyen hal çıkış 2). Dependabot birleştirmeleri (başlığı `chore(deps…):`, `chore(ci…):` ya da `chore(tools…):`;
+önekler `.github/dependabot.yml`'deki `commit-message.prefix` değerleridir, test ikisini eşit tutar) teslim sayılmaz: ayrı
 "Bot PR" satırında görünür, çıkış kodunu etkilemez (OPS 10-10). İkisi birlikte koşulur; notsuz bulunan teslim sahibine yazılır, OPS'a özet gider.
 
 **Ölçülmüş tuzaklar ve karşılıkları:**

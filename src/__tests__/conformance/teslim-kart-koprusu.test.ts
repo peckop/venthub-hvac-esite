@@ -98,20 +98,34 @@ describe('INV-TESLIM-KART-1 · departman ve teslim ayrıştırma', () => {
     expect(ikisi.teslimler.map((t) => t.pr)).toEqual(['1774'])
   })
 
-  it('bot PR\'ı (dependabot "chore(deps…):" / "chore(ci…):") teslim DEĞİL, ayrı döner; insan başlıkları ve başka chore kapsamları teslimdir', () => {
+  it('bot PR\'ı (dependabot "chore(deps…):" / "chore(ci…):" / "chore(tools…):") teslim DEĞİL, ayrı döner; insan başlıkları ve başka chore kapsamları teslimdir', () => {
     const { teslimler, prSiz, botlar } = T.teslimleriCoz([
       'b111111|chore(deps): bump next from 15.5.26 to 15.5.27 in the guvenlik group (#1749)',
       'b222222|chore(ci): bump actions/cache from 4.3.0 to 6.1.0 (#1695)',
       'b333333|chore(deps-dev): bump vitest (#1700)',
       'b444444|Chore(CI): büyük harfli yazılmış (#1701)',
+      'b555555|chore(tools): bump @modelcontextprotocol/sdk in /tools/wrongstack-mcp (#1810)',
+      'b666666|chore(tools-deps): bileşik kapsam (#1811)',
       'c111111|chore(docs): belge düzeltmesi (#1702)',
       'c222222|chore: kapsamsız (#1703)',
       'c333333|URUN (URN-1): not chore(deps): bump başlığın ortasında geçer (#1704)',
       'c444444|chore(deps): PR numarasız bot commit',
+      'c555555|HARİTA (HRT-1): chore(tools): ortada geçer (#1812)',
     ])
-    expect(botlar.map((b) => b.pr)).toEqual(['1749', '1695', '1700', '1701'])
-    expect(teslimler.map((t) => t.pr)).toEqual(['1702', '1703', '1704'])
+    expect(botlar.map((b) => b.pr)).toEqual(['1749', '1695', '1700', '1701', '1810', '1811'])
+    expect(teslimler.map((t) => t.pr)).toEqual(['1702', '1703', '1704', '1812'])
     expect(prSiz.map((c) => c.kisa)).toEqual(['c444444'])
+  })
+
+  it('bot öneki listesi .github/dependabot.yml ile aynı: her `commit-message.prefix` bot sayılır (yeni ekosistem eklenirse bu test kırılır)', () => {
+    const yml = fs.readFileSync(path.join(KOK, '.github', 'dependabot.yml'), 'utf8')
+    const onekler = [...yml.matchAll(/^\s*prefix:\s*['"]?(chore\([^)]*\))['"]?\s*$/gm)].map((m) => m[1])
+    expect(onekler.length).toBeGreaterThanOrEqual(3)
+    for (const onek of onekler) {
+      const { botlar, teslimler } = T.teslimleriCoz([`d000001|${onek}: bump x (#1900)`])
+      expect(botlar.map((b) => b.pr), `${onek} bot sayılmadı`).toEqual(['1900'])
+      expect(teslimler).toHaveLength(0)
+    }
   })
 
   it('harf sonekli kart numarası düşmez (10-08: ALT-38e, ALT-37d, ALT-37b başlıkları kartsız görünüyordu)', () => {

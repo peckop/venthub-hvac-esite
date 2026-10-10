@@ -42,10 +42,11 @@ const { VeriHatasi, gunAdi, gunGecerli, bugun, notSayilir } = K
 const KART_NO = /\b([A-Z]{2,5}-\d+[a-z]?)\b/
 const PR_SONU = /\(#(\d{2,6})\)\s*$/
 /**
- * Bot PR'ı (dependabot): başlık "chore(deps…):" ya da "chore(ci…):" ile başlar (10-08: #1749, #1695). Sahibi bir departman değil, kartı
- * yok; PR numarasız commit gibi AYRI satırda sayılır ve çıkış kodunu etkilemez (OPS kararı, 10-10). Son 400 commit'te başka bot öneki yok.
+ * Bot PR'ı (dependabot): başlık "chore(deps…):", "chore(ci…):" ya da "chore(tools…):" ile başlar (10-08: #1749, #1695; "tools" =
+ * tools/wrongstack-mcp, Pazartesi 06:00). Önekler .github/dependabot.yml'deki `commit-message.prefix` değerleridir (üç ekosistem, üç önek).
+ * Sahibi bir departman değil, kartı yok; PR numarasız commit gibi AYRI satırda sayılır ve çıkış kodunu etkilemez (OPS kararı, 10-10).
  */
-const BOT_BASLIK = /^chore\((?:deps|ci)[^)]*\)\s*:/i
+const BOT_BASLIK = /^chore\((?:deps|ci|tools)[^)]*\)\s*:/i
 /** Commit kısaltması en az bu kadar karakter (git %h) olmalı; daha kısası PR anmaz. */
 const KISA_MIN = 7
 /** Metindeki 7-40 karakterlik onaltılık sözcükler (harf ya da rakama bitişik olmayan): commit kısaltması adayı. */
@@ -191,40 +192,13 @@ function logOku(yol) {
   }
 }
 
-/** Not verisi: --tam dışa aktarımı. Done şartı aranmaz (köprü Done dışı kartları da görür); kayıt boşluğu ve bayatlık denetlenir. */
+/**
+ * Not verisi: --tam dışa aktarımı. Okuyucu kart-not-sayimi.cjs'inkidir (python/py döngüsü, kayıt boşluğu, bayatlık: tek kopya;
+ * iki kopya 10-10'da `python3` düzeltmesini iki yerde yaptırmıştı). Köprü Done dışı kartları da görür, bu yüzden "en az bir Done" şartı kapalı.
+ */
 function kanbanOku(a, gun) {
-  if (a.dosya) {
-    let d
-    try {
-      d = JSON.parse(fs.readFileSync(a.dosya, 'utf8'))
-    } catch (e) {
-      throw new VeriHatasi(`Kanban dosyası okunamadı/çözülemedi: ${a.dosya} (${e.code || 'JSON'})`)
-    }
-    return kontrol(d, gun)
-  }
-  for (const py of ['python', 'py']) {
-    const r = spawnSync(py, [path.join(REPO, 'scripts', 'nlm', 'kanban_disa_aktar.py'), '--tam'], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, timeout: 120000 })
-    if (r.error && r.error.code === 'ENOENT') continue
-    if (r.error) throw new VeriHatasi(`${py} çalıştırılamadı: ${r.error.message}`)
-    if (r.status !== 0) throw new VeriHatasi(`dışa aktarım çıkış ${r.status}: ${(r.stderr || '').trim().split('\n').pop()}`)
-    try {
-      return kontrol(JSON.parse(r.stdout), gun)
-    } catch (e) {
-      if (e instanceof VeriHatasi) throw e
-      throw new VeriHatasi('dışa aktarım JSON çözülemedi')
-    }
-  }
-  throw new VeriHatasi('python bulunamadı (python ya da py PATH içinde olmalı)')
-}
-
-function kontrol(d, gun) {
-  if (!d || !Array.isArray(d.kayitlar) || d.kayitlar.length === 0) throw new VeriHatasi('kayitlar[] yok ya da boş — Kanban verisi ölçülemedi')
-  if (d.kayitlar.some((k) => !k || typeof k !== 'object')) throw new VeriHatasi('kayitlar[] içinde kayıt olmayan öğe var')
-  if (d.damga) {
-    const g = gunAdi(d.damga)
-    if (g !== null && g < gun) throw new VeriHatasi(`dışa aktarım damgası (${d.damga}) istenen günden (${gun}) eski — bayat dosya`)
-  }
-  return d.kayitlar
+  const secenek = { doneSart: false }
+  return a.dosya ? K.dosyadanOku(a.dosya, gun, secenek) : K.canlidanOku(gun, secenek)
 }
 
 /** `simdi` yalnız test içindir (varsayılan gün saat dilimi sınırında sınanabilsin diye saat dışarıdan verilir). */
