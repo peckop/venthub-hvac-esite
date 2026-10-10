@@ -10,7 +10,7 @@ import { useCategoryViewModel } from '../hooks/useCategoryViewModel'
 import { useI18n } from '../i18n/I18nProvider'
 import { compareText } from '../i18n/sort'
 import type { DomainCategory } from '../lib/type-converters'
-import type { FamilyListItem } from '../types/ui-models'
+import type { FamilyListItem, KatalogSayilari } from '../types/ui-models'
 
 // ssr:false BİLİNÇLİ KALDIRILDI (SSR boş-kabuk kök sebebiydi): client bileşende
 // ssr:false, SSR sırasında en yakın Suspense sınırını komple CSR'a düşürür —
@@ -82,6 +82,11 @@ interface CategoryMasterViewProps {
    * ve alt kategori kartları o hâlin kendi kapısıdır.
    */
   kategoriler?: CategoryViewModelLite[]
+  /**
+   * URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucudan, `getBrandCatalogSummary` özeti). Yalnız
+   * hava perdesi ve sessiz fan anlatısındaki iki Vortice bölümünün sayaç kartlarını besler; yoksa kartlar çizilmez.
+   */
+  vorticeKatalogSayilari?: KatalogSayilari | null
 }
 
 const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
@@ -91,7 +96,8 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
   page = 1,
   pageSize = 24,
   initialSubCategories,
-  kategoriler
+  kategoriler,
+  vorticeKatalogSayilari
 }) => {
   const { lang } = useI18n()
 
@@ -203,6 +209,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
             category={category.raw}
             parentCategory={parentCategory?.raw}
             families={visibleFamilies}
+            vorticeKatalogSayilari={vorticeKatalogSayilari}
           />
         )
       case 'series':
@@ -234,6 +241,7 @@ const CategoryMasterView: React.FC<CategoryMasterViewProps> = ({
                 category={category.raw}
                 parentCategory={parentCategory?.raw}
                 families={visibleFamilies}
+                vorticeKatalogSayilari={vorticeKatalogSayilari}
               />
             )
         }

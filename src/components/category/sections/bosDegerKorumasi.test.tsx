@@ -76,6 +76,13 @@ function sozluk(...degisiklikler: Array<Record<string, string>>): object {
   return kopya
 }
 
+/**
+ * URN-95: Vortice bölümlerinde 1. ve 2. sayaç kartının DEĞERİ sözlükten değil sunucudan gelen katalog sayısıdır
+ * (`vorticeSayac.ts`; ayrıntılı kapı `vorticeKatalogSayilari.test.tsx`). Bu dosyadaki boş-kart testleri kart 1-2'yi
+ * dolu varsaymak için sayıyı prop verir; etiketler yine sözlükten (`E1`, `E2`).
+ */
+const SAYILAR = { aile: 11, model: 22 }
+
 const bosMetin = (el: Element) => !el.textContent?.trim()
 // Test ortamında lucide simgeleri `<div data-testid="lucide-…">` olarak taklit edilir (vitest.setup); bunlar boş kutu DEĞİL, simgedir.
 const ikonMu = (el: Element) => Boolean(el.getAttribute('data-testid')?.startsWith('lucide-'))
@@ -211,7 +218,7 @@ describe('VorticeBrand — boş sayaç kartı ve boş ödül parçası çizilmez
 
   it('değer VE etiket boş kart atılır: dört kart üçe iner, ızgara üç sütun olur', () => {
     kaynak.dict = sozluk(TABAN)
-    const { container } = render(<VorticeBrand />)
+    const { container } = render(<VorticeBrand katalogSayilari={SAYILAR} />)
 
     const satir = sayacSatiri(container)
     expect(satir).not.toBeNull()
@@ -219,12 +226,12 @@ describe('VorticeBrand — boş sayaç kartı ve boş ödül parçası çizilmez
     expect(satir!.className).toContain('grid-cols-3')
     expect(satir!.className).not.toContain('grid-cols-4')
     expect(Array.from(satir!.children).filter(bosMetin)).toHaveLength(0)
-    expect(Array.from(satir!.children).map((k) => k.textContent)).toEqual(['D1E1', 'D2E2', 'D3E3'])
+    expect(Array.from(satir!.children).map((k) => k.textContent)).toEqual(['11E1', '22E2', 'D3E3'])
   })
 
   it('OLUMLU KONTROL: kart dolu bırakılırsa dört kart çizilir, ızgara dört sütun', () => {
     kaynak.dict = sozluk(TABAN, { [`${V}highlights[0].value`]: 'DEĞER', [`${V}highlights[0].label`]: 'ETİKET' })
-    const { container } = render(<VorticeBrand />)
+    const { container } = render(<VorticeBrand katalogSayilari={SAYILAR} />)
     const satir = sayacSatiri(container)
     expect(satir!.children).toHaveLength(4)
     expect(satir!.className).toContain('grid-cols-4')
@@ -282,17 +289,17 @@ describe('SilentFanVorticeBrand — boş sayaç kartı çizilmez', () => {
 
   it('değer VE etiket boş kart atılır: dört kart üçe iner, hiçbiri boş değildir', () => {
     kaynak.dict = sozluk(TABAN)
-    const { container } = render(<SilentFanVorticeBrand />)
+    const { container } = render(<SilentFanVorticeBrand katalogSayilari={SAYILAR} />)
     const kutu = sayac(container)
     expect(kutu).not.toBeNull()
     expect(kutu!.children).toHaveLength(3)
     expect(Array.from(kutu!.children).filter(bosMetin)).toHaveLength(0)
-    expect(Array.from(kutu!.children).map((k) => k.textContent)).toEqual(['D1E1', 'D2E2', 'D3E3'])
+    expect(Array.from(kutu!.children).map((k) => k.textContent)).toEqual(['11E1', '22E2', 'D3E3'])
   })
 
   it('OLUMLU KONTROL: kart dolu bırakılırsa dört kart çizilir', () => {
     kaynak.dict = sozluk(TABAN, { [`${S}stats[0].value`]: 'DEĞER', [`${S}stats[0].label`]: 'ETİKET' })
-    const { container } = render(<SilentFanVorticeBrand />)
+    const { container } = render(<SilentFanVorticeBrand katalogSayilari={SAYILAR} />)
     expect(sayac(container)!.children).toHaveLength(4)
     expect(sayac(container)!.children[0].textContent).toBe('DEĞERETİKET')
   })

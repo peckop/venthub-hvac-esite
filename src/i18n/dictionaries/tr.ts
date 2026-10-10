@@ -1740,15 +1740,15 @@ export const tr = {
           desc: 'İtalya merkezli marka'
         },
         {
-          // URN-82: sayı (`{aile}`/`{model}` yer tutucusu) bu bileşene hiç verilmiyordu, ekranda ham şablon görünürdü; sayı
-          // kaynağı sunucudan prop aktarımı ister (ayrı kart). Değer VE etiket boşken kart çizilmez (URN-84 mekanizması).
+          // URN-95: değer sözlükte DEĞİL sunucudan gelen katalog sayısıdır (`vorticeSayac.ts`, 1. kart = ürün ailesi,
+          // 2. kart = aktif model); sayı yoksa kart çizilmez. Yer tutucu (`{aile}`/`{model}`) YAZILMAZ.
           value: '',
-          label: '',
+          label: 'Vortice Ürün Ailesi',
           desc: 'Katalogda yer alan'
         },
         {
           value: '',
-          label: '',
+          label: 'Vortice Aktif Model',
           desc: 'Katalogdaki Vortice modelleri'
         },
         {
@@ -3086,13 +3086,13 @@ export const tr = {
           value: ''
         },
         {
-          // URN-82: sayı (`{aile}`/`{model}` yer tutucusu) bu bileşene hiç verilmiyordu, ekranda ham şablon görünürdü; sayı
-          // kaynağı sunucudan prop aktarımı ister (ayrı kart). Değer VE etiket boşken kart çizilmez (URN-84 mekanizması).
-          label: '',
+          // URN-95: değer sözlükte DEĞİL sunucudan gelen katalog sayısıdır (`vorticeSayac.ts`, 1. kart = ürün ailesi,
+          // 2. kart = aktif model); sayı yoksa kart çizilmez. Yer tutucu (`{aile}`/`{model}`) YAZILMAZ.
+          label: 'Vortice Ürün Ailesi',
           value: ''
         },
         {
-          label: '',
+          label: 'Vortice Aktif Model',
           value: ''
         },
         {

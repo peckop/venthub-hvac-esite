@@ -21,7 +21,7 @@ import SilentFanWizard from '@/components/category/SilentFanWizard'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
 import FamilyCard from '@/components/products/FamilyCard'
 import { resolveCategoryImageUrl } from '@/lib/images/categoryImage'
-import type { FamilyListItem } from '@/types/ui-models'
+import type { FamilyListItem, KatalogSayilari } from '@/types/ui-models'
 
 import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
@@ -52,9 +52,11 @@ interface CategoryLandingProps {
     families: FamilyListItem[]
     /** Breadcrumb hiyerarşisi için üst kategori (gateway'den gelir). */
     parentCategory?: DomainCategory | null
+    /** URN-95: Vortice'nin katalogdaki aile ve model sayısı (sunucu özetinden); iki marka bölümünün sayaç kartlarını besler. */
+    vorticeKatalogSayilari?: KatalogSayilari | null
 }
 
-const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory }) => {
+const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, parentCategory, vorticeKatalogSayilari }) => {
     const { t, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
@@ -177,7 +179,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                     <>
                         <ProblemSection />
                         <HowItWorks />
-                        <VorticeBrand />
+                        <VorticeBrand katalogSayilari={vorticeKatalogSayilari} />
                         <TypeComparison
                             onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
                             onSelectType={() => handleShowProducts()}
@@ -191,7 +193,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                     <>
                         <SilentFanProblem />
                         <SilentFanHowItWorks />
-                        <SilentFanVorticeBrand />
+                        <SilentFanVorticeBrand katalogSayilari={vorticeKatalogSayilari} />
                         <TrustSignals />
                         <SilentFanFAQ />
                     </>
