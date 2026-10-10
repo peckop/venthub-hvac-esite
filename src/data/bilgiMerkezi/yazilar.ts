@@ -28,8 +28,18 @@ export type YaziKonusu = 'konfor' | 'guvenlik' | 'verimlilik'
 export interface YaziMetni {
   /** Adres metni (o dilde). */
   slug: string
-  /** Liste kartı ve meta açıklaması. Gövdenin ilk paragrafıyla aynı cevap, tek cümle. */
+  /**
+   * META AÇIKLAMASI: `<meta name="description">`, `og:description` ve `Article` JSON-LD `description`.
+   * Gövdenin ilk paragrafıyla aynı cevap, tek cümle. Liste kartında BASILMAZ (`kartOzeti`).
+   */
   ozet: string
+  /**
+   * LİSTE KARTI ve liste araması (BilgiMerkeziListe, BilgiMerkeziArama). ZORUNLU ve `ozet`ten FARKLI
+   * olmalıdır: kart ile meta açıklaması aynı alandan geliyordu ve tam başlık aramasında yazı yerine
+   * liste sayfası görünüyordu (SEO-30). Yazının KENDİ metninden yazılır; gövdede olmayan sayı, marka
+   * ya da iddia eklenmez. Kapı: src/lib/bilgiMerkezi/__tests__/kartOzeti.test.tsx.
+   */
+  kartOzeti: string
   /** Markdown; tek `# ` başlık (H1) ile başlar. */
   govde: string
 }
@@ -55,12 +65,17 @@ export const YAZILAR: readonly RehberYazisi[] = [
     kimlik: 'frekans-konvertoru',
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
-    guncellemeTarihi: '2026-09-25',
+    // Gövdenin SON değişikliği: 2026-10-08, #1755 ("Fiyatı belirleyen etkenler" giriş cümlesi). Daha önce
+    // 2026-10-06, #1733 (aile bağlantı kimlikleri). Site haritası lastmod'u ve Article `dateModified` buradan.
+    guncellemeTarihi: '2026-10-08',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
         slug: 'frekans-konvertoru-nedir',
         ozet: 'Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır.',
+        // Kart metni yazının kendi bölüm başlıklarından ve seçim ölçütlerinden derlenir: yeni iddia, sayı ya da marka yok.
+        kartOzeti:
+          'Frekans konvertörünün nasıl çalıştığı, fan ve pompada neden kullanıldığı ve seçimde bakılacak ölçütler: besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
 
 Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
