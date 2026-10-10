@@ -30,14 +30,17 @@ export interface YaziMetni {
   slug: string
   /**
    * META AÇIKLAMASI: `<meta name="description">`, `og:description` ve `Article` JSON-LD `description`.
-   * Gövdenin ilk paragrafıyla aynı cevap, tek cümle. Liste kartında BASILMAZ (`kartOzeti`).
+   * Gövdenin ilk paragrafıyla aynı cevap, tek cümle. Hiçbir kartta BASILMAZ (`kartOzeti`).
    */
   ozet: string
   /**
-   * LİSTE KARTI ve liste araması (BilgiMerkeziListe, BilgiMerkeziArama). ZORUNLU ve `ozet`ten FARKLI
-   * olmalıdır: kart ile meta açıklaması aynı alandan geliyordu ve tam başlık aramasında yazı yerine
-   * liste sayfası görünüyordu (SEO-30). Yazının KENDİ metninden yazılır; gövdede olmayan sayı, marka
-   * ya da iddia eklenmez. Kapı: src/lib/bilgiMerkezi/__tests__/kartOzeti.test.tsx.
+   * KART METNİ — her kart yüzeyi bunu basar: liste kartı ve araması (BilgiMerkeziListe, BilgiMerkeziArama),
+   * ana sayfa Bilgi bloğu (KnowledgeBlock), kategori ve aile sayfasının "ilgili rehberler" kartları
+   * (tersDizin.ts → IlgiliRehberler) ve yazı altı "ilgili yazılar" (sayfa.ts → RehberYazisiSayfasi).
+   * ZORUNLU ve `ozet`ten FARKLI olmalıdır: kart ile meta açıklaması aynı alandan geliyordu ve tam başlık
+   * aramasında yazı yerine liste sayfası görünüyordu (SEO-30). Yazının KENDİ metninden yazılır; gövdede
+   * olmayan sayı, marka ya da iddia eklenmez. Kapılar: src/lib/bilgiMerkezi/__tests__/kartOzeti.test.tsx
+   * ve kartOzetiYuzeyler.test.tsx.
    */
   kartOzeti: string
   /** Markdown; tek `# ` başlık (H1) ile başlar. */
