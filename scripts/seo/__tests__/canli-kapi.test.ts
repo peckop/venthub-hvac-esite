@@ -494,9 +494,9 @@ describe('bilinen listesi kalıcı susturucu olamaz (OPS şartı, REC-502)', () 
  */
 type HaritaSatir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
 const haritaSatir = (yol: string): HaritaSatir => ({ loc: TABAN + yol, lastmod: null, changefreq: null, priority: null })
-function haritaKur(toplam: number, kategori: number, enSayfa = 0): { satirlar: HaritaSatir[]; hreflangSayisi: number } {
+function haritaKur(toplam: number, kategori: number, enSayfa = 0, kategoriYolu = 'category'): { satirlar: HaritaSatir[]; hreflangSayisi: number } {
   const satirlar: HaritaSatir[] = []
-  for (let i = 0; i < kategori; i++) satirlar.push(haritaSatir(`/tr/category/k${i}`))
+  for (let i = 0; i < kategori; i++) satirlar.push(haritaSatir(`/tr/${kategoriYolu}/k${i}`))
   for (let i = 0; i < enSayfa; i++) satirlar.push(haritaSatir(`/en/products/p${i}`))
   while (satirlar.length < toplam) satirlar.push(haritaSatir(`/tr/products/p${satirlar.length}`))
   return { satirlar, hreflangSayisi: 0 }
@@ -530,6 +530,19 @@ describe('INV-LLMS-GERCEK-1 · llms.txt beyanı haritayla tutarlı', () => {
   })
   it('sabotaj: kategori sayısı haritadan farklıysa KIRMIZI (24 yazılı, haritada 23)', () => {
     expect(llmsBulgu(haritaKur(87, 23), llmsMetni()).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+  })
+  describe.each([
+    { ad: 'kapalı kip: /tr/category/<slug> (bayrak kapalı, bugünkü canlı)', yol: 'category' },
+    { ad: 'açık kip: /tr/kategori/<slug> (K3-b bayrağı açık, Pazar sonrası)', yol: 'kategori' },
+  ])('kategori sayacı, $ad', ({ yol }) => {
+    it('doğru beyan hiç bulgu vermez (24 yazılı, 24 adres)', () => {
+      expect(llmsBulgu(haritaKur(87, 24, 0, yol), llmsMetni())).toEqual([])
+    })
+    it('sabotaj: bir kategori adresi eksikse KIRMIZI (24 yazılı, haritada 23; sayaç körleşmedi)', () => {
+      const b = llmsBulgu(haritaKur(87, 23, 0, yol), llmsMetni())
+      expect(b.map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+      expect(b[0].kanit).toMatch(/23 kategori/)
+    })
   })
   it('sabotaj: harita /en adresleri taşıyorken llms.txt yalnız "tr" diyorsa KIRMIZI (EN yayınlanınca dosya güncellenmeli)', () => {
     const b = llmsBulgu(haritaKur(87, 24, 10), llmsMetni())
