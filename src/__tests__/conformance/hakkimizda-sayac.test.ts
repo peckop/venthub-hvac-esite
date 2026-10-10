@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
  * (karar 295) ve elle yazılan sayı ürün eklendikçe sessizce yanlışlaşır. Ayrıca sayfa DB'den sayı basmaya başlayınca
  * "tam statik" sınıfından çıkar: tazeleme sözleşmesi (rendering-cache-standard §3) kurulmadan sayı bayat kalırdı.
  *
- * KAPI: (1) elle yazılmış sayaç değeri yok (yalnız kurucu yılı `15+` izinli), (2) rota ISR ilan eder ve sayacı
+ * KAPI: (1) elle yazılmış sayaç değeri yok (URN-82 ile `15+` deneyim sayacı da kalktı: İSTİSNA YOK), (2) rota ISR ilan eder ve sayacı
  * önbellekli sarmaldan okur, (3) sarmal anahtarı `lang` + `tenantId`, etiketi keşif etiketi (kural 12), (4) webhook
  * `products` / `product_families` / `brands` dallarında keşif etiketini tazeler ve ürün için duyarlı alanlar
  * `status` / `family_id` / `deleted_at`'i içerir, (5) hata sayfayı çökertmez: sayaç `null`, kartlar çizilmez.
@@ -20,32 +20,31 @@ import { describe, expect, it } from 'vitest'
 const KOK = path.resolve(__dirname, '../../..')
 const oku = (yol: string) => fs.readFileSync(path.join(KOK, yol), 'utf8')
 
-/** `stats` dizisinde elle yazılmış, `15+` dışındaki sayı değerleri (saf: sentetik girdiyle sınanır). */
+/** `stats` bildiriminde elle yazılmış sayı değerleri; `15+` DAHİL hepsi ihlaldir (saf: sentetik girdiyle sınanır). */
 function elleYazilmisSayaclar(kaynak: string): string[] {
-  const blok = kaynak.match(/const stats = \[[\s\S]*?\n  \]/)
+  const blok = kaynak.match(/const stats = [\s\S]*?\n\s*(?:\]|: \[\])/)
   if (!blok) return ['stats bloğu bulunamadı']
-  return [...blok[0].matchAll(/value:\s*(['"`])([^'"`]*)\1/g)]
-    .map((m) => m[2])
-    .filter((deger) => deger !== '15+')
+  return [...blok[0].matchAll(/value:\s*(['"`])([^'"`]*)\1/g)].map((m) => m[2])
 }
 
 describe('INV-HAKKIMIZDA-SAYAC-1', () => {
   describe('elle yazılmış sayaç dedektörü (sentetik)', () => {
-    it('eski dört sayıyı yakalar', () => {
+    it('eski dört sayıyı yakalar: `15+` DAHİL', () => {
       const eski = `const stats = [
     { value: '15+', label: t('a'), icon: Zap },
     { value: '6', label: t('b'), icon: Award },
     { value: '50+', label: t('c'), icon: Factory },
     { value: '81', label: t('d'), icon: Globe }
   ]`
-      expect(elleYazilmisSayaclar(eski)).toEqual(['6', '50+', '81'])
+      expect(elleYazilmisSayaclar(eski)).toEqual(['15+', '6', '50+', '81'])
     })
 
-    it('canlı veriden gelen değere ve kurucu yılına izin verir', () => {
-      const yeni = `const stats = [
-    { value: '15+', label: t('a'), icon: Zap },
-    ...(sayaclar ? [{ value: String(sayaclar.markaSayisi), label: t('b'), icon: Award }] : [])
-  ]`
+    it('canlı veriden gelen değere izin verir', () => {
+      const yeni = `const stats = sayaclar
+    ? [
+        { value: String(sayaclar.markaSayisi), label: t('b'), icon: Award }
+      ]
+    : []`
       expect(elleYazilmisSayaclar(yeni)).toEqual([])
     })
 

@@ -1164,7 +1164,6 @@ export const tr = {
     // Sayaç etiketleri KART SIRASINA göre (src/views/AboutPage.tsx `stats`): her anahtarın canlı değer kaynağı
     // `hakkimizda-sayac.test.ts` içinde SABİTLENMİŞTİR (anahtar-kart kayması kırmızı verir). Anahtar adları tarihseldir:
     // `distributorship` = ürünü olan marka sayısı (bayilik DEĞİL), `completedProject` = aktif model sayısı (proje DEĞİL).
-    experience: 'Yıllık Tecrübe',
     distributorship: 'Ürünü Olan Marka',
     completedProject: 'Aktif Model',
     productFamilies: 'Ürün Ailesi',

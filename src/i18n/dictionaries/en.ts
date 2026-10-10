@@ -979,7 +979,6 @@ export const en: typeof tr = {
     // Counter labels follow the CARD ORDER (src/views/AboutPage.tsx `stats`): each key's live value source is PINNED in
     // `hakkimizda-sayac.test.ts` (key-card drift turns it red). Key names are historical: `distributorship` = number of
     // brands with products (NOT a distributorship), `completedProject` = number of active models (NOT a project).
-    experience: 'Years of Experience',
     distributorship: 'Brands with Products',
     completedProject: 'Active Models',
     productFamilies: 'Product Families',
