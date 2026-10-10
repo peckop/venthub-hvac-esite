@@ -981,7 +981,7 @@ export const en: typeof tr = {
     experience: 'Years of Experience',
     distributorship: 'Global Brand Network',
     completedProject: 'Product Types',
-    shippingNetwork: 'Province Delivery Network',
+    productFamilies: 'Product Families',
     precisionTitle: 'Engineering Precision',
     precisionDesc: 'We do not just sell products; we offer engineering solutions with project-specific airflow, pressure, and efficiency calculations.',
     standardsTitle: 'Global Standards',

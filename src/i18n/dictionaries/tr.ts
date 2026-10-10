@@ -1157,7 +1157,7 @@ export const tr = {
     experience: 'Yıllık Tecrübe',
     distributorship: 'Küresel Marka Ağı',
     completedProject: 'Ürün Çeşidi',
-    shippingNetwork: 'İl Sevkiyat Ağı',
+    productFamilies: 'Ürün Ailesi',
     precisionTitle: 'Mühendislik Hassasiyeti',
     precisionDesc: 'Sadece ürün satmıyoruz; her projeye özel debi, basınç ve verimlilik hesaplamalarıyla mühendislik çözümü sunuyoruz.',
     standardsTitle: 'Global Standartlar',
