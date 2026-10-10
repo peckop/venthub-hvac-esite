@@ -9,7 +9,7 @@
  * HİÇBİR dalda değişmez: yalnız ön izleme ağacında (ayrık commit) yamalanır, derleme biter bitmez geri alınır.
  * Kimsenin çalışma kopyası, dalı ya da canlı ortam etkilenmez; iş sonunda ön izleme ağacı da temizdir.
  *
- * İÇİNDEKİLER: yama tablosu (YAMALAR) · yama uygula/geri al · tıklama listesi okuyucu · ön kontrol (17 adres) ·
+ * İÇİNDEKİLER: yama tablosu (YAMALAR) · yama uygula/geri al · tıklama listesi okuyucu · ön kontrol (18 adres) ·
  * tam tarama özeti · derleme izi (aynı commit + aynı kip yeniden derlenmez) · kaynak seçimi (yerel dal mı origin mi,
  * hangisi yeni).
  * Ağ, git ve dosya erişimi çağırandan ENJEKTE edilir ya da dar tutulur: testler gerçek sunucu istemez.
@@ -161,7 +161,7 @@ export function yamalariGeriAl(agac, git) {
   return sonuc
 }
 
-// ── Tıklama listesi (Recep'in 17 adresi) ─────────────────────────────────────────────────────────
+// ── Tıklama listesi (Recep'in 18 adresi) ─────────────────────────────────────────────────────────
 
 const TIKLAMA_LISTESI_DESENI = /^onizleme-tiklama-listesi-.*\.md$/
 
@@ -245,7 +245,7 @@ export async function kontrolEt(k, izleTek) {
   return { ...taban, durum: 'KIRMIZI', ayrinti: sorunlar.join(' | ') }
 }
 
-/** Listedeki her adresi sırayla kontrol eder (17 adres: sıralı istek yeter, sunucuyu yormaz). */
+/** Listedeki her adresi sırayla kontrol eder (18 adres: sıralı istek yeter, sunucuyu yormaz). */
 export async function onKontrol(liste, izle) {
   const sonuclar = []
   for (const k of liste) sonuclar.push(await kontrolEt(k, izle))
@@ -300,7 +300,7 @@ export function gercekTarayici() {
 }
 
 /**
- * Tam taramanın çıktısından tabloyu atar: tablodan türeyen yüzlerce adres terminali boğar ve 17 adreslik ön kontrol
+ * Tam taramanın çıktısından tabloyu atar: tablodan türeyen yüzlerce adres terminali boğar ve 18 adreslik ön kontrol
  * tablosunu gömer. Kalan: PİLOT LİSTE satırı, varsa SORUNLU SATIRLAR bölümü ve TARAMA özeti.
  * @param {unknown[]} yazilanlar
  * @returns {string[]}

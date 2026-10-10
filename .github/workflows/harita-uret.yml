@@ -3,9 +3,11 @@ name: Eski Adres Haritasi Uret (salt-okuma)
 # ════════════════════════════════════════════════════════════════════════════
 # NİÇİN VAR (ALT-37a, OPS onayı 2026-10-05; plan rec-adres-agac-tek-yayin §4.1, ALT-13 parçası)
 #
-# Eski adres haritası (src/data/generated/eski-adres-haritasi.json) commit EDİLMEZ ve üreteci
-# (src/lib/adres/haritaUret.ts) service-role anahtarı ister: `url_takma_adlari` tablosu anonim erişime
-# kapalı. Bu iş akışı üreteci canlı veritabanına karşı BİR KEZ koşturur, haritayı ARTEFAKT olarak indirir.
+# Eski adres haritası (src/data/generated/eski-adres-haritasi.json) bu iş akışıyla commit EDİLMEZ;
+# KARAR DEĞİŞTİ (10 Ekim 2026, plan §4.1 karar notu, Faz 3-C PR'ı #1811): dosya artık depoda durur ve
+# commit'i İNSAN yapar (3-C PR'ında URUN). Üreteci (src/lib/adres/haritaUret.ts) service-role anahtarı
+# ister: `url_takma_adlari` tablosu anonim erişime kapalı. Bu iş akışı üreteci canlı veritabanına karşı
+# BİR KEZ koşturur, haritayı ARTEFAKT olarak indirir.
 # Cuma önizlemesi (karar 68) için harita yerel kopyaya konur; anahtar ne bir kişiye ne bir makineye verilir.
 #
 # ⛔YALNIZ OKUMA. Veritabanına tek çağrı türü SELECT'tir. Yazma çağrısı (insert/update/upsert/delete/rpc)
@@ -15,7 +17,8 @@ name: Eski Adres Haritasi Uret (salt-okuma)
 #    repo PUBLIC, fork PR'ı sırrı görmemeli ve prod'a ne zaman bağlanıldığı insanın kararı olmalı.
 # ⛔SIR YALNIZ ÜRETİM ADIMINDA. Anahtar iş düzeyinde ya da kurulum adımında DEĞİL, yalnız o tek adımın
 #    `env:` bloğunda; hiçbir adım değeri basmaz (GitHub günlükte ayrıca maskeler).
-# ⛔DOĞRUDAN COMMIT YOK. Çıktı 1 gün saklanan artefakttır; depoya girmez.
+# ⛔DOĞRUDAN COMMIT YOK. Çıktı 1 gün saklanan artefakttır; iş akışı depoya hiçbir şey göndermez,
+#    dosyayı depoya sokmak insanın PR'ıdır (10 Ekim 2026 kararı).
 # ════════════════════════════════════════════════════════════════════════════
 
 on:
