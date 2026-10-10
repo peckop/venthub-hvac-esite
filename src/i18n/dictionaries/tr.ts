@@ -920,11 +920,12 @@ export const tr = {
       kvkk: '6698 sayılı KVKK kapsamında kişisel verilerin işlenmesine ilişkin aydınlatma metni.',
       privacy: 'VentHub web sitesinde kişisel verilerin nasıl toplandığı, kullanıldığı ve korunduğu.',
       cookie: 'VentHub web sitesinde kullanılan çerezler ve çerez tercihlerinin yönetimi.',
-      // SEO-32 (URN-91): üç taslak belgenin açıklaması sayfanın kendi bölüm başlıklarından yazıldı
-      // (110-155 karakter). "taslağı" sözcüğü bilerek korunur: sayfanın kendisi taslaktır.
-      terms: 'VentHub web sitesinin kullanım koşulları taslağı: hizmet kapsamı, üyelik ve hesap güvenliği, fiyat ve stok, fikri mülkiyet, sorumluluk reddi.',
-      distanceSales: 'VentHub satışlarına ilişkin mesafeli satış sözleşmesi taslağı: taraflar, ödeme ve teslimat, cayma hakkı, iade, ayıplı mal ve uyuşmazlık.',
-      preInformation: 'Mesafeli satış öncesi ön bilgilendirme formu taslağı: ürünün nitelikleri, toplam bedel, ödeme, teslimat, cayma hakkı ve iade masrafı.',
+      // SEO-32 (URN-91): üç belgenin açıklaması sayfanın kendi bölüm başlıklarından yazıldı (110-155 karakter).
+      // "taslak" sözcüğü açıklamada YOKTUR: taslak durumunu `yasalBaslik` başlıkta kendiliğinden izler
+      // (hukukçu teyidi gelince "(Taslak)" kalkar); sabit yazılan sözcük o gün yanlış kalırdı.
+      terms: 'VentHub web sitesinin kullanım koşulları: hizmet kapsamı, üyelik ve hesap güvenliği, fiyat ve stok, fikri mülkiyet, sorumluluk reddi.',
+      distanceSales: 'VentHub satışlarına ilişkin mesafeli satış sözleşmesi: taraflar, ödeme ve teslimat, cayma hakkı, iade, ayıplı mal ve uyuşmazlık.',
+      preInformation: 'Mesafeli satış öncesi ön bilgilendirme formu: ürünün nitelikleri, toplam bedel, ödeme, teslimat, cayma hakkı ve iade masrafı.',
     }
   },
   footer: {
@@ -2036,13 +2037,13 @@ export const tr = {
     seo: {
       // Sekme başlığı: sayfa H1'i "SSS" kısaltmasıdır; arama sonucunda kısaltma ve tam ad birlikte okunur.
       faqTitle: 'SSS: Sık Sorulan Sorular',
-      faq: 'Teklif talebine dönüş, ödeme yöntemleri ve kurulum hizmeti hakkında sık sorulan sorular ve cevapları. VentHub destek ve satış öncesi sorular.',
+      faq: 'Teklif talebinin ve kurulum sorularının nasıl iletileceği, ödeme yöntemleri hakkında sık sorulan sorular ve cevapları. VentHub destek sayfası.',
       shippingTitle: 'Kargo ve Teslimat Bilgileri',
-      shipping: 'Kargo ücreti ve firması teklifte belirtilir, takip numarası e-posta ile iletilir. Teslimat süresi kampanya ve stok durumuna göre değişebilir.',
+      shipping: 'Teslimat süresi ve sevkiyat koşulları teklif aşamasında netleştirilir. Kargo ücreti ve firması teklifte belirtilir; takip numarası e-posta ile iletilir.',
       returnsTitle: 'İade ve Değişim Koşulları',
-      returns: 'Cayma hakkı, iade koşulları ve iade talebinin sipariş numarasıyla destek ekibine nasıl iletileceği; onay sonrası kargo talimatı paylaşılır.',
-      warrantyTitle: 'Garanti ve Servis: Kapsam ve Arıza Kaydı',
-      warranty: 'Garanti kapsamı üretici ya da ithalatçı firmaya göre değişir. Garanti belgesi ve kullanım kılavuzunu saklayın; arıza kaydı için destek ekibine ulaşın.',
+      returns: 'Cayma hakkı, iade koşulları ve iade talebinin sipariş numarasıyla iletişim formu ya da e-posta ile nasıl iletileceği hakkında bilgi.',
+      warrantyTitle: 'Garanti ve Servis: Kapsam ve Arıza Soruları',
+      warranty: 'Garanti kapsamı üretici/ithalatçıya göre değişebilir. Garanti belgesini ve kılavuzu saklayın; servis ve arıza sorularını form ya da e-posta ile iletin.',
     },
     returns: {
       title: 'İade ve Değişim',
@@ -2766,7 +2767,7 @@ export const tr = {
       title: 'Hava Perdesi Hesaplayıcı',
       description: 'Kapı ölçüsü ve kullanım koşullarına göre hava perdesi hesabı',
       // SEO-32 (URN-91): arama sonucu açıklaması. `description` sayfanın GÖRÜNÜR alt başlığıdır, ona dokunulmaz.
-      metaDescription: 'Kapı ölçüleri, uygulama, rüzgar ve trafik koşullarına göre gerekli hava debisini, üfleme hızını ve motor gücünü hesaplayın; hava perdesi seçin.',
+      metaDescription: 'Kapı ölçüleri, uygulama, rüzgar ve trafik koşullarına göre gerekli hava debisini, üfleme hızını ve motor gücünü hesaplayın.',
       infoText: 'Bu araç, Ürün Seçici\'deki hava perdesi hesabıdır. Hesaplar ön değerlendirmedir.',
       steps: {
         dimensions: 'Kapı Ölçüleri',

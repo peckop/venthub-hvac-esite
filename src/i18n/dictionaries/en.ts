@@ -919,9 +919,9 @@ export const en: typeof tr = {
       privacy: 'How personal data is collected, used and protected on the VentHub website.',
       cookie: 'Cookies used on the VentHub website and how to manage cookie preferences.',
       // SEO-32 (URN-91): see tr.ts — written from each page's own section headings.
-      terms: 'Draft terms of use for the VentHub website: scope of service, membership and account security, pricing and stock, intellectual property and disclaimer.',
-      distanceSales: 'Draft distance sales agreement for VentHub purchases: parties, payment and delivery, right of withdrawal, returns, defective goods and disputes.',
-      preInformation: 'Draft pre-information form for distance sales: essential characteristics, total price, payment, delivery, right of withdrawal and return costs.',
+      terms: 'Terms of use for the VentHub website: scope of service, membership and account security, pricing and stock, intellectual property and disclaimer.',
+      distanceSales: 'Distance sales agreement for VentHub purchases: parties, payment and delivery, right of withdrawal, returns, defective goods and disputes.',
+      preInformation: 'Pre-information form for distance sales: essential characteristics, total price, payment, delivery, right of withdrawal and return costs.',
     }
   },
   footer: {
@@ -2084,13 +2084,13 @@ export const en: typeof tr = {
     // SEO-32 (URN-91): see tr.ts — `*Title` keys feed only the <title>, never the visible H1.
     seo: {
       faqTitle: 'FAQ: Frequently Asked Questions',
-      faq: 'Frequently asked questions and answers about quote replies, payment methods and installation service. VentHub support and pre-sales questions.',
+      faq: 'Frequently asked questions and answers on how to send a quote request or an installation question, and on payment methods. VentHub support.',
       shippingTitle: 'Shipping & Delivery Information',
-      shipping: 'The shipping fee and carrier are stated in your quote, and the tracking number is sent by e-mail. Delivery time may vary with campaigns and stock.',
+      shipping: 'Delivery time and shipping terms are set at the quote stage. The shipping fee and carrier are stated in your quote; tracking is sent by e-mail.',
       returnsTitle: 'Returns & Exchange Terms',
-      returns: 'Right of withdrawal, return conditions and how to send a return request with your order number to the support team; shipping instructions follow approval.',
-      warrantyTitle: 'Warranty & Service: Coverage & Malfunction Records',
-      warranty: 'Warranty coverage varies by manufacturer or importer. Keep the warranty card and user manual, and contact the support team for malfunction records.',
+      returns: 'Right of withdrawal, return conditions and how to send a return request with your order number via the contact form or e-mail.',
+      warrantyTitle: 'Warranty & Service: Coverage & Fault Questions',
+      warranty: 'Warranty coverage may vary by manufacturer or importer. Keep the warranty card and manual; send service and fault questions by form or e-mail.',
     },
     returns: {
       title: 'Returns & Exchanges',
@@ -2722,7 +2722,7 @@ export const en: typeof tr = {
       title: 'Air Curtain Calculator',
       description: 'Air curtain calculation based on door dimensions and operating conditions',
       // SEO-32 (URN-91): meta description; `description` is the page's VISIBLE subtitle and stays unchanged.
-      metaDescription: 'Calculate the required airflow, nozzle velocity and motor power from door dimensions, application, wind and traffic conditions, and select an air curtain.',
+      metaDescription: 'Calculate the required airflow, nozzle velocity and motor power from door dimensions, application, wind and traffic conditions.',
       infoText: 'This tool is the air curtain calculator in the Product Selector. Calculations are a preliminary assessment.',
       steps: {
         dimensions: 'Door Dimensions',

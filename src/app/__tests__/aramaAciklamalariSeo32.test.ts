@@ -41,6 +41,8 @@ const STANDART_ADI = /\b(?:ISO|NFPA|BS|IEC|ASHRAE|AMCA)\b|\b(?:TS\s)?EN\s?\d/
 const YER_TUTUCU = /[{}]/
 /** Çözülmemiş sözlük anahtarı sızıntısı. */
 const HAM_ANAHTAR = /\b(?:support|legal|calculators)\.[a-zA-Z]+\.[a-zA-Z]/
+/** Taslak sözcüğü: Türkçede "taslak" ekle "taslağı" olur (k → ğ), kalıp iki kökü de yakalar. */
+const TASLAK_SOZCUGU = /taslak|taslağ|draft/i
 
 type SayfaUstVerisiModulu = {
   generateMetadata: (girdi: { params: Promise<{ lang: string }> }) => Promise<Metadata>
@@ -115,6 +117,15 @@ describe('SEO-32 · tarayıcı kör değil', () => {
     }
   })
 
+  it('taslak kalıbı "taslağı" ve "Draft" biçimini yakalar; sıradan metni yakalamaz', () => {
+    for (const kotu of ['kullanım koşulları taslağı: kapsam', 'Draft terms of use', 'bu bir taslak metin']) {
+      expect(TASLAK_SOZCUGU.test(kotu), kotu).toBe(true)
+    }
+    for (const iyi of ['kullanım koşulları: kapsam', 'Terms of use for the website']) {
+      expect(TASLAK_SOZCUGU.test(iyi), iyi).toBe(false)
+    }
+  })
+
   it('yer tutucu ve ham anahtar kalıpları yakalar', () => {
     expect(YER_TUTUCU.test('{{count}} ürün')).toBe(true)
     expect(YER_TUTUCU.test('{ad} markası')).toBe(true)
@@ -154,15 +165,35 @@ describe('SEO-32 · açıklama: gerçek generateMetadata, 11 sayfa × TR ve EN',
       expect(metin(tr, s.aciklama), `${s.ad}: TR = EN`).not.toBe(metin(en, s.aciklama))
     }
   })
+
+  it('yasal sayfa açıklaması taslak durumunu sabit yazmaz: durumu başlık (yasalBaslik) kendiliğinden izler', () => {
+    // Hukukçu teyidi gelince başlıktan "(Taslak)" kalkar; açıklamada sabit "taslağı" kalsaydı o gün yanlış olurdu.
+    for (const s of SAYFALAR.filter((x) => x.ad.startsWith('legal/'))) {
+      for (const [dil, sozluk] of SOZLUKLER) {
+        expect(metin(sozluk, s.aciklama), `${s.ad} ${dil}`).not.toMatch(TASLAK_SOZCUGU)
+      }
+    }
+  })
+
+  it('destek açıklamaları #1793 sonrası gövdenin söylemediği iddiayı taşımaz (süre, kampanya, hizmet, talimat, kayıt)', () => {
+    // Gövde (support.shipping/returns/warranty/faq) teslim süresini "teklif aşamasında netleşir" der; #1793
+    // "1-5 iş günü, kampanya ve stok" cümlesini kaynaksız diye kaldırdı. Açıklama o cümleyi geri getiremez.
+    const KAYNAKSIZ_TR = /kampanya|stok durumu|iş günü|kurulum hizmeti|kargo talimat|onay sonrası|arıza kayd/i
+    const KAYNAKSIZ_EN = /campaign|stock|business day|installation service|shipping instruction|follow(?:s)? approval|malfunction record/i
+    for (const s of SAYFALAR.filter((x) => x.ad.startsWith('destek/'))) {
+      expect(metin(tr, s.aciklama), `${s.ad} tr`).not.toMatch(KAYNAKSIZ_TR)
+      expect(metin(en, s.aciklama), `${s.ad} en`).not.toMatch(KAYNAKSIZ_EN)
+    }
+  })
 })
 
 describe('SEO-32 · hesaplayıcı: görünür alt başlık DEĞİŞMEDİ, açıklama ayrı anahtardan', () => {
-  /** Değerler SEO-32 öncesi master'daki (145af5703) metinlerdir; görünür alt başlığı sabitler. */
+  /** Değerler #1793 sonrası master'daki (e16324c3d) metinlerdir; görünür alt başlığı sabitler. */
   const GORUNUR_ALT_BASLIK: Array<{ gorunur: string; tr: string; en: string; gorunum: string }> = [
     {
       gorunur: 'calculators.jetFan.pageDescription',
-      tr: 'Otopark ve tünel jet fan itki ve havalandırma hesabı',
-      en: 'Parking and tunnel jet fan thrust and ventilation calculation',
+      tr: 'Jet fan hesabı',
+      en: 'Jet fan calculation',
       gorunum: 'calculators/JetFanCalcPage.tsx',
     },
     {
@@ -179,8 +210,8 @@ describe('SEO-32 · hesaplayıcı: görünür alt başlık DEĞİŞMEDİ, açık
     },
     {
       gorunur: 'calculators.airCurtain.description',
-      tr: 'Kapı ölçüleri ve kullanım koşullarına göre ideal hava perdesi seçimi',
-      en: 'Ideal air curtain selection based on door dimensions and usage conditions',
+      tr: 'Kapı ölçüsü ve kullanım koşullarına göre hava perdesi hesabı',
+      en: 'Air curtain calculation based on door dimensions and operating conditions',
       gorunum: 'calculators/AirCurtainCalcPage.tsx',
     },
   ]
