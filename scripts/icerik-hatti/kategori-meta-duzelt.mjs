@@ -50,11 +50,11 @@ import { join } from 'node:path'
 import { kanon, kategoriPlani, alanOku, yolEtiketi, KOLON } from './kategori-meta-duzelt-kurallar.mjs'
 
 /** @typedef {import('./kategori-meta-duzelt-kurallar.mjs').Kalem} Kalem */
-/** @typedef {{ id: string, tenant_id: string, slug: string, metadata: Record<string, unknown> | null, updated_at: string, seo_title?: string | null, seo_desc?: string | null }} KategoriSatiri */
+/** @typedef {{ id: string, tenant_id: string, slug: string, metadata: Record<string, unknown> | null, updated_at: string, seo_title?: string | null, seo_desc?: string | null, name?: string | null, menu_label?: string | null, marketing_title?: string | null, description?: string | null }} KategoriSatiri */
 
 // KTL-21: seo_title / seo_desc ÜST DÜZEY kolonlar; satır, çekirdeğin tek belge kuralıyla çalışması için
 // {...metadata, "@kolon": {seo_title, seo_desc}} belgesine çevrilir (belge()); yazımda geri bölünür (bol()).
-const SECIM = 'id,tenant_id,slug,metadata,updated_at,seo_title,seo_desc'
+const SECIM = 'id,tenant_id,slug,metadata,updated_at,seo_title,seo_desc,name,menu_label,marketing_title,description'
 
 /** Satır → çekirdek belgesi. "@kolon" anahtarı gerçek bir metadata anahtarı olamaz. */
 const belge = (/** @type {KategoriSatiri} */ s) => ({ ...(s.metadata ?? {}), [KOLON]: { seo_title: s.seo_title ?? null, seo_desc: s.seo_desc ?? null } })
@@ -149,6 +149,9 @@ async function tekSatirOku(/** @type {string} */ id) {
   return /** @type {KategoriSatiri} */ (k[0])
 }
 
+/** Kaynak-sözcük kapısı için satırın kendi metin sütunları (sayfa h1'i bunlardan gelir). Yazılmaz, yedeklenmez. */
+const ekKaynak = (/** @type {KategoriSatiri} */ s) => [s.name, s.menu_label, s.marketing_title, s.description].filter((x) => typeof x === 'string').join('\n')
+
 const yedekSatiri = (/** @type {KategoriSatiri} */ s) => ({ id: s.id, tenant_id: s.tenant_id, slug: s.slug, updated_at: s.updated_at, metadata: s.metadata, seo_title: s.seo_title ?? null, seo_desc: s.seo_desc ?? null })
 
 /** Yedek dosyasını yazar ve OKUYARAK doğrular (yazımdan ÖNCE). Var olan dosya ezilmez. */
@@ -184,7 +187,7 @@ function yedegeEkle(/** @type {string} */ yol, /** @type {KategoriSatiri} */ sat
 async function kategoriyeYaz(/** @type {KategoriSatiri} */ ilk, /** @type {Kalem[]} */ kalemler) {
   let satir = ilk
   for (let deneme = 0; deneme < 2; deneme++) {
-    const p = kategoriPlani(belge(satir), kalemler)
+    const p = kategoriPlani(belge(satir), kalemler, ekKaynak(satir))
     if (p.red) throw new Cikis(1, [`⛔ ${satir.slug}: yeniden okunan satırda kalem RED (canlı bu arada değişmiş): ${p.sonuclar.filter(s => s.durum === 'red').map(s => `${yolEtiketi(s.kalem.yol)}: ${s.sebep}`).join('; ')}`])
     if (!p.degisen) return { yazildi: false, beklenen: belge(satir), sonuclar: p.sonuclar }
     // KTL-21: yalnız DEĞİŞEN parça gönderilir: metadata değiştiyse metadata, kolon değiştiyse o kolon.
@@ -249,7 +252,7 @@ async function main() {
       for (const k of tekrar) { console.log(`  ⛔ ${yolEtiketi(Array.isArray(k.yol) ? k.yol : [])}: R4 aynı alan planda birden çok kalemde`); red++ }
       continue
     }
-    const p = kategoriPlani(belge(satirlar[0]), ks)
+    const p = kategoriPlani(belge(satirlar[0]), ks, ekKaynak(satirlar[0]))
     for (const s of p.sonuclar) {
       const etiket = yolEtiketi(Array.isArray(s.kalem?.yol) ? s.kalem.yol : [])
       const kurallar = s.kurallar.map(x => `${x.gecti ? '✓' : '✗'}${x.kural}${!x.gecti && x.ayrinti ? ` (${x.ayrinti})` : ''}`).join(' ')

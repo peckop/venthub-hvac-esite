@@ -31,7 +31,7 @@ vi.setConfig({ testTimeout: 60000 })
 const BETIK = process.env.KMD_BETIK || join(process.cwd(), 'scripts', 'icerik-hatti', 'kategori-meta-duzelt.mjs')
 
 type Meta = Record<string, unknown>
-type Satir = { id: string; tenant_id: string; slug: string; metadata: Meta | null; updated_at: string; seo_title: string | null; seo_desc: string | null }
+type Satir = { id: string; tenant_id: string; slug: string; metadata: Meta | null; updated_at: string; seo_title: string | null; seo_desc: string | null; name?: string | null }
 type Istek = { yontem: string; url: string; govde?: Record<string, unknown> }
 type Kalem = { slug: string; yol: Array<string | number>; eski: string | null; yeni: string | null; tam: boolean }
 
@@ -43,10 +43,16 @@ let sunucu: Server
 let dizin = ''
 let envDosya = ''
 
+// KTL-21 kaynak-sözcük kapısı: arama metni kategorinin KENDİ gövdesindeki sözcüklerden kurulur; sabitler gövdede de geçer.
+const TR_BASLIK = 'Kanal Tipi Fanlar: Yuvarlak ve Dikdörtgen Kesitli' // 50 karakter eksiz sınırının altında
+const TR_ACIKLAMA = 'Havayı kanal hattının içinde taşıyan, kanala seri bağlanan fanlar. Yuvarlak ve dikdörtgen kesitli modeller vardır.'
+const EN_BASLIK = 'Duct Fans: Circular and Rectangular Models'
+const EN_ACIKLAMA = 'Fans that move air inside the duct run, installed in-line with the ductwork. Circular and rectangular models are available.'
+
 const meta1 = (): Meta => ({
   slug: { tr: 'kanal-fanlari', en: 'duct-fans' },
   hide_price: true,
-  description_i18n: { tr: 'Kanal fanları açıklaması.', en: 'Duct fans description.' },
+  description_i18n: { tr: `Kanal fanları açıklaması. ${TR_BASLIK}. ${TR_ACIKLAMA} VentHub`, en: `Duct fans description. ${EN_BASLIK}. ${EN_ACIKLAMA} VentHub` },
   ek_alan: { x: [1, 2] },
 })
 
@@ -102,10 +108,6 @@ function kos(plan: unknown, o: { yaz?: boolean; onay?: boolean; yedek?: string }
       (hata, so, se) => coz({ kod: hata ? Number((hata as NodeJS.ErrnoException).code) : 0, cikti: `${so}${se}` }))
   })
 }
-const TR_BASLIK = 'Kanal Tipi Fanlar: Yuvarlak ve Dikdörtgen Kesitli' // 50 karakter eksiz sınırının altında
-const TR_ACIKLAMA = 'Havayı kanal hattının içinde taşıyan, kanala seri bağlanan fanlar. Yuvarlak ve dikdörtgen kesitli modeller vardır.'
-const EN_BASLIK = 'Duct Fans: Circular and Rectangular Models'
-const EN_ACIKLAMA = 'Fans that move air inside the duct run, installed in-line with the ductwork. Circular and rectangular models are available.'
 const kalem = (yol: Kalem['yol'], yeni: string | null, o: Partial<Kalem> = {}): Kalem => ({ slug: 'duct-fans', yol, eski: null, yeni, tam: true, ...o })
 /** Yazım planının tersi: her kalemde eski ↔ yeni (yazımdan önce alanlar boştu → geri alma yeni=null). */
 const geriAlmaPlani = () => ({ kalemler: tamPlan().kalemler.map((k) => ({ ...k, eski: k.yeni, yeni: null })) })
@@ -164,11 +166,11 @@ describe('KTL-21 S3 · idempotent', () => {
 describe('KTL-21 S4 · uzunluk kapısı', () => {
   const dene = async (yol: Kalem['yol'], yeni: string) => (await kos({ kalemler: [kalem(yol, yeni)] }))
   it('başlık 50 geçer, 51 RED; 20 geçer, 19 RED', async () => {
-    expect((await dene(['@kolon', 'seo_title'], 'A'.repeat(50))).kod).toBe(0)
-    const fazla = await dene(['@kolon', 'seo_title'], 'A'.repeat(51))
+    expect((await dene(['@kolon', 'seo_title'], 'a'.repeat(50))).kod).toBe(0)
+    const fazla = await dene(['@kolon', 'seo_title'], 'a'.repeat(51))
     expect(fazla.kod).toBe(1); expect(fazla.cikti).toContain('R7 seo-uzunluk'); expect(fazla.cikti).toContain('51 karakter')
-    expect((await dene(['@kolon', 'seo_title'], 'A'.repeat(20))).kod).toBe(0)
-    expect((await dene(['@kolon', 'seo_title'], 'A'.repeat(19))).kod).toBe(1)
+    expect((await dene(['@kolon', 'seo_title'], 'a'.repeat(20))).kod).toBe(0)
+    expect((await dene(['@kolon', 'seo_title'], 'a'.repeat(19))).kod).toBe(1)
   })
   it('açıklama 110 geçer, 109 RED; 155 geçer, 156 RED', async () => {
     expect((await dene(['@kolon', 'seo_desc'], 'a'.repeat(110))).kod).toBe(0)
@@ -177,7 +179,7 @@ describe('KTL-21 S4 · uzunluk kapısı', () => {
     expect((await dene(['@kolon', 'seo_desc'], 'a'.repeat(156))).kod).toBe(1)
   })
   it('EN alanları aynı aralıkta ölçülür', async () => {
-    expect((await dene(['seo_title_en'], 'B'.repeat(51))).kod).toBe(1)
+    expect((await dene(['seo_title_en'], 'b'.repeat(51))).kod).toBe(1)
     expect((await dene(['seo_desc_en'], 'b'.repeat(109))).kod).toBe(1)
   })
 })
@@ -185,7 +187,9 @@ describe('KTL-21 S4 · uzunluk kapısı', () => {
 describe('KTL-21 S5 · marka eki', () => {
   it('başlıkta " | VentHub" RED (kod ekler)', async () => {
     const r = await kos({ kalemler: [kalem(['@kolon', 'seo_title'], 'Kanal Tipi Fanlar | VentHub')] })
-    expect(r.kod).toBe(1); expect(r.cikti).toContain('R7 baslik-ek-yok')
+    // Metindeki bütün sözcükler gövdede var ve uzunluk sınır içinde: yalnız ek kuralı düşebilir.
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 baslik-ek-yok')
+    expect(r.cikti).not.toContain('✗R7 seo-kaynak-sozcuk'); expect(r.cikti).not.toContain('✗R7 seo-uzunluk')
   })
 })
 
@@ -311,5 +315,82 @@ describe('KTL-21 S14 · boş alanda geri alma idempotent', () => {
     expect(r.cikti).toContain('yazılacak 0')
     expect(r.cikti).toContain('zaten aynı 4')
     expect(patchler()).toHaveLength(0)
+  })
+})
+
+// Bağımsız iddia okumasının bulguları: eski kapılar bu girdilere KÖRDÜ (112/112 geçiyordu).
+const DOLGU = ' kanal hattının içinde taşıyan kanala seri bağlanan fanlar yuvarlak ve dikdörtgen kesitli modeller vardır' // gövdede geçen sözcükler, ≥110 kr için
+
+describe('KTL-21 S15 · rakam ve yüzde yazılmaz', () => {
+  it.each([['yüzde 95 daha sessiz'], ['%95 daha sessiz'], ['95 dB altında çalışır'], ['ISO 9001 kapsamındadır'], ['2G sınıfı için uygundur']])('"%s" RED', async (parca: string) => {
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_desc'], `fanlar ${parca}${DOLGU}`)] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 seo-rakam-yok')
+    expect(patchler()).toHaveLength(0)
+  })
+})
+
+describe('KTL-21 S16 · iddia kökü yazılmaz (çekimli biçimler dahil)', () => {
+  it.each([['enerji tasarrufu sağlar'], ['işletme maliyeti düşüktür'], ['garantili çalışır'], ['sertifikalı üründür'], ['operating cost is low'], ['energy savings']])('"%s" RED', async (parca: string) => {
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_desc'], `fanlar ${parca}${DOLGU}`)] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 seo-iddia-koku-yok')
+  })
+})
+
+describe('KTL-21 S17 · büyük harfli sözcük kategorinin kendi kaynağında geçmeli', () => {
+  it.each([[['@kolon', 'seo_desc']], [['seo_desc_en']]])('kaynakta olmayan marka RED (%j)', async (yol: unknown) => {
+    const r = await kos({ kalemler: [kalem(yol as Kalem['yol'], `Siemens motorlu fanlar${DOLGU}`)] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 seo-kaynak-sozcuk'); expect(r.cikti).toContain('Siemens')
+  })
+  it('cümle başındaki kaynak dışı sözcük de yakalanır', async () => {
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_desc'], `Vortice fanları${DOLGU}`)] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('Vortice')
+  })
+  it('kaynakta geçen büyük harfli sözcükler (çekimli) geçer, çıkış 0', async () => {
+    // "Kanalın" gövdede tam bu biçimde YOK (gövdede "kanal", "kanala"); ilk 5 harf eşleşmesi çekimi karşılar.
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_desc'], 'Kanalın hattının içinde havayı taşıyan Fanlar. Yuvarlak ve Dikdörtgen kesitli modeller vardır, kanala seri bağlanır.')] })
+    expect(r.kod).toBe(0)
+  })
+  it('kategorinin kendi seo_title_en değeri kaynak sayılmaz (kalem kendini doğrulayamaz)', async () => {
+    // 1. kalem GEÇERLİ (yeni sözcük küçük harfli, kapıya takılmaz); 2. kalem aynı sözcüğü büyük harfle kullanır.
+    // seo_title_en kaynak sayılsaydı 2. kalem geçerdi.
+    const r = await kos({ kalemler: [kalem(['seo_title_en'], 'Duct Fans: circular models with zorlu'), kalem(['seo_desc_en'], `Zorlu fans${DOLGU}`)] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 seo-kaynak-sozcuk'); expect(r.cikti).toContain('Zorlu')
+  })
+})
+
+const DOLGU_EN = ' fans move air inside the duct run installed in-line with the ductwork circular and rectangular models' // EN gövdede geçen sözcükler
+
+describe('KTL-21 S18 · kaynak-sözcük kapısının kapsamı', () => {
+  it('BAŞLIKTA tamamı büyük harfli marka/model (SIEMENS) kaynakta yoksa RED', async () => {
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_title'], 'Kanal Fanları: SIEMENS Motorlu')] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('✗R7 seo-kaynak-sozcuk'); expect(r.cikti).toContain('SIEMENS')
+  })
+  it('başlıkta Title Case sözcük (büyük harf bilgi taşımaz) kaynak gerektirmez, ALL-CAPS kaynakta ise geçer', async () => {
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_title'], 'Kanal Fanları: Zorlu Seriler')] })
+    expect(r.kod).toBe(0)
+  })
+  it('AÇIKLAMADA aynı Title Case sözcük denetlenir (bilgi taşır)', async () => {
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_desc'], `Zorlu Seriler${DOLGU}`)] })
+    expect(r.kod).toBe(1); expect(r.cikti).toContain('Zorlu')
+  })
+  it('satırın kendi name sütunu kaynaktır (sayfa h1\'i oradan gelir)', async () => {
+    satirlar[0].name = 'Özgün Adlı Kategori'
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_desc'], `Özgün Adlı fanlar${DOLGU}`)] })
+    expect(r.kod).toBe(0)
+  })
+  it('İngilizce büyük I ile başlayan sözcük kaynaktaki küçük harfli biçimle eşleşir (ı→i katlama)', async () => {
+    satirlar[0].name = 'installation guide'
+    const r = await kos({ kalemler: [kalem(['seo_desc_en'], `Installation${DOLGU_EN}`)] })
+    expect(r.kod).toBe(0)
+  })
+  it('PATCH gövdesine ve yedeğe satırın name/description sütunları SIZMAZ (yalnız metadata ve arama kolonları)', async () => {
+    satirlar[0].name = 'Özgün Adlı Kategori'
+    const yedek = join(dizin, 'yedek-s18.json')
+    const r = await kos({ kalemler: [kalem(['@kolon', 'seo_title'], TR_BASLIK)] }, { yaz: true, onay: true, yedek })
+    expect(r.kod).toBe(0)
+    const g = patchler()[0].govde as Record<string, unknown>
+    expect(Object.keys(g).sort()).toEqual(['seo_title'])
+    const y = JSON.parse(readFileSync(yedek, 'utf8')) as { satirlar: Array<Record<string, unknown>> }
+    expect('name' in y.satirlar[0]).toBe(false)
   })
 })

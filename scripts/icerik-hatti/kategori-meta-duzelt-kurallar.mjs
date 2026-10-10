@@ -179,11 +179,59 @@ function notArtigiBul(/** @type {string} */ m) {
 /** Kategori metninde iş numarası yasak: REC-nn / KTL-nn / OPS-nn ve tek başına büyük harfli OPS (REF_DESENI yalnız [s.41] / [DB] kalıbını yakalar). */
 const IS_NUMARASI = /(?<![\p{L}\p{N}])(?:(?:REC|KTL|URN|ALT|SEO|BLG|HRT|ADM|SAT|EDG|TSR|OPS)-\d+|OPS)(?![\p{L}\p{N}])/u
 
+// ---- KTL-21 arama alanı kapıları (bağımsız iddia okuması bulguları: R3 rakama, çekimli iddia köküne ve kaynakta olmayan özel ada KÖRDÜ).
+/** Kök eşleşmesi (çekimli biçimler dahil): "tasarrufu", "garantili", "sertifikalı", "maliyeti" yakalanır. Yalnız arama alanlarında. */
+const IDDIA_KOKU = /(?<![\p{L}\p{N}])(?:tasarruf|garanti|sertifika|belgeli|maliyet|ücretsiz|indirim|kazanç|saving|warrant|certif|cost|discount)/u
+const RAKAM = /[\d%]|(?<![\p{L}\p{N}])(?:yüzde|percent)(?![\p{L}\p{N}])/iu
+// ı→i katlaması: Türkçe küçültmede İngilizce "Installation" "ınstallation" olur ve kaynaktaki "installation" ile eşleşmezdi.
+const kucuk = (/** @type {string} */ x) => x.toLocaleLowerCase('tr-TR').replace(/ı/g, 'i')
+
+/**
+ * Kategorinin KENDİ metin kaynağı: metadata'daki bütün dizgeler (açıklama, hero, başlık, özellikler, slug).
+ * Arama alanlarının kendisi (seo_*_en, "@kolon") DIŞARIDA: plan kalemi kendi yazdığı metne dayanarak "kaynakta var" sayılamaz.
+ * @param {Meta | null | undefined} metadata
+ */
+export function kaynakMetni(metadata) {
+  /** @type {string[]} */
+  const parca = []
+  /** @param {unknown} v */
+  const gez = (v) => {
+    if (typeof v === 'string') parca.push(v)
+    else if (dizi(v)) /** @type {unknown[]} */ (v).forEach(gez)
+    else if (nesne(v)) for (const [k, x] of Object.entries(/** @type {Meta} */ (v))) { if (k !== KOLON && k !== 'seo_title_en' && k !== 'seo_desc_en') gez(x) }
+  }
+  gez(metadata)
+  return parca.join('\n')
+}
+
+/**
+ * Marka/model/özel ad kapısı: büyük harfli sözcük kategorinin KENDİ kaynağında geçmeli.
+ * - AÇIKLAMA (baslikMi=false): büyük harfle başlayan HER sözcük (cümle başı dahil: "Vortice fanları…").
+ * - BAŞLIK (baslikMi=true): başlıkta her sözcük büyük harfle başladığı için büyük harf bilgi taşımaz;
+ *   yalnız TAMAMI BÜYÜK sözcükler (AIR DOOR, PTC, ATEX) denetlenir.
+ * Eşleşme: sözcüğün ilk 5 harfi (kısa sözcükte tamamı) kaynakta bir sözcüğün başında aranır (Türkçe çekim eki toleransı).
+ * @returns {string[]} kaynakta bulunamayan sözcükler
+ */
+export function kaynakDisiOzelAd(/** @type {string} */ metin, /** @type {string} */ kaynak, /** @type {boolean} */ baslikMi = false) {
+  const sozcukler = kucuk(kaynak).match(/\p{L}+/gu) ?? []
+  /** @type {Set<string>} */
+  const yok = new Set()
+  for (const m of metin.matchAll(/\p{Lu}\p{L}*/gu)) {
+    const ham = m[0]
+    if (baslikMi && !(ham.length >= 2 && ham === ham.toLocaleUpperCase('tr-TR'))) continue
+    const t = kucuk(ham)
+    const p = t.slice(0, 5)
+    if (!sozcukler.some((w) => w.startsWith(p))) yok.add(ham)
+  }
+  return [...yok]
+}
+
 /**
  * KURAL 3 — `yeni` metin kapıları. Her kural ayrı satırda raporlanır (kuru koşumda ✓/✗).
+ * `kaynak` verilirse (arama alanları) kaynak-sözcük kapısı da koşar; verilmezse atlanır.
  * @returns {KuralSonucu[]}
  */
-export function metinKapilari(/** @type {string} */ yeni, /** @type {Yol} */ yol) {
+export function metinKapilari(/** @type {string} */ yeni, /** @type {Yol} */ yol, /** @type {string | undefined} */ kaynak) {
   const seo = seoAlani(yol)
   const en = (dizi(yol) && yol[0] === 'description_i18n' && yol[1] === 'en') || seo === 'seo_title_en' || seo === 'seo_desc_en'
   const s = typeof yeni === 'string' ? yeni : ''
@@ -206,6 +254,15 @@ export function metinKapilari(/** @type {string} */ yeni, /** @type {Yol} */ yol
     if (seo === 'seo_title' || seo === 'seo_title_en') {
       const ek = /\|\s*VentHub\s*$/i.test(s.trim())
       kurallar.push({ kural: 'R7 baslik-ek-yok', gecti: !ek, ayrinti: ek ? 'başlıkta " | VentHub" eki var (kod ekler; iki kez eklenmez ama uzunluk sınırı eksiz hesaplanır)' : undefined })
+    }
+    // KTL-21 bağımsız okuma bulguları: sayı/yüzde yok, iddia kökü yok, özel ad kaynakta olmalı.
+    const rakam = RAKAM.test(s)
+    kurallar.push({ kural: 'R7 seo-rakam-yok', gecti: !rakam, ayrinti: rakam ? 'rakam ya da yüzde var (arama alanında yeni sayı yazılmaz)' : undefined })
+    const kok = IDDIA_KOKU.exec(kucuk(s))
+    kurallar.push({ kural: 'R7 seo-iddia-koku-yok', gecti: !kok, ayrinti: kok ? `iddia kökü: "${kok[0]}" (tasarruf/garanti/sertifika/maliyet vb. arama alanında yazılmaz)` : undefined })
+    if (kaynak !== undefined) {
+      const yok = kaynakDisiOzelAd(s, kaynak, seo === 'seo_title' || seo === 'seo_title_en')
+      kurallar.push({ kural: 'R7 seo-kaynak-sozcuk', gecti: yok.length === 0, ayrinti: yok.length ? `kaynakta geçmeyen büyük harfli sözcük: ${yok.join(', ')}` : undefined })
     }
   }
   return kurallar
@@ -236,9 +293,10 @@ export function kalemSekli(/** @type {unknown} */ k) {
  * Tek kalemi mevcut metadata'ya uygular. SIRA: şekil → yol (R1) → metin (R3) → eşleşme (R2) → idempotent (R6).
  * @param {Meta | null | undefined} metadata
  * @param {Kalem} kalem
+ * @param {string} [ekKaynak] satırın metin sütunları (name, menu_label, marketing_title, description); arama alanı kaynak kapısı için
  * @returns {{ durum: 'yaz' | 'ayni' | 'red', sebep?: string, once?: unknown, sonra?: string | null, yeni_metadata?: Meta, kurallar: KuralSonucu[] }}
  */
-export function kalemUygula(metadata, kalem) {
+export function kalemUygula(metadata, kalem, ekKaynak = '') {
   /** @type {KuralSonucu[]} */
   const kurallar = []
   const red = (/** @type {string} */ sebep) => ({ durum: /** @type {const} */ ('red'), sebep, kurallar })
@@ -260,7 +318,8 @@ export function kalemUygula(metadata, kalem) {
     return { durum: 'yaz', once: mevcut, sonra: null, yeni_metadata: alanBosalt(metadata, kalem.yol), kurallar }
   }
 
-  for (const m of metinKapilari(kalem.yeni, kalem.yol)) kurallar.push(m)
+  // KTL-21: kaynak = metadata dizgeleri + satırın kendi metin sütunları (name, menu_label, marketing_title, description) — sayfanın h1'i bunlardan gelir.
+  for (const m of metinKapilari(kalem.yeni, kalem.yol, seoAlani(kalem.yol) ? `${kaynakMetni(metadata)}\n${ekKaynak}` : undefined)) kurallar.push(m)
   const metinHata = kurallar.find(x => !x.gecti)
   if (metinHata) return red(`${metinHata.kural}: ${metinHata.ayrinti}`)
 
@@ -307,12 +366,13 @@ export function kalemUygula(metadata, kalem) {
  * Bir kategorinin tüm kalemlerini SIRAYLA uygular (sonraki kalem öncekinin sonucunu görür).
  * @param {Meta | null | undefined} metadata
  * @param {Kalem[]} kalemler
+ * @param {string} [ekKaynak]
  */
-export function kategoriPlani(metadata, kalemler) {
+export function kategoriPlani(metadata, kalemler, ekKaynak = '') {
   let gecerli = metadata
   const sonuclar = []
   for (const k of kalemler) {
-    const r = kalemUygula(gecerli, k)
+    const r = kalemUygula(gecerli, k, ekKaynak)
     sonuclar.push({ kalem: k, ...r })
     if (r.durum === 'yaz' && r.yeni_metadata) gecerli = r.yeni_metadata
   }
