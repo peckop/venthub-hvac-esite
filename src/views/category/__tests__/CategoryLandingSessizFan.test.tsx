@@ -45,7 +45,6 @@ vi.mock('@/components/category/sections', () => {
     SilentFanFAQ: kutu('SilentFanFAQ'),
     SilentFanHowItWorks: kutu('SilentFanHowItWorks'),
     SilentFanProblem: kutu('SilentFanProblem'),
-    SilentFanTypeComparison: kutu('SilentFanTypeComparison'),
     SilentFanVorticeBrand: kutu('SilentFanVorticeBrand'),
     TrustSignals: kutu('TrustSignals'),
     TypeComparison: kutu('TypeComparison'),

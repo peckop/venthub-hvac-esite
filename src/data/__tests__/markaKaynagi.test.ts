@@ -141,7 +141,8 @@ describe('INV-MARKA-KAYNAK-1: marka listesi = DB\'de ürünü olan markalar', ()
     expect(harita).toMatch(/from '\.\.\/lib\/seo\/markaUrunDurumu'/)
     // Gövde kararı aynı `markaUrunsuzMu` ile alır ve istemci görünümüne prop geçirir.
     expect(sayfa).toMatch(/const urunsuz = await markaUrunsuzMu\(lang, slug, sayac\)/)
-    expect(sayfa).toMatch(/<PageComponent initialBrandSlug=\{slug\} urunsuz=\{urunsuz\} \/>/)
+    // URN-79: aynı görünüme DB'den türeyen `urunOzeti` de geçer (ürünsüz markada boş; karar `urunsuz`dan gelir).
+    expect(sayfa).toMatch(/<PageComponent initialBrandSlug=\{slug\} urunsuz=\{urunsuz\} urunOzeti=\{urunOzeti\} katalogSayilari=\{katalogSayilari\} \/>/)
     // Her iki üst veri rotası kararı yardımcıdan alıp üst veri kurucusuna geçirir (atlayıp doğrudan çağırmak kırmızı).
     for (const yol of [
       ['src', 'app', '[lang]', 'brands', '[slug]', 'page.tsx'],
@@ -163,6 +164,23 @@ describe('INV-MARKA-KAYNAK-1: marka listesi = DB\'de ürünü olan markalar', ()
     expect(sarmal![0]).not.toMatch(/\.catch\(|try\s*\{/)
     // Kural 6: aynı render'da tekrar eden sorgu React.cache ile tekilleştirilir.
     expect(sayfa).toMatch(/const markaUrunSayisiOku = cache\(/)
+  })
+
+  // URN-79: marka sayfası metnini DB'den türeten ikinci okuma (aile adları + kategoriler) AYNI kuralla sarılır: yeni önbellek
+  // biçimi yok, anahtar lang+tenantId, webhook'un tazelediği keşif etiketleri (rendering-cache-standard.md §3: product_families,
+  // products, brands ve categories değişimi bu etiketi tazeler). Hata önbelleğe yazılmaz; "özet yok" kararı önbelleğin DIŞINDA.
+  it('katalog özeti önbellek sarmalı: anahtar lang+tenantId+marka, keşif etiketleri, sarmalın içinde hata yutulmaz; ürünsüz markada okunmaz', () => {
+    const sayfa = readFileSync(join(KOK, 'src', 'app', '_components', 'markaSayfasi.tsx'), 'utf8')
+    const sarmal = sayfa.match(/const getCachedMarkaKatalogOzeti = [\s\S]*?\)\(\)/)
+    expect(sarmal, 'getCachedMarkaKatalogOzeti sarmalı bulunamadı').not.toBeNull()
+    expect(sarmal![0]).toMatch(/unstable_cache\(/)
+    expect(sarmal![0]).toMatch(/\['brand-catalog-summary', lang, tenantId, markaAdi\]/)
+    expect(sarmal![0]).toMatch(/tags: \[PRODUCTS_DISCOVERY_TAG, discoveryTag\(tenantId\)\]/)
+    expect(sarmal![0]).not.toMatch(/\.catch\(|try\s*\{/)
+    // DI (kural 2): servis çağrısının ilk parametresi statik istemci enjeksiyonu, modül düzeyi istemci importu değil.
+    expect(sarmal![0]).toMatch(/getBrandCatalogSummary\(supabaseStaticClient, markaAdi\)/)
+    // Ürünsüz markada özet sorgusu hiç atılmaz.
+    expect(sayfa).toMatch(/brand && !urunsuz\s*\?\s*await markaKatalogVerisi\(/)
   })
 
   it('casals ve flexiva listede, eski 308 tablosunda DEĞİL (OPS-51)', () => {
@@ -407,7 +425,8 @@ describe('INV-MARKA-KAYNAK-1 (f): ürünsüz marka sayfası noindex,follow ve ü
     vi.resetModules()
     const m = await import('../../app/_components/markaSayfasi')
     const urunsuzProp = async (sayi: number) => {
-      const el = await m.MarkaSayfasi({ lang: 'tr', slug: 'flexiva', sayac: async () => sayi })
+      // URN-79: ürünlü kolda gövde katalog özetini de okur; bu test `urunsuz` kararını ölçer → okuyucu ENJEKTE (ağ/önbellek yok).
+      const el = await m.MarkaSayfasi({ lang: 'tr', slug: 'flexiva', sayac: async () => sayi, katalogOzeti: async () => null })
       const cocuklar = (el.props as { children: { props: { urunsuz?: boolean } }[] }).children
       return cocuklar[1].props.urunsuz
     }

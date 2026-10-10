@@ -319,44 +319,45 @@ describe('SilentFanVorticeBrand — boş sayaç kartı çizilmez', () => {
 
 describe('SilentFanProblem — boş sorun kartı ve boş açıklama çizilmez', () => {
   const P = 'categorySilentFan.problem.'
+  // URN-82: sözlükte ÜÇ sorun kartı var (dördüncü, kaynağı olmayan kart kalktı); koruma kart sayısına bağlı değildir.
+  // Son kart tablonun bıraktığı gibi BOŞ yazılır; sütun sayısı çizilen kart sayısından türer.
   const TABAN = {
     [`${P}painPoints[0].title`]: 'B0',
     [`${P}painPoints[0].description`]: 'A0',
     [`${P}painPoints[1].title`]: 'B1',
     [`${P}painPoints[1].description`]: 'A1',
-    [`${P}painPoints[2].title`]: 'B2',
-    [`${P}painPoints[2].description`]: 'A2',
-    [`${P}painPoints[3].title`]: '',
-    [`${P}painPoints[3].description`]: '',
+    [`${P}painPoints[2].title`]: '',
+    [`${P}painPoints[2].description`]: '',
   }
   /** Kart ızgarası: `grid … gap-4` (içerideki karşılaştırma ızgarası gap-8). */
   const kartlar = (container: HTMLElement) => container.querySelector('div.grid.gap-4')
 
-  it('başlık VE açıklama boş kart atılır: dört kart üçe iner, ızgara üç sütun olur', () => {
+  it('başlık VE açıklama boş kart atılır: üç kart ikiye iner, ızgara iki sütun olur', () => {
     kaynak.dict = sozluk(TABAN)
+    const { container } = render(<SilentFanProblem />)
+    const kutu = kartlar(container)
+    expect(kutu!.children).toHaveLength(2)
+    expect(kutu!.className).toContain('lg:grid-cols-2')
+    expect(kutu!.className).not.toContain('lg:grid-cols-3')
+    expect(kutu!.className).not.toContain('lg:grid-cols-4')
+    expect(Array.from(kutu!.querySelectorAll('h3')).map((h) => h.textContent)).toEqual(['B0', 'B1'])
+  })
+
+  it('OLUMLU KONTROL: üçüncü kart doluysa üç kart, üç sütun', () => {
+    kaynak.dict = sozluk(TABAN, { [`${P}painPoints[2].title`]: 'BAŞLIK', [`${P}painPoints[2].description`]: 'AÇIKLAMA' })
     const { container } = render(<SilentFanProblem />)
     const kutu = kartlar(container)
     expect(kutu!.children).toHaveLength(3)
     expect(kutu!.className).toContain('lg:grid-cols-3')
-    expect(kutu!.className).not.toContain('lg:grid-cols-4')
-    expect(Array.from(kutu!.querySelectorAll('h3')).map((h) => h.textContent)).toEqual(['B0', 'B1', 'B2'])
-  })
-
-  it('OLUMLU KONTROL: dördüncü kart doluysa dört kart, dört sütun', () => {
-    kaynak.dict = sozluk(TABAN, { [`${P}painPoints[3].title`]: 'BAŞLIK', [`${P}painPoints[3].description`]: 'AÇIKLAMA' })
-    const { container } = render(<SilentFanProblem />)
-    const kutu = kartlar(container)
-    expect(kutu!.children).toHaveLength(4)
-    expect(kutu!.className).toContain('lg:grid-cols-4')
-    expect(kutu!.children[3].textContent).toBe('BAŞLIKAÇIKLAMA')
+    expect(kutu!.children[2].textContent).toBe('BAŞLIKAÇIKLAMA')
   })
 
   it('yalnız açıklama boşsa kart başlıkla durur, boş <p> basılmaz', () => {
-    kaynak.dict = sozluk(TABAN, { [`${P}painPoints[3].title`]: 'Yalnız başlık' })
+    kaynak.dict = sozluk(TABAN, { [`${P}painPoints[2].title`]: 'Yalnız başlık' })
     const { container } = render(<SilentFanProblem />)
-    const dorduncu = kartlar(container)!.children[3]
-    expect(dorduncu.textContent).toBe('Yalnız başlık')
-    expect(dorduncu.querySelector('p')).toBeNull()
+    const ucuncu = kartlar(container)!.children[2]
+    expect(ucuncu.textContent).toBe('Yalnız başlık')
+    expect(ucuncu.querySelector('p')).toBeNull()
     expect(Array.from(container.querySelectorAll('p, h3')).filter(bosMetin)).toHaveLength(0)
   })
 })

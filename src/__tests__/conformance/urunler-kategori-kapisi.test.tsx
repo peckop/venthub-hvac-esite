@@ -154,7 +154,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
 
     // `getDictValue` NESTED-ONLY: anahtar çözülemezse HAM ANAHTARI basar ve hiçbir
     // statik kapı bunu görmez. Bu kol tam o hâli yakalar.
-    expect(baslik.textContent).toBe('Popüler Kategoriler')
+    expect(baslik.textContent).toBe('Ana Kategoriler')
     expect(baslik.textContent).not.toContain('products.')
   })
 
@@ -163,7 +163,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
     const icinde = within(blok())
 
     expect(icinde.getAllByRole('link')[0].getAttribute('href')).toBe('/en/category/fanlar')
-    expect(icinde.getByRole('heading', { level: 2 }).textContent).toBe('Popular Categories')
+    expect(icinde.getByRole('heading', { level: 2 }).textContent).toBe('Main Categories')
   })
 
   it('K4 · AYIRT EDİCİ — kategori yoksa hiç bağlantı üretmez (boş başlık bırakmaz)', () => {
@@ -250,12 +250,12 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
     )
     const icinde = within(blok())
     // Başlık ana sayfanın kendi cümlesi olmalı — products'ınki DEĞİL.
-    expect(icinde.getByRole('heading', { level: 2 }).textContent).toBe('Hava Akışının Mühendislik Estetiği')
+    expect(icinde.getByRole('heading', { level: 2 }).textContent).toBe('Kategoriye Göre Havalandırma Ürünleri')
     // Göz satırı ve giriş cümlesi ana sayfada ÇİZİLİR (products'ta `null` geçilip susturuluyor).
     // Bu iki satır olmadan kol boş bir iddiaya döner: "bir şeyler var" ölçüm değildir.
     expect(icinde.getByText('HAVALANDIRMA ÇÖZÜMLERİ')).toBeInTheDocument()
     expect(
-      icinde.getByText('VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.')
+      icinde.getByText('Fan, hava perdesi, ısı geri kazanım ve kontrol sistemi ürün ailelerini ve modellerini inceleyin.')
     ).toBeInTheDocument()
   })
 })

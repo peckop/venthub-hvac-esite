@@ -299,6 +299,28 @@ notu bunu açıkça yasaklıyor.
 > üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
 > yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
 
+### 3.4 Marka sayfası (`/[lang]/brands/[slug]`) — DB'den türeyen gövde özeti, URN-79 (2026-10-09)
+
+Marka sayfasının gövdesi üretici övgüsü yerine markanın sitedeki **ürün ailelerini ve kategorilerini** DB'den yazar
+(`markaSayfasi.tsx` → `getBrandCatalogSummary`, sözlük şablonu `brands.detail.catalog*`). Statik sayfada görünen her tablo için
+zincir (§3 kuralı) — hepsi aynı keşif etiketine bağlanır, yeni önbellek biçimi YOKTUR:
+
+| Marka sayfasında görünen | Kaynak | Tetik + handler | Keşif etiketini tazeliyor mu |
+|---|---|---|---|
+| Aile sayısı + aile adları (`name`, `name_i18n`) | `product_families` (+ `products.status='active'` süzgeci, RPC) | `on_product_families_change`, `on_products_change` | **EVET** — `PRODUCTS_DISCOVERY_TAG` |
+| Kategori adları (alt kategori, yoksa ana kategori; yalnız `is_active`) | `categories` | `on_categories_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
+| Marka eşleşmesi (`p_brand` adı) | `brands` | `on_brands_change` | **EVET** — handler `PRODUCTS_DISCOVERY_TAG` + `HOME_DATA_TAG` |
+
+Önbellek: `unstable_cache`, anahtar `['brand-catalog-summary', lang, tenantId, markaAdı]` (kural 12), etiketler
+`[PRODUCTS_DISCOVERY_TAG, discoveryTag(tenantId)]`, `revalidate: 3600` emniyet kemeri — aile sayısı için kurulan
+`brand-active-product-count` sarmalıyla AYNI desen. Kapı: `markaKaynagi.test.ts` "katalog özeti önbellek sarmalı".
+
+**Hata yolu SAYIDAN FARKLIDIR (bilerek):** aile SAYISI okunamazsa karar fırlatır (yanlış "ürünsüz" noindex + harita dışı yazar,
+bkz. `markaUrunDurumu.ts`); bu ÖZET ise isteğe bağlı metindir — okunamazsa sayfa özet paragrafsız çizilir, uyarı basılır, hata
+önbelleğe YAZILMAZ ve sonraki yenilemede (en geç 1 saat) kendiliğinden döner. Ürünsüz markada (sayı 0) özet sorgusu hiç atılmaz.
+Üst veri (`<title>`/meta description) ve Brand JSON-LD bu özeti KULLANMAZ: yalnız kayıttaki nötr cümleden türer
+(`markaAciklamasi`, tek kaynak) — arama sonucu açıklaması DB gecikmesine/hatasına bağlanmaz.
+
 ### Prod doğrulaması (2026-08-15, `pg_trigger` sorgulandı)
 
 Statik kapı repo SQL'ini denetler; **prod'un gerçekten aynı hâlde olduğu ayrıca ölçülmelidir.** Ölçüm:

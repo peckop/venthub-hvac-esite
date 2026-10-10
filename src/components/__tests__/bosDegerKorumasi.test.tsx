@@ -110,22 +110,39 @@ describe('CaseStudySection — etiketi boş ölçü hapı ve boş kart çizilmez
   })
 })
 
-describe('Footer — boş cumartesi satırı çizilmez', () => {
-  it('cumartesi etiketi boşken ne "09:00 - 14:00" ne de yarım satır / <br> basılır', () => {
-    kaynak.dict = sozluk({ 'footer.saturday': '' })
+// URN-82 ile çalışma saati kutusu (hafta içi / cumartesi saat aralığı) kalktı; yerinde "Teklif ve Sorular" başlığı,
+// yönlendirme cümlesi ve iletişim formu bağlantısı durur. URN-84'ün koruması bu yeni kutuya taşındı: başlık ya da cümle
+// sözlükte BOŞ bırakılırsa o öğe boş çizilmez; iletişim bağlantısı her durumda kalır.
+describe('Footer — "Teklif ve Sorular" kutusunda boş başlık ya da cümle çizilmez', () => {
+  /** Kutu = iletişim formu bağlantısının (metniyle bulunur; adres dil önekine bağlı değil) kapsayıcısı. */
+  const kutu = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll('footer a')).find((a) => a.textContent === tr.footer.contactForm)?.parentElement ?? null
+
+  it('başlık ve cümle boşken kutuda boş <h4> / <p> yok, saat sabiti de yok; iletişim bağlantısı durur', () => {
+    kaynak.dict = sozluk({ 'footer.workingHours': '', 'footer.weekdays': '' })
     const { container } = render(<Footer />)
-    const saatler = container.querySelector('footer p.text-xs')
-    expect(saatler).not.toBeNull()
-    expect(saatler!.textContent).not.toContain('09:00 - 14:00')
-    expect(saatler!.querySelector('br')).toBeNull()
+    const cizilen = kutu(container)
+    expect(cizilen, 'iletişim formu bağlantısının kutusu bulunamadı').not.toBeNull()
+    expect(cizilen!.querySelector('h4')).toBeNull()
+    expect(cizilen!.querySelector('p')).toBeNull()
+    expect(cizilen!.textContent).toContain(tr.footer.contactForm)
+    expect(container.textContent).not.toMatch(/\d{1,2}:\d{2}/)
   })
 
-  it('OLUMLU KONTROL: etiket doluysa cumartesi satırı çizilir', () => {
-    kaynak.dict = sozluk({ 'footer.saturday': 'Cumartesi' })
+  it('yalnız cümle boşsa yalnız o alan basılmaz (başlık durur)', () => {
+    kaynak.dict = sozluk({ 'footer.weekdays': '' })
     const { container } = render(<Footer />)
-    const saatler = container.querySelector('footer p.text-xs')
-    expect(saatler!.textContent).toContain('Cumartesi: 09:00 - 14:00')
-    expect(saatler!.querySelector('br')).not.toBeNull()
+    const cizilen = kutu(container)
+    expect(cizilen!.querySelector('h4')?.textContent).toBe(tr.footer.workingHours)
+    expect(cizilen!.querySelector('p')).toBeNull()
+  })
+
+  it('OLUMLU KONTROL: ikisi doluyken başlık ve cümle çizilir', () => {
+    kaynak.dict = sozluk({})
+    const { container } = render(<Footer />)
+    const cizilen = kutu(container)
+    expect(cizilen!.querySelector('h4')?.textContent).toBe(tr.footer.workingHours)
+    expect(cizilen!.querySelector('p')?.textContent).toBe(tr.footer.weekdays)
   })
 })
 

@@ -13,8 +13,6 @@ import BuildTag from './BuildTag'
 // ADDRESS/PHONE ikon sabitleri, adres+telefon satırlarıyla birlikte kaldırıldı
 // (2026-08-28) — kullanılmayan sabit bırakmak lint'i kırardı.
 const FOOTER_ICON_MAIL = 'M'
-const WEEKDAY_HOURS = '09:00 - 18:00'
-const SATURDAY_HOURS = '09:00 - 14:00'
 /** Telif satırında marka adından sonra gelen cümle sonu (JSX'te çıplak metin `jsx-no-literals` kuralına takılır). */
 const TELIF_CUMLE_SONU = '.'
 /** Altbilgide gösterilecek en çok kök kategori (bugün 7 ürünlü kök var; 8. kök gelirse tavan bilinçli kararla artar). */
@@ -26,7 +24,10 @@ const Footer: React.FC = () => {
   const { categories: globalCategories } = useCategories()
   // Karar 92: Bilgi Merkezi adresi dile göre; EN kapalıyken bağlantı basılmaz.
   const bilgiMerkeziHref = bilgiMerkeziListeHref(lang)
-  const cumartesi = t('footer.saturday')
+  // URN-84 + URN-82: "Teklif ve Sorular" başlığı ile yönlendirme cümlesi (anahtar adları `workingHours` / `weekdays` tarihsel)
+  // sözlükte BOŞ bırakılabilir; boş değer boş öğe olarak çizilmez (iletişim formu bağlantısı her durumda durur).
+  const teklifBaslik = t('footer.workingHours')
+  const teklifCumle = t('footer.weekdays')
 
   // OPS-51: Sığınak 7. KÖK oldu (ürünlü kök sayısı 6 → 7). Eskiden burada `.slice(0, 8)` ve aşağıda İKİNCİ bir
   // `.slice(0, 6)` vardı (ilk depo işlemi, gerekçe yorumu YOK): kategoriler `level, name` sırasıyla geldiği için 7. kök
@@ -145,23 +146,30 @@ const Footer: React.FC = () => {
                   değer basılmaz (2026-08-28 taraması); gerçek bilgi gelince geri eklenir. */}
               <div className="flex items-center space-x-3">
                 <span className="text-secondary-blue flex-shrink-0">{FOOTER_ICON_MAIL}</span>
-                <span className="text-gray-300 text-sm">{t('footer.email')}</span>
+                <a
+                  href={`mailto:${t('footer.email')}`}
+                  className="text-gray-300 hover:text-white transition-colors text-sm"
+                >
+                  {t('footer.email')}
+                </a>
               </div>
             </div>
 
-            {/* Working Hours */}
-            <div className="mt-4 p-3 bg-white/5 rounded-lg">
-              <h4 className="font-medium text-sm mb-2">{t('footer.workingHours')}</h4>
-              <p className="text-gray-300 text-xs">
-                {t('footer.weekdays')}: {WEEKDAY_HOURS}
-                {/* URN-84: tablo cumartesi satırını kaldırır (sözlükte BOŞ); boşken ne <br /> ne yarım satır basılır. */}
-                {doluMu(cumartesi) && (
-                  <>
-                    <br />
-                    {cumartesi}: {SATURDAY_HOURS}
-                  </>
-                )}
-              </p>
+            {/* URN-80: "Çalışma Saatleri" kutusu KALDIRILDI — hafta içi ve cumartesi saat aralıklarının hiçbir
+                kaynağı yoktu (2025-08-23 ilk şablon commit'inden kalma). URN-82: yerinde Blog tablosunun "Teklif ve
+                Sorular" başlığı ve yönlendirme cümlesi (sözlük anahtarları `footer.workingHours` / `footer.weekdays`:
+                adları tarihsel, değerleri saat değil) ve iletişim formu bağlantısı durur; saat gerçek ve kayıtlı olunca
+                sözlükle birlikte (TR+EN) geri eklenir. URN-84: başlık ya da cümle sözlükte boş kalırsa o öğe çizilmez.
+                Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts */}
+            <div className="mt-4">
+              {doluMu(teklifBaslik) && <h4 className="text-sm font-semibold mb-1">{teklifBaslik}</h4>}
+              {doluMu(teklifCumle) && <p className="text-gray-300 text-sm mb-2">{teklifCumle}</p>}
+              <Link
+                href={Routes.contact()}
+                className="inline-block text-sm font-medium text-white underline underline-offset-4 hover:text-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm"
+              >
+                {t('footer.contactForm')}
+              </Link>
             </div>
           </div>
         </div>

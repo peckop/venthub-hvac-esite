@@ -12,11 +12,17 @@ import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useSc
 const ProblemSection: React.FC = () => {
     const { t } = useI18n()
     const [sectionRef, isVisible] = useScrollAnimation<HTMLElement>()
+    // URN-80: kartlardaki büyük "stat" rakamları ('%30', '15°C', '2.5 m/s', '7/24') KALDIRILDI. Kaynak
+    // dizininde (venthub-pdf-ingestor/kaynak-dizini, Vortice AIR DOOR kataloğu, 2026-10-09 tarandı) bu
+    // rakamların hiçbiri geçmiyor: katalog yalnız "ısıtma ve soğutmada belirgin maliyet tasarrufu" diyor,
+    // yüzde vermiyor; 15°C'lik bir fark ya da 2.5 m/s'lik bir rüzgar değeri de yok (m/s değerleri
+    // üfleme hızıdır: 8-11.5 / 4-5 / 3-4.5 / 2-3.5 m/s, çıkıştan uzaklığa göre). Kaynaksız rakam doğrulanmış
+    // gibi basılmaz (vitrin-metni-standard K4/K4.1). Rakamı geri koyan, önce kaynak satırını yorumda gösterir.
+    // Kapı: src/components/category/sections/ProblemSection.test.tsx
     const problems = [
         {
             icon: DollarSign,
             title: t('category.problemSection.energyLossTitle'),
-            stat: '%30',
             description: t('category.problemSection.energyLossDesc'),
             color: 'text-red-500',
             bgColor: 'bg-red-50'
@@ -24,7 +30,6 @@ const ProblemSection: React.FC = () => {
         {
             icon: Thermometer,
             title: t('category.problemSection.tempDiffTitle'),
-            stat: '15°C',
             description: t('category.problemSection.tempDiffDesc'),
             color: 'text-orange-500',
             bgColor: 'bg-orange-50'
@@ -32,7 +37,6 @@ const ProblemSection: React.FC = () => {
         {
             icon: Wind,
             title: t('category.problemSection.airflowTitle'),
-            stat: '2.5 m/s',
             description: t('category.problemSection.airflowDesc'),
             color: 'text-blue-500',
             bgColor: 'bg-blue-50'
@@ -40,7 +44,6 @@ const ProblemSection: React.FC = () => {
         {
             icon: Bug,
             title: t('category.problemSection.pestTitle'),
-            stat: '7/24',
             description: t('category.problemSection.pestDesc'),
             color: 'text-green-500',
             bgColor: 'bg-green-50'
@@ -73,11 +76,6 @@ const ProblemSection: React.FC = () => {
                                 {/* Icon */}
                                 <div className={`w-10 h-10 sm:w-14 sm:h-14 ${problem.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
                                     <Icon className={problem.color} size={20} />
-                                </div>
-
-                                {/* Stat */}
-                                <div className={`text-2xl sm:text-4xl font-bold ${problem.color} mb-1 sm:mb-2`}>
-                                    {problem.stat}
                                 </div>
 
                                 {/* Title & Description */}

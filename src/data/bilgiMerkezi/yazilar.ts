@@ -90,15 +90,15 @@ Frekans konvertörü, motor hızını değiştirebilen ya da yükteki değişime
 
 ## Nasıl çalışır?
 
-Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre, evirici ve kontrol birimi [1].
+Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
 
 | Bölüm | Görevi |
 |---|---|
 | Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir [1] |
 | DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler [1] |
-| Evirici | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
+| İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
 
-Evirici, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
+İnvertör, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
 
 Hızı ayarlamanın temel yolu gerilimi ve frekansı birlikte değiştirmektir (V/Hz kontrolü); sürücü düşük hızlarda da tam tork verebilmek için bu oranı bir eğriye göre ayarlar [1]. Danfoss'un gerilim vektör kontrolü (VVC+), standart V/Hz kontrolüne göre hız ayarı ve yük torku değiştiğinde daha iyi dinamik tepki ve kararlılık sağlar [2][4].
 
@@ -194,9 +194,9 @@ Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasınd
 
 ## Sık sorulan sorular
 
-### Frekans konvertörü ile inverter aynı şey mi?
+### Frekans konvertörü ile invertör aynı şey mi?
 
-Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. Evirici (inverter) ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
+Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
 
 ### Frekans konvertörü ne kadar enerji tasarrufu sağlar?
 

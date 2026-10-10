@@ -60,7 +60,6 @@ interface KnowledgeBlockProps {
     cta: string;
     headingPrefix: string;
     headingAccent: string;
-    statsPipelineLabel: string;
     /**
      * ⭐`eyebrow` TİPE EKLENDİ (REC-148 B5, 2026-09-05) — ÖLÜ ANAHTARDI.
      *
@@ -79,12 +78,11 @@ interface KnowledgeBlockProps {
     primaryCta: string;
     secondaryCta: string;
   };
-  statsExperience: string;
   lang: string;
   onQuoteClick?: () => void;
 }
 
-const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, statsExperience, lang, onQuoteClick }) => {
+const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCtaDict, lang, onQuoteClick }) => {
   // Numara SSOT = ENV (NEXT_PUBLIC_SHOP_WHATSAPP); eski sabit değer uydurmaydı
   // ve gerçek bir vatandaşa denk gelebilirdi (2026-08-30 temizliği). ENV yoksa buton çıkmaz.
   const whatsAppNumber = getWhatsAppNumber()
@@ -206,7 +204,12 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
         )}
 
         {/* Integrated Final Action Layer (Unified Conversion) */}
-        <div className="mt-24 pt-24 border-t border-white/5 grid gap-12 lg:grid-cols-2 items-center">
+        {/* URN-80: sağ sütundaki "15+ Yıl Deneyim" sayaç kartı KALDIRILDI — şirketin deneyim yılı
+            hiçbir yerde kayıtlı değildi, rakam koda gömülüydü (`{15}`). Yerine bir şey KONMADI: koddan
+            ya da veritabanından türetilebilen karşılık yok. Kart çıkınca iki sütunlu ızgara tek hücreye
+            düşerdi (boş hücre); bu yüzden ızgara da kalktı, düğmeler tek satırda kalır.
+            Kapı: src/__tests__/conformance/vitrin-kaynaksiz-metin-yok.test.ts */}
+        <div className="mt-24 pt-24 border-t border-white/5">
           <div className="flex flex-wrap gap-6">
             <ClientLeadButton 
               primaryCta={finalCtaDict.primaryCta} 
@@ -223,20 +226,6 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                 {finalCtaDict.secondaryCta}
               </Link>
             )}
-          </div>
-
-          <div className="relative" data-observe="fade-up">
-            <div className="opacity-0 translate-y-4 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out delay-200 relative rounded-hvac-xl border border-white/10 bg-white/2 p-8 backdrop-blur-3xl overflow-hidden max-w-md lg:ml-auto">
-              <div className="flex items-center gap-8">
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-hvac-loose text-cyan-400 mb-1">{t.statsPipelineLabel}</div>
-                  <div className="text-4xl font-black text-white tracking-tighter">{15}<span className="text-cyan-400">+</span></div>
-                  <div className="text-xs font-bold uppercase tracking-hvac-normal text-slate-500 mt-1">
-                    {statsExperience}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

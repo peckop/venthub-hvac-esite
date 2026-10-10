@@ -303,7 +303,8 @@ describe('eski marka rotası — bugünküyle aynı', () => {
   it('üst veri BİREBİR bugünkü', async () => {
     const m = await markaEskiUst(p({ lang: 'tr', slug: 'avens' }))
     // REC-497: şablon kalktı; açıklama markanın kendi kaydından, marka adı başta, ilk cümlede biter.
-    const aciklama = 'Avens: Yüksek performanslı endüstriyel havalandırma ve klima santralleri çözümleri.'
+    // BLG-6 (10-09): kayıt metni kanıtlı katalog olgusuna çevrildi; 160 karakterde kırpılır.
+    const aciklama = 'Avens: Türkiye merkezli havalandırma markası. Katalogda kanal ısıtıcıları, sulu bataryalar, ısı geri kazanım cihazları, sığınak havalandırma üniteleri ve…'
     expect(m).toEqual({
       title: 'Avens Ürünleri ve Çözümleri | VentHub',
       description: aciklama,
@@ -334,7 +335,8 @@ describe('eski marka rotası — bugünküyle aynı', () => {
     // İki dil de ölçülür: EN öneki yeni şemada da `brands` olduğu için yalnız EN'e bakan kol
     // şema kaymasını GÖRMEZ (sabotaj S14 ilk koşumda tam bu yüzden yeşil kaldı).
     for (const lang of ['tr', 'en'] as const) {
-      const el = await GercekMarkaSayfasi({ lang, slug: 'avens', sayac: async () => 5 })
+      // URN-79: gövde DB'den katalog özeti de okur; bu test adresi ölçer → özet okuyucusu ENJEKTE (ağ/önbellek yok).
+      const el = await GercekMarkaSayfasi({ lang, slug: 'avens', sayac: async () => 5, katalogOzeti: async () => null })
       const cocuklar = (el.props as { children: ReactElement<{ dangerouslySetInnerHTML: { __html: string } }>[] })
         .children
       const jsonLd = JSON.parse(cocuklar[0].props.dangerouslySetInnerHTML.__html) as { url: string }

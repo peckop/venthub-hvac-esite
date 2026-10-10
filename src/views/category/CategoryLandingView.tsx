@@ -13,7 +13,6 @@ import {
     SilentFanFAQ,
     SilentFanHowItWorks,
     SilentFanProblem,
-    SilentFanTypeComparison,
     SilentFanVorticeBrand,
     TrustSignals,
     TypeComparison,
@@ -193,7 +192,6 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                         <SilentFanProblem />
                         <SilentFanHowItWorks />
                         <SilentFanVorticeBrand />
-                        <SilentFanTypeComparison />
                         <TrustSignals />
                         <SilentFanFAQ />
                     </>

@@ -13,7 +13,21 @@ export interface EngineeringInference {
   type: 'noise' | 'efficiency' | 'power' | 'quality';
   descriptionKey: string;
   isI18n: boolean;
+  /**
+   * Sözlük metnindeki `{{esik1}}` gibi yer tutucuların değerleri (URN-82). Metin (label/desc) eşikleri YAZMAZ, bu
+   * alandan alır: sınıflandırma ile ekrandaki cümle aynı sabitten beslenir, biri değişince öteki kendiliğinden döner.
+   * Çağıran `t(labelKey, params)` / `t(descriptionKey, params)` verir; vermezse ekranda ham `{{esik1}}` görünür
+   * (kapı: `src/i18n/__tests__/yer-tutucu-kapisi.test.ts`).
+   */
+  params?: Record<string, number>;
 }
+
+/** Ses sınıfı eşikleri, dB(A): <esik1 · esik1–esik2 · esik2–esik3 · ≥esik3. */
+export const SES_ESIKLERI = { esik1: 30, esik2: 45, esik3: 60 } as const;
+/** Isıl verim sınıfı eşikleri, %: ≥esik1 · esik2–esik1 · esik3–esik2 (esik3 altı sınıflanmaz). */
+export const VERIM_ESIKLERI = { esik1: 92, esik2: 88, esik3: 80 } as const;
+/** Debi sınıfı eşikleri, m³/h: esik1 altı sınıflanmaz · esik1–esik2 · esik2 üzeri. */
+export const DEBI_ESIKLERI = { esik1: 500, esik2: 2000 } as const;
 
 /**
  * Ses basınç seviyesini insan algısına göre yorumlar.
@@ -21,29 +35,32 @@ export interface EngineeringInference {
 export const getNoiseInference = (db: number): EngineeringInference | null => {
   if (!db || db <= 0) return null;
 
-  if (db < 30) {
+  if (db < SES_ESIKLERI.esik1) {
     return {
       labelKey: 'pdp.engineering.noise.ultraQuiet.label',
       value: `${db} dB(A)`,
       type: 'noise',
       descriptionKey: 'pdp.engineering.noise.ultraQuiet.desc',
-      isI18n: true
+      isI18n: true,
+      params: SES_ESIKLERI
     };
-  } else if (db < 45) {
+  } else if (db < SES_ESIKLERI.esik2) {
     return {
       labelKey: 'pdp.engineering.noise.officeComfort.label',
       value: `${db} dB(A)`,
       type: 'noise',
       descriptionKey: 'pdp.engineering.noise.officeComfort.desc',
-      isI18n: true
+      isI18n: true,
+      params: SES_ESIKLERI
     };
-  } else if (db < 60) {
+  } else if (db < SES_ESIKLERI.esik3) {
     return {
       labelKey: 'pdp.engineering.noise.standard.label',
       value: `${db} dB(A)`,
       type: 'noise',
       descriptionKey: 'pdp.engineering.noise.standard.desc',
-      isI18n: true
+      isI18n: true,
+      params: SES_ESIKLERI
     };
   }
   return {
@@ -51,7 +68,8 @@ export const getNoiseInference = (db: number): EngineeringInference | null => {
     value: `${db} dB(A)`,
     type: 'noise',
     descriptionKey: 'pdp.engineering.noise.industrial.desc',
-    isI18n: true
+    isI18n: true,
+    params: SES_ESIKLERI
   };
 };
 
@@ -61,29 +79,32 @@ export const getNoiseInference = (db: number): EngineeringInference | null => {
 export const getEfficiencyInference = (efficiency?: number): EngineeringInference | null => {
   if (!efficiency || efficiency <= 0) return null;
 
-  if (efficiency >= 92) {
+  if (efficiency >= VERIM_ESIKLERI.esik1) {
     return {
       labelKey: 'pdp.engineering.efficiency.diamond.label',
       value: `%${efficiency}`,
       type: 'efficiency',
       descriptionKey: 'pdp.engineering.efficiency.diamond.desc',
-      isI18n: true
+      isI18n: true,
+      params: VERIM_ESIKLERI
     };
-  } else if (efficiency >= 88) {
+  } else if (efficiency >= VERIM_ESIKLERI.esik2) {
     return {
       labelKey: 'pdp.engineering.efficiency.platinum.label',
       value: `%${efficiency}`,
       type: 'efficiency',
       descriptionKey: 'pdp.engineering.efficiency.platinum.desc',
-      isI18n: true
+      isI18n: true,
+      params: VERIM_ESIKLERI
     };
-  } else if (efficiency >= 80) {
+  } else if (efficiency >= VERIM_ESIKLERI.esik3) {
     return {
       labelKey: 'pdp.engineering.efficiency.gold.label',
       value: `%${efficiency}`,
       type: 'efficiency',
       descriptionKey: 'pdp.engineering.efficiency.gold.desc',
-      isI18n: true
+      isI18n: true,
+      params: VERIM_ESIKLERI
     };
   }
   return null;
@@ -165,14 +186,15 @@ export const generateEngineeringSummary = (product: Product): EngineeringInferen
       ? parseFloat(airflowValue.replace(/[^0-9.]/g, ''))
       : Number(airflowValue);
 
-    if (!isNaN(numericAirflow) && numericAirflow > 500) {
-      const isIndustrial = numericAirflow > 2000;
+    if (!isNaN(numericAirflow) && numericAirflow > DEBI_ESIKLERI.esik1) {
+      const isIndustrial = numericAirflow > DEBI_ESIKLERI.esik2;
       inferences.push({
         labelKey: isIndustrial ? 'pdp.engineering.capacity.industrialFlow.label' : 'pdp.engineering.capacity.highFlow.label',
         value: `${numericAirflow} m³/h`,
         type: 'power',
         descriptionKey: isIndustrial ? 'pdp.engineering.capacity.industrialFlow.desc' : 'pdp.engineering.capacity.highFlow.desc',
-        isI18n: true
+        isI18n: true,
+        params: DEBI_ESIKLERI
       });
     }
   }

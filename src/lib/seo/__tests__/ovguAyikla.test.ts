@@ -6,6 +6,11 @@ import { cumleleriAyir, ovguCumleleriniAt, ovguVarMi } from '../ovguAyikla'
  * INV-OVGU-AYIKLA-1 — arama sonucu açıklamasına üreticinin kanıtsız üstünlük iddiası giremez (REC-497,
  * çürütücü bulgusu 10). Örnekler `src/data/brands.ts` kayıtlarından ve canlı ölçümden BİREBİR alındı;
  * kalıp körleşirse (regex bozulur ya da gevşerse) bu test kırılır.
+ *
+ * URN-79 (2026-10-09) NOTU: bu cümleler artık kayıtlarda YOK — üstünlük/oran/ömür iddiaları `brands.ts`'ten kaldırıldı
+ * (kapı: INV-MARKA-IDDIA-1, `conformance/marka-iddia-yasagi.test.ts`). Örnekler süzgecin KALIBINI ölçmek için tarihî
+ * kayıt metni olarak durur. `DOGRULANABILIR` = "SÜZGEÇ bu cümleye dokunmaz" demektir, "kaynakta doğrulandı" DEĞİL
+ * (ör. "Yüksek performanslı…" ölçütsüz sıfattır; süzgeç onu yakalamaz, kayıttan elle kaldırıldı).
  */
 
 const UST_IDDIALAR = [
