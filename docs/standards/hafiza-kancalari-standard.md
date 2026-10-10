@@ -476,11 +476,31 @@ Bekçi **kendi hatasında da susmaz**: tek satır *"BEKCI CALISAMADI"* basar. Se
 
 ### ⛔Mutlak yol yazılmaz
 
-Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
+(Güncel durum, 2026-09-29'dan beri: bekçi hedefi **yazılan dosyanın yolundan** türetir, `os.homedir()` kullanmaz;
+aşağıdaki transcript/`os.homedir()` anlatımı precompact kapısı içindir.) Hafıza dizini `os.homedir()` + oturumun transcript kanıtından **türetilir**, gövdeye
 gömülmez: depo 2026-08-15'ten beri PUBLIC ve kullanıcı adı taşıyan yol kimlik sızdırır
 (§24). Türetim `precompact-durum-kapisi.cjs` ile aynı mantığı kullanır ve aynı ölçülmüş
 sebeple: worktree'de açılan oturumların kendi proje dizini vardır ve orada `memory/` **yok**;
 cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 ölçümü).
+
+### Departman indeksi (2026-09-30, HARİTA kararı 4; şartname `hafiza-yazma-duzeni-standard.md` §7)
+
+Bekçi `.../memory/departman/<ROL>/MEMORY.md` dosyalarını da tanır (yalnız bu yol biçimi; harf duyarsız, `..` giderilmiş;
+`docs/departman/...`, `departman/<ROL>/alt/MEMORY.md`, konu dosyaları SUSAR). Departman indeksi Claude'un yerleşik yoluyla
+yüklenmez, `SessionStart` kancası onu rol kartıyla enjekte eder ve enjeksiyon **60 satır / 8 KB**'ta keser; bekçi aynı sayıyı
+**YUMUŞAK** eşik yapar, yoksa bekçiden geçen indeks açılışta görünmeden kırpılırdı.
+
+| | ana `memory/MEMORY.md` | `departman/<ROL>/MEMORY.md` |
+|---|---|---|
+| yumuşak (UYARIR, engel değil) | 160 satır / 20.000 bayt (`>=`) | 60 satır / 8.000 bayt (**aşılınca** `>`: 60 satır enjeksiyona sığar) |
+| sert (ENGELLER, çıkış 2) | 200 satır / 25.000 bayt | **aynı** 200 / 25.000 (engel dalı tektir) |
+| katlanmış satır aranan yer | hafıza dizini (`dizin-*.md`) | departmanın kendi dizini (`departman/<ROL>/<konu>.md`) |
+
+Ana `MEMORY.md` davranışı değişmedi (regresyon testi). **Ortak aday işlevi bu değişiklikte YAZILMADI:** bekçi hedefi yazılan
+dosyanın yolundan türetir, aday kümesi gerekmez. Kilit testinin `projeDiziniBul` yasağı bu yüzden **bilinçli** gevşetildi
+(hazırlık): ad yalnız paylaşılan modülden `require` edilen ortak işlev olarak serbest, kancanın içinde yerel türetim ve
+`os.homedir()` yasak; **mutlak kullanıcı yolu yasağı ve `os.homedir()` ile türetilmiş modül sabiti yasağı aynen kalır**
+(`.claude/hooks/lib/*hafiza*|*aday*.cjs` yazıldığı gün otomatik kapsanır).
 
 ### Kapı
 
@@ -488,4 +508,7 @@ cwd'ye güvenen bir kapı en çok ihtiyaç duyulan yerde kör olur (2026-08-28 �
 bağlı · exit 2 yok + kendi hatasını söyler · mutlak yol yok, dizin türetilir · ⭐**katlanmış
 satır sessiz / silinmiş satır uyarır** (ayırt edici çift) · yalnız boşluk farkı uyarı üretmez
 · yumuşak eşik üstünde uyarır, altında susar (ikinci ayırt edici çift) · precompact iki eşiği
-taşır ve **farklı** şey söyler.
+taşır ve **farklı** şey söyler. Departman genişlemesiyle eklenenler: eşik çifti (59/60 sessiz, 61 uyarı) ·
+bayt eşiği · Edit sonucu · sert eşik ortak · ana regresyon · katlama araması departman dizininde · tanıma sınırları ·
+harf duyarsız + `..` · fail-open (boş/bozuk/okunamayan) · **mutasyon tablosu** (kancanın kritik satırı bozulunca senaryo
+kırmızı) · kullanıcı yolu dedektörlerinin sabotaj testi.
