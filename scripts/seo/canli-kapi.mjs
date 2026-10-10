@@ -21,7 +21,9 @@
  *   SOFT404 1 (54) · IC-BAGLANTI-YONLENDIRME 12 · YONLENDIRME-ZINCIRI 14 · JSONLD-* 66/18/17/58/59/20/62 ·
  *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse) ·
  *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse) ·
- *   SPEC-HAM-DEGER (ek, URN-58: teknik tablo hücresinin görünür metni tam `true`/`false` ise).
+ *   SPEC-HAM-DEGER (ek, URN-58: teknik tablo hücresinin görünür metni tam `true`/`false` ise) ·
+ *   CIFT-GOVDE (URN-59: ürün/aile sayfasının HAM HTML'inde `<h1` sayısı 1 değilse; YALNIZ `ADRES_SEMASI_K3B` açıkken ölçülür,
+ *   kapalıyken bilinen çift gövde kusuru yüzünden kırmızı vermez; <template> içi dahil sayılır, <script> hariç).
  *
  * Kullanım: node scripts/seo/canli-kapi.mjs [--taban https://venthub.com.tr] [--cikti <depo dışı klasör>]
  *           [--bilinen <json>] [--kayit-durum <json>] [--bugun YYYY-MM-DD]
@@ -76,6 +78,7 @@ export const KURAL_NO = {
   'LLMS-DIL': '-',
   'VITRIN-IDDIA': '-',
   'SPEC-HAM-DEGER': '-',
+  'CIFT-GOVDE': '-',
 }
 const KOD_SIRASI = Object.keys(KURAL_NO)
 
@@ -240,6 +243,31 @@ export function icHedefleriTopla(sayfalar, taban) {
 }
 
 const dilOnEki = (yol) => (/^\/(tr|en)(?:\/|$)/.exec(yol) || [])[1] || null
+
+/**
+ * URN-59: HAM HTML'deki `<h1` sayısı. `temizle()` KULLANILMAZ: çift gövdenin ikinci kopyası `<template>`/gizli blokta
+ * durur ve `temizle` template'i siler (kusur görünmez olurdu). Yalnız yorumlar ve <script> (RSC yükü) atılır.
+ */
+export function h1SayisiHam(html) {
+  const ham = String(html ?? '').replace(/<!--[\s\S]*?-->/g, ' ').replace(/<script\b[\s\S]*?<\/script\s*>/gi, ' ')
+  return (ham.match(/<h1[\s>]/gi) ?? []).length
+}
+/** Ürün (aile/model) sayfası yolu: `/tr|en/(products|urun)/<tek segment>`. */
+const URUN_SAYFASI_YOLU = /^\/(tr|en)\/(products|urun)\/[^/]+$/
+
+/**
+ * CIFT-GOVDE (URN-59): ürün sayfasının ham HTML'inde gövde BİR kez olmalı (H1 = 1). YALNIZ `ADRES_SEMASI_K3B` AÇIKKEN
+ * ölçülür (`ek.adresSemasiAcik`): kapalıyken bilinen çift gövde (köprü + Suspense) sürer ve kırmızı vermez.
+ */
+function ciftGovdeKontrolu(tamam, bayrakAcik, cikti) {
+  if (!bayrakAcik) return
+  for (const { yol, html } of tamam) {
+    if (!URUN_SAYFASI_YOLU.test(yol)) continue
+    const n = h1SayisiHam(html)
+    if (n !== 1) cikti.push(bulgu('CIFT-GOVDE', 'KIRMIZI', yol, `ham HTML'de <h1 sayısı ${n} (1 beklenir; gövde birden fazla basılıyor)`))
+  }
+}
+
 const kisalt = (s, n = 90) => (uzunluk(String(s)) > n ? [...String(s)].slice(0, n).join('') + '…' : String(s))
 
 function baslikKontrolleri(ozet, cikti) {
@@ -561,6 +589,7 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   jsonldKontrolleri(tamam, cikti)
   vitrinIddiaKontrolu(tamam, cikti)
   specHamDegerKontrolu(tamam, cikti)
+  ciftGovdeKontrolu(tamam, ek.adresSemasiAcik === true, cikti)
   for (const s of harita.satirlar) {
     if (s.changefreq) cikti.push(bulgu('ROBOTS-HARITA-ALAN', 'UYARI', s.loc, `<changefreq>${s.changefreq}</changefreq>: Google yok sayar (kod anahtarı yanlış, REC-498)`))
   }
@@ -733,6 +762,19 @@ async function zincirIzle(baslangic, enCok = 8) {
 }
 
 /** Tek geçişte tüm veriyi toplar; dönüş: { harita, sayfalar, ek, hatalar }. */
+/**
+ * `ADRES_SEMASI_K3B` bayrağı kodda AÇIK mı (`src/config/features.ts`, kapı master'dan koşar = yayındaki kod)? Okunamazsa
+ * KAPALI sayılır (CIFT-GOVDE ölçülmez, sahte kırmızı yok; okuma hatası ayrıca stderr'e yazılır).
+ */
+export function adresSemasiAcikMi(yol = fileURLToPath(new URL('../../src/config/features.ts', import.meta.url))) {
+  try {
+    return /export const ADRES_SEMASI_K3B\s*=\s*true\b/.test(readFileSync(yol, 'utf8'))
+  } catch (e) {
+    console.error(`UYARI: features.ts okunamadı (${e.message}); CIFT-GOVDE ölçülmedi`)
+    return false
+  }
+}
+
 async function topla(taban, bugun) {
   const hatalar = []
   const dene = async (etiket, fn) => { try { return await fn() } catch (e) { hatalar.push(`${etiket} (${e.message})`); return null } }
@@ -753,7 +795,7 @@ async function topla(taban, bugun) {
   })
   sayfalar.sort((a, b) => a.yol.localeCompare(b.yol))
 
-  const ek = { taban, bugun, enSayfalar: [], varliklar: {}, gizli: {}, yanitlar: {}, yonlendirmeler: {}, zincirler: {} }
+  const ek = { taban, bugun, adresSemasiAcik: adresSemasiAcikMi(), enSayfalar: [], varliklar: {}, gizli: {}, yanitlar: {}, yonlendirmeler: {}, zincirler: {} }
   const isler = []
   isler.push(async () => { const r = await dene('/robots.txt', () => istek(`${taban}/robots.txt`, { govde: 'metin' })); if (r) { if (r.durum === 200) ek.robots = r.html; else hatalar.push(`/robots.txt (HTTP ${r.durum})`) } })
   isler.push(async () => { const r = await dene('/llms.txt', () => istek(`${taban}/llms.txt`, { govde: 'metin' })); if (r) { if (r.durum === 200) ek.llms = r.html; else if (r.durum !== 404) hatalar.push(`/llms.txt (HTTP ${r.durum})`) } })

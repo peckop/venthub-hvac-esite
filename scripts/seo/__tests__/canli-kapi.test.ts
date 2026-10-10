@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest'
 import {
   kontrolEt, haritaCoz, sayfaAlanlari, jsonldBloklari, robotsDisallow, robotsEslesir,
   bilinenUygula, bilinenDogrula, kayitDurumlariCek, cikisKodu, ozetSatirlari, KURAL_NO, llmsKontrolu, hamDegerHucreleri,
+  h1SayisiHam, adresSemasiAcikMi,
 } from '../canli-kapi.mjs'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -30,6 +31,7 @@ type Ek = {
   enSayfalar: Kayit[]; varliklar: Record<string, Kayit>; gizli: Record<string, GizliKayit>
   yanitlar: Record<string, Kayit>; yonlendirmeler: Record<string, Kayit>; zincirler: Record<string, Kayit>
   llms?: string
+  adresSemasiAcik?: boolean
 }
 type Satir = { loc: string; lastmod: string | null; changefreq: string | null; priority: string | null }
 type Veri = { harita: { satirlar: Satir[]; hreflangSayisi?: number }; sayfalar: Sayfa[]; ek: Ek }
@@ -571,6 +573,56 @@ describe('INV-LLMS-GERCEK-1 · llms.txt beyanı haritayla tutarlı', () => {
     expect(yazilanKategori).toBeGreaterThan(0)
     expect(llmsBulgu(haritaKur(yazilanSayfa, yazilanKategori), llms)).toEqual([])
     expect(llmsBulgu(haritaKur(yazilanSayfa - 1, yazilanKategori), llms).map((x) => x.kod)).toEqual(['LLMS-SAYFA'])
+  })
+})
+
+describe('CIFT-GOVDE (URN-59) — ürün sayfasının ham HTML\'inde gövde bir kez; YALNIZ adres bayrağı açıkken ölçülür', () => {
+  /** Çift gövde: ikinci kopya <template> içinde (temizle() onu siler, bu yüzden kural ham HTML sayar). */
+  const ciftGovdeHtml = () => {
+    const tek = html({ h1: 'Ürün' })
+    return tek.replace('</body>', '<template data-dgst="BAILOUT"><h1>Ürün</h1></template></body>')
+  }
+  const urunVeri = (acik: boolean | undefined, cift: boolean): Veri => {
+    const v = temiz()
+    const yol = '/tr/urun/storm-serisi'
+    const s = sayfa(yol, { title: 'Storm | VentHub', desc: 'Storm serisi çatı fanlarının debi, basınç ve ses bilgilerini karşılaştırmalı olarak sunan açıklamadır.', links: ['/tr'] })
+    if (cift) s.html = ciftGovdeHtml()
+    v.sayfalar.push(s)
+    v.harita.satirlar.push({ loc: TABAN + yol, lastmod: null, changefreq: null, priority: '0.8' })
+    v.sayfalar[0].html = v.sayfalar[0].html!.replace('</body>', `<a href="${yol}">u</a></body>`)
+    if (acik !== undefined) v.ek.adresSemasiAcik = acik
+    return v
+  }
+
+  it('h1SayisiHam: <template> içi dahil sayar, <script> (RSC yükü) ve yorum hariç', () => {
+    expect(h1SayisiHam('<h1>a</h1>')).toBe(1)
+    expect(h1SayisiHam('<h1>a</h1><template><h1>b</h1></template>')).toBe(2)
+    expect(h1SayisiHam('<h1 class="x">a</h1><script>self.__next_f.push(["<h1>"])</script><!-- <h1> -->')).toBe(1)
+    expect(h1SayisiHam(null)).toBe(0)
+  })
+  it('bayrak AÇIK + çift gövde → KIRMIZI CIFT-GOVDE (ayırt edicilik)', () => {
+    const b = kodlar(urunVeri(true, true), 'CIFT-GOVDE')
+    expect(b.map((x) => x.adres)).toEqual(['/tr/urun/storm-serisi'])
+    expect(b[0].seviye).toBe('KIRMIZI')
+    expect(b[0].kanit).toContain('2')
+  })
+  it('bayrak AÇIK + tek gövde → temiz', () => {
+    expect(kodlar(urunVeri(true, false), 'CIFT-GOVDE')).toEqual([])
+  })
+  it('bayrak KAPALI (ya da bilinmiyor) + çift gövde → kırmızı VERMEZ (bilinen kusur, sahte alarm yok)', () => {
+    expect(kodlar(urunVeri(false, true), 'CIFT-GOVDE')).toEqual([])
+    expect(kodlar(urunVeri(undefined, true), 'CIFT-GOVDE')).toEqual([])
+  })
+  it('ürün sayfası olmayan yol ölçülmez (kategori sayfası H1 sayısına bakılmaz)', () => {
+    const v = urunVeri(true, false)
+    v.sayfalar[1].html = v.sayfalar[1].html!.replace('</body>', '<h1>ikinci</h1></body>')
+    expect(kodlar(v, 'CIFT-GOVDE')).toEqual([])
+  })
+  it('KURAL_NO kayıtlı ve bayrak okuyucu: depodaki features.ts bugün KAPALI → false; "true" metniyle true', () => {
+    expect(KURAL_NO['CIFT-GOVDE']).toBe('-')
+    const mevcut = join(__dirname, '..', '..', '..', 'src', 'config', 'features.ts')
+    expect(adresSemasiAcikMi(mevcut)).toBe(/export const ADRES_SEMASI_K3B\s*=\s*true\b/.test(readFileSync(mevcut, 'utf8')))
+    expect(adresSemasiAcikMi(join(__dirname, 'yok-boyle-dosya.ts'))).toBe(false)
   })
 })
 

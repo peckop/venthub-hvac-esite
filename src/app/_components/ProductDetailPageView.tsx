@@ -18,7 +18,7 @@ import {
 import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { Suspense, useCallback, useEffect, useMemo,useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo,useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { BrandIcon } from '../../components/HVACIcons'
@@ -30,7 +30,7 @@ import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
 import QuoteRequestModal from '../../components/quotes/QuoteRequestModal'
-import { UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
+import { ADRES_SEMASI_K3B, UC_BOYUT_MUSTERI_YUZEYINDE } from '../../config/features'
 import { useCategories } from '../../contexts/CategoryContext'
 import { useCart } from '../../hooks/useCartHook'
 import { useFavorites } from '../../hooks/useFavorites'
@@ -62,6 +62,7 @@ import {
 import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
 import { adresDili, adresRotalari, modelBaglantiAdresi, modelSecimiHedefi } from '../../utils/yuzeyAdresleri'
+import { PdpGovdeSecici } from './pdpGovdeSecici'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -1082,10 +1083,10 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   )
 }
 
-/** `?sku=` köprüsü — useSearchParams YALNIZ burada; Suspense sınırı bunu sarar. */
-const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
+/** `?sku=` köprüsü — useSearchParams YALNIZ burada; Suspense sınırı bunu sarar (`PdpGovdeSecici`, yalnız bayrak kapalıyken). */
+const PdpSkuBridge: React.FC<{ govde: (secili: string | null) => React.ReactNode }> = ({ govde }) => {
   const searchParams = useSearchParams()
-  return <ProductDetailBody {...props} selectedSku={searchParams.get('sku')} />
+  return <>{govde(searchParams.get('sku'))}</>
 }
 
 /**
@@ -1100,12 +1101,13 @@ const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
  * tam gövdedir: statik ön-render'da HTML gerçek ürün içeriğiyle çıkar (SEO/LCP),
  * istemci hidrasyonunda ?sku= seçimi devralır.
  */
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) =>
-  // Model rotası seçimi sunucuda yaptı: köprü ve Suspense GEREKMEZ (useSearchParams yok).
-  props.sunucuSku ? (
-    <ProductDetailBody {...props} selectedSku={props.sunucuSku} />
-  ) : (
-    <Suspense fallback={<ProductDetailBody {...props} selectedSku={null} />}>
-      <PdpSkuBridge {...props} />
-    </Suspense>
-  )
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) => (
+  // URN-59: seçim `PdpGovdeSecici`de. Model rotası (sunucuSku) ve bayrak AÇIK (`?sku=` adres katmanında 308'lenir)
+  // iken köprü + Suspense YOK, gövde bir kez; bayrak KAPALIYKEN eski yapı birebir (köprü + Suspense).
+  <PdpGovdeSecici
+    sunucuSku={props.sunucuSku}
+    adresSemasiAcik={ADRES_SEMASI_K3B}
+    govde={(secili) => <ProductDetailBody {...props} selectedSku={secili} />}
+    SkuKoprusu={PdpSkuBridge}
+  />
+)
