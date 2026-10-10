@@ -79,6 +79,7 @@ vi.mock('../_components/markaSayfasi', async (orijinal) => ({
 
 import { ADRES_SEMASI_K3B } from '../../config/features'
 import { SITE_URL as SITE } from '../../config/siteUrl'
+import MarkaListeEski, { generateMetadata as markaListeEskiUst } from '../[lang]/brands/page'
 import MarkaEski, { generateMetadata as markaEskiUst } from '../[lang]/brands/[slug]/page'
 import AltKategori, { generateMetadata as altKategoriUst } from '../[lang]/category/[categorySlug]/[subCategorySlug]/page'
 import KategoriEski, { generateMetadata as kategoriEskiUst } from '../[lang]/category/[categorySlug]/page'
@@ -86,6 +87,10 @@ import KategoriYeni, {
   generateMetadata as kategoriYeniUst,
   generateStaticParams as kategoriYeniParam,
 } from '../[lang]/kategori/[kok]/[[...dal]]/page'
+import MarkaListeYeni, {
+  generateMetadata as markaListeYeniUst,
+  generateStaticParams as markaListeYeniParam,
+} from '../[lang]/markalar/page'
 import MarkaYeni, { generateMetadata as markaYeniUst, generateStaticParams as markaYeniParam } from '../[lang]/markalar/[slug]/page'
 import UrunEski from '../[lang]/products/[slug]/page'
 import UrunlerEski, { generateMetadata as urunlerEskiUst } from '../[lang]/products/page'
@@ -296,6 +301,42 @@ describe('markalar', () => {
     const r = await markaYeniParam()
     expect(r.length).toBeGreaterThan(0)
     expect(r.every((x) => x.lang === 'tr')).toBe(true)
+  })
+})
+
+describe('marka LİSTESİ (URN-85, Design CSV satır 4): /tr/markalar ↔ /en/brands', () => {
+  const cizildi = async (calis: () => Promise<unknown>): Promise<string> => {
+    try {
+      const el = (await calis()) as ReactElement
+      return el && typeof el === 'object' && 'type' in el ? 'CIZ' : 'BASKA'
+    } catch (e) {
+      return (e as Error).message
+    }
+  }
+
+  it.each([
+    ['/tr/brands (eski)', () => MarkaListeEski(p({ lang: 'tr' })), 'REDIRECT:/tr/markalar'],
+    ['/en/brands yerinde çizilir', () => MarkaListeEski(p({ lang: 'en' })), 'CIZ'],
+    ['/tr/markalar çizilir', () => MarkaListeYeni(p({ lang: 'tr' })), 'CIZ'],
+    ['/en/markalar yok → 404', () => MarkaListeYeni(p({ lang: 'en' })), 'NOT_FOUND'],
+  ])('%s', async (_ad, calis, beklenen) => {
+    await expect(cizildi(calis)).resolves.toBe(beklenen)
+  })
+
+  it('üst veri: canonical /tr/markalar, hreflang tr=/tr/markalar en=/en/brands; eski adreste TR üst verisi yazılmaz', async () => {
+    const tr = await markaListeYeniUst(p({ lang: 'tr' }))
+    expect(tr.alternates).toEqual({
+      canonical: `${SITE}/tr/markalar`,
+      languages: { tr: `${SITE}/tr/markalar`, en: `${SITE}/en/brands`, 'x-default': `${SITE}/tr/markalar` },
+    })
+    expect(await markaListeYeniUst(p({ lang: 'en' }))).toEqual({})
+    expect(await markaListeEskiUst(p({ lang: 'tr' }))).toEqual({})
+    const en = await markaListeEskiUst(p({ lang: 'en' }))
+    expect(en.alternates).toMatchObject({ canonical: `${SITE}/en/brands` })
+  })
+
+  it('önceden üretim yalnız TR', async () => {
+    await expect(markaListeYeniParam()).resolves.toEqual([{ lang: 'tr' }])
   })
 })
 

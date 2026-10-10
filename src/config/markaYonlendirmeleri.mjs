@@ -67,8 +67,9 @@ export function k3bOku(kaynak) {
 export function markaHedefi(slug, dil, k3b) {
   const h = KALDIRILAN_MARKALAR[slug]
   if (!h) throw new Error(`markaYonlendirmeleri: bilinmeyen eski marka "${slug}"`)
-  // Marka LİSTESİ yeni şemada da `/<dil>/brands` (adresUret'te liste nesnesi yok; Routes.brands()).
-  if (h.tur === 'liste') return `/${dil}/brands`
+  // Marka LİSTESİ: kapalıyken `/<dil>/brands`; K3-b açıkken TR `/tr/markalar` (adresUret `{ tur: 'markalar' }`, URN-85),
+  // EN yerinde `/en/brands`. Liste kolu bugün hiçbir eski marka kullanmıyor; ileride kullanılırsa hedef doğru olsun.
+  if (h.tur === 'liste') return k3b && dil === 'tr' ? '/tr/markalar' : `/${dil}/brands`
   return k3b
     ? `/${dil}/${KATEGORI_BOLUMU[dil]}/${h.kok[dil]}/${h.dal[dil]}`
     : `/${dil}/category/${h.dal[dil]}`
