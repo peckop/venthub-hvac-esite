@@ -16,7 +16,7 @@ import { tr } from '../../i18n/dictionaries/tr'
 import { getDictValue } from '../../i18n/getDictValue'
 import { compareText } from '../../i18n/sort'
 import { DomainCategory, toUICategoryList } from '../../lib/type-converters'
-import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { aramaAlanlariniAyikla, getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { adresDili, adresRotalari } from '../../utils/yuzeyAdresleri'
 import HomePage from '../../views/HomePage'
 
@@ -276,7 +276,9 @@ export default async function RootPage({ params }: Props) {
       ))}
       <HomePage
         initialCategories={displayCategories}
-        rawCategories={categories}
+        // URN-105: istemci bileşenleri arama sonucu alanlarını (seo_title/seo_desc, metadata.seo_*_en) okumaz;
+        // gömülü veriye gitmeleri EN sayfada Türkçe metin bırakır (INV-DIL-DUSUSU-1).
+        rawCategories={categories.map((c) => aramaAlanlariniAyikla(c))}
         initialProducts={products}
         dictionary={dict.home}
         lang={lang}
