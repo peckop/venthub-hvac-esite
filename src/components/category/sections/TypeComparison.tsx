@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 
 import VentImage from '@/components/ui/VentImage'
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMetinler } from '@/utils/bosDegerKorumasi'
 
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
 
@@ -34,22 +35,23 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 button: 'bg-orange-500 hover:bg-orange-600',
                 ring: 'ring-orange-200'
             },
-            benefits: [
+            // URN-84: tablo bazı maddeleri BOŞ bırakır (kaldırma); boş madde çizilmez, anahtar silinmez.
+            benefits: doluMetinler([
                 t('category.typeComparison.electricBenefit1'),
                 t('category.typeComparison.electricBenefit2'),
                 t('category.typeComparison.electricBenefit3'),
                 t('category.typeComparison.electricBenefit4')
-            ],
-            bestFor: [
+            ]),
+            bestFor: doluMetinler([
                 t('category.typeComparison.electricBestFor1'),
                 t('category.typeComparison.electricBestFor2'),
                 t('category.typeComparison.electricBestFor3'),
                 t('category.typeComparison.electricBestFor4')
-            ],
-            notFor: [
+            ]),
+            notFor: doluMetinler([
                 t('category.typeComparison.electricNotFor1'),
                 t('category.typeComparison.electricNotFor2')
-            ]
+            ])
         },
         {
             id: 'ortam' as const,
@@ -64,22 +66,22 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                 button: 'bg-blue-500 hover:bg-blue-600',
                 ring: 'ring-blue-200'
             },
-            benefits: [
+            benefits: doluMetinler([
                 t('category.typeComparison.ambientBenefit1'),
                 t('category.typeComparison.ambientBenefit2'),
                 t('category.typeComparison.ambientBenefit3'),
                 t('category.typeComparison.ambientBenefit4')
-            ],
-            bestFor: [
+            ]),
+            bestFor: doluMetinler([
                 t('category.typeComparison.ambientBestFor1'),
                 t('category.typeComparison.ambientBestFor2'),
                 t('category.typeComparison.ambientBestFor3'),
                 t('category.typeComparison.ambientBestFor4')
-            ],
-            notFor: [
+            ]),
+            notFor: doluMetinler([
                 t('category.typeComparison.ambientNotFor1'),
                 t('category.typeComparison.ambientNotFor2')
-            ]
+            ])
         }
     ]
 
@@ -137,42 +139,48 @@ const TypeComparison: React.FC<TypeComparisonProps> = ({ onOpenWizard, onSelectT
                                 </div>
 
                                 {/* Benefits */}
-                                <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('category.typeComparison.advantagesLabel')}</h4>
-                                    <ul className="space-y-2">
-                                        {type.benefits.map((benefit, i) => (
-                                            <li key={i} className="flex items-start gap-2">
-                                                <Check className="text-green-500 mt-0.5 flex-shrink-0" size={18} />
-                                                <span className="text-gray-700">{benefit}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                {type.benefits.length > 0 && (
+                                    <div className="mb-6">
+                                        <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('category.typeComparison.advantagesLabel')}</h4>
+                                        <ul className="space-y-2">
+                                            {type.benefits.map((benefit, i) => (
+                                                <li key={i} className="flex items-start gap-2">
+                                                    <Check className="text-green-500 mt-0.5 flex-shrink-0" size={18} />
+                                                    <span className="text-gray-700">{benefit}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
 
                                 {/* Best For */}
-                                <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('category.typeComparison.bestForLabel')}</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {type.bestFor.map((item, i) => (
-                                            <span key={i} className={`px-3 py-1 rounded-full text-xs font-medium ${type.colorClasses.bg} ${type.colorClasses.text}`}>
-                                                {item}
-                                            </span>
-                                        ))}
+                                {type.bestFor.length > 0 && (
+                                    <div className="mb-6">
+                                        <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('category.typeComparison.bestForLabel')}</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {type.bestFor.map((item, i) => (
+                                                <span key={i} className={`px-3 py-1 rounded-full text-xs font-medium ${type.colorClasses.bg} ${type.colorClasses.text}`}>
+                                                    {item}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Not For */}
-                                <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('category.typeComparison.notForLabel')}</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {type.notFor.map((item, i) => (
-                                            <span key={i} className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
-                                                <X size={12} className="inline mr-1" />
-                                                {item}
-                                            </span>
-                                        ))}
+                                {type.notFor.length > 0 && (
+                                    <div className="mb-6">
+                                        <h4 className="text-sm font-semibold text-gray-700 mb-2">{t('category.typeComparison.notForLabel')}</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {type.notFor.map((item, i) => (
+                                                <span key={i} className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                                                    <X size={12} className="inline mr-1" />
+                                                    {item}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* CTA */}
                                 <button

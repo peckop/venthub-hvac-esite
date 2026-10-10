@@ -10,7 +10,7 @@
  * Kategori ölçümü (frekans-konvertoru yönlendirmesinin hedefi):
  *   categories.slug = 'frequency-converters', metadata.slug = {tr: 'frekans-konvertorleri', en: 'frequency-converters'},
  *   is_active = true, aktif ürün 35 (hepsi Danfoss); üstü 'control-systems'
- *   (metadata.slug.tr = 'kontrol-sistemleri'), is_active = true.
+ *   (metadata.slug.tr = 'kontrol-ve-suruculer'; 2026-10-10 öncesi 'kontrol-sistemleri', URN-85 migration'ı), is_active = true.
  *
  * TAZELEME: DB'ye marka ya da bir markanın ilk ürünü girdiğinde bu dosya YENİDEN ÖLÇÜLÜR (yukarıdaki
  * sorgu) ve tarih güncellenir.
@@ -47,7 +47,7 @@ export const DB_KATEGORILERI: Readonly<
   /** `aktifUrun: null` = ölçülmedi (üst kategori yalnız adresin kök parçası olarak kullanılır). */
   Record<string, { slug: { tr: string; en: string }; aktif: boolean; aktifUrun: number | null; ust: string | null }>
 > = {
-  'control-systems': { slug: { tr: 'kontrol-sistemleri', en: 'control-systems' }, aktif: true, aktifUrun: null, ust: null },
+  'control-systems': { slug: { tr: 'kontrol-ve-suruculer', en: 'control-systems' }, aktif: true, aktifUrun: null, ust: null },
   'frequency-converters': {
     slug: { tr: 'frekans-konvertorleri', en: 'frequency-converters' },
     aktif: true,

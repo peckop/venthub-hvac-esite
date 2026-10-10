@@ -24,6 +24,8 @@
  * KATEGORİ SLUG'LARI DB'DEN ÖLÇÜLDÜ (2026-09-27, canlı): `frequency-converters`
  * (metadata.slug.tr = `frekans-konvertorleri`, aktif, 35 aktif ürün — hepsi Danfoss), üstü
  * `control-systems` (metadata.slug.tr = `kontrol-sistemleri`, aktif).
+ * 2026-10-10 (URN-85): üstün TR slug'ı Design CSV adına çekildi (`kontrol-ve-suruculer`,
+ * supabase/migrations/20261010090000_kategori_tr_adlari_design_csv.sql); `kok.tr` aşağıda buna uyar.
  */
 
 /**
@@ -33,7 +35,7 @@
 export const KALDIRILAN_MARKALAR = Object.freeze({
   'frekans-konvertoru': {
     tur: 'kategori',
-    kok: { tr: 'kontrol-sistemleri', en: 'control-systems' },
+    kok: { tr: 'kontrol-ve-suruculer', en: 'control-systems' },
     dal: { tr: 'frekans-konvertorleri', en: 'frequency-converters' },
   },
 })
