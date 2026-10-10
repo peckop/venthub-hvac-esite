@@ -910,7 +910,7 @@ export const tr = {
   },
   legal: {
     kvkkTitle: 'KVKK Aydınlatma Metni (Taslak)',
-    draftWarning: 'Şirket bilgileri kuruluş tamamlandığında bu metne eklenecektir.',
+    draftWarning: 'Satıcı ve iletişim bilgileri bu metne eklenecektir.',
     disclaimer: 'Bu metin hukuki danışmanlık niteliği taşımaz. Nihai metin için uzman görüşü almanız tavsiye edilir.',
     privacyTitle: 'Gizlilik Politikası (Taslak)',
     cookieTitle: 'Çerez Politikası (Taslak)',

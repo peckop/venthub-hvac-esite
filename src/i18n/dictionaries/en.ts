@@ -909,7 +909,7 @@ export const en: typeof tr = {
   },
   legal: {
     kvkkTitle: 'KVKK Clarification Text (Draft)',
-    draftWarning: 'Company details will be added to this text once the company\'s incorporation is complete.',
+    draftWarning: 'Seller and contact details will be added to this text.',
     disclaimer: 'This text does not constitute legal advice. It is recommended to seek professional counsel for the final text.',
     privacyTitle: 'Privacy Policy (Draft)',
     cookieTitle: 'Cookie Policy (Draft)',

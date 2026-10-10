@@ -30,7 +30,13 @@ const GELISTIRICI_NOTU_KALIPLARI: RegExp[] = [
   /legal expert/i,
 ]
 
-const ONAYLI_TR = 'Şirket bilgileri kuruluş tamamlandığında bu metne eklenecektir.'
+const ONAYLI_TR = 'Satıcı ve iletişim bilgileri bu metne eklenecektir.'
+
+/**
+ * Kutu şirketin durumunu ilan etmez, yalnız sayfayı anlatır (içerik kuralı: şirket iddiası yok, #1813).
+ * Kuruluş, tescil, ünvan ya da "şirketimiz/our company" gibi bir durum bildirimi bu kutuya girmez.
+ */
+const SIRKET_DURUMU_KALIPLARI: RegExp[] = [/kuruluş/i, /tescil/i, /şirket/i, /incorporat/i, /company/i, /registered/i]
 
 describe('INV-YASAL-UYARI-1 — legal.draftWarning geliştirici notu taşımaz', () => {
   const dilleri: Array<[string, string]> = [
@@ -50,10 +56,16 @@ describe('INV-YASAL-UYARI-1 — legal.draftWarning geliştirici notu taşımaz',
     expect(tr.legal.draftWarning).toBe(ONAYLI_TR)
   })
 
-  it('iki dilde de şirket bilgisinin sonradan ekleneceğini söyler, "taslak" kutusunun yerine kalıcı vaat yazmaz', () => {
-    expect(en.legal.draftWarning).toMatch(/company/i)
+  it('iki dilde de satıcı ve iletişim bilgisinin metne ekleneceğini söyler; tarih ya da vaat sözü içermez', () => {
+    expect(en.legal.draftWarning).toMatch(/seller/i)
     expect(en.legal.draftWarning).toMatch(/added/i)
     expect(tr.legal.draftWarning).not.toMatch(/\d{4}/)
     expect(en.legal.draftWarning).not.toMatch(/\d{4}/)
+  })
+
+  it.each(dilleri)('%s: kutu şirketin durumunu ilan etmez (kuruluş, tescil, ünvan, company)', (_dil, metin) => {
+    for (const kalip of SIRKET_DURUMU_KALIPLARI) {
+      expect(metin, `şirket durumu kalıbı: ${String(kalip)}`).not.toMatch(kalip)
+    }
   })
 })
