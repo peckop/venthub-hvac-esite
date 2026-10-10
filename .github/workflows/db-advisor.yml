@@ -214,7 +214,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 
@@ -346,7 +346,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 
@@ -381,6 +381,19 @@ jobs:
           # Kok sertifikanin TEK kaynagi depo dosyasidir (kardes adimla ayni gerekce).
           export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
           node scripts/db/checks/anon-yazma-nobetcisi.mjs
+
+      # ⭐INV-STORAGE-YAZMA-1 (REC-442) — kardes adim `Anon yazma nobetcisi`nin gerekcesi AYNEN gecerli
+      # (yeni IS ADI acilmadi, advisor'a konmadi: o is continue-on-error tasiyor). Konu: storage.objects
+      # uzerinde kiracisiz/yoneticisiz YAZMA politikasi. Olculdu 2026-09-29: category-images kovasinda
+      # panelden acilmis 3 politika giris yapmis herkese yukleme/silme veriyordu ve HICBIR migration'da
+      # yoktu; bu yuzden olcum CANLI KATALOGDAN yapilir, depo metninden degil.
+      - name: Storage yazma nobetcisi (INV-STORAGE-YAZMA-1)
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -Eeuo pipefail
+          export PGSSLROOTCERT="scripts/db/checks/supabase-root-2021-ca.pem"
+          node scripts/db/checks/storage-yazma-nobetcisi.mjs
 
       # ⭐INV-RLS-SARMA-1 — NICIN BU ISE ADIM OLARAK EKLENDI (REC-216):
       # Kardes adim `Anon yazma nobetcisi`nin gerekcesi burada da AYNEN gecerli ve o gerekce
@@ -522,7 +535,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '24'
 

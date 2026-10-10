@@ -128,3 +128,81 @@ export function maliyetTahmini({ girisJetonu, cikisJetonu, girisUsdMilyon, cikis
     ((girisJetonu / 1_000_000) * girisUsdMilyon + (cikisJetonu / 1_000_000) * cikisUsdMilyon).toFixed(4),
   )
 }
+
+/**
+ * SKILL.md frontmatter'ından `name` ve `description` çıkarır (yaml bağımlılığı olmadan).
+ *
+ * ÖLÇÜLEN KUSUR (prompt denetimi 2026-09-25): eski okuyucu yalnız `description:` satırının
+ * KENDİSİNİ alıyordu. `.claude/skills` ağacındaki 38 skill'in 33'ünde açıklama alt satırlara
+ * taşıyor, 8'i `>-` blok biçiminde; yönlendirme kataloğuna bunların ya ilk satırı ya da düz
+ * ">-" metni gidiyordu. Sınav, modelin gerçekte gördüğü kataloğu değil kırpık bir kopyayı
+ * ölçüyordu.
+ *
+ * Desteklenen YAML alt kümesi (skill dosyalarında görülen biçimler):
+ *   - düz değer, alt satırlara girintiyle taşabilir (satırlar boşlukla birleşir)
+ *   - tırnaklı değer ("..." / '...'), birden fazla satıra yayılabilir
+ *   - blok skaler: `>` `>-` `>+` (katlanır) ve `|` `|-` `|+` (satır sonu korunur)
+ * Değerin sonu: girintisiz ilk dolu satır (bir sonraki anahtar).
+ *
+ * @param {string} ham SKILL.md içeriği
+ * @returns {{ad: string, aciklama: string} | null} frontmatter yoksa null
+ */
+export function frontmatterCoz(ham) {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---/.exec(ham)
+  if (!m) return null
+  const satirlar = m[1].split(/\r?\n/)
+
+  const al = (anahtar) => {
+    const i = satirlar.findIndex((s) => s.startsWith(anahtar + ':'))
+    if (i < 0) return ''
+    const bas = satirlar[i].slice(anahtar.length + 1).trim()
+    const devam = []
+    for (let j = i + 1; j < satirlar.length; j++) {
+      const s = satirlar[j]
+      if (s.trim() !== '' && !/^\s/.test(s)) break
+      devam.push(s)
+    }
+    while (devam.length && devam[devam.length - 1].trim() === '') devam.pop()
+
+    const blok = /^([>|])([+-]?)\s*(?:#.*)?$/.exec(bas)
+    if (blok) {
+      const girinti = Math.min(...devam.filter((s) => s.trim()).map((s) => /^\s*/.exec(s)[0].length))
+      const icerik = devam.map((s) => s.slice(Number.isFinite(girinti) ? girinti : 0))
+      if (blok[1] === '|') return icerik.join('\n').trim()
+      // Katlanır: boş satır paragraf sonudur, diğer satırlar boşlukla birleşir.
+      return icerik
+        .join('\n')
+        .split(/\n\s*\n/)
+        .map((p) => p.split('\n').map((s) => s.trim()).join(' '))
+        .join('\n')
+        .trim()
+    }
+
+    const birlesik = [bas, ...devam.map((s) => s.trim())].filter(Boolean).join(' ')
+    const t = /^(["'])([\s\S]*)\1$/.exec(birlesik)
+    if (t) return t[1] === "'" ? t[2].replace(/''/g, "'") : t[2].replace(/\\"/g, '"')
+    return birlesik
+  }
+
+  return { ad: al('name'), aciklama: al('description') }
+}
+
+/**
+ * Başsız `claude -p` için SADE bayrak seti (skill yönlendirme sınavı).
+ *
+ * ÖLÇÜLEN KUSUR (2026-09-25): bayraksız `claude -p --model <m>` her çağrıda TAM Claude Code
+ * oturumu açar: bizim CLAUDE.md'ler, kancalar, MCP sunucuları ve Claude Code'un KENDİ skill
+ * listesi. Yani model sınav kataloğunun yanında gerçek `.claude/skills` listesini de görüyordu;
+ * `.agent/skills` sınavında iki katalog yarışıyordu. Her çağrı makinede ayrı bir oturum olarak
+ * da göründü (ListAgents'ta "vh-arac-1-…"), kancalar her çağrıda koştu ve 120 sn'de üç skill
+ * zaman aşımına düştü. Aynı bağlam ~257k jetona çıkıp "Prompt is too long" da verebiliyor
+ * (REC-345, ALTYAPI ölçümü 2026-09-22).
+ * `--bare` KULLANILMAZ: OAuth'u kapatır, yalnız API anahtarı kabul eder.
+ */
+export const CLI_SADE_BAYRAKLAR = [
+  '--tools', '',
+  '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}',
+  '--disable-slash-commands',
+  '--setting-sources', '',
+  '--system-prompt', 'Sen bir yonlendirme siniflandiricisisin. Yalniz istenen bicimde cevap ver.',
+]

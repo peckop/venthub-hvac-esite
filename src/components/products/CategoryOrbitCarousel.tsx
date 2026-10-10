@@ -68,7 +68,12 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
     const [frontCardTitle, setFrontCardTitle] = useState<string | null>(null) 
     const [hintIndex, setHintIndex] = useState(0) 
 
-    const ROTATING_HINTS = ['Tut Çevir', 'Ürüne Tıkla', 'Sol-Sağ Çevir', 'Kategoriyi Seç']
+    const ROTATING_HINTS = [
+        t('products.orbital.dragHint'),
+        t('products.orbital.tapProductHint'),
+        t('products.orbital.swipeHint'),
+        t('products.orbital.pickCategoryHint'),
+    ]
 
     // 1. Prepare Main Categories (ViewModels)
     const mainCategories = useMemo(() => {
@@ -160,6 +165,8 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     title: vm.displayName,
                     image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.webp',
                     categorySlug: vm.slug,
+                    // REC-403: çift tık adresi dile göre slug'la kurulur (`id` EN kanonik).
+                    urlSlug: getLocalizedCategorySlug(vm.raw, lang),
                     modelType: dbModelType || getModelTypeForCategory(vm.slug)
                 }
             })
@@ -173,12 +180,15 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                     title: vm.displayName,
                     image: vm.imageUrl || '/images/hvac_installation_close_up_premium_3.webp',
                     categorySlug: vm.slug,
+                    // REC-403: dal tek slugla sıçrama yapardı; üstü (`activeMainUrlSlug`) ile tam nesne.
+                    urlSlug: getLocalizedCategorySlug(vm.raw, lang),
+                    parentSlug: activeMainUrlSlug ?? undefined,
                     modelType: dbModelType || getModelTypeForCategory(vm.slug)
                 }
             })
         }
         return []
-    }, [level, mainCategories, subcategories, categories])
+    }, [level, mainCategories, subcategories, categories, lang, activeMainUrlSlug])
 
     const handleCardClick = useCallback((itemId: string) => {
         if (level === 'main') {
@@ -295,13 +305,13 @@ const CategoryOrbitCarousel = ({ onSubcategorySelect, compact = false }: Categor
                 >
                     <style>{FADE_IN_CSS}</style>
                     <h2 className="text-xl md:text-3xl font-bold text-white/90">
-                        {focusedItemTitle || frontCardTitle || (level === 'main' ? 'Ürün Yelpazemizi Keşfedin' : `${activeMainCategory?.displayName} Alt Kategorileri`)}
+                        {focusedItemTitle || frontCardTitle || (level === 'main' ? t('products.orbital.discoverTitle') : t('products.orbital.subcategoriesTitle', { name: activeMainCategory?.displayName ?? '' }))}
                     </h2>
                     <p className="text-white/50 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                         {focusedItemTitle
                             ? (level === 'main'
-                                ? (isMobile ? 'Dokun: Aç • Çift Dokun: Git' : 'Tek tık: Kategoriyi Aç • Çift tık: Sayfaya Git')
-                                : (isMobile ? 'Dokunarak Sayfaya Gidin' : 'Tıklayarak Ürün Sayfasına Gidin'))
+                                ? t(isMobile ? 'products.orbital.openMainTouch' : 'products.orbital.openMainDesktop')
+                                : t(isMobile ? 'products.orbital.openSubTouch' : 'products.orbital.openSubDesktop'))
                             : ROTATING_HINTS[hintIndex]
                         }
                     </p>

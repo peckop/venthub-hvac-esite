@@ -22,10 +22,14 @@
  * Pano TTL'li ve süpürülebilir; registry kalıcıdır. İkisini karıştırmak panoyu şişirir.
  */
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const { execFileSync } = require('child_process')
+const canlilik = require('./canlilik.cjs')
 
 const BOARD_DIR = process.env.VENTHUB_BOARD_DIR || path.join('C:', 'tmp', 'venthub-board')
+/** Claude Code'un pencere başına yazdığı oturum kaydı: `<pid>.json` (sessionId + name). Test için env ile değişir. */
+const OTURUM_KAYIT_DIZINI = process.env.VENTHUB_OTURUM_KAYIT_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
 /** Kira ömrü: bu süre atış almayan talep BAYAT sayılır ve engellemez (ölü oturum kilitlemesin). */
 const DEFAULT_TTL_MS = 4 * 60 * 60 * 1000
 /** Bu yaştan eski dosyalar hiç OKUNMAZ (sınırsız büyümeye karşı; pano anlık kanaldır). */
@@ -251,6 +255,86 @@ function tumTalepler(now = Date.now()) {
   return out
 }
 
+/**
+ * BİR OTURUMUN KENDİ talep geçmişi — süresi dolmuş / düşmüş talep DAHİL (claim yenileme için).
+ *
+ * NİÇİN AYRI: `liveClaims`/`tumTalepler` (a) PRUNE_MS'ten eski dosyaları HİÇ açmaz ve (b) tüm oturumları birleştirir.
+ * Makine gece kapanıp sabah `resume` olunca oturumun dosyası 24 saatten eskidir → o talep panodan tamamen "yokmuş"
+ * gibi düşer; yenileme kararı için tam da o geçmişe bakmak gerekir. Bu fonksiyon YALNIZ verilen sid'in kendi dosyasını
+ * okur (tek sahiplik: başka oturumun geçmişine dokunulmaz) ve `liveClaims` ile AYNI birleştirme kuralını uygular
+ * (globlar birleşir, `exact` ezer, kıdem = ilk claim, heartbeat kirayı uzatır, release kapatır).
+ *
+ * DÖNÜŞ: `{durum:'yok'}` (dosya/claim yok) · `{durum:'birakildi'}` (son hareket release: BİLİNÇLİ kapanış) ·
+ * `{durum:'talep', canli, lane, globs, ts, heartbeat, ttlMs, yasDk}`. Okuma hatası (ENOENT dışı) FIRLATIR — çağıran
+ * fail-open karar verir; sessizce "yok" demek, okunamayan geçmişi "geçmiş yok" saymak olurdu.
+ * Bozuk satır atlanır ve `bozukSatir` sayısı döner (tek bozuk satır sessizce geçilmez).
+ */
+function gecmisTalep(sid, now = Date.now()) {
+  let raw
+  try { raw = fs.readFileSync(sessionFile(sid), 'utf8') } catch (e) {
+    if (e && e.code === 'ENOENT') return { durum: 'yok', bozukSatir: 0 }
+    throw e
+  }
+  let c = null
+  let birakildi = false
+  let bozukSatir = 0
+  for (const line of raw.split('\n')) {
+    if (!line.trim()) continue
+    let e
+    try { e = JSON.parse(line) } catch { bozukSatir++; continue }
+    if (!e || typeof e !== 'object' || (e.sid && e.sid !== sid)) continue
+    if (e.type === 'claim') {
+      const globs = Array.isArray(e.globs) ? e.globs : []
+      c = {
+        lane: e.lane || (c && c.lane) || 'lane',
+        globs: c && !e.exact ? [...new Set([...c.globs, ...globs])] : globs,
+        ts: c ? c.ts : e.ts,
+        heartbeat: e.ts,
+        ttlMs: typeof e.ttlMs === 'number' ? e.ttlMs : DEFAULT_TTL_MS,
+      }
+      birakildi = false
+    } else if (e.type === 'heartbeat') {
+      if (c) c.heartbeat = e.ts
+    } else if (e.type === 'release') {
+      c = null
+      birakildi = true
+    }
+  }
+  if (!c) return { durum: birakildi ? 'birakildi' : 'yok', bozukSatir }
+  const yasMs = now - Date.parse(c.heartbeat)
+  return {
+    durum: 'talep',
+    canli: Number.isFinite(yasMs) && yasMs <= c.ttlMs,
+    ...c,
+    yasDk: Number.isFinite(yasMs) ? Math.max(0, Math.round(yasMs / 60000)) : null,
+    bozukSatir,
+  }
+}
+
+/** Glob'un joker öncesi sabit öneki (`src/app/**` → `src/app/`). */
+function globOneki(glob) {
+  const norm = String(glob).replace(/\\/g, '/').toLowerCase()
+  const i = norm.search(/[*?[{]/)
+  return i < 0 ? norm : norm.slice(0, i)
+}
+
+/**
+ * İki glob ÇAKIŞIYOR mu? (talep-talep; `findConflict` yol-talep karşılaştırır.) MUHAFAZAKÂR: kesin bilemediği
+ * durumda "çakışır" der — yenileme için yanlış-pozitif yalnız UYARIDIR (claim alınmaz), yanlış-negatif ise iki
+ * oturumun aynı yolu tutmasıdır. Kurallar: biri ötekinin örneği (`a/**` ↔ `a/b/**`, literal yol ↔ glob) ya da sabit
+ * önekleri iç içe (`src/**\/x.ts` ↔ `src/a/**`). Boş/geçersiz girdi çakışmaz.
+ */
+function globCakisir(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || !a.trim() || !b.trim()) return false
+  const na = a.replace(/\\/g, '/')
+  const nb = b.replace(/\\/g, '/')
+  if (na.toLowerCase() === nb.toLowerCase()) return true
+  if (globToRegExp(na).test(nb) || globToRegExp(nb).test(na)) return true
+  const pa = globOneki(na)
+  const pb = globOneki(nb)
+  return pa.startsWith(pb) || pb.startsWith(pa)
+}
+
 /** Glob → RegExp. `**` her şeyi, `*` tek segmenti karşılar. */
 function globToRegExp(glob) {
   const norm = String(glob).replace(/\\/g, '/')
@@ -413,28 +497,92 @@ function findConflict(filePath, sid, repoRoot) {
  * yazılmış" gibi okunup kafa karıştırıyordu — artık ÇAKIŞMA olarak işaretlenir, çünkü aynı
  * adı taşıyan iki canlı talep birbirini bloklayabilir (kıdemsiz olan yazamaz).
  */
+/**
+ * sid → PENCERE ADI (SendMessage / ListAgents'in kullandığı ad; örn. `venthub-hvac-72`).
+ *
+ * NİÇİN (REC-404, Recep 2026-09-27 "ekibindekileri sürekli karıştırıyorsun"): pano oturum numarasıyla
+ * (sid), SendMessage ise pencere adıyla çalışıyor; aradaki eşleme yoktu ve iki pencere AYNI adı
+ * taşıyabiliyor (`venthub-hvac-8e` ×2, ölçüldü). Eşleme her çağrıda kayıt dosyasından YENİDEN okunur:
+ * ad oturum boyunca değişebilir (`nameSince` alanı), önbellek bayatlatır.
+ *
+ * FAIL-OPEN: dizin yok / dosya bozuk → o kayıt atlanır, pano yine çalışır (ad göstermek panonun ana
+ * işi DEĞİL; adı okuyamamak şerit listesini düşürmemeli). `<pid>.<hash>.key` dosyaları ATLANIR.
+ */
+function pencereAdlari(dizin = OTURUM_KAYIT_DIZINI) {
+  const out = new Map()
+  let dosyalar
+  try { dosyalar = fs.readdirSync(dizin) } catch { return out }
+  for (const f of dosyalar) {
+    if (!/^\d+\.json$/.test(f)) continue
+    try {
+      const j = JSON.parse(fs.readFileSync(path.join(dizin, f), 'utf8'))
+      if (j && typeof j.sessionId === 'string' && typeof j.name === 'string' && j.name) out.set(j.sessionId, j.name)
+    } catch { /* bozuk ya da yarım yazılmış kayıt: atla */ }
+  }
+  return out
+}
+
+/**
+ * Pano canlılığı (REC-524): `claude agents --json` ile claim'leri birleştirir.
+ * Kablo ince: mantık `canlilik.cjs`te. FAIL-OPEN ama sessiz değil — ölçüm yoksa `birlesim` null döner
+ * ve `olculemedi` satırı çağırana verilir (eski çıktı korunur + tek satır).
+ * @returns {{olcum:object, birlesim:object|null}}
+ */
+function canlilikOlc(hepsi, benSid) {
+  let olcum
+  // benSid: çağıranın oturumu önbellekte yoksa önbellek yok sayılır (30 sn içinde açılan yeni pencere, ORTA-1).
+  try { olcum = canlilik.olc({ onbellekYolu: canlilik.onbellekYolu(BOARD_DIR), benSid }) } catch (e) {
+    olcum = { ok: false, sebep: `ölçüm hatası: ${(e && e.message) || 'bilinmeyen'}` }
+  }
+  return { olcum, birlesim: olcum.ok ? canlilik.birlestir(hepsi, olcum.pencereler) : null }
+}
+
 function summary(sid) {
   // BAYAT şeritler artık DÜŞMEZ, etiketle gösterilir (T084-VH — bkz. tumTalepler yorumu).
   const hepsi = tumTalepler()
-  if (hepsi.length === 0) return 'PANO: talep yok.'
+  const { olcum, birlesim } = canlilikOlc(hepsi, sid)
+  // Ölçüm açıkça kapatıldıysa (VENTHUB_CANLILIK_KAPALI=1) ek satır YOK; başarısızsa TEK satır var.
+  const ekSatirlar = birlesim
+    ? canlilik.ekSatirlar(birlesim, olcum, sid)
+    : (olcum.kapali ? [] : [canlilik.olculemediSatiri(olcum)])
+  if (hepsi.length === 0) return ['PANO: talep yok.', ...ekSatirlar].join('\n')
+  // HAYALET (pencere kapalı) şerit bir adı/şerit adını TUTMAZ: kapalı pencere çakışma sayılmaz.
+  const hayalet = (c) => !!(birlesim && birlesim.serit.get(c.sid) && birlesim.serit.get(c.sid).durum === 'hayalet')
   const laneCount = new Map()
-  for (const c of hepsi) if (!c.bayat) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
+  for (const c of hepsi) if (!c.bayat && !hayalet(c)) laneCount.set(c.lane, (laneCount.get(c.lane) || 0) + 1)
+  // Pencere adı çakışması: aynı ad iki CANLI sid'de → çıplak adla gönderilen mesaj belirsiz (REC-404).
+  // Ad kaynağı: önce `~/.claude/sessions/<pid>.json` (yedek), üstüne `claude agents` (gerçek, güncel ad).
+  const adlar = pencereAdlari()
+  if (birlesim) for (const p of olcum.pencereler) if (p.sessionId && p.name) adlar.set(p.sessionId, p.name)
+  const adSayac = new Map()
+  for (const c of hepsi) {
+    const ad = adlar.get(c.sid)
+    if (ad && !c.bayat && !hayalet(c)) adSayac.set(ad, (adSayac.get(ad) || 0) + 1)
+  }
   const lines = hepsi.map(c => {
+    const ad = adlar.get(c.sid)
+    const adEtiketi = ad ? ` (${ad})` : ''
+    const canliEtiketi = birlesim ? canlilik.seritEtiketi(birlesim.serit.get(c.sid)) : ''
+    const adCakisma = ad && !c.bayat && !hayalet(c) && adSayac.get(ad) > 1
+      ? ' ⚠ÇAKIŞMA aynı pencere adı birden çok canlı oturumda — SendMessage için ListAgents\'taki "[ref]" ile gönder'
+      : ''
     const mine = c.sid === sid ? ' (sen)' : ''
-    // Çakışma uyarısı yalnız CANLI şeritler için anlamlı: bayat olan bloklamıyor.
-    const dup = !c.bayat && laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
+    // Çakışma uyarısı yalnız CANLI şeritler için anlamlı: bayat olan bloklamıyor; kapalı pencerenin (hayalet) claim'i de sayılmaz.
+    const dup = !c.bayat && !hayalet(c) && laneCount.get(c.lane) > 1 ? ' ⚠ AYNI ŞERİT ADI birden çok oturumda' : ''
     const bayat = c.bayat
       ? ` ⚠ BAYAT (${c.yasDk}dk atış yok — bırakılmadı, SAHİPSİZ olabilir; bloklamıyor)`
       : ''
     // TAM oturum numarası (karar 54, 2026-09-21): posta kutusu alıcıyı TAM UUID ile eşler; kısa
     // 8 hane SESSİZCE düşer (ölçüldü: OPS'un to="ac03ce11" mesajı alıcının unread'ine girmedi).
-    return `  · ${c.lane}${mine}${dup}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
+    return `  · ${c.lane}${adEtiketi}${mine}${canliEtiketi}${dup}${adCakisma}${bayat} — ${c.globs.join(', ')} [${c.sid}, ${c.yasDk}dk önce]`
   })
-  const bayatSayi = hepsi.filter(c => c.bayat).length
-  const bas = bayatSayi > 0
-    ? `PANO — şeritler (${hepsi.length - bayatSayi} canlı, ${bayatSayi} BAYAT):`
+  // Sayım ayrık kovalar: hayalet (pencere kapalı) · yalnız-bayat (pencere açık/bilinmiyor, atış yok) · canlı.
+  const hayaletSayi = hepsi.filter(c => hayalet(c)).length
+  const bayatSayi = hepsi.filter(c => c.bayat && !hayalet(c)).length
+  const bas = bayatSayi > 0 || hayaletSayi > 0
+    ? `PANO — şeritler (${hepsi.length - bayatSayi - hayaletSayi} canlı${hayaletSayi > 0 ? `, ${hayaletSayi} KAPALI(hayalet)` : ''}${bayatSayi > 0 ? `, ${bayatSayi} BAYAT` : ''}):`
     : 'PANO — canlı şeritler:'
-  return bas + '\n' + lines.join('\n')
+  return [bas, ...lines, ...ekSatirlar].join('\n')
 }
 
 /** Bu oturumun teslim aldığı son not zamanı (`seen` işareti). */
@@ -568,11 +716,12 @@ function markSeen(sid, notes) {
 
 module.exports = {
   BOARD_DIR, DEFAULT_TTL_MS, PRUNE_MS, BROADCAST_WORDS, PANOYA_YAZAN_FIILLER,
-  append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary,
+  append, touch, readEvents, liveClaims, tumTalepler, findConflict, summary, pencereAdlari,
   notesFor, markSeen, lastSeen, resolveNoteTarget, knownSids, yoklama, sidDogrula,
   taramaDurumu, teslimDurumu, teslimKanitSinifi, esikleriOku, ESIK_ADLARI,
   EKSENLER, SAYI_SOZU, eksenOzeti, kullanimMetni,
   globToRegExp, toRepoRelative, repoRootFor, agacKonumu, ayrismaSay,
+  gecmisTalep, globCakisir, OTURUM_KAYIT_DIZINI,
 }
 
 /**

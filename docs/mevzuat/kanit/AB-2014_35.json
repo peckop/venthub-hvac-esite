@@ -1,0 +1,30 @@
+{
+  "kimlik": "AB-2014/35",
+  "eksen": "D",
+  "kaynaklar": [
+    {
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0035",
+      "son_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32014L0035",
+      "http": 202,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "eur-lex.europa.eu",
+      "resmi": true,
+      "durum_satiri": "ERİŞİLMEDİ: aynı AWS WAF challenge bloğu (bkz. EU-2014/30 kaydı).",
+      "alinti": "",
+      "alinti_dogrulandi": false
+    },
+    {
+      "url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en",
+      "son_url": "https://single-market-economy.ec.europa.eu/sectors/electrical-and-electronic-engineering-industries-eei/low-voltage-directive-lvd_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "single-market-economy.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "yururlukte",
+      "alinti": "The low voltage directive (LVD) (2014/35/EU) ensures that electrical equipment within certain voltage limits provides a high level of protection for European citizens, and benefits fully from the single market. It has been applicable since 20 April 2016. [...] The LVD is aligned with the new legislative framework policy and has replaced Directive 2006/95/EC, while keeping the same scope and safety objectives.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

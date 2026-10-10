@@ -1,13 +1,18 @@
 import { MetadataRoute } from 'next'
 
-import { EN_YAYIN } from '../config/features'
+import { ADRES_SEMASI_K3B, EN_YAYIN } from '../config/features'
 import { SITE_URL } from '../config/siteUrl'
+import { sitemapModelMi } from '../config/yayindaModeller'
 import { HVAC_BRANDS } from '../data/brands'
+import { rotaDiliYoluOku } from '../lib/adres/rotaDiliTablo'
+import { bilgiMerkeziSiteHaritasi } from '../lib/bilgiMerkezi/siteHaritasi'
+import { siteHaritasiAlternates } from '../lib/seo/enYayinKurali'
+import { urunsuzMarkaSluglari } from '../lib/seo/markaUrunDurumu'
 import { getCategories } from '../lib/services/category.service'
-import { getAllFamilySlugs } from '../lib/services/family.service'
+import { type FamilySitemapData, getAllFamilySlugs, getBrandFamilyCount, getFamilySitemapData } from '../lib/services/family.service'
 import { supabaseStaticClient } from '../lib/supabase/static'
 import { getLocalizedCategorySlug } from '../utils/categoryHelpers'
-import { Routes } from '../utils/routes'
+import { adresDili, adresRotalari, kategoriArgumanlari } from '../utils/yuzeyAdresleri'
 
 /**
  * W3 (render-dalga1) — YEDEK TAZELEME YOLU.
@@ -22,6 +27,7 @@ import { Routes } from '../utils/routes'
  */
 export const revalidate = 21600
 
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
   /**
@@ -31,19 +37,53 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * "bunları tara" diye bir talep gitmez. Sayfalar çalışmaya devam eder (bkz. bayrağın
    * kendi gerekçesi, `src/config/features.ts`).
    *
-   * ⚠`alternates.languages` blokları BİLEREK DOKUNULMADI: hreflang beyanı sayfa var
-   * olduğu sürece doğrudur ve onu bozmak TR sayfaların dil eşleşmesini de bozar.
-   * Bayrağın "BİLİNEN SINIR" maddesi tam olarak bunu yazıyor.
+   * `alternates.languages` blokları da AYNI BAYRAĞA BAĞLI (REC-300 Faz 3e-3, OPS hükmü 2026-09-29):
+   * kapalıyken satırda `alternates` alanı hiç çıkmaz (Google'a dizine kapalı `/en` eşi
+   * gösterilmez, sayfaların `<link rel=alternate>`i de aynı kuralla kalkar — `enYayinKurali.ts`);
+   * açılınca bugünkü çıktı BİREBİR geri gelir. Bayrağın eski "BİLİNEN SINIR" maddesi bununla kalktı.
    */
   const locales = EN_YAYIN ? ['tr', 'en'] : ['tr']
 
-  // Fetch all categories, product families and per-category product counts
-  const [categories, familySlugs, countRes] = await Promise.all([
-    getCategories(supabaseStaticClient).catch(() => []),
-    getAllFamilySlugs(supabaseStaticClient).catch(() => []),
-    // Supabase builder reject etmez; hata {error} alanında döner — data ?? [] yeterli
+  // Fetch all categories, product families and per-category product counts.
+  //
+  // HATA YUTULMAZ (REC-300 onarımı, OPS 2026-09-29): önceki `.catch(() => [])` build anındaki TEK geçici DB
+  // hatasını boş listeye çeviriyordu → ürünsüz/kategorisiz harita üretilir, Google'a o gider (CI koşusu
+  // 36548708171: kategori 24, ürün 0 ölçüldü). Artık hata build'i KIRAR; yeniden deneme ile örtülmez —
+  // Vercel önceki başarılı yayını tutar, bozuk harita canlıya çıkmaz. Servisler zaten `throw` eder.
+  //
+  // TEK İSTİSNA — SAHTE VERİTABANLI CI BUILD'İ: `ci.yml` `Build (blocking)` adımı `dummy.supabase.co` ile
+  // (ağ yok) koşar ve rotaların ağsız ortamda da ÜRETİLEBİLMESİ zorunludur (bkz. `urunlerSayfasi.tsx`
+  // "HATA YOLU"; ilk denemede bu PR o build'i kırdı — koşu 36553735279). Sahte adreste veri hiç gelmez;
+  // orada boş liste ile devam edilir ve uyarı basılır. Gerçek adreste (Vercel, e2e-smoke gerçek-env build'i)
+  // katı kural geçerlidir.
+  // BİREBİR eşitlik (OPS şartı): boş, tanımsız, yanlış yazılmış ya da `xdummy.supabase.co` gibi kaçak adres
+  // gevşek kola GİRMEZ — yanlış yapılandırılmış canlı ortam sessizce ürünsüz haritaya düşmesin.
+  const veritabaniSahte = process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://dummy.supabase.co'
+  const [categories, familySlugs, { aileTarihleri, modeller }, countRes] = await Promise.all([
+    veritabaniSahte ? getCategories(supabaseStaticClient).catch(() => []) : getCategories(supabaseStaticClient),
+    veritabaniSahte ? getAllFamilySlugs(supabaseStaticClient).catch(() => []) : getAllFamilySlugs(supabaseStaticClient),
+    // REC-454: aile lastmod'u = ailenin + aktif varyantlarının en son `updated_at`'i. Hata yutulmaz
+    // (aynı katı kural); sahte veritabanında boş harita → lastmod hiç yazılmaz.
+    // REC-300 3e-2: aynı sorgu aktif model listesini de döner (ikinci sorgu YOK); bayrak kapalıyken kullanılmaz.
+    veritabaniSahte
+      ? getFamilySitemapData(supabaseStaticClient).catch(
+          (): FamilySitemapData => ({ aileTarihleri: new Map<string, string>(), modeller: [] }),
+        )
+      : getFamilySitemapData(supabaseStaticClient),
+    // Supabase builder reject ETMEZ; hata {error} alanında döner — aşağıda AÇIKÇA fırlatılır.
     supabaseStaticClient.rpc('get_category_counts'),
   ])
+  if (veritabaniSahte) {
+    console.warn('[sitemap] sahte veritabanı (dummy.supabase.co): kategori/aile satırları OLMADAN üretildi — yalnız CI derlemesi için')
+  } else {
+    if (countRes.error) throw new Error(`sitemap: get_category_counts başarısız — ${countRes.error.message}`)
+    // Hata olmadan BOŞ dönmek de ürünsüz haritadır (canlıda 24 kategori / 47 aile var; sıfır = veri kaybı).
+    if (categories.length === 0 || familySlugs.length === 0) {
+      throw new Error(
+        `sitemap: boş katalog (kategori ${categories.length}, aile ${familySlugs.length}) — ürünsüz harita üretilmez`,
+      )
+    }
+  }
 
   // Nav (CategoryContext) ile tutarlılık: yalnız ÜRÜNÜ OLAN kategoriler sitemap'e yazılır.
   // Boş iskele kategoriler (gelecekteki ürün ailesi için bilinçli oluşturulmuş) DB'de kalır
@@ -64,7 +104,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/brands',
     '/contact',
     '/about',
-    '/destek/merkez',
+    // `/destek/merkez` ÇIKTI (karar 92): adres 308 verir; Bilgi Merkezi aşağıda kendi bloğunda
+    // (bölüm adı dile göre değiştiği için bu ortak listeye giremez).
     // Ürün Seçici (karar K17): hesaplama araçlarının tek kalıcı girişi. Dört aracın
     // KENDİ adresleri sitemap'te YOK ve bu kasıtlı — arama motoruna verilen kapı tek
     // olsun; araçlar bu sayfadan bulunur.
@@ -77,34 +118,58 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/legal/cerez-politikasi',
   ]
 
+  // REC-300 Faz 3e-1: TÜM ürün/kategori/marka/aile adresleri `adresUret` katmanından (`yuzeyAdresleri`) gelir;
+  // bayrak (`ADRES_SEMASI_K3B`) kapalıyken çıktı eski kodla bayt bayt aynıdır (INV-SITEMAP-ADRES-1, altın veri).
+  // Adres her dil için ayrı üretilir: hem satırın `url`i hem hreflang eşi aynı üreticiden çıkar.
+  const dilYolu = (lang: string) => adresRotalari(adresDili(lang))
+
+  // Ürün listesi şemaya duyarlıdır (`/products` ↔ `/urunler`); diğer statik sayfalar şemadan bağımsız.
+  // Statik sayfalar dilde GÖRÜNEN adresle ilan edilir (rota dili, OPS-52): kanonik = sitemap adresi
+  // (canonical-url-standard); ikisi de aynı `rotaDiliYoluOku` tablosundan çıkar. Anahtar kapalıyken
+  // `rotaDiliYoluOku` rotayı AYNEN döndürür → bugünkü `/${lang}${route}`.
+  const statikYol = (lang: string, route: string): string =>
+    route === '/products'
+      ? dilYolu(lang).products()
+      : route === '/brands'
+        ? dilYolu(lang).brands() // marka listesi şemaya duyarlı (URN-85): TR `/tr/markalar` ↔ EN `/en/brands`
+        : `/${lang}${rotaDiliYoluOku(route, lang)}`
+
   const staticRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     staticRoutesList.map((route) => ({
-      url: `${baseUrl}/${lang}${route}`,
-      lastModified: new Date(),
-      changefreq: 'daily',
+      url: `${baseUrl}${statikYol(lang, route)}`,
+      // lastmod YOK (REC-454): bu sayfaların güvenilir değişiklik tarihi yok. Eskiden `new Date()`
+      // yazılıyordu = her üretimde "bugün değişti" → Google haritanın tarihlerine güvenmeyi bırakır.
+      // Uydurma tarih yerine alan hiç yazılmaz (Google: lastmod isteğe bağlıdır).
       priority: route === '' ? 1.0 : 0.8,
-      alternates: {
-        languages: {
-          tr: `${baseUrl}/tr${route}`,
-          en: `${baseUrl}/en${route}`,
-        }
-      }
+      ...siteHaritasiAlternates({
+        tr: `${baseUrl}${statikYol('tr', route)}`,
+        en: `${baseUrl}${statikYol('en', route)}`,
+      }),
     }))
   )
 
   // 2. Category Routes (URL'ler dile göre yerelleştirilmiş slug ile üretilir; boş kategoriler hariç)
+  // Kategori adresi ÜST'ü bilerek üretilir (dal → iki seviyeli kanonik, kök → tek); kapalıyken tek slug.
+  const kategoriById = new Map(categories.map((c) => [c.id, c]))
+  const kategoriYolu = (cat: (typeof categories)[number], lang: string): string => {
+    const ust = cat.parent_id ? kategoriById.get(cat.parent_id) : undefined
+    const slug = getLocalizedCategorySlug(cat, lang)
+    const k = kategoriArgumanlari(slug, {
+      slug,
+      ustSlug: ust ? getLocalizedCategorySlug(ust, lang) : null,
+    })
+    return dilYolu(lang).category(k.slug, k.subSlug)
+  }
   const categoryRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
     categoriesWithProducts.map((cat) => ({
-      url: `${baseUrl}/${lang}${Routes.category(getLocalizedCategorySlug(cat, lang))}`,
-      lastModified: new Date(cat.updated_at || new Date()),
-      changefreq: 'weekly',
+      url: `${baseUrl}${kategoriYolu(cat, lang)}`,
+      // Tarihsiz satırda `new Date()` yedeği KALDIRILDI (REC-454) — tarih yoksa alan yazılmaz.
+      ...(cat.updated_at ? { lastModified: new Date(cat.updated_at) } : {}),
       priority: 0.7,
-      alternates: {
-        languages: {
-          tr: `${baseUrl}/tr${Routes.category(getLocalizedCategorySlug(cat, 'tr'))}`,
-          en: `${baseUrl}/en${Routes.category(getLocalizedCategorySlug(cat, 'en'))}`,
-        }
-      }
+      ...siteHaritasiAlternates({
+        tr: `${baseUrl}${kategoriYolu(cat, 'tr')}`,
+        en: `${baseUrl}${kategoriYolu(cat, 'en')}`,
+      }),
     }))
   )
 
@@ -123,18 +188,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // yönlendirme yapar). Site haritası kanonik olmayan adresi İLAN ETMEZ.
 
   // 3. Brand Routes
+  // OPS-51: ürünsüz marka (DB'de aktif ürünü 0; şu an flexiva) sitemap DIŞI — sayfası noindex,follow basar (markaSayfasi.tsx);
+  // dizine kapalı bir adresi haritada ilan etmek çelişkidir. Marka listesinde ve ana sayfa bandında logoyla kalır.
+  // Karar sayfayla AYNI yardımcıdan (`markaUrunDurumu.ts`) ve harita üretildiği ANDA DB'den türer: ürün girince marka
+  // satırı kendiliğinden haritaya girer (statik bayrak YOK). DB okunamazsa karar FIRLATIR (harita üretilmez; hata yutulmaz,
+  // sahte-veritabanlı CI derlemesi hariç — yardımcının HATA YOLU).
+  const urunsuzMarkalar = await urunsuzMarkaSluglari(HVAC_BRANDS, (ad) => getBrandFamilyCount(supabaseStaticClient, ad))
   const brandRoutes: MetadataRoute.Sitemap = locales.flatMap((lang) =>
-    HVAC_BRANDS.map((brand) => ({
-      url: `${baseUrl}/${lang}${Routes.brand(brand.slug)}`,
-      lastModified: new Date(),
-      changefreq: 'weekly',
+    HVAC_BRANDS.filter((brand) => !urunsuzMarkalar.has(brand.slug)).map((brand) => ({
+      url: `${baseUrl}${dilYolu(lang).brand(brand.slug)}`,
+      // lastmod YOK (REC-454): marka listesi kod sabiti, sayfanın değişiklik tarihi tutulmuyor.
       priority: 0.6,
-      alternates: {
-        languages: {
-          tr: `${baseUrl}/tr${Routes.brand(brand.slug)}`,
-          en: `${baseUrl}/en${Routes.brand(brand.slug)}`,
-        }
-      }
+      ...siteHaritasiAlternates({
+        tr: `${baseUrl}${dilYolu('tr').brand(brand.slug)}`,
+        en: `${baseUrl}${dilYolu('en').brand(brand.slug)}`,
+      }),
     }))
   )
 
@@ -145,20 +213,45 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     familySlugs
       .filter((f) => !!f.slug)
       .map((f) => ({
-        url: `${baseUrl}/${lang}${Routes.product(f.slug)}`,
-        lastModified: new Date(),
-        changefreq: 'daily',
+        url: `${baseUrl}${dilYolu(lang).product(f.slug)}`,
+        // REC-454: gerçek değişiklik tarihi (aile + aktif varyantlar). Seri slug'ı haritada yok → alan yazılmaz.
+        ...(aileTarihleri.has(f.slug) ? { lastModified: new Date(aileTarihleri.get(f.slug) as string) } : {}),
         priority: 0.9,
-        alternates: {
-          languages: {
-            tr: `${baseUrl}/tr${Routes.product(f.slug)}`,
-            en: `${baseUrl}/en${Routes.product(f.slug)}`,
-          }
-        }
+        ...siteHaritasiAlternates({
+          tr: `${baseUrl}${dilYolu('tr').product(f.slug)}`,
+          en: `${baseUrl}${dilYolu('en').product(f.slug)}`,
+        }),
       }))
   )
 
+  // 4b. Model Routes — REC-300 Faz 3e-2: her aktif model kendi adresine sahip (`/tr/urun/<aile>-p-<sku>`,
+  // `/en/products/<aile>-p-<sku>`). YALNIZ `ADRES_SEMASI_K3B` AÇIKKEN: kapalıyken model adresi `?sku=`
+  // sorgusudur (aile sayfasının kopyası) ve haritaya girmez; kapalı çıktı bayt bayt aynıdır (INV-SITEMAP-MODEL-1).
+  // `lastModified` = modelin kendi `updated_at`'i; yoksa alan yazılmaz (uydurma tarih yok, REC-454).
+  const modelRoutes: MetadataRoute.Sitemap = ADRES_SEMASI_K3B
+    ? locales.flatMap((lang) =>
+        // URN-31: yalnız yayındaki listedeki TEMEL modeller (sürüm kanoniği temele gider; liste dışı modelin sayfası
+        // yok). Boş liste = sıfır satır. DB'deki aktiflik süzgeci serviste, liste süzgeci burada.
+        modeller.filter((m) => sitemapModelMi(m.sku)).map((m) => ({
+          url: `${baseUrl}${dilYolu(lang).product(m.aileSlug, m.sku)}`,
+          ...(m.updatedAt ? { lastModified: new Date(m.updatedAt) } : {}),
+          priority: 0.8,
+          ...siteHaritasiAlternates({
+            tr: `${baseUrl}${dilYolu('tr').product(m.aileSlug, m.sku)}`,
+            en: `${baseUrl}${dilYolu('en').product(m.aileSlug, m.sku)}`,
+          }),
+        })),
+      )
+    : []
+
   // `subCategoryRoutes` KALDIRILDI (REC-205) — alt kategoriler `categoryRoutes` içinde
   // zaten tek seviyeli kanonik adresleriyle var; ikinci kez eklemek çift yayın demekti.
-  return [...staticRoutes, ...categoryRoutes, ...brandRoutes, ...productRoutes]
+  return [
+    ...staticRoutes,
+    ...bilgiMerkeziSiteHaritasi(baseUrl),
+    ...categoryRoutes,
+    ...brandRoutes,
+    ...productRoutes,
+    ...modelRoutes,
+  ]
 }

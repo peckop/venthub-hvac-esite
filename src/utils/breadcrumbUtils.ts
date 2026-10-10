@@ -1,7 +1,7 @@
 import type { BreadcrumbItem } from '../components/navigation/Breadcrumb'
 import { DomainCategory } from '../lib/type-converters'
-import { Routes } from '../utils/routes'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from './categoryHelpers'
+import { adresDili, kategoriKirintiYolu } from './yuzeyAdresleri'
 
 /**
  * Helper: Kategori sayfaları için breadcrumb items oluştur
@@ -27,7 +27,9 @@ export function buildCategoryBreadcrumb(
     if (parentCategory) {
         items.push({
             label: getCategoryDisplayName(parentCategory, t),
-            href: Routes.category(getLocalizedCategorySlug(parentCategory, lang))
+            // REC-300 Faz 3d: K3-b açıkken `adresUret` (dil önekli; Breadcrumb önek eklemez —
+            // `localizedHref` idempotent). Kapalıyken bugünkü dilsiz `Routes.category`.
+            href: kategoriKirintiYolu(getLocalizedCategorySlug(parentCategory, lang), null, adresDili(lang))
         })
     }
 

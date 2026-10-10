@@ -1,0 +1,42 @@
+{
+  "kimlik": "AB-1253/2014",
+  "eksen": "E",
+  "kaynaklar": [
+    {
+      "url": "http://publications.europa.eu/resource/celex/32014R1253",
+      "son_url": "http://publications.europa.eu/resource/cellar/a65efd48-747b-11e4-b593-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Cellar/EUR-Lex konsolide 'in force' etiketi ayrıca doğrulanamadı (EUR-Lex ana domaini WAF ile curl'e kapalı, aşağıya bkz. erisilemeyenler); değişiklik zinciri (EU) 2016/2282 metninden doğrulandı.",
+      "alinti": "1. This Regulation applies to ventilation units and establishes ecodesign requirements for their placing on the market or putting into service. 2. This Regulation shall not apply to ventilation units which: (a) are unidirectional (exhaust or supply) with an electric power input of less than 30 W, except for information requirements; (b) are bidirectional, with a total electric power input for the fans of less than 30 W per air stream, except for information requirements;",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "http://publications.europa.eu/resource/celex/32016R2282",
+      "son_url": "http://publications.europa.eu/resource/cellar/771646c6-c684-11e6-a6db-01aa75ed71a1.0006.03/DOC_1",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "publications.europa.eu",
+      "resmi": true,
+      "durum_satiri": "amended by — yalnız Ek VI değişti, ana metin geçerliliğini korur",
+      "alinti": "COMMISSION REGULATION (EU) 2016/2282 of 30 November 2016 amending Regulations ... (EU) No 1253/2014 ... with regard to the use of tolerances in verification procedures ... Annex VI to Regulation (EU) No 1253/2014 is amended in accordance with Annex XX to this Regulation.",
+      "alinti_dogrulandi": true
+    },
+    {
+      "url": "https://energy-efficient-products.ec.europa.eu/ecodesignenergy-labelling-review-ventilation-units_en",
+      "son_url": "https://energy-efficient-products.ec.europa.eu/ecodesignenergy-labelling-review-ventilation-units_en",
+      "http": 200,
+      "robots": "izinli",
+      "erisim_tarihi": "2026-09-25",
+      "yayinci": "energy-efficient-products.ec.europa.eu",
+      "resmi": true,
+      "durum_satiri": "Sayfa JSON-LD dateModified=2026-03-09 ama gövde metni hâlâ 'expected to conclude in May 2025' diyor — içerik güncellenmemiş olabilir (drift şüphesi, ayrı doğrulama gerekir).",
+      "alinti": "This is the home of the DG GROW follow-up study on the review of Commission Regulation 1253/2014 (Ecodesign) and 1254/2014 (Energy Labelling) of Ventilation Units. The study is carried out for the European Commission, DG GROW and started in December 2023 and is expected to conclude in May 2025 (18 months). ... As per Article 8 of Ecodesign Regulation (EU) 1253/2014 and Article 7 of 1254/2014, the Commission shall review these Regulations in the light of technological progress and shall present the results of the assessment, including, if appropriate, a draft revision proposal, to the Consultation Forum.",
+      "alinti_dogrulandi": true
+    }
+  ]
+}

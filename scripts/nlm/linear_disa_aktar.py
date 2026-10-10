@@ -28,10 +28,10 @@ from pano_disa_aktar import sir_suz, yol_suz  # noqa: E402  (deger basilmaz; rep
 API = "https://api.linear.app/graphql"
 QUERY = """
 query($after: String) {
-  issues(first: 100, after: $after, includeArchived: false) {
+  issues(first: 100, after: $after, includeArchived: true) {
     pageInfo { hasNextPage endCursor }
     nodes {
-      identifier title priority createdAt updatedAt completedAt startedAt url
+      identifier title priority createdAt updatedAt completedAt startedAt archivedAt url
       comments(last: 1) { nodes { createdAt } }
       attachments(last: 1) { nodes { createdAt } }
       state { name type }
@@ -103,7 +103,9 @@ def cek(key):
                 "projectMilestone": (n.get("projectMilestone") or {}).get("name"),
                 "labels": sorted(l["name"] for l in n["labels"]["nodes"]),
                 "priority": n["priority"], "createdAt": n["createdAt"], "updatedAt": n["updatedAt"],
-                "completedAt": n.get("completedAt"), "url": n["url"],
+                "completedAt": n.get("completedAt"), "archivedAt": n.get("archivedAt"), "url": n["url"],
+                # ARSIV DAHIL (OPS 09-25): Linear kapanan isi kendiliginden arsivler; arsivsiz dokumde karar
+                # basligindaki kapanmis REC "yok" gorunur, karar-kayit-bagi kapisi yanlis KIRMIZI verir (REC-65/281/291).
                 # SON ANLAMLI DOKUNUS (Katalog uyarisi 2026-09-07): updatedAt etiket/bakim/betikle tazelenir, curume olcutu olamaz.
                 # Anlamli = son yorum · son PR/ek baglama · ise baslama · bitis · acilis. Aciklama govdesi degisikligi API'de ucuz izlenemiyor, KAPSAM DISI (yazili).
                 # startedAt/completedAt CIKARILDI (Katalog 09-07): durum gezdirmek saati sifirlamasin.

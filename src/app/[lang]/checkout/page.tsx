@@ -6,6 +6,7 @@ import { tr } from '@/i18n/dictionaries/tr'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
 import { Routes } from '@/utils/routes'
 
+import { odemeKarari } from '../../../lib/kip/odemeKapisi'
 import { satisKipiOku } from '../../../lib/kip/satisKipi'
 import OdemeKapaliBilgi from '../../../views/checkout/OdemeKapaliBilgi'
 import CheckoutPage from '../../../views/CheckoutPage'
@@ -51,6 +52,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 export default async function Page() {
   const kip = await satisKipiOku()
+  // REC-168 B: anahtar açık OLSA BİLE satıcı bilgisi yer tutucuysa ödeme adımı açılmaz (`odemeKarari`).
+  const karar = odemeKarari(kip)
+  if (!karar.acik && karar.neden === 'satici-bilgisi-eksik') {
+    // Değer DEĞİL yalnız alan adları: satış anahtarı açılmış ama yasal bilgi eksik = operatörün görmesi gereken durum.
+    console.error(`[checkout] satış anahtarı AÇIK ama satıcı bilgisi eksik; ödeme adımı açılmadı: ${karar.eksikAlanlar.join(', ')}`)
+  }
 
   return (
     <Suspense fallback={
@@ -58,7 +65,7 @@ export default async function Page() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-navy" />
       </div>
     }>
-      {kip.acik ? <CheckoutPage /> : <OdemeKapaliBilgi />}
+      {karar.acik ? <CheckoutPage /> : <OdemeKapaliBilgi />}
     </Suspense>
   )
 }

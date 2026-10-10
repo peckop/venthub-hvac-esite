@@ -51,7 +51,7 @@ const HomePage: React.FC<HomePageProps> = ({
             <CinematicProductShowcase />
           </RevealSection>
 
-          <ApplicationSolutions dictionary={dictionary.applicationSolutions} lang={lang} />
+          <ApplicationSolutions dictionary={dictionary.applicationSolutions} lang={lang} categories={rawCategories} />
 
           <TrustProofSection dictionary={dictionary.trustProof} trustStripDict={dictionary.hero.trustStrip} />
 

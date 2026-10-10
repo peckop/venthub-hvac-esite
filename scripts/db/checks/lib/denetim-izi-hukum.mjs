@@ -38,6 +38,24 @@ export const KAPSAM = [
   'product_images',
   'brands',
   'site_settings',
+  // REC-412 Faz 0.5 (2026-09-29): vitrin fiyatını belirleyen tablolar (cetvel denetim-izi-standard §7.2 → §8).
+  'pricing_rule',
+  'pricing_policy',
+  'price_lists',
+  'currency_rates',
+  'product_prices',
+]
+
+/**
+ * ADIYLA ZORUNLU tetikler (REC-412 Faz 0.5/0.5b). Tabloda BAŞKA bir denetim tetiği durduğu için "tabloda tetik var mı"
+ * sorusu yeşil kalır ama ifade düzeyi özet tetiği sökülmüş olabilir (`products`'ta zaten iki satır tetiği var; çürütme B3).
+ * Özet tetiği kalkarsa toplu yazımlar (yeniden hesap, maliyet yenileme) günlüğe sessizce düşmez → adıyla aranır.
+ */
+export const ZORUNLU_TETIKLER = [
+  'denetim_izi_ozet_ins',
+  'denetim_izi_ozet_upd',
+  'denetim_izi_ozet_del',
+  'denetim_izi_maliyet_ozet',
 ]
 
 /** `products` UPDATE süzgecinde BULUNMASI ZORUNLU kolonlar (ticari çekirdek). */
@@ -59,6 +77,19 @@ export function degerlendir(satirlar) {
           `${tablo} tablosunda denetim_izi tetigi YOK. Bu tabloya yapilan her yazim ` +
           `KAYITSIZ gecer. Migration dosyasinin repoda durmasi bunu KANITLAMAZ — ` +
           `tetik DROP edilmis olabilir.`,
+      })
+    }
+  }
+
+  // (1b) ADIYLA ZORUNLU TETİKLER (ifade düzeyi özetler)
+  for (const ad of ZORUNLU_TETIKLER) {
+    if (!denetimSatirlari.some((r) => r.tetik === ad)) {
+      ihlaller.push({
+        sinif: 'TETIK-YOK',
+        tablo: ad,
+        aciklama:
+          `${ad} tetigi YOK. Bu ifade duzeyi ozet tetigi kalkarsa toplu yazimlar (fiyat yeniden hesabi, maliyet ` +
+          `yenileme) gunluge dusmez; tabloda baska bir denetim tetigi durdugu icin kapinin (1) kolu bunu GORMEZ.`,
       })
     }
   }

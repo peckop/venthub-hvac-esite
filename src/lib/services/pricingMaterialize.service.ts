@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '../../types/database.types'
+import { type DegisiklikYontemi, yeniOturumKimligi, yontemli } from '../pricing/degisiklikYontemi'
 import { tumSatirlariCek, VARSAYILAN_SAYFA_BOYU } from '../supabase/tumSatirlar'
 import { resolveFxRate } from './fxRate.service'
 import { type PricingRuleRow, resolvePriceWithRules, type RuleEvaluationInputs } from './pricing.service'
@@ -108,7 +109,23 @@ export interface MaterializeOptions {
    * değmez). Üretimde verilmez; varsayılan `VARSAYILAN_SAYFA_BOYU`.
    */
   cacheSayfaBoyu?: number
+  /**
+   * TEK/BİRKAÇ ÜRÜN kapsamı (REC-412 Faz 1): verilirse yalnız bu ürünler taranır VE bayat-satır tasfiyesi
+   * yalnız BU ürünlerin cache satırlarına uygulanır. ⛔Tasfiye kapsamı daraltılmazsa taranmayan 347 ürünün
+   * satırı "bu koşuda üretilmedi" sayılıp pasifleştirilirdi — bu yüzden cache fotoğrafı da aynı süzgeçle okunur.
+   * `undefined` = katalog geneli (mevcut davranış). BOŞ dizi = HİÇBİR ürün (fail-open yasak: "kapsam boş"
+   * asla "hepsi" demek değildir).
+   */
+  productIds?: string[]
+  /**
+   * Fiyat günlüğü yöntem etiketi (INV-FIYAT-GUNLUGU-1). Varsayılan `yeniden_hesap` (katalog yeniden hesabı);
+   * panelden tek ürün yansıtılırken çağıran `panel`/`liste` verir ki günlükte kaynağı doğru okunsun.
+   */
+  yontem?: DegisiklikYontemi
 }
+
+/** `productIds` üst sınırı: id'ler URL'e `in.(...)` olarak gider; sınırsız liste PostgREST adres tavanına çarpar. */
+export const MATERIALIZE_URUN_TAVANI = 200
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10)
@@ -118,8 +135,8 @@ function round4(value: number): number {
   return Number(value.toFixed(4))
 }
 
-/** Maliyet tazelemesinde eşzamanlı PATCH sayısı (sıralı koşu yüzlerce round-trip demek). */
-const COST_UPDATE_CONCURRENCY = 20
+/** `maliyet_yenile` RPC'sinin parti sınırıyla AYNI (supabase/migrations/20260929143000_maliyet_yenileme_gunlugu.sql). */
+const MALIYET_PARTI_TAVANI = 5000
 
 /**
  * `products.cost_in_base`'i (donmuş TL maliyet) tazeler. Katalog satın-alma fiyatı
@@ -186,7 +203,15 @@ export async function refreshCostInBase(
   let skippedNoRate = 0
   let skippedNoPurchasePrice = 0
   let skippedFxLocked = 0
-  const toWrite: { id: string; costInBase: number; purchaseRateToBase: number }[] = []
+  // `purchasePrice`/`purchaseCurrency`: maliyetin HESAPLANDIĞI alış fiyatı. RPC bunu güncel satırla karşılaştırır:
+  // okuma ile yazma arasında fiyat değiştiyse eski fiyattan üretilmiş maliyet YAZILMAZ, tüm parti geri alınır.
+  const toWrite: {
+    id: string
+    costInBase: number
+    purchaseRateToBase: number
+    purchasePrice: number
+    purchaseCurrency: string
+  }[] = []
 
   // W5 — fiyat kilidi (cetvel §8.2). Kilitli kapsamın `cost_in_base`'i TAZELENMEZ.
   //
@@ -228,31 +253,53 @@ export async function refreshCostInBase(
     }
 
     const newCostInBase = round4(purchasePrice * fx.rate)
-    const newRate = fx.rate
+    // Sütun duyarlığına (numeric(18,6)) yuvarla: fazla ondalıklı kur her koşuda "değişti" görünüp satırı boşuna
+    // yeniden yazmasın (DB de aynı duyarlığa yuvarlar; günlük yazılmaz ama satır ve sayaç şişerdi).
+    const newRate = Math.round(fx.rate * 1e6) / 1e6
     const sameCost = p.cost_in_base != null && Math.abs(Number(p.cost_in_base) - newCostInBase) < 1e-9
     const sameRate = p.purchase_rate_to_base != null && Math.abs(Number(p.purchase_rate_to_base) - newRate) < 1e-9
     if (sameCost && sameRate) continue
 
     updated++
-    toWrite.push({ id: p.id, costInBase: newCostInBase, purchaseRateToBase: newRate })
+    toWrite.push({
+      id: p.id,
+      costInBase: newCostInBase,
+      purchaseRateToBase: newRate,
+      purchasePrice,
+      purchaseCurrency: p.purchase_currency,
+    })
   }
 
-  if (!dryRun) {
-    // Ürün başına ayrı PATCH gerekiyor (Update tipi toplu upsert'e girmiyor: name/sku/brand zorunlu),
-    // ama sıralı koşarsak yüzlerce ardışık round-trip olur → sınırlı eşzamanlılıkla gruplanır.
-    for (let i = 0; i < toWrite.length; i += COST_UPDATE_CONCURRENCY) {
-      const chunk = toWrite.slice(i, i + COST_UPDATE_CONCURRENCY)
-      const results = await Promise.all(
-        chunk.map(row =>
-          supabase
-            .from('products')
-            .update({ cost_in_base: row.costInBase, purchase_rate_to_base: row.purchaseRateToBase })
-            .eq('id', row.id),
+  if (!dryRun && toWrite.length > 0) {
+    // TEK ATOMİK YAZIM (REC-412 Faz 0.5b, karar 186). Eskiden ürün başına ayrı PATCH (20 paralel) yazılıyordu:
+    // ortada hata olursa katalog YARI yenilenmiş kalırdı ve DB günlüğü ayrı istekleri tek özete toplayamazdı.
+    // `maliyet_yenile` tüm partiyi TEK UPDATE ifadesiyle yazar: ya hepsi ya hiçbiri, ve günlükte parti başına
+    // TEK özet satırı (eski→yeni dizisi) düşer. Yönetici kapısı RPC içinde (JWT app_metadata).
+    if (toWrite.length > MALIYET_PARTI_TAVANI) {
+      // Bölmek atomikliği bozar (ilk parça yazılır, ikincisi düşerse yarım yenileme) → BÖLMEDEN dur.
+      // `code`: RPC'nin kendi 54000 hatasıyla AYNI; arayüz iki kaynağı tek mesajla gösterir (CostRefreshModal).
+      throw Object.assign(
+        new Error(
+          `Maliyet yenileme partisi ${toWrite.length} satır; sınır ${MALIYET_PARTI_TAVANI}. ` +
+            `Yarım yenileme yapılmaz — katalog bu sınırı aştıysa parti sınırı (maliyet_yenile migration'ı) yükseltilmelidir.`,
         ),
+        { code: '54000' },
       )
-      const failed = results.find(r => r.error)
-      if (failed?.error) throw failed.error
     }
+    const { error } = await yontemli(
+      supabase.rpc('maliyet_yenile', {
+        p_satirlar: toWrite.map(row => ({
+          id: row.id,
+          cost_in_base: row.costInBase,
+          purchase_rate_to_base: row.purchaseRateToBase,
+          purchase_price: row.purchasePrice,
+          purchase_currency: row.purchaseCurrency,
+        })),
+      }),
+      'maliyet_yenileme',
+      yeniOturumKimligi(),
+    )
+    if (error) throw error
   }
 
   return { scanned: products.length, updated, skippedNoRate, skippedNoPurchasePrice, skippedFxLocked, ratesUsed }
@@ -295,6 +342,35 @@ export async function materializePrices(
   const today = options?.today ?? todayIso()
   const sampleSize = options?.sampleSize ?? 10
   const cacheSayfaBoyu = options?.cacheSayfaBoyu ?? VARSAYILAN_SAYFA_BOYU
+  const yontem: DegisiklikYontemi = options?.yontem ?? 'yeniden_hesap'
+  // Kapsam: `undefined` = tüm katalog; dizi = yalnız o ürünler (tekilleştirilir, tavanlanır, BOŞ = hiçbiri).
+  const urunKapsami = options?.productIds === undefined ? null : [...new Set(options.productIds)]
+  if (urunKapsami !== null && urunKapsami.length > MATERIALIZE_URUN_TAVANI) {
+    throw new Error(
+      `materializePrices: productIds ${urunKapsami.length} > ${MATERIALIZE_URUN_TAVANI}. ` +
+        'Sınırsız liste adres tavanına çarpar; katalog geneli için productIds verme.',
+    )
+  }
+  // Fiyat günlüğü (INV-FIYAT-GUNLUGU-1): bu koşunun tüm partileri (upsert 500'lük, pasifleştirme 200'lük) aynı
+  // oturum kimliğini taşır → günlükte birden çok özet satırı tek koşuya bağlanır.
+  const oturum = yeniOturumKimligi()
+  if (urunKapsami !== null && urunKapsami.length === 0) {
+    // Boş kapsam: hiçbir okuma/yazma yapma (kapsam boşken "hepsi"ne düşmek yasak).
+    return {
+      dryRun,
+      productsScanned: 0,
+      pricedProducts: 0,
+      quoteOnlyProducts: 0,
+      rowsUpserted: 0,
+      skippedManual: 0,
+      unbridgedBrand: 0,
+      skippedFxLocked: 0,
+      deactivated: 0,
+      bySegment: [],
+      samples: [],
+      totalNetTry: 0,
+    }
+  }
 
   // 1) Kural havuzu — bir kez.
   const { data: ruleRows, error: rulesErr } = await supabase.from('pricing_rule').select('*')
@@ -356,13 +432,17 @@ export async function materializePrices(
   const derivedActiveIdByKey = new Map<string, string>()
   const existingRows = await tumSatirlariCek<CachedPriceRow>(
     'product_prices (cache fotoğrafı)',
-    (bas, son) =>
-      supabase
+    (bas, son) => {
+      const sorgu = supabase
         .from('product_prices')
         .select('id, product_id, price_list_id, currency, is_derived, is_active', { count: 'exact' })
         .eq('valid_from', DERIVED_VALID_FROM)
+      // Tek/birkaç ürün kapsamında fotoğraf da AYNI süzgeçle okunur: bayat-satır tasfiyesi bu fotoğraftan
+      // beslendiği için, süzülmeyen fotoğraf taranmayan ürünlerin satırlarını pasifleştirirdi.
+      return (urunKapsami === null ? sorgu : sorgu.in('product_id', urunKapsami))
         .order('id', { ascending: true })
-        .range(bas, son),
+        .range(bas, son)
+    },
     cacheSayfaBoyu,
   )
   for (const row of existingRows) {
@@ -397,19 +477,24 @@ export async function materializePrices(
 
   async function flushUpsertBatch(rows: ProductPriceUpsertRow[]) {
     if (dryRun || rows.length === 0) return
-    const { error } = await supabase
-      .from('product_prices')
-      .upsert(rows, { onConflict: CACHE_CONFLICT_TARGET })
+    const { error } = await yontemli(
+      supabase.from('product_prices').upsert(rows, { onConflict: CACHE_CONFLICT_TARGET }),
+      yontem,
+      oturum,
+    )
     if (error) throw error
   }
 
   let offset = 0
   for (;;) {
-    const { data: pageRows, error: productsErr } = await supabase
+    const urunSorgusu = supabase
       .from('products')
       .select(PRODUCT_SCOPE_COLUMNS)
       .is('deleted_at', null)
       .eq('status', 'active')
+    const { data: pageRows, error: productsErr } = await (
+      urunKapsami === null ? urunSorgusu : urunSorgusu.in('id', urunKapsami)
+    )
       .order('id', { ascending: true })
       .range(offset, offset + PRODUCTS_PAGE_SIZE - 1)
     if (productsErr) throw productsErr
@@ -516,8 +601,20 @@ export async function materializePrices(
   if (!dryRun) {
     for (let i = 0; i < staleIds.length; i += DEACTIVATE_BATCH_SIZE) {
       const chunk = staleIds.slice(i, i + DEACTIVATE_BATCH_SIZE)
-      const { error } = await supabase.from('product_prices').update({ is_active: false }).in('id', chunk)
+      const { data: pasiflesen, error } = await yontemli(
+        supabase.from('product_prices').update({ is_active: false }).in('id', chunk).select('id'),
+        yontem,
+        oturum,
+      )
       if (error) throw error
+      // ⛔RLS USING dışında kalan satıra UPDATE HATA VERMEZ, 0 satır etkiler. Sayıyı kontrol etmezsek yetkisiz bir
+      // kullanıcı (ör. moderatör) yeniden hesap çalıştırınca bayat fiyat vitrinde kalır ama sonuç "tamam" görünür.
+      if ((pasiflesen ?? []).length !== chunk.length) {
+        throw new Error(
+          `materializePrices: ${chunk.length} bayat satırdan ${(pasiflesen ?? []).length} tanesi pasifleştirilebildi ` +
+            '(yetki/RLS?). Eski fiyat vitrinde kalmış olabilir.',
+        )
+      }
     }
   }
 

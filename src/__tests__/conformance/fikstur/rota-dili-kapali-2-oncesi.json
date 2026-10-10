@@ -1,0 +1,661 @@
+{
+  "not": "KAPALI KİP (NEXT_PUBLIC_ADRES_DILI yok) çıktıları; OPS-52 PR-C1 işe başlamadan ÖNCE üretildi (HEAD 407c42fe8). | BİLİNÇLİ YENİLEME: #1686, yeni marka Casals (tr/en marka satırı; Flexiva ürünsüz olduğu için haritada YOK), OPS onayı 10-06. Başka satır değişmedi.",
+  "localizedHref": {
+    "tr": {
+      "home()": "/tr",
+      "home(ornek-slug,ornek-alt)": "/tr",
+      "product()": "/tr/products/",
+      "product(ornek-slug,ornek-alt)": "/tr/products/ornek-slug?sku=ornek-alt",
+      "products()": "/tr/products",
+      "products(ornek-slug,ornek-alt)": "/tr/products",
+      "legacyProduct()": "/tr/products",
+      "legacyProduct(ornek-slug,ornek-alt)": "/tr/products/ornek-slug",
+      "category()": "/tr/category/undefined",
+      "category(ornek-slug,ornek-alt)": "/tr/category/ornek-alt",
+      "brand()": "/tr/brands/undefined",
+      "brand(ornek-slug,ornek-alt)": "/tr/brands/ornek-slug",
+      "brands()": "/tr/brands",
+      "brands(ornek-slug,ornek-alt)": "/tr/brands",
+      "cart()": "/tr/cart",
+      "cart(ornek-slug,ornek-alt)": "/tr/cart",
+      "checkout()": "/tr/checkout",
+      "checkout(ornek-slug,ornek-alt)": "/tr/checkout",
+      "paymentSuccess()": "/tr/payment-success",
+      "paymentSuccess(ornek-slug,ornek-alt)": "/tr/payment-success?orderId=ornek-slug&status=ornek-alt",
+      "about()": "/tr/about",
+      "about(ornek-slug,ornek-alt)": "/tr/about",
+      "contact()": "/tr/contact",
+      "contact(ornek-slug,ornek-alt)": "/tr/contact?dept=ornek-slug",
+      "account.overview()": "/tr/account",
+      "account.overview(ornek-slug,ornek-alt)": "/tr/account",
+      "account.orders()": "/tr/account/orders",
+      "account.orders(ornek-slug,ornek-alt)": "/tr/account/orders",
+      "account.orderDetail()": "/tr/account/orders/detail?id=undefined",
+      "account.orderDetail(ornek-slug,ornek-alt)": "/tr/account/orders/detail?id=ornek-slug",
+      "account.shipments()": "/tr/account/shipments",
+      "account.shipments(ornek-slug,ornek-alt)": "/tr/account/shipments",
+      "account.returns()": "/tr/account/returns",
+      "account.returns(ornek-slug,ornek-alt)": "/tr/account/returns?new=ornek-slug",
+      "account.quotes()": "/tr/account/quotes",
+      "account.quotes(ornek-slug,ornek-alt)": "/tr/account/quotes",
+      "account.quoteDetail()": "/tr/account/quotes/detail?id=undefined",
+      "account.quoteDetail(ornek-slug,ornek-alt)": "/tr/account/quotes/detail?id=ornek-slug",
+      "account.addresses()": "/tr/account/addresses",
+      "account.addresses(ornek-slug,ornek-alt)": "/tr/account/addresses",
+      "account.invoices()": "/tr/account/invoices",
+      "account.invoices(ornek-slug,ornek-alt)": "/tr/account/invoices",
+      "account.profile()": "/tr/account/profile",
+      "account.profile(ornek-slug,ornek-alt)": "/tr/account/profile",
+      "account.favorites()": "/tr/account/favorites",
+      "account.favorites(ornek-slug,ornek-alt)": "/tr/account/favorites",
+      "account.projects()": "/tr/account/projects",
+      "account.projects(ornek-slug,ornek-alt)": "/tr/account/projects",
+      "account.security()": "/tr/account/security",
+      "account.security(ornek-slug,ornek-alt)": "/tr/account/security",
+      "account.dataRequests()": "/tr/account/data-requests",
+      "account.dataRequests(ornek-slug,ornek-alt)": "/tr/account/data-requests",
+      "admin.dashboard()": "/admin",
+      "admin.dashboard(ornek-slug,ornek-alt)": "/admin",
+      "admin.products()": "/admin/products",
+      "admin.products(ornek-slug,ornek-alt)": "/admin/products?id=ornek-slug",
+      "admin.orders()": "/admin/orders",
+      "admin.orders(ornek-slug,ornek-alt)": "/admin/orders?q=ornek-slug",
+      "admin.categories()": "/admin/categories",
+      "admin.categories(ornek-slug,ornek-alt)": "/admin/categories/ornek-slug/builder",
+      "admin.users()": "/admin/users",
+      "admin.users(ornek-slug,ornek-alt)": "/admin/users",
+      "urunSecici()": "/tr/urun-secici",
+      "urunSecici(ornek-slug,ornek-alt)": "/tr/urun-secici",
+      "destek.home()": "/tr/destek/merkez",
+      "destek.home(ornek-slug,ornek-alt)": "/tr/destek/merkez",
+      "destek.hesaplayicilar()": "/tr/destek/hesaplayicilar",
+      "destek.hesaplayicilar(ornek-slug,ornek-alt)": "/tr/destek/hesaplayicilar/ornek-slug",
+      "destek.konular()": "/tr/destek/konular",
+      "destek.konular(ornek-slug,ornek-alt)": "/tr/destek/konular/ornek-slug",
+      "destek.sss()": "/tr/destek/sss",
+      "destek.sss(ornek-slug,ornek-alt)": "/tr/destek/sss",
+      "destek.iadeDegisim()": "/tr/destek/iade-degisim",
+      "destek.iadeDegisim(ornek-slug,ornek-alt)": "/tr/destek/iade-degisim",
+      "destek.teslimatKargo()": "/tr/destek/teslimat-kargo",
+      "destek.teslimatKargo(ornek-slug,ornek-alt)": "/tr/destek/teslimat-kargo",
+      "destek.garantiServis()": "/tr/destek/garanti-servis",
+      "destek.garantiServis(ornek-slug,ornek-alt)": "/tr/destek/garanti-servis",
+      "legal.kvkk()": "/tr/legal/kvkk",
+      "legal.kvkk(ornek-slug,ornek-alt)": "/tr/legal/kvkk",
+      "legal.mesafeliSatis()": "/tr/legal/mesafeli-satis-sozlesmesi",
+      "legal.mesafeliSatis(ornek-slug,ornek-alt)": "/tr/legal/mesafeli-satis-sozlesmesi",
+      "legal.onBilgilendirme()": "/tr/legal/on-bilgilendirme-formu",
+      "legal.onBilgilendirme(ornek-slug,ornek-alt)": "/tr/legal/on-bilgilendirme-formu",
+      "legal.cerez()": "/tr/legal/cerez-politikasi",
+      "legal.cerez(ornek-slug,ornek-alt)": "/tr/legal/cerez-politikasi",
+      "legal.gizlilik()": "/tr/legal/gizlilik-politikasi",
+      "legal.gizlilik(ornek-slug,ornek-alt)": "/tr/legal/gizlilik-politikasi",
+      "legal.kullanimKosullari()": "/tr/legal/kullanim-kosullari",
+      "legal.kullanimKosullari(ornek-slug,ornek-alt)": "/tr/legal/kullanim-kosullari",
+      "auth.login()": "/tr/auth/login",
+      "auth.login(ornek-slug,ornek-alt)": "/tr/auth/login?redirect=ornek-slug&error=ornek-alt",
+      "auth.register()": "/tr/auth/register",
+      "auth.register(ornek-slug,ornek-alt)": "/tr/auth/register",
+      "auth.forgotPassword()": "/tr/auth/forgot-password",
+      "auth.forgotPassword(ornek-slug,ornek-alt)": "/tr/auth/forgot-password",
+      "auth.resetPassword()": "/tr/auth/reset-password",
+      "auth.resetPassword(ornek-slug,ornek-alt)": "/tr/auth/reset-password",
+      "auth.callback()": "/tr/auth/callback",
+      "auth.callback(ornek-slug,ornek-alt)": "/tr/auth/callback"
+    },
+    "en": {
+      "home()": "/en",
+      "home(ornek-slug,ornek-alt)": "/en",
+      "product()": "/en/products/",
+      "product(ornek-slug,ornek-alt)": "/en/products/ornek-slug?sku=ornek-alt",
+      "products()": "/en/products",
+      "products(ornek-slug,ornek-alt)": "/en/products",
+      "legacyProduct()": "/en/products",
+      "legacyProduct(ornek-slug,ornek-alt)": "/en/products/ornek-slug",
+      "category()": "/en/category/undefined",
+      "category(ornek-slug,ornek-alt)": "/en/category/ornek-alt",
+      "brand()": "/en/brands/undefined",
+      "brand(ornek-slug,ornek-alt)": "/en/brands/ornek-slug",
+      "brands()": "/en/brands",
+      "brands(ornek-slug,ornek-alt)": "/en/brands",
+      "cart()": "/en/cart",
+      "cart(ornek-slug,ornek-alt)": "/en/cart",
+      "checkout()": "/en/checkout",
+      "checkout(ornek-slug,ornek-alt)": "/en/checkout",
+      "paymentSuccess()": "/en/payment-success",
+      "paymentSuccess(ornek-slug,ornek-alt)": "/en/payment-success?orderId=ornek-slug&status=ornek-alt",
+      "about()": "/en/about",
+      "about(ornek-slug,ornek-alt)": "/en/about",
+      "contact()": "/en/contact",
+      "contact(ornek-slug,ornek-alt)": "/en/contact?dept=ornek-slug",
+      "account.overview()": "/en/account",
+      "account.overview(ornek-slug,ornek-alt)": "/en/account",
+      "account.orders()": "/en/account/orders",
+      "account.orders(ornek-slug,ornek-alt)": "/en/account/orders",
+      "account.orderDetail()": "/en/account/orders/detail?id=undefined",
+      "account.orderDetail(ornek-slug,ornek-alt)": "/en/account/orders/detail?id=ornek-slug",
+      "account.shipments()": "/en/account/shipments",
+      "account.shipments(ornek-slug,ornek-alt)": "/en/account/shipments",
+      "account.returns()": "/en/account/returns",
+      "account.returns(ornek-slug,ornek-alt)": "/en/account/returns?new=ornek-slug",
+      "account.quotes()": "/en/account/quotes",
+      "account.quotes(ornek-slug,ornek-alt)": "/en/account/quotes",
+      "account.quoteDetail()": "/en/account/quotes/detail?id=undefined",
+      "account.quoteDetail(ornek-slug,ornek-alt)": "/en/account/quotes/detail?id=ornek-slug",
+      "account.addresses()": "/en/account/addresses",
+      "account.addresses(ornek-slug,ornek-alt)": "/en/account/addresses",
+      "account.invoices()": "/en/account/invoices",
+      "account.invoices(ornek-slug,ornek-alt)": "/en/account/invoices",
+      "account.profile()": "/en/account/profile",
+      "account.profile(ornek-slug,ornek-alt)": "/en/account/profile",
+      "account.favorites()": "/en/account/favorites",
+      "account.favorites(ornek-slug,ornek-alt)": "/en/account/favorites",
+      "account.projects()": "/en/account/projects",
+      "account.projects(ornek-slug,ornek-alt)": "/en/account/projects",
+      "account.security()": "/en/account/security",
+      "account.security(ornek-slug,ornek-alt)": "/en/account/security",
+      "account.dataRequests()": "/en/account/data-requests",
+      "account.dataRequests(ornek-slug,ornek-alt)": "/en/account/data-requests",
+      "admin.dashboard()": "/admin",
+      "admin.dashboard(ornek-slug,ornek-alt)": "/admin",
+      "admin.products()": "/admin/products",
+      "admin.products(ornek-slug,ornek-alt)": "/admin/products?id=ornek-slug",
+      "admin.orders()": "/admin/orders",
+      "admin.orders(ornek-slug,ornek-alt)": "/admin/orders?q=ornek-slug",
+      "admin.categories()": "/admin/categories",
+      "admin.categories(ornek-slug,ornek-alt)": "/admin/categories/ornek-slug/builder",
+      "admin.users()": "/admin/users",
+      "admin.users(ornek-slug,ornek-alt)": "/admin/users",
+      "urunSecici()": "/en/urun-secici",
+      "urunSecici(ornek-slug,ornek-alt)": "/en/urun-secici",
+      "destek.home()": "/en/destek/merkez",
+      "destek.home(ornek-slug,ornek-alt)": "/en/destek/merkez",
+      "destek.hesaplayicilar()": "/en/destek/hesaplayicilar",
+      "destek.hesaplayicilar(ornek-slug,ornek-alt)": "/en/destek/hesaplayicilar/ornek-slug",
+      "destek.konular()": "/en/destek/konular",
+      "destek.konular(ornek-slug,ornek-alt)": "/en/destek/konular/ornek-slug",
+      "destek.sss()": "/en/destek/sss",
+      "destek.sss(ornek-slug,ornek-alt)": "/en/destek/sss",
+      "destek.iadeDegisim()": "/en/destek/iade-degisim",
+      "destek.iadeDegisim(ornek-slug,ornek-alt)": "/en/destek/iade-degisim",
+      "destek.teslimatKargo()": "/en/destek/teslimat-kargo",
+      "destek.teslimatKargo(ornek-slug,ornek-alt)": "/en/destek/teslimat-kargo",
+      "destek.garantiServis()": "/en/destek/garanti-servis",
+      "destek.garantiServis(ornek-slug,ornek-alt)": "/en/destek/garanti-servis",
+      "legal.kvkk()": "/en/legal/kvkk",
+      "legal.kvkk(ornek-slug,ornek-alt)": "/en/legal/kvkk",
+      "legal.mesafeliSatis()": "/en/legal/mesafeli-satis-sozlesmesi",
+      "legal.mesafeliSatis(ornek-slug,ornek-alt)": "/en/legal/mesafeli-satis-sozlesmesi",
+      "legal.onBilgilendirme()": "/en/legal/on-bilgilendirme-formu",
+      "legal.onBilgilendirme(ornek-slug,ornek-alt)": "/en/legal/on-bilgilendirme-formu",
+      "legal.cerez()": "/en/legal/cerez-politikasi",
+      "legal.cerez(ornek-slug,ornek-alt)": "/en/legal/cerez-politikasi",
+      "legal.gizlilik()": "/en/legal/gizlilik-politikasi",
+      "legal.gizlilik(ornek-slug,ornek-alt)": "/en/legal/gizlilik-politikasi",
+      "legal.kullanimKosullari()": "/en/legal/kullanim-kosullari",
+      "legal.kullanimKosullari(ornek-slug,ornek-alt)": "/en/legal/kullanim-kosullari",
+      "auth.login()": "/en/auth/login",
+      "auth.login(ornek-slug,ornek-alt)": "/en/auth/login?redirect=ornek-slug&error=ornek-alt",
+      "auth.register()": "/en/auth/register",
+      "auth.register(ornek-slug,ornek-alt)": "/en/auth/register",
+      "auth.forgotPassword()": "/en/auth/forgot-password",
+      "auth.forgotPassword(ornek-slug,ornek-alt)": "/en/auth/forgot-password",
+      "auth.resetPassword()": "/en/auth/reset-password",
+      "auth.resetPassword(ornek-slug,ornek-alt)": "/en/auth/reset-password",
+      "auth.callback()": "/en/auth/callback",
+      "auth.callback(ornek-slug,ornek-alt)": "/en/auth/callback"
+    }
+  },
+  "dilDegistirYolu": {
+    "/tr -> tr": "/tr",
+    "/tr -> en": "/en",
+    "/en -> tr": "/tr",
+    "/en -> en": "/en",
+    "/tr/about -> tr": "/tr/about",
+    "/tr/about -> en": "/en/about",
+    "/en/about -> tr": "/tr/about",
+    "/en/about -> en": "/en/about",
+    "/tr/contact -> tr": "/tr/contact",
+    "/tr/contact -> en": "/en/contact",
+    "/en/contact -> tr": "/tr/contact",
+    "/en/contact -> en": "/en/contact",
+    "/tr/hakkimizda -> tr": "/tr/hakkimizda",
+    "/tr/hakkimizda -> en": "/en/hakkimizda",
+    "/tr/iletisim -> tr": "/tr/iletisim",
+    "/tr/iletisim -> en": "/en/iletisim",
+    "/tr/urun-secici -> tr": "/tr/urun-secici",
+    "/tr/urun-secici -> en": "/en/urun-secici",
+    "/en/urun-secici -> tr": "/tr/urun-secici",
+    "/en/urun-secici -> en": "/en/urun-secici",
+    "/tr/destek/sss -> tr": "/tr/destek/sss",
+    "/tr/destek/sss -> en": "/en/destek/sss",
+    "/en/destek/sss -> tr": "/tr/destek/sss",
+    "/en/destek/sss -> en": "/en/destek/sss",
+    "/tr/legal/kvkk -> tr": "/tr/legal/kvkk",
+    "/tr/legal/kvkk -> en": "/en/legal/kvkk",
+    "/en/legal/kvkk -> tr": "/tr/legal/kvkk",
+    "/en/legal/kvkk -> en": "/en/legal/kvkk",
+    "/tr/products -> tr": "/tr/products",
+    "/tr/products -> en": "/en/products",
+    "/en/products -> tr": "/tr/products",
+    "/en/products -> en": "/en/products",
+    "/tr/products/aile-x -> tr": "/tr/products/aile-x",
+    "/tr/products/aile-x -> en": "/en/products/aile-x",
+    "/en/products/aile-x -> tr": "/tr/products/aile-x",
+    "/en/products/aile-x -> en": "/en/products/aile-x",
+    "/tr/category/fanlar -> tr": "/tr/category/fanlar",
+    "/tr/category/fanlar -> en": "/en/category/fanlar",
+    "/en/category/fans -> tr": "/tr/category/fans",
+    "/en/category/fans -> en": "/en/category/fans",
+    "/tr/brands -> tr": "/tr/brands",
+    "/tr/brands -> en": "/en/brands",
+    "/en/brands/vortice -> tr": "/tr/brands/vortice",
+    "/en/brands/vortice -> en": "/en/brands/vortice",
+    "/tr/cart -> tr": "/tr/cart",
+    "/tr/cart -> en": "/en/cart",
+    "/en/checkout -> tr": "/tr/checkout",
+    "/en/checkout -> en": "/en/checkout",
+    "/tr/account/orders -> tr": "/tr/account/orders",
+    "/tr/account/orders -> en": "/en/account/orders",
+    "/about -> tr": "/tr/about",
+    "/about -> en": "/en/about",
+    "/contact -> tr": "/tr/contact",
+    "/contact -> en": "/en/contact"
+  },
+  "sitemap": {
+    "EN_YAYIN=false": [
+      {
+        "url": "http://localhost:3000/tr",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/products",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/contact",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/about",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/urun-secici",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/legal/kvkk",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/legal/gizlilik-politikasi",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/legal/cerez-politikasi",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/category/fanlar",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/vortice",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/avens",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/casals",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/seat",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/danfoss",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/nicotra-gebhardt",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/products/test-aile-1",
+        "alternates": null
+      }
+    ],
+    "EN_YAYIN=true": [
+      {
+        "url": "http://localhost:3000/tr",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr",
+            "en": "http://localhost:3000/en"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/products",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/products",
+            "en": "http://localhost:3000/en/products"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands",
+            "en": "http://localhost:3000/en/brands"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/contact",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/contact",
+            "en": "http://localhost:3000/en/contact"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/about",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/about",
+            "en": "http://localhost:3000/en/about"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/urun-secici",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/urun-secici",
+            "en": "http://localhost:3000/en/urun-secici"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/legal/kvkk",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/legal/kvkk",
+            "en": "http://localhost:3000/en/legal/kvkk"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/legal/gizlilik-politikasi",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/legal/gizlilik-politikasi",
+            "en": "http://localhost:3000/en/legal/gizlilik-politikasi"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/legal/cerez-politikasi",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/legal/cerez-politikasi",
+            "en": "http://localhost:3000/en/legal/cerez-politikasi"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr",
+            "en": "http://localhost:3000/en"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/products",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/products",
+            "en": "http://localhost:3000/en/products"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands",
+            "en": "http://localhost:3000/en/brands"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/contact",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/contact",
+            "en": "http://localhost:3000/en/contact"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/about",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/about",
+            "en": "http://localhost:3000/en/about"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/urun-secici",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/urun-secici",
+            "en": "http://localhost:3000/en/urun-secici"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/legal/kvkk",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/legal/kvkk",
+            "en": "http://localhost:3000/en/legal/kvkk"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/legal/gizlilik-politikasi",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/legal/gizlilik-politikasi",
+            "en": "http://localhost:3000/en/legal/gizlilik-politikasi"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/legal/cerez-politikasi",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/legal/cerez-politikasi",
+            "en": "http://localhost:3000/en/legal/cerez-politikasi"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+        "alternates": null
+      },
+      {
+        "url": "http://localhost:3000/tr/category/fanlar",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/category/fanlar",
+            "en": "http://localhost:3000/en/category/fans"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/category/fans",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/category/fanlar",
+            "en": "http://localhost:3000/en/category/fans"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/vortice",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/vortice",
+            "en": "http://localhost:3000/en/brands/vortice"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/avens",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/avens",
+            "en": "http://localhost:3000/en/brands/avens"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/casals",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/casals",
+            "en": "http://localhost:3000/en/brands/casals"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/seat",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/seat",
+            "en": "http://localhost:3000/en/brands/seat"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/danfoss",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/danfoss",
+            "en": "http://localhost:3000/en/brands/danfoss"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/brands/nicotra-gebhardt",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/nicotra-gebhardt",
+            "en": "http://localhost:3000/en/brands/nicotra-gebhardt"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/vortice",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/vortice",
+            "en": "http://localhost:3000/en/brands/vortice"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/avens",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/avens",
+            "en": "http://localhost:3000/en/brands/avens"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/casals",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/casals",
+            "en": "http://localhost:3000/en/brands/casals"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/seat",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/seat",
+            "en": "http://localhost:3000/en/brands/seat"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/danfoss",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/danfoss",
+            "en": "http://localhost:3000/en/brands/danfoss"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/brands/nicotra-gebhardt",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/brands/nicotra-gebhardt",
+            "en": "http://localhost:3000/en/brands/nicotra-gebhardt"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/tr/products/test-aile-1",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/products/test-aile-1",
+            "en": "http://localhost:3000/en/products/test-aile-1"
+          }
+        }
+      },
+      {
+        "url": "http://localhost:3000/en/products/test-aile-1",
+        "alternates": {
+          "languages": {
+            "tr": "http://localhost:3000/tr/products/test-aile-1",
+            "en": "http://localhost:3000/en/products/test-aile-1"
+          }
+        }
+      }
+    ]
+  }
+}

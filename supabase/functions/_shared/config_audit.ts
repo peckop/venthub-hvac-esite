@@ -163,3 +163,14 @@ export function auditConfig(env: Env): ConfigRaporu {
   const saglikli = bulgular.every((b) => b.hukum === 'ok')
   return { olculdu: true, odemeOrtami, siteOrtami, bulgular, saglikli }
 }
+
+/**
+ * Tek kusur "üretim sitesi + sandbox ödeme ucu" mu? Satış kapalıyken bu durum BEKLENENDİR (sandbox
+ * provası, B′ tasarımı); satış açıkken kusurdur. Yalnız tek kusur ise true: başka herhangi bir
+ * eksik/geçersiz/tutarsız kalem varsa sandbox açıklaması onu SAKLAYAMAZ.
+ */
+export function yalnizSandboxTutarsizligi(rapor: ConfigRaporu): boolean {
+  if (!rapor.olculdu || rapor.odemeOrtami !== 'sandbox' || rapor.siteOrtami !== 'prod') return false
+  const sorunlu = rapor.bulgular.filter((b) => b.hukum !== 'ok')
+  return sorunlu.length === 1 && sorunlu[0].ad === 'IYZICO_BASE_URL' && sorunlu[0].hukum === 'tutarsiz'
+}

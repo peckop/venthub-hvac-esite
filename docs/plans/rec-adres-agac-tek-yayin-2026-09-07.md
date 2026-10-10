@@ -15,7 +15,9 @@
   ERTELENDİ; sıra 1 Cloudflare Workers + OpenNext, 2 DigitalOcean, 3 Vercel Pro; tetik: ödeme/fiyat
   canlıya açılmadan önce ya da kota dağıtımı durdurursa) · karar **60** (dağıtım depolaması temizliği) ·
   **68** (tek yayın, REC-212 sonrası, ön izleme) · **78b** (iki perde dalı pazar kelimesi) · **84**
-  (korozyon dalı model adresi `korozyon-dayanimli-asit-fani`) · **86** (2026-09-23: 39 aile adres
+  (korozyon dalı model adresi `korozyon-dayanimli-asit-fani`; **yerine geçti: karar 287/288 (10-05)**: dal adı
+  "Korozyona ve Aside Dayanımlı Fanlar", adres `korozyona-ve-aside-dayanimli-fanlar`; radyal dalı "Radyal (Santrifüj)
+  Fanlar", `radyal-fanlar` değişmedi) · **86** (2026-09-23: 39 aile adres
   metni Design `seo_slug`'ına geçer; istisna Casals 4 aile K17 + 2 perde ailesi 78b; yayından önce
   GSC taban ölçümü).
 - **Recep hükümleri (09-22):** aile adresi `/tr/urun/`'e geçer (R2 kapandı) · ağaç = bugünkü 18 dal +
@@ -140,6 +142,11 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
   DB ile birebirlik **zamanlanmış iş** olarak prod DB'ye karşı ölçülür (INV-ADRES-HARITA-1'in DB kolu).
   Çelişki giderildi: **harita commit'lenmez** (derleme çıktısı); **envanter dosyası** (§6, eski → yeni tam
   liste) commit'lenir ve kapı onu okur.
+  **KARAR DEĞİŞTİ (10 Ekim 2026, Faz 3-C PR'ı #1811): harita COMMIT'LENİR**
+  (`src/data/generated/eski-adres-haritasi.json`); üretim `harita-uret.yml` (canlı DB'ye karşı salt-okuma,
+  migration sonrası); DB değişince yeniden üretilip commit'lenir; bayatlık kapısı
+  `harita-3c-karsiliklari.test.ts` + zamanlanmış DB kolu. Yukarıdaki "commit'lenmez" cümlesi bu kararla
+  yürürlükten kalktı.
 - **Dil (Y3, ölçüldü):** bugünkü `detectLocale` `accept-language` içinde `en` geçiyor mu diye bakıyor;
   Türkçe Chrome'un varsayılanı `tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7` → Türkçe ziyaretçi `/category/fans`'ta
   EN (noindex) sayfaya düşüyor. v5: **slug'ı Türkçe olan dilsiz eski adres deterministik TR'ye 308**
@@ -150,6 +157,20 @@ koşar (belge: "runs globally before the cache") → `?sku=` statik aile sayfas�
 - **Bayat harita (O1):** derlemeden sonra değişen slug'da zincir en çok **2 hop** (harita → eski hedef → sayfa
   308) — cetvele yazılır. Slug değişince tazeleme: webhook dalı Vercel **deploy hook**'unu tetikler (gün
   içinde ≤ 1 yeniden derleme, sıraya alınır) + gecelik derleme yedeği.
+- **Takma ad okuma yolu (karar 310 A, 10-08 canlı salt-okuma ölçümü):** `url_takma_adlari` anon'a kapalıdır (42501) ve
+  Vercel derleme ortamına `service_role` KONMAZ; tek yol parametresiz, yalnız-okuma `public.url_takma_adlari_listele()`
+  (SECURITY DEFINER, süzgeç `tenant_id = (select jwt_tenant_id())`). Derleme anon anahtarıyla koşar, anahtarda
+  `app_metadata.tenant_id` yoktur → `jwt_tenant_id()` **varsayılan kiracıyı** döndürür (gövdede claim yok/boş/bozuk →
+  varsayılan; anon claim'iyle ölçüldü: dönen kiracı `tenants`'taki tek kiracı, 49 takma ad satırının 49'u onun).
+  Tohumdaki `kiraciId` varsayılandan farklıysa işlev YABANCI satır döndürür ve üretici hata verip derlemeyi düşürür
+  (fail-closed, `haritaUret.ts`); parametre eklenmedi, çünkü anon çağıran kiracıyı kendisi seçerdi. İşlev canlıda
+  (migration #1757, 10-08, kural 13). Listede hedefi görünmeyen (silinmiş aile) takma adlar da bulunur: işlev kiracının
+  satırlarının TAMAMINI döner, hedefin görünürlüğüne bakmaz; ürün ve kategori zaten anon'a kiracı süzgeciyle açıktır,
+  aile yalnız silinmemişse (`deleted_at is null`). Bekçi `url-takma-adlari-listele.test.ts`: statik kol CI'da koşar
+  (gövde normalize edilmiş TEK beklenen dizeyle birebir karşılaştırılır; alt dize yetmez, `is not null` gibi süzgeci
+  söken yazımlar geçerdi). Davranış kolu (ikinci kiracı satırı varken yabancı satır dönerse KIRMIZI) PGlite ister;
+  PGlite depoda bağımlılık olmadığı için CI'da KOŞMAZ, yerelde `PGLITE_ZORUNLU=1` ile koşar (komut test dosyasının
+  başlığında).
 
 ## 5. Fazlar
 
@@ -208,7 +229,7 @@ inmiş olarak kalır; görünür bir şey değiştirmez.
 ### Faz 2 — model slug'ları (veri migration'ı)
 Kaynak: URUN listesi (bu dal; REC-212 paketi `slug_tr/en` taşırsa paket kazanır, doğrulayıcı
 karşılaştırır). Doğrulayıcı: ≤ 70 · `-p-` yok · rezerve kelime yok · `(tenant, dil, slug)` tekil ·
-teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81) · 7 eski slug takma adda.
+teknik değer `technical_specs`'te · EN'de Türkçe harf yok · karar 84 (81/81; korozyon dalı adresi sonradan karar 287/288 ile değişti, bkz. başlık) · 7 eski slug takma adda.
 Ön koşul: 7 ailenin EN adı. Bugün: 442/442 tekil, en uzun 70/69.
 
 ### Faz 3 — kod (bayrak = derleme sabiti `ADRES_SEMASI_K3B`, canlıda görünmez)
@@ -358,7 +379,7 @@ sınırına uzak; Cloudflare/OpenNext'te koşullu aynen çalışır). Kapanan: v
 | # | bulgu | derece | v5 cevabı |
 |---|---|---|---|
 | Y1 | DB'den üretilen harita, DB'de hiç olmamış eski adresleri (13 dilsiz kural kaynağının 7'si, 6 Lineo) kaybeder; 4 hedef bugün 404 | YÜKSEK | §4.1 tohum dosyası; ölü hedefler en yakın canlı adrese; silinen satır 25 |
-| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; harita commit'lenmez, envanter commit'lenir |
+| Y2 | derlemede DB yoksa davranış tanımsız; CI'da DB yok; §4/§11 çelişkisi | YÜKSEK | §4.1 fail-closed + CI fikstürü + zamanlanmış DB kolu; ~~harita commit'lenmez~~ → **KARAR DEĞİŞTİ (10 Ekim 2026, #1811): harita commit'lenir** (bkz. §4.1 karar notu); envanter commit'lenir |
 | Y3 | `detectLocale` Türkçe Chrome'u EN'e yolluyor (ölçüldü) | YÜKSEK | §4.1 Türkçe slug'lı dilsiz adres → TR 308; q değeri ayrıştırma |
 | Y4 | `/tr/products/<x>` için sayfa katmanı dalı yok | YÜKSEK | Faz 3 m.5 genişledi |
 | O1 | bayat harita 2 hop | ORTA | §4.1 cetvel + deploy hook + gecelik derleme |

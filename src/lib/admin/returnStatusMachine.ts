@@ -45,7 +45,11 @@ const TRANSITIONS: Record<string, readonly string[]> = {
 /**
  * Verilen statüden izin verilen sonraki statüleri döndürür.
  * Bilinmeyen statü → boş dizi (kilitli; ileri geçiş yok).
+ *
+ * Kendi-anahtar denetimi KASITLI (REC-551): `?? []` kalıtsal üyeleri (`'constructor'`,
+ * `'toString'`, `'__proto__'`) "tanımlı" sayar ve yayma işlemi TypeError fırlatırdı.
  */
 export function allowedNextStatuses(current: string): string[] {
-  return [...(TRANSITIONS[current] ?? [])]
+  if (!Object.prototype.hasOwnProperty.call(TRANSITIONS, current)) return []
+  return [...TRANSITIONS[current]]
 }

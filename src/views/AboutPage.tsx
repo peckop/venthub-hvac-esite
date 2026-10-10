@@ -1,23 +1,27 @@
-import { 
-  Award,   Factory, Globe, Microscope,
+import {
+  Award,   Factory, Layers, Microscope,
 Shield, Target, Zap} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 import { localizedHref, Routes } from '@/utils/routes';
+import { adresDili, adresRotalari } from '@/utils/yuzeyAdresleri'
 
 import { BrandIcon } from '../components/HVACIcons'
 import { ScrollReveal } from '../components/ScrollReveal'
 import { HVAC_BRANDS } from '../data/brands'
 import { en } from '../i18n/dictionaries/en'
 import { tr } from '../i18n/dictionaries/tr'
+import type { SiteSayaclari } from '../lib/services/siteSayaclari.service'
 
 interface AboutPageProps {
   lang?: string
+  /** Canlı marka / aktif ürün / aile sayıları (URN-75). `null` = okunamadı: sayaç kartları çizilmez. */
+  sayaclar?: SiteSayaclari | null
 }
 
-const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
+const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr', sayaclar = null }) => {
   const dict = lang === 'en' ? en : tr
 
   // Server-component safe translation helper
@@ -36,13 +40,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
   }
 
   const stats = [
-    // Sayılar dayanaklı: 15+ = kurucunun saha yılı, 6 = markalar sayfasındaki marka sayısı,
-    // 50+ = katalogdaki ürün çeşidi, 81 = kargoyla tüm illere sevkiyat vaadi.
-    // Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30 dürüstlük temizliği).
+    // 15+ = kurucunun saha yılı (elle, dayanaklı). Marka / aktif ürün / aile sayıları ELLE YAZILMAZ: canlı veriden
+    // gelir (`sayaclar`, URN-75); okunamadıysa bu üç kart hiç çizilmez, eski ya da uydurma sayı basılmaz.
+    // Eski '500+ Tamamlanan Proje' şirket adına dayanaksızdı (2026-08-30), '81 İl' dayanaksız vaatti (karar 295).
     { value: '15+', label: t('aboutPage.experience'), icon: Zap },
-    { value: '6', label: t('aboutPage.distributorship'), icon: Award },
-    { value: '50+', label: t('aboutPage.completedProject'), icon: Factory },
-    { value: '81', label: t('aboutPage.shippingNetwork'), icon: Globe }
+    ...(sayaclar
+      ? [
+          { value: String(sayaclar.markaSayisi), label: t('aboutPage.distributorship'), icon: Award },
+          { value: String(sayaclar.aktifUrunSayisi), label: t('aboutPage.completedProject'), icon: Factory },
+          { value: String(sayaclar.aileSayisi), label: t('aboutPage.productFamilies'), icon: Layers }
+        ]
+      : [])
   ]
 
   const coreValues = [
@@ -129,19 +137,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
       {/* Story & Philosophy */}
       <section className="py-24 lg:py-32 overflow-hidden">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <ScrollReveal animation="slideLeft" className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden">
-              <Image 
-                src="/images/ekran/homepage beğendiğim yapı.png" 
-                alt="" 
-                fill 
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover grayscale hover:grayscale-0 transition-transform duration-1000"
-              />
-              <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
-            </ScrollReveal>
-
-            <div>
+          {/* URN-60: sol sütundaki görsel KALDIRILDI. Dosya adı "homepage beğendiğim yapı.png" bir
+              tasarım referansı ekran görüntüsüydü (şirketin gerçek bir fotoğrafı değil) ve "gerçek
+              görsel ya da hiç" kuralıyla çıktı. Metin tek sütunda okunur genişlikte kalır. */}
+          <div className="grid gap-24 items-center">
+            <div className="max-w-3xl">
               <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-8">{t('aboutPage.vision')}</div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-12 text-slate-900">
                 {t('aboutPage.storyTitle')} <br />
@@ -152,20 +152,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
                 <p>{t('aboutPage.storyDesc2')}</p>
               </div>
               
+              {/* URN-60: dört "avatar" kümesi KALDIRILDI: aynı kurulum fotoğrafı dört kez yuvarlak
+                  yüz gibi basılıyordu; var olmayan bir ekip izlenimi veriyordu. */}
               <div className="mt-12 flex items-center gap-8">
-                <div className="flex -space-x-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden relative">
-                      <Image 
-                        src={`/images/hvac_installation_close_up_premium_3.webp`} 
-                        alt="" 
-                        fill 
-                        sizes="48px"
-                        className="object-cover" 
-                      />
-                    </div>
-                  ))}
-                </div>
                 <div className="text-sm font-bold text-slate-900">
                   {t('aboutPage.teamTitle')} <br /> 
                   <span className="text-slate-400 font-medium tracking-tight">{t('aboutPage.teamSubtitle')}</span>
@@ -236,7 +225,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
               {t('aboutPage.ctaContact')}
             </Link>
             <Link
-              href={localizedHref(Routes.products(), lang)}
+              href={adresRotalari(adresDili(lang)).products()}
               className="bg-white text-slate-950 border border-slate-200 px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-colors"
             >
               {t('aboutPage.ctaExplore')}

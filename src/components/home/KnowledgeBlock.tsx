@@ -1,6 +1,12 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { en } from '../../i18n/dictionaries/en'
+import { tr } from '../../i18n/dictionaries/tr'
+import { getDictValue } from '../../i18n/getDictValue'
+import { enYeniRehberler } from '../../lib/bilgiMerkezi/tersDizin'
+import { bilgiMerkeziListeHref } from '../../utils/bilgiMerkezi'
+import { bilgiMerkeziRotalari } from '../../utils/bilgiMerkeziRotalari'
 import { localizedHref, Routes } from '../../utils/routes'
 import { getWhatsAppNumber } from '../../utils/whatsapp'
 import { ClientLeadButton } from './ClientLeadButton'
@@ -12,9 +18,11 @@ interface KnowledgeItem {
 }
 
 const knowledgeItems: KnowledgeItem[] = [
-  { 
-    id: 'guides', 
-    href: Routes.destek.home(),
+  {
+    id: 'guides',
+    // Karar 92: Bilgi Merkezi bölüm adı DİLE göre değişir ve EN kapalıyken yoktur — adres
+    // render anında `bilgiMerkeziListeHref(lang)`'ten gelir; o dilde yoksa kart basılmaz.
+    href: bilgiMerkeziRotalari.liste('tr'),
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
         <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -53,7 +61,6 @@ interface KnowledgeBlockProps {
     headingPrefix: string;
     headingAccent: string;
     statsPipelineLabel: string;
-    statsOptimization: string;
     /**
      * ⭐`eyebrow` TİPE EKLENDİ (REC-148 B5, 2026-09-05) — ÖLÜ ANAHTARDI.
      *
@@ -81,6 +88,11 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
   // Numara SSOT = ENV (NEXT_PUBLIC_SHOP_WHATSAPP); eski sabit değer uydurmaydı
   // ve gerçek bir vatandaşa denk gelebilirdi (2026-08-30 temizliği). ENV yoksa buton çıkmaz.
   const whatsAppNumber = getWhatsAppNumber()
+  // REC-452 (rehber-yazisi-standard R3.1): ana sayfa en yeni rehberlere doğrudan bağlanır — önce
+  // yalnız liste sayfasına bağlanıyordu, yeni yazıya ana sayfadan yol yoktu. Sunucuda hesaplanır
+  // (bu bileşen RSC); o dilde Bilgi Merkezi kapalıysa ya da yazı yoksa liste boş, blok basılmaz.
+  const sonRehberler = enYeniRehberler(lang)
+  const sonRehberBaslik = getDictValue(lang === 'en' ? en : tr, 'bilgiMerkezi.sonRehberler')
   return (
     <section className="relative overflow-hidden bg-slate-950 py-24 sm:py-32 text-white">
       {/* Background Elements */}
@@ -117,7 +129,11 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
         <div 
           className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         >
-          {knowledgeItems.map((item, index) => {
+          {knowledgeItems.flatMap((item) => {
+            if (item.id !== 'guides') return [{ item, href: localizedHref(item.href, lang) }]
+            const href = bilgiMerkeziListeHref(lang)
+            return href ? [{ item, href }] : []
+          }).map(({ item, href }, index) => {
             const delayClass = ['delay-0', 'delay-100', 'delay-200'][index % 3];
             return (
               <div 
@@ -126,7 +142,7 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                 className={`opacity-0 translate-y-8 data-[in-view=true]:opacity-100 data-[in-view=true]:translate-y-0 transition-opacity-transform duration-700 ease-out ${delayClass}`}
               >
                 <Link
-                  href={localizedHref(item.href, lang)}
+                  href={href}
                   className="group relative block h-full overflow-hidden rounded-hvac-2xl border border-white/10 bg-white/2 p-10 backdrop-blur-md transition-colors duration-500 hover:border-cyan-500/40 hover:bg-white/5"
                 >
                   <div className="absolute top-8 right-10 text-4xl font-black text-white/5 transition-colors group-hover:text-cyan-500/10">
@@ -166,6 +182,29 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
           })}
         </div>
 
+        {sonRehberler.length > 0 && (
+          <section aria-labelledby="son-rehberler" className="mt-16">
+            <h3 id="son-rehberler" className="text-xs font-bold uppercase tracking-hvac-normal text-cyan-400">
+              {sonRehberBaslik}
+            </h3>
+            <ul className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {sonRehberler.map((r) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className="block h-full rounded-hvac-xl border border-white/10 bg-white/2 p-6 transition-colors hover:border-cyan-500/40 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+                  >
+                    <span className="block text-lg font-bold text-white">{r.baslik}</span>
+                    {/* Ham gri yasak (storefront-design-standard §2.2, INV-9); koyu zeminde saydam beyaz.
+                        Kart metni `kartOzeti`dir (meta açıklaması DEĞİL); boşsa çizilmez, yerine meta konmaz. */}
+                    {r.kartOzeti ? <span className="mt-2 block text-base font-light text-white/70">{r.kartOzeti}</span> : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {/* Integrated Final Action Layer (Unified Conversion) */}
         <div className="mt-24 pt-24 border-t border-white/5 grid gap-12 lg:grid-cols-2 items-center">
           <div className="flex flex-wrap gap-6">
@@ -195,12 +234,6 @@ const KnowledgeBlock: React.FC<KnowledgeBlockProps> = ({ dictionary: t, finalCta
                   <div className="text-xs font-bold uppercase tracking-hvac-normal text-slate-500 mt-1">
                     {statsExperience}
                   </div>
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full w-11/12 bg-gradient-to-r from-cyan-600 to-cyan-400" />
-                  </div>
-                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500">{t.statsOptimization}</div>
                 </div>
               </div>
             </div>

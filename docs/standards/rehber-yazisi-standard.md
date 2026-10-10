@@ -1,4 +1,4 @@
-# Rehber Yazısı Standardı (Cetvel) — v0.4 TASLAK
+# Rehber Yazısı Standardı (Cetvel) — v0.7 TASLAK
 
 > **Ne yönetir:** Bilgi niyetli teknik yazının (rehber) konusu nasıl seçilir, hangi kaynaktan
 > araştırılır, nasıl yazılır, nasıl doğrulanır, Recep'e nasıl sunulur, nerede ve nasıl yayınlanır,
@@ -32,6 +32,13 @@ bağlandı (Ölçüm geçmişi). Yayın, R8'deki kapılar kendi PR'larında doğ
 bölümü (fiyatı belirleyen etkenler, teknik sorumluluk notu) eksik çıktı; hiçbir kontrol görmedi, OPS emsal
 yazıyla elle kıyaslarken buldu. Recep "görmeden onay yok" dedi. Değişenler: R3 zorunlu bölümler + kalıp
 kapısı (R8), sorumluluk notunun sabit ilk cümlesi, R5 girişi ve R5.4 (önizleme şart), R5.7 ara önizleme.
+**v0.5 (2026-09-25):** karar 121 (içerik stratejisi) kalıcı kural oldu: R1.4 konu sırası ve içerik türleri;
+R2.1'de eski destek sayfası içerikleri kaynak değildir; R0.1 ve R9'da taşınan eski konular yayından kalkar,
+sırası gelince sıfırdan yazılır.
+**v0.6 (2026-09-25):** MEVZUAT şeridiyle iş bölümü (OPS): R2.6 mevzuat paketi, R5.1 3g mevzuat kontrolü,
+AB/TR tarih kuralı.
+**2026-09-29 (REC-452, GEO-SEO):** R3.2 ters bağlantı — kategori, aile ve ana sayfadan rehbere yol;
+INV-REHBER-TERS-BAGLANTI-1.
 
 ---
 
@@ -67,6 +74,9 @@ Onarım iki adımdır, ikisi de seçenek değildir:
 2. **Karar 92 taşımasında (URUN rota + BLOG içerik):** konular yeni adrese **kaldırılıp yönlendirilir**;
    yeniden yazım R9 ritmine girer (R8.1 sayacı). **10 canlı adresin her biri için hedef yazılır, 404'e
    düşen adres 0.**
+3. **Karar 121c (2026-09-25):** Bilgi Merkezi'ne taşınan üç konu da yayından kalkar (URUN); konu sırası
+   (R1.4) gelince aynı adreste sıfırdan, kaynaklı yazıyla döner. Taşınan metin yeniden yazımda kaynak
+   olarak kullanılmaz (R2.1).
 
 ## R1 — Konu seçimi
 
@@ -84,7 +94,7 @@ Onarım iki adımdır, ikisi de seçenek değildir:
 gösterim verdi. Bu "talep yok" demek değil; aynı konular için Google arama önerisi 16 tohumda toplam
 93 bilgi niyetli öneri döndürdü (ör. "hava perdesi" tek başına 16). Search Console, yazı yayımlanana
 kadar bilgi talebini ölçemez; konu seçimi en az bir **dış** kaynağa dayanır. Sorgu dökümü ve tohum
-listesi REC-369 BLOG F1 yorumunda (PUBLIC depoya girmez).
+listesi eski Linear REC-369 BLOG F1 yorumunda; güncel yer Kanban kartı/depo dışı dosya (PUBLIC depoya girmez).
 
 ### R1.2 Ölçütler (konu başına tablo, Recep'e özetle gider)
 
@@ -105,6 +115,38 @@ Aynı sorguya iki yazı yarışmaz. Yeni konu açılmadan önce Search Console'd
 küme için mevcut sayfa aranır; varsa yeni yazı değil **o yazının genişletilmesi** (R5.5 revizyonu)
 yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 
+### R1.4 Konu sırası ve içerik türleri (karar 121, Recep 2026-09-24/25)
+
+**Konu sırası** (kayıt: REC-369 yorumu 2026-09-24):
+
+| Sıra | Konu | Durum 2026-09-25 |
+|---|---|---|
+| 1 | Frekans konvertörü | doğrulandı; yerel önizlemede Recep'e gösterilecek (karar 120) |
+| 2 | Radyal fan mı aksiyel fan mı, fan nasıl seçilir | üç doğrulama turu bitti |
+| 3 | Vortice sessiz fanlar | sırada |
+| 4 | Korozyona dayanıklı (asit) fanlar | sırada |
+| 5 | Isı geri kazanım | sırada; REC-392 (enerji etiketi) bu konuya değer |
+| 6 | Çatı fanları | sırada |
+| 7 | Banyo fanları | sırada |
+
+Sırayı **yalnız Recep** değiştirir. Hacim ve mevsim verisi (pazar ölçüm düzeni kol 2) geldiğinde BLOG
+ölçer, öneriyi OPS götürür; öneri sırayı kendiliğinden değiştirmez. Blog üretimi durmaz.
+
+**İçerik türleri:**
+
+| Tür | Durum | Not |
+|---|---|---|
+| "Doğrusu ve yanlışı" dizisi (yaygın yanlış + kaynaklı doğrusu) | EVET | yanlış da doğru da kaynağa bağlanır; kaynaksız "yaygın yanlış" yazılmaz |
+| Mevzuatı ilk anlatan yazı | EVET | konu listesi MEVZUAT şeridinden gelir; resmî metin R2.1/2'dir, BLOG kendi indirdiği ham metinle doğrular |
+| Hesaplayıcıyla birleşen yazı | EVET | R2.5: hesap örneğinin sonucu hesaplayıcıyla aynıdır, bağlantı `vh:hesaplayici/…` |
+| Saha deneyimi yazıları, Türkçe iklimlendirme terimleri sözlüğü | SONRA | sözlük Bilgi Merkezi alt kırılımı; bilgi mimarisi kararı TASARIM'dan sonra |
+| Tedarikçi yazıları | ŞİMDİLİK YOK | |
+| ESP yazısı | MÜMKÜN | üçüncü bir firmanın iç bilgisi ve o firma için yazılmış metin kullanılmaz; farklı açı (ayrıntı Kararlar belgesinde, PUBLIC depoya girmez) |
+
+**Eski içerik** (karar 121c): Bilgi Merkezi'ne taşınan üç eski konu (hava perdesi, otopark jet fan, ısı
+geri kazanım) yayından kalkar (URUN); konu sırası geldiğinde aynı adreste **sıfırdan, kaynaklı** yeni
+yazıyla döner. Eski metin kaynak değildir (R2.1).
+
 ## R2 — Kaynak
 
 ### R2.1 Öncelik sırası
@@ -118,7 +160,10 @@ yapılır. Bugünkü ihlal: `air-curtain` ↔ `hava-perdesi` (R0.1).
 4. **Diğer** — sektör yayını. Yalnız bağlam için; **sayı bu sınıftan alınmaz**.
 
 **Kaynak olmayanlar:** rakip sitesi, forum, yapay zekâ cevabı (ChatGPT, Gemini, Perplexity dahil),
-kaynağı gösterilmeyen blog.
+kaynağı gösterilmeyen blog, **sitenin eski destek sayfası içerikleri** (karar 121c: sözlükteki
+`knowledge.topics` metinleri ve onlardan Bilgi Merkezi'ne taşınan yazılar; Recep 2026-09-25: "çok kaba
+bilgiler, faydası yok bize"). Eski metinden cümle, sayı ya da yapı alınmaz; aynı konu yeniden
+yazılırken araştırma sıfırdan yapılır.
 
 ### R2.2 Erişim sınıfı — açılamayan kaynak atıf alamaz
 
@@ -174,6 +219,22 @@ metinde "örnek varsayım" diye işaretlenir (ör. "7.200 m³'lük bir otopark v
 katsayılar kaynaklıdır (R2.2). Sonuç sitedeki ilgili hesaplayıcının aynı girdiyle verdiği sonuçla
 **aynı** çıkmalıdır; farklıysa ya yazı ya hesaplayıcı yanlıştır ve yayın durur.
 
+### R2.6 Mevzuat iddiası MEVZUAT şeridinin paketinden gelir (OPS iş bölümü, 2026-09-25)
+
+Teknik mevzuat ve standart kaydının sahibi MEVZUAT şerididir. BLOG yönetmelik yorumlamaz.
+
+| # | Adım | Sahibi |
+|---|---|---|
+| 1 | Her yazıdan **önce** konu ve ürün aileleri MEVZUAT'a bildirilir; MEVZUAT **mevzuat paketi** verir: yürürlükteki metin, AB/TR farkı, geçiş tarihleri, birebir alıntı | BLOG ister, MEVZUAT verir |
+| 2 | Yazıdaki her mevzuat iddiası (`tur: mevzuat`) yalnız paketten yazılır; pakette olmayan önce MEVZUAT'a sorulur. Araştırma ajanları mevzuat eksenini ayrıca araştırmaz | BLOG |
+| 3 | Yazı bitince mevzuat cümlelerini MEVZUAT kontrol eder; bu, R5.1 akışının bir adımıdır (3d'ye ek, onun yerine geçmez) | MEVZUAT |
+| 4 | Kayıtta değişiklik olunca MEVZUAT yayındaki yazı için "güncelle" bildirir → R5.5 revizyonu | MEVZUAT bildirir, BLOG yazar |
+| 5 | "Mevzuatı ilk anlatan" yazı adaylarını MEVZUAT önerir; sırayı Recep belirler (R1.4) | MEVZUAT / Recep |
+
+**Tarih kuralı:** AB ile TR ayrı takvimdedir (ör. fan tebliği TR'de 24.7.2027'de yürürlüğe girer, o güne
+kadar eski tebliğ geçerli). Bir TR tebliğinin kendi metninde basılı AB tarihi AB metniyle çelişirse AB
+tarihi AB metninden yazılır; çelişki MEVZUAT paketinde belirtilir (MEVZUAT bulgusu, SGM 2021/16).
+
 ## R3 — Yazı kalıbı
 
 Kalıp rakip ölçümünden (n = 1) çıkarıldı; bu yüzden **sayı hedefi değil ölçüttür**: konunun yan
@@ -195,7 +256,7 @@ değildir. Fark ancak emsal yazıyla elle kıyasla bulundu (OPS).
 | Tablo | En az bir (kıyas ya da boyutlandırma); hücreler de iddiadır (R5.1) |
 | Fiyat | **Rakam yok.** "Fiyatı belirleyen etkenler" bölümü etkenleri anlatır; fiyat yalnız ürün sayfasında görünür (`rendering-cache-standard.md` §2) |
 | SSS | 5–8 soru; her cevap tek başına anlamlı (okuyucu için; işaretleme için değil — R6) |
-| İç bağlantı | İlgili ürün aileleri (kart, fiyatsız) · ana kategori · varsa hesaplayıcı. Ters yön (kategoriden yazıya) URUN'un sayfa işi. **Adres değil kimlik yazılır** (v0.4, Recep 2026-09-24: "URL değişirse sorun olmaz mı?"): metinde `[metin](vh:<tür>/<anahtar>)`, tür ∈ model · aile · kategori · marka · hesaplayici · sayfa; anahtar (URUN ile kesinleşti, 2026-09-24) model için **SKU** (harf duyarsız), kategori için **kanonik EN slug** (CLAUDE.md kural 7), aile için **aile slug'ı** — slug Faz 1-B'de değişirse çözücü `url_takma_adlari` tablosuna bakar. Sayfa üretilirken kimlik `adresUret` ile **güncel** adrese çözülür; **çözülemeyen bağlantı derlemeyi düşürür** (URUN). Metne düz site adresi (`/tr/…`, `https://venthub.com.tr/…`) yazılmaz. Niçin: adres ağacı tek yayında değişecek (`docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md`); eski adres kırılmaz, 308 verir, ama her tıklama bir durak daha yapar ve yazı eski adresi kalıcı taşır. Şablonun kendi kartları ve teklif bağlantısı da aynı çözücüyü kullanır |
+| İç bağlantı | İlgili ürün aileleri (kart, fiyatsız) · ana kategori · varsa hesaplayıcı. Ters yön (kategoriden ve aileden yazıya, ana sayfadan en yeni yazılara) **R3.2**'dedir. **Adres değil kimlik yazılır** (v0.4, Recep 2026-09-24: "URL değişirse sorun olmaz mı?"): metinde `[metin](vh:<tür>/<anahtar>)`, tür ∈ model · aile · kategori · marka · hesaplayici · sayfa; anahtar (URUN ile kesinleşti, 2026-09-24) model için **SKU** (harf duyarsız), kategori için **kanonik EN slug** (CLAUDE.md kural 7), aile için **aile slug'ı** — slug Faz 1-B'de değişirse çözücü `url_takma_adlari` tablosuna bakar. Sayfa üretilirken kimlik `adresUret` ile **güncel** adrese çözülür; **çözülemeyen bağlantı derlemeyi düşürür** (URUN). Metne düz site adresi (`/tr/…`, `https://venthub.com.tr/…`) yazılmaz. Niçin: adres ağacı tek yayında değişecek (`docs/plans/rec-adres-agac-tek-yayin-2026-09-07.md`); eski adres kırılmaz, 308 verir, ama her tıklama bir durak daha yapar ve yazı eski adresi kalıcı taşır. Şablonun kendi kartları ve teklif bağlantısı da aynı çözücüyü kullanır |
 | Kaynaklar | R2.4 |
 | Teknik sorumluluk notu | `## Teknik sorumluluk notu`, Kaynaklar'dan sonra, yazının içinde (doğrulamadan ve sha256'dan geçsin diye sözlükte değil). İlk cümle her yazıda aynıdır: *"Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz."* Ardından yazıya özgü uyarılar gelir: örnek oranlar kendi sisteminde farklı çıkabilir, kurulum yetkili personelle, yasal bilgi yayın tarihindekidir. Emsal yazının "…garantisi içermez" biçimi alınmaz (ölçüldü): "garanti içermez" vaat desenine takılır; "garantisi içermez" takılmaz ama "içermez" olumsuz iddia sınıfına girer ve kaynaksız cümle kırmızı verir. Aynı koruma "yerini tutmaz", "farklı olabilir" biçimiyle yazılır |
 | Tarih | Yayın ve güncelleme tarihi görünür |
@@ -204,7 +265,32 @@ değildir. Fark ancak emsal yazıyla elle kıyasla bulundu (OPS).
 | Liste sayfası (URUN) | `/tr/bilgi-merkezi`: tek H1, her yazı bir kart (görsel · kategori · tarih · başlık · özet), yeniden eskiye; **arama kutusu** (tasarım kararı K37-a / U2); kategori süzgeci yazı sayısı artınca. Kendi `<title>`/meta/canonical; JSON-LD en az `BreadcrumbList` (emsal liste sayfasında yok — kopyalanmaz). Mobilde yatay taşma 0 (emsalin yazı şablonunda sayfa geneli ~380 px taşma ölçüldü — kopyalanmaz) |
 | İlgili yazılar (şablon, URUN) | Yazının altında aynı kategoriden ya da aynı ürün ailesine bağlı diğer rehber yazıları (kimlikle, iç bağlantı kuralı). **Kaynak: tasarım kararı K37-a / U2** (Linear P-REC-4, 2026-09-06: "Bilgi Merkezi iç tasarımı (içindekiler · arama · ilgili makale · ürün bağı; uydurma başlık yok)"). Emsal yazıların üçünde de yok (2026-09-24 şablon ölçümü); karar bizim tasarımımızdan gelir. İlk yazıda ilgili yazı olmadığı için blok görünmez (boş başlık basılmaz) |
 | Teklif çağrısı (şablon, URUN) | Yazının altında tek kutu: iletişim/teklif sayfasına bağlantı, bir cümlelik açıklama. Ürün övgüsü ve vaat yok (R4.2). Emsalde var, v0.3'te kural yoktu (2026-09-24 kıyası) |
-| Görsel (isteğe bağlı) | Yazıya özgü (bugünkü dört konunun üçü aynı genel kurulum görselini kullanıyor — ikinci tur ölçümü; tekrar edilmez); hakkı belli (Design System varlığı ya da üretici görseli); alt metin zorunlu; `<Image>` genişlik/yükseklik (kural 10). Temsilî görselse alt metin bunu söyler; emsal yazıdaki biçim: *"temsili görsel; ölçekli teknik çizim veya belirli bir ürün modeli değildir"* (DEA, 2026-09-24 ölçümü) |
+| Görsel | **R3.1** (v0.7 taslak): kapak her yazıda; şema metnin anlattığı yapı ya da eğri için; hak, kaynak, alt metin ve doğrulama kuralları orada |
+
+### R3.1 Görsel — kapak ve şema (v0.7 TASLAK; karar 134 ve 135 verildi)
+
+**Tetik (2026-09-25):** Recep ilk yazının ön izlemesini gördü: *"blog gibi, daha kaliteli görünmeli,
+kapak resmi bile yok"* (OPS aktarımı). Eleştiri metne değil sunuma. v0.6'da görsel "isteğe bağlı" idi;
+emsal yazıların hepsinde kapak var (2026-09-24 şablon ölçümü). Yazı başına ihtiyaç listesi:
+`docs/plans/rec369-gorsel-ihtiyac-2026-09-25.md`.
+
+**Ölçülen kısıt (BLOG, 2026-09-25):** `src/lib/bilgiMerkezi/markdown.ts` görsel sözdizimini reddeder
+(satır 93, `görsel sözdizimi desteklenmiyor` → derleme düşer); yazı kaydında kapak alanı yok. Aşağıdaki
+kurallar şablon desteği gelince (URUN) uygulanır; o güne kadar görsel metne yazılmaz.
+
+| Kural | İçerik |
+|---|---|
+| **Kapak — KARAR 134 (Recep, 2026-09-25, OPS aktarımı)** | *"Kapak = yazının konusuyla ilgili KENDİ ürün görselimiz (DB `product_images`); konuyla ilgili ürünümüz yoksa kapağı Recep verir (bulunan foto ya da Gemini üretimi)."* Her yazıda bir kapak. Aday seçilirken görsel **açılıp bakılır**: üzerinde yazıyla ilgisiz rozet/damga ya da yazı (ör. sertifika rozeti, "photo non contractuelle") olan görsel kırpılmadan kullanılmaz; eğri/tablo görseli kapak olmaz. Yazıya özgüdür: aynı görsel iki yazıda kullanılmaz. Liste kartında ve `Article` JSON-LD `image` alanında aynı görsel (R6). **KARAR 135 (Recep, 2026-09-25):** yazılar mevcut şablonla yayına girer, görsel yükseltme sonra gelir |
+| **Şema** | Metnin anlattığı bir yapı (bölümler, kesit, hava yolu) ya da ilişki (eğri, kıyas) okuru metinden daha hızlı taşıyorsa çizilir. Süs şeması yok: her şema bir bölüme bağlıdır ve o bölümde anılır |
+| **Şemadaki her sayı ve etiket iddiadır** | İddia tablosuna satır olarak girer (R5.1); doğrulayıcı şemayı da görür; tuzak şemaya da konabilir. Grafik verisi yazıdaki tablo ya da kaynak sayfasındaki değerle birebir aynıdır; okunan eğriden "göz kararı" değer alınmaz |
+| **Kaynak gösterimi** | Şemanın altında tek satır: *"VentHub çizimi; veriler: [n]"* ya da *"Temsilî çizim; ölçekli değildir"*. `[n]` yazının kaynak listesindeki numaradır (R2.4) |
+| **Hak (telif)** | Hakkı belgelenmemiş görsel kullanılmaz. Üretici kataloğundaki çizim ya da grafik **birebir kopyalanmaz**; gerekiyorsa verisi kaynaktan alınıp yeniden çizilir ve kaynak gösterilir. Ürün fotoğrafı yalnız sitede o ürün için zaten kullanılan medyadan (hakkı ürün kaydıyla aynı). Başka sitelerden görsel alınmaz. Kapak kaynağı **karar 134** (yukarıda); şemalar VentHub çizimidir |
+| **Alt metin** | Zorunlu; görselin **ne gösterdiğini** anlatır (süs kelimesi değil): *"Frekans konvertörünün dört bölümü: doğrultucu, DC ara devre, evirici, kontrol birimi"*. Temsilî görselde alt metin bunu söyler; emsal biçim: *"temsili görsel; ölçekli teknik çizim veya belirli bir ürün modeli değildir"* (DEA, 2026-09-24). Şemadaki yazılar Türkçe, SI birimi, ondalık virgül (R3 üslup) |
+| **Teknik** | `<Image>` genişlik/yükseklik (CLAUDE.md kural 10); ekranın üst kısmındaki kapak dışında tembel yükleme; açık ve koyu temada okunur (renk token'ları, kural 8); dar ekranda yatay taşma 0 |
+| **Ürün kartı ve iç bağlantı** | Görsel değil ama aynı derste doğdu (2026-09-25): ön izleme betiği önceki yazının elle yazılmış ürün kartlarını taşıdı. Kart ve kategori yalnız yazının `vh:` bağlantılarından türetilir; bağlantı seçilmeden önce kategorideki tüm aileler veritabanından ve katalogdan okunur (R3 "İç bağlantı") |
+
+**Kapı (şablon desteğiyle aynı PR'da, R8.1):** her görselin alt metni dolu · kapak var · şema altı kaynak
+satırı var · aynı görsel dosyası iki yazıda yok.
 
 **Emsalden bilerek alınmayanlar (2026-09-24 kıyası):** `TechArticle` türü (Google'ın Article listesinde
 yok, R6) · `FAQPage` işaretlemesi (zengin sonuç 2026-05-07'de kalktı, R6) · numarasız, bölüm sonu
@@ -229,6 +315,23 @@ JSON-LD taranarak): emsal yazıda yapay zekâ açıklaması **yok**; yazar `Orga
 görünür, "gözden geçiren" satırı yok. Sitede geçen tek "yapay zeka" ifadesi alt menüdeki sohbet asistanı
 bağlantısıdır, yazıyla ilgili değildir.
 
+### R3.2 Ters bağlantı — yazıya site içinden gelen yol (REC-452, 2026-09-29)
+
+Yayındaki her rehber, bağlandığı her kategori ve aile sayfasından **geri bağlantı** alır; ana sayfa en
+yeni rehberlere (en çok 3) doğrudan bağlanır. Bağlantı sunucuda çizilir (ilk HTML'de durur).
+
+| Kural | Nasıl |
+|---|---|
+| Dizin elle tutulmaz | Kategori/aile → yazı eşlemesi yazının KENDİ kimliklerinden türer: gövdedeki `vh:kategori/…`, `vh:aile/…` + `urunler`. Kod: `src/lib/bilgiMerkezi/tersDizin.ts`. Yeni yazı eklenince bağlantı kendiliğinden gelir |
+| Boş blok basılmaz | O konuda yazı yoksa ya da Bilgi Merkezi o dilde kapalıysa (EN, R6) blok hiç çıkmaz |
+| Anahtar | Kimliğin yazıldığı slug (kategori = kanonik EN slug, aile = aile slug'ı). Yazı takma adlı eski slug taşırsa ters dizin eşleşmez; yeniden yazımda kimlik güncel slug'la yazılır |
+| Kapı | INV-REHBER-TERS-BAGLANTI-1 (`src/lib/bilgiMerkezi/__tests__/tersDizin.test.ts`) — yayındaki frekans konvertörü yazısının kategorisine ve üç Danfoss ailesine döndüğünü de ölçer |
+
+**Niçin (ölçüm, 2026-09-29, A sınıfı):** frekans konvertörü rehberi 09-25'te yayına girdi; 09-27'de
+Search Console "Google tarafından bilinmiyor" dedi, 09-29'da aramada yazı değil yalnız liste sayfası
+çıktı. Yazıya sitenin içinden bağlanan TEK sayfa listeydi (ana sayfa 0, kategori 0, aileler 0). Bu satır
+v0.4'ten beri "URUN'un sayfa işi" diye yazılıydı ama emre bağlanmamıştı — yapılmadı.
+
 ## R4 — Yasaklar
 
 1. **Toplu üretim yok.** Google spam politikası: *"Scaled content abuse is when many pages are generated
@@ -243,11 +346,14 @@ bağlantısıdır, yazıyla ilgili değildir.
 6. **Mevzuat hükmü** ("zorunludur", "yasaktır") yalnız resmî metne atıfla ve yürürlük tarihiyle yazılır.
 7. **Kişi ve proje adı yok** (müşteri, şantiye, teklif).
 8. **Yayından önce metin herkese açık başka bir adreste durmaz.** Depo PUBLIC; taslak, iddia tablosu ve
-   doğrulama kaydı yayından önce depoya girmez (veritabanının iç tablosu ya da Linear kaydı).
+   doğrulama kaydı yayından önce depoya girmez (veritabanının iç tablosu ya da Kanban kartı/depo dışı dosya).
 9. **Google Indexing API kullanılmaz.** Google: *"The Indexing API can only be used to crawl pages with
    either JobPosting or BroadcastEvent embedded in a VideoObject."*
    (developers.google.com/search/apis/indexing-api/v3/quickstart, ham HTML, "Last updated 2026-07-16",
    erişim 2026-09-24). Yazılar site haritası + tazeleme ile duyurulur.
+10. **Şirket iddiası ve reklam dili yok** (HRT-46): yazıda firma, kurum, ekip, kuruluş yılı, referans ya da "biz"
+    dili ve reklam dili kullanılmaz; tek istisna marka adı VentHub'dır. Aynı kural sözlük metni için
+    `i18n-localization-standard.md` §4'te de yazılıdır.
 
 ## R5 — Doğrulama (ajanlarda)
 
@@ -268,6 +374,7 @@ yazının sitedeki görünüşüne yakın önizleme eklenir (R5.4).
 | 3d. Sınıflama | Doğrulayıcı alt ajan | Her iddia için öneri sınıfı: DOĞRULANDI / DESTEKSİZ / ÇELİŞİYOR / BAYAT (alıntı var ama güncel değil) + gerekçe. Birim/dönüşüm, sayının bağlamı (model mi seri mi), cümle içindeki **her iddia ayrı** (K4.1 vakası), olumsuz iddia için açık ifade, 3c'nin `INCELE` çevreleri. **Hüküm BLOG'dadır** (`execution-method-standard.md` §4: alt ajan yargı vermez) |
 | 3e. Sabotaj kolu | BLOG, doğrulayıcı bilmeden | Tuzaklar **metnin KOPYASINA** konur (asıl metin tuzaksız kalır; kopya ile asıl arasındaki farkın yalnız tuzak satırları olduğu betikle gösterilir). Her turda **en az 3 tuzak**; **en az biri** betiklerin yakalayamayacağı türden: alıntısı kaynakta birebir geçen ama bağlamı ya da güncelliği yanlış iddia (SSS vakası gibi). Hepsi yakalanmadıkça tur **geçersiz** (emsal: `vitrin-metni-standard.md` K9.7) |
 | 3f. Örnekleme | BLOG | DOĞRULANDI satırlarından en az 3'ü BLOG tarafından ham kaynaktan yeniden açılır. **Örneklenen satırlardan biri yanlışsa tur geçersizdir** |
+| 3g. Mevzuat kontrolü | MEVZUAT şeridi (R2.6) | `tur: mevzuat` satırlarının her biri yürürlükteki metne karşı: yürürlük, değişiklik, AB/TR takvimi. MEVZUAT "yanlış" ya da "bayat" derse tur geçersizdir |
 | 4. Düzeltme | BLOG | DESTEKSİZ / ÇELİŞİYOR / BAYAT satırlar düzeltilir ya da silinir; tuzaklar çıkarılır |
 | 5. İkinci tur | aynı doğrulayıcı | **Tüm metin** 3a'dan yeniden geçer (yalnız değişen satırlar değil: düzeltmede eklenen yeni iddia tabloya girmemiş olabilir) |
 
@@ -326,7 +433,7 @@ sha256'sının ilk 12 hanesini gösterir; Recep'in onayladığı metin doğrulan
 ### R5.7 Ara düzen — tablo ve rota gelene kadar (F4)
 
 Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü). İlk yazı beklemez; yayın bekler:
-- Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Linear REC-369 ekinde** tutulur
+- Taslak, iddia tablosu, betik çıktıları ve tuzaksız metnin sha256'sı **Kanban kartında (not + depo dışı dosya yolu; eski kayıt Linear REC-369)** tutulur
   (özel; PUBLIC depo değil — R4.8).
 - ⛔**Rota ve sayfa gelmeden Recep'e yayın onayı sorulmaz** (Recep, 2026-09-24: "sayfa yapılmadı, ürün
   bekliyor, hem de 105 bir karar; ya verin ya doğru anlatın" → karar 105 geri çekildi). Yayına giremeyecek
@@ -340,7 +447,7 @@ Bugün prod'da rehber tablosu ve önizleme rotası **yok** (ikinci tur ölçtü)
   ürün kartı) temsilîdir ve sayfada bu yazılır.
 - Onaylanan sha256, tablo geldiğinde yazının ilk revizyonu olarak yazılır; farklıysa akış baştan.
 - Bağımlı işler (sırasıyla, URUN): karar 92 rotası + rehber tablosu migration'ı (kural 13) → önizleme
-  rotası. Hepsi REC-369 altında izlenir (Linear aktif kayıt sınırı dolu, yeni kayıt açılmıyor).
+  rotası. Hepsi REC-369 (Linear, donuk arşiv) altında izlenmişti; yeni izleme BLOG'un Kanban kartında (karar 219; kart numarası BLOG kartı açınca buraya yazılır).
 
 ## R6 — Yer ve teknik gereklilikler (uygulayan URUN)
 
@@ -377,7 +484,7 @@ girer. Bugünkü 10 adres (R0.1) kalıcı yönlendirmeyle taşınır; hedefsiz a
 - **Taban:** F1 küme rakamları (Ölçüm geçmişi, A sınıfı). Kıyas aynı sorgu ve aynı gün sayısıyla yapılır.
 - Sayısal hedef yazılmadı: 25 günlük, 448 gösterimlik tabanla hedef koymak tahmin olurdu. İlk dört
   yazının ölçümü tabanı oluşturur.
-- Sorgu listeleri PUBLIC depoya girmez; depoya yalnız özet sayılar, sorgular Linear kaydına.
+- Sorgu listeleri PUBLIC depoya girmez; depoya yalnız özet sayılar, sorgular Kanban kartına (depo dışı dosya yolu).
 
 ## R8 — Kapılar
 
@@ -389,7 +496,7 @@ Kapılar "ilk yazıdan önce bir gün" kurulmaz: her kapı, koruduğu şeyi geti
 (`scripts/rehber/__tests__/`, vitest `ci` işinde; betiklerin **kendi** doğruluğunu sınar).
 ⚠**Betik testleri yazıyı denetlemez.** Yazının kendisi ancak yayın geçişi betik çıktısına bağlanınca
 (R5.5, tablo kısıtı) kapı altına girer; o güne kadar ara düzende (R5.7) betikler elle koşar ve çıktıları
-Linear ekine girer.
+Kanban kartına not + depo dışı dosya yolu olarak girer.
 ⚠**Kapının koştuğu ortam:** DB kapıları (ziyaretçi rolü, durum ↔ sha256) prod'a değil **Supabase dalına**
 karşı koşar — tablo ancak merge'ten sonra prod'da olur. SSR kapısı yayında yazı yokken **fikstür yazıyla**
 koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil verir.
@@ -402,7 +509,7 @@ koşar; site haritasından temsilci seçen kapı boş evrende sessiz yeşil veri
 | İç bağlantı — canlı (R3) | yayındaki her rehber yazısının gövdesindeki site içi bağlantı **doğrudan 200**; 3xx ve 404 KIRMIZI (yönlendirme izlenmez); yayında yazı yoksa `EVREN-BOS` (çıkış 3), temiz değil. **Betik var** (`scripts/rehber/ic-baglanti-denetle.mjs`, ağlı); ölçüldü 2026-09-24: site haritasında yazı 0 → EVREN-BOS; önizlemenin 5 bağlantısı 200; sabotaj: kök adres 308 → KIRMIZI. **Zamanlı koşu ve adres yayınından (REC-300) sonra koşturma ALTYAPI'da** | BLOG kalıp kapısı PR'ı (betik) · ALTYAPI (bağlama) | BLOG + ALTYAPI |
 | Alıntı betiği (R5.1 3c) | alıntı ham kaynakta; son adres/durum/sha256 kaydı | BLOG doğrulama betikleri PR'ı | BLOG |
 | Not deseni (R4.4) | K2 sınıfı not 0 (R8.2) | BLOG doğrulama betikleri PR'ı ya da tablo kısıtı (migration PR'ı) | BLOG + URUN |
-| Vaat / rakip / fiyat deseni (R4.2, R4.3, R3) | "en iyi", "%100", "garanti"; rakip ad listesi (Linear'dan, depoya girmez); `₺ TL € EUR USD` + rakam = 0 | BLOG doğrulama betikleri PR'ı | BLOG |
+| Vaat / rakip / fiyat deseni (R4.2, R4.3, R3) | "en iyi", "%100", "garanti"; rakip ad listesi (Kanban kartı/depo dışı dosyadan, depoya girmez); `₺ TL € EUR USD` + rakam = 0 | BLOG doğrulama betikleri PR'ı | BLOG |
 | Olumsuz iddia (R4.5) | olumsuz fiilli her cümle iddia tablosunda `tur = olumsuz` + açık alıntı | BLOG doğrulama betikleri PR'ı | BLOG |
 | Mevzuat (R4.6) | "zorunlu/yasaktır/yönetmelik" cümlesi → resmî kaynak + yürürlük tarihi | BLOG doğrulama betikleri PR'ı | BLOG |
 | Toplu üretim (R4.1) | 7 günde yayına geçen **yeni** yazı sayısı > eşik → KIRMIZI (revizyon sayılmaz; eşik Recep'in ritim tercihidir, öneri 2); her yayında doğrulama + onay kaydı | migration PR'ı (onay kaydı) | URUN + BLOG |
@@ -428,7 +535,7 @@ biçim listesinin **yanlış pozitif ölçümüyle** birlikte kurulur.
 Orta yol: planlı üretim. Başlangıç önerisi **haftada bir yazı**, ilk dört yazının R7 ölçümü bitene
 kadar; sonra ölçüme göre artırılır. Üst sınır R8.1'deki toplu üretim kapısıdır (önerilen eşik 7 günde
 2 yeni yazı; revizyon sayılmaz). Karar 92 taşımasında eski konular **kaldırılıp yönlendirilir**, yeniden
-yazımları bu ritme girer. Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
+yazımları bu ritme ve R1.4 sırasına girer (karar 121: eski metinden alıntı yok, sıfırdan). Ritim ve eşik Recep'in tercihidir; bu satır öneridir.
 
 ---
 
@@ -441,6 +548,7 @@ Kaynak sınıfı (`hukum-kaynak-standard.md`): **A** = BLOG'un kendi ölçümü 
 | 2026-09-24 | Rakip yazı (OPS) | B | 2.561 kelime · 15 H2 · 8 SSS · 17 kaynak; Türkçe rakipler 433–1.565 kelime, 0 kaynak (REC-369 OPS yorumu) |
 | 2026-09-24 | F1 Search Console (BLOG) | A | Veri 2026-08-28'de başlıyor (25 gün): 34 tık · 448 gösterim · ort. sıra 28,0 · sorguda görünen gösterim %50, tık %26 · bilgi niyetli sorgu 2 gösterim |
 | 2026-09-24 | F1 konu kümeleri (BLOG) | A | 11 küme; en büyük marka dışı küme 57 gösterim / 0 tık / sıra 44. Küme adları ve sorgular REC-369'da (depoya yalnız özet) |
+| 2026-09-25 | Bilgi Merkezi ayrıştırıcısında görsel desteği (BLOG) | A | `src/lib/bilgiMerkezi/markdown.ts` satır 93 görsel sözdizimini reddediyor; yazı kaydında kapak alanı yok (R3.1) |
 | 2026-09-24 | F1 arama önerisi (BLOG, 16 tohum × 6 ek) | A | 93 bilgi niyetli öneri; en geniş tohum 16 öneri |
 | 2026-09-24 | F1b bot karnesi (BLOG, 45 adres × 5 kimlik) | A | 45/45 adreste beş kimlik aynı HTML; 32 adreste sorun (hreflang düşüşü 28, iki title 15, varsayılan başlık + canonical yok 13) |
 | 2026-09-24 | Google belgeleri, ham HTML (BLOG) | A | Article türleri Article/NewsArticle/BlogPosting · SSS zengin sonucu 2026-05-07'de kaldırıldı · spam politikası alıntıları birebir · Indexing API yalnız JobPosting/BroadcastEvent |

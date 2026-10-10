@@ -1,5 +1,7 @@
 ---
 name: plan-challenger
+context: fork
+agent: denetim-opus
 description: >-
   Bir teknik PLAN, PRD, RFC, mimari tasarım ya da "şöyle yapacağız" önerisi ortaya çıktığında — veya
   kullanıcı "planı çürüt", "red team yap", "plan challenge", "stress-test et", "bu plan sağlam mı",

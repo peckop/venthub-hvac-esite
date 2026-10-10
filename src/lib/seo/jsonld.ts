@@ -14,13 +14,18 @@
  * Bu modülde ikinci bir fiyat hesabı yoktur; yalnız beyan edilip edilmeyeceğine karar verilir.
  */
 
+import { ADRES_SEMASI_K3B } from '../../config/features'
+import { sitemapModelMi } from '../../config/yayindaModeller'
 import type { FamilyListItem } from '../../types/ui-models'
+import { adresUret } from '../../utils/adresUret'
 import { dildekiMetin } from '../../utils/dilMetni'
 import { getProductDisplayName, getProductModelLabel } from '../../utils/productHelpers'
+import { adresRotalari } from '../../utils/yuzeyAdresleri'
 import { familyName } from '../i18n/familyName'
 import { storagePathToUrl } from '../images/productImage'
 import { quoteModeHesapla } from '../pricing/quoteMode'
 import type { FamilyDetail, FamilyVariant } from '../services/family.service'
+import { dilOnekliMi } from './kirinti'
 
 /**
  * Aile description/meta alanları için dil çözümü — YALNIZ sayfanın dili (INV-DIL-DUSUSU-1).
@@ -31,11 +36,45 @@ const pickLocalized = dildekiMetin
 /** Site adı — root layout'taki WebSite JSON-LD ("isPartOf" hedefi) ile aynı. */
 const SITE_NAME = 'VentHub'
 
+/**
+ * REC-300 Faz 3d — JSON-LD adresleri `adresUret`'ten. `bayrak` yalnız test içindir (varsayılan
+ * `ADRES_SEMASI_K3B`). KAPALIYKEN her üretici bugünkü şablon dizgesini AYNEN yazar (aşağıdaki
+ * `bayrak ? … : \`${baseUrl}/${lang}/products/…\`` dalları) — yeni kod yolu yoktur.
+ */
+const dilOf = (lang: string) => (lang === 'en' ? 'en' : 'tr') as 'tr' | 'en'
+const aileUrl = (baseUrl: string, lang: string, slug: string, bayrak: boolean) =>
+  bayrak ? `${baseUrl}${adresUret({ tur: 'aile', slug }, dilOf(lang), true)}` : `${baseUrl}/${lang}/products/${slug}`
+
 function buildWebSiteRef(baseUrl: string) {
   return {
     '@type': 'WebSite' as const,
     name: SITE_NAME,
     url: baseUrl,
+  }
+}
+
+/** `ItemList` içindeki tek satır: konum + dil önekli mutlak adres (fiyat/offers YAZILMAZ). */
+interface ListeSatiri {
+  position: number
+  url: string
+}
+
+/**
+ * REC-494 — liste düğümü. `numberOfItems` ve `itemListElement` schema.org'da `ItemList`'in
+ * özellikleridir, `CollectionPage`'in DEĞİL; sayfa düğümü listeyi `mainEntity` ile taşır
+ * (canlı kapı `JSONLD-COLLECTIONPAGE`: üst düzeyde bu iki alan KIRMIZI, 28 kategori sayfasında
+ * ölçüldü). İki CollectionPage üreticisi (kategori + seri) AYNI yardımcıyı kullanır; konum ve
+ * adres hesabı çağıranda kalır, burada yalnız şekil kurulur.
+ */
+function buildItemList(numberOfItems: number, satirlar: ListeSatiri[]) {
+  return {
+    '@type': 'ItemList' as const,
+    numberOfItems,
+    itemListElement: satirlar.map(({ position, url }) => ({
+      '@type': 'ListItem' as const,
+      position,
+      url,
+    })),
   }
 }
 
@@ -53,6 +92,8 @@ export interface BuildProductGroupJsonLdParams {
    * yayınlıyordu. `null` geçmek GÜVENLİ tarafa düşer (mod bilinmiyor → teklif modu).
    */
   mainCategory: { metadata?: unknown } | null
+  /** K3-b şeması (yalnız test verir; varsayılan `ADRES_SEMASI_K3B`). */
+  bayrak?: boolean
 }
 
 /**
@@ -66,8 +107,8 @@ export interface BuildProductGroupJsonLdParams {
  * ürünün başka bir yazılışıdır — beyan edilirse arama sonucunda "0,00 ₺" görünür.
  */
 export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): Record<string, unknown> {
-  const { family, variants, lang, baseUrl, mainCategory } = params
-  const url = `${baseUrl}/${lang}/products/${family.slug}`
+  const { family, variants, lang, baseUrl, mainCategory, bayrak = ADRES_SEMASI_K3B } = params
+  const url = aileUrl(baseUrl, lang, family.slug, bayrak)
   const description =
     pickLocalized(family.description, lang) ||
     (lang === 'en' ? 'VentHub Product Details' : 'VentHub Ürün Detayı')
@@ -80,6 +121,17 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
     const productNode: Record<string, unknown> = {
       '@type': 'Product',
       name: getProductDisplayName(variant, family, lang),
+    }
+
+    // K3-b (REC-300 Faz 3d, plan §2): her model KENDİ kanonik adresine sahip → varyant düğümü o
+    // adresi taşır. Bugün (bayrak kapalı) varyant URL'i YAZILMAZ — tek adres aile adresiydi (`?sku=`
+    // kanoniğe girmez). Faz 2 öncesi slug metni aile slug'ıdır (rota modeli SKU'dan çözer).
+    // ⚠Adres SKU'yu (küçük harf) taşır — plan §2 şemasının kendisi (`…-p-<sku>`); `sku` ALANI yine
+    // yazılmaz (INV-SKU-GORUNMEZ-1 K2). Adres `adresRotalari` üzerinden (`adresUret` model nesnesi).
+    // URN-31: yalnız DİZİNE AÇIK model adresi yazılır (`sitemapModelMi`: yayındaki listedeki temel model). Liste dışı
+    // varyantın model sayfası yok (404); sürüm sayfasının kanoniği temele gider — ikisinde de url YOK.
+    if (bayrak && sitemapModelMi(variant.sku)) {
+      productNode.url = `${baseUrl}${adresRotalari(dilOf(lang), true).product(family.slug, variant.sku)}`
     }
 
     // ⭐`sku` ARTIK YAYINLANMIYOR (REC-146, 2026-09-09).
@@ -164,7 +216,10 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
         name: family.brand_name,
       },
     }),
-    isPartOf: buildWebSiteRef(baseUrl),
+    // REC-494: `isPartOf` YAZILMAZ. schema.org'da `isPartOf` bir CreativeWork özelliğidir;
+    // `ProductGroup` (Product soyundan) onu tanımaz ve doğrulayıcı "şema uyarısı" verir
+    // (canlı kapı `JSONLD-ISPARTOF`, 47 aile sayfasında ölçüldü). Site ilişkisi CollectionPage
+    // düğümlerinde (kategori + seri) kalır; onlar bir WebPage'dir.
     hasVariant,
   }
 }
@@ -179,6 +234,13 @@ export interface BuildCategoryJsonLdParams {
   page: number
   pageSize: number
   families: FamilyListItem[]
+  /**
+   * K3-b: sayfanın DİL ÖNEKLİ kanonik yolu (`kategoriKanonikAdresi` — iki seviyeli dal adresi
+   * slug'dan kurulamaz, üst kategori gerekir). Yalnız bayrak açıkken okunur.
+   */
+  sayfaYolu?: string
+  /** K3-b şeması (yalnız test verir; varsayılan `ADRES_SEMASI_K3B`). */
+  bayrak?: boolean
 }
 
 /**
@@ -188,20 +250,27 @@ export interface BuildCategoryJsonLdParams {
  */
 export function buildCategoryJsonLd(params: BuildCategoryJsonLdParams): Record<string, unknown> {
   const { lang, baseUrl, categorySlug, name, description, total, page, pageSize, families } = params
+  const { sayfaYolu, bayrak = ADRES_SEMASI_K3B } = params
+  const url =
+    bayrak
+      ? `${baseUrl}${sayfaYolu ?? adresUret({ tur: 'kategori', kok: categorySlug }, dilOf(lang), true)}`
+      : `${baseUrl}/${lang}/category/${categorySlug}`
 
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name,
     description,
-    url: `${baseUrl}/${lang}/category/${categorySlug}`,
+    url,
     isPartOf: buildWebSiteRef(baseUrl),
-    numberOfItems: total,
-    itemListElement: families.map((family, index) => ({
-      '@type': 'ListItem',
-      position: (page - 1) * pageSize + index + 1,
-      url: `${baseUrl}/${lang}/products/${family.slug}`,
-    })),
+    // REC-494: liste `mainEntity` ItemList içinde (CollectionPage üst düzeyinde değil).
+    mainEntity: buildItemList(
+      total,
+      families.map((family, index) => ({
+        position: (page - 1) * pageSize + index + 1,
+        url: aileUrl(baseUrl, lang, family.slug, bayrak),
+      })),
+    ),
   }
 }
 
@@ -213,6 +282,8 @@ export interface BuildSeriesLandingJsonLdParams {
   description: string
   /** Seri altındaki modeller — kart listesiyle AYNI kaynak (`FamilyListItem[]`). */
   models: FamilyListItem[]
+  /** K3-b şeması (yalnız test verir; varsayılan `ADRES_SEMASI_K3B`). */
+  bayrak?: boolean
 }
 
 /**
@@ -220,7 +291,7 @@ export interface BuildSeriesLandingJsonLdParams {
  *
  * `ProductGroup` KASITLI KULLANILMAZ: seri satılabilir bir ürün değil, altındaki MODELLERİN
  * listesidir (K1 kararı — "KART = MODEL, SERİ = LANDING"). Şekil `buildCategoryJsonLd` ile
- * BİREBİR aynı (CollectionPage + numberOfItems + itemListElement) — kategori sayfası da aynı
+ * BİREBİR aynı (CollectionPage + mainEntity ItemList{numberOfItems, itemListElement}) — kategori sayfası da aynı
  * sınıf içerik sunar (bir grup ürünün landing'i). Sayfalama YOK: seri sayfası tüm modellerini
  * tek seferde basar (`?page=` bu yüzeyde hiç yok), bu yüzden `buildCategoryJsonLd`'nin
  * page/pageSize parametreleri burada bulunmaz.
@@ -240,21 +311,23 @@ export interface BuildSeriesLandingJsonLdParams {
  * disiplin); "Teklif Alın" modelinde model listesinden fiyat sızdırmanın bir yolu yok.
  */
 export function buildSeriesLandingJsonLd(params: BuildSeriesLandingJsonLdParams): Record<string, unknown> {
-  const { lang, baseUrl, seriesSlug, name, description, models } = params
+  const { lang, baseUrl, seriesSlug, name, description, models, bayrak = ADRES_SEMASI_K3B } = params
 
   return {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name,
     description,
-    url: `${baseUrl}/${lang}/products/${seriesSlug}`,
+    url: aileUrl(baseUrl, lang, seriesSlug, bayrak),
     isPartOf: buildWebSiteRef(baseUrl),
-    numberOfItems: models.length,
-    itemListElement: models.map((model, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `${baseUrl}/${lang}/products/${model.slug}`,
-    })),
+    // REC-494: liste `mainEntity` ItemList içinde (CollectionPage üst düzeyinde değil).
+    mainEntity: buildItemList(
+      models.length,
+      models.map((model, index) => ({
+        position: index + 1,
+        url: aileUrl(baseUrl, lang, model.slug, bayrak),
+      })),
+    ),
   }
 }
 
@@ -288,6 +361,17 @@ export interface BuildBreadcrumbJsonLdParams {
   lang: string
   baseUrl: string
   steps: BreadcrumbStep[]
+}
+
+/**
+ * Kırıntı basamağının mutlak adresi. REC-494: ana sayfa basamağı (`path: '/'`) `https://…/tr/`
+ * (sonda eğik çizgi) üretiyordu; sitenin kanonik ana sayfası `/tr` ve `/tr/` 308 verir — yani
+ * yapılandırılmış veri her sayfada yönlendirilen adresi gösteriyordu. Sondaki eğik çizgi atılır
+ * (adres her zaman en az `/<dil>` taşır, boşalmaz).
+ */
+function kirintiAdresi(baseUrl: string, lang: string, path: string): string {
+  const adres = `${baseUrl}${dilOnekliMi(path) ? path : `/${lang}${path}`}`
+  return adres.endsWith('/') ? adres.slice(0, -1) : adres
 }
 
 /**
@@ -327,7 +411,9 @@ export function buildBreadcrumbJsonLd(params: BuildBreadcrumbJsonLdParams): Reco
       '@type': 'ListItem',
       position: index + 1,
       name: step.name,
-      ...(step.path ? { item: `${baseUrl}/${lang}${step.path}` } : {}),
+      // K3-b (REC-300 Faz 3d): adım `adresUret` çıktısı (zaten dil önekli) olabilir — önek ikinci
+      // kez eklenmez. Dilsiz yol (bugünkü çağıranlar) bugünkü gibi `/${lang}` ile birleşir.
+      ...(step.path ? { item: kirintiAdresi(baseUrl, lang, step.path) } : {}),
     })),
   }
 }

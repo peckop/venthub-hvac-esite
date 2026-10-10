@@ -12,6 +12,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
 import type { CategoryMetadata } from '../../types/db-rows'
 import { getLocalizedCategorySlug } from '../../utils/categoryHelpers'
+import { kategoriArgumanlari } from '../../utils/yuzeyAdresleri'
 import { VentHubCanvas } from '../products/3d/core'
 import Category3DIcon from '../products/Category3DIcon'
 
@@ -99,7 +100,15 @@ const CategoryHubOverlay: React.FC<CategoryHubOverlayProps> = ({
         if (selectedParentCategory) {
             router.push(Routes.category(getLocalizedCategorySlug(selectedParentCategory, lang), getLocalizedCategorySlug(subCategory, lang)))
         } else {
-            router.push(Routes.category(getLocalizedCategorySlug(subCategory, lang)))
+            // REC-403: üst seçili değilse de dalın üstü veride var (`parent_id`); tek slug AÇIK kipte
+            // sayfa katmanında bir fazla 308 sıçraması demekti. Kapalıyken bugünkü tek slug birebir.
+            const ust = categories.find((c) => c.id === subCategory.parent_id)
+            const dalSlug = getLocalizedCategorySlug(subCategory, lang)
+            const k = kategoriArgumanlari(dalSlug, {
+                slug: dalSlug,
+                ustSlug: ust ? getLocalizedCategorySlug(ust, lang) : null,
+            })
+            router.push(Routes.category(k.slug, k.subSlug))
         }
         onClose()
     }

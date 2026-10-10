@@ -1,6 +1,8 @@
 'use client'
 
 import { LayoutGrid, List, Search } from 'lucide-react'
+import type { Route } from 'next'
+import Link from 'next/link'
 import React, { useMemo, useState } from 'react'
 
 import { formatCurrency } from '../../i18n/format'
@@ -53,6 +55,12 @@ export interface VariantSelectorProps {
   variants: FamilyVariant[]
   selectedSku: string | null
   onSelect: (sku: string) => void
+  /**
+   * URN-21 — modelin sayfa adresi (dil önekli). Her satır gerçek `<a href>` olur: arama motoru ve
+   * JS koşmayan tarayıcı model sayfalarına bu satırlardan ulaşır. Düz sol tıklama `onSelect`'e gider
+   * (sayfa yeniden yüklenmez, mevcut davranış); Ctrl/Cmd/Shift/orta tık tarayıcıya bırakılır.
+   */
+  modelAdresi: (sku: string) => string
   /** Fiyat gösterimi kapalıysa (Teklif Alın modeli) fiyat kolonu "Teklif" yazar. */
   quoteMode: boolean
   /**
@@ -104,10 +112,49 @@ function distinguishingSpecKeys(variants: FamilyVariant[]): string[] {
     .slice(0, VARIANT_MATRIX_MAX_COLUMNS)
 }
 
+interface ModelBaglantisiProps {
+  sku: string
+  href: string
+  active: boolean
+  onSelect: (sku: string) => void
+  className: string
+  style?: React.CSSProperties
+  ariaLabel?: string
+  children: React.ReactNode
+}
+
+/** Modeller satırı: gerçek bağlantı; düz sol tık seçimi yerinde yapar, değiştirici tuşlu tık tarayıcıya kalır. */
+const ModelBaglantisi: React.FC<ModelBaglantisiProps> = ({ sku, href, active, onSelect, className, style, ariaLabel, children }) => (
+  <Link
+    href={href as Route}
+    prefetch={false}
+    aria-current={active ? 'true' : undefined}
+    aria-label={ariaLabel}
+    className={className}
+    style={style}
+    onClick={(e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      e.preventDefault()
+      onSelect(sku)
+    }}
+    // Eski <button> Space ile de seçiyordu; <a> yalnız Enter'la tıklanır. Space'e aynı davranış verilir
+    // (preventDefault: sayfa kaymasın). Enter'a dokunulmaz — tarayıcı onu click'e çevirir. Değiştirici tuşlu
+    // Space'e dokunulmaz.
+    onKeyDown={(e) => {
+      if (e.key !== ' ' || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      e.preventDefault()
+      onSelect(sku)
+    }}
+  >
+    {children}
+  </Link>
+)
+
 export const VariantSelector: React.FC<VariantSelectorProps> = ({
   variants,
   selectedSku,
   onSelect,
+  modelAdresi,
   quoteMode,
   priceTaxIncluded = null,
 }) => {
@@ -212,17 +259,18 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
           {filtered.map((v) => {
             const active = v.sku === selectedSku
             return (
-              <button
+              <ModelBaglantisi
                 key={v.sku}
-                type="button"
-                onClick={() => onSelect(v.sku)}
-                aria-pressed={active}
-                className={`px-3.5 py-2 rounded-xl border text-xs font-black uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
+                sku={v.sku}
+                href={modelAdresi(v.sku)}
+                active={active}
+                onSelect={onSelect}
+                className={`inline-flex items-center min-h-11 sm:min-h-0 px-3.5 py-2 rounded-xl border text-xs font-black uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
                   ? 'bg-primary-navy text-white border-primary-navy'
                   : 'bg-white text-industrial-gray border-light-gray hover:border-primary-navy hover:text-primary-navy'}`}
               >
                 {variantLabel(v, lang)}
-              </button>
+              </ModelBaglantisi>
             )
           })}
         </div>
@@ -235,11 +283,12 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
             const active = v.sku === selectedSku
             return (
               <li key={v.sku}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(v.sku)}
-                  aria-pressed={active}
-                  className={`w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
+                <ModelBaglantisi
+                  sku={v.sku}
+                  href={modelAdresi(v.sku)}
+                  active={active}
+                  onSelect={onSelect}
+                  className={`w-full flex items-center justify-between gap-3 min-h-11 px-3.5 py-2.5 rounded-xl border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
                     ? 'bg-air-blue/40 border-primary-navy'
                     : 'bg-white border-light-gray hover:border-primary-navy/40'}`}
                 >
@@ -254,7 +303,7 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                   <span className="text-xs font-black text-primary-navy whitespace-nowrap">
                     {priceCell(v)}
                   </span>
-                </button>
+                </ModelBaglantisi>
               </li>
             )
           })}
@@ -286,13 +335,14 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
               {filtered.map((v) => {
                 const active = v.sku === selectedSku
                 return (
-                  <button
+                  <ModelBaglantisi
                     key={v.sku}
-                    type="button"
-                    onClick={() => onSelect(v.sku)}
-                    aria-pressed={active}
-                    aria-label={t('pdp.variant.selectAria', { model: variantLabel(v, lang) })}
-                    className={`w-full grid gap-2 items-center px-3 py-2.5 rounded-xl border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
+                    sku={v.sku}
+                    href={modelAdresi(v.sku)}
+                    active={active}
+                    onSelect={onSelect}
+                    ariaLabel={t('pdp.variant.selectAria', { model: variantLabel(v, lang) })}
+                    className={`w-full grid gap-2 items-center min-h-11 px-3 py-2.5 rounded-xl border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-navy ${active
                       ? 'bg-air-blue/40 border-primary-navy'
                       : 'bg-white border-transparent hover:bg-slate-50 hover:border-light-gray'}`}
                     style={{ gridTemplateColumns: `minmax(9rem, 1fr) repeat(${specKeys.length + 1}, minmax(7rem, auto))` }}
@@ -301,17 +351,20 @@ export const VariantSelector: React.FC<VariantSelectorProps> = ({
                       <span className="text-xs font-black text-industrial-gray uppercase tracking-widest truncate">
                         {variantLabel(v, lang)}
                       </span>
-                      <span className="text-xs font-medium text-steel-gray truncate">{v.sku}</span>
+                      {/* URN-32: eskiden ham `v.sku` basılıyordu (müşteriye İÇ KOD). Liste kipiyle AYNI çözücü:
+                          görünen ad (`getProductDisplayName`) — aynı model kodunu paylaşan üyeleri
+                          (T / TP / PIR / HCS) ayırt eden de bu ad. Bekçi: INV-SKU-GORUNMEZ-1 (K5). */}
+                      <span className="text-xs font-medium text-steel-gray truncate">{getProductDisplayName(v, null, lang)}</span>
                     </span>
                     {specKeys.map((key) => (
                       <span key={key} className="text-xs font-bold text-industrial-gray truncate">
-                        {formatSpecValue(key, v.technical_specs?.[key] ?? null)}
+                        {formatSpecValue(key, v.technical_specs?.[key] ?? null, t)}
                       </span>
                     ))}
                     <span className="text-xs font-black text-primary-navy text-right whitespace-nowrap">
                       {priceCell(v)}
                     </span>
-                  </button>
+                  </ModelBaglantisi>
                 )
               })}
             </div>

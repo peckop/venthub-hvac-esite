@@ -173,6 +173,8 @@ export const pricing = {
       scopeTarget: "Scope and target do not match: exactly one valid target is required for the selected scope.",
       scopeRange: "Invalid scope value.",
       checkViolation: "The rule failed database validation. Please review the fields.",
+      productFixedExists:
+        "This product already has a fixed-price rule with no end date. Edit the existing rule, or give the new rule a validity period or a currency.",
     },
     validation: {
       minQuantity: "Minimum quantity must be 0 or greater",
@@ -293,6 +295,10 @@ export const pricing = {
       toasts: {
         applied: "{{count}} product costs refreshed",
         applyFailed: "Could not refresh costs",
+        applyFailedNotAdmin: "Refreshing costs requires an admin role. Try signing out and back in; nothing was written.",
+        applyFailedTooLarge: "The product count exceeds the limit for one refresh; nothing was written. Please contact the technical team.",
+        applyFailedTimeout: "The operation timed out; nothing was written. Please try again shortly.",
+        applyFailedChanged: "Product prices or your permissions changed during the refresh; nothing was written. Please try again.",
       },
     },
     impact: {

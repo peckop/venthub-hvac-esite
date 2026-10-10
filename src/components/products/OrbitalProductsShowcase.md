@@ -292,7 +292,7 @@ Bu modül, ürün kartlarını dairesel bir 3B yörüngede sergileyen interaktif
 ### [N4_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::SuspendedCardMaterial
 - **params**: `finalPath` — `string | null` tipinde doku dosya yolu; `hovered` — `boolean` tipinde hover durumu
 - **ic_degiskenler**:
-  - `texture` — `useTexture(finalPath || '/images/placeholders/product-placeholder.png')` çağrısı sonucu; ürün kartının dokusu
+  - `texture` — `useTexture(finalPath || YER_TUTUCU_GORSEL)` çağrısı sonucu; ürün kartının dokusu
 - **Dönüş**: JSX elementi — `<meshStandardMaterial>`; `texture` map olarak, `hovered` true ise `CONFIG.glowColor` emissive renk ve `CONFIG.emissiveIntensity * 1.5` yoğunluk, aksi halde siyah ve 0 yoğunluk
 
 ### [N5_NASIL] AST Pointer: OrbitalProductsShowcase.tsx::OrbitalCard

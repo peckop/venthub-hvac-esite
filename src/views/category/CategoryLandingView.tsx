@@ -3,6 +3,7 @@ import { Info } from 'lucide-react'
 import Image from 'next/image'
 import React, { useEffect,useRef, useState } from 'react'
 
+import { AIR_CURTAIN_WIZARD_ENABLED } from '@/components/category/airCurtainWizardGate'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import {
     BottomCTA,
@@ -27,6 +28,7 @@ import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
+import { doluMu } from '../../utils/bosDegerKorumasi'
 import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 /**
@@ -38,8 +40,12 @@ import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/cat
  * sihirbaz başka ürün önerir; hiçbir sayı bunu göstermez).
  *
  * Bekçi: `src/__tests__/conformance/silent-fan-series-binding.test.ts` (INV-SILENTFAN-SERI-1).
+ *
+ * TEK SLUG (REC-300 Faz 1-B #1352 canlıda ölçüldü, URN-53): migration aileyi `vortice-lineo-quiet` →
+ * `vortice-lineo-quiet-sessiz-kanal-fanlari` yaptı; geçiş dönemindeki eski slug buradan SİLİNDİ. Sihirbaza
+ * giden değer yine sayfadaki aile listesinin GERÇEKTEN taşıdığı slug'dır (`sessizFanSerisi`).
  */
-const SESSIZ_FAN_SERISI = 'vortice-lineo-quiet'
+const SESSIZ_FAN_SERILERI = ['vortice-lineo-quiet-sessiz-kanal-fanlari'] as const
 
 interface CategoryLandingProps {
     category: DomainCategory
@@ -79,8 +85,20 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     // Doğru bağ, anlatının gerçek konusu olan seridir.
     //
     // Seri kanonik slug ile aranır; `catalog-integrity` slug-unresolved kolu bu sabiti korur.
-    const isSilentFan = families.some((aile) => aile.slug === SESSIZ_FAN_SERISI)
+    const sessizFanSerisi = families.find((aile) => (SESSIZ_FAN_SERILERI as readonly string[]).includes(aile.slug))?.slug ?? null
+    const isSilentFan = sessizFanSerisi !== null
     const isDehumidifier = category.slug === 'dehumidifiers'
+    // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; giriş noktaları tek kapıdan kapalı
+    // (`airCurtainWizardGate.ts`). Sessiz fan sihirbazı ayrı bileşen, bu kapıdan etkilenmez.
+    const havaPerdesiSihirbazi = isAirCurtain && AIR_CURTAIN_WIZARD_ENABLED
+    const sihirbazGirisi = havaPerdesiSihirbazi || isSilentFan
+
+    // URN-84: tablo iki nem alma rakamını BOŞ bırakır (kaynaksız teknik değer → çip kalkar). Değeri boş çip etiketiyle
+    // birlikte atılır (etiket tek başına anlamsız); hiç çip kalmazsa ızgara da basılmaz.
+    const nemAlmaCipleri = [
+        { value: t('category.landing.dehumidifierCapacityValue'), label: t('category.landing.dehumidifierCapacityLabel') },
+        { value: t('category.landing.dehumidifierNoiseValue'), label: t('category.landing.dehumidifierNoiseLabel') }
+    ].filter(cip => doluMu(cip.value))
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
     const breadcrumbItems = [
@@ -162,7 +180,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                         <HowItWorks />
                         <VorticeBrand />
                         <TypeComparison
-                            onOpenWizard={() => setWizardOpen(true)}
+                            onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
                             onSelectType={() => handleShowProducts()}
                         />
                         <TrustSignals />
@@ -190,10 +208,16 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                                     <p className="text-xl text-slate-400 leading-relaxed mb-12">
                                         {t('category.landing.dehumidifierDesc')}
                                     </p>
-                                    <div className="grid grid-cols-2 gap-8">
-                                        <div><p className="text-3xl font-black text-secondary-blue">{t('category.landing.dehumidifierCapacityValue')}</p><p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">{t('category.landing.dehumidifierCapacityLabel')}</p></div>
-                                        <div><p className="text-3xl font-black text-secondary-blue">{t('category.landing.dehumidifierNoiseValue')}</p><p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">{t('category.landing.dehumidifierNoiseLabel')}</p></div>
-                                    </div>
+                                    {nemAlmaCipleri.length > 0 && (
+                                        <div className="grid grid-cols-2 gap-8">
+                                            {nemAlmaCipleri.map(cip => (
+                                                <div key={`${cip.value}|${cip.label}`}>
+                                                    <p className="text-3xl font-black text-secondary-blue">{cip.value}</p>
+                                                    {doluMu(cip.label) && <p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">{cip.label}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-secondary-blue/10 to-transparent pointer-events-none" />
                             </div>
@@ -228,15 +252,17 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
             </div>
 
             {/* Sihirbaz iki kategoride de var ama AYNI bileşen değil: hava perdesi kapı ölçüsü
-                sorar, sessiz fan oda hacmi/kanal direnci sorar. Ortak buton, ayrı motor. */}
+                sorar, sessiz fan oda hacmi/kanal direnci sorar. Ortak buton, ayrı motor.
+                URN-83: hava perdesi sihirbazı bozuk olduğu için KAPALI (`airCurtainWizardGate.ts`);
+                bugün bu buton yalnız sessiz fan sayfasında çıkar. */}
             <BottomCTA
-                onOpenWizard={isAirCurtain || isSilentFan ? () => setWizardOpen(true) : undefined}
+                onOpenWizard={sihirbazGirisi ? () => setWizardOpen(true) : undefined}
                 onShowProducts={handleShowProducts}
-                showWizard={isAirCurtain || isSilentFan}
+                showWizard={sihirbazGirisi}
                 categoryName={vm?.displayName || t('category.landing.venthubSolution')}
             />
 
-            {isAirCurtain && (
+            {havaPerdesiSihirbazi && (
                 <EnhancedNeedsWizard
                     isOpen={wizardOpen}
                     onClose={() => setWizardOpen(false)}
@@ -244,11 +270,11 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                 />
             )}
 
-            {isSilentFan && (
+            {sessizFanSerisi !== null && (
                 <SilentFanWizard
                     isOpen={wizardOpen}
                     onClose={() => setWizardOpen(false)}
-                    familySlug={SESSIZ_FAN_SERISI}
+                    familySlug={sessizFanSerisi}
                 />
             )}
         </div>

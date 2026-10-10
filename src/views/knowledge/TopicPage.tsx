@@ -18,7 +18,7 @@ interface TopicPageProps {
 }
 
 const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
   const params = useParams()
   const currentSlug = propSlug || (params?.slug as string)
@@ -146,7 +146,7 @@ const TopicPage: React.FC<TopicPageProps> = ({ slug: propSlug }) => {
           {/* Action Footer */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link
-              href={(currentSlug ? getCategoryUrlFromTopic(currentSlug) : '/products') as import('next').Route}
+              href={getCategoryUrlFromTopic(currentSlug ?? '', lang) as import('next').Route}
               className="group inline-flex items-center gap-4 bg-slate-950 text-white px-12 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-cyan-600 transition-transform shadow-2xl active:scale-95"
             >
               {t('knowledge.topic.toProducts')} <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />

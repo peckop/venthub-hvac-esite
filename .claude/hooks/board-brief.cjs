@@ -35,6 +35,19 @@ try {
   board = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'board.cjs'))
 } catch { process.exit(0) } // pano yoksa sessizce geç (koordinasyon katmanı fail-open)
 
+// ⭐RECEP SÖZÜ DEFTERİ (REC-554, karar 218/224): Recep'in KENDİ mesajı ortak deftere yazılır, OPS görür (iki yön).
+// Pano okuması (aşağıdaki try) hata verip çıkış yapsa bile kayıt kaybolmasın diye ONDAN ÖNCE. Fail-open: modül yok/bozuksa
+// kanca eskisi gibi çalışır. Bilmek yetki taşımaz; ayrıntı ve sınırlar: scripts/board/recep-sozu-defteri.cjs.
+let recepDefteri = null
+try { recepDefteri = require(path.join(__dirname, '..', '..', 'scripts', 'board', 'recep-sozu-defteri.cjs')) } catch { recepDefteri = null }
+let recepRol = ''
+if (recepDefteri) {
+  try {
+    recepDefteri.kaydet(input, { board })
+    recepRol = recepDefteri.rolBul(sid, board).rol
+  } catch { /* kayıt kancayı asla düşürmez */ }
+}
+
 /** Loop hatırlatması bu yaştan sonra susar — sürekli nag etmesin (T085-VH). */
 const LOOP_HATIRLATMA_PENCERESI_MS = 2 * 60 * 60 * 1000
 
@@ -121,12 +134,19 @@ async function linearCizgisi() {
 void (async () => {
 const linear = await linearCizgisi()
 
-// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok ise
+// Recep sözü defteri satırları (REC-554): yeni söz varsa konuşur, yoksa susar. Okuma imleci ilerler.
+let recepSatirlari = []
+if (recepDefteri) {
+  try { recepSatirlari = recepDefteri.gorunur({ sid, rol: recepRol }) } catch { recepSatirlari = [] }
+}
+
+// SESSIZLIK KURALI KORUNDU: pano bos + serit alinmis + Linear'da yeni yorum yok + defterde yeni soz yok ise
 // brifing hic akmaz.
-if (others.length === 0 && notes.length === 0 && seritAldiMi && !linear) process.exit(0)
+if (others.length === 0 && notes.length === 0 && seritAldiMi && recepSatirlari.length === 0 && !linear) process.exit(0)
 
 const lines = []
 if (linear) lines.push(linear)
+for (const s of recepSatirlari) lines.push(s)
 /**
  * ⭐ÖZET SATIR (REC-345 Kova C, 2026-09-17) — tam desen listesi HER TURDA basılmaz.
  *
@@ -150,7 +170,20 @@ function istemYollari(metin) {
 
 if (others.length > 0) {
   const yollar = istemYollari(input.prompt)
+  // PENCERE ADI (REC-404): pano sid ile, SendMessage pencere adıyla çalışır; eşleme satırda görünür ve
+  // aynı ad iki CANLI sid'de ise ⚠ÇAKIŞMA basılır. FAIL-OPEN: eski board.cjs'te `pencereAdlari` yoksa ya da
+  // kayıt okunamazsa ad yazılmaz, satır aynen eskisi gibi basılır (özet satırı ad yüzünden düşmez).
+  let adlar = new Map()
+  try { if (typeof board.pencereAdlari === 'function') adlar = board.pencereAdlari() } catch { adlar = new Map() }
+  const adSayac = new Map()
+  for (const c of hepsi) {
+    const ad = adlar.get(c.sid)
+    if (ad && !c.bayat) adSayac.set(ad, (adSayac.get(ad) || 0) + 1)
+  }
   lines.push('PANO: ' + others.map(c => {
+    const ad = adlar.get(c.sid)
+    const adEt = ad ? `[${ad}]` : ''
+    const adCak = ad && !c.bayat && adSayac.get(ad) > 1 ? ' ⚠ÇAKIŞMA(aynı ad, ListAgents [ref] ile gönder)' : ''
     const bayat = c.bayat ? ` ⚠BAYAT ${c.yasDk}dk atış yok, bırakılmadı` : ''
     const globs = Array.isArray(c.globs) ? c.globs : []
     let degen = []
@@ -158,14 +191,18 @@ if (others.length > 0) {
       degen = globs.filter(g => yollar.some(y => board.globToRegExp(g).test(y)))
     } catch { degen = [] } // eşleyici yoksa özet yine basılır; ayrıntı düşer, satır düşmez
     const ek = degen.length > 0 ? `; istemdeki yola değen: ${degen.join(' ')}` : ''
-    return `${c.lane}=${String(c.sid).slice(0, 8)} (${globs.length} desen, ${c.yasDk}dk${ek})${bayat}`
+    return `${c.lane}${adEt}=${String(c.sid).slice(0, 8)} (${globs.length} desen, ${c.yasDk}dk${ek})${adCak}${bayat}`
   }).join(' · '))
 }
+// KARAR 117 (Recep, 2026-09-25): bu satır eskiden her turda "CronCreate ile 30dk tur kur"
+// diyordu; karar 53 ("zamanlayıcı gerekiyorsa ÖNCE Recep ile konuş") ile çelişiyordu ve her
+// turda tekrarlandığı için kazanan oydu. Recep'in sözü: "ihtiyaca göre önce konu bana gelir,
+// gerekiyorsa da gerçekten ölçüm ile karar verilir." Satır artık kurdurmaz, sordurur.
 if (!seritAldiMi) {
   lines.push(
-    'LOOP: zincirin kurulu değilse docs/standards/session-loop-ritual.md KOMUT-B ile kur ' +
-    '(OPS-AUDIT oturumuysan KOMUT-A) + yedek olarak CronCreate ile 30dk recurring tur kur ' +
-    '(dakika 0/30 dışı). Şerit talep edince bu satır kendiliğinden susar.',
+    'LOOP: bu oturum henüz şerit almadı. Tekrarlanan tur (loop/cron/uyandırma) gerekiyorsa ' +
+    'KURMADAN ÖNCE Recep ile konuş; gereklilik ölçümle gösterilir (karar 117). Nasıl kurulacağı: ' +
+    'docs/standards/session-loop-ritual.md. Şerit talep edince bu satır kendiliğinden susar.',
   )
 }
 // YÖNTEM işareti (T144-VH): yalnız pano konuştuğunda (sessizlik kuralına tabi) tek satır —

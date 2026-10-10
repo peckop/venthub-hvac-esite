@@ -1,0 +1,271 @@
+{
+  "_aciklama": "Rol kartlarının Amaç ve Düzenli görevler verisi (OPS-27, HRT-24). Yöneten cetvel: docs/standards/duzenli-gorevler-standard.md. Üretici (scripts/belge/rol-karti-uret.cjs) kartın Amaç bölümünü ve docs/roller/<ROL>-gorevler.md tablosunu BURADAN yazar; o dosyalar elle düzenlenmez. Bağlı: evet yalnız tetik gerçekten kuruluysa yazılır (test iş akışı/betik dosyasını okuyup doğrular).",
+  "roller": {
+    "GEO-SEO": {
+      "amac": "Müşterinin bizi arama motorlarında ve yapay zekâ cevaplarında bulabilmesini ölçer ve korur; yayından sonra görünürlük bozulursa (kırık adres, dizinden düşen sayfa, yanlış başlık) aynı gün sahibine yazar.",
+      "gorevler": [
+        {
+          "gorev": "Dağıtım sonrası canlı kapı: yayındaki siteyi tek geçişte ölç (adres, başlık, açıklama, hreflang, yetim sayfa, llms.txt)",
+          "komut": "scripts/seo/canli-kapi.mjs",
+          "siklik": "her-dagitim-gunluk",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows altında workflow_run (başarılı production dağıtımı) + günlük schedule; karar 260 ve 261, iskelet ARC-26 (iş akışı sahibi ARAÇ), kontrol içeriği SEO-15",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Her yeni KIRMIZI için ilgili Kanban kartı (bilinen kırmızılar --bilinen ile kart numarasıyla taşınır)",
+          "esik": "Yeni KIRMIZI 0 (cetvel Y3)"
+        },
+        {
+          "gorev": "Haftalık veri incelemesi: Search Console ve Bing verisini kendi verimizden oku (aynı aramada yarışan sayfalar, dizinlenme oranı, düşen ve ilk 10'a giren sayfalar, son 60 günde değişene dokunma kuralı)",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "istem satırında \"SEO haftalık: N gün\" (7 gün eşik); satırı ARAÇ kuruyor, ARC-28; incelemenin kendisi SEO-17",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Tek rapor (docs/audits/seo-haftalik-<tarih>.md) ve en önemli 5 iş; her iş için kart önerisi OPS'a",
+          "esik": "TASLAK: geçti/kaldı ölçütünü GEO-SEO belirler (SEO-17); kural: son 60 günde değişen sayfa için iş önerilmez.",
+          "taslak": true
+        },
+        {
+          "gorev": "Aylık resmi belge incelemesi: Google Search Central ve Bing Webmaster belgelerinde değişen hüküm var mı, cetvellerimiz hâlâ uyuyor mu",
+          "siklik": "aylik",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows altında aylık schedule (karar 260); iş akışı ARAÇ'ta ARC-27, resmi kaynak listesi SEO-16 (GEO-SEO)",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Değişen hüküm başına Kanban kartı ve cetvel güncellemesi (cetvel sahibi GEO-SEO)",
+          "esik": "TASLAK: hangi belgelerin kapsandığını GEO-SEO teyit eder.",
+          "taslak": true
+        },
+        {
+          "gorev": "Yayın öncesi liste: adres ağacı, şablon ya da site haritası değiştiren işte taban ölçümü ve ön izleme koşusu (cetvel Y2 taban ve ön izleme satırları)",
+          "komut": "scripts/seo/adres-yayin-denetim.mjs",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs: arama görünürlüğüne dokunan kartta Y2 koşu notunu istemek (henüz yok)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Kusur listesi sahibine (cetvel Y4); taban dosyasının yolu Kanban kartına",
+          "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
+        }
+      ]
+    },
+    "HARITA": {
+      "amac": "Belge ve hafıza düzenini güncel, bulunabilir ve tutarlı tutar; bayat belge, kırık yol ya da cetvelsiz iş yüzünden bir ekibin yanlış bilgiyle çalışması önce mesaj satırında, sonra kartta görünür.",
+      "gorevler": [
+        {
+          "gorev": "Belge tazelik ölçümü: çekirdek belge yaşı (CLAUDE.md, docs/README.md), bu iki belgedeki kırık yol, kod haritası yaşı ve hafıza indeksi (MEMORY.md) boyutu",
+          "komut": "scripts/belge/belge-tazelik.cjs",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": ".claude/hooks/belge-satiri.cjs her mesajda önbelleği okur, 6 saatten eskiyse ölçümü arka planda başlatır ve eşik aşılınca ⚠BELGE satırını basar (REC-400 D2; kanca kurulumu ARAÇ'ın)",
+          "bagli": "evet",
+          "cikti": "⚠BELGE satırı her mesajda (eşik üstündeyse); bayat ya da kırık belge için HARİTA kartı",
+          "esik": "Çekirdek belge 14 gün, kod haritası 7 gün, kırık yol 1, hafıza indeksi 160 satır ya da 20.000 bayt (yumuşak), önbellek 24 saat (belge-yonetimi-standard.md eşik tablosu)"
+        },
+        {
+          "gorev": "Rol kartları, kurallar dosyaları ve açılış özetinin üreticiyle birebir kalması ve bayt sınırlarının aşılmaması",
+          "komut": "scripts/belge/rol-karti-uret.cjs",
+          "siklik": "olay",
+          "tetik": "actions",
+          "tetikAyrinti": "scripts/ci/test-haritasi.json haritasıyla ci iş akışının Test adımı (.github/workflows/ci.yml) değişen dosyaya göre src/__tests__/conformance/rol-kartlari.test.ts'i seçer; test üreticiyi --kontrol ile koşar (INV-ROL-1)",
+          "bagli": "evet",
+          "cikti": "Kırmızı ci (PR birleşmez); düzeltmeyi HARİTA yapar",
+          "esik": "Üretici --kontrol çıkış 0; en büyük kart 6.255 bayt ya da altı (sert sınır 6.656); açılış özeti 2.048 bayt ya da altı; hiçbir kural kayıp değil (INV-ROL-1)"
+        },
+        {
+          "gorev": "Kart plan kapısı: yeni kartın planı (amaç, önceki çalışma, adımlar, sor-noktaları) eksiksiz mi",
+          "komut": "scripts/belge/kart-plan-kapisi.cjs",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "Kart açılırken ya da Review'a geçerken kendiliğinden çağıran bağ yok: kapı yalnız elle (kart sahibi) ve conformance testinde koşuyor (HARİTA ölçümü 10-09: iş akışı, kanca ve scripts/board içinde çağrı yok); kanca altyapısı gerekirse ARAÇ'ın",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Eksik alanların listesi kart sahibine; kurulunca planı eksik kart Review'a geçmez",
+          "esik": "GEÇTİ: plan iskeleti eksiksiz (docs/standards/kart-plani-standard.md)"
+        }
+      ]
+    },
+    "TAKIP": {
+      "amac": "Kullandığımız dış araçların (Claude Code, WrongStack, notebooklm-py) yeni sürümünü ve bağlantı kopukluğunu işimizi aksatmadan yakalar; faydasını, riskini ve işin kime düştüğünü ölçüp yazar, böylece yükseltme sürpriz, kopukluk sessiz kalmaz.",
+      "gorevler": [
+        {
+          "gorev": "WrongStack sürüm farkı: kurulu sürümle GitHub son etiketini karşılaştır, yeni sürümün faydasını, riskini ve işin kime düştüğünü yaz",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": ".claude/hooks/wrongstack-satiri.cjs ⚠WRONGSTACK satırı farkı gösteriyor (ARC-24, karar 257; ağ ölçümü günde en çok bir kez, önbellekli); ikinci tetik Actions günlük etiket kontrolü: iş akışı PR'ı ARC-74'te hazırlanıyor, birleşmedi (kuracak: ARAÇ)",
+          "bagli": "evet",
+          "cikti": "OPS'a tek tablo (ne çıktı · bize faydası · risk · kime iş); yükseltme hazırlığı için ARAÇ panosuna kart",
+          "esik": "TASLAK: fark 0 ise rapor yok; son etiket kurulu sürümden büyükse rapor; GitHub'da olup npm'de olmayan etiket ayrı yazılır (1.0.30, 1.0.31, 1.0.34 örneği)",
+          "taslak": true
+        },
+        {
+          "gorev": "Claude Code sürümü: kurulu sürümle npm latest'i karşılaştır, değişiklik kaydından bize dokunan maddeleri ayıkla (claude --version, npm view @anthropic-ai/claude-code dist-tags)",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "Claude Code için istem satırı yok; ⚠WRONGSTACK gibi bir sürüm satırı kurulacak (satır tasarımı HARİTA, kanca altyapısı gerekirse ARAÇ)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "OPS'a tek tablo; güncelleme kartı ARAÇ'a (pencereler kapalıyken yapılır)",
+          "esik": "TASLAK: kurulu sürüm latest'ten küçükse rapor; güvenlik etiketli madde varsa aynı gün, yoksa beklet",
+          "taslak": true
+        },
+        {
+          "gorev": "MCP bağlantı sağlığı: bağlanamayan ya da kimlik bekleyen sunucuyu bul, sebebini ölç, sahibine kart aç (claude mcp list)",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "Tekrarlanan satır ya da kapı yok: Claude Code açılışta \"bağlanamadı\" bildirimini bir kez gösteriyor; notebooklm-py bu yüzden 09-09'dan beri kopuk kaldı ve kimse sebebini aramadı (ARC-70); pencere açılışında koşması hedeflenir",
+          "bagli": "hayir",
+          "baglayacak": "ARAC",
+          "cikti": "Sahibine sebebi ölçülmüş Kanban kartı",
+          "esik": "TASLAK: bağlanamayan sunucu 0; kimlik bekleyen ayrı sayılır",
+          "taslak": true
+        },
+        {
+          "gorev": "Bağımlılık güncelleme önerileri: her açık güncelleme PR'ı için birleştir / önce sına / kapat hükmü yaz",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "⚠BAGIMLILIK satırı son tarama süresini ve high sayısını gösteriyor, açık güncelleme PR sayısını göstermiyor (TAKİP satır metninden çıkardı, kanca okunmadı); sayıyı gösteren satırı HARİTA tasarlayacak, kanca altyapısı gerekirse ARAÇ",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "PR'a hüküm notu ve OPS'a tek tablo; birleştirmeyi ya da kapatmayı ARAÇ ya da OPS yapar, TAKİP yapmaz",
+          "esik": "TASLAK: hükümsüz açık güncelleme PR'ı 0",
+          "taslak": true
+        }
+      ]
+    },
+    "ALTYAPI": {
+      "amac": "Siteye giren her değişikliğin otomatik kontrollerden geçmesini ve kullandığımız paketlerdeki bilinen güvenlik açıklarının zamanında kapanmasını sağlar; bozulursa hatalı kod canlıya girer ya da açık fark edilmeden kalır.",
+      "gorevler": [
+        {
+          "gorev": "PR kapıları: her pull request'te kayıt kapısı, lint, tip denetimi, edge korumaları, test ve derleme (ayrıca admin-smoke ve catalog-integrity)",
+          "siklik": "olay",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/ci.yml her pull request'te koşar (pull_request); admin-smoke ve catalog-integrity kapıları da iş akışlarında tanımlı",
+          "bagli": "evet",
+          "cikti": "PR kontrol durumu; kırmızı PR sahibine döner",
+          "esik": "Tüm kontroller yeşil olmadan birleşme yok (merge-ritueli.cjs bunu doğrular)"
+        },
+        {
+          "gorev": "Bağımlılık denetimi: kilitli sürümlerde bilinen güvenlik kaydı var mı",
+          "komut": "scripts/hijyen/bagimlilik-denetimi.cjs",
+          "siklik": "haftalik",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/bagimlilik-denetimi.yml haftalık schedule (pazartesi) ve kilit dosyası değişince pull_request",
+          "bagli": "evet",
+          "cikti": "Kırmızıda ALTYAPI kartı; kayıt docs/audits/bagimlilik-<tarih>.md ve kabul listesi",
+          "esik": "Kabul listesinde olmayan yüksek/kritik kayıt 0 ve listede kalıp kapanmış kayıt 0 (bagimlilik-kararlari.md §7, bagimlilik-guvenlik-yukseltme-standard.md §11)"
+        },
+        {
+          "gorev": "Bağımlılık tarama tazeliği: son taramanın yaşı her mesajda görünür, eşik aşılınca uyarı satırı çıkar",
+          "siklik": "haftalik",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": ".claude/hooks/defter-tazelik-satiri.cjs son tarama yaşını okur ve eşik (BAGIMLILIK_ESIK_GUN) aşılınca ⚠BAGIMLILIK satırını basar",
+          "bagli": "evet",
+          "cikti": "⚠BAGIMLILIK uyarı satırı; taramayı ALTYAPI koşar",
+          "esik": "14 gün (karar 13, kancadaki BAGIMLILIK_ESIK_GUN)"
+        },
+        {
+          "gorev": "Font ön yükleme ölçümü: derlemede beklenen fontun ön yüklendiği doğrulanır",
+          "komut": "scripts/ci/font-preload-olc.cjs",
+          "siklik": "olay",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/e2e-smoke.yml (pull_request) font ölçümünü çağırır",
+          "bagli": "evet",
+          "cikti": "Kırmızıda PR durur",
+          "esik": "Kapalı kipte yalnız Inter; TASARIM Faz 2b'de Archivo beklenir, o PR'da eşik değişir"
+        },
+        {
+          "gorev": "Dependabot PR'ları: haftalık açılan PR'ları gözden geçirip birleştir ya da gerekçeyle kapat",
+          "siklik": "haftalik",
+          "tetik": "actions",
+          "tetikAyrinti": "Dependabot PR'ları haftalık açılıyor; bunları ele alan kendiliğinden bir tetik kurulu değil (kuracak: ALTYAPI)",
+          "bagli": "hayir",
+          "baglayacak": "ALTYAPI",
+          "cikti": "Birleşme ya da gerekçeli kapatma (bagimlilik-kararlari.md §7 kaydı)",
+          "esik": "TASLAK: açık Dependabot PR'ı 7 günden eski kalmaz (eşik cetvelde yok, teyidi ALTYAPI'da)",
+          "taslak": true
+        },
+        {
+          "gorev": "Canlı adres matrisi: yayın ya da anahtar açılışı sonrası canlıda her adresin son durumu ve sıçrama sayısı",
+          "komut": "scripts/adres/matris.cjs",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "Yayın ya da anahtar açılışı kartında matris koşusunu kendiliğinden isteyen kapı yok (kuracak: HARİTA, scripts/belge/kart-plan-kapisi.cjs)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "docs/audits/adres-matrisi-<tarih>.json ve kusur için Kanban kartı",
+          "esik": "TASLAK: hata satırı 0 ve dilsiz adreslerde --dilsiz-hop-en-cok değerinin altı (rota-dili-standard.md; ölçüt ALT-14 canlı ölçümünden)",
+          "taslak": true
+        }
+      ]
+    },
+    "TASARIM": {
+      "amac": "Yeni görünümün Design'ın çizdiği ekranla birebir aynı olmasını ve tasarım sisteminin (renk, yazı tipi, boşluk) koddaki kopyasının Design'dan sapmamasını sağlar; bozulursa müşteri tutarsız, okunaksız ya da erişilemeyen bir site görür.",
+      "gorevler": [
+        {
+          "gorev": "Token, palet ve görünüm kapılarını her değişiklikte koştur: marka paleti (INV-PALET-1), Tailwind sınıf geçerliliği ve AA kontrast, storefront stil çıtası, admin tema değişmezleri, görünüm anahtarı testi",
+          "siklik": "her-dagitim",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/ci.yml pull_request ve master push'ta koşar",
+          "bagli": "evet",
+          "cikti": "Kırmızı test PR'ı kilitler; kusur PR sahibine ve ilgili Kanban kartına",
+          "esik": "Düşen test 0 (merge ritüeli)"
+        },
+        {
+          "gorev": "Erişilebilirlik tabanı: ana sayfa TR 390 px axe taraması tabandan artmaz (e2e/axe-anasayfa.e2e.ts, INV-AXE-1; kapı sahibi ALTYAPI)",
+          "siklik": "her-dagitim",
+          "tetik": "actions",
+          "tetikAyrinti": ".github/workflows/e2e-smoke.yml pull_request ve master push'ta koşar; playwright e2e/ altındaki axe spec'ini topluyor (testMatch **/*.e2e.ts)",
+          "bagli": "evet",
+          "cikti": "Kırmızı kapı PR'ı kilitler; kusur Kanban kartı",
+          "esik": "Taban 0 ihlal; color-contrast \"karar verilemedi\" tavanı 17, artarsa kırmızı (ALTYAPI #1708)"
+        },
+        {
+          "gorev": "Yeni görünüm bayrağını (YENI_GORUNUM) ya da yazı tipini değiştiren her işte bayrak AÇIK geçici dalla KAPALI dalı kıyasla: erişilebilirlik tabanı, font preload sayımı (M6, Linux/CI), admin ekranı yazı tipi aynı",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs'e bu ölçüm satırını istetmek (henüz yok; kuracak: HARİTA)",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Ölçüm tablosu PR gövdesine; fark Kanban kartı TASARIM'a, admin farkı ADMIN'e",
+          "esik": "TASLAK: bayrak kapalıyken fark 0; açıkken preload ve axe tavanını ALTYAPI (M6, M3) belirler, ALTYAPI teyit eder",
+          "taslak": true
+        },
+        {
+          "gorev": "Tasarım sistemi kopyasının koddaki adlarla eşitliği: Design'daki adlar (bugün 66) ile :root ve Tailwind adlarını karşılaştır (INV-TOKEN-PARITE-1)",
+          "siklik": "her-dagitim",
+          "tetik": "actions",
+          "tetikAyrinti": "Design kopyası (ds-kaynak) ve kapı henüz yok; yeni iş akışı ya da ci içinde test olarak kurulacak (kuracak: ALTYAPI)",
+          "bagli": "hayir",
+          "baglayacak": "ALTYAPI",
+          "cikti": "Eksik ya da değeri farklı ad için Kanban kartı TASARIM'a; Design önerisi \"öneri\" diye kayda geçer",
+          "esik": "TASLAK: eksik ve farklı değerli ad 0; ALTYAPI ile teyit",
+          "taslak": true
+        },
+        {
+          "gorev": "Design'ın yeni yorumunu ve cevabını oku ve kayda geçir (öneri diye işaretle, karar sayma; OPS'a bildir)",
+          "komut": "scripts/board/linear-okundu.cjs",
+          "siklik": "olay",
+          "tetik": "istem-tazelik",
+          "tetikAyrinti": "scripts/board/linear-yeni-yorum.cjs istem satırındaki \"LINEAR: N yeni yorum\" satırını üretir ve metni okundu komutunu verir (kanca .claude/hooks/board-brief.cjs, .claude/settings.json'da bağlı); sayaç dört Design projesinin (MENU, KATALOG, MARKA, BELGE) ve ALTYAPI'nın proje yorumlarını sayar, aynı şeridin kendi yorumlarını saymaz",
+          "bagli": "evet",
+          "cikti": "Kanban kartı notu ve OPS'a mesaj; karar OPS'tan",
+          "esik": "TASLAK: okunmamış Design yorumu 0; süre eşiğini OPS belirler",
+          "taslak": true
+        },
+        {
+          "gorev": "Yapılan ekranı Design karesiyle yan yana ölç (kare kabul ölçüm satırı, skill venthub-tasarim-dili)",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "scripts/belge/kart-plan-kapisi.cjs kare kabul satırını istemiyor (henüz yok; kuracak: HARİTA); bir ekranı değiştiren her PR'da",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "PR gövdesine kare numarası ve ölçüm satırı; fark Kanban kartı ÜRÜN'e (sayfa) ya da TASARIM'a (token, bileşen)",
+          "esik": "TASLAK: geçti/kaldı ölçütü venthub-tasarim-dili skill'indeki ölçüm satırıdır; TASARIM teyit eder",
+          "taslak": true
+        }
+      ]
+    }
+  }
+}

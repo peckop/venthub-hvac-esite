@@ -25,6 +25,7 @@ import { BrandIcon } from '../../components/HVACIcons'
 import ImageGallery from '../../components/ImageGallery'
 import { ProductSmartInference } from '../../components/product/ProductSmartInference'
 import { AddToProjectModal } from '../../components/products'
+import { AileKirintisi } from '../../components/products/AileKirintisi'
 import FamilyCard from '../../components/products/FamilyCard'
 import RichTextRenderer from '../../components/products/RichTextRenderer'
 import { VARIANT_PILL_MAX,VariantSelector } from '../../components/products/VariantSelector'
@@ -37,9 +38,11 @@ import { useProjectLists } from '../../hooks/useProjectLists'
 import { formatCurrency } from '../../i18n/format'
 import { useI18n } from '../../i18n/I18nProvider'
 import { selectVariant } from '../../lib/data/selectVariant'
+import { egriYaklasikMi } from '../../lib/hvac/ductFanSelection'
 import { familyName } from '../../lib/i18n/familyName'
 import { resolveProductImageUrl,storagePathToUrl } from '../../lib/images/productImage'
 import { quoteModeHesapla } from '../../lib/pricing/quoteMode'
+import type { KirintiAdimi } from '../../lib/seo/kirinti'
 import type { FamilyDetail, FamilyVariant } from '../../lib/services/family.service'
 import { getFamiliesEnriched } from '../../lib/services/family.service'
 import { getProductById } from '../../lib/services/product.service'
@@ -56,8 +59,9 @@ import {
   groupTechnicalSpecs,
   SPEC_SORT_ORDER,
   translateSpecKey} from '../../utils/productHelpers'
-import { localizedHref, Routes } from '../../utils/routes'
+import { localizedHref } from '../../utils/routes'
 import { specFieldLabel, specGroupLabel } from '../../utils/specLabel'
+import { adresDili, adresRotalari, modelBaglantiAdresi, modelSecimiHedefi } from '../../utils/yuzeyAdresleri'
 
 /**
  * F5-B W2.2 — PDP artık AİLE kanoniktir.
@@ -86,6 +90,19 @@ export interface ProductDetailPageProps {
    * ve KDV etiketi HİÇ çizilmez; yanlış etiket, eksik etiketten kötüdür.
    */
   priceTaxIncluded?: boolean | null
+  /**
+   * REC-300 Faz 3b (INV-MODEL-SSR-1) — model rotasının (`/tr/urun/<slug>-p-<sku>`) SUNUCUDA
+   * seçtiği SKU. Verilirse `?sku=` köprüsü hiç kurulmaz: seçili model ilk HTML'de çizilir
+   * (JS koşturmayan tarayıcı ve paylaşım önizlemesi de o modeli görür) ve model değişimi o
+   * modelin KENDİ adresine gider. Aile rotası vermez → bugünkü `?sku=` davranışı aynen.
+   */
+  sunucuSku?: string | null
+  /**
+   * URN-21 — görünür kırıntı adımları. SUNUCUDA bir kez kurulur (`aileKirintiAdimlari`) ve JSON-LD
+   * BreadcrumbList'e aynı nesneyle verilir. Eskiden bu bileşen kırıntıyı `useCategories()` bağlamından
+   * kuruyordu; bağlam ilk render'da boş olduğundan ham HTML'de kategori/marka bağlantısı yoktu.
+   */
+  kirinti: KirintiAdimi[]
 }
 
 interface ProductDetailBodyProps extends ProductDetailPageProps {
@@ -125,9 +142,13 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
   variants,
   selectedSku: skuParam,
   priceTaxIncluded = null,
+  sunucuSku = null,
+  kirinti,
 }) => {
   const { t, lang } = useI18n()
   const router = useRouter()
+  // REC-300 Faz 3d: kırıntı ve geri dönüş adresleri `adresUret`'ten (kapalıyken bugünkü `localizedHref(Routes…)`).
+  const yuzeyAdresi = adresRotalari(adresDili(lang))
   const pathname = usePathname()
   const { addToCart } = useCart()
   const { isFavorite, toggleFavorite } = useFavorites()
@@ -287,12 +308,24 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
 
   // Varyant seçimi yalnız ?sku='yı günceller — sayfa yeniden yüklenmez, kaydırma korunur.
   const handleSelectVariant = useCallback((sku: string) => {
+    // Karar `modelSecimiHedefi`'nde (URN-31, INV-YAYINDA-MODEL-4): yayındaki listedeki modelin kendi sayfasına GİDİLİR
+    // (push: geri tuşu önceki modele döner); yayında OLMAYAN modelin adresine push EDİLMEZ (404 olurdu) — aile
+    // sayfasında `?sku=` yazıcısı, model sayfasında aile sayfası + `?sku=` adresine gidilir. Adres metni listeden.
+    const hedef = family ? modelSecimiHedefi(adresDili(lang), family.slug, sku, sunucuSku !== null) : { tur: 'sorgu' as const }
+    if (hedef.tur === 'git') {
+      router.push(hedef.adres as Route, { scroll: false })
+      return
+    }
     // Tıklama yalnız istemcide olur — mevcut query'yi konumdan okumak useSearchParams
     // bağımlılığını (ve tüm gövdenin Suspense'e düşmesini) gereksiz kılar.
     const next = new URLSearchParams(typeof window === 'undefined' ? '' : window.location.search)
     next.set('sku', sku)
     router.replace(`${pathname}?${next.toString()}` as Route, { scroll: false })
-  }, [pathname, router])
+  }, [pathname, router, sunucuSku, family, lang])
+
+  // URN-21: Modeller satırlarının gerçek `<a href>` hedefi — adres üreticisinden (bayrak kapalıyken
+  // `?sku=` kipi, K3-b açılınca modelin kendi adresi). Tıklama yine `handleSelectVariant`'tan geçer.
+  const modelAdresi = (sku: string): string => modelBaglantiAdresi(adresDili(lang), family?.slug ?? '', sku)
 
   // Galeri: seçili varyantın görselleri → yoksa ailedeki ilk görselli varyant.
   const galleryImages = useMemo(() => {
@@ -473,31 +506,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
       {/* Seamless Integrated Breadcrumb */}
       <div className="relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-          <nav className="flex items-center space-x-2 text-xs sm:text-xs uppercase tracking-widest font-bold text-steel-gray/60">
-            <Link href={localizedHref('/', lang)} className="hover:text-primary-navy transition-colors">
-              {t('category.breadcrumbHome')}
-            </Link>
-            <ChevronRight size={10} className="flex-shrink-0" />
-            {mainCategory && (
-              <>
-                <Link href={localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang)), lang)} className="hover:text-primary-navy transition-colors">
-                  {getCategoryDisplayName(mainCategory, t)}
-                </Link>
-                {subCategory && subCategory.slug !== mainCategory.slug && (
-                  <>
-                    <ChevronRight size={10} className="flex-shrink-0" />
-                    <Link href={localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), lang)} className="hover:text-primary-navy transition-colors">
-                      {getCategoryDisplayName(subCategory, t)}
-                    </Link>
-                  </>
-                )}
-                <ChevronRight size={10} className="flex-shrink-0" />
-              </>
-            )}
-            <span className="text-industrial-gray truncate max-w-150px sm:max-w-none">
-              {gorunenAileAdi}
-            </span>
-          </nav>
+          <AileKirintisi adimlar={kirinti} lang={lang} etiket={t('category.breadcrumbAria')} />
         </div>
       </div>
 
@@ -510,8 +519,8 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             try { stack = typeof window !== 'undefined' ? JSON.parse(sessionStorage.getItem('vh_nav_stack') || '[]') : []; } catch { stack = []; }
             const lastSafeStop = stack[stack.length - 1];
             if (lastSafeStop) { router.push(localizedHref(lastSafeStop, lang), { scroll: false }); }
-            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), lang), { scroll: false }) }
-            else if (mainCategory) { router.push(localizedHref(Routes.category(getLocalizedCategorySlug(mainCategory, lang)), lang), { scroll: false }) }
+            else if (subCategory && mainCategory && subCategory.slug !== mainCategory.slug) { router.push(yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang), getLocalizedCategorySlug(subCategory, lang)), { scroll: false }) }
+            else if (mainCategory) { router.push(yuzeyAdresi.category(getLocalizedCategorySlug(mainCategory, lang)), { scroll: false }) }
             else { router.push(localizedHref('/', lang), { scroll: false }) }
           }}
           className="flex items-center space-x-2 text-steel-gray hover:text-primary-navy mb-6 sm:mb-8 transition-colors group font-bold text-xs uppercase tracking-widest"
@@ -626,6 +635,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                   variants={variants}
                   selectedSku={selectedVariant.sku}
                   onSelect={handleSelectVariant}
+                  modelAdresi={modelAdresi}
                   quoteMode={quoteMode}
                   priceTaxIncluded={priceTaxIncluded}
                 />
@@ -651,7 +661,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
             {/* Price Area - Elegant & Technical */}
             <div className="mb-6 p-5 bg-white rounded-2xl border border-light-gray shadow-sm relative overflow-hidden group">
               <div className="flex flex-col relative z-10">
-                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{t('pdp.priceAvailability')}</span>
+                <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal mb-1 opacity-60">{/* URN-60: teklif kipinde "Fiyat & Stok" başlığı yanlış vaat (fiyat/stok gösterilmiyor);
+                    kip `quoteMode` tek kaynağından (satis-kipi-gecis) okunur. */}
+                  {quoteMode ? t('pdp.quoteLabel') : t('pdp.priceAvailability')}</span>
                 <div className="flex items-baseline justify-between">
                   <div className="flex flex-col">
                     <div className="text-3xl sm:text-4xl font-black text-primary-navy tracking-tight">
@@ -689,7 +701,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                         Kardeş yüzeyler bu çözücüye çoktan geçmişti (VariantSelector:78,
                         JSON-LD `mpn`); geride kalan tek yer burasıydı. */}
                     {variantLabel && (
-                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.sku')}: {variantLabel}</span>
+                      <span className="text-xs text-steel-gray font-bold mt-1.5 opacity-50 uppercase tracking-widest">{t('pdp.labels.modelCode')}: {variantLabel}</span>
                     )}
                   </div>
                 </div>
@@ -959,7 +971,9 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                               </div>
                             ))}
                             <div className="flex justify-between items-center py-4 px-4 bg-slate-50 rounded-xl mt-4">
-                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{t('common.listingPrice')}</span>
+                              {/* URN-83: teklif kipinde "Liste Fiyatı: Teknik Teklif İste" çelişkisi — fiyat yok, etiket de "fiyat"
+                                  demez. Üstteki fiyat bloğundaki URN-60 düzeltmesinin aynısı; kip `quoteMode` tek kaynağından. */}
+                              <span className="text-xs font-bold text-steel-gray uppercase tracking-hvac-normal">{quoteMode ? t('pdp.quoteLabel') : t('common.listingPrice')}</span>
                               <span className="text-lg font-black text-primary-navy">
                                 {quoteMode ? t('pdp.techQuote') : formatCurrency(Number(selectedVariant.price ?? 0), lang, { currency: 'TRY', maximumFractionDigits: 0 })}
                               </span>
@@ -977,6 +991,7 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                           variants={variants}
                           selectedSku={selectedVariant.sku}
                           onSelect={handleSelectVariant}
+                          modelAdresi={modelAdresi}
                           quoteMode={quoteMode}
                           priceTaxIncluded={priceTaxIncluded}
                         />
@@ -1009,7 +1024,14 @@ const ProductDetailBody: React.FC<ProductDetailBodyProps> = ({
                                     {Object.entries(group.specs).sort(([kA], [kB]) => (SPEC_SORT_ORDER[kA] || 99) - (SPEC_SORT_ORDER[kB] || 99)).map(([key, val]) => (
                                       <div key={key} className="flex justify-between items-center py-2.5 border-b border-light-gray/20 last:border-0 md:last:border-b group hover:bg-slate-50 px-2 rounded-lg transition-colors">
                                         <span className="text-xs font-bold text-steel-gray uppercase tracking-wider">{specFieldLabel(key, t)}</span>
-                                        <span className="text-xs font-black text-industrial-gray">{formatSpecValue(key, val)}</span>
+                                        <span className="text-xs font-black text-industrial-gray text-right">
+                                          {formatSpecValue(key, val, t)}
+                                          {key === 'pq_curve' && egriYaklasikMi(val) && (
+                                            <span className="block text-xs font-normal normal-case tracking-normal text-steel-gray" data-testid="yaklasik-egri-notu">
+                                              {t('pdp.labels.approxCurve')}
+                                            </span>
+                                          )}
+                                        </span>
                                       </div>
                                     ))}
                                   </div>
@@ -1078,8 +1100,12 @@ const PdpSkuBridge: React.FC<ProductDetailPageProps> = (props) => {
  * tam gövdedir: statik ön-render'da HTML gerçek ürün içeriğiyle çıkar (SEO/LCP),
  * istemci hidrasyonunda ?sku= seçimi devralır.
  */
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) => (
-  <Suspense fallback={<ProductDetailBody {...props} selectedSku={null} />}>
-    <PdpSkuBridge {...props} />
-  </Suspense>
-)
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = (props) =>
+  // Model rotası seçimi sunucuda yaptı: köprü ve Suspense GEREKMEZ (useSearchParams yok).
+  props.sunucuSku ? (
+    <ProductDetailBody {...props} selectedSku={props.sunucuSku} />
+  ) : (
+    <Suspense fallback={<ProductDetailBody {...props} selectedSku={null} />}>
+      <PdpSkuBridge {...props} />
+    </Suspense>
+  )

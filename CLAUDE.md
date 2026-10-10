@@ -1,7 +1,7 @@
 # CLAUDE.md — VentHub HVAC
 
 > Bu dosya her oturumda otomatik yüklenir. **Kısa ve yüksek sinyalli** tutulur.
-> Kapsamlı referans için → **`CONTEXT.md`** (NotebookLM üretir, elle yeniden yazma).
+> Kapsamlı harita için → **`docs/README.md`** (tek giriş haritası). `CONTEXT.md` emekli (2026-09-29).
 > Milestone/DI detayı → `PROJECT.md` · Üretilmiş master MD'ler → `docs/`
 
 ## Proje Özeti
@@ -52,8 +52,8 @@ supabase/
 ├── functions/   # Edge Functions (Deno/TS) · migrations/ # PostgreSQL migration'ları
 ```
 
-Karar: Rota mı → `app/` · Sayfa görünümü mü → `views/` · Tekrar kullanılır UI mı →
-`components/` · Veri/servis mi → `lib/services/` (DI) · Hook mu → `hooks/` ·
+Karar: Rota mı → `src/app/` · Sayfa görünümü mü → `src/views/` · Tekrar kullanılır UI mı →
+`src/components/` · Veri/servis mi → `src/lib/services/` (DI) · Hook mu → `src/hooks/` ·
 DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql` — damga **14 hane**;
 8 haneli `YYYYMMDD_` biçimi INV-MIGRATION-2 kapısında KIRMIZI verir, 2026-08-31'de sahada ölçüldü).
 
@@ -62,8 +62,8 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 1. **No-Plan-No-Code:** Değişiklikten önce plan çıkar, onay al. Plan, **kendisini hangi cetvelin
    yönettiğini** söylemeli: ya `docs/standards/` altından bir dosya adı, ya açıkça "cetvel yok".
    "Cetvel yok" geçerli bir cevap ama **bedava değil** — o zaman iş, cetveli yazmayı da kapsar.
-   **İş emri de aynı kurala tabidir (2026-08-20):** registry'de açılan her görevin
-   açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
+   **İş emri de aynı kurala tabidir (2026-08-20):** Kanban'da açılan her kartın (iş emri;
+   Linear 2026-10-01'den beri donuktur, karar 219; 2026-10-08'de iş kaydı olarak emekli edildi, karar 324 — yalnız Design yorum kanalı ve eski kayıt arşivi kaldı) açıklamasında zorunlu **KAYNAK/CETVEL bloğu** bulunur — yöneten cetvel dosya adları +
    karne/ölçüm tazeliği; cetvel yoksa açıkça "cetvel yok — yazımı bu işin kapsamında" yazılır.
    Emri açan (orkestratör dahil) önce docs/README haritasına ve ikize "bu konuda mevcut
    cetvel var mı" diye SORAR. (Niçin: 2026-08-20'de ERP yetenek çerçeveleri zaten yazılıyken
@@ -71,7 +71,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
    "hatırlanan" değil "emre yazılan" şey olmalı.)
    (Niçin: 2026-08-15'te 1044 fiyat satırı prod'a yazıldı ve vitrin değişmedi; sebebi render/önbellek
    cetvelinin hiç yazılmamış olmasıydı — hata tam o boşlukta yaşadı ve hiçbir kapı görmedi.)
-2. **Dependency Injection:** Tüm `lib/services/*` fonksiyonları ilk parametre olarak
+2. **Dependency Injection:** Tüm `src/lib/services/*` fonksiyonları ilk parametre olarak
    `supabase: SupabaseClient<Database>` alır. Modül düzeyinde statik client importu yok.
    (ESLint `no-restricted-imports` + AST testi zorlar.)
 3. **Tip güvenliği:** `any` yasak, strict TypeScript.
@@ -110,13 +110,21 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
     numarası raporda geçer. Bu kural kapsam hakkındadır, yetki hakkında değil — hiçbir kapıyı
     (özellikle kural 13'ü) gevşetmez. Cetvel: `docs/standards/execution-method-standard.md` §8.
 
-> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `CONTEXT.md §14`.
+> Kuralların tam listesi (31 madde, detaylı gerekçeli) → `docs/standards/gelistirme-kurallari-tam-liste.md`. Her kural ilgili rolün kurallar dosyasında (`docs/roller/<ROL>-kurallar.md`; kartta kısa ad listesi) özetlenir; sayım testi `INV-ROL-1` hiçbir kuralın düşmediğini ölçer (REC-503, REC-521).
+
+## Tek Giriş Haritası — "hangi soru → hangi belge / hangi harita"
+
+**Nereye bakılacağını bilmiyorsan önce `docs/README.md`'yi aç.** Orada iki tablo var: "haritaların haritası"
+(kod → CodeGraph, kod + veritabanı → graphify + şema grafı, metin arama → WrongStack dizini, dosya dersi → sage,
+geçmiş karar → NotebookLM takip defteri + Linear Kararlar (REC-554'e kadar), iş durumu → Kanban, tazelik → durum satırları) ve
+"hangi soru → hangi cetvel". Yeni cetvel oraya satırı eklenmeden bitmiş sayılmaz. Belge bayatlığı her mesajdaki
+`BELGE` satırında görünür (`docs/standards/belge-yonetimi-standard.md`).
 
 ## Doküman Haritası
 
-- `CONTEXT.md` — uçtan uca kapsamlı referans (mimari, DB, akışlar, kurallar). **İlk buraya bak.**
+- `CONTEXT.md` — **EMEKLİ (2026-09-29)**: yerinde yönlendirme sayfası; eski metin `docs/archive/`. Bilgi için `docs/README.md`.
 - `docs/README.md` — doküman sistemi haritası ("hangi soru → hangi dosya"). `docs/standards/` = cetveller (admin/bayi standartları, blueprint), `docs/audits/` = ölçümler, `docs/plans/` = roadmap.
-- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` — canlı "neredeyiz" + **şerit panosu**.
+- `docs/standards/collaboration-protocol.md` — **çok-ajan işbirliği kuralları** (eş-Controller=Claude Code ikizleri / ortak Worker=Antigravity CLI; controller↔controller şerit sahipliği + **worktree izolasyonu**; bir-iş-bir-dal; deterministik kapı; doküman SSOT). · `docs/DURUM-TAKIP.md` **EMEKLİ (2026-09-29)** — canlı durum = Kanban panoları + claim panosu (`board.cjs who`); Linear iş kaydı olarak emekli, arşiv (karar 324).
 - `docs/standards/execution-method-standard.md` — **iş hangi yöntemle koşar** (şerit / alt-ajan / Workflow / maestro /
   skill / elle): karar tablosu + emirde `YÖNTEM:` satırı (öneri; sapma yazılır). Yöntemsiz emir eksik emirdir.
 - `docs/standards/rendering-cache-standard.md` — **hangi sayfa nasıl üretilir, veri değişince ne
@@ -126,9 +134,9 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
 - `RECOMMENDATIONS.md` · `CHANGELOG.md` — durum ve değişiklik geçmişi.
 - **Katalog→ticaret hattı SSOT:** `docs/plans/catalog-commerce-pipeline-master-2026-06-20.md` (uçtan-uca pano)
   + `docs/standards/{catalog-ingestion,csv-import-export,pricing,product-schema,category-taxonomy}-standard.md`.
-  Veri deposu: `C:/Users/alize/venthub-pdf-ingestor` (CSV'ler). **KATALOG PDF'İNDE NE YAZDIĞI
+  Veri deposu: kardeş depo `venthub-pdf-ingestor` (aşağıda `<ingestor>`; CSV'ler). **KATALOG PDF'İNDE NE YAZDIĞI
   sorusu → önce KAYNAK DİZİNİ:** `<ingestor>/kaynak-dizini/sayfalar.jsonl` (+ `manifest.json`);
-  **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`scripts/kaynak_dizini/cikar.py`,
+  **PDF doğrudan taranmaz** — dizinde yoksa önce dizine eklenir (`<ingestor>/scripts/kaynak_dizini/cikar.py`,
   tazelik kapısı `tazelik.py`). Cetvel: `catalog-ingestion-standard.md` §6.3.
   NLM auth bozulursa → memory `nlm-auth-issue`
   (**2026-08-17 ürün değişti:** paket `notebooklm-py`, CLI `notebooklm`, MCP sunucusu `notebooklm-py`;
@@ -142,11 +150,11 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
   ~1sn taze, kesin). grep'ten önce buna bak.
 - **"Katalog PDF'inde ne yazıyor" sorusu** → **KAYNAK DİZİNİ**, PDF'i AÇMA:
   `<venthub-pdf-ingestor>/kaynak-dizini/sayfalar.jsonl` (sayfa metni + tablo hücreleri, hash'li,
-  deterministik). Dizinde yoksa **önce dizine eklenir** (`scripts/kaynak_dizini/cikar.py`);
+  deterministik). Dizinde yoksa **önce dizine eklenir** (`<ingestor>/scripts/kaynak_dizini/cikar.py`);
   tazelik `tazelik.py` ile ölçülür. Cetvel: `catalog-ingestion-standard.md` §6.3.
   *(Niçin kural: PDF'i doğrudan tarayan her iş, aynı kataloğu üçüncü kez okur — patinajın sebebi buydu.)*
 - **Kural / niçin / mimari karar / SaaS plan sorusu** → **NotebookLM dijital ikiz** (`chat_ask` — 08-17'ye kadar `notebook_query`,
-  ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `CONTEXT.md`.
+  ID `235043eb-970f-4a52-9f39-1d02b2621e9c`) veya `docs/README.md` haritası.
 - **Çelişirse kod kazanır.** NLM ikizi snapshot'tır, drift edebilir (ör. tablo sayısı); kod
   yapısı için daima CodeGraph/gerçek kaynağı doğrula. CLAUDE.md = her oturum yüklü çekirdek katman.
 
@@ -173,7 +181,7 @@ DB değişikliği mi → `supabase/migrations/` (`YYYYMMDDHHMMSS_description.sql
   `post-commit`te arka planda (log: `.git/orion-doc.log`). Yedekler: `*.oncesi-2026-08-15`.
   Eskisi rastgele reddediyordu (aynı dosya 80/100 ↔ 100/100) ve 3 dalından 2'si sessizce ölüydü.
 
-- **CONTEXT.md NotebookLM tarafından üretilir** — "iyileştirme" adına yeniden yazma; not/ilave ekleyebilirsin.
+- **CONTEXT.md emekli** — yönlendirme sayfası olarak duruyor; "iyileştirme" adına yeniden doldurma.
 - Dokümantasyon, Corpus Callosum / Orion CLI ile `*.md` master dosyalarına çevrilip
   NotebookLM "VentHub Proje Hafızası" defterine (dijital ikiz) yüklenir.
 

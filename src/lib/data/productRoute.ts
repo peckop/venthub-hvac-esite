@@ -1,4 +1,6 @@
+import { ADRES_SEMASI_K3B } from '@/config/features'
 import type { FamilyDetail, SeriesLanding } from '@/lib/services/family.service'
+import { adresUret, yonlendirmeNesnesi } from '@/utils/adresUret'
 import { localizedHref, Routes } from '@/utils/routes'
 
 /**
@@ -25,7 +27,11 @@ import { localizedHref, Routes } from '@/utils/routes'
 export type ProductRouteResolution =
   | { kind: 'family'; detail: FamilyDetail }
   | { kind: 'series'; landing: SeriesLanding }
-  | { kind: 'redirect'; to: string }
+  /**
+   * `to` = bugünkü şemadaki hedef (aile adresi, gerekirse `?sku=`). `hedef` = aynı hedefin KİMLİĞİ;
+   * K3-b eski TR adresi (REC-300 Faz 3b-2) yeni adresi `adresUret`'le buradan kurar — `to`'yu ayrıştırmaz.
+   */
+  | { kind: 'redirect'; to: string; hedef: { aileSlug: string; sku: string | null } }
   | { kind: 'not-found' }
   | { kind: 'unavailable' }
 
@@ -40,12 +46,52 @@ export interface ProductRouteDeps {
   variantById: (productId: string) => Promise<{ sku: string; family_id: string | null } | null>
 }
 
+const UUID_DESENI = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * Yönlendirme hedefinin ADRESİ (REC-300 Faz 3d). KAPALI (bugün): aile adresi + `?sku=` — ifade bugünkünün
+ * aynısı. AÇIK (plan §2, "`?sku=` kalkar"): yayındaki listedeki SKU'nun kendi adresi `adresUret` ile (adres
+ * metni listeden: istenen slug da UUID de adrese yazılmaz); liste dışı SKU → aile adresi, sorgusuz (URN-31).
+ */
+function hedefAdresi(
+  familySlug: string,
+  sku: string | null,
+  lang: string,
+  bayrak: boolean,
+): string {
+  if (!bayrak) {
+    const base = localizedHref(Routes.product(familySlug), lang)
+    return sku ? `${base}?sku=${encodeURIComponent(sku)}` : base
+  }
+  const dil = lang === 'en' ? 'en' : 'tr'
+  // URN-31: liste içi SKU → modelin adresi (metin listeden; istenen slug ve UUID adrese yazılmaz); liste dışı SKU ya
+  // da SKU yok → aile adresi, SORGUSUZ.
+  return adresUret(sku ? yonlendirmeNesnesi(familySlug, sku) : { tur: 'aile', slug: familySlug }, dil, true)
+}
+
 export async function resolveProductRoute(
   slug: string,
   lang: string,
-  deps: ProductRouteDeps
+  deps: ProductRouteDeps,
+  /** K3-b şeması — yalnız test verir (varsayılan `ADRES_SEMASI_K3B`). */
+  bayrak: boolean = ADRES_SEMASI_K3B,
 ): Promise<ProductRouteResolution> {
   try {
+    // 0) UUID adresi (REC-300 Faz 3 madde 6, REC-289) — YALNIZ bayrak açıkken. Bugün UUID'yi
+    // middleware Edge'de DB'ye sorarak çözüyor (kural 12: Edge'de DB sorgusu yasak); bayrak açıkken
+    // middleware o dalı atlar ve karar burada, sayfa katmanında verilir. Hata FIRLAR (catch →
+    // `unavailable`), bulunamazsa 404 — UUID hiçbir aile/seri/varyant slug'ı olamaz.
+    if (bayrak && UUID_DESENI.test(slug)) {
+      const urun = await deps.variantById(slug)
+      const familySlug = urun?.family_id ? await deps.familySlugById(urun.family_id) : null
+      if (!urun || !familySlug) return { kind: 'not-found' }
+      return {
+        kind: 'redirect',
+        to: hedefAdresi(familySlug, urun.sku, lang, bayrak),
+        hedef: { aileSlug: familySlug, sku: urun.sku },
+      }
+    }
+
     // 1) Aile — ama AKTİF VARYANTI varsa. `get_family_detail` varyant şartı koymaz:
     // seri satırı da `family` döndürür, `variants` boş gelir. Boş varyant listesiyle
     // PDP'ye girmek, ürün detay sayfasında "ürün bulunamadı" kutusu demekti (soft-404).
@@ -67,8 +113,11 @@ export async function resolveProductRoute(
       if (familySlug && familySlug !== slug) {
         // Dil öneki ELLE kurulmaz — SSOT `localizedHref` (INV-2 · localized-route-ssot).
         // Elle birleştirme, tr/en dallarından biri unutulduğunda linki sessizce kıran sınıf.
-        const base = localizedHref(Routes.product(familySlug), lang)
-        return { kind: 'redirect', to: `${base}?sku=${encodeURIComponent(variant.sku)}` }
+        return {
+          kind: 'redirect',
+          to: hedefAdresi(familySlug, variant.sku, lang, bayrak),
+          hedef: { aileSlug: familySlug, sku: variant.sku },
+        }
       }
     }
 
@@ -80,8 +129,11 @@ export async function resolveProductRoute(
       if (hedef?.family_id) {
         const familySlug = await deps.familySlugById(hedef.family_id)
         if (familySlug && familySlug !== slug) {
-          const base = localizedHref(Routes.product(familySlug), lang)
-          return { kind: 'redirect', to: `${base}?sku=${encodeURIComponent(hedef.sku)}` }
+          return {
+            kind: 'redirect',
+            to: hedefAdresi(familySlug, hedef.sku, lang, bayrak),
+            hedef: { aileSlug: familySlug, sku: hedef.sku },
+          }
         }
       }
     }
@@ -89,7 +141,11 @@ export async function resolveProductRoute(
     if (aileId) {
       const familySlug = await deps.familySlugById(aileId)
       if (familySlug && familySlug !== slug) {
-        return { kind: 'redirect', to: localizedHref(Routes.product(familySlug), lang) }
+        return {
+          kind: 'redirect',
+          to: hedefAdresi(familySlug, null, lang, bayrak),
+          hedef: { aileSlug: familySlug, sku: null },
+        }
       }
     }
 

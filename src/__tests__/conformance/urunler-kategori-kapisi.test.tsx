@@ -226,7 +226,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
   it('K7 · TRİPWIRE — sayfa ve ana görünüm `kategoriler` prop\'unu ZİNCİR boyunca geçirir', () => {
     const kok = path.resolve(__dirname, '../../..')
     const halkalar = [
-      'src/app/[lang]/products/page.tsx',
+      'src/app/_components/urunlerSayfasi.tsx', // REC-300 Faz 3b-2: kategoriler={...} rota gövdesiyle buraya taşındı
       'src/views/CategoryMasterView.tsx',
     ]
 
@@ -253,7 +253,7 @@ describe('INV-URUNLER-KATEGORI-1 — Ürünler sayfasının kategori kapısı', 
     expect(icinde.getByRole('heading', { level: 2 }).textContent).toBe('Hava Akışının Mühendislik Estetiği')
     // Göz satırı ve giriş cümlesi ana sayfada ÇİZİLİR (products'ta `null` geçilip susturuluyor).
     // Bu iki satır olmadan kol boş bir iddiaya döner: "bir şeyler var" ölçüm değildir.
-    expect(icinde.getByText('DETERMİNİSTİK SİSTEMLER')).toBeInTheDocument()
+    expect(icinde.getByText('HAVALANDIRMA ÇÖZÜMLERİ')).toBeInTheDocument()
     expect(
       icinde.getByText('VentHub kürasyonu ile endüstriyel standartlarda havalandırma çözümlerini keşfedin.')
     ).toBeInTheDocument()

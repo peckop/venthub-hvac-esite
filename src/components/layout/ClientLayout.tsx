@@ -12,6 +12,7 @@ import { CategoryProvider } from '../../contexts/CategoryContext'
 import { ProjectProvider } from '../../contexts/ProjectProvider'
 import { I18nProvider } from '../../i18n/I18nProvider'
 import { yoldanDilCoz } from '../../i18n/yoldanDil'
+import { urunDetayYoluMu } from '../../utils/yuzeyAdresleri'
 import CookieConsent from './CookieConsent'
 import MainLayout from './MainLayout'
 
@@ -74,7 +75,8 @@ function NavigationTracker() {
                 return
             }
 
-            if (pathname.includes('/products/')) return
+            // Ürün detay sayfası yığına girmez — K3-b açıkken `/tr/urun/…` de (REC-300 Faz 3d).
+            if (urunDetayYoluMu(pathname)) return
 
             let stack: string[] = []
             try {

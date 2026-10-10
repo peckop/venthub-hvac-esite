@@ -62,6 +62,14 @@ function fikstur(satirlar: Satir[]): string {
   return p
 }
 
+/** Geçici taban dosyası: izlenen TABAN'a dokunmadan betiği başka tabanla sınamanın tek yolu. */
+function geciciTaban(icerik: string): string {
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-rls-taban-'))
+  const p = path.join(d, 'taban.json')
+  fs.writeFileSync(p, icerik, 'utf8')
+  return p
+}
+
 /** Tabandaki 11 bilinen borcu fikstür satırına çevirir (gerçek ölçümün aynası). */
 function tabandanSatirlar(): Satir[] {
   const t = JSON.parse(fs.readFileSync(TABAN, 'utf8')) as { girdiler: Record<string, number> }
@@ -156,20 +164,13 @@ describe('INV-RLS-SARMA-1: RLS politikalarinda ic ice sarma', () => {
   })
 
   it('ONARIM SONRASI: taban bosalir ve sisme kalmazsa YESIL', () => {
-    const gecici = fs.mkdtempSync(path.join(os.tmpdir(), 'inv-rls-taban-'))
-    const yedek = fs.readFileSync(TABAN, 'utf8')
-    fs.writeFileSync(path.join(gecici, 'yedek.json'), yedek, 'utf8')
-    try {
-      fs.writeFileSync(TABAN, JSON.stringify({ girdiler: {} }, null, 2), 'utf8')
-      const r = kostur(['--fikstur', fikstur(saglikliDolgu(25))])
-      expect(r.kod, 'onarim sonrasi kapi hala kirmizi — kapi ASLA yesile donemezdi').toBe(0)
-      expect(r.stdout).toContain('YESIL')
-    } finally {
-      fs.writeFileSync(TABAN, yedek, 'utf8')
-    }
-    // ⭐GERİ YÜKLEME ÖLÇÜLÜR: temizlenmemiş sabotaj sonraki kolları ve depoyu kirletir.
-    const geri = JSON.parse(fs.readFileSync(TABAN, 'utf8')) as { girdiler: Record<string, number> }
-    expect(Object.keys(geri.girdiler).length, 'taban geri yuklenmedi').toBe(11)
+    // ⭐İZLENEN TABAN DOSYASINA YAZILMAZ (ALT-8): boş taban geçici kopyada kurulur ve betiğe
+    // RLS_SARMA_TABAN ile gösterilir. Yarım kalan koşum izlenen dosyayı bozuk bırakamaz.
+    const r = kostur(['--fikstur', fikstur(saglikliDolgu(25))], {
+      RLS_SARMA_TABAN: geciciTaban(JSON.stringify({ girdiler: {} }, null, 2)),
+    })
+    expect(r.kod, 'onarim sonrasi kapi hala kirmizi — kapi ASLA yesile donemezdi').toBe(0)
+    expect(r.stdout).toContain('YESIL')
   })
 
   describe('FAIL-CLOSED — "olcemedim" asla "temiz" degildir', () => {
@@ -189,16 +190,44 @@ describe('INV-RLS-SARMA-1: RLS politikalarinda ic ice sarma', () => {
     })
 
     it('TABAN bozuksa cikis 2 (ayristirilamayan taban sessizce BOS sayilmaz)', () => {
-      const yedek = fs.readFileSync(TABAN, 'utf8')
-      try {
-        fs.writeFileSync(TABAN, '{ bozuk json', 'utf8')
-        const r = kostur(['--fikstur', fikstur(saglikliDolgu(25))])
-        expect(r.kod, 'bozuk taban BOS taban gibi davrandi — sessizce fail-open').toBe(2)
-        expect(r.stderr).toContain('OLCULEMEDI')
-      } finally {
-        fs.writeFileSync(TABAN, yedek, 'utf8')
-      }
+      const r = kostur(['--fikstur', fikstur(saglikliDolgu(25))], {
+        RLS_SARMA_TABAN: geciciTaban('{ bozuk json'),
+      })
+      expect(r.kod, 'bozuk taban BOS taban gibi davrandi — sessizce fail-open').toBe(2)
+      expect(r.stderr).toContain('OLCULEMEDI')
     })
+
+    it('RLS_SARMA_TABAN gercek olcumde REDDEDILIR (taban kapinin fail-open kapisi olamaz)', () => {
+      const r = kostur([], {
+        RLS_SARMA_TABAN: geciciTaban(JSON.stringify({ girdiler: {} })),
+        SUPABASE_DB_URL: 'postgres://x',
+      })
+      expect(r.kod, 'DB li olcumde taban degistirilebildi').toBe(2)
+      expect(r.stderr).toContain('yalniz --fikstur ile gecerli')
+    })
+
+    it('RLS_SARMA_TABAN olmayan dosyayi gosterirse cikis 2 (sessizce bos taban sayilmaz)', () => {
+      const r = kostur(['--fikstur', fikstur(saglikliDolgu(25))], {
+        RLS_SARMA_TABAN: path.join(os.tmpdir(), 'inv-rls-taban-yok', 'yok.json'),
+      })
+      expect(r.kod).toBe(2)
+      expect(r.stderr).toContain('gosterilen dosya yok')
+    })
+  })
+
+  /**
+   * ⛔İZLENEN TABAN DOSYASINA HİÇBİR KOL YAZMAZ (ALT-8, 2026-10-01; 09-27 olayı).
+   * İki kol izlenen taban dosyasını yerinde bozup `finally`de geri yazıyordu; yarım kalan
+   * koşum (süreç ölümü, iki işçinin yarışı) dosyayı `{ bozuk json` bırakıp kapıyı ve CI'ı
+   * kırmızıya çevirdi, 4 gün ana ağaçta kirli kaldı. Bu kol testin KAYNAĞINI ölçer: biri
+   * TABAN'a yazan eski kalıba dönerse kırmızı verir (sabotaj kanıtı PR açıklamasında).
+   */
+  it('TABAN DOSYASINA YAZILMAZ: bu testte TABAN hedefli yazma kalıbı yok', () => {
+    const kaynak = fs.readFileSync(path.join(KOK, 'src', '__tests__', 'conformance', 'rls-politika-sarma.test.ts'), 'utf8')
+    const kod = kaynak.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+    expect(kod, 'test izlenen taban dosyasina YAZIYOR — yarim kalan kosum depoyu bozar').not.toMatch(
+      /(writeFileSync|appendFileSync|copyFileSync|renameSync|rmSync|unlinkSync|truncateSync)\(\s*TABAN\b/,
+    )
   })
 
   /**

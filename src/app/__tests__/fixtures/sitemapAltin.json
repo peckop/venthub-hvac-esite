@@ -1,0 +1,502 @@
+{
+ "enKapali": [
+  {
+   "url": "{BASE}/tr",
+   "priority": 1
+  },
+  {
+   "url": "{BASE}/tr/products",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/brands",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/contact",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/about",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/urun-secici",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/legal/kvkk",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/legal/gizlilik-politikasi",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/legal/cerez-politikasi",
+   "priority": 0.8
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi",
+   "priority": 0.7
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/category/fanlar",
+   "priority": 0.7
+  },
+  {
+   "url": "{BASE}/tr/category/sessiz-kanal-fanlari",
+   "priority": 0.7
+  },
+  {
+   "url": "{BASE}/tr/category/hava-perdeleri",
+   "priority": 0.7
+  },
+  {
+   "url": "{BASE}/tr/brands/vortice",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/avens",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/casals",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/seat",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/danfoss",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/nicotra-gebhardt",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/products/vortice-lineo-quiet",
+   "priority": 0.9
+  },
+  {
+   "url": "{BASE}/tr/products/vortice-hava-perdesi",
+   "priority": 0.9
+  }
+ ],
+ "enAcik": [
+  {
+   "url": "{BASE}/tr",
+   "priority": 1,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr",
+     "en": "{BASE}/en"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/products",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/products",
+     "en": "{BASE}/en/products"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands",
+     "en": "{BASE}/en/brands"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/contact",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/contact",
+     "en": "{BASE}/en/contact"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/about",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/about",
+     "en": "{BASE}/en/about"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/urun-secici",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/urun-secici",
+     "en": "{BASE}/en/urun-secici"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/legal/kvkk",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/legal/kvkk",
+     "en": "{BASE}/en/legal/kvkk"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/legal/gizlilik-politikasi",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/legal/gizlilik-politikasi",
+     "en": "{BASE}/en/legal/gizlilik-politikasi"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/legal/cerez-politikasi",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/legal/cerez-politikasi",
+     "en": "{BASE}/en/legal/cerez-politikasi"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en",
+   "priority": 1,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr",
+     "en": "{BASE}/en"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/products",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/products",
+     "en": "{BASE}/en/products"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands",
+     "en": "{BASE}/en/brands"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/contact",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/contact",
+     "en": "{BASE}/en/contact"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/about",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/about",
+     "en": "{BASE}/en/about"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/urun-secici",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/urun-secici",
+     "en": "{BASE}/en/urun-secici"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/legal/kvkk",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/legal/kvkk",
+     "en": "{BASE}/en/legal/kvkk"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/legal/gizlilik-politikasi",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/legal/gizlilik-politikasi",
+     "en": "{BASE}/en/legal/gizlilik-politikasi"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/legal/cerez-politikasi",
+   "priority": 0.8,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/legal/cerez-politikasi",
+     "en": "{BASE}/en/legal/cerez-politikasi"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi",
+   "priority": 0.7
+  },
+  {
+   "url": "{BASE}/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/category/fanlar",
+   "priority": 0.7,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/category/fanlar",
+     "en": "{BASE}/en/category/fans"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/category/sessiz-kanal-fanlari",
+   "priority": 0.7,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/category/sessiz-kanal-fanlari",
+     "en": "{BASE}/en/category/quiet-duct-fans"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/category/hava-perdeleri",
+   "priority": 0.7,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/category/hava-perdeleri",
+     "en": "{BASE}/en/category/air-curtains"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/category/fans",
+   "priority": 0.7,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/category/fanlar",
+     "en": "{BASE}/en/category/fans"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/category/quiet-duct-fans",
+   "priority": 0.7,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/category/sessiz-kanal-fanlari",
+     "en": "{BASE}/en/category/quiet-duct-fans"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/category/air-curtains",
+   "priority": 0.7,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/category/hava-perdeleri",
+     "en": "{BASE}/en/category/air-curtains"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands/vortice",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/vortice",
+     "en": "{BASE}/en/brands/vortice"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands/avens",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/avens",
+     "en": "{BASE}/en/brands/avens"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands/casals",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands/seat",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/seat",
+     "en": "{BASE}/en/brands/seat"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands/danfoss",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/danfoss",
+     "en": "{BASE}/en/brands/danfoss"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/brands/nicotra-gebhardt",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/nicotra-gebhardt",
+     "en": "{BASE}/en/brands/nicotra-gebhardt"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/vortice",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/vortice",
+     "en": "{BASE}/en/brands/vortice"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/avens",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/avens",
+     "en": "{BASE}/en/brands/avens"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/casals",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/seat",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/seat",
+     "en": "{BASE}/en/brands/seat"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/danfoss",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/danfoss",
+     "en": "{BASE}/en/brands/danfoss"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/brands/nicotra-gebhardt",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/nicotra-gebhardt",
+     "en": "{BASE}/en/brands/nicotra-gebhardt"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/products/vortice-lineo-quiet",
+   "priority": 0.9,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/products/vortice-lineo-quiet",
+     "en": "{BASE}/en/products/vortice-lineo-quiet"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/tr/products/vortice-hava-perdesi",
+   "priority": 0.9,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/products/vortice-hava-perdesi",
+     "en": "{BASE}/en/products/vortice-hava-perdesi"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/products/vortice-lineo-quiet",
+   "priority": 0.9,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/products/vortice-lineo-quiet",
+     "en": "{BASE}/en/products/vortice-lineo-quiet"
+    }
+   }
+  },
+  {
+   "url": "{BASE}/en/products/vortice-hava-perdesi",
+   "priority": 0.9,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/products/vortice-hava-perdesi",
+     "en": "{BASE}/en/products/vortice-hava-perdesi"
+    }
+   }
+  }
+ ]
+}

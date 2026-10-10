@@ -36,10 +36,11 @@ const path = require('path')
 // ayırt eder. Eşiği düşürmek (ör. 30) AUTH'u yanlış alarmla vururdu — o gün 46 dakikaydı.
 const BAYAT_ESIK_DK = 60
 
-// MEMORY.md boyut bekçisi. ÖLÇÜM TABANI: indeks ~24.4KB'de okunamaz oluyor ve 27.5KB'de
-// sessizce kırpıldığı gözlendi (memory-index-truncates-silently). Filo 16KB'yi çalışma
-// eşiği seçti; uyarı onun üstünde başlar. Ölçü BAYT, satır DEĞİL — kırpma bayta bakıyor.
-const MEMORY_ESIK_BAYT = 16384
+// MEMORY.md boyut bekçisi. ÖLÇÜM TABANI (HARİTA, REC-433 1.9, 2026-09-29): gerçek kırpma sınırı
+// 200 SATIR YA DA ~25.000 BAYT, hangisi önce dolarsa. Eski "16384 bayt" yanlış ölçümdü ve satır
+// sınırını hiç izlemiyordu. Aynı eşikler `hafiza-indeks-bekcisi.cjs`te de var (orada yazım engellenir).
+const MEMORY_ESIK_BAYT = 25000
+const MEMORY_ESIK_SATIR = 200
 
 /**
  * ⭐YUMUŞAK EŞİK (REC-280) — SERT eşiğin uyarısı GEÇ KALIYORDU, ölçüldü.
@@ -47,12 +48,13 @@ const MEMORY_ESIK_BAYT = 16384
  * VAKA (2026-09-07 20:41–20:57Z, üç şerit): dosya 16414 → 16510 bayta çıktı ve alt satırlar
  * SESSİZCE kırpıldı; en alttaki dersler hiçbir oturuma yüklenmedi. Sert eşik ancak taşma
  * OLDUKTAN sonra yanar — yani kırpma zaten gerçekleşmiştir ve uyarı "haber" değil "otopsi"dir.
- * 15800, taşmaya ~584 bayt kala uyarır: bir indeks satırı ortalama 60-120 bayt, yani
- * katlamak için hâlâ birkaç satırlık pay vardır.
+ * 20000 bayt / 160 satır, taşmaya 5 KB / 40 satır kala uyarır: bir indeks satırı ortalama 60-120 bayt,
+ * yani katlamak için bolca pay vardır.
  * İKİ EŞİK, İKİ AD: yumuşak = "satır ekleme, katla" · sert = "taşma OLDU, alt satırlar gitti".
  * Aynı sayıyı iki anlam için kullanmak, ikisinden birinin sessizce yanlış olması demekti.
  */
-const MEMORY_YUMUSAK_ESIK_BAYT = 15800
+const MEMORY_YUMUSAK_ESIK_BAYT = 20000
+const MEMORY_YUMUSAK_ESIK_SATIR = 160
 
 /**
  * ⭐TÜRKÇE HARFLERİ ASCII'YE KATLAR — ölçülmüş kusur (2026-09-01, URUN bildirdi, ALTYAPI ölçtü).
@@ -157,31 +159,131 @@ const AD_KALIBI = /(lane-day|state|durum)/i
  * (2)'nin eşiği ölçümle seçildi; gerekçesi gövdedeki yorumda — önce 2 yazmıştım ve o değer
  * katmanı ÖLÜ bırakıyordu, çünkü gerçek durum dosyaları da dörtten yalnız birini tutuyor.
  */
-function oturumunDosyalari(memoryDir, sid) {
-  let adlar = []
-  try {
-    adlar = fs.readdirSync(memoryDir).filter(a => a.endsWith('.md'))
-  } catch {
-    return []
+/**
+ * ⭐HAFIZA DİZİNLERİ — ARC-6 + ARC-17 (2026-10-01), ÖLÇÜLMÜŞ iki kusur:
+ *
+ * (ARC-6) Worktree'de açılan pencerenin transcript'i KENDİ proje dizininde durur
+ * (`...--claude-worktrees-<ad>`), ama şeritler durum dosyasını çoğunlukla ANA projenin
+ * `memory/` klasörüne yazar. Kapı yalnız transcript'in dizinine baktığı için dosya VAR iken
+ * "originSessionId taşıyan dosya 0" deyip compact'ı DURDURDU (ALTYAPI, iki kez; ilk seferde
+ * dosyayı worktree dizinine kopyalayarak aşmıştı, kalıcı çözüm bu). Artık ikisine de bakılır.
+ *
+ * (ARC-17) Şartname (`hafiza-yazma-duzeni`) durum dosyalarının `memory/` kökünde VE
+ * `memory/gunluk/<tarih>/` + `memory/gunluk/_sahipsiz/` altında durabileceğini söyler; kod
+ * yalnız kökü tarıyordu. Günlük alt klasörler de taranır.
+ *
+ * @param {string} projeDizini  oturumun (transcript'in) proje dizini
+ * @returns {string[]} taranacak memory dizinleri (var olmayanlar elenir; tekrar yok)
+ */
+function hafizaDizinleri(projeDizini) {
+  const adaylar = [path.join(projeDizini, 'memory')]
+  const ana = process.env.VENTHUB_ANA_PROJE_DIZINI || anaProjeDizini()
+  if (ana && path.resolve(ana).toLowerCase() !== path.resolve(projeDizini).toLowerCase()) {
+    adaylar.push(path.join(ana, 'memory'))
   }
+  // Yalnız KÖK memory dizinleri döner; `gunluk/*` alt klasörlerini `oturumunDosyalari` ekler (tek yerde).
+  return adaylar.filter((d, i) => adaylar.indexOf(d) === i && fs.existsSync(d))
+}
+
+/** Ana projenin dizini (`~/.claude/projects/<ana-kök-adı>`). Çözülemezse null (kapı yine worktree dizinine bakar). */
+function anaProjeDizini() {
+  try {
+    const { anaKok } = require(path.join(__dirname, '..', '..', 'scripts', 'hijyen', 'ana-kok.cjs'))
+    // Claude Code yol→ad kuralı: alfasayısal olmayan her karakter '-'. Sürücü harfi büyük/küçük gelebilir.
+    const hedef = String(anaKok()).replace(/[^A-Za-z0-9]/g, '-').toLowerCase()
+    const kok = path.join(os.homedir(), '.claude', 'projects')
+    const e = fs.readdirSync(kok, { withFileTypes: true }).find(x => x.isDirectory() && x.name.toLowerCase() === hedef)
+    return e ? path.join(kok, e.name) : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * ⭐ŞERİT ADI YEDEĞİ — ARC-6 2. katman (2026-10-01, ÖLÇÜLDÜ): kapı kimliği dosyanın İLK 600 karakterinde arıyor; her yeni
+ * oturumun kimliği değiştiği için başlığı güncellenmemiş durum dosyası "dosya 0" diye compact'ı DURDURUYORDU (ARAÇ'ın kendi
+ * dosyasında önceki oturumun kimliği vardı; kimliği yenileyince kapı geçti). Kalıcı çözüm: kimlikle eşleşen dosya YOKSA,
+ * oturumun şerit adıyla (sessions kaydındaki `name`; Türkçe katlamalı) başlayan durum dosyası KABUL edilir ve
+ * "kimlik eski, güncelle" diye UYARILIR. Bloklamaz; başka şeridin dosyasını kabul etmez (ad ÖNEK eşleşmesi + durum kalıbı).
+ */
+function oturumSeridi(sid) {
+  if (!sid) return ''
+  try {
+    const dizin = process.env.VENTHUB_SESSIONS_DIZINI || path.join(os.homedir(), '.claude', 'sessions')
+    for (const f of fs.readdirSync(dizin)) {
+      if (!f.endsWith('.json')) continue
+      try {
+        const j = JSON.parse(fs.readFileSync(path.join(dizin, f), 'utf8'))
+        if (j && j.sessionId === sid && typeof j.name === 'string') return asciiKatla(j.name).trim().toLowerCase().replace(/[^a-z0-9]+/g, '')
+      } catch { /* bozuk kayıt atlanır */ }
+    }
+  } catch { /* sessions dizini yok */ }
+  return ''
+}
+
+function oturumunDosyalari(memoryDizinleri, sid) {
+  const sidli = sidIleDosyalar(memoryDizinleri, sid)
+  if (sidli.length) return sidli
+  const serit = oturumSeridi(sid)
+  if (!serit) return sidli
+  const yedek = []
+  for (const k of [].concat(memoryDizinleri)) {
+    const dizinler = [k]
+    try {
+      const g = path.join(k, 'gunluk')
+      for (const e of fs.readdirSync(g, { withFileTypes: true })) if (e.isDirectory()) dizinler.push(path.join(g, e.name))
+    } catch { /* gunluk yok */ }
+    for (const d of dizinler) {
+      let adlar = []
+      try { adlar = fs.readdirSync(d).filter(a => a.endsWith('.md')) } catch { continue }
+      for (const ad of adlar) {
+        if (!asciiKatla(ad).toLowerCase().startsWith(serit + '-') || !AD_KALIBI.test(ad)) continue
+        try { yedek.push({ ad, tam: path.join(d, ad), mt: fs.statSync(path.join(d, ad)).mtimeMs, seritEslesmesi: serit }) } catch { /* atla */ }
+      }
+    }
+  }
+  return yedek.sort((a, b) => b.mt - a.mt)
+}
+
+function sidIleDosyalar(memoryDizinleri, sid) {
+  // Eski çağrı biçimi (tek dizin dizgisi) çalışmaya devam eder; günlük alt klasörleri de tarar.
+  const kokler = [].concat(memoryDizinleri)
+  const dizinler = []
+  for (const k of kokler) {
+    dizinler.push(k)
+    try {
+      const g = path.join(k, 'gunluk')
+      for (const e of fs.readdirSync(g, { withFileTypes: true })) if (e.isDirectory()) dizinler.push(path.join(g, e.name))
+    } catch { /* gunluk yok */ }
+  }
+  const benzersiz = dizinler.filter((d, i) => dizinler.indexOf(d) === i)
   const adEsleseni = []
   const icerikEsleseni = []
-  for (const ad of adlar) {
-    const tam = path.join(memoryDir, ad)
+  const tara = (memoryDir) => {
+    let adlar = []
     try {
-      const govde = fs.readFileSync(tam, 'utf8')
-      // Kimlik yalnız frontmatter'da aranır: gövdede geçen bir sid ATIFTIR, sahiplik değil.
-      if (!sid || !govde.slice(0, 600).includes(sid)) continue
-      const kayit = { ad, tam, mt: fs.statSync(tam).mtimeMs }
-      // İçerik eşiği 1 — ÖLÇÜLDÜ 2026-08-28, ilk yazdığım 2 değeri ÖLÜ KATMAN üretiyordu:
-      // filodaki gerçek durum dosyaları bu dört desenden yalnız BİRİNİ tutuyor
-      // (altyapi-lane-day: 1 alan), ders dosyaları ise SIFIR (dizin-olcum-kanit-dersleri: 0,
-      // dizin-kapi-test-dersleri: 0). Yani 1, durum dosyasını yakalar ve dersi yine dışlar;
-      // 2 ise ikisini birden dışlıyordu — katman hiç iş görmüyordu ve bunu ancak ölçünce gördüm.
-      if (AD_KALIBI.test(ad)) adEsleseni.push(kayit)
-      else if (DORT_ALAN.filter(a => a.desen.test(asciiKatla(govde))).length >= 1) icerikEsleseni.push(kayit)
-    } catch { /* okunamayan dosya kapıyı düşürmez */ }
+      adlar = fs.readdirSync(memoryDir).filter(a => a.endsWith('.md'))
+    } catch {
+      return
+    }
+    for (const ad of adlar) {
+      const tam = path.join(memoryDir, ad)
+      try {
+        const govde = fs.readFileSync(tam, 'utf8')
+        // Kimlik yalnız frontmatter'da aranır: gövdede geçen bir sid ATIFTIR, sahiplik değil.
+        if (!sid || !govde.slice(0, 600).includes(sid)) continue
+        const kayit = { ad, tam, mt: fs.statSync(tam).mtimeMs }
+        // İçerik eşiği 1 — ÖLÇÜLDÜ 2026-08-28, ilk yazdığım 2 değeri ÖLÜ KATMAN üretiyordu:
+        // filodaki gerçek durum dosyaları bu dört desenden yalnız BİRİNİ tutuyor
+        // (altyapi-lane-day: 1 alan), ders dosyaları ise SIFIR (dizin-olcum-kanit-dersleri: 0,
+        // dizin-kapi-test-dersleri: 0). Yani 1, durum dosyasını yakalar ve dersi yine dışlar;
+        // 2 ise ikisini birden dışlıyordu — katman hiç iş görmüyordu ve bunu ancak ölçünce gördüm.
+        if (AD_KALIBI.test(ad)) adEsleseni.push(kayit)
+        else if (DORT_ALAN.filter(a => a.desen.test(asciiKatla(govde))).length >= 1) icerikEsleseni.push(kayit)
+      } catch { /* okunamayan dosya kapıyı düşürmez */ }
+    }
   }
+  for (const d of benzersiz) tara(d)
   const secilen = adEsleseni.length ? adEsleseni : icerikEsleseni
   return secilen.sort((a, b) => b.mt - a.mt)
 }
@@ -194,7 +296,7 @@ function oturumunDosyalari(memoryDir, sid) {
 function durumDosyasiBul(sid, transcriptPath) {
   const pd = projeDiziniBul(sid, transcriptPath)
   if (!pd) return null
-  const liste = oturumunDosyalari(path.join(pd, 'memory'), sid)
+  const liste = oturumunDosyalari(hafizaDizinleri(pd), sid)
   return liste.length ? liste[0] : null
 }
 
@@ -222,6 +324,16 @@ function sonBlok(yol, enFazlaSatir = 60) {
   return dilim.slice(0, enFazlaSatir).join('\n')
 }
 
+/**
+ * Yaşı okunur yazar (Ops 09-29: iki günlük dosya "2880 dakika" diye görünüyordu): 2 saate kadar dakika,
+ * 2 güne kadar saat, sonrası gün. Uyarının işi bayatlığın BÜYÜKLÜĞÜNÜ tek bakışta göstermek.
+ */
+function yasMetni(dk) {
+  if (dk < 120) return dk + ' dakika'
+  if (dk < 48 * 60) return Math.round(dk / 60) + ' saat'
+  return Math.round(dk / 1440) + ' gun'
+}
+
 function main() {
 const girdi = girdiOku()
 const sid = girdi.session_id || girdi.sessionId || process.env.CLAUDE_SESSION_ID || ''
@@ -243,13 +355,15 @@ if (!projeDizini) {
 }
 
 const memoryDir = path.join(projeDizini, 'memory')
-const dosyalar = oturumunDosyalari(memoryDir, sid)
+const tarananDizinler = hafizaDizinleri(projeDizini)
+const dosyalar = oturumunDosyalari(tarananDizinler, sid)
 const uyarilar = []
 
 // KOL 1 — durum dosyası hiç yok mu? Tek BLOKLAYAN kol.
 if (dosyalar.length === 0) {
   process.stderr.write(
-    '⛔ COMPACT DURDURULDU — bu oturumun HIC durum dosyasi yok (' + memoryDir + ' icinde ' +
+    '⛔ COMPACT DURDURULDU — bu oturumun HIC durum dosyasi yok (' +
+      (tarananDizinler.length ? tarananDizinler.join(' + ') : memoryDir) + ' ve gunluk/* altlarinda ' +
       'originSessionId=' + (sid || 'YOK') + ' tasiyan dosya 0).\n' +
       'Compact baglami kirpar; yazilmayan sey KAYBOLUR. Once durum dosyani yaz:\n' +
       '  <serit>-lane-day-<tarih>.md, frontmatter metadata.originSessionId = ' + sid + '\n' +
@@ -261,10 +375,16 @@ if (dosyalar.length === 0) {
 
 // KOL 2 — en taze dosya bayat mı? (uyarır, bloklamaz)
 const enTaze = dosyalar[0]
+if (enTaze.seritEslesmesi) {
+  uyarilar.push(
+    'KIMLIK ESKI: ' + enTaze.ad + ' dosyasinin originSessionId alani bu oturumu (' + sid + ') gostermiyor; "' +
+      enTaze.seritEslesmesi + '" serit adiyla eslesti ve KABUL edildi. Kimligi guncelle (sonraki acilis ayni yere takilmasin).',
+  )
+}
 const yasDk = Math.round((Date.now() - enTaze.mt) / 60000)
 if (yasDk > BAYAT_ESIK_DK) {
   uyarilar.push(
-    'BAYAT: en taze durum dosyan ' + yasDk + ' dakika onceki (esik ' + BAYAT_ESIK_DK +
+    'BAYAT: en taze durum dosyan ' + yasMetni(yasDk) + ' onceki (esik ' + BAYAT_ESIK_DK +
       ' dk) — ' + enTaze.ad + '. Bu turda konusulanlar ORADA YOK.',
   )
 }
@@ -284,17 +404,22 @@ try {
 try {
   const idx = path.join(memoryDir, 'MEMORY.md')
   const bayt = fs.statSync(idx).size
-  if (bayt > MEMORY_ESIK_BAYT) {
+  // Satır sayısı: sondaki satır sonu fazladan satır sayılmaz (bekçi kancasıyla aynı ölçü).
+  const govde = fs.readFileSync(idx, 'utf8')
+  const satir = govde === '' ? 0 : govde.split(/\r?\n/).length - (/\r?\n$/.test(govde) ? 1 : 0)
+  const ol = bayt + ' bayt / ' + satir + ' satir'
+  if (bayt > MEMORY_ESIK_BAYT || satir > MEMORY_ESIK_SATIR) {
     uyarilar.push(
-      '⛔MEMORY.md ' + bayt + ' bayt — SERT esik ' + MEMORY_ESIK_BAYT + ' ASILDI (asim ' +
-        (bayt - MEMORY_ESIK_BAYT) + '). Bu bir haber degil OTOPSI: alt satirlar SESSIZCE ' +
-        'kirpilmis olabilir ve o dersler hicbir oturuma yuklenmez. HEMEN katla; olcu BAYT.',
+      '⛔MEMORY.md ' + ol + ' — SERT esik ' + MEMORY_ESIK_BAYT + ' bayt / ' + MEMORY_ESIK_SATIR +
+        ' satir ASILDI. Bu bir haber degil OTOPSI: alt satirlar SESSIZCE kirpilmis olabilir ve o ' +
+        'dersler hicbir oturuma yuklenmez. HEMEN katla; olcu bayt YA DA satir, hangisi once dolarsa.',
     )
-  } else if (bayt >= MEMORY_YUMUSAK_ESIK_BAYT) {
-    // ⭐YUMUŞAK eşik: taşmadan ÖNCE söyler. Sert eşiğe ~584 bayt kaldı, yani hâlâ pay var.
+  } else if (bayt >= MEMORY_YUMUSAK_ESIK_BAYT || satir >= MEMORY_YUMUSAK_ESIK_SATIR) {
+    // ⭐YUMUŞAK eşik: taşmadan ÖNCE söyler; sert eşiğe hâlâ pay var (5 KB / 40 satır).
     uyarilar.push(
-      'MEMORY.md ' + bayt + ' bayt — YUMUSAK esik ' + MEMORY_YUMUSAK_ESIK_BAYT + ' asildi, ' +
-        'sert esige ' + (MEMORY_ESIK_BAYT - bayt) + ' bayt kaldi. Yeni satir EKLEMEDEN once ' +
+      'MEMORY.md ' + ol + ' — YUMUSAK esik ' + MEMORY_YUMUSAK_ESIK_BAYT + ' bayt / ' +
+        MEMORY_YUMUSAK_ESIK_SATIR + ' satir asildi, sert esige ' + (MEMORY_ESIK_BAYT - bayt) + ' bayt / ' +
+        (MEMORY_ESIK_SATIR - satir) + ' satir kaldi. Yeni satir EKLEMEDEN once ' +
         'eski ders satirlarini dizin-*.md dosyalarina katla; indekste isaretci birak.',
     )
   }
@@ -317,7 +442,7 @@ process.exit(0)
 // `require` edildiğinde kapı KOŞMAMALI: session-board.cjs bu dosyayı modül olarak çağırıyor ve
 // stdin okuyup process.exit çağıran bir modül, çağıranın oturumunu öldürürdü.
 module.exports = {
-  durumDosyasiBul, sonBlok, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI,
+  durumDosyasiBul, sonBlok, projeDiziniBul, hafizaDizinleri, oturumunDosyalari, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI, yasMetni,
   // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
   // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
   asciiKatla,

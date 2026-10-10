@@ -1,0 +1,129 @@
+# DERLEME ÇIKTISI ÖLÇÜMÜ — "bu paket Vercel'e giden çıktıda VAR MI?" (REC-436)
+#
+# ⭐BU BİR PR KAPISI DEĞİL, ELLE TETİKLENEN ÖLÇÜMDÜR. Yalnız `workflow_dispatch`; push/PR/zamanlama YOK,
+# kendiliğinden hiç koşmaz. Yazan hiçbir şey yok: depoya, veritabanına, Vercel'e dokunmaz.
+#
+# NİÇİN: bir güvenlik uyarısı "bağımlılık zincirinde" çıktığında (REC-424: `fast-uri`, kök Sentry'nin derleme
+# eklentisi) asıl soru zincir değil ÇIKTIDIR: paket sunucu işlevlerine giren dosya listesinde mi? Zincir
+# "derleme aracı" dese bile bunu kanıtlayan tek şey `next build` çıktısıdır. 09-29'da yerelde ölçülemedi
+# (bellek), Vercel API'si kaynak dosyaları listeliyor, izlenen paketleri değil.
+#
+# NE ÖLÇER: `.next/**/*.nft.json` = Next'in her sayfa/rota için "bu dosyalar işleve girer" dediği liste
+# (Vercel'in paketlediği şeyin kendisi). Paket adı bu listelerde `node_modules/<paket>/` ya da
+# `.pnpm/<paket>@` yolu olarak aranır. BULUNURSA hangi rotalar getiriyor yazılır (ilk 15).
+# BULUNMAZSA "sunucu çıktısında YOK" denir — ama bu "istemci paketinde de yok" DEĞİLDİR; istemci paketi
+# (`.next/static`) ayrıca metin araması olarak raporlanır.
+#
+# Derleme, ci.yml'deki `build:ci` ile AYNI (sahte Supabase adresi); yani ölçülen şey CI'ın derlediği çıktıdır.
+name: Derleme Çıktısı Ölçümü (elle)
+
+on:
+  workflow_dispatch:
+    inputs:
+      paket:
+        description: 'Derleme çıktısında aranacak paket adı (örn. fast-uri)'
+        required: true
+        default: 'fast-uri'
+
+concurrency:
+  group: derleme-cikti-olcumu
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  olcum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --config.allow-scripts true
+
+      - name: Build (ci.yml ile aynı)
+        run: pnpm run build:ci
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://dummy.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key
+
+      - name: Ölç — paket derleme çıktısında var mı
+        env:
+          # Girdi ortam değişkeni olarak geçer, betik metnine gömülmez (komut enjeksiyonu kapısı).
+          PAKET: ${{ github.event.inputs.paket }}
+        run: |
+          node --input-type=module <<'EOF'
+          import { readdirSync, readFileSync, appendFileSync, statSync } from 'node:fs'
+          import { join, relative } from 'node:path'
+
+          const paket = process.env.PAKET
+          if (!paket || !/^[@a-z0-9][a-z0-9._\-/]*$/i.test(paket)) {
+            console.error('Geçersiz paket adı: ' + JSON.stringify(paket))
+            process.exit(2)
+          }
+          const kok = '.next'
+          const nft = []
+          const js = []
+          const yuru = (d) => {
+            for (const ad of readdirSync(d)) {
+              const y = join(d, ad)
+              const s = statSync(y)
+              if (s.isDirectory()) yuru(y)
+              else if (ad.endsWith('.nft.json')) nft.push(y)
+              else if (ad.endsWith('.js') && (y.includes('static') || y.includes('server'))) js.push(y)
+            }
+          }
+          yuru(kok)
+          if (nft.length === 0) {
+            console.error('ÖLÇÜLEMEDİ: .next altında hiç .nft.json yok (derleme çıktısı beklenmedik) — YOK SAYILMAZ.')
+            process.exit(2)
+          }
+          const kacis = paket.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          const yolDeseni = new RegExp('node_modules/(?:\\.pnpm/)?' + kacis + '(?:@|/)')
+          const bulunan = []
+          for (const f of nft) {
+            let liste
+            try { liste = JSON.parse(readFileSync(f, 'utf8')).files || [] } catch { continue }
+            const isabet = liste.filter((x) => yolDeseni.test(String(x).replace(/\\/g, '/')))
+            if (isabet.length) bulunan.push({ rota: relative(kok, f), ornek: isabet[0] })
+          }
+          // İstemci/sunucu parçalarında metin araması (yalnız bilgi: paket kodu paketlenmiş mi).
+          const metin = new RegExp('(?:node_modules/|from ["\']|require\\(["\'])' + kacis + '(?:/|["\'@])')
+          let metinIsabet = 0
+          for (const f of js) {
+            try { if (metin.test(readFileSync(f, 'utf8'))) metinIsabet++ } catch { /* okunamayan atlanır */ }
+          }
+          const satirlar = [
+            '## Derleme çıktısı ölçümü — `' + paket + '`',
+            '',
+            '| ölçü | değer |',
+            '|---|---|',
+            '| taranan .nft.json (izlenen dosya listesi) | ' + nft.length + ' |',
+            '| paketi İÇEREN liste | ' + bulunan.length + ' |',
+            '| paket adını içeren .js parçası (metin araması, bilgi) | ' + metinIsabet + ' / ' + js.length + ' |',
+            '',
+          ]
+          if (bulunan.length) {
+            satirlar.push('**SONUÇ: paket sunucu çıktısında VAR.** İlk 15 rota:', '')
+            for (const b of bulunan.slice(0, 15)) satirlar.push('- `' + b.rota + '` → `' + b.ornek + '`')
+          } else {
+            satirlar.push('**SONUÇ: paket izlenen sunucu dosya listelerinde YOK.** (İstemci paketi için yukarıdaki metin araması satırına bak; o yalnız bilgidir.)')
+          }
+          const cikti = satirlar.join('\n')
+          console.log(cikti)
+          if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, cikti + '\n')
+          EOF

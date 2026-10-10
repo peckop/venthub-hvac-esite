@@ -2413,6 +2413,7 @@ export type Database = {
           created_at: string
           email_to: string | null
           error: string | null
+          event: string
           id: string
           provider: string
           provider_message_id: string | null
@@ -2424,6 +2425,7 @@ export type Database = {
           created_at?: string
           email_to?: string | null
           error?: string | null
+          event?: string
           id?: string
           provider?: string
           provider_message_id?: string | null
@@ -2435,6 +2437,7 @@ export type Database = {
           created_at?: string
           email_to?: string | null
           error?: string | null
+          event?: string
           id?: string
           provider?: string
           provider_message_id?: string | null
@@ -2451,6 +2454,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      quote_number_counters: {
+        Row: {
+          gun: string
+          son_no: number
+          tenant_id: string
+        }
+        Insert: {
+          gun: string
+          son_no?: number
+          tenant_id: string
+        }
+        Update: {
+          gun?: string
+          son_no?: number
+          tenant_id?: string
+        }
+        Relationships: []
       }
       rate_limits: {
         Row: {
@@ -3597,6 +3618,7 @@ export type Database = {
           currency: string | null
           id: string
           party_role: string | null
+          published_email_sent_at: string | null
           quote_no: string | null
           request_email_sent_at: string | null
           revision_no: number
@@ -3634,6 +3656,7 @@ export type Database = {
           currency?: string | null
           id?: string
           party_role?: string | null
+          published_email_sent_at?: string | null
           quote_no?: string | null
           request_email_sent_at?: string | null
           revision_no?: number
@@ -3671,6 +3694,7 @@ export type Database = {
           currency?: string | null
           id?: string
           party_role?: string | null
+          published_email_sent_at?: string | null
           quote_no?: string | null
           request_email_sent_at?: string | null
           revision_no?: number
@@ -4242,6 +4266,10 @@ export type Database = {
     }
     Functions: {
       _normalize_rls_expr: { Args: { expr: string }; Returns: string }
+      _quote_published_enqueue: {
+        Args: { p_quote_id: string; p_zorunlu: boolean }
+        Returns: boolean
+      }
       adjust_stock:
         | {
             Args: { p_delta: number; p_product_id: string; p_reason: string }
@@ -4286,6 +4314,10 @@ export type Database = {
       }
       admin_publish_quote: {
         Args: { p_currency: string; p_quote_id: string; p_valid_until: string }
+        Returns: undefined
+      }
+      admin_resend_quote_published: {
+        Args: { p_quote_id: string }
         Returns: undefined
       }
       admin_search_products: {
@@ -4347,6 +4379,10 @@ export type Database = {
           remaining: number
           reset_at: string
         }[]
+      }
+      create_quote_with_items: {
+        Args: { p_items: Json; p_quote: Json }
+        Returns: string
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       display_price: {
@@ -4551,6 +4587,7 @@ export type Database = {
       is_user_admin: { Args: { user_id: string }; Returns: boolean }
       jwt_price_segment: { Args: never; Returns: string }
       jwt_tenant_id: { Args: never; Returns: string }
+      maliyet_yenile: { Args: { p_satirlar: Json }; Returns: number }
       process_goods_receipt: {
         Args: {
           p_document_no: string
@@ -4574,6 +4611,7 @@ export type Database = {
             Args: { p_batch_id: string; p_max_minutes?: number }
             Returns: number
           }
+      satis_kipi_oku: { Args: never; Returns: Json }
       set_stock:
         | {
             Args: { p_new_qty: number; p_product_id: string; p_reason: string }
@@ -4621,6 +4659,16 @@ export type Database = {
       url_takma_ad_coz: {
         Args: { p_dil: string; p_eski_slug: string; p_tur: string }
         Returns: string
+      }
+      url_takma_adlari_listele: {
+        Args: never
+        Returns: {
+          dil: string
+          eski_slug: string
+          hedef_id: string
+          tenant_id: string
+          tur: string
+        }[]
       }
     }
     Enums: {

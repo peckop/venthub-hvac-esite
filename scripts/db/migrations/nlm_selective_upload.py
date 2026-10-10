@@ -12,7 +12,8 @@ def main():
         {"file": "docs/venthub_hvac_master.md", "title": "VentHub HVAC Master"},
         {"file": "README.md", "title": "README.md"},
         {"file": "CHANGELOG.md", "title": "CHANGELOG.md"},
-        {"file": "CONTEXT.md", "title": "CONTEXT.md (SaaS Güncel)"}
+        {"file": "docs/README.md", "title": "Tek Giriş Haritası (docs/README.md)"},
+        {"file": "docs/standards/gelistirme-kurallari-tam-liste.md", "title": "Geliştirme Kuralları (31 madde, tam liste)"}
     ]
     
     total = len(uploads)

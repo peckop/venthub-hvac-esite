@@ -6,14 +6,15 @@
 > ölçülsün." Ölçüm düzeni REC-369'da sekiz kol olarak yazıldı ama cetveli yoktu. 2026-09-24'te iki ölçüm
 > düzeni değiştirdi: ücretli kaynak (DataForSEO) Recep kararıyla masadan kalktı; rakip sonuç sayfasını
 > tarayıcıyla izlemenin Google şartlarına aykırı olduğu ölçüldü (P4).
-> **Sahibi:** BLOG şeridi (karar 93: yazı + arama görünürlüğü; pazar ölçüm kolları). Araç kurulumu
+> **Sahibi:** GEO-SEO şeridi (karar 124, 2026-09-25: arama görünürlüğü ölçümü BLOG'dan GEO-SEO'ya geçti; karar 93'ün
+> "denetim üreticiden bağımsız" ilkesi geçerli). Yazı konusu seçimi BLOG'da kalır. Araç kurulumu
 > ALTYAPI'da. Recep'ten yalnız hesap, ödeme ve kimlik gibi tek seferlik adımlar istenir; Recep panellere
 > elle girip iş yapmaz.
 > **Kayıt:** REC-369. **İlgili cetveller:** `rehber-yazisi-standard.md` (R1 konu seçimi, R7 yazı ölçümü) ·
 > `analytics-standard.md` (site içi olay ölçümü, GA4) · `hukum-kaynak-standard.md` (A/B/C kaynak sınıfı).
 
 **Durum:** TASLAK. Haftalık koşunun zamanlayıcısı kurulmadı: zamanlayıcı/cron/loop kararı önce Recep ile
-konuşulur (karar 53). O güne kadar haftalık koşu BLOG tarafından elle yapılır.
+konuşulur (karar 53). O güne kadar haftalık koşu GEO-SEO tarafından elle yapılır.
 
 ---
 
@@ -27,20 +28,20 @@ yapılabiliyorsa neden ücret ödeyelim").
 
 | Kol | Soru | Kaynak | Durum 2026-09-24 | Sahip |
 |---|---|---|---|---|
-| 1 | Google'da hangi aramada görünüyoruz, sıra, tık | Search Console API (hizmet hesabı, `scripts/gsc/gsc-token.cjs`) | ÇALIŞIYOR; veri 2026-08-28'de başlıyor | BLOG |
-| 2 | Aylık arama hacmi | Google Ads API anahtar kelime servisi | Recep adımı bekliyor (P3) | BLOG ölçer · ALTYAPI kurar · Recep hesap |
-| 3 | Mevsim ve il bazında ilgi | Google Trends web arayüzü (elle) | Resmî API alpha bekleme listesinde | BLOG |
-| 4 | Rakip ve arama sonuç sayfası | Search Console'da kendi sıramız + arada bir elle bakış | Otomatik izleme YASAK (P4) | BLOG |
-| 5 | Yapay zekâ cevaplarında VentHub geçiyor mu | Aylık sabit soru listesi | Yok; ölçüm yolunun şartlara uygunluğu ayrıca ölçülecek | BLOG |
-| 6 | Sitede ne aranıp bulunamıyor | Sonuçsuz arama günlüğü (karar 87) | URUN kuruyor | URUN kurar · BLOG okur |
-| 7 | Hangi ürüne teklif isteniyor | Teklif kayıtları (DB) | Veri var, rapor yok | BLOG |
+| 1 | Google'da hangi aramada görünüyoruz, sıra, tık | Search Console API (hizmet hesabı, `scripts/gsc/gsc-token.cjs`) | ÇALIŞIYOR; veri 2026-08-28'de başlıyor | GEO-SEO |
+| 2 | Aylık arama hacmi | Google Ads API anahtar kelime servisi | Recep adımı bekliyor (P3) | GEO-SEO ölçer · ALTYAPI kurar · Recep hesap |
+| 3 | Mevsim ve il bazında ilgi | Google Trends web arayüzü (elle) | Resmî API alpha bekleme listesinde | GEO-SEO |
+| 4 | Rakip ve arama sonuç sayfası | Search Console'da kendi sıramız + arada bir elle bakış | Otomatik izleme YASAK (P4) | GEO-SEO |
+| 5 | Yapay zekâ cevaplarında VentHub geçiyor mu | Aylık sabit soru listesi — yöntem `geo-olcum-standard.md` | Claude + Gemini ÇALIŞIYOR (2026-09-25); liste v0 yazılıyor | GEO-SEO |
+| 6 | Sitede ne aranıp bulunamıyor | Sonuçsuz arama günlüğü (karar 87) | URUN kuruyor | URUN kurar · GEO-SEO okur · BLOG konu için kullanır |
+| 7 | Hangi ürüne teklif isteniyor | Teklif kayıtları (DB) | Veri var, rapor yok | GEO-SEO |
 | 8 | Ziyaretçi sitede ne yaptı | GA4 (`analytics-standard.md`) | Canlıda kimlik tanımlı mı ölçülmedi | ALTYAPI |
 
 ## P2 — Search Console kuralları (kol 1)
 
 - **Değişiklik öncesi taban:** adres ağacı, şablon ya da site haritası gibi arama görünürlüğünü etkileyen
   bir yayından önce, **yayın günü** `scripts/rehber/gsc-taban.mjs` koşulur (90 gün, son 3 gün hariç;
-  sayfa×gün kırılımı dahil). Çıktı depoya değil Linear kaydına eklenir (P6). İlk taban 2026-09-24
+  sayfa×gün kırılımı dahil). Çıktı depoya değil Kanban kartına eklenir (P6; kartlar depoda izlenmez). İlk taban 2026-09-24
   (REC-369 eki); REC-300 adres yayını günü yenilenir.
 - **Veri gecikmesi:** Google'a göre veri normalde 2–3 günde gelir, son 2 günün verisi ön veridir
   (support.google.com/webmasters/answer/10083653). Haftalık koşu bu yüzden son 3 günü dışarıda bırakan
@@ -96,15 +97,15 @@ platform ve ücretli veri kaynağı alınmadı.
 | 4. Geçmiş | Haftalık anlık görüntü, zaman serisi olarak saklanır | "Şu an" değil "zaman içinde ne değişti" birinci sınıf veri |
 
 - **Salt okur, salt önerir.** Rapor siteyi değiştirmez; öneri ilgili şeride iş olarak gider.
-- **Dil:** sade Türkçe; Recep'e OPS üzerinden kısa özet, ayrıntı Linear'da.
+- **Dil:** sade Türkçe; Recep'e OPS üzerinden kısa özet, ayrıntı Kanban kartında.
 - **İzlenen 10 sayfa:** yayındaki rehber yazıları önce, sonra F1 kümelerinin karşılığı olan kategori ve ürün
-  sayfaları. Liste Linear'da tutulur; değişiklik gerekçesiyle yazılır.
+  sayfaları. Liste Kanban kartında tutulur; değişiklik gerekçesiyle yazılır.
 - **Saklama:** sorgu ve sayfa verisi PUBLIC depoya girmez (P6). Kalıcı saklama yeri (özel tablo ya da
-  Linear eki) ilk koşuda ölçülüp bu satıra yazılır.
+  özel depolama) ilk koşuda ölçülüp bu satıra yazılır.
 
 ## P6 — Depoya girmeyen veri
 
-Depo PUBLIC'tir. Şunlar depoya **girmez**, yalnız Linear kaydına ve özel depolamaya girer: arama sorgusu
+Depo PUBLIC'tir. Şunlar depoya **girmez**, yalnız Kanban kartına ve özel depolamaya girer: arama sorgusu
 listeleri, izlenen anahtar kelimeler, rakip adları ve adresleri, hacim verileri, yazı taslakları. Depoya
 yalnız özet sayılar ve yöntem girer.
 
@@ -119,7 +120,8 @@ yayındaki yazı adreslerinde haftada bir koşar.
 
 ## Ölçüm geçmişi
 
-Kaynak sınıfı: **A** = BLOG'un kendi ölçümü · **B** = başkasının ölçümü, okundu.
+Kaynak sınıfı: **A** = cetvel sahibinin kendi ölçümü (2026-09-24 satırları BLOG'un, sonrası GEO-SEO'nun) ·
+**B** = başkasının ölçümü, okundu.
 
 | Tarih | Ölçüm | Sınıf | Sonuç |
 |---|---|---|---|

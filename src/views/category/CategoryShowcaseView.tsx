@@ -1,8 +1,9 @@
 'use client';
 import { Activity, ArrowRight, ChevronDown, Layers,ShieldCheck, ThermometerSun, Zap } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
+import { AIR_CURTAIN_WIZARD_ENABLED } from '@/components/category/airCurtainWizardGate'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import { BottomCTA } from '@/components/category/sections'
 import Breadcrumb from '@/components/navigation/Breadcrumb'
@@ -27,28 +28,23 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
     subCategories,
     onSubcategorySelect
 }) => {
-    const router = useRouter()
     const { t, dict, lang } = useI18n()
     const Routes = useLocalizedRoutes()
     const { wrapCategory } = useCategoryViewModel()
     const [wizardOpen, setWizardOpen] = useState(false)
     
     const vm = wrapCategory(category)
-    const isAirCurtain = category.slug.includes('hava-perde')
+    // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; tüm giriş noktaları (kahraman düğmesi,
+    // BottomCTA, sihirbazın kendisi) tek kapıdan kapalı — `airCurtainWizardGate.ts`.
+    const havaPerdesiSihirbazi = category.slug.includes('hava-perde') && AIR_CURTAIN_WIZARD_ENABLED
     const [breadcrumbRef, breadcrumbVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.1 })
     const [heroBadgeRef, heroBadgeVisible] = useScrollAnimation<HTMLDivElement>({ threshold: 0.2 })
     const [heroTitleRef, heroTitleVisible] = useScrollAnimation<HTMLHeadingElement>({ threshold: 0.2 })
     const [heroTextRef, heroTextVisible] = useScrollAnimation<HTMLParagraphElement>({ threshold: 0.2 })
     const [airCurtainBtnRef, airCurtainBtnVisible] = useScrollAnimation<HTMLButtonElement>({ threshold: 0.2 })
 
-    // Handle selection either via prop or direct routing
-    const handleSubSelect = (subSlug: string) => {
-        if (onSubcategorySelect) {
-            onSubcategorySelect(subSlug)
-        } else {
-            router.push(Routes.category(getLocalizedCategorySlug(category, lang), subSlug))
-        }
-    }
+    // Alt kategori adresi (üst + alt); kart bağlantısı ve seçici modu aynı adresi kullanır.
+    const subHref = (subSlug: string) => Routes.category(getLocalizedCategorySlug(category, lang), subSlug)
 
     // Breadcrumb (VENTHUB SIGNATURE - FIXED LOCATION)
     const breadcrumbItems = [
@@ -96,7 +92,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                         {vm?.description || t('category.showcase.defaultDescription')}
                     </p>
 
-                    {isAirCurtain && (
+                    {havaPerdesiSihirbazi && (
                         <button
                             ref={airCurtainBtnRef}
                             onClick={() => setWizardOpen(true)}
@@ -136,10 +132,18 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                     {subCategories.map((sub) => {
                         const subVm = wrapCategory(sub)
                         return (
-                            <button
+                            // REC-471: kart GERÇEK bağlantı (`<a href>`, sunucuda basılır). Eskiden `<button onClick>` +
+                            // `router.push` idi: Google alt kategori sayfalarına ulaşamıyordu (17 yetim sayfa, GEO-SEO
+                            // REC-461). Adres `Routes.category` (adresUret) üzerinden — şema değişince kendiliğinden doğru.
+                            <Link
                                 key={sub.id}
+                                href={subHref(getLocalizedCategorySlug(sub, lang))}
                                 className="group relative bg-white rounded-hvac-2xl p-10 border border-slate-100 hover:border-cyan-500/20 hover:shadow-hvac-card-hover transition-shadow duration-700 cursor-pointer overflow-hidden max-w-modal text-left block w-full"
-                                onClick={() => handleSubSelect(getLocalizedCategorySlug(sub, lang))}
+                                onClick={onSubcategorySelect ? (e) => {
+                                    // Üst bileşen seçimi kendi yönetiyorsa (seçici modu) gezinme onda; bağlantı yine de basılı kalır.
+                                    e.preventDefault()
+                                    onSubcategorySelect(getLocalizedCategorySlug(sub, lang))
+                                } : undefined}
                             >
                                 <div className="relative z-10">
                                     {/* ⭐GÖRSEL (REC-291, Recep isteği: "görselli olması lazım bence").
@@ -148,7 +152,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         10'unda DOLU; yani veri hazırdı, onu okuyan kart yoktu.
 
                                         ⛔YER TUTUCU BİLEREK YOK: `VentImage` görsel bulunamayınca
-                                        `category-placeholder.png` basar. Onu her karta koymak, hangi
+                                        nötr yer tutucuyu (YER_TUTUCU_GORSEL) basar. Onu her karta koymak, hangi
                                         kategorinin görseli eksik olduğunu EKRANDA GÖRÜNMEZ yapardı.
                                         Bu yüzden bileşen yalnız `image_url` doluyken çiziliyor; boşsa
                                         kart aşağıdaki ikon düzeninde kalır — eksiklik hem ziyaretçiye
@@ -194,7 +198,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
                                         <div className="h-px w-6 bg-slate-200 group-hover:w-12 group-hover:bg-cyan-500 transition-colors duration-500" />
                                     </div>
                                 </div>
-                            </button>
+                            </Link>
                         )
                     })}
                 </div>
@@ -240,16 +244,18 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({
             </section>
 
             <BottomCTA 
-                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
-                showWizard={isAirCurtain}
+                onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
+                showWizard={havaPerdesiSihirbazi}
                 categoryName={vm?.displayName || getCategoryDisplayName(category, t)}
             />
 
-            <EnhancedNeedsWizard 
-                isOpen={wizardOpen} 
-                onClose={() => setWizardOpen(false)} 
-                parentSlug={category.slug}
-            />
+            {havaPerdesiSihirbazi && (
+                <EnhancedNeedsWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    parentSlug={category.slug}
+                />
+            )}
         </div>
     )
 }
