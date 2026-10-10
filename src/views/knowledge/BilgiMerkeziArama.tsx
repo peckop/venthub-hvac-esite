@@ -22,12 +22,15 @@ export interface ListeKarti {
   konu: string
   tarih: string
   tarihIso: string
+  /** Güncelleme tarihi (görünen biçim); yayın tarihinden FARKLI değilse `null` ve kartta basılmaz. */
+  guncelleme: string | null
+  guncellemeIso: string | null
 }
 
 interface Props {
   kartlar: ListeKarti[]
   dil: string
-  metin: { aramaEtiketi: string; aramaYerTutucu: string; sonucYok: string; oku: string }
+  metin: { aramaEtiketi: string; aramaYerTutucu: string; sonucYok: string; oku: string; guncelleme: string }
 }
 
 const odakSinifi =
@@ -75,6 +78,14 @@ export default function BilgiMerkeziArama({ kartlar, dil, metin }: Props) {
                   <span className="font-semibold text-brand-cyan-ink">{k.konu}</span>
                   <span aria-hidden="true">{'·'}</span>
                   <time dateTime={k.tarihIso}>{k.tarih}</time>
+                  {k.guncelleme && k.guncellemeIso && (
+                    <>
+                      <span aria-hidden="true">{'·'}</span>
+                      <span>
+                        {metin.guncelleme} <time dateTime={k.guncellemeIso}>{k.guncelleme}</time>
+                      </span>
+                    </>
+                  )}
                 </span>
                 <h2 className="mt-3 text-xl font-bold tracking-tight text-primary-navy">{k.baslik}</h2>
                 {k.kartOzeti ? <p className="mt-3 flex-1 text-base text-industrial-gray">{k.kartOzeti}</p> : <span className="flex-1" />}
