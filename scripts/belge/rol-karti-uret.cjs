@@ -149,6 +149,18 @@ const DURUM_SATIRI_KURALI = [
   '- Recep compact hazırlığı istediğinde (ya da "COMPACT YAKIN" uyarısında) üç maddelik not (durum dosyası güncel mi + saat / yarım iş / hüküm) ve iki aşamalı compact cümlesi KENDİ penceresinde Recep\'e yazılır; OPS\'a yalnız tek satır gider ("hazır" ya da "X bitince hazır"). Notu OPS\'a yazıp Recep\'e yazmamak kuralı çiğner (OPS 2026-10-05: iki departman bunu yaptı).',
 ].join('\n')
 
+/**
+ * İÇERİK KURALI (HRT-46, OPS emri 2026-10-05; kural Design'dan 2026-10-05): kullanıcıya görünen metin üreten ROLLERE özgü, bu yüzden
+ * her rolün dosyasına değil yalnız aşağıdaki beşinin kurallar dosyasına girer (kartın bayt payına dokunmaz). Yöneten cetveller:
+ * `docs/standards/rehber-yazisi-standard.md` R4 madde 10 (yazı) ve `docs/standards/i18n-localization-standard.md` §4 (sözlük metni).
+ * Depo herkese açık: kuralın gerekçesi (şirketin durumu) buraya YAZILMAZ; kart notlarında durur.
+ */
+const ICERIK_KURALI_ROLLERI = ['BLOG', 'I18N', 'TASARIM', 'URUN', 'SATIS']
+const ICERIK_KURALI = [
+  '## İçerik kuralı (HRT-46)',
+  '- Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub\'dır. Cetveller: `docs/standards/rehber-yazisi-standard.md` R4 madde 10, `docs/standards/i18n-localization-standard.md` §4.',
+].join('\n')
+
 /** Bir rolün kurallar dosyası: kartta kısa adıyla anılan her kuralın özeti (kaynak sırasıyla). */
 function kuralDosyasi(ad) {
   return [
@@ -166,6 +178,7 @@ function kuralDosyasi(ad) {
     '',
     DURUM_SATIRI_KURALI,
     '',
+    ...(ICERIK_KURALI_ROLLERI.includes(ad) ? [ICERIK_KURALI, ''] : []),
   ].join('\n')
 }
 
@@ -227,7 +240,7 @@ const CALISMA = [
   '## Çalışma düzeni',
   '- Çok dosyalı işten önce şerit al (`node scripts/board/board.cjs claim --sid <sid> --lane <ROL> --globs ...`); kendi worktree\'sinde çalış, ana dizinde ölçüm koşma (mutlak yol ya da `git -C`).',
   '- Her iş: Kanban kartı (`<KISA AD>-<sayı>`, is-kayit-duzeni §1) + emirde YÖNTEM + KAYNAK/CETVEL. Linear iş kaydı olarak emekli (karar 324): yeni kayıt açılmaz.',
-  '- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` taşır (`Fixes`/`Kayıtsız:` yolları 10-08\'de kapandı); kartsız iş yok, önce kart açılır.',
+  '- Kanban: her iş bir kart; sütun ve status birlikte değişir, her adımda not düşülür, Done yalnız kanıtla (ölçmediğini olgu yazma). Pano kartı açılırken kanıt zorunlu: `command` ya da `file_matches`. PR gövdesi `Kanban: <numara>` ile başlar (`Fixes`/`Kayıtsız:` yolları 10-08\'de kapandı); kartsız iş yok, önce kart açılır.',
   '- Açılışta ilk iş: `memory/<rol>-lane-day-<tarih>.md` yaz (`metadata.originSessionId` = TAM oturum kimliği); compact öncesi güncelle; alanlar: son girdi / açık kuyruk / verilen sözler / bekleyen kararlar; dosyanın SONUNA `Yarım iş: yok|var — <ne>, <ne zaman güvenli>` (§9b).',
   '- Ders ve hata anında `wrongstack-sage remember` (`audience.roles=[<ROL>]`, tags [rol, ders]); gün sonu raporunda "sage\'e bugün N ders".',
   '- Vitrin, föy ya da yazıda OLGU (marka, üretici, adres, kuruluş yılı, sertifika, garanti, performans sayısı) yazmadan önce resmî kaynaktan al; kaynakta birebir yoksa yazılmaz, yapay zekâ özeti kanıt değildir (`rehber-yazisi-standard.md` R2.3).',
@@ -950,6 +963,7 @@ function main() {
 }
 
 module.exports = {
+  ROLLER,
   DURUM_SATIRI_KURALI,
   CALISMA,
   haritaOzet,

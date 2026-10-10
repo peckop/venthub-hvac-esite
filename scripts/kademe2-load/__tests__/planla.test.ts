@@ -14,7 +14,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { planla, satirlariTopla, specValue, num } from '../planla.mjs'
+import { planla, satirlariTopla, specValue, num, pqKapisi, pqTurevDeseniMi, PQ_KAYNAK } from '../planla.mjs'
 
 const KAT = [
   { id: 'k-fan', slug: 'fans', parent_id: null },
@@ -118,6 +118,89 @@ describe('planla — boş fiyat sessiz 0 değildir (REC-193 kök sebebi)', () =>
     expect(r.errors).toEqual([])
     expect(r.products.map((p: { purchase_price: number }) => p.purchase_price)).toEqual([0, 0, 0, 10])
     expect(r.fiyatsiz).toEqual(['AVE-20150', 'AVE-20151', 'AVE-20152'])
+  })
+})
+
+/**
+ * KTL-7 · karar 320 — eğri kaynağı kapısı. Köken (2026-10-08 ölçümü): 141 üç noktalı eğrinin ortadaki noktası
+ * ingestor'daki yapay zekâ çıkarım hattında HESAPLANDI (58 ürün %75, 48 ürün %50, 35 ürün elle sabit) ve etiketsiz
+ * yüklendi. Kapı gerçeği HÜKMETMEZ (etiketli QBK eğrisini geçirir); ETİKETSİZLİĞİ ve "hesaplanmış ama ölçüm
+ * diye etiketli" yalanını durdurur. Gerçek eğri doğruluğu §6.3 "Eğri çizimi" ±%2 kapısının işidir.
+ * Sabotaj yönü: planla.mjs'ten `pqKapisi(r)` çağrısı silinirse "etiketsiz eğri plan KIRMIZI" testleri kırmızı olur.
+ */
+const BASLIK_PQ = 'model_code;name;brand;category_slug;subcategory_slug;purchase_price_eur;currency;confidence;spec_pq_curve;spec_pq_curve_kaynak'
+const csvPq = (...satir: string[]) => [BASLIK_PQ, ...satir].join('\n')
+const calisPq = (...satir: string[]) => {
+  const t = topla('avens-test', csvPq(...satir))
+  return planla({ rows: t.rows, kategoriler: KAT, aileHaritasi: AILE, gorselCoz: () => null })
+}
+const U75 = '[[0.0, 126.0], [572.0, 94.0], [1145.0, 0.0]]' // E-ATEX: sabit yazılmış, 94 ↔ 0,75·126 = 94,5 (yuvarlama)
+const U50 = '[[0.0, 130.0], [19.0, 65.0], [38.0, 0.0]]' // Mono: tam %50, düz çizgi
+const QBK = '[[0.0, 370.0], [1270.0, 240.0], [2540.0, 0.0]]' // desene uymuyor (%65): gerçek mi uydurma mı BİLİNMİYOR
+const GERCEK8 = '[[0,736],[250,640],[500,560],[750,490],[1000,420],[1250,340],[1500,230],[1740,0]]'
+
+describe('planla — pq_curve kaynak kapısı (KTL-7, karar 320)', () => {
+  it('desen tanıma: %75 ve %50 üçgeni (yuvarlamalı dahil) yakalanır; QBK, 6 ve 8 nokta yakalanmaz', () => {
+    expect(pqTurevDeseniMi(JSON.parse(U75))).toBe(0.75)
+    expect(pqTurevDeseniMi(JSON.parse(U50))).toBe(0.5)
+    expect(pqTurevDeseniMi(JSON.parse(QBK))).toBeNull()
+    expect(pqTurevDeseniMi(JSON.parse(GERCEK8))).toBeNull()
+    expect(pqTurevDeseniMi([[0, 39.23], [20, 29.42], [40, 21.57], [60, 20.59], [80, 17.65], [90, 9.81]])).toBeNull()
+    // orta debi tam yarı değil → hesaplanmış üçgen değil
+    expect(pqTurevDeseniMi([[0, 100], [60, 75], [100, 0]])).toBeNull()
+  })
+
+  it('etiketsiz eğri plan KIRMIZI: ürün düşer, hata satırı adıyla söyler', () => {
+    const r = calisPq(`11;A;AVenS;fans;;1;EUR;ok;${QBK};`)
+    expect(r.products).toHaveLength(0)
+    expect(r.errors).toEqual([expect.stringMatching(/avens-test\/11: pq_curve var ama pq_curve_kaynak yok/)])
+  })
+
+  it('tanımsız kaynak adı reddedilir; üç tanımlı değer kabul edilir', () => {
+    const r = calisPq(`12;A;AVenS;fans;;1;EUR;ok;${QBK};olculmus`)
+    expect(r.errors).toEqual([expect.stringMatching(/pq_curve_kaynak 'olculmus' tanımsız/)])
+    for (const k of PQ_KAYNAK.filter((x) => x !== 'turetilmis')) {
+      const ok = calisPq(`13;B;AVenS;fans;;1;EUR;ok;${GERCEK8};${k}`)
+      expect(ok.errors).toEqual([])
+      expect((ok.products[0].technical_specs as Record<string, unknown>).pq_curve_kaynak).toBe(k)
+    }
+  })
+
+  it('hesaplanmış üçgen ölçüm diye etiketlenemez: kitapcik_grafik/kitapcik_tablo → hata, turetilmis → geçer', () => {
+    for (const [egri, oran] of [[U75, '75'], [U50, '50']] as const) {
+      for (const k of ['kitapcik_grafik', 'kitapcik_tablo']) {
+        const r = calisPq(`14;C;AVenS;fans;;1;EUR;ok;${egri};${k}`)
+        expect(r.products).toHaveLength(0)
+        expect(r.errors).toEqual([expect.stringMatching(new RegExp(`orta basınç tam %${oran}\\) ama pq_curve_kaynak='${k}'`))])
+      }
+      const dogru = calisPq(`15;D;AVenS;fans;;1;EUR;ok;${egri};turetilmis`)
+      expect(dogru.errors).toEqual([])
+      expect((dogru.products[0].technical_specs as Record<string, unknown>).pq_curve_kaynak).toBe('turetilmis')
+    }
+  })
+
+  it('kapı hüküm vermez, etiket ister: desene uymayan QBK eğrisi etiketliyse geçer (gerçeklik Faz 1 kıyasının işi)', () => {
+    expect(calisPq(`16;E;AVenS;fans;;1;EUR;ok;${QBK};kitapcik_grafik`).errors).toEqual([])
+  })
+
+  it('bozuk eğri yazılmaz: JSON değil, tek nokta, sayı olmayan nokta', () => {
+    expect(pqKapisi({ spec_pq_curve: '[[0,1' })).toMatch(/pq_curve JSON değil/)
+    expect(pqKapisi({ spec_pq_curve: '[[0,1]]', spec_pq_curve_kaynak: 'turetilmis' })).toMatch(/biçiminde değil/)
+    expect(pqKapisi({ spec_pq_curve: '[[0,"a"],[1,2]]', spec_pq_curve_kaynak: 'turetilmis' })).toMatch(/biçiminde değil/)
+  })
+
+  it('eğrisiz satıra kapı dokunmaz (kaynak etiketi yalnız eğri varken istenir)', () => {
+    const r = calisPq('17;F;AVenS;fans;;1;EUR;ok;;')
+    expect(r.errors).toEqual([])
+    expect(r.products).toHaveLength(1)
+  })
+
+  it('kapı aile kaydından ÖNCE çalışır: reddedilen satır boş aile bırakmaz', () => {
+    const r = calisPq(`18;G;AVenS;fans;;1;EUR;ok;${QBK};`)
+    expect(r.families.size).toBe(0)
+    const kaynak = readFileSync(join(__dirname, '..', 'planla.mjs'), 'utf8')
+    expect(kaynak).toMatch(/const pqHata = pqKapisi\(r\)/)
+    expect(kaynak.indexOf('pqKapisi(r)')).toBeLessThan(kaynak.indexOf('const fam = families.get'))
   })
 })
 
