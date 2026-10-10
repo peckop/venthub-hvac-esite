@@ -2,6 +2,7 @@
 name: tasarim-uygulayici
 description: TASARIM departmanının uygulayıcı çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
 model: sonnet
+memory: user
 skills:
   - typography
   - venthub-tasarim-dili
