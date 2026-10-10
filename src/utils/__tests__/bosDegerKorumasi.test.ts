@@ -17,11 +17,11 @@ describe('doluMu', () => {
     expect(doluMu(girdi)).toBe(beklenen)
   })
 
-  it('dize olmayan değerler boştur (undefined, null, sayı, nesne)', () => {
+  // Sayı ve nesne artık DERLENMEZ (parametre `string | null | undefined`): o girdiler için çalışma anı testi yazılmaz,
+  // sözleşmeyi derleyici tutar. Metin olmayan tek yasal değerler:
+  it('dize olmayan yasal değerler boştur (undefined, null)', () => {
     expect(doluMu(undefined)).toBe(false)
     expect(doluMu(null)).toBe(false)
-    expect(doluMu(0)).toBe(false)
-    expect(doluMu({})).toBe(false)
   })
 })
 
@@ -39,7 +39,7 @@ describe('doluMetinler', () => {
     expect(doluMetinler(null)).toEqual([])
   })
 
-  it('dize olmayan öğeleri de atar', () => {
-    expect(doluMetinler(['a', undefined, null, 3, 'b'])).toEqual(['a', 'b'])
+  it('null ve undefined öğeleri de atar', () => {
+    expect(doluMetinler(['a', undefined, null, 'b'])).toEqual(['a', 'b'])
   })
 })

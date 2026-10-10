@@ -141,6 +141,55 @@ describe('TypeComparison — boş UYGUN / TERCİH EDİLMEZ maddesi boş hap çiz
     expect(haplar(container).filter(bosMetin)).toHaveLength(0)
     expect(haplar(container)).toHaveLength(4)
   })
+
+  /** Bir tipin dört AVANTAJ maddesine aynı değeri yazar. */
+  const avantajlar = (tip: 'electric' | 'ambient', deger: string): Record<string, string> =>
+    Object.fromEntries([1, 2, 3, 4].map((n) => [`${T}${tip}Benefit${n}`, deger]))
+  const notForBos = (tip: 'electric' | 'ambient'): Record<string, string> => ({
+    [`${T}${tip}NotFor1`]: '',
+    [`${T}${tip}NotFor2`]: '',
+  })
+  const advantagesLabel = tr.category.typeComparison.advantagesLabel
+  const notForLabel = tr.category.typeComparison.notForLabel
+
+  it('OLUMLU KONTROL: avantajlar doluyken iki tipte de başlık ve dört madde çizilir', () => {
+    kaynak.dict = sozluk(TABAN, avantajlar('electric', 'Avantaj'), avantajlar('ambient', 'Avantaj'))
+    const { container } = ciz()
+    expect(screen.getAllByText(advantagesLabel)).toHaveLength(2)
+    expect(container.querySelectorAll('ul')).toHaveLength(2)
+    expect(container.querySelectorAll('li')).toHaveLength(8)
+  })
+
+  it('bir tipin AVANTAJ listesi tümden boşsa başlığı ve listesi de basılmaz (boş <ul> kalmaz)', () => {
+    kaynak.dict = sozluk(TABAN, avantajlar('electric', ''), avantajlar('ambient', 'Avantaj'))
+    const { container } = ciz()
+    expect(screen.getAllByText(advantagesLabel)).toHaveLength(1)
+    expect(container.querySelectorAll('ul')).toHaveLength(1)
+    expect(container.querySelectorAll('li')).toHaveLength(4)
+  })
+
+  it('iki tipin de AVANTAJ listesi boşsa başlık, liste ve madde hiç basılmaz', () => {
+    kaynak.dict = sozluk(TABAN, avantajlar('electric', ''), avantajlar('ambient', '   '))
+    const { container } = ciz()
+    expect(screen.queryAllByText(advantagesLabel)).toHaveLength(0)
+    expect(container.querySelectorAll('ul')).toHaveLength(0)
+    expect(container.querySelectorAll('li')).toHaveLength(0)
+  })
+
+  it('bir tipin TERCİH EDİLMEZ listesi tümden boşsa başlığı basılmaz, öbür tipinki durur', () => {
+    kaynak.dict = sozluk(TABAN, notForBos('electric'))
+    const { container } = ciz()
+    expect(screen.getAllByText(notForLabel)).toHaveLength(1)
+    expect(haplar(container).map((h) => h.textContent?.trim())).toEqual(['E-uygun-1', 'A-uygun-1', 'A-degil-1'])
+  })
+
+  it('iki tipin de TERCİH EDİLMEZ listesi boşsa başlık hiç basılmaz', () => {
+    kaynak.dict = sozluk(TABAN, notForBos('electric'), notForBos('ambient'))
+    ciz()
+    expect(screen.queryAllByText(notForLabel)).toHaveLength(0)
+    // UYGUN başlığı bundan etkilenmez: tipler hâlâ birer UYGUN maddesi taşıyor.
+    expect(screen.getAllByText(tr.category.typeComparison.bestForLabel)).toHaveLength(2)
+  })
 })
 
 describe('VorticeBrand — boş sayaç kartı ve boş ödül parçası çizilmez', () => {

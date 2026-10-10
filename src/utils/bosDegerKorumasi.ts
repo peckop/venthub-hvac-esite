@@ -12,12 +12,18 @@
  *  · yalnız boşluk içeren dize de boş sayılır.
  */
 
-/** Dize ve en az bir boşluk-dışı karakter içeriyorsa true. `null`/`undefined`/sayı/nesne → false. */
-export function doluMu(deger: unknown): deger is string {
+/**
+ * Dize ve en az bir boşluk-dışı karakter içeriyorsa true; `''`, yalnız boşluk, `null`, `undefined` → false.
+ *
+ * Parametre tipi bilerek dar (`unknown` değil): sayı ya da nesne geçilirse derleyici uyarır, "dolu mu" sorusu
+ * yalnız metin için sorulur. Çalışma anında dize-olmayan değer yine false döner (savunma). Dönüş `boolean`:
+ * tip koruyucu olsaydı yanlış dalda `string` daralıp `never` olurdu.
+ */
+export function doluMu(deger: string | null | undefined): boolean {
   return typeof deger === 'string' && deger.trim().length > 0
 }
 
 /** Listeden boş / yalnız-boşluk / dize-olmayan öğeleri atar; sırayı korur. Liste yoksa boş dizi. */
-export function doluMetinler(liste: ReadonlyArray<unknown> | null | undefined): string[] {
-  return (liste ?? []).filter(doluMu)
+export function doluMetinler(liste: ReadonlyArray<string | null | undefined> | null | undefined): string[] {
+  return (liste ?? []).filter((metin): metin is string => doluMu(metin))
 }

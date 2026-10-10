@@ -78,6 +78,8 @@ describe('CaseStudySection — etiketi boş ölçü hapı ve boş kart çizilmez
 
     expect(kartlar(container)).toHaveLength(2)
     expect(haplar(container)).toHaveLength(0)
+    // Ölçülerin hepsi elendiyse hap sarmalayıcısı da çizilmez (boş bir `flex-wrap` kutusu kalmaz).
+    expect(container.querySelectorAll('div.flex-wrap')).toHaveLength(0)
     for (const gomulu of ['%35', '2 hafta', '%+20', '< 6 ay']) {
       expect(container.textContent).not.toContain(gomulu)
     }
@@ -88,6 +90,8 @@ describe('CaseStudySection — etiketi boş ölçü hapı ve boş kart çizilmez
     const { container } = render(<CaseStudySection />)
     const haplarMetni = haplar(container).map((h) => h.textContent?.replace(/\s+/g, ' ').trim())
     expect(haplarMetni).toEqual(['Etiket: %35'])
+    // Sarmalayıcı yalnız ölçüsü kalan kartta var (parking); airCurtain kartında yok.
+    expect(container.querySelectorAll('div.flex-wrap')).toHaveLength(1)
   })
 
   it('başlığı boş kart çizilmez; özeti boş kartta özet satırı basılmaz', () => {
