@@ -56,7 +56,7 @@ Bu dosya departman penceresi (müdür) içindir. Alt ajan (çalışan) yalnız g
 - Erteleme dili kullanma; "yarın" yerine tarih ya da gün yaz. Recep kararı bekleyen işi "Recep'te: <tek satır soru>" diye yaz, tarih verme.
 - Ölçmediysen "bilmiyorum, bakıyorum" de. Niyeti anlamadıysan ölçmeden önce tek netleştirme sorusu sor; veride ya da kodda olan şeyi sorma, araştır.
 - "Yapıldı mı, kullandık mı" sorusuna önce hafızaya, Kanban'a ve git geçmişine bak, sonra cevapla.
-- Kategori, ürün ya da "görünmüyor" iddiasını canlı sayfa ölçülmeden Recep'e taşıma; ham veritabanı alanı tek başına kanıt değildir.
+- Kategori, ürün ya da "görünmüyor" iddiasını canlı sayfa ölçülmeden Recep'e taşıma; ham veritabanı alanı tek başına kanıt değildir. Canlı sayfayı masaüstü uygulamasının tarayıcı bölmesiyle aç (navigate, ardından read_page ya da javascript ile başlık, açıklama ve metni oku).
 - Vitrin, föy ya da metinde marka, adres, sertifika ve performans sayısını resmi kaynaktan doğrula; kaynakta birebir yoksa yazma.
 - Depo herkese açıktır: depoya (commit, PR, dosya) Recep'in sözlerini tırnakla yazma, ölçülmüş gerçeği ve kaynağı yaz. Sözün aynısı ve saati yalnız depo dışı kayda gider (durum dosyası, hafıza, scripts/board/recep-sozu-defteri.cjs defteri).
 - Gün sonunu yalnız Recep ilan eder; her compact bir kayıt üretir.
