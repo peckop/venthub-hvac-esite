@@ -145,9 +145,9 @@ function yuvalar(dizin, adet) {
  * Yuva almayı dener.
  * @returns {{ok:true, yuva:number}|{ok:false, sahipler:Array<{sid:string,lane:string,komut:string,ad:string,ts:number}>}}
  */
-function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini(), adet = N }) {
+function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini(), adet = N, arkaPlan = false }) {
   fs.mkdirSync(dizin, { recursive: true })
-  const kayit = { sid, lane: lane || '', ad, komut: String(komut || '').slice(0, 120), ts: simdi }
+  const kayit = { sid, lane: lane || '', ad, komut: String(komut || '').slice(0, 120), ts: simdi, arkaPlan: Boolean(arkaPlan) }
   const sahipler = []
   const hepsi = yuvalar(dizin, adet)
   for (let i = 0; i < hepsi.length; i += 1) {
@@ -163,7 +163,9 @@ function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini
       const s = sahipOku(yol)
       if (s && s.sid === sid) {
         // Aynı pencere: yeniden giriş (arka plan komutunun üstüne ikinci ağır komut) yuvayı yeniler.
-        fs.writeFileSync(path.join(yol, 'sahip.json'), JSON.stringify(kayit))
+        // ⭐arkaPlan İŞARETİ KORUNUR (OPS 10-10): arka plandaki komut hâlâ koşuyorken öndeki ikinci
+        // ağır komutun PostToolUse'u yuvayı düşürmemeli; yuva TTL'e kalır.
+        fs.writeFileSync(path.join(yol, 'sahip.json'), JSON.stringify({ ...kayit, arkaPlan: Boolean(s.arkaPlan) || kayit.arkaPlan }))
         return { ok: true, yuva: i }
       }
       if (bayatMi(yol, simdi)) {
@@ -177,12 +179,15 @@ function kilitAl({ sid, komut, ad, lane, simdi = Date.now(), dizin = kilitDizini
   return { ok: false, sahipler }
 }
 
-/** Pencerenin tuttuğu yuvayı geri verir; kaç yuva bırakıldığını döner. */
+/**
+ * Pencerenin tuttuğu yuvayı geri verir; kaç yuva bırakıldığını döner.
+ * Arka plan komutunun yuvası (`arkaPlan: true`) bırakılmaz: komut hâlâ koşuyor, yuva TTL'le düşer.
+ */
 function kilitBirak({ sid, dizin = kilitDizini(), adet = N }) {
   let n = 0
   for (const yol of yuvalar(dizin, adet)) {
     const s = sahipOku(yol)
-    if (s && s.sid === sid) {
+    if (s && s.sid === sid && !s.arkaPlan) {
       fs.rmSync(yol, { recursive: true, force: true })
       n += 1
     }
@@ -245,22 +250,28 @@ function girdiOku() {
 }
 
 function calistir() {
-  const birak = process.argv.includes('--birak')
   const girdi = girdiOku()
+  // BAŞARISIZ ağır komut (tsc çıkış 2, kırmızı test) PostToolUse üretmez; olay PostToolUseFailure'dır.
+  // Aynı kayıt (`--birak`) iki olayda da çalışır; olay adı girdiden de okunur (OPS 10-10).
+  const birak = process.argv.includes('--birak') || girdi.hook_event_name === 'PostToolUseFailure'
   if (girdi.tool_name && girdi.tool_name !== 'Bash') return
   const komut = girdi.tool_input && girdi.tool_input.command
   const sid = UUID.test(String(girdi.session_id || '')) ? String(girdi.session_id) : String(process.env.CLAUDE_SESSION_ID || '')
   if (!sid) return
   const simdi = Date.now()
   if (birak) {
-    // Arka plan komutu hemen döner ama koşmaya devam eder: yuva TTL'e bırakılır.
-    if (girdi.tool_input && girdi.tool_input.run_in_background) return
+    // ⭐YALNIZ AĞIR KOMUTUN olayı yuvayı bırakır (OPS 10-10): kilitBirak sid'e bakar, komuta bakmaz;
+    // aynı pencerenin sonraki hafif Bash çağrısı (git status) arka plandaki tsc'nin yuvasını düşürürdü.
+    if (!agirMi(komut)) return
+    // Arka plan komutu hemen döner ama koşmaya devam eder: yuvası `arkaPlan` işaretiyle alındı,
+    // kilitBirak onu bırakmaz, TTL düşürür (tek mekanizma; ayrıca run_in_background bakmak gereksizdi).
     kilitBirak({ sid })
     return
   }
   const ad = agirMi(komut)
   if (!ad) return
-  const r = kilitAl({ sid, komut, ad, lane: process.env.CC_LANE || '', simdi })
+  const arkaPlan = Boolean(girdi.tool_input && girdi.tool_input.run_in_background)
+  const r = kilitAl({ sid, komut, ad, lane: process.env.CC_LANE || '', simdi, arkaPlan })
   if (r.ok) return
   process.stdout.write(
     JSON.stringify({

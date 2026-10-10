@@ -181,6 +181,47 @@ describe('INV-AGIR-KILIT-2b: kanca protokolü (stdin → stdout, çıkış kodu 
     expect(b.stdout).toMatch(/"permissionDecision":"deny"/)
   })
 
+  const reddedildi = (dizin: string, sid = B, komut = 'pnpm type-check'): boolean =>
+    /"permissionDecision":"deny"/.test(calistir(dizin, bash(sid, komut)).stdout)
+
+  it('HAFİF komutun PostToolUse\'u, aynı pencerenin tuttuğu yuvayı BIRAKMAZ (OPS 10-10 düzeltme 1)', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, bash(A, 'pnpm build'))
+    calistir(dizin, bash(A, 'git status'), '--birak')
+    expect(reddedildi(dizin)).toBe(true)
+  })
+
+  it('arka plan ağır komutun yuvası, sonraki HAFİF komutun PostToolUse\'unda KALIR', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, bash(A, 'pnpm build', { run_in_background: true }))
+    calistir(dizin, bash(A, 'git status'), '--birak')
+    expect(reddedildi(dizin)).toBe(true)
+  })
+
+  it('arka plan yuvasına giren ÖN PLAN ağır komutun PostToolUse\'u yuvayı düşürmez (arkaPlan işareti korunur)', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, bash(A, 'pnpm build', { run_in_background: true }))
+    const ikinci = calistir(dizin, bash(A, 'pnpm type-check'))
+    expect(ikinci.stdout.trim()).toBe('')
+    calistir(dizin, bash(A, 'pnpm type-check'), '--birak')
+    expect(reddedildi(dizin)).toBe(true)
+  })
+
+  it('BAŞARISIZ ağır komut (PostToolUseFailure) yuvayı bırakır; kayıt `--birak` argümansız da çalışır (OPS düzeltme 2)', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, bash(A, 'pnpm exec tsc --noEmit'))
+    expect(reddedildi(dizin)).toBe(true)
+    calistir(dizin, { ...bash(A, 'pnpm exec tsc --noEmit'), hook_event_name: 'PostToolUseFailure', error: 'exit 2' })
+    expect(reddedildi(dizin)).toBe(false)
+  })
+
+  it('HAFİF komutun PostToolUseFailure\'ı yuvayı bırakmaz', () => {
+    const dizin = yeniDizin()
+    calistir(dizin, bash(A, 'pnpm build'))
+    calistir(dizin, { ...bash(A, 'git status'), hook_event_name: 'PostToolUseFailure', error: 'exit 1' })
+    expect(reddedildi(dizin)).toBe(true)
+  })
+
   it('hafif komut ve Bash dışı araç yuva ALMAZ', () => {
     const dizin = yeniDizin()
     calistir(dizin, bash(A, 'pnpm test:ilgili'))

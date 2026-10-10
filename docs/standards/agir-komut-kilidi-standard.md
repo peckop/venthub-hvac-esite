@@ -27,8 +27,12 @@ kendi kuralına uyuyordu; makineyi bağlayan bir şey yoktu. Pencereler birbirin
 2. **Yuva:** ağır komut için `<pano>/agir-kilit/yuva-<i>` dizini atomik `mkdir` ile alınır.
    Varsayılan yuva sayısı **1**. Yuva doluysa komut REDDEDİLİR; cevap sahibi (pencere, komut, kaç dk
    önce) söyler ve "döngü kurma, bir kez daha dene" der.
-3. **Bırakma:** PostToolUse(Bash) `--birak` yuvayı verir. Arka plan komutu (`run_in_background`) yuvayı
-   BIRAKMAZ; komut hâlâ koşuyordur.
+3. **Bırakma:** PostToolUse(Bash) ve **PostToolUseFailure(Bash)** `--birak` yuvayı verir; başarısız
+   komut (tsc çıkış 2, kırmızı test) PostToolUse üretmez, olay PostToolUseFailure'dır. Yalnız
+   **AĞIR komutun** olayı bırakır: aynı pencerenin sonraki hafif Bash çağrısı (`git status`) yuvayı
+   düşürmez. Arka plan komutu (`run_in_background`) yuvayı BIRAKMAZ (komut hâlâ koşuyordur) ve
+   yuvaya `arkaPlan` işareti konur; o yuvaya girilen ön plan ağır komutun olayı da onu düşürmez.
+   Arka plan yuvası TTL ile düşer.
 4. **Bayat yuva:** 20 dakikadan eski yuva ölü sayılır ve bir sonraki deneyen onu siler (pencere
    kapanır, iptal edilir, PostToolUse gelmez).
 5. **Açık kalır:** kilit dizini yazılamıyor, girdi bozuk ya da beklenmeyen hata varsa komut GEÇER.
@@ -80,13 +84,33 @@ PostToolUse → yeni grup:
 }
 ```
 
-**Geri alma:** iki kaydı sil. Yuva dizinini silmek gerekmez (20 dk içinde bayatlar). Kancayı
-geçici kapatmak için `VENTHUB_AGIR_KILIT_N=99` yeter.
+PostToolUseFailure → yeni grup (başarısız komut PostToolUse üretmez; bu kayıt olmazsa yuva 20 dk dolu kalır
+ve bütün filo bekler). Aynı komut, aynı `--birak`:
+
+```json
+{
+  "matcher": "Bash",
+  "hooks": [
+    {
+      "type": "command",
+      "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/agir-komut-kilidi.cjs\" --birak"
+    }
+  ]
+}
+```
+
+**Geri alma:** üç kaydı (PreToolUse, PostToolUse, PostToolUseFailure) sil. Yuva dizinini silmek
+gerekmez (20 dk içinde bayatlar). Kancayı geçici kapatmak için `VENTHUB_AGIR_KILIT_N=99` yeter.
+
+**Onay:** filoda komutu REDDEDEN yeni bir davranıştır; ayar kaydı Recep'in sözüyle OPS tarafından
+uygulanır (karar 224: onay pencereler arası taşınmaz).
 
 ## §5 Kabul
 
 - Test: `INV-AGIR-KILIT-1..3` (sınıflama tablosu, yuva dışlama/bırakma/bayat, kanca protokolü,
-  istem satırı, pencere sayımı). Bozma: 18 mutasyonun 18'i yakalandı (2026-10-10).
+  istem satırı, pencere sayımı, hafif komutun ve başarısız komutun bırakma davranışı). Bozma:
+  2026-10-10'da 22 mutasyonun 22'si yakalandı (OPS düzeltmeleri: hafif komut bırakmaz,
+  PostToolUseFailure, arkaPlan işareti dahil).
 - Canlı kabul (ayar kaydından sonra): iki pencerede aynı anda `pnpm type-check` denenince ikincisi
   `AGIR KOMUT KILIDI` ile reddedilir ve istem satırında `⚠KILIT` görünür. Bu ölçüm kayıttan sonra
   karta yazılır; ölçülmeden "çalışıyor" denmez.
