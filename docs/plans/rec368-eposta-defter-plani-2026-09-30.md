@@ -1,6 +1,6 @@
 # REC-368 — E-posta defteri: her gönderim başarıda da başarısızlıkta da iz bırakır
 
-**Durum:** PLAN (kod yok). Bağımsız çürütme (plan-challenger) sonucu §9'a işlenir; OPS onayı olmadan kod başlamaz.
+**Durum:** PLAN v4 (kod yok). M0 canlıda (#1574). M1 tasarımı §10, çürütme sonucu ve revizyonu §11 (çelişen yerde §11 kazanır); OPS onayı olmadan M1 kodu başlamaz.
 **Yöneten cetvel:** `docs/standards/notification-standard.md` v1.1 — §B3.3 (defter her iki hâlde satır bırakır),
 §B4 (sessizlik yasağı), §B5 (kiracı kapsamı), §B8 (kapılar). Migration için `create-migration` skill'i
 (damga 14 hane, geri alma satırı, INV-MIGRATION-3 SQL kalitesi). Bu plan cetveli DEĞİŞTİRMEZ; §B8'e bir kapı ekler (§6).
@@ -155,6 +155,119 @@ Sabotaj kolları: (a) defter yazımı silinirse, (b) muaf listesine gerekçesiz 
 4. Şema tabanı M1'den sonra tazelenir (ikinci taban PR'ı açılmaz; ADMIN/ARAÇ koordinasyonu).
 
 **Ölçülemedi (açık):** yerel/CI PG sürümü (kararı etkilemiyor: sentinel seçildi); `canCarrierTransition`'ın `received→received`'a izin verip vermediği (webhook ile yönetici ekranı gerçekten çakışır mı; Katman 1+2 bunu bilmeden de güvenli kılar); canlıdaki 2 aktif oturumun içeriği.
+
+## 10. M1 KESİN TASARIM (v3, 09-30 — M0 canlıda: #1574 61ec00b93; kod başlamadan plan-challenger'a gider)
+
+**M0 durumu:** birleşti ve yayında (deploy-functions 36693905928). Canlı kanıt ilk gerçek siparişte; yapay sipariş atılmaz.
+
+### 10.1 Canlıda ölçülenler (salt okuma, 09-30, proje tnofewwkwlyjsqgwjjga) — §9'daki varsayımları kesinleştirir
+
+| Ölçüm | Sonuç | Plana etkisi |
+|---|---|---|
+| PostgreSQL sürümü | 17.6 (canlı) | `NULLS NOT DISTINCT` canlıda VAR; ama yerel/CI sürümü hâlâ ölçülmedi → sentinel `coalesce` KALIR (§9.3) |
+| `order_email_events` politikaları | yalnız `service_role` (ALL + SELECT), `TO service_role` | anon/authenticated yazamaz; ama tablo hibeleri açık (anon: INSERT/UPDATE/DELETE/TRUNCATE) → `REVOKE` savunma derinliği, davranış değiştirmez |
+| `order_email_events` okuyanlar (`src/`) | yalnız testler + `database.types.ts` | `REVOKE ALL … FROM anon, authenticated` hiçbir çalışma zamanı okuyucusunu kırmaz |
+| `shipping_email_events.tenant_id` emsali | `uuid NOT NULL DEFAULT 'd3b07384-…0000' REFERENCES tenants(id) ON DELETE CASCADE` (migration 20260530220000) | `order_email_events.tenant_id` aynı kalıpla eklenir; tetik yalnız DEFAULT'u siparişin kiracısıyla ezer |
+| `venthub_orders.tenant_id` | `NOT NULL DEFAULT 'd3b07384-…0000'` | tetikteki alt sorgu NULL dönmez |
+| `tenants` | 1 satır | çok kiracılı mod PARK'ta; DEFAULT kabulü kayıtlı |
+| `order_email_events` | 0 satır (ödenmiş sipariş yok) | `ADD COLUMN NOT NULL DEFAULT` + dizin değişimi risksiz, kilit süresi ihmal edilebilir |
+| `quote_email_events` | `anon` SELECT hibesi + `user_profiles.role` okuyan politika | **kapsam dışı**, REC-442 (68 politika göçü) içinde; bu planda dokunulmaz |
+
+### 10.2 M1 migration iskeleti (`YYYYMMDDHHMMSS_eposta_defter_ref_tenant_sistem.sql`, 14 hane)
+
+1. Başlık: geri alma satırları (yorum). Geri alma sırası: yeni tabloyu düşür → eski dizini `(order_id, kind) WHERE status='sent'` ile yeniden kur → yeni dizini düşür → tetik+fonksiyonu düşür → `ref_id`, `tenant_id` kolonlarını düşür. Tablolar boş olduğu sürece veri kaybı yok; **satış açıldıktan sonra** geri alma satır kaybettirir → M1 satıştan ÖNCE uygulanmalı (zamanlama gerekçesi).
+2. `SET lock_timeout='3s'; SET statement_timeout='30s';` `BEGIN`'den önce.
+3. `ALTER TABLE order_email_events ADD COLUMN IF NOT EXISTS ref_id uuid;`
+4. `ADD COLUMN IF NOT EXISTS tenant_id uuid NOT NULL DEFAULT 'd3b07384-d113-495f-a558-8c38634e0000' REFERENCES tenants(id) ON DELETE CASCADE` + `idx_order_email_events_tenant_id`.
+5. BEFORE INSERT tetiği `order_email_events_set_tenant()`: `NEW.tenant_id := coalesce((select tenant_id from venthub_orders where id = NEW.order_id), NEW.tenant_id)`; `SECURITY INVOKER`, `SET search_path = ''`, şema-nitelikli adlar.
+6. AYNI transaction: `CREATE UNIQUE INDEX uq_order_email_events_sent_once_ref ON order_email_events (order_id, kind, coalesce(ref_id, '00000000-0000-0000-0000-000000000000'::uuid)) WHERE status='sent'` → sonra `DROP INDEX uq_order_email_events_sent_once`.
+7. `CREATE TABLE system_email_events` (id, tenant_id NOT NULL DEFAULT emsal + FK, kind, email_to, subject, provider, provider_message_id, status CHECK `attempt|sent|failed`, error, ref_type, ref_id, created_at) + `ENABLE ROW LEVEL SECURITY` + `REVOKE ALL … FROM anon, authenticated` + `service_role` politikası (`TO service_role`).
+8. `REVOKE ALL ON order_email_events FROM anon, authenticated;` (davranış değişmez, RLS zaten kapalı tutuyor).
+9. Öz-denetim (`DO $$`): yeni dizinin `indexdef`'i `coalesce(ref_id` ve `WHERE (status = 'sent'` içeriyor; eski dizin yok; `ref_id`/`tenant_id` var; `system_email_events` RLS açık ve anon hibesi yok; tetik var. Hepsi `RAISE EXCEPTION` ile kırılır.
+
+### 10.3 M1 PR'ının geri kalanı (aynı PR, kural 14)
+
+- `src/types/database.types.ts` yeniden üretilir (`ref_id`, `tenant_id`, yeni tablo); tip senkron kapısı yeşil kalmalı.
+- `notification-standard.md` §B3 dizin tarifi (satır 333/362) güncellenir.
+- Şema tabanı (`scripts/db/checks/*`) yeni tabloyu ve dizin adını bilir: ADMIN/ARAÇ ile koordinasyon, ikinci taban PR'ı açılmaz (§8/4).
+- Migration testi: dizin davranışı gerçek PG'de sınanır (aynı `(order_id, kind, NULL)` ikinci `sent` reddedilir; aynı sipariş + aynı kind + FARKLI `ref_id` iki `sent` KABUL edilir; `failed` satırları sınırsız). Sabotaj: dizinden `coalesce` çıkarılırsa NULL-ref türünde tekrar yakalanmaz → kırmızı.
+- PR gövdesi: `Kayitsiz: Linear siniri dolu, Part of REC-368`.
+
+### 10.4 Çürütücüye açık sorular
+
+1. Tetik `SECURITY INVOKER` yeterli mi (yazıcı `service_role`, `venthub_orders` okuyabilir) yoksa yetki boşluğu var mı?
+2. `ON DELETE CASCADE` (tenants → defter) kiracı silinirse e-posta delilini de siler: kabul mü (KVKK gerekçesiyle) yoksa `RESTRICT` mı?
+3. Sıfır-uuid sentinel, gerçek bir `ref_id` ile çakışabilir mi (`gen_random_uuid()` sıfır üretmez, ama dışarıdan verilen `return_id`?).
+4. Tek transaction içinde yeni dizini kurup eskiyi düşürmek, `order-paid-webhook`'un eşzamanlı `sent` PATCH'i ile yarışırsa koruma açığı doğar mı (tablo boş; ama satış açılınca)?
+5. `REVOKE ALL FROM authenticated` ileride yönetici okumasını (`shipping_email_events_admin_select` kalıbı) engeller mi, yoksa o zaman `GRANT SELECT` + politika ile mi eklenir?
+6. Zamanlama: M1 satıştan önce uygulanmalı; satış açma kapısına ("açılış önkoşulları") madde olarak eklenmeli mi?
+
+## 11. Bağımsız çürütme (§10) ve doğrulama sonucu — REVİZYON v4 (09-30)
+
+**Hüküm: KOŞULLU.** Çekirdek (ref_id, tenant_id, tetik, yeni tablo) doğru; §10.2 olduğu gibi merge edilirse squawk'ta kırılır, tip-drift penceresi açar, öz-denetim prod'da patlayabilir. **Çelişen yerde bu bölüm §10'un yerine geçer.** Yöneten cetvel ek olarak `migration-safety-standard.md` (§ "tip dosyası ve şema tabanı AYNI SAATTE").
+Bağımsız doğrulayıcı §10.1'in 8 ölçümünü kendi sorgusuyla yeniden ölçtü: hepsi doğru; iki eksik (aşağıda 11.5) ve bir düzeltme (11.6).
+
+### 11.1 M1 migration yapısı — üç adım, idempotent (squawk INV-MIGRATION-3 + INV-MIGRATION-1)
+
+Emsal: `20260930061500_pricing_rule_urun_tek_sabit_uq.sql` (düz `CREATE UNIQUE INDEX` squawk'ta KIRMIZI, ölçülmüş; `CONCURRENTLY` transaction içinde yasak).
+
+- **A (`begin … commit`):** kolonlar, `system_email_events`, tetik fonksiyonu + tetik, REVOKE'lar, RLS/politika. Hepsi yeniden koşulabilir: `add column if not exists`, `create table if not exists`, `create or replace function`, `drop trigger if exists` + `create trigger`, `drop policy if exists` + `create policy`. FK `ADD CONSTRAINT … NOT VALID` (ayrı), `VALIDATE` bloğun dışında (emsal `20260923083021_url_takma_adlari`).
+- **B (transaction DIŞI):** `create unique index concurrently if not exists` (yeni dizinler), `idx_order_email_events_tenant_id` concurrently, sonra `drop index concurrently if exists uq_order_email_events_sent_once`. Önce yenisi, sonra eskisi: koruma açığı yok (yeni dizinler eskinin yalnız iade türü için gevşetilmişi).
+- **C (`begin … commit`):** son-guard: `indisvalid` (yarıda kalan CONCURRENTLY geçersiz dizin bırakır; `if not exists` onu "var" sayar) + yapı denetimi.
+- Runner `supabase-migrate.yml` kendi `BEGIN`'i olan dosyayı sarmaz: A commit'lenip B düşerse A kalıcıdır, ledger yazılmaz, sonraki koşu baştan dener → bu yüzden idempotans zorunlu.
+- **İlk sinyal CI'dır:** squawk yerelde kurulu değil, çıktısı ÖLÇÜLEMEDİ. PR'da squawk kırmızı verirse kural gerekçesiyle ele alınır, sessizce `squawk-ignore` konmaz.
+
+### 11.2 Dizin: sentinel YOK, iki kısmi dizin (S3, S-A3)
+
+`coalesce(ref_id, sıfır-uuid)` terk edilir (sentinel çakışma koruması yoktu; `pg_indexes.indexdef` deparse'ında büyük/küçük harf tuzağı; sürüm belirsizliği). Yerine:
+
+- `uq_order_email_events_sent_once_null ON (order_id, kind) WHERE status='sent' AND ref_id IS NULL`
+- `uq_order_email_events_sent_once_ref ON (order_id, kind, ref_id) WHERE status='sent' AND ref_id IS NOT NULL`
+
+İkisi de düz kolon: PostgREST insert/PATCH kalıbı ve `23505` yakalama (`order-paid-webhook:290`, `delivery-notification` `damgala` 409) aynen çalışır. Öz-denetim `indexdef ILIKE` ile `ref_id IS NULL` / `ref_id IS NOT NULL` ve `status = 'sent'` içeriğini + `indisvalid`'i sınar; eski dizin yok.
+
+### 11.3 Tetik ve yetki (S1, S-A7)
+
+- `coalesce(…, NEW.tenant_id)` KALDIRILDI: sipariş görünmezse sessizce DEFAULT kiracıya düşerdi (kural 12 sızıntı vektörü). Alt sorgu NULL dönerse NOT NULL ihlali fail-closed olur.
+- Tetik `BEFORE INSERT OR UPDATE OF order_id, tenant_id`.
+- Fonksiyona açık `REVOKE ALL ON FUNCTION … FROM public, anon, authenticated` (canlı varsayılan ACL anon/authenticated'a EXECUTE veriyor; `create-migration` skill'i her yeni fonksiyonda ister).
+- Cetvel §B5 "gönderen uç `tenant_id`'yi yazar" (A PR'ı): `order-paid-webhook` `order.tenant_id`'yi elinde tutuyor, yazıcılara ekler; tetik ikinci savunma.
+- `REVOKE ALL … FROM anon, authenticated` `order_email_events` için de (authenticated'ın SELECT dahil 7 hibesi açık; §10.1 satır 2b'ye eklenir). Kimseyi kırmaz (bağımlı view/fonksiyon yok; `src/`'de çalışma zamanı okuyucusu yok).
+- `ON DELETE CASCADE` (tenants → defter) KABUL: `venthub_orders` ve `shipping_email_events` da aynı; RESTRICT bu zincirde yanlış olur. `system_email_events` için de CASCADE, bu satırla kayıtlı.
+- Yönetici okuması ileride: `GRANT SELECT` + politika. Kopyalanacak `shipping_email_events_admin_select` kalıbı kural 12'ye tam temiz DEĞİL (`is_admin_user()` claim yoksa `user_profiles.role`'e, `jwt_tenant_id()` claim yoksa DEFAULT kiracıya düşüyor): o gün REC-442 sonucu beklenir ya da düşme bilinçli kabul edilir.
+
+### 11.4 `system_email_events` sütunları (S-A8; M0'ın kök nedeni tam buydu)
+
+`id uuid pk default gen_random_uuid()`; `tenant_id uuid NOT NULL DEFAULT '<varsayılan kiracı>' REFERENCES tenants ON DELETE CASCADE`; `kind text NOT NULL`; `email_to text` (NULLABLE); `subject text` (NULLABLE); `provider text NOT NULL DEFAULT 'resend'`; `provider_message_id text`; `status text NOT NULL DEFAULT 'attempt' CHECK (status IN ('attempt','sent','failed'))`; `error text`; `ref_type text`; `ref_id uuid`; `created_at timestamptz NOT NULL DEFAULT now()`. İndeksler: `(tenant_id)`, `(kind, created_at DESC)`. `INV-EPOSTA-DEFTER-YAZICI-1` yeni tabloyu da kapsayacak şekilde A PR'ında genişletilir. SMS/WhatsApp bu tabloda DEĞİL (§9.5).
+
+### 11.5 Tip dosyası, şema tabanı, PR gövdesi (S-A4) — §10.3'ün ilk maddesi DEĞİŞTİ
+
+- `database.types.ts` M1 PR'ında ÜRETİLMEZ: migration canlıya inmeden canlıdan üretilemez ve PR'da önde giden tip `INV-TIP-DRIFT-1`'i "TİPLERDE VAR, CANLIDA YOK" diye kırar; merge sonrası geride kalan "CANLIDA VAR, TİPLERDE YOK" diye filo genelinde kırar. Sıra: PR gövdesinde `tip takibi: URUN` (URUN merge'ten ÖNCE haberdar) → merge → `supabase-migrate.yml` yeşil → sahibi aynı saatte `pnpm supabase:gen` PR'ı.
+- Şema tabanı: migration damgası taban tarihinden (09-30) yeni olmamalı; merge günü `sema-tabani-uret.yml` koşturulur (ADMIN/ARAÇ'a haber, ikinci taban PR'ı açılmaz).
+- PR gövdesi: `Kayitsiz: Linear siniri dolu, Part of REC-368` + `⚠ MIGRATION İÇERİR — merge = prod'a otomatik uygulama. Yalnız Recep onayıyla merge.` + `tip takibi: URUN`.
+- Geri alma metni düzeltildi: A PR'ı yayına girip farklı `ref_id`'li iki `return_*` `sent` satırı doğduktan sonra eski `(order_id, kind)` dizinini yeniden kurmak HATA verir (satır kaybı değil, geri alma yapılamaz). Geri alma penceresi = M1'in uygulanmasından A'nın yayınına kadar.
+
+### 11.6 Doğrulayıcının plana düzeltmeleri
+
+- §2: `order-confirmation` "hata görünür mü: hayır" YANLIŞ: gönderim hatası `index.ts:229-246` ile Sentry + `admin_audit_log` + 502 olarak görünür; kör olan yalnız BAŞARI kaydı (`:250-257`, status/kind NULL, `.error` denetlenmiyor).
+- §2: `api.resend.com` çağıran `.ts` dosyası 6 (`order-confirmation`, `delivery-notification`, `shipping-notification`, `quote-notification-webhook`, `return-status-notification`, `notification-service`); `order-paid-webhook` gönderen değil devreden. `.md` dosyaları da bu dizeyi içerir → tarayıcı `.ts` ile sınırlanır (yoksa evren 9). **INV-NOTIFY-3 kanaryası ≥ 6** (≥ 7 ilk günden kırmızı doğardı) ve `notification-standard.test.ts`'teki mevcut `resendGonderenUclar()` yardımcısı kullanılır, ikinci tarayıcı yazılmaz. Muaf listesine `order-confirmation` değil tek-sahip ilkesiyle `order-paid-webhook` (devreden) uygun.
+- `notification-service` çağıranları: `stock-alert` (`:318`, `:400`), `_shared/notify.ts:75` (`iyzico-payment` ×3, `log-client-error` ×2), `QuotesTableBody.tsx:364` (plandaki `:346` yanlıştı).
+- Ek çift yazım: `shipping-notification:421` ve `admin-update-shipping:353` aynı e-posta için `shipping_email_events`'e iki satır yazıyor; `delivery-notification` da `order_email_events`'e ek olarak `shipping_email_events:288`'e yazıyor. M1/A kapsamı DEĞİL; ayrı alt iş olarak REC-368 altına yorum.
+- `quote-notification-webhook` iç bildirimi zaten `quote_email_events`'te (`:361-382`): `system_email_events` fiilen yalnız `notification-service` yolları için (stok özeti, `notify.ts` uyarıları, teklif durum e-postası).
+- Canlıda `venthub_returns` 1 satır (§2'de yoktu), `venthub_orders` 5 (hiçbiri ödenmiş değil).
+
+### 11.7 A PR'ına eklenenler (S-A6, S-A10, K10, 23505)
+
+- `order-paid-webhook` `sent` güncellemesine `provider_message_id` (`order-confirmation` cevabındaki `result.id`; `:275-278` bugün yalnız status+subject yazıyor). Yoksa satış açılış kontrolü K9'un sipariş kolu (`scripts/kip/acilis-onkosullari.mjs:234`: `status='sent' AND provider_message_id IS NOT NULL`) yapısal olarak sıfır sayar.
+- `order-paid-webhook` `sent` PATCH'inde (`:275-278`) 23505 filtresi yok (yalnız insert dalında `:290`); yeni dizinle yarışta yanlış alarm (`sent_guncelle`) üretir → filtre eklenir.
+- **A PR'ı yayınından ÖNCE** ölçüm: `order_email_events.ref_id` canlıda var mı (deploy-functions migration'dan bağımsız yayınlar; kolon yokken PostgREST yazımı düşer ve sessiz kalır). Recep sözü öncesi kontrol satırı.
+- Satış açılış önkoşullarına **K10** (ALTYAPI sahibi): `ref_id` kolonu + yeni dizinler + `system_email_events` tablosu + RLS var mı; `satis-kipi-acilis-onkosullari.test.ts` güncellenir. M1 satıştan ÖNCE uygulanmalıdır.
+- Migration içi apply-anı sondajı (gerçek PG CI'da yok: `ci.yml`'de postgres service yok; gölge DB Docker ister): var olan bir siparişle alt-işlemde iki `sent` ekle → `unique_violation` beklenir; farklı `ref_id` ile kabul beklenir; sonra geri al. Sipariş yoksa sondaj atlanır. Ek olarak statik konformans (migration metnini ayrıştırır) ve PGlite gölge koşumu PR'a kanıt olarak eklenir (PGlite geçici kurulur, depoya bağımlılık eklenmez).
+- Eski dizin adı/tanımını anlatan yorumlar (`delivery-notification:49,277`, `order-paid-webhook:269,288`) M1 ile güncellenir; `audit_checks.js` sabit R2/R10 listelerine `system_email_events` eklenir; pg_graphql canlıda kurulu değil (etkisiz), yine de tablo yorumuna `@graphql({"disabled": true})` konur.
+
+### 11.8 Ölçülemedi (açık)
+
+squawk çıktısı (kurulu değil; ilk sinyal CI); PGlite sürümü; `supabase-migrate.yml`'de `DB_URL` pooler tipi (oturum `SET lock_timeout` korunuyor mu); `tip-drift` PR'da zorunlu (required) kontrol mü (GitHub dal koruması, kodda görünmez); `returns-webhook` ile yönetici ekranı aynı değişiklik için ardışık çalışıyor mu (Katman 1+2 bunu bilmeden güvenli kılar).
 
 ## OKUNANLAR
 

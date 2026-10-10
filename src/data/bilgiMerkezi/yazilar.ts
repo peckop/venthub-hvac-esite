@@ -68,9 +68,10 @@ export const YAZILAR: readonly RehberYazisi[] = [
     kimlik: 'frekans-konvertoru',
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
-    // Gövdenin SON değişikliği: 2026-10-08, #1755 ("Fiyatı belirleyen etkenler" giriş cümlesi). Daha önce
-    // 2026-10-06, #1733 (aile bağlantı kimlikleri). Site haritası lastmod'u ve Article `dateModified` buradan.
-    guncellemeTarihi: '2026-10-08',
+    // Güncelleme tarihi 2026-10-10: karar OPS'ta, 10 Ekim 2026. Liste kartı ve yazı künyesi "Güncelleme" olarak
+    // basar; site haritası lastmod'u ve Article `dateModified` buradan. Önceki değer 2026-10-08: gövdenin son
+    // değişikliği, #1755 ("Fiyatı belirleyen etkenler" giriş cümlesi); ondan önce 2026-10-06, #1733.
+    guncellemeTarihi: '2026-10-10',
     urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
