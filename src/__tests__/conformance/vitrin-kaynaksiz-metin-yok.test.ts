@@ -318,4 +318,56 @@ describe('INV-VITRIN-KAYNAKSIZ-1 (URN-80)', () => {
       expect(Object.keys(sayfa)).not.toContain('experience')
     })
   })
+
+  describe('sözlük: şirketin / mağazanın kuruluş durumu ilanı yok (URN-96, karar 317)', () => {
+    /**
+     * Kuruluş durumunu ilan eden kalıp: "Mağazamız kuruluş aşamasında", "Our store is still being set up",
+     * "Şirket bilgileri kuruluşla eklenecek", "upon incorporation". NİÇİN: kayıtta şirket kurulmuş sayılmıyor ve kuruluş
+     * durumunu söylemek vitrinde kaynaksız bir şirket beyanıdır (#1813 içerik kuralı). URN-94 yasal sayfa gövdesinden,
+     * URN-96 SSS cevabından kaldırdı; bu kol aynı sınıfın sözlüğe başka yerden geri girmesini kapıda tutar.
+     * Gerçek (çevrimiçi ödeme kapalı, sipariş için teklif istenir) ayrıca ve nötr söylenir.
+     */
+    const KURULUS_DURUMU = /kuruluş\s+aşamasında|kuruluşla\s+eklenecek|being\s+set\s+up|upon\s+incorporation/i
+
+    /**
+     * JS'te `i` bayrağı "ı" ile "I"yı eşleştirmez (ASCII'ye düşen büyük harf dönüşümü yasak); "AŞAMASINDA" kaçardı.
+     * Deneyim dedektöründeki gibi metin iki küçük harf kuralıyla da denenir: genel ve tr-TR ("I" → "ı").
+     * Bölünmez boşluk (NBSP) kalıptaki `\s` ile zaten eşleşir.
+     */
+    const kurulusDurumuMu = (deger: string): boolean =>
+      [deger.toLowerCase(), deger.toLocaleLowerCase('tr-TR')].some((k) => KURULUS_DURUMU.test(k))
+
+    it('dedektör (sentetik): ilan kalıbını yakalar, nötr gerçek cümlesini ve "teklif aşamasında"yı yakalamaz', () => {
+      const yakalanmali = [
+        'Mağazamız kuruluş aşamasında olduğu için çevrimiçi ödeme henüz açık değil.',
+        'Şirket bilgileri kuruluşla eklenecek',
+        'MAĞAZAMIZ KURULUŞ AŞAMASINDA',
+        'Our store is still being set up, so online payment is not open yet.',
+        'Company details will be added upon incorporation',
+      ]
+      for (const s of yakalanmali) expect(kurulusDurumuMu(s), `yakalanmadı: ${s}`).toBe(true)
+      const yakalanmamali = [
+        'Çevrimiçi ödeme henüz açık değil. Sipariş için bizden teklif isteyebilirsiniz.',
+        'Online payment is not open yet. You can request a quote from us to place an order.',
+        'Bilgi eklenecek',
+        'To be added',
+        'Teslimat süresi ve sevkiyat koşulları teklif aşamasında netleştirilir.',
+      ]
+      for (const s of yakalanmamali) expect(kurulusDurumuMu(s), `yanlış yakalandı: ${s}`).toBe(false)
+    })
+
+    it.each(DILLER)('%s sözlüğünün HİÇBİR değeri şirketin/mağazanın kuruluş durumunu ilan etmez', (_dil, d) => {
+      const tum = duzlestir(d, '')
+      // BOŞ EVREN MUHAFIZI: düzleştirme boş dönerse kol sahte-yeşil verirdi.
+      expect(Object.keys(tum).length, 'sözlük düzleştirilemedi — tarayıcı kör').toBeGreaterThan(1000)
+      const ihlal = Object.entries(tum)
+        .filter(([, deger]) => kurulusDurumuMu(deger))
+        .map(([anahtar, deger]) => `${anahtar} = "${deger}"`)
+      expect(
+        ihlal,
+        'sözlükte şirketin/mağazanın kuruluş durumu ilan ediliyor (karar 317: kaldırma sorulmaz; gerçek nötr cümleyle ' +
+          'söylenir: "Çevrimiçi ödeme henüz açık değil"):\n' + ihlal.join('\n'),
+      ).toEqual([])
+    })
+  })
 })
