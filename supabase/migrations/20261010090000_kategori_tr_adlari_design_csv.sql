@@ -9,8 +9,10 @@
 --
 -- ESKİ ADRES NEDEN KIRILMAZ: `url_takma_ad_kategori` tetiği (20260923083021) güncellemede eski TR slug'ı
 -- `url_takma_adlari`'na (tur=kategori, dil=tr, hedef=kategori kimliği) kendisi yazar; sayfa katmanı eski adrese 308 verir
--- (bayrak kapalıyken `/tr/category/<yeni>`, açıkken tek sıçrama `/tr/kategori/<yeni>`). Bu migration o iddiayı apply
--- anında SAYAR (guard 3): tutmazsa işlem geri alınır, hiçbir satır değişmez.
+-- (bayrak kapalıyken `/tr/category/<yeni>`, açıkken tek sıçrama `/tr/kategori/<yeni>`). Bu migration, takma ad
+-- SATIRININ var olduğunu apply anında SAYAR (guard 3): tutmazsa işlem geri alınır, hiçbir satır değişmez. Guard 3
+-- sayfa katmanını (çözücü, kiracı kimliği, yönlendirme) ÇALIŞTIRMAZ; "eski adres tek 308 ile yeni adrese gider"
+-- kanıtı birleşme sonrası HTTP ölçümüyle alınır (plan §Kanıt) ve korozyon emsalindeki tek-sıçrama testiyle sınanır.
 --
 -- ÖLÇÜM (canlı SELECT, 2026-10-10): sekiz EN slug tek kiracıda birer satır; bugünkü TR adlar aşağıdaki tablodaki gibi; sekiz
 -- yeni ad `categories` içinde slug/tr/en alanlarında başka kategoride YOK; tetik açık (`tgenabled = 'O'`); canlıda
@@ -25,6 +27,12 @@
 -- ŞEMA TABANI: INV-TABAN-TAZE-1 gereği birleşme sonrası aynı gün `sema-tabani-uret.yml` koşturulur.
 --
 -- ATOMİKLİK: dosyada BEGIN/COMMIT YOK; çalıştırıcı `psql --single-transaction` ile sarar (INV-MIGRATION-1, biçim b).
+--
+-- ZAMAN AŞIMI: kategori satırı kilitliyse (admin düzenlemesi, webhook) CI süresiz asılmasın, 5 sn sonra düşsün;
+-- INV-MIGRATION-3 (squawk) çifti ister, son 27 migration taşıyor (docs/audits/rec315-squawk-ilk-tarama-2026-09-13.md §7).
+
+set lock_timeout = '5s';
+set statement_timeout = '30s';
 
 do $migration$
 declare
@@ -46,7 +54,8 @@ begin
       ('industrial-ceiling-fans', 'endustriyel-tavan-vantilatorleri',   'tavan-vantilatorleri')
     ) as t(en_slug, eski_tr, yeni_tr)
   loop
-    -- GUARD 1: hedef satır TAM BİR tane (çok kiracılı olunca ya da satır yoksa kör yazılmaz).
+    -- GUARD 1: hedef satır TAM BİR tane. `categories.slug` küresel benzersiz (UNIQUE), yani sayı ≤ 1; guard yalnız
+    -- "satır yok"u yakalar (kör yazılmaz). Kiracı sabitlenmez: tek kiracılı bugünkü şemada slug zaten tek kimliktir.
     select count(*) into v_adet from public.categories c where c.slug = r.en_slug;
     if v_adet <> 1 then
       raise exception 'URN-85 guard 1: % için % satır var (beklenen 1); hiçbir şey yazılmadı', r.en_slug, v_adet;
