@@ -28,6 +28,7 @@ import { useCategoryViewModel } from '../../hooks/useCategoryViewModel'
 import { useLocalizedRoutes } from '../../hooks/useLocalizedRoutes'
 import { useI18n } from '../../i18n/I18nProvider'
 import { DomainCategory } from '../../lib/type-converters'
+import { doluMu } from '../../utils/bosDegerKorumasi'
 import { getCategoryDisplayName,getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 
 /**
@@ -91,6 +92,13 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     // (`airCurtainWizardGate.ts`). Sessiz fan sihirbazı ayrı bileşen, bu kapıdan etkilenmez.
     const havaPerdesiSihirbazi = isAirCurtain && AIR_CURTAIN_WIZARD_ENABLED
     const sihirbazGirisi = havaPerdesiSihirbazi || isSilentFan
+
+    // URN-84: tablo iki nem alma rakamını BOŞ bırakır (kaynaksız teknik değer → çip kalkar). Değeri boş çip etiketiyle
+    // birlikte atılır (etiket tek başına anlamsız); hiç çip kalmazsa ızgara da basılmaz.
+    const nemAlmaCipleri = [
+        { value: t('category.landing.dehumidifierCapacityValue'), label: t('category.landing.dehumidifierCapacityLabel') },
+        { value: t('category.landing.dehumidifierNoiseValue'), label: t('category.landing.dehumidifierNoiseLabel') }
+    ].filter(cip => doluMu(cip.value))
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
     const breadcrumbItems = [
@@ -200,10 +208,16 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                                     <p className="text-xl text-slate-400 leading-relaxed mb-12">
                                         {t('category.landing.dehumidifierDesc')}
                                     </p>
-                                    <div className="grid grid-cols-2 gap-8">
-                                        <div><p className="text-3xl font-black text-secondary-blue">{t('category.landing.dehumidifierCapacityValue')}</p><p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">{t('category.landing.dehumidifierCapacityLabel')}</p></div>
-                                        <div><p className="text-3xl font-black text-secondary-blue">{t('category.landing.dehumidifierNoiseValue')}</p><p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">{t('category.landing.dehumidifierNoiseLabel')}</p></div>
-                                    </div>
+                                    {nemAlmaCipleri.length > 0 && (
+                                        <div className="grid grid-cols-2 gap-8">
+                                            {nemAlmaCipleri.map(cip => (
+                                                <div key={`${cip.value}|${cip.label}`}>
+                                                    <p className="text-3xl font-black text-secondary-blue">{cip.value}</p>
+                                                    {doluMu(cip.label) && <p className="text-xs uppercase tracking-widest font-bold text-slate-500 mt-2">{cip.label}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-secondary-blue/10 to-transparent pointer-events-none" />
                             </div>

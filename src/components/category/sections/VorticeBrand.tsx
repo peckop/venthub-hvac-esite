@@ -3,8 +3,12 @@ import React from 'react'
 
 import VentImage from '@/components/ui/VentImage'
 import { useI18n } from '@/i18n/I18nProvider'
+import { doluMu } from '@/utils/bosDegerKorumasi'
 
 import useScrollAnimation, { scrollAnimationClasses } from '../../../hooks/useScrollAnimation'
+
+/** Sayaç satırının kart sayısına göre sütun sayısı (Tailwind sınıfı TAM dize olmalı, birleştirilmez). */
+const SAYAC_SUTUNLARI: Record<number, string> = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3' }
 
 /**
  * VorticeBrand - Marka Hikayesi Bölümü
@@ -16,15 +20,21 @@ const VorticeBrand: React.FC = () => {
 
     const bDict = dict.category.vorticeBrand
     const icons = [Clock, Globe, Award, Star]
+    // URN-84: ödül parçası BOŞ olabilir (tablo kaldırır); boşken paragraf düz metin çizilir, boş <strong> basılmaz.
+    const compassoDoro = t('category.vorticeBrand.compassoDoro')
 
-    const highlights = icons.map((Icon, index) => {
+    // URN-84: tablo bazı sayaç kartlarını (ör. kuruluş yılı) BOŞ bırakır. Değer VE etiket birlikte
+    // boşsa kart çizilmez (ızgara 4'ten 3'e iner); yalnız biri boşsa o alan basılmaz.
+    // Simge, sözlükteki özgün sıraya bağlı kalır: kart düşünce kalanların simgesi kaymaz.
+    const highlights = icons.flatMap((Icon, index) => {
         const item = bDict.highlights[index]
-        return {
+        if (!item || (!doluMu(item.value) && !doluMu(item.label))) return []
+        return [{
             icon: Icon,
             value: item.value,
             label: item.label,
             description: item.desc
-        }
+        }]
     })
 
     return (
@@ -61,9 +71,13 @@ const VorticeBrand: React.FC = () => {
                         </p>
 
                         <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 hidden sm:block">
-                            {bDict.description2.split('Compasso d\'Oro')[0]}
-                            <strong className="text-orange-400">{t('category.vorticeBrand.compassoDoro')}</strong>
-                            {bDict.description2.split('Compasso d\'Oro')[1] || ''}
+                            {doluMu(compassoDoro) ? (
+                                <>
+                                    {bDict.description2.split('Compasso d\'Oro')[0]}
+                                    <strong className="text-orange-400">{compassoDoro}</strong>
+                                    {bDict.description2.split('Compasso d\'Oro')[1] || ''}
+                                </>
+                            ) : bDict.description2}
                         </p>
 
                         {/* Trust Badges */}
@@ -97,22 +111,24 @@ const VorticeBrand: React.FC = () => {
                         </div>
 
                         {/* Stats Row */}
-                        <div className="grid grid-cols-4 gap-2">
-                            {highlights.map((item, index) => {
-                                const Icon = item.icon
-                                return (
-                                    <div
-                                        key={index}
-                                        className={`bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3 text-center hover:bg-white/10 transition-colors ${scrollAnimationClasses.fadeUp(isVisible)}`}
-                                        style={{ transitionDelay: `${400 + index * 100}ms` }}
-                                    >
-                                        <Icon className="text-orange-400 mx-auto mb-1" size={20} />
-                                        <div className="text-xl font-bold text-white">{item.value}</div>
-                                        <div className="text-xs text-gray-400">{item.label}</div>
-                                    </div>
-                                )
-                            })}
-                        </div>
+                        {highlights.length > 0 && (
+                            <div className={`grid ${SAYAC_SUTUNLARI[highlights.length] ?? 'grid-cols-4'} gap-2`}>
+                                {highlights.map((item, index) => {
+                                    const Icon = item.icon
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3 text-center hover:bg-white/10 transition-colors ${scrollAnimationClasses.fadeUp(isVisible)}`}
+                                            style={{ transitionDelay: `${400 + index * 100}ms` }}
+                                        >
+                                            <Icon className="text-orange-400 mx-auto mb-1" size={20} />
+                                            {doluMu(item.value) && <div className="text-xl font-bold text-white">{item.value}</div>}
+                                            {doluMu(item.label) && <div className="text-xs text-gray-400">{item.label}</div>}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
 

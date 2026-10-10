@@ -15,6 +15,7 @@ import { formatDateTime } from '../i18n/datetime'
 import { formatCurrency } from '../i18n/format'
 import { useI18n } from '../i18n/I18nProvider'
 import { reportError } from '../lib/errorReporter'
+import { doluMu } from '../utils/bosDegerKorumasi'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
@@ -32,6 +33,9 @@ const PaymentSuccessPage: React.FC = () => {
   const searchParams = useSearchParams()
   const { t, lang } = useI18n()
   const Routes = useLocalizedRoutes()
+  // URN-84: "3D Secure ile korundu" rozeti tabloda BOŞ (koşulsuz basılıyordu, ödemede uygulandığını gösteren veri okunmuyor);
+  // metin boşken kalkan şey simgeyle birlikte rozetin kendisidir — yarım rozet (yalnız kalkan simgesi) basılmaz.
+  const guvenRozeti = t('payment.securedBy3d')
   const { clearCart } = useCart()
   // 'inceleme' = iyzico-callback'in needs_review cevabi (REC-355 Faz 1): para CEKILMIS ama
   // odeme-siparis eslesmesi dogrulanamamis. 'error' ile birlestirilemez — o ekran tekrar
@@ -382,10 +386,12 @@ const PaymentSuccessPage: React.FC = () => {
           )}
         </div>
         {/* Trust badge */}
-        <div className="flex items-center justify-center space-x-2 text-success-green mb-4">
-          <ShieldCheck size={18} />
-          <span className="text-sm font-medium">{t('payment.securedBy3d')}</span>
-        </div>
+        {doluMu(guvenRozeti) && (
+          <div className="flex items-center justify-center space-x-2 text-success-green mb-4">
+            <ShieldCheck size={18} />
+            <span className="text-sm font-medium">{guvenRozeti}</span>
+          </div>
+        )}
         <div className="space-y-3">
           <Link
             href={siparisKimligi ? Routes.account.orderDetail(siparisKimligi) : Routes.account.orders()}

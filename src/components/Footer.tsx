@@ -6,6 +6,7 @@ import { useCategories } from '../contexts/CategoryContext'
 import { useLocalizedRoutes } from '../hooks/useLocalizedRoutes'
 import { useI18n } from '../i18n/I18nProvider'
 import { bilgiMerkeziListeHref } from '../utils/bilgiMerkezi'
+import { doluMu } from '../utils/bosDegerKorumasi'
 import { getCategoryDisplayName, getLocalizedCategorySlug } from '../utils/categoryHelpers'
 import BuildTag from './BuildTag'
 
@@ -25,6 +26,7 @@ const Footer: React.FC = () => {
   const { categories: globalCategories } = useCategories()
   // Karar 92: Bilgi Merkezi adresi dile göre; EN kapalıyken bağlantı basılmaz.
   const bilgiMerkeziHref = bilgiMerkeziListeHref(lang)
+  const cumartesi = t('footer.saturday')
 
   // OPS-51: Sığınak 7. KÖK oldu (ürünlü kök sayısı 6 → 7). Eskiden burada `.slice(0, 8)` ve aşağıda İKİNCİ bir
   // `.slice(0, 6)` vardı (ilk depo işlemi, gerekçe yorumu YOK): kategoriler `level, name` sırasıyla geldiği için 7. kök
@@ -151,8 +153,14 @@ const Footer: React.FC = () => {
             <div className="mt-4 p-3 bg-white/5 rounded-lg">
               <h4 className="font-medium text-sm mb-2">{t('footer.workingHours')}</h4>
               <p className="text-gray-300 text-xs">
-                {t('footer.weekdays')}: {WEEKDAY_HOURS}<br />
-                {t('footer.saturday')}: {SATURDAY_HOURS}
+                {t('footer.weekdays')}: {WEEKDAY_HOURS}
+                {/* URN-84: tablo cumartesi satırını kaldırır (sözlükte BOŞ); boşken ne <br /> ne yarım satır basılır. */}
+                {doluMu(cumartesi) && (
+                  <>
+                    <br />
+                    {cumartesi}: {SATURDAY_HOURS}
+                  </>
+                )}
               </p>
             </div>
           </div>

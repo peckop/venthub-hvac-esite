@@ -1462,6 +1462,7 @@ export const en: typeof tr = {
       productDescription: 'Product Description',
       category: 'Category',
       noSpecsAvailable: 'No technical specifications available for this product.',
+      approxCurve: 'Approximate curve — being refined from the manufacturer chart.',
       technicalDatasheet: 'TECHNICAL DATASHEET',
       engineeringAnalysis: 'Engineering Analysis',
       /** Label of the product-page code line: the value is `model_code`, not the internal SKU (URN-32). */
@@ -3114,6 +3115,8 @@ export const en: typeof tr = {
     badgeQuietest: 'Quietest',
     badgeEfficient: 'Most efficient',
     cardDelivers: 'In your duct',
+    cardDeliversApprox: 'In your duct (approx.)',
+    cardApproxCurve: 'Approximate curve — being refined from the manufacturer chart. Please confirm this model\'s suitability with the manufacturer.',
     cardNoise: 'Noise level',
     cardDiameter: 'Connection diameter',
     cardCta: 'View product',
