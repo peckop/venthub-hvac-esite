@@ -332,6 +332,19 @@ try {
 }
 
 /**
+ * ── KİLİT (ARC-81) — EŞİKLİ ──
+ * Ağır komut yuvası doluysa kim tuttuğunu söyler (boşken susar). Yalnız yuva dizini okunur.
+ * Gerekçe ve sınıflama: agir-komut-kilidi.cjs.
+ */
+try {
+  const ak = require(path.join(__dirname, 'agir-komut-kilidi.cjs'))
+  const s = ak.satir(String(girdi.session_id || ''), Date.now())
+  if (s) process.stdout.write(s + '\n')
+} catch (e) {
+  process.stdout.write('⚠KILIT: OLCULEMEDI (' + String(e.message).slice(0, 70) + ')\n')
+}
+
+/**
  * ── BAĞLAM (karar 148, 2026-09-27) — HER MESAJDA ──
  * Eşik altında düz "BAGLAM: 146k/1M"; compact sınırından sonra cevap yoksa "compact sonrasi".
  * 300k "doluyor", 500k "compact yakın" (pencere küçültülmüşse %60/%80). Konuşma kaydının son

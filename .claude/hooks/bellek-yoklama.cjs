@@ -46,6 +46,12 @@ const ESIK_BOS_MB = Number(process.env.VENTHUB_BELLEK_BOS_MB || 2048)
 const ESIK_COMMIT_ORAN = Number(process.env.VENTHUB_BELLEK_COMMIT_ORAN || 0.85)
 const TAZELE_DK = 10
 const BAYAT_DK = 60
+// ARC-81 ölçümü (2026-10-10): 640 süreç; her pencere altında 32-56, pencereler toplamı ~300.
+// Eşikler ölçülen dağılımın ÜSTÜNDE; kullanımla yeniden ayarlanır (env ile).
+const ESIK_PENCERE_SUREC = Number(process.env.VENTHUB_BELLEK_PENCERE_SUREC || 80)
+const ESIK_PENCERE_TOPLAM = Number(process.env.VENTHUB_BELLEK_PENCERE_TOPLAM || 400)
+// Departman penceresinin ajan süreci: ...\claude-code\<sürüm>\...\claude.exe --output ...
+const PENCERE_KOMUT = /claude-code[\\/][^"]*claude\.exe/i
 
 function onbellekYolu() {
   const pano = process.env.VENTHUB_BOARD_DIR || process.env.VENTHUB_PANO_DIR || 'C:/tmp/venthub-board'
@@ -86,6 +92,46 @@ function oluVar(ob, yasiyor = pidYasiyor) {
 }
 
 /**
+ * Pencere başına süreç sayımı (ARC-81 madde b). Girdi: tüm süreçlerin `{i,p,n,c}` listesi
+ * (pid, ebeveyn pid, ad, yalnız claude.exe için komut satırı). Pencere = komut satırı
+ * `claude-code\...\claude.exe` olan ajan süreci; sayı = altındaki TÜM torunlar (MCP sunucuları,
+ * kabuklar, tsserver, conhost). Döngü ve kendi kendine ebeveyn güvenli.
+ * @param {Array<{i:number,p:number,n:string,c?:string}>} liste
+ * @returns {{toplam:number, pencereToplam:number, pencereler:Array<{pid:number,alt:number}>}}
+ */
+function pencereSayimi(liste) {
+  const cocuklar = new Map()
+  for (const s of liste || []) {
+    if (s.p === s.i) continue
+    if (!cocuklar.has(s.p)) cocuklar.set(s.p, [])
+    cocuklar.get(s.p).push(s.i)
+  }
+  const say = (kok) => {
+    const goruldu = new Set([kok])
+    const yigin = [kok]
+    let n = 0
+    while (yigin.length) {
+      for (const c of cocuklar.get(yigin.pop()) || []) {
+        if (goruldu.has(c)) continue
+        goruldu.add(c)
+        n += 1
+        yigin.push(c)
+      }
+    }
+    return n
+  }
+  const pencereler = (liste || [])
+    .filter((s) => /^claude\.exe$/i.test(String(s.n || '')) && PENCERE_KOMUT.test(String(s.c || '')))
+    .map((s) => ({ pid: s.i, alt: say(s.i) }))
+    .sort((a, b) => b.alt - a.alt)
+  return {
+    toplam: (liste || []).length,
+    pencereToplam: pencereler.reduce((t, w) => t + w.alt, 0),
+    pencereler: pencereler.slice(0, 10),
+  }
+}
+
+/**
  * Önbellekten satır üretir; söyleyecek bir şey yoksa null. Büyük süreçlerden biri ölmüşse
  * satır SUSAR (önbellek bayat; kanca hemen yeniden ölçtürür).
  * @param {{ts:number,bosMb:number,commitMb?:number,commitToplamMb?:number,surecler:Array<{pid:number,ad:string,mb:number,ipucu:string}>}|null} ob
@@ -105,9 +151,15 @@ function satir(ob, simdi, yasiyor = pidYasiyor) {
     typeof ob.commitToplamMb === 'number' &&
     ob.commitToplamMb > 0 &&
     ob.commitMb / ob.commitToplamMb >= ESIK_COMMIT_ORAN
-  if (!buyukler.length && !bosAz && !commitYuksek) return null
+  const kalabalik = (ob.pencereler || []).filter((w) => w.alt >= ESIK_PENCERE_SUREC)
+  const pencereToplamYuksek = typeof ob.pencereToplam === 'number' && ob.pencereToplam >= ESIK_PENCERE_TOPLAM
+  if (!buyukler.length && !bosAz && !commitYuksek && !kalabalik.length && !pencereToplamYuksek) return null
   const gb = (mb) => (mb / 1024).toFixed(1).replace('.', ',')
   const parca = ['bos ' + gb(ob.bosMb) + ' GB']
+  if (kalabalik.length) {
+    parca.push('KALABALIK pencere (>= ' + ESIK_PENCERE_SUREC + ' surec): ' + kalabalik.map((w) => 'claude ' + w.pid + ' altinda ' + w.alt).join(', '))
+  }
+  if (pencereToplamYuksek) parca.push('pencereler toplam ' + ob.pencereToplam + ' surec (esik ' + ESIK_PENCERE_TOPLAM + ')')
   if (commitYuksek) {
     const oran = Math.round((100 * ob.commitMb) / ob.commitToplamMb)
     parca.push('SANAL BELLEK ' + gb(ob.commitMb) + '/' + gb(ob.commitToplamMb) + ' GB (%' + oran + ') — dolarsa pencereler duser')
@@ -157,16 +209,23 @@ function tazele() {
   const ps =
     '$ErrorActionPreference="Stop";' +
     '$o=Get-CimInstance Win32_OperatingSystem;' +
-    '$p=Get-CimInstance Win32_Process | Sort-Object PrivatePageCount -Descending | Select-Object -First 8 ProcessId,Name,PrivatePageCount,CommandLine;' +
-    '@{bos=[int64]$o.FreePhysicalMemory*1024;cTop=[int64]$o.TotalVirtualMemorySize*1024;cBos=[int64]$o.FreeVirtualMemory*1024;p=@($p)} | ConvertTo-Json -Depth 3 -Compress'
+    '$a=@(Get-CimInstance Win32_Process);' +
+    '$p=$a | Sort-Object PrivatePageCount -Descending | Select-Object -First 8 ProcessId,Name,PrivatePageCount,CommandLine;' +
+    // ARC-81: pencere başına süreç sayımı için hafif liste (komut satırı yalnız claude.exe için)
+    '$t=@($a | ForEach-Object { @{i=[int]$_.ProcessId;p=[int]$_.ParentProcessId;n=[string]$_.Name;c=$(if($_.Name -eq "claude.exe"){[string]$_.CommandLine}else{""})} });' +
+    '@{bos=[int64]$o.FreePhysicalMemory*1024;cTop=[int64]$o.TotalVirtualMemorySize*1024;cBos=[int64]$o.FreeVirtualMemory*1024;p=@($p);t=$t} | ConvertTo-Json -Depth 4 -Compress'
   const cikti = execFileSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', ps], {
     encoding: 'utf8',
     windowsHide: true,
     timeout: 30000,
   })
   const v = JSON.parse(cikti)
+  const sayim = pencereSayimi(Array.isArray(v.t) ? v.t : [])
   const ob = {
     ts: Date.now(),
+    toplamSurec: sayim.toplam,
+    pencereToplam: sayim.pencereToplam,
+    pencereler: sayim.pencereler,
     bosMb: Math.round(Number(v.bos) / MB),
     commitMb: Math.round((Number(v.cTop) - Number(v.cBos)) / MB),
     commitToplamMb: Math.round(Number(v.cTop) / MB),
@@ -194,4 +253,18 @@ if (require.main === module && process.argv.includes('--tazele')) {
   }
 }
 
-module.exports = { satir, ipucu, oku, oluVar, pidYasiyor, gerekirseTazele, tazele, ESIK_SUREC_MB, ESIK_BOS_MB, ESIK_COMMIT_ORAN }
+module.exports = {
+  satir,
+  ipucu,
+  oku,
+  oluVar,
+  pidYasiyor,
+  gerekirseTazele,
+  tazele,
+  pencereSayimi,
+  ESIK_SUREC_MB,
+  ESIK_BOS_MB,
+  ESIK_COMMIT_ORAN,
+  ESIK_PENCERE_SUREC,
+  ESIK_PENCERE_TOPLAM,
+}
