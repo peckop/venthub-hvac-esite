@@ -291,7 +291,7 @@ notu bunu açıkça yasaklıyor.
 > üretiyor. Bugün kırmızı vermiyor çünkü o sınıfın kapı kuralı yok. Aynı satırın oraya da
 > yazılması ayrı bir iştir; bu değişikliğin kapsamı dışında bırakıldı (kapsam, yetki değil).
 
-### 3.3 Marka sayfası (`/[lang]/brands/[slug]`) — DB'den türeyen gövde özeti, URN-79 (2026-10-09)
+### 3.4 Marka sayfası (`/[lang]/brands/[slug]`) — DB'den türeyen gövde özeti, URN-79 (2026-10-09)
 
 Marka sayfasının gövdesi üretici övgüsü yerine markanın sitedeki **ürün ailelerini ve kategorilerini** DB'den yazar
 (`markaSayfasi.tsx` → `getBrandCatalogSummary`, sözlük şablonu `brands.detail.catalog*`). Statik sayfada görünen her tablo için

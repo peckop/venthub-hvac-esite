@@ -57,7 +57,7 @@ export const KAYNAKLI_KURULUS: Readonly<Record<string, { yil: number; kaynak: st
  *  · `yillar`: metinde geçmesine izin verilen yıllar (kuruluş yılı alanı `founded` değildir; o hâlâ KAYNAKLI_KURULUS'a bağlı).
  *  · `atifliOran`: yasak listesindeki bir ORAN ifadesi (`yasakIfadeler` içindeki deseni) yalnız metinde şirkete atfedildiğinde
  *    ("belirtiyor", "states") serbesttir; atıfsız olgu cümlesi hâlâ KIRMIZI.
- * Danfoss: BLOG ham metni C:/Users/alize/blog-calisma/marka-ham/danfoss/ (10-09); BLG-7 `docs/standards/marka-olgu-kaydi.json`
+ * Danfoss: BLOG ham metni (BLOG departmanının marka ham metin klasörü, 10-09); BLG-7 `docs/standards/marka-olgu-kaydi.json`
  * dosyasını getirince bu tablo o dosyadan okunacak.
  */
 export const WEB_ATIFLI_OLGU: Readonly<Record<string, { yillar: readonly number[]; atifliOran: readonly RegExp[]; kaynaklar: readonly string[] }>> = {
