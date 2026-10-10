@@ -79,19 +79,19 @@ vi.mock('../_components/markaSayfasi', async (orijinal) => ({
 
 import { ADRES_SEMASI_K3B } from '../../config/features'
 import { SITE_URL as SITE } from '../../config/siteUrl'
-import MarkaListeEski, { generateMetadata as markaListeEskiUst } from '../[lang]/brands/page'
 import MarkaEski, { generateMetadata as markaEskiUst } from '../[lang]/brands/[slug]/page'
+import MarkaListeEski, { generateMetadata as markaListeEskiUst } from '../[lang]/brands/page'
 import AltKategori, { generateMetadata as altKategoriUst } from '../[lang]/category/[categorySlug]/[subCategorySlug]/page'
 import KategoriEski, { generateMetadata as kategoriEskiUst } from '../[lang]/category/[categorySlug]/page'
 import KategoriYeni, {
   generateMetadata as kategoriYeniUst,
   generateStaticParams as kategoriYeniParam,
 } from '../[lang]/kategori/[kok]/[[...dal]]/page'
+import MarkaYeni, { generateMetadata as markaYeniUst, generateStaticParams as markaYeniParam } from '../[lang]/markalar/[slug]/page'
 import MarkaListeYeni, {
   generateMetadata as markaListeYeniUst,
   generateStaticParams as markaListeYeniParam,
 } from '../[lang]/markalar/page'
-import MarkaYeni, { generateMetadata as markaYeniUst, generateStaticParams as markaYeniParam } from '../[lang]/markalar/[slug]/page'
 import UrunEski from '../[lang]/products/[slug]/page'
 import UrunlerEski, { generateMetadata as urunlerEskiUst } from '../[lang]/products/page'
 import UrunlerYeni, { generateMetadata as urunlerYeniUst, generateStaticParams as urunlerYeniParam } from '../[lang]/urunler/page'
