@@ -3,7 +3,7 @@
 import { AlertCircle, CheckCircle, Loader, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { supabaseBrowserClient as supabase } from '@/lib/supabase/client'
@@ -18,6 +18,16 @@ import { reportError } from '../lib/errorReporter'
 
 type PaymentInfo = { conversationId?: string; token?: string; errorMessage?: string }
 
+/**
+ * Sipariş satırı ÖDENMİŞ mi? `iyzico-callback` başarıda tek yazımla `status='confirmed'` + `payment_status='paid'`
+ * yazar (iki ayrı sözlük: yaşam döngüsü / ödeme). Biri yeter; ikisi de yoksa ödeme doğrulanmış sayılmaz.
+ * Yalnız OKUMA — bu sayfa sipariş durumu yazmaz (CLAUDE.md kural 11: durumlar monoton, yazan taraf callback).
+ */
+function siparisOdenmisMi(satir: { status?: string | null; payment_status?: string | null } | null | undefined): boolean {
+  if (!satir) return false
+  return satir.payment_status === 'paid' || satir.status === 'paid' || satir.status === 'confirmed'
+}
+
 const PaymentSuccessPage: React.FC = () => {
   const searchParams = useSearchParams()
   const { t, lang } = useI18n()
@@ -29,6 +39,10 @@ const PaymentSuccessPage: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'inceleme'>('loading')
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null)
   const [orderSummary, setOrderSummary] = useState<{ amount?: number, items?: number, createdAt?: string }>({})
+  // URN-83: doğrulama artık başarı yolunda da bir `await` ile başlıyor (veritabanı okuması). Etki bağımlılıkları
+  // (`clearCart` kimliği kullanıcı/sepet yüklenince değişir) bu bekleme sırasında etkiyi yeniden koşturabilir;
+  // korumasız hâlde çift okuma, çift sepet temizliği ve çift bildirim olurdu. Doğrulama sayfa başına BİR KEZ koşar.
+  const dogrulamaBasladi = useRef(false)
 
   // Başarı teyit edilmeden sepeti temizleme! Yalnızca doğrulanmış başarıda temizlenecek.
 
@@ -56,10 +70,28 @@ const PaymentSuccessPage: React.FC = () => {
       } catch { }
     }
 
+    // Sipariş veritabanında ödenmiş görünüyor mu? Yalnız okuma; hata/boş/yetkisiz okuma = DOĞRULANAMADI (false).
+    async function siparisDogrulandiMi(oid: string): Promise<boolean> {
+      try {
+        const { data, error } = await (supabase
+          .from('venthub_orders'))
+          .select('status, payment_status')
+          .eq('id', oid)
+          .maybeSingle()
+        if (error) return false
+        return siparisOdenmisMi(data)
+      } catch {
+        return false
+      }
+    }
+
     async function verify() {
       try {
-        // 1) Eğer callback status=success ile yönlendirdiyse, doğrudan başarı kabul et
-        if (statusParam === 'success') {
+        // 1) Callback / yoklama `status=success` ile yönlendirdi. URN-83: bu URL parametresi TEK BAŞINA kanıt DEĞİLDİR —
+        // adres elle yazılabilir; eskiden hiçbir doğrulama yapılmadan "Siparişiniz Tamamlandı" + DEMO-ORDER basılıyor ve
+        // sepet siliniyordu. Başarı yalnız sipariş kimliği VARSA ve sipariş veritabanında ödenmiş görünüyorsa basılır.
+        // Doğrulanamazsa aşağıdaki akış sürer (token → sipariş kimliği → hata): başarı basılmaz, sepet silinmez.
+        if (statusParam === 'success' && orderId && (await siparisDogrulandiMi(orderId))) {
           setStatus('success')
           setPaymentInfo({ conversationId: conversationId || orderId, token })
           clearCart({ silent: true })
@@ -71,7 +103,7 @@ const PaymentSuccessPage: React.FC = () => {
             localStorage.setItem('vh_last_order_status', 'success');
             localStorage.setItem('vh_clear_server_cart_once', '1');
           } catch { }
-          if (orderId) await fetchOrderDetails(orderId)
+          await fetchOrderDetails(orderId)
           toast.success(t('checkout.paymentSuccess'))
           return
         }
@@ -156,7 +188,7 @@ const PaymentSuccessPage: React.FC = () => {
 
           const { data, error } = await (supabase
             .from('venthub_orders'))
-            .select('status')
+            .select('status, payment_status')
             .eq('id', orderId)
             .maybeSingle()
 
@@ -168,7 +200,7 @@ const PaymentSuccessPage: React.FC = () => {
             return
           }
 
-          if (data && (data.status === 'paid' || data.status === 'confirmed')) {
+          if (siparisOdenmisMi(data)) {
             setStatus('success')
             setPaymentInfo({ conversationId: conversationId || orderId, token })
             clearCart({ silent: true })
@@ -207,7 +239,10 @@ const PaymentSuccessPage: React.FC = () => {
       }
     }
 
-    if (status === 'loading') verify()
+    if (status === 'loading' && !dogrulamaBasladi.current) {
+      dogrulamaBasladi.current = true
+      verify()
+    }
   }, [searchParams, clearCart, status, t])
 
   if (status === 'loading') {
@@ -304,6 +339,9 @@ const PaymentSuccessPage: React.FC = () => {
     )
   }
 
+  // Sipariş kimliği yoksa (yalnız token ile doğrulanan başarı) "sipariş detayı" boş kimlikli adrese değil listeye gider.
+  const siparisKimligi = searchParams?.get('orderId') || undefined
+
   return (
     <div className="min-h-screen bg-light-gray flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
@@ -313,9 +351,12 @@ const PaymentSuccessPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-industrial-gray mb-4">
           {t('payment.orderCompletedTitle')}
         </h2>
-        <p className="text-steel-gray mb-6">
-          {t('payment.orderNoLabel')}: <strong>{paymentInfo?.conversationId || 'DEMO-ORDER'}</strong>
-        </p>
+        {/* URN-83: sipariş numarası yoksa satır HİÇ çıkmaz — eskiden burada sabit "DEMO-ORDER" yazıyordu. */}
+        {paymentInfo?.conversationId && (
+          <p className="text-steel-gray mb-6">
+            {t('payment.orderNoLabel')}: <strong>{paymentInfo.conversationId}</strong>
+          </p>
+        )}
         <p className="text-steel-gray mb-8">
           {t('payment.orderCompletedDesc')}
         </p>
@@ -347,7 +388,7 @@ const PaymentSuccessPage: React.FC = () => {
         </div>
         <div className="space-y-3">
           <Link
-            href={Routes.account.orderDetail(searchParams?.get('orderId') || '')}
+            href={siparisKimligi ? Routes.account.orderDetail(siparisKimligi) : Routes.account.orders()}
             className="w-full bg-primary-navy hover:bg-secondary-blue text-white font-semibold py-3 px-6 rounded-lg transition-colors block text-center"
           >
             {t('payment.viewOrderDetails')}

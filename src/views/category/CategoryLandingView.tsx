@@ -3,6 +3,7 @@ import { Info } from 'lucide-react'
 import Image from 'next/image'
 import React, { useEffect,useRef, useState } from 'react'
 
+import { AIR_CURTAIN_WIZARD_ENABLED } from '@/components/category/airCurtainWizardGate'
 import EnhancedNeedsWizard from '@/components/category/EnhancedNeedsWizard'
 import {
     BottomCTA,
@@ -86,6 +87,10 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
     const sessizFanSerisi = families.find((aile) => (SESSIZ_FAN_SERILERI as readonly string[]).includes(aile.slug))?.slug ?? null
     const isSilentFan = sessizFanSerisi !== null
     const isDehumidifier = category.slug === 'dehumidifiers'
+    // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; giriş noktaları tek kapıdan kapalı
+    // (`airCurtainWizardGate.ts`). Sessiz fan sihirbazı ayrı bileşen, bu kapıdan etkilenmez.
+    const havaPerdesiSihirbazi = isAirCurtain && AIR_CURTAIN_WIZARD_ENABLED
+    const sihirbazGirisi = havaPerdesiSihirbazi || isSilentFan
 
     // Breadcrumb Items (MAXIMUM GATEWAY STANDARD)
     const breadcrumbItems = [
@@ -167,7 +172,7 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
                         <HowItWorks />
                         <VorticeBrand />
                         <TypeComparison
-                            onOpenWizard={() => setWizardOpen(true)}
+                            onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
                             onSelectType={() => handleShowProducts()}
                         />
                         <TrustSignals />
@@ -233,15 +238,17 @@ const CategoryLanding: React.FC<CategoryLandingProps> = ({ category, families, p
             </div>
 
             {/* Sihirbaz iki kategoride de var ama AYNI bileşen değil: hava perdesi kapı ölçüsü
-                sorar, sessiz fan oda hacmi/kanal direnci sorar. Ortak buton, ayrı motor. */}
+                sorar, sessiz fan oda hacmi/kanal direnci sorar. Ortak buton, ayrı motor.
+                URN-83: hava perdesi sihirbazı bozuk olduğu için KAPALI (`airCurtainWizardGate.ts`);
+                bugün bu buton yalnız sessiz fan sayfasında çıkar. */}
             <BottomCTA
-                onOpenWizard={isAirCurtain || isSilentFan ? () => setWizardOpen(true) : undefined}
+                onOpenWizard={sihirbazGirisi ? () => setWizardOpen(true) : undefined}
                 onShowProducts={handleShowProducts}
-                showWizard={isAirCurtain || isSilentFan}
+                showWizard={sihirbazGirisi}
                 categoryName={vm?.displayName || t('category.landing.venthubSolution')}
             />
 
-            {isAirCurtain && (
+            {havaPerdesiSihirbazi && (
                 <EnhancedNeedsWizard
                     isOpen={wizardOpen}
                     onClose={() => setWizardOpen(false)}

@@ -38,7 +38,9 @@ export const en: typeof tr = {
     dimensions2D: '{{w}}m × {{h}}m',
     brand: 'VentHub',
     brandTagline: 'Ventilation & HVAC',
-    brandLegalName: 'VentHub HVAC Solutions.',
+    // URN-83: the company is not incorporated yet; no legal entity name (e.g. "… Solutions.") is written. Once the
+    // registered name exists this value is REPLACED with it (hence the key name stays "LegalName"). Used by: login footer.
+    brandLegalName: 'VentHub',
     vortice: 'Vortice',
     comma: ',',
     decrease: 'Decrease',
@@ -2665,8 +2667,11 @@ export const en: typeof tr = {
     seoDescription: 'Run a pre-assessment for duct fans, heat recovery, air curtains and jet fans from your volume, airflow and pressure inputs.',
     araclar: {
       kanal: {
-        ad: 'Duct fan sizing',
-        aciklama: 'Derive the required airflow and pressure from room volume and air change rate.',
+        // URN-83: the card said "airflow from volume and air change rate" but the link goes to the DUCT PRESSURE LOSS
+        // calculator (target: `calculators.duct` — enter flow rate + duct size, get air velocity and estimated pressure loss).
+        // The card now follows the target page's own sentence; it claims nothing beyond it.
+        ad: 'Duct pressure loss calculation',
+        aciklama: 'Calculate air velocity and estimated pressure loss from flow rate and duct dimensions.',
       },
       hrv: {
         ad: 'Heat recovery (HRV) sizing',
