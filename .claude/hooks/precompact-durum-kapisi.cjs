@@ -36,6 +36,18 @@ const path = require('path')
 // ayırt eder. Eşiği düşürmek (ör. 30) AUTH'u yanlış alarmla vururdu — o gün 46 dakikaydı.
 const BAYAT_ESIK_DK = 60
 
+// ── ÖZET YÖNERGESİ (ARC-69, karar 321, 2026-10-10) ──
+// Otomatik compact (350k) uyarısız gelir; özet durum dosyasını taşımazsa pencere dönüşte "neredeydim"i kaybeder.
+// PreCompact'ın stdout'u özet talimatı olarak işlenir (10-08 deneme: kancanın yazdığı cümle özete AYNEN geçti).
+// Bu yüzden kapı, durum dosyasının SON bloğunu "özete aynen taşı" yönergesiyle stdout'a da yazar.
+// YÖNERGE_BAYAT_DK uyarı eşiği DEĞİL (o 60'tır, yukarıda ölçülü): burada bayatlık özetin başına konan bir not,
+// yanlış alarm üretmez; 30 dakika kart (ARC-69) hükmüdür.
+// Uzunluk sınırı: SessionStart 4500 karakterde bloğu ortadan kesiyordu (10-07 dersi); baş ve son korunur.
+const YONERGE_MAX_KARAKTER = 2800
+const YONERGE_BAS_KARAKTER = 2000
+const YONERGE_SON_KARAKTER = 700
+const YONERGE_BAYAT_DK = 30
+
 // MEMORY.md boyut bekçisi. ÖLÇÜM TABANI (HARİTA, REC-433 1.9, 2026-09-29): gerçek kırpma sınırı
 // 200 SATIR YA DA ~25.000 BAYT, hangisi önce dolarsa. Eski "16384 bayt" yanlış ölçümdü ve satır
 // sınırını hiç izlemiyordu. Aynı eşikler `hafiza-indeks-bekcisi.cjs`te de var (orada yazım engellenir).
@@ -334,6 +346,43 @@ function yasMetni(dk) {
   return Math.round(dk / 1440) + ' gun'
 }
 
+/**
+ * Özete AYNEN taşınacak yönerge metni (ARC-69). Durum dosyasının SON bloğunu sınırlı uzunlukta verir; bayatsa
+ * (YONERGE_BAYAT_DK) dönüşte ilk işin son konuşma dökümünü okumak olduğunu söyler. Blok okunamazsa yönerge
+ * ÜRETİLMEZ ama bunu açıkça söyler (sessiz değil). Saf işlev: dosya okumak dışında yan etkisi yok.
+ *
+ * @param {{ad: string, tam: string}} dosya  durum dosyası (oturumunDosyalari öğesi)
+ * @param {number} yasDk  dosyanın yaşı (dakika)
+ * @param {string} sid  oturum kimliği (son-konusma dökümünün adı için)
+ * @returns {string}
+ */
+function ozetYonergesi(dosya, yasDk, sid) {
+  let blok = sonBlok(dosya.tam)
+  if (blok === '(durum dosyasi okunamadi)') {
+    return '[precompact] OZET YONERGESI URETILEMEDI: ' + dosya.ad + ' okunamadi. Donuste durum dosyani ELLE ac.\n'
+  }
+  if (blok.length > YONERGE_MAX_KARAKTER) {
+    const atilan = blok.length - YONERGE_BAS_KARAKTER - YONERGE_SON_KARAKTER
+    blok =
+      blok.slice(0, YONERGE_BAS_KARAKTER) +
+      '\n[... ' + atilan + ' karakter kirpildi: blogun tamami ' + dosya.ad + ' dosyasinda ...]\n' +
+      blok.slice(-YONERGE_SON_KARAKTER)
+  }
+  const satirlar = [
+    '[precompact] OZET YONERGESI: asagidaki blok ' + dosya.ad + ' dosyasinin SON blogudur (' + yasMetni(yasDk) +
+      ' once guncellenmis). Ozetin ILK satirlarina AYNEN tasi; ozetleme, kisaltma, yeniden yazma.',
+  ]
+  if (yasDk > YONERGE_BAYAT_DK) {
+    const dokum = sid ? 'son-konusma-' + sid + '.md' : 'son konusma dokumunu'
+    satirlar.push(
+      '[precompact] DURUM DOSYASI BAYAT (' + yasMetni(yasDk) + '): bu blok son konusmayi yansitmiyor olabilir. ' +
+        'Donuste ILK IS: ' + dokum + ' dosyasini oku (Recep\'in son sozleri orada).',
+    )
+  }
+  satirlar.push('<<<DURUM-DOSYASI-SON-BLOK', blok, 'DURUM-DOSYASI-SON-BLOK>>>')
+  return satirlar.join('\n') + '\n'
+}
+
 function main() {
 const girdi = girdiOku()
 const sid = girdi.session_id || girdi.sessionId || process.env.CLAUDE_SESSION_ID || ''
@@ -436,6 +485,8 @@ if (uyarilar.length) {
     '[precompact] durum kapisi TEMIZ — ' + enTaze.ad + ' ' + yasDk + ' dk once guncellenmis, dort alan tam.\n',
   )
 }
+// ARC-69: uyarı olsun olmasın özetin başına durum dosyasının son bloğu yönergesi (kapı BLOKLAMADI, yalnız ekler).
+process.stdout.write(ozetYonergesi(enTaze, yasDk, sid))
 process.exit(0)
 }
 
@@ -443,6 +494,7 @@ process.exit(0)
 // stdin okuyup process.exit çağıran bir modül, çağıranın oturumunu öldürürdü.
 module.exports = {
   durumDosyasiBul, sonBlok, projeDiziniBul, hafizaDizinleri, oturumunDosyalari, BAYAT_ESIK_DK, MEMORY_ESIK_BAYT, DORT_ALAN, AD_KALIBI, yasMetni,
+  ozetYonergesi, YONERGE_MAX_KARAKTER, YONERGE_BAYAT_DK,
   // Testin ölçütü KOPYALAMAMASI için dışa açık: kapının katlaması ile testin katlaması
   // ayrışırsa biri bayatlar ve yanlış alarm sessizce geri gelir.
   asciiKatla,

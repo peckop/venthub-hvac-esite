@@ -149,6 +149,27 @@ describe('INV-BAGLAM-BELGE-SATIRI-1 · BAĞLAM bloğu', () => {
       'Compact iki aşamalıdır: önce araç çıktıları temizlenir, konuşmanın özeti sonra gelir.',
     )
     expect(yakin).toContain('Uyarı kısa sürede yeniden görünebilir; bu normaldir ve hiçbir iş kaybolmaz.')
+    // ARC-69 (OPS 10-09): rol kurallarındaki "listenin altında tek kod bloğunda /compact satırı" şartı kancada da
+    // olmalı; pencere her istemde kancayı görür, kurallar dosyasını görmez (10-09'da OPS /compact satırını vermedi).
+    for (const parca of [
+      'UC PARCA',
+      'TEK KOD BLOGU',
+      "/compact Recep'in son sozlerini aynen koru",
+      'Sunlari koru: <numara (durum)>',
+      'yarim isler (<kisa adlar>)',
+      'Ayrinti durum dosyamda',
+      'Arac ciktilarini ve eski olcum ayrintilarini at',
+    ]) {
+      expect(yakin, 'kod bloğu parçası eksik: ' + parca).toContain(parca)
+    }
+    // Sıra: liste → kod bloğundaki /compact satırı → en altta iki aşamalı cümle (filo-ortak.md "Compact" bölümü).
+    const sira = [
+      yakin.indexOf('Ucuncu madde: hukum'),
+      yakin.indexOf("/compact Recep'in son sozlerini aynen koru"),
+      yakin.indexOf('Compact iki aşamalıdır'),
+    ]
+    expect(sira.every((i) => i >= 0), 'bir parça yok: ' + sira.join(',')).toBe(true)
+    expect(sira, 'parçaların sırası bozuk (liste, /compact kod bloğu, iki aşamalı cümle)').toEqual([...sira].sort((a, b) => a - b))
     // Ops 09-29: "JEV" iç kelimedir, Recep'e giden hiçbir kanca metninde geçmez (kaynak dosya hafızası da anılmaz).
     expect(yakin, 'Recep e giden metinde iç kelime JEV').not.toMatch(/JEV/i)
     expect(yakin, 'kaynak hafıza dosyası adı metne sızmış').not.toContain('compact-jev')
