@@ -302,6 +302,13 @@ export interface Temsilciler {
   yaprakKategori: string | null
   pdp: string | null
   /**
+   * Tüm ürünler LİSTESİ yolu — haritadan gelir (ESKİ `/tr/products`, AÇIK `/tr/urunler`). Verilmezse eski yol.
+   * İsteğe bağlı: bu alan gelmeden önce kurulmuş fikstürler (`kurallar(fake)`) derlenmeye devam eder.
+   */
+  liste?: string | undefined
+  /** Marka LİSTESİ yolu — haritadan (ESKİ `/tr/brands`, AÇIK `/tr/markalar`). Verilmezse eski yol. */
+  markaListesi?: string | undefined
+  /**
    * Marka detay temsilcisi (REC-59 açık kalemi). Adresten seçilir, içerikten DEĞİL — ve
    * bu ayrım kasıtlı: kategori sınıflarında içerikten seçim gerekmişti çünkü "alt gruplu"
    * olmak ADRESTEN anlaşılmıyordu (REC-286). Marka sınıfında böyle bir belirsizlik YOK:
@@ -318,9 +325,85 @@ export interface Temsilciler {
 
 const SITEMAP_YOLU = '/sitemap.xml'
 
+/**
+ * ADRES ŞEMALARI — kapı İKİSİNİ de tanır (URN-85, Faz 3-C 2/2, 2026-10-10).
+ *
+ * ESKİ (bayrak `ADRES_SEMASI_K3B` kapalı, bugünkü canlı):
+ *   `/tr/products` · `/tr/products/<aile>` · `/tr/category/<slug>` · `/tr/brands` · `/tr/brands/<marka>`
+ *   (REC-205'ten beri kategori TEK seviyeli; `/tr/category/<x>/<y>` yalnız REC-205 ÖNCESİ iki seviyeli biçimdir)
+ * AÇIK (bayrak açık, plan §2):
+ *   `/tr/urunler` · `/tr/urun/<aile>` (+ model segmenti) · `/tr/kategori/<kök>` · `/tr/kategori/<kök>/<dal>` ·
+ *   `/tr/markalar` · `/tr/markalar/<marka>`
+ *
+ * ⛔NİÇİN İKİSİ BİRDEN: kapı bayrağı OKUMAZ, sunucunun HARİTASINI ölçer. Yalnız eski şemayı tanıyan kalıp, bayrak
+ * açılınca sayımları `kategori=0, iki-segmentli=0, pdp=0` verip kapıyı kırmızıya çevirdi (PR #1811, E2E Smoke):
+ * sayfalar doluydu, kusur kalıptaydı. İki şemayı birlikte tanımak, bayrağın iki durumunda da AYNI kapının koşmasını
+ * sağlar. Ölçüt SIKILIĞI değişmedi: aynı içerik işaretleri, aynı bailout tavanları; yalnız adres biçimi genişledi.
+ *
+ * ⚠KALIPLAR BİLEREK ELLE YAZILI: üreticiden (`adresUret`) türetilseydi üretici bozulduğunda kapı da onunla birlikte
+ * "doğru" kalırdı — bağımsız bir ölçüt olmazdı. Üreticiyle uyumu iki kol ölçer: `ssr-duman-kilidi.test.ts` INV-DUMAN-9
+ * (elle fikstür) ve `src/app/__tests__/sitemapSsrDumanKapisi.test.ts` (GERÇEK site haritası üreticisinin çıktısı).
+ */
+const YOL = {
+  /** ESKİ: tek seviyeli kategori (REC-205 sonrası kök de dal da bu biçimde). */
+  eskiKategori: /^\/tr\/category\/[^/]+$/,
+  /** ESKİ: REC-205 ÖNCESİ iki seviyeli biçim — haritada VARSA seçim ADRESTEN yapılır (geriye dönük kol). */
+  eskiIkiSeviye: /^\/tr\/category\/[^/]+\/[^/]+$/,
+  /** AÇIK: kök kategori. */
+  acikKok: /^\/tr\/kategori\/[^/]+$/,
+  /** AÇIK: dal kategori. KANONİK iki seviyedir, eski iki-seviyeli biçim DEĞİL → seçim yine İÇERİKTEN yapılır. */
+  acikDal: /^\/tr\/kategori\/[^/]+\/[^/]+$/,
+  /** Ürün detayı: ESKİ `/tr/products/<x>`, AÇIK `/tr/urun/<x>` (aile ya da model segmenti). */
+  urun: /^\/tr\/(?:products|urun)\/[^/]+$/,
+  /** Marka detayı: ESKİ `/tr/brands/<x>`, AÇIK `/tr/markalar/<x>`. */
+  marka: /^\/tr\/(?:brands|markalar)\/[^/]+$/,
+}
+
+/** Liste sayfası yolları: AÇIK önce (haritada ikisi birden olmaz; olursa kanonik olan açık şemadır). */
+const URUN_LISTESI_YOLLARI = ['/tr/urunler', '/tr/products'] as const
+const MARKA_LISTESI_YOLLARI = ['/tr/markalar', '/tr/brands'] as const
+/** Haritada liste yolu bulunamazsa (yapay fikstür) düşülen yol: kapının bugüne kadarki sabit yolu. */
+const ESKI_URUN_LISTESI = '/tr/products'
+const ESKI_MARKA_LISTESI = '/tr/brands'
+
+/**
+ * Bir yol ya da bağlantı ÜRÜN DETAY adresi mi? ESKİ `/<dil>/products/<x>` ve AÇIK `/tr/urun/<x>`; sorgu (`?sku=`) ve
+ * parça yok sayılır, mutlak adres yola indirilir. `/tr/products` (liste), `/tr/urunler`, `/tr/urun-secici` ve ek
+ * segmentli yollar ürün detayı DEĞİLDİR.
+ *
+ * Tek yer: E2E huni testi (`checkout-smoke`) kart bağlantısını bununla süzer ve ürün sayfasına vardığını bununla
+ * doğrular. Adres biçimi kapı modülünde TEK kez yazılır (aynı kural iki dosyada iki kopya yaşarsa sessizce ayrışır).
+ */
+export function urunDetayAdresiMi(yol: string): boolean {
+  let temiz: string
+  try {
+    temiz = new URL(yol, 'http://adres.invalid').pathname
+  } catch {
+    return false
+  }
+  return /^\/(?:tr\/(?:products|urun)|en\/products)\/[^/]+\/?$/.test(temiz)
+}
+
 /** `<loc>` değerlerini çıkarır. Tam XML ayrıştırıcı gerekmez: aranan tek şey adres listesi. */
 function locListesi(xml: string): string[] {
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim())
+}
+
+/**
+ * Haritadaki `/tr/<bölüm>/…` dağılımı. Temsilci bulunamadığında `0/0/0` sayımı tek başına "adres kalıbı mı bozuk,
+ * harita mı boş" sorusunu cevaplamaz; bu özet hata metninde cevabı verir (#1811'de soru koddan okunarak cevaplandı).
+ */
+function bolumDagilimi(yollar: string[]): string {
+  const sayac = new Map<string, number>()
+  for (const p of yollar) {
+    const m = /^\/tr\/([^/]+)\/./.exec(p)
+    if (m) sayac.set(m[1], (sayac.get(m[1]) ?? 0) + 1)
+  }
+  const satir = [...sayac.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 12)
+    .map(([bolum, n]) => `${bolum}=${n}`)
+  return satir.length ? satir.join(', ') : '(yok)'
 }
 
 /**
@@ -350,7 +433,8 @@ export async function temsilcileriSec(
     )
   }
 
-  // Sınıf ayrımı YOL DERİNLİĞİNDEN çıkar: /tr/category/X = kök, /tr/category/X/Y = alt.
+  // Sınıf ayrımı YOL DERİNLİĞİNDEN çıkar ve İKİ şemayı tanır (bkz. `YOL`):
+  //   ESKİ `/tr/category/X` = tek seviyeli kategori · AÇIK `/tr/kategori/<kök>` = kök, `/tr/kategori/<kök>/<dal>` = dal.
   const yollar = loclar
     .map((l) => {
       try {
@@ -361,17 +445,23 @@ export async function temsilcileriSec(
     })
     .filter(Boolean)
 
-  const kategori = yollar.filter((p) => /^\/tr\/category\/[^/]+$/.test(p))
-  const ikiSegmentli = yollar.filter((p) => /^\/tr\/category\/[^/]+\/[^/]+$/.test(p))
-  const pdp = yollar.filter((p) => /^\/tr\/products\/[^/]+$/.test(p))
+  const kategoriEski = yollar.filter((p) => YOL.eskiKategori.test(p))
+  const ikiSeviyeEski = yollar.filter((p) => YOL.eskiIkiSeviye.test(p))
+  const kokAcik = yollar.filter((p) => YOL.acikKok.test(p))
+  const dalAcik = yollar.filter((p) => YOL.acikDal.test(p))
+  const pdp = yollar.filter((p) => YOL.urun.test(p))
   // Marka detayı: site haritası bunları kanonik olarak ilan ediyor (`sitemap.ts` §3 Brand
-  // Routes, `HVAC_BRANDS` üzerinden). Liste sayfası (`/tr/brands`) SABİT yol olduğu için
-  // temsilci gerektirmez; yalnız detay sınıfı seçilir.
-  const marka = yollar.filter((p) => /^\/tr\/brands\/[^/]+$/.test(p))
+  // Routes, `HVAC_BRANDS` üzerinden). Liste sayfası SABİT yol olduğu için temsilci gerektirmez
+  // (haritadan okunur: ESKİ `/tr/brands`, AÇIK `/tr/markalar`); yalnız detay sınıfı seçilir.
+  const marka = yollar.filter((p) => YOL.marka.test(p))
+  const liste = URUN_LISTESI_YOLLARI.find((y) => yollar.includes(y))
+  const markaListesi = MARKA_LISTESI_YOLLARI.find((y) => yollar.includes(y))
+  const bolumler = bolumDagilimi(yollar)
 
+  // Sayımlar derinliği AÇIK şemadan da yansıtır: `kategori` = kök (tek seviyeli) sayfa, `ikiSegmentli` = iki seviyeli.
   const sayimlar = {
-    kategori: kategori.length,
-    ikiSegmentli: ikiSegmentli.length,
+    kategori: kategoriEski.length + kokAcik.length,
+    ikiSegmentli: ikiSeviyeEski.length + dalAcik.length,
     pdp: pdp.length,
     marka: marka.length,
   }
@@ -420,17 +510,23 @@ export async function temsilcileriSec(
   const ALTGRUP_DESENI = />Alt Ürün Grupları</
   const YAPRAK_DESENI = /data-ssr="family-card"/
 
-  const adaylar = [...kategori].sort()
+  // ⭐AÇIK ŞEMADA `kök/dal` KANONİK adrestir: aday kümesi iki derinliği BİRLİKTE içerir ve seçim yine İÇERİKTEN
+  // yapılır (aşağıdaki geriye dönük kol YALNIZ REC-205 öncesi eski iki seviyeli biçimde devreye girer). Açık şema
+  // `kök/dal` adresini "doğrulanmamış temsilci" sayıp gevşek ölçüte düşürseydi yaprak ölçütü gevşerdi (ratchet kaybı).
+  // Aday sayısı iki şemada aynıdır (kategori sayfası sayısı): ESKİ 23 tek seviyeli, AÇIK 6 kök + 17 dal (REC-286 sayımı).
+  const adaylar = [...kategoriEski, ...kokAcik, ...dalAcik].sort()
   const atlananlar: Atlanan[] = []
 
-  // Geriye dönük kol: iki seviyeli yol VARSA eski (ucuz, isteksiz) ayrım korunur.
-  if (ikiSegmentli.length > 0) {
-    const altPrefixleri = new Set(ikiSegmentli.map((p) => p.split('/').slice(0, 4).join('/')))
+  // Geriye dönük kol: REC-205 ÖNCESİ iki seviyeli yol VARSA eski (ucuz, isteksiz) ayrım korunur.
+  if (ikiSeviyeEski.length > 0) {
+    const altPrefixleri = new Set(ikiSeviyeEski.map((p) => p.split('/').slice(0, 4).join('/')))
     const t: Temsilciler = {
-      altgrupluKategori: ilk(kategori.filter((p) => altPrefixleri.has(p))),
-      yaprakKategori: ilk(ikiSegmentli),
+      altgrupluKategori: ilk(kategoriEski.filter((p) => altPrefixleri.has(p))),
+      yaprakKategori: ilk(ikiSeviyeEski),
       pdp: ilk(pdp),
       marka: ilk(marka),
+      liste,
+      markaListesi,
       sayimlar,
       secim: { icerikten: false, denenenAday: 0, adayTavani: ADAY_TAVANI },
       atlananlar,
@@ -441,7 +537,7 @@ export async function temsilcileriSec(
         sebep: 'iki segmentli yol var ama hiçbiri tek segmentli bir kategoriyle eşleşmedi',
       })
     }
-    zorunluKontrol(t, sayimlar)
+    zorunluKontrol(t, sayimlar, bolumler)
     return t
   }
 
@@ -482,8 +578,8 @@ export async function temsilcileriSec(
     atlananlar.push({
       sinif: 'marka',
       sebep:
-        "site haritasinda /tr/brands/<slug> deseni HIC YOK — temsilci secilemedi, " +
-        'sinif OLCULMEDI (yesil DEGIL). Harita brand rotalarini ilan ediyor olmali ' +
+        "site haritasinda /tr/brands/<slug> ya da /tr/markalar/<slug> deseni HIC YOK — temsilci secilemedi, " +
+        'sinif OLCULMEDI (yesil DEGIL). Harita marka rotalarini ilan ediyor olmali ' +
         '(sitemap.ts §3 Brand Routes).',
     })
   }
@@ -493,11 +589,13 @@ export async function temsilcileriSec(
     yaprakKategori,
     pdp: ilk(pdp),
     marka: ilk(marka),
+    liste,
+    markaListesi,
     sayimlar,
     secim: { icerikten: true, denenenAday, adayTavani: ADAY_TAVANI },
     atlananlar,
   }
-  zorunluKontrol(t, sayimlar)
+  zorunluKontrol(t, sayimlar, bolumler)
   return t
 }
 
@@ -508,14 +606,17 @@ export async function temsilcileriSec(
  * (i18n sözlük metnine bağlı, bkz. kural bloğu). Temsilcisi bulunamadığında kapı kırmızı
  * OLMAZ ama sınıf `atlananlar`a yazılır — ölçülmeyen şey yeşil sayılmaz, GÖRÜNÜR olur.
  */
-function zorunluKontrol(t: Temsilciler, sayimlar: Temsilciler['sayimlar']): void {
+function zorunluKontrol(t: Temsilciler, sayimlar: Temsilciler['sayimlar'], bolumler: string): void {
   if (!t.yaprakKategori || !t.pdp) {
     throw new Error(
       'SSR duman kuralları: KAPIDA koşan sınıfların temsilcisi YOK ' +
         `(kategori=${sayimlar.kategori}, iki-segmentli=${sayimlar.ikiSegmentli}, pdp=${sayimlar.pdp}, ` +
         `içerikten=${t.secim.icerikten}, denenen aday=${t.secim.denenenAday}/${t.secim.adayTavani}). ` +
         'Kapı KIRMIZI. NOT: sitemap\'te HİÇ kategori/PDP yolu yoksa bu gerçek bir kusurdur; ' +
-        'aday çekilebildiği hâlde hiçbiri aile kartı basmıyorsa bu da gerçek bir kusurdur.'
+        'aday çekilebildiği hâlde hiçbiri aile kartı basmıyorsa bu da gerçek bir kusurdur. ' +
+        'Sayımlar SIFIRSA önce adres kalıbına bak: tanınan şemalar ESKİ (/tr/category, /tr/products, /tr/brands) ' +
+        've AÇIK (/tr/kategori, /tr/urun, /tr/markalar). ' +
+        `Sitemap bölüm dağılımı: ${bolumler} (bölüm adı=yol sayısı)`
     )
   }
 
@@ -532,9 +633,9 @@ function zorunluKontrol(t: Temsilciler, sayimlar: Temsilciler['sayimlar']): void
   if (!t.marka) {
     throw new Error(
       'SSR duman kurallari: MARKA sinifinin temsilcisi YOK ' +
-        `(sitemap'te /tr/brands/<slug> sayisi=${sayimlar.marka}). Kapi KIRMIZI. ` +
+        `(sitemap'te /tr/brands/<slug> ya da /tr/markalar/<slug> sayisi=${sayimlar.marka}). Kapi KIRMIZI. ` +
         'Bu gercek bir kusurdur: sitemap.ts §3 Brand Routes marka adreslerini ilan ediyor ' +
-        'olmali. Olcememek gecmek DEGILDIR.'
+        `olmali. Olcememek gecmek DEGILDIR. Sitemap bolum dagilimi: ${bolumler}`
     )
   }
 }
@@ -559,8 +660,10 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
 
     // Ürün listesi: aile kartları SSR'da olmalı — `data-ssr` işareti ÜRÜN tarafının
     // bilerek koyduğu ölçüm kancası, i18n metnine bağlı değil, bu yüzden kapıya uygun.
+    // Yol haritadan gelir: ESKİ `/tr/products`, AÇIK `/tr/urunler` (açıkta `/tr/products` yalnız 308 verir; kapı
+    // kanonik sayfayı ölçer, yönlendirmenin ardındakini değil). Haritada yoksa eski yol (bugüne kadarki sabit).
     {
-      yol: '/tr/products',
+      yol: t.liste ?? ESKI_URUN_LISTESI,
       sinif: 'liste',
       markerlar: [/<h1[\s>]/, /data-ssr="family-card"/],
       maxBailout: 0,
@@ -658,19 +761,21 @@ export function kurallar(t: Temsilciler, yalnizKapi = false): Kural[] {
     /**
      * MARKA LİSTESİ — REC-59 açık kaleminin birinci yarısı.
      *
-     * SABİT YOL: temsilci gerekmez, `/tr/brands` her zaman var (sitemap statik rotası).
+     * SABİT YOL: temsilci gerekmez, liste her zaman var (sitemap statik rotası): ESKİ `/tr/brands`,
+     * AÇIK `/tr/markalar` — yol haritadan okunur, haritada yoksa eski yol.
      *
      * İKİ İŞARET DE ÖLÇÜLDÜ (kendi derlemem, `.next/server/app/tr/brands.html`):
      * `<h1>` 1 · `href="/tr/brands/` **6**. İkinci işaret ayırt edicidir: yalnız `<h1>`
      * arayan bir kural, liste boş gelse bile yeşil kalırdı — başlık kabuğun parçası,
-     * bağlantılar ise VERİNİN sunucuda çözüldüğünün kanıtı.
+     * bağlantılar ise VERİNİN sunucuda çözüldüğünün kanıtı. Bağlantı işareti iki şemayı da
+     * tanır (`/tr/brands/<x>` ya da `/tr/markalar/<x>`); ölçüt aynı, yalnız adres biçimi genişledi.
      *
      * KAPIDA KOŞAR: ölçüt sağlam (dil metnine bağlı değil, adres desenine bağlı).
      */
     {
-      yol: '/tr/brands',
+      yol: t.markaListesi ?? ESKI_MARKA_LISTESI,
       sinif: 'marka-listesi',
-      markerlar: [/<h1[\s>]/, /href="\/tr\/brands\//],
+      markerlar: [/<h1[\s>]/, /href="\/tr\/(?:brands|markalar)\//],
       maxBailout: MARKA_MAX_BAILOUT,
       kapida: true,
     },
