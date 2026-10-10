@@ -75,7 +75,12 @@ jobs:
 
       # SIRSIZ ikinci adım: dosyanın boş/yarım olmadığını ve anahtar, JWT, e-posta biçimi taşımadığını
       # üretimden bağımsız olarak yeniden doğrular.
+      # JITI_ALIAS BURADA DA ŞART (ALT-50, 2026-10-10 ilk koşuda ölçüldü): betik üstte `haritaUret.ts`i içe
+      # aktarır, o da `@/utils/categoryHelpers` ister; takma ad yoksa `--dogrula` yolu bile "Cannot find module"
+      # ile düşer ve artefakt yüklenmeden iş kırmızı biter. Değer sır DEĞİLDİR (yalnız çalışma alanı yolu).
       - name: Ciktiyi dogrula (sirsiz)
+        env:
+          JITI_ALIAS: '{"@/":"${{ github.workspace }}/src/"}'
         run: pnpm exec jiti scripts/adres/harita-uret.ts --dogrula harita-cikti/eski-adres-haritasi.json
 
       - name: Artefakt yukle
