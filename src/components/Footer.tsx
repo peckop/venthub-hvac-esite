@@ -15,7 +15,8 @@ import BuildTag from './BuildTag'
 const FOOTER_ICON_MAIL = 'M'
 const WEEKDAY_HOURS = '09:00 - 18:00'
 const SATURDAY_HOURS = '09:00 - 14:00'
-const HVAC_SUFFIX = 'HVAC.'
+/** Telif satırında marka adından sonra gelen cümle sonu (JSX'te çıplak metin `jsx-no-literals` kuralına takılır). */
+const TELIF_CUMLE_SONU = '.'
 /** Altbilgide gösterilecek en çok kök kategori (bugün 7 ürünlü kök var; 8. kök gelirse tavan bilinçli kararla artar). */
 const FOOTER_KATEGORI_TAVANI = 8
 
@@ -171,7 +172,9 @@ const Footer: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-300 text-sm">
-              © {new Date().getFullYear()} {t('header.brandName')} {HVAC_SUFFIX} {t('footer.rights')}
+              {/* URN-83: şirket kurulmadı — telif satırı yasal unvan / "HVAC." eki taşımaz; ad giriş sayfasıyla AYNI sözlük
+                  anahtarından gelir (`common.brandLegalName`), unvan kesinleşince tek yerden değişir. */}
+              © {new Date().getFullYear()} {t('common.brandLegalName')}{TELIF_CUMLE_SONU} {t('footer.rights')}
             </div>
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm justify-center md:justify-end">
               {/* Build meta tag */}
