@@ -7,9 +7,9 @@
  *
  * KAPSAM (dürüst sınır): bu dosya (1) `.claude/rules/filo-ortak.md` dosyasının varlığını, boyutunu ve üreticideki ortak
  * metinlerle eşitliğini ölçer; (2) ajan tanımlarında yazma kapısının kapalı kaldığını ve `memory:` alanının yalnız `user`
- * olabildiğini korur. Ajan hafızasının KURULUMUNU (`memory: user` satırının üretilen 51 tanımda bulunmasını) ölçmez: o adım
- * Kanban HRT-48 / PR #1795'tedir ve oradaki "her yardımcıda memory: user" kolu eklenince kurulum da ölçülür. Hafıza yokken
- * bu testin yeşil olması "hafıza kuruldu" demek DEĞİLDİR.
+ * olabildiğini korur; (3) hafızanın KURULUMUNU ölçer: üretilen her yardımcıda `memory: user` (HRT-48, #1797) ve her açık
+ * departmanın müdür penceresi tanımında (`<departman>-pencere.md`, HRT-49) `memory: user`, model, araç kısıtının yokluğu.
+ * Bu test dosyada `memory: user` satırını ölçer; ajanın o hafızayı gerçekten yüklediği ayrıca ÖLÇÜLDÜ (OPS-101 pilotu), burada değil.
  *
  * ÖLÇÜLMÜŞ OLGULAR (2026-10-09, deney dizini, `claude -p`):
  *   - `paths:` alanı olmayan `.claude/rules/<dosya>.md` açılışta yüklenir. Belgeye göre compact sonrası da diskten yeniden
@@ -52,6 +52,17 @@ const KURAL_ISARETLERI = ['/compact', 'kart numara', 'mekanik', 'YÖNTEM:', 'ağ
 const SALT_OKUMA = /-(arastirmaci|curutucu|dogrulayici)\.md$/
 /** Üreticinin yazdığı yardımcı ajan adları (dört tür); security-reviewer ve denetim-opus bu kalıpta değildir. */
 const YARDIMCI = /-(arastirmaci|uygulayici|curutucu|dogrulayici)\.md$/
+/** Departman müdür penceresi tanımı (HRT-49): settings'teki `"agent": "<departman>-pencere"` ile pencere bu tanımla açılır. */
+const PENCERE = /-pencere\.md$/
+/**
+ * Pencere tanımı olan AÇIK departmanlar (OPS emri 2026-10-10). Bilerek elle yazılı: üreticinin listesinden okunsaydı, listeden
+ * departman düşüren PR kapıyı da kendiliğinden yeşil tutardı (totoloji). Kapalı departmanlar (ADMIN, EDGE, I18N, MARKA, MEVZUAT,
+ * SATIS) pencere açıldığında hem buraya hem üretici listesine eklenir; ikisi ayrışırsa aşağıdaki "üreticiyle bağ" kolu kırmızı verir.
+ */
+const ACIK_DEPARTMANLAR = ['OPS', 'ARAC', 'ALTYAPI', 'HARITA', 'URUN', 'KATALOG', 'TASARIM', 'BLOG', 'GEO-SEO', 'TAKIP', 'YETENEK'] as const
+/** Pencere modeli: pencerenin bugünkü modeli (OPS Opus 5.5, öteki departmanlar Sonnet 5.5); TAM kimlik, takma ad kayar. */
+const PENCERE_MODEL: Record<string, string> = { OPS: 'claude-opus-5-5' }
+const PENCERE_MODEL_VARSAYILAN = 'claude-sonnet-5-5'
 
 const lf = (m: string): string => m.replace(/\r\n/g, '\n')
 
@@ -205,7 +216,7 @@ describe('INV-HAZIR-OZELLIK-1 — .claude/rules/filo-ortak.md', () => {
   })
 })
 
-describe('INV-HAZIR-OZELLIK-1 — ajan yazma kapısı ve hafıza KAPSAMI (hafızanın kurulumu değil: o adım HRT-48 / #1795)', () => {
+describe('INV-HAZIR-OZELLIK-1 — ajan yazma kapısı, hafıza KAPSAMI ve `memory: user` kurulumu (yardımcılar HRT-48, pencereler HRT-49)', () => {
   it('kaynak sağlam: .claude/agents altında salt-okuma ajanı çok sayıda (kapı boş kümeyi geçmesin)', () => {
     expect(ajanDosyalari().filter((f) => SALT_OKUMA.test(f)).length).toBeGreaterThan(30)
   })
@@ -243,7 +254,7 @@ describe('INV-HAZIR-OZELLIK-1 — ajan yazma kapısı ve hafıza KAPSAMI (hafız
     const eksik = yardimcilar.filter((f) => alan(ajanFm(f), 'memory') !== 'user')
     expect(eksik, 'üretici `memory: user` yazmıyor ya da dosya elle bozulmuş (scripts/belge/ajan-tanimi-uret.cjs --yaz)').toEqual([])
     // Muaf iki tanım: tools allowlist'i var; memory verilince Read/Write/Edit otomatik açılır (ÖLÇÜLMEDİ). Eklenirse karar yeniden verilir.
-    const muaflar = ajanDosyalari().filter((f) => !YARDIMCI.test(f))
+    const muaflar = ajanDosyalari().filter((f) => !YARDIMCI.test(f) && !PENCERE.test(f))
     expect(muaflar.sort()).toEqual(['denetim-opus.md', 'security-reviewer.md'])
     expect(muaflar.filter((f) => alan(ajanFm(f), 'memory') !== undefined)).toEqual([])
   })
@@ -305,5 +316,111 @@ describe('INV-HAZIR-OZELLIK-1 — ajan yazma kapısı ve hafıza KAPSAMI (hafız
     expect(bomluMu(bomlu)).toBe(true)
     expect(alan(frontmatter(bomlu), 'memory')).toBe('user')
     expect(bomluMu(govde('memory: user'))).toBe(false)
+  })
+})
+
+/** Dizindeki `<departman>-pencere.md` kümesi ile beklenen açık departman kümesi arasındaki fark (boş = aynı). */
+function pencereKumeFarki(dosyalar: string[]): string[] {
+  const var_ = dosyalar.filter((f) => PENCERE.test(f)).sort()
+  const olmasi = ACIK_DEPARTMANLAR.map((d) => `${d.toLowerCase()}-pencere.md`).sort()
+  return [...olmasi.filter((f) => !var_.includes(f)).map((f) => `eksik: ${f}`), ...var_.filter((f) => !olmasi.includes(f)).map((f) => `fazla: ${f}`)]
+}
+
+/**
+ * Tek pencere tanımının sorunları (boş liste = sağlam). `dept` büyük harfli departman adı, `metin` dosyanın tamamı.
+ * Ölçülen: `name`, `memory: user`, tam model kimliği, araç kısıtının YOKLUĞU (müdür yazar), gövdenin rol dosyalarına ve açılış sırasına
+ * atfı, rol dosyalarının varlığı, gövdede anılan çalışanların gerçekten var olması (ve var olan çalışanların anılması).
+ */
+function pencereSorunlari(dept: string, metin: string): string[] {
+  const s: string[] = []
+  const alt = dept.toLowerCase()
+  const fm = frontmatter(metin)
+  const govde = lf(metin).replace(/^---\n[\s\S]*?\n---\n/, '')
+  if (bomluMu(metin)) s.push('BOM ile başlıyor')
+  if (alan(fm, 'name') !== `${alt}-pencere`) s.push(`name ${alt}-pencere değil`)
+  if (alan(fm, 'memory') !== 'user') s.push('`memory: user` yok')
+  const model = PENCERE_MODEL[dept] ?? PENCERE_MODEL_VARSAYILAN
+  if (alan(fm, 'model') !== model) s.push(`model ${model} değil`)
+  if (liste(fm, 'tools') !== undefined) s.push('`tools:` allowlist var: müdür yazar, araç kısıtı konmaz')
+  if (liste(fm, 'disallowedTools') !== undefined) s.push('`disallowedTools:` var: müdür yazar, araç kısıtı konmaz')
+  if (!(alan(fm, 'description') ?? '').includes(dept)) s.push('açıklama departman adını taşımıyor')
+  for (const yol of [`docs/roller/${dept}.md`, `docs/roller/${dept}-kurallar.md`]) {
+    if (!govde.includes(yol)) s.push(`gövde ${yol} yoluna atıf yapmıyor`)
+    if (!fs.existsSync(path.join(kok, yol))) s.push(`${yol} dosyası yok`)
+  }
+  if (!/durum dosyanı oku/.test(govde) || !/Kanban/.test(govde)) s.push('açılış sırası (durum dosyası → Kanban → iş) yok')
+  if (!govde.includes('Müdür penceresisin')) s.push('"Müdür penceresisin" cümlesi yok')
+  const anilan = [...govde.matchAll(new RegExp(`${alt}-(?:arastirmaci|uygulayici|curutucu|dogrulayici)(?![a-z])`, 'g'))].map((m) => m[0]).sort()
+  const mevcut = ajanDosyalari()
+    .filter((f) => YARDIMCI.test(f) && f.startsWith(`${alt}-`))
+    .map((f) => f.replace(/\.md$/, ''))
+    .sort()
+  if (JSON.stringify(anilan) !== JSON.stringify(mevcut)) s.push(`gövdede anılan çalışanlar [${anilan.join(', ')}] ≠ diskteki çalışanlar [${mevcut.join(', ')}]`)
+  return s
+}
+
+describe('INV-HAZIR-OZELLIK-1 — departman müdür pencere tanımları (HRT-49): her açık departmanın tanımı var ve `memory: user` taşıyor', () => {
+  it('pencere tanımı kümesi tam olarak açık departmanlar kadardır (eksik de fazla da kırmızı); kapalı departman için tanım yok', () => {
+    expect(ACIK_DEPARTMANLAR.length, 'kapı boş kümeyi geçmesin').toBeGreaterThanOrEqual(11)
+    expect(pencereKumeFarki(ajanDosyalari())).toEqual([])
+  })
+
+  it('her açık departmanın pencere tanımı `memory: user` taşır, doğru modelle açılır, araç kısıtı yoktur ve rol dosyalarına bağlıdır', () => {
+    for (const d of ACIK_DEPARTMANLAR) {
+      const dosya = `${d.toLowerCase()}-pencere.md`
+      expect(alan(ajanFm(dosya), 'memory'), `${dosya}: memory`).toBe('user')
+      expect(pencereSorunlari(d, ajanMetin(dosya)), dosya).toEqual([])
+    }
+  })
+
+  it('model sabit ve beklenen: OPS claude-opus-5-5, öteki on departman claude-sonnet-5-5 (takma ad değil tam kimlik)', () => {
+    const modeller = Object.fromEntries(ACIK_DEPARTMANLAR.map((d) => [d, alan(ajanFm(`${d.toLowerCase()}-pencere.md`), 'model')]))
+    expect(modeller).toEqual({
+      OPS: 'claude-opus-5-5',
+      ARAC: 'claude-sonnet-5-5',
+      ALTYAPI: 'claude-sonnet-5-5',
+      HARITA: 'claude-sonnet-5-5',
+      URUN: 'claude-sonnet-5-5',
+      KATALOG: 'claude-sonnet-5-5',
+      TASARIM: 'claude-sonnet-5-5',
+      BLOG: 'claude-sonnet-5-5',
+      'GEO-SEO': 'claude-sonnet-5-5',
+      TAKIP: 'claude-sonnet-5-5',
+      YETENEK: 'claude-sonnet-5-5',
+    })
+  })
+
+  it('üreticiyle bağ: ajan-tanimi-uret.cjs pencere listesi ve model sabitleri bu dosyadakilerle birebir aynı (iki liste sessizce ayrışmasın)', () => {
+    const uretici = createRequire(import.meta.url)(path.join(kok, 'scripts', 'belge', 'ajan-tanimi-uret.cjs')) as {
+      PENCERE_DEPARTMANLARI: string[]
+      PENCERE_MODEL: Record<string, string>
+      PENCERE_MODEL_VARSAYILAN: string
+    }
+    expect([...uretici.PENCERE_DEPARTMANLARI].sort()).toEqual([...ACIK_DEPARTMANLAR].sort())
+    expect(uretici.PENCERE_MODEL).toEqual(PENCERE_MODEL)
+    expect(uretici.PENCERE_MODEL_VARSAYILAN).toBe(PENCERE_MODEL_VARSAYILAN)
+  })
+
+  it('ayırt edici (bilinçli bozma): eksik ya da fazla pencere dosyası, memory/model/araç/atıf/çalışan bozulması kapıda kırmızı verir; sağlam metin yeşil kalır', () => {
+    const tum = ajanDosyalari()
+    expect(pencereKumeFarki(tum.filter((f) => f !== 'altyapi-pencere.md'))).toEqual(['eksik: altyapi-pencere.md'])
+    expect(pencereKumeFarki([...tum, 'admin-pencere.md'])).toEqual(['fazla: admin-pencere.md'])
+
+    const sag = ajanMetin('altyapi-pencere.md')
+    expect(pencereSorunlari('ALTYAPI', sag)).toEqual([])
+    const boz = (degistir: (m: string) => string): string[] => pencereSorunlari('ALTYAPI', degistir(lf(sag)))
+    expect(boz((m) => m.replace('memory: user\n', ''))).toContain('`memory: user` yok')
+    expect(boz((m) => m.replace('memory: user', 'memory: project'))).toContain('`memory: user` yok')
+    expect(boz((m) => m.replace('claude-sonnet-5-5', 'sonnet'))).toContain('model claude-sonnet-5-5 değil')
+    expect(boz((m) => m.replace('claude-sonnet-5-5', 'claude-opus-5-5'))).toContain('model claude-sonnet-5-5 değil')
+    expect(boz((m) => m.replace('memory: user\n', 'memory: user\ntools: Read, Grep\n'))).toContain('`tools:` allowlist var: müdür yazar, araç kısıtı konmaz')
+    expect(boz((m) => m.replace('memory: user\n', 'memory: user\ndisallowedTools: Edit, Write\n'))).toContain('`disallowedTools:` var: müdür yazar, araç kısıtı konmaz')
+    expect(boz((m) => m.replace('name: altyapi-pencere', 'name: altyapi'))).toContain('name altyapi-pencere değil')
+    expect(boz((m) => m.replace('docs/roller/ALTYAPI-kurallar.md', 'docs/roller/YOK-kurallar.md'))).toContain('gövde docs/roller/ALTYAPI-kurallar.md yoluna atıf yapmıyor')
+    expect(boz((m) => m.replace('durum dosyanı oku', 'kartlarına bak'))).toContain('açılış sırası (durum dosyası → Kanban → iş) yok')
+    expect(boz((m) => m.replace('altyapi-curutucu', 'altyapi-hayalet')).join(' | ')).toMatch(/gövdede anılan çalışanlar/)
+    expect(boz((m) => `${BOM}${m}`)).toContain('BOM ile başlıyor')
+    // OPS'a Sonnet yazılırsa da kırmızı: model departmana göre ayrışır
+    expect(pencereSorunlari('OPS', ajanMetin('ops-pencere.md').replace('claude-opus-5-5', 'claude-sonnet-5-5'))).toContain('model claude-opus-5-5 değil')
   })
 })

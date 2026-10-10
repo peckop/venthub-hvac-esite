@@ -950,6 +950,7 @@ function main() {
 }
 
 module.exports = {
+  ROLLER,
   DURUM_SATIRI_KURALI,
   CALISMA,
   haritaOzet,
