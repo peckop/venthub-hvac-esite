@@ -58,6 +58,8 @@ describe('adresRotalari — vekilin (useLocalizedRoutes) ve sunucu yüzeylerinin
     ['marka süzgeci', (r) => r.products({ brand: 'Vortice' }), 'tr', '/tr/products?brand=Vortice', '/tr/urunler?brand=Vortice'],
     ['marka', (r) => r.brand('vortice'), 'tr', '/tr/brands/vortice', '/tr/markalar/vortice'],
     ['marka EN', (r) => r.brand('vortice'), 'en', '/en/brands/vortice', '/en/brands/vortice'],
+    ['marka listesi', (r) => r.brands(), 'tr', '/tr/brands', '/tr/markalar'],
+    ['marka listesi EN', (r) => r.brands(), 'en', '/en/brands', '/en/brands'],
   ]
 
   it.each(tablo)('KAPALI birebir bugünkü: %s', (_ad, cagri, dil, bugun) => {
@@ -90,6 +92,8 @@ describe('dilDegistirYolu — LanguageSwitcher', () => {
     ['/en/category/fans', 'tr', '/tr/category/fans', '/tr/kategori/fans'],
     ['/tr/markalar/vortice', 'en', '/en/markalar/vortice', '/en/brands/vortice'],
     ['/en/brands/vortice', 'tr', '/tr/brands/vortice', '/tr/markalar/vortice'],
+    ['/tr/markalar', 'en', '/en/markalar', '/en/brands'],
+    ['/en/brands', 'tr', '/tr/brands', '/tr/markalar'],
     ['/tr/cart', 'en', '/en/cart', '/en/cart'],
     ['/tr', 'en', '/en', '/en'],
     ['/about', 'en', '/en/about', '/en/about'],
@@ -143,7 +147,7 @@ describe('kırıntı yolu (aile sayfası BreadcrumbList + breadcrumbUtils)', () 
       ],
     }) as { itemListElement: { item?: string }[] }
     expect(ld.itemListElement.map((i) => i.item)).toEqual([
-      'https://x/tr/',
+      'https://x/tr', // REC-494: ana sayfa sonda eğik çizgisiz (`/tr/` 308 verir)
       'https://x/tr/category/fanlar',
       'https://x/tr/kategori/fanlar/kanal-tipi-fanlar',
       undefined,

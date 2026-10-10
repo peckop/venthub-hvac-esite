@@ -127,10 +127,12 @@ describe('markaBulAdla', () => {
     expect(markaBulAdla('  ')).toBeNull()
   })
 
-  it('GERÇEK DB marka adlarının TAMAMI (fikstür, 2026-10-03 ölçümü: 5 marka / 47 aile) kendi slug\'ına eşleşir, düşen ya da yanlış eşleşen yok', () => {
+  it('GERÇEK DB marka adlarının TAMAMI (fikstür: 5 ölçülü marka + OPS-51 casals/flexiva = 7) kendi slug\'ına eşleşir, düşen ya da yanlış eşleşen yok', () => {
     const sonuc = Object.entries(DB_MARKALARI).map(([slug, m]) => [slug, markaBulAdla(m.ad)?.slug ?? null])
     expect(sonuc.filter(([slug, bulunan]) => bulunan !== slug)).toEqual([])
-    expect(sonuc).toHaveLength(5)
+    expect(sonuc).toHaveLength(7)
+    // Casals ürünlerinin `brand_name`'i ('Casals') artık vitrin markasına çözülür → aile sayfasındaki marka bağlantısı canlı.
+    expect(markaBulAdla('Casals')?.slug).toBe('casals')
   })
 
   it('farklı iki marka adı aynı kayda düşmez (yanlış eşleşme yok)', () => {

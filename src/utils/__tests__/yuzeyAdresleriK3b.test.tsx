@@ -80,18 +80,26 @@ describe('useLocalizedRoutes vekili — K3-b açık', () => {
     expect(result.current.brand('vortice')).toBe('/en/brands/vortice')
   })
 
-  it('vitrin nesnesi OLMAYAN rotalar değişmez (sepet, hesap, marka listesi)', () => {
+  it('vitrin nesnesi OLMAYAN rotalar değişmez (sepet, hesap)', () => {
     const { result } = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('tr') })
     expect(result.current.cart()).toBe('/tr/cart')
     expect(result.current.account.orders()).toBe('/tr/account/orders')
-    expect(result.current.brands()).toBe('/tr/brands')
+  })
+
+  // URN-85: marka LİSTESİ de açık şemanın parçası (Design CSV: TR `/tr/markalar`); EN yayın kapalıyken `/en/brands`
+  // aynen kalır (marka sayfaları `/en/brands/<slug>` zaten böyle).
+  it('marka LİSTESİ: TR `/tr/markalar`, EN `/en/brands`', () => {
+    const tr = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('tr') })
+    expect(tr.result.current.brands()).toBe('/tr/markalar')
+    const en = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('en') })
+    expect(en.result.current.brands()).toBe('/en/brands')
   })
 })
 
 describe('Bilgi Merkezi iç bağlantı çözücüsü — K3-b açık (adresUret doğrudan)', () => {
   const k = sahteKaynak()
   it('aile, model (seçili model korunur), kategori, tüm ürünler', async () => {
-    expect(await icBaglantiCoz('vh:aile/danfoss-fc101', 'tr', k)).toBe('/tr/urun/danfoss-fc101')
+    expect(await icBaglantiCoz('vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'tr', k)).toBe('/tr/urun/danfoss-vlt-hvac-basic-drive-fc-101')
     expect(await icBaglantiCoz('vh:model/vrt-65195', 'tr', k)).toBe('/tr/urun/vortice-hava-perdesi-p-vrt-65195')
     expect(await icBaglantiCoz('vh:kategori/frequency-converters', 'tr', k)).toBe('/tr/kategori/frekans-konvertorleri')
     expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/fanlar/duman-egzoz-fanlari')
@@ -100,21 +108,27 @@ describe('Bilgi Merkezi iç bağlantı çözücüsü — K3-b açık (adresUret 
   })
 
   it('EK ÖLÇÜM: frekans konvertörü yazısı — bugünkü href 3c eşleyicisinde yeni adrese TEK 308, hedef çözücüyle AYNI', async () => {
-    const aileler = ['danfoss-fc101', 'danfoss-fc102', 'danfoss-fc51']
+    // URN-53: yazı artık YENİ slug'ı anar; yazının eski href'leri (2026-09-27 ölçümü: /tr/products/danfoss-fc101 · fc102 · fc51)
+    // takma adla aynı aileye çözülür ve tek 308 ile yeni adrese gider.
+    const ciftler = [
+      ['danfoss-fc101', 'danfoss-vlt-hvac-basic-drive-fc-101'],
+      ['danfoss-fc102', 'danfoss-vlt-hvac-drive-fc-102'],
+      ['danfoss-fc51', 'danfoss-vlt-micro-drive-fc-51'],
+    ] as const
+    const aileler = ciftler.map(([, yeniSlug]) => yeniSlug)
     const harita: KiraciHaritasi = {
       urunSayisi: 35,
       aileler,
       modeller: {},
       eskiSkular: {},
       urunSluglari: {},
-      aileSluglari: Object.fromEntries(aileler.map((a, i) => [a, i])),
+      aileSluglari: Object.fromEntries(ciftler.flatMap(([eskiSlug, yeniSlug], i) => [[yeniSlug, i], [eskiSlug, i]])),
       kategoriler: [],
       kategoriSluglari: {},
     }
-    for (const aile of aileler) {
+    for (const [eskiSlug, aile] of ciftler) {
       const yeni = await icBaglantiCoz(`vh:aile/${aile}`, 'tr', k)
-      // Canlıdaki yazıda bugün yazılı olan href (ölçüldü 2026-09-27: /tr/products/danfoss-fc101 · fc102 · fc51, üçü 200).
-      const eski = `/tr/products/${aile}`
+      const eski = `/tr/products/${eskiSlug}`
       expect(eskiAdresEsle(harita, { yol: eski, sku: null, dilTespit: () => 'tr' })).toEqual({ hedef: yeni, durum: 308 })
     }
   })

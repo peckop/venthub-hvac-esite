@@ -2,114 +2,96 @@
  "enKapali": [
   {
    "url": "{BASE}/tr",
-   "changefreq": "daily",
    "priority": 1
   },
   {
    "url": "{BASE}/tr/products",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/brands",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/contact",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/about",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/urun-secici",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/legal/kvkk",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/legal/gizlilik-politikasi",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/legal/cerez-politikasi",
-   "changefreq": "daily",
    "priority": 0.8
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi",
-   "changefreq": "weekly",
    "priority": 0.7
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi/frekans-konvertoru-nedir",
-   "changefreq": "monthly",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/category/fanlar",
-   "changefreq": "weekly",
    "priority": 0.7
   },
   {
    "url": "{BASE}/tr/category/sessiz-kanal-fanlari",
-   "changefreq": "weekly",
    "priority": 0.7
   },
   {
    "url": "{BASE}/tr/category/hava-perdeleri",
-   "changefreq": "weekly",
    "priority": 0.7
   },
   {
    "url": "{BASE}/tr/brands/vortice",
-   "changefreq": "weekly",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/brands/avens",
-   "changefreq": "weekly",
+   "priority": 0.6
+  },
+  {
+   "url": "{BASE}/tr/brands/casals",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/brands/seat",
-   "changefreq": "weekly",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/brands/danfoss",
-   "changefreq": "weekly",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/brands/nicotra-gebhardt",
-   "changefreq": "weekly",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/products/vortice-lineo-quiet",
-   "changefreq": "daily",
    "priority": 0.9
   },
   {
    "url": "{BASE}/tr/products/vortice-hava-perdesi",
-   "changefreq": "daily",
    "priority": 0.9
   }
  ],
  "enAcik": [
   {
    "url": "{BASE}/tr",
-   "changefreq": "daily",
    "priority": 1,
    "alternates": {
     "languages": {
@@ -120,7 +102,6 @@
   },
   {
    "url": "{BASE}/tr/products",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -131,7 +112,6 @@
   },
   {
    "url": "{BASE}/tr/brands",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -142,7 +122,6 @@
   },
   {
    "url": "{BASE}/tr/contact",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -153,7 +132,6 @@
   },
   {
    "url": "{BASE}/tr/about",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -164,7 +142,6 @@
   },
   {
    "url": "{BASE}/tr/urun-secici",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -175,7 +152,6 @@
   },
   {
    "url": "{BASE}/tr/legal/kvkk",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -186,7 +162,6 @@
   },
   {
    "url": "{BASE}/tr/legal/gizlilik-politikasi",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -197,7 +172,6 @@
   },
   {
    "url": "{BASE}/tr/legal/cerez-politikasi",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -208,7 +182,6 @@
   },
   {
    "url": "{BASE}/en",
-   "changefreq": "daily",
    "priority": 1,
    "alternates": {
     "languages": {
@@ -219,7 +192,6 @@
   },
   {
    "url": "{BASE}/en/products",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -230,7 +202,6 @@
   },
   {
    "url": "{BASE}/en/brands",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -241,7 +212,6 @@
   },
   {
    "url": "{BASE}/en/contact",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -252,7 +222,6 @@
   },
   {
    "url": "{BASE}/en/about",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -263,7 +232,6 @@
   },
   {
    "url": "{BASE}/en/urun-secici",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -274,7 +242,6 @@
   },
   {
    "url": "{BASE}/en/legal/kvkk",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -285,7 +252,6 @@
   },
   {
    "url": "{BASE}/en/legal/gizlilik-politikasi",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -296,7 +262,6 @@
   },
   {
    "url": "{BASE}/en/legal/cerez-politikasi",
-   "changefreq": "daily",
    "priority": 0.8,
    "alternates": {
     "languages": {
@@ -307,17 +272,14 @@
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi",
-   "changefreq": "weekly",
    "priority": 0.7
   },
   {
    "url": "{BASE}/tr/bilgi-merkezi/frekans-konvertoru-nedir",
-   "changefreq": "monthly",
    "priority": 0.6
   },
   {
    "url": "{BASE}/tr/category/fanlar",
-   "changefreq": "weekly",
    "priority": 0.7,
    "alternates": {
     "languages": {
@@ -328,7 +290,6 @@
   },
   {
    "url": "{BASE}/tr/category/sessiz-kanal-fanlari",
-   "changefreq": "weekly",
    "priority": 0.7,
    "alternates": {
     "languages": {
@@ -339,7 +300,6 @@
   },
   {
    "url": "{BASE}/tr/category/hava-perdeleri",
-   "changefreq": "weekly",
    "priority": 0.7,
    "alternates": {
     "languages": {
@@ -350,7 +310,6 @@
   },
   {
    "url": "{BASE}/en/category/fans",
-   "changefreq": "weekly",
    "priority": 0.7,
    "alternates": {
     "languages": {
@@ -361,7 +320,6 @@
   },
   {
    "url": "{BASE}/en/category/quiet-duct-fans",
-   "changefreq": "weekly",
    "priority": 0.7,
    "alternates": {
     "languages": {
@@ -372,7 +330,6 @@
   },
   {
    "url": "{BASE}/en/category/air-curtains",
-   "changefreq": "weekly",
    "priority": 0.7,
    "alternates": {
     "languages": {
@@ -383,7 +340,6 @@
   },
   {
    "url": "{BASE}/tr/brands/vortice",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -394,7 +350,6 @@
   },
   {
    "url": "{BASE}/tr/brands/avens",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -404,8 +359,17 @@
    }
   },
   {
+   "url": "{BASE}/tr/brands/casals",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
+    }
+   }
+  },
+  {
    "url": "{BASE}/tr/brands/seat",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -416,7 +380,6 @@
   },
   {
    "url": "{BASE}/tr/brands/danfoss",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -427,7 +390,6 @@
   },
   {
    "url": "{BASE}/tr/brands/nicotra-gebhardt",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -438,7 +400,6 @@
   },
   {
    "url": "{BASE}/en/brands/vortice",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -449,7 +410,6 @@
   },
   {
    "url": "{BASE}/en/brands/avens",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -459,8 +419,17 @@
    }
   },
   {
+   "url": "{BASE}/en/brands/casals",
+   "priority": 0.6,
+   "alternates": {
+    "languages": {
+     "tr": "{BASE}/tr/brands/casals",
+     "en": "{BASE}/en/brands/casals"
+    }
+   }
+  },
+  {
    "url": "{BASE}/en/brands/seat",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -471,7 +440,6 @@
   },
   {
    "url": "{BASE}/en/brands/danfoss",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -482,7 +450,6 @@
   },
   {
    "url": "{BASE}/en/brands/nicotra-gebhardt",
-   "changefreq": "weekly",
    "priority": 0.6,
    "alternates": {
     "languages": {
@@ -493,7 +460,6 @@
   },
   {
    "url": "{BASE}/tr/products/vortice-lineo-quiet",
-   "changefreq": "daily",
    "priority": 0.9,
    "alternates": {
     "languages": {
@@ -504,7 +470,6 @@
   },
   {
    "url": "{BASE}/tr/products/vortice-hava-perdesi",
-   "changefreq": "daily",
    "priority": 0.9,
    "alternates": {
     "languages": {
@@ -515,7 +480,6 @@
   },
   {
    "url": "{BASE}/en/products/vortice-lineo-quiet",
-   "changefreq": "daily",
    "priority": 0.9,
    "alternates": {
     "languages": {
@@ -526,7 +490,6 @@
   },
   {
    "url": "{BASE}/en/products/vortice-hava-perdesi",
-   "changefreq": "daily",
    "priority": 0.9,
    "alternates": {
     "languages": {

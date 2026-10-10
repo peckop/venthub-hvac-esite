@@ -224,26 +224,6 @@
       "source": "/en/brands/frekans-konvertoru",
       "destination": "/en/category/frequency-converters",
       "permanent": true
-    },
-    {
-      "source": "/tr/brands/flexiva",
-      "destination": "/tr/brands",
-      "permanent": true
-    },
-    {
-      "source": "/en/brands/flexiva",
-      "destination": "/en/brands",
-      "permanent": true
-    },
-    {
-      "source": "/tr/brands/casals",
-      "destination": "/tr/brands",
-      "permanent": true
-    },
-    {
-      "source": "/en/brands/casals",
-      "destination": "/en/brands",
-      "permanent": true
     }
   ],
   "headers": [

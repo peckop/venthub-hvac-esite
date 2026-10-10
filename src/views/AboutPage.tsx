@@ -130,19 +130,11 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
       {/* Story & Philosophy */}
       <section className="py-24 lg:py-32 overflow-hidden">
         <div className="max-w-page mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-24 items-center">
-            <ScrollReveal animation="slideLeft" className="relative aspect-square lg:aspect-video rounded-hvac-3xl overflow-hidden">
-              <Image 
-                src="/images/ekran/homepage beğendiğim yapı.png" 
-                alt="" 
-                fill 
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover grayscale hover:grayscale-0 transition-transform duration-1000"
-              />
-              <div className="absolute inset-0 bg-cyan-500/10 mix-blend-overlay" />
-            </ScrollReveal>
-
-            <div>
+          {/* URN-60: sol sütundaki görsel KALDIRILDI. Dosya adı "homepage beğendiğim yapı.png" bir
+              tasarım referansı ekran görüntüsüydü (şirketin gerçek bir fotoğrafı değil) ve "gerçek
+              görsel ya da hiç" kuralıyla çıktı. Metin tek sütunda okunur genişlikte kalır. */}
+          <div className="grid gap-24 items-center">
+            <div className="max-w-3xl">
               <div className="text-cyan-600 text-xs font-black uppercase tracking-hvac-wide mb-8">{t('aboutPage.vision')}</div>
               <h2 className="text-4xl lg:text-6xl font-extralight tracking-tighter leading-hvac-11 mb-12 text-slate-900">
                 {t('aboutPage.storyTitle')} <br />
@@ -153,20 +145,9 @@ const AboutPage: React.FC<AboutPageProps> = ({ lang = 'tr' }) => {
                 <p>{t('aboutPage.storyDesc2')}</p>
               </div>
               
+              {/* URN-60: dört "avatar" kümesi KALDIRILDI: aynı kurulum fotoğrafı dört kez yuvarlak
+                  yüz gibi basılıyordu; var olmayan bir ekip izlenimi veriyordu. */}
               <div className="mt-12 flex items-center gap-8">
-                <div className="flex -space-x-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden relative">
-                      <Image 
-                        src={`/images/hvac_installation_close_up_premium_3.webp`} 
-                        alt="" 
-                        fill 
-                        sizes="48px"
-                        className="object-cover" 
-                      />
-                    </div>
-                  ))}
-                </div>
                 <div className="text-sm font-bold text-slate-900">
                   {t('aboutPage.teamTitle')} <br /> 
                   <span className="text-slate-400 font-medium tracking-tight">{t('aboutPage.teamSubtitle')}</span>

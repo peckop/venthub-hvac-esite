@@ -2,6 +2,7 @@
 name: tasarim-curutucu
 description: TASARIM departmanının çürütücü çalışanı. Müdür (departman penceresi) konu başına açar; sonucu yalnız açana döner, Recep'e yazmaz.
 model: sonnet
+memory: user
 disallowedTools: Edit, Write, NotebookEdit
 skills:
   - plan-challenger

@@ -31,12 +31,21 @@ export const compressImage = async (file: File): Promise<Blob> => {
 }
 
 /**
+ * URN-57: görseli olmayan her yüzeyin ortak yer tutucusu — ÜRÜN İÇERMEYEN nötr çizim.
+ * Eskiden varsayılan yedek bir Vortice Lineo fan fotoğrafıydı: görseli olmayan bir ısıtıcı,
+ * başka bir markanın fan fotoğrafıyla gösteriliyordu (müşteri de görsel okuyan sistemler de
+ * yanlış ürünü görüyordu). Yer tutucu gösterilen yerde alt metin ürün adı DEĞİL, sözlükteki
+ * "görsel hazırlanıyor" ifadesidir (`common.imagePreparing`).
+ */
+export const YER_TUTUCU_GORSEL = '/images/urun-gorseli-yok.svg'
+
+/**
  * Normalizes any image URL, providing robust validation, handling local/remote paths,
  * and falling back safely to a default placeholder for missing or invalid URLs.
  */
 export const normalizeImageUrl = (
   url: string | null | undefined,
-  fallback: string = '/images/vortice_lineo_futuristic.webp',
+  fallback: string = YER_TUTUCU_GORSEL,
   bucketPrefix?: string
 ): string => {
   if (!url || typeof url !== 'string') return fallback;

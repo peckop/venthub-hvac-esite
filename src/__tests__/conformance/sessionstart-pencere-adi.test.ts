@@ -161,6 +161,8 @@ const TABLO: ReadonlyArray<readonly [string, string]> = [
   ['EDGE', 'Edge'],
   ['I18N', 'I18N'],
   ['MEVZUAT', 'Mevzuat'],
+  // HRT-35 (10-09, karar 322): TAKİP etkin. MÜHENDİSLİK planlı/kapalı, tabloda yok.
+  ['TAKIP', 'Takip'],
 ]
 
 describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adını şeridin insan adına sabitler', () => {
@@ -194,7 +196,7 @@ describe('INV-SESSIONSTART-AD-1 · talep varsa startup/resume/fork pencere adın
       talepYaz(pano, serit)
       expect(calistir('resume', pano).baslik, serit).toBe(ad)
     }
-  }, 120_000) // her satır gerçek kancayı ayrı süreçte koşturur; tablo 16 satıra çıkınca varsayılan 20 sn yetmedi (ARC-61)
+  }, 150_000) // her satır gerçek kancayı ayrı süreçte koşturur; tablo 16 satıra çıkınca varsayılan 20 sn yetmedi (ARC-61), 17 satırda pay büyütüldü (HRT-35)
 
   it('tablo anahtarı büyük/küçük harfe duyarsız: panoda küçük yazılmış "ops" da "Ops" olur', () => {
     const pano = yeniPano()
@@ -561,7 +563,7 @@ describe('INV-SESSIONSTART-AD-7 · scripts/board/pencere-adlari.cjs tek kaynakt�
     PENCERE_ADLARI: Map<string, string>
   }
 
-  it('dışa aktarılan TABLO beklenen on altı satırın aynısıdır (sıra dahil)', () => {
+  it('dışa aktarılan TABLO beklenen on yedi satırın aynısıdır (sıra dahil)', () => {
     expect(modul.TABLO.map(([k, v]) => [k, v])).toEqual(TABLO.map(([k, v]) => [k, v]))
     expect(modul.PENCERE_ADLARI.size).toBe(TABLO.length)
   })
