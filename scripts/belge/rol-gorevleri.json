@@ -47,6 +47,18 @@
           "baglayacak": "HARITA",
           "cikti": "Kusur listesi sahibine (cetvel Y4); taban dosyasının yolu Kanban kartına",
           "esik": "Cetvel Y3 kabul: zincir 0, kırık bağlantı 0, yetim sayfa 0, canlı kapı KIRMIZI 0, SEO ortalaması tabandan düşmez"
+        },
+        {
+          "gorev": "Yayın sonrası dizin isteği: yeni yazı ya da düzeltilmiş sayfa canlıda 200 görülünce Search Console'da URL denetimi ve \"dizine eklenmesini iste\" (yalnız o adresler) ile IndexNow gönderimi; bu görev GEO-SEO'nundur, Recep'ten ayrıca onay istenmez",
+          "komut": "scripts/seo/indexnow-bildir.mjs",
+          "siklik": "olay",
+          "tetik": "kart-kapisi",
+          "tetikAyrinti": "yayın kartı (BLOG, KATALOG, URUN) Done'a geçerken kapıda dizin isteği satırı (henüz yok); o zamana dek yayını bildiren pencere GEO-SEO'ya SendMessage yazar",
+          "bagli": "hayir",
+          "baglayacak": "HARITA",
+          "cikti": "Adres başına Search Console isteği ve IndexNow sonucu ilgili Kanban kartına; engel varsa (oturum yok, günlük sınır) OPS'a tek satır",
+          "esik": "TASLAK: canlıda 200 görülen her yeni ya da düzeltilmiş adres için aynı gün istek; Search Console günlük sınırına takılan adresler sonraki gün, IndexNow aynı gün; GEO-SEO teyit eder.",
+          "taslak": true
         }
       ]
     },

@@ -33,11 +33,11 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
     //                                        yalnız AKTİF kuponu verir; bugün hepsi aktif
     //                                        olduğu için tam göründü. Pasif kupon girildiği
     //                                        gün kısmi olur — kupon defteri büyüyünce ölç.)
-    //   /admin/purchasing                  → purchase_orders politikası 'moderator'ü AÇIKÇA
-    //                                        sayıyor (tek istisna; T062 notu bunu doğruluyor)
     //   /admin/inventory/settings          → inventory_settings tenant geneli okuma, TAM
     //
     // ÇIKARILANLAR — hepsi ÖLÇÜLDÜ, hiçbiri tahmin değil (moderator 0 satır görüyor):
+    //   purchasing (REC-140 Faz 1b, karar 95: moderatör maliyeti ve tedarikçiyi GÖRMEZ; satınalma
+    //   politikaları is_admin_user()'a çekildi, UI izni DB izninin ötesine geçemez) ·
     //   audit-logs (admin_audit_log) · error-groups · errors (client_errors) ·
     //   webhook-events · settings (site_settings) ·
     //   pricing (pricing_rule kör, product_prices 348/1044 KISMİ) · movements ve
@@ -62,13 +62,13 @@ const ROLE_PAGE_ACCESS: Record<UserRole, string[]> = {
         '/admin/categories',
         '/admin/coupons',
         '/admin/inventory/settings',
-        '/admin/products',
-        '/admin/purchasing'
+        '/admin/products'
     ],
     // T062 NOTU: `/admin/purchasing` warehouse'ta BİLEREK YOK. `process_goods_receipt` RPC'si
     // warehouse'u kabul eder, ama satınalma tablolarının RLS SELECT'i (maliyet hassas)
-    // yalnız super_admin/admin/moderator'a açık. Sayfayı açsa BOŞ liste görür ve hata
-    // da almaz — sessiz-boş. UI izni, DB'nin gerçekten verdiğinin ötesine geçemez.
+    // yalnız super_admin/admin'e açık (REC-140 Faz 1b'den beri; öncesinde moderator da vardı).
+    // Sayfayı açsa BOŞ liste görür ve hata da almaz — sessiz-boş. UI izni, DB'nin gerçekten
+    // verdiğinin ötesine geçemez.
     // Açılış şartı: purchasing-standard.md §8.1 (maliyetsiz view + warehouse SELECT).
     warehouse: [
         '/admin',
@@ -112,15 +112,18 @@ const ROLE_WRITE_ACCESS: Record<UserRole, string[]> = {
     super_admin: ['*'],
     admin: ['orders', 'logistics', 'returns', 'quotes', 'coupons', 'products', 'categories', 'inventory', 'movements', 'inventory_settings', 'webhook_events', 'error_groups', 'settings', 'pricing', 'purchasing', 'data_requests', 'invoices'],
     // moderator YAZMA listesi de CANLI POLITIKADAN olculdu (2026-08-20), sayfa listesiyle
-    // ayni yontemle. UC tablo moderator'u ACIKCA sayiyor (INSERT/UPDATE/DELETE hepsinde):
-    //   products · categories · purchase_orders + purchase_order_items
+    // ayni yontemle. IKI tablo moderator'u ACIKCA sayiyor (INSERT/UPDATE/DELETE hepsinde):
+    //   products · categories
+    // purchase_orders + purchase_order_items (+ pricing_rule, suppliers) REC-140 Faz 1b ile
+    // is_admin_user()'a cekildi: moderator maliyeti/tedarikciyi gormez (karar 95), 'purchasing'
+    // yazma izni de bu yuzden cikti.
     // OKUYUP YAZAMADIKLARI - sayfasi acik ama yazma izni YOK, kasitli asimetri:
     //   coupons ve inventory_settings yazma politikalari is_user_admin() istiyor, o da
     //   yalniz admin/super_admin kabul ediyor. Sayfayi goruyor, degistiremiyor.
     // Digerlerinin (orders, returns, quotes, pricing, settings, error_groups, movements,
     // webhook_events) sayfasini zaten ACAMIYOR; yazma izni vermek yalniz yaniltici buton
     // uretirdi. 'data_requests' ve 'invoices' de ayni sebeple yalniz admin'de.
-    moderator: ['products', 'categories', 'purchasing'],
+    moderator: ['products', 'categories'],
     // warehouse'a 'purchasing' yazma izni YOK — yukarıdaki sayfa notuna bak (RLS okuma
     // vermiyor; yazma izni tek başına kullanılamaz, yalnız yanıltıcı buton üretirdi).
     warehouse: ['logistics', 'inventory', 'movements', 'inventory_settings'],
@@ -244,4 +247,14 @@ export function canWrite(role: UserRole | null | undefined, entity: string): boo
 export function isReadOnly(role: UserRole | null | undefined): boolean {
     if (!role) return true;
     return role === 'viewer' || role === 'user';
+}
+
+/**
+ * Maliyet ve tedarik verisini (alış fiyatı, bağlı sermaye, tedarikçi) görebilen roller.
+ * REC-140 Faz 1b, karar 95: yalnız admin ve super_admin. Bu küme veritabanındaki
+ * `public.is_admin_user()` kararıyla AYNIDIR; biri değişirse öteki de değişmeli
+ * (UI izni DB izninin ötesine geçemez, purchasing-standard §8.1).
+ */
+export function canViewCost(role: UserRole | null | undefined): boolean {
+    return role === 'admin' || role === 'super_admin';
 }

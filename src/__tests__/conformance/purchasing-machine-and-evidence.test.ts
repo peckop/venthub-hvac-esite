@@ -125,8 +125,35 @@ function statusDictFromMigrations(): { file: string; statuses: string[] } | null
  * (R1a ile aynı "son tanım kazanır" mantığı — politika `drop policy if exists` + `create`
  * ile yeniden yazılabilir.)
  */
+/**
+ * REC-140 Faz 1b: politika rol kararını `is_admin_user()`'a çekti. O fonksiyon YALNIZ
+ * admin/super_admin kabul eder (rls-yetki-karari-standard.md §1; `INV-AUTH-ROLE`). Fonksiyonun
+ * tanımı değişirse bu sabit ve `rec140-faz1b-moderator-kapsami.test.ts` birlikte güncellenir.
+ */
+const IS_ADMIN_USER_ROLES = ['super_admin', 'admin'] as const
+
+/** SQL satır yorumlarını (`-- …`) sıyırır; başlık yorumundaki "create policy" geçişleri ayrıştırıcıyı yanıltmasın. */
+function stripSqlLineComments(sql: string): string {
+  return sql.replace(/--[^\n]*/g, '')
+}
+
+/**
+ * Tek bir politika gövdesinden rol kümesini çıkarır: satır içi `array[...]` listesi varsa o,
+ * yoksa `is_admin_user()` çağrısı varsa admin/super_admin; ikisi de yoksa null (tanınmayan biçim).
+ */
+function rolesFromPolicyBody(body: string): string[] | null {
+  const m = body.match(/array\s*\[([^\]]+)\]/i)
+  if (m) {
+    const roles = [...m[1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
+    if (roles.length > 0) return roles
+  }
+  if (/is_admin_user\s*\(\s*\)/i.test(body)) return [...IS_ADMIN_USER_ROLES]
+  return null
+}
+
 function selectPolicyRolesFromMigrations(): { file: string; roles: string[] } | null {
   const defs = Object.entries(migrationSql)
+    .map(([file, sql]) => [file, stripSqlLineComments(sql)] as const)
     .filter(([, sql]) => /create policy\s+purchase_orders_admin_select/i.test(sql))
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
   for (let i = defs.length - 1; i >= 0; i--) {
@@ -135,10 +162,8 @@ function selectPolicyRolesFromMigrations(): { file: string; roles: string[] } | 
     if (idx === -1) continue
     // Politika gövdesi bir sonraki `;`'e kadar.
     const body = sql.slice(idx, sql.indexOf(';', idx) + 1)
-    const m = body.match(/array\s*\[([^\]]+)\]/i)
-    if (!m) continue
-    const roles = [...m[1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1])
-    if (roles.length > 0) return { file, roles }
+    const roles = rolesFromPolicyBody(body)
+    if (roles) return { file, roles }
   }
   return null
 }
@@ -161,6 +186,21 @@ describe('INV-PURCH-1 — satınalma sözleşmeleri', () => {
     expect(/\brefreshCostInBase\s*\(/.test(stripComments(motoruYorumdaAnan))).toBe(false)
     // CRLF-güvenlik: satır yorumu \r\n ile bitse de sıyrılır.
     expect(stripComments('// yorum refreshCostInBase(\r\nconst z = 3')).not.toMatch(/refreshCostInBase/)
+
+    // REC-140 Faz 1b: politika rol ayrıştırıcısı iki biçimi de tanır ve tanımadığında SUSAR değil null döner.
+    const eskiBicim =
+      "create policy purchase_orders_admin_select on public.purchase_orders for select to authenticated " +
+      "using (up.role = any (array['super_admin','admin','moderator']));"
+    const yeniBicim =
+      'create policy purchase_orders_admin_select on public.purchase_orders for select to authenticated ' +
+      'using (tenant_id = (select public.jwt_tenant_id()) and (select public.is_admin_user()));'
+    const taninmayan =
+      'create policy purchase_orders_admin_select on public.purchase_orders for select to authenticated using (true);'
+    expect(rolesFromPolicyBody(eskiBicim)).toEqual(['super_admin', 'admin', 'moderator'])
+    expect(rolesFromPolicyBody(yeniBicim)).toEqual(['super_admin', 'admin'])
+    expect(rolesFromPolicyBody(taninmayan)).toBeNull()
+    // Yorumdaki "create policy" geçişi ayrıştırıcıyı yanıltmaz.
+    expect(stripSqlLineComments('-- create policy purchase_orders_admin_select\nselect 1;')).not.toMatch(/create policy/)
   })
 
   it('R1a — modül sözlüğü ↔ migration CHECK birebir aynı (T052: sözlük iki yerde ayrı yaşayamaz)', () => {
