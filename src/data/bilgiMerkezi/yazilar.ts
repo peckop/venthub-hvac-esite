@@ -241,7 +241,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     },
   },
   {
-    // BLOG, doğrulanan metin sha f35b1afa7f7d, gövde sha f614b15b8282 (tur 7, 2026-10-11: bağımsız Opus doğrulayıcı +
+    // BLOG, doğrulanan metin sha 838d303351b5, gövde sha adb8d11a4d29 (tur 8, 2026-10-11: bağımsız Opus doğrulayıcı +
     // belirlenimci atıf/alıntı/kalıp kontrolleri; mevzuat kaynakları 2026-10-11 tarihinde resmî metinden yeniden okundu).
     // Yayın onayı Recep'ten, OPS penceresinde, 2026-10-11. Kapak karar 135'e göre kapak şablonu PR'ında eklenecek.
     kimlik: 'radyal-aksiyel-fan-secimi',
@@ -303,7 +303,7 @@ Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düze
 | Nicotra Gebhardt RDH | Geriye eğik [3] | Kayışlı [3] |
 | Nicotra Gebhardt DD | Öne eğik [5] | Doğrudan tahrikli [5] |
 
-Bu serilerin modellerini [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarında; tüm fanları [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans), [aksiyel sanayi fanları](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde inceleyebilirsiniz.
+Bu serilerin modellerini [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fanlar), [ADH](vh:aile/nicotra-gebhardt-adh-sik-kanatli-radyal-fanlar), [RDH](vh:aile/nicotra-gebhardt-rdh-seyrek-kanatli-radyal-fanlar) ve [DD](vh:aile/nicotra-gebhardt-dd-direkt-akuple-radyal-fanlar) sayfalarında; diğer fanları [radyal (santrifüj) fanlar](vh:kategori/centrifugal-fans), [aksiyel sanayi fanları](vh:kategori/axial-industrial-fans) ve [duman egzoz fanları](vh:kategori/smoke-exhaust-fans) kategorilerinde inceleyebilirsiniz.
 
 ## Fan eğrisi nasıl okunur?
 
@@ -356,13 +356,13 @@ Vortice, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanların EN
 
 ## Fiyatı belirleyen etkenler
 
-Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifleri karşılaştırırken aşağıdaki seçimlerin aynı olup olmadığına bakın; her biri teklif edilen fanı ya da kurulumu değiştirir.
+Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifleri karşılaştırırken aşağıdaki seçimlerin aynı olup olmadığına bakın.
 
 - **Fan tipi ve kanat biçimi.** Öne eğik, radyal ve geriye eğik kanatlar ile aksiyel türler farklı verim aralıklarına sahiptir [1].
 - **Debi ve basınç aralığı.** Aynı seri içinde boy büyüdükçe debi aralığı değişir; örneğin RDH serisinde 0180–0560 boyları 90.000 m³/h'e, 0630–1000 boyları 290.000 m³/h'e kadar çıkar [3].
 - **Tahrik biçimi.** Kayışlı tahrik hız ayarında esneklik sunar, doğrudan tahrik daha basit bir düzendir [1].
 - **Çark malzemesi.** Örneğin SEAT serisinde çark enjeksiyon kalıplı PPH'den üretilir [10].
-- **Özel kullanım belgesi.** Duman tahliye fanları EN 12101-3'e göre belgelendirilir ve F300/120 ya da F400/120 gibi sınıflarla sunulur [7].
+- **Özel kullanım belgesi.** Vortice'ye göre, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanlar EN 12101-3'e göre belgelendirilir ve F300/120 ya da F400/120 gibi sınıflarla sunulur [7].
 - **Kurulum kalemleri.** Esnek bağlantı ve koruyucu tertibatlar kurulumun parçasıdır [2].
 
 ## İzlenecek yol
@@ -372,7 +372,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "T
 3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
 4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
 5. Fan girişinde ve çıkışında sistem etkisi yaratacak dirsekleri azaltın [1].
-6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [7]; patlayıcı ortam söz konusuysa fanın o ortam için tasarlanıp pazarlandığını gösteren belgeyi üreticiden isteyin [8].
+6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [7]; patlayıcı ortam söz konusuysa fanın o ortam için tasarlanmış olduğunu gösteren belgeyi üreticiden isteyin.
 
 ## Sık sorulan sorular
 
@@ -390,7 +390,7 @@ Nicotra Gebhardt'ın kayışlı AT, ADH ve RDH serilerinin eğrilerinde verim de
 
 ### Fazla büyük fan seçmenin zararı ne?
 
-Büyük seçilen fan en yüksek verim noktasından uzakta çalışır; bu durumda yatak yükleri ve gürültü artar [1].
+Büyük seçilen fan en yüksek verim noktasından uzakta çalışabilir; çalışma noktası bu noktadan uzaklaştıkça yatak yükleri ve gürültü artar [1].
 
 ### 327/2011 sayılı AB tüzüğü hâlâ geçerli mi?
 
