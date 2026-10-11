@@ -782,6 +782,11 @@ const OPAK_CAGRI_DOSYALARI: ReadonlySet<string> = new Set([
   // ('home.guidedDiscovery.*'), tek override ise ProductsDiscoveryView.tsx'te JSX prop'u olarak
   // ('products.popularCategories'). Yani ölü-anahtar taraması üçünü de literal olarak görür;
   // opak olan yalnız ÇAĞRI biçimi. Bileşen iki sayfada çizildiği için başlıklar prop'a taşındı.
+  // URN-80 (2026-10-09) — aynı soru, aynı cevap: "anahtar literal olarak keşfedilebilir mi?" → EVET.
+  // `CinematicProductShowcase` görsel alt metnini `t(img.altKey)` ile çözer; iki anahtar da aynı dosyadaki
+  // `productImages` verisinde literal duruyor ('home.cinematicShowcase.imageAlt.airflow' / '...side'), yani
+  // BARE_KEY ekseni ikisini de canlı görür. Önceki hâl koda gömülü ham İngilizce `label` idi (sözlük dışı).
+  'src/components/home/CinematicProductShowcase.tsx',
   'src/components/home/GuidedCategoryDiscovery.tsx',
   'src/components/home/HomeSinevizyon.tsx',
   'src/components/product/ProductSmartInference.tsx',

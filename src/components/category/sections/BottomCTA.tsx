@@ -12,7 +12,11 @@ interface BottomCTAProps {
     onOpenWizard?: () => void
     /** Callback for showing products (optional) */
     onShowProducts?: () => void
-    /** Show wizard button (default: true for air curtains) */
+    /**
+     * Show wizard button. VARSAYILAN KAPALI (URN-83): sihirbaz düğmesi yalnız çağıran AÇIKÇA isterse çıkar.
+     * Hava perdesi sihirbazı bozuk olduğu için (bkz. `airCurtainWizardGate.ts`) eski "varsayılan açık"
+     * davranışı kaldırıldı; sessiz fan sihirbazı (`SilentFanWizard`) çağıranda `showWizard` ile açılır.
+     */
     showWizard?: boolean
     /** Custom category name for dynamic text */
     categoryName?: string
@@ -29,7 +33,7 @@ interface BottomCTAProps {
 const BottomCTA: React.FC<BottomCTAProps> = ({
     onOpenWizard,
     onShowProducts,
-    showWizard = true,
+    showWizard = false,
     categoryName = 'Ürünler'
 }) => {
     const { t } = useI18n()

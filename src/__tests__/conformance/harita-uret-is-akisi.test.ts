@@ -104,6 +104,18 @@ describe('INV-HARITA-URET-1 · iş akışı yapısı', () => {
   it('kurulum adımı betik çalıştırmaz (--ignore-scripts) ve sırrı görmez', () => {
     expect(GOVDE).toMatch(/pnpm install --frozen-lockfile --ignore-scripts/)
   })
+
+  it('betiği yükleyen HER jiti adımı JITI_ALIAS taşır (ALT-50: ilk koşuda --dogrula adımı takma ad yüzünden düştü)', () => {
+    // Betik üstte haritaUret.ts'i içe aktarır, o `@/utils/categoryHelpers` ister: `--dogrula` yolu da alias ister.
+    const adimlar = GOVDE.split(/^ {6}- name:/m).slice(1)
+    const jitiAdimlari = adimlar.filter((a) => /jiti scripts\/adres\/harita-uret\.ts/.test(a))
+    expect(jitiAdimlari.length, 'üretim + doğrulama adımı beklenir').toBeGreaterThanOrEqual(2)
+    for (const a of jitiAdimlari) {
+      expect(a, 'jiti adımında JITI_ALIAS yok: @/ takma adı çözülmez').toMatch(
+        /JITI_ALIAS:\s*'\{"@\/":"\$\{\{ github\.workspace \}\}\/src\/"\}'/
+      )
+    }
+  })
 })
 
 /**

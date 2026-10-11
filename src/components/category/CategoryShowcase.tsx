@@ -14,6 +14,7 @@ import { buildCategoryBreadcrumb } from '../../utils/breadcrumbUtils'
 import { getCategoryDescription, getCategoryDisplayName, getLocalizedCategorySlug } from '../../utils/categoryHelpers'
 import { getCategoryIcon } from '../../utils/getCategoryIcon'
 import Breadcrumb from '../navigation/Breadcrumb'
+import { AIR_CURTAIN_WIZARD_ENABLED } from './airCurtainWizardGate'
 import EnhancedNeedsWizard from './EnhancedNeedsWizard'
 import { BottomCTA } from './sections'
 
@@ -32,6 +33,9 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
     // Check if this is special showcase categories
     const isAirCurtain = category.slug === 'air-curtains'
+    // URN-83: hava perdesi sihirbazı 3. adımdan sonra boş panel açıyordu; giriş noktaları tek kapıdan kapalı
+    // (`airCurtainWizardGate.ts`). Bu dosyayı hiçbir sayfa import etmiyor; yine de yeniden bağlanırsa bozuk akış açılmasın.
+    const havaPerdesiSihirbazi = isAirCurtain && AIR_CURTAIN_WIZARD_ENABLED
     const isQuietFan = category.slug === 'quiet-duct-fans'
     interface CategoryMetadataExtended { showcase_images?: { desktop: string }[] }
     const metadata = category.metadata as CategoryMetadataExtended | null
@@ -84,7 +88,7 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
                             </p>
 
                             {/* Quick Start Wizard Button (only for air curtains) */}
-                            {isAirCurtain && (
+                            {havaPerdesiSihirbazi && (
                                 <button
                                     type="button"
                                     onClick={() => setWizardOpen(true)}
@@ -115,11 +119,13 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
             <div id="content-start" className="scroll-mt-20" />
 
             {/* Enhanced Needs Analysis Wizard */}
-            <EnhancedNeedsWizard
-                isOpen={wizardOpen}
-                onClose={() => setWizardOpen(false)}
-                parentSlug={category.slug}
-            />
+            {havaPerdesiSihirbazi && (
+                <EnhancedNeedsWizard
+                    isOpen={wizardOpen}
+                    onClose={() => setWizardOpen(false)}
+                    parentSlug={category.slug}
+                />
+            )}
 
             {/* REC-434: "Hangi hava perdesini seçmelisiniz" kartları kaldırıldı. DB'de olmayan iki alt kategoriye
                 (elektrikli-isitici, ortam-havali) bağlıydılar ve hava perdesinin alt kategorisi olmadığından bu
@@ -311,8 +317,8 @@ const CategoryShowcase: React.FC<CategoryShowcaseProps> = ({ category, subCatego
 
             {/* Bottom CTA Section */}
             <BottomCTA
-                onOpenWizard={isAirCurtain ? () => setWizardOpen(true) : undefined}
-                showWizard={isAirCurtain}
+                onOpenWizard={havaPerdesiSihirbazi ? () => setWizardOpen(true) : undefined}
+                showWizard={havaPerdesiSihirbazi}
                 categoryName={getCategoryDisplayName(category, t)}
             />
         </div >

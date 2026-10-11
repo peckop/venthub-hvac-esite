@@ -6,7 +6,8 @@ import { canonicalOrigin } from '@/lib/seo/canonicalOrigin'
 
 interface SeoProps {
   title?: string
-  description?: string
+  /** Zorunlu: sayfanın kendi özeti. Varsayılan bir site sloganı YOK (kanıtsız iddia taşırdı, URN-78). */
+  description: string
   canonical?: string
   ogImage?: string
   ogType?: 'website' | 'product' | 'article'
@@ -41,9 +42,8 @@ const Seo: React.FC<SeoProps> = ({
    * gelir (`CalculatorLayout` → `urunSecici.ustBaslik` gibi), site adı ise DAİMA buradan.
    */
   const fullTitle = title ? `${title} | ${siteName}` : siteName
-  const defaultDesc = 'Premium HVAC ve Havalandırma Çözümleri'
-  const finalDesc = description || defaultDesc
-  
+  const finalDesc = description
+
   // Construct absolute URLs for social sharing.
   // REC-100: burası eskiden doğrudan `SITE_URL` okuyordu. Bu bir `'use client'` bileşeni
   // olduğu için tarayıcı paketinde o değer `http://localhost:3000`'e düşüyordu ve canlıda

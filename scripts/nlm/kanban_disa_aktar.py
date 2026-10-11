@@ -18,7 +18,11 @@ completedAt/labels/notes):
   · Recep kapısı = "Recep kapısı" etiketi.
 
 --tam (HRT-28, ARC-30 isteği): kayıtlara kartın `description` metni ve `notes` listesi (author, content, createdAt) da
-eklenir; "ÖNCEKİ ÇALIŞMA" gibi kart İÇİ bilgiler aranabilsin diye. Bayrak yoksa çıktı bayt bayt aynıdır. İçerik taşıyan çıktı
+eklenir; "ÖNCEKİ ÇALIŞMA" gibi kart İÇİ bilgiler aranabilsin diye. `completedAt` (kartın Done'a geçtiği an; HRT-44) da yalnız --tam ile
+çıkar: "bugün Done oldu" sorusunun cevabı sonAnlamli değildir (eski bir karta bugün düşülen not onu bugüne taşır). `doneAt` kartın Done
+kolonuna son taşınma anıdır (kanban_events 'task.moved'): completedAt yalnız status=completed iken yazıldığı için Done kolonundaki
+arşivli kartlarda boştur. `id` kartın tam kimliğidir (numara tekil değil: 75 numara birden fazla kartta geçiyor, 10-09 ölçümü).
+Bayrak yoksa çıktı bayt bayt aynıdır. İçerik taşıyan çıktı
 depoya sızmasın diye: --tam ile --hedef depo içinde git'in yok saymadığı (izlenebilir) bir yolsa betik YAZMAZ, çıkış 2.
 Hedefsiz (stdout) kullanım ve depo dışı hedef serbesttir.
 
@@ -70,13 +74,36 @@ def son_anlamli(kart):
     return max(adaylar) if adaylar else None
 
 
-def tam_alanlar(kart):
-    """--tam: kart içi metin. Alan yoksa boş ('' / []), şema kayması sessizce None üretmesin."""
+def tam_alanlar(kart, done_ani=None):
+    """--tam: kart içi metin. Alan yoksa boş ('' / []), şema kayması sessizce None üretmesin.
+    `doneAt` (HRT-44): kartın Done kolonuna SON taşınma anı (kanban_events). completedAt yalnız status=completed iken yazılır;
+    Done kolonundaki arşivli kartlarda (10-09 ölçümü: 240 Done kartın 83'ü) boştur, gün tespiti doneAt'e düşer."""
     notlar = [
         {"author": n.get("author"), "content": n.get("content") or "", "createdAt": n.get("createdAt")}
         for n in (kart.get("notes") or []) if isinstance(n, dict)
     ]
-    return {"description": kart.get("description") or "", "notes": notlar}
+    return {"id": kart.get("id"), "description": kart.get("description") or "", "completedAt": kart.get("completedAt"),
+            "doneAt": done_ani, "notes": notlar}
+
+
+def done_anlari(db):
+    """{taskId: Done kolonuna son taşınma anı (ISO)} — kanban_events 'task.moved' (after.columnId == done). Tablo ya da olay yoksa {}
+    (eski/sade pano dosyası; çağıran doneAt'i None bırakır, sayaç bunu 'tarihsiz' diye işaretler)."""
+    try:
+        satirlar = db.execute("select payload from kanban_events where payload like '%task.moved%' order by seq").fetchall()
+    except sqlite3.Error:
+        return {}
+    son = {}
+    for (yuk,) in satirlar:
+        try:
+            e = json.loads(yuk)
+        except ValueError:
+            continue
+        if e.get("type") != "task.moved" or ((e.get("after") or {}).get("columnId")) != "done":
+            continue
+        if e.get("taskId") and e.get("ts"):
+            son[e["taskId"]] = max(son.get(e["taskId"], ""), e["ts"])
+    return son
 
 
 def hedef_izlenebilir(hedef):
@@ -100,6 +127,7 @@ def kayitlar(yol, tam=False):
     db = sqlite3.connect(f"file:{yol}?mode=ro", uri=True, timeout=5)
     try:
         satirlar = db.execute("select payload from kanban_boards").fetchall()
+        done_ani = done_anlari(db) if tam else {}
     finally:
         db.close()
     cikti = []
@@ -126,7 +154,7 @@ def kayitlar(yol, tam=False):
                 "sonAnlamli": son_anlamli(k),
             }
             if tam:
-                kayit.update(tam_alanlar(k))
+                kayit.update(tam_alanlar(k, done_ani.get(k.get("id"))))
             cikti.append(kayit)
     return cikti
 

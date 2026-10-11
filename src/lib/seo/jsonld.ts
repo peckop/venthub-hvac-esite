@@ -53,6 +53,31 @@ function buildWebSiteRef(baseUrl: string) {
   }
 }
 
+/** `ItemList` içindeki tek satır: konum + dil önekli mutlak adres (fiyat/offers YAZILMAZ). */
+interface ListeSatiri {
+  position: number
+  url: string
+}
+
+/**
+ * REC-494 — liste düğümü. `numberOfItems` ve `itemListElement` schema.org'da `ItemList`'in
+ * özellikleridir, `CollectionPage`'in DEĞİL; sayfa düğümü listeyi `mainEntity` ile taşır
+ * (canlı kapı `JSONLD-COLLECTIONPAGE`: üst düzeyde bu iki alan KIRMIZI, 28 kategori sayfasında
+ * ölçüldü). İki CollectionPage üreticisi (kategori + seri) AYNI yardımcıyı kullanır; konum ve
+ * adres hesabı çağıranda kalır, burada yalnız şekil kurulur.
+ */
+function buildItemList(numberOfItems: number, satirlar: ListeSatiri[]) {
+  return {
+    '@type': 'ItemList' as const,
+    numberOfItems,
+    itemListElement: satirlar.map(({ position, url }) => ({
+      '@type': 'ListItem' as const,
+      position,
+      url,
+    })),
+  }
+}
+
 export interface BuildProductGroupJsonLdParams {
   family: FamilyDetail['family']
   variants: FamilyVariant[]
@@ -191,7 +216,10 @@ export function buildProductGroupJsonLd(params: BuildProductGroupJsonLdParams): 
         name: family.brand_name,
       },
     }),
-    isPartOf: buildWebSiteRef(baseUrl),
+    // REC-494: `isPartOf` YAZILMAZ. schema.org'da `isPartOf` bir CreativeWork özelliğidir;
+    // `ProductGroup` (Product soyundan) onu tanımaz ve doğrulayıcı "şema uyarısı" verir
+    // (canlı kapı `JSONLD-ISPARTOF`, 47 aile sayfasında ölçüldü). Site ilişkisi CollectionPage
+    // düğümlerinde (kategori + seri) kalır; onlar bir WebPage'dir.
     hasVariant,
   }
 }
@@ -207,8 +235,9 @@ export interface BuildCategoryJsonLdParams {
   pageSize: number
   families: FamilyListItem[]
   /**
-   * K3-b: sayfanın DİL ÖNEKLİ kanonik yolu (`kategoriKanonikAdresi` — iki seviyeli dal adresi
-   * slug'dan kurulamaz, üst kategori gerekir). Yalnız bayrak açıkken okunur.
+   * K3-b: sayfanın DİL ÖNEKLİ kanonik yolu (`kategoriKanonikAdresi`; SEO-35 B-1'den beri kök de alt de tek segment,
+   * yani `categorySlug` görünen slug olduğunda aynı adres çıkar — çağıran satırdan kurduğu yolu yine de verir).
+   * Yalnız bayrak açıkken okunur.
    */
   sayfaYolu?: string
   /** K3-b şeması (yalnız test verir; varsayılan `ADRES_SEMASI_K3B`). */
@@ -235,12 +264,14 @@ export function buildCategoryJsonLd(params: BuildCategoryJsonLdParams): Record<s
     description,
     url,
     isPartOf: buildWebSiteRef(baseUrl),
-    numberOfItems: total,
-    itemListElement: families.map((family, index) => ({
-      '@type': 'ListItem',
-      position: (page - 1) * pageSize + index + 1,
-      url: aileUrl(baseUrl, lang, family.slug, bayrak),
-    })),
+    // REC-494: liste `mainEntity` ItemList içinde (CollectionPage üst düzeyinde değil).
+    mainEntity: buildItemList(
+      total,
+      families.map((family, index) => ({
+        position: (page - 1) * pageSize + index + 1,
+        url: aileUrl(baseUrl, lang, family.slug, bayrak),
+      })),
+    ),
   }
 }
 
@@ -261,7 +292,7 @@ export interface BuildSeriesLandingJsonLdParams {
  *
  * `ProductGroup` KASITLI KULLANILMAZ: seri satılabilir bir ürün değil, altındaki MODELLERİN
  * listesidir (K1 kararı — "KART = MODEL, SERİ = LANDING"). Şekil `buildCategoryJsonLd` ile
- * BİREBİR aynı (CollectionPage + numberOfItems + itemListElement) — kategori sayfası da aynı
+ * BİREBİR aynı (CollectionPage + mainEntity ItemList{numberOfItems, itemListElement}) — kategori sayfası da aynı
  * sınıf içerik sunar (bir grup ürünün landing'i). Sayfalama YOK: seri sayfası tüm modellerini
  * tek seferde basar (`?page=` bu yüzeyde hiç yok), bu yüzden `buildCategoryJsonLd`'nin
  * page/pageSize parametreleri burada bulunmaz.
@@ -290,12 +321,14 @@ export function buildSeriesLandingJsonLd(params: BuildSeriesLandingJsonLdParams)
     description,
     url: aileUrl(baseUrl, lang, seriesSlug, bayrak),
     isPartOf: buildWebSiteRef(baseUrl),
-    numberOfItems: models.length,
-    itemListElement: models.map((model, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: aileUrl(baseUrl, lang, model.slug, bayrak),
-    })),
+    // REC-494: liste `mainEntity` ItemList içinde (CollectionPage üst düzeyinde değil).
+    mainEntity: buildItemList(
+      models.length,
+      models.map((model, index) => ({
+        position: index + 1,
+        url: aileUrl(baseUrl, lang, model.slug, bayrak),
+      })),
+    ),
   }
 }
 

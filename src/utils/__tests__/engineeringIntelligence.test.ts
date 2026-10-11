@@ -1,12 +1,19 @@
 import { describe, expect,it } from 'vitest';
 
+import { en } from '@/i18n/dictionaries/en';
+import { tr } from '@/i18n/dictionaries/tr';
+import { getDictValue } from '@/i18n/getDictValue';
 import type { Product } from '@/types/ui-models';
 
 import {
+  DEBI_ESIKLERI,
+  type EngineeringInference,
   generateEngineeringSummary,
   getEfficiencyInference,
   getMotorInference,
-  getNoiseInference} from '../engineeringIntelligence';
+  getNoiseInference,
+  SES_ESIKLERI,
+  VERIM_ESIKLERI} from '../engineeringIntelligence';
 
 describe('engineeringIntelligence', () => {
   describe('getNoiseInference', () => {
@@ -23,7 +30,8 @@ describe('engineeringIntelligence', () => {
         value: '25 dB(A)',
         type: 'noise',
         descriptionKey: 'pdp.engineering.noise.ultraQuiet.desc',
-        isI18n: true
+        isI18n: true,
+        params: { esik1: 30, esik2: 45, esik3: 60 }
       });
 
       // Boundary test
@@ -37,7 +45,8 @@ describe('engineeringIntelligence', () => {
         value: '35 dB(A)',
         type: 'noise',
         descriptionKey: 'pdp.engineering.noise.officeComfort.desc',
-        isI18n: true
+        isI18n: true,
+        params: { esik1: 30, esik2: 45, esik3: 60 }
       });
 
       // Boundary tests
@@ -52,7 +61,8 @@ describe('engineeringIntelligence', () => {
         value: '50 dB(A)',
         type: 'noise',
         descriptionKey: 'pdp.engineering.noise.standard.desc',
-        isI18n: true
+        isI18n: true,
+        params: { esik1: 30, esik2: 45, esik3: 60 }
       });
 
       // Boundary tests
@@ -67,7 +77,8 @@ describe('engineeringIntelligence', () => {
         value: '80 dB(A)',
         type: 'noise',
         descriptionKey: 'pdp.engineering.noise.industrial.desc',
-        isI18n: true
+        isI18n: true,
+        params: { esik1: 30, esik2: 45, esik3: 60 }
       });
 
       // Boundary test
@@ -200,6 +211,55 @@ describe('engineeringIntelligence', () => {
 
       const inferences = generateEngineeringSummary(emptyProduct);
       expect(inferences).toHaveLength(0);
+    });
+  });
+  // URN-82: Blog metin tablosu sözlükteki sabit sayıları `{{esik1}}` yer tutucusuna çevirdi; sayıyı DOLDURAN kod
+  // eksikti ve ürün sayfasında ham `{{esik1}}` görünüyordu (OPS okuması, #1793). Bu blok ekrandaki cümleyi
+  // `t()`'nin yaptığı gibi kurar: çıkarımın `params` alanı verilince hiçbir yer tutucu açıkta KALMAZ.
+  describe('eşik parametreleri — sözlük cümlesi eksiksiz kurulur', () => {
+    const doldur = (metin: string, params?: Record<string, number>) =>
+      metin.replace(/\{\{\s*(\w+)\s*\}\}/g, (_m, ad: string) => (params && ad in params ? String(params[ad]) : _m));
+
+    const urun = (specs: Record<string, unknown>) =>
+      ({ id: '1', name: 'Test Fan', technical_specs: specs }) as Partial<Product> as Product;
+
+    const ornekler: Array<[string, EngineeringInference | null | undefined]> = [
+      ['ses <esik1', getNoiseInference(25)],
+      ['ses esik1–esik2', getNoiseInference(35)],
+      ['ses esik2–esik3', getNoiseInference(50)],
+      ['ses ≥esik3', getNoiseInference(80)],
+      ['verim ≥esik1', getEfficiencyInference(95)],
+      ['verim esik2–esik1', getEfficiencyInference(90)],
+      ['verim esik3–esik2', getEfficiencyInference(85)],
+      ['debi esik1–esik2', generateEngineeringSummary(urun({ max_delivery_m3h: 1200 })).find(i => i.type === 'power')],
+      ['debi >esik2', generateEngineeringSummary(urun({ max_delivery_m3h: 3000 })).find(i => i.type === 'power')],
+    ];
+
+    it.each(ornekler)('%s: TR ve EN etiket + açıklama yer tutucusuz kurulur', (_ad, cikarim) => {
+      expect(cikarim, 'örnek çıkarım üretilemedi').toBeTruthy();
+      const c = cikarim as EngineeringInference;
+      for (const sozluk of [tr, en]) {
+        for (const anahtar of [c.labelKey, c.descriptionKey]) {
+          const ham = getDictValue(sozluk, anahtar);
+          expect(ham, `${anahtar}: sözlükte yok`).not.toBe(anahtar);
+          const metin = doldur(ham, c.params);
+          expect(metin, `${anahtar} → "${metin}" yer tutucu açıkta`).not.toMatch(/\{\{|\{\w+\}/);
+        }
+      }
+    });
+
+    it('çıkarımın params alanı sınıflandırma sabitleriyle AYNI nesnedir', () => {
+      expect(getNoiseInference(25)?.params).toEqual(SES_ESIKLERI);
+      expect(getEfficiencyInference(95)?.params).toEqual(VERIM_ESIKLERI);
+      expect(
+        generateEngineeringSummary(urun({ max_delivery_m3h: 1200 })).find(i => i.type === 'power')?.params,
+      ).toEqual(DEBI_ESIKLERI);
+    });
+
+    it('sınıf sınırı metindeki sayıyla aynı: SES_ESIKLERI.esik1 tam sınırda üst sınıfa geçer', () => {
+      expect(getNoiseInference(SES_ESIKLERI.esik1 - 0.1)?.labelKey).toBe('pdp.engineering.noise.ultraQuiet.label');
+      expect(getNoiseInference(SES_ESIKLERI.esik1)?.labelKey).toBe('pdp.engineering.noise.officeComfort.label');
+      expect(getNoiseInference(SES_ESIKLERI.esik3)?.labelKey).toBe('pdp.engineering.noise.industrial.label');
     });
   });
 });

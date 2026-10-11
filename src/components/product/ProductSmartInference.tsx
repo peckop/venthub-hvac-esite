@@ -70,7 +70,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
             <div className="relative z-10">
               <div className="flex items-center gap-3 flex-wrap">
                 <h4 className="font-black text-slate-900 text-sm tracking-tight">
-                  {item.isI18n ? t(item.labelKey) : item.labelKey}
+                  {item.isI18n ? t(item.labelKey, item.params) : item.labelKey}
                 </h4>
                 <div className="h-1 w-1 rounded-full bg-slate-300" />
                 <span className={`text-xs font-black px-2 py-0.5 rounded-md bg-white/60 border border-white/80 shadow-xs`}>
@@ -78,7 +78,7 @@ export const ProductSmartInference: React.FC<ProductSmartInferenceProps> = React
                 </span>
               </div>
               <p className="text-xs text-slate-600 mt-2 leading-relaxed font-medium">
-                {item.isI18n ? t(item.descriptionKey) : item.descriptionKey}
+                {item.isI18n ? t(item.descriptionKey, item.params) : item.descriptionKey}
               </p>
             </div>
           </div>

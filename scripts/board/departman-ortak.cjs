@@ -19,8 +19,8 @@ const { katla } = require('../belge/konu-yonlendirici.cjs')
 
 const SID_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-/** Aynı anda açık tutulacak EN ÇOK departman penceresi. OPS penceresi SAYILMAZ (Recep 09-30: "OPS hariç 5"). */
-const PENCERE_TAVANI = 5
+/** Aynı anda açık tutulacak EN ÇOK departman penceresi. OPS penceresi SAYILMAZ. Karar 328 (OPS hükmü, 10-09): 5 → 8 (Recep 09-30 "OPS hariç 5" demişti; 10-09'da yedi pencere Recep'in sözüyle açıldı). */
+const PENCERE_TAVANI = 8
 /** Ops'un pano şerit adı (tablo anahtarı). Görünen adı tablodan alınır (`pencereAdlari.ad`). */
 const OPS_SERIT = 'OPS'
 /** Durum dosyası bu süreden eskiyse "günlük BAYAT" sayılır (kapatma kapısı). */

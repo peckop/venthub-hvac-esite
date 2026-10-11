@@ -83,25 +83,26 @@ describe('marka açıklaması', () => {
     })
   }
 
-  it('tr: üstünlük cümlesi atılınca kalan iddiasız cümle korunur (Danfoss), kalmazsa uzmanlık yedeği gelir (Vortice)', () => {
+  // BLG-6 (10-09): marka kayıt metinlerinden üretici öz beyanları (lider/en geniş/öncü) KAYNAĞINDA kalktı; süzgeç
+  // (ovguCumleleriniAt) artık veriyi değiştirmiyor, yalnız geri dönüş güvencesi. Bu iki kol kaydın kendi iddiasız
+  // metninin açıklamaya olduğu gibi gittiğini ve süzgeç yedeğinin (VentHub kataloğunda…) artık devreye girmediğini kilitler.
+  it('tr: kayıt metni iddiasız (Danfoss, Vortice): açıklama kaydın kendi cümlesidir, övgü ve yedek cümle yok', () => {
     const danfoss = String(markaUstVerisi('tr', 'danfoss').description)
     expect(danfoss).toContain('1933')
-    expect(danfoss).toContain('VentHub kataloğunda')
     expect(ovguVarMi(danfoss)).toBe(false)
     const vortice = String(markaUstVerisi('tr', 'vortice').description)
     expect(vortice.startsWith('Vortice: ')).toBe(true)
-    expect(vortice).toContain('VentHub kataloğunda')
     expect(ovguVarMi(vortice)).toBe(false)
   })
 
-  it('en: iddia atılınca yedek cümle gelir, ham sözlük anahtarı sızmaz (Vortice, Danfoss)', () => {
+  it('en: kayıt metni iddiasız (Vortice, Danfoss), ham sözlük anahtarı sızmaz', () => {
     const vortice = String(markaUstVerisi('en', 'vortice').description)
     expect(vortice.startsWith('Vortice: ')).toBe(true)
-    expect(vortice).toContain('VentHub catalog')
+    expect(vortice).not.toMatch(/brands\./)
     expect(ovguVarMi(vortice)).toBe(false)
     const danfoss = String(markaUstVerisi('en', 'danfoss').description)
     expect(danfoss).toContain('1933')
-    expect(danfoss).toContain('VentHub catalog')
+    expect(ovguVarMi(danfoss)).toBe(false)
   })
 
   it('marka adı kayıt metninde yoksa başa eklenir, varsa tekrarlanmaz', () => {

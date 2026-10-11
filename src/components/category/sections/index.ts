@@ -11,7 +11,6 @@ export { default as VorticeBrand } from './VorticeBrand'
 export { default as SilentFanFAQ } from './silent-fan/SilentFanFAQ'
 export { default as SilentFanHowItWorks } from './silent-fan/SilentFanHowItWorks'
 export { default as SilentFanProblem } from './silent-fan/SilentFanProblem'
-export { default as SilentFanTypeComparison } from './silent-fan/SilentFanTypeComparison'
 export { default as SilentFanVorticeBrand } from './silent-fan/SilentFanVorticeBrand'
 
 

@@ -327,7 +327,7 @@ describe('INV-CI-SINIF-2 · "siteye dokunmayan" tanımı ölçülür: derleme gi
     const e2e = yukle('.github/workflows/e2e-smoke.yml')
     const bulunan = new Set<string>()
     for (const s of yorumsuz(e2e.split('\n'))) for (const m of s.matchAll(/scripts\/[A-Za-z0-9_./-]+/g)) bulunan.add(m[0].replace(/[.]+$/, ''))
-    expect([...bulunan]).toEqual(expect.arrayContaining(['scripts/ci/apt-hardening.sh', 'scripts/ci/retry-bounded.sh', 'scripts/ci/font-preload-olc.cjs']))
+    expect([...bulunan]).toEqual(expect.arrayContaining(['scripts/ci/apt-hardening.sh', 'scripts/ci/retry-bounded.sh', 'scripts/ci/font-preload-olc.cjs', 'scripts/ci/arka-plan.sh']))
     const ihlal = [...bulunan].filter((b) => sinifi(b) !== 'tam').map((b) => `${b}: e2e-smoke.yml betiği dar sınıfta (${sinifi(b)})`)
     expect(ihlal).toEqual([])
   })

@@ -324,6 +324,18 @@ export const VITRIN_YASAK_IFADELER = [
   { ifade: 'beğendiğim', kaynak: 'tasarım referansı ekran görüntüsü, şirket görseli değil (URN-60 adım 5)' },
   { ifade: '81 il', kaynak: '81 ile kargo vaadi kalktı (karar 295)' },
   { ifade: 'Partneri', kaynak: 'partner dili yalnız yetkili distribütörlük için (karar 295; yok)' },
+  // URN-79 (karar 317, OPS abartı taraması 2026-10-09): marka kayıtlarından kalkan üretici öz beyanları. Her biri kaynak
+  // dizininde karşılıksız ya da atıfsız; geri gelirse canlıda KIRMIZI. İfadeler bilerek marka cümlesine ÖZGÜ (genel
+  // "dünya"/"lider" sözcüğü değil): başka sayfalardaki meşru kullanımı yakalamasın.
+  { ifade: 'dünya lideri', kaynak: 'marka metni: kaynaksız liderlik iddiası, Vortice/Nicotra (URN-79)' },
+  { ifade: 'world leader', kaynak: 'marka metni: kaynaksız liderlik iddiası, Vortice/Nicotra (URN-79)' },
+  { ifade: 'standartları belirliyor', kaynak: 'marka metni: Vortice üstünlük iddiası (URN-79)' },
+  { ifade: 'dünyanın en geniş', kaynak: 'marka metni: Nicotra kataloğu "dünya" demiyor (URN-79)' },
+  { ifade: 'öncüsüdür', kaynak: 'marka metni: Danfoss öz beyanı, atıfsız (URN-79)' },
+  // Kesme işareti İÇERMEZ: React HTML'de `'` işaretini `&#x27;` yazar, `gorunenMetin` yalnız `&amp;` çözer → "%80'e varan" eşleşmezdi.
+  { ifade: 'varan oranda azaltır', kaynak: 'marka metni: Danfoss "%80\'e varan" enerji tasarrufu oranı, atıfsız; FC102 kataloğu "%50\'den fazla" (URN-79)' },
+  { ifade: 'önde gelen yerli', kaynak: 'marka metni: Avens, kaynak dizininde karşılığı yok (URN-79)' },
+  { ifade: 'Yüksek Verimli Santrifüj', kaynak: 'marka uzmanlık etiketi: ölçütsüz sıfat, Nicotra (URN-79)' },
 ]
 
 const trKucuk = (s) => String(s).toLocaleLowerCase('tr')
@@ -489,7 +501,8 @@ export function llmsKontrolu(harita, llms, cikti, adres = '/llms.txt') {
   const metin = String(llms)
   const yollar = harita.satirlar.map((s) => { try { return new URL(s.loc).pathname } catch { return s.loc } })
   const gercekSayfa = harita.satirlar.length
-  const gercekKategori = yollar.filter((y) => /\/category\//.test(y)).length
+  // K3-b bayrağı açıkken TR kategori adresi /tr/kategori/<slug>, kapalıyken /tr/category/<slug>: iki kipte de kategoridir (SEO-21)
+  const gercekKategori = yollar.filter((y) => /\/(?:category|kategori)\//.test(y)).length
   for (const m of metin.matchAll(/(\d[\d.,]*)\s+(?:indexable\s+)?(?:pages|urls)\b/gi)) {
     if (sayiOku(m[1]) !== gercekSayfa) cikti.push(bulgu('LLMS-SAYFA', 'KIRMIZI', adres, `llms.txt "${m[0]}" diyor, site haritasında ${gercekSayfa} adres var`))
   }

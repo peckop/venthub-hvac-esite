@@ -11,7 +11,8 @@
  * KULLANIM (yerelde; CI'da KOŞMAZ: Kanban verisi git dışıdır, depo public):
  *   node scripts/belge/kart-plan-kapisi.cjs --kart HRT-14
  *   node scripts/belge/kart-plan-kapisi.cjs --dosya <aciklama.txt>
- *   node scripts/belge/kart-plan-kapisi.cjs --pr-govde-dosyasi <govde.md>     (gövdedeki "Kanban: <NO>" satırlarını okur)
+ *   node scripts/belge/kart-plan-kapisi.cjs --pr-govde-dosyasi <govde.md>     (gövdedeki "Kanban: <NO>" satırlarını okur;
+ *                                                                              gövdenin İLK boş olmayan satırı bu satırdır, HRT-46)
  *
  * KANBAN VERİSİ (2026-10-02 ölçüldü): ana deponun `.wrongstack/kanbans/_kanban.sqlite` dosyası (ya da VENTHUB_KANBAN_DB),
  * tablo `kanban_boards(id, payload, revision, updated_at)`; `payload` bir pano JSON'u, kartlar `payload.tasks[]`
@@ -227,6 +228,18 @@ function prGovdesindenNumaralar(govde) {
   return [...numaralar]
 }
 
+/**
+ * PR gövdesinin İLK boş olmayan satırı `Kanban: <NO>` mı (HRT-46, OPS emri: gövde ilk satırı). Niçin ilk satır: PR listesinde ve
+ * birleştirme ritüelinde gövdenin başı okunur; kart numarası aşağıda gömülü kalırsa kayıt görünmez olur. Markdown süsü
+ * (`>`, `*`, `_`, `-`) tolere edilir; başlık, özet metni ya da HTML yorumu ilk satırda ise numara satırı "ilk" sayılmaz.
+ * Geriye dönük değil: yalnız kapıya verilen gövde dosyasını ölçer (CI'da koşmaz, eski açık PR'lara kendiliğinden uygulanmaz).
+ */
+function prGovdeIlkSatiri(govde) {
+  const ilk = String(govde).replace(/^﻿/, '').split(/\r?\n/).find((s) => s.trim() !== '') || ''
+  const tamam = /^[ \t>*_-]*(?:[Kk]anban|KANBAN)[ \t]*:[ \t]*[A-Z]{2,5}-\d+\b/.test(ilk)
+  return { tamam, ilk: ilk.trim().slice(0, 60) }
+}
+
 /** --db > VENTHUB_KANBAN_DB > ana deponun .wrongstack/kanbans/_kanban.sqlite (worktree'den de ana depo; scripts/nlm/kanban_disa_aktar.py pano_dosyasi() mantığı). */
 function panoDosyasi(ortam = process.env) {
   if (ortam.VENTHUB_KANBAN_DB) return ortam.VENTHUB_KANBAN_DB
@@ -356,6 +369,12 @@ function main(argv) {
       if (numaralar.length === 0) {
         console.log(`EKSİK ${d}: PR gövdesinde "Kanban: <NO>" satırı yok, kart okunamadı`)
         kod = Math.max(kod, 1)
+      } else {
+        const ilk = prGovdeIlkSatiri(govde)
+        if (!ilk.tamam) {
+          console.log(`EKSİK ${d}: PR gövdesinin İLK satırı "Kanban: <NO>" olmalı (şu an: "${ilk.ilk}")`)
+          kod = Math.max(kod, 1)
+        }
       }
       kartNolari.push(...numaralar)
     }
@@ -390,7 +409,7 @@ function main(argv) {
   return kod
 }
 
-module.exports = { degerlendir, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
+module.exports = { degerlendir, oncekiKipi, ONCEKI_CALISMA_YURURLUK, govdeyiTemizle, prGovdesindenNumaralar, prGovdeIlkSatiri, panoDosyasi, kartiOku, kartBul, sinifUyarisi, ETIKETLER, ETKI_DEGERLERI }
 
 if (require.main === module) {
   process.exitCode = main(process.argv.slice(2))

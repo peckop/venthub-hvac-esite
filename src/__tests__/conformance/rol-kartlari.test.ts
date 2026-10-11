@@ -591,6 +591,73 @@ describe('INV-ROL-1 — gerçek depoda mandal', () => {
     for (const [ad, metin] of Object.entries(uretilen)) expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('Çalışan açma (karar 251)')
   })
 
+  it('HRT-46: içerik kuralı yalnız içerik üreten beş rolün kurallar dosyasında (üretilen ve diskteki); kartta ve öteki rollerde yok; iki cetvelde yazılı', () => {
+    const kural =
+      'Sitede kullanıcıya görünen metinde şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yazılmaz; tek istisna marka adı VentHub\'dır.'
+    const icerikRolleri = ['BLOG', 'I18N', 'TASARIM', 'URUN', 'SATIS']
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      const disk = fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+      if (icerikRolleri.includes(ad)) {
+        expect(metin, `${ad} (üretilen)`).toContain(kural)
+        expect(disk, `${ad}-kurallar.md (disk)`).toContain(kural)
+      } else {
+        expect(metin, `${ad} (üretilen): içerik kuralı bu role ait değil`).not.toContain('## İçerik kuralı')
+        expect(disk, `${ad}-kurallar.md (disk): içerik kuralı bu role ait değil`).not.toContain('## İçerik kuralı')
+      }
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('## İçerik kuralı')
+      expect(metin, `${ad} kartı: PR gövdesi Kanban satırıyla başlar`).toContain('PR gövdesi `Kanban: <numara>` ile başlar')
+    }
+    const cetveller: Array<[string, string]> = [
+      ['rehber-yazisi-standard.md', '10. **Şirket iddiası ve reklam dili yok**'],
+      ['i18n-localization-standard.md', 'Şirket iddiası (firma, kurum, ekip, kuruluş yılı, referans, "biz" dili) ve reklam dili yok'],
+      ['is-kayit-duzeni-standard.md', 'Her PR gövdesinin İLK satırı `Kanban: <numara>` olur'],
+    ]
+    for (const [dosya, parca] of cetveller) {
+      const metin = fs.readFileSync(path.join(KOK, 'docs', 'standards', dosya), 'utf8').replace(/\r\n/g, '\n')
+      expect(metin, dosya).toContain(parca)
+    }
+  })
+
+  it("OPS-104: unvan ve ölçüm kuralları bölümü yalnız URUN'un kurallar dosyasında (üretilen ve diskteki); rol kartında ve öteki rollerin kurallar dosyasında yok", () => {
+    const baslik = '## Unvan ve ölçüm kuralları (OPS-104)'
+    const bolum = (m: string): string => {
+      const bas = m.indexOf(baslik)
+      if (bas === -1) return ''
+      const son = m.indexOf('\n## ', bas + baslik.length)
+      return m.slice(bas, son === -1 ? undefined : son)
+    }
+    const diskMetni = (ad: string): string =>
+      fs.readFileSync(path.join(KOK, 'docs', 'roller', uretici.kuralDosyaAdi(ad)), 'utf8').replace(/\r\n/g, '\n')
+    expect(Object.keys(kuralMetinleri), 'URUN kurallar dosyası üretilmeli').toContain('URUN')
+    for (const [ad, metin] of Object.entries(kuralMetinleri)) {
+      const kaynaklar: Array<[string, string]> = [
+        [metin, `${ad}-kurallar.md (üretilen)`],
+        [diskMetni(ad), `${ad}-kurallar.md (disk)`],
+      ]
+      for (const [m, etiket] of kaynaklar) {
+        if (ad !== 'URUN') {
+          expect(m, `${etiket}: unvan ve ölçüm kuralları bu role ait değil`).not.toContain('Unvan ve ölçüm kuralları')
+          continue
+        }
+        expect(m.split(baslik).length - 1, `${etiket}: bölüm tam bir kez`).toBe(1)
+        const maddeler = bolum(m)
+          .split('\n')
+          .filter((s) => s.startsWith('- '))
+        expect(maddeler, `${etiket}: bölümde tam iki madde`).toHaveLength(2)
+        expect(maddeler[0], etiket).toContain('- Bayilik unvanı: yazılı distribütörlük ya da yetki sözleşmesi olmayan markanın sitesinde')
+        expect(maddeler[0], etiket).toContain('Yöneten cetvel: docs/standards/vaat-butunlugu-standard.md.')
+        expect(maddeler[0], `${etiket}: sahiplik haritası vaat-butunlugu cetvelini URUN'a yazıyor`).not.toContain("URUN'un değildir")
+        expect(maddeler[1], etiket).toContain('- Ham HTML ölçümünde S:0 kopyası AYRI sayılır')
+        expect(maddeler[1], etiket).toContain('başkasının cetvelidir: bu kural onlara atıf verir, onları değiştirmez.')
+      }
+    }
+    for (const [ad, metin] of Object.entries(uretilen)) {
+      expect(metin, `${ad} kartında olmamalı (bayt payı)`).not.toContain('Unvan ve ölçüm kuralları')
+    }
+  })
+
   it('beş Recep kapısı her kartta bire bir aynı', () => {
     const blok = (m: string) => m.slice(m.indexOf('## Recep kapıları'), m.indexOf('## İletişim'))
     const ilki = blok(Object.values(uretilen)[0])
