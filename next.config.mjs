@@ -227,6 +227,24 @@ const nextConfig = {
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
                     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
                     {
+                        // ALT-57 (OPS-104 K-038) · cetvel: docs/standards/csp-standard.md §8 ·
+                        // bekçi: INV-PERMISSIONS-POLICY-1
+                        // (src/__tests__/conformance/permissions-policy-baslik.test.ts).
+                        //
+                        // Sitenin kullanmadığı üç özellik kapatılır: bir sayfaya sızan üçüncü parti betik ya da
+                        // gömülü iframe kamera, mikrofon ve konum isteyemez. Kaynakta üçünün kullanımı 0
+                        // (ölçüldü 2026-10-11; tek iframe VideoAuthority.tsx bunları `allow`'a yazmıyor).
+                        //
+                        // `payment` BİLEREK YOK: İyzico formu çapraz kaynaklı iframe içinde açılıyor; `payment=(self)`
+                        // yazmak o iframe'in `allow` ile ödeme yetkisi devralmasını kapatır (MDN: iframe'in kaynağı üst
+                        // sayfanın izin listesinde de olmalı). İyzico'nun gerçek host'u IYZICO_BASE_URL secret'inden
+                        // kurulur (kodda yalnız yedek görünür) ve alt alan jokeri (`https://*.iyzipay.com`)
+                        // Permissions-Policy'de yalnız "desteklenen yerde" çalışır (MDN). Sandbox ödemesiyle
+                        // ölçülmeden bu satır yazılmaz (ALT-63 ile birlikte).
+                        key: 'Permissions-Policy',
+                        value: 'camera=(), microphone=(), geolocation=()',
+                    },
+                    {
                         // Cetvel: docs/standards/csp-standard.md · bekçi: INV-CSP-1
                         // (src/__tests__/conformance/csp-origin-coverage.test.ts) + INV-3D-5.
                         //

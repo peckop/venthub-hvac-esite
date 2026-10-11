@@ -1,8 +1,9 @@
 # CSP Standardı (Content-Security-Policy)
 
-> **Durum:** v1.0 · 2026-08-17 · Şerit: LEGAL-SEO
+> **Durum:** v1.1 · 2026-10-11 (§8 Permissions-Policy, ALT-57; sahibi ALTYAPI) · v1.0 · 2026-08-17 · Şerit: LEGAL-SEO
 > **Bekçi:** `INV-CSP-1` → `src/__tests__/conformance/csp-origin-coverage.test.ts`
 > **Kardeş bekçi:** `INV-3D-5` → `src/__tests__/conformance/3d-csp.test.ts` (yalnız `connect-src` + 3D CDN'leri)
+> **Başlık bekçisi (§8):** `INV-PERMISSIONS-POLICY-1` → `src/__tests__/conformance/permissions-policy-baslik.test.ts`
 > **SSOT:** politika metni `next.config.mjs` `headers()` içinde, TEK yerde.
 
 ## 0. Bu cetvel niçin var
@@ -159,3 +160,33 @@ koruma modunu DEĞİŞTİRMEZ (risksiz) ve enforce gününe kör gitmeyi önler 
 - `docs/standards/analytics-standard.md` — GA/GTM rıza kapısı ve ölçüm; CSP maddesi buraya devreder.
 - `CLAUDE.md` #9 (3D CDN whitelist), #11 (güvenlik/webhook), #12 (multi-tenant).
 - `docs/standards/storefront-design-standard.md` — vitrin yüzeyleri.
+
+## 8. Permissions-Policy başlığı (ALT-57, 2026-10-11)
+
+**Ne:** `next.config.mjs` `headers()` içindeki `/(.*)` grubunda
+`Permissions-Policy: camera=(), microphone=(), geolocation=()`. Bekçi: `INV-PERMISSIONS-POLICY-1`
+(`src/__tests__/conformance/permissions-policy-baslik.test.ts`).
+
+**Niçin:** ZAP/OWASP taraması (REC-337) başlığın yokluğunu bulmuştu ve düzeltme kalemi açılmamıştı.
+Ölçüm 2026-10-11 (OPS-104 K-038): kodda ve cetvellerde `Permissions-Policy` geçmiyordu, canlı yanıtta
+başlık yoktu. Site kamera, mikrofon ve konumu kullanmıyor (`src/**` içinde `getUserMedia`,
+`navigator.geolocation` ve `PaymentRequest` kullanımı 0; tek iframe `VideoAuthority.tsx` bunları `allow`
+listesine yazmıyor). Kapatmak, bir sayfaya sızan üçüncü parti betiğin ya da gömülü iframe'in bu üç
+özelliği istemesini engeller.
+
+**`payment` direktifi bilerek yok.** İyzico formu çapraz kaynaklı iframe içinde açılıyor (§6.1);
+`payment=(self)` yazmak iframe'in `allow` ile ödeme yetkisi devralmasını kapatır (MDN: iframe'in
+kaynağı üst sayfanın izin listesinde de olmalı). İyzico'nun gerçek host'u `IYZICO_BASE_URL`
+secret'inden kurulur ve alt alan jokeri (`https://*.iyzipay.com`) Permissions-Policy'de yalnız
+"desteklenen yerde" çalışır. Bu satır, sandbox ödemesi ölçülünce (ALT-63) en az bir açık origin ile
+yazılır; bekçi `payment=(self)` yazılırsa kırmızı verir.
+
+**Yeni özellik eklerken:** bu üçünden birini kullanan kod (örneğin bir konum ya da barkod okuyucu)
+yazılacaksa önce başlık ve bu bölüm kararla güncellenir; bekçi kodu kırmızı gösterir, tarayıcı isteği
+sessizce reddederdi.
+
+**Canlı doğrulama (birleşmeden sonra):** `curl -sI https://venthub.com.tr/tr | grep -i -c "^permissions-policy"`
+→ `1`. Bu satır birleşme öncesi ölçülmedi.
+
+**Bu cetvelin yapmadığı:** başka direktifler (`accelerometer`, `usb`, `bluetooth` vb.) ölçülmedi ve
+eklenmedi; kapsam kartın istediği üçlüdür.
