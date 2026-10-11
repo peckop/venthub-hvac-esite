@@ -241,7 +241,7 @@ Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kıl
     },
   },
   {
-    // BLOG, doğrulanan metin sha 53569f2f8bdd, gövde sha b5ae82bfc1bc (tur 4, 2026-10-11: bağımsız Opus doğrulayıcı +
+    // BLOG, doğrulanan metin sha c4d8d1e25207, gövde sha 23dbe2cc3300 (tur 5, 2026-10-11: bağımsız Opus doğrulayıcı +
     // belirlenimci atıf/alıntı/kalıp kontrolleri; mevzuat kaynakları 2026-10-11 tarihinde resmî metinden yeniden okundu).
     // Yayın onayı Recep'ten, OPS penceresinde, 2026-10-11. Kapak karar 135'e göre kapak şablonu PR'ında eklenecek.
     kimlik: 'radyal-aksiyel-fan-secimi',
@@ -294,7 +294,7 @@ Vortice'nin Industrial Ventilation kataloğundaki örneklerde MPC HP ve MPC ED s
 
 ## Kayışlı mı doğrudan tahrikli mi?
 
-Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1]. Aksiyel fanlarda kayışlı tahrik motoru hava akımının dışında tutar; bu, yüksek sıcaklıklı, kirli ya da korozif ortamlarda bir üstünlüktür [1]. Düşük sıcaklıklı ve temiz havalı uygulamalarda ise doğrudan tahrik uygundur, çünkü fanın hemen arkasındaki motor hava akımıyla soğutulabilir [1].
+Doğrudan tahrikte çark motor miline bağlıdır; bu basit ve verimli bir düzendir, ancak hız ayarında daha az esneklik sunar [1]. Kayışlı tahrikte fan hızı kasnak çapları değiştirilerek ayarlanabilir [1]. Aksiyel fanlarda kayışlı tahrik motoru hava akımının dışında tutar; bu, yüksek sıcaklıklı, kirli ya da korozif ortamlarda bir üstünlüktür [1]. Aksiyel fanlarda düşük sıcaklıklı ve temiz havalı uygulamalarda ise doğrudan tahrik uygundur, çünkü fanın hemen arkasındaki motor hava akımıyla soğutulabilir [1].
 
 | Seri (üretici belgesi) | Kanat | Tahrik |
 |---|---|---|
@@ -307,15 +307,15 @@ Bu serilerin modellerini [AT](vh:aile/nicotra-gebhardt-at-cift-emisli-radyal-fan
 
 ## Fan eğrisi nasıl okunur?
 
-Üretici eğrileri fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2]. Doğrudan tahrikli DD serisinin eğrisinde üretici, gri işaretli bölgede fanın kullanılmamasını ister [5].
+Nicotra Gebhardt'ın kayışlı radyal fan kataloğunda (AT serisi) eğriler, fanın toplam basınç artışını debinin fonksiyonu olarak çift logaritmik bir diyagramda gösterilir [2]. Bu diyagramda sistem direnç eğrileri düz çizgi olarak görünür [2]. Eğri üzerindeki uygulama sınırları, kararlı ve yüksek verimli çalışmanın beklenebileceği önerilen aralığı gösterir [2]. Diyagramdaki verim değeri yalnız en yüksek fan devrinde geçerlidir; devir düştükçe verim de düşer [2]. Doğrudan tahrikli DD serisinin eğrisinde üretici, gri işaretli bölgede fanın kullanılmamasını önerir [5].
 
-Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, iki nokta arasında gidip gelen kararsız bir davranışa girebilir [1]. Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu yüzden çalışma koşulları değişken sistemlere özellikle uygun değildir [1]. Radyal kanatlı fanlarda ise tutunma kaybı sorunları diğer fan tiplerine göre daha az görülür [1].
+Sistem eğrisi, bir sistemin basınç–debi karakteristiğinin grafik gösterimidir [1]. Fan eğrisinin sistem eğrisiyle aynı yönde eğimli olduğu bölgede çalışan fan kararsız çalışabilir [1]. Fan eğrisi sistem eğrisini birden fazla noktada keserse fan, "hunting" denen, iki nokta arasında gidip gelen kararsız bir davranışa girebilir [1]. Aksiyel fanların şiddetli bir tutunma kaybı bölgesi vardır; bu yüzden çalışma koşulları geniş ölçüde değişen sistemlere özellikle uygun değildir [1]. Radyal kanatlı fanlarda ise tutunma kaybı sorunları diğer fan tiplerine göre daha az görülür [1].
 
 ## En yüksek verim noktasına yakın seçin
 
-Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve bakım aralıklarını uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Damper (ayar klapesi) karşı basıncı artırarak fanın toplam çıkışını düşürür ve çalışma noktasını eğri üzerinde sola kaydırır [1].
+Bir fanı en yüksek verim noktasına yakın çalıştırmak performansı artırır, aşınmayı azaltır ve onarımlar arasındaki süreyi uzatır [1]. Çalışma noktası en yüksek verim noktasından uzaklaştıkça yatak yükleri ve gürültü artar [1]. Damper (ayar klapesi) karşı basıncı artırarak fanın toplam çıkışını düşürür ve çalışma noktasını eğri üzerinde sola kaydırır [1].
 
-Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1]. ABD Enerji Bakanlığı'nın 2003 tarihli rehberinin aktardığı bir ABD Çevre Koruma Ajansı çalışmasında, bina fan sistemlerindeki fanların yaklaşık %60'ının gereğinden büyük seçildiği, yaklaşık %10'unun ise %60 oranında büyük seçildiği bulunmuştur [1].
+Tasarımdaki güvenlik payı, ileride kapasite artırma beklentisi ve kirlenme payı, sistem ihtiyacından bir boy büyük fan seçilmesine yol açabilir [1]. ABD Enerji Bakanlığı'nın 2003 tarihli rehberinin aktardığı bir ABD Çevre Koruma Ajansı çalışmasında (rehberin dipnotundaki kaynak: Temmuz 1997 tarihli ENERGY STAR Buildings Upgrade Manual), bina fan sistemlerindeki fanların yaklaşık %60'ının gereğinden büyük seçildiği, yaklaşık %10'unun ise %60 oranında büyük seçildiği bulunmuştur [1].
 
 Fan devri düşürüldüğünde debi devirle doğrusal, basınç devrin karesiyle, güç devrin küpüyle değişir [1]. Aynı rehbere göre fan devrini %20 azaltmak fan gücünü yaklaşık %50 azaltır [1].
 
@@ -335,13 +335,15 @@ Ses gücü seviyesi, bir ses kaynağından yayılan akustik güçtür ve watt ya
 
 ## Fanlar için verimlilik mevzuatı
 
-Avrupa Birliği'nde elektrik giriş gücü 125 W ile 500 kW arasında olan motorlarla tahrik edilen fanların ekotasarım gereklilikleri, 3 Temmuz 2024 tarihli (EU) 2024/1834 sayılı Komisyon Tüzüğü ile düzenlenir [8]. Bu tüzük, önceki (EU) No 327/2011 sayılı tüzüğü 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [8]. Yeni tüzük 24 Temmuz 2026'dan itibaren uygulanır [8]. Tüzük, 2 Aralık 2025 tarihli (EU) 2025/2481 sayılı Komisyon Tüzüğü ile değiştirilmiştir; bu değişikliğe göre eski tüzüğün I, II ve III numaralı ekleri başka ürünlere entegre edilen fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [11].
+Avrupa Birliği'nde elektrik giriş gücü 125 W ile 500 kW arasında olan motorlarla tahrik edilen fanların ekotasarım gereklilikleri, 3 Temmuz 2024 tarihli (EU) 2024/1834 sayılı Komisyon Tüzüğü ile düzenlenir [8]. Bu tüzük, önceki (EU) No 327/2011 sayılı tüzüğü 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [8]. Yeni tüzük genel olarak 24 Temmuz 2026'dan itibaren uygulanır [8]. Tüzük, 2 Aralık 2025 tarihli (EU) 2025/2481 sayılı Komisyon Tüzüğü ile değiştirilmiştir; bu değişikliğe göre, yeni tüzüğün Ek II'sinin ilk iki paragrafına uygun olarak, eski tüzüğün I, II ve III numaralı ekleri başka ürünlere entegre edilen fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [11].
 
-Tüzük, yalnız 2014/34/AB sayılı Direktif anlamında patlayıcı ortamlarda çalışmak üzere tasarlanıp pazarlanan fanları ve yalnız acil durum için, 300 °C ve üzerinde 1 saat ya da daha uzun çalışabilecek yangın güvenliği fanlarını kapsamının dışında tutar [8].
+Tüzüğün kapsam dışı bıraktığı fanlar arasında, yalnız 2014/34/AB sayılı Direktif anlamında patlayıcı ortamlarda çalışmak üzere tasarlanıp pazarlanan fanlar ile yalnız acil durum için, 300 °C ve üzerinde 1 saat ya da daha uzun çalışabilecek yangın güvenliği fanları da bulunur [8].
 
-Türkiye'de aynı konu, 7 Şubat 2026 tarihli ve 33161 sayılı Resmî Gazete'de yayımlanan, (AB) 2024/1834 sayılı tüzük ile onu değiştiren (AB) 2025/2481 sayılı tüzük esas alınarak hazırlanan Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2) ile düzenlenir [9]. Tebliğ, diğer ürünlere entegre edilenler dahil bu güç aralığındaki fanların piyasaya arzına ilişkin çevreye duyarlı tasarım gerekliliklerini belirler [9]. Tebliğ, 20 Aralık 2019 tarihli ve 30984 sayılı Resmî Gazete'de yayımlanan önceki fan tebliğini yürürlükten kaldırır [9]. Tebliğin esas hükümleri 24 Temmuz 2027'de yürürlüğe girer [9].
+Türkiye'de aynı konu, 7 Şubat 2026 tarihli ve 33161 sayılı Resmî Gazete'de yayımlanan, (AB) 2024/1834 sayılı tüzük ile onu değiştiren (AB) 2025/2481 sayılı tüzük esas alınarak hazırlanan Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2) ile düzenlenir [9]. Tebliğ, diğer ürünlere entegre edilenler dahil bu güç aralığındaki fanların piyasaya arz edilmesi veya hizmete sunulması açısından çevreye duyarlı tasarım gerekliliklerini belirler [9]. Tebliğ, 20 Aralık 2019 tarihli ve 30984 sayılı Resmî Gazete'de yayımlanan önceki fan tebliğini yürürlükten kaldırır [9]. Bu hüküm de dahil tebliğin esas hükümleri 24 Temmuz 2027'de yürürlüğe girer [9].
 
 ## Patlayıcı ortam ve duman tahliyesi
+
+Yalnız patlayıcı ortamlarda çalışmak üzere tasarlanıp pazarlanan fanlar, yukarıda anlatılan verimlilik tüzüğünün kapsamı dışındadır [8].
 
 Vortice, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanların EN 12101-3 standardına göre üçüncü taraf bir kuruluşça belgelendirildiğini belirtir [7]. Aynı belgeye göre en yaygın sınıflar, sırasıyla 300 °C ve 400 °C'de duman tahliyesinde 2 saat kesintisiz çalışmaya karşılık gelen F300/120 ve F400/120'dir [7]. Vortice'nin VORT JET A F400 serisi F400/120 sertifikalıdır [6].
 
@@ -349,12 +351,12 @@ Vortice, yüksek sıcaklıktaki dumanın tahliyesi için tasarlanan fanların EN
 
 - Fanın tesisata esnek bir bağlantıyla bağlanması titreşim ve gürültü yalıtımını iyileştirir [2].
 - Tüm koruyucu tertibatlar takılıp bağlanmadan fan işletmeye alınmamalıdır [2].
-- Kayışlı fanlarda doğru gerginlik, test kuvvetinin kayış açıklığının metresi başına 16 mm sehim oluşturduğu noktada elde edilir [2]. Rulmanın aşırı zorlanmaması için gerdirme iki aşamada yapılmalıdır [2].
+- Nicotra Gebhardt'ın kayışlı fanlarında doğru gerginlik, üreticinin belirttiği test kuvvetinin kayış açıklığının metresi başına 16 mm sehim oluşturduğu noktada elde edilir [2]. Aynı üretici, ölçü işaretleri arasındaki uzunluğun belirtilen uzama değeri kadar artmasıyla da doğru gerginliğin elde edildiğini söyler; bu işlem rulmanın aşırı zorlanmaması için iki aşamada yapılmalıdır [2].
 - Nicotra Gebhardt'ın kayışlı AT serisi fanlarındaki rulmanlar 40.000 çalışma saatlik nominal ömür için tasarlanmıştır [2].
 
 ## Fiyatı belirleyen etkenler
 
-Bu yazıda fiyat verilmez; güncel fiyat ürün sayfasında görünür. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen fanı ya da kurulumu değiştirir.
+Bu yazıda fiyat verilmez; güncel fiyat ve teklif için ürün sayfasındaki "Teknik Teklif İste" düğmesini kullanabilirsiniz. Teklifleri karşılaştırırken aşağıdaki seçimlerin aynı olup olmadığına bakın; her biri teklif edilen fanı ya da kurulumu değiştirir.
 
 - **Fan tipi ve kanat biçimi.** Öne eğik, radyal ve geriye eğik kanatlar ile aksiyel türler farklı verim aralıklarına sahiptir [1].
 - **Debi ve basınç aralığı.** Aynı seri içinde boy büyüdükçe debi aralığı değişir; örneğin RDH serisinde 0180–0560 boyları 90.000 m³/h'e, 0630–1000 boyları 290.000 m³/h'e kadar çıkar [3].
@@ -370,7 +372,7 @@ Bu yazıda fiyat verilmez; güncel fiyat ürün sayfasında görünür. İki tek
 3. Çalışma noktasının üretici eğrisinde önerilen kararlı ve verimli aralıkta olduğunu kontrol edin [2].
 4. Gerçek hava yoğunluğu referans yoğunluktan farklıysa eğri değerlerini düzeltin [1][2].
 5. Fan girişinde ve çıkışında sistem etkisi yaratacak dirsekleri ve daralmaları azaltın [1].
-6. Patlayıcı ortam ya da duman tahliyesi söz konusuysa ilgili belgeyi isteyin [7][8].
+6. Duman tahliyesi söz konusuysa fanın EN 12101-3 belgesini ve sınıfını isteyin [7]; patlayıcı ortam söz konusuysa fanın o ortam için tasarlanıp pazarlandığını gösteren belgeyi üreticiden isteyin [8].
 
 ## Sık sorulan sorular
 
@@ -392,7 +394,7 @@ Büyük seçilen fan en yüksek verim noktasından uzakta çalışır; bu durumd
 
 ### 327/2011 sayılı AB tüzüğü hâlâ geçerli mi?
 
-Hayır. (EU) 2024/1834 sayılı tüzük, 327/2011'i 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [8]. 2025/2481 sayılı değişiklik tüzüğüne göre eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [11]. Türkiye'de ise tebliğe göre yürürlükten kaldırılan eski tebliğin ekleri, diğer ürünlere entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [9].
+Yürürlükten kalktı; ancak iki sınırlı istisna sürer. (EU) 2024/1834 sayılı tüzük, 327/2011'i 24 Temmuz 2026'dan itibaren yürürlükten kaldırmıştır [8]. 2025/2481 sayılı değişiklik tüzüğüne göre, yeni tüzüğün Ek II'sinin ilk iki paragrafına uygun olarak, eski tüzüğün ekleri yalnız başka ürünlere entegre fanlar için 24 Temmuz 2027'ye, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanır [11]. Türkiye'de ise tebliğe göre, tebliğin Ek II'sinin ilk iki paragrafına uygun olarak, yürürlükten kaldırılan eski tebliğin ekleri, diğer ürünlere entegre fanlar için 24 Temmuz 2028'e, yedek parça fanlar için 24 Temmuz 2037'ye kadar uygulanmaya devam eder [9].
 
 ### Doğru teklif için hangi bilgileri paylaşmalıyım?
 
@@ -402,21 +404,21 @@ Gerekli debi ve toplam basınç [1], havanın temiz ya da parçacıklı olup olm
 
 Üretici belgelerinde verilen sayfa numaraları PDF dosyasındaki sayfa sırasıdır; basılı sayfa numarasından farklı olabilir.
 
-1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003. https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 24.09.2026)
-2. Nicotra Gebhardt, Belt Driven Centrifugal Fans AT (480-series), Issue 2.5 EN, 2013, s. 5, 70–71, 85, 99, 101 (üretici belgesi).
-3. Nicotra Gebhardt, Centrifugal Fans RDH, belt driven (481-series), Issue 2.5 EN, 2013, s. 7 (üretici belgesi).
-4. Nicotra Gebhardt, Centrifugal Fans ADH, belt driven (479-series), Issue 2.5 EN, 2013, s. 5, 7 (üretici belgesi).
-5. Nicotra Gebhardt, Centrifugal Fans direct driven with scroll, DD range (493-series), Issue 1.3, s. 6, 9 (üretici belgesi).
+1. U.S. Department of Energy, AMCA International, Improving Fan System Performance — A Sourcebook for Industry, DOE/GO-102003-1294, 2003, s. 3, 4, 6–9, 11, 13, 17–24, 32–34, 80 (basılı sayfa numaraları). https://www1.eere.energy.gov/manufacturing/tech_assistance/pdfs/fan_sourcebook.pdf (erişim 11.10.2026)
+2. Nicotra Gebhardt, Belt Driven Centrifugal Fans AT, Issue 2.5 EN, 2013, s. 5, 70–71, 85, 99, 101 (üretici belgesi).
+3. Nicotra Gebhardt, Centrifugal Fans RDH, belt driven, Issue 2.5 EN, 2013, s. 5, 7 (üretici belgesi).
+4. Nicotra Gebhardt, Centrifugal Fans ADH, belt driven, Issue 2.5 EN, 2013, s. 5, 7 (üretici belgesi).
+5. Nicotra Gebhardt, Centrifugal Fans direct driven with scroll, DD range, Issue 1.3, s. 6, 9 (üretici belgesi).
 6. Vortice, Industrial Ventilation kataloğu, s. 4, 45, 58, 64 (üretici belgesi).
 7. Vortice, VORT JET FAN SYSTEM broşürü, s. 10 (üretici belgesi).
-8. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 24.09.2026)
-9. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2). https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 24.09.2026)
+8. Avrupa Komisyonu, Commission Regulation (EU) 2024/1834, EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1834 (erişim 11.10.2026)
+9. T.C. Resmî Gazete, 07.02.2026, Sayı 33161, Elektrik Giriş Gücü 125 W ile 500 kW Arasında Olan Motorlarla Tahrik Edilen Fanlarla İlgili Çevreye Duyarlı Tasarım Gerekliliklerine Dair Tebliğ (SGM-2026/2). https://www.resmigazete.gov.tr/eskiler/2026/02/20260207-4.htm (erişim 11.10.2026)
 10. SEAT Ventilation, SEAT Series — Specifications, s. 1 (üretici belgesi).
-11. Avrupa Komisyonu, Commission Regulation (EU) 2025/2481 (2024/1834'ü değiştiren tüzük), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2481 (erişim 25.09.2026)
+11. Avrupa Komisyonu, Commission Regulation (EU) 2025/2481 (2024/1834'ü değiştiren tüzük), EUR-Lex. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32025R2481 (erişim 11.10.2026)
 
 ## Teknik sorumluluk notu
 
-Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Yazıdaki verim, debi ve basınç değerleri üretici belgelerinde ve kaynak rehberlerde verilen değerlerdir; kendi sisteminizdeki sonuç, montaj koşullarına ve hava yoğunluğuna göre farklı olabilir. Kurulum, devreye alma ve bakım yetkili ve eğitimli personel tarafından yapılmalıdır. Yasal şartlara ilişkin bilgiler yayın tarihindeki resmî metinlere dayanır; uygulamadan önce güncel metin kontrol edilmelidir.
+Bu yazı genel mühendislik bilgisi verir; projeye özel hesabın, üretici kılavuzunun ve güncel resmî metinlerin yerini tutmaz. Örnek hesaptaki varsayım değerleri dışında, yazıdaki verim, debi ve basınç değerleri üretici belgelerinde ve kaynak rehberlerde verilen değerlerdir; kendi sisteminizdeki sonuç, montaj koşullarına ve hava yoğunluğuna göre farklı olabilir. Kurulum, devreye alma ve bakım yetkili ve eğitimli personel tarafından yapılmalıdır. Yasal şartlara ilişkin bilgiler yayın tarihindeki resmî metinlere dayanır; uygulamadan önce güncel metin kontrol edilmelidir.
 `,
       },
     },
