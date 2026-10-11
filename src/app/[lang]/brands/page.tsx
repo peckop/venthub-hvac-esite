@@ -1,16 +1,24 @@
 import type { Metadata } from 'next'
+import { permanentRedirect } from 'next/navigation'
 import React, { Suspense } from 'react'
 
+import { ADRES_SEMASI_K3B } from '@/config/features'
 import { en } from '@/i18n/dictionaries/en'
 import { tr } from '@/i18n/dictionaries/tr'
 import { sayfaUstVerisi } from '@/lib/seo/sayfaUstVerisi'
+import { adresUret } from '@/utils/adresUret'
 import { Routes } from '@/utils/routes'
 
 import BrandsPage from '../../../views/BrandsPage'
 
-/** Üst veri tek yazıcıda (REC-150 Adım 5, bot karnesi 2026-09-24): görünümdeki istemci `Seo` kaldırıldı. */
+/**
+ * BAYRAK AÇIKKEN (URN-85, Design CSV satır 4): TR marka listesi `/tr/markalar`'a TEK 308 verir (içerik orada, iki
+ * adresten 200 dönmez — REC-205); EN `/en/brands` yerinde kalır. KAPALIYKEN davranış bugünküyle BİREBİR.
+ */
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params
+  // TR bu adreste hiç çizilmez (308) → üst veri yazılmaz; yönlendirmenin kendi hedefi üst veriyi taşır.
+  if (ADRES_SEMASI_K3B && lang !== 'en') return {}
   const dict = lang === 'en' ? en : tr
   return sayfaUstVerisi({
     lang,
@@ -37,7 +45,9 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
  */
 export const dynamic = 'force-static'
 
-export default function Page() {
+export default async function Page({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params
+  if (ADRES_SEMASI_K3B && lang !== 'en') permanentRedirect(adresUret({ tur: 'markalar' }, 'tr'))
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">

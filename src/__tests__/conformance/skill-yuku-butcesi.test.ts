@@ -38,7 +38,16 @@ const OTURUMA_GIREN = new Set(['name', 'description', 'argument-hint'])
  * veren bir kapı üretir; o kapı okunmaz hâle gelir (§25 gürültülü kapı). Niçin daha da yüksek
  * değil: baş payı bir skill'in ortalama bedeli kadar olmalı ki büyüme FARK EDİLSİN.
  */
-const BUTCE_BAYT = 20 * 1024
+/**
+ * ⭐BÜTÇE 20 → 24 KB (OPS kararı, 2026-10-01, REC-519 WrongStack alımı 2. paket; ölçüm tarihi 2026-10-01).
+ * GEREKÇE: 20 KB sınırı, liste bütçesi büyütülmeden ÖNCE konmuştu (09-30'da `skillListingBudgetFraction`
+ * büyütüldü, Recep onaylı). Sınırın koruduğu şey bayt değil, "proje skill'leri Sonnet'te AÇIKLAMALI görünür"
+ * sonucudur. KESİN sayım (`scripts/hijyen/skill-listesi-say.cjs`, oturum dökümündeki `skill_listing`):
+ * 54 proje skill'i ile Sonnet 5.5 düz ve [1m]'de PROJE ADSIZ 0 / 54. Haiku 200K'da 39 / 54 adsız; o taraf bu
+ * bütçeyle çözülmez (SKILL_ATAMASI'ndaki Haiku kuralı: skill adı müdür görev metninde AÇIKÇA yazılır).
+ * ⛔24 KB'ı aşan bir sonraki PR kendiliğinden yükseltmez: OPS'a gider (yükseltme kararı OPS'undur).
+ */
+const BUTCE_BAYT = 24 * 1024
 
 /** Tek bir açıklamanın tavanı. Yeni skill'ler için geçerli; bugünkü aşanlar aşağıda ADIYLA. */
 const ACIKLAMA_TAVANI = 300

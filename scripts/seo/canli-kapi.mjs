@@ -19,7 +19,9 @@
  *   YETIM 9 (7, 11) · TITLE-YOK/TEKRAR 76 · TITLE-UZUN 77 · TITLE-TASLAK 3 · ACIKLAMA-YOK/TEKRAR 79 ·
  *   ACIKLAMA-KESIK/SABLON/KISA 5 · LANG 6 · FAVICON 2 · LASTMOD-BUGUN 42 · LASTMOD-TOPLU 29 · ROBOTS-KALIP 15 (44) ·
  *   SOFT404 1 (54) · IC-BAGLANTI-YONLENDIRME 12 · YONLENDIRME-ZINCIRI 14 · JSONLD-* 66/18/17/58/59/20/62 ·
- *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse).
+ *   ROBOTS-HARITA-ALAN 16 · HARITA-ADRES-DURUM 73 (ek: haritadaki adres 200 değilse) ·
+ *   LLMS-SAYFA / LLMS-DIL (ek, SEO-6: llms.txt'in sayfa/kategori sayısı ve `Languages:` beyanı haritayla çelişirse) ·
+ *   SPEC-HAM-DEGER (ek, URN-58: teknik tablo hücresinin görünür metni tam `true`/`false` ise).
  *
  * Kullanım: node scripts/seo/canli-kapi.mjs [--taban https://venthub.com.tr] [--cikti <depo dışı klasör>]
  *           [--bilinen <json>] [--kayit-durum <json>] [--bugun YYYY-MM-DD]
@@ -70,6 +72,10 @@ export const KURAL_NO = {
   'JSONLD-BREADCRUMB': '20,62',
   'ROBOTS-HARITA-ALAN': '16',
   'HARITA-ADRES-DURUM': '73',
+  'LLMS-SAYFA': '-',
+  'LLMS-DIL': '-',
+  'VITRIN-IDDIA': '-',
+  'SPEC-HAM-DEGER': '-',
 }
 const KOD_SIRASI = Object.keys(KURAL_NO)
 
@@ -170,7 +176,10 @@ function tumDugumler(v, cikti = []) {
 // ---------------------------------------------------------------------------------------------------------------
 // Site haritası ve robots.txt (saf)
 
-/** Site haritası XML'i → [{loc, lastmod, changefreq, priority}] (alt harita dizini burada çözülmez; ağ katmanı gezer). */
+/**
+ * Site haritası XML'i → { satirlar: [{loc, lastmod, changefreq, priority}], hreflangSayisi } (alt harita dizini burada
+ * çözülmez; ağ katmanı gezer). `hreflangSayisi`: `<xhtml:link … hreflang=…>` sayısı (llms.txt dil beyanı sınaması için).
+ */
 export function haritaCoz(xml) {
   const satirlar = []
   for (const m of String(xml).matchAll(/<url>([\s\S]*?)<\/url>/g)) {
@@ -178,7 +187,8 @@ export function haritaCoz(xml) {
     const loc = al('loc')
     if (loc) satirlar.push({ loc, lastmod: al('lastmod'), changefreq: al('changefreq'), priority: al('priority') })
   }
-  return { satirlar }
+  const hreflangSayisi = [...String(xml).matchAll(/<xhtml:link\b[^>]*\bhreflang\s*=/gi)].length
+  return { satirlar, hreflangSayisi }
 }
 
 /** robots.txt → `User-agent: *` grubundaki boş olmayan Disallow kalıpları. */
@@ -298,6 +308,90 @@ function dilKontrolu(sayfalar, enSayfalar, cikti) {
   }
 }
 
+/**
+ * VITRIN-IDDIA (URN-60, karar 295): vitrinde DAYANAKSIZ ya da kararla kaldırılmış iddia ifadeleri. Her ifade
+ * sayfanın GÖRÜNEN metninde (script/style/etiket atıldıktan sonra) aranır. Karşılaştırma iki tarafı AYNI Türkçe
+ * küçültmeyle yapar (REC-343: ASCII sabit + Türkçe küçültme "AI"yı ıi'ye çevirip eşleşmiyordu; simetri bunu önler).
+ * Liste kararlarla büyür: yeni yasak ifade BURAYA, tek yerden. `kaynak` = neden yasak olduğu.
+ */
+export const VITRIN_YASAK_IFADELER = [
+  { ifade: '%92', kaynak: 'dayanaksız "%92 Optimizasyon" (URN-60 adım 1)' },
+  { ifade: 'Çok Satanlar', kaynak: 'teklif kipinde satış verisi yok; "Öne çıkanlar" (karar 295)' },
+  { ifade: 'Geniş stok', kaynak: 'stok vaadi dayanaksız (URN-60 adım 1)' },
+  { ifade: 'Dünya Devlerinin', kaynak: 'distribütörlük/partner iddiası yok (karar 295)' },
+  { ifade: 'DETERMİNİSTİK', kaynak: 'bilgi taşımayan başlık (URN-60 adım 2)' },
+  { ifade: 'Sistem.Veri.Canlı', kaynak: 'dekoratif HUD metni bağlantı metni olmamalı (URN-60 adım 3)' },
+  { ifade: 'beğendiğim', kaynak: 'tasarım referansı ekran görüntüsü, şirket görseli değil (URN-60 adım 5)' },
+  { ifade: '81 il', kaynak: '81 ile kargo vaadi kalktı (karar 295)' },
+  { ifade: 'Partneri', kaynak: 'partner dili yalnız yetkili distribütörlük için (karar 295; yok)' },
+  // URN-79 (karar 317, OPS abartı taraması 2026-10-09): marka kayıtlarından kalkan üretici öz beyanları. Her biri kaynak
+  // dizininde karşılıksız ya da atıfsız; geri gelirse canlıda KIRMIZI. İfadeler bilerek marka cümlesine ÖZGÜ (genel
+  // "dünya"/"lider" sözcüğü değil): başka sayfalardaki meşru kullanımı yakalamasın.
+  { ifade: 'dünya lideri', kaynak: 'marka metni: kaynaksız liderlik iddiası, Vortice/Nicotra (URN-79)' },
+  { ifade: 'world leader', kaynak: 'marka metni: kaynaksız liderlik iddiası, Vortice/Nicotra (URN-79)' },
+  { ifade: 'standartları belirliyor', kaynak: 'marka metni: Vortice üstünlük iddiası (URN-79)' },
+  { ifade: 'dünyanın en geniş', kaynak: 'marka metni: Nicotra kataloğu "dünya" demiyor (URN-79)' },
+  { ifade: 'öncüsüdür', kaynak: 'marka metni: Danfoss öz beyanı, atıfsız (URN-79)' },
+  // Kesme işareti İÇERMEZ: React HTML'de `'` işaretini `&#x27;` yazar, `gorunenMetin` yalnız `&amp;` çözer → "%80'e varan" eşleşmezdi.
+  { ifade: 'varan oranda azaltır', kaynak: 'marka metni: Danfoss "%80\'e varan" enerji tasarrufu oranı, atıfsız; FC102 kataloğu "%50\'den fazla" (URN-79)' },
+  { ifade: 'önde gelen yerli', kaynak: 'marka metni: Avens, kaynak dizininde karşılığı yok (URN-79)' },
+  { ifade: 'Yüksek Verimli Santrifüj', kaynak: 'marka uzmanlık etiketi: ölçütsüz sıfat, Nicotra (URN-79)' },
+]
+
+const trKucuk = (s) => String(s).toLocaleLowerCase('tr')
+const gorunenMetin = (html) => String(html)
+  .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+  .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+  .replace(/<[^>]+>/g, ' ')
+  .replace(/&amp;/g, '&')
+  .replace(/\s+/g, ' ')
+
+function vitrinIddiaKontrolu(sayfalar, cikti) {
+  for (const s of sayfalar) {
+    if (s.html == null) continue
+    const metin = trKucuk(gorunenMetin(s.html))
+    for (const { ifade, kaynak } of VITRIN_YASAK_IFADELER) {
+      if (metin.includes(trKucuk(ifade))) cikti.push(bulgu('VITRIN-IDDIA', 'KIRMIZI', s.yol, `yasak ifade "${ifade}" görünen metinde: ${kaynak}`))
+    }
+  }
+}
+
+/**
+ * SPEC-HAM-DEGER (URN-58, karar 298): teknik tablo hücresinde ham makine değeri. Mantıksal özellik ("Zamanlayıcı",
+ * "ErP Uyumlu", "Higrostat") sözlükten "Var/Yok" ("Yes/No") basılır; görünen metni TAM OLARAK `true` ya da `false`
+ * olan bir hücre, biçimlendiricinin dil bilmeden `String(value)` bastığı eski hâlin izidir (canlıda Lineo Quiet
+ * ailesinde ölçüldü: gövde çift olduğu için her alan iki kez). Hücre = alt öğesi olmayan öğe (`<span>`, `<td>`, `<dd>`,
+ * `<div>` …); yorum/script/style/template atılır, yani JSON-LD ve RSC yükündeki `true` sayılmaz. Kod gösteren öğeler
+ * (`code`, `pre`, `kbd`, `samp`) ve cümle içinde geçen sözcük sayılmaz. Büyük/küçük harf duyarlıdır: ham değer
+ * küçük harftir, "True" yazılmış metin editoryal içeriktir. Çıktı sayfa başına TEK bulgu (hücre sayısı + etiket=değer).
+ */
+const KOD_OGELERI = new Set(['code', 'pre', 'kbd', 'samp'])
+const HAM_DEGER_HUCRESI = /<([a-zA-Z][a-zA-Z0-9-]*)(?=[\s/>])(?:[^>"']|"[^"]*"|'[^']*')*>\s*(true|false)\s*<\/\1\s*>/g
+
+/** Ham HTML → [{ deger, etiket }]; `etiket` hücreden hemen önceki kapanan öğenin metni (yoksa '?'). */
+export function hamDegerHucreleri(html) {
+  const temiz = temizle(html)
+  const bulunan = []
+  for (const m of temiz.matchAll(HAM_DEGER_HUCRESI)) {
+    if (KOD_OGELERI.has(m[1].toLowerCase())) continue
+    const once = temiz.slice(Math.max(0, m.index - 400), m.index)
+    const etiket = />([^<>]{1,80})<\/[a-zA-Z][a-zA-Z0-9-]*\s*>\s*$/.exec(once)
+    bulunan.push({ deger: m[2], etiket: etiket ? bosluksuz(etiket[1]) || '?' : '?' })
+  }
+  return bulunan
+}
+
+function specHamDegerKontrolu(sayfalar, cikti) {
+  for (const s of sayfalar) {
+    if (s.html == null) continue
+    const hucreler = hamDegerHucreleri(s.html)
+    if (hucreler.length === 0) continue
+    const ozet = [...new Set(hucreler.map((h) => `${h.etiket}=${h.deger}`))].slice(0, 6).join(', ')
+    cikti.push(bulgu('SPEC-HAM-DEGER', 'KIRMIZI', s.yol,
+      `${hucreler.length} teknik tablo hücresinde ham makine değeri (${ozet}); doğrusu sözlükten "Var/Yok" ("Yes/No") — formatSpecValue, URN-58`))
+  }
+}
+
 const metinBaytlari = (b) => [...(b || [])].slice(0, 24).map((x) => (x >= 32 && x < 127 ? String.fromCharCode(x) : '.')).join('')
 const ICO = [0, 0, 1, 0]
 const PNG = [0x89, 0x50, 0x4e, 0x47]
@@ -393,6 +487,41 @@ function jsonldKontrolleri(sayfalar, cikti) {
   }
 }
 
+/** Sayıyı yazıdan okur ("1.234", "1,234" binlik ayırıcılı olabilir). */
+const sayiOku = (s) => Number(String(s).replace(/[.,]/g, ''))
+
+/**
+ * llms.txt'in sayfa/dil beyanı site haritası gerçeğiyle çelişirse KIRMIZI (SEO-6, 2026-10-02: dosya "~190 sayfa, TR/EN
+ * hreflang, ~37 kategori" diyordu, gerçek 87 adres, yalnız TR, 24 kategori, hreflang yok; 08-29'dan beri bayattı).
+ * Beyan biçimi (makine okur): "N pages|URLs" (yalnız yazılmışsa sınanır), "N categories" (yalnız yazılmışsa sınanır) ve
+ * ZORUNLU `Languages (ISO 639-1): tr[, en]` satırı. Dil kümesi haritanın `/tr|/en` yol önekleri; `<xhtml:link hreflang>`
+ * varsa karşı dil de var sayılır (iki dil). Dil satırı yoksa da KIRMIZI: dil beyanı zorunlu, sessiz geçmez.
+ */
+export function llmsKontrolu(harita, llms, cikti, adres = '/llms.txt') {
+  const metin = String(llms)
+  const yollar = harita.satirlar.map((s) => { try { return new URL(s.loc).pathname } catch { return s.loc } })
+  const gercekSayfa = harita.satirlar.length
+  // K3-b bayrağı açıkken TR kategori adresi /tr/kategori/<slug>, kapalıyken /tr/category/<slug>: iki kipte de kategoridir (SEO-21)
+  const gercekKategori = yollar.filter((y) => /\/(?:category|kategori)\//.test(y)).length
+  for (const m of metin.matchAll(/(\d[\d.,]*)\s+(?:indexable\s+)?(?:pages|urls)\b/gi)) {
+    if (sayiOku(m[1]) !== gercekSayfa) cikti.push(bulgu('LLMS-SAYFA', 'KIRMIZI', adres, `llms.txt "${m[0]}" diyor, site haritasında ${gercekSayfa} adres var`))
+  }
+  for (const m of metin.matchAll(/(\d[\d.,]*)\s+categories\b/gi)) {
+    if (sayiOku(m[1]) !== gercekKategori) cikti.push(bulgu('LLMS-SAYFA', 'KIRMIZI', adres, `llms.txt "${m[0]}" diyor, site haritasında ${gercekKategori} kategori adresi var`))
+  }
+  const satir = /^[\s>*_-]*languages\b[^:\n]*:\s*(.+)$/im.exec(metin)
+  if (!satir) {
+    cikti.push(bulgu('LLMS-DIL', 'KIRMIZI', adres, 'llms.txt\'te "Languages (ISO 639-1): tr" biçiminde dil beyanı satırı yok (zorunlu)'))
+    return
+  }
+  const beyan = new Set(satir[1].toLowerCase().match(/\b(?:tr|en)\b/g) || [])
+  const gercek = new Set()
+  for (const y of yollar) { const d = dilOnEki(y); if (d) gercek.add(d) }
+  if ((harita.hreflangSayisi || 0) > 0) { gercek.add('tr'); gercek.add('en') }
+  const yaz = (k) => [...k].sort().join(',') || 'yok'
+  if (yaz(beyan) !== yaz(gercek)) cikti.push(bulgu('LLMS-DIL', 'KIRMIZI', adres, `llms.txt diller: ${yaz(beyan)}; site haritası diller: ${yaz(gercek)} (hreflang ${harita.hreflangSayisi || 0})`))
+}
+
 function yonlendirmeKontrolleri(sayfalar, ek, taban, cikti) {
   const YON = new Set([301, 302, 307, 308])
   if (ek.yonlendirmeler) {
@@ -437,11 +566,14 @@ export function kontrolEt({ harita, sayfalar, ek = {} }) {
   faviconKontrolu(sayfalar, ek.varliklar, cikti)
   lastmodKontrolu(harita, bugun, cikti)
   if (ek.robots != null) robotsKontrolu(harita, ek.robots, ek.gizli, taban, cikti)
+  if (ek.llms != null) llmsKontrolu(harita, ek.llms, cikti, taban + '/llms.txt')
   for (const [yol, v] of Object.entries(ek.yanitlar || {})) {
     if (v.durum !== 404 && v.durum !== 410) cikti.push(bulgu('SOFT404', 'KIRMIZI', yol, `olmayan adres HTTP ${v.durum} döndü (404 beklenir)${v.konum ? ' → ' + v.konum : ''}`))
   }
   yonlendirmeKontrolleri(tamam, ek, taban, cikti)
   jsonldKontrolleri(tamam, cikti)
+  vitrinIddiaKontrolu(tamam, cikti)
+  specHamDegerKontrolu(tamam, cikti)
   for (const s of harita.satirlar) {
     if (s.changefreq) cikti.push(bulgu('ROBOTS-HARITA-ALAN', 'UYARI', s.loc, `<changefreq>${s.changefreq}</changefreq>: Google yok sayar (kod anahtarı yanlış, REC-498)`))
   }
@@ -588,12 +720,15 @@ async function haritaGetir(taban) {
   if (r.durum !== 200) throw new Error(`sitemap.xml HTTP ${r.durum}`)
   if (!/<sitemapindex/i.test(r.html)) return haritaCoz(r.html)
   const satirlar = []
+  let hreflangSayisi = 0
   for (const m of r.html.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)) {
     const alt = await istek(varlikCoz(m[1]), { govde: 'metin' })
     if (alt.durum !== 200) throw new Error(`alt harita HTTP ${alt.durum}`)
-    satirlar.push(...haritaCoz(alt.html).satirlar)
+    const cozulen = haritaCoz(alt.html)
+    satirlar.push(...cozulen.satirlar)
+    hreflangSayisi += cozulen.hreflangSayisi
   }
-  return { satirlar }
+  return { satirlar, hreflangSayisi }
 }
 
 /** Yönlendirme zincirini elle izler; sıçrama = 3xx yanıt sayısı. */
@@ -634,6 +769,7 @@ async function topla(taban, bugun) {
   const ek = { taban, bugun, enSayfalar: [], varliklar: {}, gizli: {}, yanitlar: {}, yonlendirmeler: {}, zincirler: {} }
   const isler = []
   isler.push(async () => { const r = await dene('/robots.txt', () => istek(`${taban}/robots.txt`, { govde: 'metin' })); if (r) { if (r.durum === 200) ek.robots = r.html; else hatalar.push(`/robots.txt (HTTP ${r.durum})`) } })
+  isler.push(async () => { const r = await dene('/llms.txt', () => istek(`${taban}/llms.txt`, { govde: 'metin' })); if (r) { if (r.durum === 200) ek.llms = r.html; else if (r.durum !== 404) hatalar.push(`/llms.txt (HTTP ${r.durum})`) } })
   for (const yol of EN_SAYFALAR) isler.push(async () => { const r = await dene(yol, () => istek(taban + yol, { govde: 'metin' })); if (r) ek.enSayfalar.push({ yol, durum: r.durum, html: r.durum === 200 ? r.html : null }) })
   for (const [yol, tur] of IKON_DOSYALARI) isler.push(async () => { const r = await dene(yol, () => istek(taban + yol, { govde: 'bayt' })); if (r) ek.varliklar[yol] = { durum: r.durum, ilk: r.ilk, tur } })
   for (const yol of GIZLI_YUZEYLER) isler.push(async () => { const r = await dene(yol, () => istek(taban + yol, { govde: 'metin' })); if (r) ek.gizli[yol] = { durum: r.durum, basliklar: r.basliklar, html: r.durum === 200 ? r.html : null } })

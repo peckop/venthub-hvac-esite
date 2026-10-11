@@ -1,0 +1,4335 @@
+{
+  "surum": 1,
+  "taban": "https://venthub.com.tr",
+  "adresSayisi": 245,
+  "satirlar": [
+    {
+      "adres": "/",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/about",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/about",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/about",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/account",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/account",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/auth/login",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/auth/login",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/auth/login",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/bilgi-merkezi",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/brands",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/brands",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/cart",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/cart",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/cart",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/aksesuarlar",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/accessories/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/aksesuarlar",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/aksesuarlar/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/accessories/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/duman-egzoz-fanlari",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/smoke-exhaust-fans/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/duman-egzoz-fanlari",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/duman-egzoz-fanlari/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/smoke-exhaust-fans/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/endustriyel-havalandirma",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/industrial-ventilation/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/industrial-ventilation",
+      "zincir": [
+        308,
+        308,
+        307,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/endustriyel-havalandirma/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/industrial-ventilation/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/fanlar",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/fans/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/fanlar",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/fanlar/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/fans/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/flexible-hava-kanallari",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/flexible-air-ducts/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/flexible-air-ducts",
+      "zincir": [
+        308,
+        308,
+        307,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/flexible-hava-kanallari/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/flexible-air-ducts/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/hava-perdeleri",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/air-curtains/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/hava-perdeleri",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/hava-perdeleri/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/air-curtains/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/hava-temizleyiciler-anti-viral-urunler",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/air-purifiers/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/air-purifiers",
+      "zincir": [
+        308,
+        308,
+        307,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/hava-temizleyiciler-anti-viral-urunler/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/air-purifiers/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/hiz-kontrolu-cihazlari",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/speed-controllers/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/hiz-anahtarlari",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/hiz-kontrolu-cihazlari/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/speed-controllers/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/isi-geri-kazanim-cihazlari",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/heat-recovery-units/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/heat-recovery-units",
+      "zincir": [
+        308,
+        308,
+        307,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/isi-geri-kazanim-cihazlari/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/heat-recovery-units/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/konut-tipi-havalandirma",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/residential-ventilation/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/konut-tipi-havalandirma",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/konut-tipi-havalandirma/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/residential-ventilation/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/nem-alma-cihazlari",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/dehumidifiers/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/nem-alma-cihazlari",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/nem-alma-cihazlari/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/dehumidifiers/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/otopark-jet-fanlari",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/jet-fans/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/otopark-jet-fanlari",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/otopark-jet-fanlari/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/jet-fans/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/ticari-havalandirma",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/commercial-ventilation/",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 4,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/ticari-havalandirma",
+      "zincir": [
+        308,
+        308,
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/category/ticari-havalandirma/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/category/commercial-ventilation/ornek",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 3,
+      "sonDurum": 404,
+      "sonUrl": "/tr/category/ornek",
+      "zincir": [
+        308,
+        307,
+        308,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/checkout",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/checkout",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/checkout",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/contact",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/contact",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/contact",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/destek/hesaplayicilar",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/destek/hesaplayicilar",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 2,
+      "sonDurum": 200,
+      "sonUrl": "/tr/urun-secici",
+      "zincir": [
+        307,
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/destek/sss",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/destek/sss",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/sss",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/about",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/about",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/addresses",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/addresses",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/data-requests",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/data-requests",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/favorites",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/favorites",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/invoices",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/invoices",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/orders",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/orders",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/orders/detail",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/orders/detail",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/profile",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/profile",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/projects",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/projects",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/quotes",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/quotes",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/quotes/detail",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/quotes/detail",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/returns",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/returns",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/security",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/security",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/account/shipments",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/account/shipments",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/auth/callback",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/auth/callback",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/auth/forgot-password",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/auth/forgot-password",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/auth/login",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/auth/login",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/auth/register",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/auth/register",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/auth/reset-password",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/auth/reset-password",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/bilgi-merkezi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/bilgi-merkezi",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/bilgi-merkezi/frekans-konvertoru-nedir",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/bilgi-merkezi/frekans-konvertoru-nedir",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/bilgi-merkezi/hava-perdesi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/bilgi-merkezi/hava-perdesi",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/bilgi-merkezi/otopark-jet-fan",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/bilgi-merkezi/otopark-jet-fan",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/brands",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands/avens",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/brands/avens",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands/casals",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/brands",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/brands",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands/flexiva",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/brands",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/brands",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands/frekans-konvertoru",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/frequency-converters",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/frequency-converters",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands/seat",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/brands/seat",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/brands/vortice",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/brands/vortice",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/cart",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/cart",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/category/aksesuarlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/accessories",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/accessories",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/category/fanlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/fans",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/fans",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/category/fanlar/aksiyel-sanayi-fanlari",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/axial-industrial-fans",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/axial-industrial-fans",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/category/fanlar/radyal-fanlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/centrifugal-fans",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/centrifugal-fans",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/category/hava-perdeleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/air-curtains",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/air-curtains",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/category/kontrol-sistemleri/frekans-konvertorleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/frequency-converters",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/frequency-converters",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/checkout",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/checkout",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/contact",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/contact",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/garanti-servis",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/garanti-servis",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/hesaplayicilar",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/urun-secici",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/urun-secici",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/hesaplayicilar/hava-perdesi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/hesaplayicilar/hava-perdesi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/hesaplayicilar/hrv",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/hesaplayicilar/hrv",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/hesaplayicilar/jet-fan",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/hesaplayicilar/jet-fan",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/hesaplayicilar/kanal",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/hesaplayicilar/kanal",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/iade-degisim",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/iade-degisim",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/konular",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/urun-secici",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/urun-secici",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/konular/air-curtain",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/air-curtains",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/air-curtains",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/konular/hava-perdesi",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/air-curtains",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/air-curtains",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/konular/hrv",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/category/heat-recovery-vmc",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/category/heat-recovery-vmc",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/konular/jet-fan",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/destek/hesaplayicilar/jet-fan",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/hesaplayicilar/jet-fan",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/konular/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/urun-secici",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/urun-secici",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/merkez",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/urun-secici",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/urun-secici",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/sss",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/sss",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/destek/teslimat-kargo",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/destek/teslimat-kargo",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/hakkimizda",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/hakkimizda",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/iletisim",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/iletisim",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/kategori/aksesuarlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/kategori/aksesuarlar",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/kategori/fanlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/kategori/fanlar",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/kategori/kontrol-sistemleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/kategori/kontrol-sistemleri",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/kategori/kontrol-sistemleri/frekans-konvertorleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/kategori/kontrol-sistemleri/frekans-konvertorleri",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/knowledge-hub",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/knowledge-hub",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/knowledge-hub/air-curtain",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/knowledge-hub/air-curtain",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/knowledge-hub/car-park-jet-fan",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/knowledge-hub/car-park-jet-fan",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/knowledge-hub/frequency-converter-guide",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/knowledge-hub/frequency-converter-guide",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/legal/cerez-politikasi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/legal/cerez-politikasi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/legal/gizlilik-politikasi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/legal/gizlilik-politikasi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/legal/kullanim-kosullari",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/legal/kullanim-kosullari",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/legal/kvkk",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/legal/kvkk",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/legal/mesafeli-satis-sozlesmesi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/legal/mesafeli-satis-sozlesmesi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/legal/on-bilgilendirme-formu",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/legal/on-bilgilendirme-formu",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/markalar/avens",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/markalar/avens",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/markalar/seat",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/markalar/seat",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/markalar/vortice",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/markalar/vortice",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/olmayan-sayfa-matris",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/olmayan-sayfa-matris",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/payment-success",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/payment-success",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/products",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/avens-bvu-ls",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/avens-bvu-ls",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/avens-dikdortgen-kanal-radyal",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/avens-dikdortgen-kanal-radyal",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/avens-siginak-havalandirma-uniteleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/avens-siginak-havalandirma-uniteleri",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/nicotra-gebhardt-dd?sku=NIC-11921",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/nicotra-gebhardt-dd?sku=NIC-11921",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-ca-il-4020-es-rect-16076",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-ca-il-5035-es-rect-16077",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-ca-il-6040-es-rect-16078",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-ca-il-7050-es-rect-16079",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-ca-il-8060-es-rect-16080",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-lineo-100-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-lineo-125-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-lineo-150-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-lineo-200-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-lineo-250-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/products/vortice-lineo-315-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/en/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/en/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/urun-secici",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/en/urun-secici",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/urun/avens-bvu-ls",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/urun/avens-bvu-ls",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/urun/avens-dikdortgen-kanal-radyal",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/urun/avens-dikdortgen-kanal-radyal",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/urun/avens-siginak-havalandirma-uniteleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/urun/avens-siginak-havalandirma-uniteleri",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/en/urunler",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/en/urunler",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/hakkimizda",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/hakkimizda",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 404,
+      "sonUrl": "/tr/hakkimizda",
+      "zincir": [
+        307,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/iletisim",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/iletisim",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 404,
+      "sonUrl": "/tr/iletisim",
+      "zincir": [
+        307,
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/legal/kvkk",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/legal/kvkk",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/kvkk",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/products",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/products",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/robots.txt",
+      "tur": "dosya",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/robots.txt",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/sitemap.xml",
+      "tur": "dosya",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/sitemap.xml",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/about",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/about",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/addresses",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/addresses",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/data-requests",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/data-requests",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/favorites",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/favorites",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/invoices",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/invoices",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/orders",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/orders",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/orders/detail",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/orders/detail",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/profile",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/profile",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/projects",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/projects",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/quotes",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/quotes",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/quotes/detail",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/quotes/detail",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/returns",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/returns",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/security",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/security",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/account/shipments",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/account/shipments",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/auth/callback",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/auth/callback",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/auth/forgot-password",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/auth/forgot-password",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/auth/login",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/auth/login",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/auth/register",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/auth/register",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/auth/reset-password",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/auth/reset-password",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/bilgi-merkezi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi/frekans-konvertoru-nedir",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/bilgi-merkezi/hava-perdesi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/bilgi-merkezi/isi-geri-kazanim",
+      "tur": "eski",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/bilgi-merkezi/otopark-jet-fan",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands/avens",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands/avens",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands/casals",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/brands",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands/flexiva",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/brands",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands/frekans-konvertoru",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/category/frekans-konvertorleri",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/frekans-konvertorleri",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands/seat",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands/seat",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/brands/vortice",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/brands/vortice",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/cart",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/cart",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/category/aksesuarlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/aksesuarlar",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/category/fanlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/fanlar",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/category/fanlar/aksiyel-sanayi-fanlari",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/category/aksiyel-sanayi-fanlari",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/aksiyel-sanayi-fanlari",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/category/fanlar/radyal-fanlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/category/radyal-fanlar",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/radyal-fanlar",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/category/hava-perdeleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/hava-perdeleri",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/category/kontrol-sistemleri/frekans-konvertorleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/category/frekans-konvertorleri",
+        "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/category/frekans-konvertorleri",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/checkout",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/checkout",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/contact",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/contact",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/destek",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/garanti-servis",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/garanti-servis",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/hesaplayicilar",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/urun-secici",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/urun-secici",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/hesaplayicilar/hava-perdesi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/hesaplayicilar/hava-perdesi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/hesaplayicilar/hrv",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/hesaplayicilar/hrv",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/hesaplayicilar/jet-fan",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/hesaplayicilar/jet-fan",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/hesaplayicilar/kanal",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/hesaplayicilar/kanal",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/iade-degisim",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/iade-degisim",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/konular",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/konular/air-curtain",
+      "tur": "eski",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/konular/hava-perdesi",
+      "tur": "eski",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/konular/hrv",
+      "tur": "eski",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/konular/jet-fan",
+      "tur": "eski",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/konular/ornek",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/merkez",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/bilgi-merkezi",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/bilgi-merkezi",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/sss",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/sss",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/destek/teslimat-kargo",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/destek/teslimat-kargo",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/hakkimizda",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/hakkimizda",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/iletisim",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/iletisim",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/kategori/aksesuarlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/kategori/aksesuarlar",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/kategori/fanlar",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/kategori/fanlar",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/kategori/kontrol-sistemleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/kategori/kontrol-sistemleri",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/kategori/kontrol-sistemleri/frekans-konvertorleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/kategori/kontrol-sistemleri/frekans-konvertorleri",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/knowledge-hub",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/knowledge-hub",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/knowledge-hub/air-curtain",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/knowledge-hub/air-curtain",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/knowledge-hub/car-park-jet-fan",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/knowledge-hub/car-park-jet-fan",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/knowledge-hub/frequency-converter-guide",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/knowledge-hub/frequency-converter-guide",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/legal/cerez-politikasi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/cerez-politikasi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/legal/gizlilik-politikasi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/gizlilik-politikasi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/legal/kullanim-kosullari",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/kullanim-kosullari",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/legal/kvkk",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/kvkk",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/legal/mesafeli-satis-sozlesmesi",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/mesafeli-satis-sozlesmesi",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/legal/on-bilgilendirme-formu",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/legal/on-bilgilendirme-formu",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/markalar/avens",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/markalar/avens",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/markalar/seat",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/markalar/seat",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/markalar/vortice",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/markalar/vortice",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/olmayan-sayfa-matris",
+      "tur": "dilli-ek",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/olmayan-sayfa-matris",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/payment-success",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": "noindex, follow"
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/payment-success",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/avens-bvu-ls",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/avens-bvu-ls",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/avens-dikdortgen-kanal-radyal",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/avens-dikdortgen-kanal-radyal",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/avens-siginak-havalandirma-uniteleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/avens-siginak-havalandirma-uniteleri",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/dd-12-12-1500w-3f-4p-2v-6n090p-11921",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/nicotra-gebhardt-dd?sku=NIC-11921",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/nicotra-gebhardt-dd?sku=NIC-11921",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-ca-il-4020-es-rect-16076",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-4020-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-ca-il-5035-es-rect-16077",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-5035-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-ca-il-6040-es-rect-16078",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-6040-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-ca-il-7050-es-rect-16079",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-7050-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-ca-il-8060-es-rect-16080",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-vort-commercial-in-line-rectangular?sku=VRT-CA-IL-8060-ES-RECT",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-lineo-100-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-lineo-125-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-lineo-150-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-lineo-200-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-lineo-250-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/products/vortice-lineo-315-quiet",
+      "tur": "eski",
+      "ilk": {
+        "durum": 308,
+        "location": "/tr/products/vortice-lineo-quiet",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/products/vortice-lineo-quiet",
+      "zincir": [
+        308,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/urun-secici",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 200,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 200,
+      "sonUrl": "/tr/urun-secici",
+      "zincir": [
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/urun/avens-bvu-ls",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/urun/avens-bvu-ls",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/urun/avens-dikdortgen-kanal-radyal",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/urun/avens-dikdortgen-kanal-radyal",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/urun/avens-siginak-havalandirma-uniteleri",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/urun/avens-siginak-havalandirma-uniteleri",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/tr/urunler",
+      "tur": "sablon",
+      "ilk": {
+        "durum": 404,
+        "location": null,
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 0,
+      "sonDurum": 404,
+      "sonUrl": "/tr/urunler",
+      "zincir": [
+        404
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/urun-secici",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/urun-secici",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 200,
+      "sonUrl": "/tr/urun-secici",
+      "zincir": [
+        307,
+        200
+      ],
+      "hata": null
+    },
+    {
+      "adres": "/urunler",
+      "tur": "dilsiz",
+      "ilk": {
+        "durum": 307,
+        "location": "/tr/urunler",
+        "cacheControl": "public, max-age=0, must-revalidate",
+        "xRobotsTag": null
+      },
+      "hop": 1,
+      "sonDurum": 404,
+      "sonUrl": "/tr/urunler",
+      "zincir": [
+        307,
+        404
+      ],
+      "hata": null
+    }
+  ]
+}

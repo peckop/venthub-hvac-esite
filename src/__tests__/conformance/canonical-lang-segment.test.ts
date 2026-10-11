@@ -60,7 +60,10 @@ function kod(src: string): string {
  * kırmızı yakıyor — bu bekçiyi yazarken benim kendi kodumda yakaladı). Yani yardımcıyı
  * dil imzası saymazsak, doğru yazılmış kodu yanlış-KIRMIZI yakarız.
  */
-const DIL_PARCASI = /\$\{lang\}|\/tr[/`'"]|\/en[/`'"]|['"]tr['"]|['"]en['"]|\blocalizedHref\s*\(/
+// REC-300 3e-1: `sitemap.ts` adreslerini `yuzeyAdresleri` üzerinden kuran yerel yardımcılar (`dilYolu`,
+// `kategoriYolu`, `statikYol`) dil önekini KENDİ ekler; `localizedHref` ile aynı gerekçeyle kabul edilir.
+const DIL_PARCASI =
+  /\$\{lang\}|\/tr[/`'"]|\/en[/`'"]|['"]tr['"]|['"]en['"]|\blocalizedHref\s*\(|\b(?:dilYolu|kategoriYolu|statikYol)\s*\(/
 
 /**
  * Dosyadaki `const X = ...` atamalarını (satır sonuna kadar) topla.

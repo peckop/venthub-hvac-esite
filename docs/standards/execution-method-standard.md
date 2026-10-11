@@ -30,7 +30,7 @@
 | **maestro** (skill) | Çok dosyaya **aynı** yapısal değişikliği paralel dalgalarla uygulama + yargıç + merkezi kapı | Tek koşum, çok PR | YÜKSEK ama elle yapmaktan ucuz |
 | **agy-orchestrate** (skill) | Antigravity/Gemini filosuyla ucuz geniş tarama; Claude CodeGraph ile doğrular | Tek koşum | DÜŞÜK (Claude kotası yerine Gemini) |
 | **Tekil skill** (office-hours, plan-challenger, diff-review, code-review, qa, llm-council, task-observer, 20-eksen, prd-complexity, supabase-security…) | Paketlenmiş tek amaçlı prosedür | Tek koşum (task-observer: oturum boyu arka planda) | DÜŞÜK-ORTA |
-| **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Linear kaydına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
+| **Plan modu** (`EnterPlanMode`) | Kapsamı belirsiz işi ÖNCE ölçüp planlamak: paralel salt-okuma `Explore` ajanları + `AskUserQuestion` ile kapsam sorusu → plan | Tek koşum; plan Kanban kartına ve `docs/plans/`e kalır | DÜŞÜK-ORTA (ajanlar sonnet, yazma yok) |
 | **Elle** (oturumun kendisi) | Doğrudan okuma/düzenleme | — | En ucuz, en dar |
 
 ---
@@ -52,7 +52,7 @@
 | **Lansman öncesi / büyük katman değişti** | **venthub-20-eksen-denetimi** (karne) | Tek kusur avı | `docs/audits/` karne |
 | "Neyi silebiliriz, vizyona sadık mı" | **prd-complexity-audit** | Bug avı | `docs/audits/` |
 | RLS / politika / migration yazımı | **supabase-security** + plan-challenger | — | migration + INV |
-| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Linear kayıt gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Linear kaydı + `docs/plans/` |
+| **Çok-eksenli envanter + KAPSAM KARARI gerektiren tasarım/plan işi** ("neresi eksik, ne kadarını bu turda yapacağız") | **PLAN MODU:** `EnterPlanMode` → paralel salt-okuma `Explore` ajanları (**`model: 'sonnet'`**) + canlı ölçüm → `AskUserQuestion` ile kapsam sorusu **Recep'e** → plan Kanban kartı gövdesine + `docs/plans/` dosyası | Kapsam belliyse (tek eksen, tek soru) → şerit içinde elle · yazma gerektiren adımlar plan modunda KOŞULMAZ | Kanban kartı + `docs/plans/` |
 | Küçük **tek dosya**, tek PR, net iş | **Elle** (müdür modelinin tek istisnası, §10) | Tek dosyayı aşınca müdür modeli: böl, çalışana ver, denetle · **kapsam kararı gerekiyorsa PLAN MODU** (bu sınıf 2026-09-07'ye kadar yanlışlıkla "elle" sayılıyordu) | PR |
 
 **Seçim ilkesi:** önce *şekli* tanı (kaç dosya? salt-okuma mı yazım mı? yargı mı tarama mı? kaç gün?),
@@ -390,6 +390,11 @@ müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan
 2. **Planla:** işin şeklini ölç (kaç dosya, salt-okuma mı yazım mı) ve §2'den yöntemi seç; işe uyan skill'i
    `Skill` aracıyla çağır (hangi rol için hangisi: `SKILL_ATAMASI`); sapmayı yaz (§3).
 3. **Böl:** birbirinden bağımsız parçalara ayır; her parçaya **tek** çalışan türü ata (§10.3 tablo).
+   - Görev metnine kural, **proje kural metninden aynen kopyalanır; müdür yorum ya da genelleme eklemez.**
+     Vaka (ARAÇ deneyi 205, 2026-09-30; B referans kolu, hüküm dökümü yalnız ARAÇ'ın durum notunda): kör doğrulayıcı 41 hükümden 21'ini doğru, 9'unu yanlış,
+     11'ini sınırda buldu; 9 yanlışın 8'i tek kuraldandı (A/C kollarının liste dökümünden yeniden sayıldığında da K2 yanlışı 8) : görev metninde bağımlılık
+     enjeksiyonu kuralı "bileşen ve servis dosyasında" diye genişletilmişti, liderler harfiyen uyguladı. Kural yalnız `src/lib/services/**/*.ts` içindir
+     (`eslint.config.cjs`, `no-restricted-imports` bloğu; 2026-09-30 okundu). Hata modelde değil **aktarımdaydı**.
 4. **Denetle:** çalışan çıktısını kaynağına karşı örnekle: atıf gerçek mi, sayı komutla yeniden üretiliyor mu.
 5. **Bağımsız doğrulat:** işi yapmamış ayrı bir çalışana ver (§10.3); doğrulanmamış çıktı rapora girmez.
 6. **Raporla:** OPS'a ayrıntılı, Recep'e özet; ölçülmeyeni "ölçülmedi" yaz.
@@ -406,10 +411,78 @@ müdürün doğrudan çalışan açması da geçerlidir; küçük işte fazladan
 **Ajan tipi:** araştırmacı ve doğrulayıcı için salt-okuma `Explore` tipi yeterlidir. Kendi alt ajanını açması gereken
 ekip lideri `general-purpose` olmalıdır (araçları "*"); `Explore` ve `Plan` tipleri alt ajan açamaz.
 
+**Salt-okuma çalışan AD VERİLMEDEN açılır (karar 251 = EVET, 2026-10-03; ölçüm ARAÇ'ın, OPS aktardı, HARİTA yeniden koşmadı):**
+- Araştırmacı, çürütücü ve doğrulayıcı `Agent` aracıyla **`name` parametresi olmadan** açılır (örnek: `subagent_type: harita-curutucu`, ad yok). Sonuç doğrudan açana döner ve tanımdaki yazma yasağı gerçekten işler.
+- Yazan **uygulayıcı** ekip üyesi olarak (`name` ile) kalır; yazma yasağı ona zaten uygulanmaz.
+- Niçin: ekip üyesine (adlı çalışana) verilen yazma yasağı Claude'da işlemiyor (ARC-20).
+- **Ölçüm (ARAÇ ölçtü 10-03, OPS aktardı; HARİTA özet dosyasını okudu, deneyi yeniden koşmadı):** müdür → 5 adsız denetçi (paralel) → 1 adsız doğrulayıcı + 1 adlı uygulayıcı ekip üyesi; girdi 15 kusurlu dosya.
+
+  | Ölçüt | Sonuç |
+  |---|---|
+  | Kusur yakalama | 15/15 (toplam 47 bulgu; doğrulayıcı: 41 doğru, 6 sınırda, 0 yanlış) |
+  | Rapor kaybı | 0 (denetçi→müdür 5/5 rapor; müdür→üye→dosya 47→47) |
+  | Denetçi yazabildi mi | Hayır, 5/5. **Sınır:** üçünde `Write` aracı listede yoktu; ikisi `Bash` ile yazmayı talimat gereği denemedi (yasak araç düzeyinde 3/5 kanıtlı); dosya özeti (md5) önce/sonra aynı |
+  | Süre | ~4 dk (dünkü saf ekip 73 sn; dünkü ekip üyesi→Haiku işçi düzeni 238 sn ve 25/25 işçi raporu kayıp) |
+
+- **Bedel:** saf ekipten ~3 kat yavaş; karşılığında yazma kısıtı gerçekten işliyor ve rapor kaybolmuyor. Tek koşumdur, eğilim değil; yeniden ölçülürse bu satır güncellenir.
+
+**Çalışan tanımı kuralları (YTN-8 ölçümü, 2026-10-01; rapor `docs/audits/skill-calisan-yukleme-olcumu-2026-10-01.md`):**
+- **`ToolSearch`, tanımın `disallowedTools` alanına YAZILMAZ.** Ölçüldü: yazılınca Haiku çalışan hiç açılmadı (istek ~329 bin jeton, limit 200 bin, "Prompt is too long"; ertelenmiş araç listesi satır içine dökülüyor); aynı tanımla Sonnet açıldı ama ~330 bin jetonlu istekle. Mevcut tanımların hiçbirinde yok; üretici çıktısı `INV-AJAN-TANIM-1` mandalıyla (disk = üretici) ve yazmayan üç türde ToolSearch'ü arayan testle korunur (uygulayıcıya `disallowedTools` hiç yazılmadığı için orada test boş geçer).
+- **`skills:` ön yüklemesi yalnız `Agent` aracıyla açılan alt ajanda ölçüldü.** `claude --agent <ad>` ile açılan ANA oturumda ön yükleme çalışmadı (Haiku, tek koşu; Sonnet ölçülmedi; üretim yolu değil): ana oturumu bir çalışan tanımıyla açıp skill ön yüklemesine güvenme.
+
+**Model açıkça yazılır.** Kullanıcı ayarında `CLAUDE_CODE_SUBAGENT_MODEL` `sonnet` olarak tanımlıdır (kullanıcı ayar
+dosyası, 2026-10-01 okundu); `model` parametresi verilmeyen alt ajan **sessizce Sonnet'e** düşer. **Ölçüldü** (ARAÇ kontrol
+deneyi, HARİTA dökümü yeniden okudu, 2026-09-30): model parametresiz açılan yazıcı ajanın (a3ed24ff) döküm dosyasında
+`model` alanı yalnız `claude-sonnet-5-5`; `model: "haiku"` ile açılan çalışanların dökümlerinde yalnız
+`claude-haiku-4-5-20251001` (ilk 10 dosya okundu). Ajanın modelsiz açıldığı ARAÇ'ın beyanıdır; döküm bunu tek başına
+göstermez. Ajan tipinin kendi `model:` başlığı varsa (`denetim-opus`, `security-reviewer`: `opus`) o öncelikli olur (§5.4); başlıksız tipte ve `model` verilmeyen çağrıda Sonnet'e düşülür.
+Haiku (ya da Opus) istenen her `Agent` çağrısında `model` açıkça yazılır (§5.1 workflow betiği için aynı kuraldır: **bir seçim yapmamak da seçimdir**).
+
+#### Rol → model tablosu (karar 314, Recep 2026-10-08; ALT-45; kapı INV-AJAN-TANIM-1)
+
+| Tür | Dosyadaki `model:` | Gerekçe |
+|---|---|---|
+| **Araştırmacı** | `claude-haiku-5-5` | Salt-okuma, yargı vermez; çıktısını doğrulayıcı ve müdür yeniden ölçer (aşağıdaki sıra). OPS kartı (10-08): Haiku 5.5 fiyatı Sonnet 5.5'in ~1/20'si (100 bin jeton altı istem; üstünde ~1/4) ve AYNI haftalık havuzdan düşer. **Yalnız DAR okumada kullanılır** (aşağıdaki "Haiku araştırmacı şartı"). |
+| **Uygulayıcı** | `sonnet` | Dosya yazar, kapıları koşar; Haiku denenmedi. |
+| **Çürütücü** | `sonnet` | Kaçırdığı bulgu, hatalı kodun kontrolden geçmesi demektir; Haiku denenmedi. |
+| **Doğrulayıcı** | `sonnet` | Son halka. KALICI Sonnet (OPS, 10-08): asıl işi atıf ve sayıları yeniden ölçmektir; Haiku'nun sayı, dosya yolu ve sayfa numarasında uydurma yaptığı sahada görüldü (aşağıdaki "Doğrulayıcı Haiku denemesi" ve "Haiku araştırmacı şartı"). Çağrı başına `model` ile de Haiku verilmez. |
+
+- **Değişmeyenler:** `denetim-opus` ve `security-reviewer` `opus` KALIR; departman pencereleri (müdür) değişmez.
+- **Tek kaynak ve kayıt:** model YALNIZ `scripts/belge/ajan-tanimi-uret.cjs` içindeki `TUR_MODEL` sabitinde değişir (elle düzenleme yok); yeni bir departman bu üreticiden geçtiği için bu tabloya kendiliğinden uyar. Kapı `INV-AJAN-TANIM-1`: üretici sabiti = diskteki `model:` satırları = bu tablo; üçünden biri değişirse kırmızı.
+- **Departman pencere tanımları (HRT-49, OPS 10-10; pilot OPS-101):** müdür penceresi için `.claude/agents/<departman>-pencere.md` AYNI üreticiden çıkar (11 açık departman; kapalılar pencere açılınca listeye eklenir). `memory: user` taşır, model pencerenin bugünkü modelidir (OPS `claude-opus-5-5`, öteki on `claude-sonnet-5-5`; üretici sabitleri `PENCERE_MODEL`, `PENCERE_MODEL_VARSAYILAN`) ve araç kısıtı YOKTUR (müdür yazar). Pencere settings'teki `"agent": "<departman>-pencere"` ile açılır; settings'e geçişi bu üretici yapmaz (OPS yapar). Kapı: `INV-AJAN-TANIM-1` (disk = üretici çıktısı, öksüz yok, çalışan + pencere birlikte maliyet tavanı altında) ve `INV-HAZIR-OZELLIK-1` (her açık departmanın tanımı var, `memory: user`, model, araç kısıtı yok).
+- **Tam kimlik, takma ad değil:** `haiku` takma adı kayar (2026-09-30 ölçümünde `claude-haiku-4-5-20251001`, 2026-10-08'de `claude-haiku-5-5`); dosyaya tam kimlik yazılır.
+- **Doğrulayıcı Haiku denemesi (OPS, karar 314) — ÖLÇÜLDÜ 2026-10-08 (ALTYAPI); KARAR (OPS): doğrulayıcı KALICI Sonnet.** *Ayak 1, günlük okuma (yapıldı):* Haiku 5.5 (üç alt ajan dökümünde de yalnız `claude-haiku-5-5`), çağrıda `model: "haiku"` + `effort: "high"`; 3 bağımsız koşu (okuma sırası farklı) × 8 CI/test çıktısı = 24 hüküm. Çıktılar: 1 gerçek kırmızı günlük (CI koşusu 37628802492, shard 4/4) + 7 yazılmış çıktı (nokta raporlayıcıda tek gizli başarısız test, hepsi atlanmış, kesik günlük, testler geçtiği hâlde kapsama eşiği ihlaliyle süreç 1, iptal edilmiş iş, tsc hatası, stderr gürültülü ama yeşil). Gerçek hükümler cevaptan ÖNCE yazıldı (sha256 başı `dc682f23`). Hüküm kuralı ajan istemindeydi: YEŞİL = testler koştu ve hata yok; KIRMIZI = başarısız test, tip hatası, eşik ihlali, sıfırdan farklı çıkış, iptal; BELİRSİZ = kesik günlük ya da hiç test koşmamış. **Sonuç: 24/24 doğru; kırmızıya ya da belirsize "yeşil" diyen 0; yeşile "yeşil değil" diyen 0.** Sapma: bir koşuda iki satır ASCII yazım (`BELIRSIZ`); hükmü makineyle ayrıştıran kapı Türkçe harfsiz yazımı da tanımalıdır. Maliyet: koşu başı ≈210 bin jeton (alt ajan toplamı; dosyaları parça parça okuma ve ön yüklenen yetenekler dahil), 40-68 sn; haftalık kota göstergesi (tam puan, %77) oynamadı, etkisi ayrıştırılamadı. *Ayak 2, atıf ve sayı yeniden ölçümü (doğrulayıcının asıl işi) YAPILMADI:* OPS iptal etti, çünkü Katalog sahasında rapor veren beş Haiku araştırmacıdan ikisinin raporu yanlıştı (var olmayan bir sayısal tabloyu bildirdi, dosya yolu ve sayfa numarası uydurdu; Katalog betikle yeniden ölçtü; OPS aktarımı). Yani 24/24 YALNIZ günlük okumayı kapsar; doğrulayıcı rolünün kanıtı DEĞİLDİR ve model dosyada Sonnet kalır.
+- **Haiku araştırmacı şartı (OPS, 10-08; saha verisi: Katalog'da rapor veren 5 Haiku araştırmacıdan 2'sinin raporu yanlıştı):** Haiku araştırmacı dar okuma işinde kullanılır (verilen dosyaları oku, alan çıkar). Geniş tarama ile sayı, varlık, dosya yolu ve sayfa no hükmü betikle ya da kaynağa bakılarak doğrulanmadan rapora girmez; bütünü taramak gereken iş betikle yapılır. Bu şart §5.1'deki "Salt-okuma ölçüm / envanter / tarama → sonnet" satırını DEĞİŞTİRMEZ: geniş tarama Sonnet'te ya da betikte kalır; Haiku yalnız araştırmacı türünün DAR okumasıdır.
+- **Araştırmacı raporu hükme ikinci ölçümle girer (filo kuralı, OPS 10-09; Takip ve Katalog dersi):** Araştırmacının (özellikle Haiku'nun) raporu, ikinci bir ölçümden geçmeden hükme ya da karta girmez. Karta yazılacak sayı, yazar, varlık ve sebep iddiasını kartı açan müdür bir komutla bir kez yeniden ölçer (örnek: `gh pr view`, `ls`, `npm view`, kaynak dizininde `k.var_mi`); tutmayan iddia raporda "düzeltilen iddia" diye yazılır, sessizce silinmez. Bu madde yukarıdaki Haiku şartını değiştirmez, Haiku dışı araştırmacıyı da kapsayacak biçimde genişletir; doğrulayıcı zaten ikinci ölçümdür, ona uygulanmaz.
+  - **Niçin (sage kayıtlarının beyanı; HARİTA olayları yeniden koşmadı):** Katalog'da bir Haiku araştırmacı "sayısal P-Q tablosu, sayfa 280-340" bildirdi; kaynakta eğri yalnız grafikti ve dosyada o sayfalar yoktu (dosya yolu ve sayfa numarası uydurma), bir başka taramada "tablo boş" diyerek ölçmeden hüküm verdi (sage `01M4G22XX4VMYQABPFMG2M0FPW`). Takip'te emirdeki "iki mailbox dosyası" `ls` ile beş çıktı, bir alt ajan raporunun "envanter testi kırmızı olur" hükmünü bağımsız doğrulayıcı çürüttü, "giriş sorunu" sanılan bağlantı hatasının kök sebebi uv ortamında eksik modüldü (sage `01M4G0ZXBSYF86DGSY99ERP142`).
+
+**Ölçümler (2026-10-08, ALTYAPI; alt ajan döküm dosyasındaki `model` alanı ve `claude -p` çıktısındaki `modelUsage` okundu, beyan değil):**
+
+| Soru | Sonuç |
+|---|---|
+| Çağrıda `model: "haiku"` + kullanıcı ayarı `CLAUDE_CODE_SUBAGENT_MODEL=sonnet` + tanımda `model: sonnet` | Çağrı parametresi kazandı: dökümde yalnız `claude-haiku-5-5`. |
+| Taze süreçte (`claude -p`) tanım dosyasındaki `model: claude-haiku-5-5` (çağrıda model yok, ortam değişkeni `sonnet` duruyor) | Uygulandı: `modelUsage` = `claude-sonnet-5-5` (ebeveyn) + `claude-haiku-5-5` (araştırmacı). Claude Code belgesindeki sıra da bu: çağrı parametresi > tanımdaki `model` > `CLAUDE_CODE_SUBAGENT_MODEL` > ana oturum modeli. |
+| Haiku'ya geçen araştırmacı pencerenin effort ayarını alıyor mu | Evet: aynı görev (iki koşuda da doğru cevap 3/13), tanımda effort yok; ebeveyn `--effort low` iken Haiku düşünme jetonu 499, `--effort max` iken 8.084 (16 kat). n=1 koşu/seviye; düşünme jetonu effort'un vekilidir. Bu yüzden tanıma `effort` YAZILMAZ (OPS, karar 314 eki). |
+| Açık pencerede tanım dosyası diskte değişince sonraki çağrı yeni tanımı alıyor mu | Bu pencerede almadı: dosyaya `model: claude-haiku-5-5` ve gövdeye işaret satırı yazıldı, sonraki çağrı Sonnet'te koştu ve işareti görmedi. Claude Code belgesi `.claude/agents/` dizinini izlediğini ve yeniden başlatma gerekmediğini söylüyor (üç istisna: yeni açılan agents dizini, `--add-dir` ile eklenen dizin, `--disable-slash-commands`); çelişki ÇÖZÜLMEDİ (bu pencerenin tanımları ek dizinden gelmiş olabilir). Kural: yeni tanımın geçerli olduğundan emin olmak için pencere yeniden açılır. |
+| Maliyet göstergesi | CLI 2.1.288 Haiku 5.5 fiyat tablosunu taşımıyor (`costBasis: unknown`; belge Haiku 5.5 için v2.1.293+ diyor): `total_cost_usd` Haiku payında GÜVENİLMEZ (0,42 USD göründü, Sonnet ebeveyn 0,35). Gerçek kota etkisi ÖLÇÜLMEDİ. |
+
 **Sıra:** çalışan → müdür denetimi → bağımsız doğrulayıcı → müdür hükmü. Ekip liderli işte: çalışan → ekip liderinin
 denetimi → liderin çalıştırdığı bağımsız doğrulayıcı → lider özeti → müdür denetimi (özeti örnekler, kaynağa iner). **Bağımsızlık şartı:** doğrulayıcı
 üretenle aynı ajan değildir. Ölçüm yapılan işte soruları seçen ölçümü yapmaz, puanlayan cevap üretmez
 (kör puanlama). Mekanik okuma Sonnet'e, yargı ve sentez müdüre (§4, §5).
+
+**Ekip lideri çalışanlarını `run_in_background: false` ile TEK mesajda paralel açar.** Arka planda açılan çalışanların
+raporları müdürün bağlamına tekrar tekrar düşer (ARAÇ deneyi 205'te gözlendi). **Jeton maliyeti ÖLÇÜLMEDİ:** "yaklaşık
+30 bin" ARAÇ'ın kestirimidir, ölçüm olarak yazılmaz. Jeton ölçümleri **birime bağlıdır:** ürün liderinin (deney 205 B2) ARAÇ notundaki "132 bin"i dökümden yeniden toplanınca
+girdi + önbellek yazma + çıktı 110,8 bin, önbellek okuma dahil 426 bin çıkar (132 bin yeniden üretilemedi, birim belirsiz); A kolu (saf ekip) 0,68 M ve C kolu (karma) 1,03 M dökümün kullanım
+alanından toplandı (ARAÇ). Bir jeton sayısı birimsiz cetvele girmez.
+
+**İstisna: mutasyon doğrulayıcısı.** Doğrulayıcı "yazmaz" kuralının (yukarıdaki tabloda Doğrulayıcı "Hayır") tek istisnasıdır ve yalnız şu şartlarla: (1) **atılabilir
+worktree'de** üretim dosyasını geçici olarak değiştirir (testin gerçekten kırılıp kırılmadığını ölçmek için); (2) her
+mutasyondan sonra dosyanın **sha256** özetiyle geri alındığını doğrular; (3) **asla commit etmez**; (4) ana ağaçta,
+`migrations/` altında, `.sql` dosyalarında ve test dosyalarında **yasaktır**. **Ne mekanik zorlanır (okundu, `.claude/skills/mutasyon-testi/mutasyon-kosucu.cjs`):**
+bağlı worktree şartı (ana ağaç reddi), sha256 geri alma, `migrations/` ve `.sql` ve test dosyası reddi. **Zorlanmayan, beyan olan:** "atılabilir" (herhangi bir bağlı worktree kabul
+edilir) ve "asla commit etmez" (kodda yasak yok, yalnız commit çağrısı yok).
 
 **Vaka (2026-09-30, HARİTA):** beş araştırmacı beş yeni rol kartı taslağı yazdı. İşi yapmamış doğrulayıcı
 yaklaşık 55 iddiayı yeniden ölçtü ve **sekiz düzeltme kalemi** buldu: "30 fonksiyon" aslında 29 + `_shared`;
@@ -447,6 +520,19 @@ Claude Code sürümüyle değişebilir: bir sayıya dayanan iş, sayıyı önce 
 - **Ultracode ve 20 sınırı (belgede yazıyor, SINANMADI):** belgeye göre ultracode açıkken 20'lik sınır `Agent` aracıyla açılan alt ajanlara uygulanmaz; bu cümle ölçülmedi, ölçülene kadar ona güvenilmez. `ultracode` kelimesi yalnız o istem için ve yalnız insanın yazdığı istemde etkilidir (webhook, PR yorumu, `-p` ile gelende tetiklemez); `/effort ultracode` oturum boyunca, `ultracode` ayarı her oturumda açar.
 - **Workflow izni izin moduna göre değişir:** Auto modda yalnız İLK çalıştırmada sorar ve verilen herhangi bir "Yes" kullanıcı ayarına kalıcı yazılır (sonra sorulmaz); Manual ve accept-edits modunda her çalıştırmada sorar (kayıtlı workflow için "bir daha sorma" vardır); Bypass modunda ve `claude -p`/SDK'da sorulmaz (`Workflow` allow kuralı işler). Ultracode açıkken auto modda ilk onay da sorulmaz.
 - **Agent teams (ekip) AYRI KOŞUL:** deneysel ve varsayılan kapalı, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` gerekir; yalnız interaktif oturumda; oturumda tek ekip; **iç içe ekip yok** (üye ekip açamaz); üye sayısına sert sınır yok, öneri 3-5; üyeler liderin izin modunu miras alır (`dontAsk` hariç). Bu, alt ajan zincirinden (müdür → ekip lideri → çalışan) farklı bir mekanizmadır.
+- **Ekip özelliğinin (agent teams) lideri hangi yüzeyde kurulur (ölçüm, her biri TEK oturum; ARAÇ ekip deneyleri 2026-09-30 / 10-01).** Bu madde
+  yalnız **agent teams** mekanizmasını anlatır; müdür → ekip lideri (`general-purpose` alt ajan) → çalışan zinciri (§10.1) ayrı bir mekanizmadır ve bu ölçümlerle **sınanmadı**.
+  - **Etkileşimli terminal (`entrypoint=cli`, temiz ortamla açıldı): ekip kuruldu** — kullanıcı ayar dizinindeki `teams/` altında oturum klasörü ve `config.json`;
+    `Agent` + `name` ile açılan üye `in-process teammate` olarak kayıtlı (ekip deneyi 2, oturum 757ab120).
+  - **Claude Desktop (Code sekmesi, `entrypoint=claude-desktop`; `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` ortamda AÇIKTI; Desktop 2.16120.0, claude-code 2.1.284): ekip dizini
+    oluşmadı** — iki denemede `Agent` + `name` ile açılan üye düz alt ajan oldu, `config.json` yok; üyenin sistem isteminde `team-lead`/`teammate` yok (bu gözlem **birinci**
+    üyenin raporundandır; arka plan kolundaki ikinci üyenin raporu ölçüm sırasında gelmedi); hata metni yok, **sessizce** açılmadı. Dar okuma: Teammates paneli görülmedi, Recep teyit etmedi.
+  - **VS Code eklentisi:** **ölçülmedi.** Yalnız belgede (`agent-teams.md`) "`-p` ve SDK kipinde üye açılmaz" yazar. (Deney 205'in 68e95ce3 oturumu eklenti DEĞİL, terminalden
+    `Start-Process` ile açılmıştı; kabuktan miras kalan `CLAUDE_CODE_ENTRYPOINT=claude-vscode` etiketini taşıdığı için eklenti sanılmıştı; ekip deneyi 1'in (8b465648) yüzeyi de bilinmiyor.)
+  - **Teslim (terminal liderli ekip, deney 205):** A kolunda 5/5 **üye** raporunu teslim etti; C kolunda üyelerin kendi alt işçileri (3. katman, 25 Haiku) 25/25
+    "SubagentHandback ile rapor teslim etmeden bitti" (sebep bilinmiyor). Soru "kuruldu mu" değil **"sonuç lidere teslim edildi mi"**dir.
+  - Sonuç: ekip denenecekse lider **etkileşimli terminalde** açılır; departman pencerelerinde (Desktop ölçüldü: kurulmadı; eklenti ölçülmedi) varsayılan olarak denenmez; iç içe üçüncü katmanda
+    teslim güvenilmez.
 - ⚠**SINANMADI:** agent teams (ekip) üyelerinin "eşzamanlı 20" sınırına ayrı oturum olarak sayılıp sayılmadığı (yukarıdaki ölçüm ekip bayrağı kapalıyken yapıldı, belgede de yok).
 - **Bizim kuralımız (Recep: "sınır koymayız"):** bu sınırlara ilk takılışta ilgili ortam değişkeni artırılır; kota ya da varsayılan bahane edilip iş küçültülmez (§8: kapsamı kota daraltır, tamlık ölçütünü daraltmaz). Ayar değişikliği `.claude/settings.json` üzerinden yapılıyorsa OPS kapısıdır.
 

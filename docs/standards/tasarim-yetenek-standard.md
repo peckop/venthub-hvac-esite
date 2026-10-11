@@ -116,7 +116,7 @@ Tam liste + her satırın tekil gerekçesi: envanter §2. Kaldırma işlemi Rece
 1. **Kapsam:** kullanıcı kapsamı (`~/.claude/skills`) depoya girmez (repo PUBLIC, üçüncü taraf
    kod). Proje ağaçları iki tanedir (`.claude/skills` · `.agent/skills`) — kasıtlı, birleştirme
    önerilmez (CLAUDE.md doküman haritası).
-2. **Ekleme:** §1'deki üç sorudan geçen yetenek eklenir. Linear kaydında **KAYNAK** (depo URL +
+2. **Ekleme:** §1'deki üç sorudan geçen yetenek eklenir. Kanban kartında **KAYNAK** (depo URL +
    commit) yazılır; ilk okuma tablosu (ne yapar · bize ne için · hangi kuralla çakışıyor) zorunlu.
 3. **Çıkarma:** KALDIR kararı **Recep onayıyla** uygulanır; kaldırma komutu Recep'in terminalinde
    (`permissions.deny rm -rf` sınırı) ya da OPS'un `cmd /c rmdir` betiğiyle — önce silinecek liste,

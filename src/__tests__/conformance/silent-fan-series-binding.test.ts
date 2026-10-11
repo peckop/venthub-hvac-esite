@@ -70,23 +70,34 @@ function jsxProp(sf: ts.SourceFile, eleman: string, prop: string): ts.JsxAttribu
 describe('INV-SILENTFAN-SERI-1 — anlatı ve sihirbaz aynı SERİye bağlı', () => {
   const gorunum = ayrıştır(GORUNUM, ts.ScriptKind.TSX)
 
-  it('SABİT — seri kimliği tek bir yerde, dizgi değişmezi olarak yaşar', () => {
-    const sabit = degiskenBildirimi(gorunum, 'SESSIZ_FAN_SERISI')
-    expect(sabit, 'SESSIZ_FAN_SERISI sabiti bulunamadı').not.toBeNull()
-    const deger = sabit!.initializer
-    expect(deger && ts.isStringLiteral(deger), 'sabit bir dizgi değişmezi olmalı').toBe(true)
-    expect((deger as ts.StringLiteral).text).toBe('vortice-lineo-quiet')
+  it('SABİT — seri kimlikleri tek bir yerde, dizgi değişmezi dizisi olarak yaşar; yalnız YENİ slug var', () => {
+    const sabit = degiskenBildirimi(gorunum, 'SESSIZ_FAN_SERILERI')
+    expect(sabit, 'SESSIZ_FAN_SERILERI sabiti bulunamadı').not.toBeNull()
+    // `[...] as const` → AsExpression içindeki dizi değişmezi.
+    let dizi = sabit!.initializer
+    if (dizi && ts.isAsExpression(dizi)) dizi = dizi.expression
+    expect(dizi && ts.isArrayLiteralExpression(dizi), 'sabit bir dizgi dizisi olmalı').toBe(true)
+    const degerler = (dizi as ts.ArrayLiteralExpression).elements.map((e) => (ts.isStringLiteral(e) ? e.text : null))
+    // URN-53: #1352 canlıda ölçüldü, geçiş dönemindeki eski slug kaldırıldı. Yeni slug düşerse anlatı ve
+    // sihirbaz sessizce kalkar; eski slug geri gelirse bayat bir köprü yeniden doğar.
+    expect(degerler).toEqual(['vortice-lineo-quiet-sessiz-kanal-fanlari'])
   })
 
-  it('TETİKLEYİCİ — isSilentFan SERİ listesinden hesaplanır, kategori slugundan DEĞİL', () => {
-    const tetikleyici = degiskenBildirimi(gorunum, 'isSilentFan')
-    expect(tetikleyici, 'isSilentFan bildirimi bulunamadı').not.toBeNull()
-    const ifade = tetikleyici!.initializer!.getText(gorunum)
+  it('TETİKLEYİCİ — seri, SERİ listesinden hesaplanır, kategori slugundan DEĞİL', () => {
+    const seri = degiskenBildirimi(gorunum, 'sessizFanSerisi')
+    expect(seri, 'sessizFanSerisi bildirimi bulunamadı').not.toBeNull()
+    const ifade = seri!.initializer!.getText(gorunum)
 
-    // Pozitif kol: sabit gerçekten tetikleyicide kullanılıyor.
-    expect(ifade).toContain('SESSIZ_FAN_SERISI')
+    // Pozitif kol: sabit gerçekten seri çözümünde kullanılıyor, sayfadaki AİLE listesinden bakılıyor.
+    expect(ifade).toContain('SESSIZ_FAN_SERILERI')
+    expect(ifade).toContain('families')
     // Ayırt edici kol: eski (ölü) bağ geri gelirse kırmızı yanar.
     expect(ifade, 'tetikleyici kategori sluguna bağlanamaz').not.toContain('category.slug')
+
+    // isSilentFan, AYNI değerden türer — ayrı bir koşul olamaz.
+    const tetikleyici = degiskenBildirimi(gorunum, 'isSilentFan')
+    expect(tetikleyici, 'isSilentFan bildirimi bulunamadı').not.toBeNull()
+    expect(tetikleyici!.initializer!.getText(gorunum)).toContain('sessizFanSerisi')
   })
 
   it('TEK KAYNAK — sihirbaz, tetikleyicinin kullandığı AYNI sabitle beslenir', () => {
@@ -98,9 +109,9 @@ describe('INV-SILENTFAN-SERI-1 — anlatı ve sihirbaz aynı SERİye bağlı', (
     const ic = (deger as ts.JsxExpression).expression
     expect(ic && ts.isIdentifier(ic), 'familySlug gömülü dizgi değil SABİT almalı').toBe(true)
 
-    // ASIL KOL: sihirbaza giden ad ile tetikleyicinin okuduğu ad AYNI olmalı.
+    // ASIL KOL: sihirbaza giden değer ile tetikleyicinin okuduğu değer AYNI olmalı.
     // Ayrışırlarsa anlatı görünür, sihirbaz başka ürün önerir — ve hiçbir sayı bozulmaz.
-    expect((ic as ts.Identifier).text).toBe('SESSIZ_FAN_SERISI')
+    expect((ic as ts.Identifier).text).toBe('sessizFanSerisi')
   })
 
   it('SİHİRBAZ artık kategori prop\'u KABUL ETMEZ (eski bağ geri sızamaz)', () => {

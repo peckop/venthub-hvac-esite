@@ -48,7 +48,9 @@ TIP = {
     'smoke-exhaust-fans': ('duman egzoz fani', 'smoke exhaust fan', ['cap', 'debi'], []),
     'industrial-ceiling-fans': ('endustriyel tavan vantilatoru', 'industrial ceiling fan', ['cap', 'debi'], []),
     'chimney-fans': ('baca fani', 'chimney fan', ['cap', 'debi'], ['somine ve baca fani']),
-    'frequency-converters': ('frekans invertoru', 'frequency converter', ['guc_kw', 'gerilim', 'faz'], ['frekans konvertoru']),
+    # Recep kararı 325 (2026-10-08): "gerçeği konvertör ama piyasa inverter kullanıyor" → iki arama kelimesi
+    # tek adreste, asit fanı kuralıyla aynı sıra: dal adı önde, pazar kelimesi arkada. EN değişmedi.
+    'frequency-converters': ('frekans konvertoru inverter', 'frequency converter', ['guc_kw', 'gerilim', 'faz'], ['frekans konvertoru']),
     'speed-controllers': ('hiz anahtari', 'speed controller', [], ['hiz anahtari']),
     'ambient-air-curtains': ('isiticisiz hava perdesi', 'unheated air curtain', ['uzunluk'], []),  # EN dal adı 'Unheated Air Curtains' (Faz 1-B, 2026-09-23)
     'electric-heated-air-curtains': ('elektrikli isiticili hava perdesi', 'electric heated air curtain', ['uzunluk'], []),

@@ -48,6 +48,10 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
   }, [initialProducts])
 
   const activeProducts = productsByTab[activeTab]
+  // URN-57: odak paneli GÖRSELİ OLAN ilk ürünü gösterir. Eskiden listenin ilk ürünü görselsizse
+  // başka bir markanın fan fotoğrafı (yedek) çiziliyordu; hiçbirinde görsel yoksa panel görselsiz.
+  const odakUrun = activeProducts.find((p) => resolveProductImageUrl(p))
+  const odakGorsel = odakUrun ? normalizeImageUrl(resolveProductImageUrl(odakUrun)) : null
 
   return (
     <section className="relative py-24 lg:py-32 bg-white overflow-hidden content-auto-showcase">
@@ -155,34 +159,31 @@ const FeaturedCommercialBlocks: React.FC<FeaturedCommercialBlocksProps> = ({
                   {t('home.featuredCommercial.panelEyebrow')}
                 </div>
 
-                <div className="aspect-square relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 mb-8 p-8">
-                  <Image
-                    src={normalizeImageUrl(activeProducts[0] ? resolveProductImageUrl(activeProducts[0]) : null)}
-                    alt={activeProducts[0]?.name || "Product Focus"}
-                    fill
-                    sizes="300px"
-                    className="object-contain opacity-60 grayscale group-hover:grayscale-0 transition-transform duration-700 p-8"
-                  />
-                  <div className="absolute inset-0 border border-cyan-500/10 rounded-full animate-pulse" />
-                </div>
+                {odakUrun && odakGorsel && (
+                  <div className="aspect-square relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 mb-8 p-8">
+                    <Image
+                      src={odakGorsel}
+                      alt={odakUrun.name}
+                      fill
+                      sizes="300px"
+                      className="object-contain opacity-60 grayscale group-hover:grayscale-0 transition-transform duration-700 p-8"
+                    />
+                    <div className="absolute inset-0 border border-cyan-500/10 rounded-full animate-pulse" />
+                  </div>
+                )}
 
                 <h3 className="text-xl font-bold mb-4 tracking-tight">{t(`home.featuredCommercial.panelTitles.${activeTab}`)}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed mb-8 font-light italic">
                   {t(`home.featuredCommercial.panelDescriptions.${activeTab}`)}
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">{t('home.featuredCommercial.gradeLabel')}</div>
-                    <div className="text-xl font-black text-cyan-400">{t('home.featuredCommercial.gradeValue')}</div>
-                  </div>
-                  <div className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <div className="text-xs text-slate-500 uppercase mb-1 font-bold">{t('home.featuredCommercial.standardLabel')}</div>
-                    <div className="text-xl font-black text-white">{t('home.featuredCommercial.standardValue')}</div>
-                  </div>
-                </div>
+                {/* URN-57: sabit "Sınıf A++ / Standart ERP" rozeti KALDIRILDI. Canlı veritabanında
+                    (441 aktif ürün) technical_specs içinde enerji sınıfı/ERP anahtarı YOK ve hiçbir
+                    üründe "A++" geçmiyor: her panele aynı iddiayı basmak veriye dayanmıyordu.
+                    Ürün verisinde enerji sınıfı alanı (spec-axis-standard) açılırsa o değerle,
+                    yalnız o alanı olan üründe çizilir. */}
 
-                <Link 
+                <Link
                   href={Routes.products()}
                   className="flex items-center justify-center gap-3 w-full py-5 bg-white text-slate-950 font-black uppercase text-xs tracking-widest rounded-2xl transition-transform hover:bg-cyan-400 hover:scale-102 active:scale-95 shadow-xl"
                 >

@@ -218,7 +218,7 @@ const AirCurtainCalcPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.steps.dimensions')}</h2>
-                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
+                <p className="text-sm text-steel-gray">{t('calculators.airCurtain.steps.dimensionsDesc')}</p>
               </div>
             </div>
 

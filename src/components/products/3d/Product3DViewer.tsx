@@ -114,7 +114,7 @@ const Product3DViewer: React.FC<Product3DViewerProps> = ({
 
     const tb = isFullscreen
         ? { icon: 18, font: 'text-xs', pad: 'p-1.5', minW: 'min-w-40px', div: 'h-7', top: 'top-4' }
-        : { icon: 13, font: 'text-[6px]', pad: 'p-1', minW: 'min-w-28px', div: 'h-5', top: 'top-2' }
+        : { icon: 13, font: 'text-6px', pad: 'p-1', minW: 'min-w-28px', div: 'h-5', top: 'top-2' }
 
     const handleReset = useCallback(() => {
         setAutoRotate(false)

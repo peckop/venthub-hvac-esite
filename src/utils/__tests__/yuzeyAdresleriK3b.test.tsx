@@ -9,7 +9,21 @@
  */
 import { renderHook } from '@testing-library/react'
 import React from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { modellerdenVeri, yayindaVeriAyarla } from '../../config/__tests__/yayindaTestKiti'
+
+// URN-31: model adresi yalnız yayındaki listedeki SKU için üretilir; adres metni listeden (burada aile slug'ı,
+// eski beklentilerle aynı).
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+beforeEach(() =>
+  yayindaVeriAyarla(
+    modellerdenVeri([
+      ...['SEA-61143003', 'SEA-1'].map((sku) => ({ aile: 'storm-serisi', sku, tr: 'storm-serisi', en: 'storm-serisi' })),
+      { aile: 'vortice-hava-perdesi', sku: 'VRT-65195', tr: 'vortice-hava-perdesi', en: 'vortice-hava-perdesi' },
+    ]),
+  ),
+)
 
 // `EN_YAYIN: true`: hreflang yalnız EN yayındayken yazılır (REC-300 3e-3); bu dosya hreflang ADRESLERİNİ ölçer.
 vi.mock('@/config/features', async (asil) => ({ ...(await asil<typeof import('@/config/features')>()), ADRES_SEMASI_K3B: true, EN_YAYIN: true }))
@@ -54,53 +68,68 @@ describe('useLocalizedRoutes vekili — K3-b açık', () => {
     expect(r.products({ brand: 'Vortice' })).toBe('/tr/urunler?brand=Vortice')
     expect(r.product('storm-serisi')).toBe('/tr/urun/storm-serisi')
     expect(r.product('storm-serisi', 'SEA-61143003')).toBe('/tr/urun/storm-serisi-p-sea-61143003')
-    expect(r.category('fanlar', 'kanal-tipi-fanlar')).toBe('/tr/kategori/fanlar/kanal-tipi-fanlar')
+    // SEO-35 B-1: alt kategori TEK segment (üst slug'ı adrese girmez); kök adresi değişmedi.
+    expect(r.category('fanlar', 'kanal-tipi-fanlar')).toBe('/tr/kategori/kanal-tipi-fanlar')
     expect(r.category('fanlar')).toBe('/tr/kategori/fanlar')
     expect(r.brand('vortice')).toBe('/tr/markalar/vortice')
   })
 
-  it('EN: önekler aynı, dal iki seviyeli, model kendi adresinde', () => {
+  it('EN: önekler aynı, dal tek segment (B-1), model kendi adresinde', () => {
     const { result } = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('en') })
-    expect(result.current.category('fans', 'duct-fans')).toBe('/en/category/fans/duct-fans')
+    expect(result.current.category('fans', 'duct-fans')).toBe('/en/category/duct-fans')
     expect(result.current.product('storm-serisi', 'SEA-1')).toBe('/en/products/storm-serisi-p-sea-1')
     expect(result.current.brand('vortice')).toBe('/en/brands/vortice')
   })
 
-  it('vitrin nesnesi OLMAYAN rotalar değişmez (sepet, hesap, marka listesi)', () => {
+  it('vitrin nesnesi OLMAYAN rotalar değişmez (sepet, hesap)', () => {
     const { result } = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('tr') })
     expect(result.current.cart()).toBe('/tr/cart')
     expect(result.current.account.orders()).toBe('/tr/account/orders')
-    expect(result.current.brands()).toBe('/tr/brands')
+  })
+
+  // URN-85: marka LİSTESİ de açık şemanın parçası (Design CSV: TR `/tr/markalar`); EN yayın kapalıyken `/en/brands`
+  // aynen kalır (marka sayfaları `/en/brands/<slug>` zaten böyle).
+  it('marka LİSTESİ: TR `/tr/markalar`, EN `/en/brands`', () => {
+    const tr = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('tr') })
+    expect(tr.result.current.brands()).toBe('/tr/markalar')
+    const en = renderHook(() => useLocalizedRoutes(), { wrapper: sarici('en') })
+    expect(en.result.current.brands()).toBe('/en/brands')
   })
 })
 
 describe('Bilgi Merkezi iç bağlantı çözücüsü — K3-b açık (adresUret doğrudan)', () => {
   const k = sahteKaynak()
   it('aile, model (seçili model korunur), kategori, tüm ürünler', async () => {
-    expect(await icBaglantiCoz('vh:aile/danfoss-fc101', 'tr', k)).toBe('/tr/urun/danfoss-fc101')
+    expect(await icBaglantiCoz('vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'tr', k)).toBe('/tr/urun/danfoss-vlt-hvac-basic-drive-fc-101')
     expect(await icBaglantiCoz('vh:model/vrt-65195', 'tr', k)).toBe('/tr/urun/vortice-hava-perdesi-p-vrt-65195')
     expect(await icBaglantiCoz('vh:kategori/frequency-converters', 'tr', k)).toBe('/tr/kategori/frekans-konvertorleri')
-    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/fanlar/duman-egzoz-fanlari')
+    expect(await icBaglantiCoz('vh:kategori/smoke-exhaust-fans', 'tr', k)).toBe('/tr/kategori/duman-egzoz-fanlari')
     expect(await icBaglantiCoz('vh:sayfa/urunler', 'tr', k)).toBe('/tr/urunler')
     expect(await icBaglantiCoz('vh:marka/vortice', 'tr', k)).toBe('/tr/markalar/vortice')
   })
 
   it('EK ÖLÇÜM: frekans konvertörü yazısı — bugünkü href 3c eşleyicisinde yeni adrese TEK 308, hedef çözücüyle AYNI', async () => {
-    const aileler = ['danfoss-fc101', 'danfoss-fc102', 'danfoss-fc51']
+    // URN-53: yazı artık YENİ slug'ı anar; yazının eski href'leri (2026-09-27 ölçümü: /tr/products/danfoss-fc101 · fc102 · fc51)
+    // takma adla aynı aileye çözülür ve tek 308 ile yeni adrese gider.
+    const ciftler = [
+      ['danfoss-fc101', 'danfoss-vlt-hvac-basic-drive-fc-101'],
+      ['danfoss-fc102', 'danfoss-vlt-hvac-drive-fc-102'],
+      ['danfoss-fc51', 'danfoss-vlt-micro-drive-fc-51'],
+    ] as const
+    const aileler = ciftler.map(([, yeniSlug]) => yeniSlug)
     const harita: KiraciHaritasi = {
       urunSayisi: 35,
       aileler,
       modeller: {},
       eskiSkular: {},
       urunSluglari: {},
-      aileSluglari: Object.fromEntries(aileler.map((a, i) => [a, i])),
+      aileSluglari: Object.fromEntries(ciftler.flatMap(([eskiSlug, yeniSlug], i) => [[yeniSlug, i], [eskiSlug, i]])),
       kategoriler: [],
       kategoriSluglari: {},
     }
-    for (const aile of aileler) {
+    for (const [eskiSlug, aile] of ciftler) {
       const yeni = await icBaglantiCoz(`vh:aile/${aile}`, 'tr', k)
-      // Canlıdaki yazıda bugün yazılı olan href (ölçüldü 2026-09-27: /tr/products/danfoss-fc101 · fc102 · fc51, üçü 200).
-      const eski = `/tr/products/${aile}`
+      const eski = `/tr/products/${eskiSlug}`
       expect(eskiAdresEsle(harita, { yol: eski, sku: null, dilTespit: () => 'tr' })).toEqual({ hedef: yeni, durum: 308 })
     }
   })

@@ -11,6 +11,19 @@ export function getAbsoluteAssetUrl(path: string): string {
     return new URL(path, base).toString();
 }
 
+/**
+ * Föyün alt bilgisinde basılan alan adı (şemasız).
+ *
+ * NİÇİN `SITE_URL` DEĞİL: föy TARAYICIDA üretilir; `SITE_URL` `process.env` okur ve tarayıcıda env boştur
+ * (`NEXT_PUBLIC_SITE_URL` prod'da tanımsız), yani değer `http://localhost:3000`'a düşer. 2026-10-09'da canlı
+ * pakette ölçüldü: indirilen her föyün alt bilgisi "localhost:3000" basıyordu. Tarayıcıda gerçek adres zaten
+ * `window.location`'dır (`getAbsoluteAssetUrl` de aynısını yapar); `SITE_URL` yalnız sunucu tarafı yedeğidir.
+ */
+export function getPdfSiteHost(): string {
+    const host = typeof window !== 'undefined' && window.location ? window.location.host : '';
+    return host || SITE_URL.replace(/^https?:\/\//, '');
+}
+
 // Roboto font URLs from reliable local server (for runtime loading and CSP compliance)
 export const PDF_FONTS = {
     Roboto: {

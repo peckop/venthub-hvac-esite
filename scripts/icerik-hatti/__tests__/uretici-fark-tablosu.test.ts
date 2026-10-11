@@ -91,7 +91,7 @@ describe('üretici fark tablosu', () => {
     const veri = join(kok, 'rapor-urunler.json')
     writeFileSync(veri, JSON.stringify([
       { sku: 'AVE-NX313290', name: 'NIMAX 314 T2 1,5kW', brand: 'AVenS', family_slug: 'avens-nimax', deleted_at: null, technical_specs: {} },
-      { sku: 'AVE-1200', name: 'AVENS 40x20', brand: 'AVenS', family_slug: 'avens-dikdortgen-kanal-radyal', deleted_at: null, technical_specs: null },
+      { sku: 'AVE-1200', name: 'AVENS 40x20', brand: 'AVenS', family_slug: 'avens-dikdortgen-kanal-tipi-radyal-fanlar', deleted_at: null, technical_specs: null },
       { sku: 'VRT-1', name: 'Vortice Punto', brand: 'Vortice', family_slug: 'vortice-punto', deleted_at: null, technical_specs: null },
     ]))
     const dizin = yaz('rapor', [sayfa(CASALS, casalsMetni), sayfa(AVENS, '', avensTablo)])

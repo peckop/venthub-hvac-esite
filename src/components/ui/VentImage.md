@@ -70,21 +70,19 @@ Bu modül, görsel gösterimi ve yedek görsel mekanizması üzerine kurulu bir 
 
 ### VentImageProps
 - `src: string | null | undefined`
-- `fallbackType?: 'product' | 'category' | 'brand' | 'generic'`
+- `fallbackType?: 'product' | 'category' | 'brand' | 'generic'` — **@deprecated (URN-69)**: etkisi yok, yedek tektir
 
 ---
 
 ## SABİTLER
-- **FALLBACK_IMAGES** (object) — `{
-  product: '/images/placeholders/product-placeholder.png',
-  category: '/...`
+- Yedek sabiti bu dosyada yok: görsel yokken ya da yüklenemediğinde `YER_TUTUCU_GORSEL` (`@/utils/imageUtils`, ürün içermeyen nötr SVG) basılır; yer tutucuda alt metin `t('common.imagePreparing')`.
 
 ---
 
 ## AST POINTERS
 
 ### [N1_NASIL] AST Pointer: VentImage.tsx::VentImage
-- **params**: (src, alt, fallbackType = 'generic', className, ...props)
+- **params**: (src, alt, fallbackType (kullanılmaz), className, ...props)
 - **ic_degiskenler**: 
   - `error` — React state boolean, resim yükleneme durumunu takip eder
   - `isLoaded` — React state boolean, resmin başarıyla yüklenip yüklenmediğini takip eder

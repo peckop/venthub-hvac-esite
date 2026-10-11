@@ -54,8 +54,31 @@ describe('INV-BREADCRUMB-LD-1 — buildBreadcrumbJsonLd', () => {
       ],
     })
     const ogeler = ld.itemListElement as Array<Record<string, unknown>>
-    expect(ogeler[0].item).toBe('https://venthub.example/en/')
+    // REC-494: ana sayfa sonda eğik çizgisiz (`/en/` 308 verir, yapılandırılmış veri yönlendirilen
+    // adresi göstermemeli).
+    expect(ogeler[0].item).toBe('https://venthub.example/en')
     expect(ogeler[1].item).toBe('https://venthub.example/en/category/commercial-ventilation')
+  })
+
+  it('REC-494: hiçbir basamak adresi sonda eğik çizgiyle bitmez (ana sayfa dahil, dilli ya da dilsiz yol)', () => {
+    const ld = buildBreadcrumbJsonLd({
+      ...TEMEL,
+      steps: [
+        { name: 'Ana Sayfa', path: '/' },
+        { name: 'Ana Sayfa (dil önekli)', path: '/tr/' },
+        { name: 'Kategori', path: '/tr/category/fanlar' },
+        { name: 'Aile', path: null },
+      ],
+    })
+    const adresler = (ld.itemListElement as Array<Record<string, unknown>>)
+      .map((o) => o.item)
+      .filter((a): a is string => typeof a === 'string')
+    expect(adresler).toEqual([
+      'https://venthub.example/tr',
+      'https://venthub.example/tr',
+      'https://venthub.example/tr/category/fanlar',
+    ])
+    for (const a of adresler) expect(a.endsWith('/')).toBe(false)
   })
 
   it('bulunulan sayfaya (son basamak) `item` YAZMAZ — Breadcrumb.tsx ile aynı şekil', () => {

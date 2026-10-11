@@ -14,12 +14,13 @@
  *     `utm_*` gibi parametrelerin düşmesi bilinçli (plan §6 satır 9, v4 D2).
  *  5. Hedef adresler yeni şemayla `adresUret(…, dil, true)`'dan kurulur — şemanın tek kaynağı.
  *  6. Hedef, gelen yolun kendisiyse null (kanonik adres kendine yönlenmez; EN önekleri yeni şemada
- *     değişmediği için `/en/category/<kök>` ve `/en/products/<aile>` bu yoldan geçer).
+ *     değişmediği için `/en/category/<kök>`, `/en/category/<alt>` ve `/en/products/<aile>` bu yoldan geçer).
  *
  * Pasif kategori → aktif üst kategoriye; üstü de pasifse tüm ürünler (plan §5 Faz 3 m.5, v4 O4).
  * Model adresi biçimindeki yollar (`…-p-<sku>`) haritanın değil sayfa çözücüsünün işidir → null.
  */
-import { type AdresDili, type AdresNesnesi, adresUret, MODEL_AYIRICI } from '@/utils/adresUret'
+import { type AdresDili, type AdresNesnesi, adresUret, yonlendirmeNesnesi } from '@/utils/adresUret'
+import { modelSegmentiMi } from '@/utils/modelAdresBicimi'
 
 import type { KategoriHedefi, KiraciHaritasi } from './haritaTipi'
 
@@ -42,10 +43,15 @@ const KATEGORI_ONEKLERI = new Set(['category', 'kategori'])
 const URUN_ONEKLERI = new Set(['products', 'urun'])
 const TUM_URUNLER_ONEKLERI = new Set(['products', 'urunler'])
 
-/** Sondaki eğik çizgileri atar (kök `/` hariç). */
+/**
+ * Sondaki eğik çizgileri atar (kök `/` hariç). `replace(/\/+$/, '')` YERİNE doğrusal döngü: o desen çok sayıda
+ * ardışık `/` + başka karakter içeren yollarda ikinci dereceden yavaşlar (64.000 `/` ≈ 3 sn CPU) ve bu fonksiyon
+ * middleware'de İSTEK yolunda çalışır (ALT-15; aynı kusur OPS-52 PR-C2'de ölçülüp düzeltildi).
+ */
 function normalizeEt(yol: string): string {
-  const kirpilmis = yol.replace(/\/+$/, '')
-  return kirpilmis === '' ? '/' : kirpilmis
+  let son = yol.length
+  while (son > 0 && yol.charCodeAt(son - 1) === 47) son--
+  return son === 0 ? '/' : yol.slice(0, son)
 }
 
 /** Segmentleri çözer; bozuk yüzde kodlamada null (eşleşme yok — bugünkü akış karar versin). */
@@ -83,8 +89,10 @@ function kategoriNesnesi(harita: KiraciHaritasi, hedef: KategoriHedefi): (dil: A
 function kategoriCoz(harita: KiraciHaritasi, kuyruk: string[]): Cozum | null {
   const ilk = kuyruk[0] ? harita.kategoriSluglari[kuyruk[0]] : undefined
   if (!ilk) return null
-  // İki seviye: ikinci segment bilinen bir kategoriyse o kazanır — kök segmenti yanlış olsa bile
-  // (üst değişimi, v4 O6) dalın bugünkü köküne gidilir. Tanınmayan ikinci segment düşer (önek eşleşmesi).
+  // İki segmentli istek (bugünkü `/<dil>/category/<üst>/<alt>` ve 3-C'nin `/tr/kategori/<üst>/<alt>`'ı): ikinci
+  // segment bilinen bir kategoriyse o kazanır — üst segmenti yanlış olsa bile (üst değişimi, v4 O6) dalın kanonik
+  // adresine gidilir; hedef TEK segmenttir (SEO-35 B-1: `adresUret` dal verilince üst slug'ını adrese koymaz), yani
+  // iki sıçrama yok. Tanınmayan ikinci segment düşer (önek eşleşmesi).
   const ikinci = kuyruk[1] ? harita.kategoriSluglari[kuyruk[1]] : undefined
   const secilen = ikinci ?? ilk
   return {
@@ -98,16 +106,15 @@ function modelNesnesi(harita: KiraciHaritasi, sku: string): ((dil: AdresDili) =>
   if (!model) return null
   const aileSlug = harita.aileler[model.aile]
   if (aileSlug === undefined) return null
-  return (dil) => {
-    const slug = model.slug[dil]
-    // Model adres metni yoksa (Faz 2 verisi eksik) aile adresi: kırık model adresi üretilmez.
-    return slug ? { tur: 'model', aileSlug, sku, slug } : { tur: 'aile', slug: aileSlug }
-  }
+  // URN-31: liste İÇİ SKU → modelin adresi (metin yayındaki listeden); liste DIŞI SKU → AİLE adresi, SORGUSUZ
+  // (middleware `url.pathname = hedef` atar; hedefte `?` olursa `%3F` olur — bu yüzden `?sku=`'lu aile adresi
+  // üreten model nesnesi buradan ASLA çıkmaz, bkz. `yonlendirmeNesnesi`). Haritadaki `slug` alanı artık okunmaz.
+  return () => yonlendirmeNesnesi(aileSlug, sku)
 }
 
 function urunCoz(harita: KiraciHaritasi, segment: string, skuParametresi: string | null): Cozum | null {
   // `…-p-<sku>` yeni model adresidir; kanonikliğine (büyük harf, yanlış slug) sayfa çözücüsü karar verir.
-  if (segment.includes(MODEL_AYIRICI)) return null
+  if (modelSegmentiMi(segment)) return null
   if (skuParametresi) {
     const buyuk = skuParametresi.trim().toUpperCase()
     const sku = buyuk in harita.modeller ? buyuk : harita.eskiSkular[buyuk]

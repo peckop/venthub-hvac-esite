@@ -48,9 +48,9 @@ const DuctCalcPage: React.FC = () => {
   ], [t])
 
   const materialOptions = useMemo(() => [
-    { value: 'galvanized', label: t('calculators.duct.form.steel'), description: 'Standart' },
-    { value: 'pvc', label: t('calculators.duct.form.pvc'), description: 'Low Friction' },
-    { value: 'flex', label: t('calculators.duct.form.flex'), description: 'Flexible' }
+    { value: 'galvanized', label: t('calculators.duct.form.steel'), description: t('calculators.duct.form.steelDesc') },
+    { value: 'pvc', label: t('calculators.duct.form.pvc'), description: t('calculators.duct.form.pvcDesc') },
+    { value: 'flex', label: t('calculators.duct.form.flex'), description: t('calculators.duct.form.flexDesc') }
   ], [t])
 
   // Form state
@@ -113,8 +113,8 @@ const DuctCalcPage: React.FC = () => {
               <Wind className="text-primary-navy" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.form.inputSummary')}</h2>
-              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.form.applicationPurpose')}</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.duct.form.inputTitle')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.duct.form.inputDesc')}</p>
             </div>
           </div>
 
@@ -208,8 +208,8 @@ const DuctCalcPage: React.FC = () => {
               <Wind className="text-success-green" size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.airCurtain.results.title')}</h2>
-              <p className="text-sm text-steel-gray">{t('calculators.airCurtain.results.subtitle')}</p>
+              <h2 className="text-lg font-semibold text-industrial-gray">{t('calculators.duct.results.title')}</h2>
+              <p className="text-sm text-steel-gray">{t('calculators.duct.results.subtitle')}</p>
             </div>
           </div>
 

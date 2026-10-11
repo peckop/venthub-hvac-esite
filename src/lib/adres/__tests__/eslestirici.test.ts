@@ -1,5 +1,9 @@
-import { describe, expect, it, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { modellerdenVeri, yayindaVeriAyarla } from '@/config/__tests__/yayindaTestKiti'
 import { type AdresDili, adresUret } from '@/utils/adresUret'
 
 import { eskiAdresEsle } from '../eslestirici'
@@ -10,6 +14,13 @@ import { fiksturHaritasi, modelSlugluHarita } from './fikstur'
  * REC-300 Faz 3 m.4 — ESKİ ADRES EŞLEYİCİSİ (plan §4.1, §6). Her kuralın en az bir testi; kural
  * numaraları `eslestirici.ts` başlığındakilerle aynı.
  */
+// URN-31: model hedefi yalnız yayındaki listedeki SKU için üretilir (adres metni listeden; fikstürdeki Faz 2 metinleri).
+// Liste dışı SKU davranışı: eslestiriciYayinda.test.ts.
+vi.mock('@/config/yayindaModeller', async () => (await import('@/config/__tests__/yayindaTestKiti')).sahteYayindaModulu())
+const SEA = { aile: 'storm-serisi', sku: 'SEA-61143003', tr: 'storm-14-atex-cati-fani', en: 'storm-14-atex-roof-fan' }
+const VRT = { aile: 'vortice-vort-commercial-in-line-rectangular', sku: 'VRT-CA-IL-4020-ES-RECT', tr: 'vortice-ca-il-4020-kanal-fani', en: 'vortice-ca-il-4020-duct-fan' }
+beforeEach(() => yayindaVeriAyarla(modellerdenVeri([SEA])))
+
 const h = fiksturHaritasi()
 
 function esle(yol: string, sku: string | null = null, dil: AdresDili = 'tr', harita: KiraciHaritasi = h) {
@@ -22,16 +33,21 @@ describe('kural 1 — dil önekli eski adres → TEK 308', () => {
   it.each([
     ['/tr/category/fans', '/tr/kategori/fanlar'], // TR önekinde EN slug'lı eski adres
     ['/tr/category/fanlar', '/tr/kategori/fanlar'],
-    ['/tr/category/duct-fans', '/tr/kategori/fanlar/kanal-tipi-fanlar'], // tek seviyeli dal
-    ['/tr/category/kanal-tipi-fanlar', '/tr/kategori/fanlar/kanal-tipi-fanlar'],
-    ['/tr/category/fans/duct-fans', '/tr/kategori/fanlar/kanal-tipi-fanlar'], // iki seviye, EN biçim
-    ['/tr/category/kanal-fanlari', '/tr/kategori/fanlar/kanal-tipi-fanlar'], // takma ad (DB tetiği)
-    ['/en/category/duct-fans', '/en/category/fans/duct-fans'], // EN tek seviyeli dal (REC-205, Y4)
+    // SEO-35 B-1: kanonik adres TEK segment — dalın üst slug'ı adrese girmez, tek sıçrama.
+    ['/tr/category/duct-fans', '/tr/kategori/kanal-tipi-fanlar'], // tek seviyeli dal (bugünkü canlı kanonik)
+    ['/tr/category/kanal-tipi-fanlar', '/tr/kategori/kanal-tipi-fanlar'],
+    ['/tr/category/fans/duct-fans', '/tr/kategori/kanal-tipi-fanlar'], // (a) bugünkü canlı iç içe, EN biçim
+    ['/tr/category/fanlar/kanal-tipi-fanlar', '/tr/kategori/kanal-tipi-fanlar'], // (a) iç içe, TR biçim
+    ['/tr/kategori/fanlar/kanal-tipi-fanlar', '/tr/kategori/kanal-tipi-fanlar'], // (a) 3-C'nin iki seviyeli adresi
+    ['/tr/kategori/duct-fans', '/tr/kategori/kanal-tipi-fanlar'], // yeni önekte EN biçimli slug
+    ['/tr/category/kanal-fanlari', '/tr/kategori/kanal-tipi-fanlar'], // takma ad (DB tetiği)
+    ['/en/category/fans/duct-fans', '/en/category/duct-fans'], // (a) EN iç içe → tek segmentli kanonik
+    ['/en/category/kanal-tipi-fanlar', '/en/category/duct-fans'], // EN önekinde TR biçimli dal
     ['/en/category/fanlar', '/en/category/fans'], // EN önekinde TR slug
     ['/tr/products/storm-serisi', '/tr/urun/storm-serisi'], // aile, eski önek
     ['/en/products/seat-storm', '/en/products/storm-serisi'], // eski aile slug'ı (takma ad)
-    ['/tr/products/vortice-lineo-100-quiet', '/tr/urun/vortice-lineo-quiet'], // tohum: Lineo çap
-    ['/en/products/vortice-lineo-315-quiet', '/en/products/vortice-lineo-quiet'],
+    ['/tr/products/vortice-lineo-100-quiet', '/tr/urun/vortice-lineo-quiet-sessiz-kanal-fanlari'], // tohum: Lineo çap (URN-53: yeni slug)
+    ['/en/products/vortice-lineo-315-quiet', '/en/products/vortice-lineo-quiet-sessiz-kanal-fanlari'],
     ['/tr/products/vortice-ca-il-4020-es-rect-16076', '/tr/urun/vortice-vort-commercial-in-line-rectangular'], // tohum/takma: ürün
     ['/tr/products/vorticent-cms-atex-35-14-t4-4kw-253490106xn', '/tr/urun/vortice-vorticent-cms-atex'], // config'te satırı YOK, takma adda var
     ['/tr/products', '/tr/urunler'],
@@ -42,8 +58,23 @@ describe('kural 1 — dil önekli eski adres → TEK 308', () => {
     expect(dilTespit).not.toHaveBeenCalled()
   })
 
-  it('üst değişimi (O6): kök segmenti yanlış iki seviyeli adres dalın bugünkü köküne gider', () => {
-    expect(esle('/tr/category/air-curtains/duct-fans').sonuc?.hedef).toBe('/tr/kategori/fanlar/kanal-tipi-fanlar')
+  it('üst değişimi (O6): üst segmenti yanlış iki seviyeli adres dalın kanonik tek segmentli adresine gider', () => {
+    expect(esle('/tr/category/air-curtains/duct-fans').sonuc?.hedef).toBe('/tr/kategori/kanal-tipi-fanlar')
+    expect(esle('/tr/kategori/hava-perdeleri/kanal-tipi-fanlar').sonuc?.hedef).toBe('/tr/kategori/kanal-tipi-fanlar')
+    expect(esle('/en/category/air-curtains/duct-fans').sonuc?.hedef).toBe('/en/category/duct-fans')
+  })
+
+  it('(a) iç içe adres TEK sıçramada biter: hedef tek segment ve yeniden eşleşmez (ikinci hop yok)', () => {
+    for (const yol of [
+      '/tr/category/fanlar/kanal-tipi-fanlar',
+      '/tr/kategori/fanlar/kanal-tipi-fanlar',
+      '/en/category/fans/duct-fans',
+    ]) {
+      const hedef = esle(yol).sonuc?.hedef
+      expect(hedef, yol).toBeDefined()
+      expect(hedef!.split('/').filter(Boolean), `${yol} → ${hedef} tek segmentli değil`).toHaveLength(3)
+      expect(esle(hedef!).sonuc, `${yol} → ${hedef} yeniden eşleşiyor (ikinci sıçrama)`).toBeNull()
+    }
   })
 
   it('pasif kategori (O4): aktif üst köke; üstü de pasifse tüm ürünler', () => {
@@ -67,7 +98,7 @@ describe('kural 2 — dilsiz eski adres → TEK 307 (dil tespiti); Türkçe slug
 
   it.each([
     ['/category/hava-temizleyiciler-anti-viral-urunler', '/tr/urunler'], // tohum: ölü hedef → tüm ürünler
-    ['/category/hiz-kontrolu-cihazlari', '/tr/kategori/kontrol-sistemleri/hiz-anahtarlari'], // tohum: DB'de hiç olmamış slug
+    ['/category/hiz-kontrolu-cihazlari', '/tr/kategori/hiz-anahtarlari'], // tohum: DB'de hiç olmamış slug
     ['/category/isi-geri-kazanim-cihazlari', '/tr/kategori/isi-geri-kazanim'], // tohum: 404 hedef → en yakın canlı kök
     ['/category/ticari-havalandirma', '/tr/urunler'], // pasif kök
     ['/category/otopark-jet-fanlari', '/tr/kategori/fanlar'], // pasif dal
@@ -91,9 +122,9 @@ describe('kural 2 — dilsiz eski adres → TEK 307 (dil tespiti); Türkçe slug
 })
 
 describe('kural 3 — segment öneki + sondaki eğik çizgi', () => {
-  it('dilsiz :path* karşılığı: /category/fanlar/<dal> tek hop\'ta iki seviyeli yeni adrese', () => {
+  it('dilsiz :path* karşılığı: /category/fanlar/<dal> tek hop\'ta tek segmentli yeni adrese (B-1)', () => {
     expect(esle('/category/fanlar/duct-fans', null, 'en').sonuc).toEqual({
-      hedef: '/tr/kategori/fanlar/kanal-tipi-fanlar',
+      hedef: '/tr/kategori/kanal-tipi-fanlar',
       durum: 308,
     })
   })
@@ -131,6 +162,7 @@ describe('kural 4 — ?sku= ayrıştırılır, hedefte query YOK', () => {
   })
 
   it('eski ürün slug\'ı → model kanoniği', () => {
+    yayindaVeriAyarla(modellerdenVeri([SEA, VRT]))
     expect(esle('/en/products/vortice-ca-il-4020-es-rect-16076', null, 'tr', m).sonuc?.hedef).toBe(
       '/en/products/vortice-ca-il-4020-duct-fan-p-vrt-ca-il-4020-es-rect'
     )
@@ -141,7 +173,8 @@ describe('kural 4 — ?sku= ayrıştırılır, hedefte query YOK', () => {
     expect(esle('/en/products/storm-serisi', 'YOK-1').sonuc).toBeNull()
   })
 
-  it('model adres metni yokken (Faz 2 öncesi) EN kanonik aile + ?sku= kendine yönlenmez (model seçimi düşmesin)', () => {
+  it('SKU yayında değilken (liste dışı / boş liste) EN kanonik aile + ?sku= kendine yönlenmez (model seçimi düşmesin)', () => {
+    yayindaVeriAyarla({ modeller: {}, surumler: {} })
     expect(esle('/en/products/storm-serisi', 'SEA-61143003').sonuc).toBeNull()
   })
 
@@ -166,7 +199,7 @@ describe('kural 5 — hedefler yeni şemadan (adresUret(…, dil, true))', () =>
     )
     expect(esle('/tr/products/storm-serisi').sonuc?.hedef).toBe(adresUret({ tur: 'aile', slug: 'storm-serisi' }, 'tr', true))
     expect(esle('/tr/products/storm-serisi', 'SEA-61143003', 'tr', m).sonuc?.hedef).toBe(
-      adresUret({ tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003', slug: 'storm-14-atex-cati-fani' }, 'tr', true)
+      adresUret({ tur: 'model', aileSlug: 'storm-serisi', sku: 'SEA-61143003' }, 'tr', true)
     )
   })
 })
@@ -174,9 +207,9 @@ describe('kural 5 — hedefler yeni şemadan (adresUret(…, dil, true))', () =>
 describe('kural 6 — kanonik adres ve tanınmayan yol → null', () => {
   it.each([
     '/en/category/fans',
-    '/en/category/fans/duct-fans',
+    '/en/category/duct-fans', // B-1: alt kategori de tek segment kanonik
     '/tr/kategori/fanlar',
-    '/tr/kategori/fanlar/kanal-tipi-fanlar',
+    '/tr/kategori/kanal-tipi-fanlar',
     '/en/products/storm-serisi',
     '/tr/urun/storm-serisi',
     '/tr/urunler',
@@ -198,5 +231,34 @@ describe('kural 6 — kanonik adres ve tanınmayan yol → null', () => {
 
   it('kiracının haritası yoksa null (tahmin yürütülmez)', () => {
     expect(eskiAdresEsle(undefined, { yol: '/tr/category/fans', sku: null, dilTespit: () => 'tr' })).toBeNull()
+  })
+})
+
+describe('istek yolu işleme — ikinci dereceden yavaşlama (ReDoS) yok (ALT-15)', () => {
+  // normalizeEt middleware'de İSTEK yolunda çalışır. Eski `replace(/\/+$/, '')` 64.000 ardışık `/` + harfte
+  // ≈ 3 sn CPU yiyordu (kare büyüme); doğrusal döngü ≈ 0.
+  it('kaynakta sondaki-eğik-çizgi kırpan düzenli ifade YOK (yorumlar hariç)', () => {
+    const kaynak = readFileSync(join(process.cwd(), 'src', 'lib', 'adres', 'eslestirici.ts'), 'utf8')
+    const kod = kaynak
+      .split('\n')
+      .filter((satir) => !/^\s*(\/\/|\/\*|\*)/.test(satir))
+      .join('\n')
+    expect(kod.includes('replace(/\\/+$/')).toBe(false)
+  })
+
+  it('64.000 ardışık `/` + harf: eskiAdresEsle 250 ms altında', () => {
+    const kotu = `${'/'.repeat(64_000)}x`
+    const t0 = performance.now()
+    expect(esle(kotu).sonuc).toBeNull()
+    expect(performance.now() - t0).toBeLessThan(250)
+  })
+
+  it('kırpma davranışı eskisiyle aynı: sondaki bir ya da çok `/` aynı sonucu verir, yalnız `/` eşleşmez', () => {
+    const referans = esle('/tr/category/fans').sonuc
+    expect(referans).not.toBeNull()
+    for (const yol of ['/tr/category/fans/', '/tr/category/fans///']) {
+      expect(esle(yol).sonuc).toEqual(referans)
+    }
+    for (const yol of ['/', '//', '///']) expect(esle(yol).sonuc).toBeNull()
   })
 })

@@ -28,8 +28,21 @@ export type YaziKonusu = 'konfor' | 'guvenlik' | 'verimlilik'
 export interface YaziMetni {
   /** Adres metni (o dilde). */
   slug: string
-  /** Liste kartı ve meta açıklaması. Gövdenin ilk paragrafıyla aynı cevap, tek cümle. */
+  /**
+   * META AÇIKLAMASI: `<meta name="description">`, `og:description` ve `Article` JSON-LD `description`.
+   * Gövdenin ilk paragrafıyla aynı cevap, tek cümle. Hiçbir kartta BASILMAZ (`kartOzeti`).
+   */
   ozet: string
+  /**
+   * KART METNİ — her kart yüzeyi bunu basar: liste kartı ve araması (BilgiMerkeziListe, BilgiMerkeziArama),
+   * ana sayfa Bilgi bloğu (KnowledgeBlock), kategori ve aile sayfasının "ilgili rehberler" kartları
+   * (tersDizin.ts → IlgiliRehberler) ve yazı altı "ilgili yazılar" (sayfa.ts → RehberYazisiSayfasi).
+   * ZORUNLU ve `ozet`ten FARKLI olmalıdır: kart ile meta açıklaması aynı alandan geliyordu ve tam başlık
+   * aramasında yazı yerine liste sayfası görünüyordu (SEO-30). Yazının KENDİ metninden yazılır; gövdede
+   * olmayan sayı, marka ya da iddia eklenmez. Kapılar: src/lib/bilgiMerkezi/__tests__/kartOzeti.test.tsx
+   * ve kartOzetiYuzeyler.test.tsx.
+   */
+  kartOzeti: string
   /** Markdown; tek `# ` başlık (H1) ile başlar. */
   govde: string
 }
@@ -55,12 +68,18 @@ export const YAZILAR: readonly RehberYazisi[] = [
     kimlik: 'frekans-konvertoru',
     konu: 'verimlilik',
     yayinTarihi: '2026-09-25',
-    guncellemeTarihi: '2026-09-25',
-    urunler: ['vh:aile/danfoss-fc101', 'vh:aile/danfoss-fc102', 'vh:aile/danfoss-fc51'],
+    // Güncelleme tarihi 2026-10-10: karar OPS'ta, 10 Ekim 2026. Liste kartı ve yazı künyesi "Güncelleme" olarak
+    // basar; site haritası lastmod'u ve Article `dateModified` buradan. Önceki değer 2026-10-08: gövdenin son
+    // değişikliği, #1755 ("Fiyatı belirleyen etkenler" giriş cümlesi); ondan önce 2026-10-06, #1733.
+    guncellemeTarihi: '2026-10-10',
+    urunler: ['vh:aile/danfoss-vlt-hvac-basic-drive-fc-101', 'vh:aile/danfoss-vlt-hvac-drive-fc-102', 'vh:aile/danfoss-vlt-micro-drive-fc-51'],
     diller: {
       tr: {
         slug: 'frekans-konvertoru-nedir',
         ozet: 'Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır.',
+        // Kart metni yazının kendi bölüm başlıklarından ve seçim ölçütlerinden derlenir: yeni iddia, sayı ya da marka yok.
+        kartOzeti:
+          'Frekans konvertörünün nasıl çalıştığı, fan ve pompada neden kullanıldığı ve seçimde bakılacak ölçütler: besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği.',
         govde: `# Frekans konvertörü nedir, fan ve pompada nasıl seçilir?
 
 Frekans konvertörü, motora uyguladığı gerilimi ve frekansı değiştirerek motorun hızını ayarlayan elektronik bir kontrol cihazıdır [1]. Fan ve pompada hız biraz düşürüldüğünde enerji tüketimi belirgin biçimde azalır: üretici belgesindeki örnekte hızı %20 azaltmak elektrik tüketimini %50 azaltır [2]. Doğru cihaz; besleme gerilimi, güç aralığı, koruma sınıfı, çalışma ortamı ve uygulamanın tork karakteristiği birlikte değerlendirilerek seçilir [1][2].
@@ -71,15 +90,15 @@ Frekans konvertörü, motor hızını değiştirebilen ya da yükteki değişime
 
 ## Nasıl çalışır?
 
-Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre, evirici ve kontrol birimi [1].
+Bir frekans konvertörü dört ana bölümden oluşur: doğrultucu, DC ara devre, invertör (İngilizcesi inverter) ve kontrol birimi [1].
 
 | Bölüm | Görevi |
 |---|---|
 | Doğrultucu | Şebekedeki 3 fazlı AC gerilimi diyot ya da SCR'larla darbeli DC gerilime çevirir [1] |
 | DC ara devre | Endüktör ve kapasitörlerle bu gerilimi dengeler [1] |
-| Evirici | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
+| İnvertör | IGBT'lerle DC gerilimi, gerilimi ve frekansı değişken AC'ye çevirir [1] |
 
-Evirici, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
+İnvertör, motora giden dalgayı kısa elektriksel darbelerle oluşturur; bu darbelerin tekrarlanma hızına anahtarlama frekansı denir [1]. Anahtarlama frekansı bir dengedir: düşük tutulursa motorda duyulabilir ses oluşur, yüksek tutulursa sürücüde ısı artar [1]. Örneğin Danfoss FC 51'de bu değer 2, 4, 8 ya da 16 kHz olarak seçilebilir ve fabrika ayarı 4 kHz'dir [5].
 
 Hızı ayarlamanın temel yolu gerilimi ve frekansı birlikte değiştirmektir (V/Hz kontrolü); sürücü düşük hızlarda da tam tork verebilmek için bu oranı bir eğriye göre ayarlar [1]. Danfoss'un gerilim vektör kontrolü (VVC+), standart V/Hz kontrolüne göre hız ayarı ve yük torku değiştiğinde daha iyi dinamik tepki ve kararlılık sağlar [2][4].
 
@@ -119,7 +138,7 @@ Büyük motorlarda kalkış akımını sınırlamak için geleneksel olarak yıl
 | Koruma sınıfı | IP20; kitle IP21 [5] | IP20, IP54; kitle IP21 [3] | Modele göre; ürün sayfasına bakınız |
 | Öne çıkan işlevler | Dahili süreç PI kontrolü, otomatik enerji optimizasyonu [6] | Uyku modu, yangın modu [3] | Yerleşik PID kontrolü, pompa kademeleme [1] |
 
-Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-fc51), [FC 101](vh:aile/danfoss-fc101) ve [FC 102](vh:aile/danfoss-fc102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
+Bu üç ailenin modellerini [FC 51](vh:aile/danfoss-vlt-micro-drive-fc-51), [FC 101](vh:aile/danfoss-vlt-hvac-basic-drive-fc-101) ve [FC 102](vh:aile/danfoss-vlt-hvac-drive-fc-102) sayfalarında, tüm cihazları [frekans konvertörleri](vh:kategori/frequency-converters) kategorisinde inceleyebilirsiniz.
 
 ## HVAC'a özel işlevler
 
@@ -156,7 +175,7 @@ Türkiye'de elektrik motorları ve değişken hız sürücüleri için çevreye 
 
 ## Fiyatı belirleyen etkenler
 
-Bu yazıda fiyat verilmez; güncel fiyat ürün sayfasında görünür. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
+Bu yazıda fiyat verilmez; güncel fiyat ve stok bilgisi için ürün sayfasından teklif isteyin. İki teklif ancak aşağıdaki seçimler aynıysa karşılaştırılabilir, çünkü her biri teklif edilen cihazı ya da kurulumu değiştirir.
 
 - **Güç ve giriş gerilimi.** Aynı aile içinde modeli güç ve gerilim sınıfı belirler; örneğin FC 101 0,25 kW ile 90 kW arasında, üç fazlı 200–240 V, 380–480 V ve 525–600 V girişle üretilir [2].
 - **Koruma sınıfı ve kitler.** FC 101 IP20 ya da IP54 gövdeyle sunulur; IP21 isteğe bağlı bir kitle sağlanır [3].
@@ -175,9 +194,9 @@ Bu yazıda fiyat verilmez; güncel fiyat ürün sayfasında görünür. İki tek
 
 ## Sık sorulan sorular
 
-### Frekans konvertörü ile inverter aynı şey mi?
+### Frekans konvertörü ile invertör aynı şey mi?
 
-Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. Evirici (inverter) ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
+Frekans konvertörü, elektronik değişken hız sürücülerinin en yaygın biçimidir [7]. İnvertör ise cihazın içinde DC gerilimi değişken AC'ye çeviren bölümün adıdır [1].
 
 ### Frekans konvertörü ne kadar enerji tasarrufu sağlar?
 
